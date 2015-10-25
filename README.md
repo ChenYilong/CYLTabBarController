@@ -7,6 +7,16 @@
 
 </a>
 
+## 导航
+ 1.  [与其他自定义TabBarController的区别](https://github.com/ChenYilong/CYLTabBarController#与其他自定义tabbarcontroller的区别) 
+ 2.  [集成后的效果](https://github.com/ChenYilong/CYLTabBarController#集成后的效果) 
+ 3.  [使用CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#使用cyltabbarcontroller) 
+  1.  [ 第一步：使用cocoaPods导入CYLTabBarController ](https://github.com/ChenYilong/CYLTabBarController#第一步使用cocoapods导入cyltabbarcontroller) 
+  2.  [第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组](https://github.com/ChenYilong/CYLTabBarController#第二步设置cyltabbarcontroller的两个数组控制器数组和tabbar属性数组) 
+  3.  [第三步：将CYLTabBarController设置为window的RootViewController](https://github.com/ChenYilong/CYLTabBarController#第三步将cyltabbarcontroller设置为window的rootviewcontroller) 
+  4.  [第四步：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步创建自定义的形状不规则加号按钮) 
+ 2.  [补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) 
+
 
 ## 与其他自定义TabBarController的区别
 
@@ -43,7 +53,6 @@
   2.  [第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组](https://github.com/ChenYilong/CYLTabBarController#第二步设置cyltabbarcontroller的两个数组控制器数组和tabbar属性数组) 
   3.  [第三步：将CYLTabBarController设置为window的RootViewController](https://github.com/ChenYilong/CYLTabBarController#第三步将cyltabbarcontroller设置为window的rootviewcontroller) 
   4.  [第四步：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步创建自定义的形状不规则加号按钮) 
- 2.  [补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) 
 
 
 ### 第一步：使用cocoaPods导入CYLTabBarController
