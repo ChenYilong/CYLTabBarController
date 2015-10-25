@@ -59,7 +59,7 @@
            CGSize sizeOfPlusButton = self.plusButton.frame.size;
             CGFloat heightDifference = sizeOfPlusButton.height - self.bounds.size.height;
             if (heightDifference < 0) {
-                multiplerInCenterY = 1/2;
+                multiplerInCenterY = 0.5;
             } else {
                 CGPoint center = CGPointMake(self.bounds.size.height/2, self.bounds.size.height/2);
                 center.y = center.y - heightDifference/2.0;

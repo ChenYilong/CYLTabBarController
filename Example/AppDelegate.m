@@ -23,7 +23,18 @@
 
 @implementation AppDelegate
 
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
+    // 设置主窗口,并设置跟控制器
+    self.window = [[UIWindow alloc]init];
+    self.window.frame = [UIScreen mainScreen].bounds;
+    [self setupViewControllers];
+    [self.window setRootViewController:self.tabBarController];
+    [self.window makeKeyAndVisible];
+    [self customizeInterface];
+    
+    return YES;
+}
 
 - (void)setupViewControllers {
     CYLHomeViewController *firstViewController = [[CYLHomeViewController alloc] init];
