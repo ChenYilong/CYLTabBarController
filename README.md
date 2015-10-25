@@ -15,7 +15,7 @@
   1.  [ 第一步：使用cocoaPods导入CYLTabBarController ](https://github.com/ChenYilong/CYLTabBarController#第一步使用cocoapods导入cyltabbarcontroller) 
   2.  [第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组](https://github.com/ChenYilong/CYLTabBarController#第二步设置cyltabbarcontroller的两个数组控制器数组和tabbar属性数组) 
   3.  [第三步：将CYLTabBarController设置为window的RootViewController](https://github.com/ChenYilong/CYLTabBarController#第三步将cyltabbarcontroller设置为window的rootviewcontroller) 
-  4.  [第四步：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步创建自定义的形状不规则加号按钮) 
+  4.  [第四步（可选）：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步可选创建自定义的形状不规则加号按钮) 
  2.  [补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) 
 
 
@@ -25,7 +25,7 @@
 -------------|-------------|-------------
 1| 低耦合 | 与业务完全分离，最低只需传两个数组即可完成主流App框架搭建
 2 |TabBar内均使用系统的TabbarItem ，并非UIButton或UIView | 无需反复调“间距位置等”来接近系统效果
-3 | 自动监测是否需要添加“加号”按钮，并能自动设置位置 |[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 既支持类似微信的“中规中矩”的 `TabBarController` 演示，并且默认就是微信这种样式，同时又支持类似“微博”或“淘宝闲鱼”这种具有不规则加号按钮的 `TabBarController` 。想支持这种样式，只需自定义个加号按钮，[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 能检测到它的存在并自动将 `tabBar` 排序好，无需多余操作，并且也预留了一定接口来满足自定义需求。“加号”按钮的样式、frame均在自定义的类中独立实现，不会涉及tabbar相关设置。
+3 | 自动监测是否需要添加“加号”按钮，并能自动设置位置 |[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 既支持类似微信的“中规中矩”的 `TabBarController` 样式，并且默认就是微信这种样式，同时又支持类似“微博”或“淘宝闲鱼”这种具有不规则加号按钮的 `TabBarController` 。想支持这种样式，只需自定义一个加号按钮，[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 能检测到它的存在并自动将 `tabBar` 排序好，无需多余操作，并且也预留了一定接口来满足自定义需求。“加号”按钮的样式、frame均在自定义的类中独立实现，不会涉及tabbar相关设置。
 4|即使加号按钮超出了tabbar的区域，超出部分依然能响应点击事件 | 红线内的区域均能响应tabbar相关的点击事件，![enter image description here](http://i57.tinypic.com/2r7ndzk.jpg)
 5 |支持CocoaPods |容易集成
 
@@ -53,7 +53,7 @@
   1.  [ 第一步：使用cocoaPods导入CYLTabBarController ](https://github.com/ChenYilong/CYLTabBarController#第一步使用cocoapods导入cyltabbarcontroller) 
   2.  [第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组](https://github.com/ChenYilong/CYLTabBarController#第二步设置cyltabbarcontroller的两个数组控制器数组和tabbar属性数组) 
   3.  [第三步：将CYLTabBarController设置为window的RootViewController](https://github.com/ChenYilong/CYLTabBarController#第三步将cyltabbarcontroller设置为window的rootviewcontroller) 
-  4.  [第四步：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步创建自定义的形状不规则加号按钮) 
+  4.  [第四步（可选）：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步可选创建自定义的形状不规则加号按钮) 
 
 
 ### 第一步：使用cocoaPods导入CYLTabBarController
@@ -134,7 +134,7 @@ pod update --verbose
 }
  ```
 
-### 第四步：创建自定义的形状不规则加号按钮
+### 第四步（可选）：创建自定义的形状不规则加号按钮
 
 
 创建一个继承于 CYLPlusButton 的类，要求和步骤：
