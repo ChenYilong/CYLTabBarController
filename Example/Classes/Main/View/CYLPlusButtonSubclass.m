@@ -134,10 +134,4 @@
     return  0.3;
 }
 
-//+ (CGSize)sizeOfPlusButton {
-//    UIImage *buttonImage = [UIImage imageNamed:@"hood.png"];
-//    CGSize size = CGSizeMake(buttonImage.size.width, buttonImage.size.height);
-//    return size;
-//}
-
 @end

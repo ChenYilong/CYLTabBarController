@@ -1,19 +1,19 @@
 //
-//  RDVDetailsViewController.m
-//  RDVTabBarController
+//  CYLDetailsViewController.m
+//  CYLTabBarController
 //
 //  Created by Robert Dimitrov on 11/8/14.
 //  Copyright (c) 2014 Robert Dimitrov. All rights reserved.
 //
 
-#import "RDVDetailsViewController.h"
+#import "CYLDetailsViewController.h"
 #import "CYLTabBarController.h"
 
-@interface RDVDetailsViewController ()
+@interface CYLDetailsViewController ()
 
 @end
 
-@implementation RDVDetailsViewController
+@implementation CYLDetailsViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];

@@ -16,7 +16,7 @@
 		9AE942EB1BDC933E00354519 /* CYLMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942DA1BDC933E00354519 /* CYLMessageViewController.m */; };
 		9AE942EC1BDC933E00354519 /* CYLMineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942DD1BDC933E00354519 /* CYLMineViewController.m */; };
 		9AE942ED1BDC933E00354519 /* CYLSameFityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E01BDC933E00354519 /* CYLSameFityViewController.m */; };
-		9AE942EE1BDC933E00354519 /* RDVDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E21BDC933E00354519 /* RDVDetailsViewController.m */; };
+		9AE942EE1BDC933E00354519 /* CYLDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E21BDC933E00354519 /* CYLDetailsViewController.m */; };
 		9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942E31BDC933E00354519 /* Images.xcassets */; };
 		9AE942F01BDC933E00354519 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942E41BDC933E00354519 /* Info.plist */; };
 		9AE942F11BDC933E00354519 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E51BDC933E00354519 /* main.m */; };
@@ -54,8 +54,8 @@
 		9AE942DD1BDC933E00354519 /* CYLMineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMineViewController.m; sourceTree = "<group>"; };
 		9AE942DF1BDC933E00354519 /* CYLSameFityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLSameFityViewController.h; sourceTree = "<group>"; };
 		9AE942E01BDC933E00354519 /* CYLSameFityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLSameFityViewController.m; sourceTree = "<group>"; };
-		9AE942E11BDC933E00354519 /* RDVDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RDVDetailsViewController.h; sourceTree = "<group>"; };
-		9AE942E21BDC933E00354519 /* RDVDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RDVDetailsViewController.m; sourceTree = "<group>"; };
+		9AE942E11BDC933E00354519 /* CYLDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLDetailsViewController.h; sourceTree = "<group>"; };
+		9AE942E21BDC933E00354519 /* CYLDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLDetailsViewController.m; sourceTree = "<group>"; };
 		9AE942E31BDC933E00354519 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9AE942E41BDC933E00354519 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9AE942E51BDC933E00354519 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -197,8 +197,8 @@
 			children = (
 				9AE942DF1BDC933E00354519 /* CYLSameFityViewController.h */,
 				9AE942E01BDC933E00354519 /* CYLSameFityViewController.m */,
-				9AE942E11BDC933E00354519 /* RDVDetailsViewController.h */,
-				9AE942E21BDC933E00354519 /* RDVDetailsViewController.m */,
+				9AE942E11BDC933E00354519 /* CYLDetailsViewController.h */,
+				9AE942E21BDC933E00354519 /* CYLDetailsViewController.m */,
 			);
 			path = SameCity;
 			sourceTree = "<group>";
@@ -206,12 +206,12 @@
 		9AE942F21BDC937F00354519 /* CYLTabBarController */ = {
 			isa = PBXGroup;
 			children = (
-				9AE942F31BDC937F00354519 /* CYLPlusButton.h */,
-				9AE942F41BDC937F00354519 /* CYLPlusButton.m */,
 				9AE942F51BDC937F00354519 /* CYLTabBar.h */,
 				9AE942F61BDC937F00354519 /* CYLTabBar.m */,
 				9AE942F71BDC937F00354519 /* CYLTabBarController.h */,
 				9AE942F81BDC937F00354519 /* CYLTabBarController.m */,
+				9AE942F31BDC937F00354519 /* CYLPlusButton.h */,
+				9AE942F41BDC937F00354519 /* CYLPlusButton.m */,
 			);
 			path = CYLTabBarController;
 			sourceTree = "<group>";
@@ -321,7 +321,7 @@
 				9AE942F91BDC937F00354519 /* CYLPlusButton.m in Sources */,
 				9AE942EC1BDC933E00354519 /* CYLMineViewController.m in Sources */,
 				9AE942EB1BDC933E00354519 /* CYLMessageViewController.m in Sources */,
-				9AE942EE1BDC933E00354519 /* RDVDetailsViewController.m in Sources */,
+				9AE942EE1BDC933E00354519 /* CYLDetailsViewController.m in Sources */,
 				9AE942ED1BDC933E00354519 /* CYLSameFityViewController.m in Sources */,
 				9AE942E91BDC933E00354519 /* CYLHomeViewController.m in Sources */,
 				9AE942FB1BDC937F00354519 /* CYLTabBarController.m in Sources */,
@@ -524,6 +524,7 @@
 				9AE942991BDC91B900354519 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9AE9429A1BDC91B900354519 /* Build configuration list for PBXNativeTarget "CYLTabBarControllerTests" */ = {
 			isa = XCConfigurationList;
@@ -532,6 +533,7 @@
 				9AE9429C1BDC91B900354519 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

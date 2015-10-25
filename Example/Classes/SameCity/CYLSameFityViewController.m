@@ -8,7 +8,7 @@
 
 #import "CYLSameFityViewController.h"
 #import "CYLTabBarController.h"
-#import "RDVDetailsViewController.h"
+#import "CYLDetailsViewController.h"
 
 @implementation CYLSameFityViewController
 
@@ -19,37 +19,6 @@
         self.title = @"同城";
     }
     return self;
-}
-
-#pragma mark - View lifecycle
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    if (self.cyl_tabBarController.tabBar.translucent) {
-        UIEdgeInsets insets = UIEdgeInsetsMake(0,
-                                               0,
-                                               CGRectGetHeight(self.cyl_tabBarController.tabBar.frame),
-                                               0);
-        
-        self.tableView.contentInset = insets;
-        self.tableView.scrollIndicatorInsets = insets;
-    }
-}
-
-- (NSUInteger)supportedInterfaceOrientations {
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        return UIInterfaceOrientationMaskAll;
-    } else {
-        return UIInterfaceOrientationMaskPortrait;
-    }
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        return YES;
-    }
-    return toInterfaceOrientation == UIInterfaceOrientationPortrait;
 }
 
 #pragma mark - Methods
@@ -79,7 +48,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    UIViewController *viewController = [[RDVDetailsViewController alloc] init];
+    UIViewController *viewController = [[CYLDetailsViewController alloc] init];
     viewController.hidesBottomBarWhenPushed = YES;  // This property needs to be set before pushing viewController to the navigationController's stack.
 
     [self.navigationController pushViewController:viewController animated:YES];
