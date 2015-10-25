@@ -4,6 +4,12 @@
 
 四步完成主流App框架搭建：
 
+下面是本仓库配套Demo的效果：
+
+![enter image description here](http://i59.tinypic.com/wvxutv.jpg)
+
+ [另一个Demo](https://github.com/ChenYilong/CYLTabBarControllerDemoForWeib) 使用CYLTabBarController实现了微博Tabbar框架，效果如下
+![enter image description here](http://i62.tinypic.com/6ru269.jpg)
 
 
 ## 第一步：使用cocoaPods导入CYLTabBarController
