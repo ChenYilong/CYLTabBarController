@@ -17,9 +17,13 @@
 
 @interface AppDelegate ()
 
+@property (strong, nonatomic) CYLTabBarController *tabBarController;
+
 @end
 
 @implementation AppDelegate
+
+    
 
 - (void)setupViewControllers {
     CYLHomeViewController *firstViewController = [[CYLHomeViewController alloc] init];
@@ -46,55 +50,48 @@
                                            thirdNavigationController,
                                            fourthNavigationController
                                            ]];
-    self.viewController = tabBarController;
-    
+    self.tabBarController = tabBarController;
 }
 
+/*
+ *
+ 在`-setViewControllers:`之前设置TabBar的属性，
+ *
+ */
 - (void)customizeTabBarForController:(CYLTabBarController *)tabBarController {
-    
-    // 1.定义一个字典
-    NSDictionary *dict1 = @{
-                            CYLTabBarItemTitle : @"首页",
-                            CYLTabBarItemImage : @"home_normal",
-                            CYLTabBarItemSelectedImage : @"home_highlight",
-                            };
-    // 1.定义一个字典
-    NSDictionary *dict2 = @{
-                            CYLTabBarItemTitle : @"同城",
-                            CYLTabBarItemImage : @"mycity_normal",
-                            CYLTabBarItemSelectedImage : @"mycity_highlight",
-                            };
-    // 1.定义一个字典
-    NSDictionary *dict3 = @{
-                            CYLTabBarItemTitle : @"消息",
-                            CYLTabBarItemImage : @"message_normal",
-                            CYLTabBarItemSelectedImage : @"message_highlight",
-                            };
-    // 1.定义一个字典
-    NSDictionary *dict4 = @{
-                            CYLTabBarItemTitle : @"我的",
-                            CYLTabBarItemImage : @"account_normal",
-                            CYLTabBarItemSelectedImage : @"account_highlight"
-                            };
-    NSArray *tabBarItemsAttributes = @[ dict1, dict2, dict3, dict4 ];
-    tabBarController.tabBarItemsAttributes = tabBarItemsAttributes;
-}
-
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
-    // 设置主窗口,并设置跟控制器
-    self.window = [[UIWindow alloc]init];
-    self.window.frame = [UIScreen mainScreen].bounds;
-    [self setupViewControllers];
-    [self.window setRootViewController:self.viewController];
-    [self.window makeKeyAndVisible];
-    [self customizeInterface];
-
-    return YES;
-}
+     
+     NSDictionary *dict1 = @{
+                             CYLTabBarItemTitle : @"首页",
+                             CYLTabBarItemImage : @"home_normal",
+                             CYLTabBarItemSelectedImage : @"home_highlight",
+                             };
+     NSDictionary *dict2 = @{
+                             CYLTabBarItemTitle : @"同城",
+                             CYLTabBarItemImage : @"mycity_normal",
+                             CYLTabBarItemSelectedImage : @"mycity_highlight",
+                             };
+     NSDictionary *dict3 = @{
+                             CYLTabBarItemTitle : @"消息",
+                             CYLTabBarItemImage : @"message_normal",
+                             CYLTabBarItemSelectedImage : @"message_highlight",
+                             };
+     NSDictionary *dict4 = @{
+                             CYLTabBarItemTitle : @"我的",
+                             CYLTabBarItemImage : @"account_normal",
+                             CYLTabBarItemSelectedImage : @"account_highlight"
+                             };
+     NSArray *tabBarItemsAttributes = @[ dict1, dict2, dict3, dict4 ];
+     tabBarController.tabBarItemsAttributes = tabBarItemsAttributes;
+ }
 
 - (void)customizeInterface {
+    [self setUpNavigationBarAppearance];
+    [self setUpTabBarItemTextAttributes];
+}
+/**
+ *  设置navigationBar样式
+ */
+- (void)setUpNavigationBarAppearance {
     UINavigationBar *navigationBarAppearance = [UINavigationBar appearance];
     
     UIImage *backgroundImage = nil;
@@ -123,13 +120,12 @@
     [navigationBarAppearance setBackgroundImage:backgroundImage
                                   forBarMetrics:UIBarMetricsDefault];
     [navigationBarAppearance setTitleTextAttributes:textAttributes];
-    [self setUpTabBarItemTextAttributes];
 }
 
 /**
  *  tabBarItem 的选中和不选中文字属性
  */
-- (void)setUpTabBarItemTextAttributes{
+- (void)setUpTabBarItemTextAttributes {
     
     // 普通状态下的文字属性
     NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];
@@ -143,6 +139,7 @@
     UITabBarItem *tabBar = [UITabBarItem appearance];
     [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
     [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateHighlighted];
-    
+//    UITabBar *tabBarAppearance = [UITabBar appearance];
+//    [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"navigationbar_background_tall"]];
 }
 @end

@@ -28,20 +28,14 @@ NSUInteger CYLTabbarItemsCount = 0;
 #pragma mark - Life Cycle
 
 -(void)viewDidLoad{
-    
     [super viewDidLoad];
-    
     // 设置 TabBarItemTestAttributes 的颜色。
     [self setUpTabBarItemTextAttributes];
-
     // 处理tabBar，使用自定义 tabBar 添加 发布按钮
     [self setUpTabBar];
-    
     [[UITabBar appearance] setBackgroundImage:[self imageWithColor:[UIColor whiteColor]]];
-    
     //去除 TabBar 自带的顶部阴影
     [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
-        
 }
 
 #pragma mark -
@@ -50,8 +44,7 @@ NSUInteger CYLTabbarItemsCount = 0;
 /**
  *  利用 KVC 把 系统的 tabBar 类型改为自定义类型。
  */
-- (void)setUpTabBar{
-    
+- (void)setUpTabBar {
     [self setValue:[[CYLTabBar alloc] init] forKey:@"tabBar"];
 }
 
@@ -117,7 +110,6 @@ NSUInteger CYLTabbarItemsCount = 0;
  *  @param normalImageName   图片
  *  @param selectedImageName 选中图片
  */
-
 - (void)addOneChildViewController:(UIViewController *)viewController
                         WithTitle:(NSString *)title
                   normalImageName:(NSString *)normalImageName
@@ -152,7 +144,6 @@ NSUInteger CYLTabbarItemsCount = 0;
     return image;
 }
 
-
 @end
 
 #pragma mark - UIViewController+CYLTabBarControllerItem
@@ -176,4 +167,5 @@ NSUInteger CYLTabbarItemsCount = 0;
     
     return tabBarController;
 }
+
 @end
