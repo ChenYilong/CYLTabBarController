@@ -1,8 +1,32 @@
-# CYLTabBarController（学习交流群：498865024）
-低耦合的TabBarController
+# CYLTabBarController【低耦合集成的TabBarController】
 
 
-四步完成主流App框架搭建：
+<p align="center">
+![enter image description here](https://img.shields.io/badge/pod-v1.0.1-brightgreen.svg)
+![enter image description here](https://img.shields.io/badge/Objective--C-compatible-orange.svg)     <a href="http://weibo.com/luohanchenyilong/"><img src="https://img.shields.io/badge/作者-微博%40iOS程序犭袁-blue.svg?style=flat" alt="微博@iOS程序犭袁" />
+
+</a>
+
+
+[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController)
+与其他自定义 TabBarController的区别：
+
+ -| 特点 |解释
+-------------|-------------|-------------
+1| 低耦合 | 与业务完全分离，最低只需传两个数组即可完成主流App框架搭建
+2 |TabBar内均使用系统的TabbarItem ，并非UIButton或UIView | 无需反复调间距、位置以接近系统效果
+3 | 自动监测是否需要添加“加号”按钮，并能自动设置位置 |“加号”按钮的样式、frame均在自定义的类中独立实现，不会涉及tabbar相关设置。
+4|即使加号按钮超出了tabbar的区域，超出部分依然能响应点击事件 | 红线的内的区域均能响应tabbar相关的点击事件，![enter image description here](http://i57.tinypic.com/2r7ndzk.jpg)
+5 |支持CocoaPods |容易集成
+
+
+
+（学习交流群：498865024）
+
+
+
+
+
 
 下面是本仓库配套Demo的效果：
 
@@ -10,6 +34,10 @@
 
  [另一个Demo](https://github.com/ChenYilong/CYLTabBarControllerDemoForWeib) 使用CYLTabBarController实现了微博Tabbar框架，效果如下
 ![enter image description here](http://i62.tinypic.com/6ru269.jpg)
+
+
+使用[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController)
+四步完成主流App框架搭建：
 
 
 ## 第一步：使用cocoaPods导入CYLTabBarController
