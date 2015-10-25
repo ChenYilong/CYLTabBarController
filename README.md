@@ -8,8 +8,7 @@
 </a>
 
 
-## [CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController)
-与其他自定义 TabBarController的区别：
+## 与其他自定义TabBarController的区别
 
  -| 特点 |解释
 -------------|-------------|-------------
@@ -20,9 +19,6 @@
 5 |支持CocoaPods |容易集成
 
 
-既支持默认样式 | 同时也支持创建自定义的形状不规则加号按钮
--------------|-------------
-![enter image description here](http://i62.tinypic.com/rvcbit.jpg?192x251_130)| ![enter image description here](http://i58.tinypic.com/24d4t3p.jpg?192x251_130)
 
 
 （学习交流群：498865024）
@@ -30,6 +26,9 @@
 
 
 ## 集成后的效果：
+既支持默认样式 | 同时也支持创建自定义的形状不规则加号按钮
+-------------|-------------
+![enter image description here](http://i62.tinypic.com/rvcbit.jpg?192x251_130)| ![enter image description here](http://i58.tinypic.com/24d4t3p.jpg?192x251_130)
 
 
 本仓库配套Demo的效果：| [另一个Demo](https://github.com/ChenYilong/CYLTabBarControllerDemoForWeib) 使用CYLTabBarController实现了微博Tabbar框架，效果如下
