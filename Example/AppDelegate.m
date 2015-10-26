@@ -70,30 +70,30 @@
  *
  */
 - (void)customizeTabBarForController:(CYLTabBarController *)tabBarController {
-     
-     NSDictionary *dict1 = @{
-                             CYLTabBarItemTitle : @"首页",
-                             CYLTabBarItemImage : @"home_normal",
-                             CYLTabBarItemSelectedImage : @"home_highlight",
-                             };
-     NSDictionary *dict2 = @{
-                             CYLTabBarItemTitle : @"同城",
-                             CYLTabBarItemImage : @"mycity_normal",
-                             CYLTabBarItemSelectedImage : @"mycity_highlight",
-                             };
-     NSDictionary *dict3 = @{
-                             CYLTabBarItemTitle : @"消息",
-                             CYLTabBarItemImage : @"message_normal",
-                             CYLTabBarItemSelectedImage : @"message_highlight",
-                             };
-     NSDictionary *dict4 = @{
-                             CYLTabBarItemTitle : @"我的",
-                             CYLTabBarItemImage : @"account_normal",
-                             CYLTabBarItemSelectedImage : @"account_highlight"
-                             };
-     NSArray *tabBarItemsAttributes = @[ dict1, dict2, dict3, dict4 ];
-     tabBarController.tabBarItemsAttributes = tabBarItemsAttributes;
- }
+    
+    NSDictionary *dict1 = @{
+                            CYLTabBarItemTitle : @"首页",
+                            CYLTabBarItemImage : @"home_normal",
+                            CYLTabBarItemSelectedImage : @"home_highlight",
+                            };
+    NSDictionary *dict2 = @{
+                            CYLTabBarItemTitle : @"同城",
+                            CYLTabBarItemImage : @"mycity_normal",
+                            CYLTabBarItemSelectedImage : @"mycity_highlight",
+                            };
+    NSDictionary *dict3 = @{
+                            CYLTabBarItemTitle : @"消息",
+                            CYLTabBarItemImage : @"message_normal",
+                            CYLTabBarItemSelectedImage : @"message_highlight",
+                            };
+    NSDictionary *dict4 = @{
+                            CYLTabBarItemTitle : @"我的",
+                            CYLTabBarItemImage : @"account_normal",
+                            CYLTabBarItemSelectedImage : @"account_highlight"
+                            };
+    NSArray *tabBarItemsAttributes = @[ dict1, dict2, dict3, dict4 ];
+    tabBarController.tabBarItemsAttributes = tabBarItemsAttributes;
+}
 
 - (void)customizeInterface {
     [self setUpNavigationBarAppearance];
@@ -150,7 +150,9 @@
     UITabBarItem *tabBar = [UITabBarItem appearance];
     [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
     [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateHighlighted];
+    
+    // 设置背景图片
 //    UITabBar *tabBarAppearance = [UITabBar appearance];
-//    [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"navigationbar_background_tall"]];
+//    [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background_os7"]];
 }
 @end

@@ -197,6 +197,8 @@ pod update --verbose
     UITabBarItem *tabBar = [UITabBarItem appearance];
     [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
     [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateHighlighted];
+
+    // 设置背景图片
     UITabBar *tabBarAppearance = [UITabBar appearance];
     [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background"]];
 }
