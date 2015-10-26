@@ -12,13 +12,9 @@
 
 @implementation CYLSameFityViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        self.title = @"同城";
-    }
-    return self;
+-(void)viewDidLoad {
+    [super viewDidLoad];
+    self.title = @"同城";
 }
 
 #pragma mark - Methods

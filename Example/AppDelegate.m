@@ -58,8 +58,8 @@
     [tabBarController setViewControllers:@[
                                            firstNavigationController,
                                            secondNavigationController,
-                                           thirdNavigationController,
-                                           fourthNavigationController
+                                           //                                           thirdNavigationController,
+                                           //                                           fourthNavigationController
                                            ]];
     self.tabBarController = tabBarController;
 }
@@ -91,7 +91,11 @@
                             CYLTabBarItemImage : @"account_normal",
                             CYLTabBarItemSelectedImage : @"account_highlight"
                             };
-    NSArray *tabBarItemsAttributes = @[ dict1, dict2, dict3, dict4 ];
+    NSArray *tabBarItemsAttributes = @[ dict1,
+                                        dict2,
+//                                        dict3,
+//                                        dict4
+                                        ];
     tabBarController.tabBarItemsAttributes = tabBarItemsAttributes;
 }
 
@@ -152,7 +156,7 @@
     [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateHighlighted];
     
     // 设置背景图片
-//    UITabBar *tabBarAppearance = [UITabBar appearance];
-//    [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background_os7"]];
+    //    UITabBar *tabBarAppearance = [UITabBar appearance];
+    //    [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background_os7"]];
 }
 @end
