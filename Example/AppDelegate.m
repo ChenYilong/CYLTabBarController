@@ -91,11 +91,12 @@
                             CYLTabBarItemImage : @"account_normal",
                             CYLTabBarItemSelectedImage : @"account_highlight"
                             };
-    NSArray *tabBarItemsAttributes = @[ dict1,
-                                        dict2,
-                                        dict3,
-                                        dict4
-                                        ];
+    NSArray *tabBarItemsAttributes = @[
+                                       dict1,
+                                       dict2,
+                                       dict3,
+                                       dict4
+                                       ];
     tabBarController.tabBarItemsAttributes = tabBarItemsAttributes;
 }
 
