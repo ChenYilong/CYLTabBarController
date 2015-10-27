@@ -29,7 +29,7 @@ extern NSUInteger CYLTabbarItemsCount;
 
 @end
 
-@interface UIViewController (RDVTabBarControllerItem)
+@interface UIViewController (CYLTabBarController)
 
 /**
  * The nearest ancestor in the view controller hierarchy that is a tab bar controller. (read-only)

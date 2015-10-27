@@ -45,68 +45,73 @@
 
 -(void)layoutSubviews{
     [super layoutSubviews];
-    if (CYLExternPushlishButton) {
-        CGFloat barWidth = self.frame.size.width;
-        CGFloat barHeight = self.frame.size.height;
-        
-        CGFloat tabBarButtonW = barWidth / (CYLTabbarItemsCount + 1);
-        NSInteger buttonIndex = 0;
-        CGFloat multiplerInCenterY;
-        if ([[self.plusButton class] respondsToSelector:@selector(multiplerInCenterY)]) {
-            multiplerInCenterY = [[self.plusButton class] multiplerInCenterY];
+    
+    if (!CYLExternPushlishButton) {
+        return;
+    }
+    
+    CGFloat barWidth = self.frame.size.width;
+    CGFloat barHeight = self.frame.size.height;
+    
+    CGFloat tabBarButtonW = (CGFloat) barWidth / (CYLTabbarItemsCount + 1);
+    NSInteger buttonIndex = 0;
+    CGFloat multiplerInCenterY;
+    if ([[self.plusButton class] respondsToSelector:@selector(multiplerInCenterY)]) {
+        multiplerInCenterY = [[self.plusButton class] multiplerInCenterY];
+    }
+    else {
+        CGSize sizeOfPlusButton = self.plusButton.frame.size;
+        CGFloat heightDifference = sizeOfPlusButton.height - self.bounds.size.height;
+        if (heightDifference < 0) {
+            multiplerInCenterY = 0.5;
+        } else {
+            CGPoint center = CGPointMake(self.bounds.size.height / 2.0f, self.bounds.size.height / 2.0f);
+            center.y = center.y - heightDifference / 2.0f;
+            multiplerInCenterY = center.y/self.bounds.size.height;
         }
-        else {
-           CGSize sizeOfPlusButton = self.plusButton.frame.size;
-            CGFloat heightDifference = sizeOfPlusButton.height - self.bounds.size.height;
-            if (heightDifference < 0) {
-                multiplerInCenterY = 0.5;
-            } else {
-                CGPoint center = CGPointMake(self.bounds.size.height/2, self.bounds.size.height/2);
-                center.y = center.y - heightDifference/2.0;
-                multiplerInCenterY = center.y/self.bounds.size.height;
-            }
+    }
+    
+    self.plusButton.center = CGPointMake(barWidth * 0.5, barHeight * multiplerInCenterY);
+    
+    NSUInteger plusButtonIndex;
+    if ([[self.plusButton class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
+        if (CYLTabbarItemsCount % 2 == 0) {
+            [NSException raise:@"CYLTabBarController" format:@"If the count of CYLTabbarControllers is not odd,there's no need to realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【中文】如果CYLTabbarControllers的个数不是奇数，会自动居中，你无需在你自定义的plusButton中实现`+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
         }
-
-            self.plusButton.center = CGPointMake(barWidth * 0.5, barHeight * multiplerInCenterY);
-        
-        NSUInteger plusButtonIndex;
-        if ([[self.plusButton class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
-
-            plusButtonIndex = [[self.plusButton class] indexOfPlusButtonInTabBar];
-            //仅修改self.plusButton的x,ywh值不变
-            self.plusButton.frame = CGRectMake(plusButtonIndex*tabBarButtonW,
-                                               CGRectGetMinY(self.plusButton.frame),
-                                               CGRectGetWidth(self.plusButton.frame),
-                                               CGRectGetHeight(self.plusButton.frame)
-                                               );
+        plusButtonIndex = [[self.plusButton class] indexOfPlusButtonInTabBar];
+        //仅修改self.plusButton的x,ywh值不变
+        self.plusButton.frame = CGRectMake(plusButtonIndex*tabBarButtonW,
+                                           CGRectGetMinY(self.plusButton.frame),
+                                           CGRectGetWidth(self.plusButton.frame),
+                                           CGRectGetHeight(self.plusButton.frame)
+                                           );
+    }
+    else {
+        if (CYLTabbarItemsCount % 2 != 0) {
+            [NSException raise:@"CYLTabBarController" format:@"If the count of CYLTabbarControllers is odd,you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【中文】如果CYLTabbarControllers的个数是奇数，你必须在你自定义的plusButton中实现`+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
         }
-        else {
-            if (CYLTabbarItemsCount % 2 != 0) {
-                [NSException raise:@"CYLTabBarController" format:@"If the count of CYLTabbarControllers is odd,you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【中文】如果CYLTabbarControllers的个数是奇数，你必须在你自定义的plusButton中实现`+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
-            }
-            plusButtonIndex = CYLTabbarItemsCount / 2;
-        }
-        
-        for (UIView *childView in self.subviews) {
-            //调整UITabBarButton的位置。其他 的view不用管
-            if ([childView isKindOfClass:NSClassFromString(@"UITabBarButton")]) {
-                if (buttonIndex == plusButtonIndex) {
-                    buttonIndex++;
-                }
-                //仅修改childView的宽度,xyh值不变
-                childView.frame = CGRectMake(CGRectGetMinX(childView.frame),
-                                             CGRectGetMinY(childView.frame),
-                                             tabBarButtonW,
-                                             CGRectGetHeight(childView.frame)
-                                             );
-                //仅修改childView的x,ywh值不变
-                childView.frame = CGRectMake(buttonIndex*tabBarButtonW,
-                                             CGRectGetMinY(childView.frame),
-                                             CGRectGetWidth(childView.frame),
-                                             CGRectGetHeight(childView.frame)
-                                             );
+        plusButtonIndex = CYLTabbarItemsCount / 2.0;
+    }
+    
+    for (UIView *childView in self.subviews) {
+        //调整UITabBarButton的位置。其他 的view不用管
+        if ([childView isKindOfClass:NSClassFromString(@"UITabBarButton")]) {
+            if (buttonIndex == plusButtonIndex) {
                 buttonIndex++;
             }
+            //仅修改childView的宽度,xyh值不变
+            childView.frame = CGRectMake(CGRectGetMinX(childView.frame),
+                                         CGRectGetMinY(childView.frame),
+                                         tabBarButtonW,
+                                         CGRectGetHeight(childView.frame)
+                                         );
+            //仅修改childView的x,ywh值不变
+            childView.frame = CGRectMake(buttonIndex*tabBarButtonW,
+                                         CGRectGetMinY(childView.frame),
+                                         CGRectGetWidth(childView.frame),
+                                         CGRectGetHeight(childView.frame)
+                                         );
+            buttonIndex++;
         }
     }
 }

@@ -36,6 +36,7 @@
 extern UIButton<CYLPlusButtonSubclassing> *CYLExternPushlishButton;
 
 @interface CYLPlusButton : UIButton
+
 + (void)registerSubclass;
 
 @end
