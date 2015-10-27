@@ -2,7 +2,7 @@
 
 
 <p align="center">
-![enter image description here](https://img.shields.io/badge/pod-v1.0.1-brightgreen.svg)
+![enter image description here](https://img.shields.io/badge/pod-v1.0.2-brightgreen.svg)
 ![enter image description here](https://img.shields.io/badge/Objective--C-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%206.0%2B-ff69b4.svg)
 
 
@@ -17,6 +17,8 @@
   3.  [第三步：将CYLTabBarController设置为window的RootViewController](https://github.com/ChenYilong/CYLTabBarController#第三步将cyltabbarcontroller设置为window的rootviewcontroller) 
   4.  [第四步（可选）：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步可选创建自定义的形状不规则加号按钮) 
  2.  [补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) 
+ 2.  [Q-A](https://github.com/ChenYilong/CYLTabBarController#qa) 
+
 
 
 ## 与其他自定义TabBarController的区别
@@ -210,9 +212,27 @@ pod update --verbose
     return YES;
 }
  ```
+## Q-A
+
+Q：为什么放置6个TabBarItem会显示异常？
+
+A：
+
+Apple 规定：
+
+ >  一个 `TabBar` 上只能出现最多5个 `TabBarItem` ，第六个及更多的将不被显示。
+
+
+另外注意，Apple检测的是 `UITabBarItem` 及其子类，所以放置“加号按钮”，这是 `UIButton` 不在“5个”里面。
+
+最多只能添加5个 `TabBarItem` ，也就是说加上“加号按钮”，一共最多在一个 `TabBar` 上放置6个控件。否则第6个及之后出现 `TabBarItem` 会被自动屏蔽掉。而且就Apple的审核机制来说，超过5个也会被直接拒绝上架。
 
 
 
+Q：我把 demo 两侧的 item 各去掉一个后，按钮的响应区域就变成下图的样子了：
+![wechat_1445851872](https://cloud.githubusercontent.com/assets/12152553/10725491/62600172-7c07-11e5-9e0a-0ec7d795d1e3.jpeg)
+
+A：这个是iOS系统对 `tabBar` 做的优化，请在真机上进行右手体验。如果你将iPhone切换到左手模式，触摸区域将“反过来”，有兴趣可以试一下。
 
 
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
