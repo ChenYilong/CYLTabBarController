@@ -1,4 +1,4 @@
-# CYLTabBarController【低耦合集成的TabBarController】
+# CYLTabBarController【低耦合集成TabBarController】
 
 
 <p align="center">
