@@ -17,7 +17,7 @@
   3.  [第三步：将CYLTabBarController设置为window的RootViewController](https://github.com/ChenYilong/CYLTabBarController#第三步将cyltabbarcontroller设置为window的rootviewcontroller) 
   4.  [第四步（可选）：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步可选创建自定义的形状不规则加号按钮) 
  2.  [补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) 
- 2.  [Q-A](https://github.com/ChenYilong/CYLTabBarController#qa) 
+ 2.  [Q-A](https://github.com/ChenYilong/CYLTabBarController#q-a) 
 
 
 
