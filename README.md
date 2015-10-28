@@ -2,8 +2,8 @@
 
 
 <p align="center">
-![enter image description here](https://img.shields.io/badge/pod-v1.0.2-brightgreen.svg)
-![enter image description here](https://img.shields.io/badge/Objective--C-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%206.0%2B-ff69b4.svg)
+![enter image description here](https://img.shields.io/badge/pod-v1.0.3-brightgreen.svg)
+![enter image description here](https://img.shields.io/badge/Objective--C-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b4.svg)
 
 
 </a>
