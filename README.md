@@ -235,6 +235,19 @@ Q：我把 demo 两侧的 item 各去掉一个后，按钮的响应区域就变�
 A：这个是iOS系统对 `tabBar` 做的优化，请在真机上进行右手体验。如果你将iPhone切换到左手模式，触摸区域将“反过来”，有兴趣可以试一下。
 
 
+Q： 如何实现添加选中背景色的功能 ，像下面这样：
+<img width="409" alt="screen shot 2015-10-28 at 9 21 56 am" src="https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png">
+
+A：我已经在 Demo 中添加了如何实现该功能的代码：
+详情见appdelegate 类中下面方法的实现：
+
+ ```Objective-C
+    [self setUpTabBarItemTextAttributes];
+ ```
+
+效果如下：
+![simulator screen shot 2015 10 28 11 44 32](https://cloud.githubusercontent.com/assets/2911921/10779397/34956b0a-7d6b-11e5-82d9-fa75aa34e8d0.png)
+
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
 
 ----------
