@@ -102,7 +102,7 @@
 
 - (void)customizeInterface {
     [self setUpNavigationBarAppearance];
-//    [self setUpTabBarItemTextAttributes];
+//    [self setUpTabBarItemTextAttributes];//tabbarcontroller里面已经有了 重复设置
 }
 /**
  *  设置navigationBar样式
