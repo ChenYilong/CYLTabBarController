@@ -59,12 +59,12 @@ NSUInteger CYLTabbarItemsCount = 0;
     
     // 选中状态下的文字属性
     NSMutableDictionary *selectedAttrs = [NSMutableDictionary dictionary];
-    selectedAttrs[NSForegroundColorAttributeName] = [UIColor darkGrayColor];
+    selectedAttrs[NSForegroundColorAttributeName] = [UIColor orangeColor];//**改为orange
     
     // 设置文字属性
     UITabBarItem *tabBar = [UITabBarItem appearance];
     [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
-    [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateHighlighted];
+    [tabBar setTitleTextAttributes:selectedAttrs forState:UIControlStateSelected];//**属性错误
     
 }
 
