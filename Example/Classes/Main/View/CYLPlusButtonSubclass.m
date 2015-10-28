@@ -20,9 +20,6 @@
     [super registerSubclass];
 }
 
-#pragma mark -
-#pragma mark - Life Cycle
-
 -(instancetype)initWithFrame:(CGRect)frame{
     
     if (self = [super initWithFrame:frame]) {
@@ -49,13 +46,12 @@
     // imageView 和 titleLabel 中心的 Y 值
     CGFloat const centerOfImageView  = verticalMargin + imageViewEdge * 0.5;
     CGFloat const centerOfTitleLabel = imageViewEdge  + verticalMargin * 2 + labelLineHeight * 0.5 + 5;
+
     //imageView position 位置
-    
     self.imageView.bounds = CGRectMake(0, 0, imageViewEdge, imageViewEdge);
     self.imageView.center = CGPointMake(centerOfView, centerOfImageView);
     
     //title position 位置
-    
     self.titleLabel.bounds = CGRectMake(0, 0, self.bounds.size.width, labelLineHeight);
     self.titleLabel.center = CGPointMake(centerOfView, centerOfTitleLabel);
 }
@@ -69,7 +65,7 @@
  */
 + (instancetype)plusButton{
 
-    CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc]init];
+    CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
 
     [button setImage:[UIImage imageNamed:@"post_normal"] forState:UIControlStateNormal];
     [button setTitle:@"发布" forState:UIControlStateNormal];
@@ -125,6 +121,8 @@
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
     NSLog(@"buttonIndex = %ld", buttonIndex);
 }
+
+#pragma mark - CYLPlusButtonSubclassing
 
 //+ (NSUInteger)indexOfPlusButtonInTabBar {
 //    return 3;
