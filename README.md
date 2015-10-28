@@ -242,7 +242,11 @@ A：我已经在 Demo 中添加了如何实现该功能的代码：
 详情见appdelegate 类中下面方法的实现：
 
  ```Objective-C
-    [self setUpTabBarItemTextAttributes];
+/**
+ *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
+ */
+- (void)setUpTabBarCustomizeAttributes;
+
  ```
 
 效果如下：
