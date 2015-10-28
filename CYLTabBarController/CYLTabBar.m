@@ -39,7 +39,7 @@
         self.plusButton = CYLExternPushlishButton;
         [self addSubview:(UIButton *)self.plusButton];
     }
-    self.backgroundColor = [UIColor whiteColor];
+    [self setBackgroundImage:[self imageWithColor:[UIColor whiteColor]]];
     return self;
 }
 
@@ -49,7 +49,6 @@
     if (!CYLExternPushlishButton) {
         return;
     }
-    
     CGFloat barWidth = self.frame.size.width;
     CGFloat barHeight = self.frame.size.height;
     
@@ -133,6 +132,22 @@
         }
     }
     return nil;
+}
+
+
+- (UIImage *)imageWithColor:(UIColor *)color
+{
+    NSParameterAssert(color != nil);
+    
+    CGRect rect = CGRectMake(0, 0, 1, 1);
+    // Create a 1 by 1 pixel context
+    UIGraphicsBeginImageContextWithOptions(rect.size, NO, 0);
+    [color setFill];
+    UIRectFill(rect);   // Fill it with your color
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image;
 }
 
 @end

@@ -34,8 +34,6 @@ NSUInteger CYLTabbarItemsCount = 0;
     // 处理tabBar，使用自定义 tabBar 添加 发布按钮
     [self setUpTabBar];
     [[UITabBar appearance] setBackgroundImage:[self imageWithColor:[UIColor whiteColor]]];
-    //去除 TabBar 自带的顶部阴影
-    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
 }
 
 #pragma mark -
@@ -52,19 +50,22 @@ NSUInteger CYLTabbarItemsCount = 0;
  *  tabBarItem 的选中和不选中文字属性
  */
 - (void)setUpTabBarItemTextAttributes{
-    
+
+    // set the text color for unselected state
     // 普通状态下的文字属性
     NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];
     normalAttrs[NSForegroundColorAttributeName] = [UIColor grayColor];
-    
+
+    // set the text color for selected state
     // 选中状态下的文字属性
     NSMutableDictionary *selectedAttrs = [NSMutableDictionary dictionary];
     selectedAttrs[NSForegroundColorAttributeName] = [UIColor darkGrayColor];
-    
+
+    // set the text Attributes
     // 设置文字属性
-    UITabBarItem *tabBar = [UITabBarItem appearance];
-    [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
-    [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateHighlighted];
+    UITabBarItem *tabBarItem = [UITabBarItem appearance];
+    [tabBarItem setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
+    [tabBarItem setTitleTextAttributes:selectedAttrs forState:UIControlStateSelected];
     
 }
 
@@ -81,7 +82,7 @@ NSUInteger CYLTabbarItemsCount = 0;
         _viewControllers = [viewControllers copy];
         if (_tabBarItemsAttributes) {
             if (_tabBarItemsAttributes.count != _viewControllers.count) {
-                [NSException raise:@"CYLTabBarController" format:@"The count of CYLTabBarControllers is not equal to the count of tabBarItemsAttributes 设置_tabBarItemsAttributes属性时，请确保元素个数与控制器的个数相同，并在方法`-setViewControllers:`之前设置"];
+                [NSException raise:@"CYLTabBarController" format:@"The count of CYLTabBarControllers is not equal to the count of tabBarItemsAttributes.【中文】设置_tabBarItemsAttributes属性时，请确保元素个数与控制器的个数相同，并在方法`-setViewControllers:`之前设置"];
             }
         }
         CYLTabbarItemsCount = [viewControllers count];
