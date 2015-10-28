@@ -93,7 +93,7 @@
     }
     
     for (UIView *childView in self.subviews) {
-        //调整UITabBarButton的位置。其他 的view不用管
+        //调整加号按钮后面的UITabBarItem的位置
         if ([childView isKindOfClass:NSClassFromString(@"UITabBarButton")]) {
             if (buttonIndex == plusButtonIndex) {
                 buttonIndex++;

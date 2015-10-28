@@ -103,7 +103,7 @@
 - (void)customizeInterface {
     [self setUpNavigationBarAppearance];
     //去除 TabBar 自带的顶部阴影
-//    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
+    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
     // 更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
     [self setUpTabBarCustomizeAttributes];
 }
