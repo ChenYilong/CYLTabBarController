@@ -176,6 +176,15 @@ pod update --verbose
 
 详见Demo中的 `CYLPlusButtonSubclass` 类的实现。
 
+另外，如果加号按钮超出了边界，一般需要手动调用如下代码取消 tabbar 顶部默认的阴影，可在 AppDelegate 类中调用：
+
+
+ ```Objective-C
+    //去除 TabBar 自带的顶部阴影
+    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
+ ```
+
+
 
 
 ### 补充说明
