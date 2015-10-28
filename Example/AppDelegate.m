@@ -104,10 +104,8 @@
     [self setUpNavigationBarAppearance];
     //去除 TabBar 自带的顶部阴影
     [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
-    /**
-     *  TabBar更多自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
-     */
-    //    [self setUpTabBarCustomizeAttributes];
+    // 更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
+     [self setUpTabBarCustomizeAttributes];
 }
 /**
  *  设置navigationBar样式
@@ -144,10 +142,9 @@
 }
 
 /**
- *  TabBar更多自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
+ *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
  */
 - (void)setUpTabBarCustomizeAttributes {
-    
     
     // set the text color for unselected state
     // 普通状态下的文字属性
@@ -171,12 +168,8 @@
     
     // set the bar background color
     // 设置背景图片
-    UITabBar *tabBarAppearance = [UITabBar appearance];
-    [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background_os7"]];
-    
-    //去除 TabBar 自带的顶部阴影
-    [[UITabBar appearance] setShadowImage:[AppDelegate imageFromColor:[UIColor redColor] forSize:CGSizeMake([UIScreen mainScreen].bounds.size.width,1) withCornerRadius:0]];
-    
+//    UITabBar *tabBarAppearance = [UITabBar appearance];
+//    [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background_ios7"]];
 }
 
 + (UIImage *)imageFromColor:(UIColor *)color forSize:(CGSize)size withCornerRadius:(CGFloat)radius
