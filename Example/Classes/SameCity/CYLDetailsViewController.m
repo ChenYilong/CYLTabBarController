@@ -2,8 +2,8 @@
 //  CYLDetailsViewController.m
 //  CYLTabBarController
 //
-//  Created by Robert Dimitrov on 11/8/14.
-//  Copyright (c) 2014 Robert Dimitrov. All rights reserved.
+//  Created by 微博@iOS程序犭袁 (http://weibo.com/luohanchenyilong/) on 10/20/15.
+//  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLDetailsViewController.h"

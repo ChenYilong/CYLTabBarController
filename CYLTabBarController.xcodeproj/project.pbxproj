@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9A10522A1BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1052291BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.m */; };
 		9AE942941BDC91B900354519 /* CYLTabBarControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942931BDC91B900354519 /* CYLTabBarControllerTests.m */; };
 		9AE942E61BDC933E00354519 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942CA1BDC933E00354519 /* AppDelegate.m */; };
 		9AE942E71BDC933E00354519 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942CB1BDC933E00354519 /* LaunchScreen.xib */; };
@@ -35,6 +36,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9A1052281BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTabBarControllerConfig.h; sourceTree = "<group>"; };
+		9A1052291BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarControllerConfig.m; sourceTree = "<group>"; };
 		9AE942741BDC91B800354519 /* CYLTabBarController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CYLTabBarController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AE9428D1BDC91B900354519 /* CYLTabBarControllerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CYLTabBarControllerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AE942921BDC91B900354519 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -143,6 +146,8 @@
 				9AE942D81BDC933E00354519 /* Message */,
 				9AE942DB1BDC933E00354519 /* Mine */,
 				9AE942DE1BDC933E00354519 /* SameCity */,
+				9A1052281BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.h */,
+				9A1052291BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -316,6 +321,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A10522A1BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.m in Sources */,
 				9AE942EA1BDC933E00354519 /* CYLPlusButtonSubclass.m in Sources */,
 				9AE942F91BDC937F00354519 /* CYLPlusButton.m in Sources */,
 				9AE942EC1BDC933E00354519 /* CYLMineViewController.m in Sources */,

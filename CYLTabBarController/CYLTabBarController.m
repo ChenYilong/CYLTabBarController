@@ -29,11 +29,8 @@ NSUInteger CYLTabbarItemsCount = 0;
 
 -(void)viewDidLoad{
     [super viewDidLoad];
-    // 设置 TabBarItemTestAttributes 的颜色。
-    [self setUpTabBarItemTextAttributes];
     // 处理tabBar，使用自定义 tabBar 添加 发布按钮
     [self setUpTabBar];
-    [[UITabBar appearance] setBackgroundImage:[self imageWithColor:[UIColor whiteColor]]];
 }
 
 #pragma mark -
@@ -44,29 +41,6 @@ NSUInteger CYLTabbarItemsCount = 0;
  */
 - (void)setUpTabBar {
     [self setValue:[[CYLTabBar alloc] init] forKey:@"tabBar"];
-}
-
-/**
- *  tabBarItem 的选中和不选中文字属性
- */
-- (void)setUpTabBarItemTextAttributes{
-
-    // set the text color for unselected state
-    // 普通状态下的文字属性
-    NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];
-    normalAttrs[NSForegroundColorAttributeName] = [UIColor grayColor];
-
-    // set the text color for selected state
-    // 选中状态下的文字属性
-    NSMutableDictionary *selectedAttrs = [NSMutableDictionary dictionary];
-    selectedAttrs[NSForegroundColorAttributeName] = [UIColor darkGrayColor];
-
-    // set the text Attributes
-    // 设置文字属性
-    UITabBarItem *tabBarItem = [UITabBarItem appearance];
-    [tabBarItem setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
-    [tabBarItem setTitleTextAttributes:selectedAttrs forState:UIControlStateSelected];
-    
 }
 
 - (void)setViewControllers:(NSArray *)viewControllers {

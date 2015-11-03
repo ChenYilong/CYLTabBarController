@@ -248,13 +248,13 @@ Q： 如何实现添加选中背景色的功能 ，像下面这样：
 <img width="409" alt="screen shot 2015-10-28 at 9 21 56 am" src="https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png">
 
 A：我已经在 Demo 中添加了如何实现该功能的代码：
-详情见appdelegate 类中下面方法的实现：
+详情见 `CYLTabBarControllerConfig`  类中下面方法的实现：
 
  ```Objective-C
 /**
  *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
  */
-- (void)setUpTabBarCustomizeAttributes;
+- (void)customizeTabBarAppearance;
 
  ```
 
