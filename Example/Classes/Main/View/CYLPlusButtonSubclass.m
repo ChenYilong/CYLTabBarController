@@ -46,7 +46,7 @@
     // imageView 和 titleLabel 中心的 Y 值
     CGFloat const centerOfImageView  = verticalMargin + imageViewEdge * 0.5;
     CGFloat const centerOfTitleLabel = imageViewEdge  + verticalMargin * 2 + labelLineHeight * 0.5 + 5;
-
+    
     //imageView position 位置
     self.imageView.bounds = CGRectMake(0, 0, imageViewEdge, imageViewEdge);
     self.imageView.center = CGPointMake(centerOfView, centerOfImageView);
@@ -64,18 +64,18 @@
  *
  */
 + (instancetype)plusButton{
-
+    
     CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
-
+    
     [button setImage:[UIImage imageNamed:@"post_normal"] forState:UIControlStateNormal];
     [button setTitle:@"发布" forState:UIControlStateNormal];
-
+    
     [button setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
     button.titleLabel.font = [UIFont systemFontOfSize:9.5];
     [button sizeToFit];
-
+    
     [button addTarget:button action:@selector(clickPublish) forControlEvents:UIControlEventTouchUpInside];
-
+    
     return button;
 }
 
@@ -86,18 +86,18 @@
  */
 //+ (instancetype)plusButton
 //{
-//    
+//
 //    UIImage *buttonImage = [UIImage imageNamed:@"hood.png"];
 //    UIImage *highlightImage = [UIImage imageNamed:@"hood-selected.png"];
-//    
+//
 //    CYLPlusButtonSubclass* button = [CYLPlusButtonSubclass buttonWithType:UIButtonTypeCustom];
-//    
+//
 //    button.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleTopMargin;
 //    button.frame = CGRectMake(0.0, 0.0, buttonImage.size.width, buttonImage.size.height);
 //    [button setBackgroundImage:buttonImage forState:UIControlStateNormal];
 //    [button setBackgroundImage:highlightImage forState:UIControlStateHighlighted];
 //    [button addTarget:button action:@selector(clickPublish) forControlEvents:UIControlEventTouchUpInside];
-//    
+//
 //    return button;
 //}
 
@@ -108,18 +108,18 @@
     UITabBarController *tabBarController = (UITabBarController *)self.window.rootViewController;
     UIViewController *viewController = tabBarController.selectedViewController;
     
-    UIActionSheet *actionSheet = [[UIActionSheet alloc]initWithTitle:nil
-                                                            delegate:nil
-                                                   cancelButtonTitle:@"取消"
-                                              destructiveButtonTitle:nil
-                                                   otherButtonTitles:@"拍照", @"从相册选取", @"淘宝一键转卖", nil];
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+                                                             delegate:nil
+                                                    cancelButtonTitle:@"取消"
+                                               destructiveButtonTitle:nil
+                                                    otherButtonTitles:@"拍照", @"从相册选取", @"淘宝一键转卖", nil];
     [actionSheet showInView:viewController.view];
 }
 
 #pragma mark - UIActionSheetDelegate
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
-    NSLog(@"buttonIndex = %ld", buttonIndex);
+    NSLog(@"buttonIndex = %@", @(buttonIndex));
 }
 
 #pragma mark - CYLPlusButtonSubclassing

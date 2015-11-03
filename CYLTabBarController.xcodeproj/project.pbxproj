@@ -18,7 +18,6 @@
 		9AE942ED1BDC933E00354519 /* CYLSameFityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E01BDC933E00354519 /* CYLSameFityViewController.m */; };
 		9AE942EE1BDC933E00354519 /* CYLDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E21BDC933E00354519 /* CYLDetailsViewController.m */; };
 		9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942E31BDC933E00354519 /* Images.xcassets */; };
-		9AE942F01BDC933E00354519 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942E41BDC933E00354519 /* Info.plist */; };
 		9AE942F11BDC933E00354519 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E51BDC933E00354519 /* main.m */; };
 		9AE942F91BDC937F00354519 /* CYLPlusButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942F41BDC937F00354519 /* CYLPlusButton.m */; };
 		9AE942FA1BDC937F00354519 /* CYLTabBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942F61BDC937F00354519 /* CYLTabBar.m */; };
@@ -260,7 +259,7 @@
 		9AE9426C1BDC91B800354519 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0630;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "微博@iOS程序犭袁";
 				TargetAttributes = {
 					9AE942731BDC91B800354519 = {
@@ -297,7 +296,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9AE942F01BDC933E00354519 /* Info.plist in Resources */,
 				9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */,
 				9AE942E71BDC933E00354519 /* LaunchScreen.xib in Resources */,
 				9AE942E81BDC933E00354519 /* Main.storyboard in Resources */,
@@ -391,6 +389,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -460,6 +459,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = "$(SRCROOT)/Example/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "CYL.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -473,6 +473,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = "$(SRCROOT)/Example/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "CYL.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -492,6 +493,7 @@
 				);
 				INFOPLIST_FILE = CYLTabBarControllerTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "CYL.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CYLTabBarController.app/CYLTabBarController";
 			};
@@ -507,6 +509,7 @@
 				);
 				INFOPLIST_FILE = CYLTabBarControllerTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "CYL.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CYLTabBarController.app/CYLTabBarController";
 			};

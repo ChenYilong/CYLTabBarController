@@ -21,7 +21,7 @@
 #pragma mark - Methods
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
-    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ Controller Cell %ld", self.title, (long)indexPath.row]];
+    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ Controller Cell %@", self.title, @(indexPath.row)]];
 }
 
 #pragma mark - Table view
