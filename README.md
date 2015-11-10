@@ -2,7 +2,7 @@
 
 
 <p align="center">
-![enter image description here](https://img.shields.io/badge/pod-v1.0.3-brightgreen.svg)
+![enter image description here](https://img.shields.io/badge/pod-v1.0.5-brightgreen.svg)
 ![enter image description here](https://img.shields.io/badge/Objective--C-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b4.svg)
 
 
@@ -34,7 +34,7 @@
 
 
 
-（学习交流群：512437027）
+（学习交流群：458884057）
 
 
 
@@ -221,6 +221,9 @@ pod update --verbose
     return YES;
 }
  ```
+
+更多文档信息可查看 [ ***CocoaDocs：CYLTabBarController*** ](http://cocoadocs.org/docsets/CYLTabBarController/1.0.5/index.html) 。
+
 ## Q-A
 
 Q：为什么放置6个TabBarItem会显示异常？
