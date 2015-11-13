@@ -113,6 +113,8 @@
             buttonIndex++;
         }
     }
+    //bring the plus button to top
+    [self bringSubviewToFront:self.plusButton];
 }
 
 /*
