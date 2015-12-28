@@ -2,7 +2,7 @@
 //  CYLTabBarControllerTests.m
 //  CYLTabBarControllerTests
 //
-//  Created by 微博@iOS程序犭袁 (http://weibo.com/luohanchenyilong/) on 15/10/25.
+//  Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 15/10/25.
 //  Copyright (c) 2015年 微博@iOS程序犭袁. All rights reserved.
 //
 
