@@ -58,23 +58,46 @@
   4.  [第四步（可选）：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步可选创建自定义的形状不规则加号按钮) 
 
 
-### 第一步：使用cocoaPods导入CYLTabBarController
+### 第一步：使用CocoaPods导入CYLTabBarController
 
-在 `Podfile` 中如下导入：
+
+在 `Podfile` 中进行如下导入：
 
 
  ```Objective-C
- pod 'CYLTabBarController'
+pod 'CYLTabBarController'
  ```
+
+
 
 然后使用 `cocoaPods` 进行安装：
 
-建议使用如下方式：
+如果尚未安装 Cocoapods, 运行以下命令进行安装:
+
 
  ```Objective-C
- # 不升级CocoaPods的spec仓库
-pod update --verbose 
+gem install cocoapods
  ```
+
+
+安装成功后就可以安装依赖了：
+
+建议使用如下方式：
+
+
+ ```Objective-C
+ # 禁止升级CocoaPods的spec仓库，否则会卡在 Analyzing dependencies ，非常慢 
+ pod update --verbose --no-repo-update
+ ```
+
+
+如果提示找不到库，则可去掉 --no-repo-update
+
+
+ ```Objective-C
+pod update
+ ```
+
 
 
 
