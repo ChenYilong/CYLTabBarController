@@ -79,7 +79,7 @@
         }
         plusButtonIndex = [[self.plusButton class] indexOfPlusButtonInTabBar];
         //仅修改self.plusButton的x,ywh值不变
-        self.plusButton.frame = CGRectMake(plusButtonIndex*tabBarButtonW,
+        self.plusButton.frame = CGRectMake(plusButtonIndex * tabBarButtonW,
                                            CGRectGetMinY(self.plusButton.frame),
                                            CGRectGetWidth(self.plusButton.frame),
                                            CGRectGetHeight(self.plusButton.frame)
