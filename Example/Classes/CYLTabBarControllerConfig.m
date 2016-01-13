@@ -127,7 +127,7 @@
     // 设置文字属性
     UITabBarItem *tabBar = [UITabBarItem appearance];
     [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
-    [tabBar setTitleTextAttributes:selectedAttrs forState:UIControlStateHighlighted];
+    [tabBar setTitleTextAttributes:selectedAttrs forState:UIControlStateSelected];
     
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色

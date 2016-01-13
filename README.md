@@ -230,8 +230,8 @@ pod update
     // 设置文字属性
     UITabBarItem *tabBar = [UITabBarItem appearance];
     [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
-    [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateHighlighted];
-
+    [tabBar setTitleTextAttributes:selectedAttrs forState:UIControlStateSelected];
+    
     // 设置背景图片
     UITabBar *tabBarAppearance = [UITabBar appearance];
     [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background"]];
