@@ -8,6 +8,6 @@
 
 #import "CYLPlusButton.h"
 
-@interface CYLPlusButtonSubclass : CYLPlusButton<CYLPlusButtonSubclassing>
+@interface CYLPlusButtonSubclass : CYLPlusButton <CYLPlusButtonSubclassing>
 
 @end

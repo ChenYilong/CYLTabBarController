@@ -17,8 +17,7 @@
 
 @implementation CYLTabBar
 
-- (instancetype)initWithFrame:(CGRect)frame
-{
+- (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         self = [self sharedInit];
@@ -26,8 +25,8 @@
     return self;
 }
 
-- (instancetype)initWithCoder: (NSCoder *)aDecoder {
-    self = [super initWithCoder: aDecoder];
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
     if (self) {
         self = [self sharedInit];
     }
@@ -45,7 +44,6 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
     if (!CYLExternPushlishButton) {
         return;
     }
@@ -57,8 +55,7 @@
     CGFloat multiplerInCenterY;
     if ([[self.plusButton class] respondsToSelector:@selector(multiplerInCenterY)]) {
         multiplerInCenterY = [[self.plusButton class] multiplerInCenterY];
-    }
-    else {
+    } else {
         CGSize sizeOfPlusButton = self.plusButton.frame.size;
         CGFloat heightDifference = sizeOfPlusButton.height - self.bounds.size.height;
         if (heightDifference < 0) {
@@ -66,7 +63,7 @@
         } else {
             CGPoint center = CGPointMake(self.bounds.size.height / 2.0f, self.bounds.size.height / 2.0f);
             center.y = center.y - heightDifference / 2.0f;
-            multiplerInCenterY = center.y/self.bounds.size.height;
+            multiplerInCenterY = center.y / self.bounds.size.height;
         }
     }
     
@@ -84,14 +81,12 @@
                                            CGRectGetWidth(self.plusButton.frame),
                                            CGRectGetHeight(self.plusButton.frame)
                                            );
-    }
-    else {
+    } else {
         if (CYLTabbarItemsCount % 2 != 0) {
             [NSException raise:@"CYLTabBarController" format:@"If the count of CYLTabbarControllers is odd,you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【中文】如果CYLTabbarControllers的个数是奇数，你必须在你自定义的plusButton中实现`+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
         }
         plusButtonIndex = CYLTabbarItemsCount / 2.0;
     }
-    
     for (UIView *childView in self.subviews) {
         //调整加号按钮后面的UITabBarItem的位置
         if ([childView isKindOfClass:NSClassFromString(@"UITabBarButton")]) {
@@ -116,8 +111,7 @@
  Capturing touches on a subview outside the frame of its superview
  *
  */
-- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
-{
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     if (!self.clipsToBounds && !self.hidden && self.alpha > 0) {
         UIView *result = [super hitTest:point withEvent:event];
         if (result) {
@@ -135,7 +129,6 @@
     return nil;
 }
 
-
 - (UIImage *)imageWithColor:(UIColor *)color {
     NSParameterAssert(color != nil);
     
@@ -146,7 +139,6 @@
     UIRectFill(rect);   // Fill it with your color
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    
     return image;
 }
 

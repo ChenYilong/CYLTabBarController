@@ -18,16 +18,14 @@ NSUInteger CYLTabbarItemsCount = 0;
 
 @end
 
-@interface CYLTabBarController ()
-
-@end
 @implementation CYLTabBarController
+
 @synthesize viewControllers = _viewControllers;
 
 #pragma mark -
 #pragma mark - Life Cycle
 
--(void)viewDidLoad{
+- (void)viewDidLoad {
     [super viewDidLoad];
     // 处理tabBar，使用自定义 tabBar 添加 发布按钮
     [self setUpTabBar];
@@ -51,7 +49,6 @@ NSUInteger CYLTabbarItemsCount = 0;
             [viewController removeFromParentViewController];
         }
     }
-    
     if (viewControllers && [viewControllers isKindOfClass:[NSArray class]]) {
         _viewControllers = [viewControllers copy];
         if (_tabBarItemsAttributes) {
@@ -118,11 +115,9 @@ NSUInteger CYLTabbarItemsCount = 0;
 
 - (CYLTabBarController *)cyl_tabBarController {
     CYLTabBarController *tabBarController = objc_getAssociatedObject(self, @selector(cyl_tabBarController));
-    
     if (!tabBarController && self.parentViewController) {
         tabBarController = [self.parentViewController cyl_tabBarController];
     }
-    
     return tabBarController;
 }
 

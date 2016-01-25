@@ -7,33 +7,32 @@
 //
 
 #import "CYLPlusButtonSubclass.h"
+
 @interface CYLPlusButtonSubclass ()<UIActionSheetDelegate> {
     CGFloat _buttonImageHeight;
 }
+
 @end
+
 @implementation CYLPlusButtonSubclass
 
 #pragma mark -
 #pragma mark - Life Cycle
 
-+(void)load {
++ (void)load {
     [super registerSubclass];
 }
 
--(instancetype)initWithFrame:(CGRect)frame{
-    
+- (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         self.titleLabel.textAlignment = NSTextAlignmentCenter;
         self.adjustsImageWhenHighlighted = NO;
     }
-    
     return self;
 }
 
-
 //上下结构的 button
-- (void)layoutSubviews
-{
+- (void)layoutSubviews {
     [super layoutSubviews];
     
     // 控件大小,间距大小
@@ -58,12 +57,13 @@
 
 #pragma mark -
 #pragma mark - Public Methods
+
 /*
  *
  Create a custom UIButton with title and add it to the center of our tab bar
  *
  */
-+ (instancetype)plusButton{
++ (instancetype)plusButton {
     
     CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
     
@@ -75,10 +75,8 @@
     [button sizeToFit];
     
     [button addTarget:button action:@selector(clickPublish) forControlEvents:UIControlEventTouchUpInside];
-    
     return button;
 }
-
 /*
  *
  Create a custom UIButton without title and add it to the center of our tab bar
@@ -123,7 +121,6 @@
 }
 
 #pragma mark - CYLPlusButtonSubclassing
-
 //+ (NSUInteger)indexOfPlusButtonInTabBar {
 //    return 3;
 //}

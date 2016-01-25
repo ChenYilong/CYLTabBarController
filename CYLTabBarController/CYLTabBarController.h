@@ -8,9 +8,9 @@
 
 @import Foundation;
 
-static NSString *const CYLTabBarItemTitle= @"tabBarItemTitle";
-static NSString *const CYLTabBarItemImage= @"tabBarItemImage";
-static NSString *const CYLTabBarItemSelectedImage= @"tabBarItemSelectedImage";
+static NSString * const CYLTabBarItemTitle = @"tabBarItemTitle";
+static NSString * const CYLTabBarItemImage = @"tabBarItemImage";
+static NSString * const CYLTabBarItemSelectedImage = @"tabBarItemSelectedImage";
 
 extern NSUInteger CYLTabbarItemsCount;
 
@@ -34,6 +34,6 @@ extern NSUInteger CYLTabbarItemsCount;
 /**
  * The nearest ancestor in the view controller hierarchy that is a tab bar controller. (read-only)
  */
-@property(nonatomic, readonly) CYLTabBarController *cyl_tabBarController;
+@property (nonatomic, readonly) CYLTabBarController *cyl_tabBarController;
 
 @end

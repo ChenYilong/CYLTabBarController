@@ -16,7 +16,6 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
     // 设置主窗口,并设置根控制器
     self.window = [[UIWindow alloc]init];
     self.window.frame = [UIScreen mainScreen].bounds;
@@ -24,7 +23,6 @@
     [self.window setRootViewController:tabBarControllerConfig.tabBarController];
     [self.window makeKeyAndVisible];
     [self customizeInterface];
-    
     return YES;
 }
 
@@ -40,7 +38,6 @@
     
     UIImage *backgroundImage = nil;
     NSDictionary *textAttributes = nil;
-    
     if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
         backgroundImage = [UIImage imageNamed:@"navigationbar_background_tall"];
         

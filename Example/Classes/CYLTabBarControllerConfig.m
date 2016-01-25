@@ -27,8 +27,7 @@
  *
  *  @return CYLTabBarController
  */
-- (CYLTabBarController *)tabBarController
-{
+- (CYLTabBarController *)tabBarController {
     if (_tabBarController == nil) {
         CYLHomeViewController *firstViewController = [[CYLHomeViewController alloc] init];
         UIViewController *firstNavigationController = [[UINavigationController alloc]
@@ -131,7 +130,7 @@
     
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色
-    [[UITabBar appearance] setSelectionIndicatorImage:[self imageFromColor:[UIColor colorWithRed:26/255.0 green:163/255.0 blue:133/255.0 alpha:1] forSize:CGSizeMake([UIScreen mainScreen].bounds.size.width/5.0f, 49) withCornerRadius:0]];
+    [[UITabBar appearance] setSelectionIndicatorImage:[self imageFromColor:[UIColor colorWithRed:26 / 255.0 green:163 / 255.0 blue:133 / 255.0 alpha:1] forSize:CGSizeMake([UIScreen mainScreen].bounds.size.width / 5.0f, 49) withCornerRadius:0]];
     
     // set the bar background color
     // 设置背景图片
@@ -164,7 +163,6 @@
     
     // Lets forget about that we were drawing
     UIGraphicsEndImageContext();
-    
     return image;
 }
 

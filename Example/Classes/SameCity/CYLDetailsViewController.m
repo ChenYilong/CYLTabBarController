@@ -19,7 +19,7 @@
     [super viewDidLoad];
     
     self.title = @"详情页";
-    self.view.backgroundColor = [UIColor colorWithRed:250/255.0 green:250/255.0 blue:250/255.0 alpha:1.0];
+    self.view.backgroundColor = [UIColor colorWithRed:250 / 255.0 green:250 / 255.0 blue:250 / 255.0 alpha:1.0];
     
     UILabel *label = [[UILabel alloc] init];
     label.text = @"微博@iOS程序犭袁";

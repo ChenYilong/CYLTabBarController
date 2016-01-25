@@ -11,4 +11,5 @@
 #import "CYLPlusButton.h"
 
 @interface CYLTabBar : UITabBar
+
 @end
