@@ -119,11 +119,16 @@
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
 {
     if (!self.clipsToBounds && !self.hidden && self.alpha > 0) {
-        for (UIView *subview in self.subviews.reverseObjectEnumerator) {
-            CGPoint subPoint = [subview convertPoint:point fromView:self];
-            UIView *result = [subview hitTest:subPoint withEvent:event];
-            if (result != nil) {
-                return result;
+        UIView *result = [super hitTest:point withEvent:event];
+        if (result) {
+            return result;
+        } else {
+            for (UIView *subview in self.subviews.reverseObjectEnumerator) {
+                CGPoint subPoint = [subview convertPoint:point fromView:self];
+                result = [subview hitTest:subPoint withEvent:event];
+                if (result) {
+                    return result;
+                }
             }
         }
     }
