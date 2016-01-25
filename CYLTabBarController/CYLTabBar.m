@@ -43,7 +43,7 @@
     return self;
 }
 
--(void)layoutSubviews{
+- (void)layoutSubviews {
     [super layoutSubviews];
     
     if (!CYLExternPushlishButton) {
@@ -98,16 +98,10 @@
             if (buttonIndex == plusButtonIndex) {
                 buttonIndex++;
             }
-            //仅修改childView的宽度,xyh值不变
-            childView.frame = CGRectMake(CGRectGetMinX(childView.frame),
-                                         CGRectGetMinY(childView.frame),
-                                         tabBarButtonW,
-                                         CGRectGetHeight(childView.frame)
-                                         );
-            //仅修改childView的x,ywh值不变
+            //仅修改childView的x和宽度,yh值不变
             childView.frame = CGRectMake(buttonIndex * tabBarButtonW,
                                          CGRectGetMinY(childView.frame),
-                                         CGRectGetWidth(childView.frame),
+                                         tabBarButtonW,
                                          CGRectGetHeight(childView.frame)
                                          );
             buttonIndex++;
@@ -137,8 +131,7 @@
 }
 
 
-- (UIImage *)imageWithColor:(UIColor *)color
-{
+- (UIImage *)imageWithColor:(UIColor *)color {
     NSParameterAssert(color != nil);
     
     CGRect rect = CGRectMake(0, 0, 1, 1);

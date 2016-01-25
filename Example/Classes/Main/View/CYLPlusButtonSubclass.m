@@ -7,7 +7,7 @@
 //
 
 #import "CYLPlusButtonSubclass.h"
-@interface CYLPlusButtonSubclass () {
+@interface CYLPlusButtonSubclass ()<UIActionSheetDelegate> {
     CGFloat _buttonImageHeight;
 }
 @end

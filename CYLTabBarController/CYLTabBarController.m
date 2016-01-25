@@ -37,7 +37,7 @@ NSUInteger CYLTabbarItemsCount = 0;
 #pragma mark - Private Methods
 
 /**
- *  利用 KVC 把 系统的 tabBar 类型改为自定义类型。
+ *  利用 KVC 把系统的 tabBar 类型改为自定义类型。
  */
 - (void)setUpTabBar {
     [self setValue:[[CYLTabBar alloc] init] forKey:@"tabBar"];

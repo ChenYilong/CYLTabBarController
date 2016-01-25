@@ -10,7 +10,7 @@
 #import "CYLTabBarController.h"
 
 UIButton<CYLPlusButtonSubclassing> *CYLExternPushlishButton = nil;
-@interface CYLPlusButton ()<UIActionSheetDelegate>
+@interface CYLPlusButton ()
 
 @end
 
