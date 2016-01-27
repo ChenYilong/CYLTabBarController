@@ -14,14 +14,16 @@
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad {
-    self.title = @"消息";
+    self.navigationItem.title = @"消息";    //✅sets navigation bar title.The right way to set the title of the navigation
+    self.tabBarItem.title = @"消息23333";   //❌sets tab bar title. But this will be ignored.
+    //self.title = @"消息1";                //❌sets both of these. Do not do this‼️‼️ This may cause tabBar to be in disorder.
     [super viewDidLoad];
 }
 
 #pragma mark - Methods
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
-    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ Controller Cell %@", self.title, @(indexPath.row)]];
+    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ Controller Cell %@", self.tabBarItem.title, @(indexPath.row)]];
 }
 
 #pragma mark - Table view

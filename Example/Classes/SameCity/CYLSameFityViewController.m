@@ -14,13 +14,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"同城";
+    self.navigationItem.title = @"同城";    //✅sets navigation bar title.The right way to set the title of the navigation
+    self.tabBarItem.title = @"同城23333";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in  tabbar.
+    //self.title = @"同城1";                //❌sets both of these. Do not do this‼️‼️ This may cause tabBar to be in disorder.
 }
 
 #pragma mark - Methods
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
-    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ Controller Cell %@", self.title, @(indexPath.row)]];
+    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ Controller Cell %@", self.tabBarItem.title, @(indexPath.row)]];
 }
 
 #pragma mark - Table view

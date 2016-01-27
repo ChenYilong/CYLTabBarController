@@ -287,6 +287,26 @@ A：我已经在 Demo 中添加了如何实现该功能的代码：
 效果如下：
 ![simulator screen shot 2015 10 28 11 44 32](https://cloud.githubusercontent.com/assets/2911921/10779397/34956b0a-7d6b-11e5-82d9-fa75aa34e8d0.png)
 
+
+Q:当ViewController设置的self.title和tabBarItemsAttributes中对应的title不一致的时候，会出现如图的错误，排序不对了
+
+A:请勿使用 `self.title = @"同城";  ` 这种方式，请使用 `self.navigationItem.title = @"同城"; ` 
+
+
+规则如下：
+
+ ```Objective-C
+
+    self.navigationItem.title = @"同城";    //✅sets navigation bar title.The right way to set the title of the navigation
+    self.tabBarItem.title = @"同城23333";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in  tabbar.
+    self.title = @"同城1";                  //❌sets both of these. Do not do this‼️‼️ This may cause tabBar to be in disorder.
+
+    /* NOTE: If the `self.title of ViewController` and `the correct title of tabBarItemsAttributes` are different, Apple will delete the correct tabBarItem from subViews, and then trigger `-layoutSubviews`, therefore subViews will be in disorder. 
+
+ ```
+
+
+
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
 
 ----------
