@@ -15,7 +15,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationItem.title = @"我的";    //✅sets navigation bar title.The right way to set the title of the navigation
-    self.tabBarItem.title = @"我的23333";   //❌sets tab bar title. But this will be ignored.
+    self.tabBarItem.title = @"我的23333";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
     //self.title = @"我的1";                //❌sets both of these. Do not do this‼️‼️ This may cause something strange like this : http://i68.tinypic.com/282l3x4.jpg .
     [self.navigationController.tabBarItem setBadgeValue:@"3"];
 }
