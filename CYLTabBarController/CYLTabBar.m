@@ -87,7 +87,17 @@
         }
         plusButtonIndex = CYLTabbarItemsCount / 2.0;
     }
-    for (UIView *childView in self.subviews) {
+    /* NOTE: If the `self.title of ViewController` and `the correct title of tabBarItemsAttributes` are different, Apple will delete the correct tabBarItem from subViews, and then trigger `-layoutSubviews`, therefore subViews will be in disorder. So we need to rearrange them.*/
+    NSArray *sortedSubviews = [self.subviews sortedArrayUsingComparator:^NSComparisonResult(UIView * view1, UIView * view2) {
+        CGFloat view1_x = view1.frame.origin.x;
+        CGFloat view2_x = view2.frame.origin.x;
+        if (view1_x > view2_x) {
+            return NSOrderedDescending;
+        } else {
+            return NSOrderedAscending;
+        }
+    }];
+    for (UIView *childView in sortedSubviews) {
         //调整加号按钮后面的UITabBarItem的位置
         if ([childView isKindOfClass:NSClassFromString(@"UITabBarButton")]) {
             if (buttonIndex == plusButtonIndex) {
