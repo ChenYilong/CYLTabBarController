@@ -43,10 +43,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
     UIViewController *viewController = [[CYLDetailsViewController alloc] init];
     viewController.hidesBottomBarWhenPushed = YES;  // This property needs to be set before pushing viewController to the navigationController's stack.
-
     [self.navigationController pushViewController:viewController animated:YES];
 }
 
