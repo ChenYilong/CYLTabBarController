@@ -72,7 +72,7 @@ pod 'CYLTabBarController'
 
 然后使用 `cocoaPods` 进行安装：
 
-如果尚未安装 Cocoapods, 运行以下命令进行安装:
+如果尚未安装 CocoaPods, 运行以下命令进行安装:
 
 
  ```Objective-C
