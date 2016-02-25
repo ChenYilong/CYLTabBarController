@@ -208,7 +208,9 @@ pod update
  ```
 
 
+### 在 Swift 项目中使用 CYLTabBarController
 
+参考： [《从头开始swift2.1 仿搜材通项目（三） 主流框架Tabbed的搭建》]( http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes ) 
 
 ### 补充说明
 如果想更进一步的自定义 `TabBar` 样式可在 `-application:didFinishLaunchingWithOptions:` 方法中设置
