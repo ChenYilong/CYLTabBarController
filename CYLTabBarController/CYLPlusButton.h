@@ -11,8 +11,9 @@
 @protocol CYLPlusButtonSubclassing
 
 @required
-+ (instancetype)plusButton;
++ (id)plusButton;
 @optional
+
 /*!
  用来自定义加号按钮的位置，如果不实现默认居中，但是如果 tabbar 的个数是奇数则必须实现该方法，否则 CYLTabBarController 会抛出 exception 来进行提示。
  
