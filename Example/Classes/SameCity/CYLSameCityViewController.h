@@ -1,5 +1,5 @@
 //
-//  CYLSameFityViewController.h
+//  CYLSameCityViewController.h
 //  CYLCustomTabBarDemo
 //
 //  Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CYLSameFityViewController : UITableViewController
+@interface CYLSameCityViewController : UITableViewController
 
 @end

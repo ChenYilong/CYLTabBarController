@@ -12,7 +12,7 @@
 #import "CYLHomeViewController.h"
 #import "CYLMessageViewController.h"
 #import "CYLMineViewController.h"
-#import "CYLSameFityViewController.h"
+#import "CYLSameCityViewController.h"
 
 @interface CYLTabBarControllerConfig ()
 
@@ -33,7 +33,7 @@
         UIViewController *firstNavigationController = [[UINavigationController alloc]
                                                        initWithRootViewController:firstViewController];
         
-        CYLSameFityViewController *secondViewController = [[CYLSameFityViewController alloc] init];
+        CYLSameCityViewController *secondViewController = [[CYLSameCityViewController alloc] init];
         UIViewController *secondNavigationController = [[UINavigationController alloc]
                                                         initWithRootViewController:secondViewController];
         

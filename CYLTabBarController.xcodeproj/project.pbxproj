@@ -16,7 +16,7 @@
 		9AE942EA1BDC933E00354519 /* CYLPlusButtonSubclass.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942D71BDC933E00354519 /* CYLPlusButtonSubclass.m */; };
 		9AE942EB1BDC933E00354519 /* CYLMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942DA1BDC933E00354519 /* CYLMessageViewController.m */; };
 		9AE942EC1BDC933E00354519 /* CYLMineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942DD1BDC933E00354519 /* CYLMineViewController.m */; };
-		9AE942ED1BDC933E00354519 /* CYLSameFityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E01BDC933E00354519 /* CYLSameFityViewController.m */; };
+		9AE942ED1BDC933E00354519 /* CYLSameCityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E01BDC933E00354519 /* CYLSameCityViewController.m */; };
 		9AE942EE1BDC933E00354519 /* CYLDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E21BDC933E00354519 /* CYLDetailsViewController.m */; };
 		9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942E31BDC933E00354519 /* Images.xcassets */; };
 		9AE942F11BDC933E00354519 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E51BDC933E00354519 /* main.m */; };
@@ -54,8 +54,8 @@
 		9AE942DA1BDC933E00354519 /* CYLMessageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMessageViewController.m; sourceTree = "<group>"; };
 		9AE942DC1BDC933E00354519 /* CYLMineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMineViewController.h; sourceTree = "<group>"; };
 		9AE942DD1BDC933E00354519 /* CYLMineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMineViewController.m; sourceTree = "<group>"; };
-		9AE942DF1BDC933E00354519 /* CYLSameFityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLSameFityViewController.h; sourceTree = "<group>"; };
-		9AE942E01BDC933E00354519 /* CYLSameFityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLSameFityViewController.m; sourceTree = "<group>"; };
+		9AE942DF1BDC933E00354519 /* CYLSameCityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLSameCityViewController.h; sourceTree = "<group>"; };
+		9AE942E01BDC933E00354519 /* CYLSameCityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLSameCityViewController.m; sourceTree = "<group>"; };
 		9AE942E11BDC933E00354519 /* CYLDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLDetailsViewController.h; sourceTree = "<group>"; };
 		9AE942E21BDC933E00354519 /* CYLDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLDetailsViewController.m; sourceTree = "<group>"; };
 		9AE942E31BDC933E00354519 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -199,8 +199,8 @@
 		9AE942DE1BDC933E00354519 /* SameCity */ = {
 			isa = PBXGroup;
 			children = (
-				9AE942DF1BDC933E00354519 /* CYLSameFityViewController.h */,
-				9AE942E01BDC933E00354519 /* CYLSameFityViewController.m */,
+				9AE942DF1BDC933E00354519 /* CYLSameCityViewController.h */,
+				9AE942E01BDC933E00354519 /* CYLSameCityViewController.m */,
 				9AE942E11BDC933E00354519 /* CYLDetailsViewController.h */,
 				9AE942E21BDC933E00354519 /* CYLDetailsViewController.m */,
 			);
@@ -327,7 +327,7 @@
 				9AE942EC1BDC933E00354519 /* CYLMineViewController.m in Sources */,
 				9AE942EB1BDC933E00354519 /* CYLMessageViewController.m in Sources */,
 				9AE942EE1BDC933E00354519 /* CYLDetailsViewController.m in Sources */,
-				9AE942ED1BDC933E00354519 /* CYLSameFityViewController.m in Sources */,
+				9AE942ED1BDC933E00354519 /* CYLSameCityViewController.m in Sources */,
 				9AE942E91BDC933E00354519 /* CYLHomeViewController.m in Sources */,
 				9AE942FB1BDC937F00354519 /* CYLTabBarController.m in Sources */,
 				9AE942F11BDC933E00354519 /* main.m in Sources */,
