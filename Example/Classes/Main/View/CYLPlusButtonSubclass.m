@@ -56,7 +56,7 @@
 }
 
 #pragma mark -
-#pragma mark - Public Methods
+#pragma mark - CYLPlusButtonSubclassing Methods
 
 /*
  *

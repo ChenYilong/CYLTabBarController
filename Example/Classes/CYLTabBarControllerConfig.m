@@ -14,7 +14,7 @@
 @implementation CYLBaseNavigationController
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
-    // fix strange animate when use `-[UIViewController cyl_jumpToOtherTabBarControllerItem:(Class)ClassType performSelector:arguments:returnValue:]` ,like this http://i63.tinypic.com/bg766g.jpg .
+    // fix strange animate when use `-[UIViewController cyl_jumpToOtherTabBarControllerItem:(Class)ClassType performSelector:arguments:returnValue:]` ,like this http://i63.tinypic.com/bg766g.jpg . If you have not used this method delete this line blow.
     [(CYLTabBarController *)self.tabBarController rootWindow].backgroundColor = [UIColor whiteColor];
     if (self.viewControllers.count > 0) {
         viewController.hidesBottomBarWhenPushed = YES;
@@ -63,11 +63,7 @@
                                                         initWithRootViewController:fourthViewController];
         CYLTabBarController *tabBarController = [[CYLTabBarController alloc] init];
         
-        /*
-         *
-         在`-setViewControllers:`之前设置TabBar的属性，设置TabBarItem的属性，包括 title、Image、selectedImage。
-         *
-         */
+         // 在`-setViewControllers:`之前设置TabBar的属性，设置TabBarItem的属性，包括 title、Image、selectedImage。
         [self setUpTabBarItemsAttributesForController:tabBarController];
         
         [tabBarController setViewControllers:@[
@@ -76,9 +72,7 @@
                                                thirdNavigationController,
                                                fourthNavigationController
                                                ]];
-        /**
-         *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
-         */
+         // 更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
 #warning IF YOU NEED CUSTOMIZE TABBAR APPEARANCE, REMOVE THE COMMENT '//'
 //        [[self class] customizeTabBarAppearance:tabBarController];
         _tabBarController = tabBarController;
@@ -86,10 +80,8 @@
     return _tabBarController;
 }
 
-/*
- *
- 在`-setViewControllers:`之前设置TabBar的属性，设置TabBarItem的属性，包括 title、Image、selectedImage。
- *
+/**
+ *  在`-setViewControllers:`之前设置TabBar的属性，设置TabBarItem的属性，包括 title、Image、selectedImage。
  */
 - (void)setUpTabBarItemsAttributesForController:(CYLTabBarController *)tabBarController {
     
@@ -133,7 +125,7 @@
     // set the text color for unselected state
     // 普通状态下的文字属性
     NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];
-    normalAttrs[NSForegroundColorAttributeName] = [UIColor blackColor];
+    normalAttrs[NSForegroundColorAttributeName] = [UIColor grayColor];
     
     // set the text color for selected state
     // 选中状态下的文字属性
