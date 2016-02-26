@@ -6,7 +6,7 @@
 //  Copyright © 2016年 https://github.com/ChenYilong .All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+@import UIKit;
 
 @interface UIViewController (CYLJumpToOtherTabBarControllerItem)
 

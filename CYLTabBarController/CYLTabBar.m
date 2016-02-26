@@ -7,6 +7,8 @@
 //
 
 #import "CYLTabBar.h"
+#import "CYLPlusButton.h"
+#import "CYLTabBarController.h"
 
 @interface CYLTabBar ()
 

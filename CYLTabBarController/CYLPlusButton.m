@@ -11,10 +11,6 @@
 
 UIButton<CYLPlusButtonSubclassing> *CYLExternPushlishButton = nil;
 
-@interface CYLPlusButton ()
-
-@end
-
 @implementation CYLPlusButton
 
 #pragma mark -

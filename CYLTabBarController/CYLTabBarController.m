@@ -7,9 +7,10 @@
 //
 
 #import "CYLTabBarController.h"
-
 #import "CYLTabBar.h"
+#import "CYLPlusButton.h"
 #import <objc/runtime.h>
+
 NSUInteger CYLTabbarItemsCount = 0;
 
 @interface UIViewController (CYLTabBarControllerItemInternal)
@@ -98,6 +99,21 @@ NSUInteger CYLTabbarItemsCount = 0;
     [self addChildViewController:viewController];
 }
 
++ (BOOL)havePlusButton {
+    if (CYLExternPushlishButton) {
+        return YES;
+    }
+    return NO;
+}
+
++ (NSUInteger)allItemsInTabBarCount {
+    NSUInteger allItemsInTabBar = CYLTabbarItemsCount;
+    if ([CYLTabBarController havePlusButton]) {
+        allItemsInTabBar += 1;
+    }
+    return allItemsInTabBar;
+}
+
 - (id<UIApplicationDelegate>)appDelegate {
     return [UIApplication sharedApplication].delegate;
 }
@@ -116,13 +132,6 @@ NSUInteger CYLTabbarItemsCount = 0;
     } while (NO);
     
     return result;
-}
-
-+ (BOOL)havePlusButton {
-    if (CYLExternPushlishButton) {
-        return YES;
-    }
-    return NO;
 }
 
 @end

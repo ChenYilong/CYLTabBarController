@@ -6,9 +6,7 @@
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
-#import "CYLTabBarController.h"
-#import "CYLPlusButton.h"
+@import UIKit;
 
 @interface CYLTabBar : UITabBar
 
