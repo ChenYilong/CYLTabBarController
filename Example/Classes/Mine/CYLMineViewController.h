@@ -10,4 +10,6 @@
 
 @interface CYLMineViewController : UITableViewController
 
+- (void)testPush;
+
 @end

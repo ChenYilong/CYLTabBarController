@@ -36,4 +36,7 @@ extern NSUInteger CYLTabbarItemsCount;
  */
 @property (nonatomic, readonly) CYLTabBarController *cyl_tabBarController;
 
+- (id<UIApplicationDelegate>)appDelegate;
+- (UIWindow *)rootWindow;
+
 @end

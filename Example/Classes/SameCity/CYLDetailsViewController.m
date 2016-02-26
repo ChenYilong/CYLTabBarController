@@ -8,6 +8,9 @@
 
 #import "CYLDetailsViewController.h"
 #import "CYLTabBarController.h"
+#import "CYLMineViewController.h"
+#import "CYLSameCityViewController.h"
+#import "UIViewController+CYLJumpToOtherTabBarControllerItem.h"
 
 @interface CYLDetailsViewController ()
 
@@ -19,14 +22,18 @@
     [super viewDidLoad];
     
     self.title = @"详情页";
-    self.view.backgroundColor = [UIColor colorWithRed:250 / 255.0 green:250 / 255.0 blue:250 / 255.0 alpha:1.0];
+    self.view.backgroundColor = [UIColor whiteColor];
     
     UILabel *label = [[UILabel alloc] init];
-    label.text = @"微博@iOS程序犭袁";
+    label.text = @"点击屏幕可跳转到“我的”，执行testPush";
     label.frame = CGRectMake(20, 150, CGRectGetWidth(self.view.frame) - 2 * 20, 20);
     label.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     label.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:label];
+}
+
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [self cyl_jumpToOtherTabBarControllerItem:[CYLMineViewController class] performSelector:@selector(testPush) arguments:nil];
 }
 
 @end

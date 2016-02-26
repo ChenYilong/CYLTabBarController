@@ -5,8 +5,25 @@
 //  Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
-
 #import "CYLTabBarControllerConfig.h"
+
+@import Foundation;
+@import UIKit;
+@interface CYLBaseNavigationController : UINavigationController
+@end
+@implementation CYLBaseNavigationController
+
+- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
+    // fix strange animate when use `-[UIViewController cyl_jumpToOtherTabBarControllerItem:(Class)ClassType performSelector:arguments:returnValue:]` ,like this http://i63.tinypic.com/bg766g.jpg .
+    [(CYLTabBarController *)self.tabBarController rootWindow].backgroundColor = [UIColor whiteColor];
+    if (self.viewControllers.count > 0) {
+        viewController.hidesBottomBarWhenPushed = YES;
+    }
+    [super pushViewController:viewController animated:animated];
+}
+
+@end
+
 
 //View Controllers
 #import "CYLHomeViewController.h"
@@ -30,19 +47,19 @@
 - (CYLTabBarController *)tabBarController {
     if (_tabBarController == nil) {
         CYLHomeViewController *firstViewController = [[CYLHomeViewController alloc] init];
-        UIViewController *firstNavigationController = [[UINavigationController alloc]
+        UIViewController *firstNavigationController = [[CYLBaseNavigationController alloc]
                                                        initWithRootViewController:firstViewController];
         
         CYLSameCityViewController *secondViewController = [[CYLSameCityViewController alloc] init];
-        UIViewController *secondNavigationController = [[UINavigationController alloc]
+        UIViewController *secondNavigationController = [[CYLBaseNavigationController alloc]
                                                         initWithRootViewController:secondViewController];
         
         CYLMessageViewController *thirdViewController = [[CYLMessageViewController alloc] init];
-        UIViewController *thirdNavigationController = [[UINavigationController alloc]
+        UIViewController *thirdNavigationController = [[CYLBaseNavigationController alloc]
                                                        initWithRootViewController:thirdViewController];
         
         CYLMineViewController *fourthViewController = [[CYLMineViewController alloc] init];
-        UIViewController *fourthNavigationController = [[UINavigationController alloc]
+        UIViewController *fourthNavigationController = [[CYLBaseNavigationController alloc]
                                                         initWithRootViewController:fourthViewController];
         CYLTabBarController *tabBarController = [[CYLTabBarController alloc] init];
         

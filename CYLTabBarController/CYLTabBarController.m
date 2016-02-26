@@ -98,6 +98,28 @@ NSUInteger CYLTabbarItemsCount = 0;
     [self addChildViewController:viewController];
 }
 
+- (id<UIApplicationDelegate>)appDelegate
+{
+    return [UIApplication sharedApplication].delegate;
+}
+
+- (UIWindow *)rootWindow {
+    UIWindow *result = nil;
+    
+    do {
+        if ([self.appDelegate respondsToSelector:@selector(window)]) {
+            result = [self.appDelegate window];
+        }
+        
+        if (result) {
+            break;
+        }
+    } while (NO);
+    
+    return result;
+    
+}
+
 @end
 
 #pragma mark - UIViewController+CYLTabBarControllerItem
