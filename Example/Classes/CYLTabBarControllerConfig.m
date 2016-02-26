@@ -79,7 +79,7 @@
         /**
          *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
          */
-        // [[self class] customizeTabBarAppearance];
+        //[[self class] customizeTabBarAppearance:tabBarController];
         _tabBarController = tabBarController;
     }
     return _tabBarController;
@@ -124,7 +124,7 @@
 /**
  *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
  */
-+ (void)customizeTabBarAppearance {
++ (void)customizeTabBarAppearance:(CYLTabBarController *)tabBarController {
     
     //去除 TabBar 自带的顶部阴影
     [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
@@ -147,7 +147,12 @@
     
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色
-    [[UITabBar appearance] setSelectionIndicatorImage:[self imageFromColor:[UIColor colorWithRed:26 / 255.0 green:163 / 255.0 blue:133 / 255.0 alpha:1] forSize:CGSizeMake([UIScreen mainScreen].bounds.size.width / 5.0f, 49) withCornerRadius:0]];
+    NSUInteger tabBarItemsCount = tabBarController.viewControllers.count;
+    NSUInteger allItemsInTabBar = tabBarItemsCount;
+    if ([CYLTabBarController havePlusButton]) {
+        allItemsInTabBar = tabBarItemsCount +1;
+    }
+    [[UITabBar appearance] setSelectionIndicatorImage:[self imageFromColor:[UIColor colorWithRed:26 / 255.0 green:163 / 255.0 blue:133 / 255.0 alpha:1] forSize:CGSizeMake([UIScreen mainScreen].bounds.size.width / (CGFloat)allItemsInTabBar, 49) withCornerRadius:0]];
     
     // set the bar background color
     // 设置背景图片

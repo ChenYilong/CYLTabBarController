@@ -98,8 +98,7 @@ NSUInteger CYLTabbarItemsCount = 0;
     [self addChildViewController:viewController];
 }
 
-- (id<UIApplicationDelegate>)appDelegate
-{
+- (id<UIApplicationDelegate>)appDelegate {
     return [UIApplication sharedApplication].delegate;
 }
 
@@ -117,7 +116,13 @@ NSUInteger CYLTabbarItemsCount = 0;
     } while (NO);
     
     return result;
-    
+}
+
++ (BOOL)havePlusButton {
+    if (CYLExternPushlishButton) {
+        return YES;
+    }
+    return NO;
 }
 
 @end

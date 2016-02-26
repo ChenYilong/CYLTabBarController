@@ -27,6 +27,10 @@ extern NSUInteger CYLTabbarItemsCount;
  */
 @property (nonatomic, readwrite, copy) IBOutletCollection(NSDictionary) NSArray *tabBarItemsAttributes;
 
+- (id<UIApplicationDelegate>)appDelegate;
+- (UIWindow *)rootWindow;
++ (BOOL)havePlusButton;
+
 @end
 
 @interface UIViewController (CYLTabBarController)
@@ -35,8 +39,5 @@ extern NSUInteger CYLTabbarItemsCount;
  * The nearest ancestor in the view controller hierarchy that is a tab bar controller. (read-only)
  */
 @property (nonatomic, readonly) CYLTabBarController *cyl_tabBarController;
-
-- (id<UIApplicationDelegate>)appDelegate;
-- (UIWindow *)rootWindow;
 
 @end
