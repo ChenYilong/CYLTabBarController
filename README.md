@@ -255,16 +255,24 @@ pod update
 
 第一种：
 
+对于 `UIViewController` ：
 
  ```Objective-C
-- (void)viewDidLoad {
-    [super viewDidLoad];
+    UITabBarController *tabBarController = (UITabBarController *)self.view.window.rootViewController;
+ ```
+
+对于 `UIView` ：
+
+ ```Objective-C
+    UITabBarController *tabBarController = (UITabBarController *)self.window.rootViewController;
+ ```
+
+对于任意 `NSObject` 对象：
+
+ ```Objective-C
     id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
     UIWindow *window = delegate.window;
     CYLTabBarController *tabbarController = (CYLTabBarController *)window.rootViewController;
-    /*...*/
-}
-
  ```
 
 第二种：
