@@ -214,6 +214,9 @@ pod update
 参考： [《从头开始swift2.1 仿搜材通项目（三） 主流框架Tabbed的搭建》]( http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes ) 
 
 ### 补充说明
+
+#### 自定义 `TabBar` 样式
+
 如果想更进一步的自定义 `TabBar` 样式可在 `-application:didFinishLaunchingWithOptions:` 方法中设置
 
  ```Objective-C
@@ -247,6 +250,58 @@ pod update
     return YES;
 }
  ```
+
+#### 访问初始化好的 CYLTabBarController 对象
+
+有两种方式：
+
+第一种：
+
+
+ ```Objective-C
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
+    UIWindow *window = delegate.window;
+    CYLTabBarController *tabbarController = (CYLTabBarController *)window.rootViewController;
+    /*...*/
+}
+
+ ```
+
+第二种：
+
+ `CYLTabBarController.h`  中为 `UIViewController` 提供了分类方法 `-cyl_tabBarController` ，所以在  `UIViewController`  一行代码就可以访问到一个初始化好的  `CYLTabBarController`  对象，`-cyl_tabBarController` 的作用你可以这样理解：与获取单例对象的  `+shareInstance` 方法作用一样。
+
+源码：
+
+ ```Objective-C
+@interface UIViewController (CYLTabBarController)
+
+/**
+ * The nearest ancestor in the view controller hierarchy that is a tab bar controller. (read-only)
+ */
+@property (nonatomic, readonly) CYLTabBarController *cyl_tabBarController;
+
+@end
+ ```
+
+用法：
+
+
+ ```Objective-C
+//导入 CYLTabBarController.h
+#import "CYLTabBarController.h"
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    CYLTabBarController *tabbarController = [self cyl_tabBarController];
+    /*...*/
+}
+ ```
+
+
+
 
 更多文档信息可查看 [ ***CocoaDocs：CYLTabBarController*** ](http://cocoadocs.org/docsets/CYLTabBarController/1.0.5/index.html) 。
 
@@ -291,7 +346,7 @@ A：我已经在 Demo 中添加了如何实现该功能的代码：
 ![simulator screen shot 2015 10 28 11 44 32](https://cloud.githubusercontent.com/assets/2911921/10779397/34956b0a-7d6b-11e5-82d9-fa75aa34e8d0.png)
 
 
-Q:当ViewController设置的self.title和tabBarItemsAttributes中对应的title不一致的时候，会出现如图的错误，排序不对了
+Q: 当 `ViewController` 设置的 `self.title` 和 `tabBarItemsAttributes` 中对应的 `title` 不一致的时候，会出现如图的错误，排序不对了
 
 A：在 v1.0.7 版本中已经修复了该 bug，但是也需要注意：
 
