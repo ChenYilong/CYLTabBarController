@@ -16,8 +16,11 @@
   2.  [第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组](https://github.com/ChenYilong/CYLTabBarController#第二步设置cyltabbarcontroller的两个数组控制器数组和tabbar属性数组) 
   3.  [第三步：将CYLTabBarController设置为window的RootViewController](https://github.com/ChenYilong/CYLTabBarController#第三步将cyltabbarcontroller设置为window的rootviewcontroller) 
   4.  [第四步（可选）：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步可选创建自定义的形状不规则加号按钮) 
- 4.  [在 Swift 项目中使用 CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#在-swift-项目中使用-cyltabbarcontroller) 
  5.  [补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) 
+  1.  [自定义 TabBar 样式](https://github.com/ChenYilong/CYLTabBarController#自定义-tabbar-样式) 
+  2.  [访问初始化好的 CYLTabBarController 对象](https://github.com/ChenYilong/CYLTabBarController#访问初始化好的-cyltabbarcontroller-对象) 
+  3.  [在 Swift 项目中使用 CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#在-swift-项目中使用-cyltabbarcontroller) 
+  4.  [源码实现原理](https://github.com/ChenYilong/CYLTabBarController#源码实现原理) 
  6.  [Q-A](https://github.com/ChenYilong/CYLTabBarController#q-a) 
 
 
@@ -208,11 +211,6 @@ pod update
     [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
  ```
 
-
-### 在 Swift 项目中使用 CYLTabBarController
-
-参考： [《从头开始swift2.1 仿搜材通项目（三） 主流框架Tabbed的搭建》]( http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes ) 
-
 ### 补充说明
 
 #### 自定义 `TabBar` 样式
@@ -271,11 +269,13 @@ pod update
 
 第二种：
 
- `CYLTabBarController.h`  中为 `UIViewController` 提供了分类方法 `-cyl_tabBarController` ，所以在  `UIViewController`  一行代码就可以访问到一个初始化好的  `CYLTabBarController`  对象，`-cyl_tabBarController` 的作用你可以这样理解：与获取单例对象的  `+shareInstance` 方法作用一样。
+ `CYLTabBarController.h`  中为 `UIViewController` 提供了分类方法 `-cyl_tabBarController` ，所以在  `UIViewController`  类中，一行代码就可以访问到一个初始化好的  `CYLTabBarController`  对象，`-cyl_tabBarController` 的作用你可以这样理解：与获取单例对象的  `+shareInstance` 方法作用一样。
 
-源码：
+接口如下：
 
  ```Objective-C
+// CYLTabBarController.h
+
 @interface UIViewController (CYLTabBarController)
 
 /**
@@ -300,8 +300,13 @@ pod update
 }
  ```
 
+#### 在 Swift 项目中使用 CYLTabBarController
 
+参考： [《从头开始swift2.1 仿搜材通项目（三） 主流框架Tabbed的搭建》]( http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes ) 
 
+### 源码实现原理
+
+参考： [《[Note] CYLTabBarController》]( http://www.jianshu.com/p/8758d8014f86 ) 
 
 更多文档信息可查看 [ ***CocoaDocs：CYLTabBarController*** ](http://cocoadocs.org/docsets/CYLTabBarController/1.0.5/index.html) 。
 
