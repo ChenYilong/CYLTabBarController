@@ -2,7 +2,7 @@
 
 
 <p align="center">
-![enter image description here](https://img.shields.io/badge/pod-v1.0.5-brightgreen.svg)
+![enter image description here](https://img.shields.io/badge/pod-v1.2.1-brightgreen.svg)
 ![enter image description here](https://img.shields.io/badge/Objective--C-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b4.svg)
 
 
@@ -33,7 +33,8 @@
 2 | `TabBar` 以及 `TabBar` 内的 `TabBarItem` 均使用系统原生的控件 | 因为使用原生的控件，并非 `UIButton` 或 `UIView` 。好处如下：</p> 1. 无需反复调“间距位置等”来接近系统效果。</p> 2. 在push到下一页时 `TabBar`  的隐藏和显示之间的过渡效果跟系统一致（详见“ [集成后的效果](https://github.com/ChenYilong/CYLTabBarController#集成后的效果) ”部分，给出了效果图） </p> 3. 原生控件，所以可以使用诸多系统API，比如：可以使用 ` [UITabBar appearance];` 、` [UITabBarItem appearance];` 设置样式。（详见“[补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) ”部分，给出了响应代码示例）
 3 | 自动监测是否需要添加“加号”按钮，</p>并能自动设置位置 |[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 既支持类似微信的“中规中矩”的 `TabBarController` 样式，并且默认就是微信这种样式，同时又支持类似“微博”或“淘宝闲鱼”这种具有不规则加号按钮的 `TabBarController` 。想支持这种样式，只需自定义一个加号按钮，[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 能检测到它的存在并自动将 `tabBar` 排序好，无需多余操作，并且也预留了一定接口来满足自定义需求。</p>“加号”按钮的样式、frame均在自定义的类中独立实现，不会涉及tabbar相关设置。
 4|即使加号按钮超出了tabbar的区域，</p>超出部分依然能响应点击事件 | 红线内的区域均能响应tabbar相关的点击事件，</p>![enter image description here](http://i57.tinypic.com/2r7ndzk.jpg)
-5 |支持CocoaPods |容易集成
+5 | 允许指定加号按钮位置 | 效果如下：</p>![enter image description here](http://a64.tinypic.com/2mo0h.jpg)
+6 |支持CocoaPods |容易集成
 
 
 
@@ -193,6 +194,9 @@ pod update
  ```
 用来自定义加号按钮的位置，如果不实现默认居中，但是如果 `tabbar` 的个数是奇数则必须实现该方法，否则 `CYLTabBarController` 会抛出 `exception` 来进行提示。
 
+主要适用于如下情景：
+
+![enter image description here](http://a64.tinypic.com/2mo0h.jpg)
 
  ```Objective-C
  + (CGFloat)multiplerInCenterY;
@@ -316,7 +320,7 @@ pod update
 
 参考： [《[Note] CYLTabBarController》]( http://www.jianshu.com/p/8758d8014f86 ) 
 
-更多文档信息可查看 [ ***CocoaDocs：CYLTabBarController*** ](http://cocoadocs.org/docsets/CYLTabBarController/1.0.5/index.html) 。
+更多文档信息可查看 [ ***CocoaDocs：CYLTabBarController*** ](http://cocoadocs.org/docsets/CYLTabBarController/1.2.1/index.html) 。
 
 ## Q-A
 
@@ -365,7 +369,7 @@ A：在 v1.0.7 版本中已经修复了该 bug，但是也需要注意：
 
 请勿使用 `self.title = @"同城";  ` 这种方式，请使用 `self.navigationItem.title = @"同城"; ` 
 
-`self.title = @"同城";  ` 这种方式，如果和tabBarItemsAttributes中对应的title不一致的时候可能会导致如下现象（不算 bug，但看起来也很奇怪）：
+`self.title = @"同城";  ` 这种方式，如果和 `tabBarItemsAttributes` 中对应的 `title` 不一致的时候可能会导致如下现象（不算 bug，但看起来也很奇怪）：
 
 ![enter image description here](http://i68.tinypic.com/282l3x4.jpg )
 
