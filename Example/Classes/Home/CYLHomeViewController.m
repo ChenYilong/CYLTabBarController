@@ -7,6 +7,7 @@
 //
 
 #import "CYLHomeViewController.h"
+#import "CYLTabBarController.h"
 
 @implementation CYLHomeViewController
 
@@ -19,6 +20,11 @@
     self.tabBarItem.title = @"首页23333";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
     //self.title = @"首页1";                //❌sets both of these. Do not do this‼️‼️This may cause something strange like this : http://i68.tinypic.com/282l3x4.jpg .
     [self.navigationController.tabBarItem setBadgeValue:@"3"];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"removeORAdd" style:UIBarButtonItemStyleDone target:self action:@selector(rightBarButtonItemClicked:)];
+}
+
+- (void)rightBarButtonItemClicked:(id)sender {
+    [[self cyl_tabBarController] removePlusButton];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {

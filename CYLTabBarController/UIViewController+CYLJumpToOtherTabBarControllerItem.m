@@ -28,13 +28,11 @@
                    performSelector:(SEL)selector
                          arguments:(NSArray *)arguments
                        returnValue:(void *)returnValue {
-    id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
-    UIWindow *window = delegate.window;
-    CYLTabBarController *tabbarController = (CYLTabBarController *)window.rootViewController;
-    BOOL isNavigationController = [[tabbarController.viewControllers[0] class] isSubclassOfClass:[UINavigationController class]];
+    CYLTabBarController *tabBarController = [self cyl_tabBarController];
+    BOOL isNavigationController = [[tabBarController.viewControllers[0] class] isSubclassOfClass:[UINavigationController class]];
     [self.navigationController popToRootViewControllerAnimated:NO];
     __block NSUInteger selectingIndex;
-    [tabbarController.viewControllers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    [tabBarController.viewControllers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         id obj_;
         if (isNavigationController) {
             obj_ = ((UINavigationController *)obj).viewControllers[0];
@@ -48,7 +46,7 @@
         }
     }];
     
-    if (!selectingIndex || selectingIndex >= tabbarController.viewControllers.count) {
+    if (!selectingIndex || selectingIndex >= tabBarController.viewControllers.count) {
         NSString *formatString = @"\n\n\
         ------ BEGIN NSException Log ---------------------------------------------------------------------\n \
         class name: %@                                                                                    \n \
@@ -65,13 +63,13 @@
         return;
     }
     
-    tabbarController.selectedIndex = selectingIndex;
+    tabBarController.selectedIndex = selectingIndex;
     UIViewController *target;
     if (isNavigationController) {
-        UINavigationController *selectingNavigationController = tabbarController.selectedViewController;
+        UINavigationController *selectingNavigationController = tabBarController.selectedViewController;
         target = selectingNavigationController.viewControllers[0];
     } else {
-        target = tabbarController.selectedViewController;
+        target = tabBarController.selectedViewController;
     }
     [[self class] callMethodWithTarget:target selector:selector arguments:arguments returnValue:returnValue];
 }

@@ -18,19 +18,22 @@ extern NSUInteger CYLTabbarItemsCount;
 
 @interface CYLTabBarController : UITabBarController
 
-/**
+/*!
  * An array of the root view controllers displayed by the tab bar interface.
  */
-@property (nonatomic, readwrite, copy) IBOutletCollection(UIViewController) NSArray *viewControllers;
-/**
+@property (nonatomic, readwrite, copy) NSArray<UIViewController *> *viewControllers;
+
+/*!
  * The Attributes of items which is displayed on the tab bar.
  */
-@property (nonatomic, readwrite, copy) IBOutletCollection(NSDictionary) NSArray *tabBarItemsAttributes;
+@property (nonatomic, readwrite, copy) NSArray<NSDictionary *> *tabBarItemsAttributes;
 
 /*!
  * Judge if there is plus button.
  */
 + (BOOL)havePlusButton;
+
+- (void)removePlusButton;
 
 /*!
  * Include plusButton if exists.
@@ -38,13 +41,14 @@ extern NSUInteger CYLTabbarItemsCount;
 + (NSUInteger)allItemsInTabBarCount;
 
 - (id<UIApplicationDelegate>)appDelegate;
+
 - (UIWindow *)rootWindow;
 
 @end
 
 @interface UIViewController (CYLTabBarController)
 
-/**
+/*!
  * The nearest ancestor in the view controller hierarchy that is a tab bar controller. (read-only)
  */
 @property (nonatomic, readonly) CYLTabBarController *cyl_tabBarController;

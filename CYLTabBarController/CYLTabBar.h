@@ -10,4 +10,6 @@
 
 @interface CYLTabBar : UITabBar
 
+- (void)removePlusButton;
+
 @end

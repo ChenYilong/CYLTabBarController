@@ -19,6 +19,10 @@ NSUInteger CYLTabbarItemsCount = 0;
 
 @end
 
+@interface CYLTabBarController ()
+@property (nonatomic, strong) CYLTabBar *customTabBar;
+@end
+
 @implementation CYLTabBarController
 
 @synthesize viewControllers = _viewControllers;
@@ -39,7 +43,8 @@ NSUInteger CYLTabbarItemsCount = 0;
  *  利用 KVC 把系统的 tabBar 类型改为自定义类型。
  */
 - (void)setUpTabBar {
-    [self setValue:[[CYLTabBar alloc] init] forKey:@"tabBar"];
+    _customTabBar = [[CYLTabBar alloc] init];
+    [self setValue:_customTabBar forKey:@"tabBar"];
 }
 
 - (void)setViewControllers:(NSArray *)viewControllers {
@@ -104,6 +109,12 @@ NSUInteger CYLTabbarItemsCount = 0;
         return YES;
     }
     return NO;
+}
+
+- (void)removePlusButton {
+    CYLExternPlusButton = nil;
+    [self.customTabBar removePlusButton];
+    CYLTabbarItemsCount = self.viewControllers.count;
 }
 
 + (NSUInteger)allItemsInTabBarCount {

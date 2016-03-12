@@ -207,7 +207,7 @@ pod update
 
 详见Demo中的 `CYLPlusButtonSubclass` 类的实现。
 
-另外，如果加号按钮超出了边界，一般需要手动调用如下代码取消 tabbar 顶部默认的阴影，可在 AppDelegate 类中调用：
+另外，如果加号按钮超出了边界，一般需要手动调用如下代码取消 `TabBar` 顶部默认的阴影，可在 AppDelegate 类中调用：
 
 
  ```Objective-C
@@ -281,7 +281,7 @@ pod update
 
 第二种：
 
- `CYLTabBarController.h`  中为 `UIViewController` 提供了分类方法 `-cyl_tabBarController` ，所以在  `UIViewController`  类中，一行代码就可以访问到一个初始化好的  `CYLTabBarController`  对象，`-cyl_tabBarController` 的作用你可以这样理解：与获取单例对象的  `+shareInstance` 方法作用一样。
+ `CYLTabBarController.h`  中为 `UIViewController` 提供了分类方法 `-cyl_tabBarController` ，所以在  `UIViewController`  类中，一行代码就可以访问到一个初始化好的  `CYLTabBarController`  对象，`-cyl_tabBarController` 的作用你可以这样理解：与获取单例对象的  `+sharedInstance` 方法作用一样。
 
 接口如下：
 

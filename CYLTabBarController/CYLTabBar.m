@@ -10,6 +10,8 @@
 #import "CYLPlusButton.h"
 #import "CYLTabBarController.h"
 
+static void * const CYLTabBarContext = (void*)&CYLTabBarContext;
+
 @interface CYLTabBar ()
 
 /** 发布按钮 */
@@ -35,24 +37,32 @@
     return self;
 }
 
+- (void)dealloc {
+    // KVO反注册
+    [self removeObserver:self forKeyPath:@"plusButton"];
+}
+
 - (instancetype)sharedInit {
-    if (CYLExternPlusButton) {
-        self.plusButton = CYLExternPlusButton;
+    self.plusButton = CYLExternPlusButton;
+    if (self.plusButton) {
         [self addSubview:(UIButton *)self.plusButton];
     }
+    [self setNeedsLayout];
+    // KVO注册
+    [self addObserver:self forKeyPath:@"plusButton" options:NSKeyValueObservingOptionNew context:CYLTabBarContext];
     [self setBackgroundImage:[self imageWithColor:[UIColor whiteColor]]];
     return self;
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    if (!CYLExternPlusButton) {
-        return;
-    }
+//    if (!CYLExternPlusButton) {
+//        return;
+//    }
     CGFloat barWidth = self.frame.size.width;
     CGFloat barHeight = self.frame.size.height;
     
-    CGFloat tabBarButtonW = (CGFloat) barWidth / (CYLTabbarItemsCount + 1);
+    CGFloat tabBarButtonW = (CGFloat) barWidth / [CYLTabBarController allItemsInTabBarCount];
     NSInteger buttonIndex = 0;
     CGFloat multiplerInCenterY;
     if ([[self.plusButton class] respondsToSelector:@selector(multiplerInCenterY)]) {
@@ -150,6 +160,28 @@
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
+}
+
+- (void)removePlusButton {
+    CYLExternPlusButton = nil;
+    [self.plusButton removeFromSuperview];
+    self.plusButton = nil;
+}
+
+// KVO监听执行
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if(context != CYLTabBarContext) {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
+    if(context == CYLTabBarContext) {
+        //if ([keyPath isEqualToString:@"plusButton"]) {
+        UIButton *newKey = change[NSKeyValueChangeNewKey];
+        if((!newKey) || (newKey == [NSNull null])) {
+            [self.plusButton removeFromSuperview];
+        }
+        [self layoutSubviews];
+    }
 }
 
 @end
