@@ -40,7 +40,6 @@
         self.plusButton = CYLExternPlusButton;
         [self addSubview:(UIButton *)self.plusButton];
     }
-    [self setBackgroundImage:[self imageWithColor:[UIColor whiteColor]]];
     return self;
 }
 
