@@ -34,7 +34,7 @@
 
 @class CYLTabBar;
 
-extern UIButton<CYLPlusButtonSubclassing> *CYLExternPlusButton;
+FOUNDATION_EXTERN UIButton<CYLPlusButtonSubclassing> *CYLExternPlusButton;
 
 @interface CYLPlusButton : UIButton
 

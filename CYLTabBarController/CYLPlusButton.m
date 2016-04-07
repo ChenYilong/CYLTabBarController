@@ -9,6 +9,8 @@
 #import "CYLPlusButton.h"
 #import "CYLTabBarController.h"
 
+CGFloat CYLPlusButtonWidth = 0.0f;
+
 UIButton<CYLPlusButtonSubclassing> *CYLExternPlusButton = nil;
 
 @implementation CYLPlusButton
@@ -19,7 +21,9 @@ UIButton<CYLPlusButtonSubclassing> *CYLExternPlusButton = nil;
 + (void)registerSubclass {
     if ([self conformsToProtocol:@protocol(CYLPlusButtonSubclassing)]) {
         Class<CYLPlusButtonSubclassing> class = self;
-        CYLExternPlusButton = [class plusButton];
+        UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
+        CYLExternPlusButton = plusButton;
+        CYLPlusButtonWidth = plusButton.frame.size.width;
     }
 }
 

@@ -138,8 +138,7 @@
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色
     NSUInteger allItemsInTabBarCount = [CYLTabBarController allItemsInTabBarCount];
-    [[UITabBar appearance] setSelectionIndicatorImage:[self imageFromColor:[UIColor yellowColor] forSize:CGSizeMake([UIScreen mainScreen].bounds.size.width / allItemsInTabBarCount, 49.f) withCornerRadius:0]];
-    
+    [[UITabBar appearance] setSelectionIndicatorImage:[self imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(([UIScreen mainScreen].bounds.size.width - CYLPlusButtonWidth) / (allItemsInTabBarCount - 1), 49.f) withCornerRadius:0]];
     // set the bar background color
     // 设置背景图片
     // UITabBar *tabBarAppearance = [UITabBar appearance];

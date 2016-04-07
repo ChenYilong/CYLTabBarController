@@ -273,6 +273,7 @@ pod update
 
  > 即使加号按钮超出了tabbar的区域，超出部分依然能响应点击事件
 
+并且你可以在项目中的任意位置读取到 `PlusButton` 的宽度，借助 `CYLTabBarController.h` 定义的 `CYLPlusButtonWidth` 这个extern。可参考 `+[CYLTabBarControllerConfig customizeTabBarAppearance:]` 里的用法。
 
 ### 补充说明
 

@@ -50,8 +50,7 @@
     }
     CGFloat barWidth = self.frame.size.width;
     CGFloat barHeight = self.frame.size.height;
-    CGFloat widthOfPlusButton = CGRectGetWidth(self.plusButton.frame);
-    CGFloat tabBarButtonW = (barWidth - widthOfPlusButton) / CYLTabbarItemsCount;
+    CGFloat tabBarButtonW = (barWidth - CYLPlusButtonWidth) / CYLTabbarItemsCount;
     NSInteger buttonIndex = 0;
     CGFloat multiplerInCenterY;
     if ([[self.plusButton class] respondsToSelector:@selector(multiplerInCenterY)]) {
@@ -102,7 +101,7 @@
         if ([childView isKindOfClass:NSClassFromString(@"UITabBarButton")]) {
             CGFloat childViewX;
             if (buttonIndex >= plusButtonIndex) {
-                childViewX = buttonIndex * tabBarButtonW + widthOfPlusButton;
+                childViewX = buttonIndex * tabBarButtonW + CYLPlusButtonWidth;
             } else {
                 childViewX = buttonIndex * tabBarButtonW;
             }
