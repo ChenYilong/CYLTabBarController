@@ -9,9 +9,11 @@
 </a>
 
 ## 导航
+
  1.  [与其他自定义TabBarController的区别](https://github.com/ChenYilong/CYLTabBarController#与其他自定义tabbarcontroller的区别) 
  2.  [集成后的效果](https://github.com/ChenYilong/CYLTabBarController#集成后的效果) 
- 3.  [使用CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#使用cyltabbarcontroller) 
+ 3.  [项目结构](https://github.com/ChenYilong/CYLTabBarController#项目结构) 
+ 4.  [使用CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#使用cyltabbarcontroller) 
   1.  [ 第一步：使用cocoaPods导入CYLTabBarController ](https://github.com/ChenYilong/CYLTabBarController#第一步使用cocoapods导入cyltabbarcontroller) 
   2.  [第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组](https://github.com/ChenYilong/CYLTabBarController#第二步设置cyltabbarcontroller的两个数组控制器数组和tabbar属性数组) 
   3.  [第三步：将CYLTabBarController设置为window的RootViewController](https://github.com/ChenYilong/CYLTabBarController#第三步将cyltabbarcontroller设置为window的rootviewcontroller) 
@@ -53,6 +55,28 @@
 本仓库配套Demo的效果：| [另一个Demo](https://github.com/ChenYilong/CYLTabBarControllerDemoForWeib) 使用CYLTabBarController实现了微博Tabbar框架，效果如下
 -------------|-------------
 ![enter image description here](http://i59.tinypic.com/wvxutv.jpg)|![enter image description here](http://i62.tinypic.com/6ru269.jpg)
+
+## 项目结构
+
+
+![enter image description here](http://i65.tinypic.com/21l25af.jpg)
+
+做下说明：
+
+ ```Objective-C
+
+├── CYLTabBarController  ＃核心库文件夹，如果不使用 CocoaPods 集成，请直接将这个文件夹下拖拽带你的项目中
+└── Example
+    └── Classes
+        ├── Module       #模块类文件夹
+        │   ├── Home
+        │   ├── Message
+        │   ├── Mine
+        │   └── SameCity
+        └── View         #这个里放着CYLPlusButton的子类，演示里如何创建自定义的形状不规则加号按钮
+        
+        
+ ```
 
 
 ## 使用[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController)
@@ -216,7 +240,7 @@ pod update
     [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
  ```
 
-如何调整自定义 `PlusButton` 与其它 `TabBarItem` 的宽度？
+如何调整、自定义 `PlusButton` 与其它 `TabBarItem` 的宽度？
 
 `CYLTabBarController` 规定：
 
@@ -245,7 +269,7 @@ pod update
 
 ![enter image description here](http://i64.tinypic.com/vx16r5.jpg)
 
-同时你也测试下 `CYLTabBarController` 的这一个特性：
+同时你也可以顺便测试下 `CYLTabBarController` 的这一个特性：
 
  > 即使加号按钮超出了tabbar的区域，超出部分依然能响应点击事件
 
