@@ -36,18 +36,19 @@
     [super layoutSubviews];
     
     // 控件大小,间距大小
-    CGFloat const imageViewEdge   = self.bounds.size.width * 0.6;
+    CGFloat const imageViewEdgeWidth   = self.bounds.size.width * 0.7;
+    CGFloat const imageViewEdgeHeight  = imageViewEdgeWidth * 0.9;
     CGFloat const centerOfView    = self.bounds.size.width * 0.5;
     CGFloat const labelLineHeight = self.titleLabel.font.lineHeight;
-    CGFloat const verticalMarginT = self.bounds.size.height - labelLineHeight - imageViewEdge;
+    CGFloat const verticalMarginT = self.bounds.size.height - labelLineHeight - imageViewEdgeWidth;
     CGFloat const verticalMargin  = verticalMarginT / 2;
     
     // imageView 和 titleLabel 中心的 Y 值
-    CGFloat const centerOfImageView  = verticalMargin + imageViewEdge * 0.5;
-    CGFloat const centerOfTitleLabel = imageViewEdge  + verticalMargin * 2 + labelLineHeight * 0.5 + 5;
+    CGFloat const centerOfImageView  = verticalMargin + imageViewEdgeWidth * 0.5;
+    CGFloat const centerOfTitleLabel = imageViewEdgeWidth  + verticalMargin * 2 + labelLineHeight * 0.5 + 5;
     
     //imageView position 位置
-    self.imageView.bounds = CGRectMake(0, 0, imageViewEdge, imageViewEdge);
+    self.imageView.bounds = CGRectMake(0, 0, imageViewEdgeWidth, imageViewEdgeHeight);
     self.imageView.center = CGPointMake(centerOfView, centerOfImageView);
     
     //title position 位置
@@ -64,16 +65,15 @@
  *
  */
 + (instancetype)plusButton {
-    
     CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
-    
-    [button setImage:[UIImage imageNamed:@"post_normal"] forState:UIControlStateNormal];
+    UIImage *buttonImage = [UIImage imageNamed:@"post_normal"];
+    [button setImage:buttonImage forState:UIControlStateNormal];
     [button setTitle:@"发布" forState:UIControlStateNormal];
-    
     [button setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
     button.titleLabel.font = [UIFont systemFontOfSize:9.5];
-    [button sizeToFit];
-    
+    [button sizeToFit]; // or set frame in this way `button.frame = CGRectMake(0.0, 0.0, 250, 100);`
+    button.frame = CGRectMake(0.0, 0.0, 250, 100);
+    button.backgroundColor = [UIColor redColor];
     [button addTarget:button action:@selector(clickPublish) forControlEvents:UIControlEventTouchUpInside];
     return button;
 }

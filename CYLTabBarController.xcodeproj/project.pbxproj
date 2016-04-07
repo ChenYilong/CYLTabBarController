@@ -7,17 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9A10522A1BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1052291BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.m */; };
+		9A1559C51CB6D4C700CAB1AF /* CYLTabBarControllerConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559C41CB6D4C700CAB1AF /* CYLTabBarControllerConfig.m */; };
+		9A1559C81CB6D4D300CAB1AF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559C61CB6D4D300CAB1AF /* AppDelegate.m */; };
+		9A1559DB1CB6D56500CAB1AF /* CYLHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559CC1CB6D56500CAB1AF /* CYLHomeViewController.m */; };
+		9A1559DC1CB6D56500CAB1AF /* CYLMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559CF1CB6D56500CAB1AF /* CYLMessageViewController.m */; };
+		9A1559DD1CB6D56500CAB1AF /* CYLMineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559D21CB6D56500CAB1AF /* CYLMineViewController.m */; };
+		9A1559DE1CB6D56500CAB1AF /* CYLDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559D51CB6D56500CAB1AF /* CYLDetailsViewController.m */; };
+		9A1559DF1CB6D56500CAB1AF /* CYLSameCityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559D71CB6D56500CAB1AF /* CYLSameCityViewController.m */; };
+		9A1559E01CB6D56500CAB1AF /* CYLPlusButtonSubclass.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559DA1CB6D56500CAB1AF /* CYLPlusButtonSubclass.m */; };
 		9AE667131C800085001DED12 /* UIViewController+CYLJumpToOtherTabBarControllerItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE667121C800085001DED12 /* UIViewController+CYLJumpToOtherTabBarControllerItem.m */; };
-		9AE942E61BDC933E00354519 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942CA1BDC933E00354519 /* AppDelegate.m */; };
 		9AE942E71BDC933E00354519 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942CB1BDC933E00354519 /* LaunchScreen.xib */; };
 		9AE942E81BDC933E00354519 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942CD1BDC933E00354519 /* Main.storyboard */; };
-		9AE942E91BDC933E00354519 /* CYLHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942D21BDC933E00354519 /* CYLHomeViewController.m */; };
-		9AE942EA1BDC933E00354519 /* CYLPlusButtonSubclass.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942D71BDC933E00354519 /* CYLPlusButtonSubclass.m */; };
-		9AE942EB1BDC933E00354519 /* CYLMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942DA1BDC933E00354519 /* CYLMessageViewController.m */; };
-		9AE942EC1BDC933E00354519 /* CYLMineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942DD1BDC933E00354519 /* CYLMineViewController.m */; };
-		9AE942ED1BDC933E00354519 /* CYLSameCityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E01BDC933E00354519 /* CYLSameCityViewController.m */; };
-		9AE942EE1BDC933E00354519 /* CYLDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E21BDC933E00354519 /* CYLDetailsViewController.m */; };
 		9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942E31BDC933E00354519 /* Images.xcassets */; };
 		9AE942F11BDC933E00354519 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E51BDC933E00354519 /* main.m */; };
 		9AE942F91BDC937F00354519 /* CYLPlusButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942F41BDC937F00354519 /* CYLPlusButton.m */; };
@@ -26,29 +26,29 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		9A1052281BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTabBarControllerConfig.h; sourceTree = "<group>"; };
-		9A1052291BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarControllerConfig.m; sourceTree = "<group>"; };
+		9A1559C31CB6D4C700CAB1AF /* CYLTabBarControllerConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTabBarControllerConfig.h; sourceTree = "<group>"; };
+		9A1559C41CB6D4C700CAB1AF /* CYLTabBarControllerConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarControllerConfig.m; sourceTree = "<group>"; };
+		9A1559C61CB6D4D300CAB1AF /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		9A1559C71CB6D4D300CAB1AF /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		9A1559CB1CB6D56500CAB1AF /* CYLHomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLHomeViewController.h; sourceTree = "<group>"; };
+		9A1559CC1CB6D56500CAB1AF /* CYLHomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLHomeViewController.m; sourceTree = "<group>"; };
+		9A1559CE1CB6D56500CAB1AF /* CYLMessageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMessageViewController.h; sourceTree = "<group>"; };
+		9A1559CF1CB6D56500CAB1AF /* CYLMessageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMessageViewController.m; sourceTree = "<group>"; };
+		9A1559D11CB6D56500CAB1AF /* CYLMineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMineViewController.h; sourceTree = "<group>"; };
+		9A1559D21CB6D56500CAB1AF /* CYLMineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMineViewController.m; sourceTree = "<group>"; };
+		9A1559D41CB6D56500CAB1AF /* CYLDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLDetailsViewController.h; sourceTree = "<group>"; };
+		9A1559D51CB6D56500CAB1AF /* CYLDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLDetailsViewController.m; sourceTree = "<group>"; };
+		9A1559D61CB6D56500CAB1AF /* CYLSameCityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLSameCityViewController.h; sourceTree = "<group>"; };
+		9A1559D71CB6D56500CAB1AF /* CYLSameCityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLSameCityViewController.m; sourceTree = "<group>"; };
+		9A1559D91CB6D56500CAB1AF /* CYLPlusButtonSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLPlusButtonSubclass.h; sourceTree = "<group>"; };
+		9A1559DA1CB6D56500CAB1AF /* CYLPlusButtonSubclass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLPlusButtonSubclass.m; sourceTree = "<group>"; };
 		9AE667111C800085001DED12 /* UIViewController+CYLJumpToOtherTabBarControllerItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+CYLJumpToOtherTabBarControllerItem.h"; sourceTree = "<group>"; };
 		9AE667121C800085001DED12 /* UIViewController+CYLJumpToOtherTabBarControllerItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+CYLJumpToOtherTabBarControllerItem.m"; sourceTree = "<group>"; };
 		9AE942741BDC91B800354519 /* CYLTabBarController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CYLTabBarController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AE942921BDC91B900354519 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9AE942931BDC91B900354519 /* CYLTabBarControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarControllerTests.m; sourceTree = "<group>"; };
-		9AE942C91BDC933E00354519 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		9AE942CA1BDC933E00354519 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		9AE942CC1BDC933E00354519 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		9AE942CE1BDC933E00354519 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		9AE942D11BDC933E00354519 /* CYLHomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLHomeViewController.h; sourceTree = "<group>"; };
-		9AE942D21BDC933E00354519 /* CYLHomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLHomeViewController.m; sourceTree = "<group>"; };
-		9AE942D61BDC933E00354519 /* CYLPlusButtonSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLPlusButtonSubclass.h; sourceTree = "<group>"; };
-		9AE942D71BDC933E00354519 /* CYLPlusButtonSubclass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLPlusButtonSubclass.m; sourceTree = "<group>"; };
-		9AE942D91BDC933E00354519 /* CYLMessageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMessageViewController.h; sourceTree = "<group>"; };
-		9AE942DA1BDC933E00354519 /* CYLMessageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMessageViewController.m; sourceTree = "<group>"; };
-		9AE942DC1BDC933E00354519 /* CYLMineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMineViewController.h; sourceTree = "<group>"; };
-		9AE942DD1BDC933E00354519 /* CYLMineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMineViewController.m; sourceTree = "<group>"; };
-		9AE942DF1BDC933E00354519 /* CYLSameCityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLSameCityViewController.h; sourceTree = "<group>"; };
-		9AE942E01BDC933E00354519 /* CYLSameCityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLSameCityViewController.m; sourceTree = "<group>"; };
-		9AE942E11BDC933E00354519 /* CYLDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLDetailsViewController.h; sourceTree = "<group>"; };
-		9AE942E21BDC933E00354519 /* CYLDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLDetailsViewController.m; sourceTree = "<group>"; };
 		9AE942E31BDC933E00354519 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9AE942E41BDC933E00354519 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9AE942E51BDC933E00354519 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -71,6 +71,64 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9A1559C91CB6D56500CAB1AF /* Module */ = {
+			isa = PBXGroup;
+			children = (
+				9A1559CA1CB6D56500CAB1AF /* Home */,
+				9A1559CD1CB6D56500CAB1AF /* Message */,
+				9A1559D01CB6D56500CAB1AF /* Mine */,
+				9A1559D31CB6D56500CAB1AF /* SameCity */,
+			);
+			path = Module;
+			sourceTree = "<group>";
+		};
+		9A1559CA1CB6D56500CAB1AF /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				9A1559CB1CB6D56500CAB1AF /* CYLHomeViewController.h */,
+				9A1559CC1CB6D56500CAB1AF /* CYLHomeViewController.m */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		9A1559CD1CB6D56500CAB1AF /* Message */ = {
+			isa = PBXGroup;
+			children = (
+				9A1559CE1CB6D56500CAB1AF /* CYLMessageViewController.h */,
+				9A1559CF1CB6D56500CAB1AF /* CYLMessageViewController.m */,
+			);
+			path = Message;
+			sourceTree = "<group>";
+		};
+		9A1559D01CB6D56500CAB1AF /* Mine */ = {
+			isa = PBXGroup;
+			children = (
+				9A1559D11CB6D56500CAB1AF /* CYLMineViewController.h */,
+				9A1559D21CB6D56500CAB1AF /* CYLMineViewController.m */,
+			);
+			path = Mine;
+			sourceTree = "<group>";
+		};
+		9A1559D31CB6D56500CAB1AF /* SameCity */ = {
+			isa = PBXGroup;
+			children = (
+				9A1559D41CB6D56500CAB1AF /* CYLDetailsViewController.h */,
+				9A1559D51CB6D56500CAB1AF /* CYLDetailsViewController.m */,
+				9A1559D61CB6D56500CAB1AF /* CYLSameCityViewController.h */,
+				9A1559D71CB6D56500CAB1AF /* CYLSameCityViewController.m */,
+			);
+			path = SameCity;
+			sourceTree = "<group>";
+		};
+		9A1559D81CB6D56500CAB1AF /* View */ = {
+			isa = PBXGroup;
+			children = (
+				9A1559D91CB6D56500CAB1AF /* CYLPlusButtonSubclass.h */,
+				9A1559DA1CB6D56500CAB1AF /* CYLPlusButtonSubclass.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		9AE9426B1BDC91B800354519 = {
 			isa = PBXGroup;
 			children = (
@@ -109,9 +167,11 @@
 		9AE942C81BDC933E00354519 /* Example */ = {
 			isa = PBXGroup;
 			children = (
+				9A1559C61CB6D4D300CAB1AF /* AppDelegate.m */,
+				9A1559C71CB6D4D300CAB1AF /* AppDelegate.h */,
+				9A1559C31CB6D4C700CAB1AF /* CYLTabBarControllerConfig.h */,
+				9A1559C41CB6D4C700CAB1AF /* CYLTabBarControllerConfig.m */,
 				9AE942CF1BDC933E00354519 /* Classes */,
-				9AE942C91BDC933E00354519 /* AppDelegate.h */,
-				9AE942CA1BDC933E00354519 /* AppDelegate.m */,
 				9AE942CB1BDC933E00354519 /* LaunchScreen.xib */,
 				9AE942CD1BDC933E00354519 /* Main.storyboard */,
 				9AE942E31BDC933E00354519 /* Images.xcassets */,
@@ -124,70 +184,10 @@
 		9AE942CF1BDC933E00354519 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				9AE942D01BDC933E00354519 /* Home */,
-				9AE942D31BDC933E00354519 /* Main */,
-				9AE942D81BDC933E00354519 /* Message */,
-				9AE942DB1BDC933E00354519 /* Mine */,
-				9AE942DE1BDC933E00354519 /* SameCity */,
-				9A1052281BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.h */,
-				9A1052291BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.m */,
+				9A1559C91CB6D56500CAB1AF /* Module */,
+				9A1559D81CB6D56500CAB1AF /* View */,
 			);
 			path = Classes;
-			sourceTree = "<group>";
-		};
-		9AE942D01BDC933E00354519 /* Home */ = {
-			isa = PBXGroup;
-			children = (
-				9AE942D11BDC933E00354519 /* CYLHomeViewController.h */,
-				9AE942D21BDC933E00354519 /* CYLHomeViewController.m */,
-			);
-			path = Home;
-			sourceTree = "<group>";
-		};
-		9AE942D31BDC933E00354519 /* Main */ = {
-			isa = PBXGroup;
-			children = (
-				9AE942D51BDC933E00354519 /* View */,
-			);
-			path = Main;
-			sourceTree = "<group>";
-		};
-		9AE942D51BDC933E00354519 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				9AE942D61BDC933E00354519 /* CYLPlusButtonSubclass.h */,
-				9AE942D71BDC933E00354519 /* CYLPlusButtonSubclass.m */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		9AE942D81BDC933E00354519 /* Message */ = {
-			isa = PBXGroup;
-			children = (
-				9AE942D91BDC933E00354519 /* CYLMessageViewController.h */,
-				9AE942DA1BDC933E00354519 /* CYLMessageViewController.m */,
-			);
-			path = Message;
-			sourceTree = "<group>";
-		};
-		9AE942DB1BDC933E00354519 /* Mine */ = {
-			isa = PBXGroup;
-			children = (
-				9AE942DC1BDC933E00354519 /* CYLMineViewController.h */,
-				9AE942DD1BDC933E00354519 /* CYLMineViewController.m */,
-			);
-			path = Mine;
-			sourceTree = "<group>";
-		};
-		9AE942DE1BDC933E00354519 /* SameCity */ = {
-			isa = PBXGroup;
-			children = (
-				9AE942DF1BDC933E00354519 /* CYLSameCityViewController.h */,
-				9AE942E01BDC933E00354519 /* CYLSameCityViewController.m */,
-				9AE942E11BDC933E00354519 /* CYLDetailsViewController.h */,
-				9AE942E21BDC933E00354519 /* CYLDetailsViewController.m */,
-			);
-			path = SameCity;
 			sourceTree = "<group>";
 		};
 		9AE942F21BDC937F00354519 /* CYLTabBarController */ = {
@@ -276,19 +276,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A1559DC1CB6D56500CAB1AF /* CYLMessageViewController.m in Sources */,
+				9A1559C51CB6D4C700CAB1AF /* CYLTabBarControllerConfig.m in Sources */,
+				9A1559DE1CB6D56500CAB1AF /* CYLDetailsViewController.m in Sources */,
 				9AE667131C800085001DED12 /* UIViewController+CYLJumpToOtherTabBarControllerItem.m in Sources */,
-				9A10522A1BE8FFC600AEEDA8 /* CYLTabBarControllerConfig.m in Sources */,
-				9AE942EA1BDC933E00354519 /* CYLPlusButtonSubclass.m in Sources */,
+				9A1559E01CB6D56500CAB1AF /* CYLPlusButtonSubclass.m in Sources */,
+				9A1559DF1CB6D56500CAB1AF /* CYLSameCityViewController.m in Sources */,
+				9A1559DB1CB6D56500CAB1AF /* CYLHomeViewController.m in Sources */,
 				9AE942F91BDC937F00354519 /* CYLPlusButton.m in Sources */,
-				9AE942EC1BDC933E00354519 /* CYLMineViewController.m in Sources */,
-				9AE942EB1BDC933E00354519 /* CYLMessageViewController.m in Sources */,
-				9AE942EE1BDC933E00354519 /* CYLDetailsViewController.m in Sources */,
-				9AE942ED1BDC933E00354519 /* CYLSameCityViewController.m in Sources */,
-				9AE942E91BDC933E00354519 /* CYLHomeViewController.m in Sources */,
+				9A1559C81CB6D4D300CAB1AF /* AppDelegate.m in Sources */,
+				9A1559DD1CB6D56500CAB1AF /* CYLMineViewController.m in Sources */,
 				9AE942FB1BDC937F00354519 /* CYLTabBarController.m in Sources */,
 				9AE942F11BDC933E00354519 /* main.m in Sources */,
 				9AE942FA1BDC937F00354519 /* CYLTabBar.m in Sources */,
-				9AE942E61BDC933E00354519 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

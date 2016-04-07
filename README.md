@@ -2,8 +2,8 @@
 
 
 <p align="center">
-![enter image description here](https://img.shields.io/badge/pod-v1.2.1-brightgreen.svg)
-![enter image description here](https://img.shields.io/badge/Objective--C-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b4.svg)
+![enter image description here](https://img.shields.io/badge/pod-v1.2.3-brightgreen.svg)
+![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b4.svg)
 
 
 </a>
@@ -35,6 +35,7 @@
 4|即使加号按钮超出了tabbar的区域，</p>超出部分依然能响应点击事件 | 红线内的区域均能响应tabbar相关的点击事件，</p>![enter image description here](http://i57.tinypic.com/2r7ndzk.jpg)
 5 | 允许指定加号按钮位置 | 效果如下：</p>![enter image description here](http://a64.tinypic.com/2mo0h.jpg)
 6 |支持CocoaPods |容易集成
+7 |支持Swift项目导入 | 兼容
 
 
 
@@ -215,6 +216,40 @@ pod update
     [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
  ```
 
+如何调整自定义 `PlusButton` 与其它 `TabBarItem` 的宽度？
+
+`CYLTabBarController` 规定：
+
+ ```Objective-C
+ TabBarItem 宽度 ＝  ( TabBar 总宽度 －  PlusButton 宽度  ) / (TabBarItem 个数)
+ ```
+
+所以想自定义宽度，只需要修改 `PlusButton` 的宽度即可。
+
+比如你就可以在 Demo中的 `CYLPlusButtonSubclass.m` 类里：
+   
+把
+
+ ```Objective-C
+ [button sizeToFit]; 
+ ```
+
+改为
+
+ ```Objective-C
+ button.frame = CGRectMake(0.0, 0.0, 250, 100);
+ button.backgroundColor = [UIColor redColor];
+ ```
+
+效果如下，
+
+![enter image description here](http://i64.tinypic.com/vx16r5.jpg)
+
+同时你也测试下 `CYLTabBarController` 的这一个特性：
+
+ > 即使加号按钮超出了tabbar的区域，超出部分依然能响应点击事件
+
+
 ### 补充说明
 
 #### 自定义 `TabBar` 样式
@@ -252,6 +287,7 @@ pod update
     return YES;
 }
  ```
+
 
 #### 访问初始化好的 CYLTabBarController 对象
 
@@ -337,14 +373,6 @@ Apple 规定：
 
 最多只能添加5个 `TabBarItem` ，也就是说加上“加号按钮”，一共最多在一个 `TabBar` 上放置6个控件。否则第6个及之后出现 `TabBarItem` 会被自动屏蔽掉。而且就Apple的审核机制来说，超过5个也会被直接拒绝上架。
 
-
-
-Q：我把 demo 两侧的 item 各去掉一个后，按钮的响应区域就变成下图的样子了：
-![wechat_1445851872](https://cloud.githubusercontent.com/assets/12152553/10725491/62600172-7c07-11e5-9e0a-0ec7d795d1e3.jpeg)
-
-A：这个是iOS系统对 `tabBar` 做的优化，请在真机上进行右手体验。如果你将iPhone切换到左手模式，触摸区域将“反过来”，有兴趣可以试一下。
-
-
 Q： 如何实现添加选中背景色的功能 ，像下面这样：
 <img width="409" alt="screen shot 2015-10-28 at 9 21 56 am" src="https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png">
 
@@ -383,6 +411,17 @@ A：在 v1.0.7 版本中已经修复了该 bug，但是也需要注意：
     self.tabBarItem.title = @"同城23333";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in  tabbar.
     self.title = @"同城1";                  //❌sets both of these. Do not do this‼️‼️ This may cause something strange like this : http://i68.tinypic.com/282l3x4.jpg 
 
+ ```
+
+ Q :  当使用这个方法时 `-[UIViewController cyl_jumpToOtherTabBarControllerItem:(Class)ClassType performSelector:arguments:returnValue:]` 会出现如下的黑边问题。
+
+![enter image description here](http://i63.tinypic.com/bg766g.jpg)
+
+A： 这个时 iOS 系统的BUG，经测试iOS9.3已经修复了，如果在更早起版本中出现了，可以通过下面将 `rootWindow`的背景色改为白色来避免：比如你可以这样：
+
+
+ ```Objective-C
+    [(CYLTabBarController *)self.tabBarController rootWindow].backgroundColor = [UIColor whiteColor];
  ```
 
 

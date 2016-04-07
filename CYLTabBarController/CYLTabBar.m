@@ -50,8 +50,8 @@
     }
     CGFloat barWidth = self.frame.size.width;
     CGFloat barHeight = self.frame.size.height;
-    
-    CGFloat tabBarButtonW = (CGFloat) barWidth / (CYLTabbarItemsCount + 1);
+    CGFloat widthOfPlusButton = CGRectGetWidth(self.plusButton.frame);
+    CGFloat tabBarButtonW = (barWidth - widthOfPlusButton) / CYLTabbarItemsCount;
     NSInteger buttonIndex = 0;
     CGFloat multiplerInCenterY;
     if ([[self.plusButton class] respondsToSelector:@selector(multiplerInCenterY)]) {
@@ -69,11 +69,10 @@
     }
     
     self.plusButton.center = CGPointMake(barWidth * 0.5, barHeight * multiplerInCenterY);
-    
     NSUInteger plusButtonIndex;
     if ([[self.plusButton class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
         if (CYLTabbarItemsCount % 2 == 0) {
-            [NSException raise:@"CYLTabBarController" format:@"If the count of CYLTabbarControllers is not odd,there's no need to realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】如果CYLTabbarControllers的个数不是奇数，会自动居中，你无需在你自定义的plusButton中实现`+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
+            [NSException raise:@"CYLTabBarController" format:@"If the count of CYLTabbarControllers is not odd, there's no need to realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】如果CYLTabbarControllers的个数不是奇数，会自动居中，你无需在你自定义的plusButton中实现`+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
         }
         plusButtonIndex = [[self.plusButton class] indexOfPlusButtonInTabBar];
         //仅修改self.plusButton的x,ywh值不变
@@ -99,13 +98,16 @@
         }
     }];
     for (UIView *childView in sortedSubviews) {
-        //调整加号按钮后面的UITabBarItem的位置
+        //调整UITabBarItem的位置
         if ([childView isKindOfClass:NSClassFromString(@"UITabBarButton")]) {
-            if (buttonIndex == plusButtonIndex) {
-                buttonIndex++;
+            CGFloat childViewX;
+            if (buttonIndex >= plusButtonIndex) {
+                childViewX = buttonIndex * tabBarButtonW + widthOfPlusButton;
+            } else {
+                childViewX = buttonIndex * tabBarButtonW;
             }
             //仅修改childView的x和宽度,yh值不变
-            childView.frame = CGRectMake(buttonIndex * tabBarButtonW,
+            childView.frame = CGRectMake(childViewX,
                                          CGRectGetMinY(childView.frame),
                                          tabBarButtonW,
                                          CGRectGetHeight(childView.frame)
