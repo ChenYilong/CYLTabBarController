@@ -73,7 +73,7 @@
         │   ├── Message
         │   ├── Mine
         │   └── SameCity
-        └── View         #这个里放着CYLPlusButton的子类，演示里如何创建自定义的形状不规则加号按钮
+        └── View         #这里放着 CYLPlusButton 的子类 CYLPlusButtonSubclass，演示了如何创建自定义的形状不规则加号按钮
         
         
  ```
