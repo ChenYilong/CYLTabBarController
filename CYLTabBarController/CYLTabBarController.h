@@ -23,11 +23,11 @@ FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
 /**
  * An array of the root view controllers displayed by the tab bar interface.
  */
-@property (nonatomic, readwrite, copy) IBOutletCollection(UIViewController) NSArray *viewControllers;
+@property (nonatomic, readwrite, copy) NSArray<UIViewController *> *viewControllers;
 /**
  * The Attributes of items which is displayed on the tab bar.
  */
-@property (nonatomic, readwrite, copy) IBOutletCollection(NSDictionary) NSArray *tabBarItemsAttributes;
+@property (nonatomic, readwrite, copy) NSArray<NSDictionary *> *tabBarItemsAttributes;
 
 /*!
  * Judge if there is plus button.

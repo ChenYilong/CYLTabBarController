@@ -60,7 +60,7 @@
                                                         initWithRootViewController:fourthViewController];
         CYLTabBarController *tabBarController = [[CYLTabBarController alloc] init];
         
-         // 在`-setViewControllers:`之前设置TabBar的属性，设置TabBarItem的属性，包括 title、Image、selectedImage。
+        // 在`-setViewControllers:`之前设置TabBar的属性，设置TabBarItem的属性，包括 title、Image、selectedImage。
         [self setUpTabBarItemsAttributesForController:tabBarController];
         
         [tabBarController setViewControllers:@[
@@ -69,9 +69,9 @@
                                                thirdNavigationController,
                                                fourthNavigationController
                                                ]];
-         // 更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
-#warning IF YOU NEED CUSTOMIZE TABBAR APPEARANCE, REMOVE THE COMMENT '//'
-//        [[self class] customizeTabBarAppearance:tabBarController];
+        // 更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
+#warning IF YOU DO NOT NEED CUSTOMIZE TABBAR APPEARANCE, ADD THE COMMENT '//'
+        [[self class] customizeTabBarAppearance:tabBarController];
         _tabBarController = tabBarController;
     }
     return _tabBarController;
@@ -116,9 +116,6 @@
  */
 + (void)customizeTabBarAppearance:(CYLTabBarController *)tabBarController {
     
-    //去除 TabBar 自带的顶部阴影
-    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
-    
     // set the text color for unselected state
     // 普通状态下的文字属性
     NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];
@@ -137,12 +134,25 @@
     
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色
-    NSUInteger allItemsInTabBarCount = [CYLTabBarController allItemsInTabBarCount];
-    [[UITabBar appearance] setSelectionIndicatorImage:[self imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(([UIScreen mainScreen].bounds.size.width - CYLPlusButtonWidth) / (allItemsInTabBarCount - 1), 49.f) withCornerRadius:0]];
-    // set the bar background color
+    //    NSUInteger allItemsInTabBarCount = [CYLTabBarController allItemsInTabBarCount];
+    //    [[UITabBar appearance] setSelectionIndicatorImage:[self imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(([UIScreen mainScreen].bounds.size.width - CYLPlusButtonWidth) / (allItemsInTabBarCount - 1), 49.f) withCornerRadius:0]];
+    
+    // set the bar shadow image
+    // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
+    [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
+    [[UITabBar appearance] setBackgroundColor:[UIColor whiteColor]];
+    [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"tapbar_top_line"]];
+    
+    // set the bar background image
     // 设置背景图片
-    // UITabBar *tabBarAppearance = [UITabBar appearance];
-    // [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background_ios7"]];
+    //     UITabBar *tabBarAppearance = [UITabBar appearance];
+    //     [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background"]];
+    
+    //remove the bar system shadow image
+    //去除 TabBar 自带的顶部阴影
+    //    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
+    
+    
 }
 
 + (UIImage *)imageFromColor:(UIColor *)color forSize:(CGSize)size withCornerRadius:(CGFloat)radius {
