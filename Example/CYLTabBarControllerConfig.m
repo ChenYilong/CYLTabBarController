@@ -70,7 +70,6 @@
                                                fourthNavigationController
                                                ]];
         // 更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
-#warning IF YOU DO NOT NEED CUSTOMIZE TABBAR APPEARANCE, ADD THE COMMENT '//'
         [[self class] customizeTabBarAppearance:tabBarController];
         _tabBarController = tabBarController;
     }
@@ -115,7 +114,9 @@
  *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
  */
 + (void)customizeTabBarAppearance:(CYLTabBarController *)tabBarController {
-    
+
+#warning CUSTOMIZE YOUR TABBAR APPEARANCE
+
     // set the text color for unselected state
     // 普通状态下的文字属性
     NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];
