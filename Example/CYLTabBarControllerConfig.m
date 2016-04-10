@@ -133,12 +133,12 @@
     
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色
-//    [[UITabBar appearance] setSelectionIndicatorImage:[[self class] imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(CYLTabBarItemWidth , 49.f) withCornerRadius:0]];
+    //    [self customizeTabBarSelectionIndicatorImage];
     
     // update TabBar when TabBarItem width did update
     // If your app need support UIDeviceOrientationLandscapeLeft or UIDeviceOrientationLandscapeRight， remove the comment '//'
     //如果你的App需要支持横竖屏，请使用该方法移除注释 '//'
-    //[self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
+    //    [self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
     
     // set the bar shadow image
     // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
@@ -158,7 +158,13 @@
 
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {
     void (^deviceOrientationDidChangeBlock)(NSNotification *) = ^(NSNotification *notification) {
-        [self tabBarItemWidthDidUpdate];
+        UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+        if ((orientation == UIDeviceOrientationLandscapeLeft) || (orientation == UIDeviceOrientationLandscapeRight)) {
+            NSLog(@"Landscape Left or Right !");
+        } else if (orientation == UIDeviceOrientationPortrait){
+            NSLog(@"Landscape portrait!");
+        }
+        [self customizeTabBarSelectionIndicatorImage];
     };
     [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemWidthDidChangeNotification
                                                       object:nil
@@ -166,13 +172,7 @@
                                                   usingBlock:deviceOrientationDidChangeBlock];
 }
 
-- (void)tabBarItemWidthDidUpdate {
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    if ((orientation == UIDeviceOrientationLandscapeLeft) || (orientation == UIDeviceOrientationLandscapeRight)) {
-        NSLog(@"Landscape Left or Right !");
-    } else if (orientation == UIDeviceOrientationPortrait){
-        NSLog(@"Landscape portrait!");
-    }
+- (void)customizeTabBarSelectionIndicatorImage {
     CGSize selectionIndicatorImageSize = CGSizeMake(CYLTabBarItemWidth, [self cyl_tabBarController].tabBar.bounds.size.height);
     [[self cyl_tabBarController].tabBar setSelectionIndicatorImage:[[self class]
                                                                     imageFromColor:[UIColor yellowColor]

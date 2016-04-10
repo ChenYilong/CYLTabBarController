@@ -41,10 +41,10 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     if (CYLExternPlusButton) {
         self.plusButton = CYLExternPlusButton;
         [self addSubview:(UIButton *)self.plusButton];
-        // KVO注册监听
-        _tabBarItemWidth = CYLTabBarItemWidth;
-        [self addObserver:self forKeyPath:@"tabBarItemWidth" options:NSKeyValueObservingOptionNew context:CYLTabBarContext];
     }
+    // KVO注册监听
+    _tabBarItemWidth = CYLTabBarItemWidth;
+    [self addObserver:self forKeyPath:@"tabBarItemWidth" options:NSKeyValueObservingOptionNew context:CYLTabBarContext];
     return self;
 }
 
@@ -78,14 +78,13 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    if (!CYLExternPlusButton) {
-        return;
-    }
-    
     CGFloat barWidth = self.bounds.size.width;
     CGFloat barHeight = self.bounds.size.height;
     CYLTabBarItemWidth = (barWidth - CYLPlusButtonWidth) / CYLTabbarItemsCount;
     self.tabBarItemWidth = CYLTabBarItemWidth;
+    if (!CYLExternPlusButton) {
+        return;
+    }
     NSInteger buttonIndex = 0;
     CGFloat multiplerInCenterY;
     if ([[self.plusButton class] respondsToSelector:@selector(multiplerInCenterY)]) {
