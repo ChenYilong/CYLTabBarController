@@ -20,11 +20,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Example/CYLTabBarControllerConfig.m"
-            timestampString = "481971133.560991"
+            timestampString = "481973416.604497"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "208"
-            endingLineNumber = "208"
+            startingLineNumber = "212"
+            endingLineNumber = "212"
             landmarkName = "-dealloc"
             landmarkType = "5">
          </BreakpointContent>

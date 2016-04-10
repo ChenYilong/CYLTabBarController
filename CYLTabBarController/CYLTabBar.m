@@ -54,7 +54,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         return;
     }
-    if(context == CYLTabBarContext && [keyPath isEqualToString:@"tabBarItemWidth"]) {
+    if(context == CYLTabBarContext) {
         [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemWidthDidChangeNotification object:self];
     }
 }
