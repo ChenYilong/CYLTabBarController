@@ -49,10 +49,12 @@
 
 
 ## 集成后的效果：
-既支持默认样式 | 同时也支持创建自定义的形状不规则加号按钮 | 支持横竖屏
--------------|-------------|-----------
-![enter image description here](http://i62.tinypic.com/rvcbit.jpg?192x251_130)| ![enter image description here](http://i58.tinypic.com/24d4t3p.jpg?192x251_130) | ![enter image description here](http://i67.tinypic.com/2u4snk7.jpg)
+既支持默认样式 | 同时也支持创建自定义的形状不规则加号按钮 
+-------------|------------
+![enter image description here](http://i62.tinypic.com/rvcbit.jpg?192x251_130)| ![enter image description here](http://i58.tinypic.com/24d4t3p.jpg?192x251_130)
 
+ 支持横竖屏
+ ![enter image description here](http://i67.tinypic.com/2u4snk7.jpg)
 
 
 本仓库配套Demo的效果：| [另一个Demo](https://github.com/ChenYilong/CYLTabBarControllerDemoForWeib) 使用CYLTabBarController实现了微博Tabbar框架，效果如下
@@ -328,9 +330,9 @@ pod update
     void (^deviceOrientationDidChangeBlock)(NSNotification *) = ^(NSNotification *notification) {
         [self tabBarItemWidthDidUpdate];
     };
-    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemWidthDidUpdate
+    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemWidthDidChangeNotification
                                                       object:nil
-                                                       queue:nil
+                                                       queue:[NSOperationQueue mainQueue]
                                                   usingBlock:deviceOrientationDidChangeBlock];
 }
 
@@ -341,7 +343,11 @@ pod update
     } else if (orientation == UIDeviceOrientationPortrait){
         NSLog(@"Landscape portrait!");
     }
-    [[self cyl_tabBarController].tabBar setSelectionIndicatorImage:[[self class] imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(CYLTabBarItemWidth, [self cyl_tabBarController].tabBar.bounds.size.height) withCornerRadius:0]];
+    CGSize selectionIndicatorImageSize = CGSizeMake(CYLTabBarItemWidth, [self cyl_tabBarController].tabBar.bounds.size.height);
+    [[self cyl_tabBarController].tabBar setSelectionIndicatorImage:[[self class]
+                                                                    imageFromColor:[UIColor yellowColor]
+                                                                    forSize:selectionIndicatorImageSize
+                                                                    withCornerRadius:0]];
 }
  ```
 

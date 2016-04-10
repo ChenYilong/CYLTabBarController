@@ -173,7 +173,11 @@
     } else if (orientation == UIDeviceOrientationPortrait){
         NSLog(@"Landscape portrait!");
     }
-    [[self cyl_tabBarController].tabBar setSelectionIndicatorImage:[[self class] imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(CYLTabBarItemWidth, [self cyl_tabBarController].tabBar.bounds.size.height) withCornerRadius:0]];
+    CGSize selectionIndicatorImageSize = CGSizeMake(CYLTabBarItemWidth, [self cyl_tabBarController].tabBar.bounds.size.height);
+    [[self cyl_tabBarController].tabBar setSelectionIndicatorImage:[[self class]
+                                                                    imageFromColor:[UIColor yellowColor]
+                                                                    forSize:selectionIndicatorImageSize
+                                                                    withCornerRadius:0]];
 }
 
 + (UIImage *)imageFromColor:(UIColor *)color forSize:(CGSize)size withCornerRadius:(CGFloat)radius {
