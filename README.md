@@ -457,11 +457,12 @@ A：在 v1.0.7 版本中已经修复了该 bug，但是也需要注意：
 
 ![enter image description here](http://i63.tinypic.com/bg766g.jpg)
 
-A： 这个是 iOS 系统的BUG，经测试iOS9.3已经修复了，如果在更早起版本中出现了，可以通过下面将 `rootWindow` 的背景色改为白色来避免：比如你可以这样：
+A： 这个是 iOS 系统的BUG，经测试iOS9.3已经修复了，如果在更早起版本中出现了，可以通过下面将 `rootWindow` 的背景色改为白色来避免：比如你可以 `Appdelegate` 类里这样设置：
 
 
  ```Objective-C
-    [(CYLTabBarController *)self.tabBarController rootWindow].backgroundColor = [UIColor whiteColor];
+//#import "CYLTabBarController.h"
+    [[self cyl_tabBarController] rootWindow].backgroundColor = [UIColor whiteColor];
  ```
 
 
