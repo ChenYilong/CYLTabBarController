@@ -16,7 +16,7 @@ static NSString * const CYLTabBarItemSelectedImage = @"tabBarItemSelectedImage";
 FOUNDATION_EXTERN NSUInteger CYLTabbarItemsCount;
 FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
-static NSString *const CYLTabBarItemWidthDidUpdate = @"CYLTabBarItemWidthDidUpdate";
+FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidUpdate;
 
 @import UIKit;
 

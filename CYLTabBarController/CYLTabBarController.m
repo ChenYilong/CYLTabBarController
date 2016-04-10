@@ -13,6 +13,7 @@
 
 NSUInteger CYLTabbarItemsCount = 0;
 CGFloat CYLTabBarItemWidth = 0.0f;
+NSString *const CYLTabBarItemWidthDidUpdate = @"CYLTabBarItemWidthDidUpdate";
 
 @interface NSObject (CYLTabBarControllerItemInternal)
 
