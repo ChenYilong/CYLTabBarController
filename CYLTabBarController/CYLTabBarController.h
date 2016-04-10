@@ -9,16 +9,13 @@
 @import Foundation;
 @import UIKit;
 
-static NSString * const CYLTabBarItemTitle = @"tabBarItemTitle";
-static NSString * const CYLTabBarItemImage = @"tabBarItemImage";
-static NSString * const CYLTabBarItemSelectedImage = @"tabBarItemSelectedImage";
-
+FOUNDATION_EXTERN NSString *const CYLTabBarItemTitle;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemImage;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedImage;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidChangeNotification;
 FOUNDATION_EXTERN NSUInteger CYLTabbarItemsCount;
 FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
-FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidUpdate;
-
-@import UIKit;
 
 @interface CYLTabBarController : UITabBarController
 

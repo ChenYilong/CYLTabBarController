@@ -133,10 +133,12 @@
     
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色
-    [[UITabBar appearance] setSelectionIndicatorImage:[[self class] imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(CYLTabBarItemWidth , 49.f) withCornerRadius:0]];
+//    [[UITabBar appearance] setSelectionIndicatorImage:[[self class] imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(CYLTabBarItemWidth , 49.f) withCornerRadius:0]];
     
     // update TabBar when TabBarItem width did update
-    [self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
+    // If your app need support UIDeviceOrientationLandscapeLeft or UIDeviceOrientationLandscapeRight， remove the comment '//'
+    //如果你的App需要支持横竖屏，请使用该方法移除注释 '//'
+    //[self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
     
     // set the bar shadow image
     // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
@@ -155,13 +157,12 @@
 }
 
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {
-    // I know here is a retain cycle, but I want to receice notifaction, so retain cycle is necessary.
     void (^deviceOrientationDidChangeBlock)(NSNotification *) = ^(NSNotification *notification) {
         [self tabBarItemWidthDidUpdate];
     };
-    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemWidthDidUpdate
+    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemWidthDidChangeNotification
                                                       object:nil
-                                                       queue:nil
+                                                       queue:[NSOperationQueue mainQueue]
                                                   usingBlock:deviceOrientationDidChangeBlock];
 }
 

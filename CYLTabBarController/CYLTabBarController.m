@@ -10,10 +10,13 @@
 #import "CYLTabBar.h"
 #import "CYLPlusButton.h"
 #import <objc/runtime.h>
+NSString *const CYLTabBarItemTitle = @"CYLTabBarItemTitle";
+NSString *const CYLTabBarItemImage = @"CYLTabBarItemImage";
+NSString *const CYLTabBarItemSelectedImage = @"CYLTabBarItemSelectedImage";
 
 NSUInteger CYLTabbarItemsCount = 0;
 CGFloat CYLTabBarItemWidth = 0.0f;
-NSString *const CYLTabBarItemWidthDidUpdate = @"CYLTabBarItemWidthDidUpdate";
+NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDidChangeNotification";
 
 @interface NSObject (CYLTabBarControllerItemInternal)
 

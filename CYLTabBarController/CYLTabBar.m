@@ -10,7 +10,7 @@
 #import "CYLPlusButton.h"
 #import "CYLTabBarController.h"
 
-static void * const CYLTabBarContext = (void*)&CYLTabBarContext;
+static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 
 @interface CYLTabBar ()
 
@@ -55,7 +55,7 @@ static void * const CYLTabBarContext = (void*)&CYLTabBarContext;
         return;
     }
     if(context == CYLTabBarContext && [keyPath isEqualToString:@"tabBarItemWidth"]) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemWidthDidUpdate object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemWidthDidChangeNotification object:self];
     }
 }
 

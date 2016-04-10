@@ -20,7 +20,8 @@
   4.  [第四步（可选）：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步可选创建自定义的形状不规则加号按钮) 
  5.  [补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) 
   1.  [自定义 TabBar 样式](https://github.com/ChenYilong/CYLTabBarController#自定义-tabbar-样式) 
-  2.  [访问初始化好的 CYLTabBarController 对象](https://github.com/ChenYilong/CYLTabBarController#访问初始化好的-cyltabbarcontroller-对象) 
+  2.  [横竖适配](https://github.com/ChenYilong/CYLTabBarController#横竖适配) 
+  3.  [访问初始化好的 CYLTabBarController 对象](https://github.com/ChenYilong/CYLTabBarController#访问初始化好的-cyltabbarcontroller-对象) 
   3.  [在 Swift 项目中使用 CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#在-swift-项目中使用-cyltabbarcontroller) 
   4.  [源码实现原理](https://github.com/ChenYilong/CYLTabBarController#源码实现原理) 
  6.  [Q-A](https://github.com/ChenYilong/CYLTabBarController#q-a) 
@@ -48,9 +49,10 @@
 
 
 ## 集成后的效果：
-既支持默认样式 | 同时也支持创建自定义的形状不规则加号按钮
--------------|-------------
-![enter image description here](http://i62.tinypic.com/rvcbit.jpg?192x251_130)| ![enter image description here](http://i58.tinypic.com/24d4t3p.jpg?192x251_130)
+既支持默认样式 | 同时也支持创建自定义的形状不规则加号按钮 | 支持横竖屏
+-------------|-------------|-----------
+![enter image description here](http://i62.tinypic.com/rvcbit.jpg?192x251_130)| ![enter image description here](http://i58.tinypic.com/24d4t3p.jpg?192x251_130) | ![enter image description here](http://i67.tinypic.com/2u4snk7.jpg)
+
 
 
 本仓库配套Demo的效果：| [另一个Demo](https://github.com/ChenYilong/CYLTabBarControllerDemoForWeib) 使用CYLTabBarController实现了微博Tabbar框架，效果如下
@@ -314,6 +316,36 @@ pod update
 }
  ```
 
+#### 横竖适配
+
+`TabBar` 横竖屏适配时，如果你添加了 `PlusButton`，且适配时用到了 `TabBarItem` 的宽度, 不建议使用系统的`UIDeviceOrientationDidChangeNotification` , 请使用库里的 `CYLTabBarItemWidthDidUpdate` 来更新 `TabBar` 布局，最典型的场景就是，根据 `TabBarItem` 在不同横竖屏状态下的宽度变化来切换选中的`TabBarItem` 的背景图片。Demo 里 `CYLTabBarControllerConfig.m` 给出了这一场景的用法:
+
+
+ `CYLTabBarController.h`  中提供了 `CYLTabBarItemWidth` 这一extern常量，并且会在 `TabBarItem` 的宽度发生变化时，及时更新该值，所以用法就如下所示：
+
+ ```Objective-C
+- (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {
+    void (^deviceOrientationDidChangeBlock)(NSNotification *) = ^(NSNotification *notification) {
+        [self tabBarItemWidthDidUpdate];
+    };
+    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemWidthDidUpdate
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:deviceOrientationDidChangeBlock];
+}
+
+- (void)tabBarItemWidthDidUpdate {
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if ((orientation == UIDeviceOrientationLandscapeLeft) || (orientation == UIDeviceOrientationLandscapeRight)) {
+        NSLog(@"Landscape Left or Right !");
+    } else if (orientation == UIDeviceOrientationPortrait){
+        NSLog(@"Landscape portrait!");
+    }
+    [[self cyl_tabBarController].tabBar setSelectionIndicatorImage:[[self class] imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(CYLTabBarItemWidth, [self cyl_tabBarController].tabBar.bounds.size.height) withCornerRadius:0]];
+}
+ ```
+
+![enter image description here](http://i67.tinypic.com/2u4snk7.jpg)
 
 #### 访问初始化好的 CYLTabBarController 对象
 
@@ -385,7 +417,7 @@ A：我已经在 Demo 中添加了如何实现该功能的代码：
 /**
  *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
  */
-- (void)customizeTabBarAppearance;
+- (void)customizeTabBarAppearance:(CYLTabBarController *)tabBarController;
 
  ```
 
