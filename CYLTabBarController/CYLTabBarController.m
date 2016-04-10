@@ -12,8 +12,9 @@
 #import <objc/runtime.h>
 
 NSUInteger CYLTabbarItemsCount = 0;
+CGFloat CYLTabBarItemWidth = 0.0f;
 
-@interface UIViewController (CYLTabBarControllerItemInternal)
+@interface NSObject (CYLTabBarControllerItemInternal)
 
 - (void)cyl_setTabBarController:(CYLTabBarController *)tabBarController;
 
@@ -58,6 +59,7 @@ NSUInteger CYLTabbarItemsCount = 0;
             }
         }
         CYLTabbarItemsCount = [viewControllers count];
+        CYLTabBarItemWidth = ([UIScreen mainScreen].bounds.size.width - CYLPlusButtonWidth) / (CYLTabbarItemsCount);
         NSUInteger idx = 0;
         for (UIViewController *viewController in viewControllers) {
             [self addOneChildViewController:viewController
@@ -136,9 +138,9 @@ NSUInteger CYLTabbarItemsCount = 0;
 
 @end
 
-#pragma mark - UIViewController+CYLTabBarControllerItem
+#pragma mark - NSObject+CYLTabBarControllerItem
 
-@implementation UIViewController (CYLTabBarControllerItemInternal)
+@implementation NSObject (CYLTabBarControllerItemInternal)
 
 - (void)cyl_setTabBarController:(CYLTabBarController *)tabBarController {
     objc_setAssociatedObject(self, @selector(cyl_tabBarController), tabBarController, OBJC_ASSOCIATION_ASSIGN);
@@ -146,12 +148,20 @@ NSUInteger CYLTabbarItemsCount = 0;
 
 @end
 
-@implementation UIViewController (CYLTabBarController)
+@implementation NSObject (CYLTabBarController)
 
 - (CYLTabBarController *)cyl_tabBarController {
     CYLTabBarController *tabBarController = objc_getAssociatedObject(self, @selector(cyl_tabBarController));
-    if (!tabBarController && self.parentViewController) {
-        tabBarController = [self.parentViewController cyl_tabBarController];
+    if (!tabBarController ) {
+        if ([self isKindOfClass:[UIViewController class]] && [(UIViewController *)self parentViewController]) {
+            tabBarController = [[(UIViewController *)self parentViewController] cyl_tabBarController];
+        } else {
+            id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
+            UIWindow *window = delegate.window;
+            if ([window.rootViewController isKindOfClass:[CYLTabBarController class]]) {
+                tabBarController = (CYLTabBarController *)window.rootViewController;
+            }
+        }
     }
     return tabBarController;
 }

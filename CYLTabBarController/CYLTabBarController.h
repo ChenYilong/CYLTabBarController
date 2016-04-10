@@ -15,6 +15,8 @@ static NSString * const CYLTabBarItemSelectedImage = @"tabBarItemSelectedImage";
 
 FOUNDATION_EXTERN NSUInteger CYLTabbarItemsCount;
 FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
+FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
+static NSString *const CYLTabBarItemWidthDidUpdate = @"CYLTabBarItemWidthDidUpdate";
 
 @import UIKit;
 
@@ -44,10 +46,10 @@ FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
 
 @end
 
-@interface UIViewController (CYLTabBarController)
+@interface NSObject (CYLTabBarController)
 
 /**
- * The nearest ancestor in the view controller hierarchy that is a tab bar controller. (read-only)
+ * If `self` is kind of `UIViewController`, this method will return the nearest ancestor in the view controller hierarchy that is a tab bar controller. If `self` is not kind of `UIViewController`, it will return the `rootViewController` of the `rootWindow` as long as you have set the `CYLTabBarController` as the  `rootViewController`. Otherwise return nil. (read-only)
  */
 @property (nonatomic, readonly) CYLTabBarController *cyl_tabBarController;
 

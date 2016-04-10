@@ -70,7 +70,7 @@
                                                fourthNavigationController
                                                ]];
         // 更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
-        [[self class] customizeTabBarAppearance:tabBarController];
+        [self customizeTabBarAppearance:tabBarController];
         _tabBarController = tabBarController;
     }
     return _tabBarController;
@@ -113,10 +113,8 @@
 /**
  *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
  */
-+ (void)customizeTabBarAppearance:(CYLTabBarController *)tabBarController {
-
+- (void)customizeTabBarAppearance:(CYLTabBarController *)tabBarController {
 #warning CUSTOMIZE YOUR TABBAR APPEARANCE
-
     // set the text color for unselected state
     // 普通状态下的文字属性
     NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];
@@ -135,8 +133,10 @@
     
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色
-    //    NSUInteger allItemsInTabBarCount = [CYLTabBarController allItemsInTabBarCount];
-    //    [[UITabBar appearance] setSelectionIndicatorImage:[self imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(([UIScreen mainScreen].bounds.size.width - CYLPlusButtonWidth) / (allItemsInTabBarCount - 1), 49.f) withCornerRadius:0]];
+    [[UITabBar appearance] setSelectionIndicatorImage:[[self class] imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(CYLTabBarItemWidth , 49.f) withCornerRadius:0]];
+    
+    // update TabBar when TabBarItem width did update
+    [self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
     
     // set the bar shadow image
     // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
@@ -152,8 +152,27 @@
     //remove the bar system shadow image
     //去除 TabBar 自带的顶部阴影
     //    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
-    
-    
+}
+
+- (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {
+    // I know here is a retain cycle, but I want to receice notifaction, so retain cycle is necessary.
+    void (^deviceOrientationDidChangeBlock)(NSNotification *) = ^(NSNotification *notification) {
+        [self tabBarItemWidthDidUpdate];
+    };
+    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemWidthDidUpdate
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:deviceOrientationDidChangeBlock];
+}
+
+- (void)tabBarItemWidthDidUpdate {
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if ((orientation == UIDeviceOrientationLandscapeLeft) || (orientation == UIDeviceOrientationLandscapeRight)) {
+        NSLog(@"Landscape Left or Right !");
+    } else if (orientation == UIDeviceOrientationPortrait){
+        NSLog(@"Landscape portrait!");
+    }
+    [[self cyl_tabBarController].tabBar setSelectionIndicatorImage:[[self class] imageFromColor:[UIColor yellowColor] forSize:CGSizeMake(CYLTabBarItemWidth, [self cyl_tabBarController].tabBar.bounds.size.height) withCornerRadius:0]];
 }
 
 + (UIImage *)imageFromColor:(UIColor *)color forSize:(CGSize)size withCornerRadius:(CGFloat)radius {
@@ -182,6 +201,10 @@
     // Lets forget about that we were drawing
     UIGraphicsEndImageContext();
     return image;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end

@@ -38,6 +38,7 @@
 5 | 允许指定加号按钮位置 | 效果如下：</p>![enter image description here](http://a64.tinypic.com/2mo0h.jpg)
 6 |支持CocoaPods |容易集成
 7 |支持Swift项目导入 | 兼容
+8 |支持横竖屏 | －－
 
 
 
@@ -65,7 +66,7 @@
 
  ```Objective-C
 
-├── CYLTabBarController  ＃核心库文件夹，如果不使用 CocoaPods 集成，请直接将这个文件夹下拖拽带你的项目中
+├── CYLTabBarController  ＃核心库文件夹，如果不使用 CocoaPods 集成，请直接将这个文件夹拖拽带你的项目中
 └── Example
     └── Classes
         ├── Module       #模块类文件夹
@@ -316,43 +317,19 @@ pod update
 
 #### 访问初始化好的 CYLTabBarController 对象
 
-有两种方式：
-
-第一种：
-
-对于 `UIViewController` ：
-
- ```Objective-C
-    UITabBarController *tabBarController = (UITabBarController *)self.view.window.rootViewController;
- ```
-
-对于 `UIView` ：
-
- ```Objective-C
-    UITabBarController *tabBarController = (UITabBarController *)self.window.rootViewController;
- ```
-
 对于任意 `NSObject` 对象：
 
- ```Objective-C
-    id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
-    UIWindow *window = delegate.window;
-    CYLTabBarController *tabbarController = (CYLTabBarController *)window.rootViewController;
- ```
-
-第二种：
-
- `CYLTabBarController.h`  中为 `UIViewController` 提供了分类方法 `-cyl_tabBarController` ，所以在  `UIViewController`  类中，一行代码就可以访问到一个初始化好的  `CYLTabBarController`  对象，`-cyl_tabBarController` 的作用你可以这样理解：与获取单例对象的  `+shareInstance` 方法作用一样。
+ `CYLTabBarController.h`  中为 `NSObject` 提供了分类方法 `-cyl_tabBarController` ，所以在任意对象中，一行代码就可以访问到一个初始化好的  `CYLTabBarController`  对象，`-cyl_tabBarController` 的作用你可以这样理解：与获取单例对象的  `+shareInstance` 方法作用一样。
 
 接口如下：
 
  ```Objective-C
 // CYLTabBarController.h
 
-@interface UIViewController (CYLTabBarController)
+@interface NSObject (CYLTabBarController)
 
 /**
- * The nearest ancestor in the view controller hierarchy that is a tab bar controller. (read-only)
+ * If `self` is kind of `UIViewController`, this method will return the nearest ancestor in the view controller hierarchy that is a tab bar controller. If `self` is not kind of `UIViewController`, it will return the `rootViewController` of the `rootWindow` as long as you have set the `CYLTabBarController` as the  `rootViewController`. Otherwise return nil. (read-only)
  */
 @property (nonatomic, readonly) CYLTabBarController *cyl_tabBarController;
 
@@ -442,7 +419,7 @@ A：在 v1.0.7 版本中已经修复了该 bug，但是也需要注意：
 
 ![enter image description here](http://i63.tinypic.com/bg766g.jpg)
 
-A： 这个时 iOS 系统的BUG，经测试iOS9.3已经修复了，如果在更早起版本中出现了，可以通过下面将 `rootWindow`的背景色改为白色来避免：比如你可以这样：
+A： 这个是 iOS 系统的BUG，经测试iOS9.3已经修复了，如果在更早起版本中出现了，可以通过下面将 `rootWindow` 的背景色改为白色来避免：比如你可以这样：
 
 
  ```Objective-C

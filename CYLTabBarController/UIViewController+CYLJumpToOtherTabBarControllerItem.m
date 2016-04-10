@@ -28,9 +28,7 @@
                    performSelector:(SEL)selector
                          arguments:(NSArray *)arguments
                        returnValue:(void *)returnValue {
-    id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
-    UIWindow *window = delegate.window;
-    CYLTabBarController *tabbarController = (CYLTabBarController *)window.rootViewController;
+    CYLTabBarController *tabbarController = [self cyl_tabBarController];
     BOOL isNavigationController = [[tabbarController.viewControllers[0] class] isSubclassOfClass:[UINavigationController class]];
     [self.navigationController popToRootViewControllerAnimated:NO];
     __block NSUInteger selectingIndex;
