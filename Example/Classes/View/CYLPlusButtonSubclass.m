@@ -7,6 +7,7 @@
 //
 
 #import "CYLPlusButtonSubclass.h"
+#import "CYLTabBarController.h"
 
 @interface CYLPlusButtonSubclass ()<UIActionSheetDelegate> {
     CGFloat _buttonImageHeight;
@@ -101,7 +102,7 @@
 #pragma mark - Event Response
 
 - (void)clickPublish {
-    UITabBarController *tabBarController = (UITabBarController *)self.window.rootViewController;
+    CYLTabBarController *tabBarController = [self cyl_tabBarController];
     UIViewController *viewController = tabBarController.selectedViewController;
     
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
