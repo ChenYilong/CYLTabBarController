@@ -20,11 +20,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Example/CYLTabBarControllerConfig.m"
-            timestampString = "482294547.088128"
+            timestampString = "482295802.220628"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "214"
-            endingLineNumber = "214"
+            startingLineNumber = "218"
+            endingLineNumber = "218"
             landmarkName = "-dealloc"
             landmarkType = "5">
          </BreakpointContent>
@@ -42,6 +42,22 @@
             startingLineNumber = "167"
             endingLineNumber = "167"
             landmarkName = "-updateTabBarCustomizationWhenTabBarItemWidthDidUpdate"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Example/CYLTabBarControllerConfig.m"
+            timestampString = "482295636.508473"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "179"
+            endingLineNumber = "179"
+            landmarkName = "-customizeTabBarSelectionIndicatorImage"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
