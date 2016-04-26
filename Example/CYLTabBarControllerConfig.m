@@ -180,36 +180,19 @@
     CGSize selectionIndicatorImageSize = CGSizeMake(CYLTabBarItemWidth, tabBarHeight);
     //Get initialized tabbar if exists.
     UITabBar *tabBar = [self cyl_tabBarController].tabBar ?: [UITabBar appearance];
-    [tabBar setSelectionIndicatorImage:[[self class]
-                                                                    imageFromColor:[UIColor yellowColor]
-                                                                    forSize:selectionIndicatorImageSize
-                                                                    withCornerRadius:0]];
+    [tabBar setSelectionIndicatorImage:
+     [[self class] imageWithColor:[UIColor redColor]
+                             size:selectionIndicatorImageSize]];
 }
 
-+ (UIImage *)imageFromColor:(UIColor *)color forSize:(CGSize)size withCornerRadius:(CGFloat)radius {
-    CGRect rect = CGRectMake(0, 0, size.width, size.height);
-    UIGraphicsBeginImageContext(rect.size);
-    
++ (UIImage *)imageWithColor:(UIColor *)color size:(CGSize)size {
+    if (!color || size.width <= 0 || size.height <= 0) return nil;
+    CGRect rect = CGRectMake(0.0f, 0.0f, size.width + 1, size.height);
+    UIGraphicsBeginImageContextWithOptions(rect.size, NO, 0);
     CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextSetFillColorWithColor(context, color.CGColor);
     CGContextFillRect(context, rect);
-    
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    // Begin a new image that will be the new image with the rounded corners
-    // (here with the size of an UIImageView)
-    UIGraphicsBeginImageContext(size);
-    
-    // Add a clip before drawing anything, in the shape of an rounded rect
-    [[UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:radius] addClip];
-    // Draw your image
-    [image drawInRect:rect];
-    
-    // Get the image, here setting the UIImageView image
-    image = UIGraphicsGetImageFromCurrentImageContext();
-    
-    // Lets forget about that we were drawing
     UIGraphicsEndImageContext();
     return image;
 }
