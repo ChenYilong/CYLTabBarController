@@ -392,6 +392,11 @@ pod update
 
 参考： [《从头开始swift2.1 仿搜材通项目（三） 主流框架Tabbed的搭建》]( http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes ) 
 
+这里注意，文章的示例代码有问题，少了设置 PlusButton 大小的代码：
+这将导致 PlusButton 点击事件失效，具体修改代码如下：
+![enter image description here](http://i66.tinypic.com/e7juyv.jpg)
+
+
 ### 源码实现原理
 
 参考： [《[Note] CYLTabBarController》]( http://www.jianshu.com/p/8758d8014f86 ) 
