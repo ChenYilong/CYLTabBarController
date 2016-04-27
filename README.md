@@ -22,8 +22,9 @@
   1.  [自定义 TabBar 样式](https://github.com/ChenYilong/CYLTabBarController#自定义-tabbar-样式) 
   2.  [横竖适配](https://github.com/ChenYilong/CYLTabBarController#横竖适配) 
   3.  [访问初始化好的 CYLTabBarController 对象](https://github.com/ChenYilong/CYLTabBarController#访问初始化好的-cyltabbarcontroller-对象) 
-  3.  [在 Swift 项目中使用 CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#在-swift-项目中使用-cyltabbarcontroller) 
-  4.  [源码实现原理](https://github.com/ChenYilong/CYLTabBarController#源码实现原理) 
+  4.  [点击 PlusButton 跳转到指定 UIViewController](https://github.com/ChenYilong/CYLTabBarController#点击-plusbutton-跳转到指定-uiviewcontroller) 
+  5.  [在 Swift 项目中使用 CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#在-swift-项目中使用-cyltabbarcontroller) 
+  6.  [源码实现原理](https://github.com/ChenYilong/CYLTabBarController#源码实现原理) 
  6.  [Q-A](https://github.com/ChenYilong/CYLTabBarController#q-a) 
 
 
