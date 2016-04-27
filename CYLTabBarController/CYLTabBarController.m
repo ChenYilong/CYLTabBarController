@@ -168,9 +168,11 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController*)viewController {
     NSUInteger selectedIndex = tabBarController.selectedIndex;
-    if (CYLPlusChildViewController && (selectedIndex == CYLPlusButtonIndex)) {
-        UIButton *plusButton = CYLExternPlusButton;
-        plusButton.selected = NO;
+    UIButton *plusButton = CYLExternPlusButton;
+    if (CYLPlusChildViewController) {
+        if ((selectedIndex == CYLPlusButtonIndex) && (viewController != CYLPlusChildViewController)) {
+            plusButton.selected = NO;
+        } 
     }
     return YES;
 }

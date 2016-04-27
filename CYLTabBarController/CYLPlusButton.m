@@ -53,7 +53,7 @@ UIViewController *CYLPlusChildViewController = nil;
 }
 
 + (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender {
-    sender.selected = !sender.selected;
+    sender.selected = YES;
     id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
     CYLTabBarController *tabBarController;
     UIWindow *window = delegate.window;

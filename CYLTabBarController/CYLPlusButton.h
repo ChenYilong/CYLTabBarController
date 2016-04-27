@@ -40,9 +40,6 @@
 
 @end
 
-
-
-
 @class CYLTabBar;
 
 FOUNDATION_EXTERN UIButton<CYLPlusButtonSubclassing> *CYLExternPlusButton;
@@ -51,5 +48,7 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 @interface CYLPlusButton : UIButton
 
 + (void)registerSubclass;
+
++ (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender;
 
 @end
