@@ -167,8 +167,8 @@
 		9AE942C81BDC933E00354519 /* Example */ = {
 			isa = PBXGroup;
 			children = (
-				9A1559C61CB6D4D300CAB1AF /* AppDelegate.m */,
 				9A1559C71CB6D4D300CAB1AF /* AppDelegate.h */,
+				9A1559C61CB6D4D300CAB1AF /* AppDelegate.m */,
 				9A1559C31CB6D4C700CAB1AF /* CYLTabBarControllerConfig.h */,
 				9A1559C41CB6D4C700CAB1AF /* CYLTabBarControllerConfig.m */,
 				9AE942CF1BDC933E00354519 /* Classes */,

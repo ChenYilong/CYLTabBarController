@@ -14,16 +14,18 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemImage;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedImage;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidChangeNotification;
 FOUNDATION_EXTERN NSUInteger CYLTabbarItemsCount;
+FOUNDATION_EXTERN NSUInteger CYLPlusButtonIndex;
 FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 
 @interface CYLTabBarController : UITabBarController
 
-/**
+/*!
  * An array of the root view controllers displayed by the tab bar interface.
  */
 @property (nonatomic, readwrite, copy) NSArray<UIViewController *> *viewControllers;
-/**
+
+/*!
  * The Attributes of items which is displayed on the tab bar.
  */
 @property (nonatomic, readwrite, copy) NSArray<NSDictionary *> *tabBarItemsAttributes;

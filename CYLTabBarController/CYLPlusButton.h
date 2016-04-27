@@ -30,11 +30,23 @@
  */
 + (CGFloat)multiplerInCenterY;
 
+/*!
+ 实现该方法后，能让 PlusButton 的点击效果与跟点击其他 UITabBarButton 效果一样，跳转到该方法指定的 UIViewController 。
+ @attention 必须同时实现 `+indexOfPlusButtonInTabBar` 来指定 PlusButton 的位置。
+ @return UIViewController 指定 PlusButton 点击后跳转的 UIViewController。
+ *
+ */
++ (UIViewController *)plusChildViewController;
+
 @end
+
+
+
 
 @class CYLTabBar;
 
 FOUNDATION_EXTERN UIButton<CYLPlusButtonSubclassing> *CYLExternPlusButton;
+FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 
 @interface CYLPlusButton : UIButton
 

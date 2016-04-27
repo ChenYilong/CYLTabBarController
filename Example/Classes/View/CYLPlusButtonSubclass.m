@@ -8,6 +8,7 @@
 
 #import "CYLPlusButtonSubclass.h"
 #import "CYLTabBarController.h"
+#import "CYLMineViewController.h"
 
 @interface CYLPlusButtonSubclass ()<UIActionSheetDelegate> {
     CGFloat _buttonImageHeight;
@@ -71,6 +72,10 @@
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button setTitle:@"发布" forState:UIControlStateNormal];
     [button setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+    
+    [button setTitle:@"选中" forState:UIControlStateSelected];
+    [button setTitleColor:[UIColor blueColor] forState:UIControlStateSelected];
+
     button.titleLabel.font = [UIFont systemFontOfSize:9.5];
     [button sizeToFit]; // or set frame in this way `button.frame = CGRectMake(0.0, 0.0, 250, 100);`
     [button addTarget:button action:@selector(clickPublish) forControlEvents:UIControlEventTouchUpInside];
@@ -120,8 +125,18 @@
 }
 
 #pragma mark - CYLPlusButtonSubclassing
+
+//+ (UIViewController *)plusChildViewController {
+//    UIViewController *plusChildViewController = [[UIViewController alloc] init];
+//    plusChildViewController.view.backgroundColor = [UIColor redColor];
+//    plusChildViewController.navigationItem.title = @"PlusChildViewController";
+//    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
+//                                                   initWithRootViewController:plusChildViewController];
+//    return plusChildNavigationController;
+//}
+//
 //+ (NSUInteger)indexOfPlusButtonInTabBar {
-//    return 3;
+//    return 2;
 //}
 
 + (CGFloat)multiplerInCenterY {

@@ -10,11 +10,13 @@
 #import "CYLTabBar.h"
 #import "CYLPlusButton.h"
 #import <objc/runtime.h>
+
 NSString *const CYLTabBarItemTitle = @"CYLTabBarItemTitle";
 NSString *const CYLTabBarItemImage = @"CYLTabBarItemImage";
 NSString *const CYLTabBarItemSelectedImage = @"CYLTabBarItemSelectedImage";
 
 NSUInteger CYLTabbarItemsCount = 0;
+NSUInteger CYLPlusButtonIndex = 0;
 CGFloat CYLTabBarItemWidth = 0.0f;
 NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDidChangeNotification";
 
@@ -23,7 +25,9 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
 - (void)cyl_setTabBarController:(CYLTabBarController *)tabBarController;
 
 @end
+@interface CYLTabBarController () <UITabBarControllerDelegate>
 
+@end
 @implementation CYLTabBarController
 
 @synthesize viewControllers = _viewControllers;
@@ -35,6 +39,7 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
     [super viewDidLoad];
     // 处理tabBar，使用自定义 tabBar 添加 发布按钮
     [self setUpTabBar];
+    self.delegate = self;
 }
 
 #pragma mark -
@@ -56,20 +61,36 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
         }
     }
     if (viewControllers && [viewControllers isKindOfClass:[NSArray class]]) {
-        _viewControllers = [viewControllers copy];
-        if (_tabBarItemsAttributes) {
-            if (_tabBarItemsAttributes.count != _viewControllers.count) {
-                [NSException raise:@"CYLTabBarController" format:@"The count of CYLTabBarControllers is not equal to the count of tabBarItemsAttributes.【Chinese】设置_tabBarItemsAttributes属性时，请确保元素个数与控制器的个数相同，并在方法`-setViewControllers:`之前设置"];
-            }
+        if ((!_tabBarItemsAttributes) || (_tabBarItemsAttributes.count != viewControllers.count)) {
+            [NSException raise:@"CYLTabBarController" format:@"The count of CYLTabBarControllers is not equal to the count of tabBarItemsAttributes.【Chinese】设置_tabBarItemsAttributes属性时，请确保元素个数与控制器的个数相同，并在方法`-setViewControllers:`之前设置"];
+        }
+        
+        if (CYLPlusChildViewController) {
+            NSMutableArray *viewControllersWithPlusButton = [NSMutableArray arrayWithArray:viewControllers];
+            [viewControllersWithPlusButton insertObject:CYLPlusChildViewController atIndex:CYLPlusButtonIndex];
+            _viewControllers = [viewControllersWithPlusButton copy];
+        } else {
+            _viewControllers = [viewControllers copy];
         }
         CYLTabbarItemsCount = [viewControllers count];
         CYLTabBarItemWidth = ([UIScreen mainScreen].bounds.size.width - CYLPlusButtonWidth) / (CYLTabbarItemsCount);
         NSUInteger idx = 0;
-        for (UIViewController *viewController in viewControllers) {
+        for (UIViewController *viewController in _viewControllers) {
+            NSString *title = nil;
+            NSString *normalImageName = nil;
+            NSString *selectedImageName = nil;
+            if (viewController != CYLPlusChildViewController) {
+                title = _tabBarItemsAttributes[idx][CYLTabBarItemTitle];
+                normalImageName = _tabBarItemsAttributes[idx][CYLTabBarItemImage];
+                selectedImageName = _tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage];
+            } else {
+                idx--;
+            }
+            
             [self addOneChildViewController:viewController
-                                  WithTitle:_tabBarItemsAttributes[idx][CYLTabBarItemTitle]
-                            normalImageName:_tabBarItemsAttributes[idx][CYLTabBarItemImage]
-                          selectedImageName:_tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage]];
+                                  WithTitle:title
+                            normalImageName:normalImageName
+                          selectedImageName:selectedImageName];
             [viewController cyl_setTabBarController:self];
             idx++;
         }
@@ -95,13 +116,16 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
                 selectedImageName:(NSString *)selectedImageName {
     
     viewController.tabBarItem.title = title;
-    UIImage *normalImage = [UIImage imageNamed:normalImageName];
-    normalImage = [normalImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-    viewController.tabBarItem.image = normalImage;
-    UIImage *selectedImage = [UIImage imageNamed:selectedImageName];
-    selectedImage = [selectedImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-    viewController.tabBarItem.selectedImage = selectedImage;
-    
+    if (normalImageName) {
+        UIImage *normalImage = [UIImage imageNamed:normalImageName];
+        normalImage = [normalImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+        viewController.tabBarItem.image = normalImage;
+    }
+    if (selectedImageName) {
+        UIImage *selectedImage = [UIImage imageNamed:selectedImageName];
+        selectedImage = [selectedImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+        viewController.tabBarItem.selectedImage = selectedImage;
+    }
     [self addChildViewController:viewController];
 }
 
@@ -138,6 +162,17 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
     } while (NO);
     
     return result;
+}
+
+#pragma mark - delegate
+
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController*)viewController {
+    NSUInteger selectedIndex = tabBarController.selectedIndex;
+    if (CYLPlusChildViewController && (selectedIndex == CYLPlusButtonIndex)) {
+        UIButton *plusButton = CYLExternPlusButton;
+        plusButton.selected = NO;
+    }
+    return YES;
 }
 
 @end

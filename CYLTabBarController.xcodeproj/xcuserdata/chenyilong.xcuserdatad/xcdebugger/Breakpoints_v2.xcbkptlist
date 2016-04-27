@@ -20,11 +20,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Example/CYLTabBarControllerConfig.m"
-            timestampString = "482295802.220628"
+            timestampString = "483352295.724451"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "218"
-            endingLineNumber = "218"
+            startingLineNumber = "202"
+            endingLineNumber = "202"
             landmarkName = "-dealloc"
             landmarkType = "5">
          </BreakpointContent>
@@ -35,29 +35,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Example/CYLTabBarControllerConfig.m"
-            timestampString = "482294094.55157"
+            filePath = "CYLTabBarController/CYLTabBarController.m"
+            timestampString = "483484968.396325"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
-            landmarkName = "-updateTabBarCustomizationWhenTabBarItemWidthDidUpdate"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Example/CYLTabBarControllerConfig.m"
-            timestampString = "482295636.508473"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "179"
-            endingLineNumber = "179"
-            landmarkName = "-customizeTabBarSelectionIndicatorImage"
+            startingLineNumber = "70"
+            endingLineNumber = "70"
+            landmarkName = "-setViewControllers:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

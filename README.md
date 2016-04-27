@@ -2,7 +2,7 @@
 
 
 <p align="center">
-![enter image description here](https://img.shields.io/badge/pod-v1.2.7-brightgreen.svg)
+![enter image description here](https://img.shields.io/badge/pod-v1.2.8-brightgreen.svg)
 ![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b4.svg)
 
 
@@ -388,13 +388,29 @@ pod update
 }
  ```
 
+##  点击 PlusButton 跳转到指定 UIViewController
+
+提供了一个协议方法来完成本功能：
+
+![enter image description here](http://i68.tinypic.com/2who9rs.jpg)
+
+实现该方法后，能让 PlusButton 的点击效果与跟点击其他 UITabBarButton 效果一样，跳转到该方法指定的 UIViewController 。
+
+注意：必须同时实现 `+indexOfPlusButtonInTabBar` 来指定 PlusButton 的位置。
+
+
+
+遵循两个协议：
+
+![enter image description here](http://i64.tinypic.com/14jw5zt.jpg)
+
 #### 在 Swift 项目中使用 CYLTabBarController
 
 参考： [《从头开始swift2.1 仿搜材通项目（三） 主流框架Tabbed的搭建》]( http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes ) 
 
 这里注意，文章的示例代码有问题，少了设置 PlusButton 大小的代码：
 这将导致 PlusButton 点击事件失效，具体修改代码如下：
-![enter image description here](http://i66.tinypic.com/e7juyv.jpg)
+![enter image description here](http://i67.tinypic.com/118ottv.jpg)
 
 
 ### 源码实现原理
