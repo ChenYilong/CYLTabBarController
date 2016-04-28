@@ -49,6 +49,6 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 
 + (void)registerSubclass;
 
-+ (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender;
+- (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender;
 
 @end

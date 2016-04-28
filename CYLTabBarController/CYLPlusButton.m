@@ -48,19 +48,12 @@ UIViewController *CYLPlusChildViewController = nil;
         SEL selector =  NSSelectorFromString(obj);
         [plusButton removeTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
     }];
-    [plusButton addTarget:self action:@selector(plusChildViewControllerButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
-    
+    [plusButton addTarget:plusButton action:@selector(plusChildViewControllerButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
 }
 
-+ (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender {
+- (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender {
     sender.selected = YES;
-    id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
-    CYLTabBarController *tabBarController;
-    UIWindow *window = delegate.window;
-    if ([window.rootViewController isKindOfClass:[CYLTabBarController class]]) {
-        tabBarController = (CYLTabBarController *)window.rootViewController;
-    }
-    tabBarController.selectedIndex = CYLPlusButtonIndex;
+    [self cyl_tabBarController].selectedIndex = CYLPlusButtonIndex;
 }
 
 @end
