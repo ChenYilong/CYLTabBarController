@@ -173,12 +173,11 @@
 }
 
 - (void)customizeTabBarSelectionIndicatorImage {
-    //Get Default TabBar Height
-    UITabBarController *tabBarController;
-    tabBarController = [self cyl_tabBarController] ?: [[UITabBarController alloc] init];
+    ///Get initialized TabBar Height if exists, otherwise get Default TabBar Height.
+    UITabBarController *tabBarController = [self cyl_tabBarController] ?: [[UITabBarController alloc] init];
     CGFloat tabBarHeight = tabBarController.tabBar.frame.size.height;
     CGSize selectionIndicatorImageSize = CGSizeMake(CYLTabBarItemWidth, tabBarHeight);
-    //Get initialized tabbar if exists.
+    //Get initialized TabBar if exists.
     UITabBar *tabBar = [self cyl_tabBarController].tabBar ?: [UITabBar appearance];
     [tabBar setSelectionIndicatorImage:
      [[self class] imageWithColor:[UIColor redColor]
