@@ -1,5 +1,7 @@
 # CYLTabBarController【低耦合集成TabBarController】
 
+[![Join the chat at https://gitter.im/ChenYilong/CYLTabBarController](https://badges.gitter.im/ChenYilong/CYLTabBarController.svg)](https://gitter.im/ChenYilong/CYLTabBarController?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 <p align="center">
 ![enter image description here](https://img.shields.io/badge/pod-v1.3.1-brightgreen.svg)
