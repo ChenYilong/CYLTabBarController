@@ -104,9 +104,6 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     self.plusButton.center = CGPointMake(barWidth * 0.5, barHeight * multiplerInCenterY);
     NSUInteger plusButtonIndex;
     if ([[self.plusButton class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
-        if (CYLTabbarItemsCount % 2 == 0 && !CYLPlusChildViewController) {
-            [NSException raise:@"CYLTabBarController" format:@"If the count of CYLTabbarControllers is not odd, there's no need to realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】如果CYLTabbarControllers的个数不是奇数，会自动居中，你无需在你自定义的plusButton中实现`+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
-        }
         plusButtonIndex = [[self.plusButton class] indexOfPlusButtonInTabBar];
         //仅修改self.plusButton的x,ywh值不变
         self.plusButton.frame = CGRectMake(plusButtonIndex * CYLTabBarItemWidth,
