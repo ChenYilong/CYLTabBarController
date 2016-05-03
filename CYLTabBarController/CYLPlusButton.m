@@ -16,26 +16,34 @@ UIViewController *CYLPlusChildViewController = nil;
 @implementation CYLPlusButton
 
 #pragma mark -
-#pragma mark - Private Methods
+#pragma mark - public Methods
 
 + (void)registerSubclass {
-    if ([self conformsToProtocol:@protocol(CYLPlusButtonSubclassing)]) {
-        Class<CYLPlusButtonSubclassing> class = self;
-        UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
-        CYLExternPlusButton = plusButton;
-        CYLPlusButtonWidth = plusButton.frame.size.width;
-        if ([[self class] respondsToSelector:@selector(plusChildViewController)]) {
-            CYLPlusChildViewController = [class plusChildViewController];
-            [[self class] addSelectViewControllerTarget:plusButton];
-            if ([[self class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
-                CYLPlusButtonIndex = [[self class] indexOfPlusButtonInTabBar];
-            } else {
-                [NSException raise:@"CYLTabBarController" format:@"If you want to add PlusChildViewController, you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】如果你想使用PlusChildViewController样式，你必须同时在你自定义的plusButton中实现 `+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
-            }
+    if (![self conformsToProtocol:@protocol(CYLPlusButtonSubclassing)]) {
+        return;
+    }
+    Class<CYLPlusButtonSubclassing> class = self;
+    UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
+    CYLExternPlusButton = plusButton;
+    CYLPlusButtonWidth = plusButton.frame.size.width;
+    if ([[self class] respondsToSelector:@selector(plusChildViewController)]) {
+        CYLPlusChildViewController = [class plusChildViewController];
+        [[self class] addSelectViewControllerTarget:plusButton];
+        if ([[self class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
+            CYLPlusButtonIndex = [[self class] indexOfPlusButtonInTabBar];
+        } else {
+            [NSException raise:@"CYLTabBarController" format:@"If you want to add PlusChildViewController, you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】如果你想使用PlusChildViewController样式，你必须同时在你自定义的plusButton中实现 `+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
         }
-        
     }
 }
+
+- (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender {
+    sender.selected = YES;
+    [self cyl_tabBarController].selectedIndex = CYLPlusButtonIndex;
+}
+
+#pragma mark -
+#pragma mark - Private Methods
 
 + (void)addSelectViewControllerTarget:(UIButton<CYLPlusButtonSubclassing> *)plusButton {
     id target = self;
@@ -51,9 +59,5 @@ UIViewController *CYLPlusChildViewController = nil;
     [plusButton addTarget:plusButton action:@selector(plusChildViewControllerButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
 }
 
-- (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender {
-    sender.selected = YES;
-    [self cyl_tabBarController].selectedIndex = CYLPlusButtonIndex;
-}
 
 @end

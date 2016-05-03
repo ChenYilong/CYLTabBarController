@@ -43,6 +43,44 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
 }
 
 #pragma mark -
+#pragma mark - public Methods
+
++ (BOOL)havePlusButton {
+    if (CYLExternPlusButton) {
+        return YES;
+    }
+    return NO;
+}
+
++ (NSUInteger)allItemsInTabBarCount {
+    NSUInteger allItemsInTabBar = CYLTabbarItemsCount;
+    if ([CYLTabBarController havePlusButton]) {
+        allItemsInTabBar += 1;
+    }
+    return allItemsInTabBar;
+}
+
+- (id<UIApplicationDelegate>)appDelegate {
+    return [UIApplication sharedApplication].delegate;
+}
+
+- (UIWindow *)rootWindow {
+    UIWindow *result = nil;
+    
+    do {
+        if ([self.appDelegate respondsToSelector:@selector(window)]) {
+            result = [self.appDelegate window];
+        }
+        
+        if (result) {
+            break;
+        }
+    } while (NO);
+    
+    return result;
+}
+
+#pragma mark -
 #pragma mark - Private Methods
 
 /**
@@ -127,41 +165,6 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
         viewController.tabBarItem.selectedImage = selectedImage;
     }
     [self addChildViewController:viewController];
-}
-
-+ (BOOL)havePlusButton {
-    if (CYLExternPlusButton) {
-        return YES;
-    }
-    return NO;
-}
-
-+ (NSUInteger)allItemsInTabBarCount {
-    NSUInteger allItemsInTabBar = CYLTabbarItemsCount;
-    if ([CYLTabBarController havePlusButton]) {
-        allItemsInTabBar += 1;
-    }
-    return allItemsInTabBar;
-}
-
-- (id<UIApplicationDelegate>)appDelegate {
-    return [UIApplication sharedApplication].delegate;
-}
-
-- (UIWindow *)rootWindow {
-    UIWindow *result = nil;
-    
-    do {
-        if ([self.appDelegate respondsToSelector:@selector(window)]) {
-            result = [self.appDelegate window];
-        }
-        
-        if (result) {
-            break;
-        }
-    } while (NO);
-    
-    return result;
 }
 
 #pragma mark - delegate
