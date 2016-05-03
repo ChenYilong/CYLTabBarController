@@ -3,7 +3,7 @@
 
 <p align="center">
 ![enter image description here](https://img.shields.io/badge/pod-v1.3.1-brightgreen.svg)
-![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b4.svg) 
+![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5618733984.svg) 
 </a>
 
 <p align="center">
@@ -47,7 +47,7 @@
 
 
 
-（学习交流群：541317935）
+（学习交流群：561873398）
 
 
 
@@ -500,7 +500,19 @@ A： 这个是 iOS 系统的BUG，经测试iOS9.3已经修复了，如果在更�
 //#import "CYLTabBarController.h"
     [[self cyl_tabBarController] rootWindow].backgroundColor = [UIColor whiteColor];
  ```
+Q:我现在已经做好了一个比较简单的中间凸起的 icon 但是超过了49这个高度的位置是不能效应的  我想请问你的demo哪个功能是可以使我超出的范围也可以响应的呢?
 
+
+A: 这个是自动做的，但是 `CYLTabBarController` 只能保证的是：只要是 `UIButton` 的 frame 区域内就能响应。
+
+请把 button 的背景颜色设置为显眼的颜色，比如红色，比如像下面的plus按钮，红色部分是能接收点击事件的，但是超出了红色按钮的，黄色的图片区域，依然是无法响应点击事件的。
+
+![enter image description here](http://i64.tinypic.com/vx16r5.jpg)
+
+这是因为，在响应链上，`UIControl` 能响应点击事件， `UIImage` 无法响应。
+
+
+ 
 
 
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
