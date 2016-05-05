@@ -8,6 +8,7 @@
 
 @import Foundation;
 @import UIKit;
+#import "UIViewController+CYLJumpToOtherTabBarControllerItem.h"
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitle;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImage;

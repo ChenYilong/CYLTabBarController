@@ -20,14 +20,14 @@
                                   arguments:(NSArray *)arguments {
     [self cyl_jumpToOtherTabBarControllerItem:ClassType performSelector:selector arguments:arguments returnValue:nil];
 }
-
 /*!
  * This will invoke like this: `-[ClassTypeOject selector:arguments]`.
  */
 - (void)cyl_jumpToOtherTabBarControllerItem:(Class)ClassType
-                   performSelector:(SEL)selector
-                         arguments:(NSArray *)arguments
-                       returnValue:(void *)returnValue {
+                                     target:(id)target
+                            performSelector:(SEL)selector
+                                  arguments:(NSArray *)arguments
+                                returnValue:(void *)returnValue {
     CYLTabBarController *tabbarController = [self cyl_tabBarController];
     BOOL isNavigationController = [[tabbarController.viewControllers[0] class] isSubclassOfClass:[UINavigationController class]];
     [self.navigationController popToRootViewControllerAnimated:NO];
@@ -64,14 +64,29 @@
     }
     
     tabbarController.selectedIndex = selectingIndex;
-    UIViewController *target;
-    if (isNavigationController) {
-        UINavigationController *selectingNavigationController = tabbarController.selectedViewController;
-        target = selectingNavigationController.viewControllers[0];
-    } else {
-        target = tabbarController.selectedViewController;
+    if (!target) {
+        if (isNavigationController) {
+            UINavigationController *selectingNavigationController = tabbarController.selectedViewController;
+            target = selectingNavigationController.viewControllers[0];
+        } else {
+            target = tabbarController.selectedViewController;
+        }
     }
     [[self class] callMethodWithTarget:target selector:selector arguments:arguments returnValue:returnValue];
+}
+
+/*!
+ * This will invoke like this: `-[ClassTypeOject selector:arguments]`.
+ */
+- (void)cyl_jumpToOtherTabBarControllerItem:(Class)ClassType
+                   performSelector:(SEL)selector
+                         arguments:(NSArray *)arguments
+                       returnValue:(void *)returnValue {
+    [self cyl_jumpToOtherTabBarControllerItem:ClassType
+                                       target:nil
+                              performSelector:selector
+                                    arguments:arguments
+                                  returnValue:returnValue];
 }
 
 + (void)callMethodWithTarget:(id)target selector:(SEL)selector arguments:(NSArray *)arguments returnValue:(void *)returnValue {

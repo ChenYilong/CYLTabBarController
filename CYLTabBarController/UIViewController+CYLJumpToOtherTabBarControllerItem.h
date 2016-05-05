@@ -11,17 +11,24 @@
 @interface UIViewController (CYLJumpToOtherTabBarControllerItem)
 
 /*!
- * This will invoke like this: `-[ClassTypeOject selector:arguments]`.
+ * This will invoke: `-[ClassTypeOject selector:arguments]`.
  */
 - (void)cyl_jumpToOtherTabBarControllerItem:(Class)ClassType
                             performSelector:(SEL)selector
                                   arguments:(NSArray *)arguments;
 /*!
- * This will invoke like this: `-[ClassTypeOject selector:arguments]`.
+ * This will invoke: `-[ClassTypeOject selector:arguments]`.
  */
 - (void)cyl_jumpToOtherTabBarControllerItem:(Class)ClassType
                             performSelector:(SEL)selector
                                   arguments:(NSArray *)arguments
                                 returnValue:(void *)returnValue;
-
+/*!
+ * This will invoke: `-[target selector:arguments]`.
+ */
+- (void)cyl_jumpToOtherTabBarControllerItem:(Class)ClassType
+                                     target:(id)target
+                            performSelector:(SEL)selector
+                                  arguments:(NSArray *)arguments
+                                returnValue:(void *)returnValue;
 @end
