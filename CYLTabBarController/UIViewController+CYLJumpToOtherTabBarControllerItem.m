@@ -31,7 +31,7 @@
     CYLTabBarController *tabbarController = [self cyl_tabBarController];
     BOOL isNavigationController = [[tabbarController.viewControllers[0] class] isSubclassOfClass:[UINavigationController class]];
     [self.navigationController popToRootViewControllerAnimated:NO];
-    __block NSUInteger selectingIndex;
+    __block NSNumber *selectingIndex = nil;
     [tabbarController.viewControllers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         id obj_;
         if (isNavigationController) {
@@ -40,13 +40,13 @@
             obj_ = obj;
         }
         if ([obj_ isKindOfClass:ClassType]) {
-            selectingIndex = idx;
+            selectingIndex = @(idx);
             *stop = YES;
             return;
         }
     }];
     
-    if (!selectingIndex || selectingIndex >= tabbarController.viewControllers.count) {
+    if (selectingIndex == nil || (selectingIndex.intValue >= tabbarController.viewControllers.count)) {
         NSString *formatString = @"\n\n\
         ------ BEGIN NSException Log ---------------------------------------------------------------------\n \
         class name: %@                                                                                    \n \
@@ -63,7 +63,7 @@
         return;
     }
     
-    tabbarController.selectedIndex = selectingIndex;
+    tabbarController.selectedIndex = selectingIndex.unsignedLongValue;
     if (!target) {
         if (isNavigationController) {
             UINavigationController *selectingNavigationController = tabbarController.selectedViewController;
