@@ -10,8 +10,7 @@
 #import "CYLTabBarController.h"
 #import "CYLMineViewController.h"
 #import "CYLSameCityViewController.h"
-#import "UIViewController+CYLJumpToOtherTabBarControllerItem.h"
-
+#import "CYLHomeViewController.h"
 @interface CYLDetailsViewController ()
 
 @end
@@ -33,7 +32,9 @@
 }
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    [self cyl_jumpToOtherTabBarControllerItem:[CYLMineViewController class] performSelector:@selector(testPush) arguments:nil];
+    [self cyl_popSelectTabBarChildViewControllerAtIndex:0 completion:^(UIViewController *selectedTabBarChildViewController) {
+        [(CYLMineViewController *)selectedTabBarChildViewController testPush];
+    }];
 }
 
 @end
