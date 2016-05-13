@@ -1,6 +1,6 @@
 //
 //  CYLTabBar.m
-//  CYLCustomTabBarDemo
+//  CYLTabBarController
 //
 //  Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
@@ -126,8 +126,8 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         if (heightDifference < 0) {
             multiplerInCenterY = 0.5;
         } else {
-            CGPoint center = CGPointMake(self.bounds.size.height / 2.0f, self.bounds.size.height / 2.0f);
-            center.y = center.y - heightDifference / 2.0f;
+            CGPoint center = CGPointMake(self.bounds.size.height * 0.5, self.bounds.size.height * 0.5);
+            center.y = center.y - heightDifference * 0.5;
             multiplerInCenterY = center.y / self.bounds.size.height;
         }
     }
@@ -148,7 +148,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         if (CYLTabbarItemsCount % 2 != 0) {
             [NSException raise:@"CYLTabBarController" format:@"If the count of CYLTabbarControllers is odd,you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】如果CYLTabbarControllers的个数是奇数，你必须在你自定义的plusButton中实现`+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
         }
-        plusButtonIndex = CYLTabbarItemsCount / 2.0;
+        plusButtonIndex = CYLTabbarItemsCount * 0.5;
     }
     CYLPlusButtonIndex = plusButtonIndex;
     return plusButtonIndex;
@@ -194,13 +194,12 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         UIView *result = [super hitTest:point withEvent:event];
         if (result) {
             return result;
-        } else {
-            for (UIView *subview in self.subviews.reverseObjectEnumerator) {
-                CGPoint subPoint = [subview convertPoint:point fromView:self];
-                result = [subview hitTest:subPoint withEvent:event];
-                if (result) {
-                    return result;
-                }
+        }
+        for (UIView *subview in self.subviews.reverseObjectEnumerator) {
+            CGPoint subPoint = [subview convertPoint:point fromView:self];
+            result = [subview hitTest:subPoint withEvent:event];
+            if (result) {
+                return result;
             }
         }
     }
