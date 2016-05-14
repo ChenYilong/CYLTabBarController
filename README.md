@@ -67,7 +67,7 @@
 ## 项目结构
 
 
-![enter image description here](http://i65.tinypic.com/21l25af.jpg)
+![enter image description here](http://i66.tinypic.com/1zwzdc.jpg)
 
 做下说明：
 
