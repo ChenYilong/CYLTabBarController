@@ -30,18 +30,18 @@ typedef void (^CYLPopSelectTabBarChildViewControllerCompletion)(__kindof UIViewC
 
 /*!
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器作为返回值返回。
- @param ClassType 需要选择的控制器所属的类。
+ @param classType 需要选择的控制器所属的类。
  @return 最终被选择的控制器。
  @attention 注意：方法中的参数和返回值都是 `UIViewController` 的子类，但并非 `UINavigationController` 的子类。
  */
-- (UIViewController *)cyl_popSelectTabBarChildViewControllerForClassType:(Class)ClassType;
+- (UIViewController *)cyl_popSelectTabBarChildViewControllerForClassType:(Class)classType;
 
 /*!
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器在 `Block` 回调中返回。
- @param ClassType 需要选择的控制器所属的类。
+ @param classType 需要选择的控制器所属的类。
  @attention 注意：方法中的参数和返回值都是 `UIViewController` 的子类，但并非 `UINavigationController` 的子类。
  */
-- (void)cyl_popSelectTabBarChildViewControllerForClassType:(Class)ClassType
+- (void)cyl_popSelectTabBarChildViewControllerForClassType:(Class)classType
                                               completion:(CYLPopSelectTabBarChildViewControllerCompletion)completion;
 
 @end

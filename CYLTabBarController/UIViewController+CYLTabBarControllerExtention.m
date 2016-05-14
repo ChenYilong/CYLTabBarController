@@ -30,7 +30,7 @@
     !completion ?: completion(selectedTabBarChildViewController);
 }
 
-- (UIViewController *)cyl_popSelectTabBarChildViewControllerForClassType:(Class)ClassType {
+- (UIViewController *)cyl_popSelectTabBarChildViewControllerForClassType:(Class)classType {
     CYLTabBarController *tabBarController = [self cyl_tabBarController];
     __block NSInteger atIndex = NSNotFound;
     [tabBarController.viewControllers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -41,7 +41,7 @@
         } else {
             obj_ = obj;
         }
-        if ([obj_ isKindOfClass:ClassType]) {
+        if ([obj_ isKindOfClass:classType]) {
             atIndex = idx;
             *stop = YES;
             return;
@@ -51,9 +51,9 @@
     return [self cyl_popSelectTabBarChildViewControllerAtIndex:atIndex];
 }
 
-- (void)cyl_popSelectTabBarChildViewControllerForClassType:(Class)ClassType
+- (void)cyl_popSelectTabBarChildViewControllerForClassType:(Class)classType
                                                 completion:(CYLPopSelectTabBarChildViewControllerCompletion)completion {
-    UIViewController *selectedTabBarChildViewController = [self cyl_popSelectTabBarChildViewControllerForClassType:ClassType];
+    UIViewController *selectedTabBarChildViewController = [self cyl_popSelectTabBarChildViewControllerForClassType:classType];
     !completion ?: completion(selectedTabBarChildViewController);
 }
 
