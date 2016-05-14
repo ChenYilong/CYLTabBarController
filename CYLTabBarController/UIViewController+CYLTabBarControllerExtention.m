@@ -27,7 +27,13 @@
 - (void)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index
                                            completion:(CYLPopSelectTabBarChildViewControllerCompletion)completion {
     UIViewController *selectedTabBarChildViewController = [self cyl_popSelectTabBarChildViewControllerAtIndex:index];
-    !completion ?: completion(selectedTabBarChildViewController);
+    if ([NSThread isMainThread]) {
+        !completion ?: completion(selectedTabBarChildViewController);
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            !completion ?: completion(selectedTabBarChildViewController);
+        });
+    }
 }
 
 - (UIViewController *)cyl_popSelectTabBarChildViewControllerForClassType:(Class)classType {
@@ -54,7 +60,13 @@
 - (void)cyl_popSelectTabBarChildViewControllerForClassType:(Class)classType
                                                 completion:(CYLPopSelectTabBarChildViewControllerCompletion)completion {
     UIViewController *selectedTabBarChildViewController = [self cyl_popSelectTabBarChildViewControllerForClassType:classType];
-    !completion ?: completion(selectedTabBarChildViewController);
+    if ([NSThread isMainThread]) {
+        !completion ?: completion(selectedTabBarChildViewController);
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            !completion ?: completion(selectedTabBarChildViewController);
+        });
+    }
 }
 
 - (void)checkTabBarChildControllerValidityAtIndex:(NSUInteger)index {
