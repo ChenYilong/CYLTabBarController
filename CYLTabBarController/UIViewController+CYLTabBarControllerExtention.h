@@ -42,6 +42,6 @@ typedef void (^CYLPopSelectTabBarChildViewControllerCompletion)(__kindof UIViewC
  @attention 注意：方法中的参数和返回值都是 `UIViewController` 的子类，但并非 `UINavigationController` 的子类。
  */
 - (void)cyl_popSelectTabBarChildViewControllerForClassType:(Class)classType
-                                              completion:(CYLPopSelectTabBarChildViewControllerCompletion)completion;
+                                                completion:(CYLPopSelectTabBarChildViewControllerCompletion)completion;
 
 @end

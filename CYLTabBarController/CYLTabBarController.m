@@ -175,7 +175,7 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
     if (CYLPlusChildViewController) {
         if ((selectedIndex == CYLPlusButtonIndex) && (viewController != CYLPlusChildViewController)) {
             plusButton.selected = NO;
-        } 
+        }
     }
     return YES;
 }
@@ -196,16 +196,17 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
 
 - (CYLTabBarController *)cyl_tabBarController {
     CYLTabBarController *tabBarController = objc_getAssociatedObject(self, @selector(cyl_tabBarController));
-    if (!tabBarController ) {
-        if ([self isKindOfClass:[UIViewController class]] && [(UIViewController *)self parentViewController]) {
-            tabBarController = [[(UIViewController *)self parentViewController] cyl_tabBarController];
-        } else {
-            id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
-            UIWindow *window = delegate.window;
-            if ([window.rootViewController isKindOfClass:[CYLTabBarController class]]) {
-                tabBarController = (CYLTabBarController *)window.rootViewController;
-            }
-        }
+    if (tabBarController) {
+        return tabBarController;
+    }
+    if ([self isKindOfClass:[UIViewController class]] && [(UIViewController *)self parentViewController]) {
+        tabBarController = [[(UIViewController *)self parentViewController] cyl_tabBarController];
+        return tabBarController;
+    }
+    id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
+    UIWindow *window = delegate.window;
+    if ([window.rootViewController isKindOfClass:[CYLTabBarController class]]) {
+        tabBarController = (CYLTabBarController *)window.rootViewController;
     }
     return tabBarController;
 }
