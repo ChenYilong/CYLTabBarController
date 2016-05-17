@@ -123,9 +123,9 @@
  */
 - (void)customizeTabBarAppearance:(CYLTabBarController *)tabBarController {
 #warning CUSTOMIZE YOUR TABBAR APPEARANCE
-    //Customize UITabBar height
-    //自定义 TabBar 高度
-//    tabBarController.tabBarHeight = 40.f;
+    // Customize UITabBar height
+    // 自定义 TabBar 高度
+    // tabBarController.tabBarHeight = 40.f;
     
     // set the text color for unselected state
     // 普通状态下的文字属性
@@ -145,12 +145,13 @@
     
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色
-    //    [self customizeTabBarSelectionIndicatorImage];
+    // [self customizeTabBarSelectionIndicatorImage];
     
     // update TabBar when TabBarItem width did update
-    // If your app need support UIDeviceOrientationLandscapeLeft or UIDeviceOrientationLandscapeRight， remove the comment '//'
-    //如果你的App需要支持横竖屏，请使用该方法移除注释 '//'
-    //    [self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
+    // If your app need support UIDeviceOrientationLandscapeLeft or UIDeviceOrientationLandscapeRight，
+    // remove the comment '//'
+    // 如果你的App需要支持横竖屏，请使用该方法移除注释 '//'
+    // [self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
     
     // set the bar shadow image
     // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
@@ -160,12 +161,12 @@
     
     // set the bar background image
     // 设置背景图片
-    //     UITabBar *tabBarAppearance = [UITabBar appearance];
-    //     [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background"]];
+    // UITabBar *tabBarAppearance = [UITabBar appearance];
+    // [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background"]];
     
-    //remove the bar system shadow image
-    //去除 TabBar 自带的顶部阴影
-    //    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
+    // remove the bar system shadow image
+    // 去除 TabBar 自带的顶部阴影
+    // [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
 }
 
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {
