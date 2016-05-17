@@ -22,7 +22,7 @@
   4.  [第四步（可选）：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步可选创建自定义的形状不规则加号按钮) 
  5.  [补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) 
   1.  [自定义 TabBar 样式](https://github.com/ChenYilong/CYLTabBarController#自定义-tabbar-样式) 
-  2.  [横竖适配](https://github.com/ChenYilong/CYLTabBarController#横竖适配) 
+  2.  [横竖屏适配](https://github.com/ChenYilong/CYLTabBarController#横竖屏适配) 
   3.  [访问初始化好的 CYLTabBarController 对象](https://github.com/ChenYilong/CYLTabBarController#访问初始化好的-cyltabbarcontroller-对象) 
   4.  [点击 PlusButton 跳转到指定 UIViewController](https://github.com/ChenYilong/CYLTabBarController#点击-plusbutton-跳转到指定-uiviewcontroller) 
   5.  [让TabBarItem仅显示图标，并使图标垂直居中](https://github.com/ChenYilong/CYLTabBarController#让tabbaritem仅显示图标并使图标垂直居中) 
@@ -335,7 +335,7 @@ Airbnb-app效果：
 }
  ```
 
-#### 横竖适配
+#### 横竖屏适配
 
 `TabBar` 横竖屏适配时，如果你添加了 `PlusButton`，且适配时用到了 `TabBarItem` 的宽度, 不建议使用系统的`UIDeviceOrientationDidChangeNotification` , 请使用库里的 `CYLTabBarItemWidthDidChangeNotification` 来更新 `TabBar` 布局，最典型的场景就是，根据 `TabBarItem` 在不同横竖屏状态下的宽度变化来切换选中的`TabBarItem` 的背景图片。Demo 里 `CYLTabBarControllerConfig.m` 给出了这一场景的用法:
 
