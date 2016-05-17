@@ -46,6 +46,19 @@ static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwapp
     self.delegate = self;
 }
 
+- (void)viewWillLayoutSubviews {
+    if (!self.tabBarHeight) {
+        return;
+    }
+    self.tabBar.frame = ({
+        CGRect frame = self.tabBar.frame;
+        CGFloat tabBarHeight = self.tabBarHeight;
+        frame.size.height = tabBarHeight;
+        frame.origin.y = self.view.frame.size.height - tabBarHeight;
+        frame;
+    });
+}
+
 - (void)dealloc {
     // KVO反注册
     [self.tabBar removeObserver:self forKeyPath:@"swappableImageViewDefaultOffset"];

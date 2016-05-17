@@ -31,6 +31,11 @@ FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 @property (nonatomic, readwrite, copy) NSArray<NSDictionary *> *tabBarItemsAttributes;
 
 /*!
+ * Customize UITabBar height
+ */
+@property (nonatomic, assign) CGFloat tabBarHeight;
+
+/*!
  * To set both UIBarItem image view attributes in the tabBar,
  * default is UIEdgeInsetsZero.
  */

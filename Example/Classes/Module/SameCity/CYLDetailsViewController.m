@@ -32,7 +32,7 @@
 }
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    [self cyl_popSelectTabBarChildViewControllerAtIndex:0 completion:^(__kindof UIViewController *selectedTabBarChildViewController) {
+    [self cyl_popSelectTabBarChildViewControllerAtIndex:3 completion:^(__kindof UIViewController *selectedTabBarChildViewController) {
         CYLMineViewController *mineViewController = selectedTabBarChildViewController;
         [mineViewController testPush];
     }];

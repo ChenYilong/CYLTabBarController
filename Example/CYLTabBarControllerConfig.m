@@ -60,6 +60,14 @@
                                                         initWithRootViewController:fourthViewController];
         CYLTabBarController *tabBarController = [[CYLTabBarController alloc] init];
         
+        /**
+         * 以下两行代码目的在于手动设置让TabBarItem只显示图标，不显示文字，并让图标垂直居中。
+         * 等效于在`-setUpTabBarItemsAttributesForController`方法中不传`CYLTabBarItemTitle`字段。
+         * 更推荐后一种做法。
+         */
+        //tabBarController.imageInsets = UIEdgeInsetsMake(4.5, 0, -4.5, 0);
+        //tabBarController.titlePositionAdjustment = UIOffsetMake(0, MAXFLOAT);
+        
         // 在`-setViewControllers:`之前设置TabBar的属性，设置TabBarItem的属性，包括 title、Image、selectedImage。
         [self setUpTabBarItemsAttributesForController:tabBarController];
         
@@ -115,6 +123,10 @@
  */
 - (void)customizeTabBarAppearance:(CYLTabBarController *)tabBarController {
 #warning CUSTOMIZE YOUR TABBAR APPEARANCE
+    //Customize UITabBar height
+    //自定义 TabBar 高度
+//    tabBarController.tabBarHeight = 40.f;
+    
     // set the text color for unselected state
     // 普通状态下的文字属性
     NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];
