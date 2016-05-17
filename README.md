@@ -442,7 +442,7 @@ Airbnb-app效果：
 做法如下：
 ![enter image description here](http://i66.tinypic.com/4rq8ap.jpg)
 
-注：“仅显示图标，并使图标垂直居中”这里所指的“图标”，其所属的类是私有类： `UITabBarSwappableImageView`，所以 `CYLTabBarController` 在相关的接口在命名时会包含 `SwappableImageView` 字样。
+注：“仅显示图标，并使图标垂直居中”这里所指的“图标”，其所属的类是私有类： `UITabBarSwappableImageView`，所以 `CYLTabBarController` 在相关的接口命名时会包含 `SwappableImageView` 字样。
 
 #### 在 Swift 项目中使用 CYLTabBarController
 
