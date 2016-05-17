@@ -66,6 +66,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     NSUInteger plusButtonIndex = [self plusButtonIndex];
     NSArray *sortedSubviews = [self sortedSubviews];
     NSArray *tabBarButtonArray = [self tabBarButtonFromTabBarSubviews:sortedSubviews];
+    [self setupSwappableImageViewDefaultOffset:tabBarButtonArray[0]];
     [tabBarButtonArray enumerateObjectsUsingBlock:^(UIView * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
         //调整UITabBarItem的位置
         CGFloat childViewX;
@@ -109,6 +110,14 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         [self willChangeValueForKey:@"tabBarItemWidth"];
         _tabBarItemWidth = tabBarItemWidth;
         [self didChangeValueForKey:@"tabBarItemWidth"];
+    }
+}
+
+- (void)setSwappableImageViewDefaultOffset:(CGFloat)swappableImageViewDefaultOffset {
+    if (swappableImageViewDefaultOffset != 0.f) {
+        [self willChangeValueForKey:@"swappableImageViewDefaultOffset"];
+        _swappableImageViewDefaultOffset = swappableImageViewDefaultOffset;
+        [self didChangeValueForKey:@"swappableImageViewDefaultOffset"];
     }
 }
 
@@ -169,7 +178,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 
 - (NSArray *)tabBarButtonFromTabBarSubviews:(NSArray *)tabBarSubviews {
     NSMutableArray *tabBarButtonMutableArray = [NSMutableArray arrayWithCapacity:tabBarSubviews.count - 1];
-    [tabBarSubviews enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    [tabBarSubviews enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([obj isKindOfClass:NSClassFromString(@"UITabBarButton")]) {
             [tabBarButtonMutableArray addObject:obj];
         }
@@ -178,6 +187,30 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         [tabBarButtonMutableArray removeObjectAtIndex:CYLPlusButtonIndex];
     }
     return [tabBarButtonMutableArray copy];
+}
+
+- (void)setupSwappableImageViewDefaultOffset:(UIView *)tabBarButton {
+    __block BOOL shouldCustomizeImageView = YES;
+    __block CGFloat swappableImageViewHeight = 0.f;
+    __block CGFloat swappableImageViewDefaultOffset = 0.f;
+    CGFloat tabBarHeight = self.frame.size.height;
+    [tabBarButton.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([[obj class] isSubclassOfClass:[UILabel class]]) {
+            shouldCustomizeImageView = NO;
+        }
+        swappableImageViewHeight = obj.frame.size.height;
+        BOOL isNotSelectionIndicatorView = swappableImageViewHeight < (tabBarHeight - 5);
+        BOOL isSwappableImageView = ([[obj class] isSubclassOfClass:[UIImageView class]]) && isNotSelectionIndicatorView;
+        if (isSwappableImageView) {
+            swappableImageViewDefaultOffset = (tabBarHeight - swappableImageViewHeight) * 0.5 * 0.5;
+        }
+        if (isSwappableImageView && swappableImageViewDefaultOffset == 0.f) {
+            shouldCustomizeImageView = NO;
+        }
+    }];
+    if (shouldCustomizeImageView) {
+        self.swappableImageViewDefaultOffset = swappableImageViewDefaultOffset;
+    }
 }
 
 /*!

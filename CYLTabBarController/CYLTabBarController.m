@@ -19,12 +19,14 @@ NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;
 CGFloat CYLTabBarItemWidth = 0.0f;
 NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDidChangeNotification";
+static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwappableImageViewDefaultOffsetContext;
 
 @interface NSObject (CYLTabBarControllerItemInternal)
 
 - (void)cyl_setTabBarController:(CYLTabBarController *)tabBarController;
 
 @end
+
 @interface CYLTabBarController () <UITabBarControllerDelegate>
 
 @end
@@ -39,7 +41,14 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
     [super viewDidLoad];
     // 处理tabBar，使用自定义 tabBar 添加 发布按钮
     [self setUpTabBar];
+    // KVO注册监听
+    [self.tabBar addObserver:self forKeyPath:@"swappableImageViewDefaultOffset" options:NSKeyValueObservingOptionNew context:CYLSwappableImageViewDefaultOffsetContext];
     self.delegate = self;
+}
+
+- (void)dealloc {
+    // KVO反注册
+    [self.tabBar removeObserver:self forKeyPath:@"swappableImageViewDefaultOffset"];
 }
 
 #pragma mark -
@@ -152,7 +161,6 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
                         WithTitle:(NSString *)title
                   normalImageName:(NSString *)normalImageName
                 selectedImageName:(NSString *)selectedImageName {
-    
     viewController.tabBarItem.title = title;
     if (normalImageName) {
         UIImage *normalImage = [UIImage imageNamed:normalImageName];
@@ -164,7 +172,52 @@ NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDi
         selectedImage = [selectedImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         viewController.tabBarItem.selectedImage = selectedImage;
     }
+    if (self.shouldCustomizeImageInsets) {
+        viewController.tabBarItem.imageInsets = self.imageInsets;
+    }
+    if (self.shouldCustomizeTitlePositionAdjustment) {
+        viewController.tabBarItem.titlePositionAdjustment = self.titlePositionAdjustment;
+    }
     [self addChildViewController:viewController];
+}
+
+- (BOOL)shouldCustomizeImageInsets {
+    BOOL shouldCustomizeImageInsets = self.imageInsets.top != 0.f || self.imageInsets.left != 0.f || self.imageInsets.bottom != 0.f || self.imageInsets.right != 0.f;
+    return shouldCustomizeImageInsets;
+}
+
+- (BOOL)shouldCustomizeTitlePositionAdjustment {
+    BOOL shouldCustomizeTitlePositionAdjustment = self.titlePositionAdjustment.horizontal != 0.f || self.titlePositionAdjustment.vertical != 0.f;
+    return shouldCustomizeTitlePositionAdjustment;
+}
+
+#pragma mark -
+#pragma mark - KVO Method
+
+// KVO监听执行
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if(context != CYLSwappableImageViewDefaultOffsetContext) {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
+    if(context == CYLSwappableImageViewDefaultOffsetContext) {
+        CGFloat swappableImageViewDefaultOffset = [change[NSKeyValueChangeNewKey] floatValue];
+        [self offsetTabBarSwappableImageViewToFit:swappableImageViewDefaultOffset];
+    }
+}
+
+- (void)offsetTabBarSwappableImageViewToFit:(CGFloat)swappableImageViewDefaultOffset {
+    if (self.shouldCustomizeImageInsets) {
+        return;
+    }
+    NSArray<UITabBarItem *> *tabBarItems = [self cyl_tabBarController].tabBar.items;
+    [tabBarItems enumerateObjectsUsingBlock:^(UITabBarItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        UIEdgeInsets imageInset = UIEdgeInsetsMake(swappableImageViewDefaultOffset, 0, -swappableImageViewDefaultOffset, 0);
+        obj.imageInsets = imageInset;
+        if (!self.shouldCustomizeTitlePositionAdjustment) {
+            obj.titlePositionAdjustment = UIOffsetMake(0, MAXFLOAT);;
+        }
+    }];
 }
 
 #pragma mark - delegate

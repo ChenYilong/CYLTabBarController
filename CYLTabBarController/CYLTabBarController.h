@@ -31,6 +31,18 @@ FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 @property (nonatomic, readwrite, copy) NSArray<NSDictionary *> *tabBarItemsAttributes;
 
 /*!
+ * To set both UIBarItem image view attributes in the tabBar,
+ * default is UIEdgeInsetsZero.
+ */
+@property (nonatomic, readwrite, assign) UIEdgeInsets imageInsets;
+
+/*! 
+ * To set both UIBarItem label text attributes in the tabBar,
+ * use the following to tweak the relative position of the label within the tab button (for handling visual centering corrections if needed because of custom text attributes)
+ */
+@property (nonatomic, readwrite, assign) UIOffset titlePositionAdjustment;
+
+/*!
  * Judge if there is plus button.
  */
 + (BOOL)havePlusButton;
@@ -41,6 +53,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 + (NSUInteger)allItemsInTabBarCount;
 
 - (id<UIApplicationDelegate>)appDelegate;
+
 - (UIWindow *)rootWindow;
 
 @end
