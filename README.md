@@ -4,12 +4,13 @@
 <p align="center">
 ![enter image description here](https://img.shields.io/badge/pod-v1.4.4-brightgreen.svg)
 ![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5618733984.svg) 
-[![https://twitter.com/stevechen1010](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&maxAge=2592000)](https://twitter.com/stevechen1010)
 </a>
 
-<p align="center">
-进入聊天室:[![Gitter](https://badges.gitter.im/ChenYilong/CYLTabBarController.svg)](https://gitter.im/ChenYilong/CYLTabBarController?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+<p align="center">[![https://twitter.com/stevechen1010](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&maxAge=2592000)](https://twitter.com/stevechen1010)[![bitHound](http://i67.tinypic.com/wbulbr.jpg)](http://weibo.com/luohanchenyilong)
+[![Gitter](https://badges.gitter.im/ChenYilong/CYLTabBarController.svg)](https://gitter.im/ChenYilong/CYLTabBarController?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 </a>
+
+
 
 ## 导航
 
@@ -548,4 +549,4 @@ A: 这个是自动做的，但是 `CYLTabBarController` 只能保证的是：只
 ----------
 Posted by [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/)  
 原创文章，版权声明：自由转载-非商用-非衍生-保持署名 | [Creative Commons BY-NC-ND 3.0](http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh)
-
+<p align="center"><a href="http://weibo.com/u/1692391497?s=6uyXnP" target="_blank"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1692391497/b46c844b/1.png"/></a></a>
