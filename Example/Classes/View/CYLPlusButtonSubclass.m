@@ -66,7 +66,7 @@
  Create a custom UIButton with title and add it to the center of our tab bar
  *
  */
-+ (instancetype)plusButton {
++ (id)plusButton {
     CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
     UIImage *buttonImage = [UIImage imageNamed:@"post_normal"];
     [button setImage:buttonImage forState:UIControlStateNormal];
@@ -86,7 +86,7 @@
  Create a custom UIButton without title and add it to the center of our tab bar
  *
  */
-//+ (instancetype)plusButton
+//+ (id)plusButton
 //{
 //
 //    UIImage *buttonImage = [UIImage imageNamed:@"hood.png"];

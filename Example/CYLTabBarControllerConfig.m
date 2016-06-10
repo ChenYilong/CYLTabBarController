@@ -44,7 +44,7 @@
 - (CYLTabBarController *)tabBarController {
     if (_tabBarController == nil) {
         CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithViewControllers:self.viewControllers
-                                                                               tabBarItemsAttributes:self.tabBarItemsAttributesForController];
+                                                                                   tabBarItemsAttributes:self.tabBarItemsAttributesForController];
         [self customizeTabBarAppearance:tabBarController];
         _tabBarController = tabBarController;
     }
@@ -85,31 +85,31 @@
 }
 
 - (NSArray *)tabBarItemsAttributesForController {
-    NSDictionary *dict1 = @{
-                            CYLTabBarItemTitle : @"首页",
-                            CYLTabBarItemImage : @"home_normal",
-                            CYLTabBarItemSelectedImage : @"home_highlight",
-                            };
-    NSDictionary *dict2 = @{
-                            CYLTabBarItemTitle : @"同城",
-                            CYLTabBarItemImage : @"mycity_normal",
-                            CYLTabBarItemSelectedImage : @"mycity_highlight",
-                            };
-    NSDictionary *dict3 = @{
-                            CYLTabBarItemTitle : @"消息",
-                            CYLTabBarItemImage : @"message_normal",
-                            CYLTabBarItemSelectedImage : @"message_highlight",
-                            };
-    NSDictionary *dict4 = @{
-                            CYLTabBarItemTitle : @"我的",
-                            CYLTabBarItemImage : @"account_normal",
-                            CYLTabBarItemSelectedImage : @"account_highlight"
-                            };
+    NSDictionary *firstTabBarItemsAttributes = @{
+                                                 CYLTabBarItemTitle : @"首页",
+                                                 CYLTabBarItemImage : @"home_normal",
+                                                 CYLTabBarItemSelectedImage : @"home_highlight",
+                                                 };
+    NSDictionary *secondTabBarItemsAttributes = @{
+                                                  CYLTabBarItemTitle : @"同城",
+                                                  CYLTabBarItemImage : @"mycity_normal",
+                                                  CYLTabBarItemSelectedImage : @"mycity_highlight",
+                                                  };
+    NSDictionary *thirdTabBarItemsAttributes = @{
+                                                 CYLTabBarItemTitle : @"消息",
+                                                 CYLTabBarItemImage : @"message_normal",
+                                                 CYLTabBarItemSelectedImage : @"message_highlight",
+                                                 };
+    NSDictionary *fourthTabBarItemsAttributes = @{
+                                                  CYLTabBarItemTitle : @"我的",
+                                                  CYLTabBarItemImage : @"account_normal",
+                                                  CYLTabBarItemSelectedImage : @"account_highlight"
+                                                  };
     NSArray *tabBarItemsAttributes = @[
-                                       dict1,
-                                       dict2,
-                                       dict3,
-                                       dict4
+                                       firstTabBarItemsAttributes,
+                                       secondTabBarItemsAttributes,
+                                       thirdTabBarItemsAttributes,
+                                       fourthTabBarItemsAttributes
                                        ];
     return tabBarItemsAttributes;
 }
