@@ -43,52 +43,48 @@
  */
 - (CYLTabBarController *)tabBarController {
     if (_tabBarController == nil) {
-        CYLHomeViewController *firstViewController = [[CYLHomeViewController alloc] init];
-        UIViewController *firstNavigationController = [[CYLBaseNavigationController alloc]
-                                                       initWithRootViewController:firstViewController];
-        
-        CYLSameCityViewController *secondViewController = [[CYLSameCityViewController alloc] init];
-        UIViewController *secondNavigationController = [[CYLBaseNavigationController alloc]
-                                                        initWithRootViewController:secondViewController];
-        
-        CYLMessageViewController *thirdViewController = [[CYLMessageViewController alloc] init];
-        UIViewController *thirdNavigationController = [[CYLBaseNavigationController alloc]
-                                                       initWithRootViewController:thirdViewController];
-        
-        CYLMineViewController *fourthViewController = [[CYLMineViewController alloc] init];
-        UIViewController *fourthNavigationController = [[CYLBaseNavigationController alloc]
-                                                        initWithRootViewController:fourthViewController];
-        CYLTabBarController *tabBarController = [[CYLTabBarController alloc] init];
-        
-        /**
-         * 以下两行代码目的在于手动设置让TabBarItem只显示图标，不显示文字，并让图标垂直居中。
-         * 等效于在`-setUpTabBarItemsAttributesForController`方法中不传`CYLTabBarItemTitle`字段。
-         * 更推荐后一种做法。
-         */
-        //tabBarController.imageInsets = UIEdgeInsetsMake(4.5, 0, -4.5, 0);
-        //tabBarController.titlePositionAdjustment = UIOffsetMake(0, MAXFLOAT);
-        
-        // 在`-setViewControllers:`之前设置TabBar的属性，设置TabBarItem的属性，包括 title、Image、selectedImage。
-        [self setUpTabBarItemsAttributesForController:tabBarController];
-        
-        [tabBarController setViewControllers:@[
-                                               firstNavigationController,
-                                               secondNavigationController,
-                                               thirdNavigationController,
-                                               fourthNavigationController
-                                               ]];
-        // 更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
+        CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithViewControllers:self.viewControllers
+                                                                               tabBarItemsAttributes:self.tabBarItemsAttributesForController];
         [self customizeTabBarAppearance:tabBarController];
         _tabBarController = tabBarController;
     }
     return _tabBarController;
 }
 
-/**
- *  在`-setViewControllers:`之前设置TabBar的属性，设置TabBarItem的属性，包括 title、Image、selectedImage。
- */
-- (void)setUpTabBarItemsAttributesForController:(CYLTabBarController *)tabBarController {
+- (NSArray *)viewControllers {
+    CYLHomeViewController *firstViewController = [[CYLHomeViewController alloc] init];
+    UIViewController *firstNavigationController = [[CYLBaseNavigationController alloc]
+                                                   initWithRootViewController:firstViewController];
     
+    CYLSameCityViewController *secondViewController = [[CYLSameCityViewController alloc] init];
+    UIViewController *secondNavigationController = [[CYLBaseNavigationController alloc]
+                                                    initWithRootViewController:secondViewController];
+    
+    CYLMessageViewController *thirdViewController = [[CYLMessageViewController alloc] init];
+    UIViewController *thirdNavigationController = [[CYLBaseNavigationController alloc]
+                                                   initWithRootViewController:thirdViewController];
+    
+    CYLMineViewController *fourthViewController = [[CYLMineViewController alloc] init];
+    UIViewController *fourthNavigationController = [[CYLBaseNavigationController alloc]
+                                                    initWithRootViewController:fourthViewController];
+    
+    /**
+     * 以下两行代码目的在于手动设置让TabBarItem只显示图标，不显示文字，并让图标垂直居中。
+     * 等效于在 `-tabBarItemsAttributesForController` 方法中不传 `CYLTabBarItemTitle` 字段。
+     * 更推荐后一种做法。
+     */
+    //tabBarController.imageInsets = UIEdgeInsetsMake(4.5, 0, -4.5, 0);
+    //tabBarController.titlePositionAdjustment = UIOffsetMake(0, MAXFLOAT);
+    NSArray *viewControllers = @[
+                                 firstNavigationController,
+                                 secondNavigationController,
+                                 thirdNavigationController,
+                                 fourthNavigationController
+                                 ];
+    return viewControllers;
+}
+
+- (NSArray *)tabBarItemsAttributesForController {
     NSDictionary *dict1 = @{
                             CYLTabBarItemTitle : @"首页",
                             CYLTabBarItemImage : @"home_normal",
@@ -115,11 +111,11 @@
                                        dict3,
                                        dict4
                                        ];
-    tabBarController.tabBarItemsAttributes = tabBarItemsAttributes;
+    return tabBarItemsAttributes;
 }
 
 /**
- *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
+ *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性等等
  */
 - (void)customizeTabBarAppearance:(CYLTabBarController *)tabBarController {
 #warning CUSTOMIZE YOUR TABBAR APPEARANCE

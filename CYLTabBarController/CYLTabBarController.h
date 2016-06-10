@@ -47,6 +47,10 @@ FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
  */
 @property (nonatomic, readwrite, assign) UIOffset titlePositionAdjustment;
 
+- (instancetype)initWithViewControllers:(NSArray<UIViewController *> *)viewControllers tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
+
++ (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
+
 /*!
  * Judge if there is plus button.
  */

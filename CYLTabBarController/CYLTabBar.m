@@ -89,6 +89,10 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 #pragma mark -
 #pragma mark - Private Methods
 
++ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key {
+    return NO;
+}
+
 // KVO监听执行
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if(context != CYLTabBarContext) {
@@ -119,10 +123,6 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         _swappableImageViewDefaultOffset = swappableImageViewDefaultOffset;
         [self didChangeValueForKey:@"swappableImageViewDefaultOffset"];
     }
-}
-
-+ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key {
-    return NO;
 }
 
 - (CGFloat)multiplerInCenterY {
