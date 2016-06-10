@@ -228,7 +228,7 @@ static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwapp
         UIEdgeInsets imageInset = UIEdgeInsetsMake(swappableImageViewDefaultOffset, 0, -swappableImageViewDefaultOffset, 0);
         obj.imageInsets = imageInset;
         if (!self.shouldCustomizeTitlePositionAdjustment) {
-            obj.titlePositionAdjustment = UIOffsetMake(0, MAXFLOAT);;
+            obj.titlePositionAdjustment = UIOffsetMake(0, MAXFLOAT);
         }
     }];
 }

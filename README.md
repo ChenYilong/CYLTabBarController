@@ -2,7 +2,7 @@
 
 
 <p align="center">
-![enter image description here](https://img.shields.io/badge/pod-v1.4.4-brightgreen.svg)
+![enter image description here](https://img.shields.io/badge/pod-v1.4.5-brightgreen.svg)
 ![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5618733984.svg) 
 </a>
 
