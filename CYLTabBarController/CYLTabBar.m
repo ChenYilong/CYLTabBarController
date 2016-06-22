@@ -235,24 +235,19 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     }
     if (CYLExternPlusButton) {
         CGRect plusButtonFrame = self.plusButton.frame;
-        CGFloat plusButtonMinX = CGRectGetMinX(plusButtonFrame);
-        CGFloat plusButtonMaxX = CGRectGetMaxX(plusButtonFrame);
-        if (point.x >= plusButtonMinX && point.x < plusButtonMaxX) {
+        if (CGRectContainsPoint(plusButtonFrame, point)) {
             return CYLExternPlusButton;
         }
     }
     NSArray *tabBarButtons = self.tabBarButtonArray;
     for (NSUInteger index = 0; index < tabBarButtons.count; index++) {
-        CGRect tabBarButtonFrame = [tabBarButtons[index] frame];
-        CGFloat tabBarButtonMinX = CGRectGetMinX(tabBarButtonFrame);
-        CGFloat tabBarButtonMaxX = CGRectGetMaxX(tabBarButtonFrame);
-        if (point.x >= tabBarButtonMinX && point.x < tabBarButtonMaxX) {
-            return tabBarButtons[index];
+        UIView *selectedTabBarButton = tabBarButtons[index];
+        CGRect selectedTabBarButtonFrame = selectedTabBarButton.frame;
+        if (CGRectContainsPoint(selectedTabBarButtonFrame, point)) {
+            return selectedTabBarButton;
         }
     }
     return nil;
 }
-
-
 
 @end
