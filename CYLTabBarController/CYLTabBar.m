@@ -230,12 +230,20 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
  *  Capturing touches on a subview outside the frame of its superview.
  */
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-    if (self.clipsToBounds || self.hidden || (self.alpha == 0.f)) {
+    BOOL canNotResponseEvent = self.hidden || (self.alpha <= 0.01f) || (self.userInteractionEnabled == NO);
+    if (canNotResponseEvent) {
         return nil;
     }
+    if (!CYLExternPlusButton && ![self pointInside:point withEvent:event]) {
+        return nil;
+    }
+    CGRect plusButtonFrame = self.plusButton.frame;
     if (CYLExternPlusButton) {
-        CGRect plusButtonFrame = self.plusButton.frame;
-        if (CGRectContainsPoint(plusButtonFrame, point)) {
+        BOOL isInPlusButtonFrame = CGRectContainsPoint(plusButtonFrame, point);
+        if (!isInPlusButtonFrame && (point.y < 0) ) {
+            return nil;
+        }
+        if (isInPlusButtonFrame) {
             return CYLExternPlusButton;
         }
     }
