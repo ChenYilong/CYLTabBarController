@@ -237,8 +237,8 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     if (!CYLExternPlusButton && ![self pointInside:point withEvent:event]) {
         return nil;
     }
-    CGRect plusButtonFrame = self.plusButton.frame;
     if (CYLExternPlusButton) {
+        CGRect plusButtonFrame = self.plusButton.frame;
         BOOL isInPlusButtonFrame = CGRectContainsPoint(plusButtonFrame, point);
         if (!isInPlusButtonFrame && (point.y < 0) ) {
             return nil;
@@ -248,6 +248,9 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         }
     }
     NSArray *tabBarButtons = self.tabBarButtonArray;
+    if (self.tabBarButtonArray.count == 0) {
+        tabBarButtons = [self tabBarButtonFromTabBarSubviews:self.subviews];
+    }
     for (NSUInteger index = 0; index < tabBarButtons.count; index++) {
         UIView *selectedTabBarButton = tabBarButtons[index];
         CGRect selectedTabBarButtonFrame = selectedTabBarButton.frame;
