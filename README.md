@@ -3,7 +3,7 @@
 
 <p align="center">
 ![enter image description here](https://img.shields.io/badge/pod-v1.5.4-brightgreen.svg)
-![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5618733984.svg) 
+![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5297537064.svg) 
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
 </a>
 
@@ -52,7 +52,7 @@
 
 
 
-（学习交流群：561873398）
+（学习交流群：529753706）
 
 
 
