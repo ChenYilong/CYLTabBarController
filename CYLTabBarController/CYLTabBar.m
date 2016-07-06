@@ -72,15 +72,15 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     CGFloat barHeight = self.bounds.size.height;
     CYLTabBarItemWidth = (barWidth - CYLPlusButtonWidth) / CYLTabbarItemsCount;
     self.tabBarItemWidth = CYLTabBarItemWidth;
+    NSArray *sortedSubviews = [self sortedSubviews];
+    self.tabBarButtonArray = [self tabBarButtonFromTabBarSubviews:sortedSubviews];
+    [self setupSwappableImageViewDefaultOffset:self.tabBarButtonArray[0]];
     if (!CYLExternPlusButton) {
         return;
     }
     CGFloat multiplerInCenterY = [self multiplerInCenterY];
     self.plusButton.center = CGPointMake(barWidth * 0.5, barHeight * multiplerInCenterY);
     NSUInteger plusButtonIndex = [self plusButtonIndex];
-    NSArray *sortedSubviews = [self sortedSubviews];
-    self.tabBarButtonArray = [self tabBarButtonFromTabBarSubviews:sortedSubviews];
-    [self setupSwappableImageViewDefaultOffset:self.tabBarButtonArray[0]];
     [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIView * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
         //调整UITabBarItem的位置
         CGFloat childViewX;

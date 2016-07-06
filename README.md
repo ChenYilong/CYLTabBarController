@@ -2,7 +2,7 @@
 
 
 <p align="center">
-![enter image description here](https://img.shields.io/badge/pod-v1.5.4-brightgreen.svg)
+![enter image description here](https://img.shields.io/badge/pod-v1.5.5-brightgreen.svg)
 ![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5297537064.svg) 
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
 </a>
@@ -447,7 +447,7 @@ Airbnb-app效果：
 
 但是想达到Airbnb-app的效果只有这个接口是不行的，还需要自定义下 `TabBar` 的高度，你需要设置 `CYLTabBarController` 的 `tabBarHeight` 属性。你可以在Demo的 `CYLTabBarControllerConfig.m` 中的 `-customizeTabBarAppearance:` 方法中设置。
 
-注：“仅显示图标，并使图标垂直居中”这里所指的“图标”，其所属的类是私有类： `UITabBarSwappableImageView`，所以 `CYLTabBarController` 在相关的接口命名时会包含 `SwappableImageView` 字样。
+注：“仅显示图标，并使图标垂直居中”这里所指的“图标”，其所属的类是私有类： `UITabBarSwappableImageView`，所以 `CYLTabBarController` 在相关的接口命名时会包含 `SwappableImageView` 字样。另外，使用该特性需要 `pod update` 到 1.5.5以上的版本。
 
 #### 在 Swift 项目中使用 CYLTabBarController
 
@@ -482,7 +482,7 @@ Apple 规定：
 Q：我把 demo 两侧的 item 各去掉一个后，按钮的响应区域就变成下图的样子了：
  ![wechat_1445851872](https://cloud.githubusercontent.com/assets/12152553/10725491/62600172-7c07-11e5-9e0a-0ec7d795d1e3.jpeg)
   		  
- A：v1.5.4 版本已经修复了该问题，现在不会出现类似的问题了：点击按钮区域却不响应，响应区域有偏移。
+ A：v1.5.5 版本已经修复了该问题，现在不会出现类似的问题了：点击按钮区域却不响应，响应区域有偏移。
 
 Q： 如何实现添加选中背景色的功能 ，像下面这样：
 <img width="409" alt="screen shot 2015-10-28 at 9 21 56 am" src="https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png">
