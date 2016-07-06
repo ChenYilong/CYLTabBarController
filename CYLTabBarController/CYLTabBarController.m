@@ -29,6 +29,8 @@ static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwapp
 
 @interface CYLTabBarController () <UITabBarControllerDelegate>
 
+@property (nonatomic, assign, getter=isObservingSwappableImageViewDefaultOffset) BOOL observingSwappableImageViewDefaultOffset;
+
 @end
 @implementation CYLTabBarController
 
@@ -42,7 +44,10 @@ static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwapp
     // 处理tabBar，使用自定义 tabBar 添加 发布按钮
     [self setUpTabBar];
     // KVO注册监听
-    [self.tabBar addObserver:self forKeyPath:@"swappableImageViewDefaultOffset" options:NSKeyValueObservingOptionNew context:CYLSwappableImageViewDefaultOffsetContext];
+    if (!self.isObservingSwappableImageViewDefaultOffset) {
+        [self.tabBar addObserver:self forKeyPath:@"swappableImageViewDefaultOffset" options:NSKeyValueObservingOptionNew context:CYLSwappableImageViewDefaultOffsetContext];
+        self.observingSwappableImageViewDefaultOffset = YES;
+    }
     self.delegate = self;
 }
 
@@ -61,7 +66,9 @@ static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwapp
 
 - (void)dealloc {
     // KVO反注册
-    [self.tabBar removeObserver:self forKeyPath:@"swappableImageViewDefaultOffset"];
+    if (self.isObservingSwappableImageViewDefaultOffset) {
+        [self.tabBar removeObserver:self forKeyPath:@"swappableImageViewDefaultOffset"];
+    }
 }
 
 #pragma mark -
