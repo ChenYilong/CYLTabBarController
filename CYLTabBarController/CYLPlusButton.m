@@ -18,7 +18,7 @@ UIViewController *CYLPlusChildViewController = nil;
 #pragma mark -
 #pragma mark - public Methods
 
-+ (void)registerSubclass {
++ (void)registerPlusButton {
     if (![self conformsToProtocol:@protocol(CYLPlusButtonSubclassing)]) {
         return;
     }
@@ -36,6 +36,13 @@ UIViewController *CYLPlusChildViewController = nil;
         }
     }
 }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
++ (void)registerSubclass {
+    [self registerPlusButton];
+}
+#pragma clang diagnostic pop
 
 - (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender {
     sender.selected = YES;

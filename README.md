@@ -210,11 +210,11 @@ pod update
 
  1. 实现  `CYLPlusButtonSubclassing`  协议 
 
- 2. 子类将自身类型进行注册，一般可在 `application` 的 `applicationDelegate` 方法里面调用 `[YourClass registerSubClass]` 或者在子类的 `+load` 方法中调用：
+ 2. 子类将自身类型进行注册，一般可在 `application` 的 `applicationDelegate` 方法里面调用 `[YourClass registerPlusButton]` 或者在子类的 `+load` 方法中调用：
 
  ```Objective-C
  +(void)load {
-    [super registerSubclass];
+    [super registerPlusButton];
 }
  ```
 
@@ -222,7 +222,7 @@ pod update
 
  ```Objective-C
 + (NSUInteger)indexOfPlusButtonInTabBar;
-+ (CGFloat)multiplerInCenterY;
++ (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight;
 + (UIViewController *)plusChildViewController;
  ```
 
@@ -242,11 +242,29 @@ Airbnb-app效果：
 ![enter image description here](http://a63.tinypic.com/2mgk02v.gif)
 
  ```Objective-C
- + (CGFloat)multiplerInCenterY;
++ (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight;
  ```
 
 该方法是为了调整自定义按钮中心点Y轴方向的位置，建议在按钮超出了 `tabbar` 的边界时实现该方法。返回值是自定义按钮中心点Y轴方向的坐标除以 `tabbar` 的高度，如果不实现，会自动进行比对，预设一个较为合适的位置，如果实现了该方法，预设的逻辑将失效。
 
+内部实现时，会使用该返回值来设置 PlusButton 的 centerY 坐标，公式如下：
+              
+`PlusButtonCenterY = multiplierOfTabBarHeight * taBarHeight + constantOfPlusButtonCenterYOffset;`
+
+也就是说：如果 constantOfPlusButtonCenterYOffset 为0，同时 multiplierOfTabBarHeight 的值是0.5，表示 PlusButton 居中，小于0.5表示 PlusButton 偏上，大于0.5则表示偏下。
+
+
+ ```Objective-C
++ (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight;
+ ```
+
+参考 `+multiplierOfTabBarHeight:` 中的公式：
+
+`PlusButtonCenterY = multiplierOfTabBarHeight * taBarHeight + constantOfPlusButtonCenterYOffset;`
+
+也就是说： constantOfPlusButtonCenterYOffset 大于0会向下偏移，小于0会向上偏移。
+
+注意：实现了该方法，但没有实现 `+multiplierOfTabBarHeight:` 方法，在这种情况下，会在预设逻辑的基础上进行偏移。
 
 详见Demo中的 `CYLPlusButtonSubclass` 类的实现。
 
