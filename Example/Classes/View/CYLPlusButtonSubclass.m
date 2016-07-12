@@ -22,7 +22,7 @@
 #pragma mark - Life Cycle
 
 + (void)load {
-    [super registerSubclass];
+    [super registerPlusButton];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -38,8 +38,10 @@
     [super layoutSubviews];
     
     // 控件大小,间距大小
+    // 注意：一定要根据项目中的图片去调整下面的0.7和0.9，Demo之所以这么设置，因为demo中的 plusButton 的 icon 不是正方形。
     CGFloat const imageViewEdgeWidth   = self.bounds.size.width * 0.7;
     CGFloat const imageViewEdgeHeight  = imageViewEdgeWidth * 0.9;
+    
     CGFloat const centerOfView    = self.bounds.size.width * 0.5;
     CGFloat const labelLineHeight = self.titleLabel.font.lineHeight;
     CGFloat const verticalMarginT = self.bounds.size.height - labelLineHeight - imageViewEdgeWidth;
@@ -78,6 +80,8 @@
 
     button.titleLabel.font = [UIFont systemFontOfSize:9.5];
     [button sizeToFit]; // or set frame in this way `button.frame = CGRectMake(0.0, 0.0, 250, 100);`
+//    button.frame = CGRectMake(0.0, 0.0, 250, 100);
+//    button.backgroundColor = [UIColor redColor];
     [button addTarget:button action:@selector(clickPublish) forControlEvents:UIControlEventTouchUpInside];
     return button;
 }
@@ -134,13 +138,18 @@
 //                                                   initWithRootViewController:plusChildViewController];
 //    return plusChildNavigationController;
 //}
-//
+
+
 //+ (NSUInteger)indexOfPlusButtonInTabBar {
-//    return 2;
+//    return 4;
 //}
 
-+ (CGFloat)multiplerInCenterY {
++ (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
     return  0.3;
+}
+
++ (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
+    return  -10;
 }
 
 @end

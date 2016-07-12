@@ -8,6 +8,8 @@
 
 @import Foundation;
 @import UIKit;
+
+#import "CYLPlusButton.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitle;

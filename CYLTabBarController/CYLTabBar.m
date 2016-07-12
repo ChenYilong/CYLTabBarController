@@ -68,9 +68,9 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    CGFloat barWidth = self.bounds.size.width;
-    CGFloat barHeight = self.bounds.size.height;
-    CYLTabBarItemWidth = (barWidth - CYLPlusButtonWidth) / CYLTabbarItemsCount;
+    CGFloat taBarWidth = self.bounds.size.width;
+    CGFloat taBarHeight = self.bounds.size.height;
+    CYLTabBarItemWidth = (taBarWidth - CYLPlusButtonWidth) / CYLTabbarItemsCount;
     self.tabBarItemWidth = CYLTabBarItemWidth;
     NSArray *sortedSubviews = [self sortedSubviews];
     self.tabBarButtonArray = [self tabBarButtonFromTabBarSubviews:sortedSubviews];
@@ -78,8 +78,9 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     if (!CYLExternPlusButton) {
         return;
     }
-    CGFloat multiplerInCenterY = [self multiplerInCenterY];
-    self.plusButton.center = CGPointMake(barWidth * 0.5, barHeight * multiplerInCenterY);
+    CGFloat multiplierOfTabBarHeight = [self multiplierOfTabBarHeight:taBarHeight];
+    CGFloat constantOfPlusButtonCenterYOffset = [self constantOfPlusButtonCenterYOffsetForTabBarHeight:taBarHeight];
+    self.plusButton.center = CGPointMake(taBarWidth * 0.5, taBarHeight * multiplierOfTabBarHeight + constantOfPlusButtonCenterYOffset);
     NSUInteger plusButtonIndex = [self plusButtonIndex];
     [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIView * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
         //调整UITabBarItem的位置
@@ -139,22 +140,39 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     }
 }
 
-- (CGFloat)multiplerInCenterY {
-    CGFloat multiplerInCenterY;
-    if ([[self.plusButton class] respondsToSelector:@selector(multiplerInCenterY)]) {
-        multiplerInCenterY = [[self.plusButton class] multiplerInCenterY];
-    } else {
+- (CGFloat)multiplierOfTabBarHeight:(CGFloat)taBarHeight {
+    CGFloat multiplierOfTabBarHeight;
+    if ([[self.plusButton class] respondsToSelector:@selector(multiplierOfTabBarHeight:)]) {
+        multiplierOfTabBarHeight = [[self.plusButton class] multiplierOfTabBarHeight:taBarHeight];
+    }
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    else if ([[self.plusButton class] respondsToSelector:@selector(multiplerInCenterY)]) {
+        multiplierOfTabBarHeight = [[self.plusButton class] multiplerInCenterY];
+    }
+#pragma clang diagnostic pop
+    
+    else {
         CGSize sizeOfPlusButton = self.plusButton.frame.size;
         CGFloat heightDifference = sizeOfPlusButton.height - self.bounds.size.height;
         if (heightDifference < 0) {
-            multiplerInCenterY = 0.5;
+            multiplierOfTabBarHeight = 0.5;
         } else {
             CGPoint center = CGPointMake(self.bounds.size.height * 0.5, self.bounds.size.height * 0.5);
             center.y = center.y - heightDifference * 0.5;
-            multiplerInCenterY = center.y / self.bounds.size.height;
+            multiplierOfTabBarHeight = center.y / self.bounds.size.height;
         }
     }
-    return multiplerInCenterY;
+    return multiplierOfTabBarHeight;
+}
+
+- (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)taBarHeight {
+    CGFloat constantOfPlusButtonCenterYOffset = 0.f;
+    if ([[self.plusButton class] respondsToSelector:@selector(constantOfPlusButtonCenterYOffsetForTabBarHeight:)]) {
+        constantOfPlusButtonCenterYOffset = [[self.plusButton class] constantOfPlusButtonCenterYOffsetForTabBarHeight:taBarHeight];
+    }
+    return constantOfPlusButtonCenterYOffset;
 }
 
 - (NSUInteger)plusButtonIndex {
