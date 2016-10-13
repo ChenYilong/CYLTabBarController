@@ -52,7 +52,7 @@ static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwapp
 
 //Fix issue #93
 - (void)viewDidLayoutSubviews {
-    [self.tabBar layoutIfNeeded];
+    [self.tabBar layoutSubviews];
 }
 
 - (void)viewWillLayoutSubviews {
