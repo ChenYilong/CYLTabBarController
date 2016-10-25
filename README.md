@@ -210,8 +210,11 @@ pod update
 
 
  1. 实现  `CYLPlusButtonSubclassing`  协议 
+    //请在中进行注册，否则iOS10系统下存在Crash风险。
 
- 2. 子类将自身类型进行注册，一般可在 `application` 的 `applicationDelegate` 方法里面调用 `[YourClass registerPlusButton]` 或者在子类的 `+load` 方法中调用：
+ 2. 子类将自身类型进行注册，需要在 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerPlusButton]` 
+
+   这里注意，不能在子类的 `+load` 方法中调用，比如像下面这样做，在 iOS10 系统上有 Crash 的风险：
 
  ```Objective-C
  +(void)load {
@@ -564,6 +567,20 @@ A: 这个是自动做的，但是 `CYLTabBarController` 只能保证的是：只
 
 这是因为，在响应链上，`UIControl` 能响应点击事件， `UIImage` 无法响应。
 
+Q：为什么在iOS10上会Crash，iOS9上不会？
+
+
+A：
+
+  在注册加号按钮时，需要在 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerPlusButton]` 
+
+   这里注意，不能在子类的 `+load` 方法中调用，比如像下面这样做，在 iOS10 系统上有 Crash 的风险：
+
+ ```Objective-C
+ +(void)load {
+    [super registerPlusButton];
+}
+ ```
 
 
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
