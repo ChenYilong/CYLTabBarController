@@ -6,5 +6,11 @@
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 
+#ifndef CYLConstants_h
+#define CYLConstants_h
+
 #define CYL_DEPRECATED(explain) __attribute__((deprecated(explain)))
+
+#endif /* CYLConstants_h */
+
 

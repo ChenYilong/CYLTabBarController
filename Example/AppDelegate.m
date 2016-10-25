@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "CYLTabBarControllerConfig.h"
+#import "CYLPlusButtonSubclass.h"
 
 @interface AppDelegate ()
 
@@ -19,6 +20,7 @@
     // 设置主窗口,并设置根控制器
     self.window = [[UIWindow alloc]init];
     self.window.frame = [UIScreen mainScreen].bounds;
+    [CYLPlusButtonSubclass registerPlusButton];
     CYLTabBarControllerConfig *tabBarControllerConfig = [[CYLTabBarControllerConfig alloc] init];
     [self.window setRootViewController:tabBarControllerConfig.tabBarController];
     [self.window makeKeyAndVisible];

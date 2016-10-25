@@ -22,7 +22,8 @@
 #pragma mark - Life Cycle
 
 + (void)load {
-    [super registerPlusButton];
+    //请在 `-application:didFinishLaunchingWithOptions:` 中进行注册，否则iOS10系统下存在Crash风险。
+    //[super registerPlusButton];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
