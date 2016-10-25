@@ -109,7 +109,7 @@
 
 
  ```Objective-C
-pod "CYLTabBarController", "1.6.1"
+pod "CYLTabBarController", "~>1.6.1"
  ```
 
 注意：v1.6.1是 iOS10 适配版本，之前版本可能在 iOS10 上表现异常。
