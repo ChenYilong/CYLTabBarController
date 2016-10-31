@@ -2,7 +2,7 @@
 
 
 <p align="center">
-![enter image description here](https://img.shields.io/badge/pod-v1.6.1-brightgreen.svg)
+![enter image description here](https://img.shields.io/badge/pod-v1.6.3-brightgreen.svg)
 ![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5152950834.svg) 
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
 [![Codewake](https://www.codewake.com/badges/ask_question.svg)](https://www.codewake.com/p/cyltabbarcontroller)
@@ -109,10 +109,10 @@
 
 
  ```Objective-C
-pod "CYLTabBarController", "~>1.6.1"
+pod "CYLTabBarController", "~>1.6.3"
  ```
 
-注意：v1.6.1是 iOS10 适配版本，之前版本可能在 iOS10 上表现异常。
+注意：v1.6.3是 iOS10 适配版本，之前版本可能在 iOS10 上表现异常。
 
 
 然后使用 `cocoaPods` 进行安装：

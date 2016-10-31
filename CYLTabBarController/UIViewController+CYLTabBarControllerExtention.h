@@ -6,7 +6,7 @@
 //  Copyright © 2016年 https://github.com/ChenYilong .All rights reserved.
 //
 
-@import UIKit;
+#import <UIKit/UIKit.h>
 
 typedef void (^CYLPopSelectTabBarChildViewControllerCompletion)(__kindof UIViewController *selectedTabBarChildViewController);
 

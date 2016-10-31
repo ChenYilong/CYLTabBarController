@@ -6,7 +6,8 @@
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 
-@import UIKit;
+#import <UIKit/UIKit.h>
+
 #import "CYLConstants.h"
 @class CYLPlusButton;
 
