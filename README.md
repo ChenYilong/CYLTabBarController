@@ -31,7 +31,8 @@
   4.  [点击 PlusButton 跳转到指定 UIViewController](https://github.com/ChenYilong/CYLTabBarController#点击-plusbutton-跳转到指定-uiviewcontroller) 
   5.  [让TabBarItem仅显示图标，并使图标垂直居中](https://github.com/ChenYilong/CYLTabBarController#让tabbaritem仅显示图标并使图标垂直居中) 
   6.  [在 Swift 项目中使用 CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#在-swift-项目中使用-cyltabbarcontroller) 
-  7.  [源码实现原理](https://github.com/ChenYilong/CYLTabBarController#源码实现原理) 
+  7.  [搭配 Storyboard 使用 CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#搭配-storyboard-使用-cyltabbarcontroller) 
+  8.  [源码实现原理](https://github.com/ChenYilong/CYLTabBarController#源码实现原理) 
  6.  [Q-A](https://github.com/ChenYilong/CYLTabBarController#q-a) 
 
 
@@ -479,6 +480,9 @@ Airbnb-app效果：
 这将导致 PlusButton 点击事件失效，具体修改代码如下：
 ![enter image description here](http://i67.tinypic.com/118ottv.jpg)
 
+### 搭配 Storyboard 使用 CYLTabBarController
+
+[这里](https://github.com/ChenYilong/CYLDeallocBlockExecutor) ，里面有个文件夹CYLTabBarControllerTestDemo，这个Demo演示了如何搭配 Storyboard 使用。
 
 ### 源码实现原理
 
