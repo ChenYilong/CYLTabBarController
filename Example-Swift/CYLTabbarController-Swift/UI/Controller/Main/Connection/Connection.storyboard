@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Mak-5M-po7">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <scenes>
+        <!--人脉-->
+        <scene sceneID="se8-r5-n0u">
+            <objects>
+                <viewController id="ekp-Gm-SoS" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="EdT-yt-Ug3"/>
+                        <viewControllerLayoutGuide type="bottom" id="QNU-Zi-02g"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Ed3-Dw-rw1">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="人脉" id="ild-1X-gTb"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Edg-lt-25o" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1144" y="354"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="kv6-MB-Led">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Mak-5M-po7" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="LmP-5g-2fY">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="ekp-Gm-SoS" kind="relationship" relationship="rootViewController" id="k1F-W9-CfF"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="pvY-SY-yHY" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="332" y="354"/>
+        </scene>
+    </scenes>
+</document>

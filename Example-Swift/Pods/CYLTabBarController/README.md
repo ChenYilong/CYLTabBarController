@@ -31,8 +31,7 @@
   4.  [点击 PlusButton 跳转到指定 UIViewController](https://github.com/ChenYilong/CYLTabBarController#点击-plusbutton-跳转到指定-uiviewcontroller) 
   5.  [让TabBarItem仅显示图标，并使图标垂直居中](https://github.com/ChenYilong/CYLTabBarController#让tabbaritem仅显示图标并使图标垂直居中) 
   6.  [在 Swift 项目中使用 CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#在-swift-项目中使用-cyltabbarcontroller) 
-  7.  [搭配 Storyboard 使用 CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#搭配-storyboard-使用-cyltabbarcontroller) 
-  8.  [源码实现原理](https://github.com/ChenYilong/CYLTabBarController#源码实现原理) 
+  7.  [源码实现原理](https://github.com/ChenYilong/CYLTabBarController#源码实现原理) 
  6.  [Q-A](https://github.com/ChenYilong/CYLTabBarController#q-a) 
 
 
@@ -213,14 +212,12 @@ pod update
 
  1. 实现  `CYLPlusButtonSubclassing`  协议 
 
- 2. 子类将自身类型进行注册，需要在 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerPlusButton]` 
-
-   这里注意，不能在子类的 `+load` 方法中调用，比如像下面这样做，在 iOS10 系统上有 Crash 的风险：
+ 2. 子类将自身类型进行注册，一般可在 `application` 的 `applicationDelegate` 方法里面调用 `[YourClass registerPlusButton]` 或者在子类的 `+load` 方法中调用：
 
  ```Objective-C
- + (void)load {
+ +(void)load {
     [super registerPlusButton];
- }
+}
  ```
 
 协议提供了可选方法：
@@ -474,17 +471,12 @@ Airbnb-app效果：
 
 #### 在 Swift 项目中使用 CYLTabBarController
 
-仓库中给出了一个Swift Demo，文件夹叫做 Example-Swift。
-
-具体的编写步骤参考热心网友提供的教程： [《从头开始swift2.1 仿搜材通项目（三） 主流框架Tabbed的搭建》]( http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes ) 
+参考： [《从头开始swift2.1 仿搜材通项目（三） 主流框架Tabbed的搭建》]( http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes ) 
 
 这里注意，文章的示例代码有问题，少了设置 PlusButton 大小的代码：
 这将导致 PlusButton 点击事件失效，具体修改代码如下：
 ![enter image description here](http://i67.tinypic.com/118ottv.jpg)
 
-### 搭配 Storyboard 使用 CYLTabBarController
-
-[这里](https://github.com/ChenYilong/CYLDeallocBlockExecutor) ，里面有个文件夹CYLTabBarControllerTestDemo，这个Demo演示了如何搭配 Storyboard 使用。
 
 ### 源码实现原理
 
@@ -574,19 +566,6 @@ A: 这个是自动做的，但是 `CYLTabBarController` 只能保证的是：只
 这是因为，在响应链上，`UIControl` 能响应点击事件， `UIImage` 无法响应。
 
 
-Q：为什么在iOS10上会Crash，iOS9上不会？
-
-
-A：
-  在注册加号按钮时，需要在 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerPlusButton]` 
-
-   这里注意，不能在子类的 `+load` 方法中调用，比如像下面这样做，在 iOS10 系统上有 Crash 的风险：
-
- ```Objective-C
- + (void)load {
-    [super registerPlusButton];
-}
- ```
 
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
 

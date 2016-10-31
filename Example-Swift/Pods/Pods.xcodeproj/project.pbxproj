@@ -1,0 +1,485 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		14804AF6F665292345A3617B99A3908C /* CYLTabBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 24E118EF1FBB14C3D2CDB2F083EA048D /* CYLTabBar.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CC4F56F95BAD6706291C68A5E65EE84 /* CYLTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27930174D6A2951946EA8CF4848B28A7 /* CYLTabBarController.m */; };
+		4A47648C553C80402520D43163E5F22C /* CYLPlusButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 2667D0B3278629C94E3C9A1C167B61C1 /* CYLPlusButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		706DD8FF096C234E8CA60A7C2853884B /* CYLPlusButton.m in Sources */ = {isa = PBXBuildFile; fileRef = F5327A23F39657DB7844AB8875763C71 /* CYLPlusButton.m */; };
+		71CFBD4AFEF8AFA9C6CB9B9050B2645D /* Pods-CYLTabbarController-Swift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A0FF6CDC78B7654FDB237B64C83BB34F /* Pods-CYLTabbarController-Swift-dummy.m */; };
+		8E520FFE0CB5746AFDD09A455008BE16 /* CYLConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D194EC883941F5EAE3CF60CA459DF64 /* CYLConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ABD9C7E4737F28E48833F21BDAF6B477 /* UIViewController+CYLTabBarControllerExtention.m in Sources */ = {isa = PBXBuildFile; fileRef = CADFC08C268A046B8EB7285B9676F954 /* UIViewController+CYLTabBarControllerExtention.m */; };
+		B114DE31A770E7A8D0FC345F47973314 /* CYLTabBarController.h in Headers */ = {isa = PBXBuildFile; fileRef = 04DB5E2002E683A0C38BE445DAAD6D0D /* CYLTabBarController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B2F7F45FDBEC10A913006AA8951AF781 /* CYLTabBar.m in Sources */ = {isa = PBXBuildFile; fileRef = C6921533AD2D18F50F35AF43B4CC7B41 /* CYLTabBar.m */; };
+		BA743E2665C1C3D87FD70E8CFBC581AC /* UIViewController+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = 50742D46E9779EE739097FD3D64EE58D /* UIViewController+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C543EA7F1EE3EF1EA0B35FC74C1F0634 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC22C73C1608DFA5D5D78BDCB218219 /* Foundation.framework */; };
+		CCE8A94564E7CA042FA573CFE277360A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC22C73C1608DFA5D5D78BDCB218219 /* Foundation.framework */; };
+		E945BDD35E1CB29A64A46A30FB726E02 /* CYLTabBarController-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = BAE3A0D6AA7AB7BE173F59C833D7CF6D /* CYLTabBarController-dummy.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8922B928F1C46675AF563DCCF07199B1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0C1D89EAE68EF4D4ABEDB611EC44AAB0;
+			remoteInfo = CYLTabBarController;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		008D9EC2DE19E1430F116603DE8BA891 /* CYLTabBarController-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CYLTabBarController-prefix.pch"; sourceTree = "<group>"; };
+		04DB5E2002E683A0C38BE445DAAD6D0D /* CYLTabBarController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CYLTabBarController.h; path = CYLTabBarController/CYLTabBarController.h; sourceTree = "<group>"; };
+		0D194EC883941F5EAE3CF60CA459DF64 /* CYLConstants.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CYLConstants.h; path = CYLTabBarController/CYLConstants.h; sourceTree = "<group>"; };
+		10091F00BFF559CAD46EB62FF71A7A93 /* CYLTabBarController.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CYLTabBarController.xcconfig; sourceTree = "<group>"; };
+		1EFD36367FD011A616500679F044F247 /* Pods-CYLTabbarController-Swift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-CYLTabbarController-Swift.release.xcconfig"; sourceTree = "<group>"; };
+		24E118EF1FBB14C3D2CDB2F083EA048D /* CYLTabBar.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CYLTabBar.h; path = CYLTabBarController/CYLTabBar.h; sourceTree = "<group>"; };
+		2667D0B3278629C94E3C9A1C167B61C1 /* CYLPlusButton.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CYLPlusButton.h; path = CYLTabBarController/CYLPlusButton.h; sourceTree = "<group>"; };
+		27930174D6A2951946EA8CF4848B28A7 /* CYLTabBarController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = CYLTabBarController.m; path = CYLTabBarController/CYLTabBarController.m; sourceTree = "<group>"; };
+		2A6EC3B35B5AC443F7BD1344E8418B74 /* libPods-CYLTabbarController-Swift.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CYLTabbarController-Swift.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4FD86729516FDAB167D102A80DD5EA7A /* libCYLTabBarController.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCYLTabBarController.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		50227D02C909EEFABAB8B97BDF6E85FE /* Pods-CYLTabbarController-Swift-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-CYLTabbarController-Swift-acknowledgements.markdown"; sourceTree = "<group>"; };
+		50742D46E9779EE739097FD3D64EE58D /* UIViewController+CYLTabBarControllerExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIViewController+CYLTabBarControllerExtention.h"; path = "CYLTabBarController/UIViewController+CYLTabBarControllerExtention.h"; sourceTree = "<group>"; };
+		697585A7D2E51D41974E5CCF63671E62 /* Pods-CYLTabbarController-Swift-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-CYLTabbarController-Swift-frameworks.sh"; sourceTree = "<group>"; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		A0FF6CDC78B7654FDB237B64C83BB34F /* Pods-CYLTabbarController-Swift-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-CYLTabbarController-Swift-dummy.m"; sourceTree = "<group>"; };
+		BAE3A0D6AA7AB7BE173F59C833D7CF6D /* CYLTabBarController-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "CYLTabBarController-dummy.m"; sourceTree = "<group>"; };
+		C6921533AD2D18F50F35AF43B4CC7B41 /* CYLTabBar.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = CYLTabBar.m; path = CYLTabBarController/CYLTabBar.m; sourceTree = "<group>"; };
+		C8A0330CDD92BF2FF3796FE84B52CA0E /* Pods-CYLTabbarController-Swift-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-CYLTabbarController-Swift-resources.sh"; sourceTree = "<group>"; };
+		CADFC08C268A046B8EB7285B9676F954 /* UIViewController+CYLTabBarControllerExtention.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+CYLTabBarControllerExtention.m"; path = "CYLTabBarController/UIViewController+CYLTabBarControllerExtention.m"; sourceTree = "<group>"; };
+		CEC22C73C1608DFA5D5D78BDCB218219 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		DB84DDF52E80529669575AB623BA9425 /* Pods-CYLTabbarController-Swift-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-CYLTabbarController-Swift-acknowledgements.plist"; sourceTree = "<group>"; };
+		DF0517E67A13DF636A863232BB6D01E0 /* Pods-CYLTabbarController-Swift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-CYLTabbarController-Swift.debug.xcconfig"; sourceTree = "<group>"; };
+		F5327A23F39657DB7844AB8875763C71 /* CYLPlusButton.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = CYLPlusButton.m; path = CYLTabBarController/CYLPlusButton.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6AF685B991DFAD51D1E7573EFFA6F6AF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCE8A94564E7CA042FA573CFE277360A /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		73A66D90BCCB957D0200BF72AD8D2C1F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C543EA7F1EE3EF1EA0B35FC74C1F0634 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0454148FD8ACE6570FE721028812B709 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				EFFD0BE8A66B206BE8C7ED09AEDCC91C /* Pods-CYLTabbarController-Swift */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		17AF3629C596E3FE4E557DFB189B9DCD /* CYLTabBarController */ = {
+			isa = PBXGroup;
+			children = (
+				0D194EC883941F5EAE3CF60CA459DF64 /* CYLConstants.h */,
+				2667D0B3278629C94E3C9A1C167B61C1 /* CYLPlusButton.h */,
+				F5327A23F39657DB7844AB8875763C71 /* CYLPlusButton.m */,
+				24E118EF1FBB14C3D2CDB2F083EA048D /* CYLTabBar.h */,
+				C6921533AD2D18F50F35AF43B4CC7B41 /* CYLTabBar.m */,
+				04DB5E2002E683A0C38BE445DAAD6D0D /* CYLTabBarController.h */,
+				27930174D6A2951946EA8CF4848B28A7 /* CYLTabBarController.m */,
+				50742D46E9779EE739097FD3D64EE58D /* UIViewController+CYLTabBarControllerExtention.h */,
+				CADFC08C268A046B8EB7285B9676F954 /* UIViewController+CYLTabBarControllerExtention.m */,
+				9BD19557099368146BE33C6B9072E838 /* Support Files */,
+			);
+			path = CYLTabBarController;
+			sourceTree = "<group>";
+		};
+		3DCAB2B7CDE207B3958B6CB957FCC758 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				CEC22C73C1608DFA5D5D78BDCB218219 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		4DB49FE7FD5B8494E9B1D7ABD1483A98 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4FD86729516FDAB167D102A80DD5EA7A /* libCYLTabBarController.a */,
+				2A6EC3B35B5AC443F7BD1344E8418B74 /* libPods-CYLTabbarController-Swift.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7DB346D0F39D3F0E887471402A8071AB = {
+			isa = PBXGroup;
+			children = (
+				93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */,
+				BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */,
+				A5F74714DF34C5EB8452755D66C440D5 /* Pods */,
+				4DB49FE7FD5B8494E9B1D7ABD1483A98 /* Products */,
+				0454148FD8ACE6570FE721028812B709 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		9BD19557099368146BE33C6B9072E838 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				10091F00BFF559CAD46EB62FF71A7A93 /* CYLTabBarController.xcconfig */,
+				BAE3A0D6AA7AB7BE173F59C833D7CF6D /* CYLTabBarController-dummy.m */,
+				008D9EC2DE19E1430F116603DE8BA891 /* CYLTabBarController-prefix.pch */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/CYLTabBarController";
+			sourceTree = "<group>";
+		};
+		A5F74714DF34C5EB8452755D66C440D5 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				17AF3629C596E3FE4E557DFB189B9DCD /* CYLTabBarController */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3DCAB2B7CDE207B3958B6CB957FCC758 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		EFFD0BE8A66B206BE8C7ED09AEDCC91C /* Pods-CYLTabbarController-Swift */ = {
+			isa = PBXGroup;
+			children = (
+				50227D02C909EEFABAB8B97BDF6E85FE /* Pods-CYLTabbarController-Swift-acknowledgements.markdown */,
+				DB84DDF52E80529669575AB623BA9425 /* Pods-CYLTabbarController-Swift-acknowledgements.plist */,
+				A0FF6CDC78B7654FDB237B64C83BB34F /* Pods-CYLTabbarController-Swift-dummy.m */,
+				697585A7D2E51D41974E5CCF63671E62 /* Pods-CYLTabbarController-Swift-frameworks.sh */,
+				C8A0330CDD92BF2FF3796FE84B52CA0E /* Pods-CYLTabbarController-Swift-resources.sh */,
+				DF0517E67A13DF636A863232BB6D01E0 /* Pods-CYLTabbarController-Swift.debug.xcconfig */,
+				1EFD36367FD011A616500679F044F247 /* Pods-CYLTabbarController-Swift.release.xcconfig */,
+			);
+			name = "Pods-CYLTabbarController-Swift";
+			path = "Target Support Files/Pods-CYLTabbarController-Swift";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		280A7F11CF813C04AD91EDFDC092FC4F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8E520FFE0CB5746AFDD09A455008BE16 /* CYLConstants.h in Headers */,
+				4A47648C553C80402520D43163E5F22C /* CYLPlusButton.h in Headers */,
+				14804AF6F665292345A3617B99A3908C /* CYLTabBar.h in Headers */,
+				B114DE31A770E7A8D0FC345F47973314 /* CYLTabBarController.h in Headers */,
+				BA743E2665C1C3D87FD70E8CFBC581AC /* UIViewController+CYLTabBarControllerExtention.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		0C1D89EAE68EF4D4ABEDB611EC44AAB0 /* CYLTabBarController */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5974F75F57FC1A6F3462B24D17473E06 /* Build configuration list for PBXNativeTarget "CYLTabBarController" */;
+			buildPhases = (
+				CE84A772E28105B307D4B6A91BF03791 /* Sources */,
+				6AF685B991DFAD51D1E7573EFFA6F6AF /* Frameworks */,
+				280A7F11CF813C04AD91EDFDC092FC4F /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CYLTabBarController;
+			productName = CYLTabBarController;
+			productReference = 4FD86729516FDAB167D102A80DD5EA7A /* libCYLTabBarController.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		A85ACB39B05F71D084D3F1ABFA66FB4C /* Pods-CYLTabbarController-Swift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F7C3B1F3C8112B84179A60A4AD92F066 /* Build configuration list for PBXNativeTarget "Pods-CYLTabbarController-Swift" */;
+			buildPhases = (
+				AA9906E396D7D4B44E0007E45E953828 /* Sources */,
+				73A66D90BCCB957D0200BF72AD8D2C1F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E39A4C094EA565A2ED9E3FCD41E702C9 /* PBXTargetDependency */,
+			);
+			name = "Pods-CYLTabbarController-Swift";
+			productName = "Pods-CYLTabbarController-Swift";
+			productReference = 2A6EC3B35B5AC443F7BD1344E8418B74 /* libPods-CYLTabbarController-Swift.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D41D8CD98F00B204E9800998ECF8427E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0730;
+				LastUpgradeCheck = 0700;
+			};
+			buildConfigurationList = 2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
+			productRefGroup = 4DB49FE7FD5B8494E9B1D7ABD1483A98 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0C1D89EAE68EF4D4ABEDB611EC44AAB0 /* CYLTabBarController */,
+				A85ACB39B05F71D084D3F1ABFA66FB4C /* Pods-CYLTabbarController-Swift */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AA9906E396D7D4B44E0007E45E953828 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71CFBD4AFEF8AFA9C6CB9B9050B2645D /* Pods-CYLTabbarController-Swift-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE84A772E28105B307D4B6A91BF03791 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				706DD8FF096C234E8CA60A7C2853884B /* CYLPlusButton.m in Sources */,
+				B2F7F45FDBEC10A913006AA8951AF781 /* CYLTabBar.m in Sources */,
+				E945BDD35E1CB29A64A46A30FB726E02 /* CYLTabBarController-dummy.m in Sources */,
+				2CC4F56F95BAD6706291C68A5E65EE84 /* CYLTabBarController.m in Sources */,
+				ABD9C7E4737F28E48833F21BDAF6B477 /* UIViewController+CYLTabBarControllerExtention.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E39A4C094EA565A2ED9E3FCD41E702C9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CYLTabBarController;
+			target = 0C1D89EAE68EF4D4ABEDB611EC44AAB0 /* CYLTabBarController */;
+			targetProxy = 8922B928F1C46675AF563DCCF07199B1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3FA451D268613890FA8A5A03801E11D5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5E62115DE8C09934BF8D2FE5D15FED1E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				ONLY_ACTIVE_ARCH = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+		8B02717F04144BC458C4032570002F5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1EFD36367FD011A616500679F044F247 /* Pods-CYLTabbarController-Swift.release.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MACH_O_TYPE = staticlib;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		9BFF86A7D37ECD79548AF17D703EFB7D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 10091F00BFF559CAD46EB62FF71A7A93 /* CYLTabBarController.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/CYLTabBarController/CYLTabBarController-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		D95C5F87C8D0FBF2BC97E9EB7C8EB390 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 10091F00BFF559CAD46EB62FF71A7A93 /* CYLTabBarController.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/CYLTabBarController/CYLTabBarController-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		F1DBFFC60BCE9E93A7B80ED0E80A01C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DF0517E67A13DF636A863232BB6D01E0 /* Pods-CYLTabbarController-Swift.debug.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MACH_O_TYPE = staticlib;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5E62115DE8C09934BF8D2FE5D15FED1E /* Debug */,
+				3FA451D268613890FA8A5A03801E11D5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5974F75F57FC1A6F3462B24D17473E06 /* Build configuration list for PBXNativeTarget "CYLTabBarController" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9BFF86A7D37ECD79548AF17D703EFB7D /* Debug */,
+				D95C5F87C8D0FBF2BC97E9EB7C8EB390 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F7C3B1F3C8112B84179A60A4AD92F066 /* Build configuration list for PBXNativeTarget "Pods-CYLTabbarController-Swift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F1DBFFC60BCE9E93A7B80ED0E80A01C4 /* Debug */,
+				8B02717F04144BC458C4032570002F5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+}
