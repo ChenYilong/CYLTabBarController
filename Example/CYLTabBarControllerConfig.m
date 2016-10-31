@@ -7,8 +7,6 @@
 //
 #import "CYLTabBarControllerConfig.h"
 
-@import Foundation;
-@import UIKit;
 @interface CYLBaseNavigationController : UINavigationController
 @end
 @implementation CYLBaseNavigationController
