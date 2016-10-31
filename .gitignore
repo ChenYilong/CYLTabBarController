@@ -17,3 +17,6 @@ DerivedData
 .idea/ 
 Pods 
 Podfile.lock
+
+CYLTabBarController.xcodeproj/project.xcworkspace/xcuserdata/chenyilong.xcuserdatad/UserInterfaceState.xcuserstate
+

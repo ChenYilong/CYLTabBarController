@@ -6,9 +6,6 @@
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 
-@import Foundation;
-@import UIKit;
-
 #import "CYLPlusButton.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"
 
