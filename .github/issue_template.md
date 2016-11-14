@@ -4,7 +4,7 @@
 
 <!--- 每个类的第五行都标记有版本号，请贴出。 -->
 
- 1. Version：v1.6.4
+ 1. Version：v1.6.5
  2. Language：Objective-C
  4. iOS System Version：iOS10
  5. Prototype（是否是真机）：YES
