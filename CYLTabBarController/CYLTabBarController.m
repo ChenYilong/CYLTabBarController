@@ -68,6 +68,16 @@ static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwapp
     });
 }
 
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations{
+    UIViewController *controller = self.selectedViewController;
+    if ([controller isKindOfClass:[UINavigationController class]]) {
+        UINavigationController *navController = (UINavigationController *)controller;
+        return navController.topViewController.supportedInterfaceOrientations;
+    } else {
+        return controller.supportedInterfaceOrientations;
+    }
+}
+
 - (void)dealloc {
     // KVO反注册
     if (self.isObservingSwappableImageViewDefaultOffset) {
