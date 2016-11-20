@@ -45,12 +45,11 @@
     
     CGFloat const centerOfView    = self.bounds.size.width * 0.5;
     CGFloat const labelLineHeight = self.titleLabel.font.lineHeight;
-    CGFloat const verticalMarginT = self.bounds.size.height - labelLineHeight - imageViewEdgeWidth;
-    CGFloat const verticalMargin  = verticalMarginT / 2;
+    CGFloat const verticalMargin  = (self.bounds.size.height - labelLineHeight - imageViewEdgeHeight) * 0.5;
     
     // imageView 和 titleLabel 中心的 Y 值
-    CGFloat const centerOfImageView  = verticalMargin + imageViewEdgeWidth * 0.5;
-    CGFloat const centerOfTitleLabel = imageViewEdgeWidth  + verticalMargin * 2 + labelLineHeight * 0.5 + 5;
+    CGFloat const centerOfImageView  = verticalMargin + imageViewEdgeHeight * 0.5;
+    CGFloat const centerOfTitleLabel = imageViewEdgeHeight  + verticalMargin * 2 + labelLineHeight * 0.5 + 5;
     
     //imageView position 位置
     self.imageView.bounds = CGRectMake(0, 0, imageViewEdgeWidth, imageViewEdgeHeight);
@@ -83,6 +82,8 @@
     [button sizeToFit]; // or set frame in this way `button.frame = CGRectMake(0.0, 0.0, 250, 100);`
 //    button.frame = CGRectMake(0.0, 0.0, 250, 100);
 //    button.backgroundColor = [UIColor redColor];
+    
+    // if you use `+plusChildViewController` , do not addTarget to plusButton.
     [button addTarget:button action:@selector(clickPublish) forControlEvents:UIControlEventTouchUpInside];
     return button;
 }
