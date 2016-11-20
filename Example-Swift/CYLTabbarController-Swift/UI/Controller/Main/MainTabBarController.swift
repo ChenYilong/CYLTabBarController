@@ -41,7 +41,7 @@ class PlusButtonSubclass : CYLPlusButton,CYLPlusButtonSubclassing{
     class func plusButton() -> AnyObject! {
         let button:PlusButtonSubclass =  PlusButtonSubclass()
         button.setImage(UIImage(named: "icon_middle_add"), forState: UIControlState.Normal)
-        button.backgroundColor = UIColor.yellowColor()
+        //        button.backgroundColor = UIColor.yellowColor()
         button.setTitle("发布", forState: UIControlState.Normal)
         button.setTitle("选中", forState: UIControlState.Selected)
         button.setTitleColor(UIColor.redColor(), forState: UIControlState.Normal)
