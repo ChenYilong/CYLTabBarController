@@ -589,6 +589,29 @@ A：
 }
  ```
 
+Q: 我的样式是点击 `plusButton` 后跳转到一个 `ViewController`，但是选中了一次中间的 `plusButton` 之后，再点别的 `tabItem` ，中间不会变成 `normal` 的状态。
+
+A: 有两种情况会造成这个问题：
+
+ 1.  应该是你的 `tabBar` 设置了 `delegate` 了，你要是 `tabBar` 的代理没设置的话，默认会有这个 `selected` 状态切换的处理。你设置代理后，会覆盖我的行为。所以手动加上就好了。
+
+ ```Objective-C
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController*)viewController {
+    NSUInteger selectedIndex = tabBarController.selectedIndex;
+    UIButton *plusButton = CYLExternPlusButton;
+    if (CYLPlusChildViewController) {
+        if ((selectedIndex == CYLPlusButtonIndex) && (viewController != CYLPlusChildViewController)) {
+            plusButton.selected = NO;
+        }
+    }
+    return YES;
+}
+ ```
+
+ 2. `plusButton` 添加了自定义点击事件或者自定义手势，因为这样会造成点击事件冲突或手势冲突，当需要 `pushViewController` 的时候，这个库会自动的添加点击事件，你这里重新加了点击事件所以冲突了；
+
+ 在你项目的基础，把 `plusButton` 的点击事件取消掉,也就是 `addTarget` 这一行注释掉，手势事件也同理，应该就ok了
+
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
 
 ----------
