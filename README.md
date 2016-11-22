@@ -114,7 +114,7 @@
 
   如果您的网络已经翻墙，在终端中运行如下命令直接安装：
 
-  ```shell
+  ```
      sudo gem install cocoapods
   ```
 
@@ -122,7 +122,7 @@
 
   在终端依次运行以下命令：
 
-  ```shell
+  ```
      gem sources --add https://gems.ruby-china.org/ --remove https://rubygems.org/
      sudo gem install cocoapods
   ```
@@ -131,13 +131,13 @@
 
   在终端中运行以下命令：
 
-  ```shell
+  ```
      pod search CYLTabBarController
   ```
  
    这里注意，这个命令搜索的是本机上的最新版本，并没有联网查询。如果运行以上命令，没有搜到或者搜不到最新版本，您可以运行以下命令，更新一下您本地的 CocoaPods 源列表。
 
-  ```shell
+  ```
      pod repo update
   ```
  
@@ -145,13 +145,13 @@
 
   打开终端，进入到您的工程目录，执行以下命令，会自动生成一个 Podfile 文件。
 
-  ```shell
+  ```
      pod init
   ```
 
   然后使用 CocoaPods 进行安装。如果尚未安装 CocoaPods，运行以下命令进行安装：
 
- ```shell
+ ```
     gem install cocoapods
  ```
 
@@ -159,19 +159,19 @@
 
   在文件 `Podfile` 中加入以下内容：
 
- ```shell
+ ```
     pod 'CYLTabBarController', '1.6.7'
  ```
 
   然后在终端中运行以下命令：
 
- ```shell
+ ```
     pod install
  ```
 
   或者这个命令：
 
- ```shell
+ ```
     # 禁止升级 CocoaPods 的 spec 仓库，否则会卡在 Analyzing dependencies，非常慢
     pod update --verbose --no-repo-update
  ```
@@ -191,7 +191,7 @@ CocoaPods 中，有几种设置 CYLTabBarController 版本的方法。如：
 `~> 1.6.X` 会根据您本地的 CocoaPods 源列表，介于 1.6.X~1.7.0 之前版本的 CYLTabBarController。
 我们建议您锁定版本，便于团队开发。如，指定 1.6.7 版本。
 
- ```shell
+ ```
 pod 'CYLTabBarController', '1.6.7'
  ```
 
@@ -201,7 +201,7 @@ pod 'CYLTabBarController', '1.6.7'
 
  如果搜索的时候没有搜到或者搜不到最新版本，可以执行以下命令更新一下本地的缓存。
 
- ```shell
+ ```
 pod repo update
  ```
  
@@ -209,7 +209,7 @@ pod repo update
 
  更新您工程目录中 Podfile 指定的 CYLTabBarController 版本后，在终端中执行以下命令。
 
- ```shell
+ ```
 pod update
  ```
 
