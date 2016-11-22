@@ -118,7 +118,7 @@
      sudo gem install cocoapods
   ```
 
-  如果您的网络不能翻墙，可以通过国内 Ruby China 的 RubyGems 镜像进行安装。
+  如果您的网络不能翻墙，可以通过国内 Ruby China 的 RubyGems 镜像进行安装。
 
   在终端依次运行以下命令：
 
