@@ -106,47 +106,125 @@
 
 ### 第一步：使用CocoaPods导入CYLTabBarController
 
+### CocoaPods 导入
 
-在 `Podfile` 中进行如下导入：
+ 1. CocoaPods 安装
 
+  如果您的机器上已经安装了 CocoaPods，直接进入下一步即可。
 
- ```Objective-C
-pod "CYLTabBarController", "~>1.6.5"
+  如果您的网络已经翻墙，在终端中运行如下命令直接安装：
+
+  ```shell
+     sudo gem install cocoapods
+  ```
+
+  如果您的网络不能翻墙，可以通过国内 Ruby China 的 RubyGems 镜像进行安装。
+
+  在终端依次运行以下命令：
+
+  ```shell
+     gem sources --add https://gems.ruby-china.org/ --remove https://rubygems.org/
+     sudo gem install cocoapods
+  ```
+
+ 2. 查询 CocoaPods 源中的本库
+
+  在终端中运行以下命令：
+
+  ```shell
+     pod search CYLTabBarController
+  ```
+ 
+   这里注意，这个命令搜索的是本机上的最新版本，并没有联网查询。如果运行以上命令，没有搜到或者搜不到最新版本，您可以运行以下命令，更新一下您本地的 CocoaPods 源列表。
+
+  ```shell
+     pod repo update
+  ```
+ 
+ 3. 使用 CocoaPods 导入
+
+  打开终端，进入到您的工程目录，执行以下命令，会自动生成一个 Podfile 文件。
+
+  ```shell
+     pod init
+  ```
+
+  然后使用 CocoaPods 进行安装。如果尚未安装 CocoaPods，运行以下命令进行安装：
+
+ ```shell
+    gem install cocoapods
  ```
 
-注意：v1.6.5是 iOS10 适配版本，之前版本可能在 iOS10 上表现异常。
+  打开 Podfile，在您项目的 target 下加入以下内容。（在此以 v1.6.7 版本为例）
 
+  在文件 `Podfile` 中加入以下内容：
 
-然后使用 `cocoaPods` 进行安装：
-
-如果尚未安装 CocoaPods, 运行以下命令进行安装:
-
-
- ```Objective-C
-gem install cocoapods
+ ```shell
+    pod 'CYLTabBarController', '1.6.7'
  ```
 
+  然后在终端中运行以下命令：
 
-安装成功后就可以安装依赖了：
-
-建议使用如下方式：
-
-
- ```Objective-C
- # 禁止升级CocoaPods的spec仓库，否则会卡在 Analyzing dependencies ，非常慢 
- pod update --verbose --no-repo-update
+ ```shell
+    pod install
  ```
 
+  或者这个命令：
 
-如果提示找不到库，则可去掉 --no-repo-update
+ ```shell
+    # 禁止升级 CocoaPods 的 spec 仓库，否则会卡在 Analyzing dependencies，非常慢
+    pod update --verbose --no-repo-update
+ ```
 
+  如果提示找不到库，则可去掉 `--no-repo-update`。
 
- ```Objective-C
+  完成后，CocoaPods 会在您的工程根目录下生成一个 `.xcworkspace` 文件。您需要通过此文件打开您的工程，而不是之前的 `.xcodeproj`。
+
+**CocoaPods 使用说明**
+
+**指定 CYLTabBarController 版本** 
+
+CocoaPods 中，有几种设置 CYLTabBarController 版本的方法。如：
+
+`>= 1.6.X` 会根据您本地的 CocoaPods 源列表，导入不低于 `1.6.X` 版本的 CYLTabBarController。
+
+`~> 1.6.X` 会根据您本地的 CocoaPods 源列表，介于 1.6.X~1.7.0 之前版本的 CYLTabBarController。
+我们建议您锁定版本，便于团队开发。如，指定 1.6.7 版本。
+
+ ```shell
+pod 'CYLTabBarController', '1.6.7'
+ ```
+
+ - 升级本地 CocoaPods 源
+
+  `CocoaPods 有一个中心化的源，默认本地会缓存 CocoaPods 源服务器上的所有 CYLTabBarController 版本。
+
+ 如果搜索的时候没有搜到或者搜不到最新版本，可以执行以下命令更新一下本地的缓存。
+
+ ```shell
+pod repo update
+ ```
+ 
+ - 升级工程的 CYLTabBarController 版本
+
+ 更新您工程目录中 Podfile 指定的 CYLTabBarController 版本后，在终端中执行以下命令。
+
+ ```shell
 pod update
  ```
 
 
+ - 清除 Cocoapods 本地缓存
 
+ 特殊情况下，由于网络或者别的原因，通过 CocoaPods 下载的文件可能会有问题。
+
+ 这时候您可以删除 CocoaPods 的缓存(~/Library/Caches/CocoaPods/Pods/Release 目录)，再次导入即可。
+
+ - 查看当前使用的 CYLTabBarController 版本
+
+ 您可以在 Podfile.lock 文件中看到您工程中使用的 CYLTabBarController 版本。
+
+ 关于 CocoaPods 的更多内容，您可以参考 [CocoaPods 文档](https://cocoapods.org/)。
 
 ### 第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组
 
