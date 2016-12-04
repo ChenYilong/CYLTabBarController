@@ -308,6 +308,7 @@ pod update
 + (NSUInteger)indexOfPlusButtonInTabBar;
 + (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight;
 + (UIViewController *)plusChildViewController;
++ (BOOL)shouldSelectPlusChildViewController;
  ```
 
 作用分别是：
@@ -520,9 +521,32 @@ Airbnb-app效果：
 
 注意：必须同时实现 `+indexOfPlusButtonInTabBar` 来指定 PlusButton 的位置。
 
-遵循两个协议：
+遵循几个协议：
 
 ![enter image description here](http://i64.tinypic.com/14jw5zt.jpg)
+
+
+另外你可以通过下面这个方法获取到 `PlusButton` 的点击事件：
+
+```Objective-C
++ (BOOL)shouldSelectPlusChildViewController;
+```
+
+用法如下：
+
+
+```Objective-C
++ (BOOL)shouldSelectPlusChildViewController {
+    BOOL isSelected = CYLExternPlusButton.selected;
+    if (isSelected) {
+        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
+    } else {
+        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
+    }
+    return YES;
+}
+
+```
 
 ## 让TabBarItem仅显示图标，并使图标垂直居中 
 
