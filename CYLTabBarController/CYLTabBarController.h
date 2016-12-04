@@ -50,6 +50,8 @@ FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 
 + (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
 
+- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController;
+
 /*!
  * Judge if there is plus button.
  */

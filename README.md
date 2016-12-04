@@ -674,14 +674,8 @@ A: 有两种情况会造成这个问题：
  1.  应该是你的 `tabBar` 设置了 `delegate` 了，你要是 `tabBar` 的代理没设置的话，默认会有这个 `selected` 状态切换的处理。你设置代理后，会覆盖我的行为。所以手动加上就好了。
 
  ```Objective-C
-- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController*)viewController {
-    NSUInteger selectedIndex = tabBarController.selectedIndex;
-    UIButton *plusButton = CYLExternPlusButton;
-    if (CYLPlusChildViewController) {
-        if ((selectedIndex == CYLPlusButtonIndex) && (viewController != CYLPlusChildViewController)) {
-            plusButton.selected = NO;
-        }
-    }
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
     return YES;
 }
  ```
