@@ -45,6 +45,13 @@ UIViewController *CYLPlusChildViewController = nil;
 #pragma clang diagnostic pop
 
 - (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender {
+    BOOL notNeedConfigureSelectionStatus = [[self class] respondsToSelector:@selector(shouldSelectPlusChildViewController)] && ![[self class] shouldSelectPlusChildViewController];
+    if (notNeedConfigureSelectionStatus) {
+        return;
+    }
+    if (sender.selected) {
+        return;
+    }
     sender.selected = YES;
     [self cyl_tabBarController].selectedIndex = CYLPlusButtonIndex;
 }

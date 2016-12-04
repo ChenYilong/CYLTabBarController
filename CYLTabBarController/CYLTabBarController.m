@@ -268,14 +268,17 @@ static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwapp
 
 #pragma mark - delegate
 
-- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController*)viewController {
+- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
     NSUInteger selectedIndex = tabBarController.selectedIndex;
     UIButton *plusButton = CYLExternPlusButton;
-    if (CYLPlusChildViewController) {
-        if ((selectedIndex == CYLPlusButtonIndex) && (viewController != CYLPlusChildViewController)) {
-            plusButton.selected = NO;
-        }
+    BOOL shouldConfigureSelectionStatus = CYLPlusChildViewController && ((selectedIndex == CYLPlusButtonIndex) && (viewController != CYLPlusChildViewController));
+    if (shouldConfigureSelectionStatus) {
+        plusButton.selected = NO;
     }
+}
+
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
     return YES;
 }
 

@@ -66,8 +66,10 @@
     @try {
         UIViewController *viewController;
         viewController = tabBarController.viewControllers[index];
-        if (index != tabBarController.selectedIndex) {
-            CYLExternPlusButton.selected = NO;
+        UIButton *plusButton = CYLExternPlusButton;
+        BOOL shouldConfigureSelectionStatus = (CYLPlusChildViewController) && ((index != CYLPlusButtonIndex) && (viewController != CYLPlusChildViewController));
+        if (shouldConfigureSelectionStatus) {
+            plusButton.selected = NO;
         }
     } @catch (NSException *exception) {
         NSString *formatString = @"\n\n\
