@@ -2,7 +2,7 @@
 
 
 <p align="center">
-![enter image description here](https://img.shields.io/badge/pod-v1.7.0-brightgreen.svg)
+![enter image description here](https://img.shields.io/badge/pod-v1.8.0-brightgreen.svg)
 ![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5152950834.svg) 
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
 [![Codewake](https://www.codewake.com/badges/ask_question.svg)](https://www.codewake.com/p/cyltabbarcontroller)
@@ -160,7 +160,7 @@
   在文件 `Podfile` 中加入以下内容：
 
  ```
-    pod 'CYLTabBarController', '1.6.7'
+    pod 'CYLTabBarController', '1.8.0'
  ```
 
   然后在终端中运行以下命令：
@@ -186,13 +186,14 @@
 
 CocoaPods 中，有几种设置 CYLTabBarController 版本的方法。如：
 
-`>= 1.6.X` 会根据您本地的 CocoaPods 源列表，导入不低于 `1.6.X` 版本的 CYLTabBarController。
+`>= 1.8.X` 会根据您本地的 CocoaPods 源列表，导入不低于 `1.8.X` 版本的 CYLTabBarController。
 
-`~> 1.6.X` 会根据您本地的 CocoaPods 源列表，介于 1.6.X~1.7.0 之前版本的 CYLTabBarController。
+`~> 1.8.X` 会根据您本地的 CocoaPods 源列表，介于 1.8.X~1.9.0 之前版本的 CYLTabBarController。
 我们建议您锁定版本，便于团队开发。如，指定 1.6.7 版本。
 
- ```
-pod 'CYLTabBarController', '1.6.7'
+ 
+```
+pod 'CYLTabBarController', '1.8.0'
  ```
 
  - 升级本地 CocoaPods 源
