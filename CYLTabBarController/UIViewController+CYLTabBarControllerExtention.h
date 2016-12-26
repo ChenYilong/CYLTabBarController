@@ -68,7 +68,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
                                                                                              注意：该属性在 Pop 行为时不起作用。
                                              *@param index Pop 改变 `TabBarController` 的 `selectedViewController` 属性。
                                                            注意：该属性在 Pop 行为时不起作用。
-                   */
+*/
 - (void)cyl_pushOrPopToViewController:(UIViewController *)viewController
                              animated:(BOOL)animated
                              callback:(CYLPushOrPopCallback)callback;

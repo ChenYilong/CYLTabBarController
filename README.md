@@ -709,6 +709,31 @@ A: 有两种情况会造成这个问题：
 
  在你项目的基础，把 `plusButton` 的点击事件取消掉,也就是 `addTarget` 这一行注释掉，手势事件也同理，应该就ok了
 
+A: `PlusButton` 与其他的 `TabBarItem` 距离没有平均分布 
+
+(对应于 [issue#36](https://github.com/ChenYilong/CYLTabBarController/issues/36#issuecomment-269165471) )
+
+把这 Demo 里的这一行代码改下：
+
+ ```Objective-C
+[button sizeToFit];
+ ```
+
+改成：
+
+ ```Objective-C
+button.frame = CGRectMake(0.0, 0.0, w, h);
+ ```
+
+那么如果单是放一个照相机的图片，一般是多大的尺寸？
+
+这个要看设计图，通常情况下，你可以写死与其他TabBarItem一样大小：
+
+
+ ```Objective-C
+ [UIScreen mainScreen].bounds.size.width / [CYLTabBarController allItemsInTabBarCount]
+ ```
+
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
 
 ----------
