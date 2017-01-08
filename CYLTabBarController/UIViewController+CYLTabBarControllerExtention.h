@@ -2,7 +2,7 @@
 //  UIViewController+CYLTabBarControllerExtention.h
 //  CYLTabBarController
 //
-//  v1.9.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 16/2/26.
+//  v1.10.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 16/2/26.
 //  Copyright © 2016年 https://github.com/ChenYilong .All rights reserved.
 //
 
@@ -40,14 +40,19 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器作为返回值返回。
  @param classType 需要选择的控制器所属的类。
  @return 最终被选择的控制器。
- @attention 注意：方法中的参数和返回值都是 `UIViewController` 的子类，但并非 `UINavigationController` 的子类。
+ @attention 注意：
+                - 方法中的参数和返回值都是 `UIViewController` 的子类，但并非 `UINavigationController` 的子类。
+                - 如果 TabBarViewController 的 viewControllers 中包含多个相同的 `classType` 类型，会返回最左端的一个。
+ 
  */
 - (UIViewController *)cyl_popSelectTabBarChildViewControllerForClassType:(Class)classType;
 
 /*!
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器在 `Block` 回调中返回。
  @param classType 需要选择的控制器所属的类。
- @attention 注意：方法中的参数和返回值都是 `UIViewController` 的子类，但并非 `UINavigationController` 的子类。
+ @attention 注意：
+                - 方法中的参数和返回值都是 `UIViewController` 的子类，但并非 `UINavigationController` 的子类。
+                - 如果 TabBarViewController 的 viewControllers 中包含多个相同的 `classType` 类型，会返回最左端的一个。
  */
 - (void)cyl_popSelectTabBarChildViewControllerForClassType:(Class)classType
                                                 completion:(CYLPopSelectTabBarChildViewControllerCompletion)completion;
@@ -74,8 +79,8 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
                              callback:(CYLPushOrPopCallback)callback;
 
 /*!
- * 如果正要 Push 的页面与当前栈顶的页面类型相同则取消  Push
- * 这样做防止主界面卡顿时，导致一个 ViewController 被  Push 多次
+ * 如果正要 Push 的页面与当前栈顶的页面类型相同则取消 Push
+ * 这样做防止主界面卡顿时，导致一个 ViewController 被 Push 多次
  */
 - (void)cyl_pushViewController:(UIViewController *)viewController animated:(BOOL)animated;
 
