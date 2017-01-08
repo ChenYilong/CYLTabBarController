@@ -2,7 +2,7 @@
 //  CYLTabBarControllerConfig.m
 //  CYLTabBarController
 //
-//  v1.9.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  v1.10.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 #import "CYLTabBarControllerConfig.h"
@@ -86,8 +86,8 @@
 - (NSArray *)tabBarItemsAttributesForController {
     NSDictionary *firstTabBarItemsAttributes = @{
 //                                                 CYLTabBarItemTitle : @"首页",
-                                                 CYLTabBarItemImage : @"home_normal",
-                                                 CYLTabBarItemSelectedImage : @"home_highlight",
+                                                 CYLTabBarItemImage : @"home_normal",  /* NSString and UIImage are supported*/
+                                                 CYLTabBarItemSelectedImage : @"home_highlight", /* NSString and UIImage are supported*/
                                                  };
     NSDictionary *secondTabBarItemsAttributes = @{
 //                                                  CYLTabBarItemTitle : @"同城",
