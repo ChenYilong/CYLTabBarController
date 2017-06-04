@@ -27,7 +27,7 @@
 #import "CYLMineViewController.h"
 #import "CYLSameCityViewController.h"
 
-@interface CYLTabBarControllerConfig ()
+@interface CYLTabBarControllerConfig ()<UITabBarControllerDelegate>
 
 @property (nonatomic, readwrite, strong) CYLTabBarController *tabBarController;
 
@@ -42,8 +42,19 @@
  */
 - (CYLTabBarController *)tabBarController {
     if (_tabBarController == nil) {
+        /**
+         * 以下两行代码目的在于手动设置让TabBarItem只显示图标，不显示文字，并让图标垂直居中。
+         * 等效于在 `-tabBarItemsAttributesForController` 方法中不传 `CYLTabBarItemTitle` 字段。
+         * 更推荐后一种做法。
+         */
+        UIEdgeInsets imageInsets = UIEdgeInsetsZero;//UIEdgeInsetsMake(4.5, 0, -4.5, 0);
+        UIOffset titlePositionAdjustment = UIOffsetZero;//UIOffsetMake(0, MAXFLOAT);
+        
         CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithViewControllers:self.viewControllers
-                                                                                   tabBarItemsAttributes:self.tabBarItemsAttributesForController];
+                                                                                   tabBarItemsAttributes:self.tabBarItemsAttributesForController
+                                                                                             imageInsets:imageInsets
+                                                                                 titlePositionAdjustment:titlePositionAdjustment];
+        
         [self customizeTabBarAppearance:tabBarController];
         _tabBarController = tabBarController;
     }
@@ -67,13 +78,7 @@
     UIViewController *fourthNavigationController = [[CYLBaseNavigationController alloc]
                                                     initWithRootViewController:fourthViewController];
     
-    /**
-     * 以下两行代码目的在于手动设置让TabBarItem只显示图标，不显示文字，并让图标垂直居中。
-     * 等效于在 `-tabBarItemsAttributesForController` 方法中不传 `CYLTabBarItemTitle` 字段。
-     * 更推荐后一种做法。
-     */
-    //tabBarController.imageInsets = UIEdgeInsetsMake(4.5, 0, -4.5, 0);
-    //tabBarController.titlePositionAdjustment = UIOffsetMake(0, MAXFLOAT);
+  
     NSArray *viewControllers = @[
                                  firstNavigationController,
                                  secondNavigationController,
@@ -156,8 +161,8 @@
     
     // set the bar background image
     // 设置背景图片
-    // UITabBar *tabBarAppearance = [UITabBar appearance];
-    // [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tabbar_background"]];
+//     UITabBar *tabBarAppearance = [UITabBar appearance];
+//     [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tab_bar"]];
     
     // remove the bar system shadow image
     // 去除 TabBar 自带的顶部阴影
@@ -207,5 +212,7 @@
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
+
+
 
 @end

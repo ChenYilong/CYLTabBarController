@@ -17,7 +17,18 @@ FOUNDATION_EXTERN NSUInteger CYLPlusButtonIndex;
 FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 
-@interface CYLTabBarController : UITabBarController
+@protocol CYLTabBarControllerDelegate <NSObject>
+
+/*!
+ * @param tabBarController The tab bar controller containing viewController.
+ * @param control Selected UIControl in TabBar.
+ * @attention If PlusButton also add an action, then this delegate method will not be invoked when the PlusButton is selected.
+ */
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control;
+
+@end
+
+@interface CYLTabBarController : UITabBarController <CYLTabBarControllerDelegate>
 
 /*!
  * An array of the root view controllers displayed by the tab bar interface.
@@ -38,17 +49,29 @@ FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
  * To set both UIBarItem image view attributes in the tabBar,
  * default is UIEdgeInsetsZero.
  */
-@property (nonatomic, readwrite, assign) UIEdgeInsets imageInsets;
+@property (nonatomic, readonly, assign) UIEdgeInsets imageInsets;
 
 /*! 
  * To set both UIBarItem label text attributes in the tabBar,
  * use the following to tweak the relative position of the label within the tab button (for handling visual centering corrections if needed because of custom text attributes)
  */
-@property (nonatomic, readwrite, assign) UIOffset titlePositionAdjustment;
+@property (nonatomic, readonly, assign) UIOffset titlePositionAdjustment;
 
-- (instancetype)initWithViewControllers:(NSArray<UIViewController *> *)viewControllers tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
+- (instancetype)initWithViewControllers:(NSArray<UIViewController *> *)viewControllers
+                  tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
 
-+ (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
++ (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
+                              tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
+
+- (instancetype)initWithViewControllers:(NSArray<UIViewController *> *)viewControllers
+                  tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
+                            imageInsets:(UIEdgeInsets)imageInsets
+                titlePositionAdjustment:(UIOffset)titlePositionAdjustment;
+
++ (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
+                              tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
+                                        imageInsets:(UIEdgeInsets)imageInsets
+                            titlePositionAdjustment:(UIOffset)titlePositionAdjustment;
 
 - (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController;
 
@@ -68,12 +91,12 @@ FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 
 @end
 
-@interface NSObject (CYLTabBarController)
+@interface NSObject (CYLTabBarControllerReferenceExtension)
 
 /*!
  * If `self` is kind of `UIViewController`, this method will return the nearest ancestor in the view controller hierarchy that is a tab bar controller. If `self` is not kind of `UIViewController`, it will return the `rootViewController` of the `rootWindow` as long as you have set the `CYLTabBarController` as the  `rootViewController`. Otherwise return nil. (read-only)
  */
-@property (nonatomic, readonly) CYLTabBarController *cyl_tabBarController;
+@property (nonatomic, setter=cyl_setTabBarController:) CYLTabBarController *cyl_tabBarController;
 
 @end
 

@@ -60,8 +60,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
  */
 - (NSArray *)tabBarButtonArray {
     if (_tabBarButtonArray == nil) {
-        NSArray *tabBarButtonArray = [[NSArray alloc] init];
-        _tabBarButtonArray = tabBarButtonArray;
+        _tabBarButtonArray = @[];
     }
     return _tabBarButtonArray;
 }
@@ -251,19 +250,19 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
  *  Capturing touches on a subview outside the frame of its superview.
  */
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    //1. 边界情况：不能响应点击事件
+    
     BOOL canNotResponseEvent = self.hidden || (self.alpha <= 0.01f) || (self.userInteractionEnabled == NO);
     if (canNotResponseEvent) {
         return nil;
     }
-    if (!CYLExternPlusButton && ![self pointInside:point withEvent:event]) {
-        return nil;
-    }
+    
+    //2. 优先处理 PlusButton （包括其突出的部分）、TabBarItems 未凸出的部分
+    //这一步主要是在处理只有两个 TabBarItems 的场景。
+    
     if (CYLExternPlusButton) {
         CGRect plusButtonFrame = self.plusButton.frame;
         BOOL isInPlusButtonFrame = CGRectContainsPoint(plusButtonFrame, point);
-        if (!isInPlusButtonFrame && (point.y < 0) ) {
-            return nil;
-        }
         if (isInPlusButtonFrame) {
             return CYLExternPlusButton;
         }
@@ -275,8 +274,24 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     for (NSUInteger index = 0; index < tabBarButtons.count; index++) {
         UIView *selectedTabBarButton = tabBarButtons[index];
         CGRect selectedTabBarButtonFrame = selectedTabBarButton.frame;
-        if (CGRectContainsPoint(selectedTabBarButtonFrame, point)) {
+        BOOL isTabBarButtonFrame = CGRectContainsPoint(selectedTabBarButtonFrame, point);\
+        if (isTabBarButtonFrame) {
             return selectedTabBarButton;
+        }
+    }
+    
+    //3. 最后处理 TabBarItems 凸出的部分、添加到 TabBar 上的自定义视图、点击到 TabBar 上的空白区域
+    
+    UIView *result = [super hitTest:point withEvent:event];
+    if (result) {
+        return result;
+    }
+    
+    for (UIView *subview in self.subviews.reverseObjectEnumerator) {
+        CGPoint subPoint = [subview convertPoint:point fromView:self];
+        result = [subview hitTest:subPoint withEvent:event];
+        if (result) {
+            return result;
         }
     }
     return nil;

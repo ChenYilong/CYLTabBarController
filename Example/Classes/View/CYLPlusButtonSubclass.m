@@ -75,7 +75,7 @@
     [button setTitle:@"发布" forState:UIControlStateNormal];
     [button setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
     
-    [button setTitle:@"选中" forState:UIControlStateSelected];
+    [button setTitle:@"发布" forState:UIControlStateSelected];
     [button setTitleColor:[UIColor blueColor] forState:UIControlStateSelected];
 
     button.titleLabel.font = [UIFont systemFontOfSize:9.5];
