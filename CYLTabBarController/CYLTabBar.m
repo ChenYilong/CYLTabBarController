@@ -259,6 +259,10 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     
     //2. 优先处理 PlusButton （包括其突出的部分）、TabBarItems 未凸出的部分
     //这一步主要是在处理只有两个 TabBarItems 的场景。
+    // 2.1先考虑clipsToBounds情况：子view超出部分没有显示出来
+    if (self.clipsToBounds && ![self pointInside:point withEvent:event]) {
+        return nil;
+    }
     
     if (CYLExternPlusButton) {
         CGRect plusButtonFrame = self.plusButton.frame;
