@@ -16,7 +16,34 @@
 
 ## 导航
 
-[TOC]
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [CYLTabBarController【低耦合集成TabBarController】](#cyltabbarcontroller%E4%BD%8E%E8%80%A6%E5%90%88%E9%9B%86%E6%88%90tabbarcontroller)
+  - [导航](#%E5%AF%BC%E8%88%AA)
+  - [与其他自定义TabBarController的区别](#%E4%B8%8E%E5%85%B6%E4%BB%96%E8%87%AA%E5%AE%9A%E4%B9%89tabbarcontroller%E7%9A%84%E5%8C%BA%E5%88%AB)
+  - [集成后的效果：](#%E9%9B%86%E6%88%90%E5%90%8E%E7%9A%84%E6%95%88%E6%9E%9C)
+  - [项目结构](#%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84)
+  - [使用CYLTabBarController](#%E4%BD%BF%E7%94%A8cyltabbarcontroller)
+    - [第一步：使用CocoaPods导入CYLTabBarController](#%E7%AC%AC%E4%B8%80%E6%AD%A5%E4%BD%BF%E7%94%A8cocoapods%E5%AF%BC%E5%85%A5cyltabbarcontroller)
+    - [第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组](#%E7%AC%AC%E4%BA%8C%E6%AD%A5%E8%AE%BE%E7%BD%AEcyltabbarcontroller%E7%9A%84%E4%B8%A4%E4%B8%AA%E6%95%B0%E7%BB%84%E6%8E%A7%E5%88%B6%E5%99%A8%E6%95%B0%E7%BB%84%E5%92%8Ctabbar%E5%B1%9E%E6%80%A7%E6%95%B0%E7%BB%84)
+    - [第三步：将CYLTabBarController设置为window的RootViewController](#%E7%AC%AC%E4%B8%89%E6%AD%A5%E5%B0%86cyltabbarcontroller%E8%AE%BE%E7%BD%AE%E4%B8%BAwindow%E7%9A%84rootviewcontroller)
+    - [第四步（可选）：创建自定义的形状不规则加号按钮](#%E7%AC%AC%E5%9B%9B%E6%AD%A5%E5%8F%AF%E9%80%89%E5%88%9B%E5%BB%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E5%BD%A2%E7%8A%B6%E4%B8%8D%E8%A7%84%E5%88%99%E5%8A%A0%E5%8F%B7%E6%8C%89%E9%92%AE)
+    - [补充说明](#%E8%A1%A5%E5%85%85%E8%AF%B4%E6%98%8E)
+      - [自定义 `TabBar` 样式](#%E8%87%AA%E5%AE%9A%E4%B9%89-tabbar-%E6%A0%B7%E5%BC%8F)
+      - [捕获 TabBar 点击事件](#%E6%8D%95%E8%8E%B7-tabbar-%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6)
+      - [点击 TabBarButton 时添加动画](#%E7%82%B9%E5%87%BB-tabbarbutton-%E6%97%B6%E6%B7%BB%E5%8A%A0%E5%8A%A8%E7%94%BB)
+      - [横竖屏适配](#%E6%A8%AA%E7%AB%96%E5%B1%8F%E9%80%82%E9%85%8D)
+      - [访问初始化好的 CYLTabBarController 对象](#%E8%AE%BF%E9%97%AE%E5%88%9D%E5%A7%8B%E5%8C%96%E5%A5%BD%E7%9A%84-cyltabbarcontroller-%E5%AF%B9%E8%B1%A1)
+  - [点击 PlusButton 跳转到指定 UIViewController](#%E7%82%B9%E5%87%BB-plusbutton-%E8%B7%B3%E8%BD%AC%E5%88%B0%E6%8C%87%E5%AE%9A-uiviewcontroller)
+  - [让TabBarItem仅显示图标，并使图标垂直居中](#%E8%AE%A9tabbaritem%E4%BB%85%E6%98%BE%E7%A4%BA%E5%9B%BE%E6%A0%87%E5%B9%B6%E4%BD%BF%E5%9B%BE%E6%A0%87%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD)
+    - [在 Swift 项目中使用 CYLTabBarController](#%E5%9C%A8-swift-%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BD%BF%E7%94%A8-cyltabbarcontroller)
+    - [搭配 Storyboard 使用 CYLTabBarController](#%E6%90%AD%E9%85%8D-storyboard-%E4%BD%BF%E7%94%A8-cyltabbarcontroller)
+    - [源码实现原理](#%E6%BA%90%E7%A0%81%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86)
+  - [Q-A](#q-a)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 ## 与其他自定义TabBarController的区别
 
