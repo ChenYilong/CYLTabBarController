@@ -75,16 +75,13 @@
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;
-    NSString *button = [NSString stringWithFormat:@"UIT%@arB%@", @"abB", @"utton"];
-    // 如果 PlusButton 也添加了点击事件，那么点击 PlusButton 后不会触发该代理方法。
-    if ([control isKindOfClass:[CYLExternPlusButton class]]) {
+    // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
+    if ([control cyl_isPlusButton]) {
         UIButton *button = CYLExternPlusButton;
         animationView = button.imageView;
-        
-    } else if ([control isKindOfClass:NSClassFromString(button)]) {
-        NSString *imageView = [NSString stringWithFormat:@"UITabB%@pp%@", @"arSwa", @"ableImageView"];
+    } else if ([control cyl_isTabButton]) {
         for (UIView *subView in control.subviews) {
-            if ([subView isKindOfClass:NSClassFromString(imageView)]) {
+            if ([subView cyl_isTabImageView]) {
                 animationView = subView;
             }
         }

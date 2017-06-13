@@ -8,6 +8,7 @@
 
 #import "CYLPlusButton.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"
+#import "UIView+CYLTabBarControllerExtention.h"
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitle;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImage;
@@ -22,7 +23,6 @@ FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 /*!
  * @param tabBarController The tab bar controller containing viewController.
  * @param control Selected UIControl in TabBar.
- * @attention If PlusButton also add an action, then this delegate method will not be invoked when the PlusButton is selected.
  */
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control;
 

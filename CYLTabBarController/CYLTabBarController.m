@@ -19,11 +19,11 @@ NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;
 CGFloat CYLTabBarItemWidth = 0.0f;
 NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDidChangeNotification";
-static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwappableImageViewDefaultOffsetContext;
+static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageViewDefaultOffsetContext;
 
 @interface CYLTabBarController () <UITabBarControllerDelegate>
 
-@property (nonatomic, assign, getter=isObservingSwappableImageViewDefaultOffset) BOOL observingSwappableImageViewDefaultOffset;
+@property (nonatomic, assign, getter=isObservingTabImageViewDefaultOffset) BOOL observingTabImageViewDefaultOffset;
 
 @end
 @implementation CYLTabBarController
@@ -38,9 +38,9 @@ static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwapp
     // 处理tabBar，使用自定义 tabBar 添加 发布按钮
     [self setUpTabBar];
     // KVO注册监听
-    if (!self.isObservingSwappableImageViewDefaultOffset) {
-        [self.tabBar addObserver:self forKeyPath:@"swappableImageViewDefaultOffset" options:NSKeyValueObservingOptionNew context:CYLSwappableImageViewDefaultOffsetContext];
-        self.observingSwappableImageViewDefaultOffset = YES;
+    if (!self.isObservingTabImageViewDefaultOffset) {
+        [self.tabBar addObserver:self forKeyPath:@"tabImageViewDefaultOffset" options:NSKeyValueObservingOptionNew context:CYLTabImageViewDefaultOffsetContext];
+        self.observingTabImageViewDefaultOffset = YES;
     }
     
 }
@@ -86,8 +86,8 @@ static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwapp
 
 - (void)dealloc {
     // KVO反注册
-    if (self.isObservingSwappableImageViewDefaultOffset) {
-        [self.tabBar removeObserver:self forKeyPath:@"swappableImageViewDefaultOffset"];
+    if (self.isObservingTabImageViewDefaultOffset) {
+        [self.tabBar removeObserver:self forKeyPath:@"tabImageViewDefaultOffset"];
     }
 }
 
@@ -287,23 +287,23 @@ static void * const CYLSwappableImageViewDefaultOffsetContext = (void*)&CYLSwapp
 
 // KVO监听执行
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if(context != CYLSwappableImageViewDefaultOffsetContext) {
+    if(context != CYLTabImageViewDefaultOffsetContext) {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         return;
     }
-    if(context == CYLSwappableImageViewDefaultOffsetContext) {
-        CGFloat swappableImageViewDefaultOffset = [change[NSKeyValueChangeNewKey] floatValue];
-        [self offsetTabBarSwappableImageViewToFit:swappableImageViewDefaultOffset];
+    if(context == CYLTabImageViewDefaultOffsetContext) {
+        CGFloat tabImageViewDefaultOffset = [change[NSKeyValueChangeNewKey] floatValue];
+        [self offsetTabBarTabImageViewToFit:tabImageViewDefaultOffset];
     }
 }
 
-- (void)offsetTabBarSwappableImageViewToFit:(CGFloat)swappableImageViewDefaultOffset {
+- (void)offsetTabBarTabImageViewToFit:(CGFloat)tabImageViewDefaultOffset {
     if (self.shouldCustomizeImageInsets) {
         return;
     }
     NSArray<UITabBarItem *> *tabBarItems = [self cyl_tabBarController].tabBar.items;
     [tabBarItems enumerateObjectsUsingBlock:^(UITabBarItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        UIEdgeInsets imageInset = UIEdgeInsetsMake(swappableImageViewDefaultOffset, 0, -swappableImageViewDefaultOffset, 0);
+        UIEdgeInsets imageInset = UIEdgeInsetsMake(tabImageViewDefaultOffset, 0, -tabImageViewDefaultOffset, 0);
         obj.imageInsets = imageInset;
         if (!self.shouldCustomizeTitlePositionAdjustment) {
             obj.titlePositionAdjustment = UIOffsetMake(0, MAXFLOAT);
