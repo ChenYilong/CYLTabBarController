@@ -23,7 +23,13 @@
 
 - (BOOL)cyl_isTabImageView {
     BOOL isKindOfImageView = [self cyl_isKindOfClass:[UIImageView class]];
-    return isKindOfImageView;
+    if (!isKindOfImageView) {
+        return NO;
+    }
+    NSString *subString = [NSString stringWithFormat:@"%@cat%@ew", @"Indi" , @"orVi"];
+    BOOL isBackgroundImage = [self cyl_classStringContainsString:subString];
+    BOOL isTabImageView = !isBackgroundImage;
+    return isTabImageView;
 }
 
 - (BOOL)cyl_isTabLabel {
@@ -34,14 +40,23 @@
 - (BOOL)cyl_isKindOfClass:(Class)class {
     BOOL isKindOfClass = [self isKindOfClass:class];
     BOOL isClass = [self isMemberOfClass:class];
+    BOOL isKind = isKindOfClass && !isClass;
+    if (!isKind) {
+        return NO;
+    }
     BOOL isTabBarClass = [self cyl_isTabBarClass];
-    return isKindOfClass && !isClass && isTabBarClass;
+    return isTabBarClass;
 }
 
 - (BOOL)cyl_isTabBarClass {
-    NSString *classString = NSStringFromClass([self class]);
     NSString *tabBarClassString = [NSString stringWithFormat:@"U%@a%@ar", @"IT" , @"bB"];
-    if ([classString rangeOfString:tabBarClassString].location == NSNotFound) {
+    BOOL isTabBarClass = [self cyl_classStringContainsString:tabBarClassString];
+    return isTabBarClass;
+}
+
+- (BOOL)cyl_classStringContainsString:(NSString *)subString {
+    NSString *classString = NSStringFromClass([self class]);
+    if ([classString rangeOfString:subString].location == NSNotFound) {
         return NO;
     }
     return YES;

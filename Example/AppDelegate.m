@@ -107,6 +107,9 @@
 
 //旋转动画
 - (void)addRotateAnimationOnView:(UIView *)animationView {
+    // 针对旋转动画，需要将旋转轴向屏幕外侧平移，最大图片宽度的一半
+    // 否则背景与按钮图片处于同一层次，当按钮图片旋转时，转轴就在背景图上，动画时会有一部分在背景图之下。
+    animationView.layer.zPosition = 65.f / 2;
     [UIView animateWithDuration:0.32 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
         animationView.layer.transform = CATransform3DMakeRotation(M_PI, 0, 1, 0);
     } completion:nil];
