@@ -2,7 +2,7 @@
 
 
 <p align="center">
-<a href=""><img src="https://img.shields.io/badge/pod-v1.11.0-brightgreen.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/pod-v1.12.0-brightgreen.svg"></a>
 <a href=""><img src="https://img.shields.io/badge/Swift-compatible-orange.svg"></a>
 <a href=""><img src="https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5152950834.svg"></a>
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
@@ -167,7 +167,7 @@
   在文件 `Podfile` 中加入以下内容：
 
  ```
-    pod 'CYLTabBarController', '1.11.0'
+    pod 'CYLTabBarController', '~> 1.12.0'
  ```
 
   然后在终端中运行以下命令：
@@ -193,14 +193,14 @@
 
 CocoaPods 中，有几种设置 CYLTabBarController 版本的方法。如：
 
-`>= 1.11.X` 会根据您本地的 CocoaPods 源列表，导入不低于 `1.12.X` 版本的 CYLTabBarController。
+`>= 1.12.X` 会根据您本地的 CocoaPods 源列表，导入不低于 `1.12.X` 版本的 CYLTabBarController。
 
-`~> 1.11.X` 会根据您本地的 CocoaPods 源列表，介于 1.11.X~1.12.0 之前版本的 CYLTabBarController。
-我们建议您锁定版本，便于团队开发。如，指定 1.11.0 版本。
+`~> 1.12.X` 会根据您本地的 CocoaPods 源列表，介于 1.12.X~1.13.0 之前版本的 CYLTabBarController。
+我们建议您锁定版本，便于团队开发。如，指定 1.12.0 版本。
 
  
 ```
-pod 'CYLTabBarController', '1.11.0'
+pod 'CYLTabBarController', '1.12.0'
 ```
 
  - 升级本地 CocoaPods 源
@@ -532,7 +532,6 @@ Demo 演示的效果图：
 /*!
  * @param tabBarController The tab bar controller containing viewController.
  * @param control Selected UIControl in TabBar.
- * @attention If PlusButton also add an action, then this delegate method will not be invoked when the PlusButton is selected.
  */
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control;
 
