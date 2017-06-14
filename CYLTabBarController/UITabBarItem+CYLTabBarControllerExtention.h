@@ -6,14 +6,10 @@
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
-@interface UIView (CYLTabBarControllerExtention)
+@interface UITabBarItem (CYLTabBarControllerExtention)
 
-- (BOOL)cyl_isPlusButton;
-- (BOOL)cyl_isTabButton;
-- (BOOL)cyl_isTabImageView;
-- (BOOL)cyl_isTabLabel;
-- (BOOL)cyl_isTabBadgeView;
+@property (nonatomic, readonly) UIControl *cyl_tabButton;
 
 @end

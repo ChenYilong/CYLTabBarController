@@ -42,7 +42,10 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         [self.tabBar addObserver:self forKeyPath:@"tabImageViewDefaultOffset" options:NSKeyValueObservingOptionNew context:CYLTabImageViewDefaultOffsetContext];
         self.observingTabImageViewDefaultOffset = YES;
     }
-    
+}
+
+- (void)setViewDidLayoutSubViewsBlock:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock {
+    _viewDidLayoutSubviewsBlock = viewDidLayoutSubviewsBlock;
 }
 
 //Fix issue #93
@@ -57,6 +60,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                 [control addTarget:self action:actin forControlEvents:UIControlEventTouchUpInside];
             }
         }
+        !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
     });
    
 }

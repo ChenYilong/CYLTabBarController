@@ -9,6 +9,11 @@
 #import "CYLPlusButton.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "UIView+CYLTabBarControllerExtention.h"
+#import "UITabBarItem+CYLTabBarControllerExtention.h"
+#import "UIControl+CYLTabBarControllerExtention.h"
+
+@class CYLTabBarController;
+typedef void(^CYLViewDidLayoutSubViewsBlock)(CYLTabBarController *tabBarController);
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitle;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImage;
@@ -29,6 +34,10 @@ FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 @end
 
 @interface CYLTabBarController : UITabBarController <CYLTabBarControllerDelegate>
+
+@property (nonatomic, copy) CYLViewDidLayoutSubViewsBlock viewDidLayoutSubviewsBlock;
+
+- (void)setViewDidLayoutSubViewsBlock:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock;
 
 /*!
  * An array of the root view controllers displayed by the tab bar interface.

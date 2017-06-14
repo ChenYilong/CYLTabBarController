@@ -20,6 +20,25 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 @interface UIViewController (CYLTabBarControllerExtention)
 
+@property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *tabBadgePointView;
+
+@property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset tabBadgePointViewOffset;
+
+@property (nonatomic, readonly, getter=cyl_isEmbedInTabBarController) BOOL cyl_embedInTabBarController;
+
+@property (nonatomic, readonly, getter=cyl_tabIndex) NSInteger cyl_tabIndex;
+
+@property (nonatomic, readonly) UIControl *cyl_tabButton;
+
+/*!
+ * 调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
+ */
+- (void)cyl_showTabBadgePoint;
+
+- (void)cyl_removeTabBadgePoint;
+
+- (BOOL)cyl_isShowTabBadgePoint;
+
 /*!
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器作为返回值返回。
  @param index 需要选择的控制器在 `TabBar` 中的 index。

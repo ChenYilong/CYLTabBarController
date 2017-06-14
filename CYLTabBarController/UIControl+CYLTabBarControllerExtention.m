@@ -1,0 +1,152 @@
+//
+//  CYLTabBarController.m
+//  CYLTabBarController
+//
+//  v1.12.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
+//
+
+#import "UIControl+CYLTabBarControllerExtention.h"
+#import <objc/runtime.h>
+#import "UIView+CYLTabBarControllerExtention.h"
+
+@implementation UIControl (CYLTabBarControllerExtention)
+
+- (void)cyl_showTabBadgePoint {
+    [self cyl_setShowTabBadgePoint:YES];
+}
+
+- (void)cyl_removeTabBadgePoint {
+    [self cyl_setShowTabBadgePoint:NO];
+}
+
+- (BOOL)cyl_isShowTabBadgePoint {
+    return !self.tabBadgePointView.hidden;
+}
+
+- (void)cyl_setShowTabBadgePoint:(BOOL)showTabBadgePoint {
+    if (showTabBadgePoint && self.tabBadgePointView.superview == nil) {
+        [self addSubview:self.tabBadgePointView];
+        [self bringSubviewToFront:self.tabBadgePointView];
+        self.tabBadgePointView.layer.zPosition = MAXFLOAT;
+        // X
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:self.tabBadgePointView //self.cyl_imageView
+                                      attribute:NSLayoutAttributeCenterX
+                                      relatedBy:0
+                                         toItem:self.cyl_imageView
+                                      attribute:NSLayoutAttributeRight
+                                     multiplier:1
+                                       constant:self.tabBadgePointViewOffset.horizontal]];
+        //Y
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:self.tabBadgePointView //self.cyl_imageView
+                                      attribute:NSLayoutAttributeCenterY
+                                      relatedBy:0
+                                         toItem:self.cyl_imageView
+                                      attribute:NSLayoutAttributeTop
+                                     multiplier:1
+                                       constant:self.tabBadgePointViewOffset.vertical]];
+    }
+    
+    self.tabBadgePointView.hidden = showTabBadgePoint == NO;
+    self.cyl_tabBadgeView.hidden = showTabBadgePoint == YES;
+}
+
+- (void)cyl_setTabBadgePointView:(UIView *)tabBadgePointView {
+    if (tabBadgePointView.superview) {
+        [tabBadgePointView removeFromSuperview];
+    }
+    
+    tabBadgePointView.hidden = YES;
+    objc_setAssociatedObject(self, @selector(cyl_tabBadgePointView), tabBadgePointView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (UIView *)cyl_tabBadgePointView {
+    UIView *tabBadgePointView = objc_getAssociatedObject(self, @selector(cyl_tabBadgePointView));
+    
+    if (tabBadgePointView == nil) {
+        tabBadgePointView = self.cyl_defaultTabBadgePointView;
+        objc_setAssociatedObject(self, @selector(cyl_tabBadgePointView), tabBadgePointView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return tabBadgePointView;
+}
+
+- (void)cyl_setTabBadgePointViewOffset:(UIOffset)tabBadgePointViewOffset {
+    objc_setAssociatedObject(self, @selector(cyl_tabBadgePointViewOffset), [NSValue valueWithUIOffset:tabBadgePointViewOffset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+//offset如果都是整数，则往右下偏移
+- (UIOffset)cyl_tabBadgePointViewOffset {
+    id tabBadgePointViewOffsetObject = objc_getAssociatedObject(self, @selector(cyl_tabBadgePointViewOffset));
+    UIOffset tabBadgePointViewOffset = [tabBadgePointViewOffsetObject UIOffsetValue];
+    return tabBadgePointViewOffset;
+}
+
+- (UIImageView *)cyl_imageView {
+    for (UIView *subview in self.subviews) {
+        if ([subview cyl_isTabImageView]) {
+            return (UIImageView *)subview;
+        }
+    }
+    return nil;
+}
+
+- (UIView *)cyl_tabBadgeView {
+    for (UIView *subview in self.subviews) {
+        if ([subview cyl_isTabBadgeView]) {
+            return (UIView *)subview;
+        }
+    }
+    return nil;
+}
+
+- (UIImageView *)cyl_tabImageView {
+    for (UIImageView *subview in self.subviews) {
+        if ([subview cyl_isTabImageView]) {
+            return (UIImageView *)subview;
+        }
+    }
+    return nil;
+}
+- (UILabel *)cyl_tabLabel {
+    for (UILabel *subview in self.subviews) {
+        if ([subview cyl_isTabLabel]) {
+            return (UILabel *)subview;
+        }
+    }
+    return nil;
+}
+
+#pragma mark - private method
+
+- (UIView *)cyl_defaultTabBadgePointView {
+    CGFloat const defaultTabBadgePointViewRadius = 4.5;
+    UIView * defaultTabBadgePointView = [[UIView alloc] init];
+    [defaultTabBadgePointView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    defaultTabBadgePointView.backgroundColor = [UIColor redColor];
+    defaultTabBadgePointView.layer.cornerRadius = defaultTabBadgePointViewRadius;
+    defaultTabBadgePointView.layer.masksToBounds = YES;
+    defaultTabBadgePointView.hidden = YES;
+    // Width constraint
+    [defaultTabBadgePointView addConstraint:[NSLayoutConstraint constraintWithItem:defaultTabBadgePointView
+                                                                         attribute:NSLayoutAttributeWidth
+                                                                         relatedBy:NSLayoutRelationEqual
+                                                                            toItem:nil
+                                                                         attribute: NSLayoutAttributeNotAnAttribute
+                                                                        multiplier:1
+                                                                          constant:defaultTabBadgePointViewRadius * 2]];
+    
+    // Height constraint
+    [defaultTabBadgePointView addConstraint:[NSLayoutConstraint constraintWithItem:defaultTabBadgePointView
+                                                                         attribute:NSLayoutAttributeHeight
+                                                                         relatedBy:NSLayoutRelationEqual
+                                                                            toItem:nil
+                                                                         attribute: NSLayoutAttributeNotAnAttribute
+                                                                        multiplier:1
+                                                                          constant:defaultTabBadgePointViewRadius * 2]];
+    return defaultTabBadgePointView;
+}
+
+@end
+

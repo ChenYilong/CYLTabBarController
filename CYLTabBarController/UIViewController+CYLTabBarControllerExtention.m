@@ -8,6 +8,7 @@
 
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "CYLTabBarController.h"
+#import <objc/runtime.h>
 
 @implementation UIViewController (CYLTabBarControllerExtention)
 
@@ -102,6 +103,82 @@
     }
     return self;
 }
+
+
+#pragma mark - public method
+
+- (void)cyl_showTabBadgePoint {
+    [self.cyl_tabButton cyl_showTabBadgePoint];
+}
+
+- (void)cyl_removeTabBadgePoint {
+    [self.cyl_tabButton cyl_removeTabBadgePoint];
+}
+
+- (BOOL)cyl_isShowTabBadgePoint {
+    return [self.cyl_tabButton cyl_isShowTabBadgePoint];
+}
+
+- (void)cyl_setTabBadgePointView:(UIView *)tabBadgePointView {
+    [self.cyl_tabButton cyl_setTabBadgePointView:tabBadgePointView];
+}
+
+- (UIView *)cyl_tabBadgePointView {
+    return [self.cyl_tabButton cyl_tabBadgePointView];;
+}
+
+- (void)cyl_setTabBadgePointViewOffset:(UIOffset)tabBadgePointViewOffset {
+    return [self.cyl_tabButton cyl_setTabBadgePointViewOffset:tabBadgePointViewOffset];
+}
+
+//offset如果都是整数，则往右下偏移
+- (UIOffset)cyl_tabBadgePointViewOffset {
+    return [self.cyl_tabButton cyl_tabBadgePointViewOffset];
+}
+
+- (BOOL)cyl_isEmbedInTabBarController {
+    if (self.cyl_tabBarController == nil) {
+        return NO;
+    }
+    BOOL isEmbedInTabBarController = NO;
+    for (NSInteger i = 0; i < self.cyl_tabBarController.viewControllers.count; i++) {
+        UIViewController * vc = self.cyl_tabBarController.viewControllers[i];
+        if ([vc cyl_getViewControllerInsteadIOfNavigationController] == [self cyl_getViewControllerInsteadIOfNavigationController]) {
+            isEmbedInTabBarController = YES;
+            [self cyl_setTabIndex:i];
+            break;
+        }
+    }
+    return isEmbedInTabBarController;
+}
+
+- (void)cyl_setTabIndex:(NSInteger)tabIndex {
+    objc_setAssociatedObject(self, @selector(cyl_tabIndex), @(tabIndex), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSInteger)cyl_tabIndex {
+    if (self.cyl_embedInTabBarController == NO) {
+        return NSNotFound;
+    }
+    
+    id tabIndexObject = objc_getAssociatedObject(self, @selector(cyl_tabIndex));
+    NSInteger tabIndex = [tabIndexObject integerValue];
+    return tabIndex;
+}
+
+- (UIControl *)cyl_tabButton {
+    if (self.cyl_embedInTabBarController == NO) {
+        return nil;
+    }
+    UITabBarItem *tabBarItem;
+    UIControl *control;
+    @try {
+        tabBarItem = self.cyl_tabBarController.tabBar.items[self.cyl_tabIndex];
+        control = [tabBarItem cyl_tabButton];
+    } @catch (NSException *exception) {}
+    return control;
+}
+
 
 #pragma mark -
 #pragma mark - Private Methods

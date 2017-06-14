@@ -26,11 +26,21 @@
     tabBarControllerConfig.tabBarController.delegate = self;
     [self.window makeKeyAndVisible];
     [self customizeInterface];
+    
+    [tabBarControllerConfig.tabBarController setViewDidLayoutSubViewsBlock:^(CYLTabBarController *tabBarController) {
+        [tabBarController.viewControllers[1] cyl_showTabBadgePoint];
+
+        [tabBarController.viewControllers[2] cyl_showTabBadgePoint];
+
+        [tabBarController.viewControllers[3] cyl_showTabBadgePoint];
+    }];
+    
     return YES;
 }
 
 - (void)customizeInterface {
     [self setUpNavigationBarAppearance];
+
 }
 
 /**
@@ -74,17 +84,19 @@
 }
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+    if ([[self cyl_tabBarController].selectedViewController cyl_isShowTabBadgePoint]) {
+        [[self cyl_tabBarController].selectedViewController cyl_removeTabBadgePoint];
+    } else {
+        [[self cyl_tabBarController].selectedViewController cyl_showTabBadgePoint];
+    }
+    
     UIView *animationView;
     // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
     if ([control cyl_isPlusButton]) {
         UIButton *button = CYLExternPlusButton;
         animationView = button.imageView;
     } else if ([control cyl_isTabButton]) {
-        for (UIView *subView in control.subviews) {
-            if ([subView cyl_isTabImageView]) {
-                animationView = subView;
-            }
-        }
+        animationView = [control cyl_tabImageView];
     }
     
     if ([self cyl_tabBarController].selectedIndex % 2 == 0) {
@@ -109,6 +121,8 @@
 - (void)addRotateAnimationOnView:(UIView *)animationView {
     // 针对旋转动画，需要将旋转轴向屏幕外侧平移，最大图片宽度的一半
     // 否则背景与按钮图片处于同一层次，当按钮图片旋转时，转轴就在背景图上，动画时会有一部分在背景图之下。
+    // 动画结束后复位
+    CGFloat oldZPosition = animationView.layer.zPosition;//0
     animationView.layer.zPosition = 65.f / 2;
     [UIView animateWithDuration:0.32 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
         animationView.layer.transform = CATransform3DMakeRotation(M_PI, 0, 1, 0);

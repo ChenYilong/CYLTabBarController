@@ -27,7 +27,7 @@
         return NO;
     }
     NSString *subString = [NSString stringWithFormat:@"%@cat%@ew", @"Indi" , @"orVi"];
-    BOOL isBackgroundImage = [self cyl_classStringContainsString:subString];
+    BOOL isBackgroundImage = [self cyl_classStringhasPrefix:subString];
     BOOL isTabImageView = !isBackgroundImage;
     return isTabImageView;
 }
@@ -35,6 +35,18 @@
 - (BOOL)cyl_isTabLabel {
     BOOL isKindOfLabel = [self cyl_isKindOfClass:[UILabel class]];
     return isKindOfLabel;
+}
+
+- (BOOL)cyl_isTabBadgeView {
+    BOOL isKindOfClass = [self isKindOfClass:[UIView class]];
+    BOOL isClass = [self isMemberOfClass:[UIView class]];
+    BOOL isKind = isKindOfClass && !isClass;
+    if (!isKind) {
+        return NO;
+    }
+    NSString *tabBarClassString = [NSString stringWithFormat:@"%@IB%@", @"_U" , @"adg"];
+    BOOL isTabBadgeView = [self cyl_classStringhasPrefix:tabBarClassString];;
+    return isTabBadgeView;
 }
 
 - (BOOL)cyl_isKindOfClass:(Class)class {
@@ -50,16 +62,13 @@
 
 - (BOOL)cyl_isTabBarClass {
     NSString *tabBarClassString = [NSString stringWithFormat:@"U%@a%@ar", @"IT" , @"bB"];
-    BOOL isTabBarClass = [self cyl_classStringContainsString:tabBarClassString];
+    BOOL isTabBarClass = [self cyl_classStringhasPrefix:tabBarClassString];
     return isTabBarClass;
 }
 
-- (BOOL)cyl_classStringContainsString:(NSString *)subString {
+- (BOOL)cyl_classStringhasPrefix:(NSString *)subString {
     NSString *classString = NSStringFromClass([self class]);
-    if ([classString rangeOfString:subString].location == NSNotFound) {
-        return NO;
-    }
-    return YES;
+    return [classString hasPrefix:subString];
 }
 
 @end
