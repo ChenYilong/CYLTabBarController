@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface UIView (CYLTabBarControllerExtention)
 
@@ -15,5 +16,7 @@
 - (BOOL)cyl_isTabImageView;
 - (BOOL)cyl_isTabLabel;
 - (BOOL)cyl_isTabBadgeView;
+
++ (UIView *)cyl_tabBadgePointViewWithClolor:(UIColor *)color radius:(CGFloat)radius;
 
 @end

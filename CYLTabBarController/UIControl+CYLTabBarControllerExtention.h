@@ -22,9 +22,8 @@
 - (void)cyl_removeTabBadgePoint;
 - (BOOL)cyl_isShowTabBadgePoint;
 - (void)cyl_setShowTabBadgePoint:(BOOL)showTabBadgePoint;
-
-@property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *tabBadgePointView;
-
-@property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset tabBadgePointViewOffset;
+//- (void)cyl_setTabBadgePointSize:(CGSize)size;
+@property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *cyl_tabBadgePointView;
+@property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset cyl_tabBadgePointViewOffset;
 
 @end

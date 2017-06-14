@@ -20,9 +20,9 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 @interface UIViewController (CYLTabBarControllerExtention)
 
-@property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *tabBadgePointView;
+@property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *cyl_tabBadgePointView;
 
-@property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset tabBadgePointViewOffset;
+@property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset cyl_tabBadgePointViewOffset;
 
 @property (nonatomic, readonly, getter=cyl_isEmbedInTabBarController) BOOL cyl_embedInTabBarController;
 

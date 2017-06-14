@@ -21,35 +21,35 @@
 }
 
 - (BOOL)cyl_isShowTabBadgePoint {
-    return !self.tabBadgePointView.hidden;
+    return !self.cyl_tabBadgePointView.hidden;
 }
 
 - (void)cyl_setShowTabBadgePoint:(BOOL)showTabBadgePoint {
-    if (showTabBadgePoint && self.tabBadgePointView.superview == nil) {
-        [self addSubview:self.tabBadgePointView];
-        [self bringSubviewToFront:self.tabBadgePointView];
-        self.tabBadgePointView.layer.zPosition = MAXFLOAT;
-        // X
+    if (showTabBadgePoint && self.cyl_tabBadgePointView.superview == nil) {
+        [self addSubview:self.cyl_tabBadgePointView];
+        [self bringSubviewToFront:self.cyl_tabBadgePointView];
+        self.cyl_tabBadgePointView.layer.zPosition = MAXFLOAT;
+        // X constraint
         [self addConstraint:
-         [NSLayoutConstraint constraintWithItem:self.tabBadgePointView //self.cyl_imageView
+         [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView
                                       attribute:NSLayoutAttributeCenterX
                                       relatedBy:0
                                          toItem:self.cyl_imageView
                                       attribute:NSLayoutAttributeRight
                                      multiplier:1
-                                       constant:self.tabBadgePointViewOffset.horizontal]];
-        //Y
+                                       constant:self.cyl_tabBadgePointViewOffset.horizontal]];
+        //Y constraint
         [self addConstraint:
-         [NSLayoutConstraint constraintWithItem:self.tabBadgePointView //self.cyl_imageView
+         [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView 
                                       attribute:NSLayoutAttributeCenterY
                                       relatedBy:0
                                          toItem:self.cyl_imageView
                                       attribute:NSLayoutAttributeTop
                                      multiplier:1
-                                       constant:self.tabBadgePointViewOffset.vertical]];
+                                       constant:self.cyl_tabBadgePointViewOffset.vertical]];
     }
     
-    self.tabBadgePointView.hidden = showTabBadgePoint == NO;
+    self.cyl_tabBadgePointView.hidden = showTabBadgePoint == NO;
     self.cyl_tabBadgeView.hidden = showTabBadgePoint == YES;
 }
 
@@ -109,6 +109,7 @@
     }
     return nil;
 }
+
 - (UILabel *)cyl_tabLabel {
     for (UILabel *subview in self.subviews) {
         if ([subview cyl_isTabLabel]) {
@@ -121,31 +122,8 @@
 #pragma mark - private method
 
 - (UIView *)cyl_defaultTabBadgePointView {
-    CGFloat const defaultTabBadgePointViewRadius = 4.5;
-    UIView * defaultTabBadgePointView = [[UIView alloc] init];
-    [defaultTabBadgePointView setTranslatesAutoresizingMaskIntoConstraints:NO];
-    defaultTabBadgePointView.backgroundColor = [UIColor redColor];
-    defaultTabBadgePointView.layer.cornerRadius = defaultTabBadgePointViewRadius;
-    defaultTabBadgePointView.layer.masksToBounds = YES;
-    defaultTabBadgePointView.hidden = YES;
-    // Width constraint
-    [defaultTabBadgePointView addConstraint:[NSLayoutConstraint constraintWithItem:defaultTabBadgePointView
-                                                                         attribute:NSLayoutAttributeWidth
-                                                                         relatedBy:NSLayoutRelationEqual
-                                                                            toItem:nil
-                                                                         attribute: NSLayoutAttributeNotAnAttribute
-                                                                        multiplier:1
-                                                                          constant:defaultTabBadgePointViewRadius * 2]];
-    
-    // Height constraint
-    [defaultTabBadgePointView addConstraint:[NSLayoutConstraint constraintWithItem:defaultTabBadgePointView
-                                                                         attribute:NSLayoutAttributeHeight
-                                                                         relatedBy:NSLayoutRelationEqual
-                                                                            toItem:nil
-                                                                         attribute: NSLayoutAttributeNotAnAttribute
-                                                                        multiplier:1
-                                                                          constant:defaultTabBadgePointViewRadius * 2]];
-    return defaultTabBadgePointView;
+    UIView *defaultRedTabBadgePointView = [UIView cyl_tabBadgePointViewWithClolor:[UIColor redColor] radius:4.5];
+    return defaultRedTabBadgePointView;
 }
 
 @end
