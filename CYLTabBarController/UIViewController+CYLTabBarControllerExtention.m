@@ -104,35 +104,62 @@
     return self;
 }
 
-
 #pragma mark - public method
 
+- (BOOL)cyl_isPlusChildViewController {
+    if (!CYLPlusChildViewController) {
+        return NO;
+    }
+    return (self == CYLPlusChildViewController);
+}
+
 - (void)cyl_showTabBadgePoint {
+    if (self.cyl_isPlusChildViewController) {
+        return;
+    }
     [self.cyl_tabButton cyl_showTabBadgePoint];
 }
 
 - (void)cyl_removeTabBadgePoint {
+    if (self.cyl_isPlusChildViewController) {
+        return;
+    }
     [self.cyl_tabButton cyl_removeTabBadgePoint];
 }
 
 - (BOOL)cyl_isShowTabBadgePoint {
+    if (self.cyl_isPlusChildViewController) {
+        return NO;
+    }
     return [self.cyl_tabButton cyl_isShowTabBadgePoint];
 }
 
 - (void)cyl_setTabBadgePointView:(UIView *)tabBadgePointView {
+    if (self.cyl_isPlusChildViewController) {
+        return;
+    }
     [self.cyl_tabButton cyl_setTabBadgePointView:tabBadgePointView];
 }
 
 - (UIView *)cyl_tabBadgePointView {
+    if (self.cyl_isPlusChildViewController) {
+        return nil;
+    }
     return [self.cyl_tabButton cyl_tabBadgePointView];;
 }
 
 - (void)cyl_setTabBadgePointViewOffset:(UIOffset)tabBadgePointViewOffset {
+    if (self.cyl_isPlusChildViewController) {
+        return;
+    }
     return [self.cyl_tabButton cyl_setTabBadgePointViewOffset:tabBadgePointViewOffset];
 }
 
 //offset如果都是整数，则往右下偏移
 - (UIOffset)cyl_tabBadgePointViewOffset {
+    if (self.cyl_isPlusChildViewController) {
+        return UIOffsetZero;
+    }
     return [self.cyl_tabButton cyl_tabBadgePointViewOffset];
 }
 
@@ -140,10 +167,14 @@
     if (self.cyl_tabBarController == nil) {
         return NO;
     }
+    if (self.cyl_isPlusChildViewController) {
+        return NO;
+    }
     BOOL isEmbedInTabBarController = NO;
+    UIViewController *viewControllerInsteadIOfNavigationController = [self cyl_getViewControllerInsteadIOfNavigationController];
     for (NSInteger i = 0; i < self.cyl_tabBarController.viewControllers.count; i++) {
         UIViewController * vc = self.cyl_tabBarController.viewControllers[i];
-        if ([vc cyl_getViewControllerInsteadIOfNavigationController] == [self cyl_getViewControllerInsteadIOfNavigationController]) {
+        if ([vc cyl_getViewControllerInsteadIOfNavigationController] == viewControllerInsteadIOfNavigationController) {
             isEmbedInTabBarController = YES;
             [self cyl_setTabIndex:i];
             break;
@@ -157,7 +188,7 @@
 }
 
 - (NSInteger)cyl_tabIndex {
-    if (self.cyl_embedInTabBarController == NO) {
+    if (!self.cyl_isEmbedInTabBarController) {
         return NSNotFound;
     }
     
@@ -167,7 +198,7 @@
 }
 
 - (UIControl *)cyl_tabButton {
-    if (self.cyl_embedInTabBarController == NO) {
+    if (!self.cyl_isEmbedInTabBarController) {
         return nil;
     }
     UITabBarItem *tabBarItem;
