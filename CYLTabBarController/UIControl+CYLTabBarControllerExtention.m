@@ -2,7 +2,7 @@
 //  CYLTabBarController.m
 //  CYLTabBarController
 //
-//  v1.12.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  v1.13.1 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 
@@ -13,15 +13,23 @@
 @implementation UIControl (CYLTabBarControllerExtention)
 
 - (void)cyl_showTabBadgePoint {
-    [self cyl_setShowTabBadgePoint:YES];
+    [self cyl_setShowTabBadgePointIfNeeded:YES];
 }
 
 - (void)cyl_removeTabBadgePoint {
-    [self cyl_setShowTabBadgePoint:NO];
+    [self cyl_setShowTabBadgePointIfNeeded:NO];
 }
 
 - (BOOL)cyl_isShowTabBadgePoint {
     return !self.cyl_tabBadgePointView.hidden;
+}
+
+- (void)cyl_setShowTabBadgePointIfNeeded:(BOOL)showTabBadgePoint {
+    @try {
+        [self cyl_setShowTabBadgePoint:showTabBadgePoint];
+    } @catch (NSException *exception) {
+        NSLog(@"CYLPlusChildViewController do not support set TabBarItem red point");
+    }
 }
 
 - (void)cyl_setShowTabBadgePoint:(BOOL)showTabBadgePoint {
@@ -40,7 +48,7 @@
                                        constant:self.cyl_tabBadgePointViewOffset.horizontal]];
         //Y constraint
         [self addConstraint:
-         [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView 
+         [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView
                                       attribute:NSLayoutAttributeCenterY
                                       relatedBy:0
                                          toItem:self.cyl_imageView

@@ -2,7 +2,7 @@
 //  UIViewController+CYLTabBarControllerExtention.h
 //  CYLTabBarController
 //
-//  v1.12.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 16/2/26.
+//  v1.13.1 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 16/2/26.
 //  Copyright © 2016年 https://github.com/ChenYilong .All rights reserved.
 //
 
@@ -31,7 +31,9 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 @property (nonatomic, readonly) UIControl *cyl_tabButton;
 
 /*!
- * 调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
+ * @attention 
+   - 调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
+   - 不支持 CYLPlusChildViewController 对应的 TabBarItem 角标设置，调用会被忽略。
  */
 - (void)cyl_showTabBadgePoint;
 
