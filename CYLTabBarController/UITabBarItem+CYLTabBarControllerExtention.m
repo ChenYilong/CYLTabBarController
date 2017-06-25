@@ -13,10 +13,10 @@
 @implementation UITabBarItem (CYLTabBarControllerExtention)
 
 + (void)load {
-    [self cyl_swizzleRedPacketMethod];
+    [self cyl_swizzleSetBadgeValue];
 }
 
-+ (void)cyl_swizzleRedPacketMethod {
++ (void)cyl_swizzleSetBadgeValue {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         cyl_ClassMethodSwizzle([self class], @selector(setBadgeValue:), @selector(cyl_setBadgeValue:));
