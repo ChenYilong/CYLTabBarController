@@ -332,7 +332,6 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 }
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
-    
 }
 
 - (void)didSelectControl:(UIControl *)control {

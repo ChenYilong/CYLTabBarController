@@ -10,7 +10,6 @@
 
 @interface UIControl (CYLTabBarControllerExtention)
 
-- (UIImageView *)cyl_imageView;
 - (UIView *)cyl_tabBadgeView;
 - (UIImageView *)cyl_tabImageView;
 - (UILabel *)cyl_tabLabel;

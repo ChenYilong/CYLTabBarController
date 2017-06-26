@@ -42,7 +42,7 @@
          [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView
                                       attribute:NSLayoutAttributeCenterX
                                       relatedBy:0
-                                         toItem:self.cyl_imageView
+                                         toItem:self.cyl_tabImageView
                                       attribute:NSLayoutAttributeRight
                                      multiplier:1
                                        constant:self.cyl_tabBadgePointViewOffset.horizontal]];
@@ -51,12 +51,11 @@
          [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView
                                       attribute:NSLayoutAttributeCenterY
                                       relatedBy:0
-                                         toItem:self.cyl_imageView
+                                         toItem:self.cyl_tabImageView
                                       attribute:NSLayoutAttributeTop
                                      multiplier:1
                                        constant:self.cyl_tabBadgePointViewOffset.vertical]];
     }
-    
     self.cyl_tabBadgePointView.hidden = showTabBadgePoint == NO;
     self.cyl_tabBadgeView.hidden = showTabBadgePoint == YES;
 }
@@ -84,20 +83,11 @@
     objc_setAssociatedObject(self, @selector(cyl_tabBadgePointViewOffset), [NSValue valueWithUIOffset:tabBadgePointViewOffset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-//offset如果都是整数，则往右下偏移
+//offset如果都是正数，则往右下偏移
 - (UIOffset)cyl_tabBadgePointViewOffset {
     id tabBadgePointViewOffsetObject = objc_getAssociatedObject(self, @selector(cyl_tabBadgePointViewOffset));
     UIOffset tabBadgePointViewOffset = [tabBadgePointViewOffsetObject UIOffsetValue];
     return tabBadgePointViewOffset;
-}
-
-- (UIImageView *)cyl_imageView {
-    for (UIView *subview in self.subviews) {
-        if ([subview cyl_isTabImageView]) {
-            return (UIImageView *)subview;
-        }
-    }
-    return nil;
 }
 
 - (UIView *)cyl_tabBadgeView {
