@@ -201,7 +201,7 @@ CocoaPods 中，有几种设置 CYLTabBarController 版本的方法。如：
 
  
 ```
-    pod 'CYLTabBarController', '~> 1.13.1'
+    pod 'CYLTabBarController', '~> 1.13.2'
 ```
 
  - 升级本地 CocoaPods 源
