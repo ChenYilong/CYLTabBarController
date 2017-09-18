@@ -131,7 +131,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 #warning CUSTOMIZE YOUR TABBAR APPEARANCE
     // Customize UITabBar height
     // 自定义 TabBar 高度
-     tabBarController.tabBarHeight = CYLTabBarControllerHeight;
+//     tabBarController.tabBarHeight = CYLTabBarControllerHeight;
     
     // set the text color for unselected state
     // 普通状态下的文字属性

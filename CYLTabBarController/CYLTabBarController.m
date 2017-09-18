@@ -63,6 +63,20 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         }
         !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
     });
+   
+}
+
+- (void)viewWillLayoutSubviews {
+    if (CYL_IS_IOS_11 || !self.tabBarHeight) {
+        return;
+    }
+    self.tabBar.frame = ({
+        CGRect frame = self.tabBar.frame;
+        CGFloat tabBarHeight = self.tabBarHeight;
+        frame.size.height = tabBarHeight;
+        frame.origin.y = self.view.frame.size.height - tabBarHeight;
+        frame;
+    });
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {

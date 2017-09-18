@@ -9,7 +9,7 @@
 #import "CYLTabBar.h"
 #import "CYLPlusButton.h"
 #import "CYLTabBarController.h"
-#import "CYLConstants.H"
+#import "CYLConstants.h"
 
 static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 
@@ -56,7 +56,8 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 
 - (CGSize)sizeThatFits:(CGSize)size {
     CGSize sizeThatFits = [super sizeThatFits:size];
-    if (!IS_IPHONE_X) {
+    CGFloat height = [self cyl_tabBarController].tabBarHeight;
+    if (height > 0 && !CYL_IS_IPHONE_X && CYL_IS_IOS_11) {
         sizeThatFits.height = [self cyl_tabBarController].tabBarHeight;
     }
     return sizeThatFits;
@@ -235,7 +236,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     __block CGFloat tabImageViewDefaultOffset = 0.f;
     CGFloat tabBarHeight = self.frame.size.height;
     [tabBarButton.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([obj cyl_isTabLabel] || IS_IPHONE_X) {
+        if ([obj cyl_isTabLabel]) {
             shouldCustomizeImageView = NO;
         }
         tabImageViewHeight = obj.frame.size.height;
@@ -247,7 +248,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
             shouldCustomizeImageView = NO;
         }
     }];
-    if (shouldCustomizeImageView) {
+    if (shouldCustomizeImageView && !CYL_IS_IPHONE_X) {
         self.tabImageViewDefaultOffset = tabImageViewDefaultOffset;
     }
 }
