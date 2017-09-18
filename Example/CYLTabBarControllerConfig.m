@@ -2,11 +2,10 @@
 //  CYLTabBarControllerConfig.m
 //  CYLTabBarController
 //
-//  v1.13.1 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  v1.14.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 #import "CYLTabBarControllerConfig.h"
-
 static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 @interface CYLBaseNavigationController : UINavigationController
@@ -14,9 +13,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 @implementation CYLBaseNavigationController
 
+#define IS_IPHONE (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+#define IS_IPHONE_X (IS_IPHONE && [[UIScreen mainScreen] bounds].size.height == 812.0f)
+
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     if (self.viewControllers.count > 0) {
-        viewController.hidesBottomBarWhenPushed = YES;
+        if (!IS_IPHONE_X) {
+            viewController.hidesBottomBarWhenPushed = YES;
+        }
     }
     [super pushViewController:viewController animated:animated];
 }
@@ -127,7 +131,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 #warning CUSTOMIZE YOUR TABBAR APPEARANCE
     // Customize UITabBar height
     // 自定义 TabBar 高度
-//     tabBarController.tabBarHeight = CYLTabBarControllerHeight;
+     tabBarController.tabBarHeight = CYLTabBarControllerHeight;
     
     // set the text color for unselected state
     // 普通状态下的文字属性
@@ -144,7 +148,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     UITabBarItem *tabBar = [UITabBarItem appearance];
     [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
     [tabBar setTitleTextAttributes:selectedAttrs forState:UIControlStateSelected];
-    
+
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色
     // [self customizeTabBarSelectionIndicatorImage];
@@ -213,7 +217,5 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
-
 
 @end

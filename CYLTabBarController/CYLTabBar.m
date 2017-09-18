@@ -2,13 +2,14 @@
 //  CYLTabBar.m
 //  CYLTabBarController
 //
-//  v1.13.1 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  v1.14.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLTabBar.h"
 #import "CYLPlusButton.h"
 #import "CYLTabBarController.h"
+#import "CYLConstants.H"
 
 static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 
@@ -51,6 +52,14 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     _tabBarItemWidth = CYLTabBarItemWidth;
     [self addObserver:self forKeyPath:@"tabBarItemWidth" options:NSKeyValueObservingOptionNew context:CYLTabBarContext];
     return self;
+}
+
+- (CGSize)sizeThatFits:(CGSize)size {
+    CGSize sizeThatFits = [super sizeThatFits:size];
+    if (!IS_IPHONE_X) {
+        sizeThatFits.height = [self cyl_tabBarController].tabBarHeight;
+    }
+    return sizeThatFits;
 }
 
 /**
@@ -226,7 +235,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     __block CGFloat tabImageViewDefaultOffset = 0.f;
     CGFloat tabBarHeight = self.frame.size.height;
     [tabBarButton.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([obj cyl_isTabLabel]) {
+        if ([obj cyl_isTabLabel] || IS_IPHONE_X) {
             shouldCustomizeImageView = NO;
         }
         tabImageViewHeight = obj.frame.size.height;

@@ -2,7 +2,7 @@
 //  CYLTabBarController.m
 //  CYLTabBarController
 //
-//  v1.13.1 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  v1.14.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 
@@ -42,6 +42,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         [self.tabBar addObserver:self forKeyPath:@"tabImageViewDefaultOffset" options:NSKeyValueObservingOptionNew context:CYLTabImageViewDefaultOffsetContext];
         self.observingTabImageViewDefaultOffset = YES;
     }
+
 }
 
 - (void)setViewDidLayoutSubViewsBlock:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock {
@@ -61,20 +62,6 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
             }
         }
         !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
-    });
-   
-}
-
-- (void)viewWillLayoutSubviews {
-    if (!self.tabBarHeight) {
-        return;
-    }
-    self.tabBar.frame = ({
-        CGRect frame = self.tabBar.frame;
-        CGFloat tabBarHeight = self.tabBarHeight;
-        frame.size.height = tabBarHeight;
-        frame.origin.y = self.view.frame.size.height - tabBarHeight;
-        frame;
     });
 }
 
