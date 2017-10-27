@@ -366,7 +366,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     UIWindow *window = delegate.window;
     UIViewController *rootViewController = [window.rootViewController cyl_getViewControllerInsteadIOfNavigationController];;
     if ([rootViewController isKindOfClass:[CYLTabBarController class]]) {
-        tabBarController = (CYLTabBarController *)window.rootViewController;
+        tabBarController = (CYLTabBarController *)rootViewController;
     }
     return tabBarController;
 }
