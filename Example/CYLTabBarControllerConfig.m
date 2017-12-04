@@ -18,9 +18,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     if (self.viewControllers.count > 0) {
-        if (!IS_IPHONE_X) {
-            viewController.hidesBottomBarWhenPushed = YES;
-        }
+        viewController.hidesBottomBarWhenPushed = YES;
     }
     [super pushViewController:viewController animated:animated];
 }

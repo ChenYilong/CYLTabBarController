@@ -63,7 +63,6 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         }
         !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
     });
-   
 }
 
 - (void)viewWillLayoutSubviews {

@@ -63,6 +63,15 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     return sizeThatFits;
 }
 
+- (void)setFrame:(CGRect)frame {
+    if (CYL_IS_IPHONE_X) {
+        if (self.superview && CGRectGetMaxY(self.superview.bounds) != CGRectGetMaxY(frame)) {
+            frame.origin.y = CGRectGetHeight(self.superview.bounds) - CGRectGetHeight(frame);
+        }
+    }
+    [super setFrame:frame];
+}
+
 /**
  *  lazy load tabBarButtonArray
  *

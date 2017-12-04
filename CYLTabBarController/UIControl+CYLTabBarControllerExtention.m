@@ -9,6 +9,7 @@
 #import "UIControl+CYLTabBarControllerExtention.h"
 #import <objc/runtime.h>
 #import "UIView+CYLTabBarControllerExtention.h"
+#import "CYLConstants.h"
 
 @implementation UIControl (CYLTabBarControllerExtention)
 
@@ -21,10 +22,16 @@
 }
 
 - (BOOL)cyl_isShowTabBadgePoint {
+    if (CYL_IS_IPHONE_X) {
+        return NO;
+    }
     return !self.cyl_tabBadgePointView.hidden;
 }
 
 - (void)cyl_setShowTabBadgePointIfNeeded:(BOOL)showTabBadgePoint {
+    if (CYL_IS_IPHONE_X) {
+        return;
+    }
     @try {
         [self cyl_setShowTabBadgePoint:showTabBadgePoint];
     } @catch (NSException *exception) {
