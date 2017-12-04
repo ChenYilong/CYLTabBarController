@@ -68,6 +68,10 @@
 }
 
 - (void)cyl_setTabBadgePointView:(UIView *)tabBadgePointView {
+    UIView *tempView = objc_getAssociatedObject(self, @selector(cyl_tabBadgePointView));
+    if (tempView) {
+        [tempView removeFromSuperview];
+    }
     if (tabBadgePointView.superview) {
         [tabBadgePointView removeFromSuperview];
     }
