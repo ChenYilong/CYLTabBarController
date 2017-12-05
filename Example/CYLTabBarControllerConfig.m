@@ -6,15 +6,14 @@
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
 #import "CYLTabBarControllerConfig.h"
+#import <UIKit/UIKit.h>
+
 static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 @interface CYLBaseNavigationController : UINavigationController
 @end
 
 @implementation CYLBaseNavigationController
-
-#define IS_IPHONE (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-#define IS_IPHONE_X (IS_IPHONE && [[UIScreen mainScreen] bounds].size.height == 812.0f)
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     if (self.viewControllers.count > 0) {
@@ -129,7 +128,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 #warning CUSTOMIZE YOUR TABBAR APPEARANCE
     // Customize UITabBar height
     // 自定义 TabBar 高度
-//     tabBarController.tabBarHeight = CYLTabBarControllerHeight;
+    tabBarController.tabBarHeight = CYL_IS_IPHONE_X ? 65 : 40;
     
     // set the text color for unselected state
     // 普通状态下的文字属性

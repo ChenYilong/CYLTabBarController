@@ -35,6 +35,9 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if (CYL_IS_IPHONE_X) {
+        self.tabBarHeight = 83;
+    }
     // 处理tabBar，使用自定义 tabBar 添加 发布按钮
     [self setUpTabBar];
     // KVO注册监听
@@ -42,38 +45,33 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         [self.tabBar addObserver:self forKeyPath:@"tabImageViewDefaultOffset" options:NSKeyValueObservingOptionNew context:CYLTabImageViewDefaultOffsetContext];
         self.observingTabImageViewDefaultOffset = YES;
     }
-
 }
 
 - (void)setViewDidLayoutSubViewsBlock:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock {
     _viewDidLayoutSubviewsBlock = viewDidLayoutSubviewsBlock;
 }
 
-//Fix issue #93
 - (void)viewDidLayoutSubviews {
-    [self.tabBar layoutSubviews];
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        UITabBar *tabBar =  self.tabBar;
-        for (UIControl *control in tabBar.subviews) {
-            if ([control isKindOfClass:[UIControl class]]) {
-                SEL actin = @selector(didSelectControl:);
-                [control addTarget:self action:actin forControlEvents:UIControlEventTouchUpInside];
-            }
+    [self.tabBar layoutSubviews];//Fix issue #93
+    UITabBar *tabBar =  self.tabBar;
+    for (UIControl *control in tabBar.subviews) {
+        if ([control isKindOfClass:[UIControl class]]) {
+            SEL actin = @selector(didSelectControl:);
+            [control addTarget:self action:actin forControlEvents:UIControlEventTouchUpInside];
         }
-        !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
-    });
+    }
+    !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
 }
 
 - (void)viewWillLayoutSubviews {
-    if (CYL_IS_IOS_11 || !self.tabBarHeight) {
+    if (!(self.tabBarHeight > 0)) {
         return;
     }
     self.tabBar.frame = ({
         CGRect frame = self.tabBar.frame;
         CGFloat tabBarHeight = self.tabBarHeight;
         frame.size.height = tabBarHeight;
-        frame.origin.y = self.view.frame.size.height - tabBarHeight;
+        frame.origin.y = [UIScreen mainScreen].bounds.size.height - tabBarHeight;
         frame;
     });
 }

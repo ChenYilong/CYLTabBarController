@@ -22,16 +22,10 @@
 }
 
 - (BOOL)cyl_isShowTabBadgePoint {
-    if (CYL_IS_IPHONE_X) {
-        return NO;
-    }
     return !self.cyl_tabBadgePointView.hidden;
 }
 
 - (void)cyl_setShowTabBadgePointIfNeeded:(BOOL)showTabBadgePoint {
-    if (CYL_IS_IPHONE_X) {
-        return;
-    }
     @try {
         [self cyl_setShowTabBadgePoint:showTabBadgePoint];
     } @catch (NSException *exception) {
