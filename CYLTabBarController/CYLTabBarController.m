@@ -71,7 +71,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         CGRect frame = self.tabBar.frame;
         CGFloat tabBarHeight = self.tabBarHeight;
         frame.size.height = tabBarHeight;
-        frame.origin.y = [UIScreen mainScreen].bounds.size.height - tabBarHeight;
+        frame.origin.y = self.view.frame.size.height - tabBarHeight;
         frame;
     });
 }
@@ -135,6 +135,11 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                                tabBarItemsAttributes:tabBarItemsAttributes
                                          imageInsets:UIEdgeInsetsZero
                              titlePositionAdjustment:UIOffsetZero];
+}
+
+- (void)hideTabBadgeBackgroundSeparator {
+    [self.tabBar layoutIfNeeded];
+    self.tabBar.cyl_tabBadgeBackgroundSeparator.hidden = YES;
 }
 
 + (BOOL)havePlusButton {

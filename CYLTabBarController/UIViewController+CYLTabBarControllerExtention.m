@@ -118,6 +118,7 @@
         return;
     }
     [self.cyl_tabButton cyl_showTabBadgePoint];
+    [[self cyl_tabBarController].tabBar layoutIfNeeded];
 }
 
 - (void)cyl_removeTabBadgePoint {
@@ -125,6 +126,7 @@
         return;
     }
     [self.cyl_tabButton cyl_removeTabBadgePoint];
+    [[self cyl_tabBarController].tabBar layoutIfNeeded];
 }
 
 - (BOOL)cyl_isShowTabBadgePoint {

@@ -49,6 +49,42 @@
     return isTabBadgeView;
 }
 
+- (BOOL)cyl_isTabBackgroundView {
+    BOOL isKindOfClass = [self isKindOfClass:[UIView class]];
+    BOOL isClass = [self isMemberOfClass:[UIView class]];
+    BOOL isKind = isKindOfClass && !isClass;
+    if (!isKind) {
+        return NO;
+    }
+    NSString *tabBackgroundViewString = [NSString stringWithFormat:@"%@IB%@", @"_U" , @"arBac"];
+    BOOL isTabBackgroundView = [self cyl_classStringHasPrefix:tabBackgroundViewString] && [self cyl_classStringHasSuffix:@"nd"];
+    return isTabBackgroundView;
+}
+
+- (UIView *)cyl_tabBadgeBackgroundView {
+    for (UIImageView *subview in self.subviews) {
+        if ([subview cyl_isTabBackgroundView]) {
+            return (UIImageView *)subview;
+        }
+    }
+    return nil;
+}
+
+- (UIView *)cyl_tabBadgeBackgroundSeparator {
+    UIView *subview = [self cyl_tabBadgeBackgroundView];
+    if (!subview) {
+        return nil;
+    }
+    NSArray<__kindof UIView *> *bgSubviews = subview.subviews;
+    if (bgSubviews.count > 1) {
+        UIView *destView = bgSubviews[1];
+        if (CGRectGetHeight(destView.bounds) < 1.0 ) {
+            return destView;
+        }
+    }
+    return nil;
+}
+
 - (BOOL)cyl_isKindOfClass:(Class)class {
     BOOL isKindOfClass = [self isKindOfClass:class];
     BOOL isClass = [self isMemberOfClass:class];
