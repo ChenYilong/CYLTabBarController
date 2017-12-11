@@ -164,12 +164,17 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
     // set the bar background image
     // 设置背景图片
-//     UITabBar *tabBarAppearance = [UITabBar appearance];
-//     [tabBarAppearance setBackgroundImage:[UIImage imageNamed:@"tab_bar"]];
+     UITabBar *tabBarAppearance = [UITabBar appearance];
+    
+    //FIXED: #196
+    UIImage *tabBarBackgroundImage = [UIImage imageNamed:@"tab_bar"];
+     UIImage *scanedTabBarBackgroundImage = [[self class] scaleImage:tabBarBackgroundImage toScale:1.0];
+     [tabBarAppearance setBackgroundImage:scanedTabBarBackgroundImage];
     
     // remove the bar system shadow image
     // 去除 TabBar 自带的顶部阴影
-    // [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
+    // iOS10 后 需要使用 `-[CYLTabBarController hideTabBadgeBackgroundSeparator]` 见 AppDelegate 类中的演示;
+     [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
 }
 
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {
@@ -197,6 +202,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [tabBar setSelectionIndicatorImage:
      [[self class] imageWithColor:[UIColor yellowColor]
                              size:selectionIndicatorImageSize]];
+}
+
++ (UIImage *)scaleImage:(UIImage *)image toScale:(float)scaleSize {
+    UIGraphicsBeginImageContext(CGSizeMake([UIScreen mainScreen].bounds.size.width * scaleSize, image.size.height * scaleSize));
+    [image drawInRect:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * scaleSize, image.size.height * scaleSize)];
+    UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return scaledImage;
 }
 
 + (UIImage *)imageWithColor:(UIColor *)color size:(CGSize)size {
