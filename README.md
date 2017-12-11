@@ -3,7 +3,7 @@
 
 
 <p align="center">
-<a href=""><img src="https://img.shields.io/badge/pod-v1.16.1-brightgreen.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/pod-v1.17.0-brightgreen.svg"></a>
 <a href=""><img src="https://img.shields.io/badge/Swift-compatible-orange.svg"></a>
 <a href=""><img src="https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5152950834.svg"></a>
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
@@ -169,7 +169,7 @@
   在文件 `Podfile` 中加入以下内容：
 
  ```
-    pod 'CYLTabBarController', '~> 1.16.1'
+    pod 'CYLTabBarController', '~> 1.17.0'
  ```
 
   然后在终端中运行以下命令：
@@ -187,7 +187,7 @@
 
   如果提示找不到库，则可去掉 `--no-repo-update`。
 
-  完成后，CocoaPods 会在您的工程根目录下生成一个 `.xcworkspace` 文件。您需要通过此文件打开您的工程，而不是之前的 `.xcodeproj`。
+  完成后1.17.0，CocoaPods 会在您的工程根目录下生成一个 `.xcworkspace` 文件。您需要通过此文件打开您的工程，而不是之前的 `.xcodeproj`。
 
 **CocoaPods 使用说明**
 
@@ -195,14 +195,14 @@
 
 CocoaPods 中，有几种设置 CYLTabBarController 版本的方法。如：
 
-`>= 1.16.X` 会根据您本地的 CocoaPods 源列表，导入不低于 `1.17.X` 版本的 CYLTabBarController。
+`>= 1.16.X` 会根据您本地的 CocoaPods 源列表，导入不低于 `1.18.X` 版本的 CYLTabBarController。
 
-`~> 1.16.X` 会根据您本地的 CocoaPods 源列表，介于 1.16.X~1.17.0 之前版本的 CYLTabBarController。
-我们建议您锁定版本，便于团队开发。如，指定 1.16.1 版本。
+`~> 1.16.X` 会根据您本地的 CocoaPods 源列表，介于 1.16.X~1.18.0 之前版本的 CYLTabBarController。
+我们建议您锁定版本，便于团队开发。如，指定 1.17.0 版本。
 
  
 ```
-    pod 'CYLTabBarController', '~> 1.16.1'
+    pod 'CYLTabBarController', '~> 1.17.0'
 ```
 
  - 升级本地 CocoaPods 源
@@ -380,8 +380,10 @@ Airbnb-app效果：
 
  ```Objective-C
     //去除 TabBar 自带的顶部阴影
-    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
+    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];        
  ```
+
+// iOS10 后 需要使用 `-[CYLTabBarController hideTabBadgeBackgroundSeparator]` 见 AppDelegate 类中的演示;
 
 如何调整、自定义 `PlusButton` 与其它 `TabBarItem` 的宽度？
 
@@ -409,7 +411,7 @@ Airbnb-app效果：
  ```
 
 效果如下，
-1.16.1
+1.17.0
 ![enter image description here](http://i64.tinypic.com/vx16r5.jpg)
 
 同时你也可以顺便测试下 `CYLTabBarController` 的这一个特性：
