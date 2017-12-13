@@ -98,7 +98,7 @@
 
 - (UIViewController *)cyl_getViewControllerInsteadIOfNavigationController {
     BOOL isNavigationController = [[self class] isSubclassOfClass:[UINavigationController class]];
-    if (isNavigationController) {
+    if (isNavigationController && ((UINavigationController *)self).viewControllers.count > 0) {
         return ((UINavigationController *)self).viewControllers[0];
     }
     return self;

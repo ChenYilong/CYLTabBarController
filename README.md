@@ -41,7 +41,7 @@
     - [在 Swift 项目中使用 CYLTabBarController](#%E5%9C%A8-swift-%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BD%BF%E7%94%A8-cyltabbarcontroller)
     - [搭配 Storyboard 使用 CYLTabBarController](#%E6%90%AD%E9%85%8D-storyboard-%E4%BD%BF%E7%94%A8-cyltabbarcontroller)
     - [源码实现原理](#%E6%BA%90%E7%A0%81%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86)
-  - [Q-A](#q-a)
+  - [FAQ](#FAQ)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -757,8 +757,10 @@ Demo 演示的效果图：
 
 更多文档信息可查看 [ ***CocoaDocs：CYLTabBarController*** ](http://cocoadocs.org/docsets/CYLTabBarController/1.2.1/index.html) 。
 
-## Q-A
+## FAQ
 
+
+更多Q-A内容，可以在这里查看： [issue-FAQ](https://github.com/ChenYilong/CYLTabBarController/issues?utf8=✓&q=+label%3AQ-A+) 
 Q：为什么放置6个TabBarItem会显示异常？
 
 A：
