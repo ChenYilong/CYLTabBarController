@@ -3,7 +3,7 @@
 
 
 <p align="center">
-<a href=""><img src="https://img.shields.io/badge/pod-v1.17.0-brightgreen.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/pod-v1.17.4-brightgreen.svg"></a>
 <a href=""><img src="https://img.shields.io/badge/Swift-compatible-orange.svg"></a>
 <a href=""><img src="https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5152950834.svg"></a>
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
@@ -170,7 +170,7 @@
   在文件 `Podfile` 中加入以下内容：
 
  ```
-    pod 'CYLTabBarController', '~> 1.17.0'
+    pod 'CYLTabBarController', '~> 1.17.4'
  ```
 
   然后在终端中运行以下命令：
@@ -188,7 +188,7 @@
 
   如果提示找不到库，则可去掉 `--no-repo-update`。
 
-  完成后1.17.0，CocoaPods 会在您的工程根目录下生成一个 `.xcworkspace` 文件。您需要通过此文件打开您的工程，而不是之前的 `.xcodeproj`。
+  完成后1.17.4，CocoaPods 会在您的工程根目录下生成一个 `.xcworkspace` 文件。您需要通过此文件打开您的工程，而不是之前的 `.xcodeproj`。
 
 **CocoaPods 使用说明**
 
@@ -199,11 +199,11 @@ CocoaPods 中，有几种设置 CYLTabBarController 版本的方法。如：
 `>= 1.16.X` 会根据您本地的 CocoaPods 源列表，导入不低于 `1.18.X` 版本的 CYLTabBarController。
 
 `~> 1.16.X` 会根据您本地的 CocoaPods 源列表，介于 1.16.X~1.18.0 之前版本的 CYLTabBarController。
-我们建议您锁定版本，便于团队开发。如，指定 1.17.0 版本。
+我们建议您锁定版本，便于团队开发。如，指定 1.17.4 版本。
 
  
 ```
-    pod 'CYLTabBarController', '~> 1.17.0'
+    pod 'CYLTabBarController', '~> 1.17.4'
 ```
 
  - 升级本地 CocoaPods 源
@@ -412,7 +412,7 @@ Airbnb-app效果：
  ```
 
 效果如下，
-1.17.0
+1.17.4
 ![enter image description here](http://i64.tinypic.com/vx16r5.jpg)
 
 同时你也可以顺便测试下 `CYLTabBarController` 的这一个特性：
@@ -744,6 +744,8 @@ Demo 演示的效果图：
 
 
 ### 多TabBar嵌套，并指定PlusButton位置 
+
+该功能的版本需要 >= v1.17.4。
 
 效果图：
 

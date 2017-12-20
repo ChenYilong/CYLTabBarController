@@ -92,7 +92,9 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         plusButton.selected = NO;
         [plusButton removeFromSuperview];
     }
-    if (CYLPlusChildViewController.cyl_plusViewControllerEverAdded == YES) {
+    BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
+    BOOL hasPlusChildViewController = [self hasPlusChildViewController] && isAdded;
+    if (isAdded && hasPlusChildViewController && CYLPlusChildViewController.cyl_plusViewControllerEverAdded == YES) {
         [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:NO];
     }
     // KVO反注册
