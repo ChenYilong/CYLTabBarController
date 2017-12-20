@@ -58,7 +58,6 @@
     [self.navigationController.tabBarItem setBadgeValue:[NSString stringWithFormat:@"%@", badgeNumber]];
     
     CYLTabBarControllerConfig *tabBarControllerConfig = [[CYLTabBarControllerConfig alloc] init];
-    tabBarControllerConfig.context = NSStringFromClass([CYLPlusButtonSubclass class]);
     CYLTabBarController *tabBarController = tabBarControllerConfig.tabBarController;
     tabBarController.delegate = self;
 

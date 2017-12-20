@@ -23,7 +23,6 @@
     self.window.frame = [UIScreen mainScreen].bounds;
     [CYLPlusButtonSubclass registerPlusButton];
     CYLTabBarControllerConfig *tabBarControllerConfig = [[CYLTabBarControllerConfig alloc] init];
-    tabBarControllerConfig.context = @"test";
     CYLTabBarController *tabBarController = tabBarControllerConfig.tabBarController;
     [self.window setRootViewController:tabBarController];
 
