@@ -29,6 +29,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 #import "CYLMessageViewController.h"
 #import "CYLMineViewController.h"
 #import "CYLSameCityViewController.h"
+#import "CYLPlusButtonSubclass.h"
 
 @interface CYLTabBarControllerConfig ()<UITabBarControllerDelegate>
 
@@ -56,8 +57,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithViewControllers:self.viewControllers
                                                                                    tabBarItemsAttributes:self.tabBarItemsAttributesForController
                                                                                              imageInsets:imageInsets
-                                                                                 titlePositionAdjustment:titlePositionAdjustment];
-        
+                                                                                 titlePositionAdjustment:titlePositionAdjustment
+                                                 context:self.context
+                                                 ];
         [self customizeTabBarAppearance:tabBarController];
         _tabBarController = tabBarController;
     }
@@ -160,7 +162,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
     [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
     [[UITabBar appearance] setBackgroundColor:[UIColor whiteColor]];
-    [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"tapbar_top_line"]];
+//    [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"tapbar_top_line"]];
     
     // set the bar background image
     // 设置背景图片
@@ -169,7 +171,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //FIXED: #196
     UIImage *tabBarBackgroundImage = [UIImage imageNamed:@"tab_bar"];
      UIImage *scanedTabBarBackgroundImage = [[self class] scaleImage:tabBarBackgroundImage toScale:1.0];
-     [tabBarAppearance setBackgroundImage:scanedTabBarBackgroundImage];
+//     [tabBarAppearance setBackgroundImage:scanedTabBarBackgroundImage];
     
     // remove the bar system shadow image
     // 去除 TabBar 自带的顶部阴影

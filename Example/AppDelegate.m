@@ -23,6 +23,7 @@
     self.window.frame = [UIScreen mainScreen].bounds;
     [CYLPlusButtonSubclass registerPlusButton];
     CYLTabBarControllerConfig *tabBarControllerConfig = [[CYLTabBarControllerConfig alloc] init];
+    tabBarControllerConfig.context = @"test";
     CYLTabBarController *tabBarController = tabBarControllerConfig.tabBarController;
     [self.window setRootViewController:tabBarController];
 
@@ -37,7 +38,6 @@
     [self setUpNavigationBarAppearance];
     
     [tabBarController hideTabBadgeBackgroundSeparator];
-    
     //添加小红点
     UIViewController *viewController = tabBarController.viewControllers[0];
     UIView *tabBadgePointView0 = [UIView cyl_tabBadgePointViewWithClolor:RANDOM_COLOR radius:4.5];
@@ -117,8 +117,6 @@
         UIButton *button = CYLExternPlusButton;
         animationView = button.imageView;
     }
-    
-    
     
     if ([self cyl_tabBarController].selectedIndex % 2 == 0) {
         [self addScaleAnimationOnView:animationView repeatCount:1];

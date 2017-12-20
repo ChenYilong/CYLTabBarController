@@ -17,4 +17,6 @@
  */
 @property (nonatomic, assign, readonly) CGFloat tabImageViewDefaultOffset;
 
+@property (nonatomic, copy) NSString *context;
+
 @end

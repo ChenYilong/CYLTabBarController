@@ -7,8 +7,9 @@
 //
 
 #import "CYLHomeViewController.h"
-
-@implementation CYLHomeViewController
+#import "CYLTabBarControllerConfig.h"
+#import "CYLPlusButtonSubclass.h"
+@implementation CYLHomeViewController 
 
 #pragma mark - View lifecycle
 
@@ -52,9 +53,23 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    NSNumber *badgeNumber = @(indexPath.row + 1);
+    NSNumber *badgeNumber = @(indexPath.row);
     self.navigationItem.title = [NSString stringWithFormat:@"首页(%@)", badgeNumber]; //sets navigation bar title.
     [self.navigationController.tabBarItem setBadgeValue:[NSString stringWithFormat:@"%@", badgeNumber]];
+    
+    CYLTabBarControllerConfig *tabBarControllerConfig = [[CYLTabBarControllerConfig alloc] init];
+    tabBarControllerConfig.context = NSStringFromClass([CYLPlusButtonSubclass class]);
+    CYLTabBarController *tabBarController = tabBarControllerConfig.tabBarController;
+    tabBarController.delegate = self;
+
+    [self.navigationController  pushViewController:tabBarController animated:YES];
+}
+
+
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    UIViewController *viewController_ = [viewController  cyl_getViewControllerInsteadOfNavigationController];
+    [[viewController_ cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
+    return YES;
 }
 
 @end

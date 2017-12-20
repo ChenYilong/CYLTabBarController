@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CYLHomeViewController : UITableViewController
+@interface CYLHomeViewController : UITableViewController<UITabBarControllerDelegate>
 
 @end

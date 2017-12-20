@@ -30,6 +30,10 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 @property (nonatomic, readonly) UIControl *cyl_tabButton;
 
+@property (nonatomic, copy, setter=cyl_setContext:, getter=cyl_context) NSString *cyl_context;
+
+@property (nonatomic, assign, setter=cyl_setPlusViewControllerEverAdded:, getter=cyl_plusViewControllerEverAdded) BOOL cyl_plusViewControllerEverAdded;
+
 /*!
  * @attention 
    - 调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
@@ -105,6 +109,6 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  */
 - (void)cyl_pushViewController:(UIViewController *)viewController animated:(BOOL)animated;
 
-- (UIViewController *)cyl_getViewControllerInsteadIOfNavigationController;
+- (UIViewController *)cyl_getViewControllerInsteadOfNavigationController;
 
 @end

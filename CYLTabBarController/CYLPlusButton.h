@@ -67,6 +67,8 @@
 
 + (CGFloat)multiplerInCenterY CYL_DEPRECATED("Deprecated in 1.6.0. Use `+multiplierOfTabBarHeight:` instead.");
 
++ (NSString *)tabBarContext;
+
 @end
 
 @class CYLTabBar;
