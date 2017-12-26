@@ -142,7 +142,7 @@
 //}
 //
 //+ (NSUInteger)indexOfPlusButtonInTabBar {
-//    return 4;
+//    return 1;
 //}
 //
 //+ (BOOL)shouldSelectPlusChildViewController {

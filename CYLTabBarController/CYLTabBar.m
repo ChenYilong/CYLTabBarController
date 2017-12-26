@@ -158,10 +158,18 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIView * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
             //调整UITabBarItem的位置
             CGFloat childViewX;
-            if (buttonIndex >= plusButtonIndex) {
-                childViewX = buttonIndex * CYLTabBarItemWidth + CYLPlusButtonWidth;
+            if ([self hasPlusChildViewController]) {
+                if (buttonIndex <= plusButtonIndex) {
+                    childViewX = buttonIndex * CYLTabBarItemWidth;
+                } else {
+                    childViewX = (buttonIndex - 1) * CYLTabBarItemWidth + CYLPlusButtonWidth;
+                }
             } else {
-                childViewX = buttonIndex * CYLTabBarItemWidth;
+                if (buttonIndex >= plusButtonIndex) {
+                    childViewX = buttonIndex * CYLTabBarItemWidth + CYLPlusButtonWidth;
+                } else {
+                    childViewX = buttonIndex * CYLTabBarItemWidth;
+                }
             }
             //仅修改childView的x和宽度,yh值不变
             childView.frame = CGRectMake(childViewX,
@@ -308,16 +316,28 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
             [tabBarButtonMutableArray addObject:obj];
         }
     }];
-    NSString *context = CYLPlusChildViewController.cyl_context;
-    BOOL isSameContext = [context isEqualToString:self.context] && (context && self.context);
-   BOOL isAdded = [[self cyl_tabBarController].viewControllers containsObject:CYLPlusChildViewController];
-    BOOL numberEnough = (tabBarButtonMutableArray.count > CYLPlusButtonIndex);
-    if (CYLPlusChildViewController && isSameContext && numberEnough && isAdded) {
-        UIControl *control = tabBarButtonMutableArray[CYLPlusButtonIndex];
-        control.hidden = YES;
-
+//    NSString *context = CYLPlusChildViewController.cyl_context;
+//    BOOL isSameContext = [context isEqualToString:self.context] && (context && self.context);
+//   BOOL isAdded = [[self cyl_tabBarController].viewControllers containsObject:CYLPlusChildViewController];
+//    BOOL numberEnough = (tabBarButtonMutableArray.count > CYLPlusButtonIndex);
+    if ([self hasPlusChildViewController]) {
+        @try {
+            UIControl *control = tabBarButtonMutableArray[CYLPlusButtonIndex];
+            control.hidden = YES;
+        } @catch (NSException *exception) {}
     }
     return [tabBarButtonMutableArray copy];
+}
+
+- (BOOL)hasPlusChildViewController {
+    NSString *context = CYLPlusChildViewController.cyl_context;
+    BOOL isSameContext = [context isEqualToString:self.context] && (context && self.context);
+    BOOL isAdded = [[self cyl_tabBarController].viewControllers containsObject:CYLPlusChildViewController];
+//    BOOL numberEnough = (tabBarButtonMutableArray.count > CYLPlusButtonIndex);
+    if (CYLPlusChildViewController && isSameContext && isAdded) {
+        return YES;
+    }
+    return NO;
 }
 
 - (void)setupTabImageViewDefaultOffset:(UIView *)tabBarButton {
