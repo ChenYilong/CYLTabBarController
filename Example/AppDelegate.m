@@ -44,17 +44,19 @@
     [viewController cyl_showTabBadgePoint];
     
     UIView *tabBadgePointView1 = [UIView cyl_tabBadgePointViewWithClolor:RANDOM_COLOR radius:4.5];
-    [tabBarController.viewControllers[1] cyl_setTabBadgePointView:tabBadgePointView1];
-    [tabBarController.viewControllers[1] cyl_showTabBadgePoint];
-    
-    UIView *tabBadgePointView2 = [UIView cyl_tabBadgePointViewWithClolor:RANDOM_COLOR radius:4.5];
-    [tabBarController.viewControllers[2] cyl_setTabBadgePointView:tabBadgePointView2];
-    [tabBarController.viewControllers[2] cyl_showTabBadgePoint];
-    
-    [tabBarController.viewControllers[3] cyl_showTabBadgePoint];
-    
-    //添加提示动画，引导用户点击
-    [self addScaleAnimationOnView:tabBarController.viewControllers[3].cyl_tabButton.cyl_tabImageView repeatCount:20];
+    @try {
+        [tabBarController.viewControllers[1] cyl_setTabBadgePointView:tabBadgePointView1];
+        [tabBarController.viewControllers[1] cyl_showTabBadgePoint];
+        
+        UIView *tabBadgePointView2 = [UIView cyl_tabBadgePointViewWithClolor:RANDOM_COLOR radius:4.5];
+        [tabBarController.viewControllers[2] cyl_setTabBadgePointView:tabBadgePointView2];
+        [tabBarController.viewControllers[2] cyl_showTabBadgePoint];
+        
+        [tabBarController.viewControllers[3] cyl_showTabBadgePoint];
+        
+        //添加提示动画，引导用户点击
+        [self addScaleAnimationOnView:tabBarController.viewControllers[3].cyl_tabButton.cyl_tabImageView repeatCount:20];
+    } @catch (NSException *exception) {}
 }
 
 /**

@@ -316,13 +316,10 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
             [tabBarButtonMutableArray addObject:obj];
         }
     }];
-//    NSString *context = CYLPlusChildViewController.cyl_context;
-//    BOOL isSameContext = [context isEqualToString:self.context] && (context && self.context);
-//   BOOL isAdded = [[self cyl_tabBarController].viewControllers containsObject:CYLPlusChildViewController];
-//    BOOL numberEnough = (tabBarButtonMutableArray.count > CYLPlusButtonIndex);
     if ([self hasPlusChildViewController]) {
         @try {
             UIControl *control = tabBarButtonMutableArray[CYLPlusButtonIndex];
+            control.userInteractionEnabled = NO;
             control.hidden = YES;
         } @catch (NSException *exception) {}
     }
@@ -333,7 +330,6 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     NSString *context = CYLPlusChildViewController.cyl_context;
     BOOL isSameContext = [context isEqualToString:self.context] && (context && self.context);
     BOOL isAdded = [[self cyl_tabBarController].viewControllers containsObject:CYLPlusChildViewController];
-//    BOOL numberEnough = (tabBarButtonMutableArray.count > CYLPlusButtonIndex);
     if (CYLPlusChildViewController && isSameContext && isAdded) {
         return YES;
     }
