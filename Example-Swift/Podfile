@@ -1,5 +1,5 @@
 target "Swift_demo" do
 platform :ios, '10.0'
-#pod 'CYLTabBarController'
+pod 'CYLTabBarController'
 
 end
