@@ -1,54 +1,67 @@
 # CYLTabBarController【低耦合集成TabBarController】
 
 
+
 <p align="center">
-![enter image description here](https://img.shields.io/badge/pod-v1.6.3-brightgreen.svg)
-![enter image description here](https://img.shields.io/badge/Swift-compatible-orange.svg)   ![enter image description here](https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5152950834.svg) 
+<a href=""><img src="https://img.shields.io/badge/pod-v1.17.4-brightgreen.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/Swift-compatible-orange.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5152950834.svg"></a>
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
-[![Codewake](https://www.codewake.com/badges/ask_question.svg)](https://www.codewake.com/p/cyltabbarcontroller)
-</a>
-
-<p align="center">[![https://twitter.com/stevechen1010](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&maxAge=2592000)](https://twitter.com/stevechen1010)[![bitHound](http://i67.tinypic.com/wbulbr.jpg)](http://weibo.com/luohanchenyilong)
-[![Gitter](https://badges.gitter.im/ChenYilong/CYLTabBarController.svg)](https://gitter.im/ChenYilong/CYLTabBarController?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-</a>
-
+</p>
+<p align="center">
+<a href="https://twitter.com/stevechen1010"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social&maxAge=2592000"></a>
+<a href="http://weibo.com/luohanchenyilong"><img src="http://i67.tinypic.com/wbulbr.jpg"></a>
+<a href="https://gitter.im/ChenYilong/CYLTabBarController?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge"><img src="https://badges.gitter.im/ChenYilong/CYLTabBarController.svg"></a>
+</p>
 
 
 ## 导航
 
- 1.  [与其他自定义TabBarController的区别](https://github.com/ChenYilong/CYLTabBarController#与其他自定义tabbarcontroller的区别) 
- 2.  [集成后的效果](https://github.com/ChenYilong/CYLTabBarController#集成后的效果) 
- 3.  [项目结构](https://github.com/ChenYilong/CYLTabBarController#项目结构) 
- 4.  [使用CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#使用cyltabbarcontroller) 
-  1.  [ 第一步：使用CocoaPods导入CYLTabBarController ](https://github.com/ChenYilong/CYLTabBarController#第一步使用cocoapods导入cyltabbarcontroller) 
-  2.  [第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组](https://github.com/ChenYilong/CYLTabBarController#第二步设置cyltabbarcontroller的两个数组控制器数组和tabbar属性数组) 
-  3.  [第三步：将CYLTabBarController设置为window的RootViewController](https://github.com/ChenYilong/CYLTabBarController#第三步将cyltabbarcontroller设置为window的rootviewcontroller) 
-  4.  [第四步（可选）：创建自定义的形状不规则加号按钮](https://github.com/ChenYilong/CYLTabBarController#第四步可选创建自定义的形状不规则加号按钮) 
- 5.  [补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) 
-  1.  [自定义 TabBar 样式](https://github.com/ChenYilong/CYLTabBarController#自定义-tabbar-样式) 
-  2.  [横竖屏适配](https://github.com/ChenYilong/CYLTabBarController#横竖屏适配) 
-  3.  [访问初始化好的 CYLTabBarController 对象](https://github.com/ChenYilong/CYLTabBarController#访问初始化好的-cyltabbarcontroller-对象) 
-  4.  [点击 PlusButton 跳转到指定 UIViewController](https://github.com/ChenYilong/CYLTabBarController#点击-plusbutton-跳转到指定-uiviewcontroller) 
-  5.  [让TabBarItem仅显示图标，并使图标垂直居中](https://github.com/ChenYilong/CYLTabBarController#让tabbaritem仅显示图标并使图标垂直居中) 
-  6.  [在 Swift 项目中使用 CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController#在-swift-项目中使用-cyltabbarcontroller) 
-  7.  [源码实现原理](https://github.com/ChenYilong/CYLTabBarController#源码实现原理) 
- 6.  [Q-A](https://github.com/ChenYilong/CYLTabBarController#q-a) 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
+- [与其他自定义TabBarController的区别](#%E4%B8%8E%E5%85%B6%E4%BB%96%E8%87%AA%E5%AE%9A%E4%B9%89tabbarcontroller%E7%9A%84%E5%8C%BA%E5%88%AB)
+- [集成后的效果：](#%E9%9B%86%E6%88%90%E5%90%8E%E7%9A%84%E6%95%88%E6%9E%9C)
+- [项目结构](#%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84)
+- [使用CYLTabBarController](#%E4%BD%BF%E7%94%A8cyltabbarcontroller)
+  - [第一步：使用CocoaPods导入CYLTabBarController](#%E7%AC%AC%E4%B8%80%E6%AD%A5%E4%BD%BF%E7%94%A8cocoapods%E5%AF%BC%E5%85%A5cyltabbarcontroller)
+  - [第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组](#%E7%AC%AC%E4%BA%8C%E6%AD%A5%E8%AE%BE%E7%BD%AEcyltabbarcontroller%E7%9A%84%E4%B8%A4%E4%B8%AA%E6%95%B0%E7%BB%84%E6%8E%A7%E5%88%B6%E5%99%A8%E6%95%B0%E7%BB%84%E5%92%8Ctabbar%E5%B1%9E%E6%80%A7%E6%95%B0%E7%BB%84)
+  - [第三步：将CYLTabBarController设置为window的RootViewController](#%E7%AC%AC%E4%B8%89%E6%AD%A5%E5%B0%86cyltabbarcontroller%E8%AE%BE%E7%BD%AE%E4%B8%BAwindow%E7%9A%84rootviewcontroller)
+  - [第四步（可选）：创建自定义的形状不规则加号按钮](#%E7%AC%AC%E5%9B%9B%E6%AD%A5%E5%8F%AF%E9%80%89%E5%88%9B%E5%BB%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E5%BD%A2%E7%8A%B6%E4%B8%8D%E8%A7%84%E5%88%99%E5%8A%A0%E5%8F%B7%E6%8C%89%E9%92%AE)
+- [补充说明](#%E8%A1%A5%E5%85%85%E8%AF%B4%E6%98%8E)
+  - [自定义 `TabBar` 样式](#%E8%87%AA%E5%AE%9A%E4%B9%89-tabbar-%E6%A0%B7%E5%BC%8F)
+    - [捕获 TabBar 点击事件](#%E6%8D%95%E8%8E%B7-tabbar-%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6)
+  - [点击 TabBarButton 时添加动画](#%E7%82%B9%E5%87%BB-tabbarbutton-%E6%97%B6%E6%B7%BB%E5%8A%A0%E5%8A%A8%E7%94%BB)
+  - [横竖屏适配](#%E6%A8%AA%E7%AB%96%E5%B1%8F%E9%80%82%E9%85%8D)
+  - [访问初始化好的 CYLTabBarController 对象](#%E8%AE%BF%E9%97%AE%E5%88%9D%E5%A7%8B%E5%8C%96%E5%A5%BD%E7%9A%84-cyltabbarcontroller-%E5%AF%B9%E8%B1%A1)
+  - [点击 PlusButton 跳转到指定 UIViewController](#%E7%82%B9%E5%87%BB-plusbutton-%E8%B7%B3%E8%BD%AC%E5%88%B0%E6%8C%87%E5%AE%9A-uiviewcontroller)
+  - [让TabBarItem仅显示图标，并使图标垂直居中](#%E8%AE%A9tabbaritem%E4%BB%85%E6%98%BE%E7%A4%BA%E5%9B%BE%E6%A0%87%E5%B9%B6%E4%BD%BF%E5%9B%BE%E6%A0%87%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD)
+  - [多TabBar嵌套，并指定PlusButton位置](#%E5%A4%9Atabbar%E5%B5%8C%E5%A5%97%E5%B9%B6%E6%8C%87%E5%AE%9Aplusbutton%E4%BD%8D%E7%BD%AE)
+  - [在 Swift 项目中使用 CYLTabBarController](#%E5%9C%A8-swift-%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BD%BF%E7%94%A8-cyltabbarcontroller)
+  - [搭配 Storyboard 使用 CYLTabBarController](#%E6%90%AD%E9%85%8D-storyboard-%E4%BD%BF%E7%94%A8-cyltabbarcontroller)
+  - [源码实现原理](#%E6%BA%90%E7%A0%81%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86)
+- [FAQ](#faq)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 ## 与其他自定义TabBarController的区别
 
- -| 特点 |解释
--------------|-------------|-------------
-1| 低耦合，易删除 | 1、TabBar设置与业务完全分离，最低只需传两个数组即可完成主流App框架搭建。</p> 2、 PlusButton 的所有设置都在单独的一个类（ `CYLPlusButton` 的子类）中实现：删除该特定的类，就能完全将 PlusButton 从项目中删除掉。
-2 | `TabBar` 以及 `TabBar` 内的 `TabBarItem` 均使用系统原生的控件 | 因为使用原生的控件，并非 `UIButton` 或 `UIView` 。好处如下：</p> 1. 无需反复调“间距位置等”来接近系统效果。</p> 2. 在push到下一页时 `TabBar`  的隐藏和显示之间的过渡效果跟系统一致（详见“ [集成后的效果](https://github.com/ChenYilong/CYLTabBarController#集成后的效果) ”部分，给出了效果图） </p> 3. 原生控件，所以可以使用诸多系统API，比如：可以使用 ` [UITabBar appearance];` 、` [UITabBarItem appearance];` 设置样式。（详见“[补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) ”部分，给出了响应代码示例）
-3 | 自动监测是否需要添加“加号”按钮，</p>并能自动设置位置 |[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 既支持类似微信的“中规中矩”的 `TabBarController` 样式，并且默认就是微信这种样式，同时又支持类似“微博”或“淘宝闲鱼”这种具有不规则加号按钮的 `TabBarController` 。想支持这种样式，只需自定义一个加号按钮，[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 能检测到它的存在并自动将 `tabBar` 排序好，无需多余操作，并且也预留了一定接口来满足自定义需求。</p>“加号”按钮的样式、frame均在自定义的类中独立实现，不会涉及tabbar相关设置。
-4|即使加号按钮超出了tabbar的区域，</p>超出部分依然能响应点击事件 | 红线内的区域均能响应tabbar相关的点击事件，</p>![enter image description here](http://i57.tinypic.com/2r7ndzk.jpg)
-5 | 允许指定加号按钮位置 | 效果如下：</p>![enter image description here](http://a64.tinypic.com/2mo0h.jpg) </p>Airbnb-app效果：</p>![enter image description here](http://a63.tinypic.com/2mgk02v.gif)
-6| 支持让 `TabBarItem` 仅显示图标，并自动使图标垂直居中，支持自定义TabBar高度 | 效果可见Airbnb-app效果，或者下图</p>![enter image description here](https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png)
-7 |支持CocoaPods |容易集成
-8 |支持Swift项目导入 | 兼容
-9 |支持横竖屏 | －－
+ 特点 |解释
+-------------|-------------
+ 低耦合，易删除 | 1、TabBar设置与业务完全分离，最低只需传两个数组即可完成主流App框架搭建。</p> 2、 PlusButton 的所有设置都在单独的一个类（ `CYLPlusButton` 的子类）中实现：删除该特定的类，就能完全将 PlusButton 从项目中删除掉。
+ `TabBar` 以及 `TabBar` 内的 `TabBarItem` 均使用系统原生的控件 | 因为使用原生的控件，并非 `UIButton` 或 `UIView` 。好处如下：</p> 1. 无需反复调“间距位置等”来接近系统效果。</p> 2. 在push到下一页时 `TabBar`  的隐藏和显示之间的过渡效果跟系统一致（详见“ [集成后的效果](https://github.com/ChenYilong/CYLTabBarController#集成后的效果) ”部分，给出了效果图） </p> 3. 原生控件，所以可以使用诸多系统API，比如：可以使用 ` [UITabBar appearance];` 、` [UITabBarItem appearance];` 设置样式。（详见“[补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) ”部分，给出了响应代码示例）
+ 自动监测是否需要添加“加号”按钮，</p>并能自动设置位置 |[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 既支持类似微信的“中规中矩”的 `TabBarController` 样式，并且默认就是微信这种样式，同时又支持类似“微博”或“淘宝闲鱼”这种具有不规则加号按钮的 `TabBarController` 。想支持这种样式，只需自定义一个加号按钮，[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 能检测到它的存在并自动将 `tabBar` 排序好，无需多余操作，并且也预留了一定接口来满足自定义需求。</p>“加号”按钮的样式、frame均在自定义的类中独立实现，不会涉及tabbar相关设置。
+即使加号按钮超出了tabbar的区域，</p>超出部分依然能响应点击事件 | 红线内的区域均能响应tabbar相关的点击事件，</p>![enter image description here](http://i57.tinypic.com/2r7ndzk.jpg)
+允许指定加号按钮位置 | 效果如下：</p>![enter image description here](http://a64.tinypic.com/2mo0h.jpg) </p>Airbnb-app效果：</p>![enter image description here](http://a63.tinypic.com/2mgk02v.gif)
+支持让 `TabBarItem` 仅显示图标，并自动使图标垂直居中，支持自定义TabBar高度 | 效果可见Airbnb-app效果，或者下图</p>![enter image description here](https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png)
+ 支持自定义动画 | ![](https://ww1.sinaimg.cn/large/006tNbRwly1fg9hu6qnwbg308v0gctcc.gif)
+ 支持角标自定义View | ![enter image description here](https://ws4.sinaimg.cn/large/006tKfTcly1fgl0yxcaboj30yi06at8t.jpg) 
+ 支持多TabBar嵌套，并指定PlusButton位置 | ![enter image description here](https://ws4.sinaimg.cn/large/006tNc79ly1fmn3005isfg308r0iltl6.gif)
+支持CocoaPods |容易集成
+支持Swift项目导入 | 兼容
+支持横竖屏 | －－
 
 
 
@@ -94,6 +107,7 @@
 
 
 ## 使用[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController)
+
 四步完成主流App框架搭建：
 
   1.  [ 第一步：使用CocoaPods导入CYLTabBarController ](https://github.com/ChenYilong/CYLTabBarController#第一步使用cocoapods导入cyltabbarcontroller) 
@@ -104,49 +118,127 @@
 
 ### 第一步：使用CocoaPods导入CYLTabBarController
 
+ 1. CocoaPods 安装
 
-在 `Podfile` 中进行如下导入：
+  如果您的机器上已经安装了 CocoaPods，直接进入下一步即可。
 
+  如果您的网络已经翻墙，在终端中运行如下命令直接安装：
 
- ```Objective-C
-pod "CYLTabBarController", "~>1.6.3"
+  ```
+     sudo gem install cocoapods
+  ```
+
+  如果您的网络不能翻墙，可以通过国内 Ruby China 的 RubyGems 镜像进行安装。
+
+  在终端依次运行以下命令：
+
+  ```
+     gem sources --add https://gems.ruby-china.org/ --remove https://rubygems.org/
+     sudo gem install cocoapods
+  ```
+
+ 2. 查询 CocoaPods 源中的本库
+
+  在终端中运行以下命令：
+
+  ```
+     pod search CYLTabBarController
+  ```
+ 
+   这里注意，这个命令搜索的是本机上的最新版本，并没有联网查询。如果运行以上命令，没有搜到或者搜不到最新版本，您可以运行以下命令，更新一下您本地的 CocoaPods 源列表。
+
+  ```
+     pod repo update
+  ```
+ 
+ 3. 使用 CocoaPods 导入
+
+  打开终端，进入到您的工程目录，执行以下命令，会自动生成一个 Podfile 文件。
+
+  ```
+     pod init
+  ```
+
+  然后使用 CocoaPods 进行安装。如果尚未安装 CocoaPods，运行以下命令进行安装：
+
+ ```
+    gem install cocoapods
  ```
 
-注意：v1.6.3是 iOS10 适配版本，之前版本可能在 iOS10 上表现异常。
+  打开 Podfile，在您项目的 target 下加入以下内容。（在此以 v1.6.7 版本为例）
 
+  在文件 `Podfile` 中加入以下内容：
 
-然后使用 `cocoaPods` 进行安装：
-
-如果尚未安装 CocoaPods, 运行以下命令进行安装:
-
-
- ```Objective-C
-gem install cocoapods
+ ```
+    pod 'CYLTabBarController', '~> 1.17.4'
  ```
 
+  然后在终端中运行以下命令：
 
-安装成功后就可以安装依赖了：
-
-建议使用如下方式：
-
-
- ```Objective-C
- # 禁止升级CocoaPods的spec仓库，否则会卡在 Analyzing dependencies ，非常慢 
- pod update --verbose --no-repo-update
+ ```
+    pod install
  ```
 
+  或者这个命令：
 
-如果提示找不到库，则可去掉 --no-repo-update
+ ```
+    # 禁止升级 CocoaPods 的 spec 仓库，否则会卡在 Analyzing dependencies，非常慢
+    pod update --verbose --no-repo-update
+ ```
 
+  如果提示找不到库，则可去掉 `--no-repo-update`。
 
- ```Objective-C
+  完成后1.17.4，CocoaPods 会在您的工程根目录下生成一个 `.xcworkspace` 文件。您需要通过此文件打开您的工程，而不是之前的 `.xcodeproj`。
+
+**CocoaPods 使用说明**
+
+**指定 CYLTabBarController 版本** 
+
+CocoaPods 中，有几种设置 CYLTabBarController 版本的方法。如：
+
+`>= 1.16.X` 会根据您本地的 CocoaPods 源列表，导入不低于 `1.18.X` 版本的 CYLTabBarController。
+
+`~> 1.16.X` 会根据您本地的 CocoaPods 源列表，介于 1.16.X~1.18.0 之前版本的 CYLTabBarController。
+我们建议您锁定版本，便于团队开发。如，指定 1.17.4 版本。
+
+ 
+```
+    pod 'CYLTabBarController', '~> 1.17.4'
+```
+
+ - 升级本地 CocoaPods 源
+
+  `CocoaPods 有一个中心化的源，默认本地会缓存 CocoaPods 源服务器上的所有 CYLTabBarController 版本。
+
+ 如果搜索的时候没有搜到或者搜不到最新版本，可以执行以下命令更新一下本地的缓存。
+
+ ```
+pod repo update
+ ```
+ 
+ - 升级工程的 CYLTabBarController 版本
+
+ 更新您工程目录中 Podfile 指定的 CYLTabBarController 版本后，在终端中执行以下命令。
+
+ ```
 pod update
  ```
 
 
+ - 清除 Cocoapods 本地缓存
+
+ 特殊情况下，由于网络或者别的原因，通过 CocoaPods 下载的文件可能会有问题。
+
+ 这时候您可以删除 CocoaPods 的缓存(~/Library/Caches/CocoaPods/Pods/Release 目录)，再次导入即可。
+
+ - 查看当前使用的 CYLTabBarController 版本
+
+ 您可以在 Podfile.lock 文件中看到您工程中使用的 CYLTabBarController 版本。
+
+ 关于 CocoaPods 的更多内容，您可以参考 [CocoaPods 文档](https://cocoapods.org/)。
 
 
-### 第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组
+###  第二步：设置CYLTabBarController的两个数组：控制器数组和TabBar属性数组
 
  ```Objective-C
  - (void)setupViewControllers {
@@ -192,8 +284,11 @@ pod update
 }
  ```
 
+在这个字典中，`CYLTabBarItemImage` 和 `CYLTabBarItemSelectedImage` 支持 `NSString`、`UIImage`
+两种格式。`CYLTabBarItemTitle` 不设置将只展示图标，并会对布局作出居中处理。
 
-### 第三步：将CYLTabBarController设置为window的RootViewController
+
+###  第三步：将CYLTabBarController设置为window的RootViewController
 
  ```Objective-C
  - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -204,7 +299,8 @@ pod update
 }
  ```
 
-### 第四步（可选）：创建自定义的形状不规则加号按钮
+
+###  第四步（可选）：创建自定义的形状不规则加号按钮
 
 
 创建一个继承于 CYLPlusButton 的类，要求和步骤：
@@ -212,12 +308,14 @@ pod update
 
  1. 实现  `CYLPlusButtonSubclassing`  协议 
 
- 2. 子类将自身类型进行注册，一般可在 `application` 的 `applicationDelegate` 方法里面调用 `[YourClass registerPlusButton]` 或者在子类的 `+load` 方法中调用：
+ 2. 子类将自身类型进行注册，需要在 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerPlusButton]` 
+
+   这里注意，不能在子类的 `+load` 方法中调用，比如像下面这样做，在 iOS10 系统上有 Crash 的风险：
 
  ```Objective-C
- +(void)load {
+ + (void)load {
     [super registerPlusButton];
-}
+ }
  ```
 
 协议提供了可选方法：
@@ -226,6 +324,7 @@ pod update
 + (NSUInteger)indexOfPlusButtonInTabBar;
 + (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight;
 + (UIViewController *)plusChildViewController;
++ (BOOL)shouldSelectPlusChildViewController;
  ```
 
 作用分别是：
@@ -282,8 +381,10 @@ Airbnb-app效果：
 
  ```Objective-C
     //去除 TabBar 自带的顶部阴影
-    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
+    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];        
  ```
+
+// iOS10 后 需要使用 `-[CYLTabBarController hideTabBadgeBackgroundSeparator]` 见 AppDelegate 类中的演示;
 
 如何调整、自定义 `PlusButton` 与其它 `TabBarItem` 的宽度？
 
@@ -311,7 +412,7 @@ Airbnb-app效果：
  ```
 
 效果如下，
-
+1.17.4
 ![enter image description here](http://i64.tinypic.com/vx16r5.jpg)
 
 同时你也可以顺便测试下 `CYLTabBarController` 的这一个特性：
@@ -320,9 +421,13 @@ Airbnb-app效果：
 
 并且你可以在项目中的任意位置读取到 `PlusButton` 的宽度，借助 `CYLTabBarController.h` 定义的 `CYLPlusButtonWidth` 这个extern。可参考 `+[CYLTabBarControllerConfig customizeTabBarAppearance:]` 里的用法。
 
-### 补充说明
 
-#### 自定义 `TabBar` 样式
+
+## 补充说明
+
+
+
+### 自定义 `TabBar` 样式
 
 如果想更进一步的自定义 `TabBar` 样式可在 `-application:didFinishLaunchingWithOptions:` 方法中设置
 
@@ -357,8 +462,153 @@ Airbnb-app效果：
     return YES;
 }
  ```
+ 
+####  捕获 TabBar 点击事件
 
-#### 横竖屏适配
+实现 CYLTabBarController 的如下几个代理方法即可捕获点击事件。 
+  
+  下面这个方法能捕获当前点击的 `TabBar` 上的控件，可以是 `UITabBarButton`、也可以 `PlusButton`、也可以是添加到 `TabBar` 上的任意 `UIControl` 的子类。但是如果 `PlusButton` 也添加了点击事件，那么点击 `PlusButton` 将不会被触发这个代理方法。
+  
+ ```Objective-C
+//CYLTabBarController.h
+
+@protocol CYLTabBarControllerDelegate <NSObject>
+
+/*!
+ * @param tabBarController The tab bar controller containing viewController.
+ * @param control Selected UIControl in TabBar.
+ * @attention If PlusButton also add an action, then this delegate method will not be invoked when the PlusButton is selected.
+ */
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control;
+
+@end
+
+ ```
+
+ 下面这个方法能捕获跳转前所在的控制器，以及跳转到的目标控制器。
+ 
+ ```Objective-C
+//UITabBarController.h
+@protocol UITabBarControllerDelegate <NSObject>
+@optional
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController NS_AVAILABLE_IOS(3_0);
+@end
+
+ ```
+
+注意：在调用该方法时应该始终调用
+`    [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];` 来确保 `PlusButton` 的选中状态。示例如下：
+
+ ```Objective-C
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
+    return YES;
+}
+ ```
+
+相关用法已经在 Demo 中展示。
+
+ 遵循协议的方式如下：
+ 
+ 
+ ```Objective-C
+@interface AppDelegate ()<UITabBarControllerDelegate, CYLTabBarControllerDelegate>
+
+@end
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    //...
+        tabBarControllerConfig.tabBarController.delegate = self;
+    //...
+    return YES;
+}
+ ```
+
+###  点击 TabBarButton 时添加动画
+
+Demo 演示的效果图：
+
+![](https://ww1.sinaimg.cn/large/006tNbRwly1fg9hu6qnwbg308v0gctcc.gif)
+
+实现如下代理方法，就能得到对应的选中控件，可以在控件上直接添加动画。
+
+
+ ```Objective-C
+//CYLTabBarController.h
+
+@protocol CYLTabBarControllerDelegate <NSObject>
+
+/*!
+ * @param tabBarController The tab bar controller containing viewController.
+ * @param control Selected UIControl in TabBar.
+ */
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control;
+
+@end
+
+ ```
+ 
+ Demo 中示例代码如下：
+
+ 遵循协议
+ 
+ 
+ ```Objective-C
+@interface AppDelegate ()<UITabBarControllerDelegate, CYLTabBarControllerDelegate>
+
+@end
+ ```
+
+ 
+ ```Objective-C
+ //AppDelegate.m
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+    UIView *animationView;
+    // 如果 PlusButton 也添加了点击事件，那么点击 PlusButton 后不会触发该代理方法。
+    if ([control isKindOfClass:[CYLExternPlusButton class]]) {
+        UIButton *button = CYLExternPlusButton;
+        animationView = button.imageView;
+    } else if ([control isKindOfClass:NSClassFromString(@"UITabBarButton")]) {
+        for (UIView *subView in control.subviews) {
+            if ([subView isKindOfClass:NSClassFromString(@"UITabBarSwappableImageView")]) {
+                animationView = subView;
+            }
+        }
+    }
+    
+    if ([self cyl_tabBarController].selectedIndex % 2 == 0) {
+        [self addScaleAnimationOnView:animationView];
+    } else {
+        [self addRotateAnimationOnView:animationView];
+    }
+}
+
+//缩放动画
+- (void)addScaleAnimationOnView:(UIView *)animationView {
+    //需要实现的帧动画，这里根据需求自定义
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animation];
+    animation.keyPath = @"transform.scale";
+    animation.values = @[@1.0,@1.3,@0.9,@1.15,@0.95,@1.02,@1.0];
+    animation.duration = 1;
+    animation.calculationMode = kCAAnimationCubic;
+    [animationView.layer addAnimation:animation forKey:nil];
+}
+
+//旋转动画
+- (void)addRotateAnimationOnView:(UIView *)animationView {
+    [UIView animateWithDuration:0.32 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        animationView.layer.transform = CATransform3DMakeRotation(M_PI, 0, 1, 0);
+    } completion:nil];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:0.70 delay:0 usingSpringWithDamping:1 initialSpringVelocity:0.2 options:UIViewAnimationOptionCurveEaseOut animations:^{
+            animationView.layer.transform = CATransform3DMakeRotation(2 * M_PI, 0, 1, 0);
+        } completion:nil];
+    });
+}
+ ```
+
+### 横竖屏适配
 
 `TabBar` 横竖屏适配时，如果你添加了 `PlusButton`，且适配时用到了 `TabBarItem` 的宽度, 不建议使用系统的`UIDeviceOrientationDidChangeNotification` , 请使用库里的 `CYLTabBarItemWidthDidChangeNotification` 来更新 `TabBar` 布局，最典型的场景就是，根据 `TabBarItem` 在不同横竖屏状态下的宽度变化来切换选中的`TabBarItem` 的背景图片。Demo 里 `CYLTabBarControllerConfig.m` 给出了这一场景的用法:
 
@@ -369,7 +619,7 @@ Airbnb-app效果：
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {
     void (^deviceOrientationDidChangeBlock)(NSNotification *) = ^(NSNotification *notification) {
         [self tabBarItemWidthDidUpdate];
-    };
+};
     [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemWidthDidChangeNotification
                                                       object:nil
                                                        queue:[NSOperationQueue mainQueue]
@@ -393,7 +643,7 @@ Airbnb-app效果：
 
 ![enter image description here](http://i67.tinypic.com/2u4snk7.jpg)
 
-#### 访问初始化好的 CYLTabBarController 对象
+### 访问初始化好的 CYLTabBarController 对象
 
 对于任意 `NSObject` 对象：
 
@@ -428,21 +678,44 @@ Airbnb-app效果：
 }
  ```
 
-##  点击 PlusButton 跳转到指定 UIViewController
+###  点击 PlusButton 跳转到指定 UIViewController
 
 提供了一个协议方法来完成本功能：
 
 ![enter image description here](http://i68.tinypic.com/2who9rs.jpg)
 
-实现该方法后，能让 PlusButton 的点击效果与跟点击其他 UITabBarButton 效果一样，跳转到该方法指定的 UIViewController 。
+实现该方法后，能让 PlusButton 的点击效果与跟点击其他 TabBar 按钮效果一样，跳转到该方法指定的 UIViewController 。
 
 注意：必须同时实现 `+indexOfPlusButtonInTabBar` 来指定 PlusButton 的位置。
 
-遵循两个协议：
+遵循几个协议：
 
 ![enter image description here](http://i64.tinypic.com/14jw5zt.jpg)
 
-## 让TabBarItem仅显示图标，并使图标垂直居中 
+
+另外你可以通过下面这个方法获取到 `PlusButton` 的点击事件：
+
+```Objective-C
++ (BOOL)shouldSelectPlusChildViewController;
+```
+
+用法如下：
+
+
+```Objective-C
++ (BOOL)shouldSelectPlusChildViewController {
+    BOOL isSelected = CYLExternPlusButton.selected;
+    if (isSelected) {
+        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
+    } else {
+        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
+    }
+    return YES;
+}
+
+```
+
+### 让TabBarItem仅显示图标，并使图标垂直居中 
 
 要想实现该效果，只需要在设置 `tabBarItemsAttributes`该属性时不传 title 即可。
 
@@ -469,14 +742,43 @@ Airbnb-app效果：
 
 注：“仅显示图标，并使图标垂直居中”这里所指的“图标”，其所属的类是私有类： `UITabBarSwappableImageView`，所以 `CYLTabBarController` 在相关的接口命名时会包含 `SwappableImageView` 字样。另外，使用该特性需要 `pod update` 到 1.5.5以上的版本。
 
-#### 在 Swift 项目中使用 CYLTabBarController
 
-参考： [《从头开始swift2.1 仿搜材通项目（三） 主流框架Tabbed的搭建》]( http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes ) 
+### 多TabBar嵌套，并指定PlusButton位置 
+
+该功能的版本需要 >= v1.17.4。
+
+效果图：
+
+ ![enter image description here](https://ws4.sinaimg.cn/large/006tNc79ly1fmn3005isfg308r0iltl6.gif)
+
+
+实现 PlusButton 的如下协议方法指定 context：
+
+ ```Objective-C
+//CYLPlusButtonSubclassing
++ (NSString *)tabBarContext;
+
+ ```
+
+当该值与 TabBarController 的 context 能够匹配上，PlusButton 将会展示。如果 PlusButton 与 TabBarController 均未制定 context 值，那么默认 context 值是相等的。
+
+目前仅支持一个 PlusButton 展示一次，不限层级。如果与多个 TabBarController 的 context 能够匹配上，仅展示在最先一次的匹配上的 TabBarController 上。
+
+
+
+### 在 Swift 项目中使用 CYLTabBarController
+
+仓库中给出了一个Swift Demo，文件夹叫做 Example-Swift。
+
+具体的编写步骤参考热心网友提供的教程： [《从头开始swift2.1 仿搜材通项目（三） 主流框架Tabbed的搭建》]( http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes ) 
 
 这里注意，文章的示例代码有问题，少了设置 PlusButton 大小的代码：
 这将导致 PlusButton 点击事件失效，具体修改代码如下：
 ![enter image description here](http://i67.tinypic.com/118ottv.jpg)
 
+### 搭配 Storyboard 使用 CYLTabBarController
+
+[这里](https://github.com/ChenYilong/CYLDeallocBlockExecutor) ，里面有个文件夹CYLTabBarControllerTestDemo，这个Demo演示了如何搭配 Storyboard 使用。
 
 ### 源码实现原理
 
@@ -484,8 +786,10 @@ Airbnb-app效果：
 
 更多文档信息可查看 [ ***CocoaDocs：CYLTabBarController*** ](http://cocoadocs.org/docsets/CYLTabBarController/1.2.1/index.html) 。
 
-## Q-A
+## FAQ
 
+
+更多Q-A内容，可以在这里查看： [issue-FAQ](https://github.com/ChenYilong/CYLTabBarController/issues?utf8=✓&q=+label%3AQ-A+) 
 Q：为什么放置6个TabBarItem会显示异常？
 
 A：
@@ -566,6 +870,61 @@ A: 这个是自动做的，但是 `CYLTabBarController` 只能保证的是：只
 这是因为，在响应链上，`UIControl` 能响应点击事件， `UIImage` 无法响应。
 
 
+Q：为什么在iOS10上会Crash，iOS9上不会？
+
+
+A：
+  在注册加号按钮时，需要在 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerPlusButton]` 
+
+   这里注意，不能在子类的 `+load` 方法中调用，比如像下面这样做，在 iOS10 系统上有 Crash 的风险：
+
+ ```Objective-C
+ + (void)load {
+    [super registerPlusButton];
+}
+ ```
+
+Q: 我的样式是点击 `plusButton` 后跳转到一个 `ViewController`，但是选中了一次中间的 `plusButton` 之后，再点别的 `tabItem` ，中间不会变成 `normal` 的状态。
+
+A: 有两种情况会造成这个问题：
+
+ 1.  应该是你的 `tabBar` 设置了 `delegate` 了，你要是 `tabBar` 的代理没设置的话，默认会有这个 `selected` 状态切换的处理。你设置代理后，会覆盖我的行为。所以手动加上就好了。
+
+ ```Objective-C
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
+    return YES;
+}
+ ```
+
+ 2. `plusButton` 添加了自定义点击事件或者自定义手势，因为这样会造成点击事件冲突或手势冲突，当需要 `pushViewController` 的时候，这个库会自动的添加点击事件，你这里重新加了点击事件所以冲突了；
+
+ 在你项目的基础，把 `plusButton` 的点击事件取消掉,也就是 `addTarget` 这一行注释掉，手势事件也同理，应该就ok了
+
+A: `PlusButton` 与其他的 `TabBarItem` 距离没有平均分布 
+
+(对应于 [issue#36](https://github.com/ChenYilong/CYLTabBarController/issues/36#issuecomment-269165471) )
+
+把这 Demo 里的这一行代码改下：
+
+ ```Objective-C
+[button sizeToFit];
+ ```
+
+改成：
+
+ ```Objective-C
+button.frame = CGRectMake(0.0, 0.0, w, h);
+ ```
+
+那么如果单是放一个照相机的图片，一般是多大的尺寸？
+
+这个要看设计图，通常情况下，你可以写死与其他TabBarItem一样大小：
+
+
+ ```Objective-C
+ [UIScreen mainScreen].bounds.size.width / [CYLTabBarController allItemsInTabBarCount]
+ ```
 
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
 
@@ -573,3 +932,5 @@ A: 这个是自动做的，但是 `CYLTabBarController` 只能保证的是：只
 Posted by [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/)  
 原创文章，版权声明：自由转载-非商用-非衍生-保持署名 | [Creative Commons BY-NC-ND 3.0](http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh)
 <p align="center"><a href="http://weibo.com/u/1692391497?s=6uyXnP" target="_blank"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1692391497/b46c844b/1.png"/></a></a>
+
+
