@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/chenyilong/Downloads/YGTabbar/CYLTabbarController-Swift.xcodeproj">
+      location = "self:CYLTabBarController-Swift.xcodeproj">
    </FileRef>
 </Workspace>

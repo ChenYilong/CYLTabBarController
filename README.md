@@ -770,6 +770,8 @@ Demo 演示的效果图：
 
 仓库中给出了一个Swift Demo，文件夹叫做 Example-Swift。
 
+感谢[@WeMadeCode](https://github.com/WeMadeCode) 提供的 Swift 版 Demo，原仓库地址：[WeMadeCode/CYLTabBarController-Swift](https://github.com/WeMadeCode/CYLTabBarController-Swift) 
+
 具体的编写步骤参考热心网友提供的教程： [《从头开始swift2.1 仿搜材通项目（三） 主流框架Tabbed的搭建》]( http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes ) 
 
 这里注意，文章的示例代码有问题，少了设置 PlusButton 大小的代码：
