@@ -24,7 +24,7 @@ FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 
 @protocol CYLTabBarControllerDelegate <NSObject>
-
+@optional
 /*!
  * @param tabBarController The tab bar controller containing viewController.
  * @param control Selected UIControl in TabBar.
