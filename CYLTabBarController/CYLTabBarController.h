@@ -101,6 +101,8 @@ FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 
 - (void)hideTabBadgeBackgroundSeparator;
 
+- (void)setTintColor:(UIColor *)tintColor;
+
 /*!
  * Judge if there is plus button.
  */

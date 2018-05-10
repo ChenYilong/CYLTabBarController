@@ -342,14 +342,12 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     viewController.tabBarItem.title = title;
     if (normalImageInfo) {
         UIImage *normalImage = [self getImageFromImageInfo:normalImageInfo];
-//        normalImage = [normalImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         viewController.tabBarItem.image = normalImage;
     }
     if (selectedImageInfo) {
         UIImage *selectedImage = [self getImageFromImageInfo:selectedImageInfo];
-//        selectedImage = [selectedImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         viewController.tabBarItem.selectedImage = selectedImage;
-    }
+    } 
     if (self.shouldCustomizeImageInsets) {
         viewController.tabBarItem.imageInsets = self.imageInsets;
     }
@@ -363,6 +361,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     UIImage *image = nil;
     if ([imageInfo isKindOfClass:[NSString class]]) {
         image = [UIImage imageNamed:imageInfo];
+        image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     } else if ([imageInfo isKindOfClass:[UIImage class]]) {
         image = (UIImage *)imageInfo;
     }
