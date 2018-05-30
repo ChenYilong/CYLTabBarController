@@ -52,7 +52,6 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 }
 
 - (void)viewDidLayoutSubviews {
-    [self.tabBar layoutSubviews];//Fix issue #93
     UITabBar *tabBar =  self.tabBar;
     for (UIControl *control in tabBar.subviews) {
         if ([control isKindOfClass:[UIControl class]]) {
