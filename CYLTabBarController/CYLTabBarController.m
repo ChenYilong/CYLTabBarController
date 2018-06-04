@@ -52,7 +52,10 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 }
 
 - (void)viewDidLayoutSubviews {
-    [self.tabBar layoutSubviews];//Fix issue #93
+    CGFloat deviceVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
+    if (deviceVersion >=10 && deviceVersion <10.2) {
+        [self.tabBar layoutSubviews];//Fix issue #93
+    }
     UITabBar *tabBar =  self.tabBar;
     for (UIControl *control in tabBar.subviews) {
         if ([control isKindOfClass:[UIControl class]]) {

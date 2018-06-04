@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "CYLTabBarController"
-  s.version      = "1.17.9"
+  s.version      = "1.17.10"
   s.summary      = "Highly customizable tabBar and tabBarController for iOS"
   s.description  = "CYLTabBarController is iPad and iPhone compatible. Supports landscape and portrait orientations and can be used inside UINavigationController."
   s.homepage     = "https://github.com/ChenYilong/CYLTabBarController"
