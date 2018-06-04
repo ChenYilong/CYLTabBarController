@@ -77,9 +77,10 @@
     }
     NSArray<__kindof UIView *> *backgroundSubviews = subview.subviews;
     if (backgroundSubviews.count > 1) {
-        UIView *tabBadgeBackgroundSeparator = backgroundSubviews[1];
-        if (CGRectGetHeight(tabBadgeBackgroundSeparator.bounds) < 1.0 ) {
-            return tabBadgeBackgroundSeparator;
+        for (UIView *tabBadgeBackgroundSeparator in backgroundSubviews) {
+            if (CGRectGetHeight(tabBadgeBackgroundSeparator.bounds) < 1.0 ) {
+                return tabBadgeBackgroundSeparator;
+            }
         }
     }
     return nil;
