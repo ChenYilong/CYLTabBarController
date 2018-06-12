@@ -142,11 +142,8 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         CYLTabBarItemWidth = (tabBarWidth) / CYLTabbarItemsCount;
         [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIView * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
             //仅修改childView的x和宽度,yh值不变
-            childView.frame = CGRectMake(buttonIndex * CYLTabBarItemWidth,
-                                         CGRectGetMinY(childView.frame),
-                                         CYLTabBarItemWidth,
-                                         CGRectGetHeight(childView.frame)
-                                         );
+            CGFloat childViewX = buttonIndex * CYLTabBarItemWidth;
+            [self changeXForChildView:childView childViewX:childViewX tabBarItemWidth:CYLTabBarItemWidth];
         }];
         
     } else {
@@ -172,17 +169,22 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
                 }
             }
             //仅修改childView的x和宽度,yh值不变
-            childView.frame = CGRectMake(childViewX,
-                                         CGRectGetMinY(childView.frame),
-                                         CYLTabBarItemWidth,
-                                         CGRectGetHeight(childView.frame)
-                                         );
+            [self changeXForChildView:childView childViewX:childViewX tabBarItemWidth:CYLTabBarItemWidth];
         }];
         //bring the plus button to top
         [self bringSubviewToFront:_plusButton];
     }
 
     self.tabBarItemWidth = CYLTabBarItemWidth;
+}
+
+- (void)changeXForChildView:(UIView *)childView childViewX:(CGFloat)childViewX tabBarItemWidth:(CGFloat)tabBarItemWidth {
+    //仅修改childView的x和宽度,yh值不变
+    childView.frame = CGRectMake(childViewX,
+                                 CGRectGetMinY(childView.frame),
+                                 tabBarItemWidth,
+                                 CGRectGetHeight(childView.frame)
+                                 );
 }
 
 #pragma mark -
@@ -267,12 +269,9 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     NSUInteger plusButtonIndex;
     if ([[self.plusButton class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
         plusButtonIndex = [[self.plusButton class] indexOfPlusButtonInTabBar];
-        //仅修改self.plusButton的x,ywh值不变
-        self.plusButton.frame = CGRectMake(plusButtonIndex * CYLTabBarItemWidth,
-                                           CGRectGetMinY(self.plusButton.frame),
-                                           CGRectGetWidth(self.plusButton.frame),
-                                           CGRectGetHeight(self.plusButton.frame)
-                                           );
+        CGFloat childViewX = plusButtonIndex * CYLTabBarItemWidth;
+        CGFloat tabBarItemWidth = CGRectGetWidth(self.plusButton.frame);
+        [self changeXForChildView:self.plusButton childViewX:childViewX tabBarItemWidth:tabBarItemWidth];
     } else {
         if (CYLTabbarItemsCount % 2 != 0) {
             [NSException raise:NSStringFromClass([CYLTabBarController class]) format:@"If the count of CYLTabbarControllers is odd,you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】如果CYLTabbarControllers的个数是奇数，你必须在你自定义的plusButton中实现`+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];

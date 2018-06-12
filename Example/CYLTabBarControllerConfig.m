@@ -97,22 +97,34 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     NSDictionary *firstTabBarItemsAttributes = @{
 //                                                 CYLTabBarItemTitle : @"首页",
                                                  CYLTabBarItemImage : @"home_normal",  /* NSString and UIImage are supported*/
-                                                 CYLTabBarItemSelectedImage : @"home_highlight", /* NSString and UIImage are supported*/
+                                                 CYLTabBarItemSelectedImage : [UIImage imageNamed:@"home_highlight"], /* NSString and UIImage are supported*/
+//                                                 CYLTabBarItemImageInsets: [NSValue valueWithUIEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)],
+//                                                 CYLTabBarItemImageInsets: [NSValue valueWithUIEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)]
                                                  };
     NSDictionary *secondTabBarItemsAttributes = @{
 //                                                  CYLTabBarItemTitle : @"同城",
                                                   CYLTabBarItemImage : @"mycity_normal",
-                                                  CYLTabBarItemSelectedImage : @"mycity_highlight",
+                                                  CYLTabBarItemSelectedImage : [UIImage imageNamed:@"mycity_highlight"],
+//                                                  CYLTabBarItemImageInsets: [NSValue valueWithUIEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)],
+//                                                  CYLTabBarItemImageInsets: [NSValue valueWithUIEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)]
+
+
+
                                                   };
     NSDictionary *thirdTabBarItemsAttributes = @{
 //                                                 CYLTabBarItemTitle : @"消息",
                                                  CYLTabBarItemImage : @"message_normal",
-                                                 CYLTabBarItemSelectedImage : @"message_highlight",
+                                                 CYLTabBarItemSelectedImage : [UIImage imageNamed:@"message_highlight"],
+//                                                 CYLTabBarItemImageInsets: [NSValue valueWithUIEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)],
+//                                                 CYLTabBarItemImageInsets: [NSValue valueWithUIEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)]
+
                                                  };
     NSDictionary *fourthTabBarItemsAttributes = @{
 //                                                  CYLTabBarItemTitle : @"我的",
                                                   CYLTabBarItemImage : @"account_normal",
-                                                  CYLTabBarItemSelectedImage : @"account_highlight"
+                                                  CYLTabBarItemSelectedImage : [UIImage imageNamed:@"account_highlight"],
+//                                                  CYLTabBarItemImageInsets: [NSValue valueWithUIEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)],
+//                                                  CYLTabBarItemImageInsets: [NSValue valueWithUIEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)]
                                                   };
     NSArray *tabBarItemsAttributes = @[
                                        firstTabBarItemsAttributes,
@@ -163,7 +175,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
     [[UITabBar appearance] setBackgroundColor:[UIColor whiteColor]];
 //    [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"tapbar_top_line"]];
-    
+//    [[UITabBar appearance] setTintColor:[UIColor redColor]];
     // set the bar background image
     // 设置背景图片
      UITabBar *tabBarAppearance = [UITabBar appearance];
@@ -207,7 +219,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 }
 
 + (UIImage *)scaleImage:(UIImage *)image toScale:(float)scaleSize {
-    UIGraphicsBeginImageContext(CGSizeMake([UIScreen mainScreen].bounds.size.width * scaleSize, image.size.height * scaleSize));
+    CGSize size = CGSizeMake([UIScreen mainScreen].bounds.size.width * scaleSize, image.size.height * scaleSize);
+    UIGraphicsBeginImageContextWithOptions(size, NO, 1.0);
     [image drawInRect:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * scaleSize, image.size.height * scaleSize)];
     UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
