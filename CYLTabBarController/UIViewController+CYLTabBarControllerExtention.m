@@ -18,9 +18,9 @@
 - (UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index {
     UIViewController *viewController = [self cyl_getViewControllerInsteadOfNavigationController];
     [viewController checkTabBarChildControllerValidityAtIndex:index];
-    [viewController.navigationController popToRootViewControllerAnimated:NO];
     CYLTabBarController *tabBarController = [viewController cyl_tabBarController];
     tabBarController.selectedIndex = index;
+    [viewController.navigationController popToRootViewControllerAnimated:NO];
     UIViewController *selectedTabBarChildViewController = tabBarController.selectedViewController;
     return [selectedTabBarChildViewController cyl_getViewControllerInsteadOfNavigationController];
 }
