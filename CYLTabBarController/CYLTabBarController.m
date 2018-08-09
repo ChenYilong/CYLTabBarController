@@ -460,12 +460,10 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         viewController = tabBarViewController.selectedViewController;
     }
      BOOL isCurrentViewController = [self isEqualViewController:viewController compairedViewController:CYLPlusChildViewController];
-    if (!hasPlusChildViewController) {
-        return;
-    }
     BOOL shouldConfigureSelectionStatus = (!isCurrentViewController);
     if (shouldConfigureSelectionStatus) {
         plusButton.selected = NO;
+        [self didSelectControl:nil];
     } else {
         plusButton.selected = YES;
         [self didSelectControl:plusButton];
@@ -495,7 +493,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     if ([self.delegate respondsToSelector:actin]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        [self.delegate performSelector:actin withObject:self withObject:control];
+        [self.delegate performSelector:actin withObject:self withObject:control ?: self.selectedViewController.tabBarItem.cyl_tabButton];
 #pragma clang diagnostic pop
     }
 }
