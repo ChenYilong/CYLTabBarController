@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9A0E059421180EE200588A43 /* home_selected_cover@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A0E059221180EE200588A43 /* home_selected_cover@2x.png */; };
+		9A0E059521180EE200588A43 /* home_selected_cover@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A0E059321180EE200588A43 /* home_selected_cover@3x.png */; };
 		9A1559C51CB6D4C700CAB1AF /* CYLTabBarControllerConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559C41CB6D4C700CAB1AF /* CYLTabBarControllerConfig.m */; };
 		9A1559C81CB6D4D300CAB1AF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559C61CB6D4D300CAB1AF /* AppDelegate.m */; };
 		9A1559DB1CB6D56500CAB1AF /* CYLHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559CC1CB6D56500CAB1AF /* CYLHomeViewController.m */; };
@@ -30,6 +32,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9A0E059221180EE200588A43 /* home_selected_cover@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "home_selected_cover@2x.png"; sourceTree = "<group>"; };
+		9A0E059321180EE200588A43 /* home_selected_cover@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "home_selected_cover@3x.png"; sourceTree = "<group>"; };
 		9A1559C31CB6D4C700CAB1AF /* CYLTabBarControllerConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLTabBarControllerConfig.h; sourceTree = "<group>"; };
 		9A1559C41CB6D4C700CAB1AF /* CYLTabBarControllerConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarControllerConfig.m; sourceTree = "<group>"; };
 		9A1559C61CB6D4D300CAB1AF /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -84,6 +88,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9A0E059121180EE200588A43 /* home_selected_cover */ = {
+			isa = PBXGroup;
+			children = (
+				9A0E059221180EE200588A43 /* home_selected_cover@2x.png */,
+				9A0E059321180EE200588A43 /* home_selected_cover@3x.png */,
+			);
+			path = home_selected_cover;
+			sourceTree = "<group>";
+		};
 		9A1559C91CB6D56500CAB1AF /* Module */ = {
 			isa = PBXGroup;
 			children = (
@@ -190,6 +203,7 @@
 		9AE942C81BDC933E00354519 /* Example */ = {
 			isa = PBXGroup;
 			children = (
+				9A0E059121180EE200588A43 /* home_selected_cover */,
 				9A1559C71CB6D4D300CAB1AF /* AppDelegate.h */,
 				9A1559C61CB6D4D300CAB1AF /* AppDelegate.m */,
 				9A1559C31CB6D4C700CAB1AF /* CYLTabBarControllerConfig.h */,
@@ -295,6 +309,8 @@
 			files = (
 				9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */,
 				9AE942E71BDC933E00354519 /* LaunchScreen.xib in Resources */,
+				9A0E059521180EE200588A43 /* home_selected_cover@3x.png in Resources */,
+				9A0E059421180EE200588A43 /* home_selected_cover@2x.png in Resources */,
 				9AE942E81BDC933E00354519 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
