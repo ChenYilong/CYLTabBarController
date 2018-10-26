@@ -31,10 +31,14 @@
     [self.view addSubview:label];
 }
 
--(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [self cyl_popSelectTabBarChildViewControllerAtIndex:3 completion:^(__kindof UIViewController *selectedTabBarChildViewController) {
         CYLMineViewController *mineViewController = selectedTabBarChildViewController;
-        [mineViewController testPush];
+        @try {
+            [mineViewController testPush];
+        } @catch (NSException *exception) {
+            NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        }
     }];
 }
 
