@@ -70,8 +70,8 @@
  */
 + (id)plusButton {
     CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
-    UIImage *normalButtonImage = [UIImage imageNamed:@"video_normal"];
-    UIImage *hlightButtonImage = [UIImage imageNamed:@"video_hlight"];
+    UIImage *normalButtonImage = [UIImage imageNamed:@"post_normal"];
+    UIImage *hlightButtonImage = [UIImage imageNamed:@"post_highlight"];
     [button setImage:normalButtonImage forState:UIControlStateNormal];
     [button setImage:hlightButtonImage forState:UIControlStateSelected];
     UIImage *normalButtonBackImage = [UIImage imageNamed:@"videoback"];
