@@ -437,7 +437,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         UIView *selectedTabBarButton = tabBarButtons[index];
         CGRect selectedTabBarButtonFrame = selectedTabBarButton.frame;
         BOOL isTabBarButtonFrame = CGRectContainsPoint(selectedTabBarButtonFrame, point);
-        if (isTabBarButtonFrame) {
+        if (isTabBarButtonFrame && !selectedTabBarButton.hidden) {
             return selectedTabBarButton;
         }
     }
