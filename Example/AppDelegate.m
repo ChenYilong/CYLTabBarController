@@ -8,10 +8,10 @@
 
 #import "AppDelegate.h"
 #import "CYLPlusButtonSubclass.h"
-#import "HDLTabBarController.h"
+#import "MainTabBarController.h"
 
 @interface AppDelegate ()<UITabBarControllerDelegate, CYLTabBarControllerDelegate>
-@property (nonatomic, strong) HDLTabBarController *tabBarController;
+@property (nonatomic, strong) MainTabBarController *tabBarController;
 @property (nonatomic, weak) UIButton *selectedCover;
 
 @end
@@ -26,26 +26,27 @@
     self.window = [[UIWindow alloc]init];
     self.window.frame = [UIScreen mainScreen].bounds;
     [CYLPlusButtonSubclass registerPlusButton];
-    HDLTabBarController *tabBarController = [[HDLTabBarController alloc] init];
+    MainTabBarController *tabBarController = [[MainTabBarController alloc] init];
     [tabBarController hideTabBadgeBackgroundSeparator];
-    [tabBarController setViewDidLayoutSubViewsBlock:^(CYLTabBarController *tabBarController) {
-        if ([self cyl_tabBarController].selectedIndex != 0) {
-            return;
-        }
-        static dispatch_once_t onceToken;
-        UITabBar *tabBar =  tabBarController.tabBar;
-        for (UIControl *control in tabBar.subviews) {
-            if ([control cyl_isTabButton]) {
-                dispatch_once(&onceToken, ^{
-                    NSUInteger delaySeconds = 0.2;
-                    dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
-                    dispatch_after(when, dispatch_get_main_queue(), ^{
-                        [self setSelectedCoverShow:YES];
-                    });
-                });
-            }
-        }
-    }];
+    //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+//    [tabBarController setViewDidLayoutSubViewsBlock:^(CYLTabBarController *tabBarController) {
+//        if ([self cyl_tabBarController].selectedIndex != 0) {
+//            return;
+//        }
+//        static dispatch_once_t onceToken;
+//        UITabBar *tabBar =  tabBarController.tabBar;
+//        for (UIControl *control in tabBar.subviews) {
+//            if ([control cyl_isTabButton]) {
+//                dispatch_once(&onceToken, ^{
+//                    NSUInteger delaySeconds = 0.2;
+//                    dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
+//                    dispatch_after(when, dispatch_get_main_queue(), ^{
+//                        [self setSelectedCoverShow:YES];
+//                    });
+//                });
+//            }
+//        }
+//    }];
     tabBarController.delegate = self;
     self.tabBarController = tabBarController;
     [self.window setRootViewController:tabBarController];
@@ -94,7 +95,6 @@
     animation.calculationMode = kCAAnimationCubic;
     [animationView.layer addAnimation:animation forKey:nil];
 }
-
 
 - (void)customizeInterfaceWithTabBarController:(CYLTabBarController *)tabBarController {
     //设置导航栏
@@ -162,16 +162,15 @@
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
     [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
-    if ([viewController.tabBarItem.cyl_tabButton cyl_isTabButton]|| [viewController.tabBarItem.cyl_tabButton cyl_isPlusButton]) {
-        CGFloat index = [tabBarController.viewControllers indexOfObject:viewController];
-        BOOL shouldSelectedCoverShow = (index == 0);
-        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@===%@", @(__PRETTY_FUNCTION__), @(__LINE__), tabBarController, @(tabBarController.selectedIndex));
-        [self setSelectedCoverShow:shouldSelectedCoverShow];
-    }
+    //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+//    if ([viewController.tabBarItem.cyl_tabButton cyl_isTabButton]|| [viewController.tabBarItem.cyl_tabButton cyl_isPlusButton]) {
+//        CGFloat index = [tabBarController.viewControllers indexOfObject:viewController];
+//        BOOL shouldSelectedCoverShow = (index == 0);
+//        [self setSelectedCoverShow:shouldSelectedCoverShow];
+//    }
     
     return YES;
 }
-
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;

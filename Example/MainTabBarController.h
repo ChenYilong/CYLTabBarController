@@ -1,5 +1,5 @@
 //
-//  HDLTabBarController.h
+//  MainTabBarController.h
 //  CYLTabBarController
 //
 //  v1.16.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 15/11/3.
@@ -16,7 +16,7 @@
 @interface CYLBaseNavigationController : UINavigationController
 @end
 
-@interface HDLTabBarController : CYLTabBarController
+@interface MainTabBarController : CYLTabBarController
 
 //@property (nonatomic, copy) NSString *context;
 

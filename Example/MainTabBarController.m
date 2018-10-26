@@ -1,11 +1,11 @@
 //
-//  HDLTabBarController.m
+//  MainTabBarController.m
 //  CYLTabBarController
 //
 //  v1.16.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
 //  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
 //
-#import "HDLTabBarController.h"
+#import "MainTabBarController.h"
 #import <UIKit/UIKit.h>
 
 static CGFloat const CYLTabBarControllerHeight = 40.f;
@@ -29,11 +29,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 #import "CYLMineViewController.h"
 #import "CYLSameCityViewController.h"
 
-@interface HDLTabBarController ()<UITabBarControllerDelegate>
+@interface MainTabBarController ()<UITabBarControllerDelegate>
 
 @end
 
-@implementation HDLTabBarController
+@implementation MainTabBarController
 
 - (instancetype)init {
     if (!(self = [super init])) {
@@ -53,7 +53,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                                                              context:nil
                                              ];
     [self customizeTabBarAppearance:tabBarController];
-    return (self = (HDLTabBarController *)tabBarController);
+    return (self = (MainTabBarController *)tabBarController);
 }
 
 - (NSArray *)viewControllers {
@@ -157,7 +157,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // If your app need support UIDeviceOrientationLandscapeLeft or UIDeviceOrientationLandscapeRight，
     // remove the comment '//'
     // 如果你的App需要支持横竖屏，请使用该方法移除注释 '//'
-    // [self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
+     [self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
     
     // set the bar shadow image
     // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
