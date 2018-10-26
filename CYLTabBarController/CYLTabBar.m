@@ -47,7 +47,7 @@ static void * const CYLTabBarContext = (void*)&CYLTabBarContext;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
             if (@available(iOS 12.1, *)) {
-                OverridImplementation(NSClassFromString(@"UITabBarButton"), @selector(setFrame:), ^id(__unsafe_unretained Class originClass, SEL originCMD, IMP originIMP) {
+                OverrideImplementation(NSClassFromString(@"UITabBarButton"), @selector(setFrame:), ^id(__unsafe_unretained Class originClass, SEL originCMD, IMP originIMP) {
                     return ^(UIView *selfObject, CGRect firstArgv) {
     
                         if ([selfObject isKindOfClass:originClass]) {
