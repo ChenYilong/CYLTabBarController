@@ -3,7 +3,7 @@
 //  CYLTabBarController
 //
 //  v1.16.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2015 https://github.com/ChenYilong . All rights reserved.
+//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLMineViewController.h"
@@ -19,7 +19,7 @@
     self.navigationItem.title = @"我的";    //✅sets navigation bar title.The right way to set the title of the navigation
     self.tabBarItem.title = @"我的23333";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
     //self.title = @"我的1";                //❌sets both of these. Do not do this‼️‼️ This may cause something strange like this : http://i68.tinypic.com/282l3x4.jpg .
-    [self.navigationController.tabBarItem setBadgeValue:@"3"];
+//    [self.navigationController.tabBarItem setBadgeValue:@"3"];
 }
 
 #pragma mark - Methods

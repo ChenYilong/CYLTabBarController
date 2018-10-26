@@ -9,28 +9,28 @@
 import UIKit
 
 class MessageViewController: UIViewController {
-
+    private weak var myLabel1:UILabel!
+    private weak var myLabel2:UILabel!
+    private weak var myLabel3:UILabel!
+    private weak var myLabel4:UILabel!
+    private weak var myLabel5:UILabel!
+    private weak var myLabel6:UILabel!
+    
+    var buttonColor: UIColor {
+        return UIColor(named: "buttonColor")!
+    }
+    
+    var labelColor: UIColor {
+        return UIColor(named: "labelColor")!
+    }
+    
+    var textFieldColor: UIColor {
+        return UIColor(named: "textFieldColor")!
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.view.backgroundColor = UIColor.gray
-
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

@@ -3,7 +3,7 @@
 //  CYLTabBarController
 //
 //  v1.16.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 16/2/26.
-//  Copyright © 2016年 https://github.com/ChenYilong .All rights reserved.
+//  Copyright © 2018年 https://github.com/ChenYilong .All rights reserved.
 //
 
 #import "UIViewController+CYLTabBarControllerExtention.h"

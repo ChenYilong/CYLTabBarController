@@ -1,9 +1,8 @@
 //
 //  AppDelegate.swift
-//  SwiftDemo
 //
-//  Created by Anthony on 2017/10/12.
-//  Copyright © 2017年 Anthony. All rights reserved.
+//  v1.16.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
 //
 
 import UIKit
@@ -17,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
     var window: UIWindow?
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
        
         CYLPlusButtonSubclass.register()
         
