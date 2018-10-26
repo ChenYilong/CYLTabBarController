@@ -458,4 +458,12 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     return nil;
 }
 
+// In iOS 11, UITabBarItem's have the title to the right of the icon in horizontally regular environments
+// (i.e. the iPad).  In order to keep the title below the icon, it was necessary to subclass UITabBar and override
+// traitCollection to make it horizontally compact.
+
+- (UITraitCollection *)traitCollection {
+    return [UITraitCollection traitCollectionWithHorizontalSizeClass:UIUserInterfaceSizeClassCompact];
+}
+
 @end
