@@ -20,6 +20,8 @@ NSString *const CYLTabBarItemTitlePositionAdjustment = @"CYLTabBarItemTitlePosit
 NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;
 CGFloat CYLTabBarItemWidth = 0.0f;
+CGFloat CYLTabBarHeight = 0.0f;
+
 NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDidChangeNotification";
 static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageViewDefaultOffsetContext;
 
@@ -84,6 +86,11 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         frame.origin.y = self.view.frame.size.height - tabBarHeight;
         frame;
     });
+}
+
+- (void)setTabBarHeight:(CGFloat)tabBarHeight {
+    _tabBarHeight = tabBarHeight;
+    CYLTabBarHeight = tabBarHeight;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {

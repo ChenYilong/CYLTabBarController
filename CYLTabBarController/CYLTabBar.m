@@ -12,6 +12,8 @@
 #import "CYLConstants.h"
 #import <objc/runtime.h>
 
+static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
+
 /**
  *  用 block 重写某个 class 的指定方法
  *  @param targetClass 要重写的 class
@@ -30,9 +32,6 @@ OverrideImplementation(Class targetClass, SEL targetSelector, id (^implementatio
     return YES;
 }
 
-
-static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
-
 @interface CYLTabBar ()
 
 /** 发布按钮 */
@@ -49,23 +48,30 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 #pragma mark -
 #pragma mark - LifeCycle Method
 
+static CGFloat const CYLIPhoneXTabbarButtonHeight = 48;
+static CGFloat const CYLIPhoneXTabbarButtonSafeAreaHeight = 35;
+
 + (void)load {
-    /* 这个问题是 iOS 12.1 Beta 2 的问题，只要 UITabBar 是磨砂的，并且 push viewController 时 hidesBottomBarWhenPushed = YES 则手势返回的时候就会触发。
-     
-     出现这个现象的直接原因是 tabBar 内的按钮 UITabBarButton 被设置了错误的 frame，frame.size 变为 (0, 0) 导致的。如果12.1正式版Apple修复了这个bug可以移除调这段代码(来源于QMUIKit的处理方式)*/
+    /* 这个问题是 iOS 12.1 的问题，只要 UITabBar 是磨砂的，并且 push viewController 时 hidesBottomBarWhenPushed = YES 则手势返回的时候就会触发。(来源于QMUIKit的处理方式)*/
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         if (@available(iOS 12.1, *)) {
             OverrideImplementation(NSClassFromString(@"UITabBarButton"), @selector(setFrame:), ^id(__unsafe_unretained Class originClass, SEL originCMD, IMP originIMP) {
                 return ^(UIView *selfObject, CGRect firstArgv) {
-                    
                     if ([selfObject isKindOfClass:originClass]) {
+                        
                         // 如果发现即将要设置一个 size 为空的 frame，则屏蔽掉本次设置
                         if (!CGRectIsEmpty(selfObject.frame) && CGRectIsEmpty(firstArgv)) {
                             return;
                         }
+                        
+                        // 兼容 iOS 12 的 iPhoneX
+                        CGFloat tabBarHeight = firstArgv.size.height;
+                        CGFloat realTabBarHeight = CYLTabBarHeight ? (CYLTabBarHeight - CYLIPhoneXTabbarButtonSafeAreaHeight): CYLIPhoneXTabbarButtonHeight;
+                        if (CYL_IS_IPHONE_X && (tabBarHeight != realTabBarHeight)) {
+                            firstArgv.size.height = realTabBarHeight;
+                        }
                     }
-                    
                     // call super
                     void (*originSelectorIMP)(id, SEL, CGRect);
                     originSelectorIMP = (void (*)(id, SEL, CGRect))originIMP;
