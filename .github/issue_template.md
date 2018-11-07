@@ -18,7 +18,7 @@
 
 ## 3. Here is a Demo. 
 
-<!--- 尽量提供一个可以复现的Demo，我的邮箱：luohanchenyilong@163.com。或者前往 Telegram 群交流 https://t.me/iosobjc -->
+<!--- 尽量提供一个可以复现的Demo，我的邮箱：luohanchenyilong@163.com。或者前往 Telegram 群交流 https://t.me/CYLTabBarController -->
 
 ## 4. Here is my Debug log
 
