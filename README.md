@@ -11,9 +11,10 @@
 <p align="center">
 <a href="https://twitter.com/stevechen1010"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social&maxAge=2592000"></a>
 <a href="http://weibo.com/luohanchenyilong"><img src="http://i67.tinypic.com/wbulbr.jpg"></a>
-<a href="https://gitter.im/ChenYilong/CYLTabBarController?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge"><img src="https://badges.gitter.im/ChenYilong/CYLTabBarController.svg"></a>
+</a><a href="https://t.me/CYLTabBarController"><img src="http://i66.tinypic.com/of2hbn.jpg"></a></a> 
 </p>
 
+学习QQ群 515295083 或 Telegram 群交流 https://t.me/iosobjc
 
 ## 导航
 
