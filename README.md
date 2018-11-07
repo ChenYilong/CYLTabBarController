@@ -14,7 +14,7 @@
 </a><a href="https://t.me/CYLTabBarController"><img src="http://i66.tinypic.com/of2hbn.jpg"></a></a> 
 </p>
 
-学习QQ群 515295083 或 Telegram 群交流 https://t.me/iosobjc
+学习QQ群 515295083 或 Telegram 群交流 https://t.me/CYLTabBarController 
 
 ## 导航
 
