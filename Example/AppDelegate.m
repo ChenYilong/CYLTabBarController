@@ -162,13 +162,6 @@
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
     [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
-    //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
-//    if ([viewController.tabBarItem.cyl_tabButton cyl_isTabButton]|| [viewController.tabBarItem.cyl_tabButton cyl_isPlusButton]) {
-//        CGFloat index = [tabBarController.viewControllers indexOfObject:viewController];
-//        BOOL shouldSelectedCoverShow = (index == 0);
-//        [self setSelectedCoverShow:shouldSelectedCoverShow];
-//    }
-    
     return YES;
 }
 
@@ -186,9 +179,10 @@
         animationView = [control cyl_tabImageView];
     }
 
+    UIButton *button = CYLExternPlusButton;
+    BOOL isPlusButton = [control cyl_isPlusButton];
     // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
-    if ([control cyl_isPlusButton]) {
-        UIButton *button = CYLExternPlusButton;
+    if (isPlusButton) {
         animationView = button.imageView;
     }
 
@@ -197,6 +191,13 @@
     } else {
         [self addRotateAnimationOnView:animationView];
     }
+    
+    //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+//    if ([control cyl_isTabButton]|| [control cyl_isPlusButton]) {
+//        BOOL shouldSelectedCoverShow = ([self cyl_tabBarController].selectedIndex == 0);
+//        [self setSelectedCoverShow:shouldSelectedCoverShow];
+//    }
+    
 }
 
 //缩放动画

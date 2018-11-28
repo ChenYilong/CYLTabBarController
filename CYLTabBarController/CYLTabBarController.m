@@ -463,13 +463,9 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     if (!viewController) {
         viewController = self.selectedViewController;
     }
-     BOOL isCurrentViewController = [self isEqualViewController:viewController compairedViewController:CYLPlusChildViewController];
+    BOOL isCurrentViewController = [self isEqualViewController:viewController compairedViewController:CYLPlusChildViewController];
     BOOL shouldConfigureSelectionStatus = (!isCurrentViewController);
-    if (shouldConfigureSelectionStatus) {
-        plusButton.selected = NO;
-    } else {
-        plusButton.selected = YES;
-    }
+    plusButton.selected = !shouldConfigureSelectionStatus;
 }
 
 - (BOOL)isEqualViewController:(UIViewController *)viewController compairedViewController:(UIViewController *)compairedViewController {
