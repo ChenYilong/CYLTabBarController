@@ -467,10 +467,8 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     BOOL shouldConfigureSelectionStatus = (!isCurrentViewController);
     if (shouldConfigureSelectionStatus) {
         plusButton.selected = NO;
-        [self didSelectControl:viewController.tabBarItem.cyl_tabButton];
     } else {
         plusButton.selected = YES;
-        [self didSelectControl:plusButton];
     }
 }
 
