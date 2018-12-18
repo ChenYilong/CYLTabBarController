@@ -7,37 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		922DCEE61FF63399005C89BE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 922DCEE41FF63399005C89BE /* Main.storyboard */; };
-		922DCEE81FF63399005C89BE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 922DCEE71FF63399005C89BE /* Assets.xcassets */; };
-		922DCEEB1FF63399005C89BE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 922DCEE91FF63399005C89BE /* LaunchScreen.storyboard */; };
-		922DCF091FF63402005C89BE /* PersonalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCEF41FF63402005C89BE /* PersonalViewController.swift */; };
-		922DCF0A1FF63402005C89BE /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCEF61FF63402005C89BE /* HomeViewController.swift */; };
-		922DCF0B1FF63402005C89BE /* ConnectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCEF81FF63402005C89BE /* ConnectionViewController.swift */; };
-		922DCF0C1FF63402005C89BE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCEFA1FF63402005C89BE /* ViewController.swift */; };
-		922DCF101FF63402005C89BE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCF001FF63402005C89BE /* AppDelegate.swift */; };
-		922DCF121FF63402005C89BE /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCF031FF63402005C89BE /* MessageViewController.swift */; };
-		922DCF131FF63402005C89BE /* PublishViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCF051FF63402005C89BE /* PublishViewController.swift */; };
-		922DCF141FF63402005C89BE /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCF071FF63402005C89BE /* MainTabBarController.swift */; };
-		922DCF151FF63402005C89BE /* CYLPlusButtonSubclass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCF081FF63402005C89BE /* CYLPlusButtonSubclass.swift */; };
+		9AF595E221C8E63C00C6AF2B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595DF21C8E63C00C6AF2B /* AppDelegate.swift */; };
+		9AF595E321C8E63C00C6AF2B /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595E021C8E63C00C6AF2B /* MainTabBarController.swift */; };
+		9AF5960E21C8E7B100C6AF2B /* CYLPlusButtonSubclass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595E721C8E7B000C6AF2B /* CYLPlusButtonSubclass.swift */; };
+		9AF5960F21C8E7B100C6AF2B /* PersonalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595EC21C8E7B000C6AF2B /* PersonalViewController.swift */; };
+		9AF5961021C8E7B100C6AF2B /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595F221C8E7B000C6AF2B /* HomeViewController.swift */; };
+		9AF5961121C8E7B100C6AF2B /* ConnectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595F821C8E7B000C6AF2B /* ConnectionViewController.swift */; };
+		9AF5961221C8E7B100C6AF2B /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595FE21C8E7B000C6AF2B /* MessageViewController.swift */; };
+		9AF5961321C8E7B100C6AF2B /* PublishViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF5960421C8E7B000C6AF2B /* PublishViewController.swift */; };
+		9AF5961421C8E7B100C6AF2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AF5960821C8E7B100C6AF2B /* Assets.xcassets */; };
+		9AF5961521C8E7B100C6AF2B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AF5960921C8E7B100C6AF2B /* LaunchScreen.storyboard */; };
+		9AF5961621C8E7B100C6AF2B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AF5960B21C8E7B100C6AF2B /* Main.storyboard */; };
 		C0196AB673A3C11A8689ED66 /* Pods_CYLTabBarController_Swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DEC604443F0BED5845C1590 /* Pods_CYLTabBarController_Swift.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2CDA77BCC28E878CAB5EFD15 /* Pods-CYLTabBarController-Swift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTabBarController-Swift.release.xcconfig"; path = "Pods/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift.release.xcconfig"; sourceTree = "<group>"; };
 		922DCEDD1FF63399005C89BE /* CYLTabBarController-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CYLTabBarController-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		922DCEE51FF63399005C89BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		922DCEE71FF63399005C89BE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		922DCEEA1FF63399005C89BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		922DCEEC1FF63399005C89BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		922DCEF41FF63402005C89BE /* PersonalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalViewController.swift; sourceTree = "<group>"; };
-		922DCEF61FF63402005C89BE /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
-		922DCEF81FF63402005C89BE /* ConnectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionViewController.swift; sourceTree = "<group>"; };
-		922DCEFA1FF63402005C89BE /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		922DCF001FF63402005C89BE /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		922DCF031FF63402005C89BE /* MessageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
-		922DCF051FF63402005C89BE /* PublishViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PublishViewController.swift; sourceTree = "<group>"; };
-		922DCF071FF63402005C89BE /* MainTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
-		922DCF081FF63402005C89BE /* CYLPlusButtonSubclass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLPlusButtonSubclass.swift; sourceTree = "<group>"; };
+		9AF595DF21C8E63C00C6AF2B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		9AF595E021C8E63C00C6AF2B /* MainTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
+		9AF595E721C8E7B000C6AF2B /* CYLPlusButtonSubclass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLPlusButtonSubclass.swift; sourceTree = "<group>"; };
+		9AF595EC21C8E7B000C6AF2B /* PersonalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalViewController.swift; sourceTree = "<group>"; };
+		9AF595F221C8E7B000C6AF2B /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		9AF595F821C8E7B000C6AF2B /* ConnectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionViewController.swift; sourceTree = "<group>"; };
+		9AF595FE21C8E7B000C6AF2B /* MessageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
+		9AF5960421C8E7B000C6AF2B /* PublishViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PublishViewController.swift; sourceTree = "<group>"; };
+		9AF5960821C8E7B100C6AF2B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9AF5960A21C8E7B100C6AF2B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		9AF5960C21C8E7B100C6AF2B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		9AF5960D21C8E7B100C6AF2B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9DEC604443F0BED5845C1590 /* Pods_CYLTabBarController_Swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CYLTabBarController_Swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7C15F27AFB129417A291CF9 /* Pods-CYLTabBarController-Swift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTabBarController-Swift.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -65,7 +63,13 @@
 		922DCED41FF63399005C89BE = {
 			isa = PBXGroup;
 			children = (
-				922DCEDF1FF63399005C89BE /* CYLTabBarController-Swift */,
+				9AF595DF21C8E63C00C6AF2B /* AppDelegate.swift */,
+				9AF595E021C8E63C00C6AF2B /* MainTabBarController.swift */,
+				9AF595E821C8E7B000C6AF2B /* Module */,
+				9AF595E521C8E7B000C6AF2B /* Model */,
+				9AF595E621C8E7B000C6AF2B /* View */,
+				9AF5961821C8E8B700C6AF2B /* Controller */,
+				9AF5960721C8E7B100C6AF2B /* Other */,
 				922DCEDE1FF63399005C89BE /* Products */,
 				9E8F1952DFE997BA5D0E1F59 /* Pods */,
 				6961000247EFFCCDCECEE099 /* Frameworks */,
@@ -80,88 +84,257 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		922DCEDF1FF63399005C89BE /* CYLTabBarController-Swift */ = {
+		9AF595E521C8E7B000C6AF2B /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				922DCEF21FF63402005C89BE /* Classes */,
-				922DCEE41FF63399005C89BE /* Main.storyboard */,
-				922DCEE71FF63399005C89BE /* Assets.xcassets */,
-				922DCEE91FF63399005C89BE /* LaunchScreen.storyboard */,
-				922DCEEC1FF63399005C89BE /* Info.plist */,
 			);
-			path = "CYLTabBarController-Swift";
+			path = Model;
 			sourceTree = "<group>";
 		};
-		922DCEF21FF63402005C89BE /* Classes */ = {
+		9AF595E621C8E7B000C6AF2B /* View */ = {
 			isa = PBXGroup;
 			children = (
-				922DCEF31FF63402005C89BE /* Personal */,
-				922DCEF51FF63402005C89BE /* Home */,
-				922DCEF71FF63402005C89BE /* Connection */,
-				922DCEF91FF63402005C89BE /* Other */,
-				922DCF021FF63402005C89BE /* Message */,
-				922DCF041FF63402005C89BE /* Publish */,
-				922DCF061FF63402005C89BE /* Main */,
+				9AF595E721C8E7B000C6AF2B /* CYLPlusButtonSubclass.swift */,
 			);
-			path = Classes;
+			path = View;
 			sourceTree = "<group>";
 		};
-		922DCEF31FF63402005C89BE /* Personal */ = {
+		9AF595E821C8E7B000C6AF2B /* Module */ = {
 			isa = PBXGroup;
 			children = (
-				922DCEF41FF63402005C89BE /* PersonalViewController.swift */,
+				9AF595E921C8E7B000C6AF2B /* Personal */,
+				9AF595EF21C8E7B000C6AF2B /* Home */,
+				9AF595F521C8E7B000C6AF2B /* Connection */,
+				9AF595FB21C8E7B000C6AF2B /* Message */,
+				9AF5960121C8E7B000C6AF2B /* Publish */,
+				9AF5961921C8E8D600C6AF2B /* Other */,
+			);
+			path = Module;
+			sourceTree = "<group>";
+		};
+		9AF595E921C8E7B000C6AF2B /* Personal */ = {
+			isa = PBXGroup;
+			children = (
+				9AF595EA21C8E7B000C6AF2B /* Other */,
+				9AF595EB21C8E7B000C6AF2B /* Controller */,
+				9AF595ED21C8E7B000C6AF2B /* Model */,
+				9AF595EE21C8E7B000C6AF2B /* View */,
 			);
 			path = Personal;
 			sourceTree = "<group>";
 		};
-		922DCEF51FF63402005C89BE /* Home */ = {
+		9AF595EA21C8E7B000C6AF2B /* Other */ = {
 			isa = PBXGroup;
 			children = (
-				922DCEF61FF63402005C89BE /* HomeViewController.swift */,
-			);
-			path = Home;
-			sourceTree = "<group>";
-		};
-		922DCEF71FF63402005C89BE /* Connection */ = {
-			isa = PBXGroup;
-			children = (
-				922DCEF81FF63402005C89BE /* ConnectionViewController.swift */,
-			);
-			path = Connection;
-			sourceTree = "<group>";
-		};
-		922DCEF91FF63402005C89BE /* Other */ = {
-			isa = PBXGroup;
-			children = (
-				922DCF001FF63402005C89BE /* AppDelegate.swift */,
-				922DCEFA1FF63402005C89BE /* ViewController.swift */,
 			);
 			path = Other;
 			sourceTree = "<group>";
 		};
-		922DCF021FF63402005C89BE /* Message */ = {
+		9AF595EB21C8E7B000C6AF2B /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				922DCF031FF63402005C89BE /* MessageViewController.swift */,
+				9AF595EC21C8E7B000C6AF2B /* PersonalViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		9AF595ED21C8E7B000C6AF2B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		9AF595EE21C8E7B000C6AF2B /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		9AF595EF21C8E7B000C6AF2B /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				9AF595F021C8E7B000C6AF2B /* Other */,
+				9AF595F121C8E7B000C6AF2B /* Controller */,
+				9AF595F321C8E7B000C6AF2B /* Model */,
+				9AF595F421C8E7B000C6AF2B /* View */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		9AF595F021C8E7B000C6AF2B /* Other */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Other;
+			sourceTree = "<group>";
+		};
+		9AF595F121C8E7B000C6AF2B /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				9AF595F221C8E7B000C6AF2B /* HomeViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		9AF595F321C8E7B000C6AF2B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		9AF595F421C8E7B000C6AF2B /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		9AF595F521C8E7B000C6AF2B /* Connection */ = {
+			isa = PBXGroup;
+			children = (
+				9AF595F621C8E7B000C6AF2B /* Other */,
+				9AF595F721C8E7B000C6AF2B /* Controller */,
+				9AF595F921C8E7B000C6AF2B /* Model */,
+				9AF595FA21C8E7B000C6AF2B /* View */,
+			);
+			path = Connection;
+			sourceTree = "<group>";
+		};
+		9AF595F621C8E7B000C6AF2B /* Other */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Other;
+			sourceTree = "<group>";
+		};
+		9AF595F721C8E7B000C6AF2B /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				9AF595F821C8E7B000C6AF2B /* ConnectionViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		9AF595F921C8E7B000C6AF2B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		9AF595FA21C8E7B000C6AF2B /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		9AF595FB21C8E7B000C6AF2B /* Message */ = {
+			isa = PBXGroup;
+			children = (
+				9AF595FC21C8E7B000C6AF2B /* Other */,
+				9AF595FD21C8E7B000C6AF2B /* Controller */,
+				9AF595FF21C8E7B000C6AF2B /* Model */,
+				9AF5960021C8E7B000C6AF2B /* View */,
 			);
 			path = Message;
 			sourceTree = "<group>";
 		};
-		922DCF041FF63402005C89BE /* Publish */ = {
+		9AF595FC21C8E7B000C6AF2B /* Other */ = {
 			isa = PBXGroup;
 			children = (
-				922DCF051FF63402005C89BE /* PublishViewController.swift */,
+			);
+			path = Other;
+			sourceTree = "<group>";
+		};
+		9AF595FD21C8E7B000C6AF2B /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				9AF595FE21C8E7B000C6AF2B /* MessageViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		9AF595FF21C8E7B000C6AF2B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		9AF5960021C8E7B000C6AF2B /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		9AF5960121C8E7B000C6AF2B /* Publish */ = {
+			isa = PBXGroup;
+			children = (
+				9AF5960221C8E7B000C6AF2B /* Other */,
+				9AF5960321C8E7B000C6AF2B /* Controller */,
+				9AF5960521C8E7B000C6AF2B /* Model */,
+				9AF5960621C8E7B000C6AF2B /* View */,
 			);
 			path = Publish;
 			sourceTree = "<group>";
 		};
-		922DCF061FF63402005C89BE /* Main */ = {
+		9AF5960221C8E7B000C6AF2B /* Other */ = {
 			isa = PBXGroup;
 			children = (
-				922DCF071FF63402005C89BE /* MainTabBarController.swift */,
-				922DCF081FF63402005C89BE /* CYLPlusButtonSubclass.swift */,
 			);
-			path = Main;
+			path = Other;
+			sourceTree = "<group>";
+		};
+		9AF5960321C8E7B000C6AF2B /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				9AF5960421C8E7B000C6AF2B /* PublishViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		9AF5960521C8E7B000C6AF2B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		9AF5960621C8E7B000C6AF2B /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		9AF5960721C8E7B100C6AF2B /* Other */ = {
+			isa = PBXGroup;
+			children = (
+				9AF5960821C8E7B100C6AF2B /* Assets.xcassets */,
+				9AF5960921C8E7B100C6AF2B /* LaunchScreen.storyboard */,
+				9AF5960B21C8E7B100C6AF2B /* Main.storyboard */,
+				9AF5960D21C8E7B100C6AF2B /* Info.plist */,
+			);
+			path = Other;
+			sourceTree = "<group>";
+		};
+		9AF5961821C8E8B700C6AF2B /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		9AF5961921C8E8D600C6AF2B /* Other */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Other;
 			sourceTree = "<group>";
 		};
 		9E8F1952DFE997BA5D0E1F59 /* Pods */ = {
@@ -202,7 +375,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 1000;
+				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = Anthony;
 				TargetAttributes = {
 					922DCEDC1FF63399005C89BE = {
@@ -235,9 +408,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				922DCEEB1FF63399005C89BE /* LaunchScreen.storyboard in Resources */,
-				922DCEE81FF63399005C89BE /* Assets.xcassets in Resources */,
-				922DCEE61FF63399005C89BE /* Main.storyboard in Resources */,
+				9AF5961521C8E7B100C6AF2B /* LaunchScreen.storyboard in Resources */,
+				9AF5961421C8E7B100C6AF2B /* Assets.xcassets in Resources */,
+				9AF5961621C8E7B100C6AF2B /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,11 +424,25 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/AFNetworking/AFNetworking.framework",
 				"${BUILT_PRODUCTS_DIR}/CYLTabBarController/CYLTabBarController.framework",
+				"${BUILT_PRODUCTS_DIR}/FBRetainCycleDetector/FBRetainCycleDetector.framework",
+				"${BUILT_PRODUCTS_DIR}/MBProgressHUD/MBProgressHUD.framework",
+				"${BUILT_PRODUCTS_DIR}/MJRefresh/MJRefresh.framework",
+				"${BUILT_PRODUCTS_DIR}/MLeaksFinder/MLeaksFinder.framework",
+				"${BUILT_PRODUCTS_DIR}/Masonry/Masonry.framework",
+				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AFNetworking.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CYLTabBarController.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBRetainCycleDetector.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MBProgressHUD.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MJRefresh.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MLeaksFinder.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Masonry.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -287,35 +474,34 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				922DCF0C1FF63402005C89BE /* ViewController.swift in Sources */,
-				922DCF151FF63402005C89BE /* CYLPlusButtonSubclass.swift in Sources */,
-				922DCF141FF63402005C89BE /* MainTabBarController.swift in Sources */,
-				922DCF121FF63402005C89BE /* MessageViewController.swift in Sources */,
-				922DCF091FF63402005C89BE /* PersonalViewController.swift in Sources */,
-				922DCF0B1FF63402005C89BE /* ConnectionViewController.swift in Sources */,
-				922DCF101FF63402005C89BE /* AppDelegate.swift in Sources */,
-				922DCF0A1FF63402005C89BE /* HomeViewController.swift in Sources */,
-				922DCF131FF63402005C89BE /* PublishViewController.swift in Sources */,
+				9AF5961021C8E7B100C6AF2B /* HomeViewController.swift in Sources */,
+				9AF595E221C8E63C00C6AF2B /* AppDelegate.swift in Sources */,
+				9AF5961121C8E7B100C6AF2B /* ConnectionViewController.swift in Sources */,
+				9AF5960E21C8E7B100C6AF2B /* CYLPlusButtonSubclass.swift in Sources */,
+				9AF5961321C8E7B100C6AF2B /* PublishViewController.swift in Sources */,
+				9AF5960F21C8E7B100C6AF2B /* PersonalViewController.swift in Sources */,
+				9AF595E321C8E63C00C6AF2B /* MainTabBarController.swift in Sources */,
+				9AF5961221C8E7B100C6AF2B /* MessageViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		922DCEE41FF63399005C89BE /* Main.storyboard */ = {
+		9AF5960921C8E7B100C6AF2B /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				922DCEE51FF63399005C89BE /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		922DCEE91FF63399005C89BE /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				922DCEEA1FF63399005C89BE /* Base */,
+				9AF5960A21C8E7B100C6AF2B /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		9AF5960B21C8E7B100C6AF2B /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9AF5960C21C8E7B100C6AF2B /* Base */,
+			);
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -371,7 +557,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -424,7 +610,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -439,9 +625,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 2NJT7K4VZ7;
-				INFOPLIST_FILE = "CYLTabBarController-Swift/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = "$(SRCROOT)/Other/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "WeMadeCode.CYLTabBarController-Swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -457,9 +643,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 2NJT7K4VZ7;
-				INFOPLIST_FILE = "CYLTabBarController-Swift/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = "$(SRCROOT)/Other/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "WeMadeCode.CYLTabBarController-Swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
