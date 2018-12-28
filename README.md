@@ -57,13 +57,12 @@
 即使加号按钮超出了tabbar的区域，</p>超出部分依然能响应点击事件 | 红线内的区域均能响应tabbar相关的点击事件，</p>![enter image description here](http://i57.tinypic.com/2r7ndzk.jpg)
 允许指定加号按钮位置 | 效果如下：</p>![enter image description here](http://a64.tinypic.com/2mo0h.jpg) </p>Airbnb-app效果：</p>![enter image description here](http://a63.tinypic.com/2mgk02v.gif)
 支持让 `TabBarItem` 仅显示图标，并自动使图标垂直居中，支持自定义TabBar高度 | 效果可见Airbnb-app效果，或者下图</p>![enter image description here](https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png)
- 支持自定义动画 | ![](https://ww1.sinaimg.cn/large/006tNbRwly1fg9hu6qnwbg308v0gctcc.gif)
+ 支持自定义动画 | 兼容 Lottie 动画 用法见：https://github.com/ChenYilong/CYLTabBarController/issues/341 </p> ![](https://ww1.sinaimg.cn/large/006tNbRwly1fg9hu6qnwbg308v0gctcc.gif) 
  支持角标自定义View | ![enter image description here](https://ws4.sinaimg.cn/large/006tKfTcly1fgl0yxcaboj30yi06at8t.jpg) 
  支持多TabBar嵌套，并指定PlusButton位置 | ![enter image description here](https://ws4.sinaimg.cn/large/006tNc79ly1fmn3005isfg308r0iltl6.gif)
 支持CocoaPods |容易集成
 支持Swift项目导入 | 兼容
 支持横竖屏 | －－
-兼容 Lottie 动画 | 用法见：https://github.com/ChenYilong/CYLTabBarController/issues/341
 
 
 
@@ -167,12 +166,12 @@
     gem install cocoapods
  ```
 
-  打开 Podfile，在您项目的 target 下加入以下内容。（在此以 v1.6.7 版本为例）
+  打开 Podfile，在您项目的 target 下加入以下内容。（在此以 v1.17.22 版本为例）
 
   在文件 `Podfile` 中加入以下内容：
 
  ```
-    pod 'CYLTabBarController', '~> 1.17.4'
+    pod 'CYLTabBarController', '~> 1.17.22'
  ```
 
   然后在终端中运行以下命令：
@@ -190,7 +189,7 @@
 
   如果提示找不到库，则可去掉 `--no-repo-update`。
 
-  完成后1.17.4，CocoaPods 会在您的工程根目录下生成一个 `.xcworkspace` 文件。您需要通过此文件打开您的工程，而不是之前的 `.xcodeproj`。
+  完成后1.17.22，CocoaPods 会在您的工程根目录下生成一个 `.xcworkspace` 文件。您需要通过此文件打开您的工程，而不是之前的 `.xcodeproj`。
 
 **CocoaPods 使用说明**
 
@@ -198,14 +197,14 @@
 
 CocoaPods 中，有几种设置 CYLTabBarController 版本的方法。如：
 
-`>= 1.16.X` 会根据您本地的 CocoaPods 源列表，导入不低于 `1.18.X` 版本的 CYLTabBarController。
+`>= 1.17.X` 会根据您本地的 CocoaPods 源列表，导入不低于 `1.18.X` 版本的 CYLTabBarController。
 
-`~> 1.16.X` 会根据您本地的 CocoaPods 源列表，介于 1.16.X~1.18.0 之前版本的 CYLTabBarController。
-我们建议您锁定版本，便于团队开发。如，指定 1.17.4 版本。
+`~> 1.17.X` 会根据您本地的 CocoaPods 源列表，介于 1.17.X~1.18.0 之前版本的 CYLTabBarController。
+我们建议您锁定版本，便于团队开发。如，指定 1.17.22 版本。
 
  
 ```
-    pod 'CYLTabBarController', '~> 1.17.4'
+    pod 'CYLTabBarController', '~> 1.17.22'
 ```
 
  - 升级本地 CocoaPods 源
@@ -939,7 +938,7 @@ A：用法见：https://github.com/ChenYilong/CYLTabBarController/issues/341
 
 ----------
 Posted by [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/)  
-原创文章，版权声明：自由转载-非商用-非衍生-保持署名 | [Creative Commons BY-NC-ND 3.0](http://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh)
+原创作品，版权声明：License MIT
 <p align="center"><a href="http://weibo.com/u/1692391497?s=6uyXnP" target="_blank"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1692391497/b46c844b/1.png"/></a></a>
 
 
