@@ -4,13 +4,13 @@
 
 <!--- 每个类的第五行都标记有版本号，请贴出。 -->
 
- 1. Version：v1.13.1
+ 1. Version：v1.17.x
  2. Language：Objective-C
  4. iOS System Version：iOS10
  5. Prototype（是否是真机）：YES
  6. Issue Type：Crash、Bug、Enhancement（希望能支持一个新需求）、Q-A
 
-## 1. How to repeat the problem.
+## 1. How to reproduce the problem.
 <!--- 请详细描述下复现步骤。 -->
 
 ## 2. Please help me in this way.
