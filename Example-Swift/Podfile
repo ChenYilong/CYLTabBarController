@@ -3,92 +3,14 @@
 source 'git@github.com:CocoaPods/Specs.git'
 
 
-
-
 # Uncomment the next line to define a global platform for your project
 # platform :ios, '9.0'
 source 'git@github.com:CocoaPods/Specs.git'
-source 'https://github.com/aliyun/aliyun-specs.git'
-source 'git@gitlab-ce.emas-poc.com:EMAS-iOS/emas-specs-thirdpart.git'     
-source 'git@gitlab-ce.emas-poc.com:EMAS-iOS/emas-specs.git'
-source 'git@gitlab-ce.emas-poc.com:EMAS-Weex-iOS/native-common.git'
-source 'git@gitlab-ce.emas-poc.com:EMAS-Weex-iOS/weex-common.git'
 
 platform:ios,'9.0'
 inhibit_all_warnings!
 
-def network
-  pod 'AFNetworking', '3.1.0'
-end
-
-def  imageOperation
-   pod 'SDWebImage', '~> 4.4.1'
-   # pod 'FLAnimatedImage', '~> 1.0.12'
-end
-
-def commonUI 
-  pod 'MBProgressHUD', '~> 1.1.0'
-  pod 'Masonry', '~> 1.1.0'
-  pod 'MJRefresh', '~> 3.1.15.1'  
-  pod 'CYLTabBarController', '~> 1.17.17'
-end
-
-# def AlicloudSDK 
-#   pod 'AlicloudPush', '~> 1.9.8'
-#   pod 'AlicloudUtils', '1.3.4'
-# end
-
-def commonDebug
-  pod 'MLeaksFinder' ,:configurations => ['Debug']
-end
-
-def weex
-  pod 'WeexSDK', '~>0.18.0'
-  #pod  'WeexNested', '1.0.0.3'
-  pod 'SocketRocket'
-  pod 'WXDevtool', '~> 0.15.3' ,:configurations => ['Debug']
-  pod 'UMCShare/UI'
-  pod 'UMCShare/Social', '6.9.3'
-  pod 'BindingX', '~> 1.0.3'
-  pod 'UITextView+Placeholder'
-
-  # --通用库
-  pod  'UserTrack',        '~> 6.3.5.100005-poc'
-  pod  'Reachability',     '~> 3.2'
-  #pod  'FMDB',             '~> 2.7.2'
-  pod  'NetworkSDK',       '~> 10.0.3.2'
-  pod  'tnet',             '~> 10.0.3.1'
-
-  # --ACCS(通用库 -> ACCS)
-  pod  'TBAccsSDK',        '10.0.3'
-  
-  # --网关(通用库-> 网关)
-  pod  'MtopSDK',          '~> 10.0.3.1'
-  pod  'mtopext/MtopCore', '~> 10.0.3.1'
-  
-  # --高可用(通用库-> ACCS -> 高可用)
-  pod  'AliHAAdapter4poc',   '10.0.4'
-  
-  # --Weex(通用库-> 高可用 -> 网关 -> Weex)
-  pod 'ZCache', '~> 10.0.3'
-  pod 'ZipArchive', '~> 1.4.0'
-  pod 'SDWebImage', '~> 4.4.1'
-  pod 'DynamicConfiguration', '10.0.3'
-  pod 'DynamicConfigurationAdaptor', '10.0.3'
-
-end
-
-
-
 target 'CYLTabBarController-Swift' do
-  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
-  
-  network
-  imageOperation
-  commonUI
-  # AlicloudSDK
-  commonDebug
-  #weex
-
+   pod 'CYLTabBarController'
 end
