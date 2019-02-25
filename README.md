@@ -143,7 +143,7 @@
   在终端依次运行以下命令：
 
   ```
-     gem sources --add https://gems.ruby-china.org/ --remove https://rubygems.org/
+     gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/
      sudo gem install cocoapods
   ```
 
