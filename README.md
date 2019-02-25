@@ -1,4 +1,5 @@
-# CYLTabBarController【低耦合集成TabBarController】
+# [CN]CYLTabBarController【低耦合集成TabBarController】
+# [EN]CYLTabBarController [Low coupling] 
 
 
 
@@ -14,9 +15,16 @@
 </a><a href="https://t.me/CYLTabBarController"><img src="http://i66.tinypic.com/of2hbn.jpg"></a></a> 
 </p>
 
-学习QQ群 515295083 或 Telegram 群交流 https://t.me/CYLTabBarController 
+## [CN]阅读须知 
+## [EN]Before Reading 
 
-## 导航
+ - [CN] mark means Chinese language by default.
+ - [EN] mark means English language.
+ - [CN]学习QQ群 515295083 
+ - [EN]Telegram Group to communicate the features or bugs: https://t.me/CYLTabBarController 
+
+## [CN]导航 
+##[EN]CONTENTS 
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -48,12 +56,13 @@
 
 
 ## 与其他自定义TabBarController的区别
+## Comparetion with
 
- 特点 |解释
+[CN]特点 </p>[EN]Features |[CN]解释 </p>[EN]Explanation
 -------------|-------------
- 低耦合，易删除 | 1、TabBar设置与业务完全分离，最低只需传两个数组即可完成主流App框架搭建。</p> 2、 PlusButton 的所有设置都在单独的一个类（ `CYLPlusButton` 的子类）中实现：删除该特定的类，就能完全将 PlusButton 从项目中删除掉。
- `TabBar` 以及 `TabBar` 内的 `TabBarItem` 均使用系统原生的控件 | 因为使用原生的控件，并非 `UIButton` 或 `UIView` 。好处如下：</p> 1. 无需反复调“间距位置等”来接近系统效果。</p> 2. 在push到下一页时 `TabBar`  的隐藏和显示之间的过渡效果跟系统一致（详见“ [集成后的效果](https://github.com/ChenYilong/CYLTabBarController#集成后的效果) ”部分，给出了效果图） </p> 3. 原生控件，所以可以使用诸多系统API，比如：可以使用 ` [UITabBar appearance];` 、` [UITabBarItem appearance];` 设置样式。（详见“[补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) ”部分，给出了响应代码示例）
- 自动监测是否需要添加“加号”按钮，</p>并能自动设置位置 |[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 既支持类似微信的“中规中矩”的 `TabBarController` 样式，并且默认就是微信这种样式，同时又支持类似“微博”或“淘宝闲鱼”这种具有不规则加号按钮的 `TabBarController` 。想支持这种样式，只需自定义一个加号按钮，[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 能检测到它的存在并自动将 `tabBar` 排序好，无需多余操作，并且也预留了一定接口来满足自定义需求。</p>“加号”按钮的样式、frame均在自定义的类中独立实现，不会涉及tabbar相关设置。
+[CN]低耦合，易删除</p>[EN]Loose coupling  | [CN]1、TabBar设置与业务完全分离，最低只需传两个数组即可完成主流App框架搭建。</p>[EN]1. This library is independent of your business codes which only needs two array parameters to be passed.   </p> [CN]2、 PlusButton 的所有设置都在单独的一个类（ `CYLPlusButton` 的子类）中实现：删除该特定的类，就能完全将 PlusButton 从项目中删除掉。</p>[EN]2.PlusButton is also independent. If you delete the code of this class, you remove the PlusButton feature from your UI on screen completely.  
+[CN]`TabBar` 以及 `TabBar` 内的 `TabBarItem` 均使用系统原生的控件</p>[EN]`TabBar` and `TabBarItem` those parts of this library both are system objects. | [CN]因为使用原生的控件，并非 `UIButton` 或 `UIView` 。好处如下：</p>[EN]Advantages of quitting choosing `UIButton` or `UIView`: </p> 1. 无需反复调“间距位置等”来接近系统效果。</p>[EN]There is not need to adjust those object to make them close to a system  object appearance. </p> 2. 在push到下一页时 `TabBar`  的隐藏和显示之间的过渡效果跟系统一致（详见“ [集成后的效果](https://github.com/ChenYilong/CYLTabBarController#集成后的效果) ”部分，给出了效果图）</p>[EN]2. A push animation is same to a system objects appearance. </p> 3. 原生控件，所以可以使用诸多系统API，比如：可以使用 ` [UITabBar appearance];` 、` [UITabBarItem appearance];` 设置样式。（详见“[补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) ”部分，给出了响应代码示例）</p>[EN]3.It is convenient to use the system API such as ` [UITabBar appearance];`,` [UITabBarItem appearance];`, etc.
+ 自动监测是否需要添加“加号”按钮，</p>并能自动设置位置</p>[EN] It is able to check if need to add a PlusButton automatically. |[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 既支持类似微信的“中规中矩”的 `TabBarController` 样式，并且默认就是微信这种样式，同时又支持类似“微博”或“淘宝闲鱼”这种具有不规则加号按钮的 `TabBarController` 。想支持这种样式，只需自定义一个加号按钮，[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 能检测到它的存在并自动将 `tabBar` 排序好，无需多余操作，并且也预留了一定接口来满足自定义需求。</p>“加号”按钮的样式、frame均在自定义的类中独立实现，不会涉及tabbar相关设置。</p>[EN]
 即使加号按钮超出了tabbar的区域，</p>超出部分依然能响应点击事件 | 红线内的区域均能响应tabbar相关的点击事件，</p>![enter image description here](http://i57.tinypic.com/2r7ndzk.jpg)
 允许指定加号按钮位置 | 效果如下：</p>![enter image description here](http://a64.tinypic.com/2mo0h.jpg) </p>Airbnb-app效果：</p>![enter image description here](http://a63.tinypic.com/2mgk02v.gif)
 支持让 `TabBarItem` 仅显示图标，并自动使图标垂直居中，支持自定义TabBar高度 | 效果可见Airbnb-app效果，或者下图</p>![enter image description here](https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png)

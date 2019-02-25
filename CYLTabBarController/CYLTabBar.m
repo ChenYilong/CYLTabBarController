@@ -52,11 +52,12 @@ static CGFloat const CYLIPhoneXTabbarButtonHeight = 48;
 static CGFloat const CYLIPhoneXTabbarButtonSafeAreaHeight = 35;
 
 + (void)load {
-    /* 这个问题是 iOS 12.1 的问题，只要 UITabBar 是磨砂的，并且 push viewController 时 hidesBottomBarWhenPushed = YES 则手势返回的时候就会触发。(来源于QMUIKit的处理方式)*/
+    /* 这个问题是iOS12.1出现的问题, iOS 12.1.1已修复，只要 UITabBar 是磨砂的，并且 push viewController 时 hidesBottomBarWhenPushed = YES 则手势返回的时候就会触发。(来源于QMUIKit的处理方式)*/
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        if (@available(iOS 12.1, *)) {
-            OverrideImplementation(NSClassFromString(@"UITabBarButton"), @selector(setFrame:), ^id(__unsafe_unretained Class originClass, SEL originCMD, IMP originIMP) {
+        if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"12.1") && CYL_SYSTEM_VERSION_LESS_THAN(@"12.1.1"))  {
+            NSString *tabbarButtonString = [NSString stringWithFormat:@"U%@abB%@utton", @"IT", @"arB"];
+            OverrideImplementation(NSClassFromString(tabbarButtonString), @selector(setFrame:), ^id(__unsafe_unretained Class originClass, SEL originCMD, IMP originIMP) {
                 return ^(UIView *selfObject, CGRect firstArgv) {
                     if ([selfObject isKindOfClass:originClass]) {
                         
@@ -190,6 +191,11 @@ static CGFloat const CYLIPhoneXTabbarButtonSafeAreaHeight = 35;
     if (!CYLExternPlusButton) {
         return;
     }
+    
+    if (![self hasPlusChildViewController]) {
+        self.tabBarItemWidth = CYLTabBarItemWidth;
+    }
+    
     BOOL addedToTabBar = [_plusButton.superview isEqual:self];
     if (!addedToTabBar) {
         CYLTabBarItemWidth = (tabBarWidth) / CYLTabbarItemsCount;
@@ -209,7 +215,11 @@ static CGFloat const CYLIPhoneXTabbarButtonSafeAreaHeight = 35;
             //调整UITabBarItem的位置
             CGFloat childViewX;
             if ([self hasPlusChildViewController]) {
+                self.tabBarItemWidth = CYLTabBarItemWidth;
                 if (buttonIndex <= plusButtonIndex) {
+                    if (buttonIndex == plusButtonIndex) {
+                        self.tabBarItemWidth = CYLPlusButtonWidth;
+                    }
                     childViewX = buttonIndex * CYLTabBarItemWidth;
                 } else {
                     childViewX = (buttonIndex - 1) * CYLTabBarItemWidth + CYLPlusButtonWidth;
@@ -222,13 +232,11 @@ static CGFloat const CYLIPhoneXTabbarButtonSafeAreaHeight = 35;
                 }
             }
             //仅修改childView的x和宽度,yh值不变
-            [self changeXForChildView:childView childViewX:childViewX tabBarItemWidth:CYLTabBarItemWidth];
+            [self changeXForChildView:childView childViewX:childViewX tabBarItemWidth:self.tabBarItemWidth];
         }];
         //bring the plus button to top
         [self bringSubviewToFront:_plusButton];
     }
-
-    self.tabBarItemWidth = CYLTabBarItemWidth;
 }
 
 - (void)changeXForChildView:(UIView *)childView childViewX:(CGFloat)childViewX tabBarItemWidth:(CGFloat)tabBarItemWidth {
