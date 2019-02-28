@@ -161,13 +161,14 @@
 #pragma mark - delegate
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
-    [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
-    return YES;
+    BOOL should = YES;
+    [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController shouldSelect:should];
+    return should;
 }
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;
-
+//    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：tabBarChildViewControllerIndex: %@, tabBarItemVisibleIndex : %@", @(__PRETTY_FUNCTION__), @(__LINE__), @(control.cyl_tabBarChildViewControllerIndex), @(control.cyl_tabBarItemVisibleIndex));
     if ([control cyl_isTabButton]) {
         //更改红标状态
         if ([[self cyl_tabBarController].selectedViewController cyl_isShowTabBadgePoint]) {
@@ -175,7 +176,6 @@
         } else {
             [[self cyl_tabBarController].selectedViewController cyl_showTabBadgePoint];
         }
-
         animationView = [control cyl_tabImageView];
     }
 

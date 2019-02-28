@@ -10,6 +10,7 @@
 #import "CYLTabBar.h"
 #import <objc/runtime.h>
 #import "UIViewController+CYLTabBarControllerExtention.h"
+#import "UIControl+CYLTabBarControllerExtention.h"
 
 NSString *const CYLTabBarItemTitle = @"CYLTabBarItemTitle";
 NSString *const CYLTabBarItemImage = @"CYLTabBarItemImage";
@@ -304,8 +305,10 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
             [viewControllersWithPlusButton insertObject:CYLPlusChildViewController atIndex:CYLPlusButtonIndex];
             _viewControllers = [viewControllersWithPlusButton copy];
             [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:YES];
+            [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:CYLPlusButtonIndex];
         } else {
             _viewControllers = [viewControllers copy];
+            [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:NSNotFound];
         }
         CYLTabbarItemsCount = [viewControllers count];
         CYLTabBarItemWidth = ([UIScreen mainScreen].bounds.size.width - CYLPlusButtonWidth) / (CYLTabbarItemsCount);
@@ -457,8 +460,14 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 }
 
 #pragma mark - delegate
-
 - (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    [self updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController shouldSelect:YES];
+}
+
+- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController shouldSelect:(BOOL)shouldSelect {
+    if (!shouldSelect) {
+        return;
+    }
     UIButton *plusButton = CYLExternPlusButton;
     if (!viewController) {
         viewController = self.selectedViewController;
@@ -488,7 +497,15 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 
 - (void)didSelectControl:(UIControl *)control {
     SEL actin = @selector(tabBarController:didSelectControl:);
-    if ([self.delegate respondsToSelector:actin]) {
+    NSUInteger tabIndex = control.cyl_tabBarChildViewControllerIndex;
+    BOOL shouldSelectViewController =  YES;
+    @try {
+       shouldSelectViewController = control.cyl_isPlusButton || (control.cyl_isTabButton &&
+                                       [self.delegate tabBarController:self shouldSelectViewController:self.viewControllers[tabIndex]]);
+    } @catch (NSException *exception) {
+        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+    }
+    if ([self.delegate respondsToSelector:actin] && shouldSelectViewController) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
         [self.delegate performSelector:actin withObject:self withObject:control ?: self.selectedViewController.tabBarItem.cyl_tabButton];

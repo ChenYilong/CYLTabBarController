@@ -53,6 +53,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                                                              context:nil
                                              ];
     [self customizeTabBarAppearance:tabBarController];
+
     return (self = (MainTabBarController *)tabBarController);
 }
 
@@ -131,8 +132,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 - (void)customizeTabBarAppearance:(CYLTabBarController *)tabBarController {
     // Customize UITabBar height
     // 自定义 TabBar 高度
-    //    tabBarController.tabBarHeight = CYL_IS_IPHONE_X ? 65 : 40;
-    
+//        tabBarController.tabBarHeight = CYL_IS_IPHONE_X ? 65 : 40;
+    [tabBarController rootWindow].backgroundColor = [UIColor whiteColor];
+
     // set the text color for unselected state
     // 普通状态下的文字属性
     NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];

@@ -102,6 +102,8 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
 - (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController;
 
+- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController shouldSelect:(BOOL)shouldSelect;
+
 - (void)hideTabBadgeBackgroundSeparator;
 
 - (void)setTintColor:(UIColor *)tintColor;
