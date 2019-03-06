@@ -396,8 +396,7 @@ static CGFloat const CYLIPhoneXTabbarButtonSafeAreaHeight = 35;
         @try {
             UIControl *control = tabBarButtonMutableArray[CYLPlusButtonIndex];
             control.userInteractionEnabled = NO;
-//            control.hidden = YES;
-//            control.backgroundColor = [UIColor redColor];
+            control.hidden = YES;
         } @catch (NSException *exception) {}
     }
     return [tabBarButtonMutableArray copy];

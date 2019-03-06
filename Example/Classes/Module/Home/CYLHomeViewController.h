@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#if __has_include(<CYLTabBarController/CYLTabBarController.h>)
+#import <CYLTabBarController/CYLTabBarController.h>
+#else
+#import "CYLTabBarController.h"
+#endif
 
-@interface CYLHomeViewController : UITableViewController<UITabBarControllerDelegate>
+@interface CYLHomeViewController : CYLBaseTableViewController <UITabBarControllerDelegate>
 
 @end

@@ -26,12 +26,14 @@
 /*!
  * PlusButton without plusViewController equals NSNotFound
  */
-@property (nonatomic, assign, getter=cyl_tabBarChildViewControllerIndex, setter=cyl_setTabBarChildViewControllerIndex:) NSInteger tabBarChildViewControllerIndex;
+@property (nonatomic, assign, getter=cyl_tabBarChildViewControllerIndex, setter=cyl_setTabBarChildViewControllerIndex:) NSInteger cyl_tabBarChildViewControllerIndex;
 
 /*!
  * PlusButton has its own visible index,
  * in this case PlusButton is same as TabBarItem
  */
-@property (nonatomic, assign, getter=cyl_tabBarItemVisibleIndex, setter=cyl_setTabBarItemVisibleIndex:) NSInteger tabBarItemVisibleIndex;
+@property (nonatomic, assign, getter=cyl_tabBarItemVisibleIndex, setter=cyl_setTabBarItemVisibleIndex:) NSInteger cyl_tabBarItemVisibleIndex;
+
+@property (nonatomic, assign, getter=cyl_shouldNotSelect, setter=cyl_setShouldNotSelect:) BOOL cyl_shouldNotSelect;
 
 @end

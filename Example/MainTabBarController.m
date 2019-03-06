@@ -10,19 +10,6 @@
 
 static CGFloat const CYLTabBarControllerHeight = 40.f;
 
-@implementation CYLBaseNavigationController
-
-- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
-    if (self.viewControllers.count > 0) {
-        viewController.hidesBottomBarWhenPushed = YES;
-    } else {
-        viewController.hidesBottomBarWhenPushed = NO;
-    }
-    [super pushViewController:viewController animated:animated];
-}
-
-@end
-
 //View Controllers
 #import "CYLHomeViewController.h"
 #import "CYLMessageViewController.h"
@@ -61,18 +48,21 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     CYLHomeViewController *firstViewController = [[CYLHomeViewController alloc] init];
     UIViewController *firstNavigationController = [[CYLBaseNavigationController alloc]
                                                    initWithRootViewController:firstViewController];
-    
+    [firstViewController cyl_setHideNavigationBarSeparator:YES];
+    [firstViewController cyl_setNavigationBarHidden:YES];
     CYLSameCityViewController *secondViewController = [[CYLSameCityViewController alloc] init];
     UIViewController *secondNavigationController = [[CYLBaseNavigationController alloc]
                                                     initWithRootViewController:secondViewController];
-    
+    [secondViewController cyl_setHideNavigationBarSeparator:YES];
+
     CYLMessageViewController *thirdViewController = [[CYLMessageViewController alloc] init];
     UIViewController *thirdNavigationController = [[CYLBaseNavigationController alloc]
                                                    initWithRootViewController:thirdViewController];
-    
+    [thirdViewController cyl_setHideNavigationBarSeparator:YES];
     CYLMineViewController *fourthViewController = [[CYLMineViewController alloc] init];
     UIViewController *fourthNavigationController = [[CYLBaseNavigationController alloc]
                                                     initWithRootViewController:fourthViewController];
+    [fourthNavigationController cyl_setHideNavigationBarSeparator:YES];
     NSArray *viewControllers = @[
                                  firstNavigationController,
                                  secondNavigationController,

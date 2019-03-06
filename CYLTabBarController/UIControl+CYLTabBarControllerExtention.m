@@ -14,6 +14,16 @@
 
 @implementation UIControl (CYLTabBarControllerExtention)
 
+- (BOOL)cyl_shouldNotSelect {
+    NSNumber *shouldNotSelectObject = objc_getAssociatedObject(self, @selector(cyl_shouldNotSelect));
+    return [shouldNotSelectObject boolValue];
+}
+
+- (void)cyl_setShouldNotSelect:(BOOL)shouldNotSelect {
+    NSNumber *shouldNotSelectObject = @(shouldNotSelect);
+    objc_setAssociatedObject(self, @selector(cyl_shouldNotSelect), shouldNotSelectObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 - (NSInteger)cyl_tabBarItemVisibleIndex {
     if (!self.cyl_isTabButton && !self.cyl_isPlusButton ) {
         return NSNotFound;

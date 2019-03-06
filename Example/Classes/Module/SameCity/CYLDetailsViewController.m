@@ -19,9 +19,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     self.title = @"详情页";
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor orangeColor];
     
     UILabel *label = [[UILabel alloc] init];
     label.text = @"点击屏幕可跳转到“我的”，执行testPush";

@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CYLBadgeProtocol.h"
+#import "CYLConstants.h"
 
 typedef void (^CYLPopSelectTabBarChildViewControllerCompletion)(__kindof UIViewController *selectedTabBarChildViewController);
 
@@ -18,11 +20,7 @@ typedef void (^CYLPushOrPopCompletionHandler)(BOOL shouldPop,
 
 typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewControllers, CYLPushOrPopCompletionHandler completionHandler);
 
-@interface UIViewController (CYLTabBarControllerExtention)
-
-@property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *cyl_tabBadgePointView;
-
-@property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset cyl_tabBadgePointViewOffset;
+@interface UIViewController (CYLTabBarControllerExtention)<CYLBadgeProtocol>
 
 @property (nonatomic, readonly, getter=cyl_isEmbedInTabBarController) BOOL cyl_embedInTabBarController;
 
@@ -34,16 +32,35 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 @property (nonatomic, assign, setter=cyl_setPlusViewControllerEverAdded:, getter=cyl_plusViewControllerEverAdded) BOOL cyl_plusViewControllerEverAdded;
 
-/*!
- * @attention 
-   - 调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
-   - 不支持 CYLPlusChildViewController 对应的 TabBarItem 角标设置，调用会被忽略。
+- (BOOL)cyl_isShowBadge;
+/**
+ *  show badge with red dot style and CYLBadgeAnimTypeNone by default.
  */
-- (void)cyl_showTabBadgePoint;
+- (void)cyl_showBadge;
 
-- (void)cyl_removeTabBadgePoint;
+/**
+ *
+ *  @param value String value, default is `nil`. if value equal @"" means red dot style.
+ *  @param aniType
+ *  @attention
+ - 调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
+ - 不支持 CYLPlusChildViewController 对应的 TabBarItem 角标设置，调用会被忽略。
+ */
+- (void)cyl_showBadgeValue:(NSString *)value
+             animationType:(CYLBadgeAnimType)aniType;
 
-- (BOOL)cyl_isShowTabBadgePoint;
+/**
+ *  clear badge(hide badge)
+ */
+- (void)cyl_clearBadge;
+
+/**
+ *  make bage(if existing) not hiden
+ */
+- (void)cyl_resumeBadge;
+
+- (BOOL)cyl_isPauseBadge;
+
 
 /*!
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器作为返回值返回。
@@ -117,7 +134,25 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  * 这样做防止主界面卡顿时，导致一个 ViewController 被 Push 多次
  */
 - (void)cyl_pushViewController:(UIViewController *)viewController animated:(BOOL)animated;
-
 - (UIViewController *)cyl_getViewControllerInsteadOfNavigationController;
++ (UIViewController * __nullable)cyl_topmostViewController;
++ (UINavigationController * __nullable)cyl_currentNavigationController;
++ (void)cyl_dismissAll:(void (^ __nullable)(void))completion;
+- (void)cyl_handleNavigationBackAction;
+- (void)cyl_handleNavigationBackActionWithAnimated:(BOOL)animated;
+
+@end
+
+@interface UIViewController (CYLTabBarControllerExtentionDeprecated)
+
+- (void)cyl_showTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use `-[UIViewController cyl_showBadgeValue:animationType:]` instead.");
+
+- (void)cyl_removeTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use `-[UIViewController cyl_clearBadge]` instead.");
+
+- (BOOL)cyl_isShowTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use `-[UIViewController cyl_isShowBadge]` instead.");
+
+@property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *cyl_tabBadgePointView CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
+
+@property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset cyl_tabBadgePointViewOffset CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
 
 @end

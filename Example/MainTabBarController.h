@@ -13,9 +13,6 @@
 #import "CYLTabBarController.h"
 #endif
 
-@interface CYLBaseNavigationController : UINavigationController
-@end
-
 @interface MainTabBarController : CYLTabBarController
 
 //@property (nonatomic, copy) NSString *context;

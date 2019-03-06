@@ -27,34 +27,29 @@
     self.window.frame = [UIScreen mainScreen].bounds;
     [CYLPlusButtonSubclass registerPlusButton];
     MainTabBarController *tabBarController = [[MainTabBarController alloc] init];
-    [tabBarController hideTabBadgeBackgroundSeparator];
+    
     //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
 //    [tabBarController setViewDidLayoutSubViewsBlock:^(CYLTabBarController *tabBarController) {
 //        if ([self cyl_tabBarController].selectedIndex != 0) {
 //            return;
 //        }
 //        static dispatch_once_t onceToken;
-//        UITabBar *tabBar =  tabBarController.tabBar;
-//        for (UIControl *control in tabBar.subviews) {
-//            if ([control cyl_isTabButton]) {
-//                dispatch_once(&onceToken, ^{
-//                    NSUInteger delaySeconds = 0.2;
-//                    dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
-//                    dispatch_after(when, dispatch_get_main_queue(), ^{
-//                        [self setSelectedCoverShow:YES];
-//                    });
-//                });
-//            }
-//        }
+//        dispatch_once(&onceToken, ^{
+//            NSUInteger delaySeconds = 0.2;
+//            dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
+//            dispatch_after(when, dispatch_get_main_queue(), ^{
+//                tabBarController.selectedIndex = 0;
+//            });
+//        });
 //    }];
     tabBarController.delegate = self;
     self.tabBarController = tabBarController;
     [self.window setRootViewController:tabBarController];
     [self.window makeKeyAndVisible];
     [self customizeInterfaceWithTabBarController:tabBarController];
+
     return YES;
 }
-
 
 - (void)setSelectedCoverShow:(BOOL)show {
     if (_selectedCover.superview && show) {
@@ -99,29 +94,17 @@
 - (void)customizeInterfaceWithTabBarController:(CYLTabBarController *)tabBarController {
     //设置导航栏
     [self setUpNavigationBarAppearance];
-    
     [tabBarController hideTabBadgeBackgroundSeparator];
     //添加小红点
-    UIViewController *viewController = tabBarController.viewControllers[0];
-    UIView *tabBadgePointView0 = [UIView cyl_tabBadgePointViewWithClolor:RANDOM_COLOR radius:4.5];
-    [viewController.tabBarItem.cyl_tabButton cyl_setTabBadgePointView:tabBadgePointView0];
-    [viewController cyl_showTabBadgePoint];
-    
-    UIView *tabBadgePointView1 = [UIView cyl_tabBadgePointViewWithClolor:RANDOM_COLOR radius:4.5];
+    //添加提示动画，引导用户点击
     @try {
-        [tabBarController.viewControllers[1] cyl_setTabBadgePointView:tabBadgePointView1];
-        [tabBarController.viewControllers[1] cyl_showTabBadgePoint];
-
-        UIView *tabBadgePointView2 = [UIView cyl_tabBadgePointViewWithClolor:RANDOM_COLOR radius:4.5];
-        [tabBarController.viewControllers[2] cyl_setTabBadgePointView:tabBadgePointView2];
-        [tabBarController.viewControllers[2] cyl_showTabBadgePoint];
-
-        [tabBarController.viewControllers[3] cyl_showTabBadgePoint];
-
-        //添加提示动画，引导用户点击
-        [self addScaleAnimationOnView:tabBarController.viewControllers[3].cyl_tabButton.cyl_tabImageView repeatCount:20];
+        [tabBarController.viewControllers[0] cyl_showBadge];
+        [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimTypeScale];
+        [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:[UIColor blueColor]];
+        [tabBarController.viewControllers[2] cyl_showBadgeValue:@"test" animationType:CYLBadgeAnimTypeShake];
+        [tabBarController.viewControllers[3] cyl_showBadgeValue:@"100" animationType:CYLBadgeAnimTypeBounce];
+        [tabBarController.viewControllers[4] cyl_showBadgeValue:@"new" animationType:CYLBadgeAnimTypeBreathe];
     } @catch (NSException *exception) {}
-    
 }
 
 /**
@@ -168,13 +151,13 @@
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;
-//    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：tabBarChildViewControllerIndex: %@, tabBarItemVisibleIndex : %@", @(__PRETTY_FUNCTION__), @(__LINE__), @(control.cyl_tabBarChildViewControllerIndex), @(control.cyl_tabBarItemVisibleIndex));
+    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：tabBarChildViewControllerIndex: %@, tabBarItemVisibleIndex : %@", @(__PRETTY_FUNCTION__), @(__LINE__), @(control.cyl_tabBarChildViewControllerIndex), @(control.cyl_tabBarItemVisibleIndex));
     if ([control cyl_isTabButton]) {
         //更改红标状态
-        if ([[self cyl_tabBarController].selectedViewController cyl_isShowTabBadgePoint]) {
-            [[self cyl_tabBarController].selectedViewController cyl_removeTabBadgePoint];
+        if ([[self cyl_tabBarController].selectedViewController cyl_isShowBadge]) {
+            [[self cyl_tabBarController].selectedViewController cyl_clearBadge];
         } else {
-            [[self cyl_tabBarController].selectedViewController cyl_showTabBadgePoint];
+            [[self cyl_tabBarController].selectedViewController cyl_showBadge];
         }
         animationView = [control cyl_tabImageView];
     }
@@ -186,18 +169,14 @@
         animationView = button.imageView;
     }
 
-    if ([self cyl_tabBarController].selectedIndex % 2 == 0) {
         [self addScaleAnimationOnView:animationView repeatCount:1];
-    } else {
-        [self addRotateAnimationOnView:animationView];
-    }
+//        [self addRotateAnimationOnView:animationView];//暂时不推荐用旋转方式，badge也会旋转。
     
     //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
 //    if ([control cyl_isTabButton]|| [control cyl_isPlusButton]) {
 //        BOOL shouldSelectedCoverShow = ([self cyl_tabBarController].selectedIndex == 0);
 //        [self setSelectedCoverShow:shouldSelectedCoverShow];
 //    }
-    
 }
 
 //缩放动画

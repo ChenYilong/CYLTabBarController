@@ -9,6 +9,7 @@
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "CYLTabBarController.h"
 #import <objc/runtime.h>
+#define kActualView     [self cyl_getActualBadgeSuperView]
 
 @implementation UIViewController (CYLTabBarControllerExtention)
 
@@ -118,28 +119,29 @@
     return (self == CYLPlusChildViewController);
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 - (void)cyl_showTabBadgePoint {
     if (self.cyl_isPlusChildViewController) {
         return;
     }
-    [self.cyl_tabButton cyl_showTabBadgePoint];
-    [[[self cyl_getViewControllerInsteadOfNavigationController] cyl_tabBarController].tabBar layoutIfNeeded];
+    [self cyl_showBadge];
 }
 
 - (void)cyl_removeTabBadgePoint {
     if (self.cyl_isPlusChildViewController) {
         return;
     }
-    [self.cyl_tabButton cyl_removeTabBadgePoint];
-    [[[self cyl_getViewControllerInsteadOfNavigationController] cyl_tabBarController].tabBar layoutIfNeeded];
+    [self cyl_clearBadge];
 }
 
 - (BOOL)cyl_isShowTabBadgePoint {
     if (self.cyl_isPlusChildViewController) {
         return NO;
     }
-    return [self.cyl_tabButton cyl_isShowTabBadgePoint];
+    return [self cyl_isShowBadge];;
 }
+#pragma clang diagnostic pop
 
 - (void)cyl_setTabBadgePointView:(UIView *)tabBadgePointView {
     if (self.cyl_isPlusChildViewController) {
@@ -293,6 +295,223 @@
         }
     }];
     return atIndex;
+}
+
++ (UIViewController * __nullable)cyl_topmostViewController {
+    UIViewController *topViewController = [[[UIApplication sharedApplication] keyWindow] rootViewController];
+    
+    if (topViewController == nil) {
+        return nil;
+    }
+    
+    while (true) {
+        if (topViewController.presentedViewController != nil) {
+            topViewController = topViewController.presentedViewController;
+        } else if ([topViewController isKindOfClass:[UINavigationController class]]) {
+            UINavigationController *navi = (UINavigationController *)topViewController;
+            topViewController = navi.topViewController;
+        } else if ([topViewController isKindOfClass:[UITabBarController class]]) {
+            UITabBarController *tab = (UITabBarController *)topViewController;
+            topViewController = tab.selectedViewController;
+        } else {
+            break;
+        }
+    }
+    
+    return topViewController;
+}
+
++ (UINavigationController * __nullable)cyl_currentNavigationController {
+    return [[UIViewController cyl_topmostViewController] navigationController];
+}
+
++ (void)cyl_dismissAll:(void (^ __nullable)(void))completion {
+    UIViewController *topViewController = [[[UIApplication sharedApplication] keyWindow] rootViewController];
+    
+    if (topViewController == nil) {
+        !completion ?: completion();
+        return;
+    }
+    
+    NSMutableArray *list = [NSMutableArray new];
+    
+    while (true) {
+        if (topViewController.presentedViewController != nil) {
+            topViewController = topViewController.presentedViewController;
+            [list addObject:topViewController];
+        } else if ([topViewController isKindOfClass:[UINavigationController class]]) {
+            UINavigationController *navi = (UINavigationController *)topViewController;
+            topViewController = navi.topViewController;
+        } else if ([topViewController isKindOfClass:[UITabBarController class]]) {
+            UITabBarController *tab = (UITabBarController *)topViewController;
+            topViewController = tab.selectedViewController;
+        } else {
+            break;
+        }
+    }
+    
+    if (list.count == 0) {
+        if (completion) {
+            completion();
+        }
+        return;
+    }
+    
+    for (NSInteger i = list.count - 1; i >=0 ; i--) {
+        
+        UIViewController *vc = list[i];
+        if (i == 0) {
+            if ([vc isKindOfClass:[UINavigationController class]]) {
+                [(UINavigationController *)vc popToRootViewControllerAnimated:NO];
+            }
+            [vc dismissViewControllerAnimated:NO completion:completion];
+        } else {
+            if ([vc isKindOfClass:[UINavigationController class]]) {
+                [(UINavigationController *)vc popToRootViewControllerAnimated:NO];
+            }
+            [vc dismissViewControllerAnimated:NO completion:nil];
+        }
+    }
+}
+
+- (void)cyl_handleNavigationBackAction {
+    [self cyl_handleNavigationBackActionWithAnimated:YES];
+}
+
+- (void)cyl_handleNavigationBackActionWithAnimated:(BOOL)animated {
+    if (!self.presentationController) {
+        [self.navigationController popViewControllerAnimated:animated];
+        return;
+    }
+    if (self.navigationController.viewControllers.count > 1) {
+        [self.navigationController popViewControllerAnimated:animated];
+    } else {
+        [self dismissViewControllerAnimated:animated completion:nil];
+    }
+}
+
+#pragma mark -- public methods
+
+/**
+ *  show badge with red dot style and CYLBadgeAnimTypeNone by default.
+ */
+- (void)cyl_showBadge {
+    [kActualView cyl_showBadge];
+}
+
+- (void)cyl_showBadgeValue:(NSString *)value
+             animationType:(CYLBadgeAnimType)aniType {
+    [kActualView cyl_showBadgeValue:value animationType:aniType];
+}
+
+- (void)cyl_clearBadge {
+    [kActualView cyl_clearBadge];
+}
+
+- (void)cyl_resumeBadge {
+    [kActualView cyl_resumeBadge];
+}
+
+- (BOOL)cyl_isShowBadge {
+    return [kActualView cyl_isShowBadge];
+}
+
+- (BOOL)cyl_isPauseBadge {
+    return [kActualView cyl_isPauseBadge];
+}
+
+#pragma mark -- private method
+
+/**
+ *  Because UIBarButtonItem is kind of NSObject, it is not able to directly attach badge.
+ This method is used to find actual view (non-nil) inside UIBarButtonItem instance.
+ *
+ *  @return view
+ */
+- (UITabBarItem *)cyl_getActualBadgeSuperView {
+    return self.navigationController.tabBarItem ?: self.tabBarItem;
+//    return  ?: self.navigationController.tabBarItem;
+}
+
+#pragma mark -- setter/getter
+- (UILabel *)cyl_badge {
+    return kActualView.cyl_badge;
+}
+
+- (void)cyl_setBadge:(UILabel *)label {
+    [kActualView cyl_setBadge:label];
+}
+
+- (UIFont *)cyl_badgeFont {
+    return kActualView.cyl_badgeFont;
+}
+
+- (void)cyl_setBadgeFont:(UIFont *)badgeFont {
+    [kActualView cyl_setBadgeFont:badgeFont];
+}
+
+- (UIColor *)cyl_badgeBackgroundColor {
+    return [kActualView cyl_badgeBackgroundColor];
+}
+
+- (void)cyl_setBadgeBackgroundColor:(UIColor *)badgeBackgroundColor {
+    [kActualView cyl_setBadgeBackgroundColor:badgeBackgroundColor];
+}
+
+- (UIColor *)cyl_badgeTextColor {
+    return [kActualView cyl_badgeTextColor];
+}
+
+- (void)cyl_setBadgeTextColor:(UIColor *)badgeTextColor {
+    [kActualView cyl_setBadgeTextColor:badgeTextColor];
+}
+
+- (CYLBadgeAnimType)cyl_aniType {
+    return [kActualView cyl_aniType];
+}
+
+- (void)cyl_setAniType:(CYLBadgeAnimType)aniType {
+    [kActualView cyl_setAniType:aniType];
+}
+
+- (CGRect)cyl_badgeFrame {
+    return [kActualView cyl_badgeFrame];
+}
+
+- (void)cyl_setBadgeFrame:(CGRect)badgeFrame {
+    [kActualView cyl_setBadgeFrame:badgeFrame];
+}
+
+- (CGPoint)cyl_badgeCenterOffset {
+    return [kActualView cyl_badgeCenterOffset];
+}
+
+- (void)cyl_setBadgeCenterOffset:(CGPoint)badgeCenterOffset {
+    [kActualView cyl_setBadgeCenterOffset:badgeCenterOffset];
+}
+
+- (NSInteger)cyl_badgeMaximumBadgeNumber {
+    return [kActualView cyl_badgeMaximumBadgeNumber];
+}
+
+- (void)cyl_setBadgeMaximumBadgeNumber:(NSInteger)badgeMaximumBadgeNumber {
+    [kActualView cyl_setBadgeMaximumBadgeNumber:badgeMaximumBadgeNumber];
+}
+
+- (CGFloat)cyl_badgeMargin {
+    return [kActualView cyl_badgeMargin];
+}
+
+- (void)cyl_setBadgeMargin:(CGFloat)badgeMargin {
+    [kActualView cyl_setBadgeMargin:badgeMargin];
+}
+
+- (CGFloat)cyl_badgeRadius {
+    return [kActualView cyl_badgeRadius];
+}
+
+- (void)cyl_setBadgeRadius:(CGFloat)badgeRadius {
+    [kActualView cyl_setBadgeRadius:badgeRadius];
 }
 
 @end

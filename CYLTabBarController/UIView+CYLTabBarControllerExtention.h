@@ -19,7 +19,6 @@
 - (BOOL)cyl_isTabBackgroundView;
 - (UIView *)cyl_tabBadgeBackgroundView;
 - (UIView *)cyl_tabBadgeBackgroundSeparator;
-
 + (UIView *)cyl_tabBadgePointViewWithClolor:(UIColor *)color radius:(CGFloat)radius;
 
 @end

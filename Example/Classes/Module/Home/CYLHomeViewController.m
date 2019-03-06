@@ -22,13 +22,6 @@
 //    [self.navigationController.tabBarItem setBadgeValue:@"3"];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        return YES;
-    }
-    return toInterfaceOrientation == UIInterfaceOrientationPortrait;
-}
-
 #pragma mark - Methods
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
@@ -113,16 +106,15 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     NSNumber *badgeNumber = @(indexPath.row);
     self.navigationItem.title = [NSString stringWithFormat:@"首页(%@)", badgeNumber]; //sets navigation bar title.
+    
 //    [self.navigationController.tabBarItem setBadgeValue:[NSString stringWithFormat:@"%@", badgeNumber]];
     
 //    CYLTabBarControllerConfig *tabBarControllerConfig = [[CYLTabBarControllerConfig alloc] init];
 //    CYLTabBarController *tabBarController = tabBarControllerConfig.tabBarController;
 //    tabBarController.delegate = self;
 //
-    
-    UIViewController *vc = [UIViewController new];
-    vc.view.backgroundColor = [UIColor whiteColor];
-    [self.navigationController  pushViewController:vc animated:YES];
+    [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimTypeScale];
+    [self pushToNewViewController];
 }
 
 
@@ -131,10 +123,16 @@
 ////    [[viewController_ cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
 //    return YES;
 //}
+
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    UIViewController *vc = [UIViewController new];
-    vc.view.backgroundColor = [UIColor whiteColor];
-    [self.navigationController  pushViewController:vc animated:YES];
+    [self pushToNewViewController];
+}
+
+- (void)pushToNewViewController {
+    CYLBaseViewController *viewController = [CYLBaseViewController new];
+    viewController.view.backgroundColor = [UIColor orangeColor];
+    [viewController cyl_setNavigationBarHidden:YES];
+    [self.navigationController  pushViewController:viewController animated:YES];
 }
 
 @end
