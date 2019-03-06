@@ -429,8 +429,14 @@
  *  @return view
  */
 - (UITabBarItem *)cyl_getActualBadgeSuperView {
-    return self.navigationController.tabBarItem ?: self.tabBarItem;
-//    return  ?: self.navigationController.tabBarItem;
+    UIViewController *viewController = self.cyl_getViewControllerInsteadOfNavigationController;
+    UITabBarItem *viewControllerItem = viewController.tabBarItem;
+    UIControl *viewControllerControl = viewControllerItem.cyl_tabButton;
+    UITabBarItem *navigationViewControllerItem = viewController.navigationController.tabBarItem;
+    if (viewControllerControl) {
+        return viewControllerItem;
+    }
+    return navigationViewControllerItem;
 }
 
 #pragma mark -- setter/getter

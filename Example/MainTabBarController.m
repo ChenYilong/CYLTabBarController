@@ -40,7 +40,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                                                              context:nil
                                              ];
     [self customizeTabBarAppearance:tabBarController];
-
+    self.navigationController.navigationBar.hidden = YES;
     return (self = (MainTabBarController *)tabBarController);
 }
 
@@ -76,7 +76,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
                                                  CYLTabBarItemTitle : @"首页",
-                                                 CYLTabBarItemImage : @"home_normal",  /* NSString and UIImage are supported*/
+                                                 CYLTabBarItemImage : self.darkMode ? @"home_highlight" : @"home_normal",  /* NSString and UIImage are supported*/
                                                  CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)]
                                                  //第一位 右大，下大
@@ -84,20 +84,20 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     CGFloat secondXOffset = (-25+2)/2;
     NSDictionary *secondTabBarItemsAttributes = @{
                                                   CYLTabBarItemTitle : @"鱼塘",
-                                                  CYLTabBarItemImage : @"fishpond_normal",
+                                                  CYLTabBarItemImage : self.darkMode ? @"fishpond_highlight" : @"fishpond_normal",
                                                   CYLTabBarItemSelectedImage : @"fishpond_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)]
                                                   };
     
     NSDictionary *thirdTabBarItemsAttributes = @{
                                                  CYLTabBarItemTitle : @"消息",
-                                                 CYLTabBarItemImage : @"message_normal",
+                                                 CYLTabBarItemImage : self.darkMode ? @"message_highlight" : @"message_normal",
                                                  CYLTabBarItemSelectedImage : @"message_highlight",
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-secondXOffset, -3.5)]
                                                  };
     NSDictionary *fourthTabBarItemsAttributes = @{
                                                   CYLTabBarItemTitle : @"我的",
-                                                  CYLTabBarItemImage : @"account_normal",
+                                                  CYLTabBarItemImage :self.darkMode ? @"account_highlight" :  @"account_normal",
                                                   CYLTabBarItemSelectedImage : @"account_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-firstXOffset, -3.5)]
                                                   };
@@ -116,6 +116,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [self becomeFirstResponder];
 }
 
+- (BOOL)isDarkMode {
+    return  !CYLExternPlusButton;
+}
 /**
  *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性等等
  */
@@ -128,12 +131,13 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // set the text color for unselected state
     // 普通状态下的文字属性
     NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];
-    normalAttrs[NSForegroundColorAttributeName] = [UIColor grayColor];
+    
+    normalAttrs[NSForegroundColorAttributeName] = self.darkMode ? [UIColor whiteColor] :[UIColor grayColor] ;
     
     // set the text color for selected state
     // 选中状态下的文字属性
     NSMutableDictionary *selectedAttrs = [NSMutableDictionary dictionary];
-    selectedAttrs[NSForegroundColorAttributeName] = [UIColor blackColor];
+    selectedAttrs[NSForegroundColorAttributeName] =  self.darkMode ? [UIColor whiteColor] :[UIColor blackColor];
     
     // set the text Attributes
     // 设置文字属性
@@ -143,7 +147,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色
-     [self customizeTabBarSelectionIndicatorImage];
+//     [self customizeTabBarSelectionIndicatorImage];
     
     // update TabBar when TabBarItem width did update
     // If your app need support UIDeviceOrientationLandscapeLeft or UIDeviceOrientationLandscapeRight，
@@ -154,26 +158,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // set the bar shadow image
     // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
     [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
-    [[UITabBar appearance] setBackgroundColor:[UIColor clearColor]];
+    [[UITabBar appearance] setBackgroundColor:self.darkMode ? [UIColor blackColor] : [UIColor whiteColor]];
     [[UITabBar appearance] setTintColor:[UIColor whiteColor]];
     //        [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"tapbar_top_line"]];
     
-    // set the bar background image
-    // 设置背景图片
-    UITabBar *tabBarAppearance = [UITabBar appearance];
     
-    //FIXED:  https://github.com/ChenYilong/CYLTabBarController/issues/312
-    [UITabBar appearance].translucent = NO;
-    //FIXED: https://github.com/ChenYilong/CYLTabBarController/issues/196
-    NSString *tabBarBackgroundImageName = @"tabbarBg";
-    UIImage *tabBarBackgroundImage = [UIImage imageNamed:tabBarBackgroundImageName];
-    UIImage *scanedTabBarBackgroundImage = [[self class] scaleImage:tabBarBackgroundImage];
-    [tabBarAppearance setBackgroundImage:scanedTabBarBackgroundImage];
-    
-    // remove the bar system shadow image
-    // 去除 TabBar 自带的顶部阴影
-    // iOS10 后 需要使用 `-[CYLTabBarController hideTabBadgeBackgroundSeparator]` 见 AppDelegate 类中的演示;
-    [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];
 }
 
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {
@@ -199,7 +188,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //Get initialized TabBar if exists.
     UITabBar *tabBar = [self cyl_tabBarController].tabBar ?: [UITabBar appearance];
     [tabBar setSelectionIndicatorImage:
-     [[self class] imageWithColor:[UIColor whiteColor]
+     [[self class] imageWithColor:(self.darkMode ? [UIColor blackColor] : [UIColor whiteColor])
                              size:selectionIndicatorImageSize]];
 }
 
@@ -224,6 +213,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 }
 
 @end

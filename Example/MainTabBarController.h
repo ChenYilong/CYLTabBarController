@@ -15,7 +15,7 @@
 
 @interface MainTabBarController : CYLTabBarController
 
-//@property (nonatomic, copy) NSString *context;
+@property (nonatomic, assign, getter=isDarkMode) BOOL darkMode;
 
 @end
 

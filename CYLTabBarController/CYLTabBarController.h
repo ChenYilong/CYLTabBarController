@@ -49,7 +49,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 @property (nonatomic, copy) CYLViewDidLayoutSubViewsBlock viewDidLayoutSubviewsBlock;
 
 - (void)setViewDidLayoutSubViewsBlock:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock;
-
+- (void)setViewDidLayoutSubViewsBlockInvokeOnce:(BOOL)invokeOnce block:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock;
 /*!
  * An array of the root view controllers displayed by the tab bar interface.
  */

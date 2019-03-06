@@ -29,8 +29,9 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 @interface CYLTabBarController () <UITabBarControllerDelegate>
 
 @property (nonatomic, assign, getter=isObservingTabImageViewDefaultOffset) BOOL observingTabImageViewDefaultOffset;
-
+@property (nonatomic, assign, getter=shouldInvokeOnceViewDidLayoutSubViewsBlock) BOOL invokeOnceViewDidLayoutSubViewsBlock;
 @end
+
 @implementation CYLTabBarController
 
 @synthesize viewControllers = _viewControllers;
@@ -66,6 +67,11 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     }
 }
 
+- (void)setViewDidLayoutSubViewsBlockInvokeOnce:(BOOL)invokeOnce block:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock  {
+    self.viewDidLayoutSubviewsBlock = viewDidLayoutSubviewsBlock;
+    self.invokeOnceViewDidLayoutSubViewsBlock = YES;
+}
+
 - (void)setViewDidLayoutSubViewsBlock:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock {
     _viewDidLayoutSubviewsBlock = viewDidLayoutSubviewsBlock;
 }
@@ -81,6 +87,16 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         [control addTarget:self action:actin forControlEvents:UIControlEventTouchUpInside];
         
     }];
+    if (self.shouldInvokeOnceViewDidLayoutSubViewsBlock) {
+        //在对象生命周期内，不添加 flag 属性的情况下，防止多次调进这个方法
+        if (objc_getAssociatedObject(self, _cmd)) {
+            return;
+        } else {
+            !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
+            objc_setAssociatedObject(self, _cmd, @"shouldInvokeOnceViewDidLayoutSubViewsBlock", OBJC_ASSOCIATION_RETAIN);
+        }
+        return;
+    }
     !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
 }
 
