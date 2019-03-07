@@ -12,7 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UITabBar (CYLTabBarControllerExtention)
 
-- (NSArray<UIControl *> *)cyl_subControls;
+- (NSArray<UIControl *> *)cyl_visibleControls;
+- (NSArray<UIControl *> *)cyl_subTabBarButtons;
 
 @end
 

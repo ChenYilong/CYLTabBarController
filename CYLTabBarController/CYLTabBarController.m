@@ -58,7 +58,8 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     [self updateSelectionStatusIfNeededForTabBarController:nil shouldSelectViewController:nil];
     UIControl *selectedControl;
     @try {
-        selectedControl = self.tabBar.cyl_subControls[selectedIndex];
+        NSArray *subControls =  self.tabBar.cyl_visibleControls;
+        selectedControl = subControls[selectedIndex];
     } @catch (NSException *exception) {
         NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
     }
@@ -82,10 +83,12 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         [self.tabBar layoutSubviews];//Fix issue #93
     }
     UITabBar *tabBar =  self.tabBar;
-    [tabBar.cyl_subControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
+    [tabBar.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([control cyl_isPlusButton] && CYLPlusChildViewController.cyl_plusViewControllerEverAdded) {
+            return;
+        }
         SEL actin = @selector(didSelectControl:);
         [control addTarget:self action:actin forControlEvents:UIControlEventTouchUpInside];
-        
     }];
     if (self.shouldInvokeOnceViewDidLayoutSubViewsBlock) {
         //在对象生命周期内，不添加 flag 属性的情况下，防止多次调进这个方法
@@ -527,17 +530,16 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     SEL actin = @selector(tabBarController:didSelectControl:);
     BOOL shouldSelectViewController =  YES;
     @try {
-       shouldSelectViewController = control.cyl_isPlusButton || (control.cyl_isTabButton &&
-                                       (!control.cyl_shouldNotSelect));
+       shouldSelectViewController = (!control.cyl_shouldNotSelect) &&  (!control.hidden) ;
     } @catch (NSException *exception) {
         NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
     }
+    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @(control.cyl_tabBarChildViewControllerIndex));
     if ([self.delegate respondsToSelector:actin] && shouldSelectViewController) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
         [self.delegate performSelector:actin withObject:self withObject:control ?: self.selectedViewController.tabBarItem.cyl_tabButton];
 #pragma clang diagnostic pop
-        [control cyl_setShouldNotSelect:NO];
     }
 }
 

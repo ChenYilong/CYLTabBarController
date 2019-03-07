@@ -58,10 +58,6 @@ UIViewController *CYLPlusChildViewController = nil;
     if (notNeedConfigureSelectionStatus) {
         return;
     }
-    if (sender.selected) {
-        return;
-    }
-    sender.selected = YES;
     CYLTabBarController *tabBarController = [sender cyl_tabBarController];
     NSInteger index = [tabBarController.viewControllers indexOfObject:CYLPlusChildViewController];
     @try {

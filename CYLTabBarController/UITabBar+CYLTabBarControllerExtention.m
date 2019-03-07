@@ -7,13 +7,34 @@
  */
 
 #import "UITabBar+CYLTabBarControllerExtention.h"
+#import "UIView+CYLTabBarControllerExtention.h"
+#import "CYLTabBar.h"
 
 @implementation UITabBar (CYLTabBarControllerExtention)
 
-- (NSArray<UIControl *> *)cyl_subControls {
+- (NSArray *)cyl_visibleControls {
+        if (self.subviews.count == 0) {
+            return self.subviews;
+        }
+        NSMutableArray *tabBarButtonArray = [NSMutableArray arrayWithCapacity:self.subviews.count];
+        [self.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([obj cyl_isTabButton] || [obj cyl_isPlusButton] ) {
+                [tabBarButtonArray addObject:obj];
+            }
+        }];
+        
+        NSArray *sortedSubviews = [[tabBarButtonArray copy] sortedArrayUsingComparator:^NSComparisonResult(UIView * formerView, UIView * latterView) {
+            CGFloat formerViewX = formerView.frame.origin.x;
+            CGFloat latterViewX = latterView.frame.origin.x;
+            return  (formerViewX > latterViewX) ? NSOrderedDescending : NSOrderedAscending;
+        }];
+        return sortedSubviews;
+}
+
+- (NSArray<UIControl *> *)cyl_subTabBarButtons {
     NSMutableArray *subControls = [NSMutableArray arrayWithCapacity:self.subviews.count];
-    for (UIControl *control in self.subviews) {
-        if ([control isKindOfClass:[UIControl class]]) {
+    for (UIControl *control in self.cyl_visibleControls) {
+        if ([control cyl_isTabButton]) {
             [subControls addObject:control];
         }
     }

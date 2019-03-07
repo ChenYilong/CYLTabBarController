@@ -75,7 +75,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 - (NSArray *)tabBarItemsAttributesForController {
     CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
-                                                 CYLTabBarItemTitle : @"首页",
+//                                                 CYLTabBarItemTitle : @"首页",
                                                  CYLTabBarItemImage : self.darkMode ? @"home_highlight" : @"home_normal",  /* NSString and UIImage are supported*/
                                                  CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)]
@@ -83,20 +83,20 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                  };
     CGFloat secondXOffset = (-25+2)/2;
     NSDictionary *secondTabBarItemsAttributes = @{
-                                                  CYLTabBarItemTitle : @"鱼塘",
+//                                                  CYLTabBarItemTitle : @"鱼塘",
                                                   CYLTabBarItemImage : self.darkMode ? @"fishpond_highlight" : @"fishpond_normal",
                                                   CYLTabBarItemSelectedImage : @"fishpond_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)]
                                                   };
     
     NSDictionary *thirdTabBarItemsAttributes = @{
-                                                 CYLTabBarItemTitle : @"消息",
+//                                                 CYLTabBarItemTitle : @"消息",
                                                  CYLTabBarItemImage : self.darkMode ? @"message_highlight" : @"message_normal",
                                                  CYLTabBarItemSelectedImage : @"message_highlight",
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-secondXOffset, -3.5)]
                                                  };
     NSDictionary *fourthTabBarItemsAttributes = @{
-                                                  CYLTabBarItemTitle : @"我的",
+//                                                  CYLTabBarItemTitle : @"我的",
                                                   CYLTabBarItemImage :self.darkMode ? @"account_highlight" :  @"account_normal",
                                                   CYLTabBarItemSelectedImage : @"account_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-firstXOffset, -3.5)]
