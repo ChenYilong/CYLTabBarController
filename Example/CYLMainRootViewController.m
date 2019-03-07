@@ -112,22 +112,24 @@
     //添加小红点
     //添加提示动画，引导用户点击
     [[self cyl_tabBarController] setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *tabBarController) {
-        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"");
         if ([self cyl_tabBarController].selectedIndex != 0) {
             return;
         }
-        @try {
-            UIViewController *viewControler0 = tabBarController.viewControllers[0];
-            NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), viewControler0);
-            [viewControler0 cyl_showBadge];
-            [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimTypeScale];
-            [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:[UIColor blueColor]];
-            [tabBarController.viewControllers[2] cyl_showBadgeValue:@"test" animationType:CYLBadgeAnimTypeShake];
-            [tabBarController.viewControllers[3] cyl_showBadgeValue:@"100" animationType:CYLBadgeAnimTypeBounce];
-            [tabBarController.viewControllers[4] cyl_showBadgeValue:@"new" animationType:CYLBadgeAnimTypeBreathe];
-        } @catch (NSException *exception) {}
+        NSUInteger delaySeconds = 0.2;
+        dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
+        dispatch_after(when, dispatch_get_main_queue(), ^{
+            @try {
+                UIViewController *viewControler0 = tabBarController.viewControllers[0];
+                NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), viewControler0);
+                [viewControler0 cyl_showBadge];
+                [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimTypeScale];
+                [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:[UIColor blueColor]];
+                [tabBarController.viewControllers[2] cyl_showBadgeValue:@"test" animationType:CYLBadgeAnimTypeShake];
+                [tabBarController.viewControllers[3] cyl_showBadgeValue:@"100" animationType:CYLBadgeAnimTypeBounce];
+                [tabBarController.viewControllers[4] cyl_showBadgeValue:@"new" animationType:CYLBadgeAnimTypeBreathe];
+            } @catch (NSException *exception) {}
+        });
     }];
-    
 }
 
 #pragma mark - delegate
