@@ -117,7 +117,7 @@
         dispatch_after(when, dispatch_get_main_queue(), ^{
             @try {
                 UIViewController *viewControler0 = tabBarController.viewControllers[0];
-                NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), viewControler0);
+//                NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), viewControler0);
                 [viewControler0 cyl_showBadge];
                 [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimTypeScale];
                 [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:[UIColor blueColor]];
