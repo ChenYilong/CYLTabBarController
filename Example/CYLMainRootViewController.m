@@ -112,9 +112,6 @@
     //添加小红点
     //添加提示动画，引导用户点击
     [[self cyl_tabBarController] setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *tabBarController) {
-        if ([self cyl_tabBarController].selectedIndex != 0) {
-            return;
-        }
         NSUInteger delaySeconds = 0.2;
         dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
         dispatch_after(when, dispatch_get_main_queue(), ^{
