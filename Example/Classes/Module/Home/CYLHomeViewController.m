@@ -113,7 +113,7 @@
 //    CYLTabBarController *tabBarController = tabBarControllerConfig.tabBarController;
 //    tabBarController.delegate = self;
 //
-    [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimTypeScale];
+    [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimationTypeScale];
     [self pushToNewViewController];
 }
 

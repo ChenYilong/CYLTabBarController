@@ -15,38 +15,26 @@
 
 #pragma mark -- types definition
 
-#define kBadgeBreatheAniKey     @"breathe"
-#define kBadgeRotateAniKey      @"rotate"
-#define kBadgeShakeAniKey       @"shake"
-#define kBadgeScaleAniKey       @"scale"
-#define kBadgeBounceAniKey      @"bounce"
-
-//key for associative methods during runtime
-static char badgeLabelKey;
-static char badgeBackgroundColorKey;
-static char badgeFontKey;
-static char badgeTextColorKey;
-static char badgeAniTypeKey;
-static char badgeFrameKey;
-static char badgeCenterOffsetKey;
-static char badgeMaximumBadgeNumberKey;
-static char badgeRadiusKey;
-static char badgeMarginKey;
+#define CYLBadgeBreatheAnimationKey     @"breathe"
+#define CYLBadgeRotateAnimationKey      @"rotate"
+#define CYLBadgeShakeAnimationKey       @"shake"
+#define CYLBadgeScaleAnimationKey       @"scale"
+#define CYLBadgeBounceAnimationKey      @"bounce"
 
 typedef NS_ENUM(NSUInteger, CYLBadgeStyle)
 {
-    CYLBadgeStyleRedDot = 0,          /* red dot style */
+    CYLBadgeStyleRedDot = 1,          /* red dot style */
     CYLBadgeStyleNumber,              /* badge with number */
     CYLBadgeStyleNew,                  /* badge with a fixed text "new" */
     CYLBadgeStyleOther                /* badge with a fixed text */
 };
 
-typedef NS_ENUM(NSUInteger, CYLBadgeAnimType) {
-    CYLBadgeAnimTypeNone = 0,         /* without animation, badge stays still */
-    CYLBadgeAnimTypeScale,            /* scale effect */
-    CYLBadgeAnimTypeShake,            /* shaking effect */
-    CYLBadgeAnimTypeBounce,           /* bouncing effect */
-    CYLBadgeAnimTypeBreathe           /* breathing light effect, which makes badge more attractive */
+typedef NS_ENUM(NSUInteger, CYLBadgeAnimationType) {
+    CYLBadgeAnimationTypeNone = 0,         /* without animation, badge stays still */
+    CYLBadgeAnimationTypeScale,            /* scale effect */
+    CYLBadgeAnimationTypeShake,            /* shaking effect */
+    CYLBadgeAnimationTypeBounce,           /* bouncing effect */
+    CYLBadgeAnimationTypeBreathe           /* breathing light effect, which makes badge more attractive */
 };
 
 #pragma mark -- protocol definition
@@ -68,8 +56,8 @@ typedef NS_ENUM(NSUInteger, CYLBadgeAnimType) {
 /* For x, negative number means left offset
  For y, negative number means bottom offset */
 
-@property (nonatomic, assign, getter=cyl_aniType, setter=cyl_setAniType:) CYLBadgeAnimType cyl_aniType;/* NOTE that this is not animation type of badge's
-                                                                                                      appearing, nor  hidding*/
+@property (nonatomic, assign, getter=cyl_badgeAnimationType, setter=cyl_setBadgeAnimationType:) CYLBadgeAnimationType cyl_badgeAnimationType;/* NOTE that this is not animation type of badge's
+                                                                                                                                              //                                                                                                      appearing, nor  hidding*/
 
 @property (nonatomic, assign, getter=cyl_badgeMaximumBadgeNumber, setter=cyl_setBadgeMaximumBadgeNumber:) NSInteger cyl_badgeMaximumBadgeNumber; /*for CYLBadgeStyleNumber style badge,
                                                                                                                                                   if badge value is above badgeMaximumBadgeNumber,
@@ -82,20 +70,20 @@ typedef NS_ENUM(NSUInteger, CYLBadgeAnimType) {
 - (BOOL)cyl_isShowBadge;
 
 /**
- *  show badge with red dot style and CYLBadgeAnimTypeNone by default.
+ *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
  */
 - (void)cyl_showBadge;
 
 /**
  *
  *  @param value String value, default is `nil`. if value equal @"" means red dot style.
- *  @param aniType
+ *  @param animationType
  *  @attention
  - 调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
  - 不支持 CYLPlusChildViewController 对应的 TabBarItem 角标设置，调用会被忽略。
  */
 - (void)cyl_showBadgeValue:(NSString *)value
-             animationType:(CYLBadgeAnimType)aniType;
+             animationType:(CYLBadgeAnimationType)animationType;
 
 /**
  *  clear badge(hide badge)

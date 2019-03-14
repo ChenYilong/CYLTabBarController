@@ -14,7 +14,7 @@
 - (BOOL)cyl_isShowBadge;
 
 /**
- *  show badge with red dot style and CYLBadgeAnimTypeNone by default.
+ *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
  */
 - (void)cyl_showBadge;
 
@@ -22,10 +22,10 @@
  *  cyl_showBadge
  *
  *  @param value String value, default is `nil`. if value equal @"" means red dot style.
- *  @param aniType
+ *  @param animationType
  */
 - (void)cyl_showBadgeValue:(NSString *)value
-         animationType:(CYLBadgeAnimType)aniType;
+         animationType:(CYLBadgeAnimationType)animationType;
 
 
 /**

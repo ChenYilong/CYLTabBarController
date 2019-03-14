@@ -10,6 +10,8 @@
 #import "MainTabBarController.h"
 #import "CYLPlusButtonSubclass.h"
 
+#define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
+
 @interface CYLMainRootViewController ()<UITabBarControllerDelegate, CYLTabBarControllerDelegate>
 
 @property (nonatomic, weak) UIButton *selectedCover;
@@ -116,14 +118,19 @@
         dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
         dispatch_after(when, dispatch_get_main_queue(), ^{
             @try {
-                UIViewController *viewControler0 = tabBarController.viewControllers[0];
-//                NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), viewControler0);
-                [viewControler0 cyl_showBadge];
-                [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimTypeScale];
-                [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:[UIColor blueColor]];
-                [tabBarController.viewControllers[2] cyl_showBadgeValue:@"test" animationType:CYLBadgeAnimTypeShake];
-                [tabBarController.viewControllers[3] cyl_showBadgeValue:@"100" animationType:CYLBadgeAnimTypeBounce];
-                [tabBarController.viewControllers[4] cyl_showBadgeValue:@"new" animationType:CYLBadgeAnimTypeBreathe];
+                UIViewController *viewController0 = tabBarController.viewControllers[0];
+//                UIControl *tab0 = viewController0.cyl_tabButton;
+                [viewController0 cyl_setBadgeBackgroundColor:RANDOM_COLOR];
+                [viewController0 cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
+                [viewController0 cyl_setBadgeRadius:5/2];
+                [viewController0 cyl_setBadgeMargin:1];
+                [viewController0 cyl_showBadge];
+                
+                [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScale];
+                [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:RANDOM_COLOR];
+                [tabBarController.viewControllers[2] cyl_showBadgeValue:@"test" animationType:CYLBadgeAnimationTypeShake];
+                [tabBarController.viewControllers[3] cyl_showBadgeValue:@"100" animationType:CYLBadgeAnimationTypeBounce];
+                [tabBarController.viewControllers[4] cyl_showBadgeValue:@"new" animationType:CYLBadgeAnimationTypeBreathe];
             } @catch (NSException *exception) {}
         });
     }];

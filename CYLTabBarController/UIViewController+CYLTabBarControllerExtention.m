@@ -393,15 +393,15 @@
 #pragma mark -- public methods
 
 /**
- *  show badge with red dot style and CYLBadgeAnimTypeNone by default.
+ *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
  */
 - (void)cyl_showBadge {
     [kActualView cyl_showBadge];
 }
 
 - (void)cyl_showBadgeValue:(NSString *)value
-             animationType:(CYLBadgeAnimType)aniType {
-    [kActualView cyl_showBadgeValue:value animationType:aniType];
+             animationType:(CYLBadgeAnimationType)animationType {
+    [kActualView cyl_showBadgeValue:value animationType:animationType];
 }
 
 - (void)cyl_clearBadge {
@@ -472,12 +472,12 @@
     [kActualView cyl_setBadgeTextColor:badgeTextColor];
 }
 
-- (CYLBadgeAnimType)cyl_aniType {
-    return [kActualView cyl_aniType];
+- (CYLBadgeAnimationType)cyl_badgeAnimationType {
+    return [kActualView cyl_badgeAnimationType];
 }
 
-- (void)cyl_setAniType:(CYLBadgeAnimType)aniType {
-    [kActualView cyl_setAniType:aniType];
+- (void)cyl_setBadgeAnimationType:(CYLBadgeAnimationType)animationType {
+    [kActualView cyl_setBadgeAnimationType:animationType];
 }
 
 - (CGRect)cyl_badgeFrame {
