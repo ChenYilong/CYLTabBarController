@@ -21,7 +21,7 @@
 
  - [CN] mark means Chinese language by default.
  - [EN] mark means English language.
- - [CN]学习QQ群 515295083 
+ - [CN] [点此获取 QQ 群,Telegram 群交流信息]( https://github.com/ChenYilong/iOSBlog/issues/21) 。
  - [EN]Telegram Group to communicate the features or bugs: https://t.me/CYLTabBarController 
 
 ## [CN]导航 
