@@ -46,6 +46,12 @@ UIViewController *CYLPlusChildViewController = nil;
     }
 }
 
++ (void)removePlusButton {
+    CYLExternPlusButton = nil;
+    [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:NO];
+    CYLPlusChildViewController = nil;
+}
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 + (void)registerSubclass {

@@ -40,31 +40,36 @@
     //            });
     //        });
     //    }];
+    [CYLPlusButtonSubclass registerPlusButton];
     [self createNewTabBar];
-    
-    //这里演示如何动态替换TabBar
+#warning ----------------- <FROM：[CN]这里演示如何动态替换 [EN]To show how to remove plusButton from TabBar dynamically>-----------------
     NSUInteger delaySeconds = 3;
     __block dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
-        [self createNewTabBar];
+        [self createNewTabBardynamically];
         when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
         dispatch_after(when, dispatch_get_main_queue(), ^{
-            [self createNewTabBar];
+            [self createNewTabBardynamically];
         });
     });
-    // Do any additional setup after loading the view.
+#warning ----------------- <TO：[CN]这里演示如何动态替换 [EN]To show how to remove plusButton from TabBar dynamically>-----------------
+
 }
 
 - (void)createNewTabBar {
-    if (arc4random_uniform(10)%2 == 0) {
-        CYLExternPlusButton = nil;
-    } else {
-        [CYLPlusButtonSubclass registerPlusButton];
-    }
     MainTabBarController *tabBarController = [[MainTabBarController alloc] init];
     tabBarController.delegate = self;
     self.viewControllers = @[tabBarController];
     [self customizeInterfaceWithTabBarController:tabBarController];
+}
+
+- (void)createNewTabBardynamically {
+    if (arc4random_uniform(10)%2 == 0) {
+        [CYLPlusButtonSubclass removePlusButton];
+    } else {
+        [CYLPlusButtonSubclass registerPlusButton];
+    }
+    [self createNewTabBar];
 }
 
 - (void)setSelectedCoverShow:(BOOL)show {

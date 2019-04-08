@@ -22,8 +22,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
         self.window = UIWindow()
         self.window?.frame  = UIScreen.main.bounds
         self.window?.rootViewController = mainTabBarVc
+        mainTabBarVc?.hideTabBadgeBackgroundSeparator();
+
         self.window?.makeKeyAndVisible()
-        
         
         UITabBar.appearance().backgroundColor = UIColor.white
         

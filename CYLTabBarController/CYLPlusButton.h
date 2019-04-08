@@ -79,7 +79,7 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 @interface CYLPlusButton : UIButton
 
 + (void)registerPlusButton;
-
++ (void)removePlusButton;
 - (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender;
 
 @end

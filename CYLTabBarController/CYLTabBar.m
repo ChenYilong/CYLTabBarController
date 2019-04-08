@@ -406,7 +406,8 @@ static CGFloat const CYLIPhoneXTabbarButtonSafeAreaHeight = 35;
     NSString *context = CYLPlusChildViewController.cyl_context;
     BOOL isSameContext = [context isEqualToString:self.context] && (context && self.context);
     BOOL isAdded = [[self cyl_tabBarController].viewControllers containsObject:CYLPlusChildViewController];
-    if (CYLPlusChildViewController && isSameContext && isAdded) {
+    BOOL isEverAdded = CYLPlusChildViewController.cyl_plusViewControllerEverAdded;
+    if (CYLPlusChildViewController && isSameContext && isAdded && isEverAdded) {
         return YES;
     }
     return NO;

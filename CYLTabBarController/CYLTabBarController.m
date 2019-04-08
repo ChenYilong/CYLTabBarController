@@ -231,7 +231,6 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 - (void)hideTabBadgeBackgroundSeparator {
     [self.tabBar layoutIfNeeded];
     self.tabBar.cyl_tabBadgeBackgroundSeparator.alpha = 0;
-    self.tabBar.barStyle = UIBarStyleBlack;
 }
 
 + (BOOL)havePlusButton {
