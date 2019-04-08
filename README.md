@@ -1,7 +1,8 @@
+
 # [CN]CYLTabBarController【低耦合集成TabBarController】
 # [EN]CYLTabBarController [Low coupling] 
 
-
+![enter image description here](http://i68.tinypic.com/ifyhoo.jpg)
 
 <p align="center">
 <a href=""><img src="https://img.shields.io/badge/pod-v1.17.4-brightgreen.svg"></a>
@@ -20,7 +21,7 @@
 
  - [CN] mark means Chinese language by default.
  - [EN] mark means English language.
- - [CN]学习QQ群 515295083 
+ - [CN] [点此获取 QQ 群,Telegram 群交流信息]( https://github.com/ChenYilong/iOSBlog/issues/21) 。
  - [EN]Telegram Group to communicate the features or bugs: https://t.me/CYLTabBarController 
 
 ## [CN]导航 
