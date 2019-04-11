@@ -60,6 +60,7 @@
 		9A474B5C1EF1586C0020D132 /* UIControl+CYLTabBarControllerExtention.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIControl+CYLTabBarControllerExtention.m"; sourceTree = "<group>"; };
 		9A474C0D1EEFCCE200560ED1 /* UIView+CYLTabBarControllerExtention.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+CYLTabBarControllerExtention.h"; sourceTree = "<group>"; };
 		9A474C0E1EEFCCE200560ED1 /* UIView+CYLTabBarControllerExtention.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+CYLTabBarControllerExtention.m"; sourceTree = "<group>"; };
+		9A579C98225F6E3A00F3C8F0 /* Location.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = Location.gpx; path = ../../../../../Location.gpx; sourceTree = "<group>"; };
 		9A5B29111D3475BC009E1BEE /* CYLConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLConstants.h; sourceTree = "<group>"; };
 		9A707578222E60E800EEF63E /* UIViewController+CYLNavigationControllerExtention.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIViewController+CYLNavigationControllerExtention.h"; sourceTree = "<group>"; };
 		9A707579222E60E800EEF63E /* UIViewController+CYLNavigationControllerExtention.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+CYLNavigationControllerExtention.m"; sourceTree = "<group>"; };
@@ -161,6 +162,7 @@
 				9A1559D51CB6D56500CAB1AF /* CYLDetailsViewController.m */,
 				9A1559D61CB6D56500CAB1AF /* CYLSameCityViewController.h */,
 				9A1559D71CB6D56500CAB1AF /* CYLSameCityViewController.m */,
+				9A579C98225F6E3A00F3C8F0 /* Location.gpx */,
 			);
 			path = SameCity;
 			sourceTree = "<group>";

@@ -94,13 +94,6 @@
     [self pushToNewViewController];
 }
 
-
-//- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
-////    UIViewController *viewController_ = [viewController  cyl_getViewControllerInsteadOfNavigationController];
-////    [[viewController_ cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
-//    return YES;
-//}
-
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [self pushToNewViewController];
 }

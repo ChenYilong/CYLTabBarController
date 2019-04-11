@@ -15,7 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)customizeInterfaceWithTabBarController:(CYLTabBarController *)tabBarController;
 - (void)createNewTabBar;
-- (void)createNewTabBardynamically;
 
 @end
 
