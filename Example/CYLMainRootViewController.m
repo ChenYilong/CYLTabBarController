@@ -26,77 +26,41 @@
     [super viewDidLoad];
     self.navigationBarHidden = YES;
     self.view.backgroundColor = [UIColor whiteColor];
-    //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
-    //    [tabBarController setViewDidLayoutSubViewsBlock:^(CYLTabBarController *tabBarController) {
-    //        if ([self cyl_tabBarController].selectedIndex != 0) {
-    //            return;
-    //        }
-    //        static dispatch_once_t onceToken;
-    //        dispatch_once(&onceToken, ^{
-    //            NSUInteger delaySeconds = 0.2;
-    //            dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
-    //            dispatch_after(when, dispatch_get_main_queue(), ^{
-    //                tabBarController.selectedIndex = 0;
-    //            });
-    //        });
-    //    }];
     [CYLPlusButtonSubclass registerPlusButton];
     [self createNewTabBar];
-#warning ----------------- <FROM：[CN]这里演示如何动态替换 [EN]To show how to remove plusButton from TabBar dynamically>-----------------
-    NSUInteger delaySeconds = 3;
-    __block dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
-    dispatch_after(when, dispatch_get_main_queue(), ^{
-        [self createNewTabBardynamically];
-        when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
-        dispatch_after(when, dispatch_get_main_queue(), ^{
-            [self createNewTabBardynamically];
-        });
-    });
-#warning ----------------- <TO：[CN]这里演示如何动态替换 [EN]To show how to remove plusButton from TabBar dynamically>-----------------
-
 }
 
 - (void)createNewTabBar {
     MainTabBarController *tabBarController = [[MainTabBarController alloc] init];
     tabBarController.delegate = self;
     self.viewControllers = @[tabBarController];
-    [self customizeInterfaceWithTabBarController:tabBarController];
+    [[self class] customizeInterfaceWithTabBarController:tabBarController];
 }
 
-- (void)createNewTabBardynamically {
-    if (arc4random_uniform(10)%2 == 0) {
-        [CYLPlusButtonSubclass removePlusButton];
-    } else {
-        [CYLPlusButtonSubclass registerPlusButton];
+- (UIButton *)selectedCover {
+    if (_selectedCover) {
+        return _selectedCover;
     }
-    [self createNewTabBar];
+    UIButton *selectedCover = [UIButton buttonWithType:UIButtonTypeCustom];
+    UIImage *image = [UIImage imageNamed:@"home_select_cover"];
+    [selectedCover setImage:image forState:UIControlStateNormal];
+    selectedCover.frame = ({
+        CGRect frame = selectedCover.frame;
+        frame.size = CGSizeMake(image.size.width, image.size.height);
+        frame;
+    });
+    selectedCover.translatesAutoresizingMaskIntoConstraints = NO;
+    // selectedCover.userInteractionEnabled = false;
+    _selectedCover = selectedCover;
+    return _selectedCover;
 }
 
 - (void)setSelectedCoverShow:(BOOL)show {
-    if (_selectedCover.superview && show) {
-        [self addOnceScaleAnimationOnView:_selectedCover];
-        return;
-    }
     UIControl *selectedTabButton = [[self cyl_tabBarController].viewControllers[0].tabBarItem cyl_tabButton];
-    if (show && !_selectedCover.superview) {
-        UIButton *selectedCover = [UIButton buttonWithType:UIButtonTypeCustom];
-        UIImage *image = [UIImage imageNamed:@"home_select_cover"];
-        [selectedCover setImage:image forState:UIControlStateNormal];
-        selectedCover.frame = CGRectMake(0, 0, image.size.width, image.size.height);
-        if (selectedTabButton) {
-            selectedCover.center = CGPointMake(selectedTabButton.cyl_tabImageView.center.x, selectedTabButton.center.y);
-            [self addOnceScaleAnimationOnView:selectedCover];
-            [selectedTabButton addSubview:(_selectedCover = selectedCover)];
-            [selectedTabButton bringSubviewToFront:_selectedCover];
-        }
-    } else if (_selectedCover.superview){
-        [_selectedCover removeFromSuperview];
-        _selectedCover = nil;
-    }
-    if (selectedTabButton) {
-        selectedTabButton.cyl_tabLabel.hidden =
-        (show );
-        selectedTabButton.cyl_tabImageView.hidden = (show);
+    [selectedTabButton cyl_replaceTabImageViewWithNewView:self.selectedCover
+                                            show:show];
+    if (show) {
+        [self addOnceScaleAnimationOnView:self.selectedCover];
     }
 }
 
@@ -112,13 +76,13 @@
     [animationView.layer addAnimation:animation forKey:nil];
 }
 
-- (void)customizeInterfaceWithTabBarController:(CYLTabBarController *)tabBarController {
++ (void)customizeInterfaceWithTabBarController:(CYLTabBarController *)tabBarController {
     //设置导航栏
     //    [self setUpNavigationBarAppearance];
     [tabBarController hideTabBadgeBackgroundSeparator];
     //添加小红点
     //添加提示动画，引导用户点击
-    [[self cyl_tabBarController] setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *tabBarController) {
+    [tabBarController setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *tabBarController) {
         NSUInteger delaySeconds = 0.2;
         dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
         dispatch_after(when, dispatch_get_main_queue(), ^{
@@ -137,6 +101,12 @@
                 [tabBarController.viewControllers[3] cyl_showBadgeValue:@"100" animationType:CYLBadgeAnimationTypeBounce];
                 [tabBarController.viewControllers[4] cyl_showBadgeValue:@"new" animationType:CYLBadgeAnimationTypeBreathe];
             } @catch (NSException *exception) {}
+
+            //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+            if ([self cyl_tabBarController].selectedIndex != 0) {
+                return;
+            }
+            tabBarController.selectedIndex = 0;
         });
     }];
 }
@@ -173,10 +143,10 @@
     // [self addRotateAnimationOnView:animationView];//暂时不推荐用旋转方式，badge也会旋转。
     
     //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
-    //    if ([control cyl_isTabButton]|| [control cyl_isPlusButton]) {
-    //        BOOL shouldSelectedCoverShow = ([self cyl_tabBarController].selectedIndex == 0);
-    //        [self setSelectedCoverShow:shouldSelectedCoverShow];
-    //    }
+    if ([control cyl_isTabButton]|| [control cyl_isPlusButton]) {
+        BOOL shouldSelectedCoverShow = ([self cyl_tabBarController].selectedIndex == 0);
+        [self setSelectedCoverShow:shouldSelectedCoverShow];
+    }
 }
 
 //缩放动画

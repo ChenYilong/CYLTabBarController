@@ -20,6 +20,8 @@
 #import "UIBarButtonItem+CYLBadgeExtention.h"
 #import "UIView+CYLBadgeExtention.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class CYLTabBarController;
 typedef void(^CYLViewDidLayoutSubViewsBlock)(CYLTabBarController *tabBarController);
 
@@ -143,3 +145,4 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidChangeNotification;
 
+NS_ASSUME_NONNULL_END

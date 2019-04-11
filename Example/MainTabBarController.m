@@ -49,7 +49,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     UIViewController *firstNavigationController = [[CYLBaseNavigationController alloc]
                                                    initWithRootViewController:firstViewController];
     [firstViewController cyl_setHideNavigationBarSeparator:YES];
-    [firstViewController cyl_setNavigationBarHidden:YES];
+//    [firstViewController cyl_setNavigationBarHidden:YES];
     CYLSameCityViewController *secondViewController = [[CYLSameCityViewController alloc] init];
     UIViewController *secondNavigationController = [[CYLBaseNavigationController alloc]
                                                     initWithRootViewController:secondViewController];
@@ -160,9 +160,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
     [[UITabBar appearance] setBackgroundColor:self.darkMode ? [UIColor blackColor] : [UIColor whiteColor]];
     [[UITabBar appearance] setTintColor:[UIColor whiteColor]];
-    //        [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"tapbar_top_line"]];
-    
-    
+    //        [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"tapbar_top_line"]];    
 }
 
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {

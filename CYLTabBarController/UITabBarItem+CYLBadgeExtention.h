@@ -10,6 +10,8 @@
 #import "UIView+CYLBadgeExtention.h"
 #import "CYLBadgeProtocol.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface UITabBarItem (CYLBadgeExtention)<CYLBadgeProtocol>
 
 - (BOOL)cyl_isShowBadge;
@@ -42,3 +44,6 @@
 - (BOOL)cyl_isPauseBadge;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

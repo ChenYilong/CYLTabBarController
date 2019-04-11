@@ -10,6 +10,8 @@
 #import "UIView+CYLBadgeExtention.h"
 #import "CYLBadgeProtocol.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface UIBarButtonItem (CYLBadgeExtention)<CYLBadgeProtocol>
 - (BOOL)cyl_isShowBadge;
 
@@ -37,6 +39,10 @@
  *  make bage(if existing) not hiden
  */
 - (void)cyl_resumeBadge;
+
 - (BOOL)cyl_isPauseBadge;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

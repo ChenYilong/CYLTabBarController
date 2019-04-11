@@ -8,8 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface UITabBarItem (CYLTabBarControllerExtention)
 
 @property (nonatomic, readonly) UIControl *cyl_tabButton;
 
 @end
+
+NS_ASSUME_NONNULL_END

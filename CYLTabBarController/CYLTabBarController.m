@@ -177,6 +177,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                 titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                                 context:(NSString *)context {
     if (self = [super init]) {
+        
         _imageInsets = imageInsets;
         _titlePositionAdjustment = titlePositionAdjustment;
         _tabBarItemsAttributes = tabBarItemsAttributes;

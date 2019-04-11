@@ -7,8 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-
 #import "CYLConstants.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
 @class CYLPlusButton;
 
 @protocol CYLPlusButtonSubclassing
@@ -91,3 +93,5 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 + (void)registerSubclass CYL_DEPRECATED("Deprecated in 1.6.0. Use `+[CYLPlusButton registerPlusButton]` instead.");
 
 @end
+
+NS_ASSUME_NONNULL_END

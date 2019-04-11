@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface UIView (CYLTabBarControllerExtention)
 
 - (BOOL)cyl_isPlusButton;
@@ -22,3 +24,5 @@
 + (UIView *)cyl_tabBadgePointViewWithClolor:(UIColor *)color radius:(CGFloat)radius;
 
 @end
+
+NS_ASSUME_NONNULL_END

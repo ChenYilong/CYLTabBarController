@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef NS_ENUM(NSUInteger, CYLAxis) {
     CYLAxisX = 0,
     CYLAxisY,
@@ -85,3 +87,6 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
 + (CAKeyframeAnimation *)cyl_bounce_AnimationRepeatTimes:(float)repeatTimes durTimes:(float)time forObj:(id)obj;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

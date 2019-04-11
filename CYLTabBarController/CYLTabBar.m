@@ -415,17 +415,17 @@ static CGFloat const CYLIPhoneXTabbarButtonSafeAreaHeight = 35;
 
 - (void)setupTabImageViewDefaultOffset:(UIView *)tabBarButton {
     __block BOOL shouldCustomizeImageView = YES;
-    __block CGFloat tabImageViewHeight = 0.f;
     __block CGFloat tabImageViewDefaultOffset = 0.f;
-    CGFloat tabBarHeight = self.frame.size.height;
+    CGFloat tabButtonCenterY = tabBarButton.center.y;
     [tabBarButton.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([obj cyl_isTabLabel]) {
             shouldCustomizeImageView = NO;
         }
-        tabImageViewHeight = obj.frame.size.height;
+        CGFloat tabImageViewCenterY = obj.center.y;
+        
         BOOL isTabImageView = [obj cyl_isTabImageView];
         if (isTabImageView) {
-            tabImageViewDefaultOffset = (tabBarHeight - tabImageViewHeight) * 0.5 * 0.5;
+            tabImageViewDefaultOffset = (tabButtonCenterY - tabImageViewCenterY) * 0.5;
         }
         if (isTabImageView && tabImageViewDefaultOffset == 0.f) {
             shouldCustomizeImageView = NO;

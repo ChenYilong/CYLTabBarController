@@ -10,6 +10,8 @@
 #import "CYLBadgeProtocol.h"
 #import "CYLConstants.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef void (^CYLPopSelectTabBarChildViewControllerCompletion)(__kindof UIViewController *selectedTabBarChildViewController);
 
 typedef void (^CYLPushOrPopCompletionHandler)(BOOL shouldPop,
@@ -156,3 +158,5 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 @property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset cyl_tabBadgePointViewOffset CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
 
 @end
+
+NS_ASSUME_NONNULL_END

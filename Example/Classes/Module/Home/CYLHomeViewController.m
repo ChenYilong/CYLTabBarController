@@ -9,6 +9,9 @@
 #import "CYLHomeViewController.h"
 //#import "CYLTabBarControllerConfig.h"
 //#import "CYLPlusButtonSubclass.h"
+#import "MainTabBarController.h"
+#import "CYLMainRootViewController.h"
+
 @implementation CYLHomeViewController 
 
 #pragma mark - View lifecycle
@@ -20,6 +23,25 @@
     self.tabBarItem.title = @"首页23333";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
     //self.title = @"首页1";                //❌sets both of these. Do not do this‼️‼️This may cause something strange like this : http://i68.tinypic.com/282l3x4.jpg .
 //    [self.navigationController.tabBarItem setBadgeValue:@"3"];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"refresh TabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
+}
+
+- (void)refreshTabBar:(id)sender {
+    [self createNewTabBardynamically];
+}
+
+- (void)createNewTabBar {
+    id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
+    UIWindow *window = delegate.window;
+    CYLMainRootViewController *rootController = (CYLMainRootViewController *)window.rootViewController;
+    [rootController createNewTabBar];
+}
+
+- (void)createNewTabBardynamically {
+    id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
+    UIWindow *window = delegate.window;
+    CYLMainRootViewController *rootController = (CYLMainRootViewController *)window.rootViewController;
+    [rootController createNewTabBar];
 }
 
 #pragma mark - Methods
@@ -40,51 +62,6 @@
     return cell;
 }
 
-//- (void)viewWillAppear:(BOOL)animated {
-//    [super viewWillAppear:animated];
-//    
-//    [self
-//     .navigationController setNavigationBarHidden:YES animated:animated];
-//    
-//    // 当新的视图控制器加载完成后再启用
-//    if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
-//        self.navigationController.interactivePopGestureRecognizer.delegate = self;
-//    }
-//    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@====%@", @(__PRETTY_FUNCTION__), @(__LINE__), [NSValue valueWithUIEdgeInsets:self.view.safeAreaInsets]
-//          ,[NSValue valueWithUIEdgeInsets:[UIApplication sharedApplication].keyWindow.safeAreaInsets]);
-//}
-//- (void)viewWillDisappear:(BOOL)animated {
-//    [super viewWillDisappear:animated];
-//    
-//    
-//    [self.navigationController setNavigationBarHidden:NO animated:animated];
-//    // 在过渡的时候禁用interactivePopGestureRecognizer
-//    if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
-//        self.navigationController.interactivePopGestureRecognizer.delegate = nil;
-//    }
-//    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@====%@", @(__PRETTY_FUNCTION__), @(__LINE__), [NSValue valueWithUIEdgeInsets:self.view.safeAreaInsets]
-//          ,[NSValue valueWithUIEdgeInsets:[UIApplication sharedApplication].keyWindow.safeAreaInsets]);
-//}
-//
-//-(void)viewDidDisappear:(BOOL)animated {
-//    [super viewDidDisappear:animated];
-//    if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
-//        self.navigationController.interactivePopGestureRecognizer.delegate = self;
-//        self.navigationController.interactivePopGestureRecognizer.enabled = YES;
-//    }
-//}
-//- (void)viewDidAppear:(BOOL)animated {
-//    [super viewDidAppear:animated];
-//    
-//    
-////    if (self.disablePopGestureRecognizer) {
-////        if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
-////            self.navigationController.interactivePopGestureRecognizer.enabled = NO;
-////        }
-////    }
-//    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@====%@", @(__PRETTY_FUNCTION__), @(__LINE__), [NSValue valueWithUIEdgeInsets:self.view.safeAreaInsets]
-//          ,[NSValue valueWithUIEdgeInsets:[UIApplication sharedApplication].keyWindow.safeAreaInsets]);
-//}
 #pragma mark - UINavigationControllerDelegate
 
 - (void)navigationController:(UINavigationController *)navigationController

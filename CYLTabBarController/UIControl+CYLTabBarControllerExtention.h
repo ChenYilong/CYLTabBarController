@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface UIControl (CYLTabBarControllerExtention)
 
 - (UIView *)cyl_tabBadgeView;
@@ -36,4 +38,14 @@
 
 @property (nonatomic, assign, getter=cyl_shouldNotSelect, setter=cyl_setShouldNotSelect:) BOOL cyl_shouldNotSelect;
 
+- (void)cyl_replaceTabImageViewWithNewView:(UIView *)newView
+                             show:(BOOL)show;
+
+- (void)cyl_replaceTabImageViewWithNewView:(UIView *)newView
+                                           offset:(UIOffset)offset
+                                    show:(BOOL)show
+                                       completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
+
 @end
+
+NS_ASSUME_NONNULL_END
