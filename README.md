@@ -1,8 +1,7 @@
+![enter image description here](http://i68.tinypic.com/ifyhoo.jpg)
 
 # [CN]CYLTabBarController【低耦合集成TabBarController】
 # [EN]CYLTabBarController [Low coupling] 
-
-![enter image description here](http://i68.tinypic.com/ifyhoo.jpg)
 
 <p align="center">
 <a href=""><img src="https://img.shields.io/badge/pod-v1.17.4-brightgreen.svg"></a>
