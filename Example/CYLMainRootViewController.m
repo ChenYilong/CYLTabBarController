@@ -57,7 +57,7 @@
 
 - (void)setSelectedCoverShow:(BOOL)show {
     UIControl *selectedTabButton = [[self cyl_tabBarController].viewControllers[0].tabBarItem cyl_tabButton];
-    [selectedTabButton cyl_replaceTabImageViewWithNewView:self.selectedCover
+    [selectedTabButton cyl_replaceTabButtonWithNewView:self.selectedCover
                                             show:show];
     if (show) {
         [self addOnceScaleAnimationOnView:self.selectedCover];

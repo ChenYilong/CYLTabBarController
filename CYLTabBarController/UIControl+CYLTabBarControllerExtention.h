@@ -46,6 +46,14 @@ NS_ASSUME_NONNULL_BEGIN
                                     show:(BOOL)show
                                        completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
 
+- (void)cyl_replaceTabButtonWithNewView:(UIView *)newView
+                                   show:(BOOL)show;
+
+- (void)cyl_replaceTabButtonWithNewView:(UIView *)newView
+                                 offset:(UIOffset)offset
+                                   show:(BOOL)theShow
+                             completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
+
 @end
 
 NS_ASSUME_NONNULL_END
