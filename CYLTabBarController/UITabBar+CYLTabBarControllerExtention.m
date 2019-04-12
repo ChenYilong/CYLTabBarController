@@ -8,6 +8,8 @@
 
 #import "UITabBar+CYLTabBarControllerExtention.h"
 #import "UIView+CYLTabBarControllerExtention.h"
+#import "UIControl+CYLTabBarControllerExtention.h"
+
 #import "CYLTabBar.h"
 
 @implementation UITabBar (CYLTabBarControllerExtention)
@@ -18,7 +20,11 @@
         }
         NSMutableArray *tabBarButtonArray = [NSMutableArray arrayWithCapacity:self.subviews.count];
         [self.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([obj cyl_isTabButton] || [obj cyl_isPlusButton] ) {
+            BOOL canNotResponseEvent = obj.hidden || (obj.alpha <= 0.01f) || (obj.userInteractionEnabled == NO) || (!obj.superview) || obj.frame.size.width == 0 || obj.frame.size.height == 0;
+            if (canNotResponseEvent) {
+                return;
+            }
+            if (([obj cyl_isTabButton] || [obj cyl_isPlusButton] ) ) {
                 [tabBarButtonArray addObject:obj];
             }
         }];
