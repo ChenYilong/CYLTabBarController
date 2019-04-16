@@ -4,7 +4,7 @@
 # [EN]CYLTabBarController [Low coupling] 
 
 <p align="center">
-<a href=""><img src="https://img.shields.io/badge/pod-v1.17.4-brightgreen.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/pod-v1.21.x-brightgreen.svg"></a>
 <a href=""><img src="https://img.shields.io/badge/Swift-compatible-orange.svg"></a>
 <a href=""><img src="https://img.shields.io/badge/platform-iOS%207.0%2B-ff69b5152950834.svg"></a>
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
