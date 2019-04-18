@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.author       = { "ChenYilong" => "luohanchenyilong@163.com" }
   s.social_media_url = 'http://weibo.com/luohanchenyilong/'
-  s.platform     = :ios, '7.0'
+  s.platform     = :ios, '9.0'
   s.source       = { :git => "https://github.com/ChenYilong/CYLTabBarController.git", :tag => s.version.to_s }
   s.source_files  = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}'
   s.public_header_files = 'CYLTabBarController/**/*.h'
