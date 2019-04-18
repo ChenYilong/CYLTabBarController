@@ -428,4 +428,17 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
     }
 }
 
+- (BOOL)cyl_isInvisiable {
+    UIView *obj = self;
+    CGFloat width = obj.frame.size.width;
+    CGFloat height = obj.frame.size.height;
+    BOOL isSizeZero = (width == 0 || height == 0);
+    BOOL isInvisible = (obj.hidden == YES) || (obj.alpha <= 0.01f)  || (!obj.superview) || isSizeZero;
+    return isInvisible;
+}
+
+- (BOOL)cyl_canNotResponseEvent {
+    return self.cyl_isInvisiable || (self.userInteractionEnabled == NO);
+}
+
 @end

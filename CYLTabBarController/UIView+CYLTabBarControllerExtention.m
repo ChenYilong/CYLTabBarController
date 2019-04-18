@@ -2,13 +2,17 @@
 //  CYLTabBarController.m
 //  CYLTabBarController
 //
-//  v1.16.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
 //  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "CYLPlusButton.h"
+#if __has_include(<Lottie/Lottie.h>)
+#import <Lottie/Lottie.h>
+#else
+#endif
 
 @implementation UIView (CYLTabBarControllerExtention)
 
@@ -68,6 +72,18 @@
         }
     }
     return nil;
+}
+
+- (BOOL)cyl_isLottieAnimationView {
+    BOOL isKindOfClass = [self isKindOfClass:[UIView class]];
+    BOOL isClass = [self isMemberOfClass:[UIView class]];
+    BOOL isKind = isKindOfClass && !isClass;
+    if (!isKind) {
+        return NO;
+    }
+    Class classType = NSClassFromString(@"LOTAnimationView");
+    BOOL isLottieAnimationView = ([self isKindOfClass:classType] || [self isMemberOfClass:classType]);
+    return isLottieAnimationView;
 }
 
 - (UIView *)cyl_tabBadgeBackgroundSeparator {

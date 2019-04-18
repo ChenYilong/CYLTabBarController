@@ -2,7 +2,7 @@
 //  CYLTabBarController.m
 //  CYLTabBarController
 //
-//  v1.16.0 Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
 //  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
 //
 
@@ -11,6 +11,10 @@
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
 #import "CYLTabBarController.h"
+#if __has_include(<Lottie/Lottie.h>)
+#import <Lottie/Lottie.h>
+#else
+#endif
 
 @implementation UIControl (CYLTabBarControllerExtention)
 
@@ -60,6 +64,17 @@
 
 - (BOOL)cyl_isShowTabBadgePoint {
     return !self.cyl_tabBadgePointView.hidden;
+}
+
+- (BOOL)cyl_isSelected {
+    BOOL isSelected = NO;
+    NSUInteger tabBarSelectedIndex = self.cyl_tabBarController.selectedIndex;
+    NSUInteger tabBarChildViewControllerIndex = self.cyl_tabBarChildViewControllerIndex;
+    BOOL defaultSelected = self.selected;
+    if ((tabBarSelectedIndex == tabBarChildViewControllerIndex) && defaultSelected) {
+        isSelected = YES;
+    }
+    return isSelected;
 }
 
 - (void)cyl_setShowTabBadgePointIfNeeded:(BOOL)showTabBadgePoint {
@@ -159,6 +174,15 @@
     return nil;
 }
 
+- (LOTAnimationView *)cyl_lottieAnimationView {
+    for (UILabel *subview in self.subviews) {
+        if ([subview cyl_isLottieAnimationView]) {
+            return (LOTAnimationView *)subview;
+        }
+    }
+    return nil;
+}
+
 - (void)cyl_replaceTabImageViewWithNewView:(UIView *)newView
                              show:(BOOL)show {
     [self cyl_replaceTabImageViewWithNewView:newView offset:UIOffsetZero show:show completion:^(BOOL isReplaced, UIControl *tabBarButton, UIView *newView) {
@@ -196,6 +220,17 @@
     if (isTabButton) {
         replacedView = tabBarButton;
     }
+    if (!replacedView) {
+        return;
+    }
+    if (newView.frame.size.width == 0 || newView.frame.size.height == 0 || newView.frame.size.width > tabBarButton.frame.size.width || newView.frame.size.height > tabBarButton.frame.size.height) {
+        UIImage *image = swappableImageView.image;
+        newView.frame = ({
+            CGRect frame = newView.frame;
+            frame.size = CGSizeMake(image.size.width, image.size.height);
+            frame;
+        });
+    }
     BOOL newViewCreated = (newView.superview);
     BOOL newViewAddedToTabButton = [self.subviews containsObject:newView];
     BOOL isNewViewAddedToTabButton = newViewCreated && newViewAddedToTabButton;
@@ -216,27 +251,53 @@
     if (shouldShowNewView) {
         [tabBarButton addSubview:newView];
         [tabBarButton bringSubviewToFront:newView];
+        CGSize newViewSize = newView.frame.size;
         if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0"))  {
             [NSLayoutConstraint activateConstraints:@[
                                                       [newView.centerXAnchor constraintEqualToAnchor:swappableImageView.centerXAnchor constant:offset.horizontal],
                                                       [newView.centerYAnchor constraintEqualToAnchor:replacedView.centerYAnchor constant:offset.vertical],
+                                                      [newView.widthAnchor constraintEqualToConstant:newViewSize.width],
+                                                      [newView.heightAnchor constraintEqualToConstant:newViewSize.height],
                                                       ]
              ];
         } else {
-            [NSLayoutConstraint constraintWithItem:newView
-                                         attribute:NSLayoutAttributeCenterX
-                                         relatedBy:NSLayoutRelationEqual
-                                            toItem:swappableImageView
-                                         attribute:NSLayoutAttributeCenterX
-                                        multiplier:1.0
-                                          constant:offset.horizontal];
-            [NSLayoutConstraint constraintWithItem:newView
-                                         attribute:NSLayoutAttributeCenterY
-                                         relatedBy:NSLayoutRelationEqual
-                                            toItem:replacedView
-                                         attribute:NSLayoutAttributeCenterY
-                                        multiplier:1.0
-                                          constant:offset.vertical];
+            [self addConstraints:@[
+                                   [NSLayoutConstraint constraintWithItem:newView
+                                                                attribute:NSLayoutAttributeCenterX
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:swappableImageView
+                                                                attribute:NSLayoutAttributeCenterX
+                                                               multiplier:1.0
+                                                                 constant:offset.horizontal],
+                                   [NSLayoutConstraint constraintWithItem:newView
+                                                                attribute:NSLayoutAttributeCenterY
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:replacedView
+                                                                attribute:NSLayoutAttributeCenterY
+                                                               multiplier:1.0
+                                                                 constant:offset.vertical],
+                                   [NSLayoutConstraint constraintWithItem:newView
+                                                                attribute:NSLayoutAttributeCenterY
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:replacedView
+                                                                attribute:NSLayoutAttributeCenterY
+                                                               multiplier:1.0
+                                                                 constant:offset.vertical],
+                                   [NSLayoutConstraint constraintWithItem:newView
+                                                                attribute:NSLayoutAttributeWidth
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:nil
+                                                                attribute:NSLayoutAttributeNotAnAttribute
+                                                               multiplier:1.0
+                                                                 constant:newViewSize.width],
+                                   [NSLayoutConstraint constraintWithItem:newView
+                                                                attribute:NSLayoutAttributeHeight
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:nil
+                                                                attribute:NSLayoutAttributeNotAnAttribute
+                                                               multiplier:1.0
+                                                                 constant:newViewSize.height]
+                                   ]];
         }
         !completion?:completion(YES, self, newView);
         return;
@@ -247,6 +308,27 @@
         !completion?:completion(NO, self, nil);
         return;
     }
+}
+
+- (void)cyl_addLottieImageWithLottieURL:(NSURL *)lottieURL
+                                   size:(CGSize)size {
+//#if __has_include(<Lottie/Lottie.h>)
+    if (self.cyl_lottieAnimationView) {
+        return;
+    }
+    UIControl *tabButton = self;
+    LOTAnimationView *lottieView = [[LOTAnimationView alloc] initWithContentsOfURL:lottieURL];
+    lottieView.frame = CGRectMake(0, 0, size.width, size.height);
+    lottieView.userInteractionEnabled = NO;
+    lottieView.contentMode = UIViewContentModeScaleAspectFill;
+    lottieView.translatesAutoresizingMaskIntoConstraints = NO;
+    [lottieView setClipsToBounds:NO];
+    [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
+
+//#else
+//    return;
+//#endif
+
 }
 
 #pragma mark - private method
