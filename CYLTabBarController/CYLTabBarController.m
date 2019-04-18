@@ -111,22 +111,14 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
             self.lottieViewAdded = YES;
             break;
         }
-        //FIXME:  del
-        id a = tabBar.cyl_visibleControls;
-        id b = tabBar.cyl_subTabBarButtons;
-//
-        
         dispatch_async(dispatch_get_main_queue(),^{
             [subTabBarButtonsWithoutPlusButton enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
                 UIControl *tabButton = control;
-                [self addLottieImageWithControl:tabButton];
-
+                BOOL animation = NO;
                 if (idx == self.selectedIndex) {
-                    NSURL *lottieURL = self.lottieURLs[idx];
-                    CGSize lottieSize = [self.lottieSizes[idx] CGSizeValue];
-                    [self.tabBar cyl_animationLottieImageWithSelectedControl:tabButton lottieURL:lottieURL size:lottieSize];
-                        
+                    animation = YES;
                 }
+                [self addLottieImageWithControl:tabButton animation:animation];
             }];
             self.lottieViewAdded = YES;
         });
@@ -635,11 +627,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         BOOL isSelected = control.cyl_isSelected;
         BOOL isLottieEnabled = [self isLottieEnabled];
         if (!isSelected && isLottieEnabled) {
-            [self addLottieImageWithControl:tabButton];
-//            NSUInteger index = [self.tabBar.cyl_subTabBarButtonsWithoutPlusButton indexOfObject:control];
-//            if (NSNotFound != index) {
-//                [self.tabBar cyl_animationLottieImageWithSelectedControl:tabButton lottieURL:self.lottieURLs[index] size:[self.lottieSizes[index] CGSizeValue]];
-//            }
+            [self addLottieImageWithControl:tabButton animation:YES];
         }
         [self.tabBar.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             obj.selected = NO;
@@ -655,14 +643,18 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     }
 }
 
-- (void)addLottieImageWithControl:(UIControl *)control {
+- (void)addLottieImageWithControl:(UIControl *)control animation:(BOOL)animation {
     NSUInteger index = [self.tabBar.cyl_subTabBarButtonsWithoutPlusButton indexOfObject:control];
     if (NSNotFound == index) {
         return;
     }
     NSURL *lottieURL = self.lottieURLs[index];
-    CGSize lottieSize = [self.lottieSizes[index] CGSizeValue];
+    NSValue *lottieSizeValue = self.lottieSizes[index];
+    CGSize lottieSize = [lottieSizeValue CGSizeValue];
     [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize];
+    if (animation) {
+        [self.tabBar cyl_animationLottieImageWithSelectedControl:control lottieURL:lottieURL size:lottieSize];
+    }
 }
 
 - (id)rootViewController {

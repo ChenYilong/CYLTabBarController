@@ -74,13 +74,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (NSArray *)tabBarItemsAttributesForController {
     CGFloat firstXOffset = -12/2;
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     NSDictionary *firstTabBarItemsAttributes = @{
                                                  CYLTabBarItemTitle : @"首页",
 ////                                                 CYLTabBarItemImage : self.darkMode ? @"home_highlight" : @"home_normal",  /* NSString and UIImage are supported*/
 //                                                 CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
                                                  //第一位 右大，下大
-                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_home_animate" ofType:@"json"]],
+                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[bundle pathForResource:@"tab_home_animate" ofType:@"json"]],
 //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                  };
     CGFloat secondXOffset = (-25+2)/2;
@@ -89,7 +90,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 //                                                  CYLTabBarItemImage : self.darkMode ? @"fishpond_highlight" : @"fishpond_normal",
 //                                                  CYLTabBarItemSelectedImage : @"fishpond_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)],
-                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_search_animate" ofType:@"json"]],
+                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[bundle pathForResource:@"tab_search_animate" ofType:@"json"]],
 //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(33, 33)]
                                                   };
     
@@ -98,7 +99,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 //                                                 CYLTabBarItemImage : self.darkMode ? @"message_highlight" : @"message_normal",
 //                                                 CYLTabBarItemSelectedImage : @"message_highlight",
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-secondXOffset, -3.5)],
-                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_message_animate" ofType:@"json"]],
+                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[bundle pathForResource:@"tab_message_animate" ofType:@"json"]],
 //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(44, 44)]
                                                  };
     NSDictionary *fourthTabBarItemsAttributes = @{
@@ -106,7 +107,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 //                                                  CYLTabBarItemImage :self.darkMode ? @"account_highlight" :  @"account_normal",
 //                                                  CYLTabBarItemSelectedImage : @"account_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-firstXOffset, -3.5)],
-                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_me_animate" ofType:@"json"]],
+                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[bundle pathForResource:@"tab_me_animate" ofType:@"json"]],
 //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                   };
     NSArray *tabBarItemsAttributes = @[
