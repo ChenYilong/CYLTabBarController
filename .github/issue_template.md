@@ -1,12 +1,39 @@
+
+![enter image description here](http://i68.tinypic.com/ifyhoo.jpg)
+
+----------
+
+
+<p align="center">
+<a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec"><img src="https://img.shields.io/badge/Pod-GetLatestVersion-green.svg?style=flat"></a>
+<a href=""><img src="https://img.shields.io/badge/Swift-compatible-orange.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/platform-iOS%208.0%2B-ff69b5152950834.svg"></a>
+<a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
+</p>
+
+<p align="center">
+<a href="https://github.com/ChenYilong/iOSBlog/issues/21"><img src="https://img.shields.io/static/v1.svg?label=Consider%20donating!&color=blue&message=%E7%82%B9%E5%87%BB%E6%8D%90%E8%B5%A0&color=green"></a>
+</p>
+
+
+<p align="center">
+<a href="https://twitter.com/stevechen1010"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social&maxAge=2592000"></a>
+<a href="http://weibo.com/luohanchenyilong"><img src="http://i67.tinypic.com/wbulbr.jpg"></a>
+</a><a href="https://t.me/CYLTabBarController"><img src="http://i66.tinypic.com/of2hbn.jpg"></a></a> 
+</p>
+
+----------
+
+
 ## Base Info for this issue 
 
 <!--- 基本信息 -->
 
 <!--- 每个类的第五行都标记有版本号，请贴出。 -->
 
- 1. Version：v1.17.x
- 2. Language：Objective-C
- 4. iOS System Version：iOS10
+ 1. Version：Latest Version as [here](https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec) 
+ 2. Language of App ：Objective-C/Swift
+ 4. iOS System Version：iOS12
  5. Prototype（是否是真机）：YES
  6. Issue Type：Crash、Bug、Enhancement（希望能支持一个新需求）、Q-A
 
@@ -26,3 +53,8 @@
 
 
 
+
+
+----------
+
+<p align="center"><a href="http://weibo.com/u/1692391497?s=6uyXnP" target="_blank"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1692391497/b46c844b/1.png"/></a></a>
