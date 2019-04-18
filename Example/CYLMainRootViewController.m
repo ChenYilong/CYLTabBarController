@@ -124,7 +124,7 @@
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;
-    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：control : %@ ,tabBarChildViewControllerIndex: %@, tabBarItemVisibleIndex : %@", @(__PRETTY_FUNCTION__), @(__LINE__), control, @(control.cyl_tabBarChildViewControllerIndex), @(control.cyl_tabBarItemVisibleIndex));
+//    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：control : %@ ,tabBarChildViewControllerIndex: %@, tabBarItemVisibleIndex : %@", @(__PRETTY_FUNCTION__), @(__LINE__), control, @(control.cyl_tabBarChildViewControllerIndex), @(control.cyl_tabBarItemVisibleIndex));
     if ([control cyl_isTabButton]) {
         //更改红标状态
         if ([[self cyl_tabBarController].selectedViewController cyl_isShowBadge]) {
