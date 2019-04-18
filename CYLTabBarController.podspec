@@ -12,6 +12,6 @@ Pod::Spec.new do |s|
   s.source_files  = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}'
   s.public_header_files = 'CYLTabBarController/**/*.h'
   s.requires_arc = true
-  s.dependency "lottie-ios" , "~> 3.0.5"
+  s.dependency "lottie-ios" , "~> 3.0.4"
 
 end
