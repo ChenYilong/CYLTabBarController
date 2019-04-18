@@ -1,7 +1,7 @@
 ![enter image description here](http://i68.tinypic.com/ifyhoo.jpg)
 
-# [CN]CYLTabBarController【一行代码实现 Lottie 动画样式的 TabBar】
-# [EN]CYLTabBarController [An animated tabBar suppoeted by Lottie with one line of code] 
+# [CN]CYLTabBarController【一行代码实现 Lottie 动画 TabBar】
+# [EN]CYLTabBarController [An animated tabBar supported by Lottie with one line of code] 
 
 <p align="center">
 <a href=""><img src="https://img.shields.io/badge/pod-v1.21.x-brightgreen.svg"></a>
