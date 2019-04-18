@@ -5,8 +5,6 @@ target 'CYLTabBarController' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  # Pods for CYLTabBarController
-pod 'lottie-ios'
-#pod 'CYLTabBarController', :path => './'
+pod 'CYLTabBarController', :path => './'
 
 end

@@ -12,11 +12,7 @@
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "UIControl+CYLTabBarControllerExtention.h"
 #import "UIImage+CYLTabBarControllerExtention.h"
-
-#if __has_include(<Lottie/Lottie.h>)
 #import <Lottie/Lottie.h>
-#else
-#endif
 
 NSString *const CYLTabBarItemTitle = @"CYLTabBarItemTitle";
 NSString *const CYLTabBarItemImage = @"CYLTabBarItemImage";
@@ -219,9 +215,9 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         _tabBarItemsAttributes = tabBarItemsAttributes;
         self.context = context;
         self.viewControllers = viewControllers;
-        if ([self hasPlusChildViewController]) {
-            self.delegate = self;
-        }
+//        if ([self hasPlusChildViewController]) {
+//            self.delegate = self;
+//        }
     }
     return self;
 }
@@ -449,7 +445,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                   lottieSizeValue:(NSValue *)lottieSizeValue {
     viewController.tabBarItem.title = title;
     CGSize placeholderSize = CGSizeMake(22, 22);
-    UIImage *placeholderImage = [UIImage cyl_imageWithColor:[UIColor redColor] size:placeholderSize];
+    UIImage *placeholderImage = [UIImage cyl_imageWithColor:[UIColor whiteColor] size:placeholderSize];
     UIImage *normalImage = nil;
     if (normalImageInfo) {
         normalImage = [self getImageFromImageInfo:normalImageInfo];
@@ -476,8 +472,6 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     }
     if (lottieURL) {
         [self.lottieURLs addObject:lottieURL];
-        //FIXME:  delete
-//        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：self.lottieURLs= %@, lottieURL: %@", @(__PRETTY_FUNCTION__), @(__LINE__), self.lottieURLs, lottieURL);
         NSValue *tureLottieSizeValue = nil;
         do {
             if (!CGSizeEqualToSize(CGSizeZero, [lottieSizeValue CGSizeValue])) {
@@ -609,24 +603,26 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 
 - (BOOL)isLottieEnabled {
     NSInteger lottieURLCount = self.lottieURLs.count;
-    NSInteger lottieSizesCount = self.lottieSizes.count;
-    BOOL isLottieEnabled = lottieURLCount > 0 && (lottieURLCount == lottieSizesCount);
+    BOOL isLottieEnabled = lottieURLCount > 0 ;
     return isLottieEnabled;
 }
 
 - (void)didSelectControl:(UIControl *)control {
     SEL actin = @selector(tabBarController:didSelectControl:);
+
     BOOL shouldSelectViewController =  YES;
     @try {
        shouldSelectViewController = (!control.cyl_shouldNotSelect) &&  (!control.hidden) ;
     } @catch (NSException *exception) {
         NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
     }
-    if (shouldSelectViewController) {
+    
+    BOOL isPlusButton = control.cyl_isPlusButton;
+    if (shouldSelectViewController && !isPlusButton) {
         UIControl *tabButton = control;
         BOOL isSelected = control.cyl_isSelected;
         BOOL isLottieEnabled = [self isLottieEnabled];
-        if (!isSelected && isLottieEnabled) {
+        if (!isSelected && isLottieEnabled ) {
             [self addLottieImageWithControl:tabButton animation:YES];
         }
         [self.tabBar.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -644,8 +640,11 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 }
 
 - (void)addLottieImageWithControl:(UIControl *)control animation:(BOOL)animation {
-    NSUInteger index = [self.tabBar.cyl_subTabBarButtonsWithoutPlusButton indexOfObject:control];
+     NSUInteger index = [self.tabBar.cyl_subTabBarButtonsWithoutPlusButton indexOfObject:control];
     if (NSNotFound == index) {
+        return;
+    }
+    if (control.cyl_isPlusButton) {
         return;
     }
     NSURL *lottieURL = self.lottieURLs[index];

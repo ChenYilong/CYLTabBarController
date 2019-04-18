@@ -73,6 +73,7 @@
     UIImage *normalButtonImage = [UIImage imageNamed:@"post_normal"];
     UIImage *hlightButtonImage = [UIImage imageNamed:@"post_highlight"];
     [button setImage:normalButtonImage forState:UIControlStateNormal];
+    [button setImage:hlightButtonImage forState:UIControlStateHighlighted];
     [button setImage:hlightButtonImage forState:UIControlStateSelected];
     UIImage *normalButtonBackImage = [UIImage imageNamed:@"videoback"];
     [button setBackgroundImage:normalButtonBackImage forState:UIControlStateNormal];
@@ -132,28 +133,28 @@
 
 #pragma mark - CYLPlusButtonSubclassing
 
-+ (UIViewController *)plusChildViewController {
-    UIViewController *plusChildViewController = [[UIViewController alloc] init];
-    plusChildViewController.view.backgroundColor = [UIColor redColor];
-    plusChildViewController.navigationItem.title = @"PlusChildViewController";
-    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
-                                                   initWithRootViewController:plusChildViewController];
-    return plusChildNavigationController;
-}
-
-+ (NSUInteger)indexOfPlusButtonInTabBar {
-    return 2;
-}
-
-+ (BOOL)shouldSelectPlusChildViewController {
-    BOOL isSelected = CYLExternPlusButton.selected;
-    if (isSelected) {
-//        HDLLogDebug("🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
-    } else {
-//        HDLLogDebug("🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
-    }
-    return YES;
-}
+//+ (UIViewController *)plusChildViewController {
+//    UIViewController *plusChildViewController = [[UIViewController alloc] init];
+//    plusChildViewController.view.backgroundColor = [UIColor redColor];
+//    plusChildViewController.navigationItem.title = @"PlusChildViewController";
+//    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
+//                                                   initWithRootViewController:plusChildViewController];
+//    return plusChildNavigationController;
+//}
+//
+//+ (NSUInteger)indexOfPlusButtonInTabBar {
+//    return 2;
+//}
+//
+//+ (BOOL)shouldSelectPlusChildViewController {
+//    BOOL isSelected = CYLExternPlusButton.selected;
+//    if (isSelected) {
+////        HDLLogDebug("🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
+//    } else {
+////        HDLLogDebug("🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
+//    }
+//    return YES;
+//}
 
 + (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
     return  0.3;

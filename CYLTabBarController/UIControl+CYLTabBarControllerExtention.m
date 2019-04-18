@@ -11,10 +11,7 @@
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
 #import "CYLTabBarController.h"
-#if __has_include(<Lottie/Lottie.h>)
 #import <Lottie/Lottie.h>
-#else
-#endif
 
 @implementation UIControl (CYLTabBarControllerExtention)
 
@@ -312,7 +309,7 @@
 
 - (void)cyl_addLottieImageWithLottieURL:(NSURL *)lottieURL
                                    size:(CGSize)size {
-//#if __has_include(<Lottie/Lottie.h>)
+#if __has_include(<Lottie/Lottie.h>)
     if (self.cyl_lottieAnimationView) {
         return;
     }
@@ -325,9 +322,9 @@
     [lottieView setClipsToBounds:NO];
     [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
 
-//#else
-//    return;
-//#endif
+#else
+    return;
+#endif
 
 }
 
