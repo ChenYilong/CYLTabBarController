@@ -64,7 +64,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 - (void)setSelectedIndex:(NSUInteger)selectedIndex {
     [super setSelectedIndex:selectedIndex];
     [self updateSelectionStatusIfNeededForTabBarController:nil shouldSelectViewController:nil];
-    UIControl *selectedControl = [self.tabBar cyl_visibleControlWithIndex:selectedIndex];
+    UIControl *selectedControl = [self.tabBar cyl_tabBarButtonWithTabIndex:selectedIndex];
     if (selectedControl) {
         [self didSelectControl:selectedControl];
     }

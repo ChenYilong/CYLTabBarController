@@ -66,10 +66,8 @@ UIViewController *CYLPlusChildViewController = nil;
     }
     CYLTabBarController *tabBarController = [sender cyl_tabBarController];
     NSInteger index = [tabBarController.viewControllers indexOfObject:CYLPlusChildViewController];
-    @try {
+    if (NSNotFound != index && (index < tabBarController.viewControllers.count)) {
         [tabBarController setSelectedIndex:index];
-    } @catch (NSException *exception) {
-        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception);
     }
 }
 

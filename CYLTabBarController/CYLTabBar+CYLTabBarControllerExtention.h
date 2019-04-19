@@ -16,17 +16,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<UIControl *> *)cyl_visibleControls;
 - (NSArray<UIControl *> *)cyl_subTabBarButtons;
 - (NSArray<UIControl *> *)cyl_subTabBarButtonsWithoutPlusButton;
-- (UIControl *)cyl_visibleControlWithIndex:(NSUInteger)index;
-//- (UIControl *)cyl_subTabBarButtonWithIndex:(NSUInteger)index;
-//- (void)cyl_animationLottieImageWithSelectedIndex:(NSUInteger)selectedIndex;
-//- (void)cyl_animationLottieImageWithSelectedControl:(UIControl *)selectedControl;
+- (UIControl *)cyl_tabBarButtonWithTabIndex:(NSUInteger)tabIndex;
 - (void)cyl_animationLottieImageWithSelectedControl:(UIControl *)selectedControl
                                           lottieURL:(NSURL *)lottieURL
                                                size:(CGSize)size;
 - (void)cyl_stopAnimationOfAllLottieView;
 - (NSArray *)cyl_originalTabBarButtons;
-//- (NSArray *)cyl_tabBarButtonFromTabBarSubviews:(NSArray *)tabBarSubviews;
-//- (NSArray *)cyl_sortedSubviews;
 - (BOOL)cyl_hasPlusChildViewController;
 
 @end
