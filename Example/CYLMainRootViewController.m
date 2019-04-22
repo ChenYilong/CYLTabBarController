@@ -9,8 +9,10 @@
 #import "CYLMainRootViewController.h"
 #import "MainTabBarController.h"
 #import "CYLPlusButtonSubclass.h"
-
+#if __has_include(<Lottie/Lottie.h>)
 #import <Lottie/Lottie.h>
+#else
+#endif
 
 #define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
 

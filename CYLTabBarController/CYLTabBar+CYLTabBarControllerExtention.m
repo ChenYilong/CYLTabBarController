@@ -13,7 +13,10 @@
 #import <objc/runtime.h>
 
 #import "CYLTabBar.h"
+#if __has_include(<Lottie/Lottie.h>)
 #import <Lottie/Lottie.h>
+#else
+#endif
 
 
 @implementation CYLTabBar (CYLTabBarControllerExtention)
@@ -153,14 +156,10 @@
     return selectedControl;
 }
 
-//- (void)cyl_animationLottieImageWithSelectedIndex:(NSUInteger)selectedIndex {
-//    UIControl *selectedControl = [self cyl_subTabBarButtonWithIndex:selectedIndex];
-//    [self cyl_animationLottieImageWithSelectedControl:selectedControl];
-//}
-
 - (void)cyl_animationLottieImageWithSelectedControl:(UIControl *)selectedControl
                                           lottieURL:(NSURL *)lottieURL
                                                size:(CGSize)size {
+#if __has_include(<Lottie/Lottie.h>)
     [selectedControl cyl_addLottieImageWithLottieURL:lottieURL size:size];
     [self cyl_stopAnimationOfAllLottieView];
     LOTAnimationView *lottieView = selectedControl.cyl_lottieAnimationView;
@@ -171,12 +170,17 @@
         lottieView.animationProgress = 0;
         [lottieView play];
     }
+#else
+#endif
 }
 
 - (void)cyl_stopAnimationOfAllLottieView {
+#if __has_include(<Lottie/Lottie.h>)
     [self.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj.cyl_lottieAnimationView stop];
     }];
+#else
+#endif
 }
 
 @end

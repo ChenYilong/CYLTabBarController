@@ -12,7 +12,10 @@
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "UIControl+CYLTabBarControllerExtention.h"
 #import "UIImage+CYLTabBarControllerExtention.h"
+#if __has_include(<Lottie/Lottie.h>)
 #import <Lottie/Lottie.h>
+#else
+#endif
 
 NSString *const CYLTabBarItemTitle = @"CYLTabBarItemTitle";
 NSString *const CYLTabBarItemImage = @"CYLTabBarItemImage";

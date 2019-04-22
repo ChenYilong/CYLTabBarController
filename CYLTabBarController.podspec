@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "CYLTabBarController"
-  s.version      = "1.23.1"
+  s.version      = "1.24.0"
   s.summary      = "Highly customizable tabBar and tabBarController for iOS"
   s.description  = "CYLTabBarController is iPad and iPhone compatible. Supports landscape and portrait orientations and can be used inside UINavigationController."
   s.homepage     = "https://github.com/ChenYilong/CYLTabBarController"
@@ -9,9 +9,19 @@ Pod::Spec.new do |s|
   s.social_media_url = 'http://weibo.com/luohanchenyilong/'
   s.platform     = :ios, '8.0'
   s.source       = { :git => "https://github.com/ChenYilong/CYLTabBarController.git", :tag => s.version.to_s }
-  s.source_files  = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}'
-  s.public_header_files = 'CYLTabBarController/**/*.h'
+ 
   s.requires_arc = true
-  s.dependency "lottie-ios" , '~> 2.5.0'
 
+
+  s.default_subspec = 'Core'
+
+  s.subspec 'Core' do |core|
+  core.source_files  = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}'
+  core.public_header_files = 'CYLTabBarController/**/*.h'
+  end
+
+  s.subspec 'Lottie' do |lottie|
+    lottie.dependency 'CYLTabBarController/Core'
+    lottie.dependency "lottie-ios" , '~> 2.5.3'
+  end
 end

@@ -11,7 +11,10 @@
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
 #import "CYLTabBarController.h"
+#if __has_include(<Lottie/Lottie.h>)
 #import <Lottie/Lottie.h>
+#else
+#endif
 
 @implementation UIControl (CYLTabBarControllerExtention)
 
@@ -321,9 +324,7 @@
     lottieView.translatesAutoresizingMaskIntoConstraints = NO;
     [lottieView setClipsToBounds:NO];
     [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
-
 #else
-    return;
 #endif
 
 }

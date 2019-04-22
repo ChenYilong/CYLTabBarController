@@ -9,7 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "CYLPlusButton.h"
+#if __has_include(<Lottie/Lottie.h>)
 #import <Lottie/Lottie.h>
+#else
+#endif
 
 @implementation UIView (CYLTabBarControllerExtention)
 
