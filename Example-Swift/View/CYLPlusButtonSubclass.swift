@@ -26,8 +26,13 @@ class CYLPlusButtonSubclass: CYLPlusButton,CYLPlusButtonSubclassing {
         
         button.adjustsImageWhenHighlighted = false
         button.sizeToFit()
+//        button.addTarget(self, action: #selector(testClick(sender:)), for: .touchUpInside)
         return button
     }
+    
+//    @objc static func testClick(sender: UIButton){
+//        print("testClick")
+//    }
     
     static func indexOfPlusButtonInTabBar() -> UInt {
         return 2
