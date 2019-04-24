@@ -91,7 +91,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     // add callback for visiable control, included all plusButton.
     [tabBar.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
         //to avoid invoking didSelectControl twice, because plusChildViewControllerButtonClicked will invoke setSelectedIndex
-        if ([control cyl_isPlusButton] && CYLPlusChildViewController.cyl_plusViewControllerEverAdded) {
+        if ([control cyl_isChildViewControllerPlusButton]) {
             return;
         }
         SEL actin = @selector(didSelectControl:);
@@ -620,18 +620,18 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
     }
     
-    BOOL isPlusButton = control.cyl_isPlusButton;
-    if (shouldSelectViewController && !isPlusButton) {
-        UIControl *tabButton = control;
-        BOOL isSelected = control.cyl_isSelected;
-        BOOL isLottieEnabled = [self isLottieEnabled];
-        if (!isSelected && isLottieEnabled ) {
-            [self addLottieImageWithControl:tabButton animation:YES];
-        }
+    BOOL isSelected = control.cyl_isSelected;
+    if (shouldSelectViewController) {
         [self.tabBar.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             obj.selected = NO;
         }];
         control.selected = YES;
+        UIControl *tabButton = control;
+        BOOL isChildViewControllerPlusButton = [control cyl_isChildViewControllerPlusButton];
+        BOOL isLottieEnabled = [self isLottieEnabled];
+        if (!isSelected && isLottieEnabled && !isChildViewControllerPlusButton) {
+            [self addLottieImageWithControl:tabButton animation:YES];
+        }
     }
     
     if ([self.delegate respondsToSelector:actin] && shouldSelectViewController) {

@@ -18,6 +18,11 @@
 
 @implementation UIControl (CYLTabBarControllerExtention)
 
+- (BOOL)cyl_isChildViewControllerPlusButton {
+    BOOL isChildViewControllerPlusButton = ([self cyl_isPlusButton] && CYLPlusChildViewController.cyl_plusViewControllerEverAdded);
+    return isChildViewControllerPlusButton;
+}
+
 - (BOOL)cyl_shouldNotSelect {
     NSNumber *shouldNotSelectObject = objc_getAssociatedObject(self, @selector(cyl_shouldNotSelect));
     return [shouldNotSelectObject boolValue];
