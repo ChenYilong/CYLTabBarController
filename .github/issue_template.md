@@ -12,9 +12,8 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/ChenYilong/iOSBlog/issues/21"><img src="https://img.shields.io/static/v1.svg?label=Consider%20donating!&color=blue&message=%E7%82%B9%E5%87%BB%E6%8D%90%E8%B5%A0&color=green"></a>
+<a href="https://github.com/ChenYilong/iOSBlog/issues/21"><img src="https://img.shields.io/static/v1.svg?label=QQ%E3%80%81Telegram%20Group&color=blue&message=%E7%82%B9%E5%87%BB%E8%8E%B7%E5%8F%96QQ%E3%80%81Telegram%E7%BE%A4%E4%BF%A1%E6%81%AF&color=green"></a>
 </p>
-
 
 <p align="center">
 <a href="https://twitter.com/stevechen1010"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social&maxAge=2592000"></a>
