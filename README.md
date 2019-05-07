@@ -9,8 +9,20 @@
 <a href=""><img src="https://img.shields.io/badge/Swift-compatible-orange.svg"></a>
 <a href=""><img src="https://img.shields.io/badge/platform-iOS%208.0%2B-ff69b5152950834.svg"></a>
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
- <a href="https://github.com/ChenYilong/iOSBlog/issues/21"><img src="https://img.shields.io/static/v1.svg?label=Consider%20donating!&color=blue&message=%E7%82%B9%E5%87%BB%E6%8D%90%E8%B5%A0&color=green"></a>
 
+</p>
+
+
+<p align="center">
+<a href="https://github.com/ChenYilong/iOSBlog/issues/21"><img src="https://img.shields.io/static/v1.svg?label=QQ%E3%80%81Telegram%20Group&color=blue&message=%E7%82%B9%E5%87%BB%E8%8E%B7%E5%8F%96QQ%E3%80%81Telegram%E7%BE%A4%E4%BF%A1%E6%81%AF&color=green"></a>
+</p>
+
+<p align="center">
+<a href="https://github.com/ChenYilong/CYLTabBarController/releases.atom"><img src="https://img.shields.io/badge/RSS feed (full text feed)-订阅仓库版本更新-yellow.svg"></a>
+</p>
+
+<p align="center">
+<a href="https://github.com/ChenYilong/iOSBlog/releases.atom"><img src="https://img.shields.io/badge/RSS feed (full text feed)-订阅我的博客更新-yellow.svg"></a>
 </p>
 
 <p align="center">
