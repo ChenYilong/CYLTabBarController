@@ -25,3 +25,4 @@ Pod::Spec.new do |s|
     lottie.dependency "lottie-ios" , '~> 2.5.3'
   end
 end
+ 
