@@ -38,7 +38,6 @@ FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
-
 @protocol CYLTabBarControllerDelegate <NSObject>
 @optional
 /*!

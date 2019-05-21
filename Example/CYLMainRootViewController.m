@@ -34,11 +34,12 @@
     [self createNewTabBar];
 }
 
-- (void)createNewTabBar {
+- (CYLTabBarController *)createNewTabBar {
     MainTabBarController *tabBarController = [[MainTabBarController alloc] init];
     tabBarController.delegate = self;
     self.viewControllers = @[tabBarController];
     [[self class] customizeInterfaceWithTabBarController:tabBarController];
+    return tabBarController;
 }
 
 - (UIButton *)selectedCover {

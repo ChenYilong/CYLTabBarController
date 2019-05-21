@@ -132,15 +132,19 @@
 
 - (UIControl *)cyl_tabBarButtonWithTabIndex:(NSUInteger)tabIndex {
     UIControl *selectedControl = [self cyl_visibleControlWithIndex:tabIndex];
+    
     NSInteger plusViewControllerIndex = [self.cyl_tabBarController.viewControllers indexOfObject:CYLPlusChildViewController];
     BOOL isPlusButton = selectedControl.cyl_isPlusButton;
-    BOOL shouldSelect = (plusViewControllerIndex <= self.cyl_tabBarController.viewControllers.count) && isPlusButton;
-    if (!shouldSelect) {
-        @try {
-            selectedControl = [self cyl_subTabBarButtonsWithoutPlusButton][tabIndex];
-        } @catch (NSException *exception) {
-            NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-        }
+    BOOL isPlusViewControllerAdded =  CYLPlusChildViewController.cyl_plusViewControllerEverAdded && (plusViewControllerIndex != NSNotFound);
+    
+    if (isPlusViewControllerAdded) {
+        return selectedControl;
+    }
+    
+    @try {
+        selectedControl = [self cyl_subTabBarButtonsWithoutPlusButton][tabIndex];
+    } @catch (NSException *exception) {
+        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
     }
     return selectedControl;
 }

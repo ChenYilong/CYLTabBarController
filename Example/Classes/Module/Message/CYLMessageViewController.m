@@ -8,6 +8,7 @@
 
 #import "CYLMessageViewController.h"
 #import "CYLTabBarController.h"
+#import "CYLMainRootViewController.h"
 
 @implementation CYLMessageViewController
 
@@ -39,6 +40,23 @@
     }
     [self configureCell:cell forIndexPath:indexPath];
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+//    NSNumber *badgeNumber = @(indexPath.row);
+//    self.navigationItem.title = [NSString stringWithFormat:@"首页(%@)", badgeNumber]; //sets navigation bar title.
+    
+    //    [self.navigationController.tabBarItem setBadgeValue:[NSString stringWithFormat:@"%@", badgeNumber]];
+    
+    //    CYLTabBarControllerConfig *tabBarControllerConfig = [[CYLTabBarControllerConfig alloc] init];
+    //    CYLTabBarController *tabBarController = tabBarControllerConfig.tabBarController;
+    //    tabBarController.delegate = self;
+    //
+    //    [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimationTypeScale];
+    //    [self pushToNewViewController];
+    CYLTabBarController *tabBarController = [[CYLMainRootViewController new] createNewTabBar];
+    [self.navigationController pushViewController:tabBarController animated:YES];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
