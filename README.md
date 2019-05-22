@@ -40,7 +40,7 @@
  - [EN]Telegram Group to communicate the features or bugs: https://t.me/CYLTabBarController 
 
 
-# [CN]谁在用?上架APP列表[EN]who are using?List  of App punished 
+# [CN]谁在用?上架APP列表[EN]who are using?List  of App published 
 
 
 
