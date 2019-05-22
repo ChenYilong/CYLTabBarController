@@ -54,10 +54,10 @@ static CGFloat const CYLIPhoneXTabbarButtonHeight = 48;
 static CGFloat const CYLIPhoneXTabbarButtonSafeAreaHeight = 35;
 
 + (void)load {
-    /* 这个问题是iOS12.1出现的问题, iOS 12.1.1已修复，只要 UITabBar 是磨砂的，并且 push viewController 时 hidesBottomBarWhenPushed = YES 则手势返回的时候就会触发。(来源于QMUIKit的处理方式)*/
+    /* 这个问题是iOS12.1出现的问题, iOS 12.1.1已修复，12.2又重新引入，只要 UITabBar 是磨砂的，并且 push viewController 时 hidesBottomBarWhenPushed = YES 则手势返回的时候就会触发。(来源于QMUIKit的处理方式)*/
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"12.1") && CYL_SYSTEM_VERSION_LESS_THAN(@"12.1.1"))  {
+        if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"12.1"))  {
             NSString *tabbarButtonString = [NSString stringWithFormat:@"U%@abB%@utton", @"IT", @"arB"];
             OverrideImplementation(NSClassFromString(tabbarButtonString), @selector(setFrame:), ^id(__unsafe_unretained Class originClass, SEL originCMD, IMP originIMP) {
                 return ^(UIView *selfObject, CGRect firstArgv) {

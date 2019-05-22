@@ -137,4 +137,12 @@
     [kActualView cyl_setBadgeRadius:badgeRadius];
 }
 
+- (CGFloat)cyl_badgeCornerRadius {
+    return [kActualView cyl_badgeCornerRadius];
+}
+
+- (void)cyl_setBadgeCornerRadius:(CGFloat)cyl_badgeCornerRadius {
+    [kActualView cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
+}
+
 @end

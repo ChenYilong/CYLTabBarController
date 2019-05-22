@@ -175,6 +175,14 @@
     [kActualView cyl_setBadgeRadius:badgeRadius];
 }
 
+- (CGFloat)cyl_badgeCornerRadius {
+    return [kActualView cyl_badgeCornerRadius];
+}
+
+- (void)cyl_setBadgeCornerRadius:(CGFloat)cyl_badgeCornerRadius {
+    [kActualView cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
+}
+
 #pragma mark - private method
 
 BOOL cyl_ClassMethodSwizzle(Class aClass, SEL originalSelector, SEL swizzleSelector) {

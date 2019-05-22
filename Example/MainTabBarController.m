@@ -49,11 +49,12 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     UIViewController *firstNavigationController = [[CYLBaseNavigationController alloc]
                                                    initWithRootViewController:firstViewController];
     [firstViewController cyl_setHideNavigationBarSeparator:YES];
-//    [firstViewController cyl_setNavigationBarHidden:YES];
+    // [firstViewController cyl_setNavigationBarHidden:YES];
     CYLSameCityViewController *secondViewController = [[CYLSameCityViewController alloc] init];
     UIViewController *secondNavigationController = [[CYLBaseNavigationController alloc]
                                                     initWithRootViewController:secondViewController];
     [secondViewController cyl_setHideNavigationBarSeparator:YES];
+    // [secondViewController cyl_setNavigationBarHidden:YES];
 
     CYLMessageViewController *thirdViewController = [[CYLMessageViewController alloc] init];
     UIViewController *thirdNavigationController = [[CYLBaseNavigationController alloc]
@@ -168,8 +169,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
     [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
     [[UITabBar appearance] setBackgroundColor:self.darkMode ? [UIColor blackColor] : [UIColor whiteColor]];
+    // [[UITabBar appearance] setBackgroundImage:[[self class] imageWithColor: [UIColor blackColor] size:CGSizeMake([UIScreen mainScreen].bounds.size.width, tabBarController.tabBarHeight ?: (CYL_IS_IPHONE_X ? 65 : 40))]];
     [[UITabBar appearance] setTintColor:[UIColor whiteColor]];
-    //        [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"tapbar_top_line"]];    
+    [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"TabBar_Bg_Shadow"]];
+    
 }
 
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {

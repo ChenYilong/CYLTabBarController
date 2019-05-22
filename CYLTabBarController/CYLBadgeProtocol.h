@@ -65,7 +65,9 @@ typedef NS_ENUM(NSUInteger, CYLBadgeAnimationType) {
 
 @property (nonatomic, assign, getter=cyl_badgeRadius, setter=cyl_setBadgeRadius:) CGFloat cyl_badgeRadius;
 
-@property (nonatomic, assign, getter=cyl_badgeMargin, setter=cyl_setBadgeMargin:) CGFloat cyl_badgeMargin; /**< // nomal use for red dot style of badge */
+@property (nonatomic, assign, getter=cyl_badgeMargin, setter=cyl_setBadgeMargin:) CGFloat cyl_badgeMargin; /**< // normal use for text and number style of badge */
+
+@property (nonatomic, assign, getter=cyl_badgeCornerRadius, setter=cyl_setBadgeCornerRadius:) CGFloat cyl_badgeCornerRadius;
 
 - (BOOL)cyl_isShowBadge;
 
