@@ -54,6 +54,8 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     [super viewDidLoad];
     if (CYL_IS_IPHONE_X) {
         self.tabBarHeight = 83;
+    } else {
+        self.tabBarHeight = 49;
     }
     // 处理tabBar，使用自定义 tabBar 添加 发布按钮
     [self setUpTabBar];

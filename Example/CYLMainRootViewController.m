@@ -63,7 +63,7 @@
 - (void)setSelectedCoverShow:(BOOL)show {
     UIControl *selectedTabButton = [[self cyl_tabBarController].viewControllers[0].tabBarItem cyl_tabButton];
     [selectedTabButton cyl_replaceTabButtonWithNewView:self.selectedCover
-                                            show:show];
+                                                  show:show];
     if (show) {
         [self addOnceScaleAnimationOnView:self.selectedCover];
     }
@@ -84,7 +84,7 @@
 + (void)customizeInterfaceWithTabBarController:(CYLTabBarController *)tabBarController {
     //设置导航栏
     //    [self setUpNavigationBarAppearance];
-//    [tabBarController hideTabBadgeBackgroundSeparator];
+    //    [tabBarController hideTabBadgeBackgroundSeparator];
     //添加小红点
     //添加提示动画，引导用户点击
     [tabBarController setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *tabBarController) {
@@ -97,35 +97,35 @@
                 // [tab0 cyl_showBadge];
                 [viewController0 cyl_setBadgeBackgroundColor:RANDOM_COLOR];
                 [viewController0 cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
-//                [viewController0 cyl_setBadgeRadius:11/2];
+                //                [viewController0 cyl_setBadgeRadius:11/2];
                 //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
                 [viewController0 cyl_showBadge];
                 
-//                [tabBarController.viewControllers[1] cyl_setBadgeMargin:5];
-//                [tabBarController.viewControllers[2] cyl_setBadgeMargin:5];
-//                [tabBarController.viewControllers[3] cyl_setBadgeMargin:5];
-//                [tabBarController.viewControllers[4] cyl_setBadgeMargin:5];
+                //                [tabBarController.viewControllers[1] cyl_setBadgeMargin:5];
+                //                [tabBarController.viewControllers[2] cyl_setBadgeMargin:5];
+                //                [tabBarController.viewControllers[3] cyl_setBadgeMargin:5];
+                //                [tabBarController.viewControllers[4] cyl_setBadgeMargin:5];
                 [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:RANDOM_COLOR];
                 [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScale];
                 [tabBarController.viewControllers[2] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake];
                 
                 NSString *testBadgeString = @"100";
-//                [tabBarController.viewControllers[3] cyl_setBadgeMargin:-5];
+                //                [tabBarController.viewControllers[3] cyl_setBadgeMargin:-5];
                 CGSize size = [testBadgeString sizeWithAttributes:
                                @{NSFontAttributeName:
                                      tabBarController.viewControllers[3].cyl_badgeFont}];
-                float labelHeight = ceilf(size.height);
-//                [tabBarController.viewControllers[3] cyl_setBadgeCornerRadius:(labelHeight+ tabBarController.viewControllers[3].cyl_badgeMargin)/2];
+                //                float labelHeight = ceilf(size.height);
+                //                [tabBarController.viewControllers[3] cyl_setBadgeCornerRadius:(labelHeight+ tabBarController.viewControllers[3].cyl_badgeMargin)/2];
                 [tabBarController.viewControllers[3] cyl_showBadgeValue:testBadgeString animationType:CYLBadgeAnimationTypeBounce];
                 
                 [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
             } @catch (NSException *exception) {}
-
+            
             //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
             if ([self cyl_tabBarController].selectedIndex != 0) {
                 return;
             }
-//            tabBarController.selectedIndex = 1;
+            //            tabBarController.selectedIndex = 1;
         });
     }];
 }

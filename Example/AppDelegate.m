@@ -11,12 +11,15 @@
 #import "CYLMainRootViewController.h"
 
 @interface AppDelegate ()
-
+@property (nonatomic, strong) NSMutableData *data;
 @end
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    
+    
     [UIApplication sharedApplication].statusBarHidden = NO;
     // 设置主窗口,并设置根控制器
     self.window = [[UIWindow alloc]init];
@@ -28,6 +31,20 @@
     [self setUpNavigationBarAppearance];
     return YES;
 }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmethod-signatures"
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+    //设置强制旋转屏幕
+    if (self.cyl_isForceLandscape) {
+        //只支持横屏
+        return UIInterfaceOrientationMaskLandscape;
+    } else {
+        //只支持竖屏
+        return UIInterfaceOrientationMaskPortrait;
+    }
+}
+#pragma clang diagnostic pop
 
 /**
  *  设置navigationBar样式

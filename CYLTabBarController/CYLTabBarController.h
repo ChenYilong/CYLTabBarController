@@ -19,6 +19,7 @@
 #import "UITabBarItem+CYLBadgeExtention.h"
 #import "UIBarButtonItem+CYLBadgeExtention.h"
 #import "UIView+CYLBadgeExtention.h"
+#import "NSObject+CYLLandscapeExtension.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -38,7 +39,7 @@ FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
-@protocol CYLTabBarControllerDelegate <NSObject>
+@protocol CYLTabBarControllerDelegate <NSObject, UITabBarControllerDelegate>
 @optional
 /*!
  * @param tabBarController The tab bar controller containing viewController.
