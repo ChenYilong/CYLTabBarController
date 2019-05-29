@@ -136,8 +136,8 @@
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
     BOOL should = YES;
-    [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController shouldSelect:should];    
-    if ([self cyl_tabBarController].selectedIndex == viewController.cyl_tabIndex) {
+    [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController shouldSelect:should];
+    if (should && [self cyl_tabBarController].selectedIndex == viewController.cyl_tabIndex) {
         @try {
             [[[self class] cyl_topmostViewController] performSelector:@selector(refresh)];
         } @catch (NSException *exception) {
