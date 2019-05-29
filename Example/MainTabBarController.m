@@ -41,6 +41,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                              ];
     [self customizeTabBarAppearance:tabBarController];
     self.navigationController.navigationBar.hidden = YES;
+//    tabBarController.delegate = self;
     return (self = (MainTabBarController *)tabBarController);
 }
 
@@ -124,6 +125,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [super viewDidLoad];
     [[UIApplication sharedApplication] setApplicationSupportsShakeToEdit:YES];
     [self becomeFirstResponder];
+    [self cyl_tabBarController].delegate = self;
 }
 
 - (BOOL)isDarkMode {
@@ -165,14 +167,25 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // 如果你的App需要支持横竖屏，请使用该方法移除注释 '//'
      [self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
     
+
     // set the bar shadow image
     // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
     [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
     [[UITabBar appearance] setBackgroundColor:self.darkMode ? [UIColor blackColor] : [UIColor whiteColor]];
     // [[UITabBar appearance] setBackgroundImage:[[self class] imageWithColor: [UIColor blackColor] size:CGSizeMake([UIScreen mainScreen].bounds.size.width, tabBarController.tabBarHeight ?: (CYL_IS_IPHONE_X ? 65 : 40))]];
     [[UITabBar appearance] setTintColor:[UIColor whiteColor]];
-    [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"TabBar_Bg_Shadow"]];
-    
+    //Three way to deal with shadow 三种阴影处理方式：
+    // NO.3, without shadow
+        [[UITabBar appearance] setShadowImage:[UIImage new]];
+    //NO.2，using Image
+    //    [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"TabBar_Bg_Shadow"]];
+    //NO.1，using layer to add shadow. note:recommended. 推荐该方式，可以给PlusButton突出的部分也添加上阴影
+    tabBarController.tabBar.clipsToBounds = NO;
+    tabBarController.tabBar.layer.shadowColor = [UIColor blackColor].CGColor;
+    tabBarController.tabBar.layer.shadowRadius = 5.0;
+    tabBarController.tabBar.layer.shadowOpacity = 0.2;
+    tabBarController.tabBar.layer.masksToBounds = NO;
+    tabBarController.tabBar.layer.shadowOffset = CGSizeMake(0, 3);
 }
 
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {

@@ -15,4 +15,6 @@
 
 @interface CYLHomeViewController : CYLBaseTableViewController <UITabBarControllerDelegate>
 
+- (void)refresh;
+
 @end

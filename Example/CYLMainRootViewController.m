@@ -13,6 +13,8 @@
 #import <Lottie/Lottie.h>
 #else
 #endif
+#import <MJRefresh/MJRefresh.h>
+
 
 #define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
 
@@ -135,6 +137,14 @@
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
     BOOL should = YES;
     [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController shouldSelect:should];
+    UIControl *selectedTabButton = [viewController.tabBarItem cyl_tabButton];
+    if (selectedTabButton.selected) {
+        @try {
+            [[[self class] cyl_topmostViewController] performSelector:@selector(refresh)];
+        } @catch (NSException *exception) {
+            NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        }
+    }
     return should;
 }
 
@@ -163,8 +173,8 @@
 
     //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
     if ([control cyl_isTabButton]|| [control cyl_isPlusButton]) {
-//        BOOL shouldSelectedCoverShow = ([self cyl_tabBarController].selectedIndex == 0);
-//        [self setSelectedCoverShow:shouldSelectedCoverShow];
+        //        BOOL shouldSelectedCoverShow = ([self cyl_tabBarController].selectedIndex == 0);
+        //        [self setSelectedCoverShow:shouldSelectedCoverShow];
     }
 }
 

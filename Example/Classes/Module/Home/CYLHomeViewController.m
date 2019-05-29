@@ -11,6 +11,7 @@
 //#import "CYLPlusButtonSubclass.h"
 #import "MainTabBarController.h"
 #import "CYLMainRootViewController.h"
+#import <MJRefresh/MJRefresh.h>
 
 @implementation CYLHomeViewController 
 
@@ -24,6 +25,24 @@
     //self.title = @"首页1";                //❌sets both of these. Do not do this‼️‼️This may cause something strange like this : http://i68.tinypic.com/282l3x4.jpg .
 //    [self.navigationController.tabBarItem setBadgeValue:@"3"];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"refresh TabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
+    __weak __typeof(self) weakSelf = self;
+    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        //Call this Block When enter the refresh status automatically
+        NSUInteger delaySeconds = 1;
+        dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
+        dispatch_after(when, dispatch_get_main_queue(), ^{
+            [weakSelf.tableView.mj_header endRefreshing];
+        });
+    }];
+}
+
+- (void)refresh {
+    [self.tableView.mj_header beginRefreshing];
+    NSUInteger delaySeconds = 1;
+    dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
+    dispatch_after(when, dispatch_get_main_queue(), ^{
+        [self.tableView.mj_header endRefreshing];
+    });
 }
 
 - (void)refreshTabBar:(id)sender {
