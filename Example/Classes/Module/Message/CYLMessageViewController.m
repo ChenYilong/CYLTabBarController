@@ -9,6 +9,7 @@
 #import "CYLMessageViewController.h"
 #import "CYLTabBarController.h"
 #import "CYLMainRootViewController.h"
+#import <MJRefresh/MJRefresh.h>
 
 @implementation CYLMessageViewController
 
@@ -20,6 +21,24 @@
     self.navigationItem.title = @"消息";    //✅sets navigation bar title.The right way to set the title of the navigation
     self.tabBarItem.title = @"消息23333";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
     //self.title = @"消息1";                //❌sets both of these. Do not do this‼️‼️ This may cause something strange like this : http://i68.tinypic.com/282l3x4.jpg .
+    __weak __typeof(self) weakSelf = self;
+    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        //Call this Block When enter the refresh status automatically
+        NSUInteger delaySeconds = 1;
+        dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
+        dispatch_after(when, dispatch_get_main_queue(), ^{
+            [weakSelf.tableView.mj_header endRefreshing];
+        });
+    }];
+}
+
+- (void)refresh {
+    [self.tableView.mj_header beginRefreshing];
+    NSUInteger delaySeconds = 1;
+    dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
+    dispatch_after(when, dispatch_get_main_queue(), ^{
+        [self.tableView.mj_header endRefreshing];
+    });
 }
 #pragma mark - Methods
 

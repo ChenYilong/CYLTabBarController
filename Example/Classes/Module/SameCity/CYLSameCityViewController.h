@@ -15,4 +15,7 @@
 
 @interface CYLSameCityViewController : CYLBaseTableViewController
 
+- (void)refresh;
+
+
 @end

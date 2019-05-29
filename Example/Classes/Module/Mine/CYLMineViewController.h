@@ -17,4 +17,6 @@
 
 - (void)testPush;
 
+- (void)refresh;
+
 @end

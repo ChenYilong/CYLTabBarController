@@ -15,4 +15,6 @@
 
 @interface CYLMessageViewController : CYLBaseTableViewController
 
+- (void)refresh;
+
 @end
