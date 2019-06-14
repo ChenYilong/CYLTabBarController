@@ -7,7 +7,6 @@
 //
 
 #import "CYLMessageViewController.h"
-#import "CYLTabBarController.h"
 #import "CYLMainRootViewController.h"
 #import <MJRefresh/MJRefresh.h>
 

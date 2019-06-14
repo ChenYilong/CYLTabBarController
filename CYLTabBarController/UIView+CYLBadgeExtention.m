@@ -368,11 +368,6 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
     objc_setAssociatedObject(self, @selector(cyl_badgeCornerRadius), badgeCornerRadiusObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (void)cyl_setCornerRadius:(CGFloat)cornerRadius {
-#warning Attention:`numberWithBool` ,If it is other Number type change this method.
-    NSNumber *cornerRadiusObject = @(cornerRadius);
-    objc_setAssociatedObject(self, @selector(cyl_cornerRadius), cornerRadiusObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
 - (CGPoint)cyl_badgeCenterOffset {
     id obj = objc_getAssociatedObject(self, @selector(cyl_badgeCenterOffset));
     if (obj != nil && [obj isKindOfClass:[NSDictionary class]] && [obj count] == 2) {

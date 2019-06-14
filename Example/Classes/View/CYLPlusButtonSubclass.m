@@ -7,10 +7,9 @@
 //
 
 #import "CYLPlusButtonSubclass.h"
-#import "CYLTabBarController.h"
 #import "CYLMineViewController.h"
 
-@interface CYLPlusButtonSubclass ()<UIActionSheetDelegate> {
+@interface CYLPlusButtonSubclass () {
     CGFloat _buttonImageHeight;
 }
 
@@ -75,9 +74,9 @@
     [button setImage:normalButtonImage forState:UIControlStateNormal];
     [button setImage:hlightButtonImage forState:UIControlStateHighlighted];
     [button setImage:hlightButtonImage forState:UIControlStateSelected];
-    UIImage *normalButtonBackImage = [UIImage imageNamed:@"videoback"];
-    [button setBackgroundImage:normalButtonBackImage forState:UIControlStateNormal];
-    [button setBackgroundImage:normalButtonBackImage forState:UIControlStateSelected];
+    //    UIImage *normalButtonBackImage = [UIImage imageNamed:@"videoback"];
+    //    [button setBackgroundImage:normalButtonBackImage forState:UIControlStateNormal];
+    //    [button setBackgroundImage:normalButtonBackImage forState:UIControlStateSelected];
     button.imageEdgeInsets = UIEdgeInsetsMake(5, 0, -5, 0);
     button.titleLabel.font = [UIFont systemFontOfSize:9.5];
     [button sizeToFit]; // or set frame in this way `button.frame = CGRectMake(0.0, 0.0, 250, 100);`
@@ -86,8 +85,8 @@
     // if you use `+plusChildViewController` , do not addTarget to plusButton.
     [button addTarget:button action:@selector(clickPublish) forControlEvents:UIControlEventTouchUpInside];
     return button;
-
 }
+
 /*
  *
  Create a custom UIButton without title and add it to the center of our tab bar
@@ -116,21 +115,25 @@
 - (void)clickPublish {
     CYLTabBarController *tabBarController = [self cyl_tabBarController];
     UIViewController *viewController = tabBarController.selectedViewController;
-    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
                                                              delegate:nil
                                                     cancelButtonTitle:@"取消"
                                                destructiveButtonTitle:nil
                                                     otherButtonTitles:@"拍照", @"从相册选取", @"淘宝一键转卖", nil];
     [actionSheet showInView:viewController.view];
+#pragma clang diagnostic pop
+
 }
 
 #pragma mark - UIActionSheetDelegate
-
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
     NSLog(@"buttonIndex = %@", @(buttonIndex));
 }
-
+#pragma clang diagnostic pop
 #pragma mark - CYLPlusButtonSubclassing
 
 + (UIViewController *)plusChildViewController {

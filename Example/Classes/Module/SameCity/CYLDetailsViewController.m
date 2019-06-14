@@ -7,7 +7,6 @@
 //
 
 #import "CYLDetailsViewController.h"
-#import "CYLTabBarController.h"
 #import "CYLMineViewController.h"
 #import "CYLSameCityViewController.h"
 #import "CYLHomeViewController.h"

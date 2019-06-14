@@ -83,14 +83,33 @@
     [animationView.layer addAnimation:animation forKey:nil];
 }
 
+- (void)traitCollectionDidChange:(nullable UITraitCollection *)previousTraitCollection  {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+#if __has_include(<UIKit/UIScene.h>)
+        UIUserInterfaceStyle currentUserInterfaceStyle = [UITraitCollection currentTraitCollection].userInterfaceStyle;
+        if (currentUserInterfaceStyle == previousTraitCollection.userInterfaceStyle) {
+            return;
+        }
+#else
+#endif
+    //TODO:
+        [[UIViewController cyl_topmostViewController].navigationController.navigationBar setBarTintColor:[UIColor cyl_systemBackgroundColor]];
+    }
+    
+}
+
 + (void)customizeInterfaceWithTabBarController:(CYLTabBarController *)tabBarController {
     //设置导航栏
     //    [self setUpNavigationBarAppearance];
-    //    [tabBarController hideTabBadgeBackgroundSeparator];
+    [tabBarController hideTabBarShadowImageView];
+    //    if (@available(iOS 13.0, *)) {
+    //        tabBarController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
+    //    }
     //添加小红点
     //添加提示动画，引导用户点击
     [tabBarController setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *tabBarController) {
-        NSUInteger delaySeconds = 1;
+        NSUInteger delaySeconds = 1.5;
         dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
         dispatch_after(when, dispatch_get_main_queue(), ^{
             @try {
@@ -113,9 +132,9 @@
                 
                 NSString *testBadgeString = @"100";
                 //                [tabBarController.viewControllers[3] cyl_setBadgeMargin:-5];
-                CGSize size = [testBadgeString sizeWithAttributes:
-                               @{NSFontAttributeName:
-                                     tabBarController.viewControllers[3].cyl_badgeFont}];
+                //                CGSize size = [testBadgeString sizeWithAttributes:
+                //                               @{NSFontAttributeName:
+                //                                     tabBarController.viewControllers[3].cyl_badgeFont}];
                 //                float labelHeight = ceilf(size.height);
                 //                [tabBarController.viewControllers[3] cyl_setBadgeCornerRadius:(labelHeight+ tabBarController.viewControllers[3].cyl_badgeMargin)/2];
                 [tabBarController.viewControllers[3] cyl_showBadgeValue:testBadgeString animationType:CYLBadgeAnimationTypeBounce];
@@ -127,7 +146,7 @@
             if ([self cyl_tabBarController].selectedIndex != 0) {
                 return;
             }
-            //            tabBarController.selectedIndex = 1;
+            //                        tabBarController.selectedIndex = 1;
         });
     }];
 }

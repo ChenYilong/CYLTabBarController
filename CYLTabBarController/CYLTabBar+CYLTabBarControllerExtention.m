@@ -133,7 +133,6 @@
     UIControl *selectedControl = [self cyl_visibleControlWithIndex:tabIndex];
     
     NSInteger plusViewControllerIndex = [self.cyl_tabBarController.viewControllers indexOfObject:CYLPlusChildViewController];
-    BOOL isPlusButton = selectedControl.cyl_isPlusButton;
     BOOL isPlusViewControllerAdded =  CYLPlusChildViewController.cyl_plusViewControllerEverAdded && (plusViewControllerIndex != NSNotFound);
     
     if (isPlusViewControllerAdded) {

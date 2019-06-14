@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  cyl_showBadge
  *
  *  @param value String value, default is `nil`. if value equal @"" means red dot style.
- *  @param animationType
+ *  @param animationType animationType
  */
 - (void)cyl_showBadgeValue:(NSString *)value
          animationType:(CYLBadgeAnimationType)animationType;

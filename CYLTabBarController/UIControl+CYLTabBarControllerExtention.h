@@ -12,9 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class LOTAnimationView;
 @interface UIControl (CYLTabBarControllerExtention)
 
-- (UIView *)cyl_tabBadgeView;
-- (UIImageView *)cyl_tabImageView;
-- (UILabel *)cyl_tabLabel;
 - (LOTAnimationView *)cyl_lottieAnimationView;
 - (BOOL)cyl_isChildViewControllerPlusButton;
 

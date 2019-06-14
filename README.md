@@ -463,7 +463,7 @@ Airbnb-app效果：
     [[UITabBar appearance] setShadowImage:[[UIImage alloc] init]];        
  ```
 
-// iOS10 后 需要使用 `-[CYLTabBarController hideTabBadgeBackgroundSeparator]` 见 AppDelegate 类中的演示;
+// iOS10 后 需要使用 `-[CYLTabBarController hideTabBarShadowImageView]` 见 AppDelegate 类中的演示;
 
 如何调整、自定义 `PlusButton` 与其它 `TabBarItem` 的宽度？
 

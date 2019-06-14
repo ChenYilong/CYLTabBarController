@@ -19,10 +19,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [UIApplication sharedApplication].statusBarHidden = NO;
     // 设置主窗口,并设置根控制器
-    self.window = [[UIWindow alloc]init];
+    self.window = [[UIWindow alloc] init];
     self.window.frame = [UIScreen mainScreen].bounds;
     [self.window makeKeyAndVisible];
-
     CYLMainRootViewController *rootViewController = [[CYLMainRootViewController alloc] init];
     [self.window setRootViewController:rootViewController];
     [self setUpNavigationBarAppearance];
@@ -48,32 +47,27 @@
  */
 - (void)setUpNavigationBarAppearance {
     UINavigationBar *navigationBarAppearance = [UINavigationBar appearance];
-
-    UIImage *backgroundImage = nil;
+    UIColor *backgroundColor = [UIColor cyl_systemBackgroundColor];
     NSDictionary *textAttributes = nil;
-    if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
-        backgroundImage = [UIImage imageNamed:@"navigationbar_background_tall"];
+    UIColor *labelColor =   [UIColor cyl_labelColor];
 
+    if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
         textAttributes = @{
                            NSFontAttributeName : [UIFont boldSystemFontOfSize:18],
-                           NSForegroundColorAttributeName : [UIColor blackColor],
+                           NSForegroundColorAttributeName : labelColor,
                            };
     } else {
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-        backgroundImage = [UIImage imageNamed:@"navigationbar_background"];
         textAttributes = @{
                            UITextAttributeFont : [UIFont boldSystemFontOfSize:18],
-                           UITextAttributeTextColor : [UIColor blackColor],
+                           UITextAttributeTextColor : labelColor,
                            UITextAttributeTextShadowColor : [UIColor clearColor],
                            UITextAttributeTextShadowOffset : [NSValue valueWithUIOffset:UIOffsetZero],
                            };
 #endif
     }
-
-    [navigationBarAppearance setBackgroundImage:backgroundImage
-                                  forBarMetrics:UIBarMetricsDefault];
+    [navigationBarAppearance setBarTintColor:backgroundColor];
     [navigationBarAppearance setTitleTextAttributes:textAttributes];
-    
 }
 
 @end

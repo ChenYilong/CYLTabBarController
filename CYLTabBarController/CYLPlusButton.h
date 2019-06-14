@@ -88,7 +88,7 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 
 #pragma mark - Deprecated API
 
-@interface CYLPlusButton (CYLDeprecated)
+@interface CYLPlusButton (CYLPlusButtonDeprecated)
 
 + (void)registerSubclass CYL_DEPRECATED("Deprecated in 1.6.0. Use `+[CYLPlusButton registerPlusButton]` instead.");
 

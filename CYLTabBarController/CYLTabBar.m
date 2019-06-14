@@ -177,12 +177,33 @@ static CGFloat const CYLIPhoneXTabbarButtonSafeAreaHeight = 35;
     return nil;
 }
 
+- (void)presetUnselectedItemTintColor {
+    if (@available(iOS 13.0, *)) {
+        if (self.unselectedItemTintColor) {
+            return;
+        }
+        __block UIColor *tabLabelTextColor = nil;//for iOS13+
+        tabLabelTextColor = [UIColor cyl_systemGrayColor];
+        [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            UIControl *childView = obj;
+            if (childView.selected) {
+                return;
+            }
+            if (childView.cyl_tabEffectView && childView.cyl_tabLabel ) {
+                tabLabelTextColor = childView.cyl_tabLabel.textColor;
+            }
+        }];
+        self.unselectedItemTintColor = tabLabelTextColor;
+    }
+}
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.tabBarButtonArray = [self cyl_originalTabBarButtons];
     if (self.tabBarButtonArray.count == 0) {
         return;
     }
+    [self presetUnselectedItemTintColor];
     [self setupTabImageViewDefaultOffset:self.tabBarButtonArray[0]];
     CGFloat tabBarWidth = self.bounds.size.width;
     CGFloat tabBarHeight = self.bounds.size.height;
@@ -435,14 +456,6 @@ static CGFloat const CYLIPhoneXTabbarButtonSafeAreaHeight = 35;
         }
     }
     return nil;
-}
-
-// In iOS 11, UITabBarItem's have the title to the right of the icon in horizontally regular environments
-// (i.e. the iPad).  In order to keep the title below the icon, it was necessary to subclass UITabBar and override
-// traitCollection to make it horizontally compact.
-
-- (UITraitCollection *)traitCollection {
-    return [UITraitCollection traitCollectionWithHorizontalSizeClass:UIUserInterfaceSizeClassCompact];
 }
 
 @end

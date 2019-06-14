@@ -152,33 +152,6 @@
     return tabBadgePointViewOffset;
 }
 
-- (UIView *)cyl_tabBadgeView {
-    for (UIView *subview in self.subviews) {
-        if ([subview cyl_isTabBadgeView]) {
-            return (UIView *)subview;
-        }
-    }
-    return nil;
-}
-
-- (UIImageView *)cyl_tabImageView {
-    for (UIImageView *subview in self.subviews) {
-        if ([subview cyl_isTabImageView]) {
-            return (UIImageView *)subview;
-        }
-    }
-    return nil;
-}
-
-- (UILabel *)cyl_tabLabel {
-    for (UILabel *subview in self.subviews) {
-        if ([subview cyl_isTabLabel]) {
-            return (UILabel *)subview;
-        }
-    }
-    return nil;
-}
-
 - (LOTAnimationView *)cyl_lottieAnimationView {
     for (UILabel *subview in self.subviews) {
         if ([subview cyl_isLottieAnimationView]) {
@@ -197,7 +170,7 @@
 - (void)cyl_replaceTabImageViewWithNewView:(UIView *)newView
                                            offset:(UIOffset)offset
                                     show:(BOOL)theShow
-                                       completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
+                                        completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
     [self cyl_replaceTabImageViewOrTabButton:NO newView:newView offset:offset show:theShow completion:completion];
 }
 
@@ -257,7 +230,7 @@
         [tabBarButton addSubview:newView];
         [tabBarButton bringSubviewToFront:newView];
         CGSize newViewSize = newView.frame.size;
-        if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0"))  {
+        if (@available(iOS 9.0, *)) {
             [NSLayoutConstraint activateConstraints:@[
                                                       [newView.centerXAnchor constraintEqualToAnchor:swappableImageView.centerXAnchor constant:offset.horizontal],
                                                       [newView.centerYAnchor constraintEqualToAnchor:replacedView.centerYAnchor constant:offset.vertical],

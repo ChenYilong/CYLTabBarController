@@ -13,6 +13,7 @@
 #import <Lottie/Lottie.h>
 #else
 #endif
+#import "NSObject+CYLTabBarControllerExtention.h"
 
 @implementation UIView (CYLTabBarControllerExtention)
 
@@ -65,7 +66,125 @@
     return isTabBackgroundView;
 }
 
+- (UIImageView *)cyl_tabImageView {
+    for (UIImageView *subview in self.cyl_allSubviews) {
+        if ([subview cyl_isTabImageView]) {
+            return (UIImageView *)subview;
+        }
+    }
+    return nil;
+}
+
+- (NSArray *)cyl_allSubviews {
+    __block NSArray* allSubviews = [NSArray arrayWithObject:self];
+    [self.subviews enumerateObjectsUsingBlock:^(UIView* view, NSUInteger idx, BOOL*stop) {
+        allSubviews = [allSubviews arrayByAddingObjectsFromArray:[view cyl_allSubviews]];
+    }];
+    return allSubviews;
+}
+
+- (UIView *)cyl_tabBadgeView {
+    for (UIView *subview in self.cyl_allSubviews) {
+        if ([subview cyl_isTabBadgeView]) {
+            return (UIView *)subview;
+        }
+    }
+    return nil;
+}
+
+- (UILabel *)cyl_tabLabel {
+    for (UILabel *subview in self.cyl_allSubviews) {
+        if ([subview cyl_isTabLabel]) {
+            return (UILabel *)subview;
+        }
+    }
+    return nil;
+}
+
+//UIVisualEffectView
+- (BOOL)cyl_isTabEffectView {
+    BOOL isClass = [self isMemberOfClass:[UIVisualEffectView class]];
+    return isClass;
+}
+
+//_UIVisualEffectContentView
+- (BOOL)cyl_isTabEffectContentView {
+    BOOL isKindOfClass = [self isKindOfClass:[UIView class]];
+    BOOL isClass = [self isMemberOfClass:[UIView class]];
+    BOOL isKind = isKindOfClass && !isClass;
+    if (!isKind) {
+        return NO;
+    }
+    NSString *tabBackgroundViewString = [NSString stringWithFormat:@"%@IVisualE%@", @"_U" , @"ffectC"];
+    BOOL isTabBackgroundView = [self cyl_classStringHasPrefix:tabBackgroundViewString] && [self cyl_classStringHasSuffix:@"entView"];
+    return isTabBackgroundView;
+}
+
+//_UIVisualEffectBackdropView
+//- (BOOL)cyl_isTabEffectBackdropView {
+//    BOOL isKindOfClass = [self isKindOfClass:[UIView class]];
+//    BOOL isClass = [self isMemberOfClass:[UIView class]];
+//    BOOL isKind = isKindOfClass && !isClass;
+//    if (!isKind) {
+//        return NO;
+//    }
+//    NSString *tabBackgroundViewString = [NSString stringWithFormat:@"%@IVisualE%@", @"_U" , @"ffectC"];
+//    BOOL isTabBackgroundView = [self cyl_classStringHasPrefix:tabBackgroundViewString] && [self cyl_classStringHasSuffix:@"dropView"];
+//    return isTabBackgroundView;
+//}
+
+//UIVisualEffectView
+- (UIVisualEffectView *)cyl_tabEffectView {
+    for (UIView *subview in self.subviews) {
+        if ([subview cyl_isTabEffectView]) {
+            return (UIVisualEffectView *)subview;
+        }
+    }
+    return nil;
+}
+
+////_UIVisualEffectContentView
+//- (UIView *)cyl_tabEffectContentView {
+//    for (UIView *subview in self.subviews) {
+//        if ([subview cyl_isTabEffectContentView]) {
+//            return subview;
+//        }
+//    }
+//    return nil;
+//}
+//
+////_UIVisualEffectBackdropView
+//- (UIView *)cyl_tabEffectBackdropView {
+//    for (UIView *subview in self.cyl_allSubviews) {
+//        if ([subview cyl_isTabEffectBackdropView]) {
+//            return subview;
+//        }
+//    }
+//    return nil;
+//}
+
 - (UIView *)cyl_tabBadgeBackgroundView {
+    return [self cyl_tabBackgroundView];
+}
+
+- (UIImageView *)cyl_tabShadowImageView {
+    if (@available(iOS 13, *)) {
+        return [self.cyl_tabBackgroundView cyl_valueForKey:@"_shadowView1"];
+    } else if (@available(iOS 10, *)) {
+        // iOS 10 及以后，在 UITabBar 初始化之后就能获取到 backgroundView 和 shadowView 了
+        return [self.cyl_tabBackgroundView cyl_valueForKey:@"_shadowView"];
+    }
+    // iOS 9 及以前，shadowView 要在 UITabBar 第一次 layoutSubviews 之后才会被创建，直至 UITabBarController viewWillAppear: 时仍未能获取到 shadowView，所以为了省去调用时机的考虑，这里获取不到的时候会主动触发一次 tabBar 的布局
+    UIImageView *shadowView = [self cyl_valueForKey:@"_shadowView"];
+    if (!shadowView) {
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
+        shadowView = [self cyl_valueForKey:@"_shadowView"];
+    }
+    return shadowView;
+}
+
+- (UIView *)cyl_tabBackgroundView {
     for (UIImageView *subview in self.subviews) {
         if ([subview cyl_isTabBackgroundView]) {
             return (UIImageView *)subview;
@@ -87,19 +206,7 @@
 }
 
 - (UIView *)cyl_tabBadgeBackgroundSeparator {
-    UIView *subview = [self cyl_tabBadgeBackgroundView];
-    if (!subview) {
-        return nil;
-    }
-    NSArray<__kindof UIView *> *backgroundSubviews = subview.subviews;
-    if (backgroundSubviews.count > 1) {
-        for (UIView *tabBadgeBackgroundSeparator in backgroundSubviews) {
-            if (CGRectGetHeight(tabBadgeBackgroundSeparator.bounds) <= 1.0 ) {
-                return tabBadgeBackgroundSeparator;
-            }
-        }
-    }
-    return nil;
+    return [self cyl_tabShadowImageView];
 }
 
 - (BOOL)cyl_isKindOfClass:(Class)class {

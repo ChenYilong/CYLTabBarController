@@ -19,7 +19,8 @@
 #import "UITabBarItem+CYLBadgeExtention.h"
 #import "UIBarButtonItem+CYLBadgeExtention.h"
 #import "UIView+CYLBadgeExtention.h"
-#import "NSObject+CYLLandscapeExtension.h"
+#import "NSObject+CYLTabBarControllerExtention.h"
+#import "UIColor+CYLTabBarControllerExtention.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -114,12 +115,11 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
                             titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                                             context:(NSString *)context;
 
-
 - (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController;
 
 - (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController shouldSelect:(BOOL)shouldSelect;
 
-- (void)hideTabBadgeBackgroundSeparator;
+- (void)hideTabBarShadowImageView;
 
 - (void)setTintColor:(UIColor *)tintColor;
 
@@ -145,6 +145,14 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  * If `self` is kind of `UIViewController`, this method will return the nearest ancestor in the view controller hierarchy that is a tab bar controller. If `self` is not kind of `UIViewController`, it will return the `rootViewController` of the `rootWindow` as long as you have set the `CYLTabBarController` as the  `rootViewController`. Otherwise return nil. (read-only)
  */
 @property (nonatomic, setter=cyl_setTabBarController:) CYLTabBarController *cyl_tabBarController;
+
+@end
+
+#pragma mark - Deprecated API
+
+@interface CYLTabBarController (CYLTabBarControllerDeprecated)
+
+- (void)hideTabBadgeBackgroundSeparator CYL_DEPRECATED("Deprecated in 1.27.0. Use `+[CYLPlusButton hideTabBarShadowImageView]` instead.");
 
 @end
 

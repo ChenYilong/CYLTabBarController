@@ -15,7 +15,5 @@
 
 @interface MainTabBarController : CYLTabBarController
 
-@property (nonatomic, assign, getter=isDarkMode) BOOL darkMode;
-
 @end
 

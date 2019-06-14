@@ -220,9 +220,6 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         _tabBarItemsAttributes = tabBarItemsAttributes;
         self.context = context;
         self.viewControllers = viewControllers;
-//        if ([self hasPlusChildViewController]) {
-//            self.delegate = self;
-//        }
     }
     return self;
 }
@@ -267,8 +264,15 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 }
 
 - (void)hideTabBadgeBackgroundSeparator {
+    [self hideTabBarShadowImageView];
+}
+
+- (void)hideTabBarShadowImageView {
     [self.tabBar layoutIfNeeded];
-    self.tabBar.cyl_tabBadgeBackgroundSeparator.alpha = 0;
+    UIImageView *imageView = self.tabBar.cyl_tabShadowImageView;
+    imageView.image = [UIImage new];//iOS13-
+    imageView.hidden = YES;//iOS13+
+    imageView.alpha = 0;
 }
 
 + (BOOL)havePlusButton {
@@ -358,7 +362,6 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         if ((!_tabBarItemsAttributes) || (_tabBarItemsAttributes.count != viewControllers.count)) {
             [NSException raise:NSStringFromClass([CYLTabBarController class]) format:@"The count of CYLTabBarControllers is not equal to the count of tabBarItemsAttributes.【Chinese】设置_tabBarItemsAttributes属性时，请确保元素个数与控制器的个数相同，并在方法`-setViewControllers:`之前设置"];
         }
-        //TODO:
         BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
         BOOL addedFlag = [CYLPlusChildViewController cyl_plusViewControllerEverAdded];
         BOOL hasPlusChildViewController = [self hasPlusChildViewController] && !isAdded && !addedFlag;
