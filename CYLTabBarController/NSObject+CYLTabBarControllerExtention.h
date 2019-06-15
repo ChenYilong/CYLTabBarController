@@ -18,8 +18,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (UIResponder<UIApplicationDelegate> *)cyl_sharedAppDelegate;
 
-- (id)cyl_valueForKey:(NSString *)key;
-
 @end
 
 NS_ASSUME_NONNULL_END

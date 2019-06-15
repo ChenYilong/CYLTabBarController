@@ -270,7 +270,6 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 - (void)hideTabBarShadowImageView {
     [self.tabBar layoutIfNeeded];
     UIImageView *imageView = self.tabBar.cyl_tabShadowImageView;
-    imageView.image = [UIImage new];//iOS13-
     imageView.hidden = YES;//iOS13+
     imageView.alpha = 0;
 }
