@@ -7,11 +7,11 @@ target 'CYLTabBarController' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-#pod 'CYLTabBarController', '~> 1.26.0'        # 默认不依赖Lottie
-#pod 'CYLTabBarController/Lottie', '~> 1.26.0' # 依赖Lottie库
+#pod 'CYLTabBarController', '~> 1.27.3'        # 默认不依赖Lottie
+pod 'CYLTabBarController/Lottie', '~> 1.27.3' # 依赖Lottie库
 
 #pod 'CYLTabBarController', :path => './'
-pod 'CYLTabBarController/Lottie', :path => './'
+#pod 'CYLTabBarController/Lottie', :path => './'
 
 pod 'MJRefresh'
 
