@@ -22,4 +22,42 @@
     return [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
 
++ (UIImage *)cyl_assetImageName:(NSString *)assetImageName
+             userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle  {
+    UIImage *image = [UIImage imageNamed:@"image"];
+    if (@available(iOS 13.0, *)) {
+#if __has_include(<UIKit/UIScene.h>)
+        UITraitCollection *trait = [UITraitCollection traitcollectionWithUserInterfaceStyle:userInterfaceStyle];
+        image = [image.imageAsset imageWithTraitCollection: trait];
+        return image;
+#else
+#endif
+    }
+    return image;
+}
+
++ (UIImage *)cyl_lightOrDarkModeImageWithOwner:(id<UITraitEnvironment>)owner
+                     lightImage:(UIImage *)lightImage
+                      darkImage:(UIImage *)darkImage {
+    BOOL isDarkImage = NO;
+    if (@available(iOS 13.0, *)) {
+#if __has_include(<UIKit/UIScene.h>)
+        UIUserInterfaceStyle userInterfaceStyle = owner.traitCollection.userInterfaceStyle;
+        isDarkImage = (userInterfaceStyle == UIUserInterfaceStyleDark);
+#else
+#endif
+    }
+    UIImage *image = (isDarkImage ? darkImage : lightImage);
+    return image;
+}
+
++ (UIImage *)cyl_lightOrDarkModeImageWithOwner:(id<UITraitEnvironment>)owner
+                 lightImageName:(NSString *)lightImageName
+                  darkImageName:(NSString *)darkImageName {
+    UIImage *lightImage = [UIImage imageNamed:lightImageName];
+    UIImage *darkImage= [UIImage imageNamed:darkImageName];
+    UIImage *lightOrDarkImage = [UIImage cyl_lightOrDarkModeImageWithOwner:owner lightImage:lightImage darkImage:darkImage];
+    return lightOrDarkImage;
+}
+
 @end

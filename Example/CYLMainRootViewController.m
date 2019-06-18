@@ -32,7 +32,7 @@
     [super viewDidLoad];
     self.navigationBarHidden = YES;
     self.view.backgroundColor = [UIColor whiteColor];
-    [CYLPlusButtonSubclass registerPlusButton];
+//    [CYLPlusButtonSubclass registerPlusButton];
     [self createNewTabBar];
 }
 
@@ -102,7 +102,7 @@
 + (void)customizeInterfaceWithTabBarController:(CYLTabBarController *)tabBarController {
     //设置导航栏
     //    [self setUpNavigationBarAppearance];
-    [tabBarController hideTabBarShadowImageView];
+//    [tabBarController hideTabBarShadowImageView];
     //    if (@available(iOS 13.0, *)) {
     //        tabBarController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
     //    }
@@ -156,7 +156,8 @@
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
     BOOL should = YES;
     [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController shouldSelect:should];
-    if (should && [self cyl_tabBarController].selectedIndex == viewController.cyl_tabIndex) {
+    UIControl *selectedTabButton = [viewController.tabBarItem cyl_tabButton];
+    if (selectedTabButton.selected) {
         @try {
             [[[self class] cyl_topmostViewController] performSelector:@selector(refresh)];
         } @catch (NSException *exception) {

@@ -18,7 +18,7 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = @"我的";    //✅sets navigation bar title.The right way to set the title of the navigation
-    self.tabBarItem.title = @"我的23333";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
+    self.tabBarItem.title = @"我的";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
     //self.title = @"我的1";                //❌sets both of these. Do not do this‼️‼️ This may cause something strange like this : http://i68.tinypic.com/282l3x4.jpg .
 //    [self.navigationController.tabBarItem setBadgeValue:@"3"];
     __weak __typeof(self) weakSelf = self;
@@ -43,7 +43,7 @@
 #pragma mark - Methods
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
-    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ Controller Cell %@", self.tabBarItem.title, @(indexPath.row)]];
+    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController %@", self.tabBarItem.title, @(indexPath.row)]];
 }
 
 #pragma mark - Table view
