@@ -27,8 +27,14 @@
     UIImage *image = [UIImage imageNamed:@"image"];
     if (@available(iOS 13.0, *)) {
 #if __has_include(<UIKit/UIScene.h>)
-        UITraitCollection *trait = [UITraitCollection traitcollectionWithUserInterfaceStyle:userInterfaceStyle];
-        image = [image.imageAsset imageWithTraitCollection: trait];
+        UITraitCollection *trait;
+//        UIUserInterfaceStyle currentUserInterfaceStyle = [UITraitCollection currentTraitCollection].userInterfaceStyle;
+//        if (currentUserInterfaceStyle == UIUserInterfaceStyleUnspecified) {
+//            currentUserInterfaceStyle == userInterfaceStyle;
+//        }
+        trait = [UITraitCollection traitCollectionWithUserInterfaceStyle:userInterfaceStyle];
+        image = [image.imageAsset imageWithTraitCollection:trait];
+        //TODO: 如果Xcode10加入的asset，没有加入图片，那么image是nil，还是默认是light的值？我期望是获取的light的值，要不然xcode11编译后很多图片都不会显示啊！！！！！
         return image;
 #else
 #endif
@@ -36,19 +42,9 @@
     return image;
 }
 
-+ (UIImage *)cyl_lightOrDarkModeImageWithOwner:(id<UITraitEnvironment>)owner
-                     lightImage:(UIImage *)lightImage
-                      darkImage:(UIImage *)darkImage {
-    BOOL isDarkImage = NO;
-    if (@available(iOS 13.0, *)) {
-#if __has_include(<UIKit/UIScene.h>)
-        UIUserInterfaceStyle userInterfaceStyle = owner.traitCollection.userInterfaceStyle;
-        isDarkImage = (userInterfaceStyle == UIUserInterfaceStyleDark);
-#else
-#endif
-    }
-    UIImage *image = (isDarkImage ? darkImage : lightImage);
-    return image;
++ (UIImage *)cyl_lightOrDarkModeImageWithLightImage:(UIImage *)lightImage
+                                     darkImage:(UIImage *)darkImage  {
+    return [self cyl_lightOrDarkModeImageWithOwner:nil lightImage:lightImage darkImage:darkImage];
 }
 
 + (UIImage *)cyl_lightOrDarkModeImageWithOwner:(id<UITraitEnvironment>)owner
@@ -58,6 +54,23 @@
     UIImage *darkImage= [UIImage imageNamed:darkImageName];
     UIImage *lightOrDarkImage = [UIImage cyl_lightOrDarkModeImageWithOwner:owner lightImage:lightImage darkImage:darkImage];
     return lightOrDarkImage;
+}
+
++ (UIImage *)cyl_lightOrDarkModeImageWithOwner:(id<UITraitEnvironment>)owner
+                                    lightImage:(UIImage *)lightImage
+                                     darkImage:(UIImage *)darkImage {
+    BOOL isDarkImage = NO;
+    if (@available(iOS 13.0, *)) {
+#if __has_include(<UIKit/UIScene.h>)
+        //TODO: self 有自定义traitCollection，那么 [UITraitCollection currentTraitCollection]获取到的是当前系统的，还是当前self的？我期望是self的，不然的话，那就太坑了。每次都要判断self和系统两个做取舍，那太坑了！！！！！
+        UITraitCollection *traitCollection = owner.traitCollection ?: [UITraitCollection currentTraitCollection];
+        UIUserInterfaceStyle userInterfaceStyle = traitCollection.userInterfaceStyle;
+        isDarkImage = (userInterfaceStyle == UIUserInterfaceStyleDark);
+#else
+#endif
+    }
+    UIImage *image = (isDarkImage ? darkImage : lightImage);
+    return image;
 }
 
 @end

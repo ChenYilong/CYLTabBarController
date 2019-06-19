@@ -49,18 +49,11 @@
     [self createNewTabBardynamically];
 }
 
-- (void)createNewTabBar {
-    id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
-    UIWindow *window = delegate.window;
-    CYLMainRootViewController *rootController = (CYLMainRootViewController *)window.rootViewController;
-    [rootController createNewTabBar];
-}
-
 - (void)createNewTabBardynamically {
     id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
     UIWindow *window = delegate.window;
     CYLMainRootViewController *rootController = (CYLMainRootViewController *)window.rootViewController;
-    [rootController createNewTabBar];
+    [rootController createNewTabBarWithContext:NSStringFromClass([self class])];
 }
 
 #pragma mark - Methods

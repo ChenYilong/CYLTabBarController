@@ -73,7 +73,7 @@
     //
     //    [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimationTypeScale];
     //    [self pushToNewViewController];
-    CYLTabBarController *tabBarController = [[CYLMainRootViewController new] createNewTabBar];
+    CYLTabBarController *tabBarController = [[CYLMainRootViewController new] createNewTabBarWithContext:NSStringFromClass([self class])];
     [self.navigationController pushViewController:tabBarController animated:YES];
 }
 

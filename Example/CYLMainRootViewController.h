@@ -17,8 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CYLMainRootViewController : UINavigationController
 
-+ (void)customizeInterfaceWithTabBarController:(CYLTabBarController *)tabBarController;
-- (CYLTabBarController *)createNewTabBar;
+- (CYLTabBarController *)createNewTabBarWithContext:(NSString *)context;
 
 @end
 
