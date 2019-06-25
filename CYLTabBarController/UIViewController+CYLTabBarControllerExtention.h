@@ -137,9 +137,6 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  */
 - (void)cyl_pushViewController:(UIViewController *)viewController animated:(BOOL)animated;
 - (UIViewController *)cyl_getViewControllerInsteadOfNavigationController;
-+ (UIViewController * __nullable)cyl_topmostViewController;
-+ (UINavigationController * __nullable)cyl_currentNavigationController;
-+ (void)cyl_dismissAll:(void (^ __nullable)(void))completion;
 - (void)cyl_handleNavigationBackAction;
 - (void)cyl_handleNavigationBackActionWithAnimated:(BOOL)animated;
 

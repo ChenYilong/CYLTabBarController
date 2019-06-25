@@ -22,7 +22,7 @@
 
 - (BOOL)cyl_hasPlusChildViewController {
     NSString *context = CYLPlusChildViewController.cyl_context;
-    BOOL isSameContext = [context isEqualToString:self.context] && (context && self.context);
+    BOOL isSameContext = [context isEqualToString:self.context] && (context && (context.length > 0) && self.context && self.context.length > 0);
     BOOL isAdded = [[self cyl_tabBarController].viewControllers containsObject:CYLPlusChildViewController];
     BOOL isEverAdded = CYLPlusChildViewController.cyl_plusViewControllerEverAdded;
     if (CYLPlusChildViewController && isSameContext && isAdded && isEverAdded) {

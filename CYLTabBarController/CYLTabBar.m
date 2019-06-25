@@ -54,15 +54,14 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     }
     _plusButton = plusButton;
     if (!self.hasAddPlusButton) {
-        NSString *tabBarContext = self.tabBarContext;
+        NSString *tabBarContext = self.plusButtonTabBarContext;
         BOOL isFirstAdded = (_plusButton.superview == nil);
-        
         BOOL isSameContext = [tabBarContext isEqualToString:self.context] && (tabBarContext && self.context);
         if (_plusButton && isSameContext && isFirstAdded) {
             [self addSubview:(UIButton *)_plusButton];
-            [_plusButton cyl_setTabBarController: [self cyl_tabBarController]];
+            self.addPlusButton = YES;
+            [_plusButton cyl_setTabBarController:[self cyl_tabBarController]];
         }
-        self.addPlusButton = YES;
     }
 }
 
@@ -82,7 +81,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     CGSize sizeThatFits = [super sizeThatFits:size];
     CGFloat height = [self cyl_tabBarController].tabBarHeight;
     if (height > 0) {
-        sizeThatFits.height = [self cyl_tabBarController].tabBarHeight;
+        sizeThatFits.height = height;
     }
     return sizeThatFits;
 }
@@ -99,7 +98,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     return _tabBarButtonArray;
 }
 
-- (NSString *)tabBarContext {
+- (NSString *)plusButtonTabBarContext {
     NSString *tabBarContext;
     if ([[_plusButton class] respondsToSelector:@selector(tabBarContext)]) {
         tabBarContext = [[_plusButton class] tabBarContext];
@@ -115,9 +114,9 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     if (!CYLExternPlusButton || !_plusButton) {
         return nil;
     }
-    NSString *tabBarContext = self.tabBarContext;
+    NSString *plusButtonTabBarContext = self.plusButtonTabBarContext;
     BOOL addedToTabBar = [_plusButton.superview isEqual:self];
-    BOOL isSameContext = [tabBarContext isEqualToString:self.context] && (tabBarContext && self.context);;//|| (!tabBarContext  && !self.context);
+    BOOL isSameContext = [plusButtonTabBarContext isEqualToString:self.context] && (plusButtonTabBarContext && self.context);//|| (!tabBarContext  && !self.context);
     if (_plusButton  &&  addedToTabBar && isSameContext) {
         return _plusButton;
     }
@@ -155,7 +154,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     CGFloat tabBarWidth = self.bounds.size.width;
     CGFloat tabBarHeight = self.bounds.size.height;
     
-    if (!CYLExternPlusButton) {
+    if (!self.addPlusButton) {
         return;
     }
     

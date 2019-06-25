@@ -15,7 +15,6 @@
 
 @interface MainTabBarController : CYLTabBarController
 
-//- (instancetype)init;
 - (instancetype)initWithContext:(NSString *)context;
 
 @end

@@ -718,26 +718,34 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                              block, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+//TODO: 更新实现，多实例场景下进行栈操作，弹出最新一个。
 - (CYLTabBarController *)cyl_tabBarController {
     CYLTabBarController *tabBarController;
     id (^block)(void) = objc_getAssociatedObject(self, @selector(cyl_tabBarController));
     tabBarController = (block ? block() : nil);
-    if (tabBarController && [tabBarController isKindOfClass:[CYLTabBarController class]]) {
+    if ([self cyl_getValidCYLTabBarController:tabBarController]) {
         return tabBarController;
     }
     if ([self isKindOfClass:[UIViewController class]] && [(UIViewController *)self parentViewController]) {
         tabBarController = [[(UIViewController *)self parentViewController] cyl_tabBarController];
-        if ([tabBarController isKindOfClass:[CYLTabBarController class]]) {
+        if ([self cyl_getValidCYLTabBarController:tabBarController]) {
             return tabBarController;
         }
     }
     id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
     UIWindow *window = delegate.window;
     UIViewController *rootViewController = [window.rootViewController cyl_getViewControllerInsteadOfNavigationController];;
-    if ([rootViewController isKindOfClass:[CYLTabBarController class]]) {
+    if ([self cyl_getValidCYLTabBarController:tabBarController]) {
         tabBarController = (CYLTabBarController *)rootViewController;
     }
     return tabBarController;
+}
+
+- (CYLTabBarController *)cyl_getValidCYLTabBarController:(id)tabBarController {
+    if (tabBarController && [tabBarController isKindOfClass:[CYLTabBarController class]]) {
+        return tabBarController;
+    }
+    return nil;
 }
 
 @end
