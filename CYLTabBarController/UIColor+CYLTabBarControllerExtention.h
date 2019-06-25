@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CYLConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,7 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, nonatomic, readonly) UIColor *cyl_systemYellowColor;
 @property (class, nonatomic, readonly) UIColor *cyl_systemPinkColor;
 @property (class, nonatomic, readonly) UIColor *cyl_systemPurpleColor;
-@property (class, nonatomic, readonly) UIColor *cyl_systemBrownColor;
 @property (class, nonatomic, readonly) UIColor *cyl_systemTealColor;
 @property (class, nonatomic, readonly) UIColor *cyl_systemIndigoColor;
 
@@ -123,4 +123,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+#pragma mark - Deprecated API
+
+@interface UIColor (CYLTabBarControllerDeprecated)
+
+@property (class, nonatomic, readonly) UIColor *cyl_systemBrownColor CYL_DEPRECATED("Deprecated in 1.27.5.");
+
+@end
 NS_ASSUME_NONNULL_END

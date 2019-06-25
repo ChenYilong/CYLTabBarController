@@ -117,21 +117,6 @@
             ];
 }
 
-+ (UIColor *)cyl_systemBrownColor {
-    if (@available(iOS 13.0, *)) {
-#if __has_include(<UIKit/UIScene.h>)
-        return [UIColor systemBrownColor];
-#else
-#endif
-    }
-    return [UIColor
-            colorWithRed:0.6352941176470588
-            green:0.5176470588235295
-            blue:0.3686274509803922
-            alpha:1.0
-            ];
-}
-
 + (UIColor *)cyl_systemTealColor {
     if (@available(iOS 13.0, *)) {
 #if __has_include(<UIKit/UIScene.h>)
@@ -564,5 +549,11 @@
             ];
 }
 
+#pragma mark - Deprecated API
+
+//Apple remove this API in iOS13 beta 2
++ (UIColor *)cyl_systemBrownColor {
+    return nil;
+}
 
 @end

@@ -723,29 +723,22 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     CYLTabBarController *tabBarController;
     id (^block)(void) = objc_getAssociatedObject(self, @selector(cyl_tabBarController));
     tabBarController = (block ? block() : nil);
-    if ([self cyl_getValidCYLTabBarController:tabBarController]) {
+    if (tabBarController && [tabBarController isKindOfClass:[CYLTabBarController class]]) {
         return tabBarController;
     }
     if ([self isKindOfClass:[UIViewController class]] && [(UIViewController *)self parentViewController]) {
         tabBarController = [[(UIViewController *)self parentViewController] cyl_tabBarController];
-        if ([self cyl_getValidCYLTabBarController:tabBarController]) {
+        if ([tabBarController isKindOfClass:[CYLTabBarController class]]) {
             return tabBarController;
         }
     }
     id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
     UIWindow *window = delegate.window;
     UIViewController *rootViewController = [window.rootViewController cyl_getViewControllerInsteadOfNavigationController];;
-    if ([self cyl_getValidCYLTabBarController:tabBarController]) {
+    if ([rootViewController isKindOfClass:[CYLTabBarController class]]) {
         tabBarController = (CYLTabBarController *)rootViewController;
     }
     return tabBarController;
-}
-
-- (CYLTabBarController *)cyl_getValidCYLTabBarController:(id)tabBarController {
-    if (tabBarController && [tabBarController isKindOfClass:[CYLTabBarController class]]) {
-        return tabBarController;
-    }
-    return nil;
 }
 
 @end
