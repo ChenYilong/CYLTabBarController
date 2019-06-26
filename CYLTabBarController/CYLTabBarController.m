@@ -85,10 +85,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 }
 
 - (void)viewDidLayoutSubviews {
-    CGFloat deviceVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
-    if (deviceVersion >= 10 && deviceVersion < 10.2) {
-        [self.tabBar layoutSubviews];//Fix issue #93
-    }
+    [self.tabBar layoutSubviews];//Fix issue #93 #392
     CYLTabBar *tabBar =  (CYLTabBar *)self.tabBar;
     // add callback for visiable control, included all plusButton.
     [tabBar.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
