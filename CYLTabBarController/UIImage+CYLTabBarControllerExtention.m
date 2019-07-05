@@ -23,7 +23,7 @@
 }
 
 + (UIImage *)cyl_assetImageName:(NSString *)assetImageName
-             userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle  {
+             userInterfaceStyle:(NSInteger)userInterfaceStyle  {
     UIImage *image = [UIImage imageNamed:@"image"];
     if (@available(iOS 13.0, *)) {
 #if __has_include(<UIKit/UIScene.h>)

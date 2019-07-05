@@ -244,7 +244,6 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 }
 
-
 - (UIButton *)selectedCover {
     if (_selectedCover) {
         return _selectedCover;
@@ -427,6 +426,5 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         } completion:nil];
     });
 }
-
 
 @end
