@@ -1,8 +1,8 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Feature request
+about: Suggest an idea for this project
 title: ''
-labels: bug
+labels: enhancement
 assignees: ChenYilong
 
 ---
@@ -32,36 +32,17 @@ assignees: ChenYilong
 ----------
 
 
-## Base Info for this issue 
 
-<!--- 基本信息 -->
-
-<!--- 每个类的第五行都标记有版本号，请贴出。 -->
-
- 1. Version：Latest Version as [here](https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec) 
- 2. Language of App ：Objective-C/Swift
- 4. iOS System Version：iOS12
- 5. Prototype（是否是真机）：YES
- 6. Issue Type：Crash、Bug、Enhancement（希望能支持一个新需求）、Q-A
-
-## 1. How to reproduce the problem.
-<!--- 请详细描述下复现步骤。 -->
-
-## 2. Please help me in this way.
-<!--- 请详细描述下我需要怎么做才能符合你的需求。 -->
-
-## 3. Here is a Demo. 
-
-<!--- 尽量提供一个可以复现的Demo，我的邮箱：luohanchenyilong@163.com。或者前往 Telegram 群交流：https://t.me/iosobjc -->
-
-## 4. Here is my Debug log
-
-<!--- 请尽量提供详细的日志打印信息，控制台默认会有网络请求的打印信息，请将相关的日志贴出-->
+**Is your feature request related to a problem? Please describe.**
+<!--- A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]-->
 
 
+**Describe the solution you'd like**
+<!--- A clear and concise description of what you want to happen.-->
 
 
+**Describe alternatives you've considered**
+<!--- A clear and concise description of any alternative solutions or features you've considered.-->
 
-----------
-
-<p align="center"><a href="http://weibo.com/u/1692391497?s=6uyXnP" target="_blank"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1692391497/b46c844b/1.png"/></a></a>
+**Additional context**
+<!--- Add any other context or screenshots about the feature request here.-->
