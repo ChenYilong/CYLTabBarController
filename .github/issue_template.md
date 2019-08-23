@@ -44,7 +44,7 @@
 
 ## 3. Here is a Demo. 
 
-<!--- 尽量提供一个可以复现的Demo，我的邮箱：luohanchenyilong@163.com。或者前往 Telegram 群交流 https://t.me/CYLTabBarController -->
+<!--- 尽量提供一个可以复现的Demo，我的邮箱：luohanchenyilong@163.com。或者前往 Telegram 群交流：https://t.me/iosobjc -->
 
 ## 4. Here is my Debug log
 
@@ -57,3 +57,5 @@
 ----------
 
 <p align="center"><a href="http://weibo.com/u/1692391497?s=6uyXnP" target="_blank"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1692391497/b46c844b/1.png"/></a></a>
+
+
