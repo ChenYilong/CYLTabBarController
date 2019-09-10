@@ -135,12 +135,15 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 -------------|------------
 ![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqwf0dm7j30ku048glt.jpg)| ![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqwv5bptj30ku04a74i.jpg)
 
- 支持横竖屏
-![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqsi30npj30fe0ggq47.jpg)
 
-本仓库配套Demo的效果：| [另一个Demo](https://github.com/ChenYilong/CYLTabBarControllerDemoForWeib) 使用CYLTabBarController实现了微博Tabbar框架，效果如下
+ 支持横竖屏
+ 
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6us68c57ig30fe0ggwj3.gif"></a></p>
+
+
+本仓库配套Demo的效果：| [另一个Demo](https://github.com/ChenYilong/CYLTabBarControllerDemoForWeib) </p> 使用CYLTabBarController实现了微博Tabbar框架，</p>效果如下
 -------------|-------------
-![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqyiupiuj30ac0j175j.jpg)|![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqz6o4xhj30ac0j1wfq.jpg)
+![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6usablffxg30ac0j1e81.gif) |  ![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6usaqu6ulg30ac0j1ttj.gif)
 
 ## 项目结构
 
@@ -732,7 +735,8 @@ Demo 演示的效果图：
 }
  ```
  
-<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6urcxd4b9j30fe0ggq47.jpg"></a></p>
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6us68c57ig30fe0ggwj3.gif"></a></p>
 
 
 
