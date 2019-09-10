@@ -109,12 +109,12 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 
 [CN]特点 </p>[EN]Features |[CN]解释 </p>[EN]Explanation
 :-------------:|:-------------:
-[CN]一行代码支持Lottie动画TabBar样式 </p> [EN] It only needs one line of code to have an animated TabBar with Lottie. |[CN][使用方法]( https://github.com/ChenYilong/CYLTabBarController/issues/341) </p>  [EN][How to add animation of Lottie with one line of code.]( https://github.com/ChenYilong/CYLTabBarController/issues/341)  </p> ![enter image description here](http://i66.tinypic.com/25oxkqo.jpg)  </p>  ![enter image description here](http://i64.tinypic.com/2h835ae.jpg) 
+[CN]一行代码支持Lottie动画TabBar样式 </p> [EN] It only needs one line of code to have an animated TabBar with Lottie. |[CN][使用方法]( https://github.com/ChenYilong/CYLTabBarController/issues/341) </p>  [EN][How to add animation of Lottie with one line of code.]( https://github.com/ChenYilong/CYLTabBarController/issues/341)  </p> ![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6upmqhqjrg30o209r4qp.gif) </p>  ![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqohfiw2g30cd03hdop.gif)
 [CN]低耦合，易删除</p>[EN]Loose coupling  | [CN]1、TabBar设置与业务完全分离，最低只需传两个数组即可完成主流App框架搭建。</p>[EN]1. This library is independent of your business codes which only needs two array parameters to be passed.   </p> [CN]2、 PlusButton 的所有设置都在单独的一个类（ `CYLPlusButton` 的子类）中实现：删除该特定的类，就能完全将 PlusButton 从项目中删除掉。</p>[EN]2.PlusButton is also independent. If you delete the code of this class, you remove the PlusButton feature from your UI on screen completely.  
 [CN]`TabBar` 以及 `TabBar` 内的 `TabBarItem` 均使用系统原生的控件</p>[EN]`TabBar` and `TabBarItem` those parts of this library both are system objects. | [CN]因为使用原生的控件，并非 `UIButton` 或 `UIView` 。好处如下：</p>[EN]Advantages of quitting choosing `UIButton` or `UIView`: </p> 1. 无需反复调“间距位置等”来接近系统效果。</p>[EN]There is not need to adjust those object to make them close to a system  object appearance. </p> 2. 在push到下一页时 `TabBar`  的隐藏和显示之间的过渡效果跟系统一致（详见“ [集成后的效果](https://github.com/ChenYilong/CYLTabBarController#集成后的效果) ”部分，给出了效果图）</p>[EN]2. A push animation is same to a system objects appearance. </p> 3. 原生控件，所以可以使用诸多系统API，比如：可以使用 ` [UITabBar appearance];` 、` [UITabBarItem appearance];` 设置样式。（详见“[补充说明](https://github.com/ChenYilong/CYLTabBarController#补充说明) ”部分，给出了响应代码示例）</p>[EN]3.It is convenient to use the system API such as ` [UITabBar appearance];`,` [UITabBarItem appearance];`, etc.
  自动监测是否需要添加“加号”按钮，</p>并能自动设置位置</p>[EN] It is able to check if need to add a PlusButton automatically. |[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 既支持类似微信的“中规中矩”的 `TabBarController` 样式，并且默认就是微信这种样式，同时又支持类似“微博”或“淘宝闲鱼”这种具有不规则加号按钮的 `TabBarController` 。想支持这种样式，只需自定义一个加号按钮，[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 能检测到它的存在并自动将 `tabBar` 排序好，无需多余操作，并且也预留了一定接口来满足自定义需求。</p>“加号”按钮的样式、frame均在自定义的类中独立实现，不会涉及tabbar相关设置。
-  支持动态更新 | 可动态删除PlusButton ，可以动态更新样式 </p> ![enter image description here](http://i63.tinypic.com/208ba7a.jpg)
-即使加号按钮超出了tabbar的区域，</p>超出部分依然能响应点击事件 | 红线内的区域均能响应tabbar相关的点击事件，</p>![enter image description here](http://i57.tinypic.com/2r7ndzk.jpg)
+  支持动态更新 | 可动态删除PlusButton ，可以动态更新样式 </p> ![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uq38ulz8g30al02w0u1.gif)
+即使加号按钮超出了tabbar的区域，</p>超出部分依然能响应点击事件 | 红线内的区域均能响应tabbar相关的点击事件，</p>![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqi6prqsj30j60g8js7.jpg)
 允许指定加号按钮位置 | 效果如下：</p>![enter image description here](http://a64.tinypic.com/2mo0h.jpg) </p>Airbnb-app效果：</p>![enter image description here](http://a63.tinypic.com/2mgk02v.gif)
 支持让 `TabBarItem` 仅显示图标，并自动使图标垂直居中，支持自定义TabBar高度 | 效果可见Airbnb-app效果，或者下图</p>![enter image description here](https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png)
  支持角标自定义View | ![enter image description here](https://ws4.sinaimg.cn/large/006tKfTcly1fgl0yxcaboj30yi06at8t.jpg) 
@@ -133,20 +133,18 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 ## 集成后的效果：
 既支持默认样式 | 同时也支持创建自定义的形状不规则加号按钮 
 -------------|------------
-![enter image description here](http://i62.tinypic.com/rvcbit.jpg?192x251_130)| ![enter image description here](http://i58.tinypic.com/24d4t3p.jpg?192x251_130)
+![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqwf0dm7j30ku048glt.jpg)| ![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqwv5bptj30ku04a74i.jpg)
 
  支持横竖屏
- ![enter image description here](http://i67.tinypic.com/2u4snk7.jpg)
-
+![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqsi30npj30fe0ggq47.jpg)
 
 本仓库配套Demo的效果：| [另一个Demo](https://github.com/ChenYilong/CYLTabBarControllerDemoForWeib) 使用CYLTabBarController实现了微博Tabbar框架，效果如下
 -------------|-------------
-![enter image description here](http://i59.tinypic.com/wvxutv.jpg)|![enter image description here](http://i62.tinypic.com/6ru269.jpg)
+![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqyiupiuj30ac0j175j.jpg)|![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqz6o4xhj30ac0j1wfq.jpg)
 
 ## 项目结构
 
-
-![enter image description here](http://i66.tinypic.com/1zwzdc.jpg)
+![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqzog2wmj30ae0a8js5.jpg)
 
 做下说明：
 
@@ -503,7 +501,9 @@ Airbnb-app效果：
 
 效果如下，
 1.24.0
-![enter image description here](http://i64.tinypic.com/vx16r5.jpg)
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur17yxa3j30yi0c6abk.jpg"></a></p>
+
 
 同时你也可以顺便测试下 `CYLTabBarController` 的这一个特性：
 
@@ -618,7 +618,8 @@ Airbnb-app效果：
 
 Demo 演示的效果图：
 
-![](https://ww1.sinaimg.cn/large/006tNbRwly1fg9hu6qnwbg308v0gctcc.gif)
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://ww1.sinaimg.cn/large/006tNbRwly1fg9hu6qnwbg308v0gctcc.gif"></a></p>
 
 实现如下代理方法，就能得到对应的选中控件，可以在控件上直接添加动画。
 
@@ -730,8 +731,10 @@ Demo 演示的效果图：
                                                                     withCornerRadius:0]];
 }
  ```
+ 
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6urcxd4b9j30fe0ggq47.jpg"></a></p>
 
-![enter image description here](http://i67.tinypic.com/2u4snk7.jpg)
+
 
 ### 访问初始化好的 CYLTabBarController 对象
 
@@ -772,7 +775,8 @@ Demo 演示的效果图：
 
 提供了一个协议方法来完成本功能：
 
-![enter image description here](http://i68.tinypic.com/2who9rs.jpg)
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6urdwrhhjj30mx0gjq5r.jpg"></a></p>
+
 
 实现该方法后，能让 PlusButton 的点击效果与跟点击其他 TabBar 按钮效果一样，跳转到该方法指定的 UIViewController 。
 
@@ -780,7 +784,46 @@ Demo 演示的效果图：
 
 遵循几个协议：
 
-![enter image description here](http://i64.tinypic.com/14jw5zt.jpg)
+
+ ```Objective-C
+#pragma mark - CYLPlusButtonSubclassing
+
++ (UIViewController *)plusChildViewController {
+    UIViewController *plusChildViewController = [[UIViewController alloc] init];
+    plusChildViewController.view.backgroundColor = [UIColor redColor];
+    plusChildViewController.navigationItem.title = @"PlusChildViewController";
+    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
+                                                   initWithRootViewController:plusChildViewController];
+    return plusChildNavigationController;
+}
+
++ (NSUInteger)indexOfPlusButtonInTabBar {
+    return 2;
+}
+
++ (BOOL)shouldSelectPlusChildViewController {
+    BOOL isSelected = CYLExternPlusButton.selected;
+    if (isSelected) {
+//        HDLLogDebug("🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
+    } else {
+//        HDLLogDebug("🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
+    }
+    return YES;
+}
+
++ (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
+    return  0.3;
+}
+
++ (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
+    return (CYL_IS_IPHONE_X ? - 6 : 4);
+}
+
+//+ (NSString *)tabBarContext {
+//    return NSStringFromClass([self class]);
+//}
+
+ ```
 
 
 另外你可以通过下面这个方法获取到 `PlusButton` 的点击事件：
@@ -810,23 +853,25 @@ Demo 演示的效果图：
 要想实现该效果，只需要在设置 `tabBarItemsAttributes`该属性时不传 title 即可。
 
 比如：在Demo的基础上，注释掉图中红框部分：
-![enter image description here](http://i64.tinypic.com/2cwu8ok.jpg)
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6urbcuckkj30ly0erdil.jpg"></a></p>
+
 
 注释前 | 注释后
 -------------|-------------
-![enter image description here](http://i66.tinypic.com/2z3rj0z.jpg)|![enter image description here](http://i65.tinypic.com/29cp1r9.jpg)
+![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6urbvymxij30yi05g74r.jpg)|![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6urc80bdoj30yi05iq3b.jpg)
 
 可以通过这种方式来达到 Airbnb-app 的效果：
 
-![enter image description here](http://a63.tinypic.com/2mgk02v.gif)
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="http://a63.tinypic.com/2mgk02v.gif"></a></p>
+
 
 如果想手动设置偏移量来达到该效果：
 可以在 `-setViewControllers:` 方法前设置 `CYLTabBarController` 的 `imageInsets` 和 `titlePositionAdjustment` 属性
 
 这里注意：设置这两个属性后，`TabBar` 中所有的 `TabBarItem` 都将被设置。并且第一种做法的逻辑将不会执行，也就是说该做法优先级要高于第一种做法。
 
-做法如下：
-![enter image description here](http://i66.tinypic.com/4rq8ap.jpg)
+做法在demo中已经给出。
 
 但是想达到Airbnb-app的效果只有这个接口是不行的，还需要自定义下 `TabBar` 的高度，你需要设置 `CYLTabBarController` 的 `tabBarHeight` 属性。你可以在Demo的 `CYLTabBarControllerConfig.m` 中的 `-customizeTabBarAppearance:` 方法中设置。
 
@@ -839,7 +884,8 @@ Demo 演示的效果图：
 
 效果图：
 
- ![enter image description here](https://ws4.sinaimg.cn/large/006tNc79ly1fmn3005isfg308r0iltl6.gif)
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://ws4.sinaimg.cn/large/006tNc79ly1fmn3005isfg308r0iltl6.gif"></a></p>
+
 
 
 实现 PlusButton 的如下协议方法指定 context：
@@ -866,7 +912,8 @@ Demo 演示的效果图：
 
 这里注意，文章的早期一个版本的示例代码有问题（笔者注：现在已经更新了），少了设置 PlusButton 大小的代码：
 这将导致 PlusButton 点击事件失效，具体修改代码如下：
-![enter image description here](http://i67.tinypic.com/118ottv.jpg)
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur43ri5uj30ko0jmdjc.jpg"></a></p>
 
 ### 搭配 Storyboard 使用 CYLTabBarController
 
@@ -929,7 +976,8 @@ A：在 v1.0.7 版本中已经修复了该 bug，但是也需要注意：
 
 `self.title = @"同城";  ` 这种方式，如果和 `tabBarItemsAttributes` 中对应的 `title` 不一致的时候可能会导致如下现象（不算 bug，但看起来也很奇怪）：
 
-![enter image description here](http://i68.tinypic.com/282l3x4.jpg )
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur9yhnqej30ac01pq2z.jpg"></a></p>
 
 
 
@@ -945,7 +993,7 @@ A：在 v1.0.7 版本中已经修复了该 bug，但是也需要注意：
 
  Q :  当使用这个方法时 `-[UIViewController cyl_popSelectTabBarChildViewControllerAtIndex:]` 系列方法时，会出现如下的黑边问题。
 
-![enter image description here](http://i63.tinypic.com/bg766g.jpg)
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur5d01x6j30af0ijmy6.jpg"></a></p>
 
 A： 这个是 iOS 系统的BUG，经测试iOS9.3已经修复了，如果在更早起版本中出现了，可以通过下面将 `rootWindow` 的背景色改为白色来避免：比如你可以 `Appdelegate` 类里这样设置：
 
@@ -960,7 +1008,8 @@ A: 这个是自动做的，但是 `CYLTabBarController` 只能保证的是：只
 
 请把 button 的背景颜色设置为显眼的颜色，比如红色，比如像下面的plus按钮，红色部分是能接收点击事件的，但是超出了红色按钮的，黄色的图片区域，依然是无法响应点击事件的。
 
-![enter image description here](http://i64.tinypic.com/vx16r5.jpg)
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur67tddnj30yi0c6abk.jpg"></a></p>
+
 
 这是因为，在响应链上，`UIControl` 能响应点击事件， `UIImage` 无法响应。
 
@@ -1027,10 +1076,13 @@ A：用法见：https://github.com/ChenYilong/CYLTabBarController/issues/341
 
 
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
+ 
 
-----------
-Posted by [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/)  
+--------------------------------------------
+
+
+Posted by Posted by [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) & [公众号@iTeaTime技术清谈](https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw) 
 原创作品，版权声明：License MIT
-<p align="center"><a href="http://weibo.com/u/1692391497?s=6uyXnP" target="_blank"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1692391497/b46c844b/1.png"/></a></a>
+<p align="center"><a href="http://weibo.com/u/1692391497?s=6uyXnP" target="_blank"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1692391497/b46c844b/1.png"/></a></p>
 
 
