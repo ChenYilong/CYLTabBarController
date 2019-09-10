@@ -1,4 +1,5 @@
-![enter image description here](http://i68.tinypic.com/ifyhoo.jpg)
+<p align="center"><a href="https://github.com/ChenYilong/CYLTabBarController"><img src="https://repository-images.githubusercontent.com/44896762/c1d6e880-a8d8-11e9-8bb4-2da8ebc06f0a"></a></p>
+
 
 # [CN]CYLTabBarController【一行代码实现 Lottie 动画 TabBar】
 # [EN]CYLTabBarController [An animated tabBar supported by Lottie with one line of code] 
@@ -30,7 +31,7 @@
 
 <p align="center">
  <a href="http://ww2.sinaimg.cn/large/006tNc79ly1g5et6q6sm5j30go0goaar.jpg"><img src="http://ww1.sinaimg.cn/large/006tNc79ly1g5esb5j4oaj300w00rdfn.jpg"></a>
-<a href="http://weibo.com/luohanchenyilong"><img src="http://i67.tinypic.com/wbulbr.jpg"></a>
+<a href="http://weibo.com/luohanchenyilong"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6um2edt3jj300w00q3y9.jpg"></a>
 <a href="https://twitter.com/iOSChenYilong"><img src="http://ww3.sinaimg.cn/large/006tNc79ly1g5erhikv2kj300w00wgld.jpg"></a>
 <a href="https://github.com/ChenYilong"><img src="http://ww3.sinaimg.cn/large/006tNc79gy1g5ercvzgxzj300w00wmwx.jpg"></a> 
 <a href="https://qm.qq.com/cgi-bin/qm/qr?k=SEdIYBh52YzquCEo8cmPwgkko1VgSAlw&authKey=sGcG%2BGB81DW%2Ba8v3dCufFSNoxhykAU61Uz%2B%2BqDiKQN2BGHP2xHYVI2tc0Cah2lpu"><img src="http://ww1.sinaimg.cn/large/006tNc79ly1g5euf38fedj300w00wjr5.jpg"></a>
