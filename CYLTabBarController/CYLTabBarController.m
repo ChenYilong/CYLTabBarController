@@ -178,7 +178,9 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     }
     // KVO反注册
     if (self.isObservingTabImageViewDefaultOffset) {
-        [self.tabBar removeObserver:self forKeyPath:@"tabImageViewDefaultOffset"];
+        @try {
+            [self.tabBar removeObserver:self forKeyPath:@"tabImageViewDefaultOffset"];
+        } @catch(NSException *e) { }
     }
 }
 
