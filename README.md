@@ -115,7 +115,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
  自动监测是否需要添加“加号”按钮，</p>并能自动设置位置</p>[EN] It is able to check if need to add a PlusButton automatically. |[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 既支持类似微信的“中规中矩”的 `TabBarController` 样式，并且默认就是微信这种样式，同时又支持类似“微博”或“淘宝闲鱼”这种具有不规则加号按钮的 `TabBarController` 。想支持这种样式，只需自定义一个加号按钮，[CYLTabBarController](https://github.com/ChenYilong/CYLTabBarController) 能检测到它的存在并自动将 `tabBar` 排序好，无需多余操作，并且也预留了一定接口来满足自定义需求。</p>“加号”按钮的样式、frame均在自定义的类中独立实现，不会涉及tabbar相关设置。
   支持动态更新 | 可动态删除PlusButton ，可以动态更新样式 </p> ![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uq38ulz8g30al02w0u1.gif)
 即使加号按钮超出了tabbar的区域，</p>超出部分依然能响应点击事件 | 红线内的区域均能响应tabbar相关的点击事件，</p>![https://github.com/ChenYilong](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqi6prqsj30j60g8js7.jpg)
-允许指定加号按钮位置 | 效果如下：</p>![enter image description here](http://a64.tinypic.com/2mo0h.jpg) </p>Airbnb-app效果：</p>![enter image description here](http://a63.tinypic.com/2mgk02v.gif)
+允许指定加号按钮位置 | 效果如下：</p>![iTeaTime(技术清谈)](https://tva1.sinaimg.cn/large/006y8mN6gy1g92nics1hvj30a906u3ym.jpg) </p>Airbnb-app效果：</p>![iTeaTime(技术清谈)](https://tva1.sinaimg.cn/large/006y8mN6gy1g92nir57tmg308w0fsapi.gif)
 支持让 `TabBarItem` 仅显示图标，并自动使图标垂直居中，支持自定义TabBar高度 | 效果可见Airbnb-app效果，或者下图</p>![enter image description here](https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png)
  支持角标自定义View | ![enter image description here](https://ws4.sinaimg.cn/large/006tKfTcly1fgl0yxcaboj30yi06at8t.jpg) 
  支持多TabBar嵌套，并指定PlusButton位置 | ![enter image description here](https://ws4.sinaimg.cn/large/006tNc79ly1fmn3005isfg308r0iltl6.gif)
@@ -427,11 +427,12 @@ pod 'CYLTabBarController', '~> 1.24.0'
 
 主要适用于如下情景：
 
-![enter image description here](http://a64.tinypic.com/2mo0h.jpg)
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g92nics1hvj30a906u3ym.jpg"></a></p>
+
 
 Airbnb-app效果：
 
-![enter image description here](http://a63.tinypic.com/2mgk02v.gif)
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g92nir57tmg308w0fsapi.gif"></a></p>
 
  ```Objective-C
 + (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight;
@@ -867,7 +868,7 @@ Demo 演示的效果图：
 
 可以通过这种方式来达到 Airbnb-app 的效果：
 
-<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="http://a63.tinypic.com/2mgk02v.gif"></a></p>
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g92nir57tmg308w0fsapi.gif"></a></p>
 
 
 如果想手动设置偏移量来达到该效果：
@@ -950,12 +951,15 @@ Apple 规定：
 最多只能添加5个 `TabBarItem` ，也就是说加上“加号按钮”，一共最多在一个 `TabBar` 上放置6个控件。否则第6个及之后出现 `TabBarItem` 会被自动屏蔽掉。而且就Apple的审核机制来说，超过5个也会被直接拒绝上架。
 
 Q：我把 demo 两侧的 item 各去掉一个后，按钮的响应区域就变成下图的样子了：
- ![wechat_1445851872](https://cloud.githubusercontent.com/assets/12152553/10725491/62600172-7c07-11e5-9e0a-0ec7d795d1e3.jpeg)
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://cloud.githubusercontent.com/assets/12152553/10725491/62600172-7c07-11e5-9e0a-0ec7d795d1e3.jpeg"></a></p>
   		  
  A：v1.5.5 版本已经修复了该问题，现在不会出现类似的问题了：点击按钮区域却不响应，响应区域有偏移。
 
 Q： 如何实现添加选中背景色的功能 ，像下面这样：
-<img width="409" alt="screen shot 2015-10-28 at 9 21 56 am" src="https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png">
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png"></a></p>
+
 
 A：我已经在 Demo 中添加了如何实现该功能的代码：
 详情见 `CYLTabBarControllerConfig`  类中下面方法的实现：
@@ -969,7 +973,9 @@ A：我已经在 Demo 中添加了如何实现该功能的代码：
  ```
 
 效果如下：
-![simulator screen shot 2015 10 28 11 44 32](https://cloud.githubusercontent.com/assets/2911921/10779397/34956b0a-7d6b-11e5-82d9-fa75aa34e8d0.png)
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://cloud.githubusercontent.com/assets/2911921/10779397/34956b0a-7d6b-11e5-82d9-fa75aa34e8d0.png"></a></p>
+
 
 
 Q: 当 `ViewController` 设置的 `self.title` 和 `tabBarItemsAttributes` 中对应的 `title` 不一致的时候，会出现如图的错误，排序不对了
