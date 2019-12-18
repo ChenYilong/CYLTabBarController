@@ -285,6 +285,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (void)traitCollectionDidChange:(nullable UITraitCollection *)previousTraitCollection  {
     [super traitCollectionDidChange:previousTraitCollection];
+    #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
     if (@available(iOS 13.0, *)) {
 #if __has_include(<UIKit/UIScene.h>)
         UIUserInterfaceStyle currentUserInterfaceStyle = [UITraitCollection currentTraitCollection].userInterfaceStyle;
@@ -296,6 +297,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //TODO:
         [[UIViewController cyl_topmostViewController].navigationController.navigationBar setBarTintColor:[UIColor cyl_systemBackgroundColor]];
     }
+    #endif
     
 }
 
@@ -303,9 +305,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //设置导航栏
     //    [self setUpNavigationBarAppearance];
         [self hideTabBarShadowImageView];
+    //#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
     //    if (@available(iOS 13.0, *)) {
     //        tabBarController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
     //    }
+    //#endif
     //添加小红点
     //添加提示动画，引导用户点击
     [self setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *tabBarController) {
