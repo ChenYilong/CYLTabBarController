@@ -1,0 +1,25 @@
+{
+  "name": "CYLTabBarController",
+  "version": "1.0.0",
+  "description": "<p align=\"center\"><a href=\"https://github.com/ChenYilong/CYLTabBarController\"><img src=\"https://repository-images.githubusercontent.com/44896762/c1d6e880-a8d8-11e9-8bb4-2da8ebc06f0a\"></a></p>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChenYilong/CYLTabBarController.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChenYilong/CYLTabBarController/issues"
+  },
+  "homepage": "https://github.com/ChenYilong/CYLTabBarController#readme",
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  } 
+}
