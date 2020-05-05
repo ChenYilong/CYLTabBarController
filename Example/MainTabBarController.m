@@ -198,7 +198,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         UITabBarAppearance *standardAppearance = [[UITabBarAppearance alloc] init];
         standardAppearance.stackedLayoutAppearance = inlineLayoutAppearance;
         standardAppearance.backgroundColor = [UIColor cyl_systemBackgroundColor];
-        standardAppearance.shadowImage = [[self class] imageWithColor:[UIColor cyl_systemGrayColor] size:CGSizeMake([UIScreen mainScreen].bounds.size.width, 1)];
+        standardAppearance.shadowImage = [[self class] imageWithColor:[UIColor cyl_systemGreenColor] size:CGSizeMake([UIScreen mainScreen].bounds.size.width, 1)];
         self.tabBar.standardAppearance = standardAppearance;
     } else {
         // Override point for customization after application launch.
@@ -208,9 +208,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
         [tabBar setTitleTextAttributes:selectedAttrs forState:UIControlStateSelected];
         
-        // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
+//        // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
         [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
-        [[UITabBar appearance] setShadowImage:[[self class] imageWithColor:[UIColor cyl_systemGrayColor] size:CGSizeMake([UIScreen mainScreen].bounds.size.width, 1)]];
+        [[UITabBar appearance] setShadowImage:[[self class] imageWithColor:[UIColor cyl_systemGreenColor] size:CGSizeMake([UIScreen mainScreen].bounds.size.width, 1)]];
     }
 }
 
@@ -325,7 +325,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 - (void)customizeInterface {
     //设置导航栏
     //    [self setUpNavigationBarAppearance];
-    // [self hideTabBarShadowImageView];
+//     [self hideTabBarShadowImageView];
     //#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
     //    if (@available(iOS 13.0, *)) {
     //        tabBarController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
