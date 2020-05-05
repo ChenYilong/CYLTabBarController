@@ -40,6 +40,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 @property (nonatomic, strong) NSMutableArray<NSURL *> *lottieURLs;
 @property (nonatomic, strong) NSMutableArray *lottieSizes;
 @property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
+@property (nonatomic, strong) UIImage *tabItemPlaceholderImage;
 
 @end
 
@@ -91,6 +92,8 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         if ([control cyl_isChildViewControllerPlusButton]) {
             return;
         }
+        UILabel *tabLabel = control.cyl_tabLabel;
+        tabLabel.textAlignment = NSTextAlignmentCenter;
         SEL actin = @selector(didSelectControl:);
         [control addTarget:self action:actin forControlEvents:UIControlEventTouchUpInside];
         if (idx == self.selectedIndex && ![control isKindOfClass:[CYLPlusButton class]]) {
@@ -434,6 +437,21 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 }
 
 /**
+ *  lazy load tabItemPlaceholderImage
+ *
+ *  @return UIImage
+ */
+- (UIImage *)tabItemPlaceholderImage {
+    if (_tabItemPlaceholderImage == nil) {
+        CGSize placeholderSize = CGSizeMake(22, 22);
+        UIImage *placeholderImage = [UIImage cyl_imageWithColor:[UIColor whiteColor] size:placeholderSize];
+        UIImage *tabItemPlaceholderImage = placeholderImage;
+        _tabItemPlaceholderImage = tabItemPlaceholderImage;
+    }
+    return _tabItemPlaceholderImage;
+}
+
+/**
  *  添加一个子控制器
  *
  *  @param viewController    控制器
@@ -450,13 +468,11 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                         lottieURL:(NSURL *)lottieURL
                   lottieSizeValue:(NSValue *)lottieSizeValue {
     viewController.tabBarItem.title = title;
-    CGSize placeholderSize = CGSizeMake(22, 22);
-    UIImage *placeholderImage = [UIImage cyl_imageWithColor:[UIColor whiteColor] size:placeholderSize];
     UIImage *normalImage = nil;
     if (normalImageInfo) {
         normalImage = [self getImageFromImageInfo:normalImageInfo];
     } else {
-        normalImage = placeholderImage;
+        normalImage = self.tabItemPlaceholderImage;
     }
     viewController.tabBarItem.image = normalImage;
 
@@ -464,7 +480,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     if (selectedImageInfo) {
         selectedImage = [self getImageFromImageInfo:selectedImageInfo];
     } else {
-        selectedImage = placeholderImage;
+        selectedImage = self.tabItemPlaceholderImage;
     }
     viewController.tabBarItem.selectedImage = selectedImage;
 
@@ -488,6 +504,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                 tureLottieSizeValue = [NSValue valueWithCGSize:normalImage.size];
                 break;
             }
+            CGSize placeholderSize = CGSizeMake(22, 22);
             tureLottieSizeValue = [NSValue valueWithCGSize:placeholderSize];
             break;
         } while (NO);

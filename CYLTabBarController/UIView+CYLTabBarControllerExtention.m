@@ -134,13 +134,24 @@
 }
 
 - (UIImageView *)cyl_tabShadowImageView {
-    UIView *subview = [self cyl_tabBackgroundView];
-    if (!subview) {
-        return nil;
-    }
-    NSArray<__kindof UIView *> *backgroundSubviews = subview.subviews;
-    if (backgroundSubviews.count > 1) {
-        for (UIView *subview in backgroundSubviews) {
+    if (@available(iOS 10.0, *)) {
+        //iOS10及以上这样获取ShadowImageView：
+        UIView *subview = [self cyl_tabBackgroundView];
+        if (!subview) {
+            return nil;
+        }
+        NSArray<__kindof UIView *> *backgroundSubviews = subview.subviews;
+        //iOS13系统backgroundSubviews.count > 1可行，12及以下就不可行了
+        if (backgroundSubviews.count >= 1) {
+            for (UIView *subview in backgroundSubviews) {
+                if (CGRectGetHeight(subview.bounds) <= 1.0 ) {
+                    return (UIImageView *)subview;
+                }
+            }
+        }
+    } else {
+        //iOS9这样获取ShadowImageView：
+        for (UIView *subview in self.subviews) {
             if (CGRectGetHeight(subview.bounds) <= 1.0 ) {
                 return (UIImageView *)subview;
             }

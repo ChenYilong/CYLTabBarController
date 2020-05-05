@@ -84,6 +84,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 }
 
 - (NSArray *)tabBarItemsAttributesForTabBar {
+    // lottie动画的json文件来自于NorthSea, respect!
     CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
                                                  CYLTabBarItemTitle : @"首页",
@@ -91,7 +92,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                  CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
                                                  //第一位 右大，下大
-                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_home_animate" ofType:@"json"]],
+                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"]],
 //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                  };
     CGFloat secondXOffset = (-25+2)/2;
@@ -100,7 +101,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                   CYLTabBarItemImage : [UIImage imageNamed:@"fishpond_normal"],
                                                   CYLTabBarItemSelectedImage : @"fishpond_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)],
-                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_search_animate" ofType:@"json"]],
+                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"]],
 //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(33, 33)]
                                                   };
     
@@ -109,7 +110,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                  CYLTabBarItemImage : [UIImage imageNamed:@"message_normal"],
                                                  CYLTabBarItemSelectedImage : @"message_highlight",
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-secondXOffset, -3.5)],
-                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_message_animate" ofType:@"json"]],
+                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news" ofType:@"json"]],
 //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(44, 44)]
                                                  };
     NSDictionary *fourthTabBarItemsAttributes = @{
@@ -117,7 +118,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                   CYLTabBarItemImage :[UIImage imageNamed:@"account_normal"],
                                                   CYLTabBarItemSelectedImage : @"account_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-firstXOffset, -3.5)],
-                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_me_animate" ofType:@"json"]],
+                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine" ofType:@"json"]],
 //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                   };
     NSArray *tabBarItemsAttributes = @[
@@ -143,19 +144,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // 普通状态下的文字属性
     NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];
     normalAttrs[NSForegroundColorAttributeName] = [UIColor cyl_systemGrayColor];
+    //normalAttrs[NSFontAttributeName] = [UIFont systemFontOfSize:10];
     
     // set the text color for selected state
     // 选中状态下的文字属性
     NSMutableDictionary *selectedAttrs = [NSMutableDictionary dictionary];
     selectedAttrs[NSForegroundColorAttributeName] = [UIColor cyl_labelColor];
-    
-    
-    // set the text Attributes
-    // 设置文字属性
-    UITabBarItem *tabBar = [UITabBarItem appearance];
-    [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
-    [tabBar setTitleTextAttributes:selectedAttrs forState:UIControlStateSelected];
-    
+    //selectedAttrs[NSFontAttributeName] = [UIFont systemFontOfSize:10];
+
     // Set the dark color to selected tab (the dimmed background)
     // TabBarItem选中后的背景颜色
     // [self customizeTabBarSelectionIndicatorImage];
@@ -179,18 +175,43 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
     //Three way to deal with shadow 三种阴影处理方式：
     // NO.3, without shadow : use -[[CYLTabBarController hideTabBarShadowImageView] in CYLMainRootViewController.m
-    // NO.2，using Image
+    
+    // NO.2，using layer to add shadow.
+    //    CYLTabBarController *tabBarController = [self cyl_tabBarController];
+    //    tabBarController.tabBar.layer.shadowColor = [UIColor blackColor].CGColor;
+    //    tabBarController.tabBar.layer.shadowRadius = 15.0;
+    //    tabBarController.tabBar.layer.shadowOpacity = 1;
+    //    tabBarController.tabBar.layer.shadowOffset = CGSizeMake(0, 3);
+    //    tabBarController.tabBar.layer.masksToBounds = NO;
+    //    tabBarController.tabBar.clipsToBounds = NO;
+    
+    // NO.1，using Image note:recommended.推荐方式
     // set the bar shadow image
-    // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
-//    [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
-//    [[UITabBar appearance] setShadowImage:[UIImage imageNamed:@"TabBar_Bg_Shadow"]];
-    // NO.1，using layer to add shadow. note:recommended. 推荐该方式，可以给PlusButton突出的部分也添加上阴影
-//    tabBarController.tabBar.layer.shadowColor = [UIColor blackColor].CGColor;
-//    tabBarController.tabBar.layer.shadowRadius = 15.0;
-//    tabBarController.tabBar.layer.shadowOpacity = 0.2;
-//    tabBarController.tabBar.layer.shadowOffset = CGSizeMake(0, 3);
-//    tabBarController.tabBar.layer.masksToBounds = NO;
-//    tabBarController.tabBar.clipsToBounds = NO;
+    // without shadow : use -[[CYLTabBarController hideTabBarShadowImageView] in CYLMainRootViewController.m
+    if (@available(iOS 13.0, *)) {
+        UITabBarItemAppearance *inlineLayoutAppearance = [[UITabBarItemAppearance  alloc] init];
+        // set the text Attributes
+        // 设置文字属性
+        [inlineLayoutAppearance.normal setTitleTextAttributes:normalAttrs];
+        [inlineLayoutAppearance.selected setTitleTextAttributes:selectedAttrs];
+    
+        UITabBarAppearance *standardAppearance = [[UITabBarAppearance alloc] init];
+        standardAppearance.stackedLayoutAppearance = inlineLayoutAppearance;
+        standardAppearance.backgroundColor = [UIColor cyl_systemBackgroundColor];
+        standardAppearance.shadowImage = [[self class] imageWithColor:[UIColor cyl_systemGrayColor] size:CGSizeMake([UIScreen mainScreen].bounds.size.width, 1)];
+        self.tabBar.standardAppearance = standardAppearance;
+    } else {
+        // Override point for customization after application launch.
+        // set the text Attributes
+        // 设置文字属性
+        UITabBarItem *tabBar = [UITabBarItem appearance];
+        [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
+        [tabBar setTitleTextAttributes:selectedAttrs forState:UIControlStateSelected];
+        
+        // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
+        [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
+        [[UITabBar appearance] setShadowImage:[[self class] imageWithColor:[UIColor cyl_systemGrayColor] size:CGSizeMake([UIScreen mainScreen].bounds.size.width, 1)]];
+    }
 }
 
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {
@@ -304,7 +325,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 - (void)customizeInterface {
     //设置导航栏
     //    [self setUpNavigationBarAppearance];
-        [self hideTabBarShadowImageView];
+    // [self hideTabBarShadowImageView];
     //#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
     //    if (@available(iOS 13.0, *)) {
     //        tabBarController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;

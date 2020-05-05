@@ -69,11 +69,13 @@
  */
 + (id)plusButton {
     CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
-    UIImage *normalButtonImage = [UIImage imageNamed:@"post_normal"];
-    UIImage *hlightButtonImage = [UIImage imageNamed:@"post_highlight"];
+    UIImage *normalButtonImage = [UIImage imageNamed:@"icon_tabbar_plus"];
+    UIImage *hlightButtonImage = [UIImage imageNamed:@"icon_tabbar_plus"];
     [button setImage:normalButtonImage forState:UIControlStateNormal];
-    [button setImage:hlightButtonImage forState:UIControlStateHighlighted];
-    [button setImage:hlightButtonImage forState:UIControlStateSelected];
+    [button setImage:[hlightButtonImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateHighlighted];
+    [button setImage:[hlightButtonImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
+    [button setTintColor:  [UIColor colorWithRed:0/255.0f green:255/255.0f blue:189/255.0f alpha:1]];
+    
     //    UIImage *normalButtonBackImage = [UIImage imageNamed:@"videoback"];
     //    [button setBackgroundImage:normalButtonBackImage forState:UIControlStateNormal];
     //    [button setBackgroundImage:normalButtonBackImage forState:UIControlStateSelected];

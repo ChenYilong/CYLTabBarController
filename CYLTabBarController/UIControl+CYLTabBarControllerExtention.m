@@ -76,7 +76,7 @@
     NSUInteger tabBarSelectedIndex = self.cyl_tabBarController.selectedIndex;
     NSUInteger tabBarChildViewControllerIndex = self.cyl_tabBarChildViewControllerIndex;
     BOOL defaultSelected = self.selected;
-    if ((tabBarSelectedIndex == tabBarChildViewControllerIndex) && defaultSelected) {
+    if ((tabBarSelectedIndex == tabBarChildViewControllerIndex) && defaultSelected && CYLPlusChildViewController.cyl_plusViewControllerEverAdded) {
         isSelected = YES;
     }
     return isSelected;
