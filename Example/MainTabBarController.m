@@ -198,7 +198,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         UITabBarAppearance *standardAppearance = [[UITabBarAppearance alloc] init];
         standardAppearance.stackedLayoutAppearance = inlineLayoutAppearance;
         standardAppearance.backgroundColor = [UIColor cyl_systemBackgroundColor];
-        standardAppearance.shadowImage = [[self class] imageWithColor:[UIColor cyl_systemGreenColor] size:CGSizeMake([UIScreen mainScreen].bounds.size.width, 1)];
+        //shadowColor和shadowImage均可以自定义颜色, shadowColor默认高度为1, shadowImage可以自定义高度.
+        standardAppearance.shadowColor = [UIColor cyl_systemGreenColor];
+        // standardAppearance.shadowImage = [[self class] imageWithColor:[UIColor cyl_systemGreenColor] size:CGSizeMake([UIScreen mainScreen].bounds.size.width, 1)];
         self.tabBar.standardAppearance = standardAppearance;
     } else {
         // Override point for customization after application launch.
@@ -208,7 +210,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         [tabBar setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
         [tabBar setTitleTextAttributes:selectedAttrs forState:UIControlStateSelected];
         
-//        // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
+        // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
         [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
         [[UITabBar appearance] setShadowImage:[[self class] imageWithColor:[UIColor cyl_systemGreenColor] size:CGSizeMake([UIScreen mainScreen].bounds.size.width, 1)]];
     }
