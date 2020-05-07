@@ -20,6 +20,10 @@
 		9A3865F82266FA3C008EE46F /* tab_search_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A3865F42266FA3C008EE46F /* tab_search_animate.json */; };
 		9A3865F92266FA3C008EE46F /* tab_me_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A3865F52266FA3C008EE46F /* tab_me_animate.json */; };
 		9A7C59902181C39000EDB266 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7C598E2181C39000EDB266 /* MainTabBarController.m */; };
+		9A98017D2461249F00E65289 /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A9801792461249F00E65289 /* green_lottie_tab_mine.json */; };
+		9A98017E2461249F00E65289 /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A98017A2461249F00E65289 /* green_lottie_tab_discover.json */; };
+		9A98017F2461249F00E65289 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A98017B2461249F00E65289 /* green_lottie_tab_news.json */; };
+		9A9801802461249F00E65289 /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A98017C2461249F00E65289 /* green_lottie_tab_home.json */; };
 		9AC0181B1FE90AA1001EC2D6 /* CYLPlusDemoChildViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0181A1FE90AA1001EC2D6 /* CYLPlusDemoChildViewController.m */; };
 		9AD7F5B022B7D4B6004BF0A0 /* gray_tabbar_me_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 9AD7F5AD22B7D4B6004BF0A0 /* gray_tabbar_me_animation.json */; };
 		9AD7F5B122B7D4B6004BF0A0 /* gray_tabbar_home_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 9AD7F5AE22B7D4B6004BF0A0 /* gray_tabbar_home_animation.json */; };
@@ -63,6 +67,10 @@
 		9A579C98225F6E3A00F3C8F0 /* Location.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = Location.gpx; path = ../../../../../Location.gpx; sourceTree = "<group>"; };
 		9A7C598E2181C39000EDB266 /* MainTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainTabBarController.m; sourceTree = "<group>"; };
 		9A7C598F2181C39000EDB266 /* MainTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainTabBarController.h; sourceTree = "<group>"; };
+		9A9801792461249F00E65289 /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_mine.json; sourceTree = "<group>"; };
+		9A98017A2461249F00E65289 /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_discover.json; sourceTree = "<group>"; };
+		9A98017B2461249F00E65289 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_news.json; sourceTree = "<group>"; };
+		9A98017C2461249F00E65289 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_home.json; sourceTree = "<group>"; };
 		9AC018191FE90AA1001EC2D6 /* CYLPlusDemoChildViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLPlusDemoChildViewController.h; sourceTree = "<group>"; };
 		9AC0181A1FE90AA1001EC2D6 /* CYLPlusDemoChildViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLPlusDemoChildViewController.m; sourceTree = "<group>"; };
 		9AD7F5AD22B7D4B6004BF0A0 /* gray_tabbar_me_animation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = gray_tabbar_me_animation.json; sourceTree = "<group>"; };
@@ -201,6 +209,10 @@
 				9A3865F52266FA3C008EE46F /* tab_me_animate.json */,
 				9A3865F22266FA3C008EE46F /* tab_message_animate.json */,
 				9A3865F42266FA3C008EE46F /* tab_search_animate.json */,
+				9A98017A2461249F00E65289 /* green_lottie_tab_discover.json */,
+				9A98017C2461249F00E65289 /* green_lottie_tab_home.json */,
+				9A9801792461249F00E65289 /* green_lottie_tab_mine.json */,
+				9A98017B2461249F00E65289 /* green_lottie_tab_news.json */,
 			);
 			path = LottieResources;
 			sourceTree = "<group>";
@@ -339,14 +351,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A9801802461249F00E65289 /* green_lottie_tab_home.json in Resources */,
 				9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */,
+				9A98017F2461249F00E65289 /* green_lottie_tab_news.json in Resources */,
 				9AD7F5BE22B7D695004BF0A0 /* img_tab_home_0.png in Resources */,
 				9AE942E71BDC933E00354519 /* LaunchScreen.xib in Resources */,
 				9AD7F5B122B7D4B6004BF0A0 /* gray_tabbar_home_animation.json in Resources */,
 				9A3865F82266FA3C008EE46F /* tab_search_animate.json in Resources */,
+				9A98017D2461249F00E65289 /* green_lottie_tab_mine.json in Resources */,
 				9AD7F5BA22B7D695004BF0A0 /* img_tab_message_0.png in Resources */,
 				9AD7F5B022B7D4B6004BF0A0 /* gray_tabbar_me_animation.json in Resources */,
 				9AD7F5B222B7D4B6004BF0A0 /* gray_tabbar_message_animation.json in Resources */,
+				9A98017E2461249F00E65289 /* green_lottie_tab_discover.json in Resources */,
 				9AD7F5C022B7D695004BF0A0 /* img_tab_me_0.png in Resources */,
 				9AE942E81BDC933E00354519 /* Main.storyboard in Resources */,
 				9A3865F92266FA3C008EE46F /* tab_me_animate.json in Resources */,
@@ -560,7 +576,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_ENTITLEMENTS = CYLTabBarController/CYLTabBarController.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
@@ -583,7 +599,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_ENTITLEMENTS = CYLTabBarController/CYLTabBarController.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
