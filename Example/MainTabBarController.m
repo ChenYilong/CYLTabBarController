@@ -289,6 +289,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     UIControl *selectedTabButton = [self.viewControllers[0].tabBarItem cyl_tabButton];
     [selectedTabButton cyl_replaceTabButtonWithNewView:self.selectedCover
                                                   show:show];
+    //fix: #480
+    //selectedTabButton.cyl_tabImageView.hidden = YES;
     if (show) {
         [self addOnceScaleAnimationOnView:self.selectedCover];
     }
