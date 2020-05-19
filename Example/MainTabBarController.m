@@ -40,7 +40,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                       titlePositionAdjustment:titlePositionAdjustment
                                       context:context
                 ]) {
-        [self customizeTabBarAppearance];
+        [self customizeTabBarAppearanceWithTitlePositionAdjustment:titlePositionAdjustment];
         self.delegate = self;
         self.navigationController.navigationBar.hidden = YES;
     }
@@ -133,7 +133,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 /**
  *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性等等
  */
-- (void)customizeTabBarAppearance {
+- (void)customizeTabBarAppearanceWithTitlePositionAdjustment:(UIOffset)titlePositionAdjustment {
     // Customize UITabBar height
     // 自定义 TabBar 高度
     // tabBarController.tabBarHeight = CYL_IS_IPHONE_X ? 65 : 40;
@@ -190,11 +190,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // without shadow : use -[[CYLTabBarController hideTabBarShadowImageView] in CYLMainRootViewController.m
     if (@available(iOS 13.0, *)) {
         UITabBarItemAppearance *inlineLayoutAppearance = [[UITabBarItemAppearance  alloc] init];
+        // fix https://github.com/ChenYilong/CYLTabBarController/issues/456
+        inlineLayoutAppearance.normal.titlePositionAdjustment = titlePositionAdjustment;
+
         // set the text Attributes
         // 设置文字属性
         [inlineLayoutAppearance.normal setTitleTextAttributes:normalAttrs];
         [inlineLayoutAppearance.selected setTitleTextAttributes:selectedAttrs];
-    
+
         UITabBarAppearance *standardAppearance = [[UITabBarAppearance alloc] init];
         standardAppearance.stackedLayoutAppearance = inlineLayoutAppearance;
         standardAppearance.backgroundColor = [UIColor cyl_systemBackgroundColor];
