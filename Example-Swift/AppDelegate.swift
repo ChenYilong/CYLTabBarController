@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
         self.window = UIWindow()
         self.window?.frame  = UIScreen.main.bounds
         self.window?.rootViewController = mainTabBarVc
-        mainTabBarVc?.hideTabBadgeBackgroundSeparator();
+        mainTabBarVc.hideTabBarShadowImageView();
 
         self.window?.makeKeyAndVisible()
         

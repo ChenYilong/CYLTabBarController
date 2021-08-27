@@ -152,7 +152,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
 @interface CYLTabBarController (CYLTabBarControllerDeprecated)
 
-- (void)hideTabBadgeBackgroundSeparator CYL_DEPRECATED("Deprecated in 1.27.0. Use `+[CYLPlusButton hideTabBarShadowImageView]` instead.");
+- (void)hideTabBadgeBackgroundSeparator CYL_DEPRECATED("Deprecated in 1.27.0. Use `-[CYLTabBarController hideTabBarShadowImageView]` instead.");
 
 @end
 

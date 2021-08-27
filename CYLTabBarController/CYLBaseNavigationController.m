@@ -15,12 +15,22 @@
 @implementation CYLBaseNavigationController
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
-    if (self.viewControllers.count > 0) {
+    // 当前导航栏, 只有第一个viewController push的时候设置隐藏
+    if (self.viewControllers.count == 1) {
         viewController.hidesBottomBarWhenPushed = YES;
     } else {
         viewController.hidesBottomBarWhenPushed = NO;
     }
     [super pushViewController:viewController animated:animated];
+}
+
+//fix https://github.com/ChenYilong/CYLTabBarController/issues/483
+- (void)setViewControllers:(NSArray<UIViewController *> *)viewControllers animated:(BOOL)animated {
+    if (self.viewControllers.count > 1) {
+        UIViewController *viewController = [self.viewControllers lastObject];
+        viewController.hidesBottomBarWhenPushed = YES;
+    }
+    [super setViewControllers:viewControllers animated:animated];
 }
 
 @end

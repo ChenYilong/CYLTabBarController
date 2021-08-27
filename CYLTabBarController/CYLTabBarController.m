@@ -84,6 +84,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 }
 
 - (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
     [self.tabBar layoutSubviews];//Fix issue #93 #392
     CYLTabBar *tabBar =  (CYLTabBar *)self.tabBar;
     // add callback for visiable control, included all plusButton.
@@ -141,6 +142,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 }
 
 - (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
     if (!(self.tabBarHeight > 0)) {
         return;
     }
@@ -180,7 +182,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:NO];
     }
     // KVO反注册
-    if (self.isObservingTabImageViewDefaultOffset) {
+    if (self.tabBar && self.isObservingTabImageViewDefaultOffset) {
         @try {
             [self.tabBar removeObserver:self forKeyPath:@"tabImageViewDefaultOffset"];
         } @catch(NSException *e) { }
@@ -376,6 +378,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
             _viewControllers = [viewControllers copy];
             [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:NSNotFound];
         }
+      
         CYLTabbarItemsCount = [viewControllers count];
         CYLTabBarItemWidth = ([UIScreen mainScreen].bounds.size.width - CYLPlusButtonWidth) / (CYLTabbarItemsCount);
         NSUInteger idx = 0;
@@ -388,7 +391,13 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
             NSURL *lottieURL = nil;
             NSValue *lottieSizeValue = nil;
             if (viewController != CYLPlusChildViewController) {
-                title = _tabBarItemsAttributes[idx][CYLTabBarItemTitle];
+                if (@available(iOS 13.0, *)) {
+                    //fix https://github.com/ChenYilong/CYLTabBarController/issues/437
+                    title = _tabBarItemsAttributes[idx][CYLTabBarItemTitle] ?: @"";
+                } else {
+                    title = _tabBarItemsAttributes[idx][CYLTabBarItemTitle];
+                }
+
                 normalImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemImage];
                 selectedImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage];
                 lottieURL = _tabBarItemsAttributes[idx][CYLTabBarLottieURL];
@@ -403,6 +412,11 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                 imageInsets = insets;
             } else {
                 idx--;
+                /**如果是CYLPlusChildViewController ，title设置为空字符串，解决把第一个tabbarItem设置成plusButton后，其他的
+                   tabbarItem会不显示title问题
+                  见： https://github.com/ChenYilong/CYLTabBarController/issues/563
+                 **/
+                title = @"";
             }
             
             [self addOneChildViewController:viewController
@@ -732,6 +746,27 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                              block, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+
+static inline UIWindow *getMainWindow(){
+   UIWindow *window = nil;
+    window = UIApplication.sharedApplication.delegate.window;
+    if (!window) {
+        if (@available(iOS 13.0, *))
+           {
+               for (UIWindowScene* wScene in [UIApplication sharedApplication].connectedScenes)
+               {
+                   if (wScene.activationState == UISceneActivationStateForegroundActive)
+                   {
+                       window = wScene.windows.firstObject;
+
+                       break;
+                   }
+               }
+           }
+    }
+    return window;
+}
+
 //TODO: 更新实现，多实例场景下进行栈操作，弹出最新一个。
 - (CYLTabBarController *)cyl_tabBarController {
     CYLTabBarController *tabBarController;
@@ -746,8 +781,9 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
             return tabBarController;
         }
     }
-    id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
-    UIWindow *window = delegate.window;
+//    id<UIApplicationDelegate> delegate = ((id<UIApplicationDelegate>)[[UIApplication sharedApplication] delegate]);
+//    UIWindow *window = delegate.window;
+    UIWindow *window = getMainWindow();
     UIViewController *rootViewController = [window.rootViewController cyl_getViewControllerInsteadOfNavigationController];;
     if ([rootViewController isKindOfClass:[CYLTabBarController class]]) {
         tabBarController = (CYLTabBarController *)rootViewController;

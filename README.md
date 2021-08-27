@@ -909,7 +909,28 @@ Demo 演示的效果图：
 
 ### 在 Swift 项目中使用 CYLTabBarController
 
+
 仓库中给出了一个Swift Demo，文件夹叫做 Example-Swift。
+
+如果想在Swift 项目中，将本库作为静态库使用：
+
+CocoaPods 1.5.0+ (with Xcode 9+)：
+
+ ```Objective-C
+ platform :ios, '8.0'
+# Uncomment the next line when you want all Pods as static framework
+# use_modular_headers!
+pod 'CYLTabBarController', '~> 1.29.0', :modular_headers => true
+ ```
+
+
+作为动态库使用：
+
+ ```Objective-C
+platform :ios, '8.0'
+use_frameworks!
+ ```
+
 
 感谢[@WeMadeCode](https://github.com/WeMadeCode) 提供的 Swift 版 Demo，原仓库地址：[WeMadeCode/CYLTabBarController-Swift](https://github.com/WeMadeCode/CYLTabBarController-Swift) 
 
