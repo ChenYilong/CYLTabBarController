@@ -72,12 +72,11 @@
 }
 
 - (BOOL)cyl_isSelected {
-    BOOL isSelected = NO;
     NSUInteger tabBarSelectedIndex = self.cyl_tabBarController.selectedIndex;
     NSUInteger tabBarChildViewControllerIndex = self.cyl_tabBarChildViewControllerIndex;
-    BOOL defaultSelected = self.selected;
-    if ((tabBarSelectedIndex == tabBarChildViewControllerIndex) && defaultSelected && CYLPlusChildViewController.cyl_plusViewControllerEverAdded) {
-        isSelected = YES;
+    BOOL isSelected = (tabBarSelectedIndex == tabBarChildViewControllerIndex) && self.selected;
+    if (self.cyl_tabBarController.tabBar.cyl_hasPlusChildViewController) {
+        isSelected = isSelected && CYLPlusChildViewController.cyl_plusViewControllerEverAdded;
     }
     return isSelected;
 }
