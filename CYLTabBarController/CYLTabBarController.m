@@ -691,10 +691,21 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     NSURL *lottieURL = self.lottieURLs[index];
     NSValue *lottieSizeValue = self.lottieSizes[index];
     CGSize lottieSize = [lottieSizeValue CGSizeValue];
+    if ([lottieURL isKindOfClass:NSString.class] && isEmpty((NSString *)lottieURL)) {
+        [self.tabBar cyl_stopAnimationOfAllLottieView]; return;
+    }
     [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize];
     if (animation) {
         [self.tabBar cyl_animationLottieImageWithSelectedControl:control lottieURL:lottieURL size:lottieSize defaultSelected:defaultSelected];
     }
+}
+
+BOOL isEmpty(NSString *str) {
+    if (str == nil || str == NULL) {return YES;}
+    if ([str isKindOfClass:[NSNull class]]) {return YES;}
+    if ([[str stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0) {return YES;}
+    if([str isEqualToString:@"<null>"]) {return YES;}
+    return NO;
 }
 
 - (id)rootViewController {
