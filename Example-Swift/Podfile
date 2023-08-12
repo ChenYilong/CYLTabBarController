@@ -12,5 +12,5 @@ inhibit_all_warnings!
 
 target 'CYLTabBarController-Swift' do
   use_frameworks!
-   pod 'CYLTabBarController'
+ pod 'CYLTabBarController', :path => '../'
 end

@@ -15,22 +15,22 @@ class MessageViewController: UIViewController {
 //    private weak var myLabel4:UILabel!
 //    private weak var myLabel5:UILabel!
 //    private weak var myLabel6:UILabel!
-//    
+//
 //    var buttonColor: UIColor {
 //        return UIColor(named: "buttonColor")!
 //    }
-//    
+//
 //    var labelColor: UIColor {
 //        return UIColor(named: "labelColor")!
 //    }
-//    
+//
 //    var textFieldColor: UIColor {
 //        return UIColor(named: "textFieldColor")!
 //    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.backgroundColor = UIColor.gray
+        view.backgroundColor = UIColor.gray
     }
 }
