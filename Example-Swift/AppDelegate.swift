@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
         window?.frame = UIScreen.main.bounds
         window?.rootViewController = mainTabBarVc
         mainTabBarVc?.hideTabBadgeBackgroundSeparator()
+        mainTabBarVc.hideTabBarShadowImageView();
 
         window?.makeKeyAndVisible()
 
