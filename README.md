@@ -1105,6 +1105,10 @@ button.frame = CGRectMake(0.0, 0.0, w, h);
 Q：如何兼容 Lottie 动画？
 A：用法见：https://github.com/ChenYilong/CYLTabBarController/issues/341
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=ChenYilong/CYLTabBarController&type=Date)](https://star-history.com/#ChenYilong/CYLTabBarController&Date)
+
 
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
  
