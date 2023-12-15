@@ -88,7 +88,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
                                                  CYLTabBarItemTitle : @"首页",
-                                                 CYLTabBarItemImage : [UIImage imageNamed:@"home_normal"],  /* NSString and UIImage are supported*/
+                                                 CYLTabBarItemImage : [[UIImage imageNamed:@"home_normal"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal],  /* NSString and UIImage are supported*/
                                                  CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
                                                  //第一位 右大，下大
@@ -98,7 +98,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     CGFloat secondXOffset = (-25+2)/2;
     NSDictionary *secondTabBarItemsAttributes = @{
                                                   CYLTabBarItemTitle : @"鱼塘",
-                                                  CYLTabBarItemImage : [UIImage imageNamed:@"fishpond_normal"],
+                                                  CYLTabBarItemImage : [[UIImage imageNamed:@"fishpond_normal"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal],
                                                   CYLTabBarItemSelectedImage : @"fishpond_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)],
                                                   CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"]],
@@ -107,7 +107,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
     NSDictionary *thirdTabBarItemsAttributes = @{
                                                  CYLTabBarItemTitle : @"消息",
-                                                 CYLTabBarItemImage : [UIImage imageNamed:@"message_normal"],
+                                                 CYLTabBarItemImage : [[UIImage imageNamed:@"message_normal"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal],
                                                  CYLTabBarItemSelectedImage : @"message_highlight",
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-secondXOffset, -3.5)],
                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news" ofType:@"json"]],
@@ -115,7 +115,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                  };
     NSDictionary *fourthTabBarItemsAttributes = @{
                                                   CYLTabBarItemTitle : @"我的",
-                                                  CYLTabBarItemImage :[UIImage imageNamed:@"account_normal"],
+                                                  CYLTabBarItemImage : [[UIImage imageNamed:@"account_normal"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal],
                                                   CYLTabBarItemSelectedImage : @"account_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-firstXOffset, -3.5)],
                                                   CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine" ofType:@"json"]],

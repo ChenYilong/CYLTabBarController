@@ -5,13 +5,11 @@
 //  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
 //
 
-import UIKit
 import CYLTabBarController
+import UIKit
 
 class MainTabBarController: CYLTabBarController {
-
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-
 }

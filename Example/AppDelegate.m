@@ -16,7 +16,9 @@
 
 @implementation AppDelegate
 
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
     [UIApplication sharedApplication].statusBarHidden = NO;
     // 设置主窗口,并设置根控制器
     self.window = [[UIWindow alloc] init];
