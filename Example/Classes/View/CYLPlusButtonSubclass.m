@@ -267,18 +267,18 @@
 #pragma clang diagnostic pop
 #pragma mark - CYLPlusButtonSubclassing
 
-+ (UIViewController *)plusChildViewController {
-    UIViewController *plusChildViewController = [[UIViewController alloc] init];
-    plusChildViewController.view.backgroundColor = [UIColor redColor];
-    plusChildViewController.navigationItem.title = @"PlusChildViewController";
-    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
-                                                   initWithRootViewController:plusChildViewController];
-    return plusChildNavigationController;
-}
-
-+ (NSUInteger)indexOfPlusButtonInTabBar {
-    return 2;
-}
+//+ (UIViewController *)plusChildViewController {
+//    UIViewController *plusChildViewController = [[UIViewController alloc] init];
+//    plusChildViewController.view.backgroundColor = [UIColor redColor];
+//    plusChildViewController.navigationItem.title = @"PlusChildViewController";
+//    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
+//                                                   initWithRootViewController:plusChildViewController];
+//    return plusChildNavigationController;
+//}
+//
+//+ (NSUInteger)indexOfPlusButtonInTabBar {
+//    return 2;
+//}
 
 + (BOOL)shouldSelectPlusChildViewController {
     BOOL isSelected = CYLExternPlusButton.selected;

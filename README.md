@@ -49,9 +49,16 @@
  - [EN] mark means English language.
  - [CN] [点此获取 QQ 群,Telegram 群交流信息]( https://github.com/ChenYilong/iOSBlog/issues/21) 。
  - [EN]Telegram Group to communicate the features or bugs: https://t.me/CYLTabBarController 
+## Preview of latest version 
 
+ Preview of the latest version 1.99.2 on iOS 26+ 
 
-# [CN]谁在用?上架APP列表[EN]who are using?List  of App published 
+![Image](https://github.com/user-attachments/assets/5895c2af-0be7-46e9-8a69-a5576922877b)
+![Image](https://github.com/user-attachments/assets/6bc78f3b-5b78-4083-bb3f-28c8a9a1edcc)
+![Image](https://github.com/user-attachments/assets/c196f44e-ce4b-4de0-b6be-6cafe5b93292)
+![Image](https://github.com/user-attachments/assets/5c2f0a09-6c2b-4506-a3b9-87ca3f1fe779)
+![Image](https://github.com/user-attachments/assets/3a2f2c8a-db70-4513-8b7f-0fcff077baec)
+# [CN]谁在用?上架APP列表[EN]who are using? List  of App published 
 
 
 
