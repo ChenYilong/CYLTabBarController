@@ -1,7 +1,7 @@
 <p align="center"><a href="https://github.com/ChenYilong/CYLTabBarController"><img src="https://repository-images.githubusercontent.com/44896762/c1d6e880-a8d8-11e9-8bb4-2da8ebc06f0a"></a></p>
 
 
-# [CN]CYLTabBarController【一行代码实现 Lottie 动画 TabBar】
+# [CN]CYLTabBarController【一行代码实现 Lottie 动画 TabBar】iOS26+ Tested
 # [EN]CYLTabBarController [An animated tabBar supported by Lottie with one line of code] 
 
 
