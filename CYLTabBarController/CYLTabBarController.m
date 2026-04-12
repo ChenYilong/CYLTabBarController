@@ -811,7 +811,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     UIImage *normalImage = [UIImage cyl_imageNamed:normalImageInfo];
     viewController.tabBarItem.image = normalImage;
 
-    UIImage *selectedImage = [UIImage cyl_imageNamed:normalImageInfo];;
+    UIImage *selectedImage = [UIImage cyl_imageNamed:selectedImageInfo];;
     viewController.tabBarItem.selectedImage = selectedImage;
 
     if (self.shouldCustomizeImageInsets || ([self isNOTEmptyForImageInsets:imageInsets])) {
