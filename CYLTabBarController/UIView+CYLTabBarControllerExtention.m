@@ -342,7 +342,7 @@ in UIView:
     for (UIView *subview in self.subviews) {
         NSString *classString = NSStringFromClass(subview.class);
         
-        // iOS10+ 官方使用 UITabBarSwappableImageView
+        // iOS10+ 官方使用 SwappableImageView
         if ([classString hasSuffix:@"ImageView"] && [classString hasPrefix:@"UITabB"]) {
             return (UIImageView *)subview;
         }

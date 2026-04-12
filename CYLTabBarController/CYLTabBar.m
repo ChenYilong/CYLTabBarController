@@ -565,18 +565,16 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     [super addSubview:view];
 }
 
-//
-
-//相识别_UIContinuousSelectionGestureRecognizer，这个位置是对的，需要禁止长按等其他
+// 识别ContinuousSelection手势，需要禁止长按等其他
 - (void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
     
     if ([CYLConstants isUsedLiquidGlass] && [self isKindOfClass:[CYLTabBar class]] && !CYLPlusChildViewController) {
         
-        if ([gestureRecognizer isKindOfClass:NSClassFromString(@"_UIContinuousSelectionGestureRecognizer")]) {
+        NSString *gestureRecognizerClassString = NSStringFromClass([gestureRecognizer class]);
+        if ([gestureRecognizerClassString hasPrefix:(@"_UIContinuous")] && [gestureRecognizerClassString hasSuffix:@"tionGestureRecognizer"]) {
             gestureRecognizer.delegate = self;
         }
-        
-        if ([gestureRecognizer isKindOfClass:NSClassFromString(@"UILongPressGestureRecognizer")]) {
+        if ([gestureRecognizerClassString hasPrefix:(@"UILongPr")] && [gestureRecognizerClassString hasSuffix:@"essGestureRecognizer"]) {
             gestureRecognizer.delegate = self;
         }
     }
