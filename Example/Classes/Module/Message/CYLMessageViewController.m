@@ -2,8 +2,8 @@
 //  CYLMessageViewController.m
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLMessageViewController.h"
@@ -29,6 +29,8 @@
             [weakSelf.tableView.mj_header endRefreshing];
         });
     }];
+//    [self.view layoutIfNeeded];
+
 }
 
 - (void)refresh {
@@ -44,6 +46,7 @@
 - (void)viewDidAppear:(BOOL)animated {
     [self.navigationItem.leftBarButtonItem cyl_showBadge];
 }
+
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
     [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController %@", self.tabBarItem.title, @(indexPath.row)]];
 }

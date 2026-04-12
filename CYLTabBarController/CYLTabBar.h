@@ -2,11 +2,12 @@
 //  CYLTabBar.h
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
+#import "CYLPlusButton.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,6 +21,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) CGFloat tabImageViewDefaultOffset;
 
 @property (nonatomic, copy) NSString *context;
+
+/** 发布按钮 */
+@property (nonatomic, strong) UIButton<CYLPlusButtonSubclassing> *plusButton;
+@property (nonatomic, assign) CGFloat tabBarItemWidth;
+@property (nonatomic, copy) NSArray<UIControl *> *tabBarButtonArray;
+@property (nonatomic, assign, getter=hasAddPlusButton) BOOL addPlusButton;
+@property (nonatomic, assign) BOOL isLensViewLifed;
+
+- (NSUInteger)plusButtonIndex;
 
 @end
 

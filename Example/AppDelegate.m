@@ -2,8 +2,8 @@
 //  AppDelegate.m
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "AppDelegate.h"
@@ -18,8 +18,10 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [UIApplication sharedApplication].statusBarHidden = NO;
+#pragma clang diagnostic pop
     // 设置主窗口,并设置根控制器
     self.window = [[UIWindow alloc] init];
     self.window.frame = [UIScreen mainScreen].bounds;
@@ -27,11 +29,12 @@
     CYLMainRootViewController *rootViewController = [[CYLMainRootViewController alloc] init];
     [self.window setRootViewController:rootViewController];
     [self setUpNavigationBarAppearance];
+//    CYLGetRootWindow().overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+//    [UIWindow appearance].overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
     return YES;
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmethod-signatures"
+CYL_METHOD_SIGNATURES_PUSH
 - (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
     //设置强制旋转屏幕
     if (self.cyl_isForceLandscape) {
@@ -42,8 +45,7 @@
         return UIInterfaceOrientationMaskPortrait;
     }
 }
-#pragma clang diagnostic pop
-
+CYL_METHOD_SIGNATURES_POP
 /**
  *  设置navigationBar样式
  */

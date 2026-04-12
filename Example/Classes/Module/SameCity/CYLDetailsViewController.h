@@ -2,7 +2,7 @@
 //  CYLDetailsViewController.h
 //  CYLTabBarController
 //
-//  v1.21.x Created by Robert Dimitrov on 11/8/14.
+//  v1.99.x Created by Robert Dimitrov on 11/8/14.
 //  Copyright (c) 2014 Robert Dimitrov. All rights reserved.
 //
 

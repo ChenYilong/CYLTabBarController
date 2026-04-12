@@ -2,19 +2,41 @@
 //  UIViewController+CYLTabBarControllerExtention.m
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 16/2/26.
-//  Copyright © 2018年 https://github.com/ChenYilong .All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 16/2/26.
+//  Copyright © 2026年 https://github.com/ChenYilong .All rights reserved.
 //
 
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "CYLTabBarController.h"
 #import <objc/runtime.h>
-#define kActualView     [self cyl_getActualBadgeSuperView]
+//#import "CYLFlatDesignTabBar.h"
+#import "UIView+CYLTabBarControllerExtention.h"
+
+#define kActualView ((UIView *)[[self cyl_getViewControllerInsteadOfNavigationController] cyl_getActualBadgeSuperView])
 
 @implementation UIViewController (CYLTabBarControllerExtention)
 
+@dynamic cyl_badgeAnimationTypeValue;
+@dynamic cyl_badgeCenterOffsetValue;
+@dynamic cyl_badgeCornerRadiusValue;
+@dynamic cyl_badgeFrameValue;
+@dynamic cyl_badgeMarginValue;
+@dynamic cyl_badgeMaximumBadgeNumberValue;
+@dynamic cyl_badgeRadiusValue;
+@dynamic cyl_delayIfNeededForSeconds;
+
 #pragma mark -
 #pragma mark - public Methods
+
+- (BOOL)cyl_isPlaceholder {
+    NSNumber *isPlaceholderObject = objc_getAssociatedObject(self, @selector(cyl_isPlaceholder));
+    return [isPlaceholderObject boolValue];
+}
+
+- (void)cyl_setIsPlaceholder:(BOOL)isPlaceholder {
+    NSNumber *isPlaceholderObject = @(isPlaceholder);
+    objc_setAssociatedObject(self, @selector(cyl_isPlaceholder), isPlaceholderObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
 
 - (UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index {
     return [self cyl_popSelectTabBarChildViewControllerAtIndex:index animated:NO];
@@ -118,9 +140,7 @@
     }
     return (self == CYLPlusChildViewController);
 }
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 - (void)cyl_showTabBadgePoint {
     if (self.cyl_isPlusChildViewController) {
         return;
@@ -141,7 +161,6 @@
     }
     return [self cyl_isShowBadge];;
 }
-#pragma clang diagnostic pop
 
 - (void)cyl_setTabBadgePointView:(UIView *)tabBadgePointView {
     if (self.cyl_isPlusChildViewController) {
@@ -171,7 +190,7 @@
     }
     return [self.cyl_tabButton cyl_tabBadgePointViewOffset];
 }
-
+CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (BOOL)cyl_isEmbedInTabBarController {
     if (self.cyl_tabBarController == nil) {
         return NO;
@@ -206,7 +225,17 @@
     return tabIndex;
 }
 
+- (void)cyl_setTabButton:(UIControl *)tabButton {
+    UIControl *tabButton_ = tabButton;
+    objc_setAssociatedObject(self, @selector(cyl_tabButton), tabButton_, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 - (UIControl *)cyl_tabButton {
+    
+    UIControl *tabButton = objc_getAssociatedObject(self, @selector(cyl_tabButton));
+    if (tabButton) {
+        return tabButton;
+    }
     if (!self.cyl_isEmbedInTabBarController) {
         return nil;
     }
@@ -297,7 +326,6 @@
     return atIndex;
 }
 
-
 - (void)cyl_handleNavigationBackAction {
     [self cyl_handleNavigationBackActionWithAnimated:YES];
 }
@@ -320,20 +348,33 @@
  *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
  */
 - (void)cyl_showBadge {
-    [kActualView cyl_showBadge];
+    // [kActualView cyl_showBadge];
+    SEL selector = @selector(cyl_showBadge);
+    [kActualView cyl_performSelector:selector];
+}
+
+- (void)cyl_showBadgeValue:(NSString *)value
+             animationTypeValue:(NSNumber *)animationTypeValue {
+//    [kActualView cyl_showBadgeValue:value animationType:animationType];
+    SEL selector = @selector(cyl_showBadgeValue:animationTypeValue:);
+    [kActualView cyl_performSelector:selector withObject:value withObject:animationTypeValue];
 }
 
 - (void)cyl_showBadgeValue:(NSString *)value
              animationType:(CYLBadgeAnimationType)animationType {
-    [kActualView cyl_showBadgeValue:value animationType:animationType];
+    [self cyl_showBadgeValue:value animationTypeValue:@(animationType)];
 }
 
 - (void)cyl_clearBadge {
-    [kActualView cyl_clearBadge];
+//    [kActualView cyl_clearBadge];
+    SEL selector = @selector(cyl_clearBadge);
+    [kActualView cyl_performSelector:selector];
 }
 
 - (void)cyl_resumeBadge {
-    [kActualView cyl_resumeBadge];
+//    [kActualView cyl_resumeBadge];
+    SEL selector = @selector(cyl_resumeBadge);
+    [kActualView cyl_performSelector:selector];
 }
 
 - (BOOL)cyl_isShowBadge {
@@ -347,20 +388,56 @@
 #pragma mark -- private method
 
 /**
- *  Because UIBarButtonItem is kind of NSObject, it is not able to directly attach badge.
- This method is used to find actual view (non-nil) inside UIBarButtonItem instance.
  *
- *  @return view
+ * @return UIView or UITabBarItem
  */
-- (UITabBarItem *)cyl_getActualBadgeSuperView {
+- (id)cyl_getActualBadgeSuperView {
+    if (self.cyl_isPlaceholder) {
+        return nil;
+    }
+
     UIViewController *viewController = self.cyl_getViewControllerInsteadOfNavigationController;
     UITabBarItem *viewControllerItem = viewController.tabBarItem;
     UIControl *viewControllerControl = viewControllerItem.cyl_tabButton;
     UITabBarItem *navigationViewControllerItem = viewController.navigationController.tabBarItem;
+    if (viewControllerItem && !viewControllerControl) {
+        CYLFlatDesignTabBar *pureCustomTabBar = (CYLFlatDesignTabBar * )self.cyl_tabBarController.tabBar;
+        if ([pureCustomTabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+           CYLFlatDesignTabBarItem *item = (CYLFlatDesignTabBarItem *)viewController.cyl_tabButton;
+            if (item.imageView.isHidden == NO) {
+                return item.imageView;
+            }
+            return item.actualBadgeSuperView;
+        }
+    }
     if (viewControllerControl) {
-        return viewControllerItem;
+        return viewControllerControl;
     }
     return navigationViewControllerItem;
+}
+
+- (BOOL)cyl_isReady { 
+    return YES;
+}
+
+
+- (void)cyl_performSelector:(SEL)aSelector {
+}
+
+
+- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object {
+}
+
+
+- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 {
+}
+
+
+- (UIControl *)cyl_visiableTabButton {
+    if ([CYLConstants isUsedLiquidGlass]) {
+        return self.tabBarItem.cyl_selectedTabButton;
+    }
+    return self.cyl_tabButton;
 }
 
 #pragma mark -- setter/getter
@@ -369,7 +446,9 @@
 }
 
 - (void)cyl_setBadge:(UILabel *)label {
-    [kActualView cyl_setBadge:label];
+//    [kActualView cyl_setBadge:label];
+    SEL selector = @selector(cyl_setBadge:);
+    [kActualView cyl_performSelector:selector withObject:label];
 }
 
 - (UIFont *)cyl_badgeFont {
@@ -377,7 +456,10 @@
 }
 
 - (void)cyl_setBadgeFont:(UIFont *)badgeFont {
-    [kActualView cyl_setBadgeFont:badgeFont];
+//    [kActualView cyl_setBadgeFont:badgeFont];
+    SEL selector = @selector(cyl_setBadgeFont:);
+    [kActualView cyl_performSelector:selector withObject:badgeFont];
+
 }
 
 - (UIColor *)cyl_badgeBackgroundColor {
@@ -385,7 +467,10 @@
 }
 
 - (void)cyl_setBadgeBackgroundColor:(UIColor *)badgeBackgroundColor {
-    [kActualView cyl_setBadgeBackgroundColor:badgeBackgroundColor];
+//    [kActualView cyl_setBadgeBackgroundColor:badgeBackgroundColor];
+    SEL selector = @selector(cyl_setBadgeBackgroundColor:);
+    [kActualView cyl_performSelector:selector withObject:badgeBackgroundColor];
+
 }
 
 - (UIColor *)cyl_badgeTextColor {
@@ -393,7 +478,10 @@
 }
 
 - (void)cyl_setBadgeTextColor:(UIColor *)badgeTextColor {
-    [kActualView cyl_setBadgeTextColor:badgeTextColor];
+//    [kActualView cyl_setBadgeTextColor:badgeTextColor];
+    SEL selector = @selector(cyl_setBadgeTextColor:);
+    [kActualView cyl_performSelector:selector withObject:badgeTextColor];
+
 }
 
 - (CYLBadgeAnimationType)cyl_badgeAnimationType {
@@ -401,7 +489,10 @@
 }
 
 - (void)cyl_setBadgeAnimationType:(CYLBadgeAnimationType)animationType {
-    [kActualView cyl_setBadgeAnimationType:animationType];
+//    [kActualView cyl_setBadgeAnimationType:animationType];
+    SEL selector = @selector(cyl_setBadgeAnimationTypeValue:);
+    NSNumber *cyl_setBadgeAnimationTypeValue = @(animationType);
+    [kActualView cyl_performSelector:selector withObject:cyl_setBadgeAnimationTypeValue];
 }
 
 - (CGRect)cyl_badgeFrame {
@@ -409,15 +500,26 @@
 }
 
 - (void)cyl_setBadgeFrame:(CGRect)badgeFrame {
-    [kActualView cyl_setBadgeFrame:badgeFrame];
+//    [kActualView cyl_setBadgeFrame:badgeFrame];
+    SEL selector = @selector(cyl_setBadgeFrameValue:);
+    NSValue *badgeCenterOffsetValue = [NSValue valueWithCGRect:badgeFrame];
+    [kActualView cyl_performSelector:selector withObject:badgeCenterOffsetValue];
 }
 
+- (void)cyl_setBadgeCenterOffsetValue:(NSValue *)badgeCenterOffsetValue {
+//    [CYL_ACTUAL_BARBUTTON cyl_setBadgeCenterOffset:badgeCenterOffset];
+    CGPoint badgeCenterOffset = badgeCenterOffsetValue.CGPointValue;
+    [self cyl_setBadgeCenterOffset:badgeCenterOffset];
+}
 - (CGPoint)cyl_badgeCenterOffset {
     return [kActualView cyl_badgeCenterOffset];
 }
 
 - (void)cyl_setBadgeCenterOffset:(CGPoint)badgeCenterOffset {
-    [kActualView cyl_setBadgeCenterOffset:badgeCenterOffset];
+//    [kActualView cyl_setBadgeCenterOffset:badgeCenterOffset];
+    SEL selector = @selector(cyl_setBadgeCenterOffsetValue:);
+    NSValue *badgeCenterOffsetValue = [NSValue valueWithCGPoint:badgeCenterOffset];
+    [kActualView cyl_performSelector:selector withObject:badgeCenterOffsetValue];
 }
 
 - (NSInteger)cyl_badgeMaximumBadgeNumber {
@@ -425,15 +527,22 @@
 }
 
 - (void)cyl_setBadgeMaximumBadgeNumber:(NSInteger)badgeMaximumBadgeNumber {
-    [kActualView cyl_setBadgeMaximumBadgeNumber:badgeMaximumBadgeNumber];
+//    [kActualView cyl_setBadgeMaximumBadgeNumber:badgeMaximumBadgeNumber];
+    SEL selector = @selector(cyl_setBadgeMaximumBadgeNumberValue:);
+    NSNumber *cyl_setBadgeMaximumBadgeNumberValue = @(badgeMaximumBadgeNumber);
+    [kActualView cyl_performSelector:selector withObject:cyl_setBadgeMaximumBadgeNumberValue];
 }
+
 
 - (CGFloat)cyl_badgeMargin {
     return [kActualView cyl_badgeMargin];
 }
 
 - (void)cyl_setBadgeMargin:(CGFloat)badgeMargin {
-    [kActualView cyl_setBadgeMargin:badgeMargin];
+//    [kActualView cyl_setBadgeMargin:badgeMargin];
+    SEL selector = @selector(cyl_setBadgeMarginValue:);
+    NSNumber *cyl_setBadgeMarginValue = @(badgeMargin);
+    [kActualView cyl_performSelector:selector withObject:cyl_setBadgeMarginValue];
 }
 
 - (CGFloat)cyl_badgeRadius {
@@ -441,7 +550,11 @@
 }
 
 - (void)cyl_setBadgeRadius:(CGFloat)badgeRadius {
-    [kActualView cyl_setBadgeRadius:badgeRadius];
+//    [kActualView cyl_setBadgeRadius:badgeRadius];
+    SEL selector = @selector(cyl_setBadgeRadiusValue:);
+    NSNumber *cyl_setBadgeRadiusValue = @(badgeRadius);
+    [kActualView cyl_performSelector:selector withObject:cyl_setBadgeRadiusValue];
+
 }
 
 - (CGFloat)cyl_badgeCornerRadius {
@@ -449,7 +562,11 @@
 }
 
 - (void)cyl_setBadgeCornerRadius:(CGFloat)cyl_badgeCornerRadius {
-    [kActualView cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
+//    [kActualView cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
+    SEL selector = @selector(cyl_setBadgeCornerRadiusValue:);
+    NSNumber *cyl_setBadgeCornerRadiusValue = @(cyl_badgeCornerRadius);
+    [kActualView cyl_performSelector:selector withObject:cyl_setBadgeCornerRadiusValue];
 }
 
 @end
+

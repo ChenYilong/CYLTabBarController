@@ -66,9 +66,7 @@
 				9AF595DF21C8E63C00C6AF2B /* AppDelegate.swift */,
 				9AF595E021C8E63C00C6AF2B /* MainTabBarController.swift */,
 				9AF595E821C8E7B000C6AF2B /* Module */,
-				9AF595E521C8E7B000C6AF2B /* Model */,
 				9AF595E621C8E7B000C6AF2B /* View */,
-				9AF5961821C8E8B700C6AF2B /* Controller */,
 				9AF5960721C8E7B100C6AF2B /* Other */,
 				922DCEDE1FF63399005C89BE /* Products */,
 				9E8F1952DFE997BA5D0E1F59 /* Pods */,
@@ -82,13 +80,6 @@
 				922DCEDD1FF63399005C89BE /* CYLTabBarController-Swift.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		9AF595E521C8E7B000C6AF2B /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		9AF595E621C8E7B000C6AF2B /* View */ = {
@@ -107,7 +98,6 @@
 				9AF595F521C8E7B000C6AF2B /* Connection */,
 				9AF595FB21C8E7B000C6AF2B /* Message */,
 				9AF5960121C8E7B000C6AF2B /* Publish */,
-				9AF5961921C8E8D600C6AF2B /* Other */,
 			);
 			path = Module;
 			sourceTree = "<group>";
@@ -115,19 +105,9 @@
 		9AF595E921C8E7B000C6AF2B /* Personal */ = {
 			isa = PBXGroup;
 			children = (
-				9AF595EA21C8E7B000C6AF2B /* Other */,
 				9AF595EB21C8E7B000C6AF2B /* Controller */,
-				9AF595ED21C8E7B000C6AF2B /* Model */,
-				9AF595EE21C8E7B000C6AF2B /* View */,
 			);
 			path = Personal;
-			sourceTree = "<group>";
-		};
-		9AF595EA21C8E7B000C6AF2B /* Other */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Other;
 			sourceTree = "<group>";
 		};
 		9AF595EB21C8E7B000C6AF2B /* Controller */ = {
@@ -138,36 +118,12 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
-		9AF595ED21C8E7B000C6AF2B /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		9AF595EE21C8E7B000C6AF2B /* View */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
 		9AF595EF21C8E7B000C6AF2B /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				9AF595F021C8E7B000C6AF2B /* Other */,
 				9AF595F121C8E7B000C6AF2B /* Controller */,
-				9AF595F321C8E7B000C6AF2B /* Model */,
-				9AF595F421C8E7B000C6AF2B /* View */,
 			);
 			path = Home;
-			sourceTree = "<group>";
-		};
-		9AF595F021C8E7B000C6AF2B /* Other */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Other;
 			sourceTree = "<group>";
 		};
 		9AF595F121C8E7B000C6AF2B /* Controller */ = {
@@ -178,36 +134,12 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
-		9AF595F321C8E7B000C6AF2B /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		9AF595F421C8E7B000C6AF2B /* View */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
 		9AF595F521C8E7B000C6AF2B /* Connection */ = {
 			isa = PBXGroup;
 			children = (
-				9AF595F621C8E7B000C6AF2B /* Other */,
 				9AF595F721C8E7B000C6AF2B /* Controller */,
-				9AF595F921C8E7B000C6AF2B /* Model */,
-				9AF595FA21C8E7B000C6AF2B /* View */,
 			);
 			path = Connection;
-			sourceTree = "<group>";
-		};
-		9AF595F621C8E7B000C6AF2B /* Other */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Other;
 			sourceTree = "<group>";
 		};
 		9AF595F721C8E7B000C6AF2B /* Controller */ = {
@@ -218,36 +150,12 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
-		9AF595F921C8E7B000C6AF2B /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		9AF595FA21C8E7B000C6AF2B /* View */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
 		9AF595FB21C8E7B000C6AF2B /* Message */ = {
 			isa = PBXGroup;
 			children = (
-				9AF595FC21C8E7B000C6AF2B /* Other */,
 				9AF595FD21C8E7B000C6AF2B /* Controller */,
-				9AF595FF21C8E7B000C6AF2B /* Model */,
-				9AF5960021C8E7B000C6AF2B /* View */,
 			);
 			path = Message;
-			sourceTree = "<group>";
-		};
-		9AF595FC21C8E7B000C6AF2B /* Other */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Other;
 			sourceTree = "<group>";
 		};
 		9AF595FD21C8E7B000C6AF2B /* Controller */ = {
@@ -258,36 +166,12 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
-		9AF595FF21C8E7B000C6AF2B /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		9AF5960021C8E7B000C6AF2B /* View */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
 		9AF5960121C8E7B000C6AF2B /* Publish */ = {
 			isa = PBXGroup;
 			children = (
-				9AF5960221C8E7B000C6AF2B /* Other */,
 				9AF5960321C8E7B000C6AF2B /* Controller */,
-				9AF5960521C8E7B000C6AF2B /* Model */,
-				9AF5960621C8E7B000C6AF2B /* View */,
 			);
 			path = Publish;
-			sourceTree = "<group>";
-		};
-		9AF5960221C8E7B000C6AF2B /* Other */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Other;
 			sourceTree = "<group>";
 		};
 		9AF5960321C8E7B000C6AF2B /* Controller */ = {
@@ -298,20 +182,6 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
-		9AF5960521C8E7B000C6AF2B /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		9AF5960621C8E7B000C6AF2B /* View */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
 		9AF5960721C8E7B100C6AF2B /* Other */ = {
 			isa = PBXGroup;
 			children = (
@@ -319,20 +189,6 @@
 				9AF5960921C8E7B100C6AF2B /* LaunchScreen.storyboard */,
 				9AF5960B21C8E7B100C6AF2B /* Main.storyboard */,
 				9AF5960D21C8E7B100C6AF2B /* Info.plist */,
-			);
-			path = Other;
-			sourceTree = "<group>";
-		};
-		9AF5961821C8E8B700C6AF2B /* Controller */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Controller;
-			sourceTree = "<group>";
-		};
-		9AF5961921C8E8D600C6AF2B /* Other */ = {
-			isa = PBXGroup;
-			children = (
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -423,7 +279,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/CYLTabBarController/CYLTabBarController.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -432,7 +288,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		CDF94486ED41F7591F19980E /* [CP] Check Pods Manifest.lock */ = {
@@ -543,7 +399,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -596,7 +452,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -609,15 +465,16 @@
 			baseConfigurationReference = C7C15F27AFB129417A291CF9 /* Pods-CYLTabBarController-Swift.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Other/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "WeMadeCode.CYLTabBarController-Swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -627,15 +484,16 @@
 			baseConfigurationReference = 2CDA77BCC28E878CAB5EFD15 /* Pods-CYLTabBarController-Swift.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Other/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "WeMadeCode.CYLTabBarController-Swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

@@ -2,8 +2,8 @@
 //  CYLMineViewController.m
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLMineViewController.h"
@@ -16,21 +16,45 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
     self.view.backgroundColor = [UIColor whiteColor];
-    self.navigationItem.title = @"我的";    //✅sets navigation bar title.The right way to set the title of the navigation
-    self.tabBarItem.title = @"我的";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
-    //self.title = @"我的1";                //❌sets both of these. Do not do this‼️‼️ This may cause something strange like this : http://i68.tinypic.com/282l3x4.jpg .
-//    [self.navigationController.tabBarItem setBadgeValue:@"3"];
+
+    self.navigationItem.title = @"我的";
+    self.tabBarItem.title = @"我的";
+
+    // ✅ 关键代码：设置 NavigationBar 为白色背景（非透明）
+    if (@available(iOS 13.0, *)) {
+        UINavigationBarAppearance *appearance = [[UINavigationBarAppearance alloc] init];
+        [appearance configureWithOpaqueBackground];   // ⚠️ 非透明关键
+//        appearance.backgroundColor = [UIColor whiteColor];
+        appearance.backgroundColor = [UIColor cyl_systemBackgroundColor];
+
+        appearance.titleTextAttributes = @{
+            NSForegroundColorAttributeName : [UIColor cyl_labelColor]
+        };
+
+        self.navigationController.navigationBar.standardAppearance = appearance;
+        self.navigationController.navigationBar.scrollEdgeAppearance = appearance;
+        self.navigationController.navigationBar.compactAppearance = appearance;
+    } else {
+        // iOS 12 及以下
+        self.navigationController.navigationBar.translucent = NO;
+        self.navigationController.navigationBar.barTintColor = [UIColor cyl_systemBackgroundColor];
+
+        self.navigationController.navigationBar.titleTextAttributes =
+        @{ NSForegroundColorAttributeName : [UIColor cyl_labelColor] };
+    }
+
     __weak __typeof(self) weakSelf = self;
-    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        //Call this Block When enter the refresh status automatically
-        NSUInteger delaySeconds = 1;
-        dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
-        dispatch_after(when, dispatch_get_main_queue(), ^{
+    self.tableView.mj_header =
+    [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)),
+                       dispatch_get_main_queue(), ^{
             [weakSelf.tableView.mj_header endRefreshing];
         });
     }];
 }
+
 
 - (void)refresh {
     [self.tableView.mj_header beginRefreshing];
@@ -64,13 +88,17 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+//    展示红点
+    [self cyl_setBadgeCenterOffset:CGPointZero];
+
     [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimationTypeNone];
     [self testPush];
 }
 
 - (void)testPush {
-    UIViewController *viewController = [[UIViewController alloc] init];
+    CYLBaseViewController *viewController = [[CYLBaseViewController alloc] init];
     viewController.view.backgroundColor = [UIColor redColor];
+    [viewController cyl_setDisablePopGestureRecognizer:YES];
     [self.navigationController pushViewController:viewController animated:YES];
 }
 

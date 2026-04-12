@@ -2,8 +2,8 @@
 //  CYLDetailsViewController.m
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLDetailsViewController.h"
@@ -27,6 +27,15 @@
     label.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     label.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:label];
+//    [[self cyl_sharedAppDelegate] cyl_forceUpdateInterfaceOrientation:UIInterfaceOrientationLandscapeLeft];
+//    self.navigationItem.backBarButtonItem;
+    [self.navigationItem.backBarButtonItem cyl_setBadgeBackgroundColor:UIColor.redColor];
+    [self.navigationItem.backBarButtonItem cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
+    //                [viewController0 cyl_setBadgeRadius:11/2];
+    //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
+    [self.navigationItem.backBarButtonItem cyl_showBadge];
+    [self.navigationItem.backBarButtonItem cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScale];
+
 }
 
 - (void)viewDidAppear:(BOOL)animated {

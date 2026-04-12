@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
         window = UIWindow()
         window?.frame = UIScreen.main.bounds
         window?.rootViewController = mainTabBarVc
-        mainTabBarVc?.hideTabBadgeBackgroundSeparator()
+        mainTabBarVc.hideTabBadgeBackgroundSeparator()
         mainTabBarVc.hideTabBarShadowImageView();
 
         window?.makeKeyAndVisible()
@@ -44,9 +44,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
                              CYLTabBarItemImage: "home_normal",
                              CYLTabBarItemSelectedImage: "home_highlight"]
 
-        let tabBarItemTwo = [CYLTabBarItemTitle: "同城",
-                             CYLTabBarItemImage: "mycity_normal",
-                             CYLTabBarItemSelectedImage: "mycity_highlight"]
+        let tabBarItemTwo = [CYLTabBarItemTitle: "鱼塘",
+                             CYLTabBarItemImage: "fishpond_normal",
+                             CYLTabBarItemSelectedImage: "fishpond_highlight"]
 
         let tabBarItemThree = [CYLTabBarItemTitle: "消息",
                                CYLTabBarItemImage: "message_normal",

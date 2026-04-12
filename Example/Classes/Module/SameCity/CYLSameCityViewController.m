@@ -2,8 +2,8 @@
 //  CYLSameCityViewController.m
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLSameCityViewController.h"
@@ -27,6 +27,8 @@
             [weakSelf.tableView.mj_header endRefreshing];
         });
     }];
+//    [self.view layoutIfNeeded];
+
 }
 
 - (void)refresh {
@@ -64,6 +66,8 @@
     UIViewController *viewController = [[CYLDetailsViewController alloc] init];
 //    viewController.hidesBottomBarWhenPushed = YES;  // This property needs to be set before pushing viewController to the navigationController's stack. Meanwhile as it is all base on CYLBaseNavigationController, there is no need to do this.
     [viewController cyl_setNavigationBarHidden:YES];
+    [viewController cyl_setDisablePopGestureRecognizer:YES];
+
     [self.navigationController pushViewController:viewController animated:YES];
 }
 

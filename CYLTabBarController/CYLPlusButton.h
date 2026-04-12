@@ -2,11 +2,10 @@
 //  CYLPlusButton.h
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import "CYLConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -17,7 +16,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @required
 + (id)plusButton;
+//@property (nonatomic, strong, readonly) UIImage *snapshot;
+
+
 @optional
+
+
+/*!
+ * iOS26+
+ */
+@property (nonatomic, weak) __kindof UIView *selectedContentView;
+
+/*!
+ * Snapshot of plusButton, iOS26+
+ */
+@property (nonatomic, strong) UIImage *selectedContentImage;
 
 /*!
  * 用来自定义加号按钮的位置，如果不实现默认居中。
@@ -31,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /*!
  * 该方法是为了调整 PlusButton 中心点Y轴方向的位置，建议在按钮超出了 tabbar 的边界时实现该方法。
- * @attention 如果不实现该方法，内部会自动进行比对，预设一个较为合适的位置，如果实现了该方法，预设的逻辑将失效。
+ * @attention 如果不实现该方法，内部会自动进行比对，预设一个较为合适的位置，如果实现了该方法，预设的逻辑将失效。但是 iOS26+ 系统， Liquid Glass 效果下， 无法自定义，强制使用内部预设逻辑 ，数值总是 0.5。
  * @return 返回值是自定义按钮中心点Y轴方向的坐标除以 tabbar 的高度，
            内部实现时，会使用该返回值来设置 PlusButton 的 centerY 坐标，公式如下：
               `PlusButtonCenterY = multiplierOfTabBarHeight * tabBarHeight + constantOfPlusButtonCenterYOffset;`
@@ -44,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
  * 见 `+multiplierOfTabBarHeight:` 注释：
  * `PlusButtonCenterY = multiplierOfTabBarHeight * tabBarHeight + constantOfPlusButtonCenterYOffset;`
  * 也就是说： constantOfPlusButtonCenterYOffset 大于0会向下偏移，小于0会向上偏移。
- * @attention 实现了该方法，但没有实现 `+multiplierOfTabBarHeight:` 方法，在这种情况下，会在预设逻辑的基础上进行偏移。
+ * @attention 实现了该方法，但没有实现 `+multiplierOfTabBarHeight:` 方法，在这种情况下，会在预设逻辑的基础上进行偏移。但是 iOS26+ 系统， Liquid Glass 效果下， 无法自定义，强制使用内部预设逻辑 ，数值总是 0。
  */
 + (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight;
 
@@ -78,11 +91,14 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXTERN UIButton<CYLPlusButtonSubclassing> *CYLExternPlusButton;
 FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 
-@interface CYLPlusButton : UIButton
+@interface CYLPlusButton : UIButton 
 
 + (void)registerPlusButton;
 + (void)removePlusButton;
 - (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender;
+
+@property (nonatomic, weak) UIView *selectedContentView;
+@property (nonatomic, strong) UIImage *selectedContentImage;
 
 @end
 

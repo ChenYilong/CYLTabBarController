@@ -2,8 +2,8 @@
 //  CYLTabBarController.m
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -22,6 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_removeTabBadgePoint;
 - (BOOL)cyl_isShowTabBadgePoint;
 - (BOOL)cyl_isSelected;
+- (BOOL)cyl_isReady;
+- (BOOL)cyl_isLottieReady;
+- (BOOL)cyl_isPlusControl;
+
 @property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *cyl_tabBadgePointView;
 @property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset cyl_tabBadgePointViewOffset;
 /*!
@@ -40,21 +44,52 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_addLottieImageWithLottieURL:(NSURL *)lottieURL
                                    size:(CGSize)size;
 
-- (void)cyl_replaceTabImageViewWithNewView:(UIView *)newView
-                             show:(BOOL)show;
+- (void)cyl_animationLottieImageWithLottieURL:(NSURL *)lottieURL
+                                               size:(CGSize)size
+                              defaultSelected:(BOOL)defaultSelected;
+
+- (void)cyl_stopAnimationOfLottieView;
 
 - (void)cyl_replaceTabImageViewWithNewView:(UIView *)newView
-                                           offset:(UIOffset)offset
-                                    show:(BOOL)show
-                                       completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
+                                      show:(BOOL)show;
+
+- (void)cyl_replaceTabImageViewWithNewView:(UIView *)newView
+                                    offset:(UIOffset)offset
+                                      show:(BOOL)show
+                                completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
 
 - (void)cyl_replaceTabButtonWithNewView:(UIView *)newView
                                    show:(BOOL)show;
+
 
 - (void)cyl_replaceTabButtonWithNewView:(UIView *)newView
                                  offset:(UIOffset)offset
                                    show:(BOOL)theShow
                              completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
+//- (CGFloat)cyl_xOffset;
++ (NSString *)cyl_createUILabelTextFromPlusButtonWithStateAppearance:(UITabBarItemStateAppearance *)state;
+
+- (BOOL)cyl_isPlatterSelectedControl;
+- (UIControl *)cyl_platterSelectedControl;
+- (BOOL)cyl_isPlatterNormalControl;
+- (UIControl *)cyl_platterNormalControl;
+
+- (void)cyl_coverTabImageViewOrTabButton:(BOOL)isTabButton
+                               newView:(UIView *)newView
+                                    offset:(UIOffset)offset
+                                      show:(BOOL)theShow
+                           delayIfNeededForSeconds:(CGFloat)delay
+                              completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
+- (void)cyl_coverVisiableTabImageViewOrTabButton:(BOOL)isTabButton
+                               newView:(UIView *)newView
+                                    offset:(UIOffset)offset
+                                      show:(BOOL)theShow
+                           delayIfNeededForSeconds:(CGFloat)delay
+                                      completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
+- (void)cyl_hideControl;
+- (void)cyl_performSelector:(SEL)aSelector;
+- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object;
+- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2;
 
 @end
 

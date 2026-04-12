@@ -358,7 +358,7 @@ pod 'CYLTabBarController', '~> 1.24.0'
                                                  CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
                                                  };
     NSDictionary *secondTabBarItemsAttributes = @{
-                                                  CYLTabBarItemTitle : @"鱼塘",
+                                                  CYLTabBarItemTitle : @"同城",
                                                   CYLTabBarItemImage : self.darkMode ? @"fishpond_highlight" : @"fishpond_normal",
                                                   CYLTabBarItemSelectedImage : @"fishpond_highlight",
                                                   };

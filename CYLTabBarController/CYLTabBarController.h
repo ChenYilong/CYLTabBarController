@@ -2,8 +2,8 @@
 //  CYLTabBarController.h
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLPlusButton.h"
@@ -21,6 +21,7 @@
 #import "UIView+CYLBadgeExtention.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
+#import "CYLFlatDesignTabBar.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -44,13 +45,24 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 @optional
 /*!
  * @param tabBarController The tab bar controller containing viewController.
- * @param control Selected UIControl in TabBar.
+ * @param control Selected UIControl in TabBar. 与 `-[UITaBar  tabBar: didSelectItem:]` 相比，差别在于该参数UIControl可能包含自定义加号➕按钮。且支持如果是代码或者用户交互切换index时都进行回调。弥补了 `-[UITaBar  tabBar: didSelectItem:]` 仅在用户点击时调用的不足。
+
+ * @attention 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。可在PlusButton初始化时使用 CYLExternPlusButton.cyl_shouldNotSelect = YES; 来禁止该协议方法触发涉及plusButton的回调
  */
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control;
 
 @end
 
-@interface CYLTabBarController : UITabBarController <CYLTabBarControllerDelegate>
+@interface CYLTabBarController : UITabBarController <CYLTabBarControllerDelegate, CYLFlatDesignTabBarDelegate>
+
+typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
+    CYLTabBarStyleTypeDefault,
+    CYLTabBarStyleTypeSystem,
+    CYLTabBarStyleTypeFlatDesign,
+    CYLTabBarStyleTypeLiquidGlass
+};
+
+@property (nonatomic, assign) CYLTabBarStyleType tabBarStyleType;
 
 @property (nonatomic, copy) CYLViewDidLayoutSubViewsBlock viewDidLayoutSubviewsBlock;
 
@@ -77,7 +89,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  */
 @property (nonatomic, readonly, assign) UIEdgeInsets imageInsets;
 
-@property (nonatomic, strong) CYLTabBar *tabBar;
+@property (nonatomic, strong, readonly) CYLTabBar *tabBar;
 
 /*! 
  * To set both UIBarItem label text attributes in the tabBar,
@@ -115,9 +127,12 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
                             titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                                             context:(NSString *)context;
 
-- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController;
+- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController
+                              shouldSelectViewController:(UIViewController *)viewController;
 
-- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController shouldSelect:(BOOL)shouldSelect;
+- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController
+                              shouldSelectViewController:(UIViewController *)viewController
+                                            shouldSelect:(BOOL)shouldSelect;
 
 - (void)hideTabBarShadowImageView;
 
@@ -137,6 +152,17 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
 - (UIWindow *)rootWindow;
 
+- (CGSize)visiableTabBarSize;
+
+/*!
+ * use CYL_UIDesignClassicCYLTabBar if return YES
+ */
+//switch to CYLTabBarStyleType
+@property (nonatomic, assign, getter=noNeedUIDesignCompatibility) BOOL noNeedUIDesignCompatibility;
+@property (nonatomic, assign, getter=isLottieViewAdded, readonly) BOOL lottieViewAdded;
+
+@property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs;
+@property (nonatomic, strong, readonly) NSMutableArray *lottieSizes;
 @end
 
 @interface NSObject (CYLTabBarControllerReferenceExtension)
@@ -159,3 +185,4 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidChangeNotification;
 
 NS_ASSUME_NONNULL_END
+

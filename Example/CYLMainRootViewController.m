@@ -2,8 +2,8 @@
 //  CYLMainRootViewController.m
 //  CYLTabBarController
 //
-//  Created by chenyilong on 7/3/2019.
-//  Copyright © 2019 微博@iOS程序犭袁. All rights reserved.
+//  Created by chenyilong on 7/3/2026.
+//  Copyright © 2026 微博@iOS程序犭袁. All rights reserved.
 //
 
 #import "CYLMainRootViewController.h"
@@ -25,7 +25,7 @@
 
 - (CYLTabBarController *)createNewTabBar {
     [CYLPlusButtonSubclass registerPlusButton];
-    return [self createNewTabBarWithContext:nil];
+    return [self createNewTabBarWithContext:@""];
 }
 
 - (CYLTabBarController *)createNewTabBarWithContext:(NSString *)context {
