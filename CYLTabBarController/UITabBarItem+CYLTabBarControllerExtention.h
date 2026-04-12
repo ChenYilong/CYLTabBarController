@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) UIControl *cyl_selectedTabButton;
 @property (nonatomic, readonly) UIControl *cyl_visiableTabButton;
 @property (nonatomic, strong, getter=cyl_lottieURL, setter=cyl_setLottieURL:) NSURL *cyl_lottieURL;
-//@property (nonatomic, assign, getter=cyl_lottieSize, setter=cyl_setLottieSize:) CGRect cyl_lottieSize;
+
 @property (nonatomic, strong, getter=cyl_lottieSizeValue, setter=cyl_setLottieSizeValue:) NSValue *cyl_lottieSizeValue;
 
 /**

@@ -365,7 +365,7 @@ in UIView:
     
     @try {
         // ① 优先尝试 KVC 直接获取（iOS 13+ 常见）
-        imageView = [self cyl_valueForKey:@"_imageView"];
+        imageView = [self cyl_valueForKey:@"imageView"];
         if ([imageView isKindOfClass:[UIImageView class]]) {
             return imageView;
         }
@@ -388,7 +388,7 @@ in UIView:
             imageView = (UIImageView *)subview;
         }
     }
-
+    
     return imageView;
 }
 

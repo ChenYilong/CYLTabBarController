@@ -25,17 +25,6 @@
     NSURL *lottieURL_ = lottieURL;
     objc_setAssociatedObject(self, @selector(cyl_lottieURL), lottieURL_, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
-//
-//- (CGRect)cyl_lottieSize {
-//    CGRect cyl_lottieSizeObject = CGRectFromString(objc_getAssociatedObject(self, @selector(cyl_lottieSize)));
-//    return cyl_lottieSizeObject;
-//}
-//
-//- (void)cyl_setLottieSize:(CGRect)cyl_lottieSize {
-//    NSString *cyl_lottieSizeObject = NSStringFromCGRect(cyl_lottieSize);
-//    objc_setAssociatedObject(self, @selector(cyl_lottieSize), cyl_lottieSizeObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-//}
-
 
 - (NSValue *)cyl_lottieSizeValue {
     NSValue *lottieSizeValue = objc_getAssociatedObject(self, @selector(cyl_lottieSizeValue));
@@ -46,8 +35,6 @@
     NSValue *lottieSizeValue_ = lottieSizeValue;
     objc_setAssociatedObject(self, @selector(cyl_lottieSizeValue), lottieSizeValue_, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
-
-
 
 /*!
  *     if ([classString isEqualToString:@"UITabBarButton"] || [classString isEqualToString:@"_UITabButton"]) {
@@ -80,11 +67,11 @@
 }
 
 - (UIImageView *)cyl_imageView {
-    return self.cyl_view.cyl_imageViewInTabBarButton;
+    return self.cyl_view.cyl_tabImageView;
 }
 
 - (UIImageView *)cyl_imageViewInTabBarButton {
-    return [self.cyl_view cyl_imageViewInTabBarButton];
+    return [self.cyl_view cyl_tabImageView];
 }
 
 // 如果使用了液态玻璃，则返回 UITabBarPlatterView 中的 SelectedContentView 中的 subviews 中的 view

@@ -119,7 +119,7 @@
 - (UIView *)cyl_getActualBadgeSuperViewFromControl:(UIControl *)tabButton {
     // badge label will be added onto imageView
     //只有在TabBar选中状态下才能取到SwappableImageView
-    UIImageView *tabImageView = [self cyl_imageView];
+    UIImageView *tabImageView = [tabButton cyl_tabImageView];
     UIView *lottieAnimationView = (UIView *)tabButton.cyl_lottieAnimationView;
     
     UIView *actualBadgeSuperView = nil;
@@ -157,9 +157,9 @@
     if (aSelector == NULL) { return; }
     UIControl *normalControl = nil;
     UIControl *selectedControl = nil;
-
+    
     UIControl *selfControl = [self cyl_tabButton];
- 
+    
     if ([selfControl cyl_isPlatterSelectedControl]) {
         selectedControl = selfControl;
     } else {

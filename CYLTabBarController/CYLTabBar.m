@@ -327,9 +327,10 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 
 - (void)dealloc {
     // KVO反注册
-    [self removeObserver:self forKeyPath:@"tabBarItemWidth"];
-    // KVO反注册
-    [self removeObserver:self.cyl_platterLiquidLensView forKeyPath:@"_lifted"];
+    @try {
+        [self removeObserver:self forKeyPath:@"tabBarItemWidth"];
+    } @catch (NSException *exception) {
+    }
 }
 
 - (void)setTabBarItemWidth:(CGFloat )tabBarItemWidth {
