@@ -131,17 +131,17 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
 
 
 - (void)cyl_performSelector:(SEL)aSelector { 
-    
+
 }
 
 
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object { 
-    
+
 }
 
 
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 { 
-    
+
 }
 
 

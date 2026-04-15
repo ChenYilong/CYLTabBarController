@@ -60,58 +60,9 @@
         return NO;
     }
 
-    NSString *classString = NSStringFromClass([self class]);
-    BOOL isKindOfPlatterPortalView = [classString hasSuffix:@"_UIPortalView"];
+    BOOL isKindOfPlatterPortalView = [self cyl_isViewPortalView:self];
     
     return isKindOfPlatterPortalView && (self.hidden == NO);
-}
-
-- (UIView * _Nullable)cyl_makePortalView:(BOOL)matchPosition portalView:(UIView<UIKitPortalViewProtocol> *)portalView sourceView:(UIView *)sourceView {
-    static Class portalViewClass = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        portalViewClass = NSClassFromString([@[@"_", @"UI", @"Portal", @"View"] componentsJoinedByString:@""]);
-    });
-    if (!portalViewClass) {
-        return nil;
-    }
-    
-    UIView<UIKitPortalViewProtocol> *view = portalView;// = [[portalViewClass alloc] init];
-    if (!portalViewClass) {
-        view = [[portalViewClass alloc] init];
-    }
-    if (!view) {
-        return nil;
-    }
-    
-    if (@available(iOS 14.0, *)) {
-        view.forwardsClientHitTestingToSourceView = false;
-    }
-    view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-
-    view.sourceView = sourceView;
-    view.sourceView.bounds = sourceView.bounds;
-
-    view.matchesPosition = matchPosition;
-    view.matchesTransform = matchPosition;
-    view.matchesAlpha = false;
-    if (@available(iOS 14.0, *)) {
-        view.allowsHitTesting = false;
-    }
-    
-//    UIView *superview = view.superview;
-//    if (superview) {
-//        
-//        NSInteger index = [superview.subviews indexOfObject:superview];
-//        [superview insertSubview:view atIndex:index];
-//        
-//    } else {
-//        CALayer *superlayer = view.layer.superlayer;
-//        NSInteger index = [superlayer.sublayers indexOfObject:view.layer];
-//        [superlayer insertSublayer:view.layer atIndex:index];
-//    }
-    
-    return view;
 }
 
 - (BOOL)cyl_isViewPortalView:(UIView * _Nonnull)view {
@@ -125,14 +76,6 @@
     } else {
         return false;
     }
-}
-
-- (UIView * _Nullable)cyl_getPortalViewSourceView:(UIView * _Nonnull)portalView {
-    if (![self cyl_isViewPortalView:portalView]) {
-        return nil;
-    }
-    UIView<UIKitPortalViewProtocol> *view = (UIView<UIKitPortalViewProtocol> *)portalView;
-    return view.sourceView;
 }
 
 - (BOOL)cyl_isPlatterContentView {
@@ -163,25 +106,21 @@
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
-    BOOL isPlatterLiquidLensView = [classString containsString:@"_UITabBarVisualProvider_Floating"] && [classString containsString:@"SelectedContentView"];
+    BOOL isPlatterLiquidLensView = [classString hasPrefix:@"_UITab"] && [classString containsString:@"VisualProvider"] && [classString containsString:@"_Floating"] && [classString containsString:@"SelectedContentView"];
     
     return isPlatterLiquidLensView && (self.hidden == NO);
 }
 
-
-/*!
- * _TtCE5UIKitCSo17_UILiquidLensViewP33_4C400BD973F5E4E0B779D1A21A7AEB2711DestOutView
- */
-    - (BOOL)cyl_isPlatterLiquidLensView {
-        if (![CYLConstants isUsedLiquidGlass]) {
-            // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
-            return NO;
-        }
-        NSString *classString = NSStringFromClass([self class]);
-        BOOL isPlatterLiquidLensView = [classString containsString:@"_UILiquidLensView"] && ![classString containsString:@"DestOutView"]&& ![classString containsString:@"BackdropView"];
-        
-        return isPlatterLiquidLensView && (self.hidden == NO);
+- (BOOL)cyl_isPlatterLiquidLensView {
+    if (![CYLConstants isUsedLiquidGlass]) {
+        // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        return NO;
     }
+    NSString *classString = NSStringFromClass([self class]);
+    BOOL isPlatterLiquidLensView = [classString hasPrefix:@"_UI"] && [classString containsString:@"LiquidLens"] && [classString containsString:@"View"] && ![classString containsString:@"DestOutView"]&& ![classString containsString:@"BackdropView"];
+    
+    return isPlatterLiquidLensView && (self.hidden == NO);
+}
 
 - (BOOL) cyl_isPlatterLiquidLensClearGlassView {
     if (![CYLConstants isUsedLiquidGlass]) {
@@ -189,51 +128,30 @@
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
-    BOOL isPlatterLiquidLensView = [classString containsString:@"_UILiquidLensView"] && [classString hasSuffix:@"ClearGlassView"];
+    BOOL isPlatterLiquidLensView = [classString hasPrefix:@"_UI"] && [classString containsString:@"LiquidLens"] && [classString hasSuffix:@"ClearGlassView"];
     
     return isPlatterLiquidLensView && (self.hidden == NO);
 }
-/*!
- *  cyl_resetPlatterSelectedContentSourceViewNewBounds]_block_invoke（在第545行）, 描述：<_UITabSelectionView: 0x105d37c00>:
-in _UITabSelectionView:
-    [408|0x198]backdropLayer (CABackdropLayer*): <CABackdropLayer: 0x600001740dc0>
-in UIView:
-    [16|0x10]_constraintsExceptingSubviewAutoresizingConstraints (NSMutableArray*): nil
-    [24|0x18]_cachedTraitCollection (UITraitCollection*): <UITraitCollection: 0x105f361a0>
-    [32|0x20]_swiftAnimationInfo (id): nil
-    [40|0x28]_traitChangeRegistry (_UITraitChangeRegistry*): <_UITraitChangeRegistry: 0x600001740e00>
-    [48|0x30]_layerRetained (CALayer*): nil
-    [56|0x38]_subviewCache (NSArray*): <__NSArray0: 0x1e60df928>
-    [64|0x40]_window (UIWindow*): <UIWindow: 0x105d0a560>
-    [72|0x48]_gestureRecognizers (NSArray*): nil
-    [80|0x50]_viewDelegate (UIViewController*): nil
-    [88|0x58]_viewFlags (struct ?): {
-        userInteractionDisabled (b1): NO
-        implementsDrawRect (b1): NO
-        implementsDidScroll (b1): NO
-        implementsMous
- */
+
 - (BOOL)cyl_isPlatterLiquidLensTabSelectionView {
     if (![CYLConstants isUsedLiquidGlass]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
-    BOOL isPlatterLiquidLensView = [classString containsString:@"_UITabSelectionView"];
+    BOOL isPlatterLiquidLensView = [classString hasPrefix:@"_UITab"] && [classString hasSuffix:@"SelectionView"];
     
     return isPlatterLiquidLensView && (self.hidden == NO);
 }
 
-/*!
- * _UILiquidLensView.belowGlassWarpBackdrop
- */
+
 - (BOOL)cyl_isPlatterLiquidLensBackdropView {
     if (![CYLConstants isUsedLiquidGlass]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
-    BOOL isPlatterLiquidLensView = [classString containsString:@"_UILiquidLensView"] && [classString hasSuffix:@"BackdropView"];
+    BOOL isPlatterLiquidLensView = [classString hasPrefix:@"_UI"] && [classString containsString:@"LiquidLens"]  && [classString hasSuffix:@"BackdropView"];
     
     return isPlatterLiquidLensView && (self.hidden == NO);
 }
@@ -245,7 +163,7 @@ in UIView:
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
-    BOOL isPlatterLiquidLensView = [classString containsString:@"_UILiquidLensView"] && [classString containsString:@"DestOutView"];
+    BOOL isPlatterLiquidLensView = [classString hasPrefix:@"_UI"] && [classString containsString:@"LiquidLens"] && [classString containsString:@"View"]  && [classString containsString:@"DestOutView"];
     
     return isPlatterLiquidLensView && (self.hidden == NO);
 }
@@ -663,9 +581,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     point.y += frame.size.height;
     return [self cyl_newPointInView:point];
 }
-/*!
- * 🔴类名与方法名：-[CYLTabBarController didSelectControl:]（在第1191行），描述：-[UITabBarItem cyl_viewPerformSelector:]: unrecognized selector sent to instance 0x106e1a280
- */
+
 - (void)cyl_performSelector:(SEL)aSelector {
     if (aSelector == NULL) { return; }
     [self cyl_performSelector:aSelector withObject:nil];
@@ -678,17 +594,36 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 {
     if (aSelector == NULL) { return; }
+    
+    CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+    (
+     [self performSelector:aSelector withObject:object1 withObject:object2];
+     )
+    return;
+    
     UIControl *normalControl = nil;
     UIControl *selectedControl = nil;
     
      
     UIControl *selfControl = nil;
+    
+    
     if ([self cyl_isTabButton]) {
         selfControl = (UIControl *)self;
-    } else {
+    } else if (self.superview && [self.superview cyl_isTabButton]) {
         selfControl = (UIControl *)self.superview;
+    } else if (self.superview.superview && [self.superview.superview cyl_isTabButton]) {
+        selfControl = (UIControl *)self.superview.superview;
     }
     
+    
+    if (![selfControl isKindOfClass:[UIControl class]]) {
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+        (
+         [selfControl performSelector:aSelector withObject:object1 withObject:object2];
+         )
+        return;
+    }
     if ([selfControl cyl_isPlatterSelectedControl]) {
         selectedControl = selfControl;
     } else {
@@ -711,6 +646,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
      }
      );
 }
+
 - (id)cyl_invokeSelector:(SEL)selector
             withVAList:(va_list)args
          argumentCount:(NSUInteger)argumentCount {

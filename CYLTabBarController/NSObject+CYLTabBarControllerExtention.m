@@ -280,6 +280,21 @@ static UIInterfaceOrientationMask CYLMaskFromOrientation(UIInterfaceOrientation 
     return @"Sorry, only support UIView";
 }
 
+- (BOOL)cyl_isContinuousGestureRecognizer {
+    NSString *gestureRecognizerClassString = NSStringFromClass([self class]);
+    if ([gestureRecognizerClassString hasPrefix:(@"_UIContinuous")] && [gestureRecognizerClassString hasSuffix:@"tionGestureRecognizer"]) {
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)cyl_isLongGestureRecognizer {
+    NSString *gestureRecognizerClassString = NSStringFromClass([self class]);
+    if ([gestureRecognizerClassString hasPrefix:(@"UILongPr")] && [gestureRecognizerClassString hasSuffix:@"essGestureRecognizer"]) {
+        return YES;
+    }
+    return NO;
+}
 
 @end
 

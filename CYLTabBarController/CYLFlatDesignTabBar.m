@@ -97,6 +97,8 @@
             blurView.frame = CGRectMake(0, 0, CYLScreenWidth(), CYLScreenWidth());
             blurView.layer.cornerRadius = CYLScaleValue(16);
             blurView.layer.masksToBounds = YES;
+            blurView.clipsToBounds = NO;
+
             [self addSubview:blurView];
             self.blurView = blurView;
         } else {
@@ -105,6 +107,8 @@
             blurView.frame = CGRectMake(0, 0, CYLScreenWidth(), CYLScreenWidth());
             blurView.layer.cornerRadius = CYLScaleValue(16);
             blurView.layer.masksToBounds = YES;
+            blurView.clipsToBounds = NO;
+
             [self addSubview:blurView];
             self.blurView = blurView;
         }
@@ -115,6 +119,8 @@
                                  initWithFrame:[self plusFrame]
                                  
         ];
+        plusSuperView.clipsToBounds = NO;
+
         self.clipsToBounds = NO;
         // UIView *plusSuperView = CYLExternPlusButton;
         [self addSubview:plusSuperView];
@@ -141,7 +147,7 @@
         [plusSuperView addSubview:plusView];
         self.plusView = plusView;
         
-//        __weak typeof(self) wSelf = self;
+        //        __weak typeof(self) wSelf = self;
         //        plusView.viewTouchUpInside = ^(CYLBaseView *bounceView) {
         //            __strong typeof(wSelf) sSelf = wSelf;
         //            if (!sSelf) return;
@@ -166,12 +172,14 @@
             [view cyl_setHidden:YES];
         }
     }
-    [super addSubview:view];
+    if (![self isEqual:view]) {
+        [super addSubview:view];
+    }
 }
 
 - (void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
     if ([self isKindOfClass:[UITabBar class]]) {
-        if ([gestureRecognizer isKindOfClass:NSClassFromString(@"_UIContinuousSelectionGestureRecognizer")]) {
+        if ([gestureRecognizer cyl_isContinuousGestureRecognizer]) {
             gestureRecognizer.enabled = NO;
         }
     }
@@ -195,8 +203,8 @@
     BOOL inside = [super pointInside:point withEvent:event];
     if (inside) {
         if (CGRectContainsPoint(self.plusSuperView.frame, point)) {
-            //TODO: plus button vs touch event?            
-            //                        self.plusView.isTouching = YES;
+            //TODO: plus button vs touch event?
+            // self.plusView.isTouching = YES;
             return inside;
         }
         for (CYLFlatDesignTabBarItem *item in self.tabBarItems) {
@@ -249,7 +257,7 @@
         sSelf.selectedIndex = tag;
         if (!sSelf.wlDelegate) {
             sSelf.wlDelegate = self.cyl_tabBarController;
-        }        
+        }
         [sSelf.wlDelegate tabBar:sSelf didSelectItemAt:sSelf.selectedIndex];
     };
     tabBarItem.viewTouchUpInside = viewTouchUpInside;
@@ -263,7 +271,7 @@
     } else {
         [self addSubview:tabBarItem];
     }
-
+    
     return tabBarItem;
 }
 
@@ -283,18 +291,17 @@
 }
 
 - (void)setSelectedIndex:(NSInteger)selectedIndex {
-
+    
     if (_selectedIndex == selectedIndex) { return; }
     
     [self closePlus:YES];
- 
-    CYLFlatDesignTabBarItem *currTabBarItem = self.tabBarItems[_selectedIndex];
-    [currTabBarItem setIsSelected:NO animated:YES];
-
-    
-    CYLFlatDesignTabBarItem *tabBarItem = self.tabBarItems[selectedIndex];
-    [tabBarItem setIsSelected:YES animated:YES];
-    
+    if (self.tabBarItems && self.tabBarItems.count > _selectedIndex) {
+        CYLFlatDesignTabBarItem *currTabBarItem = self.tabBarItems[_selectedIndex];
+        [currTabBarItem setIsSelected:NO animated:YES];
+        
+        CYLFlatDesignTabBarItem *tabBarItem = self.tabBarItems[selectedIndex];
+        [tabBarItem setIsSelected:YES animated:YES];
+    }
     _selectedIndex = selectedIndex;
 }
 
@@ -323,7 +330,7 @@
 
 - (void)setIsAnimating:(BOOL)isAnimating {
     _isAnimating = isAnimating;
-//    if (!isAnimating) { self.plusView.isCanTouchesBegan = YES; }
+    //    if (!isAnimating) { self.plusView.isCanTouchesBegan = YES; }
 }
 
 - (void)setPlusing:(BOOL)plusing {
@@ -360,7 +367,7 @@
     
     CGFloat blurRadius = self.plusing ? CYLScaleValue(22) : CYLScaleValue(16);
     
-//    UIImage *plusImage = self.plusing ? [UIImage imageNamed:@"home_normal"] : [UIImage imageNamed:@"home_normal"];
+    //    UIImage *plusImage = self.plusing ? [UIImage imageNamed:@"home_normal"] : [UIImage imageNamed:@"home_normal"];
     
     CGFloat tabBarItemScaleXY = self.plusing ? 0.5 : 1;
     CGFloat tabBarItemAlpha = self.plusing ? 0 : 1;
@@ -372,7 +379,7 @@
         self.blurView.layer.cornerRadius = blurRadius;
         
         
-//        self.plusView.image = plusImage;
+        //        self.plusView.image = plusImage;
         
         for (CYLFlatDesignTabBarItem *tabBarItem in self.tabBarItems) {
             tabBarItem.layer.transform = CATransform3DMakeScale(tabBarItemScaleXY, tabBarItemScaleXY, 1);
@@ -435,8 +442,8 @@
     w = h = CYLScaleValue(60);
     x = CYLScaleValue(43);
     y = _blurPlusY + CYLScaleValue(48);
-//    CGFloat space = (CYLScreenWidth() - 2 * x - 3 * w) / 2.0;
-//    
+    //    CGFloat space = (CYLScreenWidth() - 2 * x - 3 * w) / 2.0;
+    //
     
 }
 
@@ -515,7 +522,7 @@
         
         NSValue *tureLottieSizeValue = [CYLConstants cyl_getTureLottieSizeValue:lottieSizeValue fromNormalImage:self.tabBarItemImage];
         self.lottieSizeValue = tureLottieSizeValue;
-
+        
         // =========================
         // 1️⃣ ImageView
         // =========================
@@ -530,7 +537,8 @@
         imageView.image = self.tabBarItemImage;
         imageView.highlightedImage = self.tabBarItemSelectedImage;
         imageView.highlighted = (index == 0);
-        
+        imageView.clipsToBounds = NO;
+
         self.imageView = imageView;
         
         [NSLayoutConstraint activateConstraints:@[
@@ -560,13 +568,14 @@
             self.imageView,
             self.titleLabel
         ]];
-        
         stackView.translatesAutoresizingMaskIntoConstraints = NO;
         stackView.axis = UILayoutConstraintAxisVertical;
         stackView.alignment = UIStackViewAlignmentCenter;
         stackView.distribution = UIStackViewDistributionFill;
         stackView.spacing = 4; // image 与 label 间距
+        stackView.clipsToBounds = NO;
         self.stackView = stackView;
+        
         [self addSubview:self.stackView];
         
         [NSLayoutConstraint activateConstraints:@[
@@ -607,10 +616,14 @@
         self.tag = tag;
         
         if (lottieURL) {
+#if __has_include(<Lottie/Lottie.h>)
             CGSize lottieSize = [lottieSizeValue CGSizeValue];
             [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize];
+#else
+#endif
+            
         }
-      }
+    }
     
     return self;
 }
@@ -624,22 +637,15 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self.imageView.highlighted = isSelected;
         self.titleLabel.textColor = isSelected ? CYLRGBColor(29, 121, 255) : CYLRGBColor(115, 122, 135);
-        //        self.imgTabIcon.image = self.currentTab?.tabBarItem?.image
+        // self.imgTabIcon.image = self.currentTab?.tabBarItem?.image
         
         if (isSelected) {
             CGSize lottieSize = [self.lottieSizeValue CGSizeValue];
             [self cyl_animationLottieImageWithLottieURL:self.lottieURL size:lottieSize defaultSelected:NO];
-
         } else {
-//            [self stopAnimationOfAllLottieView];
-              [self cyl_stopAnimationOfLottieView];
-
+            [self cyl_stopAnimationOfLottieView];
         }
-        
-        
     });
-    
-
 }
 
 - (void)setIsHasBadge:(BOOL)isHasBadge {
@@ -653,7 +659,7 @@
 - (UIView *)actualBadgeSuperView {
     // badge label will be added onto imageView
     UIControl *tabButton = self;
-     UIImageView *tabImageView = [self imageView];
+    UIImageView *tabImageView = [self imageView];
     UIView *lottieAnimationView = (UIView *)tabButton.cyl_lottieAnimationView;
     
     UIView *actualBadgeSuperView = nil;

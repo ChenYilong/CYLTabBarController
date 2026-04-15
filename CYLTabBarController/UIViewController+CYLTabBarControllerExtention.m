@@ -231,7 +231,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (UIControl *)cyl_tabButton {
-    
     UIControl *tabButton = objc_getAssociatedObject(self, @selector(cyl_tabButton));
     if (tabButton) {
         return tabButton;
@@ -244,6 +243,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     @try {
         tabBarItem = self.cyl_tabBarController.tabBar.items[self.cyl_tabIndex];
         control = [tabBarItem cyl_tabButton];
+        
     } @catch (NSException *exception) {}
     return control;
 }
@@ -403,11 +403,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (viewControllerItem && !viewControllerControl) {
         CYLFlatDesignTabBar *pureCustomTabBar = (CYLFlatDesignTabBar * )self.cyl_tabBarController.tabBar;
         if ([pureCustomTabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-           CYLFlatDesignTabBarItem *item = (CYLFlatDesignTabBarItem *)viewController.cyl_tabButton;
-            if (item.imageView.isHidden == NO) {
-                return item.imageView;
+            CYLFlatDesignTabBarItem *item = (CYLFlatDesignTabBarItem *)viewController.cyl_tabButton;
+            if ([item isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
+                return item.actualBadgeSuperView;
             }
-            return item.actualBadgeSuperView;
         }
     }
     if (viewControllerControl) {

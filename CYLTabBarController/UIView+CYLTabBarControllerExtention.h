@@ -10,18 +10,6 @@
 #import "CYLConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@protocol UIKitPortalViewProtocol <NSObject>
-
-@property(nonatomic) __weak UIView * _Nullable sourceView;
-@property(nonatomic) _Bool forwardsClientHitTestingToSourceView;
-@property(nonatomic) _Bool allowsHitTesting; // @dynamic allowsHitTesting;
-@property(nonatomic) _Bool allowsBackdropGroups; // @dynamic allowsBackdropGroups;
-@property(nonatomic) _Bool matchesPosition; // @dynamic matchesPosition;
-@property(nonatomic) _Bool matchesTransform; // @dynamic matchesTransform;
-@property(nonatomic) _Bool matchesAlpha; // @dynamic matchesAlpha;
-@property(nonatomic) _Bool hidesSourceView; // @dynamic hidesSourceView;
-
-@end
 
 @interface UIView (CYLTabBarControllerExtention)
 
@@ -56,10 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray *)cyl_allSubviews;
 - (UIImageView *)cyl_imageViewInTabBarButton;
 - (void)cyl_bringSubviewToFront:(UIView *)view;
-//- (void)cyl_addThenBringSubviewToFront:(UIView *)view;
 - (void)cyl_addPlatterViewThenBringSubviewToFront:(UIView *)view;
-- (UIView * _Nullable)cyl_makePortalView:(BOOL)matchPosition portalView:(UIView<UIKitPortalViewProtocol> *)portalView  sourceView:(UIView *)sourceView;
-- (UIView * _Nullable)cyl_getPortalViewSourceView:(UIView * _Nonnull)portalView;
 - (UIImageView *)cyl_swappableImageViewViewInTabBarButton;
 - (UIImage *)cyl_takeSnapshot;
 - (void)cyl_setHidden:(BOOL)hidden;

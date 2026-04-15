@@ -7,7 +7,9 @@ inhibit_all_warnings!
 
 target 'CYLTabBarController-Swift' do
   use_frameworks!
- pod 'CYLTabBarController', :path => '../'
+# pod 'CYLTabBarController', :path => '../'
+ pod 'CYLTabBarController/Lottie', :path => './'
+
 end
  
 post_install do |installer|

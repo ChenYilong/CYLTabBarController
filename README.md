@@ -49,11 +49,12 @@
  - [EN] mark means English language.
  - [CN] [点此获取 QQ 群,Telegram 群交流信息]( https://github.com/ChenYilong/iOSBlog/issues/21) 。
  - [EN]Telegram Group to communicate the features or bugs: https://t.me/CYLTabBarController 
+ 
 ## Preview of latest version 
 
- Preview of the latest version 1.99.2 on iOS 26+ 
+ Preview of the latest version 1.99.5 on iOS 26+ 
  
-CYLTabBarController 现已支持 iOS26 上实现以下效果， 请更新至版本1.99.3以上版本：
+CYLTabBarController 现已支持 iOS26 上实现以下效果， 请更新至版本1.99.5以上版本：
 
 - ✅同时展示 Lottie动画与液态玻璃效果；
 - ✅支持将加号➕按钮，展示在液态玻璃效果上，并居中展示。保留 CYLTabBarController 旧版本的所有加号按钮逻辑。仅增加玻璃遮罩效果；
@@ -830,11 +831,6 @@ Demo 演示的效果图：
 
 + (BOOL)shouldSelectPlusChildViewController {
     BOOL isSelected = CYLExternPlusButton.selected;
-    if (isSelected) {
-//        HDLLogDebug("🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
-    } else {
-//        HDLLogDebug("🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
-    }
     return YES;
 }
 

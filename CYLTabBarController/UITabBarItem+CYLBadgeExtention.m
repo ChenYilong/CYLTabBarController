@@ -140,9 +140,6 @@
     return actualBadgeSuperView;
 }
 
-/*!
- * 🔴类名与方法名：-[CYLTabBarController didSelectControl:]（在第1191行），描述：-[UITabBarItem cyl_viewPerformSelector:]: unrecognized selector sent to instance 0x106e1a280
- */
 - (void)cyl_performSelector:(SEL)aSelector {
     if (aSelector == NULL) { return; }
     [self cyl_performSelector:aSelector withObject:nil];
@@ -159,7 +156,13 @@
     UIControl *selectedControl = nil;
     
     UIControl *selfControl = [self cyl_tabButton];
-    
+    if (![selfControl isKindOfClass:[UIControl class]]) {
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+        (
+         [selfControl performSelector:aSelector withObject:object1 withObject:object2];
+         )
+        return;
+    }
     if ([selfControl cyl_isPlatterSelectedControl]) {
         selectedControl = selfControl;
     } else {

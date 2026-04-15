@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -16,33 +16,6 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     </imageView>
                 </viewController>
-                <view contentMode="scaleToFill" id="bJx-IZ-d6y">
-                    <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    <subviews>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="  Copyright (c) 2018年 微博@iOS程序犭袁. All rights reserved." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="2d4-ms-y0C">
-                            <rect key="frame" x="20" y="439" width="440" height="21"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                            <color key="textColor" systemColor="darkTextColor"/>
-                            <nil key="highlightedColor"/>
-                        </label>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="CYLTabBarController" textAlignment="center" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" minimumFontSize="18" translatesAutoresizingMaskIntoConstraints="NO" id="YDj-aN-ZXu">
-                            <rect key="frame" x="20" y="139.66666666666666" width="440" height="43"/>
-                            <fontDescription key="fontDescription" type="boldSystem" pointSize="36"/>
-                            <color key="textColor" systemColor="darkTextColor"/>
-                            <nil key="highlightedColor"/>
-                        </label>
-                    </subviews>
-                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    <constraints>
-                        <constraint firstItem="YDj-aN-ZXu" firstAttribute="centerY" secondItem="bJx-IZ-d6y" secondAttribute="bottom" multiplier="1/3" constant="1" id="9j9-pK-vhl"/>
-                        <constraint firstAttribute="centerX" secondItem="YDj-aN-ZXu" secondAttribute="centerX" id="DMS-ko-rD6"/>
-                        <constraint firstAttribute="centerX" secondItem="2d4-ms-y0C" secondAttribute="centerX" id="Jgc-FX-ngY"/>
-                        <constraint firstItem="2d4-ms-y0C" firstAttribute="leading" secondItem="bJx-IZ-d6y" secondAttribute="leading" constant="20" symbolic="YES" id="Ze1-Uv-m5r"/>
-                        <constraint firstAttribute="bottom" secondItem="2d4-ms-y0C" secondAttribute="bottom" constant="20" id="sd0-Wp-6qf"/>
-                        <constraint firstItem="YDj-aN-ZXu" firstAttribute="leading" secondItem="bJx-IZ-d6y" secondAttribute="leading" constant="20" symbolic="YES" id="szu-MS-OSw"/>
-                    </constraints>
-                </view>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="139" y="131"/>
@@ -50,8 +23,5 @@
     </scenes>
     <resources>
         <image name="CYLTabBar" width="1177" height="472.5"/>
-        <systemColor name="darkTextColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
     </resources>
 </document>

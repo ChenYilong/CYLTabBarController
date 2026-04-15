@@ -438,6 +438,9 @@
 - (void)cyl_addLottieImageWithLottieURL:(NSURL *)lottieURL
                                    size:(CGSize)size {
 #if __has_include(<Lottie/Lottie.h>)
+    if (!lottieURL) {
+        return;
+    }
     if (self.cyl_lottieAnimationView) {
         return;
     }
@@ -458,6 +461,9 @@
                                                size:(CGSize)size
                                     defaultSelected:(BOOL)defaultSelected {
 #if __has_include(<Lottie/Lottie.h>)
+    if (!lottieURL) {
+        return;
+    }
     //_UITabButton
     [self cyl_addLottieImageWithLottieURL:lottieURL size:size];
     LOTAnimationView *lottieView = self.cyl_lottieAnimationView;
@@ -481,12 +487,12 @@
 - (void)cyl_stopAnimationOfLottieView {
 #if __has_include(<Lottie/Lottie.h>)
     if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
-        if (self.cyl_lottieAnimationView  ) {
+        if (self.cyl_lottieAnimationView) {
             [self.cyl_lottieAnimationView stop];
         }
     } else
         if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-            if (self.cyl_lottieAnimationView ) {
+            if (self.cyl_lottieAnimationView) {
                 [self.cyl_lottieAnimationView stop];
             }
         }
@@ -511,6 +517,9 @@
 //}
 
 - (UIControl *)cyl_platterSelectedControl {
+    if (![self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+        return nil;
+    }
     UIControl *selectedContentControl = [self.cyl_tabBarController.tabBar cyl_selectedContentControlFromContentControl:self];
     if (!selectedContentControl) {
         selectedContentControl = self;
@@ -519,11 +528,18 @@
 }
 
 - (BOOL)cyl_isPlatterSelectedControl {
-    return [self.superview cyl_isPlatterSelectedContentView];
+    if (self.cyl_tabBarController.tabBar && [self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+        return [self.superview cyl_isPlatterSelectedContentView];
+
+    }
+    return NO;
 }
 
 - (BOOL)cyl_isPlatterNormalControl {
-    return [self.superview cyl_isPlatterContentView];
+    if (self.cyl_tabBarController.tabBar && [self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+        return [self.superview cyl_isPlatterContentView];
+    }
+    return NO;
 }
 
 - (UIControl *)cyl_platterNormalControl {
@@ -578,6 +594,13 @@
     if (aSelector == NULL) { return; }
     UIControl *normalControl = nil;
     UIControl *selectedControl = nil;
+    if (![self isKindOfClass:[UIControl class]]) {
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+        (
+         [self performSelector:aSelector withObject:object1 withObject:object2];
+         )
+        return;
+    }
     if ([self cyl_isPlatterSelectedControl]) {
         selectedControl = self;
     } else {

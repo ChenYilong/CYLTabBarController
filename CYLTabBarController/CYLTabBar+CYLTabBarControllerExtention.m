@@ -179,6 +179,9 @@
                                                size:(CGSize)size
                                     defaultSelected:(BOOL)defaultSelected {
 #if __has_include(<Lottie/Lottie.h>)
+    if (!lottieURL) {
+        return;
+    }
     //_UITabButton
     [self cyl_stopAnimationOfAllLottieView];
     [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected];
@@ -594,15 +597,8 @@
     }
     
     return contentView;
-    
 }
 
-
-/*!
- * [self.tabBar.cyl_portalView cyl_valueForKey:@"sourceView"]
- * ===
- self.tabBar.cyl_platterLiquidLensViewContentView
- */
 - (UIView *)cyl_platterLiquidLensViewContentView {
     UIView *contentView = [self.cyl_portalView cyl_valueForKey:@"sourceView"];
     if (contentView) {
@@ -624,22 +620,12 @@
     return contentView;
 }
 
-
-
-
-
 - (UIView *)cyl_platterLiquidLensClearGlassView {
-    UIView *contentView;// = [self.cyl_platterLiquidLensView cyl_valueForKey:@"belowGlassWarpBackdrop"];
-    
-    if (contentView) {
-        return contentView;
-    }
+    UIView *contentView;
     for (UIView *sub in self.cyl_platterLiquidLensViewSubViews) {
         if ([sub cyl_isPlatterLiquidLensClearGlassView]) {
             contentView = sub;
             break;
-            
-            
         }
     }
     
@@ -657,7 +643,6 @@
     if (!contentView) {
         return nil;
     }
-    
     
     return contentView.subviews;
     

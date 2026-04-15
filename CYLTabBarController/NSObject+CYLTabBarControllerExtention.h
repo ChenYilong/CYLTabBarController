@@ -28,6 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_setValue:(id)value forKey:(NSString *)key;
 - (NSString *)cyl_ivarList;
 
+- (BOOL)cyl_isContinuousGestureRecognizer;
+- (BOOL)cyl_isLongGestureRecognizer;
+
 @end
 
 NS_ASSUME_NONNULL_END

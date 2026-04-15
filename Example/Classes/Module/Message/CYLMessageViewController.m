@@ -76,8 +76,9 @@
     //
     //    [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimationTypeScale];
     //    [self pushToNewViewController];
-    CYLTabBarController *tabBarController = [[CYLMainRootViewController new] createNewTabBarWithContext:NSStringFromClass([self class])];
-    [self.navigationController pushViewController:tabBarController animated:YES];
+    //TODO:  iOS26 上多tabbar，暂未实现。暂时取消展示。
+//    CYLTabBarController *tabBarController = [[CYLMainRootViewController new] createNewTabBarWithContext:NSStringFromClass([self class])];
+//    [self.navigationController pushViewController:tabBarController animated:YES];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

@@ -14,13 +14,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         CYLPlusButtonSubclass.register()
 
-        let mainTabBarVc = MainTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
-
+//        let mainTabBarVc = MainTabBarController()
+        let mainTabBarVc = MainRootNavigationViewController()
         window = UIWindow()
         window?.frame = UIScreen.main.bounds
         window?.rootViewController = mainTabBarVc
-        mainTabBarVc.hideTabBadgeBackgroundSeparator()
-        mainTabBarVc.hideTabBarShadowImageView();
+
 
         window?.makeKeyAndVisible()
 
@@ -29,33 +28,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
         return true
     }
 
-    func viewControllers() -> [UINavigationController] {
-        let home = UINavigationController(rootViewController: HomeViewController())
-        let connection = UINavigationController(rootViewController: ConnectionViewController())
-        let message = UINavigationController(rootViewController: MessageViewController())
-        let personal = UINavigationController(rootViewController: PersonalViewController())
-        let viewControllers = [home, connection, message, personal]
-
-        return viewControllers
-    }
-
-    func tabBarItemsAttributesForController() -> [[String: String]] {
-        let tabBarItemOne = [CYLTabBarItemTitle: "首页",
-                             CYLTabBarItemImage: "home_normal",
-                             CYLTabBarItemSelectedImage: "home_highlight"]
-
-        let tabBarItemTwo = [CYLTabBarItemTitle: "鱼塘",
-                             CYLTabBarItemImage: "fishpond_normal",
-                             CYLTabBarItemSelectedImage: "fishpond_highlight"]
-
-        let tabBarItemThree = [CYLTabBarItemTitle: "消息",
-                               CYLTabBarItemImage: "message_normal",
-                               CYLTabBarItemSelectedImage: "message_highlight"]
-
-        let tabBarItemFour = [CYLTabBarItemTitle: "我的",
-                              CYLTabBarItemImage: "account_normal",
-                              CYLTabBarItemSelectedImage: "account_highlight"]
-        let tabBarItemsAttributes = [tabBarItemOne, tabBarItemTwo, tabBarItemThree, tabBarItemFour]
-        return tabBarItemsAttributes
-    }
 }

@@ -49,7 +49,6 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         [self customizeTabBarAppearanceWithTitlePositionAdjustment:titlePositionAdjustment];
         self.delegate = self;
         self.navigationController.navigationBar.hidden = YES;
-
     }
     return self;
 }
@@ -101,7 +100,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                  CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
                                                  //第一位 右大，下大
-//                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"]],
+                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"]],
 //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                  };
     CGFloat secondXOffset = (-25+2)/2;
@@ -110,7 +109,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                   CYLTabBarItemImage :@"fishpond_normal",
                                                   CYLTabBarItemSelectedImage : @"fishpond_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)],
-//                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"]],
+                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"]],
 //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                   };
     
@@ -119,7 +118,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                  CYLTabBarItemImage : @"message_normal",
                                                  CYLTabBarItemSelectedImage : @"message_highlight",
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-secondXOffset, -3.5)],
-//                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news" ofType:@"json"]],
+                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news" ofType:@"json"]],
 //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                  };
     NSDictionary *fourthTabBarItemsAttributes = @{
@@ -127,7 +126,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                   CYLTabBarItemImage : @"account_normal",
                                                   CYLTabBarItemSelectedImage : @"account_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-firstXOffset, -3.5)],
-//                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine" ofType:@"json"]],
+                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine" ofType:@"json"]],
 //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                   };
     NSArray *tabBarItemsAttributes = @[
@@ -383,21 +382,21 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                 // [tab0 cyl_showBadge];
                 [viewController0 cyl_setBadgeBackgroundColor:RANDOM_COLOR];
                 [viewController0 cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
-                                [viewController0 cyl_setBadgeRadius:11/2];
+                [viewController0 cyl_setBadgeRadius:11/2];
                 [viewController0 cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeBreathe];
-
+                
                 //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
-//                [viewController0 cyl_showBadge];
-
-//                                [tabBarController.viewControllers[1] cyl_setBadgeMargin:1.0];
-//                                [tabBarController.viewControllers[2] cyl_setBadgeMargin:1.0];
-//                                [tabBarController.viewControllers[3] cyl_setBadgeMargin:1.0];
-//                                [tabBarController.viewControllers[4] cyl_setBadgeMargin:1.0];
+                //                [viewController0 cyl_showBadge];
+                
+                //                                [tabBarController.viewControllers[1] cyl_setBadgeMargin:1.0];
+                //                                [tabBarController.viewControllers[2] cyl_setBadgeMargin:1.0];
+                //                                [tabBarController.viewControllers[3] cyl_setBadgeMargin:1.0];
+                //                                [tabBarController.viewControllers[4] cyl_setBadgeMargin:1.0];
                 [tabBarController.viewControllers[1] cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
                 [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:RANDOM_COLOR];
                 [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScale];
                 [tabBarController.viewControllers[2] cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
-
+                
                 [tabBarController.viewControllers[2] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake];
                 
                 NSString *testBadgeString = @"100";
@@ -409,8 +408,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                 //                [tabBarController.viewControllers[3] cyl_setBadgeCornerRadius:(labelHeight+ tabBarController.viewControllers[3].cyl_badgeMargin)/2];
                 [tabBarController.viewControllers[3] cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
                 [tabBarController.viewControllers[3] cyl_showBadgeValue:testBadgeString animationType:CYLBadgeAnimationTypeBounce];
-                
-                [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
+                if (tabBarController.viewControllers.count > 4) {
+                    [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
+                }
             } @catch (NSException *exception) {
                 NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
             }
@@ -457,7 +457,6 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;
-    //    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：control : %@ ,tabBarChildViewControllerIndex: %@, tabBarItemVisibleIndex : %@", @(__PRETTY_FUNCTION__), @(__LINE__), control, @(control.cyl_tabBarChildViewControllerIndex), @(control.cyl_tabBarItemVisibleIndex));
     if ([control cyl_isTabButton]) {
         //更改红标状态 
         if ([self.selectedViewController cyl_isShowBadge]) {

@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
                                    size:(CGSize)size;
 
 - (void)cyl_animationLottieImageWithLottieURL:(NSURL *)lottieURL
-                                               size:(CGSize)size
+                                         size:(CGSize)size
                               defaultSelected:(BOOL)defaultSelected;
 
 - (void)cyl_stopAnimationOfLottieView;
@@ -75,16 +75,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (UIControl *)cyl_platterNormalControl;
 
 - (void)cyl_coverTabImageViewOrTabButton:(BOOL)isTabButton
-                               newView:(UIView *)newView
-                                    offset:(UIOffset)offset
-                                      show:(BOOL)theShow
-                           delayIfNeededForSeconds:(CGFloat)delay
+                                 newView:(UIView *)newView
+                                  offset:(UIOffset)offset
+                                    show:(BOOL)theShow
+                 delayIfNeededForSeconds:(CGFloat)delay
                               completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
 - (void)cyl_coverVisiableTabImageViewOrTabButton:(BOOL)isTabButton
-                               newView:(UIView *)newView
-                                    offset:(UIOffset)offset
-                                      show:(BOOL)theShow
-                           delayIfNeededForSeconds:(CGFloat)delay
+                                         newView:(UIView *)newView
+                                          offset:(UIOffset)offset
+                                            show:(BOOL)theShow
+                         delayIfNeededForSeconds:(CGFloat)delay
                                       completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
 - (void)cyl_hideControl;
 - (void)cyl_performSelector:(SEL)aSelector;

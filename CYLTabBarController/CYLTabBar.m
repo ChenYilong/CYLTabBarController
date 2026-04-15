@@ -220,7 +220,6 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     }];
 }
 
-
 /*!
  *     //玻璃效果不能使用 frame 进行修改， 否则 会引发 lifted 状态变更后的点击后左右闪动。
  */
@@ -310,8 +309,6 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 
 // KVO监听执行
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-
-    
     if(context == CYLTabBarContext) {
         [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemWidthDidChangeNotification object:self];
         if (@available(iOS 11.0, *)) {
@@ -320,9 +317,6 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
             }
         }
     }
-    
-    
-    
 }
 
 - (void)dealloc {
@@ -455,7 +449,6 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     return plusButtonIndex;
 }
 
-
 - (void)setupTabImageViewDefaultOffset:(UIView *)tabBarButton {
     if (self.tabImageViewDefaultOffset > 0) {
         return;
@@ -568,14 +561,11 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 
 // 识别ContinuousSelection手势，需要禁止长按等其他
 - (void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
-    
     if ([CYLConstants isUsedLiquidGlass] && [self isKindOfClass:[CYLTabBar class]] && !CYLPlusChildViewController) {
-        
-        NSString *gestureRecognizerClassString = NSStringFromClass([gestureRecognizer class]);
-        if ([gestureRecognizerClassString hasPrefix:(@"_UIContinuous")] && [gestureRecognizerClassString hasSuffix:@"tionGestureRecognizer"]) {
+        if ([gestureRecognizer cyl_isContinuousGestureRecognizer]) {
             gestureRecognizer.delegate = self;
         }
-        if ([gestureRecognizerClassString hasPrefix:(@"UILongPr")] && [gestureRecognizerClassString hasSuffix:@"essGestureRecognizer"]) {
+        if ([gestureRecognizer cyl_isLongGestureRecognizer]) {
             gestureRecognizer.delegate = self;
         }
     }
