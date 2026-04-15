@@ -88,6 +88,8 @@
         view.forwardsClientHitTestingToSourceView = false;
     }
     view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    // 使用公开 API，确保 PortalView 不参与命中测试，避免遮挡 TabBar 点击。
+    view.userInteractionEnabled = NO;
 
     view.sourceView = sourceView;
     view.sourceView.bounds = sourceView.bounds;
@@ -95,9 +97,6 @@
     view.matchesPosition = matchPosition;
     view.matchesTransform = matchPosition;
     view.matchesAlpha = false;
-    if (@available(iOS 14.0, *)) {
-        view.allowsHitTesting = false;
-    }
     
 //    UIView *superview = view.superview;
 //    if (superview) {
@@ -878,4 +877,3 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 
 @end
-

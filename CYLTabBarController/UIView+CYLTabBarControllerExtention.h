@@ -14,7 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic) __weak UIView * _Nullable sourceView;
 @property(nonatomic) _Bool forwardsClientHitTestingToSourceView;
-@property(nonatomic) _Bool allowsHitTesting; // @dynamic allowsHitTesting;
 @property(nonatomic) _Bool allowsBackdropGroups; // @dynamic allowsBackdropGroups;
 @property(nonatomic) _Bool matchesPosition; // @dynamic matchesPosition;
 @property(nonatomic) _Bool matchesTransform; // @dynamic matchesTransform;
