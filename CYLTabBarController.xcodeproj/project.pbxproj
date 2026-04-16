@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		56676081F69A826056C45ADD /* Pods_CYLTabBarController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EA6761185EC902A2428DDB4 /* Pods_CYLTabBarController.framework */; };
-		9A1559C81CB6D4D300CAB1AF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559C61CB6D4D300CAB1AF /* AppDelegate.m */; };
+		9A1559C81CB6D4D300CAB1AF /*  AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559C61CB6D4D300CAB1AF /*  AppDelegate.m */; };
 		9A1559DB1CB6D56500CAB1AF /* CYLHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559CC1CB6D56500CAB1AF /* CYLHomeViewController.m */; };
 		9A1559DC1CB6D56500CAB1AF /* CYLMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559CF1CB6D56500CAB1AF /* CYLMessageViewController.m */; };
 		9A1559DD1CB6D56500CAB1AF /* CYLMineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559D21CB6D56500CAB1AF /* CYLMineViewController.m */; };
@@ -36,6 +36,7 @@
 		9AD7F5BF22B7D695004BF0A0 /* img_tab_message_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AD7F5B822B7D695004BF0A0 /* img_tab_message_1.png */; };
 		9AD7F5C022B7D695004BF0A0 /* img_tab_me_0.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AD7F5B922B7D695004BF0A0 /* img_tab_me_0.png */; };
 		9AE0BD3122303BA800302A35 /* CYLMainRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE0BD3022303BA800302A35 /* CYLMainRootViewController.m */; };
+		9AE51DDC2F90C9D000BB0831 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE51DDB2F90C9D000BB0831 /* SceneDelegate.m */; };
 		9AE942E81BDC933E00354519 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942CD1BDC933E00354519 /* Main.storyboard */; };
 		9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942E31BDC933E00354519 /* Images.xcassets */; };
 		9AE942F11BDC933E00354519 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E51BDC933E00354519 /* main.m */; };
@@ -45,7 +46,7 @@
 		7EA6761185EC902A2428DDB4 /* Pods_CYLTabBarController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CYLTabBarController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		89D5086598A9EFD751C286DB /* Pods-CYLTabBarController.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTabBarController.debug.xcconfig"; path = "Target Support Files/Pods-CYLTabBarController/Pods-CYLTabBarController.debug.xcconfig"; sourceTree = "<group>"; };
 		8A12E1E008D40054CA1B0110 /* Pods-CYLTabBarController.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTabBarController.release.xcconfig"; path = "Target Support Files/Pods-CYLTabBarController/Pods-CYLTabBarController.release.xcconfig"; sourceTree = "<group>"; };
-		9A1559C61CB6D4D300CAB1AF /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		9A1559C61CB6D4D300CAB1AF /*  AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = " AppDelegate.m"; sourceTree = "<group>"; };
 		9A1559C71CB6D4D300CAB1AF /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9A1559CB1CB6D56500CAB1AF /* CYLHomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLHomeViewController.h; sourceTree = "<group>"; };
 		9A1559CC1CB6D56500CAB1AF /* CYLHomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLHomeViewController.m; sourceTree = "<group>"; };
@@ -84,6 +85,8 @@
 		9AD7F5B922B7D695004BF0A0 /* img_tab_me_0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = img_tab_me_0.png; sourceTree = "<group>"; };
 		9AE0BD2F22303BA800302A35 /* CYLMainRootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLMainRootViewController.h; sourceTree = "<group>"; };
 		9AE0BD3022303BA800302A35 /* CYLMainRootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLMainRootViewController.m; sourceTree = "<group>"; };
+		9AE51DDA2F90C9D000BB0831 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		9AE51DDB2F90C9D000BB0831 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
 		9AE942741BDC91B800354519 /* CYLTabBarController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CYLTabBarController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AE942921BDC91B900354519 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9AE942931BDC91B900354519 /* CYLTabBarControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarControllerTests.m; sourceTree = "<group>"; };
@@ -264,7 +267,9 @@
 			isa = PBXGroup;
 			children = (
 				9A1559C71CB6D4D300CAB1AF /* AppDelegate.h */,
-				9A1559C61CB6D4D300CAB1AF /* AppDelegate.m */,
+				9A1559C61CB6D4D300CAB1AF /*  AppDelegate.m */,
+				9AE51DDA2F90C9D000BB0831 /* SceneDelegate.h */,
+				9AE51DDB2F90C9D000BB0831 /* SceneDelegate.m */,
 				9A7C598F2181C39000EDB266 /* MainTabBarController.h */,
 				9A7C598E2181C39000EDB266 /* MainTabBarController.m */,
 				9AE0BD2F22303BA800302A35 /* CYLMainRootViewController.h */,
@@ -431,7 +436,8 @@
 				9A1559E41CB6EB1F00CAB1AF /* CYLPlusButtonSubclass.m in Sources */,
 				9A1559DF1CB6D56500CAB1AF /* CYLSameCityViewController.m in Sources */,
 				9A1559DB1CB6D56500CAB1AF /* CYLHomeViewController.m in Sources */,
-				9A1559C81CB6D4D300CAB1AF /* AppDelegate.m in Sources */,
+				9A1559C81CB6D4D300CAB1AF /*  AppDelegate.m in Sources */,
+				9AE51DDC2F90C9D000BB0831 /* SceneDelegate.m in Sources */,
 				9A7C59902181C39000EDB266 /* MainTabBarController.m in Sources */,
 				9A1559DD1CB6D56500CAB1AF /* CYLMineViewController.m in Sources */,
 				9AE942F11BDC933E00354519 /* main.m in Sources */,

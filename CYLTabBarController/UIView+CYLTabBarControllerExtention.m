@@ -508,10 +508,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         [self insertSubview:view belowSubview:self.cyl_tabBarController.tabBar.cyl_platterView];
 
     } else {
-        [self addSubview:view];
-        [self bringSubviewToFront:view];
-        view.layer.zPosition = MAXFLOAT;
+        [self cyl_bringSubviewToTop:view];
     }
+}
+
+- (void)cyl_bringSubviewToTop:(UIView *)view {
+    [self addSubview:view];
+    [self bringSubviewToFront:view];
+    view.layer.zPosition = MAXFLOAT;
 }
 
 - (void)cyl_setHidden:(BOOL)hidden {

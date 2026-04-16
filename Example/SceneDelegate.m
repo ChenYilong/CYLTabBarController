@@ -1,38 +1,37 @@
 //
-//  AppDelegate.m
+//  SceneDelegate.m
 //  CYLTabBarController
 //
-//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
+//  Created by chenyilong on 2026/4/16.
+//  Copyright © 2026 微博@iOS程序犭袁. All rights reserved.
 //
 
-#import "AppDelegate.h"
-#import "CYLPlusButtonSubclass.h"
+#import "SceneDelegate.h"
 #import "CYLMainRootViewController.h"
 
-@interface AppDelegate ()
-@property (nonatomic, strong) NSMutableData *data;
-@end
+NS_ASSUME_NONNULL_BEGIN
 
-@implementation AppDelegate
+@implementation SceneDelegate
 
+- (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session
+      options:(UISceneConnectionOptions *)connectionOptions {
+    if (![scene isKindOfClass:[UIWindowScene class]]) { return; }
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [UIApplication sharedApplication].statusBarHidden = NO;
-#pragma clang diagnostic pop
-    // 设置主窗口,并设置根控制器
-    self.window = [[UIWindow alloc] init];
-    self.window.frame = [UIScreen mainScreen].bounds;
-    [self.window makeKeyAndVisible];
+    UIWindowScene *windowScene = (UIWindowScene *)scene;
+    self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
+    self.window.frame = windowScene.coordinateSpace.bounds;
+    self.window.backgroundColor = [UIColor whiteColor];
+
     CYLMainRootViewController *rootViewController = [[CYLMainRootViewController alloc] init];
-    [self.window setRootViewController:rootViewController];
+    self.window.rootViewController = rootViewController;
+    [self.window makeKeyAndVisible];
+    CYLGetRootWindow().overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+
     [self setUpNavigationBarAppearance];
-//    CYLGetRootWindow().overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
-//    [UIWindow appearance].overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
-    return YES;
 }
+ 
+ 
+
 
 CYL_METHOD_SIGNATURES_PUSH
 - (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
@@ -75,3 +74,5 @@ CYL_METHOD_SIGNATURES_POP
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

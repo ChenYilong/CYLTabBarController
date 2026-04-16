@@ -373,7 +373,7 @@
     BOOL shouldShowNewView = show && !newView.superview;
     BOOL shouldRemoveNewView = newView.superview;
     if (shouldShowNewView) {
-        [tabBarButton cyl_bringSubviewToFront:newView];
+        [tabBarButton cyl_bringSubviewToTop:newView];
         CGSize newViewSize = newView.frame.size;
         if (@available(iOS 9.0, *)) {
             [NSLayoutConstraint activateConstraints:@[

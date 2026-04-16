@@ -147,15 +147,12 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.tabBarButtonArray = [self cyl_originalTabBarButtons];
-    if (!self.tabBarButtonArray || self.tabBarButtonArray.count == 0) {
-        return;
-    }
-    //    [self presetUnselectedItemTintColor];
-    @try {
+    
+    [self presetUnselectedItemTintColor];
+    if (self.tabBarButtonArray && self.tabBarButtonArray.count > 0) {
         [self setupTabImageViewDefaultOffset:self.tabBarButtonArray[0]];
-    } @catch (NSException *exception) {
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
     }
+    
     CGFloat tabBarWidth = self.cyl_boundsSize.width;
     CGFloat tabBarHeight = self.cyl_boundsSize.height;
     

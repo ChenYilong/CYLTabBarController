@@ -622,10 +622,13 @@
 
 - (UIView *)cyl_platterLiquidLensClearGlassView {
     UIView *contentView;
+
     for (UIView *sub in self.cyl_platterLiquidLensViewSubViews) {
         if ([sub cyl_isPlatterLiquidLensClearGlassView]) {
             contentView = sub;
             break;
+            
+            
         }
     }
     
@@ -643,6 +646,7 @@
     if (!contentView) {
         return nil;
     }
+    
     
     return contentView.subviews;
     

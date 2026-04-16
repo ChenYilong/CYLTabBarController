@@ -300,7 +300,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  
     __weak __typeof(self) weakSelf = self;
     //TODO:  如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
-    [selectedTabButton cyl_coverVisiableTabImageViewOrTabButton:YES newView:self.selectedCover offset:UIOffsetZero show:show delayIfNeededForSeconds:1 completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull newView) {
+    [selectedTabButton cyl_coverVisiableTabImageViewOrTabButton:YES newView:self.selectedCover offset:UIOffsetZero show:show delayIfNeededForSeconds:0.2 completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull newView) {
         __strong typeof(self) self = weakSelf;
         if (!self) {
             return;
@@ -384,7 +384,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                 [viewController0 cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
                 [viewController0 cyl_setBadgeRadius:11/2];
                 [viewController0 cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeBreathe];
-                
+                [self setSelectedCoverShow:YES];
                 //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
                 //                [viewController0 cyl_showBadge];
                 

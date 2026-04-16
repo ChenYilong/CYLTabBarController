@@ -44,6 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray *)cyl_allSubviews;
 - (UIImageView *)cyl_imageViewInTabBarButton;
 - (void)cyl_bringSubviewToFront:(UIView *)view;
+- (void)cyl_bringSubviewToTop:(UIView *)view;
 - (void)cyl_addPlatterViewThenBringSubviewToFront:(UIView *)view;
 - (UIImageView *)cyl_swappableImageViewViewInTabBarButton;
 - (UIImage *)cyl_takeSnapshot;
