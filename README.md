@@ -8,7 +8,7 @@
 <p align="center">
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec"><img src="https://img.shields.io/badge/Pod-GetLatestVersion-green.svg?style=flat"></a>
 <a href=""><img src="https://img.shields.io/badge/Swift-compatible-orange.svg"></a>
-<a href=""><img src="https://img.shields.io/badge/platform-iOS%208.0%2B-ff69b5152950834.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/platform-iOS%2012.0%2B-ff69b5152950834.svg"></a>
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
 
 </p>
@@ -52,9 +52,9 @@
  
 ## Preview of latest version 
 
- Preview of the latest version 1.99.6 on iOS 26+ 
+ Preview of the latest version 1.99.7 on iOS 26+ 
  
-CYLTabBarController 现已支持 iOS26 上实现以下效果， 请更新至版本1.99.6以上版本：
+CYLTabBarController 现已支持 iOS26 上实现以下效果， 请更新至版本1.99.7以上版本：
 
 - ✅同时展示 Lottie动画与液态玻璃效果；
 - ✅支持将加号➕按钮，展示在液态玻璃效果上，并居中展示。保留 CYLTabBarController 旧版本的所有加号按钮逻辑。仅增加玻璃遮罩效果；

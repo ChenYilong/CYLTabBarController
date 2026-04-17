@@ -652,8 +652,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         BOOL noNeedUIDesignCompatibility = [self noNeedUIDesignCompatibility];
         if (noNeedUIDesignCompatibility || !CYL_IS_IOS_26) {
             [self cyl_setValue:tabBar forKey:@"tabBar"];
-            tabBar.delegate = self;
-
         } else if (CYL_IS_IOS_26 && !noNeedUIDesignCompatibility) {
             CYLFlatDesignTabBar *pureCustomTabBar = (CYLFlatDesignTabBar *)_tabBar;
             if (!pureCustomTabBar || ![pureCustomTabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
@@ -843,6 +841,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                         lottieURL:(NSURL *)lottieURL
                   lottieSizeValue:(NSValue *)lottieSizeValue {
     viewController.tabBarItem.title = title;
+    [viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem.title = title;
     UIImage *normalImage = [UIImage cyl_imageNamed:normalImageInfo];
     viewController.tabBarItem.image = normalImage;
 
