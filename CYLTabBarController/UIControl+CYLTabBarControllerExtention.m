@@ -276,6 +276,32 @@
 }
 
 - (void)cyl_coverVisiableTabImageViewOrTabButton:(BOOL)isTabButton
+                                  contentNewView:(UIView *)contentNewView
+                           seclectContentNewView:(UIView *)seclectContentNewView
+                                          offset:(UIOffset)offset
+                                            show:(BOOL)theShow
+                         delayIfNeededForSeconds:(CGFloat)delay
+                                      completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
+    [self cyl_coverTabImageViewOrTabButton:isTabButton newView:contentNewView offset:offset show:theShow delayIfNeededForSeconds:delay completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull theNewView) {
+        if (isReplaced && tabBarButton.cyl_platterSelectedControl)  {
+            [tabBarButton cyl_coverSeclectContentTabImageViewOrTabButton:isTabButton newView:seclectContentNewView offset:offset show:theShow delayIfNeededForSeconds:delay completion:^(BOOL theTheIsReplaced, UIControl *theTheTabBarButton, UIView *theTheNewView) {
+                !completion?:completion(theTheIsReplaced, theTheTabBarButton, theTheNewView);
+            }];
+        } else
+            !completion?:completion(isReplaced, tabBarButton, theNewView);
+    }];
+}
+
+- (void)cyl_coverVisiableTabImageViewOrTabButton:(BOOL)isTabButton
+                                         newView:(UIView *)newView
+                                          offset:(UIOffset)offset
+                                            show:(BOOL)theShow
+                         delayIfNeededForSeconds:(CGFloat)delay
+                                      completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
+    [self cyl_coverSeclectContentTabImageViewOrTabButton:isTabButton newView:newView offset:offset show:theShow delayIfNeededForSeconds:delay completion:completion];
+}
+
+- (void)cyl_coverSeclectContentTabImageViewOrTabButton:(BOOL)isTabButton
                                newView:(UIView *)newView
                                     offset:(UIOffset)offset
                                       show:(BOOL)theShow

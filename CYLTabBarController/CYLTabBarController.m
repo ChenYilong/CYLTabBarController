@@ -237,7 +237,12 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
             [plusControlOrigin.cyl_tabImageView cyl_setHidden:YES];
             
             if ([self hasPlusChildViewController]) {
-                [plusControlOrigin cyl_coverVisiableTabImageViewOrTabButton:YES newView:selectedCover offset:UIOffsetZero show:YES delayIfNeededForSeconds:1 completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull newView) {
+                [plusControlOrigin cyl_coverSeclectContentTabImageViewOrTabButton:YES
+                                                                    newView:selectedCover
+                                                                     offset:UIOffsetZero
+                                                                       show:YES
+                                                    delayIfNeededForSeconds:1
+                                                                 completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull newView) {
                     
                 }];
             } else {

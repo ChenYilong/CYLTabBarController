@@ -80,8 +80,24 @@ NS_ASSUME_NONNULL_BEGIN
                                     show:(BOOL)theShow
                  delayIfNeededForSeconds:(CGFloat)delay
                               completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
+
+- (void)cyl_coverSeclectContentTabImageViewOrTabButton:(BOOL)isTabButton
+                               newView:(UIView *)newView
+                                    offset:(UIOffset)offset
+                                      show:(BOOL)theShow
+                           delayIfNeededForSeconds:(CGFloat)delay
+                                            completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
+
 - (void)cyl_coverVisiableTabImageViewOrTabButton:(BOOL)isTabButton
                                          newView:(UIView *)newView
+                                          offset:(UIOffset)offset
+                                            show:(BOOL)theShow
+                         delayIfNeededForSeconds:(CGFloat)delay
+                                      completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
+
+- (void)cyl_coverVisiableTabImageViewOrTabButton:(BOOL)isTabButton
+                                  contentNewView:(UIView *)contentNewView
+                           seclectContentNewView:(UIView *)seclectContentNewView
                                           offset:(UIOffset)offset
                                             show:(BOOL)theShow
                          delayIfNeededForSeconds:(CGFloat)delay

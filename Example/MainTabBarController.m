@@ -275,9 +275,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 }
 
 - (UIButton *)selectedCover {
-    if (_selectedCover) {
-        return _selectedCover;
-    }
+//    if (_selectedCover) {
+//        return _selectedCover;
+//    }
     UIButton *selectedCover = [UIButton buttonWithType:UIButtonTypeCustom];
     
     UIImage *image = [UIImage imageNamed:@"home_select_cover"];
@@ -292,15 +292,21 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
     selectedCover.translatesAutoresizingMaskIntoConstraints = NO;
     // selectedCover.userInteractionEnabled = false;
-    _selectedCover = selectedCover;
-    return _selectedCover;
+//    _selectedCover = selectedCover;
+    return selectedCover;
 }
 
 - (void)setSelectedCoverShow:(BOOL)show {
-    UIControl *selectedTabButton = [self.viewControllers[0] cyl_visiableTabButton];
+    UIControl *selectedTabButton = [self.viewControllers[0] cyl_tabButton];
     __weak __typeof(self) weakSelf = self;
     //TODO:  如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
-    [selectedTabButton cyl_coverVisiableTabImageViewOrTabButton:YES newView:self.selectedCover offset:UIOffsetZero show:show delayIfNeededForSeconds:0 completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull newView) {
+    [selectedTabButton cyl_coverVisiableTabImageViewOrTabButton:YES
+                                                 contentNewView:self.selectedCover
+                                          seclectContentNewView:self.selectedCover
+                                                         offset:UIOffsetZero
+                                                           show:show
+                                        delayIfNeededForSeconds:0.1
+                                                     completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull newView) {
         __strong typeof(self) self = weakSelf;
         if (!self) {
             return;
