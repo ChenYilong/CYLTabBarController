@@ -55,6 +55,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (void)viewDidLoad {
     self.tabBarStyleType = CYLTabBarStyleTypeFlatDesign;
+    // 设置 TabBar 样式：液态玻璃效果（覆盖上一行）
     self.tabBarStyleType = CYLTabBarStyleTypeLiquidGlass;
     [[UIApplication sharedApplication] setApplicationSupportsShakeToEdit:YES];
     [self becomeFirstResponder];
@@ -100,7 +101,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                  CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
                                                  //第一位 右大，下大
-//                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"]],
+                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"]],
 //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                  };
     CGFloat secondXOffset = (-25+2)/2;
@@ -109,7 +110,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                   CYLTabBarItemImage :@"fishpond_normal",
                                                   CYLTabBarItemSelectedImage : @"fishpond_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)],
-//                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"]],
+                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"]],
 //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                   };
     
@@ -118,7 +119,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                  CYLTabBarItemImage : @"message_normal",
                                                  CYLTabBarItemSelectedImage : @"message_highlight",
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-secondXOffset, -3.5)],
-//                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news" ofType:@"json"]],
+                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news" ofType:@"json"]],
 //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                  };
     NSDictionary *fourthTabBarItemsAttributes = @{
@@ -126,7 +127,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                   CYLTabBarItemImage : @"account_normal",
                                                   CYLTabBarItemSelectedImage : @"account_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-firstXOffset, -3.5)],
-//                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine" ofType:@"json"]],
+                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine" ofType:@"json"]],
 //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                   };
     NSArray *tabBarItemsAttributes = @[
@@ -297,17 +298,18 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (void)setSelectedCoverShow:(BOOL)show {
     UIControl *selectedTabButton = [self.viewControllers[0] cyl_visiableTabButton];
- 
     __weak __typeof(self) weakSelf = self;
     //TODO:  如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
-    [selectedTabButton cyl_coverVisiableTabImageViewOrTabButton:YES newView:self.selectedCover offset:UIOffsetZero show:show delayIfNeededForSeconds:0.2 completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull newView) {
+    [selectedTabButton cyl_coverVisiableTabImageViewOrTabButton:YES newView:self.selectedCover offset:UIOffsetZero show:show delayIfNeededForSeconds:0 completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull newView) {
         __strong typeof(self) self = weakSelf;
         if (!self) {
             return;
         }
         if (isReplaced && show && newView) {
             [self.viewControllers[0] cyl_clearBadge];
-
+//            [tabBarButton insertSubview:tabBarButton.cyl_lottieAnimationView belowSubview:selectedTabButton];
+//            [tabBarButton bringSubviewToFront:newView];
+            [tabBarButton cyl_bringSubviewToTop:newView];
             if (![CYLConstants isUsedLiquidGlass]) {
                 // LiquidGlass 已经自带缩放动画， 无需缩放
                 [self addOnceScaleAnimationOnView:newView];
@@ -445,7 +447,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     BOOL should = YES;
 
     UIControl *selectedTabButton = [viewController.tabBarItem cyl_tabButton];
-    if (selectedTabButton.selected) {
+    if (selectedTabButton.selected && [[[self class] cyl_topmostViewController] respondsToSelector:@selector(refresh)]) {
         //双重点击， 触发刷新。
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(
                                                 [[[self class] cyl_topmostViewController] performSelector:@selector(refresh)];

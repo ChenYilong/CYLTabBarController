@@ -200,6 +200,7 @@ static UIInterfaceOrientationMask CYLMaskFromOrientation(UIInterfaceOrientation 
         value = [self valueForKey:key];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
+//        NSLog(@"🔴类名与方法名：%@（在第%@行）, KVC failed：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     return value;

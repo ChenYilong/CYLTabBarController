@@ -211,17 +211,18 @@
 - (UIImageView *)cyl_tabImageView {
     UIImageView *imageView = nil;
     do {
-        if (self.cyl_imageViewInTabBarButton) {
-            imageView = self.cyl_imageViewInTabBarButton;
-            break;
-        }
+        
         for (UIImageView *subview in self.cyl_allSubviews) {
             if ([subview cyl_isTabImageView]) {
                 imageView = (UIImageView *)subview;
                 break;
             }
         }
-     } while (false); 
+        if (self.cyl_imageViewInTabBarButton) {
+            imageView = self.cyl_imageViewInTabBarButton;
+            break;
+        }
+     } while (false);
      
     return imageView;
 }
@@ -248,7 +249,7 @@
 }
 
 /*!
- * 只有在TabBar选中状态下才能取到UITabBarSwappableImageView, 未选中状态就使用这个。
+ * 只有在TabBar选中状态下才能取到UITabBar+SwappableImageView, 未选中状态就使用这个。
  */
 - (UIImageView *)cyl_otherImageViewViewInTabBarButton {
     if (![self isKindOfClass:[UIView class]]) {
@@ -265,9 +266,9 @@
             return (UIImageView *)subview;
         }
         
-        // 过滤掉选中背景
+        // 过滤掉选中背景, UITabBar+SelectionIndicatorView
         if ([subview isKindOfClass:[UIImageView class]] &&
-            ![classString isEqualToString:@"UITabBarSelectionIndicatorView"]) {
+            ![classString containsString:@"SelectionIndicatorView"]) {
             imageView = (UIImageView *)subview;
         }
     }
@@ -281,28 +282,24 @@
     
     UIImageView *imageView = nil;
     
-    @try {
-        // ① 优先尝试 KVC 直接获取（iOS 13+ 常见）
-        imageView = [self cyl_valueForKey:@"imageView"];
-        if ([imageView isKindOfClass:[UIImageView class]]) {
-            return imageView;
-        }
-    } @catch (NSException *exception) {
-        NSLog(@"🔴 KVC _imageView failed: %@", exception.reason);
+    // ① 优先尝试 KVC 直接获取（iOS 13+ 常见）
+    imageView = [self cyl_valueForKey:@"imageView"];
+    if ([imageView isKindOfClass:[UIImageView class]]) {
+        return imageView;
     }
     
     // ② 遍历 subviews 查找
     for (UIView *subview in self.subviews) {
         NSString *classString = NSStringFromClass(subview.class);
         
-        // iOS10+ 官方使用 UITabBarSwappableImageView
-        if ([classString isEqualToString:@"UITabBarSwappableImageView"]) {
+        // iOS10+ 官方使用 UITabBar+SwappableImageView
+        if ([classString hasPrefix:@"UITabBar"] && [classString hasSuffix:@"SwappableImageView"]) {
             return (UIImageView *)subview;
         }
         
-        // 过滤掉选中背景
+        // 过滤掉选中背景, UITabBar+SelectionIndicatorView
         if ([subview isKindOfClass:[UIImageView class]] &&
-            ![classString isEqualToString:@"UITabBarSelectionIndicatorView"]) {
+            ![classString hasSuffix:@"SelectionIndicatorView"]&& ![classString hasPrefix:@"UITabBar"]  ) {
             imageView = (UIImageView *)subview;
         }
     }
@@ -336,13 +333,13 @@
     return nil;
 }
 
-//UIVisualEffectView
+//UI+Visual+EffectView
 - (BOOL)cyl_isTabEffectView {
     BOOL isClass = [self isMemberOfClass:[UIVisualEffectView class]];
     return isClass;
 }
 
-//_UIVisualEffectContentView
+//_UI+Visual+EffectContentView
 - (BOOL)cyl_isTabEffectContentView {
     BOOL isKindOfClass = [self isKindOfClass:[UIView class]];
     BOOL isClass = [self isMemberOfClass:[UIView class]];
@@ -484,7 +481,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
  *  @warning 仅对 UIBarButtonItem、UITabBarItem 有效
  *   UIBarItem 本身没有 view 属性，只有子类 UIBarButtonItem 和 UITabBarItem 才有
  *   iOS11改成了类似懒加载机制，要等到UIBarButtonItem被展示后才能获取到_view
- 
  */
 - (UIView *)cyl_contentView {
     if ([self respondsToSelector:@selector(view)]) {
@@ -503,16 +499,15 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_bringSubviewToFront:(UIView *)view {
-
     if (self.cyl_tabBarController.tabBar.cyl_platterView) {
         [self insertSubview:view belowSubview:self.cyl_tabBarController.tabBar.cyl_platterView];
-
     } else {
         [self cyl_bringSubviewToTop:view];
     }
 }
 
 - (void)cyl_bringSubviewToTop:(UIView *)view {
+    
     [self addSubview:view];
     [self bringSubviewToFront:view];
     view.layer.zPosition = MAXFLOAT;
@@ -521,12 +516,11 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (void)cyl_setHidden:(BOOL)hidden {
     if (hidden) {
         self.hidden = YES;
-        self.alpha = 0;
+        self.alpha = 0.0f;
     } else {
         self.hidden = NO;
-        self.alpha = 1;
+        self.alpha = 1.0f;
     }
-    
 }
 
 // helper to get pre transform frame

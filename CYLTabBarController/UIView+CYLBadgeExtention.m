@@ -577,7 +577,7 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
     NSString *classString = NSStringFromClass(self.class);
     if ([classString isEqualToString:@"UITabBarButton"] || [classString isEqualToString:@"_UITabButton"]) {
         // 特别的，对于 UITabBarItem，将 imageView 作为参考 view
-        UIView *imageView = [self cyl_imageViewInTabBarButton];
+        UIView *imageView = [self cyl_tabImageView];
         return imageView;
     }
     

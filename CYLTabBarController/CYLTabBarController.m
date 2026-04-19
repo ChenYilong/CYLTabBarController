@@ -84,10 +84,9 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 - (void)tabChangedToSelectedIndex:(NSUInteger)selectedIndex
                    viewController:(UIViewController *)viewController
                           control:(UIControl *)control {
-    //CYL_UIDesignClassicCYLTabBar
-//    if (![self.tabBar isKindOfClass:[CYLTabBar class]]) {
-//        return;
-//    }
+    if (![self.tabBar isKindOfClass:[CYLTabBar class]]) {
+        return;
+    }
     if (!viewController) {
         viewController = self.selectedViewController;
     }
@@ -100,25 +99,71 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         UITabBarController *tabBarController = nil;
         [self updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:targetVC];
     }
-    UIControl *selectedControl = control;
-
-    if (!selectedControl) {
-        //        selectedControl = [self.tabBar cyl_tabBarButtonWithTabIndex:selectedIndex];
+    if (control) {
+        [self didSelectControl:control];
     }
     
-    if (selectedControl) {
-        [self didSelectControl:selectedControl];
-    }
-    
-    UITabBarItem *item = viewController.tabBarItem;//.cyl_tabButton;
+    UITabBarItem *item = viewController.tabBarItem;
     BOOL isChildViewControllerPlusButton = [control cyl_isChildViewControllerPlusButton];
     BOOL isLottieEnabled = [self isLottieEnabled];
-    
-    if (isLottieEnabled && !isChildViewControllerPlusButton && [CYLConstants isUsedLiquidGlass]) {
-        if (self.selectedViewController.cyl_isPlaceholder == NO) {
+
+    if (isLottieEnabled && !isChildViewControllerPlusButton) {
+        //非液态玻璃 与 液态玻璃逻辑共用，Lottie 播放逻辑都在 tabChangedToSelectedIndex 中。
+        if (NO == self.selectedViewController.cyl_isPlaceholder) {
             [self addLottieImageWithControl:control lottieURL:item.cyl_lottieURL lottieSizeValue:item.cyl_lottieSizeValue animation:YES];
         }
     }
+}
+
+
+- (void)initLottieTabBar:(CYLTabBar *)tabBar {
+    //CYL_UIDesignClassicCYLTabBar
+    
+    
+    dispatch_async(dispatch_get_main_queue(),^{
+        if ([CYLConstants isUsedLiquidGlass]) {
+            [self.viewControllers enumerateObjectsUsingBlock:^(UIViewController * _Nonnull viewController, NSUInteger idx, BOOL * _Nonnull stop) {
+                UIControl *control = viewController.cyl_tabButton;
+                NSURL *url = viewController.tabBarItem.cyl_lottieURL;
+                NSValue *lottieSizeValue = viewController.tabBarItem.cyl_lottieSizeValue;
+                if (!control) {
+
+                    return;
+                }
+                if (!url) {
+                    return;
+                }
+                if (viewController.cyl_isPlaceholder) {
+                    return;
+                }
+                UIControl *tabButton = control;
+                BOOL defaultSelected = NO;
+                if (idx == self.selectedIndex) {
+                    defaultSelected = YES;
+                }
+                //TODO:  selected content, double add
+                [self addLottieImageWithControl:tabButton
+                                      lottieURL:url
+                                lottieSizeValue:lottieSizeValue
+                                      animation:defaultSelected
+                                defaultSelected:defaultSelected];
+                self.lottieViewAdded = YES;
+                
+            }];
+        } else {
+            NSArray *subTabBarButtonsWithoutPlusButton = tabBar.cyl_subTabBarButtonsWithoutPlusButton;
+            [subTabBarButtonsWithoutPlusButton enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
+                UIControl *tabButton = control;
+                BOOL defaultSelected = NO;
+                if (idx == self.selectedIndex) {
+                    defaultSelected = YES;
+                }
+                //TODO:  selected content, double add
+                [self addLottieImageWithControl:tabButton animation:defaultSelected defaultSelected:defaultSelected];
+                self.lottieViewAdded = YES;
+            }];
+        }
+    });
 }
 
 - (void)setViewDidLayoutSubViewsBlockInvokeOnce:(BOOL)invokeOnce block:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock  {
@@ -135,7 +180,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 //    [self.tabBar cyl_resetPlatterSelectedContentSourceViewNewBounds];
 
     [self.tabBar layoutSubviews];//Fix issue #93 #392
-    CYLTabBar *tabBar =  (CYLTabBar *)self.tabBar;
+    CYLTabBar *tabBar = (CYLTabBar *)self.tabBar;
     if ([self.tabBar isKindOfClass:[CYLTabBar class]] ) {
         // add callback for visiable control, included all plusButton.
         
@@ -161,7 +206,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
             if (self.isLottieViewAdded) {
                 break;
             }
-            //FIXME:
+            //FIXME: ??
             NSArray *subTabBarButtonsWithoutPlusButton = tabBar.cyl_subTabBarButtonsWithoutPlusButton;
             BOOL isLottieEnabled = [self isLottieEnabled];
 
@@ -177,55 +222,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                     break;
                 }
             }
-            dispatch_async(dispatch_get_main_queue(),^{
-                if ([CYLConstants isUsedLiquidGlass]) {
-                    [self.viewControllers enumerateObjectsUsingBlock:^(UIViewController * _Nonnull viewController, NSUInteger idx, BOOL * _Nonnull stop) {
-                        UIControl * control = viewController.cyl_tabButton;
-                        NSURL *url = viewController.tabBarItem.cyl_lottieURL;
-                        NSValue *lottieSizeValue = viewController.tabBarItem.cyl_lottieSizeValue;
-
-                        if (!control) {
-                            return;
-                        }
-                        
-                        if (!url) {
-                            return;
-                        }
-                        if (viewController.cyl_isPlaceholder) {
-                            return;
-                        }
-                        UIControl *tabButton = control;
-                        BOOL defaultSelected = NO;
-                        if (idx == self.selectedIndex) {
-                            defaultSelected = YES;
-                        }
-                        //TODO:  selected content, double add
-                        [self addLottieImageWithControl:tabButton
-                                              lottieURL:url
-                                        lottieSizeValue:lottieSizeValue
-                                              animation:defaultSelected
-                                        defaultSelected:defaultSelected];
-                        self.lottieViewAdded = YES;
-
-                    }];
-                } else {
-                    [subTabBarButtonsWithoutPlusButton enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
-                        UIControl *tabButton = control;
-                        BOOL defaultSelected = NO;
-                        if (idx == self.selectedIndex) {
-                            defaultSelected = YES;
-                        }
-                        //TODO:  selected content, double add
-                        [self addLottieImageWithControl:tabButton animation:defaultSelected defaultSelected:defaultSelected];
-                        self.lottieViewAdded = YES;
-
-                    }];
-                }
-                
-
-                
-                });
-            
+            [self initLottieTabBar:tabBar];
             break;
         } while (NO);
     }
@@ -717,6 +714,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         for (UIViewController *viewController in _viewControllers) {
             CYLTabBarController *tabBarController = nil;
             [[viewController cyl_getViewControllerInsteadOfNavigationController] cyl_setTabBarController:tabBarController];
+            [viewController cyl_setTabBarController:tabBarController];
         }
         _viewControllers = nil;
         return;
@@ -792,7 +790,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                 [[viewController cyl_getViewControllerInsteadOfNavigationController] cyl_setTabButton:tabItem];
             }
         }
-        
+        [viewController cyl_setTabBarController:self];
         [[viewController cyl_getViewControllerInsteadOfNavigationController] cyl_setTabBarController:self];
         idx++;
     }
@@ -859,10 +857,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (lottieURL) {
         [self.lottieURLs addObject:lottieURL];
         [viewController.tabBarItem cyl_setLottieURL:lottieURL];
+        [[viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem cyl_setLottieURL:lottieURL];
 
         NSValue *tureLottieSizeValue = [CYLConstants cyl_getTureLottieSizeValue:lottieSizeValue fromNormalImage:normalImage];
         [self.lottieSizes addObject:tureLottieSizeValue];
         [viewController.tabBarItem cyl_setLottieSizeValue:tureLottieSizeValue];
+        [[viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem cyl_setLottieSizeValue:tureLottieSizeValue];
     }
     [self addChildViewController:viewController];
 }
@@ -1058,12 +1058,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             }];
             contentControl.selected = YES;
             selectedContentControl.selected = YES;
-            BOOL isChildViewControllerPlusButton = [control cyl_isChildViewControllerPlusButton];
-            BOOL isLottieEnabled = [self isLottieEnabled];
-            if ( isLottieEnabled && !isChildViewControllerPlusButton && ![CYLConstants isUsedLiquidGlass]) {
-                //TODO:  selected content, double add
-                [self addLottieImageWithControl:contentControl animation:YES];
-            }
+            //非液态玻璃 与 液态玻璃逻辑共用，Lottie播放逻辑都在 tabChangedToSelectedIndex 中。
         }
     }
     if ([self.delegate respondsToSelector:actin] && shouldSelectViewController) {
@@ -1138,6 +1133,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             if (!lottieURL) {
                 //TODO:lottieURLs 与 Control对应的index不一致， 因为 lottieURLs 可能会少一个 plusButton 对应的。如何能够不通过index就获取到 lottieURLs ?
                 lottieURL = self.lottieURLs[index];
+                NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：lottieURL%@theLottieURL%@", @(__PRETTY_FUNCTION__), @(__LINE__), lottieURL, theLottieURL);
+
             }
             
             if (!lottieSizeValue) {

@@ -218,7 +218,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 }
 
 /*!
- *     //玻璃效果不能使用 frame 进行修改， 否则 会引发 lifted 状态变更后的点击后左右闪动。
+ * iOS26+ 玻璃效果不能使用 frame 进行修改， 否则 会引发 手势的 lifted 状态变更后，点击后左右闪动bug。
  */
 - (void)changeXForChildView:(UIControl *)childView
                  childViewX:(CGFloat)childViewX
@@ -238,27 +238,15 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
                                            );
     }
     UIControl *selectedContentControl = [self cyl_selectedContentControlFromContentControl:childView];
-    
-    selectedContentControl.transform = CGAffineTransformIdentity;//(1, 1);
-    childView.transform = CGAffineTransformIdentity;//(1, 1);
-    
     [childView cyl_setTabBarItemVisibleIndex:index];
-    if (!selectedContentControl) { return;}
-    if (![CYLConstants isUsedLiquidGlass]) {
-        
-        selectedContentControl.frame = CGRectMake(childViewX,
-                                                  CGRectGetMinY(childView.frame),
-                                                  tabBarItemWidth,
-                                                  CGRectGetHeight(childView.frame)
-                                                  );
-        selectedContentControl.layer.frame = CGRectMake(childViewX,
-                                                        CGRectGetMinY(childView.frame),
-                                                        tabBarItemWidth,
-                                                        CGRectGetHeight(childView.frame)
-                                                        );
-    }
+    if (!selectedContentControl) { return; }
+    //只有玻璃效果有 selectedContentControl，所以可以代替玻璃效果判断。
+ 
+    //非常重要的 transform 设置， 请勿删除， iOS26+ 玻璃效果+Lottie动画需要禁用形变，否则会引发手势的 lifted 状态变更后的闪动bug。因静态图片场景下不会引起异常， 故未判断是否为Lottie场景
+//    childView.transform = CGAffineTransformIdentity;//(1, 1);
+    selectedContentControl.transform = CGAffineTransformIdentity;//(1, 1);
     
-    [selectedContentControl cyl_setTabBarItemVisibleIndex:index];
+    
 }
 
 #pragma mark - plusFrame and tabBarItemFrameWithIndex
@@ -509,7 +497,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
             return selectedTabBarButton;
         }
     }
-    //TODO:  return CYLFlatDesignTabBar
+    //CYLFlatDesignTabBar 已经封装在该类内部，不需要在这里处理
     
     //3. 最后处理 TabBarItems 凸出的部分、添加到 TabBar 上的自定义视图、点击到 TabBar 上的空白区域
     UIView *result = [super hitTest:point withEvent:event];

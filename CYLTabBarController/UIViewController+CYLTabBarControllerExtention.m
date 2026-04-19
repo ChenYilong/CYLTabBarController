@@ -30,12 +30,16 @@
 
 - (BOOL)cyl_isPlaceholder {
     NSNumber *isPlaceholderObject = objc_getAssociatedObject(self, @selector(cyl_isPlaceholder));
-    return [isPlaceholderObject boolValue];
+    NSNumber *isPlaceholderObjectFromViewControllerInsteadOfNavigationController = objc_getAssociatedObject([self cyl_getViewControllerInsteadOfNavigationController], @selector(cyl_isPlaceholder));
+
+    return [isPlaceholderObject boolValue] || [isPlaceholderObjectFromViewControllerInsteadOfNavigationController boolValue];
 }
 
 - (void)cyl_setIsPlaceholder:(BOOL)isPlaceholder {
     NSNumber *isPlaceholderObject = @(isPlaceholder);
     objc_setAssociatedObject(self, @selector(cyl_isPlaceholder), isPlaceholderObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject([self cyl_getViewControllerInsteadOfNavigationController], @selector(cyl_isPlaceholder), isPlaceholderObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+
 }
 
 - (UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index {
@@ -192,16 +196,16 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 }
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (BOOL)cyl_isEmbedInTabBarController {
-    if (self.cyl_tabBarController == nil) {
+    UIViewController *viewControllerInsteadIOfNavigationController = [self cyl_getViewControllerInsteadOfNavigationController];
+    if (nil == self.cyl_tabBarController && nil == viewControllerInsteadIOfNavigationController.cyl_tabBarController) {
         return NO;
     }
     if (self.cyl_isPlusChildViewController) {
         return NO;
     }
     BOOL isEmbedInTabBarController = NO;
-    UIViewController *viewControllerInsteadIOfNavigationController = [self cyl_getViewControllerInsteadOfNavigationController];
     for (NSInteger i = 0; i < self.cyl_tabBarController.viewControllers.count; i++) {
-        UIViewController * vc = self.cyl_tabBarController.viewControllers[i];
+        UIViewController *vc = self.cyl_tabBarController.viewControllers[i];
         if ([vc cyl_getViewControllerInsteadOfNavigationController] == viewControllerInsteadIOfNavigationController) {
             isEmbedInTabBarController = YES;
             [self cyl_setTabIndex:i];
@@ -238,13 +242,46 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (!self.cyl_isEmbedInTabBarController) {
         return nil;
     }
-    UITabBarItem *tabBarItem;
-    UIControl *control;
-    @try {
-        tabBarItem = self.cyl_tabBarController.tabBar.items[self.cyl_tabIndex];
-        control = [tabBarItem cyl_tabButton];
+    UITabBarItem *tabBarItem = nil;
+    UIControl *control = nil;
+    UIViewController *viewController = nil;
+    
+    do {
+        @try {
+            tabBarItem = self.cyl_tabBarController.tabBar.items[self.cyl_tabIndex];
+            control = [tabBarItem cyl_tabButton];
+        } @catch (NSException *exception) {}
+        if (control) {
+            break;
+        }
         
-    } @catch (NSException *exception) {}
+        if (!control) {
+            @try {
+                viewController = self;
+                tabBarItem = viewController.tabBarItem;
+                control = [tabBarItem cyl_tabButton];
+            } @catch (NSException *exception) {}
+        }
+        
+        if (control) {
+            break;
+        }
+        
+        if (!control) {
+            @try {
+                viewController = [self cyl_getViewControllerInsteadOfNavigationController];
+                tabBarItem = viewController.tabBarItem;
+                control = [tabBarItem cyl_tabButton];
+            } @catch (NSException *exception) {}
+            
+        }
+        
+        if (control) {
+            break;
+        }
+        break;
+    } while (NO);
+    
     return control;
 }
 
