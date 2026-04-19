@@ -53,6 +53,7 @@
             [weakSelf.tableView.mj_header endRefreshing];
         });
     }];
+    self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
 }
 
 

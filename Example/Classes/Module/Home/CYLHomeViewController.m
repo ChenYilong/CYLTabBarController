@@ -51,7 +51,6 @@
             // Fallback on earlier versions
         }
         }
-
 }
 
 - (void)refresh {

@@ -16,17 +16,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session
       options:(UISceneConnectionOptions *)connectionOptions {
     if (![scene isKindOfClass:[UIWindowScene class]]) { return; }
-
+    
     UIWindowScene *windowScene = (UIWindowScene *)scene;
     self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
     self.window.frame = windowScene.coordinateSpace.bounds;
     self.window.backgroundColor = [UIColor whiteColor];
-
+    
     CYLMainRootViewController *rootViewController = [[CYLMainRootViewController alloc] init];
     self.window.rootViewController = rootViewController;
     [self.window makeKeyAndVisible];
-    CYLGetRootWindow().overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+    self.window.rootViewController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
 
+    [UIWindow appearance].overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
     [self setUpNavigationBarAppearance];
 }
  

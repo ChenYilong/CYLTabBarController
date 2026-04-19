@@ -498,6 +498,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     [self cyl_bringSubviewToFront:view];
 }
 
+- (BOOL)cyl_isViewAddedToPlatterView:(UIView *)view {
+    if (self.cyl_tabBarController.tabBar.cyl_platterContentView) {
+        return [view.superview isEqual:(self.cyl_tabBarController.tabBar.cyl_platterContentView)];
+    } else {
+        return [view.superview isEqual:self];
+    }
+}
+
 - (void)cyl_bringSubviewToFront:(UIView *)view {
     if (self.cyl_tabBarController.tabBar.cyl_platterView) {
         [self insertSubview:view belowSubview:self.cyl_tabBarController.tabBar.cyl_platterView];

@@ -45,7 +45,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (UIImageView *)cyl_imageViewInTabBarButton;
 - (void)cyl_bringSubviewToFront:(UIView *)view;
 - (void)cyl_bringSubviewToTop:(UIView *)view;
+
+/**
+ 使用 cyl_isViewAddedToPlatterView判断是否添加view成功
+ **/
 - (void)cyl_addPlatterViewThenBringSubviewToFront:(UIView *)view;
+- (BOOL)cyl_isViewAddedToPlatterView:(UIView *)view;
 - (UIImageView *)cyl_swappableImageViewViewInTabBarButton;
 - (UIImage *)cyl_takeSnapshot;
 - (void)cyl_setHidden:(BOOL)hidden;

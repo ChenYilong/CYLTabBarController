@@ -52,9 +52,9 @@
  
 ## Preview of latest version 
 
- Preview of the latest version 1.99.8 on iOS 26+ 
+ Preview of the latest version 1.99.9 on iOS 26+ 
  
-CYLTabBarController 现已支持 iOS26 上实现以下效果， 请更新至版本1.99.8以上版本：
+CYLTabBarController 现已支持 iOS26 上实现以下效果， 请更新至版本1.99.9以上版本：
 
 - ✅同时展示 Lottie动画与液态玻璃效果；
 - ✅支持将加号➕按钮，展示在液态玻璃效果上，并居中展示。保留 CYLTabBarController 旧版本的所有加号按钮逻辑。仅增加玻璃遮罩效果；

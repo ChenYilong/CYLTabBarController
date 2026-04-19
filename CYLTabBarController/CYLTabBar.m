@@ -154,7 +154,6 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     }
     
     CGFloat tabBarWidth = self.cyl_boundsSize.width;
-    CGFloat tabBarHeight = self.cyl_boundsSize.height;
     
     if (!self.addPlusButton) {
         return;
@@ -175,9 +174,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         return;
     }
     CYLTabBarItemWidth = (tabBarWidth - CYLPlusButtonWidth) / CYLTabbarItemsCount;
-    CGFloat multiplierOfTabBarHeight = [self multiplierOfTabBarHeight:tabBarHeight];
-    CGFloat constantOfPlusButtonCenterYOffset = [self constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
-    _plusButton.center = CGPointMake(tabBarWidth * 0.5, tabBarHeight * multiplierOfTabBarHeight + constantOfPlusButtonCenterYOffset);
+   //plusButtonIndex内部调整 PlusButton 的中心坐标，不能直接修改 center，否则会造成点击动画时的闪动bug，需要借助坐标系转换。
     NSUInteger plusButtonIndex = [self plusButtonIndex];
     [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIControl * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
         //调整UITabBarItem的位置
@@ -207,13 +204,12 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         UIControl *selectedContentControl = [self cyl_selectedContentControlFromContentControl:childView];
         
         [selectedContentControl cyl_setTabBarChildViewControllerIndex:buttonIndex];
-        
+        //仅修改childView的x和宽度,yh值不变
         [self changeXForChildView:childView
                        childViewX:childViewX
                   tabBarItemWidth:tabBarItemWidth
                             index:visiableTabIndex
         ];
-        //仅修改childView的x和宽度,yh值不变
     }];
 }
 
@@ -241,12 +237,8 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     [childView cyl_setTabBarItemVisibleIndex:index];
     if (!selectedContentControl) { return; }
     //只有玻璃效果有 selectedContentControl，所以可以代替玻璃效果判断。
- 
     //非常重要的 transform 设置， 请勿删除， iOS26+ 玻璃效果+Lottie动画需要禁用形变，否则会引发手势的 lifted 状态变更后的闪动bug。因静态图片场景下不会引起异常， 故未判断是否为Lottie场景
-//    childView.transform = CGAffineTransformIdentity;//(1, 1);
     selectedContentControl.transform = CGAffineTransformIdentity;//(1, 1);
-    
-    
 }
 
 #pragma mark - plusFrame and tabBarItemFrameWithIndex
@@ -385,9 +377,6 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     [self.plusButton cyl_setTabBarItemVisibleIndex:CYLPlusButtonIndex];
     
     UIView *platterView = self.cyl_contentView;
-    
-    
-//    CGFloat tabBarWidth = self.cyl_boundsSize.width;
     CGFloat tabBarHeight = self.cyl_boundsSize.height;
     
     // 系统默认参数
@@ -396,10 +385,6 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     
     CGFloat constantOfPlusButtonCenterYOffset =
     [self constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
-    
-    // 例如：
-    // customYOffset = -4;
-    // customXOffset = 2;
     
     // ===============================
     // 计算 platterView 中心
