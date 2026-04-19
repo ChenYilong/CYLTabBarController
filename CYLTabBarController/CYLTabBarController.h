@@ -102,6 +102,7 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
  */
 @property (nonatomic, readonly, assign) UIOffset titlePositionAdjustment;
 
+/** 可以不设置， 默认为 CYLTabBarController，如果设置了，请实现 CYLPlusButton 里 的 +[CYLPlusButton tabBarContext] 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController */
 @property (nonatomic, readonly, copy) NSString *context;
 
 - (instancetype)initWithViewControllers:(NSArray<UIViewController *> *)viewControllers

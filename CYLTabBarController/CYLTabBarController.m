@@ -387,7 +387,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     
     if ([[CYLExternPlusButton class] respondsToSelector:@selector(tabBarContext)]) {
         NSString *plusButtonContext = [[CYLExternPlusButton class] performSelector:@selector(tabBarContext)];
-        if (plusButtonContext && ![self.context isEqualToString:plusButtonContext]) {
+        if (plusButtonContext && ![_context isEqualToString:plusButtonContext]) {
             // contexts differ; remove PlusButton
             if ([[CYLExternPlusButton class] respondsToSelector:@selector(removePlusButton)]) {
                 [[CYLExternPlusButton class] performSelector:@selector(removePlusButton)];

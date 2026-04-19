@@ -78,6 +78,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (BOOL)shouldSelectPlusChildViewController;
 
+/** 可以不设置， 默认为 CYLTabBarController，如果设置了，请 与 CYLTabBarController 里 context 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController */
 + (NSString *)tabBarContext;
 
 #pragma mark - Deprecated API

@@ -8,7 +8,7 @@
 
 #import "CYLHomeViewController.h"
 //#import "CYLTabBarControllerConfig.h"
-//#import "CYLPlusButtonSubclass.h"
+#import "CYLPlusButtonSubclass.h"
 #import "MainTabBarController.h"
 #import "CYLMainRootViewController.h"
 #import <MJRefresh/MJRefresh.h>
@@ -67,6 +67,7 @@
 }
 
 - (void)createNewTabBardynamically {
+//    [CYLPlusButtonSubclass registerPlusButton];
     CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
     [rootController createNewTabBarWithContext:NSStringFromClass([self class])];
 }

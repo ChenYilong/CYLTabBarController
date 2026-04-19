@@ -299,9 +299,9 @@
     }
     return 4;
 }
-
-+ (NSString *)tabBarContext {
-    return NSStringFromClass([CYLMainRootViewController class]);
-}
+//
+//+ (NSString *)tabBarContext {
+//    return NSStringFromClass([CYLMainRootViewController class]);
+//}
 
 @end

@@ -158,4 +158,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 }
 
++ (NSString *)tabBarContext {
+    return NSStringFromClass([CYLTabBarController class]);
+}
+
 @end
