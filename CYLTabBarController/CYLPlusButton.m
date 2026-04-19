@@ -56,9 +56,18 @@ UIViewController *CYLPlusChildViewController = nil;
 }
 
 + (void)removePlusButton {
-    CYLExternPlusButton = nil;
-    [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:NO];
-    CYLPlusChildViewController = nil;
+    if (CYLExternPlusButton) {
+        [CYLExternPlusButton removeFromSuperview];
+        CYLExternPlusButton = nil;
+    }
+    
+    if (CYLPlusChildViewController) {
+        [CYLPlusChildViewController willMoveToParentViewController:nil];
+        [CYLPlusChildViewController.view removeFromSuperview];
+        [CYLPlusChildViewController removeFromParentViewController];
+        [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:NO];
+        CYLPlusChildViewController = nil;
+    }
 }
 
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH

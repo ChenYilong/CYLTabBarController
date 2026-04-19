@@ -7,8 +7,7 @@
 //
 
 #import "CYLPlusButtonSubclass.h"
-#import "CYLMineViewController.h"
-
+#import "CYLMainRootViewController.h"
 @interface CYLPlusButtonSubclass () {
     CGFloat _buttonImageHeight;
 }
@@ -301,8 +300,8 @@
     return 4;
 }
 
-//+ (NSString *)tabBarContext {
-//    return NSStringFromClass([self class]);
-//}
++ (NSString *)tabBarContext {
+    return NSStringFromClass([CYLMainRootViewController class]);
+}
 
 @end

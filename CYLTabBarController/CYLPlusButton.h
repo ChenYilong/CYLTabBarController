@@ -78,11 +78,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (BOOL)shouldSelectPlusChildViewController;
 
++ (NSString *)tabBarContext;
+
 #pragma mark - Deprecated API
 
 + (CGFloat)multiplerInCenterY CYL_DEPRECATED("Deprecated in 1.6.0. Use `+multiplierOfTabBarHeight:` instead.");
 
-+ (NSString *)tabBarContext;
 
 @end
 

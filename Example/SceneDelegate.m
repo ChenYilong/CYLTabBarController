@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
     CYLMainRootViewController *rootViewController = [[CYLMainRootViewController alloc] init];
     self.window.rootViewController = rootViewController;
     [self.window makeKeyAndVisible];
+    //要根据你的window与tabbar的关系，来设置， 如果你 设置了 self.window.rootViewController = rootViewController; 那么你应该用下面的方式来设置暗黑模式, 否则 window的overrideUserInterfaceStyle 不认, 只跟随系统
     self.window.rootViewController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
 
     [UIWindow appearance].overrideUserInterfaceStyle = UIUserInterfaceStyleDark;

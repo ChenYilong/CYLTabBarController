@@ -53,7 +53,10 @@
             [weakSelf.tableView.mj_header endRefreshing];
         });
     }];
-    self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+    if (@available(iOS 13.0, *)) {
+        //触发暗黑模式切换， 会引起 tabBar 的 重新布局 ，可以用来测试常见的 tabBar 布局bug
+        self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+    }
 }
 
 
@@ -104,3 +107,4 @@
 }
 
 @end
+

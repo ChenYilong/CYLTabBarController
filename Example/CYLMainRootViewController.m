@@ -25,7 +25,7 @@
 
 - (CYLTabBarController *)createNewTabBar {
     [CYLPlusButtonSubclass registerPlusButton];
-    return [self createNewTabBarWithContext:@""];
+    return [self createNewTabBarWithContext:NSStringFromClass([self class])];
 }
 
 - (CYLTabBarController *)createNewTabBarWithContext:(NSString *)context {

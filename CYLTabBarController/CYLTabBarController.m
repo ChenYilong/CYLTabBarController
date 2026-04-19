@@ -377,6 +377,17 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     @try {
         [self.tabBar setValue:_context forKey:@"context"];
     } @catch (NSException *exception) {
+        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+    }
+    
+    if ([[CYLExternPlusButton class] respondsToSelector:@selector(tabBarContext)]) {
+        NSString *plusButtonContext = [[CYLExternPlusButton class] performSelector:@selector(tabBarContext)];
+        if (plusButtonContext && ![self.context isEqualToString:plusButtonContext]) {
+            // contexts differ; remove PlusButton
+            if ([[CYLExternPlusButton class] respondsToSelector:@selector(removePlusButton)]) {
+                [[CYLExternPlusButton class] performSelector:@selector(removePlusButton)];
+            }
+        }
     }
 }
 
@@ -437,7 +448,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     
     UIViewController *viewController = nil;
     NSInteger index = NSNotFound;
-    if (CYLPlusChildViewController) {
+    if ([self hasPlusChildViewController]) {
         viewController = CYLPlusChildViewController;
         index = CYLPlusButtonIndex;
     } else {
@@ -501,38 +512,17 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         }
         return;
     }
-    //TODO: iOS26+ , 有plusButton ， 但不是 hasPlusChildViewController。
- 
-    // plusButton and plusVC 全部使用 旧的 plusVC 逻辑， 摒弃 plusButton but no plusVC 逻辑。统一逻辑
-    [self alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:viewControllers];
-    if ([self isLottieEnabled]) {
-        
+    // iOS26+ , 有 plusButton 
+    if ([[self class] havePlusButton] && [CYLConstants isUsedLiquidGlass]) {
+        [self alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:viewControllers];
         NSDictionary *plusInfo =
-        @{
-
-            CYLTabBarItemTitle: @"",
-            CYLTabBarItemImage :  [UIImage cyl_imageWithColor:[UIColor whiteColor] size:CGSizeMake(22, 22)],
-            CYLTabBarItemSelectedImage : [UIImage cyl_imageWithColor:[UIColor whiteColor] size:CGSizeMake(22, 22)]
-        };
-        _tabBarItemsAttributes = [self alignArray:_tabBarItemsAttributes object:plusInfo];
-    }
-    else {
-         //FIXME:  to delete 不能使用 imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal否则不显示
-        //                    image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+                @{
         
-
-        UIImage *normalImageInfo = _tabBarItemsAttributes[0][CYLTabBarItemImage];
-        UIImage *selectedImageInfo = _tabBarItemsAttributes[0][CYLTabBarItemSelectedImage];
-        normalImageInfo = [UIImage cyl_imageWithColor:[UIColor whiteColor] size:CGSizeMake(CYLTabBarHeight, CYLTabBarHeight)];
-        selectedImageInfo = [UIImage cyl_imageWithColor:[UIColor whiteColor] size:CGSizeMake(CYLTabBarHeight, CYLTabBarHeight)];
-
-        NSDictionary *plusInfo =
-        @{
-            CYLTabBarItemTitle: @"",
-        CYLTabBarItemImage : normalImageInfo,
-        CYLTabBarItemSelectedImage: selectedImageInfo
-        };
-        _tabBarItemsAttributes = [self alignArray:_tabBarItemsAttributes object:plusInfo];
+                    CYLTabBarItemTitle: @"",
+                    CYLTabBarItemImage :  [UIImage cyl_imageWithColor:[UIColor whiteColor] size:CGSizeMake(22, 22)],
+                    CYLTabBarItemSelectedImage : [UIImage cyl_imageWithColor:[UIColor whiteColor] size:CGSizeMake(22, 22)]
+                };
+                _tabBarItemsAttributes = [self alignArray:_tabBarItemsAttributes object:plusInfo];
     }
     [self doubleCheckTabControlAlignWithViewControllers:_viewControllers ?: viewControllers];
 }
@@ -668,7 +658,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 - (BOOL)hasPlusChildViewController {
     NSString *context = CYLPlusChildViewController.cyl_context;
-    BOOL isSameContext = [context isEqualToString:self.context] && (context && self.context); // || (!context && !self.context);
+    BOOL isSameContext = (context && self.context) && [context isEqualToString:self.context]; // || (!context && !self.context);
     BOOL hasPlusChildViewController = CYLPlusChildViewController && isSameContext;//&& !isAdded;
     return hasPlusChildViewController;
 }
@@ -983,6 +973,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
     if (viewController.cyl_isPlaceholder == YES) {
+        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @(viewController.cyl_isPlaceholder));
+
         return NO;
     }
     if (@available(iOS 18.0, *)) {
