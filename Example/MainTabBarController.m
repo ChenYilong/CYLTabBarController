@@ -54,6 +54,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 }
 
 - (void)viewDidLoad {
+    // * @attention 请在父类的 ViewDidLoad 调用之前设置CYLTabBarStyleType。也就是在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
     self.tabBarStyleType = CYLTabBarStyleTypeFlatDesign;
     // 设置 TabBar 样式：液态玻璃效果（覆盖上一行）
     self.tabBarStyleType = CYLTabBarStyleTypeLiquidGlass;

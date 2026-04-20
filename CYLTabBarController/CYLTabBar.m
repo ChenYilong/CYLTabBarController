@@ -139,6 +139,22 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
                 tabLabelTextColor = childView.cyl_tabLabel.textColor;
             }
         }];
+        
+        if (@available(iOS 26.0, *)) {
+            //fix #631
+            [self.cyl_tabBarSubviews enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                [obj.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                    if ([obj cyl_isTabLabel]) {
+                        @try {
+                            UILabel *label = (UILabel *)obj;
+                            tabLabelTextColor = label.textColor;
+                        } @catch (NSException *exception) {
+                            NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+                        }
+                    }
+                }];
+            }];
+        }
         self.unselectedItemTintColor = tabLabelTextColor;
     }
 #endif

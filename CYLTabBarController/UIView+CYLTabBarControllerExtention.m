@@ -180,8 +180,15 @@
 }
 
 - (BOOL)cyl_isTabLabel {
-    BOOL isKindOfLabel = [self cyl_isKindOfClass:[UILabel class]];
+    BOOL isKindOfLabel;
+    // iOS 26 以前，保持原逻辑
+    if (![CYLConstants isUsedLiquidGlass]) {
+        return [self cyl_isKindOfClass:[UILabel class]];
+    }
+    NSString *classString = NSStringFromClass([self class]);
+    isKindOfLabel = [classString hasSuffix:@"Label"] && [classString containsString:@"TabButton"] && [classString containsString:@"_UI"];
     return isKindOfLabel;
+    
 }
 
 - (BOOL)cyl_isTabBadgeView {

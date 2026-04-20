@@ -65,7 +65,7 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
 /*!
  * 设置为CYLTabBarStyleTypeFlatDesign，表示扁平化设计， 本属性相当于UI兼容模式的代码替代版本，仅仅在 iOS26+ 系统有效。   其内部会设置noNeedUIDesignCompatibility该属性用于决定是否使用扁平设计。
  * @return means noNeedUIDesignCompatibility == YES if return CYLTabBarStyleTypeLiquidGlass, means noNeedUIDesignCompatibility == NO if return CYLTabBarStyleTypeFlatDesign;
- * @attention better switch to property CYLTabBarStyleType
+ * @attention 请在父类的 ViewDidLoad 调用之前设置 CYLTabBarStyleType 。也就是在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
  */
 @property (nonatomic, assign) CYLTabBarStyleType tabBarStyleType;
 

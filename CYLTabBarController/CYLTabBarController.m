@@ -55,12 +55,6 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 #pragma mark - Life Cycle
 
 - (void)viewDidLoad {
-    if (@available(iOS 26.0, *)) {
-        self.tabBarMinimizeBehavior = UITabBarMinimizeBehaviorOnScrollDown;
-    } else {
-        // Fallback on earlier versions
-    }
-    
     [super viewDidLoad];
     if (CYL_IS_IPHONE_X) {
         self.tabBarHeight = 83;
