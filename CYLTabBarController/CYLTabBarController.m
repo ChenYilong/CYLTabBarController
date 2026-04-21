@@ -628,6 +628,22 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     [self setUpTabBar:nil];
 }
 
+- (void)setUpIPADForTabBar:(CYLTabBar *)tabBar {
+    if (@available(iOS 18.0, *)) {
+        if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+            self.mode = UITabBarControllerModeTabBar;
+            self.traitOverrides.horizontalSizeClass = UIUserInterfaceSizeClassCompact;
+            [self.view addSubview:tabBar];
+            for (UIView *subview in self.view.subviews) {
+                NSString *tabContainerClassName = [NSString stringWithFormat:@"%@%@%@", @"_UITab", @"Container", @"View"];
+                if ([NSStringFromClass(subview.class) isEqualToString:tabContainerClassName]) {
+                    [subview setHidden:YES];
+                }
+            }
+        }
+    }
+}
+
 - (void)setUpTabBar:(UITabBar *)_tabBar {
     @try {
         CYLTabBar *tabBar = (CYLTabBar *)_tabBar;
@@ -638,6 +654,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         BOOL noNeedUIDesignCompatibility = [self noNeedUIDesignCompatibility];
         if (noNeedUIDesignCompatibility || !CYL_IS_IOS_26) {
             [self cyl_setValue:tabBar forKey:@"tabBar"];
+            [self setUpIPADForTabBar:tabBar];
         } else if (CYL_IS_IOS_26 && !noNeedUIDesignCompatibility) {
             CYLFlatDesignTabBar *pureCustomTabBar = (CYLFlatDesignTabBar *)_tabBar;
             if (!pureCustomTabBar || ![pureCustomTabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
@@ -649,7 +666,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             [self.tabBar addSubview:pureCustomTabBar];
         }
         [tabBar cyl_setTabBarController:self];
-            
     } @catch (NSException *exception) {
         NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@", @(__PRETTY_FUNCTION__), @(__LINE__), @"setUpTabBar failed", exception.reason);
     }
