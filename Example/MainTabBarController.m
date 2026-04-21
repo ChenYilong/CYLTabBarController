@@ -61,7 +61,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [[UIApplication sharedApplication] setApplicationSupportsShakeToEdit:YES];
     [self becomeFirstResponder];
     [self customizeInterface];
-    [super viewDidLoad];
+//    [super viewDidLoad];
     /**
      // ipados 18 固定tabbar 在底部
      if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {

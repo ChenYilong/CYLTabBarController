@@ -376,7 +376,10 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     @try {
         [self.tabBar setValue:_context forKey:@"context"];
     } @catch (NSException *exception) {
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#if defined(DEBUG) || defined(BETA)
+        //fix [bug]: #556
+        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@，【DEBUG】请确保你的自定义 CYLTabBarController 的子类，在viewDidLoad中调用了`super.viewDidLoad()`，否则KVC会失败。", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif
     }
     
     if ([[CYLExternPlusButton class] respondsToSelector:@selector(tabBarContext)]) {
