@@ -628,17 +628,25 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     [self setUpTabBar:nil];
 }
 
+/** ipados 18 固定tabbar 在底部 */
 - (void)setUpIPADForTabBar:(CYLTabBar *)tabBar {
     if (@available(iOS 18.0, *)) {
         if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
             self.mode = UITabBarControllerModeTabBar;
             self.traitOverrides.horizontalSizeClass = UIUserInterfaceSizeClassCompact;
+            BOOL setupSuccess = NO;
             [self.view addSubview:tabBar];
             for (UIView *subview in self.view.subviews) {
                 NSString *tabContainerClassName = [NSString stringWithFormat:@"%@%@%@", @"_UITab", @"Container", @"View"];
                 if ([NSStringFromClass(subview.class) isEqualToString:tabContainerClassName]) {
                     [subview setHidden:YES];
+                    setupSuccess = YES;
                 }
+            }
+            if (!setupSuccess) {
+                //防止未来类名变动， 暂时不会调用。
+                [self.tabBar removeFromSuperview];
+                [self.view addSubview:self.tabBar];
             }
         }
     }
