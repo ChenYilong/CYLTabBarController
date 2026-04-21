@@ -16,6 +16,9 @@
 
 @implementation CYLBaseNavigationController
 
+/**
+ * TabBar内的ViewControllers会懒加载
+ */
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     // 当前导航栏, 只有第一个viewController push的时候设置隐藏
     if (self.viewControllers.count == 1) {
@@ -23,10 +26,11 @@
     } else {
         viewController.cyl_hidesBottomBarWhenPushed = NO;
     }
-    //FIXME:  闪动
-    [viewController.view layoutIfNeeded];
+    //在ios26.1，如果rootVC是TabbarController，并且通过UINavigationControllert跳转，UINavigationControllery页面的布局会多出来一个动画，这个问题请问怎么处理？
+    //FIXME: #632 如果你想避免闪动，可以通过提前加载 viewController 来解决。但是负作用是 viewController viewDidLoad 会提前加载， 所以不推荐该默认操作， 如果你可以接受 viewDidLoad 提前加载， 请pushViewController 后，自行调用该方法，解决闪动问题。
+    // [viewController.view layoutIfNeeded];
     [super pushViewController:viewController animated:animated];
-
+    
 }
 
 //fix https://github.com/ChenYilong/CYLTabBarController/issues/483
@@ -43,18 +47,6 @@
     } @catch (NSException *exception) {   
     }
     viewController.hidesBottomBarWhenPushed = isHidden;
-}
-
-- (BOOL)shouldAutorotate {
-    return [self cyl_getViewControllerInsteadOfNavigationController].shouldAutorotate;
-}
-
-- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
-    return [self cyl_getViewControllerInsteadOfNavigationController].preferredInterfaceOrientationForPresentation;
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return [self cyl_getViewControllerInsteadOfNavigationController].supportedInterfaceOrientations;
 }
 
 @end

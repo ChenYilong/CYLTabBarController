@@ -147,7 +147,12 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
                     if ([obj cyl_isTabLabel]) {
                         @try {
                             UILabel *label = (UILabel *)obj;
-                            tabLabelTextColor = label.textColor;
+                            UIColor *color = label.textColor;
+                            if (color && [color isKindOfClass:[UIColor class]]) {
+                                tabLabelTextColor = label.textColor;
+                                *stop = YES;
+                                return;
+                            }
                         } @catch (NSException *exception) {
                             NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
                         }
