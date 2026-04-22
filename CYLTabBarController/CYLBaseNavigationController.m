@@ -30,7 +30,6 @@
     //FIXME: #632 如果你想避免闪动，可以通过提前加载 viewController 来解决。但是负作用是 viewController viewDidLoad 会提前加载， 所以不推荐该默认操作， 如果你可以接受 viewDidLoad 提前加载， 请pushViewController 后，自行调用该方法，解决闪动问题。
     // [viewController.view layoutIfNeeded];
     [super pushViewController:viewController animated:animated];
-    
 }
 
 //fix https://github.com/ChenYilong/CYLTabBarController/issues/483

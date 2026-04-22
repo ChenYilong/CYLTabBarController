@@ -102,49 +102,6 @@
     return NO;
 }
 
-
-+ (NSString *)cyl_createUILabelTextFromPlusButtonWithStateAppearance:(UITabBarItemStateAppearance *)state {
-    return [self cyl_createUILabelTextFromSize:CYLExternPlusButton.bounds.size stateAppearance:state];
-}
-
-+ (NSString *)cyl_createUILabelTextFromSize:(CGSize)size stateAppearance:(UITabBarItemStateAppearance *)state {
-    
-    if (size.width <= 0 || size.height <= 0) {
-        return @"";
-    }
-    /*!
-     * //                    [[UITabBarItem appearance] setTitleTextAttributes:@{NSFontAttributeName: [UIFont fontWithName:@"AmericanTypewriter" size:20.0f]} forState:UIControlStateNormal];
-
-     */
-//    UIFont *font = state.titleTextAttributes[NSFontAttributeName];
-    NSString *baseString = @".";
-    
-    NSDictionary *attrs = state.titleTextAttributes;//@{NSFontAttributeName : font};
-    
-    NSMutableString *result = [NSMutableString string];
-    
-    CGSize currentSize = CGSizeZero;
-    
-    while (currentSize.height < size.height) {
-        
-        [result appendString:baseString];
-        
-        CGRect rect = [result boundingRectWithSize:CGSizeMake(size.width, CGFLOAT_MAX)
-                                           options:NSStringDrawingUsesLineFragmentOrigin |
-                                                   NSStringDrawingUsesFontLeading
-                                        attributes:attrs
-                                           context:nil];
-        
-        currentSize = rect.size;
-        
-        if (currentSize.height >= size.height) {
-            break;
-        }
-    }
-    
-    return result;
-}
-
 - (BOOL)cyl_isSelected {
     NSUInteger tabBarSelectedIndex = self.cyl_tabBarController.selectedIndex;
     NSUInteger tabBarChildViewControllerIndex = self.cyl_tabBarChildViewControllerIndex;
@@ -358,10 +315,6 @@
                                 completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
     UIControl *tabBarButton = self;//_UITabButton
      UIImageView *swappableImageView = tabBarButton.cyl_tabImageView;
-
-    if (swappableImageView) {
-        // swappableImageView.hidden = theShow;
-    }
     UIView *replacedView = swappableImageView;
     if (isTabButton) {
         replacedView = tabBarButton;
@@ -371,7 +324,7 @@
 
         return;
     }
-    if (newView.frame.size.width == 0 || newView.frame.size.height == 0 || newView.frame.size.width > tabBarButton.frame.size.width || newView.frame.size.height > tabBarButton.frame.size.height) {
+    if (newView.frame.size.width == 0 || newView.frame.size.height == 0) {
         UIImage *image = swappableImageView.image;
         newView.frame = ({
             CGRect frame = newView.frame;

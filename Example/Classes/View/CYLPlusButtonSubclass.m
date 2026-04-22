@@ -96,12 +96,12 @@
  */
 + (id)plusButton {
     CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
-    UIImage *normalButtonImage = [UIImage imageNamed:@"icon_tabbar_plus"];
-    UIImage *hlightButtonImage = [UIImage imageNamed:@"icon_tabbar_plus"];
-   
+    UIImage *normalButtonImage = [self contentImage];
+    UIImage *hlightButtonImage = [self selectedContentImage];
+    
     [button setImage:normalButtonImage forState:UIControlStateNormal];
-    [button setImage:[hlightButtonImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateHighlighted];
-    [button setImage:[hlightButtonImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
+    [button setImage:hlightButtonImage forState:UIControlStateHighlighted];
+    [button setImage:hlightButtonImage forState:UIControlStateSelected];
     [button setTintColor:[UIColor colorWithRed:0/255.0f green:255/255.0f blue:189/255.0f alpha:1]];
     button.contentMode = UIViewContentModeCenter;
     button.imageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -141,7 +141,7 @@
     
     // if you use `+plusChildViewController` , do not addTarget to plusButton.
     [button addTarget:button action:@selector(clickPublish) forControlEvents:UIControlEventTouchUpInside];
-    button.cyl_shouldNotSelect = YES;
+//    button.cyl_shouldNotSelect = YES;
     return button;
 }
 
@@ -266,18 +266,18 @@
 #pragma clang diagnostic pop
 #pragma mark - CYLPlusButtonSubclassing
 
-//+ (UIViewController *)plusChildViewController {
-//    UIViewController *plusChildViewController = [[UIViewController alloc] init];
-//    plusChildViewController.view.backgroundColor = [UIColor redColor];
-//    plusChildViewController.navigationItem.title = @"PlusChildViewController";
-//    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
-//                                                   initWithRootViewController:plusChildViewController];
-//    return plusChildNavigationController;
-//}
-//
-//+ (NSUInteger)indexOfPlusButtonInTabBar {
-//    return 2;
-//}
++ (UIViewController *)plusChildViewController {
+    UIViewController *plusChildViewController = [[UIViewController alloc] init];
+    plusChildViewController.view.backgroundColor = [UIColor redColor];
+    plusChildViewController.navigationItem.title = @"PlusChildViewController";
+    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
+                                                   initWithRootViewController:plusChildViewController];
+    return plusChildNavigationController;
+}
+
++ (NSUInteger)indexOfPlusButtonInTabBar {
+    return 2;
+}
 
 + (BOOL)shouldSelectPlusChildViewController {
     BOOL isSelected = CYLExternPlusButton.selected;
@@ -286,6 +286,8 @@
     } else {
         NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
     }
+//    CYLExternPlusButton.highlighted = isSelected;
+
     return YES;
 }
 
@@ -303,5 +305,15 @@
 //+ (NSString *)tabBarContext {
 //    return NSStringFromClass([CYLMainRootViewController class]);
 //}
+
++ (UIImage *)selectedContentImage {
+    UIImage *hlightButtonImage = [UIImage imageNamed:@"post_highlight"];
+    return hlightButtonImage ;
+}
+
++ (UIImage *)contentImage {
+    UIImage *normalButtonImage = [UIImage imageNamed:@"post_normal"];
+    return normalButtonImage;
+}
 
 @end

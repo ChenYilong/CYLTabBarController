@@ -66,8 +66,6 @@ NS_ASSUME_NONNULL_BEGIN
                                  offset:(UIOffset)offset
                                    show:(BOOL)theShow
                              completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
-//- (CGFloat)cyl_xOffset;
-+ (NSString *)cyl_createUILabelTextFromPlusButtonWithStateAppearance:(UITabBarItemStateAppearance *)state;
 
 - (BOOL)cyl_isPlatterSelectedControl;
 - (UIControl *)cyl_platterSelectedControl;

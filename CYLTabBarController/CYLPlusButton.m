@@ -18,6 +18,11 @@ UIViewController *CYLPlusChildViewController = nil;
 
 @property (nonatomic, strong) UIImage *snapshot;
 
+@property (nonatomic, weak) UIButton *contentView;
+@property (nonatomic, weak) UIButton *selectedContentView;
+@property (nonatomic, strong) UIImage *selectedContentImage;
+@property (nonatomic, strong) UIImage *contentImage;
+
 @end
 
 @implementation CYLPlusButton
@@ -45,6 +50,10 @@ UIViewController *CYLPlusChildViewController = nil;
             [CYLPlusChildViewController cyl_setContext:NSStringFromClass([CYLTabBarController class])];
         }
         [[self class] addSelectViewControllerTarget:plusButton];
+        //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
+        if ([CYLConstants isUsedLiquidGlass]) {
+            plusButton.cyl_shouldNotSelect = YES;
+        }
         if ([[self class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
             CYLPlusButtonIndex = [[self class] indexOfPlusButtonInTabBar];
         } else {
@@ -84,6 +93,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     NSInteger index = [tabBarController.viewControllers indexOfObject:CYLPlusChildViewController];
     if (NSNotFound != index && (index < tabBarController.viewControllers.count)) {
         [tabBarController setSelectedIndex:index];
+        if (!sender.cyl_shouldNotSelect) {
+            sender.selected = YES;
+        }
+
     }
 }
 
@@ -126,36 +139,58 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return _snapshot;
 }
 
-- (UIView *)selectedContentView {
-
+- (UIButton *)selectedContentView {
+    
     if (_selectedContentView) {
         return _selectedContentView;
     }
     UIButton *selectedContentView = [UIButton buttonWithType:UIButtonTypeCustom];
     
-    UIImage *image = [self selectedContentImage];
-    [selectedContentView setImage:image forState:UIControlStateNormal];
+    [selectedContentView setImage:([[self class] contentImage] ?: self.contentImage ?: UIImage.new) forState:UIControlStateNormal];
+    [selectedContentView setImage:([[self class] selectedContentImage] ?: self.selectedContentImage ?: UIImage.new)
+                         forState:UIControlStateHighlighted];
+    CGRect bounds = self.bounds;
     selectedContentView.frame = ({
         CGRect frame = selectedContentView.frame;
-        frame.size = CGSizeMake(image.size.width, image.size.height);
+        frame.size = CGSizeMake(bounds.size.width, bounds.size.height);
         frame;
     });
     selectedContentView.contentMode = UIViewContentModeCenter;
     selectedContentView.imageView.contentMode = UIViewContentModeScaleAspectFit;
-
+    
     selectedContentView.translatesAutoresizingMaskIntoConstraints = NO;
     selectedContentView.userInteractionEnabled = false;
+    [selectedContentView sizeToFit];
+    selectedContentView.highlighted = YES;
     _selectedContentView = selectedContentView;
-    return (UIView *)_selectedContentView;
+    return _selectedContentView;
 }
 
-- (UIImage *)selectedContentImage{
++ (UIImage *)contentImage {
+    return nil;
+}
+
++ (UIImage *)selectedContentImage {
+    return nil;
+}
+
+- (UIImage *)selectedContentImage {
     if (_selectedContentImage) {
         return _selectedContentImage;
     }
-    _selectedContentImage = self.imageView.image;
-    return _selectedContentImage;
+    UIImage *image = self.imageView.image;
+    _selectedContentImage = image;
+    return _selectedContentImage ;
+}
 
+- (UIImage *)contentImage {
+    if (_contentImage) {
+        return _contentImage;
+    }
+
+    UIImage *image = self.imageView.image;
+    _contentImage = image;
+    return _contentImage;
 }
 
 + (NSString *)tabBarContext {

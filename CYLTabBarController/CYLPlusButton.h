@@ -16,21 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @required
 + (id)plusButton;
-//@property (nonatomic, strong, readonly) UIImage *snapshot;
-
 
 @optional
-
-
-/*!
- * iOS26+
- */
-@property (nonatomic, weak) __kindof UIView *selectedContentView;
-
-/*!
- * Snapshot of plusButton, iOS26+
- */
-@property (nonatomic, strong) UIImage *selectedContentImage;
 
 /*!
  * 用来自定义加号按钮的位置，如果不实现默认居中。
@@ -81,6 +68,39 @@ NS_ASSUME_NONNULL_BEGIN
 /** 可以不设置， 默认为 CYLTabBarController，如果设置了，请 与 CYLTabBarController 里 context 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController */
 + (NSString *)tabBarContext;
 
+/*!
+ * iOS26+ selectedContentView 只有在选中状态下会显示。
+ 
+
+ */
++ (UIButton *)selectedContentView;
+
+/*!
+ * iOS26+
+ */
++ (UIImage *)contentImage;
+
+/*!
+ * iOS26+  如果plusButton只有图片没有label，更简单的方式是实现下面这个代理。
+ 
+ */
++ (UIImage *)selectedContentImage;
+
+/*!
+ * iOS26+
+ */
+@property (nonatomic, weak) __kindof UIButton *selectedContentView;
+
+/*!
+ * Snapshot of plusButton, iOS26+
+ */
+@property (nonatomic, strong) UIImage *selectedContentImage;
+
+/*!
+ * Snapshot of plusButton, iOS26+
+ */
+@property (nonatomic, strong) UIImage *contentImage;
+
 #pragma mark - Deprecated API
 
 + (CGFloat)multiplerInCenterY CYL_DEPRECATED("Deprecated in 1.6.0. Use `+multiplierOfTabBarHeight:` instead.");
@@ -98,9 +118,6 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 + (void)registerPlusButton;
 + (void)removePlusButton;
 - (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender;
-
-@property (nonatomic, weak) UIView *selectedContentView;
-@property (nonatomic, strong) UIImage *selectedContentImage;
 
 @end
 
