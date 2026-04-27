@@ -16,6 +16,13 @@
 #import <Lottie/Lottie.h>
 #else
 #endif
+
+#if __has_include(<Lottie/Lottie-Swift.h>)
+#import <Lottie/Lottie-Swift.h>
+#else
+
+#endif
+
 #import "CYLFlatDesignTabBar.h"
 
 NSString *const CYLTabBarItemTitle = @"CYLTabBarItemTitle";
@@ -43,13 +50,14 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 @property (nonatomic, strong) NSMutableArray *lottieSizes;
 @property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
 @property (nonatomic, strong) UIImage *tabItemPlaceholderImage;
+@property (nonatomic, copy) NSString *context;
 
 @end
 
 @implementation CYLTabBarController
 
 @synthesize viewControllers = _viewControllers;
-
+@synthesize context = _context;
 
 #pragma mark -
 #pragma mark - Life Cycle
@@ -63,8 +71,8 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     //    if (CYL_NoNeed_UIDesignRequiresCompatibility) {
     //        self.tabBar.translucent = NO;
     //    }
-    // 处理tabBar，使用自定义 tabBar 添加 发布按钮
-    [self setUpTabBar];
+    // 处理tabBar，使用自定义 tabBar 并添加 发布按钮。仅限 CYLTabBar，CYLTabBarStyleTypeFlatDesign 会在 setViewControllers 内部设置。
+    [self setUpDefaultStyleTabBar];
     // KVO注册监听
     if (!self.isObservingTabImageViewDefaultOffset) {
         @try {
@@ -78,7 +86,8 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 - (void)tabChangedToSelectedIndex:(NSUInteger)selectedIndex
                    viewController:(UIViewController *)viewController
                           control:(UIControl *)control {
-    if (![self.tabBar isKindOfClass:[CYLTabBar class]]) {
+    //扁平样式，与玻璃样式均可使用
+    if (![self.tabBar isKindOfClass:[UITabBar class]]) {
         return;
     }
     if (!viewController) {
@@ -360,13 +369,20 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         _imageInsets = imageInsets;
         _titlePositionAdjustment = titlePositionAdjustment;
         _tabBarItemsAttributes = tabBarItemsAttributes;
-        self.context = context; //must use setter
-        self.viewControllers = viewControllers;//must use setter
-        self.tabBarStyleType = styleType;//must use setter
+        self.tabBarStyleType = styleType;// 步骤1 must use setter 必须在 self.viewControllers之前设置， 因为 self.viewControllers直接涉及到样式判断逻辑。
+        self.viewControllers = viewControllers;// 步骤2 must use setter,必须在 self.tabBarStyleType之后设置， 因为 self.viewControllers 直接涉及到扁平TabBar样式KVC逻辑。
+        self.context = context; // 步骤3 must use setter 必须在 self.viewControllers之后设置， 因为 self.viewControllers 直接涉及样式判断逻辑。
     }
     return self;
 }
- 
+
+- (NSString *)context {
+    if (!_context) {
+        return NSStringFromClass([CYLTabBarController class]);
+    }
+    return _context;
+}
+
 - (void)setContext:(NSString *)context {
     if (context && context.length > 0) {
         _context = [context copy];
@@ -378,7 +394,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
         //fix [bug]: #556
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@，【DEBUG】请确保你的自定义 CYLTabBarController 的子类，在viewDidLoad中调用了`super.viewDidLoad()`，否则KVC会失败。", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@，【DEBUG】请确保你的自定义 CYLTabBarController 的子类，在viewDidLoad中调用了 `super.viewDidLoad()`，且在viewDidLoad方法中最后一行调用，否则 CYLTabBar KVC 设置会失败。", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     
@@ -626,9 +642,50 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 /**
  *  利用 KVC 把系统的 tabBar 类型改为自定义类型。
+ *  仅限 CYLTabBar，在ViewDidLoad中调用
+ *  不涉及 CYLTabBarStyleTypeFlatDesign样式（ 会在 setViewControllers 内部设置。）
  */
-- (void)setUpTabBar {
+- (void)setUpDefaultStyleTabBar {
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+        return;
+    }
     [self setUpTabBar:nil];
+}
+
+/**
+ *  利用 KVC 把系统的 tabBar 类型改为自定义类型。
+ *  包含所有样式类型：
+ *   CYLTabBar，在ViewDidLoad中调用；因为考虑到PlusButton的逻辑， 涉及坐标计算，还有运行中增删 PlusButton的逻辑，需要涉及重新布局，需要layoutSubviews中进行。故延迟调用。
+ *   CYLTabBarStyleTypeFlatDesign样式 会在 setViewControllers 内部调用，调用时机靠前。
+ */
+- (void)setUpTabBar:(UITabBar *)_tabBar {
+    @try {
+        if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+            CYLFlatDesignTabBar *pureCustomTabBar = (CYLFlatDesignTabBar *)(_tabBar);
+            if (!pureCustomTabBar || ![pureCustomTabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+                
+                pureCustomTabBar = [[CYLFlatDesignTabBar alloc] init];
+                pureCustomTabBar.delegate = self;
+                _tabBar = pureCustomTabBar;
+            }
+            [self cyl_setValue:pureCustomTabBar forKey:@"tabBar"];
+            [pureCustomTabBar cyl_setTabBarController:self];
+        } else {
+            CYLTabBar *tabBar = (CYLTabBar *)_tabBar;
+            if (!tabBar) {
+                tabBar = [[CYLTabBar alloc] init];
+                _tabBar = tabBar;
+            }
+            [self cyl_setValue:tabBar forKey:@"tabBar"];
+            [self setUpIPADForTabBar:tabBar];
+            [tabBar cyl_setTabBarController:self];
+        }
+    } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@", @(__PRETTY_FUNCTION__), @(__LINE__), @"setUpTabBar failed", exception.reason);
+#endif
+    }
+    
 }
 
 /** ipados 18 固定tabbar 在底部 */
@@ -655,36 +712,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     }
 }
 
-- (void)setUpTabBar:(UITabBar *)_tabBar {
-    @try {
-        CYLTabBar *tabBar = (CYLTabBar *)_tabBar;
-        if (!tabBar) {
-            tabBar = [[CYLTabBar alloc] init];
-        }
-        //    CYL_UIDesignClassicCYLTabBar
-        BOOL noNeedUIDesignCompatibility = [self noNeedUIDesignCompatibility];
-        if (noNeedUIDesignCompatibility || !CYL_IS_IOS_26) {
-            [self cyl_setValue:tabBar forKey:@"tabBar"];
-            [self setUpIPADForTabBar:tabBar];
-        } else if (CYL_IS_IOS_26 && !noNeedUIDesignCompatibility) {
-            CYLFlatDesignTabBar *pureCustomTabBar = (CYLFlatDesignTabBar *)_tabBar;
-            if (!pureCustomTabBar || ![pureCustomTabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-                pureCustomTabBar = [[CYLFlatDesignTabBar alloc] init];
-            }
-            pureCustomTabBar.delegate = self;
-            
-            [self cyl_setValue:pureCustomTabBar forKey:@"tabBar"];
-            [self.tabBar addSubview:pureCustomTabBar];
-        }
-        [tabBar cyl_setTabBarController:self];
-    } @catch (NSException *exception) {
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@", @(__PRETTY_FUNCTION__), @(__LINE__), @"setUpTabBar failed", exception.reason);
-    }
-    
-}
 - (BOOL)hasPlusChildViewController {
     NSString *context = CYLPlusChildViewController.cyl_context;
-    BOOL isSameContext = (context && self.context) && [context isEqualToString:self.context]; // || (!context && !self.context);
+    BOOL isSameContext = ((context && self.context) && [context isEqualToString:self.context]);
     BOOL hasPlusChildViewController = CYLPlusChildViewController && isSameContext;//&& !isAdded;
     return hasPlusChildViewController;
 }
@@ -705,11 +735,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)setViewControllers:(NSArray *)viewControllers {
-    BOOL noNeedUIDesignCompatibility = [self noNeedUIDesignCompatibility];
     CYLFlatDesignTabBar *pureCustomTabBar;
-    if (!noNeedUIDesignCompatibility && CYL_IS_IOS_26) {
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
         pureCustomTabBar = [CYLFlatDesignTabBar new];
-        pureCustomTabBar.delegate = self;
+        [self setUpTabBar:pureCustomTabBar];
     }
     if (_viewControllers && (_viewControllers.count > 0)) {
         for (UIViewController *viewController in _viewControllers) {
@@ -735,9 +764,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         _viewControllers = nil;
         return;
     }
-
+    
     [self alignTabControlIfNeededWithViewControllers:viewControllers];
-
+    
     CYLTabbarItemsCount = [viewControllers count];
     CYLTabBarItemWidth = (self.tabBar.cyl_boundsSize.width - CYLPlusButtonWidth) / (CYLTabbarItemsCount);
     NSUInteger idx = 0;
@@ -757,19 +786,19 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                 } else {
                     title = _tabBarItemsAttributes[idx][CYLTabBarItemTitle];
                 }
-           
-            normalImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemImage];
-            selectedImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage];
-            lottieURL = _tabBarItemsAttributes[idx][CYLTabBarLottieURL];
-            lottieSizeValue = _tabBarItemsAttributes[idx][CYLTabBarLottieSize];
-            
-            NSValue *offsetValue = _tabBarItemsAttributes[idx][CYLTabBarItemTitlePositionAdjustment];
-            UIOffset offset = [offsetValue UIOffsetValue];
-            titlePositionAdjustment = offset;
-            
-            NSValue *insetsValue = _tabBarItemsAttributes[idx][CYLTabBarItemImageInsets];
-            UIEdgeInsets insets = [insetsValue UIEdgeInsetsValue];
-            imageInsets = insets;
+                
+                normalImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemImage];
+                selectedImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage];
+                lottieURL = _tabBarItemsAttributes[idx][CYLTabBarLottieURL];
+                lottieSizeValue = _tabBarItemsAttributes[idx][CYLTabBarLottieSize];
+                
+                NSValue *offsetValue = _tabBarItemsAttributes[idx][CYLTabBarItemTitlePositionAdjustment];
+                UIOffset offset = [offsetValue UIOffsetValue];
+                titlePositionAdjustment = offset;
+                
+                NSValue *insetsValue = _tabBarItemsAttributes[idx][CYLTabBarItemImageInsets];
+                UIEdgeInsets insets = [insetsValue UIEdgeInsetsValue];
+                imageInsets = insets;
             }
         } else {
             /**如果是CYLPlusChildViewController ，title设置为空字符串，解决把第一个tabbarItem设置成plusButton后，其他的
@@ -793,8 +822,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                         lottieSizeValue:lottieSizeValue
          
         ];
-        if (!noNeedUIDesignCompatibility && CYL_IS_IOS_26) {
+        
+        
+        if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+            //已经在addOneChildViewController 中操作， 这里无需重复处理
+            //            [self addChildViewController:viewController];
+            
             if (!viewController.cyl_isPlaceholder && ![self isEqualViewController:viewController compairedViewController:CYLPlusChildViewController]) {
+                pureCustomTabBar.delegate = self;
                 CYLFlatDesignTabBarItem *tabItem = [pureCustomTabBar addItemWithTitle:title
                                                                       tabBarItemImage:normalImageInfo
                                                               tabBarItemSelectedImage:selectedImageInfo
@@ -803,17 +838,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                                                                           imageInsets:imageInsets
                                                                             lottieURL:lottieURL
                                                                       lottieSizeValue:lottieSizeValue];
+                [viewController cyl_setTabButton:tabItem];
                 [[viewController cyl_getViewControllerInsteadOfNavigationController] cyl_setTabButton:tabItem];
             }
         }
         [viewController cyl_setTabBarController:self];
         [[viewController cyl_getViewControllerInsteadOfNavigationController] cyl_setTabBarController:self];
         idx++;
-    }
-    
-    if (!noNeedUIDesignCompatibility && CYL_IS_IOS_26) {
-        pureCustomTabBar.delegate = self;
-        [self setUpTabBar:pureCustomTabBar];
     }
 }
 
@@ -882,8 +913,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     }
     [self addChildViewController:viewController];
 }
-
-
 
 - (UIImage *)getImageFromImageInfo:(id)imageInfo {
     UIImage *image = [UIImage cyl_getImageFromImageInfo:imageInfo];
@@ -982,8 +1011,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         if ([self.tabBar isKindOfClass:[CYLTabBar class]]) {
             [self.tabBar cyl_stopAnimationOfAllLottieView];
         }
-#else
 #endif
+        
+#if __has_include(<Lottie/Lottie-Swift.h>)
+        if ([self.tabBar isKindOfClass:[CYLTabBar class]]) {
+            [self.tabBar cyl_stopAnimationOfAllLottieView];
+        }
+#endif
+
     }
 }
 
@@ -999,8 +1034,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
     if (viewController.cyl_isPlaceholder == YES) {
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @(viewController.cyl_isPlaceholder));
-
         return NO;
     }
     if (@available(iOS 18.0, *)) {
@@ -1040,9 +1073,22 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         }
     }
     return isLottieEnabled || isLottieEnabledFromAttributes;
-#else
-    return NO;
 #endif
+
+#if __has_include(<Lottie/Lottie-Swift.h>)
+
+    NSInteger lottieURLCount = self.lottieURLs.count;
+    BOOL isLottieEnabled = lottieURLCount > 0 ;
+    BOOL isLottieEnabledFromAttributes = NO;
+    if (self.tabBarItemsAttributes && self.tabBarItemsAttributes.count > 0) {
+        @try {
+            isLottieEnabledFromAttributes = self.tabBarItemsAttributes[0][CYLTabBarLottieURL];
+        } @catch (NSException *exception) {
+        }
+    }
+    return isLottieEnabled || isLottieEnabledFromAttributes;
+#endif
+    return NO;
 }
  
 
@@ -1054,7 +1100,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     @try {
         shouldSelectViewController = (!control.cyl_shouldNotSelect) && (!control.hidden) ;
     } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
         NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif
     }
     UIControl *contentControl = control;
     UIControl *selectedContentControl = nil;
@@ -1151,8 +1199,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             if (!lottieURL) {
                 //TODO:lottieURLs 与 Control对应的index不一致， 因为 lottieURLs 可能会少一个 plusButton 对应的。如何能够不通过index就获取到 lottieURLs ?
                 lottieURL = self.lottieURLs[index];
-                NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：lottieURL%@theLottieURL%@", @(__PRETTY_FUNCTION__), @(__LINE__), lottieURL, theLottieURL);
-
             }
             
             if (!lottieSizeValue) {
@@ -1160,7 +1206,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             }
         }
     } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
         NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif
     }
     
     CGSize lottieSize = [lottieSizeValue CGSizeValue];
@@ -1226,14 +1274,18 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (void)tabBar:(CYLFlatDesignTabBar *)tabBar didSelectItemAt:(NSInteger)index {
     [self setSelectedIndex:index];
-    [self tabChangedToSelectedIndex:index
-                            viewController:self.selectedViewController
-                                   control:tabBar.tabBarItems[index]];
+    if (tabBar.tabBarItems && tabBar.tabBarItems.count > index) {
+        [self tabChangedToSelectedIndex:index
+                         viewController:self.selectedViewController
+                                       control:tabBar.tabBarItems[index]];
+    }
 }
 
 #pragma mark - Override selectedViewController (User initiated)
-
+//FIXME:  to delete
 - (void)setSelectedViewController:(__kindof UIViewController *)selectedViewController {
+
+    //必须调用父类逻辑。
     [super setSelectedViewController:selectedViewController];
 //    [self.tabBar layoutIfNeeded];
     // 用户点击 tab 时会触发 //showing initial vc for every tab :)

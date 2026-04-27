@@ -141,7 +141,7 @@
     
     // if you use `+plusChildViewController` , do not addTarget to plusButton.
     [button addTarget:button action:@selector(clickPublish) forControlEvents:UIControlEventTouchUpInside];
-//    button.cyl_shouldNotSelect = YES;
+    button.cyl_shouldNotSelect = YES;
     return button;
 }
 
@@ -266,18 +266,18 @@
 #pragma clang diagnostic pop
 #pragma mark - CYLPlusButtonSubclassing
 
-+ (UIViewController *)plusChildViewController {
-    UIViewController *plusChildViewController = [[UIViewController alloc] init];
-    plusChildViewController.view.backgroundColor = [UIColor redColor];
-    plusChildViewController.navigationItem.title = @"PlusChildViewController";
-    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
-                                                   initWithRootViewController:plusChildViewController];
-    return plusChildNavigationController;
-}
-
-+ (NSUInteger)indexOfPlusButtonInTabBar {
-    return 2;
-}
+//+ (UIViewController *)plusChildViewController {
+//    UIViewController *plusChildViewController = [[UIViewController alloc] init];
+//    plusChildViewController.view.backgroundColor = [UIColor redColor];
+//    plusChildViewController.navigationItem.title = @"PlusChildViewController";
+//    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
+//                                                   initWithRootViewController:plusChildViewController];
+//    return plusChildNavigationController;
+//}
+//
+//+ (NSUInteger)indexOfPlusButtonInTabBar {
+//    return 2;
+//}
 
 + (BOOL)shouldSelectPlusChildViewController {
     BOOL isSelected = CYLExternPlusButton.selected;

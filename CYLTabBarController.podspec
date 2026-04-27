@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "CYLTabBarController"
-  s.version      = "1.99.17"
+  s.version      = "1.99.18"
   s.summary      = "Highly customizable tabBar and tabBarController for iOS"
   s.description  = "[EN]It is an iOS UI module library for adding animation to iOS tabbar items and icons with Lottie and Liquid Glass Animation.  [CN]【中国特色 TabBar】一行代码实现 Lottie +玻璃效果动画TabBar，支持中间带+号的TabBar样式，自带红点角标，支持动态刷新。【iOS26 & iPhone 17 supported】"
   s.homepage     = "https://github.com/ChenYilong/CYLTabBarController"
@@ -20,8 +20,31 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'Lottie' do |lottie|
-    lottie.dependency 'CYLTabBarController/Core'
-    lottie.dependency "lottie-ios" , '~> 2.5.3'
+    #指定2.5.3，使用 oc 版本 lottie
+    lottie.dependency "CYLTabBarController/LottieObjectiveC"
   end
+
+  s.subspec 'LottieObjectiveC' do |lottieobjc|
+    lottieobjc.dependency 'CYLTabBarController/Core'
+    #指定2.5.3，使用 oc 版本 lottie
+    lottieobjc.dependency "lottie-ios", '~> 2.5.3'
+  end
+
+  s.subspec "LottieSwift" do |lottieswift|
+    lottieswift.source_files = 'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}'
+    #不指定 lottie 版本 
+    #使用 swift 版本 lottie
+    lottieswift.dependency 'lottie-ios', '>=4.0.0'
+    lottieswift.dependency 'CYLTabBarController/Core'
+  end
+
+  s.pod_target_xcconfig = {
+    'DEFINES_MODULE' => 'YES',
+    'WARNING_CFLAGS' => [
+      '-Werror=undeclared-selector',
+      '-Werror=incomplete-implementation'
+    ]
+  }
+
 end
  

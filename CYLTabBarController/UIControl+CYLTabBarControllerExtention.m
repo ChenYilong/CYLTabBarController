@@ -11,10 +11,22 @@
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
 #import "CYLTabBarController.h"
+
+#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
+#import <CYLTabBarController/CYLTabBarController-Swift.h>
+#else
+#endif
+
 #if __has_include(<Lottie/Lottie.h>)
 #import <Lottie/Lottie.h>
 #else
 #endif
+
+#if __has_include(<Lottie/Lottie-Swift.h>)
+#import <Lottie/Lottie-Swift.h>
+#else
+#endif
+
 #import "UITabBarItem+CYLTabBarControllerExtention.h"
 #import "CYLPlusButton.h"
 
@@ -95,9 +107,10 @@
         return self.cyl_tabBarController.lottieViewAdded;
     }
     if (self.cyl_lottieAnimationView) {
-        UIView *view = self.cyl_lottieAnimationView;
-        return view.frame.size.width > 10;
-
+        UIView *view = (UIView *)self.cyl_lottieAnimationView;
+        if (view && [view respondsToSelector:@selector(frame)]) {
+            return view.frame.size.width > 10;
+        }
     }
     return NO;
 }
@@ -185,16 +198,16 @@
     return tabBadgePointViewOffset;
 }
 
-- (LOTAnimationView *)cyl_lottieAnimationView {
-    LOTAnimationView *animationView = nil;
-    for (UILabel *subview in self.subviews) {
+- (UIView *)cyl_lottieAnimationView {
+    UIView *animationView = nil;
+    for (UIView *subview in self.subviews) {
         if ([subview cyl_isLottieAnimationView]) {
-            animationView = (LOTAnimationView *)subview;
+            animationView = subview;
             return animationView;
         }
-        for (UILabel *subsubview in subview.subviews) {
+        for (UIView *subsubview in subview.subviews) {
             if ([subsubview cyl_isLottieAnimationView]) {
-                animationView = (LOTAnimationView *)subsubview;
+                animationView = subsubview;
                 return animationView;
             }
         }
@@ -313,18 +326,20 @@
                     shouldAutoHideNewView:(BOOL)shouldAutoHideNewView
                     shouldHideOriginalView:(BOOL)shouldHideOriginalView
                                 completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
-    UIControl *tabBarButton = self;//_UITabButton
-     UIImageView *swappableImageView = tabBarButton.cyl_tabImageView;
+    UIControl *tabBarButton = self;//_UI+TabButton
+    UIImageView *swappableImageView = tabBarButton.cyl_tabImageView;
     UIView *replacedView = swappableImageView;
     if (isTabButton) {
         replacedView = tabBarButton;
     }
     if (!replacedView) {
         !completion?:completion(NO, self, nil);
-
         return;
     }
     if (newView.frame.size.width == 0 || newView.frame.size.height == 0) {
+        //TODO: 区分cover 与 replace 两个场景， 获取到真实的view，可能是lottie，决定是否限制新视图的尺寸， 目前暂不限制尺寸。 因为主要场景为 cover 场景。
+        //    if(!shouldHideOriginalView) && (newView.frame.size.width > tabBarButton.frame.size.width || newView.frame.size.height > tabBarButton.frame.size.height) {
+
         UIImage *image = swappableImageView.image;
         newView.frame = ({
             CGRect frame = newView.frame;
@@ -431,9 +446,27 @@
     lottieView.translatesAutoresizingMaskIntoConstraints = NO;
     [lottieView setClipsToBounds:NO];
     [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
-#else
 #endif
 
+#if __has_include(<Lottie/Lottie-Swift.h>)
+    if (!lottieURL) {
+        return;
+    }
+    if (self.cyl_lottieAnimationView) {
+        return;
+    }
+    UIControl *tabButton = self;
+    NSString *filePath = [lottieURL path];
+    CompatibleLOTAnimation *composition = [[CompatibleLOTAnimation alloc] initWithFilepath:filePath];
+    CompatibleLOTAnimationView *lottieView = [[CompatibleLOTAnimationView alloc] initWithCompatibleAnimation:composition];
+    lottieView.frame = CGRectMake(0, 0, size.width, size.height);
+    lottieView.userInteractionEnabled = NO;
+    lottieView.contentMode = UIViewContentModeScaleAspectFill;
+    lottieView.translatesAutoresizingMaskIntoConstraints = NO;
+    [lottieView setClipsToBounds:NO];
+    [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
+#endif
+    
 }
 
 - (void)cyl_animationLottieImageWithLottieURL:(NSURL *)lottieURL
@@ -445,11 +478,11 @@
     }
     //_UITabButton
     [self cyl_addLottieImageWithLottieURL:lottieURL size:size];
-    LOTAnimationView *lottieView = self.cyl_lottieAnimationView;
+    LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
     if (!lottieView) {
         [self cyl_addLottieImageWithLottieURL:lottieURL size:size];
     }
-    
+    lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
     if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]]) {
         if (defaultSelected) {
             lottieView.animationProgress = 1;
@@ -459,24 +492,71 @@
         lottieView.animationProgress = 0;
         [lottieView play];
     }
-#else
 #endif
+    
+    
+#if __has_include(<Lottie/Lottie-Swift.h>)
+    if (!lottieURL) {
+        return;
+    }
+    //_UITabButton
+    [self cyl_addLottieImageWithLottieURL:lottieURL size:size];
+
+    CompatibleLOTAnimationView *lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+    
+    
+    if (!lottieView) {
+        [self cyl_addLottieImageWithLottieURL:lottieURL size:size];
+    }
+    lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+
+
+    if (lottieView && [NSStringFromClass([lottieView class]) containsString:NSStringFromClass([CompatibleLOTAnimationView class])]) {
+        ///播放到指定进度（0-1）
+        [lottieView play];
+    }
+#endif
+
 }
 
 - (void)cyl_stopAnimationOfLottieView {
 #if __has_include(<Lottie/Lottie.h>)
     if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
-        if (self.cyl_lottieAnimationView) {
-            [self.cyl_lottieAnimationView stop];
+        LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
+
+        if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]]) {
+            [lottieView stop];
         }
     } else
         if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-            if (self.cyl_lottieAnimationView) {
-                [self.cyl_lottieAnimationView stop];
+            LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
+
+            if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]]) {
+                [lottieView stop];
             }
         }
-#else
 #endif
+    
+    
+#if __has_include(<Lottie/Lottie-Swift.h>)
+
+    if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+        
+        CompatibleLOTAnimationView *lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+
+        if (lottieView && [lottieView isKindOfClass:[CompatibleLOTAnimationView class]]) {
+            [lottieView stop];
+        }
+    } else
+        if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+            CompatibleLOTAnimationView *lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+
+            if (lottieView && [lottieView isKindOfClass:[CompatibleLOTAnimationView class]]) {
+                [lottieView stop];
+            }
+        }
+#endif
+
 }
 
 #pragma mark - private method

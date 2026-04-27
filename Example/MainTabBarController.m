@@ -40,12 +40,17 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
      */
     UIEdgeInsets imageInsets = UIEdgeInsetsZero;//UIEdgeInsetsMake(4.5, 0, -4.5, 0);
     UIOffset titlePositionAdjustment = UIOffsetMake(0, -3.5);
+    CYLTabBarStyleType tabBarStyleType;
+    tabBarStyleType = CYLTabBarStyleTypeFlatDesign;
+    // 设置 TabBar 样式：液态玻璃效果（覆盖上一行）
+    tabBarStyleType = CYLTabBarStyleTypeLiquidGlass;
+
     if (self = [super initWithViewControllers:[self viewControllersForTabBar]
                         tabBarItemsAttributes:[self tabBarItemsAttributesForTabBar]
                                   imageInsets:imageInsets
                       titlePositionAdjustment:titlePositionAdjustment
-                                      context:context
-                ]) {
+                                    styleType:tabBarStyleType
+                                      context:context]) {
         [self customizeTabBarAppearanceWithTitlePositionAdjustment:titlePositionAdjustment];
         self.delegate = self;
         self.navigationController.navigationBar.hidden = YES;
@@ -54,10 +59,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 }
 
 - (void)viewDidLoad {
-    // * @attention 请在父类的 ViewDidLoad 调用之前设置CYLTabBarStyleType。也就是在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
-    self.tabBarStyleType = CYLTabBarStyleTypeFlatDesign;
-    // 设置 TabBar 样式：液态玻璃效果（覆盖上一行）
-    self.tabBarStyleType = CYLTabBarStyleTypeLiquidGlass;
+    // * @attention 请在父类的 ViewDidLoad 调用之前设置CYLTabBarStyleType。最佳位置是initWithViewControllers方法内部， 最晚在在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
+//    self.tabBarStyleType = CYLTabBarStyleTypeFlatDesign;
     [[UIApplication sharedApplication] setApplicationSupportsShakeToEdit:YES];
     [self becomeFirstResponder];
     [self customizeInterface];
@@ -144,6 +147,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性等等
  */
 - (void)customizeTabBarAppearanceWithTitlePositionAdjustment:(UIOffset)titlePositionAdjustment {
+    
     // Customize UITabBar height
     // 自定义 TabBar 高度
     // tabBarController.tabBarHeight = CYL_IS_IPHONE_X ? 65 : 40;
@@ -153,13 +157,13 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // set the text color for unselected state
     // 普通状态下的文字属性
     NSMutableDictionary *normalAttrs = [NSMutableDictionary dictionary];
-    normalAttrs[NSForegroundColorAttributeName] = [UIColor cyl_systemGrayColor];
+    normalAttrs[NSForegroundColorAttributeName] = [UIColor cyl_secondaryLabelColor];
     normalAttrs[NSFontAttributeName] = [UIFont systemFontOfSize:10];
     
     // set the text color for selected state
     // 选中状态下的文字属性
     NSMutableDictionary *selectedAttrs = [NSMutableDictionary dictionary];
-    selectedAttrs[NSForegroundColorAttributeName] = [UIColor cyl_labelColor];
+    selectedAttrs[NSForegroundColorAttributeName] = [UIColor cyl_systemGreenColor];
     selectedAttrs[NSFontAttributeName] = [UIFont systemFontOfSize:10];
 
     // Set the dark color to selected tab (the dimmed background)
@@ -172,15 +176,20 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // 如果你的App需要支持横竖屏，请使用该方法移除注释 '//'
 //     [self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
     
+    // 半透明， 需要注意：iOS26 液态玻璃下， 具有特殊效果， View 将延伸至TabBar以外区域。
+    if (CYL_IS_IOS_26) {
+//        [UITabBar appearance].translucent = NO;
+    }
+
     // set background color
     // 设置 TabBar 背景
-    // 半透明
-    if (CYL_IS_IOS_26) {
-        [UITabBar appearance].translucent = NO;
-    }
-    // [UITabBar appearance].barTintColor = [UIColor cyl_systemBackgroundColor];
-    // [[UITabBar appearance] setBackgroundColor:[UIColor cyl_systemBackgroundColor]];
     
+    if (!CYL_IS_IOS_26) {
+        //iOS26 不推荐设置 `UITabBar.appearance().backgroundColor` 玻璃效果下，不仅无法设置背景，同时会干扰 TabBar 里的 Label 未选中颜色，因为 iOS26 里的未选中时的 Label 颜色为系统内部逻辑， 无法自定义。所以如果背景颜色， 与Label颜色一致，白底白字， 用户将无法辨认。暗黑模式下， 也会有类似问题。
+        [UITabBar appearance].translucent = NO;
+        [UITabBar appearance].barTintColor = [UIColor cyl_systemBackgroundColor];
+        [[UITabBar appearance] setBackgroundColor:[UIColor cyl_systemBackgroundColor]];
+    }
     
     //     [[UITabBar appearance] setBackgroundImage:[[self class] imageWithColor:[UIColor whiteColor] size:CGSizeMake(self.cyl_tabBarController.visiableTabBarSize.width, tabBarController.tabBarHeight ?: (CYL_IS_IPHONE_X ? 65 : 40))]];
     //    [[UITabBar appearance] setUnselectedItemTintColor:[UIColor systemGrayColor]];
@@ -201,22 +210,31 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // set the bar shadow image
     // without shadow : use -[[CYLTabBarController hideTabBarShadowImageView] in CYLMainRootViewController.m
     if (@available(iOS 13.0, *)) {
-        UITabBarItemAppearance *inlineLayoutAppearance = [[UITabBarItemAppearance  alloc] init];
+        self.tabBar.unselectedItemTintColor = normalAttrs[NSForegroundColorAttributeName];
+
+        UITabBarItemAppearance *stackedLayoutAppearance = [[UITabBarItemAppearance alloc] init];
         // fix https://github.com/ChenYilong/CYLTabBarController/issues/456
-        inlineLayoutAppearance.normal.titlePositionAdjustment = titlePositionAdjustment;
+        stackedLayoutAppearance.normal.titlePositionAdjustment = titlePositionAdjustment;
 
         // set the text Attributes
         // 设置文字属性
-        [inlineLayoutAppearance.normal setTitleTextAttributes:normalAttrs];
-        [inlineLayoutAppearance.selected setTitleTextAttributes:selectedAttrs];
+        [stackedLayoutAppearance.normal setTitleTextAttributes:normalAttrs];
+        [stackedLayoutAppearance.selected setTitleTextAttributes:selectedAttrs];
 
         UITabBarAppearance *standardAppearance = [[UITabBarAppearance alloc] init];
-        standardAppearance.stackedLayoutAppearance = inlineLayoutAppearance;
+        standardAppearance.stackedLayoutAppearance = stackedLayoutAppearance;
+        standardAppearance.inlineLayoutAppearance = stackedLayoutAppearance;
+        standardAppearance.compactInlineLayoutAppearance = stackedLayoutAppearance;
+        
         standardAppearance.backgroundColor = [UIColor cyl_systemBackgroundColor];
         //shadowColor和shadowImage均可以自定义颜色, shadowColor默认高度为1, shadowImage可以自定义高度.
         standardAppearance.shadowColor = [UIColor cyl_systemGreenColor];
         // standardAppearance.shadowImage = [[self class] imageWithColor:[UIColor cyl_systemGreenColor] size:CGSizeMake(self.cyl_tabBarController.visiableTabBarSize.width, 1)];
         self.tabBar.standardAppearance = standardAppearance;
+        self.tabBar.scrollEdgeAppearance = standardAppearance;
+
+        self.tabBar.unselectedItemTintColor = normalAttrs[NSForegroundColorAttributeName];
+        //self.tabBar.unselectedLabelColor = [UIColor redColor];
     } else {
         // Override point for customization after application launch.
         // set the text Attributes
@@ -228,6 +246,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         // This shadow image attribute is ignored if the tab bar does not also have a custom background image.So at least set somthing.
         [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
         [[UITabBar appearance] setShadowImage:[UIImage cyl_imageWithColor:[UIColor cyl_systemGreenColor] size:CGSizeMake(self.cyl_tabBarController.visiableTabBarSize.width, 1)]];
+        [self.tabBarItem setTitleTextAttributes:normalAttrs forState:UIControlStateNormal];
+        [self.tabBarItem setTitleTextAttributes:selectedAttrs forState:UIControlStateSelected];
     }
 }
 
@@ -260,7 +280,6 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                             size:selectionIndicatorImageSize];
     image = [image resizableImageWithCapInsets:UIEdgeInsetsMake(1, 0, 0, 0)];
     [tabBar setSelectionIndicatorImage:image];
-    
 }
 
 + (UIImage *)scaleImage:(UIImage *)image {
@@ -470,12 +489,13 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 //    }
     UIView *animationView;
     if ([control cyl_isTabButton]) {
-        //更改红标状态 
-        if ([self.selectedViewController cyl_isShowBadge]) {
-            [self.selectedViewController cyl_clearBadge];
+
+        //更改红标状态
+        if ([tabBarController.selectedViewController cyl_isShowBadge]) {
+            [tabBarController.selectedViewController cyl_clearBadge];
         } else {
-            [self.selectedViewController cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
-            [self.selectedViewController cyl_showBadge];
+            [tabBarController.selectedViewController cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
+            [tabBarController.selectedViewController cyl_showBadge];
         }
         animationView = [control cyl_tabImageView];
     }
@@ -537,11 +557,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [animationView.layer addAnimation:rotateAnimation forKey:@"rotateAnimation"];
 }
 
-- (void)tabBar:(CYLFlatDesignTabBar *)tabBar didSelectItemAt:(NSInteger)index {
-    self.cyl_tabBarController.selectedIndex = index;
-}
-
-
+//- (void)tabBar:(CYLFlatDesignTabBar *)tabBar didSelectItemAt:(NSInteger)index {
+// //子类实现代理方法会， 覆盖父类的默认实现， 所以请先调用父类方法。
+//    [super tabBar:tabBar didSelectItemAt:index];
+//}
 
 #pragma mark - Layout
 

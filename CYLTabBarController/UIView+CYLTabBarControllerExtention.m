@@ -12,6 +12,12 @@
 #import <Lottie/Lottie.h>
 #else
 #endif
+
+#if __has_include(<Lottie/Lottie-Swift.h>)
+#import <Lottie/Lottie-Swift.h>
+#else
+#endif
+
 #if __has_include(<CYLTabBarController/CYLTabBarController.h>)
 #import <CYLTabBarController/CYLTabBarController.h>
 #else
@@ -39,8 +45,8 @@
 //        BOOL result = isKindOfButton && (self.hidden == NO);
         return isKindOfButton;
     }
-    //UIControl
-    return [self cyl_isKindOfClass:[UIControl class]];
+    //UIControl 扁平或者玻璃样式共用
+    return [self isKindOfClass:[UIControl class]];
 }
 
 - (BOOL)cyl_isPlatterView {
@@ -62,7 +68,7 @@
 
     BOOL isKindOfPlatterPortalView = [self cyl_isViewPortalView:self];
     
-    return isKindOfPlatterPortalView && (self.hidden == NO);
+    return isKindOfPlatterPortalView;
 }
 
 - (BOOL)cyl_isViewPortalView:(UIView * _Nonnull)view {
@@ -417,12 +423,29 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (!isKind) {
         return NO;
     }
+
     Class classType = nil;
+
 #if __has_include(<Lottie/Lottie.h>)
-    classType = [LOTAnimationView class];
-#else
-    classType = NSClassFromString(@"LOTAnimationView");
+    // Prefer Objective-C Lottie class when available at compile time
+    Class swiftCompatClass = NSClassFromString(@"LOTAnimationView");
+    if (swiftCompatClass) {
+        classType = swiftCompatClass;
+    }
 #endif
+
+#if __has_include(<Lottie/Lottie-Swift.h>)
+    // Avoid sending messages to a forward-declared class; resolve at runtime instead
+    NSString *swiftCompatClassString = @"CompatibleLOTAnimationView";
+
+    if ( [NSStringFromClass([self class]) containsString:swiftCompatClassString]) {
+        return YES;
+    }
+#endif
+
+    if (!classType) {
+        return NO;
+    }
     BOOL isLottieAnimationView = ([self isKindOfClass:classType] || [self isMemberOfClass:classType]);
     return isLottieAnimationView;
 }

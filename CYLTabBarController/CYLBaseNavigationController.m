@@ -34,8 +34,26 @@
 
 //fix https://github.com/ChenYilong/CYLTabBarController/issues/483
 - (void)setViewControllers:(NSArray<UIViewController *> *)viewControllers animated:(BOOL)animated {
-    [self toggleTabBarHidden];
     [super setViewControllers:viewControllers animated:animated];
+    [self toggleTabBarHidden];
+}
+
+- (NSArray<__kindof UIViewController *> *)popToRootViewControllerAnimated:(BOOL)animated {
+    NSArray<__kindof UIViewController *> *array = [super popToRootViewControllerAnimated:animated];
+    [self toggleTabBarHidden];
+    return array;
+}
+
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated {
+    UIViewController *viewController = [super popViewControllerAnimated:animated];
+    [self toggleTabBarHidden];
+    return viewController;
+}
+
+- (NSArray<__kindof UIViewController *> *)popToViewController:(UIViewController *)viewController animated:(BOOL)animated {
+    NSArray<__kindof UIViewController *> * array = [super popToViewController:viewController animated:animated];
+    [self toggleTabBarHidden];
+    return array;
 }
 
 - (void)toggleTabBarHidden {
@@ -45,7 +63,7 @@
         viewController = [self.viewControllers lastObject];
     } @catch (NSException *exception) {   
     }
-    viewController.hidesBottomBarWhenPushed = isHidden;
+    viewController.cyl_hidesBottomBarWhenPushed = isHidden;
 }
 
 @end

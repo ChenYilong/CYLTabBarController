@@ -14,6 +14,7 @@
 #else
 #import "CYLTabBarController.h"
 #endif
+#import "UIView+CYLTabBarControllerExtention.h"
 
 @implementation UIViewController (CYLNavigationControllerExtention)
 
@@ -56,8 +57,6 @@
     self.hidesBottomBarWhenPushed = hidesBottomBarWhenPushed;
     NSNumber *hidesBottomBarWhenPushedObject = @(hidesBottomBarWhenPushed);
     objc_setAssociatedObject(self, @selector(cyl_hidesBottomBarWhenPushed), hidesBottomBarWhenPushedObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    //    [self.cyl_tabBarController setTabBarHidden:hidesBottomBarWhenPushed animated:YES];
-    //    [self cyl_setTabBarVisible:!hidesBottomBarWhenPushed animated:YES completion:nil];
 }
 
 //viewWillDisappear
@@ -137,7 +136,104 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
 - (void)cyl_resetTabBarHidden {
     CYLTabBar *tabBar = self.cyl_tabBarController.tabBar;
     for (UIView *subview in tabBar.subviews) {
-        subview.hidden = self.cyl_hidesBottomBarWhenPushed;
+        [subview cyl_setHidden:self.cyl_hidesBottomBarWhenPushed];
+    }
+}
+
+#pragma mark - private
+
+- (void)cyl_changeTabbarStatusIfNeeded {
+    if (![self cyl_isDirectChildOfRootTabBarController]) {
+        return;
+    }
+
+    BOOL shouldTabBarHidden = [self cyl_shouldTabBarHidden];
+    BOOL currentTabbarHidden = self.cyl_tabBarController.tabBar.cyl_isHidden;
+
+    if (shouldTabBarHidden && !currentTabbarHidden) {
+        [self  cyl_hideTabbar];
+    } else if (!shouldTabBarHidden && currentTabbarHidden) {
+        [self cyl_showTabbar];
+    }
+}
+
+- (BOOL)cyl_shouldTabBarHidden {
+    for (int i = 1; i < [self cyl_getViewControllerInsteadOfNavigationController].navigationController.viewControllers.count; i++ ) {
+        if ([self cyl_getViewControllerInsteadOfNavigationController].navigationController.viewControllers[i].cyl_hidesBottomBarWhenPushed) {
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
+- (void)cyl_hideTabbar {
+    [self cyl_updateTabbarWithShouldHidden:YES];
+
+    if (self.transitionCoordinator) {
+        UIImageView *tabbarImageView = [self cyl_imageViewFromSnapshotOfView:self.cyl_tabBarController.tabBar];
+        UIViewController *fromVC = [self.transitionCoordinator viewControllerForKey:UITransitionContextFromViewControllerKey];
+        [fromVC.view addSubview:tabbarImageView];
+
+        [self.transitionCoordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+
+        } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+            [tabbarImageView removeFromSuperview];
+            if (context.isCancelled) {
+                [self cyl_updateTabbarWithShouldHidden:NO];
+            }
+        }];
+    }
+}
+
+- (void)cyl_showTabbar {
+    if (self.transitionCoordinator) {
+        UIImageView *tabbarImageView = [self cyl_imageViewFromSnapshotOfView:self.cyl_tabBarController.tabBar];
+        UIViewController *toVC = [self.transitionCoordinator viewControllerForKey:UITransitionContextToViewControllerKey];
+        [toVC.view addSubview:tabbarImageView];
+
+        [self.transitionCoordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+
+        } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+            [tabbarImageView removeFromSuperview];
+            if (context.isCancelled) {
+
+            } else {
+                [self cyl_updateTabbarWithShouldHidden:NO];
+            }
+        }];
+    } else {
+        [self cyl_updateTabbarWithShouldHidden:NO];
+    }
+}
+
+#pragma mark - helper
+
+- (BOOL)cyl_isDirectChildOfRootTabBarController {
+    if (!self.cyl_tabBarController) {
+        return NO;
+    }
+    return self.parentViewController == self.cyl_tabBarController;
+}
+
+- (UIImageView *)cyl_imageViewFromSnapshotOfView:(UIView *)view {
+//    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithBounds:view.bounds];
+//    UIImage *snapshot = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+//        [view.layer renderInContext:context.CGContext];
+//    }];
+//
+   UIImage *snapshot = [view cyl_takeSnapshotWithoutViews:@[]];
+
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:snapshot];
+    imageView.frame = view.frame;
+    return imageView;
+}
+
+- (void)cyl_updateTabbarWithShouldHidden:(BOOL)shouldHidden {
+    CYLTabBar *tabBar = self.cyl_tabBarController.tabBar;
+    [tabBar cyl_setHidden:shouldHidden];
+    for (UIView *subview in tabBar.subviews) {
+        [subview cyl_setHidden:shouldHidden];
     }
 }
 
@@ -252,11 +348,6 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
 }
 
 #pragma mark - 判断 TabBar 是否可见
-
-
-
-
-
 
 //viewWillAppear
 - (void)cyl_hideNavigationBarSeparatorIfNeeded {

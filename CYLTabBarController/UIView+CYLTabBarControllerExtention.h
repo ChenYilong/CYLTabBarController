@@ -53,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)cyl_isViewAddedToPlatterView:(UIView *)view;
 - (UIImageView *)cyl_swappableImageViewViewInTabBarButton;
 - (UIImage *)cyl_takeSnapshot;
+- (UIImage *)cyl_takeSnapshotWithoutViews:(NSArray<UIView __kindof *> *)hideViews;
 - (void)cyl_setHidden:(BOOL)hidden;
 
 @end

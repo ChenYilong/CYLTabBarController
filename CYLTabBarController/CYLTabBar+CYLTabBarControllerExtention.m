@@ -11,13 +11,17 @@
 #import "UIControl+CYLTabBarControllerExtention.h"
 #import "CYLTabBarController.h"
 #import <objc/runtime.h>
-
 #import "CYLTabBar.h"
+
 #if __has_include(<Lottie/Lottie.h>)
 #import <Lottie/Lottie.h>
 #else
 #endif
 
+#if __has_include(<Lottie/Lottie-Swift.h>)
+#import <Lottie/Lottie-Swift.h>
+#else
+#endif
 
 @implementation CYLTabBar (CYLTabBarControllerExtention)
 
@@ -185,8 +189,19 @@
     //_UITabButton
     [self cyl_stopAnimationOfAllLottieView];
     [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected];
-#else
+
 #endif
+    
+#if __has_include(<Lottie/Lottie-Swift.h>)
+    if (!lottieURL) {
+        return;
+    }
+    //_UITabButton
+    [self cyl_stopAnimationOfAllLottieView];
+    [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected];
+#endif
+    
+
 }
 
 - (void)cyl_stopAnimationOfAllLottieView {
@@ -205,8 +220,27 @@
             [obj cyl_stopAnimationOfLottieView];
         }];
     }
-#else
+
 #endif
+    
+#if __has_include(<Lottie/Lottie-Swift.h>)
+    if ([self isKindOfClass:[CYLTabBar class]]) {
+        [self.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [obj cyl_stopAnimationOfLottieView];
+        }];
+        [self.cyl_platterSelectedContentViews enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [obj cyl_stopAnimationOfLottieView];
+        }];
+    } else
+    if ([self isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        CYLFlatDesignTabBar *flatDesignTabBar = (CYLFlatDesignTabBar *)self;
+        [flatDesignTabBar.tabBarItems enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [obj cyl_stopAnimationOfLottieView];
+        }];
+    }
+
+#endif
+    
 }
 /*!
  * 思路为： 从当前图层的control，获得index， 再从另外的图层中的index位置， 获取control。以此来避免直接使用 index 来获取不同图层的。因为有可能存在plusButton， 导致，index的数值变动， 降级复杂度。以control为锚点， index仅辅助。

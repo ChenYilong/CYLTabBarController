@@ -144,7 +144,7 @@
         //        plusView.scale = 1.15;
         //        plusView.scaleDuration = 0.2;
         //        plusView.isJudgeBegin = YES;
-        [plusSuperView addSubview:plusView];
+        [plusSuperView cyl_bringSubviewToTop:plusView];
         self.plusView = plusView;
         
         //        __weak typeof(self) wSelf = self;
@@ -156,10 +156,12 @@
         
         UILongPressGestureRecognizer *lpGR = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressAction:)];
         lpGR.minimumPressDuration = 0.4;
-        [plusView addGestureRecognizer:lpGR];
+//        [plusView addGestureRecognizer:lpGR];
         self.lpGR = lpGR;
         
         _blurPlusY = -(CYLScaleValue(212) + CYLGetRootWindow().safeAreaInsets.bottom);
+//        [self setSelectedIndex:0];
+        _defaultSelectedIndex = 0;
     }
     return self;
 }
@@ -167,14 +169,24 @@
 #pragma mark - 重写父类方法
 
 - (void)addSubview:(UIView *)view {
-    if ([self isKindOfClass:[UITabBar class]]) {
-        if ([view cyl_isPlatterView]) {
-            [view cyl_setHidden:YES];
-        }
-    }
-    if (![self isEqual:view]) {
+    if (![self isKindOfClass:[UITabBar class]]) {
         [super addSubview:view];
+        return;
     }
+    if ([view isKindOfClass:[UITabBar class]]) {
+        //为了防止类似这样的异常代码，自己添加自己：`[self.tabBar addSubview:myTabBar]`(这是异常逻辑， 解决办法是请使用  KVC: `[self cyl_setValue:myTabBar forKey:@"tabBar"]`)
+        return;
+    }
+    if ([view cyl_isPlatterView]) {
+        //不再添加 cyl_PlatterView。效果与隐藏  cyl_PlatterView（ `[view cyl_setHidden:YES];` ）相同，
+        // [view cyl_setHidden:YES];
+        return;
+    }
+    //plusButton可能会超出TabBar，故设置不裁剪
+    if (YES == view.clipsToBounds) {
+        view.clipsToBounds = NO;
+    }
+    [super addSubview:view];
 }
 
 - (void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
@@ -182,13 +194,45 @@
         if ([gestureRecognizer cyl_isContinuousGestureRecognizer]) {
             gestureRecognizer.enabled = NO;
         }
+        if ([gestureRecognizer cyl_isLongGestureRecognizer]) {
+//            gestureRecognizer.delegate = self;
+            gestureRecognizer.enabled = NO;
+
+        }
+
     }
+//
     [super addGestureRecognizer:gestureRecognizer];
 }
+
+//- (void)addSubview:(UIView *)view {
+//    if ([self isKindOfClass:[UITabBar class]]) {
+//        if ([view isKindOfClass:NSClassFromString(@"UIKit._UITabBarPlatterView")]) {
+//            [view cyl_setHidden:YES];
+//        }
+//    }
+//    if (![view isKindOfClass:[UITabBar class]]) {
+//        [super addSubview:view];
+//    }
+//
+//}
+//
+//- (void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+//    if ([self isKindOfClass:[UITabBar class]]) {
+//        if ([gestureRecognizer isKindOfClass:NSClassFromString(@"_UIContinuousSelectionGestureRecognizer")]) {
+//            gestureRecognizer.enabled = NO;
+//        }
+//    }
+//    [super addGestureRecognizer:gestureRecognizer];
+//}
+
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     CGPoint location = [gestureRecognizer locationInView:self];
     UIView *hitView = [self hitTest:location withEvent:nil];
+    if ([hitView isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
+        return NO;
+    }
     if ([hitView isKindOfClass:[CYLPlusButton class]]) {
         return NO;
     }
@@ -250,7 +294,7 @@
         if (tag < 0) {
             tag = 0;
         }
-        if (!sSelf || sSelf.selectedIndex == tag) {
+        if (!sSelf ) {
             return;
         }
         
@@ -258,11 +302,12 @@
         if (!sSelf.wlDelegate) {
             sSelf.wlDelegate = self.cyl_tabBarController;
         }
+
         [sSelf.wlDelegate tabBar:sSelf didSelectItemAt:sSelf.selectedIndex];
     };
     tabBarItem.viewTouchUpInside = viewTouchUpInside;
-    if (index == 0) {
-        // viewTouchUpInside(tabBarItem);
+    if (index == self.defaultSelectedIndex) {
+         viewTouchUpInside(tabBarItem);
     }
     
     [self.tabBarItems addObject:tabBarItem];
@@ -286,13 +331,23 @@
         }];
         
     }
-#else
 #endif
+    
+    
+#if __has_include(<Lottie/Lottie-Swift.h>)
+    if ([self isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        CYLFlatDesignTabBar *flatDesignTabBar = (CYLFlatDesignTabBar *)self;
+        [flatDesignTabBar.tabBarItems enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [obj cyl_stopAnimationOfLottieView];
+        }];
+        
+    }
+#endif
+
 }
 
 - (void)setSelectedIndex:(NSInteger)selectedIndex {
-    
-    if (_selectedIndex == selectedIndex) { return; }
+    if (_selectedIndex == selectedIndex && (self.defaultSelectedIndex != selectedIndex)) { return; }
     
     [self closePlus:YES];
     if (self.tabBarItems && self.tabBarItems.count > _selectedIndex) {
@@ -311,10 +366,9 @@
     if (self.plusing) { return; }
     if (lrGR.state == UIGestureRecognizerStateBegan) {
         //TODO: plus button vs touch event?
-        //        self.plusView.isCanTouchesBegan = NO;
+        // self.plusView.isCanTouchesBegan = NO;
         [self didClickPlus];
         //TODO: delegate
-        // AudioServicesPlaySystemSound(1519);
     }
 }
 
@@ -366,9 +420,6 @@
     blurFrame.origin.y = self.plusing ? _blurPlusY : 0;
     
     CGFloat blurRadius = self.plusing ? CYLScaleValue(22) : CYLScaleValue(16);
-    
-    //    UIImage *plusImage = self.plusing ? [UIImage imageNamed:@"home_normal"] : [UIImage imageNamed:@"home_normal"];
-    
     CGFloat tabBarItemScaleXY = self.plusing ? 0.5 : 1;
     CGFloat tabBarItemAlpha = self.plusing ? 0 : 1;
     
@@ -377,10 +428,6 @@
         
         self.blurView.frame = blurFrame;
         self.blurView.layer.cornerRadius = blurRadius;
-        
-        
-        //        self.plusView.image = plusImage;
-        
         for (CYLFlatDesignTabBarItem *tabBarItem in self.tabBarItems) {
             tabBarItem.layer.transform = CATransform3DMakeScale(tabBarItemScaleXY, tabBarItemScaleXY, 1);
             tabBarItem.layer.opacity = tabBarItemAlpha;
@@ -391,32 +438,9 @@
     }
     
     NSTimeInterval beginTime = 0;
-    
-    // ------------------ 背景 ------------------
-    //    [self.backgroundView jp_addPOPBasicAnimationWithPropertyNamed:kPOPViewBackgroundColor toValue:backgroundColor duration:0.3 beginTime:beginTime completionBlock:nil];
-    
     CGFloat springSpeed = self.plusing ? 10 : 17;
     CGFloat springBounciness = self.plusing ? 7 : 4;
-    //    [self.blurView jp_addPOPSpringAnimationWithPropertyNamed:kPOPViewFrame toValue:@(blurFrame) springSpeed:springSpeed springBounciness:springBounciness beginTime:beginTime completionBlock:nil];
-    //    [self.blurView.layer jp_addPOPBasicAnimationWithPropertyNamed:kPOPLayerCornerRadius toValue:@(blurRadius) duration:0.3 beginTime:beginTime completionBlock:nil];
-    // -----------------------------------------
     
-    
-    
-    
-    
-    // ------------------ 按钮 ------------------
-    //    [self.plusSuperView.layer jp_addPOPBasicAnimationWithPropertyNamed:kPOPLayerScaleXY toValue:@(CGPointMake(0.1, 0.1)) duration:0.13 beginTime:beginTime completionBlock:^(POPAnimation *anim, BOOL finished) {
-    //        self.plusView.image = plusImage;
-    //        [self.plusSuperView.layer jp_addPOPSpringAnimationWithPropertyNamed:kPOPLayerScaleXY toValue:@(CGPointMake(1, 1)) springSpeed:20 springBounciness:8 completionBlock:^(POPAnimation *anim, BOOL finished) {
-    //            // 不知道被什么覆盖了点不了，重新按上去
-    //            [self addSubview:self.plusSuperView];
-    //            self.isAnimating = NO;
-    //        }];
-    //    }];
-    // -----------------------------------------
-    
-    // ------------------ 贴吧 ------------------
     beginTime = self.plusing ? 0 : 0.15;
     springSpeed = 20;
     springBounciness = self.plusing ? 7 : 5;
@@ -435,16 +459,13 @@
     CGFloat y = CYLScreenHeight() - h;
     UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectMake(x, y, w, h)];
     backgroundView.backgroundColor = CYLRGBAColor(0, 0, 0, 0);
-    [backgroundView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closePlus)]];
+//    [backgroundView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closePlus)]];
     [self insertSubview:backgroundView belowSubview:self.blurView];
     self.backgroundView = backgroundView;
     
     w = h = CYLScaleValue(60);
     x = CYLScaleValue(43);
     y = _blurPlusY + CYLScaleValue(48);
-    //    CGFloat space = (CYLScreenWidth() - 2 * x - 3 * w) / 2.0;
-    //
-    
 }
 
 - (CYLBaseView *)createTypeViewWithFrame:(CGRect)frame
@@ -619,9 +640,14 @@
 #if __has_include(<Lottie/Lottie.h>)
             CGSize lottieSize = [lottieSizeValue CGSizeValue];
             [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize];
-#else
 #endif
-            
+         
+    
+#if __has_include(<Lottie/Lottie-Swift.h>)
+            CGSize lottieSize = [lottieSizeValue CGSizeValue];
+            [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize];
+#endif
+
         }
     }
     
@@ -638,7 +664,6 @@
         self.imageView.highlighted = isSelected;
         self.titleLabel.textColor = isSelected ? CYLRGBColor(29, 121, 255) : CYLRGBColor(115, 122, 135);
         // self.imgTabIcon.image = self.currentTab?.tabBarItem?.image
-        
         if (isSelected) {
             CGSize lottieSize = [self.lottieSizeValue CGSizeValue];
             [self cyl_animationLottieImageWithLottieURL:self.lottieURL size:lottieSize defaultSelected:NO];

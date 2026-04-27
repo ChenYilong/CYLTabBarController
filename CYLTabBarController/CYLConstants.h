@@ -79,25 +79,6 @@ CG_INLINE CGFloat CYLGetTabBarFullH(CGFloat baseTabBarHeight) {
     }
 }
 
-/*!
- *  屏幕尺寸  不是tabbar尺寸
- */
-CG_INLINE CGSize CYLScreenSize(void) {
-    CGSize size = CYLGetWindowScene().screen.bounds.size;
-    if (size.width == 0 || size.height == 0) {
-        size = [[UIScreen mainScreen] bounds].size;
-    }
-    return size;
-}
-
-CG_INLINE CGFloat CYLScreenWidth(void) {
-    return CYLScreenSize().width;
-}
-
-CG_INLINE CGFloat CYLScreenHeight(void) {
-    return CYLScreenSize().height;
-}
-
 #define CYLRGBColor(r, g, b) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:1]
 #define CYLRGBAColor(r, g, b, a) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:a]
 
@@ -178,6 +159,27 @@ _Pragma("clang diagnostic pop") \
 #define CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 #define CYL_SYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 #define CYL_SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
+
+/*!
+ *  屏幕尺寸  不是tabbar尺寸
+ */
+CG_INLINE CGSize CYLScreenSize(void) {
+    CGSize size = CYLGetWindowScene().screen.bounds.size;
+    if (size.width == 0 || size.height == 0) {
+        CYL_DEPRECATED_DECLARATIONS_PUSH
+        size = [[UIScreen mainScreen] bounds].size;
+        CYL_DEPRECATED_DECLARATIONS_POP
+    }
+    return size;
+}
+
+CG_INLINE CGFloat CYLScreenWidth(void) {
+    return CYLScreenSize().width;
+}
+
+CG_INLINE CGFloat CYLScreenHeight(void) {
+    return CYLScreenSize().height;
+}
 
 CG_INLINE CGFloat CYLScaleValue(CGFloat value) {
     return value * CYLScale;

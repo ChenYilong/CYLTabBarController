@@ -18,7 +18,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"详情页";
+//    self.title = @"详情页";
     self.view.backgroundColor = [UIColor orangeColor];
     
     UILabel *label = [[UILabel alloc] init];

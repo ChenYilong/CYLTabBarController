@@ -154,7 +154,9 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
                                 return;
                             }
                         } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
                             NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif
                         }
                     }
                 }];
@@ -524,7 +526,6 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 - (void)addSubview:(UIView *)view {
     if ([view cyl_isPlatterView]) {
         [self cyl_setPlatterView:view];
-        
         UIView * container = view;
         //  从 PlatterView 中，找真正承载 UITabBarButton 的 ContentView
         UIView *contentView = nil;

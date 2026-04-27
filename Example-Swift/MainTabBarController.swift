@@ -15,6 +15,7 @@ class MainTabBarController: CYLTabBarController {
         tabBarItemsAttributes: [[AnyHashable: Any]],
         imageInsets: UIEdgeInsets,
         titlePositionAdjustment: UIOffset,
+        
         context: String
     ) {
         super.init(
@@ -25,6 +26,37 @@ class MainTabBarController: CYLTabBarController {
             context: context
         )
     }
+    override init(
+        viewControllers: [UIViewController],
+        tabBarItemsAttributes: [[AnyHashable: Any]],
+        imageInsets: UIEdgeInsets,
+        titlePositionAdjustment: UIOffset,
+        styleType: CYLTabBarStyleType,
+        context: String
+    ) {
+        super.init(
+            viewControllers: viewControllers,
+            tabBarItemsAttributes: tabBarItemsAttributes,
+            imageInsets: imageInsets,
+            titlePositionAdjustment: titlePositionAdjustment,
+            styleType: styleType,
+            context: context
+        )
+    }
+  
+//    override init() {
+//            super.init()
+//    }
+
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+            super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+
+//    required init(coder aDecoder: NSCoder) {
+//            super.init(coder: aDecoder)
+//    }
+
+    
     convenience init(context: String = "") {
         let imageInsets = UIEdgeInsets.zero
         let titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3.5)
@@ -54,11 +86,16 @@ class MainTabBarController: CYLTabBarController {
     }
     
     override func viewDidLoad() {
-        super.viewDidLoad()
+        // * @attention 请在父类的 ViewDidLoad 调用之前设置CYLTabBarStyleType。也就是在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
+
         self.tabBarStyleType = .liquidGlass
 
         UIApplication.shared.applicationSupportsShakeToEdit = true
         self.becomeFirstResponder()
+        
+        
+        super.viewDidLoad()
+
     }
     
     

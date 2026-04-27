@@ -32,9 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
     [self setUpNavigationBarAppearance];
 }
  
- 
-
-
 CYL_METHOD_SIGNATURES_PUSH
 - (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
     //设置强制旋转屏幕

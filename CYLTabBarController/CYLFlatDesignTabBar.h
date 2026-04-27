@@ -20,7 +20,10 @@
 @interface CYLFlatDesignTabBar : UITabBar
 
 @property (nonatomic, assign) NSInteger selectedIndex;
+@property (nonatomic, assign) NSInteger defaultSelectedIndex;
+
 @property (nonatomic, weak) id<CYLFlatDesignTabBarDelegate> wlDelegate;
+@property (nonatomic, copy) NSString *context;
 
 @property (nonatomic, strong) NSMutableArray<CYLFlatDesignTabBarItem *> *tabBarItems;
 - (CYLFlatDesignTabBarItem *)addItemWithTitle:(NSString *)title

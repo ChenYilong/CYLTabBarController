@@ -21,7 +21,7 @@
     self.view.backgroundColor = [UIColor whiteColor];
 
     self.navigationItem.title = @"我的";
-    self.tabBarItem.title = @"我的";
+//    self.tabBarItem.title = @"我的";
 
     // ✅ 关键代码：设置 NavigationBar 为白色背景（非透明）
     if (@available(iOS 13.0, *)) {

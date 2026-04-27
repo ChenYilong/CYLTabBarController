@@ -8,6 +8,7 @@
 import CYLTabBarController
 import UIKit
 
+ 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegate {
     var window: UIWindow?
@@ -22,9 +23,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
 
 
         window?.makeKeyAndVisible()
-
-        UITabBar.appearance().backgroundColor = UIColor.white
-
+        //iOS26 不推荐设置 `UITabBar.appearance().backgroundColor` 不仅无法设置背景，同时会干扰 TabBar 里的 Label 未选中颜色，iOS26 里无选中时的Label颜色为系统内部逻辑， 无法自定义。
+//        UITabBar.appearance().backgroundColor = UIColor.white
+//        UITabBar.appearance().unselectedItemTintColor = UIColor.label;
+        
         return true
     }
 

@@ -127,18 +127,18 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
                 titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                                 context:(NSString *)context;
 
++ (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
+                              tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
+                                        imageInsets:(UIEdgeInsets)imageInsets
+                            titlePositionAdjustment:(UIOffset)titlePositionAdjustment
+                                            context:(NSString *)context;
+
 - (instancetype)initWithViewControllers:(NSArray<UIViewController *> *)viewControllers
                   tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
                             imageInsets:(UIEdgeInsets)imageInsets
                 titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                               styleType:(CYLTabBarStyleType)styleType
                                 context:(NSString *)context;
-
-+ (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
-                              tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
-                                        imageInsets:(UIEdgeInsets)imageInsets
-                            titlePositionAdjustment:(UIOffset)titlePositionAdjustment
-                                            context:(NSString *)context;
 
 + (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
                               tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
