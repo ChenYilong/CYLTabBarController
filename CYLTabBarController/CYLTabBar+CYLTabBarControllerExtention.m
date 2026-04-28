@@ -189,7 +189,7 @@
     }
     //_UITabButton
     [self cyl_stopAnimationOfAllLottieView];
-    [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected contentMode:contentMode]
+    [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected contentMode:contentMode];
 
 #endif
     

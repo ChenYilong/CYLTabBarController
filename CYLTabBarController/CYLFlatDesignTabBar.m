@@ -639,7 +639,7 @@
         if (lottieURL) {
 #if __has_include(<Lottie/Lottie.h>)
             CGSize lottieSize = [lottieSizeValue CGSizeValue];
-            [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize];
+            [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.cyl_tabBarController.lottieAnimationViewContentMode];
 #endif
          
     
