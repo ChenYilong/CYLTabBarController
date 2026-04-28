@@ -11,8 +11,8 @@ target 'CYLTabBarController' do
 #pod 'CYLTabBarController/LottieSwift', '~> 1.99.19'  # 依赖Lottie Swift库
 
 #pod 'CYLTabBarController', :path => './'
-#pod 'CYLTabBarController/LottieObjectiveC', :path => './'
-pod 'CYLTabBarController/LottieSwift', :path => './'
+pod 'CYLTabBarController/LottieObjectiveC', :path => './'
+#pod 'CYLTabBarController/LottieSwift', :path => './'
 
 
 pod 'MJRefresh'
