@@ -122,7 +122,11 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
  *  重写此方法即不会出现上述情况，与 UITabBarButton 相似
  */
 - (void)setHighlighted:(BOOL)highlighted {}
-  
+
+- (CGRect)touchableRect {
+    return self.frame;
+}
+
 - (UIImage *)getSnapshot {
 //    return CYLExternPlusButton.imageView.image;
     if (_snapshot) {

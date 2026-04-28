@@ -42,11 +42,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, getter=cyl_shouldNotSelect, setter=cyl_setShouldNotSelect:) BOOL cyl_shouldNotSelect;
 
 - (void)cyl_addLottieImageWithLottieURL:(NSURL *)lottieURL
-                                   size:(CGSize)size;
-
+                                   size:(CGSize)size
+                            contentMode:(UIViewContentMode)contentMode;
 - (void)cyl_animationLottieImageWithLottieURL:(NSURL *)lottieURL
                                          size:(CGSize)size
-                              defaultSelected:(BOOL)defaultSelected;
+                              defaultSelected:(BOOL)defaultSelected
+                                  contentMode:(UIViewContentMode)contentMode;
 
 - (void)cyl_stopAnimationOfLottieView;
 

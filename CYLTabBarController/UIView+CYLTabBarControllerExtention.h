@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL) cyl_isPlatterLiquidLensBackdropView;
 - (BOOL)cyl_isPlatterVisualProviderFloatingSelectedContentView;
 
+- (UIImageView *)cyl_imageView;
 - (BOOL)cyl_isTabImageView;
 - (BOOL)cyl_isTabLabel;
 - (BOOL)cyl_isTabBadgeView;

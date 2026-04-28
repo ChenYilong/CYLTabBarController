@@ -16,9 +16,12 @@
 #import "UIImage+CYLTabBarControllerExtention.h"
 
 static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
+static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 
 
 @interface CYLTabBar () <UIGestureRecognizerDelegate>
+
+@property (nonatomic, copy) NSMutableSet<UIView *> *observedViews;
 
 @end
 
@@ -176,9 +179,36 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
         [self setupTabImageViewDefaultOffset:self.tabBarButtonArray[0]];
     }
     
+    // FIX: iOS15有时候会导致TaBar透明的问题 但是这样会导致无法主动让TabBar透明 考虑以后添加属性 // 现在通过判断isHidden来处理，如果隐藏了就不再修改alpha
+    if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0")) {
+        [self removeAlphaObserver];
+        UIView *backgroundView = self.cyl_tabBackgroundView;
+        UIView *shadowView = self.cyl_tabShadowImageView.subviews.firstObject;
+        
+        if (shadowView && ![self.observedViews containsObject:shadowView]) {
+            [self.observedViews addObject:shadowView];
+            [shadowView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew context:CYLTabBarAlpha];
+        }
+        if ([UITabBar appearance].backgroundImage) {
+            UIView *imageView = backgroundView.cyl_imageView;
+            if (imageView && ![self.observedViews containsObject:imageView]) {
+                [self.observedViews addObject:imageView];
+                [imageView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew context:CYLTabBarAlpha];
+            }
+        } else {
+            UIView *effectView = backgroundView.cyl_tabEffectView;
+            if (effectView && ![self.observedViews containsObject:effectView]) {
+                [self.observedViews addObject:effectView];
+                [effectView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew context:CYLTabBarAlpha];
+            }
+        }
+    }
     CGFloat tabBarWidth = self.cyl_boundsSize.width;
     
     if (!self.addPlusButton) {
+        if (self.didLayoutSubViewsBlock) {
+            self.didLayoutSubViewsBlock(self);
+        }
         return;
     }
     
@@ -194,6 +224,9 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
                                 index:buttonIndex
             ];
         }];
+        if (self.didLayoutSubViewsBlock) {
+            self.didLayoutSubViewsBlock(self);
+        }
         return;
     }
     CYLTabBarItemWidth = (tabBarWidth - CYLPlusButtonWidth) / CYLTabbarItemsCount;
@@ -234,6 +267,9 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
                             index:visiableTabIndex
         ];
     }];
+    if (self.didLayoutSubViewsBlock) {
+        self.didLayoutSubViewsBlock(self);
+    }
 }
 
 /*!
@@ -303,12 +339,25 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 #pragma mark -
 #pragma mark - Private Methods
 
-//+ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key {
-//    return NO;
-//}
++ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key {
+    return NO;
+}
 
 // KVO监听执行
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (context == CYLTabBarAlpha) {
+        UIView *view = object;
+        if (!view.isHidden) {
+            if ([change[NSKeyValueChangeNewKey] floatValue] == 0) {
+                view.alpha = 1;
+            }
+        }
+        return;
+    }
+    if(context != CYLTabBarContext) {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
     if(context == CYLTabBarContext) {
         [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemWidthDidChangeNotification object:self];
         if (@available(iOS 11.0, *)) {
@@ -316,6 +365,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
                 [self layoutIfNeeded];
             }
         }
+        return;
     }
 }
 
@@ -323,7 +373,17 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     // KVO反注册
     @try {
         [self removeObserver:self forKeyPath:@"tabBarItemWidth"];
+        [self removeAlphaObserver];
     } @catch (NSException *exception) {
+    }
+}
+
+- (void)removeAlphaObserver {
+    if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0")) {
+        [_observedViews enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, BOOL * _Nonnull stop) {
+            [obj removeObserver:self forKeyPath:@"alpha"];
+        }];
+        [_observedViews removeAllObjects];
     }
 }
 
@@ -487,7 +547,7 @@ static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
     }
     
     if (self.plusButton) {
-        CGRect plusButtonFrame = self.plusButton.frame;
+        CGRect plusButtonFrame = [self.plusButton touchableRect];
         BOOL isInPlusButtonFrame = CGRectContainsPoint(plusButtonFrame, point);
         if (isInPlusButtonFrame) {
             return self.plusButton;

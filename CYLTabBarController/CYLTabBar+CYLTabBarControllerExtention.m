@@ -181,14 +181,15 @@
 - (void)cyl_animationLottieImageWithSelectedControl:(UIControl *)selectedControl
                                           lottieURL:(NSURL *)lottieURL
                                                size:(CGSize)size
-                                    defaultSelected:(BOOL)defaultSelected {
+                                    defaultSelected:(BOOL)defaultSelected
+                                        contentMode:(UIViewContentMode)contentMode {
 #if __has_include(<Lottie/Lottie.h>)
     if (!lottieURL) {
         return;
     }
     //_UITabButton
     [self cyl_stopAnimationOfAllLottieView];
-    [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected];
+    [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected contentMode:contentMode]
 
 #endif
     
@@ -198,7 +199,7 @@
     }
     //_UITabButton
     [self cyl_stopAnimationOfAllLottieView];
-    [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected];
+    [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected contentMode:contentMode];
 #endif
     
 

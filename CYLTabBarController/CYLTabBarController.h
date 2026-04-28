@@ -97,10 +97,19 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
 @property (nonatomic, strong, readonly) CYLTabBar *tabBar;
 
 /*!
+ *  动画视图的渲染模式 只有集成了lottie动画才会生效
+ */
+- (UIViewContentMode)lottieAnimationViewContentMode;
+/*!
  * To set both UIBarItem label text attributes in the tabBar,
  * use the following to tweak the relative position of the label within the tab button (for handling visual centering corrections if needed because of custom text attributes)
  */
 @property (nonatomic, readonly, assign) UIOffset titlePositionAdjustment;
+
+/*!
+ * /// 如果用户设置的TabBarItemImageViewSize不合规，则依据父视图大小来调整，否则依据默认的imageView的大小来调整
+ */
+@property (nonatomic, assign) BOOL adjustTabBarItemImageViewSizeDependOnSuperView;
 
 /** 可以不设置， 默认为 CYLTabBarController，如果设置了，请实现 CYLPlusButton 里 的 +[CYLPlusButton tabBarContext] 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController */
 @property (nonatomic, readonly, copy) NSString *context;
@@ -172,6 +181,13 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
 
 - (UIWindow *)rootWindow;
 
+/*!
+ *
+/// 更新TabBarItems 其内部其实也重新设置了viewControllers
+/// @param tabBarItemsAttributes tabBarItemsAttributes
+ */
+- (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
+
 - (CGSize)visiableTabBarSize;
 
 /*!
@@ -188,6 +204,7 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
 
 @property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs;
 @property (nonatomic, strong, readonly) NSMutableArray *lottieSizes;
+
 @end
 
 @interface NSObject (CYLTabBarControllerReferenceExtension)

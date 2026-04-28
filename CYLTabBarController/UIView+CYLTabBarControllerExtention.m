@@ -221,6 +221,15 @@
     return isTabBackgroundView;
 }
 
+- (UIImageView *)cyl_imageView {
+    for (UIImageView *subview in self.subviews) {
+        if ([subview isKindOfClass:[UIImageView class]]) {
+            return (UIImageView *)subview;
+        }
+    }
+    return nil;
+}
+
 - (UIImageView *)cyl_tabImageView {
     UIImageView *imageView = nil;
     do {

@@ -336,14 +336,17 @@
         !completion?:completion(NO, self, nil);
         return;
     }
-    if (newView.frame.size.width == 0 || newView.frame.size.height == 0) {
-        //TODO: 区分cover 与 replace 两个场景， 获取到真实的view，可能是lottie，决定是否限制新视图的尺寸， 目前暂不限制尺寸。 因为主要场景为 cover 场景。
-        //    if(!shouldHideOriginalView) && (newView.frame.size.width > tabBarButton.frame.size.width || newView.frame.size.height > tabBarButton.frame.size.height) {
-
-        UIImage *image = swappableImageView.image;
+//        //TODO: 区分cover 与 replace 两个场景， 获取到真实的view，可能是lottie，决定是否限制新视图的尺寸， 目前暂不限制尺寸。 因为主要场景为 cover 场景。cover =( adjustTabBarItemImageViewSizeDependOnSuperView == yes), replace =( adjustTabBarItemImageViewSizeDependOnSuperView == NO)
+    if (newView.frame.size.width == 0 || newView.frame.size.height == 0 || newView.frame.size.width > tabBarButton.frame.size.width || newView.frame.size.height > tabBarButton.frame.size.height) {
+        
         newView.frame = ({
             CGRect frame = newView.frame;
-            frame.size = CGSizeMake(image.size.width, image.size.height);
+            if (self.cyl_tabBarController.adjustTabBarItemImageViewSizeDependOnSuperView) {
+                frame.size = tabBarButton.frame.size;
+            } else {
+                UIImage *image = swappableImageView.image;
+                frame.size = CGSizeMake(image.size.width, image.size.height);
+            }
             frame;
         });
     }
@@ -430,7 +433,8 @@
 }
 
 - (void)cyl_addLottieImageWithLottieURL:(NSURL *)lottieURL
-                                   size:(CGSize)size {
+                                   size:(CGSize)size
+                            contentMode:(UIViewContentMode)contentMode {
 #if __has_include(<Lottie/Lottie.h>)
     if (!lottieURL) {
         return;
@@ -442,7 +446,7 @@
     LOTAnimationView *lottieView = [[LOTAnimationView alloc] initWithContentsOfURL:lottieURL];
     lottieView.frame = CGRectMake(0, 0, size.width, size.height);
     lottieView.userInteractionEnabled = NO;
-    lottieView.contentMode = UIViewContentModeScaleAspectFill;
+    lottieView.contentMode = contentMode;
     lottieView.translatesAutoresizingMaskIntoConstraints = NO;
     [lottieView setClipsToBounds:NO];
     [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
@@ -461,7 +465,8 @@
     CompatibleLOTAnimationView *lottieView = [[CompatibleLOTAnimationView alloc] initWithCompatibleAnimation:composition];
     lottieView.frame = CGRectMake(0, 0, size.width, size.height);
     lottieView.userInteractionEnabled = NO;
-    lottieView.contentMode = UIViewContentModeScaleAspectFill;
+    lottieView.contentMode = contentMode;
+
     lottieView.translatesAutoresizingMaskIntoConstraints = NO;
     [lottieView setClipsToBounds:NO];
     [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
@@ -471,16 +476,18 @@
 
 - (void)cyl_animationLottieImageWithLottieURL:(NSURL *)lottieURL
                                                size:(CGSize)size
-                                    defaultSelected:(BOOL)defaultSelected {
+                                    defaultSelected:(BOOL)defaultSelected
+                                  contentMode:(UIViewContentMode)contentMode {
+
 #if __has_include(<Lottie/Lottie.h>)
     if (!lottieURL) {
         return;
     }
     //_UITabButton
-    [self cyl_addLottieImageWithLottieURL:lottieURL size:size];
+    [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
     LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
     if (!lottieView) {
-        [self cyl_addLottieImageWithLottieURL:lottieURL size:size];
+        [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
     }
     lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
     if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]]) {
@@ -500,13 +507,13 @@
         return;
     }
     //_UITabButton
-    [self cyl_addLottieImageWithLottieURL:lottieURL size:size];
+    [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
 
     CompatibleLOTAnimationView *lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
     
     
     if (!lottieView) {
-        [self cyl_addLottieImageWithLottieURL:lottieURL size:size];
+        [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
     }
     lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
 

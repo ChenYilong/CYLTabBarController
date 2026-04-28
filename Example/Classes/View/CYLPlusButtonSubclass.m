@@ -306,6 +306,10 @@
 //    return NSStringFromClass([CYLMainRootViewController class]);
 //}
 
+- (CGRect)touchableRect {
+    return self.frame;
+}
+
 + (UIImage *)selectedContentImage {
     UIImage *hlightButtonImage = [UIImage imageNamed:@"post_highlight"];
     return hlightButtonImage ;

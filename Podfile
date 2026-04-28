@@ -6,11 +6,12 @@ target 'CYLTabBarController' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-#pod 'CYLTabBarController', '~> 1.99.18'        # 默认不依赖Lottie
-#pod 'CYLTabBarController/Lottie', '~> 1.99.18'  # 依赖Lottie库
+#pod 'CYLTabBarController', '~> 1.99.19'        # 默认不依赖Lottie
+#pod 'CYLTabBarController/LottieObjectiveC', '~> 1.99.19'  # 依赖Lottie Objective-C库
+#pod 'CYLTabBarController/LottieSwift', '~> 1.99.19'  # 依赖Lottie Swift库
 
 #pod 'CYLTabBarController', :path => './'
-#pod 'CYLTabBarController/Lottie', :path => './'
+#pod 'CYLTabBarController/LottieObjectiveC', :path => './'
 pod 'CYLTabBarController/LottieSwift', :path => './'
 
 

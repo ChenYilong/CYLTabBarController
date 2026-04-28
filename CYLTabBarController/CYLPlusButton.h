@@ -69,9 +69,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)tabBarContext;
 
 /*!
- * iOS26+ selectedContentView 只有在选中状态下会显示。
- 
+* 可点击的范围
+*/
+- (CGRect)touchableRect;
 
+/*!
+ * iOS26+ selectedContentView 只有在选中状态下会显示。
  */
 + (UIButton *)selectedContentView;
 

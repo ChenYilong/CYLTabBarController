@@ -645,7 +645,7 @@
     
 #if __has_include(<Lottie/Lottie-Swift.h>)
             CGSize lottieSize = [lottieSizeValue CGSizeValue];
-            [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize];
+            [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.cyl_tabBarController.lottieAnimationViewContentMode];
 #endif
 
         }
@@ -666,7 +666,7 @@
         // self.imgTabIcon.image = self.currentTab?.tabBarItem?.image
         if (isSelected) {
             CGSize lottieSize = [self.lottieSizeValue CGSizeValue];
-            [self cyl_animationLottieImageWithLottieURL:self.lottieURL size:lottieSize defaultSelected:NO];
+            [self cyl_animationLottieImageWithLottieURL:self.lottieURL size:lottieSize defaultSelected:NO contentMode:self.cyl_tabBarController.lottieAnimationViewContentMode];
         } else {
             [self cyl_stopAnimationOfLottieView];
         }

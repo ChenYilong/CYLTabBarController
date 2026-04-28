@@ -306,11 +306,12 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         plusButton.selected = NO;
         [plusButton removeFromSuperview];
     }
-    BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
-    BOOL hasPlusChildViewController = [self hasPlusChildViewController] && isAdded;
-    if (isAdded && hasPlusChildViewController && CYLPlusChildViewController.cyl_plusViewControllerEverAdded == YES) {
-        [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:NO];
-    }
+    /// MARK: 这里是全局处理，如果生成新的，这里操作时会破坏新的视图展示
+//    BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
+//    BOOL hasPlusChildViewController = [self hasPlusChildViewController] && isAdded;
+//    if (isAdded && hasPlusChildViewController && CYLPlusChildViewController.cyl_plusViewControllerEverAdded == YES) {
+//        [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:NO];
+//    }
     // KVO反注册
     if (self.tabBar && self.isObservingTabImageViewDefaultOffset) {
         @try {
@@ -369,11 +370,16 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
         _imageInsets = imageInsets;
         _titlePositionAdjustment = titlePositionAdjustment;
         _tabBarItemsAttributes = tabBarItemsAttributes;
+        _adjustTabBarItemImageViewSizeDependOnSuperView = YES;
         self.tabBarStyleType = styleType;// 步骤1 must use setter 必须在 self.viewControllers之前设置， 因为 self.viewControllers直接涉及到样式判断逻辑。
         self.viewControllers = viewControllers;// 步骤2 must use setter,必须在 self.tabBarStyleType之后设置， 因为 self.viewControllers 直接涉及到扁平TabBar样式KVC逻辑。
         self.context = context; // 步骤3 must use setter 必须在 self.viewControllers之后设置， 因为 self.viewControllers 直接涉及样式判断逻辑。
     }
     return self;
+}
+
+- (UIViewContentMode)lottieAnimationViewContentMode {
+    return UIViewContentModeScaleAspectFit;
 }
 
 - (NSString *)context {
@@ -635,6 +641,25 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             [self setNoNeedUIDesignCompatibility:YES];
             break;
     }
+}
+
+- (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
+    _tabBarItemsAttributes = tabBarItemsAttributes;
+    self.invokeOnceViewDidLayoutSubViewsBlock = YES;
+    self.lottieViewAdded = NO;
+    [_lottieURLs removeAllObjects];
+    [_lottieSizes removeAllObjects];
+    NSInteger index = [self selectedIndex];
+    UIViewController *selected = _viewControllers[index];
+    UIView *superView = selected.view.superview;
+    NSMutableArray<UIViewController *> *viewControllers = [_viewControllers mutableCopy];
+    if ([self hasPlusChildViewController]) {
+        [viewControllers removeObjectAtIndex:CYLPlusButtonIndex];
+    }
+    [self setViewControllers:viewControllers];
+    [self.view setNeedsLayout];
+    self.selectedIndex = index;
+    [superView addSubview:selected.view];
 }
 
 #pragma mark -
@@ -1168,9 +1193,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         NSURL *lottieURL = self.lottieURLs[index];
         NSValue *lottieSizeValue = self.lottieSizes[index];
         CGSize lottieSize = [lottieSizeValue CGSizeValue];
-        [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize];
+        [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode];
         if (animation) {
-            [self.tabBar cyl_animationLottieImageWithSelectedControl:control lottieURL:lottieURL size:lottieSize defaultSelected:defaultSelected];
+            [self.tabBar cyl_animationLottieImageWithSelectedControl:control lottieURL:lottieURL size:lottieSize defaultSelected:defaultSelected contentMode:self.lottieAnimationViewContentMode];
         }
     }
 }
@@ -1189,7 +1214,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         return;
     }
     
-
     NSURL *lottieURL = theLottieURL;
     NSValue *lottieSizeValue = theLottieSizeValue;
 
@@ -1212,7 +1236,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     }
     
     CGSize lottieSize = [lottieSizeValue CGSizeValue];
-    [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize];
+    [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode];
     
     if (![self.tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
@@ -1220,13 +1244,21 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     selectedContentControl = [self.tabBar cyl_selectedContentControlFromContentControl:contentControl];
 
     if (selectedContentControl) {
-        [selectedContentControl cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize];
+        [selectedContentControl cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode];
     }
     
     if (animation) {
-        [self.tabBar cyl_animationLottieImageWithSelectedControl:contentControl lottieURL:lottieURL size:lottieSize defaultSelected:defaultSelected];
+        [self.tabBar cyl_animationLottieImageWithSelectedControl:contentControl
+                                                       lottieURL:lottieURL
+                                                            size:lottieSize
+                                                 defaultSelected:defaultSelected
+                                                     contentMode:self.lottieAnimationViewContentMode];
         if (selectedContentControl) {
-            [self.tabBar cyl_animationLottieImageWithSelectedControl:selectedContentControl lottieURL:lottieURL size:lottieSize defaultSelected:defaultSelected];
+            [self.tabBar cyl_animationLottieImageWithSelectedControl:selectedContentControl
+                                                           lottieURL:lottieURL
+                                                                size:lottieSize
+                                                     defaultSelected:defaultSelected
+                                                         contentMode:self.lottieAnimationViewContentMode];
         }
     }
 }
@@ -1282,16 +1314,15 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 #pragma mark - Override selectedViewController (User initiated)
-//FIXME:  to delete
-- (void)setSelectedViewController:(__kindof UIViewController *)selectedViewController {
 
+- (void)setSelectedViewController:(__kindof UIViewController *)selectedViewController {
     //必须调用父类逻辑。
     [super setSelectedViewController:selectedViewController];
-//    [self.tabBar layoutIfNeeded];
+    //    [self.tabBar layoutIfNeeded];
     // 用户点击 tab 时会触发 //showing initial vc for every tab :)
     UIControl *control = selectedViewController.cyl_tabButton;
     
-   
+    
     if ([selectedViewController isEqual:CYLPlusChildViewController]) {
         CYLExternPlusButton.selected = YES;
         [self tabChangedToSelectedIndex:CYLPlusButtonIndex
@@ -1302,7 +1333,11 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                          viewController:selectedViewController
                                 control:control];
     }
-    
+    // Fix: 解决iOS15有时候TabBar会变透明的问题
+    if ([UITabBar appearance].backgroundImage == nil) {
+        self.tabBar.cyl_tabBackgroundView.cyl_tabEffectView.alpha = 1;
+        self.tabBar.cyl_tabShadowImageView.subviews.firstObject.alpha = 1;
+    }
 }
 
 #pragma mark - Override selectedIndex (Programmatic changes)

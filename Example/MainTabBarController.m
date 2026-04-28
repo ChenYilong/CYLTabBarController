@@ -600,4 +600,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     self.tabBar.selectionIndicatorImage = finalImage;
 }
 
+- (UIViewContentMode)lottieAnimationViewContentMode {
+    return UIViewContentModeScaleAspectFit;
+}
+
 @end
