@@ -435,7 +435,20 @@
 - (void)cyl_addLottieImageWithLottieURL:(NSURL *)lottieURL
                                    size:(CGSize)size
                             contentMode:(UIViewContentMode)contentMode {
+    NSString *lottieFilePath = [lottieURL path];
+    [self cyl_addLottieImageWithLottieFilePath:lottieFilePath size:size contentMode:contentMode];
+}
+
+- (void)cyl_addLottieImageWithLottieFilePath:(NSString *)lottieFilePath
+                                        size:(CGSize)size
+                                 contentMode:(UIViewContentMode)contentMode {
+    if (!lottieFilePath) {
+        return;
+    }
+    
+    NSURL *lottieURL = [NSURL fileURLWithPath:lottieFilePath];
 #if __has_include(<Lottie/Lottie.h>)
+    
     if (!lottieURL) {
         return;
     }
@@ -451,7 +464,7 @@
     [lottieView setClipsToBounds:NO];
     [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
 #endif
-
+    
 #if __has_include(<Lottie/Lottie-Swift.h>)
     if (!lottieURL) {
         return;
@@ -460,18 +473,17 @@
         return;
     }
     UIControl *tabButton = self;
-    NSString *filePath = [lottieURL path];
+    NSString *filePath = lottieFilePath;
     CompatibleLOTAnimation *composition = [[CompatibleLOTAnimation alloc] initWithFilepath:filePath];
     CompatibleLOTAnimationView *lottieView = [[CompatibleLOTAnimationView alloc] initWithCompatibleAnimation:composition];
     lottieView.frame = CGRectMake(0, 0, size.width, size.height);
     lottieView.userInteractionEnabled = NO;
     lottieView.contentMode = contentMode;
-
+    
     lottieView.translatesAutoresizingMaskIntoConstraints = NO;
     [lottieView setClipsToBounds:NO];
     [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
 #endif
-    
 }
 
 - (void)cyl_animationLottieImageWithLottieURL:(NSURL *)lottieURL
@@ -492,6 +504,7 @@
     lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
     if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]]) {
         if (defaultSelected) {
+            //Avoid triggering Lottie animation when index == 0 on app startup. 希望Lottie icon 启动后 index== 0 不执行动画 #389
             lottieView.animationProgress = 1;
             [lottieView forceDrawingUpdate];
             return;
@@ -508,17 +521,19 @@
     }
     //_UITabButton
     [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
-
     CompatibleLOTAnimationView *lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-    
-    
     if (!lottieView) {
         [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
     }
     lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-
-
     if (lottieView && [NSStringFromClass([lottieView class]) containsString:NSStringFromClass([CompatibleLOTAnimationView class])]) {
+        if (defaultSelected) {
+            //Avoid triggering Lottie animation when index == 0 on app startup. 希望Lottie icon 启动后 index== 0 不执行动画 #389
+            [lottieView animationProgress:1];
+            [lottieView forceDrawingUpdate];
+            return;
+        }
+        [lottieView animationProgress:0];
         ///播放到指定进度（0-1）
         [lottieView play];
     }

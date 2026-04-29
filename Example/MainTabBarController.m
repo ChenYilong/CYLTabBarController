@@ -105,7 +105,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                  CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
                                                  //第一位 右大，下大
-                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"]],
+                                                 CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"],
 //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                  };
     CGFloat secondXOffset = (-25+2)/2;
@@ -114,7 +114,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                   CYLTabBarItemImage :@"fishpond_normal",
                                                   CYLTabBarItemSelectedImage : @"fishpond_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)],
-                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"]],
+                                                  CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"],
 //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                   };
     
@@ -123,7 +123,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                  CYLTabBarItemImage : @"message_normal",
                                                  CYLTabBarItemSelectedImage : @"message_highlight",
                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-secondXOffset, -3.5)],
-                                                 CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news" ofType:@"json"]],
+                                                 CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news" ofType:@"json"],
 //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                  };
     NSDictionary *fourthTabBarItemsAttributes = @{
@@ -131,7 +131,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                   CYLTabBarItemImage : @"account_normal",
                                                   CYLTabBarItemSelectedImage : @"account_highlight",
                                                   CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-firstXOffset, -3.5)],
-                                                  CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine" ofType:@"json"]],
+                                                  CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine" ofType:@"json"],
 //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
                                                   };
     NSArray *tabBarItemsAttributes = @[
@@ -412,7 +412,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                 [viewController0 cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
                 [viewController0 cyl_setBadgeRadius:11/2];
                 [viewController0 cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeBreathe];
-                [self setSelectedCoverShow:YES];
+//                [self setSelectedCoverShow:YES];
                 //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
                 //                [viewController0 cyl_showBadge];
                 

@@ -17,7 +17,7 @@ assignees: ChenYilong
 <p align="center">
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec"><img src="https://img.shields.io/badge/Pod-GetLatestVersion-green.svg?style=flat"></a>
 <a href=""><img src="https://img.shields.io/badge/Swift-compatible-orange.svg"></a>
-<a href=""><img src="https://img.shields.io/badge/platform-iOS%208.0%2B-ff69b5152950834.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/platform-iOS%2012.0%2B-ff69b5152950834.svg"></a>
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
 
 </p>
@@ -60,7 +60,7 @@ assignees: ChenYilong
 
  1. Version：Latest Version as [here](https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec) 
  2. Language of App ：Objective-C/Swift
- 4. iOS System Version：iOS12
+ 4. iOS System Version：iOS26
  5. Prototype（是否是真机）：YES
  6. Issue Type：Crash、Bug、Enhancement（希望能支持一个新需求）、Q-A
 

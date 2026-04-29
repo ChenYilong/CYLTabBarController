@@ -271,7 +271,7 @@
                                         index:(NSInteger)index
                       titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                                   imageInsets:(UIEdgeInsets)imageInsets
-                                    lottieURL:(NSURL *)lottieURL
+                               lottieFilePath:(NSString *)lottieFilePath
                               lottieSizeValue:(NSValue *)lottieSizeValue {
     CYLFlatDesignTabBarItem *tabBarItem = [[CYLFlatDesignTabBarItem alloc] initWithFrame:[self tabBarItemFrameWithIndex:index]
                                                                                    title:title
@@ -280,7 +280,7 @@
                                                                                    index:index
                                                                  titlePositionAdjustment:titlePositionAdjustment
                                                                              imageInsets:imageInsets
-                                                                               lottieURL:lottieURL
+                                                                          lottieFilePath:lottieFilePath
                                                                          lottieSizeValue:lottieSizeValue];
     tabBarItem.tag = index;
     tabBarItem.isSelected = index == 0;
@@ -529,7 +529,7 @@
                         index:(NSInteger)index
       titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                   imageInsets:(UIEdgeInsets)imageInsets
-                    lottieURL:(NSURL *)lottieURL
+               lottieFilePath:(NSString *)lottieFilePath
               lottieSizeValue:(NSValue *)lottieSizeValue {
     if (self = [super initWithFrame:frame]) {
         
@@ -539,7 +539,7 @@
         
         self.titlePositionAdjustment = titlePositionAdjustment;
         self.imageInsets = imageInsets;
-        self.lottieURL = lottieURL;
+        self.lottieFilePath = lottieFilePath;
         
         NSValue *tureLottieSizeValue = [CYLConstants cyl_getTureLottieSizeValue:lottieSizeValue fromNormalImage:self.tabBarItemImage];
         self.lottieSizeValue = tureLottieSizeValue;
@@ -636,6 +636,12 @@
         }
         self.tag = tag;
         
+        NSURL *lottieURL;
+        
+        if (lottieFilePath) {
+            lottieURL = [NSURL fileURLWithPath:lottieFilePath];
+        }
+
         if (lottieURL) {
 #if __has_include(<Lottie/Lottie.h>)
             CGSize lottieSize = [lottieSizeValue CGSizeValue];
@@ -666,7 +672,8 @@
         // self.imgTabIcon.image = self.currentTab?.tabBarItem?.image
         if (isSelected) {
             CGSize lottieSize = [self.lottieSizeValue CGSizeValue];
-            [self cyl_animationLottieImageWithLottieURL:self.lottieURL size:lottieSize defaultSelected:NO contentMode:self.cyl_tabBarController.lottieAnimationViewContentMode];
+            NSURL *url = [NSURL fileURLWithPath:self.lottieFilePath];
+            [self cyl_animationLottieImageWithLottieURL:url size:lottieSize defaultSelected:NO contentMode:self.cyl_tabBarController.lottieAnimationViewContentMode];
         } else {
             [self cyl_stopAnimationOfLottieView];
         }

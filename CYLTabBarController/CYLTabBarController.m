@@ -30,6 +30,7 @@ NSString *const CYLTabBarItemImage = @"CYLTabBarItemImage";
 NSString *const CYLTabBarItemSelectedImage = @"CYLTabBarItemSelectedImage";
 NSString *const CYLTabBarItemImageInsets = @"CYLTabBarItemImageInsets";
 NSString *const CYLTabBarItemTitlePositionAdjustment = @"CYLTabBarItemTitlePositionAdjustment";
+NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
 
@@ -802,6 +803,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         UIOffset titlePositionAdjustment = UIOffsetZero;
         UIEdgeInsets imageInsets = UIEdgeInsetsZero;
         NSURL *lottieURL = nil;
+        NSString *lottieFilePath = nil;
+
         NSValue *lottieSizeValue = nil;
         if (viewController != CYLPlusChildViewController) {
             if (_tabBarItemsAttributes.count > idx) {
@@ -815,6 +818,11 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                 normalImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemImage];
                 selectedImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage];
                 lottieURL = _tabBarItemsAttributes[idx][CYLTabBarLottieURL];
+                lottieFilePath = _tabBarItemsAttributes[idx][CYLTabBarLottieFilePath];
+
+                if (!lottieURL) {
+                    lottieURL = [NSURL URLWithString:lottieFilePath];
+                }
                 lottieSizeValue = _tabBarItemsAttributes[idx][CYLTabBarLottieSize];
                 
                 NSValue *offsetValue = _tabBarItemsAttributes[idx][CYLTabBarItemTitlePositionAdjustment];
@@ -861,7 +869,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                                                                                 index:idx
                                                               titlePositionAdjustment:titlePositionAdjustment
                                                                           imageInsets:imageInsets
-                                                                            lottieURL:lottieURL
+                                                                       lottieFilePath:lottieFilePath
                                                                       lottieSizeValue:lottieSizeValue];
                 [viewController cyl_setTabButton:tabItem];
                 [[viewController cyl_getViewControllerInsteadOfNavigationController] cyl_setTabButton:tabItem];
@@ -1093,7 +1101,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     BOOL isLottieEnabledFromAttributes = NO;
     if (self.tabBarItemsAttributes && self.tabBarItemsAttributes.count > 0) {
         @try {
-            isLottieEnabledFromAttributes = self.tabBarItemsAttributes[0][CYLTabBarLottieURL];
+            isLottieEnabledFromAttributes = self.tabBarItemsAttributes[0][CYLTabBarLottieURL] || self.tabBarItemsAttributes[0][CYLTabBarLottieFilePath];
         } @catch (NSException *exception) {
         }
     }
@@ -1107,7 +1115,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     BOOL isLottieEnabledFromAttributes = NO;
     if (self.tabBarItemsAttributes && self.tabBarItemsAttributes.count > 0) {
         @try {
-            isLottieEnabledFromAttributes = self.tabBarItemsAttributes[0][CYLTabBarLottieURL];
+            isLottieEnabledFromAttributes = self.tabBarItemsAttributes[0][CYLTabBarLottieURL] || self.tabBarItemsAttributes[0][CYLTabBarLottieFilePath];
         } @catch (NSException *exception) {
         }
     }

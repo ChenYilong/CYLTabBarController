@@ -32,7 +32,7 @@
                                         index:(NSInteger)index
                       titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                                   imageInsets:(UIEdgeInsets)imageInsets
-                                    lottieURL:(NSURL *)lottieURL
+                               lottieFilePath:(NSString *)lottieFilePath
                               lottieSizeValue:(NSValue *)lottieSizeValue;
 @property (nonatomic, weak) UIView *plusSuperView;
 @property (nonatomic, weak) UIButton<CYLPlusButtonSubclassing> *plusView;
@@ -55,7 +55,9 @@
 
 @property (nonatomic, assign) UIOffset titlePositionAdjustment;
 @property (nonatomic, assign) UIEdgeInsets imageInsets;
-@property (nonatomic, strong) NSURL *lottieURL;
+//@property (nonatomic, strong) NSURL *lottieURL;
+@property (nonatomic, copy) NSString *lottieFilePath;
+
 @property (nonatomic, strong) NSValue *lottieSizeValue;
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -65,7 +67,7 @@
                         index:(NSInteger)index
       titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                   imageInsets:(UIEdgeInsets)imageInsets
-                    lottieURL:(NSURL *)lottieURL
+               lottieFilePath:(NSString *)lottieFilePath
               lottieSizeValue:(NSValue *)lottieSizeValue;
 
 @property (nonatomic, weak, readonly) UIViewController *childVC;

@@ -31,6 +31,7 @@ typedef void(^CYLViewDidLayoutSubViewsBlock)(CYLTabBarController *tabBarControll
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitle;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImage;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedImage;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieFilePath;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieURL;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImageInsets;

@@ -44,6 +44,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_addLottieImageWithLottieURL:(NSURL *)lottieURL
                                    size:(CGSize)size
                             contentMode:(UIViewContentMode)contentMode;
+- (void)cyl_addLottieImageWithLottieFilePath:(NSString *)lottieFilePath
+                                   size:(CGSize)size
+                            contentMode:(UIViewContentMode)contentMode;
+
 - (void)cyl_animationLottieImageWithLottieURL:(NSURL *)lottieURL
                                          size:(CGSize)size
                               defaultSelected:(BOOL)defaultSelected
