@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
     'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}'
 #    ,'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/*.{h,m,swift}'
     ]
-    core.resource = 'CYLTabBarController/**/CYLFlatDesignTabBarController.bundle'
+    #core.resource = 'CYLTabBarController/**/CYLFlatDesignTabBarController.bundle'
     core.public_header_files = 'CYLTabBarController/**/*.h'
 
     
