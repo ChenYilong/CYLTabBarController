@@ -305,7 +305,6 @@
 				9AE942711BDC91B800354519 /* Frameworks */,
 				9AE942721BDC91B800354519 /* Resources */,
 				21663BD34D0451A2C1920020 /* [CP] Embed Pods Frameworks */,
-				2EB7C9DE2C6FC69CBABA18A0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -388,32 +387,16 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController/Pods-CYLTabBarController-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/MJRefresh/MJRefresh.framework",
+				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MJRefresh.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController/Pods-CYLTabBarController-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		2EB7C9DE2C6FC69CBABA18A0 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController/Pods-CYLTabBarController-resources.sh",
-				"${PODS_ROOT}/../CYLTabBarController/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/CYLFlatDesignTabBarController.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLFlatDesignTabBarController.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController/Pods-CYLTabBarController-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		5B2F02C6CEFA9E652D86AB7B /* [CP] Check Pods Manifest.lock */ = {
