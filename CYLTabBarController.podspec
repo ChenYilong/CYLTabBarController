@@ -16,7 +16,8 @@ Pod::Spec.new do |s|
   s.subspec 'Core' do |core|
     core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}'
     core.exclude_files = [
-    'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}', 'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/*.{h,m,swift}'
+    'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}'
+#    ,'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/*.{h,m,swift}'
     ]
     core.resource = 'CYLTabBarController/**/CYLFlatDesignTabBarController.bundle'
     core.public_header_files = 'CYLTabBarController/**/*.h'
