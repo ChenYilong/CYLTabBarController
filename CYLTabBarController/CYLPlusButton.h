@@ -31,12 +31,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 /*!
  * 该方法是为了调整 PlusButton 中心点Y轴方向的位置，建议在按钮超出了 tabbar 的边界时实现该方法。
- * @attention 如果不实现该方法，内部会自动进行比对，预设一个较为合适的位置，如果实现了该方法，预设的逻辑将失效。但是 iOS26+ 系统， Liquid Glass 效果下， 无法自定义，强制使用内部预设逻辑 ，数值总是 0.5。
+ * @attention 如果不实现该方法，内部会自动进行比对，预设一个较为合适的位置，如果实现了该方法，预设的逻辑将失效。
+ * 但是 iOS26+ 系统， Liquid Glass 效果下， 自定义后，需要实现代理方法如下， 隐藏玻璃遮罩，
+ 见 issue#636 讨论：
+
+ - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]) {
+    [self.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:YES];
+} else {
+    [self.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:NO];
+}
  * @return 返回值是自定义按钮中心点Y轴方向的坐标除以 tabbar 的高度，
            内部实现时，会使用该返回值来设置 PlusButton 的 centerY 坐标，公式如下：
               `PlusButtonCenterY = multiplierOfTabBarHeight * tabBarHeight + constantOfPlusButtonCenterYOffset;`
            也就是说：如果 constantOfPlusButtonCenterYOffset 为0，同时 multiplierOfTabBarHeight 的值是0.5，表示 PlusButton 居中，小于0.5表示 PlusButton 偏上，大于0.5则表示偏下。
- *
+ 
  */
 + (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight;
 
@@ -44,7 +53,15 @@ NS_ASSUME_NONNULL_BEGIN
  * 见 `+multiplierOfTabBarHeight:` 注释：
  * `PlusButtonCenterY = multiplierOfTabBarHeight * tabBarHeight + constantOfPlusButtonCenterYOffset;`
  * 也就是说： constantOfPlusButtonCenterYOffset 大于0会向下偏移，小于0会向上偏移。
- * @attention 实现了该方法，但没有实现 `+multiplierOfTabBarHeight:` 方法，在这种情况下，会在预设逻辑的基础上进行偏移。但是 iOS26+ 系统， Liquid Glass 效果下， 无法自定义，强制使用内部预设逻辑 ，数值总是 0。
+ * @attention 实现了该方法，但没有实现 `+multiplierOfTabBarHeight:` 方法，在这种情况下，会在预设逻辑的基础上进行偏移。但是 iOS26+ 系统， Liquid Glass 效果下， 自定义后，需要实现代理方法如下， 隐藏玻璃遮罩，
+ 见 issue#636 讨论：
+  - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]) {
+     [self.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:YES];
+ } else {
+     [self.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:NO];
+ }
+
  */
 + (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight;
 

@@ -411,7 +411,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 
 - (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
     if ([CYLConstants isUsedLiquidGlass] && self.cyl_hasPlusChildViewController) {
-        return 0.5;
+//        return 0.5;
     }
     CGFloat multiplierOfTabBarHeight;
     if ([[self.plusButton class] respondsToSelector:@selector(multiplierOfTabBarHeight:)]) {
@@ -440,7 +440,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 
 - (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
     if ([CYLConstants isUsedLiquidGlass] && self.cyl_hasPlusChildViewController) {
-        return 0;
+//        return 0;
     }
     CGFloat constantOfPlusButtonCenterYOffset = 0.f;
     if ([[self.plusButton class] respondsToSelector:@selector(constantOfPlusButtonCenterYOffsetForTabBarHeight:)]) {

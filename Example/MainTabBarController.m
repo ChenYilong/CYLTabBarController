@@ -493,9 +493,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 }
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
-//    if (control.cyl_shouldNotSelect) {
-//        return;
-//    }
+    if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]) {
+        [self.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:YES];
+    } else {
+        [self.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:NO];
+    }
     UIView *animationView;
     if ([control cyl_isTabButton]) {
 

@@ -232,6 +232,14 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
 @end
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidChangeNotification;
+/*!
+ * 液态玻璃开关变化
+ //TODO:  
+ FOUNDATION_EXTERN NSString *const CYLTabBarStyleTypeDidChangeNotification;
+ FOUNDATION_EXTERN NSString *const CYLTabBarDarkModeShowDarkDidChangeNotification;
+
+ */
+
 
 NS_ASSUME_NONNULL_END
 
