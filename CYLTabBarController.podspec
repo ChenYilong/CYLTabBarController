@@ -16,11 +16,11 @@ Pod::Spec.new do |s|
   s.subspec 'Core' do |core|
     core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}'
     core.exclude_files = [
-    'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}', 'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/*.{h,m,swift}', 'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/*.{h,m,swift}'
+    'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}', 'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/*.{h,m,swift}'
     ]
     core.resource = 'CYLTabBarController/**/CYLFlatDesignTabBarController.bundle'
     core.public_header_files = 'CYLTabBarController/**/*.h'
-    core.dependency "CYLTabBarController/CYLFlatDesignTabBar"
+
     
   end
   
@@ -43,18 +43,15 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'CYLFlatDesignTabBar' do |flatdesign|
-    flatdesign.dependency 'CYLTabBarController/Core'
-    flatdesign.dependency "CYLTabBarController/CYLFlatDesignTabBar-ObjectiveC"
+    flatdesign.dependency "CYLTabBarController/CYLFlatDesignTabBar-Swift"
   end
   
   s.subspec 'CYLFlatDesignTabBar-Swift' do |flatdesign|
+    flatdesign.dependency "CYLTabBarController/Core"
     flatdesign.source_files = 'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/*.{h,m,swift}'
   end
   
-  s.subspec 'CYLFlatDesignTabBar-ObjectiveC' do |flatdesign|
-    flatdesign.dependency 'CYLTabBarController/Core'
-    flatdesign.source_files = 'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/*.{h,m,swift}'
-  end
+  
   
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
