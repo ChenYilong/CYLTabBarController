@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "CYLTabBarController"
-  s.version      = "1.99.24"
+  s.version      = "1.99.26"
   s.summary      = "Highly customizable tabBar and tabBarController for iOS"
   s.description  = "[EN]It is an iOS UI module library for adding animation to iOS tabbar items and icons with Lottie and Liquid Glass Animation.  [CN]【中国特色 TabBar】一行代码实现 Lottie +玻璃效果动画TabBar，支持中间带+号的TabBar样式，自带红点角标，支持动态刷新。【iOS26 & iPhone 17 supported】"
   s.homepage     = "https://github.com/ChenYilong/CYLTabBarController"
@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
     ]
     core.resource = 'CYLTabBarController/**/CYLFlatDesignTabBarController.bundle'
     core.public_header_files = 'CYLTabBarController/**/*.h'
-    core.dependency "CYLTabBarController/CYLFlatDesignTabBar-ObjectiveC"
+    core.dependency "CYLTabBarController/CYLFlatDesignTabBar"
     
   end
   
@@ -43,7 +43,8 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'CYLFlatDesignTabBar' do |flatdesign|
-    flatdesign.dependency "CYLTabBarController/CYLFlatDesignTabBar-Swift"
+    flatdesign.dependency 'CYLTabBarController/Core'
+    flatdesign.dependency "CYLTabBarController/CYLFlatDesignTabBar-ObjectiveC"
   end
   
   s.subspec 'CYLFlatDesignTabBar-Swift' do |flatdesign|
@@ -51,6 +52,7 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'CYLFlatDesignTabBar-ObjectiveC' do |flatdesign|
+    flatdesign.dependency 'CYLTabBarController/Core'
     flatdesign.source_files = 'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/*.{h,m,swift}'
   end
   
