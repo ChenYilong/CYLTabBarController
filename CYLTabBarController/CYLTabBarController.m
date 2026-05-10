@@ -1066,14 +1066,16 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     
     if (!shouldConfigureSelectionStatus) {
 #if __has_include(<Lottie/Lottie.h>)
-        if ([self.tabBar isKindOfClass:[CYLTabBar class]]) {
-            [self.tabBar cyl_stopAnimationOfAllLottieView];
+        if ([tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+            CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
+            [tabBar cyl_stopAnimationOfAllLottieView];
         }
 #endif
         
 #if __has_include(<Lottie/Lottie-Swift.h>)
-        if ([self.tabBar isKindOfClass:[CYLTabBar class]]) {
-            [self.tabBar cyl_stopAnimationOfAllLottieView];
+        if ([tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+            CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
+            [tabBar cyl_stopAnimationOfAllLottieView];
         }
 #endif
 
@@ -1116,7 +1118,31 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     
 }
 
-- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
+    return YES;
+}
+
+- (void)tabBarController:(CYLTabBarController *)tabBarController beginShowPlatterLiquidLensViewForControl:(UIControl *)control {
+    if (![CYLConstants isUsedLiquidGlass] || ![tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+        return;
+    }
+    SEL action = @selector(tabBarController:shouldShowPlatterLiquidLensViewForControl:);
+    BOOL shouldShowPlatterLiquidLensView = YES;
+    if ([self.delegate respondsToSelector:action]) {
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+        (
+         shouldShowPlatterLiquidLensView = [self.delegate performSelector:action withObject:tabBarController withObject:control];
+         )
+    }
+    if (shouldShowPlatterLiquidLensView) {
+        [tabBarController.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:NO];
+        tabBarController.tabBar.liquidGlassContinuousGestureRecognizer.enabled = YES;
+        tabBarController.tabBar.liquidGlassLongGestureRecognizer.enabled = YES;
+    } else {
+        [tabBarController.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:YES];
+        tabBarController.tabBar.liquidGlassContinuousGestureRecognizer.enabled = NO;
+        tabBarController.tabBar.liquidGlassLongGestureRecognizer.enabled = NO;
+    }
 }
 
 - (BOOL)isLottieEnabled {
@@ -1185,12 +1211,18 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             //非液态玻璃 与 液态玻璃逻辑共用，Lottie播放逻辑都在 tabChangedToSelectedIndex 中。
         }
     }
-
-    if ([self.delegate respondsToSelector:actin] && shouldSelectViewController) {
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-        (
-         [self.delegate performSelector:actin withObject:self withObject:control ?: self.selectedViewController.cyl_tabButton];
-         );
+    if (shouldSelectViewController){
+        UIControl *control_ = control ?: self.selectedViewController.cyl_tabButton;
+        [self tabBarController:self beginShowPlatterLiquidLensViewForControl:control_];
+        
+        if ([self.delegate respondsToSelector:actin]) {
+            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+            (
+             UIControl *control_ = control ?: self.selectedViewController.cyl_tabButton;
+             [self tabBarController:self beginShowPlatterLiquidLensViewForControl:control_];
+             [self.delegate performSelector:actin withObject:self withObject:control_];
+             );
+        }
     }
 }
 

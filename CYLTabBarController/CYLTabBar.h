@@ -33,8 +33,8 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 @property (nonatomic, copy) NSArray<UIControl *> *tabBarButtonArray;
 @property (nonatomic, assign, getter=hasAddPlusButton) BOOL addPlusButton;
 @property (nonatomic, assign) BOOL isLensViewLifed;
-@property (nonatomic, strong) UIGestureRecognizer *continuousGestureRecognizer;
-@property (nonatomic, strong) UIGestureRecognizer *longGestureRecognizer;
+@property (nonatomic, strong) UIGestureRecognizer *liquidGlassContinuousGestureRecognizer;
+@property (nonatomic, strong) UIGestureRecognizer *liquidGlassLongGestureRecognizer;
 
 - (NSUInteger)plusButtonIndex;
 

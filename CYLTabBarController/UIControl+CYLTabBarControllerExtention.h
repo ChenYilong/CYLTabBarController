@@ -38,7 +38,12 @@ NS_ASSUME_NONNULL_BEGIN
  * in this case PlusButton is same as TabBarItem
  */
 @property (nonatomic, assign, getter=cyl_tabBarItemVisibleIndex, setter=cyl_setTabBarItemVisibleIndex:) NSInteger cyl_tabBarItemVisibleIndex;
-
+/*!
+ *
+ *对于- (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
+ *   // 即使 PlusButton 也添加了自定义点击事件，点击 PlusButton 后也会触发该代理方法。
+    // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_shouldNotSelect = YES; 来禁止该协议方法触发plusButton回调
+ */
 @property (nonatomic, assign, getter=cyl_shouldNotSelect, setter=cyl_setShouldNotSelect:) BOOL cyl_shouldNotSelect;
 
 - (void)cyl_addLottieImageWithLottieURL:(NSURL *)lottieURL

@@ -55,7 +55,8 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
   *  代码切换index 时，底层通过 `-setSelectedIndex` 方法来实现。
  * @attention 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。可在PlusButton初始化时使用 CYLExternPlusButton.cyl_shouldNotSelect = YES; 来禁止该协议方法触发涉及plusButton的回调
  */
-- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control;
+- (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
+- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control;
 
 @end
 

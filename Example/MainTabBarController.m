@@ -492,15 +492,17 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     return should && shouldSelectViewControllerFromSuper;
 }
 
-- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
     if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]) {
-        [self.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:YES];
-    } else {
-        [self.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:NO];
+        return NO;
     }
+
+    return YES;
+}
+
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;
     if ([control cyl_isTabButton]) {
-
         //更改红标状态
         if ([tabBarController.selectedViewController cyl_isShowBadge]) {
             [tabBarController.selectedViewController cyl_clearBadge];
