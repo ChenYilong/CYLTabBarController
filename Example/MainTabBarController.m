@@ -492,13 +492,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     return should && shouldSelectViewControllerFromSuper;
 }
 
-- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
-    if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]) {
-        return NO;
-    }
-
-    return YES;
-}
+//- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
+//    return YES;
+//}
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;

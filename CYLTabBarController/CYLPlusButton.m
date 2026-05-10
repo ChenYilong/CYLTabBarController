@@ -35,10 +35,6 @@ UIViewController *CYLPlusChildViewController = nil;
         return;
     }
     Class<CYLPlusButtonSubclassing> class = self;
-    UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
-    CYLExternPlusButton = plusButton;
-    CYLPlusButtonWidth = plusButton.frame.size.width;
-
     if ([[self class] respondsToSelector:@selector(plusChildViewController)]) {
         CYLPlusChildViewController = [class plusChildViewController];
         if ([[self class] respondsToSelector:@selector(tabBarContext)]) {
@@ -49,6 +45,9 @@ UIViewController *CYLPlusChildViewController = nil;
         } else {
             [CYLPlusChildViewController cyl_setContext:NSStringFromClass([CYLTabBarController class])];
         }
+        UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
+        CYLExternPlusButton = plusButton;
+        CYLPlusButtonWidth = plusButton.frame.size.width;
         [[self class] addSelectViewControllerTarget:plusButton];
         //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
         if ([CYLConstants isUsedLiquidGlass]) {

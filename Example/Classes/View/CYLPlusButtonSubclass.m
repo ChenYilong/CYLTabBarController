@@ -156,7 +156,11 @@
     SEL action = @selector(clickPublish);
     [button removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
     [button addTarget:button action:action forControlEvents:UIControlEventTouchUpInside];
-    button.cyl_shouldNotSelect = NO;
+    if (CYLPlusChildViewController) {
+        button.cyl_shouldNotSelect = NO;
+    } else {
+        button.cyl_shouldNotSelect = YES;
+    }
     return button;
 }
 
@@ -248,6 +252,10 @@
 
 //缩放动画
 - (void)addScaleAnimationOnView:(UIView *)animationView repeatCount:(float)repeatCount {
+    if ([CYLConstants isUsedLiquidGlass]) {
+        //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
+        return;
+    }
     //需要实现的帧动画，这里根据需求自定义
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animation];
     animation.keyPath = @"transform.scale";
@@ -259,6 +267,10 @@
 }
 
 - (void)addRotateAnimationOnPlusButton:(UIView *)animationView repeatCount:(float)repeatCount {
+    if ([CYLConstants isUsedLiquidGlass]) {
+        //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
+        return;
+    }
     NSLog(@"plusButton.frame = %@", NSStringFromCGRect(animationView.frame));
     
     [UIView animateWithDuration:0.32 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -306,16 +318,16 @@
     return YES;
 }
 
-+ (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
-    return  0.3;
-}
+//+ (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
+//    return  0.3;
+//}
 
-+ (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
-    if (@available(iOS 13.0, *)) {
-        return (CYL_IS_IPHONE_X ? - 6 : 4);
-    }
-    return 4;
-}
+//+ (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
+//    if (@available(iOS 13.0, *)) {
+//        return (CYL_IS_IPHONE_X ? - 6 : 4);
+//    }
+//    return 4;
+//}
 //
 //+ (NSString *)tabBarContext {
 //    return NSStringFromClass([CYLMainRootViewController class]);

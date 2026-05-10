@@ -404,6 +404,20 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     }
 }
 
+- (BOOL)isPlusButtonCenterCustomized {
+    if ([self constantOfPlusButtonCenterYOffsetForTabBarHeight] > 0) {
+        return YES;
+    }
+    if ([self multiplierOfTabBarHeight] != 0.5) {
+        return YES;
+    }
+    return NO;
+}
+
+- (CGFloat)multiplierOfTabBarHeight {
+    return [self multiplierOfTabBarHeight:self.cyl_boundsSize.height];
+}
+
 - (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
     if ([CYLConstants isUsedLiquidGlass] && self.cyl_hasPlusChildViewController) {
 //        return 0.5;
@@ -431,6 +445,10 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         }
     }
     return multiplierOfTabBarHeight;
+}
+
+- (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight {
+    return [self constantOfPlusButtonCenterYOffsetForTabBarHeight:self.cyl_boundsSize.height];
 }
 
 - (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {

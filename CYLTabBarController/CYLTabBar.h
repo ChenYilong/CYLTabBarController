@@ -38,6 +38,8 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 
 - (NSUInteger)plusButtonIndex;
 
+- (BOOL)isPlusButtonCenterCustomized;
+
 @end
 
 NS_ASSUME_NONNULL_END

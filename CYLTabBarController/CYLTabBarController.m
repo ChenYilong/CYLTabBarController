@@ -1115,10 +1115,15 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     
     [self updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
     return viewController != self.selectedViewController;
-    
 }
 
-- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
+- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
+    if (![self hasPlusChildViewController]) {
+        return YES;
+    }
+    if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController] && [tabBarController.tabBar isPlusButtonCenterCustomized]) {
+        return NO;
+    }
     return YES;
 }
 
