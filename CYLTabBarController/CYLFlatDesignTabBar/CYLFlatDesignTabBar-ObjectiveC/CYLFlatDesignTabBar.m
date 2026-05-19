@@ -83,13 +83,7 @@
 - (instancetype)init {
     if (self = [super initWithFrame:CGRectMake(0, 0, CYLScreenWidth(), self.cyl_fullHeight)]) {
         
-#if defined(DEBUG) || defined(BETA)
-        //        self.backgroundColor = UIColor.redColor;
         self.backgroundColor = UIColor.clearColor;
-        
-#else
-        self.backgroundColor = UIColor.clearColor;
-#endif
         
         if (@available(iOS 26.0, *)) {
             UIGlassEffect *effect = [UIGlassEffect effectWithStyle:UIGlassEffectStyleRegular];
@@ -124,12 +118,7 @@
         self.clipsToBounds = NO;
         // UIView *plusSuperView = CYLExternPlusButton;
         [self addSubview:plusSuperView];
-        
-#if defined(DEBUG) || defined(BETA)
         plusSuperView.backgroundColor = [UIColor clearColor];
-#else
-#endif
-        
         self.plusSuperView = plusSuperView;
         UIButton<CYLPlusButtonSubclassing> *plusView = (UIButton<CYLPlusButtonSubclassing> *)CYLExternPlusButton;
         plusView.frame = plusSuperView.bounds;
@@ -195,36 +184,13 @@
             gestureRecognizer.enabled = NO;
         }
         if ([gestureRecognizer cyl_isLongGestureRecognizer]) {
-//            gestureRecognizer.delegate = self;
             gestureRecognizer.enabled = NO;
-
         }
-
     }
 //
     [super addGestureRecognizer:gestureRecognizer];
 }
 
-//- (void)addSubview:(UIView *)view {
-//    if ([self isKindOfClass:[UITabBar class]]) {
-//        if ([view isKindOfClass:NSClassFromString(@"UIKit._UITabBarPlatterView")]) {
-//            [view cyl_setHidden:YES];
-//        }
-//    }
-//    if (![view isKindOfClass:[UITabBar class]]) {
-//        [super addSubview:view];
-//    }
-//
-//}
-//
-//- (void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
-//    if ([self isKindOfClass:[UITabBar class]]) {
-//        if ([gestureRecognizer isKindOfClass:NSClassFromString(@"_UIContinuousSelectionGestureRecognizer")]) {
-//            gestureRecognizer.enabled = NO;
-//        }
-//    }
-//    [super addGestureRecognizer:gestureRecognizer];
-//}
 
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {

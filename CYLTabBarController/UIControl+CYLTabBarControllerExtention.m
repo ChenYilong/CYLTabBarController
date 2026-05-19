@@ -447,11 +447,12 @@
     }
     
     NSURL *lottieURL = [NSURL fileURLWithPath:lottieFilePath];
-#if __has_include(<Lottie/Lottie.h>)
-    
     if (!lottieURL) {
         return;
     }
+
+#if __has_include(<Lottie/Lottie.h>)
+    
     if (self.cyl_lottieAnimationView) {
         return;
     }
@@ -466,9 +467,6 @@
 #endif
     
 #if __has_include(<Lottie/Lottie-Swift.h>)
-    if (!lottieURL) {
-        return;
-    }
     if (self.cyl_lottieAnimationView) {
         return;
     }
@@ -589,7 +587,7 @@
 }
 
 //- (CGFloat)cyl_xOffset {
-//    if (![CYLConstants isUsedLiquidGlass]) {
+//    if (![CYLConstants isLiquidGlassActive]) {
 //        return 0.0f;
 //    }
 //    CGFloat boundsWidthOffset;// = (CYLScreenWidth() - self.cyl_boundsSize.width) * 0.5;
@@ -609,7 +607,7 @@
 }
 
 - (BOOL)cyl_isPlatterSelectedControl {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         return NO;
     }
     if (!self.superview) {

@@ -26,6 +26,10 @@ static CGFloat _basisHeightScale = 1.0;
     return _basisHeightScale;
 }
 
++ (BOOL)isLiquidGlassActive {
+    return [self isUsedLiquidGlass];
+}
+
 + (BOOL)isUsedLiquidGlass {
     static BOOL result = NO;
     static dispatch_once_t onceToken;

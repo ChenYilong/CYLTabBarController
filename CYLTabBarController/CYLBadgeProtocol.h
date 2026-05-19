@@ -6,8 +6,8 @@
  //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
  */
 
-//CYLBadgeProtocol is a protocol which any Class supported (such UIView and UIBarButtonItem) should confirm
-//At present, there are two classes support CYLBadgeExtention(UIView and UIBarButtonItem). However, there may be more classes to support. Thus, it is necessary to abstract a protocol. 20260812.
+//CYLBadgeProtocol is a protocol which any Class supported (such UIView, UITabBarItem and UIBarButtonItem) should confirm
+//At present, there are same classes support CYLBadgeExtention(UIView, UITabBarItem and UIBarButtonItem). However, there may be more classes to support. Thus, it is necessary to abstract a protocol. 20260812.
 
 
 #ifndef CYLBadgeDemo_CYLBadgeProtocol_h
@@ -24,7 +24,7 @@
 typedef NS_ENUM(NSUInteger, CYLBadgeStyle) {
     CYLBadgeStyleRedDot = 1,          /* red dot style */
     CYLBadgeStyleNumber,              /* badge with number */
-    CYLBadgeStyleNew,                  /* badge with a fixed text "new" */
+    CYLBadgeStyleNew,                 /* badge with a fixed text "new" */
     CYLBadgeStyleOther                /* badge with a fixed text */
 };
 
@@ -134,6 +134,7 @@ typedef NS_ENUM(NSUInteger, CYLBadgeAnimationType) {
 - (void)cyl_performSelector:(SEL)aSelector;
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object;
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2;
+
 @end
 
 #endif

@@ -50,7 +50,7 @@ UIViewController *CYLPlusChildViewController = nil;
         CYLPlusButtonWidth = plusButton.frame.size.width;
         [[self class] addSelectViewControllerTarget:plusButton];
         //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
-        if ([CYLConstants isUsedLiquidGlass]) {
+        if ([CYLConstants isLiquidGlassActive]) {
 //            plusButton.cyl_shouldNotSelect = YES;
         }
         if ([[self class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
@@ -60,6 +60,10 @@ UIViewController *CYLPlusChildViewController = nil;
             [NSException raise:NSStringFromClass([CYLTabBarController class]) format:@"[DEBUG INFO]If you want to add PlusChildViewController, you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】[DEBUG INFO]如果你想使用PlusChildViewController样式，你必须同时在你自定义的plusButton中实现 `+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
 #endif
         }
+    } else {
+        UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
+        CYLExternPlusButton = plusButton;
+        CYLPlusButtonWidth = plusButton.frame.size.width;
     }
 }
 
@@ -114,6 +118,55 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         [plusButton removeTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
     }];
     [plusButton addTarget:plusButton action:@selector(plusChildViewControllerButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (BOOL)isLayoutCentered {
+    if ((0 == [self constantOfPlusButtonCenterYOffsetForTabBarHeight]) && (0.5 == [self multiplierOfTabBarHeight])) {
+        return YES;
+    }
+    return NO;
+}
+
+- (CGFloat)multiplierOfTabBarHeight {
+    return [self multiplierOfTabBarHeight:self.cyl_tabBarController.tabBar.cyl_boundsSize.height];
+}
+
+- (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
+    CGFloat multiplierOfTabBarHeight;
+    if ([[self class] respondsToSelector:@selector(multiplierOfTabBarHeight:)]) {
+        multiplierOfTabBarHeight = [[self class] multiplierOfTabBarHeight:tabBarHeight];
+    }
+    
+    CYL_DEPRECATED_DECLARATIONS_PUSH
+    else if ([[self class] respondsToSelector:@selector(multiplerInCenterY)]) {
+        multiplierOfTabBarHeight = [[self class] multiplerInCenterY];
+    }
+    CYL_DEPRECATED_DECLARATIONS_POP
+    
+    else {
+        CGSize sizeOfPlusButton = self.frame.size;
+        CGFloat heightDifference = sizeOfPlusButton.height - self.cyl_tabBarController.tabBar.cyl_boundsSize.height;
+        if (heightDifference < 0) {
+            multiplierOfTabBarHeight = 0.5;
+        } else {
+            CGPoint center = CGPointMake(self.cyl_tabBarController.tabBar.cyl_boundsSize.height * 0.5, self.cyl_tabBarController.tabBar.cyl_boundsSize.height * 0.5);
+            center.y = center.y - heightDifference * 0.5;
+            multiplierOfTabBarHeight = center.y / self.cyl_tabBarController.tabBar.cyl_boundsSize.height;
+        }
+    }
+    return multiplierOfTabBarHeight;
+}
+
+- (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight {
+    return [self constantOfPlusButtonCenterYOffsetForTabBarHeight:self.cyl_tabBarController.tabBar.cyl_boundsSize.height];
+}
+
+- (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
+    CGFloat constantOfPlusButtonCenterYOffset = 0.f;
+    if ([[self class] respondsToSelector:@selector(constantOfPlusButtonCenterYOffsetForTabBarHeight:)]) {
+        constantOfPlusButtonCenterYOffset = [[self class] constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
+    }
+    return constantOfPlusButtonCenterYOffset;
 }
 
 /**
@@ -181,7 +234,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     selectedContentView.translatesAutoresizingMaskIntoConstraints = NO;
     selectedContentView.userInteractionEnabled = false;
     [selectedContentView sizeToFit];
-    selectedContentView.highlighted = YES;
+    if (NO == self.cyl_shouldNotSelect) {
+        selectedContentView.selected = YES;
+    }
     _selectedContentView = selectedContentView;
     return _selectedContentView;
 }

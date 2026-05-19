@@ -21,7 +21,7 @@
 
 + (void)load {
     //请在 `-[AppDelegate application:didFinishLaunchingWithOptions:]` 中进行注册，否则iOS10系统下存在Crash风险。
-    //[super registerPlusButton];
+//    [super registerPlusButton];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -156,7 +156,7 @@
     SEL action = @selector(clickPublish);
     [button removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
     [button addTarget:button action:action forControlEvents:UIControlEventTouchUpInside];
-    if (CYLPlusChildViewController) {
+    if (CYLPlusChildViewController && button.isLayoutCentered) {
         button.cyl_shouldNotSelect = NO;
     } else {
         button.cyl_shouldNotSelect = YES;
@@ -252,7 +252,7 @@
 
 //缩放动画
 - (void)addScaleAnimationOnView:(UIView *)animationView repeatCount:(float)repeatCount {
-    if ([CYLConstants isUsedLiquidGlass]) {
+    if ([CYLConstants isLiquidGlassActive]) {
         //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
         return;
     }
@@ -267,7 +267,7 @@
 }
 
 - (void)addRotateAnimationOnPlusButton:(UIView *)animationView repeatCount:(float)repeatCount {
-    if ([CYLConstants isUsedLiquidGlass]) {
+    if ([CYLConstants isLiquidGlassActive]) {
         //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
         return;
     }
@@ -293,18 +293,18 @@
 #pragma clang diagnostic pop
 #pragma mark - CYLPlusButtonSubclassing
 
-+ (UIViewController *)plusChildViewController {
-    UIViewController *plusChildViewController = [[UIViewController alloc] init];
-    plusChildViewController.view.backgroundColor = [UIColor redColor];
-    plusChildViewController.navigationItem.title = @"PlusChildViewController";
-    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
-                                                   initWithRootViewController:plusChildViewController];
-    return plusChildNavigationController;
-}
-
-+ (NSUInteger)indexOfPlusButtonInTabBar {
-    return 2;
-}
+//+ (UIViewController *)plusChildViewController {
+//    UIViewController *plusChildViewController = [[UIViewController alloc] init];
+//    plusChildViewController.view.backgroundColor = [UIColor redColor];
+//    plusChildViewController.navigationItem.title = @"PlusChildViewController";
+//    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
+//                                                   initWithRootViewController:plusChildViewController];
+//    return plusChildNavigationController;
+//}
+//
+//+ (NSUInteger)indexOfPlusButtonInTabBar {
+//    return 2;
+//}
 
 + (BOOL)shouldSelectPlusChildViewController {
     BOOL isSelected = CYLExternPlusButton.selected;
@@ -318,16 +318,16 @@
     return YES;
 }
 
-//+ (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
-//    return  0.3;
-//}
++ (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
+    return  0.2;
+}
 
-//+ (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
-//    if (@available(iOS 13.0, *)) {
-//        return (CYL_IS_IPHONE_X ? - 6 : 4);
-//    }
-//    return 4;
-//}
++ (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
+    if (@available(iOS 13.0, *)) {
+        return (CYL_IS_IPHONE_X ? - 6 : 4);
+    }
+    return 4;
+}
 //
 //+ (NSString *)tabBarContext {
 //    return NSStringFromClass([CYLMainRootViewController class]);

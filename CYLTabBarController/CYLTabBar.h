@@ -34,11 +34,16 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 @property (nonatomic, assign, getter=hasAddPlusButton) BOOL addPlusButton;
 @property (nonatomic, assign) BOOL isLensViewLifed;
 @property (nonatomic, strong) UIGestureRecognizer *liquidGlassContinuousGestureRecognizer;
+
+/*!
+ *TODO:
+ * 之前 tabbar 上有长按手势，iOS 26 液态玻璃，长按手势都不起作用了，需要重新增加自定义手势。
+  */
 @property (nonatomic, strong) UIGestureRecognizer *liquidGlassLongGestureRecognizer;
 
 - (NSUInteger)plusButtonIndex;
 
-- (BOOL)isPlusButtonCenterCustomized;
+- (BOOL)isPlusButtonLayoutCentered;
 
 @end
 

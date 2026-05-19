@@ -144,7 +144,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     
     
     dispatch_async(dispatch_get_main_queue(),^{
-        if ([CYLConstants isUsedLiquidGlass]) {
+        if ([CYLConstants isLiquidGlassActive]) {
             [self.viewControllers enumerateObjectsUsingBlock:^(UIViewController * _Nonnull viewController, NSUInteger idx, BOOL * _Nonnull stop) {
                 UIControl *control = viewController.cyl_tabButton;
                 NSURL *url = viewController.tabBarItem.cyl_lottieURL;
@@ -200,15 +200,13 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
-//    [self.tabBar cyl_resetPlatterSelectedContentSourceViewNewBounds];
-
     [self.tabBar layoutSubviews];//Fix issue #93 #392
     CYLTabBar *tabBar = (CYLTabBar *)self.tabBar;
     if ([self.tabBar isKindOfClass:[CYLTabBar class]] ) {
         // add callback for visiable control, included all plusButton.
         
         [tabBar.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([CYLConstants isUsedLiquidGlass]) {
+            if ([CYLConstants isLiquidGlassActive]) {
                 //液态玻璃无法添加事件 放进手势响代理里处理。
                 return;
             }
@@ -238,7 +236,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
             NSArray *subTabBarButtonsWithoutPlusButton = tabBar.cyl_subTabBarButtonsWithoutPlusButton;
             BOOL isLottieEnabled = [self isLottieEnabled];
 
-            if (![CYLConstants isUsedLiquidGlass]) {
+            if (![CYLConstants isLiquidGlassActive]) {
                 // 因为液态玻璃， 补全了所有的缺失的lottieURLs，所以一定保持一致， 无需要处理。
                 if(!isLottieEnabled || (subTabBarButtonsWithoutPlusButton.count != self.lottieURLs.count)) {
                     self.lottieViewAdded = YES;
@@ -256,7 +254,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
     }
 
     
-    if ([CYLConstants isUsedLiquidGlass] && ([[self class] havePlusButton]) && [self.tabBar isKindOfClass:[CYLTabBar class]]) {
+    if ([CYLConstants isLiquidGlassActive] && ([[self class] havePlusButton]) && [self.tabBar isKindOfClass:[CYLTabBar class]]) {
         
         dispatch_async(dispatch_get_main_queue(),^{
             
@@ -272,8 +270,30 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                                                                offset:UIOffsetZero
                                                                  show:YES
                                               delayIfNeededForSeconds:1
-                                                           completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull newView) {
+                                                           completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull selectedCover) {
+                    if (self.tabBar.isPlusButtonLayoutCentered) {
+                        return;
+                    }
+                    /*!
+                     *
+                     *我要求 selectedCover 的中心坐标 强制与 CYLExternPlusButton坐标一致。 坐标系转换
+                     * _UITabBarPlatterView
+                     ├── SelectedContentView
+                     │    └── selectedCover
+                     │
+                     └── CYLPlusButtonSubclass
+                     */
+                    UIView *platterView = CYLExternPlusButton.superview;
+                    UIView *selectedContainerView = selectedCover.superview;
                     
+                    if (platterView && selectedContainerView) {
+                        
+                        CGPoint convertedCenter =
+                        [selectedContainerView convertPoint:CYLExternPlusButton.center
+                                                   fromView:platterView];
+                        
+                        selectedCover.center = convertedCenter;
+                    }
                 }];
             } else {
                 [plusSelectedControl.cyl_tabImageView cyl_setHidden:YES];
@@ -545,7 +565,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:NSNotFound];
     }
 
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         if (!hasPlusChildViewController) {
             _viewControllers = [viewControllers copy];
         }
@@ -564,7 +584,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         return;
     }
     // iOS26+ , 有 plusButton 
-    if ([[self class] havePlusButton] && [CYLConstants isUsedLiquidGlass]) {
+    if ([[self class] havePlusButton] && [CYLConstants isLiquidGlassActive]) {
         [self alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:viewControllers];
         NSDictionary *plusInfo =
                 @{
@@ -634,7 +654,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (!CYL_IS_IOS_26) {
         return YES;
     }
-    BOOL isLiquidGlass = [CYLConstants isUsedLiquidGlass];
+    BOOL isLiquidGlass = [CYLConstants isLiquidGlassActive];
     //， 这个表示requiresCompatibility，必须使用， 否则iOS26里的兼容模式会错乱。
     if (!isLiquidGlass) {
         return YES;
@@ -710,7 +730,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
  *   CYLTabBar，在ViewDidLoad中调用；因为考虑到PlusButton的逻辑， 涉及坐标计算，还有运行中增删 PlusButton的逻辑，需要涉及重新布局，需要layoutSubviews中进行。故延迟调用。
  *   CYLTabBarStyleTypeFlatDesign样式 会在 setViewControllers 内部调用，调用时机靠前。
  */
-- (void)setUpTabBar:(UITabBar *)_tabBar {
+- (void)setUpTabBar:(UIView __kindof *)_tabBar {
     @try {
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
             CYLFlatDesignTabBar *pureCustomTabBar = (CYLFlatDesignTabBar *)(_tabBar);
@@ -865,7 +885,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
               见： https://github.com/ChenYilong/CYLTabBarController/issues/563
              **/
             title = @"";
-            if ([CYLConstants isUsedLiquidGlass] && ([[self class] havePlusButton])) {
+            if ([CYLConstants isLiquidGlassActive] && ([[self class] havePlusButton])) {
             } else {
                 idx--;
             }
@@ -885,7 +905,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
             //已经在addOneChildViewController 中操作， 这里无需重复处理
-            //            [self addChildViewController:viewController];
+            // [self addChildViewController:viewController];
             
             if (!viewController.cyl_isPlaceholder && ![self isEqualViewController:viewController compairedViewController:CYLPlusChildViewController]) {
                 pureCustomTabBar.delegate = self;
@@ -1121,14 +1141,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (![self hasPlusChildViewController]) {
         return YES;
     }
-    if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController] && [tabBarController.tabBar isPlusButtonCenterCustomized]) {
+    if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController] && ![tabBarController.tabBar isPlusButtonLayoutCentered]) {
         return NO;
     }
     return YES;
 }
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController beginShowPlatterLiquidLensViewForControl:(UIControl *)control {
-    if (![CYLConstants isUsedLiquidGlass] || ![tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+    if (![CYLConstants isLiquidGlassActive] || ![tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
     }
     SEL action = @selector(tabBarController:shouldShowPlatterLiquidLensViewForControl:);
@@ -1216,15 +1236,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             //非液态玻璃 与 液态玻璃逻辑共用，Lottie播放逻辑都在 tabChangedToSelectedIndex 中。
         }
     }
+    UIControl *control_ = control ?: self.selectedViewController.cyl_tabButton;
+    [self tabBarController:self beginShowPlatterLiquidLensViewForControl:control_];
+
     if (shouldSelectViewController){
-        UIControl *control_ = control ?: self.selectedViewController.cyl_tabButton;
-        [self tabBarController:self beginShowPlatterLiquidLensViewForControl:control_];
-        
         if ([self.delegate respondsToSelector:actin]) {
             CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
             (
-             UIControl *control_ = control ?: self.selectedViewController.cyl_tabButton;
-             [self tabBarController:self beginShowPlatterLiquidLensViewForControl:control_];
              [self.delegate performSelector:actin withObject:self withObject:control_];
              );
         }
@@ -1251,7 +1269,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (void)addLottieImageWithControl:(UIControl *)control
                         animation:(BOOL)animation
                   defaultSelected:(BOOL)defaultSelected {
-    if ([CYLConstants isUsedLiquidGlass]) {
+    if ([CYLConstants isLiquidGlassActive]) {
         [self addLottieImageWithControl:control lottieURL:nil lottieSizeValue:nil animation:animation defaultSelected:defaultSelected];
     } else {
         NSUInteger index = [self.tabBar.cyl_subTabBarButtonsWithoutPlusButton indexOfObject:control];
@@ -1393,7 +1411,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     //必须调用父类逻辑。
     [super setSelectedViewController:selectedViewController];
     // Fix: #574 解决iOS15 扁平风格， 有时候TabBar会变透明的问题
-    if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0") && ![CYLConstants isUsedLiquidGlass]) {
+    if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0") && ![CYLConstants isLiquidGlassActive]) {
         if (nil == [UITabBar appearance].backgroundImage) {
             @try {
                 //因为非核心功能， 仅为部分版本的细节修复， 所以用try catch 防止异常， 防止影响主要功能。
@@ -1407,7 +1425,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         }
     }
 
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         return;
     }
 
@@ -1434,7 +1452,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         CYLFlatDesignTabBar *tabBar = (CYLFlatDesignTabBar *)self.tabBar;
         [tabBar setSelectedIndex:selectedIndex];
     }
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         return;
     }
     // 代码切换 tab 时会触发

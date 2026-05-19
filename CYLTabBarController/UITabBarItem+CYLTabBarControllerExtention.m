@@ -78,7 +78,7 @@
 
 // 如果使用了液态玻璃，则返回 UITabBarPlatterView 中的 SelectedContentView 中的 subviews 中的 view
 - (UIControl *)cyl_selectedTabButton {
-    if ([CYLConstants isUsedLiquidGlass]) {
+    if ([CYLConstants isLiquidGlassActive]) {
         if (![self isKindOfClass:UITabBarItem.class]) {
             return nil;
         }
@@ -108,7 +108,7 @@
 }
 
 - (UIControl *)cyl_visiableTabButton {
-    if ([CYLConstants isUsedLiquidGlass]) {
+    if ([CYLConstants isLiquidGlassActive]) {
         return self.cyl_selectedTabButton;
     }
     return self.cyl_tabButton;

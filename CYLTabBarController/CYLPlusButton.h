@@ -121,6 +121,8 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
  */
 @property (nonatomic, strong) UIImage *contentImage;
 
+- (BOOL)isLayoutCentered;
+
 #pragma mark - Deprecated API
 
 + (CGFloat)multiplerInCenterY CYL_DEPRECATED("Deprecated in 1.6.0. Use `+multiplierOfTabBarHeight:` instead.");

@@ -35,7 +35,7 @@
 - (BOOL)cyl_isTabButton {
     BOOL isKindOfButton;
     // iOS 26 以前，保持原逻辑
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         //UIControl
         return [self cyl_isKindOfClass:[UIControl class]];
     }
@@ -50,7 +50,7 @@
 }
 
 - (BOOL)cyl_isPlatterView {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
@@ -61,7 +61,7 @@
 }
 
 - (BOOL)cyl_isPlatterPortalView {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
@@ -85,7 +85,7 @@
 }
 
 - (BOOL)cyl_isPlatterContentView {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
@@ -96,7 +96,7 @@
 }
 
 - (BOOL)cyl_isPlatterSelectedContentView {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
@@ -107,7 +107,7 @@
 
 
 - (BOOL)cyl_isPlatterVisualProviderFloatingSelectedContentView {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
@@ -118,7 +118,7 @@
 }
 
 - (BOOL)cyl_isPlatterLiquidLensView {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
@@ -129,7 +129,7 @@
 }
 
 - (BOOL) cyl_isPlatterLiquidLensClearGlassView {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
@@ -140,7 +140,7 @@
 }
 
 - (BOOL)cyl_isPlatterLiquidLensTabSelectionView {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
@@ -152,7 +152,7 @@
 
 
 - (BOOL)cyl_isPlatterLiquidLensBackdropView {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
@@ -164,7 +164,7 @@
 
 
 - (BOOL)cyl_isPlatterDestOutView {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
         return NO;
     }
@@ -188,7 +188,7 @@
 - (BOOL)cyl_isTabLabel {
     BOOL isKindOfLabel;
     // iOS 26 以前，保持原逻辑
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         return [self cyl_isKindOfClass:[UILabel class]];
     }
     NSString *classString = NSStringFromClass([self class]);
@@ -554,7 +554,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_bringSubviewToTop:(UIView *)view {
-    
     [self addSubview:view];
     [self bringSubviewToFront:view];
     view.layer.zPosition = MAXFLOAT;

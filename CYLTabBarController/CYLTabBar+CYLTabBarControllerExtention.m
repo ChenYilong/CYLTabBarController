@@ -115,7 +115,7 @@
  * cyl_subTabBarButtons也就是与 VC匹配的Control集合，
  */
 - (NSArray<UIControl *> *)cyl_subTabBarButtons {
-    if ([CYLConstants isUsedLiquidGlass]) {
+    if ([CYLConstants isLiquidGlassActive]) {
         return self.cyl_tabBarSubviews;
     }
     //FIXME:  to delete 这个逻辑是不是和cyl_subTabBarButtonsWithoutPlusButton一样子？
@@ -240,8 +240,8 @@
     }
 
 #endif
-    
 }
+
 /*!
  * 思路为： 从当前图层的control，获得index， 再从另外的图层中的index位置， 获取control。以此来避免直接使用 index 来获取不同图层的。因为有可能存在plusButton， 导致，index的数值变动， 降级复杂度。以control为锚点， index仅辅助。
  */
@@ -286,7 +286,7 @@
 }
 
 - (CGFloat)cyl_cachedXOffsetWithIndex:(CGFloat)index {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         return 0.0f;
     }
     CGFloat boundsWidthOffset = (self.cyl_boundsSize.width - CYLScreenWidth()) * 0.5;
@@ -298,7 +298,7 @@
 }
 
 - (CGFloat)cyl_cachedWidthOffsetWithIndex:(CGFloat)index {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         return 0.0f;
     }
     CGFloat originalTabBarItemWidth = self.cyl_boundsSize.width / CYLTabbarItemsCount;
@@ -429,7 +429,7 @@
  
  */
 - (NSArray<UIControl *> *)cyl_tabBarSubviews {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         return self.subviews;
         
     }
@@ -496,14 +496,14 @@
 #if defined(DEBUG) || defined(BETA)
     
     // 6️⃣ 转成 frame 数组
-    NSMutableArray<NSValue *> *frames = [NSMutableArray array];
-    for (UIView *v in itemViews) {
-        [frames addObject:[NSValue valueWithCGRect:v.frame]];
-    }
-    static BOOL logged = NO;
-    if (!logged) {
-        logged = YES;
-    }
+//    NSMutableArray<NSValue *> *frames = [NSMutableArray array];
+//    for (UIView *v in itemViews) {
+//        [frames addObject:[NSValue valueWithCGRect:v.frame]];
+//    }
+//    static BOOL logged = NO;
+//    if (!logged) {
+//        logged = YES;
+//    }
 #endif
 
     return itemViews;
@@ -515,7 +515,7 @@
 
 - (CGSize)cyl_boundsSize {
     CGSize size = self.bounds.size;
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         return size;
     }
     if (CYL_NoNeed_UIDesignRequiresCompatibility_with_iOS26) {
@@ -529,7 +529,7 @@
 }
 
 - (CGFloat)cyl_boundsWidthOffset {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         return 0.0f;
     }
     CGFloat boundsWidthOffset = (CYLScreenWidth() - self.cyl_boundsSize.width) * 0.5;

@@ -177,6 +177,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 //     [self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
     
     // 半透明， 需要注意：iOS26 液态玻璃下， 具有特殊效果， View 将延伸至TabBar以外区域。
+    //如果想固定 TabBar 的背景色，就通过控制 translucent，否则默认一直都是透视的
+
     if (CYL_IS_IOS_26) {
 //        [UITabBar appearance].translucent = NO;
     }
@@ -345,7 +347,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 //            [tabBarButton insertSubview:tabBarButton.cyl_lottieAnimationView belowSubview:selectedTabButton];
 //            [tabBarButton bringSubviewToFront:newView];
             [tabBarButton cyl_bringSubviewToTop:newView];
-            if (![CYLConstants isUsedLiquidGlass]) {
+            if (![CYLConstants isLiquidGlassActive]) {
                 // LiquidGlass 已经自带缩放动画， 无需缩放
                 [self addOnceScaleAnimationOnView:newView];
             }
@@ -492,11 +494,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     return should && shouldSelectViewControllerFromSuper;
 }
 
-//- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
+//- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
 //    return YES;
 //}
 
-- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+- (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;
     if ([control cyl_isTabButton]) {
         //更改红标状态
@@ -528,6 +530,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 }
 //缩放动画
 - (void)addScaleAnimationOnView:(UIView *)animationView repeatCount:(float)repeatCount {
+    if (CYL_IS_IOS_26) {
+        //不建议在iOS26上给PlusButton添加动画， 因为在玻璃遮罩显示时， 玻璃遮罩本身就有缩放动画， 再添加动画， 会非常冗余。
+        return;
+    }
     //需要实现的帧动画，这里根据需求自定义
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animation];
     animation.keyPath = @"transform.scale";
@@ -540,6 +546,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 //旋转动画
 - (void)addRotateAnimationOnView:(UIView *)animationView {
+    if (CYL_IS_IOS_26) {
+        //不建议在iOS26上给PlusButton添加动画， 因为在玻璃遮罩显示时， 玻璃遮罩本身就有缩放动画， 再添加动画， 会非常冗余。
+        return;
+    }
     // 针对旋转动画，需要将旋转轴向屏幕外侧平移，最大图片宽度的一半
     // 否则背景与按钮图片处于同一层次，当按钮图片旋转时，转轴就在背景图上，动画时会有一部分在背景图之下。
     // 动画结束后复位

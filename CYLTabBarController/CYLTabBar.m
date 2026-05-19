@@ -180,7 +180,7 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
     }
     
     // FIX: iOS15有时候会导致TaBar透明的问题 但是这样会导致无法主动让TabBar透明 考虑以后添加属性 // 现在通过判断isHidden来处理，如果隐藏了就不再修改alpha
-    if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0") && ![CYLConstants isUsedLiquidGlass]) {
+    if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0") && ![CYLConstants isLiquidGlassActive]) {
         [self removeAlphaObserver];
         UIView *backgroundView = self.cyl_tabBackgroundView;
         UIView *shadowView = self.cyl_tabShadowImageView.subviews.firstObject;
@@ -279,7 +279,7 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
                  childViewX:(CGFloat)childViewX
             tabBarItemWidth:(CGFloat)tabBarItemWidth
                       index:(NSUInteger)index {
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         //仅修改childView的x和宽度,yh值不变
         childView.frame = CGRectMake(childViewX,
                                      CGRectGetMinY(childView.frame),
@@ -380,7 +380,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 }
 
 - (void)removeAlphaObserver {
-    if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0") && ![CYLConstants isUsedLiquidGlass]) {
+    if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0") && ![CYLConstants isLiquidGlassActive]) {
         [_observedViews enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, BOOL * _Nonnull stop) {
             [obj removeObserver:self forKeyPath:@"alpha"];
         }];
@@ -404,14 +404,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     }
 }
 
-- (BOOL)isPlusButtonCenterCustomized {
-    if ([self constantOfPlusButtonCenterYOffsetForTabBarHeight] > 0) {
-        return YES;
-    }
-    if ([self multiplierOfTabBarHeight] != 0.5) {
-        return YES;
-    }
-    return NO;
+- (BOOL)isPlusButtonLayoutCentered {
+    return [self.plusButton isLayoutCentered];
 }
 
 - (CGFloat)multiplierOfTabBarHeight {
@@ -419,9 +413,6 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 }
 
 - (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
-    if ([CYLConstants isUsedLiquidGlass] && self.cyl_hasPlusChildViewController) {
-//        return 0.5;
-    }
     CGFloat multiplierOfTabBarHeight;
     if ([[self.plusButton class] respondsToSelector:@selector(multiplierOfTabBarHeight:)]) {
         multiplierOfTabBarHeight = [[self.plusButton class] multiplierOfTabBarHeight:tabBarHeight];
@@ -452,9 +443,6 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 }
 
 - (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
-    if ([CYLConstants isUsedLiquidGlass] && self.cyl_hasPlusChildViewController) {
-//        return 0;
-    }
     CGFloat constantOfPlusButtonCenterYOffset = 0.f;
     if ([[self.plusButton class] respondsToSelector:@selector(constantOfPlusButtonCenterYOffsetForTabBarHeight:)]) {
         constantOfPlusButtonCenterYOffset = [[self.plusButton class] constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
@@ -478,7 +466,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     CGFloat tabBarWidth = self.cyl_boundsSize.width;
     CGFloat tabBarHeight = self.cyl_boundsSize.height;
     
-    if (![CYLConstants isUsedLiquidGlass]) {
+    if (![CYLConstants isLiquidGlassActive]) {
         CGFloat multiplierOfTabBarHeight = [self multiplierOfTabBarHeight:tabBarHeight];
         CGFloat constantOfPlusButtonCenterYOffset = [self constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
         _plusButton.center = CGPointMake(tabBarWidth * 0.5, tabBarHeight * multiplierOfTabBarHeight + constantOfPlusButtonCenterYOffset);
@@ -649,7 +637,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 
 // 识别ContinuousSelection手势，需要代理长按等其他，处理PlusButton事件响应优先级为最优。
 - (void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
-    if (![CYLConstants isUsedLiquidGlass] || ![self isKindOfClass:[CYLTabBar class]]) {
+    if (![CYLConstants isLiquidGlassActive] || ![self isKindOfClass:[CYLTabBar class]]) {
         [super addGestureRecognizer:gestureRecognizer];
         return;
     }
@@ -666,7 +654,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 
 //处理PlusButton事件响应优先级为最优。
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    if (![CYLConstants isUsedLiquidGlass] || ![self isKindOfClass:[CYLTabBar class]]) {
+    if (![CYLConstants isLiquidGlassActive] || ![self isKindOfClass:[CYLTabBar class]]) {
         return YES;
     }
     CGPoint location = [gestureRecognizer locationInView:self];

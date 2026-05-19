@@ -16,7 +16,17 @@
 
 + (CGFloat)UIBasisWidthScale;
 + (CGFloat)UIBasisHeightScale;
+
+/*!
+ * Liquid Glass, same as `+isUsedLiquidGlass`
+ */
++ (BOOL)isLiquidGlassActive;
+
+/*!
+ * Liquid Glass, same as `+isLiquidGlassActive`
+ */
 + (BOOL)isUsedLiquidGlass;
+
 + (NSValue *)cyl_getTureLottieSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage;
 
 @end

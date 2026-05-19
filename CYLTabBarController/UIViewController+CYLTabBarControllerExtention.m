@@ -237,6 +237,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (UIControl *)cyl_tabButton {
     UIControl *tabButton = objc_getAssociatedObject(self, @selector(cyl_tabButton));
     if (tabButton) {
+        //TODO:      if (tabButton && [tabButton isKindOfClass:[UIControl class]]) {
+
         return tabButton;
     }
     if (!self.cyl_isEmbedInTabBarController) {
@@ -444,7 +446,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         if ([pureCustomTabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
             CYLFlatDesignTabBarItem *item = (CYLFlatDesignTabBarItem *)viewController.cyl_tabButton;
             if ([item isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
-                return item.actualBadgeSuperView;
+//                UIControl *view;
+//                if ([item respondsToSelector:@selector(actualBadgeSuperView)]) {
+//                    view = [item performSelector:@selector(actualBadgeSuperView)];
+//                }
+//                return view;
+            } else if ([item isKindOfClass:[UIControl class]]) {
+                return item;
             }
         }
     }
@@ -472,7 +480,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 
 - (UIControl *)cyl_visiableTabButton {
-    if ([CYLConstants isUsedLiquidGlass]) {
+    if ([CYLConstants isLiquidGlassActive]) {
         return self.tabBarItem.cyl_selectedTabButton;
     }
     return self.cyl_tabButton;
