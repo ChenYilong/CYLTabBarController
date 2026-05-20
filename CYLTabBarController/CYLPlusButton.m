@@ -199,7 +199,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     Class<CYLPlusButtonSubclassing> class = self;
     UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
     if (NO == plusButton.cyl_userInteractionDisabled) {
-        plusButton.selected = YES;
+        // 不使用selected 以避免选中背景
+        plusButton.highlighted = YES;
     }
     return plusButton;
 }
@@ -235,7 +236,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     selectedContentView.userInteractionEnabled = false;
     [selectedContentView sizeToFit];
     if (NO == self.cyl_userInteractionDisabled) {
-        selectedContentView.selected = YES;
+        // 不使用selected 以避免选中背景
+        selectedContentView.highlighted = YES;
     }
     _selectedContentView = selectedContentView;
     return _selectedContentView;
