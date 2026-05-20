@@ -60,115 +60,120 @@
     return self;
 }
 
-//上下结构的 button
-/*
-+ (id)plusButton {
-CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
-UIImage *normalButtonImage = [self contentImage];
-UIImage *hlightButtonImage = [self selectedContentImage];
-
-[button setImage:normalButtonImage forState:UIControlStateNormal];
-[button setImage:hlightButtonImage forState:UIControlStateHighlighted];
-[button setImage:hlightButtonImage forState:UIControlStateSelected];
-
-button.contentMode = UIViewContentModeCenter;
-button.imageView.contentMode = UIViewContentModeScaleAspectFit;
-
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000
-if (@available(iOS 15.0, *)) {
-    UIButtonConfiguration *config = [UIButtonConfiguration plainButtonConfiguration];
-    config.baseBackgroundColor = [UIColor clearColor];
-    
-    // ===== 核心：图片在上，文字在下 =====
-    config.imagePlacement = NSDirectionalRectEdgeTop;
-//        config.imagePadding = 1.0;
-    
-    // 字体
-    UIFont *font = [UIFont systemFontOfSize:9.5];
-    config.titleTextAttributesTransformer =
-        ^NSDictionary<NSAttributedStringKey,id> *(NSDictionary<NSAttributedStringKey,id> *attrs) {
-            NSMutableDictionary *m = [attrs mutableCopy];
-            m[NSFontAttributeName] = font;
-            return [m copy];
-        };
-    
-    button.configuration = config;
-    
-    // ===== 禁用高亮变暗效果 =====
-    button.configurationUpdateHandler = ^(UIButton *btn) {
-        btn.tintAdjustmentMode = UIViewTintAdjustmentModeNormal;
-        btn.imageView.alpha = 1.0;
-    };
-    
-} else
-#endif
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    // ===== iOS 15 以下：手动布局 =====
-    button.adjustsImageWhenHighlighted = NO;
-    button.backgroundColor = UIColor.clearColor;
-    button.titleLabel.font = [UIFont systemFontOfSize:9.5];
-#pragma clang diagnostic pop
-}
-
-[button setTitle:@"发布" forState:UIControlStateNormal];
-[button setTitle:@"发布" forState:UIControlStateSelected];
-
-//    button.frame = CGRectMake(0.0, 0.0, 55, 80);
-button.bounds = CGRectMake(0.0, 0.0, 55, 80);
-
-// if you use `+plusChildViewController`, do not addTarget to plusButton.
-SEL action = @selector(clickPublish);
-[button removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-[button addTarget:button action:action forControlEvents:UIControlEventTouchUpInside];
-
-if (CYLPlusChildViewController && button.isLayoutCentered) {
-    [button cyl_setUserInteractionDisabled:NO];
-} else {
-    [button cyl_setUserInteractionDisabled:YES];
-}
-
-// ===== iOS 15 以下：手动设置 imageView / titleLabel 位置 =====
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000
-if (@available(iOS 15.0, *)) {
-    // iOS 15+ 由 UIButtonConfiguration 自动处理，无需手动布局
-} else
-#endif
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    CGFloat const imageViewEdgeWidth  = self.cyl_tabBarController.visiableTabBarSize.width * 0.7;
-    CGFloat const imageViewEdgeHeight = imageViewEdgeWidth * 0.9;
-    CGFloat const centerOfView        = self.cyl_tabBarController.visiableTabBarSize.width * 0.5;
-    CGFloat const labelLineHeight     = button.titleLabel.font.lineHeight;
-    CGFloat const verticalMargin      = (self.cyl_tabBarController.visiableTabBarSize.height
-                                         - labelLineHeight - imageViewEdgeHeight) * 0.5;
-    
-    CGFloat const centerOfImageView   = verticalMargin + imageViewEdgeHeight * 0.5;
-    CGFloat const centerOfTitleLabel  = imageViewEdgeHeight + verticalMargin * 2
-                                        + labelLineHeight * 0.5 + 5;
-    
-    button.imageView.bounds  = CGRectMake(0, 0, imageViewEdgeWidth, imageViewEdgeHeight);
-    button.imageView.center  = CGPointMake(centerOfView, centerOfImageView);
-    
-    button.titleLabel.bounds = CGRectMake(0, 0,
-                                          self.cyl_tabBarController.visiableTabBarSize.width,
-                                          labelLineHeight);
-    button.titleLabel.center = CGPointMake(centerOfView, centerOfTitleLabel);
-#pragma clang diagnostic pop
-}
-
-return button;
-}
-*/
 #pragma mark -
 #pragma mark - CYLPlusButtonSubclassing Methods
 
 /*
+//上下结构的 button
+
++ (id)plusButton {
+    CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
+    UIImage *normalButtonImage = [self contentImage];
+    UIImage *hlightButtonImage = [self selectedContentImage];
+    
+    [button setImage:normalButtonImage forState:UIControlStateNormal];
+    [button setImage:hlightButtonImage forState:UIControlStateHighlighted];
+    [button setImage:hlightButtonImage forState:UIControlStateSelected];
+    
+    button.contentMode = UIViewContentModeCenter;
+    button.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000
+    if (@available(iOS 15.0, *)) {
+        UIButtonConfiguration *config = [UIButtonConfiguration plainButtonConfiguration];
+        config.baseBackgroundColor = [UIColor clearColor];
+        config.baseForegroundColor = [UIColor labelColor]; // ← 加这一行，控制图片 tint 和文字颜色
+
+        // ===== 核心：图片在上，文字在下 =====
+        config.imagePlacement = NSDirectionalRectEdgeTop;
+        //        config.imagePadding = 1.0;
+        
+        // 字体
+        UIFont *font = [UIFont systemFontOfSize:9.5];
+        config.titleTextAttributesTransformer =
+        ^NSDictionary<NSAttributedStringKey,id> *(NSDictionary<NSAttributedStringKey,id> *attrs) {
+            NSMutableDictionary *m = [attrs mutableCopy];
+            m[NSFontAttributeName] = font;
+            m[NSForegroundColorAttributeName] = [UIColor labelColor]; // ← 加这一行，直接覆盖颜色
+            return [m copy];
+        };
+        
+        button.configuration = config;
+        
+        // ===== 禁用高亮变暗效果 =====
+        button.configurationUpdateHandler = ^(UIButton *btn) {
+            btn.tintAdjustmentMode = UIViewTintAdjustmentModeNormal;
+            btn.imageView.alpha = 1.0;
+        };
+        
+    } else
+#endif
+    {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        // ===== iOS 15 以下：手动布局 =====
+        button.adjustsImageWhenHighlighted = NO;
+        button.backgroundColor = UIColor.clearColor;
+        button.titleLabel.font = [UIFont systemFontOfSize:9.5];
+#pragma clang diagnostic pop
+    }
+    
+    [button setTitle:@"发布" forState:UIControlStateNormal];
+    [button setTitle:@"发布" forState:UIControlStateSelected];
+    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];   // ← 加这一行
+    [button setTitleColor:[UIColor blackColor] forState:UIControlStateSelected]; // ← 加这一行
+    [button setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted]; // ← 加这一行
+    //    button.frame = CGRectMake(0.0, 0.0, 55, 80);
+    button.bounds = CGRectMake(0.0, 0.0, 55, 80);
+    
+    // if you use `+plusChildViewController`, do not addTarget to plusButton.
+    SEL action = @selector(clickPublish);
+    [button removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+    [button addTarget:button action:action forControlEvents:UIControlEventTouchUpInside];
+    
+    if (CYLPlusChildViewController && button.isLayoutCentered) {
+        [button cyl_setUserInteractionDisabled:NO];
+    } else {
+        [button cyl_setUserInteractionDisabled:YES];
+    }
+    
+    // ===== iOS 15 以下：手动设置 imageView / titleLabel 位置 =====
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000
+    if (@available(iOS 15.0, *)) {
+        // iOS 15+ 由 UIButtonConfiguration 自动处理，无需手动布局
+    } else
+#endif
+    {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        CGFloat const imageViewEdgeWidth  = self.cyl_tabBarController.visiableTabBarSize.width * 0.7;
+        CGFloat const imageViewEdgeHeight = imageViewEdgeWidth * 0.9;
+        CGFloat const centerOfView        = self.cyl_tabBarController.visiableTabBarSize.width * 0.5;
+        CGFloat const labelLineHeight     = button.titleLabel.font.lineHeight;
+        CGFloat const verticalMargin      = (self.cyl_tabBarController.visiableTabBarSize.height
+                                             - labelLineHeight - imageViewEdgeHeight) * 0.5;
+        
+        CGFloat const centerOfImageView   = verticalMargin + imageViewEdgeHeight * 0.5;
+        CGFloat const centerOfTitleLabel  = imageViewEdgeHeight + verticalMargin * 2
+        + labelLineHeight * 0.5 + 5;
+        
+        button.imageView.bounds  = CGRectMake(0, 0, imageViewEdgeWidth, imageViewEdgeHeight);
+        button.imageView.center  = CGPointMake(centerOfView, centerOfImageView);
+        
+        button.titleLabel.bounds = CGRectMake(0, 0,
+                                              self.cyl_tabBarController.visiableTabBarSize.width,
+                                              labelLineHeight);
+        button.titleLabel.center = CGPointMake(centerOfView, centerOfTitleLabel);
+#pragma clang diagnostic pop
+    }
+    
+    return button;
+}
+*/
+
+/*
  *
  Create a custom UIButton with title and add it to the center of our tab bar
- *
  */
 + (id)plusButton {
     CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
@@ -224,29 +229,8 @@ return button;
     }
     return button;
 }
-
-/*
- *
- Create a custom UIButton without title and add it to the center of our tab bar
- *
- */
-//+ (id)plusButton
-//{
-//
-//    UIImage *buttonImage = [UIImage imageNamed:@"hood.png"];
-//    UIImage *highlightImage = [UIImage imageNamed:@"hood-selected.png"];
-//
-//    CYLPlusButtonSubclass* button = [CYLPlusButtonSubclass buttonWithType:UIButtonTypeCustom];
-//
-//    button.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleTopMargin;
-//    button.frame = CGRectMake(0.0, 0.0, buttonImage.size.width, buttonImage.size.height);
-//    [button setBackgroundImage:buttonImage forState:UIControlStateNormal];
-//    [button setBackgroundImage:highlightImage forState:UIControlStateHighlighted];
-//    [button addTarget:button action:@selector(clickPublish) forControlEvents:UIControlEventTouchUpInside];
-//
-//    return button;
-//}
-
+ 
+ 
 #pragma mark -
 #pragma mark - Event Response
 
@@ -354,18 +338,18 @@ return button;
 #pragma clang diagnostic pop
 #pragma mark - CYLPlusButtonSubclassing
 
-//+ (UIViewController *)plusChildViewController {
-//    UIViewController *plusChildViewController = [[UIViewController alloc] init];
-//    plusChildViewController.view.backgroundColor = [UIColor redColor];
-//    plusChildViewController.navigationItem.title = @"PlusChildViewController";
-//    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
-//                                                   initWithRootViewController:plusChildViewController];
-//    return plusChildNavigationController;
-//}
-//
-//+ (NSUInteger)indexOfPlusButtonInTabBar {
-//    return 2;
-//}
++ (UIViewController *)plusChildViewController {
+    UIViewController *plusChildViewController = [[UIViewController alloc] init];
+    plusChildViewController.view.backgroundColor = [UIColor redColor];
+    plusChildViewController.navigationItem.title = @"PlusChildViewController";
+    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
+                                                   initWithRootViewController:plusChildViewController];
+    return plusChildNavigationController;
+}
+
++ (NSUInteger)indexOfPlusButtonInTabBar {
+    return 2;
+}
 
 + (BOOL)shouldSelectPlusChildViewController {
     BOOL isSelected = CYLExternPlusButton.selected;

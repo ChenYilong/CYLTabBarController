@@ -496,14 +496,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     return should && shouldSelectViewControllerFromSuper;
 }
 
-- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
-    if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController] && ![self.tabBar isPlusButtonLayoutCentered]) {
-        [CYLExternPlusButton.titleLabel cyl_setHidden:YES];
-    } else {
-        [CYLExternPlusButton.titleLabel cyl_setHidden:NO];
-    }
-    return YES;
-}
+//- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
+//    if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController] && ![self.tabBar isPlusButtonLayoutCentered]) {
+//        CYLExternPlusButton.titleLabel.alpha = 0.5;
+//    } else {
+//        [CYLExternPlusButton.titleLabel cyl_setHidden:NO];
+//    }
+//    return YES;
+//}
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;

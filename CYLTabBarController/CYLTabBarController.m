@@ -271,9 +271,7 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
                                                                  show:YES
                                               delayIfNeededForSeconds:1
                                                            completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull selectedCover) {
-                    if (self.tabBar.isPlusButtonLayoutCentered) {
-                        return;
-                    }
+
                     /*!
                      *
                      *我要求 selectedCover 的中心坐标 强制与 CYLExternPlusButton坐标一致。 坐标系转换
