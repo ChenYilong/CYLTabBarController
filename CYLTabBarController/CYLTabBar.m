@@ -674,8 +674,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     
     if ([hitView isKindOfClass:[CYLPlusButton class]] && !CYLPlusChildViewController) {
         // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
-        // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_shouldNotSelect = YES; 来禁止该协议方法触发plusButton回调
-        if (!CYLExternPlusButton.cyl_shouldNotSelect) {
+        // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
+        if (!CYLExternPlusButton.cyl_userInteractionDisabled) {
             if ([self.cyl_tabBarController respondsToSelector:actin]) {
                 CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
                 (

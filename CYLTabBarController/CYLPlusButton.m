@@ -51,7 +51,7 @@ UIViewController *CYLPlusChildViewController = nil;
         [[self class] addSelectViewControllerTarget:plusButton];
         //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
         if ([CYLConstants isLiquidGlassActive]) {
-//            plusButton.cyl_shouldNotSelect = YES;
+//            plusButton.cyl_userInteractionDisabled = YES;
         }
         if ([[self class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
             CYLPlusButtonIndex = [[self class] indexOfPlusButtonInTabBar];
@@ -96,7 +96,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     NSInteger index = [tabBarController.viewControllers indexOfObject:CYLPlusChildViewController];
     if (NSNotFound != index && (index < tabBarController.viewControllers.count)) {
         [tabBarController setSelectedIndex:index];
-        if (NO == sender.cyl_shouldNotSelect) { 
+        if (NO == sender.cyl_userInteractionDisabled) { 
             sender.selected = YES;
             [tabBarController tabChangedToControl:self];
         }
@@ -198,7 +198,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 + (UIButton *)selectedContentView {
     Class<CYLPlusButtonSubclassing> class = self;
     UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
-    if (NO == plusButton.cyl_shouldNotSelect) {
+    if (NO == plusButton.cyl_userInteractionDisabled) {
         plusButton.selected = YES;
     }
     return plusButton;
@@ -234,7 +234,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     selectedContentView.translatesAutoresizingMaskIntoConstraints = NO;
     selectedContentView.userInteractionEnabled = false;
     [selectedContentView sizeToFit];
-    if (NO == self.cyl_shouldNotSelect) {
+    if (NO == self.cyl_userInteractionDisabled) {
         selectedContentView.selected = YES;
     }
     _selectedContentView = selectedContentView;

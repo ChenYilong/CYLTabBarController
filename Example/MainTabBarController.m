@@ -51,6 +51,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                       titlePositionAdjustment:titlePositionAdjustment
                                     styleType:tabBarStyleType
                                       context:context]) {
+//        self.adjustTabBarItemImageViewSizeDependOnSuperView = NO;
+
         [self customizeTabBarAppearanceWithTitlePositionAdjustment:titlePositionAdjustment];
         self.delegate = self;
         self.navigationController.navigationBar.hidden = YES;
@@ -467,7 +469,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 #pragma mark - delegate
 
-- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
     UIControl *tabButton = viewController.tabBarItem.cyl_visiableTabButton;
     BOOL shouldSelectViewControllerFromSuper = [super tabBarController:tabBarController shouldSelectViewController:viewController];
 
@@ -494,9 +496,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     return should && shouldSelectViewControllerFromSuper;
 }
 
-//- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
-//    return YES;
-//}
+- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
+    if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController] && ![self.tabBar isPlusButtonLayoutCentered]) {
+        [CYLExternPlusButton.titleLabel cyl_setHidden:YES];
+    } else {
+        [CYLExternPlusButton.titleLabel cyl_setHidden:NO];
+    }
+    return YES;
+}
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;
@@ -514,7 +521,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     UIButton *button = CYLExternPlusButton;
     BOOL isPlusButton = [control cyl_isPlusButton];
     // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
-    // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_shouldNotSelect = YES; 来禁止该协议方法触发plusButton回调
+    // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
     if (isPlusButton) {
         animationView = button.imageView;
     }

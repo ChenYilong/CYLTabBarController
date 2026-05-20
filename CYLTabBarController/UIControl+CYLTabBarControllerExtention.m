@@ -47,6 +47,14 @@
     return isChildViewControllerPlusButton;
 }
 
+- (void)cyl_setUserInteractionDisabled:(BOOL)cyl_userInteractionDisabled {
+    [self cyl_setShouldNotSelect:cyl_userInteractionDisabled];
+}
+
+- (BOOL)cyl_userInteractionDisabled {
+    return self.cyl_shouldNotSelect;
+}
+
 - (BOOL)cyl_shouldNotSelect {
     NSNumber *shouldNotSelectObject = objc_getAssociatedObject(self, @selector(cyl_shouldNotSelect));
     return [shouldNotSelectObject boolValue];
@@ -337,8 +345,9 @@
         return;
     }
 //        //TODO: 区分cover 与 replace 两个场景， 获取到真实的view，可能是lottie，决定是否限制新视图的尺寸， 目前暂不限制尺寸。 因为主要场景为 cover 场景。cover =( adjustTabBarItemImageViewSizeDependOnSuperView == yes), replace =( adjustTabBarItemImageViewSizeDependOnSuperView == NO)
-    if (newView.frame.size.width == 0 || newView.frame.size.height == 0 || newView.frame.size.width > tabBarButton.frame.size.width || newView.frame.size.height > tabBarButton.frame.size.height) {
-        
+    if (newView.frame.size.width == 0 || newView.frame.size.height == 0) {
+        //        不再限制newView 是否能超过父视图，因为你可以通过设置size来控制newView的展示大小。
+        //        if (newView.frame.size.width > tabBarButton.frame.size.width || newView.frame.size.height > tabBarButton.frame.size.height) {
         newView.frame = ({
             CGRect frame = newView.frame;
             if (self.cyl_tabBarController.adjustTabBarItemImageViewSizeDependOnSuperView) {

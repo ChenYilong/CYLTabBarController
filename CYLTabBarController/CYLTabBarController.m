@@ -1067,7 +1067,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController
                               shouldSelectViewController:(UIViewController *)viewController
                                             shouldSelect:(BOOL)shouldSelect {
-    [[viewController.tabBarItem cyl_tabButton] cyl_setShouldNotSelect:!shouldSelect];
+    [[viewController.tabBarItem cyl_tabButton] cyl_setUserInteractionDisabled:!shouldSelect];
     if (!shouldSelect) {
         return;
     }
@@ -1083,6 +1083,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (plusButton.selected) {
         plusButton.selected = NO;
     }
+
     
     if (!shouldConfigureSelectionStatus) {
 #if __has_include(<Lottie/Lottie.h>)
@@ -1138,6 +1139,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
+    if (![CYLConstants isLiquidGlassActive] || ![tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+        return NO;
+    }
     if (![self hasPlusChildViewController]) {
         return YES;
     }
@@ -1207,7 +1211,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     
     BOOL shouldSelectViewController =  YES;
     @try {
-        shouldSelectViewController = (!control.cyl_shouldNotSelect) && (!control.hidden) ;
+        shouldSelectViewController = (!control.cyl_userInteractionDisabled) && (!control.hidden) ;
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
         NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
