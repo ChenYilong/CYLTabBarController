@@ -1,17 +1,28 @@
 # Uncomment the next line to define a global platform for your project
-# platform :ios, '9.0'
-source 'https://cdn.cocoapods.org/'
+platform :ios, '13.0'
+ENV['SWIFT_VERSION'] = '5'
 
 target 'CYLTabBarController' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-#pod 'CYLTabBarController', '~> 1.28.5'        # 默认不依赖Lottie
-pod 'CYLTabBarController/Lottie', '~> 1.29.0'  # 依赖Lottie库
+#pod 'CYLTabBarController', '~> 1.99.38'        # 默认不依赖Lottie
+#pod 'CYLTabBarController/LottieObjectiveC', '~> 1.99.38'  # 依赖Lottie Objective-C库
+#pod 'CYLTabBarController/LottieSwift', '~> 1.99.38'  # 依赖Lottie Swift库
 
 #pod 'CYLTabBarController', :path => './'
-#pod 'CYLTabBarController/Lottie', :path => './'
+#pod 'CYLTabBarController/LottieObjectiveC', :path => './'
+pod 'CYLTabBarController/LottieSwift', :path => './'
+
 
 pod 'MJRefresh'
 
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "13.0"
+    end
+  end
 end

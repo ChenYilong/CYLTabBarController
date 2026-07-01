@@ -3,7 +3,7 @@
  //  CYLTabBarController
  //
  //  Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 03/06/19.
- //  Copyright © 2019 https://github.com/ChenYilong . All rights reserved.
+ //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
  */
 
 #import <UIKit/UIKit.h>
@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, getter=cyl_disablePopGestureRecognizer, setter=cyl_setDisablePopGestureRecognizer:) BOOL cyl_disablePopGestureRecognizer;
 @property (nonatomic, assign, getter=cyl_hideNavigationBarSeparator, setter=cyl_setHideNavigationBarSeparator:) BOOL cyl_hideNavigationBarSeparator;
 @property (nonatomic, assign, getter=cyl_navigationBarHidden, setter=cyl_setNavigationBarHidden:) BOOL cyl_navigationBarHidden;
+@property (nonatomic, assign, getter=cyl_hidesBottomBarWhenPushed, setter=cyl_setHidesBottomBarWhenPushed:) BOOL cyl_hidesBottomBarWhenPushed;
 
 /*!
  * 使用方法：用在viewWillDisappear/dealloc

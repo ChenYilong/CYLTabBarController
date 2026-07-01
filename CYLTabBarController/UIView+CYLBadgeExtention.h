@@ -3,7 +3,7 @@
  //  CYLTabBarController
  //
  //  Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 03/06/19.
- //  Copyright © 2019 https://github.com/ChenYilong . All rights reserved.
+ //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
  */
 
 #import <UIKit/UIKit.h>
@@ -49,7 +49,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)cyl_isPauseBadge;
 
 - (BOOL)cyl_isInvisiable;
+
+- (BOOL)cyl_isHidden;
+
 - (BOOL)cyl_canNotResponseEvent;
+
+/*!
+ * 在 cyl_getActualBadgeSuperView方法中使用
+ */
+- (UIView *)cyl_findBarButtonContentView;
 
 @end
 

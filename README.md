@@ -1,14 +1,14 @@
 <p align="center"><a href="https://github.com/ChenYilong/CYLTabBarController"><img src="https://repository-images.githubusercontent.com/44896762/c1d6e880-a8d8-11e9-8bb4-2da8ebc06f0a"></a></p>
 
 
-# [CN]CYLTabBarController【一行代码实现 Lottie 动画 TabBar】
+# [CN]CYLTabBarController【一行代码实现 Lottie 动画 TabBar】iOS26+ Tested
 # [EN]CYLTabBarController [An animated tabBar supported by Lottie with one line of code] 
 
 
 <p align="center">
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec"><img src="https://img.shields.io/badge/Pod-GetLatestVersion-green.svg?style=flat"></a>
 <a href=""><img src="https://img.shields.io/badge/Swift-compatible-orange.svg"></a>
-<a href=""><img src="https://img.shields.io/badge/platform-iOS%208.0%2B-ff69b5152950834.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/platform-iOS%2012.0%2B-ff69b5152950834.svg"></a>
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
 
 </p>
@@ -49,9 +49,41 @@
  - [EN] mark means English language.
  - [CN] [点此获取 QQ 群,Telegram 群交流信息]( https://github.com/ChenYilong/iOSBlog/issues/21) 。
  - [EN]Telegram Group to communicate the features or bugs: https://t.me/CYLTabBarController 
+ 
+## Preview of latest version 
+
+ Preview of the latest version 1.99.38 on iOS 26+ 
+ 
+CYLTabBarController 现已支持 iOS26 上实现以下效果， 请更新至版本1.99.38以上版本：
+
+- ✅同时展示 Lottie动画与液态玻璃效果；
+- ✅支持将加号➕按钮，展示在液态玻璃效果上，并居中展示。保留 CYLTabBarController 旧版本的所有加号按钮逻辑。仅增加玻璃遮罩效果；
+- ✅未使用私有API实现液态玻璃，可通过代码静态扫描，Apple 审核过审安全；
+- ✅采用纯原生的液态玻璃效果，支持 iOS 系统设置对液态玻璃属性的全部修改操作；
+- ✅企业生产环境级别开源解决方案；
+- ✅对于已经集成 CYLTabBarController 的开发者友好，升级适配开发难度， 代码修改低于10行，升级总时长低于1小时；
+- ✅不依赖UI兼容模式， iOS27 过审友好；
+- ✅不依赖UI兼容模式， 实现扁平风格UI， iOS27 过审友好；
+
+即刻访问 [这里]( https://github.com/ChenYilong/CYLTabBarController
+ "") ，了解更多：
+ 
 
 
-# [CN]谁在用?上架APP列表[EN]who are using?List  of App published 
+
+![Image](https://github.com/user-attachments/assets/eb8fc2c1-1998-4280-92ac-15d26732904c)
+
+![Image](https://github.com/user-attachments/assets/5895c2af-0be7-46e9-8a69-a5576922877b)
+![Image](https://github.com/user-attachments/assets/6bc78f3b-5b78-4083-bb3f-28c8a9a1edcc)
+![Image](https://github.com/user-attachments/assets/c196f44e-ce4b-4de0-b6be-6cafe5b93292)
+![Image](https://github.com/user-attachments/assets/5c2f0a09-6c2b-4506-a3b9-87ca3f1fe779)
+![Image](https://github.com/user-attachments/assets/3a2f2c8a-db70-4513-8b7f-0fcff077baec)
+1.99.38 版本， 现已支持 iOS26上 ， APP 运行中， 增加或者删除加号按钮， 效果见下面的演示，即刻访问：https://github.com/ChenYilong/CYLTabBarController Demo 进行尝试：
+
+<img width="1320" height="2868" alt="Image" src="https://github.com/user-attachments/assets/4825a10c-df23-42ae-b8d6-322646b090e4" />
+<img width="883" height="1917" alt="Image" src="https://github.com/user-attachments/assets/8e6aeca5-8e36-46d0-9626-c6de94edbef3" />
+
+# [CN]谁在用?上架APP列表[EN]who are using? List  of App published
 
 
 
@@ -358,7 +390,7 @@ pod 'CYLTabBarController', '~> 1.24.0'
                                                  CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
                                                  };
     NSDictionary *secondTabBarItemsAttributes = @{
-                                                  CYLTabBarItemTitle : @"鱼塘",
+                                                  CYLTabBarItemTitle : @"同城",
                                                   CYLTabBarItemImage : self.darkMode ? @"fishpond_highlight" : @"fishpond_normal",
                                                   CYLTabBarItemSelectedImage : @"fishpond_highlight",
                                                   };
@@ -808,11 +840,6 @@ Demo 演示的效果图：
 
 + (BOOL)shouldSelectPlusChildViewController {
     BOOL isSelected = CYLExternPlusButton.selected;
-    if (isSelected) {
-//        HDLLogDebug("🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
-    } else {
-//        HDLLogDebug("🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
-    }
     return YES;
 }
 

@@ -2,8 +2,8 @@
 //  CYLTabBarController.h
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLPlusButton.h"
@@ -21,6 +21,7 @@
 #import "UIView+CYLBadgeExtention.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
+#import "CYLFlatDesignTabBar.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,6 +31,7 @@ typedef void(^CYLViewDidLayoutSubViewsBlock)(CYLTabBarController *tabBarControll
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitle;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImage;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedImage;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieFilePath;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieURL;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImageInsets;
@@ -44,13 +46,35 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 @optional
 /*!
  * @param tabBarController The tab bar controller containing viewController.
- * @param control Selected UIControl in TabBar.
+ * @param control Selected UIControl in TabBar. 与 `-[UITaBar  tabBar: didSelectItem:]` 相比，差别在于该参数UIControl可能包含自定义加号➕按钮。且支持如果是代码或者用户交互切换index时都进行回调。弥补了 `-[UITaBar  tabBar: didSelectItem:]` 仅在用户点击时调用的不足。
+ *
+ *调用时机与shouldSelectViewController 代理方法一致。
+  * 三个地方 ， 时机会调用：
+  *  选中状态下的重新点击，（iOS26 需要在手势代理方法中进行hook追加该方法）
+  *  用户切换index时 ，底层通过 `-setSelectedViewController`方法来实现。
+  *  代码切换index 时，底层通过 `-setSelectedIndex` 方法来实现。
+ * @attention 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发涉及plusButton的回调
  */
-- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control;
+- (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
+- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control;
 
 @end
 
-@interface CYLTabBarController : UITabBarController <CYLTabBarControllerDelegate>
+@interface CYLTabBarController : UITabBarController <CYLTabBarControllerDelegate, CYLFlatDesignTabBarDelegate>
+
+typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
+    CYLTabBarStyleTypeDefault = 0,
+    CYLTabBarStyleTypeSystem,
+    CYLTabBarStyleTypeFlatDesign,
+    CYLTabBarStyleTypeLiquidGlass
+};
+
+/*!
+ * 设置为CYLTabBarStyleTypeFlatDesign，表示扁平化设计， 本属性相当于UI兼容模式的代码替代版本，仅仅在 iOS26+ 系统有效。   其内部会设置noNeedUIDesignCompatibility该属性用于决定是否使用扁平设计。
+ * @return means noNeedUIDesignCompatibility == YES if return CYLTabBarStyleTypeLiquidGlass, means noNeedUIDesignCompatibility == NO if return CYLTabBarStyleTypeFlatDesign;
+ * @attention 请在父类的 ViewDidLoad 调用之前设置 CYLTabBarStyleType 。也就是在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
+ */
+@property (nonatomic, assign) CYLTabBarStyleType tabBarStyleType;
 
 @property (nonatomic, copy) CYLViewDidLayoutSubViewsBlock viewDidLayoutSubviewsBlock;
 
@@ -77,14 +101,24 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  */
 @property (nonatomic, readonly, assign) UIEdgeInsets imageInsets;
 
-@property (nonatomic, strong) CYLTabBar *tabBar;
+@property (nonatomic, strong, readonly) CYLTabBar *tabBar;
 
-/*! 
+/*!
+ *  动画视图的渲染模式 只有集成了lottie动画才会生效
+ */
+- (UIViewContentMode)lottieAnimationViewContentMode;
+/*!
  * To set both UIBarItem label text attributes in the tabBar,
  * use the following to tweak the relative position of the label within the tab button (for handling visual centering corrections if needed because of custom text attributes)
  */
 @property (nonatomic, readonly, assign) UIOffset titlePositionAdjustment;
 
+/*!
+ * /// 如果用户设置的TabBarItemImageViewSize不合规，则依据父视图大小来调整，否则依据默认的imageView的大小来调整
+ */
+@property (nonatomic, assign) BOOL adjustTabBarItemImageViewSizeDependOnSuperView;
+
+/** 可以不设置， 默认为 CYLTabBarController，如果设置了，请实现 CYLPlusButton 里 的 +[CYLPlusButton tabBarContext] 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController */
 @property (nonatomic, readonly, copy) NSString *context;
 
 - (instancetype)initWithViewControllers:(NSArray<UIViewController *> *)viewControllers
@@ -115,9 +149,26 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
                             titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                                             context:(NSString *)context;
 
-- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController;
+- (instancetype)initWithViewControllers:(NSArray<UIViewController *> *)viewControllers
+                  tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
+                            imageInsets:(UIEdgeInsets)imageInsets
+                titlePositionAdjustment:(UIOffset)titlePositionAdjustment
+                              styleType:(CYLTabBarStyleType)styleType
+                                context:(NSString *)context;
 
-- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController shouldSelect:(BOOL)shouldSelect;
++ (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
+                              tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
+                                        imageInsets:(UIEdgeInsets)imageInsets
+                            titlePositionAdjustment:(UIOffset)titlePositionAdjustment
+                                          styleType:(CYLTabBarStyleType)styleType
+                                            context:(NSString *)context;
+
+- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController
+                              shouldSelectViewController:(UIViewController *)viewController;
+
+- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController
+                              shouldSelectViewController:(UIViewController *)viewController
+                                            shouldSelect:(BOOL)shouldSelect;
 
 - (void)hideTabBarShadowImageView;
 
@@ -136,6 +187,31 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 - (id<UIApplicationDelegate>)appDelegate;
 
 - (UIWindow *)rootWindow;
+
+/*!
+ *
+/// 更新TabBarItems 其内部其实也重新设置了viewControllers
+/// @param tabBarItemsAttributes tabBarItemsAttributes
+ */
+- (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
+
+- (CGSize)visiableTabBarSize;
+
+- (void)tabChangedToControl:(UIControl *)control;
+/*!
+ * double-check if to use CYLTabBarStyleTypeLiquidGlass or not:
+ * UIDesignCompatibility == FlatDesign , noNeedUIDesignCompatibility == noNeed FlatDesign == LiquidGlass
+ * 设置为 NO，表示扁平化设计， 本属性相当于UI兼容模式的代码替代版本，仅仅在 iOS26+ 系统有效。
+ * 由于 UI 兼容模式的命名晦涩， 更优雅直观的方式为 设置 CYLTabBarStyleType，其内部会设置该属性用于决定是否使用扁平设计。
+ 
+ * @return means  CYLTabBarStyleType == CYLTabBarStyleTypeFlatDesign if return NO, means  CYLTabBarStyleType == CYLTabBarStyleTypeLiquidGlass if return YES;
+ * @attention better switch to property CYLTabBarStyleType
+ */
+@property (nonatomic, assign) BOOL noNeedUIDesignCompatibility;
+@property (nonatomic, assign, getter=isLottieViewAdded, readonly) BOOL lottieViewAdded;
+
+@property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs;
+@property (nonatomic, strong, readonly) NSMutableArray *lottieSizes;
 
 @end
 
@@ -157,5 +233,14 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 @end
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidChangeNotification;
+/*!
+ * 液态玻璃开关变化
+ //TODO:  
+ FOUNDATION_EXTERN NSString *const CYLTabBarStyleTypeDidChangeNotification;
+ FOUNDATION_EXTERN NSString *const CYLTabBarDarkModeShowDarkDidChangeNotification;
+
+ */
+
 
 NS_ASSUME_NONNULL_END
+

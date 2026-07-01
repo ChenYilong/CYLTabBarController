@@ -2,11 +2,10 @@
 //  UIViewController+CYLTabBarControllerExtention.h
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 16/2/26.
-//  Copyright © 2018年 https://github.com/ChenYilong .All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 16/2/26.
+//  Copyright © 2026年 https://github.com/ChenYilong .All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import "CYLBadgeProtocol.h"
 #import "CYLConstants.h"
 
@@ -28,11 +27,14 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 @property (nonatomic, readonly, getter=cyl_tabIndex) NSInteger cyl_tabIndex;
 
-@property (nonatomic, readonly) UIControl *cyl_tabButton;
+//@property (nonatomic, strong) UIControl *cyl_tabButton;
+@property (nonatomic, strong, getter=cyl_tabButton, setter=cyl_setTabButton:) UIControl *cyl_tabButton;
 
 @property (nonatomic, copy, setter=cyl_setContext:, getter=cyl_context) NSString *cyl_context;
 
 @property (nonatomic, assign, setter=cyl_setPlusViewControllerEverAdded:, getter=cyl_plusViewControllerEverAdded) BOOL cyl_plusViewControllerEverAdded;
+
+@property (nonatomic, assign, getter=cyl_isPlaceholder, setter=cyl_setIsPlaceholder:) BOOL cyl_isPlaceholder;
 
 - (BOOL)cyl_isShowBadge;
 /**
@@ -139,6 +141,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 - (UIViewController *)cyl_getViewControllerInsteadOfNavigationController;
 - (void)cyl_handleNavigationBackAction;
 - (void)cyl_handleNavigationBackActionWithAnimated:(BOOL)animated;
+- (UIControl *)cyl_visiableTabButton;
 
 @end
 

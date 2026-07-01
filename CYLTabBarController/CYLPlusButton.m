@@ -2,8 +2,8 @@
 //  CYLPlusButton.m
 //  CYLTabBarController
 //
-//  v1.21.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
-//  Copyright © 2018 https://github.com/ChenYilong . All rights reserved.
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLPlusButton.h"
@@ -13,6 +13,17 @@
 CGFloat CYLPlusButtonWidth = 0.0f;
 UIButton<CYLPlusButtonSubclassing> *CYLExternPlusButton = nil;
 UIViewController *CYLPlusChildViewController = nil;
+
+@interface CYLPlusButton () 
+
+@property (nonatomic, strong) UIImage *snapshot;
+
+@property (nonatomic, weak) UIButton *contentView;
+@property (nonatomic, weak) UIButton *selectedContentView;
+@property (nonatomic, strong) UIImage *selectedContentImage;
+@property (nonatomic, strong) UIImage *contentImage;
+
+@end
 
 @implementation CYLPlusButton
 
@@ -24,9 +35,6 @@ UIViewController *CYLPlusChildViewController = nil;
         return;
     }
     Class<CYLPlusButtonSubclassing> class = self;
-    UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
-    CYLExternPlusButton = plusButton;
-    CYLPlusButtonWidth = plusButton.frame.size.width;
     if ([[self class] respondsToSelector:@selector(plusChildViewController)]) {
         CYLPlusChildViewController = [class plusChildViewController];
         if ([[self class] respondsToSelector:@selector(tabBarContext)]) {
@@ -37,25 +45,48 @@ UIViewController *CYLPlusChildViewController = nil;
         } else {
             [CYLPlusChildViewController cyl_setContext:NSStringFromClass([CYLTabBarController class])];
         }
+        UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
+        CYLExternPlusButton = plusButton;
+        CYLPlusButtonWidth = plusButton.frame.size.width;
         [[self class] addSelectViewControllerTarget:plusButton];
+        //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
+        if ([CYLConstants isLiquidGlassActive]) {
+//            plusButton.cyl_userInteractionDisabled = YES;
+        }
         if ([[self class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
             CYLPlusButtonIndex = [[self class] indexOfPlusButtonInTabBar];
         } else {
-            [NSException raise:NSStringFromClass([CYLTabBarController class]) format:@"If you want to add PlusChildViewController, you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】如果你想使用PlusChildViewController样式，你必须同时在你自定义的plusButton中实现 `+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
+#if defined(DEBUG) || defined(BETA)
+            [NSException raise:NSStringFromClass([CYLTabBarController class]) format:@"[DEBUG INFO]If you want to add PlusChildViewController, you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】[DEBUG INFO]如果你想使用PlusChildViewController样式，你必须同时在你自定义的plusButton中实现 `+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
+#endif
         }
+    } else {
+        UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
+        CYLExternPlusButton = plusButton;
+        CYLPlusButtonWidth = plusButton.frame.size.width;
     }
 }
 
 + (void)removePlusButton {
-    CYLExternPlusButton = nil;
-    [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:NO];
-    CYLPlusChildViewController = nil;
+    if (CYLExternPlusButton) {
+        [CYLExternPlusButton removeFromSuperview];
+        CYLExternPlusButton = nil;
+    }
+    
+    if (CYLPlusChildViewController) {
+        [CYLPlusChildViewController willMoveToParentViewController:nil];
+        [CYLPlusChildViewController.view removeFromSuperview];
+        [CYLPlusChildViewController removeFromParentViewController];
+        [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:NO];
+        CYLPlusChildViewController = nil;
+    }
 }
 
+CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 + (void)registerSubclass {
     [self registerPlusButton];
 }
-
+CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender {
     BOOL notNeedConfigureSelectionStatus = [[self class] respondsToSelector:@selector(shouldSelectPlusChildViewController)] && ![[self class] shouldSelectPlusChildViewController];
     if (notNeedConfigureSelectionStatus) {
@@ -65,6 +96,10 @@ UIViewController *CYLPlusChildViewController = nil;
     NSInteger index = [tabBarController.viewControllers indexOfObject:CYLPlusChildViewController];
     if (NSNotFound != index && (index < tabBarController.viewControllers.count)) {
         [tabBarController setSelectedIndex:index];
+        if (NO == sender.cyl_userInteractionDisabled) { 
+            sender.selected = YES;
+            [tabBarController tabChangedToControl:self];
+        }
     }
 }
 
@@ -85,10 +120,158 @@ UIViewController *CYLPlusChildViewController = nil;
     [plusButton addTarget:plusButton action:@selector(plusChildViewControllerButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
 }
 
+- (BOOL)isLayoutCentered {
+    if ((0 == [self constantOfPlusButtonCenterYOffsetForTabBarHeight]) && (0.5 == [self multiplierOfTabBarHeight])) {
+        return YES;
+    }
+    return NO;
+}
+
+- (CGFloat)multiplierOfTabBarHeight {
+    return [self multiplierOfTabBarHeight:self.cyl_tabBarController.tabBar.cyl_boundsSize.height];
+}
+
+- (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
+    CGFloat multiplierOfTabBarHeight;
+    if ([[self class] respondsToSelector:@selector(multiplierOfTabBarHeight:)]) {
+        multiplierOfTabBarHeight = [[self class] multiplierOfTabBarHeight:tabBarHeight];
+    }
+    
+    CYL_DEPRECATED_DECLARATIONS_PUSH
+    else if ([[self class] respondsToSelector:@selector(multiplerInCenterY)]) {
+        multiplierOfTabBarHeight = [[self class] multiplerInCenterY];
+    }
+    CYL_DEPRECATED_DECLARATIONS_POP
+    
+    else {
+        CGSize sizeOfPlusButton = self.frame.size;
+        CGFloat heightDifference = sizeOfPlusButton.height - self.cyl_tabBarController.tabBar.cyl_boundsSize.height;
+        if (heightDifference < 0) {
+            multiplierOfTabBarHeight = 0.5;
+        } else {
+            CGPoint center = CGPointMake(self.cyl_tabBarController.tabBar.cyl_boundsSize.height * 0.5, self.cyl_tabBarController.tabBar.cyl_boundsSize.height * 0.5);
+            center.y = center.y - heightDifference * 0.5;
+            multiplierOfTabBarHeight = center.y / self.cyl_tabBarController.tabBar.cyl_boundsSize.height;
+        }
+    }
+    return multiplierOfTabBarHeight;
+}
+
+- (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight {
+    return [self constantOfPlusButtonCenterYOffsetForTabBarHeight:self.cyl_tabBarController.tabBar.cyl_boundsSize.height];
+}
+
+- (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
+    CGFloat constantOfPlusButtonCenterYOffset = 0.f;
+    if ([[self class] respondsToSelector:@selector(constantOfPlusButtonCenterYOffsetForTabBarHeight:)]) {
+        constantOfPlusButtonCenterYOffset = [[self class] constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
+    }
+    return constantOfPlusButtonCenterYOffset;
+}
+
 /**
  *  按钮选中状态下点击先显示normal状态的颜色，松开时再回到selected状态下颜色。
  *  重写此方法即不会出现上述情况，与 UITabBarButton 相似
  */
-- (void)setHighlighted:(BOOL)highlighted {}
+//- (void)setHighlighted:(BOOL)highlighted {}
+
+- (CGRect)touchableRect {
+    return self.frame;
+}
+
+- (UIImage *)getSnapshot {
+//    return CYLExternPlusButton.imageView.image;
+    if (_snapshot) {
+        UIImage *originalImage = _snapshot;
+        UIImage *newImage = originalImage;
+        newImage =
+        [UIImage imageWithCGImage:[originalImage CGImage]
+                            scale:(originalImage.scale)
+                      orientation:(originalImage.imageOrientation)];
+        return newImage;
+    }
+    
+    _snapshot = [self cyl_takeSnapshot];
+    return _snapshot;
+}
+
++ (UIButton *)selectedContentView {
+    Class<CYLPlusButtonSubclassing> class = self;
+    UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
+    if (NO == plusButton.cyl_userInteractionDisabled) {
+        // 不使用selected 以避免选中背景
+        plusButton.highlighted = YES;
+    }
+    return plusButton;
+}
+
+- (UIButton *)selectedContentView {
+    
+    if (_selectedContentView) {
+        return _selectedContentView;
+    }
+    
+    if ([[self class] respondsToSelector:@selector(selectedContentView)]) {
+        UIButton *button = [[self class] performSelector:@selector(selectedContentView)];
+        if (button) {
+            _selectedContentView = button;
+            return _selectedContentView;
+        }
+    }
+    UIButton *selectedContentView = [UIButton buttonWithType:UIButtonTypeCustom];
+    
+    [selectedContentView setImage:([[self class] contentImage] ?: self.contentImage ?: UIImage.new) forState:UIControlStateNormal];
+    [selectedContentView setImage:([[self class] selectedContentImage] ?: self.selectedContentImage ?: UIImage.new)
+                         forState:UIControlStateHighlighted];
+    CGRect bounds = self.bounds;
+    selectedContentView.frame = ({
+        CGRect frame = selectedContentView.frame;
+        frame.size = CGSizeMake(bounds.size.width, bounds.size.height);
+        frame;
+    });
+    selectedContentView.contentMode = UIViewContentModeCenter;
+    selectedContentView.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    
+    selectedContentView.translatesAutoresizingMaskIntoConstraints = NO;
+    selectedContentView.userInteractionEnabled = false;
+    [selectedContentView sizeToFit];
+    if (NO == self.cyl_userInteractionDisabled) {
+        // 不使用selected 以避免选中背景
+        selectedContentView.highlighted = YES;
+    }
+    _selectedContentView = selectedContentView;
+    return _selectedContentView;
+}
+
++ (UIImage *)contentImage {
+    return nil;
+}
+
++ (UIImage *)selectedContentImage {
+    return nil;
+}
+
+- (UIImage *)selectedContentImage {
+    if (_selectedContentImage) {
+        return _selectedContentImage;
+    }
+    UIImage *image = self.imageView.image;
+    _selectedContentImage = image;
+    return _selectedContentImage ;
+}
+
+- (UIImage *)contentImage {
+    if (_contentImage) {
+        return _contentImage;
+    }
+
+    UIImage *image = self.imageView.image;
+    _contentImage = image;
+    return _contentImage;
+}
+
++ (NSString *)tabBarContext {
+    return NSStringFromClass([CYLTabBarController class]);
+}
 
 @end
