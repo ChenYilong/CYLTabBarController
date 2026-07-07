@@ -12,22 +12,57 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+
+@class CYLTabBarController;
+@class CYLFlatDesignTabBar;
+
+@protocol CYLFlatDesignUITabBarControllerDelegate <UITabBarControllerDelegate>
+
+@optional
+
+// tabBar show/hide only for CYLTabBarController
+- (void)tabBarController:(CYLTabBarController *)tabBarController willShowTabBar:(CYLFlatDesignTabBar *)tabBar;
+- (void)tabBarController:(CYLTabBarController *)tabBarController didShowTabBar:(CYLFlatDesignTabBar *)tabBar;
+- (void)tabBarController:(CYLTabBarController *)tabBarController willHideTabBar:(CYLFlatDesignTabBar *)tabBar;
+- (void)tabBarController:(CYLTabBarController *)tabBarController didHideTabBar:(CYLFlatDesignTabBar *)tabBar;
+
+@end
+#endif
+
+
+FOUNDATION_EXTERN CGFloat CYLTabBarItemImagePlaceholderWidth;
+FOUNDATION_EXTERN CGFloat CYLTabBarItemImagePlaceholderHeight;
+
+typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
+    CYLTabBarStyleTypeDefault = 0,
+    CYLTabBarStyleTypeSystem,
+    CYLTabBarStyleTypeFlatDesign,
+    CYLTabBarStyleTypeLiquidGlass
+};
+
 @interface CYLConstants : NSObject
 
 + (CGFloat)UIBasisWidthScale;
 + (CGFloat)UIBasisHeightScale;
 
 /*!
- * Liquid Glass, same as `+isUsedLiquidGlass`
+ * Liquid Glass, same as `+isUsedLiquidGlass`.
+ * @return YES  if iOS Version > iOS 27.0
  */
 + (BOOL)isLiquidGlassActive;
 
 /*!
  * Liquid Glass, same as `+isLiquidGlassActive`
+ * @return YES  if iOS Version > iOS 27.0
  */
 + (BOOL)isUsedLiquidGlass;
 
 + (NSValue *)cyl_getTureLottieSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage;
+
++ (NSURL *)cyl_getURLFromString:(NSString *)string;
+
++ (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
 
 @end
 
@@ -134,8 +169,46 @@ NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", \
 _Pragma("clang diagnostic pop") \
 } while (0);
 
+#define CYL_PERFORM_SELECTOR_BOOL(Target, SelectorName, Result) \
+do { \
+    SEL action = @selector(SelectorName); \
+    if ([Target respondsToSelector:action]) { \
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS( \
+            Result = ((BOOL (*)(id, SEL))[Target methodForSelector:action])(Target, action); \
+        ); \
+    } \
+} while (0)
+
+#define CYL_PERFORM_SELECTOR(Target, SelectorName) \
+do { \
+    SEL action = @selector(SelectorName); \
+    if ([Target respondsToSelector:action]) { \
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS( \
+            (( (*)(id, SEL))[Target methodForSelector:action])(Target, action); \
+        ); \
+    } \
+} while (0)
+
+#define CYL_PERFORM_SELECTOR_2OBJECT(Target, SelectorName, Obj1, Obj2) \
+do { \
+    SEL action = @selector(SelectorName); \
+    if ([Target respondsToSelector:action]) { \
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS( \
+            [Target performSelector:action withObject:Obj1 withObject:Obj2]\
+        ); \
+    } \
+} while (0)
+
 
 #define CYL_IS_IPHONE (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+#define CYL_IF_NOT_FLATDESIGN_BEGIN if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) {     //Not CYLTabBarStyleTypeFlatDesign
+#define CYL_IF_NOT_FLATDESIGN_END } else { \
+}
+
+#define CYL_IF_FLATDESIGN_BEGIN if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) { \
+
+#define CYL_IF_FLATDESIGN_END } else { \
+    }
 
 #define CYL_NoNeed_UIDesignRequiresCompatibility_with_iOS26 CYL_IS_IOS_26 && (self.cyl_tabBarController.noNeedUIDesignCompatibility)
 
@@ -161,6 +234,7 @@ _Pragma("clang diagnostic pop") \
 #define CYL_IS_IOS_16  if (@available(iOS 16.0, *))
 
 #define CYL_IS_IOS_26 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 26.f)
+#define CYL_IS_IOS_27 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 27.f)
 
 #define CYL_IS_IPHONE_X ((MIN(self.cyl_tabBarController.visiableTabBarSize.width, self.cyl_tabBarController.visiableTabBarSize.height) >= 375 && MAX(self.cyl_tabBarController.visiableTabBarSize.width, self.cyl_tabBarController.visiableTabBarSize.height) >= 812))
 

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CYLConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class LOTAnimationView;
@@ -15,19 +16,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (UIView *)cyl_lottieAnimationView;
 - (BOOL)cyl_isChildViewControllerPlusButton;
 
-/*!
- * 调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
- */
-- (void)cyl_showTabBadgePoint;
-- (void)cyl_removeTabBadgePoint;
-- (BOOL)cyl_isShowTabBadgePoint;
 - (BOOL)cyl_isSelected;
-- (BOOL)cyl_isReady;
+
 - (BOOL)cyl_isLottieReady;
+
 - (BOOL)cyl_isPlusControl;
 
-@property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *cyl_tabBadgePointView;
-@property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset cyl_tabBadgePointViewOffset;
 /*!
  * PlusButton without plusViewController equals NSNotFound
  */
@@ -118,9 +112,28 @@ NS_ASSUME_NONNULL_BEGIN
                          delayIfNeededForSeconds:(CGFloat)delay
                                       completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion;
 - (void)cyl_hideControl;
-- (void)cyl_performSelector:(SEL)aSelector;
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object;
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2;
+
+@end
+
+@interface UIControl (CYLTabBarControllerExtentionDeprecated)
+
+@property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *cyl_tabBadgePointView CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
+@property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset cyl_tabBadgePointViewOffset CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
+/*!
+ * *  调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
+ * @attention 已经废弃，请改用`-[UIViewController cyl_showBadgeValue:animationType:]`
+ */
+- (void)cyl_showTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
+/*!
+ * *  调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
+ * @attention 已经废弃，请改用`-[UIViewController cyl_showBadgeValue:animationType:]`
+ */
+- (void)cyl_removeTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
+/*!
+ * *  调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
+ * @attention 已经废弃，请改用`-[UIViewController cyl_showBadgeValue:animationType:]`
+ */
+- (BOOL)cyl_isShowTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
 
 @end
 

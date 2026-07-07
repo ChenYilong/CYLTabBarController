@@ -21,26 +21,43 @@
     [super viewDidLoad];
     NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), self);
     self.view.backgroundColor = [UIColor whiteColor];
-    self.navigationItem.title = @"首页(3)"; //✅sets navigation bar title.The right way to set the title of the navigation
+//    self.navigationItem.title = @"首页"; //✅sets navigation bar title.The right way to set the title of the navigation
 //    self.tabBarItem.title = @"首页";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
     //self.title = @"首页1";                //❌sets both of these. Do not do this‼️‼️This may cause something strange  .
 //    [self.navigationController.tabBarItem setBadgeValue:@"3"];
 //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
+//    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
+    
+    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"FlatDesign" style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
+//    leftBarButtonItem.tintColor = UIColor.redColor; // 确保使用原图色
+    self.navigationItem.leftBarButtonItem = leftBarButtonItem;
 
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"refresh TabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
+
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"LiquidGlass" style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"CYLTabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
 
 #define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
+    [self.navigationItem.leftBarButtonItem cyl_setBadgeBackgroundColor:UIColor.redColor];
 
     [self.navigationItem.rightBarButtonItem cyl_setBadgeBackgroundColor:UIColor.redColor];
+//    [self.navigationItem.leftBarButtonItem setTintColor:UIColor.blackColor];
+//    [self.navigationItem.rightBarButtonItem setTintColor:UIColor.blackColor];
+
+    [self.navigationItem.leftBarButtonItem cyl_setBadgeTextColor:UIColor.redColor];
+    [self.navigationItem.rightBarButtonItem cyl_setBadgeTextColor:UIColor.redColor];
+
+    
+
+    
+
     [self.navigationItem.rightBarButtonItem cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
     //                [viewController0 cyl_setBadgeRadius:11/2];
     
     //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
     [self.navigationItem.rightBarButtonItem cyl_showBadge];
-    [self.navigationItem.rightBarButtonItem cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScale];
-    [self.navigationItem.leftBarButtonItem cyl_showBadge];
+    [self.navigationItem.rightBarButtonItem cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake];
+    [self.navigationItem.leftBarButtonItem cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScaleOnce];
+
     if (CYL_IS_IOS_26) {
         if (@available(iOS 26.0, *)) {
             UIScrollEdgeElementContainerInteraction *interaction = [UIScrollEdgeElementContainerInteraction new];
@@ -67,6 +84,11 @@
     [self createNewTabBardynamically];
 }
 
+- (void)flatDesignTabBar:(id)sender {
+    CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
+    [rootController createFlatDesignTabBar];
+}
+
 - (void)createNewTabBardynamically {
 //    [CYLPlusButtonSubclass registerPlusButton];
     CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
@@ -76,7 +98,8 @@
 #pragma mark - Methods
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
-    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController %@", self.tabBarItem.title, @(indexPath.row)]];
+    
+    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController on iOS %@", self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
 }
 
 #pragma mark - Table view

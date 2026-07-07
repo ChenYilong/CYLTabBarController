@@ -26,9 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
     self.window.rootViewController = rootViewController;
     [self.window makeKeyAndVisible];
     //要根据你的window与tabbar的关系，来设置， 如果你 设置了 self.window.rootViewController = rootViewController; 那么你应该用下面的方式来设置暗黑模式, 否则 window的overrideUserInterfaceStyle 不认, 只跟随系统
-    self.window.rootViewController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
+//    self.window.rootViewController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
 
-    [UIWindow appearance].overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+//    [UIWindow appearance].overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
     [self setUpNavigationBarAppearance];
 }
  
@@ -48,28 +48,28 @@ CYL_METHOD_SIGNATURES_POP
  *  设置navigationBar样式
  */
 - (void)setUpNavigationBarAppearance {
-    UINavigationBar *navigationBarAppearance = [UINavigationBar appearance];
-    UIColor *backgroundColor = [UIColor cyl_systemBackgroundColor];
-    NSDictionary *textAttributes = nil;
-    UIColor *labelColor =   [UIColor cyl_labelColor];
-
-    if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
-        textAttributes = @{
-                           NSFontAttributeName : [UIFont boldSystemFontOfSize:18],
-                           NSForegroundColorAttributeName : labelColor,
-                           };
-    } else {
-#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-        textAttributes = @{
-                           UITextAttributeFont : [UIFont boldSystemFontOfSize:18],
-                           UITextAttributeTextColor : labelColor,
-                           UITextAttributeTextShadowColor : [UIColor clearColor],
-                           UITextAttributeTextShadowOffset : [NSValue valueWithUIOffset:UIOffsetZero],
-                           };
-#endif
-    }
-    [navigationBarAppearance setBarTintColor:backgroundColor];
-    [navigationBarAppearance setTitleTextAttributes:textAttributes];
+//    UINavigationBar *navigationBarAppearance = [UINavigationBar appearance];
+//    UIColor *backgroundColor = [UIColor cyl_systemBackgroundColor];
+//    NSDictionary *textAttributes = nil;
+//    UIColor *labelColor =   [UIColor cyl_labelColor];
+//
+//    if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
+//        textAttributes = @{
+//                           NSFontAttributeName : [UIFont boldSystemFontOfSize:18],
+//                           NSForegroundColorAttributeName : labelColor,
+//                           };
+//    } else {
+//#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
+//        textAttributes = @{
+//                           UITextAttributeFont : [UIFont boldSystemFontOfSize:18],
+//                           UITextAttributeTextColor : labelColor,
+//                           UITextAttributeTextShadowColor : [UIColor clearColor],
+//                           UITextAttributeTextShadowOffset : [NSValue valueWithUIOffset:UIOffsetZero],
+//                           };
+//#endif
+//    }
+//    [navigationBarAppearance setBarTintColor:backgroundColor];
+//    [navigationBarAppearance setTitleTextAttributes:textAttributes];
 }
 
 @end

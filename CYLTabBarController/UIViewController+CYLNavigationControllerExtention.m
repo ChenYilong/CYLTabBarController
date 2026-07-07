@@ -134,10 +134,11 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
 #pragma mark - TabBar Show / Hide
 
 - (void)cyl_resetTabBarHidden {
-    CYLTabBar *tabBar = self.cyl_tabBarController.tabBar;
-    for (UIView *subview in tabBar.subviews) {
-        [subview cyl_setHidden:self.cyl_hidesBottomBarWhenPushed];
-    }
+//    CYLTabBar *tabBar = self.cyl_tabBarController.tabBar;
+//    for (UIView *subview in tabBar.subviews) {
+        
+//        [subview cyl_setHidden:self.cyl_hidesBottomBarWhenPushed];
+//    }
 }
 
 #pragma mark - private
@@ -148,7 +149,7 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
     }
 
     BOOL shouldTabBarHidden = [self cyl_shouldTabBarHidden];
-    BOOL currentTabbarHidden = self.cyl_tabBarController.tabBar.cyl_isHidden;
+    BOOL currentTabbarHidden = self.cyl_tabBarController.tabBar.cyl_isInvisiable;//cyl_isHidden
 
     if (shouldTabBarHidden && !currentTabbarHidden) {
         [self  cyl_hideTabbar];

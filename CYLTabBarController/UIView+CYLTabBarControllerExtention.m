@@ -197,6 +197,15 @@
     
 }
 
+- (BOOL)cyl_isButtonLabel {
+    BOOL isButtonLabel;
+    // iOS 26 以前，保持原逻辑
+    NSString *classString = NSStringFromClass([self class]);
+    isButtonLabel = [classString hasSuffix:@"Label"] && [classString hasPrefix:@"UIButton"];
+    return isButtonLabel;
+    
+}
+
 - (BOOL)cyl_isTabBadgeView {
     BOOL isKindOfClass = [self isKindOfClass:[UIView class]];
     BOOL isClass = [self isMemberOfClass:[UIView class]];
@@ -233,7 +242,6 @@
 - (UIImageView *)cyl_tabImageView {
     UIImageView *imageView = nil;
     do {
-        
         for (UIImageView *subview in self.cyl_allSubviews) {
             if ([subview cyl_isTabImageView]) {
                 imageView = (UIImageView *)subview;
@@ -445,7 +453,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 #if __has_include(<Lottie/Lottie-Swift.h>)
     // Avoid sending messages to a forward-declared class; resolve at runtime instead
-    NSString *swiftCompatClassString = @"CompatibleLOTAnimationView";
+    NSString *swiftCompatClassString = @"CYLCompatibleLOTAnimationView";
 
     if ( [NSStringFromClass([self class]) containsString:swiftCompatClassString]) {
         return YES;
@@ -488,32 +496,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (BOOL)cyl_classStringHasSuffix:(NSString *)suffix {
     NSString *classString = NSStringFromClass([self class]);
     return [classString hasSuffix:suffix];
-}
-
-+ (UIView *)cyl_tabBadgePointViewWithClolor:(UIColor *)color radius:(CGFloat)radius {
-    UIView *defaultTabBadgePointView = [[UIView alloc] init];
-    [defaultTabBadgePointView setTranslatesAutoresizingMaskIntoConstraints:NO];
-    defaultTabBadgePointView.backgroundColor = color;
-    defaultTabBadgePointView.layer.cornerRadius = radius;
-    defaultTabBadgePointView.layer.masksToBounds = YES;
-    defaultTabBadgePointView.hidden = YES;
-    // Width constraint
-    [defaultTabBadgePointView addConstraint:[NSLayoutConstraint constraintWithItem:defaultTabBadgePointView
-                                                                         attribute:NSLayoutAttributeWidth
-                                                                         relatedBy:NSLayoutRelationEqual
-                                                                            toItem:nil
-                                                                         attribute: NSLayoutAttributeNotAnAttribute
-                                                                        multiplier:1
-                                                                          constant:radius * 2]];
-    // Height constraint
-    [defaultTabBadgePointView addConstraint:[NSLayoutConstraint constraintWithItem:defaultTabBadgePointView
-                                                                         attribute:NSLayoutAttributeHeight
-                                                                         relatedBy:NSLayoutRelationEqual
-                                                                            toItem:nil
-                                                                         attribute: NSLayoutAttributeNotAnAttribute
-                                                                        multiplier:1
-                                                                          constant:radius * 2]];
-    return defaultTabBadgePointView;
 }
 
 /*!
@@ -564,10 +546,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         self.opaque = NO;
         self.hidden = YES;
         self.alpha = 0.0f;
+        self.userInteractionEnabled = NO;
+        [self cyl_setIsPlaceholder:NO];
     } else {
         self.opaque = YES;
         self.hidden = NO;
         self.alpha = 1.0f;
+        self.userInteractionEnabled = YES;
+        [self cyl_setIsPlaceholder:YES];
     }
 }
 
@@ -626,71 +612,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     point.x += frame.size.width;
     point.y += frame.size.height;
     return [self cyl_newPointInView:point];
-}
-
-- (void)cyl_performSelector:(SEL)aSelector {
-    if (aSelector == NULL) { return; }
-    [self cyl_performSelector:aSelector withObject:nil];
-}
-
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object {
-    if (aSelector == NULL) { return; }
-    [self cyl_performSelector:aSelector withObject:object withObject:nil];
-}
-
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 {
-    if (aSelector == NULL) { return; }
-    
-    CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-    (
-     [self performSelector:aSelector withObject:object1 withObject:object2];
-     )
-    return;
-    
-    UIControl *normalControl = nil;
-    UIControl *selectedControl = nil;
-    
-     
-    UIControl *selfControl = nil;
-    
-    
-    if ([self cyl_isTabButton]) {
-        selfControl = (UIControl *)self;
-    } else if (self.superview && [self.superview cyl_isTabButton]) {
-        selfControl = (UIControl *)self.superview;
-    } else if (self.superview.superview && [self.superview.superview cyl_isTabButton]) {
-        selfControl = (UIControl *)self.superview.superview;
-    }
-    
-    
-    if (![selfControl isKindOfClass:[UIControl class]]) {
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-        (
-         [selfControl performSelector:aSelector withObject:object1 withObject:object2];
-         )
-        return;
-    }
-    if ([selfControl cyl_isPlatterSelectedControl]) {
-        selectedControl = selfControl;
-    } else {
-        normalControl = selfControl;
-    }
-    CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-    (
-     if (normalControl) {
-         [normalControl performSelector:aSelector withObject:object1 withObject:object2];
-         UIControl *counterpart = normalControl.cyl_platterSelectedControl;
-         if (counterpart) {
-             [counterpart performSelector:aSelector withObject:object1 withObject:object2];
-         }
-     } else if (selectedControl) {
-         [selectedControl performSelector:aSelector withObject:object1 withObject:object2];
-         UIControl *counterpart = selectedControl.cyl_platterNormalControl;
-         if (counterpart) {
-             [counterpart performSelector:aSelector withObject:object1 withObject:object2];
-         }
-     }
-     );
 }
 
 - (id)cyl_invokeSelector:(SEL)selector
@@ -858,6 +779,33 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return newImage;
 }
 
+CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
++ (UIView *)cyl_tabBadgePointViewWithClolor:(UIColor *)color radius:(CGFloat)radius {
+    UIView *defaultTabBadgePointView = [[UIView alloc] init];
+    [defaultTabBadgePointView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    defaultTabBadgePointView.backgroundColor = color;
+    defaultTabBadgePointView.layer.cornerRadius = radius;
+    defaultTabBadgePointView.layer.masksToBounds = YES;
+    defaultTabBadgePointView.hidden = YES;
+    // Width constraint
+    [defaultTabBadgePointView addConstraint:[NSLayoutConstraint constraintWithItem:defaultTabBadgePointView
+                                                                         attribute:NSLayoutAttributeWidth
+                                                                         relatedBy:NSLayoutRelationEqual
+                                                                            toItem:nil
+                                                                         attribute: NSLayoutAttributeNotAnAttribute
+                                                                        multiplier:1
+                                                                          constant:radius * 2]];
+    // Height constraint
+    [defaultTabBadgePointView addConstraint:[NSLayoutConstraint constraintWithItem:defaultTabBadgePointView
+                                                                         attribute:NSLayoutAttributeHeight
+                                                                         relatedBy:NSLayoutRelationEqual
+                                                                            toItem:nil
+                                                                         attribute: NSLayoutAttributeNotAnAttribute
+                                                                        multiplier:1
+                                                                          constant:radius * 2]];
+    return defaultTabBadgePointView;
+}
+CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 @end
 

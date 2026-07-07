@@ -20,6 +20,11 @@
 		9A3865F82266FA3C008EE46F /* tab_search_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A3865F42266FA3C008EE46F /* tab_search_animate.json */; };
 		9A3865F92266FA3C008EE46F /* tab_me_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A3865F52266FA3C008EE46F /* tab_me_animate.json */; };
 		9A7C59902181C39000EDB266 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7C598E2181C39000EDB266 /* MainTabBarController.m */; };
+		9A9180BD2FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B72FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m */; };
+		9A9180BE2FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B22FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m */; };
+		9A9180BF2FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B52FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.m */; };
+		9A9180C12FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B02FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.m */; };
+		9A9180C32FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B92FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.m */; };
 		9A98017D2461249F00E65289 /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A9801792461249F00E65289 /* green_lottie_tab_mine.json */; };
 		9A98017E2461249F00E65289 /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A98017A2461249F00E65289 /* green_lottie_tab_discover.json */; };
 		9A98017F2461249F00E65289 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A98017B2461249F00E65289 /* green_lottie_tab_news.json */; };
@@ -67,6 +72,16 @@
 		9A579C98225F6E3A00F3C8F0 /* Location.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = Location.gpx; path = ../../../../../Location.gpx; sourceTree = "<group>"; };
 		9A7C598E2181C39000EDB266 /* MainTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainTabBarController.m; sourceTree = "<group>"; };
 		9A7C598F2181C39000EDB266 /* MainTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainTabBarController.h; sourceTree = "<group>"; };
+		9A9180AF2FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLFlatDesignMainTabBarController.h; sourceTree = "<group>"; };
+		9A9180B02FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLFlatDesignMainTabBarController.m; sourceTree = "<group>"; };
+		9A9180B12FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLFlatDesignSystemTabBarController.h; sourceTree = "<group>"; };
+		9A9180B22FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLFlatDesignSystemTabBarController.m; sourceTree = "<group>"; };
+		9A9180B42FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLFlatDesignModalViewController.h; sourceTree = "<group>"; };
+		9A9180B52FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLFlatDesignModalViewController.m; sourceTree = "<group>"; };
+		9A9180B62FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLFlatDesignTabBarDemoViewController.h; sourceTree = "<group>"; };
+		9A9180B72FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLFlatDesignTabBarDemoViewController.m; sourceTree = "<group>"; };
+		9A9180B82FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLFlatDesignTableViewController.h; sourceTree = "<group>"; };
+		9A9180B92FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLFlatDesignTableViewController.m; sourceTree = "<group>"; };
 		9A9801792461249F00E65289 /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_mine.json; sourceTree = "<group>"; };
 		9A98017A2461249F00E65289 /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_discover.json; sourceTree = "<group>"; };
 		9A98017B2461249F00E65289 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_news.json; sourceTree = "<group>"; };
@@ -218,6 +233,31 @@
 			path = LottieResources;
 			sourceTree = "<group>";
 		};
+		9A9180B32FCACE6D002DC8F3 /* MainVC */ = {
+			isa = PBXGroup;
+			children = (
+				9A9180AF2FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.h */,
+				9A9180B02FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.m */,
+				9A9180B12FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.h */,
+				9A9180B22FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m */,
+			);
+			path = MainVC;
+			sourceTree = "<group>";
+		};
+		9A9180BC2FCACE6D002DC8F3 /* FlatDesignExample */ = {
+			isa = PBXGroup;
+			children = (
+				9A9180B32FCACE6D002DC8F3 /* MainVC */,
+				9A9180B42FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.h */,
+				9A9180B52FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.m */,
+				9A9180B62FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.h */,
+				9A9180B72FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m */,
+				9A9180B82FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.h */,
+				9A9180B92FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.m */,
+			);
+			path = FlatDesignExample;
+			sourceTree = "<group>";
+		};
 		9AC018181FE90A70001EC2D6 /* Other */ = {
 			isa = PBXGroup;
 			children = (
@@ -286,6 +326,7 @@
 		9AE942CF1BDC933E00354519 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				9A9180BC2FCACE6D002DC8F3 /* FlatDesignExample */,
 				9A3865CF22663549008EE46F /* Other */,
 				9A1559E11CB6EB1F00CAB1AF /* View */,
 				9A1559C91CB6D56500CAB1AF /* Module */,
@@ -429,6 +470,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A1559DC1CB6D56500CAB1AF /* CYLMessageViewController.m in Sources */,
+				9A9180BD2FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m in Sources */,
+				9A9180BE2FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m in Sources */,
+				9A9180BF2FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.m in Sources */,
+				9A9180C12FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.m in Sources */,
+				9A9180C32FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.m in Sources */,
 				9AE0BD3122303BA800302A35 /* CYLMainRootViewController.m in Sources */,
 				9A1559DE1CB6D56500CAB1AF /* CYLDetailsViewController.m in Sources */,
 				9A1559E41CB6EB1F00CAB1AF /* CYLPlusButtonSubclass.m in Sources */,

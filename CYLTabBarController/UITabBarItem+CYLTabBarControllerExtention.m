@@ -36,6 +36,16 @@
     objc_setAssociatedObject(self, @selector(cyl_lottieSizeValue), lottieSizeValue_, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+- (UIOffset)cyl_imagePositionAdjustment {
+    NSValue *imagePositionAdjustmentObject = objc_getAssociatedObject(self, @selector(cyl_imagePositionAdjustment));
+    return [imagePositionAdjustmentObject UIOffsetValue];
+}
+
+- (void)cyl_setImagePositionAdjustment:(UIOffset)imagePositionAdjustment {
+    NSValue *imagePositionAdjustmentObject = @(imagePositionAdjustment);
+    objc_setAssociatedObject(self, @selector(cyl_imagePositionAdjustment), imagePositionAdjustmentObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 /*!
  *     if ([classString isEqualToString:@"UITabBarButton"] || [classString isEqualToString:@"_UITabButton"]) {
  */

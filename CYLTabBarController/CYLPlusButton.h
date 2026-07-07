@@ -86,7 +86,8 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
 + (NSString *)tabBarContext;
 
 /*!
-* 可点击的范围
+* 可点击的范围,
+ //TODO:  更换使用 padding 会更直观。
 */
 - (CGRect)touchableRect;
 
@@ -102,7 +103,6 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
 
 /*!
  * iOS26+  如果plusButton只有图片没有label，更简单的方式是实现下面这个代理。
- 
  */
 + (UIImage *)selectedContentImage;
 
@@ -123,23 +123,46 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
 
 - (BOOL)isLayoutCentered;
 
++ (BOOL)matchedTabBarContext:(NSString *)tabBarContext;
+
 #pragma mark - Deprecated API
 
 + (CGFloat)multiplerInCenterY CYL_DEPRECATED("Deprecated in 1.6.0. Use `+multiplierOfTabBarHeight:` instead.");
-
 
 @end
 
 @class CYLTabBar;
 
-FOUNDATION_EXTERN UIButton<CYLPlusButtonSubclassing> *CYLExternPlusButton;
+FOUNDATION_EXTERN CYLPlusButton<CYLPlusButtonSubclassing> *CYLExternPlusButton;
 FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 
 @interface CYLPlusButton : UIButton 
 
+/*!
+ * plusButton state:
+ * Register + Context match == Active
+ */
 + (void)registerPlusButton;
+
 + (void)removePlusButton;
+
 - (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender;
+
+/*!
+ * plusButton state:
+ * Register + Context match == Active
+ */
++ (NSString *)matchedTabBarContext;
+
++ (BOOL)hasPlusButtonForTabBarContext:(NSString *)tabBarContext;
+
++ (BOOL)hasPlusChildViewControllerForTabBarContext:(NSString *)tabBarContext;
+
+- (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight;
+
+- (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight;
+
++ (NSUInteger)indexForTabbarItemsCount:(NSUInteger)tabbarItemsCount;
 
 @end
 

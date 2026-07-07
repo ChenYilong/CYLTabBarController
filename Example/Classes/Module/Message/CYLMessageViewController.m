@@ -19,7 +19,7 @@
     NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), self);
 
     self.view.backgroundColor = [UIColor whiteColor];
-    self.navigationItem.title = @"消息";    //✅sets navigation bar title.The right way to set the title of the navigation
+//    self.navigationItem.title = @"消息";    //✅sets navigation bar title.The right way to set the title of the navigation
 //    self.tabBarItem.title = @"消息";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
     //self.title = @"消息1";                //❌sets both of these. Do not do this‼️‼️ This may cause something strange
     __weak __typeof(self) weakSelf = self;
@@ -50,7 +50,8 @@
 }
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
-    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController %@", self.tabBarItem.title, @(indexPath.row)]];
+    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController on iOS %@", self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
+
 }
 
 #pragma mark - Table view

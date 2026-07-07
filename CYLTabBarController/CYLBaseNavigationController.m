@@ -61,7 +61,10 @@
     UIViewController *viewController;
     @try {
         viewController = [self.viewControllers lastObject];
-    } @catch (NSException *exception) {   
+    } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif  
     }
     viewController.cyl_hidesBottomBarWhenPushed = isHidden;
 }

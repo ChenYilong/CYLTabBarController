@@ -11,7 +11,7 @@
 #import "UIViewController+CYLTabBarControllerExtention.h"
 
 CGFloat CYLPlusButtonWidth = 0.0f;
-UIButton<CYLPlusButtonSubclassing> *CYLExternPlusButton = nil;
+CYLPlusButton<CYLPlusButtonSubclassing> *CYLExternPlusButton = nil;
 UIViewController *CYLPlusChildViewController = nil;
 
 @interface CYLPlusButton () 
@@ -26,7 +26,7 @@ UIViewController *CYLPlusChildViewController = nil;
 @end
 
 @implementation CYLPlusButton
-
+//@synthesize selected = _selected;
 #pragma mark -
 #pragma mark - public Methods
 
@@ -37,31 +37,27 @@ UIViewController *CYLPlusChildViewController = nil;
     Class<CYLPlusButtonSubclassing> class = self;
     if ([[self class] respondsToSelector:@selector(plusChildViewController)]) {
         CYLPlusChildViewController = [class plusChildViewController];
-        if ([[self class] respondsToSelector:@selector(tabBarContext)]) {
-            NSString *tabBarContext = [class tabBarContext];
-            if (tabBarContext && tabBarContext.length) {
-                [CYLPlusChildViewController cyl_setContext:tabBarContext];
-            }
-        } else {
-            [CYLPlusChildViewController cyl_setContext:NSStringFromClass([CYLTabBarController class])];
+         NSString *tabBarContext = [self matchedTabBarContext];
+        if (tabBarContext && tabBarContext.length) {
+            [CYLPlusChildViewController cyl_setContext:tabBarContext];
         }
-        UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
+        CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
         CYLExternPlusButton = plusButton;
         CYLPlusButtonWidth = plusButton.frame.size.width;
         [[self class] addSelectViewControllerTarget:plusButton];
         //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
         if ([CYLConstants isLiquidGlassActive]) {
-//            plusButton.cyl_userInteractionDisabled = YES;
+            //            plusButton.cyl_userInteractionDisabled = YES;
         }
         if ([[self class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
             CYLPlusButtonIndex = [[self class] indexOfPlusButtonInTabBar];
         } else {
 #if defined(DEBUG) || defined(BETA)
-            [NSException raise:NSStringFromClass([CYLTabBarController class]) format:@"[DEBUG INFO]If you want to add PlusChildViewController, you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】[DEBUG INFO]如果你想使用PlusChildViewController样式，你必须同时在你自定义的plusButton中实现 `+indexOfPlusButtonInTabBar`，来指定plusButton的位置"];
+            NSAssert(NO, @"[DEBUG INFO]If you want to add PlusChildViewController, you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】[DEBUG INFO]如果你想使用PlusChildViewController样式，你必须同时在你自定义的plusButton中实现 `+indexOfPlusButtonInTabBar`，来指定plusButton的位置");
 #endif
         }
     } else {
-        UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
+        CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
         CYLExternPlusButton = plusButton;
         CYLPlusButtonWidth = plusButton.frame.size.width;
     }
@@ -69,7 +65,9 @@ UIViewController *CYLPlusChildViewController = nil;
 
 + (void)removePlusButton {
     if (CYLExternPlusButton) {
-        [CYLExternPlusButton removeFromSuperview];
+        if (CYLExternPlusButton.superview) {
+            [CYLExternPlusButton removeFromSuperview];
+        }
         CYLExternPlusButton = nil;
     }
     
@@ -106,6 +104,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 #pragma mark -
 #pragma mark - Private Methods
 
+//- (void)setSelected:(BOOL)selected {
+//    _selected = selected;
+//    if (_selected) {
+//        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
+//    }
+//}
+
 + (void)addSelectViewControllerTarget:(UIButton<CYLPlusButtonSubclassing> *)plusButton {
     id target = self;
     NSArray<NSString *> *selectorNamesArray = [plusButton actionsForTarget:target forControlEvent:UIControlEventTouchUpInside];
@@ -121,17 +126,21 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (BOOL)isLayoutCentered {
-    if ((0 == [self constantOfPlusButtonCenterYOffsetForTabBarHeight]) && (0.5 == [self multiplierOfTabBarHeight])) {
+    if ((0 == [self constantOfPlusButtonCenterYOffsetForTabBarHeight]) && (0.5 == [self defaultMultiplierOfTabBarHeight])) {
         return YES;
     }
     return NO;
 }
 
-- (CGFloat)multiplierOfTabBarHeight {
-    return [self multiplierOfTabBarHeight:self.cyl_tabBarController.tabBar.cyl_boundsSize.height];
+- (CGFloat)defaultMultiplierOfTabBarHeight {
+    return [self multiplierOfTabBarHeight:self.cyl_tabBarController.tabBar.cyl_boundsSize.height plusButtonHeight:self.frame.size.height];
 }
 
 - (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
+    return [self multiplierOfTabBarHeight:tabBarHeight plusButtonHeight:self.frame.size.height];
+}
+
+- (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight plusButtonHeight:(CGFloat)plusButtonHeight {
     CGFloat multiplierOfTabBarHeight;
     if ([[self class] respondsToSelector:@selector(multiplierOfTabBarHeight:)]) {
         multiplierOfTabBarHeight = [[self class] multiplierOfTabBarHeight:tabBarHeight];
@@ -144,14 +153,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     CYL_DEPRECATED_DECLARATIONS_POP
     
     else {
-        CGSize sizeOfPlusButton = self.frame.size;
-        CGFloat heightDifference = sizeOfPlusButton.height - self.cyl_tabBarController.tabBar.cyl_boundsSize.height;
+        CGFloat heightDifference = plusButtonHeight - tabBarHeight;
         if (heightDifference < 0) {
             multiplierOfTabBarHeight = 0.5;
         } else {
-            CGPoint center = CGPointMake(self.cyl_tabBarController.tabBar.cyl_boundsSize.height * 0.5, self.cyl_tabBarController.tabBar.cyl_boundsSize.height * 0.5);
+            CGPoint center = CGPointMake(tabBarHeight* 0.5, tabBarHeight * 0.5);
             center.y = center.y - heightDifference * 0.5;
-            multiplierOfTabBarHeight = center.y / self.cyl_tabBarController.tabBar.cyl_boundsSize.height;
+            multiplierOfTabBarHeight = center.y / tabBarHeight;
         }
     }
     return multiplierOfTabBarHeight;
@@ -270,8 +278,55 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return _contentImage;
 }
 
-+ (NSString *)tabBarContext {
-    return NSStringFromClass([CYLTabBarController class]);
+//+ (NSString *)tabBarContext {
+//    return NSStringFromClass([CYLTabBarController class]);
+//}
+
++ (BOOL)hasPlusButtonForTabBarContext:(NSString *)tabBarContext {
+    NSString *matchedTabBarContext = self.matchedTabBarContext;
+    BOOL isSameContext = [matchedTabBarContext isEqualToString:tabBarContext] && (matchedTabBarContext && tabBarContext);//|| (!tabBarContext  && !self.context);
+    return isSameContext;
+    
+}
+
++ (BOOL)hasPlusChildViewControllerForTabBarContext:(NSString *)tabBarContext {
+    NSString *context = CYLPlusChildViewController.cyl_context;
+    BOOL isSameContext = ((context && tabBarContext) && [context isEqualToString:tabBarContext]);
+    BOOL hasPlusChildViewController = CYLPlusChildViewController && isSameContext;//&& !isAdded;
+    return hasPlusChildViewController;
+}
+
++ (NSString *)matchedTabBarContext {
+    NSString *matchedTabBarContext;
+    SEL action = @selector(tabBarContext);
+    if ([self respondsToSelector:action]) {
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+        (
+         matchedTabBarContext = [self performSelector:action];
+         )
+    }
+    if (matchedTabBarContext && matchedTabBarContext.length > 0) {
+        return matchedTabBarContext;
+    }
+    matchedTabBarContext = NSStringFromClass([CYLTabBarController class]);
+    return matchedTabBarContext;
+}
+
++ (NSUInteger)indexForTabbarItemsCount:(NSUInteger)tabbarItemsCount {
+    NSUInteger plusButtonIndex = NSNotFound;
+
+    if ([[self class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
+        plusButtonIndex = [[self class] indexOfPlusButtonInTabBar];
+    } else {
+        if (tabbarItemsCount % 2 != 0) {
+#if defined(DEBUG) || defined(BETA)
+            NSAssert(NO, @"[DEBUG INFO]If the count of CYLTabbarControllers is odd,you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】[DEBUG INFO] 如果CYLTabbarControllers的个数是奇数，你必须在你自定义的plusButton中实现`+indexOfPlusButtonInTabBar`，来指定plusButton的位置");
+#endif
+        } else {
+            plusButtonIndex = tabbarItemsCount * 0.5;
+        }
+    }
+    return plusButtonIndex;
 }
 
 @end

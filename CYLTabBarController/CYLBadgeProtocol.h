@@ -15,11 +15,16 @@
 
 #pragma mark -- types definition
 
-#define CYLBadgeBreatheAnimationKey     @"breathe"
-#define CYLBadgeRotateAnimationKey      @"rotate"
-#define CYLBadgeShakeAnimationKey       @"shake"
-#define CYLBadgeScaleAnimationKey       @"scale"
-#define CYLBadgeBounceAnimationKey      @"bounce"
+#define CYLBadgeBreatheAnimationKey     @"cyl.badge.breathe"
+#define CYLBadgeRotateAnimationKey      @"cyl.badge.rotate"
+#define CYLBadgeShakeAnimationKey       @"cyl.badge.shake"
+#define CYLBadgeScaleAnimationKey       @"cyl.badge.scale"
+#define CYLBadgeBounceAnimationKey      @"cyl.badge.bounce"
+#define CYLBadgeLeftRightOnceAnimationKey   @"cyl.badge.LeftRightOnce"
+#define CYLBadgeRightLeftOnceAnimationKey   @"cyl.badge.RightLeftOnce"
+#define CYLBadgeFadeInOnceAnimationKey      @"cyl.badge.FadeInOnce"
+#define CYLBadgeRollingOnceAnimationKey     @"cyl.badge.RollingOnce"
+#define CYLBadgeScaleOnceAnimationKey     @"cyl.badge.ScaleOnce"
 
 typedef NS_ENUM(NSUInteger, CYLBadgeStyle) {
     CYLBadgeStyleRedDot = 1,          /* red dot style */
@@ -33,7 +38,12 @@ typedef NS_ENUM(NSUInteger, CYLBadgeAnimationType) {
     CYLBadgeAnimationTypeScale,            /* scale effect */
     CYLBadgeAnimationTypeShake,            /* shaking effect */
     CYLBadgeAnimationTypeBounce,           /* bouncing effect */
-    CYLBadgeAnimationTypeBreathe           /* breathing light effect, which makes badge more attractive */
+    CYLBadgeAnimationTypeBreathe,          /* breathing light effect, which makes badge more attractive */
+    CYLBadgeAnimationTypeLeftRightOnce,    /* left to right animation*/
+    CYLBadgeAnimationTypeRightLeftOnce,    /* right to left animation*/
+    CYLBadgeAnimationTypeFadeInOnce,       /* fade in animation */
+    CYLBadgeAnimationTypeRollingOnce,      /*rolling animation*/
+    CYLBadgeAnimationTypeScaleOnce         /*ScaleOnce animation*/
 };
 
 #pragma mark -- protocol definition
@@ -42,7 +52,7 @@ typedef NS_ENUM(NSUInteger, CYLBadgeAnimationType) {
 
 @required
 /** badge entity, which is adviced not to set manually */
-@property (nonatomic, strong, getter=cyl_badge, setter=cyl_setBadge:) UILabel *cyl_badge;
+//@property (nonatomic, strong, getter=cyl_badge, setter=cyl_setBadge:) UIView __kindof *cyl_badge;
 /** [UIFont boldSystemFontOfSize:9] by default if not set */
 @property (nonatomic, strong, getter=cyl_badgeFont, setter=cyl_setBadgeFont:) UIFont *cyl_badgeFont;
 /** red color by default if not set */
@@ -131,8 +141,17 @@ typedef NS_ENUM(NSUInteger, CYLBadgeAnimationType) {
 
 - (BOOL)cyl_isReady;
 
+/*!
+ * iOS26+ only
+ */
 - (void)cyl_performSelector:(SEL)aSelector;
+/*!
+ * iOS26+ only
+ */
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object;
+/*!
+ * iOS26+ only
+ */
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2;
 
 @end

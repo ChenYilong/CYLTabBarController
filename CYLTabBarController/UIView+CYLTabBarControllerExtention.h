@@ -32,16 +32,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (UIImageView *)cyl_imageView;
 - (BOOL)cyl_isTabImageView;
 - (BOOL)cyl_isTabLabel;
+
+/*!
+ * UIBarButtonContentView.titleLabel;
+ */
+- (BOOL)cyl_isButtonLabel;
 - (BOOL)cyl_isTabBadgeView;
-- (BOOL)cyl_isTabBackgroundView;
 - (UIView *)cyl_tabBadgeView;
+- (BOOL)cyl_isTabBackgroundView;
 - (UIImageView *)cyl_tabImageView;
 - (UILabel *)cyl_tabLabel;
 - (UIImageView *)cyl_tabShadowImageView;
 - (UIVisualEffectView *)cyl_tabEffectView;
 - (BOOL)cyl_isLottieAnimationView;
 - (UIView *)cyl_tabBackgroundView;
-+ (UIView *)cyl_tabBadgePointViewWithClolor:(UIColor *)color radius:(CGFloat)radius;
 - (NSArray *)cyl_allSubviews;
 - (UIImageView *)cyl_imageViewInTabBarButton;
 - (void)cyl_bringSubviewToFront:(UIView *)view;
@@ -57,12 +61,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (UIImage *)cyl_takeSnapshotWithoutViews:(NSArray<UIView __kindof *> *)hideViews;
 - (void)cyl_setHidden:(BOOL)hidden;
 
+
 @end
 
 @interface UIView (CYLTabBarControllerExtentionDeprecated)
 - (UIView *)cyl_tabBadgeBackgroundView CYL_DEPRECATED("Deprecated in 1.6.0. Use `+[CYLPlusButton cyl_tabBackgroundView]` instead.");
 - (UIView *)cyl_tabBadgeBackgroundSeparator CYL_DEPRECATED("Deprecated in 1.6.0. Use `+[CYLPlusButton cyl_tabShadowImageView]` instead.");
-
++ (UIView *)cyl_tabBadgePointViewWithClolor:(UIColor *)color radius:(CGFloat)radius CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
 @end
 
 NS_ASSUME_NONNULL_END

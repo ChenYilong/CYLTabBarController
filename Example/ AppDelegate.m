@@ -61,28 +61,28 @@ CYL_METHOD_SIGNATURES_POP
  *  设置navigationBar样式
  */
 - (void)setUpNavigationBarAppearance {
-    UINavigationBar *navigationBarAppearance = [UINavigationBar appearance];
-    UIColor *backgroundColor = [UIColor cyl_systemBackgroundColor];
-    NSDictionary *textAttributes = nil;
-    UIColor *labelColor =   [UIColor cyl_labelColor];
-
-    if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
-        textAttributes = @{
-                           NSFontAttributeName : [UIFont boldSystemFontOfSize:18],
-                           NSForegroundColorAttributeName : labelColor,
-                           };
-    } else {
-#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-        textAttributes = @{
-                           UITextAttributeFont : [UIFont boldSystemFontOfSize:18],
-                           UITextAttributeTextColor : labelColor,
-                           UITextAttributeTextShadowColor : [UIColor clearColor],
-                           UITextAttributeTextShadowOffset : [NSValue valueWithUIOffset:UIOffsetZero],
-                           };
-#endif
-    }
-    [navigationBarAppearance setBarTintColor:backgroundColor];
-    [navigationBarAppearance setTitleTextAttributes:textAttributes];
+//    UINavigationBar *navigationBarAppearance = [UINavigationBar appearance];
+//    UIColor *backgroundColor = [UIColor cyl_systemBackgroundColor];
+//    NSDictionary *textAttributes = nil;
+//    UIColor *labelColor =   [UIColor cyl_labelColor];
+//
+//    if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
+//        textAttributes = @{
+//                           NSFontAttributeName : [UIFont boldSystemFontOfSize:18],
+//                           NSForegroundColorAttributeName : labelColor,
+//                           };
+//    } else {
+//#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
+//        textAttributes = @{
+//                           UITextAttributeFont : [UIFont boldSystemFontOfSize:18],
+//                           UITextAttributeTextColor : labelColor,
+//                           UITextAttributeTextShadowColor : [UIColor clearColor],
+//                           UITextAttributeTextShadowOffset : [NSValue valueWithUIOffset:UIOffsetZero],
+//                           };
+//#endif
+//    }
+//    [navigationBarAppearance setBarTintColor:backgroundColor];
+//    [navigationBarAppearance setTitleTextAttributes:textAttributes];
 }
 
 @end

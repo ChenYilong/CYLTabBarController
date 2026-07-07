@@ -15,7 +15,7 @@ import UIKit
 /// An Objective-C compatible wrapper around Lottie's Animation class.
 /// Use in tandem with CompatibleAnimationView when using Lottie in Objective-C
 @objc
-public final class CompatibleLOTAnimation: NSObject {
+public final class CYLCompatibleLOTAnimation: NSObject {
     
     // MARK: Lifecycle
     @objc
@@ -44,14 +44,14 @@ public final class CompatibleLOTAnimation: NSObject {
 
 /// An Objective-C compatible wrapper around Lottie's LottieAnimationView.
 @objc
-public final class CompatibleLOTAnimationView: UIView {
+public final class CYLCompatibleLOTAnimationView: UIView {
     
     // MARK: Lifecycle
     
     /// Initializes a compatible AnimationView with a given compatible animation. Defaults to using
     /// the rendering engine specified in LottieConfiguration.shared.
     @objc
-    public convenience init(compatibleAnimation: CompatibleLOTAnimation) {
+    public convenience init(compatibleAnimation: CYLCompatibleLOTAnimation) {
         self.init(compatibleAnimation: compatibleAnimation, compatibleRenderingEngineOption: .shared)
     }
     
@@ -59,7 +59,7 @@ public final class CompatibleLOTAnimationView: UIView {
     /// configuration.
     @objc
     public init(
-        compatibleAnimation: CompatibleLOTAnimation,
+        compatibleAnimation: CYLCompatibleLOTAnimation,
         compatibleRenderingEngineOption: CompatibleRenderingEngineOption)
     {
         animationView = LottieAnimationView(
@@ -126,7 +126,7 @@ public final class CompatibleLOTAnimationView: UIView {
     // MARK: Public
     
     @objc
-    public var compatibleAnimation: CompatibleLOTAnimation? {
+    public var compatibleAnimation: CYLCompatibleLOTAnimation? {
         didSet {
             animationView.animation = compatibleAnimation?.animation
         }
@@ -157,6 +157,16 @@ public final class CompatibleLOTAnimationView: UIView {
         get { animationView.currentProgress }
     }
     
+//    @objc public func animationProgress(_ progress: CGFloat){
+//        animationView.currentProgress = progress
+//    }
+    @objc
+    public var animationProgress: CGFloat {
+        set { animationView.currentProgress = newValue }
+        get { animationView.currentProgress }
+    }
+
+
     @objc
     public var duration: CGFloat {
         animationView.animation?.duration ?? 0.0
@@ -285,9 +295,6 @@ public final class CompatibleLOTAnimationView: UIView {
         animationView.forceDisplayUpdate()
     }
     
-    @objc public func animationProgress(_ progress: CGFloat){
-        animationView.currentProgress = progress
-    }
     
     @objc
     public func forceDrawingUpdate() {

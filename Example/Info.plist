@@ -2,7 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-
+<!--   UI 兼容模式-->
+<!--    <key>UIDesignRequiresCompatibility</key>-->
+<!--    <true/>-->
     <key>UIApplicationSceneManifest</key>
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>
@@ -49,8 +51,6 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-<!--	<key>UIDesignRequiresCompatibility</key>-->
-<!--	<true/>-->
 	<key>UILaunchStoryboardName</key>
 	<string>Main.storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>

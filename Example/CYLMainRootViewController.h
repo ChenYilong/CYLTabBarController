@@ -12,12 +12,15 @@
 #else
 #import "CYLTabBarController.h"
 #endif
+@class CYLFlatDesignMainTabBarController;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CYLMainRootViewController : UINavigationController
 
+- (CYLTabBarController *)createLiquidGlassTabBar;
 - (CYLTabBarController *)createNewTabBarWithContext:(NSString *)context;
+- (CYLFlatDesignMainTabBarController *)createFlatDesignTabBar;
 
 @end
 

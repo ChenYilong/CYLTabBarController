@@ -9,8 +9,9 @@
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "CYLTabBarController.h"
 #import <objc/runtime.h>
-//#import "CYLFlatDesignTabBar.h"
 #import "UIView+CYLTabBarControllerExtention.h"
+#import "UIControl+CYLBadgeExtention.h"
+#import "UIImage+CYLTabBarControllerExtention.h"
 
 #define kActualView ((UIView *)[[self cyl_getViewControllerInsteadOfNavigationController] cyl_getActualBadgeSuperView])
 
@@ -28,18 +29,22 @@
 #pragma mark -
 #pragma mark - public Methods
 
-- (BOOL)cyl_isPlaceholder {
-    NSNumber *isPlaceholderObject = objc_getAssociatedObject(self, @selector(cyl_isPlaceholder));
-    NSNumber *isPlaceholderObjectFromViewControllerInsteadOfNavigationController = objc_getAssociatedObject([self cyl_getViewControllerInsteadOfNavigationController], @selector(cyl_isPlaceholder));
-
-    return [isPlaceholderObject boolValue] || [isPlaceholderObjectFromViewControllerInsteadOfNavigationController boolValue];
+- (BOOL)cyl_isSystemStyleTabBar {
+    BOOL isSystemStyleTabBar = [self isKindOfClass:[CYLTabBarController class]] ;
+    if (isSystemStyleTabBar) {
+        CYLTabBarController *tabBarController = (CYLTabBarController *)self;
+        isSystemStyleTabBar = (tabBarController.tabBarStyleType != CYLTabBarStyleTypeFlatDesign);
+    }
+    return isSystemStyleTabBar;
 }
 
-- (void)cyl_setIsPlaceholder:(BOOL)isPlaceholder {
-    NSNumber *isPlaceholderObject = @(isPlaceholder);
-    objc_setAssociatedObject(self, @selector(cyl_isPlaceholder), isPlaceholderObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    objc_setAssociatedObject([self cyl_getViewControllerInsteadOfNavigationController], @selector(cyl_isPlaceholder), isPlaceholderObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-
+- (BOOL)cyl_isFlatDesignStyleTabBar {
+    BOOL isSystemStyleTabBar = [self isKindOfClass:[CYLTabBarController class]] ;
+    if (isSystemStyleTabBar) {
+        CYLTabBarController *tabBarController = (CYLTabBarController *)self;
+        isSystemStyleTabBar = (tabBarController.tabBarStyleType == CYLTabBarStyleTypeFlatDesign);
+    }
+    return isSystemStyleTabBar;
 }
 
 - (UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index {
@@ -144,6 +149,7 @@
     }
     return (self == CYLPlusChildViewController);
 }
+
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 - (void)cyl_showTabBadgePoint {
     if (self.cyl_isPlusChildViewController) {
@@ -195,12 +201,16 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
     return [self.cyl_tabButton cyl_tabBadgePointViewOffset];
 }
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
+
 - (BOOL)cyl_isEmbedInTabBarController {
     UIViewController *viewControllerInsteadIOfNavigationController = [self cyl_getViewControllerInsteadOfNavigationController];
-    if (nil == self.cyl_tabBarController && nil == viewControllerInsteadIOfNavigationController.cyl_tabBarController) {
+    if ((nil == self.cyl_tabBarController) && (nil == viewControllerInsteadIOfNavigationController.cyl_tabBarController)) {
         return NO;
     }
     if (self.cyl_isPlusChildViewController) {
+        return NO;
+    }
+    if (self.cyl_isPlaceholder || self.cyl_getViewControllerInsteadOfNavigationController.cyl_isPlaceholder) {
         return NO;
     }
     BOOL isEmbedInTabBarController = NO;
@@ -232,37 +242,67 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (void)cyl_setTabButton:(UIControl *)tabButton {
     UIControl *tabButton_ = tabButton;
     objc_setAssociatedObject(self, @selector(cyl_tabButton), tabButton_, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if ([self cyl_getViewControllerInsteadOfNavigationController]) {
+        objc_setAssociatedObject([self cyl_getViewControllerInsteadOfNavigationController], @selector(cyl_tabButton), tabButton_, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
 }
 
 - (UIControl *)cyl_tabButton {
     UIControl *tabButton = objc_getAssociatedObject(self, @selector(cyl_tabButton));
     if (tabButton) {
         //TODO:      if (tabButton && [tabButton isKindOfClass:[UIControl class]]) {
-
         return tabButton;
     }
-    if (!self.cyl_isEmbedInTabBarController) {
-        return nil;
-    }
+    //FIXME:  to delete flat design not include
+    //    if (!self.cyl_isEmbedInTabBarController) {
+    //        return nil;
+    //    }
     UITabBarItem *tabBarItem = nil;
     UIControl *control = nil;
     UIViewController *viewController = nil;
     
     do {
         @try {
-            tabBarItem = self.cyl_tabBarController.tabBar.items[self.cyl_tabIndex];
-            control = [tabBarItem cyl_tabButton];
-        } @catch (NSException *exception) {}
+            if ((!(NSNotFound == self.cyl_tabIndex)) && (self.cyl_tabBarController.tabBar.items.count > self.cyl_tabIndex)) {
+                tabBarItem = self.cyl_tabBarController.tabBar.items[self.cyl_tabIndex];
+                control = [tabBarItem cyl_tabButton];
+            } else if (self.cyl_isPlaceholder || (self.cyl_getViewControllerInsteadOfNavigationController.cyl_isPlaceholder)){
+                //说明是PlusChildViewController， PlusChildViewController对应的cyl_tabButton为PlusButton
+                //    if (!self.cyl_isEmbedInTabBarController) {
+                control = (UIControl *)CYLExternPlusButton;
+            }
+        } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
+            NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif
+        }
         if (control) {
             break;
         }
         
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+        @try {
+            control = self.cyl_tabBarItem.tabBarButton;
+        } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
+            NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif
+        }
+        if (control) {
+            break;
+        }
+#else
+#endif
         if (!control) {
             @try {
                 viewController = self;
                 tabBarItem = viewController.tabBarItem;
                 control = [tabBarItem cyl_tabButton];
-            } @catch (NSException *exception) {}
+            } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
+                NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif
+            }
         }
         
         if (control) {
@@ -274,7 +314,11 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                 viewController = [self cyl_getViewControllerInsteadOfNavigationController];
                 tabBarItem = viewController.tabBarItem;
                 control = [tabBarItem cyl_tabButton];
-            } @catch (NSException *exception) {}
+            } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
+                NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif
+            }
             
         }
         
@@ -285,14 +329,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     } while (NO);
     
     return control;
-}
-
-- (NSString *)cyl_context {
-    return objc_getAssociatedObject(self, @selector(cyl_context));
-}
-
-- (void)cyl_setContext:(NSString *)cyl_context {
-    objc_setAssociatedObject(self, @selector(cyl_context), cyl_context, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 - (BOOL)cyl_plusViewControllerEverAdded {
@@ -395,8 +431,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_showBadgeValue:(NSString *)value
-             animationTypeValue:(NSNumber *)animationTypeValue {
-//    [kActualView cyl_showBadgeValue:value animationType:animationType];
+        animationTypeValue:(NSNumber *)animationTypeValue {
+    //    [kActualView cyl_showBadgeValue:value animationType:animationType];
     SEL selector = @selector(cyl_showBadgeValue:animationTypeValue:);
     [kActualView cyl_performSelector:selector withObject:value withObject:animationTypeValue];
 }
@@ -407,13 +443,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_clearBadge {
-//    [kActualView cyl_clearBadge];
+    //    [kActualView cyl_clearBadge];
     SEL selector = @selector(cyl_clearBadge);
     [kActualView cyl_performSelector:selector];
 }
 
 - (void)cyl_resumeBadge {
-//    [kActualView cyl_resumeBadge];
+    //    [kActualView cyl_resumeBadge];
     SEL selector = @selector(cyl_resumeBadge);
     [kActualView cyl_performSelector:selector];
 }
@@ -436,46 +472,69 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (self.cyl_isPlaceholder) {
         return nil;
     }
-
+    
     UIViewController *viewController = self.cyl_getViewControllerInsteadOfNavigationController;
     UITabBarItem *viewControllerItem = viewController.tabBarItem;
     UIControl *viewControllerControl = viewControllerItem.cyl_tabButton;
     UITabBarItem *navigationViewControllerItem = viewController.navigationController.tabBarItem;
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
     if (viewControllerItem && !viewControllerControl) {
-        CYLFlatDesignTabBar *pureCustomTabBar = (CYLFlatDesignTabBar * )self.cyl_tabBarController.tabBar;
+        
+        CYLTabBarController *flatDesignTabBarController = (CYLTabBarController * )viewController.cylflatdesign_tabBarController;
+        CYLFlatDesignTabBar *pureCustomTabBar = (CYLFlatDesignTabBar * )flatDesignTabBarController.cyl_tabBar;
         if ([pureCustomTabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-            CYLFlatDesignTabBarItem *item = (CYLFlatDesignTabBarItem *)viewController.cyl_tabButton;
+            CYLFlatDesignTabBarItem *item = (CYLFlatDesignTabBarItem *)viewController.cyl_tabBarItem;
+            
             if ([item isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
-//                UIControl *view;
-//                if ([item respondsToSelector:@selector(actualBadgeSuperView)]) {
-//                    view = [item performSelector:@selector(actualBadgeSuperView)];
-//                }
-//                return view;
+                CYLFlatDesignTabBarButton *view = item.tabBarButton;
+                if ([view isKindOfClass:[CYLFlatDesignTabBarButton class]] && [view respondsToSelector:@selector(actualBadgeSuperView)]) {
+                    return view.actualBadgeSuperView;
+                }
             } else if ([item isKindOfClass:[UIControl class]]) {
-                return item;
+                UIControl *itemControl = (UIControl *)item;
+                return itemControl.cyl_getActualBadgeSuperView;
             }
         }
     }
-    if (viewControllerControl) {
-        return viewControllerControl;
+#endif
+    
+    if ([CYLConstants isLiquidGlassActive]) {
+        if (viewControllerControl) {
+            return viewControllerControl;
+        }
+        return navigationViewControllerItem;
     }
-    return navigationViewControllerItem;
+    if (viewControllerControl) {
+        [viewControllerControl layoutIfNeeded];//建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用
+        return viewControllerControl.cyl_getActualBadgeSuperView;
+    }
+    return navigationViewControllerItem.cyl_getActualBadgeSuperView;
 }
 
-- (BOOL)cyl_isReady { 
+- (BOOL)cyl_isReady {
     return YES;
 }
 
 
 - (void)cyl_performSelector:(SEL)aSelector {
+    if (aSelector == NULL) { return; }
+    NSObject *object2 = nil;
+    [self cyl_performSelector:aSelector withObject:object2];
 }
-
 
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object {
+    if (aSelector == NULL) { return; }
+    NSObject *object2 = nil;
+    [self cyl_performSelector:aSelector withObject:object withObject:object2];
 }
 
-
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 {
+    if (aSelector == NULL) { return; }
+    
+    CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+    (
+     [self performSelector:aSelector withObject:object1 withObject:object2];
+     )
 }
 
 
@@ -487,12 +546,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 #pragma mark -- setter/getter
-- (UILabel *)cyl_badge {
-    return kActualView.cyl_badge;
+- (UIView __kindof *)cyl_badge {
+    return (UIView __kindof *)kActualView.cyl_badge;
 }
 
-- (void)cyl_setBadge:(UILabel *)label {
-//    [kActualView cyl_setBadge:label];
+- (void)cyl_setBadge:(UIView __kindof *)label {
+    //    [kActualView cyl_setBadge:label];
     SEL selector = @selector(cyl_setBadge:);
     [kActualView cyl_performSelector:selector withObject:label];
 }
@@ -502,10 +561,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_setBadgeFont:(UIFont *)badgeFont {
-//    [kActualView cyl_setBadgeFont:badgeFont];
+    //    [kActualView cyl_setBadgeFont:badgeFont];
     SEL selector = @selector(cyl_setBadgeFont:);
     [kActualView cyl_performSelector:selector withObject:badgeFont];
-
+    
 }
 
 - (UIColor *)cyl_badgeBackgroundColor {
@@ -513,10 +572,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_setBadgeBackgroundColor:(UIColor *)badgeBackgroundColor {
-//    [kActualView cyl_setBadgeBackgroundColor:badgeBackgroundColor];
+    //    [kActualView cyl_setBadgeBackgroundColor:badgeBackgroundColor];
     SEL selector = @selector(cyl_setBadgeBackgroundColor:);
     [kActualView cyl_performSelector:selector withObject:badgeBackgroundColor];
-
+    //    kActualView.tintColor = badgeBackgroundColor;
 }
 
 - (UIColor *)cyl_badgeTextColor {
@@ -524,10 +583,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_setBadgeTextColor:(UIColor *)badgeTextColor {
-//    [kActualView cyl_setBadgeTextColor:badgeTextColor];
+    //    [kActualView cyl_setBadgeTextColor:badgeTextColor];
     SEL selector = @selector(cyl_setBadgeTextColor:);
     [kActualView cyl_performSelector:selector withObject:badgeTextColor];
-
+    
 }
 
 - (CYLBadgeAnimationType)cyl_badgeAnimationType {
@@ -535,7 +594,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_setBadgeAnimationType:(CYLBadgeAnimationType)animationType {
-//    [kActualView cyl_setBadgeAnimationType:animationType];
+    //    [kActualView cyl_setBadgeAnimationType:animationType];
     SEL selector = @selector(cyl_setBadgeAnimationTypeValue:);
     NSNumber *cyl_setBadgeAnimationTypeValue = @(animationType);
     [kActualView cyl_performSelector:selector withObject:cyl_setBadgeAnimationTypeValue];
@@ -546,14 +605,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_setBadgeFrame:(CGRect)badgeFrame {
-//    [kActualView cyl_setBadgeFrame:badgeFrame];
+    //    [kActualView cyl_setBadgeFrame:badgeFrame];
     SEL selector = @selector(cyl_setBadgeFrameValue:);
     NSValue *badgeCenterOffsetValue = [NSValue valueWithCGRect:badgeFrame];
     [kActualView cyl_performSelector:selector withObject:badgeCenterOffsetValue];
 }
 
 - (void)cyl_setBadgeCenterOffsetValue:(NSValue *)badgeCenterOffsetValue {
-//    [CYL_ACTUAL_BARBUTTON cyl_setBadgeCenterOffset:badgeCenterOffset];
+    //    [CYL_ACTUAL_BARBUTTON cyl_setBadgeCenterOffset:badgeCenterOffset];
     CGPoint badgeCenterOffset = badgeCenterOffsetValue.CGPointValue;
     [self cyl_setBadgeCenterOffset:badgeCenterOffset];
 }
@@ -562,7 +621,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_setBadgeCenterOffset:(CGPoint)badgeCenterOffset {
-//    [kActualView cyl_setBadgeCenterOffset:badgeCenterOffset];
+    //    [kActualView cyl_setBadgeCenterOffset:badgeCenterOffset];
     SEL selector = @selector(cyl_setBadgeCenterOffsetValue:);
     NSValue *badgeCenterOffsetValue = [NSValue valueWithCGPoint:badgeCenterOffset];
     [kActualView cyl_performSelector:selector withObject:badgeCenterOffsetValue];
@@ -573,7 +632,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_setBadgeMaximumBadgeNumber:(NSInteger)badgeMaximumBadgeNumber {
-//    [kActualView cyl_setBadgeMaximumBadgeNumber:badgeMaximumBadgeNumber];
+    //    [kActualView cyl_setBadgeMaximumBadgeNumber:badgeMaximumBadgeNumber];
     SEL selector = @selector(cyl_setBadgeMaximumBadgeNumberValue:);
     NSNumber *cyl_setBadgeMaximumBadgeNumberValue = @(badgeMaximumBadgeNumber);
     [kActualView cyl_performSelector:selector withObject:cyl_setBadgeMaximumBadgeNumberValue];
@@ -585,7 +644,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_setBadgeMargin:(CGFloat)badgeMargin {
-//    [kActualView cyl_setBadgeMargin:badgeMargin];
+    //    [kActualView cyl_setBadgeMargin:badgeMargin];
     SEL selector = @selector(cyl_setBadgeMarginValue:);
     NSNumber *cyl_setBadgeMarginValue = @(badgeMargin);
     [kActualView cyl_performSelector:selector withObject:cyl_setBadgeMarginValue];
@@ -596,11 +655,11 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_setBadgeRadius:(CGFloat)badgeRadius {
-//    [kActualView cyl_setBadgeRadius:badgeRadius];
+    //    [kActualView cyl_setBadgeRadius:badgeRadius];
     SEL selector = @selector(cyl_setBadgeRadiusValue:);
     NSNumber *cyl_setBadgeRadiusValue = @(badgeRadius);
     [kActualView cyl_performSelector:selector withObject:cyl_setBadgeRadiusValue];
-
+    
 }
 
 - (CGFloat)cyl_badgeCornerRadius {
@@ -608,11 +667,113 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)cyl_setBadgeCornerRadius:(CGFloat)cyl_badgeCornerRadius {
-//    [kActualView cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
+    //    [kActualView cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
     SEL selector = @selector(cyl_setBadgeCornerRadiusValue:);
     NSNumber *cyl_setBadgeCornerRadiusValue = @(cyl_badgeCornerRadius);
     [kActualView cyl_performSelector:selector withObject:cyl_setBadgeCornerRadiusValue];
 }
 
+- (BOOL)cyl_isEqualToViewController:(UIViewController *)compairedViewController {
+    if ([self isEqual:compairedViewController]) {
+        return YES;
+    }
+    if ([[self cyl_getViewControllerInsteadOfNavigationController] isEqual:[compairedViewController cyl_getViewControllerInsteadOfNavigationController]]) {
+        return YES;
+    }
+    return NO;
+}
+
+- (void)cyl_addChildViewController:(id)childController {
+    if (![childController isKindOfClass:[UIViewController class]]) { return; }
+    UIViewController *viewController = (UIViewController *)childController;
+    if (viewController.cyl_isPlaceholder) { return; }
+    if (viewController.cyl_getViewControllerInsteadOfNavigationController.cyl_isPlaceholder) { return; }
+    [self addChildViewController:viewController];
+}
+
+#pragma mark - @implementation UIViewController (CYLFlatDesignUITabBarControllerItem) @implementation UIViewController (CYLFlatDesignUIViewControllerItem)
+// MARK: @implementation UIViewController (CYLFlatDesignUITabBarControllerItem) @implementation UIViewController (CYLFlatDesignUIViewControllerItem)
+
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+
+
+
+
+- (CYLFlatDesignTabBarItem *)cyl_tabBarItem {
+    CYLFlatDesignTabBarItem *tabBarItem = objc_getAssociatedObject(self, @selector(cyl_tabBarItem));
+    if (!tabBarItem) {
+        NSString *title = tabBarItem.title ?: self.title ?: @"test";
+        UIImage *image = tabBarItem.image ?: [UIImage cyl_tabItemPlaceholderImage];
+        ;
+        UIImage *selectedImage = tabBarItem.selectedImage ?: [UIImage cyl_tabItemPlaceholderImage];
+        
+        tabBarItem = [[CYLFlatDesignTabBarItem alloc] initWithTitle:title image:image selectedImage:selectedImage];
+        tabBarItem.index = NSNotFound;
+        objc_setAssociatedObject(self, @selector(cyl_tabBarItem), tabBarItem, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        if (self.cyl_getViewControllerInsteadOfNavigationController) {
+            objc_setAssociatedObject(self.cyl_getViewControllerInsteadOfNavigationController, @selector(cyl_tabBarItem), tabBarItem, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+    }
+    return tabBarItem;
+}
+
+- (void)cyl_setTabBarItem:(CYLFlatDesignTabBarItem *)tabBarItem {
+    //    [self cylflatdesign_setTabBarController:vc];
+    
+    if (tabBarItem == nil) {
+        tabBarItem = [[CYLFlatDesignTabBarItem alloc] initWithTitle:self.title image:nil];
+    }
+    //FIXME:  [CYLFlatDesignTabBarButton setTabBarItem:] 需要在cyl_setTabBarItem之前调用。否则无法获取到 [tabBarItem view]
+    CYLFlatDesignTabBarItem *oldItem = self.cyl_tabBarItem;
+    
+    
+    if (self.cyl_getViewControllerInsteadOfNavigationController.cyl_tabBarItem) {
+        oldItem = self.cyl_getViewControllerInsteadOfNavigationController.cyl_tabBarItem;
+    }
+    
+    //TODO:          可以通过 [self cyl_valueForKey:@"view"]; 获得绑定的 UIControl 。
+    UIControl *tabBarControl = nil;
+    UIViewController *cylflatdesign_tabBarController = self.cylflatdesign_tabBarController;
+    
+    
+    if (!cylflatdesign_tabBarController) {
+        return;
+    }
+    if ([cylflatdesign_tabBarController cyl_isFlatDesignStyleTabBar]) {
+        CYLTabBarController *tabBarController = (CYLTabBarController *)cylflatdesign_tabBarController;
+        [tabBarController changeItem:oldItem toItem:tabBarItem];
+        
+        if (!tabBarControl) {
+            // tabBarControl = [tabBarItem getTabBarControl];
+            tabBarControl = [tabBarItem tabBarButton];
+        }
+        
+        if (tabBarControl) {
+#if __has_include(<CYLTabBarController/CYLTabBarController.h>)
+            [self cyl_setTabButton:tabBarControl];
+#else
+#endif
+        }
+        
+    }
+    
+    /*!
+     *     else if ([cylflatdesign_tabBarController isKindOfClass:[CYLFlatDesignUIViewController class]]) {
+     CYLFlatDesignUIViewController *tabBarController = (CYLFlatDesignUIViewController *)cylflatdesign_tabBarController;
+     [tabBarController changeItem:oldItem toItem:tabBarItem];
+     
+     }
+     
+     */
+    objc_setAssociatedObject(self, @selector(cyl_tabBarItem), tabBarItem, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (self.cyl_getViewControllerInsteadOfNavigationController) {
+        objc_setAssociatedObject(self.cyl_getViewControllerInsteadOfNavigationController, @selector(cyl_tabBarItem), tabBarItem, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    
+}
+
+#endif
+
 @end
+
 

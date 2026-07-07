@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "CYLPlusButton.h"
+#import "NSObject+CYLTabBarControllerExtention.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class CYLTabBar;
@@ -22,16 +23,25 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
  */
 @property (nonatomic, assign, readonly) CGFloat tabImageViewDefaultOffset;
 
-/** 可以不设置， 默认为 CYLTabBarController，如果设置了，请实现 CYLPlusButton 里 的 +[CYLPlusButton tabBarContext] 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController */
-@property (nonatomic, copy) NSString *context;
+/*!
+ [EN] This can be left unset; the default is CYLTabBarController. If set, please implement the `+[CYLPlusButton tabBarContext]` method in CYLPlusButton and ensure consistency. If neither is implemented, the default is CYLTabBarController for both.
+
+ [CN] 可以不设置， 默认为 CYLTabBarController，如果设置了，请实现 CYLPlusButton 里 的 `+[CYLPlusButton tabBarContext]` 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController
+ */
+@property (nonatomic, copy, nullable) NSString *context;
 
 @property (nonatomic, copy, nullable) CYLTabBarDidLayoutSubViewsBlock didLayoutSubViewsBlock;
 
 /** 发布按钮 */
-@property (nonatomic, strong) UIButton<CYLPlusButtonSubclassing> *plusButton;
+@property (nonatomic, strong) CYLPlusButton<CYLPlusButtonSubclassing> *plusButton;
 @property (nonatomic, assign) CGFloat tabBarItemWidth;
 @property (nonatomic, copy) NSArray<UIControl *> *tabBarButtonArray;
-@property (nonatomic, assign, getter=hasAddPlusButton) BOOL addPlusButton;
+
+/*!
+ * plusButton state:
+ * Register + Context match == Active
+ */
+@property (nonatomic, assign, getter=isPlusButtonActive) BOOL plusButtonActive;
 @property (nonatomic, assign) BOOL isLensViewLifed;
 @property (nonatomic, strong) UIGestureRecognizer *liquidGlassContinuousGestureRecognizer;
 
@@ -43,6 +53,8 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 
 - (NSUInteger)plusButtonIndex;
 
+- (BOOL)hasPlusButton;
+- (BOOL)hasPlusChildViewController;
 - (BOOL)isPlusButtonLayoutCentered;
 
 @end

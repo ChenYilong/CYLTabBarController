@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIImage *)cyl_imageWithColor:(UIColor *)color size:(CGSize)size;
 
++ (UIImage *)cyl_imageWithColor:(UIColor *)color size:(CGSize)size cornerRadius:(CGFloat)cornerRadius;
+
 + (UIImage *)cyl_imageNamed:(id)imageInfo;
 
 + (UIImage *)cyl_getImageFromImageInfo:(id)imageInfo;

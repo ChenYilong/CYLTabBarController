@@ -8,6 +8,9 @@
 
 #import "CYLBadgeProtocol.h"
 #import "CYLConstants.h"
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#import <CYLTabBarController/CYLFlatDesignTabBar.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,22 +26,58 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 @interface UIViewController (CYLTabBarControllerExtention)<CYLBadgeProtocol>
 
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+
+//TODO: 分类统一放置到一个独立的文件中， 方便管理。
+
+// 如果未显式设置，则根据视图控制器的标题自动延迟创建
+@property (null_resettable, nonatomic, strong, getter=cyl_tabBarItem, setter=cyl_setTabBarItem:) CYLFlatDesignTabBarItem *cyl_tabBarItem;
+
+// 返回控制器的tabBarController，可能为nil
+//TODO:  更换为统一的 cyl_tabBarController
+@property (nullable, nonatomic, weak, getter=cylflatdesign_tabBarController, setter=cylflatdesign_setTabBarController:) UIViewController __kindof *cylflatdesign_tabBarController;
+
+
+
+
+#endif
+
+- (BOOL)cyl_isSystemStyleTabBar;
+
+- (BOOL)cyl_isFlatDesignStyleTabBar;
+
 @property (nonatomic, readonly, getter=cyl_isEmbedInTabBarController) BOOL cyl_embedInTabBarController;
 
 @property (nonatomic, readonly, getter=cyl_tabIndex) NSInteger cyl_tabIndex;
 
-//@property (nonatomic, strong) UIControl *cyl_tabButton;
 @property (nonatomic, strong, getter=cyl_tabButton, setter=cyl_setTabButton:) UIControl *cyl_tabButton;
 
-@property (nonatomic, copy, setter=cyl_setContext:, getter=cyl_context) NSString *cyl_context;
-
 @property (nonatomic, assign, setter=cyl_setPlusViewControllerEverAdded:, getter=cyl_plusViewControllerEverAdded) BOOL cyl_plusViewControllerEverAdded;
-
-@property (nonatomic, assign, getter=cyl_isPlaceholder, setter=cyl_setIsPlaceholder:) BOOL cyl_isPlaceholder;
 
 - (BOOL)cyl_isShowBadge;
 /**
  *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
+ *
+ * @attention 如果如果涉及到outlayout， 建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame。 推荐使用 UIViewController 进行调用该方法， 并在 setViewDidLayoutSubViewsBlockInvokeOnce  展示， 因为 如果使用 UIViewController setViewDidLayoutSubViewsBlockInvokeOnce中调用， 可以保证 cyl_showBadge 在 layoutSubviews之后调用。
+ *  layoutSubviews
+ * 效果与下面的调用方式一致：
+ *  // ====================== ZJ添加:修正xib控件显示角标位置不正确问题 ======================
+ 
+ - (void)load {
+    [super load];
+    Method m1 = class_getInstanceMethod(self, @selector(layoutSubviews));
+    Method m2 = class_getInstanceMethod(self, @selector(cyl_layoutSubviews));
+    method_exchangeImplementations(m1, m2);
+ }
+ 
+ - (void)cyl_layoutSubviews {
+    [self cyl_layoutSubviews];
+    self.badge.center = CGPointMake(CGRectGetWidth(self.frame) + 2 + self.badgeCenterOffset.x, self.badgeCenterOffset.y);
+ }
+ // ====================== end ======================
+
+
+ 
  */
 - (void)cyl_showBadge;
 
@@ -142,16 +181,24 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 - (void)cyl_handleNavigationBackAction;
 - (void)cyl_handleNavigationBackActionWithAnimated:(BOOL)animated;
 - (UIControl *)cyl_visiableTabButton;
+- (BOOL)cyl_isEqualToViewController:(UIViewController *)compairedViewController;
+
+/*
+  If the child controller has a different parent controller, it will first be removed from its current parent
+  by calling removeFromParentViewController. If this method is overridden then the super implementation must
+  be called.
+*/
+- (void)cyl_addChildViewController:(id)childController;
 
 @end
 
 @interface UIViewController (CYLTabBarControllerExtentionDeprecated)
 
-- (void)cyl_showTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use `-[UIViewController cyl_showBadgeValue:animationType:]` instead.");
+- (void)cyl_showTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol>, such as `-[UIViewController cyl_showBadgeValue:animationType:]` instead.");
 
-- (void)cyl_removeTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use `-[UIViewController cyl_clearBadge]` instead.");
+- (void)cyl_removeTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol>, such as `-[UIViewController cyl_clearBadge]` instead.");
 
-- (BOOL)cyl_isShowTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use `-[UIViewController cyl_isShowBadge]` instead.");
+- (BOOL)cyl_isShowTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol>, such as `-[UIViewController cyl_isShowBadge]` instead.");
 
 @property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *cyl_tabBadgePointView CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
 

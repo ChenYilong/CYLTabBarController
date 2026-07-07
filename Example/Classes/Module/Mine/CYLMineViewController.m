@@ -20,7 +20,7 @@
 
     self.view.backgroundColor = [UIColor whiteColor];
 
-    self.navigationItem.title = @"我的";
+//    self.navigationItem.title = @"我的";
 //    self.tabBarItem.title = @"我的";
 
     // ✅ 关键代码：设置 NavigationBar 为白色背景（非透明）
@@ -72,7 +72,7 @@
 #pragma mark - Methods
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
-    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController %@", self.tabBarItem.title, @(indexPath.row)]];
+    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController on iOS %@", self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
 }
 
 #pragma mark - Table view

@@ -66,7 +66,7 @@
 }
 
 - (NSInteger)cyl_tabBarItemVisibleIndex {
-    if (!self.cyl_isTabButton && !self.cyl_isPlusButton ) {
+    if (!self.cyl_isTabButton && !self.cyl_isPlusButton) {
         return NSNotFound;
     }
     NSNumber *tabBarItemVisibleIndexObject = objc_getAssociatedObject(self, @selector(cyl_tabBarItemVisibleIndex));
@@ -91,25 +91,6 @@
     objc_setAssociatedObject(self, @selector(cyl_tabBarChildViewControllerIndex), tabBarChildViewControllerIndexObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (void)cyl_showTabBadgePoint {
-    [self cyl_setShowTabBadgePointIfNeeded:YES];
-}
-
-- (void)cyl_removeTabBadgePoint {
-    [self cyl_setShowTabBadgePointIfNeeded:NO];
-}
-
-- (BOOL)cyl_isShowTabBadgePoint {
-    return !self.cyl_tabBadgePointView.hidden;
-}
-
-- (BOOL)cyl_isReady {
-    if (self.cyl_tabBarController.lottieURLs.count > 0) {
-        return self.cyl_isLottieReady;
-    }
-    return self.cyl_tabImageView.frame.size.width > 10 || self.cyl_tabLabel.frame.size.width > 10 ;
-}
-
 - (BOOL)cyl_isLottieReady {
     if (self.cyl_tabBarController.lottieURLs.count > 0) {
         return self.cyl_tabBarController.lottieViewAdded;
@@ -127,7 +108,7 @@
     NSUInteger tabBarSelectedIndex = self.cyl_tabBarController.selectedIndex;
     NSUInteger tabBarChildViewControllerIndex = self.cyl_tabBarChildViewControllerIndex;
     BOOL isSelected = (tabBarSelectedIndex == tabBarChildViewControllerIndex) && self.selected;
-
+    
     if (self.cyl_tabBarController.tabBar.cyl_hasPlusChildViewController) {
         isSelected = isSelected && CYLPlusChildViewController.cyl_plusViewControllerEverAdded;
     }
@@ -138,75 +119,10 @@
     return [self isKindOfClass:[CYLExternPlusButton class]] || [self cyl_isChildViewControllerPlusButton];
 }
 
-- (void)cyl_setShowTabBadgePointIfNeeded:(BOOL)showTabBadgePoint {
-    @try {
-        [self cyl_setShowTabBadgePoint:showTabBadgePoint];
-    } @catch (NSException *exception) {
-        NSLog(@"CYLPlusChildViewController do not support set TabBarItem red point");
-    }
-}
-
-- (void)cyl_setShowTabBadgePoint:(BOOL)showTabBadgePoint {
-    if (showTabBadgePoint && self.cyl_tabBadgePointView.superview == nil) {
-        [self cyl_bringSubviewToFront:self.cyl_tabBadgePointView];
-        // X constraint
-        [self addConstraint:
-         [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView
-                                      attribute:NSLayoutAttributeCenterX
-                                      relatedBy:0
-                                         toItem:self.cyl_tabImageView
-                                      attribute:NSLayoutAttributeRight
-                                     multiplier:1
-                                       constant:self.cyl_tabBadgePointViewOffset.horizontal]];
-        //Y constraint
-        [self addConstraint:
-         [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView
-                                      attribute:NSLayoutAttributeCenterY
-                                      relatedBy:0
-                                         toItem:self.cyl_tabImageView
-                                      attribute:NSLayoutAttributeTop
-                                     multiplier:1
-                                       constant:self.cyl_tabBadgePointViewOffset.vertical]];
-    }
-    self.cyl_tabBadgePointView.hidden = showTabBadgePoint == NO;
-    self.cyl_tabBadgeView.hidden = showTabBadgePoint == YES;
-}
-
-- (void)cyl_setTabBadgePointView:(UIView *)tabBadgePointView {
-    UIView *tempView = objc_getAssociatedObject(self, @selector(cyl_tabBadgePointView));
-    if (tempView) {
-        [tempView removeFromSuperview];
-    }
-    if (tabBadgePointView.superview) {
-        [tabBadgePointView removeFromSuperview];
-    }
-    
-    tabBadgePointView.hidden = YES;
-    objc_setAssociatedObject(self, @selector(cyl_tabBadgePointView), tabBadgePointView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (UIView *)cyl_tabBadgePointView {
-    UIView *tabBadgePointView = objc_getAssociatedObject(self, @selector(cyl_tabBadgePointView));
-    
-    if (tabBadgePointView == nil) {
-        tabBadgePointView = self.cyl_defaultTabBadgePointView;
-        objc_setAssociatedObject(self, @selector(cyl_tabBadgePointView), tabBadgePointView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    return tabBadgePointView;
-}
-
-- (void)cyl_setTabBadgePointViewOffset:(UIOffset)tabBadgePointViewOffset {
-    objc_setAssociatedObject(self, @selector(cyl_tabBadgePointViewOffset), [NSValue valueWithUIOffset:tabBadgePointViewOffset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-//offset如果都是正数，则往右下偏移
-- (UIOffset)cyl_tabBadgePointViewOffset {
-    id tabBadgePointViewOffsetObject = objc_getAssociatedObject(self, @selector(cyl_tabBadgePointViewOffset));
-    UIOffset tabBadgePointViewOffset = [tabBadgePointViewOffsetObject UIOffsetValue];
-    return tabBadgePointViewOffset;
-}
-
 - (UIView *)cyl_lottieAnimationView {
+    if ([self cyl_isPlusControl]) {
+        return nil;
+    }
     UIView *animationView = nil;
     for (UIView *subview in self.subviews) {
         if ([subview cyl_isLottieAnimationView]) {
@@ -231,26 +147,26 @@
 }
 
 - (void)cyl_replaceTabImageViewWithNewView:(UIView *)newView
-                                           offset:(UIOffset)offset
-                                    show:(BOOL)theShow
-                                        completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
+                                    offset:(UIOffset)offset
+                                      show:(BOOL)theShow
+                                completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
     [self cyl_replaceTabImageViewOrTabButton:NO newView:newView offset:offset show:theShow shouldAutoHideNewView:YES completion:completion];
 }
 
 - (void)cyl_replaceTabButtonWithNewView:(UIView *)newView
-                                    offset:(UIOffset)offset
-                                      show:(BOOL)theShow
-                                completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
+                                 offset:(UIOffset)offset
+                                   show:(BOOL)theShow
+                             completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
     [self cyl_replaceTabImageViewOrTabButton:YES newView:newView offset:offset show:theShow shouldAutoHideNewView:YES completion:completion];
 }
 
 - (void)cyl_replaceTabButtonWithNewView:(UIView *)newView
-                                      show:(BOOL)show {
-        [self cyl_replaceTabButtonWithNewView:newView offset:UIOffsetZero show:show completion:^(BOOL isReplaced, UIControl *tabBarButton, UIView *newView) {
-            if (isReplaced) {
-                tabBarButton.cyl_swappableImageViewViewInTabBarButton.hidden = YES;
-            }
-        }];
+                                   show:(BOOL)show {
+    [self cyl_replaceTabButtonWithNewView:newView offset:UIOffsetZero show:show completion:^(BOOL isReplaced, UIControl *tabBarButton, UIView *newView) {
+        if (isReplaced) {
+            tabBarButton.cyl_swappableImageViewViewInTabBarButton.hidden = YES;
+        }
+    }];
 }
 
 - (void)cyl_coverVisiableTabImageViewOrTabButton:(BOOL)isTabButton
@@ -280,19 +196,19 @@
 }
 
 - (void)cyl_coverSeclectContentTabImageViewOrTabButton:(BOOL)isTabButton
-                               newView:(UIView *)newView
-                                    offset:(UIOffset)offset
-                                      show:(BOOL)theShow
-                           delayIfNeededForSeconds:(CGFloat)delay
-                              completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
+                                               newView:(UIView *)newView
+                                                offset:(UIOffset)offset
+                                                  show:(BOOL)theShow
+                               delayIfNeededForSeconds:(CGFloat)delay
+                                            completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
     [(self.cyl_platterSelectedControl ?: self) cyl_coverTabImageViewOrTabButton:isTabButton newView:newView offset:offset show:theShow delayIfNeededForSeconds:delay completion:completion];
 }
 
 - (void)cyl_coverTabImageViewOrTabButton:(BOOL)isTabButton
-                               newView:(UIView *)newView
-                                    offset:(UIOffset)offset
-                                      show:(BOOL)theShow
-                           delayIfNeededForSeconds:(CGFloat)delay
+                                 newView:(UIView *)newView
+                                  offset:(UIOffset)offset
+                                    show:(BOOL)theShow
+                 delayIfNeededForSeconds:(CGFloat)delay
                               completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
     UIControl *selectedTabButton = self;
     NSUInteger delaySeconds = selectedTabButton.cyl_isReady ? 0 : delay;
@@ -304,13 +220,19 @@
             if (isReplaced) {
                 tabBarButton.cyl_swappableImageViewViewInTabBarButton.hidden = YES;
                 // tabBarButton.cyl_platterNormalControl.cyl_swappableImageViewViewInTabBarButton.hidden = YES;
+                [tabBarButton.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+
+                    if (![obj isEqual:newView]) {
+                        [obj cyl_setHidden:theShow];
+                    }
+                }];
             }
             if (theShow) {
-//                [tabBarButton cyl_clearBadge];
+                //                [tabBarButton cyl_clearBadge];
                 [tabBarButton cyl_performSelector:@selector(cyl_clearBadge)];
             } else {
                 [tabBarButton cyl_performSelector:@selector(cyl_resumeBadge)];
-
+                
             }
             !completion?:completion(isReplaced, tabBarButton, newView);
             
@@ -319,7 +241,7 @@
 }
 
 - (void)cyl_replaceTabImageViewOrTabButton:(BOOL)isTabButton
-                               newView:(UIView *)newView
+                                   newView:(UIView *)newView
                                     offset:(UIOffset)offset
                                       show:(BOOL)theShow
                      shouldAutoHideNewView:(BOOL)shouldAutoHideNewView
@@ -328,12 +250,15 @@
 }
 
 - (void)cyl_replaceTabImageViewOrTabButton:(BOOL)isTabButton
-                               newView:(UIView *)newView
+                                   newView:(UIView *)newView
                                     offset:(UIOffset)offset
                                       show:(BOOL)theShow
-                    shouldAutoHideNewView:(BOOL)shouldAutoHideNewView
+                     shouldAutoHideNewView:(BOOL)shouldAutoHideNewView
                     shouldHideOriginalView:(BOOL)shouldHideOriginalView
                                 completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
+//    newView.translatesAutoresizingMaskIntoConstraints = NO;
+//    self.translatesAutoresizingMaskIntoConstraints = NO;
+
     UIControl *tabBarButton = self;//_UI+TabButton
     UIImageView *swappableImageView = tabBarButton.cyl_tabImageView;
     UIView *replacedView = swappableImageView;
@@ -344,7 +269,7 @@
         !completion?:completion(NO, self, nil);
         return;
     }
-//        //TODO: 区分cover 与 replace 两个场景， 获取到真实的view，可能是lottie，决定是否限制新视图的尺寸， 目前暂不限制尺寸。 因为主要场景为 cover 场景。cover =( adjustTabBarItemImageViewSizeDependOnSuperView == yes), replace =( adjustTabBarItemImageViewSizeDependOnSuperView == NO)
+    //        //TODO: 区分cover 与 replace 两个场景， 获取到真实的view，可能是lottie，决定是否限制新视图的尺寸， 目前暂不限制尺寸。 因为主要场景为 cover 场景。cover =( adjustTabBarItemImageViewSizeDependOnSuperView == yes), replace =( adjustTabBarItemImageViewSizeDependOnSuperView == NO)
     if (newView.frame.size.width == 0 || newView.frame.size.height == 0) {
         //        不再限制newView 是否能超过父视图，因为你可以通过设置size来控制newView的展示大小。
         //        if (newView.frame.size.width > tabBarButton.frame.size.width || newView.frame.size.height > tabBarButton.frame.size.height) {
@@ -451,15 +376,16 @@
 - (void)cyl_addLottieImageWithLottieFilePath:(NSString *)lottieFilePath
                                         size:(CGSize)size
                                  contentMode:(UIViewContentMode)contentMode {
-    if (!lottieFilePath) {
-        return;
-    }
-    
-    NSURL *lottieURL = [NSURL fileURLWithPath:lottieFilePath];
+    NSURL *lottieURL = [CYLConstants cyl_getURLFromString:lottieFilePath];
     if (!lottieURL) {
         return;
     }
-
+    if (CGSizeEqualToSize(CGSizeZero, size)) {
+        size = CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
+    }
+    if ([self cyl_isPlusControl]) {
+        return;
+    }
 #if __has_include(<Lottie/Lottie.h>)
     
     if (self.cyl_lottieAnimationView) {
@@ -481,8 +407,8 @@
     }
     UIControl *tabButton = self;
     NSString *filePath = lottieFilePath;
-    CompatibleLOTAnimation *composition = [[CompatibleLOTAnimation alloc] initWithFilepath:filePath];
-    CompatibleLOTAnimationView *lottieView = [[CompatibleLOTAnimationView alloc] initWithCompatibleAnimation:composition];
+    CYLCompatibleLOTAnimation *composition = [[CYLCompatibleLOTAnimation alloc] initWithFilepath:filePath];
+    CYLCompatibleLOTAnimationView *lottieView = [[CYLCompatibleLOTAnimationView alloc] initWithCompatibleAnimation:composition];
     lottieView.frame = CGRectMake(0, 0, size.width, size.height);
     lottieView.userInteractionEnabled = NO;
     lottieView.contentMode = contentMode;
@@ -494,14 +420,18 @@
 }
 
 - (void)cyl_animationLottieImageWithLottieURL:(NSURL *)lottieURL
-                                               size:(CGSize)size
-                                    defaultSelected:(BOOL)defaultSelected
+                                         size:(CGSize)size
+                              defaultSelected:(BOOL)defaultSelected
                                   contentMode:(UIViewContentMode)contentMode {
-
-#if __has_include(<Lottie/Lottie.h>)
+    if ([self cyl_isPlusControl]) {
+        return;
+    }
     if (!lottieURL) {
         return;
     }
+    
+#if __has_include(<Lottie/Lottie.h>)
+    
     //_UITabButton
     [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
     LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
@@ -509,98 +439,122 @@
         [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
     }
     lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
-    if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]]) {
+    if (!lottieView || ![lottieView isKindOfClass:[LOTAnimationView class]]) {
+        return;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
+
+    dispatch_async(dispatch_get_main_queue(),^{
+        
         if (defaultSelected) {
             //Avoid triggering Lottie animation when index == 0 on app startup. 希望Lottie icon 启动后 index== 0 不执行动画 #389
             lottieView.animationProgress = 1;
             [lottieView forceDrawingUpdate];
-            return;
+        } else {
+            lottieView.animationProgress = 0;
+            [lottieView play];
         }
-        lottieView.animationProgress = 0;
-        [lottieView play];
-    }
+    });
 #endif
     
     
 #if __has_include(<Lottie/Lottie-Swift.h>)
-    if (!lottieURL) {
-        return;
-    }
+    
     //_UITabButton
     [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
-    CompatibleLOTAnimationView *lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+    CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
     if (!lottieView) {
         [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
     }
-    lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-    if (lottieView && [NSStringFromClass([lottieView class]) containsString:NSStringFromClass([CompatibleLOTAnimationView class])]) {
+    lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+    if (!lottieView || ![NSStringFromClass([lottieView class]) containsString:NSStringFromClass([CYLCompatibleLOTAnimationView class])]) {
+        return;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
+
+//    dispatch_async(dispatch_get_main_queue(),^{  不能增加dispatch_get_main_queue判断，否则暂停与播放，可能错乱。
+
         if (defaultSelected) {
             //Avoid triggering Lottie animation when index == 0 on app startup. 希望Lottie icon 启动后 index== 0 不执行动画 #389
-            [lottieView animationProgress:1];
+            lottieView.animationProgress = 1;
             [lottieView forceDrawingUpdate];
-            return;
+        } else {
+            lottieView.animationProgress = 0;
+            ///播放到指定进度（0-1）
+            [lottieView play];
         }
-        [lottieView animationProgress:0];
-        ///播放到指定进度（0-1）
-        [lottieView play];
-    }
+//    });
 #endif
-
 }
 
+/*!
+  通过(lottieView.animationProgress > 0) 判断，以及放置在 dispatch_get_main_queue， 尝试 修复扁平风格 CYLFlatDesignTabBar 第一次初始化时，可能展示失败的问题。
+ 其中 通过(lottieView.animationProgress > 0) 判断 ， 可以降低80%的发生几率， 但并不保证100%完全避免，
+ 不能增加dispatch_get_main_queue判断，否则暂停与播放，可能错乱。
+ */
 - (void)cyl_stopAnimationOfLottieView {
+//    dispatch_async(dispatch_get_main_queue(),^{
 #if __has_include(<Lottie/Lottie.h>)
-    if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
-        LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
-
-        if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]]) {
-            [lottieView stop];
-        }
-    } else
-        if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
             LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
-
-            if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]]) {
+            
+            if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]] && (lottieView.animationProgress > 0)) {
                 [lottieView stop];
             }
         }
-#endif
-    
-    
-#if __has_include(<Lottie/Lottie-Swift.h>)
-
-    if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
         
-        CompatibleLOTAnimationView *lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-
-        if (lottieView && [lottieView isKindOfClass:[CompatibleLOTAnimationView class]]) {
-            [lottieView stop];
-        }
-    } else
-        if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-            CompatibleLOTAnimationView *lottieView = (CompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-
-            if (lottieView && [lottieView isKindOfClass:[CompatibleLOTAnimationView class]]) {
+        else if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+            LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
+            
+            if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]] && (lottieView.animationProgress > 0)) {
                 [lottieView stop];
             }
         }
 #endif
-
+        
+        
+#endif
+        
+        
+#if __has_include(<Lottie/Lottie-Swift.h>)
+        
+        if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+            
+            CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+            
+            if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
+                [lottieView stop];
+            }
+        }
+        
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+        //TODO:   仅仅保留一个 else if or else 即可
+        else if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+            CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+            if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
+                [lottieView stop];
+            }
+        }  else {
+            CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+            if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
+                [lottieView stop];
+            }
+        }
+#endif
+        
+#endif
+//    });
 }
 
 #pragma mark - private method
-
-- (UIView *)cyl_defaultTabBadgePointView {
-    UIView *defaultRedTabBadgePointView = [UIView cyl_tabBadgePointViewWithClolor:[UIColor redColor] radius:4.5];
-    return defaultRedTabBadgePointView;
-}
 
 //- (CGFloat)cyl_xOffset {
 //    if (![CYLConstants isLiquidGlassActive]) {
 //        return 0.0f;
 //    }
 //    CGFloat boundsWidthOffset;// = (CYLScreenWidth() - self.cyl_boundsSize.width) * 0.5;
-//    
+//
 //    return boundsWidthOffset;
 //}
 
@@ -628,7 +582,7 @@
     if (![self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
         return NO;
     }
-
+    
     return [self.superview cyl_isPlatterSelectedContentView];
 }
 
@@ -660,51 +614,99 @@
     selectedControl.userInteractionEnabled = NO;
     
 }
-- (void)cyl_performSelector:(SEL)aSelector {
-    if (aSelector == NULL) { return; }
-    NSObject *obj = nil;
-    [self cyl_performSelector:aSelector withObject:obj];
+
+CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
+CYL_DEPRECATED_DECLARATIONS_PUSH
+- (void)cyl_setShowTabBadgePointIfNeeded:(BOOL)showTabBadgePoint {
+    @try {
+        [self cyl_setShowTabBadgePoint:showTabBadgePoint];
+    } @catch (NSException *exception) {
+        NSLog(@"CYLPlusChildViewController do not support set TabBarItem red point");
+    }
 }
 
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object {
-    if (aSelector == NULL) { return; }
-    NSObject *obj = nil;
-    [self cyl_performSelector:aSelector withObject:object withObject:obj];
+- (void)cyl_setShowTabBadgePoint:(BOOL)showTabBadgePoint {
+    if (showTabBadgePoint && self.cyl_tabBadgePointView.superview == nil) {
+        [self cyl_bringSubviewToFront:self.cyl_tabBadgePointView];
+        // X constraint
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView
+                                      attribute:NSLayoutAttributeCenterX
+                                      relatedBy:0
+                                         toItem:self.cyl_tabImageView
+                                      attribute:NSLayoutAttributeRight
+                                     multiplier:1
+                                       constant:self.cyl_tabBadgePointViewOffset.horizontal]];
+        //Y constraint
+        [self addConstraint:
+         [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView
+                                      attribute:NSLayoutAttributeCenterY
+                                      relatedBy:0
+                                         toItem:self.cyl_tabImageView
+                                      attribute:NSLayoutAttributeTop
+                                     multiplier:1
+                                       constant:self.cyl_tabBadgePointViewOffset.vertical]];
+    }
+    self.cyl_tabBadgePointView.hidden = showTabBadgePoint == NO;
+    self.cyl_tabBadgeView.hidden = showTabBadgePoint == YES;
 }
 
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 {
-    if (aSelector == NULL) { return; }
-    UIControl *normalControl = nil;
-    UIControl *selectedControl = nil;
-    if (![self isKindOfClass:[UIControl class]]) {
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-        (
-         [self performSelector:aSelector withObject:object1 withObject:object2];
-         )
-        return;
+- (void)cyl_setTabBadgePointView:(UIView *)tabBadgePointView {
+    UIView *tempView = objc_getAssociatedObject(self, @selector(cyl_tabBadgePointView));
+    if (tempView) {
+        [tempView removeFromSuperview];
     }
-    if ([self cyl_isPlatterSelectedControl]) {
-        selectedControl = self;
-    } else {
-        normalControl = self;
+    if (tabBadgePointView.superview) {
+        [tabBadgePointView removeFromSuperview];
     }
-    CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-    (
-     if (normalControl) {
-         [normalControl performSelector:aSelector withObject:object1 withObject:object2];
-         UIControl *counterpart = normalControl.cyl_platterSelectedControl;
-         if (counterpart) {
-             [counterpart performSelector:aSelector withObject:object1 withObject:object2];
-         }
-     } else if (selectedControl) {
-         [selectedControl performSelector:aSelector withObject:object1 withObject:object2];
-         UIControl *counterpart = selectedControl.cyl_platterNormalControl;
-         if (counterpart) {
-             [counterpart performSelector:aSelector withObject:object1 withObject:object2];
-         }
-     }
-     );
+    
+    tabBadgePointView.hidden = YES;
+    objc_setAssociatedObject(self, @selector(cyl_tabBadgePointView), tabBadgePointView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
+
+- (UIView *)cyl_tabBadgePointView {
+    UIView *tabBadgePointView = objc_getAssociatedObject(self, @selector(cyl_tabBadgePointView));
+    
+    if (tabBadgePointView == nil) {
+        tabBadgePointView = self.cyl_defaultTabBadgePointView;
+        objc_setAssociatedObject(self, @selector(cyl_tabBadgePointView), tabBadgePointView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return tabBadgePointView;
+}
+
+- (void)cyl_setTabBadgePointViewOffset:(UIOffset)tabBadgePointViewOffset {
+    objc_setAssociatedObject(self, @selector(cyl_tabBadgePointViewOffset), [NSValue valueWithUIOffset:tabBadgePointViewOffset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+//offset如果都是正数，则往右下偏移
+- (UIOffset)cyl_tabBadgePointViewOffset {
+    id tabBadgePointViewOffsetObject = objc_getAssociatedObject(self, @selector(cyl_tabBadgePointViewOffset));
+    UIOffset tabBadgePointViewOffset = [tabBadgePointViewOffsetObject UIOffsetValue];
+    return tabBadgePointViewOffset;
+}
+
+- (void)cyl_showTabBadgePoint {
+    [self cyl_setShowTabBadgePointIfNeeded:YES];
+}
+
+- (void)cyl_removeTabBadgePoint {
+    [self cyl_setShowTabBadgePointIfNeeded:NO];
+}
+
+- (BOOL)cyl_isShowTabBadgePoint {
+    return !self.cyl_tabBadgePointView.hidden;
+}
+
+- (UIView *)cyl_defaultTabBadgePointView {
+    
+    UIView *defaultRedTabBadgePointView;
+    CYL_DEPRECATED_DECLARATIONS_PUSH
+    defaultRedTabBadgePointView = [UIView cyl_tabBadgePointViewWithClolor:[UIColor redColor] radius:4.5];
+    CYL_DEPRECATED_DECLARATIONS_POP
+    return defaultRedTabBadgePointView;
+}
+CYL_DEPRECATED_DECLARATIONS_POP
+CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 @end
 

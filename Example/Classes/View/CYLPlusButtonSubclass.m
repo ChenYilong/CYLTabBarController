@@ -56,6 +56,7 @@
 #pragma clang diagnostic pop
         
 #endif
+        
     }
     return self;
 }
@@ -63,7 +64,7 @@
 #pragma mark -
 #pragma mark - CYLPlusButtonSubclassing Methods
 
-/*
+
 //上下结构的 button
 
 + (id)plusButton {
@@ -83,7 +84,7 @@
         UIButtonConfiguration *config = [UIButtonConfiguration plainButtonConfiguration];
         config.baseBackgroundColor = [UIColor clearColor];
         config.baseForegroundColor = [UIColor labelColor]; // ← 加这一行，控制图片 tint 和文字颜色
-
+        
         // ===== 核心：图片在上，文字在下 =====
         config.imagePlacement = NSDirectionalRectEdgeTop;
         //        config.imagePadding = 1.0;
@@ -120,13 +121,13 @@
     
     [button setTitle:@"发布" forState:UIControlStateNormal];
     [button setTitle:@"发布" forState:UIControlStateSelected];
-    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];   // ← 加这一行
-    [button setTitleColor:[UIColor blackColor] forState:UIControlStateSelected]; // ← 加这一行
-    [button setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted]; // ← 加这一行
+    //    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];   // ← 加这一行
+    //    [button setTitleColor:[UIColor blackColor] forState:UIControlStateSelected]; // ← 加这一行
+    //    [button setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted]; // ← 加这一行
     //    button.frame = CGRectMake(0.0, 0.0, 55, 80);
     button.bounds = CGRectMake(0.0, 0.0, 55, 80);
     
-    // if you use `+plusChildViewController`, do not addTarget to plusButton.
+    // if you use `+plusChildViewController`, do not add Target to plusButton.
     SEL action = @selector(clickPublish);
     [button removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
     [button addTarget:button action:action forControlEvents:UIControlEventTouchUpInside];
@@ -169,68 +170,68 @@
     
     return button;
 }
-*/
 
 /*
- *
- Create a custom UIButton with title and add it to the center of our tab bar
+ 
+ + (id)plusButton {
+ 
+ // Create a custom UIButton with title and add it to the center of our tab bar
+ CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
+ UIImage *normalButtonImage = [self contentImage];
+ UIImage *hlightButtonImage = [self selectedContentImage];
+ 
+ [button setImage:normalButtonImage forState:UIControlStateNormal];
+ [button setImage:hlightButtonImage forState:UIControlStateHighlighted];
+ [button setImage:hlightButtonImage forState:UIControlStateSelected];
+ //    [button setTintColor:[UIColor colorWithRed:0/255.0f green:255/255.0f blue:189/255.0f alpha:1]];
+ button.contentMode = UIViewContentModeCenter;
+ button.imageView.contentMode = UIViewContentModeScaleAspectFit;
+ 
+ #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000
+ if (@available(iOS 15.0, *)) {
+ // Ensure configuration exists
+ UIButtonConfiguration *config = button.configuration ?: [UIButtonConfiguration plainButtonConfiguration];
+ config.baseBackgroundColor = [UIColor clearColor];
+ // ===== Highlight behavior (no dimming) =====
+ __weak typeof(button) weakButton = button;
+ UIButtonConfigurationUpdateHandler existingHandler = button.configurationUpdateHandler;
+ button.configurationUpdateHandler = ^(UIButton *btn) {
+ btn.tintAdjustmentMode = UIViewTintAdjustmentModeNormal;
+ btn.imageView.alpha = 1.0;
+ };
+ 
+ } else
+ #endif
+ {
+ #pragma clang diagnostic push
+ #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+ // ===== iOS 15 以下：手动布局 =====
+ button.adjustsImageWhenHighlighted = NO;
+ button.backgroundColor = UIColor.clearColor;
+ button.titleLabel.font = [UIFont systemFontOfSize:9.5];
+ #pragma clang diagnostic pop
+ }
+ button.titleLabel.font = [UIFont systemFontOfSize:9.5];
+ [button sizeToFit]; // or set frame in this way `button.frame = CGRectMake(0.0, 0.0, 250, 100);`
+ button.frame = CGRectMake(0.0, 0.0, 55, 59);
+ button.bounds = CGRectMake(0.0, 0.0, 55, 59);
+ 
+ 
+ // if you use `+plusChildViewController` , do not addTarget to plusButton.
+ SEL action = @selector(clickPublish);
+ [button removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+ [button addTarget:button action:action forControlEvents:UIControlEventTouchUpInside];
+ 
+ if (CYLPlusChildViewController && button.isLayoutCentered) {
+ [button cyl_setUserInteractionDisabled:NO];
+ } else {
+ button.cyl_shouldNotSelect = YES;
+ }
+ return button;
+ }
+ 
  */
-+ (id)plusButton {
-    CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
-    UIImage *normalButtonImage = [self contentImage];
-    UIImage *hlightButtonImage = [self selectedContentImage];
-    
-    [button setImage:normalButtonImage forState:UIControlStateNormal];
-    [button setImage:hlightButtonImage forState:UIControlStateHighlighted];
-    [button setImage:hlightButtonImage forState:UIControlStateSelected];
-    //    [button setTintColor:[UIColor colorWithRed:0/255.0f green:255/255.0f blue:189/255.0f alpha:1]];
-    button.contentMode = UIViewContentModeCenter;
-    button.imageView.contentMode = UIViewContentModeScaleAspectFit;
-    
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000
-    if (@available(iOS 15.0, *)) {
-        // Ensure configuration exists
-        UIButtonConfiguration *config = button.configuration ?: [UIButtonConfiguration plainButtonConfiguration];
-        config.baseBackgroundColor = [UIColor clearColor];
-        // ===== Highlight behavior (no dimming) =====
-        __weak typeof(button) weakButton = button;
-        UIButtonConfigurationUpdateHandler existingHandler = button.configurationUpdateHandler;
-        button.configurationUpdateHandler = ^(UIButton *btn) {
-            btn.tintAdjustmentMode = UIViewTintAdjustmentModeNormal;
-            btn.imageView.alpha = 1.0;
-        };
-        
-    } else
-#endif
-    {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        // ===== iOS 15 以下：手动布局 =====
-        button.adjustsImageWhenHighlighted = NO;
-        button.backgroundColor = UIColor.clearColor;
-        button.titleLabel.font = [UIFont systemFontOfSize:9.5];
-#pragma clang diagnostic pop
-    }
-    button.titleLabel.font = [UIFont systemFontOfSize:9.5];
-    [button sizeToFit]; // or set frame in this way `button.frame = CGRectMake(0.0, 0.0, 250, 100);`
-    button.frame = CGRectMake(0.0, 0.0, 55, 59);
-    button.bounds = CGRectMake(0.0, 0.0, 55, 59);
-    
-    
-    // if you use `+plusChildViewController` , do not addTarget to plusButton.
-    SEL action = @selector(clickPublish);
-    [button removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-    [button addTarget:button action:action forControlEvents:UIControlEventTouchUpInside];
-    
-    if (CYLPlusChildViewController && button.isLayoutCentered) {
-        [button cyl_setUserInteractionDisabled:NO];
-    } else {
-        button.cyl_shouldNotSelect = YES;
-    }
-    return button;
-}
- 
- 
+
 #pragma mark -
 #pragma mark - Event Response
 
@@ -245,52 +246,61 @@
 //                                                    otherButtonTitles:@"拍照", @"从相册选取", @"淘宝一键转卖", nil];
 //    [actionSheet showInView:viewController.view];
 //    CYL_DEPRECATED_DECLARATIONS_POP
-//    
+//
 //    [self addScaleAnimationOnView:self.imageView repeatCount:1];
 //    //暂时不推荐用旋转方式，badge也会旋转。
-//    
+//
 ////    [self addRotateAnimationOnPlusButton:self.imageView repeatCount:1];
 //
 //}
 - (void)clickPublish {
     CYLTabBarController *tabBarController = [self cyl_tabBarController];
-    UIViewController *viewController = tabBarController.selectedViewController;
-
+    
+    UIViewController *viewController = CYLGetRootViewController();
+    
     UIAlertController *actionSheet = [UIAlertController
-                                      alertControllerWithTitle:@"发布"
+                                      alertControllerWithTitle:@"Switch Style 切换样式"
                                       message:nil
                                       preferredStyle:UIAlertControllerStyleActionSheet];
-
-    [actionSheet addAction:[UIAlertAction actionWithTitle:@"拍照"
+    
+    [actionSheet addAction:[UIAlertAction actionWithTitle:@"Liquid Glass液态玻璃"
                                                     style:UIAlertActionStyleDefault
                                                   handler:^(UIAlertAction *action) {
-        // handle take photo
-    }]];
+        // handle choose
 
-    [actionSheet addAction:[UIAlertAction actionWithTitle:@"从相册选取"
+        CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
+        [rootController createLiquidGlassTabBar];
+
+    }]];
+    
+    [actionSheet addAction:[UIAlertAction actionWithTitle:@"FlatDesign扁平设计样式"
                                                     style:UIAlertActionStyleDefault
                                                   handler:^(UIAlertAction *action) {
-        // handle choose from album
+        // handle choose
+
+        CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
+        [rootController createFlatDesignTabBar];
+
     }]];
-
-
-
+    
+    
+    
     [actionSheet addAction:[UIAlertAction actionWithTitle:@"取消"
                                                     style:UIAlertActionStyleCancel
                                                   handler:nil]];
-
+    
     // Fix for iPad — anchor to the bottom of the screen
     if (actionSheet.popoverPresentationController) {
         actionSheet.popoverPresentationController.sourceView = viewController.view;
         actionSheet.popoverPresentationController.sourceRect = CGRectMake(
-            viewController.view.bounds.size.width / 2,  // center X
-            viewController.view.bounds.size.height,     // bottom Y
-            0,
-            0
-        );
+                                                                          viewController.view.bounds.size.width / 2,  // center X
+                                                                          viewController.view.bounds.size.height,     // bottom Y
+                                                                          0,
+                                                                          0
+                                                                          );
         actionSheet.popoverPresentationController.permittedArrowDirections = 0; // no arrow
     }
-
+    
     [viewController presentViewController:actionSheet animated:YES completion:nil];
     [self addScaleAnimationOnView:self.imageView repeatCount:1];
 }
@@ -344,6 +354,7 @@
 //    plusChildViewController.navigationItem.title = @"PlusChildViewController";
 //    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
 //                                                   initWithRootViewController:plusChildViewController];
+//    plusChildNavigationController.title = @"发布";
 //    return plusChildNavigationController;
 //}
 //
@@ -362,15 +373,16 @@
 }
 
 //+ (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
-//    return  0.2;
+//    return  0.5;
 //}
-//
-//+ (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
-//    if (@available(iOS 13.0, *)) {
-//        return (CYL_IS_IPHONE_X ? - 6 : 4);
-//    }
-//    return 4;
-//}
+
++ (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
+    //    if (@available(iOS 13.0, *)) {
+    //        return (CYL_IS_IPHONE_X ? - 6 : 4);
+    //    }
+    //    return 4;
+    return -14;
+}
 
 //
 //+ (NSString *)tabBarContext {

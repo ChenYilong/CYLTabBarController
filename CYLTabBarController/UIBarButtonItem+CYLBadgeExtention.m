@@ -9,6 +9,8 @@
 #import "UIBarButtonItem+CYLBadgeExtention.h"
 #import <objc/runtime.h>
 #import "NSObject+CYLTabBarControllerExtention.h"
+#import "UIControl+CYLBadgeExtention.h"
+#import "CYLConstants.h"
 
 #define kActualView ((UIView *)[self cyl_getActualBadgeSuperView])
 #define CYL_ACTUAL_BARBUTTON kActualView
@@ -89,32 +91,44 @@
     UIButton *barButtonContentView = (UIButton *)self.cyl_view.cyl_findBarButtonContentView;
     UIView *actualBadgeSuperView = barButtonContentView;
 
-    // 不管 image 还是 text 的 UIBarButtonItem 都获取内部的 _UIModernBarButton 即可
+    // 不管 image 还是 text 的 UIBarButtonItem 都获取内部的 _UI+ModernBarButton 即可
     do {
-        if (barButtonContentView.imageView.frame.size.width > 10) {
+        if (barButtonContentView.imageView && (barButtonContentView.imageView.frame.size.width > 10)) {
             actualBadgeSuperView = barButtonContentView.imageView;
             break;
         }
-        if (barButtonContentView.titleLabel.frame.size.width > 10) {
+        if (barButtonContentView.titleLabel && (barButtonContentView.titleLabel.frame.size.width > 10)) {
+            //cyl_isButtonLabel
             actualBadgeSuperView = barButtonContentView.titleLabel;
             break;
         }
+        
     } while (false); // same as : 0, NO
+    //建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用 
+    [actualBadgeSuperView layoutIfNeeded];//建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame
     return actualBadgeSuperView;//use KVC to hack actual view
 }
 
-- (void)cyl_performSelector:(SEL)aSelector { 
-        
+- (void)cyl_performSelector:(SEL)aSelector {
+    if (aSelector == NULL) { return; }
+    NSObject *object2 = nil;
+    [self cyl_performSelector:aSelector withObject:object2];
 }
 
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object { 
-        
+- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object {
+    if (aSelector == NULL) { return; }
+    NSObject *object2 = nil;
+    [self cyl_performSelector:aSelector withObject:object withObject:object2];
 }
 
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 { 
-        
+- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 {
+    if (aSelector == NULL) { return; }
+    
+    CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+    (
+     [self performSelector:aSelector withObject:object1 withObject:object2];
+     )
 }
-
 
 /*!
  *  @warning 仅对 UIBarButtonItem、UITabBarItem 有效
@@ -172,11 +186,11 @@
 }
 
 #pragma mark -- setter/getter
-- (UILabel *)cyl_badge {
+- (CYLTabBarBadgeView *)cyl_badge {
     return CYL_ACTUAL_BARBUTTON.cyl_badge;
 }
 
-- (void)cyl_setBadge:(UILabel *)label {
+- (void)cyl_setBadge:(CYLTabBarBadgeView *)label {
     [CYL_ACTUAL_BARBUTTON cyl_setBadge:label];
 }
 

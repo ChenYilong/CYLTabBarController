@@ -8,12 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import "CYLBadgeProtocol.h"
+@class CYLTabBarBadgeView;
 
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -- badge apis
 
 @interface UIView (CYLBadgeExtention)<CYLBadgeProtocol>
+@property (nonatomic, strong, getter=cyl_badge, setter=cyl_setBadge:) CYLTabBarBadgeView *cyl_badge;
 
 - (BOOL)cyl_isShowBadge;
 

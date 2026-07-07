@@ -9,6 +9,11 @@
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import <objc/runtime.h>
 #import "CYLConstants.h"
+#if __has_include(<CYLTabBarController/CYLTabBarController.h>)
+#import <CYLTabBarController/CYLTabBarController.h>
+#else
+#import "CYLTabBarController.h"
+#endif
 
 @implementation NSString (CYLTabBarControllerExtention)
 
@@ -21,6 +26,24 @@
 @end
 
 @implementation NSObject (CYLTabBarControllerExtention)
+
+- (NSString *)cyl_context {
+    NSString *context = objc_getAssociatedObject(self, @selector(cyl_context));
+    if (!context) {
+        return NSStringFromClass([CYLTabBarController class]);
+    }
+    return context;
+}
+
+- (void)cyl_setContext:(NSString *)context {
+    NSString *context_ = context;
+    if (context && context.length > 0) {
+        context_ = [context copy];
+    } else {
+        context_ = NSStringFromClass([CYLTabBarController class]);
+    }
+    objc_setAssociatedObject(self, @selector(cyl_context), context_, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
 
 - (BOOL)cyl_isForceLandscape {
     NSNumber *isForceLandscapeObject = objc_getAssociatedObject(self, @selector(cyl_isForceLandscape));
@@ -200,7 +223,9 @@ static UIInterfaceOrientationMask CYLMaskFromOrientation(UIInterfaceOrientation 
         value = [self valueForKey:key];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-//        NSLog(@"🔴类名与方法名：%@（在第%@行）, KVC failed：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        if (![key isEqualToString:@"imageView"]) {
+            NSLog(@"🔴类名与方法名：%@（在第%@行）, KVC failed：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        }
 #endif
     }
     return value;
@@ -295,6 +320,65 @@ static UIInterfaceOrientationMask CYLMaskFromOrientation(UIInterfaceOrientation 
         return YES;
     }
     return NO;
+}
+
+- (BOOL)cyl_isPlusViewControllerAdded:(NSArray *)viewControllers {
+    if ([viewControllers containsObject:CYLPlusChildViewController]) {
+        return YES;
+    }
+    __block BOOL isAdded = NO;
+    [viewControllers enumerateObjectsUsingBlock:^(UIViewController * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj cyl_isEqualToViewController:CYLPlusChildViewController]) {
+            isAdded = YES;
+            *stop = YES;
+            return;
+        }
+    }];
+    return isAdded;
+}
+
+- (BOOL)cyl_isPlaceholder {
+    NSNumber *isPlaceholderObject = objc_getAssociatedObject(self, @selector(cyl_isPlaceholder));
+    UIViewController *viewController = nil;
+    if ([self isKindOfClass:[UIViewController class]]) {
+        viewController = (UIViewController *)self;
+    }
+    if (viewController && [viewController cyl_getViewControllerInsteadOfNavigationController]) {
+        viewController = [viewController cyl_getViewControllerInsteadOfNavigationController];
+    }
+    if (!viewController || ![self isKindOfClass:[UIViewController class]]) {
+        return [isPlaceholderObject boolValue];
+    }
+    NSNumber *isPlaceholderObjectFromViewControllerInsteadOfNavigationController = objc_getAssociatedObject(viewController, @selector(cyl_isPlaceholder));
+
+    return [isPlaceholderObject boolValue] || [isPlaceholderObjectFromViewControllerInsteadOfNavigationController boolValue];
+}
+
+- (void)cyl_setIsPlaceholder:(BOOL)isPlaceholder {
+    NSNumber *isPlaceholderObject = @(isPlaceholder);
+    objc_setAssociatedObject(self, @selector(cyl_isPlaceholder), isPlaceholderObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    
+    UIViewController *viewController = nil;
+    if ([self isKindOfClass:[UIViewController class]]) {
+        viewController = (UIViewController *)self;
+    }
+    if (viewController && [viewController cyl_getViewControllerInsteadOfNavigationController]) {
+        viewController = [viewController cyl_getViewControllerInsteadOfNavigationController];
+    }
+    if (!viewController || ![self isKindOfClass:[UIViewController class]]) {
+        return;
+    }
+    objc_setAssociatedObject([viewController cyl_getViewControllerInsteadOfNavigationController], @selector(cyl_isPlaceholder), isPlaceholderObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)cyl_removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath {
+    @try {
+        [self removeObserver:observer forKeyPath:keyPath];
+    } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif
+    }
 }
 
 @end

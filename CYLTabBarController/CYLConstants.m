@@ -7,11 +7,19 @@
 //
 
 #import "CYLConstants.h"
+#if __has_include(<CYLTabBarController/CYLTabBarController.h>)
+#import <CYLTabBarController/CYLTabBarController.h>
+#else
+#import "CYLTabBarController.h"
+#endif
 
 @implementation CYLConstants
 
 static CGFloat _basisWidthScale = 1.0;
 static CGFloat _basisHeightScale = 1.0;
+
+CGFloat CYLTabBarItemImagePlaceholderWidth = 22.0f;
+CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
 
 + (void)initialize {
     _basisWidthScale = CYLGetRootWindow().windowScene.screen.bounds.size.width / 375.0;
@@ -34,7 +42,9 @@ static CGFloat _basisHeightScale = 1.0;
     static BOOL result = NO;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        if (@available(iOS 26.0, *)) {
+        if (@available(iOS 27.0, *)) {
+            result = YES;
+        } else if (@available(iOS 26.0, *)) {
             result = ![[NSBundle.mainBundle objectForInfoDictionaryKey:@"UIDesignRequiresCompatibility"] boolValue];
         } else {
             result = NO;
@@ -54,7 +64,8 @@ static CGFloat _basisHeightScale = 1.0;
             tureLottieSizeValue = [NSValue valueWithCGSize:normalImage.size];
             break;
         }
-        CGSize placeholderSize = CGSizeMake(22, 22);
+        
+        CGSize placeholderSize = CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
         tureLottieSizeValue = [NSValue valueWithCGSize:placeholderSize];
         break;
     } while (NO);
@@ -116,4 +127,58 @@ static CGFloat _basisHeightScale = 1.0;
 }
 
 */
++ (NSURL *)cyl_getURLFromString:(NSString *)string {
+    if (!string) {
+        return nil;
+    }
+    NSURL *URL;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+
+    if ([fileManager fileExistsAtPath:string]){
+        // URL = [NSURL URLWithString:string]; 会无法识别中文， 故改用 fileURLWithPath
+        URL = [NSURL fileURLWithPath:string];
+    }
+    
+    if (!URL) {
+        return nil;
+    }
+    return URL;
+}
+
++ (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
+#if __has_include(<Lottie/Lottie.h>)
+    NSInteger lottieURLCount = self.lottieURLs.count;
+    BOOL isLottieEnabled = lottieURLCount > 0 ;
+    BOOL isLottieEnabledFromAttributes = NO;
+    if (self.tabBarItemsAttributes && self.tabBarItemsAttributes.count > 0) {
+        @try {
+            isLottieEnabledFromAttributes = self.tabBarItemsAttributes[0][CYLTabBarLottieURL] || self.tabBarItemsAttributes[0][CYLTabBarLottieFilePath];
+        } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif
+        }
+    }
+    return isLottieEnabled || isLottieEnabledFromAttributes;
+#endif
+
+#if __has_include(<Lottie/Lottie-Swift.h>)
+
+    NSInteger lottieURLCount = lottieURLs.count;
+    BOOL isLottieEnabled = lottieURLCount > 0 ;
+    BOOL isLottieEnabledFromAttributes = NO;
+    if (tabBarItemsAttributes && tabBarItemsAttributes.count > 0) {
+        @try {
+            isLottieEnabledFromAttributes = tabBarItemsAttributes[0][CYLTabBarLottieURL] || tabBarItemsAttributes[0][CYLTabBarLottieFilePath];
+        } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+#endif
+        }
+    }
+    return isLottieEnabled || isLottieEnabledFromAttributes;
+#endif
+    return NO;
+}
+
 @end

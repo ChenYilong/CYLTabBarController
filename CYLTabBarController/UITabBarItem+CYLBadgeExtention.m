@@ -11,6 +11,7 @@
 #import <objc/runtime.h>
 #import "UITabBarItem+CYLTabBarControllerExtention.h"
 #import "CYLBadgeProtocol.h"
+#import "UIControl+CYLBadgeExtention.h"
 
 #define kActualView ((UIView *)[self cyl_getActualBadgeSuperView])
 #define CYL_ACTUAL_BARBUTTON kActualView
@@ -18,7 +19,16 @@
 @implementation UITabBarItem (CYLBadgeExtention) 
 
 - (void)cyl_setBadgeValue:(NSString *)badgeValue {
-    [self.cyl_tabButton cyl_removeTabBadgePoint];
+    CYL_DEPRECATED_DECLARATIONS_PUSH
+    CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+    (
+     // 不再必须， 因此， 并非核心逻辑， 未来考虑删除。
+     if (self.cyl_tabButton && [self.cyl_tabButton respondsToSelector:@selector(cyl_removeTabBadgePoint)]) {
+         [self.cyl_tabButton cyl_removeTabBadgePoint];
+     }
+     );
+    CYL_DEPRECATED_DECLARATIONS_POP
+    
     [self cyl_clearBadge];
     [self cyl_setBadgeValue:badgeValue];
 }
@@ -74,33 +84,41 @@
  *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
  */
 - (void)cyl_showBadge {
-    [CYL_ACTUAL_BARBUTTON cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeNone];
+    // [kActualView cyl_showBadge];
+    SEL selector = @selector(cyl_showBadge);
+    [kActualView cyl_performSelector:selector];
 }
 
-- (void)cyl_showBadgeValue:(NSString *)value animationType:(CYLBadgeAnimationType)animationType {
-    [CYL_ACTUAL_BARBUTTON cyl_showBadgeValue:value animationType:animationType];
-    self.cyl_tabButton.cyl_tabBadgeView.hidden = YES;
+- (void)cyl_showBadgeValue:(NSString *)value
+             animationTypeValue:(NSNumber *)animationTypeValue {
+//    [kActualView cyl_showBadgeValue:value animationType:animationType];
+    SEL selector = @selector(cyl_showBadgeValue:animationTypeValue:);
+    [kActualView cyl_performSelector:selector withObject:value withObject:animationTypeValue];
 }
 
-- (BOOL)cyl_isShowBadge {
-    return [CYL_ACTUAL_BARBUTTON cyl_isShowBadge];
+- (void)cyl_showBadgeValue:(NSString *)value
+             animationType:(CYLBadgeAnimationType)animationType {
+    [self cyl_showBadgeValue:value animationTypeValue:@(animationType)];
 }
 
-- (BOOL)cyl_isPauseBadge {
-    return [CYL_ACTUAL_BARBUTTON cyl_isPauseBadge];
-}
-
-/**
- *  clear badge
- */
 - (void)cyl_clearBadge {
-    [CYL_ACTUAL_BARBUTTON cyl_clearBadge];
-    self.cyl_tabButton.cyl_tabBadgeView.hidden = NO;
+//    [kActualView cyl_clearBadge];
+    SEL selector = @selector(cyl_clearBadge);
+    [kActualView cyl_performSelector:selector];
 }
 
 - (void)cyl_resumeBadge {
-    [CYL_ACTUAL_BARBUTTON cyl_resumeBadge];
-    self.cyl_tabButton.cyl_tabBadgeView.hidden = YES;
+//    [kActualView cyl_resumeBadge];
+    SEL selector = @selector(cyl_resumeBadge);
+    [kActualView cyl_performSelector:selector];
+}
+
+- (BOOL)cyl_isShowBadge {
+    return [kActualView cyl_isShowBadge];
+}
+
+- (BOOL)cyl_isPauseBadge {
+    return [kActualView cyl_isPauseBadge];
 }
 
 #pragma mark -- private method
@@ -112,42 +130,36 @@
  *  @return view
  */
 - (UIView *)cyl_getActualBadgeSuperView {
+    //_UITabButton
     UIControl *tabButton = [self cyl_tabButton];
-    return [self cyl_getActualBadgeSuperViewFromControl:tabButton];
+//    UIView *actualBadgeSuperView = [self cyl_getActualBadgeSuperViewFromControl:tabButton];
+    UIView *actualBadgeSuperView;
+    if ([tabButton isKindOfClass:[UIControl class]]) {
+        actualBadgeSuperView = [tabButton cyl_getActualBadgeSuperView];
+        if (![CYLConstants isLiquidGlassActive]) {
+            return actualBadgeSuperView;
+        }
+    }
+    return tabButton;
 }
 
 - (UIView *)cyl_getActualBadgeSuperViewFromControl:(UIControl *)tabButton {
     // badge label will be added onto imageView
     //只有在TabBar选中状态下才能取到SwappableImageView
-    UIImageView *tabImageView = [tabButton cyl_tabImageView];
-    UIView *lottieAnimationView = (UIView *)tabButton.cyl_lottieAnimationView;
-    
-    UIView *actualBadgeSuperView = nil;
-    
-    do {
-        if (lottieAnimationView && !lottieAnimationView.cyl_isInvisiable) {
-            actualBadgeSuperView = lottieAnimationView;
-            break;
-        }
-        if (tabImageView && !tabImageView.cyl_isInvisiable) {
-            actualBadgeSuperView = tabImageView;
-            break;
-        }
-    } while (NO);
-    if (actualBadgeSuperView) {
-        [actualBadgeSuperView setClipsToBounds:NO];
-    }
+    UIView *actualBadgeSuperView = [tabButton cyl_getActualBadgeSuperView];
     return actualBadgeSuperView;
 }
 
 - (void)cyl_performSelector:(SEL)aSelector {
     if (aSelector == NULL) { return; }
-    [self cyl_performSelector:aSelector withObject:nil];
+    NSObject *object2 = nil;
+    [self cyl_performSelector:aSelector withObject:object2];
 }
 
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object {
     if (aSelector == NULL) { return; }
-    [self cyl_performSelector:aSelector withObject:object withObject:nil];
+    NSObject *object2 = nil;
+    [self cyl_performSelector:aSelector withObject:object withObject:object2];
 }
 
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 {
@@ -156,7 +168,8 @@
     UIControl *selectedControl = nil;
     
     UIControl *selfControl = [self cyl_tabButton];
-    if (![selfControl isKindOfClass:[UIControl class]]) {
+    
+    if (![selfControl isKindOfClass:[UIControl class]] || ![CYLConstants isLiquidGlassActive]) {
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
         (
          [selfControl performSelector:aSelector withObject:object1 withObject:object2];
@@ -188,23 +201,23 @@
          UIControl *counterpart = selectedControl.cyl_platterNormalControl;
          if (counterpart) {
              UIView *actualBadgeSuperViewFromNormalControl = [self cyl_getActualBadgeSuperViewFromControl:counterpart];
-             
              [actualBadgeSuperViewFromNormalControl performSelector:aSelector withObject:object1 withObject:object2];
          }
      }
      );
 }
 
-- (BOOL)cyl_isReady { 
-    return YES;
+- (BOOL)cyl_isReady {
+    UIControl *selfControl = [self cyl_tabButton];
+    return selfControl.cyl_isReady;
 }
 
 #pragma mark -- setter/getter
-- (UILabel *)cyl_badge {
+- (CYLTabBarBadgeView *)cyl_badge {
     return CYL_ACTUAL_BARBUTTON.cyl_badge;
 }
 
-- (void)cyl_setBadge:(UILabel *)label {
+- (void)cyl_setBadge:(CYLTabBarBadgeView *)label {
     [CYL_ACTUAL_BARBUTTON cyl_setBadge:label];
 }
 
@@ -262,7 +275,6 @@
 }
 
 - (void)cyl_setBadgeCenterOffsetValue:(NSValue *)badgeCenterOffsetValue {
-//    [CYL_ACTUAL_BARBUTTON cyl_setBadgeCenterOffset:badgeCenterOffset];
     CGPoint badgeCenterOffset = badgeCenterOffsetValue.CGPointValue;
     [self cyl_setBadgeCenterOffset:badgeCenterOffset];
 }

@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSObject (CYLTabBarControllerExtention)
 
+@property (nonatomic, copy, getter=cyl_context, setter=cyl_setContext:) NSString *cyl_context;
+
 @property (nonatomic, assign, getter=cyl_isForceLandscape, setter=cyl_setIsForceLandscape:) BOOL cyl_isForceLandscape;
 
 - (void)cyl_forceUpdateInterfaceOrientation:(UIInterfaceOrientation)orientation;
@@ -30,6 +32,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)cyl_isContinuousGestureRecognizer;
 - (BOOL)cyl_isLongGestureRecognizer;
+- (BOOL)cyl_isPlusViewControllerAdded:(NSArray *)viewControllers;
+@property (nonatomic, assign, getter=cyl_isPlaceholder, setter=cyl_setIsPlaceholder:) BOOL cyl_isPlaceholder;
+
+- (void)cyl_removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath;
 
 @end
 
