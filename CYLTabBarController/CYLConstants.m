@@ -147,12 +147,12 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
 
 + (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
 #if __has_include(<Lottie/Lottie.h>)
-    NSInteger lottieURLCount = self.lottieURLs.count;
+    NSInteger lottieURLCount = lottieURLs.count;
     BOOL isLottieEnabled = lottieURLCount > 0 ;
     BOOL isLottieEnabledFromAttributes = NO;
-    if (self.tabBarItemsAttributes && self.tabBarItemsAttributes.count > 0) {
+    if (tabBarItemsAttributes && tabBarItemsAttributes.count > 0) {
         @try {
-            isLottieEnabledFromAttributes = self.tabBarItemsAttributes[0][CYLTabBarLottieURL] || self.tabBarItemsAttributes[0][CYLTabBarLottieFilePath];
+            isLottieEnabledFromAttributes = tabBarItemsAttributes[0][CYLTabBarLottieURL] || tabBarItemsAttributes[0][CYLTabBarLottieFilePath];
         } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
         NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
