@@ -52,7 +52,7 @@ Pod::Spec.new do |s|
   s.subspec 'CYLFlatDesignTabBar-ObjectiveC' do |flatdesign|
     flatdesign.dependency "CYLTabBarController/LottieSwift"
     flatdesign.source_files = 'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{h,m,swift}'
-    flatdesign.resource = 'CYLTabBarController/**/CYLFlatDesignUITabBarController.bundle'
+#    flatdesign.resource = 'CYLTabBarController/**/CYLFlatDesignUITabBarController.bundle'
 
   end
   
