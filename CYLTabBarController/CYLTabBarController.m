@@ -2355,6 +2355,7 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
 #pragma mark - Override selectedIndex (Programmatic changes)
 
 - (void)setSelectedIndex:(NSUInteger)selectedIndex {
+//    if (self.selectedIndex == selectedIndex) { return; }
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     [super setSelectedIndex:selectedIndex];
     
@@ -2371,7 +2372,12 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
     }
     //  iOS26 液态玻璃样式 不再使用点击事件， 而是在 `-setSelectedViewController` and `-setSelectedIndex`中处理
     // 代码切换 tab 时会触发
-    [self tabChangedToSelectedIndex:selectedIndex viewController:nil control:nil];
+    
+    UIViewController *selectedViewController;
+    if (self.viewControllers && self.viewControllers.count > 0 && self.viewControllers.count > selectedIndex) {
+        selectedViewController = [self.viewControllers objectAtIndex:selectedIndex];
+    }
+    [self tabChangedToSelectedIndex:selectedIndex viewController:selectedViewController control:nil];
     
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {

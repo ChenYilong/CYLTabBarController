@@ -525,6 +525,12 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     UIControl *tabButton = viewController.tabBarItem.cyl_visiableTabButton;
     BOOL shouldSelectViewControllerFromSuper = [super tabBarController:tabBarController shouldSelectViewController:viewController];
     
+#if defined(DEBUG) || defined(BETA)
+    // test for issue #642
+    self.selectedIndex = [self.viewControllers indexOfObject:viewController];
+
+NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@", @(__PRETTY_FUNCTION__), @(__LINE__), @(self.selectedIndex), viewController.title);
+#endif
     if ([tabButton cyl_isPlusControl]) {
         //FIXME:  to delete 玻璃效果下， 不能调用 updateSelectionStatusIfNeededForTabBarController，selectedViewController， selectedIndex 否则无法实现plusButton的点击事件响应， 响应的仅仅是tabButton
         //         [self updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
