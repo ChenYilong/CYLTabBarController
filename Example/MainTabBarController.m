@@ -190,7 +190,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性等等
  */
 - (void)customizeTabBarAppearanceWithTitlePositionAdjustment:(UIOffset)titlePositionAdjustment {
-    
+    if ([CYLConstants isLiquidGlassActive]) {
+        return;
+    }
     // Customize UITabBar height
     // 自定义 TabBar 高度
 //     [self cyl_tabBarController].tabBarHeight = CYL_IS_IPHONE_X ? 65 : 40;
@@ -527,9 +529,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
 #if defined(DEBUG) || defined(BETA)
     // test for issue #642
-    self.selectedIndex = [self.viewControllers indexOfObject:viewController];
+//    self.selectedIndex = [self.viewControllers indexOfObject:viewController];
 
-NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@", @(__PRETTY_FUNCTION__), @(__LINE__), @(self.selectedIndex), viewController.title);
+NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@", @(__PRETTY_FUNCTION__), @(__LINE__), @([self.viewControllers indexOfObject:viewController]), viewController.title);
 #endif
     if ([tabButton cyl_isPlusControl]) {
         //FIXME:  to delete 玻璃效果下， 不能调用 updateSelectionStatusIfNeededForTabBarController，selectedViewController， selectedIndex 否则无法实现plusButton的点击事件响应， 响应的仅仅是tabButton

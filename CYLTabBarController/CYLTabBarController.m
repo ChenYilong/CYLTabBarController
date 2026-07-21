@@ -174,6 +174,9 @@ CGFloat const CYLFlatDesignUITabBarControllerHideShowBarDuration = 0.2;
     if (![self.cyl_tabBar isKindOfClass:[UITabBar class]] && ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
     }
+    if (YES == viewController.cyl_isPlaceholder) {
+        return;
+    }
     if (!viewController) {
         viewController = self.selectedViewController;
     }
@@ -2376,6 +2379,10 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
     UIViewController *selectedViewController;
     if (self.viewControllers && self.viewControllers.count > 0 && self.viewControllers.count > selectedIndex) {
         selectedViewController = [self.viewControllers objectAtIndex:selectedIndex];
+        _selectedViewController = selectedViewController;
+    }
+    if (YES == _selectedViewController.cyl_isPlaceholder) {
+        return;
     }
     [self tabChangedToSelectedIndex:selectedIndex viewController:selectedViewController control:nil];
     
