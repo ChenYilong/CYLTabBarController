@@ -34,15 +34,22 @@
 
 - (BOOL)cyl_isTabButton {
     BOOL isKindOfButton;
-    // iOS 26 以前，保持原逻辑
+    NSString *classString = NSStringFromClass([self class]);
+    //fix issue #641
+    BOOL isTabButton = [classString hasSuffix:@"BarButton"] && [classString hasPrefix:@"UITab"];
+    if (isTabButton) { return isTabButton; }
+    
     if (![CYLConstants isLiquidGlassActive]) {
+        // iOS 26 以前，保持原逻辑
         //UIControl
-        return [self cyl_isKindOfClass:[UIControl class]];
+        NSString *classString = NSStringFromClass([self class]);
+        BOOL isTabButton = [classString hasSuffix:@"BarButton"] && [classString hasPrefix:@"UITab"];
+        return isTabButton || [self cyl_isKindOfClass:[UIControl class]];
     }
     if (CYL_NoNeed_UIDesignRequiresCompatibility_with_iOS26) {
         //UITabButton
         isKindOfButton = [self isKindOfClass:[UIControl class]];
-//        BOOL result = isKindOfButton && (self.hidden == NO);
+        //        BOOL result = isKindOfButton && (self.hidden == NO);
         return isKindOfButton;
     }
     //UIControl 扁平或者玻璃样式共用
