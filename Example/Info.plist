@@ -3,8 +3,8 @@
 <plist version="1.0">
 <dict>
 <!--   UI 兼容模式-->
-<!--    <key>UIDesignRequiresCompatibility</key>-->
-<!--    <true/>-->
+ <key>UIDesignRequiresCompatibility</key>
+ <true/>
     <key>UIApplicationSceneManifest</key>
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>

@@ -2278,15 +2278,13 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
 #pragma mark - Override selectedViewController (User initiated)
 
 - (void)setSelectedViewController:(__kindof UIViewController *)selectedViewController {
-    if (selectedViewController.cyl_isPlaceholder) { return; }
-
-    if (self.selectedViewController == selectedViewController) { return; }
-
    NSUInteger indexOfSelectedViewController = [self.childViewControllers indexOfObject:selectedViewController];
     if (NSNotFound == indexOfSelectedViewController) { return; }
     [super setSelectedViewController:selectedViewController];
-
     _selectedViewController = selectedViewController;
+
+    if (selectedViewController.cyl_isPlaceholder) { return; }
+
 //           NSUInteger indexOfSelectedViewController = [self.childViewControllers indexOfObject:selectedViewController];
 //            if (NSNotFound == indexOfSelectedViewController) { return; }
     
@@ -2362,25 +2360,16 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     [super setSelectedIndex:selectedIndex];
     
-    //#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
-    //
-    //    if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-    //        CYLFlatDesignTabBar *tabBar = (CYLFlatDesignTabBar *)self.cyl_tabBar;
-    //        [tabBar setSelectedIndex:selectedIndex];
-    //    }
-    //#endif
-    
-    if (![CYLConstants isLiquidGlassActive]) {
-        return;
-    }
-    //  iOS26 液态玻璃样式 不再使用点击事件， 而是在 `-setSelectedViewController` and `-setSelectedIndex`中处理
-    // 代码切换 tab 时会触发
-    
     UIViewController *selectedViewController;
     if (self.viewControllers && self.viewControllers.count > 0 && self.viewControllers.count > selectedIndex) {
         selectedViewController = [self.viewControllers objectAtIndex:selectedIndex];
         _selectedViewController = selectedViewController;
     }
+    if (![CYLConstants isLiquidGlassActive]) {
+        return;
+    }
+    //  iOS26 液态玻璃样式 不再使用点击事件， 而是在 `-setSelectedViewController` and `-setSelectedIndex`中处理
+    // 代码切换 tab 时会触发
     if (YES == _selectedViewController.cyl_isPlaceholder) {
         return;
     }
