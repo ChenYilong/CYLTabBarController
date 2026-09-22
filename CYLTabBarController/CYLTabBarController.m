@@ -804,7 +804,6 @@ if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
                     imageoffset = imagePositionAdjustment;
                 }
                 
-                lottieURL = [CYLConstants cyl_getURLFromString:lottieFilePath];
                 if (lottieURL) {
                     [self.lottieURLs addObject:lottieURL];
                     NSValue *tureLottieSizeValue = [CYLConstants cyl_getTureLottieSizeValue:lottieSizeValue fromNormalImage:normalImage];
@@ -819,6 +818,7 @@ if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
                                                                                              imageInsets:insets
                                                                                           lottieFilePath:lottieFilePath
                                                                                          lottieSizeValue:lottieSizeValue];
+                cyl_tabBarItem.lottieURL = lottieURL;
                 
                 
                 [cyl_tabBarItem cylflatdesign_setTabBarController:self];

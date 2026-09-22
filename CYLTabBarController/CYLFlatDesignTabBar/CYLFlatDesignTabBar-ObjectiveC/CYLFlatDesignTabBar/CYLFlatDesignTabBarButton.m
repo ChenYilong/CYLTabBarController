@@ -276,12 +276,22 @@
     return lottieFilePath;
 }
 
+- (NSURL *)_lottieURL {
+    NSURL *lottieURL;
+    if ([_tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
+        // Keep the URL-first behavior used by the default tab bar, then fall back to the local path.
+        lottieURL = _tabBarItem.lottieURL;
+        if (!lottieURL) {
+            lottieURL = [CYLConstants cyl_getURLFromString:[self _lottieFilePath]];
+        }
+    }
+    return lottieURL;
+}
+
 - (void)initLottie {
-    NSString *lottieFilePath = [self _lottieFilePath];
-    
     NSValue *lottieSizeValue = [self _lottieSizeValue];
     
-    NSURL *lottieURL = [CYLConstants cyl_getURLFromString:lottieFilePath];
+    NSURL *lottieURL = [self _lottieURL];
     if (!lottieURL) {
         return;
     }
@@ -305,9 +315,8 @@
     }
     if (self.isSelected) {
         NSValue *lottieSizeValue = [self _lottieSizeValue];
-        NSString *lottieFilePath = [self _lottieFilePath];
         CGSize lottieSize = [lottieSizeValue CGSizeValue];
-        NSURL *lottieURL = [CYLConstants cyl_getURLFromString:lottieFilePath];
+        NSURL *lottieURL = [self _lottieURL];
         if (!lottieURL) {
             return;
         }
