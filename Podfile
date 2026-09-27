@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '15.0'
+#platform :ios, '15.0'
 ENV['SWIFT_VERSION'] = '5'
 
 target 'CYLTabBarController' do
