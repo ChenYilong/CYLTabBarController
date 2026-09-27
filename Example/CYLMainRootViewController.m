@@ -23,8 +23,13 @@
     self.navigationBarHidden = YES;
     self.view.backgroundColor = [UIColor whiteColor];
     [self createLiquidGlassTabBar];
+//    [self createFlatDesignTabBar];
+
 }
 
+#pragma mark -
+#pragma mark - createLiquidGlassTabBar
+// MARK: createLiquidGlassTabBar
 
 - (CYLTabBarController *)createLiquidGlassTabBar {
     [CYLPlusButtonSubclass registerPlusButton];
@@ -44,28 +49,29 @@
 // MARK: createFlatDesignTabBar
 
 - (CYLFlatDesignMainTabBarController *)createFlatDesignTabBar {
-
-    
-       
+    [CYLPlusButtonSubclass registerPlusButton];
     CYLTabBarStyleType type = CYLTabBarStyleTypeDefault;
     NSString *context = nil;
     CYLFlatDesignMainTabBarController *tabBarController = [[CYLFlatDesignMainTabBarController alloc] initWithViewControllers:[self viewControllersForTabBar]
+                                                           
                                                                                                        tabBarItemsAttributes:[self tabBarItemsAttributesForTabBar]
                                                                                                                      context:context];
-
     
-    
-//    CYLTabBarStyleType type = CYLTabBarStyleTypeDefault;
-//        return [self initWithViewControllers:viewControllers
-//                       tabBarItemsAttributes:tabBarItemsAttributes
-//                                 imageInsets:UIEdgeInsetsZero
-//                     titlePositionAdjustment:UIOffsetZero
-//                                   styleType:type
-//                                     context:context];
+    //    CYLTabBarStyleType type = CYLTabBarStyleTypeDefault;
+    //        return [self initWithViewControllers:viewControllers
+    //                       tabBarItemsAttributes:tabBarItemsAttributes
+    //                                 imageInsets:UIEdgeInsetsZero
+    //                     titlePositionAdjustment:UIOffsetZero
+    //                                   styleType:type
+    //                                     context:context];
     tabBarController.tabBarStyleType = CYLTabBarStyleTypeFlatDesign;
     self.viewControllers = @[tabBarController];
     return tabBarController;
 }
+
+#pragma mark -
+#pragma mark - other
+// MARK: other
 
 - (NSArray *)viewControllersForTabBar {
     NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
