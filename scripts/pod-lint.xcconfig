@@ -1,0 +1,5 @@
+// Xcode 27+ only supports iOS 15.0+. Dependencies such as lottie-ios declare
+// lower deployment targets (8.0 / 13.0) in their podspecs, and a Podfile
+// post_install hook does not run during `pod lib lint` / `pod trunk push`.
+// xcodebuild applies XCODE_XCCONFIG_FILE on top of every target's settings.
+IPHONEOS_DEPLOYMENT_TARGET = 15.0
