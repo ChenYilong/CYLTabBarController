@@ -16,12 +16,13 @@ let package = Package(
         .target(
             name: "CYLTabBarController",
             path: "CYLTabBarController",
-            exclude: ["LottieSwift"],
+            // Same as the CocoaPods `Core` subspec: FlatDesign relies on
+            // `__has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)`, which is never
+            // true under SPM, so its sources would not compile (issue #649).
+            exclude: ["LottieSwift", "CYLFlatDesignTabBar"],
             cSettings: [
                 .headerSearchPath("."),
-                .headerSearchPath("CYLBadge"),
-                .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar"),
-                .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBarPrivate")
+                .headerSearchPath("CYLBadge")
             ]
         )
     ],
