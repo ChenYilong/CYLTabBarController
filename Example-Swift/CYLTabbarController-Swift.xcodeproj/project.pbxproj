@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9AE51DD72F8BC10100BB0831 /* MainRootNavigationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AE51DD62F8BC10100BB0831 /* MainRootNavigationViewController.swift */; };
 		9AF595E221C8E63C00C6AF2B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595DF21C8E63C00C6AF2B /* AppDelegate.swift */; };
+		C1A5CE0E2E000000000000B1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E000000000000B2 /* SceneDelegate.swift */; };
 		9AF595E321C8E63C00C6AF2B /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595E021C8E63C00C6AF2B /* MainTabBarController.swift */; };
 		9AF5960E21C8E7B100C6AF2B /* CYLPlusButtonSubclass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595E721C8E7B000C6AF2B /* CYLPlusButtonSubclass.swift */; };
 		9AF5960F21C8E7B100C6AF2B /* PersonalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595EC21C8E7B000C6AF2B /* PersonalViewController.swift */; };
@@ -26,6 +27,7 @@
 		922DCEDD1FF63399005C89BE /* CYLTabBarController-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CYLTabBarController-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AE51DD62F8BC10100BB0831 /* MainRootNavigationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainRootNavigationViewController.swift; sourceTree = "<group>"; };
 		9AF595DF21C8E63C00C6AF2B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C1A5CE0E2E000000000000B2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		9AF595E021C8E63C00C6AF2B /* MainTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		9AF595E721C8E7B000C6AF2B /* CYLPlusButtonSubclass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLPlusButtonSubclass.swift; sourceTree = "<group>"; };
 		9AF595EC21C8E7B000C6AF2B /* PersonalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalViewController.swift; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 			isa = PBXGroup;
 			children = (
 				9AF595DF21C8E63C00C6AF2B /* AppDelegate.swift */,
+				C1A5CE0E2E000000000000B2 /* SceneDelegate.swift */,
 				9AF595E021C8E63C00C6AF2B /* MainTabBarController.swift */,
 				9AE51DD62F8BC10100BB0831 /* MainRootNavigationViewController.swift */,
 				9AF595E821C8E7B000C6AF2B /* Module */,
@@ -317,6 +320,7 @@
 			files = (
 				9AF5961021C8E7B100C6AF2B /* HomeViewController.swift in Sources */,
 				9AF595E221C8E63C00C6AF2B /* AppDelegate.swift in Sources */,
+				C1A5CE0E2E000000000000B1 /* SceneDelegate.swift in Sources */,
 				9AF5961121C8E7B100C6AF2B /* ConnectionViewController.swift in Sources */,
 				9AE51DD72F8BC10100BB0831 /* MainRootNavigationViewController.swift in Sources */,
 				9AF5960E21C8E7B100C6AF2B /* CYLPlusButtonSubclass.swift in Sources */,

@@ -15,14 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         CYLPlusButtonSubclass.register()
 
-//        let mainTabBarVc = MainTabBarController()
-        let mainTabBarVc = MainRootNavigationViewController()
-        window = UIWindow()
-        window?.frame = UIScreen.main.bounds
-        window?.rootViewController = mainTabBarVc
-
-
-        window?.makeKeyAndVisible()
+        // The window is created in SceneDelegate (UIScene life cycle).
         //iOS26 不推荐设置 `UITabBar.appearance().backgroundColor` 不仅无法设置背景，同时会干扰 TabBar 里的 Label 未选中颜色，iOS26 里无选中时的Label颜色为系统内部逻辑， 无法自定义。
 //        UITabBar.appearance().backgroundColor = UIColor.white
 //        UITabBar.appearance().unselectedItemTintColor = UIColor.label;
@@ -30,4 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
         return true
     }
 
+    func application(_: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options _: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
 }
