@@ -25,6 +25,25 @@ class MainTabBarController: CYLTabBarController {
             context: context
         )
     }
+    // The ObjC initializer above forwards to this one via `self`, so a Swift subclass
+    // must override it too, otherwise: "Use of unimplemented initializer".
+    override init(
+        viewControllers: [UIViewController],
+        tabBarItemsAttributes: [[AnyHashable: Any]],
+        imageInsets: UIEdgeInsets,
+        titlePositionAdjustment: UIOffset,
+        styleType: CYLTabBarStyleType,
+        context: String
+    ) {
+        super.init(
+            viewControllers: viewControllers,
+            tabBarItemsAttributes: tabBarItemsAttributes,
+            imageInsets: imageInsets,
+            titlePositionAdjustment: titlePositionAdjustment,
+            styleType: styleType,
+            context: context
+        )
+    }
     convenience init(context: String = "") {
         let imageInsets = UIEdgeInsets.zero
         let titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3.5)
@@ -32,19 +51,11 @@ class MainTabBarController: CYLTabBarController {
         self.init(viewControllers: Self.makeViewControllers(), tabBarItemsAttributes: Self.makeTabBarItemsAttributes(), imageInsets: imageInsets, titlePositionAdjustment: titlePositionAdjustment, context: context)
     }
     // MARK: - REQUIRED by UIKit (🔥 Fix here)
+    // Must only forward to super: CYLTabBarController's designated initializer calls
+    // `[super init]`, which UIKit routes back here via `initWithNibName:bundle:`.
+    // Calling `super.init(viewControllers:...)` from here recurses until the stack overflows.
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-
-        let imageInsets = UIEdgeInsets.zero
-        let titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3.5)
-
-        super.init(
-            viewControllers: Self.makeViewControllers(),
-            tabBarItemsAttributes: Self.makeTabBarItemsAttributes(),
-            imageInsets: imageInsets,
-            titlePositionAdjustment: titlePositionAdjustment,
-            context: ""
-        )
-
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
     
     // MARK: - REQUIRED
