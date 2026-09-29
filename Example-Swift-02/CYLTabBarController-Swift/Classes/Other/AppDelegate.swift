@@ -49,12 +49,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
 
             guard let windowScene = scene as? UIWindowScene else { return }
 
-            let window = CYLGetRootWindow()
+            // No window exists yet at this point, so create one for this scene.
+            let window = UIWindow(windowScene: windowScene)
             // ✅ Move your original logic here
             let mainTabBarVc = MainRootNavigationViewController()
 
-            window?.rootViewController = mainTabBarVc
-            window?.makeKeyAndVisible()
+            window.rootViewController = mainTabBarVc
+            window.makeKeyAndVisible()
 
             self.window = window
 

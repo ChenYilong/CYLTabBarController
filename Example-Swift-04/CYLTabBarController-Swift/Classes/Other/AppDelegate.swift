@@ -17,15 +17,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
        
         CYLPlusButtonSubclass.register()
-        
 
-        let mainTabBarVc = MainTabBarController(viewControllers: self.viewControllers(), tabBarItemsAttributes: self.tabBarItemsAttributesForController())
-        
-        self.window = UIWindow()
-        self.window?.frame  = UIScreen.main.bounds
-        self.window?.rootViewController = mainTabBarVc
-        self.window?.makeKeyAndVisible()
-        
+        // The window is created in SceneDelegate (UIScene life cycle).
+
         //tabbar背景色
 //        UITabBar.appearance().backgroundColor = UIColor.white
         //tabbar字体颜色
@@ -34,7 +28,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
         return true
     }
 
-    
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
+
+    func makeMainTabBarController() -> MainTabBarController {
+        return MainTabBarController(viewControllers: self.viewControllers(), tabBarItemsAttributes: self.tabBarItemsAttributesForController())
+    }
+
+
     func viewControllers() -> [UINavigationController]{
         let home = UINavigationController(rootViewController: HomeViewController())
         let connection = UINavigationController(rootViewController: ConnectionViewController())

@@ -13,7 +13,7 @@ typealias endBlock = () -> Void
 class GuideViewController: UIViewController,UIScrollViewDelegate {
 
     var numOfPages = 3 //图片数
-    var disTimer: DispatchSourceTimer! //计时器
+    var disTimer: DispatchSourceTimer? //计时器
     var time: NSInteger = 5 //时长
     var timeEndBlock: endBlock!
     
@@ -53,7 +53,9 @@ class GuideViewController: UIViewController,UIScrollViewDelegate {
         self.view.addSubview(timeBtn)
         
         //设置定时器⏲
-        disTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.global())
+        // 直接在主队列计时：避免后台 tick 堆积多个 main.async，在 disTimer 置 nil 后再次 cancel 导致崩溃
+        let disTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
+        self.disTimer = disTimer
         /**
          设置timer的计时参数
          wallDeadline: 什么时候开始
@@ -62,16 +64,12 @@ class GuideViewController: UIViewController,UIScrollViewDelegate {
         //循环执行，马上开始，间隔为1s,误差允许10微秒
         disTimer.schedule(deadline: DispatchTime.now(), repeating: DispatchTimeInterval.seconds(1), leeway: DispatchTimeInterval.microseconds(10))
         //执行disTimer事件
-        disTimer.setEventHandler {
-            // 回到了主线程
-            DispatchQueue.main.async {
-                self.time -= 1
-                if self.time <= 0 {
-                    self.disTimer.cancel()
-                    self.disTimer = nil
-                    self.timeClicked()
-                }
-                timeBtn.setTitle(String(self.time) + " 跳过", for: .normal)
+        disTimer.setEventHandler { [weak self] in
+            guard let self = self else { return }
+            self.time -= 1
+            timeBtn.setTitle(String(self.time) + " 跳过", for: .normal)
+            if self.time <= 0 {
+                self.timeClicked()
             }
         }
         //执行disTimer
@@ -89,9 +87,12 @@ class GuideViewController: UIViewController,UIScrollViewDelegate {
     
     
     @objc func timeClicked() {
-        if self.timeEndBlock != nil {
-            self.timeEndBlock()
-        }
+        // 跳过按钮、滑动到底、倒计时结束都会走这里：只停一次计时器、只回调一次
+        disTimer?.cancel()
+        disTimer = nil
+        guard let block = timeEndBlock else { return }
+        timeEndBlock = nil
+        block()
     }
     
     

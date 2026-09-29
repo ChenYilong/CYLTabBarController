@@ -14,24 +14,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
-
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window?.backgroundColor = .white
-        
-        if isFirst() {
-            let guide = GuideViewController()
-            guide.timeEndBlock = {
-                TabBarCommon.TabBarController()
-            }
-            self.window?.rootViewController = guide
-        }else {
-            TabBarCommon.TabBarController()
-        }
-        
-        window?.makeKeyAndVisible()
-
+        // The window is created in SceneDelegate (UIScene life cycle).
         return true
+    }
+
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
 
     //程序进入非活动状态，调用此方法，在此期间程序不接受任何消息或事件

@@ -25,6 +25,7 @@
 		184C1CE423F65A9A00B23C7F /* RootNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CDE23F65A9A00B23C7F /* RootNavigationController.swift */; };
 		184C1CE623F65A9A00B23C7F /* RootTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CE023F65A9A00B23C7F /* RootTabBarController.swift */; };
 		184C1CE723F65A9A00B23C7F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CE323F65A9A00B23C7F /* AppDelegate.swift */; };
+		C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000004 /* SceneDelegate.swift */; };
 		184C1CEB23F65B0B00B23C7F /* OCSwift.m in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CEA23F65B0B00B23C7F /* OCSwift.m */; };
 		184C1CF123F686AE00B23C7F /* TabBarCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CF023F686AE00B23C7F /* TabBarCommon.swift */; };
 		184C1CF323F6898300B23C7F /* CYLPlusButtonSubclass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CF223F6898300B23C7F /* CYLPlusButtonSubclass.swift */; };
@@ -84,6 +85,7 @@
 		184C1CDE23F65A9A00B23C7F /* RootNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootNavigationController.swift; sourceTree = "<group>"; };
 		184C1CE023F65A9A00B23C7F /* RootTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootTabBarController.swift; sourceTree = "<group>"; };
 		184C1CE323F65A9A00B23C7F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C1A5CE0E2E00000000000004 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		184C1CE823F65B0B00B23C7F /* HealthyHome-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HealthyHome-Bridging-Header.h"; sourceTree = "<group>"; };
 		184C1CE923F65B0B00B23C7F /* OCSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCSwift.h; sourceTree = "<group>"; };
 		184C1CEA23F65B0B00B23C7F /* OCSwift.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCSwift.m; sourceTree = "<group>"; };
@@ -339,6 +341,7 @@
 			isa = PBXGroup;
 			children = (
 				184C1CE323F65A9A00B23C7F /* AppDelegate.swift */,
+				C1A5CE0E2E00000000000004 /* SceneDelegate.swift */,
 				184F198F23F7EE40002DBAE4 /* APPDelegate+Categories.swift */,
 			);
 			path = Main;
@@ -574,6 +577,7 @@
 				184C1CE623F65A9A00B23C7F /* RootTabBarController.swift in Sources */,
 				184C1CC823F65A6700B23C7F /* HomeVC.swift in Sources */,
 				184C1CE723F65A9A00B23C7F /* AppDelegate.swift in Sources */,
+				C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */,
 				184C1CD523F65A7400B23C7F /* ImageHelper.swift in Sources */,
 				184C1C9223F65A2800B23C7F /* ViewController.swift in Sources */,
 				184C1CD923F65A8C00B23C7F /* Common.swift in Sources */,

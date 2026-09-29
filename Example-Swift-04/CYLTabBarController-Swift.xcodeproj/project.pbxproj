@@ -15,6 +15,7 @@
 		922DCF0B1FF63402005C89BE /* ConnectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCEF81FF63402005C89BE /* ConnectionViewController.swift */; };
 		922DCF0C1FF63402005C89BE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCEFA1FF63402005C89BE /* ViewController.swift */; };
 		922DCF101FF63402005C89BE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCF001FF63402005C89BE /* AppDelegate.swift */; };
+		C1A5CE0E2E00000000000001 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000002 /* SceneDelegate.swift */; };
 		922DCF121FF63402005C89BE /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCF031FF63402005C89BE /* MessageViewController.swift */; };
 		922DCF131FF63402005C89BE /* PublishViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCF051FF63402005C89BE /* PublishViewController.swift */; };
 		922DCF141FF63402005C89BE /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922DCF071FF63402005C89BE /* MainTabBarController.swift */; };
@@ -36,6 +37,7 @@
 		922DCEF81FF63402005C89BE /* ConnectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionViewController.swift; sourceTree = "<group>"; };
 		922DCEFA1FF63402005C89BE /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		922DCF001FF63402005C89BE /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C1A5CE0E2E00000000000002 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		922DCF031FF63402005C89BE /* MessageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
 		922DCF051FF63402005C89BE /* PublishViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PublishViewController.swift; sourceTree = "<group>"; };
 		922DCF071FF63402005C89BE /* MainTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 			isa = PBXGroup;
 			children = (
 				922DCF001FF63402005C89BE /* AppDelegate.swift */,
+				C1A5CE0E2E00000000000002 /* SceneDelegate.swift */,
 				922DCEFA1FF63402005C89BE /* ViewController.swift */,
 			);
 			path = Other;
@@ -190,7 +193,6 @@
 				922DCED91FF63399005C89BE /* Sources */,
 				922DCEDA1FF63399005C89BE /* Frameworks */,
 				922DCEDB1FF63399005C89BE /* Resources */,
-				66B8CB3D934CEEA7F1A6E40D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -250,24 +252,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		66B8CB3D934CEEA7F1A6E40D /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/CYLTabBarController/CYLTabBarController.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CYLTabBarController.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		CDF94486ED41F7591F19980E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -301,6 +285,7 @@
 				922DCF091FF63402005C89BE /* PersonalViewController.swift in Sources */,
 				922DCF0B1FF63402005C89BE /* ConnectionViewController.swift in Sources */,
 				922DCF101FF63402005C89BE /* AppDelegate.swift in Sources */,
+				C1A5CE0E2E00000000000001 /* SceneDelegate.swift in Sources */,
 				922DCF0A1FF63402005C89BE /* HomeViewController.swift in Sources */,
 				922DCF131FF63402005C89BE /* PublishViewController.swift in Sources */,
 			);
@@ -449,6 +434,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BPBCHD64GW;
 				INFOPLIST_FILE = "CYLTabBarController-Swift/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "WeMadeCode.CYLTabBarController-Swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -465,6 +451,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BPBCHD64GW;
 				INFOPLIST_FILE = "CYLTabBarController-Swift/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "WeMadeCode.CYLTabBarController-Swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
