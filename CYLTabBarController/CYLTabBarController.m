@@ -2673,7 +2673,8 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         // 转场或pop手势返回时禁止用户交互
         self.view.userInteractionEnabled = NO;
         UIEdgeInsets additionalSafeAreaInsets = self.selectedViewController.additionalSafeAreaInsets;
-        additionalSafeAreaInsets.bottom = self.tabBarHeight;
+            //FIX:  issue#652
+//        additionalSafeAreaInsets.bottom = self.tabBarHeight;
         [UIView performWithoutAnimation:^{
             self.selectedViewController.additionalSafeAreaInsets = additionalSafeAreaInsets;
             if ([self _showsMoreNavigationController] && self.moreNavigationController != self.selectedViewController) {

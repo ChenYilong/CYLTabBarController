@@ -91,12 +91,38 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         return;
     }
     CYLTabBarController *tabBarController = [sender cyl_tabBarController];
+    UIView *flatDesignTabBar = nil;
+    
+    if (!tabBarController) {
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+        //FIX: issue##650
+        tabBarController = CYLPlusChildViewController.cylflatdesign_tabBarController;
+        if ([tabBarController.cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+            flatDesignTabBar = (CYLFlatDesignTabBar *)tabBarController.cyl_tabBar;
+        }
+#else
+        return;
+#endif
+    }
+    
+    if (!tabBarController) {
+        return;
+    }
+    
     NSInteger index = [tabBarController.viewControllers indexOfObject:CYLPlusChildViewController];
     if (NSNotFound != index && (index < tabBarController.viewControllers.count)) {
-        [tabBarController setSelectedIndex:index];
-        if (NO == sender.cyl_userInteractionDisabled) { 
-            sender.selected = YES;
-            [tabBarController tabChangedToControl:self];
+        if (flatDesignTabBar) {
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+            CYLFlatDesignTabBar *theCYLFlatDesignTabBar = (CYLFlatDesignTabBar *)flatDesignTabBar;
+            [theCYLFlatDesignTabBar setSelectedIndex:index];
+            [tabBarController setSelectedViewController:CYLPlusChildViewController];
+#endif
+        } else {
+            [tabBarController setSelectedIndex:index];
+            if (NO == sender.cyl_userInteractionDisabled) {
+                sender.selected = YES;
+                [tabBarController tabChangedToControl:sender];
+            }
         }
     }
 }

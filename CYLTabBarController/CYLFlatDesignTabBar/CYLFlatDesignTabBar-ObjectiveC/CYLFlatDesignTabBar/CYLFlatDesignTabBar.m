@@ -398,7 +398,7 @@
     if (_selectedItemIndex != selectedIndex) {
         //统一使用CYLTabBarItemLottieAnimationPlayingNotification进行动画重置， 故删除手动重置。
 //         [self stopAnimationOfAllLottieView];
-//        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
         _selectedItemIndex = selectedIndex;
         for (NSInteger i = 0; i < _buttons.count; i++) {
             CYLFlatDesignTabBarButton *tabBarButton = _buttons[i];
