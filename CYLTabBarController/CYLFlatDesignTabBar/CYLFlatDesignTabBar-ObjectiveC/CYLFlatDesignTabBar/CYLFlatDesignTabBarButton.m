@@ -147,11 +147,18 @@
         return;
     }
     
-    BOOL isShowImageView = _imageView.image != nil;
+    // A Lottie-only item has no image, but the Lottie view is centered on `_imageView`,
+    // so still lay the image slot out, sized to the Lottie size; otherwise it collapses to
+    // CGRectZero and the animation is drawn around the button's top-left corner.
+    CGSize lottieSize = [[self _lottieSizeValue] CGSizeValue];
+    BOOL isLottieOnlyItem = (_imageView.image == nil) && (lottieSize.width > 0 && lottieSize.height > 0) && ([self _lottieURL] != nil);
+    BOOL isShowImageView = (_imageView.image != nil) || isLottieOnlyItem;
     BOOL isShowTitleLabel = _titleLabel.text.length > 0;
     BOOL isCYLFlatDesignTabBarItem = [_tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]];
-    
-    if (isShowImageView) {
+
+    if (isLottieOnlyItem) {
+        _imageView.frame = CGRectMake(0, 0, lottieSize.width, lottieSize.height);
+    } else if (isShowImageView) {
         [_imageView sizeToFit];
     }
     
