@@ -323,9 +323,13 @@
     UIImageView *imageView = nil;
     
     // ① 优先尝试 KVC 直接获取（iOS 13+ 常见）
-    imageView = [self cyl_valueForKey:@"imageView"];
-    if ([imageView isKindOfClass:[UIImageView class]]) {
-        return imageView;
+    // iOS 26+ 的 _UITabButton 没有 imageView 这个 KVC key，valueForKey: 会抛 NSUnknownKeyException。
+    // 后面的子视图查找仍然适用，这里直接跳过。
+    if (![NSStringFromClass(self.class) isEqualToString:@"_UITabButton"]) {
+        imageView = [self cyl_valueForKey:@"imageView"];
+        if ([imageView isKindOfClass:[UIImageView class]]) {
+            return imageView;
+        }
     }
     
     // ② 遍历 subviews 查找
