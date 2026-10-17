@@ -22,9 +22,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * 获取一个UITabBarItem内显示图标的UIImageView，如果找不到则返回nil
+ * [EN] Returns the image view that shows this item's icon, or nil.
+ * [CN] 返回该 Item 用于显示图标的图片视图，找不到时返回 nil。
  */
 - (nullable UIImageView *)cyl_imageView;
+
+/*!
+ * [EN] Same as `-cyl_imageView`.
+ * [CN] 同 -cyl_imageView。
+ */
 - (nullable UIImageView *)cyl_imageViewInTabBarButton;
+
+/*!
+ * [EN] Returns YES once the item's image view or title label has been laid out (width > 10).
+ * [CN] 判断该 Item 的图片视图或标题 Label 是否已完成布局（宽度大于 10）。
+ */
 - (BOOL)cyl_isReady;
 
 @end

@@ -17,6 +17,11 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 
 // 当用户点击时调用（而非通过编程）
+
+/*!
+ * [EN] Called when the user taps an item (not when selection changes in code).
+ * [CN] 用户点击 Item 时回调（通过代码切换选中项时不会回调）。
+ */
 - (void)tabBar:(CYLFlatDesignTabBar *)tabBar didSelectItem:(CYLFlatDesignTabBarItem *)item;
 
 @end
@@ -31,6 +36,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nullable, nonatomic, copy) NSArray<CYLFlatDesignTabBarButton *> *tabBarItems;
 
+/*!
+ * [EN] Creates and returns a new item with the given attributes. It does NOT add the item to `items`; assign `items` yourself.
+ * [CN] 使用给定属性创建并返回一个新 Item。注意：不会自动加入 items，需自行设置 items。
+ */
 - (CYLFlatDesignTabBarItem *)addItemWithTitle:(NSString *)title
                               tabBarItemImage:(id)tabBarItemImage
                       tabBarItemSelectedImage:(id)tabBarItemSelectedImage
@@ -70,8 +79,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSString *context;
 
+/*!
+ * [EN] Returns YES if the registered plus button's context matches this tab bar's context.
+ * [CN] 判断已注册 PlusButton 的 context 是否与当前 TabBar 的 context 一致。
+ */
 - (BOOL)hasPlusButton;
 
+/*!
+ * [EN] Returns YES if the plus child view controller exists and matches this tab bar's context.
+ * [CN] 判断 PlusButton 子控制器是否存在且与当前 TabBar 的 context 一致。
+ */
 - (BOOL)hasPlusChildViewController;
 
 @end

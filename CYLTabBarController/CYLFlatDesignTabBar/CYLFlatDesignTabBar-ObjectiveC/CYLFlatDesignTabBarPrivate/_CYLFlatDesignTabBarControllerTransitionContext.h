@@ -17,6 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, getter=isAnimated) BOOL animated;
 @property (nonatomic, assign, getter=isInteractive) BOOL interactive;
 
+/*!
+ * [EN] Creates a transition context for switching from `sourceViewController` to `destinationViewController` inside `containerView`.
+ * [CN] 创建转场上下文，用于在 containerView 中从 sourceViewController 切换到 destinationViewController。
+ */
 - (instancetype)initWithSourceViewController:(nullable UIViewController *)sourceViewController
                    destinationViewController:(nullable __kindof UIViewController *)destinationViewController
                                containerView:(__kindof UIView *)containerView;

@@ -25,9 +25,29 @@
 @optional
 
 // tabBar show/hide only for CYLTabBarController
+
+/*!
+ * [EN] Flat design only. Called before the flat-design tab bar is shown.
+ * [CN] 仅扁平化模式。扁平化 TabBar 即将显示时回调。
+ */
 - (void)tabBarController:(CYLTabBarController *)tabBarController willShowTabBar:(CYLFlatDesignTabBar *)tabBar;
+
+/*!
+ * [EN] Flat design only. Called after the flat-design tab bar is shown.
+ * [CN] 仅扁平化模式。扁平化 TabBar 显示完成后回调。
+ */
 - (void)tabBarController:(CYLTabBarController *)tabBarController didShowTabBar:(CYLFlatDesignTabBar *)tabBar;
+
+/*!
+ * [EN] Flat design only. Called before the flat-design tab bar is hidden.
+ * [CN] 仅扁平化模式。扁平化 TabBar 即将隐藏时回调。
+ */
 - (void)tabBarController:(CYLTabBarController *)tabBarController willHideTabBar:(CYLFlatDesignTabBar *)tabBar;
+
+/*!
+ * [EN] Flat design only. Called after the flat-design tab bar is hidden.
+ * [CN] 仅扁平化模式。扁平化 TabBar 隐藏完成后回调。
+ */
 - (void)tabBarController:(CYLTabBarController *)tabBarController didHideTabBar:(CYLFlatDesignTabBar *)tabBar;
 
 @end
@@ -46,25 +66,50 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
 
 @interface CYLConstants : NSObject
 
+/*!
+ * [EN] Returns the screen width divided by 375 (the iPhone 8 design width), for scaling layouts.
+ * [CN] 返回屏幕宽度与 375（iPhone 8 设计稿宽度）的比例，用于等比适配布局。
+ */
 + (CGFloat)UIBasisWidthScale;
+
+/*!
+ * [EN] Returns the screen height divided by 667 (the iPhone 8 design height), for scaling layouts.
+ * [CN] 返回屏幕高度与 667（iPhone 8 设计稿高度）的比例，用于等比适配布局。
+ */
 + (CGFloat)UIBasisHeightScale;
 
 /*!
  * Liquid Glass, same as `+isUsedLiquidGlass`.
  * @return YES  if iOS Version > iOS 27.0
+ * [EN] Returns YES if Liquid Glass is in use: always on iOS 27+, on iOS 26 unless `UIDesignRequiresCompatibility` is YES in Info.plist, never below iOS 26.
+ * [CN] 判断是否启用了液态玻璃：iOS 27+ 始终为 YES；iOS 26 下除非 Info.plist 中 UIDesignRequiresCompatibility 为 YES；iOS 26 以下始终为 NO。
  */
 + (BOOL)isLiquidGlassActive;
 
 /*!
  * Liquid Glass, same as `+isLiquidGlassActive`
  * @return YES  if iOS Version > iOS 27.0
+ * [EN] Same as `+isLiquidGlassActive`; the result is computed once and cached.
+ * [CN] 同 +isLiquidGlassActive，结果只计算一次并缓存。
  */
 + (BOOL)isUsedLiquidGlass;
 
+/*!
+ * [EN] Returns the Lottie size to use: `lottieSizeValue` if non-zero, else the normal image size, else the default placeholder size.
+ * [CN] 返回实际使用的 Lottie 尺寸：优先 lottieSizeValue（非零），其次普通图片尺寸，最后使用默认占位尺寸。
+ */
 + (NSValue *)cyl_getTureLottieSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage;
 
+/*!
+ * [EN] Returns a file URL for a local file path, or nil if the file does not exist.
+ * [CN] 将本地文件路径转换为文件 URL，文件不存在时返回 nil。
+ */
 + (NSURL *)cyl_getURLFromString:(NSString *)string;
 
+/*!
+ * [EN] Returns YES if Lottie is linked and either `lottieURLs` is non-empty or the first item attributes specify a Lottie URL or file path.
+ * [CN] 判断是否启用 Lottie：需集成 Lottie，且 lottieURLs 非空或第一个 TabBarItem 属性中指定了 Lottie URL / 文件路径。
+ */
 + (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
 
 @end

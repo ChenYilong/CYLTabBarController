@@ -55,11 +55,34 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
   */
 @property (nonatomic, strong) UIGestureRecognizer *liquidGlassLongGestureRecognizer;
 
+/*!
+ * [EN] Returns the plus button's index in the tab bar. Note: it also repositions the plus button as a side effect.
+ * [CN] 返回 PlusButton 在 TabBar 中的索引。注意：调用时会顺带重新设置 PlusButton 的位置。
+ */
 - (NSUInteger)plusButtonIndex;
 
+/*!
+ * [EN] Returns YES if the registered plus button's context matches this tab bar's context.
+ * [CN] 判断已注册 PlusButton 的 context 是否与当前 TabBar 的 context 一致。
+ */
 - (BOOL)hasPlusButton;
+
+/*!
+ * [EN] Returns YES if the plus child view controller exists and matches this tab bar's context.
+ * [CN] 判断 PlusButton 子控制器是否存在且与当前 TabBar 的 context 一致。
+ */
 - (BOOL)hasPlusChildViewController;
+
+/*!
+ * [EN] Returns YES if the plus button is vertically centered in the tab bar.
+ * [CN] 判断 PlusButton 是否在 TabBar 中垂直居中。
+ */
 - (BOOL)isPlusButtonLayoutCentered;
+
+/*!
+ * [EN] Returns the owning CYLTabBarController (the delegate if it is one, otherwise `cyl_tabBarController`).
+ * [CN] 返回所属的 CYLTabBarController（优先取 delegate，否则取 cyl_tabBarController）。
+ */
 - (CYLTabBarController *)tabBarController;
 
 @end

@@ -15,13 +15,25 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
 
 @interface CYLFlatDesignTabBarItem : NSObject
 
+/*!
+ * [EN] Creates a flat-design tab bar item with a title and image.
+ * [CN] 使用标题与图片创建扁平化 TabBarItem。
+ */
 - (instancetype)initWithTitle:(nullable NSString *)title
                         image:(nullable UIImage *)image;
 
+/*!
+ * [EN] Creates a flat-design tab bar item with a title, image and selected image.
+ * [CN] 使用标题、图片与选中态图片创建扁平化 TabBarItem。
+ */
 - (instancetype)initWithTitle:(nullable NSString *)title
                         image:(nullable UIImage *)image
                 selectedImage:(nullable UIImage *)selectedImage;
 
+/*!
+ * [EN] Designated initializer: title, images, index, title/image offsets, image insets and optional Lottie file path and size.
+ * [CN] 指定初始化方法：设置标题、图片、索引、标题/图片偏移、图片内边距，以及可选的 Lottie 文件路径与尺寸。
+ */
 - (instancetype)initWithTitle:(NSString *)title
                         image:(id)image
                 selectedImage:(id)selectedImage
@@ -54,10 +66,28 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
 
 @property (nonatomic, readwrite, assign) UIOffset titlePositionAdjustment UI_APPEARANCE_SELECTOR;
 
+/*!
+ * [EN] Sets the title text attributes for `state` (like UITabBarItem).
+ * [CN] 设置指定状态下的标题文字属性（同 UITabBarItem）。
+ */
 - (void)setTitleTextAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)attributes forState:(UIControlState)state UI_APPEARANCE_SELECTOR;
+
+/*!
+ * [EN] Returns the title text attributes for `state`.
+ * [CN] 返回指定状态下的标题文字属性。
+ */
 - (nullable NSDictionary<NSAttributedStringKey,id> *)titleTextAttributesForState:(UIControlState)state;
 
+/*!
+ * [EN] Sets the badge text attributes for `state`.
+ * [CN] 设置指定状态下的角标文字属性。
+ */
 - (void)setBadgeTextAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)textAttributes forState:(UIControlState)state UI_APPEARANCE_SELECTOR;
+
+/*!
+ * [EN] Returns the badge text attributes for `state`.
+ * [CN] 返回指定状态下的角标文字属性。
+ */
 - (nullable NSDictionary<NSAttributedStringKey,id> *)badgeTextAttributesForState:(UIControlState)state;
 
 #pragma mark - CYLFlatDesignTabBarItem 新增属性
@@ -84,6 +114,11 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
 @property (nonatomic, copy) NSString *lottieFilePath;
 
 @property (nonatomic, strong) NSValue *lottieSizeValue;
+
+/*!
+ * [EN] Returns the view that hosts this item's badge (from its tab bar button).
+ * [CN] 返回承载该 Item 角标的视图（取自其 TabBar 按钮）。
+ */
 - (UIView *)actualBadgeSuperView;
 
 @end

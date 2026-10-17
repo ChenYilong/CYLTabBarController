@@ -136,6 +136,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 }
 
 - (NSArray *)tabBarItemsAttributesForTabBar {
+    return [[self class] tabBarItemsAttributesForTabBar];
+}
++ (NSArray *)tabBarItemsAttributesForTabBar {
+    
     // lottie动画的json文件来自于NorthSea, respect!
     CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
@@ -145,7 +149,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                 CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         //                                                 CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         //第一位 右大，下大
-        CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"],
+                CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"],
         //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     CGFloat secondXOffset = (-25+2)/2;
@@ -190,12 +194,12 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性等等
  */
 - (void)customizeTabBarAppearanceWithTitlePositionAdjustment:(UIOffset)titlePositionAdjustment {
-//    if ([CYLConstants isLiquidGlassActive]) {
-//        return;
-//    }
+    //    if ([CYLConstants isLiquidGlassActive]) {
+    //        return;
+    //    }
     // Customize UITabBar height
     // 自定义 TabBar 高度
-//     [self cyl_tabBarController].tabBarHeight = CYL_IS_IPHONE_X ? 65 : 40;
+    //     [self cyl_tabBarController].tabBarHeight = CYL_IS_IPHONE_X ? 65 : 40;
     
     [self rootWindow].backgroundColor = [UIColor cyl_systemBackgroundColor];
     
@@ -529,9 +533,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
 #if defined(DEBUG) || defined(BETA)
     // test for issue #642
-//    self.selectedIndex = [self.viewControllers indexOfObject:viewController];
-
-NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@", @(__PRETTY_FUNCTION__), @(__LINE__), @([self.viewControllers indexOfObject:viewController]), viewController.title);
+    //    self.selectedIndex = [self.viewControllers indexOfObject:viewController];
+    
+    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@", @(__PRETTY_FUNCTION__), @(__LINE__), @([self.viewControllers indexOfObject:viewController]), viewController.title);
 #endif
     if ([tabButton cyl_isPlusControl]) {
         //FIXME:  to delete 玻璃效果下， 不能调用 updateSelectionStatusIfNeededForTabBarController，selectedViewController， selectedIndex 否则无法实现plusButton的点击事件响应， 响应的仅仅是tabButton
@@ -606,8 +610,8 @@ NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@",
     
     //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
     if ([control cyl_isTabButton] || [control cyl_isPlusButton]) {
-//        BOOL shouldSelectedCoverShow = (self.selectedIndex == 0);
-//        [self setSelectedCoverShow:shouldSelectedCoverShow];
+        //        BOOL shouldSelectedCoverShow = (self.selectedIndex == 0);
+        //        [self setSelectedCoverShow:shouldSelectedCoverShow];
     }
 }
 //缩放动画

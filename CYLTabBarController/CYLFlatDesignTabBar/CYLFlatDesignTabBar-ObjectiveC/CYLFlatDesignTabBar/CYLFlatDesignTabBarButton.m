@@ -295,6 +295,49 @@
     return lottieURL;
 }
 
+/*!
+ * Resolves the `contentMode` for this button's Lottie view from the owning `CYLTabBarController`,
+ * so the default (`UIViewContentModeScaleAspectFit`) and any subclass override of
+ * `-lottieAnimationViewContentMode` also apply in flat-design mode.
+ *
+ * Problem this solves:
+ * The previous code passed `self.cyl_tabBarController.lottieAnimationViewContentMode`, but
+ * `-cyl_tabBarController` only returns controllers whose `tabBarStyleType` is NOT
+ * `CYLTabBarStyleTypeFlatDesign` (see `-cyl_isSystemStyleTabBar`). For this button it is always nil,
+ * and messaging nil returns 0, i.e. `UIViewContentModeScaleToFill`. As a result the Lottie animation
+ * was stretched whenever `lottieSizeValue`'s aspect ratio differed from the animation's own, and a
+ * subclass override of `-lottieAnimationViewContentMode` was silently ignored.
+ *
+ * Why it is written this way:
+ * - Every style (system and flat design) is the same `CYLTabBarController` class, so the style cannot
+ *   be told apart by class, and walking the responder chain for a `CYLTabBarController` is not reliable.
+ *   Instead the flat-design controller is read from the explicit `cylflatdesign_tabBarController`
+ *   references, the same approach `CYLPlusButton` uses for issue #650.
+ * - Only the first call matters: `-cyl_addLottieImageWithLottieURL:size:contentMode:` returns early once
+ *   the Lottie view exists, so a wrong mode picked here would stick for the button's lifetime. That is why
+ *   an unresolved controller falls back to the documented default instead of 0.
+ */
+- (UIViewContentMode)_lottieContentMode {
+    // Non-flat styles: the regular lookup finds the controller (nil for flat design, by design).
+    CYLTabBarController *tabBarController = [self cyl_tabBarController];
+    if (!tabBarController) {
+        // Flat design: CYLTabBarController hands itself to each flat item via
+        // -cylflatdesign_setTabBarController: when it builds the items.
+        tabBarController = _tabBarItem.cylflatdesign_tabBarController;
+        if (!tabBarController) {
+            // Fallback: the item passes the same reference on to its child view controller in
+            // -setChildViewController:, mirroring how CYLPlusButton resolves the controller.
+            tabBarController = _tabBarItem.childViewController.cylflatdesign_tabBarController;
+        }
+    }
+    // Never let a missing controller become 0 (UIViewContentModeScaleToFill);
+    // fall back to the documented default instead.
+    if (![tabBarController isKindOfClass:[CYLTabBarController class]]) {
+        return UIViewContentModeScaleAspectFit;
+    }
+    return [tabBarController lottieAnimationViewContentMode];
+}
+
 - (void)initLottie {
     NSValue *lottieSizeValue = [self _lottieSizeValue];
     
@@ -306,12 +349,12 @@
     if (lottieURL) {
 #if __has_include(<Lottie/Lottie.h>)
         CGSize lottieSize = [lottieSizeValue CGSizeValue];
-        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.cyl_tabBarController.lottieAnimationViewContentMode];
+        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode]];
 #endif
      
 #if __has_include(<Lottie/Lottie-Swift.h>)
         CGSize lottieSize = [lottieSizeValue CGSizeValue];
-        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.cyl_tabBarController.lottieAnimationViewContentMode];
+        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode]];
 #endif
     }
 }
@@ -327,7 +370,7 @@
         if (!lottieURL) {
             return;
         }
-        [self cyl_animationLottieImageWithLottieURL:lottieURL size:lottieSize defaultSelected:NO contentMode:self.cyl_tabBarController.lottieAnimationViewContentMode];
+        [self cyl_animationLottieImageWithLottieURL:lottieURL size:lottieSize defaultSelected:NO contentMode:[self _lottieContentMode]];
     }
     else {
 //        [self cyl_stopAnimationOfLottieView];

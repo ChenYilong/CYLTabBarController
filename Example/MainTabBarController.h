@@ -16,6 +16,6 @@
 @interface MainTabBarController : CYLTabBarController
 
 - (instancetype)initWithContext:(NSString *)context;
-
++ (NSArray *)tabBarItemsAttributesForTabBar;
 @end
 
