@@ -2412,6 +2412,7 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
             _selectedIndex = selectedIndex;
             [super setSelectedIndex:selectedIndex];
             if (selectedIndex < 0 || selectedIndex >= self.viewControllers.count) { return; }
+            _selectedViewController = self.viewControllers[selectedIndex];
             if (_needsReloadItems) {
                 [self _captureItems];
                 [self.cyl_tabBar setItems:self.items];
