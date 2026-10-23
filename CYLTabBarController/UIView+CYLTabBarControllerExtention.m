@@ -32,6 +32,10 @@
     return [self isKindOfClass:[CYLExternPlusButton class]];
 }
 
+- (BOOL)cyl_isRightToLeftLayout {
+    return self.effectiveUserInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+}
+
 - (BOOL)cyl_isTabButton {
     BOOL isKindOfButton;
     NSString *classString = NSStringFromClass([self class]);

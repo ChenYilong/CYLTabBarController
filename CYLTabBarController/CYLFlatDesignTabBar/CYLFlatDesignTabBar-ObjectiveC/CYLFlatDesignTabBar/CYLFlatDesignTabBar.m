@@ -103,6 +103,14 @@
     [self _updateLayout];
 }
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    //RTL（如阿语）切换布局方向后需重新排列按钮
+    if (previousTraitCollection.layoutDirection != self.traitCollection.layoutDirection) {
+        [self setNeedsLayout];
+    }
+}
+
 - (void)commonInit {
     _selectedItemIndex = -1;
     _buttons = [NSMutableArray array];
@@ -456,13 +464,16 @@
         buttonWidth = (contentWidth - margin * 2 - (itemCount - 1) * buttonSpace) / itemCount;
     }
     CGFloat buttonHeight = CGRectGetHeight(self.contentView.frame) - buttonY;
+    BOOL isRightToLeft = [self cyl_isRightToLeftLayout];
 
     for (NSInteger i = 0; i < self.items.count; i++) {
         CYLFlatDesignTabBarButton *button = _buttons[i];
         //        button.tabBarItem = self.items[i];
         [button setTabBarItem:self.items[i]];
         
-        CGFloat buttonX = margin + i * (buttonWidth + buttonSpace);
+        //RTL（如阿语）下按钮从右到左排列，第 0 个 Tab 位于最右侧
+        NSInteger visibleIndex = isRightToLeft ? (itemCount - 1 - i) : i;
+        CGFloat buttonX = margin + visibleIndex * (buttonWidth + buttonSpace);
         if (self.useLayoutSafeAreaInsets) {
             buttonX += self.safeAreaInsets.left;
         }

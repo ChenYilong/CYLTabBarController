@@ -20,6 +20,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)cyl_isPlusButton;
 
 /*!
+ * [EN] Returns YES if the receiver lays out right-to-left (e.g. Arabic, Hebrew), based on `effectiveUserInterfaceLayoutDirection`.
+ * [CN] 判断当前视图是否为从右到左布局（如阿拉伯语、希伯来语），依据 `effectiveUserInterfaceLayoutDirection` 判断。
+ */
+- (BOOL)cyl_isRightToLeftLayout;
+
+/*!
  * [EN] Returns YES if the receiver is a system tab bar button (UITabBarButton).
  * [CN] 判断当前视图是否为系统 TabBar 按钮（UITabBarButton）。
  */
