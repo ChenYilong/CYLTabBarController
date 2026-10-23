@@ -41,6 +41,22 @@
     return tabBarButtons;
 }
 
+/*!
+ * [EN] Sorts tab bar buttons in logical (view controller) order: left-to-right for LTR, right-to-left for RTL (e.g. Arabic).
+ * [CN] 按逻辑顺序（与子控制器顺序一致）排序：LTR 下从左到右，RTL（如阿语）下从右到左。
+ */
+- (NSComparator)cyl_tabBarButtonComparator {
+    BOOL isRightToLeft = [self cyl_isRightToLeftLayout];
+    return ^NSComparisonResult(UIView * formerView, UIView * latterView) {
+        CGFloat formerViewX = formerView.frame.origin.x;
+        CGFloat latterViewX = latterView.frame.origin.x;
+        if (isRightToLeft) {
+            return  (formerViewX < latterViewX) ? NSOrderedDescending : NSOrderedAscending;
+        }
+        return  (formerViewX > latterViewX) ? NSOrderedDescending : NSOrderedAscending;
+    };
+}
+
 - (NSArray *)cyl_sortedSubviews {
     if (self.cyl_tabBarSubviews.count == 0) {
         return self.cyl_tabBarSubviews;
@@ -52,11 +68,7 @@
         }
     }];
     //    return tabBarButtonArray;
-    NSArray *sortedSubviews = [[tabBarButtonArray copy] sortedArrayUsingComparator:^NSComparisonResult(UIView * formerView, UIView * latterView) {
-        CGFloat formerViewX = formerView.frame.origin.x;
-        CGFloat latterViewX = latterView.frame.origin.x;
-        return  (formerViewX > latterViewX) ? NSOrderedDescending : NSOrderedAscending;
-    }];
+    NSArray *sortedSubviews = [[tabBarButtonArray copy] sortedArrayUsingComparator:[self cyl_tabBarButtonComparator]];
     return sortedSubviews;
 }
 
@@ -92,11 +104,7 @@
         }
     }];
     
-    NSArray *sortedSubviews = [[tabBarButtonArray copy] sortedArrayUsingComparator:^NSComparisonResult(UIView * formerView, UIView * latterView) {
-        CGFloat formerViewX = formerView.frame.origin.x;
-        CGFloat latterViewX = latterView.frame.origin.x;
-        return  (formerViewX > latterViewX) ? NSOrderedDescending : NSOrderedAscending;
-    }];
+    NSArray *sortedSubviews = [[tabBarButtonArray copy] sortedArrayUsingComparator:[self cyl_tabBarButtonComparator]];
     return sortedSubviews;
 }
 
@@ -589,6 +597,10 @@
     }
     CGFloat boundsWidthOffset = (CYLScreenWidth() - self.cyl_boundsSize.width) * 0.5;
     return boundsWidthOffset;
+}
+
+- (BOOL)cyl_isRightToLeftLayout {
+    return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
 }
 
 - (NSArray *)cyl_platterViews {
