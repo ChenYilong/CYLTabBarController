@@ -599,10 +599,6 @@
     return boundsWidthOffset;
 }
 
-- (BOOL)cyl_isRightToLeftLayout {
-    return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
-}
-
 - (NSArray *)cyl_platterViews {
     //    - (BOOL)cyl_isPlatterView; {
     return  [NSArray new];

@@ -32,12 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (CGFloat)cyl_boundsWidthOffset;
 
 /*!
- * [EN] Returns YES if the tab bar lays out right-to-left (e.g. Arabic, Hebrew), based on its `semanticContentAttribute`.
- * [CN] 判断 TabBar 是否为从右到左布局（如阿拉伯语、希伯来语），依据 `semanticContentAttribute` 判断。
- */
-- (BOOL)cyl_isRightToLeftLayout;
-
-/*!
  * [EN] Returns the Liquid Glass platter views. Currently a placeholder that returns an empty array.
  * [CN] 返回液态玻璃 Platter 视图数组。当前为占位实现，返回空数组。
  */
