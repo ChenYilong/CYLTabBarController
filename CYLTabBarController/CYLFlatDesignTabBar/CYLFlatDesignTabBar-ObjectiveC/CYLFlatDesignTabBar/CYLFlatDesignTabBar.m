@@ -43,7 +43,8 @@
 @implementation CYLFlatDesignTabBar {
     NSInteger _selectedItemIndex;
     NSMutableArray *_buttons;
-    UIEdgeInsets _lastHorizontalSafeAreaInsets;
+    UIEdgeInsets _lastLayoutSafeAreaInsets;
+    BOOL _hasLastLayoutSafeAreaInsets;
 }
 //@synthesize context = _context;
 
@@ -107,7 +108,7 @@
 
 - (void)safeAreaInsetsDidChange {
     [super safeAreaInsetsDidChange];
-    //iPhone Duo 折叠/展开、横竖屏切换时左右安全区会变化（如右侧 84pt 的竖向状态栏），需重新排列按钮
+    //iPhone Duo 折叠/展开、横竖屏切换时安全区会变化（如右侧 84pt 的竖向状态栏），需重新排列按钮
     [self setNeedsLayout];
 }
 
@@ -445,7 +446,8 @@
     }
     
     // 放在UITabBarController里
-    CGFloat contentHeight = CGRectGetHeight(self.bounds) - self.safeAreaInsets.bottom;
+    UIEdgeInsets layoutInsets = [self _safeAreaInsetsForLayout];
+    CGFloat contentHeight = CGRectGetHeight(self.bounds) - layoutInsets.bottom;
 //    if (self.useLayoutSafeAreaInsets) {
 //        contentHeight = CGRectGetHeight(self.bounds);
 //    }
@@ -456,8 +458,9 @@
     if (_buttons.count != itemCount) { return; }
 
     CGFloat contentWidth = CGRectGetWidth(self.contentView.frame);
-    UIEdgeInsets horizontalInsets = [self _horizontalSafeAreaInsetsForLayout];
-    contentWidth -= (horizontalInsets.left + horizontalInsets.right);
+    CGFloat leftInset = self.useLayoutSafeAreaInsets ? layoutInsets.left : 0;
+    CGFloat rightInset = self.useLayoutSafeAreaInsets ? layoutInsets.right : 0;
+    contentWidth -= (leftInset + rightInset);
     
 //    系统间距
 //    CGFloat margin = 2.0;
@@ -484,7 +487,7 @@
         //RTL（如阿语）下按钮从右到左排列，第 0 个 Tab 位于最右侧
         NSInteger visibleIndex = isRightToLeft ? (itemCount - 1 - i) : i;
         CGFloat buttonX = margin + visibleIndex * (buttonWidth + buttonSpace);
-        buttonX += horizontalInsets.left;
+        buttonX += leftInset;
         button.frame = CGRectMake(buttonX, buttonY, buttonWidth, buttonHeight);
     }
     if ([self hasPlusButton]) {
@@ -556,23 +559,31 @@
 }
 
 /*!
- * [EN] Left/right insets the buttons must stay clear of. During a FlatDesign push/pop the bar is moved into
- *      `_CYLFlatDesignTabBarParallaxOverlayView` on the sliding page, so its own safe area changes every frame
- *      (on iPhone Duo it leaves and re-enters the 84 pt trailing status column). The insets measured in place
- *      are reused there, so the buttons keep their size and position for the whole transition.
- * [CN] 按钮需要避开的左右安全区。push/pop 转场时 TabBar 被移到滑动页面上的 `_CYLFlatDesignTabBarParallaxOverlayView`，
- *      它自身的安全区会逐帧变化（iPhone Duo 上会移出/移入右侧 84pt 的竖向状态栏）。转场中沿用 TabBar 在原位置测得的值，
- *      保证整个转场中按钮尺寸和位置不变。
+ * [EN] Safe area insets used to lay out the content (bottom: content height; left/right: button row).
+ *      During a FlatDesign push/pop the bar is moved into `_CYLFlatDesignTabBarParallaxOverlayView` on the
+ *      page's view, inside `selectedViewController`. That page carries the bottom
+ *      `additionalSafeAreaInsets` (= tabBarHeight) that CYLTabBarController gives `selectedViewController`,
+ *      so the bar's own `safeAreaInsets.bottom` grows from 34 to 34 + 49 = 83, the bar's whole height,
+ *      and the content collapsed vertically until the bar went back to the tab bar controller's view.
+ *      Its left/right insets also change every frame as the page slides (iPhone Duo's 84 pt trailing
+ *      status column). While in the overlay, the insets measured in place are reused instead.
+ * [CN] 用于布局内容的安全区（bottom 决定内容高度，left/right 决定按钮行）。
+ *      push/pop 转场时 TabBar 被移到 `selectedViewController` 内页面视图上的 `_CYLFlatDesignTabBarParallaxOverlayView`。
+ *      该页面带有 CYLTabBarController 给 `selectedViewController` 设置的底部 `additionalSafeAreaInsets`（= tabBarHeight），
+ *      TabBar 自身的 `safeAreaInsets.bottom` 会从 34 变成 34 + 49 = 83（即整个 TabBar 高度），
+ *      内容高度因此被压缩，直到 TabBar 回到 TabBarController 的 view 上才恢复。
+ *      左右安全区也会随页面滑动逐帧变化（iPhone Duo 右侧 84pt 竖向状态栏）。
+ *      位于 overlay 中时，沿用 TabBar 在原位置测得的安全区。
  */
-- (UIEdgeInsets)_horizontalSafeAreaInsetsForLayout {
-    if (!self.useLayoutSafeAreaInsets) {
-        return UIEdgeInsetsZero;
+- (UIEdgeInsets)_safeAreaInsetsForLayout {
+    BOOL isInParallaxOverlay = [self.superview isKindOfClass:[_CYLFlatDesignTabBarParallaxOverlayView class]];
+    if (isInParallaxOverlay && _hasLastLayoutSafeAreaInsets) {
+        return _lastLayoutSafeAreaInsets;
     }
-    if ([self.superview isKindOfClass:[_CYLFlatDesignTabBarParallaxOverlayView class]]) {
-        return _lastHorizontalSafeAreaInsets;
-    }
-    _lastHorizontalSafeAreaInsets = UIEdgeInsetsMake(0, self.safeAreaInsets.left, 0, self.safeAreaInsets.right);
-    return _lastHorizontalSafeAreaInsets;
+    UIEdgeInsets safeAreaInsets = self.safeAreaInsets;
+    _lastLayoutSafeAreaInsets = UIEdgeInsetsMake(0, safeAreaInsets.left, safeAreaInsets.bottom, safeAreaInsets.right);
+    _hasLastLayoutSafeAreaInsets = !isInParallaxOverlay;
+    return _lastLayoutSafeAreaInsets;
 }
 
 //- (UIButton *)selectedCover {
