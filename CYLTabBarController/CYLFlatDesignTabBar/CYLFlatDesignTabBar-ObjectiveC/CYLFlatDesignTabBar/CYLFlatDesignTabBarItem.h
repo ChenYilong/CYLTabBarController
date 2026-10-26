@@ -57,7 +57,10 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
 @property (nullable, nonatomic, copy) NSString *title;
 @property (nullable, nonatomic, strong) UIImage *image;
 @property (nullable, nonatomic, strong) UIImage *selectedImage;
-@property (nullable, nonatomic, strong) UIViewController *childViewController;
+// ⚠️ PATCH(aifirx): 原本是 strong，与 UIViewController.cyl_tabBarItem 的关联对象（RETAIN）构成
+// <ViewController> → <CYLFlatDesignTabBarItem> → <childViewController> 的自我强引用闭环，
+// 导致 tab 子控制器在 pop 之后永远无法释放。改为 weak。
+@property (nullable, nonatomic, weak) UIViewController *childViewController;
 // default is nil, badgeValue为nil并且badgeSize为CGSizeZero时，badge隐藏
 @property (nullable, nonatomic, copy) NSString *badgeValue;
 @property (nonatomic, readwrite, copy, nullable) UIColor *badgeColor;
