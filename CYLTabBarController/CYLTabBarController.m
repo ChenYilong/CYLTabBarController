@@ -3006,8 +3006,12 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
 
 
 - (void)cylflatdesign_setTabBarController:(UIViewController *)tabBarController {
+    // The property is declared `weak` in the header, so store a weak box instead of
+    // retaining the tab bar controller directly. A strong reference here creates a
+    // retain cycle (tab bar controller -> child view controller -> tab bar controller)
+    // and the whole FlatDesign tab tree is never deallocated after it is popped (#661).
     UIViewController *tabBarController_ = tabBarController;
-    objc_setAssociatedObject(self, @selector(cylflatdesign_tabBarController), tabBarController_, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, @selector(cylflatdesign_tabBarController), [self cyl_cylflatdesign_weakBoxWithTarget:tabBarController_], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     UIViewController *referenceViewController = nil;
     if ([self isKindOfClass:[UIViewController class]]) {
         referenceViewController = (UIViewController *)self;
@@ -3016,7 +3020,7 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         return;
     }
     if (referenceViewController.cyl_getViewControllerInsteadOfNavigationController) {
-        objc_setAssociatedObject(referenceViewController.cyl_getViewControllerInsteadOfNavigationController, @selector(cylflatdesign_tabBarController), (tabBarController_), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(referenceViewController.cyl_getViewControllerInsteadOfNavigationController, @selector(cylflatdesign_tabBarController), [self cyl_cylflatdesign_weakBoxWithTarget:tabBarController_], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     
     /*!
@@ -3037,8 +3041,17 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
      */
 }
 
+/// Wraps `target` in a block that only holds it weakly, matching `cyl_setTabBarController:`.
+/// The block itself is retained by the associated object, but the target is not.
+- (id)cyl_cylflatdesign_weakBoxWithTarget:(UIViewController *)target {
+    id __weak weakTarget = target;
+    return ^{ return weakTarget; };
+}
+
 - (UIViewController __kindof *)cylflatdesign_tabBarController {
-    UIViewController *viewController = objc_getAssociatedObject(self, @selector(cylflatdesign_tabBarController));
+    // The associated object is always a weak box block; unwrap it.
+    id (^box)(void) = objc_getAssociatedObject(self, @selector(cylflatdesign_tabBarController));
+    UIViewController *viewController = (box ? box() : nil);
     if (viewController) {
         return viewController;
     }
