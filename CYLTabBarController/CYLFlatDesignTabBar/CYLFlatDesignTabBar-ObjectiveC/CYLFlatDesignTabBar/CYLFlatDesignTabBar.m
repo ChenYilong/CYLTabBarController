@@ -579,6 +579,10 @@
  *      左右安全区也会随页面滑动逐帧变化（iPhone Duo 右侧 84pt 竖向状态栏）。
  *      位于 overlay 中时，实时读取 TabBar 的原宿主 TabBarController.view 的安全区（TabBar 在其中贴底、满宽），
  *      与原位置一致、始终最新（不缓存），且不受页面额外 inset 影响。
+ * 状态 / Status (iPhone Duo): 展开（内屏）push/pop 高度不变，符合预期；折叠（外屏）仍反馈会变矮后恢复，
+ *      原因尚未定位，见 CYLTabBarController.m `-_logTabBarClippingInParallaxOverlay`（DEBUG 诊断）。
+ *      Unfolded: height stays put, as expected. Folded: still reported to shrink and recover; cause not yet
+ *      located, see the DEBUG diagnostic `-_logTabBarClippingInParallaxOverlay` in CYLTabBarController.m.
  */
 - (UIEdgeInsets)_safeAreaInsetsForLayout {
     UIView *homeView = self.tabBarController.viewIfLoaded;
