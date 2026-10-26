@@ -108,7 +108,7 @@
 
 - (void)safeAreaInsetsDidChange {
     [super safeAreaInsetsDidChange];
-    //iPhone Duo 折叠/展开、横竖屏切换时安全区会变化（如右侧 84pt 的竖向状态栏），需重新排列按钮
+    //FIX: issue #662 iPhone Duo 折叠/展开、横竖屏切换时安全区会变化（如右侧 84pt 的竖向状态栏），需重新排列按钮
     [self setNeedsLayout];
 }
 
@@ -140,6 +140,7 @@
     
     self.barTintColor = [UIColor clearColor];
     self.tintColor = [UIColor systemBlueColor];
+    // FIX: issue #662 (iPhone Duo follow-up, PR #665)
     // 与头文件声明的默认值保持一致（default is YES）。
     // 按钮必须避开左右安全区：iPhone Duo（iOS 27.1 SDK）右侧有 84pt 的竖向状态栏，
     // 若忽略，最后一个 Tab 会被盖住，并在 push/pop 转场中被裁掉一截。
@@ -559,6 +560,7 @@
 }
 
 /*!
+ * FIX: issue #662 (push/pop follow-up, PR #665): the tab bar's height shrinks during push/pop, then recovers.
  * [EN] Safe area insets used to lay out the content (bottom: content height; left/right: button row).
  *      During a FlatDesign push/pop the bar is moved into `_CYLFlatDesignTabBarParallaxOverlayView` on the
  *      page's view, inside `selectedViewController`. That page carries the bottom

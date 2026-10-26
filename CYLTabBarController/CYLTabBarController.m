@@ -2913,6 +2913,7 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         [superview bringSubviewToFront:_parallaxOverlayView];
         
         if (self.cyl_tabBar.superview != _parallaxOverlayView) {
+            // FIX: issue #662 (PR #665)
             // This runs inside the navigation transition's animation block; re-parenting and
             // re-positioning must not be animated, or the bar visibly slides into place.
             [UIView performWithoutAnimation:^{
@@ -2928,7 +2929,7 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
 }
 
-/// FIX: tab bar shrinks/jumps during push and pop.
+/// FIX: issue #662 (push/pop follow-up, PR #665): tab bar shrinks/jumps during push and pop.
 /// `tabBarFrame` is expressed in `self.view`'s coordinate space, but during a push/pop the tab bar is
 /// moved into `_parallaxOverlayView`, which lives inside the child view controller's view. That view
 /// does not always share `self.view`'s geometry: with an opaque navigation bar
