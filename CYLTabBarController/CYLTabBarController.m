@@ -2908,19 +2908,43 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         if (!_parallaxOverlayView) {
             _parallaxOverlayView = [[_CYLFlatDesignTabBarParallaxOverlayView alloc] initWithFrame:superview.bounds];
         }
+        _parallaxOverlayView.frame = superview.bounds;
         [superview addSubview:_parallaxOverlayView];
         [superview bringSubviewToFront:_parallaxOverlayView];
         
         if (self.cyl_tabBar.superview != _parallaxOverlayView) {
-            if (!_tabBarIsAnimating) {
-                self.cyl_tabBar.frame = self.tabBarFrame;
-            }
-            self.cyl_tabBar.hidden = NO;
-            [_parallaxOverlayView addSubview:self.cyl_tabBar];
+            // This runs inside the navigation transition's animation block; re-parenting and
+            // re-positioning must not be animated, or the bar visibly slides into place.
+            [UIView performWithoutAnimation:^{
+                [self->_parallaxOverlayView addSubview:self.cyl_tabBar];
+                if (!self->_tabBarIsAnimating) {
+                    self.cyl_tabBar.frame = [self _tabBarFrameInParallaxOverlayView:self->_parallaxOverlayView];
+                }
+                self.cyl_tabBar.hidden = NO;
+            }];
         }
 #else
 #endif
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
+}
+
+/// FIX: tab bar shrinks/jumps during push and pop.
+/// `tabBarFrame` is expressed in `self.view`'s coordinate space, but during a push/pop the tab bar is
+/// moved into `_parallaxOverlayView`, which lives inside the child view controller's view. That view
+/// does not always share `self.view`'s geometry: with an opaque navigation bar
+/// (e.g. `edgesForExtendedLayout = UIRectEdgeNone`, a non-translucent bar, or libraries such as
+/// HBDNavigationBar) it starts below the navigation bar and is shorter. Using `tabBarFrame` unchanged
+/// placed the bar too low by the navigation bar height, so it was partly or fully off screen during the
+/// transition and then snapped back when it returned to `self.view`.
+/// Only the vertical position is converted; the horizontal position stays relative to the child's view
+/// so the bar keeps moving with it (the parallax effect).
+- (CGRect)_tabBarFrameInParallaxOverlayView:(UIView *)overlayView {
+    CGRect frame = self.tabBarFrame;
+    if (overlayView.window && overlayView.window == self.view.window) {
+        frame.origin.y = [self.view convertPoint:CGPointMake(0, CGRectGetMinY(frame)) toView:overlayView].y;
+    }
+    // Otherwise the two views cannot be related yet; keep the previous behaviour.
+    return frame;
 }
 
 - (void)_updateAdditionalSafeAreaInsetsWithAnimated:(BOOL)animated {
