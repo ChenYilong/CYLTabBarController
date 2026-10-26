@@ -19,6 +19,7 @@
 
 #endif
 #import "UINavigationController+CYLFlatDesignTabBarPrivate.h"
+#import "_CYLFlatDesignTabBarParallaxOverlayView.h"
 
 @interface CYLFlatDesignTabBar ()
 
@@ -42,6 +43,7 @@
 @implementation CYLFlatDesignTabBar {
     NSInteger _selectedItemIndex;
     NSMutableArray *_buttons;
+    UIEdgeInsets _lastHorizontalSafeAreaInsets;
 }
 //@synthesize context = _context;
 
@@ -103,6 +105,12 @@
     [self _updateLayout];
 }
 
+- (void)safeAreaInsetsDidChange {
+    [super safeAreaInsetsDidChange];
+    //iPhone Duo 折叠/展开、横竖屏切换时左右安全区会变化（如右侧 84pt 的竖向状态栏），需重新排列按钮
+    [self setNeedsLayout];
+}
+
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
     //RTL（如阿语）切换布局方向后需重新排列按钮
@@ -131,7 +139,10 @@
     
     self.barTintColor = [UIColor clearColor];
     self.tintColor = [UIColor systemBlueColor];
-    _useLayoutSafeAreaInsets = NO;
+    // 与头文件声明的默认值保持一致（default is YES）。
+    // 按钮必须避开左右安全区：iPhone Duo（iOS 27.1 SDK）右侧有 84pt 的竖向状态栏，
+    // 若忽略，最后一个 Tab 会被盖住，并在 push/pop 转场中被裁掉一截。
+    _useLayoutSafeAreaInsets = YES;
 }
 
 #pragma mark - Setter & Getter
@@ -445,9 +456,8 @@
     if (_buttons.count != itemCount) { return; }
 
     CGFloat contentWidth = CGRectGetWidth(self.contentView.frame);
-    if (self.useLayoutSafeAreaInsets) {
-        contentWidth -= (self.safeAreaInsets.left + self.safeAreaInsets.right);
-    }
+    UIEdgeInsets horizontalInsets = [self _horizontalSafeAreaInsetsForLayout];
+    contentWidth -= (horizontalInsets.left + horizontalInsets.right);
     
 //    系统间距
 //    CGFloat margin = 2.0;
@@ -474,9 +484,7 @@
         //RTL（如阿语）下按钮从右到左排列，第 0 个 Tab 位于最右侧
         NSInteger visibleIndex = isRightToLeft ? (itemCount - 1 - i) : i;
         CGFloat buttonX = margin + visibleIndex * (buttonWidth + buttonSpace);
-        if (self.useLayoutSafeAreaInsets) {
-            buttonX += self.safeAreaInsets.left;
-        }
+        buttonX += horizontalInsets.left;
         button.frame = CGRectMake(buttonX, buttonY, buttonWidth, buttonHeight);
     }
     if ([self hasPlusButton]) {
@@ -545,6 +553,26 @@
         
 //        self.plusButton.center = CGPointMake(tabBarWidth * 0.5, tabBarHeight * multiplierOfTabBarHeight + constantOfPlusButtonCenterYOffset);
     }
+}
+
+/*!
+ * [EN] Left/right insets the buttons must stay clear of. During a FlatDesign push/pop the bar is moved into
+ *      `_CYLFlatDesignTabBarParallaxOverlayView` on the sliding page, so its own safe area changes every frame
+ *      (on iPhone Duo it leaves and re-enters the 84 pt trailing status column). The insets measured in place
+ *      are reused there, so the buttons keep their size and position for the whole transition.
+ * [CN] 按钮需要避开的左右安全区。push/pop 转场时 TabBar 被移到滑动页面上的 `_CYLFlatDesignTabBarParallaxOverlayView`，
+ *      它自身的安全区会逐帧变化（iPhone Duo 上会移出/移入右侧 84pt 的竖向状态栏）。转场中沿用 TabBar 在原位置测得的值，
+ *      保证整个转场中按钮尺寸和位置不变。
+ */
+- (UIEdgeInsets)_horizontalSafeAreaInsetsForLayout {
+    if (!self.useLayoutSafeAreaInsets) {
+        return UIEdgeInsetsZero;
+    }
+    if ([self.superview isKindOfClass:[_CYLFlatDesignTabBarParallaxOverlayView class]]) {
+        return _lastHorizontalSafeAreaInsets;
+    }
+    _lastHorizontalSafeAreaInsets = UIEdgeInsetsMake(0, self.safeAreaInsets.left, 0, self.safeAreaInsets.right);
+    return _lastHorizontalSafeAreaInsets;
 }
 
 //- (UIButton *)selectedCover {
