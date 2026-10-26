@@ -305,6 +305,10 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
             tabBarItemWidth:(CGFloat)tabBarItemWidth
                       index:(NSUInteger)index {
     if (![CYLConstants isLiquidGlassActive]) {
+        //RTL（如阿语）下镜像 x 坐标，使第 0 个 Tab 位于最右侧
+        if ([self cyl_isRightToLeftLayout]) {
+            childViewX = self.cyl_boundsSize.width - childViewX - tabBarItemWidth;
+        }
         //仅修改childView的x和宽度,yh值不变
         childView.frame = CGRectMake(childViewX,
                                      CGRectGetMinY(childView.frame),
