@@ -19,6 +19,23 @@
 @end
 @implementation CYLFlatDesignTabBarHideTabBar
 
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        // FIX: issue #662
+        // `-setHidden:` below forces the system tab bar to stay hidden, but it only runs when
+        // someone calls it. On iOS 18+ CYLTabBarController hides the system bar with
+        // `-[UITabBarController setTabBarHidden:animated:]`, which does not call it, so at launch
+        // this bar stayed visible. On iOS 27+ UIKit then reserves its height (49 pt) in the
+        // children's safe area on top of CYL's own `additionalSafeAreaInsets`, e.g.
+        // 34 (window) + 49 (system tab bar) + 49 (CYL) = 132 instead of 83. It only healed after a
+        // push/pop, when UIKit calls `-setHidden:` for `hidesBottomBarWhenPushed`.
+        // Hide it from the start so UIKit never reserves space for it.
+        [super setHidden:YES];
+    }
+    return self;
+}
+
 #pragma mark - 重写父类方法
 
 - (void)setHidden:(BOOL)hidden {
