@@ -43,8 +43,6 @@
 @implementation CYLFlatDesignTabBar {
     NSInteger _selectedItemIndex;
     NSMutableArray *_buttons;
-    UIEdgeInsets _lastLayoutSafeAreaInsets;
-    BOOL _hasLastLayoutSafeAreaInsets;
 }
 //@synthesize context = _context;
 
@@ -442,7 +440,9 @@
     }
     
     if (_shadowImageView) {
-        CGFloat shadowImageHeight = 1.0 / UIScreen.mainScreen.scale;
+        // 像素比例取自当前 trait，而非 UIScreen.mainScreen（iPhone Duo 内外屏可能不同）
+        CGFloat displayScale = self.traitCollection.displayScale > 0 ? self.traitCollection.displayScale : 1.0;
+        CGFloat shadowImageHeight = 1.0 / displayScale;
         _shadowImageView.frame = CGRectMake(0, -shadowImageHeight, CGRectGetWidth(_backgroundView.frame), shadowImageHeight);
     }
     
@@ -568,24 +568,27 @@
  *      so the bar's own `safeAreaInsets.bottom` grows from 34 to 34 + 49 = 83, the bar's whole height,
  *      and the content collapsed vertically until the bar went back to the tab bar controller's view.
  *      Its left/right insets also change every frame as the page slides (iPhone Duo's 84 pt trailing
- *      status column). While in the overlay, the insets measured in place are reused instead.
+ *      status column). While in the overlay, the insets are read live from the tab bar controller's view,
+ *      the bar's home, where it sits along the bottom edge at full width: the same insets it has in place,
+ *      always current (nothing is cached), and unaffected by the page's extra inset.
  * [CN] 用于布局内容的安全区（bottom 决定内容高度，left/right 决定按钮行）。
  *      push/pop 转场时 TabBar 被移到 `selectedViewController` 内页面视图上的 `_CYLFlatDesignTabBarParallaxOverlayView`。
  *      该页面带有 CYLTabBarController 给 `selectedViewController` 设置的底部 `additionalSafeAreaInsets`（= tabBarHeight），
  *      TabBar 自身的 `safeAreaInsets.bottom` 会从 34 变成 34 + 49 = 83（即整个 TabBar 高度），
  *      内容高度因此被压缩，直到 TabBar 回到 TabBarController 的 view 上才恢复。
  *      左右安全区也会随页面滑动逐帧变化（iPhone Duo 右侧 84pt 竖向状态栏）。
- *      位于 overlay 中时，沿用 TabBar 在原位置测得的安全区。
+ *      位于 overlay 中时，实时读取 TabBar 的原宿主 TabBarController.view 的安全区（TabBar 在其中贴底、满宽），
+ *      与原位置一致、始终最新（不缓存），且不受页面额外 inset 影响。
  */
 - (UIEdgeInsets)_safeAreaInsetsForLayout {
+    UIView *homeView = self.tabBarController.viewIfLoaded;
     BOOL isInParallaxOverlay = [self.superview isKindOfClass:[_CYLFlatDesignTabBarParallaxOverlayView class]];
-    if (isInParallaxOverlay && _hasLastLayoutSafeAreaInsets) {
-        return _lastLayoutSafeAreaInsets;
+    if (isInParallaxOverlay && homeView.window) {
+        UIEdgeInsets homeInsets = homeView.safeAreaInsets;
+        return UIEdgeInsetsMake(0, homeInsets.left, MIN(homeInsets.bottom, CGRectGetHeight(self.bounds)), homeInsets.right);
     }
     UIEdgeInsets safeAreaInsets = self.safeAreaInsets;
-    _lastLayoutSafeAreaInsets = UIEdgeInsetsMake(0, safeAreaInsets.left, safeAreaInsets.bottom, safeAreaInsets.right);
-    _hasLastLayoutSafeAreaInsets = !isInParallaxOverlay;
-    return _lastLayoutSafeAreaInsets;
+    return UIEdgeInsetsMake(0, safeAreaInsets.left, safeAreaInsets.bottom, safeAreaInsets.right);
 }
 
 //- (UIButton *)selectedCover {
