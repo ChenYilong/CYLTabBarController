@@ -734,12 +734,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     //TODO:          可以通过 [self cyl_valueForKey:@"view"]; 获得绑定的 UIControl 。
     UIControl *tabBarControl = nil;
     UIViewController *cylflatdesign_tabBarController = self.cylflatdesign_tabBarController;
-    
-    
-    if (!cylflatdesign_tabBarController) {
-        return;
-    }
-    if ([cylflatdesign_tabBarController cyl_isFlatDesignStyleTabBar]) {
+
+    // PATCH(aifirx): 原本这里在 tabBarController 为 nil 时直接 return，会跳过下面的关联对象设置。
+    // 由于 cylflatdesign_tabBarController 现在是 weak 引用（tabBarController 释放后为 nil），
+    // 这里改为：无论 tabBarController 是否存在，都必须把 tabBarItem 绑定到 self 上，
+    // 否则 controller 会拿不到自己的 item，导致 tab 图标/标题丢失。
+    if (cylflatdesign_tabBarController && [cylflatdesign_tabBarController cyl_isFlatDesignStyleTabBar]) {
         CYLTabBarController *tabBarController = (CYLTabBarController *)cylflatdesign_tabBarController;
         [tabBarController changeItem:oldItem toItem:tabBarItem];
         
