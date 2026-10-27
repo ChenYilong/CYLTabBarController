@@ -812,6 +812,39 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     return YES;
 }
 
+/*!
+ * FIX: issue #653 — plus button does not respond in the iOS 27.1 vertical bar.
+ * [EN] With a horizontal tab bar, UIKit's hit test reaches the plus button (via `-hitTest:withEvent:` above), so the
+ *      touch goes to it and its `UIControlEventTouchUpInside` actions run. In the vertical bar this tab bar's container
+ *      (`_UIBottomTabBarGroupView`) is 0 pt tall, so UIKit's hit test never reaches the plus button: the touch goes to
+ *      the placeholder tab in the vertical bar and the plus button's actions (e.g. the demo's `-clickPublish`) never run.
+ *      When that happens, send them here. Several gesture recognizers can ask during the same touch; the calls are
+ *      coalesced to one per run loop turn.
+ * [CN] 横向时系统 hitTest 能命中加号按钮（见上方 `-hitTest:withEvent:`），触摸交给加号按钮，触发其 TouchUpInside 事件。
+ *      竖向栏中本 TabBar 所在容器 `_UIBottomTabBarGroupView` 高度为 0，系统 hitTest 命中不了加号按钮，触摸落到竖向栏的占位 Tab 上，
+ *      加号按钮的点击事件（如 Demo 中的 `-clickPublish`）不会执行，这里补发。同一次触摸可能有多个手势询问，同一 run loop 内只发送一次。
+ */
+- (void)cyl_sendPlusButtonActionsIfUnreachableForGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+    CYLPlusButton *plusButton = CYLExternPlusButton;
+    UIWindow *window = self.window;
+    if (!plusButton || !window || !plusButton.enabled || !plusButton.userInteractionEnabled || plusButton.hidden) {
+        return;
+    }
+    UIView *systemHitView = [window hitTest:[gestureRecognizer locationInView:window] withEvent:nil];
+    if ([systemHitView isDescendantOfView:plusButton]) {
+        return; // UIKit delivers the touch to the plus button itself. 系统会把触摸交给加号按钮，无需补发。
+    }
+    static BOOL isSendPending = NO;
+    if (isSendPending) {
+        return;
+    }
+    isSendPending = YES;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        isSendPending = NO;
+        [plusButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    });
+}
+
 - (CYLTabBarController *)tabBarController {
     CYLTabBarController *tabBarController = self.cyl_tabBarController;
     if (self.delegate && [self.delegate isKindOfClass:[CYLTabBarController class]]) {
@@ -868,6 +901,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
                  )
             }
         }
+        [self cyl_sendPlusButtonActionsIfUnreachableForGestureRecognizer:gestureRecognizer];
         return NO;
     }
     
