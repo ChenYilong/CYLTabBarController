@@ -60,7 +60,23 @@
 CYLTabBarController 现已适配iOS27， 新增如下功能：
 <img width="1206" height="768" alt="Image" src="https://github.com/user-attachments/assets/9b6acbb4-d9dd-461e-bc3b-ea8916e97d6d" />
 
-现在适配iPhone duo，横向布局与竖向布局，请更新 CYLTabBarController 1.99.66查看 https://github.com/ChenYilong/CYLTabBarController
+现在适配iPhone duo，横向布局与竖向布局，请更新 CYLTabBarController 1.99.66查看
+
+ CYLTabBarController现已适配iOS 27 和 iPhone Duo，更新内容如下：
+
+✅支持横向布局与竖向布局
+
+✅支持扁平样式与液态玻璃样式
+
+✅所有样式均支持加号➕按钮居中显示。 
+
+✅零代码适配：已经接入CYLTabBar液态玻璃样式或扁平样式的代码，无需修改代码，更新版本即可适配iPhone duo。
+
+✅审核友好，适配代码均为纯原生公有api，无审核风险。
+
+请更新 CYLTabBarController 1.99.66查看  https://github.com/ChenYilong/CYLTabBarController 演示如下：
+
+
 
 <img width="1556" height="1080" alt="Image" src="https://github.com/user-attachments/assets/fad2a853-124f-4152-b18b-9db379077797" />
 
