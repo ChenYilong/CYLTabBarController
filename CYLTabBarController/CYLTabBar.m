@@ -644,6 +644,22 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 }
 
 /*!
+ * FIX: issue #653
+ * [EN] `view.frame` converted from its superview's coordinate space to this tab bar's; `CGRectNull` if `view` is nil.
+ * [CN] 将 `view.frame` 从其父视图坐标系转换到本 TabBar 坐标系；`view` 为 nil 时返回 `CGRectNull`。
+ */
+- (CGRect)cyl_convertFrameOfView:(UIView *)view {
+    if (!view) {
+        return CGRectNull;
+    }
+    UIView *superview = view.superview;
+    if (!superview || superview == self) {
+        return view.frame;
+    }
+    return [superview convertRect:view.frame toView:self];
+}
+
+/*!
  *  Capturing touches on a subview outside the frame of its superview.
  */
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
@@ -679,8 +695,14 @@ UISearchTab 会从 TabBar 分离出来单独显示。
             imageView = selectedTabBarButton.cyl_getActualBadgeSuperView;
         }
         
-        CGRect selectedTabBarButtonFrame = selectedTabBarButton.frame;
-        CGRect imageViewFrame = imageView.frame;
+        // FIX: issue #653 — in Liquid Glass the tab buttons live in the platter, not in this tab bar, so their `frame`
+        // is in the platter's coordinate space while `point` is in this tab bar's. On the unfolded iPhone Duo the platter
+        // is centered with a large horizontal offset, so a tap on the 2nd tab hit-tested as another tab and a repeat tap on
+        // the selected tab never called `tabBarController:didSelectControl:`. Convert both frames to this tab bar first.
+        // 液态玻璃下 Tab 按钮在 platter 内，frame 是 platter 坐标，point 是本 TabBar 坐标；iPhone Duo 展开时 platter 居中、偏移较大，
+        // 点击第 2 个 Tab 被识别为其他 Tab，导致选中状态下再次点击不回调 didSelectControl。这里先把 frame 转换到本 TabBar 坐标系。
+        CGRect selectedTabBarButtonFrame = [self cyl_convertFrameOfView:selectedTabBarButton];
+        CGRect imageViewFrame = [self cyl_convertFrameOfView:imageView];
 
         BOOL isTabBarButtonFrame = CGRectContainsPoint(selectedTabBarButtonFrame, point) || CGRectContainsPoint(imageViewFrame, point);
         if (isTabBarButtonFrame && !selectedTabBarButton.cyl_canNotResponseEvent) {
