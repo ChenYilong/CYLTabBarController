@@ -60,6 +60,11 @@
 CYLTabBarController 现已适配iOS27， 新增如下功能：
 <img width="1206" height="768" alt="Image" src="https://github.com/user-attachments/assets/9b6acbb4-d9dd-461e-bc3b-ea8916e97d6d" />
 
+现在适配iPhone duo，横向布局与竖向布局，请更新 CYLTabBarController 1.99.66查看 https://github.com/ChenYilong/CYLTabBarController
+
+<img width="1556" height="1080" alt="Image" src="https://github.com/user-attachments/assets/fad2a853-124f-4152-b18b-9db379077797" />
+
+<img width="1556" height="1080" alt="Image" src="https://github.com/user-attachments/assets/30c636a7-819c-495f-9906-eb99427a8706" />
 - ✅支持iOS27下，0代码，实现扁平风格样式。 无需新增代码， 即可继续使用UI兼容模式，如果你在iOS27下 保留 UIDesignRequiresCompatibility 字段， CYLTabBarController 将会检测该字段， 如果为True，将切换至UI扁平设计样式。iOS27之前， UIDesignRequiresCompatibi字段， 维持系统逻辑。以此实现0代码，切换到扁平风格样式。
 - ✅UI扁平风格作为独立组件集成， 插件化集成， 若仅需液态玻璃效果， 则可实现更低耦合，更小包体积。
 - ✅1比1实现系统扁平风格样式，API接口完全与液态玻璃样式共享， 仅需修改样式属性，即可实现样式切换。
