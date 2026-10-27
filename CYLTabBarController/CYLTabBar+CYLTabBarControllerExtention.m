@@ -546,12 +546,19 @@
          }
     }
     
-    // 5️⃣ 按视觉顺序排序（x 轴）
+    // 5️⃣ 按视觉顺序排序（x 轴；竖向栏中 x 相同，再按 y 轴）
+    // FIX: issue #653 — in the iOS 27.1 vertical bar (folded iPhone Duo) every tab button has the same x,
+    // so ties are ordered top to bottom. 竖向栏中所有按钮 x 相同，按从上到下排序。
     [itemViews sortUsingComparator:^NSComparisonResult(UIView *a, UIView *b) {
-        if (CGRectGetMinX(a.frame) < CGRectGetMinX(b.frame)) {
-            return NSOrderedAscending;
+        CGFloat dx = CGRectGetMinX(a.frame) - CGRectGetMinX(b.frame);
+        if (fabs(dx) >= 0.5) {
+            return dx < 0 ? NSOrderedAscending : NSOrderedDescending;
         }
-        return NSOrderedDescending;
+        CGFloat dy = CGRectGetMinY(a.frame) - CGRectGetMinY(b.frame);
+        if (fabs(dy) >= 0.5) {
+            return dy < 0 ? NSOrderedAscending : NSOrderedDescending;
+        }
+        return NSOrderedSame;
     }];
     
 #if defined(DEBUG) || defined(BETA)

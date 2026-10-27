@@ -513,6 +513,29 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         //FIXME:  to delete 液态玻璃暂时不支持自定义PlusButton位置。
 //        [self.plusButton cyl_setTabBarItemVisibleIndex:CYLPlusButtonIndex];
         
+        // FIX: issue #653 — iOS 27.1 vertical bar (folded iPhone Duo, `allowsVerticalBar = YES`).
+        // [EN] The system moves the tab buttons out of this bar into a vertical bar on the trailing edge, while the
+        //      plus button stays here. Centre it on its placeholder tab button instead of the horizontal position.
+        // [CN] 系统把 Tab 按钮移出本 TabBar，放进右侧竖向栏，而加号按钮仍在本 TabBar 上，需对齐到它的占位 Tab 按钮中心。
+        UIView *verticalBarSlot = [self cyl_verticalBarTabButtonAtIndex:plusButtonIndex];
+        if (verticalBarSlot) {
+            CGPoint slotCenter = [verticalBarSlot.superview convertPoint:verticalBarSlot.center toView:self];
+            if (!CGPointEqualToPoint(self.plusButton.center, slotCenter)) {
+                [CATransaction begin];
+                [CATransaction setDisableActions:YES];
+                self.plusButton.center = slotCenter;
+                [CATransaction commit];
+                // The vertical bar may lay out its buttons after this pass; check again on the next run loop.
+                // 竖向栏可能在本次布局之后才排好按钮，下一个 run loop 再校正一次（位置不变时不会再次触发）。
+                __weak typeof(self) weakSelf = self;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf setNeedsLayout];
+                });
+            }
+            [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
+            return plusButtonIndex;
+        }
+        
         UIView *platterView = self.cyl_contentView;
         
         // 系统默认参数
@@ -555,6 +578,25 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
 
     return plusButtonIndex;
+}
+
+/*!
+ * FIX: issue #653
+ * [EN] The tab button at `index` when the system shows the tab buttons in the iOS 27.1 vertical bar, i.e. when the
+ *      platter is no longer inside this tab bar; nil otherwise.
+ * [CN] iOS 27.1 竖向栏中（platter 已不在本 TabBar 内）第 `index` 个 Tab 按钮；其他情况返回 nil。
+ */
+- (UIView *)cyl_verticalBarTabButtonAtIndex:(NSUInteger)index {
+    UIView *platterView = self.cyl_platterView;
+    if (!platterView || !platterView.window || platterView.window != self.window || [platterView isDescendantOfView:self]) {
+        return nil;
+    }
+    NSArray<UIControl *> *tabButtons = [self cyl_tabBarSubviews];
+    if (index == NSNotFound || index >= tabButtons.count) {
+        return nil;
+    }
+    UIView *tabButton = tabButtons[index];
+    return [tabButton isDescendantOfView:platterView] ? tabButton : nil;
 }
 
 - (void)setupTabImageViewDefaultOffset:(UIView *)tabBarButton {

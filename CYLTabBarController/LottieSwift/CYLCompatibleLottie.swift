@@ -411,11 +411,12 @@ public final class CYLCompatibleLOTAnimationView: UIView {
     }
     
     private func setUpViews() {
-        animationView.translatesAutoresizingMaskIntoConstraints = false
+        // FIX: issue #653 — fill with an autoresizing mask instead of edge constraints. This view sits inside a tab
+        // button; any constraint there pulls the tab bar platter into Auto Layout, and on iOS 27.1 the vertical bar
+        // (folded iPhone Duo) then stretches the platter over the content.
+        animationView.translatesAutoresizingMaskIntoConstraints = true
+        animationView.frame = bounds
+        animationView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         addSubview(animationView)
-        animationView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        animationView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        animationView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        animationView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
 }
