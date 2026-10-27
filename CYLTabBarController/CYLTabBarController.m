@@ -2562,6 +2562,41 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
 }
 
 
+#pragma mark - Vertical bar (iOS 27.1+, iPhone Duo)
+// MARK: Vertical bar
+
+/*!
+ * FIX: issue #653
+ * [EN] On the folded iPhone Duo, iOS 27.1 moves bar content to a vertical bar on the trailing edge.
+ *      CYLTabBarController's tab bar is laid out for the bottom edge only, so it is kept horizontal
+ *      unless `allowsVerticalBar` is YES. Returning nil from the child getter stops UITabBarController
+ *      from forwarding the choice to the selected view controller (whose default is Automatic).
+ * [CN] iPhone Duo 折叠时，iOS 27.1 会把栏内容放到右侧竖向栏。CYLTabBarController 的 TabBar 只按底部横向布局，
+ *      因此除非 `allowsVerticalBar` 为 YES，否则保持横向。子控制器 getter 返回 nil，
+ *      避免 UITabBarController 把决定权转交给选中的子控制器（其默认值为 Automatic）。
+ */
+- (void)setAllowsVerticalBar:(BOOL)allowsVerticalBar {
+    if (_allowsVerticalBar == allowsVerticalBar) { return; }
+    _allowsVerticalBar = allowsVerticalBar;
+#if defined(__IPHONE_27_1) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_27_1
+    if (@available(iOS 27.1, *)) {
+        [self setNeedsUpdateOfVerticalBarConfiguration];
+    }
+#endif
+}
+
+#if defined(__IPHONE_27_1) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_27_1
+- (UIVerticalBarBehavior)preferredVerticalBarBehavior API_AVAILABLE(ios(27.1)) {
+    if (self.allowsVerticalBar) { return [super preferredVerticalBarBehavior]; }
+    return UIVerticalBarBehaviorDisabled;
+}
+
+- (UIViewController *)childViewControllerForPreferredVerticalBarBehavior API_AVAILABLE(ios(27.1)) {
+    if (self.allowsVerticalBar) { return [super childViewControllerForPreferredVerticalBarBehavior]; }
+    return nil;
+}
+#endif
+
 #pragma mark - UIContentContainer
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {

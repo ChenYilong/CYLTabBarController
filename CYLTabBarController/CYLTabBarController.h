@@ -339,6 +339,24 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  * @attention better switch to property CYLTabBarStyleType
  */
 @property (nonatomic, assign) BOOL noNeedUIDesignCompatibility;
+
+/*!
+ * FIX: issue #653 (iPhone Duo, iOS 27.1+)
+ * [EN] Whether the system may move the bars to the vertical edge (the "vertical bar") on devices that support it,
+ *      such as the folded iPhone Duo. Defaults to NO: CYLTabBarController returns `UIVerticalBarBehaviorDisabled`,
+ *      so the tab bar stays at the bottom and the status bar stays horizontal. The custom tab bar (plus button,
+ *      Lottie items, FlatDesign bar) is laid out for a horizontal bar only; when the system moved it to the
+ *      vertical edge, the Liquid Glass bar became a tall panel over the content and the FlatDesign bar shrank
+ *      during push/pop. Set to YES to let the selected view controller decide (system default behaviour).
+ *      No effect below iOS 27.1 or when built with an SDK older than iOS 27.1.
+ * [CN] 是否允许系统把导航栏/TabBar 放到竖向边缘（竖向栏，如 iPhone Duo 折叠状态）。默认 NO：
+ *      CYLTabBarController 返回 `UIVerticalBarBehaviorDisabled`，TabBar 保持在底部，状态栏保持横向。
+ *      自定义 TabBar（加号按钮、Lottie、扁平 TabBar）只按横向布局；被系统放到竖向边缘时，
+ *      液态玻璃 TabBar 会变成盖住内容的竖长面板，扁平 TabBar 在 push/pop 时会变矮。
+ *      设为 YES 则交给当前选中的控制器决定（系统默认行为）。iOS 27.1 以下或使用 iOS 27.1 以下 SDK 编译时无效。
+ */
+@property (nonatomic, assign) BOOL allowsVerticalBar;
+
 @property (nonatomic, assign, getter=isLottieViewAdded, readonly) BOOL lottieViewAdded;
 
 @property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs;
