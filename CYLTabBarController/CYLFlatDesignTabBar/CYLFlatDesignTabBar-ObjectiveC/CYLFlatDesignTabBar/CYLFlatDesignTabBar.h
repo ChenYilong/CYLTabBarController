@@ -68,7 +68,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, strong) UIImage *shadowImage UI_APPEARANCE_SELECTOR;
 
 /* default is YES.
-    当横屏时左右两边是否使用安全区域
+    按钮是否避开左右安全区域（横屏刘海、iPhone Duo 右侧竖向状态栏）。背景始终铺满整个宽度。
+    [EN] Whether the buttons stay clear of the left/right safe area (landscape notch, the iPhone Duo's
+    trailing status column). The background always spans the full width.
  */
 @property (nonatomic, assign) BOOL useLayoutSafeAreaInsets UI_APPEARANCE_SELECTOR;
 

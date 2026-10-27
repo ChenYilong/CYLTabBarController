@@ -2908,20 +2908,87 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         if (!_parallaxOverlayView) {
             _parallaxOverlayView = [[_CYLFlatDesignTabBarParallaxOverlayView alloc] initWithFrame:superview.bounds];
         }
+        _parallaxOverlayView.frame = superview.bounds;
         [superview addSubview:_parallaxOverlayView];
         [superview bringSubviewToFront:_parallaxOverlayView];
         
         if (self.cyl_tabBar.superview != _parallaxOverlayView) {
-            if (!_tabBarIsAnimating) {
-                self.cyl_tabBar.frame = self.tabBarFrame;
-            }
-            self.cyl_tabBar.hidden = NO;
-            [_parallaxOverlayView addSubview:self.cyl_tabBar];
+            // FIX: issue #662 (PR #665)
+            // This runs inside the navigation transition's animation block; re-parenting and
+            // re-positioning must not be animated, or the bar visibly slides into place.
+            [UIView performWithoutAnimation:^{
+                [self->_parallaxOverlayView addSubview:self.cyl_tabBar];
+                if (!self->_tabBarIsAnimating) {
+                    self.cyl_tabBar.frame = [self _tabBarFrameInParallaxOverlayView:self->_parallaxOverlayView];
+                }
+                self.cyl_tabBar.hidden = NO;
+            }];
+#if defined(DEBUG) || defined(BETA)
+            [self _logTabBarClippingInParallaxOverlay];
+#endif
         }
 #else
 #endif
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
 }
+
+/// FIX: issue #662 (push/pop follow-up, PR #665): tab bar shrinks/jumps during push and pop.
+/// `tabBarFrame` is expressed in `self.view`'s coordinate space, but during a push/pop the tab bar is
+/// moved into `_parallaxOverlayView`, which lives inside the child view controller's view. That view
+/// does not always share `self.view`'s geometry: with an opaque navigation bar
+/// (e.g. `edgesForExtendedLayout = UIRectEdgeNone`, a non-translucent bar, or libraries such as
+/// HBDNavigationBar) it starts below the navigation bar and is shorter. Using `tabBarFrame` unchanged
+/// placed the bar too low by the navigation bar height, so it was partly or fully off screen during the
+/// transition and then snapped back when it returned to `self.view`.
+/// Only the vertical position is converted; the horizontal position stays relative to the child's view
+/// so the bar keeps moving with it (the parallax effect).
+- (CGRect)_tabBarFrameInParallaxOverlayView:(UIView *)overlayView {
+    CGRect frame = self.tabBarFrame;
+    if (overlayView.window && overlayView.window == self.view.window) {
+        frame.origin.y = [self.view convertPoint:CGPointMake(0, CGRectGetMinY(frame)) toView:overlayView].y;
+    }
+    // Otherwise the two views cannot be related yet; keep the previous behaviour.
+    return frame;
+}
+
+#if defined(DEBUG) || defined(BETA)
+/*!
+ * FIX: issue #662 (PR #665) — DEBUG diagnostic, not a fix.
+ * [EN] Reported on iPhone Duo: folded (outer display, 466 × 678, 84 pt trailing status column), the tab bar
+ *      still looks shorter during push/pop and then recovers; unfolded (inner display) it is fine.
+ *      The bar's frame and its content height are the same in both poses on this branch, so a folded-only
+ *      shrink points to a view *above* the bar clipping it (clipsToBounds or a layer mask) while it rides
+ *      the sliding page. This logs the first such ancestor, once per transition, so the cause can be fixed.
+ * [CN] iPhone Duo 反馈：折叠状态（外屏 466 × 678，右侧 84pt 竖向状态栏）push/pop 时 TabBar 仍会变矮后恢复；
+ *      展开状态（内屏）正常。本分支上 TabBar 的 frame 与内容高度在两种状态下一致，
+ *      因此只在折叠时出现的变矮，指向 TabBar 的某个祖先视图在转场中把它裁掉（clipsToBounds 或 layer.mask）。
+ *      此处在每次转场打印第一个裁切 TabBar 的祖先视图，便于定位并修复。
+ */
+- (void)_logTabBarClippingInParallaxOverlay {
+    UIView *tabBar = self.cyl_tabBar;
+    UIWindow *window = tabBar.window;
+    if (!window) { return; }
+    CGRect tabBarInWindow = [tabBar convertRect:tabBar.bounds toView:window];
+    for (UIView *ancestor = tabBar.superview; ancestor && ancestor != window; ancestor = ancestor.superview) {
+        CALayer *maskLayer = ancestor.layer.mask;
+        if (!ancestor.clipsToBounds && !maskLayer) { continue; }
+        CGRect clipRect = maskLayer ? [ancestor.layer convertRect:maskLayer.frame toLayer:window.layer]
+                                    : [ancestor convertRect:ancestor.bounds toView:window];
+        CGRect visibleRect = CGRectIntersection(tabBarInWindow, clipRect);
+        if (CGRectGetHeight(visibleRect) < CGRectGetHeight(tabBarInWindow) - 0.5) {
+            NSLog(@"🟠[CYL #662] tab bar clipped vertically by %@ (%@): tabBar=%@ clip=%@ visibleHeight=%.1f window=%@ windowSafe=%@",
+                  NSStringFromClass(ancestor.class),
+                  maskLayer ? @"layer.mask" : @"clipsToBounds",
+                  NSStringFromCGRect(tabBarInWindow),
+                  NSStringFromCGRect(clipRect),
+                  CGRectGetHeight(visibleRect),
+                  NSStringFromCGRect(window.bounds),
+                  NSStringFromUIEdgeInsets(window.safeAreaInsets));
+            return;
+        }
+    }
+}
+#endif
 
 - (void)_updateAdditionalSafeAreaInsetsWithAnimated:(BOOL)animated {
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
