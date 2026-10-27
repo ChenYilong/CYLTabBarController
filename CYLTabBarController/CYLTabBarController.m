@@ -2562,6 +2562,43 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
 }
 
 
+#pragma mark - Vertical bar (iOS 27.1+, iPhone Duo)
+// MARK: Vertical bar
+
+/*!
+ * FIX: issue #653
+ * [EN] On the folded iPhone Duo, iOS 27.1 can move bar content to a vertical bar on the trailing edge.
+ *      `allowsVerticalBar` (default NO) is a convenience switch for UIKit's `preferredVerticalBarBehavior`:
+ *      NO keeps the tab bar horizontal; YES restores the system default. Returning nil from the child getter
+ *      when NO stops UITabBarController from forwarding the choice to the selected view controller (whose default
+ *      is Automatic). Unrelated to `sidebar.preferredPlacement` (tab bar vs. iPad-style sidebar, regular width).
+ * [CN] iPhone Duo 折叠时，iOS 27.1 可能把栏内容放到右侧竖向栏。`allowsVerticalBar`（默认 NO）是 UIKit
+ *      `preferredVerticalBarBehavior` 的便捷开关：NO 保持 TabBar 横向；YES 恢复系统默认行为。为 NO 时子控制器 getter 返回 nil，
+ *      避免 UITabBarController 把决定权转交给选中的子控制器（其默认值为 Automatic）。
+ *      与 `sidebar.preferredPlacement`（regular 宽度下 TabBar 与 iPad 式侧边栏之间的选择）无关。
+ */
+- (void)setAllowsVerticalBar:(BOOL)allowsVerticalBar {
+    if (_allowsVerticalBar == allowsVerticalBar) { return; }
+    _allowsVerticalBar = allowsVerticalBar;
+#if defined(__IPHONE_27_1) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_27_1
+    if (@available(iOS 27.1, *)) {
+        [self setNeedsUpdateOfVerticalBarConfiguration];
+    }
+#endif
+}
+
+#if defined(__IPHONE_27_1) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_27_1
+- (UIVerticalBarBehavior)preferredVerticalBarBehavior API_AVAILABLE(ios(27.1)) {
+    if (self.allowsVerticalBar) { return [super preferredVerticalBarBehavior]; }
+    return UIVerticalBarBehaviorDisabled;
+}
+
+- (UIViewController *)childViewControllerForPreferredVerticalBarBehavior API_AVAILABLE(ios(27.1)) {
+    if (self.allowsVerticalBar) { return [super childViewControllerForPreferredVerticalBarBehavior]; }
+    return nil;
+}
+#endif
+
 #pragma mark - UIContentContainer
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {

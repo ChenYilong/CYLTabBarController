@@ -13,6 +13,10 @@
 #import "CYLMainRootViewController.h"
 #import <MJRefresh/MJRefresh.h>
 
+@interface CYLHomeViewController ()
+@property (nonatomic, strong) id<UIInteraction> bottomEdgeInteraction;
+@end
+
 @implementation CYLHomeViewController 
 
 #pragma mark - View lifecycle
@@ -65,10 +69,28 @@
             interaction.scrollView = self.tableView;
             interaction.edge = UIRectEdgeBottom;
             [self.cyl_tabBarController.tabBar addInteraction:interaction];
+            self.bottomEdgeInteraction = interaction;
         } else {
             // Fallback on earlier versions
         }
         }
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    if (@available(iOS 26.0, *)) {
+        // FIX: issue #653 — on iOS 27.1 the folded iPhone Duo can show the tab bar as a vertical bar
+        // (`allowsVerticalBar = YES`). The tab bar is then a full-height column on the trailing edge, so a
+        // bottom-edge effect tied to it would blur the whole list. Only use it while the tab bar is horizontal.
+        // iPhone Duo 折叠且 TabBar 为竖向栏时，TabBar 是整列高度，底部边缘效果会把整个列表模糊掉，因此只在横向时启用。
+        UIScrollEdgeElementContainerInteraction *interaction = (UIScrollEdgeElementContainerInteraction *)self.bottomEdgeInteraction;
+        CGSize tabBarSize = self.cyl_tabBarController.tabBar.bounds.size;
+        BOOL isVerticalTabBar = tabBarSize.height > tabBarSize.width;
+        UIScrollView *scrollView = isVerticalTabBar ? nil : self.tableView;
+        if (interaction && interaction.scrollView != scrollView) {
+            interaction.scrollView = scrollView;
+        }
+    }
 }
 
 - (void)refresh {

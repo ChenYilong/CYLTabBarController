@@ -270,7 +270,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     selectedContentView.contentMode = UIViewContentModeCenter;
     selectedContentView.imageView.contentMode = UIViewContentModeScaleAspectFit;
     
-    selectedContentView.translatesAutoresizingMaskIntoConstraints = NO;
+    // FIX: issue #653 — placed by frame (see `_CYLTabButtonLayoutTracker`), not by Auto Layout.
+    selectedContentView.translatesAutoresizingMaskIntoConstraints = YES;
     selectedContentView.userInteractionEnabled = false;
     [selectedContentView sizeToFit];
     if (NO == self.cyl_userInteractionDisabled) {

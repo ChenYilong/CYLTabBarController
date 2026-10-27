@@ -47,6 +47,21 @@
  */
 - (NSComparator)cyl_tabBarButtonComparator {
     BOOL isRightToLeft = [self cyl_isRightToLeftLayout];
+    // FIX: issue #653 — in the iOS 27.1 vertical bar the tab buttons are no longer inside this tab bar and are
+    // stacked top to bottom: order them by their vertical centre in window coordinates (the plus button stays
+    // in this tab bar, so a shared coordinate space is needed).
+    // 竖向栏中 Tab 按钮不在本 TabBar 内且从上到下排列：按窗口坐标系中的垂直中心排序（加号按钮仍在本 TabBar 上，需统一坐标系）。
+    UIView *platterView = self.cyl_platterView;
+    BOOL isVerticalBar = platterView.window && platterView.window == self.window && ![platterView isDescendantOfView:self]
+                         && CGRectGetHeight(platterView.bounds) > CGRectGetWidth(platterView.bounds);
+    if (isVerticalBar) {
+        return ^NSComparisonResult(UIView * formerView, UIView * latterView) {
+            CGFloat formerViewY = [formerView convertPoint:CGPointMake(CGRectGetMidX(formerView.bounds), CGRectGetMidY(formerView.bounds)) toView:nil].y;
+            CGFloat latterViewY = [latterView convertPoint:CGPointMake(CGRectGetMidX(latterView.bounds), CGRectGetMidY(latterView.bounds)) toView:nil].y;
+            if (fabs(formerViewY - latterViewY) < 0.5) { return NSOrderedSame; }
+            return (formerViewY < latterViewY) ? NSOrderedAscending : NSOrderedDescending;
+        };
+    }
     return ^NSComparisonResult(UIView * formerView, UIView * latterView) {
         CGFloat formerViewX = formerView.frame.origin.x;
         CGFloat latterViewX = latterView.frame.origin.x;
@@ -546,8 +561,20 @@
          }
     }
     
-    // 5️⃣ 按视觉顺序排序（x 轴）
+    // 5️⃣ 按视觉顺序排序（横向栏按 x 轴；竖向栏按 y 轴）
+    // FIX: issue #653 — in the iOS 27.1 vertical bar (folded iPhone Duo) the buttons are stacked top to bottom.
+    // Sort them by their vertical centre: while the selection lens animates, the touched button widens
+    // (e.g. x 396 → 386, width 44 → 64), so sorting by x would move it to the front and shift every index
+    // (the selected copy of another tab then got the plus cover and lost its icon).
+    // 竖向栏中按钮从上到下排列，按垂直中心排序：选中玻璃动画时被按下的按钮会变宽、x 变小，
+    // 若按 x 排序会被排到最前，导致索引错位（其他 Tab 的选中副本被加上加号遮罩、图标消失）。
+    BOOL isVerticalBar = CGRectGetHeight(contentView.bounds) > CGRectGetWidth(contentView.bounds);
     [itemViews sortUsingComparator:^NSComparisonResult(UIView *a, UIView *b) {
+        if (isVerticalBar) {
+            CGFloat dy = CGRectGetMidY(a.frame) - CGRectGetMidY(b.frame);
+            if (fabs(dy) < 0.5) { return NSOrderedSame; }
+            return dy < 0 ? NSOrderedAscending : NSOrderedDescending;
+        }
         if (CGRectGetMinX(a.frame) < CGRectGetMinX(b.frame)) {
             return NSOrderedAscending;
         }

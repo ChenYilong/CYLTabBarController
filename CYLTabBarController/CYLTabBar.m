@@ -513,6 +513,29 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         //FIXME:  to delete 液态玻璃暂时不支持自定义PlusButton位置。
 //        [self.plusButton cyl_setTabBarItemVisibleIndex:CYLPlusButtonIndex];
         
+        // FIX: issue #653 — iOS 27.1 vertical bar (folded iPhone Duo, `allowsVerticalBar = YES`).
+        // [EN] The system moves the tab buttons out of this bar into a vertical bar on the trailing edge, while the
+        //      plus button stays here. Centre it on its placeholder tab button instead of the horizontal position.
+        // [CN] 系统把 Tab 按钮移出本 TabBar，放进右侧竖向栏，而加号按钮仍在本 TabBar 上，需对齐到它的占位 Tab 按钮中心。
+        UIView *verticalBarSlot = [self cyl_verticalBarTabButtonAtIndex:plusButtonIndex];
+        if (verticalBarSlot) {
+            CGPoint slotCenter = [verticalBarSlot.superview convertPoint:verticalBarSlot.center toView:self];
+            if (!CGPointEqualToPoint(self.plusButton.center, slotCenter)) {
+                [CATransaction begin];
+                [CATransaction setDisableActions:YES];
+                self.plusButton.center = slotCenter;
+                [CATransaction commit];
+                // The vertical bar may lay out its buttons after this pass; check again on the next run loop.
+                // 竖向栏可能在本次布局之后才排好按钮，下一个 run loop 再校正一次（位置不变时不会再次触发）。
+                __weak typeof(self) weakSelf = self;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf setNeedsLayout];
+                });
+            }
+            [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
+            return plusButtonIndex;
+        }
+        
         UIView *platterView = self.cyl_contentView;
         
         // 系统默认参数
@@ -555,6 +578,43 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
 
     return plusButtonIndex;
+}
+
+/*!
+ * FIX: issue #653
+ * [EN] The tab button at `index` when the system shows the tab buttons in the iOS 27.1 vertical bar, i.e. when the
+ *      platter is no longer inside this tab bar; nil otherwise.
+ * [CN] iOS 27.1 竖向栏中（platter 已不在本 TabBar 内）第 `index` 个 Tab 按钮；其他情况返回 nil。
+ */
+- (UIView *)cyl_verticalBarTabButtonAtIndex:(NSUInteger)index {
+    UIView *platterView = self.cyl_platterView;
+    if (!platterView || !platterView.window || platterView.window != self.window || [platterView isDescendantOfView:self]) {
+        return nil;
+    }
+    NSArray<UIControl *> *tabButtons = [self cyl_tabBarSubviews];
+    if (index == NSNotFound || index >= tabButtons.count) {
+        return nil;
+    }
+    UIView *tabButton = tabButtons[index];
+    return [tabButton isDescendantOfView:platterView] ? tabButton : nil;
+}
+
+/*!
+ * FIX: issue #653
+ * [EN] The tab button (normal layer) under `windowPoint` while the tab buttons are shown in the iOS 27.1 vertical bar; nil otherwise.
+ * [CN] iOS 27.1 竖向栏中，位于 `windowPoint`（窗口坐标）下的 Tab 按钮（常态图层）；其他情况返回 nil。
+ */
+- (UIControl *)cyl_verticalBarTabButtonAtWindowPoint:(CGPoint)windowPoint {
+    if (![self cyl_verticalBarTabButtonAtIndex:0]) {
+        return nil;
+    }
+    for (UIControl *tabButton in [self cyl_tabBarSubviews]) {
+        CGPoint point = [tabButton convertPoint:windowPoint fromView:nil];
+        if ([tabButton pointInside:point withEvent:nil]) {
+            return tabButton;
+        }
+    }
+    return nil;
 }
 
 - (void)setupTabImageViewDefaultOffset:(UIView *)tabBarButton {
@@ -682,12 +742,107 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     if ([gestureRecognizer cyl_isContinuousGestureRecognizer]) {
         self.liquidGlassContinuousGestureRecognizer = gestureRecognizer;
         gestureRecognizer.delegate = self;
+        [gestureRecognizer addTarget:self action:@selector(cyl_liquidGlassGestureRecognizerDidUpdate:)];
     }
     if ([gestureRecognizer cyl_isLongGestureRecognizer]) {
         self.liquidGlassLongGestureRecognizer = gestureRecognizer;
         gestureRecognizer.delegate = self;
+        [gestureRecognizer addTarget:self action:@selector(cyl_liquidGlassGestureRecognizerDidUpdate:)];
     }
     [super addGestureRecognizer:gestureRecognizer];
+}
+
+/*!
+ * FIX: issue #653 — plus button hidden while pressing or dragging in the iOS 27.1 vertical bar.
+ * [EN] While a tab is pressed or dragged, UIKit shows a lifted copy of the tab platter in a portal view. With a
+ *      horizontal tab bar that portal is added to this tab bar, below the plus button. In the vertical bar it is added
+ *      to the tab bar controller's container view, above the branch that holds this tab bar, so it covered the plus
+ *      button (only the plus cover in the selected layer stayed visible). Keep such portal views just below that branch.
+ * [CN] 按住或拖拽 Tab 时，系统用 portal 视图显示抬起的 platter 副本。横向时该 portal 加在本 TabBar 上、位于加号按钮之下；
+ *      竖向栏中它被加到 TabBarController 的容器视图上，位于本 TabBar 所在分支之上，遮住了加号按钮（只剩选中图层里的加号遮罩）。
+ *      这里把这类 portal 视图移到该分支下方。
+ */
+- (void)cyl_liquidGlassGestureRecognizerDidUpdate:(UIGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state != UIGestureRecognizerStateBegan && gestureRecognizer.state != UIGestureRecognizerStateChanged) {
+        return;
+    }
+    if (![self cyl_keepPlusButtonAbovePortalViewsInVerticalBar] || gestureRecognizer.state != UIGestureRecognizerStateBegan) {
+        return;
+    }
+    // The portal is added by the lift animation, slightly after the gesture begins, and a finger held still sends no
+    // further updates: keep checking while the gesture is active. 抬起动画稍后才添加 portal，手指不动时没有后续回调，因此手势进行中持续检查。
+    [self cyl_keepPlusButtonAbovePortalViewsWhileGestureIsActive:gestureRecognizer];
+}
+
+- (void)cyl_keepPlusButtonAbovePortalViewsWhileGestureIsActive:(UIGestureRecognizer *)gestureRecognizer {
+    __weak typeof(self) weakSelf = self;
+    __weak UIGestureRecognizer *weakGestureRecognizer = gestureRecognizer;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        UIGestureRecognizer *strongGestureRecognizer = weakGestureRecognizer;
+        if (!strongSelf || !strongGestureRecognizer) {
+            return;
+        }
+        [strongSelf cyl_keepPlusButtonAbovePortalViewsInVerticalBar];
+        UIGestureRecognizerState state = strongGestureRecognizer.state;
+        if (state == UIGestureRecognizerStateBegan || state == UIGestureRecognizerStateChanged) {
+            [strongSelf cyl_keepPlusButtonAbovePortalViewsWhileGestureIsActive:strongGestureRecognizer];
+        }
+    });
+}
+
+/// Returns NO when there is nothing to do (no plus button, or the tab buttons are not in the vertical bar).
+- (BOOL)cyl_keepPlusButtonAbovePortalViewsInVerticalBar {
+    if (!self.plusButton.superview || ![self cyl_verticalBarTabButtonAtIndex:0]) {
+        return NO;
+    }
+    UIView *rootView = self.tabBarController.viewIfLoaded;
+    for (UIView *child = self, *parent = self.superview; parent; child = parent, parent = parent.superview) {
+        for (UIView *sibling in [parent.subviews copy]) {
+            NSUInteger childIndex = [parent.subviews indexOfObject:child];
+            NSUInteger siblingIndex = [parent.subviews indexOfObject:sibling];
+            if (siblingIndex != NSNotFound && childIndex != NSNotFound && siblingIndex > childIndex && [sibling cyl_isPlatterPortalView]) {
+                [parent insertSubview:sibling belowSubview:child];
+            }
+        }
+        if (parent == rootView || parent == self.window) {
+            break;
+        }
+    }
+    return YES;
+}
+
+/*!
+ * FIX: issue #653 — plus button does not respond in the iOS 27.1 vertical bar.
+ * [EN] With a horizontal tab bar, UIKit's hit test reaches the plus button (via `-hitTest:withEvent:` above), so the
+ *      touch goes to it and its `UIControlEventTouchUpInside` actions run. In the vertical bar this tab bar's container
+ *      (`_UIBottomTabBarGroupView`) is 0 pt tall, so UIKit's hit test never reaches the plus button: the touch goes to
+ *      the placeholder tab in the vertical bar and the plus button's actions (e.g. the demo's `-clickPublish`) never run.
+ *      When that happens, send them here. Several gesture recognizers can ask during the same touch; the calls are
+ *      coalesced to one per run loop turn.
+ * [CN] 横向时系统 hitTest 能命中加号按钮（见上方 `-hitTest:withEvent:`），触摸交给加号按钮，触发其 TouchUpInside 事件。
+ *      竖向栏中本 TabBar 所在容器 `_UIBottomTabBarGroupView` 高度为 0，系统 hitTest 命中不了加号按钮，触摸落到竖向栏的占位 Tab 上，
+ *      加号按钮的点击事件（如 Demo 中的 `-clickPublish`）不会执行，这里补发。同一次触摸可能有多个手势询问，同一 run loop 内只发送一次。
+ */
+- (void)cyl_sendPlusButtonActionsIfUnreachableForGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+    CYLPlusButton *plusButton = CYLExternPlusButton;
+    UIWindow *window = self.window;
+    if (!plusButton || !window || !plusButton.enabled || !plusButton.userInteractionEnabled || plusButton.hidden) {
+        return;
+    }
+    UIView *systemHitView = [window hitTest:[gestureRecognizer locationInView:window] withEvent:nil];
+    if ([systemHitView isDescendantOfView:plusButton]) {
+        return; // UIKit delivers the touch to the plus button itself. 系统会把触摸交给加号按钮，无需补发。
+    }
+    static BOOL isSendPending = NO;
+    if (isSendPending) {
+        return;
+    }
+    isSendPending = YES;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        isSendPending = NO;
+        [plusButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    });
 }
 
 - (CYLTabBarController *)tabBarController {
@@ -706,6 +861,13 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     }
     CGPoint location = [gestureRecognizer locationInView:self];
     UIView *hitView = [self hitTest:location withEvent:nil];
+    if (!hitView) {
+        // FIX: issue #653 — in the iOS 27.1 vertical bar the tab buttons are outside this tab bar, so the hit test
+        // above finds nothing and a tap on the already selected tab never reached `-tabChangedToControl:`
+        // (no `tabBarController:didSelectControl:` callback). Look the tab button up under the touch instead.
+        // 竖向栏中 Tab 按钮不在本 TabBar 内，上面的 hitTest 为 nil，导致选中状态下再次点击不回调 didSelectControl，这里按触摸点查找 Tab 按钮。
+        hitView = [self cyl_verticalBarTabButtonAtWindowPoint:[gestureRecognizer locationInView:nil]];
+    }
     SEL actin = @selector(tabChangedToControl:);
     CYLTabBarController *tabBarController = [self tabBarController];
     if ([self cyl_shouldUpdateHiddenStatueForPlusButtonLabel] && [hitView isKindOfClass:[CYLPlusButton class]] && [tabBarController.selectedViewController isEqual:CYLPlusChildViewController]) {
@@ -739,6 +901,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
                  )
             }
         }
+        [self cyl_sendPlusButtonActionsIfUnreachableForGestureRecognizer:gestureRecognizer];
         return NO;
     }
     

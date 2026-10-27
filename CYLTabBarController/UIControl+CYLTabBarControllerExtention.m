@@ -30,6 +30,87 @@
 #import "UITabBarItem+CYLTabBarControllerExtention.h"
 #import "CYLPlusButton.h"
 
+/*!
+ * FIX: issue #653 (iPhone Duo, vertical bar)
+ * [EN] Keeps views that CYL adds to a tab button (Lottie icon, selected cover, badge point) at a point
+ *      derived from the button's own subviews, using frames instead of Auto Layout.
+ *      Any constraint inside a tab button pulls the whole tab bar platter into Auto Layout. On iOS 27.1,
+ *      when the system moves the tab bar to the vertical bar (folded iPhone Duo with `allowsVerticalBar = YES`),
+ *      the platter is hosted by a SwiftUI toolbar that then sizes it to the whole free area (a tall panel
+ *      over the content) instead of its natural size.
+ *      The tracker fills the tab button (flexible width and height), so its `-layoutSubviews` runs whenever the
+ *      button is resized, e.g. when it moves between the horizontal and the vertical bar, and re-centres the views.
+ * [CN] 让 CYL 添加到 Tab 按钮上的视图（Lottie 图标、选中遮罩、红点）用 frame 跟随按钮内的参照视图，不再使用 Auto Layout。
+ *      Tab 按钮内只要有约束，整个 TabBar 的 platter 都会进入 Auto Layout。iOS 27.1 系统把 TabBar 放到竖向栏时
+ *      （iPhone Duo 折叠且 `allowsVerticalBar = YES`），platter 由 SwiftUI 工具栏承载，会被撑满整个可用区域，
+ *      变成盖住内容的竖长面板，而不是按内容大小显示。
+ *      tracker 铺满 Tab 按钮（宽高自适应），按钮尺寸变化（如横向栏与竖向栏之间切换）时触发 `-layoutSubviews`，重新定位这些视图。
+ */
+typedef CGPoint (^_CYLTabButtonCenterProvider)(UIControl *tabButton);
+
+@interface _CYLTabButtonLayoutTracker : UIView
++ (instancetype)cyl_trackerForTabButton:(UIControl *)tabButton;
+- (void)cyl_trackView:(UIView *)view centerProvider:(_CYLTabButtonCenterProvider)centerProvider;
+@end
+
+@implementation _CYLTabButtonLayoutTracker {
+    NSMapTable<UIView *, _CYLTabButtonCenterProvider> *_centerProviders;
+}
+
++ (instancetype)cyl_trackerForTabButton:(UIControl *)tabButton {
+    for (UIView *subview in tabButton.subviews) {
+        if ([subview isKindOfClass:self]) {
+            return (_CYLTabButtonLayoutTracker *)subview;
+        }
+    }
+    _CYLTabButtonLayoutTracker *tracker = [[self alloc] initWithFrame:tabButton.bounds];
+    tracker.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    tracker.userInteractionEnabled = NO;
+    tracker.backgroundColor = UIColor.clearColor;
+    [tabButton insertSubview:tracker atIndex:0];
+    return tracker;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        _centerProviders = [NSMapTable weakToStrongObjectsMapTable];
+    }
+    return self;
+}
+
+- (void)cyl_trackView:(UIView *)view centerProvider:(_CYLTabButtonCenterProvider)centerProvider {
+    if (!view || !centerProvider) { return; }
+    [_centerProviders setObject:[centerProvider copy] forKey:view];
+    [self cyl_updateTrackedView:view];
+}
+
+- (void)cyl_updateTrackedView:(UIView *)view {
+    UIControl *tabButton = (UIControl *)self.superview;
+    _CYLTabButtonCenterProvider centerProvider = [_centerProviders objectForKey:view];
+    if (!centerProvider || ![tabButton isKindOfClass:UIControl.class] || view.superview != tabButton) { return; }
+    CGPoint center = centerProvider(tabButton);
+    if (isnan(center.x) || isnan(center.y) || CGPointEqualToPoint(view.center, center)) { return; }
+    view.center = center;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    for (UIView *view in _centerProviders.keyEnumerator.allObjects) {
+        [self cyl_updateTrackedView:view];
+    }
+}
+
+@end
+
+/// [EN] Converts `view`'s centre (plus `offset`) to `tabButton`'s coordinates; falls back to the button's centre.
+/// [CN] 把 `view` 的中心点（加 `offset`）转换到 `tabButton` 坐标系；取不到时用按钮中心。
+static CGPoint CYLTabButtonPointInView(UIControl *tabButton, UIView *view, CGPoint pointInView) {
+    if (!view || !view.superview) {
+        return CGPointMake(CGRectGetMidX(tabButton.bounds), CGRectGetMidY(tabButton.bounds));
+    }
+    return [view convertPoint:pointInView toView:tabButton];
+}
+
 @implementation UIControl (CYLTabBarControllerExtention)
 
 - (BOOL)cyl_isChildViewControllerPlusButton {
@@ -222,7 +303,7 @@
                 // tabBarButton.cyl_platterNormalControl.cyl_swappableImageViewViewInTabBarButton.hidden = YES;
                 [tabBarButton.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
 
-                    if (![obj isEqual:newView]) {
+                    if (![obj isEqual:newView] && ![obj isKindOfClass:[_CYLTabButtonLayoutTracker class]]) {
                         [obj cyl_setHidden:theShow];
                     }
                 }];
@@ -306,53 +387,19 @@
     if (shouldShowNewView) {
         [tabBarButton addSubview:newView];
         CGSize newViewSize = newView.frame.size;
-        if (@available(iOS 9.0, *)) {
-            [NSLayoutConstraint activateConstraints:@[
-                [newView.centerXAnchor constraintEqualToAnchor:swappableImageView.centerXAnchor constant:offset.horizontal],
-                [newView.centerYAnchor constraintEqualToAnchor:replacedView.centerYAnchor constant:offset.vertical],
-                [newView.widthAnchor constraintEqualToConstant:newViewSize.width],
-                [newView.heightAnchor constraintEqualToConstant:newViewSize.height],
-            ]
-            ];
-        } else {
-            [self addConstraints:@[
-                [NSLayoutConstraint constraintWithItem:newView
-                                             attribute:NSLayoutAttributeCenterX
-                                             relatedBy:NSLayoutRelationEqual
-                                                toItem:swappableImageView
-                                             attribute:NSLayoutAttributeCenterX
-                                            multiplier:1.0
-                                              constant:offset.horizontal],
-                [NSLayoutConstraint constraintWithItem:newView
-                                             attribute:NSLayoutAttributeCenterY
-                                             relatedBy:NSLayoutRelationEqual
-                                                toItem:replacedView
-                                             attribute:NSLayoutAttributeCenterY
-                                            multiplier:1.0
-                                              constant:offset.vertical],
-                [NSLayoutConstraint constraintWithItem:newView
-                                             attribute:NSLayoutAttributeCenterY
-                                             relatedBy:NSLayoutRelationEqual
-                                                toItem:replacedView
-                                             attribute:NSLayoutAttributeCenterY
-                                            multiplier:1.0
-                                              constant:offset.vertical],
-                [NSLayoutConstraint constraintWithItem:newView
-                                             attribute:NSLayoutAttributeWidth
-                                             relatedBy:NSLayoutRelationEqual
-                                                toItem:nil
-                                             attribute:NSLayoutAttributeNotAnAttribute
-                                            multiplier:1.0
-                                              constant:newViewSize.width],
-                [NSLayoutConstraint constraintWithItem:newView
-                                             attribute:NSLayoutAttributeHeight
-                                             relatedBy:NSLayoutRelationEqual
-                                                toItem:nil
-                                             attribute:NSLayoutAttributeNotAnAttribute
-                                            multiplier:1.0
-                                              constant:newViewSize.height]
-            ]];
-        }
+        // FIX: issue #653 — frames, not constraints: see `_CYLTabButtonLayoutTracker`.
+        // Same placement as the former constraints: centre X on the image view, centre Y on the replaced view, fixed size.
+        newView.translatesAutoresizingMaskIntoConstraints = YES;
+        newView.bounds = (CGRect){CGPointZero, newViewSize};
+        __weak UIView *weakImageView = swappableImageView;
+        __weak UIView *weakReplacedView = replacedView;
+        [[_CYLTabButtonLayoutTracker cyl_trackerForTabButton:tabBarButton] cyl_trackView:newView centerProvider:^CGPoint(UIControl *tabButton) {
+            UIView *imageView = weakImageView;
+            UIView *replaced = weakReplacedView ?: imageView;
+            CGPoint centerX = CYLTabButtonPointInView(tabButton, imageView, CGPointMake(CGRectGetMidX(imageView.bounds), CGRectGetMidY(imageView.bounds)));
+            CGPoint centerY = CYLTabButtonPointInView(tabButton, replaced, CGPointMake(CGRectGetMidX(replaced.bounds), CGRectGetMidY(replaced.bounds)));
+            return CGPointMake(centerX.x + offset.horizontal, centerY.y + offset.vertical);
+        }];
         !completion?:completion(YES, self, newView);
         return;
     }
@@ -396,7 +443,7 @@
     lottieView.frame = CGRectMake(0, 0, size.width, size.height);
     lottieView.userInteractionEnabled = NO;
     lottieView.contentMode = contentMode;
-    lottieView.translatesAutoresizingMaskIntoConstraints = NO;
+    lottieView.translatesAutoresizingMaskIntoConstraints = YES;// FIX: issue #653, see `_CYLTabButtonLayoutTracker`
     [lottieView setClipsToBounds:NO];
     [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
 #endif
@@ -413,7 +460,7 @@
     lottieView.userInteractionEnabled = NO;
     lottieView.contentMode = contentMode;
     
-    lottieView.translatesAutoresizingMaskIntoConstraints = NO;
+    lottieView.translatesAutoresizingMaskIntoConstraints = YES;// FIX: issue #653, see `_CYLTabButtonLayoutTracker`
     [lottieView setClipsToBounds:NO];
     [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
 #endif
@@ -627,25 +674,18 @@ CYL_DEPRECATED_DECLARATIONS_PUSH
 
 - (void)cyl_setShowTabBadgePoint:(BOOL)showTabBadgePoint {
     if (showTabBadgePoint && self.cyl_tabBadgePointView.superview == nil) {
-        [self cyl_bringSubviewToFront:self.cyl_tabBadgePointView];
-        // X constraint
-        [self addConstraint:
-         [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView
-                                      attribute:NSLayoutAttributeCenterX
-                                      relatedBy:0
-                                         toItem:self.cyl_tabImageView
-                                      attribute:NSLayoutAttributeRight
-                                     multiplier:1
-                                       constant:self.cyl_tabBadgePointViewOffset.horizontal]];
-        //Y constraint
-        [self addConstraint:
-         [NSLayoutConstraint constraintWithItem:self.cyl_tabBadgePointView
-                                      attribute:NSLayoutAttributeCenterY
-                                      relatedBy:0
-                                         toItem:self.cyl_tabImageView
-                                      attribute:NSLayoutAttributeTop
-                                     multiplier:1
-                                       constant:self.cyl_tabBadgePointViewOffset.vertical]];
+        UIView *tabBadgePointView = self.cyl_tabBadgePointView;
+        [self cyl_bringSubviewToFront:tabBadgePointView];
+        // FIX: issue #653 — frames, not constraints: see `_CYLTabButtonLayoutTracker`.
+        // Same placement as the former constraints: centre at the image view's top-right corner plus the offset.
+        tabBadgePointView.translatesAutoresizingMaskIntoConstraints = YES;
+        __weak UIView *weakImageView = self.cyl_tabImageView;
+        [[_CYLTabButtonLayoutTracker cyl_trackerForTabButton:self] cyl_trackView:tabBadgePointView centerProvider:^CGPoint(UIControl *tabButton) {
+            UIView *imageView = weakImageView;
+            CGPoint topRight = CYLTabButtonPointInView(tabButton, imageView, CGPointMake(CGRectGetMaxX(imageView.bounds), CGRectGetMinY(imageView.bounds)));
+            UIOffset offset = tabButton.cyl_tabBadgePointViewOffset;
+            return CGPointMake(topRight.x + offset.horizontal, topRight.y + offset.vertical);
+        }];
     }
     self.cyl_tabBadgePointView.hidden = showTabBadgePoint == NO;
     self.cyl_tabBadgeView.hidden = showTabBadgePoint == YES;

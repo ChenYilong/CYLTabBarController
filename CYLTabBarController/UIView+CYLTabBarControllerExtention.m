@@ -799,28 +799,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 + (UIView *)cyl_tabBadgePointViewWithClolor:(UIColor *)color radius:(CGFloat)radius {
-    UIView *defaultTabBadgePointView = [[UIView alloc] init];
-    [defaultTabBadgePointView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    // FIX: issue #653 — fixed frame instead of width/height constraints (constraints inside a tab button break
+    // the iOS 27.1 vertical bar, see `_CYLTabButtonLayoutTracker` in UIControl+CYLTabBarControllerExtention.m).
+    UIView *defaultTabBadgePointView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, radius * 2, radius * 2)];
+    defaultTabBadgePointView.translatesAutoresizingMaskIntoConstraints = YES;
     defaultTabBadgePointView.backgroundColor = color;
     defaultTabBadgePointView.layer.cornerRadius = radius;
     defaultTabBadgePointView.layer.masksToBounds = YES;
     defaultTabBadgePointView.hidden = YES;
-    // Width constraint
-    [defaultTabBadgePointView addConstraint:[NSLayoutConstraint constraintWithItem:defaultTabBadgePointView
-                                                                         attribute:NSLayoutAttributeWidth
-                                                                         relatedBy:NSLayoutRelationEqual
-                                                                            toItem:nil
-                                                                         attribute: NSLayoutAttributeNotAnAttribute
-                                                                        multiplier:1
-                                                                          constant:radius * 2]];
-    // Height constraint
-    [defaultTabBadgePointView addConstraint:[NSLayoutConstraint constraintWithItem:defaultTabBadgePointView
-                                                                         attribute:NSLayoutAttributeHeight
-                                                                         relatedBy:NSLayoutRelationEqual
-                                                                            toItem:nil
-                                                                         attribute: NSLayoutAttributeNotAnAttribute
-                                                                        multiplier:1
-                                                                          constant:radius * 2]];
     return defaultTabBadgePointView;
 }
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
