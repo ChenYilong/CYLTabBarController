@@ -742,12 +742,74 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     if ([gestureRecognizer cyl_isContinuousGestureRecognizer]) {
         self.liquidGlassContinuousGestureRecognizer = gestureRecognizer;
         gestureRecognizer.delegate = self;
+        [gestureRecognizer addTarget:self action:@selector(cyl_liquidGlassGestureRecognizerDidUpdate:)];
     }
     if ([gestureRecognizer cyl_isLongGestureRecognizer]) {
         self.liquidGlassLongGestureRecognizer = gestureRecognizer;
         gestureRecognizer.delegate = self;
+        [gestureRecognizer addTarget:self action:@selector(cyl_liquidGlassGestureRecognizerDidUpdate:)];
     }
     [super addGestureRecognizer:gestureRecognizer];
+}
+
+/*!
+ * FIX: issue #653 — plus button hidden while pressing or dragging in the iOS 27.1 vertical bar.
+ * [EN] While a tab is pressed or dragged, UIKit shows a lifted copy of the tab platter in a portal view. With a
+ *      horizontal tab bar that portal is added to this tab bar, below the plus button. In the vertical bar it is added
+ *      to the tab bar controller's container view, above the branch that holds this tab bar, so it covered the plus
+ *      button (only the plus cover in the selected layer stayed visible). Keep such portal views just below that branch.
+ * [CN] 按住或拖拽 Tab 时，系统用 portal 视图显示抬起的 platter 副本。横向时该 portal 加在本 TabBar 上、位于加号按钮之下；
+ *      竖向栏中它被加到 TabBarController 的容器视图上，位于本 TabBar 所在分支之上，遮住了加号按钮（只剩选中图层里的加号遮罩）。
+ *      这里把这类 portal 视图移到该分支下方。
+ */
+- (void)cyl_liquidGlassGestureRecognizerDidUpdate:(UIGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state != UIGestureRecognizerStateBegan && gestureRecognizer.state != UIGestureRecognizerStateChanged) {
+        return;
+    }
+    if (![self cyl_keepPlusButtonAbovePortalViewsInVerticalBar] || gestureRecognizer.state != UIGestureRecognizerStateBegan) {
+        return;
+    }
+    // The portal is added by the lift animation, slightly after the gesture begins, and a finger held still sends no
+    // further updates: keep checking while the gesture is active. 抬起动画稍后才添加 portal，手指不动时没有后续回调，因此手势进行中持续检查。
+    [self cyl_keepPlusButtonAbovePortalViewsWhileGestureIsActive:gestureRecognizer];
+}
+
+- (void)cyl_keepPlusButtonAbovePortalViewsWhileGestureIsActive:(UIGestureRecognizer *)gestureRecognizer {
+    __weak typeof(self) weakSelf = self;
+    __weak UIGestureRecognizer *weakGestureRecognizer = gestureRecognizer;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        UIGestureRecognizer *strongGestureRecognizer = weakGestureRecognizer;
+        if (!strongSelf || !strongGestureRecognizer) {
+            return;
+        }
+        [strongSelf cyl_keepPlusButtonAbovePortalViewsInVerticalBar];
+        UIGestureRecognizerState state = strongGestureRecognizer.state;
+        if (state == UIGestureRecognizerStateBegan || state == UIGestureRecognizerStateChanged) {
+            [strongSelf cyl_keepPlusButtonAbovePortalViewsWhileGestureIsActive:strongGestureRecognizer];
+        }
+    });
+}
+
+/// Returns NO when there is nothing to do (no plus button, or the tab buttons are not in the vertical bar).
+- (BOOL)cyl_keepPlusButtonAbovePortalViewsInVerticalBar {
+    if (!self.plusButton.superview || ![self cyl_verticalBarTabButtonAtIndex:0]) {
+        return NO;
+    }
+    UIView *rootView = self.tabBarController.viewIfLoaded;
+    for (UIView *child = self, *parent = self.superview; parent; child = parent, parent = parent.superview) {
+        for (UIView *sibling in [parent.subviews copy]) {
+            NSUInteger childIndex = [parent.subviews indexOfObject:child];
+            NSUInteger siblingIndex = [parent.subviews indexOfObject:sibling];
+            if (siblingIndex != NSNotFound && childIndex != NSNotFound && siblingIndex > childIndex && [sibling cyl_isPlatterPortalView]) {
+                [parent insertSubview:sibling belowSubview:child];
+            }
+        }
+        if (parent == rootView || parent == self.window) {
+            break;
+        }
+    }
+    return YES;
 }
 
 - (CYLTabBarController *)tabBarController {
