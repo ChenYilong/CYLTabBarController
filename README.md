@@ -1187,17 +1187,13 @@ A：用法见：https://github.com/ChenYilong/CYLTabBarController/issues/341
 
 ## Star History
 
-
-<a href="https://star-history.dera.page/#ChenYilong/CYLTabBarController&type=date">
+<a href="https://star-history.dera.page/ChenYilong/CYLTabBarController">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=ChenYilong/CYLTabBarController&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=ChenYilong/CYLTabBarController&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=ChenYilong/CYLTabBarController&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=ChenYilong/CYLTabBarController&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=ChenYilong/CYLTabBarController" />
+   <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=ChenYilong/CYLTabBarController" />
  </picture>
 </a>
-
-
-
 
 （更多iOS开发干货，欢迎关注  [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) ）
  
