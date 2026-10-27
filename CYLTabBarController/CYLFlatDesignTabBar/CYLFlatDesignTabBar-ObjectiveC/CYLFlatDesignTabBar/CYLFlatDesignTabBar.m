@@ -520,7 +520,13 @@
                                                       CGFloat plusButtonoffsetY = multiplierOfTabBarHeight * TabBarHeight
                                                */
         UIOffset plusButtonoffset =  UIOffsetMake(0, constantOfPlusButtonCenterYOffset);
-        self.plusButton.translatesAutoresizingMaskIntoConstraints = NO;
+        // FIX: issue #662 — the plus button is placed by frame (`cyl_coverVisiableTabImageViewOrTabButton:` tracks it, see
+        // `_CYLTabButtonLayoutTracker`). Turning `translatesAutoresizingMaskIntoConstraints` off here on every layout left it
+        // in Auto Layout with no constraints, so a later layout pass could restore a stale frame: after the iPhone Duo was
+        // folded, tapping other tabs moved the plus button down.
+        // 加号按钮由 frame 定位（见 `_CYLTabButtonLayoutTracker`）。此处每次布局都关闭 translatesAutoresizingMaskIntoConstraints，
+        // 使其处于无约束的 Auto Layout 中，之后的布局可能恢复旧 frame：iPhone Duo 折叠后点击其他 Tab，加号按钮会下移。
+        self.plusButton.translatesAutoresizingMaskIntoConstraints = YES;
         
         [plusButtonIndexPlaceholder cyl_coverVisiableTabImageViewOrTabButton:YES
                                                         contentNewView:self.plusButton

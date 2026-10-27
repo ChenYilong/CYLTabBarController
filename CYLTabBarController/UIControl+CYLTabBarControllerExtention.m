@@ -111,6 +111,31 @@ static CGPoint CYLTabButtonPointInView(UIControl *tabButton, UIView *view, CGPoi
     return [view convertPoint:pointInView toView:tabButton];
 }
 
+/*!
+ * FIX: issue #653 / #662
+ * [EN] Places `newView` (fixed size) by frame: centre X on `imageView`, centre Y on `replacedView`, plus `offset` —
+ *      the same placement as the former Auto Layout constraints. Calling it again for a view that is already tracked
+ *      replaces its offset (e.g. the FlatDesign plus button's vertical offset depends on the tab bar height, which
+ *      changes when the iPhone Duo folds or unfolds) and re-centres it at once.
+ * [CN] 用 frame 定位 `newView`（固定尺寸）：X 中心对齐 `imageView`，Y 中心对齐 `replacedView`，再加 `offset`，与原约束一致。
+ *      对已跟踪的视图再次调用会替换其偏移量（如扁平样式加号按钮的纵向偏移依赖 TabBar 高度，iPhone Duo 折叠/展开时会变化）并立即重新定位。
+ */
+static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CGSize newViewSize, UIView *imageView, UIView *replacedView, UIOffset offset) {
+    newView.translatesAutoresizingMaskIntoConstraints = YES;
+    if (newViewSize.width > 0 && newViewSize.height > 0) {
+        newView.bounds = (CGRect){CGPointZero, newViewSize};
+    }
+    __weak UIView *weakImageView = imageView;
+    __weak UIView *weakReplacedView = replacedView;
+    [[_CYLTabButtonLayoutTracker cyl_trackerForTabButton:tabBarButton] cyl_trackView:newView centerProvider:^CGPoint(UIControl *tabButton) {
+        UIView *imageView = weakImageView;
+        UIView *replaced = weakReplacedView ?: imageView;
+        CGPoint centerX = CYLTabButtonPointInView(tabButton, imageView, CGPointMake(CGRectGetMidX(imageView.bounds), CGRectGetMidY(imageView.bounds)));
+        CGPoint centerY = CYLTabButtonPointInView(tabButton, replaced, CGPointMake(CGRectGetMidX(replaced.bounds), CGRectGetMidY(replaced.bounds)));
+        return CGPointMake(centerX.x + offset.horizontal, centerY.y + offset.vertical);
+    }];
+}
+
 @implementation UIControl (CYLTabBarControllerExtention)
 
 - (BOOL)cyl_isChildViewControllerPlusButton {
@@ -372,6 +397,9 @@ static CGPoint CYLTabButtonPointInView(UIControl *tabButton, UIView *view, CGPoi
         [newView removeFromSuperview];
     }
     if (isNewViewAddedToTabButton && theShow) {
+        // FIX: issue #662 — already shown: refresh its placement with the current offset instead of keeping the first one.
+        // 已显示：用当前的 offset 刷新定位，而不是一直沿用第一次的值。
+        CYLTrackViewInTabButton(tabBarButton, newView, newView.bounds.size, swappableImageView, replacedView, offset);
         !completion?:completion(YES, self, newView);
         return;
     }
@@ -387,19 +415,7 @@ static CGPoint CYLTabButtonPointInView(UIControl *tabButton, UIView *view, CGPoi
     if (shouldShowNewView) {
         [tabBarButton addSubview:newView];
         CGSize newViewSize = newView.frame.size;
-        // FIX: issue #653 — frames, not constraints: see `_CYLTabButtonLayoutTracker`.
-        // Same placement as the former constraints: centre X on the image view, centre Y on the replaced view, fixed size.
-        newView.translatesAutoresizingMaskIntoConstraints = YES;
-        newView.bounds = (CGRect){CGPointZero, newViewSize};
-        __weak UIView *weakImageView = swappableImageView;
-        __weak UIView *weakReplacedView = replacedView;
-        [[_CYLTabButtonLayoutTracker cyl_trackerForTabButton:tabBarButton] cyl_trackView:newView centerProvider:^CGPoint(UIControl *tabButton) {
-            UIView *imageView = weakImageView;
-            UIView *replaced = weakReplacedView ?: imageView;
-            CGPoint centerX = CYLTabButtonPointInView(tabButton, imageView, CGPointMake(CGRectGetMidX(imageView.bounds), CGRectGetMidY(imageView.bounds)));
-            CGPoint centerY = CYLTabButtonPointInView(tabButton, replaced, CGPointMake(CGRectGetMidX(replaced.bounds), CGRectGetMidY(replaced.bounds)));
-            return CGPointMake(centerX.x + offset.horizontal, centerY.y + offset.vertical);
-        }];
+        CYLTrackViewInTabButton(tabBarButton, newView, newViewSize, swappableImageView, replacedView, offset);
         !completion?:completion(YES, self, newView);
         return;
     }
