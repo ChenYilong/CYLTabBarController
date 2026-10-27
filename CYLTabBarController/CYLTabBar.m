@@ -599,6 +599,24 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     return [tabButton isDescendantOfView:platterView] ? tabButton : nil;
 }
 
+/*!
+ * FIX: issue #653
+ * [EN] The tab button (normal layer) under `windowPoint` while the tab buttons are shown in the iOS 27.1 vertical bar; nil otherwise.
+ * [CN] iOS 27.1 竖向栏中，位于 `windowPoint`（窗口坐标）下的 Tab 按钮（常态图层）；其他情况返回 nil。
+ */
+- (UIControl *)cyl_verticalBarTabButtonAtWindowPoint:(CGPoint)windowPoint {
+    if (![self cyl_verticalBarTabButtonAtIndex:0]) {
+        return nil;
+    }
+    for (UIControl *tabButton in [self cyl_tabBarSubviews]) {
+        CGPoint point = [tabButton convertPoint:windowPoint fromView:nil];
+        if ([tabButton pointInside:point withEvent:nil]) {
+            return tabButton;
+        }
+    }
+    return nil;
+}
+
 - (void)setupTabImageViewDefaultOffset:(UIView *)tabBarButton {
     if (self.tabImageViewDefaultOffset > 0) {
         return;
@@ -748,6 +766,13 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     }
     CGPoint location = [gestureRecognizer locationInView:self];
     UIView *hitView = [self hitTest:location withEvent:nil];
+    if (!hitView) {
+        // FIX: issue #653 — in the iOS 27.1 vertical bar the tab buttons are outside this tab bar, so the hit test
+        // above finds nothing and a tap on the already selected tab never reached `-tabChangedToControl:`
+        // (no `tabBarController:didSelectControl:` callback). Look the tab button up under the touch instead.
+        // 竖向栏中 Tab 按钮不在本 TabBar 内，上面的 hitTest 为 nil，导致选中状态下再次点击不回调 didSelectControl，这里按触摸点查找 Tab 按钮。
+        hitView = [self cyl_verticalBarTabButtonAtWindowPoint:[gestureRecognizer locationInView:nil]];
+    }
     SEL actin = @selector(tabChangedToControl:);
     CYLTabBarController *tabBarController = [self tabBarController];
     if ([self cyl_shouldUpdateHiddenStatueForPlusButtonLabel] && [hitView isKindOfClass:[CYLPlusButton class]] && [tabBarController.selectedViewController isEqual:CYLPlusChildViewController]) {
