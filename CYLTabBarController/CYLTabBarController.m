@@ -2567,13 +2567,15 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
 
 /*!
  * FIX: issue #653
- * [EN] On the folded iPhone Duo, iOS 27.1 moves bar content to a vertical bar on the trailing edge.
- *      CYLTabBarController's tab bar is laid out for the bottom edge only, so it is kept horizontal
- *      unless `allowsVerticalBar` is YES. Returning nil from the child getter stops UITabBarController
- *      from forwarding the choice to the selected view controller (whose default is Automatic).
- * [CN] iPhone Duo 折叠时，iOS 27.1 会把栏内容放到右侧竖向栏。CYLTabBarController 的 TabBar 只按底部横向布局，
- *      因此除非 `allowsVerticalBar` 为 YES，否则保持横向。子控制器 getter 返回 nil，
+ * [EN] On the folded iPhone Duo, iOS 27.1 can move bar content to a vertical bar on the trailing edge.
+ *      `allowsVerticalBar` (default NO) is a convenience switch for UIKit's `preferredVerticalBarBehavior`:
+ *      NO keeps the tab bar horizontal; YES restores the system default. Returning nil from the child getter
+ *      when NO stops UITabBarController from forwarding the choice to the selected view controller (whose default
+ *      is Automatic). Unrelated to `sidebar.preferredPlacement` (tab bar vs. iPad-style sidebar, regular width).
+ * [CN] iPhone Duo 折叠时，iOS 27.1 可能把栏内容放到右侧竖向栏。`allowsVerticalBar`（默认 NO）是 UIKit
+ *      `preferredVerticalBarBehavior` 的便捷开关：NO 保持 TabBar 横向；YES 恢复系统默认行为。为 NO 时子控制器 getter 返回 nil，
  *      避免 UITabBarController 把决定权转交给选中的子控制器（其默认值为 Automatic）。
+ *      与 `sidebar.preferredPlacement`（regular 宽度下 TabBar 与 iPad 式侧边栏之间的选择）无关。
  */
 - (void)setAllowsVerticalBar:(BOOL)allowsVerticalBar {
     if (_allowsVerticalBar == allowsVerticalBar) { return; }
