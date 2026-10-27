@@ -40,6 +40,7 @@
 - (CYLTabBarController *)createNewTabBarWithContext:(NSString *)context {
     MainTabBarController *tabBarController = [[MainTabBarController alloc] initWithContext:context];
 //    CYLFlatDesignMainTabBarController *tabBarController = [[CYLFlatDesignMainTabBarController alloc] init];
+    tabBarController.allowsVerticalBar = YES;
     self.viewControllers = @[tabBarController];
     return tabBarController;
 }
