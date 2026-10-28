@@ -2362,6 +2362,7 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
                          viewController:selectedViewController
                                 control:control];
     }
+    [self cyl_setNeedsLiquidGlassTabBarResample];
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 
 
@@ -2385,6 +2386,43 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
 #endif
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
 }
+
+/*!
+ * FIX: issue #646 — mitigation, not verified on device.
+ * [EN] iOS 26 Liquid Glass tab bars switch between light and dark based on the content behind them. Reported:
+ *      with one black tab and one white tab whose view is filled by a UIScrollView (bottomEdgeEffect hidden),
+ *      switching tabs sometimes leaves the bar tinted for the previous tab's background. `translucent = NO`
+ *      avoids it but makes the whole bottom area opaque, not just the capsule.
+ *      After the switch, on the next run loop (once the new tab's view is in place), re-lay out the system
+ *      tab bar and re-register the new tab's bottom content scroll view (only when it has one), so UIKit
+ *      re-evaluates what is behind the glass. A tab without a scroll view is left on automatic detection.
+ * [CN] iOS 26 液态玻璃 TabBar 会根据其背后的内容在浅色/深色之间切换。反馈：一个黑色 Tab、一个由铺满的
+ *      UIScrollView 构成的白色 Tab（隐藏了 bottomEdgeEffect），切换时偶现 TabBar 仍保持上一个 Tab 的底色。
+ *      `translucent = NO` 可以规避，但会让整个底部区域不透明，而不仅是胶囊。
+ *      切换后在下一个 runloop（新 Tab 的 view 已就位）重新布局系统 TabBar，并为新 Tab 重新注册底部
+ *      content scroll view（仅当存在时），促使 UIKit 重新评估玻璃背后的内容。没有 scroll view 的 Tab 保持自动检测。
+ */
+- (void)cyl_setNeedsLiquidGlassTabBarResample {
+    if (![CYLConstants isLiquidGlassActive]) { return; }
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) { return; }
+        UIViewController *selectedViewController = strongSelf.selectedViewController;
+        if ([selectedViewController isKindOfClass:[UINavigationController class]]) {
+            selectedViewController = ((UINavigationController *)selectedViewController).topViewController ?: selectedViewController;
+        }
+        if (@available(iOS 15.0, *)) {
+            UIScrollView *contentScrollView = [selectedViewController contentScrollViewForEdge:NSDirectionalRectEdgeBottom];
+            if (contentScrollView) {
+                [selectedViewController setContentScrollView:contentScrollView forEdge:NSDirectionalRectEdgeBottom];
+            }
+        }
+        [strongSelf.tabBar setNeedsLayout];
+        [strongSelf.tabBar layoutIfNeeded];
+    });
+}
+
 #pragma mark - Override selectedIndex (Programmatic changes)
 
 - (void)setSelectedIndex:(NSUInteger)selectedIndex {
