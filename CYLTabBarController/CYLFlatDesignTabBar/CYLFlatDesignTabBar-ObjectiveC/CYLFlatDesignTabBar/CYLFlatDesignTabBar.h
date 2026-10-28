@@ -68,11 +68,33 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, strong) UIImage *shadowImage UI_APPEARANCE_SELECTOR;
 
 /* default is YES.
-    按钮是否避开左右安全区域（横屏刘海、iPhone Duo 右侧竖向状态栏）。背景始终铺满整个宽度。
-    [EN] Whether the buttons stay clear of the left/right safe area (landscape notch, the iPhone Duo's
-    trailing status column). The background always spans the full width.
+    按钮是否避开左右安全区域（如横屏刘海）。背景始终铺满整个宽度。
+    竖向状态栏（iPhone Duo 折叠竖屏右侧竖列）的单侧安全区另由 `respectsVerticalStatusBarSafeArea` 控制（默认忽略）。
+    [EN] Whether the buttons stay clear of the left/right safe area (e.g. a landscape notch). The background
+    always spans the full width. The one-sided inset of a vertical status bar (the folded iPhone Duo's
+    right-hand status column) is controlled separately by `respectsVerticalStatusBarSafeArea` (ignored by default).
  */
 @property (nonatomic, assign) BOOL useLayoutSafeAreaInsets UI_APPEARANCE_SELECTOR;
+
+/*!
+ * FIX: issue #672
+ * [EN] Default is NO. Whether the buttons also stay clear of the inset that a vertical status bar adds on
+ *      one side, e.g. the 84 pt column on the right of the folded iPhone Duo held upright (iOS 27.1 SDK),
+ *      where the status bar (Wi-Fi, battery) moves to the trailing edge.
+ *      NO: that one-sided inset is ignored, so the buttons span the full width and stay centered on screen;
+ *      the last button can sit partly under the status column.
+ *      YES: the buttons stay inside the safe area, so the row is shifted left by that column.
+ *      A vertical status bar is told apart by its inset being on one side only; a landscape notch insets
+ *      both sides and is still handled by `useLayoutSafeAreaInsets`. Has no effect when
+ *      `useLayoutSafeAreaInsets` is NO.
+ * [CN] 默认 NO。按钮是否同时避开竖向状态栏在单侧产生的安全区，例如 iPhone Duo 折叠且竖屏时
+ *      （iOS 27.1 SDK）状态栏（Wi-Fi、电量）移到右侧形成的 84pt 竖列。
+ *      NO：忽略这侧安全区，按钮铺满整个宽度、在屏幕上居中；最后一个按钮可能部分位于状态栏下方。
+ *      YES：按钮留在安全区内，整行会因该竖列向左偏移。
+ *      竖向状态栏的判断依据是只有一侧有安全区；横屏刘海两侧都有安全区，仍由 `useLayoutSafeAreaInsets` 处理。
+ *      `useLayoutSafeAreaInsets` 为 NO 时此属性无效。
+ */
+@property (nonatomic, assign) BOOL respectsVerticalStatusBarSafeArea UI_APPEARANCE_SELECTOR;
 
 /*!
  [EN] This can be left unset; the default is CYLTabBarController. If set, please implement the `+[CYLPlusButton tabBarContext]` method in CYLPlusButton and ensure consistency. If neither is implemented, the default is CYLTabBarController for both.

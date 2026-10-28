@@ -143,6 +143,8 @@
     // 按钮必须避开左右安全区：iPhone Duo（iOS 27.1 SDK）右侧有 84pt 的竖向状态栏，
     // 若忽略，最后一个 Tab 会被盖住，并在 push/pop 转场中被裁掉一截。
     _useLayoutSafeAreaInsets = YES;
+    // FIX: issue #672 默认忽略竖向状态栏（iPhone Duo 折叠竖屏右侧竖列）产生的单侧安全区，保持按钮居中
+    _respectsVerticalStatusBarSafeArea = NO;
 }
 
 #pragma mark - Setter & Getter
@@ -316,6 +318,13 @@
     }
 }
 
+- (void)setRespectsVerticalStatusBarSafeArea:(BOOL)respectsVerticalStatusBarSafeArea {
+    if (_respectsVerticalStatusBarSafeArea != respectsVerticalStatusBarSafeArea) {
+        _respectsVerticalStatusBarSafeArea = respectsVerticalStatusBarSafeArea;
+        [self setNeedsLayout];
+    }
+}
+
 - (void)setUseLayoutSafeAreaInsets:(BOOL)useLayoutSafeAreaInsets {
     if (_useLayoutSafeAreaInsets != useLayoutSafeAreaInsets) {
         _useLayoutSafeAreaInsets = useLayoutSafeAreaInsets;
@@ -459,8 +468,9 @@
     if (_buttons.count != itemCount) { return; }
 
     CGFloat contentWidth = CGRectGetWidth(self.contentView.frame);
-    CGFloat leftInset = self.useLayoutSafeAreaInsets ? layoutInsets.left : 0;
-    CGFloat rightInset = self.useLayoutSafeAreaInsets ? layoutInsets.right : 0;
+    UIEdgeInsets buttonInsets = [self _horizontalButtonInsetsFromSafeAreaInsets:layoutInsets];
+    CGFloat leftInset = buttonInsets.left;
+    CGFloat rightInset = buttonInsets.right;
     contentWidth -= (leftInset + rightInset);
     
 //    系统间距
@@ -590,6 +600,26 @@
  *      Unfolded: height stays put, as expected. Folded: still reported to shrink and recover; cause not yet
  *      located, see the DEBUG diagnostic `-_logTabBarClippingInParallaxOverlay` in CYLTabBarController.m.
  */
+/*!
+ * FIX: issue #672
+ * [EN] Left/right insets the button row keeps clear of. A vertical status bar (folded iPhone Duo held
+ *      upright: status column on the right) insets one side only, while a landscape notch insets both.
+ *      The one-sided inset is ignored unless `respectsVerticalStatusBarSafeArea` is YES, so the row stays
+ *      centered on screen by default.
+ * [CN] 按钮行需要避开的左右安全区。竖向状态栏（iPhone Duo 折叠且竖屏：状态栏位于右侧竖列）只在一侧产生安全区，
+ *      横屏刘海则两侧都有。除非 `respectsVerticalStatusBarSafeArea` 为 YES，否则忽略单侧安全区，默认保持按钮行居中。
+ */
+- (UIEdgeInsets)_horizontalButtonInsetsFromSafeAreaInsets:(UIEdgeInsets)safeAreaInsets {
+    if (!self.useLayoutSafeAreaInsets) {
+        return UIEdgeInsetsZero;
+    }
+    BOOL isOneSided = (safeAreaInsets.left > 0) != (safeAreaInsets.right > 0);
+    if (isOneSided && !self.respectsVerticalStatusBarSafeArea) {
+        return UIEdgeInsetsZero;
+    }
+    return UIEdgeInsetsMake(0, safeAreaInsets.left, 0, safeAreaInsets.right);
+}
+
 - (UIEdgeInsets)_safeAreaInsetsForLayout {
     UIView *homeView = self.tabBarController.viewIfLoaded;
     BOOL isInParallaxOverlay = [self.superview isKindOfClass:[_CYLFlatDesignTabBarParallaxOverlayView class]];
