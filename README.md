@@ -1141,14 +1141,17 @@ Only one PlusButton is displayed at a time, regardless of nesting depth. If mult
 ### [CN]在 Swift 项目中使用 CYLTabBarController
 ### [EN]Using CYLTabBarController in a Swift project
 
+| 中文 | English |
+|:---|:---|
+| 仓库提供了 Swift Demo，目录为 `Example-Swift`。 | The repository includes a Swift demo in `Example-Swift`. |
 
-仓库提供了 Swift Demo，目录为 `Example-Swift`。
-The repository includes a Swift demo in `Example-Swift`.
+| 中文 | English |
+|:---|:---|
+| 在 Swift 项目中作为静态库使用： | To use the library as a static library in a Swift project: |
 
-在 Swift 项目中作为静态库使用：
-To use the library as a static library in a Swift project:
-
-CocoaPods 1.5.0+ (with Xcode 9+)：
+| 中文 | English |
+|:---|:---|
+| CocoaPods 1.5.0+ (with Xcode 9+)： | CocoaPods 1.5.0+ (with Xcode 9+): |
 
  ```Objective-C
  platform :ios, '8.0'
@@ -1157,83 +1160,95 @@ CocoaPods 1.5.0+ (with Xcode 9+)：
 pod 'CYLTabBarController', '~> 1.29.0', :modular_headers => true
  ```
 
-
-作为动态库使用：
-To use it as a dynamic framework:
+| 中文 | English |
+|:---|:---|
+| 作为动态库使用： | To use it as a dynamic framework: |
 
  ```Objective-C
 platform :ios, '8.0'
 use_frameworks!
  ```
 
+| 中文 | English |
+|:---|:---|
+| 感谢 [@WeMadeCode](https://github.com/WeMadeCode) 提供 Swift Demo，原仓库：[WeMadeCode/CYLTabBarController-Swift](https://github.com/WeMadeCode/CYLTabBarController-Swift)。 | Thanks to [@WeMadeCode](https://github.com/WeMadeCode) for the Swift demo. Original repository: [WeMadeCode/CYLTabBarController-Swift](https://github.com/WeMadeCode/CYLTabBarController-Swift). |
 
-感谢 [@WeMadeCode](https://github.com/WeMadeCode) 提供 Swift Demo，原仓库：[WeMadeCode/CYLTabBarController-Swift](https://github.com/WeMadeCode/CYLTabBarController-Swift)。
-Thanks to [@WeMadeCode](https://github.com/WeMadeCode) for the Swift demo. Original repository: [WeMadeCode/CYLTabBarController-Swift](https://github.com/WeMadeCode/CYLTabBarController-Swift).
+| 中文 | English |
+|:---|:---|
+| 具体步骤可参考教程：[从头开始 Swift 2.1：主流 Tabbed 框架搭建](http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes)。 | For step-by-step instructions, see [Building a mainstream Tabbed framework with Swift 2.1](http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes). |
 
-具体步骤可参考教程：[从头开始 Swift 2.1：主流 Tabbed 框架搭建](http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes)。
-For step-by-step instructions, see [Building a mainstream Tabbed framework with Swift 2.1](http://www.jianshu.com/p/c5bc2eae0f55?nomobile=yes).
-
-注意：教程早期版本的示例缺少 PlusButton 尺寸设置，可能导致点击事件失效。当前教程已更新。
-Note: an early version of the tutorial omitted the PlusButton size, which could disable taps. The tutorial has since been updated.
+| 中文 | English |
+|:---|:---|
+| 注意：教程早期版本的示例缺少 PlusButton 尺寸设置，可能导致点击事件失效。当前教程已更新。 | Note: an early version of the tutorial omitted the PlusButton size, which could disable taps. The tutorial has since been updated. |
 
 <p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur43ri5uj30ko0jmdjc.jpg"></a></p>
 
 ### [CN]搭配 Storyboard 使用 CYLTabBarController
 ### [EN]Using CYLTabBarController with Storyboard
 
-参考 / References:
+| 中文 | English |
+|:---|:---|
+| 参考： | References: |
 
-- [Issue 讨论 / Issue discussion](https://github.com/ChenYilong/CYLTabBarController/issues/170)
-- [CYLDeallocBlockExecutor](https://github.com/ChenYilong/CYLDeallocBlockExecutor) 中的 `CYLTabBarControllerTestDemo` 演示了如何与 Storyboard 配合使用。
-  The `CYLTabBarControllerTestDemo` directory demonstrates Storyboard integration.
+| 中文 | English |
+|:---|:---|
+| [Issue 讨论](https://github.com/ChenYilong/CYLTabBarController/issues/170) | [Issue discussion](https://github.com/ChenYilong/CYLTabBarController/issues/170) |
+| [CYLDeallocBlockExecutor](https://github.com/ChenYilong/CYLDeallocBlockExecutor) 中的 `CYLTabBarControllerTestDemo` 演示了如何与 Storyboard 配合使用。 | The `CYLTabBarControllerTestDemo` directory demonstrates Storyboard integration. |
 
 ### [CN]源码实现原理
 ### [EN]Implementation details
 
-参考：[《[Note] CYLTabBarController》](http://www.jianshu.com/p/8758d8014f86)
-See [Note: CYLTabBarController](http://www.jianshu.com/p/8758d8014f86).
+| 中文 | English |
+|:---|:---|
+| 参考：[《[Note] CYLTabBarController》](http://www.jianshu.com/p/8758d8014f86) | See [Note: CYLTabBarController](http://www.jianshu.com/p/8758d8014f86). |
 
-更多文档请查看 [CocoaDocs: CYLTabBarController](http://cocoadocs.org/docsets/CYLTabBarController/1.2.1/index.html)。
-For additional documentation, see [CocoaDocs: CYLTabBarController](http://cocoadocs.org/docsets/CYLTabBarController/1.2.1/index.html).
+| 中文 | English |
+|:---|:---|
+| 更多文档请查看 [CocoaDocs: CYLTabBarController](http://cocoadocs.org/docsets/CYLTabBarController/1.2.1/index.html)。 | For additional documentation, see [CocoaDocs: CYLTabBarController](http://cocoadocs.org/docsets/CYLTabBarController/1.2.1/index.html). |
 
 ## [CN]常见问题
 ## [EN]FAQ
 
-
-更多问答请查看 [Issue FAQ](https://github.com/ChenYilong/CYLTabBarController/issues?utf8=✓&q=+label%3AQ-A+)。
-For more questions and answers, see the [Issue FAQ](https://github.com/ChenYilong/CYLTabBarController/issues?utf8=✓&q=+label%3AQ-A+).
+| 中文 | English |
+|:---|:---|
+| 更多问答请查看 [Issue FAQ](https://github.com/ChenYilong/CYLTabBarController/issues?utf8=✓&q=+label%3AQ-A+)。 | For more questions and answers, see the [Issue FAQ](https://github.com/ChenYilong/CYLTabBarController/issues?utf8=✓&q=+label%3AQ-A+). |
 
 ### [CN]为什么放置 6 个 TabBarItem 会显示异常？
 ### [EN]Why does placing six TabBarItems behave unexpectedly?
 
-Apple 规定，一个 `TabBar` 最多显示 5 个 `TabBarItem`，第六个及之后的项目不会显示。
-Apple allows a maximum of five `TabBarItem` instances in a `TabBar`; additional items are hidden.
+| 中文 | English |
+|:---|:---|
+| Apple 规定，一个 `TabBar` 最多显示 5 个 `TabBarItem`，第六个及之后的项目不会显示。 | Apple allows a maximum of five `TabBarItem` instances in a `TabBar`; additional items are hidden. |
 
-Apple 检测的是 `UITabBarItem` 及其子类。由于 PlusButton 是 `UIButton`，它不计入这五个项目。
-Because PlusButton is a `UIButton`, it is not counted as one of those five items.
+| 中文 | English |
+|:---|:---|
+| Apple 检测的是 `UITabBarItem` 及其子类。由于 PlusButton 是 `UIButton`，它不计入这五个项目。 | Because PlusButton is a `UIButton`, it is not counted as one of those five items. |
 
-因此，一个 TabBar 最多可以放置 5 个 TabBarItem 和 1 个 PlusButton。
-The practical limit is therefore five TabBarItems plus one PlusButton.
+| 中文 | English |
+|:---|:---|
+| 因此，一个 TabBar 最多可以放置 5 个 TabBarItem 和 1 个 PlusButton。 | The practical limit is therefore five TabBarItems plus one PlusButton. |
 
 ### [CN]按钮响应区域发生偏移
 ### [EN]The button hit area is offset
 
-我把 Demo 两侧的 item 各去掉一个后，按钮的响应区域变成了下图的样子：
-After removing one item from each side of the demo, the button hit area looked like this:
+| 中文 | English |
+|:---|:---|
+| 我把 Demo 两侧的 item 各去掉一个后，按钮的响应区域变成了下图的样子： | After removing one item from each side of the demo, the button hit area looked like this: |
 
 <p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://cloud.githubusercontent.com/assets/12152553/10725491/62600172-7c07-11e5-9e0a-0ec7d795d1e3.jpeg"></a></p>
 
-v1.5.5 已修复该问题，不会再出现点击区域无响应或响应区域偏移。
-This was fixed in v1.5.5; the hit area should no longer be offset.
+| 中文 | English |
+|:---|:---|
+| v1.5.5 已修复该问题，不会再出现点击区域无响应或响应区域偏移。 | This was fixed in v1.5.5; the hit area should no longer be offset. |
 
 ### [CN]如何添加选中背景色？
 ### [EN]How can I add a selected background color?
 
 <p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png"></a></p>
 
-
-Demo 中已提供实现代码，详见 `CYLTabBarControllerConfig` 的以下方法：
-The demo includes an implementation in `CYLTabBarControllerConfig`:
+| 中文 | English |
+|:---|:---|
+| Demo 中已提供实现代码，详见 `CYLTabBarControllerConfig` 的以下方法： | The demo includes an implementation in `CYLTabBarControllerConfig`: |
 
  ```Objective-C
 /**
@@ -1243,34 +1258,36 @@ The demo includes an implementation in `CYLTabBarControllerConfig`:
 
  ```
 
-效果如下：
-The result is shown below:
+| 中文 | English |
+|:---|:---|
+| 效果如下： | The result is shown below: |
 
 <p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://cloud.githubusercontent.com/assets/2911921/10779397/34956b0a-7d6b-11e5-82d9-fa75aa34e8d0.png"></a></p>
-
-
 
 ### [CN]ViewController 标题与 TabBar 标题不一致
 ### [EN]The ViewController title does not match the TabBar title
 
-当 `ViewController` 的 `self.title` 与 `tabBarItemsAttributes` 中的 `title` 不一致时，可能导致排序异常。
-If `self.title` differs from the corresponding `tabBarItemsAttributes` title, the order may appear incorrect.
+| 中文 | English |
+|:---|:---|
+| 当 `ViewController` 的 `self.title` 与 `tabBarItemsAttributes` 中的 `title` 不一致时，可能导致排序异常。 | If `self.title` differs from the corresponding `tabBarItemsAttributes` title, the order may appear incorrect. |
 
-v1.0.7 已修复相关 bug，但仍建议不要使用 `self.title` 设置导航栏标题。
-This bug was fixed in v1.0.7, but do not use `self.title` to set the navigation bar title.
+| 中文 | English |
+|:---|:---|
+| v1.0.7 已修复相关 bug，但仍建议不要使用 `self.title` 设置导航栏标题。 | This bug was fixed in v1.0.7, but do not use `self.title` to set the navigation bar title. |
 
-请使用 `self.navigationItem.title = @"同城";`：
-Use `self.navigationItem.title = @"同城";`:
+| 中文 | English |
+|:---|:---|
+| 请使用 `self.navigationItem.title = @"同城";`： | Use `self.navigationItem.title = @"同城";`: |
 
-`self.title = @"同城";  ` 这种方式，如果和 `tabBarItemsAttributes` 中对应的 `title` 不一致的时候可能会导致如下现象（不算 bug，但看起来也很奇怪）：
-
+| 中文 | English |
+|:---|:---|
+| `self.title = @"同城";  ` 这种方式，如果和 `tabBarItemsAttributes` 中对应的 `title` 不一致的时候可能会导致如下现象（不算 bug，但看起来也很奇怪）： | If `self.title = @"同城";` differs from the corresponding `tabBarItemsAttributes` title, the following strange-looking behavior may occur (this is not technically a bug): |
 
 <p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur9yhnqej30ac01pq2z.jpg"></a></p>
 
-
-
-推荐规则如下：
-Recommended usage:
+| 中文 | English |
+|:---|:---|
+| 推荐规则如下： | Recommended usage: |
 
  ```Objective-C
 
@@ -1285,9 +1302,10 @@ Recommended usage:
 
 <p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur5d01x6j30af0ijmy6.jpg"></a></p>
 
-这是早期 iOS 系统的问题，测试表明 iOS 9.3 已修复。
-On older iOS versions, set the root window background color to white:
-
+| 中文 | English |
+|:---|:---|
+| 这是早期 iOS 系统的问题，测试表明 iOS 9.3 已修复。 | This was an issue on older iOS versions; testing shows that it was fixed in iOS 9.3. |
+| 在受影响的旧版本上，可以将根窗口背景色设置为白色： | On affected older iOS versions, set the root window background color to white: |
 
  ```Objective-C
 //#import "CYLTabBarController.h"
@@ -1296,28 +1314,30 @@ On older iOS versions, set the root window background color to white:
 ### [CN]凸起的图标超出 49pt 后无法响应
 ### [EN]A raised icon does not respond above 49pt
 
-库会自动处理，但只能保证 `UIButton` frame 内的区域可以响应。
-The library handles this automatically, but only the `UIButton` frame is guaranteed to receive taps.
+| 中文 | English |
+|:---|:---|
+| 库会自动处理，但只能保证 `UIButton` frame 内的区域可以响应。 | The library handles this automatically, but only the `UIButton` frame is guaranteed to receive taps. |
 
-请给 button 设置明显的背景色以确认实际 frame。红色区域可以响应，超出 button frame 的图片区域不能响应。
-Use a visible background color to inspect the button frame. The button area receives taps; image pixels outside the frame do not.
+| 中文 | English |
+|:---|:---|
+| 请给 button 设置明显的背景色以确认实际 frame。红色区域可以响应，超出 button frame 的图片区域不能响应。 | Use a visible background color to inspect the button frame. The button area receives taps; image pixels outside the frame do not. |
 
 <p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur67tddnj30yi0c6abk.jpg"></a></p>
 
-
-这是因为响应链中的 `UIControl` 可以响应点击，而 `UIImage` 不能。
-This is because `UIControl` participates in hit testing, while `UIImage` does not.
-
+| 中文 | English |
+|:---|:---|
+| 这是因为响应链中的 `UIControl` 可以响应点击，而 `UIImage` 不能。 | This is because `UIControl` participates in hit testing, while `UIImage` does not. |
 
 ### [CN]为什么 iOS 10 会崩溃而 iOS 9 不会？
 ### [EN]Why does it crash on iOS 10 but not iOS 9?
 
+| 中文 | English |
+|:---|:---|
+| 注册 PlusButton 时，必须在 `-application:didFinishLaunchingWithOptions:` 中调用 `[YourClass registerPlusButton]`。 | Register the PlusButton by calling `[YourClass registerPlusButton]` from `-application:didFinishLaunchingWithOptions:`. |
 
-注册 PlusButton 时，必须在 `-application:didFinishLaunchingWithOptions:` 中调用 `[YourClass registerPlusButton]`。
-Register the PlusButton by calling `[YourClass registerPlusButton]` from `-application:didFinishLaunchingWithOptions:`.
-
-不要在子类的 `+load` 方法中调用，否则在 iOS 10 上可能崩溃。
-Do not call it from the subclass `+load` method, as this may crash on iOS 10.
+| 中文 | English |
+|:---|:---|
+| 不要在子类的 `+load` 方法中调用，否则在 iOS 10 上可能崩溃。 | Do not call it from the subclass `+load` method, as this may crash on iOS 10. |
 
  ```Objective-C
  + (void)load {
@@ -1328,11 +1348,13 @@ Do not call it from the subclass `+load` method, as this may crash on iOS 10.
 ### [CN]PlusButton 选中后无法恢复为 normal
 ### [EN]PlusButton remains selected after selecting another tab
 
-通常有两种原因：
-There are two common causes:
+| 中文 | English |
+|:---|:---|
+| 通常有两种原因： | There are two common causes: |
 
-1. `tabBar` 设置了自定义 delegate，覆盖了默认状态切换逻辑。请在 delegate 中手动同步状态。
-   A custom `tabBar` delegate may override the default selection handling. Synchronize the state manually:
+| 中文 | English |
+|:---|:---|
+| `tabBar` 设置了自定义 delegate，覆盖了默认状态切换逻辑。请在 delegate 中手动同步状态。 | A custom `tabBar` delegate may override the default selection handling. Synchronize the state manually: |
 
  ```Objective-C
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
@@ -1341,46 +1363,51 @@ There are two common causes:
 }
  ```
 
-2. PlusButton 添加了自定义点击事件或手势，与库内置逻辑冲突。请移除自定义 `addTarget` 或手势。
-   A custom action or gesture may conflict with the library. Remove the custom `addTarget` or gesture.
+| 中文 | English |
+|:---|:---|
+| PlusButton 添加了自定义点击事件或手势，与库内置逻辑冲突。请移除自定义 `addTarget` 或手势。 | A custom action or gesture may conflict with the library. Remove the custom `addTarget` or gesture. |
 
 ### [CN]PlusButton 与其他 TabBarItem 的间距不均匀
 ### [EN]The PlusButton is not evenly spaced
 
-对应 [issue #36](https://github.com/ChenYilong/CYLTabBarController/issues/36#issuecomment-269165471)。
-See [issue #36](https://github.com/ChenYilong/CYLTabBarController/issues/36#issuecomment-269165471).
+| 中文 | English |
+|:---|:---|
+| 对应 [issue #36](https://github.com/ChenYilong/CYLTabBarController/issues/36#issuecomment-269165471)。 | See [issue #36](https://github.com/ChenYilong/CYLTabBarController/issues/36#issuecomment-269165471). |
 
-将 Demo 中的：
+| 中文 | English |
+|:---|:---|
+| 将 Demo 中的： | Replace this in the demo: |
 
  ```Objective-C
 [button sizeToFit];
  ```
 
-改为：
-Replace it with:
+| 中文 | English |
+|:---|:---|
+| 改为： | Replace it with: |
 
  ```Objective-C
 button.frame = CGRectMake(0.0, 0.0, w, h);
  ```
 
-如果只放置一个相机图标，尺寸应以设计稿为准。
-For a camera-only icon, use the size specified by your design.
+| 中文 | English |
+|:---|:---|
+| 如果只放置一个相机图标，尺寸应以设计稿为准。 | For a camera-only icon, use the size specified by your design. |
 
-通常可以使用与其他 TabBarItem 相同的宽度：
-In most cases, use the same width as the other TabBarItems:
-
+| 中文 | English |
+|:---|:---|
+| 通常可以使用与其他 TabBarItem 相同的宽度： | In most cases, use the same width as the other TabBarItems: |
 
  ```Objective-C
  [UIScreen mainScreen].bounds.size.width / [CYLTabBarController allItemsInTabBarCount]
  ```
 
-
 ### [CN]如何兼容 Lottie 动画？
 ### [EN]How do I integrate Lottie animations?
 
-用法请参考 [issue #341](https://github.com/ChenYilong/CYLTabBarController/issues/341)。
-See [issue #341](https://github.com/ChenYilong/CYLTabBarController/issues/341) for usage.
-
+| 中文 | English |
+|:---|:---|
+| 用法请参考 [issue #341](https://github.com/ChenYilong/CYLTabBarController/issues/341)。 | See [issue #341](https://github.com/ChenYilong/CYLTabBarController/issues/341) for usage. |
 
 ## [CN]Star 历史
 ## [EN]Star history
@@ -1393,16 +1420,18 @@ See [issue #341](https://github.com/ChenYilong/CYLTabBarController/issues/341) f
  </picture>
 </a>
 
-（更多 iOS 开发干货，欢迎关注 [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/)）
-(For more iOS development tips, follow [@iOS程序犭袁 on Weibo](http://weibo.com/luohanchenyilong/).)
-
+| 中文 | English |
+|:---|:---|
+| （更多 iOS 开发干货，欢迎关注 [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/)） | (For more iOS development tips, follow [@iOS程序犭袁 on Weibo](http://weibo.com/luohanchenyilong/).) |
 
 --------------------------------------------
 
+| 中文 | English |
+|:---|:---|
+| 发布者：[微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) & [公众号@iTeaTime技术清谈](https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw) | Posted by [@iOS程序犭袁 on Weibo](http://weibo.com/luohanchenyilong/) & [@iTeaTime技术清谈 on WeChat](https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw) |
 
-Posted by [微博@iOS程序犭袁](http://weibo.com/luohanchenyilong/) &
-[公众号@iTeaTime技术清谈](https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw)
+| 中文 | English |
+|:---|:---|
+| 原创作品，版权声明：License MIT | Original work. Copyright license: MIT. |
 
-原创作品，版权声明：License MIT
-Original work. Copyright license: MIT.
 <p align="center"><a href="http://weibo.com/u/1692391497?s=6uyXnP" target="_blank"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1692391497/b46c844b/1.png"/></a></p>
