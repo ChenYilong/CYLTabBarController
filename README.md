@@ -279,6 +279,7 @@ The directory structure is organized as follows:
 | 中文 | English |
 |:---|:---|
 | 如果网络环境允许直接访问 RubyGems，请在终端运行： | If RubyGems is directly accessible, run: |
+
   ```
   sudo gem install cocoapods
   ```
@@ -290,6 +291,7 @@ The directory structure is organized as follows:
 | 中文 | English |
 |:---|:---|
 | 在终端依次运行以下命令： | Run the following commands in sequence in the terminal: |
+
   ```
   gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/
  
@@ -302,6 +304,7 @@ The directory structure is organized as follows:
 | 中文 | English |
 |:---|:---|
 | 在终端中运行以下命令： | Run the following command in the terminal: |
+
   ```
   pod search CYLTabBarController
   ```
@@ -313,6 +316,7 @@ The directory structure is organized as follows:
 | 中文 | English |
 |:---|:---|
 | 如果没有找到库或版本不是最新，请更新本地源： | If the library is missing or outdated, update the local repository: |
+
   ```
   pod repo update
   ```
@@ -323,6 +327,7 @@ The directory structure is organized as follows:
 | 中文 | English |
 |:---|:---|
 | 进入工程目录并初始化 Podfile： | Open your project directory and initialize a Podfile: |
+
   ```
   pod init
   ```
@@ -330,6 +335,7 @@ The directory structure is organized as follows:
 | 中文 | English |
 |:---|:---|
 | 如果尚未安装 CocoaPods，也可以运行： | If CocoaPods is not installed, run: |
+
  ```
  gem install cocoapods
  ```
@@ -341,6 +347,7 @@ The directory structure is organized as follows:
 | 中文 | English |
 |:---|:---|
 | 在文件 `Podfile` 中加入以下内容： | Add the following content to the `Podfile`: |
+
  ```
  pod 'CYLTabBarController', '~> 1.24.0'
  ```
@@ -348,6 +355,7 @@ The directory structure is organized as follows:
 | 中文 | English |
 |:---|:---|
 | 安装依赖： | Install the dependency: |
+
  ```
  pod install
  ```
@@ -394,6 +402,7 @@ The directory structure is organized as follows:
 | 中文 | English |
 |:---|:---|
 | （此处示例可能是旧版本，使用时请替换为最新版，最新版信息可以从这里获取：[podspec](https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec)。） | This example may use an older version. Replace it with the latest version when needed; the latest version is available in the [podspec](https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec). |
+
 ```
 pod 'CYLTabBarController', '~> 1.24.0'
 ```
@@ -404,6 +413,7 @@ pod 'CYLTabBarController', '~> 1.24.0'
 | 中文 | English |
 |:---|:---|
 | CocoaPods 会在本地缓存源服务器上的版本。如果搜索不到最新版本，请运行： | CocoaPods caches versions locally. Run the following command when the latest version is unavailable: |
+
  ```
  pod repo update
  ```
@@ -414,6 +424,7 @@ pod 'CYLTabBarController', '~> 1.24.0'
 | 中文 | English |
 |:---|:---|
 | 修改 Podfile 中的版本后运行： | After changing the version in the Podfile, run: |
+
  ```
  pod update
  ```
@@ -442,6 +453,7 @@ pod 'CYLTabBarController', '~> 1.24.0'
 | 中文 | English |
 |:---|:---|
 | 除了 CocoaPods 和 Swift Package Manager，也可以通过 [Carthage](https://github.com/Carthage/Carthage) 集成本库。在 `Cartfile` 中添加： | In addition to CocoaPods and Swift Package Manager, you can integrate the library with [Carthage](https://github.com/Carthage/Carthage). Add the following to `Cartfile`: |
+
 ```
 github "ChenYilong/CYLTabBarController"
 ```
@@ -449,6 +461,7 @@ github "ChenYilong/CYLTabBarController"
 | 中文 | English |
 |:---|:---|
 | 然后执行： | Then run: |
+
 ```
 carthage update --use-xcframeworks
 ```
@@ -570,6 +583,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 不要在子类的 `+load` 方法中注册，否则在 iOS 10 上可能发生崩溃。 | Do not register it from `+load`, because this may crash on iOS 10. |
+
  ```Objective-C
  + (void)load {
     [super registerPlusButton];
@@ -579,6 +593,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 协议提供以下可选方法： | The protocol provides the following optional methods: |
+
  ```Objective-C
 + (NSUInteger)indexOfPlusButtonInTabBar;
 + (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight;
@@ -589,6 +604,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 这些方法的作用如下： | Their roles are described below. |
+
  ```Objective-C
  + (NSUInteger)indexOfPlusButtonInTabBar;
  ```
@@ -645,6 +661,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 详见 Demo 中 `CYLPlusButtonSubclass` 的实现。 | See `CYLPlusButtonSubclass` in the demo for a complete implementation. |
+
  ```Objective-C
 + (UIViewController *)plusChildViewController;
  ```
@@ -792,6 +809,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 下面的方法可以捕获跳转前的控制器和即将跳转到的目标控制器。 | The following method receives the current and destination view controllers. |
+
  ```Objective-C
 //UITabBarController.h
 @protocol UITabBarControllerDelegate <NSObject>
@@ -819,6 +837,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 协议声明方式如下： | Declare the protocols as follows: |
+
  ```Objective-C
 @interface AppDelegate ()<UITabBarControllerDelegate, CYLTabBarControllerDelegate>
 
@@ -844,6 +863,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 实现该代理方法即可获取选中的控件，并直接为其添加动画。 | Implement this delegate method to access the selected control and animate it. |
+
  ```Objective-C
 //CYLTabBarController.h
 
@@ -866,6 +886,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 遵循协议： | Conform to the protocols: |
+
  ```Objective-C
 @interface AppDelegate ()<UITabBarControllerDelegate, CYLTabBarControllerDelegate>
 
@@ -931,6 +952,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | `CYLTabBarController.h` 提供了 `CYLTabBarItemWidth` extern 常量，并会在宽度变化时更新。 | `CYLTabBarController.h` exposes the `CYLTabBarItemWidth` extern, which is updated whenever the item width changes. |
+
  ```Objective-C
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {
     void (^deviceOrientationDidChangeBlock)(NSNotification *) = ^(NSNotification *notification) {
@@ -974,6 +996,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 接口如下： | The interface is: |
+
  ```Objective-C
 // CYLTabBarController.h
 
@@ -1022,6 +1045,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 协议示例： | Protocol example: |
+
  ```Objective-C
 #pragma mark - CYLPlusButtonSubclassing
 
@@ -1060,6 +1084,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 也可以通过下面的方法获取 PlusButton 的点击状态： | Use the following method to inspect the PlusButton selection state: |
+
 ```Objective-C
 + (BOOL)shouldSelectPlusChildViewController;
 ```
@@ -1142,6 +1167,7 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 实现以下协议方法，为 PlusButton 指定 context： | Implement the following protocol method to assign a context: |
+
  ```Objective-C
 //CYLPlusButtonSubclassing
 + (NSString *)tabBarContext;
