@@ -72,20 +72,13 @@ It also supports both landscape and portrait layouts on iPhone Duo. Update to CY
 CYLTabBarController 现已适配 iOS 27 和 iPhone Duo，更新内容如下：
 CYLTabBarController now supports iOS 27 and iPhone Duo with the following features:
 
-✅ 支持横向布局与竖向布局
-✅ Supports landscape and portrait layouts.
-
-✅ 支持扁平样式与液态玻璃样式
-✅ Supports flat and Liquid Glass styles.
-
-✅ 所有样式均支持加号按钮居中显示。
-✅ The plus button can be centered in every style.
-
-✅ 零代码适配：已经接入 CYLTabBar 液态玻璃样式或扁平样式的代码，无需修改代码，更新版本即可适配 iPhone Duo。
-✅ Zero-code adaptation: apps already using the CYLTabBar Liquid Glass or flat style require no code changes to support iPhone Duo.
-
-✅ 审核友好，适配代码均为纯原生公开 API，无审核风险。
-✅ Review-friendly: the adaptation uses only public native APIs.
+| 中文 | English |
+|:---|:---|
+| ✅ 支持横向布局与竖向布局 | ✅ Supports landscape and portrait layouts. |
+| ✅ 支持扁平样式与液态玻璃样式 | ✅ Supports flat and Liquid Glass styles. |
+| ✅ 所有样式均支持加号按钮居中显示。 | ✅ The plus button can be centered in every style. |
+| ✅ 零代码适配：已经接入 CYLTabBar 液态玻璃样式或扁平样式的代码，无需修改代码，更新版本即可适配 iPhone Duo。 | ✅ Zero-code adaptation: apps already using the CYLTabBar Liquid Glass or flat style require no code changes to support iPhone Duo. |
+| ✅ 审核友好，适配代码均为纯原生公开 API，无审核风险。 | ✅ Review-friendly: the adaptation uses only public native APIs. |
 
 请更新 CYLTabBarController 1.99.66 查看演示：
 Update to CYLTabBarController 1.99.66 to see the demo:
@@ -107,6 +100,7 @@ Update to CYLTabBarController 1.99.66 to see the demo:
 | ✅ 建议升级到 1.99.41 或更高版本进行 iOS 27 适配。 | ✅ Upgrade to 1.99.41 or later for iOS 27 support. |
 CYLTabBarController 现已支持在 iOS 26 上实现以下效果，请更新至 1.99.39 或更高版本。
 CYLTabBarController supports the following features on iOS 26. Update to version 1.99.39 or later:
+
 | 中文 | English |
 |:---|:---|
 | ✅ 同时展示 Lottie 动画与液态玻璃效果。 | ✅ Display Lottie animations and the Liquid Glass effect together. |
@@ -217,6 +211,7 @@ Learning group: 515295083.
 
 ## [CN]集成后的效果
 ## [EN]Results after integration
+
 | 中文 | English |
 |:---|:---|
 | 默认样式<br>![Default style](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqwf0dm7j30ku048glt.jpg) | Default style<br>![Default style](https://tva1.sinaimg.cn/large/006y8mN6ly1g6uqwf0dm7j30ku048glt.jpg) |
