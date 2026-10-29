@@ -18,37 +18,44 @@
 <p align="center">
 <a href="https://twitter.com/stevechen1010"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social&maxAge=2592000"></a>
 <a href="http://weibo.com/luohanchenyilong"><img src="http://i67.tinypic.com/wbulbr.jpg"></a>
-</a><a href="https://t.me/CYLTabBarController"><img src="http://i66.tinypic.com/of2hbn.jpg"></a></a> 
+</a><a href="https://t.me/CYLTabBarController"><img src="http://i66.tinypic.com/of2hbn.jpg"></a></a>
 </p>
 
 ----------
 
 
-## Base Info for this issue 
+## [CN]问题基本信息
+## [EN]Base information for this issue
 
-<!--- 基本信息 -->
+<!--- [CN]基本信息 -->
+<!--- [EN]Basic information -->
 
-<!--- 每个类的第五行都标记有版本号，请贴出。 -->
+<!--- [CN]每个类的第五行都标记有版本号，请贴出。 -->
+<!--- [EN]Each class has a version marker on its fifth line. Please include it. -->
 
- 1. Version：Latest Version as [here](https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec) 
+ 1. Version：Latest Version as [here](https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec)
  2. Language of App ：Objective-C/Swift
  4. iOS System Version：iOS26
- 5. Prototype（是否是真机）：YES
- 6. Issue Type：Crash、Bug、Enhancement（希望能支持一个新需求）、Q-A
+ 5. Prototype (是否是真机 / Is this a real device): YES
+ 6. Issue Type (问题类型 / Type): Crash, Bug, Enhancement, Q&A
 
-## 1. How to reproduce the problem.
-<!--- 请详细描述下复现步骤。 -->
+## 1. How to reproduce the problem
+<!--- [CN]请详细描述复现步骤。 -->
+<!--- [EN]Please describe the reproduction steps in detail. -->
 
-## 2. Please help me in this way.
-<!--- 请详细描述下我需要怎么做才能符合你的需求。 -->
+## 2. What would you like us to help with?
+<!--- [CN]请详细描述需要如何处理才能满足你的需求。 -->
+<!--- [EN]Please describe what we should do to meet your requirements. -->
 
-## 3. Here is a Demo. 
+## 3. Demo or sample project
 
-<!--- 尽量提供一个可以复现的Demo，我的邮箱：luohanchenyilong@163.com。或者前往 Telegram 群交流：https://t.me/iosobjc -->
+<!--- [CN]尽量提供一个可以复现的 Demo。也可以通过 Telegram 群交流：https://t.me/iosobjc -->
+<!--- [EN]Please provide a reproducible demo when possible. You can also use the Telegram group: https://t.me/iosobjc -->
 
-## 4. Here is my Debug log
+## 4. Debug log
 
-<!--- 请尽量提供详细的日志打印信息，控制台默认会有网络请求的打印信息，请将相关的日志贴出-->
+<!--- [CN]请尽量提供详细的日志信息，并贴出相关控制台输出。 -->
+<!--- [EN]Please provide detailed logs and include the relevant console output. -->
 
 
 
@@ -57,5 +64,4 @@
 ----------
 
 <p align="center"><a href="http://weibo.com/u/1692391497?s=6uyXnP" target="_blank"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1692391497/b46c844b/1.png"/></a></a>
-
 
