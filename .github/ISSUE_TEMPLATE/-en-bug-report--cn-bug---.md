@@ -42,7 +42,7 @@ assignees: ChenYilong
  <a href="http://ww2.sinaimg.cn/large/006tNc79ly1g5et6q6sm5j30go0goaar.jpg"><img src="http://ww1.sinaimg.cn/large/006tNc79ly1g5esb5j4oaj300w00rdfn.jpg"></a>
 <a href="http://weibo.com/luohanchenyilong"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6um2edt3jj300w00q3y9.jpg"></a>
 <a href="https://twitter.com/iOSChenYilong"><img src="http://ww3.sinaimg.cn/large/006tNc79ly1g5erhikv2kj300w00wgld.jpg"></a>
-<a href="https://github.com/ChenYilong"><img src="http://ww3.sinaimg.cn/large/006tNc79gy1g5ercvzgxzj300w00wmwx.jpg"></a> 
+<a href="https://github.com/ChenYilong"><img src="http://ww3.sinaimg.cn/large/006tNc79gy1g5ercvzgxzj300w00wmwx.jpg"></a>
 <a href="https://qm.qq.com/cgi-bin/qm/qr?k=SEdIYBh52YzquCEo8cmPwgkko1VgSAlw&authKey=sGcG%2BGB81DW%2Ba8v3dCufFSNoxhykAU61Uz%2B%2BqDiKQN2BGHP2xHYVI2tc0Cah2lpu"><img src="http://ww1.sinaimg.cn/large/006tNc79ly1g5euf38fedj300w00wjr5.jpg"></a>
 <a href="https://t.me/iosobjc"><img src="http://ww2.sinaimg.cn/large/006tNc79ly1g5eus39934j300w00w0r1.jpg"></a>
 <a href="http://s.zhihu.com/BU5Mp"><img src="http://ww4.sinaimg.cn/large/006tNc79ly1g5eu9melwaj300w00w3ya.jpg"></a>
@@ -52,31 +52,38 @@ assignees: ChenYilong
 --------------------------------------------
 
 
-## Base Info for this issue 
+## [CN]问题基本信息
+## [EN]Base information for this issue
 
-<!--- 基本信息 -->
+<!--- [CN]基本信息 -->
+<!--- [EN]Basic information -->
 
-<!--- 每个类的第五行都标记有版本号，请贴出。 -->
+<!--- [CN]每个类的第五行都标记有版本号，请贴出。 -->
+<!--- [EN]Each class has a version marker on its fifth line. Please include it. -->
 
- 1. Version：Latest Version as [here](https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec) 
+ 1. Version：Latest Version as [here](https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec)
  2. Language of App ：Objective-C/Swift
  4. iOS System Version：iOS26
- 5. Prototype（是否是真机）：YES
- 6. Issue Type：Crash、Bug、Enhancement（希望能支持一个新需求）、Q-A
+ 5. Prototype (是否是真机 / Is this a real device): YES
+ 6. Issue Type (问题类型 / Type): Crash, Bug, Enhancement, Q&A
 
 ## 1. How to reproduce the problem.
-<!--- 请详细描述下复现步骤。 -->
+<!--- [CN]请详细描述复现步骤。 -->
+<!--- [EN]Please describe the reproduction steps in detail. -->
 
 ## 2. Please help me in this way.
-<!--- 请详细描述下我需要怎么做才能符合你的需求。 -->
+<!--- [CN]请详细描述需要如何处理才能满足你的需求。 -->
+<!--- [EN]Please describe what we should do to meet your requirements. -->
 
-## 3. Here is a Demo. 
+## 3. Here is a Demo.
 
-<!--- 尽量提供一个可以复现的Demo，我的邮箱：luohanchenyilong@163.com。或者前往 Telegram 群交流：https://t.me/iosobjc -->
+<!--- [CN]尽量提供一个可以复现的 Demo。也可以通过 Telegram 群交流：https://t.me/iosobjc -->
+<!--- [EN]Please provide a reproducible demo when possible. You can also use the Telegram group: https://t.me/iosobjc -->
 
 ## 4. Here is my Debug log
 
-<!--- 请尽量提供详细的日志打印信息，控制台默认会有网络请求的打印信息，请将相关的日志贴出-->
+<!--- [CN]请尽量提供详细的日志信息，并贴出相关控制台输出。 -->
+<!--- [EN]Please provide detailed logs and include the relevant console output. -->
 
 
 

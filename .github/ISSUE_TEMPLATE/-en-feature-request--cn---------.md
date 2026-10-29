@@ -42,7 +42,7 @@ assignees: ChenYilong
  <a href="http://ww2.sinaimg.cn/large/006tNc79ly1g5et6q6sm5j30go0goaar.jpg"><img src="http://ww1.sinaimg.cn/large/006tNc79ly1g5esb5j4oaj300w00rdfn.jpg"></a>
 <a href="http://weibo.com/luohanchenyilong"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6um2edt3jj300w00q3y9.jpg"></a>
 <a href="https://twitter.com/iOSChenYilong"><img src="http://ww3.sinaimg.cn/large/006tNc79ly1g5erhikv2kj300w00wgld.jpg"></a>
-<a href="https://github.com/ChenYilong"><img src="http://ww3.sinaimg.cn/large/006tNc79gy1g5ercvzgxzj300w00wmwx.jpg"></a> 
+<a href="https://github.com/ChenYilong"><img src="http://ww3.sinaimg.cn/large/006tNc79gy1g5ercvzgxzj300w00wmwx.jpg"></a>
 <a href="https://qm.qq.com/cgi-bin/qm/qr?k=SEdIYBh52YzquCEo8cmPwgkko1VgSAlw&authKey=sGcG%2BGB81DW%2Ba8v3dCufFSNoxhykAU61Uz%2B%2BqDiKQN2BGHP2xHYVI2tc0Cah2lpu"><img src="http://ww1.sinaimg.cn/large/006tNc79ly1g5euf38fedj300w00wjr5.jpg"></a>
 <a href="https://t.me/iosobjc"><img src="http://ww2.sinaimg.cn/large/006tNc79ly1g5eus39934j300w00w0r1.jpg"></a>
 <a href="http://s.zhihu.com/BU5Mp"><img src="http://ww4.sinaimg.cn/large/006tNc79ly1g5eu9melwaj300w00w3ya.jpg"></a>
@@ -54,12 +54,16 @@ assignees: ChenYilong
 
 **Is your feature request related to a problem? Please describe.**
 <!--- A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]-->
+<!--- [CN]该功能请求是否与某个问题有关？请详细描述。 -->
 
 **Describe the solution you'd like**
 <!--- A clear and concise description of what you want to happen.-->
+<!--- [CN]请清晰、简洁地描述你希望实现的方案。 -->
 
 **Describe alternatives you've considered**
 <!--- A clear and concise description of any alternative solutions or features you've considered.-->
+<!--- [CN]请描述你考虑过的替代方案或功能。 -->
 
 **Additional context**
 <!--- Add any other context or screenshots about the feature request here.-->
+<!--- [CN]请补充相关背景、截图或其他信息。 -->
