@@ -787,9 +787,9 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
 }
 
 - (Class)cyl_badgeClass {
-//    return [UILabel class];
+    //    return [UILabel class];
 
-//    return [CYLTabBarBadgeView class];
+    //    return [CYLTabBarBadgeView class];
     Class badgeClass = nil;
     if (!CYL_IS_IOS_27) {
         return [UILabel class];

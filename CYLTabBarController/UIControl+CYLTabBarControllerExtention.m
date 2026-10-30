@@ -556,24 +556,24 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
  不能增加dispatch_get_main_queue判断，否则暂停与播放，可能错乱。
  */
 - (void)cyl_stopAnimationOfLottieView {
-//    dispatch_async(dispatch_get_main_queue(),^{
+    //    dispatch_async(dispatch_get_main_queue(),^{
 #if __has_include(<Lottie/Lottie.h>)
-        if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
-            LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
+    if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+        LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
             
-            if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]] && (lottieView.animationProgress > 0)) {
-                [lottieView stop];
-            }
+        if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]] && (lottieView.animationProgress > 0)) {
+            [lottieView stop];
         }
+    }
 #if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
         
-        else if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-            LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
+    else if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
             
-            if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]] && (lottieView.animationProgress > 0)) {
-                [lottieView stop];
-            }
+        if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]] && (lottieView.animationProgress > 0)) {
+            [lottieView stop];
         }
+    }
 #endif
         
         
@@ -582,32 +582,32 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
         
 #if __has_include(<Lottie/Lottie-Swift.h>)
         
-        if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+    if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
             
-            CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+        CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
             
-            if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
-                [lottieView stop];
-            }
+        if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
+            [lottieView stop];
         }
+    }
         
 #if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
-        //TODO:   仅仅保留一个 else if or else 即可
-        else if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-            CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-            if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
-                [lottieView stop];
-            }
-        }  else {
-            CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-            if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
-                [lottieView stop];
-            }
+    //TODO:   仅仅保留一个 else if or else 即可
+    else if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+        if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
+            [lottieView stop];
         }
+    }  else {
+        CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+        if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
+            [lottieView stop];
+        }
+    }
 #endif
         
 #endif
-//    });
+    //    });
 }
 
 #pragma mark - private method
