@@ -119,7 +119,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 #endif
         } else {
             [tabBarController setSelectedIndex:index];
-            if (NO == sender.cyl_userInteractionDisabled) {
+            // FIX: issue #594 — `-setSelectedIndex:` now selects the plus button and reports it through
+            // `tabBarController:didSelectControl:` itself (see `-cyl_plusButtonControlIfSelectingPlusChildViewController:`).
+            // Calling `-tabChangedToControl:` again for the plus button would report every tap twice.
+            if (sender != CYLExternPlusButton && NO == sender.cyl_userInteractionDisabled) {
                 sender.selected = YES;
                 [tabBarController tabChangedToControl:sender];
             }
