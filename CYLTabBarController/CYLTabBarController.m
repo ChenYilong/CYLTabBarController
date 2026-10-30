@@ -1672,6 +1672,20 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                 [CYLPlusChildViewController.view removeFromSuperview];
                 [CYLPlusChildViewController removeFromParentViewController];
             }
+            // FIX: issue #608
+            // [EN] Re-assigning `viewControllers` (e.g. a new set of tabs after login) crashed on the next tap on iOS 16 with
+            //      "Inconsistency in UITabBar items and view controllers detected. No view controller matches the
+            //      UITabBarItem". The classic style installs tabs with -addChildViewController: and never calls super's
+            //      -setViewControllers:, so removing the old children above does not tell UIKit those tabs are gone: the tab
+            //      bar kept the old items while `viewControllers` (CYL's own list) held only the new controllers, and
+            //      UIKit's tap handling found no controller for the tapped item. Clear UIKit's tab list too, so the new
+            //      tabs are installed exactly as on the first assignment.
+            // [CN] 重新给 `viewControllers` 赋值（如登录后换成另一组 Tab）后，iOS 16 上再点击会崩溃：
+            //      "Inconsistency in UITabBar items and view controllers detected. No view controller matches the UITabBarItem"。
+            //      经典样式用 -addChildViewController: 添加 Tab，从不调用父类的 -setViewControllers:，上面移除旧子控制器并不会
+            //      让 UIKit 知道旧 Tab 已不存在：TabBar 仍保留旧的 item，而 `viewControllers`（CYL 自己的数组）只有新控制器，
+            //      UIKit 处理点击时找不到对应的控制器。这里同时清空 UIKit 的 Tab 列表，让新 Tab 与首次赋值时一样安装。
+            [super setViewControllers:nil animated:NO];
         }
     
         if (!viewControllers || viewControllers.count == 0 || ![viewControllers isKindOfClass:[NSArray class]]) {
