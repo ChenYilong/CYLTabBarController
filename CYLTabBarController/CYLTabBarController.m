@@ -352,35 +352,56 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
     _viewDidLayoutSubviewsBlock = [viewDidLayoutSubviewsBlock copy];
 }
 
+/*!
+ * FIX: issue #610
+ * [EN] Classic (non Liquid Glass) tab buttons report taps through this target-action, which used to be added only in
+ *      `-viewDidLayoutSubviews`. Setting `tabBarItem.image` / `selectedImage` at runtime makes UIKit replace the tab
+ *      buttons (observed on iOS 17.5: 4 of 5 replaced), and only the tab bar is laid out again, not the controller's
+ *      view. The new buttons had no target, so `tabBarController:didSelectControl:` stopped being called until
+ *      something called `[tabBarController.view setNeedsLayout]`. `CYLTabBar -layoutSubviews` now calls this method
+ *      too, so new buttons get the action in the same layout pass that places them.
+ * [CN] 非液态玻璃的 Tab 按钮依靠这里添加的点击事件回调，以前只在 `-viewDidLayoutSubviews` 中添加。运行时修改
+ *      `tabBarItem.image` / `selectedImage` 会让 UIKit 重新创建 Tab 按钮（iOS 17.5 实测 5 个中替换了 4 个），而此时只会
+ *      重新布局 TabBar，不会触发控制器的 `-viewDidLayoutSubviews`。新按钮没有点击事件，于是不再回调
+ *      `tabBarController:didSelectControl:`，直到调用 `[tabBarController.view setNeedsLayout]`。现在 `CYLTabBar -layoutSubviews`
+ *      也会调用本方法，新按钮在布局的同时就会加上点击事件。
+ */
+- (void)cyl_bindTabControlActions {
+    if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]] || [CYLConstants isLiquidGlassActive]) {
+        //液态玻璃无法添加事件 放进手势响代理里处理。
+        return;
+    }
+    CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
+    // add callback for visiable control, included all plusButton.
+    SEL action = @selector(tabChangedToControl:);
+    [tabBar.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
+        // Remove first so repeated layout passes never add the action twice. 先移除，避免多次布局重复添加。
+        [control removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+        //to avoid invoking didSelectControl twice, because plusChildViewControllerButtonClicked will invoke setSelectedIndex
+        // The tab bar can lay out before the plus child view controller is added; the removal above then
+        // drops an action bound in that earlier pass. 加号子控制器添加前的布局可能已添加了事件，上面的移除会将其去掉。
+        if ([control cyl_isChildViewControllerPlusButton]) {
+            return;
+        }
+        UILabel *tabLabel = control.cyl_tabLabel;
+        tabLabel.textAlignment = NSTextAlignmentCenter;
+        
+        //FIX: iOS26 之前也不再使用点击事件， 而是在 `-setSelectedViewController` and `-setSelectedIndex`中处理
+        [control addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+        
+        if (idx == self.selectedIndex && ![control isKindOfClass:[CYLPlusButton class]]) {
+            control.selected = YES;
+        }
+    }];
+}
+
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     [self.cyl_tabBar layoutSubviews];//Fix issue #93 #392
     if ([self.cyl_tabBar isKindOfClass:[CYLTabBar class]] ) {
-        // add callback for visiable control, included all plusButton.
         CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
-        [tabBar.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([CYLConstants isLiquidGlassActive]) {
-                //液态玻璃无法添加事件 放进手势响代理里处理。
-                return;
-            }
-            //to avoid invoking didSelectControl twice, because plusChildViewControllerButtonClicked will invoke setSelectedIndex
-            if ([control cyl_isChildViewControllerPlusButton]) {
-                return;
-            }
-            UILabel *tabLabel = control.cyl_tabLabel;
-            tabLabel.textAlignment = NSTextAlignmentCenter;
-            
-            //FIX: iOS26 之前也不再使用点击事件， 而是在 `-setSelectedViewController` and `-setSelectedIndex`中处理
-            SEL action = @selector(tabChangedToControl:);
-            //fix#610 removeTarget 以避免 `-setNeedsLayout` 导致的重复调用 viewDidLayoutSubviews， 可能导致的action追加失败的bug
-            [control removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-            [control addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-            
-            if (idx == self.selectedIndex && ![control isKindOfClass:[CYLPlusButton class]]) {
-                control.selected = YES;
-            }
-        }];
+        [self cyl_bindTabControlActions];
         
         do {
             if (self.isLottieViewAdded) {
