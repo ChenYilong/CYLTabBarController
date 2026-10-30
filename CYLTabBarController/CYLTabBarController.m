@@ -2659,6 +2659,41 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     });
 }
 
+/*!
+ * FIX: issue #594 — only when a CYLPlusButton subclass is registered and implements `+plusChildViewController`
+ *      (`-hasPlusButton` and `-hasPlusChildViewController` both YES); otherwise nothing changes.
+ * [EN] A tab is selected either in code (`-setSelectedIndex:`) or by a tap (`-[CYLPlusButton
+ *      plusChildViewControllerButtonClicked:]`, which calls `-setSelectedIndex:` too). Both go through this method.
+ *      Selecting the plus button's child view controller in code (e.g. an initial `selectedIndex` equal to the plus
+ *      button's index) showed that page, but the plus button was not selected. With no control given,
+ *      `-tabChangedToSelectedIndex:viewController:control:` fell back to `CYLPlusChildViewController.cyl_tabButton`, the
+ *      system tab button under the plus button, and marked that one selected. A tap (`-plusChildViewControllerButtonClicked:`)
+ *      selects the plus button itself. Use the plus button here too, unless `+shouldSelectPlusChildViewController` opts out
+ *      (a tap does not select it then either).
+ * [CN] 仅适用于注册了 CYLPlusButton 子类并实现了 `+plusChildViewController` 的场景（`-hasPlusButton` 与
+ *      `-hasPlusChildViewController` 均为 YES），其他情况不变。Tab 的选中有两种触发方式：代码（`-setSelectedIndex:`）和用户点击
+ *      （`-[CYLPlusButton plusChildViewControllerButtonClicked:]`，内部同样调用 `-setSelectedIndex:`），两者都经过本方法。
+ *      用代码选中 PlusButton 对应的子控制器（如初始 `selectedIndex` 设为 PlusButton 的下标）时，页面正确显示，但 PlusButton
+ *      没有被选中：未传入 control 时，`-tabChangedToSelectedIndex:viewController:control:` 会使用
+ *      `CYLPlusChildViewController.cyl_tabButton`，即 PlusButton 下方的系统 Tab 按钮，并把它设为选中。点击 PlusButton
+ *      （`-plusChildViewControllerButtonClicked:`）选中的是 PlusButton 本身。这里同样使用 PlusButton，除非
+ *      `+shouldSelectPlusChildViewController` 返回 NO（此时点击也不会选中）。
+ */
+- (UIControl *)cyl_plusButtonControlIfSelectingPlusChildViewController:(UIViewController *)viewController {
+    if (!viewController || !CYLExternPlusButton || ![self hasPlusButton] || ![self hasPlusChildViewController]) {
+        return nil;
+    }
+    if (![viewController cyl_isEqualToViewController:CYLPlusChildViewController]) {
+        return nil;
+    }
+    Class plusButtonClass = [CYLExternPlusButton class];
+    if ([plusButtonClass respondsToSelector:@selector(shouldSelectPlusChildViewController)] &&
+        ![plusButtonClass shouldSelectPlusChildViewController]) {
+        return nil;
+    }
+    return CYLExternPlusButton;
+}
+
 #pragma mark - Override selectedIndex (Programmatic changes)
 
 - (void)setSelectedIndex:(NSUInteger)selectedIndex {
@@ -2676,7 +2711,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         if (YES == _selectedViewController.cyl_isPlaceholder) {
             return;
         }
-        [self tabChangedToSelectedIndex:selectedIndex viewController:selectedViewController control:nil];
+        [self tabChangedToSelectedIndex:selectedIndex
+                         viewController:selectedViewController
+                                control:[self cyl_plusButtonControlIfSelectingPlusChildViewController:selectedViewController]];
     
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {

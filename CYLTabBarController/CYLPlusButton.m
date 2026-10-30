@@ -25,6 +25,12 @@ UIViewController *CYLPlusChildViewController = nil;
 
 @end
 
+// FIX: issue #594 — implemented in CYLTabBarController.m. Declared here so a tap uses the same decision as
+// `-setSelectedIndex:` (see `-plusChildViewControllerButtonClicked:`).
+@interface CYLTabBarController (CYLPlusButtonSelection)
+- (UIControl *)cyl_plusButtonControlIfSelectingPlusChildViewController:(UIViewController *)viewController;
+@end
+
 @implementation CYLPlusButton
 //@synthesize selected = _selected;
 #pragma mark -
@@ -119,7 +125,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 #endif
         } else {
             [tabBarController setSelectedIndex:index];
-            if (NO == sender.cyl_userInteractionDisabled) {
+            // FIX: issue #594 — when the tab bar controller has a plus button with a child view controller,
+            // `-setSelectedIndex:` (the path also used for selection in code) already selected the plus button and reported
+            // it through `tabBarController:didSelectControl:`. Calling `-tabChangedToControl:` again would report every tap
+            // twice. Otherwise keep the previous behavior.
+            BOOL selectedBySetSelectedIndex =
+                ([tabBarController cyl_plusButtonControlIfSelectingPlusChildViewController:CYLPlusChildViewController] == sender);
+            if (!selectedBySetSelectedIndex && NO == sender.cyl_userInteractionDisabled) {
                 sender.selected = YES;
                 [tabBarController tabChangedToControl:sender];
             }
