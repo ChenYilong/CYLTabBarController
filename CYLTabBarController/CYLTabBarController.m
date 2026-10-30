@@ -524,7 +524,17 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
         CGRect frame = self.cyl_tabBar.frame;
         CGFloat tabBarHeight = self.tabBarFrame.size.height;
         frame.size.height = tabBarHeight;
-        frame.origin.y = self.view.frame.size.height - tabBarHeight;
+        // FIX: issue #591
+        // [EN] Use `bounds`, not `frame`: the tab bar is laid out in this view's own coordinate space, while `frame` is in
+        //      the superview's and includes the view's transform. A custom transition that scales the outgoing view
+        //      (`fromView.transform = CGAffineTransformMakeScale(...)`) shrinks `frame.size.height`, which moved the tab bar
+        //      up. Newer systems relaid the tab bar afterwards and hid the error; iOS 12 did not. `bounds` also matches
+        //      `-tabBarFrame`, and unlike the screen height it is right in Split View / Stage Manager.
+        // [CN] 使用 `bounds` 而不是 `frame`：TabBar 布局在本视图自身的坐标系中，`frame` 则在父视图坐标系中，并且包含视图的 transform。
+        //      自定义转场缩放 from 页面（`fromView.transform = CGAffineTransformMakeScale(...)`）时 `frame.size.height` 变小，
+        //      TabBar 因此被上移。高版本系统随后会重新布局 TabBar，掩盖了该问题，iOS 12 不会。`bounds` 也与 `-tabBarFrame` 一致，
+        //      且与屏幕高度不同，在分屏 / 台前调度下同样正确。
+        frame.origin.y = CGRectGetHeight(self.view.bounds) - tabBarHeight;
         frame;
     });
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
