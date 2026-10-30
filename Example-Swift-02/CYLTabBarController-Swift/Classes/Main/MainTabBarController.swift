@@ -90,6 +90,8 @@ class MainTabBarController: CYLTabBarController {
     private let issue610Label = UILabel()
 
     private func setUpIssue610Demo() {
+        // `tabBarController(_:didSelectControl:)` is a CYLTabBarControllerDelegate method; without a delegate it is never called.
+        delegate = self
         issue610Label.translatesAutoresizingMaskIntoConstraints = false
         issue610Label.font = .monospacedSystemFont(ofSize: 13, weight: .semibold)
         issue610Label.textAlignment = .center
@@ -110,31 +112,47 @@ class MainTabBarController: CYLTabBarController {
         }
     }
 
-    /// Launch with `-CYL610SelfTest` to run the #610 check without touching the screen:
-    /// swap the icons, then send `.touchUpInside` to every tab button (what a finger tap delivers to a
-    /// classic, non Liquid Glass tab button) and log how many `didSelectControl` callbacks arrived.
+    /// Launch with `-CYL610SelfTest` to run the #610 check without touching the screen. It swaps the icons, lets
+    /// only the tab bar lay out (what UIKit does after an item's image changes), then sends `.touchUpInside` to every
+    /// tab button (what a finger tap delivers to a classic, non Liquid Glass tab button) before anything lays out the
+    /// controller's view again, and logs whether each tap produced a `didSelectControl` callback.
     private func issue610RunSelfTest() {
         let before = issue610TabControls()
+        let baseline = issue610Tap(before)
+        NSLog("[#610] self-test before the icon swap, callback per tap: %@", baseline)
         issue610SwapIcons()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            guard let self = self else { return }
-            let after = self.issue610TabControls()
-            let replaced = zip(before, after).filter { $0 !== $1 }.count
-            let countBefore = self.issue610CallbackCount
-            for control in after {
-                control.sendActions(for: .touchUpInside)
-            }
-            let delivered = self.issue610CallbackCount - countBefore
-            let result = delivered >= after.count ? "PASS" : "FAIL"
-            NSLog("[#610] self-test %@: %ld of %ld tab buttons were replaced by UIKit after the icon swap; %ld taps -> %ld didSelectControl callbacks",
-                  result, replaced, after.count, after.count, delivered)
-        }
+        tabBar.layoutIfNeeded()
+        let after = issue610TabControls()
+        let replaced = zip(before, after).filter { $0 !== $1 }.count
+        let bound = issue610Bound(after)
+        let afterSwap = issue610Tap(after)
+        let result = (baseline + bound + afterSwap).contains("0") ? "FAIL" : "PASS"
+        NSLog("[#610] self-test %@: UIKit replaced %ld of %ld tab buttons; tap action bound per button: %@; callback per tap: %@",
+              result, replaced, after.count, bound, afterSwap)
     }
 
+    /// Tab buttons that report taps through CYLTabBarController's target-action. The plus button and the plus child
+    /// view controller's button report through the plus button instead, so they are left out.
     private func issue610TabControls() -> [UIControl] {
         guard let cylTabBar = tabBar as? CYLTabBar else { return [] }
-        return cylTabBar.cyl_visibleControls().filter { !($0 is CYLPlusButton) }
+        return cylTabBar.cyl_visibleControls().filter { !$0.cyl_isPlusControl() }
     }
+
+    /// "1" / "0" per control: does it carry CYLTabBarController's tap action right now?
+    private func issue610Bound(_ controls: [UIControl]) -> String {
+        controls.map { ($0.actions(forTarget: self, forControlEvent: .touchUpInside) ?? []).isEmpty ? "0" : "1" }
+            .joined(separator: " ")
+    }
+
+    /// Taps each control in turn and returns "1" / "0" per tap: did `didSelectControl` arrive?
+    private func issue610Tap(_ controls: [UIControl]) -> String {
+        controls.map { control -> String in
+            let count = issue610CallbackCount
+            control.sendActions(for: .touchUpInside)
+            return issue610CallbackCount > count ? "1" : "0"
+        }.joined(separator: " ")
+    }
+
 
     /// Replaces the icons the way the reporter did: directly on `tabBar.items`, after the controller was built
     /// with `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`.
