@@ -69,6 +69,93 @@ class MainTabBarController: CYLTabBarController {
 
         UIApplication.shared.applicationSupportsShakeToEdit = true
         self.becomeFirstResponder()
+        setUpIssue610Demo()
+    }
+
+    // MARK: - Issue #610 demo
+    // [EN] Issue #610: after replacing `tabBarItem.image` / `selectedImage` at runtime, tapping a tab no longer
+    //      called `tabBarController(_:didSelectControl:)`. Tap "Swap icons" (top right), then tap any tab:
+    //      the counter at the top must increase on every tap, including a tap on the selected tab.
+    // [CN] Issue #610：运行时替换 `tabBarItem.image` / `selectedImage` 后，点击 Tab 不再回调
+    //      `tabBarController(_:didSelectControl:)`。点右上角 "Swap icons"，再点任意 Tab：
+    //      顶部计数每次点击都要增加，包括点击已选中的 Tab。
+    private static let issue610IconSets: [[(normal: String, selected: String)]] = [
+        [("home_normal", "home_highlight"), ("mycity_normal", "mycity_highlight"),
+         ("message_normal", "message_highlight"), ("account_normal", "account_highlight")],
+        [("account_normal", "account_highlight"), ("message_normal", "message_highlight"),
+         ("mycity_normal", "mycity_highlight"), ("home_normal", "home_highlight")],
+    ]
+    private var issue610IconSetIndex = 0
+    private var issue610CallbackCount = 0
+    private let issue610Label = UILabel()
+
+    private func setUpIssue610Demo() {
+        issue610Label.translatesAutoresizingMaskIntoConstraints = false
+        issue610Label.font = .monospacedSystemFont(ofSize: 13, weight: .semibold)
+        issue610Label.textAlignment = .center
+        issue610Label.numberOfLines = 0
+        issue610Label.backgroundColor = UIColor.systemYellow.withAlphaComponent(0.85)
+        issue610Label.accessibilityIdentifier = "issue610Label"
+        issue610Label.text = "#610 didSelectControl: 0"
+        view.addSubview(issue610Label)
+        NSLayoutConstraint.activate([
+            issue610Label.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            issue610Label.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            issue610Label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+        ])
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Swap icons", style: .plain,
+                                                            target: self, action: #selector(issue610SwapIcons))
+        if ProcessInfo.processInfo.arguments.contains("-CYL610SelfTest") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in self?.issue610RunSelfTest() }
+        }
+    }
+
+    /// Launch with `-CYL610SelfTest` to run the #610 check without touching the screen:
+    /// swap the icons, then send `.touchUpInside` to every tab button (what a finger tap delivers to a
+    /// classic, non Liquid Glass tab button) and log how many `didSelectControl` callbacks arrived.
+    private func issue610RunSelfTest() {
+        let before = issue610TabControls()
+        issue610SwapIcons()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self = self else { return }
+            let after = self.issue610TabControls()
+            let replaced = zip(before, after).filter { $0 !== $1 }.count
+            let countBefore = self.issue610CallbackCount
+            for control in after {
+                control.sendActions(for: .touchUpInside)
+            }
+            let delivered = self.issue610CallbackCount - countBefore
+            let result = delivered >= after.count ? "PASS" : "FAIL"
+            NSLog("[#610] self-test %@: %ld of %ld tab buttons were replaced by UIKit after the icon swap; %ld taps -> %ld didSelectControl callbacks",
+                  result, replaced, after.count, after.count, delivered)
+        }
+    }
+
+    private func issue610TabControls() -> [UIControl] {
+        guard let cylTabBar = tabBar as? CYLTabBar else { return [] }
+        return cylTabBar.cyl_visibleControls().filter { !($0 is CYLPlusButton) }
+    }
+
+    /// Replaces the icons the way the reporter did: directly on `tabBar.items`, after the controller was built
+    /// with `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`.
+    @objc private func issue610SwapIcons() {
+        issue610IconSetIndex = (issue610IconSetIndex + 1) % Self.issue610IconSets.count
+        let icons = Self.issue610IconSets[issue610IconSetIndex]
+        // `tabBar.items` also holds the plus button's placeholder item; skip it.
+        let items = (viewControllers ?? []).filter { !$0.cyl_isPlaceholder }.map { $0.tabBarItem! }
+        for (index, item) in items.enumerated() where index < icons.count {
+            item.image = UIImage(named: icons[index].normal)
+            item.selectedImage = UIImage(named: icons[index].selected)
+        }
+        NSLog("[#610] swapped tab bar icons to set %ld", issue610IconSetIndex)
+    }
+
+    override func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
+        issue610CallbackCount += 1
+        let index = selectedIndex
+        issue610Label.text = "#610 didSelectControl: \(issue610CallbackCount) (index \(index))"
+        view.bringSubviewToFront(issue610Label)
+        NSLog("[#610] didSelectControl #%ld index %ld control %@", issue610CallbackCount, index, control)
     }
     
     
