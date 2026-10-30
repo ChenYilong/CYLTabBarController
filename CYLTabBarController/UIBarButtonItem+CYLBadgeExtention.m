@@ -29,11 +29,16 @@
 /**
  *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
  */
+/*!
+ * FIX: badge position with Auto Layout
+ * [EN] `delaySeconds` was an `NSUInteger`, so the 0.5 s wait for a bar button that is not laid out yet became 0.
+ * [CN] `delaySeconds` 原为 `NSUInteger`，尚未完成布局的 bar button 本应等待 0.5 秒，实际变成了 0 秒。
+ */
 - (void)cyl_showBadge {
     if (@available(iOS 11.0, *)) {
         [self swizzling_willMoveToSuperview];
     }
-    NSUInteger delaySeconds = self.cyl_isReady ? 0 : 0.5;
+    NSTimeInterval delaySeconds = self.cyl_isReady ? 0 : 0.5;
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
         [CYL_ACTUAL_BARBUTTON cyl_showBadge];
@@ -46,7 +51,7 @@
     if (@available(iOS 11.0, *)) {
         [self swizzling_willMoveToSuperview];
     }
-    NSUInteger delaySeconds = self.cyl_isReady ? 0 : 0.5;
+    NSTimeInterval delaySeconds = self.cyl_isReady ? 0 : 0.5;
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
         [CYL_ACTUAL_BARBUTTON cyl_showBadgeValue:value animationType:animationType];
@@ -175,7 +180,7 @@
 - (NSNumber *)cyl_delayIfNeededForSeconds {
     // Mirror the logic used when delaying badge operations.
     // 0 if ready immediately, otherwise default to 0.5s.
-    NSUInteger delaySeconds = self.cyl_isReady ? 0 : 0.5;
+    NSTimeInterval delaySeconds = self.cyl_isReady ? 0 : 0.5;
     return @(delaySeconds);
 }
 

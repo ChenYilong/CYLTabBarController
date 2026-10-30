@@ -30,6 +30,7 @@
 #define kCYLBadgeDefaultDelayIfNeededForSeconds (0.5)
 
 static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
+static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 
 @implementation UIView (CYLBadgeExtention)
 
@@ -60,6 +61,80 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
 
 - (void)cyl_showBadgeValue:(NSString *)value
         animationTypeValue:(NSNumber *)animationTypeValue {
+    NSUInteger generation = [self cyl_invalidatePendingBadgeValue];
+    if ([self cyl_shouldWaitForLayoutBeforeShowingBadgeValue:value]) {
+        [self cyl_showBadgeValue:value animationTypeValue:animationTypeValue afterLayoutWithGeneration:generation attempt:0];
+        return;
+    }
+    [self cyl_showBadgeValueNow:value animationTypeValue:animationTypeValue];
+}
+
+/*!
+ * FIX: badge position with Auto Layout (xib / storyboard / constraints, e.g. a label with a relative width in a cell)
+ * [EN] The badge was placed once, from the host view's frame at the moment it was shown. With Auto Layout that frame
+ *      is often still zero (the badge was then dropped, so apps waited with `dispatch_after`) or changes later (the
+ *      badge stayed where the old right edge was). Now:
+ *      1. A host that is not laid out yet (`-cyl_isReady` is NO even after `-layoutIfNeeded`) shows the badge on the
+ *         next run loop, then after `cyl_delayIfNeededForSeconds`, at most `kCYLBadgeMaximumLayoutRetryCount` times.
+ *         Only the latest value is shown: a newer show or a clear cancels a pending one.
+ *      2. The badge is anchored to the host's top-right corner (`-cyl_layoutBadgeAtTopRightCorner`), so it follows
+ *         later size changes.
+ *      Scope: every badge, whatever the tab bar style (classic, iOS 26 UI compatibility mode, Liquid Glass on iOS 26+
+ *      and the iPhone Duo, FlatDesign) and any other view: they all share this code. On the Duo, folding changes the
+ *      tab button widths, and Liquid Glass relays out its buttons; the anchored badge follows both.
+ * [CN] 角标只在显示时按宿主视图当时的 frame 定位一次。使用自动布局时，这个 frame 往往还是 0（角标因此不显示，App 只能用
+ *      `dispatch_after` 延迟），或者之后才改变（角标停留在原来的右边缘）。现在：
+ *      1. 宿主尚未完成布局时（调用 `-layoutIfNeeded` 后 `-cyl_isReady` 仍为 NO），先在下一个 run loop、再按
+ *         `cyl_delayIfNeededForSeconds` 延迟重试，最多 `kCYLBadgeMaximumLayoutRetryCount` 次。只显示最新的值：
+ *         新的显示或清除会取消等待中的显示。
+ *      2. 角标固定在宿主的右上角（`-cyl_layoutBadgeAtTopRightCorner`），宿主尺寸之后改变时角标跟随移动。
+ *      范围：所有角标，与 TabBar 样式无关（经典、iOS 26 UI 兼容模式、iOS 26+ 液态玻璃与 iPhone Duo、扁平样式），
+ *      以及其他任意视图：它们共用这段代码。iPhone Duo 折叠时 Tab 按钮宽度会变，液态玻璃也会重新布局按钮，角标都会跟随。
+ */
+- (BOOL)cyl_shouldWaitForLayoutBeforeShowingBadgeValue:(NSString *)value {
+    if (!value || ![self cyl_badgeClass]) {
+        return NO;
+    }
+    // A number <= 0 hides the badge, which needs no layout.
+    NSString *nonDigits = [value stringByTrimmingCharactersInSet:[NSCharacterSet decimalDigitCharacterSet]];
+    if (value.length > 0 && nonDigits.length == 0 && [value integerValue] <= 0) {
+        return NO;
+    }
+    return ![self cyl_isReady];
+}
+
+- (void)cyl_showBadgeValue:(NSString *)value
+        animationTypeValue:(NSNumber *)animationTypeValue
+ afterLayoutWithGeneration:(NSUInteger)generation
+                   attempt:(NSUInteger)attempt {
+    NSTimeInterval delay = (attempt == 0) ? 0 : MAX(self.cyl_delayIfNeededForSeconds, 0.1);
+    __weak __typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) self = weakSelf;
+        if (!self || [self cyl_pendingBadgeGeneration] != generation) {
+            return;
+        }
+        if ((attempt + 1 < kCYLBadgeMaximumLayoutRetryCount) && [self cyl_shouldWaitForLayoutBeforeShowingBadgeValue:value]) {
+            [self cyl_showBadgeValue:value animationTypeValue:animationTypeValue afterLayoutWithGeneration:generation attempt:attempt + 1];
+            return;
+        }
+        [self cyl_showBadgeValueNow:value animationTypeValue:animationTypeValue];
+    });
+}
+
+- (NSUInteger)cyl_pendingBadgeGeneration {
+    return [objc_getAssociatedObject(self, @selector(cyl_pendingBadgeGeneration)) unsignedIntegerValue];
+}
+
+/// Cancels a badge value waiting for layout; returns the new generation.
+- (NSUInteger)cyl_invalidatePendingBadgeValue {
+    NSUInteger generation = [self cyl_pendingBadgeGeneration] + 1;
+    objc_setAssociatedObject(self, @selector(cyl_pendingBadgeGeneration), @(generation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    return generation;
+}
+
+- (void)cyl_showBadgeValueNow:(NSString *)value
+           animationTypeValue:(NSNumber *)animationTypeValue {
     CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
     (
      [[[self cyl_badge] subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
@@ -139,6 +214,7 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
  *  clear badge
  */
 - (void)cyl_clearBadge {
+    [self cyl_invalidatePendingBadgeValue];
     [self.cyl_badge cyl_setHidden:YES];
 }
 
@@ -241,7 +317,7 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
     self.cyl_badge.font = self.cyl_badgeFont;
     [self cyl_adjustLabelWidth:self.cyl_badge];
     [self cyl_addMargin];
-    self.cyl_badge.center = CGPointMake(CGRectGetWidth(self.frame) + 2 + self.cyl_badgeCenterOffset.x, self.cyl_badgeCenterOffset.y);
+    [self cyl_layoutBadgeAtTopRightCorner];
     //FIXME:  to delete
     self.cyl_badge.layer.cornerRadius = (self.cyl_badgeCornerRadius !=0 ) ? self.cyl_badgeCornerRadius : CGRectGetHeight(self.cyl_badge.frame) / 2;
     [self.cyl_badge cyl_setHidden:NO];
@@ -338,13 +414,32 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
     if (!self.cyl_badge) {
         return;
     }
-    CGRect frame = CGRectMake(CGRectGetWidth(self.frame), -redotWidth, redotWidth, redotWidth);
+    CGRect frame = CGRectMake(CGRectGetWidth(self.bounds), -redotWidth, redotWidth, redotWidth);
     self.cyl_badge.frame = frame;
     //更新frame
     [self.cyl_badge layoutIfNeeded];
-    self.cyl_badge.center = CGPointMake(CGRectGetWidth(self.frame) + 2 + self.cyl_badgeCenterOffset.x, self.cyl_badgeCenterOffset.y);
+    [self cyl_layoutBadgeAtTopRightCorner];
     self.cyl_badge.layer.masksToBounds = YES;//very important
     
+}
+
+/*!
+ * [EN] Centers the badge on the host's top-right corner (plus `cyl_badgeCenterOffset`) and keeps it there: the flexible
+ *      left and bottom margins move it with the right edge when the host is resized later, by Auto Layout too (the
+ *      mask is turned into constraints). `bounds`, not `frame`: a transform on the host (e.g. a tab image animation)
+ *      must not move the badge.
+ * [CN] 将角标中心放在宿主右上角（加上 `cyl_badgeCenterOffset`），并保持在那里：左边距和下边距可变，宿主之后尺寸改变时
+ *      （包括自动布局，mask 会转换为约束）角标随右边缘移动。使用 `bounds` 而不是 `frame`：宿主上的 transform
+ *      （如 Tab 图片动画）不应移动角标。
+ */
+- (void)cyl_layoutBadgeAtTopRightCorner {
+    UIView *badge = self.cyl_badge;
+    if (!badge) {
+        return;
+    }
+    badge.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin;
+    CGPoint badgeCenterOffset = self.cyl_badgeCenterOffset;
+    badge.center = CGPointMake(CGRectGetWidth(self.bounds) + 2 + badgeCenterOffset.x, badgeCenterOffset.y);
 }
 
 #pragma mark --  other private methods
@@ -403,6 +498,26 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
 
 #pragma mark -- animation
 
+/*!
+ * FIX: issue #583, #271
+ * [EN] The badge's Shake and Bounce animations (`+cyl_shake_AnimationRepeatTimes:…`, `+cyl_bounce_AnimationRepeatTimes:…`)
+ *      kept the default `removedOnCompletion = YES`, unlike Breathe and Scale. Core Animation removes such animations when
+ *      the app goes to the background, so after returning a badge with text stopped shaking/bouncing. Keep them. Set here,
+ *      not in those public factories, so apps that use the factories themselves see no change.
+ *      Scope: every badge, whatever the tab bar style (classic, iOS 26 UI compatibility mode, Liquid Glass on iOS 26+ and
+ *      the iPhone Duo, FlatDesign): they all share this code, and the problem does not depend on the style. No style check
+ *      on purpose: looking up the tab bar controller from a badge finds the root one, which can be the wrong one with
+ *      nested tab bar controllers.
+ * [CN] 角标的 Shake、Bounce 动画（`+cyl_shake_AnimationRepeatTimes:…`、`+cyl_bounce_AnimationRepeatTimes:…`）与 Breathe、Scale 不同，
+ *      保留了默认的 `removedOnCompletion = YES`。App 进入后台时 Core Animation 会移除这类动画，回到前台后带文字的角标不再抖动/弹跳。
+ *      这里将其保留。在此处设置而不修改这两个公开的工厂方法，App 自行使用这些方法时行为不变。
+ *      范围：所有角标，与 TabBar 样式无关（经典、iOS 26 UI 兼容模式、iOS 26+ 液态玻璃与 iPhone Duo、扁平样式）：它们共用这段代码，
+ *      且该问题与样式无关。有意不判断样式：从角标查找 TabBarController 会找到根控制器，嵌套 TabBarController 时可能找错。
+ */
+- (void)cyl_keepBadgeAnimationAfterBackground:(CAAnimation *)animation {
+    animation.removedOnCompletion = NO;
+}
+
 //if u want to add badge animation type, follow steps bellow:
 //1. go to definition of CYLBadgeAnimationType and add new type
 //2. go to category of CAAnimation+CYLBadgeExtention to add new animation interface
@@ -417,12 +532,14 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
             [self.cyl_badge.layer addAnimation:[CAAnimation cyl_opacityForever_Animation:1.4]
                                         forKey:CYLBadgeBreatheAnimationKey];
             break;
-        case CYLBadgeAnimationTypeShake:
-            [self.cyl_badge.layer addAnimation:[CAAnimation cyl_shake_AnimationRepeatTimes:CGFLOAT_MAX
-                                                                                  durTimes:1
-                                                                                    forObj:self.cyl_badge.layer]
-                                        forKey:CYLBadgeShakeAnimationKey];
+        case CYLBadgeAnimationTypeShake: {
+            CAAnimation *animation = [CAAnimation cyl_shake_AnimationRepeatTimes:CGFLOAT_MAX
+                                                                        durTimes:1
+                                                                          forObj:self.cyl_badge.layer];
+            [self cyl_keepBadgeAnimationAfterBackground:animation];
+            [self.cyl_badge.layer addAnimation:animation forKey:CYLBadgeShakeAnimationKey];
             break;
+        }
         case CYLBadgeAnimationTypeScale:
             [self.cyl_badge.layer addAnimation:[CAAnimation cyl_scaleFrom:1.4
                                                                   toScale:0.6
@@ -430,12 +547,14 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
                                                                       rep:MAXFLOAT]
                                         forKey:CYLBadgeScaleAnimationKey];
             break;
-        case CYLBadgeAnimationTypeBounce:
-            [self.cyl_badge.layer addAnimation:[CAAnimation cyl_bounce_AnimationRepeatTimes:CGFLOAT_MAX
-                                                                                   durTimes:1
-                                                                                     forObj:self.cyl_badge.layer]
-                                        forKey:CYLBadgeBounceAnimationKey];
+        case CYLBadgeAnimationTypeBounce: {
+            CAAnimation *animation = [CAAnimation cyl_bounce_AnimationRepeatTimes:CGFLOAT_MAX
+                                                                         durTimes:1
+                                                                           forObj:self.cyl_badge.layer];
+            [self cyl_keepBadgeAnimationAfterBackground:animation];
+            [self.cyl_badge.layer addAnimation:animation forKey:CYLBadgeBounceAnimationKey];
             break;
+        }
             
             
             /*!
@@ -660,7 +779,7 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
     if (!self.cyl_badge) {
         [self cyl_badgeInit];
     }
-    self.cyl_badge.center = CGPointMake(CGRectGetWidth(self.frame) + 2 + badgeCenterOff.x, badgeCenterOff.y);
+    [self cyl_layoutBadgeAtTopRightCorner];
  }
 
 //badgeRadiusKey

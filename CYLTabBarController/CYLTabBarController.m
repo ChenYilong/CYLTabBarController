@@ -346,6 +346,18 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)setViewDidLayoutSubViewsBlockInvokeOnce:(BOOL)invokeOnce block:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock  {
     self.invokeOnceViewDidLayoutSubViewsBlock = YES;
     self.viewDidLayoutSubviewsBlock = [viewDidLayoutSubviewsBlock copy];
+    // FIX: issue #539
+    // [EN] `-viewDidLayoutSubviews` marks a once-block as run with an associated object keyed by its selector, and nothing
+    //      cleared it: after one once-block had run, a block set later with this method never ran (e.g. a badge shown from
+    //      it never appeared). Re-arm it, so each block set here runs once.
+    //      Scope: every tab bar style (classic, iOS 26 UI compatibility mode, Liquid Glass on iOS 26+ and the iPhone Duo,
+    //      FlatDesign): the once-block runs at the end of `-viewDidLayoutSubviews` for all of them. `invokeOnce` itself stays
+    //      ignored, as documented.
+    // [CN] `-viewDidLayoutSubviews` 用以其 selector 为 key 的关联对象标记 once-block 已执行，且从不清除：执行过一次后，之后通过本方法
+    //      设置的 block 永远不会执行（如在其中显示的角标不出现）。这里重新启用，使每次设置的 block 都执行一次。
+    //      范围：所有样式（经典、iOS 26 UI 兼容模式、iOS 26+ 液态玻璃与 iPhone Duo、扁平样式）：once-block 在
+    //      `-viewDidLayoutSubviews` 末尾对它们都会执行。`invokeOnce` 参数按文档说明仍被忽略。
+    objc_setAssociatedObject(self, @selector(viewDidLayoutSubviews), nil, OBJC_ASSOCIATION_RETAIN);
 }
 
 - (void)setViewDidLayoutSubViewsBlock:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock {
@@ -1964,7 +1976,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (shouldCustomizeTitlePositionAdjustment) {
         offset = titlePositionAdjustment;
     }
-    viewController.tabBarItem.titlePositionAdjustment = offset;
+    [self cyl_applyTitlePositionAdjustment:offset toTabBarItem:viewController.tabBarItem];
     
     UIOffset imageoffset = self.imagePositionAdjustment;
     BOOL shouldCustomizeImagePositionAdjustment= !(UIOffsetEqualToOffset(UIOffsetZero, imagePositionAdjustment));
@@ -1986,6 +1998,34 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     }
     [self addChildViewController:viewController];
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
+}
+
+/*!
+ * FIX: issue #583 (comment: on iOS 12 `[tabBar setTitlePositionAdjustment:UIOffsetMake(0, -4)]` has no effect)
+ * [EN] Each tab's `titlePositionAdjustment` was always assigned, `UIOffsetZero` when nothing was customized. A value set on
+ *      the item overrides the `UITabBarItem` appearance proxy, so an app's appearance-level title offset was wiped out.
+ *      Assign it only when there is an offset, or to reset one CYL set earlier (e.g. after reloading the items).
+ *      Scope: the classic system tab bar (iOS 25 and earlier, iOS 26 UI compatibility mode) and Liquid Glass (iOS 26+,
+ *      the iPhone Duo), which both use `UITabBarItem`. FlatDesign never reaches here: its items are
+ *      `CYLFlatDesignTabBarItem`, which has no appearance proxy to override.
+ * [CN] 以前每个 Tab 的 `titlePositionAdjustment` 总会被赋值，未自定义时为 `UIOffsetZero`。在 item 上设置的值会覆盖 `UITabBarItem`
+ *      的 appearance 代理，App 通过 appearance 设置的标题偏移因此失效。现在仅在有偏移时赋值，或用于重置 CYL 之前设置过的值
+ *      （如重新加载 item 后）。
+ *      范围：经典系统 TabBar（iOS 25 及以前、iOS 26 UI 兼容模式）与液态玻璃（iOS 26+、iPhone Duo），两者都使用 `UITabBarItem`。
+ *      扁平样式不会执行到这里：其 item 为 `CYLFlatDesignTabBarItem`，没有可被覆盖的 appearance 代理。
+ */
+static char CYLTitlePositionAdjustmentSetByCYLKey;
+- (void)cyl_applyTitlePositionAdjustment:(UIOffset)offset toTabBarItem:(UITabBarItem *)tabBarItem {
+    if (!tabBarItem) {
+        return;
+    }
+    BOOL isZero = UIOffsetEqualToOffset(UIOffsetZero, offset);
+    BOOL wasSetByCYL = [objc_getAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey) boolValue];
+    if (isZero && !wasSetByCYL) {
+        return;
+    }
+    tabBarItem.titlePositionAdjustment = offset;
+    objc_setAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey, isZero ? nil : @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (UIImage *)getImageFromImageInfo:(id)imageInfo {

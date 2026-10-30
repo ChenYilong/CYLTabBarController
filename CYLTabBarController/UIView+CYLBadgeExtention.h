@@ -42,7 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
  *  @param value String value, default is `nil`. if value equal @"" means red dot style.
  *  @param animationType animationType
  * [EN] Shows a badge with `value` (@"" for a red dot) and the given animation.
+ *      Works with Auto Layout: if this view is not laid out yet, the badge is shown once it is (no `dispatch_after`
+ *      needed), and it stays on the view's top-right corner when the view is resized.
  * [CN] 显示值为 value 的角标（传 @"" 为红点），并使用指定动画。
+ *      支持自动布局：视图尚未完成布局时，会在布局完成后显示角标（无需 `dispatch_after`）；视图尺寸改变时角标保持在右上角。
  */
 - (void)cyl_showBadgeValue:(NSString *)value
          animationType:(CYLBadgeAnimationType)animationType;
