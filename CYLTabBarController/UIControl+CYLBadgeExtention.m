@@ -112,6 +112,10 @@
     [CYL_ACTUAL_BARBUTTON cyl_resumeBadge];
 }
 
+- (void)cyl_refreshBadge {
+    [CYL_ACTUAL_BARBUTTON cyl_refreshBadge];
+}
+
 #pragma mark -- private method
 
 - (UIView *)cyl_getActualBadgeSuperViewFromControl:(UIControl *)tabButton {
@@ -257,6 +261,31 @@
 
 - (void)cyl_setBadgeAnimationType:(CYLBadgeAnimationType)animationType {
     [CYL_ACTUAL_BARBUTTON cyl_setBadgeAnimationType:animationType];
+}
+
+// The badge lives on the actual badge super view (tab image / Lottie view), like the properties above.
+- (UIColor *)cyl_badgeBorderColor {
+    return [CYL_ACTUAL_BARBUTTON cyl_badgeBorderColor];
+}
+
+- (void)cyl_setBadgeBorderColor:(UIColor *)badgeBorderColor {
+    [CYL_ACTUAL_BARBUTTON cyl_setBadgeBorderColor:badgeBorderColor];
+}
+
+- (CGFloat)cyl_badgeBorderWidth {
+    return [CYL_ACTUAL_BARBUTTON cyl_badgeBorderWidth];
+}
+
+- (void)cyl_setBadgeBorderWidth:(CGFloat)badgeBorderWidth {
+    [CYL_ACTUAL_BARBUTTON cyl_setBadgeBorderWidth:badgeBorderWidth];
+}
+
+- (BOOL)cyl_badgeRespectsReduceMotion {
+    return [CYL_ACTUAL_BARBUTTON cyl_badgeRespectsReduceMotion];
+}
+
+- (void)cyl_setBadgeRespectsReduceMotion:(BOOL)badgeRespectsReduceMotion {
+    [CYL_ACTUAL_BARBUTTON cyl_setBadgeRespectsReduceMotion:badgeRespectsReduceMotion];
 }
 
 - (CGRect)cyl_badgeFrame {

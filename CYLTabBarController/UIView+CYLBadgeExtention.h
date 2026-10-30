@@ -107,6 +107,35 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign, getter=cyl_keepShowingPlusButtonLabel, setter=cyl_setKeepShowingPlusButtonLabel:) BOOL cyl_keepShowingPlusButtonLabel;
 
+/*!
+ * [EN] Border color of the badge, nil (no border) by default. Dynamic colors follow Dark Mode. Drawn only when
+ *      `cyl_badgeBorderWidth` > 0.
+ * [CN] 角标边框颜色，默认 nil（无边框）。动态颜色会跟随深色模式。仅当 `cyl_badgeBorderWidth` > 0 时绘制。
+ */
+@property (nonatomic, strong, nullable, getter=cyl_badgeBorderColor, setter=cyl_setBadgeBorderColor:) UIColor *cyl_badgeBorderColor;
+
+/*!
+ * [EN] Border width of the badge, 0 by default. Negative or non-finite values are treated as 0.
+ * [CN] 角标边框宽度，默认 0。负数或非有限值按 0 处理。
+ */
+@property (nonatomic, assign, getter=cyl_badgeBorderWidth, setter=cyl_setBadgeBorderWidth:) CGFloat cyl_badgeBorderWidth;
+
+/*!
+ * [EN] YES by default: while the system's Reduce Motion setting is on, badges are shown without animation.
+ *      Set NO to always animate.
+ * [CN] 默认 YES：系统开启"减弱动态效果"时，角标不播放动画。设为 NO 则始终播放。
+ */
+@property (nonatomic, assign, getter=cyl_badgeRespectsReduceMotion, setter=cyl_setBadgeRespectsReduceMotion:) BOOL cyl_badgeRespectsReduceMotion;
+
+/*!
+ * [EN] Puts an existing badge back on top of this view's top-right corner, re-applies its border, and restores its
+ *      repeating animation if UIKit removed it. Call it after rebuilding the view's content; it does nothing if no
+ *      badge has been shown.
+ * [CN] 将已有角标重新放到当前视图右上角的最上层，重新应用边框，并在循环动画被 UIKit 移除时恢复。
+ *      在重建视图内容后调用；从未显示过角标时不做任何事。
+ */
+- (void)cyl_refreshBadge;
+
 @end
 
 NS_ASSUME_NONNULL_END
