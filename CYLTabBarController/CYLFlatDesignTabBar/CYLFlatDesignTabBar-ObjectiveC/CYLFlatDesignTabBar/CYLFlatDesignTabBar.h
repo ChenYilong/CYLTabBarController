@@ -87,12 +87,17 @@ NS_ASSUME_NONNULL_BEGIN
  *      A vertical status bar is told apart by its inset being on one side only; a landscape notch insets
  *      both sides and is still handled by `useLayoutSafeAreaInsets`. Has no effect when
  *      `useLayoutSafeAreaInsets` is NO.
+ *      Only matters while the vertical bar is shown. This property does not switch the vertical bar on or off; that is
+ *      `CYLTabBarController.allowsVerticalBar` (or a screen's own `preferredVerticalBarBehavior`). With the vertical bar
+ *      off the status bar is horizontal, there is no one-sided inset, and both values give the same layout.
  * [CN] 默认 NO。按钮是否同时避开竖向状态栏在单侧产生的安全区，例如 iPhone Duo 折叠且竖屏时
  *      （iOS 27.1 SDK）状态栏（Wi-Fi、电量）移到右侧形成的 84pt 竖列。
  *      NO：忽略这侧安全区，按钮铺满整个宽度、在屏幕上居中；最后一个按钮可能部分位于状态栏下方。
  *      YES：按钮留在安全区内，整行会因该竖列向左偏移。
  *      竖向状态栏的判断依据是只有一侧有安全区；横屏刘海两侧都有安全区，仍由 `useLayoutSafeAreaInsets` 处理。
  *      `useLayoutSafeAreaInsets` 为 NO 时此属性无效。
+ *      只在竖向栏显示时起作用。本属性不负责开关竖向栏，开关由 `CYLTabBarController.allowsVerticalBar`（或页面自己的
+ *      `preferredVerticalBarBehavior`）决定。竖向栏关闭时状态栏是横向的，没有单侧安全区，YES 和 NO 布局相同。
  */
 @property (nonatomic, assign) BOOL respectsVerticalStatusBarSafeArea UI_APPEARANCE_SELECTOR;
 
