@@ -398,7 +398,29 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        [self.cyl_tabBar layoutSubviews];//Fix issue #93 #392
+        // FIX: issue #585, #543 (follow-up to #93, #392)
+        // [EN] The forced `-layoutSubviews` below is an iOS 10 workaround: #93 (iOS 10.0–10.2) and #392 (iOS 10.3.x, items
+        //      misplaced next to the plus button) needed the tab bar laid out again after this controller. It later ran on
+        //      every layout pass on every system. On iOS 11+ notched iPhones that re-laid the tab bar out synchronously in
+        //      the middle of push/pop (#585: tab images flicker after `cyl_replaceTabImageView`) and rotation (#543: the tab
+        //      bar flickers when turning from landscape to portrait). From iOS 11 UIKit lays the tab bar out itself, so skip
+        //      it for the classic system tab bar on iOS 11 and later.
+        //      Scope: the classic (pre-Liquid Glass) system tab bar, i.e. iOS 25 and earlier plus iOS 26 in UI compatibility
+        //      mode (`UIDesignRequiresCompatibility`); `+[CYLConstants isLiquidGlassActive]` is NO exactly then. Liquid Glass
+        //      (iOS 26 without compatibility mode, every iOS 27+ system, the iPhone Duo) keeps the previous behavior, and
+        //      FlatDesign never reaches this code.
+        // [CN] 下面强制调用 `-layoutSubviews` 是针对 iOS 10 的处理：#93（iOS 10.0–10.2）与 #392（iOS 10.3.x，PlusButton 旁的 item
+        //      位置错误）需要在本控制器布局后再布局一次 TabBar。之后它在所有系统的每次布局中都会执行，iOS 11+ 刘海屏上会在
+        //      push/pop（#585：调用 `cyl_replaceTabImageView` 后 Tab 图片闪动）和旋转（#543：横屏转竖屏时 TabBar 闪动）过程中
+        //      同步地重新布局 TabBar。iOS 11 起 UIKit 会自行布局 TabBar，因此 iOS 11 及以上的经典系统 TabBar 不再执行。
+        //      范围：经典（液态玻璃之前的）系统 TabBar，即 iOS 25 及以前，以及 iOS 26 的 UI 兼容模式
+        //      （`UIDesignRequiresCompatibility`），此时 `+[CYLConstants isLiquidGlassActive]` 恰好为 NO。液态玻璃（未开启兼容模式
+        //      的 iOS 26、所有 iOS 27+、iPhone Duo）保持原有行为；扁平样式不会执行到这里。
+        BOOL isClassicSystemTabBar = ![CYLConstants isLiquidGlassActive];
+        BOOL needsIOS10Workaround = !CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0");
+        if (!isClassicSystemTabBar || needsIOS10Workaround) {
+            [self.cyl_tabBar layoutSubviews];//Fix issue #93 #392
+        }
         if ([self.cyl_tabBar isKindOfClass:[CYLTabBar class]] ) {
             CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
             [self cyl_bindTabControlActions];
@@ -524,7 +546,20 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
         CGRect frame = self.cyl_tabBar.frame;
         CGFloat tabBarHeight = self.tabBarFrame.size.height;
         frame.size.height = tabBarHeight;
-        frame.origin.y = self.view.frame.size.height - tabBarHeight;
+        // FIX: issue #591
+        // [EN] Use `bounds`, not `frame`: the tab bar is laid out in this view's own coordinate space, while `frame` is in
+        //      the superview's and includes the view's transform. A custom transition that scales the outgoing view
+        //      (`fromView.transform = CGAffineTransformMakeScale(...)`) shrinks `frame.size.height`, which moved the tab bar
+        //      up. Newer systems relaid the tab bar afterwards and hid the error; iOS 12 did not. `bounds` also matches
+        //      `-tabBarFrame`, and unlike the screen height it is right in Split View / Stage Manager.
+        //      Scope: Liquid Glass returns above and FlatDesign never reaches here; elsewhere `bounds` equals the old value
+        //      unless the view has a transform, so no version guard is needed.
+        // [CN] 使用 `bounds` 而不是 `frame`：TabBar 布局在本视图自身的坐标系中，`frame` 则在父视图坐标系中，并且包含视图的 transform。
+        //      自定义转场缩放 from 页面（`fromView.transform = CGAffineTransformMakeScale(...)`）时 `frame.size.height` 变小，
+        //      TabBar 因此被上移。高版本系统随后会重新布局 TabBar，掩盖了该问题，iOS 12 不会。`bounds` 也与 `-tabBarFrame` 一致，
+        //      且与屏幕高度不同，在分屏 / 台前调度下同样正确。
+        //      范围：液态玻璃已在上方返回，扁平样式不会执行到这里；其他情况下除非视图有 transform，`bounds` 与原值相同，无需版本判断。
+        frame.origin.y = CGRectGetHeight(self.view.bounds) - tabBarHeight;
         frame;
     });
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
