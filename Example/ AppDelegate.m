@@ -51,10 +51,13 @@ CYL_METHOD_SIGNATURES_PUSH
     if (self.cyl_isForceLandscape) {
         //只支持横屏
         return UIInterfaceOrientationMaskLandscape;
-    } else {
-        //只支持竖屏
-        return UIInterfaceOrientationMaskPortrait;
     }
+    // FIX: issue #680 可折叠设备（iPhone Duo）跟随设备横竖屏，展开内屏横屏时铺满屏幕
+    if (self.supportsLandscapeOnFoldableDevice) {
+        return UIInterfaceOrientationMaskAllButUpsideDown;
+    }
+    //只支持竖屏
+    return UIInterfaceOrientationMaskPortrait;
 }
 CYL_METHOD_SIGNATURES_POP
 /**
