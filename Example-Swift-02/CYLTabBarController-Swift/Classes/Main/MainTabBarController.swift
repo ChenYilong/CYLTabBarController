@@ -107,8 +107,15 @@ class MainTabBarController: CYLTabBarController {
         ])
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Swap icons", style: .plain,
                                                             target: self, action: #selector(issue610SwapIcons))
-        if ProcessInfo.processInfo.arguments.contains("-CYL610SelfTest") {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in self?.issue610RunSelfTest() }
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("-CYL610Landscape"), #available(iOS 16.0, *) {
+            // Rotate before the test so it also covers the landscape tab bar layout.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.view.window?.windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeRight))
+            }
+        }
+        if arguments.contains("-CYL610SelfTest") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.issue610RunSelfTest() }
         }
     }
 
@@ -117,6 +124,10 @@ class MainTabBarController: CYLTabBarController {
     /// tab button (what a finger tap delivers to a classic, non Liquid Glass tab button) before anything lays out the
     /// controller's view again, and logs whether each tap produced a `didSelectControl` callback.
     private func issue610RunSelfTest() {
+        if CYLConstants.isLiquidGlassActive() {
+            issue610RunLiquidGlassSelfTest()
+            return
+        }
         let before = issue610TabControls()
         let baseline = issue610Tap(before)
         NSLog("[#610] self-test before the icon swap, callback per tap: %@", baseline)
@@ -127,8 +138,25 @@ class MainTabBarController: CYLTabBarController {
         let bound = issue610Bound(after)
         let afterSwap = issue610Tap(after)
         let result = (baseline + bound + afterSwap).contains("0") ? "FAIL" : "PASS"
-        NSLog("[#610] self-test %@: UIKit replaced %ld of %ld tab buttons; tap action bound per button: %@; callback per tap: %@",
-              result, replaced, after.count, bound, afterSwap)
+        let orientation = view.bounds.width > view.bounds.height ? "landscape" : "portrait"
+        NSLog("[#610] self-test %@ (classic, %@): UIKit replaced %ld of %ld tab buttons; tap action bound per button: %@; callback per tap: %@",
+              result, orientation, replaced, after.count, bound, afterSwap)
+    }
+
+    /// Liquid Glass tab buttons take no target-action: a tap makes UIKit call `selectedViewController`'s setter, where
+    /// CYLTabBarController reports `didSelectControl`. Do the same for every tab after the icon swap.
+    private func issue610RunLiquidGlassSelfTest() {
+        issue610SwapIcons()
+        tabBar.layoutIfNeeded()
+        let tabs = (viewControllers ?? []).filter { !$0.cyl_isPlaceholder }
+        let perTab = tabs.map { viewController -> String in
+            let count = issue610CallbackCount
+            selectedViewController = viewController
+            return issue610CallbackCount > count ? "1" : "0"
+        }.joined(separator: " ")
+        let orientation = view.bounds.width > view.bounds.height ? "landscape" : "portrait"
+        NSLog("[#610] self-test %@ (Liquid Glass, %@): callback per tab selected after the icon swap: %@",
+              perTab.contains("0") ? "FAIL" : "PASS", orientation, perTab)
     }
 
     /// Tab buttons that report taps through CYLTabBarController's target-action. The plus button and the plus child
@@ -159,8 +187,10 @@ class MainTabBarController: CYLTabBarController {
     @objc private func issue610SwapIcons() {
         issue610IconSetIndex = (issue610IconSetIndex + 1) % Self.issue610IconSets.count
         let icons = Self.issue610IconSets[issue610IconSetIndex]
-        // `tabBar.items` also holds the plus button's placeholder item; skip it.
-        let items = (viewControllers ?? []).filter { !$0.cyl_isPlaceholder }.map { $0.tabBarItem! }
+        // `tabBar.items` also holds the plus button's item; skip it.
+        let items = (viewControllers ?? [])
+            .filter { !$0.cyl_isPlaceholder && $0 !== CYLPlusChildViewController }
+            .map { $0.tabBarItem! }
         for (index, item) in items.enumerated() where index < icons.count {
             item.image = UIImage(named: icons[index].normal)
             item.selectedImage = UIImage(named: icons[index].selected)
