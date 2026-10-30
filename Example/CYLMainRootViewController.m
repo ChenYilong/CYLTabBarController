@@ -11,6 +11,7 @@
 #import "CYLPlusButtonSubclass.h"
 #import "CYLFlatDesignMainTabBarController.h"
 #import "CYLFlatDesignTableViewController.h"
+#import "AppDelegate.h"
 
 @interface CYLMainRootViewController ()
 
@@ -24,7 +25,30 @@
     self.view.backgroundColor = [UIColor whiteColor];
     [self createLiquidGlassTabBar];
 //    [self createFlatDesignTabBar];
+    [self allowLandscapeOnFoldableDevice];
 
+}
+
+/*!
+ * FIX: issue #680
+ * [EN] On a foldable device (iPhone Duo) let the demo rotate with the device, so the unfolded inner screen is
+ *      filled in landscape. `UIHingeInteraction` only reports a hinge on foldable devices.
+ * [CN] 可折叠设备（iPhone Duo）上允许 Demo 跟随设备旋转，展开内屏横屏时铺满屏幕。只有可折叠设备才会通过
+ *      `UIHingeInteraction` 返回铰链。
+ */
+- (void)allowLandscapeOnFoldableDevice {
+#if defined(__IPHONE_27_1) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_27_1
+    if (@available(iOS 27.1, *)) {
+        __weak __typeof(self) weakSelf = self;
+        UIHingeInteraction *hingeInteraction = [[UIHingeInteraction alloc] initWithUpdateHandler:^(UIHingeInteraction *interaction, UIHingeInteractionUpdate *update) {
+            AppDelegate *appDelegate = (AppDelegate *)UIApplication.sharedApplication.delegate;
+            if (!update.hinge || ![appDelegate isKindOfClass:[AppDelegate class]] || appDelegate.supportsLandscapeOnFoldableDevice) { return; }
+            appDelegate.supportsLandscapeOnFoldableDevice = YES;
+            [weakSelf setNeedsUpdateOfSupportedInterfaceOrientations];
+        }];
+        [self.view addInteraction:hingeInteraction];
+    }
+#endif
 }
 
 #pragma mark -
