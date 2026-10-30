@@ -8,14 +8,20 @@
 
 #import <UIKit/UIKit.h>
 #import "CYLBadgeProtocol.h"
-@class CYLTabBarBadgeView;
+@protocol CYLBadgeTextDisplaying;
 
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -- badge apis
 
 @interface UIView (CYLBadgeExtention)<CYLBadgeProtocol>
-@property (nonatomic, strong, getter=cyl_badge, setter=cyl_setBadge:) CYLTabBarBadgeView *cyl_badge;
+/*!
+ * [EN] The badge view: a `UILabel` by default, a `CYLTabBarBadgeView` for the Liquid Glass badge on iOS 27.
+ *      The two are unrelated classes, so it is typed by what they share, `CYLBadgeTextDisplaying`.
+ * [CN] 角标视图：默认是 `UILabel`，iOS 27 液态玻璃下是 `CYLTabBarBadgeView`。
+ *      两者没有继承关系，因此按共有的 `CYLBadgeTextDisplaying` 协议声明类型。
+ */
+@property (nonatomic, strong, getter=cyl_badge, setter=cyl_setBadge:) UIView<CYLBadgeTextDisplaying> *cyl_badge;
 
 /*!
  * [EN] Returns YES if a badge is currently shown on this view.

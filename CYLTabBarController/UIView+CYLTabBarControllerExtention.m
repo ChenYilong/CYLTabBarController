@@ -366,14 +366,15 @@
 - (UIView *)cyl_tabBadgeView {
     for (UIView *subview in self.cyl_allSubviews) {
         if ([subview cyl_isTabBadgeView]) {
-            return (UIView *)subview;
+            return subview;
         }
     }
     return nil;
 }
 
 - (UILabel *)cyl_tabLabel {
-    for (UILabel *subview in self.cyl_allSubviews) {
+    //`cyl_allSubviews` holds UIViews: iterate them as UIView, not UILabel, and cast once, after `cyl_isTabLabel`.
+    for (UIView *subview in self.cyl_allSubviews) {
         if ([subview cyl_isTabLabel]) {
             return (UILabel *)subview;
         }

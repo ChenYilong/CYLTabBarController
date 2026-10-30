@@ -186,11 +186,11 @@
 }
 
 #pragma mark -- setter/getter
-- (CYLTabBarBadgeView *)cyl_badge {
+- (UIView<CYLBadgeTextDisplaying> *)cyl_badge {
     return CYL_ACTUAL_BARBUTTON.cyl_badge;
 }
 
-- (void)cyl_setBadge:(CYLTabBarBadgeView *)label {
+- (void)cyl_setBadge:(UIView<CYLBadgeTextDisplaying> *)label {
     [CYL_ACTUAL_BARBUTTON cyl_setBadge:label];
 }
 

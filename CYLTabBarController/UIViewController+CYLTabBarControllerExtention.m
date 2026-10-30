@@ -546,11 +546,11 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 #pragma mark -- setter/getter
-- (UIView __kindof *)cyl_badge {
-    return (UIView __kindof *)kActualView.cyl_badge;
+- (UIView<CYLBadgeTextDisplaying> *)cyl_badge {
+    return kActualView.cyl_badge;
 }
 
-- (void)cyl_setBadge:(UIView __kindof *)label {
+- (void)cyl_setBadge:(UIView<CYLBadgeTextDisplaying> *)label {
     //    [kActualView cyl_setBadge:label];
     SEL selector = @selector(cyl_setBadge:);
     [kActualView cyl_performSelector:selector withObject:label];
