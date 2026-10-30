@@ -120,6 +120,9 @@ CGFloat const CYLFlatDesignUITabBarControllerHideShowBarDuration = 0.2;
     BOOL _tabBarIsAnimating;
     // 用于记录快速设置tabBar显示和隐藏最后一次的状态
     BOOL _lastShowHideTabBar;
+    // `animated` of the request queued while `_tabBarIsAnimating`; replayed with its own value.
+    // 动画期间排队的那次请求自己的 animated 参数，动画结束后按它重放。
+    BOOL _lastShowHideTabBarAnimated;
     BOOL _needsReloadItems;
     BOOL _cylDidRefreshSystemTabBarVisibility;
     BOOL _cylRefreshingSystemTabBarVisibility;
@@ -569,27 +572,36 @@ if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
                 // controller-level API does not always hide that view itself.
                 if (!self.tabBar.hidden) { self.tabBar.hidden = YES; }
                 
+                // FIX: issue #662
+                // [EN] Record the request before any early return, so `isTabBarHidden` always reports the newest
+                //      request: while the hide/show animation runs (replayed in its completion with the request's
+                //      own `animated`), and while a navigation transition holds the bar in its overlay (applied by
+                //      `_updateBottomBarShowHideIfNeeded` when the bar returns, e.g. on transition end or selection).
+                //      Previously both paths dropped the request, so the getter, the bar and the safe area disagreed.
+                // [CN] 在任何提前 return 之前先记录请求，`isTabBarHidden` 始终是最新请求：动画进行中（动画结束时按该请求
+                //      自己的 animated 重放）、转场把 TabBar 放在 overlay 中（TabBar 回来后由 `_updateBottomBarShowHideIfNeeded`
+                //      应用）。以前这两条路径都丢掉了请求，导致 getter、TabBar 与安全区三者不一致。
+                self.cyl_tabBarHidden = hidden;
+                _lastShowHideTabBar = hidden;
                 if (_tabBarIsAnimating) {
-                    _lastShowHideTabBar = hidden;
+                    _lastShowHideTabBarAnimated = animated;
                     return;
                 }
-
-            
                 if (self.cyl_tabBar.superview != self.view) { return; }
-      
-            
-                if (self.cyl_tabBarHidden != hidden) {
-                    
-                    self.cyl_tabBarHidden = hidden;
-                    _lastShowHideTabBar = hidden;
-                    
-                    if (self.cyl_tabBar.hidden == hidden) {
-                        return;
-                    }
+                // Compare with what is on screen, not with the recorded state: a request recorded above during an
+                // animation is replayed here and must still be applied.
+                // 与屏幕上的实际状态比较，而不是与记录值比较：动画期间记录的请求会在这里重放，仍需生效。
+                if (self.cyl_tabBar.hidden != hidden) {
                     BOOL canShowsBottomBar = [self _checkHidesBottomBarWhenPushed];
                     if (!canShowsBottomBar) {
                         // 让 hidesBottomBarWhenPushed 优先级更高
                         return;
+                    }
+                    // FIX: issue #662 — a bar hidden before the first layout can still have a stale (zero-height)
+                    // frame; nothing else lays it out again before it is shown (seen on iOS 27.0).
+                    // 首次布局前就隐藏的 TabBar 可能保留旧的（高度为 0 的）frame，显示前同步一次。
+                    if (!hidden && !CGRectEqualToRect(self.cyl_tabBar.frame, self.tabBarFrame)) {
+                        self.cyl_tabBar.frame = self.tabBarFrame;
                     }
                     
                     if (animated) {
@@ -608,6 +620,14 @@ if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
                             CYL_PERFORM_SELECTOR_2OBJECT(self.delegate, tabBarController:willShowTabBar:, self, self.cyl_tabBar);
                                                             }
 
+                        }
+                        // FIX: issue #662 — a will-hide/will-show delegate may re-enter with the opposite request. That
+                        // request was recorded (and queued, since `_tabBarIsAnimating` is already YES); it wins, so do
+                        // not run this one. 代理回调里可能反向重入，以重入的最新请求为准，不再执行本次。
+                        if (self.cyl_tabBarHidden != hidden) {
+                            _tabBarIsAnimating = NO;
+                            [self setTabBarHidden:_lastShowHideTabBar animated:_lastShowHideTabBarAnimated];
+                            return;
                         }
                         
                         CGAffineTransform startTransform = hidden? CGAffineTransformIdentity : CGAffineTransformMakeTranslation(0, self.cyl_tabBar.frame.size.height);
@@ -640,7 +660,8 @@ if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
                             
                             if (self->_lastShowHideTabBar != hidden) {
                                 // 动画结束，如果和最后一次设置显隐状态不一致，使其显示正确的状态，主要解决快速设置bug（两次设置时间间隔<0.2s）
-                                [self setTabBarHidden:self->_lastShowHideTabBar animated:animated];
+                                // Replay with the queued request's own `animated`. 按排队请求自己的 animated 重放。
+                                [self setTabBarHidden:self->_lastShowHideTabBar animated:self->_lastShowHideTabBarAnimated];
                             }
                             [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
                         }];
@@ -661,6 +682,9 @@ if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
                             }
 
                         }
+                        // FIX: issue #662 — a will-hide/will-show delegate re-entered with the opposite request and
+                        // already applied it; do not overwrite it. 代理回调已反向重入并生效，不要覆盖。
+                        if (self.cyl_tabBarHidden != hidden) { return; }
                         
                         self.cyl_tabBar.hidden = hidden;
                         [self _updateAdditionalSafeAreaInsetsWithAnimated:animated];
@@ -2948,7 +2972,7 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
 #if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
         if ([_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {     return _showsMoreNavigationController; }
-        
+
         _showsMoreNavigationController = (self.viewControllers.count > 5) || [self.tabBar.items containsObject:self.moreNavigationController.tabBarItem] ;
 #else
 #endif
