@@ -13,6 +13,8 @@
 		184C1C9723F65A2A00B23C7F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 184C1C9623F65A2A00B23C7F /* Assets.xcassets */; };
 		184C1C9A23F65A2A00B23C7F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 184C1C9823F65A2A00B23C7F /* LaunchScreen.storyboard */; };
 		184C1CA523F65A2A00B23C7F /* HealthyHomeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CA423F65A2A00B23C7F /* HealthyHomeTests.swift */; };
+		662000012E00000000000001 /* Issue662FlatDesignTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662000012E00000000000002 /* Issue662FlatDesignTests.swift */; };
+		662000012E00000000000003 /* HealthyHomeTestHostSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662000012E00000000000004 /* HealthyHomeTestHostSupport.swift */; };
 		184C1CB023F65A2A00B23C7F /* HealthyHomeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CAF23F65A2A00B23C7F /* HealthyHomeUITests.swift */; };
 		184C1CC823F65A6700B23C7F /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CBF23F65A6700B23C7F /* HomeVC.swift */; };
 		184C1CC923F65A6700B23C7F /* HealthyVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CC123F65A6700B23C7F /* HealthyVC.swift */; };
@@ -66,6 +68,8 @@
 		184C1C9B23F65A2A00B23C7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		184C1CA023F65A2A00B23C7F /* HealthyHomeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HealthyHomeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		184C1CA423F65A2A00B23C7F /* HealthyHomeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthyHomeTests.swift; sourceTree = "<group>"; };
+		662000012E00000000000002 /* Issue662FlatDesignTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Issue662FlatDesignTests.swift; sourceTree = "<group>"; };
+		662000012E00000000000004 /* HealthyHomeTestHostSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthyHomeTestHostSupport.swift; sourceTree = "<group>"; };
 		184C1CA623F65A2A00B23C7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		184C1CAB23F65A2A00B23C7F /* HealthyHomeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HealthyHomeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		184C1CAF23F65A2A00B23C7F /* HealthyHomeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthyHomeUITests.swift; sourceTree = "<group>"; };
@@ -167,6 +171,8 @@
 			isa = PBXGroup;
 			children = (
 				184C1CA423F65A2A00B23C7F /* HealthyHomeTests.swift */,
+				662000012E00000000000002 /* Issue662FlatDesignTests.swift */,
+				662000012E00000000000004 /* HealthyHomeTestHostSupport.swift */,
 				184C1CA623F65A2A00B23C7F /* Info.plist */,
 			);
 			path = HealthyHomeTests;
@@ -471,6 +477,7 @@
 				184C1CCC23F65A6700B23C7F /* FriendsVC.swift in Sources */,
 				184F198723F7C811002DBAE4 /* UIColor+Extension.swift in Sources */,
 				184C1CE623F65A9A00B23C7F /* RootTabBarController.swift in Sources */,
+				662000012E00000000000003 /* HealthyHomeTestHostSupport.swift in Sources */,
 				184C1CC823F65A6700B23C7F /* HomeVC.swift in Sources */,
 				184C1CE723F65A9A00B23C7F /* AppDelegate.swift in Sources */,
 				C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */,
@@ -501,6 +508,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				184C1CA523F65A2A00B23C7F /* HealthyHomeTests.swift in Sources */,
+				662000012E00000000000001 /* Issue662FlatDesignTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -709,7 +717,6 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = HealthyHomeTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -730,7 +737,6 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = HealthyHomeTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
