@@ -9,6 +9,7 @@
 #import "CYLTabBarController.h"
 #import "CYLTabBar.h"
 #import <objc/runtime.h>
+#import <dlfcn.h>
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "UIControl+CYLTabBarControllerExtention.h"
 #import "UIImage+CYLTabBarControllerExtention.h"
@@ -2743,6 +2744,14 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
 }
 
 #if defined(__IPHONE_27_1) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_27_1
+/// FIX: issue #672 YES when `selector` on `cls` comes from app code rather than a system framework such as UIKitCore.
+static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
+    IMP imp = class_getMethodImplementation(cls, selector);
+    Dl_info info;
+    if (!imp || dladdr((const void *)imp, &info) == 0 || !info.dli_fname) { return NO; }
+    return strstr(info.dli_fname, "/System/Library/") == NULL && strstr(info.dli_fname, "/usr/lib/") == NULL;
+}
+
 - (UIVerticalBarBehavior)preferredVerticalBarBehavior API_AVAILABLE(ios(27.1)) {
     if (self.allowsVerticalBar) { return [super preferredVerticalBarBehavior]; }
     return UIVerticalBarBehaviorDisabled;
@@ -2750,7 +2759,33 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
 
 - (UIViewController *)childViewControllerForPreferredVerticalBarBehavior API_AVAILABLE(ios(27.1)) {
     if (self.allowsVerticalBar) { return [super childViewControllerForPreferredVerticalBarBehavior]; }
+    // FIX: issue #672 a screen that overrides `preferredVerticalBarBehavior` makes its own choice.
+    if ([self cyl_selectedChildOverridesVerticalBarBehavior]) { return self.selectedViewController; }
     return nil;
+}
+
+/*!
+ * FIX: issue #672
+ * [EN] Whether a view controller on the `childViewControllerForPreferredVerticalBarBehavior` chain that starts at
+ *      the selected view controller (e.g. navigation controller -> top view controller) implements
+ *      `preferredVerticalBarBehavior` in app code. UIKit's own implementations (UIViewController,
+ *      UINavigationController, ...) do not count, so screens without an override still follow `allowsVerticalBar`.
+ * [CN] 从选中的子控制器开始，沿 `childViewControllerForPreferredVerticalBarBehavior` 链（如导航控制器 -> 栈顶控制器）
+ *      是否有控制器在 App 代码里实现了 `preferredVerticalBarBehavior`。UIKit 自带的实现（UIViewController、UINavigationController 等）
+ *      不算，所以没有重写的页面仍按 `allowsVerticalBar` 处理。
+ */
+- (BOOL)cyl_selectedChildOverridesVerticalBarBehavior API_AVAILABLE(ios(27.1)) {
+    UIViewController *viewController = self.selectedViewController;
+    NSUInteger depth = 0;
+    while (viewController && depth++ < 16) {
+        if (CYLIsImplementedOutsideSystemFrameworks(viewController.class, @selector(preferredVerticalBarBehavior))) {
+            return YES;
+        }
+        UIViewController *child = [viewController childViewControllerForPreferredVerticalBarBehavior];
+        if (child == viewController) { break; }
+        viewController = child;
+    }
+    return NO;
 }
 #endif
 
