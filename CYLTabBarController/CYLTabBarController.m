@@ -398,7 +398,21 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        [self.cyl_tabBar layoutSubviews];//Fix issue #93 #392
+        // FIX: issue #585, #543 (follow-up to #93, #392)
+        // [EN] The forced `-layoutSubviews` below is an iOS 10 workaround: #93 (iOS 10.0–10.2) and #392 (iOS 10.3.x, items
+        //      misplaced next to the plus button) needed the tab bar laid out again after this controller. It later ran on
+        //      every layout pass on every system. On iOS 11+ notched iPhones that re-laid the tab bar out synchronously in
+        //      the middle of push/pop (#585: tab images flicker after `cyl_replaceTabImageView`) and rotation (#543: the tab
+        //      bar flickers when turning from landscape to portrait). From iOS 11 UIKit lays the tab bar out itself, so keep
+        //      the workaround to the systems it was written for.
+        // [CN] 下面强制调用 `-layoutSubviews` 是针对 iOS 10 的处理：#93（iOS 10.0–10.2）与 #392（iOS 10.3.x，PlusButton 旁的 item
+        //      位置错误）需要在本控制器布局后再布局一次 TabBar。之后它在所有系统的每次布局中都会执行，iOS 11+ 刘海屏上会在
+        //      push/pop（#585：调用 `cyl_replaceTabImageView` 后 Tab 图片闪动）和旋转（#543：横屏转竖屏时 TabBar 闪动）过程中
+        //      同步地重新布局 TabBar。iOS 11 起 UIKit 会自行布局 TabBar，因此只在当初需要的系统上执行。
+        if (@available(iOS 11.0, *)) {
+        } else {
+            [self.cyl_tabBar layoutSubviews];//Fix issue #93 #392
+        }
         if ([self.cyl_tabBar isKindOfClass:[CYLTabBar class]] ) {
             CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
             [self cyl_bindTabControlActions];
