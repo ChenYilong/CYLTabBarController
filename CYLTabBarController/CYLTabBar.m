@@ -674,19 +674,25 @@ UISearchTab 会从 TabBar 分离出来单独显示。
  *      On iOS 16, during a push (iPhone 12), the tab button was laid out stretched over the bottom safe area: its frame
  *      height went from 49 to 83, so `center.y` moved from 24.5 to 41.5. `tabImageViewDefaultOffset` came out ~8.5 pt too
  *      large, the image was moved down onto the title, and since the value is computed only once it stayed wrong.
- *      Leave out the part of the button inside the bottom safe area. Only for buttons laid out directly in this tab bar
- *      (not the Liquid Glass platter, whose buttons use their own coordinates).
+ *      Leave out the part of the button inside the bottom safe area. Classic style only (no Liquid Glass, no FlatDesign).
  * [CN] `tabBarButton` 中承载内容那部分的垂直中心，使用本 TabBar 的坐标系（按钮位于底部安全区之上时，与
  *      `tabBarButton.center.y` 相同）。
  *      iOS 16（iPhone 12）push 过程中，Tab 按钮会被拉伸到底部安全区内：frame 高度由 49 变为 83，`center.y` 由 24.5 变为 41.5，
  *      计算出的 `tabImageViewDefaultOffset` 偏大约 8.5pt，图片被下移与文字重叠；该值只计算一次，因此会一直错误。
- *      这里排除按钮位于底部安全区内的部分。仅适用于直接布局在本 TabBar 中的按钮（液态玻璃的按钮在 platter 内，使用其自身坐标系）。
+ *      这里排除按钮位于底部安全区内的部分。仅适用于经典样式（非液态玻璃、非扁平样式）。
  */
 - (CGFloat)cyl_tabButtonContentCenterY:(UIView *)tabBarButton {
-    CGRect frame = tabBarButton.frame;
-    if (tabBarButton.superview != self) {
+    // Classic style only. Liquid Glass (iOS 26+) lays the buttons out in its own platter, and FlatDesign does not use
+    // `tabImageViewDefaultOffset` at all (it is applied only by the classic `-offsetTabBarTabImageViewToFit:`): keep the
+    // previous value there. The superview check is a last line of defence for any other button layout.
+    // 仅限经典样式：液态玻璃（iOS 26+）的按钮布局在 platter 中，扁平样式完全不使用 `tabImageViewDefaultOffset`
+    // （仅由经典样式的 `-offsetTabBarTabImageViewToFit:` 使用），这两种情况保持原值。
+    if ([CYLConstants isLiquidGlassActive] ||
+        CYLTabBarStyleTypeFlatDesign == self.tabBarController.tabBarStyleType ||
+        tabBarButton.superview != self) {
         return tabBarButton.center.y;
     }
+    CGRect frame = tabBarButton.frame;
     CGFloat contentMaxY = CGRectGetHeight(self.bounds) - self.safeAreaInsets.bottom;
     if (CGRectGetMaxY(frame) <= contentMaxY || contentMaxY <= CGRectGetMinY(frame)) {
         return tabBarButton.center.y;
