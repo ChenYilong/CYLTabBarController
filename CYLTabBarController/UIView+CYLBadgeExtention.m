@@ -403,6 +403,26 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
 
 #pragma mark -- animation
 
+/*!
+ * FIX: issue #583, #271
+ * [EN] The badge's Shake and Bounce animations (`+cyl_shake_AnimationRepeatTimes:…`, `+cyl_bounce_AnimationRepeatTimes:…`)
+ *      kept the default `removedOnCompletion = YES`, unlike Breathe and Scale. Core Animation removes such animations when
+ *      the app goes to the background, so after returning a badge with text stopped shaking/bouncing. Keep them. Set here,
+ *      not in those public factories, so apps that use the factories themselves see no change.
+ *      Scope: every badge, whatever the tab bar style (classic, iOS 26 UI compatibility mode, Liquid Glass on iOS 26+ and
+ *      the iPhone Duo, FlatDesign): they all share this code, and the problem does not depend on the style. No style check
+ *      on purpose: looking up the tab bar controller from a badge finds the root one, which can be the wrong one with
+ *      nested tab bar controllers.
+ * [CN] 角标的 Shake、Bounce 动画（`+cyl_shake_AnimationRepeatTimes:…`、`+cyl_bounce_AnimationRepeatTimes:…`）与 Breathe、Scale 不同，
+ *      保留了默认的 `removedOnCompletion = YES`。App 进入后台时 Core Animation 会移除这类动画，回到前台后带文字的角标不再抖动/弹跳。
+ *      这里将其保留。在此处设置而不修改这两个公开的工厂方法，App 自行使用这些方法时行为不变。
+ *      范围：所有角标，与 TabBar 样式无关（经典、iOS 26 UI 兼容模式、iOS 26+ 液态玻璃与 iPhone Duo、扁平样式）：它们共用这段代码，
+ *      且该问题与样式无关。有意不判断样式：从角标查找 TabBarController 会找到根控制器，嵌套 TabBarController 时可能找错。
+ */
+- (void)cyl_keepBadgeAnimationAfterBackground:(CAAnimation *)animation {
+    animation.removedOnCompletion = NO;
+}
+
 //if u want to add badge animation type, follow steps bellow:
 //1. go to definition of CYLBadgeAnimationType and add new type
 //2. go to category of CAAnimation+CYLBadgeExtention to add new animation interface
@@ -417,12 +437,14 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
             [self.cyl_badge.layer addAnimation:[CAAnimation cyl_opacityForever_Animation:1.4]
                                         forKey:CYLBadgeBreatheAnimationKey];
             break;
-        case CYLBadgeAnimationTypeShake:
-            [self.cyl_badge.layer addAnimation:[CAAnimation cyl_shake_AnimationRepeatTimes:CGFLOAT_MAX
-                                                                                  durTimes:1
-                                                                                    forObj:self.cyl_badge.layer]
-                                        forKey:CYLBadgeShakeAnimationKey];
+        case CYLBadgeAnimationTypeShake: {
+            CAAnimation *animation = [CAAnimation cyl_shake_AnimationRepeatTimes:CGFLOAT_MAX
+                                                                        durTimes:1
+                                                                          forObj:self.cyl_badge.layer];
+            [self cyl_keepBadgeAnimationAfterBackground:animation];
+            [self.cyl_badge.layer addAnimation:animation forKey:CYLBadgeShakeAnimationKey];
             break;
+        }
         case CYLBadgeAnimationTypeScale:
             [self.cyl_badge.layer addAnimation:[CAAnimation cyl_scaleFrom:1.4
                                                                   toScale:0.6
@@ -430,12 +452,14 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
                                                                       rep:MAXFLOAT]
                                         forKey:CYLBadgeScaleAnimationKey];
             break;
-        case CYLBadgeAnimationTypeBounce:
-            [self.cyl_badge.layer addAnimation:[CAAnimation cyl_bounce_AnimationRepeatTimes:CGFLOAT_MAX
-                                                                                   durTimes:1
-                                                                                     forObj:self.cyl_badge.layer]
-                                        forKey:CYLBadgeBounceAnimationKey];
+        case CYLBadgeAnimationTypeBounce: {
+            CAAnimation *animation = [CAAnimation cyl_bounce_AnimationRepeatTimes:CGFLOAT_MAX
+                                                                         durTimes:1
+                                                                           forObj:self.cyl_badge.layer];
+            [self cyl_keepBadgeAnimationAfterBackground:animation];
+            [self.cyl_badge.layer addAnimation:animation forKey:CYLBadgeBounceAnimationKey];
             break;
+        }
             
             
             /*!
