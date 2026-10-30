@@ -341,32 +341,42 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 @property (nonatomic, assign) BOOL noNeedUIDesignCompatibility;
 
 /*!
- * FIX: issue #653 (iPhone Duo, iOS 27.1+)
+ * FIX: issue #653, #672 (iPhone Duo, iOS 27.1+)
  * [EN] Whether the system may show the bars in the vertical bar: a column on the leading or trailing edge that iOS 27.1
  *      uses on some devices, such as the folded iPhone Duo. Defaults to NO.
- *      - NO: CYLTabBarController returns `UIVerticalBarBehaviorDisabled` from `preferredVerticalBarBehavior` and nil from
- *        `childViewControllerForPreferredVerticalBarBehavior`, so the tab bar stays at the bottom and the status bar
- *        stays horizontal, whatever the child view controllers prefer.
- *      - YES: the system default behaviour. `UITabBarController` passes the choice to the selected view controller,
- *        so each screen can still opt out by overriding `preferredVerticalBarBehavior`.
+ *      - NO: CYLTabBarController returns `UIVerticalBarBehaviorDisabled` from `preferredVerticalBarBehavior`, so the tab
+ *        bar stays at the bottom and the status bar stays horizontal. Exception (issue #672): a screen that overrides
+ *        `preferredVerticalBarBehavior` itself (the selected view controller, or the top view controller of a selected
+ *        navigation controller) still decides for itself, e.g. return `UIVerticalBarBehaviorAutomatic` to opt in.
+ *      - YES: the system default behaviour, as in 1.99.65 and earlier. `UITabBarController` passes the choice to the
+ *        selected view controller, so each screen can still opt out by overriding `preferredVerticalBarBehavior`.
  *      This is a convenience switch for UIKit's `preferredVerticalBarBehavior`; a subclass may override that property
  *      directly instead. Changes apply immediately: the setter calls `setNeedsUpdateOfVerticalBarConfiguration`.
  *      Not related to `tabBarController.sidebar.preferredPlacement` / `sidebar.isAvailable` (iOS 27): those choose between
  *      the tab bar and an iPad-style sidebar when there is room for one (regular width) and need the `UITab` API; the
  *      vertical bar is used in compact width, where the sidebar is not available.
  *      Status with YES: Liquid Glass style verified on the iPhone Duo simulator (layout, Lottie icons, badges, plus button,
- *      re-tap, long press and drag). FlatDesign style not yet verified in the vertical bar.
+ *      re-tap, long press and drag). FlatDesign style verified on the iPhone Duo simulator: the status bar moves to the
+ *      trailing column and the FlatDesign bar stays at the bottom with its items centered across the full width
+ *      (see `CYLFlatDesignTabBar.respectsVerticalStatusBarSafeArea`).
+ *      Folded iPhone Duo, FlatDesign, vertical status bar with centered items:
+ *          tabBarController.allowsVerticalBar = YES; // respectsVerticalStatusBarSafeArea keeps its default NO
  *      No effect below iOS 27.1 or when built with an SDK older than iOS 27.1.
  * [CN] 是否允许系统以竖向栏显示导航栏/TabBar：iOS 27.1 在部分设备（如 iPhone Duo 折叠状态）上把栏放到屏幕左/右侧的一列。默认 NO。
- *      - NO：CYLTabBarController 的 `preferredVerticalBarBehavior` 返回 `UIVerticalBarBehaviorDisabled`，
- *        `childViewControllerForPreferredVerticalBarBehavior` 返回 nil，TabBar 保持在底部、状态栏保持横向，不受子控制器影响。
- *      - YES：系统默认行为。`UITabBarController` 把决定权交给当前选中的控制器，各页面仍可通过重写 `preferredVerticalBarBehavior` 关闭。
+ *      - NO：CYLTabBarController 的 `preferredVerticalBarBehavior` 返回 `UIVerticalBarBehaviorDisabled`，TabBar 保持在底部、
+ *        状态栏保持横向。例外（issue #672）：自己重写了 `preferredVerticalBarBehavior` 的页面（选中的控制器，或选中的导航控制器的
+ *        栈顶控制器）仍由该页面决定，例如返回 `UIVerticalBarBehaviorAutomatic` 即可单独开启竖向栏。
+ *      - YES：系统默认行为（与 1.99.65 及更早版本一致）。`UITabBarController` 把决定权交给当前选中的控制器，
+ *        各页面仍可通过重写 `preferredVerticalBarBehavior` 关闭。
  *      本属性是 UIKit `preferredVerticalBarBehavior` 的便捷开关；子类也可以直接重写该属性。修改后无需其他调用，
  *      setter 内部会调用 `setNeedsUpdateOfVerticalBarConfiguration`。
  *      与 `tabBarController.sidebar.preferredPlacement` / `sidebar.isAvailable`（iOS 27）无关：后者在空间足够（regular 宽度）时
  *      在 TabBar 与 iPad 式侧边栏之间选择，并依赖 `UITab` API；竖向栏用于 compact 宽度，此时侧边栏不可用。
  *      设为 YES 时的验证情况：液态玻璃样式已在 iPhone Duo 模拟器验证（布局、Lottie 图标、角标、加号按钮、重复点击、长按与拖拽）；
- *      扁平样式尚未在竖向栏中验证。
+ *      扁平样式已在 iPhone Duo 模拟器验证：状态栏移到右侧竖列，扁平 TabBar 留在底部，按钮铺满整个宽度并居中
+ *      （见 `CYLFlatDesignTabBar.respectsVerticalStatusBarSafeArea`）。
+ *      iPhone Duo 折叠、扁平样式，想要竖向状态栏且按钮居中：
+ *          tabBarController.allowsVerticalBar = YES; // respectsVerticalStatusBarSafeArea 保持默认 NO
  *      iOS 27.1 以下或使用 iOS 27.1 以下 SDK 编译时无效。
  */
 @property (nonatomic, assign) BOOL allowsVerticalBar;
