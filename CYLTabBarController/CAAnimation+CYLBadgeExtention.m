@@ -242,6 +242,48 @@
 //    return animation;
 //}
 
+#pragma mark - Relative shake / bounce
+
+static CFTimeInterval CYLBadgeSafeDuration(CFTimeInterval duration) {
+    if (!isfinite(duration) || duration <= 0) {
+        return 1;
+    }
+    return MAX(0.01, duration);
+}
+
+static float CYLBadgeSafeRepeatCount(float repeatCount) {
+    if (isnan(repeatCount)) {
+        return 0;
+    }
+    return MAX(0, repeatCount);
+}
+
+static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
+    return isfinite(offset) ? offset : 0;
+}
+
++ (CAKeyframeAnimation *)cyl_translationAnimationWithKeyPath:(NSString *)keyPath
+                                                 repeatTimes:(float)repeatTimes
+                                                    duration:(CFTimeInterval)duration
+                                                      offset:(CGFloat)offset {
+    CGFloat safeOffset = CYLBadgeSafeOffset(offset);
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:keyPath];
+    animation.values = @[@0, @(-safeOffset), @0, @(safeOffset), @0];
+    animation.repeatCount = CYLBadgeSafeRepeatCount(repeatTimes);
+    animation.duration = CYLBadgeSafeDuration(duration);
+    animation.removedOnCompletion = NO;
+    animation.fillMode = kCAFillModeForwards;
+    return animation;
+}
+
++ (CAKeyframeAnimation *)cyl_shakeAnimationRepeatTimes:(float)repeatTimes duration:(CFTimeInterval)duration offset:(CGFloat)offset {
+    return [self cyl_translationAnimationWithKeyPath:@"transform.translation.x" repeatTimes:repeatTimes duration:duration offset:offset];
+}
+
++ (CAKeyframeAnimation *)cyl_bounceAnimationRepeatTimes:(float)repeatTimes duration:(CFTimeInterval)duration offset:(CGFloat)offset {
+    return [self cyl_translationAnimationWithKeyPath:@"transform.translation.y" repeatTimes:repeatTimes duration:duration offset:offset];
+}
+
 #pragma mark - Badge Default
 
 + (CABasicAnimation *)cyl_badge_once_scale_AnimationRepeatTimes:(float)repeatTimes

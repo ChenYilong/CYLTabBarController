@@ -32,6 +32,67 @@
 static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
 static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 
+/*!
+ * [EN] Every key a badge animation is added under, so a new animation replaces the previous one instead of stacking
+ *      (e.g. Shake + Scale after showing two values with different animation types).
+ * [CN] 角标动画使用的所有 key：新动画替换旧动画，而不是叠加（例如先后以不同动画类型显示两个值，导致抖动与缩放同时进行）。
+ */
+static NSArray<NSString *> *CYLBadgeAnimationKeys(void) {
+    static NSArray<NSString *> *keys;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        keys = @[CYLBadgeBreatheAnimationKey, CYLBadgeRotateAnimationKey, CYLBadgeShakeAnimationKey,
+                 CYLBadgeScaleAnimationKey, CYLBadgeBounceAnimationKey, CYLBadgeLeftRightOnceAnimationKey,
+                 CYLBadgeRightLeftOnceAnimationKey, CYLBadgeFadeInOnceAnimationKey, CYLBadgeRollingOnceAnimationKey,
+                 CYLBadgeScaleOnceAnimationKey];
+    });
+    return keys;
+}
+
+/// The key of a repeating (endless) badge animation, nil for none and for the one-shot ones.
+static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationType) {
+    switch (animationType) {
+        case CYLBadgeAnimationTypeBreathe: return CYLBadgeBreatheAnimationKey;
+        case CYLBadgeAnimationTypeShake:   return CYLBadgeShakeAnimationKey;
+        case CYLBadgeAnimationTypeScale:   return CYLBadgeScaleAnimationKey;
+        case CYLBadgeAnimationTypeBounce:  return CYLBadgeBounceAnimationKey;
+        default:                           return nil;
+    }
+}
+
+@interface UIView (CYLBadgeEnvironmentPrivate)
+- (void)cyl_badgeEnvironmentDidChange;
+- (void)cyl_notifyBadgeHostOfEnvironmentChange;
+@end
+
+/*!
+ * [EN] The default badge view. A `UILabel` in every way; it only tells its host when it enters a window or its
+ *      traits change (e.g. Dark Mode), so the host can re-resolve the border color and restore a repeating animation
+ *      that UIKit stripped. `CYLTabBarBadgeView` (the Liquid Glass badge on iOS 27) does the same.
+ * [CN] 默认的角标视图。完全等同于 `UILabel`，只是在进入 window 或 trait 改变（如深色模式）时通知宿主，以便宿主重新解析
+ *      边框颜色，并恢复被 UIKit 移除的循环动画。`CYLTabBarBadgeView`（iOS 27 液态玻璃角标）也会这样做。
+ */
+@interface CYLBadgeLabel : UILabel
+@end
+
+@implementation CYLBadgeLabel
+
+- (void)didMoveToWindow {
+    [super didMoveToWindow];
+    [self cyl_notifyBadgeHostOfEnvironmentChange];
+}
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    [self cyl_notifyBadgeHostOfEnvironmentChange];
+}
+#pragma clang diagnostic pop
+
+@end
+
 @implementation UIView (CYLBadgeExtention)
 
 #pragma mark -- public methods
@@ -203,6 +264,11 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
         [self cyl_showRedDotBadge];
         return;
     }
+    // Only spaces or line breaks: nothing to read, so hide instead of showing an empty pill.
+    if ([value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length == 0) {
+        [self.cyl_badge cyl_setHidden:YES];
+        return;
+    }
     if ([value isEqualToString:@"new"] || [value isEqualToString:@"NEW"] ) {
         [self cyl_showNewBadge:value];
         return;
@@ -228,6 +294,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 - (void)cyl_resumeBadge {
     if (self.cyl_isPauseBadge) {
         [self.cyl_badge cyl_setHidden:NO];
+        [self cyl_badgeEnvironmentDidChange];
     }
 }
 
@@ -287,6 +354,8 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
         [self cyl_resetRedDotBadgeFrame];
         self.cyl_badge.layer.cornerRadius = CGRectGetWidth(self.cyl_badge.frame) / 2;
     }
+    self.cyl_badge.isAccessibilityElement = NO;
+    [self cyl_applyBadgeBorder];
     [self.cyl_badge cyl_setHidden:NO];
 }
 
@@ -318,8 +387,10 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     [self cyl_adjustLabelWidth:self.cyl_badge];
     [self cyl_addMargin];
     [self cyl_layoutBadgeAtTopRightCorner];
-    //FIXME:  to delete
-    self.cyl_badge.layer.cornerRadius = (self.cyl_badgeCornerRadius !=0 ) ? self.cyl_badgeCornerRadius : CGRectGetHeight(self.cyl_badge.frame) / 2;
+    self.cyl_badge.layer.cornerRadius = [self cyl_textBadgeCornerRadius];
+    self.cyl_badge.isAccessibilityElement = YES;
+    self.cyl_badge.accessibilityLabel = value;
+    [self cyl_applyBadgeBorder];
     [self.cyl_badge cyl_setHidden:NO];
 }
 
@@ -334,8 +405,10 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     [self cyl_badgeInit];
     [self.cyl_badge cyl_setHidden:(value == 0)];
     self.cyl_badge.tag = CYLBadgeStyleNumber;
-    NSString *text = (value > self.cyl_badgeMaximumBadgeNumber ?
-                      [NSString stringWithFormat:@"%@+", @(self.cyl_badgeMaximumBadgeNumber)] :
+    // A maximum below 1 would turn every number into "0+".
+    NSInteger maximumBadgeNumber = MAX(1, self.cyl_badgeMaximumBadgeNumber);
+    NSString *text = (value > maximumBadgeNumber ?
+                      [NSString stringWithFormat:@"%@+", @(maximumBadgeNumber)] :
                       [NSString stringWithFormat:@"%@", @(value)]);
     [self cyl_showTextBadge:text];
 }
@@ -353,9 +426,6 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     }
     
     if (!self.cyl_badge) {
-        if (![self cyl_isReady]) {
-            return;
-        }
         Class class = [self cyl_badgeClass];
         self.cyl_badge = [[class alloc] initWithFrame:(self.frame)];
 //        self.cyl_badge = [[class alloc] init];
@@ -367,8 +437,10 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
         self.cyl_badge.layer.cornerRadius = CGRectGetWidth(self.cyl_badge.frame) / 2;
         self.cyl_badge.layer.masksToBounds = YES;//very important
         [self.cyl_badge cyl_setHidden:YES];
+        self.cyl_badge.isAccessibilityElement = NO;
         
         self.cyl_badge.backgroundColor = self.cyl_badgeBackgroundColor;
+        [self cyl_applyBadgeBorder];
         
         [self cyl_bringBadgeToFront:self.cyl_badge];
     }
@@ -381,35 +453,16 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     [self addSubview:view];
     [self bringSubviewToFront:view];
     view.layer.zPosition = MAXFLOAT;
-    __weak __typeof(self) weakSelf = self;
-    void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
-        __strong typeof(self) self = weakSelf;
-        if (!self) {
-             return;
-        }
-//        [self cyl_setBadge:nil];
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-            (
-//             [[[self cyl_badge] subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
-//             if ([self cyl_shouldUpdateBadgeSubviews]) {
-//                 [[self cyl_badge] removeFromSuperview];
-//                 id view = nil;
-//                 [self cyl_setBadge:view];
-//             }
-             );
-    };
-    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarStyleTypeDidChangeNotification
-                                                      object:nil
-                                                       queue:[NSOperationQueue mainQueue]
-                                                  usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
-//    [self cyl_setBadge:view];
-
+    // This used to add a `CYLTabBarStyleTypeDidChangeNotification` observer whose block did nothing, on every call,
+    // including every `-willMoveToSuperview:`, and never removed it: observers piled up for the app's lifetime.
+    // 这里原先每次调用（包括每次 `-willMoveToSuperview:`）都会注册一个空操作的通知观察者且从不移除，观察者随 App 运行不断累积。
 }
 
 - (void)cyl_resetRedDotBadgeFrame {
     CGFloat redotWidth = kCYLBadgeDefaultRedDotRadius *2;
-    if (self.cyl_badgeRadius) {
-        redotWidth = self.cyl_badgeRadius * 2;
+    CGFloat badgeRadius = self.cyl_badgeRadius;
+    if (badgeRadius > 0 && isfinite(badgeRadius)) {
+        redotWidth = badgeRadius * 2;
     }
     if (!self.cyl_badge) {
         return;
@@ -439,7 +492,105 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     }
     badge.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin;
     CGPoint badgeCenterOffset = self.cyl_badgeCenterOffset;
-    badge.center = CGPointMake(CGRectGetWidth(self.bounds) + 2 + badgeCenterOffset.x, badgeCenterOffset.y);
+    CGFloat offsetX = isfinite(badgeCenterOffset.x) ? badgeCenterOffset.x : 0;
+    CGFloat offsetY = isfinite(badgeCenterOffset.y) ? badgeCenterOffset.y : 0;
+    badge.center = CGPointMake(CGRectGetWidth(self.bounds) + 2 + offsetX, offsetY);
+}
+
+/*!
+ * [EN] A custom `cyl_badgeCornerRadius` is kept within half the badge's shorter side (anything larger draws a
+ *      distorted shape); 0, negative or non-finite means automatic: half the height.
+ * [CN] 自定义的 `cyl_badgeCornerRadius` 不超过角标短边的一半（更大会导致形状变形）；0、负数或非有限值表示自动：高度的一半。
+ */
+- (CGFloat)cyl_textBadgeCornerRadius {
+    CGSize size = self.cyl_badge.bounds.size;
+    CGFloat maximumRadius = MAX(0, MIN(size.width, size.height) / 2);
+    CGFloat customRadius = self.cyl_badgeCornerRadius;
+    if (customRadius > 0 && isfinite(customRadius)) {
+        return MIN(customRadius, maximumRadius);
+    }
+    return MAX(0, size.height / 2);
+}
+
+#pragma mark -- border, environment, refresh
+
+/*!
+ * [EN] Applies `cyl_badgeBorderWidth` / `cyl_badgeBorderColor`. `CALayer.borderColor` is a `CGColor`, which does not
+ *      follow Dark Mode by itself, so a dynamic color is resolved against the badge's traits here, and again whenever
+ *      they change (see `CYLBadgeLabel`).
+ * [CN] 应用 `cyl_badgeBorderWidth` / `cyl_badgeBorderColor`。`CALayer.borderColor` 是 `CGColor`，不会自动跟随深色模式，
+ *      因此在这里按角标的 trait 解析动态颜色，并在 trait 改变时重新解析（见 `CYLBadgeLabel`）。
+ */
+- (void)cyl_applyBadgeBorder {
+    UIView *badge = self.cyl_badge;
+    if (!badge) {
+        return;
+    }
+    CGFloat borderWidth = self.cyl_badgeBorderWidth;
+    badge.layer.borderWidth = borderWidth;
+    UIColor *borderColor = self.cyl_badgeBorderColor;
+    if (borderWidth <= 0 || !borderColor) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        borderColor = [borderColor resolvedColorWithTraitCollection:badge.traitCollection];
+    }
+    badge.layer.borderColor = borderColor.CGColor;
+}
+
+/// Called by the badge view itself (`CYLBadgeLabel`, `CYLTabBarBadgeView`) when it enters a window or its traits change.
+- (void)cyl_notifyBadgeHostOfEnvironmentChange {
+    UIView *host = self.superview;
+    if (host && host.cyl_badge == self) {
+        [host cyl_badgeEnvironmentDidChange];
+    }
+}
+
+/*!
+ * [EN] Re-resolves the border color, and keeps the repeating animation in step with the environment: restores it if
+ *      UIKit stripped it (e.g. a Liquid Glass platter rebuild, a cell moved to another window), removes it while
+ *      Reduce Motion is on. One-shot animations are never replayed here.
+ * [CN] 重新解析边框颜色，并使循环动画与环境保持一致：被 UIKit 移除时恢复（如液态玻璃重建 platter、cell 移到其他 window），
+ *      开启"减弱动态效果"时移除。一次性动画不会在这里重播。
+ */
+- (void)cyl_badgeEnvironmentDidChange {
+    UIView *badge = self.cyl_badge;
+    if (!badge) {
+        return;
+    }
+    [self cyl_applyBadgeBorder];
+    NSString *repeatingAnimationKey = CYLBadgeRepeatingAnimationKey(self.cyl_badgeAnimationType);
+    if (!repeatingAnimationKey || !badge.window || badge.hidden || badge.alpha <= 0.01f) {
+        return;
+    }
+    if ([self cyl_shouldReduceBadgeMotion]) {
+        [self cyl_removeBadgeAnimations];
+        return;
+    }
+    if (![badge.layer animationForKey:repeatingAnimationKey]) {
+        [self cyl_beginAnimation];
+    }
+}
+
+- (void)cyl_refreshBadge {
+    UIView *badge = self.cyl_badge;
+    if (!badge || badge.superview != self) {
+        return;
+    }
+    [self bringSubviewToFront:badge];
+    [self cyl_layoutBadgeAtTopRightCorner];
+    [self cyl_badgeEnvironmentDidChange];
+}
+
+- (BOOL)cyl_shouldReduceBadgeMotion {
+    return self.cyl_badgeRespectsReduceMotion && UIAccessibilityIsReduceMotionEnabled();
+}
+
+- (void)cyl_removeBadgeAnimations {
+    CALayer *layer = self.cyl_badge.layer;
+    for (NSString *key in CYLBadgeAnimationKeys()) {
+        [layer removeAnimationForKey:key];
+    }
 }
 
 #pragma mark --  other private methods
@@ -472,28 +623,21 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 
 }
 
+/*!
+ * [EN] A badge is one line: measure the text as one line (`-sizeWithAttributes:`) and keep the label on one line.
+ *      It was measured with word wrapping in a screen-sized box and `numberOfLines = 0`.
+ * [CN] 角标只有一行：按单行测量文本（`-sizeWithAttributes:`），并让 Label 保持单行。原先在屏幕大小的区域内按单词换行测量，
+ *      且 `numberOfLines = 0`。
+ */
 - (CGSize)cyl_getLabelSize:(UILabel *)label {
-    [label setNumberOfLines:0];
-    NSString *s = label.text;
+    label.numberOfLines = 1;
+    NSString *text = label.text;
     UIFont *font = label.font;
-    CGSize size = CGSizeMake(CYLScreenWidth() ,CYLScreenHeight());
-    CGSize labelsize;
-    
-    if (![s respondsToSelector:@selector(boundingRectWithSize:options:attributes:context:)]) {
-        
-        CYL_DEPRECATED_DECLARATIONS_PUSH
-        labelsize = [s sizeWithFont:font constrainedToSize:size lineBreakMode:NSLineBreakByWordWrapping];
-        CYL_DEPRECATED_DECLARATIONS_POP
-    } else {
-        NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [style setLineBreakMode:NSLineBreakByWordWrapping];
-        
-        labelsize = [s boundingRectWithSize:size
-                                    options:(NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading)
-                                 attributes:@{ NSFontAttributeName:font, NSParagraphStyleAttributeName : style}
-                                    context:nil].size;
+    if (text.length == 0 || !font) {
+        return CGSizeZero;
     }
-    return labelsize;
+    CGSize size = [text sizeWithAttributes:@{NSFontAttributeName : font}];
+    return CGSizeMake(ceil(size.width), ceil(size.height));
 }
 
 #pragma mark -- animation
@@ -527,15 +671,22 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     if (!self.cyl_badge) {
         return;
     }
+    // Replace, don't stack: showing a value with another animation type used to add it on top of the previous one.
+    [self cyl_removeBadgeAnimations];
+    if ([self cyl_shouldReduceBadgeMotion]) {
+        return;
+    }
     switch(self.cyl_badgeAnimationType) {
         case CYLBadgeAnimationTypeBreathe:
             [self.cyl_badge.layer addAnimation:[CAAnimation cyl_opacityForever_Animation:1.4]
                                         forKey:CYLBadgeBreatheAnimationKey];
             break;
         case CYLBadgeAnimationTypeShake: {
-            CAAnimation *animation = [CAAnimation cyl_shake_AnimationRepeatTimes:CGFLOAT_MAX
-                                                                        durTimes:1
-                                                                          forObj:self.cyl_badge.layer];
+            // Relative (`transform.translation.x`), so the anchored badge can still move with its host while shaking;
+            // `-cyl_shake_AnimationRepeatTimes:…` animated `position` and pinned it to where it was. Same amplitude.
+            CAAnimation *animation = [CAAnimation cyl_shakeAnimationRepeatTimes:HUGE_VALF
+                                                                       duration:1
+                                                                         offset:CGRectGetWidth(self.cyl_badge.bounds) / 4];
             [self cyl_keepBadgeAnimationAfterBackground:animation];
             [self.cyl_badge.layer addAnimation:animation forKey:CYLBadgeShakeAnimationKey];
             break;
@@ -548,9 +699,10 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
                                         forKey:CYLBadgeScaleAnimationKey];
             break;
         case CYLBadgeAnimationTypeBounce: {
-            CAAnimation *animation = [CAAnimation cyl_bounce_AnimationRepeatTimes:CGFLOAT_MAX
-                                                                         durTimes:1
-                                                                           forObj:self.cyl_badge.layer];
+            // Relative (`transform.translation.y`), see Shake. Same amplitude.
+            CAAnimation *animation = [CAAnimation cyl_bounceAnimationRepeatTimes:HUGE_VALF
+                                                                        duration:1
+                                                                          offset:CGRectGetHeight(self.cyl_badge.bounds) / 4];
             [self cyl_keepBadgeAnimationAfterBackground:animation];
             [self.cyl_badge.layer addAnimation:animation forKey:CYLBadgeBounceAnimationKey];
             break;
@@ -721,6 +873,12 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 }
 
 - (void)cyl_setBadgeFrame:(CGRect)badgeFrame {
+    // Ignore a frame UIKit cannot draw (NaN / infinite, or an empty size).
+    BOOL isFinite = isfinite(badgeFrame.origin.x) && isfinite(badgeFrame.origin.y) &&
+                    isfinite(badgeFrame.size.width) && isfinite(badgeFrame.size.height);
+    if (!isFinite || badgeFrame.size.width <= 0 || badgeFrame.size.height <= 0) {
+        return;
+    }
     NSDictionary *frameInfo = @{@"x" : @(badgeFrame.origin.x), @"y" : @(badgeFrame.origin.y),
                                 @"width" : @(badgeFrame.size.width), @"height" : @(badgeFrame.size.height)};
     objc_setAssociatedObject(self, @selector(cyl_badgeFrame), frameInfo, OBJC_ASSOCIATION_RETAIN);
@@ -850,6 +1008,34 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     return @([self cyl_badgeMaximumBadgeNumber]);
 }
 
+- (UIColor *)cyl_badgeBorderColor {
+    return objc_getAssociatedObject(self, @selector(cyl_badgeBorderColor));
+}
+
+- (void)cyl_setBadgeBorderColor:(UIColor *)badgeBorderColor {
+    objc_setAssociatedObject(self, @selector(cyl_badgeBorderColor), badgeBorderColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_applyBadgeBorder];
+}
+
+- (CGFloat)cyl_badgeBorderWidth {
+    return [objc_getAssociatedObject(self, @selector(cyl_badgeBorderWidth)) floatValue];
+}
+
+- (void)cyl_setBadgeBorderWidth:(CGFloat)badgeBorderWidth {
+    CGFloat borderWidth = isfinite(badgeBorderWidth) ? MAX(0, badgeBorderWidth) : 0;
+    objc_setAssociatedObject(self, @selector(cyl_badgeBorderWidth), @(borderWidth), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_applyBadgeBorder];
+}
+
+- (BOOL)cyl_badgeRespectsReduceMotion {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(cyl_badgeRespectsReduceMotion));
+    return value ? value.boolValue : YES;
+}
+
+- (void)cyl_setBadgeRespectsReduceMotion:(BOOL)badgeRespectsReduceMotion {
+    objc_setAssociatedObject(self, @selector(cyl_badgeRespectsReduceMotion), @(badgeRespectsReduceMotion), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 - (CGFloat)cyl_delayIfNeededForSeconds {
     NSNumber *delayIfNeededForSecondsObject = objc_getAssociatedObject(self, @selector(cyl_delayIfNeededForSeconds));
     if (!delayIfNeededForSecondsObject) {
@@ -904,7 +1090,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     //    return [CYLTabBarBadgeView class];
     Class badgeClass = nil;
     if (!CYL_IS_IOS_27) {
-        return [UILabel class];
+        return [CYLBadgeLabel class];
     }
     BOOL isCYLTabBarStyleTypeLiquidGlass = [self cyl_isCYLTabBarStyleTypeLiquidGlass];
     
@@ -914,7 +1100,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
         badgeClass = [CYLTabBarBadgeView class];
     } else {
 #if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
-        badgeClass = [UILabel class];
+        badgeClass = [CYLBadgeLabel class];
 #endif
     }
     return badgeClass;

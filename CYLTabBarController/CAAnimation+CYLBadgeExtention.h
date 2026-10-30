@@ -98,6 +98,24 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
  */
 + (CAKeyframeAnimation *)cyl_bounce_AnimationRepeatTimes:(float)repeatTimes durTimes:(float)time forObj:(id)obj;
 
+/*!
+ * [EN] Horizontal shake that moves the layer relative to where it is (`transform.translation.x`), so it keeps
+ *      working when the layer is repositioned while shaking (Auto Layout, rotation, iPhone Duo fold). Unlike
+ *      `+cyl_shake_AnimationRepeatTimes:durTimes:forObj:`, it does not capture the layer's position. Invalid inputs are
+ *      clamped: a non-finite or non-positive duration becomes 1 s (minimum 0.01 s), a NaN or negative repeat count 0,
+ *      a non-finite offset 0. `removedOnCompletion` is NO.
+ * [CN] 相对当前位置的水平抖动（`transform.translation.x`），抖动过程中 layer 被重新定位（自动布局、旋转、iPhone Duo 折叠）
+ *      时依然正确。与 `+cyl_shake_AnimationRepeatTimes:durTimes:forObj:` 不同，它不记录 layer 的位置。非法参数会被修正：
+ *      非有限或非正的时长取 1 秒（最小 0.01 秒），NaN 或负的重复次数取 0，非有限的偏移取 0。`removedOnCompletion` 为 NO。
+ */
++ (CAKeyframeAnimation *)cyl_shakeAnimationRepeatTimes:(float)repeatTimes duration:(CFTimeInterval)duration offset:(CGFloat)offset;
+
+/*!
+ * [EN] Vertical bounce, relative like `+cyl_shakeAnimationRepeatTimes:duration:offset:` (`transform.translation.y`).
+ * [CN] 上下弹跳，与 `+cyl_shakeAnimationRepeatTimes:duration:offset:` 一样相对当前位置（`transform.translation.y`）。
+ */
++ (CAKeyframeAnimation *)cyl_bounceAnimationRepeatTimes:(float)repeatTimes duration:(CFTimeInterval)duration offset:(CGFloat)offset;
+
 ///**
 // *  scale animation
 // *

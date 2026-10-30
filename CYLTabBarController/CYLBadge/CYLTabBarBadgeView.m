@@ -8,6 +8,11 @@
 
 #import "CYLTabBarBadgeView.h"
 
+/// Implemented in UIView+CYLBadgeExtention.m: tells the badge's host about a window or trait change.
+@interface UIView (CYLBadgeEnvironmentNotifying)
+- (void)cyl_notifyBadgeHostOfEnvironmentChange;
+@end
+
 @interface CYLTabBarBadgeView ()
 
 @property (nonatomic, strong) UILabel *badgeLabel;
@@ -61,25 +66,42 @@
 //    self.badgeLabel.center = self.center;
 
 }
+
+/*!
+ * [EN] The label is a subview, so it fills `bounds`. `frame` and `center` are in the superview's coordinates: copying
+ *      them to the label moved the text away from the badge until the next `-layoutSubviews`.
+ * [CN] Label 是子视图，应铺满 `bounds`。`frame` 和 `center` 是父视图坐标系中的值：直接赋给 Label 会让文字偏离角标，
+ *      直到下一次 `-layoutSubviews`。
+ */
 - (void)setFrame:(CGRect)frame {
     [super setFrame:frame];
-    if (CGRectEqualToRect(CGRectZero, frame)) {
+    if (CGRectIsEmpty(self.bounds)) {
         return;
     }
-    if (CGRectEqualToRect(CGRectZero, CGRectMake(0, 0, frame.size.width, frame.size.height))) {
-        return;
-    }
-    self.badgeLabel.frame = frame;
-
+    self.badgeLabel.frame = self.bounds;
 }
 
 -(void)setCenter:(CGPoint)center {
-        [super setCenter:center];
-    if (CGPointEqualToPoint(CGPointZero, center)) {
+    [super setCenter:center];
+    if (CGRectIsEmpty(self.bounds)) {
         return;
     }
-    self.badgeLabel.center = center;
+    self.badgeLabel.frame = self.bounds;
 }
+
+- (void)didMoveToWindow {
+    [super didMoveToWindow];
+    [self cyl_notifyBadgeHostOfEnvironmentChange];
+}
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    [self cyl_notifyBadgeHostOfEnvironmentChange];
+}
+#pragma clang diagnostic pop
 
 - (void)setTextAlignment:(NSTextAlignment)textAlignment {
     _textAlignment = textAlignment;
