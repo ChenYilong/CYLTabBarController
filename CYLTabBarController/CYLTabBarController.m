@@ -83,6 +83,19 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 
 #if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
 CGFloat const CYLFlatDesignUITabBarControllerHideShowBarDuration = 0.2;
+
+/*!
+ * FIX: issue #662
+ * [EN] Sets only the bottom of `viewController.additionalSafeAreaInsets`. The More navigation controller used to get a
+ *      copy of the selected child's whole insets, which overwrote its own top/left/right.
+ * [CN] 只修改 `additionalSafeAreaInsets.bottom`。以前把选中子控制器的整个 insets 拷给 More 导航控制器，覆盖了它自己的上/左/右。
+ */
+static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGFloat bottom) {
+    UIEdgeInsets insets = viewController.additionalSafeAreaInsets;
+    if (insets.bottom == bottom) { return; }
+    insets.bottom = bottom;
+    viewController.additionalSafeAreaInsets = insets;
+}
 #else
 #endif
 
@@ -101,6 +114,7 @@ CGFloat const CYLFlatDesignUITabBarControllerHideShowBarDuration = 0.2;
 #if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
 @property (nonatomic, strong) NSMutableArray<CYLFlatDesignTabBarItem *> *items;
 @property (nonatomic, assign) BOOL cyl_tabBarHidden;
+- (void)_cyl_refreshSystemTabBarVisibilityIfNeeded;
 //@property (nonatomic, assign) CYLTabBarStyleType tabBarStyleType;
 //@property (nonatomic, readwrite) CYLFlatDesignTabBar *cyl_tabBar;
 #else
@@ -119,7 +133,14 @@ CGFloat const CYLFlatDesignUITabBarControllerHideShowBarDuration = 0.2;
     BOOL _tabBarIsAnimating;
     // 用于记录快速设置tabBar显示和隐藏最后一次的状态
     BOOL _lastShowHideTabBar;
+    // `animated` of the request queued while `_tabBarIsAnimating`; replayed with its own value.
+    // 动画期间排队的那次请求自己的 animated 参数，动画结束后按它重放。
+    BOOL _lastShowHideTabBarAnimated;
     BOOL _needsReloadItems;
+    BOOL _cylDidRefreshSystemTabBarVisibility;
+    BOOL _cylRefreshingSystemTabBarVisibility;
+    BOOL _cylWaitingForVisibilityTransition;
+    __weak UIWindow *_cylRefreshedSystemTabBarWindow;
     
     _CYLFlatDesignTabBarParallaxOverlayView *_parallaxOverlayView;
 #else
@@ -143,6 +164,67 @@ CGFloat const CYLFlatDesignUITabBarControllerHideShowBarDuration = 0.2;
 
 #pragma mark -
 #pragma mark - Life Cycle
+
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+- (void)_cyl_refreshSystemTabBarVisibilityIfNeeded {
+    if (@available(iOS 27.1, *)) {
+        if (_cylRefreshingSystemTabBarVisibility || self.tabBarStyleType != CYLTabBarStyleTypeFlatDesign ||
+            ![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
+        UIView *container = self.viewIfLoaded;
+        UIViewController *selected = self.selectedViewController;
+        UIWindow *window = container.window;
+        if (!window || window.hidden || selected.viewIfLoaded.window != window) { return; }
+        if (_cylDidRefreshSystemTabBarVisibility && _cylRefreshedSystemTabBarWindow == window) { return; }
+        if (_tabBarIsAnimating || _parallaxOverlayView) { return; }
+
+        id<UIViewControllerTransitionCoordinator> coordinator = selected.transitionCoordinator ?: self.transitionCoordinator;
+        if (coordinator) {
+            if (!_cylWaitingForVisibilityTransition) {
+                _cylWaitingForVisibilityTransition = YES;
+                __weak __typeof(self) weakSelf = self;
+                BOOL registered = [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+                    __strong __typeof(weakSelf) strongSelf = weakSelf;
+                    if (!strongSelf) { return; }
+                    strongSelf->_cylWaitingForVisibilityTransition = NO;
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [strongSelf _cyl_refreshSystemTabBarVisibilityIfNeeded];
+                    });
+                }];
+                if (!registered) { _cylWaitingForVisibilityTransition = NO; }
+            }
+            return;
+        }
+
+        // FIX: issue #662 (iOS 27.1+)
+        // [EN] 1.99.65 hides the system bar view in `-initWithFrame:` (enough on iOS 27.0). From iOS 27.1, UIKit
+        //      still reserves the system bar's height in the children's safe area at first display (observed on the
+        //      iOS 27.1 / 27.2 simulators and an iPhone 13 on iOS 27.2): the
+        //      `-setTabBarHidden:YES` sent from `viewDidLoad` happens before the controller is in a window and is
+        //      not applied to UIKit's controller-level state. Result: 34 + 49 (system) + 49 (CYL) = 132 instead of 83.
+        //      Toggle UIKit's state once the selected child is in the window, without animating the system bar.
+        // [CN] 1.99.65 只在 `-initWithFrame:` 里隐藏了系统 TabBar 视图（iOS 27.0 够用）。iOS 27.1 起，首次显示时 UIKit
+        //      仍按控制器级状态为系统 TabBar 预留高度：`viewDidLoad` 里调用的 `-setTabBarHidden:YES` 发生在进入 window
+        //      之前，没有生效。结果 34 + 49（系统）+ 49（CYL）= 132，而不是 83。所以在选中的子控制器进入 window 后，
+        //      无动画地把 UIKit 的状态刷新一次。
+        _cylRefreshingSystemTabBarVisibility = YES;
+        _cylDidRefreshSystemTabBarVisibility = YES;
+        _cylRefreshedSystemTabBarWindow = window;
+        [UIView performWithoutAnimation:^{
+            [super setTabBarHidden:NO animated:NO];
+            // If KVC replacement failed, UIKit's original bar lacks the
+            // always-hidden setter of CYLFlatDesignTabBarHideTabBar.
+            if (!self.tabBar.hidden) { self.tabBar.hidden = YES; }
+            [super setTabBarHidden:YES animated:NO];
+            if (!self.tabBar.hidden) { self.tabBar.hidden = YES; }
+        }];
+        _cylRefreshingSystemTabBarVisibility = NO;
+    }
+}
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
+}
+#endif
 
 
 - (void)tabChangedToControl:(UIControl *)control {
@@ -385,6 +467,7 @@ if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
         //目的是动态更新tabbar高度 ， 测试方法为 修改 tabBarController.tabBarHeight ， 预期为实时跟新UI中的tabbar高度。// The goal is to dynamically update the tab bar height. The test method involves modifying `tabBarController.tabBarHeight`; the expected result is that the tab bar height in the UI updates in real time.
         self.cyl_tabBar.frame = self.tabBarFrame;
     }
+    [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
 
 #else
 #endif
@@ -498,28 +581,40 @@ if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
                 } else {
                     self.tabBar.hidden = YES;
                 }
+                // KVC may have left UIKit's original bar installed; the
+                // controller-level API does not always hide that view itself.
+                if (!self.tabBar.hidden) { self.tabBar.hidden = YES; }
                 
+                // FIX: issue #662
+                // [EN] Record the request before any early return, so `isTabBarHidden` always reports the newest
+                //      request: while the hide/show animation runs (replayed in its completion with the request's
+                //      own `animated`), and while a navigation transition holds the bar in its overlay (applied by
+                //      `_updateBottomBarShowHideIfNeeded` when the bar returns, e.g. on transition end or selection).
+                //      Previously both paths dropped the request, so the getter, the bar and the safe area disagreed.
+                // [CN] 在任何提前 return 之前先记录请求，`isTabBarHidden` 始终是最新请求：动画进行中（动画结束时按该请求
+                //      自己的 animated 重放）、转场把 TabBar 放在 overlay 中（TabBar 回来后由 `_updateBottomBarShowHideIfNeeded`
+                //      应用）。以前这两条路径都丢掉了请求，导致 getter、TabBar 与安全区三者不一致。
+                self.cyl_tabBarHidden = hidden;
+                _lastShowHideTabBar = hidden;
                 if (_tabBarIsAnimating) {
-                    _lastShowHideTabBar = hidden;
+                    _lastShowHideTabBarAnimated = animated;
                     return;
                 }
-
-            
                 if (self.cyl_tabBar.superview != self.view) { return; }
-      
-            
-                if (self.cyl_tabBarHidden != hidden) {
-                    
-                    self.cyl_tabBarHidden = hidden;
-                    _lastShowHideTabBar = hidden;
-                    
-                    if (self.cyl_tabBar.hidden == hidden) {
-                        return;
-                    }
+                // Compare with what is on screen, not with the recorded state: a request recorded above during an
+                // animation is replayed here and must still be applied.
+                // 与屏幕上的实际状态比较，而不是与记录值比较：动画期间记录的请求会在这里重放，仍需生效。
+                if (self.cyl_tabBar.hidden != hidden) {
                     BOOL canShowsBottomBar = [self _checkHidesBottomBarWhenPushed];
                     if (!canShowsBottomBar) {
                         // 让 hidesBottomBarWhenPushed 优先级更高
                         return;
+                    }
+                    // FIX: issue #662 — a bar hidden before the first layout can still have a stale (zero-height)
+                    // frame; nothing else lays it out again before it is shown (seen on iOS 27.0).
+                    // 首次布局前就隐藏的 TabBar 可能保留旧的（高度为 0 的）frame，显示前同步一次。
+                    if (!hidden && !CGRectEqualToRect(self.cyl_tabBar.frame, self.tabBarFrame)) {
+                        self.cyl_tabBar.frame = self.tabBarFrame;
                     }
                     
                     if (animated) {
@@ -538,6 +633,14 @@ if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
                             CYL_PERFORM_SELECTOR_2OBJECT(self.delegate, tabBarController:willShowTabBar:, self, self.cyl_tabBar);
                                                             }
 
+                        }
+                        // FIX: issue #662 — a will-hide/will-show delegate may re-enter with the opposite request. That
+                        // request was recorded (and queued, since `_tabBarIsAnimating` is already YES); it wins, so do
+                        // not run this one. 代理回调里可能反向重入，以重入的最新请求为准，不再执行本次。
+                        if (self.cyl_tabBarHidden != hidden) {
+                            _tabBarIsAnimating = NO;
+                            [self setTabBarHidden:_lastShowHideTabBar animated:_lastShowHideTabBarAnimated];
+                            return;
                         }
                         
                         CGAffineTransform startTransform = hidden? CGAffineTransformIdentity : CGAffineTransformMakeTranslation(0, self.cyl_tabBar.frame.size.height);
@@ -570,8 +673,10 @@ if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
                             
                             if (self->_lastShowHideTabBar != hidden) {
                                 // 动画结束，如果和最后一次设置显隐状态不一致，使其显示正确的状态，主要解决快速设置bug（两次设置时间间隔<0.2s）
-                                [self setTabBarHidden:self->_lastShowHideTabBar animated:animated];
+                                // Replay with the queued request's own `animated`. 按排队请求自己的 animated 重放。
+                                [self setTabBarHidden:self->_lastShowHideTabBar animated:self->_lastShowHideTabBarAnimated];
                             }
+                            [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
                         }];
                     } else {
                         
@@ -590,6 +695,9 @@ if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
                             }
 
                         }
+                        // FIX: issue #662 — a will-hide/will-show delegate re-entered with the opposite request and
+                        // already applied it; do not overwrite it. 代理回调已反向重入并生效，不要覆盖。
+                        if (self.cyl_tabBarHidden != hidden) { return; }
                         
                         self.cyl_tabBar.hidden = hidden;
                         [self _updateAdditionalSafeAreaInsetsWithAnimated:animated];
@@ -1621,6 +1729,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             CYLPlusButtonIndex = [[CYLExternPlusButton class] indexForTabbarItemsCount:CYLTabbarItemsCount];
         }
         [super setViewControllers:viewControllers];
+        if (@available(iOS 27.1, *)) {
+            _cylDidRefreshSystemTabBarVisibility = NO;
+            if (self.isViewLoaded) { [self.view setNeedsLayout]; }
+        }
         //    _viewControllers = viewControllers;
         [self alignTabControlIfNeededWithViewControllers:viewControllers];
         if (_needsReloadItems) {
@@ -2118,10 +2230,15 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
             // 通过KVC 换成 CYLFlatDesignTabBarHideTabBar 控制系统 UITabBar 永久隐藏
             CYLFlatDesignTabBarHideTabBar *tabBar = [[CYLFlatDesignTabBarHideTabBar alloc] init];
             [self cyl_setValue:tabBar forKey:@"tabBar"];
+            // KVC can fail silently. Hide the actual system bar, not just the
+            // replacement object that may not have been installed.
+            if (!self.tabBar.hidden) { self.tabBar.hidden = YES; }
             
             CYLFlatDesignTabBar *flatDesignTabBar = [[CYLFlatDesignTabBar alloc] initWithFrame:self.tabBarFrame];
             flatDesignTabBar.delegate = self;
             _cyl_tabBar = (UIView *)flatDesignTabBar;
+            _cylDidRefreshSystemTabBarVisibility = NO;
+            _cylRefreshedSystemTabBarWindow = nil;
             [self.view addSubview:_cyl_tabBar];
             [self addObserver:self forKeyPath:@"cyl_tabBar" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew context:nil];
             
@@ -2647,7 +2764,9 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
                 [self _updateAdditionalSafeAreaInsetsWithAnimated:NO];
                 [self.selectedViewController.view setNeedsLayout];
                 [self.selectedViewController.view layoutIfNeeded];
-            } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {}];
+            } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+                [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
+            }];
         }
 #else
 #endif
@@ -2735,7 +2854,11 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
 #pragma mark - UINavigationControllerExtensionDelegate
 - (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
               navigationBarDidChangeHeight:(CGFloat)height {
-    
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+    if (navigationController == self.selectedViewController) {
+        [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
+    }
+#endif
 }
 
 - (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
@@ -2754,7 +2877,7 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         [UIView performWithoutAnimation:^{
             self.selectedViewController.additionalSafeAreaInsets = additionalSafeAreaInsets;
             if ([self _showsMoreNavigationController] && self.moreNavigationController != self.selectedViewController) {
-                self.moreNavigationController.additionalSafeAreaInsets = additionalSafeAreaInsets;
+                CYLSetAdditionalSafeAreaBottom(self.moreNavigationController, additionalSafeAreaInsets.bottom);
             }
         }];
         
@@ -2804,7 +2927,7 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         [UIView performWithoutAnimation:^{
             self.selectedViewController.additionalSafeAreaInsets = additionalSafeAreaInsets;
             if ([self _showsMoreNavigationController] && self.moreNavigationController != self.selectedViewController) {
-                self.moreNavigationController.additionalSafeAreaInsets = additionalSafeAreaInsets;
+                CYLSetAdditionalSafeAreaBottom(self.moreNavigationController, additionalSafeAreaInsets.bottom);
             }
         }];
 #else
@@ -2833,6 +2956,15 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         }
         
         [self _updateBottomBarShowHideIfNeeded];
+        // A refresh deferred while the bar was in the transition overlay must
+        // be retried after the overlay has been removed (including cancellation).
+        [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
+        if (!_cylDidRefreshSystemTabBarVisibility) {
+            __weak __typeof(self) weakSelf = self;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf _cyl_refreshSystemTabBarVisibilityIfNeeded];
+            });
+        }
 #else
 #endif
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
@@ -2852,9 +2984,14 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
     BOOL _showsMoreNavigationController = NO;
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
 #if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
-        if ([_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {     return _showsMoreNavigationController; }
-        
-        _showsMoreNavigationController = (self.viewControllers.count > 5) || [self.tabBar.items containsObject:self.moreNavigationController.tabBarItem] ;
+        // FIX: issue #662 — the guard was inverted, so FlatDesign never detected UIKit's More item and
+        // `_checkHidesBottomBarWhenPushed` / the safe-area updates ignored `moreNavigationController`.
+        // 判断条件写反了：扁平模式下永远识别不到 UIKit 的 More 项。
+        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {     return _showsMoreNavigationController; }
+
+        // Ask UIKit instead of counting: iPad and regular width show more than five items without a More tab.
+        // 以 UIKit 实际是否生成 More 项为准：iPad / regular 宽度下超过 5 个也不会出现 More。
+        _showsMoreNavigationController = [self.tabBar.items containsObject:self.moreNavigationController.tabBarItem];
 #else
 #endif
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
@@ -3077,13 +3214,13 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
             [UIView animateWithDuration:0.2 animations:^{
                 selectedViewController.additionalSafeAreaInsets = additionalSafeAreaInsets;
                 if ([self _showsMoreNavigationController] && self.moreNavigationController != selectedViewController) {
-                    self.moreNavigationController.additionalSafeAreaInsets = additionalSafeAreaInsets;
+                    CYLSetAdditionalSafeAreaBottom(self.moreNavigationController, additionalSafeAreaInsets.bottom);
                 }
             }];
         } else {
             selectedViewController.additionalSafeAreaInsets = additionalSafeAreaInsets;
             if ([self _showsMoreNavigationController] && self.moreNavigationController != selectedViewController) {
-                self.moreNavigationController.additionalSafeAreaInsets = additionalSafeAreaInsets;
+                CYLSetAdditionalSafeAreaBottom(self.moreNavigationController, additionalSafeAreaInsets.bottom);
             }
         }
 #else
