@@ -83,6 +83,19 @@ static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageVie
 
 #if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
 CGFloat const CYLFlatDesignUITabBarControllerHideShowBarDuration = 0.2;
+
+/*!
+ * FIX: issue #662
+ * [EN] Sets only the bottom of `viewController.additionalSafeAreaInsets`. The More navigation controller used to get a
+ *      copy of the selected child's whole insets, which overwrote its own top/left/right.
+ * [CN] 只修改 `additionalSafeAreaInsets.bottom`。以前把选中子控制器的整个 insets 拷给 More 导航控制器，覆盖了它自己的上/左/右。
+ */
+static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGFloat bottom) {
+    UIEdgeInsets insets = viewController.additionalSafeAreaInsets;
+    if (insets.bottom == bottom) { return; }
+    insets.bottom = bottom;
+    viewController.additionalSafeAreaInsets = insets;
+}
 #else
 #endif
 
@@ -2864,7 +2877,7 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         [UIView performWithoutAnimation:^{
             self.selectedViewController.additionalSafeAreaInsets = additionalSafeAreaInsets;
             if ([self _showsMoreNavigationController] && self.moreNavigationController != self.selectedViewController) {
-                self.moreNavigationController.additionalSafeAreaInsets = additionalSafeAreaInsets;
+                CYLSetAdditionalSafeAreaBottom(self.moreNavigationController, additionalSafeAreaInsets.bottom);
             }
         }];
         
@@ -2914,7 +2927,7 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         [UIView performWithoutAnimation:^{
             self.selectedViewController.additionalSafeAreaInsets = additionalSafeAreaInsets;
             if ([self _showsMoreNavigationController] && self.moreNavigationController != self.selectedViewController) {
-                self.moreNavigationController.additionalSafeAreaInsets = additionalSafeAreaInsets;
+                CYLSetAdditionalSafeAreaBottom(self.moreNavigationController, additionalSafeAreaInsets.bottom);
             }
         }];
 #else
@@ -2971,9 +2984,14 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
     BOOL _showsMoreNavigationController = NO;
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
 #if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
-        if ([_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {     return _showsMoreNavigationController; }
+        // FIX: issue #662 — the guard was inverted, so FlatDesign never detected UIKit's More item and
+        // `_checkHidesBottomBarWhenPushed` / the safe-area updates ignored `moreNavigationController`.
+        // 判断条件写反了：扁平模式下永远识别不到 UIKit 的 More 项。
+        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {     return _showsMoreNavigationController; }
 
-        _showsMoreNavigationController = (self.viewControllers.count > 5) || [self.tabBar.items containsObject:self.moreNavigationController.tabBarItem] ;
+        // Ask UIKit instead of counting: iPad and regular width show more than five items without a More tab.
+        // 以 UIKit 实际是否生成 More 项为准：iPad / regular 宽度下超过 5 个也不会出现 More。
+        _showsMoreNavigationController = [self.tabBar.items containsObject:self.moreNavigationController.tabBarItem];
 #else
 #endif
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
@@ -3196,13 +3214,13 @@ if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
             [UIView animateWithDuration:0.2 animations:^{
                 selectedViewController.additionalSafeAreaInsets = additionalSafeAreaInsets;
                 if ([self _showsMoreNavigationController] && self.moreNavigationController != selectedViewController) {
-                    self.moreNavigationController.additionalSafeAreaInsets = additionalSafeAreaInsets;
+                    CYLSetAdditionalSafeAreaBottom(self.moreNavigationController, additionalSafeAreaInsets.bottom);
                 }
             }];
         } else {
             selectedViewController.additionalSafeAreaInsets = additionalSafeAreaInsets;
             if ([self _showsMoreNavigationController] && self.moreNavigationController != selectedViewController) {
-                self.moreNavigationController.additionalSafeAreaInsets = additionalSafeAreaInsets;
+                CYLSetAdditionalSafeAreaBottom(self.moreNavigationController, additionalSafeAreaInsets.bottom);
             }
         }
 #else
