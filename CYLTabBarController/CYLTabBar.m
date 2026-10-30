@@ -72,7 +72,42 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
                                                       object:nil
                                                        queue:[NSOperationQueue mainQueue]
                                                   usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
+    [self cyl_keepStackedItemLayoutOnHingedDevice];
     return self;
+}
+
+#pragma mark - Stacked item layout on hinged devices (iOS 27.1+, iPhone Duo)
+// MARK: Stacked item layout
+
+/*!
+ * FIX: issue #680
+ * [EN] Liquid Glass only. When the iPhone Duo is in landscape with a compact height (e.g. folded), UIKit switches the
+ *      tab items to the compact inline layout: icon on the left, title on the right, 36 pt high. CYLTabBarController
+ *      lays out Lottie icons, badges and the plus button for the stacked layout, so their centres no longer match.
+ *      On a device with a hinge, this keeps the tab bar's vertical size class regular, so the items stay stacked
+ *      (icon above title) as in portrait. The hinge is found with `UIHingeInteraction`, which only reports a hinge on
+ *      foldable devices; every other device and the FlatDesign style are unchanged.
+ * [CN] 仅液态玻璃样式。iPhone Duo 横屏且高度为 compact（如折叠时）时，UIKit 把 Tab 按钮切换为紧凑横排布局：
+ *      图标在左、标题在右，高 36pt。CYLTabBarController 的 Lottie 图标、角标、加号按钮都按上下布局计算，中心点因此错位。
+ *      在有铰链的设备上，把 TabBar 的垂直 size class 固定为 regular，按钮保持与竖屏一致的上下结构（图标在上、标题在下）。
+ *      通过 `UIHingeInteraction` 判断是否有铰链（只有可折叠设备才会返回铰链），其他设备和扁平样式不受影响。
+ */
+- (void)cyl_keepStackedItemLayoutOnHingedDevice {
+#if defined(__IPHONE_27_1) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_27_1
+    if (@available(iOS 27.1, *)) {
+        if (![CYLConstants isLiquidGlassActive]) { return; }
+        __weak __typeof(self) weakSelf = self;
+        UIHingeInteraction *hingeInteraction = [[UIHingeInteraction alloc] initWithUpdateHandler:^(UIHingeInteraction *interaction, UIHingeInteractionUpdate *update) {
+            __strong __typeof(weakSelf) self = weakSelf;
+            if (!self || !update.hinge) { return; }
+            // Reading an unset override throws, so check `containsTrait:` first. Hinge angle updates can be frequent.
+            if (![self.traitOverrides containsTrait:UITraitVerticalSizeClass.class]) {
+                self.traitOverrides.verticalSizeClass = UIUserInterfaceSizeClassRegular;
+            }
+        }];
+        [self addInteraction:hingeInteraction];
+    }
+#endif
 }
 
 - (CGSize)sizeThatFits:(CGSize)size {
