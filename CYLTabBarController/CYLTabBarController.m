@@ -403,14 +403,19 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
         //      misplaced next to the plus button) needed the tab bar laid out again after this controller. It later ran on
         //      every layout pass on every system. On iOS 11+ notched iPhones that re-laid the tab bar out synchronously in
         //      the middle of push/pop (#585: tab images flicker after `cyl_replaceTabImageView`) and rotation (#543: the tab
-        //      bar flickers when turning from landscape to portrait). From iOS 11 UIKit lays the tab bar out itself, so keep
-        //      the workaround to the systems it was written for.
+        //      bar flickers when turning from landscape to portrait). From iOS 11 UIKit lays the tab bar out itself, so skip
+        //      it on iOS 11-25 with the classic tab bar.
+        //      Scope: iOS 26 and later (Liquid Glass, the iPhone Duo, and the classic tab bar in compatibility mode) is out of
+        //      scope for these reports and keeps the previous behavior; FlatDesign never reaches this code.
         // [CN] 下面强制调用 `-layoutSubviews` 是针对 iOS 10 的处理：#93（iOS 10.0–10.2）与 #392（iOS 10.3.x，PlusButton 旁的 item
         //      位置错误）需要在本控制器布局后再布局一次 TabBar。之后它在所有系统的每次布局中都会执行，iOS 11+ 刘海屏上会在
         //      push/pop（#585：调用 `cyl_replaceTabImageView` 后 Tab 图片闪动）和旋转（#543：横屏转竖屏时 TabBar 闪动）过程中
-        //      同步地重新布局 TabBar。iOS 11 起 UIKit 会自行布局 TabBar，因此只在当初需要的系统上执行。
-        if (@available(iOS 11.0, *)) {
-        } else {
+        //      同步地重新布局 TabBar。iOS 11 起 UIKit 会自行布局 TabBar，因此在 iOS 11–25 的经典 TabBar 上不再执行。
+        //      范围：iOS 26 及以上（液态玻璃、iPhone Duo，以及兼容模式下的经典 TabBar）不在这些问题范围内，保持原有行为；
+        //      扁平样式不会执行到这里。
+        BOOL isOutOfScopeForIssue585 = [CYLConstants isLiquidGlassActive] || CYL_IS_IOS_26;
+        BOOL needsIOS10Workaround = !CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0");
+        if (isOutOfScopeForIssue585 || needsIOS10Workaround) {
             [self.cyl_tabBar layoutSubviews];//Fix issue #93 #392
         }
         if ([self.cyl_tabBar isKindOfClass:[CYLTabBar class]] ) {
@@ -544,10 +549,13 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
         //      (`fromView.transform = CGAffineTransformMakeScale(...)`) shrinks `frame.size.height`, which moved the tab bar
         //      up. Newer systems relaid the tab bar afterwards and hid the error; iOS 12 did not. `bounds` also matches
         //      `-tabBarFrame`, and unlike the screen height it is right in Split View / Stage Manager.
+        //      Scope: Liquid Glass returns above and FlatDesign never reaches here; elsewhere `bounds` equals the old value
+        //      unless the view has a transform, so no version guard is needed.
         // [CN] 使用 `bounds` 而不是 `frame`：TabBar 布局在本视图自身的坐标系中，`frame` 则在父视图坐标系中，并且包含视图的 transform。
         //      自定义转场缩放 from 页面（`fromView.transform = CGAffineTransformMakeScale(...)`）时 `frame.size.height` 变小，
         //      TabBar 因此被上移。高版本系统随后会重新布局 TabBar，掩盖了该问题，iOS 12 不会。`bounds` 也与 `-tabBarFrame` 一致，
         //      且与屏幕高度不同，在分屏 / 台前调度下同样正确。
+        //      范围：液态玻璃已在上方返回，扁平样式不会执行到这里；其他情况下除非视图有 transform，`bounds` 与原值相同，无需版本判断。
         frame.origin.y = CGRectGetHeight(self.view.bounds) - tabBarHeight;
         frame;
     });
