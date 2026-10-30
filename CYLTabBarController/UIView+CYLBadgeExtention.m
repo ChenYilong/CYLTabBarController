@@ -298,7 +298,7 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
     }
 }
 
-- (void)cyl_bringBadgeToFront:(CYLTabBarBadgeView *)view {
+- (void)cyl_bringBadgeToFront:(UIView *)view {
     if (![self cyl_isReady]) {
         return;
     }
@@ -348,24 +348,17 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
 }
 
 #pragma mark --  other private methods
-- (void)cyl_adjustLabelWidth:(CYLTabBarBadgeView *)badgeSuperView {
+- (void)cyl_adjustLabelWidth:(UIView<CYLBadgeTextDisplaying> *)badgeSuperView {
     if (!badgeSuperView) {
         return;
     }
     //获得子视图的Label以获得字符长度。用以拉伸父视图
-    UILabel *label;
-    if ([badgeSuperView isKindOfClass:[UILabel class] ]) {
+    //UILabel 与 CYLTabBarBadgeView 没有继承关系，各自检查类型后再向下转换（两者都是 UIView 的子类）。
+    UILabel *label = nil;
+    if ([badgeSuperView isKindOfClass:[UILabel class]]) {
         label = (UILabel *)badgeSuperView;
-    } else {
-        
-        SEL actoin = NSSelectorFromString(@"badgeLabel");
-        if ([badgeSuperView respondsToSelector:actoin]) {
-            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-            (
-             label = [badgeSuperView performSelector:actoin];
-
-                                                    )
-        }
+    } else if ([badgeSuperView isKindOfClass:[CYLTabBarBadgeView class]]) {
+        label = ((CYLTabBarBadgeView *)badgeSuperView).badgeLabel;
     }
     if (!label.text || 0 == label.text.length) {
         return;
@@ -516,11 +509,11 @@ static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
 
 #pragma mark -- setter/getter
 
-- (UIView *)cyl_badge {
+- (UIView<CYLBadgeTextDisplaying> *)cyl_badge {
     return objc_getAssociatedObject(self, @selector(cyl_badge));
 }
 
-- (void)cyl_setBadge:(UIView *)label {
+- (void)cyl_setBadge:(UIView<CYLBadgeTextDisplaying> *)label {
     objc_setAssociatedObject(self, @selector(cyl_badge), label, OBJC_ASSOCIATION_RETAIN);
 }
 
