@@ -383,11 +383,16 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
     //      `-cyl_isSelected`) was wrong after the switch. Count only system tab buttons to get each button's tab index (the
     //      tab of a plus child view controller is the system button under the plus button, so it is counted), and set
     //      `selected` from it.
+    //      Scope: the classic (pre-Liquid Glass) system tab bar, i.e. iOS 25 and earlier plus iOS 26 in UI compatibility
+    //      mode. The guard at the top of this method already returns for FlatDesign (`cyl_tabBar` is not a `CYLTabBar`) and
+    //      for Liquid Glass (iOS 26 without compatibility mode, every iOS 27+ system, the iPhone Duo).
     // [CN] `cyl_visibleControls` 包含按 x 排序的 Tab 按钮和 PlusButton。没有子控制器的 PlusButton 占一个位置，却没有对应的控制器下标，
     //      因此位于它之后的 Tab，在该数组中的位置比其在 `viewControllers` 中的下标大 1。用这个位置与 `selectedIndex` 比较会把错误的
     //      Tab 按钮设为选中（如 [t0, t1, PLUS, t2, t3] 中选中 t3 时设置了 `t2.selected = YES`），且不会清除。TabBar 每次布局都会执行
     //      这里，切换暗黑模式会触发布局，于是切换后 `selected`（以及 `-cyl_isSelected`）出错。这里只对系统 Tab 按钮计数得到每个按钮的
     //      Tab 下标（PlusButton 子控制器对应的 Tab 是 PlusButton 下方的系统按钮，会被计入），并据此设置 `selected`。
+    //      范围：经典（液态玻璃之前的）系统 TabBar，即 iOS 25 及以前，以及 iOS 26 的 UI 兼容模式。本方法开头的判断已排除扁平样式
+    //      （`cyl_tabBar` 不是 `CYLTabBar`）和液态玻璃（未开启兼容模式的 iOS 26、所有 iOS 27+、iPhone Duo）。
     __block NSUInteger tabIndex = 0;
     [tabBar.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
         BOOL isTabButton = [control cyl_isTabButton];
