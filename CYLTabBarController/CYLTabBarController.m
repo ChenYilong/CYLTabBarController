@@ -1485,7 +1485,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     [_lottieURLs removeAllObjects];
     [_lottieSizes removeAllObjects];
     NSInteger index = [self selectedIndex];
-    UIViewController *selected = _viewControllers[index];
+    // FIX: issue #618 — `selectedIndex` is not always a valid index into `_viewControllers` (e.g. NSNotFound, or an
+    // extra tab UIKit created for a child that is not in `viewControllers`). Do not index out of range.
+    UIViewController *selected = (index >= 0 && index < (NSInteger)_viewControllers.count) ? _viewControllers[index] : nil;
     UIView *superView = selected.view.superview;
     NSMutableArray<UIViewController *> *viewControllers = [_viewControllers mutableCopy];
     if ([self hasPlusChildViewController]) {
@@ -1584,6 +1586,68 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return isAdded;
 }
 
+/*!
+ * FIX: issue #618 — diagnostics only (DEBUG / BETA builds); release behavior is unchanged.
+ * [EN] In the classic style, `viewControllers` is CYL's own list (`@synthesize viewControllers = _viewControllers`) and
+ *      each tab is installed with `-addChildViewController:`. Any other child added to the tab bar controller (by app
+ *      code, or by a library such as ZFPlayer during rotation) can become an extra, untitled tab when UIKit rebuilds the
+ *      tab bar, e.g. after a rotation on iOS 18. That tab has no entry in `viewControllers`, and tapping it crashes inside
+ *      UIKit, where no breakpoint stops. CYL cannot refuse the child (players rely on it), so it reports it here.
+ *      A `tabBarItemsAttributes` array whose count differs from the tabs is reported too: the extra entries draw tab
+ *      content (title, image) for tabs that have no view controller.
+ * [CN] 经典样式下，`viewControllers` 是 CYL 自己维护的数组（`@synthesize viewControllers = _viewControllers`），每个 Tab
+ *      通过 `-addChildViewController:` 添加。若有其他子控制器被直接添加到 TabBarController（App 代码，或横屏切换时的
+ *      ZFPlayer 等第三方库），UIKit 重建 TabBar 时（如 iOS 18 旋转后）可能多出一个无标题的 Tab。该 Tab 在
+ *      `viewControllers` 中没有对应项，点击后在 UIKit 内部崩溃，无法断点。CYL 不能拒绝该子控制器（播放器依赖它），因此在此提示。
+ *      `tabBarItemsAttributes` 数量与 Tab 数量不一致时同样提示：多出的配置会为不存在控制器的 Tab 显示标题和图标。
+ */
+- (void)addChildViewController:(UIViewController *)childController {
+    [super addChildViewController:childController];
+#if defined(DEBUG) || defined(BETA)
+    [self cyl_logChildViewControllerThatIsNotATabIfNeeded:childController];
+#endif
+}
+
+#if defined(DEBUG) || defined(BETA)
+- (void)cyl_logChildViewControllerThatIsNotATabIfNeeded:(UIViewController *)childController {
+    if (!childController || CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+        return;
+    }
+    if ([_viewControllers containsObject:childController] ||
+        childController == CYLPlusChildViewController ||
+        childController.cyl_isPlaceholder) {
+        return;
+    }
+    // UIKit adds controllers of its own (the "More" navigation controller, the iPad sidebar on iOS 18); those are not
+    // app tabs. Matched by class name so that the lazy `moreNavigationController` getter is never triggered from here.
+    NSString *className = NSStringFromClass([childController class]);
+    if ([className hasPrefix:@"_"] || [className hasPrefix:@"UI"]) {
+        return;
+    }
+    NSLog(@"🔴[CYL #618] %@ was added to %@ with -addChildViewController:, not through `viewControllers`. UIKit can turn it into an extra, untitled tab (e.g. after a rotation), and tapping that tab crashes. Present it, or push it from a tab's navigation controller, instead. See https://github.com/ChenYilong/CYLTabBarController/issues/618",
+          className, NSStringFromClass([self class]));
+}
+
+- (void)cyl_logTabBarItemsAttributesMismatchIfNeeded {
+    NSUInteger attributesCount = _tabBarItemsAttributes.count;
+    if (attributesCount == 0) {
+        return;
+    }
+    NSUInteger tabCount = 0;
+    for (UIViewController *viewController in _viewControllers) {
+        if (viewController == CYLPlusChildViewController || viewController.cyl_isPlaceholder) {
+            continue;
+        }
+        tabCount++;
+    }
+    if (attributesCount == tabCount) {
+        return;
+    }
+    NSLog(@"🔴[CYL #618] tabBarItemsAttributes has %lu entries for %lu tab view controllers (the plus button's view controller not counted). Each tab needs exactly one entry; a mismatch shows tabs without a view controller, and tapping one can crash. See https://github.com/ChenYilong/CYLTabBarController/issues/618",
+          (unsigned long)attributesCount, (unsigned long)tabCount);
+}
+#endif
+
 - (void)setViewControllers:(NSArray<__kindof UIViewController *> *)viewControllers {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     
@@ -1608,6 +1672,20 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                 [CYLPlusChildViewController.view removeFromSuperview];
                 [CYLPlusChildViewController removeFromParentViewController];
             }
+            // FIX: issue #608
+            // [EN] Re-assigning `viewControllers` (e.g. a new set of tabs after login) crashed on the next tap on iOS 16 with
+            //      "Inconsistency in UITabBar items and view controllers detected. No view controller matches the
+            //      UITabBarItem". The classic style installs tabs with -addChildViewController: and never calls super's
+            //      -setViewControllers:, so removing the old children above does not tell UIKit those tabs are gone: the tab
+            //      bar kept the old items while `viewControllers` (CYL's own list) held only the new controllers, and
+            //      UIKit's tap handling found no controller for the tapped item. Clear UIKit's tab list too, so the new
+            //      tabs are installed exactly as on the first assignment.
+            // [CN] 重新给 `viewControllers` 赋值（如登录后换成另一组 Tab）后，iOS 16 上再点击会崩溃：
+            //      "Inconsistency in UITabBar items and view controllers detected. No view controller matches the UITabBarItem"。
+            //      经典样式用 -addChildViewController: 添加 Tab，从不调用父类的 -setViewControllers:，上面移除旧子控制器并不会
+            //      让 UIKit 知道旧 Tab 已不存在：TabBar 仍保留旧的 item，而 `viewControllers`（CYL 自己的数组）只有新控制器，
+            //      UIKit 处理点击时找不到对应的控制器。这里同时清空 UIKit 的 Tab 列表，让新 Tab 与首次赋值时一样安装。
+            [super setViewControllers:nil animated:NO];
         }
     
         if (!viewControllers || viewControllers.count == 0 || ![viewControllers isKindOfClass:[NSArray class]]) {
@@ -1621,6 +1699,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         }
     
         [self alignTabControlIfNeededWithViewControllers:viewControllers];
+#if defined(DEBUG) || defined(BETA)
+        [self cyl_logTabBarItemsAttributesMismatchIfNeeded];
+#endif
     
         CYLTabbarItemsCount = [viewControllers count];
         if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
@@ -1974,10 +2055,21 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         
         if (fromView && toView && fromView != toView) {
             // 自定义过渡效果，用于“隐藏” tabbar 切换时产生的 VC 闪烁
-            [UIView transitionFromView:fromView
-                                toView:toView
+            // FIX: issue #618
+            // [EN] This runs before the selection is decided: a subclass calls super first and may still return NO
+            //      (e.g. a tab that needs login). `+transitionFromView:toView:` removed `fromView` and inserted `toView`
+            //      right away, so a refused selection left the selected tab's view out of the hierarchy, and the next
+            //      tab switch could crash inside UIKit. Cross-dissolve the container instead: it animates whatever UIKit
+            //      changes in this run loop, and does nothing when the selection is refused.
+            // [CN] 这里在是否切换确定之前执行：子类会先调用 super，之后仍可能返回 NO（如需要登录的 Tab）。
+            //      `+transitionFromView:toView:` 会立即移除 `fromView` 并插入 `toView`，切换被拒绝时当前 Tab 的视图已不在
+            //      视图层级中，下一次切换 Tab 可能在 UIKit 内部崩溃。改为对容器做交叉溶解：只为本次 runloop 中 UIKit 的
+            //      视图变化做动画，切换被拒绝时不产生任何变化。
+            UIView *containerView = fromView.superview ?: self.view;
+            [UIView transitionWithView:containerView
                               duration:0.01   // 几乎立即
                                options:UIViewAnimationOptionTransitionCrossDissolve
+                            animations:nil
                             completion:nil];
         }
     }
@@ -2120,6 +2212,11 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             return;
         }
         if (control.cyl_isPlusButton) {
+            return;
+        }
+        // FIX: issue #618 — a tab button without a matching Lottie entry (more tab buttons than
+        // `tabBarItemsAttributes`) used to raise NSRangeException here.
+        if (index >= self.lottieURLs.count || index >= self.lottieSizes.count) {
             return;
         }
         NSURL *lottieURL = self.lottieURLs[index];
@@ -2840,7 +2937,11 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
         CYLFlatDesignTabBar *cyl_tabBar = (CYLFlatDesignTabBar *)self.cyl_tabBar;
         
         NSInteger index = [cyl_tabBar.items indexOfObject:tabBarItem];
-        
+        // FIX: issue #618 — an item that has no view controller (NSNotFound, or more items than view controllers)
+        // used to raise NSRangeException here.
+        if (index == NSNotFound || index >= (NSInteger)self.viewControllers.count) {
+            return;
+        }
         UIViewController *didSelectViewController = self.viewControllers[index];
         if (didSelectViewController.cyl_isPlaceholder) {
             return;
@@ -2857,7 +2958,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
             
         }
         if ([self.delegate respondsToSelector:@selector(tabBarController:shouldSelectViewController:)]) {
-            BOOL sholudSelect = [self.delegate tabBarController:self shouldSelectViewController:self.viewControllers[index]];
+            BOOL sholudSelect = [self.delegate tabBarController:self shouldSelectViewController:didSelectViewController];
             if (!sholudSelect) {
                 return;
             }
