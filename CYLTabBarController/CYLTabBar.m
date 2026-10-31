@@ -58,12 +58,12 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 
 - (void)setContext:(NSString *)context {
     self.cyl_context = context;
-    [self setPlusButton:CYLExternPlusButton];
+    [self setPlusButton:[CYLPlusButton plusButtonForOwner:self]];
 }
 
 - (instancetype)sharedInit {
     // KVO注册监听
-    _tabBarItemWidth = CYLTabBarItemWidth;
+    _tabBarItemWidth = self.cyl_tabBarItemWidth;
     [self addObserver:self forKeyPath:@"tabBarItemWidth" options:NSKeyValueObservingOptionNew context:CYLTabBarContext];
     __weak __typeof(self) weakSelf = self;
     void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
@@ -142,22 +142,31 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 }
 
 - (NSString *)matchedTabBarContext {
-    NSString *matchedTabBarContext = [[CYLExternPlusButton class] matchedTabBarContext];
+    // The context of the plus button registered for THIS tab bar's context (nil if there is none).
+    NSString *matchedTabBarContext = [[[CYLPlusButton plusButtonForOwner:self] class] matchedTabBarContext];
     return matchedTabBarContext;
 }
 
+/*!
+ * [EN] The plus button and its child view controller are bound to the CYLTabBarController (by its `context`), not to
+ *      this tab bar. The tab bar finds them through the controller that owns it (`+[CYLPlusButton plusButtonForOwner:]`
+ *      asks the tab bar's `delegate`), so it always agrees with `-[CYLTabBarController hasPlusButton]`, also when
+ *      several plus buttons are registered (#414). Before the controller is set, its own `context` is used, which the
+ *      controller copies to it.
+ * [CN] PlusButton 及其子控制器绑定的是 CYLTabBarController（通过它的 `context`），而不是这个 TabBar。TabBar 通过拥有它的控制器
+ *      找到它们（`+[CYLPlusButton plusButtonForOwner:]` 会询问 TabBar 的 `delegate`），因此始终与 `-[CYLTabBarController hasPlusButton]`
+ *      一致，注册了多个时也是如此（#414）。控制器还没设置时，使用 TabBar 自己的 `context`，它是控制器复制过来的。
+ */
 - (BOOL)hasPlusButton {
-    BOOL isSameContext = [[CYLExternPlusButton class] hasPlusButtonForTabBarContext:self.context];//|| (!tabBarContext  && !self.context);
-    return isSameContext;
+    return [CYLPlusButton plusButtonForOwner:self] != nil;
 }
 
 - (BOOL)hasPlusChildViewController {
-    BOOL hasPlusChildViewController = [[CYLExternPlusButton class] hasPlusChildViewControllerForTabBarContext:self.context];//|| (!tabBarContext  && !self.context);;//&& !isAdded;
-    return hasPlusChildViewController;
+    return [CYLPlusButton plusChildViewControllerForOwner:self] != nil;
 }
 
 - (CYLPlusButton<CYLPlusButtonSubclassing> *)plusButton {
-    if (!CYLExternPlusButton || !_plusButton) {
+    if (![CYLPlusButton plusButtonForOwner:self] || !_plusButton) {
         return nil;
     }
 
@@ -289,13 +298,13 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
     
     BOOL addedToTabBar = [_plusButton.superview isEqual:self];
     if (!addedToTabBar && self.hasPlusButton) {
-        CYLTabBarItemWidth = (tabBarWidth) / CYLTabbarItemsCount;
+        [self cyl_setTabBarItemWidth:(tabBarWidth) / self.cyl_tabbarItemsCount];
         [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIControl * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
             //仅修改childView的x和宽度,yh值不变
-            CGFloat childViewX = buttonIndex * CYLTabBarItemWidth;
+            CGFloat childViewX = buttonIndex * self.cyl_tabBarItemWidth;
             [self changeXForChildView:childView
                            childViewX:childViewX
-                      tabBarItemWidth:CYLTabBarItemWidth
+                      tabBarItemWidth:self.cyl_tabBarItemWidth
                                 index:buttonIndex
             ];
         }];
@@ -304,30 +313,30 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
         }
         return;
     }
-    CYLTabBarItemWidth = (tabBarWidth - CYLPlusButtonWidth) / CYLTabbarItemsCount;
+    [self cyl_setTabBarItemWidth:(tabBarWidth - self.cyl_plusButtonWidth) / self.cyl_tabbarItemsCount];
    //plusButtonIndex内部调整 PlusButton 的中心坐标，不能直接修改 center，否则会造成点击动画时的闪动bug，需要借助坐标系转换。
     NSUInteger plusButtonIndex = [self plusButtonIndex];
     [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIControl * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
         //调整UITabBarItem的位置
         CGFloat childViewX;
         CGFloat visiableTabIndex = buttonIndex;
-        CGFloat tabBarItemWidth = CYLTabBarItemWidth;
+        CGFloat tabBarItemWidth = self.cyl_tabBarItemWidth;
         
         if ([self cyl_hasPlusChildViewController]) {
             if (buttonIndex <= plusButtonIndex) {
-                childViewX = buttonIndex * CYLTabBarItemWidth;
+                childViewX = buttonIndex * self.cyl_tabBarItemWidth;
             } else {
-                childViewX = (buttonIndex - 1) * CYLTabBarItemWidth + CYLPlusButtonWidth;
+                childViewX = (buttonIndex - 1) * self.cyl_tabBarItemWidth + self.cyl_plusButtonWidth;
             }
             if (buttonIndex == plusButtonIndex) {
-                tabBarItemWidth = CYLPlusButtonWidth;
+                tabBarItemWidth = self.cyl_plusButtonWidth;
             }
         } else {
             if (buttonIndex >= plusButtonIndex) {
-                childViewX = buttonIndex * CYLTabBarItemWidth + CYLPlusButtonWidth;
+                childViewX = buttonIndex * self.cyl_tabBarItemWidth + self.cyl_plusButtonWidth;
                 visiableTabIndex = buttonIndex  + 1;
             } else {
-                childViewX = buttonIndex * CYLTabBarItemWidth;
+                childViewX = buttonIndex * self.cyl_tabBarItemWidth;
             }
         }
         
@@ -377,15 +386,17 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 #pragma mark - plusFrame and tabBarItemFrameWithIndex
 
 - (CGFloat)tabItemWidth {
-    return CYLTabBarItemWidth;
+    return self.cyl_tabBarItemWidth;
 }
 
 - (CGFloat)plusWidth {
-    return CYLPlusButtonWidth;
+    return self.cyl_plusButtonWidth;
 }
 
 - (CGRect)plusFrame {
-    return CGRectMake(CYLHalfOfDiff(CYLScreenWidth(), [self plusWidth]), 0, [self plusWidth], CYLTabBarHeight);
+    CYLTabBarController *tabBarController = [self tabBarController];
+    CGFloat tabBarHeight = tabBarController ? tabBarController.tabBarHeight : CYLTabBarHeight;
+    return CGRectMake(CYLHalfOfDiff(CYLScreenWidth(), [self plusWidth]), 0, [self plusWidth], tabBarHeight);
 }
 
 //- (CGRect)tabBarItemFrameWithIndex:(NSInteger)index {
@@ -486,7 +497,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 
 - (CGFloat)multiplierOfTabBarHeight {
     
-    return [CYLExternPlusButton multiplierOfTabBarHeight:self.cyl_boundsSize.height];
+    return [[CYLPlusButton plusButtonForOwner:self] multiplierOfTabBarHeight:self.cyl_boundsSize.height];
 }
 
 //- (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
@@ -541,7 +552,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 //            plusButtonIndex = CYLTabbarItemsCount * 0.5;
 //        }
 //    }
-    plusButtonIndex = [[self.plusButton class] indexForTabbarItemsCount:CYLTabbarItemsCount];
+    plusButtonIndex = [[self.plusButton class] indexForTabbarItemsCount:self.cyl_tabbarItemsCount];
     CGFloat tabBarWidth = self.cyl_boundsSize.width;
     CGFloat tabBarHeight = self.cyl_boundsSize.height;
     
@@ -550,7 +561,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         CGFloat constantOfPlusButtonCenterYOffset = [self constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
         _plusButton.center = CGPointMake(tabBarWidth * 0.5, tabBarHeight * multiplierOfTabBarHeight + constantOfPlusButtonCenterYOffset);
         
-        CGFloat childViewX = plusButtonIndex * CYLTabBarItemWidth;
+        CGFloat childViewX = plusButtonIndex * self.cyl_tabBarItemWidth;
         CGFloat tabBarItemWidth = CGRectGetWidth(self.plusButton.frame);
         [self changeXForChildView:self.plusButton
                        childViewX:childViewX
@@ -582,7 +593,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
                     [weakSelf setNeedsLayout];
                 });
             }
-            [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
+            [[CYLPlusButton plusButtonForOwner:self] cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
             return plusButtonIndex;
         }
         
@@ -625,7 +636,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         
         [CATransaction commit];
     }
-    [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
+    [[CYLPlusButton plusButtonForOwner:self] cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
 
     return plusButtonIndex;
 }
@@ -930,7 +941,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
  *      加号按钮的点击事件（如 Demo 中的 `-clickPublish`）不会执行，这里补发。同一次触摸可能有多个手势询问，同一 run loop 内只发送一次。
  */
 - (void)cyl_sendPlusButtonActionsIfUnreachableForGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
-    CYLPlusButton *plusButton = CYLExternPlusButton;
+    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
     UIWindow *window = self.window;
     if (!plusButton || !window || !plusButton.enabled || !plusButton.userInteractionEnabled || plusButton.hidden) {
         return;
@@ -975,11 +986,11 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     }
     SEL actin = @selector(tabChangedToControl:);
     CYLTabBarController *tabBarController = [self tabBarController];
-    if ([self cyl_shouldUpdateHiddenStatueForPlusButtonLabel] && [hitView isKindOfClass:[CYLPlusButton class]] && [tabBarController.selectedViewController isEqual:CYLPlusChildViewController]) {
+    if ([self cyl_shouldUpdateHiddenStatueForPlusButtonLabel] && [hitView isKindOfClass:[CYLPlusButton class]] && [tabBarController.selectedViewController isEqual:[CYLPlusButton plusChildViewControllerForOwner:self]]) {
         //如果在选中CYLPlusChildViewController的状态下，  重复点击，或者滑动手势，又选中CYLPlusChildViewController。 相当于重复点击CYLPlusChildViewController， 则不显示未选中状态的Label， 仅仅在切换到其他tab的情况下， 显示未选中状态的Label。 否则会出现Label重叠的情况。
         //TODO:   选中center按钮 长按玻璃遮罩 向左或者向右 稍微移动一点距离 回到原位center 按钮标题 会变模糊. 由于无法解决， 故暂时禁止在选中PlusVC时的 用户滑动手势。等未来找到合适方案再处理.
-//        [CYLExternPlusButton setTabLabelHidden:NO];
-        if (!CYLExternPlusButton.cyl_keepShowingPlusButtonLabel) {
+//        [[CYLPlusButton plusButtonForOwner:self] setTabLabelHidden:NO];
+        if (![CYLPlusButton plusButtonForOwner:self].cyl_keepShowingPlusButtonLabel) {
             return NO;
         }
     }
@@ -994,14 +1005,14 @@ UISearchTab 会从 TabBar 分离出来单独显示。
          )
     }
     
-    if ([hitView isKindOfClass:[CYLPlusButton class]] && !CYLPlusChildViewController) {
+    if ([hitView isKindOfClass:[CYLPlusButton class]] && ![CYLPlusButton plusChildViewControllerForOwner:self]) {
         // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
         // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
-        if (!CYLExternPlusButton.cyl_userInteractionDisabled) {
+        if (![CYLPlusButton plusButtonForOwner:self].cyl_userInteractionDisabled) {
             if ([tabBarController respondsToSelector:actin]) {
                 CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
                 (
-                 [tabBarController performSelector:actin withObject:CYLExternPlusButton];
+                 [tabBarController performSelector:actin withObject:[CYLPlusButton plusButtonForOwner:self]];
                  
                  )
             }

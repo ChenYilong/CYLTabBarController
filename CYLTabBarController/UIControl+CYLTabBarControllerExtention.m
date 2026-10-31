@@ -139,15 +139,15 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
 @implementation UIControl (CYLTabBarControllerExtention)
 
 - (BOOL)cyl_isChildViewControllerPlusButton {
-    if (!CYLPlusChildViewController.cyl_plusViewControllerEverAdded) {
+    if (![CYLPlusButton plusChildViewControllerForOwner:self].cyl_plusViewControllerEverAdded) {
         return NO;
     }
-    BOOL isChildViewControllerPlusButton = ([self cyl_isPlusButton] && CYLPlusChildViewController.cyl_plusViewControllerEverAdded);
+    BOOL isChildViewControllerPlusButton = ([self cyl_isPlusButton] && [CYLPlusButton plusChildViewControllerForOwner:self].cyl_plusViewControllerEverAdded);
     if (isChildViewControllerPlusButton) {
         return YES;
     }
     
-    if (CYLExternPlusButton.cyl_tabBarItemVisibleIndex == self.cyl_tabBarItemVisibleIndex) {
+    if ([CYLPlusButton plusButtonForOwner:self].cyl_tabBarItemVisibleIndex == self.cyl_tabBarItemVisibleIndex) {
         return YES;
     }
     return isChildViewControllerPlusButton;
@@ -216,13 +216,13 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     BOOL isSelected = (tabBarSelectedIndex == tabBarChildViewControllerIndex) && self.selected;
     
     if (self.cyl_tabBarController.tabBar.cyl_hasPlusChildViewController) {
-        isSelected = isSelected && CYLPlusChildViewController.cyl_plusViewControllerEverAdded;
+        isSelected = isSelected && [CYLPlusButton plusChildViewControllerForOwner:self].cyl_plusViewControllerEverAdded;
     }
     return isSelected;
 }
 
 - (BOOL)cyl_isPlusControl {
-    return [self isKindOfClass:[CYLExternPlusButton class]] || [self cyl_isChildViewControllerPlusButton];
+    return [CYLPlusButton isPlusButtonView:self] || [self cyl_isChildViewControllerPlusButton];
 }
 
 - (UIView *)cyl_lottieAnimationView {
@@ -568,7 +568,7 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
             [lottieView stop];
         }
     }
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         
     else if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
@@ -594,7 +594,7 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
         }
     }
         
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     //TODO:   仅仅保留一个 else if or else 即可
     else if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;

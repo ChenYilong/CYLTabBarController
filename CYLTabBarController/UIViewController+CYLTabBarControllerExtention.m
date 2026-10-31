@@ -143,10 +143,10 @@
 #pragma mark - public method
 
 - (BOOL)cyl_isPlusChildViewController {
-    if (!CYLPlusChildViewController) {
+    if (![CYLPlusButton plusChildViewControllerForOwner:self]) {
         return NO;
     }
-    return (self == CYLPlusChildViewController);
+    return (self == [CYLPlusButton plusChildViewControllerForOwner:self]);
 }
 
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
@@ -268,7 +268,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             } else if (self.cyl_isPlaceholder || (self.cyl_getViewControllerInsteadOfNavigationController.cyl_isPlaceholder)){
                 //说明是PlusChildViewController， PlusChildViewController对应的cyl_tabButton为PlusButton
                 //    if (!self.cyl_isEmbedInTabBarController) {
-                control = (UIControl *)CYLExternPlusButton;
+                control = (UIControl *)[CYLPlusButton plusButtonForOwner:self];
             }
         } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
@@ -279,7 +279,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             break;
         }
         
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         @try {
             control = self.cyl_tabBarItem.tabBarButton;
         } @catch (NSException *exception) {
@@ -368,8 +368,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     @try {
         UIViewController *viewController;
         viewController = tabBarController.viewControllers[index];
-        UIButton *plusButton = CYLExternPlusButton;
-        BOOL shouldConfigureSelectionStatus = (CYLPlusChildViewController) && ((index != CYLPlusButtonIndex) && (viewController != CYLPlusChildViewController));
+        UIButton *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
+        UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:tabBarController];
+        BOOL shouldConfigureSelectionStatus = (plusChildViewController) && ((index != [tabBarController.cyl_tabBar cyl_plusButtonIndex]) && (viewController != plusChildViewController));
         if (shouldConfigureSelectionStatus) {
             plusButton.selected = NO;
         }
@@ -476,7 +477,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     UITabBarItem *viewControllerItem = viewController.tabBarItem;
     UIControl *viewControllerControl = viewControllerItem.cyl_tabButton;
     UITabBarItem *navigationViewControllerItem = viewController.navigationController.tabBarItem;
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     if (viewControllerItem && !viewControllerControl) {
         
         CYLTabBarController *flatDesignTabBarController = (CYLTabBarController * )viewController.cylflatdesign_tabBarController;
@@ -717,7 +718,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 #pragma mark - @implementation UIViewController (CYLFlatDesignUITabBarControllerItem) @implementation UIViewController (CYLFlatDesignUIViewControllerItem)
 // MARK: @implementation UIViewController (CYLFlatDesignUITabBarControllerItem) @implementation UIViewController (CYLFlatDesignUIViewControllerItem)
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 
 
 

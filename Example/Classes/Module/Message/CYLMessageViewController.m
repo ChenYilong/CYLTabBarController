@@ -8,6 +8,8 @@
 
 #import "CYLMessageViewController.h"
 #import "CYLMainRootViewController.h"
+#import "CYLPlusButtonSubclass.h"
+#import "MainTabBarController.h"
 #import <MJRefresh/MJRefresh.h>
 
 @implementation CYLMessageViewController
@@ -80,7 +82,13 @@
     //    [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimationTypeScale];
     //    [self pushToNewViewController];
 
-        CYLTabBarController *tabBarController = [[CYLMainRootViewController new] createNewTabBarWithContext:NSStringFromClass([self class])];
+    // Same logic as the plus button's "Switch Style" menu: a tab bar controller that shows the OTHER plus button (another
+    // context). The tab bar controller we push from keeps its own, both are registered at the same time.
+    // 与 PlusButton“切换样式”菜单相同的逻辑：push 一个显示 **另一个** PlusButton（另一个 context）的 TabBarController。
+    // 当前的 TabBarController 保留自己的 PlusButton，两个同时注册。
+    Class plusButtonClass = [CYLPlusButtonSubclass alternatePlusButtonClassForOwner:self];
+    MainTabBarController *tabBarController = [CYLMainRootViewController newLiquidGlassTabBarControllerWithPlusButtonClass:plusButtonClass];
+    tabBarController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:tabBarController animated:YES];
 }
 

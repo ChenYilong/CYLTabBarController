@@ -7,11 +7,6 @@
 //
 
 #import "CYLFlatDesignTabBarDemoViewController.h"
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
-//#import <CYLTabBarController/CYLTabBarController.h>
-#import <CYLTabBarController/CYLFlatDesignTabBar.h>
-#else
-#endif
 #import "CYLFlatDesignTableViewController.h"
 #import "CYLTabBarController.h"
 //#import "CYLFlatDesignUIViewController.h"
@@ -21,8 +16,12 @@
 #else
 #import "CYLTabBarController.h"
 #endif
+// After the library import, which defines CYL_FLATDESIGN_AVAILABLE.
+#if CYL_FLATDESIGN_AVAILABLE
+#import <CYLTabBarController/CYLFlatDesignTabBar.h>
+#endif
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 @interface CYLFlatDesignTabBarDemoViewController ()<UITableViewDelegate, UITableViewDataSource, CYLFlatDesignTabBarDelegate>
 
 #else
@@ -32,7 +31,7 @@
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSArray *datas;
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 @property (nonatomic, strong) CYLFlatDesignTabBar *tabBar;
 
 #else
@@ -75,7 +74,7 @@
         [items addObject:item];
     }
     
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     _tabBar = [[CYLFlatDesignTabBar alloc] init];
     _tabBar.cyl_context = NSStringFromClass([self class]);
 
@@ -102,7 +101,7 @@
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     _tabBar.frame = CGRectMake(0, CGRectGetMaxY(self.navigationController.navigationBar.frame) + 20, self.view.frame.size.width, 49);
     
     CGFloat uitabBarHeight = _tabBar.frame.size.height;
@@ -134,7 +133,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     if (indexPath.row == 0) {
         _tabBar.barTintColor = [self.cyl_randomColor colorWithAlphaComponent:0.5];
         _uitabBar.barTintColor = _tabBar.barTintColor;
@@ -170,7 +169,7 @@
 #endif
 }
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 - (void)tabBar:(CYLFlatDesignTabBar *)tabBar didSelectItem:(CYLFlatDesignTabBarItem *)item {
     CYLTabBarController *tabBarController = (CYLTabBarController *)self.cylflatdesign_tabBarController;
     if (tabBarController) {

@@ -73,7 +73,8 @@
 //上下结构的 button
 
 + (id)plusButton {
-    CYLPlusButtonSubclass *button = [[CYLPlusButtonSubclass alloc] init];
+    // `[self alloc]`, not `CYLPlusButtonSubclass`: a subclass (`CYLSecondPlusButtonSubclass`) gets its own instance and its own icon.
+    CYLPlusButtonSubclass *button = [[self alloc] init];
     UIImage *normalButtonImage = [self contentImage];
     UIImage *hlightButtonImage = [self selectedContentImage];
     
@@ -85,7 +86,9 @@
 
     // 选中后再按下（selected + highlighted）时的标题颜色
     UIColor *selectedHighlightedTitleColor = [UIColor cyl_systemGreenColor];
-    BOOL isSelectedAndHighlighted = (button.isSelected || button.isHighlighted) || ((CYLExternPlusButton.isSelected || CYLExternPlusButton.isHighlighted));
+    // The plus button of THIS class's context. With several plus buttons `CYLExternPlusButton` is only the one registered last.
+    CYLPlusButton *registeredPlusButton = [CYLPlusButton plusButtonForTabBarContext:[self matchedTabBarContext]];
+    BOOL isSelectedAndHighlighted = (button.isSelected || button.isHighlighted) || ((registeredPlusButton.isSelected || registeredPlusButton.isHighlighted));
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000
     if (@available(iOS 15.0, *)) {
@@ -130,8 +133,8 @@
 #pragma clang diagnostic pop
     }
 
-    [button setTitle:@"发布" forState:UIControlStateNormal];
-    [button setTitle:@"发布" forState:(UIControlStateSelected | UIControlStateHighlighted)];
+    [button setTitle:[self plusButtonTitle] forState:UIControlStateNormal];
+    [button setTitle:[self plusButtonTitle] forState:(UIControlStateSelected | UIControlStateHighlighted)];
     // iOS 15 以下走 titleColor，iOS 15+ 由上面的 transformer 接管（此处调用无副作用）
     [button setTitleColor:selectedHighlightedTitleColor forState:(UIControlStateSelected | UIControlStateHighlighted)];
     //    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];   // ← 加这一行
@@ -145,7 +148,7 @@
     [button removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
     [button addTarget:button action:action forControlEvents:UIControlEventTouchUpInside];
     
-    if (CYLPlusChildViewController && button.isLayoutCentered) {
+    if ([CYLPlusButton plusChildViewControllerForTabBarContext:[self matchedTabBarContext]] && button.isLayoutCentered) {
         [button cyl_setUserInteractionDisabled:NO];
     } else {
         [button cyl_setUserInteractionDisabled:YES];
@@ -271,9 +274,14 @@
     
     UIViewController *viewController = CYLGetRootViewController();
     
+    // The new tab bar controller shows the OTHER plus button (another context): the title tells which.
+    // 新的 TabBarController 显示 **另一个** PlusButton（另一个 context），标题会说明是哪一个。
+    Class nextPlusButtonClass = [CYLPlusButtonSubclass alternatePlusButtonClassForOwner:self];
+    NSString *nextPlusButtonTitle = [nextPlusButtonClass plusButtonTitle];
+    
     UIAlertController *actionSheet = [UIAlertController
                                       alertControllerWithTitle:@"Switch Style 切换样式"
-                                      message:nil
+                                      message:[NSString stringWithFormat:@"PlusButton → 「%@」", nextPlusButtonTitle]
                                       preferredStyle:UIAlertControllerStyleActionSheet];
     
     [actionSheet addAction:[UIAlertAction actionWithTitle:@"Liquid Glass液态玻璃"
@@ -282,7 +290,7 @@
         // handle choose
 
         CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
-        [rootController createLiquidGlassTabBar];
+        [rootController createLiquidGlassTabBarWithPlusButtonClass:nextPlusButtonClass];
 
     }]];
     
@@ -292,7 +300,7 @@
         // handle choose
 
         CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
-        [rootController createFlatDesignTabBar];
+        [rootController createFlatDesignTabBarWithPlusButtonClass:nextPlusButtonClass];
 
     }]];
     
@@ -376,7 +384,7 @@
 //}
 
 + (BOOL)shouldSelectPlusChildViewController {
-    BOOL isSelected = CYLExternPlusButton.selected;
+    BOOL isSelected = [CYLPlusButton plusButtonForTabBarContext:[self matchedTabBarContext]].selected;
     if  (isSelected) {
         NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
     } else {
@@ -414,6 +422,54 @@
 + (UIImage *)contentImage {
     UIImage *normalButtonImage = [UIImage imageNamed:@"post_normal"];
     return normalButtonImage;
+}
+
++ (NSString *)plusButtonTitle {
+    return @"发布";
+}
+
++ (Class)alternatePlusButtonClassForOwner:(id)owner {
+    // The class of the plus button bound to the tab bar controller `owner` belongs to (by its context).
+    Class currentPlusButtonClass = [[CYLPlusButton plusButtonForOwner:owner] class];
+    BOOL isSecond = currentPlusButtonClass && [currentPlusButtonClass isSubclassOfClass:[CYLSecondPlusButtonSubclass class]];
+    return isSecond ? [CYLPlusButtonSubclass class] : [CYLSecondPlusButtonSubclass class];
+}
+
+@end
+
+#pragma mark - CYLSecondPlusButtonSubclass
+
+@implementation CYLSecondPlusButtonSubclass
+
+/*!
+ * [EN] The context this plus button is bound to. A `CYLTabBarController` created with this `context` shows it; the
+ *      others (context "CYLTabBarController") show `CYLPlusButtonSubclass`.
+ * [CN] 这个 PlusButton 绑定的 context。用这个 `context` 创建的 `CYLTabBarController` 显示它，其他的（context 为 "CYLTabBarController"）显示 `CYLPlusButtonSubclass`。
+ */
++ (NSString *)tabBarContext {
+    return @"CYLSecondPlusButtonContext";
+}
+
++ (NSString *)plusButtonTitle {
+    return @"拍摄";
+}
+
+// Only the icon differs: a camera (SF Symbol, iOS 13+), the other plus button keeps the `post_*` images.
++ (UIImage *)cameraImageWithColor:(UIColor *)color {
+    if (@available(iOS 13.0, *)) {
+        UIImageSymbolConfiguration *configuration = [UIImageSymbolConfiguration configurationWithPointSize:34 weight:UIImageSymbolWeightMedium];
+        UIImage *image = [UIImage systemImageNamed:@"camera.circle.fill" withConfiguration:configuration];
+        return [image imageWithTintColor:color renderingMode:UIImageRenderingModeAlwaysOriginal];
+    }
+    return nil;
+}
+
++ (UIImage *)contentImage {
+    return [self cameraImageWithColor:[UIColor systemOrangeColor]] ?: [super contentImage];
+}
+
++ (UIImage *)selectedContentImage {
+    return [self cameraImageWithColor:[UIColor systemRedColor]] ?: [super selectedContentImage];
 }
 
 @end

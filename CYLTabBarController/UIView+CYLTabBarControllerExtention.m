@@ -29,7 +29,8 @@
 @implementation UIView (CYLTabBarControllerExtention)
 
 - (BOOL)cyl_isPlusButton {
-    return [self isKindOfClass:[CYLExternPlusButton class]];
+    // A plus button of any registered context, not only the one registered last.
+    return [CYLPlusButton isPlusButtonView:self];
 }
 
 - (BOOL)cyl_isRightToLeftLayout {
@@ -813,4 +814,41 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 @end
+
+@implementation UIView (CYLTabBarMetrics)
+
+- (NSUInteger)cyl_tabbarItemsCount {
+    NSNumber *count = objc_getAssociatedObject(self, @selector(cyl_tabbarItemsCount));
+    return count ? count.unsignedIntegerValue : CYLTabbarItemsCount;
+}
+
+- (void)cyl_setTabbarItemsCount:(NSUInteger)tabbarItemsCount {
+    objc_setAssociatedObject(self, @selector(cyl_tabbarItemsCount), @(tabbarItemsCount), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    CYLTabbarItemsCount = tabbarItemsCount;
+}
+
+- (CGFloat)cyl_tabBarItemWidth {
+    NSNumber *width = objc_getAssociatedObject(self, @selector(cyl_tabBarItemWidth));
+    return width ? width.doubleValue : CYLTabBarItemWidth;
+}
+
+- (void)cyl_setTabBarItemWidth:(CGFloat)tabBarItemWidth {
+    objc_setAssociatedObject(self, @selector(cyl_tabBarItemWidth), @(tabBarItemWidth), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    CYLTabBarItemWidth = tabBarItemWidth;
+}
+
+- (NSUInteger)cyl_plusButtonIndex {
+    CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    if (!plusButton) {
+        return CYLPlusButtonIndex;
+    }
+    return [[plusButton class] indexForTabbarItemsCount:self.cyl_tabbarItemsCount];
+}
+
+- (CGFloat)cyl_plusButtonWidth {
+    return [CYLPlusButton plusButtonWidthForOwner:self];
+}
+
+@end
+
 

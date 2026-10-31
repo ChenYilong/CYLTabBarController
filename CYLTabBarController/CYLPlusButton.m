@@ -14,6 +14,56 @@ CGFloat CYLPlusButtonWidth = 0.0f;
 CYLPlusButton<CYLPlusButtonSubclassing> *CYLExternPlusButton = nil;
 UIViewController *CYLPlusChildViewController = nil;
 
+#pragma mark - Registry: context -> plus button
+
+/*!
+ * [EN] What `+registerPlusButton` registers for one context. The globals above used to be the only plus button, so a
+ *      second `+registerPlusButton` overwrote the first, and every tab bar controller then looked at the second one:
+ *      with two contexts, `-hasPlusButton` was NO for the first tab bar controller (issues #414, #489).
+ * [CN] `+registerPlusButton` 为一个 context 注册的内容。上面的全局变量曾经是唯一的 PlusButton，第二次 `+registerPlusButton`
+ *      会覆盖第一次，之后所有 TabBarController 都看到第二个：有两个 context 时，第一个 TabBarController 的 `-hasPlusButton` 为 NO（issue #414、#489）。
+ */
+@interface CYLPlusButtonRegistration : NSObject
+@property (nonatomic, copy) NSString *context;
+@property (nonatomic, strong) CYLPlusButton<CYLPlusButtonSubclassing> *plusButton;
+@property (nonatomic, strong, nullable) UIViewController *plusChildViewController;
+@property (nonatomic, assign) CGFloat plusButtonWidth;
+@property (nonatomic, assign) Class plusButtonClass;
+@end
+
+@implementation CYLPlusButtonRegistration
+@end
+
+static NSMutableDictionary<NSString *, CYLPlusButtonRegistration *> *CYLPlusButtonRegistry(void) {
+    static NSMutableDictionary<NSString *, CYLPlusButtonRegistration *> *registry;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        registry = [NSMutableDictionary dictionary];
+    });
+    return registry;
+}
+
+/// The context of the plus button registered last, nil if it was removed. What the globals above describe.
+static NSString *CYLPlusButtonLatestContext = nil;
+
+static CYLPlusButtonRegistration *CYLPlusButtonRegistrationForContext(NSString *context) {
+    if (!context) {
+        return nil;
+    }
+    NSMutableDictionary *registry = CYLPlusButtonRegistry();
+    @synchronized (registry) {
+        return registry[context];
+    }
+}
+
+/// Points the globals at `registration` (nil clears them).
+static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registration) {
+    CYLPlusButtonLatestContext = registration.context;
+    CYLExternPlusButton = registration.plusButton;
+    CYLPlusChildViewController = registration.plusChildViewController;
+    CYLPlusButtonWidth = registration.plusButtonWidth;
+}
+
 @interface CYLPlusButton () 
 
 @property (nonatomic, strong) UIImage *snapshot;
@@ -41,21 +91,26 @@ UIViewController *CYLPlusChildViewController = nil;
         return;
     }
     Class<CYLPlusButtonSubclassing> class = self;
+    CYLPlusButtonRegistration *registration = [[CYLPlusButtonRegistration alloc] init];
+    registration.context = [self matchedTabBarContext];
+    registration.plusButtonClass = self;
     if ([[self class] respondsToSelector:@selector(plusChildViewController)]) {
-        CYLPlusChildViewController = [class plusChildViewController];
-         NSString *tabBarContext = [self matchedTabBarContext];
+        UIViewController *plusChildViewController = [class plusChildViewController];
+        registration.plusChildViewController = plusChildViewController;
+         NSString *tabBarContext = registration.context;
         if (tabBarContext && tabBarContext.length) {
-            [CYLPlusChildViewController cyl_setContext:tabBarContext];
+            [plusChildViewController cyl_setContext:tabBarContext];
         }
         CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
-        CYLExternPlusButton = plusButton;
-        CYLPlusButtonWidth = plusButton.frame.size.width;
+        registration.plusButton = plusButton;
+        registration.plusButtonWidth = plusButton.frame.size.width;
         [[self class] addSelectViewControllerTarget:plusButton];
         //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
         if ([CYLConstants isLiquidGlassActive]) {
             //            plusButton.cyl_userInteractionDisabled = YES;
         }
         if ([[self class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)]) {
+            // Not stored per context: it is `+indexOfPlusButtonInTabBar` of the class, which `+indexForTabbarItemsCount:` returns.
             CYLPlusButtonIndex = [[self class] indexOfPlusButtonInTabBar];
         } else {
 #if defined(DEBUG) || defined(BETA)
@@ -64,25 +119,48 @@ UIViewController *CYLPlusChildViewController = nil;
         }
     } else {
         CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
-        CYLExternPlusButton = plusButton;
-        CYLPlusButtonWidth = plusButton.frame.size.width;
+        registration.plusButton = plusButton;
+        registration.plusButtonWidth = plusButton.frame.size.width;
+    }
+    NSMutableDictionary *registry = CYLPlusButtonRegistry();
+    @synchronized (registry) {
+        registry[registration.context] = registration;
+        CYLPlusButtonMirrorLegacyGlobals(registration);
     }
 }
 
 + (void)removePlusButton {
-    if (CYLExternPlusButton) {
-        if (CYLExternPlusButton.superview) {
-            [CYLExternPlusButton removeFromSuperview];
-        }
-        CYLExternPlusButton = nil;
+    NSString *context = [self matchedTabBarContext];
+    // `CYLPlusButton` itself has no `+tabBarContext`: as before, remove the plus button the globals point at.
+    if (!CYLPlusButtonRegistrationForContext(context) && self == [CYLPlusButton class] && CYLPlusButtonLatestContext) {
+        context = CYLPlusButtonLatestContext;
     }
-    
-    if (CYLPlusChildViewController) {
-        [CYLPlusChildViewController willMoveToParentViewController:nil];
-        [CYLPlusChildViewController.view removeFromSuperview];
-        [CYLPlusChildViewController removeFromParentViewController];
-        [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:NO];
-        CYLPlusChildViewController = nil;
+    [self removePlusButtonForTabBarContext:context];
+}
+
++ (void)removePlusButtonForTabBarContext:(NSString *)tabBarContext {
+    CYLPlusButtonRegistration *registration = nil;
+    NSMutableDictionary *registry = CYLPlusButtonRegistry();
+    @synchronized (registry) {
+        registration = tabBarContext ? registry[tabBarContext] : nil;
+        if (!registration) {
+            return;
+        }
+        [registry removeObjectForKey:tabBarContext];
+        if ([CYLPlusButtonLatestContext isEqualToString:tabBarContext]) {
+            CYLPlusButtonMirrorLegacyGlobals(nil);
+        }
+    }
+    UIButton *plusButton = registration.plusButton;
+    if (plusButton.superview) {
+        [plusButton removeFromSuperview];
+    }
+    UIViewController *plusChildViewController = registration.plusChildViewController;
+    if (plusChildViewController) {
+        [plusChildViewController willMoveToParentViewController:nil];
+        [plusChildViewController.view removeFromSuperview];
+        [plusChildViewController removeFromParentViewController];
+        [plusChildViewController cyl_setPlusViewControllerEverAdded:NO];
     }
 }
 
@@ -96,46 +174,38 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (notNeedConfigureSelectionStatus) {
         return;
     }
-    CYLTabBarController *tabBarController = [sender cyl_tabBarController];
-    UIView *flatDesignTabBar = nil;
-    
-    if (!tabBarController) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
-        //FIX: issue##650
-        tabBarController = CYLPlusChildViewController.cylflatdesign_tabBarController;
-        if ([tabBarController.cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-            flatDesignTabBar = (CYLFlatDesignTabBar *)tabBarController.cyl_tabBar;
-        }
-#else
-        return;
-#endif
+    // The plus button and its child view controller are bound to a tab bar controller by context: the one the tapped
+    // button is in, else the most recently active one with that context. Any style, system or flat design (#650). It
+    // used `-cyl_tabBarController`, which only knows the system styles and fell back to the root controller.
+    // PlusButton 及其子控制器通过 context 绑定到 TabBarController：被点击的按钮所在的那个，否则取该 context 最近活跃的那个。
+    // 任意样式，系统或扁平（#650）。原先用的 `-cyl_tabBarController` 只查系统样式，找不到时回退到根控制器。
+    NSString *context = [CYLPlusButton tabBarContextForOwner:sender];
+    UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForTabBarContext:context];
+    CYLTabBarController *tabBarController = [sender cyl_owningTabBarController];
+    if (![tabBarController.cyl_context isEqualToString:context]) {
+        tabBarController = [CYLTabBarController cyl_tabBarControllerForContext:context];
     }
-    
-    if (!tabBarController) {
+    NSInteger index = plusChildViewController ? [tabBarController.viewControllers indexOfObject:plusChildViewController] : NSNotFound;
+    if (!tabBarController || NSNotFound == index) {
         return;
     }
-    
-    NSInteger index = [tabBarController.viewControllers indexOfObject:CYLPlusChildViewController];
-    if (NSNotFound != index && (index < tabBarController.viewControllers.count)) {
-        if (flatDesignTabBar) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
-            CYLFlatDesignTabBar *theCYLFlatDesignTabBar = (CYLFlatDesignTabBar *)flatDesignTabBar;
-            [theCYLFlatDesignTabBar setSelectedIndex:index];
-            [tabBarController setSelectedViewController:CYLPlusChildViewController];
+#if CYL_FLATDESIGN_AVAILABLE
+    if ([tabBarController.cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        [(CYLFlatDesignTabBar *)tabBarController.cyl_tabBar setSelectedIndex:index];
+        [tabBarController setSelectedViewController:plusChildViewController];
+        return;
+    }
 #endif
-        } else {
-            [tabBarController setSelectedIndex:index];
-            // FIX: issue #594 — when the tab bar controller has a plus button with a child view controller,
-            // `-setSelectedIndex:` (the path also used for selection in code) already selected the plus button and reported
-            // it through `tabBarController:didSelectControl:`. Calling `-tabChangedToControl:` again would report every tap
-            // twice. Otherwise keep the previous behavior.
-            BOOL selectedBySetSelectedIndex =
-                ([tabBarController cyl_plusButtonControlIfSelectingPlusChildViewController:CYLPlusChildViewController] == sender);
-            if (!selectedBySetSelectedIndex && NO == sender.cyl_userInteractionDisabled) {
-                sender.selected = YES;
-                [tabBarController tabChangedToControl:sender];
-            }
-        }
+    [tabBarController setSelectedIndex:index];
+    // FIX: issue #594 — when the tab bar controller has a plus button with a child view controller,
+    // `-setSelectedIndex:` (the path also used for selection in code) already selected the plus button and reported
+    // it through `tabBarController:didSelectControl:`. Calling `-tabChangedToControl:` again would report every tap
+    // twice. Otherwise keep the previous behavior.
+    BOOL selectedBySetSelectedIndex =
+        ([tabBarController cyl_plusButtonControlIfSelectingPlusChildViewController:plusChildViewController] == sender);
+    if (!selectedBySetSelectedIndex && NO == sender.cyl_userInteractionDisabled) {
+        sender.selected = YES;
+        [tabBarController tabChangedToControl:sender];
     }
 }
 
@@ -226,7 +296,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (UIImage *)getSnapshot {
-//    return CYLExternPlusButton.imageView.image;
+//    return [CYLPlusButton plusButtonForOwner:self].imageView.image;
     if (_snapshot) {
         UIImage *originalImage = _snapshot;
         UIImage *newImage = originalImage;
@@ -243,9 +313,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 + (UIButton *)selectedContentView {
     Class<CYLPlusButtonSubclassing> class = self;
-    if (CYLExternPlusButton) {
+    CYLPlusButton *registeredPlusButton = [CYLPlusButton plusButtonForTabBarContext:[self matchedTabBarContext]];
+    if (registeredPlusButton) {
         // 不使用selected 以避免选中背景
-        CYLExternPlusButton.highlighted = YES;
+        registeredPlusButton.highlighted = YES;
     }
     UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
     if (NO == plusButton.cyl_userInteractionDisabled) {
@@ -298,17 +369,19 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (![CYLConstants isLiquidGlassActive]) {
         return;
     }
-    if (!CYLExternPlusButton || !CYLPlusChildViewController) {
+    // The plus button of this button's own context (`self` may be any registered one).
+    CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    if (!plusButton || ![CYLPlusButton plusChildViewControllerForOwner:self]) {
         return;
     }
-    if (CYLExternPlusButton.cyl_keepShowingPlusButtonLabel) {
+    if (plusButton.cyl_keepShowingPlusButtonLabel) {
         return;
     }
-    if (!CYLExternPlusButton.cyl_tabLabel || 0 == CYLExternPlusButton.cyl_tabLabel.text.length ) {
+    if (!plusButton.cyl_tabLabel || 0 == plusButton.cyl_tabLabel.text.length ) {
         return;
     }
-    [CYLExternPlusButton.cyl_tabLabel cyl_setHidden:hidden];
-    [CYLExternPlusButton.selectedContentView.cyl_tabLabel cyl_setHidden:!hidden];
+    [plusButton.cyl_tabLabel cyl_setHidden:hidden];
+    [plusButton.selectedContentView.cyl_tabLabel cyl_setHidden:!hidden];
 }
 
 + (UIImage *)contentImage {
@@ -343,17 +416,127 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 //}
 
 + (BOOL)hasPlusButtonForTabBarContext:(NSString *)tabBarContext {
-    NSString *matchedTabBarContext = self.matchedTabBarContext;
-    BOOL isSameContext = [matchedTabBarContext isEqualToString:tabBarContext] && (matchedTabBarContext && tabBarContext);//|| (!tabBarContext  && !self.context);
-    return isSameContext;
-    
+    return [self plusButtonForTabBarContext:tabBarContext] != nil;
 }
 
 + (BOOL)hasPlusChildViewControllerForTabBarContext:(NSString *)tabBarContext {
-    NSString *context = CYLPlusChildViewController.cyl_context;
-    BOOL isSameContext = ((context && tabBarContext) && [context isEqualToString:tabBarContext]);
-    BOOL hasPlusChildViewController = CYLPlusChildViewController && isSameContext;//&& !isAdded;
-    return hasPlusChildViewController;
+    return [self plusChildViewControllerForTabBarContext:tabBarContext] != nil;
+}
+
+#pragma mark - Plus buttons by context
+
++ (CYLPlusButton<CYLPlusButtonSubclassing> *)plusButtonForTabBarContext:(NSString *)tabBarContext {
+    return CYLPlusButtonRegistrationForContext(tabBarContext).plusButton;
+}
+
++ (UIViewController *)plusChildViewControllerForTabBarContext:(NSString *)tabBarContext {
+    return CYLPlusButtonRegistrationForContext(tabBarContext).plusChildViewController;
+}
+
++ (CGFloat)plusButtonWidthForTabBarContext:(NSString *)tabBarContext {
+    return CYLPlusButtonRegistrationForContext(tabBarContext).plusButtonWidth;
+}
+
++ (CYLPlusButtonRegistration *)registrationOfPlusButtonView:(UIView *)view {
+    if (!view) {
+        return nil;
+    }
+    // The registered instance itself; otherwise the most specific registered class `view` is a kind of. A plus button
+    // class may inherit from another registered one (a second plus button that only changes the icon), and an instance
+    // of it that is not the registered one, such as the selected-state copy `+selectedContentView` creates, is also a
+    // kind of the parent class.
+    // 先找已注册的实例本身；否则取 `view` 所属的、最具体的已注册类。一个 PlusButton 类可能继承自另一个已注册的类（只改了图标的
+    // 第二个 PlusButton），它的实例如果不是已注册的那个（例如 `+selectedContentView` 创建的选中态副本），同时也是父类的实例。
+    CYLPlusButtonRegistration *mostSpecific = nil;
+    NSMutableDictionary *registry = CYLPlusButtonRegistry();
+    @synchronized (registry) {
+        for (CYLPlusButtonRegistration *registration in registry.allValues) {
+            if (registration.plusButton == (id)view) {
+                return registration;
+            }
+            Class plusButtonClass = registration.plusButtonClass;
+            if (!plusButtonClass || ![view isKindOfClass:plusButtonClass]) {
+                continue;
+            }
+            if (!mostSpecific || [plusButtonClass isSubclassOfClass:mostSpecific.plusButtonClass]) {
+                mostSpecific = registration;
+            }
+        }
+    }
+    return mostSpecific;
+}
+
++ (BOOL)isPlusButtonView:(UIView *)view {
+    return [self registrationOfPlusButtonView:view] != nil;
+}
+
++ (CYLPlusButtonRegistration *)registrationOfPlusChildViewController:(UIViewController *)viewController {
+    if (!viewController) {
+        return nil;
+    }
+    UIViewController *inner = [viewController cyl_getViewControllerInsteadOfNavigationController];
+    NSMutableDictionary *registry = CYLPlusButtonRegistry();
+    @synchronized (registry) {
+        for (CYLPlusButtonRegistration *registration in registry.allValues) {
+            UIViewController *child = registration.plusChildViewController;
+            if (child && (child == viewController || child == inner)) {
+                return registration;
+            }
+        }
+    }
+    return nil;
+}
+
+/*!
+ * [EN] Which context `owner` belongs to. A plus button and a plus child view controller know their own (the registry).
+ *      Anything else takes the context of the CYLTabBarController it belongs to, found by the same lookup as
+ *      `-cyl_tabBarController` but for any style (`-cyl_owningTabBarController`): a tab bar asks its `delegate`, a view
+ *      goes up its responder chain, a view controller up its parents. If it is in none: a tab bar not attached yet uses
+ *      its own context (copied from its controller), anything else the most recently active controller's, and only when
+ *      no tab bar controller exists yet the context registered last (what the globals describe).
+ * [CN] `owner` 属于哪个 context。PlusButton 和 PlusButton 子控制器通过注册表知道自己的 context。其他对象取它所属
+ *      CYLTabBarController 的 context，查找方式与 `-cyl_tabBarController` 相同但不限样式（`-cyl_owningTabBarController`）：
+ *      TabBar 询问它的 `delegate`，View 沿响应链向上，ViewController 沿父控制器链向上。都不在时：尚未挂上的 TabBar 用自己的 context
+ *      （从控制器复制而来），其他对象取最近活跃控制器的 context，只有还没有任何 TabBarController 时才取最后注册的 context（全局变量描述的那个）。
+ */
++ (NSString *)tabBarContextForOwner:(id)owner {
+    NSString *context = nil;
+    if ([owner isKindOfClass:[UIView class]]) {
+        context = [self registrationOfPlusButtonView:owner].context;
+    } else if ([owner isKindOfClass:[UIViewController class]]) {
+        context = [self registrationOfPlusChildViewController:owner].context;
+    }
+    if (context) {
+        return context;
+    }
+    CYLTabBarController *tabBarController = [owner cyl_owningTabBarController];
+    if (tabBarController) {
+        return tabBarController.cyl_context;
+    }
+    // A tab bar that is not attached to its controller yet (`-[CYLTabBar setContext:]` asks for its plus button right
+    // then) carries the context the controller copied to it; never take another controller's context for it.
+    // 尚未挂到控制器上的 TabBar（`-[CYLTabBar setContext:]` 此时就会查询 PlusButton）带有控制器复制给它的 context，不能取其他控制器的。
+    BOOL isTabBar = [owner isKindOfClass:[UITabBar class]];
+#if CYL_FLATDESIGN_AVAILABLE
+    isTabBar = isTabBar || [owner isKindOfClass:[CYLFlatDesignTabBar class]];
+#endif
+    if (isTabBar) {
+        return [owner cyl_context];
+    }
+    // Nothing to go by: the most recently active controller, else the context registered last.
+    return [CYLTabBarController cyl_activeTabBarController].cyl_context ?: CYLPlusButtonLatestContext;
+}
+
++ (CYLPlusButton<CYLPlusButtonSubclassing> *)plusButtonForOwner:(id)owner {
+    return [self plusButtonForTabBarContext:[self tabBarContextForOwner:owner]];
+}
+
++ (UIViewController *)plusChildViewControllerForOwner:(id)owner {
+    return [self plusChildViewControllerForTabBarContext:[self tabBarContextForOwner:owner]];
+}
+
++ (CGFloat)plusButtonWidthForOwner:(id)owner {
+    return [self plusButtonWidthForTabBarContext:[self tabBarContextForOwner:owner]];
 }
 
 + (NSString *)matchedTabBarContext {

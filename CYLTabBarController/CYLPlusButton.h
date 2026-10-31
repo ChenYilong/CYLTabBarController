@@ -163,6 +163,16 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
 
 @class CYLTabBar;
 
+/*!
+ * [EN] The plus button and the plus child view controller registered LAST (and not removed since).
+ *      Kept for source compatibility with code that reads them. The library no longer reads them: with several plus
+ *      buttons, each tab bar controller uses the one registered for its own context, see
+ *      `+plusButtonForTabBarContext:` and `+plusChildViewControllerForTabBarContext:`. With one plus button, they are
+ *      what they always were.
+ * [CN] 最后一次注册（且之后未被移除）的 PlusButton 与 PlusButton 子控制器。保留它们是为了让读取它们的代码继续可用。
+ *      库内部不再读取它们：存在多个 PlusButton 时，每个 TabBarController 使用与自己 context 对应的那一个，
+ *      见 `+plusButtonForTabBarContext:` 和 `+plusChildViewControllerForTabBarContext:`。只有一个 PlusButton 时，它们与以前完全一致。
+ */
 FOUNDATION_EXTERN CYLPlusButton<CYLPlusButtonSubclassing> *CYLExternPlusButton;
 FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 
@@ -171,16 +181,96 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 /*!
  * plusButton state:
  * Register + Context match == Active
- * [EN] Registers the subclass as the global plus button (`CYLExternPlusButton`) and sets up its child view controller if provided.
- * [CN] 将当前子类注册为全局 PlusButton（CYLExternPlusButton），若提供了子控制器也一并设置。
+ * [EN] Registers the subclass as the plus button of its context (`+tabBarContext`, "CYLTabBarController" by default)
+ *      and sets up its child view controller if provided. Several plus buttons can be registered at the same time, one
+ *      per context; a tab bar controller uses the one whose context equals its own `context`. Registering a second
+ *      plus button for a context that already has one replaces it. `CYLExternPlusButton` and
+ *      `CYLPlusChildViewController` point at the one registered last.
+ * [CN] 将当前子类注册为它所属 context（`+tabBarContext`，默认 "CYLTabBarController"）的 PlusButton，若提供了子控制器也一并设置。
+ *      可以同时注册多个 PlusButton，每个 context 一个；TabBarController 使用 context 与自己的 `context` 相同的那一个。
+ *      为已有 PlusButton 的 context 再注册一个会替换它。`CYLExternPlusButton` 与 `CYLPlusChildViewController` 指向最后注册的那一个。
  */
 + (void)registerPlusButton;
 
 /*!
- * [EN] Removes the plus button from its superview and clears the global plus button and its child view controller.
- * [CN] 将 PlusButton 从父视图移除，并清空全局 PlusButton 及其子控制器。
+ * [EN] Removes the plus button registered for this class's context from its superview, together with its child view
+ *      controller, and unregisters them. The plus buttons of other contexts are not touched. When called on
+ *      `CYLPlusButton` itself, which has no context of its own, it removes the one `CYLExternPlusButton` points at, as before.
+ * [CN] 将本类所属 context 注册的 PlusButton 及其子控制器从父视图移除并取消注册，其他 context 的 PlusButton 不受影响。
+ *      直接对没有自己 context 的 `CYLPlusButton` 调用时，与以前一样移除 `CYLExternPlusButton` 指向的那一个。
  */
 + (void)removePlusButton;
+
+/*!
+ * [EN] Same as `+removePlusButton`, for the given context.
+ * [CN] 与 `+removePlusButton` 相同，作用于指定的 context。
+ */
++ (void)removePlusButtonForTabBarContext:(NSString *)tabBarContext;
+
+#pragma mark - Plus buttons by context
+
+/*!
+ * [EN] The registry maps a context to its plus button, plus child view controller and plus button width. A plus button
+ *      is bound to a CYLTabBarController, through the controller's `context`. The controller's `-hasPlusButton` and
+ *      `-hasPlusChildViewController` read the registry, and its tab bar (system or flat design) asks the controller that
+ *      owns it, so several tab bar controllers with different contexts each get their own plus button. Tab bar
+ *      controllers that share a context share one plus button, and a view can only be in one tab bar, so give each its own context.
+ * [CN] 注册表将 context 映射到对应的 PlusButton、PlusButton 子控制器和 PlusButton 宽度。PlusButton 绑定的是 CYLTabBarController，
+ *      通过控制器的 `context`。控制器的 `-hasPlusButton`、`-hasPlusChildViewController` 读取注册表，它的 TabBar（系统样式或扁平样式）
+ *      则向拥有它的控制器询问，因此 context 不同的多个 TabBarController 各自使用自己的 PlusButton。
+ *      context 相同的 TabBarController 共用同一个 PlusButton，而一个 View 只能在一个 TabBar 中，所以请给每个设置不同的 context。
+ *
+ *      Example:
+ *      @code
+ *      [HomePlusButton registerPlusButton];     // +tabBarContext returns @"home"
+ *      [MinePlusButton registerPlusButton];     // +tabBarContext returns @"mine"
+ *      CYLTabBarController *home = [[CYLTabBarController alloc] initWithViewControllers:… tabBarItemsAttributes:… context:@"home"];
+ *      CYLTabBarController *mine = [[CYLTabBarController alloc] initWithViewControllers:… tabBarItemsAttributes:… context:@"mine"];
+ *      [CYLPlusButton plusButtonForTabBarContext:@"home"];   // the HomePlusButton instance
+ *      @endcode
+ */
+
+/*!
+ * [EN] Returns the plus button registered for `tabBarContext`, or nil.
+ * [CN] 返回为 tabBarContext 注册的 PlusButton，没有则返回 nil。
+ */
++ (nullable CYLPlusButton<CYLPlusButtonSubclassing> *)plusButtonForTabBarContext:(nullable NSString *)tabBarContext;
+
+/*!
+ * [EN] Returns the plus child view controller registered for `tabBarContext`, or nil.
+ * [CN] 返回为 tabBarContext 注册的 PlusButton 子控制器，没有则返回 nil。
+ */
++ (nullable UIViewController *)plusChildViewControllerForTabBarContext:(nullable NSString *)tabBarContext;
+
+/*!
+ * [EN] Returns the width of the plus button registered for `tabBarContext`, or 0.
+ * [CN] 返回为 tabBarContext 注册的 PlusButton 的宽度，没有则返回 0。
+ */
++ (CGFloat)plusButtonWidthForTabBarContext:(nullable NSString *)tabBarContext;
+
+/*!
+ * [EN] The context of the CYLTabBarController `owner` belongs to: the controller itself, its tab bar, a view inside the
+ *      tab bar (a tab button, the plus button), or a view controller (a tab's view controller, the plus child view controller). If it cannot be told,
+ *      the context of the plus button registered last, which is what the global `CYLExternPlusButton` points at.
+ * [CN] `owner` 所属 CYLTabBarController 的 context：控制器本身、它的 TabBar、TabBar 内的 View（Tab 按钮、PlusButton）或 ViewController
+ *      （Tab 的控制器、PlusButton 子控制器）。无法判断时，返回最后注册的 PlusButton 的 context，即全局 `CYLExternPlusButton` 所指的那个。
+ */
++ (nullable NSString *)tabBarContextForOwner:(nullable id)owner;
+
+/*!
+ * [EN] `+plusButtonForTabBarContext:` / `+plusChildViewControllerForTabBarContext:` / `+plusButtonWidthForTabBarContext:`
+ *      for the context of `owner` (see `+tabBarContextForOwner:`).
+ * [CN] 针对 `owner` 所属 context（见 `+tabBarContextForOwner:`）的 `+plusButtonForTabBarContext:` 等方法。
+ */
++ (nullable CYLPlusButton<CYLPlusButtonSubclassing> *)plusButtonForOwner:(nullable id)owner;
++ (nullable UIViewController *)plusChildViewControllerForOwner:(nullable id)owner;
++ (CGFloat)plusButtonWidthForOwner:(nullable id)owner;
+
+/*!
+ * [EN] Returns YES if `view` is the plus button of any context (the registered instance, or an instance of a registered class).
+ * [CN] 判断 `view` 是否是任意 context 的 PlusButton（已注册的实例，或已注册类的实例）。
+ */
++ (BOOL)isPlusButtonView:(nullable UIView *)view;
 
 /*!
  * [EN] Action for plus button taps; selects the plus child view controller when appropriate.
@@ -197,14 +287,14 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 + (NSString *)matchedTabBarContext;
 
 /*!
- * [EN] Returns YES if the registered plus button's context matches `tabBarContext`.
- * [CN] 判断已注册 PlusButton 的 context 是否与 tabBarContext 一致。
+ * [EN] Returns YES if a plus button is registered for `tabBarContext`.
+ * [CN] 判断是否为 tabBarContext 注册了 PlusButton。
  */
 + (BOOL)hasPlusButtonForTabBarContext:(NSString *)tabBarContext;
 
 /*!
- * [EN] Returns YES if the plus child view controller exists and its context matches `tabBarContext`.
- * [CN] 判断 PlusButton 子控制器是否存在且其 context 与 tabBarContext 一致。
+ * [EN] Returns YES if a plus child view controller is registered for `tabBarContext`.
+ * [CN] 判断是否为 tabBarContext 注册了 PlusButton 子控制器。
  */
 + (BOOL)hasPlusChildViewControllerForTabBarContext:(NSString *)tabBarContext;
 

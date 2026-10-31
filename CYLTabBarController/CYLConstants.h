@@ -12,11 +12,27 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
-// 必须在 `__has_include` 之外，否则未引入 CYLFlatDesignTabBar 子库的
+/*!
+ * [EN] 1 when the flat design subspec (CYLFlatDesignTabBar) is part of the build, 0 otherwise. The one place that asks
+ *      `__has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)`; everywhere else guard flat design code with
+ *      `#if CYL_FLATDESIGN_AVAILABLE`. Every file of the library imports this header first. Use the macro only after
+ *      importing it: an undefined macro counts as 0 in `#if` and would silently leave the flat design code out.
+ * [CN] 引入扁平样式子库（CYLFlatDesignTabBar）时为 1，否则为 0。这是唯一检查
+ *      `__has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)` 的地方；其他地方统一用 `#if CYL_FLATDESIGN_AVAILABLE`
+ *      为扁平样式代码做 guard。库中每个文件都会先引入本头文件。只能在引入之后使用该宏：未定义的宏在 `#if` 中按 0 处理，
+ *      会悄悄去掉扁平样式代码。
+ */
+#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#define CYL_FLATDESIGN_AVAILABLE 1
+#else
+#define CYL_FLATDESIGN_AVAILABLE 0
+#endif
+
+// 必须在 flat design guard 之外，否则未引入 CYLFlatDesignTabBar 子库的
 // subspec（如 LottieSwift）看不到该前向声明，会报 "expected a type"。
 @class CYLTabBarController;
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 
 @class CYLFlatDesignTabBar;
 

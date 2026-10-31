@@ -25,15 +25,24 @@
 
 @implementation CYLTabBar (CYLTabBarControllerExtention)
 
+/*!
+ * [EN] The plus child view controller is bound to the CYLTabBarController (by its `context`), so it is asked of the
+ *      controller that owns this tab bar (its `delegate`), and checked against THAT controller's `viewControllers`.
+ *      `-cyl_tabBarController` would return the root controller for a view, the wrong one with several. The context
+ *      comparison it used to make is implied: the child was registered for this controller's context.
+ * [CN] PlusButton 子控制器绑定的是 CYLTabBarController（通过它的 `context`），因此向拥有本 TabBar 的控制器（它的 `delegate`）询问，
+ *      并对 **该** 控制器的 `viewControllers` 做检查。`-cyl_tabBarController` 对 View 返回的是根控制器，有多个时会错。
+ *      原来的 context 比较已经隐含：子控制器就是按本控制器的 context 注册的。
+ */
 - (BOOL)cyl_hasPlusChildViewController {
-    NSString *context = CYLPlusChildViewController.cyl_context;
-    BOOL isSameContext = [context isEqualToString:self.cyl_context] && (context && (context.length > 0) && self.cyl_context && self.cyl_context.length > 0);
-    BOOL isAdded = [[self cyl_tabBarController].viewControllers containsObject:CYLPlusChildViewController];
-    BOOL isEverAdded = CYLPlusChildViewController.cyl_plusViewControllerEverAdded;
-    if (CYLPlusChildViewController && isSameContext && isAdded && isEverAdded) {
-        return YES;
+    CYLTabBarController *tabBarController = [self tabBarController];
+    UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:tabBarController ?: self];
+    if (!plusChildViewController) {
+        return NO;
     }
-    return NO;
+    BOOL isAdded = [tabBarController.viewControllers containsObject:plusChildViewController];
+    BOOL isEverAdded = plusChildViewController.cyl_plusViewControllerEverAdded;
+    return isAdded && isEverAdded;
 }
 
 - (NSArray *)cyl_originalTabBarButtons {
@@ -104,9 +113,9 @@
 
 - (NSArray *)cyl_visibleControls {
     NSMutableArray *originalTabBarButtons = [NSMutableArray arrayWithArray:[self.cyl_originalTabBarButtons copy]];
-    BOOL notAdded = (NSNotFound == [originalTabBarButtons indexOfObject:CYLExternPlusButton]);
-    if (CYLExternPlusButton && notAdded && [self isKindOfClass:[CYLTabBar class]] && self.hasPlusButton) {
-        [originalTabBarButtons addObject:CYLExternPlusButton];
+    BOOL notAdded = (NSNotFound == [originalTabBarButtons indexOfObject:[CYLPlusButton plusButtonForOwner:self]]);
+    if ([CYLPlusButton plusButtonForOwner:self] && notAdded && [self isKindOfClass:[CYLTabBar class]] && self.hasPlusButton) {
+        [originalTabBarButtons addObject:[CYLPlusButton plusButtonForOwner:self]];
     }
     if (originalTabBarButtons.count == 0) {
         return nil;
@@ -134,7 +143,7 @@
     //不一样，仅限 cyl_isChildViewControllerPlusButton
     NSMutableArray *subControls = [NSMutableArray arrayWithCapacity:self.cyl_visibleControls.count];
     [self.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([control cyl_isPlusButton] && !CYLPlusChildViewController.cyl_plusViewControllerEverAdded) {
+        if ([control cyl_isPlusButton] && ![CYLPlusButton plusChildViewControllerForOwner:self].cyl_plusViewControllerEverAdded) {
             return;
         }
         [subControls addObject:control];
@@ -159,8 +168,8 @@
 - (UIControl *)cyl_tabBarButtonWithTabIndex:(NSUInteger)tabIndex {
     UIControl *selectedControl = [self cyl_visibleControlWithIndex:tabIndex];
     
-    NSInteger plusViewControllerIndex = [self.tabBarController.viewControllers indexOfObject:CYLPlusChildViewController];
-    BOOL isPlusViewControllerAdded = CYLPlusChildViewController.cyl_plusViewControllerEverAdded && (plusViewControllerIndex != NSNotFound);
+    NSInteger plusViewControllerIndex = [self.tabBarController.viewControllers indexOfObject:[CYLPlusButton plusChildViewControllerForOwner:self]];
+    BOOL isPlusViewControllerAdded = [CYLPlusButton plusChildViewControllerForOwner:self].cyl_plusViewControllerEverAdded && (plusViewControllerIndex != NSNotFound);
     
     if (isPlusViewControllerAdded) {
         return selectedControl;
@@ -224,7 +233,7 @@
             [obj cyl_stopAnimationOfLottieView];
         }];
     }
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     else if ([self isKindOfClass:[CYLFlatDesignTabBar class]]) {
         CYLFlatDesignTabBar *flatDesignTabBar = (CYLFlatDesignTabBar *)self;
         [flatDesignTabBar.tabBarItems enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -245,7 +254,7 @@
             [obj cyl_stopAnimationOfLottieView];
         }];
     }
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 
     else if ([self isKindOfClass:[CYLFlatDesignTabBar class]]) {
         CYLFlatDesignTabBar *flatDesignTabBar = (CYLFlatDesignTabBar *)self;
@@ -320,8 +329,8 @@
     if (![CYLConstants isLiquidGlassActive]) {
         return 0.0f;
     }
-    CGFloat originalTabBarItemWidth = self.cyl_boundsSize.width / CYLTabbarItemsCount;
-    CGFloat visiableTabBarItemWidth = CYLTabBarItemWidth;
+    CGFloat originalTabBarItemWidth = self.cyl_boundsSize.width / self.cyl_tabbarItemsCount;
+    CGFloat visiableTabBarItemWidth = self.cyl_tabBarItemWidth;
     CGFloat WidthOffsetWithIndex = originalTabBarItemWidth - visiableTabBarItemWidth;
     return fabs(WidthOffsetWithIndex);
 }
@@ -386,17 +395,20 @@
     if (!tabBar) {
         tabBar = self;
     }
-    if (![tabBar hasPlusChildViewController]) {
+    // The plus button and its child view controller are bound to the controller (by its `context`), so ask it.
+    // PlusButton 和它的子控制器绑定的是控制器（通过它的 `context`），所以向它询问。
+    id plusOwner = tabBarController ?: self;
+    CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [CYLPlusButton plusButtonForOwner:plusOwner];
+    if (![CYLPlusButton plusChildViewControllerForOwner:plusOwner]) {
         return NO;
     }
-    if (![tabBar hasPlusButton]) {
-        return NO;
-        
-    }
-    if (!CYLExternPlusButton.cyl_tabLabel) {
+    if (!plusButton) {
         return NO;
     }
-    if (CYLExternPlusButton.cyl_tabLabel.text.length == 0) {
+    if (!plusButton.cyl_tabLabel) {
+        return NO;
+    }
+    if (plusButton.cyl_tabLabel.text.length == 0) {
         return NO;
     }
     
@@ -405,7 +417,7 @@
     CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(
                                             
                                             
-                                            shouldShowPlatterLiquidLensViewForControl = [tabBarController performSelector:actionshouldShowPlatterLiquidLensViewForControl withObject:tabBarController withObject:CYLExternPlusButton];
+                                            shouldShowPlatterLiquidLensViewForControl = [tabBarController performSelector:actionshouldShowPlatterLiquidLensViewForControl withObject:tabBarController withObject:plusButton];
                                             
                                             
                                             );

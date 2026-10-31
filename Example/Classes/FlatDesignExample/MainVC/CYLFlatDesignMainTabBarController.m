@@ -18,7 +18,7 @@
 #endif
 #define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 @interface CYLFlatDesignMainTabBarController ()<CYLFlatDesignUITabBarControllerDelegate>
 
 #else
@@ -64,7 +64,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     
     // 设置代理
     self.delegate = self;
@@ -128,7 +128,7 @@
 #endif
 }
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 - (void)setupChildViewController:(UIViewController *)childVC
                            title:(NSString *)title
                        imageName:(NSString *)imageName
@@ -156,7 +156,7 @@
 
 #pragma mark - CYLFlatDesignUITabBarControllerDelegate
 - (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     NSInteger index = [tabBarController.viewControllers indexOfObject:viewController];
     if (index != NSNotFound) {
         
@@ -382,7 +382,7 @@
 }
 
 #pragma mark - CYLFlatDesignTabBarDelegate
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 - (void)tabBar:(CYLFlatDesignTabBar *)tabBar didSelectItem:(nonnull CYLFlatDesignTabBarItem *)item {
     NSInteger index = [tabBar.items indexOfObject:item];
     if (index == 2) {
@@ -455,7 +455,8 @@ NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_F
         animationView = [control cyl_tabImageView];
     }
     
-    UIButton *button = CYLExternPlusButton;
+    // The plus button of this tab bar controller's context (`CYLExternPlusButton` is the one registered last).
+    UIButton *button = [CYLPlusButton plusButtonForOwner:tabBarController];
     BOOL isPlusButton = [control cyl_isPlusButton];
     // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
     // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调

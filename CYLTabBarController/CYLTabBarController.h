@@ -24,7 +24,7 @@
 #import "UIColor+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 //#import <CYLTabBarController/CYLTabBarController.h>
 #import <CYLTabBarController/CYLFlatDesignTabBar.h>
 #else
@@ -51,6 +51,19 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImageInsets;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitlePositionAdjustment;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImagePositionAdjustment;
+/*!
+ * [EN] These globals hold what was written LAST, by whichever tab bar controller or plus button wrote last. The library
+ *      no longer lays out with them: with several tab bar controllers they overwrote each other (a tab bar with 5 items
+ *      was laid out with the 3 of the one pushed after it, issues #414, #489). Each tab bar keeps its own values:
+ *      `-[UIView cyl_tabbarItemsCount]`, `-[UIView cyl_tabBarItemWidth]`, `-[UIView cyl_plusButtonIndex]`,
+ *      `-[UIView cyl_plusButtonWidth]` (see UIView+CYLTabBarControllerExtention.h) and `-[CYLTabBarController tabBarHeight]`.
+ *      With one tab bar controller they are what they always were.
+ * [CN] 这些全局变量保存的是 **最后一次** 写入的值，由最后写入的 TabBarController 或 PlusButton 决定。库不再使用它们来布局：
+ *      存在多个 TabBarController 时它们会互相覆盖（5 个 item 的 TabBar 按后面 push 进来的 3 个 item 来布局，issue #414、#489）。
+ *      每个 TabBar 保存自己的值：`-[UIView cyl_tabbarItemsCount]`、`-[UIView cyl_tabBarItemWidth]`、`-[UIView cyl_plusButtonIndex]`、
+ *      `-[UIView cyl_plusButtonWidth]`（见 UIView+CYLTabBarControllerExtention.h）和 `-[CYLTabBarController tabBarHeight]`。
+ *      只有一个 TabBarController 时，它们与以前完全一致。
+ */
 FOUNDATION_EXTERN NSUInteger CYLTabbarItemsCount;
 FOUNDATION_EXTERN NSUInteger CYLPlusButtonIndex;
 FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
@@ -83,7 +96,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
 @end
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 
 //TODO:  , CYLFlatDesignUITabBarControllerDelegate
 @interface CYLTabBarController : UITabBarController <CYLTabBarControllerDelegate, CYLFlatDesignTabBarDelegate>
@@ -161,7 +174,15 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  */
 @property (nonatomic, assign) BOOL adjustTabBarItemImageViewSizeDependOnSuperView;
 
-/** 可以不设置， 默认为 CYLTabBarController，如果设置了，请实现 CYLPlusButton 里 的 +[CYLPlusButton tabBarContext] 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController */
+/** 可以不设置， 默认为 CYLTabBarController，如果设置了，请实现 CYLPlusButton 里 的 +[CYLPlusButton tabBarContext] 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController
+ *
+ * [EN] The key that binds a tab bar controller to its plus button. Several plus buttons can be registered at the same
+ *      time (one per `+[CYLPlusButton tabBarContext]`), and each tab bar controller uses the one registered for its own
+ *      `context`: give every tab bar controller that has a plus button its own context. See `+[CYLPlusButton plusButtonForTabBarContext:]`.
+ * [CN] 将 TabBarController 与其 PlusButton 绑定的 key。可以同时注册多个 PlusButton（每个 `+[CYLPlusButton tabBarContext]` 一个），
+ *      每个 TabBarController 使用为自己 `context` 注册的那一个：请给每个带 PlusButton 的 TabBarController 设置不同的 context。
+ *      见 `+[CYLPlusButton plusButtonForTabBarContext:]`。
+ */
 @property (nonatomic, readonly, copy, nullable) NSString *context;
 
 /*!
@@ -386,7 +407,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 @property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs;
 @property (nonatomic, strong, readonly) NSMutableArray *lottieSizes;
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 
 //TODO:  , CYLFlatDesignUITabBarControllerDelegate
 
@@ -498,19 +519,78 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
 @end
 
+@interface CYLTabBarController (CYLActiveTabBarController)
+
+/*!
+ * [EN] The most recently active CYLTabBarController whose `context` is `context` (any context when nil), or nil.
+ *      Every CYLTabBarController that has view controllers is known, held weakly; the one that appeared last
+ *      (`-viewWillAppear:`) is the most recently active. Precise when every tab bar controller has its own context, as
+ *      several plus buttons need anyway; with a shared context (the default one) it is the last of them that appeared.
+ * [CN] `context` 为指定值（nil 表示任意）的最近活跃的 CYLTabBarController，没有则为 nil。所有已设置 viewControllers 的
+ *      CYLTabBarController 都会被弱引用记录；最后显示（`-viewWillAppear:`）的就是最近活跃的。每个 TabBarController 有自己的 context
+ *      时（多个 PlusButton 本来就需要）结果是精确的；共用 context（默认 context）时，是其中最后显示的那个。
+ */
++ (nullable CYLTabBarController *)cyl_tabBarControllerForContext:(nullable NSString *)context;
+
+/*!
+ * [EN] The most recently active CYLTabBarController, of any context: `+cyl_tabBarControllerForContext:` with nil.
+ * [CN] 最近活跃的 CYLTabBarController（任意 context），即 `+cyl_tabBarControllerForContext:` 传 nil。
+ */
++ (nullable CYLTabBarController *)cyl_activeTabBarController;
+
+@end
+
 @interface NSObject (CYLTabBarControllerReferenceExtension)
 
 /*!
- * If `self` is kind of `UIViewController`, this method will return the nearest ancestor in the view controller hierarchy that is a tab bar controller. If `self` is not kind of `UIViewController`, it will return the `rootViewController` of the `rootWindow` as long as you have set the `CYLTabBarController` as the  `rootViewController`. Otherwise return nil. (read-only)
+ * [EN] The CYLTabBarController of a system style (Default, System, LiquidGlass) `self` belongs to, made for several
+ *      tab bar controllers (#414) rather than one:
+ *      0. a system style CYLTabBarController is its own;
+ *      1. the reference set with `-cyl_setTabBarController:`;
+ *      2. where `self` is: a view controller's nearest tab bar controller above it; a view's, through the view controller
+ *         that owns it (so a tab button or the plus button finds its own controller, not the root one);
+ *      3. otherwise the most recently active one (`+cyl_activeTabBarController`), then, as before, the root view controller.
+ *      Same lookup as `-cylflatdesign_tabBarController`, see `-cyl_tabBarControllerForStyleType:`.
+ * [CN] `self` 所属的系统样式（Default、System、LiquidGlass）CYLTabBarController，按多个 TabBarController 的场景（#414）设计，而不是单例式：
+ *      0. 系统样式的 CYLTabBarController 就是它自己；
+ *      1. 通过 `-cyl_setTabBarController:` 设置的引用；
+ *      2. `self` 所在的位置：ViewController 取上方最近的 TabBarController；View 通过拥有它的 ViewController 查找
+ *         （因此 Tab 按钮或 PlusButton 找到的是自己的控制器，而不是根控制器）；
+ *      3. 否则取最近活跃的那个（`+cyl_activeTabBarController`），最后与以前一样取根控制器。
+ *      与 `-cylflatdesign_tabBarController` 使用同一个查找，见 `-cyl_tabBarControllerForStyleType:`。
  */
 @property (nonatomic, setter=cyl_setTabBarController:) CYLTabBarController *cyl_tabBarController;
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+/*!
+ * [EN] The lookup behind `-cyl_tabBarController` and `-cylflatdesign_tabBarController`, merged into one: the type picks
+ *      the style family, `CYLTabBarStyleTypeFlatDesign` for flat design, any other value for the system styles
+ *      (Default, System, LiquidGlass, as `-cyl_isSystemStyleTabBar` counts them). It falls back to the most recently
+ *      active controller of that family. `-cylflatdesign_tabBarController` keeps returning nil instead, as before.
+ * [CN] `-cyl_tabBarController` 与 `-cylflatdesign_tabBarController` 合并后的查找：类型决定样式类别，`CYLTabBarStyleTypeFlatDesign`
+ *      表示扁平样式，其他任意值表示系统样式（Default、System、LiquidGlass，与 `-cyl_isSystemStyleTabBar` 的判断一致）。
+ *      最后会回退到该类别中最近活跃的控制器；`-cylflatdesign_tabBarController` 则与以前一样返回 nil。
+ */
+- (nullable CYLTabBarController *)cyl_tabBarControllerForStyleType:(CYLTabBarStyleType)styleType;
 
-// 返回控制器的tabBarController，可能为nil
-//TODO:  更换为统一的 cyl_tabBarController
+/*!
+ * [EN] The same lookup for a CYLTabBarController of any style, without a fallback: the one `self` is in (or is), nil if
+ *      it is not inside one. The plus button registry uses it to find the context of a tab button, a view in a tab or a
+ *      view controller.
+ * [CN] 同一个查找，但不限样式、没有回退：`self` 所在（或本身就是）的 CYLTabBarController，不在任何一个之内时为 nil。
+ *      PlusButton 注册表用它确定 Tab 按钮、Tab 内的 View 或 ViewController 的 context。
+ */
+- (nullable CYLTabBarController *)cyl_owningTabBarController;
+
+#if CYL_FLATDESIGN_AVAILABLE
+
+/*!
+ * [EN] Flat design. The flat design CYLTabBarController `self` belongs to, nil if none. Same lookup as
+ *      `-cyl_tabBarController` (`-cyl_tabBarControllerForStyleType:` with `CYLTabBarStyleTypeFlatDesign`), except that an
+ *      explicit reference is returned as it is and there is no fallback, as before.
+ * [CN] 扁平样式。`self` 所属的扁平样式 CYLTabBarController，没有则为 nil。与 `-cyl_tabBarController` 使用同一个查找
+ *      （`-cyl_tabBarControllerForStyleType:` 传 `CYLTabBarStyleTypeFlatDesign`），区别是显式设置的引用原样返回、没有回退，与以前一致。
+ */
 @property (nullable, nonatomic, weak, getter=cylflatdesign_tabBarController, setter=cylflatdesign_setTabBarController:) UIViewController __kindof *cylflatdesign_tabBarController;
-
 
 #endif
 
