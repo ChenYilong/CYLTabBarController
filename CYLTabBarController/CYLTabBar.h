@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 @class CYLTabBar;
-// CYLConstants.h 里的前向声明被包在 `__has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)`
+// CYLConstants.h 里的前向声明被包在 `#if CYL_FLATDESIGN_AVAILABLE`（即 `__has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)`）
 // 里，未引入 CYLFlatDesignTabBar 子库的用法（如 LottieSwift subspec）拿不到该类型，
 // 因此这里显式再声明一次，保证本头文件可独立编译。
 @class CYLTabBarController;

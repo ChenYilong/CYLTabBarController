@@ -502,7 +502,7 @@
         button.frame = CGRectMake(buttonX, buttonY, buttonWidth, buttonHeight);
     }
     if ([self hasPlusButton]) {
-        CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = (CYLPlusButton<CYLPlusButtonSubclassing> *)CYLExternPlusButton;
+        CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = (CYLPlusButton<CYLPlusButtonSubclassing> *)[CYLPlusButton plusButtonForOwner:self];
         CGFloat tabBarHeight = self.contentView.frame.size.height;
         CGFloat tabBarWidth = self.contentView.frame.size.width;
         CGFloat multiplierOfTabBarHeight = [plusButton multiplierOfTabBarHeight:tabBarHeight];
@@ -518,7 +518,7 @@
         self.plusButton = plusButton;
         //FIXME:  to delete 自定义的index。
 //        [self cyl_replace];(
-        CYLFlatDesignTabBarButton *plusButtonIndexPlaceholder = _buttons[CYLPlusButtonIndex];
+        CYLFlatDesignTabBarButton *plusButtonIndexPlaceholder = _buttons[self.cyl_plusButtonIndex];
         if (![plusButtonIndexPlaceholder.tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
             return;
         }
@@ -799,13 +799,13 @@
 }
 
 - (CGFloat)tabItemWidth {
-    CYLTabBarItemWidth = (CYLScreenWidth() - CYLPlusButtonWidth) / CYLTabbarItemsCount;
+    [self cyl_setTabBarItemWidth:(CYLScreenWidth() - self.cyl_plusButtonWidth) / self.cyl_tabbarItemsCount];
     //        CYLTabBarItemWidth = (tabBarWidth) / CYLTabbarItemsCount;
-    return CYLTabBarItemWidth;
+    return self.cyl_tabBarItemWidth;
 }
 
 - (CGFloat)plusWidth {
-    return CYLPlusButtonWidth;
+    return self.cyl_plusButtonWidth;
 }
 
 //- (CGRect)plusFrame {
@@ -814,7 +814,12 @@
 
 - (CGRect)tabBarItemFrameWithIndex:(NSInteger)index {
     CGFloat w = [self tabItemWidth];
-    CGFloat h = CYLTabBarHeight;
+    // The height of the controller that owns this tab bar, not the global another controller may have written.
+    // 拥有本 TabBar 的控制器的高度，而不是可能被其他控制器改写的全局变量。
+    // `self.tabBarController` is never set for a flat design tab bar: the owner is found through its `delegate`.
+    // 扁平样式 TabBar 的 `self.tabBarController` 从未被赋值：通过它的 `delegate` 找到拥有它的控制器。
+    CYLTabBarController *tabBarController = [self cyl_owningTabBarController];
+    CGFloat h = tabBarController ? tabBarController.tabBarHeight : CYLTabBarHeight;
     CGFloat x = 0;
     if (index > 1) {
         x = CYLScreenWidth() - w - (3 - index) * (w + CYLScaleValue(2));
@@ -827,13 +832,13 @@
 }
 
 - (BOOL)hasPlusButton {
-    BOOL isSameContext = [[CYLExternPlusButton class] hasPlusButtonForTabBarContext:self.cyl_context];//|| (!tabBarContext  && !self.context);
-    return isSameContext;
+    // Bound to the CYLTabBarController that owns this tab bar, see `-[CYLTabBar hasPlusButton]`.
+    // 绑定的是拥有本 TabBar 的 CYLTabBarController，见 `-[CYLTabBar hasPlusButton]`。
+    return [CYLPlusButton plusButtonForOwner:self] != nil;
 }
 
 - (BOOL)hasPlusChildViewController {
-    BOOL hasPlusChildViewController = [[CYLExternPlusButton class] hasPlusChildViewControllerForTabBarContext:self.cyl_context];//|| (!tabBarContext  && !self.context);;//&& !isAdded;
-    return hasPlusChildViewController;
+    return [CYLPlusButton plusChildViewControllerForOwner:self] != nil;
 }
 
 @end

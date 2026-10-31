@@ -8,6 +8,8 @@
 
 #import "CYLMessageViewController.h"
 #import "CYLMainRootViewController.h"
+#import "CYLPlusButtonSubclass.h"
+#import "MainTabBarController.h"
 #import <MJRefresh/MJRefresh.h>
 
 @implementation CYLMessageViewController
@@ -50,6 +52,11 @@
 }
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
+    if (0 == indexPath.row) {
+        // The second row of the demo pushes a tab bar controller of the SAME context, see `-tableView:didSelectRowAtIndexPath:`.
+        [[cell textLabel] setText:@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）"];
+        return;
+    }
     [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController on iOS %@", self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
 
 }
@@ -80,7 +87,23 @@
     //    [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimationTypeScale];
     //    [self pushToNewViewController];
 
-        CYLTabBarController *tabBarController = [[CYLMainRootViewController new] createNewTabBarWithContext:NSStringFromClass([self class])];
+    // Same logic as the plus button's "Switch Style" menu: a tab bar controller that shows the OTHER plus button (another
+    // context). The tab bar controller we push from keeps its own, both are registered at the same time.
+    // 与 PlusButton“切换样式”菜单相同的逻辑：push 一个显示 **另一个** PlusButton（另一个 context）的 TabBarController。
+    // 当前的 TabBarController 保留自己的 PlusButton，两个同时注册。
+    MainTabBarController *tabBarController = nil;
+    if (0 == indexPath.row) {
+        // A tab bar controller with the SAME context as the one we push from, without registering again: it gets its
+        // own instance of the same plus button class, and the one we push from keeps its plus button.
+        // 与当前 TabBarController **相同** context 的 TabBarController，不重新注册：它得到同一个 PlusButton 类的另一个实例，
+        // 当前的 TabBarController 保留自己的 PlusButton。
+        tabBarController = [[MainTabBarController alloc] initWithContext:self.cyl_tabBarController.cyl_context];
+        tabBarController.allowsVerticalBar = YES;
+    } else {
+        Class plusButtonClass = [CYLPlusButtonSubclass alternatePlusButtonClassForOwner:self];
+        tabBarController = [CYLMainRootViewController newLiquidGlassTabBarControllerWithPlusButtonClass:plusButtonClass];
+    }
+    tabBarController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:tabBarController animated:YES];
 }
 

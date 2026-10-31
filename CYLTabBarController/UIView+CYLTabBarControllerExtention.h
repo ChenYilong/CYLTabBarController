@@ -255,4 +255,47 @@ NS_ASSUME_NONNULL_BEGIN
 + (UIView *)cyl_tabBadgePointViewWithClolor:(UIColor *)color radius:(CGFloat)radius CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
 @end
 
+#pragma mark - Per tab bar metrics
+
+/*!
+ * [EN] Numbers a tab bar lays out with, kept PER tab bar. They used to be the globals `CYLTabbarItemsCount`,
+ *      `CYLTabBarItemWidth`, ..., which the tab bar controller created last wrote, so a tab bar with 5 items laid out
+ *      with the 3 of the one pushed after it (issues #414, #489). The globals are still written (they hold what was
+ *      written last, for code that reads them) but the library reads these. Available on every tab bar, the system
+ *      one and the flat design one.
+ * [CN] TabBar 布局时使用的数值，**每个 TabBar 各自保存**。它们以前是全局变量 `CYLTabbarItemsCount`、`CYLTabBarItemWidth` 等，
+ *      最后创建的 TabBarController 会改写它们，导致 5 个 item 的 TabBar 按后面 push 进来的 3 个 item 来布局（issue #414、#489）。
+ *      全局变量仍会被写入（保留最后写入的值，供读取它们的代码使用），但库内部读取的是这里的值。系统样式和扁平样式的 TabBar 都可用。
+ */
+@interface UIView (CYLTabBarMetrics)
+
+/*!
+ * [EN] The number of view controllers (tabs) of the tab bar controller this tab bar belongs to. Falls back to the global `CYLTabbarItemsCount` until set.
+ * [CN] 本 TabBar 所属 TabBarController 的 ViewController（Tab）个数。设置之前取全局变量 `CYLTabbarItemsCount`。
+ */
+@property (nonatomic, assign, getter=cyl_tabbarItemsCount, setter=cyl_setTabbarItemsCount:) NSUInteger cyl_tabbarItemsCount;
+
+/*!
+ * [EN] The width of one tab of this tab bar. Falls back to the global `CYLTabBarItemWidth` until set.
+ * [CN] 本 TabBar 中单个 Tab 的宽度。设置之前取全局变量 `CYLTabBarItemWidth`。
+ */
+@property (nonatomic, assign, getter=cyl_tabBarItemWidth, setter=cyl_setTabBarItemWidth:) CGFloat cyl_tabBarItemWidth;
+
+/*!
+ * [EN] The index of the plus button in this tab bar: `+indexForTabbarItemsCount:` of the plus button registered for this
+ *      tab bar's context, for this tab bar's `cyl_tabbarItemsCount`. The global `CYLPlusButtonIndex` if there is no such plus button.
+ * [CN] PlusButton 在本 TabBar 中的索引：用本 TabBar 的 `cyl_tabbarItemsCount`，调用本 TabBar 所属 context 对应 PlusButton 的
+ *      `+indexForTabbarItemsCount:`。没有对应 PlusButton 时取全局变量 `CYLPlusButtonIndex`。
+ */
+- (NSUInteger)cyl_plusButtonIndex;
+
+/*!
+ * [EN] The width of the plus button registered for this tab bar's context, 0 if there is none.
+ * [CN] 本 TabBar 所属 context 对应的 PlusButton 的宽度，没有则为 0。
+ */
+- (CGFloat)cyl_plusButtonWidth;
+
+@end
+
+
 NS_ASSUME_NONNULL_END

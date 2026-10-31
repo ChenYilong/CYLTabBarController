@@ -27,7 +27,7 @@
 #endif
 
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 #import <CYLTabBarController/CYLFlatDesignTabBar.h>
 #import "CYLFlatDesignTabBar.h"
 
@@ -41,7 +41,7 @@
 //#import "CYLFlatDesignTabBarHideTabBar.h"
 
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 //#import <CYLTabBarController/CYLTabBarController.h>
 #import <CYLTabBarController/CYLFlatDesignTabBarItem.h>
 #import <CYLTabBarController/UINavigationController+CYLFlatDesignTabBarPrivate.h>
@@ -74,6 +74,7 @@ NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;
 CGFloat CYLTabBarItemWidth = 0.0f;
 CGFloat CYLTabBarHeight = 49.0f;
+static const CGFloat kCYLDefaultTabBarHeight = 49.0f;
 
 NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDidChangeNotification";
 NSString *const CYLTabBarItemLottieAnimationPlayingNotification = @"CYLTabBarItemLottieAnimationPlayingNotification";
@@ -82,7 +83,7 @@ NSString *const CYLTabBarStyleTypeDidChangeNotification = @"CYLTabBarStyleTypeDi
 static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageViewDefaultOffsetContext;
 //static void * const CYLTabBarControllerVisiableItemsCountContext = (void*)&CYLTabBarControllerVisiableItemsCountContext;
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 CGFloat const CYLFlatDesignUITabBarControllerHideShowBarDuration = 0.2;
 
 /*!
@@ -112,7 +113,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @property (nonatomic, strong) CYLTabBar *tabBar;
 @property (nonatomic, assign, readonly) CGRect tabBarFrame;
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 @property (nonatomic, strong) NSMutableArray<CYLFlatDesignTabBarItem *> *items;
 @property (nonatomic, assign) BOOL cyl_tabBarHidden;
 - (void)_cyl_refreshSystemTabBarVisibilityIfNeeded;
@@ -122,8 +123,18 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 #endif
 @end
 
+/// Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
+typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController);
+
+/// Implemented below (CYLActiveTabBarController): the registry of live tab bar controllers.
+@interface CYLTabBarController (CYLActiveTabBarControllerPrivate)
++ (void)cyl_registerTabBarController:(CYLTabBarController *)tabBarController;
++ (void)cyl_markTabBarControllerActive:(CYLTabBarController *)tabBarController;
++ (CYLTabBarController *)cyl_tabBarControllerForContext:(NSString *)context matching:(CYLTabBarControllerMatcher)matcher;
+@end
+
 @implementation CYLTabBarController {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     struct {
         unsigned willShowTabBar : 1;
         unsigned didShowTabBar : 1;
@@ -154,7 +165,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @synthesize selectedViewController = _selectedViewController;
 @dynamic tabBar;
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 //@synthesize viewControllers = _viewControllers;
 @synthesize selectedIndex = _selectedIndex;
 @dynamic delegate;
@@ -166,7 +177,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 #pragma mark -
 #pragma mark - Life Cycle
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 - (void)_cyl_refreshSystemTabBarVisibilityIfNeeded {
     if (@available(iOS 27.1, *)) {
         if (_cylRefreshingSystemTabBarVisibility || self.tabBarStyleType != CYLTabBarStyleTypeFlatDesign ||
@@ -226,6 +237,17 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
     [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
 }
 #endif
+
+/*!
+ * [EN] Every style: this controller becomes the most recently active one (`+cyl_activeTabBarController`), which
+ *      `-cyl_tabBarController` falls back to for an object that is not inside any tab bar controller.
+ * [CN] 所有样式：本控制器成为最近活跃的控制器（`+cyl_activeTabBarController`），对象不在任何 TabBarController 内时，
+ *      `-cyl_tabBarController` 会回退到它。
+ */
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [CYLTabBarController cyl_markTabBarControllerActive:self];
+}
 
 
 - (void)tabChangedToControl:(UIControl *)control {
@@ -492,8 +514,11 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
     
     
         if ([CYLConstants isLiquidGlassActive] && ([self hasPlusButton]) && [self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
-            UIControl *plusControlOrigin = [self.cyl_tabBar cyl_platterContentViewWithIndex:CYLExternPlusButton.cyl_tabBarItemVisibleIndex];
-            UIButton *selectedCover = CYLExternPlusButton.selectedContentView;
+            // The plus button of THIS tab bar controller's context, captured here for the delayed blocks below.
+            // 本 TabBarController 所属 context 的 PlusButton，在这里取出供下面延迟执行的 block 使用。
+            CYLPlusButton<CYLPlusButtonSubclassing> *contextPlusButton = [self cyl_contextPlusButton];
+            UIControl *plusControlOrigin = [self.cyl_tabBar cyl_platterContentViewWithIndex:contextPlusButton.cyl_tabBarItemVisibleIndex];
+            UIButton *selectedCover = contextPlusButton.selectedContentView;
             UIControl *plusSelectedControl = plusControlOrigin.cyl_platterSelectedControl;
             [plusControlOrigin.cyl_tabImageView cyl_setHidden:YES];
             [plusControlOrigin.cyl_swappableImageViewViewInTabBarButton cyl_setHidden:YES];
@@ -519,13 +544,13 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
                      │
                      └── CYLPlusButtonSubclass
                      */
-                    UIView *platterView = CYLExternPlusButton.superview;
+                    UIView *platterView = contextPlusButton.superview;
                     UIView *selectedContainerView = selectedCover.superview;
                 
                     if (platterView && selectedContainerView) {
                     
                         CGPoint convertedCenter =
-                        [selectedContainerView convertPoint:CYLExternPlusButton.center
+                        [selectedContainerView convertPoint:contextPlusButton.center
                                                    fromView:platterView];
                     
                         selectedCover.center = convertedCenter;
@@ -547,7 +572,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         if (!_tabBarIsAnimating && !CGRectEqualToRect(self.cyl_tabBar.frame, self.tabBarFrame) && self.cyl_tabBar.superview == self.view) {
             //目的是动态更新tabbar高度 ， 测试方法为 修改 tabBarController.tabBarHeight ， 预期为实时跟新UI中的tabbar高度。// The goal is to dynamically update the tab bar height. The test method involves modifying `tabBarController.tabBarHeight`; the expected result is that the tab bar height in the UI updates in real time.
@@ -619,7 +644,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
         }
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if ([_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {     return self.selectedViewController.supportedInterfaceOrientations; }
         return self.selectedViewController.supportedInterfaceOrientations;
 #else
@@ -631,12 +656,18 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)dealloc {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     
-        [self removePlusButtonIfNeeded];
+        // `-removePlusButtonIfNeeded` used to run here: it removed the registered plus button when its context differed from
+        // this controller's, which with several tab bar controllers (each with its own plus button) unregistered a plus
+        // button that another controller still shows. A controller only uses the plus button of its own context
+        // (`-hasPlusButton`, so the contexts were equal and it removed nothing). Removed (#414).
+        // 这里原先会执行 `-removePlusButtonIfNeeded`：当已注册 PlusButton 的 context 与本控制器不同时将其移除，存在多个 TabBarController
+        // （各自有自己的 PlusButton）时，会注销另一个控制器仍在展示的 PlusButton。控制器只使用自己 context 的 PlusButton
+        // （`-hasPlusButton`，因此 context 本来就相同，什么也不会移除）。已删除（#414）。
         /// MARK: 这里是全局处理，如果生成新的，这里操作时会破坏新的视图展示
         //    BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
         //    BOOL hasPlusChildViewController = [self hasPlusChildViewController] && isAdded;
-        //    if (isAdded && hasPlusChildViewController && CYLPlusChildViewController.cyl_plusViewControllerEverAdded == YES) {
-        //        [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:NO];
+        //    if (isAdded && hasPlusChildViewController && [self cyl_contextPlusChildViewController].cyl_plusViewControllerEverAdded == YES) {
+        //        [[self cyl_contextPlusChildViewController] cyl_setPlusViewControllerEverAdded:NO];
         //    }
         // KVO反注册
         if (self.cyl_tabBar && self.isObservingTabImageViewDefaultOffset) {
@@ -646,7 +677,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 
     //CYLTabBarStyleTypeFlatDesign
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         [self cyl_removeObserver:self forKeyPath:@"cyl_tabBar"];
 #else
@@ -657,7 +688,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 #pragma mark - Overrides
 
 - (BOOL)isTabBarHidden {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     return self.cyl_tabBarHidden;
 #else
     return NO;
@@ -671,7 +702,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)setTabBarHidden:(BOOL)hidden animated:(BOOL)animated {
     //CYLTabBarStyleTypeFlatDesign
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
                 
         // 隐藏系统 tabBar
@@ -827,7 +858,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
     BOOL showsTabBar = YES;
     //CYLTabBarStyleTypeFlatDesign
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return showsTabBar; }
         UIViewController *selectedViewController = self.selectedViewController;
         if ([self _showsMoreNavigationController]) {
@@ -865,7 +896,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
     return showsTabBar;
 }
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 - (void)setDelegate:(id<CYLTabBarControllerDelegate, CYLFlatDesignUITabBarControllerDelegate>)delegate {
 
 #else
@@ -875,7 +906,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
         [super setDelegate:delegate];
     
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
             if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
             _delegateHas.willShowTabBar = [delegate respondsToSelector:@selector(tabBarController:willShowTabBar:)];
             _delegateHas.didShowTabBar = [delegate respondsToSelector:@selector(tabBarController:didShowTabBar:)];
@@ -891,7 +922,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
                              idx:(NSUInteger)idx {
     
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         NSString *title = nil;
         id normalImageInfo = nil;
@@ -904,7 +935,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
         NSString *lottieFilePath = nil;
                 
         NSValue *lottieSizeValue = nil;
-        if (viewController != CYLPlusChildViewController) {
+        if (viewController != [self cyl_contextPlusChildViewController]) {
                     
             if (_tabBarItemsAttributes.count > idx) {
                 if (@available(iOS 13.0, *)) {
@@ -986,7 +1017,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
                   lottieSizeValue:(NSValue *)lottieSizeValue {
     
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
                 
         UIImage *normalImage = [UIImage cyl_imageNamed:normalImageInfo];
@@ -1128,24 +1159,6 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
     return UIViewContentModeScaleAspectFit;
 }
 
-- (void)removePlusButtonIfNeeded {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    if (!self.hasPlusButton) {
-        return;
-    }
-    if ([[CYLExternPlusButton class] respondsToSelector:@selector(tabBarContext)]) {
-        NSString *plusButtonContext = [[CYLExternPlusButton class] performSelector:@selector(tabBarContext)];
-        if (plusButtonContext && ![self.cyl_context isEqualToString:plusButtonContext]) {
-            // contexts differ; remove PlusButton
-            if ([[CYLExternPlusButton class] respondsToSelector:@selector(removePlusButton)]) {
-                [[CYLExternPlusButton class] performSelector:@selector(removePlusButton)];
-            }
-        }
-    }
-    
-} else {/**  CYLTabBarStyleTypeFlatDesign*/}
-}
-
 + (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
                               tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
                                         imageInsets:(UIEdgeInsets)imageInsets
@@ -1220,36 +1233,38 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
  */
 - (void)alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:(NSArray *)viewControllers {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        if (![self.cyl_tabBar hasPlusButton]) {
+        // Asked of this controller, which the plus button is bound to, not of its tab bar.
+        if (![self hasPlusButton]) {
             _viewControllers = viewControllers;
             return;
         }
         UIViewController *viewController = nil;
         NSInteger index = NSNotFound;
         if ([self hasPlusChildViewController]) {
-            viewController = CYLPlusChildViewController;
-            //        index = CYLPlusButtonIndex;
+            viewController = [self cyl_contextPlusChildViewController];
+            //        index = [self.cyl_tabBar cyl_plusButtonIndex];
         } else {
             UIViewController *placeholderViewController = [UIViewController new];
             [placeholderViewController cyl_setIsPlaceholder:YES];
             viewController = placeholderViewController;
         }
         _viewControllers = [[self alignViewControllers:viewControllers withPlusButtonViewControllerPlaceholder:viewController] copy];
-        [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:index];
+        [[self cyl_contextPlusButton] cyl_setTabBarChildViewControllerIndex:index];
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 
     //CYLTabBarStyleTypeFlatDesign
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        if (![self.cyl_tabBar hasPlusButton]) {
+        // Asked of this controller, which the plus button is bound to, not of its tab bar.
+        if (![self hasPlusButton]) {
             _viewControllers = viewControllers;
             return;
         }
         UIViewController *viewController = nil;
         NSInteger index = NSNotFound;
         if ([self hasPlusChildViewController]) {
-            viewController = CYLPlusChildViewController;
+            viewController = [self cyl_contextPlusChildViewController];
         } else {
             UIViewController *placeholderViewController = [UIViewController new];
             [placeholderViewController cyl_setIsPlaceholder:YES];
@@ -1257,10 +1272,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         }
            
 
-        index = CYLPlusButtonIndex;
+        index = [self.cyl_tabBar cyl_plusButtonIndex];
         _viewControllers = [[self alignViewControllers:viewControllers withPlusButtonViewControllerPlaceholder:viewController] copy];
                 
-        [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:index];
+        [[self cyl_contextPlusButton] cyl_setTabBarChildViewControllerIndex:index];
         
 #else
 #endif
@@ -1275,7 +1290,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         if (!plusButtonViewControllerPlaceholder) {
             return [arrayWithoutPlusButton mutableCopy];
         }
-        if (![self.cyl_tabBar hasPlusButton]) {
+        // Asked of this controller, which the plus button is bound to, not of its tab bar.
+        if (![self hasPlusButton]) {
             return [arrayWithoutPlusButton mutableCopy];
         }
         NSMutableArray *arrayWithPlusButton = nil;
@@ -1285,16 +1301,16 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             arrayWithPlusButton = (NSMutableArray *)arrayWithoutPlusButton;
         }
         NSInteger index = NSNotFound;
-        if (plusButtonViewControllerPlaceholder && (plusButtonViewControllerPlaceholder == CYLPlusChildViewController)) {
-            //        index = CYLPlusButtonIndex;
+        if (plusButtonViewControllerPlaceholder && (plusButtonViewControllerPlaceholder == [self cyl_contextPlusChildViewController])) {
+            //        index = [self.cyl_tabBar cyl_plusButtonIndex];
         }
     
-        NSInteger plusButtonIndex = (index != NSNotFound) ? CYLPlusButtonIndex : arrayWithoutPlusButton.count / 2;
+        NSInteger plusButtonIndex = (index != NSNotFound) ? [self.cyl_tabBar cyl_plusButtonIndex] : arrayWithoutPlusButton.count / 2;
     
         if (arrayWithPlusButton.count > plusButtonIndex) {
             [arrayWithPlusButton insertObject:plusButtonViewControllerPlaceholder atIndex:plusButtonIndex];
             //FIXME:  to delete 液态玻璃暂时不支持自定义PlusButton位置。
-            [CYLExternPlusButton cyl_setTabBarItemVisibleIndex:plusButtonIndex];
+            [[self cyl_contextPlusButton] cyl_setTabBarItemVisibleIndex:plusButtonIndex];
             [self cyl_addChildViewController:plusButtonViewControllerPlaceholder];
         }
         return arrayWithPlusButton;
@@ -1302,12 +1318,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
     //CYLTabBarStyleTypeFlatDesign
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return [arrayWithoutPlusButton mutableCopy]; }
         if (!plusButtonViewControllerPlaceholder) {
             return [arrayWithoutPlusButton mutableCopy];
         }
-        if (![self.cyl_tabBar hasPlusButton]) {
+        // Asked of this controller, which the plus button is bound to, not of its tab bar.
+        if (![self hasPlusButton]) {
             return [arrayWithoutPlusButton mutableCopy];
         }
         NSMutableArray *arrayWithPlusButton = nil;
@@ -1317,13 +1334,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             arrayWithPlusButton = (NSMutableArray *)arrayWithoutPlusButton;
         }
         NSInteger index = NSNotFound;
-        //    if (plusButtonViewControllerPlaceholder && (plusButtonViewControllerPlaceholder == CYLPlusChildViewController)) {
-        index = CYLPlusButtonIndex;
+        //    if (plusButtonViewControllerPlaceholder && (plusButtonViewControllerPlaceholder == [self cyl_contextPlusChildViewController])) {
+        index = [self.cyl_tabBar cyl_plusButtonIndex];
         //    }
-        NSInteger plusButtonIndex = (index != NSNotFound) ? CYLPlusButtonIndex : arrayWithoutPlusButton.count / 2;
+        NSInteger plusButtonIndex = (index != NSNotFound) ? [self.cyl_tabBar cyl_plusButtonIndex] : arrayWithoutPlusButton.count / 2;
         if (arrayWithPlusButton.count > plusButtonIndex) {
             [arrayWithPlusButton insertObject:plusButtonViewControllerPlaceholder atIndex:plusButtonIndex];
-            [CYLExternPlusButton cyl_setTabBarItemVisibleIndex:plusButtonIndex];
+            [[self cyl_contextPlusButton] cyl_setTabBarItemVisibleIndex:plusButtonIndex];
             [self cyl_addChildViewController:plusButtonViewControllerPlaceholder];
         }
                 
@@ -1345,19 +1362,20 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (void)alignTabControlIfNeededWithViewControllers:(NSArray *)viewControllers {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     
-        if (![self.cyl_tabBar hasPlusButton]) {
+        // Asked of this controller, which the plus button is bound to, not of its tab bar.
+        if (![self hasPlusButton]) {
             _viewControllers = [viewControllers copy];
             return;
         }
         [self doubleCheckTabControlAlignWithViewControllers:_viewControllers ?: viewControllers];
         BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
-        BOOL addedFlag = [CYLPlusChildViewController cyl_plusViewControllerEverAdded];
+        BOOL addedFlag = [[self cyl_contextPlusChildViewController] cyl_plusViewControllerEverAdded];
         BOOL hasPlusChildViewController = [self hasPlusChildViewController] && !isAdded && !addedFlag;
         if (hasPlusChildViewController) {
             [self alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:viewControllers];
-            [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:YES];
+            [[self cyl_contextPlusChildViewController] cyl_setPlusViewControllerEverAdded:YES];
         } else {
-            [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:NSNotFound];
+            [[self cyl_contextPlusButton] cyl_setTabBarChildViewControllerIndex:NSNotFound];
         }
     
         if (![CYLConstants isLiquidGlassActive]) {
@@ -1397,21 +1415,22 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
     //CYLTabBarStyleTypeFlatDesign
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        if (![self.cyl_tabBar hasPlusButton]) {
+        // Asked of this controller, which the plus button is bound to, not of its tab bar.
+        if (![self hasPlusButton]) {
             _viewControllers = [viewControllers copy];
             return;
         }
         [self doubleCheckTabControlAlignWithViewControllers:_viewControllers ?: viewControllers];
         BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
-        BOOL addedFlag = [CYLPlusChildViewController cyl_plusViewControllerEverAdded];
+        BOOL addedFlag = [[self cyl_contextPlusChildViewController] cyl_plusViewControllerEverAdded];
         BOOL hasPlusChildViewController = [self hasPlusChildViewController] && !isAdded && !addedFlag;
         if (hasPlusChildViewController) {
             [self alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:viewControllers];
-            [CYLPlusChildViewController cyl_setPlusViewControllerEverAdded:YES];
+            [[self cyl_contextPlusChildViewController] cyl_setPlusViewControllerEverAdded:YES];
         } else {
-            [CYLExternPlusButton cyl_setTabBarChildViewControllerIndex:NSNotFound];
+            [[self cyl_contextPlusButton] cyl_setTabBarChildViewControllerIndex:NSNotFound];
         }
         
         //        if (![CYLConstants isLiquidGlassActive]) {
@@ -1538,12 +1557,30 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
 
+/*!
+ * [EN] The plus button and the plus child view controller are bound to the tab bar controller, by its `context`: the
+ *      registry of `CYLPlusButton` is asked here. The tab bar (system or flat design) does not hold the binding, it asks
+ *      this controller (`+[CYLPlusButton plusButtonForOwner:]`), so both always agree.
+ * [CN] PlusButton 与 PlusButton 子控制器绑定的是 TabBarController，通过它的 `context`：这里直接查询 `CYLPlusButton` 的注册表。
+ *      TabBar（系统样式或扁平样式）不保存绑定关系，而是向这个控制器询问（`+[CYLPlusButton plusButtonForOwner:]`），因此两者始终一致。
+ */
 - (BOOL)hasPlusButton {
-    return [self.cyl_tabBar hasPlusButton];
+    return [self cyl_contextPlusButton] != nil;
+}
+
+/// The plus button bound to this controller: the one registered for its `context`, or, when another tab bar controller of
+/// that context already shows it, this controller's own (`+[CYLPlusButton plusButtonForOwner:]`).
+- (CYLPlusButton<CYLPlusButtonSubclassing> *)cyl_contextPlusButton {
+    return [CYLPlusButton plusButtonForOwner:self];
+}
+
+/// The plus child view controller bound to this controller, see `-cyl_contextPlusButton`.
+- (UIViewController *)cyl_contextPlusChildViewController {
+    return [CYLPlusButton plusChildViewControllerForOwner:self];
 }
 
 - (NSUInteger)allItemsInTabBarCount {
-    NSUInteger allItemsInTabBar = CYLTabbarItemsCount;
+    NSUInteger allItemsInTabBar = [self.cyl_tabBar cyl_tabbarItemsCount];
     if ([self hasPlusButton]) {
         allItemsInTabBar += 1;
     }
@@ -1568,7 +1605,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     UIView *superView = selected.view.superview;
     NSMutableArray<UIViewController *> *viewControllers = [_viewControllers mutableCopy];
     if ([self hasPlusChildViewController]) {
-        [viewControllers removeObjectAtIndex:CYLPlusButtonIndex];
+        [viewControllers removeObjectAtIndex:[self.cyl_tabBar cyl_plusButtonIndex]];
     }
     [self setViewControllers:viewControllers];
     [self.view setNeedsLayout];
@@ -1641,21 +1678,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (BOOL)hasPlusChildViewController {
-    BOOL hasPlusChildViewControllerBool = NO;
-    
-    /*!
-     *     SEL action = @selector(hasPlusChildViewController);
-        if ([self.cyl_tabBar respondsToSelector:action]) {
-            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-            (
-             hasPlusChildViewControllerBool = [self.cyl_tabBar performSelector:action];
-                                                    )
-        }
-
-     */
-    CYL_PERFORM_SELECTOR_BOOL(self.cyl_tabBar, hasPlusChildViewController, hasPlusChildViewControllerBool);
-    
-    return hasPlusChildViewControllerBool;
+    // Bound to this controller by its `context`, see `-hasPlusButton`.
+    // 通过本控制器的 `context` 绑定，见 `-hasPlusButton`。
+    return [self cyl_contextPlusChildViewController] != nil;
 }
 
 - (BOOL)isPlusViewControllerAdded:(NSArray *)viewControllers {
@@ -1691,7 +1716,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         return;
     }
     if ([_viewControllers containsObject:childController] ||
-        childController == CYLPlusChildViewController ||
+        childController == [self cyl_contextPlusChildViewController] ||
         childController.cyl_isPlaceholder) {
         return;
     }
@@ -1712,7 +1737,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     }
     NSUInteger tabCount = 0;
     for (UIViewController *viewController in _viewControllers) {
-        if (viewController == CYLPlusChildViewController || viewController.cyl_isPlaceholder) {
+        if (viewController == [self cyl_contextPlusChildViewController] || viewController.cyl_isPlaceholder) {
             continue;
         }
         tabCount++;
@@ -1726,9 +1751,16 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 #endif
 
 - (void)setViewControllers:(NSArray<__kindof UIViewController *> *)viewControllers {
+    // Known from now on (`+cyl_tabBarControllerForContext:`), but not "active" until it appears. Only with view
+    // controllers: a nil / empty array is also what a tear-down sends, when no weak reference may be formed.
+    // 从现在起可以被查到（`+cyl_tabBarControllerForContext:`），但在显示之前不算“活跃”。只在有 viewControllers 时记录：
+    // 销毁过程中传入的也是 nil / 空数组，此时不能再建立弱引用。
+    if (viewControllers.count > 0) {
+        [CYLTabBarController cyl_registerTabBarController:self];
+    }
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     
-        //#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+        //#if CYL_FLATDESIGN_AVAILABLE
         //    CYLFlatDesignTabBar *pureCustomTabBar;
         //    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         //        pureCustomTabBar = [CYLFlatDesignTabBar new];
@@ -1745,9 +1777,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
             BOOL hasPlusChildViewController = [self hasPlusChildViewController] && !isAdded;
             if (hasPlusChildViewController) {
-                [CYLPlusChildViewController willMoveToParentViewController:nil];
-                [CYLPlusChildViewController.view removeFromSuperview];
-                [CYLPlusChildViewController removeFromParentViewController];
+                [[self cyl_contextPlusChildViewController] willMoveToParentViewController:nil];
+                [[self cyl_contextPlusChildViewController].view removeFromSuperview];
+                [[self cyl_contextPlusChildViewController] removeFromParentViewController];
             }
             // FIX: issue #608
             // [EN] Re-assigning `viewControllers` (e.g. a new set of tabs after login) crashed on the next tap on iOS 16 with
@@ -1780,7 +1812,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         [self cyl_logTabBarItemsAttributesMismatchIfNeeded];
 #endif
     
-        CYLTabbarItemsCount = [viewControllers count];
+        [self.cyl_tabBar cyl_setTabbarItemsCount:[viewControllers count]];
         if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
             _viewControllers = viewControllers;
             return;
@@ -1788,7 +1820,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         }
         CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
 
-        CYLTabBarItemWidth = (cyl_tabBar.cyl_boundsSize.width - CYLPlusButtonWidth) / (CYLTabbarItemsCount);
+        [cyl_tabBar cyl_setTabBarItemWidth:(cyl_tabBar.cyl_boundsSize.width - cyl_tabBar.cyl_plusButtonWidth) / (cyl_tabBar.cyl_tabbarItemsCount)];
         NSUInteger idx = 0;
         for (UIViewController *viewController in _viewControllers) {
             NSString *title = nil;
@@ -1801,7 +1833,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             NSString *lottieFilePath = nil;
         
             NSValue *lottieSizeValue = nil;
-            if (viewController != CYLPlusChildViewController) {
+            if (viewController != [self cyl_contextPlusChildViewController]) {
                 if (_tabBarItemsAttributes.count > idx) {
                     if (@available(iOS 13.0, *)) {
                         //fix https://github.com/ChenYilong/CYLTabBarController/issues/437
@@ -1861,8 +1893,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             //            //已经在addOneChildViewController 中操作， 这里无需重复处理
             //            // [self addChildViewController:viewController];
             //
-            //            if (!viewController.cyl_isPlaceholder && ![viewController cyl_isEqualToViewController:CYLPlusChildViewController]) {
-            //#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+            //            if (!viewController.cyl_isPlaceholder && ![viewController cyl_isEqualToViewController:[self cyl_contextPlusChildViewController]]) {
+            //#if CYL_FLATDESIGN_AVAILABLE
             //                pureCustomTabBar.delegate = self;
             //                CYLFlatDesignTabBarItem *tabItem = [pureCustomTabBar addItemWithTitle:title
             //                                                                      tabBarItemImage:normalImageInfo
@@ -1890,7 +1922,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         _needsReloadItems = YES;
         __weak __typeof(self) weakSelf = self;
@@ -1904,10 +1936,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             [childVC cyl_setTabButton:childVC.cyl_tabBarItem.tabBarButton];
             //TODO: if (_tabBarItemsAttributes.count > idx)
         }];
-        CYLTabbarItemsCount = [viewControllers count];
-        if (0 == CYLPlusButtonIndex) {
-            CYLPlusButtonIndex = [[CYLExternPlusButton class] indexForTabbarItemsCount:CYLTabbarItemsCount];
-        }
+        [self.cyl_tabBar cyl_setTabbarItemsCount:[viewControllers count]];
+        // Legacy global (what was written last); this tab bar's own index is `-[UIView cyl_plusButtonIndex]`.
+        CYLPlusButtonIndex = [self.cyl_tabBar cyl_plusButtonIndex];
         [super setViewControllers:viewControllers];
         if (@available(iOS 27.1, *)) {
             _cylDidRefreshSystemTabBarVisibility = NO;
@@ -2053,7 +2084,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 #pragma mark - Observe
     //CYLTabBarStyleTypeFlatDesign
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         if ([keyPath isEqualToString:@"cyl_tabBar"]) {
             CYLFlatDesignTabBar *oldTabBar = change[NSKeyValueChangeOldKey];
@@ -2103,15 +2134,15 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     [self updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController shouldSelect:should];
     CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
     if (should && [tabBar cyl_shouldUpdateHiddenStatueForPlusButtonLabel]) {
-        if ([viewController isEqual:CYLPlusChildViewController]) {
-            [CYLExternPlusButton setTabLabelHidden:YES];
+        if ([viewController isEqual:[self cyl_contextPlusChildViewController]]) {
+            [[self cyl_contextPlusButton] setTabLabelHidden:YES];
         } else {
-            [CYLExternPlusButton setTabLabelHidden:NO];
+            [[self cyl_contextPlusButton] setTabLabelHidden:NO];
         }
     }
-    if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController] && [tabBar cyl_shouldUpdateHiddenStatueForPlusButtonLabel]) {
+    if ([tabBarController.selectedViewController isEqual:[self cyl_contextPlusChildViewController]] && [tabBar cyl_shouldUpdateHiddenStatueForPlusButtonLabel]) {
         if (!should) {
-            [CYLExternPlusButton setTabLabelHidden:YES];
+            [[self cyl_contextPlusButton] setTabLabelHidden:YES];
         }
     }
 
@@ -2126,7 +2157,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     if (!shouldSelect) {
         return;
     }
-    UIButton *plusButton = CYLExternPlusButton;
+    UIButton *plusButton = [self cyl_contextPlusButton];
     if (!viewController) {
         viewController = self.selectedViewController;
     }
@@ -2134,7 +2165,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
         return;
     }
     
-    BOOL isCurrentViewController = [viewController cyl_isEqualToViewController:CYLPlusChildViewController];
+    BOOL isCurrentViewController = [viewController cyl_isEqualToViewController:[self cyl_contextPlusChildViewController]];
     BOOL shouldConfigureSelectionStatus = (!isCurrentViewController);
     
     if (plusButton.selected) {
@@ -2197,7 +2228,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
         return YES;
     }
 
-    if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController] && ![tabBarController.tabBar isPlusButtonLayoutCentered]) {
+    if ([tabBarController.selectedViewController isEqual:[self cyl_contextPlusChildViewController]] && ![tabBarController.tabBar isPlusButtonLayoutCentered]) {
         return NO;
     }
     return YES;
@@ -2250,7 +2281,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
         if (![control cyl_isPlusControl]) {
             [self.cyl_tabBar cyl_setSelectedControl:selectedContentControl  ?: contentControl];
         } else {
-            [self.cyl_tabBar cyl_setSelectedControl:CYLExternPlusButton];
+            [self.cyl_tabBar cyl_setSelectedControl:[self cyl_contextPlusButton]];
         }
         
         if (shouldSelectViewController) {
@@ -2410,7 +2441,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 - (UIView __kindof *)cyl_tabBar {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
             _cyl_tabBar = nil;
         }
@@ -2446,7 +2477,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
             _cyl_tabBar = nil;
         }
@@ -2460,6 +2491,9 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
             
             CYLFlatDesignTabBar *flatDesignTabBar = [[CYLFlatDesignTabBar alloc] initWithFrame:self.tabBarFrame];
             flatDesignTabBar.delegate = self;
+            // `-setContext:` usually ran before this tab bar existed (it only copies the context to an existing one).
+            // `-setContext:` 通常在本 TabBar 创建之前就执行了（它只会复制给已存在的 TabBar）。
+            flatDesignTabBar.context = self.cyl_context;
             _cyl_tabBar = (UIView *)flatDesignTabBar;
             _cylDidRefreshSystemTabBarVisibility = NO;
             _cylRefreshedSystemTabBarWindow = nil;
@@ -2508,7 +2542,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 
     //CYLTabBarStyleTypeFlatDesign
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         self.cyl_context = context;
         @try {
@@ -2523,15 +2557,12 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 #endif
         }
         
-        if ([[CYLExternPlusButton class] respondsToSelector:@selector(tabBarContext)]) {
-            NSString *plusButtonContext = [[CYLExternPlusButton class] performSelector:@selector(tabBarContext)];
-            if (plusButtonContext && ![self.cyl_context isEqualToString:plusButtonContext]) {
-                // contexts differ; remove PlusButton
-                if ([[CYLExternPlusButton class] respondsToSelector:@selector(removePlusButton)]) {
-                    [[CYLExternPlusButton class] performSelector:@selector(removePlusButton)];
-                }
-            }
-        }
+        // A plus button registered for ANOTHER context used to be removed here. With several tab bar controllers, each with its
+        // own context and plus button, that unregistered the plus button of the other one as soon as this one loaded (#414).
+        // This tab bar controller only uses the plus button of its own context (`-hasPlusButton`), nothing to remove.
+        // 这里曾经会移除为 **其他** context 注册的 PlusButton。存在多个 TabBarController（各自有 context 和 PlusButton）时，
+        // 一个 TabBarController 加载就会把另一个的 PlusButton 注销（#414）。本 TabBarController 只使用自己 context 的 PlusButton
+        // （`-hasPlusButton`），不需要移除任何东西。
 #else
 #endif
         
@@ -2574,7 +2605,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         
         if (_tabBarHeight != tabBarHeight) {
@@ -2591,17 +2622,21 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 - (CGFloat)tabBarHeight {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         if (0 == _tabBarHeight) {
-            _tabBarHeight = CYLTabBarHeight;
+            // Not the global `CYLTabBarHeight`: another tab bar controller with a custom height wrote it.
+            // 不使用全局变量 `CYLTabBarHeight`：其他设置了自定义高度的 TabBarController 会改写它。
+            _tabBarHeight = kCYLDefaultTabBarHeight;
         }
         return _tabBarHeight;
         
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
     
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return _tabBarHeight; }
         if (0 == _tabBarHeight) {
-            _tabBarHeight = CYLTabBarHeight;
+            // Not the global `CYLTabBarHeight`: another tab bar controller with a custom height wrote it.
+            // 不使用全局变量 `CYLTabBarHeight`：其他设置了自定义高度的 TabBarController 会改写它。
+            _tabBarHeight = kCYLDefaultTabBarHeight;
         }
         return _tabBarHeight;
 #else
@@ -2610,7 +2645,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     return _tabBarHeight;
 }
 
-//#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+//#if CYL_FLATDESIGN_AVAILABLE
 //- (void)tabBar:(CYLFlatDesignTabBar *)tabBar didSelectItemAt:(NSInteger)index {
 //    [self setSelectedIndex:index];
 //    if (tabBar.tabBarItems && tabBar.tabBarItems.count > index) {
@@ -2627,7 +2662,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
  *
  *  @return NSMutableArray<CYLFlatDesignTabBarItem *>
  */
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 - (NSMutableArray<CYLFlatDesignTabBarItem *> *)items {
     if (_items == nil) {
         NSMutableArray<CYLFlatDesignTabBarItem *> *items = [[NSMutableArray<CYLFlatDesignTabBarItem *> alloc] init];
@@ -2648,7 +2683,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 
     if (selectedViewController.cyl_isPlaceholder) { return; }
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     NSArray *viewControllers = self.viewControllers;
     NSUInteger selectedIndex = NSNotFound;
     if (viewControllers) {
@@ -2693,11 +2728,11 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     
         // 用户点击 tab 时会触发 //showing initial vc for every tab :)
         UIControl *control = selectedViewController.cyl_tabButton;
-        if ([selectedViewController isEqual:CYLPlusChildViewController]) {
-            CYLExternPlusButton.selected = YES;
-            [self tabChangedToSelectedIndex:CYLPlusButtonIndex
+        if ([selectedViewController isEqual:[self cyl_contextPlusChildViewController]]) {
+            [self cyl_contextPlusButton].selected = YES;
+            [self tabChangedToSelectedIndex:[self.cyl_tabBar cyl_plusButtonIndex]
                              viewController:selectedViewController
-                                    control:CYLExternPlusButton];
+                                    control:[self cyl_contextPlusButton]];
         } else {
             [self tabChangedToSelectedIndex:self.selectedIndex
                              viewController:selectedViewController
@@ -2708,15 +2743,15 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         if (NSNotFound == selectedIndex) { return; }
         //  iOS26 液态玻璃样式 不再使用点击事件， 而是在 `-setSelectedViewController` and `-setSelectedIndex`中处理
             
         // 用户点击 tab 时会触发 //showing initial vc for every tab :)
         //        UIControl *control = selectedViewController.cyl_tabButton;
-        if ([selectedViewController isEqual:CYLPlusChildViewController]) {
-            CYLExternPlusButton.selected = YES;
+        if ([selectedViewController isEqual:[self cyl_contextPlusChildViewController]]) {
+            [self cyl_contextPlusButton].selected = YES;
         } else {
         }
             
@@ -2785,18 +2820,18 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
  *      `+shouldSelectPlusChildViewController` 返回 NO（此时点击也不会选中）。
  */
 - (UIControl *)cyl_plusButtonControlIfSelectingPlusChildViewController:(UIViewController *)viewController {
-    if (!viewController || !CYLExternPlusButton || ![self hasPlusButton] || ![self hasPlusChildViewController]) {
+    if (!viewController || ![self cyl_contextPlusButton] || ![self hasPlusButton] || ![self hasPlusChildViewController]) {
         return nil;
     }
-    if (![viewController cyl_isEqualToViewController:CYLPlusChildViewController]) {
+    if (![viewController cyl_isEqualToViewController:[self cyl_contextPlusChildViewController]]) {
         return nil;
     }
-    Class plusButtonClass = [CYLExternPlusButton class];
+    Class plusButtonClass = [[self cyl_contextPlusButton] class];
     if ([plusButtonClass respondsToSelector:@selector(shouldSelectPlusChildViewController)] &&
         ![plusButtonClass shouldSelectPlusChildViewController]) {
         return nil;
     }
-    return CYLExternPlusButton;
+    return [self cyl_contextPlusButton];
 }
 
 #pragma mark - Override selectedIndex (Programmatic changes)
@@ -2822,7 +2857,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         if (self.selectedIndex != selectedIndex) {
             _selectedIndex = selectedIndex;
@@ -2857,7 +2892,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
  *  用户切换index时
  *  代码切换index 时。
  **/
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 - (void)tabChangedToSelectedIndex:(NSUInteger)selectedIndex
                    viewController:(UIViewController *)viewController
                      selectedItem:(CYLFlatDesignTabBarItem *)selectedItem {
@@ -2922,7 +2957,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     } while (false); // same as : 0, NO
     if (CYLTabBarStyleTypeFlatDesign == _tabBarStyleType) {     //CYLTabBarStyleTypeFlatDesign
         
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         return childViewController;
 #else
 #endif
@@ -2940,7 +2975,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     //    self.topViewController;
     //    self.scene;
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return childViewController; }
         return childViewController;
 #else
@@ -2954,7 +2989,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     UIViewController *childViewController = self.childViewControllerForStatusBarStyle;
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return childViewController.preferredStatusBarUpdateAnimation; }
         return childViewController.preferredStatusBarUpdateAnimation;
 #else
@@ -2968,7 +3003,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     UIViewController *childViewController = self.childViewControllerForStatusBarStyle;
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return childViewController; }
         return childViewController;
 #else
@@ -3052,7 +3087,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 #pragma mark - UIContentContainer
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         if (!CGSizeEqualToSize(self.view.bounds.size, size)) {
             [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
@@ -3071,7 +3106,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 
 
 #pragma mark - TabBarItem Action
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 
 - (void)_cyltabBarItemClicked:(CYLFlatDesignTabBarItem *)tabBarItem {
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
@@ -3121,14 +3156,14 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 - (void)updateSelectionStatusIfNeededForShouldSelectViewController:(UIViewController *)viewController
                                                       shouldSelect:(BOOL)shouldSelect {
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         
         //    [[viewController.tabBarItem cyl_tabButton] cyl_setUserInteractionDisabled:!shouldSelect];
         if (!shouldSelect) {
             return;
         }
-        UIButton *plusButton = CYLExternPlusButton;
+        UIButton *plusButton = [self cyl_contextPlusButton];
         if (!viewController) {
             viewController = self.selectedViewController;
         }
@@ -3136,7 +3171,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
             return;
         }
         
-        BOOL isCurrentViewController = [viewController cyl_isEqualToViewController:CYLPlusChildViewController];
+        BOOL isCurrentViewController = [viewController cyl_isEqualToViewController:[self cyl_contextPlusChildViewController]];
         
         if (isCurrentViewController) {
             [plusButton setSelected:YES];
@@ -3150,10 +3185,14 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
 }
 
+#if CYL_FLATDESIGN_AVAILABLE
+// The `UINavigationControllerExtensionDelegate` callbacks below come from the flat design subspec only
+// (UINavigationController+CYLFlatDesignTabBarPrivate); without it nothing calls them.
+// 下面的 `UINavigationControllerExtensionDelegate` 回调只来自扁平样式子库（UINavigationController+CYLFlatDesignTabBarPrivate），没有该子库时不会被调用。
 #pragma mark - UINavigationControllerExtensionDelegate
 - (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
               navigationBarDidChangeHeight:(CGFloat)height {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
     if (navigationController == self.selectedViewController) {
         [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
     }
@@ -3165,7 +3204,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
                                         to:(UIViewController *)toVC
                                  operation:(UINavigationControllerOperation)operation {
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         
         // 转场或pop手势返回时禁止用户交互
@@ -3207,7 +3246,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
                                  cancelled:(BOOL)cancelled {
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         
         BOOL showsTabBar = [self _shouldShowsBottomBar];
@@ -3240,7 +3279,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
                                  operation:(UINavigationControllerOperation)operation
                                  cancelled:(BOOL)cancelled {
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         
         self.view.userInteractionEnabled = YES;
@@ -3268,6 +3307,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 #endif
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
 }
+#endif
 
 #pragma mark - Private
 
@@ -3282,7 +3322,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
     // 用 self.viewControllers.count > 5 判断行不行？
     BOOL _showsMoreNavigationController = NO;
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         // FIX: issue #662 — the guard was inverted, so FlatDesign never detected UIKit's More item and
         // `_checkHidesBottomBarWhenPushed` / the safe-area updates ignored `moreNavigationController`.
         // 判断条件写反了：扁平模式下永远识别不到 UIKit 的 More 项。
@@ -3299,7 +3339,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 
 - (void)_captureItems {
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         
         BOOL hasMoreItem = [self _showsMoreNavigationController];
@@ -3361,7 +3401,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 
 - (void)_syncSystemItems {
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         
         for (UIViewController *viewController in self.viewControllers) {
@@ -3382,7 +3422,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 - (BOOL)_shouldShowsBottomBar {
     BOOL showsTabBar = YES;
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return showsTabBar; }
         
         if (self.isTabBarHidden) {
@@ -3399,7 +3439,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 
 - (void)_updateBottomBarShowHideIfNeeded {
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         
         BOOL showsTabBar = [self _shouldShowsBottomBar];
@@ -3414,7 +3454,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 
 - (void)_addParallaxOverlayViewToViewController:(UIViewController *)viewController {
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         
         // create overlayView
@@ -3506,7 +3546,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 
 - (void)_updateAdditionalSafeAreaInsetsWithAnimated:(BOOL)animated {
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         
         UIViewController *selectedViewController = self.selectedViewController;
@@ -3530,7 +3570,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
 }
     
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 
 - (void)changeItem:(CYLFlatDesignTabBarItem *)item toItem:(CYLFlatDesignTabBarItem *)toItem {
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
@@ -3550,6 +3590,147 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
     
 @end
 
+#pragma mark - Live tab bar controllers (most recently active last)
+
+/*!
+ * [EN] Every CYLTabBarController that has view controllers, held WEAKLY and ordered by when it last appeared: the last
+ *      one is the most recently active. A controller joins at the bottom when it gets its view controllers, moves to the
+ *      top in `-viewWillAppear:`, and drops out by itself when it is deallocated. This replaces "the root view
+ *      controller" as the answer when nothing more specific is known: with several tab bar controllers (a pushed or
+ *      presented one, #414), the root one is often not the one in use.
+ * [CN] 所有已设置 viewControllers 的 CYLTabBarController，**弱引用** 保存，按最后一次显示的先后排序：最后一个就是最近活跃的。
+ *      控制器在设置 viewControllers 时加入到最底部，在 `-viewWillAppear:` 时移到最顶部，释放后自动移除。
+ *      在没有更具体信息时，用它代替“根控制器”作为答案：存在多个 TabBarController 时（push 或 present 出来的，#414），
+ *      根控制器往往不是正在使用的那个。
+ */
+static NSPointerArray *CYLTabBarControllerActivationStack(void) {
+    static NSPointerArray *stack;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        stack = [NSPointerArray weakObjectsPointerArray];
+    });
+    return stack;
+}
+
+/// Removes `tabBarController`, and the entries of deallocated controllers (their weak pointers are NULL).
+static void CYLTabBarControllerActivationStackRemove(NSPointerArray *stack, CYLTabBarController *tabBarController) {
+    for (NSInteger index = (NSInteger)stack.count - 1; index >= 0; index--) {
+        void *pointer = [stack pointerAtIndex:index];
+        if (!pointer || pointer == (__bridge void *)tabBarController) {
+            [stack removePointerAtIndex:index];
+        }
+    }
+}
+
+/// `object` is a CYLTabBarController that `matcher` accepts (any one when `matcher` is nil).
+static BOOL CYLTabBarControllerMatches(id object, CYLTabBarControllerMatcher matcher) {
+    return [object isKindOfClass:[CYLTabBarController class]] && (!matcher || matcher(object));
+}
+
+/// The style family a lookup asks for: flat design (`CYLTabBarStyleTypeFlatDesign`), or the system styles (any other
+/// value: Default, System, LiquidGlass, as `-cyl_isSystemStyleTabBar` counts them).
+static CYLTabBarControllerMatcher CYLTabBarControllerMatcherForStyleType(CYLTabBarStyleType styleType) {
+    BOOL wantsFlatDesign = (CYLTabBarStyleTypeFlatDesign == styleType);
+    return ^BOOL(CYLTabBarController *tabBarController) {
+        return wantsFlatDesign == (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType);
+    };
+}
+
+/// Unwraps the weak box stored by `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:`.
+static id CYLTabBarControllerFromWeakBox(id box) {
+    id (^block)(void) = box;
+    return block ? block() : nil;
+}
+
+/// The reference set on `object` with `-cyl_setTabBarController:` or `-cylflatdesign_setTabBarController:`, if accepted.
+static CYLTabBarController *CYLTabBarControllerExplicitReference(id object, CYLTabBarControllerMatcher matcher) {
+    id tabBarController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(object, @selector(cyl_tabBarController)));
+    if (CYLTabBarControllerMatches(tabBarController, matcher)) {
+        return tabBarController;
+    }
+#if CYL_FLATDESIGN_AVAILABLE
+    tabBarController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(object, @selector(cylflatdesign_tabBarController)));
+    if (CYLTabBarControllerMatches(tabBarController, matcher)) {
+        return tabBarController;
+    }
+#endif
+    return nil;
+}
+
+/// The controller of a tab bar (system or flat design): its `delegate`, which the controller sets to itself. Known even
+/// before the tab bar is in the controller's view, where the responder chain could not reach it.
+static CYLTabBarController *CYLTabBarControllerOwningTabBar(UIResponder *responder) {
+    id delegate = nil;
+    if ([responder isKindOfClass:[UITabBar class]]) {
+        delegate = ((UITabBar *)responder).delegate;
+    }
+#if CYL_FLATDESIGN_AVAILABLE
+    else if ([responder isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        delegate = ((CYLFlatDesignTabBar *)responder).delegate;
+    }
+#endif
+    return [delegate isKindOfClass:[CYLTabBarController class]] ? delegate : nil;
+}
+
+@implementation CYLTabBarController (CYLActiveTabBarController)
+
++ (void)cyl_registerTabBarController:(CYLTabBarController *)tabBarController {
+    if (!tabBarController) {
+        return;
+    }
+    NSPointerArray *stack = CYLTabBarControllerActivationStack();
+    @synchronized (stack) {
+        for (NSUInteger index = 0; index < stack.count; index++) {
+            if ([stack pointerAtIndex:index] == (__bridge void *)tabBarController) {
+                return;     // already known: keep its place
+            }
+        }
+        [stack insertPointer:(__bridge void *)tabBarController atIndex:0];
+    }
+}
+
++ (void)cyl_markTabBarControllerActive:(CYLTabBarController *)tabBarController {
+    if (!tabBarController) {
+        return;
+    }
+    NSPointerArray *stack = CYLTabBarControllerActivationStack();
+    @synchronized (stack) {
+        CYLTabBarControllerActivationStackRemove(stack, tabBarController);
+        [stack addPointer:(__bridge void *)tabBarController];
+    }
+}
+
++ (CYLTabBarController *)cyl_tabBarControllerForContext:(NSString *)context matching:(CYLTabBarControllerMatcher)matcher {
+    NSPointerArray *stack = CYLTabBarControllerActivationStack();
+    @synchronized (stack) {
+        for (NSInteger index = (NSInteger)stack.count - 1; index >= 0; index--) {
+            CYLTabBarController *tabBarController = (__bridge CYLTabBarController *)[stack pointerAtIndex:index];
+            if (!tabBarController) {
+                continue;
+            }
+            if (context && ![tabBarController.cyl_context isEqualToString:context]) {
+                continue;
+            }
+            if (!CYLTabBarControllerMatches(tabBarController, matcher)) {
+                continue;
+            }
+            return tabBarController;
+        }
+    }
+    return nil;
+}
+
++ (CYLTabBarController *)cyl_tabBarControllerForContext:(NSString *)context {
+    return [self cyl_tabBarControllerForContext:context matching:nil];
+}
+
++ (CYLTabBarController *)cyl_activeTabBarController {
+    // The most recently active one is the context lookup without a context.
+    return [self cyl_tabBarControllerForContext:nil];
+}
+
+@end
+
 @implementation NSObject (CYLTabBarControllerReferenceExtension)
 
 - (void)cyl_setTabBarController:(CYLTabBarController *)tabBarController {
@@ -3559,31 +3740,96 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
                              block, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-//TODO: 更新实现，多实例场景下进行栈操作，弹出最新一个。
-- (CYLTabBarController *)cyl_tabBarController {
-    CYLTabBarController *tabBarController;
-    id (^block)(void) = objc_getAssociatedObject(self, @selector(cyl_tabBarController));
-    tabBarController = (block ? block() : nil);
-    if (tabBarController && [tabBarController cyl_isSystemStyleTabBar]) {
+/*!
+ * [EN] The one lookup behind `-cyl_tabBarController` (system styles), `-cylflatdesign_tabBarController` (flat design),
+ *      `-cyl_tabBarControllerForStyleType:` and `-cyl_owningTabBarController` (any style, which the plus button registry
+ *      uses to find an object's context). `matcher` picks which controllers count (nil: any). In order:
+ *      0. a tab bar controller that counts is its own;
+ *      1. a reference set explicitly with `-cyl_setTabBarController:` or `-cylflatdesign_setTabBarController:`;
+ *      2. where the object is: a view goes up its responder chain, through the tab bar it is in (its `delegate`), to the
+ *         view controller that owns it; a view controller goes up its parents. So a tab button, the plus button or a view
+ *         in a tab finds its own controller, not the root one;
+ *      3. if `fallsBackToActive`, the most recently active one (`+cyl_activeTabBarController`), then the root view
+ *         controller, as before.
+ * [CN] `-cyl_tabBarController`（系统样式）、`-cylflatdesign_tabBarController`（扁平样式）、`-cyl_tabBarControllerForStyleType:`
+ *      和 `-cyl_owningTabBarController`（任意样式，PlusButton 注册表用它确定对象的 context）共用的查找。`matcher` 决定哪些控制器符合（nil 表示任意）。顺序：
+ *      0. 符合条件的 TabBarController 就是它自己；
+ *      1. 通过 `-cyl_setTabBarController:` 或 `-cylflatdesign_setTabBarController:` 显式设置的引用；
+ *      2. 对象所在的位置：View 沿响应链向上，经过它所在的 TabBar（其 `delegate`），到拥有它的 ViewController；ViewController
+ *         沿父控制器链向上。因此 Tab 按钮、PlusButton 或 Tab 页面内的 View 找到的是自己的控制器，而不是根控制器；
+ *      3. 若 `fallsBackToActive`，取最近活跃的那个（`+cyl_activeTabBarController`），最后才是根控制器（与以前一致）。
+ */
+- (CYLTabBarController *)cyl_tabBarControllerMatching:(CYLTabBarControllerMatcher)matcher fallsBackToActive:(BOOL)fallsBackToActive {
+    // 0. A tab bar controller it accepts is its own: `-visiableTabBarSize` and the `CYL_IS_IPHONE_X` /
+    //    `CYL_NoNeed_UIDesignRequiresCompatibility` macros ask `self.cyl_tabBarController` from inside it. Asking an
+    //    ancestor or the root instead gave a pushed tab bar controller the outer one's values.
+    //    匹配的 TabBarController 就是它自己：`-visiableTabBarSize` 和 `CYL_IS_IPHONE_X` 等宏在控制器内部使用
+    //    `self.cyl_tabBarController`。以前取的是上层或根控制器，push 出来的 TabBarController 会拿到外层的值。
+    if (CYLTabBarControllerMatches(self, matcher)) {
+        return (CYLTabBarController *)self;
+    }
+    // 1. An explicit reference.
+    CYLTabBarController *tabBarController = CYLTabBarControllerExplicitReference(self, matcher);
+    if (tabBarController) {
         return tabBarController;
     }
-    if ([self isKindOfClass:[UIViewController class]] && [(UIViewController *)self parentViewController]) {
-        tabBarController = [[(UIViewController *)self parentViewController] cyl_tabBarController];
-        if ([tabBarController cyl_isSystemStyleTabBar]) {
+    // 2. Where it is. A view: up its responder chain, through the tab bar it is in (whose `delegate` is the controller),
+    //    to the view controller that owns it. A view controller, or that one: up its parents.
+    UIViewController *viewController = nil;
+    if ([self isKindOfClass:[UIViewController class]]) {
+        viewController = ((UIViewController *)self).parentViewController;
+    } else if ([self isKindOfClass:[UIView class]]) {
+        UIResponder *responder = (UIView *)self;
+        for (; responder && ![responder isKindOfClass:[UIViewController class]]; responder = responder.nextResponder) {
+            tabBarController = CYLTabBarControllerOwningTabBar(responder);
+            if (CYLTabBarControllerMatches(tabBarController, matcher)) {
+                return tabBarController;
+            }
+        }
+        viewController = (UIViewController *)responder;
+    }
+    for (; viewController; viewController = viewController.parentViewController) {
+        if (CYLTabBarControllerMatches(viewController, matcher)) {
+            return (CYLTabBarController *)viewController;
+        }
+        tabBarController = CYLTabBarControllerExplicitReference(viewController, matcher);
+        if (tabBarController) {
             return tabBarController;
         }
     }
-    
-    UIViewController *rootViewController = [CYLGetRootViewController() cyl_getViewControllerInsteadOfNavigationController];;
-    if ([rootViewController cyl_isSystemStyleTabBar]) {
-        tabBarController = (CYLTabBarController *)rootViewController;
+    if (!fallsBackToActive) {
+        return nil;
     }
-    return tabBarController;
+    // 3. Nothing more specific: the most recently active one, not a singleton-like root; the root only when none is known.
+    tabBarController = [CYLTabBarController cyl_tabBarControllerForContext:nil matching:matcher];
+    if (tabBarController) {
+        return tabBarController;
+    }
+    UIViewController *rootViewController = [CYLGetRootViewController() cyl_getViewControllerInsteadOfNavigationController];
+    return CYLTabBarControllerMatches(rootViewController, matcher) ? (CYLTabBarController *)rootViewController : nil;
 }
+
+- (CYLTabBarController *)cyl_owningTabBarController {
+    // Only where it is: callers decide what to fall back to (the plus button registry must not take another
+    // controller's context for a tab bar that is not attached yet).
+    return [self cyl_tabBarControllerMatching:nil fallsBackToActive:NO];
+}
+
+- (CYLTabBarController *)cyl_tabBarControllerForStyleType:(CYLTabBarStyleType)styleType {
+    return [self cyl_tabBarControllerMatching:CYLTabBarControllerMatcherForStyleType(styleType) fallsBackToActive:YES];
+}
+
+- (CYLTabBarController *)cyl_tabBarController {
+    // System styles (everything but flat design). Falls back to the most recently active one, then the root, as the
+    // root fallback did before (#414: with several tab bar controllers the root one is often not the one in use).
+    // 系统样式（除扁平样式外）。回退到最近活跃的那个，最后才是根控制器（#414：存在多个 TabBarController 时根控制器往往不是正在使用的那个）。
+    return [self cyl_tabBarControllerForStyleType:CYLTabBarStyleTypeDefault];
+}
+
 #pragma mark - @implementation UIViewController (CYLFlatDesignUITabBarControllerItem) @implementation UIViewController (CYLFlatDesignUIViewControllerItem)
 // MARK: @implementation UIViewController (CYLFlatDesignUITabBarControllerItem) @implementation UIViewController (CYLFlatDesignUIViewControllerItem)
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 
 
 - (void)cylflatdesign_setTabBarController:(UIViewController *)tabBarController {
@@ -3629,65 +3875,23 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
     return ^{ return weakTarget; };
 }
 
+/*!
+ * [EN] Flat design. The same lookup as `-cyl_tabBarController`, `-cyl_tabBarControllerForStyleType:` with
+ *      `CYLTabBarStyleTypeFlatDesign`, with two differences kept from before: an explicit reference
+ *      (`-cylflatdesign_setTabBarController:`) is returned as it is, and there is no fallback: nil when the object is not
+ *      inside a flat design tab bar controller (callers use that to tell whether they are).
+ * [CN] 扁平样式。与 `-cyl_tabBarController` 使用同一个查找（`-cyl_tabBarControllerForStyleType:`，传 `CYLTabBarStyleTypeFlatDesign`），
+ *      保留以前的两点不同：显式设置的引用（`-cylflatdesign_setTabBarController:`）原样返回；没有回退：对象不在扁平样式的
+ *      TabBarController 内时返回 nil（调用方依此判断是否在其中）。
+ */
 - (UIViewController __kindof *)cylflatdesign_tabBarController {
-    // The associated object is always a weak box block; unwrap it.
-    id (^box)(void) = objc_getAssociatedObject(self, @selector(cylflatdesign_tabBarController));
-    UIViewController *viewController = (box ? box() : nil);
+    UIViewController *viewController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(self, @selector(cylflatdesign_tabBarController)));
     if (viewController) {
         return viewController;
     }
-    /*!
-     *     viewController = [self cyl_nearestParentViewControllerThatIsKindOf:[CYLFlatDesignUIViewController class]];
-     if (viewController) {
-     return viewController;
-     }
-     */
-    UIViewController *referenceViewController = nil;
-    if ([self isKindOfClass:[UIViewController class]]) {
-        referenceViewController = (UIViewController *)self;
-    }
-    if (!referenceViewController) {
-        return nil;
-    }
-    
-    UIViewController *flatDesignTabBarController = referenceViewController.tabBarController;
-    
-    if ([flatDesignTabBarController cyl_isFlatDesignStyleTabBar]) {
-        viewController = flatDesignTabBarController;
-    }
-    flatDesignTabBarController = referenceViewController.cyl_getViewControllerInsteadOfNavigationController.tabBarController;
-    
-    if ([flatDesignTabBarController cyl_isFlatDesignStyleTabBar]) {
-        viewController = flatDesignTabBarController;
-    }
-    flatDesignTabBarController = [self cyl_nearestParentViewControllerThatIsFlatDesignStyleTabBar];
-    
-    if ([flatDesignTabBarController cyl_isFlatDesignStyleTabBar]) {
-        viewController = flatDesignTabBarController;
-    }
-    
-    return viewController;
+    return [self cyl_tabBarControllerMatching:CYLTabBarControllerMatcherForStyleType(CYLTabBarStyleTypeFlatDesign) fallsBackToActive:NO];
 }
 
-
-- (UIViewController __kindof *)cyl_nearestParentViewControllerThatIsFlatDesignStyleTabBar {
-    UIViewController *referenceViewController = nil;
-    if ([self isKindOfClass:[UIViewController class]]) {
-        referenceViewController = (UIViewController *)self;
-    }
-    if (!referenceViewController) {
-        return nil;
-    }
-    UIViewController *controller = referenceViewController.parentViewController;
-    while (controller && ![controller cyl_isFlatDesignStyleTabBar]) {
-        controller = controller.parentViewController;
-    }
-    
-    if (controller && [controller cyl_isFlatDesignStyleTabBar]) {
-        return (UIViewController *)controller;
-    }
-    return nil;
-}
 
 /*!
  * - (CYLFlatDesignUIViewController *)cyl_nearestParentViewControllerThatIsKindOf:(Class)c {

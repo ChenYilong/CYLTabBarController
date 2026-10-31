@@ -20,7 +20,7 @@
 #import "CYLTabBarController.h"
 #endif
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 #import <CYLTabBarController/CYLFlatDesignTabBar.h>
 #endif
 
@@ -1101,7 +1101,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     if (isCYLTabBarStyleTypeLiquidGlass) {
         badgeClass = [CYLTabBarBadgeView class];
     } else {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
         badgeClass = [CYLBadgeLabel class];
 #endif
     }

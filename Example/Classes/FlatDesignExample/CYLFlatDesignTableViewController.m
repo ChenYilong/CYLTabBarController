@@ -136,7 +136,10 @@
         title = @"和系统 UITabBar 比较";
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     } else if (indexPath.row == 6) {
-        title = @"Push To 系统 UITabBarController";
+        title = @"Push To 系统 UITabBarController（另一个 PlusButton）";
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    } else if (indexPath.row == 7) {
+        title = @"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）";
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     cell.textLabel.text = title;
@@ -147,7 +150,7 @@
 #pragma mark UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 
     [tableView deselectRowAtIndexPath:indexPath animated:true];
     
@@ -217,12 +220,24 @@
         //        CYLMainRootViewController *rootViewController = [[CYLMainRootViewController alloc] init];
         //                rootViewController.hidesBottomBarWhenPushed = YES;
         //        [CYLPlusButtonSubclass registerPlusButton];
-        NSString *context = NSStringFromClass([self class]);
-        MainTabBarController *tabBarController = [[MainTabBarController alloc] initWithContext:context];
+        // Same logic as the plus button's "Switch Style" menu: a tab bar controller that shows the OTHER plus button
+        // (another context); this flat design tab bar controller keeps its own.
+        // 与 PlusButton“切换样式”菜单相同的逻辑：push 一个显示 **另一个** PlusButton（另一个 context）的 TabBarController，
+        // 当前扁平样式的 TabBarController 保留自己的 PlusButton。
+        Class plusButtonClass = [CYLPlusButtonSubclass alternatePlusButtonClassForOwner:self];
+        MainTabBarController *tabBarController = [CYLMainRootViewController newLiquidGlassTabBarControllerWithPlusButtonClass:plusButtonClass];
         //                        tabBarController.hidesBottomBarWhenPushed = YES;
         tabBarController.hidesBottomBarWhenPushed = YES;
 
         [self.navigationController pushViewController:tabBarController animated:YES];
+        
+    } else if (indexPath.row == 7) {
+        // A flat design tab bar controller inside the flat design one, also with the OTHER plus button.
+        // 在扁平样式的 TabBarController 里 push 另一个扁平样式的 TabBarController，同样使用 **另一个** PlusButton。
+        Class plusButtonClass = [CYLPlusButtonSubclass alternatePlusButtonClassForOwner:self];
+        CYLFlatDesignMainTabBarController *flatDesignTabBarController = [CYLMainRootViewController newFlatDesignTabBarControllerWithPlusButtonClass:plusButtonClass];
+        flatDesignTabBarController.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:flatDesignTabBarController animated:YES];
         
     } else {
         UIViewController *vc = [[UIViewController alloc] init];

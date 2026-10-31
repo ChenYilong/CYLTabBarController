@@ -56,9 +56,23 @@
 // MARK: createLiquidGlassTabBar
 
 - (CYLTabBarController *)createLiquidGlassTabBar {
-    [CYLPlusButtonSubclass registerPlusButton];
-    NSString *context = nil; // NSStringFromClass([self class]);
-    return [self createNewTabBarWithContext:context];
+    return [self createLiquidGlassTabBarWithPlusButtonClass:[CYLPlusButtonSubclass class]];
+}
+
+- (CYLTabBarController *)createLiquidGlassTabBarWithPlusButtonClass:(Class)plusButtonClass {
+    MainTabBarController *tabBarController = [[self class] newLiquidGlassTabBarControllerWithPlusButtonClass:plusButtonClass];
+    self.viewControllers = @[tabBarController];
+    return tabBarController;
+}
+
++ (MainTabBarController *)newLiquidGlassTabBarControllerWithPlusButtonClass:(Class)plusButtonClass {
+    // Registers for the plus button class's own context; the plus button of the other class stays registered.
+    // 按该 PlusButton 类自己的 context 注册；另一个类的 PlusButton 保持注册。
+    [plusButtonClass registerPlusButton];
+    NSString *context = [plusButtonClass matchedTabBarContext];
+    MainTabBarController *tabBarController = [[MainTabBarController alloc] initWithContext:context];
+    tabBarController.allowsVerticalBar = YES;
+    return tabBarController;
 }
 
 - (CYLTabBarController *)createNewTabBarWithContext:(NSString *)context {
@@ -74,9 +88,18 @@
 // MARK: createFlatDesignTabBar
 
 - (CYLFlatDesignMainTabBarController *)createFlatDesignTabBar {
-    [CYLPlusButtonSubclass registerPlusButton];
-    CYLTabBarStyleType type = CYLTabBarStyleTypeDefault;
-    NSString *context = nil;
+    return [self createFlatDesignTabBarWithPlusButtonClass:[CYLPlusButtonSubclass class]];
+}
+
+- (CYLFlatDesignMainTabBarController *)createFlatDesignTabBarWithPlusButtonClass:(Class)plusButtonClass {
+    CYLFlatDesignMainTabBarController *tabBarController = [[self class] newFlatDesignTabBarControllerWithPlusButtonClass:plusButtonClass];
+    self.viewControllers = @[tabBarController];
+    return tabBarController;
+}
+
++ (CYLFlatDesignMainTabBarController *)newFlatDesignTabBarControllerWithPlusButtonClass:(Class)plusButtonClass {
+    [plusButtonClass registerPlusButton];
+    NSString *context = [plusButtonClass matchedTabBarContext];
     CYLFlatDesignMainTabBarController *tabBarController = [[CYLFlatDesignMainTabBarController alloc] initWithViewControllers:[self viewControllersForTabBar]
                                                            
                                                                                                        tabBarItemsAttributes:[self tabBarItemsAttributesForTabBar]
@@ -90,7 +113,6 @@
     //                                   styleType:type
     //                                     context:context];
     tabBarController.tabBarStyleType = CYLTabBarStyleTypeFlatDesign;
-    self.viewControllers = @[tabBarController];
     return tabBarController;
 }
 
@@ -98,7 +120,7 @@
 #pragma mark - other
 // MARK: other
 
-- (NSArray *)viewControllersForTabBar {
++ (NSArray *)viewControllersForTabBar {
     NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
     NSArray *tabBarItemsAttributesForTabBar = [self tabBarItemsAttributesForTabBar];
     for (NSInteger i = 0; i < tabBarItemsAttributesForTabBar.count; i++) {
@@ -138,7 +160,7 @@
     return viewControllers;
 }
 
-- (NSArray *)tabBarItemsAttributesForTabBar {
++ (NSArray *)tabBarItemsAttributesForTabBar {
     return [MainTabBarController tabBarItemsAttributesForTabBar];
 }
 

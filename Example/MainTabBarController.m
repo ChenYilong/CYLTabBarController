@@ -336,7 +336,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     }
     ///Get initialized TabBar Height if exists, otherwise get Default TabBar Height.
     CGFloat tabBarHeight = CYLTabBarControllerHeight;
-    CGSize selectionIndicatorImageSize = CGSizeMake(CYLTabBarItemWidth, tabBarHeight);
+    // This tab bar's own item width (the global `CYLTabBarItemWidth` is what was written last, by any tab bar).
+    CGSize selectionIndicatorImageSize = CGSizeMake(self.cyl_tabBar.cyl_tabBarItemWidth, tabBarHeight);
     //Get initialized TabBar if exists.
     UITabBar *tabBar = self.tabBar ?: [UITabBar appearance];
     UIImage *image = [UIImage cyl_imageWithColor:[UIColor redColor]
@@ -597,7 +598,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         animationView = [control cyl_tabImageView];
     }
     
-    UIButton *button = CYLExternPlusButton;
+    // The plus button of this tab bar controller's context (`CYLExternPlusButton` is the one registered last).
+    UIButton *button = [CYLPlusButton plusButtonForOwner:tabBarController];
     BOOL isPlusButton = [control cyl_isPlusButton];
     // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
     // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调

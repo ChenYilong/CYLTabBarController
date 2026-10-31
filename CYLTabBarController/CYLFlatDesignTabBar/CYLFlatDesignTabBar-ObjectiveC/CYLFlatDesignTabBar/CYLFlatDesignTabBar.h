@@ -109,14 +109,17 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *context;
 
 /*!
- * [EN] Returns YES if the registered plus button's context matches this tab bar's context.
- * [CN] 判断已注册 PlusButton 的 context 是否与当前 TabBar 的 context 一致。
+ * [EN] Returns YES if a plus button is registered for the context of the CYLTabBarController that owns this tab bar
+ *      (its `delegate`). The plus button is bound to the controller, not to the tab bar, so this always agrees with
+ *      `-[CYLTabBarController hasPlusButton]`, also when several plus buttons are registered.
+ * [CN] 判断是否为拥有本 TabBar 的 CYLTabBarController（即它的 `delegate`）的 context 注册了 PlusButton。
+ *      PlusButton 绑定的是控制器而不是 TabBar，因此始终与 `-[CYLTabBarController hasPlusButton]` 一致，注册了多个 PlusButton 时也是如此。
  */
 - (BOOL)hasPlusButton;
 
 /*!
- * [EN] Returns YES if the plus child view controller exists and matches this tab bar's context.
- * [CN] 判断 PlusButton 子控制器是否存在且与当前 TabBar 的 context 一致。
+ * [EN] Returns YES if a plus child view controller is registered for the context of the CYLTabBarController that owns this tab bar.
+ * [CN] 判断是否为拥有本 TabBar 的 CYLTabBarController 的 context 注册了 PlusButton 子控制器。
  */
 - (BOOL)hasPlusChildViewController;
 

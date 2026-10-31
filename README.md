@@ -898,8 +898,9 @@ carthage update --use-xcframeworks
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
     UIView *animationView;
     // If PlusButton has its own action, this delegate is not called for it.
-    if ([control isKindOfClass:[CYLExternPlusButton class]]) {
-        UIButton *button = CYLExternPlusButton;
+    if ([control cyl_isPlusButton]) {
+        // The plus button of this tab bar controller's context (`CYLExternPlusButton` is the one registered last).
+        UIButton *button = [CYLPlusButton plusButtonForOwner:tabBarController];
         animationView = button.imageView;
     } else if ([control isKindOfClass:NSClassFromString(@"UITabBarButton")]) {
         for (UIView *subView in control.subviews) {
@@ -951,7 +952,7 @@ carthage update --use-xcframeworks
 
 | 中文 | English |
 |:---|:---|
-| `CYLTabBarController.h` 提供了 `CYLTabBarItemWidth` extern 常量，并会在宽度变化时更新。 | `CYLTabBarController.h` exposes the `CYLTabBarItemWidth` extern, which is updated whenever the item width changes. |
+| 每个 TabBar 保存自己的 item 宽度：`tabBar.cyl_tabBarItemWidth`（同理有 `cyl_tabbarItemsCount`、`cyl_plusButtonIndex`、`cyl_plusButtonWidth`），存在多个 TabBarController 时互不影响，并会在宽度变化时更新。`CYLTabBarController.h` 里的 `CYLTabBarItemWidth` extern 保存最后一次写入的值，仍然可用。 | Each TabBar keeps its own item width: `tabBar.cyl_tabBarItemWidth` (likewise `cyl_tabbarItemsCount`, `cyl_plusButtonIndex`, `cyl_plusButtonWidth`). They do not affect each other with several TabBarControllers, and are updated whenever the width changes. The `CYLTabBarItemWidth` extern in `CYLTabBarController.h` holds what was written last and still works. |
 
  ```Objective-C
 - (void)updateTabBarCustomizationWhenTabBarItemWidthDidUpdate {
@@ -971,7 +972,7 @@ carthage update --use-xcframeworks
     } else if (orientation == UIDeviceOrientationPortrait){
         NSLog(@"Landscape portrait!");
     }
-    CGSize selectionIndicatorImageSize = CGSizeMake(CYLTabBarItemWidth, [self cyl_tabBarController].tabBar.bounds.size.height);
+    CGSize selectionIndicatorImageSize = CGSizeMake([self cyl_tabBar].cyl_tabBarItemWidth, [self cyl_tabBarController].tabBar.bounds.size.height);
     [[self cyl_tabBarController].tabBar setSelectionIndicatorImage:[[self class]
                                                                     imageFromColor:[UIColor yellowColor]
                                                                     forSize:selectionIndicatorImageSize
@@ -1063,7 +1064,7 @@ carthage update --use-xcframeworks
 }
 
 + (BOOL)shouldSelectPlusChildViewController {
-    BOOL isSelected = CYLExternPlusButton.selected;
+    BOOL isSelected = [CYLPlusButton plusButtonForTabBarContext:[self matchedTabBarContext]].selected;
     return YES;
 }
 
@@ -1095,7 +1096,7 @@ carthage update --use-xcframeworks
 
 ```Objective-C
 + (BOOL)shouldSelectPlusChildViewController {
-    BOOL isSelected = CYLExternPlusButton.selected;
+    BOOL isSelected = [CYLPlusButton plusButtonForTabBarContext:[self matchedTabBarContext]].selected;
     if (isSelected) {
         NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
     } else {
@@ -1181,7 +1182,10 @@ carthage update --use-xcframeworks
 
 | 中文 | English |
 |:---|:---|
-| 当前每次只展示一个 PlusButton，不限嵌套层级；如果匹配多个 TabBarController，则展示在第一个匹配的控制器上。 | Only one PlusButton is displayed at a time, regardless of nesting depth. If multiple controllers match, it is shown on the first match. |
+| 可以同时注册多个 PlusButton（每个 `+tabBarContext` 一个），每个 TabBarController 使用 context 与自己 `context` 相同的那一个，互不影响。PlusButton 绑定的是 CYLTabBarController，它的 TabBar 通过控制器找到它。 | Several PlusButtons can be registered at the same time, one per `+tabBarContext`. Each TabBarController uses the one whose context equals its own `context`, and they do not affect each other. A PlusButton is bound to the CYLTabBarController; its TabBar finds it through the controller. |
+| context 相同的多个 TabBarController 各自有一个 PlusButton：第一个使用注册的实例，其余的使用同一个类的 `+plusButton` / `+plusChildViewController` 新建的实例（所以这两个方法每次调用应返回新实例）。 | TabBarControllers that share a context each get their own PlusButton: the first uses the registered instance, the others new instances from the same class's `+plusButton` / `+plusChildViewController` (so these should return a new instance on every call). |
+| 用 `+[CYLPlusButton plusButtonForTabBarContext:]` 和 `+[CYLPlusButton plusChildViewControllerForTabBarContext:]` 读取某个 context 的 PlusButton 及其子控制器。`CYLExternPlusButton` 与 `CYLPlusChildViewController` 指向最后注册的那一个。 | Read the PlusButton and the child view controller of a context with `+[CYLPlusButton plusButtonForTabBarContext:]` and `+[CYLPlusButton plusChildViewControllerForTabBarContext:]`. `CYLExternPlusButton` and `CYLPlusChildViewController` point at the one registered last. |
+| Demo 里有两个 PlusButton（`CYLPlusButtonSubclass`、继承自它且只改了图标、标题和 context 的 `CYLSecondPlusButtonSubclass`），点击 PlusButton 切换样式、或点击 table cell push 另一个 TabBarController 时，会显示另一个 PlusButton。 | The demo has two PlusButtons (`CYLPlusButtonSubclass`, and `CYLSecondPlusButtonSubclass`, which inherits from it and only changes the icon, the title and the context). Switching the style from the PlusButton, or pushing another TabBarController from a table cell, shows the other PlusButton. |
 ### [CN]在 Swift 项目中使用 CYLTabBarController
 ### [EN]Using CYLTabBarController in a Swift project
 

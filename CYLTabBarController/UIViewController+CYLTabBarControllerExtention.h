@@ -8,7 +8,7 @@
 
 #import "CYLBadgeProtocol.h"
 #import "CYLConstants.h"
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 #import <CYLTabBarController/CYLFlatDesignTabBar.h>
 #endif
 
@@ -26,7 +26,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 @interface UIViewController (CYLTabBarControllerExtention)<CYLBadgeProtocol>
 
-#if __has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)
+#if CYL_FLATDESIGN_AVAILABLE
 
 //TODO: 分类统一放置到一个独立的文件中， 方便管理。
 
@@ -34,7 +34,8 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 @property (null_resettable, nonatomic, strong, getter=cyl_tabBarItem, setter=cyl_setTabBarItem:) CYLFlatDesignTabBarItem *cyl_tabBarItem;
 
 // 返回控制器的tabBarController，可能为nil
-//TODO:  更换为统一的 cyl_tabBarController
+// [EN] Shares one lookup with `-cyl_tabBarController`, see `-[NSObject cyl_tabBarControllerForStyleType:]` in CYLTabBarController.h.
+// [CN] 与 `-cyl_tabBarController` 共用同一个查找，见 CYLTabBarController.h 中的 `-[NSObject cyl_tabBarControllerForStyleType:]`。
 @property (nullable, nonatomic, weak, getter=cylflatdesign_tabBarController, setter=cylflatdesign_setTabBarController:) UIViewController __kindof *cylflatdesign_tabBarController;
 
 
