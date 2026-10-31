@@ -66,12 +66,12 @@
  */
 - (UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index animated:(BOOL)animated {
     UIViewController *viewController = [self cyl_getViewControllerInsteadOfNavigationController];
-    CYLTabBarController *tabBarController = [viewController cyl_tabBarController];
+    CYLTabBarController *tabBarController = [viewController cyl_popSelectTabBarController];
     [viewController checkTabBarChildControllerValidityAtIndex:index];
     if (index >= tabBarController.viewControllers.count) {
         return nil;
     }
-    UINavigationController *navigationController = viewController.navigationController;
+    UINavigationController *navigationController = [viewController cyl_popSelectNavigationControllerInTabBarController:tabBarController];
     tabBarController.selectedIndex = index;
     [navigationController popToRootViewControllerAnimated:animated];
     [navigationController.view setNeedsLayout];
@@ -91,7 +91,7 @@
 }
 
 - (UIViewController *)cyl_popSelectTabBarChildViewControllerForClassType:(Class)classType {
-    CYLTabBarController *tabBarController = [[self cyl_getViewControllerInsteadOfNavigationController] cyl_tabBarController];
+    CYLTabBarController *tabBarController = [[self cyl_getViewControllerInsteadOfNavigationController] cyl_popSelectTabBarController];
     NSArray *viewControllers = tabBarController.viewControllers;
     NSInteger atIndex = [self cyl_indexForClassType:classType inViewControllers:viewControllers];
     return [self cyl_popSelectTabBarChildViewControllerAtIndex:atIndex];
@@ -108,18 +108,25 @@
 - (void)cyl_pushOrPopToViewController:(UIViewController *)viewController
                              animated:(BOOL)animated
                              callback:(CYLPushOrPopCallback)callback {
+    // `self` may be the navigation controller itself, whose own `navigationController` is nil: nothing was pushed then.
+    // `self` 可能就是导航控制器本身，它的 `navigationController` 为 nil，此时什么都不会 push。
+    UINavigationController *currentNavigationController = [self cyl_getViewControllerInsteadOfNavigationController].navigationController;
     if (!callback) {
-        [self.navigationController pushViewController:viewController animated:animated];
+        [currentNavigationController pushViewController:viewController animated:animated];
         return;
     }
     
     void (^popSelectTabBarChildViewControllerCallback)(BOOL shouldPopSelectTabBarChildViewController, NSUInteger index) = ^(BOOL shouldPopSelectTabBarChildViewController, NSUInteger index) {
         if (shouldPopSelectTabBarChildViewController) {
             [self cyl_popSelectTabBarChildViewControllerAtIndex:index completion:^(__kindof UIViewController *selectedTabBarChildViewController) {
-                [selectedTabBarChildViewController.navigationController pushViewController:viewController animated:animated];
+                // An invalid index selects nothing (nil), and a tab may not be in a navigation controller: push onto the
+                // current stack then, as an invalid index did before it was rejected.
+                // index 无效时什么都不选（nil），Tab 也可能不在导航控制器中：此时与 index 被拒绝之前一样，push 到当前导航栈。
+                UINavigationController *navigationController = selectedTabBarChildViewController.navigationController ?: currentNavigationController;
+                [navigationController pushViewController:viewController animated:animated];
             }];
         } else {
-            [self.navigationController pushViewController:viewController animated:animated];
+            [currentNavigationController pushViewController:viewController animated:animated];
         }
     };
     NSArray<__kindof UIViewController *> *otherSameClassTypeViewControllersInCurrentNavigationControllerStack = [self cyl_getOtherSameClassTypeViewControllersInCurrentNavigationControllerStack:viewController];
@@ -133,8 +140,10 @@
             shouldPop = NO;
         }
         dispatch_async(dispatch_get_main_queue(),^{
-            if (shouldPop) {
-                [self.navigationController popToViewController:viewControllerPopTo animated:animated];
+            // `-popToViewController:animated:` raises for a view controller that is not in the stack (or nil). Push then.
+            // `-popToViewController:animated:` 的目标不在栈中（或为 nil）时会抛异常，此时改为 push。
+            if (shouldPop && [currentNavigationController.viewControllers containsObject:viewControllerPopTo]) {
+                [currentNavigationController popToViewController:viewControllerPopTo animated:animated];
                 return;
             }
             popSelectTabBarChildViewControllerCallback(shouldPopSelectTabBarChildViewController, index);
@@ -146,6 +155,11 @@
 - (void)cyl_pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     UIViewController *fromViewController = [self cyl_getViewControllerInsteadOfNavigationController];
     NSArray *childViewControllers = fromViewController.navigationController.childViewControllers;
+    // UIKit raises when the same instance is pushed twice, also when it is not on top of the stack.
+    // 同一个实例重复 push 时 UIKit 会抛异常，即使它不在栈顶。
+    if ([childViewControllers containsObject:viewController]) {
+        return;
+    }
     if (childViewControllers.count > 0) {
         if ([[childViewControllers lastObject] isKindOfClass:[viewController class]]) {
             return;
@@ -366,12 +380,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 #pragma mark - Private Methods
 
 - (NSArray<__kindof UIViewController *> *)cyl_getOtherSameClassTypeViewControllersInCurrentNavigationControllerStack:(UIViewController *)viewController {
-    NSArray *currentNavigationControllerStack = [self.navigationController childViewControllers];
+    NSArray *currentNavigationControllerStack = [[self cyl_getViewControllerInsteadOfNavigationController].navigationController childViewControllers];
     if (currentNavigationControllerStack.count < 2) {
         return nil;
     }
     NSMutableArray *mutableArray = [currentNavigationControllerStack mutableCopy];
-    [mutableArray removeObject:self];
+    [mutableArray removeObject:[self cyl_getViewControllerInsteadOfNavigationController]];
     currentNavigationControllerStack = [mutableArray copy];
     
     __block NSMutableArray *mutableOtherViewControllersInNavigationControllerStack = [NSMutableArray arrayWithCapacity:currentNavigationControllerStack.count];
@@ -385,8 +399,39 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return [mutableOtherViewControllersInNavigationControllerStack copy];
 }
 
+/*!
+ * [EN] The tab bar controller `cyl_popSelect…` switches: the one `self` is in, of any style, else `-cyl_tabBarController`.
+ *      `-cyl_tabBarController` alone only finds system styles, so a flat design tab switched another (or no) controller.
+ * [CN] `cyl_popSelect…` 切换的 TabBarController：`self` 所在的那个（任意样式），否则取 `-cyl_tabBarController`。
+ *      只用 `-cyl_tabBarController` 只能找到系统样式，扁平样式的 Tab 会切换另一个控制器（或什么都不做）。
+ */
+- (CYLTabBarController *)cyl_popSelectTabBarController {
+    return [self cyl_owningTabBarController] ?: [self cyl_tabBarController];
+}
+
+/*!
+ * [EN] The navigation stack `cyl_popSelect…` pops: the one `self` is in, only if it is inside `tabBarController`. When
+ *      the tab is not in a navigation controller but the tab bar controller is (e.g. pushed), `navigationController` is
+ *      that outer stack, and popping it removed the whole tab bar controller. Then, and when `self` is the tab bar
+ *      controller itself, pop the selected tab's stack instead. Call it before switching tabs.
+ * [CN] `cyl_popSelect…` 要 pop 的导航栈：`self` 所在的那个，且必须在 `tabBarController` 之内。Tab 不在导航控制器中、
+ *      而 TabBarController 本身在（例如被 push）时，`navigationController` 是外层导航栈，pop 它会移除整个 TabBarController。
+ *      这种情况以及 `self` 就是 TabBarController 时，改为 pop 当前选中 Tab 的导航栈。需要在切换 Tab 之前调用。
+ */
+- (UINavigationController *)cyl_popSelectNavigationControllerInTabBarController:(CYLTabBarController *)tabBarController {
+    UINavigationController *navigationController = self.navigationController;
+    if (navigationController && navigationController != tabBarController.navigationController) {
+        return navigationController;
+    }
+    UIViewController *selectedViewController = tabBarController.selectedViewController;
+    if ([selectedViewController isKindOfClass:[UINavigationController class]]) {
+        return (UINavigationController *)selectedViewController;
+    }
+    return nil;
+}
+
 - (void)checkTabBarChildControllerValidityAtIndex:(NSUInteger)index {
-    CYLTabBarController *tabBarController = [[self cyl_getViewControllerInsteadOfNavigationController] cyl_tabBarController];
+    CYLTabBarController *tabBarController = [[self cyl_getViewControllerInsteadOfNavigationController] cyl_popSelectTabBarController];
     @try {
         UIViewController *viewController;
         viewController = tabBarController.viewControllers[index];
