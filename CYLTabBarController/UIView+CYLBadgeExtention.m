@@ -27,38 +27,10 @@
 
 #define kCYLBadgeDefaultMaximumBadgeNumber 99
 #define kCYLBadgeDefaultMargin (8.0)
-#define kCYLBadgeDefaultDelayIfNeededForSeconds (0.5)
 
 static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
+static const NSTimeInterval kCYLBadgeDefaultDelayIfNeededForSeconds = 0.5;
 static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
-
-/*!
- * [EN] Every key a badge animation is added under, so a new animation replaces the previous one instead of stacking
- *      (e.g. Shake + Scale after showing two values with different animation types).
- * [CN] 角标动画使用的所有 key：新动画替换旧动画，而不是叠加（例如先后以不同动画类型显示两个值，导致抖动与缩放同时进行）。
- */
-static NSArray<NSString *> *CYLBadgeAnimationKeys(void) {
-    static NSArray<NSString *> *keys;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        keys = @[CYLBadgeBreatheAnimationKey, CYLBadgeRotateAnimationKey, CYLBadgeShakeAnimationKey,
-                 CYLBadgeScaleAnimationKey, CYLBadgeBounceAnimationKey, CYLBadgeLeftRightOnceAnimationKey,
-                 CYLBadgeRightLeftOnceAnimationKey, CYLBadgeFadeInOnceAnimationKey, CYLBadgeRollingOnceAnimationKey,
-                 CYLBadgeScaleOnceAnimationKey];
-    });
-    return keys;
-}
-
-/// The key of a repeating (endless) badge animation, nil for none and for the one-shot ones.
-static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationType) {
-    switch (animationType) {
-        case CYLBadgeAnimationTypeBreathe: return CYLBadgeBreatheAnimationKey;
-        case CYLBadgeAnimationTypeShake:   return CYLBadgeShakeAnimationKey;
-        case CYLBadgeAnimationTypeScale:   return CYLBadgeScaleAnimationKey;
-        case CYLBadgeAnimationTypeBounce:  return CYLBadgeBounceAnimationKey;
-        default:                           return nil;
-    }
-}
 
 @interface UIView (CYLBadgeEnvironmentPrivate)
 - (void)cyl_badgeEnvironmentDidChange;
@@ -366,7 +338,7 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
     CGSize size = [value sizeWithAttributes:
                    @{NSFontAttributeName:
                          self.cyl_badgeFont}];
-    float labelHeight = ceilf(size.height)+ self.cyl_badgeMargin;
+    CGFloat labelHeight = ceil(size.height) + self.cyl_badgeMargin;
     [self cyl_setBadgeCornerRadius:labelHeight/3];
     [self cyl_showTextBadge:value];
 }
@@ -559,7 +531,7 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
         return;
     }
     [self cyl_applyBadgeBorder];
-    NSString *repeatingAnimationKey = CYLBadgeRepeatingAnimationKey(self.cyl_badgeAnimationType);
+    NSString *repeatingAnimationKey = CYLBadgeAnimationTypeRepeats(self.cyl_badgeAnimationType) ? CYLBadgeAnimationKeyForType(self.cyl_badgeAnimationType) : nil;
     if (!repeatingAnimationKey || !badge.window || badge.hidden || badge.alpha <= 0.01f) {
         return;
     }
@@ -588,7 +560,7 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
 
 - (void)cyl_removeBadgeAnimations {
     CALayer *layer = self.cyl_badge.layer;
-    for (NSString *key in CYLBadgeAnimationKeys()) {
+    for (NSString *key in CYLBadgeAllAnimationKeys()) {
         [layer removeAnimationForKey:key];
     }
 }
@@ -615,7 +587,7 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
     }
 //    CGSize labelsize = [self sizeThatFits:CGSizeMake(CYLScreenWidth() ,CYLScreenHeight())];
     CGRect frame = label.frame;
-    frame.size = CGSizeMake(ceilf(labelsize.width), ceilf(labelsize.height));
+    frame.size = CGSizeMake(ceil(labelsize.width), ceil(labelsize.height));
 //    获得字符长度后， 需要修改父视图的宽度， 仅仅修改Label无法达到真正的拉伸效果
         [label setFrame:frame];
 
@@ -625,9 +597,29 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
 
 /*!
  * [EN] A badge is one line: measure the text as one line (`-sizeWithAttributes:`) and keep the label on one line.
- *      It was measured with word wrapping in a screen-sized box and `numberOfLines = 0`.
- * [CN] 角标只有一行：按单行测量文本（`-sizeWithAttributes:`），并让 Label 保持单行。原先在屏幕大小的区域内按单词换行测量，
- *      且 `numberOfLines = 0`。
+ *
+ *      `UILabel.numberOfLines`: 0 means "as many lines as the text needs", so the text wraps whenever the label is
+ *      narrower than it; 1 means exactly one line, which never wraps and, if it does not fit, is cut at the end with "…".
+ *
+ *      What 1 fixes: `-cyl_adjustLabelWidth:` sizes the badge to the measured text width (plus `cyl_badgeMargin`).
+ *      With 0, any shortfall, a host that resizes the badge, rounding, or a bold font measured a hair narrower than it
+ *      draws ("99+", "new"), made the label wrap into two lines; the second line was clipped by `masksToBounds`,
+ *      or the badge turned taller than a one-line badge. The text was also measured with word wrapping in a screen-sized
+ *      box, which let a long text report a multi-line size. With 1 the height is always one line.
+ *
+ *      Trade-off: a text with a line break shows only its first line (and the size follows the text as measured).
+ *      Badges are short by design; use `cyl_badgeMaximumBadgeNumber` for numbers and keep text badges to a few characters.
+ * [CN] 角标只有一行：按单行测量文本（`-sizeWithAttributes:`），并让 Label 保持单行。
+ *
+ *      `UILabel.numberOfLines`：0 表示"文本需要几行就显示几行"，Label 比文本窄时就会换行；1 表示固定一行，永不换行，
+ *      放不下时在末尾用 "…" 截断。
+ *
+ *      设为 1 解决的问题：`-cyl_adjustLabelWidth:` 按测量出的文本宽度（加上 `cyl_badgeMargin`）确定角标宽度。
+ *      设为 0 时，只要宽度稍有不足（宿主调整了角标大小、取整误差、粗体测量值比实际绘制略窄，如 "99+"、"new"），
+ *      Label 就会换成两行：第二行被 `masksToBounds` 裁掉，或角标比单行角标更高。此外原先在屏幕大小的区域内按单词换行测量，
+ *      长文本会得到多行的尺寸。设为 1 后高度始终是一行。
+ *
+ *      代价：含换行符的文本只显示第一行（尺寸仍按测量值）。角标本就应该很短；数字用 `cyl_badgeMaximumBadgeNumber` 限制，文本角标保持几个字符。
  */
 - (CGSize)cyl_getLabelSize:(UILabel *)label {
     label.numberOfLines = 1;
@@ -663,7 +655,8 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
 }
 
 //if u want to add badge animation type, follow steps bellow:
-//1. go to definition of CYLBadgeAnimationType and add new type
+//1. go to definition of CYLBadgeAnimationType and add new type, with its key (see the note above the keys in
+//   CYLBadgeProtocol.h: CYLBadgeAnimationKeyForType, CYLBadgeAnimationTypeRepeats, CYLBadgeAllAnimationKeys)
 //2. go to category of CAAnimation+CYLBadgeExtention to add new animation interface
 //3. call that new interface here
 - (void)cyl_beginAnimation {
@@ -678,7 +671,7 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
     }
     switch(self.cyl_badgeAnimationType) {
         case CYLBadgeAnimationTypeBreathe:
-            [self.cyl_badge.layer addAnimation:[CAAnimation cyl_opacityForever_Animation:1.4]
+            [self.cyl_badge.layer addAnimation:[CAAnimation cyl_opacityForeverAnimationWithDuration:1.4]
                                         forKey:CYLBadgeBreatheAnimationKey];
             break;
         case CYLBadgeAnimationTypeShake: {
@@ -692,10 +685,10 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
             break;
         }
         case CYLBadgeAnimationTypeScale:
-            [self.cyl_badge.layer addAnimation:[CAAnimation cyl_scaleFrom:1.4
+            [self.cyl_badge.layer addAnimation:[CAAnimation cyl_scaleAnimationFromScale:1.4
                                                                   toScale:0.6
-                                                                 durTimes:1
-                                                                      rep:MAXFLOAT]
+                                                                 duration:1
+                                                              repeatTimes:MAXFLOAT]
                                         forKey:CYLBadgeScaleAnimationKey];
             break;
         case CYLBadgeAnimationTypeBounce: {
@@ -725,7 +718,7 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
             [self.cyl_badge.layer addAnimation:
              [CAAnimation cyl_badge_once_leftRight_AnimationMoveDistance:moveDistance
                                                              repeatTimes:1
-                                                                durTimes:0.5]
+                                                                duration:0.5]
                                         forKey:CYLBadgeLeftRightOnceAnimationKey];
             break;
             
@@ -734,7 +727,7 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
             [self.cyl_badge.layer addAnimation:
              [CAAnimation cyl_badge_once_rightLeft_AnimationMoveDistance:moveDistance
                                                              repeatTimes:1
-                                                                durTimes:0.5]
+                                                                duration:0.5]
                                         forKey:CYLBadgeRightLeftOnceAnimationKey];
             break;
             
@@ -742,21 +735,21 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
             
             [self.cyl_badge.layer addAnimation:
              [CAAnimation cyl_badge_once_fadeIn_AnimationRepeatTimes:1
-                                                            durTimes:1.5]
+                                                            duration:1.5]
                                         forKey:CYLBadgeFadeInOnceAnimationKey];
             break;
             
         case CYLBadgeAnimationTypeRollingOnce:           /*rolling animation*/
             [self.cyl_badge.layer addAnimation:
              [CAAnimation cyl_badge_once_rolling_AnimationRepeatTimes:1
-                                                             durTimes:0.5]
+                                                             duration:0.5]
                                         forKey:CYLBadgeRollingOnceAnimationKey];
             break;
             
         case CYLBadgeAnimationTypeScaleOnce:           /*ScaleOnce animation*/
             [self.cyl_badge.layer addAnimation:
              [CAAnimation cyl_badge_once_scale_AnimationRepeatTimes:1
-                                                           durTimes:0.5]
+                                                           duration:0.5]
                                         forKey:CYLBadgeScaleOnceAnimationKey];
             
             
@@ -854,10 +847,10 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
 - (CGRect)cyl_badgeFrame {
     id obj = objc_getAssociatedObject(self, @selector(cyl_badgeFrame));
     if (obj != nil && [obj isKindOfClass:[NSDictionary class]] && [obj count] == 4) {
-        CGFloat x = [obj[@"x"] floatValue];
-        CGFloat y = [obj[@"y"] floatValue];
-        CGFloat width = [obj[@"width"] floatValue];
-        CGFloat height = [obj[@"height"] floatValue];
+        CGFloat x = [obj[@"x"] doubleValue];
+        CGFloat y = [obj[@"y"] doubleValue];
+        CGFloat width = [obj[@"width"] doubleValue];
+        CGFloat height = [obj[@"height"] doubleValue];
         return  CGRectMake(x, y, width, height);
     }
     return CGRectZero;
@@ -890,7 +883,7 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
 
 - (CGFloat)cyl_badgeCornerRadius {
     NSNumber *badgeCornerRadiusObject = objc_getAssociatedObject(self, @selector(cyl_badgeCornerRadius));
-    return [badgeCornerRadiusObject floatValue];
+    return [badgeCornerRadiusObject doubleValue];
 }
 
 - (void)cyl_setBadgeCornerRadius:(CGFloat)badgeCornerRadius {
@@ -899,7 +892,7 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
 }
 
 - (void)cyl_setBadgeCornerRadiusValue:(NSNumber *)cyl_badgeCornerRadiusValue {
-    CGFloat cyl_badgeCornerRadius = [cyl_badgeCornerRadiusValue floatValue];
+    CGFloat cyl_badgeCornerRadius = [cyl_badgeCornerRadiusValue doubleValue];
     [self cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
 }
 - (NSNumber *)cyl_badgeCornerRadiusValue {
@@ -909,8 +902,8 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
 - (CGPoint)cyl_badgeCenterOffset {
     id obj = objc_getAssociatedObject(self, @selector(cyl_badgeCenterOffset));
     if (obj != nil && [obj isKindOfClass:[NSDictionary class]] && [obj count] == 2) {
-        CGFloat x = [obj[@"x"] floatValue];
-        CGFloat y = [obj[@"y"] floatValue];
+        CGFloat x = [obj[@"x"] doubleValue];
+        CGFloat y = [obj[@"y"] doubleValue];
         return CGPointMake(x, y);
     }
     return CGPointZero;
@@ -943,14 +936,14 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
 //badgeRadiusKey
 
 - (void)cyl_setBadgeRadius:(CGFloat)badgeRadius {
-    objc_setAssociatedObject(self, @selector(cyl_badgeRadius), [NSNumber numberWithFloat:badgeRadius], OBJC_ASSOCIATION_RETAIN);
+    objc_setAssociatedObject(self, @selector(cyl_badgeRadius), @(badgeRadius), OBJC_ASSOCIATION_RETAIN);
     if (!self.cyl_badge) {
         [self cyl_badgeInit];
     }
 }
 
 - (void)cyl_setBadgeRadiusValue:(NSNumber *)cyl_badgeRadiusValue {
-    CGFloat badgeRadius = [cyl_badgeRadiusValue floatValue];
+    CGFloat badgeRadius = [cyl_badgeRadiusValue doubleValue];
     [self cyl_setBadgeRadius:badgeRadius];
 }
 
@@ -959,18 +952,18 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
 }
 
 - (CGFloat)cyl_badgeRadius {
-    return [objc_getAssociatedObject(self, @selector(cyl_badgeRadius)) floatValue];
+    return [objc_getAssociatedObject(self, @selector(cyl_badgeRadius)) doubleValue];
 }
 
 - (void)cyl_setBadgeMargin:(CGFloat)badgeMargin {
-    objc_setAssociatedObject(self, @selector(cyl_badgeMargin), [NSNumber numberWithFloat:badgeMargin], OBJC_ASSOCIATION_RETAIN);
+    objc_setAssociatedObject(self, @selector(cyl_badgeMargin), @(badgeMargin), OBJC_ASSOCIATION_RETAIN);
     if (!self.cyl_badge) {
         [self cyl_badgeInit];
     }
 }
 
 - (void)cyl_setBadgeMarginValue:(NSNumber *)cyl_badgeMarginValue {
-    CGFloat badgeMargin = [cyl_badgeMarginValue floatValue];
+    CGFloat badgeMargin = [cyl_badgeMarginValue doubleValue];
     [self cyl_setBadgeMargin:badgeMargin];
 }
 
@@ -980,7 +973,7 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
 
 - (CGFloat)cyl_badgeMargin {
     id margin = objc_getAssociatedObject(self, @selector(cyl_badgeMargin));
-    return margin == nil ? kCYLBadgeDefaultMargin : [margin floatValue];
+    return margin == nil ? kCYLBadgeDefaultMargin : [margin doubleValue];
 }
 
 - (NSInteger)cyl_badgeMaximumBadgeNumber {
@@ -1018,7 +1011,7 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
 }
 
 - (CGFloat)cyl_badgeBorderWidth {
-    return [objc_getAssociatedObject(self, @selector(cyl_badgeBorderWidth)) floatValue];
+    return [objc_getAssociatedObject(self, @selector(cyl_badgeBorderWidth)) doubleValue];
 }
 
 - (void)cyl_setBadgeBorderWidth:(CGFloat)badgeBorderWidth {
@@ -1041,12 +1034,21 @@ static NSString *CYLBadgeRepeatingAnimationKey(CYLBadgeAnimationType animationTy
     if (!delayIfNeededForSecondsObject) {
         return kCYLBadgeDefaultDelayIfNeededForSeconds;
     }
-    return [delayIfNeededForSecondsObject floatValue];
+    return [delayIfNeededForSecondsObject doubleValue];
 }
 
 - (void)cyl_setDelayIfNeededForSeconds:(CGFloat)delayIfNeededForSeconds {
-    NSNumber *delayIfNeededForSecondsObject = @(delayIfNeededForSeconds);
+    // A negative or non-finite delay is meaningless; treat it as no delay.
+    NSNumber *delayIfNeededForSecondsObject = @(isfinite(delayIfNeededForSeconds) ? MAX(0, delayIfNeededForSeconds) : 0);
     objc_setAssociatedObject(self, @selector(cyl_delayIfNeededForSeconds), delayIfNeededForSecondsObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSNumber *)cyl_delayIfNeededForSecondsValue {
+    return @(self.cyl_delayIfNeededForSeconds);
+}
+
+- (void)cyl_setDelayIfNeededForSecondsValue:(NSNumber *)delayIfNeededForSecondsValue {
+    [self cyl_setDelayIfNeededForSeconds:[delayIfNeededForSecondsValue doubleValue]];
 }
 
 - (BOOL)cyl_isHidden {

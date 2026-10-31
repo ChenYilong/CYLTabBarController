@@ -108,13 +108,13 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
  *      时依然正确。与 `+cyl_shake_AnimationRepeatTimes:durTimes:forObj:` 不同，它不记录 layer 的位置。非法参数会被修正：
  *      非有限或非正的时长取 1 秒（最小 0.01 秒），NaN 或负的重复次数取 0，非有限的偏移取 0。`removedOnCompletion` 为 NO。
  */
-+ (CAKeyframeAnimation *)cyl_shakeAnimationRepeatTimes:(float)repeatTimes duration:(CFTimeInterval)duration offset:(CGFloat)offset;
++ (CAKeyframeAnimation *)cyl_shakeAnimationRepeatTimes:(float)repeatTimes duration:(NSTimeInterval)duration offset:(CGFloat)offset;
 
 /*!
  * [EN] Vertical bounce, relative like `+cyl_shakeAnimationRepeatTimes:duration:offset:` (`transform.translation.y`).
  * [CN] 上下弹跳，与 `+cyl_shakeAnimationRepeatTimes:duration:offset:` 一样相对当前位置（`transform.translation.y`）。
  */
-+ (CAKeyframeAnimation *)cyl_bounceAnimationRepeatTimes:(float)repeatTimes duration:(CFTimeInterval)duration offset:(CGFloat)offset;
++ (CAKeyframeAnimation *)cyl_bounceAnimationRepeatTimes:(float)repeatTimes duration:(NSTimeInterval)duration offset:(CGFloat)offset;
 
 ///**
 // *  scale animation
@@ -128,7 +128,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
 // */
 //+ (CABasicAnimation *)cyl_scaleAnimationFrom:(CGFloat)fromScale
 //                                          to:(CGFloat)toScale
-//                                   duration:(CFTimeInterval)duration
+//                                   duration:(NSTimeInterval)duration
 //                                repeatTimes:(float)repeatTimes;
 //
 ///**
@@ -143,7 +143,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
 // */
 //+ (CABasicAnimation *)cyl_horizontalMoveAnimationFrom:(CGFloat)fromX
 //                                                   to:(CGFloat)toX
-//                                            duration:(CFTimeInterval)duration
+//                                            duration:(NSTimeInterval)duration
 //                                         repeatTimes:(float)repeatTimes;
 //
 ///**
@@ -158,7 +158,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
 // */
 //+ (CABasicAnimation *)cyl_opacityAnimationFrom:(CGFloat)fromAlpha
 //                                            to:(CGFloat)toAlpha
-//                                     duration:(CFTimeInterval)duration
+//                                     duration:(NSTimeInterval)duration
 //                                  repeatTimes:(float)repeatTimes;
 //
 ///**
@@ -173,7 +173,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
 // */
 //+ (CABasicAnimation *)cyl_rotationAnimationFrom:(CGFloat)fromAngle
 //                                             to:(CGFloat)toAngle
-//                                      duration:(CFTimeInterval)duration
+//                                      duration:(NSTimeInterval)duration
 //                                   repeatTimes:(float)repeatTimes;
 
 /*!
@@ -288,8 +288,70 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
 + (CABasicAnimation *)cyl_badge_once_rolling_AnimationRepeatTimes:(float)repeatTimes
                                                     durTimes:(float)time;
 
- 
+#pragma mark - NSTimeInterval versions
+
+/*!
+ * [EN] The methods below do what the methods above with the same purpose do, with a precise duration type. The
+ *      originals keep their names, `float` parameters and behavior and forward to these, so nothing that calls them
+ *      changes. Prefer these in new code:
+ *      - durations are `NSTimeInterval` (a `double`, like `CAAnimation.duration`). A `float` duration loses precision:
+ *        0.1 becomes 0.10000000149;
+ *      - repeat counts stay `float` because `CAMediaTiming.repeatCount` is a `float` (pass `HUGE_VALF` to repeat forever);
+ *      - `cyl_rotationAnimationWithDuration:…` also takes a `CGFloat` angle and a `float` repeat count, so it can repeat
+ *        forever and by fractions, which the original's `int` could not.
+ *
+ *      | original                                                     | NSTimeInterval version                                         |
+ *      | `cyl_opacityForever_Animation:`                              | `cyl_opacityForeverAnimationWithDuration:`                     |
+ *      | `cyl_opacityTimes_Animation:durTimes:`                       | `cyl_opacityTimesAnimationRepeatTimes:duration:`               |
+ *      | `cyl_rotation:degree:direction:repeatCount:`                 | `cyl_rotationAnimationWithDuration:degree:direction:repeatCount:` |
+ *      | `cyl_scaleFrom:toScale:durTimes:rep:`                        | `cyl_scaleAnimationFromScale:toScale:duration:repeatTimes:`    |
+ *      | `cyl_shake_AnimationRepeatTimes:durTimes:forObj:`            | `cyl_shakeAnimationRepeatTimes:duration:forObj:`               |
+ *      | `cyl_bounce_AnimationRepeatTimes:durTimes:forObj:`           | `cyl_bounceAnimationRepeatTimes:duration:forObj:`              |
+ *      | `cyl_badge_once_*_Animation…durTimes:`                       | `cyl_badge_once_*_Animation…duration:`                         |
+ * [CN] 下面的方法与上面用途相同的方法功能一致，只是使用更精确的时长类型。原来的方法保持名称、`float` 参数和行为不变，
+ *      并转发到这些方法，因此调用它们的代码不受影响。新代码请优先使用这些方法：
+ *      - 时长是 `NSTimeInterval`（`double`，与 `CAAnimation.duration` 一致）。`float` 时长会损失精度：0.1 变成 0.10000000149；
+ *      - 重复次数仍是 `float`，因为 `CAMediaTiming.repeatCount` 就是 `float`（传 `HUGE_VALF` 表示无限重复）；
+ *      - `cyl_rotationAnimationWithDuration:…` 的角度是 `CGFloat`、重复次数是 `float`，因此可以无限重复或按小数重复，原来的 `int` 做不到。
+ */
++ (CABasicAnimation *)cyl_opacityForeverAnimationWithDuration:(NSTimeInterval)duration;
+
++ (CABasicAnimation *)cyl_opacityTimesAnimationRepeatTimes:(float)repeatTimes duration:(NSTimeInterval)duration;
+
++ (CABasicAnimation *)cyl_rotationAnimationWithDuration:(NSTimeInterval)duration
+                                                 degree:(CGFloat)degree
+                                              direction:(CYLAxis)axis
+                                            repeatCount:(float)repeatCount;
+
++ (CABasicAnimation *)cyl_scaleAnimationFromScale:(CGFloat)fromScale
+                                          toScale:(CGFloat)toScale
+                                         duration:(NSTimeInterval)duration
+                                      repeatTimes:(float)repeatTimes;
+
++ (CAKeyframeAnimation *)cyl_shakeAnimationRepeatTimes:(float)repeatTimes duration:(NSTimeInterval)duration forObj:(id)obj;
+
++ (CAKeyframeAnimation *)cyl_bounceAnimationRepeatTimes:(float)repeatTimes duration:(NSTimeInterval)duration forObj:(id)obj;
+
++ (CABasicAnimation *)cyl_badge_once_scale_AnimationRepeatTimes:(float)repeatTimes
+                                                       duration:(NSTimeInterval)duration;
+
++ (CABasicAnimation *)cyl_badge_once_leftRight_AnimationMoveDistance:(CGFloat)moveDistance
+                                                         repeatTimes:(float)repeatTimes
+                                                            duration:(NSTimeInterval)duration;
+
++ (CABasicAnimation *)cyl_badge_once_rightLeft_AnimationMoveDistance:(CGFloat)moveDistance
+                                                         repeatTimes:(float)repeatTimes
+                                                            duration:(NSTimeInterval)duration;
+
++ (CABasicAnimation *)cyl_badge_once_fadeIn_AnimationRepeatTimes:(float)repeatTimes
+                                                        duration:(NSTimeInterval)duration;
+
++ (CABasicAnimation *)cyl_badge_once_rolling_AnimationRepeatTimes:(float)repeatTimes
+                                                         duration:(NSTimeInterval)duration;
+
+
 @end
+
 
 NS_ASSUME_NONNULL_END
 

@@ -17,6 +17,28 @@
 
 #pragma mark -- types definition
 
+/*!
+ * [EN] Animation keys: the `forKey:` a badge animation is added to the badge's layer under. They are strings, defined
+ *      here with `CYLBadgeAnimationType` (below) because they are two views of the same thing: each type has one key,
+ *      listed in `CYLBadgeAnimationKeyForType`. The difference in use:
+ *      - the enum picks WHICH animation a badge plays: `[view cyl_showBadgeValue:@"3" animationType:CYLBadgeAnimationTypeShake]`;
+ *      - the key IDENTIFIES a running animation on `view.cyl_badge.layer`, to query or stop it:
+ *        `[view.cyl_badge.layer animationForKey:CYLBadgeShakeAnimationKey]`,
+ *        `[view.cyl_badge.layer removeAnimationForKey:CYLBadgeShakeAnimationKey]`.
+ *      Repeating types (Scale, Shake, Bounce, Breathe) can be queried like this; the "Once" types finish by themselves.
+ *      `CYLBadgeRotateAnimationKey` belongs to no type: it is reserved for a rotation you add yourself with
+ *      `+[CAAnimation cyl_rotation:degree:direction:repeatCount:]`.
+ *      To add an animation type: add it to the enum, add its key here, and add it to the three functions below.
+ * [CN] 动画 key：角标动画添加到角标 layer 时使用的 `forKey:`。它们是字符串，与 `CYLBadgeAnimationType`（见下）定义在一起，
+ *      因为二者描述同一件事：每个类型对应一个 key，见 `CYLBadgeAnimationKeyForType`。用法不同：
+ *      - 枚举决定角标播放哪种动画：`[view cyl_showBadgeValue:@"3" animationType:CYLBadgeAnimationTypeShake]`；
+ *      - key 用来标识 `view.cyl_badge.layer` 上正在运行的动画，用于查询或停止：
+ *        `[view.cyl_badge.layer animationForKey:CYLBadgeShakeAnimationKey]`、
+ *        `[view.cyl_badge.layer removeAnimationForKey:CYLBadgeShakeAnimationKey]`。
+ *      可以这样查询的是循环类型（Scale、Shake、Bounce、Breathe）；"Once" 类型会自行结束。
+ *      `CYLBadgeRotateAnimationKey` 不对应任何类型：留给你用 `+[CAAnimation cyl_rotation:degree:direction:repeatCount:]` 自行添加的旋转动画。
+ *      新增动画类型时：在枚举中添加，在这里添加它的 key，并更新下面的三个函数。
+ */
 #define CYLBadgeBreatheAnimationKey     @"cyl.badge.breathe"
 #define CYLBadgeRotateAnimationKey      @"cyl.badge.rotate"
 #define CYLBadgeShakeAnimationKey       @"cyl.badge.shake"
@@ -47,6 +69,44 @@ typedef NS_ENUM(NSUInteger, CYLBadgeAnimationType) {
     CYLBadgeAnimationTypeRollingOnce,      /*rolling animation*/
     CYLBadgeAnimationTypeScaleOnce         /*ScaleOnce animation*/
 };
+
+/// The key of the animation a type plays, nil for `CYLBadgeAnimationTypeNone` (and unknown values).
+static inline NSString * _Nullable CYLBadgeAnimationKeyForType(CYLBadgeAnimationType animationType) {
+    switch (animationType) {
+        case CYLBadgeAnimationTypeScale:         return CYLBadgeScaleAnimationKey;
+        case CYLBadgeAnimationTypeShake:         return CYLBadgeShakeAnimationKey;
+        case CYLBadgeAnimationTypeBounce:        return CYLBadgeBounceAnimationKey;
+        case CYLBadgeAnimationTypeBreathe:       return CYLBadgeBreatheAnimationKey;
+        case CYLBadgeAnimationTypeLeftRightOnce: return CYLBadgeLeftRightOnceAnimationKey;
+        case CYLBadgeAnimationTypeRightLeftOnce: return CYLBadgeRightLeftOnceAnimationKey;
+        case CYLBadgeAnimationTypeFadeInOnce:    return CYLBadgeFadeInOnceAnimationKey;
+        case CYLBadgeAnimationTypeRollingOnce:   return CYLBadgeRollingOnceAnimationKey;
+        case CYLBadgeAnimationTypeScaleOnce:     return CYLBadgeScaleOnceAnimationKey;
+        case CYLBadgeAnimationTypeNone:
+        default:                                 return nil;
+    }
+}
+
+/// YES for the types that repeat until stopped (Scale, Shake, Bounce, Breathe); NO for None and the "Once" types.
+static inline BOOL CYLBadgeAnimationTypeRepeats(CYLBadgeAnimationType animationType) {
+    switch (animationType) {
+        case CYLBadgeAnimationTypeScale:
+        case CYLBadgeAnimationTypeShake:
+        case CYLBadgeAnimationTypeBounce:
+        case CYLBadgeAnimationTypeBreathe:
+            return YES;
+        default:
+            return NO;
+    }
+}
+
+/// Every key a badge animation may be under (including `CYLBadgeRotateAnimationKey`), to remove them all at once.
+static inline NSArray<NSString *> * CYLBadgeAllAnimationKeys(void) {
+    return @[CYLBadgeScaleAnimationKey, CYLBadgeShakeAnimationKey, CYLBadgeBounceAnimationKey,
+             CYLBadgeBreatheAnimationKey, CYLBadgeRotateAnimationKey, CYLBadgeLeftRightOnceAnimationKey,
+             CYLBadgeRightLeftOnceAnimationKey, CYLBadgeFadeInOnceAnimationKey, CYLBadgeRollingOnceAnimationKey,
+             CYLBadgeScaleOnceAnimationKey];
+}
 
 #pragma mark -- protocol definition
 
@@ -181,6 +241,19 @@ typedef NS_ENUM(NSUInteger, CYLBadgeAnimationType) {
  * [CN] 同 -cyl_performSelector:，携带两个参数。
  */
 - (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2;
+
+@optional
+
+/*!
+ * [EN] `cyl_delayIfNeededForSeconds` (seconds, a `CGFloat`, which is a `double`) boxed in an `NSNumber`, like the other
+ *      `…Value` properties. Use it where only objects can be passed, e.g. `-cyl_performSelector:withObject:`, KVC or
+ *      `performSelector:`. The setter calls `-cyl_setDelayIfNeededForSeconds:`. Optional: classes of yours that adopt
+ *      this protocol are not required to implement it.
+ * [CN] `cyl_delayIfNeededForSeconds`（秒，`CGFloat`，即 `double`）装箱成 `NSNumber`，与其他 `…Value` 属性一致。
+ *      在只能传对象的场景使用，如 `-cyl_performSelector:withObject:`、KVC 或 `performSelector:`。
+ *      setter 内部调用 `-cyl_setDelayIfNeededForSeconds:`。可选：你自己采用该协议的类不必实现它。
+ */
+@property (nonatomic, strong, getter=cyl_delayIfNeededForSecondsValue, setter=cyl_setDelayIfNeededForSecondsValue:) NSNumber *cyl_delayIfNeededForSecondsValue;
 
 @end
 

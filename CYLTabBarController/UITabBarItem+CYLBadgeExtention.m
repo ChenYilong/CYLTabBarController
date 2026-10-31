@@ -78,6 +78,14 @@
     objc_setAssociatedObject(self, @selector(cyl_delayIfNeededForSeconds), @(seconds), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+- (NSNumber *)cyl_delayIfNeededForSecondsValue {
+    return @(self.cyl_delayIfNeededForSeconds);
+}
+
+- (void)cyl_setDelayIfNeededForSecondsValue:(NSNumber *)delayIfNeededForSecondsValue {
+    [self cyl_setDelayIfNeededForSeconds:[delayIfNeededForSecondsValue doubleValue]];
+}
+
 #pragma mark -- public methods
 
 /**
@@ -300,7 +308,7 @@
 }
 
 - (void)cyl_setBadgeMarginValue:(NSNumber *)cyl_badgeMarginValue {
-    CGFloat badgeMargin = [cyl_badgeMarginValue floatValue];
+    CGFloat badgeMargin = [cyl_badgeMarginValue doubleValue];
     [self cyl_setBadgeMargin:badgeMargin];
 }
 
@@ -313,7 +321,7 @@
 }
 
 - (void)cyl_setBadgeRadiusValue:(NSNumber *)cyl_badgeRadiusValue {
-    CGFloat badgeRadius = [cyl_badgeRadiusValue floatValue];
+    CGFloat badgeRadius = [cyl_badgeRadiusValue doubleValue];
     [self cyl_setBadgeRadius:badgeRadius];
 }
 
@@ -326,7 +334,7 @@
 }
 
 - (void)cyl_setBadgeCornerRadiusValue:(NSNumber *)cyl_badgeCornerRadiusValue {
-    CGFloat cyl_badgeCornerRadius = [cyl_badgeCornerRadiusValue floatValue];
+    CGFloat cyl_badgeCornerRadius = [cyl_badgeCornerRadiusValue doubleValue];
     [self cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
 }
 
