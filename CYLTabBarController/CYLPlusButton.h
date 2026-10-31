@@ -214,11 +214,15 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
  *      is bound to a CYLTabBarController, through the controller's `context`. The controller's `-hasPlusButton` and
  *      `-hasPlusChildViewController` read the registry, and its tab bar (system or flat design) asks the controller that
  *      owns it, so several tab bar controllers with different contexts each get their own plus button. Tab bar
- *      controllers that share a context share one plus button, and a view can only be in one tab bar, so give each its own context.
+ *      controllers that share a context each get their own too: the first one shows the registered instance, every other
+ *      one an instance of the same class from `+plusButton` (and `+plusChildViewController`), since a view can only be in
+ *      one tab bar. A `+plusButton` that always returns the same instance can still only be shown by one of them.
  * [CN] 注册表将 context 映射到对应的 PlusButton、PlusButton 子控制器和 PlusButton 宽度。PlusButton 绑定的是 CYLTabBarController，
  *      通过控制器的 `context`。控制器的 `-hasPlusButton`、`-hasPlusChildViewController` 读取注册表，它的 TabBar（系统样式或扁平样式）
  *      则向拥有它的控制器询问，因此 context 不同的多个 TabBarController 各自使用自己的 PlusButton。
- *      context 相同的 TabBarController 共用同一个 PlusButton，而一个 View 只能在一个 TabBar 中，所以请给每个设置不同的 context。
+ *      context 相同的多个 TabBarController 也各自有自己的 PlusButton：第一个展示已注册的实例，其余每个展示同一个类通过
+ *      `+plusButton`（及 `+plusChildViewController`）创建的实例，因为一个 View 只能在一个 TabBar 中。若 `+plusButton` 总是返回同一个实例，
+ *      则仍然只能在其中一个 TabBarController 中展示。
  *
  *      Example:
  *      @code
@@ -258,9 +262,11 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 + (nullable NSString *)tabBarContextForOwner:(nullable id)owner;
 
 /*!
- * [EN] `+plusButtonForTabBarContext:` / `+plusChildViewControllerForTabBarContext:` / `+plusButtonWidthForTabBarContext:`
- *      for the context of `owner` (see `+tabBarContextForOwner:`).
- * [CN] 针对 `owner` 所属 context（见 `+tabBarContextForOwner:`）的 `+plusButtonForTabBarContext:` 等方法。
+ * [EN] The plus button / plus child view controller / plus button width of `owner`. Inside a CYLTabBarController: the
+ *      ones that controller shows (its own when it shares its context with another one). Otherwise the registered ones
+ *      of the context of `owner` (see `+tabBarContextForOwner:`).
+ * [CN] `owner` 的 PlusButton / PlusButton 子控制器 / PlusButton 宽度。在 CYLTabBarController 内：该控制器展示的那个（与其他控制器
+ *      共用 context 时是它自己的那份）。否则取 `owner` 所属 context（见 `+tabBarContextForOwner:`）注册的那个。
  */
 + (nullable CYLPlusButton<CYLPlusButtonSubclassing> *)plusButtonForOwner:(nullable id)owner;
 + (nullable UIViewController *)plusChildViewControllerForOwner:(nullable id)owner;

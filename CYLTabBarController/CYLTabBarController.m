@@ -1568,14 +1568,15 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return [self cyl_contextPlusButton] != nil;
 }
 
-/// The plus button bound to this controller: the one registered for its `context`.
+/// The plus button bound to this controller: the one registered for its `context`, or, when another tab bar controller of
+/// that context already shows it, this controller's own (`+[CYLPlusButton plusButtonForOwner:]`).
 - (CYLPlusButton<CYLPlusButtonSubclassing> *)cyl_contextPlusButton {
-    return [CYLPlusButton plusButtonForTabBarContext:self.cyl_context];
+    return [CYLPlusButton plusButtonForOwner:self];
 }
 
-/// The plus child view controller bound to this controller: the one registered for its `context`.
+/// The plus child view controller bound to this controller, see `-cyl_contextPlusButton`.
 - (UIViewController *)cyl_contextPlusChildViewController {
-    return [CYLPlusButton plusChildViewControllerForTabBarContext:self.cyl_context];
+    return [CYLPlusButton plusChildViewControllerForOwner:self];
 }
 
 - (NSUInteger)allItemsInTabBarCount {
