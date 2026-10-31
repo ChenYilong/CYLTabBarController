@@ -742,62 +742,29 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (UIImage *)cyl_takeSnapshotWithoutViews:(NSArray<UIView __kindof *> *)hideViews {
-    // excluded view
-    [hideViews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull hideView, NSUInteger idx, BOOL * _Nonnull stop) {
-        [hideView cyl_setHidden:YES];
+    CGSize size = self.bounds.size;
+    if (size.width <= 0 || size.height <= 0) {
+        return nil;
+    }
+    // Hide the excluded views, then restore each one: a view that was hidden already must stay hidden.
+    // 隐藏要排除的视图，之后逐个恢复：原本就隐藏的视图必须保持隐藏。
+    NSMutableArray<UIView *> *viewsToRestore = [NSMutableArray arrayWithCapacity:hideViews.count];
+    for (UIView *hideView in hideViews) {
+        if (!hideView.isHidden) {
+            [viewsToRestore addObject:hideView];
+            [hideView cyl_setHidden:YES];
+        }
+    }
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:size];
+    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+        [self drawViewHierarchyInRect:self.bounds afterScreenUpdates:NO];
     }];
-    
-
-    UIImage *image ;
-    // begin
-    //size:指定建立出來的bitmap大小
-    //opaque:true為透明,false為不透明 self.opaque
-    //scale:縮放,0為不縮放
-    UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0.0f);
-    
-    // draw view in that context.
-    //afterScreenUpdates:是否重繪畫面
-    [self drawViewHierarchyInRect:self.bounds afterScreenUpdates:NO];
-    image = UIGraphicsGetImageFromCurrentImageContext();//取得UIGraphicsBeginImageContext所創的bitmap
-    UIGraphicsEndImageContext();// //清除UIGraphicsBeginImageContext產生的context
-    
-    [hideViews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull hideView, NSUInteger idx, BOOL * _Nonnull stop) {
+    for (UIView *hideView in viewsToRestore) {
         [hideView cyl_setHidden:NO];
-    }];
-    
-    
+    }
     return image;
 }
-/*!
- * if([UIScreen mainScreen].scale > 1)
-    {
-        thumbnailImage = [self thumbnailImage newSize:CGSizeMake(thumbnailImage.size.width/[UIScreen       mainScreen].scale, thumbnailImage.size.height/[UIScreen mainScreen].scale)];
-    }
- */
-- (UIImage *)cyl_resizeImage:(UIImage*)image newSize:(CGSize)newSize {
-    CGRect newRect = CGRectIntegral(CGRectMake(0, 0, newSize.width, newSize.height));
-    CGImageRef imageRef = image.CGImage;
 
-    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-
-    // Set the quality level to use when rescaling
-    CGContextSetInterpolationQuality(context, kCGInterpolationHigh);
-    CGAffineTransform flipVertical = CGAffineTransformMake(1, 0, 0, -1, 0, newSize.height);
-
-    CGContextConcatCTM(context, flipVertical);
-    // Draw into the context; this scales the image
-    CGContextDrawImage(context, newRect, imageRef);
-
-    // Get the resized image from the context and a UIImage
-    CGImageRef newImageRef = CGBitmapContextCreateImage(context);
-    UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
-
-    CGImageRelease(newImageRef);
-    UIGraphicsEndImageContext();
-
-    return newImage;
-}
 
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 + (UIView *)cyl_tabBadgePointViewWithClolor:(UIColor *)color radius:(CGFloat)radius {

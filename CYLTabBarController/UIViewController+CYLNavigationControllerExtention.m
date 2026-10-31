@@ -176,14 +176,17 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
         UIViewController *fromVC = [self.transitionCoordinator viewControllerForKey:UITransitionContextFromViewControllerKey];
         [fromVC.view addSubview:tabbarImageView];
 
-        [self.transitionCoordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-
-        } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        BOOL willComplete = [self.transitionCoordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
             [tabbarImageView removeFromSuperview];
             if (context.isCancelled) {
                 [self cyl_updateTabbarWithShouldHidden:NO];
             }
         }];
+        // NO: the transition cannot run the completion (e.g. it is not animated), so the snapshot would stay forever.
+        // 返回 NO 表示转场不会执行 completion（例如没有动画），快照会一直留在页面上。
+        if (!willComplete) {
+            [tabbarImageView removeFromSuperview];
+        }
     }
 }
 
@@ -193,16 +196,18 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
         UIViewController *toVC = [self.transitionCoordinator viewControllerForKey:UITransitionContextToViewControllerKey];
         [toVC.view addSubview:tabbarImageView];
 
-        [self.transitionCoordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-
-        } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        BOOL willComplete = [self.transitionCoordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
             [tabbarImageView removeFromSuperview];
-            if (context.isCancelled) {
-
-            } else {
+            if (!context.isCancelled) {
                 [self cyl_updateTabbarWithShouldHidden:NO];
             }
         }];
+        // NO: the completion never runs, and the tab bar would stay hidden. Show it now, as without a transition.
+        // 返回 NO 表示 completion 不会执行，TabBar 会一直隐藏。与没有转场时一样，立即显示。
+        if (!willComplete) {
+            [tabbarImageView removeFromSuperview];
+            [self cyl_updateTabbarWithShouldHidden:NO];
+        }
     } else {
         [self cyl_updateTabbarWithShouldHidden:NO];
     }
