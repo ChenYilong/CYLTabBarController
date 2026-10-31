@@ -317,7 +317,10 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
                  delayIfNeededForSeconds:(CGFloat)delay
                               completion:(void(^)(BOOL isReplaced, UIControl *tabBarButton, UIView *newView))completion {
     UIControl *selectedTabButton = self;
-    NSUInteger delaySeconds = selectedTabButton.cyl_isReady ? 0 : delay;
+    // NSTimeInterval, not NSUInteger: callers pass fractions (0.1, 0.5), which an integer type truncated to 0,
+    // so a Lottie tab that was not ready yet was never waited for.
+    // 必须是 NSTimeInterval：调用方传入的是小数（0.1、0.5），用整型会截断为 0，导致 Lottie 未就绪时从不等待。
+    NSTimeInterval delaySeconds = selectedTabButton.cyl_isReady ? 0 : MAX(delay, 0);
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
         //如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。

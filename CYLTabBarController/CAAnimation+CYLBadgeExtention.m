@@ -13,16 +13,16 @@
 /**
  *  breathing forever
  *
- *  @param time duritaion, from clear to fully seen
+ *  @param duration duritaion, from clear to fully seen
  *
  *  @return animation obj
  */
-+ (CABasicAnimation *)cyl_opacityForever_Animation:(float)time {
++ (CABasicAnimation *)cyl_opacityForeverAnimationWithDuration:(NSTimeInterval)duration {
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
     animation.fromValue = [NSNumber numberWithFloat:1.0];
     animation.toValue = [NSNumber numberWithFloat:0.1];
     animation.autoreverses = YES;
-    animation.duration = time;
+    animation.duration = duration;
     animation.repeatCount = FLT_MAX;
     animation.removedOnCompletion = NO;
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
@@ -34,16 +34,16 @@
  *  breathing with fixed repeated times
  *
  *  @param repeatTimes times
- *  @param time        duritaion, from clear to fully seen
+ *  @param duration        duritaion, from clear to fully seen
  *
  *  @return animation obj
  */
-+ (CABasicAnimation *)cyl_opacityTimes_Animation:(float)repeatTimes durTimes:(float)time {
++ (CABasicAnimation *)cyl_opacityTimesAnimationRepeatTimes:(float)repeatTimes duration:(NSTimeInterval)duration {
     CABasicAnimation *animation=[CABasicAnimation animationWithKeyPath:@"opacity"];
     animation.fromValue = [NSNumber numberWithFloat:1.0];
     animation.toValue = [NSNumber numberWithFloat:0.4];
     animation.repeatCount = repeatTimes;
-    animation.duration = time;
+    animation.duration = duration;
     animation.removedOnCompletion = NO;
     animation.fillMode = kCAFillModeForwards;
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
@@ -54,20 +54,20 @@
 /**
  *  //rotate
  *
- *  @param dur         duration
+ *  @param duration    duration
  *  @param degree      rotate degree in radian(弧度)
  *  @param axis        axis
  *  @param repeatCount repeat count
  *
  *  @return animation obj
  */
-+ (CABasicAnimation *)cyl_rotation:(float)dur degree:(float)degree direction:(CYLAxis)axis repeatCount:(int)repeatCount {
++ (CABasicAnimation *)cyl_rotationAnimationWithDuration:(NSTimeInterval)duration degree:(CGFloat)degree direction:(CYLAxis)axis repeatCount:(float)repeatCount {
     CABasicAnimation* animation;
     NSArray *axisArr = @[@"transform.rotation.x", @"transform.rotation.y", @"transform.rotation.z"];
     animation = [CABasicAnimation animationWithKeyPath:axisArr[axis]];
     animation.fromValue = [NSNumber numberWithFloat:0];
-    animation.toValue = [NSNumber numberWithFloat:degree];
-    animation.duration = dur;
+    animation.toValue = @(degree);
+    animation.duration = duration;
     animation.autoreverses = NO;
     animation.cumulative = YES;
     animation.removedOnCompletion = NO;
@@ -81,16 +81,16 @@
  *
  *  @param fromScale   the original scale value, 1.0 by default
  *  @param toScale     target scale
- *  @param time        duration
+ *  @param duration        duration
  *  @param repeatTimes repeat counts
  *
  *  @return animaiton obj
  */
-+ (CABasicAnimation *)cyl_scaleFrom:(CGFloat)fromScale toScale:(CGFloat)toScale durTimes:(float)time rep:(float)repeatTimes {
++ (CABasicAnimation *)cyl_scaleAnimationFromScale:(CGFloat)fromScale toScale:(CGFloat)toScale duration:(NSTimeInterval)duration repeatTimes:(float)repeatTimes {
     CABasicAnimation *animation=[CABasicAnimation animationWithKeyPath:@"transform.scale"];
     animation.fromValue = @(fromScale);
     animation.toValue = @(toScale);
-    animation.duration = time;
+    animation.duration = duration;
     animation.autoreverses = YES;
     animation.repeatCount = repeatTimes;
     animation.removedOnCompletion = NO;
@@ -102,11 +102,11 @@
  *  shake
  *
  *  @param repeatTimes time
- *  @param time        duration
+ *  @param duration        duration
  *  @param obj         always be CALayer
  *  @return aniamtion obj
  */
-+ (CAKeyframeAnimation *)cyl_shake_AnimationRepeatTimes:(float)repeatTimes durTimes:(float)time forObj:(id)obj {
++ (CAKeyframeAnimation *)cyl_shakeAnimationRepeatTimes:(float)repeatTimes duration:(NSTimeInterval)duration forObj:(id)obj {
 #if defined(DEBUG) || defined(BETA)
     NSAssert([obj isKindOfClass:[CALayer class]] , @"invalid target");
 #endif
@@ -127,7 +127,7 @@
         [NSValue valueWithCGPoint:CGPointMake(originPos.x, originPos.y)]
     ];
     anim.repeatCount = repeatTimes;
-    anim.duration = time;
+    anim.duration = duration;
     anim.fillMode = kCAFillModeForwards;
     return anim;
 }
@@ -136,11 +136,11 @@
  *  bounce
  *
  *  @param repeatTimes time
- *  @param time        duration
+ *  @param duration        duration
  *  @param obj         always be CALayer
  *  @return aniamtion obj
  */
-+ (CAKeyframeAnimation *)cyl_bounce_AnimationRepeatTimes:(float)repeatTimes durTimes:(float)time forObj:(id)obj {
++ (CAKeyframeAnimation *)cyl_bounceAnimationRepeatTimes:(float)repeatTimes duration:(NSTimeInterval)duration forObj:(id)obj {
 #if defined(DEBUG) || defined(BETA)
     NSAssert([obj isKindOfClass:[CALayer class]] , @"invalid target");
 #endif
@@ -161,14 +161,14 @@
         [NSValue valueWithCGPoint:CGPointMake(originPos.x, originPos.y)]
     ];
     anim.repeatCount = repeatTimes;
-    anim.duration = time;
+    anim.duration = duration;
     anim.fillMode = kCAFillModeForwards;
     return anim;
 }
 
 //+ (CABasicAnimation *)cyl_scaleAnimationFrom:(CGFloat)fromScale
 //                                          to:(CGFloat)toScale
-//                                   duration:(CFTimeInterval)duration
+//                                   duration:(NSTimeInterval)duration
 //                                repeatTimes:(float)repeatTimes {
 //    
 //    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
@@ -187,7 +187,7 @@
 //
 //+ (CABasicAnimation *)cyl_horizontalMoveAnimationFrom:(CGFloat)fromX
 //                                                   to:(CGFloat)toX
-//                                            duration:(CFTimeInterval)duration
+//                                            duration:(NSTimeInterval)duration
 //                                         repeatTimes:(float)repeatTimes {
 //    
 //    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.translation.x"];
@@ -206,7 +206,7 @@
 //
 //+ (CABasicAnimation *)cyl_opacityAnimationFrom:(CGFloat)fromAlpha
 //                                            to:(CGFloat)toAlpha
-//                                     duration:(CFTimeInterval)duration
+//                                     duration:(NSTimeInterval)duration
 //                                  repeatTimes:(float)repeatTimes {
 //    
 //    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
@@ -225,7 +225,7 @@
 //
 //+ (CABasicAnimation *)cyl_rotationAnimationFrom:(CGFloat)fromAngle
 //                                             to:(CGFloat)toAngle
-//                                      duration:(CFTimeInterval)duration
+//                                      duration:(NSTimeInterval)duration
 //                                   repeatTimes:(float)repeatTimes {
 //    
 //    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
@@ -244,7 +244,7 @@
 
 #pragma mark - Relative shake / bounce
 
-static CFTimeInterval CYLBadgeSafeDuration(CFTimeInterval duration) {
+static NSTimeInterval CYLBadgeSafeDuration(NSTimeInterval duration) {
     if (!isfinite(duration) || duration <= 0) {
         return 1;
     }
@@ -264,7 +264,7 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
 
 + (CAKeyframeAnimation *)cyl_translationAnimationWithKeyPath:(NSString *)keyPath
                                                  repeatTimes:(float)repeatTimes
-                                                    duration:(CFTimeInterval)duration
+                                                    duration:(NSTimeInterval)duration
                                                       offset:(CGFloat)offset {
     CGFloat safeOffset = CYLBadgeSafeOffset(offset);
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:keyPath];
@@ -276,18 +276,18 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
     return animation;
 }
 
-+ (CAKeyframeAnimation *)cyl_shakeAnimationRepeatTimes:(float)repeatTimes duration:(CFTimeInterval)duration offset:(CGFloat)offset {
++ (CAKeyframeAnimation *)cyl_shakeAnimationRepeatTimes:(float)repeatTimes duration:(NSTimeInterval)duration offset:(CGFloat)offset {
     return [self cyl_translationAnimationWithKeyPath:@"transform.translation.x" repeatTimes:repeatTimes duration:duration offset:offset];
 }
 
-+ (CAKeyframeAnimation *)cyl_bounceAnimationRepeatTimes:(float)repeatTimes duration:(CFTimeInterval)duration offset:(CGFloat)offset {
++ (CAKeyframeAnimation *)cyl_bounceAnimationRepeatTimes:(float)repeatTimes duration:(NSTimeInterval)duration offset:(CGFloat)offset {
     return [self cyl_translationAnimationWithKeyPath:@"transform.translation.y" repeatTimes:repeatTimes duration:duration offset:offset];
 }
 
 #pragma mark - Badge Default
 
 + (CABasicAnimation *)cyl_badge_once_scale_AnimationRepeatTimes:(float)repeatTimes
-                                                    durTimes:(float)time {
+                                                       duration:(NSTimeInterval)duration {
     
     CABasicAnimation *animation =
     [CABasicAnimation animationWithKeyPath:@"transform.scale"];
@@ -295,7 +295,7 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
     animation.fromValue = @(2.7);
     animation.toValue = @(1.0);
     animation.repeatCount = repeatTimes;
-    animation.duration = time;
+    animation.duration = duration;
     animation.removedOnCompletion = NO;
     animation.fillMode = kCAFillModeForwards;
     animation.timingFunction =
@@ -307,8 +307,8 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
 #pragma mark - Badge Left Right
 
 + (CABasicAnimation *)cyl_badge_once_leftRight_AnimationMoveDistance:(CGFloat)moveDistance
-                                                    repeatTimes:(float)repeatTimes
-                                                       durTimes:(float)time {
+                                                         repeatTimes:(float)repeatTimes
+                                                            duration:(NSTimeInterval)duration {
     
     CABasicAnimation *animation =
     [CABasicAnimation animationWithKeyPath:@"transform.translation.x"];
@@ -316,7 +316,7 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
     animation.fromValue = @(-moveDistance);
     animation.toValue = @(0);
     animation.repeatCount = repeatTimes;
-    animation.duration = time;
+    animation.duration = duration;
     animation.removedOnCompletion = NO;
     animation.fillMode = kCAFillModeForwards;
     animation.timingFunction =
@@ -328,8 +328,8 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
 #pragma mark - Badge Right Left
 
 + (CABasicAnimation *)cyl_badge_once_rightLeft_AnimationMoveDistance:(CGFloat)moveDistance
-                                                    repeatTimes:(float)repeatTimes
-                                                       durTimes:(float)time {
+                                                         repeatTimes:(float)repeatTimes
+                                                            duration:(NSTimeInterval)duration {
     
     CABasicAnimation *animation =
     [CABasicAnimation animationWithKeyPath:@"transform.translation.x"];
@@ -337,7 +337,7 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
     animation.fromValue = @(moveDistance);
     animation.toValue = @(0);
     animation.repeatCount = repeatTimes;
-    animation.duration = time;
+    animation.duration = duration;
     animation.removedOnCompletion = NO;
     animation.fillMode = kCAFillModeForwards;
     animation.timingFunction =
@@ -349,7 +349,7 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
 #pragma mark - Badge Fade In
 
 + (CABasicAnimation *)cyl_badge_once_fadeIn_AnimationRepeatTimes:(float)repeatTimes
-                                                   durTimes:(float)time {
+                                                        duration:(NSTimeInterval)duration {
     
     CABasicAnimation *animation =
     [CABasicAnimation animationWithKeyPath:@"opacity"];
@@ -357,7 +357,7 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
     animation.fromValue = @(0);
     animation.toValue = @(1);
     animation.repeatCount = repeatTimes;
-    animation.duration = time;
+    animation.duration = duration;
     animation.removedOnCompletion = NO;
     animation.fillMode = kCAFillModeForwards;
     animation.timingFunction =
@@ -369,7 +369,7 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
 #pragma mark - Badge RollingOnce
 
 + (CABasicAnimation *)cyl_badge_once_rolling_AnimationRepeatTimes:(float)repeatTimes
-                                                    durTimes:(float)time {
+                                                         duration:(NSTimeInterval)duration {
     
     CABasicAnimation *animation =
     [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
@@ -377,7 +377,7 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
     animation.fromValue = @(M_PI);
     animation.toValue = @(0);
     animation.repeatCount = repeatTimes;
-    animation.duration = time;
+    animation.duration = duration;
     animation.removedOnCompletion = NO;
     animation.fillMode = kCAFillModeForwards;
     animation.timingFunction =
@@ -394,6 +394,64 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
     springAnimation.keyTimes = @[@(0.0 / duration), @(0.15 / duration) , @(0.3 / duration), @(0.45 / duration),];
     springAnimation.duration = duration;
     return springAnimation;
+}
+
+#pragma mark - Original signatures (kept for compatibility)
+
+/*!
+ * [EN] The factories below keep their original names and `float` parameters, so existing callers keep compiling and
+ *      linking. Each only forwards to the `NSTimeInterval` method defined above (see the note in the header).
+ * [CN] 下面的工厂方法保持原来的名称和 `float` 参数，现有调用方可以继续编译和链接。每个方法只是转发给上面定义的 `NSTimeInterval` 方法（见头文件中的说明）。
+ */
++ (CABasicAnimation *)cyl_opacityForever_Animation:(float)time {
+    return [self cyl_opacityForeverAnimationWithDuration:time];
+}
+
++ (CABasicAnimation *)cyl_opacityTimes_Animation:(float)repeatTimes durTimes:(float)time {
+    return [self cyl_opacityTimesAnimationRepeatTimes:repeatTimes duration:time];
+}
+
++ (CABasicAnimation *)cyl_rotation:(float)dur degree:(float)degree direction:(CYLAxis)axis repeatCount:(int)repeatCount {
+    return [self cyl_rotationAnimationWithDuration:dur degree:degree direction:axis repeatCount:repeatCount];
+}
+
++ (CABasicAnimation *)cyl_scaleFrom:(CGFloat)fromScale toScale:(CGFloat)toScale durTimes:(float)time rep:(float)repeatTimes {
+    return [self cyl_scaleAnimationFromScale:fromScale toScale:toScale duration:time repeatTimes:repeatTimes];
+}
+
++ (CAKeyframeAnimation *)cyl_shake_AnimationRepeatTimes:(float)repeatTimes durTimes:(float)time forObj:(id)obj {
+    return [self cyl_shakeAnimationRepeatTimes:repeatTimes duration:time forObj:obj];
+}
+
++ (CAKeyframeAnimation *)cyl_bounce_AnimationRepeatTimes:(float)repeatTimes durTimes:(float)time forObj:(id)obj {
+    return [self cyl_bounceAnimationRepeatTimes:repeatTimes duration:time forObj:obj];
+}
+
++ (CABasicAnimation *)cyl_badge_once_scale_AnimationRepeatTimes:(float)repeatTimes
+                                                    durTimes:(float)time {
+    return [self cyl_badge_once_scale_AnimationRepeatTimes:repeatTimes duration:time];
+}
+
++ (CABasicAnimation *)cyl_badge_once_leftRight_AnimationMoveDistance:(CGFloat)moveDistance
+                                                    repeatTimes:(float)repeatTimes
+                                                       durTimes:(float)time {
+    return [self cyl_badge_once_leftRight_AnimationMoveDistance:moveDistance repeatTimes:repeatTimes duration:time];
+}
+
++ (CABasicAnimation *)cyl_badge_once_rightLeft_AnimationMoveDistance:(CGFloat)moveDistance
+                                                    repeatTimes:(float)repeatTimes
+                                                       durTimes:(float)time {
+    return [self cyl_badge_once_rightLeft_AnimationMoveDistance:moveDistance repeatTimes:repeatTimes duration:time];
+}
+
++ (CABasicAnimation *)cyl_badge_once_fadeIn_AnimationRepeatTimes:(float)repeatTimes
+                                                   durTimes:(float)time {
+    return [self cyl_badge_once_fadeIn_AnimationRepeatTimes:repeatTimes duration:time];
+}
+
++ (CABasicAnimation *)cyl_badge_once_rolling_AnimationRepeatTimes:(float)repeatTimes
+                                                    durTimes:(float)time {
+    return [self cyl_badge_once_rolling_AnimationRepeatTimes:repeatTimes duration:time];
 }
 
 @end

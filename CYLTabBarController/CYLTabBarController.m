@@ -499,7 +499,9 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
             [plusControlOrigin.cyl_swappableImageViewViewInTabBarButton cyl_setHidden:YES];
         
             //由于 SelectedControl 所在图层的渲染比未选中图层有延迟， 所以必须加延迟，如果不加延迟，可能无法获取到正确的子视图， 有概率获取的子视图为nil
-            NSUInteger delaySecondsForSelectedContentView = 0.5;
+            // NSTimeInterval, not NSUInteger: an integer type truncated 0.5 to 0, so this never waited.
+            // 必须是 NSTimeInterval：用 NSUInteger 会把 0.5 截断为 0，导致这里从未延迟。
+            NSTimeInterval delaySecondsForSelectedContentView = 0.5;
             if ([self hasPlusChildViewController]) {
                 [plusSelectedControl cyl_coverTabImageViewOrTabButton:YES
                                                               newView:selectedCover
@@ -2044,7 +2046,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
             return;
         }
         if(context == CYLTabImageViewDefaultOffsetContext) {
-            CGFloat tabImageViewDefaultOffset = [change[NSKeyValueChangeNewKey] floatValue];
+            CGFloat tabImageViewDefaultOffset = [change[NSKeyValueChangeNewKey] doubleValue];
             [self offsetTabBarTabImageViewToFit:tabImageViewDefaultOffset];
         }
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
@@ -3306,7 +3308,10 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
         }
         NSMutableArray *items = [NSMutableArray array];
         if (hasMoreItem) {
-            for (NSInteger i = 0; i < self.tabBar.items.count - 1; i++) {
+            // `i + 1 < count` instead of `i < count - 1`: `count` is unsigned, so `count - 1` wraps to a huge
+            // number when there are no items, and `viewControllers[i]` would run out of range.
+            // 用 `i + 1 < count` 而不是 `i < count - 1`：count 是无符号数，没有 item 时 `count - 1` 会回绕成极大值，导致 `viewControllers[i]` 越界。
+            for (NSUInteger i = 0; i + 1 < self.tabBar.items.count; i++) {
                 UIViewController *viewController = self.viewControllers[i];
                 if (!viewController.cyl_tabBarItem) {
                     continue;

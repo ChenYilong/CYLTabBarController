@@ -471,7 +471,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         
         //延迟是为了演示demo的时候， 方便看清楚badge动画。 非必须。可删除延迟。
         //@try是为了demo演示的时候， 随时调整减少 tabbar items 个数，而不导致崩溃， 非必须， 可删除。
-        NSUInteger delaySeconds = 1.5;
+        NSTimeInterval delaySeconds = 1.5;
         dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
         dispatch_after(when, dispatch_get_main_queue(), ^{
             @try {

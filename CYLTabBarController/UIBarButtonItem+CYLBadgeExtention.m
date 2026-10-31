@@ -177,17 +177,40 @@
     return @(self.cyl_badgeRadius);
 }
 
-- (NSNumber *)cyl_delayIfNeededForSeconds {
+/*!
+ * [EN] `CYLBadgeProtocol` declares `cyl_delayIfNeededForSeconds` as a `CGFloat`. This returned an `NSNumber *`, so a
+ *      caller going through the protocol read an object pointer as a floating-point number. Return the number itself.
+ * [CN] `CYLBadgeProtocol` 将 `cyl_delayIfNeededForSeconds` 声明为 `CGFloat`，这里却返回 `NSNumber *`，
+ *      通过协议调用时会把对象指针当作浮点数读取。现在直接返回数值。
+ */
+- (CGFloat)cyl_delayIfNeededForSeconds {
     // Mirror the logic used when delaying badge operations.
     // 0 if ready immediately, otherwise default to 0.5s.
     NSTimeInterval delaySeconds = self.cyl_isReady ? 0 : 0.5;
-    return @(delaySeconds);
+    return delaySeconds;
 }
 
-- (void)cyl_setDelayIfNeededForSeconds:(NSNumber *)seconds {
+- (void)cyl_setDelayIfNeededForSeconds:(CGFloat)seconds {
     // Accept and ignore; delay is computed dynamically by cyl_isReady.
     // Provided to satisfy protocol/KVC expectations.
     (void)seconds;
+}
+
+/*!
+ * [EN] Before, `cyl_delayIfNeededForSeconds` returned an `NSNumber *` from this class although the protocol declares a
+ *      `CGFloat`. A caller that used the declared type read a pointer as a number; one that used `performSelector:` /
+ *      KVC got the object. The declared type is the contract, so it returns the `CGFloat`. For an object, use this
+ *      NSNumber accessor, which also works through `performSelector:` and KVC.
+ * [CN] 原先这个类的 `cyl_delayIfNeededForSeconds` 返回 `NSNumber *`，而协议声明的是 `CGFloat`。按声明类型调用的代码会把指针当数字读取；
+ *      用 `performSelector:` / KVC 的代码拿到的是对象。声明的类型才是约定，所以现在返回 `CGFloat`。需要对象时请用这个 NSNumber 访问器，
+ *      它同样可用于 `performSelector:` 和 KVC。
+ */
+- (NSNumber *)cyl_delayIfNeededForSecondsValue {
+    return @(self.cyl_delayIfNeededForSeconds);
+}
+
+- (void)cyl_setDelayIfNeededForSecondsValue:(NSNumber *)delayIfNeededForSecondsValue {
+    [self cyl_setDelayIfNeededForSeconds:[delayIfNeededForSecondsValue doubleValue]];
 }
 
 #pragma mark -- setter/getter
@@ -285,7 +308,7 @@
 }
 
 - (void)cyl_setBadgeMarginValue:(NSNumber *)cyl_badgeMarginValue {
-    CGFloat badgeMargin = [cyl_badgeMarginValue floatValue];
+    CGFloat badgeMargin = [cyl_badgeMarginValue doubleValue];
     [self cyl_setBadgeMargin:badgeMargin];
 }
 
@@ -298,7 +321,7 @@
 }
 
 - (void)cyl_setBadgeRadiusValue:(NSNumber *)cyl_badgeRadiusValue {
-    CGFloat badgeRadius = [cyl_badgeRadiusValue floatValue];
+    CGFloat badgeRadius = [cyl_badgeRadiusValue doubleValue];
     [self cyl_setBadgeRadius:badgeRadius];
 }
 
@@ -311,7 +334,7 @@
 }
 
 - (void)cyl_setBadgeCornerRadiusValue:(NSNumber *)cyl_badgeCornerRadiusValue {
-    CGFloat cyl_badgeCornerRadius = [cyl_badgeCornerRadiusValue floatValue];
+    CGFloat cyl_badgeCornerRadius = [cyl_badgeCornerRadiusValue doubleValue];
     [self cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
 }
 

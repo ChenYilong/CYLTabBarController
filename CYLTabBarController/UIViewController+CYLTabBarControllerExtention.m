@@ -24,7 +24,6 @@
 @dynamic cyl_badgeMarginValue;
 @dynamic cyl_badgeMaximumBadgeNumberValue;
 @dynamic cyl_badgeRadiusValue;
-@dynamic cyl_delayIfNeededForSeconds;
 
 #pragma mark -
 #pragma mark - public Methods
@@ -671,6 +670,30 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     SEL selector = @selector(cyl_setBadgeCornerRadiusValue:);
     NSNumber *cyl_setBadgeCornerRadiusValue = @(cyl_badgeCornerRadius);
     [kActualView cyl_performSelector:selector withObject:cyl_setBadgeCornerRadiusValue];
+}
+
+/*!
+ * [EN] `cyl_delayIfNeededForSeconds` was `@dynamic` here with no implementation, so reading or setting it on a view
+ *      controller raised "unrecognized selector". It now forwards to the badge host like the properties above.
+ * [CN] 这里的 `cyl_delayIfNeededForSeconds` 原先是 `@dynamic` 且没有实现，对 view controller 读取或设置会抛出 "unrecognized selector"。
+ *      现在与上面的属性一样转发给角标宿主视图。
+ */
+- (CGFloat)cyl_delayIfNeededForSeconds {
+    return [kActualView cyl_delayIfNeededForSeconds];
+}
+
+- (void)cyl_setDelayIfNeededForSeconds:(CGFloat)delayIfNeededForSeconds {
+    SEL selector = @selector(cyl_setDelayIfNeededForSecondsValue:);
+    NSNumber *cyl_setDelayIfNeededForSecondsValue = @(delayIfNeededForSeconds);
+    [kActualView cyl_performSelector:selector withObject:cyl_setDelayIfNeededForSecondsValue];
+}
+
+- (NSNumber *)cyl_delayIfNeededForSecondsValue {
+    return @(self.cyl_delayIfNeededForSeconds);
+}
+
+- (void)cyl_setDelayIfNeededForSecondsValue:(NSNumber *)delayIfNeededForSecondsValue {
+    [self cyl_setDelayIfNeededForSeconds:[delayIfNeededForSecondsValue doubleValue]];
 }
 
 - (BOOL)cyl_isEqualToViewController:(UIViewController *)compairedViewController {

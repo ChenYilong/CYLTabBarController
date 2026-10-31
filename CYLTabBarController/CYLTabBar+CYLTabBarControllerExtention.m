@@ -425,7 +425,7 @@
 
 - (CGFloat)cyl_platterViewWidth {
     NSNumber *platterViewWidthObject = objc_getAssociatedObject(self, @selector(cyl_platterViewWidth));
-    return [platterViewWidthObject floatValue];
+    return [platterViewWidthObject doubleValue];
 }
 
 - (void)cyl_setPlatterViewWidth:(CGFloat)platterViewWidth {
