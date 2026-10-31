@@ -50,13 +50,35 @@
     return [self cyl_popSelectTabBarChildViewControllerAtIndex:index animated:NO];
 }
 
+/*!
+ * FIX: issue #519
+ * [EN] The current navigation stack is popped after the tab switch, while it is off screen, so the pop does not lay it
+ *      out. Its navigation bar (e.g. hidden on the pushed page, shown on the root) was only updated when that tab was
+ *      shown again, and the tab flickered with a black area at the top. Lay out both the popped stack and the newly
+ *      selected tab right away. (Popping before the switch is not an option: the popped page would then disappear on
+ *      screen, and work it does in `-viewDidDisappear:`, such as a forced rotation, breaks the switch.)
+ *      An index outside `viewControllers` (or a class type that is not found) no longer switches tabs or pops; it
+ *      returns nil.
+ * [CN] 当前导航栈在切换 Tab 之后才 pop，此时它已不在屏幕上，pop 不会触发布局。它的导航栏状态（例如被 push 的页面隐藏导航栏、
+ *      栈底显示导航栏）要等再次显示该 Tab 时才更新，导致闪动、顶部出现黑色区域。现在 pop 后立即对被 pop 的栈和新选中的 Tab
+ *      布局。（不能改为先 pop 再切换：被 pop 的页面会在屏幕上消失，它在 `-viewDidDisappear:` 中的操作，例如强制旋转，会打乱切换。）
+ *      index 超出 `viewControllers` 范围（或找不到对应的 classType）时，不再切换 Tab 或 pop，直接返回 nil。
+ */
 - (UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index animated:(BOOL)animated {
     UIViewController *viewController = [self cyl_getViewControllerInsteadOfNavigationController];
-    [viewController checkTabBarChildControllerValidityAtIndex:index];
     CYLTabBarController *tabBarController = [viewController cyl_tabBarController];
+    [viewController checkTabBarChildControllerValidityAtIndex:index];
+    if (index >= tabBarController.viewControllers.count) {
+        return nil;
+    }
+    UINavigationController *navigationController = viewController.navigationController;
     tabBarController.selectedIndex = index;
-    [viewController.navigationController popToRootViewControllerAnimated:animated];
+    [navigationController popToRootViewControllerAnimated:animated];
+    [navigationController.view setNeedsLayout];
+    [navigationController.view layoutIfNeeded];
     UIViewController *selectedTabBarChildViewController = tabBarController.selectedViewController;
+    [selectedTabBarChildViewController.view setNeedsLayout];
+    [selectedTabBarChildViewController.view layoutIfNeeded];
     return [selectedTabBarChildViewController cyl_getViewControllerInsteadOfNavigationController];
 }
 
