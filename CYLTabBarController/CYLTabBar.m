@@ -962,11 +962,11 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 }
 
 - (CYLTabBarController *)tabBarController {
-    CYLTabBarController *tabBarController = self.cyl_tabBarController;
-    if (self.delegate && [self.delegate isKindOfClass:[CYLTabBarController class]]) {
-        tabBarController = (CYLTabBarController *)self.delegate;
+    // The owner (its `delegate`) first; the `-cyl_tabBarController` fallback walk only when it has none.
+    if ([self.delegate isKindOfClass:[CYLTabBarController class]]) {
+        return (CYLTabBarController *)self.delegate;
     }
-    return tabBarController;
+    return self.cyl_tabBarController;
 }
 
 //处理PlusButton事件响应优先级为最优。

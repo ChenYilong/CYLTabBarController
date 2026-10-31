@@ -113,9 +113,10 @@
 
 - (NSArray *)cyl_visibleControls {
     NSMutableArray *originalTabBarButtons = [NSMutableArray arrayWithArray:[self.cyl_originalTabBarButtons copy]];
-    BOOL notAdded = (NSNotFound == [originalTabBarButtons indexOfObject:[CYLPlusButton plusButtonForOwner:self]]);
-    if ([CYLPlusButton plusButtonForOwner:self] && notAdded && [self isKindOfClass:[CYLTabBar class]] && self.hasPlusButton) {
-        [originalTabBarButtons addObject:[CYLPlusButton plusButtonForOwner:self]];
+    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    BOOL notAdded = (NSNotFound == [originalTabBarButtons indexOfObject:plusButton]);
+    if (plusButton && notAdded && [self isKindOfClass:[CYLTabBar class]]) {
+        [originalTabBarButtons addObject:plusButton];
     }
     if (originalTabBarButtons.count == 0) {
         return nil;
