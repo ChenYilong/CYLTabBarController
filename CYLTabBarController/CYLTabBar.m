@@ -26,7 +26,7 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 
 @interface CYLTabBar () <UIGestureRecognizerDelegate>
 
-@property (nonatomic, copy) NSMutableSet<UIView *> *observedViews;
+@property (nonatomic, strong) NSMutableSet<UIView *> *observedViews;
 
 @end
 
@@ -445,11 +445,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         }
         return;
     }
-    if(context != CYLTabBarContext) {
-        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-        return;
-    }
-    if(context == CYLTabBarContext) {
+    if (context == CYLTabBarContext) {
         [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemWidthDidChangeNotification object:self];
         if (@available(iOS 11.0, *)) {
             if (CYL_IS_IPHONE_X) {
@@ -458,21 +454,34 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         }
         return;
     }
+    [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 - (void)dealloc {
     // KVO反注册
-    [self cyl_removeObserver:self forKeyPath:@"tabBarItemWidth"];
+    [self cyl_removeObserver:self forKeyPath:@"tabBarItemWidth" context:CYLTabBarContext];
     [self removeAlphaObserver];
 }
 
-- (void)removeAlphaObserver {
-    if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0") && ![CYLConstants isLiquidGlassActive]) {
-        [_observedViews enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, BOOL * _Nonnull stop) {
-            [obj cyl_removeObserver:self forKeyPath:@"alpha"];
-        }];
-        [_observedViews removeAllObjects];
+/// It was never created: `-containsObject:` on nil is NO, so every layout pass added another `alpha` observer, and none
+/// was ever removed.
+/// 以前从未创建：对 nil 调用 `-containsObject:` 返回 NO，于是每次布局都会再添加一个 `alpha` 观察者，而且从不移除。
+- (NSMutableSet<UIView *> *)observedViews {
+    if (!_observedViews) {
+        _observedViews = [NSMutableSet set];
     }
+    return _observedViews;
+}
+
+- (void)removeAlphaObserver {
+    // Not gated like the registration: `_observedViews` holds exactly the views observed, and the conditions there
+    // (Liquid Glass) may have changed since; a view left observed messages this tab bar after it is deallocated.
+    // 不像注册时那样加条件：`_observedViews` 正好是被观察的视图，而注册时的条件（Liquid Glass）之后可能已改变；
+    // 漏掉的视图会在本 TabBar 释放后继续向它发消息。
+    [_observedViews enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, BOOL * _Nonnull stop) {
+        [obj cyl_removeObserver:self forKeyPath:@"alpha" context:CYLTabBarAlpha];
+    }];
+    [_observedViews removeAllObjects];
 }
 
 - (void)setTabBarItemWidth:(CGFloat )tabBarItemWidth {

@@ -81,6 +81,7 @@ NSString *const CYLTabBarItemLottieAnimationPlayingNotification = @"CYLTabBarIte
 
 NSString *const CYLTabBarStyleTypeDidChangeNotification = @"CYLTabBarStyleTypeDidChangeNotification";
 static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageViewDefaultOffsetContext;
+static void * const CYLFlatDesignTabBarContext = (void*)&CYLFlatDesignTabBarContext;
 //static void * const CYLTabBarControllerVisiableItemsCountContext = (void*)&CYLTabBarControllerVisiableItemsCountContext;
 
 #if CYL_FLATDESIGN_AVAILABLE
@@ -670,16 +671,14 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
         //        [[self cyl_contextPlusChildViewController] cyl_setPlusViewControllerEverAdded:NO];
         //    }
         // KVO反注册
-        if (self.cyl_tabBar && self.isObservingTabImageViewDefaultOffset) {
-            [self.cyl_tabBar cyl_removeObserver:self forKeyPath:@"tabImageViewDefaultOffset"];
-        }
+        [self cyl_stopObservingTabImageViewDefaultOffset];
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 
     //CYLTabBarStyleTypeFlatDesign
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
 #if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        [self cyl_removeObserver:self forKeyPath:@"cyl_tabBar"];
+        [self cyl_removeObserver:self forKeyPath:@"cyl_tabBar" context:CYLFlatDesignTabBarContext];
 #else
 #endif
     } else { }
@@ -2070,39 +2069,39 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 #pragma mark - KVO Method
 
 // KVO监听执行
+// Dispatched by `context`, not by the current style: an observation outlives a change of `tabBarStyleType`, and an
+// observation of ours passed on to `super` raises an exception.
+// 按 `context` 分发，而不是按当前样式：观察会在 `tabBarStyleType` 改变后继续存在，把自己的观察交给 `super` 会抛异常。
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        if(context != CYLTabImageViewDefaultOffsetContext) {
-            [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-            return;
-        }
-        if(context == CYLTabImageViewDefaultOffsetContext) {
+    if (context == CYLTabImageViewDefaultOffsetContext) {
+        CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
             CGFloat tabImageViewDefaultOffset = [change[NSKeyValueChangeNewKey] doubleValue];
             [self offsetTabBarTabImageViewToFit:tabImageViewDefaultOffset];
-        }
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-#pragma mark - Observe
-    //CYLTabBarStyleTypeFlatDesign
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+        } else {/**  CYLTabBarStyleTypeFlatDesign*/}
+        return;
+    }
+    if (context == CYLFlatDesignTabBarContext) {
 #if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        if ([keyPath isEqualToString:@"cyl_tabBar"]) {
-            CYLFlatDesignTabBar *oldTabBar = change[NSKeyValueChangeOldKey];
-            [oldTabBar removeFromSuperview];
-            
-            CYLFlatDesignTabBar *newTabBar = change[NSKeyValueChangeNewKey];
-            newTabBar.delegate = self;
-            newTabBar.items = oldTabBar.items;
-            newTabBar.selectedItem = oldTabBar.selectedItem;
-            self.cyl_tabBar = newTabBar;
-            if (newTabBar) {
-                [self.view addSubview:newTabBar];
-                [self.view setNeedsLayout];
-            }
+        if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType || ![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
+        id oldValue = change[NSKeyValueChangeOldKey];
+        id newValue = change[NSKeyValueChangeNewKey];
+        CYLFlatDesignTabBar *oldTabBar = (oldValue == [NSNull null]) ? nil : oldValue;
+        CYLFlatDesignTabBar *newTabBar = (newValue == [NSNull null]) ? nil : newValue;
+        // `-cyl_setTabBar:` already stored `newTabBar`. Setting it again here re-entered this callback forever.
+        // `-cyl_setTabBar:` 已经保存了 `newTabBar`，在这里再次赋值会无限重入本回调。
+        if (oldTabBar == newTabBar) { return; }
+        [oldTabBar removeFromSuperview];
+        newTabBar.delegate = self;
+        newTabBar.items = oldTabBar.items;
+        newTabBar.selectedItem = oldTabBar.selectedItem;
+        if (newTabBar) {
+            [self.view addSubview:newTabBar];
+            [self.view setNeedsLayout];
         }
-#else
 #endif
-    } else {}
+        return;
+    }
+    [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 
@@ -2434,6 +2433,17 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
 
+/// Stops observing `tabImageViewDefaultOffset` of the CYLTabBar it was added to (`_cyl_tabBar`, never the lazy getter).
+- (void)cyl_stopObservingTabImageViewDefaultOffset {
+    if (!self.isObservingTabImageViewDefaultOffset) {
+        return;
+    }
+    if ([_cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+        [_cyl_tabBar cyl_removeObserver:self forKeyPath:@"tabImageViewDefaultOffset" context:CYLTabImageViewDefaultOffsetContext];
+    }
+    self.observingTabImageViewDefaultOffset = NO;
+}
+
 #pragma mark -
 #pragma mark - getter & setter
 // MARK: getter & setter
@@ -2479,6 +2489,9 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
 #if CYL_FLATDESIGN_AVAILABLE
         if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+            // Otherwise the flag stays YES and the next CYLTabBar (back to a system style) is never observed.
+            // 否则标记一直为 YES，之后（切回系统样式时）新建的 CYLTabBar 永远不会被观察。
+            [self cyl_stopObservingTabImageViewDefaultOffset];
             _cyl_tabBar = nil;
         }
         if (!_cyl_tabBar) {
@@ -2498,7 +2511,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
             _cylDidRefreshSystemTabBarVisibility = NO;
             _cylRefreshedSystemTabBarWindow = nil;
             [self.view addSubview:_cyl_tabBar];
-            [self addObserver:self forKeyPath:@"cyl_tabBar" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew context:nil];
+            [self addObserver:self forKeyPath:@"cyl_tabBar" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew context:CYLFlatDesignTabBarContext];
             
             self.cyl_tabBarHidden = NO;
             [self setTabBarHidden:NO];

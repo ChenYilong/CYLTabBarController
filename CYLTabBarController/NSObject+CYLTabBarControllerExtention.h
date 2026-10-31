@@ -89,6 +89,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)cyl_removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath;
 
+/*!
+ * [EN] `removeObserver:forKeyPath:context:` that catches exceptions. Prefer it: the `context` makes sure only the
+ *      registration made with that context is removed, never one a superclass made for the same key path.
+ * [CN] 安全地移除指定 `context` 的 KVO 观察者，捕获异常。优先使用它：`context` 保证只移除用该 context 注册的观察，
+ *      不会误删父类对同一 keyPath 的注册。
+ */
+- (void)cyl_removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath context:(nullable void *)context;
+
 @end
 
 NS_ASSUME_NONNULL_END

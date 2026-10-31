@@ -12,13 +12,10 @@
 
 + (UIImage *)cyl_imageWithColor:(UIColor *)color size:(CGSize)size {
     if (!color || size.width <= 0 || size.height <= 0) { return nil; }
-    CGRect rect = CGRectMake(0.0f, 0.0f, size.width, size.height);
-    UIGraphicsBeginImageContextWithOptions(rect.size, NO, 0);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, color.CGColor);
-    CGContextFillRect(context, rect);
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+    UIImage *image = [self cyl_imageWithSize:size opaque:NO scale:0 actions:^(CGContextRef contextRef) {
+        CGContextSetFillColorWithColor(contextRef, color.CGColor);
+        CGContextFillRect(contextRef, CGRectMake(0.0f, 0.0f, size.width, size.height));
+    }];
     return [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
 
@@ -106,9 +103,8 @@
 
 + (UIImage *)cyl_imageWithColor:(UIColor *)color size:(CGSize)size cornerRadius:(CGFloat)cornerRadius {
     color = color ? color : [UIColor clearColor];
-    CGFloat a = 0;
-    [color getRed:0 green:0 blue:0 alpha:&a];
-    BOOL opaque = (cornerRadius == 0.0 && a == 1.0);
+    // Not `-getRed:green:blue:alpha:`: it fails for grayscale colors such as `+whiteColor` and left the alpha at 0.
+    BOOL opaque = (cornerRadius == 0.0 && CGColorGetAlpha(color.CGColor) == 1.0);
     return [self cyl_imageWithSize:size opaque:opaque scale:0 actions:^(CGContextRef contextRef) {
         CGContextSetFillColorWithColor(contextRef, color.CGColor);
         if (cornerRadius > 0) {
@@ -125,13 +121,17 @@
     if (!actionBlock || size.width <= 0 || size.height <= 0) {
         return nil;
     }
-    UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    if (!context) return nil;
-    actionBlock(context);
-    UIImage *imageOut = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return imageOut;
+    // `UIGraphicsImageRenderer`: `UIGraphicsBeginImageContextWithOptions` is deprecated (iOS 17), and its early return
+    // on a nil context left the image context pushed.
+    UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat preferredFormat];
+    format.opaque = opaque;
+    if (scale > 0) {
+        format.scale = scale;   // 0 keeps the screen scale, as `UIGraphicsBeginImageContextWithOptions` did
+    }
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:size format:format];
+    return [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+        actionBlock(rendererContext.CGContext);
+    }];
 }
 
 @end
