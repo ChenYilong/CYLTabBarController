@@ -162,8 +162,7 @@ class MainTabBarController: CYLTabBarController {
     /// Tab buttons that report taps through CYLTabBarController's target-action. The plus button and the plus child
     /// view controller's button report through the plus button instead, so they are left out.
     private func issue610TabControls() -> [UIControl] {
-        guard let cylTabBar = tabBar as? CYLTabBar else { return [] }
-        return cylTabBar.cyl_visibleControls()?.filter { !$0.cyl_isPlusControl() } ?? []
+        return tabBar.cyl_visibleControls()?.filter { !$0.cyl_isPlusControl() } ?? []
     }
 
     /// "1" / "0" per control: does it carry CYLTabBarController's tap action right now?
