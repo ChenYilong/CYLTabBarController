@@ -254,7 +254,8 @@
 }
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
-    return;
+    // Disabled demo code, kept for reference. 已停用的演示代码，保留供参考。
+#if 0
     CYLFlatDesignMainTabBarController *tabBarController = self;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{});
@@ -307,6 +308,7 @@
         
     });
     //    });
+#endif
 }
 - (UIButton *)selectedCover {
     //    if (_selectedCover) {
@@ -469,7 +471,7 @@ NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_F
     
     //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
     if ([control cyl_isTabButton] || [control cyl_isPlusButton]) {
-        BOOL shouldSelectedCoverShow = (self.selectedIndex == 0);
+        //        BOOL shouldSelectedCoverShow = (self.selectedIndex == 0);
         //        [self setSelectedCoverShow:shouldSelectedCoverShow];
     }
 }

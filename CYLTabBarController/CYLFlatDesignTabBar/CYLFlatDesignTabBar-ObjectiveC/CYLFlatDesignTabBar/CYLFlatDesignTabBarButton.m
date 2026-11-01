@@ -362,7 +362,6 @@
         return;
     }
     if (self.isSelected) {
-        NSValue *lottieSizeValue = [self _lottieSizeValue];
         CGSize lottieSize = [[self _lottieSizeValue] CGSizeValue];
         NSURL *lottieURL = [self _lottieURL];
         if (!lottieURL) {

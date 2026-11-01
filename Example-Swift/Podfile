@@ -1,7 +1,7 @@
 # Uncomment the next line to define a global platform for your project
 # source 'git@github.com:CocoaPods/Specs.git'
 
-#platform:ios,'13.0'# use post_install do |installer| instead
+platform :ios, '15.0'
 inhibit_all_warnings!
 
 target 'CYLTabBarController-Swift' do
