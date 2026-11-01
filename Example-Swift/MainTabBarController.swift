@@ -16,7 +16,7 @@ class MainTabBarController: CYLTabBarController {
         imageInsets: UIEdgeInsets,
         titlePositionAdjustment: UIOffset,
         
-        context: String
+        context: String?
     ) {
         super.init(
             viewControllers: viewControllers,
@@ -32,7 +32,7 @@ class MainTabBarController: CYLTabBarController {
         imageInsets: UIEdgeInsets,
         titlePositionAdjustment: UIOffset,
         styleType: CYLTabBarStyleType,
-        context: String
+        context: String?
     ) {
         super.init(
             viewControllers: viewControllers,

@@ -346,12 +346,12 @@
 
     if (lottieURL) {
 #if __has_include(<Lottie/Lottie.h>)
-        CGSize lottieSize = [lottieSizeValue CGSizeValue];
+        CGSize lottieSize = [[self _lottieSizeValue] CGSizeValue];
         [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode]];
 #endif
      
 #if __has_include(<Lottie/Lottie-Swift.h>)
-        CGSize lottieSize = [lottieSizeValue CGSizeValue];
+        CGSize lottieSize = [[self _lottieSizeValue] CGSizeValue];
         [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode]];
 #endif
     }
@@ -363,7 +363,7 @@
     }
     if (self.isSelected) {
         NSValue *lottieSizeValue = [self _lottieSizeValue];
-        CGSize lottieSize = [lottieSizeValue CGSizeValue];
+        CGSize lottieSize = [[self _lottieSizeValue] CGSizeValue];
         NSURL *lottieURL = [self _lottieURL];
         if (!lottieURL) {
             return;
