@@ -111,7 +111,7 @@ extension MainTabBarController {
     }
  
     static func makeViewControllers() -> [UIViewController] {
-        let home = UINavigationController(rootViewController: HomeViewController())
+        let home = UINavigationController(rootViewController: CYLBadgeHelperTableViewController())
         let connection = UINavigationController(rootViewController: ConnectionViewController())
         let message = UINavigationController(rootViewController: MessageViewController())
         let personal = UINavigationController(rootViewController: PersonalViewController())

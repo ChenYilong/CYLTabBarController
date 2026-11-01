@@ -16,6 +16,7 @@ class HomeVC: ViewController {
         self.view.backgroundColor = .red
 
         addRightBarButtonItemImage("屏幕全屏", self, action: #selector(tapAction))
+        cyl_addBadgeHelperTable()
     }
     
     @objc func tapAction() {

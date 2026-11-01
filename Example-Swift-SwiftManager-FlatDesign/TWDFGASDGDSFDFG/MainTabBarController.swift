@@ -153,9 +153,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         
         // 5. 控制器配置 (使用原生 UIViewController 占位)
         var controller: UIViewController {
-            let vc = UIViewController()
-            vc.view.backgroundColor = .white
-            return vc
+            return CYLBadgeHelperTableViewController()
         }
     }
 
