@@ -132,7 +132,7 @@
     NSArray<__kindof UIViewController *> *otherSameClassTypeViewControllersInCurrentNavigationControllerStack = [self cyl_getOtherSameClassTypeViewControllersInCurrentNavigationControllerStack:viewController];
     
     CYLPushOrPopCompletionHandler completionHandler = ^(BOOL shouldPop,
-                                                        __kindof UIViewController *viewControllerPopTo,
+                                                        __kindof UIViewController * _Nullable viewControllerPopTo,
                                                         BOOL shouldPopSelectTabBarChildViewController,
                                                         NSUInteger index
                                                         ) {

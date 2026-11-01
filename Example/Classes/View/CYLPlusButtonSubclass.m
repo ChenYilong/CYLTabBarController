@@ -272,8 +272,6 @@
 //
 //}
 - (void)clickPublish {
-    CYLTabBarController *tabBarController = [self cyl_tabBarController];
-    
     UIViewController *viewController = CYLGetRootViewController();
     
     // The new tab bar controller shows the OTHER plus button (another context): the title tells which.

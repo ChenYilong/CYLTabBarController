@@ -449,10 +449,16 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     if ([self cyl_isPlusControl]) {
         return;
     }
-#if __has_include(<Lottie/Lottie.h>)
+    // FIX: Lottie icons invisible in FlatDesign. No `CYLTabBarLottieSize` means a zero size; both Lottie flavors need
+    // the placeholder size, otherwise the animation view is 0 x 0. Only compiled with Lottie, so that the analyzer
+    // does not report a dead store without it.
+    // 未设置 `CYLTabBarLottieSize` 时 size 为 0，两种 Lottie 都需要使用占位尺寸，否则动画视图为 0 x 0（扁平样式下图标不显示）。
+#if __has_include(<Lottie/Lottie.h>) || __has_include(<Lottie/Lottie-Swift.h>)
     if (CGSizeEqualToSize(CGSizeZero, size)) {
         size = CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
     }
+#endif
+#if __has_include(<Lottie/Lottie.h>)
     if (self.cyl_lottieAnimationView) {
         return;
     }

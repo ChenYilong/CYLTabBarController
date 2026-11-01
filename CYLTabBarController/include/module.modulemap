@@ -1,7 +1,8 @@
 // Swift Package Manager module map. SPM looks for public headers in `include/`;
-// the headers stay where CocoaPods/Carthage expect them, so point at the umbrella header.
+// the headers stay where CocoaPods/Carthage expect them, so point at the main header.
+// `header` instead of `umbrella header`: an umbrella header makes its whole directory the module and warns for every
+// header there that it does not import (private headers, the `include/` shims). The main header imports the public API.
 module CYLTabBarController {
-    umbrella header "../CYLTabBarController.h"
+    header "../CYLTabBarController.h"
     export *
-    module * { export * }
 }
