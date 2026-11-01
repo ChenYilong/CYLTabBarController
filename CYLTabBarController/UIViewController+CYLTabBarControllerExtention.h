@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void (^CYLPopSelectTabBarChildViewControllerCompletion)(__kindof UIViewController *selectedTabBarChildViewController);
 
 typedef void (^CYLPushOrPopCompletionHandler)(BOOL shouldPop,
-                                              __kindof UIViewController *viewControllerPopTo,
+                                              __kindof UIViewController * _Nullable viewControllerPopTo,
                                               BOOL shouldPopSelectTabBarChildViewController,
                                               NSUInteger index
                                               );

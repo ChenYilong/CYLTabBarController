@@ -119,7 +119,7 @@ static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationItem.title = @"Badge";
+    self.navigationItem.title = NSLocalizedString(@"Badge", @"Title of the badge list");
     self.tableView.rowHeight = CYLBadgeRowHeight;
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CYLBadgeHelperCellIdentifier];
 }

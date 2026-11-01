@@ -22,7 +22,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 #define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
 
-@interface MainTabBarController ()<UITabBarControllerDelegate>
+@interface MainTabBarController ()<CYLTabBarControllerDelegate, CYLFlatDesignUITabBarControllerDelegate>
 
 @property (nonatomic, weak) UIButton *selectedCover;
 
@@ -141,7 +141,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 + (NSArray *)tabBarItemsAttributesForTabBar {
     
     // lottie动画的json文件来自于NorthSea, respect!
-    CGFloat firstXOffset = -12/2;
+    //    CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
         CYLTabBarItemTitle : @"首页",
         CYLTabBarItemImage : @"home_normal",  /* NSString and UIImage are supported*/
@@ -152,7 +152,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                 CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"],
         //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
-    CGFloat secondXOffset = (-25+2)/2;
+    //    CGFloat secondXOffset = (-25+2)/2;
     NSDictionary *secondTabBarItemsAttributes = @{
         CYLTabBarItemTitle : @"同城",
         CYLTabBarItemImage :@"fishpond_normal",

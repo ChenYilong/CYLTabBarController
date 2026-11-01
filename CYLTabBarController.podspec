@@ -59,6 +59,9 @@ Pod::Spec.new do |s|
   
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
+    # Category-only files (e.g. `CAAnimation+CYLBadgeExtention.m`) export no global symbol, which makes libtool
+    # warn "has no symbols" when CocoaPods builds a static framework.
+    'OTHER_LIBTOOLFLAGS' => '-no_warning_for_no_symbols',
     'WARNING_CFLAGS' => [
     '-Werror=undeclared-selector',
     '-Werror=incomplete-implementation'

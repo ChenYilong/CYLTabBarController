@@ -51,12 +51,12 @@
     //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
     //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
     
-    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"FlatDesign" style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
+    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"FlatDesign", nil) style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
     //    leftBarButtonItem.tintColor = UIColor.redColor; // 确保使用原图色
     self.navigationItem.leftBarButtonItem = leftBarButtonItem;
     
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"LiquidGlass" style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"LiquidGlass", nil) style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
     //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"CYLTabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
     
 #define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
@@ -123,29 +123,29 @@
     }
     
     cell.accessoryType = UITableViewCellAccessoryNone;
-    NSString *title = [NSString stringWithFormat:@"%@ CYLTabBarController on iOS %@", self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
+    NSString *title = [NSString localizedStringWithFormat:NSLocalizedString(@"%@ CYLTabBarController on iOS %@", nil), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
 
     if (indexPath.row == 0) {
-        title = @"Show / hide CYLFlatDesignTabBar";
+        title = NSLocalizedString(@"Show / hide CYLFlatDesignTabBar", nil);
     } else if (indexPath.row == 1) {
-        title = @"Change CYLFlatDesignTabBarItem 不居中显示（系统效果）";
+        title = NSLocalizedString(@"Change CYLFlatDesignTabBarItem 不居中显示（系统效果）", nil);
     } else if (indexPath.row == 2) {
-        title = @"Change CYLFlatDesignTabBarItem 居中显示";
+        title = NSLocalizedString(@"Change CYLFlatDesignTabBarItem 居中显示", nil);
     } else if (indexPath.row == 3) {
-        title = @"设置 CYLFlatDesignTabBarItem 背景色";
+        title = NSLocalizedString(@"设置 CYLFlatDesignTabBarItem 背景色", nil);
     } else if (indexPath.row == 4) {
-        title = @"改变 CYLFlatDesignTabBar 高度";
+        title = NSLocalizedString(@"改变 CYLFlatDesignTabBar 高度", nil);
     } else if (indexPath.row == 5) {
-        title = @"和系统 UITabBar 比较";
+        title = NSLocalizedString(@"和系统 UITabBar 比较", nil);
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     } else if (indexPath.row == 6) {
-        title = @"Push To 系统 UITabBarController（另一个 PlusButton）";
+        title = NSLocalizedString(@"Push To 系统 UITabBarController（另一个 PlusButton）", nil);
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     } else if (indexPath.row == 7) {
-        title = @"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）";
+        title = NSLocalizedString(@"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）", nil);
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     } else if (indexPath.row == 8) {
-        title = @"cyl_pop / cyl_push 系列方法演示";
+        title = NSLocalizedString(@"cyl_pop / cyl_push 系列方法演示", nil);
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     cell.textLabel.text = title;
@@ -199,7 +199,7 @@
     } else if (indexPath.row == 3) {
         for (UIViewController *vc in tabBarController.viewControllers) {
             UIColor *backgroundColor = vc.cyl_tabBarItem.backgroundColor;
-            UIColor *selectedBackgroundColor = vc.cyl_tabBarItem.selectedBackgroundColor;
+            UIColor *selectedBackgroundColor = nil;
             if (backgroundColor == nil) {
                 backgroundColor = [UIColor colorWithRed:0.18 green:0.18 blue:0.18 alpha:1.0];
                 selectedBackgroundColor = [UIColor blackColor];

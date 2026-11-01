@@ -1022,7 +1022,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 
 - (BOOL)cyl_badgeRespectsReduceMotion {
     NSNumber *value = objc_getAssociatedObject(self, @selector(cyl_badgeRespectsReduceMotion));
-    return value ? value.boolValue : YES;
+    return value != nil ? value.boolValue : YES;
 }
 
 - (void)cyl_setBadgeRespectsReduceMotion:(BOOL)badgeRespectsReduceMotion {
@@ -1031,7 +1031,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 
 - (CGFloat)cyl_delayIfNeededForSeconds {
     NSNumber *delayIfNeededForSecondsObject = objc_getAssociatedObject(self, @selector(cyl_delayIfNeededForSeconds));
-    if (!delayIfNeededForSecondsObject) {
+    if (delayIfNeededForSecondsObject == nil) {
         return kCYLBadgeDefaultDelayIfNeededForSeconds;
     }
     return [delayIfNeededForSecondsObject doubleValue];
