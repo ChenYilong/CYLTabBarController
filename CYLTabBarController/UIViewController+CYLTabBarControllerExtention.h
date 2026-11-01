@@ -59,7 +59,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 @property (nonatomic, readonly, getter=cyl_tabIndex) NSInteger cyl_tabIndex;
 
-@property (nonatomic, strong, getter=cyl_tabButton, setter=cyl_setTabButton:) UIControl *cyl_tabButton;
+@property (nonatomic, strong, getter=cyl_tabButton, setter=cyl_setTabButton:, nullable) UIControl *cyl_tabButton;
 
 @property (nonatomic, assign, setter=cyl_setPlusViewControllerEverAdded:, getter=cyl_plusViewControllerEverAdded) BOOL cyl_plusViewControllerEverAdded;
 
@@ -138,7 +138,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  * [EN] Pops to the root of the current navigation stack, selects the tab at `index` without animation, and returns the selected view controller.
  * [CN] Pop 到当前导航栈底，无动画地选中 index 对应的 Tab，并返回被选中的控制器。
  */
-- (UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index;
+- (nullable UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index;
 
 /*!
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器作为返回值返回。
@@ -149,7 +149,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  * [EN] Pops to the root of the current navigation stack, selects the tab at `index`, and returns the selected view controller.
  * [CN] Pop 到当前导航栈底，选中 index 对应的 Tab，并返回被选中的控制器。
  */
-- (UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index animated:(BOOL)animated;
+- (nullable UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index animated:(BOOL)animated;
 
 /*!
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器在 `Block` 回调中返回。
@@ -281,7 +281,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  */
 - (BOOL)cyl_isShowTabBadgePoint CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol>, such as `-[UIViewController cyl_isShowBadge]` instead.");
 
-@property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView) UIView *cyl_tabBadgePointView CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
+@property (nonatomic, strong, setter=cyl_setTabBadgePointView:, getter=cyl_tabBadgePointView, nullable) UIView *cyl_tabBadgePointView CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
 
 @property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset cyl_tabBadgePointViewOffset CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
 

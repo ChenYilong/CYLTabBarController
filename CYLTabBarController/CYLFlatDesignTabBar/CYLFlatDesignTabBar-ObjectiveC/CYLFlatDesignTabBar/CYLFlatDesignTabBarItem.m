@@ -61,15 +61,15 @@ NSString *const CYLFlatDesignTabBarItemDidChange = @"CYLFlatDesignTabBarItemDidC
 }
 
 
-- (instancetype)initWithTitle:(NSString *)title
-                        image:(id)image
-                selectedImage:(id)selectedImage
+- (instancetype)initWithTitle:(nullable NSString *)title
+                        image:(nullable id)image
+                selectedImage:(nullable id)selectedImage
                         index:(NSInteger)index
       titlePositionAdjustment:(UIOffset)titlePositionAdjustment
       imagePositionAdjustment:(UIOffset)imagePositionAdjustment
                   imageInsets:(UIEdgeInsets)imageInsets
-               lottieFilePath:(NSString *)lottieFilePath
-              lottieSizeValue:(NSValue *)lottieSizeValue {
+               lottieFilePath:(nullable NSString *)lottieFilePath
+              lottieSizeValue:(nullable NSValue *)lottieSizeValue {
         if (self = [super init]) {
             _title = title;
             _image = image;

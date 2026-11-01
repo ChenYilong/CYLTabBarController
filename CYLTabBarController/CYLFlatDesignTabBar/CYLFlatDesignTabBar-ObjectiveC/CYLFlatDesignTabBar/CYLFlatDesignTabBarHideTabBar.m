@@ -73,7 +73,6 @@
 - (void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
     if ([self isKindOfClass:[UITabBar class]]) {
         
-        NSString *gestureRecognizerClassString = NSStringFromClass([gestureRecognizer class]);
         if ([gestureRecognizer cyl_isContinuousGestureRecognizer]) {
             gestureRecognizer.enabled = NO;
         }

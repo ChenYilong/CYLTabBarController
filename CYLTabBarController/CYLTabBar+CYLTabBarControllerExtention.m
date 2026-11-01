@@ -111,7 +111,7 @@
     return [tabBarButtonMutableArray copy];
 }
 
-- (NSArray *)cyl_visibleControls {
+- (nullable NSArray *)cyl_visibleControls {
     NSMutableArray *originalTabBarButtons = [NSMutableArray arrayWithArray:[self.cyl_originalTabBarButtons copy]];
     CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
     BOOL notAdded = (NSNotFound == [originalTabBarButtons indexOfObject:plusButton]);
@@ -199,8 +199,8 @@
     return selectedControl;
 }
 
-- (void)cyl_animationLottieImageWithSelectedControl:(UIControl *)selectedControl
-                                          lottieURL:(NSURL *)lottieURL
+- (void)cyl_animationLottieImageWithSelectedControl:(nullable UIControl *)selectedControl
+                                          lottieURL:(nullable NSURL *)lottieURL
                                                size:(CGSize)size
                                     defaultSelected:(BOOL)defaultSelected
                                         contentMode:(UIViewContentMode)contentMode {
@@ -271,7 +271,7 @@
 /*!
  * 思路为： 从当前图层的control，获得index， 再从另外的图层中的index位置， 获取control。以此来避免直接使用 index 来获取不同图层的。因为有可能存在plusButton， 导致，index的数值变动， 降级复杂度。以control为锚点， index仅辅助。
  */
-- (UIControl *)cyl_selectedContentControlFromContentControl:(UIControl *)contentControl {
+- (nullable UIControl *)cyl_selectedContentControlFromContentControl:(nullable UIControl *)contentControl {
 //    if ([contentControl cyl_isPlusControl]) {
 //        return nil;
 //    }
@@ -290,7 +290,7 @@
     return selectedContentControl;
 }
 
-- (UIControl *)cyl_normalContentControlFromSelectedContentControl:(UIControl *)selectedContentControl {
+- (nullable UIControl *)cyl_normalContentControlFromSelectedContentControl:(UIControl *)selectedContentControl {
     //    if ([selectedContentControl cyl_isPlusControl]) {
     //        return nil;
     //    }
@@ -546,7 +546,7 @@
             break;
         }
     }
-    return [self cyl_allTabViewsFrom:contentView] ?: self.subviews;
+    return (NSArray<UIControl *> *)([self cyl_allTabViewsFrom:contentView] ?: self.subviews);
 }
 
 - (NSArray<UIControl *> *)cyl_platterSelectedContentViewsWithoutPlusButton {
@@ -672,7 +672,7 @@
     return  view;
 }
 
-- (UIView *)cyl_platterSelectedContentView {
+- (nullable UIView *)cyl_platterSelectedContentView {
     UIView *contentView = nil;
     for (UIView *sub in self.cyl_platterView.subviews) {
         
@@ -690,7 +690,7 @@
     
 }
 
-- (NSArray<UIControl *> *)cyl_platterSelectedContentViews {
+- (nullable NSArray<UIControl *> *)cyl_platterSelectedContentViews {
     UIView *contentView = nil;
     for (UIView *sub in self.cyl_platterView.subviews) {
 
@@ -705,10 +705,10 @@
     }
     
     
-    return [self cyl_allTabViewsFrom:contentView] ?: self.subviews;
+    return (NSArray<UIControl *> *)([self cyl_allTabViewsFrom:contentView] ?: self.subviews);
 }
 
-- (UIView *)cyl_platterLiquidLensView {
+- (nullable UIView *)cyl_platterLiquidLensView {
     UIView *contentView = nil;
     for (UIView *sub in self.cyl_platterView.subviews) {
         if ([sub cyl_isPlatterLiquidLensView]) {
@@ -723,7 +723,7 @@
     return contentView;
 }
 
-- (UIView *)cyl_platterVisualProviderFloatingSelectedContentView {
+- (nullable UIView *)cyl_platterVisualProviderFloatingSelectedContentView {
     UIView *contentView = nil;
     for (UIView *sub in self.cyl_platterView.subviews) {
         if ([sub cyl_isPlatterVisualProviderFloatingSelectedContentView]) {
@@ -739,7 +739,7 @@
     return contentView;
 }
 
-- (UIView *)cyl_platterLiquidLensViewContentView {
+- (nullable UIView *)cyl_platterLiquidLensViewContentView {
     UIView *contentView = [self.cyl_portalView cyl_valueForKey:@"sourceView"];
     if (contentView) {
         return contentView;
@@ -760,7 +760,7 @@
     return contentView;
 }
 
-- (UIView *)cyl_platterLiquidLensClearGlassView {
+- (nullable UIView *)cyl_platterLiquidLensClearGlassView {
     UIView *contentView;
 
     for (UIView *sub in self.cyl_platterLiquidLensViewSubViews) {
@@ -780,7 +780,7 @@
 }
 
 
-- (NSArray<UIView *> *)cyl_platterLiquidLensViewSubViews {
+- (nullable NSArray<UIView *> *)cyl_platterLiquidLensViewSubViews {
     UIView *contentView = self.cyl_platterLiquidLensViewContentView;
     
     if (!contentView) {
@@ -794,7 +794,7 @@
 
 
 
-- (UIView *)cyl_platterDestOutView {
+- (nullable UIView *)cyl_platterDestOutView {
     UIView *contentView = nil;
     for (UIView *sub in self.cyl_platterView.subviews) {
         //TODO:  找到罩子的真正view， 修改frame

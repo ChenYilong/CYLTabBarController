@@ -225,7 +225,7 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     return [CYLPlusButton isPlusButtonView:self] || [self cyl_isChildViewControllerPlusButton];
 }
 
-- (UIView *)cyl_lottieAnimationView {
+- (nullable UIView *)cyl_lottieAnimationView {
     if ([self cyl_isPlusControl]) {
         return nil;
     }
@@ -432,7 +432,7 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     !completion?:completion(NO, self, nil);
 }
 
-- (void)cyl_addLottieImageWithLottieURL:(NSURL *)lottieURL
+- (void)cyl_addLottieImageWithLottieURL:(nullable NSURL *)lottieURL
                                    size:(CGSize)size
                             contentMode:(UIViewContentMode)contentMode {
     NSString *lottieFilePath = [lottieURL path];
@@ -446,14 +446,13 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     if (!lottieURL) {
         return;
     }
-    if (CGSizeEqualToSize(CGSizeZero, size)) {
-        size = CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
-    }
     if ([self cyl_isPlusControl]) {
         return;
     }
 #if __has_include(<Lottie/Lottie.h>)
-    
+    if (CGSizeEqualToSize(CGSizeZero, size)) {
+        size = CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
+    }
     if (self.cyl_lottieAnimationView) {
         return;
     }
@@ -624,7 +623,7 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
 //    return boundsWidthOffset;
 //}
 
-- (UIControl *)cyl_platterSelectedControl {
+- (nullable UIControl *)cyl_platterSelectedControl {
     if (![self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
         return nil;
     }

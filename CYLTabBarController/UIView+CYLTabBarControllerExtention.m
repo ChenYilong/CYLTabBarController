@@ -245,7 +245,7 @@
     return isTabBackgroundView;
 }
 
-- (UIImageView *)cyl_imageView {
+- (nullable UIImageView *)cyl_imageView {
     for (UIImageView *subview in self.subviews) {
         if ([subview isKindOfClass:[UIImageView class]]) {
             return (UIImageView *)subview;
@@ -254,7 +254,7 @@
     return nil;
 }
 
-- (UIImageView *)cyl_tabImageView {
+- (nullable UIImageView *)cyl_tabImageView {
     UIImageView *imageView = nil;
     do {
         for (UIImageView *subview in self.cyl_allSubviews) {
@@ -274,7 +274,7 @@
 /*!
  * 只有在TabBar选中状态下才能取到 SwappableImageView
  */
-- (UIImageView *)cyl_swappableImageViewViewInTabBarButton {
+- (nullable UIImageView *)cyl_swappableImageViewViewInTabBarButton {
     if (![self isKindOfClass:[UIView class]]) {
         return nil;
     }
@@ -320,7 +320,7 @@
     return imageView;
 }
 
-- (UIImageView *)cyl_imageViewInTabBarButton {
+- (nullable UIImageView *)cyl_imageViewInTabBarButton {
     if (![self isKindOfClass:[UIView class]]) {
         return nil;
     }
@@ -364,7 +364,7 @@
     return allSubviews;
 }
 
-- (UIView *)cyl_tabBadgeView {
+- (nullable UIView *)cyl_tabBadgeView {
     for (UIView *subview in self.cyl_allSubviews) {
         if ([subview cyl_isTabBadgeView]) {
             return subview;
@@ -373,7 +373,7 @@
     return nil;
 }
 
-- (UILabel *)cyl_tabLabel {
+- (nullable UILabel *)cyl_tabLabel {
     //`cyl_allSubviews` holds UIViews: iterate them as UIView, not UILabel, and cast once, after `cyl_isTabLabel`.
     for (UIView *subview in self.cyl_allSubviews) {
         if ([subview cyl_isTabLabel]) {
@@ -403,7 +403,7 @@
 }
 
 //UIVisualEffectView
-- (UIVisualEffectView *)cyl_tabEffectView {
+- (nullable UIVisualEffectView *)cyl_tabEffectView {
     for (UIView *subview in self.subviews) {
         if ([subview cyl_isTabEffectView]) {
             return (UIVisualEffectView *)subview;
@@ -417,7 +417,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
     return [self cyl_tabBackgroundView];
 }
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
-- (UIImageView *)cyl_tabShadowImageView {
+- (nullable UIImageView *)cyl_tabShadowImageView {
     if (@available(iOS 10.0, *)) {
         //iOS10及以上这样获取ShadowImageView：
         UIView *subview = [self cyl_tabBackgroundView];
@@ -444,7 +444,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return nil;
 }
 
-- (UIView *)cyl_tabBackgroundView {
+- (nullable UIView *)cyl_tabBackgroundView {
     for (UIImageView *subview in self.subviews) {
         if ([subview cyl_isTabBackgroundView]) {
             return (UIImageView *)subview;
@@ -730,18 +730,15 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     }
 }
 
-- (UIImage *)cyl_takeSnapshot {
-    NSArray *withoutView = [NSArray new];
+- (nullable UIImage *)cyl_takeSnapshot {
     UIView *platterView = self.cyl_tabBarController.tabBar.cyl_platterView;
-    if (platterView) {
-        withoutView = @[platterView];
-    } else {
+    if (!platterView) {
         return nil;
     }
-    return [self cyl_takeSnapshotWithoutViews:withoutView];
+    return [self cyl_takeSnapshotWithoutViews:@[platterView]];
 }
 
-- (UIImage *)cyl_takeSnapshotWithoutViews:(NSArray<UIView __kindof *> *)hideViews {
+- (nullable UIImage *)cyl_takeSnapshotWithoutViews:(NSArray<UIView __kindof *> *)hideViews {
     CGSize size = self.bounds.size;
     if (size.width <= 0 || size.height <= 0) {
         return nil;

@@ -1011,7 +1011,7 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
           titlePositionAdjustment:(UIOffset)titlePositionAdjustment
           imagePositionAdjustment:(UIOffset)imagePositionAdjustment
                       imageInsets:(UIEdgeInsets)imageInsets
-                        lottieURL:(NSURL *)lottieURL
+                        lottieURL:(nullable NSURL *)lottieURL
                    lottieFilePath:(NSString *)lottieFilePath
                   lottieSizeValue:(NSValue *)lottieSizeValue {
     
@@ -1111,7 +1111,7 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
                   tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
                             imageInsets:(UIEdgeInsets)imageInsets
                 titlePositionAdjustment:(UIOffset)titlePositionAdjustment
-                                context:(NSString *)context {
+                                context:(nullable NSString *)context {
     CYLTabBarStyleType type = CYLTabBarStyleTypeDefault;
     return [self initWithViewControllers:viewControllers
                    tabBarItemsAttributes:tabBarItemsAttributes
@@ -1124,7 +1124,7 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 - (instancetype)initWithViewControllers:(NSArray<UIViewController *> *)viewControllers
                   tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
                               styleType:(CYLTabBarStyleType)styleType
-                                context:(NSString *)context {
+                                context:(nullable NSString *)context {
     return [self initWithViewControllers:viewControllers
                    tabBarItemsAttributes:tabBarItemsAttributes
                              imageInsets:UIEdgeInsetsZero
@@ -1138,7 +1138,7 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
                             imageInsets:(UIEdgeInsets)imageInsets
                 titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                               styleType:(CYLTabBarStyleType)styleType
-                                context:(NSString *)context {
+                                context:(nullable NSString *)context {
     if (self = [super init]) {
         _imageInsets = imageInsets;
         _titlePositionAdjustment = titlePositionAdjustment;
@@ -1163,7 +1163,7 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
                                         imageInsets:(UIEdgeInsets)imageInsets
                             titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                                           styleType:(CYLTabBarStyleType)styleType
-                                            context:(NSString *)context {
+                                            context:(nullable NSString *)context {
     return [[self alloc] initWithViewControllers:viewControllers
                            tabBarItemsAttributes:tabBarItemsAttributes
                                      imageInsets:imageInsets
@@ -1176,7 +1176,7 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
                               tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
                                         imageInsets:(UIEdgeInsets)imageInsets
                             titlePositionAdjustment:(UIOffset)titlePositionAdjustment
-                                            context:(NSString *)context {
+                                            context:(nullable NSString *)context {
     return [[self alloc] initWithViewControllers:viewControllers
                            tabBarItemsAttributes:tabBarItemsAttributes
                                      imageInsets:imageInsets
@@ -1200,7 +1200,7 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 + (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
                               tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
                                           styleType:(CYLTabBarStyleType)styleType
-                                            context:(NSString *)context {
+                                            context:(nullable NSString *)context {
     return [[self alloc] initWithViewControllers:viewControllers
                            tabBarItemsAttributes:tabBarItemsAttributes
                                      imageInsets:UIEdgeInsetsZero
@@ -1637,7 +1637,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         if (!tabBar) {
             tabBar = [[CYLTabBar alloc] init];
             [tabBar cyl_setTabBarController:self];
-            _tabBar = tabBar;
             _cyl_tabBar = tabBar;
         }
         [self cyl_setValue:tabBar forKey:@"tabBar"];
@@ -1985,7 +1984,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
           titlePositionAdjustment:(UIOffset)titlePositionAdjustment
           imagePositionAdjustment:(UIOffset)imagePositionAdjustment
                       imageInsets:(UIEdgeInsets)imageInsets
-                        lottieURL:(NSURL *)lottieURL
+                        lottieURL:(nullable NSURL *)lottieURL
                   lottieSizeValue:(NSValue *)lottieSizeValue {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     viewController.tabBarItem.title = title;
@@ -2126,7 +2125,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 }
 
 #pragma mark - delegate
-- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController
+- (void)updateSelectionStatusIfNeededForTabBarController:(nullable UITabBarController *)tabBarController
                               shouldSelectViewController:(UIViewController *)viewController {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     BOOL should = viewController != tabBarController.selectedViewController;
@@ -2148,7 +2147,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
 
-- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController
+- (void)updateSelectionStatusIfNeededForTabBarController:(nullable UITabBarController *)tabBarController
                               shouldSelectViewController:(UIViewController *)viewController
                                             shouldSelect:(BOOL)shouldSelect {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
@@ -2320,7 +2319,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 }
 
 - (void)addLottieImageWithControl:(UIControl *)control
-                        lottieURL:(NSURL *)lottieURL
+                        lottieURL:(nullable NSURL *)lottieURL
                   lottieSizeValue:(NSValue *)theLottieSizeValue
                         animation:(BOOL)animation {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
@@ -2537,7 +2536,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     return self.cyl_context;
 }
 
-- (void)setContext:(NSString *)context {
+- (void)setContext:(nullable NSString *)context {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         self.cyl_context = context;
         @try {
@@ -2922,13 +2921,6 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     if (![self.tabBar isKindOfClass:[UITabBar class]] && ![self.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         return;
     }
-    if (!viewController) {
-        viewController = self.selectedViewController;
-    }
-    if (!selectedItem) {
-        selectedItem = viewController.cyl_tabBarItem;
-    }
-    UIControl *control = viewController.cyl_tabButton;
     //    BOOL isChildViewControllerPlusButton = [control cyl_isChildViewControllerPlusButton];
     //    BOOL isLottieEnabled = [self isLottieEnabled];
     
@@ -3331,9 +3323,8 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 #pragma mark - Private
 
 - (CGRect)tabBarFrame {
-    CGRect tabBarFrame = _cyl_tabBar.frame;
     CGFloat tabBarHeight = self.tabBarHeight + self.view.safeAreaInsets.bottom;
-    tabBarFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - tabBarHeight, CGRectGetWidth(self.view.bounds), tabBarHeight);
+    CGRect tabBarFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - tabBarHeight, CGRectGetWidth(self.view.bounds), tabBarHeight);
     return tabBarFrame;
 }
 
@@ -3752,7 +3743,7 @@ static CYLTabBarController *CYLTabBarControllerOwningTabBar(UIResponder *respond
 
 @implementation NSObject (CYLTabBarControllerReferenceExtension)
 
-- (void)cyl_setTabBarController:(CYLTabBarController *)tabBarController {
+- (void)cyl_setTabBarController:(nullable CYLTabBarController *)tabBarController {
     id __weak weakObject = tabBarController;
     id (^block)(void) = ^{ return weakObject; };
     objc_setAssociatedObject(self, @selector(cyl_tabBarController),

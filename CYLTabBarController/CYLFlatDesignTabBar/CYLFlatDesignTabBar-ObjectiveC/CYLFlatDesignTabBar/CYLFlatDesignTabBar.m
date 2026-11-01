@@ -504,8 +504,6 @@
     if ([self hasPlusButton]) {
         CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = (CYLPlusButton<CYLPlusButtonSubclassing> *)[CYLPlusButton plusButtonForOwner:self];
         CGFloat tabBarHeight = self.contentView.frame.size.height;
-        CGFloat tabBarWidth = self.contentView.frame.size.width;
-        CGFloat multiplierOfTabBarHeight = [plusButton multiplierOfTabBarHeight:tabBarHeight];
         CGFloat constantOfPlusButtonCenterYOffset = [plusButton constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
         plusButton.layer.contentsGravity = kCAGravityCenter;
 

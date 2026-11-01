@@ -165,7 +165,7 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
     return [CYLPlusButton plusChildViewControllerForOwner:self] != nil;
 }
 
-- (CYLPlusButton<CYLPlusButtonSubclassing> *)plusButton {
+- (nullable CYLPlusButton<CYLPlusButtonSubclassing> *)plusButton {
     if (![CYLPlusButton plusButtonForOwner:self] || !_plusButton) {
         return nil;
     }
