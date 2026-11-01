@@ -8,6 +8,7 @@
 
 #import "CYLFlatDesignTableViewController.h"
 #import "CYLFlatDesignTabBarDemoViewController.h"
+#import "CYLPopPushDemoViewController.h"
 #import "CYLFlatDesignMainTabBarController.h"
 #import "CYLFlatDesignSystemTabBarController.h"
 #import "MainTabBarController.h"
@@ -141,6 +142,9 @@
     } else if (indexPath.row == 7) {
         title = @"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）";
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    } else if (indexPath.row == 8) {
+        title = @"cyl_pop / cyl_push 系列方法演示";
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     cell.textLabel.text = title;
 
@@ -239,6 +243,12 @@
         flatDesignTabBarController.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:flatDesignTabBarController animated:YES];
         
+    } else if (indexPath.row == 8) {
+        // Every `cyl_pop…` / `cyl_push…` method, called from a page pushed onto this tab's navigation stack.
+        // 从 push 到当前 Tab 导航栈中的页面调用每一个 `cyl_pop…` / `cyl_push…` 方法。
+        CYLPopPushDemoViewController *vc = [[CYLPopPushDemoViewController alloc] init];
+        vc.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:vc animated:YES];
     } else {
         UIViewController *vc = [[UIViewController alloc] init];
         vc.hidesBottomBarWhenPushed = YES;
