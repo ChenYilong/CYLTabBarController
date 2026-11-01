@@ -21,7 +21,7 @@
     self.view.backgroundColor = [UIColor whiteColor];
     
     _button = [[UIButton alloc] init];
-    [_button setTitle:@"关闭" forState:UIControlStateNormal];
+    [_button setTitle:NSLocalizedString(@"关闭", nil) forState:UIControlStateNormal];
     [_button setTitleColor:UIColor.redColor forState:UIControlStateNormal];
     [_button addTarget:self action:@selector(onButtonClicked) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_button];

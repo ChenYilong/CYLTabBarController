@@ -50,6 +50,7 @@
 #pragma mark - Methods
 
 - (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     [self.navigationItem.leftBarButtonItem cyl_showBadge];
 }
 
@@ -57,7 +58,7 @@
     [cell cyl_showBadgeForRow:indexPath.row];
     if (0 == indexPath.row) {
         // The second row of the demo pushes a tab bar controller of the SAME context, see `-tableView:didSelectRowAtIndexPath:`.
-        [[cell textLabel] setText:@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）"];
+        [[cell textLabel] setText:NSLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）", nil)];
         return;
     }
     [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController on iOS %@", self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
