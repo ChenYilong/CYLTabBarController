@@ -10,7 +10,7 @@
 #import "CYLConstants.h"
 @implementation UIImage (CYLTabBarControllerExtention)
 
-+ (UIImage *)cyl_imageWithColor:(UIColor *)color size:(CGSize)size {
++ (nullable UIImage *)cyl_imageWithColor:(UIColor *)color size:(CGSize)size {
     if (!color || size.width <= 0 || size.height <= 0) { return nil; }
     UIImage *image = [self cyl_imageWithSize:size opaque:NO scale:0 actions:^(CGContextRef contextRef) {
         CGContextSetFillColorWithColor(contextRef, color.CGColor);
@@ -73,7 +73,7 @@
     return image;
 }
 
-+ (UIImage *)cyl_getImageFromImageInfo:(id)imageInfo {
++ (nullable UIImage *)cyl_getImageFromImageInfo:(id)imageInfo {
     UIImage *image = nil;
     if ([imageInfo isKindOfClass:[NSString class]]) {
         image = [UIImage imageNamed:imageInfo];
@@ -84,7 +84,7 @@
     return image;
 }
 
-+ (UIImage *)cyl_imageNamed:(id)imageInfo {
++ (UIImage *)cyl_imageNamed:(nullable id)imageInfo {
     UIImage *image = nil;
     if (imageInfo) {
         image = [self cyl_getImageFromImageInfo:imageInfo];

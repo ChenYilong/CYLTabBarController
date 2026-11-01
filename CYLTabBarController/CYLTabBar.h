@@ -37,7 +37,7 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 @property (nonatomic, copy, nullable) CYLTabBarDidLayoutSubViewsBlock didLayoutSubViewsBlock;
 
 /** 发布按钮 */
-@property (nonatomic, strong) CYLPlusButton<CYLPlusButtonSubclassing> *plusButton;
+@property (nonatomic, strong, nullable) CYLPlusButton<CYLPlusButtonSubclassing> *plusButton;
 @property (nonatomic, assign) CGFloat tabBarItemWidth;
 @property (nonatomic, copy) NSArray<UIControl *> *tabBarButtonArray;
 

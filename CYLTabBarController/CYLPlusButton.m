@@ -336,8 +336,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 //    return [CYLPlusButton plusButtonForOwner:self].imageView.image;
     if (_snapshot) {
         UIImage *originalImage = _snapshot;
-        UIImage *newImage = originalImage;
-        newImage =
+        UIImage *newImage =
         [UIImage imageWithCGImage:[originalImage CGImage]
                             scale:(originalImage.scale)
                       orientation:(originalImage.imageOrientation)];

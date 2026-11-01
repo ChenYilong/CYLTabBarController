@@ -322,7 +322,7 @@ static UIInterfaceOrientationMask CYLMaskFromOrientation(UIInterfaceOrientation 
     return NO;
 }
 
-- (BOOL)cyl_isPlusViewControllerAdded:(NSArray *)viewControllers {
+- (BOOL)cyl_isPlusViewControllerAdded:(nullable NSArray *)viewControllers {
     if ([viewControllers containsObject:[CYLPlusButton plusChildViewControllerForOwner:self]]) {
         return YES;
     }

@@ -34,15 +34,15 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
  * [EN] Designated initializer: title, images, index, title/image offsets, image insets and optional Lottie file path and size.
  * [CN] 指定初始化方法：设置标题、图片、索引、标题/图片偏移、图片内边距，以及可选的 Lottie 文件路径与尺寸。
  */
-- (instancetype)initWithTitle:(NSString *)title
-                        image:(id)image
-                selectedImage:(id)selectedImage
+- (instancetype)initWithTitle:(nullable NSString *)title
+                        image:(nullable id)image
+                selectedImage:(nullable id)selectedImage
                         index:(NSInteger)index
       titlePositionAdjustment:(UIOffset)titlePositionAdjustment
       imagePositionAdjustment:(UIOffset)imagePositionAdjustment
                   imageInsets:(UIEdgeInsets)imageInsets
-               lottieFilePath:(NSString *)lottieFilePath
-              lottieSizeValue:(NSValue *)lottieSizeValue;
+               lottieFilePath:(nullable NSString *)lottieFilePath
+              lottieSizeValue:(nullable NSValue *)lottieSizeValue;
 
 //- (UIControl *)getTabBarControl;
 //FIXME:  to delete @property (nullable, nonatomic, weak) UIControl *view;
@@ -112,11 +112,11 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
 
 @property (nonatomic, assign) UIEdgeInsets imageInsets;
 
-@property (nonatomic, strong) NSURL *lottieURL;
+@property (nonatomic, strong, nullable) NSURL *lottieURL;
 
-@property (nonatomic, copy) NSString *lottieFilePath;
+@property (nonatomic, copy, nullable) NSString *lottieFilePath;
 
-@property (nonatomic, strong) NSValue *lottieSizeValue;
+@property (nonatomic, strong, nullable) NSValue *lottieSizeValue;
 
 /*!
  * [EN] Returns the view that hosts this item's badge (from its tab bar button).

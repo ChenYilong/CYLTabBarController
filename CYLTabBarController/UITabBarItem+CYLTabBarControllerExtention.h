@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface UITabBarItem (CYLTabBarControllerExtention)
 
 @property (nonatomic, readonly) UIControl *cyl_tabButton;
-@property (nonatomic, readonly) UIControl *cyl_selectedTabButton;
+@property (nonatomic, readonly, nullable) UIControl *cyl_selectedTabButton;
 @property (nonatomic, readonly) UIControl *cyl_visiableTabButton;
 @property (nonatomic, strong, getter=cyl_lottieURL, setter=cyl_setLottieURL:) NSURL *cyl_lottieURL;
 

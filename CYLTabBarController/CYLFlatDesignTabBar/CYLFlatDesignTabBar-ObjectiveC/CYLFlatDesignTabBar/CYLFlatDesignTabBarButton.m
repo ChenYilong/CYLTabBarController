@@ -339,8 +339,6 @@
 }
 
 - (void)initLottie {
-    NSValue *lottieSizeValue = [self _lottieSizeValue];
-    
     NSURL *lottieURL = [self _lottieURL];
     if (!lottieURL) {
         return;

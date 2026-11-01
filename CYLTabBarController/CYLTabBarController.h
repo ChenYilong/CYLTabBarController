@@ -148,7 +148,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 @property (nonatomic, readonly, assign) UIEdgeInsets imageInsets;
 
 @property (nonatomic, strong, readonly) CYLTabBar *tabBar;
-@property (nonatomic, strong, setter=cyl_setTabBar:) UIView __kindof *cyl_tabBar;
+@property (nonatomic, strong, nullable, setter=cyl_setTabBar:) UIView __kindof *cyl_tabBar;
 
 /*!
  *  动画视图的渲染模式 只有集成了lottie动画才会生效
@@ -225,7 +225,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
                   tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
                             imageInsets:(UIEdgeInsets)imageInsets
                 titlePositionAdjustment:(UIOffset)titlePositionAdjustment
-                                context:(NSString *)context;
+                                context:(nullable NSString *)context;
 
 /*!
  * [EN] Convenience constructor with shared image insets, title offset and context.
@@ -235,7 +235,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
                               tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
                                         imageInsets:(UIEdgeInsets)imageInsets
                             titlePositionAdjustment:(UIOffset)titlePositionAdjustment
-                                            context:(NSString *)context;
+                                            context:(nullable NSString *)context;
 
 /*!
  * [EN] Creates a tab bar controller with a style type (e.g. flat design or Liquid Glass) and context.
@@ -244,7 +244,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 - (instancetype)initWithViewControllers:(NSArray<UIViewController *> *)viewControllers
                   tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
                               styleType:(CYLTabBarStyleType)styleType
-                                context:(NSString *)context;
+                                context:(nullable NSString *)context;
 
 /*!
  * [EN] Convenience constructor with a style type and context.
@@ -253,7 +253,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 + (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
                               tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
                                           styleType:(CYLTabBarStyleType)styleType
-                                            context:(NSString *)context;
+                                            context:(nullable NSString *)context;
 
 /*!
  * [EN] Designated-style initializer with image insets, title offset, style type and context.
@@ -264,7 +264,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
                             imageInsets:(UIEdgeInsets)imageInsets
                 titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                               styleType:(CYLTabBarStyleType)styleType
-                                context:(NSString *)context;
+                                context:(nullable NSString *)context;
 
 /*!
  * [EN] Convenience constructor with image insets, title offset, style type and context.
@@ -275,20 +275,20 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
                                         imageInsets:(UIEdgeInsets)imageInsets
                             titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                                           styleType:(CYLTabBarStyleType)styleType
-                                            context:(NSString *)context;
+                                            context:(nullable NSString *)context;
 
 /*!
  * [EN] Updates the plus button's selection state before `viewController` is selected. Call it from `-tabBarController:shouldSelectViewController:`. No effect in flat-design mode.
  * [CN] 在选中 viewController 之前更新 PlusButton 的选中状态，请在 -tabBarController:shouldSelectViewController: 中调用。扁平化模式下无效。
  */
-- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController
+- (void)updateSelectionStatusIfNeededForTabBarController:(nullable UITabBarController *)tabBarController
                               shouldSelectViewController:(UIViewController *)viewController;
 
 /*!
  * [EN] Same as above, but with an explicit `shouldSelect`; when NO, the target tab button's user interaction is disabled and nothing else changes.
  * [CN] 同上，但显式传入 shouldSelect；为 NO 时仅禁用目标 Tab 按钮的交互，不做其他处理。
  */
-- (void)updateSelectionStatusIfNeededForTabBarController:(UITabBarController *)tabBarController
+- (void)updateSelectionStatusIfNeededForTabBarController:(nullable UITabBarController *)tabBarController
                               shouldSelectViewController:(UIViewController *)viewController
                                             shouldSelect:(BOOL)shouldSelect;
 
@@ -559,7 +559,7 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  *      3. 否则取最近活跃的那个（`+cyl_activeTabBarController`），最后与以前一样取根控制器。
  *      与 `-cylflatdesign_tabBarController` 使用同一个查找，见 `-cyl_tabBarControllerForStyleType:`。
  */
-@property (nonatomic, setter=cyl_setTabBarController:) CYLTabBarController *cyl_tabBarController;
+@property (nonatomic, nullable, setter=cyl_setTabBarController:) CYLTabBarController *cyl_tabBarController;
 
 /*!
  * [EN] The lookup behind `-cyl_tabBarController` and `-cylflatdesign_tabBarController`, merged into one: the type picks

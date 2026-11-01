@@ -621,7 +621,7 @@
 #pragma mark - Deprecated API
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 //Apple remove this API in iOS13 beta 2
-+ (UIColor *)cyl_systemBrownColor {
++ (nullable UIColor *)cyl_systemBrownColor {
     return nil;
 }
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP

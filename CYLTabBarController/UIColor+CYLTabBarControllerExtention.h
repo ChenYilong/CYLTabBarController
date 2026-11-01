@@ -126,7 +126,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIColor (CYLTabBarControllerDeprecated)
 
-@property (class, nonatomic, readonly) UIColor *cyl_systemBrownColor CYL_DEPRECATED("Deprecated in 1.27.5.");
+@property (class, nonatomic, readonly, nullable) UIColor *cyl_systemBrownColor CYL_DEPRECATED("Deprecated in 1.27.5.");
 
 @end
 NS_ASSUME_NONNULL_END

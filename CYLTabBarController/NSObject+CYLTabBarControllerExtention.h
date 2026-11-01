@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSObject (CYLTabBarControllerExtention)
 
-@property (nonatomic, copy, getter=cyl_context, setter=cyl_setContext:) NSString *cyl_context;
+@property (nonatomic, copy, nullable, getter=cyl_context, setter=cyl_setContext:) NSString *cyl_context;
 
 @property (nonatomic, assign, getter=cyl_isForceLandscape, setter=cyl_setIsForceLandscape:) BOOL cyl_isForceLandscape;
 
@@ -80,7 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns YES if `viewControllers` contains the plus child view controller (directly or wrapped in a navigation controller).
  * [CN] 判断 viewControllers 中是否包含 PlusButton 子控制器（直接包含或被导航控制器包裹）。
  */
-- (BOOL)cyl_isPlusViewControllerAdded:(NSArray *)viewControllers;
+- (BOOL)cyl_isPlusViewControllerAdded:(nullable NSArray *)viewControllers;
 @property (nonatomic, assign, getter=cyl_isPlaceholder, setter=cyl_setIsPlaceholder:) BOOL cyl_isPlaceholder;
 
 /*!

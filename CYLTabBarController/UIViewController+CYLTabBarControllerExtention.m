@@ -46,7 +46,7 @@
     return isSystemStyleTabBar;
 }
 
-- (UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index {
+- (nullable UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index {
     return [self cyl_popSelectTabBarChildViewControllerAtIndex:index animated:NO];
 }
 
@@ -64,7 +64,7 @@
  *      布局。（不能改为先 pop 再切换：被 pop 的页面会在屏幕上消失，它在 `-viewDidDisappear:` 中的操作，例如强制旋转，会打乱切换。）
  *      index 超出 `viewControllers` 范围（或找不到对应的 classType）时，不再切换 Tab 或 pop，直接返回 nil。
  */
-- (UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index animated:(BOOL)animated {
+- (nullable UIViewController *)cyl_popSelectTabBarChildViewControllerAtIndex:(NSUInteger)index animated:(BOOL)animated {
     UIViewController *viewController = [self cyl_getViewControllerInsteadOfNavigationController];
     CYLTabBarController *tabBarController = [viewController cyl_popSelectTabBarController];
     [viewController checkTabBarChildControllerValidityAtIndex:index];
@@ -214,7 +214,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
     [self.cyl_tabButton cyl_setTabBadgePointView:tabBadgePointView];
 }
 
-- (UIView *)cyl_tabBadgePointView {
+- (nullable UIView *)cyl_tabBadgePointView {
     if (self.cyl_isPlusChildViewController) {
         return nil;
     }
@@ -282,7 +282,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     }
 }
 
-- (UIControl *)cyl_tabButton {
+- (nullable UIControl *)cyl_tabButton {
     UIControl *tabButton = objc_getAssociatedObject(self, @selector(cyl_tabButton));
     if (tabButton) {
         //TODO:      if (tabButton && [tabButton isKindOfClass:[UIControl class]]) {
@@ -535,7 +535,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
  *
  * @return UIView or UITabBarItem
  */
-- (id)cyl_getActualBadgeSuperView {
+- (nullable id)cyl_getActualBadgeSuperView {
     if (self.cyl_isPlaceholder) {
         return nil;
     }
@@ -589,13 +589,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     [self cyl_performSelector:aSelector withObject:object2];
 }
 
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object {
+- (void)cyl_performSelector:(SEL)aSelector withObject:(nullable id)object {
     if (aSelector == NULL) { return; }
     NSObject *object2 = nil;
     [self cyl_performSelector:aSelector withObject:object withObject:object2];
 }
 
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 {
+- (void)cyl_performSelector:(SEL)aSelector withObject:(nullable id)object1 withObject:(nullable id)object2 {
     if (aSelector == NULL) { return; }
     
     CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS

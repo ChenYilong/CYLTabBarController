@@ -101,7 +101,7 @@ static inline BOOL CYLBadgeAnimationTypeRepeats(CYLBadgeAnimationType animationT
 }
 
 /// Every key a badge animation may be under (including `CYLBadgeRotateAnimationKey`), to remove them all at once.
-static inline NSArray<NSString *> * CYLBadgeAllAnimationKeys(void) {
+static inline NSArray<NSString *> * _Nonnull CYLBadgeAllAnimationKeys(void) {
     return @[CYLBadgeScaleAnimationKey, CYLBadgeShakeAnimationKey, CYLBadgeBounceAnimationKey,
              CYLBadgeBreatheAnimationKey, CYLBadgeRotateAnimationKey, CYLBadgeLeftRightOnceAnimationKey,
              CYLBadgeRightLeftOnceAnimationKey, CYLBadgeFadeInOnceAnimationKey, CYLBadgeRollingOnceAnimationKey,
@@ -109,6 +109,8 @@ static inline NSArray<NSString *> * CYLBadgeAllAnimationKeys(void) {
 }
 
 #pragma mark -- protocol definition
+
+NS_ASSUME_NONNULL_BEGIN
 
 @protocol CYLBadgeProtocol <NSObject>
 
@@ -215,7 +217,7 @@ static inline NSArray<NSString *> * CYLBadgeAllAnimationKeys(void) {
  * [EN] Returns the view (or UITabBarItem) that actually hosts the badge.
  * [CN] 返回实际承载角标的视图（或 UITabBarItem）。
  */
-- (id)cyl_getActualBadgeSuperView;
+- (nullable id)cyl_getActualBadgeSuperView;
 
 /*!
  * [EN] Returns YES once the badge host view has been laid out (width > 10), so the badge can be positioned.
@@ -234,13 +236,13 @@ static inline NSArray<NSString *> * CYLBadgeAllAnimationKeys(void) {
  * [EN] Same as `-cyl_performSelector:`, passing one argument.
  * [CN] 同 -cyl_performSelector:，携带一个参数。
  */
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object;
+- (void)cyl_performSelector:(SEL)aSelector withObject:(nullable id)object;
 /*!
  * iOS26+ only
  * [EN] Same as `-cyl_performSelector:`, passing two arguments.
  * [CN] 同 -cyl_performSelector:，携带两个参数。
  */
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2;
+- (void)cyl_performSelector:(SEL)aSelector withObject:(nullable id)object1 withObject:(nullable id)object2;
 
 @optional
 
@@ -256,5 +258,7 @@ static inline NSArray<NSString *> * CYLBadgeAllAnimationKeys(void) {
 @property (nonatomic, strong, getter=cyl_delayIfNeededForSecondsValue, setter=cyl_setDelayIfNeededForSecondsValue:) NSNumber *cyl_delayIfNeededForSecondsValue;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 #endif

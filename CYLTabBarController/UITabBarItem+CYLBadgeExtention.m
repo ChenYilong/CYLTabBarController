@@ -164,13 +164,13 @@
     [self cyl_performSelector:aSelector withObject:object2];
 }
 
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object {
+- (void)cyl_performSelector:(SEL)aSelector withObject:(nullable id)object {
     if (aSelector == NULL) { return; }
     NSObject *object2 = nil;
     [self cyl_performSelector:aSelector withObject:object withObject:object2];
 }
 
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 {
+- (void)cyl_performSelector:(SEL)aSelector withObject:(nullable id)object1 withObject:(nullable id)object2 {
     if (aSelector == NULL) { return; }
     UIControl *normalControl = nil;
     UIControl *selectedControl = nil;

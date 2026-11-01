@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the Lottie animation view inside this tab button (searching two levels deep); nil for the plus button.
  * [CN] 返回 Tab 按钮内的 Lottie 动画视图（向下查找两层）；PlusButton 返回 nil。
  */
-- (UIView *)cyl_lottieAnimationView;
+- (nullable UIView *)cyl_lottieAnimationView;
 
 /*!
  * [EN] Returns YES if the control is the plus button that has a child view controller added to the tab bar.
@@ -72,7 +72,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Adds a Lottie animation view loaded from `lottieURL` in place of the tab image; does nothing if one already exists or for the plus button.
  * [CN] 用 lottieURL 加载 Lottie 动画视图并替换 Tab 图片；已存在动画视图或为 PlusButton 时不做处理。
  */
-- (void)cyl_addLottieImageWithLottieURL:(NSURL *)lottieURL
+- (void)cyl_addLottieImageWithLottieURL:(nullable NSURL *)lottieURL
                                    size:(CGSize)size
                             contentMode:(UIViewContentMode)contentMode;
 
@@ -142,7 +142,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the platter selected-state control matching this control, or self if none.
  * [CN] 返回与当前控件对应的 Platter 选中态控件，没有则返回自身。
  */
-- (UIControl *)cyl_platterSelectedControl;
+- (nullable UIControl *)cyl_platterSelectedControl;
 
 /*!
  * [EN] Returns YES if the control lives in the platter content view (normal state).

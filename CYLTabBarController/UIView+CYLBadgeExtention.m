@@ -274,7 +274,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     return (self.cyl_badge && self.cyl_badge.cyl_isHidden);
 }
 
-- (id)cyl_getActualBadgeSuperView {
+- (nullable id)cyl_getActualBadgeSuperView {
     //建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用
     [self layoutIfNeeded];
     return self;
@@ -287,13 +287,13 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     [self cyl_performSelector:aSelector withObject:object2];
 }
 
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object {
+- (void)cyl_performSelector:(SEL)aSelector withObject:(nullable id)object {
     if (aSelector == NULL) { return; }
     NSObject *object2 = nil;
     [self cyl_performSelector:aSelector withObject:object withObject:object2];
 }
 
-- (void)cyl_performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2 {
+- (void)cyl_performSelector:(SEL)aSelector withObject:(nullable id)object1 withObject:(nullable id)object2 {
     if (aSelector == NULL) { return; }
     
     CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS

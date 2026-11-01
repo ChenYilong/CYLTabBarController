@@ -59,13 +59,13 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the platter selected content views (selected-state tab buttons).
  * [CN] 返回 Platter 选中态内容视图数组（选中态 Tab 按钮）。
  */
-- (NSArray<UIControl *> *)cyl_platterSelectedContentViews;
+- (nullable NSArray<UIControl *> *)cyl_platterSelectedContentViews;
 
 /*!
  * [EN] Returns the floating selected content view provided by the tab bar visual provider (Liquid Glass).
  * [CN] 返回 TabBar VisualProvider 提供的悬浮选中内容视图（液态玻璃）。
  */
-- (UIView *)cyl_platterVisualProviderFloatingSelectedContentView;
+- (nullable UIView *)cyl_platterVisualProviderFloatingSelectedContentView;
 
 /*!
  * [EN] Returns the platter selected content view at `index`, or nil if out of range.
@@ -95,25 +95,25 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the Liquid Glass lens view (the moving selection bubble) inside the platter.
  * [CN] 返回 Platter 中的液态玻璃 LiquidLens 视图（随选中项移动的玻璃气泡）。
  */
-- (UIView *)cyl_platterLiquidLensView;
+- (nullable UIView *)cyl_platterLiquidLensView;
 
 /*!
  * [EN] Returns the subviews of the lens content view, or nil if there is no content view.
  * [CN] 返回 LiquidLens 内容视图的子视图，没有内容视图时返回 nil。
  */
-- (NSArray<UIView *> *)cyl_platterLiquidLensViewSubViews;
+- (nullable NSArray<UIView *> *)cyl_platterLiquidLensViewSubViews;
 
 /*!
  * [EN] Returns the lens content view: the portal's `sourceView`, or the first subview of the lens view.
  * [CN] 返回 LiquidLens 内容视图：优先取 Portal 的 sourceView，否则取 LiquidLens 的第一个子视图。
  */
-- (UIView *)cyl_platterLiquidLensViewContentView;
+- (nullable UIView *)cyl_platterLiquidLensViewContentView;
 
 /*!
  * [EN] Returns the visible `DestOutView` inside the platter, or nil.
  * [CN] 返回 Platter 中可见的 DestOutView，没有则返回 nil。
  */
-- (UIView *)cyl_platterDestOutView;
+- (nullable UIView *)cyl_platterDestOutView;
 
 /*!
  * [EN] Returns the view that hosts tab content: the platter view under Liquid Glass, otherwise the tab bar itself.
@@ -125,13 +125,13 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the clear-glass layer of the Liquid Glass lens.
  * [CN] 返回液态玻璃 LiquidLens 的透明玻璃层视图。
  */
-- (UIView *)cyl_platterLiquidLensClearGlassView;
+- (nullable UIView *)cyl_platterLiquidLensClearGlassView;
 
 /*!
  * [EN] Returns the platter's selected content view container, or nil.
  * [CN] 返回 Platter 中的选中态内容容器视图，没有则返回 nil。
  */
-- (UIView *)cyl_platterSelectedContentView;
+- (nullable UIView *)cyl_platterSelectedContentView;
 
 @property (nonatomic, weak, getter=cyl_platterView, setter=cyl_setPlatterView:) UIView *cyl_platterView;
 @property (nonatomic, weak, getter=cyl_portalView, setter=cyl_setPortalView:) UIView *cyl_portalView;
@@ -174,7 +174,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the visible tab controls, including the plus button when the tab bar has one.
  * [CN] 返回可见的 Tab 控件数组；TabBar 含 PlusButton 时也包含 PlusButton。
  */
-- (NSArray<UIControl *> *)cyl_visibleControls;
+- (nullable NSArray<UIControl *> *)cyl_visibleControls;
 /*!
  * cyl_tabBarSubviews 的过滤后的结果， sub表示过滤， 可理解为filtered，子集合。
  * [EN] Returns the filtered tab bar buttons (a subset of `cyl_tabBarSubviews`).
@@ -198,20 +198,20 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the normal-state content control that matches the given selected-state content control.
  * [CN] 根据选中态内容控件，返回与之对应的常态内容控件。
  */
-- (UIControl *)cyl_normalContentControlFromSelectedContentControl:(UIControl *)selectedContentControl;
+- (nullable UIControl *)cyl_normalContentControlFromSelectedContentControl:(UIControl *)selectedContentControl;
 
 /*!
  * [EN] Returns the selected-state content control that matches the given normal-state content control.
  * [CN] 根据常态内容控件，返回与之对应的选中态内容控件。
  */
-- (UIControl *)cyl_selectedContentControlFromContentControl:(UIControl *)contentControl;
+- (nullable UIControl *)cyl_selectedContentControlFromContentControl:(nullable UIControl *)contentControl;
 
 /*!
  * [EN] Plays the Lottie animation on `selectedControl`; shows the final frame without playing when `defaultSelected` is YES.
  * [CN] 在 selectedControl 上播放 Lottie 动画；defaultSelected 为 YES 时直接显示最后一帧而不播放。
  */
-- (void)cyl_animationLottieImageWithSelectedControl:(UIControl *)selectedControl
-                                          lottieURL:(NSURL *)lottieURL
+- (void)cyl_animationLottieImageWithSelectedControl:(nullable UIControl *)selectedControl
+                                          lottieURL:(nullable NSURL *)lottieURL
                                                size:(CGSize)size
                                           defaultSelected:(BOOL)defaultSelected
                                         contentMode:(UIViewContentMode)contentMode;

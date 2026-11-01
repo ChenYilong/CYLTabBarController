@@ -26,8 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 从 fromVC 到 toVC 的 Push/Pop 转场开始时回调。
  */
 - (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
-         didBeginTransitionFrom:(UIViewController *)fromVC
-                             to:(UIViewController *)toVC
+         didBeginTransitionFrom:(nullable UIViewController *)fromVC
+                             to:(nullable UIViewController *)toVC
                       operation:(UINavigationControllerOperation)operation;
 
 /*!
@@ -35,8 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 交互式返回进行中回调，携带完成百分比。
  */
 - (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
-       didUpdateInteractiveFrom:(UIViewController *)fromVC
-                             to:(UIViewController *)toVC
+       didUpdateInteractiveFrom:(nullable UIViewController *)fromVC
+                             to:(nullable UIViewController *)toVC
                 percentComplete:(CGFloat)percentComplete;
 
 /*!
@@ -44,8 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 交互式返回进行中回调，携带驱动转场的手势识别器。
  */
 - (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
-       didUpdateInteractiveFrom:(UIViewController *)fromVC
-                             to:(UIViewController *)toVC
+       didUpdateInteractiveFrom:(nullable UIViewController *)fromVC
+                             to:(nullable UIViewController *)toVC
            popGestureRecognizer:(UIGestureRecognizer *)popGestureRecognizer;
 
 /*!
@@ -53,8 +53,8 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 转场即将结束时回调，cancelled 表示是否被取消。
  */
 - (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
-          willEndTransitionFrom:(UIViewController *)fromVC
-                             to:(UIViewController *)toVC
+          willEndTransitionFrom:(nullable UIViewController *)fromVC
+                             to:(nullable UIViewController *)toVC
                       operation:(UINavigationControllerOperation)operation
                       cancelled:(BOOL)cancelled;
 
@@ -63,8 +63,8 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 转场结束后回调，cancelled 表示是否被取消。
  */
 - (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
-           didEndTransitionFrom:(UIViewController *)fromVC
-                             to:(UIViewController *)toVC
+           didEndTransitionFrom:(nullable UIViewController *)fromVC
+                             to:(nullable UIViewController *)toVC
                       operation:(UINavigationControllerOperation)operation
                       cancelled:(BOOL)cancelled;
 

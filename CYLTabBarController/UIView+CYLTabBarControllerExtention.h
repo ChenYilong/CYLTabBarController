@@ -95,7 +95,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the first UIImageView among the receiver's direct subviews, or nil.
  * [CN] 返回当前视图直接子视图中的第一个 UIImageView，没有则返回 nil。
  */
-- (UIImageView *)cyl_imageView;
+- (nullable UIImageView *)cyl_imageView;
 
 /*!
  * [EN] Returns YES if the receiver is the image view inside a tab bar button.
@@ -126,7 +126,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the system badge view among the receiver's subviews, or nil.
  * [CN] 返回子视图中的系统角标视图，没有则返回 nil。
  */
-- (UIView *)cyl_tabBadgeView;
+- (nullable UIView *)cyl_tabBadgeView;
 
 /*!
  * [EN] Returns YES if the receiver is the tab bar's private background view (`_UIBarBackground`).
@@ -138,25 +138,25 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the image view of the tab bar button.
  * [CN] 返回 TabBar 按钮的图片视图。
  */
-- (UIImageView *)cyl_tabImageView;
+- (nullable UIImageView *)cyl_tabImageView;
 
 /*!
  * [EN] Returns the title label of the tab bar button.
  * [CN] 返回 TabBar 按钮的标题 Label。
  */
-- (UILabel *)cyl_tabLabel;
+- (nullable UILabel *)cyl_tabLabel;
 
 /*!
  * [EN] Returns the shadow (top separator line) image view of the tab bar background.
  * [CN] 返回 TabBar 背景中的阴影（顶部分割线）图片视图。
  */
-- (UIImageView *)cyl_tabShadowImageView;
+- (nullable UIImageView *)cyl_tabShadowImageView;
 
 /*!
  * [EN] Returns the first blur effect view among the receiver's subviews, or nil.
  * [CN] 返回子视图中的第一个毛玻璃效果视图，没有则返回 nil。
  */
-- (UIVisualEffectView *)cyl_tabEffectView;
+- (nullable UIVisualEffectView *)cyl_tabEffectView;
 
 /*!
  * [EN] Returns YES if the receiver is a Lottie animation view.
@@ -168,7 +168,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the tab bar's background view.
  * [CN] 返回 TabBar 的背景视图。
  */
-- (UIView *)cyl_tabBackgroundView;
+- (nullable UIView *)cyl_tabBackgroundView;
 
 /*!
  * [EN] Returns the receiver and all of its descendants, flattened recursively.
@@ -180,7 +180,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the image view inside the tab bar button, trying KVC first and then the subviews.
  * [CN] 返回 TabBar 按钮内的图片视图，优先通过 KVC 获取，失败再遍历子视图。
  */
-- (UIImageView *)cyl_imageViewInTabBarButton;
+- (nullable UIImageView *)cyl_imageViewInTabBarButton;
 
 /*!
  * [EN] Brings `view` to the front, but keeps it below the Liquid Glass platter view when one exists.
@@ -211,19 +211,19 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Returns the swappable image view inside the tab bar button, used when replacing the icon with a custom view.
  * [CN] 返回 TabBar 按钮内可替换的图片视图，用于把图标替换为自定义视图。
  */
-- (UIImageView *)cyl_swappableImageViewViewInTabBarButton;
+- (nullable UIImageView *)cyl_swappableImageViewViewInTabBarButton;
 
 /*!
  * [EN] Renders the receiver into a UIImage snapshot.
  * [CN] 将当前视图渲染为 UIImage 截图。
  */
-- (UIImage *)cyl_takeSnapshot;
+- (nullable UIImage *)cyl_takeSnapshot;
 
 /*!
  * [EN] Renders the receiver into a UIImage while temporarily hiding `hideViews`.
  * [CN] 截图时临时隐藏 hideViews 中的视图，再将当前视图渲染为 UIImage。
  */
-- (UIImage *)cyl_takeSnapshotWithoutViews:(NSArray<UIView __kindof *> *)hideViews;
+- (nullable UIImage *)cyl_takeSnapshotWithoutViews:(NSArray<UIView __kindof *> *)hideViews;
 
 /*!
  * [EN] Hides or shows the receiver, also updating alpha, opaque and userInteractionEnabled together.
