@@ -150,7 +150,9 @@
         NSMutableArray *items = [_tabBar.items mutableCopy];
         [items removeLastObject];
         _tabBar.items = items;
-        _uitabBar.items = items;
+        NSMutableArray<UITabBarItem *> *uitabBarItems = [_uitabBar.items mutableCopy];
+        [uitabBarItems removeLastObject];
+        _uitabBar.items = uitabBarItems;
     } else if (indexPath.row == 5) {
         _tabBar.backgroundImage = nil;
         _tabBar.shadowImage = nil;

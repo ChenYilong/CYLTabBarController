@@ -34,7 +34,6 @@
         _badgeLabel = [[UILabel alloc] initWithFrame:self.frame];
         _badgeLabel.textAlignment = NSTextAlignmentCenter;
         _badgeLabel.backgroundColor = [UIColor clearColor];
-        _badgeLabel.text = @"test";
         // FIX: issue #653 — the label is laid out by frame in -layoutSubviews; keep it out of Auto Layout
         // (Auto Layout inside a tab button breaks the iOS 27.1 vertical bar).
         _badgeLabel.translatesAutoresizingMaskIntoConstraints = YES;

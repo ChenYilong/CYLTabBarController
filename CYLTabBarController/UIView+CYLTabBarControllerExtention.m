@@ -783,7 +783,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (NSUInteger)cyl_tabbarItemsCount {
     NSNumber *count = objc_getAssociatedObject(self, @selector(cyl_tabbarItemsCount));
-    return count ? count.unsignedIntegerValue : CYLTabbarItemsCount;
+    return count != nil ? count.unsignedIntegerValue : CYLTabbarItemsCount;
 }
 
 - (void)cyl_setTabbarItemsCount:(NSUInteger)tabbarItemsCount {
@@ -793,7 +793,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (CGFloat)cyl_tabBarItemWidth {
     NSNumber *width = objc_getAssociatedObject(self, @selector(cyl_tabBarItemWidth));
-    return width ? width.doubleValue : CYLTabBarItemWidth;
+    return width != nil ? width.doubleValue : CYLTabBarItemWidth;
 }
 
 - (void)cyl_setTabBarItemWidth:(CGFloat)tabBarItemWidth {

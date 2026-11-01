@@ -32,12 +32,12 @@
 //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
 //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
     
-    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"FlatDesign" style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
+    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"FlatDesign", nil) style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
 //    leftBarButtonItem.tintColor = UIColor.redColor; // 确保使用原图色
     self.navigationItem.leftBarButtonItem = leftBarButtonItem;
 
 
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"LiquidGlass" style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"LiquidGlass", nil) style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"CYLTabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
 
 #define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
