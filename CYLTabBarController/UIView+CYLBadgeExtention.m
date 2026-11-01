@@ -14,6 +14,7 @@
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "UIImage+CYLTabBarControllerExtention.h"
 #import "CYLBadge/CYLTabBarBadgeView.h"
+#import "CYLBadgeAppearance.h"
 #if __has_include(<CYLTabBarController/CYLTabBarController.h>)
 #import <CYLTabBarController/CYLTabBarController.h>
 #else
@@ -24,9 +25,6 @@
 #import <CYLTabBarController/CYLFlatDesignTabBar.h>
 #endif
 
-
-#define kCYLBadgeDefaultMaximumBadgeNumber 99
-#define kCYLBadgeDefaultMargin (8.0)
 
 static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
 static const NSTimeInterval kCYLBadgeDefaultDelayIfNeededForSeconds = 0.5;
@@ -390,13 +388,8 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     if (![self cyl_isReady]) {
         return;
     }
-    if (self.cyl_badgeBackgroundColor == nil) {
-        self.cyl_badgeBackgroundColor = [UIColor redColor];
-    }
-    if (self.cyl_badgeTextColor == nil) {
-        self.cyl_badgeTextColor = [UIColor whiteColor];
-    }
-    
+    // The colors are not written back here: unset, they resolve to `CYLBadgeAppearance` (#425) every time.
+    // 这里不再把颜色写回对象：未设置时每次都从 `CYLBadgeAppearance` 取值（#425）。
     if (!self.cyl_badge) {
         Class class = [self cyl_badgeClass];
         self.cyl_badge = [[class alloc] initWithFrame:(self.frame)];
@@ -415,7 +408,12 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
         [self cyl_applyBadgeBorder];
         
         [self cyl_bringBadgeToFront:self.cyl_badge];
+        return;
     }
+    // An existing badge picks up a global color changed since it was created.
+    // 已存在的角标同步创建之后修改过的全局颜色。
+    self.cyl_badge.backgroundColor = self.cyl_badgeBackgroundColor;
+    self.cyl_badge.textColor = self.cyl_badgeTextColor;
 }
 
 - (void)cyl_bringBadgeToFront:(UIView *)view {
@@ -552,6 +550,26 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     [self bringSubviewToFront:badge];
     [self cyl_layoutBadgeAtTopRightCorner];
     [self cyl_badgeEnvironmentDidChange];
+}
+
+- (void)cyl_resetBadgeAppearance {
+    SEL keys[] = {
+        @selector(cyl_badgeFont), @selector(cyl_badgeBackgroundColor), @selector(cyl_badgeTextColor),
+        @selector(cyl_badgeCenterOffset), @selector(cyl_badgeRadius), @selector(cyl_badgeMargin),
+        @selector(cyl_badgeCornerRadius), @selector(cyl_badgeMaximumBadgeNumber),
+        @selector(cyl_badgeBorderColor), @selector(cyl_badgeBorderWidth),
+    };
+    for (size_t i = 0; i < sizeof(keys) / sizeof(keys[0]); i++) {
+        objc_setAssociatedObject(self, keys[i], nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    UIView<CYLBadgeTextDisplaying> *badge = self.cyl_badge;
+    if (!badge) {
+        return;
+    }
+    badge.backgroundColor = self.cyl_badgeBackgroundColor;
+    badge.textColor = self.cyl_badgeTextColor;
+    badge.font = self.cyl_badgeFont;
+    [self cyl_applyBadgeBorder];
 }
 
 - (BOOL)cyl_shouldReduceBadgeMotion {
@@ -783,7 +801,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 
 - (UIFont *)cyl_badgeFont {
     id font = objc_getAssociatedObject(self, @selector(cyl_badgeFont));
-    return font ?: kCYLBadgeDefaultFont;
+    return font ?: [CYLBadgeAppearance globalAppearance].font;
 }
 
 - (void)cyl_setBadgeFont:(UIFont *)badgeFont {
@@ -791,11 +809,12 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     if (!self.cyl_badge) {
         [self cyl_badgeInit];
     }
-    self.cyl_badge.font = badgeFont;
+    // nil restores the global font.
+    self.cyl_badge.font = self.cyl_badgeFont;
 }
 
 - (UIColor *)cyl_badgeBackgroundColor {
-    return objc_getAssociatedObject(self, @selector(cyl_badgeBackgroundColor));
+    return objc_getAssociatedObject(self, @selector(cyl_badgeBackgroundColor)) ?: [CYLBadgeAppearance globalAppearance].backgroundColor;
 }
 
 - (void)cyl_setBadgeBackgroundColor:(UIColor *)badgeBackgroundColor {
@@ -803,11 +822,12 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     if (!self.cyl_badge) {
         [self cyl_badgeInit];
     }
-    self.cyl_badge.backgroundColor = badgeBackgroundColor;
+    // nil restores the global color.
+    self.cyl_badge.backgroundColor = self.cyl_badgeBackgroundColor;
 }
 
 - (UIColor *)cyl_badgeTextColor {
-    return objc_getAssociatedObject(self, @selector(cyl_badgeTextColor));
+    return objc_getAssociatedObject(self, @selector(cyl_badgeTextColor)) ?: [CYLBadgeAppearance globalAppearance].textColor;
 }
 
 - (void)cyl_setBadgeTextColor:(UIColor *)badgeTextColor {
@@ -815,7 +835,8 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     if (!self.cyl_badge) {
         [self cyl_badgeInit];
     }
-    self.cyl_badge.textColor = badgeTextColor;
+    // nil restores the global color.
+    self.cyl_badge.textColor = self.cyl_badgeTextColor;
 }
 
 - (CYLBadgeAnimationType)cyl_badgeAnimationType {
@@ -883,7 +904,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 
 - (CGFloat)cyl_badgeCornerRadius {
     NSNumber *badgeCornerRadiusObject = objc_getAssociatedObject(self, @selector(cyl_badgeCornerRadius));
-    return [badgeCornerRadiusObject doubleValue];
+    return badgeCornerRadiusObject ? [badgeCornerRadiusObject doubleValue] : [CYLBadgeAppearance globalAppearance].cornerRadius;
 }
 
 - (void)cyl_setBadgeCornerRadius:(CGFloat)badgeCornerRadius {
@@ -906,7 +927,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
         CGFloat y = [obj[@"y"] doubleValue];
         return CGPointMake(x, y);
     }
-    return CGPointZero;
+    return [CYLBadgeAppearance globalAppearance].centerOffset;
 }
 
 - (void)cyl_setBadgeCenterOffsetValue:(NSValue *)badgeCenterOffsetValue {
@@ -952,7 +973,8 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 }
 
 - (CGFloat)cyl_badgeRadius {
-    return [objc_getAssociatedObject(self, @selector(cyl_badgeRadius)) doubleValue];
+    NSNumber *badgeRadiusObject = objc_getAssociatedObject(self, @selector(cyl_badgeRadius));
+    return badgeRadiusObject ? [badgeRadiusObject doubleValue] : [CYLBadgeAppearance globalAppearance].radius;
 }
 
 - (void)cyl_setBadgeMargin:(CGFloat)badgeMargin {
@@ -973,7 +995,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 
 - (CGFloat)cyl_badgeMargin {
     id margin = objc_getAssociatedObject(self, @selector(cyl_badgeMargin));
-    return margin == nil ? kCYLBadgeDefaultMargin : [margin doubleValue];
+    return margin == nil ? [CYLBadgeAppearance globalAppearance].margin : [margin doubleValue];
 }
 
 - (NSInteger)cyl_badgeMaximumBadgeNumber {
@@ -981,7 +1003,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     if(obj != nil && [obj isKindOfClass:[NSNumber class]]) {
         return [obj integerValue];
     }
-    return kCYLBadgeDefaultMaximumBadgeNumber;
+    return [CYLBadgeAppearance globalAppearance].maximumBadgeNumber;
 }
 
 - (void)cyl_setBadgeMaximumBadgeNumber:(NSInteger)badgeMaximumBadgeNumber {
@@ -1002,7 +1024,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 }
 
 - (UIColor *)cyl_badgeBorderColor {
-    return objc_getAssociatedObject(self, @selector(cyl_badgeBorderColor));
+    return objc_getAssociatedObject(self, @selector(cyl_badgeBorderColor)) ?: [CYLBadgeAppearance globalAppearance].borderColor;
 }
 
 - (void)cyl_setBadgeBorderColor:(UIColor *)badgeBorderColor {
@@ -1011,7 +1033,8 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 }
 
 - (CGFloat)cyl_badgeBorderWidth {
-    return [objc_getAssociatedObject(self, @selector(cyl_badgeBorderWidth)) doubleValue];
+    NSNumber *badgeBorderWidthObject = objc_getAssociatedObject(self, @selector(cyl_badgeBorderWidth));
+    return badgeBorderWidthObject ? [badgeBorderWidthObject doubleValue] : [CYLBadgeAppearance globalAppearance].borderWidth;
 }
 
 - (void)cyl_setBadgeBorderWidth:(CGFloat)badgeBorderWidth {

@@ -29,8 +29,8 @@
     [self.view addSubview:label];
 //    [[self cyl_sharedAppDelegate] cyl_forceUpdateInterfaceOrientation:UIInterfaceOrientationLandscapeLeft];
 //    self.navigationItem.backBarButtonItem;
-    [self.navigationItem.backBarButtonItem cyl_setBadgeBackgroundColor:UIColor.redColor];
-    [self.navigationItem.backBarButtonItem cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
+    // #425: the red background and the (-5, 3) offset come from CYLBadgeAppearance (SceneDelegate.m -setUpBadgeAppearance).
+    // #425：红色背景和 (-5, 3) 偏移来自 CYLBadgeAppearance（SceneDelegate.m -setUpBadgeAppearance）。
     //                [viewController0 cyl_setBadgeRadius:11/2];
     //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
     [self.navigationItem.backBarButtonItem cyl_showBadge];

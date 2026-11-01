@@ -21,6 +21,7 @@
 #import "UIBarButtonItem+CYLBadgeExtention.h"
 #import "UIView+CYLBadgeExtention.h"
 #import "UITableViewCell+CYLBadgeExtention.h"
+#import "CYLBadgeAppearance.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
@@ -127,6 +128,33 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  * [CN] 设置在 -viewDidLayoutSubviews 中回调的 block，并标记为只执行一次。注意：目前 invokeOnce 参数未被使用，始终按 YES 处理。
  */
 - (void)setViewDidLayoutSubViewsBlockInvokeOnce:(BOOL)invokeOnce block:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock;
+
+/*!
+ * FIX: issue #404
+ * [EN] Runs `block` as soon as the tab buttons exist, to show or update tab badges: right away if they are already laid
+ *      out, otherwise once the tab bar is laid out. Call it whenever the badge data changes, from `-viewDidLoad` or any
+ *      later time, as often as needed: each block runs once, in order, and none replaces another or
+ *      `viewDidLayoutSubviewsBlock`. No `dispatch_after` is needed.
+ *
+ *          [self reloadBadgesWithBlock:^(CYLTabBarController *tabBarController) {
+ *              [tabBarController.viewControllers[0] cyl_showBadge];
+ *              [tabBarController.viewControllers[1] cyl_showBadgeValue:@"100" animationType:CYLBadgeAnimationTypeNone];
+ *          }];
+ *
+ *      `-setViewDidLayoutSubViewsBlockInvokeOnce:block:` does not fit this: it holds one block (a later call replaces it),
+ *      and a block set after the tab bar was laid out waits for a layout pass that may not come. Use it on the tab bar
+ *      controller the app shows: subclass it with `[super initWithViewControllers:…]`, don't return another instance
+ *      from `-init` (README, Step 2). Main thread only, like the rest of UIKit; the block is held until it runs.
+ * [CN] 在 Tab 按钮创建完成后执行 block，用于显示或更新 Tab 角标：若已完成布局则立即执行，否则在 TabBar 布局完成后执行。
+ *      角标数据变化时随时调用，可在 `-viewDidLoad` 中或之后任意时机、任意多次调用：每个 block 按顺序各执行一次，
+ *      不会互相覆盖，也不会覆盖 `viewDidLayoutSubviewsBlock`。无需 `dispatch_after`（示例见上方英文部分）。
+ *
+ *      `-setViewDidLayoutSubViewsBlockInvokeOnce:block:` 不适合这个场景：它只保存一个 block（后设置的会覆盖之前的），
+ *      并且在 TabBar 已完成布局后设置的 block 要等下一次布局，而下一次布局可能不会发生。请在 App 实际显示的 TabBarController 上调用：
+ *      子类请通过 `[super initWithViewControllers:…]` 初始化，不要在 `-init` 中返回另一个实例（见 README 第二步）。
+ *      请在主线程调用，与 UIKit 其他 API 一致；block 在执行前会被持有。
+ */
+- (void)reloadBadgesWithBlock:(CYLViewDidLayoutSubViewsBlock)block;
 /*!
  * An array of the root view controllers displayed by the tab bar interface.
  */

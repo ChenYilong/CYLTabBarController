@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
     self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
     self.window.frame = windowScene.coordinateSpace.bounds;
     self.window.backgroundColor = [UIColor whiteColor];
+    [self setUpBadgeAppearance];
     
     CYLMainRootViewController *rootViewController = [[CYLMainRootViewController alloc] init];
     self.window.rootViewController = rootViewController;
@@ -32,6 +33,16 @@ NS_ASSUME_NONNULL_BEGIN
     [self setUpNavigationBarAppearance];
 }
  
+/*!
+ * #425: the badge style shared by the whole demo, set once before any badge is shown. Badges then set only what
+ * differs (e.g. a random color, or the "NEW" tab's offset). Red background and white text are already the defaults.
+ * #425：整个 Demo 共用的角标样式，在显示任何角标之前统一设置一次。之后每个角标只需设置不同之处
+ * （如随机颜色、"NEW" Tab 的偏移）。红色背景和白色文字本来就是默认值，无需设置。
+ */
+- (void)setUpBadgeAppearance {
+    [CYLBadgeAppearance globalAppearance].centerOffset = CGPointMake(-5, 3);
+}
+
 CYL_METHOD_SIGNATURES_PUSH
 - (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
     //设置强制旋转屏幕

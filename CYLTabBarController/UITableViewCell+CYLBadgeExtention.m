@@ -203,27 +203,37 @@ static UIColor *CYLBadgeHelperDynamicBorderColor(void) {
     [self layoutIfNeeded];
 
     // Cells are reused: clear the badge, stop the previous row's animation (showing a badge without an animation type
-    // does not remove it) and reset every option before the next one.
+    // does not remove it), and drop the previous row's options so they follow `CYLBadgeAppearance` again (#425).
+    // Then set only what this row changes.
     [iconView.cyl_badge.layer removeAllAnimations];
     [iconView cyl_clearBadge];
-    iconView.cyl_badgeBackgroundColor = item[CYLBadgeItemColors] ? [UIColor purpleColor] : [UIColor redColor];
-    iconView.cyl_badgeTextColor = item[CYLBadgeItemColors] ? [UIColor yellowColor] : [UIColor whiteColor];
-    iconView.cyl_badgeFont = item[CYLBadgeItemFont] ? [UIFont italicSystemFontOfSize:12] : [UIFont boldSystemFontOfSize:9];
-    iconView.cyl_badgeBorderColor = nil;
-    iconView.cyl_badgeBorderWidth = 0;
-    if (item[CYLBadgeItemBorder]) {
-        iconView.cyl_badgeBorderColor = [UIColor whiteColor];
+    [iconView cyl_resetBadgeAppearance];
+    if (item[CYLBadgeItemColors]) {
+        iconView.cyl_badgeBackgroundColor = [UIColor purpleColor];
+        iconView.cyl_badgeTextColor = [UIColor yellowColor];
+    }
+    if (item[CYLBadgeItemFont]) {
+        iconView.cyl_badgeFont = [UIFont italicSystemFontOfSize:12];
+    }
+    if (item[CYLBadgeItemBorder] || item[CYLBadgeItemDynamicBorder]) {
+        iconView.cyl_badgeBorderColor = item[CYLBadgeItemBorder] ? [UIColor whiteColor] : CYLBadgeHelperDynamicBorderColor();
         iconView.cyl_badgeBorderWidth = 2;
     }
-    if (item[CYLBadgeItemDynamicBorder]) {
-        iconView.cyl_badgeBorderColor = CYLBadgeHelperDynamicBorderColor();
-        iconView.cyl_badgeBorderWidth = 2;
+    if (item[CYLBadgeItemPosition]) {
+        iconView.cyl_badgeCenterOffset = CYLBadgeHelperCenterOffset(item[CYLBadgeItemPosition]);
     }
-    iconView.cyl_badgeCenterOffset = CYLBadgeHelperCenterOffset(item[CYLBadgeItemPosition]);
-    iconView.cyl_badgeRadius = [item[CYLBadgeItemRadius] floatValue];
-    iconView.cyl_badgeMargin = item[CYLBadgeItemMargin] ? [item[CYLBadgeItemMargin] floatValue] : 8;
-    iconView.cyl_badgeCornerRadius = [item[CYLBadgeItemCornerRadius] floatValue];
-    iconView.cyl_badgeMaximumBadgeNumber = item[CYLBadgeItemMaximum] ? [item[CYLBadgeItemMaximum] integerValue] : 99;
+    if (item[CYLBadgeItemRadius]) {
+        iconView.cyl_badgeRadius = [item[CYLBadgeItemRadius] floatValue];
+    }
+    if (item[CYLBadgeItemMargin]) {
+        iconView.cyl_badgeMargin = [item[CYLBadgeItemMargin] floatValue];
+    }
+    if (item[CYLBadgeItemCornerRadius]) {
+        iconView.cyl_badgeCornerRadius = [item[CYLBadgeItemCornerRadius] floatValue];
+    }
+    if (item[CYLBadgeItemMaximum]) {
+        iconView.cyl_badgeMaximumBadgeNumber = [item[CYLBadgeItemMaximum] integerValue];
+    }
     iconView.cyl_badgeRespectsReduceMotion = [item[CYLBadgeItemReduceMotion] boolValue];
     // Options must be set before showing the badge.
     CYLBadgeAnimationType animationType = (CYLBadgeAnimationType)[item[CYLBadgeItemAnimationType] unsignedIntegerValue];

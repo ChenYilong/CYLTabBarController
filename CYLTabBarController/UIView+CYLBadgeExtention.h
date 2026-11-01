@@ -136,6 +136,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)cyl_refreshBadge;
 
+/*!
+ * FIX: issue #425
+ * [EN] Removes the badge font, colors, center offset, radius, margin, corner radius, maximum number and border set on
+ *      this view, so they follow `[CYLBadgeAppearance globalAppearance]` again, and applies the colors, font and border
+ *      to a badge already shown. Use it on reused views (e.g. cells) before setting only what differs for the new
+ *      content, instead of setting every property back to a default by hand. Animation type, frame and the Reduce
+ *      Motion setting are kept.
+ * [CN] 移除当前视图上单独设置的角标字体、颜色、中心偏移、半径、边距、圆角半径、最大数字和边框，使其重新跟随
+ *      `[CYLBadgeAppearance globalAppearance]`，并将颜色、字体和边框应用到已显示的角标上。用于复用的视图（如 cell）：
+ *      先调用它，再只设置新内容不同的部分，不必手动把每个属性设回默认值。动画类型、frame 和"减弱动态效果"设置保持不变。
+ */
+- (void)cyl_resetBadgeAppearance;
+
 @end
 
 NS_ASSUME_NONNULL_END

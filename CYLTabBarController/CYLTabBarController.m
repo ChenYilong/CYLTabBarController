@@ -106,6 +106,8 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 
 @property (nonatomic, assign, getter=isObservingTabImageViewDefaultOffset) BOOL observingTabImageViewDefaultOffset;
 @property (nonatomic, assign, getter=shouldInvokeOnceViewDidLayoutSubViewsBlock) BOOL invokeOnceViewDidLayoutSubViewsBlock;
+/// Blocks passed to `-reloadBadgesWithBlock:` that wait for the tab buttons (#404).
+@property (nonatomic, strong) NSMutableArray<CYLViewDidLayoutSubViewsBlock> *pendingReloadBadgesBlocks;
 @property (nonatomic, strong) NSMutableArray<NSURL *> *lottieURLs;
 @property (nonatomic, strong) NSMutableArray *lottieSizes;
 @property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
@@ -387,6 +389,65 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
     _viewDidLayoutSubviewsBlock = [viewDidLayoutSubviewsBlock copy];
 }
 
+#pragma mark - Reload badges (#404)
+
+- (void)reloadBadgesWithBlock:(CYLViewDidLayoutSubViewsBlock)block {
+    if (!block) {
+        return;
+    }
+    if (!self.pendingReloadBadgesBlocks) {
+        self.pendingReloadBadgesBlocks = [NSMutableArray array];
+    }
+    [self.pendingReloadBadgesBlocks addObject:[block copy]];
+    [self cyl_runPendingReloadBadgesBlocksIfReady];
+    // On screen but not laid out yet: make sure a layout pass comes. Off screen, one comes when it is shown.
+    if (self.pendingReloadBadgesBlocks.count > 0 && self.isViewLoaded && self.view.window) {
+        [self.view setNeedsLayout];
+    }
+}
+
+/*!
+ * [EN] The tab buttons exist once the first real tab's badge host is a laid-out view: until then it is nil, or a
+ *      `UITabBarItem` (Liquid Glass) or a not yet sized control, and a badge shown on it would be dropped.
+ * [CN] 第一个真实 Tab 的角标宿主成为已布局的视图时，Tab 按钮即已创建：在此之前它为 nil、`UITabBarItem`（液态玻璃）
+ *      或尚未确定尺寸的控件，此时显示的角标会被丢弃。
+ */
+- (BOOL)cyl_tabButtonsAreReadyForBadges {
+    if (!self.isViewLoaded) {
+        return NO;
+    }
+    for (UIViewController *viewController in self.viewControllers) {
+        if (viewController.cyl_isPlaceholder) {
+            continue;
+        }
+        id host = [viewController cyl_getActualBadgeSuperView];
+        return [host isKindOfClass:[UIView class]] && CGRectGetWidth(((UIView *)host).bounds) > 10;
+    }
+    return NO;
+}
+
+- (void)cyl_runPendingReloadBadgesBlocksIfReady {
+    if (self.pendingReloadBadgesBlocks.count == 0) {
+        return;
+    }
+    if (![self cyl_tabButtonsAreReadyForBadges]) {
+        // The tab bar lays its buttons out after this controller's view; on screen, do it now instead of waiting.
+        if (!self.isViewLoaded || !self.view.window) {
+            return;
+        }
+        [self.cyl_tabBar layoutIfNeeded];
+        if (![self cyl_tabButtonsAreReadyForBadges]) {
+            return;
+        }
+    }
+    // A block may call -reloadBadgesWithBlock: again: run a copy, so that one waits for its own turn.
+    NSArray<CYLViewDidLayoutSubViewsBlock> *blocks = [self.pendingReloadBadgesBlocks copy];
+    [self.pendingReloadBadgesBlocks removeAllObjects];
+    for (CYLViewDidLayoutSubViewsBlock block in blocks) {
+        block(self);
+    }
+}
+
 /*!
  * FIX: issue #610
  * [EN] Classic (non Liquid Glass) tab buttons report taps through this target-action, which used to be added only in
@@ -585,6 +646,8 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 #endif
     } else {}
 
+
+    [self cyl_runPendingReloadBadgesBlocksIfReady];
 
     if (self.shouldInvokeOnceViewDidLayoutSubViewsBlock) {
         //在对象生命周期内，不添加 flag 属性的情况下，防止多次调进这个方法
