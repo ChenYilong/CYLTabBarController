@@ -25,7 +25,9 @@ class CYLPlusButtonSubclass: CYLPlusButton,CYLPlusButtonSubclassing {
         button.setTitle("选中", for: .selected)
         button.setTitleColor(UIColor(red:255.0/255.0,green:102.0/255.0,blue:0,alpha:1.0), for: .selected)
         
-        button.adjustsImageWhenHighlighted = false
+        // An explicit highlighted image is drawn as is, so the button does not darken on touch
+        // (replaces `adjustsImageWhenHighlighted = false`, deprecated in iOS 15).
+        button.setImage(button.image(for: .normal), for: .highlighted)
         button.sizeToFit()
         return button
     }

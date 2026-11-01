@@ -259,7 +259,7 @@
 //    CYL_DEPRECATED_DECLARATIONS_PUSH
 //    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
 //                                                             delegate:nil
-//                                                    cancelButtonTitle:@"取消"
+//                                                    cancelButtonTitle:NSLocalizedString(@"取消", nil)
 //                                               destructiveButtonTitle:nil
 //                                                    otherButtonTitles:@"拍照", @"从相册选取", @"淘宝一键转卖", nil];
 //    [actionSheet showInView:viewController.view];
@@ -272,8 +272,6 @@
 //
 //}
 - (void)clickPublish {
-    CYLTabBarController *tabBarController = [self cyl_tabBarController];
-    
     UIViewController *viewController = CYLGetRootViewController();
     
     // The new tab bar controller shows the OTHER plus button (another context): the title tells which.
@@ -286,7 +284,7 @@
                                       message:[NSString stringWithFormat:@"PlusButton → 「%@」", nextPlusButtonTitle]
                                       preferredStyle:UIAlertControllerStyleActionSheet];
     
-    [actionSheet addAction:[UIAlertAction actionWithTitle:@"Liquid Glass液态玻璃"
+    [actionSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Liquid Glass液态玻璃", nil)
                                                     style:UIAlertActionStyleDefault
                                                   handler:^(UIAlertAction *action) {
         // handle choose
@@ -296,7 +294,7 @@
 
     }]];
     
-    [actionSheet addAction:[UIAlertAction actionWithTitle:@"FlatDesign扁平设计样式"
+    [actionSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"FlatDesign扁平设计样式", nil)
                                                     style:UIAlertActionStyleDefault
                                                   handler:^(UIAlertAction *action) {
         // handle choose
@@ -308,7 +306,7 @@
     
     
     
-    [actionSheet addAction:[UIAlertAction actionWithTitle:@"取消"
+    [actionSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"取消", nil)
                                                     style:UIAlertActionStyleCancel
                                                   handler:nil]];
     
@@ -377,7 +375,7 @@
 //    plusChildViewController.navigationItem.title = @"PlusChildViewController";
 //    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
 //                                                   initWithRootViewController:plusChildViewController];
-//    plusChildNavigationController.title = @"发布";
+//    plusChildNavigationController.title = NSLocalizedString(@"发布", nil);
 //    return plusChildNavigationController;
 //}
 //
@@ -427,7 +425,7 @@
 }
 
 + (NSString *)plusButtonTitle {
-    return @"发布";
+    return NSLocalizedString(@"发布", nil);
 }
 
 /// The window's root view controller. Not `CYLGetRootViewController()`: inside an alert action handler the action sheet
@@ -461,7 +459,7 @@
 }
 
 + (NSString *)plusButtonTitle {
-    return @"拍摄";
+    return NSLocalizedString(@"拍摄", nil);
 }
 
 // Only the icon differs: a camera (SF Symbol, iOS 13+), the other plus button keeps the `post_*` images.

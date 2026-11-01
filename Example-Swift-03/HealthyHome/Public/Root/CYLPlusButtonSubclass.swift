@@ -27,7 +27,9 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         button.setTitle("菜单", for: .selected)
         button.setTitleColor(.white, for: .selected)
         
-        button.adjustsImageWhenHighlighted = false
+        // An explicit highlighted image is drawn as is, so the button does not darken on touch
+        // (replaces `adjustsImageWhenHighlighted = false`, deprecated in iOS 15).
+        button.setBackgroundImage(button.backgroundImage(for: .normal), for: .highlighted)
         button.sizeToFit()
         button.cyl_keepShowingPlusButtonLabel = true
         //        button.titleEdgeInsets = UIEdgeInsets(top: 3, left: 0, bottom: 0, right: 0)
@@ -79,7 +81,7 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
      * @attention 实现了该方法，但没有实现 `+multiplierOfTabBarHeight:` 方法，在这种情况下，会在预设逻辑的基础上进行偏移。
      */
     static func constantOfPlusButtonCenterYOffset(forTabBarHeight tabBarHeight: CGFloat) -> CGFloat {
-        let screenHeight = UIScreen.main.nativeBounds.size.height;
+        let screenHeight = currentWindowScene()?.screen.nativeBounds.size.height ?? 0
         if screenHeight == 2436 || screenHeight == 1792 || screenHeight == 2688 || screenHeight == 1624 {
             return -30
         }

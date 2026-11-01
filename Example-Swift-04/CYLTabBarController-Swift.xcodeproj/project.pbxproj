@@ -41,7 +41,7 @@
 		922DCF031FF63402005C89BE /* MessageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
 		922DCF051FF63402005C89BE /* PublishViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PublishViewController.swift; sourceTree = "<group>"; };
 		922DCF071FF63402005C89BE /* MainTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
-		922DCF081FF63402005C89BE /* CYLPlusButtonSubclass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLPlusButtonSubclass.swift; sourceTree = "<group>"; };
+		922DCF081FF63402005C89BE /* CYLPlusButtonSubclass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonSubclass.swift; path = "../Example-Swift-02/CYLTabBarController-Swift/Classes/Main/CYLPlusButtonSubclass.swift"; sourceTree = SOURCE_ROOT; };
 		92DD37DF20A5740500754AC8 /* NextHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextHomeViewController.swift; sourceTree = "<group>"; };
 		92DD37E020A5740500754AC8 /* NextHomeViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NextHomeViewController.xib; sourceTree = "<group>"; };
 		9DEC604443F0BED5845C1590 /* Pods_CYLTabBarController_Swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CYLTabBarController_Swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };

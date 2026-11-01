@@ -59,7 +59,7 @@ class ToastView: NSObject {
     }
     //居中显示
     func show() {
-        let window: UIWindow = UIApplication.shared.windows.last!
+        guard let window = ToastView.lastWindow else { return }
         contenButton.center = window.center
         window.addSubview(contenButton)
         self.showAnimation()
@@ -67,7 +67,7 @@ class ToastView: NSObject {
     }
     //顶部显示
     func showFromTopOffset(top: CGFloat) {
-        let window: UIWindow = UIApplication.shared.windows.last!
+        guard let window = ToastView.lastWindow else { return }
         contenButton.center = CGPoint(x: window.center.x, y: top + contenButton.frame.size.height / 2)
         window.addSubview(contenButton)
         self.showAnimation()
@@ -75,7 +75,7 @@ class ToastView: NSObject {
     }
     //底部显示
     func showFromBottomOffset(bottom: CGFloat) {
-        let window: UIWindow = UIApplication.shared.windows.last!
+        guard let window = ToastView.lastWindow else { return }
         contenButton.center = CGPoint(x: window.center.x, y: window.frame.size.height - (bottom + contenButton.frame.size.height/2))
         window.addSubview(contenButton)
         self.showAnimation()
@@ -125,26 +125,30 @@ class ToastView: NSObject {
         toast.showFromBottomOffset(bottom: bottomOffset)
     }
     
+    /// Last window of the connected scenes (replaces `UIApplication.shared.windows`, deprecated in iOS 15).
+    private static var lastWindow: UIWindow? {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .last
+    }
+
     //显示动画
     @objc func showAnimation() {
-        UIView.beginAnimations("show", context: nil)
         //慢到快的进入
-        UIView.setAnimationCurve(UIView.AnimationCurve.easeIn)
-        UIView.setAnimationDuration(0.3)
-        contenButton.alpha = 1
-        UIView.commitAnimations()
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseIn) {
+            self.contenButton.alpha = 1
+        }
     }
     
     //隐藏动画
     @objc func hideAnimation() {
-        UIView.beginAnimations("hide", context: nil)
         //快到慢的退出
-        UIView.setAnimationCurve(UIView.AnimationCurve.easeOut)
-        UIView.setAnimationDelegate(self)
-        UIView.setAnimationDidStop(#selector(dismissToast))
-        UIView.setAnimationDuration(0.3)
-        contenButton.alpha = 0.0
-        UIView.commitAnimations()
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut, animations: {
+            self.contenButton.alpha = 0.0
+        }, completion: { _ in
+            self.dismissToast()
+        })
     }
     
     

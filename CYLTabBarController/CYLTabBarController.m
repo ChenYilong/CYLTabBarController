@@ -2385,7 +2385,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
         
         @try {
             CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
-            NSUInteger index = [cyl_tabBar.cyl_subTabBarButtons indexOfObject:contentControl];
+            NSUInteger index = contentControl ? [cyl_tabBar.cyl_subTabBarButtons indexOfObject:contentControl] : NSNotFound;
             if (NSNotFound != index) {
                 if (!lottieURL) {
                     //TODO:lottieURLs 与 Control对应的index不一致， 因为 lottieURLs 可能会少一个 plusButton 对应的。如何能够不通过index就获取到 lottieURLs ?

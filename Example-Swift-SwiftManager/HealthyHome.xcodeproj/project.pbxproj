@@ -87,7 +87,7 @@
 		184C1CDE23F65A9A00B23C7F /* RootNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootNavigationController.swift; sourceTree = "<group>"; };
 		184C1CE023F65A9A00B23C7F /* RootTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootTabBarController.swift; sourceTree = "<group>"; };
 		184C1CE323F65A9A00B23C7F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		184C1CE823F65B0B00B23C7F /* HealthyHome-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HealthyHome-Bridging-Header.h"; sourceTree = "<group>"; };
+		184C1CE823F65B0B00B23C7F /* HealthyHome-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "HealthyHome-Bridging-Header.h"; path = "HealthyHome/HealthyHome-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
 		184C1CE923F65B0B00B23C7F /* OCSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCSwift.h; sourceTree = "<group>"; };
 		184C1CEA23F65B0B00B23C7F /* OCSwift.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCSwift.m; sourceTree = "<group>"; };
 		184C1CF023F686AE00B23C7F /* TabBarCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCommon.swift; sourceTree = "<group>"; };
@@ -164,7 +164,8 @@
 				184C1CEA23F65B0B00B23C7F /* OCSwift.m */,
 				184C1CE823F65B0B00B23C7F /* HealthyHome-Bridging-Header.h */,
 			);
-			path = HealthyHome;
+			name = HealthyHome;
+			path = "../Example-Swift-03/HealthyHome";
 			sourceTree = "<group>";
 		};
 		184C1CA323F65A2A00B23C7F /* HealthyHomeTests */ = {
@@ -676,7 +677,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 35GDVZ2Q5K;
-				INFOPLIST_FILE = HealthyHome/Info.plist;
+				INFOPLIST_FILE = "../Example-Swift-03/HealthyHome/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -697,7 +698,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 35GDVZ2Q5K;
-				INFOPLIST_FILE = HealthyHome/Info.plist;
+				INFOPLIST_FILE = "../Example-Swift-03/HealthyHome/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
