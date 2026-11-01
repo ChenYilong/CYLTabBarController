@@ -7,6 +7,7 @@
 //
 
 #import "CYLHomeViewController.h"
+#import "UITableViewCell+CYLBadgeDemo.h"
 //#import "CYLTabBarControllerConfig.h"
 #import "CYLPlusButtonSubclass.h"
 #import "MainTabBarController.h"
@@ -23,6 +24,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.tableView.rowHeight = CYLDemoBadgeRowHeight;
     NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), self);
     self.view.backgroundColor = [UIColor whiteColor];
 //    self.navigationItem.title = @"首页"; //✅sets navigation bar title.The right way to set the title of the navigation
@@ -120,8 +122,10 @@
 #pragma mark - Methods
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
+    [cell cyl_demo_showBadgeForRow:indexPath.row];
     
     [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController on iOS %@", self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
+    cell.detailTextLabel.text = [UITableViewCell cyl_demo_badgeTitleForRow:indexPath.row];
 }
 
 #pragma mark - Table view
@@ -130,7 +134,7 @@
     static NSString * CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
     [self configureCell:cell forIndexPath:indexPath];
     return cell;

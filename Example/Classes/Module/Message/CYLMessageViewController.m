@@ -7,6 +7,7 @@
 //
 
 #import "CYLMessageViewController.h"
+#import "UITableViewCell+CYLBadgeDemo.h"
 #import "CYLMainRootViewController.h"
 #import "CYLPlusButtonSubclass.h"
 #import "MainTabBarController.h"
@@ -18,6 +19,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.tableView.rowHeight = CYLDemoBadgeRowHeight;
     NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), self);
 
     self.view.backgroundColor = [UIColor whiteColor];
@@ -52,6 +54,7 @@
 }
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
+    [cell cyl_demo_showBadgeForRow:indexPath.row];
     if (0 == indexPath.row) {
         // The second row of the demo pushes a tab bar controller of the SAME context, see `-tableView:didSelectRowAtIndexPath:`.
         [[cell textLabel] setText:@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）"];

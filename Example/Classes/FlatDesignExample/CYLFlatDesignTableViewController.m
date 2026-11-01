@@ -7,6 +7,7 @@
 //
 
 #import "CYLFlatDesignTableViewController.h"
+#import "UITableViewCell+CYLBadgeDemo.h"
 #import "CYLFlatDesignTabBarDemoViewController.h"
 #import "CYLPopPushDemoViewController.h"
 #import "CYLFlatDesignMainTabBarController.h"
@@ -40,6 +41,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.tableView.rowHeight = CYLDemoBadgeRowHeight;
     NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), self);
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = self.title; //✅sets navigation bar title.The right way to set the title of the navigation
@@ -147,6 +149,7 @@
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     cell.textLabel.text = title;
+    [cell cyl_demo_showBadgeForRow:indexPath.row];
 
     return cell;
 }

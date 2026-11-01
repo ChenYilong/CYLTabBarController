@@ -7,6 +7,7 @@
 //
 
 #import "CYLFlatDesignTabBarDemoViewController.h"
+#import "UITableViewCell+CYLBadgeDemo.h"
 #import "CYLFlatDesignTableViewController.h"
 #import "CYLTabBarController.h"
 //#import "CYLFlatDesignUIViewController.h"
@@ -93,7 +94,7 @@
     _tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     _tableView.delegate = self;
     _tableView.dataSource = self;
-    _tableView.rowHeight = 50;
+    _tableView.rowHeight = CYLDemoBadgeRowHeight;
     _tableView.backgroundColor = [UIColor clearColor];
     _tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     [self.view insertSubview:_tableView atIndex:0];
@@ -129,6 +130,7 @@
     
     
     cell.textLabel.text = self.datas[indexPath.row];
+    [cell cyl_demo_showBadgeForRow:indexPath.row];
     return cell;
 }
 
