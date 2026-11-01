@@ -133,7 +133,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 /*!
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器作为返回值返回。
  @param index 需要选择的控制器在 `TabBar` 中的 index。
- @return 最终被选择的控制器。
+ @return 最终被选择的控制器；index 或 classType 无效时返回 nil，且不 pop、不切换 Tab。[EN] nil when the index or class type is invalid; nothing is popped or selected then.
  @attention 注意：方法中的参数和返回值都是 `UIViewController` 的子类，但并非 `UINavigationController` 的子类，该方法无 pop 动画。
  * [EN] Pops to the root of the current navigation stack, selects the tab at `index` without animation, and returns the selected view controller.
  * [CN] Pop 到当前导航栈底，无动画地选中 index 对应的 Tab，并返回被选中的控制器。
@@ -144,7 +144,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器作为返回值返回。
  @param index 需要选择的控制器在 `TabBar` 中的 index。
  @param animated 动画
- @return 最终被选择的控制器。
+ @return 最终被选择的控制器；index 或 classType 无效时返回 nil，且不 pop、不切换 Tab。[EN] nil when the index or class type is invalid; nothing is popped or selected then.
  @attention 注意：方法中的参数和返回值都是 `UIViewController` 的子类，但并非 `UINavigationController` 的子类。
  * [EN] Pops to the root of the current navigation stack, selects the tab at `index`, and returns the selected view controller.
  * [CN] Pop 到当前导航栈底，选中 index 对应的 Tab，并返回被选中的控制器。
@@ -164,7 +164,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 /*!
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器作为返回值返回。
  @param classType 需要选择的控制器所属的类。
- @return 最终被选择的控制器。
+ @return 最终被选择的控制器；index 或 classType 无效时返回 nil，且不 pop、不切换 Tab。[EN] nil when the index or class type is invalid; nothing is popped or selected then.
  @attention 注意：
                 - 方法中的参数和返回值都是 `UIViewController` 的子类，但并非 `UINavigationController` 的子类。
                 - 如果 TabBarViewController 的 viewControllers 中包含多个相同的 `classType` 类型，会返回最左端的一个。

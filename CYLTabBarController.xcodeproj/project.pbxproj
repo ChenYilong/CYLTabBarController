@@ -25,6 +25,7 @@
 		2E9289A064C225DD4455B1A8 /* CYLFlatDesignTabBarHideTabBar.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF2C50AEF51839180BA7ACE /* CYLFlatDesignTabBarHideTabBar.m */; };
 		2EBC8C14A1A4F918DF29B837 /* CYLBaseNavigationController.h in Headers */ = {isa = PBXBuildFile; fileRef = 22D8EE709139B6B411751735 /* CYLBaseNavigationController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2F88440A0F31D06D42074607 /* CYLPlusButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BBCEB7E28F78ABE144F0487 /* CYLPlusButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		30F844E1260777C69B048E2C /* CYLPopPushDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A951F354CA188B8C7F18C09 /* CYLPopPushDemoViewController.m */; };
 		3DFC724D5AA6D2B820CC163C /* UITabBarItem+CYLBadgeExtention.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D011D1D39B1E8C96E402189 /* UITabBarItem+CYLBadgeExtention.m */; };
 		3E5F7488174426E3E897E98D /* CYLFlatDesignTabBarButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 46818C00AA5DC8A0452B9DCA /* CYLFlatDesignTabBarButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		49F431C7B83D83B4DC51F6B7 /* CYLPlusButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 932C34E7F43574B5940DDCCA /* CYLPlusButton.m */; };
@@ -147,6 +148,7 @@
 		6BBCEB7E28F78ABE144F0487 /* CYLPlusButton.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLPlusButton.h; sourceTree = "<group>"; };
 		6D6AE8A15AA260E26D8CD7D6 /* UIControl+CYLBadgeExtention.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIControl+CYLBadgeExtention.m"; sourceTree = "<group>"; };
 		73262A7C64D406B47FB45CD4 /* UITabBarItem+CYLBadgeExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UITabBarItem+CYLBadgeExtention.h"; sourceTree = "<group>"; };
+		7A951F354CA188B8C7F18C09 /* CYLPopPushDemoViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLPopPushDemoViewController.m; sourceTree = "<group>"; };
 		7CBA275D264ECE11094A2DD4 /* UINavigationController+CYLFlatDesignTabBarPrivate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+CYLFlatDesignTabBarPrivate.h"; sourceTree = "<group>"; };
 		7D011D1D39B1E8C96E402189 /* UITabBarItem+CYLBadgeExtention.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UITabBarItem+CYLBadgeExtention.m"; sourceTree = "<group>"; };
 		7DBDB36FCFF032EEBBF40B92 /* _CYLFlatDesignTabBarControllerTransitionContext.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = _CYLFlatDesignTabBarControllerTransitionContext.h; sourceTree = "<group>"; };
@@ -221,6 +223,7 @@
 		A494E02A66D2AE6B5B42B9E8 /* UIColor+CYLTabBarControllerExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIColor+CYLTabBarControllerExtention.h"; sourceTree = "<group>"; };
 		AA4031469A97637BCCBD157F /* NSObject+CYLTabBarControllerExtention.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "NSObject+CYLTabBarControllerExtention.m"; sourceTree = "<group>"; };
 		B09E171BC787DC361EBF0D16 /* UIImage+CYLTabBarControllerExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIImage+CYLTabBarControllerExtention.h"; sourceTree = "<group>"; };
+		B51813740A2588985D01B063 /* CYLPopPushDemoViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLPopPushDemoViewController.h; sourceTree = "<group>"; };
 		C811D20FFDC0F4E69D85352A /* _CYLFlatDesignTabBarControllerTransitionContext.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = _CYLFlatDesignTabBarControllerTransitionContext.m; sourceTree = "<group>"; };
 		CEB4796BA141A6DA4F93EC36 /* CYLBaseTableViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLBaseTableViewController.m; sourceTree = "<group>"; };
 		D2D62EE59024FFA52CAE3054 /* UIViewController+CYLTabBarControllerExtention.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+CYLTabBarControllerExtention.m"; sourceTree = "<group>"; };
@@ -433,6 +436,8 @@
 				9A9180B72FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m */,
 				9A9180B82FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.h */,
 				9A9180B92FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.m */,
+				B51813740A2588985D01B063 /* CYLPopPushDemoViewController.h */,
+				7A951F354CA188B8C7F18C09 /* CYLPopPushDemoViewController.m */,
 			);
 			path = FlatDesignExample;
 			sourceTree = "<group>";
@@ -849,6 +854,7 @@
 				9A1559DD1CB6D56500CAB1AF /* CYLMineViewController.m in Sources */,
 				9AE942F11BDC933E00354519 /* main.m in Sources */,
 				9AC0181B1FE90AA1001EC2D6 /* CYLPlusDemoChildViewController.m in Sources */,
+				30F844E1260777C69B048E2C /* CYLPopPushDemoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

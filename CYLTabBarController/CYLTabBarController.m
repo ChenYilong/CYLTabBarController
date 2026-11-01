@@ -2876,6 +2876,12 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
             _selectedIndex = selectedIndex;
             [super setSelectedIndex:selectedIndex];
             if (selectedIndex < 0 || selectedIndex >= self.viewControllers.count) { return; }
+            // `_selectedIndex` is already the new index, so `-[super setSelectedIndex:]` above sees no change and does not
+            // show the tab: in code (`selectedIndex = …`, `cyl_popSelect…`) the tab bar item changed but the old tab
+            // stayed on screen. Show it the way a tap does, through super (the override would report it again).
+            // `_selectedIndex` 已经是新值，上面的 `-[super setSelectedIndex:]` 认为没有变化，不会显示该 Tab：代码切换
+            // （`selectedIndex = …`、`cyl_popSelect…`）时 TabBarItem 变了，屏幕上仍是旧 Tab。这里与点击一样通过 super 显示（重写的方法会再次回调）。
+            [super setSelectedViewController:self.viewControllers[selectedIndex]];
             _selectedViewController = self.viewControllers[selectedIndex];
             if (_needsReloadItems) {
                 [self _captureItems];
