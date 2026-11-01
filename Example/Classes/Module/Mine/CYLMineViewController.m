@@ -7,7 +7,7 @@
 //
 
 #import "CYLMineViewController.h"
-#import "UITableViewCell+CYLBadgeDemo.h"
+#import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
 #import "CYLDetailsViewController.h"
 #import <MJRefresh/MJRefresh.h>
 
@@ -17,7 +17,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.tableView.rowHeight = CYLDemoBadgeRowHeight;
+    self.tableView.rowHeight = CYLBadgeRowHeight;
     NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), self);
 
     self.view.backgroundColor = [UIColor whiteColor];
@@ -74,7 +74,7 @@
 #pragma mark - Methods
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
-    [cell cyl_demo_showBadgeForRow:indexPath.row];
+    [cell cyl_showBadgeForRow:indexPath.row];
     [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController on iOS %@", self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
 }
 

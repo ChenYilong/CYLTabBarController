@@ -20,6 +20,7 @@
 #import "UIControl+CYLBadgeExtention.h"
 #import "UIBarButtonItem+CYLBadgeExtention.h"
 #import "UIView+CYLBadgeExtention.h"
+#import "UITableViewCell+CYLBadgeExtention.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"

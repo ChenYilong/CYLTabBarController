@@ -224,7 +224,7 @@ extension MainTabBarController {
     }
     
     static func makeViewControllers() -> [UIViewController] {
-        let home =  HomeViewController()
+        let home = CYLBadgeHelperTableViewController()
         let connection = UINavigationController(rootViewController: ConnectionViewController())
         let message = UINavigationController(rootViewController: MessageViewController())
         let personal = UINavigationController(rootViewController: PersonalViewController())

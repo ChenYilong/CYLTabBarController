@@ -1,19 +1,19 @@
 //
-//  UITableViewCell+CYLBadgeDemo.m
+//  UITableViewCell+CYLBadgeExtention.m
 //  CYLTabBarController
 //
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
-#import "UITableViewCell+CYLBadgeDemo.h"
-#import <CYLTabBarController/CYLTabBarController.h>
+#import "UITableViewCell+CYLBadgeExtention.h"
+#import "UIView+CYLBadgeExtention.h"
 
-const CGFloat CYLDemoBadgeRowHeight = 60;
-static const CGFloat CYLDemoIconSide = 40;
+const CGFloat CYLBadgeRowHeight = 60;
+static const CGFloat CYLBadgeIconSide = 30;
 
-@implementation UITableViewCell (CYLBadgeDemo)
+@implementation UITableViewCell (CYLBadgeExtention)
 
-+ (NSArray<NSDictionary *> *)cyl_demo_badgeItems {
++ (NSArray<NSDictionary *> *)cyl_badgeItems {
     static NSArray *items;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -46,35 +46,35 @@ static const CGFloat CYLDemoIconSide = 40;
     return items;
 }
 
-/// The app icon drawn at 40 x 40 pt with rounded corners. At full size it fills the row, and the badge, which sits on
-/// the icon's top-right corner, ends up under the row above.
-+ (UIImage *)cyl_demo_icon {
+/// The app icon drawn at 30 x 30 pt with rounded corners, which leaves 15 pt above it in a 60 pt row. The badge sits on
+/// the icon's top-right corner, so it needs that room to stay inside the row, animations included.
++ (UIImage *)cyl_badgeIcon {
     static UIImage *icon;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         UIImage *image = [UIImage imageNamed:@"DemoIcon"];
-        CGRect rect = CGRectMake(0, 0, CYLDemoIconSide, CYLDemoIconSide);
+        CGRect rect = CGRectMake(0, 0, CYLBadgeIconSide, CYLBadgeIconSide);
         icon = [[[UIGraphicsImageRenderer alloc] initWithSize:rect.size] imageWithActions:^(UIGraphicsImageRendererContext *context) {
-            [[UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:8] addClip];
+            [[UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:6] addClip];
             [image drawInRect:rect];
         }];
     });
     return icon;
 }
 
-+ (NSString *)cyl_demo_badgeTitleForRow:(NSInteger)row {
-    NSDictionary *item = [self cyl_demo_badgeItems][row % [self cyl_demo_badgeCount]];
++ (NSString *)cyl_badgeTitleForRow:(NSInteger)row {
+    NSDictionary *item = [self cyl_badgeItems][row % [self cyl_badgeStyleCount]];
     return [NSString stringWithFormat:@"%@. %@", @(row + 1), item[@"title"]];
 }
 
-+ (NSInteger)cyl_demo_badgeCount {
-    return [self cyl_demo_badgeItems].count;
++ (NSInteger)cyl_badgeStyleCount {
+    return [self cyl_badgeItems].count;
 }
 
-- (void)cyl_demo_showBadgeForRow:(NSInteger)row {
-    NSDictionary *item = [UITableViewCell cyl_demo_badgeItems][row % [UITableViewCell cyl_demo_badgeCount]];
+- (void)cyl_showBadgeForRow:(NSInteger)row {
+    NSDictionary *item = [UITableViewCell cyl_badgeItems][row % [UITableViewCell cyl_badgeStyleCount]];
     UIImageView *iconView = self.imageView;
-    iconView.image = [UITableViewCell cyl_demo_icon];
+    iconView.image = [UITableViewCell cyl_badgeIcon];
     iconView.clipsToBounds = NO;
 
     // Cells are reused: clear the badge and reset every option before the next one.
@@ -112,3 +112,46 @@ static const CGFloat CYLDemoIconSide = 40;
 }
 
 @end
+
+static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
+
+@implementation CYLBadgeHelperTableViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.navigationItem.title = @"Badge";
+    self.tableView.rowHeight = CYLBadgeRowHeight;
+    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CYLBadgeHelperCellIdentifier];
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return [UITableViewCell cyl_badgeStyleCount];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLBadgeHelperCellIdentifier forIndexPath:indexPath];
+    cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
+    [cell cyl_showBadgeForRow:indexPath.row];
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [[tableView cellForRowAtIndexPath:indexPath].imageView cyl_clearBadge];
+}
+
+@end
+
+@implementation UIViewController (CYLBadgeExtention)
+
+- (void)cyl_addBadgeHelperTable {
+    CYLBadgeHelperTableViewController *badgeHelper = [[CYLBadgeHelperTableViewController alloc] initWithStyle:UITableViewStylePlain];
+    [self addChildViewController:badgeHelper];
+    badgeHelper.view.frame = self.view.bounds;
+    badgeHelper.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.view addSubview:badgeHelper.view];
+    [badgeHelper didMoveToParentViewController:self];
+}
+
+@end
+
