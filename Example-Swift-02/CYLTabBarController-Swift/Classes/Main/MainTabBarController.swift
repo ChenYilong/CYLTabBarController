@@ -15,7 +15,7 @@ class MainTabBarController: CYLTabBarController {
         tabBarItemsAttributes: [[AnyHashable: Any]],
         imageInsets: UIEdgeInsets,
         titlePositionAdjustment: UIOffset,
-        context: String
+        context: String?
     ) {
         super.init(
             viewControllers: viewControllers,
@@ -33,7 +33,7 @@ class MainTabBarController: CYLTabBarController {
         imageInsets: UIEdgeInsets,
         titlePositionAdjustment: UIOffset,
         styleType: CYLTabBarStyleType,
-        context: String
+        context: String?
     ) {
         super.init(
             viewControllers: viewControllers,
@@ -163,7 +163,7 @@ class MainTabBarController: CYLTabBarController {
     /// view controller's button report through the plus button instead, so they are left out.
     private func issue610TabControls() -> [UIControl] {
         guard let cylTabBar = tabBar as? CYLTabBar else { return [] }
-        return cylTabBar.cyl_visibleControls().filter { !$0.cyl_isPlusControl() }
+        return cylTabBar.cyl_visibleControls()?.filter { !$0.cyl_isPlusControl() } ?? []
     }
 
     /// "1" / "0" per control: does it carry CYLTabBarController's tap action right now?
