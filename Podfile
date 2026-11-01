@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-#platform :ios, '15.0' #use post_install do |installer| instead, not specific version
+platform :ios, '15.0'
 ENV['SWIFT_VERSION'] = '5'
 project 'CYLTabBarController.xcodeproj'
 target 'CYLTabBarController' do
@@ -17,7 +17,8 @@ pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => './'
 
 #only for test
 #pod 'CYLTabBarController/CYLFlatDesignTabBar', :git => 'https://github.com/ChenYilong/CYLTabBarController.git', :branch => 'fix/flatdesign-tabbar-position-during-transition'
-pod 'MJRefresh'
+# Third-party code: its warnings are not ours to fix.
+pod 'MJRefresh', :inhibit_warnings => true
 
 end
 

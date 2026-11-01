@@ -254,7 +254,8 @@
 }
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
-    return;
+    // Disabled demo code, kept for reference. 已停用的演示代码，保留供参考。
+#if 0
     CYLFlatDesignMainTabBarController *tabBarController = self;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{});
@@ -307,6 +308,7 @@
         
     });
     //    });
+#endif
 }
 - (UIButton *)selectedCover {
     //    if (_selectedCover) {
@@ -429,8 +431,6 @@
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control {
     
-    UIView *animationView;
-    
 #if defined(DEBUG) || defined(BETA)
 NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), control);
 #endif
@@ -452,24 +452,19 @@ NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_F
                 [tabBarController.selectedViewController cyl_showBadge];
             }
         }
-        animationView = [control cyl_tabImageView];
     }
     
-    // The plus button of this tab bar controller's context (`CYLExternPlusButton` is the one registered last).
-    UIButton *button = [CYLPlusButton plusButtonForOwner:tabBarController];
-    BOOL isPlusButton = [control cyl_isPlusButton];
     // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
     // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
-    if (isPlusButton) {
-        animationView = button.imageView;
-    }
-    
-    
-    // [self addRotateAnimationOnView:animationView];//暂时不推荐用旋转方式，badge也会旋转。
+    // Rotating the tapped icon is disabled, the badge would rotate too. To enable it:
+    // 暂时不推荐用旋转方式，badge也会旋转。如需启用：
+    //    // The plus button of this tab bar controller's context (`CYLExternPlusButton` is the one registered last).
+    //    UIView *animationView = [control cyl_isPlusButton] ? [CYLPlusButton plusButtonForOwner:tabBarController].imageView : [control cyl_tabImageView];
+    //    [self addRotateAnimationOnView:animationView];
     
     //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
     if ([control cyl_isTabButton] || [control cyl_isPlusButton]) {
-        BOOL shouldSelectedCoverShow = (self.selectedIndex == 0);
+        //        BOOL shouldSelectedCoverShow = (self.selectedIndex == 0);
         //        [self setSelectedCoverShow:shouldSelectedCoverShow];
     }
 }

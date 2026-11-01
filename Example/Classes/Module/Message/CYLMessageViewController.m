@@ -50,14 +50,16 @@
 #pragma mark - Methods
 
 - (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     [self.navigationItem.leftBarButtonItem cyl_showBadge];
 }
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
     [cell cyl_showBadgeForRow:indexPath.row];
+    cell.detailTextLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
     if (0 == indexPath.row) {
         // The second row of the demo pushes a tab bar controller of the SAME context, see `-tableView:didSelectRowAtIndexPath:`.
-        [[cell textLabel] setText:@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）"];
+        [[cell textLabel] setText:NSLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）", nil)];
         return;
     }
     [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController on iOS %@", self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
@@ -70,7 +72,7 @@
     static NSString * CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
     [self configureCell:cell forIndexPath:indexPath];
     return cell;
@@ -111,7 +113,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 15;
+    return MAX(15, [UITableViewCell cyl_badgeStyleCount]); // every badge style has a row
 }
 
 @end

@@ -577,8 +577,8 @@ public extension UIImage {
         }
         let imageRect = CGRect(origin: CGPoint.zero, size: size)
         var effectImage = self
-        let hasBlur = blurRadius > CGFloat(FLT_EPSILON)
-        let hasSaturationChange = fabs(saturationDeltaFactor - 1.0) > CGFloat(FLT_EPSILON)
+        let hasBlur = blurRadius > CGFloat(Float.ulpOfOne)
+        let hasSaturationChange = abs(saturationDeltaFactor - 1.0) > CGFloat(Float.ulpOfOne)
         if (hasBlur || hasSaturationChange) {
             
             UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
@@ -603,8 +603,8 @@ public extension UIImage {
                 rowBytes: (effectOutContext?.bytesPerRow)!)
             
             if hasBlur {
-                let inputRadius = blurRadius * UIScreen.main.scale
-                let sqrtPi: CGFloat = CGFloat(sqrt(M_PI * 2.0))
+                let inputRadius = blurRadius * UITraitCollection.current.displayScale
+                let sqrtPi: CGFloat = CGFloat(sqrt(Double.pi * 2.0))
                 var radius = UInt32(floor(inputRadius * 3.0 * sqrtPi / 4.0 + 0.5))
                 if radius % 2 != 1 {
                     radius += 1 // force radius to be odd so that the three box-blur methodology works.
@@ -656,7 +656,7 @@ public extension UIImage {
         }
         
         // Set up output context.
-        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
+        UIGraphicsBeginImageContextWithOptions(size, false, UITraitCollection.current.displayScale)
         let outputContext = UIGraphicsGetCurrentContext()
         outputContext?.scaleBy(x: 1.0, y: -1.0)
         outputContext?.translateBy(x: 0, y: -size.height)
