@@ -50,6 +50,7 @@
 | `[CN]` 表示中文内容。 | `[CN]` indicates Chinese content. |
 | `[EN]` 表示英文内容。 | `[EN]` indicates English content. |
 | [点此获取 QQ 群、Telegram 群交流信息](https://github.com/ChenYilong/iOSBlog/issues/21)。 | [Join the QQ or Telegram groups](https://github.com/ChenYilong/iOSBlog/issues/21). |
+| 遇到使用问题，请先查阅 [常见问题（docs/FAQ.md）](docs/FAQ.md)；bug 与新需求请提交 issue。 | For usage questions, see the [FAQ (docs/FAQ.md)](docs/FAQ.md) first; report bugs and feature requests as issues. |
 
 ## [CN]最新版本预览
 ## [EN]Preview of the latest version
@@ -1259,7 +1260,7 @@ use_frameworks!
 
 | 中文 | English |
 |:---|:---|
-| 更多问答请查看 [Issue FAQ](https://github.com/ChenYilong/CYLTabBarController/issues?utf8=✓&q=+label%3AQ-A+)。 | For more questions and answers, see the [Issue FAQ](https://github.com/ChenYilong/CYLTabBarController/issues?utf8=✓&q=+label%3AQ-A+). |
+| 更多问答请查看 [docs/FAQ.md](docs/FAQ.md)，其中整理了 Issues 中的使用问答（原 issue 见 [Q-A 标签](https://github.com/ChenYilong/CYLTabBarController/issues?q=label%3AQ-A)）。 | For more questions and answers, see [docs/FAQ.md](docs/FAQ.md), which collects the usage questions from Issues (the original issues are under the [Q-A label](https://github.com/ChenYilong/CYLTabBarController/issues?q=label%3AQ-A)). |
 
 ### [CN]为什么放置 6 个 TabBarItem 会显示异常？
 ### [EN]Why does placing six TabBarItems behave unexpectedly?
