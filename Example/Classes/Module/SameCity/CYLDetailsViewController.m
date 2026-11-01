@@ -22,7 +22,7 @@
     self.view.backgroundColor = [UIColor orangeColor];
     
     UILabel *label = [[UILabel alloc] init];
-    label.text = @"点击屏幕可跳转到“我的”，执行testPush";
+    label.text = NSLocalizedString(@"点击屏幕可跳转到“我的”，执行testPush", nil);
     label.frame = CGRectMake(20, 150, CGRectGetWidth(self.view.frame) - 2 * 20, 20);
     label.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     label.textAlignment = NSTextAlignmentCenter;

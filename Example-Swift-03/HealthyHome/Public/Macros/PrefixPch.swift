@@ -61,14 +61,18 @@ let IOS9_OR_LATER = (Float(systemVersion)! >= 9.0 ? true : false)
 let IOS10_OR_LATER = (Float(systemVersion)! >= 10.0 ? true : false)
 let IOS11_OR_LATER = (Float(systemVersion)! >= 11.0 ? true : false)
 
+//MARK: 当前窗口场景（`UIScreen.main`、`UIApplication.windows` 已弃用，改用 UIWindowScene）
+func currentWindowScene() -> UIWindowScene? {
+    return UIApplication.shared.connectedScenes.first { $0 is UIWindowScene } as? UIWindowScene
+}
+
 //MARK: 视图宽高
-let screenWidth = UIScreen.main.bounds.width
-let screenHeight = UIScreen.main.bounds.height
+let screenWidth = currentWindowScene()?.screen.bounds.width ?? 0
+let screenHeight = currentWindowScene()?.screen.bounds.height ?? 0
 
 //MARK: 当前状态栏高度（`UIApplication.statusBarFrame` 在 iOS 27 起已失效，改用 UIWindowScene.statusBarManager）
 private func currentStatusBarHeight() -> CGFloat {
-    let windowScene = UIApplication.shared.connectedScenes.first { $0 is UIWindowScene } as? UIWindowScene
-    return windowScene?.statusBarManager?.statusBarFrame.height ?? 0
+    return currentWindowScene()?.statusBarManager?.statusBarFrame.height ?? 0
 }
 
 //MARK:导航栏含标签栏高度
@@ -79,7 +83,7 @@ let tabHeight = currentStatusBarHeight() == 44 ? 83 : 49
 
 //MARK: 底部安全距离，全屏手机为34pt,非全屏手机为0pt
 @available(iOS 11.0, *)
-let bottomSafeAreaHeight = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0.0
+let bottomSafeAreaHeight = currentWindowScene()?.windows.first?.safeAreaInsets.bottom ?? 0.0
 
 //MARK: (1)先获取状态栏的高度，根据状态栏的高度定义 导航栏高度、tabbar高度、顶部的安全距离、底部的安全距离
 //MARK: 状态栏高度

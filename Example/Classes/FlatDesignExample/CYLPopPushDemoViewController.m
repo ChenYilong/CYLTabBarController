@@ -40,7 +40,7 @@ typedef void (^CYLPopPushDemoAction)(void);
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor systemTealColor];
-    self.navigationItem.title = @"另一个类型的页面";
+    self.navigationItem.title = NSLocalizedString(@"另一个类型的页面", nil);
 }
 @end
 
@@ -192,7 +192,7 @@ typedef void (^CYLPopPushDemoAction)(void);
 
 - (void)showMessage:(NSString *)message {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleDefault handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];
 }
 

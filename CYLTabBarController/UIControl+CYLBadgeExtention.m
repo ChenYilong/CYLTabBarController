@@ -73,7 +73,7 @@
 - (NSTimeInterval)cyl_delayIfNeededForSeconds {
     // Default to 0 if not managed elsewhere; adjust if there is a backing store
     NSNumber *value = objc_getAssociatedObject(self, @selector(cyl_delayIfNeededForSeconds));
-    return value ? value.doubleValue : 0;
+    return value != nil ? value.doubleValue : 0;
 }
 
 - (void)cyl_setDelayIfNeededForSeconds:(NSTimeInterval)seconds {

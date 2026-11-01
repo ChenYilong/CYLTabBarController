@@ -9,7 +9,7 @@ import CYLTabBarController
 import UIKit
 
 class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
-    static func plusButton() -> Any! {
+    static func plusButton() -> Any {
         let button = CYLPlusButtonSubclass()
         button.setImage(UIImage(named: "post_normal"), for: .normal)
         button.titleLabel?.textAlignment = .center
@@ -22,7 +22,9 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         button.setTitle("选中", for: .selected)
         button.setTitleColor(UIColor.blue, for: .selected)
 
-        button.adjustsImageWhenHighlighted = false
+        // An explicit highlighted image is drawn as is, so the button does not darken on touch
+        // (replaces `adjustsImageWhenHighlighted = false`, deprecated in iOS 15).
+        button.setImage(button.image(for: .normal), for: .highlighted)
         button.sizeToFit()
 //        button.addTarget(self, action: #selector(testClick(sender:)), for: .touchUpInside)
         return button
@@ -44,7 +46,7 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         return -10
     }
 
-    static func plusChildViewController() -> UIViewController! {
+    static func plusChildViewController() -> UIViewController {
         let vc = PublishViewController()
         let nav = UINavigationController(rootViewController: vc)
         return nav

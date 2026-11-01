@@ -27,6 +27,8 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 @interface CYLTabBar () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) NSMutableSet<UIView *> *observedViews;
+/// Receives the `UIScrollEdgeElementContainerInteraction`s added to the tab bar, see `-addInteraction:`.
+@property (nonatomic, strong, nullable) UIView *cyl_scrollEdgeElementContainerView;
 
 @end
 
@@ -856,6 +858,60 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     }
     
     [super addSubview:view];
+}
+
+#pragma mark - Scroll edge element container (iOS 26+)
+
+/*!
+ * FIX: issue #662 — a frosted band above the tab bar hides the last rows of a list on iOS 27
+ * [EN] Apps add a `UIScrollEdgeElementContainerInteraction` to the tab bar so a scroll view's bottom edge effect sits
+ *      under it. UIKit sizes that effect from the tab bar AND its subviews. The raised plus button is a subview that
+ *      sticks out above the tab bar (y < 0), so the effect started above the glass capsule and blurred the last rows.
+ *      The interaction is now moved to an empty view with exactly the tab bar's bounds, so the effect matches the
+ *      tab bar, as it does for tabs without the interaction. Nothing to change in the app. The interaction is not in
+ *      the tab bar's `interactions`; remove it with `-removeInteraction:` on the tab bar as usual.
+ * [CN] App 会给 TabBar 添加 `UIScrollEdgeElementContainerInteraction`，让滚动视图底部的边缘效果位于 TabBar 下方。UIKit 按
+ *      TabBar 及其子视图计算该效果的范围。凸起的加号按钮是伸出 TabBar 上方（y < 0）的子视图，于是边缘效果从玻璃胶囊上方开始，
+ *      模糊了列表最后几行。现在该交互被转移到一个与 TabBar bounds 完全相同的空视图上，边缘效果与 TabBar 一致，与未添加该交互的
+ *      Tab 相同。App 无需修改代码。该交互不会出现在 TabBar 的 `interactions` 中；照常在 TabBar 上调用 `-removeInteraction:` 移除即可。
+ */
+- (BOOL)cyl_isScrollEdgeElementContainerInteraction:(id<UIInteraction>)interaction {
+    if (@available(iOS 26.0, *)) {
+        return [(NSObject *)interaction isKindOfClass:[UIScrollEdgeElementContainerInteraction class]];
+    }
+    return NO;
+}
+
+- (UIView *)cyl_scrollEdgeElementContainer {
+    UIView *containerView = self.cyl_scrollEdgeElementContainerView;
+    if (!containerView) {
+        containerView = [[UIView alloc] initWithFrame:self.bounds];
+        containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        containerView.userInteractionEnabled = NO;
+        containerView.backgroundColor = [UIColor clearColor];
+        self.cyl_scrollEdgeElementContainerView = containerView;
+    }
+    if (containerView.superview != self) {
+        [self insertSubview:containerView atIndex:0];
+    }
+    return containerView;
+}
+
+- (void)addInteraction:(id<UIInteraction>)interaction {
+    if ([self cyl_isScrollEdgeElementContainerInteraction:interaction]) {
+        [[self cyl_scrollEdgeElementContainer] addInteraction:interaction];
+        return;
+    }
+    [super addInteraction:interaction];
+}
+
+- (void)removeInteraction:(id<UIInteraction>)interaction {
+    UIView *containerView = self.cyl_scrollEdgeElementContainerView;
+    if (containerView && interaction.view == containerView) {
+        [containerView removeInteraction:interaction];
+        return;
+    }
+    [super removeInteraction:interaction];
 }
 
 // 识别ContinuousSelection手势，需要代理长按等其他，处理PlusButton事件响应优先级为最优。
