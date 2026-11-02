@@ -63,6 +63,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    // Issue #426: on a memory warning, unload the views of the tabs that are not selected; they load again when selected.
+    // Issue #426：收到内存警告时卸载未选中 Tab 的视图，切换到该 Tab 时重新加载。
+    self.unloadsUnselectedViewsOnMemoryWarning = YES;
     
 #if CYL_FLATDESIGN_AVAILABLE
     

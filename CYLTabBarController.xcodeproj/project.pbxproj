@@ -14,6 +14,8 @@
 		044C7B1A6334E1E0C9B03395 /* NSObject+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = E2745BEF0A35D75AC1EE1802 /* NSObject+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		074B489419EC087FA632AB23 /* CYLFlatDesignTabBar.m in Sources */ = {isa = PBXBuildFile; fileRef = EDF57434DE70CEC39141CF16 /* CYLFlatDesignTabBar.m */; };
 		076D8C954F38DF05CAD01A26 /* UITableViewCell+CYLBadgeExtention.m in Sources */ = {isa = PBXBuildFile; fileRef = A63D9F62174D84768BED4A80 /* UITableViewCell+CYLBadgeExtention.m */; };
+		6F5A4B3C2D1E0F9A8B7C6D5E /* UIViewController+CYLMemoryWarningDemo.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D3E2F1A0B9C8D7E6F5A4B3C /* UIViewController+CYLMemoryWarningDemo.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7A6B5C4D3E2F1A0B9C8D7E6F /* UIViewController+CYLMemoryWarningDemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E4F3A2B1C0D9E8F7A6B5C4D /* UIViewController+CYLMemoryWarningDemo.m */; };
 		077E376118682E6BC98A554D /* UITabBarItem+CYLTabBarControllerExtention.m in Sources */ = {isa = PBXBuildFile; fileRef = 14D64365484FA027D689BD77 /* UITabBarItem+CYLTabBarControllerExtention.m */; };
 		0998FC39EE894767CF526891 /* UITabBarItem+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = 4F778C7DAAF4FF6E8B37F24A /* UITabBarItem+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0B7C3D8F44598930FAC3D25E /* CYLConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 0775BC7E3F8C5D94EA249731 /* CYLConstants.m */; };
@@ -238,6 +240,8 @@
 		9AE942E51BDC933E00354519 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9DB977CE43E8DF60DBBCD6C5 /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = Pods/Pods.xcodeproj; sourceTree = SOURCE_ROOT; };
 		A494E02A66D2AE6B5B42B9E8 /* UIColor+CYLTabBarControllerExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIColor+CYLTabBarControllerExtention.h"; sourceTree = "<group>"; };
+		4D3E2F1A0B9C8D7E6F5A4B3C /* UIViewController+CYLMemoryWarningDemo.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIViewController+CYLMemoryWarningDemo.h"; sourceTree = "<group>"; };
+		5E4F3A2B1C0D9E8F7A6B5C4D /* UIViewController+CYLMemoryWarningDemo.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+CYLMemoryWarningDemo.m"; sourceTree = "<group>"; };
 		A63D9F62174D84768BED4A80 /* UITableViewCell+CYLBadgeExtention.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UITableViewCell+CYLBadgeExtention.m"; sourceTree = "<group>"; };
 		AA4031469A97637BCCBD157F /* NSObject+CYLTabBarControllerExtention.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "NSObject+CYLTabBarControllerExtention.m"; sourceTree = "<group>"; };
 		B09E171BC787DC361EBF0D16 /* UIImage+CYLTabBarControllerExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIImage+CYLTabBarControllerExtention.h"; sourceTree = "<group>"; };
@@ -593,6 +597,8 @@
 				6D4C54D387BAE3B227860B2A /* CYLBadgeAppearance.m */,
 				6134160B6AE68986A470B5F1 /* UITableViewCell+CYLBadgeExtention.h */,
 				A63D9F62174D84768BED4A80 /* UITableViewCell+CYLBadgeExtention.m */,
+				4D3E2F1A0B9C8D7E6F5A4B3C /* UIViewController+CYLMemoryWarningDemo.h */,
+				5E4F3A2B1C0D9E8F7A6B5C4D /* UIViewController+CYLMemoryWarningDemo.m */,
 				F45F360D448D6E78DD3A4B88 /* UIView+CYLTabBarControllerExtention.h */,
 				7E837923A3C4F015D5EF885D /* UIView+CYLTabBarControllerExtention.m */,
 				FC3E14B9B33F4BBA36C13BC5 /* UIViewController+CYLNavigationControllerExtention.h */,
@@ -665,6 +671,7 @@
 				D6ED76F52724E1A27FDE3A83 /* UIView+CYLBadgeExtention.h in Headers */,
 				612BF72EA3F27506A3FB901B /* CYLBadgeAppearance.h in Headers */,
 				C0B1D2E3F4A5B6C7D8E9F0A1 /* UITableViewCell+CYLBadgeExtention.h in Headers */,
+				6F5A4B3C2D1E0F9A8B7C6D5E /* UIViewController+CYLMemoryWarningDemo.h in Headers */,
 				6DF0856810A3A8175EA3FD25 /* UIView+CYLTabBarControllerExtention.h in Headers */,
 				AC11DB045581B6D3C67A2473 /* UIViewController+CYLNavigationControllerExtention.h in Headers */,
 				C2BC718902482846D5C84EB9 /* UIViewController+CYLTabBarControllerExtention.h in Headers */,
@@ -869,6 +876,7 @@
 				93FF05430AA0DD4AF3901306 /* UIView+CYLBadgeExtention.m in Sources */,
 				3074C65391041CEB17679371 /* CYLBadgeAppearance.m in Sources */,
 				076D8C954F38DF05CAD01A26 /* UITableViewCell+CYLBadgeExtention.m in Sources */,
+				7A6B5C4D3E2F1A0B9C8D7E6F /* UIViewController+CYLMemoryWarningDemo.m in Sources */,
 				297CA4BAC3339C32B5B3AD8D /* UIView+CYLTabBarControllerExtention.m in Sources */,
 				89896F85AC7444ED382DCB77 /* UIViewController+CYLNavigationControllerExtention.m in Sources */,
 				EAEC29CCF7FF7A3DD4D64F6A /* UIViewController+CYLTabBarControllerExtention.m in Sources */,

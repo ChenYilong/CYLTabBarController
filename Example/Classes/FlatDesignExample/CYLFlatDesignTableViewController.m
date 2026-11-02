@@ -8,6 +8,7 @@
 
 #import "CYLFlatDesignTableViewController.h"
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
+#import <CYLTabBarController/UIViewController+CYLMemoryWarningDemo.h>
 #import "CYLFlatDesignTabBarDemoViewController.h"
 #import "CYLPopPushDemoViewController.h"
 #import "CYLFlatDesignMainTabBarController.h"
@@ -106,11 +107,22 @@
 
 #pragma mark - Table view data source
 
+// Section 0: the memory warning demo row (#426), shared by all the examples. 第 0 组：所有示例共用的内存警告演示行（#426）。
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (CYLMemoryWarningDemoSection == section) {
+        return 1;
+    }
     return 50;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (CYLMemoryWarningDemoSection == indexPath.section) {
+        return [self cyl_memoryWarningDemoCellForTableView:tableView];
+    }
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
@@ -152,10 +164,14 @@
 #pragma mark UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (CYLMemoryWarningDemoSection == indexPath.section) {
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        [self cyl_showMemoryWarningDemo];
+        return;
+    }
 #if CYL_FLATDESIGN_AVAILABLE
 
     [tableView deselectRowAtIndexPath:indexPath animated:true];
-    [CYLTabBarController cyl_simulateMemoryWarning]; // #426/#428: memory warning demo, see the log 内存警告演示，见日志
     
     
     if ([self.cylflatdesign_tabBarController isKindOfClass:[CYLFlatDesignSystemTabBarController class]]) {

@@ -8,6 +8,7 @@
 
 #import "CYLSameCityViewController.h"
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
+#import <CYLTabBarController/UIViewController+CYLMemoryWarningDemo.h>
 #import "CYLDetailsViewController.h"
 #import <MJRefresh/MJRefresh.h>
 
@@ -55,6 +56,9 @@
 #pragma mark - Table view
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (CYLMemoryWarningDemoSection == indexPath.section) {
+        return [self cyl_memoryWarningDemoCellForTableView:tableView];
+    }
     static NSString * CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
@@ -64,13 +68,25 @@
     return cell;
 }
 
+// Section 0: the memory warning demo row (#426), shared by all the examples. 第 0 组：所有示例共用的内存警告演示行（#426）。
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (CYLMemoryWarningDemoSection == section) {
+        return 1;
+    }
     return MAX(15, [UITableViewCell cyl_badgeStyleCount]); // every badge style has a row
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (CYLMemoryWarningDemoSection == indexPath.section) {
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        [self cyl_showMemoryWarningDemo];
+        return;
+    }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    [CYLTabBarController cyl_simulateMemoryWarning]; // #426/#428: memory warning demo, see the log 内存警告演示，见日志
     UIViewController *viewController = [[CYLDetailsViewController alloc] init];
 //    viewController.hidesBottomBarWhenPushed = YES;  // This property needs to be set before pushing viewController to the navigationController's stack. Meanwhile as it is all base on CYLBaseNavigationController, there is no need to do this.
     [viewController cyl_setNavigationBarHidden:YES];
