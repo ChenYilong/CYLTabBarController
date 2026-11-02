@@ -264,6 +264,9 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
     // 修改 item 图片后 UIKit 会重建 Tab 按钮且只重新布局 TabBar，所以这里也要为新按钮添加点击事件。放在上面的布局之后，
     // 因为布局时才会设置新按钮的 visible index（用于识别加号子控制器对应的按钮）。
     [self.tabBarController cyl_bindTabControlActions];
+    // The tab titles may have moved: lay the plus button out again so its title follows them
+    // (`+alignsTitleWithTabBarItemTitles`).
+    [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];
 }
 
 - (void)cyl_layoutTabBarSubviews {

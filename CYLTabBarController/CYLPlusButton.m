@@ -155,6 +155,315 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
     return button;
 }
 
+#pragma mark - Title alignment
+
+/// `-layoutSubviews` of a subclass runs inside this call (and lays out the title after `super`), so the alignment comes
+/// after every layout of the plus button, whatever the subclass does.
+- (void)layoutSublayersOfLayer:(CALayer *)layer {
+    [super layoutSublayersOfLayer:layer];
+    if (layer == self.layer) {
+        [self cyl_alignTitleWithTabBarItemTitlesIfNeeded];
+    }
+}
+
+- (BOOL)cyl_alignsTitleWithTabBarItemTitles {
+    Class plusButtonClass = [self class];
+    return [plusButtonClass respondsToSelector:@selector(alignsTitleWithTabBarItemTitles)] &&
+           [(Class<CYLPlusButtonSubclassing>)plusButtonClass alignsTitleWithTabBarItemTitles];
+}
+
+- (void)cyl_setNeedsTitleAlignment {
+    if ([self cyl_alignsTitleWithTabBarItemTitles]) {
+        [self setNeedsLayout];
+    }
+}
+
+/// The title colors are resolved for the tab titles' appearance: resolve them again when Dark Mode changes (before
+/// iOS 17, where the reference title's trait changes are not observed).
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            [self cyl_setNeedsTitleAlignment];
+        }
+    }
+}
+
+/// Moving the plus button does not lay it out again, but moves its title off the tab titles' line: e.g. after the Flat
+/// style's tab bar height changes, the plus button is re-centered on its placeholder tab after the tab bar's layout.
+- (void)setCenter:(CGPoint)center {
+    BOOL moved = !CGPointEqualToPoint(center, self.center);
+    [super setCenter:center];
+    if (moved) {
+        [self cyl_setNeedsTitleAlignment];
+    }
+}
+
+- (void)setFrame:(CGRect)frame {
+    BOOL moved = !CGRectEqualToRect(frame, self.frame);
+    [super setFrame:frame];
+    if (moved) {
+        [self cyl_setNeedsTitleAlignment];
+    }
+}
+
+/// See `+alignsTitleWithTabBarItemTitles`.
+- (void)cyl_alignTitleWithTabBarItemTitlesIfNeeded {
+    if (![self cyl_alignsTitleWithTabBarItemTitles]) {
+        return;
+    }
+    if (self.currentTitle.length == 0 && self.currentAttributedTitle.length == 0) {
+        return;
+    }
+    NSArray<UILabel *> *itemTitleLabels = [self cyl_tabBarItemTitleLabels];
+    UILabel *itemTitleLabel = itemTitleLabels.firstObject;
+    if (!itemTitleLabel) {
+        return;
+    }
+    [self cyl_observeAppearanceOfTabBarItemTitleLabel:itemTitleLabel];
+    UIColor *normalColor = nil;
+    UIColor *selectedColor = nil;
+    [self cyl_getTitleColorsOfTabBarItemTitleLabels:itemTitleLabels normalColor:&normalColor selectedColor:&selectedColor];
+    if ([self cyl_applyTitleFont:itemTitleLabel.font normalColor:normalColor selectedColor:selectedColor]) {
+        // The title's size changes with the font: align it after the next layout.
+        return;
+    }
+    UILabel *titleLabel = self.titleLabel;
+    if (!titleLabel.superview || ![self cyl_isVisibleView:titleLabel upTo:self]) {
+        return;
+    }
+    // The plus button can be laid out before the tab button whose title it follows (e.g. right after the Flat style's
+    // tab bar height changed): finish that layout first, so the title is read where it ends up.
+    [itemTitleLabel.superview layoutIfNeeded];
+    // Different hierarchies: convert the item title's center into the coordinate space the title label is laid out in.
+    CGPoint itemTitleCenter = [itemTitleLabel.superview convertPoint:itemTitleLabel.center toView:titleLabel.superview];
+    CGPoint titleCenter = titleLabel.center;
+    if (fabs(titleCenter.y - itemTitleCenter.y) < 0.5) {
+        return;
+    }
+    titleLabel.center = CGPointMake(titleCenter.x, itemTitleCenter.y);
+    // With UIButtonConfiguration the title sits in a container that clips to the button. A tall tab bar (e.g. the Flat
+    // style's adjustable height) can need the title below the button's bottom edge: let those containers show it.
+    for (UIView *view = titleLabel.superview; view && view != self; view = view.superview) {
+        CGRect titleFrame = [titleLabel.superview convertRect:titleLabel.frame toView:view];
+        if (view.clipsToBounds && !CGRectContainsRect(view.bounds, titleFrame)) {
+            view.clipsToBounds = NO;
+        }
+    }
+}
+
+/*!
+ * [EN] Gives the title the tab item titles' font and colors: `normalColor` when the plus button is not selected,
+ *      `selectedColor` when it is. A nil color keeps the one applied before (e.g. no tab title is selected while the plus
+ *      button's own view controller is). Works for a button with or without `UIButtonConfiguration`, whose title
+ *      attributes come from `titleTextAttributesTransformer` (`-setTitleColor:forState:` does not apply there).
+ *      Returns YES when something changed, so the title is aligned on the next layout, with its new size.
+ * [CN] 让标题使用 TabBarItem 标题的字体和颜色：未选中时为 `normalColor`，选中时为 `selectedColor`。颜色为 nil 时保留之前的颜色
+ *      （例如 PlusButton 自身的子控制器被选中时，没有选中的 Tab 标题）。同时支持使用与未使用 `UIButtonConfiguration` 的按钮
+ *      （前者的标题属性来自 `titleTextAttributesTransformer`，`-setTitleColor:forState:` 不生效）。有变化时返回 YES，
+ *      以便下次布局时按新的尺寸对齐。
+ */
+- (BOOL)cyl_applyTitleFont:(UIFont *)font normalColor:(UIColor *)normalColor selectedColor:(UIColor *)selectedColor {
+    static const void *CYLPlusButtonTitleStyleKey = &CYLPlusButtonTitleStyleKey;
+    NSDictionary *applied = objc_getAssociatedObject(self, CYLPlusButtonTitleStyleKey);
+    UIFont *titleFont = font ?: applied[@"font"];
+    UIColor *selectedTitleColor = selectedColor ?: applied[@"selected"] ?: normalColor ?: applied[@"normal"];
+    // Liquid Glass shows the selected plus button through the lens with a copy of it in the selected layer
+    // (`-selectedContentView`, highlighted rather than selected), like the tabs' selected-layer titles: always selected.
+    UIColor *titleColor = [self cyl_isInPlatterSelectedLayer] ? selectedTitleColor : (normalColor ?: applied[@"normal"]);
+    if (!titleFont || !titleColor || !selectedTitleColor) {
+        return NO;
+    }
+    NSDictionary *style = @{@"font": titleFont, @"normal": titleColor, @"selected": selectedTitleColor};
+    if ([style isEqualToDictionary:applied]) {
+        return NO;
+    }
+    objc_setAssociatedObject(self, CYLPlusButtonTitleStyleKey, style, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    if (@available(iOS 15.0, *)) {
+        UIButtonConfiguration *configuration = self.configuration;
+        if (configuration) {
+            __weak typeof(self) weakSelf = self;
+            configuration.titleTextAttributesTransformer = ^NSDictionary<NSAttributedStringKey, id> *(NSDictionary<NSAttributedStringKey, id> *attributes) {
+                NSMutableDictionary<NSAttributedStringKey, id> *titleAttributes = [attributes mutableCopy];
+                titleAttributes[NSFontAttributeName] = titleFont;
+                titleAttributes[NSForegroundColorAttributeName] = weakSelf.isSelected ? selectedTitleColor : titleColor;
+                return [titleAttributes copy];
+            };
+            self.configuration = configuration;
+            return YES;
+        }
+    }
+    self.titleLabel.font = titleFont;
+    [self setTitleColor:titleColor forState:UIControlStateNormal];
+    [self setTitleColor:selectedTitleColor forState:UIControlStateSelected];
+    [self setTitleColor:selectedTitleColor forState:(UIControlStateSelected | UIControlStateHighlighted)];
+    [self setNeedsLayout];
+    return YES;
+}
+
+/// Every visible, non-empty tab item title in the tab bar the plus button is in, in view order; empty when there is none.
+- (NSArray<UILabel *> *)cyl_tabBarItemTitleLabels {
+    Class flatDesignTabBarClass = NSClassFromString(@"CYLFlatDesignTabBar");
+    UIView *tabBar = self.superview;
+    while (tabBar && ![tabBar isKindOfClass:[UITabBar class]] &&
+           !(flatDesignTabBarClass && [tabBar isKindOfClass:flatDesignTabBarClass])) {
+        tabBar = tabBar.superview;
+    }
+    NSMutableArray<UILabel *> *labels = [NSMutableArray array];
+    if (tabBar) {
+        [self cyl_collectTabBarItemTitleLabelsInView:tabBar tabBar:tabBar into:labels];
+    }
+    return labels;
+}
+
+- (void)cyl_collectTabBarItemTitleLabelsInView:(UIView *)view tabBar:(UIView *)tabBar into:(NSMutableArray<UILabel *> *)labels {
+    for (UIView *subview in view.subviews) {
+        if (subview == self || subview.hidden || subview.alpha < 0.01) {
+            continue;
+        }
+        if ([subview isKindOfClass:[UILabel class]] && [self cyl_isTabBarItemTitleLabel:(UILabel *)subview tabBar:tabBar]) {
+            [labels addObject:(UILabel *)subview];
+            continue;
+        }
+        [self cyl_collectTabBarItemTitleLabelsInView:subview tabBar:tabBar into:labels];
+    }
+}
+
+/*!
+ * [EN] The colors the tab item titles are shown in.
+ *      - Liquid Glass: every tab has a title in the normal layer, drawn through the glass in the system label color
+ *        whatever its `textColor` says, and one in the selected layer (`-cyl_isPlatterSelectedControl`) in the selected
+ *        color, shown through the lens.
+ *      - The system tab bar and the Flat style: titles are drawn in their `textColor`. The unselected tabs are the
+ *        majority, so their color is the most common one; the selected color is the one of a title whose tab button is
+ *        selected, else any other color.
+ *      A color that cannot be told stays nil.
+ * [CN] TabBarItem 标题实际显示的颜色。液态玻璃：每个 Tab 在普通层有一个标题，透过玻璃以系统 label 颜色绘制（与其 `textColor` 无关），
+ *      在选中层（`-cyl_isPlatterSelectedControl`）还有一个使用选中颜色的标题，透过放大镜显示。系统 TabBar 与扁平样式：按 `textColor`
+ *      绘制；未选中的 Tab 占多数，出现最多的颜色即未选中颜色；选中颜色取所在按钮为选中状态的标题颜色，否则取其他颜色。无法判断的颜色为 nil。
+ */
+- (void)cyl_getTitleColorsOfTabBarItemTitleLabels:(NSArray<UILabel *> *)labels
+                                      normalColor:(UIColor **)normalColor
+                                    selectedColor:(UIColor **)selectedColor {
+    UIView *systemTabBar = self.superview;
+    while (systemTabBar && ![systemTabBar isKindOfClass:[UITabBar class]]) {
+        systemTabBar = systemTabBar.superview;
+    }
+    if ([CYLConstants isLiquidGlassActive] && systemTabBar) {
+        if (@available(iOS 13.0, *)) {
+            *normalColor = [self cyl_color:[UIColor labelColor] resolvedForLabel:labels.firstObject];
+        }
+        for (UILabel *label in labels) {
+            if ([[self cyl_tabButtonOfTabBarItemTitleLabel:label] cyl_isPlatterSelectedControl]) {
+                *selectedColor = [self cyl_shownTextColorOfLabel:label];
+                break;
+            }
+        }
+        return;
+    }
+    NSCountedSet<UIColor *> *colors = [NSCountedSet set];
+    NSMapTable<UILabel *, UIColor *> *shownColors = [NSMapTable strongToStrongObjectsMapTable];
+    for (UILabel *label in labels) {
+        UIColor *color = [self cyl_shownTextColorOfLabel:label];
+        if (color) {
+            [colors addObject:color];
+            [shownColors setObject:color forKey:label];
+        }
+    }
+    UIColor *mostCommonColor = nil;
+    for (UIColor *color in colors) {
+        if (!mostCommonColor || [colors countForObject:color] > [colors countForObject:mostCommonColor]) {
+            mostCommonColor = color;
+        }
+    }
+    *normalColor = mostCommonColor;
+    for (UILabel *label in labels) {
+        UIColor *color = [shownColors objectForKey:label];
+        if (color && ![color isEqual:mostCommonColor] &&
+            (!*selectedColor || [self cyl_tabButtonOfTabBarItemTitleLabel:label].isSelected)) {
+            *selectedColor = color;
+        }
+    }
+}
+
+/// The label's text color as it is drawn. A tint color placeholder (a label colored with the tint) resolves against the
+/// view that draws it, so on the plus button it would become the plus button's tint: use the label's tint instead.
+- (UIColor *)cyl_shownTextColorOfLabel:(UILabel *)label {
+    UIColor *color = label.textColor;
+    if (color && [NSStringFromClass([color class]) containsString:@"TintColor"]) {
+        color = label.tintColor;
+    }
+    return [self cyl_color:color resolvedForLabel:label];
+}
+
+/// The color as the label shows it: Liquid Glass gives the tab content its own light or dark appearance, depending on
+/// what is behind the glass, while the plus button outside the glass keeps the app's.
+- (UIColor *)cyl_color:(UIColor *)color resolvedForLabel:(UILabel *)label {
+    if (@available(iOS 13.0, *)) {
+        return [color resolvedColorWithTraitCollection:label.traitCollection];
+    }
+    return color;
+}
+
+/// Liquid Glass switches the tab content between light and dark with what is behind the glass, without laying the plus
+/// button out: follow the reference title's appearance (iOS 17+, which Liquid Glass needs anyway).
+- (void)cyl_observeAppearanceOfTabBarItemTitleLabel:(UILabel *)label {
+    if (@available(iOS 17.0, *)) {
+        static const void *CYLObservedTitleLabelKey = &CYLObservedTitleLabelKey;
+        if (objc_getAssociatedObject(self, CYLObservedTitleLabelKey) == label) {
+            return;
+        }
+        objc_setAssociatedObject(self, CYLObservedTitleLabelKey, label, OBJC_ASSOCIATION_ASSIGN);
+        __weak typeof(self) weakSelf = self;
+        [label registerForTraitChanges:@[[UITraitUserInterfaceStyle class]]
+                           withHandler:^(__kindof id<UITraitEnvironment> traitEnvironment, UITraitCollection *previousCollection) {
+            [weakSelf setNeedsLayout];
+        }];
+    }
+}
+
+/// Whether the view is in Liquid Glass's selected layer (shown through the lens), at any depth.
+- (BOOL)cyl_isInPlatterSelectedLayer {
+    for (UIView *view = self.superview; view; view = view.superview) {
+        if ([view cyl_isPlatterSelectedContentView]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// The tab button a tab item title belongs to.
+- (UIControl *)cyl_tabButtonOfTabBarItemTitleLabel:(UILabel *)label {
+    for (UIView *view = label.superview; view; view = view.superview) {
+        if ([view isKindOfClass:[UIControl class]]) {
+            return (UIControl *)view;
+        }
+    }
+    return nil;
+}
+
+/// A tab item's title: has text, sits in a tab button that is not a placeholder, and is not a badge.
+- (BOOL)cyl_isTabBarItemTitleLabel:(UILabel *)label tabBar:(UIView *)tabBar {
+    if (label.text.length == 0 || label == (UILabel *)label.superview.cyl_badge) {
+        return NO;
+    }
+    for (UIView *view = label.superview; view && view != tabBar; view = view.superview) {
+        if ([view isKindOfClass:[UIControl class]]) {
+            return !view.cyl_isPlaceholder && ![CYLPlusButton isPlusButtonView:view];
+        }
+    }
+    return NO;
+}
+
+- (BOOL)cyl_isVisibleView:(UIView *)view upTo:(UIView *)ancestor {
+    for (UIView *current = view; current && current != ancestor; current = current.superview) {
+        if (current.hidden || current.alpha < 0.01) {
+            return NO;
+        }
+    }
+    return YES;
+}
+
 /// The image-above-title layout of `+cyl_plusButtonWithImage:…`; other plus buttons keep UIButton's layout.
 - (void)layoutSubviews {
     [super layoutSubviews];
@@ -352,6 +661,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     }
     CYL_DEPRECATED_DECLARATIONS_POP
     
+    else if (![CYLConstants isLiquidGlassActive]) {
+        // The system tab bar (iOS 25 and earlier, and UI compatibility mode on iOS 26): center the plus button on the tab
+        // items, the way the Flat style places it. The branch below lifts a plus button taller than the items so that
+        // its bottom meets theirs, which put it 16.5 pt higher than in the Flat style with the same plus button.
+        // `cyl_boundsSize` of the system tab bar already excludes the bottom safe area, so 0.5 is the items' center.
+        multiplierOfTabBarHeight = 0.5;
+    }
     else {
         CGFloat heightDifference = plusButtonHeight - tabBarHeight;
         if (heightDifference < 0) {

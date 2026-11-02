@@ -112,6 +112,9 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self _updateLayout];
+    // The tab titles move with the tab bar height (which can change at any time in the Flat style): lay the plus button
+    // out again so its title follows them (`+alignsTitleWithTabBarItemTitles`).
+    [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];
 }
 
 - (void)safeAreaInsetsDidChange {

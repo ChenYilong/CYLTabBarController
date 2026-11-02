@@ -54,6 +54,9 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
            也就是说：如果 constantOfPlusButtonCenterYOffset 为0，同时 multiplierOfTabBarHeight 的值是0.5，表示 PlusButton 居中，小于0.5表示 PlusButton 偏上，大于0.5则表示偏下。
  
  * [EN] Returns the plus button's centerY as a ratio of the tab bar height (0.5 = centered, <0.5 = higher, >0.5 = lower).
+ *      If it is not implemented: on the system tab bar (iOS 25 and earlier, and UI compatibility mode on iOS 26) the
+ *      plus button is centered on the tab items (0.5), the same as in the Flat style; with Liquid Glass, a plus button
+ *      taller than the tab bar is raised so that its bottom meets the tab bar's.
  * [CN] 返回 PlusButton 中心点 Y 坐标相对 TabBar 高度的比例（0.5 居中，小于 0.5 偏上，大于 0.5 偏下）。
  */
 + (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight;
@@ -102,6 +105,27 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
  * [CN] 返回 PlusButton 所属的 context，需与 CYLTabBarController 的 context 保持一致，默认为 "CYLTabBarController"。
  */
 + (NSString *)tabBarContext;
+
+/*!
+ * [EN] Return YES to make the plus button's title match the tab items' titles, in every tab bar style (the system tab
+ *      bar, Liquid Glass and the Flat style): the same center line, the same font and font size, the unselected tabs'
+ *      title color, and the selected tab's title color while the plus button is selected. Nothing needs customizing in
+ *      the plus button; it works with or without `UIButtonConfiguration`, and replaces the title font and colors it set.
+ *      - The reference is the first tab item whose title label is visible and has text: a first item without a title,
+ *        or with a hidden one, is skipped. With no such item, or a plus button without a visible title, nothing
+ *        changes.
+ *      - The plus button and the tab items are in different view hierarchies, so the item title's center is converted
+ *        into the plus button's coordinate space. Only the plus button title's centerY moves.
+ *      - Not implemented, or NO: the title stays where the plus button lays it out, as before.
+ * [CN] 返回 YES 时，PlusButton 的标题与 TabBarItem 的标题保持一致，适用于所有 TabBar 样式（系统 TabBar、液态玻璃、扁平样式）：同一中心线、
+ *      相同的字体与字号、未选中 Tab 标题的颜色，以及 PlusButton 选中时使用选中 Tab 标题的颜色。PlusButton 无需任何自定义；
+ *      支持使用与未使用 `UIButtonConfiguration` 的按钮，并会替换其原有的标题字体和颜色。
+ *      - 以第一个标题可见且有文字的 TabBarItem 为参照：没有标题或标题隐藏的 item 会被跳过。没有这样的 item，或 PlusButton 没有可见
+ *        标题时，不做任何调整。
+ *      - PlusButton 与 TabBarItem 不在同一视图层级，因此会把 item 标题的中心点转换到 PlusButton 的坐标系。只调整 PlusButton 标题的 centerY。
+ *      - 未实现或返回 NO：标题保持 PlusButton 自身布局的位置，与旧版本一致。
+ */
++ (BOOL)alignsTitleWithTabBarItemTitles;
 
 /*!
 * 可点击的范围,
@@ -191,6 +215,15 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
  *      为已有 PlusButton 的 context 再注册一个会替换它。`CYLExternPlusButton` 与 `CYLPlusChildViewController` 指向最后注册的那一个。
  */
 + (void)registerPlusButton;
+
+/*!
+ * [EN] Lays the plus button out again when its class returns YES from `+alignsTitleWithTabBarItemTitles`, so its title
+ *      follows the tab item titles. The tab bars call it after their own layout; call it after moving the tab titles
+ *      yourself. Does nothing otherwise.
+ * [CN] 当 PlusButton 类的 `+alignsTitleWithTabBarItemTitles` 返回 YES 时重新布局 PlusButton，使其标题跟随 TabBarItem 标题。TabBar
+ *      在自身布局后会调用；自行移动 Tab 标题后也可以调用。其他情况不做处理。
+ */
+- (void)cyl_setNeedsTitleAlignment;
 
 /*!
  * [EN] A plus button with `image` above its title, both centered (the image 70 % of the button's width). The titles go

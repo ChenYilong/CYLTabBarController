@@ -404,6 +404,11 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 //    return 2;
 //}
 
+/// The plus button's title stays on the same center line as the tab item titles, in every tab bar style.
++ (BOOL)alignsTitleWithTabBarItemTitles {
+    return YES;
+}
+
 + (BOOL)shouldSelectPlusChildViewController {
     BOOL isSelected = [CYLPlusButton plusButtonForTabBarContext:[self matchedTabBarContext]].selected;
     if  (isSelected) {

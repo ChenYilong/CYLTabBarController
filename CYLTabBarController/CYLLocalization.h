@@ -10,6 +10,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// Marks a function that returns translated text, for the static analyzer's localizability checker.
+#define CYL_RETURNS_LOCALIZED_STRING __attribute__((annotate("returns_localized_nsstring")))
+
 /*!
  * [EN] Returns the translation of `key` from the library's string table (`CYLTabBarController.strings`, shipped in the
  *      Core subspec, so no extra import or resource is needed), or `key` itself when there is none. The key is the
@@ -34,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  *      没有时使用英文。因此本库不会显示 App 本身不支持的语言；声明了 `CFBundleLocalizations` 的 App 会跟随设备语言。
  *      可用 `CYLSetLocalizationLanguage()` 指定。线程安全。
  */
-FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString *key);
+FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString *key) CYL_RETURNS_LOCALIZED_STRING;
 
 /*!
  * [EN] The library's resource bundle, `CYLTabBarController.bundle` (Core, no extra import). It holds the `*.lproj` string
@@ -73,7 +76,7 @@ FOUNDATION_EXTERN NSString *const CYLLocalizationLanguageDidChangeNotification;
  * [CN] 同 `CYLLocalizedString()`，但使用 `language`（匹配最接近的译文）；传 nil 表示设备语言（`[NSLocale preferredLanguages]`），
  *      与 App 当前语言无关。用于切换到看不懂的语言后用户仍需读懂的提示，例如语言设置的副标题。
  */
-FOUNDATION_EXTERN NSString *CYLLocalizedStringForLanguage(NSString *key, NSString * _Nullable language);
+FOUNDATION_EXTERN NSString *CYLLocalizedStringForLanguage(NSString *key, NSString * _Nullable language) CYL_RETURNS_LOCALIZED_STRING;
 
 /*!
  * [EN] Builds `tabBarItemsAttributes` from parallel arrays, with every title passed through `CYLLocalizedString()`.

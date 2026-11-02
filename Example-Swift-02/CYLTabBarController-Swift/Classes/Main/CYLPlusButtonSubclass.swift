@@ -17,6 +17,11 @@ class CYLPlusButtonSubclass: CYLPlusButton,CYLPlusButtonSubclassing {
                                                     selectedTitle: "选中", selectedTitleColor: UIColor(red: 1, green: 102.0 / 255.0, blue: 0, alpha: 1))
     }
     
+    // The plus button's title stays on the same center line as the tab item titles, in every tab bar style.
+    static func alignsTitleWithTabBarItemTitles() -> Bool {
+        return true
+    }
+
     static func indexOfPlusButtonInTabBar() -> UInt {
         return 2
     }
