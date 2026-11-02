@@ -85,6 +85,26 @@ NS_ASSUME_NONNULL_BEGIN
                             contentMode:(UIViewContentMode)contentMode;
 
 /*!
+ * [EN] Same as `-cyl_addLottieImageWithLottieURL:size:contentMode:`, and sets `animationSpeed` on the Lottie view when this
+ *      call adds it. An existing view keeps its speed, so a speed set for one tab is not overwritten later.
+ * [CN] 同 `-cyl_addLottieImageWithLottieURL:size:contentMode:`，本次调用新添加 Lottie 视图时设置其 `animationSpeed`。
+ *      已存在的视图保持原速度，因此为某个 Tab 单独设置的速度之后不会被覆盖。
+ */
+- (void)cyl_addLottieImageWithLottieURL:(nullable NSURL *)lottieURL
+                                   size:(CGSize)size
+                            contentMode:(UIViewContentMode)contentMode
+                         animationSpeed:(CGFloat)animationSpeed;
+
+/*!
+ * [EN] Sets the playback speed of this tab's Lottie animation view, e.g. 1.5 for 1.5 times as fast. Does nothing when the
+ *      view has not been added yet, when Lottie is not integrated, or for a value of 0 or less. To set it for every tab,
+ *      override `-[CYLTabBarController lottieAnimationSpeed]` instead (issue #428).
+ * [CN] 设置当前 Tab 的 Lottie 动画视图播放速度，例如 1.5 表示 1.5 倍速。动画视图尚未添加、未集成 Lottie 或传入值小于等于 0 时
+ *      不做处理。为所有 Tab 设置时，请改为重写 `-[CYLTabBarController lottieAnimationSpeed]`（issue #428）。
+ */
+- (void)cyl_setLottieAnimationSpeed:(CGFloat)animationSpeed;
+
+/*!
  * [EN] Plays the Lottie animation for this tab (adding the view if needed); shows the final frame instead when `defaultSelected` is YES.
  * [CN] 播放当前 Tab 的 Lottie 动画（必要时先添加视图）；defaultSelected 为 YES 时直接显示最后一帧。
  */

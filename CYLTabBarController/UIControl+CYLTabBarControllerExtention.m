@@ -470,6 +470,7 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     lottieView.translatesAutoresizingMaskIntoConstraints = YES;// FIX: issue #653, see `_CYLTabButtonLayoutTracker`
     [lottieView setClipsToBounds:NO];
     [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
+    [tabButton cyl_postLottieAnimationViewDidAddNotification];
 #endif
     
 #if __has_include(<Lottie/Lottie-Swift.h>)
@@ -487,7 +488,50 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     lottieView.translatesAutoresizingMaskIntoConstraints = YES;// FIX: issue #653, see `_CYLTabButtonLayoutTracker`
     [lottieView setClipsToBounds:NO];
     [tabButton cyl_replaceTabImageViewWithNewView:lottieView show:YES];
+    [tabButton cyl_postLottieAnimationViewDidAddNotification];
 #endif
+}
+
+- (void)cyl_addLottieImageWithLottieURL:(nullable NSURL *)lottieURL
+                                   size:(CGSize)size
+                            contentMode:(UIViewContentMode)contentMode
+                         animationSpeed:(CGFloat)animationSpeed {
+    BOOL hadLottieAnimationView = (self.cyl_lottieAnimationView != nil);
+    [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
+    if (!hadLottieAnimationView) {
+        [self cyl_setLottieAnimationSpeed:animationSpeed];
+    }
+}
+
+- (void)cyl_setLottieAnimationSpeed:(CGFloat)animationSpeed {
+    if (animationSpeed <= 0) {
+        return;
+    }
+#if __has_include(<Lottie/Lottie.h>)
+    LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
+    if ([lottieView isKindOfClass:[LOTAnimationView class]]) {
+        lottieView.animationSpeed = animationSpeed;
+    }
+#endif
+#if __has_include(<Lottie/Lottie-Swift.h>)
+    CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
+    if ([lottieView respondsToSelector:@selector(setAnimationSpeed:)]) {
+        lottieView.animationSpeed = animationSpeed;
+    }
+#endif
+}
+
+/// FIX: issue #428 — posted asynchronously, so that `-cyl_addLottieImageWithLottieURL:size:contentMode:animationSpeed:`
+/// has set the default speed before observers run, and a speed set by an observer is kept.
+- (void)cyl_postLottieAnimationViewDidAddNotification {
+    __weak UIControl *weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIControl *tabButton = weakSelf;
+        if (!tabButton.cyl_lottieAnimationView) {
+            return;
+        }
+        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationViewDidAddNotification object:tabButton];
+    });
 }
 
 - (void)cyl_animationLottieImageWithLottieURL:(NSURL *)lottieURL

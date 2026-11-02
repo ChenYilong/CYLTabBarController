@@ -78,6 +78,7 @@ static const CGFloat kCYLDefaultTabBarHeight = 49.0f;
 
 NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDidChangeNotification";
 NSString *const CYLTabBarItemLottieAnimationPlayingNotification = @"CYLTabBarItemLottieAnimationPlayingNotification";
+NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification = @"CYLTabBarItemLottieAnimationViewDidAddNotification";
 
 NSString *const CYLTabBarStyleTypeDidChangeNotification = @"CYLTabBarStyleTypeDidChangeNotification";
 static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageViewDefaultOffsetContext;
@@ -1156,6 +1157,10 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 
 - (UIViewContentMode)lottieAnimationViewContentMode {
     return UIViewContentModeScaleAspectFit;
+}
+
+- (CGFloat)lottieAnimationSpeed {
+    return 1.0;
 }
 
 + (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
@@ -2356,7 +2361,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
         NSURL *lottieURL = self.lottieURLs[index];
         NSValue *lottieSizeValue = self.lottieSizes[index];
         CGSize lottieSize = [lottieSizeValue CGSizeValue];
-        [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode];
+        [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode animationSpeed:self.lottieAnimationSpeed];
         if (animation) {
             [self.cyl_tabBar cyl_animationLottieImageWithSelectedControl:control lottieURL:lottieURL size:lottieSize defaultSelected:defaultSelected contentMode:self.lottieAnimationViewContentMode];
         }
@@ -2404,7 +2409,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     }
     
     CGSize lottieSize = [lottieSizeValue CGSizeValue];
-    [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode];
+    [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode animationSpeed:self.lottieAnimationSpeed];
     
     if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
@@ -2412,7 +2417,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     selectedContentControl = [self.cyl_tabBar cyl_selectedContentControlFromContentControl:contentControl];
     
     if (selectedContentControl) {
-        [selectedContentControl cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode];
+        [selectedContentControl cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode animationSpeed:self.lottieAnimationSpeed];
     }
     
     if (animation) {

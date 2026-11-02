@@ -159,6 +159,19 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 - (UIViewContentMode)lottieAnimationViewContentMode;
 
 /*!
+ * [EN] Playback speed of the Lottie animation views (`animationSpeed`). Default is 1.0; override in a subclass to change
+ *      it, e.g. return 1.5 to play 1.5 times as fast. Applied once to each Lottie view when it is added, in every tab bar
+ *      style, so there is no need to wait for the views to be added (issue #428). To change one tab only, observe
+ *      `CYLTabBarItemLottieAnimationViewDidAddNotification`, or call `-[UIControl cyl_setLottieAnimationSpeed:]`.
+ *      A value of 0 or less is ignored. Only takes effect when Lottie is integrated.
+ * [CN] Lottie 动画视图的播放速度（`animationSpeed`），默认 1.0，可在子类中重写修改，例如返回 1.5 表示 1.5 倍速播放。
+ *      每个 Lottie 视图添加时会设置一次，适用于所有 TabBar 样式，无需等待动画视图添加完成（issue #428）。只修改某一个
+ *      Tab 时，可监听 `CYLTabBarItemLottieAnimationViewDidAddNotification`，或调用 `-[UIControl cyl_setLottieAnimationSpeed:]`。
+ *      小于等于 0 时不生效。只有集成了 Lottie 才会生效。
+ */
+- (CGFloat)lottieAnimationSpeed;
+
+/*!
  * To set both Item label text attributes in the tabBar,
  * use the following to tweak the relative position of the label within the tab button (for handling visual centering corrections if needed because of custom text attributes)
  */
@@ -610,6 +623,17 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 @end
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotification;
+
+/*!
+ * [EN] Posted after a Lottie animation view is added to a tab button (issue #428). The notification's `object` is the tab
+ *      button; get the view with `-[UIControl cyl_lottieAnimationView]`. Posted on the main queue, after
+ *      `-[CYLTabBarController lottieAnimationSpeed]` has been applied, so a value set in the handler is kept.
+ *      In the Liquid Glass style a tab has two buttons (normal and selected), so it is posted once for each.
+ * [CN] Lottie 动画视图添加到 Tab 按钮后发送（issue #428）。通知的 `object` 为 Tab 按钮，可用
+ *      `-[UIControl cyl_lottieAnimationView]` 取得动画视图。在主队列发送，此时已设置 `-[CYLTabBarController lottieAnimationSpeed]`，
+ *      在回调中设置的值不会被覆盖。液态玻璃样式中每个 Tab 有普通与选中两个按钮，因此各发送一次。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification;
 
 // * 液态玻璃开关变化
  //TODO:  

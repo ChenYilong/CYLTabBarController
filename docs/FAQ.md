@@ -434,7 +434,8 @@ NSDictionary *attributes = @{
 | 中文 | English |
 |:---|:---|
 | 来源：[#428](https://github.com/ChenYilong/CYLTabBarController/issues/428) | Source: [#428](https://github.com/ChenYilong/CYLTabBarController/issues/428) |
-| 库没有提供添加完成的回调。动画视图添加后，可以通过 `tabButton.cyl_lottieAnimationView` 取到并设置 `animationSpeed`；`tabBarController.isLottieViewAdded` 表示是否已经添加。 | There is no such callback. Once the animation views are added, get one with `tabButton.cyl_lottieAnimationView` and set its `animationSpeed`; `tabBarController.isLottieViewAdded` tells whether they have been added. |
+| 在 `CYLTabBarController` 子类中重写 `-lottieAnimationSpeed`（默认 1.0），例如返回 1.5。每个 Lottie 视图添加时都会使用该速度，适用于所有 TabBar 样式，无需 `dispatch_after` 等待。 | Override `-lottieAnimationSpeed` in your `CYLTabBarController` subclass (default 1.0), e.g. return 1.5. Every Lottie view uses it when it is added, in every tab bar style, with no `dispatch_after` needed. |
+| 需要回调时，监听 `CYLTabBarItemLottieAnimationViewDidAddNotification`：`object` 为 Tab 按钮，用 `tabButton.cyl_lottieAnimationView` 取得动画视图。只修改某一个 Tab 时，在回调中调用 `[tabButton cyl_setLottieAnimationSpeed:2.0]`。 | For a callback, observe `CYLTabBarItemLottieAnimationViewDidAddNotification`: its `object` is the tab button, and `tabButton.cyl_lottieAnimationView` is the animation view. To change one tab only, call `[tabButton cyl_setLottieAnimationSpeed:2.0]` there. |
 
 ### [CN]能否只给中间的 PlusButton 添加 Lottie 动画？是否支持 SVGA 动画？
 ### [EN]Can only the center PlusButton have a Lottie animation? Is SVGA supported?
