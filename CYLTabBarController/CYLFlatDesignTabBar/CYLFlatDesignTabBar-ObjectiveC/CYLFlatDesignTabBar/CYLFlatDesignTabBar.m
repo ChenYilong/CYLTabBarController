@@ -43,6 +43,8 @@
 @implementation CYLFlatDesignTabBar {
     NSInteger _selectedItemIndex;
     NSMutableArray *_buttons;
+    /// FIX: issue #488. The token of the block-based Lottie observer: `-removeObserver:self` cannot remove it.
+    id<NSObject> _lottieAnimationPlayingObserver;
 }
 //@synthesize context = _context;
 
@@ -52,6 +54,8 @@
         [UINavigationController cyl_navigationBarActionHook];
         [self commonInit];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_tabBarItemDidChange:) name:CYLFlatDesignTabBarItemDidChange object:nil];
+        // Only with a Lottie library. 仅在引入 Lottie 库时监听。
+#if CYL_LOTTIE_AVAILABLE
         __weak __typeof(self) weakSelf = self;
         void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
             __strong typeof(self) self = weakSelf;
@@ -60,10 +64,12 @@
             }
             [self stopAnimationOfAllLottieView];
         };
-        [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationPlayingNotification
-                                                          object:nil
-                                                           queue:[NSOperationQueue mainQueue]
-                                                      usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
+        // FIX: issue #488 keep the token, see `-dealloc`. 保存 token，见 `-dealloc`。
+        _lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationPlayingNotification
+                                                                                            object:nil
+                                                                                             queue:[NSOperationQueue mainQueue]
+                                                                                        usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
+#endif
     }
     return self;
 }
@@ -79,6 +85,10 @@
 }
 
 - (void)dealloc {
+    // A block-based observer is only removed by its token.  基于 block 的观察者只能通过 token 移除。
+    if (_lottieAnimationPlayingObserver) {
+        [[NSNotificationCenter defaultCenter] removeObserver:_lottieAnimationPlayingObserver];
+    }
     @try {
         //iOS9之后， 不再必须， 因此， 并非核心逻辑， 未来考虑删除。
         [[NSNotificationCenter defaultCenter] removeObserver:self];

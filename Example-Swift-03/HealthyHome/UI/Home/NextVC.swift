@@ -18,10 +18,8 @@ class NextVC: ViewController {
     }
     
 
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        TabBarCommon.completionhandler(3) {
-            
-        }
+    override func touchesBegan(_ _: Set<UITouch>, with _: UIEvent?) {
+        TabBarCommon.completionhandler(3)
     }
 
 }

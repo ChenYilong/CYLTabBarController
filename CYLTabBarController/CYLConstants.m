@@ -146,7 +146,9 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
 }
 
 + (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
-#if __has_include(<Lottie/Lottie.h>)
+    // Lottie ObjC (`<Lottie/Lottie.h>`) or Lottie Swift (`<Lottie/Lottie-Swift.h>`); without either, never enabled.
+    // 引入 Lottie ObjC 或 Lottie Swift 之一时才可能启用；两者都没有时恒为 NO。
+#if CYL_LOTTIE_AVAILABLE
     NSInteger lottieURLCount = lottieURLs.count;
     BOOL isLottieEnabled = lottieURLCount > 0 ;
     BOOL isLottieEnabledFromAttributes = NO;
@@ -160,25 +162,11 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
         }
     }
     return isLottieEnabled || isLottieEnabledFromAttributes;
-#endif
-
-#if __has_include(<Lottie/Lottie-Swift.h>)
-
-    NSInteger lottieURLCount = lottieURLs.count;
-    BOOL isLottieEnabled = lottieURLCount > 0 ;
-    BOOL isLottieEnabledFromAttributes = NO;
-    if (tabBarItemsAttributes && tabBarItemsAttributes.count > 0) {
-        @try {
-            isLottieEnabledFromAttributes = tabBarItemsAttributes[0][CYLTabBarLottieURL] || tabBarItemsAttributes[0][CYLTabBarLottieFilePath];
-        } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-        }
-    }
-    return isLottieEnabled || isLottieEnabledFromAttributes;
-#endif
+#else
+    (void)lottieURLs;
+    (void)tabBarItemsAttributes;
     return NO;
+#endif
 }
 
 @end

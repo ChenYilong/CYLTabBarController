@@ -148,7 +148,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             }
         }
 
-        func icon(for theme: Theme) -> AssetType {
+        func icon(for _: Theme) -> AssetType {
             return .native("\(iconName)_normal")
         }
 
@@ -187,7 +187,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         buildArchitecture()
     }
     
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -284,7 +284,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     }
     
     // MARK: - Delegate
-    override func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+    override func tabBarController(_ _: UITabBarController, didSelect viewController: UIViewController) {
         // flatDesign 下点击时 selectedIndex 可能仍是旧值，用 VC 判断更准
         let root = viewController.cyl_getViewControllerInsteadOfNavigation()
         // 此处判断逻辑已根据 ViewController 标题解耦

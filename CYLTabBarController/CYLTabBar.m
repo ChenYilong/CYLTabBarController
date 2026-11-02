@@ -29,6 +29,8 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 @property (nonatomic, strong) NSMutableSet<UIView *> *observedViews;
 /// Receives the `UIScrollEdgeElementContainerInteraction`s added to the tab bar, see `-addInteraction:`.
 @property (nonatomic, strong, nullable) UIView *cyl_scrollEdgeElementContainerView;
+/// FIX: issue #488. The token of the block-based Lottie observer: `-removeObserver:self` cannot remove it.
+@property (nonatomic, strong, nullable) id<NSObject> cyl_lottieAnimationPlayingObserver;
 
 @end
 
@@ -67,6 +69,9 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
     // KVO注册监听
     _tabBarItemWidth = self.cyl_tabBarItemWidth;
     [self addObserver:self forKeyPath:@"tabBarItemWidth" options:NSKeyValueObservingOptionNew context:CYLTabBarContext];
+    // Only with a Lottie library: without one there is no Lottie view to stop (#488).
+    // 仅在引入 Lottie 库时监听：没有 Lottie 时没有需要停止的动画（#488）。
+#if CYL_LOTTIE_AVAILABLE
     __weak __typeof(self) weakSelf = self;
     void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
         __strong typeof(self) self = weakSelf;
@@ -75,10 +80,14 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
         }
         [self cyl_stopAnimationOfAllLottieView];
     };
-    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationPlayingNotification
-                                                      object:nil
-                                                       queue:[NSOperationQueue mainQueue]
-                                                  usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
+    // FIX: issue #488 keep the token and remove it in `-dealloc`; it was dropped, so every tab bar (one per tab bar
+    // controller, e.g. each time `window.rootViewController` is replaced) left an observer behind for good.
+    // 保存 token 并在 `-dealloc` 中移除；以前直接丢弃，每个 TabBar（每次替换 `window.rootViewController` 都会新建）都会永久留下一个观察者。
+    self.cyl_lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationPlayingNotification
+                                                                                                object:nil
+                                                                                                 queue:[NSOperationQueue mainQueue]
+                                                                                            usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
+#endif
     [self cyl_keepStackedItemLayoutOnHingedDevice];
     return self;
 }
@@ -460,6 +469,9 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 }
 
 - (void)dealloc {
+    if (_cyl_lottieAnimationPlayingObserver) {
+        [[NSNotificationCenter defaultCenter] removeObserver:_cyl_lottieAnimationPlayingObserver];
+    }
     // KVO反注册
     [self cyl_removeObserver:self forKeyPath:@"tabBarItemWidth" context:CYLTabBarContext];
     [self removeAlphaObserver];

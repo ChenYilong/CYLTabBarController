@@ -254,6 +254,32 @@ static NSString *const CYLLanguageCellIdentifier = @"CYLLanguageCell";
 
 @end
 
+/*!
+ * FIX: issue #488
+ * [EN] DEBUG only. A replaced root view controller (e.g. a CYLTabBarController) should be deallocated once UIKit's
+ *      transitions have finished; when it is still alive 3 seconds later, something keeps a strong reference to it,
+ *      so this logs it. Use the Xcode Memory Graph to find the owner.
+ * [CN] 仅 DEBUG。被替换的根控制器（如 CYLTabBarController）应在 UIKit 转场结束后释放；3 秒后仍存活说明有对象强引用了它，
+ *      这里会打印出来。可用 Xcode 的 Memory Graph 找到持有者。
+ */
+static void CYLWarnIfStillAliveAfterReplacement(UIViewController *viewController) {
+#if DEBUG
+    if (!viewController) {
+        return;
+    }
+    __weak UIViewController *weakViewController = viewController;
+    NSString *description = [NSString stringWithFormat:@"<%@: %p>", NSStringFromClass(viewController.class), viewController];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (weakViewController) {
+            NSLog(@"⚠️ CYLTabBarController: %@ is still alive 3s after it was replaced as the root view controller; "
+                  @"something keeps a strong reference to it (see the Xcode Memory Graph). #488", description);
+        }
+    });
+#else
+    (void)viewController;
+#endif
+}
+
 @implementation UIWindow (CYLLocalization)
 
 - (void)cyl_setRootViewControllerProvider:(UIViewController * (^)(void))provider {
@@ -265,7 +291,9 @@ static NSString *const CYLLanguageCellIdentifier = @"CYLLanguageCell";
     void (^reload)(void) = ^{
         BOOL rightToLeft = [NSLocale characterDirectionForLanguage:CYLLocalizationLanguage()] == NSLocaleLanguageDirectionRightToLeft;
         [UIView appearance].semanticContentAttribute = rightToLeft ? UISemanticContentAttributeForceRightToLeft : UISemanticContentAttributeUnspecified;
+        UIViewController *previousRootViewController = weakWindow.rootViewController;
         weakWindow.rootViewController = provider();
+        CYLWarnIfStillAliveAfterReplacement(previousRootViewController);
     };
     reload();
     id observer = [[NSNotificationCenter defaultCenter] addObserverForName:CYLLocalizationLanguageDidChangeNotification

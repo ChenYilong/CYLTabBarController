@@ -10,12 +10,12 @@ import UIKit
 import CYLTabBarController
 
 class NextHomeViewController: UIViewController {
-    @IBAction func firstBtnClick(_ sender: UIButton) {
+    @IBAction func firstBtnClick(_ _: UIButton) {
         
         self.cyl_popSelectTabBarChildViewController(at: 1)
 
     }
-    @IBAction func secondBtnClick(_ sender: UIButton) {
+    @IBAction func secondBtnClick(_ _: UIButton) {
         
         self.cyl_popSelectTabBarChildViewController(at: 2)
 

@@ -65,11 +65,11 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
      也就是说：如果 constantOfPlusButtonCenterYOffset 为0，同时 multiplierOfTabBarHeight 的值是0.5，表示 PlusButton 居中，小于0.5表示 PlusButton 偏上，大于0.5则表示偏下。
      *
      */
-    static func multiplier(ofTabBarHeight tabBarHeight: CGFloat) -> CGFloat {
+    static func multiplier(ofTabBarHeight _: CGFloat) -> CGFloat {
         return 0.3
     }
     
-    static func constantOfPlusButtonCenterYOffsetForTabBarHeight(tabBarHeight: CGFloat) -> CGFloat {
+    static func constantOfPlusButtonCenterYOffsetForTabBarHeight(tabBarHeight _: CGFloat) -> CGFloat {
         return -10
     }
     
@@ -80,7 +80,7 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
      * 也就是说： constantOfPlusButtonCenterYOffset 大于0会向下偏移，小于0会向上偏移。
      * @attention 实现了该方法，但没有实现 `+multiplierOfTabBarHeight:` 方法，在这种情况下，会在预设逻辑的基础上进行偏移。
      */
-    static func constantOfPlusButtonCenterYOffset(forTabBarHeight tabBarHeight: CGFloat) -> CGFloat {
+    static func constantOfPlusButtonCenterYOffset(forTabBarHeight _: CGFloat) -> CGFloat {
         let screenHeight = currentWindowScene()?.screen.nativeBounds.size.height ?? 0
         if screenHeight == 2436 || screenHeight == 1792 || screenHeight == 2688 || screenHeight == 1624 {
             return -30

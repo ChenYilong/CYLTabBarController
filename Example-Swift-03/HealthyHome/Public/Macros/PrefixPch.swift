@@ -43,7 +43,7 @@ func isEmptyStr(str:String) -> Bool {
 }
 
 //MARK:设置随机颜色
-let RandomColor = UIColor(red: CGFloat(arc4random_uniform(256)/255), green: CGFloat(arc4random_uniform(256)/255), blue: CGFloat(arc4random_uniform(256)/255), alpha: 1)
+let randomColor = UIColor(red: CGFloat(arc4random_uniform(256)) / 255, green: CGFloat(arc4random_uniform(256)) / 255, blue: CGFloat(arc4random_uniform(256)) / 255, alpha: 1)
 
 //MARK: iPhone设备
 let isIPhone = (UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.phone ? true : false)
@@ -55,11 +55,7 @@ let appInfo = Bundle.main.infoDictionary
 let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")
 //MARK:  获取设备系统号
 let systemVersion = UIDevice.current.systemVersion
-//MARK:系统版本
-let IOS8_OR_LATER = (Float(systemVersion)! >= 8.0 ? true : false)
-let IOS9_OR_LATER = (Float(systemVersion)! >= 9.0 ? true : false)
-let IOS10_OR_LATER = (Float(systemVersion)! >= 10.0 ? true : false)
-let IOS11_OR_LATER = (Float(systemVersion)! >= 11.0 ? true : false)
+//MARK:系统版本：用 `if #available(iOS xx, *)` 判断（最低支持 iOS 15，原来的 IOS8~11_OR_LATER 常量恒为 true，已删除）
 
 //MARK: 当前窗口场景（`UIScreen.main`、`UIApplication.windows` 已弃用，改用 UIWindowScene）
 func currentWindowScene() -> UIWindowScene? {
@@ -122,7 +118,7 @@ func debugLog<T>(message: T,
 }
 
 ///打印日志
-func DeLog<T>(_ msg:T,fileName:String = #file,methodName:String = #function,lineNum:Int = #line){
+func debugLog<T>(_ msg:T,fileName:String = #file,methodName:String = #function,lineNum:Int = #line){
     #if DEBUG
         let logStr = fileName.components(separatedBy: "/").last!.replacingOccurrences(of: "swift", with: "");
         print("类：\(logStr) 行：[\(lineNum)] 方法：\(methodName) 数据：\(msg)")

@@ -21,11 +21,11 @@ class CYLPlusButtonSubclass: CYLPlusButton,CYLPlusButtonSubclassing {
         return 2
     }
     
-    static func multiplier(ofTabBarHeight tabBarHeight: CGFloat) -> CGFloat {
+    static func multiplier(ofTabBarHeight _: CGFloat) -> CGFloat {
         return 0.3
     }
    
-    static func constantOfPlusButtonCenterYOffset(forTabBarHeight tabBarHeight: CGFloat) -> CGFloat {
+    static func constantOfPlusButtonCenterYOffset(forTabBarHeight _: CGFloat) -> CGFloat {
         return -10
     }
     

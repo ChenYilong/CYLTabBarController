@@ -30,11 +30,11 @@ extension HomeViewController{
     }
     
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ _: UITableView, numberOfRowsInSection _: Int) -> Int {
         return 50
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    override func tableView(_ _: UITableView, didSelectRowAt _: IndexPath) {
         
         let vc = NextHomeViewController()
         vc.hidesBottomBarWhenPushed = true

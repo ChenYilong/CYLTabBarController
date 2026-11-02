@@ -556,7 +556,7 @@ private final class TabBarVisibilitySpy: NSObject, CYLTabBarControllerDelegate,
     }
 
     @objc(tabBarController:willHideTabBar:)
-    func tabBarController(_ controller: CYLTabBarController, willHide bar: CYLFlatDesignTabBar) {
+    func tabBarController(_ controller: CYLTabBarController, willHide _: CYLFlatDesignTabBar) {
         willHideCount += 1
         // Reenter only once, so an accidental repeated callback fails the test
         // instead of the spy itself causing unbounded recursion.
@@ -566,7 +566,7 @@ private final class TabBarVisibilitySpy: NSObject, CYLTabBarControllerDelegate,
     }
 
     @objc(tabBarController:didHideTabBar:)
-    func tabBarController(_ controller: CYLTabBarController, didHide bar: CYLFlatDesignTabBar) {
+    func tabBarController(_ _: CYLTabBarController, didHide _: CYLFlatDesignTabBar) {
         didHideCount += 1
     }
 }

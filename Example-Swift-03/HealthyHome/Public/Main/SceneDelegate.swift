@@ -11,7 +11,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)
@@ -23,11 +23,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if isFirst() {
             let guide = GuideViewController()
             guide.timeEndBlock = {
-                TabBarCommon.TabBarController()
+                TabBarCommon.setUpRootTabBarController()
             }
             window.rootViewController = guide
         }else {
-            TabBarCommon.TabBarController()
+            TabBarCommon.setUpRootTabBarController()
         }
 
         window.makeKeyAndVisible()

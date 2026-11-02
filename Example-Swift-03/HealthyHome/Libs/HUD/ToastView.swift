@@ -11,7 +11,7 @@ import UIKit
 //Toast默认停留时间
 let toastDispalyDuration: CGFloat = 2.0
 //Toast背景颜色
-let ToastBackgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.6)
+let toastBackgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.6)
 
 class ToastView: NSObject {
     
@@ -30,7 +30,7 @@ class ToastView: NSObject {
         
         contenButton = UIButton(frame: CGRect(x: 0, y: 0, width: label.frame.size.width, height: label.frame.size.height))
         contenButton.layer.cornerRadius = 2.0
-        contenButton.backgroundColor = ToastBackgroundColor
+        contenButton.backgroundColor = toastBackgroundColor
         contenButton.addSubview(label)
         contenButton.autoresizingMask = UIView.AutoresizingMask.flexibleWidth
         super.init()
@@ -49,7 +49,7 @@ class ToastView: NSObject {
     }
     
     //屏幕更改监听
-    func deviceOrientationDidChanged(notify: NSNotification) {
+    func deviceOrientationDidChanged(notify _: NSNotification) {
         self.hideAnimation()
     }
     
