@@ -98,9 +98,9 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  * [EN] Sets the playback speed of this tab's Lottie animation view, e.g. 1.5 for 1.5 times as fast. Does nothing when the
  *      view has not been added yet, when Lottie is not integrated, or for a value of 0 or less. To set it for every tab,
- *      override `-[CYLTabBarController lottieAnimationSpeed]` instead (issue #428).
+ *      set `-[CYLTabBarController lottieAnimationSpeed]` instead (issue #428).
  * [CN] 设置当前 Tab 的 Lottie 动画视图播放速度，例如 1.5 表示 1.5 倍速。动画视图尚未添加、未集成 Lottie 或传入值小于等于 0 时
- *      不做处理。为所有 Tab 设置时，请改为重写 `-[CYLTabBarController lottieAnimationSpeed]`（issue #428）。
+ *      不做处理。为所有 Tab 设置时，请改为设置 `-[CYLTabBarController lottieAnimationSpeed]`（issue #428）。
  */
 - (void)cyl_setLottieAnimationSpeed:(CGFloat)animationSpeed;
 

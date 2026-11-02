@@ -1159,8 +1159,15 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
     return UIViewContentModeScaleAspectFit;
 }
 
+@synthesize lottieAnimationSpeed = _lottieAnimationSpeed;
+
 - (CGFloat)lottieAnimationSpeed {
-    return 1.0;
+    // Unset (0) or invalid means the default speed.
+    return (_lottieAnimationSpeed > 0 && isfinite(_lottieAnimationSpeed)) ? _lottieAnimationSpeed : 1.0;
+}
+
+- (void)setLottieAnimationSpeed:(CGFloat)lottieAnimationSpeed {
+    _lottieAnimationSpeed = lottieAnimationSpeed;
 }
 
 + (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
@@ -3742,6 +3749,54 @@ static CYLTabBarController *CYLTabBarControllerOwningTabBar(UIResponder *respond
 + (CYLTabBarController *)cyl_activeTabBarController {
     // The most recently active one is the context lookup without a context.
     return [self cyl_tabBarControllerForContext:nil];
+}
+
+/// Every control under `view` that hosts a Lottie view: the tab buttons of any style (Liquid Glass has a normal and a
+/// selected one per tab, flat design has its own buttons).
+static void CYLCollectLottieTabButtons(UIView *view, NSMutableArray<UIControl *> *tabButtons) {
+    for (UIView *subview in view.subviews) {
+        if ([subview isKindOfClass:[UIControl class]] && ((UIControl *)subview).cyl_lottieAnimationView) {
+            [tabButtons addObject:(UIControl *)subview];
+            continue;
+        }
+        CYLCollectLottieTabButtons(subview, tabButtons);
+    }
+}
+
+/// One line per tab: badge shown or not, then each Lottie view's `animationSpeed`.
+static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController) {
+    if (!tabBarController) {
+        return @"no active CYLTabBarController";
+    }
+    NSMutableString *description = [NSMutableString stringWithFormat:@"%@ (%@)", NSStringFromClass([tabBarController class]), tabBarController.cyl_context ?: @"default context"];
+    [tabBarController.viewControllers enumerateObjectsUsingBlock:^(UIViewController *viewController, NSUInteger idx, BOOL *stop) {
+        [description appendFormat:@"\n  tab %@: badge %@", @(idx), [viewController cyl_isShowBadge] ? @"shown" : @"hidden"];
+    }];
+    NSMutableArray<UIControl *> *tabButtons = [NSMutableArray array];
+    CYLCollectLottieTabButtons(tabBarController.cyl_tabBar ?: tabBarController.tabBar, tabButtons);
+    for (UIControl *tabButton in tabButtons) {
+        UIView *lottieView = tabButton.cyl_lottieAnimationView;
+        id speed = [lottieView respondsToSelector:NSSelectorFromString(@"animationSpeed")] ? [lottieView valueForKey:@"animationSpeed"] : @"?";
+        [description appendFormat:@"\n  Lottie view in %@ at x = %.0f: animationSpeed %@", NSStringFromClass([tabButton class]), CGRectGetMinX([tabButton convertRect:tabButton.bounds toView:nil]), speed];
+    }
+    if (tabButtons.count == 0) {
+        [description appendString:@"\n  no Lottie views (Lottie not integrated or not configured)"];
+    }
+    return description;
+}
+
++ (void)cyl_simulateMemoryWarning {
+    UIApplication *application = [UIApplication sharedApplication];
+    [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationDidReceiveMemoryWarningNotification object:application];
+    if ([application.delegate respondsToSelector:@selector(applicationDidReceiveMemoryWarning:)]) {
+        [application.delegate applicationDidReceiveMemoryWarning:application];
+    }
+    // Log on the next run loop pass, after whatever the warning released has been released.
+    CYLTabBarController *tabBarController = [self cyl_activeTabBarController];
+    __weak CYLTabBarController *weakTabBarController = tabBarController;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"⚠️ Simulated memory warning (issues #426, #428). Tab bar state afterwards:\n%@", CYLTabBarStateDescription(weakTabBarController));
+    });
 }
 
 @end

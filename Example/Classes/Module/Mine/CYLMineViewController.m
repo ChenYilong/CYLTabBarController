@@ -101,6 +101,7 @@
     [self cyl_setBadgeCenterOffset:CGPointZero];
 
     [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimationTypeNone];
+    [CYLTabBarController cyl_simulateMemoryWarning]; // #426/#428: memory warning demo, see the log 内存警告演示，见日志
     [self testPush];
 }
 

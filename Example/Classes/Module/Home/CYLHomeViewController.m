@@ -169,6 +169,7 @@
 //    tabBarController.delegate = self;
 //
 //    [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimationTypeScale];
+    [CYLTabBarController cyl_simulateMemoryWarning]; // #426/#428: memory warning demo, see the log 内存警告演示，见日志
     [self pushToNewViewController];
 }
 
