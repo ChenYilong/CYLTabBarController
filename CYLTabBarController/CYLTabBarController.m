@@ -63,6 +63,8 @@
 NSString *const CYLTabBarItemTitle = @"CYLTabBarItemTitle";
 NSString *const CYLTabBarItemImage = @"CYLTabBarItemImage";
 NSString *const CYLTabBarItemSelectedImage = @"CYLTabBarItemSelectedImage";
+NSString *const CYLTabBarItemDarkImage = @"CYLTabBarItemDarkImage";
+NSString *const CYLTabBarItemSelectedDarkImage = @"CYLTabBarItemSelectedDarkImage";
 NSString *const CYLTabBarItemImageInsets = @"CYLTabBarItemImageInsets";
 NSString *const CYLTabBarItemTitlePositionAdjustment = @"CYLTabBarItemTitlePositionAdjustment";
 NSString *const CYLTabBarItemImagePositionAdjustment = @"CYLTabBarItemImagePositionAdjustment";
@@ -1007,8 +1009,15 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
                     title = _tabBarItemsAttributes[idx][CYLTabBarItemTitle];
                 }
                         
-                normalImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemImage];
-                selectedImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage];
+                // #620: an optional dark image per state (a name or a UIImage), combined here so both styles get it.
+                        
+                normalImageInfo = [UIImage cyl_imageWithImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemImage]
+                        
+                                                     darkImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemDarkImage]];
+                        
+                selectedImageInfo = [UIImage cyl_imageWithImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage]
+                        
+                                                       darkImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemSelectedDarkImage]];
                 lottieURL = _tabBarItemsAttributes[idx][CYLTabBarLottieURL];
                 lottieFilePath = _tabBarItemsAttributes[idx][CYLTabBarLottieFilePath];
                         
@@ -1903,8 +1912,15 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                         title = _tabBarItemsAttributes[idx][CYLTabBarItemTitle];
                     }
                 
-                    normalImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemImage];
-                    selectedImageInfo = _tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage];
+                    // #620: an optional dark image per state (a name or a UIImage), combined here so both styles get it.
+                
+                    normalImageInfo = [UIImage cyl_imageWithImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemImage]
+                
+                                                         darkImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemDarkImage]];
+                
+                    selectedImageInfo = [UIImage cyl_imageWithImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage]
+                
+                                                           darkImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemSelectedDarkImage]];
                     lottieURL = _tabBarItemsAttributes[idx][CYLTabBarLottieURL];
                     lottieFilePath = _tabBarItemsAttributes[idx][CYLTabBarLottieFilePath];
                 

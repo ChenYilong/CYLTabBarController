@@ -528,12 +528,13 @@ carthage update --use-xcframeworks
 - (NSArray *)tabBarItemsAttributesForTabBar {
     NSDictionary *firstTabBarItemsAttributes = @{
                                                  CYLTabBarItemTitle : @"首页",
-                                                 CYLTabBarItemImage : self.darkMode ? @"home_highlight" : @"home_normal",  /* NSString and UIImage are supported*/
+                                                 CYLTabBarItemImage : @"home_normal",  /* NSString and UIImage are supported*/
+                                                 CYLTabBarItemDarkImage : @"home_normal_night",  /* optional, Dark Mode */
                                                  CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
                                                  };
     NSDictionary *secondTabBarItemsAttributes = @{
                                                   CYLTabBarItemTitle : @"同城",
-                                                  CYLTabBarItemImage : self.darkMode ? @"fishpond_highlight" : @"fishpond_normal",
+                                                  CYLTabBarItemImage : @"fishpond_normal",
                                                   CYLTabBarItemSelectedImage : @"fishpond_highlight",
                                                   };
 
@@ -549,6 +550,34 @@ carthage update --use-xcframeworks
 | 中文 | English |
 |:---|:---|
 | 在这个字典中，`CYLTabBarItemImage` 和 `CYLTabBarItemSelectedImage` 支持 `NSString`、`UIImage` 两种格式。 | The `CYLTabBarItemImage` and `CYLTabBarItemSelectedImage` values support both `NSString` and `UIImage`. |
+
+#### [CN]图片传名称（NSString）还是 UIImage？
+#### [EN]Image names (NSString) or UIImage objects?
+
+| 中文 | English |
+|:---|:---|
+| 推荐传图片名（NSString）：这是库预先处理好的形式，适用于绝大多数场景。UIImage 则原样使用，适合需要自己控制图片的场景（[#465](https://github.com/ChenYilong/CYLTabBarController/issues/465)）。 | Pass image names (NSString) when you can: it is the form the library prepares for you and fits most cases. A UIImage is used as it is, for when you want full control of the image ([#465](https://github.com/ChenYilong/CYLTabBarController/issues/465)). |
+
+| 处理 | 图片名（NSString） | UIImage |
+|:---|:---|:---|
+| 渲染模式 | 按原图显示（`AlwaysOriginal`），图标保持设计稿的颜色 | 保留图片自身的模式；`imageNamed:` 得到的是 `Automatic`，在 TabBar 中会被当作模板图按 tintColor 着色 |
+| 深色图片 | 自动加载：Asset Catalog 的 Dark 外观，否则 `<图片名>_dark` | 只使用图片自带的 Dark 外观，或 `CYLTabBarItemDarkImage` 指定的图片 |
+| 找不到图片 | 使用透明占位图，保持布局 | 不适用 |
+
+| Handling | Image name (NSString) | UIImage |
+|:---|:---|:---|
+| Rendering mode | Rendered as original (`AlwaysOriginal`), so icons keep the designed colors | Keeps the image's own mode; `imageNamed:` gives `Automatic`, which a tab bar tints as a template with the tint color |
+| Dark image | Loaded for you: the asset's Dark appearance, else `<name>_dark` | Only the image's own Dark appearance, or the image named by `CYLTabBarItemDarkImage` |
+| Missing image | Transparent placeholder, the layout is kept | Not applicable |
+
+| 中文 | English |
+|:---|:---|
+| #465 中未选中的图标变成了灰色剪影，原因是传入的 UIImage 被系统当作模板图着色；改为传图片名后恢复正常。传 UIImage 又希望保持原色，请先调用 `imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal`，或在 Asset Catalog 中把 Render As 设为 Original Image。 | In #465, unselected icons turned into gray silhouettes because the UIImage passed in was tinted as a template; passing the names fixed it. To keep a UIImage's own colors, call `imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal` first, or set Render As to Original Image in the asset catalog. |
+| 深色模式同理：`CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage` 传图片名时同样按原图显示，推荐使用。 | The same goes for Dark Mode: names given to `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage` are rendered as original too, and are recommended. |
+
+| 中文 | English |
+|:---|:---|
+| 深色模式图片使用可选的 `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage`，同样支持 `NSString`、`UIImage`，会随深色模式自动切换。不要像旧示例那样在创建时判断 `darkMode` 二选一：那样只选择一次，之后切换风格不会更新。详见 [适配深色模式](#cn适配深色模式)。 | For Dark Mode, add the optional `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage`, also `NSString` or `UIImage`; the tab switches by itself. Don't pick one image by `darkMode` when creating the items, as the old sample did: that chooses once, and the tab won't update when the style changes. See [Supporting Dark Mode](#ensupporting-dark-mode). |
 | 不设置 `CYLTabBarItemTitle` 时，只显示图标并自动居中。 | Omit `CYLTabBarItemTitle` to display and center the icon only. |
 
 ### [CN]第三步：将 CYLTabBarController 设置为 window 的 RootViewController
@@ -994,6 +1023,88 @@ CYLBadgeAppearance.global.centerOffset = CGPoint(x: -5, y: 3)
 |:---|:---|
 | 可以随时、多次调用（如在 `-viewDidLoad` 中和数据变化后）：每个 block 各执行一次，不会互相覆盖，也无需 `dispatch_after`。`-setViewDidLayoutSubViewsBlockInvokeOnce:block:` 只保存一个 block，且在 TabBar 已完成布局后设置的 block 可能不再执行，不适合用来更新角标。 | Call it at any time and as often as needed (e.g. in `-viewDidLoad` and after data changes): each block runs once, none replaces another, and no `dispatch_after` is needed. `-setViewDidLayoutSubViewsBlockInvokeOnce:block:` holds a single block, and one set after the tab bar was laid out may never run, so it does not suit badge updates. |
 | 子类请按 [第二步](#cn第二步设置-cyltabbarcontroller-的两个数组) 通过 `[super initWithViewControllers:…]` 初始化。在 `-init` 中创建另一个 CYLTabBarController 并返回它，App 显示的是那个普通实例，子类中的代码（包括这里的 block）不会执行。 | Initialize a subclass through `[super initWithViewControllers:…]` as in [Step 2](#enstep-2-configure-the-view-controller-and-tab-bar-item-attribute-arrays). If `-init` creates and returns another CYLTabBarController, the app shows that plain instance and the subclass's code, these blocks included, never runs. |
+
+### [CN]适配深色模式
+### [EN]Supporting Dark Mode
+
+| 中文 | English |
+|:---|:---|
+| 图片有三种方式（[#620](https://github.com/ChenYilong/CYLTabBarController/issues/620)），都会随系统设置和 `overrideUserInterfaceStyle` 自动切换： | Images, three ways ([#620](https://github.com/ChenYilong/CYLTabBarController/issues/620)); all switch with the system setting and with `overrideUserInterfaceStyle`: |
+| 1. Asset Catalog（推荐）：给图片添加 Dark 外观，在 `tabBarItemsAttributes` 中传图片名。 | 1. Asset catalog (recommended): give the image a Dark appearance and pass its name in `tabBarItemsAttributes`. |
+| 2. 命名规范：传图片名 `@"home_normal"` 时，如果存在名为 `home_normal_dark` 的图片（`home.png` 对应 `home_dark.png`），会自动作为深色图片。图片自带 Dark 外观时优先使用自带的，不会出现两个深色来源。后缀可通过 `UIImage.cyl_darkImageNameSuffix` 修改（如 `@"-dark"`），设为 nil 关闭。 | 2. Naming convention: when you pass `@"home_normal"` and an image named `home_normal_dark` exists (`home_dark.png` for `home.png`), it is used as the dark image. An image's own Dark appearance wins, so one image never gets two dark sources. Change the suffix with `UIImage.cyl_darkImageNameSuffix` (e.g. `@"-dark"`), or set it to nil to turn this off. |
+| 3. 指定深色图片：在 `tabBarItemsAttributes` 中加上 `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage`（图片名或 UIImage，名称任意），优先于前两种。需要 UIImage 对象时，`+[UIImage cyl_imageWithImageInfo:darkImageInfo:]` 按名称生成（与传图片名一样按原图渲染），`+cyl_lightOrDarkModeImageWithLightImage:darkImage:`（即 `+cyl_imageWithLightImage:darkImage:`，Swift 中为 `UIImage.cyl_image(withLight:dark:)`）合成任意两张图。 | 3. Name the dark image: add `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage` (a name or a UIImage, any name) to `tabBarItemsAttributes`; it wins over the other two. For a UIImage object, `+[UIImage cyl_imageWithImageInfo:darkImageInfo:]` builds one from names (rendered as original, like names), and `+cyl_lightOrDarkModeImageWithLightImage:darkImage:` (same as `+cyl_imageWithLightImage:darkImage:`, `UIImage.cyl_image(withLight:dark:)` in Swift) combines any two images. |
+| 颜色：使用动态颜色，如 `systemBackgroundColor`、库中的 `cyl_systemBackgroundColor`、`cyl_labelColor` 等，或用 `+[UIColor cyl_colorWithLightColor:darkColor:]` 指定浅色和深色（[#552](https://github.com/ChenYilong/CYLTabBarController/issues/552)）。`+[UIImage cyl_imageWithColor:size:]` 用动态颜色生成的图片（如 `shadowImage`）同样会切换。 | Colors: use dynamic colors, such as `systemBackgroundColor`, the library's `cyl_systemBackgroundColor`, `cyl_labelColor` and so on, or give a light and a dark color with `+[UIColor cyl_colorWithLightColor:darkColor:]` ([#552](https://github.com/ChenYilong/CYLTabBarController/issues/552)). Images made from a dynamic color with `+[UIImage cyl_imageWithColor:size:]` (e.g. a `shadowImage`) switch too. |
+
+```Objective-C
+NSDictionary *homeAttributes = @{
+    CYLTabBarItemTitle : @"首页",
+    CYLTabBarItemImage : @"home_normal",              // 2. also loads home_normal_dark, if it exists
+    CYLTabBarItemSelectedImage : @"home_highlight",   // 1. an asset catalog image with a Dark appearance
+};
+NSDictionary *messageAttributes = @{
+    CYLTabBarItemTitle : @"消息",
+    CYLTabBarItemImage : @"message_normal",
+    CYLTabBarItemDarkImage : @"message_normal_night",  // 3. a dark image under any name
+};
+// 3. or one UIImage object holding a light and a dark image
+UIImage *messageImage = [UIImage cyl_imageWithImageInfo:@"message_normal" darkImageInfo:@"message_normal_night"];
+tabBarController.tabBar.backgroundColor = [UIColor cyl_colorWithLightColor:UIColor.whiteColor darkColor:UIColor.blackColor];
+```
+
+| 中文 | English |
+|:---|:---|
+| 推荐传图片名：库会按原图渲染并自动加载深色图片。传 UIImage 对象时库不会修改其渲染模式：`imageNamed:` 得到的图片在 TabBar 中会按模板图被着色（显示为 tintColor），要显示图片本身的颜色请先调用 `imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal`。两者的区别见 [图片传名称还是 UIImage](#cn图片传名称nsstring还是-uiimage)（[#465](https://github.com/ChenYilong/CYLTabBarController/issues/465)）。 | Prefer names: the library renders them as original and loads their dark images. A UIImage object keeps its rendering mode: an image from `imageNamed:` is tinted as a template in a tab bar, so call `imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal` first to show its own colors. See [Image names or UIImage objects](#enimage-names-nsstring-or-uiimage-objects) for the differences ([#465](https://github.com/ChenYilong/CYLTabBarController/issues/465)). |
+
+#### [CN]使用 CYLTabBarItemDarkImage 指定深色图片
+#### [EN]Naming dark images with CYLTabBarItemDarkImage
+
+| 键 | 值 | 作用 |
+|:---|:---|:---|
+| `CYLTabBarItemDarkImage` | `NSString`（图片名）或 `UIImage` | 深色模式下的未选中图片，对应 `CYLTabBarItemImage` |
+| `CYLTabBarItemSelectedDarkImage` | `NSString`（图片名）或 `UIImage` | 深色模式下的选中图片，对应 `CYLTabBarItemSelectedImage` |
+
+| Key | Value | Purpose |
+|:---|:---|:---|
+| `CYLTabBarItemDarkImage` | `NSString` (image name) or `UIImage` | The unselected image in Dark Mode, for `CYLTabBarItemImage` |
+| `CYLTabBarItemSelectedDarkImage` | `NSString` (image name) or `UIImage` | The selected image in Dark Mode, for `CYLTabBarItemSelectedImage` |
+
+| 中文 | English |
+|:---|:---|
+| 两个键都是可选的，可以只设置其中一个；没有设置的状态仍按 Asset Catalog 的 Dark 外观或 `_dark` 命名规范查找，都没有时深浅色共用同一张图。 | Both keys are optional, and either can be used alone. A state without one still uses the asset's Dark appearance or the `_dark` naming convention; without those it shows the same image in both styles. |
+| 设置后优先于 Asset Catalog 的 Dark 外观和 `_dark` 命名规范，适合深色图片名称不规则、来自其他 bundle 或在代码中生成（UIImage）的情况。 | When set, it wins over the asset's Dark appearance and the `_dark` naming convention: use it when the dark image has an unrelated name, comes from another bundle, or is made in code (a UIImage). |
+| 图片名与 `CYLTabBarItemImage` 一样按原图渲染；`UIImage` 保留自身的渲染模式（见上一条）。 | Names are rendered as original, as for `CYLTabBarItemImage`; a `UIImage` keeps its own rendering mode (see the note above). |
+| 普通、液态玻璃与扁平样式（`CYLTabBarStyleTypeFlatDesign`）都支持。运行时更换图片时，在新的属性数组中带上这两个键，再调用 `-reloadTabBarItemsWithAttributes:`。 | Works in the classic, Liquid Glass and flat design (`CYLTabBarStyleTypeFlatDesign`) styles. To change images at runtime, include the keys in the new attributes and call `-reloadTabBarItemsWithAttributes:`. |
+| 风格跟随系统设置，以及 window、视图控制器上的 `overrideUserInterfaceStyle`，切换时自动更新，无需在 `-traitCollectionDidChange:` 中重新设置。 | The style follows the system setting and any `overrideUserInterfaceStyle` on a window or view controller, and the tab updates by itself; there is no need to set images again in `-traitCollectionDidChange:`. |
+
+```Objective-C
+NSDictionary *messageAttributes = @{
+    CYLTabBarItemTitle : @"消息",
+    CYLTabBarItemImage : @"message_normal",
+    CYLTabBarItemDarkImage : @"message_normal_night",              // any name
+    CYLTabBarItemSelectedImage : @"message_highlight",
+    CYLTabBarItemSelectedDarkImage : [UIImage imageNamed:@"message_highlight_night"
+                                                inBundle:themeBundle
+                           compatibleWithTraitCollection:nil],     // or a UIImage, e.g. from another bundle
+};
+```
+
+```Swift
+let messageAttributes: [String: Any] = [
+    CYLTabBarItemTitle: "消息",
+    CYLTabBarItemImage: "message_normal",
+    CYLTabBarItemDarkImage: "message_normal_night",
+    CYLTabBarItemSelectedImage: "message_highlight",
+]
+```
+
+| 中文 | English |
+|:---|:---|
+| 需要同样的图片作为 UIImage 对象（例如用于其他视图）时，用 `+[UIImage cyl_imageWithImageInfo:darkImageInfo:]`，参数与这两个键的取值相同。 | To get the same image as a UIImage object (e.g. for another view), use `+[UIImage cyl_imageWithImageInfo:darkImageInfo:]`, which takes the same values as these keys. |
+
+| 中文 | English |
+|:---|:---|
+| 不要在设置颜色或图片时自行判断当前是深色还是浅色再二选一：此时 `UITraitCollection.currentTraitCollection` 往往是 unspecified，window scene 和屏幕的 trait 不认 `overrideUserInterfaceStyle`，而且之后切换风格时不会更新。需要在风格变化时执行代码，请在 `-traitCollectionDidChange:` 中比较 `self.traitCollection`。 | Don't check whether the style is dark or light yourself and pick one when you set a color or image: at that moment `UITraitCollection.currentTraitCollection` is often unspecified, the window scene's and the screen's traits ignore `overrideUserInterfaceStyle`, and nothing updates when the style changes later. To run code when it changes, compare `self.traitCollection` in `-traitCollectionDidChange:`. |
+| 不需要深色模式时（[#440](https://github.com/ChenYilong/CYLTabBarController/issues/440)），在 Info.plist 中添加 `UIUserInterfaceStyle`，值为 `Light`，整个 App 固定为浅色。也可以只设置 `window.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;`（或 window 的 rootViewController）。 | If the app does not support Dark Mode ([#440](https://github.com/ChenYilong/CYLTabBarController/issues/440)), add `UIUserInterfaceStyle` with the value `Light` to Info.plist; the whole app then stays light. Or set `window.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;` (or on the window's root view controller). |
 
 ### [CN]横竖屏适配
 ### [EN]Supporting portrait and landscape orientations

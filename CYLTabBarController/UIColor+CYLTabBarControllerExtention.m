@@ -618,6 +618,18 @@
             ];
 }
 
++ (UIColor *)cyl_colorWithLightColor:(UIColor *)lightColor darkColor:(UIColor *)darkColor {
+    if (!darkColor || !lightColor) {
+        return lightColor ?: darkColor;
+    }
+    if (@available(iOS 13.0, *)) {
+        return [UIColor colorWithDynamicProvider:^UIColor *(UITraitCollection *traitCollection) {
+            return (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) ? darkColor : lightColor;
+        }];
+    }
+    return lightColor;
+}
+
 #pragma mark - Deprecated API
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 //Apple remove this API in iOS13 beta 2

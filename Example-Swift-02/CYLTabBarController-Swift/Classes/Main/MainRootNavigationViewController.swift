@@ -46,8 +46,11 @@ class MainRootNavigationViewController: UINavigationController {
                              CYLTabBarItemImage:"mycity_normal",
                              CYLTabBarItemSelectedImage:"mycity_highlight"]
         
+        // Dark Mode (#620): "home_normal" also loads home_normal_dark (naming convention), the message tab names its dark
+        // image, account_normal has its own Dark appearance. 深色模式：见 README「适配深色模式」。
         let tabBarItemThree = [CYLTabBarItemTitle:"消息",
                                CYLTabBarItemImage:"message_normal",
+                               CYLTabBarItemDarkImage:"message_normal_night",
                                CYLTabBarItemSelectedImage:"message_highlight"]
         
         let tabBarItemFour = [CYLTabBarItemTitle:"我的",
