@@ -14,7 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
   
     var window: UIWindow?
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    func application(_ _: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
        
         CYLPlusButtonSubclass.register()
 
@@ -23,12 +23,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
         //tabbar背景色
 //        UITabBar.appearance().backgroundColor = UIColor.white
         //tabbar字体颜色
-        UITabBar.appearance().tintColor = UIColor(red:255.0/255.0,green:102.0/255.0,blue:0,alpha:1.0)
+        UITabBar.appearance().tintColor = UIColor(red: 1.0, green: 102.0 / 255.0, blue: 0, alpha: 1.0)
 
         return true
     }
 
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    func application(_ _: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options _: UIScene.ConnectionOptions) -> UISceneConfiguration {
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
 

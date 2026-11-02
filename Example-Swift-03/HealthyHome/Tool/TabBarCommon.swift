@@ -12,38 +12,43 @@ import CYLTabBarController
 class TabBarCommon: NSObject {
     
     /// MARK: 切换跳转主界面
+    /// Replaces `window.rootViewController` with a new tab bar controller (#488: the old one is then deallocated; in
+    /// DEBUG, `cyl_setRootViewControllerProvider` logs a warning if it is not).
+    /// 用新的 TabBarController 替换 `window.rootViewController`（#488：旧的随后会释放；DEBUG 下未释放时会打印警告）。
     class func tabBarSelectIndex(_ selectIndex: Int) {
         CYLPlusButtonSubclass.register()
-        let tabBarController = RootTabBarController(viewControllers: ViewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
-        tabBarController.tabBarStyleType = .liquidGlass
-//        tabBarController.noNeedUIDesignCompatibility = true
-        tabBarController.selectedIndex = selectIndex;
-        let appDelegate = UIApplication.shared.delegate
-        appDelegate?.window??.rootViewController = tabBarController
+        // Rebuilt after a language change too, so every text shows in the new language.
+        UIApplication.shared.delegate?.window??.cyl_setRootViewControllerProvider {
+            let tabBarController = RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
+            tabBarController.tabBarStyleType = .liquidGlass
+            tabBarController.selectedIndex = selectIndex
+            return tabBarController
+        }
     }
     
     /// MARK: 切换跳转主界面 操作其他事件
-    class func completionhandler(_ selectIndex: Int, _: () ->())  {
+    class func completionhandler(_ selectIndex: Int, _ completion: (() -> Void)? = nil) {
         tabBarSelectIndex(selectIndex)
+        completion?()
     }
     
     /// MARK: 进入APP
-    class func enterApp(_ : () -> ()) {
-        TabBarController()
+    class func enterApp(_ completion: (() -> Void)? = nil) {
+        setUpRootTabBarController()
+        completion?()
     }
     
     /// MARK: 创建根视图
-    class func TabBarController() {
+    class func setUpRootTabBarController() {
         CYLPlusButtonSubclass.register()
-        let appDelegate = UIApplication.shared.delegate
         // Rebuilt after a language change, so every text shows in the new language.
-        appDelegate?.window??.cyl_setRootViewControllerProvider {
-            RootTabBarController(viewControllers: ViewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
+        UIApplication.shared.delegate?.window??.cyl_setRootViewControllerProvider {
+            RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
         }
     }
     
     //MARK:主界面
-    class func ViewControllers() -> [RootNavigationController] {
+    class func viewControllers() -> [RootNavigationController] {
 
         let home = RootNavigationController(rootViewController: HomeVC())
         let healthy = RootNavigationController(rootViewController: HealthyVC())

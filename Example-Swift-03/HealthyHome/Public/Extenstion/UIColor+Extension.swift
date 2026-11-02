@@ -46,7 +46,7 @@ extension UIColor {
         if (cString.hasPrefix("#")) {
             cString = (cString as NSString).substring(from:1)
         }else if (cString.hasPrefix("0X") || cString.hasPrefix("0x")) {
-            cString = (cString as NSString).substring(to: 2)
+            cString = (cString as NSString).substring(from: 2)
         }
         if ((cString as NSString).length != 6) {
             return .gray
@@ -54,13 +54,15 @@ extension UIColor {
         let rString = (cString as NSString).substring(to:2)
         let gString = ((cString as NSString).substring(from:2) as NSString).substring(to: 2)
         let bString = ((cString as NSString).substring(from:4) as NSString).substring(to: 2)
-        var r: UInt64 = 0, g: UInt64 = 0, b: UInt64 = 0
-        
+        var r: UInt64 = 0
+        var g: UInt64 = 0
+        var b: UInt64 = 0
+
         Scanner(string: rString).scanHexInt64(&r)
         Scanner(string: gString).scanHexInt64(&g)
         Scanner(string: bString).scanHexInt64(&b)
         
-        return UIColor(red: CGFloat(r) / 255.0, green: CGFloat(g) / 255.0, blue: CGFloat(b) / 255.0, alpha: 1)
+        return UIColor(red: CGFloat(r) / 255.0, green: CGFloat(g) / 255.0, blue: CGFloat(b) / 255.0, alpha: alpha)
     }
     
     //使用rgb方式生成自定义颜色

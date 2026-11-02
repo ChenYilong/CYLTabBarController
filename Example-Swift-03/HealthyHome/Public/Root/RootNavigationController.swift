@@ -34,7 +34,7 @@ class RootNavigationController: CYLBaseNavigationController {
              viewController.hidesBottomBarWhenPushed = true
          }
          
-         super.pushViewController(viewController, animated: true)
+         super.pushViewController(viewController, animated: animated)
      }
     
     

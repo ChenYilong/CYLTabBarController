@@ -53,7 +53,7 @@ class MainTabBarController: CYLTabBarController {
     }
     
     // MARK: - REQUIRED
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -192,7 +192,7 @@ class MainTabBarController: CYLTabBarController {
         NSLog("[#610] swapped tab bar icons to set %ld", issue610IconSetIndex)
     }
 
-    override func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
+    override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
         issue610CallbackCount += 1
         let index = selectedIndex
         issue610Label.text = "#610 didSelectControl: \(issue610CallbackCount) (index \(index))"
@@ -212,7 +212,7 @@ extension MainTabBarController {
         return true
     }
     
-    override func tabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor control: UIControl) -> Bool {
+    override func tabBarController(_ _: CYLTabBarController, shouldShowPlatterLiquidLensViewFor _: UIControl) -> Bool {
 //        return super.tabBarController(tabBarController, shouldShowPlatterLiquidLensViewFor: control)
         return true
     }

@@ -131,7 +131,7 @@ public extension UIImage {
      
      - Returns A new image
      */
-    convenience init?(text: String, font: UIFont = UIFont.systemFont(ofSize: 18), color: UIColor = UIColor.white, backgroundColor: UIColor = UIColor.gray, size: CGSize = CGSize(width: 100, height: 100), offset: CGPoint = CGPoint(x: 0, y: 0)) {
+    convenience init?(text: String, font: UIFont = UIFont.systemFont(ofSize: 18), color: UIColor = UIColor.white, backgroundColor: UIColor = UIColor.gray, size: CGSize = CGSize(width: 100, height: 100), offset _: CGPoint = CGPoint(x: 0, y: 0)) {
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: size.width, height: size.height))
         label.font = font
         label.text = text
@@ -179,7 +179,7 @@ public extension UIImage {
     convenience init?(startColor: UIColor, endColor: UIColor, radialGradientCenter: CGPoint = CGPoint(x: 0.5, y: 0.5), radius: Float = 0.5, size: CGSize = CGSize(width: 100, height: 100)) {
         UIGraphicsBeginImageContextWithOptions(size, true, 0)
         
-        let num_locations: Int = 2
+        let numLocations: Int = 2
         let locations: [CGFloat] = [0.0, 1.0] as [CGFloat]
         
         let startComponents = startColor.cgColor.components!
@@ -188,7 +188,7 @@ public extension UIImage {
         let components: [CGFloat] = [startComponents[0], startComponents[1], startComponents[2], startComponents[3], endComponents[0], endComponents[1], endComponents[2], endComponents[3]]
         
         let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let gradient = CGGradient(colorSpace: colorSpace, colorComponents: components, locations: locations, count: num_locations)
+        let gradient = CGGradient(colorSpace: colorSpace, colorComponents: components, locations: locations, count: numLocations)
         
         // Normalize the 0-1 ranged inputs to the width of the image
         let aCenter = CGPoint(x: radialGradientCenter.x * size.width, y: radialGradientCenter.y * size.height)
@@ -335,7 +335,7 @@ public extension UIImage {
      
      - Returns A new image
      */
-    func resize(toSize: CGSize, contentMode: UIImageContentMode = .scaleToFill) -> UIImage? {
+    func resize(toSize _: CGSize, contentMode: UIImageContentMode = .scaleToFill) -> UIImage? {
         let horizontalRatio = size.width / self.size.width;
         let verticalRatio = size.height / self.size.height;
         var ratio: CGFloat!
@@ -481,7 +481,10 @@ public extension UIImage {
         let colorSpace = self.cgImage?.colorSpace
         let bitmapInfo = self.cgImage?.bitmapInfo
         let context = CGContext(data: nil, width: width!, height: height!, bitsPerComponent: bits!, bytesPerRow: 0, space: colorSpace!, bitmapInfo: (bitmapInfo?.rawValue)!)
-        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
         color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
         
         context?.setStrokeColor(red: red, green: green, blue: blue, alpha: alpha)
@@ -705,11 +708,9 @@ public extension UIImage {
      */
     class func image(fromURL url: String, placeholder: UIImage, shouldCacheImage: Bool = true, closure: @escaping (_ image: UIImage?) -> ()) -> UIImage? {
         // From Cache
-        if shouldCacheImage {
-            if let image = UIImage.shared.object(forKey: url as AnyObject) as? UIImage {
-                closure(nil)
-                return image
-            }
+        if shouldCacheImage, let image = UIImage.shared.object(forKey: url as AnyObject) as? UIImage {
+            closure(nil)
+            return image
         }
         // Fetch Image
         let session = URLSession(configuration: URLSessionConfiguration.default)

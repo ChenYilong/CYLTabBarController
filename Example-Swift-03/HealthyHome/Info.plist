@@ -92,5 +92,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>CYLDemoBackgroundImageURL</key>
+	<string>https://fc3tn.baidu.com/it/u=3025909226,1763324618&amp;fm=202&amp;src=bqdata</string>
 </dict>
 </plist>

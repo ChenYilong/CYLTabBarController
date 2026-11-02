@@ -83,7 +83,7 @@ public final class CYLCompatibleLOTAnimationView: UIView {
     public init(url: URL, compatibleRenderingEngineOption: CompatibleRenderingEngineOption) {
         animationView = LottieAnimationView(
             url: url,
-            closure: { _ in },
+            closure: { _ in /* Nothing to do once loaded: the view shows the animation by itself. 加载完成后无需处理。 */ },
             configuration: CompatibleRenderingEngineOption.generateLottieConfiguration(compatibleRenderingEngineOption))
         super.init(frame: .zero)
         commonInit()

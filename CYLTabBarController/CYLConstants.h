@@ -28,6 +28,23 @@
 #define CYL_FLATDESIGN_AVAILABLE 0
 #endif
 
+/*!
+ * [EN] 1 when a Lottie library is part of the build, 0 otherwise: lottie-ios 2.x for Objective-C
+ *      (`CYLTabBarController/LottieObjectiveC`, `<Lottie/Lottie.h>`) or lottie-ios 4.x for Swift
+ *      (`CYLTabBarController/LottieSwift`, `CYLFlatDesignTabBar`, SPM; `<Lottie/Lottie-Swift.h>`). The Core subspec
+ *      alone has no Lottie, and Lottie code there does nothing. Use it, like `CYL_FLATDESIGN_AVAILABLE`, only after
+ *      importing this header.
+ * [CN] 工程中引入了 Lottie 库时为 1，否则为 0：Objective-C 版 lottie-ios 2.x（`CYLTabBarController/LottieObjectiveC`，
+ *      `<Lottie/Lottie.h>`），或 Swift 版 lottie-ios 4.x（`CYLTabBarController/LottieSwift`、`CYLFlatDesignTabBar`、SPM；
+ *      `<Lottie/Lottie-Swift.h>`）。只引入 Core 子库时没有 Lottie，Lottie 相关代码不起作用。与 `CYL_FLATDESIGN_AVAILABLE`
+ *      一样，只能在引入本头文件之后使用。
+ */
+#if __has_include(<Lottie/Lottie.h>) || __has_include(<Lottie/Lottie-Swift.h>)
+#define CYL_LOTTIE_AVAILABLE 1
+#else
+#define CYL_LOTTIE_AVAILABLE 0
+#endif
+
 // 必须在 flat design guard 之外，否则未引入 CYLFlatDesignTabBar 子库的
 // subspec（如 LottieSwift）看不到该前向声明，会报 "expected a type"。
 @class CYLTabBarController;

@@ -11,9 +11,8 @@ import UIKit
 class Common: NSObject {
     
     
-    class func handlerBlock(_: () ->())  {
-    
-
+    class func handlerBlock(_ block: () -> Void) {
+        block()
     }
     
     
