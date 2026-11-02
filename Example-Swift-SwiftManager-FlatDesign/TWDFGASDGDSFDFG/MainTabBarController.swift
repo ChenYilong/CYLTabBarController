@@ -129,10 +129,10 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         // 1. 标题配置
         var title: String {
             switch self {
-            case .home: return "首页"
-            case .room: return "房间"
-            case .chat: return "消息"
-            case .mine: return "我的"
+            case .home: return CYLLocalizedString("首页")
+            case .room: return CYLLocalizedString("房间")
+            case .chat: return CYLLocalizedString("消息")
+            case .mine: return CYLLocalizedString("我的")
             }
         }
         
@@ -288,6 +288,6 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         // flatDesign 下点击时 selectedIndex 可能仍是旧值，用 VC 判断更准
         let root = viewController.cyl_getViewControllerInsteadOfNavigation()
         // 此处判断逻辑已根据 ViewController 标题解耦
-        currentTheme = (root.navigationItem.title == "房间") ? .roomStyle : .normal
+        currentTheme = (root.navigationItem.title == CYLLocalizedString("房间")) ? .roomStyle : .normal
     }
 }

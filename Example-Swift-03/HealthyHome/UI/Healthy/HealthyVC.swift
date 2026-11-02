@@ -12,7 +12,7 @@ class HealthyVC: ViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "健康"
+        self.title = CYLLocalizedString("健康")
         self.view.backgroundColor = .blue
 
     }

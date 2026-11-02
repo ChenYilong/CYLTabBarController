@@ -12,7 +12,7 @@ class MeVC: ViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "我的"
+        self.title = CYLLocalizedString("我的")
         self.view.backgroundColor = .cyan
 
     }

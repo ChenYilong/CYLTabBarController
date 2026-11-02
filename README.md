@@ -1106,6 +1106,36 @@ let messageAttributes: [String: Any] = [
 | 不要在设置颜色或图片时自行判断当前是深色还是浅色再二选一：此时 `UITraitCollection.currentTraitCollection` 往往是 unspecified，window scene 和屏幕的 trait 不认 `overrideUserInterfaceStyle`，而且之后切换风格时不会更新。需要在风格变化时执行代码，请在 `-traitCollectionDidChange:` 中比较 `self.traitCollection`。 | Don't check whether the style is dark or light yourself and pick one when you set a color or image: at that moment `UITraitCollection.currentTraitCollection` is often unspecified, the window scene's and the screen's traits ignore `overrideUserInterfaceStyle`, and nothing updates when the style changes later. To run code when it changes, compare `self.traitCollection` in `-traitCollectionDidChange:`. |
 | 不需要深色模式时（[#440](https://github.com/ChenYilong/CYLTabBarController/issues/440)），在 Info.plist 中添加 `UIUserInterfaceStyle`，值为 `Light`，整个 App 固定为浅色。也可以只设置 `window.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;`（或 window 的 rootViewController）。 | If the app does not support Dark Mode ([#440](https://github.com/ChenYilong/CYLTabBarController/issues/440)), add `UIUserInterfaceStyle` with the value `Light` to Info.plist; the whole app then stays light. Or set `window.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;` (or on the window's root view controller). |
 
+### [CN]多语言（本地化）
+### [EN]Localization
+
+| 中文 | English |
+|:---|:---|
+| 本库与所有 Demo 中用户可见的文字都已本地化，支持 16 种语言：English、简体中文、繁體中文、日本語、한국어、Français、Deutsch、Español、Italiano、Português (Brasil)、Русский、العربية、ไทย、Tiếng Việt、Bahasa Indonesia、Türkçe。 | Every user-visible text in the library and in all demos is localized into 16 languages: English, Simplified Chinese, Traditional Chinese, Japanese, Korean, French, German, Spanish, Italian, Portuguese (Brazil), Russian, Arabic, Thai, Vietnamese, Indonesian and Turkish. |
+| 译文放在 Core 中的同一张表 `CYLTabBarController.strings` 里，CocoaPods（`resource_bundles`）、SPM、Carthage 都会自动带上，无需额外导入。 | The translations live in one table in Core, `CYLTabBarController.strings`; CocoaPods (`resource_bundles`), SPM and Carthage ship it for you, with no extra import. |
+| 所有文字使用同一种语言：取 App 自身当前显示的语言（`[NSBundle mainBundle].preferredLocalizations`），匹配最接近的译文，没有时使用英文。因此本库不会显示 App 本身不支持的语言。想让 App 跟随设备语言，在 Info.plist 中声明 `CFBundleLocalizations`（Demo 已声明）。 | All text uses one language: the one the app itself is displayed in (`[NSBundle mainBundle].preferredLocalizations`), matched to the closest translation, else English. So the library never shows a language the app doesn't. To follow the device language, declare `CFBundleLocalizations` in Info.plist (the demos do). |
+| 角标值 `@"new"` / `@"NEW"` 仍按原值传入，显示时自动翻译。 | Badge values `@"new"` / `@"NEW"` are still passed as is, and are translated when shown. |
+
+```Objective-C
+// 1. 用一个 C 函数包住字面量，key 即原文（Wrap the literal; the key is the original text）
+self.navigationItem.title = CYLLocalizedString(@"首页");
+cell.textLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"首页(%@)"), @(count)];
+
+// 2. 可选：App 内切换语言（Optional: in-app language setting; nil follows the app again）
+CYLSetLocalizationLanguage(@"ja");
+NSString *language = CYLLocalizationLanguage(); // @"ja"
+```
+
+```Swift
+navigationItem.title = CYLLocalizedString("首页")
+cell.textLabel?.text = String(format: CYLLocalizedString("我是第%ld行"), indexPath.row)
+```
+
+| 中文 | English |
+|:---|:---|
+| 新增文字：在每个 `Resources/<语言>.lproj/CYLTabBarController.strings` 中添加 `"原文" = "译文";`。没有译文时显示原文。 | To add a text, add `"original" = "translation";` to each `Resources/<language>.lproj/CYLTabBarController.strings`. Without a translation the original text is shown. |
+| `CYLSetLocalizationLanguage()` 只影响之后设置的文字；已显示的文字需要重新设置（例如重新创建 TabBarController）。 | `CYLSetLocalizationLanguage()` affects texts set afterwards; texts already on screen need to be set again (e.g. create the tab bar controller again). |
+
 ### [CN]横竖屏适配
 ### [EN]Supporting portrait and landscape orientations
 

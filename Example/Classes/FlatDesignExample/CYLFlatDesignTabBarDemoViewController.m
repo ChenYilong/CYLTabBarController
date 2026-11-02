@@ -46,12 +46,12 @@
 - (NSArray<NSString *> *)datas {
     if (!_datas) {
         _datas = @[
-            @"设置 barTintColor",
-            @"设置 backgroundImage",
-            @"设置 shadowImage",
-            @"设置 tintColor",
-            @"设置 items",
-            @"设置 清空",
+            CYLLocalizedString(@"设置 barTintColor"),
+            CYLLocalizedString(@"设置 backgroundImage"),
+            CYLLocalizedString(@"设置 shadowImage"),
+            CYLLocalizedString(@"设置 tintColor"),
+            CYLLocalizedString(@"设置 items"),
+            CYLLocalizedString(@"设置 清空"),
         ];
     }
     return _datas;
@@ -65,7 +65,7 @@
 
 - (void)initSubviews {
     
-    NSArray *titles = @[@"主页", @"同城", @"消息"];
+    NSArray *titles = @[CYLLocalizedString(@"主页"), CYLLocalizedString(@"同城"), CYLLocalizedString(@"消息")];
     NSArray *images = @[@"home_normal", @"fishpond_normal", @"message_normal"];
     NSArray *selectedImages = @[@"home_highlight", @"fishpond_highlight", @"message_highlight"];
     NSMutableArray *items = [NSMutableArray array];

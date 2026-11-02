@@ -137,26 +137,26 @@ extension MainTabBarController {
         // image, account_normal has its own Dark appearance. 深色模式：见 README「适配深色模式」。
 
         let tabBarItemOne = [
-            CYLTabBarItemTitle: "首页",
+            CYLTabBarItemTitle: CYLLocalizedString("首页"),
             CYLTabBarItemImage: "home_normal",
             CYLTabBarItemSelectedImage: "home_highlight"
         ]
 
         let tabBarItemTwo = [
-            CYLTabBarItemTitle: "鱼塘",
+            CYLTabBarItemTitle: CYLLocalizedString("鱼塘"),
             CYLTabBarItemImage: "fishpond_normal",
             CYLTabBarItemSelectedImage: "fishpond_highlight"
         ]
 
         let tabBarItemThree = [
-            CYLTabBarItemTitle: "消息",
+            CYLTabBarItemTitle: CYLLocalizedString("消息"),
             CYLTabBarItemImage: "message_normal",
             CYLTabBarItemDarkImage: "message_normal_night",
             CYLTabBarItemSelectedImage: "message_highlight"
         ]
 
         let tabBarItemFour = [
-            CYLTabBarItemTitle: "我的",
+            CYLTabBarItemTitle: CYLLocalizedString("我的"),
             CYLTabBarItemImage: "account_normal",
             CYLTabBarItemSelectedImage: "account_highlight"
         ]

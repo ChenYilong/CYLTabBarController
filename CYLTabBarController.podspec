@@ -23,6 +23,8 @@ Pod::Spec.new do |s|
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/**/*.{h,m,swift}'
     ]
     core.public_header_files = 'CYLTabBarController/**/*.h'
+    # Localized strings of the library and the demos (`CYLLocalizedString()`), part of Core so no extra import is needed.
+    core.resource_bundles = { 'CYLTabBarController' => ['CYLTabBarController/Resources/*.lproj'] }
 
     
   end

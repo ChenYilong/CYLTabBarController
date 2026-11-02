@@ -12,7 +12,7 @@ class WisdomVC: ViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = "菜单"
+        self.navigationItem.title = CYLLocalizedString("菜单")
         self.view.backgroundColor = .orange
 
     }

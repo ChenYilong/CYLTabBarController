@@ -59,10 +59,10 @@
     cell.detailTextLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
     if (0 == indexPath.row) {
         // The second row of the demo pushes a tab bar controller of the SAME context, see `-tableView:didSelectRowAtIndexPath:`.
-        [[cell textLabel] setText:NSLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）", nil)];
+        [[cell textLabel] setText:CYLLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）")];
         return;
     }
-    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController on iOS %@", self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
+    [[cell textLabel] setText:[NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
 
 }
 

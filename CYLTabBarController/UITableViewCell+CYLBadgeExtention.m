@@ -119,48 +119,48 @@ static UIColor *CYLBadgeHelperDynamicBorderColor(void) {
     dispatch_once(&onceToken, ^{
         items = @[
             // 1.1 Animations that repeat forever: `CYLBadgeAnimationType`
-            @{CYLBadgeItemTitle: @"Scale (forever)",   CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeScale)},
-            @{CYLBadgeItemTitle: @"Shake (forever)",   CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeShake)},
-            @{CYLBadgeItemTitle: @"Bounce (forever)",  CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeBounce)},
-            @{CYLBadgeItemTitle: @"Breathe (forever)", CYLBadgeItemValue: @"",  CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeBreathe)},
-            @{CYLBadgeItemTitle: @"Shake, stops with Reduce Motion", CYLBadgeItemValue: @"3",
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Scale (forever)"),   CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeScale)},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Shake (forever)"),   CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeShake)},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Bounce (forever)"),  CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeBounce)},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Breathe (forever)"), CYLBadgeItemValue: @"",  CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeBreathe)},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Shake, stops with Reduce Motion"), CYLBadgeItemValue: @"3",
               CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeShake), CYLBadgeItemReduceMotion: @YES},
             // 1.2 Animations that repeat forever: `CAAnimation+CYLBadgeExtention` factories
-            @{CYLBadgeItemTitle: @"Rotation (forever)", CYLBadgeItemValue: @"new", CYLBadgeItemFactoryAnimation: CYLBadgeRotationForever},
-            @{CYLBadgeItemTitle: @"Spring (forever)",   CYLBadgeItemValue: @"3",   CYLBadgeItemFactoryAnimation: CYLBadgeSpringForever},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Rotation (forever)"), CYLBadgeItemValue: @"new", CYLBadgeItemFactoryAnimation: CYLBadgeRotationForever},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Spring (forever)"),   CYLBadgeItemValue: @"3",   CYLBadgeItemFactoryAnimation: CYLBadgeSpringForever},
             // 1.3 Animations that repeat a few times
-            @{CYLBadgeItemTitle: @"Shake ×3 (cyl_shakeAnimationRepeatTimes)",   CYLBadgeItemValue: @"3", CYLBadgeItemFactoryAnimation: CYLBadgeShakeThreeTimes},
-            @{CYLBadgeItemTitle: @"Bounce ×3 (cyl_bounceAnimationRepeatTimes)", CYLBadgeItemValue: @"3", CYLBadgeItemFactoryAnimation: CYLBadgeBounceThreeTimes},
-            @{CYLBadgeItemTitle: @"Scale ×3",  CYLBadgeItemValue: @"3", CYLBadgeItemFactoryAnimation: CYLBadgeScaleThreeTimes},
-            @{CYLBadgeItemTitle: @"Blink ×3",  CYLBadgeItemValue: @"",  CYLBadgeItemFactoryAnimation: CYLBadgeBlinkThreeTimes},
-            @{CYLBadgeItemTitle: @"Flip ×2",   CYLBadgeItemValue: @"3", CYLBadgeItemFactoryAnimation: CYLBadgeFlipTwice},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Shake ×3 (cyl_shakeAnimationRepeatTimes)"),   CYLBadgeItemValue: @"3", CYLBadgeItemFactoryAnimation: CYLBadgeShakeThreeTimes},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Bounce ×3 (cyl_bounceAnimationRepeatTimes)"), CYLBadgeItemValue: @"3", CYLBadgeItemFactoryAnimation: CYLBadgeBounceThreeTimes},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Scale ×3"),  CYLBadgeItemValue: @"3", CYLBadgeItemFactoryAnimation: CYLBadgeScaleThreeTimes},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Blink ×3"),  CYLBadgeItemValue: @"",  CYLBadgeItemFactoryAnimation: CYLBadgeBlinkThreeTimes},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Flip ×2"),   CYLBadgeItemValue: @"3", CYLBadgeItemFactoryAnimation: CYLBadgeFlipTwice},
             // 1.4 Animations that play once
-            @{CYLBadgeItemTitle: @"Left to right once", CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeLeftRightOnce)},
-            @{CYLBadgeItemTitle: @"Right to left once", CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeRightLeftOnce)},
-            @{CYLBadgeItemTitle: @"Fade in once",       CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeFadeInOnce)},
-            @{CYLBadgeItemTitle: @"Rolling once",       CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeRollingOnce)},
-            @{CYLBadgeItemTitle: @"Scale once",         CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeScaleOnce)},
-            @{CYLBadgeItemTitle: @"Spring once",        CYLBadgeItemValue: @"3", CYLBadgeItemFactoryAnimation: CYLBadgeSpringOnce},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Left to right once"), CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeLeftRightOnce)},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Right to left once"), CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeRightLeftOnce)},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Fade in once"),       CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeFadeInOnce)},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Rolling once"),       CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeRollingOnce)},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Scale once"),         CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeScaleOnce)},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Spring once"),        CYLBadgeItemValue: @"3", CYLBadgeItemFactoryAnimation: CYLBadgeSpringOnce},
             // 2.1 Styles, no animation
-            @{CYLBadgeItemTitle: @"Red dot",              CYLBadgeItemValue: @""},
-            @{CYLBadgeItemTitle: @"Number",               CYLBadgeItemValue: @"8"},
-            @{CYLBadgeItemTitle: @"Number above maximum", CYLBadgeItemValue: @"100"},
-            @{CYLBadgeItemTitle: @"Custom maximum (9)",   CYLBadgeItemValue: @"10", CYLBadgeItemMaximum: @9},
-            @{CYLBadgeItemTitle: @"New",                  CYLBadgeItemValue: @"new"},
-            @{CYLBadgeItemTitle: @"NEW",                  CYLBadgeItemValue: @"NEW"},
-            @{CYLBadgeItemTitle: @"Other text",           CYLBadgeItemValue: @"hot"},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Red dot"),              CYLBadgeItemValue: @""},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Number"),               CYLBadgeItemValue: @"8"},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Number above maximum"), CYLBadgeItemValue: @"100"},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Custom maximum (9)"),   CYLBadgeItemValue: @"10", CYLBadgeItemMaximum: @9},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"New"),                  CYLBadgeItemValue: @"new"},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"NEW"),                  CYLBadgeItemValue: @"NEW"},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Other text"),           CYLBadgeItemValue: CYLLocalizedString(@"hot")},
             // 2.2 Appearance, no animation
-            @{CYLBadgeItemTitle: @"Custom colors",        CYLBadgeItemValue: @"5",   CYLBadgeItemColors: @YES},
-            @{CYLBadgeItemTitle: @"Custom font",          CYLBadgeItemValue: @"5",   CYLBadgeItemFont: @YES},
-            @{CYLBadgeItemTitle: @"Border",               CYLBadgeItemValue: @"5",   CYLBadgeItemBorder: @YES},
-            @{CYLBadgeItemTitle: @"Border following Dark Mode", CYLBadgeItemValue: @"5", CYLBadgeItemDynamicBorder: @YES},
-            @{CYLBadgeItemTitle: @"Red dot radius",       CYLBadgeItemValue: @"",    CYLBadgeItemRadius: @6},
-            @{CYLBadgeItemTitle: @"Margin",               CYLBadgeItemValue: @"5",   CYLBadgeItemMargin: @14},
-            @{CYLBadgeItemTitle: @"Corner radius",        CYLBadgeItemValue: @"new", CYLBadgeItemCornerRadius: @3},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Custom colors"),        CYLBadgeItemValue: @"5",   CYLBadgeItemColors: @YES},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Custom font"),          CYLBadgeItemValue: @"5",   CYLBadgeItemFont: @YES},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Border"),               CYLBadgeItemValue: @"5",   CYLBadgeItemBorder: @YES},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Border following Dark Mode"), CYLBadgeItemValue: @"5", CYLBadgeItemDynamicBorder: @YES},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Red dot radius"),       CYLBadgeItemValue: @"",    CYLBadgeItemRadius: @6},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Margin"),               CYLBadgeItemValue: @"5",   CYLBadgeItemMargin: @14},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Corner radius"),        CYLBadgeItemValue: @"new", CYLBadgeItemCornerRadius: @3},
             // 3. Other corners
-            @{CYLBadgeItemTitle: @"Top left",     CYLBadgeItemValue: @"5", CYLBadgeItemPosition: CYLBadgeTopLeft},
-            @{CYLBadgeItemTitle: @"Bottom left",  CYLBadgeItemValue: @"5", CYLBadgeItemPosition: CYLBadgeBottomLeft},
-            @{CYLBadgeItemTitle: @"Bottom right", CYLBadgeItemValue: @"5", CYLBadgeItemPosition: CYLBadgeBottomRight},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Top left"),     CYLBadgeItemValue: @"5", CYLBadgeItemPosition: CYLBadgeTopLeft},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Bottom left"),  CYLBadgeItemValue: @"5", CYLBadgeItemPosition: CYLBadgeBottomLeft},
+            @{CYLBadgeItemTitle: CYLLocalizedString(@"Bottom right"), CYLBadgeItemValue: @"5", CYLBadgeItemPosition: CYLBadgeBottomRight},
         ];
     });
     return items;
@@ -255,7 +255,7 @@ static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationItem.title = NSLocalizedString(@"Badge", @"Title of the badge list");
+    self.navigationItem.title = CYLLocalizedString(@"Badge");
     self.tableView.rowHeight = CYLBadgeRowHeight;
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CYLBadgeHelperCellIdentifier];
 }

@@ -132,7 +132,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //        vc.title = firstTabBarItemsAttributes[CYLTabBarItemTitle];
         NSString *title = firstTabBarItemsAttributes[CYLTabBarItemTitle];
         if ([CYLConstants isLiquidGlassActive]) {
-            title = [NSString stringWithFormat:@"%@%@", firstTabBarItemsAttributes[CYLTabBarItemTitle],@"（液态）"];
+            title = [NSString stringWithFormat:@"%@%@", firstTabBarItemsAttributes[CYLTabBarItemTitle],CYLLocalizedString(@"（液态）")];
         }
         vc.cyl_getViewControllerInsteadOfNavigationController.title  = title;
         
@@ -178,7 +178,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // Dark 外观（推荐）。关闭 Lottie 时显示这些图标；开启时由下方的 Lottie 动画代替。另见扁平样式的演示页。
     //    CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
-        CYLTabBarItemTitle : @"首页",
+        CYLTabBarItemTitle : CYLLocalizedString(@"首页"),
         // A name also loads "<name>_dark" when that image exists: here home_normal_dark (UIImage.cyl_darkImageNameSuffix).
         // 图片名会同时加载存在的「<name>_dark」：这里是 home_normal_dark（UIImage.cyl_darkImageNameSuffix）。
         CYLTabBarItemImage : @"home_normal",  /* NSString and UIImage are supported*/
@@ -191,7 +191,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     };
     //    CGFloat secondXOffset = (-25+2)/2;
     NSDictionary *secondTabBarItemsAttributes = @{
-        CYLTabBarItemTitle : @"同城",
+        CYLTabBarItemTitle : CYLLocalizedString(@"同城"),
         CYLTabBarItemImage :@"fishpond_normal",
         CYLTabBarItemSelectedImage : @"fishpond_highlight",
         //                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)],
@@ -201,7 +201,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     };
     
     NSDictionary *thirdTabBarItemsAttributes = @{
-        CYLTabBarItemTitle : @"消息",
+        CYLTabBarItemTitle : CYLLocalizedString(@"消息"),
         // A dark image under any name. Names are the prepared form (rendered as original, #465); a UIImage object for
         // the same is `[UIImage cyl_imageWithImageInfo:@"message_normal" darkImageInfo:@"message_normal_night"]`.
         // 任意名称的深色图片。图片名是库预先处理好的形式（按原图渲染，#465）；同样效果的 UIImage 对象为
@@ -215,7 +215,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     NSDictionary *fourthTabBarItemsAttributes = @{
-        CYLTabBarItemTitle : @"我的",
+        CYLTabBarItemTitle : CYLLocalizedString(@"我的"),
         // account_normal has its own Dark appearance in Images.xcassets; it wins over any "_dark" image.
         // account_normal 在 Images.xcassets 中自带 Dark 外观，优先于任何「_dark」图片。
         CYLTabBarItemImage : @"account_normal",

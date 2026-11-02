@@ -333,6 +333,8 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     if (![self cyl_badgeClass]) {
         return;
     }
+    // "new" / "NEW" are tokens; show them in the app's language.
+    value = CYLLocalizedString(value);
     CGSize size = [value sizeWithAttributes:
                    @{NSFontAttributeName:
                          self.cyl_badgeFont}];

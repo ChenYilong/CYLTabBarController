@@ -25,6 +25,7 @@
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
+#import "CYLLocalization.h"
 
 #if CYL_FLATDESIGN_AVAILABLE
 //#import <CYLTabBarController/CYLTabBarController.h>

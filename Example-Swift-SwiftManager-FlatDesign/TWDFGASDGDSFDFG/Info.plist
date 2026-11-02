@@ -21,5 +21,24 @@
 			</array>
 		</dict>
 	</dict>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>zh-Hans</string>
+		<string>zh-Hant</string>
+		<string>ja</string>
+		<string>ko</string>
+		<string>fr</string>
+		<string>de</string>
+		<string>es</string>
+		<string>it</string>
+		<string>pt-BR</string>
+		<string>ru</string>
+		<string>ar</string>
+		<string>th</string>
+		<string>vi</string>
+		<string>id</string>
+		<string>tr</string>
+	</array>
 </dict>
 </plist>

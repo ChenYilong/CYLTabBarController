@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8EB39E8817A9817A4E51569B /* CYLLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = C93C89DCD064D1E743B84BC5 /* CYLLocalization.m */; };
+		F2584DE0CE5DF015B848AEB8 /* CYLLocalization.h in Headers */ = {isa = PBXBuildFile; fileRef = 122AD69C82D1C708D134796A /* CYLLocalization.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E49B9E31B892D4D751DC96E3 /* CYLTabBarController.strings in Resources */ = {isa = PBXBuildFile; fileRef = 85F2C6E597EAD2D434B3B28F /* CYLTabBarController.strings */; };
 		C0B1D2E3F4A5B6C7D8E9F0A1 /* UITableViewCell+CYLBadgeExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = 6134160B6AE68986A470B5F1 /* UITableViewCell+CYLBadgeExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		002ACFDEC3236108A0445E6F /* UIColor+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = A494E02A66D2AE6B5B42B9E8 /* UIColor+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		028FAD0320AE983F53C7A9E6 /* CYLTabBar+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = 120EBF27E7ADE9A221F1993A /* CYLTabBar+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -125,6 +128,24 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		122AD69C82D1C708D134796A /* CYLLocalization.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLLocalization.h; sourceTree = "<group>"; };
+		C93C89DCD064D1E743B84BC5 /* CYLLocalization.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLLocalization.m; sourceTree = "<group>"; };
+		96D53041043C3DA79EE5D664 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Resources/en.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		CC3F45F38FDB0691609BC102 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh-Hans; path = Resources/zh-Hans.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		4A7D42FE01BE5B5511DDC853 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh-Hant; path = Resources/zh-Hant.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		BF2C6411597E8D6818F0A7BF /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = Resources/ja.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		386A0643474A0574AEFCA07D /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = Resources/ko.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		F06A56F56BB71DC660A98A27 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = Resources/fr.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		30CEBE0A399E8FB3E751E7C7 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = Resources/de.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		C54CE827390E2D3B020FFC94 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = Resources/es.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		73EE1A2E07459F660577E2D2 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = Resources/it.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		11718DDEA3ACBACAAE2C514F /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt-BR; path = Resources/pt-BR.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		F4E06898392B4D98E97AE9FB /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = Resources/ru.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		2EBA4D8C8CB60993FAFF031E /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = Resources/ar.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		635B602876E733F78C5592BE /* th */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = th; path = Resources/th.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		6D6A74934DED35110870EE2F /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = Resources/vi.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		7036495C03DA1EB19148DFA5 /* id */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = id; path = Resources/id.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		C2443C67D4A987F1FA2644A1 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = Resources/tr.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
 		021F00425FA55C661271AEF0 /* CYLTabBar.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLTabBar.h; sourceTree = "<group>"; };
 		04C2AF4F5157DB1DB2A68D1B /* _CYLFlatDesignTabBarControllerTransitionAnimator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = _CYLFlatDesignTabBarControllerTransitionAnimator.h; sourceTree = "<group>"; };
 		06F2A7A4CD876B9201D6FBCF /* CYLBaseTableViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLBaseTableViewController.h; sourceTree = "<group>"; };
@@ -591,6 +612,9 @@
 				523C8674E8856EB666A84E03 /* UIView+CYLBadgeExtention.m */,
 				0B42D556C6D31DBDCF523AD3 /* CYLBadgeAppearance.h */,
 				6D4C54D387BAE3B227860B2A /* CYLBadgeAppearance.m */,
+				122AD69C82D1C708D134796A /* CYLLocalization.h */,
+				C93C89DCD064D1E743B84BC5 /* CYLLocalization.m */,
+				85F2C6E597EAD2D434B3B28F /* CYLTabBarController.strings */,
 				6134160B6AE68986A470B5F1 /* UITableViewCell+CYLBadgeExtention.h */,
 				A63D9F62174D84768BED4A80 /* UITableViewCell+CYLBadgeExtention.m */,
 				F45F360D448D6E78DD3A4B88 /* UIView+CYLTabBarControllerExtention.h */,
@@ -664,6 +688,7 @@
 				0998FC39EE894767CF526891 /* UITabBarItem+CYLTabBarControllerExtention.h in Headers */,
 				D6ED76F52724E1A27FDE3A83 /* UIView+CYLBadgeExtention.h in Headers */,
 				612BF72EA3F27506A3FB901B /* CYLBadgeAppearance.h in Headers */,
+				F2584DE0CE5DF015B848AEB8 /* CYLLocalization.h in Headers */,
 				C0B1D2E3F4A5B6C7D8E9F0A1 /* UITableViewCell+CYLBadgeExtention.h in Headers */,
 				6DF0856810A3A8175EA3FD25 /* UIView+CYLTabBarControllerExtention.h in Headers */,
 				AC11DB045581B6D3C67A2473 /* UIViewController+CYLNavigationControllerExtention.h in Headers */,
@@ -734,6 +759,21 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				"zh-Hans",
+				"zh-Hant",
+				ja,
+				ko,
+				fr,
+				de,
+				es,
+				it,
+				"pt-BR",
+				ru,
+				ar,
+				th,
+				vi,
+				id,
+				tr,
 				Base,
 			);
 			mainGroup = 9AE9426B1BDC91B800354519;
@@ -758,6 +798,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E49B9E31B892D4D751DC96E3 /* CYLTabBarController.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -868,6 +909,7 @@
 				077E376118682E6BC98A554D /* UITabBarItem+CYLTabBarControllerExtention.m in Sources */,
 				93FF05430AA0DD4AF3901306 /* UIView+CYLBadgeExtention.m in Sources */,
 				3074C65391041CEB17679371 /* CYLBadgeAppearance.m in Sources */,
+				8EB39E8817A9817A4E51569B /* CYLLocalization.m in Sources */,
 				076D8C954F38DF05CAD01A26 /* UITableViewCell+CYLBadgeExtention.m in Sources */,
 				297CA4BAC3339C32B5B3AD8D /* UIView+CYLTabBarControllerExtention.m in Sources */,
 				89896F85AC7444ED382DCB77 /* UIViewController+CYLNavigationControllerExtention.m in Sources */,
@@ -917,6 +959,29 @@
 				9AE942CE1BDC933E00354519 /* Base */,
 			);
 			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		85F2C6E597EAD2D434B3B28F /* CYLTabBarController.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				96D53041043C3DA79EE5D664 /* en */,
+				CC3F45F38FDB0691609BC102 /* zh-Hans */,
+				4A7D42FE01BE5B5511DDC853 /* zh-Hant */,
+				BF2C6411597E8D6818F0A7BF /* ja */,
+				386A0643474A0574AEFCA07D /* ko */,
+				F06A56F56BB71DC660A98A27 /* fr */,
+				30CEBE0A399E8FB3E751E7C7 /* de */,
+				C54CE827390E2D3B020FFC94 /* es */,
+				73EE1A2E07459F660577E2D2 /* it */,
+				11718DDEA3ACBACAAE2C514F /* pt-BR */,
+				F4E06898392B4D98E97AE9FB /* ru */,
+				2EBA4D8C8CB60993FAFF031E /* ar */,
+				635B602876E733F78C5592BE /* th */,
+				6D6A74934DED35110870EE2F /* vi */,
+				7036495C03DA1EB19148DFA5 /* id */,
+				C2443C67D4A987F1FA2644A1 /* tr */,
+			);
+			name = CYLTabBarController.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

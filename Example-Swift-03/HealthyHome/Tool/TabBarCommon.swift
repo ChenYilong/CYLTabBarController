@@ -54,22 +54,22 @@ class TabBarCommon: NSObject {
     
     class func tabBarItemsAttributesForController() -> [[String: String]] {
             
-        let tabBarItemHome = [CYLTabBarItemTitle: "首页",
+        let tabBarItemHome = [CYLTabBarItemTitle: CYLLocalizedString("首页"),
                               CYLTabBarItemImage: "Home",
                               CYLTabBarItemSelectedImage: "HomeSelected"]
         
         // Dark Mode (#620): "Home" also loads Home_dark (naming convention), this tab names its dark image, "Me" has its
         // own Dark appearance. 深色模式：见 README「适配深色模式」。
-        let tabBarItemHealthy = [CYLTabBarItemTitle: "健康",
+        let tabBarItemHealthy = [CYLTabBarItemTitle: CYLLocalizedString("健康"),
                               CYLTabBarItemImage: "Message",
                               CYLTabBarItemDarkImage: "Message_night",
                               CYLTabBarItemSelectedImage: "MessageSelected"]
 
-        let tabBarItemFriends = [CYLTabBarItemTitle: "朋友圈",
+        let tabBarItemFriends = [CYLTabBarItemTitle: CYLLocalizedString("朋友圈"),
                               CYLTabBarItemImage: "lianxiren",
                               CYLTabBarItemSelectedImage: "lianxirenSelected"]
         
-        let tabBarItemMe = [CYLTabBarItemTitle: "我的",
+        let tabBarItemMe = [CYLTabBarItemTitle: CYLLocalizedString("我的"),
                               CYLTabBarItemImage: "Me",
                               CYLTabBarItemSelectedImage: "MeSelected"]
 

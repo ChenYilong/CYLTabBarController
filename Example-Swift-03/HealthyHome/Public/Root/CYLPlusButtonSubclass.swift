@@ -21,10 +21,10 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         
         button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
         
-        button.setTitle("菜单", for: .normal)
+        button.setTitle(CYLLocalizedString("菜单"), for: .normal)
         button.setTitleColor(.white, for: .normal)
         
-        button.setTitle("菜单", for: .selected)
+        button.setTitle(CYLLocalizedString("菜单"), for: .selected)
         button.setTitleColor(.white, for: .selected)
         
         // An explicit highlighted image is drawn as is, so the button does not darken on touch

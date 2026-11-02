@@ -280,11 +280,11 @@
     NSString *nextPlusButtonTitle = [nextPlusButtonClass plusButtonTitle];
     
     UIAlertController *actionSheet = [UIAlertController
-                                      alertControllerWithTitle:@"Switch Style 切换样式"
-                                      message:[NSString stringWithFormat:@"PlusButton → 「%@」", nextPlusButtonTitle]
+                                      alertControllerWithTitle:CYLLocalizedString(@"Switch Style 切换样式")
+                                      message:[NSString stringWithFormat:CYLLocalizedString(@"PlusButton → 「%@」"), nextPlusButtonTitle]
                                       preferredStyle:UIAlertControllerStyleActionSheet];
     
-    [actionSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Liquid Glass液态玻璃", nil)
+    [actionSheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"Liquid Glass液态玻璃")
                                                     style:UIAlertActionStyleDefault
                                                   handler:^(UIAlertAction *action) {
         // handle choose
@@ -294,7 +294,7 @@
 
     }]];
     
-    [actionSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"FlatDesign扁平设计样式", nil)
+    [actionSheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"FlatDesign扁平设计样式")
                                                     style:UIAlertActionStyleDefault
                                                   handler:^(UIAlertAction *action) {
         // handle choose
@@ -306,7 +306,7 @@
     
     
     
-    [actionSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"取消", nil)
+    [actionSheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消")
                                                     style:UIAlertActionStyleCancel
                                                   handler:nil]];
     
@@ -425,7 +425,7 @@
 }
 
 + (NSString *)plusButtonTitle {
-    return NSLocalizedString(@"发布", nil);
+    return CYLLocalizedString(@"发布");
 }
 
 /// The window's root view controller. Not `CYLGetRootViewController()`: inside an alert action handler the action sheet
@@ -459,7 +459,7 @@
 }
 
 + (NSString *)plusButtonTitle {
-    return NSLocalizedString(@"拍摄", nil);
+    return CYLLocalizedString(@"拍摄");
 }
 
 // Only the icon differs: a camera (SF Symbol, iOS 13+), the other plus button keeps the `post_*` images.
