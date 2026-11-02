@@ -8,7 +8,7 @@
 
 #import "CYLFlatDesignTableViewController.h"
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
-#import <CYLTabBarController/UIViewController+CYLMemoryWarningDemo.h>
+#import <CYLTabBarController/UIViewController+CYLSettingsSection.h>
 #import "CYLFlatDesignTabBarDemoViewController.h"
 #import "CYLPopPushDemoViewController.h"
 #import "CYLFlatDesignMainTabBarController.h"
@@ -52,12 +52,12 @@
     //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
     //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
     
-    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"FlatDesign", nil) style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
+    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"FlatDesign") style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
     //    leftBarButtonItem.tintColor = UIColor.redColor; // 确保使用原图色
     self.navigationItem.leftBarButtonItem = leftBarButtonItem;
     
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"LiquidGlass", nil) style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"LiquidGlass") style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
     //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"CYLTabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
     
 #define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
@@ -107,21 +107,21 @@
 
 #pragma mark - Table view data source
 
-// Section 0: the memory warning demo row (#426), shared by all the examples. 第 0 组：所有示例共用的内存警告演示行（#426）。
+// Section 0: settings (language, memory warning). 第 0 组：设置（语言、内存警告）。
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (CYLMemoryWarningDemoSection == section) {
-        return 1;
+    if (section == CYLSettingsSection) {
+        return [self cyl_settingsRowCount];
     }
     return 50;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (CYLMemoryWarningDemoSection == indexPath.section) {
-        return [self cyl_memoryWarningDemoCellForTableView:tableView];
+    if (indexPath.section == CYLSettingsSection) {
+        return [self cyl_settingsCellForTableView:tableView atIndexPath:indexPath];
     }
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (cell == nil) {
@@ -130,29 +130,29 @@
     }
     
     cell.accessoryType = UITableViewCellAccessoryNone;
-    NSString *title = [NSString localizedStringWithFormat:NSLocalizedString(@"%@ CYLTabBarController on iOS %@", nil), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
+    NSString *title = [NSString localizedStringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
 
     if (indexPath.row == 0) {
-        title = NSLocalizedString(@"Show / hide CYLFlatDesignTabBar", nil);
+        title = CYLLocalizedString(@"Show / hide CYLFlatDesignTabBar");
     } else if (indexPath.row == 1) {
-        title = NSLocalizedString(@"Change CYLFlatDesignTabBarItem 不居中显示（系统效果）", nil);
+        title = CYLLocalizedString(@"Change CYLFlatDesignTabBarItem 不居中显示（系统效果）");
     } else if (indexPath.row == 2) {
-        title = NSLocalizedString(@"Change CYLFlatDesignTabBarItem 居中显示", nil);
+        title = CYLLocalizedString(@"Change CYLFlatDesignTabBarItem 居中显示");
     } else if (indexPath.row == 3) {
-        title = NSLocalizedString(@"设置 CYLFlatDesignTabBarItem 背景色", nil);
+        title = CYLLocalizedString(@"设置 CYLFlatDesignTabBarItem 背景色");
     } else if (indexPath.row == 4) {
-        title = NSLocalizedString(@"改变 CYLFlatDesignTabBar 高度", nil);
+        title = CYLLocalizedString(@"改变 CYLFlatDesignTabBar 高度");
     } else if (indexPath.row == 5) {
-        title = NSLocalizedString(@"和系统 UITabBar 比较", nil);
+        title = CYLLocalizedString(@"和系统 UITabBar 比较");
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     } else if (indexPath.row == 6) {
-        title = NSLocalizedString(@"Push To 系统 UITabBarController（另一个 PlusButton）", nil);
+        title = CYLLocalizedString(@"Push To 系统 UITabBarController（另一个 PlusButton）");
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     } else if (indexPath.row == 7) {
-        title = NSLocalizedString(@"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）", nil);
+        title = CYLLocalizedString(@"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）");
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     } else if (indexPath.row == 8) {
-        title = NSLocalizedString(@"cyl_pop / cyl_push 系列方法演示", nil);
+        title = CYLLocalizedString(@"cyl_pop / cyl_push 系列方法演示");
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     cell.textLabel.text = title;
@@ -164,9 +164,8 @@
 #pragma mark UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (CYLMemoryWarningDemoSection == indexPath.section) {
-        [tableView deselectRowAtIndexPath:indexPath animated:YES];
-        [self cyl_showMemoryWarningDemo];
+    if (indexPath.section == CYLSettingsSection) {
+        [self cyl_didSelectSettingsRowAtIndexPath:indexPath inTableView:tableView];
         return;
     }
 #if CYL_FLATDESIGN_AVAILABLE

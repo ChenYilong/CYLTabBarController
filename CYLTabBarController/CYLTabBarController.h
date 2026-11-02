@@ -21,11 +21,14 @@
 #import "UIBarButtonItem+CYLBadgeExtention.h"
 #import "UIView+CYLBadgeExtention.h"
 #import "UITableViewCell+CYLBadgeExtention.h"
-#import "UIViewController+CYLMemoryWarningDemo.h"
+#import "UIViewController+CYLMemoryWarning.h"
+#import "UIViewController+CYLSettingsSection.h"
 #import "CYLBadgeAppearance.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
+#import "CYLLocalization.h"
+#import "UIImage+CYLTabBarControllerExtention.h"
 
 #if CYL_FLATDESIGN_AVAILABLE
 //#import <CYLTabBarController/CYLTabBarController.h>
@@ -640,20 +643,20 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 + (nullable CYLTabBarController *)cyl_activeTabBarController;
 
 /*!
- * [EN] Debug and demo helper: simulates a system memory warning for the most recently active tab bar controller
+ * [EN] Debug helper: simulates a system memory warning for the most recently active tab bar controller
  *      (`+cyl_activeTabBarController`); see `+cyl_simulateMemoryWarningForTabBarController:`.
- * [CN] 调试与演示用：对最近活跃的 TabBarController（`+cyl_activeTabBarController`）模拟系统内存警告，
+ * [CN] 调试用：对最近活跃的 TabBarController（`+cyl_activeTabBarController`）模拟系统内存警告，
  *      详见 `+cyl_simulateMemoryWarningForTabBarController:`。
  */
 + (void)cyl_simulateMemoryWarning;
 
 /*!
- * [EN] Debug and demo helper: simulates a system memory warning with public API only. It posts
+ * [EN] Debug helper: simulates a system memory warning with public API only. It posts
  *      `UIApplicationDidReceiveMemoryWarningNotification`, calls the app delegate's `-applicationDidReceiveMemoryWarning:`
  *      and calls `-didReceiveMemoryWarning` on `tabBarController` (posting the notification does not call it), so that
  *      `unloadsUnselectedViewsOnMemoryWarning` unloads the unselected tabs (issue #426). Then logs every tab: its Lottie
  *      view and `animationSpeed` (issue #428) and whether its badge is shown. Works in every tab bar style. Main thread only.
- * [CN] 调试与演示用：仅使用公开 API 模拟系统内存警告。发送 `UIApplicationDidReceiveMemoryWarningNotification`，调用 App 代理的
+ * [CN] 调试用：仅使用公开 API 模拟系统内存警告。发送 `UIApplicationDidReceiveMemoryWarningNotification`，调用 App 代理的
  *      `-applicationDidReceiveMemoryWarning:`，并调用 `tabBarController` 的 `-didReceiveMemoryWarning`（发送通知不会调用该方法），
  *      使 `unloadsUnselectedViewsOnMemoryWarning` 卸载未选中的 Tab（issue #426）。随后输出每个 Tab 的状态：Lottie 视图及其
  *      `animationSpeed`（issue #428）、角标是否显示。适用于所有 TabBar 样式。请在主线程调用。

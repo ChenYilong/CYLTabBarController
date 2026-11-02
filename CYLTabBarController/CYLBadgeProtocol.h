@@ -10,8 +10,8 @@
 //At present, there are same classes support CYLBadgeExtention(UIView, UITabBarItem and UIBarButtonItem). However, there may be more classes to support. Thus, it is necessary to abstract a protocol. 20260812.
 
 
-#ifndef CYLBadgeDemo_CYLBadgeProtocol_h
-#define CYLBadgeDemo_CYLBadgeProtocol_h
+#ifndef CYLBadgeProtocol_h
+#define CYLBadgeProtocol_h
 
 #import <UIKit/UIKit.h>
 

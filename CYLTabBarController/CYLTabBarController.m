@@ -551,6 +551,17 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
         if ([self.cyl_tabBar isKindOfClass:[CYLTabBar class]] ) {
             CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
             [self cyl_bindTabControlActions];
+            // VoiceOver: the tab under the plus button has no title, so it was read as an empty tab.
+            // 加号按钮下方的占位 Tab 没有标题，VoiceOver 会读成空 Tab。
+            for (UIViewController *viewController in self.viewControllers) {
+                if (viewController.cyl_isPlaceholder) {
+                    // Classic tab bar: the button is the element. Liquid Glass: the element comes from the item, which
+                    // then reads as the plus button it is covered by (a tap on it is forwarded to the plus button).
+                    viewController.cyl_tabButton.accessibilityElementsHidden = YES;
+                    viewController.cyl_tabButton.isAccessibilityElement = NO;
+                    viewController.tabBarItem.accessibilityLabel = [self cyl_contextPlusButton].accessibilityLabel;
+                }
+            }
         
             do {
                 if (self.isLottieViewAdded) {

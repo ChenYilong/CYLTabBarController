@@ -14,6 +14,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark -- badge apis
 
+/*!
+ * [EN] What VoiceOver says for a badge value: @"" (red dot) → "New content", a number → "3 new messages", @"new" / @"NEW" →
+ *      their translation, other text as is; nil for nil or a number of 0 or less. Texts are in the app's language.
+ * [CN] 角标值对应的 VoiceOver 朗读内容：@""（红点）→“有新内容”，数字 →“3 条新消息”，@"new" / @"NEW" → 其译文，其他文字原样；
+ *      nil 或小于等于 0 的数字返回 nil。使用 App 当前语言。
+ */
+FOUNDATION_EXTERN NSString * _Nullable CYLBadgeAccessibilityDescription(NSString * _Nullable value);
+
 @interface UIView (CYLBadgeExtention)<CYLBadgeProtocol>
 /*!
  * [EN] The badge view: a `UILabel` by default, a `CYLTabBarBadgeView` for the Liquid Glass badge on iOS 27.

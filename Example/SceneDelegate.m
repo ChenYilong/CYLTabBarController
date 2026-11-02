@@ -8,6 +8,7 @@
 
 #import "SceneDelegate.h"
 #import "CYLMainRootViewController.h"
+#import <CYLTabBarController/CYLLocalization.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,8 +24,10 @@ NS_ASSUME_NONNULL_BEGIN
     self.window.backgroundColor = [UIColor whiteColor];
     [self setUpBadgeAppearance];
     
-    CYLMainRootViewController *rootViewController = [[CYLMainRootViewController alloc] init];
-    self.window.rootViewController = rootViewController;
+    // Rebuilt after a language change (the language row in every list), so every text shows in the new language.
+    [self.window cyl_setRootViewControllerProvider:^UIViewController *{
+        return [[CYLMainRootViewController alloc] init];
+    }];
     [self.window makeKeyAndVisible];
     //要根据你的window与tabbar的关系，来设置， 如果你 设置了 self.window.rootViewController = rootViewController; 那么你应该用下面的方式来设置暗黑模式, 否则 window的overrideUserInterfaceStyle 不认, 只跟随系统
 //    self.window.rootViewController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;

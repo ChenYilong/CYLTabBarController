@@ -51,10 +51,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
 
             // No window exists yet at this point, so create one for this scene.
             let window = UIWindow(windowScene: windowScene)
-            // ✅ Move your original logic here
-            let mainTabBarVc = MainRootNavigationViewController()
-
-            window.rootViewController = mainTabBarVc
+            // Rebuilt after a language change, so every text shows in the new language.
+            window.cyl_setRootViewControllerProvider { MainRootNavigationViewController() }
             window.makeKeyAndVisible()
 
             self.window = window

@@ -8,7 +8,7 @@
 
 #import "CYLMineViewController.h"
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
-#import <CYLTabBarController/UIViewController+CYLMemoryWarningDemo.h>
+#import <CYLTabBarController/UIViewController+CYLSettingsSection.h>
 #import "CYLDetailsViewController.h"
 #import <MJRefresh/MJRefresh.h>
 
@@ -77,14 +77,14 @@
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
     [cell cyl_showBadgeForRow:indexPath.row];
     cell.detailTextLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
-    [[cell textLabel] setText:[NSString stringWithFormat:@"%@ CYLTabBarController on iOS %@", self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
+    [[cell textLabel] setText:[NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
 }
 
 #pragma mark - Table view
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (CYLMemoryWarningDemoSection == indexPath.section) {
-        return [self cyl_memoryWarningDemoCellForTableView:tableView];
+    if (indexPath.section == CYLSettingsSection) {
+        return [self cyl_settingsCellForTableView:tableView atIndexPath:indexPath];
     }
     static NSString * CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -95,22 +95,21 @@
     return cell;
 }
 
-// Section 0: the memory warning demo row (#426), shared by all the examples. 第 0 组：所有示例共用的内存警告演示行（#426）。
+// Section 0: settings (language, memory warning). 第 0 组：设置（语言、内存警告）。
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (CYLMemoryWarningDemoSection == section) {
-        return 1;
+    if (section == CYLSettingsSection) {
+        return [self cyl_settingsRowCount];
     }
     return MAX(30, [UITableViewCell cyl_badgeStyleCount]); // every badge style has a row
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (CYLMemoryWarningDemoSection == indexPath.section) {
-        [tableView deselectRowAtIndexPath:indexPath animated:YES];
-        [self cyl_showMemoryWarningDemo];
+    if (indexPath.section == CYLSettingsSection) {
+        [self cyl_didSelectSettingsRowAtIndexPath:indexPath inTableView:tableView];
         return;
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];

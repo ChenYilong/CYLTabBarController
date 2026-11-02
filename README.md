@@ -1106,6 +1106,39 @@ let messageAttributes: [String: Any] = [
 | 不要在设置颜色或图片时自行判断当前是深色还是浅色再二选一：此时 `UITraitCollection.currentTraitCollection` 往往是 unspecified，window scene 和屏幕的 trait 不认 `overrideUserInterfaceStyle`，而且之后切换风格时不会更新。需要在风格变化时执行代码，请在 `-traitCollectionDidChange:` 中比较 `self.traitCollection`。 | Don't check whether the style is dark or light yourself and pick one when you set a color or image: at that moment `UITraitCollection.currentTraitCollection` is often unspecified, the window scene's and the screen's traits ignore `overrideUserInterfaceStyle`, and nothing updates when the style changes later. To run code when it changes, compare `self.traitCollection` in `-traitCollectionDidChange:`. |
 | 不需要深色模式时（[#440](https://github.com/ChenYilong/CYLTabBarController/issues/440)），在 Info.plist 中添加 `UIUserInterfaceStyle`，值为 `Light`，整个 App 固定为浅色。也可以只设置 `window.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;`（或 window 的 rootViewController）。 | If the app does not support Dark Mode ([#440](https://github.com/ChenYilong/CYLTabBarController/issues/440)), add `UIUserInterfaceStyle` with the value `Light` to Info.plist; the whole app then stays light. Or set `window.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;` (or on the window's root view controller). |
 
+### [CN]多语言（本地化）
+### [EN]Localization
+
+| 中文 | English |
+|:---|:---|
+| 本库与所有 Demo 中用户可见的文字都已本地化，支持 33 种语言：English、简体中文、繁體中文、日本語、한국어、Français、Deutsch、Español、Italiano、Português (Brasil)、Русский、العربية、ไทย、Tiếng Việt、Bahasa Indonesia、Türkçe、Nederlands、Polski、Svenska、Dansk、Norsk bokmål、Suomi、Čeština、Slovenčina、Magyar、Română、Hrvatski、Català、Bahasa Melayu、Українська、Ελληνικά、עברית、हिन्दी。 | Every user-visible text in the library and in all demos is localized into 33 languages: English, Simplified Chinese, Traditional Chinese, Japanese, Korean, French, German, Spanish, Italian, Portuguese (Brazil), Russian, Arabic, Thai, Vietnamese, Indonesian, Turkish, Dutch, Polish, Swedish, Danish, Norwegian Bokmål, Finnish, Czech, Slovak, Hungarian, Romanian, Croatian, Catalan, Malay, Ukrainian, Greek, Hebrew and Hindi. |
+| 译文放在 Core 的资源包 `CYLTabBarController.bundle` 中（`*.lproj/CYLTabBarController.strings`），CocoaPods、SPM、Carthage 都原样带上，无需额外导入。`CYLResourceBundle()` 返回该资源包，图片等资源也可以放进去，例如 `[UIImage imageNamed:@"icon" inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil]`。 | The translations live in Core's resource bundle, `CYLTabBarController.bundle` (`*.lproj/CYLTabBarController.strings`), shipped as is by CocoaPods, SPM and Carthage; no extra import. `CYLResourceBundle()` returns it, and images can go in it too, e.g. `[UIImage imageNamed:@"icon" inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil]`. |
+| App 内切换语言：列表中加入 `-cyl_languageCellForTableView:` 这一行，点击时调用 `-cyl_presentLanguagePicker`（英语、中文、印地语、西班牙语、阿拉伯语，国旗加语言名称，以及“跟随系统”）。副标题始终使用设备语言，切换到任何语言都能看懂。用 `[window cyl_setRootViewControllerProvider:^{ … }]` 代替设置 `rootViewController`，切换后界面立即用新语言重建，阿拉伯语等从右到左的语言同时翻转布局。 | In-app language setting: add the row from `-cyl_languageCellForTableView:` and call `-cyl_presentLanguagePicker` on tap (English, Chinese, Hindi, Spanish, Arabic with flag and own name, plus "Follow system"). Its subtitle is always in the device language, so it stays readable after any switch. Set the root with `[window cyl_setRootViewControllerProvider:^{ … }]` instead of `rootViewController`: the screen is rebuilt in the new language at once, and right-to-left languages such as Arabic flip the layout. |
+| VoiceOver：切换语言时同时设置 App 的 `accessibilityLanguage`，VoiceOver 使用对应语言的语音。角标会被读出（“消息，3 条新消息”“有新内容”），即使角标 label 位于 Tab 按钮或 cell 内部；加号按钮下方的占位 Tab 读作加号按钮；仅有图标的 PlusButton 读作其标题或“加号按钮”。 | VoiceOver: switching the language also sets the app's `accessibilityLanguage`, so VoiceOver uses a matching voice. Badges are read ("Messages, 3 new messages", "New content") even though the badge label sits inside a tab button or cell; the placeholder tab under the plus button reads as the plus button; an icon-only plus button reads as its title or "Plus button". |
+| 所有文字使用同一种语言：取 App 自身当前显示的语言（`[NSBundle mainBundle].preferredLocalizations`），匹配最接近的译文，没有时使用英文。因此本库不会显示 App 本身不支持的语言。想让 App 跟随设备语言，在 Info.plist 中声明 `CFBundleLocalizations`（Demo 已声明）。 | All text uses one language: the one the app itself is displayed in (`[NSBundle mainBundle].preferredLocalizations`), matched to the closest translation, else English. So the library never shows a language the app doesn't. To follow the device language, declare `CFBundleLocalizations` in Info.plist (the demos do). |
+| 角标值 `@"new"` / `@"NEW"` 仍按原值传入，显示时自动翻译。 | Badge values `@"new"` / `@"NEW"` are still passed as is, and are translated when shown. |
+| xib / storyboard 中设置的文字：在 `-viewDidLoad` 中调用 `[self.view cyl_localizeTexts]`，会翻译其中所有 `UILabel`、`UIButton` 标题和 `UITextField` 占位文字，无需为每种语言复制 xib。 | Texts set in a xib or storyboard: call `[self.view cyl_localizeTexts]` in `-viewDidLoad`; it translates every `UILabel`, `UIButton` title and `UITextField` placeholder in it, so the xib needs no per-language copy. |
+
+```Objective-C
+// 1. 用一个 C 函数包住字面量，key 即原文（Wrap the literal; the key is the original text）
+self.navigationItem.title = CYLLocalizedString(@"首页");
+cell.textLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"首页(%@)"), @(count)];
+
+// 2. 可选：App 内切换语言（Optional: in-app language setting; nil follows the app again）
+CYLSetLocalizationLanguage(@"ja");
+NSString *language = CYLLocalizationLanguage(); // @"ja"
+```
+
+```Swift
+navigationItem.title = CYLLocalizedString("首页")
+cell.textLabel?.text = String(format: CYLLocalizedString("我是第%ld行"), indexPath.row)
+```
+
+| 中文 | English |
+|:---|:---|
+| 新增文字：在每个 `Resources/<语言>.lproj/CYLTabBarController.strings` 中添加 `"原文" = "译文";`。没有译文时显示原文。 | To add a text, add `"original" = "translation";` to each `Resources/<language>.lproj/CYLTabBarController.strings`. Without a translation the original text is shown. |
+| `CYLSetLocalizationLanguage()` 只影响之后设置的文字；已显示的文字需要重新设置（例如重新创建 TabBarController）。 | `CYLSetLocalizationLanguage()` affects texts set afterwards; texts already on screen need to be set again (e.g. create the tab bar controller again). |
+
 ### [CN]横竖屏适配
 ### [EN]Supporting portrait and landscape orientations
 

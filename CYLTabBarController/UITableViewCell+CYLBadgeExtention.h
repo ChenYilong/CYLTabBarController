@@ -17,8 +17,8 @@ FOUNDATION_EXTERN const CGFloat CYLBadgeRowHeight;
 
 /*!
  * [EN] Badge samples shared by all the example apps: every badge style and animation, one per row.
- *      The icon is read from the app's asset catalog as `DemoIcon`.
- * [CN] 所有示例工程共用的角标样例：每行一种角标样式或动画。图标取 App 资源中的 `DemoIcon`。
+ *      The icon is `cyl_badge_sample_icon` in the library's resource bundle (`CYLResourceBundle()`).
+ * [CN] 所有示例工程共用的角标样例：每行一种角标样式或动画。图标为本库资源包（`CYLResourceBundle()`）中的 `cyl_badge_sample_icon`。
  */
 @interface UITableViewCell (CYLBadgeExtention)
 
@@ -29,8 +29,9 @@ FOUNDATION_EXTERN const CGFloat CYLBadgeRowHeight;
 - (void)cyl_showBadgeForRow:(NSInteger)row;
 
 /*!
- * [EN] Title of the badge sample shown on `row`.
- * [CN] 第 `row` 行角标样例的标题。
+ * [EN] Title of the badge sample shown on `row`, followed by the core API that produces the effect, e.g.
+ *      "20. Number (cyl_showBadgeValue:)" or "6. Rotation (forever) (cyl_rotationAnimationWithDuration:)".
+ * [CN] 第 `row` 行角标样例的标题，后面附上实现该效果的核心 API，例如“20. 数字 (cyl_showBadgeValue:)”。
  */
 + (NSString *)cyl_badgeTitleForRow:(NSInteger)row;
 
@@ -49,6 +50,14 @@ FOUNDATION_EXTERN const CGFloat CYLBadgeRowHeight;
  *      并输出之后的 TabBar 状态。
  */
 @interface CYLBadgeHelperTableViewController : UITableViewController
+
+/*!
+ * [EN] Section 0 holds the settings rows (`CYLSettingsSection`: language, memory warning); the badge samples are in section 1.
+ *      Called after a badge row is tapped (its badge cleared), e.g. to push a page; the row is `indexPath.row`.
+ * [CN] 第 0 组只有一行，为语言设置（`-cyl_languageCellForTableView:`）；角标样例在第 1 组。点击角标行（并清除角标）后调用，
+ *      例如用于 push 新页面；行号为 `indexPath.row`。
+ */
+@property (nonatomic, copy, nullable) void (^didSelectRowHandler)(NSIndexPath *indexPath);
 
 @end
 

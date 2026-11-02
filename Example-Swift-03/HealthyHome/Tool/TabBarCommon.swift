@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CYLTabBarController
 
 class TabBarCommon: NSObject {
     
@@ -35,7 +36,10 @@ class TabBarCommon: NSObject {
     class func TabBarController() {
         CYLPlusButtonSubclass.register()
         let appDelegate = UIApplication.shared.delegate
-        appDelegate?.window??.rootViewController = RootTabBarController(viewControllers: ViewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
+        // Rebuilt after a language change, so every text shows in the new language.
+        appDelegate?.window??.cyl_setRootViewControllerProvider {
+            RootTabBarController(viewControllers: ViewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
+        }
     }
     
     //MARK:主界面
@@ -54,22 +58,22 @@ class TabBarCommon: NSObject {
     
     class func tabBarItemsAttributesForController() -> [[String: String]] {
             
-        let tabBarItemHome = [CYLTabBarItemTitle: "首页",
+        let tabBarItemHome = [CYLTabBarItemTitle: CYLLocalizedString("首页"),
                               CYLTabBarItemImage: "Home",
                               CYLTabBarItemSelectedImage: "HomeSelected"]
         
         // Dark Mode (#620): "Home" also loads Home_dark (naming convention), this tab names its dark image, "Me" has its
         // own Dark appearance. 深色模式：见 README「适配深色模式」。
-        let tabBarItemHealthy = [CYLTabBarItemTitle: "健康",
+        let tabBarItemHealthy = [CYLTabBarItemTitle: CYLLocalizedString("健康"),
                               CYLTabBarItemImage: "Message",
                               CYLTabBarItemDarkImage: "Message_night",
                               CYLTabBarItemSelectedImage: "MessageSelected"]
 
-        let tabBarItemFriends = [CYLTabBarItemTitle: "朋友圈",
+        let tabBarItemFriends = [CYLTabBarItemTitle: CYLLocalizedString("朋友圈"),
                               CYLTabBarItemImage: "lianxiren",
                               CYLTabBarItemSelectedImage: "lianxirenSelected"]
         
-        let tabBarItemMe = [CYLTabBarItemTitle: "我的",
+        let tabBarItemMe = [CYLTabBarItemTitle: CYLLocalizedString("我的"),
                               CYLTabBarItemImage: "Me",
                               CYLTabBarItemSelectedImage: "MeSelected"]
 

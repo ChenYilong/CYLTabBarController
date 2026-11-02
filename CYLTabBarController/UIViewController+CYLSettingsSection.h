@@ -1,0 +1,51 @@
+//
+//  UIViewController+CYLSettingsSection.h
+//  CYLTabBarController
+//
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+/*!
+ * [EN] Section index of the settings rows at the top of a list: row 0 is the language setting
+ *      (`-cyl_languageCellForTableView:`), row 1 the memory warning check (`-cyl_memoryWarningCellForTableView:`).
+ * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
+ *      （`-cyl_memoryWarningCellForTableView:`）。
+ */
+FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
+
+/*!
+ * [EN] The settings section in three calls, so a list adds it with one line in each data source and delegate method:
+ *
+ *          numberOfSections                  → your sections + 1
+ *          numberOfRows      (CYLSettingsSection) → [self cyl_settingsRowCount]
+ *          cellForRow        (CYLSettingsSection) → [self cyl_settingsCellForTableView:tableView atIndexPath:indexPath]
+ *          didSelectRow      (CYLSettingsSection) → [self cyl_didSelectSettingsRowAtIndexPath:indexPath inTableView:tableView]
+ * [CN] 用三个调用提供设置分组，列表在每个数据源 / 代理方法中各加一行即可（见上）。
+ */
+@interface UIViewController (CYLSettingsSection)
+
+/*!
+ * [EN] Number of rows in the settings section.
+ * [CN] 设置分组的行数。
+ */
+- (NSInteger)cyl_settingsRowCount;
+
+/*!
+ * [EN] The cell for `indexPath.row` of the settings section.
+ * [CN] 设置分组第 `indexPath.row` 行的 cell。
+ */
+- (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath;
+
+/*!
+ * [EN] Deselects the row and runs it: the language picker or the memory warning check.
+ * [CN] 取消选中并执行该行：语言选择或内存警告检查。
+ */
+- (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
+
+@end
+
+NS_ASSUME_NONNULL_END

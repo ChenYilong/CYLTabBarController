@@ -136,7 +136,7 @@
         //                     selectedImageName:selectedImages[i]
         //                        lottieFilePath:lottieFilePaths[i]];
         
-        nav.cyl_getViewControllerInsteadOfNavigationController.title  = [NSString stringWithFormat:@"%@%@", firstTabBarItemsAttributes[CYLTabBarItemTitle],@"（扁平）"];
+        nav.cyl_getViewControllerInsteadOfNavigationController.title  = [NSString stringWithFormat:@"%@%@", firstTabBarItemsAttributes[CYLTabBarItemTitle],CYLLocalizedString(@"（扁平）")];
 
         
         //        if (i == 0) {

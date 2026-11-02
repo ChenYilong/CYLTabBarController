@@ -102,7 +102,7 @@ class MainTabBarController: CYLTabBarController {
     // Issue #428: called once for each Lottie view, after `lottieAnimationSpeed` was applied; one tab can get its own
     // speed here. 每个 Lottie 视图添加后回调一次，可在这里为某一个 Tab 单独设置速度。
     private func observeLottieAnimationViewDidAdd() {
-        let name = NSNotification.Name(CYLTabBarItemLottieAnimationViewDidAddNotification)
+        let name = NSNotification.Name.CYLTabBarItemLottieAnimationViewDidAdd
         _ = NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] note in
             guard let tabButton = note.object as? UIControl, tabButton.cyl_tabBarController === self else { return }
             if tabButton.cyl_tabBarChildViewControllerIndex == 0 {
@@ -135,32 +135,9 @@ extension MainTabBarController {
     static func makeTabBarItemsAttributes() -> [[AnyHashable: Any]] {
         // Dark Mode (#620): "home_normal" also loads home_normal_dark (naming convention), the message tab names its dark
         // image, account_normal has its own Dark appearance. 深色模式：见 README「适配深色模式」。
-
-        let tabBarItemOne = [
-            CYLTabBarItemTitle: "首页",
-            CYLTabBarItemImage: "home_normal",
-            CYLTabBarItemSelectedImage: "home_highlight"
-        ]
-
-        let tabBarItemTwo = [
-            CYLTabBarItemTitle: "鱼塘",
-            CYLTabBarItemImage: "fishpond_normal",
-            CYLTabBarItemSelectedImage: "fishpond_highlight"
-        ]
-
-        let tabBarItemThree = [
-            CYLTabBarItemTitle: "消息",
-            CYLTabBarItemImage: "message_normal",
-            CYLTabBarItemDarkImage: "message_normal_night",
-            CYLTabBarItemSelectedImage: "message_highlight"
-        ]
-
-        let tabBarItemFour = [
-            CYLTabBarItemTitle: "我的",
-            CYLTabBarItemImage: "account_normal",
-            CYLTabBarItemSelectedImage: "account_highlight"
-        ]
-
-        return [tabBarItemOne, tabBarItemTwo, tabBarItemThree, tabBarItemFour]
+        return CYLLocalizedTabBarItemsAttributes(["首页", "鱼塘", "消息", "我的"],
+                                                 ["home_normal", "fishpond_normal", "message_normal", "account_normal"],
+                                                 ["home_highlight", "fishpond_highlight", "message_highlight", "account_highlight"],
+                                                 [2: "message_normal_night"])
     }
 }

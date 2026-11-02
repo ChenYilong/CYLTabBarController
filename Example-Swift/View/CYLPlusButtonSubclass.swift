@@ -10,24 +10,8 @@ import UIKit
 
 class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
     static func plusButton() -> Any {
-        let button = CYLPlusButtonSubclass()
-        button.setImage(UIImage(named: "post_normal"), for: .normal)
-        button.titleLabel?.textAlignment = .center
-
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 10)
-
-        button.setTitle("发布", for: .normal)
-        button.setTitleColor(UIColor.gray, for: .normal)
-
-        button.setTitle("选中", for: .selected)
-        button.setTitleColor(UIColor.blue, for: .selected)
-
-        // An explicit highlighted image is drawn as is, so the button does not darken on touch
-        // (replaces `adjustsImageWhenHighlighted = false`, deprecated in iOS 15).
-        button.setImage(button.image(for: .normal), for: .highlighted)
-        button.sizeToFit()
-//        button.addTarget(self, action: #selector(testClick(sender:)), for: .touchUpInside)
-        return button
+        return CYLPlusButtonSubclass.cyl_plusButton(with: UIImage(named: "post_normal")!, title: "发布",
+                                                    selectedTitle: "选中", selectedTitleColor: .blue)
     }
 
 //    @objc static func testClick(sender: UIButton){
@@ -56,26 +40,4 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         return true
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-
-        // tabbar UI layout setup
-        let imageViewEdgeWidth: CGFloat = bounds.size.width * 0.7
-        let imageViewEdgeHeight: CGFloat = imageViewEdgeWidth * 0.9
-
-        let centerOfView = bounds.size.width * 0.5
-        let labelLineHeight = titleLabel!.font.lineHeight
-        let verticalMargin = (bounds.size.height - labelLineHeight - imageViewEdgeHeight) * 0.5
-
-        let centerOfImageView = verticalMargin + imageViewEdgeHeight * 0.5
-        let centerOfTitleLabel = imageViewEdgeHeight + verticalMargin * 2 + labelLineHeight * 0.5 + 10
-
-        // imageView position layout
-        imageView!.bounds = CGRect(x: 0, y: 0, width: imageViewEdgeWidth, height: imageViewEdgeHeight)
-        imageView!.center = CGPoint(x: centerOfView, y: centerOfImageView)
-
-        // title position layout
-        titleLabel!.bounds = CGRect(x: 0, y: 0, width: bounds.size.width, height: labelLineHeight)
-        titleLabel!.center = CGPoint(x: centerOfView, y: centerOfTitleLabel)
-    }
 }

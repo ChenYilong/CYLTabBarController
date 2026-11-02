@@ -12,7 +12,7 @@ class HomeVC: ViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "首页"
+        self.title = CYLLocalizedString("首页")
         self.view.backgroundColor = .red
 
         addRightBarButtonItemImage("屏幕全屏", self, action: #selector(tapAction))

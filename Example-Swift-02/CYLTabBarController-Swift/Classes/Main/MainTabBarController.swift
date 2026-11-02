@@ -44,12 +44,6 @@ class MainTabBarController: CYLTabBarController {
             context: context
         )
     }
-    convenience init(context: String = "") {
-        let imageInsets = UIEdgeInsets.zero
-        let titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3.5)
-        
-        self.init(viewControllers: Self.makeViewControllers(), tabBarItemsAttributes: Self.makeTabBarItemsAttributes(), imageInsets: imageInsets, titlePositionAdjustment: titlePositionAdjustment, context: context)
-    }
     // MARK: - REQUIRED by UIKit (🔥 Fix here)
     // Must only forward to super: CYLTabBarController's designated initializer calls
     // `[super init]`, which UIKit routes back here via `initWithNibName:bundle:`.
@@ -106,7 +100,7 @@ class MainTabBarController: CYLTabBarController {
             issue610Label.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             issue610Label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
         ])
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Swap icons", style: .plain,
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: CYLLocalizedString("Swap icons"), style: .plain,
                                                             target: self, action: #selector(issue610SwapIcons))
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-CYL610Landscape"), #available(iOS 16.0, *) {
@@ -221,46 +215,5 @@ extension MainTabBarController {
     override func tabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor control: UIControl) -> Bool {
 //        return super.tabBarController(tabBarController, shouldShowPlatterLiquidLensViewFor: control)
         return true
-    }
-    
-    static func makeViewControllers() -> [UIViewController] {
-        let home = CYLBadgeHelperTableViewController()
-        let connection = UINavigationController(rootViewController: ConnectionViewController())
-        let message = UINavigationController(rootViewController: MessageViewController())
-        let personal = UINavigationController(rootViewController: PersonalViewController())
-
-        return [home, connection, message, personal]
-    }
-
-    static func makeTabBarItemsAttributes() -> [[AnyHashable: Any]] {
-        // Dark Mode (#620): "home_normal" also loads home_normal_dark (naming convention), the message tab names its dark
-        // image, account_normal has its own Dark appearance. 深色模式：见 README「适配深色模式」。
-
-        let tabBarItemOne = [
-            CYLTabBarItemTitle: "首页",
-            CYLTabBarItemImage: "home_normal",
-            CYLTabBarItemSelectedImage: "home_highlight"
-        ]
-
-        let tabBarItemTwo = [
-            CYLTabBarItemTitle: "鱼塘",
-            CYLTabBarItemImage: "fishpond_normal",
-            CYLTabBarItemSelectedImage: "fishpond_highlight"
-        ]
-
-        let tabBarItemThree = [
-            CYLTabBarItemTitle: "消息",
-            CYLTabBarItemImage: "message_normal",
-            CYLTabBarItemDarkImage: "message_normal_night",
-            CYLTabBarItemSelectedImage: "message_highlight"
-        ]
-
-        let tabBarItemFour = [
-            CYLTabBarItemTitle: "我的",
-            CYLTabBarItemImage: "account_normal",
-            CYLTabBarItemSelectedImage: "account_highlight"
-        ]
-
-        return [tabBarItemOne, tabBarItemTwo, tabBarItemThree, tabBarItemFour]
     }
 }
