@@ -277,6 +277,23 @@
 		FBF2C50AEF51839180BA7ACE /* CYLFlatDesignTabBarHideTabBar.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLFlatDesignTabBarHideTabBar.m; sourceTree = "<group>"; };
 		FC3E14B9B33F4BBA36C13BC5 /* UIViewController+CYLNavigationControllerExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIViewController+CYLNavigationControllerExtention.h"; sourceTree = "<group>"; };
 		FCAE8253139A6CF74226DD8A /* UIBarButtonItem+CYLBadgeExtention.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIBarButtonItem+CYLBadgeExtention.m"; sourceTree = "<group>"; };
+		F566BD64256B00C3AD6A4C57 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = Resources/nl.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		0A009DA58D104AB521EBD8ED /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = Resources/pl.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		5A5828513B6096BFDCA604AE /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = Resources/sv.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		BBE0E72E9E2B1B3B6D0FE3D2 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = Resources/da.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		EB5A8D7FD6F41E6886B40296 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = Resources/nb.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		2CDD47A6C20F22138DC5C02F /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = Resources/fi.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		5A54CCE84373277282A0E0A1 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = Resources/cs.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		DAEA851F88EF41728A2DA7F8 /* sk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sk; path = Resources/sk.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		1C710119A464C685E1E7280A /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = Resources/hu.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		C1527F5798B1385328A69781 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = Resources/ro.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		40052C6C24536E75DA1B3581 /* hr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hr; path = Resources/hr.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		A4B9290544265BC91B5F7EDA /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = Resources/ca.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		44895E2B14EABAACF944D9B0 /* ms */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ms; path = Resources/ms.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		36080276A89C1A2B5460AD31 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = Resources/uk.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		4C8B32437FD11F646CD91DE4 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = Resources/el.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		1BEB5D5953D9C86F3892F3E1 /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = Resources/he.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
+		38F8E4053FDB822FF08CF9D6 /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = Resources/hi.lproj/CYLTabBarController.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -774,6 +791,23 @@
 				vi,
 				id,
 				tr,
+				nl,
+				pl,
+				sv,
+				da,
+				nb,
+				fi,
+				cs,
+				sk,
+				hu,
+				ro,
+				hr,
+				ca,
+				ms,
+				uk,
+				el,
+				he,
+				hi,
 				Base,
 			);
 			mainGroup = 9AE9426B1BDC91B800354519;
@@ -980,6 +1014,23 @@
 				6D6A74934DED35110870EE2F /* vi */,
 				7036495C03DA1EB19148DFA5 /* id */,
 				C2443C67D4A987F1FA2644A1 /* tr */,
+				F566BD64256B00C3AD6A4C57 /* nl */,
+				0A009DA58D104AB521EBD8ED /* pl */,
+				5A5828513B6096BFDCA604AE /* sv */,
+				BBE0E72E9E2B1B3B6D0FE3D2 /* da */,
+				EB5A8D7FD6F41E6886B40296 /* nb */,
+				2CDD47A6C20F22138DC5C02F /* fi */,
+				5A54CCE84373277282A0E0A1 /* cs */,
+				DAEA851F88EF41728A2DA7F8 /* sk */,
+				1C710119A464C685E1E7280A /* hu */,
+				C1527F5798B1385328A69781 /* ro */,
+				40052C6C24536E75DA1B3581 /* hr */,
+				A4B9290544265BC91B5F7EDA /* ca */,
+				44895E2B14EABAACF944D9B0 /* ms */,
+				36080276A89C1A2B5460AD31 /* uk */,
+				4C8B32437FD11F646CD91DE4 /* el */,
+				1BEB5D5953D9C86F3892F3E1 /* he */,
+				38F8E4053FDB822FF08CF9D6 /* hi */,
 			);
 			name = CYLTabBarController.strings;
 			sourceTree = "<group>";
