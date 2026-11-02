@@ -193,6 +193,23 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 + (void)registerPlusButton;
 
 /*!
+ * [EN] A plus button with `image` above its title, both centered (the image 70 % of the button's width). The titles go
+ *      through `CYLLocalizedString()`; the normal title is gray, the selected one `selectedTitleColor` (default blue).
+ *      The button does not darken on touch and is sized to fit. Call it on your subclass in `+plusButton`:
+ *
+ *          static func plusButton() -> Any {
+ *              CYLPlusButtonSubclass.cyl_plusButton(with: UIImage(named: "post_normal")!, title: "发布",
+ *                                                   selectedTitle: "选中", selectedTitleColor: .blue)
+ *          }
+ * [CN] 图片在上、标题在下且都居中的 PlusButton（图片宽度为按钮宽度的 70%）。标题经过 `CYLLocalizedString()`；普通状态标题为灰色，
+ *      选中状态为 `selectedTitleColor`（默认蓝色）。按下时不变暗，并自动调整尺寸。在子类的 `+plusButton` 中调用（示例见上）。
+ */
++ (instancetype)cyl_plusButtonWithImage:(UIImage *)image
+                                  title:(NSString *)title
+                          selectedTitle:(nullable NSString *)selectedTitle
+                     selectedTitleColor:(nullable UIColor *)selectedTitleColor;
+
+/*!
  * [EN] Removes the plus button registered for this class's context from its superview, together with its child view
  *      controller, and unregisters them. The plus buttons of other contexts are not touched. When called on
  *      `CYLPlusButton` itself, which has no context of its own, it removes the one `CYLExternPlusButton` points at, as before.

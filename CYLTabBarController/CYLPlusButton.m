@@ -114,8 +114,63 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 
 @implementation CYLPlusButton
 //@synthesize selected = _selected;
+
+/*!
+ * [EN] VoiceOver: an icon-only plus button was read as its image's file name (or not at all). It is read as its title, or
+ *      as "plus button" in the app's language when it has none; an `accessibilityLabel` set by the app still wins.
+ * [CN] VoiceOver：仅有图标的 PlusButton 会被读成图片文件名（或不读）。现在朗读其标题；没有标题时朗读 App 语言的“加号按钮”；
+ *      App 自行设置的 `accessibilityLabel` 仍然优先。
+ */
+- (NSString *)accessibilityLabel {
+    NSString *label = objc_getAssociatedObject(self, @selector(accessibilityLabel));
+    if (label.length > 0) {
+        return label;
+    }
+    NSString *title = self.currentTitle ?: self.titleLabel.text;
+    return title.length > 0 ? title : CYLLocalizedString(@"加号按钮");
+}
+
+- (void)setAccessibilityLabel:(NSString *)accessibilityLabel {
+    objc_setAssociatedObject(self, @selector(accessibilityLabel), accessibilityLabel, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
 #pragma mark -
 #pragma mark - public Methods
+
++ (instancetype)cyl_plusButtonWithImage:(UIImage *)image
+                                  title:(NSString *)title
+                          selectedTitle:(NSString *)selectedTitle
+                     selectedTitleColor:(UIColor *)selectedTitleColor {
+    CYLPlusButton *button = [[self alloc] init];
+    [button setImage:image forState:UIControlStateNormal];
+    // An explicit highlighted image is drawn as is, so the button does not darken on touch.
+    [button setImage:image forState:UIControlStateHighlighted];
+    button.titleLabel.textAlignment = NSTextAlignmentCenter;
+    button.titleLabel.font = [UIFont systemFontOfSize:10];
+    [button setTitle:CYLLocalizedString(title) forState:UIControlStateNormal];
+    [button setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+    [button setTitle:CYLLocalizedString(selectedTitle ?: title) forState:UIControlStateSelected];
+    [button setTitleColor:selectedTitleColor ?: [UIColor blueColor] forState:UIControlStateSelected];
+    objc_setAssociatedObject(button, @selector(cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:), @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [button sizeToFit];
+    return button;
+}
+
+/// The image-above-title layout of `+cyl_plusButtonWithImage:…`; other plus buttons keep UIButton's layout.
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    if (![objc_getAssociatedObject(self, @selector(cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:)) boolValue]) {
+        return;
+    }
+    CGFloat imageWidth = CGRectGetWidth(self.bounds) * 0.7;
+    CGFloat imageHeight = imageWidth * 0.9;
+    CGFloat centerX = CGRectGetWidth(self.bounds) * 0.5;
+    CGFloat lineHeight = self.titleLabel.font.lineHeight;
+    CGFloat verticalMargin = (CGRectGetHeight(self.bounds) - lineHeight - imageHeight) * 0.5;
+    self.imageView.bounds = CGRectMake(0, 0, imageWidth, imageHeight);
+    self.imageView.center = CGPointMake(centerX, verticalMargin + imageHeight * 0.5);
+    self.titleLabel.bounds = CGRectMake(0, 0, CGRectGetWidth(self.bounds), lineHeight);
+    self.titleLabel.center = CGPointMake(centerX, imageHeight + verticalMargin * 2 + lineHeight * 0.5 + 10);
+}
 
 + (void)registerPlusButton {
     if (![self conformsToProtocol:@protocol(CYLPlusButtonSubclassing)]) {

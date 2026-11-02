@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CYLTabBarController
 
 class TabBarCommon: NSObject {
     
@@ -35,7 +36,10 @@ class TabBarCommon: NSObject {
     class func TabBarController() {
         CYLPlusButtonSubclass.register()
         let appDelegate = UIApplication.shared.delegate
-        appDelegate?.window??.rootViewController = RootTabBarController(viewControllers: ViewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
+        // Rebuilt after a language change, so every text shows in the new language.
+        appDelegate?.window??.cyl_setRootViewControllerProvider {
+            RootTabBarController(viewControllers: ViewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
+        }
     }
     
     //MARK:主界面

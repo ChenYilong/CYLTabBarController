@@ -36,28 +36,13 @@ class MainRootNavigationViewController: UINavigationController {
     }
     
 
-    static func tabBarItemsAttributesForController() ->  [[String : String]] {
-        
-        let tabBarItemOne = [CYLTabBarItemTitle:CYLLocalizedString("首页"),
-                             CYLTabBarItemImage:"home_normal",
-                             CYLTabBarItemSelectedImage:"home_highlight"]
-        
-        let tabBarItemTwo = [CYLTabBarItemTitle:CYLLocalizedString("同城"),
-                             CYLTabBarItemImage:"mycity_normal",
-                             CYLTabBarItemSelectedImage:"mycity_highlight"]
-        
+    static func tabBarItemsAttributesForController() -> [[AnyHashable: Any]] {
         // Dark Mode (#620): "home_normal" also loads home_normal_dark (naming convention), the message tab names its dark
         // image, account_normal has its own Dark appearance. 深色模式：见 README「适配深色模式」。
-        let tabBarItemThree = [CYLTabBarItemTitle:CYLLocalizedString("消息"),
-                               CYLTabBarItemImage:"message_normal",
-                               CYLTabBarItemDarkImage:"message_normal_night",
-                               CYLTabBarItemSelectedImage:"message_highlight"]
-        
-        let tabBarItemFour = [CYLTabBarItemTitle:CYLLocalizedString("我的"),
-                              CYLTabBarItemImage:"account_normal",
-                              CYLTabBarItemSelectedImage:"account_highlight"]
-        let tabBarItemsAttributes = [tabBarItemOne,tabBarItemTwo,tabBarItemThree,tabBarItemFour]
-        return tabBarItemsAttributes
+        return CYLLocalizedTabBarItemsAttributes(["首页", "同城", "消息", "我的"],
+                                                 ["home_normal", "mycity_normal", "message_normal", "account_normal"],
+                                                 ["home_highlight", "mycity_highlight", "message_highlight", "account_highlight"],
+                                                 [2: "message_normal_night"])
     }
 }
 

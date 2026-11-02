@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import CYLTabBarController
 
 private let cellIdentifier = "cell"
 
@@ -15,7 +14,7 @@ final class HomeViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = CYLLocalizedString("首页")
+        self.navigationItem.title = "首页"
         self.navigationController?.tabBarItem.badgeValue = "3"
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
     }
@@ -26,7 +25,7 @@ extension HomeViewController{
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-        cell.textLabel?.text = String(format: CYLLocalizedString("我是第%ld行"), indexPath.row)
+        cell.textLabel?.text = "我是第\(indexPath.row)行"
         return cell
     }
     

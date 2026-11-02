@@ -5,6 +5,7 @@
 //
 
 import UIKit
+import CYLTabBarController
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
@@ -12,10 +13,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
 
-//        let mainTabBarVc = MainTabBarController()
-        let mainTabBarVc = MainRootNavigationViewController()
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = mainTabBarVc
+        // Rebuilt after a language change, so every text shows in the new language.
+        window.cyl_setRootViewControllerProvider { MainRootNavigationViewController() }
         window.makeKeyAndVisible()
         self.window = window
         // Keep AppDelegate.window in sync for code that still reads it.

@@ -26,6 +26,7 @@
 #import "UIColor+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
 #import "CYLLocalization.h"
+#import "UIImage+CYLTabBarControllerExtention.h"
 
 #if CYL_FLATDESIGN_AVAILABLE
 //#import <CYLTabBarController/CYLTabBarController.h>
@@ -607,12 +608,12 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 + (nullable CYLTabBarController *)cyl_activeTabBarController;
 
 /*!
- * [EN] Debug and demo helper: simulates a system memory warning with public API only. It posts
+ * [EN] Debug helper: simulates a system memory warning with public API only. It posts
  *      `UIApplicationDidReceiveMemoryWarningNotification` (view controllers receive `-didReceiveMemoryWarning`) and calls the
  *      app delegate's `-applicationDidReceiveMemoryWarning:`, then logs every tab of the most recently active tab bar
  *      controller: its Lottie view and `animationSpeed` (issue #428) and whether its badge is shown. Use it to check that
  *      your tab bar keeps them after a memory warning (issue #426), in every tab bar style. Main thread only.
- * [CN] 调试与演示用：仅使用公开 API 模拟系统内存警告。发送 `UIApplicationDidReceiveMemoryWarningNotification`（视图控制器会收到
+ * [CN] 调试用：仅使用公开 API 模拟系统内存警告。发送 `UIApplicationDidReceiveMemoryWarningNotification`（视图控制器会收到
  *      `-didReceiveMemoryWarning`）并调用 App 代理的 `-applicationDidReceiveMemoryWarning:`，随后输出最近活跃的 TabBarController
  *      每个 Tab 的状态：Lottie 视图及其 `animationSpeed`（issue #428）、角标是否显示。用于检查内存警告后 TabBar 是否保持这些状态
  *      （issue #426），适用于所有 TabBar 样式。请在主线程调用。

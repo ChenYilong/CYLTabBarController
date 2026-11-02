@@ -495,6 +495,19 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     // [kActualView cyl_showBadge];
     SEL selector = @selector(cyl_showBadge);
     [kActualView cyl_performSelector:selector];
+    [self cyl_setBadgeAccessibilityValue:@""];
+}
+
+/*!
+ * [EN] VoiceOver reads a tab from its `UITabBarItem` (Liquid Glass builds its own accessibility elements from it), not from
+ *      the button the badge view is added to, so the badge also goes into the item's `accessibilityValue`:
+ *      "Messages, 3 new messages". nil clears it.
+ * [CN] VoiceOver 根据 `UITabBarItem` 朗读 Tab（液态玻璃据此生成自己的无障碍元素），而不是角标所在的按钮，因此角标也写入该
+ *      item 的 `accessibilityValue`：“消息，3 条新消息”。传 nil 清除。
+ */
+- (void)cyl_setBadgeAccessibilityValue:(NSString *)value {
+    UIViewController *tabViewController = (self.navigationController.viewControllers.firstObject == self) ? self.navigationController : self;
+    tabViewController.tabBarItem.accessibilityValue = CYLBadgeAccessibilityDescription(value);
 }
 
 - (void)cyl_showBadgeValue:(NSString *)value
@@ -502,6 +515,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     //    [kActualView cyl_showBadgeValue:value animationType:animationType];
     SEL selector = @selector(cyl_showBadgeValue:animationTypeValue:);
     [kActualView cyl_performSelector:selector withObject:value withObject:animationTypeValue];
+    [self cyl_setBadgeAccessibilityValue:value];
 }
 
 - (void)cyl_showBadgeValue:(NSString *)value
@@ -513,6 +527,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     //    [kActualView cyl_clearBadge];
     SEL selector = @selector(cyl_clearBadge);
     [kActualView cyl_performSelector:selector];
+    [self cyl_setBadgeAccessibilityValue:nil];
 }
 
 - (void)cyl_resumeBadge {

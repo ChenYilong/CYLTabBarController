@@ -8,6 +8,7 @@
 
 #import "CYLSameCityViewController.h"
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
+#import <CYLTabBarController/CYLLocalization.h>
 #import "CYLDetailsViewController.h"
 #import <MJRefresh/MJRefresh.h>
 
@@ -55,6 +56,9 @@
 #pragma mark - Table view
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == CYLLanguageSettingSection) {
+        return [self cyl_languageCellForTableView:tableView];
+    }
     static NSString * CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
@@ -64,11 +68,24 @@
     return cell;
 }
 
+// Section 0: the language setting. 第 0 组：语言设置。
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (section == CYLLanguageSettingSection) {
+        return 1;
+    }
     return MAX(15, [UITableViewCell cyl_badgeStyleCount]); // every badge style has a row
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == CYLLanguageSettingSection) {
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        [self cyl_presentLanguagePicker];
+        return;
+    }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     [CYLTabBarController cyl_simulateMemoryWarning]; // #426/#428: memory warning demo, see the log 内存警告演示，见日志
     UIViewController *viewController = [[CYLDetailsViewController alloc] init];

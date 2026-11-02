@@ -63,6 +63,19 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 
 @end
 
+NSString *CYLBadgeAccessibilityDescription(NSString *value) {
+    if (!value) {
+        return nil;
+    }
+    if (value.length == 0) {
+        return CYLLocalizedString(@"有新内容");
+    }
+    if ([value rangeOfString:@"^[0-9]+\\+?$" options:NSRegularExpressionSearch].location != NSNotFound) {
+        return value.integerValue > 0 ? [NSString stringWithFormat:CYLLocalizedString(@"%@ 条新消息"), value] : nil;
+    }
+    return CYLLocalizedString(value);
+}
+
 @implementation UIView (CYLBadgeExtention)
 
 #pragma mark -- public methods
@@ -252,6 +265,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 - (void)cyl_clearBadge {
     [self cyl_invalidatePendingBadgeValue];
     [self.cyl_badge cyl_setHidden:YES];
+    [self cyl_updateBadgeAccessibility];
 }
 
 - (BOOL)cyl_isShowBadge {
@@ -324,9 +338,9 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
         [self cyl_resetRedDotBadgeFrame];
         self.cyl_badge.layer.cornerRadius = CGRectGetWidth(self.cyl_badge.frame) / 2;
     }
-    self.cyl_badge.isAccessibilityElement = NO;
     [self cyl_applyBadgeBorder];
     [self.cyl_badge cyl_setHidden:NO];
+    [self cyl_updateBadgeAccessibility];
 }
 
 - (void)cyl_showNewBadge:(NSString *)value {
@@ -349,7 +363,7 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     }
     if (value == 0 || !value ||value.length == 0) {
         [self.cyl_badge cyl_setHidden:YES];
-
+        [self cyl_updateBadgeAccessibility];
         return;
     }
     [self cyl_badgeInit];
@@ -360,10 +374,48 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
     [self cyl_addMargin];
     [self cyl_layoutBadgeAtTopRightCorner];
     self.cyl_badge.layer.cornerRadius = [self cyl_textBadgeCornerRadius];
-    self.cyl_badge.isAccessibilityElement = YES;
-    self.cyl_badge.accessibilityLabel = value;
     [self cyl_applyBadgeBorder];
     [self.cyl_badge cyl_setHidden:NO];
+    [self cyl_updateBadgeAccessibility];
+}
+
+/*!
+ * [EN] VoiceOver. The badge label sits deep inside its host, and when an ancestor is an accessibility element (a tab
+ *      button, a table view cell, a bar button), VoiceOver never reads that element's subviews, so the badge was silent.
+ *      Its meaning ("3 new messages", "New content", "New") becomes the `accessibilityValue` of the nearest accessible
+ *      ancestor, e.g. "Messages, 3 new messages"; that element's own value comes back when the badge is cleared. With no
+ *      such ancestor, the badge label itself is the element.
+ * [CN] VoiceOver：角标 label 位于宿主视图深处，当祖先视图是无障碍元素（Tab 按钮、cell、导航栏按钮）时，VoiceOver 不会读取
+ *      其子视图，角标因此无法被读到。现在把角标含义（“3 条新消息”“有新内容”“新”）设为最近的无障碍祖先的
+ *      `accessibilityValue`，例如“消息，3 条新消息”；清除角标时恢复该元素原有的值。没有这样的祖先时，角标 label 自身作为元素。
+ */
+- (void)cyl_updateBadgeAccessibility {
+    UIView<CYLBadgeTextDisplaying> *badge = self.cyl_badge;
+    NSString *description = (badge && !badge.cyl_isHidden) ?
+        CYLBadgeAccessibilityDescription(badge.tag == CYLBadgeStyleRedDot ? @"" : badge.text) : nil;
+    UIView *element = self.isAccessibilityElement ? self : nil;
+    for (UIView *view = self.superview; !element && view && ![view isKindOfClass:[UIWindow class]]; view = view.superview) {
+        if (view.isAccessibilityElement) {
+            element = view;
+        }
+    }
+    badge.isAccessibilityElement = (element == nil && description != nil);
+    badge.accessibilityLabel = description;
+    if (!element) {
+        return;
+    }
+    static const void *CYLBadgeOriginalAccessibilityValueKey = &CYLBadgeOriginalAccessibilityValueKey;
+    id saved = objc_getAssociatedObject(element, CYLBadgeOriginalAccessibilityValueKey);
+    if (description) {
+        if (!saved) {
+            // NSNull marks "had no value", so the original nil can be restored too.
+            objc_setAssociatedObject(element, CYLBadgeOriginalAccessibilityValueKey, element.accessibilityValue ?: [NSNull null], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        element.accessibilityValue = description;
+    } else if (saved) {
+        element.accessibilityValue = [saved isKindOfClass:[NSString class]] ? (NSString *)saved : nil;
+        objc_setAssociatedObject(element, CYLBadgeOriginalAccessibilityValueKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
 }
 
 - (void)cyl_showNumberBadgeWithValue:(NSInteger)value {

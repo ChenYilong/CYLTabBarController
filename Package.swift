@@ -7,7 +7,7 @@ import PackageDescription
 // SPM cannot share one set of sources between several products, so there is no Core-only variant.
 let package = Package(
     name: "CYLTabBarController",
-    // Localized strings (`CYLLocalizedString()`) are in `CYLTabBarController/Resources/*.lproj`.
+    // The resource bundle (localized strings, see `CYLResourceBundle()`) is `CYLTabBarController/Resources/CYLTabBarController.bundle`.
     defaultLocalization: "en",
     platforms: [
         // lottie-ios 4.x requires iOS 13.
@@ -39,7 +39,7 @@ let package = Package(
             ],
             path: "CYLTabBarController",
             exclude: ["LottieSwift"],
-            resources: [.process("Resources")],
+            resources: [.copy("Resources/CYLTabBarController.bundle")],
             // `include/` holds the module map plus `CYLTabBarController/*.h` shims, so the
             // CocoaPods-style `<CYLTabBarController/...>` imports and `__has_include` checks
             // (which enable FlatDesign and Lottie code) also resolve under SPM.

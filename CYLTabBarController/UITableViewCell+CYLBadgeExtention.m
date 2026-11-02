@@ -114,9 +114,12 @@ static UIColor *CYLBadgeHelperDynamicBorderColor(void) {
  * 3. the other corners: top-left, bottom-left, bottom-right.
  */
 + (NSArray<NSDictionary *> *)cyl_badgeItems {
+    // Rebuilt when the language changes (`CYLSetLocalizationLanguage()`), so the titles follow it.
     static NSArray *items;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
+    static NSString *itemsLanguage;
+    NSString *language = CYLLocalizationLanguage();
+    if (!items || ![itemsLanguage isEqualToString:language]) {
+        itemsLanguage = language;
         items = @[
             // 1.1 Animations that repeat forever: `CYLBadgeAnimationType`
             @{CYLBadgeItemTitle: CYLLocalizedString(@"Scale (forever)"),   CYLBadgeItemValue: @"3", CYLBadgeItemAnimationType: @(CYLBadgeAnimationTypeScale)},
@@ -162,7 +165,7 @@ static UIColor *CYLBadgeHelperDynamicBorderColor(void) {
             @{CYLBadgeItemTitle: CYLLocalizedString(@"Bottom left"),  CYLBadgeItemValue: @"5", CYLBadgeItemPosition: CYLBadgeBottomLeft},
             @{CYLBadgeItemTitle: CYLLocalizedString(@"Bottom right"), CYLBadgeItemValue: @"5", CYLBadgeItemPosition: CYLBadgeBottomRight},
         ];
-    });
+    }
     return items;
 }
 
@@ -172,7 +175,7 @@ static UIColor *CYLBadgeHelperDynamicBorderColor(void) {
     static UIImage *icon;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        UIImage *image = [UIImage imageNamed:@"DemoIcon"];
+        UIImage *image = [UIImage imageNamed:@"cyl_badge_sample_icon" inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil];
         CGRect rect = CGRectMake(0, 0, CYLBadgeIconSide, CYLBadgeIconSide);
         icon = [[[UIGraphicsImageRenderer alloc] initWithSize:rect.size] imageWithActions:^(UIGraphicsImageRendererContext *context) {
             [[UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:6] addClip];
@@ -260,11 +263,18 @@ static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CYLBadgeHelperCellIdentifier];
 }
 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [UITableViewCell cyl_badgeStyleCount];
+    return section == CYLLanguageSettingSection ? 1 : [UITableViewCell cyl_badgeStyleCount];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == CYLLanguageSettingSection) {
+        return [self cyl_languageCellForTableView:tableView];
+    }
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLBadgeHelperCellIdentifier forIndexPath:indexPath];
     cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
     [cell cyl_showBadgeForRow:indexPath.row];
@@ -273,9 +283,14 @@ static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    if (indexPath.section == CYLLanguageSettingSection) {
+        [self cyl_presentLanguagePicker];
+        return;
+    }
     [[tableView cellForRowAtIndexPath:indexPath].imageView cyl_clearBadge];
-    // Demo (issues #426, #428): a tap also simulates a memory warning and logs the tab bar's state afterwards, to check
-    // that the tab Lottie icons keep their speed and the badges stay. 演示：点击同时模拟内存警告并输出之后的 TabBar 状态。
+    !self.didSelectRowHandler ?: self.didSelectRowHandler(indexPath);
+    // Issues #426, #428: a tap also simulates a memory warning and logs the tab bar's state afterwards, to check
+    // that the tab Lottie icons keep their speed and the badges stay. 点击同时模拟内存警告并输出之后的 TabBar 状态。
     [CYLTabBarController cyl_simulateMemoryWarning];
 }
 

@@ -27,8 +27,8 @@ class NextHomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // The button titles come from the xib; show them in the app's language.
-        view.cyl_localizeTexts()
+
+        // Do any additional setup after loading the view.
     }
 
     override func didReceiveMemoryWarning() {

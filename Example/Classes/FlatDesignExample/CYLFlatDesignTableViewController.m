@@ -8,6 +8,7 @@
 
 #import "CYLFlatDesignTableViewController.h"
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
+#import <CYLTabBarController/CYLLocalization.h>
 #import "CYLFlatDesignTabBarDemoViewController.h"
 #import "CYLPopPushDemoViewController.h"
 #import "CYLFlatDesignMainTabBarController.h"
@@ -106,11 +107,22 @@
 
 #pragma mark - Table view data source
 
+// Section 0: the language setting. 第 0 组：语言设置。
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (section == CYLLanguageSettingSection) {
+        return 1;
+    }
     return 50;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == CYLLanguageSettingSection) {
+        return [self cyl_languageCellForTableView:tableView];
+    }
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
@@ -152,6 +164,11 @@
 #pragma mark UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == CYLLanguageSettingSection) {
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        [self cyl_presentLanguagePicker];
+        return;
+    }
 #if CYL_FLATDESIGN_AVAILABLE
 
     [tableView deselectRowAtIndexPath:indexPath animated:true];
