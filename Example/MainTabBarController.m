@@ -413,6 +413,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //        return _selectedCover;
     //    }
     UIButton *selectedCover = [UIButton buttonWithType:UIButtonTypeCustom];
+    // Decoration over the selected tab; VoiceOver reads the tab itself, not "home select cover".
+    selectedCover.accessibilityElementsHidden = YES;
     
     UIImage *image = [UIImage imageNamed:@"home_select_cover"];
     [selectedCover setImage:image forState:UIControlStateNormal];

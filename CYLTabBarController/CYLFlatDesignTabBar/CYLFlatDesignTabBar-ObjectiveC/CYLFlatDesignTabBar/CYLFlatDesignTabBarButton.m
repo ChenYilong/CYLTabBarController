@@ -398,4 +398,27 @@
     return self.cyl_getActualBadgeSuperView;
 }
 
+#pragma mark - VoiceOver
+
+/*!
+ * [EN] VoiceOver: the flat design tab bar is made of plain views, so a tab was read as loose pieces (its badge, then its
+ *      title) with no button role or selected state. Each button is now one element: its title, the button and selected
+ *      traits, and its badge as the value (set by `UIView+CYLBadgeExtention`, e.g. "Messages, 3 new messages"). A slot
+ *      without a title (the one under the plus button) is not an element; the plus button is.
+ * [CN] VoiceOver：扁平样式 TabBar 由普通视图组成，Tab 会被拆成零散的内容（先读角标再读标题），没有按钮角色和选中状态。现在每个按钮
+ *      是一个元素：标题、按钮与选中特征，角标作为值（由 `UIView+CYLBadgeExtention` 设置，如“消息，3 条新消息”）。没有标题的位置
+ *      （加号按钮下方）不作为元素，由加号按钮代替。
+ */
+- (BOOL)isAccessibilityElement {
+    return self.accessibilityLabel.length > 0;
+}
+
+- (NSString *)accessibilityLabel {
+    return [super accessibilityLabel] ?: (self.tabBarItem.title.length > 0 ? self.tabBarItem.title : self.titleLabel.text);
+}
+
+- (UIAccessibilityTraits)accessibilityTraits {
+    return [super accessibilityTraits] | UIAccessibilityTraitButton | (self.isSelected ? UIAccessibilityTraitSelected : UIAccessibilityTraitNone);
+}
+
 @end

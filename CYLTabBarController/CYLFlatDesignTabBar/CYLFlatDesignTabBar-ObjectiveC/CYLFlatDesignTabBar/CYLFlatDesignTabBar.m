@@ -120,6 +120,8 @@
 
 - (void)commonInit {
     _selectedItemIndex = -1;
+    // VoiceOver announces its buttons as tabs ("tab, 2 of 5"). VoiceOver 将其中的按钮朗读为标签页。
+    self.accessibilityTraits |= UIAccessibilityTraitTabBar;
     _buttons = [NSMutableArray array];
     
     _backgroundView = [[UIView alloc] init];

@@ -808,7 +808,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (CYLFlatDesignTabBarItem *)cyl_tabBarItem {
     CYLFlatDesignTabBarItem *tabBarItem = objc_getAssociatedObject(self, @selector(cyl_tabBarItem));
     if (!tabBarItem) {
-        NSString *title = tabBarItem.title ?: self.title ?: @"test";
+        // No title (e.g. the slot under the plus button) stays empty: "test" used to be shown, and read by VoiceOver.
+        NSString *title = tabBarItem.title ?: self.title ?: @"";
         UIImage *image = tabBarItem.image ?: [UIImage cyl_tabItemPlaceholderImage];
         ;
         UIImage *selectedImage = tabBarItem.selectedImage ?: [UIImage cyl_tabItemPlaceholderImage];
