@@ -29,8 +29,9 @@ FOUNDATION_EXTERN const CGFloat CYLBadgeRowHeight;
 - (void)cyl_showBadgeForRow:(NSInteger)row;
 
 /*!
- * [EN] Title of the badge sample shown on `row`.
- * [CN] 第 `row` 行角标样例的标题。
+ * [EN] Title of the badge sample shown on `row`, followed by the core API that produces the effect, e.g.
+ *      "20. Number (cyl_showBadgeValue:)" or "6. Rotation (forever) (cyl_rotationAnimationWithDuration:)".
+ * [CN] 第 `row` 行角标样例的标题，后面附上实现该效果的核心 API，例如“20. 数字 (cyl_showBadgeValue:)”。
  */
 + (NSString *)cyl_badgeTitleForRow:(NSInteger)row;
 
