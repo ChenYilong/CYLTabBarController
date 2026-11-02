@@ -6,7 +6,7 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -50,5 +50,21 @@ FOUNDATION_EXTERN void CYLSetLocalizationLanguage(NSString * _Nullable language)
  * [CN] `CYLLocalizedString()` 当前使用的语言，例如 @"zh-Hans"。
  */
 FOUNDATION_EXTERN NSString *CYLLocalizationLanguage(void);
+
+@interface UIView (CYLLocalization)
+
+/*!
+ * [EN] Translates, with `CYLLocalizedString()`, the texts set in a xib or storyboard: the text of every `UILabel`, the
+ *      titles of every `UIButton` and the placeholder of every `UITextField` in this view and its subviews. Call it once,
+ *      e.g. in `-viewDidLoad` with `self.view`, so a xib needs no per-language copy:
+ *
+ *          [self.view cyl_localizeTexts];    // Objective-C
+ *          view.cyl_localizeTexts()          // Swift
+ * [CN] 用 `CYLLocalizedString()` 翻译 xib 或 storyboard 中设置的文字：当前视图及其子视图中所有 `UILabel` 的 text、`UIButton` 的
+ *      标题以及 `UITextField` 的 placeholder。在 `-viewDidLoad` 中对 `self.view` 调用一次即可，xib 无需为每种语言复制一份（示例见上）。
+ */
+- (void)cyl_localizeTexts;
+
+@end
 
 NS_ASSUME_NONNULL_END

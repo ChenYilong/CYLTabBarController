@@ -36,13 +36,13 @@
 "Number above maximum" = "Nombre au-delà du maximum";
 "OK" = "OK";
 "Other text" = "Autre texte";
-"PlusButton → 「%@」" = "PlusButton → « %@ »";
+"PlusButton → 「%@」" = "Bouton plus → « %@ »";
 "Pop & Select（Pop 到栈底并切换 Tab）" = "Pop & Select (pop jusqu’à la racine et changer d’onglet)";
 "Pop 当前导航栈、选中「%@」，再向该 Tab push 一个新的演示页" = "Pop de la pile actuelle, sélection de « %@ », puis push d’une nouvelle page de démo dans cet onglet";
 "Pop 当前导航栈到栈底，并选中「%@」（index %@），无动画" = "Pop de la pile actuelle jusqu’à la racine et sélection de « %@ » (index %@), sans animation";
-"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）" = "Push vers un autre CYLFlatDesignTabBarController (autre PlusButton)";
-"Push To 系统 UITabBarController（另一个 PlusButton）" = "Push vers un UITabBarController système (autre PlusButton)";
-"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）" = "Push d’un TabBarController de même context (même classe PlusButton)";
+"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）" = "Push vers un autre CYLFlatDesignTabBarController (autre bouton plus)";
+"Push To 系统 UITabBarController（另一个 PlusButton）" = "Push vers un UITabBarController système (autre bouton plus)";
+"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）" = "Push d’un TabBarController de même context (même classe de bouton plus)";
 "Push（防重复 Push / Push 或 Pop）" = "Push (sans push en double / push ou pop)";
 "Red dot" = "Point rouge";
 "Red dot radius" = "Rayon du point rouge";

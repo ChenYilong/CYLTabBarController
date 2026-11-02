@@ -36,13 +36,13 @@
 "Number above maximum" = "Số vượt quá giá trị tối đa";
 "OK" = "OK";
 "Other text" = "Văn bản khác";
-"PlusButton → 「%@」" = "PlusButton → “%@”";
+"PlusButton → 「%@」" = "Nút cộng → “%@”";
 "Pop & Select（Pop 到栈底并切换 Tab）" = "Pop & Select (pop về gốc và chuyển tab)";
 "Pop 当前导航栈、选中「%@」，再向该 Tab push 一个新的演示页" = "Pop ngăn xếp hiện tại, chọn “%@”, rồi push một trang demo mới vào tab đó";
 "Pop 当前导航栈到栈底，并选中「%@」（index %@），无动画" = "Pop ngăn xếp hiện tại về gốc và chọn “%@” (index %@), không có hiệu ứng";
-"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）" = "Push sang CYLFlatDesignTabBarController khác (PlusButton khác)";
-"Push To 系统 UITabBarController（另一个 PlusButton）" = "Push sang UITabBarController của hệ thống (PlusButton khác)";
-"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）" = "Push TabBarController cùng context (cùng lớp PlusButton)";
+"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）" = "Push sang CYLFlatDesignTabBarController khác (nút cộng khác)";
+"Push To 系统 UITabBarController（另一个 PlusButton）" = "Push sang UITabBarController của hệ thống (nút cộng khác)";
+"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）" = "Push TabBarController cùng context (cùng lớp nút cộng)";
 "Push（防重复 Push / Push 或 Pop）" = "Push (chống push trùng / push hoặc pop)";
 "Red dot" = "Chấm đỏ";
 "Red dot radius" = "Bán kính chấm đỏ";

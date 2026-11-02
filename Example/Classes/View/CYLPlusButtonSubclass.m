@@ -21,6 +21,8 @@
 
 @end
 
+static CGFloat const CYLPlusButtonWidth = 55;
+
 @implementation CYLPlusButtonSubclass
 
 #pragma mark -
@@ -74,6 +76,19 @@
 
 //上下结构的 button
 
+/*!
+ * [EN] 9.5 pt, or smaller when the localized title is wider than `width` (e.g. German, Russian), so it stays on one line.
+ * [CN] 9.5 pt；本地化标题比 `width` 宽时（如德语、俄语）缩小字号，保证单行显示。
+ */
++ (UIFont *)titleFontFittingWidth:(CGFloat)width {
+    CGFloat const fontSize = 9.5;
+    CGFloat titleWidth = [[self plusButtonTitle] sizeWithAttributes:@{NSFontAttributeName: [UIFont systemFontOfSize:fontSize]}].width;
+    if (titleWidth <= width) {
+        return [UIFont systemFontOfSize:fontSize];
+    }
+    return [UIFont systemFontOfSize:MAX(7, floor(fontSize * width / titleWidth * 10) / 10)];
+}
+
 + (id)plusButton {
     // `[self alloc]`, not `CYLPlusButtonSubclass`: a subclass (`CYLSecondPlusButtonSubclass`) gets its own instance and its own icon.
     CYLPlusButtonSubclass *button = [[self alloc] init];
@@ -102,8 +117,8 @@
         config.imagePlacement = NSDirectionalRectEdgeTop;
         //        config.imagePadding = 1.0;
 
-        // 字体
-        UIFont *font = [UIFont systemFontOfSize:9.5];
+        // 字体：译文较长时缩小，保证单行显示 / smaller for long translations, so the title stays on one line
+        UIFont *font = [self titleFontFittingWidth:CYLPlusButtonWidth];
         // configuration 模式下 `-setTitleColor:forState:` 不生效，
         // 颜色只能在 transformer 里给定。normal / selectedContentView 是两个独立实例，
         // 各自在构造时就把颜色定死，避免依赖构造后才变化的 state。
@@ -115,6 +130,12 @@
             return [m copy];
         };
 
+        // The title gets the whole button width (the plain configuration adds leading/trailing insets).
+        NSDirectionalEdgeInsets contentInsets = config.contentInsets;
+        contentInsets.leading = 0;
+        contentInsets.trailing = 0;
+        config.contentInsets = contentInsets;
+        config.titleLineBreakMode = NSLineBreakByClipping;
         button.configuration = config;
 
         // ===== 禁用高亮变暗效果 =====
@@ -131,7 +152,7 @@
         // ===== iOS 15 以下：手动布局 =====
         button.adjustsImageWhenHighlighted = NO;
         button.backgroundColor = UIColor.clearColor;
-        button.titleLabel.font = [UIFont systemFontOfSize:9.5];
+        button.titleLabel.font = [self titleFontFittingWidth:CYLPlusButtonWidth];
 #pragma clang diagnostic pop
     }
 
@@ -143,7 +164,7 @@
     //    [button setTitleColor:[UIColor blackColor] forState:UIControlStateSelected]; // ← 加这一行
     //    [button setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted]; // ← 加这一行
     //    button.frame = CGRectMake(0.0, 0.0, 55, 80);
-    button.bounds = CGRectMake(0.0, 0.0, 55, 80);
+    button.bounds = CGRectMake(0.0, 0.0, CYLPlusButtonWidth, 80);
     
     // if you use `+plusChildViewController`, do not add Target to plusButton.
     SEL action = @selector(clickPublish);

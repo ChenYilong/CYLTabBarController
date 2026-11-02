@@ -36,13 +36,13 @@
 "Number above maximum" = "Üst sınırı aşan sayı";
 "OK" = "Tamam";
 "Other text" = "Diğer metin";
-"PlusButton → 「%@」" = "PlusButton → “%@”";
+"PlusButton → 「%@」" = "Artı düğmesi → “%@”";
 "Pop & Select（Pop 到栈底并切换 Tab）" = "Pop & Select (köke kadar pop ve sekme değiştir)";
 "Pop 当前导航栈、选中「%@」，再向该 Tab push 一个新的演示页" = "Geçerli yığını pop et, “%@” sekmesini seç, sonra o sekmeye yeni bir demo sayfası push et";
 "Pop 当前导航栈到栈底，并选中「%@」（index %@），无动画" = "Geçerli yığını köke kadar pop et ve “%@” (dizin %@) seç, animasyonsuz";
-"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）" = "Başka bir CYLFlatDesignTabBarController'a push (başka PlusButton)";
-"Push To 系统 UITabBarController（另一个 PlusButton）" = "Sistem UITabBarController'ına push (başka PlusButton)";
-"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）" = "Aynı context'e sahip TabBarController'ı push et (aynı PlusButton sınıfı)";
+"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）" = "Başka bir CYLFlatDesignTabBarController'a push (başka artı düğmesi)";
+"Push To 系统 UITabBarController（另一个 PlusButton）" = "Sistem UITabBarController'ına push (başka artı düğmesi)";
+"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）" = "Aynı context'e sahip TabBarController'ı push et (aynı artı düğmesi sınıfı)";
 "Push（防重复 Push / Push 或 Pop）" = "Push (yinelenen push yok / push veya pop)";
 "Red dot" = "Kırmızı nokta";
 "Red dot radius" = "Kırmızı nokta yarıçapı";

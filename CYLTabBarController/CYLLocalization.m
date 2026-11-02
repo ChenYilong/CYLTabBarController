@@ -98,3 +98,35 @@ NSString *CYLLocalizationLanguage(void) {
     CYLLocalizationLanguageBundle(&language);
     return language ?: CYLLocalizationFallbackLanguage;
 }
+
+@implementation UIView (CYLLocalization)
+
+- (void)cyl_localizeTexts {
+    if ([self isKindOfClass:[UIButton class]]) {
+        // The button's own title label is handled through its titles, not as a label.
+        UIButton *button = (UIButton *)self;
+        for (NSNumber *state in @[@(UIControlStateNormal), @(UIControlStateHighlighted), @(UIControlStateSelected), @(UIControlStateDisabled)]) {
+            NSString *title = [button titleForState:state.unsignedIntegerValue];
+            if (title.length > 0) {
+                [button setTitle:CYLLocalizedString(title) forState:state.unsignedIntegerValue];
+            }
+        }
+        return;
+    }
+    if ([self isKindOfClass:[UILabel class]]) {
+        UILabel *label = (UILabel *)self;
+        if (label.text.length > 0) {
+            label.text = CYLLocalizedString(label.text);
+        }
+    } else if ([self isKindOfClass:[UITextField class]]) {
+        UITextField *textField = (UITextField *)self;
+        if (textField.placeholder.length > 0) {
+            textField.placeholder = CYLLocalizedString(textField.placeholder);
+        }
+    }
+    for (UIView *subview in self.subviews) {
+        [subview cyl_localizeTexts];
+    }
+}
+
+@end

@@ -8,6 +8,7 @@
 
 #import "CYLFlatDesignSystemTabBarController.h"
 #import "CYLFlatDesignTableViewController.h"
+#import <CYLTabBarController/CYLLocalization.h>
 
 @interface CYLFlatDesignSystemTabBarController ()
 
