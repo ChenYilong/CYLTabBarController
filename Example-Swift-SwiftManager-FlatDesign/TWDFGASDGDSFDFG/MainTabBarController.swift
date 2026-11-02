@@ -57,11 +57,11 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             }
         }
         
-        // 动态：选中颜色
+        // 动态：选中颜色。Dark Mode (#620): the normal theme follows the system style, e.g. black on light, white on dark.
         var activeColor: UIColor {
             switch self {
             case .normal:
-                return .black
+                return UIColor.cyl_color(withLight: .black, dark: .white)
             case .roomStyle:
                 return .white
             }
@@ -71,7 +71,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         var tabBarBackground: UIColor {
             switch self {
             case .normal:
-                return .white
+                return UIColor.cyl_color(withLight: .white, dark: .black)
             case .roomStyle:
                 return .black
             }
@@ -137,13 +137,29 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         }
         
         // 2. 常态图标 (替换为你的占位图或实际图片名)
+        // Dark Mode (#620): "home_normal" also loads home_normal_dark (naming convention), account_normal has its own Dark
+        // appearance, the chat tab names its dark image below. 深色模式：见 README「适配深色模式」。
+        private var iconName: String {
+            switch self {
+            case .home: return "home"
+            case .room: return "mycity"
+            case .chat: return "message"
+            case .mine: return "account"
+            }
+        }
+
         func icon(for theme: Theme) -> AssetType {
-            return .native("tabbar_icon_normal")
+            return .native("\(iconName)_normal")
+        }
+
+        // 2.1 深色模式常态图标，nil 表示沿用 Asset Catalog 的 Dark 外观或命名规范
+        var darkIcon: AssetType? {
+            return self == .chat ? .native("message_normal_night") : nil
         }
         
         // 3. 选中图标 (替换为你的占位图或实际图片名)
         var activeIcon: AssetType {
-            return .native("tabbar_icon_selected")
+            return .native("\(iconName)_highlight")
         }
         
         // 4. 动效配置：LottieResources/tabbar_<模块>_<主题>.json，例如 tabbar_home_normal.json
@@ -201,6 +217,9 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
                 CYLTabBarItemImagePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: 1.5)),
                 CYLTabBarItemTitlePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: -1.5))
             ]
+            if let darkIcon = module.darkIcon {
+                attrs[CYLTabBarItemDarkImage] = darkIcon.identifier
+            }
             
             if let anim = module.animation(for: theme), let url = anim.resolvedURL {
                 attrs[CYLTabBarLottieURL] = url
@@ -229,9 +248,10 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             flatTabBar.backgroundImage = UIImage()
             flatTabBar.barTintColor = theme.tabBarBackground
             flatTabBar.backgroundColor = theme.tabBarBackground
+            // A 1-pt line from the library; a dynamic color would give an image that follows Dark Mode too.
             flatTabBar.shadowImage = theme.shadowColor == .clear
                 ? UIImage()
-                : Self.solidImage(theme.shadowColor)
+                : UIImage.cyl_image(with: theme.shadowColor, size: CGSize(width: 1, height: 1)) ?? UIImage()
             viewControllers?.forEach { vc in
                 let item = vc.cyl_getViewControllerInsteadOfNavigation().cyl_tabBarItem
                 item?.setTitleTextAttributes(normalAttrs, for: .normal)
@@ -268,18 +288,5 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         let root = viewController.cyl_getViewControllerInsteadOfNavigation()
         // 此处判断逻辑已根据 ViewController 标题解耦
         currentTheme = (root.navigationItem.title == "房间") ? .roomStyle : .normal
-    }
-    
-    private static func solidImage(_ color: UIColor) -> UIImage {
-        let size = CGSize(width: 1, height: 1)
-        let format = UIGraphicsImageRendererFormat.default()
-        format.opaque = true
-        format.scale = UIScreen.main.scale
-        let image = UIGraphicsImageRenderer(size: size, format: format).image { ctx in
-            color.setFill()
-            ctx.fill(CGRect(origin: .zero, size: size))
-        }
-        return image.resizableImage(withCapInsets: .zero, resizingMode: .stretch)
-            .withRenderingMode(.alwaysOriginal)
     }
 }

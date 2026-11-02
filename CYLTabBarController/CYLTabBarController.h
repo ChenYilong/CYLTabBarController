@@ -45,8 +45,32 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void(^CYLViewDidLayoutSubViewsBlock)(CYLTabBarController *tabBarController);
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitle;
+/*!
+ * FIX: issue #465
+ * [EN] `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` (and the dark keys below) take an image name or a UIImage.
+ *      A name is the prepared form, recommended for most cases: it is rendered as original (the icon keeps its colors)
+ *      and its dark image is loaded for you. A UIImage is used as it is: an image from `imageNamed:` has the
+ *      `Automatic` rendering mode, which a tab bar tints as a template, so icons turn into one-color silhouettes unless
+ *      you call `imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal` first.
+ * [CN] `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`（以及下方的深色图片键）可传图片名或 UIImage。图片名是库预先处理好的形式，
+ *      适用于大多数场景，推荐使用：按原图渲染（图标保持原有颜色），并自动加载深色图片。UIImage 原样使用：`imageNamed:` 得到的图片
+ *      渲染模式为 `Automatic`，TabBar 会把它当作模板图着色，图标变成单色剪影，除非先调用
+ *      `imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal`。
+ */
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImage;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedImage;
+/*!
+ * FIX: issue #620
+ * [EN] Optional dark images for `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`, as a name or a UIImage. The tab then
+ *      shows them where the interface style is dark (system setting or `overrideUserInterfaceStyle`) and switches by
+ *      itself. Not needed when the image has a Dark appearance in the asset catalog or a "<name>_dark" image exists
+ *      (`UIImage.cyl_darkImageNameSuffix`); when given, they replace those.
+ * [CN] 可选的深色图片，对应 `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`，可为图片名或 UIImage。界面风格为深色时
+ *      （系统设置或 `overrideUserInterfaceStyle`）Tab 显示这些图片，并自动切换。图片在 Asset Catalog 中自带 Dark 外观或存在
+ *      「<图片名>_dark」（`UIImage.cyl_darkImageNameSuffix`）时无需设置；设置后优先于它们。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemDarkImage;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedDarkImage;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieFilePath;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieURL;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize;

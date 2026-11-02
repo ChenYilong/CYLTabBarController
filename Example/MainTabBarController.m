@@ -141,9 +141,16 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 + (NSArray *)tabBarItemsAttributesForTabBar {
     
     // lottie动画的json文件来自于NorthSea, respect!
+    // Dark Mode (#620), three ways, one per tab: "首页" by naming convention, "消息" a UIImage built from two images,
+    // "我的" an asset catalog Dark appearance (recommended). The icons show when Lottie is off; with Lottie the
+    // animations below replace them. See also the flat design demo page.
+    // 深色模式（#620）三种方式，每个 Tab 一种：「首页」按命名规范，「消息」用两张图合成的 UIImage，「我的」用 Asset Catalog 的
+    // Dark 外观（推荐）。关闭 Lottie 时显示这些图标；开启时由下方的 Lottie 动画代替。另见扁平样式的演示页。
     //    CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
         CYLTabBarItemTitle : @"首页",
+        // A name also loads "<name>_dark" when that image exists: here home_normal_dark (UIImage.cyl_darkImageNameSuffix).
+        // 图片名会同时加载存在的「<name>_dark」：这里是 home_normal_dark（UIImage.cyl_darkImageNameSuffix）。
         CYLTabBarItemImage : @"home_normal",  /* NSString and UIImage are supported*/
         CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
         //                                                 CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
@@ -165,7 +172,12 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
     NSDictionary *thirdTabBarItemsAttributes = @{
         CYLTabBarItemTitle : @"消息",
+        // A dark image under any name. Names are the prepared form (rendered as original, #465); a UIImage object for
+        // the same is `[UIImage cyl_imageWithImageInfo:@"message_normal" darkImageInfo:@"message_normal_night"]`.
+        // 任意名称的深色图片。图片名是库预先处理好的形式（按原图渲染，#465）；同样效果的 UIImage 对象为
+        // `[UIImage cyl_imageWithImageInfo:@"message_normal" darkImageInfo:@"message_normal_night"]`。
         CYLTabBarItemImage : @"message_normal",
+        CYLTabBarItemDarkImage : @"message_normal_night",
         CYLTabBarItemSelectedImage : @"message_highlight",
         //                                                 CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-secondXOffset, -3.5)],
         //                                                 CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
@@ -174,6 +186,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     };
     NSDictionary *fourthTabBarItemsAttributes = @{
         CYLTabBarItemTitle : @"我的",
+        // account_normal has its own Dark appearance in Images.xcassets; it wins over any "_dark" image.
+        // account_normal 在 Images.xcassets 中自带 Dark 外观，优先于任何「_dark」图片。
         CYLTabBarItemImage : @"account_normal",
         CYLTabBarItemSelectedImage : @"account_highlight",
         //                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-firstXOffset, -3.5)],
@@ -431,10 +445,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
     if (@available(iOS 13.0, *)) {
 #if __has_include(<UIKit/UIScene.h>)
-        UITraitCollection *currentTraitCollection = CYLGetWindowScene().traitCollection;
-        UIUserInterfaceStyle currentStyle = currentTraitCollection.userInterfaceStyle;
-        UIUserInterfaceStyle previousStyle = previousTraitCollection ? previousTraitCollection.userInterfaceStyle : UIUserInterfaceStyleUnspecified;
-        if (currentStyle == previousStyle) {
+        // #620: compare this controller's own traits. The window scene's traits ignore `overrideUserInterfaceStyle` on
+        // the window or a view controller, so they only ever report the system style.
+        // #620：比较本控制器自身的 trait。window scene 的 trait 不认 window 或视图控制器上的 `overrideUserInterfaceStyle`，只反映系统风格。
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
             return;
         }
 #else

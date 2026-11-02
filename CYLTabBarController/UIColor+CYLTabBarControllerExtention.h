@@ -120,6 +120,29 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(class, nonatomic, readonly) UIColor *cyl_darkTextColor;     // for a light background
 
+#pragma mark Dark Mode
+
+/*!
+ * FIX: issue #552
+ * [EN] A color that follows Dark Mode: `darkColor` where the view's interface style is dark, `lightColor` otherwise
+ *      (including iOS 12 and an unspecified style). It is resolved each time it is drawn, so it switches with the system
+ *      setting and with any `overrideUserInterfaceStyle` on a window, view controller or view. Returns `lightColor` when
+ *      `darkColor` is nil.
+ *
+ *          tabBar.backgroundColor = [UIColor cyl_colorWithLightColor:UIColor.whiteColor darkColor:UIColor.blackColor];
+ *
+ *      Don't pick one of the two yourself by checking `UITraitCollection.currentTraitCollection` (or the screen's or
+ *      window scene's traits) when you set the color: outside of drawing that style is often unspecified, the scene
+ *      ignores overrides, and the color would not change when the style does.
+ * [CN] 跟随深色模式的颜色：视图为深色界面风格时为 `darkColor`，否则为 `lightColor`（包括 iOS 12 和未指定风格）。
+ *      每次绘制时解析，因此会随系统设置以及 window、视图控制器、视图上的 `overrideUserInterfaceStyle` 切换。
+ *      `darkColor` 为 nil 时返回 `lightColor`。
+ *
+ *      不要在设置颜色时通过 `UITraitCollection.currentTraitCollection`（或屏幕、window scene 的 trait）自行判断并二选一：
+ *      在绘制之外，此时的风格往往是 unspecified，scene 也不认 override，而且风格切换后颜色不会跟着变。
+ */
++ (UIColor *)cyl_colorWithLightColor:(UIColor *)lightColor darkColor:(nullable UIColor *)darkColor NS_SWIFT_NAME(cyl_color(withLight:dark:));
+
 @end
 
 #pragma mark - Deprecated API

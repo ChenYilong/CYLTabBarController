@@ -70,8 +70,12 @@
     NSArray *selectedImages = @[@"home_highlight", @"fishpond_highlight", @"message_highlight"];
     NSMutableArray *items = [NSMutableArray array];
     for (NSInteger i = 0; i < titles.count; i++) {
-        UIImage *selectedImage = [UIImage imageNamed:selectedImages[i]];
-        UITabBarItem *item = [[UITabBarItem alloc] initWithTitle:titles[i] image:[UIImage imageNamed:images[i]] selectedImage:selectedImage];
+        UIImage *selectedImage = [UIImage cyl_imageNamed:selectedImages[i]];
+        // Dark Mode (#620): +cyl_imageNamed: also loads "<name>_dark" (home_normal_dark); "消息" combines two images by hand.
+        // 深色模式（#620）：+cyl_imageNamed: 会同时加载「<name>_dark」（home_normal_dark）；「消息」手动合成两张图。
+        NSString *darkImageName = [images[i] isEqualToString:@"message_normal"] ? @"message_normal_night" : nil;
+        UIImage *image = [UIImage cyl_imageWithImageInfo:images[i] darkImageInfo:darkImageName];
+        UITabBarItem *item = [[UITabBarItem alloc] initWithTitle:titles[i] image:image selectedImage:selectedImage];
         [items addObject:item];
     }
     

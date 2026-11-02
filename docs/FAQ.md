@@ -239,9 +239,11 @@ tabBarController.tabBar.itemPositioning = UITabBarItemPositioningFill;
 | 中文 | English |
 |:---|:---|
 | 来源：[#465](https://github.com/ChenYilong/CYLTabBarController/issues/465)、[#588](https://github.com/ChenYilong/CYLTabBarController/issues/588) | Source: [#465](https://github.com/ChenYilong/CYLTabBarController/issues/465), [#588](https://github.com/ChenYilong/CYLTabBarController/issues/588) |
-| 系统会按 tint color 给图片着色。希望显示图片原色时： | The system tints images with the tint color. To show the image's own colors: |
-| 1. 在 Asset Catalog 中把图片的 Render As 设为 Original Image；或 | 1. Set Render As to Original Image for the image in the asset catalog; or |
-| 2. 代码中使用 `[image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]`。 | 2. Use `[image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]` in code. |
+| 系统会把渲染模式为 `Automatic` 的图片当作模板图，按 tint color 着色，图标就变成单色剪影（#465 的截图）。希望显示图片原色时： | The system treats images with the `Automatic` rendering mode as templates and tints them, so icons turn into one-color silhouettes (the screenshots in #465). To show the image's own colors: |
+| 1. 在 `tabBarItemsAttributes` 中传图片名（NSString）而不是 UIImage（推荐）：库会按原图渲染，并自动加载深色图片，#465 正是这样解决的；或 | 1. Pass the image name (NSString) instead of a UIImage in `tabBarItemsAttributes` (recommended): the library renders it as original and loads its dark image, which is how #465 was solved; or |
+| 2. 在 Asset Catalog 中把图片的 Render As 设为 Original Image；或 | 2. Set Render As to Original Image for the image in the asset catalog; or |
+| 3. 代码中使用 `[image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]`。 | 3. Use `[image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]` in code. |
+| 两种形式的区别见 README [图片传名称还是 UIImage](../README.md#cn图片传名称nsstring还是-uiimage)。 | See [Image names or UIImage objects](../README.md#enimage-names-nsstring-or-uiimage-objects) in the README for the differences. |
 | 只希望改变颜色时，使用模板图片并设置 `unselectedItemTintColor`。 | To change only the color, use template images and set `unselectedItemTintColor`. |
 
 ### [CN]iOS 13 起，`[[UITabBarItem appearance] setTitleTextAttributes:...]` 设置的文字颜色、字体不生效
@@ -316,10 +318,18 @@ if (@available(iOS 13.0, *)) {
 | 中文 | English |
 |:---|:---|
 | 来源：[#540](https://github.com/ChenYilong/CYLTabBarController/issues/540)、[#517](https://github.com/ChenYilong/CYLTabBarController/issues/517)、[#552](https://github.com/ChenYilong/CYLTabBarController/issues/552)、[#486](https://github.com/ChenYilong/CYLTabBarController/issues/486) | Source: [#540](https://github.com/ChenYilong/CYLTabBarController/issues/540), [#517](https://github.com/ChenYilong/CYLTabBarController/issues/517), [#552](https://github.com/ChenYilong/CYLTabBarController/issues/552), [#486](https://github.com/ChenYilong/CYLTabBarController/issues/486) |
-| 颜色：使用动态颜色，例如系统的 `systemBackgroundColor`，或库提供的 `cyl_systemBackgroundColor`、`cyl_labelColor` 等（见 `UIColor+CYLTabBarControllerExtention.h`）；也可以用 `+[UIColor colorWithDynamicProvider:]` 自定义。不要在设置颜色时自行判断当前模式后传入固定颜色，此时得到的 trait 可能是 `unspecified`。 | Colors: use dynamic colors, such as the system `systemBackgroundColor` or the library's `cyl_systemBackgroundColor`, `cyl_labelColor` and others (see `UIColor+CYLTabBarControllerExtention.h`), or your own with `+[UIColor colorWithDynamicProvider:]`. Don't check the current mode yourself and pass a fixed color: at that point the trait may still be `unspecified`. |
-| 图片：在 Asset Catalog 中为图片添加 Dark 外观，再在 `tabBarItemsAttributes` 中传入图片名。 | Images: add a Dark appearance to the image in the asset catalog, and pass the image name in `tabBarItemsAttributes`. |
-| 如果图片仍不切换，可在 TabBarController 的 `-traitCollectionDidChange:` 中重新设置各 `tabBarItem` 的 `image` / `selectedImage`（[#486](https://github.com/ChenYilong/CYLTabBarController/issues/486#issuecomment-698183206) 中有示例代码）。 | If images still don't switch, set each `tabBarItem`'s `image` / `selectedImage` again in the TabBarController's `-traitCollectionDidChange:` (sample code in [#486](https://github.com/ChenYilong/CYLTabBarController/issues/486#issuecomment-698183206)). |
-| Demo `MainTabBarController.m` 中有深色模式的完整设置。 | The demo's `MainTabBarController.m` has a complete Dark Mode setup. |
+| 颜色：使用动态颜色，例如系统的 `systemBackgroundColor`，或库提供的 `cyl_systemBackgroundColor`、`cyl_labelColor` 等（见 `UIColor+CYLTabBarControllerExtention.h`）；指定浅色和深色两种颜色时，新版本可用 `+[UIColor cyl_colorWithLightColor:darkColor:]`。不要在设置颜色时自行判断当前模式后传入固定颜色，此时得到的 trait 可能是 `unspecified`（#552 的原因）。 | Colors: use dynamic colors, such as the system `systemBackgroundColor` or the library's `cyl_systemBackgroundColor`, `cyl_labelColor` and others (see `UIColor+CYLTabBarControllerExtention.h`); for a light and a dark color, newer versions add `+[UIColor cyl_colorWithLightColor:darkColor:]`. Don't check the current mode yourself and pass a fixed color: at that point the trait may still be `unspecified` (the cause of #552). |
+| 图片：在 Asset Catalog 中为图片添加 Dark 外观，再在 `tabBarItemsAttributes` 中传入图片名；新版本中也可以按命名规范提供 `<图片名>_dark`（传图片名时自动加载），或用 `+[UIImage cyl_imageWithLightImage:darkImage:]` 把两张图合成一张会自动切换的图片，不必在 `-traitCollectionDidChange:` 中手动替换（[#486](https://github.com/ChenYilong/CYLTabBarController/issues/486#issuecomment-698183206) 中的旧做法）。 | Images: add a Dark appearance to the image in the asset catalog, and pass the image name in `tabBarItemsAttributes`; in newer versions, also provide `<name>_dark` by naming convention (loaded automatically with the name), or combine two images into one that switches by itself with `+[UIImage cyl_imageWithLightImage:darkImage:]`, instead of replacing them in `-traitCollectionDidChange:` (the older workaround in [#486](https://github.com/ChenYilong/CYLTabBarController/issues/486#issuecomment-698183206)). |
+| 详见 README [适配深色模式](../README.md#cn适配深色模式)。 | See [Supporting Dark Mode](../README.md#ensupporting-dark-mode) in the README. |
+
+### [CN]App 不需要深色模式；手动设置 window 的 overrideUserInterfaceStyle 后图片仍跟随系统
+### [EN]The app doesn't support Dark Mode; images still follow the system after setting the window's overrideUserInterfaceStyle
+
+| 中文 | English |
+|:---|:---|
+| 来源：[#440](https://github.com/ChenYilong/CYLTabBarController/issues/440)、[#620](https://github.com/ChenYilong/CYLTabBarController/issues/620) | Source: [#440](https://github.com/ChenYilong/CYLTabBarController/issues/440), [#620](https://github.com/ChenYilong/CYLTabBarController/issues/620) |
+| 不需要深色模式时，在 Info.plist 中添加 `UIUserInterfaceStyle`，值为 `Light`，整个 App 固定为浅色。 | If the app does not support Dark Mode, add `UIUserInterfaceStyle` with the value `Light` to Info.plist; the whole app then stays light. |
+| 也可以设置 `window.overrideUserInterfaceStyle`（或 window 的 rootViewController）。设置后仍只跟随系统，通常是因为代码按 window scene 或屏幕的风格选图或选色：它们不认 window 上的 override。旧版 Demo 的 `-traitCollectionDidChange:` 以及库内部（未公开）的深浅色图片方法就是这样，新版本已改为跟随每个视图自身的风格。请比较 `self.traitCollection`，并使用会自动切换的图片和颜色（见上一条）。 | You can also set `window.overrideUserInterfaceStyle` (or on the window's root view controller). If things still follow only the system after that, the code usually picks images or colors by the window scene's or the screen's style, which ignore the window's override. The old demo's `-traitCollectionDidChange:` and the library's internal (unpublished) light/dark image helper did so; newer versions follow each view's own style. Compare `self.traitCollection`, and use images and colors that switch by themselves (see the entry above). |
 
 ### [CN]深色模式下，想让 TabBar 保持浅色的毛玻璃效果
 ### [EN]Keep the TabBar's light blur in Dark Mode
@@ -340,7 +350,7 @@ if (@available(iOS 13.0, *)) {
 | 中文 | English |
 |:---|:---|
 | 来源：[#531](https://github.com/ChenYilong/CYLTabBarController/issues/531) | Source: [#531](https://github.com/ChenYilong/CYLTabBarController/issues/531) |
-| 原 issue 未能定位原因。请升级到最新版本重试，并可显式设置 `cyl_badgeBackgroundColor`；如仍复现，请提交 bug 并附上可复现的 Demo。 | The cause was not found in the original issue. Upgrade to the latest version and try again; you can also set `cyl_badgeBackgroundColor` explicitly. If it still happens, report a bug with a demo that reproduces it. |
+| 原 issue 未能定位原因。之后角标已多次重构：角标会在深色模式切换等 trait 变化时重新解析边框颜色并恢复循环动画，颜色默认值也可通过 `CYLBadgeAppearance` 全局设置。请升级到最新版本重试；如仍复现，请提交 bug 并附上可复现的 Demo。 | The cause was not found in the original issue. Badges have been reworked since: they re-resolve their border color and restore their repeating animation when traits such as Dark Mode change, and their default colors can be set globally with `CYLBadgeAppearance`. Upgrade to the latest version and try again; if it still happens, report a bug with a demo that reproduces it. |
 
 ## [CN]6. 角标 Badge
 ## [EN]6. Badges
