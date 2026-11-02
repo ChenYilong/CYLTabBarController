@@ -97,8 +97,29 @@
 | 中文 | English |
 |:---|:---|
 | 来源：[#426](https://github.com/ChenYilong/CYLTabBarController/issues/426) | Source: [#426](https://github.com/ChenYilong/CYLTabBarController/issues/426) |
-| 本库没有提供此 API。可以在各子控制器的 `-didReceiveMemoryWarning` 中自行释放不可见页面持有的大资源（图片、缓存等），并在 `-viewWillAppear:` 中按需重新加载，无需替换 ViewController 本身。 | The library has no API for this. In each child view controller, release large resources (images, caches) in `-didReceiveMemoryWarning` while it is not visible, and load them again in `-viewWillAppear:`; the view controller itself does not need replacing. |
-| 调试时可调用 `+[CYLTabBarController cyl_simulateMemoryWarning]` 模拟内存警告（仅使用公开 API），并在日志中查看之后每个 Tab 的 Lottie 动画速度与角标状态，确认 TabBar 未受影响。Demo 中点击列表的 cell 即会触发。 | To test, call `+[CYLTabBarController cyl_simulateMemoryWarning]` to simulate a memory warning (public API only); the log then shows each tab's Lottie animation speed and badge state, to check the tab bar is unaffected. In the demos, tapping a list cell triggers it. |
+| 可以。开启 `unloadsUnselectedViewsOnMemoryWarning`（默认 NO）后，收到内存警告时会卸载未选中 Tab 的视图；切换到该 Tab 时由 UIKit 重新执行 `-loadView` / `-viewDidLoad`。ViewController 仍保留在 `viewControllers` 中，TabBarItem、角标、Lottie 图标和导航栈都不变。 | Yes. With `unloadsUnselectedViewsOnMemoryWarning` on (default NO), a memory warning unloads the views of the unselected tabs; UIKit runs `-loadView` / `-viewDidLoad` again when the tab is selected. The view controllers stay in `viewControllers`, so tab bar items, badges, Lottie icons and navigation stacks are kept. |
+
+```Objective-C
+// In a CYLTabBarController subclass, e.g. in -viewDidLoad
+self.unloadsUnselectedViewsOnMemoryWarning = YES;
+
+// Optional: keep some tabs loaded, e.g. one whose -viewDidLoad must run only once
+- (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController {
+    return viewController != self.viewControllers.firstObject;
+}
+```
+
+```Swift
+unloadsUnselectedViewsOnMemoryWarning = true
+```
+
+| 中文 | English |
+|:---|:---|
+| 卸载规则：当前选中的 Tab 不卸载；`UINavigationController` 类型的 Tab 与其导航栈一起卸载，或整个保留；其中任一页面正在屏幕上或正在 present 其他页面时跳过该 Tab；`-shouldUnloadViewOfViewController:` 返回 NO 的 Tab 保留。 | Rules: the selected tab is kept; a `UINavigationController` tab is unloaded with its whole stack, or kept as a whole; a tab is skipped while any of its pages is on screen or presenting another one; a tab for which `-shouldUnloadViewOfViewController:` returns NO is kept. |
+| 注意：只有当这些页面的 `-viewDidLoad` 可以重复执行时才开启（只创建视图，不重复注册通知、定时器等）；否则用 `-shouldUnloadViewOfViewController:` 保留该 Tab。也可以在其他时机直接调用 `-unloadViewsOfUnselectedViewControllers`，例如 App 进入后台后。 | Only turn it on when those pages' `-viewDidLoad` can run again (it only builds views and does not register observers or timers a second time); otherwise keep the tab with `-shouldUnloadViewOfViewController:`. You can also call `-unloadViewsOfUnselectedViewControllers` directly at other times, e.g. after the app enters the background. |
+| 不开启时，库不会卸载任何页面；可以在各子控制器的 `-didReceiveMemoryWarning` 中自行释放大资源（图片、缓存等），并在 `-viewWillAppear:` 中按需重新加载。 | With it off, the library unloads nothing; release large resources (images, caches) in each child view controller's `-didReceiveMemoryWarning` and load them again in `-viewWillAppear:`. |
+| 调试：`+[CYLTabBarController cyl_simulateMemoryWarning]` 仅用公开 API 模拟一次内存警告：发送 `UIApplicationDidReceiveMemoryWarningNotification`，调用 App 代理和最近活跃 TabBarController 的 `-didReceiveMemoryWarning`（仅发送通知不会调用它），之后在日志中输出每个 Tab 的角标状态和 Lottie 播放速度。指定某个 TabBarController 时用 `+cyl_simulateMemoryWarningForTabBarController:`。 | Testing: `+[CYLTabBarController cyl_simulateMemoryWarning]` simulates a memory warning with public API only: it posts `UIApplicationDidReceiveMemoryWarningNotification`, calls the app delegate's and the most recently active tab bar controller's `-didReceiveMemoryWarning` (posting the notification alone does not call it), then logs each tab's badge state and Lottie speed. For a given tab bar controller, use `+cyl_simulateMemoryWarningForTabBarController:`. |
+| Demo：ObjC Demo 每个列表顶部的「模拟内存警告」行（`UIViewController+CYLMemoryWarningDemo`，`-cyl_showMemoryWarningDemo`）对所在的 TabBarController 模拟内存警告，并弹窗列出每个 Tab 是否被卸载及原因，之后切换到已卸载的 Tab 会重新执行 `-viewDidLoad`；Swift Demo 中点击角标列表的 cell 会调用 `cyl_simulateMemoryWarning` 并输出日志。普通、液态玻璃和扁平样式都适用。 | Demo: in the ObjC demo, the "模拟内存警告 Memory warning" row at the top of each list (`UIViewController+CYLMemoryWarningDemo`, `-cyl_showMemoryWarningDemo`) simulates a memory warning for its tab bar controller and shows in an alert whether each tab was unloaded and why not; selecting an unloaded tab then runs its `-viewDidLoad` again. In the Swift demos, tapping a cell of the badge list calls `cyl_simulateMemoryWarning` and logs the state. Works in the classic, Liquid Glass and flat design styles. |
 
 ### [CN]TabBar 超过 5 个 item 时，如何隐藏 More 按钮？
 ### [EN]How do I hide the More button with more than five items?
@@ -446,8 +467,34 @@ NSDictionary *attributes = @{
 | 中文 | English |
 |:---|:---|
 | 来源：[#428](https://github.com/ChenYilong/CYLTabBarController/issues/428) | Source: [#428](https://github.com/ChenYilong/CYLTabBarController/issues/428) |
-| 设置 `tabBarController.lottieAnimationSpeed`（默认 1.0），例如 `= 1.5`，在 TabBar 布局之前（`-init…` 或 `-viewDidLoad` 中）设置；也可在子类中重写其 getter。每个 Lottie 视图添加时都会使用该速度，适用于所有 TabBar 样式，无需 `dispatch_after` 等待。 | Set `tabBarController.lottieAnimationSpeed` (default 1.0), e.g. to 1.5, before the tab bar is laid out (in `-init…` or `-viewDidLoad`), or override its getter in a subclass. Every Lottie view uses it when it is added, in every tab bar style, with no `dispatch_after` needed. |
-| 需要回调时，监听 `CYLTabBarItemLottieAnimationViewDidAddNotification`：`object` 为 Tab 按钮，用 `tabButton.cyl_lottieAnimationView` 取得动画视图。只修改某一个 Tab 时，在回调中调用 `[tabButton cyl_setLottieAnimationSpeed:2.0]`。 | For a callback, observe `CYLTabBarItemLottieAnimationViewDidAddNotification`: its `object` is the tab button, and `tabButton.cyl_lottieAnimationView` is the animation view. To change one tab only, call `[tabButton cyl_setLottieAnimationSpeed:2.0]` there. |
+| 所有 Tab：设置 `lottieAnimationSpeed`（默认 1.0；0、负数或非有限值表示默认值），在 TabBar 布局之前（`-init…` 或 `-viewDidLoad` 中）设置即可，无需 `dispatch_after` 等待动画视图添加；也可以在子类中重写其 getter。每个 Lottie 视图添加时设置一次，适用于普通、液态玻璃（普通与选中两个按钮）和扁平样式。 | All tabs: set `lottieAnimationSpeed` (default 1.0; 0, negative or non-finite values mean the default) before the tab bar is laid out (in `-init…` or `-viewDidLoad`), with no `dispatch_after` to wait for the animation views; or override its getter in a subclass. Each Lottie view gets it once, when it is added, in the classic, Liquid Glass (normal and selected buttons) and flat design styles. |
+| 单个 Tab 或需要回调：监听 `CYLTabBarItemLottieAnimationViewDidAddNotification`，它在 Lottie 视图添加后于主队列发送，`object` 为 Tab 按钮，`tabButton.cyl_lottieAnimationView` 即动画视图。此时默认速度已设置，在回调中调用 `-[UIControl cyl_setLottieAnimationSpeed:]` 设置的速度不会被覆盖。液态玻璃中每个 Tab 有两个按钮，因此各发送一次。 | One tab, or a callback: observe `CYLTabBarItemLottieAnimationViewDidAddNotification`. It is posted on the main queue after a Lottie view is added; its `object` is the tab button and `tabButton.cyl_lottieAnimationView` is the view. The default speed has been applied by then, so a speed set there with `-[UIControl cyl_setLottieAnimationSpeed:]` is kept. In Liquid Glass a tab has two buttons, so it is posted once for each. |
+
+```Objective-C
+// In a CYLTabBarController subclass
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.lottieAnimationSpeed = 1.5;   // every tab
+    __weak __typeof(self) weakSelf = self;
+    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationViewDidAddNotification
+                                                      object:nil
+                                                       queue:[NSOperationQueue mainQueue]
+                                                  usingBlock:^(NSNotification *note) {
+        UIControl *tabButton = note.object;
+        if (tabButton.cyl_tabBarController == weakSelf && tabButton.cyl_tabBarChildViewControllerIndex == 0) {
+            [tabButton cyl_setLottieAnimationSpeed:2.0];   // the first tab only
+        }
+    }];
+}
+```
+
+```Swift
+lottieAnimationSpeed = 1.5
+```
+
+| 中文 | English |
+|:---|:---|
+| 只有集成了 Lottie（如 `pod 'CYLTabBarController/Lottie'`）时才生效。内存警告不会重置播放速度：Lottie 视图在 Tab 按钮上，卸载未选中 Tab 的页面（见上方 #426）不会移除它们，可用 `+[CYLTabBarController cyl_simulateMemoryWarning]` 的日志确认。完整示例见 Demo：ObjC `MainTabBarController.m`，Swift `Example-Swift/MainTabBarController.swift`。 | Only takes effect with Lottie integrated (e.g. `pod 'CYLTabBarController/Lottie'`). A memory warning does not reset the speed: the Lottie views live in the tab buttons, which unloading unselected tabs' pages (#426 above) does not remove; the log of `+[CYLTabBarController cyl_simulateMemoryWarning]` shows it. Full examples are in the demos: ObjC `MainTabBarController.m`, Swift `Example-Swift/MainTabBarController.swift`. |
 
 ### [CN]能否只给中间的 PlusButton 添加 Lottie 动画？是否支持 SVGA 动画？
 ### [EN]Can only the center PlusButton have a Lottie animation? Is SVGA supported?

@@ -720,6 +720,53 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
     return self.selectedViewController.supportedInterfaceOrientations;
 }
 
+#pragma mark - Memory warning (issue #426)
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    if (self.unloadsUnselectedViewsOnMemoryWarning) {
+        [self unloadViewsOfUnselectedViewControllers];
+    }
+}
+
+- (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController {
+    return YES;
+}
+
+- (void)unloadViewsOfUnselectedViewControllers {
+    UIViewController *selectedViewController = self.selectedViewController;
+    for (UIViewController *viewController in self.viewControllers) {
+        if (viewController == selectedViewController || viewController.cyl_isPlaceholder) {
+            continue;
+        }
+        // A navigation controller's stack is unloaded with it, or not at all.
+        NSMutableArray<UIViewController *> *viewControllersToUnload = [NSMutableArray array];
+        if ([viewController isKindOfClass:[UINavigationController class]]) {
+            [viewControllersToUnload addObjectsFromArray:((UINavigationController *)viewController).viewControllers];
+        }
+        [viewControllersToUnload addObject:viewController];
+        BOOL canUnload = YES;
+        for (UIViewController *viewControllerToUnload in viewControllersToUnload) {
+            if (viewControllerToUnload.isViewLoaded &&
+                (viewControllerToUnload.view.window || viewControllerToUnload.presentedViewController)) {
+                canUnload = NO;
+                break;
+            }
+        }
+        if (!canUnload || ![self shouldUnloadViewOfViewController:viewController]) {
+            continue;
+        }
+        for (UIViewController *viewControllerToUnload in viewControllersToUnload) {
+            if (!viewControllerToUnload.isViewLoaded) {
+                continue;
+            }
+            // Setting `view` to nil does not take the view out of its superview (e.g. the navigation controller's).
+            [viewControllerToUnload.view removeFromSuperview];
+            viewControllerToUnload.view = nil;
+        }
+    }
+}
+
 - (void)dealloc {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     
@@ -3865,13 +3912,18 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
 }
 
 + (void)cyl_simulateMemoryWarning {
+    [self cyl_simulateMemoryWarningForTabBarController:[self cyl_activeTabBarController]];
+}
+
++ (void)cyl_simulateMemoryWarningForTabBarController:(CYLTabBarController *)tabBarController {
     UIApplication *application = [UIApplication sharedApplication];
     [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationDidReceiveMemoryWarningNotification object:application];
     if ([application.delegate respondsToSelector:@selector(applicationDidReceiveMemoryWarning:)]) {
         [application.delegate applicationDidReceiveMemoryWarning:application];
     }
+    // A real memory warning also calls `-didReceiveMemoryWarning` on the view controllers; the notification does not.
+    [tabBarController didReceiveMemoryWarning];
     // Log on the next run loop pass, after whatever the warning released has been released.
-    CYLTabBarController *tabBarController = [self cyl_activeTabBarController];
     __weak CYLTabBarController *weakTabBarController = tabBarController;
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"⚠️ Simulated memory warning (issues #426, #428). Tab bar state afterwards:\n%@", CYLTabBarStateDescription(weakTabBarController));

@@ -21,6 +21,7 @@
 #import "UIBarButtonItem+CYLBadgeExtention.h"
 #import "UIView+CYLBadgeExtention.h"
 #import "UITableViewCell+CYLBadgeExtention.h"
+#import "UIViewController+CYLMemoryWarningDemo.h"
 #import "CYLBadgeAppearance.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
@@ -209,6 +210,39 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  * [CN] Lottie 动画视图的 contentMode，默认 UIViewContentModeScaleAspectFit，可在子类中重写修改。
  */
 - (UIViewContentMode)lottieAnimationViewContentMode;
+
+/*!
+ * [EN] Issue #426: when YES, a memory warning unloads the views of the tabs that are not selected, and UIKit loads them
+ *      again (`-loadView`, `-viewDidLoad`) when the tab is selected. The view controllers stay in `viewControllers`, so
+ *      their tab bar items, badges and navigation stacks are kept. For a `UINavigationController` tab, the views of every
+ *      view controller in its stack are unloaded too. Default is NO.
+ *      Only enable it when `-viewDidLoad` of those view controllers can run again: it must set up the view without
+ *      registering observers or timers a second time. A tab is skipped while its view is on screen or it presents a view
+ *      controller. Override `-shouldUnloadViewOfViewController:` to keep some tabs.
+ * [CN] Issue #426：设为 YES 时，收到内存警告会卸载未选中 Tab 的视图，切换到该 Tab 时由 UIKit 重新加载（`-loadView`、`-viewDidLoad`）。
+ *      ViewController 仍保留在 `viewControllers` 中，TabBarItem、角标和导航栈都不变。对于 `UINavigationController` 类型的 Tab，
+ *      其导航栈中所有 ViewController 的视图也会卸载。默认 NO。
+ *      仅当这些 ViewController 的 `-viewDidLoad` 可以重复执行时才开启：只用于创建视图，不能重复注册通知、定时器等。Tab 的视图正在
+ *      屏幕上或正在 present 其他 ViewController 时会跳过。重写 `-shouldUnloadViewOfViewController:` 可保留部分 Tab。
+ */
+@property (nonatomic, assign) BOOL unloadsUnselectedViewsOnMemoryWarning;
+
+/*!
+ * [EN] Issue #426: whether `-unloadViewsOfUnselectedViewControllers` may unload this tab's view controller (an element of
+ *      `viewControllers`). Default is YES; override in a subclass to keep some tabs loaded.
+ * [CN] Issue #426：`-unloadViewsOfUnselectedViewControllers` 是否可以卸载该 Tab 的 ViewController（`viewControllers` 中的元素）。
+ *      默认 YES，可在子类中重写以保留部分 Tab。
+ */
+- (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController;
+
+/*!
+ * [EN] Issue #426: unloads the views of the tabs that are not selected now; see `unloadsUnselectedViewsOnMemoryWarning`.
+ *      Called on a memory warning when that property is YES; can also be called directly, e.g. after the app enters
+ *      the background.
+ * [CN] Issue #426：立即卸载未选中 Tab 的视图，规则见 `unloadsUnselectedViewsOnMemoryWarning`。该属性为 YES 时在收到内存警告时调用；
+ *      也可以直接调用，例如在 App 进入后台后。
+ */
+- (void)unloadViewsOfUnselectedViewControllers;
 
 /*!
  * [EN] Playback speed of the Lottie animation views (`animationSpeed`). Default is 1.0; set it, e.g. to 1.5 to play 1.5
@@ -606,17 +640,25 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 + (nullable CYLTabBarController *)cyl_activeTabBarController;
 
 /*!
- * [EN] Debug and demo helper: simulates a system memory warning with public API only. It posts
- *      `UIApplicationDidReceiveMemoryWarningNotification` (view controllers receive `-didReceiveMemoryWarning`) and calls the
- *      app delegate's `-applicationDidReceiveMemoryWarning:`, then logs every tab of the most recently active tab bar
- *      controller: its Lottie view and `animationSpeed` (issue #428) and whether its badge is shown. Use it to check that
- *      your tab bar keeps them after a memory warning (issue #426), in every tab bar style. Main thread only.
- * [CN] 调试与演示用：仅使用公开 API 模拟系统内存警告。发送 `UIApplicationDidReceiveMemoryWarningNotification`（视图控制器会收到
- *      `-didReceiveMemoryWarning`）并调用 App 代理的 `-applicationDidReceiveMemoryWarning:`，随后输出最近活跃的 TabBarController
- *      每个 Tab 的状态：Lottie 视图及其 `animationSpeed`（issue #428）、角标是否显示。用于检查内存警告后 TabBar 是否保持这些状态
- *      （issue #426），适用于所有 TabBar 样式。请在主线程调用。
+ * [EN] Debug and demo helper: simulates a system memory warning for the most recently active tab bar controller
+ *      (`+cyl_activeTabBarController`); see `+cyl_simulateMemoryWarningForTabBarController:`.
+ * [CN] 调试与演示用：对最近活跃的 TabBarController（`+cyl_activeTabBarController`）模拟系统内存警告，
+ *      详见 `+cyl_simulateMemoryWarningForTabBarController:`。
  */
 + (void)cyl_simulateMemoryWarning;
+
+/*!
+ * [EN] Debug and demo helper: simulates a system memory warning with public API only. It posts
+ *      `UIApplicationDidReceiveMemoryWarningNotification`, calls the app delegate's `-applicationDidReceiveMemoryWarning:`
+ *      and calls `-didReceiveMemoryWarning` on `tabBarController` (posting the notification does not call it), so that
+ *      `unloadsUnselectedViewsOnMemoryWarning` unloads the unselected tabs (issue #426). Then logs every tab: its Lottie
+ *      view and `animationSpeed` (issue #428) and whether its badge is shown. Works in every tab bar style. Main thread only.
+ * [CN] 调试与演示用：仅使用公开 API 模拟系统内存警告。发送 `UIApplicationDidReceiveMemoryWarningNotification`，调用 App 代理的
+ *      `-applicationDidReceiveMemoryWarning:`，并调用 `tabBarController` 的 `-didReceiveMemoryWarning`（发送通知不会调用该方法），
+ *      使 `unloadsUnselectedViewsOnMemoryWarning` 卸载未选中的 Tab（issue #426）。随后输出每个 Tab 的状态：Lottie 视图及其
+ *      `animationSpeed`（issue #428）、角标是否显示。适用于所有 TabBar 样式。请在主线程调用。
+ */
++ (void)cyl_simulateMemoryWarningForTabBarController:(nullable CYLTabBarController *)tabBarController;
 
 @end
 
