@@ -359,12 +359,12 @@ if (@available(iOS 13.0, *)) {
 | 中文 | English |
 |:---|:---|
 | 来源：[#425](https://github.com/ChenYilong/CYLTabBarController/issues/425) | Source: [#425](https://github.com/ChenYilong/CYLTabBarController/issues/425) |
-| 库没有提供全局 appearance。角标属性设置在每个对象上，可以遍历设置： | The library has no global appearance. Badge properties belong to each object, so set them in a loop: |
+| 新版本提供了 `CYLBadgeAppearance`，在显示角标之前统一设置一次即可，对象上单独设置的值仍然优先。详见 README [全局设置角标样式](../README.md#cn全局设置角标样式)。 | Newer versions add `CYLBadgeAppearance`: set it once before showing badges; a value set on an object still wins. See [Setting the badge style globally](../README.md#ensetting-the-badge-style-globally) in the README. |
 
 ```Objective-C
-for (UIViewController *viewController in tabBarController.viewControllers) {
-    viewController.cyl_badgeBackgroundColor = [UIColor redColor];
-}
+[CYLBadgeAppearance globalAppearance].backgroundColor = [UIColor systemPinkColor];
+[CYLBadgeAppearance globalAppearance].font = [UIFont boldSystemFontOfSize:10];
+[CYLBadgeAppearance globalAppearance].centerOffset = CGPointMake(-5, 3);
 ```
 
 ### [CN]如何获取已设置的 badgeValue？
@@ -381,7 +381,8 @@ for (UIViewController *viewController in tabBarController.viewControllers) {
 | 中文 | English |
 |:---|:---|
 | 来源：[#404](https://github.com/ChenYilong/CYLTabBarController/issues/404) | Source: [#404](https://github.com/ChenYilong/CYLTabBarController/issues/404) |
-| 该 block 由对应 ViewController 的生命周期自动触发，并且在 ViewController 的生命周期内只执行一次（方法名中的 `Once`）。如果想手动显示红点，直接调用 `cyl_showBadgeValue:animationType:` 即可，不要放在 block 中。 | The block is run by the view controller's lifecycle, once per view controller lifetime (the `Once` in the name). To show a badge yourself, call `cyl_showBadgeValue:animationType:` directly instead of inside the block. |
+| 常见原因是子类在 `-init` 中创建了另一个 CYLTabBarController 并返回它（旧版 README 的写法）：App 显示的是那个普通实例，子类的 `-viewDidLoad` 中设置的 block 落在被丢弃的对象上，永远不会执行。请按 README [第二步](../README.md#cn第二步设置-cyltabbarcontroller-的两个数组) 通过 `[super initWithViewControllers:…]` 初始化。 | The usual cause is a subclass whose `-init` creates and returns another CYLTabBarController (as the old README did): the app shows that plain instance, and the block set in the subclass's `-viewDidLoad` lands on a discarded object and never runs. Initialize through `[super initWithViewControllers:…]` as in [Step 2](../README.md#enstep-2-configure-the-view-controller-and-tab-bar-item-attribute-arrays) of the README. |
+| 显示或更新 Tab 角标请改用 `-reloadBadgesWithBlock:`：可随时、多次调用，Tab 按钮就绪后执行，无需 `dispatch_after`。once-block 只保存一个 block，且在 TabBar 已完成布局后设置的可能不再执行。详见 README [更新 Tab 角标](../README.md#cn更新-tab-角标)。 | To show or update tab badges, use `-reloadBadgesWithBlock:` instead: call it any time, as often as needed; it runs once the tab buttons exist, with no `dispatch_after`. The once-block holds a single block, and one set after the tab bar was laid out may never run. See [Updating tab badges](../README.md#enupdating-tab-badges) in the README. |
 
 ## [CN]7. Lottie 动画
 ## [EN]7. Lottie animations

@@ -476,11 +476,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
         dispatch_after(when, dispatch_get_main_queue(), ^{
             @try {
+                // #425: the shared badge style (offset, colors, font) is set once in SceneDelegate.m
+                // -setUpBadgeAppearance; each tab below sets only what differs from it.
+                // #425：共用的角标样式（偏移、颜色、字体）在 SceneDelegate.m -setUpBadgeAppearance 中统一设置一次，
+                // 下面每个 Tab 只设置与之不同的部分。
                 UIViewController *viewController0 = tabBarController.viewControllers[0];
                 // UIControl *tab0 = viewController0.cyl_tabButton;
                 // [tab0 cyl_showBadge];
                 [viewController0 cyl_setBadgeBackgroundColor:RANDOM_COLOR];
-                [viewController0 cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
                 [viewController0 cyl_setBadgeRadius:11/2];
                 [viewController0 cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeBreathe];
                 [self setSelectedCoverShow:YES];
@@ -491,11 +494,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                 //                                [tabBarController.viewControllers[2] cyl_setBadgeMargin:1.0];
                 //                                [tabBarController.viewControllers[3] cyl_setBadgeMargin:1.0];
                 //                                [tabBarController.viewControllers[4] cyl_setBadgeMargin:1.0];
-                [tabBarController.viewControllers[1] cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
                 [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:RANDOM_COLOR];
                 [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScale];
-                [tabBarController.viewControllers[2] cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
-                
                 [tabBarController.viewControllers[2] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake];
                 
                 NSString *testBadgeString = @"100";
@@ -505,9 +505,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                 //                                     tabBarController.viewControllers[3].cyl_badgeFont}];
                 //                float labelHeight = ceilf(size.height);
                 //                [tabBarController.viewControllers[3] cyl_setBadgeCornerRadius:(labelHeight+ tabBarController.viewControllers[3].cyl_badgeMargin)/2];
-                [tabBarController.viewControllers[3] cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
                 [tabBarController.viewControllers[3] cyl_showBadgeValue:testBadgeString animationType:CYLBadgeAnimationTypeBounce];
                 if (tabBarController.viewControllers.count > 4) {
+                    // Differs from the global offset (SceneDelegate.m -setUpBadgeAppearance), so it is set here.
+                    // 与全局偏移（SceneDelegate.m -setUpBadgeAppearance）不同，因此单独设置。
                     [tabBarController.viewControllers[4] cyl_setBadgeCenterOffset:CGPointMake(-1, 3)];
                     [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
                 }
@@ -588,10 +589,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
             }
         } else {
             if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
-                [control cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
                 [control  cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScaleOnce];
             } else {
-                [tabBarController.selectedViewController cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
                 [tabBarController.selectedViewController cyl_showBadge];
             }
         }

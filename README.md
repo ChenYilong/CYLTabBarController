@@ -486,28 +486,30 @@ carthage update --use-xcframeworks
 
 
 - (instancetype)init {
-    if (!(self = [super init])) {
-        return nil;
-    }
     /**
      * 以下两行代码目的在于手动设置让TabBarItem只显示图标，不显示文字，并让图标垂直居中。
-     * 等效于在 `-tabBarItemsAttributesForController` 方法中不传 `CYLTabBarItemTitle` 字段。
+     * 等效于在 `-tabBarItemsAttributesForTabBar` 方法中不传 `CYLTabBarItemTitle` 字段。
      * 更推荐后一种做法。
      */
     UIEdgeInsets imageInsets = UIEdgeInsetsZero;//UIEdgeInsetsMake(4.5, 0, -4.5, 0);
     UIOffset titlePositionAdjustment = UIOffsetMake(0, -3.5);
-    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithViewControllers:self.viewControllers
-                                                                               tabBarItemsAttributes:self.tabBarItemsAttributesForController
-                                                                                         imageInsets:imageInsets
-                                                                             titlePositionAdjustment:titlePositionAdjustment
-                                                                                             context:nil
-                                             ];
-    [self customizeTabBarAppearance:tabBarController];
-    self.navigationController.navigationBar.hidden = YES;
-    return (self = (MainTabBarController *)tabBarController);
+    // Initialize self through super. Don't create another CYLTabBarController and return it from -init: the app would
+    // then show that plain instance, so this subclass's methods (-viewDidLoad, badge blocks, delegates) never run (#404).
+    // 通过 super 初始化 self。不要在 -init 中创建另一个 CYLTabBarController 并返回它：App 显示的会是那个普通实例，
+    // 本子类的方法（-viewDidLoad、角标 block、代理）都不会执行（#404）。
+    if (self = [super initWithViewControllers:[self viewControllersForTabBar]
+                        tabBarItemsAttributes:[self tabBarItemsAttributesForTabBar]
+                                  imageInsets:imageInsets
+                      titlePositionAdjustment:titlePositionAdjustment
+                                      context:nil]) {
+        [self customizeTabBarAppearance:self];
+    }
+    return self;
 }
 
-- (NSArray *)viewControllers {
+// Not named -viewControllers: that would override UITabBarController's own property.
+// 不要命名为 -viewControllers：那会覆盖 UITabBarController 自身的属性。
+- (NSArray *)viewControllersForTabBar {
     CYLHomeViewController *firstViewController = [[CYLHomeViewController alloc] init];
     UIViewController *firstNavigationController = [[CYLBaseNavigationController alloc]
                                                    initWithRootViewController:firstViewController];
@@ -523,7 +525,7 @@ carthage update --use-xcframeworks
     return viewControllers;
 }
 
-- (NSArray *)tabBarItemsAttributesForController {
+- (NSArray *)tabBarItemsAttributesForTabBar {
     NSDictionary *firstTabBarItemsAttributes = @{
                                                  CYLTabBarItemTitle : @"首页",
                                                  CYLTabBarItemImage : self.darkMode ? @"home_highlight" : @"home_normal",  /* NSString and UIImage are supported*/
@@ -942,6 +944,56 @@ carthage update --use-xcframeworks
     });
 }
  ```
+
+### [CN]全局设置角标样式
+### [EN]Setting the badge style globally
+
+| 中文 | English |
+|:---|:---|
+| 大多数 App 的角标处处相同：红色背景、白色文字、同一种字体、同样的位置偏移。用 `CYLBadgeAppearance` 统一设置一次即可，不必在每个 Tab、BarButton、视图上重复设置（[#425](https://github.com/ChenYilong/CYLTabBarController/issues/425)）。 | Most apps use the same badge everywhere: a red background, white text, one font, the same offset. Set it once with `CYLBadgeAppearance` instead of on every tab, bar button and view ([#425](https://github.com/ChenYilong/CYLTabBarController/issues/425)). |
+| 通常在 `-application:didFinishLaunchingWithOptions:` 中、显示角标之前设置： | Set it before showing badges, typically in `-application:didFinishLaunchingWithOptions:`: |
+
+```Objective-C
+CYLBadgeAppearance *appearance = [CYLBadgeAppearance globalAppearance];
+appearance.backgroundColor = [UIColor systemPinkColor];   // default: red
+appearance.textColor = [UIColor whiteColor];              // default: white
+appearance.font = [UIFont boldSystemFontOfSize:10];       // default: [UIFont boldSystemFontOfSize:9]
+appearance.centerOffset = CGPointMake(-5, 3);             // default: {0, 0}, from the top-right corner
+```
+
+```Swift
+CYLBadgeAppearance.global.backgroundColor = .systemPink
+CYLBadgeAppearance.global.centerOffset = CGPoint(x: -5, y: 3)
+```
+
+| 中文 | English |
+|:---|:---|
+| 优先级：对象上单独设置的值（如 `viewController.cyl_badgeBackgroundColor`）> 全局值 > 内置默认值。适用于 UIViewController、UITabBarItem、UIBarButtonItem、UIControl 和 UIView 上的所有角标。 | Precedence: a value set on an object (e.g. `viewController.cyl_badgeBackgroundColor`) > the global value > the built-in default. It covers every badge on UIViewController, UITabBarItem, UIBarButtonItem, UIControl and UIView. |
+| 可设置的属性：`backgroundColor`、`textColor`、`font`、`centerOffset`、`radius`（红点半径，默认 4）、`margin`（文字四周的空间，默认 8）、`maximumBadgeNumber`（默认 99，超过显示 "99+"）、`cornerRadius`（默认 0，即胶囊形）、`borderColor`、`borderWidth`。`-reset` 恢复全部默认值。 | Properties: `backgroundColor`, `textColor`, `font`, `centerOffset`, `radius` (red dot radius, 4 by default), `margin` (space around the text, 8 by default), `maximumBadgeNumber` (99 by default; larger numbers show "99+"), `cornerRadius` (0 by default, a capsule), `borderColor`, `borderWidth`. `-reset` restores all defaults. |
+| 复用的视图（如 cell）先调用 `-[UIView cyl_resetBadgeAppearance]`，清除上一次单独设置的角标属性、恢复跟随全局样式，再只设置本次不同的部分，不必把每个属性手动设回默认值。 | For reused views such as cells, call `-[UIView cyl_resetBadgeAppearance]` first: it drops the badge properties set for the previous content so they follow the global style again; then set only what differs, instead of setting every property back to a default by hand. |
+| 请在显示角标之前设置。之后再修改全局值，已显示的角标会在下次显示（`-cyl_showBadgeValue:animationType:`）时使用新的颜色、字体和边框。对象上设为 nil 的颜色、字体会恢复使用全局值。 | Set it before showing badges. If you change it later, a badge already on screen uses the new colors, font and border the next time it is shown (`-cyl_showBadgeValue:animationType:`). Setting a color or font to nil on an object goes back to the global value. |
+
+### [CN]更新 Tab 角标
+### [EN]Updating tab badges
+
+| 中文 | English |
+|:---|:---|
+| Tab 按钮在 TabBar 布局完成后才创建，过早调用 `cyl_showBadge` 等方法，角标不会显示。用 `-reloadBadgesWithBlock:` 包裹 Tab 角标代码即可：Tab 按钮已就绪时立即执行，否则在 TabBar 布局完成后执行（[#404](https://github.com/ChenYilong/CYLTabBarController/issues/404)）。 | Tab buttons are created when the tab bar is laid out; a badge shown on a tab earlier (e.g. with `cyl_showBadge`) is dropped. Wrap the tab badge code in `-reloadBadgesWithBlock:`: it runs right away when the tab buttons exist, otherwise once the tab bar is laid out ([#404](https://github.com/ChenYilong/CYLTabBarController/issues/404)). |
+
+```Objective-C
+// In a CYLTabBarController subclass: -viewDidLoad, or whenever the badge data changes.
+- (void)reloadBadge {
+    [self reloadBadgesWithBlock:^(CYLTabBarController *tabBarController) {
+        [tabBarController.viewControllers[0] cyl_showBadge];
+        [tabBarController.viewControllers[1] cyl_showBadgeValue:@"100" animationType:CYLBadgeAnimationTypeNone];
+    }];
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 可以随时、多次调用（如在 `-viewDidLoad` 中和数据变化后）：每个 block 各执行一次，不会互相覆盖，也无需 `dispatch_after`。`-setViewDidLayoutSubViewsBlockInvokeOnce:block:` 只保存一个 block，且在 TabBar 已完成布局后设置的 block 可能不再执行，不适合用来更新角标。 | Call it at any time and as often as needed (e.g. in `-viewDidLoad` and after data changes): each block runs once, none replaces another, and no `dispatch_after` is needed. `-setViewDidLayoutSubViewsBlockInvokeOnce:block:` holds a single block, and one set after the tab bar was laid out may never run, so it does not suit badge updates. |
+| 子类请按 [第二步](#cn第二步设置-cyltabbarcontroller-的两个数组) 通过 `[super initWithViewControllers:…]` 初始化。在 `-init` 中创建另一个 CYLTabBarController 并返回它，App 显示的是那个普通实例，子类中的代码（包括这里的 block）不会执行。 | Initialize a subclass through `[super initWithViewControllers:…]` as in [Step 2](#enstep-2-configure-the-view-controller-and-tab-bar-item-attribute-arrays). If `-init` creates and returns another CYLTabBarController, the app shows that plain instance and the subclass's code, these blocks included, never runs. |
 
 ### [CN]横竖屏适配
 ### [EN]Supporting portrait and landscape orientations

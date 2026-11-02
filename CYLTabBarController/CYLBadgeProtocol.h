@@ -112,25 +112,32 @@ static inline NSArray<NSString *> * _Nonnull CYLBadgeAllAnimationKeys(void) {
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*!
+ * [EN] A property left unset (or set to nil) on an object falls back to `[CYLBadgeAppearance globalAppearance]`, which
+ *      sets the default for the whole app (#425): font, background and text colors, center offset, radius, margin,
+ *      maximum number, corner radius, border color and width.
+ * [CN] 对象上未设置（或设为 nil）的属性回退到 `[CYLBadgeAppearance globalAppearance]`，用于设置整个 App 的默认值（#425）：
+ *      字体、背景色和文字颜色、中心偏移、半径、边距、最大数字、圆角半径、边框颜色和宽度。
+ */
 @protocol CYLBadgeProtocol <NSObject>
 
 @required
 /** badge entity, which is adviced not to set manually */
 //@property (nonatomic, strong, getter=cyl_badge, setter=cyl_setBadge:) UIView __kindof *cyl_badge;
-/** [UIFont boldSystemFontOfSize:9] by default if not set */
+/** `CYLBadgeAppearance.font` if not set, [UIFont boldSystemFontOfSize:9] by default */
 @property (nonatomic, strong, getter=cyl_badgeFont, setter=cyl_setBadgeFont:) UIFont *cyl_badgeFont;
-/** red color by default if not set */
+/** `CYLBadgeAppearance.backgroundColor` if not set, red by default */
 @property (nonatomic, strong, getter=cyl_badgeBackgroundColor, setter=cyl_setBadgeBackgroundColor:) UIColor *cyl_badgeBackgroundColor;
-/** white color by default if not set */
+/** `CYLBadgeAppearance.textColor` if not set, white by default */
 @property (nonatomic, strong, getter=cyl_badgeTextColor, setter=cyl_setBadgeTextColor:) UIColor *cyl_badgeTextColor;
 /** we have optimized the badge frame and center. This property is adviced not to set manually */
 @property (nonatomic, assign, getter=cyl_badgeFrame, setter=cyl_setBadgeFrame:) CGRect cyl_badgeFrame;
 
 @property (nonatomic, strong, getter=cyl_badgeFrameValue, setter=cyl_setBadgeFrameValue:) NSValue *cyl_badgeFrameValue;
 
-/** offset from right-top corner. {0,0} by default
+/** offset from right-top corner. `CYLBadgeAppearance.centerOffset` if not set, {0,0} by default
  For x, negative number means left offset
- For y, negative number means bottom offset
+ For y, positive number means bottom offset (the center's y is the offset itself; the doc used to say the opposite)
  */
 @property (nonatomic, assign, getter=cyl_badgeCenterOffset, setter=cyl_setBadgeCenterOffset:) CGPoint cyl_badgeCenterOffset;
 @property (nonatomic, strong, getter=cyl_badgeCenterOffsetValue, setter=cyl_setBadgeCenterOffsetValue:) NSValue *cyl_badgeCenterOffsetValue;

@@ -60,20 +60,15 @@
     //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"CYLTabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
     
 #define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
-    [self.navigationItem.leftBarButtonItem cyl_setBadgeBackgroundColor:UIColor.redColor];
-    
-    [self.navigationItem.rightBarButtonItem cyl_setBadgeBackgroundColor:UIColor.redColor];
     [self.navigationItem.leftBarButtonItem setTintColor:UIColor.redColor];
     [self.navigationItem.rightBarButtonItem setTintColor:UIColor.redColor];
     
-    [self.navigationItem.leftBarButtonItem cyl_setBadgeTextColor:UIColor.redColor];
-    [self.navigationItem.rightBarButtonItem cyl_setBadgeTextColor:UIColor.redColor];
-    
-    
     // ✅ iOS 26修复方案
     
-    
-    [self.navigationItem.rightBarButtonItem cyl_setBadgeCenterOffset:CGPointMake(-5, 3)];
+    // #425: red background, text color and the (-5, 3) offset come from CYLBadgeAppearance (SceneDelegate.m
+    // -setUpBadgeAppearance); a red dot has no text, so its text color never showed.
+    // #425：红色背景和 (-5, 3) 偏移来自 CYLBadgeAppearance（SceneDelegate.m -setUpBadgeAppearance），无需逐个设置；
+    // 红点没有文字，原先设置的文字颜色不会显示。
     //                [viewController0 cyl_setBadgeRadius:11/2];
     
     //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
