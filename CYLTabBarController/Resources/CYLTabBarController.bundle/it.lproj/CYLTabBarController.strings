@@ -124,3 +124,13 @@
 "有新内容" = "Nuovi contenuti";
 "%@ 条新消息" = "%@ nuovi messaggi";
 "加号按钮" = "Pulsante più";
+"模拟内存警告" = "Simula avviso di memoria";
+"卸载未选中的 Tab，切换时重新加载" = "Scarica i pannelli non selezionati; si ricaricano quando selezionati";
+"内存警告" = "Avviso di memoria";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "Non in un CYLTabBarController: nessun pannello da scaricare.";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO: nessun pannello scaricato.";
+"未加载" = "non caricato";
+"已卸载" = "scaricato";
+"保留：当前选中" = "mantenuto: selezionato";
+"保留：shouldUnload 返回 NO" = "mantenuto: shouldUnload ha restituito NO";
+"保留" = "mantenuto";

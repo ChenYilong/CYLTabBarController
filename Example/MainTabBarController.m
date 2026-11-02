@@ -67,6 +67,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [[UIApplication sharedApplication] setApplicationSupportsShakeToEdit:YES];
     [self becomeFirstResponder];
     [self customizeInterface];
+    // Issue #426: on a memory warning, unload the views of the tabs that are not selected; they load again when selected.
+    // Issue #426：收到内存警告时卸载未选中 Tab 的视图，切换到该 Tab 时重新加载。
+    self.unloadsUnselectedViewsOnMemoryWarning = YES;
     [super viewDidLoad];
     [self observeLottieAnimationViewDidAdd];
 }
@@ -750,6 +753,18 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     UIGraphicsEndImageContext();
     
     self.tabBar.selectionIndicatorImage = finalImage;
+}
+
+/*!
+ * [EN] Issue #426: keeps the home tab loaded. `-[CYLHomeViewController viewDidLoad]` adds a scroll edge interaction for its
+ *      table view to the tab bar, so running it again would add a second one.
+ * [CN] Issue #426：保留首页 Tab 不卸载。`-[CYLHomeViewController viewDidLoad]` 会为其 tableView 向 TabBar 添加滚动边缘交互，
+ *      重复执行会再添加一个。
+ */
+- (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController {
+    UIViewController *rootViewController = [viewController isKindOfClass:[UINavigationController class]] ?
+        ((UINavigationController *)viewController).viewControllers.firstObject : viewController;
+    return ![rootViewController isKindOfClass:[CYLHomeViewController class]];
 }
 
 - (UIViewContentMode)lottieAnimationViewContentMode {

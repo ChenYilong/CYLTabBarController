@@ -124,3 +124,13 @@
 "有新内容" = "新しいコンテンツがあります";
 "%@ 条新消息" = "新着メッセージ %@ 件";
 "加号按钮" = "プラスボタン";
+"模拟内存警告" = "メモリ警告をシミュレート";
+"卸载未选中的 Tab，切换时重新加载" = "選択されていないタブを解放し、選択時に再読み込み";
+"内存警告" = "メモリ警告";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "CYLTabBarController 内ではないため、解放できるタブはありません。";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO：タブは解放されませんでした。";
+"未加载" = "未読み込み";
+"已卸载" = "解放済み";
+"保留：当前选中" = "保持：選択中";
+"保留：shouldUnload 返回 NO" = "保持：shouldUnload が NO を返した";
+"保留" = "保持";

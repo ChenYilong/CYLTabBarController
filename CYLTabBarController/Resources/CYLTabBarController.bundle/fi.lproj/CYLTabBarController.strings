@@ -124,3 +124,13 @@
 "有新内容" = "Uutta sisältöä";
 "%@ 条新消息" = "%@ uutta viestiä";
 "加号按钮" = "Plus-painike";
+"模拟内存警告" = "Simuloi muistivaroitus";
+"卸载未选中的 Tab，切换时重新加载" = "Vapauttaa valitsemattomat välilehdet; ne ladataan uudelleen valittaessa";
+"内存警告" = "Muistivaroitus";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "Ei CYLTabBarControllerissa: ei vapautettavia välilehtiä.";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO: välilehtiä ei vapautettu.";
+"未加载" = "ei ladattu";
+"已卸载" = "vapautettu";
+"保留：当前选中" = "säilytetty: valittu";
+"保留：shouldUnload 返回 NO" = "säilytetty: shouldUnload palautti NO";
+"保留" = "säilytetty";

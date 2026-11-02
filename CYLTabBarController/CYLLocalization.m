@@ -11,7 +11,6 @@
 #import <objc/runtime.h>
 
 NSString *const CYLLocalizationLanguageDidChangeNotification = @"CYLLocalizationLanguageDidChangeNotification";
-const NSInteger CYLLanguageSettingSection = 0;
 
 static NSString *const CYLLocalizationTable = @"CYLTabBarController";
 static NSString *const CYLLocalizationFallbackLanguage = @"en";

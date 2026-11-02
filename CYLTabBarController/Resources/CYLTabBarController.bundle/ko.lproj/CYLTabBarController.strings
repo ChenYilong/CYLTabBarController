@@ -124,3 +124,13 @@
 "有新内容" = "새 콘텐츠 있음";
 "%@ 条新消息" = "새 메시지 %@개";
 "加号按钮" = "플러스 버튼";
+"模拟内存警告" = "메모리 경고 시뮬레이션";
+"卸载未选中的 Tab，切换时重新加载" = "선택되지 않은 탭을 해제하고 선택 시 다시 로드";
+"内存警告" = "메모리 경고";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "CYLTabBarController 안에 있지 않아 해제할 탭이 없습니다.";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO: 해제된 탭이 없습니다.";
+"未加载" = "로드 안 됨";
+"已卸载" = "해제됨";
+"保留：当前选中" = "유지: 선택됨";
+"保留：shouldUnload 返回 NO" = "유지: shouldUnload가 NO 반환";
+"保留" = "유지";

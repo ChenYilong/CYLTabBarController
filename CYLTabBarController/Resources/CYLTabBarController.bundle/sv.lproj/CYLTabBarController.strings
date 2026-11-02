@@ -124,3 +124,13 @@
 "有新内容" = "Nytt innehåll";
 "%@ 条新消息" = "%@ nya meddelanden";
 "加号按钮" = "Plusknapp";
+"模拟内存警告" = "Simulera minnesvarning";
+"卸载未选中的 Tab，切换时重新加载" = "Laddar ur flikar som inte är valda; de laddas igen när de väljs";
+"内存警告" = "Minnesvarning";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "Inte i en CYLTabBarController: inga flikar att ladda ur.";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO: ingen flik urladdad.";
+"未加载" = "inte laddad";
+"已卸载" = "urladdad";
+"保留：当前选中" = "behållen: vald";
+"保留：shouldUnload 返回 NO" = "behållen: shouldUnload returnerade NO";
+"保留" = "behållen";

@@ -124,3 +124,13 @@
 "有新内容" = "Contingut nou";
 "%@ 条新消息" = "%@ missatges nous";
 "加号按钮" = "Botó més";
+"模拟内存警告" = "Simula un avís de memòria";
+"卸载未选中的 Tab，切换时重新加载" = "Descarrega les pestanyes no seleccionades; es tornen a carregar en seleccionar-les";
+"内存警告" = "Avís de memòria";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "No és dins d’un CYLTabBarController: no hi ha pestanyes per descarregar.";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO: no s’ha descarregat cap pestanya.";
+"未加载" = "no carregada";
+"已卸载" = "descarregada";
+"保留：当前选中" = "mantinguda: seleccionada";
+"保留：shouldUnload 返回 NO" = "mantinguda: shouldUnload ha retornat NO";
+"保留" = "mantinguda";

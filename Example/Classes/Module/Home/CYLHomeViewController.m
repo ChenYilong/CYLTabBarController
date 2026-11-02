@@ -8,7 +8,7 @@
 
 #import "CYLHomeViewController.h"
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
-#import <CYLTabBarController/CYLLocalization.h>
+#import <CYLTabBarController/UIViewController+CYLSettingsSection.h>
 //#import "CYLTabBarControllerConfig.h"
 #import "CYLPlusButtonSubclass.h"
 #import "MainTabBarController.h"
@@ -125,8 +125,8 @@
 #pragma mark - Table view
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == CYLLanguageSettingSection) {
-        return [self cyl_languageCellForTableView:tableView];
+    if (indexPath.section == CYLSettingsSection) {
+        return [self cyl_settingsCellForTableView:tableView atIndexPath:indexPath];
     }
     static NSString * CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -150,22 +150,21 @@
         }
     }
 }
-// Section 0: the language setting. 第 0 组：语言设置。
+// Section 0: settings (language, memory warning). 第 0 组：设置（语言、内存警告）。
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (section == CYLLanguageSettingSection) {
-        return 1;
+    if (section == CYLSettingsSection) {
+        return [self cyl_settingsRowCount];
     }
     return MAX(30, [UITableViewCell cyl_badgeStyleCount]); // every badge style has a row
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == CYLLanguageSettingSection) {
-        [tableView deselectRowAtIndexPath:indexPath animated:YES];
-        [self cyl_presentLanguagePicker];
+    if (indexPath.section == CYLSettingsSection) {
+        [self cyl_didSelectSettingsRowAtIndexPath:indexPath inTableView:tableView];
         return;
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -179,7 +178,6 @@
 //    tabBarController.delegate = self;
 //
 //    [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimationTypeScale];
-    [CYLTabBarController cyl_simulateMemoryWarning]; // #426/#428: memory warning demo, see the log 内存警告演示，见日志
     [self pushToNewViewController];
 }
 

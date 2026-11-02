@@ -52,7 +52,7 @@ FOUNDATION_EXTERN const CGFloat CYLBadgeRowHeight;
 @interface CYLBadgeHelperTableViewController : UITableViewController
 
 /*!
- * [EN] Section 0 holds one row, the language setting (`-cyl_languageCellForTableView:`); the badge samples are in section 1.
+ * [EN] Section 0 holds the settings rows (`CYLSettingsSection`: language, memory warning); the badge samples are in section 1.
  *      Called after a badge row is tapped (its badge cleared), e.g. to push a page; the row is `indexPath.row`.
  * [CN] 第 0 组只有一行，为语言设置（`-cyl_languageCellForTableView:`）；角标样例在第 1 组。点击角标行（并清除角标）后调用，
  *      例如用于 push 新页面；行号为 `indexPath.row`。

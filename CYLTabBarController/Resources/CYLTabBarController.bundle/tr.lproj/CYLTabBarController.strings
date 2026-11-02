@@ -124,3 +124,13 @@
 "有新内容" = "Yeni içerik";
 "%@ 条新消息" = "%@ yeni mesaj";
 "加号按钮" = "Artı düğmesi";
+"模拟内存警告" = "Bellek uyarısını taklit et";
+"卸载未选中的 Tab，切换时重新加载" = "Seçili olmayan sekmeleri boşaltır; seçilince yeniden yüklenir";
+"内存警告" = "Bellek uyarısı";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "Bir CYLTabBarController içinde değil: boşaltılacak sekme yok.";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO: hiçbir sekme boşaltılmadı.";
+"未加载" = "yüklenmedi";
+"已卸载" = "boşaltıldı";
+"保留：当前选中" = "tutuldu: seçili";
+"保留：shouldUnload 返回 NO" = "tutuldu: shouldUnload NO döndürdü";
+"保留" = "tutuldu";

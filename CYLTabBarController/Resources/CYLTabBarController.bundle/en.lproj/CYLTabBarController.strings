@@ -124,3 +124,13 @@
 "有新内容" = "New content";
 "%@ 条新消息" = "%@ new messages";
 "加号按钮" = "Plus button";
+"模拟内存警告" = "Simulate memory warning";
+"卸载未选中的 Tab，切换时重新加载" = "Unloads unselected tabs; they load again when selected";
+"内存警告" = "Memory warning";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "Not in a CYLTabBarController: no tabs to unload.";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO: no tab unloaded.";
+"未加载" = "not loaded";
+"已卸载" = "unloaded";
+"保留：当前选中" = "kept: selected";
+"保留：shouldUnload 返回 NO" = "kept: shouldUnload returned NO";
+"保留" = "kept";

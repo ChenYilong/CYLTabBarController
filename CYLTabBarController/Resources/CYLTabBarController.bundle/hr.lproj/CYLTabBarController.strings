@@ -124,3 +124,13 @@
 "有新内容" = "Novi sadržaj";
 "%@ 条新消息" = "Nove poruke: %@";
 "加号按钮" = "Tipka plus";
+"模拟内存警告" = "Simuliraj upozorenje o memoriji";
+"卸载未选中的 Tab，切换时重新加载" = "Oslobađa neodabrane kartice; ponovno se učitavaju kad se odaberu";
+"内存警告" = "Upozorenje o memoriji";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "Nije u CYLTabBarControlleru: nema kartica za oslobađanje.";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO: nijedna kartica nije oslobođena.";
+"未加载" = "nije učitano";
+"已卸载" = "oslobođeno";
+"保留：当前选中" = "zadržano: odabrano";
+"保留：shouldUnload 返回 NO" = "zadržano: shouldUnload je vratio NO";
+"保留" = "zadržano";

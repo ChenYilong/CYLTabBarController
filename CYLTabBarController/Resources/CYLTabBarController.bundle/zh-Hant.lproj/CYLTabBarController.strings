@@ -124,3 +124,13 @@
 "有新内容" = "有新內容";
 "%@ 条新消息" = "%@ 則新訊息";
 "加号按钮" = "加號按鈕";
+"模拟内存警告" = "模擬記憶體警告";
+"卸载未选中的 Tab，切换时重新加载" = "卸載未選取的標籤頁，切換時重新載入";
+"内存警告" = "記憶體警告";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "不在 CYLTabBarController 中，沒有可卸載的標籤頁。";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO，未卸載任何標籤頁。";
+"未加载" = "未載入";
+"已卸载" = "已卸載";
+"保留：当前选中" = "保留：目前選取";
+"保留：shouldUnload 返回 NO" = "保留：shouldUnload 傳回 NO";
+"保留" = "保留";

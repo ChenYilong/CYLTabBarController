@@ -209,8 +209,8 @@ static UIColor *CYLBadgeHelperDynamicBorderColor(void) {
 
 - (void)cyl_showBadgeForRow:(NSInteger)row {
     NSDictionary *item = [UITableViewCell cyl_badgeItemForRow:row];
-    // The sample titles end with their API name; a long one is cut in the middle, so the name stays readable.
-    self.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
+    // The sample title (`+cyl_badgeTitleForRow:`, the subtitle in most lists) ends with its API name; a long one is cut
+    // in the middle, so the name stays readable.
     self.detailTextLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
     UIImageView *iconView = self.imageView;
     iconView.image = [UITableViewCell cyl_badgeIcon];
@@ -280,25 +280,26 @@ static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return section == CYLLanguageSettingSection ? 1 : [UITableViewCell cyl_badgeStyleCount];
+    return section == CYLSettingsSection ? [self cyl_settingsRowCount] : [UITableViewCell cyl_badgeStyleCount];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == CYLLanguageSettingSection) {
-        return [self cyl_languageCellForTableView:tableView];
+    if (indexPath.section == CYLSettingsSection) {
+        return [self cyl_settingsCellForTableView:tableView atIndexPath:indexPath];
     }
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLBadgeHelperCellIdentifier forIndexPath:indexPath];
     cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
+    cell.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
     [cell cyl_showBadgeForRow:indexPath.row];
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    if (indexPath.section == CYLLanguageSettingSection) {
-        [self cyl_presentLanguagePicker];
+    if (indexPath.section == CYLSettingsSection) {
+        [self cyl_didSelectSettingsRowAtIndexPath:indexPath inTableView:tableView];
         return;
     }
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     [[tableView cellForRowAtIndexPath:indexPath].imageView cyl_clearBadge];
     !self.didSelectRowHandler ?: self.didSelectRowHandler(indexPath);
     // Issues #426, #428: a tap also simulates a memory warning and logs the tab bar's state afterwards, to check

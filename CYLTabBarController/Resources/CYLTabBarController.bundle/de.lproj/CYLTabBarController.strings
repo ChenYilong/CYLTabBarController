@@ -124,3 +124,13 @@
 "有新内容" = "Neue Inhalte";
 "%@ 条新消息" = "%@ neue Nachrichten";
 "加号按钮" = "Plus-Taste";
+"模拟内存警告" = "Speicherwarnung simulieren";
+"卸载未选中的 Tab，切换时重新加载" = "Entlädt nicht ausgewählte Tabs; sie laden beim Auswählen neu";
+"内存警告" = "Speicherwarnung";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "Nicht in einem CYLTabBarController: keine Tabs zum Entladen.";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO: kein Tab entladen.";
+"未加载" = "nicht geladen";
+"已卸载" = "entladen";
+"保留：当前选中" = "behalten: ausgewählt";
+"保留：shouldUnload 返回 NO" = "behalten: shouldUnload gab NO zurück";
+"保留" = "behalten";

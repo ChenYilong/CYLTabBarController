@@ -111,12 +111,6 @@ FOUNDATION_EXTERN NSString *CYLLocalizationLanguage(void);
 
 @end
 
-/*!
- * [EN] Section index for a one-row language setting at the top of a list (`-cyl_languageCellForTableView:`).
- * [CN] 列表顶部单行语言设置所在的 section（`-cyl_languageCellForTableView:`）。
- */
-FOUNDATION_EXTERN const NSInteger CYLLanguageSettingSection;
-
 @interface UIViewController (CYLLocalization)
 
 /*!

@@ -124,3 +124,13 @@
 "有新内容" = "Nytt innhold";
 "%@ 条新消息" = "%@ nye meldinger";
 "加号按钮" = "Plussknapp";
+"模拟内存警告" = "Simuler minneadvarsel";
+"卸载未选中的 Tab，切换时重新加载" = "Laster ut faner som ikke er valgt; de lastes på nytt når de velges";
+"内存警告" = "Minneadvarsel";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "Ikke i en CYLTabBarController: ingen faner å laste ut.";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO: ingen faner lastet ut.";
+"未加载" = "ikke lastet";
+"已卸载" = "lastet ut";
+"保留：当前选中" = "beholdt: valgt";
+"保留：shouldUnload 返回 NO" = "beholdt: shouldUnload returnerte NO";
+"保留" = "beholdt";

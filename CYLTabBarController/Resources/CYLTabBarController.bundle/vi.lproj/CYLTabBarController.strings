@@ -124,3 +124,13 @@
 "有新内容" = "Có nội dung mới";
 "%@ 条新消息" = "%@ tin nhắn mới";
 "加号按钮" = "Nút cộng";
+"模拟内存警告" = "Mô phỏng cảnh báo bộ nhớ";
+"卸载未选中的 Tab，切换时重新加载" = "Giải phóng các tab chưa chọn; tải lại khi được chọn";
+"内存警告" = "Cảnh báo bộ nhớ";
+"不在 CYLTabBarController 中，没有可卸载的 Tab。" = "Không nằm trong CYLTabBarController: không có tab nào để giải phóng.";
+"unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。" = "unloadsUnselectedViewsOnMemoryWarning = NO: không giải phóng tab nào.";
+"未加载" = "chưa tải";
+"已卸载" = "đã giải phóng";
+"保留：当前选中" = "giữ lại: đang chọn";
+"保留：shouldUnload 返回 NO" = "giữ lại: shouldUnload trả về NO";
+"保留" = "giữ lại";
