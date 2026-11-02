@@ -44,6 +44,37 @@ FOUNDATION_EXTERN const CGFloat CYLBadgeRowHeight;
 @end
 
 /*!
+ * [EN] A badge on the navigation bar, adding the bar button when there is none.
+ * [CN] 导航栏上的角标，没有按钮时先添加按钮。
+ */
+@interface UIViewController (CYLNavigationBadge)
+
+/*!
+ * [EN] Shows `value` (@"" for a red dot) with `animationType` and `backgroundColor` (nil: the default, see
+ *      `CYLBadgeAppearance`) on `navigationItem.rightBarButtonItem`. When there is no right button, a bell button (a
+ *      "Badge" text button before iOS 13) is added first, with no action: set `target` / `action` on the returned item
+ *      to handle taps. Call it from `-viewDidLoad` or later; the badge appears once the bar button is laid out.
+ *
+ *          [self cyl_showNavigationBadgeValue:@"new" animationType:CYLBadgeAnimationTypeShake
+ *                             backgroundColor:UIColor.cyl_randomColor];
+ *          // Swift
+ *          cyl_showNavigationBadge(value: "new", animationType: .shake, backgroundColor: .cyl_randomColor)
+ *
+ * [CN] 在 `navigationItem.rightBarButtonItem` 上显示角标：文字为 `value`（传 @"" 为红点），动画为 `animationType`，背景色为
+ *      `backgroundColor`（传 nil 使用默认颜色，见 `CYLBadgeAppearance`）。没有右侧按钮时先添加一个铃铛按钮（iOS 13 以下为文字
+ *      “Badge”），该按钮没有点击事件，可给返回的按钮设置 `target` / `action`。在 `-viewDidLoad` 或之后调用；按钮完成布局后显示角标。
+ *      示例见上。
+ *
+ * @return [EN] The right bar button item that shows the badge. [CN] 显示角标的右侧按钮。
+ */
+- (UIBarButtonItem *)cyl_showNavigationBadgeValue:(NSString *)value
+                                    animationType:(CYLBadgeAnimationType)animationType
+                                  backgroundColor:(nullable UIColor *)backgroundColor
+    NS_SWIFT_NAME(cyl_showNavigationBadge(value:animationType:backgroundColor:));
+
+@end
+
+/*!
  * [EN] Table of every badge sample, one per row. Tap a row to clear its badge; the tap also simulates a memory warning
  *      (`+[CYLTabBarController cyl_simulateMemoryWarning]`) and logs the tab bar's state afterwards.
  * [CN] 列出全部角标样例的列表，点击一行清除该行角标；同时模拟内存警告（`+[CYLTabBarController cyl_simulateMemoryWarning]`），

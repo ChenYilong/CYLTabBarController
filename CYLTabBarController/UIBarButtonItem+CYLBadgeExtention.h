@@ -38,6 +38,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_showBadgeValue:(NSString *)value
          animationType:(CYLBadgeAnimationType)animationType;
 
+/*!
+ * [EN] Same as `-cyl_showBadgeValue:animationType:`, with the badge's background color set first (nil keeps the
+ *      current one). Safe in `-viewDidLoad`, before the bar button is laid out:
+ *
+ *          [self.navigationItem.rightBarButtonItem cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake
+ *                                                    backgroundColor:UIColor.cyl_randomColor];
+ *          // Swift
+ *          navigationItem.rightBarButtonItem?.cyl_showBadgeValue("", animationType: .shake, backgroundColor: .cyl_randomColor)
+ *
+ * [CN] 同 `-cyl_showBadgeValue:animationType:`，并先设置角标背景色（传 nil 保持当前颜色）。可在 `-viewDidLoad` 中、bar button
+ *      完成布局之前调用（示例见上）。
+ */
+- (void)cyl_showBadgeValue:(NSString *)value
+             animationType:(CYLBadgeAnimationType)animationType
+           backgroundColor:(nullable UIColor *)backgroundColor;
+
 
 /**
  *  clear badge(hide badge)

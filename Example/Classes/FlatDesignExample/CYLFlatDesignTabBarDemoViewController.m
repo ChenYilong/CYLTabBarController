@@ -141,16 +141,16 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 #if CYL_FLATDESIGN_AVAILABLE
     if (indexPath.row == 0) {
-        _tabBar.barTintColor = [self.cyl_randomColor colorWithAlphaComponent:0.5];
+        _tabBar.barTintColor = [UIColor.cyl_randomColor colorWithAlphaComponent:0.5];
         _uitabBar.barTintColor = _tabBar.barTintColor;
     } else if (indexPath.row == 1) {
-        _tabBar.backgroundImage = [UIImage cyl_imageWithColor:self.cyl_randomColor size:CGSizeMake(4, 4)];
+        _tabBar.backgroundImage = [UIImage cyl_imageWithColor:UIColor.cyl_randomColor size:CGSizeMake(4, 4)];
         _uitabBar.backgroundImage = _tabBar.backgroundImage;
     } else if (indexPath.row == 2) {
-        _tabBar.shadowImage = [UIImage cyl_imageWithColor:self.cyl_randomColor size:CGSizeMake(4, 1)];
+        _tabBar.shadowImage = [UIImage cyl_imageWithColor:UIColor.cyl_randomColor size:CGSizeMake(4, 1)];
         _uitabBar.shadowImage = _tabBar.shadowImage;
     } else if (indexPath.row == 3) {
-        _tabBar.tintColor = self.cyl_randomColor;
+        _tabBar.tintColor = UIColor.cyl_randomColor;
         _uitabBar.tintColor = _tabBar.tintColor;
     } else if (indexPath.row == 4) {
         NSMutableArray *items = [_tabBar.items mutableCopy];
@@ -202,13 +202,5 @@
 }
 #else
 #endif
-
-#pragma mark - Helps
-- (UIColor *)cyl_randomColor {
-    CGFloat red = ( arc4random() % 255 / 255.0 );
-    CGFloat green = ( arc4random() % 255 / 255.0 );
-    CGFloat blue = ( arc4random() % 255 / 255.0 );
-    return [UIColor colorWithRed:red green:green blue:blue alpha:1.0];
-}
 
 @end

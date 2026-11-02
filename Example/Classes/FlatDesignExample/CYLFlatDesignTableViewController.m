@@ -60,7 +60,6 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"LiquidGlass") style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
     //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"CYLTabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
     
-#define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
     [self.navigationItem.leftBarButtonItem setTintColor:UIColor.redColor];
     [self.navigationItem.rightBarButtonItem setTintColor:UIColor.redColor];
     
@@ -73,9 +72,9 @@
     //                [viewController0 cyl_setBadgeRadius:11/2];
     
     //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
-    [self.navigationItem.rightBarButtonItem cyl_showBadge];
-    [self.navigationItem.rightBarButtonItem cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake];
-    [self.navigationItem.leftBarButtonItem cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScaleOnce];
+    // Animated navigation item badges in a random color. 导航栏按钮的动画角标，使用随机颜色。
+    [self.navigationItem.rightBarButtonItem cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake backgroundColor:UIColor.cyl_randomColor];
+    [self.navigationItem.leftBarButtonItem cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeBreathe backgroundColor:UIColor.cyl_randomColor];
     
     if (CYL_IS_IOS_26) {
         if (@available(iOS 26.0, *)) {

@@ -637,4 +637,11 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
     return nil;
 }
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
++ (UIColor *)cyl_randomColor {
+    CGFloat hue = arc4random_uniform(256) / 256.0;
+    CGFloat saturation = arc4random_uniform(128) / 256.0 + 0.5;
+    CGFloat brightness = arc4random_uniform(128) / 256.0 + 0.5;
+    return [UIColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
+}
+
 @end

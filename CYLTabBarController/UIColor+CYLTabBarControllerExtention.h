@@ -143,6 +143,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (UIColor *)cyl_colorWithLightColor:(UIColor *)lightColor darkColor:(nullable UIColor *)darkColor NS_SWIFT_NAME(cyl_color(withLight:dark:));
 
+/*!
+ * [EN] A new random color each time it is read: any hue, with saturation and brightness kept between 0.5 and 1, so
+ *      white badge text stays readable on it. Used by the demos for badges, e.g.
+ *
+ *          self.navigationItem.rightBarButtonItem.cyl_badgeBackgroundColor = UIColor.cyl_randomColor;
+ *
+ * [CN] 每次读取都返回一个新的随机颜色：色相任意，饱和度和亮度保持在 0.5～1 之间，白色角标文字在其上依然清晰。Demo 用它给角标
+ *      设置随机颜色（示例见上）。
+ */
+@property (class, nonatomic, readonly) UIColor *cyl_randomColor;
+
 @end
 
 #pragma mark - Deprecated API

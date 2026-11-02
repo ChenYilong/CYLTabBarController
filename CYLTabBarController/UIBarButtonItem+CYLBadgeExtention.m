@@ -58,6 +58,15 @@
     });
 }
 
+- (void)cyl_showBadgeValue:(NSString *)value
+             animationType:(CYLBadgeAnimationType)animationType
+           backgroundColor:(UIColor *)backgroundColor {
+    if (backgroundColor) {
+        self.cyl_badgeBackgroundColor = backgroundColor;
+    }
+    [self cyl_showBadgeValue:value animationType:animationType];
+}
+
 - (void)cyl_clearBadge {
     [CYL_ACTUAL_BARBUTTON cyl_clearBadge];
 }
@@ -75,6 +84,30 @@
 }
 
 #pragma mark -- private method
+/*!
+ * [EN] Runs `block` with the view that shows the badge: now when the bar button is laid out, else after the same 0.5 s
+ *      that `-cyl_showBadgeValue:animationType:` waits. A style set in `-viewDidLoad` (e.g. `cyl_badgeBackgroundColor`)
+ *      was sent to a view that did not exist yet and was lost, while the badge itself still appeared later. Blocks
+ *      queued with the same delay run in order, so a style set before showing the badge is applied before it shows.
+ * [CN] 用显示角标的视图执行 `block`：bar button 已完成布局时立即执行，否则与 `-cyl_showBadgeValue:animationType:` 一样延迟 0.5 秒。
+ *      以前在 `-viewDidLoad` 中设置的样式（如 `cyl_badgeBackgroundColor`）发给了尚不存在的视图而丢失，角标本身却会稍后显示。
+ *      相同延迟的任务按顺序执行，因此在显示角标之前设置的样式会先生效。
+ */
+- (void)cyl_performWithBadgeSuperView:(void (^)(UIView *view))block {
+    if (self.cyl_isReady) {
+        block(CYL_ACTUAL_BARBUTTON);
+        return;
+    }
+    __weak __typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) self = weakSelf;
+        UIView *view = self ? (UIView *)[self cyl_getActualBadgeSuperView] : nil;
+        if (view) {
+            block(view);
+        }
+    });
+}
+
 
 /**
  *  Because UIBarButtonItem is kind of NSObject, it is not able to directly attach badge.
@@ -219,7 +252,7 @@
 }
 
 - (void)cyl_setBadge:(UIView<CYLBadgeTextDisplaying> *)label {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadge:label];
+    [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadge:label]; }];
 }
 
 - (UIFont *)cyl_badgeFont {
@@ -227,7 +260,7 @@
 }
 
 - (void)cyl_setBadgeFont:(UIFont *)badgeFont {
-	[CYL_ACTUAL_BARBUTTON cyl_setBadgeFont:badgeFont];
+	[self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeFont:badgeFont]; }];
 }
 
 - (UIColor *)cyl_badgeBackgroundColor {
@@ -235,7 +268,7 @@
 }
 
 - (void)cyl_setBadgeBackgroundColor:(UIColor *)badgeBackgroundColor {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeBackgroundColor:badgeBackgroundColor];
+    [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeBackgroundColor:badgeBackgroundColor]; }];
 }
 
 - (UIColor *)cyl_badgeTextColor {
@@ -243,7 +276,7 @@
 }
 
 - (void)cyl_setBadgeTextColor:(UIColor *)badgeTextColor {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeTextColor:badgeTextColor];
+    [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeTextColor:badgeTextColor]; }];
 }
 
 - (CYLBadgeAnimationType)cyl_badgeAnimationType {
@@ -251,7 +284,7 @@
 }
 
 - (void)cyl_setBadgeAnimationType:(CYLBadgeAnimationType)animationType {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeAnimationType:animationType];
+    [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeAnimationType:animationType]; }];
 }
 
 - (void)cyl_setBadgeAnimationTypeValue:(NSNumber *)cyl_badgeAnimationTypeValue {
@@ -264,7 +297,7 @@
 }
 
 - (void)cyl_setBadgeFrame:(CGRect)badgeFrame {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeFrame:badgeFrame];
+    [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeFrame:badgeFrame]; }];
 }
 
 - (void)cyl_setBadgeFrameValue:(NSValue *)cyl_badgeFrameValue {
@@ -277,7 +310,7 @@
 }
 
 - (void)cyl_setBadgeCenterOffset:(CGPoint)badgeCenterOffset {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeCenterOffset:badgeCenterOffset];
+    [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeCenterOffset:badgeCenterOffset]; }];
 }
 
 - (void)cyl_setBadgeCenterOffsetValue:(NSValue *)badgeCenterOffsetValue {
@@ -291,7 +324,7 @@
 }
 
 - (void)cyl_setBadgeMaximumBadgeNumber:(NSInteger)badgeMaximumBadgeNumber {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeMaximumBadgeNumber:badgeMaximumBadgeNumber];
+    [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeMaximumBadgeNumber:badgeMaximumBadgeNumber]; }];
 }
 
 - (void)cyl_setBadgeMaximumBadgeNumberValue:(NSNumber *)cyl_badgeMaximumBadgeNumberValue {
@@ -304,7 +337,7 @@
 }
 
 - (void)cyl_setBadgeMargin:(CGFloat)badgeMargin {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeMargin:badgeMargin];
+    [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeMargin:badgeMargin]; }];
 }
 
 - (void)cyl_setBadgeMarginValue:(NSNumber *)cyl_badgeMarginValue {
@@ -317,7 +350,7 @@
 }
 
 - (void)cyl_setBadgeRadius:(CGFloat)badgeRadius {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeRadius:badgeRadius];
+    [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeRadius:badgeRadius]; }];
 }
 
 - (void)cyl_setBadgeRadiusValue:(NSNumber *)cyl_badgeRadiusValue {
@@ -330,7 +363,7 @@
 }
 
 - (void)cyl_setBadgeCornerRadius:(CGFloat)cyl_badgeCornerRadius {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
+    [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeCornerRadius:cyl_badgeCornerRadius]; }];
 }
 
 - (void)cyl_setBadgeCornerRadiusValue:(NSNumber *)cyl_badgeCornerRadiusValue {
