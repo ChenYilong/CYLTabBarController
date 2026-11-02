@@ -211,6 +211,20 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 - (UIViewContentMode)lottieAnimationViewContentMode;
 
 /*!
+ * [EN] Playback speed of the Lottie animation views (`animationSpeed`). Default is 1.0; set it, e.g. to 1.5 to play 1.5
+ *      times as fast, before the tab bar is laid out (in `-init…` or `-viewDidLoad`), or override the getter in a
+ *      subclass. Applied once to each Lottie view when it is added, in every tab bar style, so there is no need to wait
+ *      for the views to be added (issue #428). To change one tab only, observe
+ *      `CYLTabBarItemLottieAnimationViewDidAddNotification`, or call `-[UIControl cyl_setLottieAnimationSpeed:]`.
+ *      0, negative or non-finite values mean the default. Only takes effect when Lottie is integrated.
+ * [CN] Lottie 动画视图的播放速度（`animationSpeed`），默认 1.0。可在 TabBar 布局之前（`-init…` 或 `-viewDidLoad` 中）设置，
+ *      例如设为 1.5 表示 1.5 倍速播放；也可在子类中重写 getter。每个 Lottie 视图添加时会设置一次，适用于所有 TabBar 样式，
+ *      无需等待动画视图添加完成（issue #428）。只修改某一个 Tab 时，可监听 `CYLTabBarItemLottieAnimationViewDidAddNotification`，
+ *      或调用 `-[UIControl cyl_setLottieAnimationSpeed:]`。0、负数或非有限值表示默认值。只有集成了 Lottie 才会生效。
+ */
+@property (nonatomic, assign) CGFloat lottieAnimationSpeed;
+
+/*!
  * To set both Item label text attributes in the tabBar,
  * use the following to tweak the relative position of the label within the tab button (for handling visual centering corrections if needed because of custom text attributes)
  */
@@ -591,6 +605,19 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  */
 + (nullable CYLTabBarController *)cyl_activeTabBarController;
 
+/*!
+ * [EN] Debug and demo helper: simulates a system memory warning with public API only. It posts
+ *      `UIApplicationDidReceiveMemoryWarningNotification` (view controllers receive `-didReceiveMemoryWarning`) and calls the
+ *      app delegate's `-applicationDidReceiveMemoryWarning:`, then logs every tab of the most recently active tab bar
+ *      controller: its Lottie view and `animationSpeed` (issue #428) and whether its badge is shown. Use it to check that
+ *      your tab bar keeps them after a memory warning (issue #426), in every tab bar style. Main thread only.
+ * [CN] 调试与演示用：仅使用公开 API 模拟系统内存警告。发送 `UIApplicationDidReceiveMemoryWarningNotification`（视图控制器会收到
+ *      `-didReceiveMemoryWarning`）并调用 App 代理的 `-applicationDidReceiveMemoryWarning:`，随后输出最近活跃的 TabBarController
+ *      每个 Tab 的状态：Lottie 视图及其 `animationSpeed`（issue #428）、角标是否显示。用于检查内存警告后 TabBar 是否保持这些状态
+ *      （issue #426），适用于所有 TabBar 样式。请在主线程调用。
+ */
++ (void)cyl_simulateMemoryWarning;
+
 @end
 
 @interface NSObject (CYLTabBarControllerReferenceExtension)
@@ -662,6 +689,17 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 @end
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotification;
+
+/*!
+ * [EN] Posted after a Lottie animation view is added to a tab button (issue #428). The notification's `object` is the tab
+ *      button; get the view with `-[UIControl cyl_lottieAnimationView]`. Posted on the main queue, after
+ *      `-[CYLTabBarController lottieAnimationSpeed]` has been applied, so a value set in the handler is kept.
+ *      In the Liquid Glass style a tab has two buttons (normal and selected), so it is posted once for each.
+ * [CN] Lottie 动画视图添加到 Tab 按钮后发送（issue #428）。通知的 `object` 为 Tab 按钮，可用
+ *      `-[UIControl cyl_lottieAnimationView]` 取得动画视图。在主队列发送，此时已设置 `-[CYLTabBarController lottieAnimationSpeed]`，
+ *      在回调中设置的值不会被覆盖。液态玻璃样式中每个 Tab 有普通与选中两个按钮，因此各发送一次。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification;
 
 // * 液态玻璃开关变化
  //TODO:  

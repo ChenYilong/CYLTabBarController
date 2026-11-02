@@ -155,6 +155,7 @@
 #if CYL_FLATDESIGN_AVAILABLE
 
     [tableView deselectRowAtIndexPath:indexPath animated:true];
+    [CYLTabBarController cyl_simulateMemoryWarning]; // #426/#428: memory warning demo, see the log 内存警告演示，见日志
     
     
     if ([self.cylflatdesign_tabBarController isKindOfClass:[CYLFlatDesignSystemTabBarController class]]) {

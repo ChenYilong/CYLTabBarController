@@ -8,6 +8,7 @@
 #import "UITableViewCell+CYLBadgeExtention.h"
 #import "UIView+CYLBadgeExtention.h"
 #import "CAAnimation+CYLBadgeExtention.h"
+#import "CYLTabBarController.h"
 
 const CGFloat CYLBadgeRowHeight = 60;
 static const CGFloat CYLBadgeIconSide = 30;
@@ -273,6 +274,9 @@ static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     [[tableView cellForRowAtIndexPath:indexPath].imageView cyl_clearBadge];
+    // Demo (issues #426, #428): a tap also simulates a memory warning and logs the tab bar's state afterwards, to check
+    // that the tab Lottie icons keep their speed and the badges stay. 演示：点击同时模拟内存警告并输出之后的 TabBar 状态。
+    [CYLTabBarController cyl_simulateMemoryWarning];
 }
 
 @end

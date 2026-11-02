@@ -183,6 +183,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         tabBarStyleType = .flatDesign
         _ = cyl_tabBar
         tabBarHeight = 60
+        lottieAnimationSpeed = 1.5 // Issue #428: Lottie tab icons at 1.5x (no effect without Lottie) Lottie 图标 1.5 倍速
         buildArchitecture()
     }
     

@@ -15,6 +15,7 @@ class MainTabBarController: CYLTabBarController {
         super.viewDidLoad()
         
         self.delegate = self
+        lottieAnimationSpeed = 1.5 // Issue #428: Lottie tab icons at 1.5x (no effect without Lottie) Lottie 图标 1.5 倍速
     }
     
     

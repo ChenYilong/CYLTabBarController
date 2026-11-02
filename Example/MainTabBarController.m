@@ -68,6 +68,36 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [self becomeFirstResponder];
     [self customizeInterface];
     [super viewDidLoad];
+    [self observeLottieAnimationViewDidAdd];
+}
+
+/*!
+ * [EN] Issue #428: called once for each Lottie view, after `-lottieAnimationSpeed` was applied. Set a different speed for
+ *      one tab here with `-[UIControl cyl_setLottieAnimationSpeed:]`.
+ * [CN] Issue #428：每个 Lottie 视图添加后回调一次，此时已设置 `-lottieAnimationSpeed`。可在这里用
+ *      `-[UIControl cyl_setLottieAnimationSpeed:]` 为某一个 Tab 单独设置速度。
+ */
+- (void)observeLottieAnimationViewDidAdd {
+    __weak __typeof(self) weakSelf = self;
+    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationViewDidAddNotification
+                                                      object:nil
+                                                       queue:[NSOperationQueue mainQueue]
+                                                  usingBlock:^(NSNotification * _Nonnull note) {
+        UIControl *tabButton = note.object;
+        if (tabButton.cyl_tabBarController != weakSelf) {
+            return;
+        }
+        NSLog(@"🟢 Lottie view added: tab %@, animationSpeed %@", @(tabButton.cyl_tabBarChildViewControllerIndex),
+              [(id)tabButton.cyl_lottieAnimationView valueForKey:@"animationSpeed"]);
+    }];
+}
+
+/*!
+ * [EN] Issue #428: plays the Lottie icons 1.5 times as fast. No need to wait for the Lottie views to be added.
+ * [CN] Issue #428：Lottie 图标以 1.5 倍速播放，无需等待 Lottie 视图添加完成。
+ */
+- (CGFloat)lottieAnimationSpeed {
+    return 1.5;
 }
 
 - (NSArray *)viewControllersForTabBar {

@@ -43,8 +43,10 @@ FOUNDATION_EXTERN const CGFloat CYLBadgeRowHeight;
 @end
 
 /*!
- * [EN] Table of every badge sample, one per row. Tap a row to clear its badge.
- * [CN] 列出全部角标样例的列表，点击一行清除该行角标。
+ * [EN] Table of every badge sample, one per row. Tap a row to clear its badge; the tap also simulates a memory warning
+ *      (`+[CYLTabBarController cyl_simulateMemoryWarning]`) and logs the tab bar's state afterwards.
+ * [CN] 列出全部角标样例的列表，点击一行清除该行角标；同时模拟内存警告（`+[CYLTabBarController cyl_simulateMemoryWarning]`），
+ *      并输出之后的 TabBar 状态。
  */
 @interface CYLBadgeHelperTableViewController : UITableViewController
 

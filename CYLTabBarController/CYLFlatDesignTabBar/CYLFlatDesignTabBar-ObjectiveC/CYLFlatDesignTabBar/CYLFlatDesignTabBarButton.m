@@ -318,6 +318,26 @@
  *   an unresolved controller falls back to the documented default instead of 0.
  */
 - (UIViewContentMode)_lottieContentMode {
+    CYLTabBarController *tabBarController = [self _lottieTabBarController];
+    // Never let a missing controller become 0 (UIViewContentModeScaleToFill);
+    // fall back to the documented default instead.
+    if (!tabBarController) {
+        return UIViewContentModeScaleAspectFit;
+    }
+    return [tabBarController lottieAnimationViewContentMode];
+}
+
+/// FIX: issue #428 — `-[CYLTabBarController lottieAnimationSpeed]` in flat design, resolved like `-_lottieContentMode`.
+- (CGFloat)_lottieAnimationSpeed {
+    CYLTabBarController *tabBarController = [self _lottieTabBarController];
+    if (!tabBarController) {
+        return 1.0;
+    }
+    return [tabBarController lottieAnimationSpeed];
+}
+
+/// The tab bar controller that owns this button, in any style; see `-_lottieContentMode`.
+- (CYLTabBarController *)_lottieTabBarController {
     // Non-flat styles: the regular lookup finds the controller (nil for flat design, by design).
     CYLTabBarController *tabBarController = [self cyl_tabBarController];
     if (!tabBarController) {
@@ -330,12 +350,10 @@
             tabBarController = _tabBarItem.childViewController.cylflatdesign_tabBarController;
         }
     }
-    // Never let a missing controller become 0 (UIViewContentModeScaleToFill);
-    // fall back to the documented default instead.
     if (![tabBarController isKindOfClass:[CYLTabBarController class]]) {
-        return UIViewContentModeScaleAspectFit;
+        return nil;
     }
-    return [tabBarController lottieAnimationViewContentMode];
+    return tabBarController;
 }
 
 - (void)initLottie {
@@ -347,12 +365,12 @@
     if (lottieURL) {
 #if __has_include(<Lottie/Lottie.h>)
         CGSize lottieSize = [[self _lottieSizeValue] CGSizeValue];
-        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode]];
+        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode] animationSpeed:[self _lottieAnimationSpeed]];
 #endif
      
 #if __has_include(<Lottie/Lottie-Swift.h>)
         CGSize lottieSize = [[self _lottieSizeValue] CGSizeValue];
-        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode]];
+        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode] animationSpeed:[self _lottieAnimationSpeed]];
 #endif
     }
 }
@@ -367,6 +385,8 @@
         if (!lottieURL) {
             return;
         }
+        // The selected button can get here before `-initLottie`; add the view with the speed first (issue #428).
+        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode] animationSpeed:[self _lottieAnimationSpeed]];
         [self cyl_animationLottieImageWithLottieURL:lottieURL size:lottieSize defaultSelected:NO contentMode:[self _lottieContentMode]];
     }
     else {
