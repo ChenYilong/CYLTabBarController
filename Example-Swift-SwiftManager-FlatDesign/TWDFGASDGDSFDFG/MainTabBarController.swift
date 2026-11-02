@@ -169,7 +169,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         
         // 5. 控制器配置 (使用原生 UIViewController 占位)
         var controller: UIViewController {
-            return CYLBadgeHelperTableViewController()
+            return self == .home ? HomeViewController() : CYLBadgeHelperTableViewController()
         }
     }
 
@@ -289,5 +289,15 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         let root = viewController.cyl_getViewControllerInsteadOfNavigation()
         // 此处判断逻辑已根据 ViewController 标题解耦
         currentTheme = (root.navigationItem.title == CYLLocalizedString("房间")) ? .roomStyle : .normal
+    }
+}
+
+/// The home page: the badge samples, plus an animated badge in a random color on the navigation bar.
+/// 首页：角标样例列表，以及导航栏上随机颜色的动画角标。
+private final class HomeViewController: CYLBadgeHelperTableViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // No navigation bar button here: a bell button is added first. 没有导航栏按钮：先添加铃铛按钮。
+        cyl_showNavigationBadge(value: "99", animationType: .scale, backgroundColor: UIColor.cyl_randomColor)
     }
 }

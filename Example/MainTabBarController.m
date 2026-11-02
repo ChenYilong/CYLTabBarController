@@ -20,7 +20,6 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 #import "CYLMineViewController.h"
 #import "CYLSameCityViewController.h"
 
-#define RANDOM_COLOR [UIColor colorWithHue: (arc4random() % 256 / 256.0) saturation:((arc4random()% 128 / 256.0 ) + 0.5) brightness:(( arc4random() % 128 / 256.0 ) + 0.5) alpha:1]
 
 @interface MainTabBarController ()<CYLTabBarControllerDelegate, CYLFlatDesignUITabBarControllerDelegate>
 
@@ -532,7 +531,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                 UIViewController *viewController0 = tabBarController.viewControllers[0];
                 // UIControl *tab0 = viewController0.cyl_tabButton;
                 // [tab0 cyl_showBadge];
-                [viewController0 cyl_setBadgeBackgroundColor:RANDOM_COLOR];
+                [viewController0 cyl_setBadgeBackgroundColor:UIColor.cyl_randomColor];
                 [viewController0 cyl_setBadgeRadius:11/2];
                 [viewController0 cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeBreathe];
                 [self setSelectedCoverShow:YES];
@@ -543,7 +542,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                 //                                [tabBarController.viewControllers[2] cyl_setBadgeMargin:1.0];
                 //                                [tabBarController.viewControllers[3] cyl_setBadgeMargin:1.0];
                 //                                [tabBarController.viewControllers[4] cyl_setBadgeMargin:1.0];
-                [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:RANDOM_COLOR];
+                [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:UIColor.cyl_randomColor];
                 [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScale];
                 [tabBarController.viewControllers[2] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake];
                 

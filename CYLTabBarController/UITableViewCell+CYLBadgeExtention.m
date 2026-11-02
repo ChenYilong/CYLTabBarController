@@ -266,6 +266,28 @@ static UIColor *CYLBadgeHelperDynamicBorderColor(void) {
 
 static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
 
+@implementation UIViewController (CYLNavigationBadge)
+
+- (UIBarButtonItem *)cyl_showNavigationBadgeValue:(NSString *)value
+                                    animationType:(CYLBadgeAnimationType)animationType
+                                  backgroundColor:(UIColor *)backgroundColor {
+    UIBarButtonItem *item = self.navigationItem.rightBarButtonItem;
+    if (!item) {
+        if (@available(iOS 13.0, *)) {
+            item = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"bell"] style:UIBarButtonItemStylePlain
+                                                   target:nil action:NULL];
+        } else {
+            item = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"Badge") style:UIBarButtonItemStylePlain
+                                                   target:nil action:NULL];
+        }
+        self.navigationItem.rightBarButtonItem = item;
+    }
+    [item cyl_showBadgeValue:value ?: @"" animationType:animationType backgroundColor:backgroundColor];
+    return item;
+}
+
+@end
+
 @implementation CYLBadgeHelperTableViewController
 
 - (void)viewDidLoad {

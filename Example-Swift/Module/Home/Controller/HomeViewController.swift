@@ -6,26 +6,14 @@
 //
 
 import UIKit
+import CYLTabBarController
 
-class HomeViewController: UIViewController {
+/// The home page: the badge samples, plus an animated badge in a random color on the navigation bar.
+/// 首页：角标样例列表，以及导航栏上随机颜色的动画角标。
+final class HomeViewController: CYLBadgeHelperTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        view.backgroundColor = UIColor.orange
+        // No navigation bar button here: a bell button is added first. 没有导航栏按钮：先添加铃铛按钮。
+        cyl_showNavigationBadge(value: "new", animationType: .breathe, backgroundColor: UIColor.cyl_randomColor)
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-    /*
-     // MARK: - Navigation
-
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-         // Get the new view controller using segue.destinationViewController.
-         // Pass the selected object to the new view controller.
-     }
-     */
 }

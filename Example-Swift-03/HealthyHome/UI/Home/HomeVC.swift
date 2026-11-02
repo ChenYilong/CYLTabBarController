@@ -16,6 +16,8 @@ class HomeVC: ViewController {
         self.view.backgroundColor = .red
 
         addRightBarButtonItemImage("屏幕全屏", self, action: #selector(tapAction))
+        // Animated badge in a random color on the right button. 右侧按钮上的随机颜色动画角标。
+        cyl_showNavigationBadge(value: "", animationType: .shake, backgroundColor: UIColor.cyl_randomColor)
         cyl_addBadgeHelperTable()
     }
     
