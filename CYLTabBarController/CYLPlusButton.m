@@ -241,6 +241,9 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     if (moved) {
         [self cyl_setNeedsTitleAlignment];
         [self cyl_moveSelectedContentViewWithPlusButton];
+    }    // Issue #91: the touchable area overlay follows the plus button. 可点击区域的调试视图跟随 PlusButton。
+    if (_showsTouchableArea) {
+        [self cyl_updateTouchableAreaView];
     }
 }
 
@@ -254,6 +257,8 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
         if (!CGPointEqualToPoint(center, self.center)) {
             [super setCenter:center];
         }
+    }    if (_showsTouchableArea) {
+        [self cyl_updateTouchableAreaView];
     }
 }
 
@@ -1125,20 +1130,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (void)removeFromSuperview {
     [self.cyl_touchableAreaView removeFromSuperview];
     [super removeFromSuperview];
-}
-
-- (void)setFrame:(CGRect)frame {
-    [super setFrame:frame];
-    if (_showsTouchableArea) {
-        [self cyl_updateTouchableAreaView];
-    }
-}
-
-- (void)setCenter:(CGPoint)center {
-    [super setCenter:center];
-    if (_showsTouchableArea) {
-        [self cyl_updateTouchableAreaView];
-    }
 }
 
 - (void)setHidden:(BOOL)hidden {
