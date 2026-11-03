@@ -52,7 +52,7 @@
 | 中文 | English |
 |:---|:---|
 | 来源：[#400](https://github.com/ChenYilong/CYLTabBarController/issues/400) | Source: [#400](https://github.com/ChenYilong/CYLTabBarController/issues/400) |
-| 本库使用 Objective-C 编写，可直接在 Swift 项目中使用。仓库中提供了多个 Swift Demo（`Example-Swift*` 目录），用法见 README 的 [在 Swift 项目中使用 CYLTabBarController](../README.md#cn在-swift-项目中使用-cyltabbarcontroller)。 | The library is written in Objective-C and works in Swift projects as is. The repository has several Swift demos (the `Example-Swift*` directories); see [Using CYLTabBarController in a Swift project](../README.md#enusing-cyltabbarcontroller-in-a-swift-project) in the README. |
+| 本库使用 Objective-C 编写，可直接在 Swift 项目中使用。仓库中提供了多个 Swift Demo（`Example-Swift*` 目录），用法见 README 的 [在 Swift 项目中使用 CYLTabBarController](../README.md#cn在-swift-项目中使用-cyltabbarcontroller)，完整的 Swift 接入与 API 示例见 [Swift 使用指南](Swift-Guide.md)（含 `import` 报错的解决方法，[#282](https://github.com/ChenYilong/CYLTabBarController/issues/282)）。 | The library is written in Objective-C and works in Swift projects as is. The repository has several Swift demos (the `Example-Swift*` directories); see [Using CYLTabBarController in a Swift project](../README.md#enusing-cyltabbarcontroller-in-a-swift-project) in the README, and the [Swift guide](Swift-Guide.md) for full setup and API examples in Swift (including fixes for `import` errors, [#282](https://github.com/ChenYilong/CYLTabBarController/issues/282)). |
 
 ### [CN]控制台打印 `Class CYLTabBar overrides the -traitCollection getter, which is not supported`
 ### [EN]The console prints `Class CYLTabBar overrides the -traitCollection getter, which is not supported`
