@@ -170,3 +170,8 @@
 "「%@」需要登录后才能查看" = "Connectez-vous pour voir « %@ »";
 "登录" = "Se connecter";
 "、" = ", ";
+
+/* Issue #91: plus button touchable area demo row. */
+"PlusButton 点击范围（issue #91）" = "Zone tactile du PlusButton (issue #91)";
+"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Activez l’interrupteur pour afficher la zone tactile en rouge translucide, désactivez-le pour revenir à l’aspect normal ; faites glisser le curseur pour multiplier la zone. Actuel : %@x";
+"当前 TabBar 没有 PlusButton" = "Cette barre d’onglets n’a pas de PlusButton";

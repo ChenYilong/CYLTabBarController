@@ -170,3 +170,8 @@
 "「%@」需要登录后才能查看" = "“%@” öğesini görmek için giriş yapın";
 "登录" = "Giriş yap";
 "、" = ", ";
+
+/* Issue #91: plus button touchable area demo row. */
+"PlusButton 点击范围（issue #91）" = "PlusButton dokunma alanı (issue #91)";
+"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Dokunma alanını yarı saydam kırmızıyla göstermek için anahtarı açın, normal görünüme dönmek için kapatın; alanı katlamak için kaydırıcıyı sürükleyin. Şu an: %@x";
+"当前 TabBar 没有 PlusButton" = "Bu sekme çubuğunda PlusButton yok";

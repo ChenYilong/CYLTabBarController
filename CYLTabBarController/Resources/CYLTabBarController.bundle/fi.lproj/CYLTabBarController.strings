@@ -170,3 +170,8 @@
 "「%@」需要登录后才能查看" = "Kirjaudu nähdäksesi “%@”";
 "登录" = "Kirjaudu";
 "、" = ", ";
+
+/* Issue #91: plus button touchable area demo row. */
+"PlusButton 点击范围（issue #91）" = "PlusButtonin kosketusalue (issue #91)";
+"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Kytke kytkin päälle näyttääksesi kosketusalueen läpikuultavan punaisena, pois palataksesi normaaliin; vedä liukusäädintä moninkertaistaaksesi alueen. Nyt: %@x";
+"当前 TabBar 没有 PlusButton" = "Tässä välilehtipalkissa ei ole PlusButtonia";

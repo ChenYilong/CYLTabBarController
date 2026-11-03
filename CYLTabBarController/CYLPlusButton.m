@@ -108,6 +108,8 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 @property (nonatomic, weak) UIButton *selectedContentView;
 @property (nonatomic, strong) UIImage *selectedContentImage;
 @property (nonatomic, strong) UIImage *contentImage;
+/// Issue #91: the overlay of `showsTouchableArea`, in the superview, under the plus button. 可点击区域的调试覆盖层。
+@property (nonatomic, strong, nullable) UIView *cyl_touchableAreaView;
 
 @end
 
@@ -128,6 +130,8 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
 
 @implementation CYLPlusButton
 //@synthesize selected = _selected;
+// Custom getter and setter: no automatic ivar. 自定义了 getter 与 setter，不会自动合成实例变量。
+@synthesize touchableAreaScale = _touchableAreaScale;
 
 /*!
  * [EN] VoiceOver: an icon-only plus button was read as its image's file name (or not at all). It is read as its title, or
@@ -752,6 +756,10 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
 /// The image-above-title layout of `+cyl_plusButtonWithImage:…`; other plus buttons keep UIButton's layout.
 - (void)layoutSubviews {
     [super layoutSubviews];
+    // Issue #91: keep the touchable area overlay on the button. 保持可点击区域覆盖层与按钮一致。
+    if (_showsTouchableArea) {
+        [self cyl_updateTouchableAreaView];
+    }
     if (![objc_getAssociatedObject(self, @selector(cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:)) boolValue]) {
         return;
     }
@@ -1019,7 +1027,125 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 //- (void)setHighlighted:(BOOL)highlighted {}
 
 - (CGRect)touchableRect {
-    return self.frame;
+    CGRect rect = self.frame;
+    CGFloat scale = MAX(_touchableAreaScale, 1.0);   // 0 (never set) and values below 1 count as 1
+    if (scale > 1.0) {
+        rect = CGRectInset(rect, -CGRectGetWidth(rect) * (scale - 1.0) / 2.0, -CGRectGetHeight(rect) * (scale - 1.0) / 2.0);
+    }
+    UIEdgeInsets outsets = _touchableAreaOutsets;
+    return UIEdgeInsetsInsetRect(rect, UIEdgeInsetsMake(-outsets.top, -outsets.left, -outsets.bottom, -outsets.right));
+}
+
+- (CGRect)touchableRectInView:(UIView *)view {
+    CGRect rect = [self touchableRect];
+    UIView *superview = self.superview;
+    if (!view || !superview || superview == view) {
+        return rect;
+    }
+    return [superview convertRect:rect toView:view];
+}
+
+#pragma mark - Touchable area (issue #91)
+
+/*!
+ * [EN] The whole touchable area counts as inside the button. The tab bars return the plus button from their hit test
+ *      for a point in that area, but UIControl only sends `UIControlEventTouchUpInside` when the touch ends inside
+ *      `-pointInside:withEvent:`; without this, a tap in the extra area ended as `TouchUpOutside` and did nothing.
+ * [CN] 整个可点击区域都算作按钮内部。TabBar 的 hitTest 会把该区域内的点交给 PlusButton，但 UIControl 只有在触摸结束于
+ *      `-pointInside:withEvent:` 之内时才发送 `UIControlEventTouchUpInside`；否则点在扩展区域内会变成 `TouchUpOutside`，不会触发点击。
+ */
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
+    if ([super pointInside:point withEvent:event]) {
+        return YES;
+    }
+    UIView *superview = self.superview;
+    if (!superview) {
+        return NO;
+    }
+    CGRect touchableRect = [self convertRect:[self touchableRect] fromView:superview];
+    return CGRectContainsPoint(touchableRect, point);
+}
+
+- (void)setTouchableAreaOutsets:(UIEdgeInsets)touchableAreaOutsets {
+    _touchableAreaOutsets = touchableAreaOutsets;
+    [self cyl_updateTouchableAreaView];
+}
+
+- (void)setTouchableAreaScale:(CGFloat)touchableAreaScale {
+    _touchableAreaScale = MAX(touchableAreaScale, 1.0);
+    [self cyl_updateTouchableAreaView];
+}
+
+- (CGFloat)touchableAreaScale {
+    return MAX(_touchableAreaScale, 1.0);
+}
+
+- (void)setShowsTouchableArea:(BOOL)showsTouchableArea {
+    _showsTouchableArea = showsTouchableArea;
+    [self cyl_updateTouchableAreaView];
+}
+
+- (void)setTouchableAreaColor:(UIColor *)touchableAreaColor {
+    _touchableAreaColor = touchableAreaColor;
+    [self cyl_updateTouchableAreaView];
+}
+
+/// Adds, moves or removes the overlay so it always covers `-touchableRect`. 添加、移动或移除覆盖层，使其始终覆盖可点击区域。
+- (void)cyl_updateTouchableAreaView {
+    UIView *superview = self.superview;
+    if (!_showsTouchableArea || !superview) {
+        [self.cyl_touchableAreaView removeFromSuperview];
+        self.cyl_touchableAreaView = nil;
+        return;
+    }
+    UIView *areaView = self.cyl_touchableAreaView;
+    if (!areaView) {
+        areaView = [[UIView alloc] init];
+        areaView.userInteractionEnabled = NO;   // never takes a touch 不响应点击
+        areaView.layer.borderWidth = 1.0;
+        areaView.accessibilityElementsHidden = YES;
+        self.cyl_touchableAreaView = areaView;
+    }
+    UIColor *color = _touchableAreaColor ?: [[UIColor systemRedColor] colorWithAlphaComponent:0.3];
+    areaView.backgroundColor = color;
+    areaView.layer.borderColor = [color colorWithAlphaComponent:1.0].CGColor;
+    if (areaView.superview != superview) {
+        [areaView removeFromSuperview];
+        [superview insertSubview:areaView belowSubview:self];
+    }
+    areaView.frame = [self touchableRect];
+    areaView.hidden = self.hidden || self.alpha < 0.01;
+}
+
+- (void)didMoveToSuperview {
+    [super didMoveToSuperview];
+    [self cyl_updateTouchableAreaView];
+}
+
+- (void)removeFromSuperview {
+    [self.cyl_touchableAreaView removeFromSuperview];
+    [super removeFromSuperview];
+}
+
+- (void)setFrame:(CGRect)frame {
+    [super setFrame:frame];
+    if (_showsTouchableArea) {
+        [self cyl_updateTouchableAreaView];
+    }
+}
+
+- (void)setCenter:(CGPoint)center {
+    [super setCenter:center];
+    if (_showsTouchableArea) {
+        [self cyl_updateTouchableAreaView];
+    }
+}
+
+- (void)setHidden:(BOOL)hidden {
+    [super setHidden:hidden];
+    if (_showsTouchableArea) {
+        [self cyl_updateTouchableAreaView];
+    }
 }
 
 - (UIImage *)getSnapshot {

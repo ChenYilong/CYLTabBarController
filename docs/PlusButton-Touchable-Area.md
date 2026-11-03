@@ -1,0 +1,179 @@
+# [CN]PlusButton 点击范围：扩大、按倍数放大与调试显示
+# [EN]PlusButton touchable area: grow it, scale it, and see it
+
+| 中文 | English |
+|:---|:---|
+| 解决 [#91](https://github.com/ChenYilong/CYLTabBarController/issues/91)：中间凸起的 PlusButton 与 TabBar 之间留有间隙时，点击间隙，事件会穿透到当前页面（如 tableView）。现在可以在**不改变 frame** 的情况下扩大 PlusButton 的点击范围，按倍数放大，并把可点击区域以半透明颜色显示出来方便调试。适用于经典系统 TabBar、液态玻璃（Liquid Glass）和扁平样式（FlatDesign）。 | Solves [#91](https://github.com/ChenYilong/CYLTabBarController/issues/91): with a gap between a raised plus button and the tab bar, a tap in the gap fell through to the page behind (e.g. a table view). You can now grow the plus button's touchable area **without changing its frame**, scale it by a factor, and show it as a translucent overlay for debugging. Works in the classic system tab bar, Liquid Glass and FlatDesign. |
+
+## [CN]新 API
+## [EN]New API
+
+| API (`CYLPlusButton`) | 中文 | English |
+|:---|:---|:---|
+| `touchableAreaOutsets` (`UIEdgeInsets`) | 向外扩展的距离（点），正值变大。默认 0。 | Extra area outward, in points; positive grows it. Default 0. |
+| `touchableAreaScale` (`CGFloat`) | 以中心按倍数放大，先于 outsets 生效。1 为 frame 本身（默认），小于 1 按 1 处理。 | Scales the area around the center, before the outsets. 1 is the frame (default); below 1 counts as 1. |
+| `showsTouchableArea` (`BOOL`) | 调试：以半透明覆盖层显示可点击区域，覆盖层不响应点击。设为 NO 恢复正常外观。 | Debugging: shows the area as a translucent overlay that takes no touches. NO restores the normal look. |
+| `touchableAreaColor` (`UIColor`) | 覆盖层颜色，nil 为半透明红色。 | The overlay color; nil is translucent red. |
+| `-touchableRect` | 可点击区域（父视图坐标系）。默认 = frame × scale + outsets；可重写为任意形状。 | The area, in the superview's coordinates. Default = frame × scale + outsets; override it for any shape. |
+| `-touchableRectInView:` | 把可点击区域转换到指定视图的坐标系，TabBar 用它做点击判断。 | The area converted to another view's coordinates; the tab bars hit-test with it. |
+
+```text
+touchableRect = frame
+              → grown around the center to frame × touchableAreaScale
+              → grown outward by touchableAreaOutsets (top, left, bottom, right)
+```
+
+## [CN]各项关系图
+## [EN]How the pieces relate
+
+```mermaid
+flowchart TB
+    subgraph API["CYLPlusButton (public)"]
+        outsets["touchableAreaOutsets"]
+        scale["touchableAreaScale"]
+        rect["-touchableRect<br/>(superview coordinates)"]
+        rectIn["-touchableRectInView:"]
+        pointInside["-pointInside:withEvent:"]
+        shows["showsTouchableArea<br/>touchableAreaColor"]
+    end
+
+    overlay["Debug overlay<br/>(below the button, no touches)"]
+
+    subgraph TabBars["Tab bars"]
+        classic["CYLTabBar -hitTest:<br/>classic style"]
+        glass["CYLTabBar -hitTest:<br/>Liquid Glass (button in the platter)"]
+        flat["CYLFlatDesignTabBar -hitTest:<br/>FlatDesign"]
+        gesture["CYLTabBar<br/>-gestureRecognizerShouldBegin:"]
+    end
+
+    control["UIControl<br/>TouchUpInside"]
+    action["plus button action<br/>or plusChildViewControllerButtonClicked:"]
+    delegate["tabBarController:didSelectControl:"]
+
+    subgraph Demo["Demo: settings section, row 5"]
+        sw["UISwitch → showsTouchableArea"]
+        slider["UISlider 1×–3× → touchableAreaScale"]
+    end
+
+    outsets --> rect
+    scale --> rect
+    rect --> rectIn
+    rect --> pointInside
+    rect --> overlay
+    shows --> overlay
+    rectIn --> classic
+    rectIn --> glass
+    rectIn --> flat
+    glass --> gesture
+    classic --> control
+    glass --> control
+    flat --> control
+    pointInside --> control
+    control --> action
+    action --> delegate
+    sw --> shows
+    slider --> scale
+```
+
+## [CN]点击判断流程（三种样式）
+## [EN]Hit testing, in every style
+
+```mermaid
+flowchart TD
+    touch["Touch at a point"] --> ask["The tab bar's -hitTest: is asked<br/>(also for points outside the bar)"]
+    ask --> hasPlus{"Has a plus button?"}
+    hasPlus -- no --> tabs["Tab buttons, then the default hit test"]
+    hasPlus -- yes --> convert["Area = touchableRectInView: tab bar<br/>(converted from the button's superview)"]
+    convert --> inArea{"Point in the area?"}
+    inArea -- no --> tabs
+    inArea -- yes --> pickStyle{"Style"}
+    pickStyle -- "Classic / Liquid Glass" --> plus["Return the plus button"]
+    pickStyle -- FlatDesign --> child{"Plus child view controller<br/>and point inside the bar?"}
+    child -- yes --> under["Tab button under the plus button<br/>(unchanged)"]
+    child -- no --> plus
+    plus --> up["-pointInside: covers the area<br/>→ TouchUpInside"]
+    up --> act["Plus button action → didSelectControl"]
+```
+
+## [CN]修复的问题
+## [EN]What was fixed
+
+| 问题 / Problem | 中文 | English |
+|:---|:---|:---|
+| #91 穿透 / fall-through | 可点击区域只能通过重写 `-touchableRect` 修改，且下面两个问题让它不能正确生效。 | The area could only be changed by overriding `-touchableRect`, and the two problems below kept it from working. |
+| 扁平样式坐标 / FlatDesign coordinates | `-touchableRect` 是父视图坐标，却按按钮自身坐标转换，frame 原点被加了两次，区域偏离按钮。 | `-touchableRect` is in superview coordinates but was converted from the button's own, adding the origin twice and moving the area off the button. |
+| 扁平样式子控制器 / FlatDesign child view controller | 有子控制器时整个区域被忽略，TabBar 之外的凸起部分点击会穿透。现在 TabBar 外的部分交给 PlusButton，TabBar 内保持原样。 | With a child view controller the area was ignored, so taps on the raised part outside the bar fell through. The part outside the bar now goes to the plus button; inside the bar nothing changes. |
+| 液态玻璃坐标 / Liquid Glass coordinates | PlusButton 位于 platter 中，不是 TabBar 的直接子视图，现在先转换坐标（与 #653 的 Tab 按钮相同）。 | The plus button sits in the platter, not directly in the tab bar; the area is now converted first (as for the tab buttons in #653). |
+| TouchUpOutside | TabBar 把触摸交给了 PlusButton，但点在按钮之外时 UIControl 发送的是 `TouchUpOutside`，点击无效。现在 `-pointInside:withEvent:` 覆盖整个区域。 | The tab bar handed the touch to the plus button, but outside the button UIControl sent `TouchUpOutside`, so nothing happened. `-pointInside:withEvent:` now covers the whole area. |
+
+## [CN]代码演示
+## [EN]Code
+
+```objc
+// CYLPlusButtonSubclass.m (Example)
++ (id)plusButton {
+    CYLPlusButtonSubclass *button = [[self alloc] init];
+    // ... image, title, sizeToFit ...
+    // 8 pt more on the left and right, 12 pt more below (the gap under the raised button).
+    // 左右各多 8 点，下方多 12 点（凸起按钮下方的间隙）。
+    button.touchableAreaOutsets = UIEdgeInsetsMake(0, 8, 12, 8);
+    // button.touchableAreaScale = 1.5;   // or: 1.5 × the button, around its center 或：以中心放大到 1.5 倍
+    // button.showsTouchableArea = YES;   // while debugging 调试时显示
+    return button;
+}
+```
+
+```swift
+// CYLPlusButtonSubclass.swift (Example-Swift)
+static func plusButton() -> Any {
+    let button = CYLPlusButtonSubclass.cyl_plusButton(with: UIImage(named: "post_normal")!, title: "发布",
+                                                      selectedTitle: "选中", selectedTitleColor: .blue)
+    button.touchableAreaOutsets = UIEdgeInsets(top: 0, left: 8, bottom: 12, right: 8)
+    return button
+}
+
+// At runtime, e.g. from a debug menu. 运行时调整，例如在调试菜单中。
+if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton.plusButton(forOwner: tabBarController) {
+    plusButton.touchableAreaScale = 2          // twice as wide and tall 宽高各放大一倍
+    plusButton.showsTouchableArea = true       // show it 显示
+    plusButton.touchableAreaColor = UIColor.systemBlue.withAlphaComponent(0.25)
+    // plusButton.showsTouchableArea = false   // back to normal 恢复正常
+}
+```
+
+```objc
+// Any other shape: override -touchableRect (superview coordinates). 其他形状：重写 -touchableRect（父视图坐标系）。
+- (CGRect)touchableRect {
+    CGRect rect = [super touchableRect];
+    rect.size.height += 20;   // down to the bottom of the tab bar 延伸到 TabBar 底部
+    return rect;
+}
+```
+
+## [CN]演示行：在 tableView 中调试
+## [EN]Demo row: debug it from a table view
+
+| 中文 | English |
+|:---|:---|
+| 所有 Demo 的设置分组（ObjC：首页、同城、消息、我的、扁平样式列表；Swift：`CYLBadgeHelperTableViewController`）新增第 5 行「PlusButton 点击范围（issue #91）」： | The settings section of every demo (ObjC: Home, Same City, Message, Mine and the FlatDesign list; Swift: `CYLBadgeHelperTableViewController`) has a new row 5, "PlusButton touchable area (issue #91)": |
+| • **开关**：打开后以半透明红色显示可点击区域（`showsTouchableArea = YES`），关闭恢复正常外观； | • **Switch**: on shows the area in translucent red (`showsTouchableArea = YES`); off restores the normal look. |
+| • **滑块**：1×–3×，步长 0.1，设置 `touchableAreaScale`，覆盖层实时跟随； | • **Slider**: 1×–3× in 0.1 steps, sets `touchableAreaScale`; the overlay follows live. |
+| • 仅在 `hasPlusButton` 时可用，否则显示「当前 TabBar 没有 PlusButton」并禁用控件。文字已翻译为 33 种语言。 | • Only with `hasPlusButton`; otherwise it reads "This tab bar has no PlusButton" and the controls are disabled. The texts are translated into 33 languages. |
+
+## [CN]滑块成倍扩大的可行性评估
+## [EN]Is a slider that multiplies the area feasible?
+
+| 中文 | English |
+|:---|:---|
+| **可行，已实现。** 放大只改变点击判断用的矩形，不改变按钮的 frame、布局或外观，因此可以在运行时随时修改，立即生效，无需重新布局 TabBar。 | **Yes, and it is implemented.** Scaling only changes the rectangle used for hit testing, not the button's frame, layout or look, so it can change at any time at runtime and takes effect immediately, without laying the tab bar out again. |
+| **注意 1：与 Tab 按钮重叠。** 区域放大后可能盖住相邻 Tab 按钮的一部分；PlusButton 优先判断，重叠部分会交给 PlusButton。滑块上限设为 3 倍，调试时打开覆盖层即可看到。 | **Note 1: overlapping tab buttons.** A larger area can cover part of the neighboring tab buttons; the plus button is checked first, so the overlap goes to it. The slider stops at 3×; turn the overlay on to see it. |
+| **注意 2：覆盖层被裁剪。** 父视图裁剪边界时（如液态玻璃的 platter），覆盖层也会被裁剪，但点击判断仍使用完整区域。 | **Note 2: a clipped overlay.** When the superview clips (e.g. Liquid Glass's platter), the overlay is clipped too, while hit testing still uses the whole area. |
+| **注意 3：扁平样式 + 子控制器。** TabBar 内部的点击仍交给下方的 Tab 按钮（行为不变），只有区域中位于 TabBar 之外的部分交给 PlusButton。 | **Note 3: FlatDesign with a child view controller.** Taps inside the bar still go to the tab button below (unchanged); only the part of the area outside the bar goes to the plus button. |
+| 线上建议使用固定的 `touchableAreaOutsets`；滑块与覆盖层用于调试时找到合适的值。 | In production, use fixed `touchableAreaOutsets`; the slider and the overlay are for finding the right values while debugging. |
+
+## [CN]测试与截图
+## [EN]Testing and screenshots
+
+| 中文 | English |
+|:---|:---|
+| 本次修改在 Linux 环境中完成，无法运行 Xcode 和 iOS 模拟器，因此**没有截图**，也没有在设备上验证。建议在三种样式下：① 打开演示行的开关，确认红色区域覆盖按钮及其下方间隙；② 点击间隙，确认触发 PlusButton 而不是下方页面；③ 拖动滑块，确认区域实时变化；④ 关闭开关，确认恢复正常外观。验证后的截图请放在 `docs/assets/` 中，并用 `![](assets/文件名.png)` 引用。 | This change was made on Linux, where Xcode and the iOS simulator cannot run, so there are **no screenshots** and it was not verified on a device. In all three styles: ① turn the demo row's switch on and check that the red area covers the button and the gap below it; ② tap the gap and check that the plus button fires, not the page behind; ③ drag the slider and check that the area follows; ④ turn the switch off and check that the normal look is back. Put screenshots from these checks in `docs/assets/` and reference them as `![](assets/file-name.png)`. |

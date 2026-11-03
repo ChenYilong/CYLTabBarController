@@ -170,3 +170,8 @@
 "「%@」需要登录后才能查看" = "「%@」需要登入後才能查看";
 "登录" = "登入";
 "、" = "、";
+
+/* Issue #91: plus button touchable area demo row. */
+"PlusButton 点击范围（issue #91）" = "PlusButton 點擊範圍（issue #91）";
+"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "打開開關以半透明紅色顯示可點擊區域，關閉恢復正常；拖動滑桿按倍數擴大點擊範圍，目前：%@ 倍";
+"当前 TabBar 没有 PlusButton" = "目前 TabBar 沒有 PlusButton";
