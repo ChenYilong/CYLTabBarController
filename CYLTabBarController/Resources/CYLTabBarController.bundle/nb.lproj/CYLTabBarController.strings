@@ -134,3 +134,5 @@
 "保留：当前选中" = "beholdt: valgt";
 "保留：shouldUnload 返回 NO" = "beholdt: shouldUnload returnerte NO";
 "保留" = "beholdt";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "Velg fanen med identifikatoren «%@» («%@», indeks %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop gjeldende stakk, velg fanen med identifikatoren «%@», og push deretter en ny demoside til fanen";

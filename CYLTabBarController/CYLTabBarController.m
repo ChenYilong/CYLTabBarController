@@ -71,6 +71,7 @@ NSString *const CYLTabBarItemImagePositionAdjustment = @"CYLTabBarItemImagePosit
 NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
+NSString *const CYLTabBarItemIdentifier = @"CYLTabBarItemIdentifier";
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
 NSString *const CYLTabBarLottieDarkColors = @"CYLTabBarLottieDarkColors";
@@ -1140,6 +1141,8 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
                         
                 CYLRegisterDarkLottieURLFromAttributes(lottieURL, _tabBarItemsAttributes[idx]);
                 lottieSizeValue = _tabBarItemsAttributes[idx][CYLTabBarLottieSize];
+                // FIX: issue #408 the tab's identifier. Tab 的标识。
+                viewController.cyl_tabBarItemIdentifier = _tabBarItemsAttributes[idx][CYLTabBarItemIdentifier];
                         
                 NSValue *offsetValue = _tabBarItemsAttributes[idx][CYLTabBarItemTitlePositionAdjustment];
                 UIOffset offset = [offsetValue UIOffsetValue];
@@ -2056,6 +2059,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                 
                     CYLRegisterDarkLottieURLFromAttributes(lottieURL, _tabBarItemsAttributes[idx]);
                     lottieSizeValue = _tabBarItemsAttributes[idx][CYLTabBarLottieSize];
+                    // FIX: issue #408 the tab's identifier. Tab 的标识。
+                    viewController.cyl_tabBarItemIdentifier = _tabBarItemsAttributes[idx][CYLTabBarItemIdentifier];
                 
                     NSValue *offsetValue = _tabBarItemsAttributes[idx][CYLTabBarItemTitlePositionAdjustment];
                     UIOffset offset = [offsetValue UIOffsetValue];
@@ -3372,6 +3377,34 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 #pragma mark - TabBarItem Action
 #if CYL_FLATDESIGN_AVAILABLE
 
+/*!
+ * FIX: issue #610
+ * [EN] Flat design: reports a tapped tab button or plus button through `tabBarController:didSelectControl:`, as the other
+ *      styles do; it was never called in the flat design style. One place for every tap, each reported once: a tab button
+ *      (`-[CYLFlatDesignTabBar _tabBarDidSelectButton:]`), a plus button with a child view controller
+ *      (`-plusChildViewControllerButtonClicked:`, or the tab button under it) and one without
+ *      (`-cyl_flatDesignPlusButtonTouchUpInside:`).
+ * [CN] 扁平样式：与其他样式一样，通过 `tabBarController:didSelectControl:` 上报被点击的 Tab 按钮或 PlusButton；以前扁平样式下不会调用。
+ *      所有点击共用这一处，每次只上报一次：Tab 按钮（`-[CYLFlatDesignTabBar _tabBarDidSelectButton:]`）、有子控制器的 PlusButton
+ *      （`-plusChildViewControllerButtonClicked:`，或其下方的 Tab 按钮）、没有子控制器的 PlusButton（`-cyl_flatDesignPlusButtonTouchUpInside:`）。
+ */
+- (void)cyl_flatDesignReportDidSelectControl:(UIControl *)control {
+    SEL actin = @selector(tabBarController:didSelectControl:);
+    if (!control || control.cyl_userInteractionDisabled || ![self.delegate respondsToSelector:actin]) {
+        return;
+    }
+    CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+    (
+     [self.delegate performSelector:actin withObject:self withObject:control];
+     )
+}
+
+/// The target of a flat design plus button that has no child view controller (that one has no action of its own here).
+/// 没有子控制器的扁平样式 PlusButton 的事件（有子控制器的由 `-plusChildViewControllerButtonClicked:` 处理）。
+- (void)cyl_flatDesignPlusButtonTouchUpInside:(UIControl *)plusButton {
+    [self cyl_flatDesignReportDidSelectControl:plusButton];
+}
+
 - (void)_cyltabBarItemClicked:(CYLFlatDesignTabBarItem *)tabBarItem {
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
@@ -3390,14 +3423,8 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
         if (didSelectViewController.cyl_getViewControllerInsteadOfNavigationController.cyl_isPlaceholder) {
             return;
         }
-        SEL actin = @selector(tabBarController:didSelectControl:);
-        if ([self.delegate respondsToSelector:actin]) {
-            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-            (
-             [self.delegate performSelector:actin withObject:self withObject:tabBarItem.tabBarButton];
-             )
-            
-        }
+        // FIX: issue #610 already reported by `-[CYLFlatDesignTabBar _tabBarDidSelectButton:]`, which every tap goes through.
+        // 已由每次点击都会经过的 `-[CYLFlatDesignTabBar _tabBarDidSelectButton:]` 上报。
         if ([self.delegate respondsToSelector:@selector(tabBarController:shouldSelectViewController:)]) {
             BOOL sholudSelect = [self.delegate tabBarController:self shouldSelectViewController:didSelectViewController];
             if (!sholudSelect) {
@@ -3934,6 +3961,118 @@ static CYLTabBarController *CYLTabBarControllerOwningTabBar(UIResponder *respond
 #endif
     return [delegate isKindOfClass:[CYLTabBarController class]] ? delegate : nil;
 }
+
+@implementation CYLTabBarController (CYLTabBarItemIdentifier)
+
+/// This tab bar controller's plus button (its own copy with several tab bar controllers), if any.
+- (UIControl *)cyl_identifiedPlusButton {
+    return [self hasPlusButton] ? [self cyl_contextPlusButton] : nil;
+}
+
+/// The identifier of one of this controller's tabs: the one set, else the default. 已设置的标识，否则为默认值。
+- (NSString *)cyl_tabBarItemIdentifierForViewController:(UIViewController *)viewController {
+    NSString *identifier = viewController ? objc_getAssociatedObject(viewController, @selector(cyl_tabBarItemIdentifier)) : nil;
+    return identifier ?: [self cyl_defaultTabBarItemIdentifierForViewController:viewController];
+}
+
++ (NSString *)cyl_defaultTabBarItemIdentifierForClass:(Class)aClass {
+    // Swift classes are named "Module.Class"; the module is dropped. Swift 类名形如「模块.类名」，去掉模块名。
+    NSString *name = aClass ? NSStringFromClass(aClass) : @"";
+    NSRange dot = [name rangeOfString:@"." options:NSBackwardsSearch];
+    return dot.location == NSNotFound ? name : [name substringFromIndex:NSMaxRange(dot)];
+}
+
+- (NSString *)cyl_defaultTabBarItemIdentifierForViewController:(UIViewController *)viewController {
+    if (!viewController) {
+        return nil;
+    }
+    NSArray<UIViewController *> *viewControllers = self.viewControllers;
+    NSUInteger index = NSNotFound;
+    for (NSUInteger i = 0; i < viewControllers.count; i++) {
+        UIViewController *tab = viewControllers[i];
+        if (tab == viewController || [tab cyl_getViewControllerInsteadOfNavigationController] == viewController) {
+            index = i;
+            break;
+        }
+    }
+    if (index == NSNotFound) {
+        return nil;
+    }
+    UIViewController *tab = viewControllers[index];
+    // The plus child view controller is the plus button's tab. PlusButton 子控制器即 PlusButton 对应的 Tab。
+    if ([tab cyl_isEqualToViewController:[self cyl_contextPlusChildViewController]] && [self cyl_identifiedPlusButton]) {
+        return [self cyl_identifiedPlusButton].cyl_tabBarItemIdentifier;
+    }
+    Class contentClass = [[tab cyl_getViewControllerInsteadOfNavigationController] class];
+    NSString *identifier = [CYLTabBarController cyl_defaultTabBarItemIdentifierForClass:contentClass];
+    // The next tabs of the same class: "_2", "_3"... 后续同类的 Tab 依次加 "_2"、"_3"……
+    NSUInteger occurrence = 1;
+    for (NSUInteger i = 0; i < index; i++) {
+        if ([[viewControllers[i] cyl_getViewControllerInsteadOfNavigationController] class] == contentClass) {
+            occurrence++;
+        }
+    }
+    return occurrence == 1 ? identifier : [NSString stringWithFormat:@"%@_%lu", identifier, (unsigned long)occurrence];
+}
+
+- (NSString *)cyl_selectedTabBarItemIdentifier {
+    return [self cyl_tabBarItemIdentifierForViewController:self.selectedViewController];
+}
+
+- (NSUInteger)cyl_indexOfTabBarItemIdentifier:(NSString *)identifier {
+    if (identifier.length == 0) {
+        return NSNotFound;
+    }
+    NSArray<UIViewController *> *viewControllers = self.viewControllers;
+    for (NSUInteger index = 0; index < viewControllers.count; index++) {
+        if ([[self cyl_tabBarItemIdentifierForViewController:viewControllers[index]] isEqualToString:identifier]) {
+            return index;
+        }
+    }
+    return NSNotFound;
+}
+
+- (UIViewController *)cyl_viewControllerWithTabBarItemIdentifier:(NSString *)identifier {
+    NSUInteger index = [self cyl_indexOfTabBarItemIdentifier:identifier];
+    return index == NSNotFound ? nil : self.viewControllers[index];
+}
+
+- (UIViewController *)cyl_selectTabBarItemWithIdentifier:(NSString *)identifier {
+    NSUInteger index = [self cyl_indexOfTabBarItemIdentifier:identifier];
+    if (index == NSNotFound) {
+        return nil;
+    }
+    self.selectedIndex = index;
+    return self.viewControllers[index];
+}
+
+- (NSArray<NSString *> *)cyl_tabBarItemIdentifiers {
+    NSMutableArray<NSString *> *identifiers = [NSMutableArray array];
+    for (UIViewController *viewController in self.viewControllers) {
+        NSString *identifier = [self cyl_tabBarItemIdentifierForViewController:viewController];
+        if (identifier) {
+            [identifiers addObject:identifier];
+        }
+    }
+    NSString *plusButtonIdentifier = [self cyl_identifiedPlusButton].cyl_tabBarItemIdentifier;
+    if (plusButtonIdentifier && ![identifiers containsObject:plusButtonIdentifier]) {
+        [identifiers addObject:plusButtonIdentifier];
+    }
+    return [identifiers copy];
+}
+
+- (UIControl *)cyl_controlWithTabBarItemIdentifier:(NSString *)identifier {
+    if (identifier.length == 0) {
+        return nil;
+    }
+    UIControl *plusButton = [self cyl_identifiedPlusButton];
+    if ([plusButton.cyl_tabBarItemIdentifier isEqualToString:identifier]) {
+        return plusButton;
+    }
+    return [self cyl_viewControllerWithTabBarItemIdentifier:identifier].cyl_tabButton;
+}
+
+@end
 
 @implementation CYLTabBarController (CYLActiveTabBarController)
 

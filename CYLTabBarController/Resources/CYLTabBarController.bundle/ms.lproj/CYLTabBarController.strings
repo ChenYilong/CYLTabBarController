@@ -134,3 +134,5 @@
 "保留：当前选中" = "dikekalkan: dipilih";
 "保留：shouldUnload 返回 NO" = "dikekalkan: shouldUnload mengembalikan NO";
 "保留" = "dikekalkan";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "Pilih tab dengan pengecam “%@” (“%@”, indeks %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop tindanan semasa, pilih tab dengan pengecam “%@”, kemudian push halaman demo baharu ke tab itu";

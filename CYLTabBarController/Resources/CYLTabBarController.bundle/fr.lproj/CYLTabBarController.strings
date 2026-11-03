@@ -134,3 +134,5 @@
 "保留：当前选中" = "conservé : sélectionné";
 "保留：shouldUnload 返回 NO" = "conservé : shouldUnload a renvoyé NO";
 "保留" = "conservé";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "Sélection de l’onglet d’identifiant « %@ » (« %@ », index %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop de la pile actuelle, sélection de l’onglet d’identifiant « %@ », puis push d’une nouvelle page de démo dans cet onglet";

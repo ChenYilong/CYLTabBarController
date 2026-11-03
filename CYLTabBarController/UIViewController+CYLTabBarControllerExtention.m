@@ -105,8 +105,49 @@
     });
 }
 
+- (nullable UIViewController *)cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:(NSString *)identifier {
+    return [self cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:identifier animated:NO];
+}
+
+- (nullable UIViewController *)cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:(NSString *)identifier
+                                                                                    animated:(BOOL)animated {
+    CYLTabBarController *tabBarController = [[self cyl_getViewControllerInsteadOfNavigationController] cyl_popSelectTabBarController];
+    // No tab bar controller: nothing to select (a message to nil would answer index 0). 没有 TabBarController：无可选中（向 nil 发消息会得到 0）。
+    if (!tabBarController) {
+        return nil;
+    }
+    // NSNotFound for an unknown identifier: rejected by the index version, as for an unknown class type.
+    // 标识不存在时为 NSNotFound，由 index 版本拒绝，与找不到 classType 时相同。
+    NSUInteger index = [tabBarController cyl_indexOfTabBarItemIdentifier:identifier];
+    return [self cyl_popSelectTabBarChildViewControllerAtIndex:index animated:animated];
+}
+
+- (void)cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:(NSString *)identifier
+                                                           completion:(CYLPopSelectTabBarChildViewControllerCompletion)completion {
+    UIViewController *selectedTabBarChildViewController = [self cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:identifier];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        !completion ?: completion(selectedTabBarChildViewController);
+    });
+}
+
 - (void)cyl_pushOrPopToViewController:(UIViewController *)viewController
                              animated:(BOOL)animated
+                             callback:(CYLPushOrPopCallback)callback {
+    [self cyl_pushOrPopToViewController:viewController animated:animated popSelectIdentifier:nil callback:callback];
+}
+
+- (void)cyl_pushOrPopToViewController:(UIViewController *)viewController
+                             animated:(BOOL)animated
+                 tabBarItemIdentifier:(NSString *)identifier
+                             callback:(CYLPushOrPopCallback)callback {
+    [self cyl_pushOrPopToViewController:viewController animated:animated popSelectIdentifier:identifier callback:callback];
+}
+
+/// The shared implementation: `identifier` nil selects by the index the completion handler passes (the original
+/// behavior), else by identifier. 共用的实现：`identifier` 为 nil 时按 completion handler 传入的 index 选中（原有行为），否则按标识。
+- (void)cyl_pushOrPopToViewController:(UIViewController *)viewController
+                             animated:(BOOL)animated
+                  popSelectIdentifier:(nullable NSString *)identifier
                              callback:(CYLPushOrPopCallback)callback {
     // `self` may be the navigation controller itself, whose own `navigationController` is nil: nothing was pushed then.
     // `self` 可能就是导航控制器本身，它的 `navigationController` 为 nil，此时什么都不会 push。
@@ -118,13 +159,20 @@
     
     void (^popSelectTabBarChildViewControllerCallback)(BOOL shouldPopSelectTabBarChildViewController, NSUInteger index) = ^(BOOL shouldPopSelectTabBarChildViewController, NSUInteger index) {
         if (shouldPopSelectTabBarChildViewController) {
-            [self cyl_popSelectTabBarChildViewControllerAtIndex:index completion:^(__kindof UIViewController *selectedTabBarChildViewController) {
+            // By identifier when one is given (#408), else by the index the completion handler was called with.
+            // 给了标识时按标识选中（#408），否则按 completion handler 传入的 index。
+            CYLPopSelectTabBarChildViewControllerCompletion pushAfterSelecting = ^(__kindof UIViewController *selectedTabBarChildViewController) {
                 // An invalid index selects nothing (nil), and a tab may not be in a navigation controller: push onto the
                 // current stack then, as an invalid index did before it was rejected.
                 // index 无效时什么都不选（nil），Tab 也可能不在导航控制器中：此时与 index 被拒绝之前一样，push 到当前导航栈。
                 UINavigationController *navigationController = selectedTabBarChildViewController.navigationController ?: currentNavigationController;
                 [navigationController pushViewController:viewController animated:animated];
-            }];
+            };
+            if (identifier) {
+                [self cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:(NSString * _Nonnull)identifier completion:pushAfterSelecting];
+            } else {
+                [self cyl_popSelectTabBarChildViewControllerAtIndex:index completion:pushAfterSelecting];
+            }
         } else {
             [currentNavigationController pushViewController:viewController animated:animated];
         }
@@ -142,8 +190,11 @@
         dispatch_async(dispatch_get_main_queue(),^{
             // `-popToViewController:animated:` raises for a view controller that is not in the stack (or nil). Push then.
             // `-popToViewController:animated:` 的目标不在栈中（或为 nil）时会抛异常，此时改为 push。
-            if (shouldPop && [currentNavigationController.viewControllers containsObject:viewControllerPopTo]) {
-                [currentNavigationController popToViewController:viewControllerPopTo animated:animated];
+            // An explicit nil check, so the nonnull parameters below get a checked value (nullability analyzer).
+            // 显式判空，使下面的 nonnull 参数拿到已检查的值（静态分析的 nullability 检查）。
+            UIViewController *popToViewController = viewControllerPopTo;
+            if (shouldPop && popToViewController && [currentNavigationController.viewControllers containsObject:(UIViewController * _Nonnull)popToViewController]) {
+                [currentNavigationController popToViewController:(UIViewController * _Nonnull)popToViewController animated:animated];
                 return;
             }
             popSelectTabBarChildViewControllerCallback(shouldPopSelectTabBarChildViewController, index);
@@ -272,6 +323,22 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     id tabIndexObject = objc_getAssociatedObject(self, @selector(cyl_tabIndex));
     NSInteger tabIndex = [tabIndexObject integerValue];
     return tabIndex;
+}
+
+- (NSString *)cyl_tabBarItemIdentifier {
+    NSString *identifier = objc_getAssociatedObject(self, @selector(cyl_tabBarItemIdentifier));
+    // None set: the default from the tab bar controller it belongs to (any style). 未设置时，取所属 TabBarController 生成的默认值。
+    return identifier ?: [[self cyl_owningTabBarController] cyl_defaultTabBarItemIdentifierForViewController:self];
+}
+
+- (void)cyl_setTabBarItemIdentifier:(NSString *)tabBarItemIdentifier {
+    NSString *identifier = [tabBarItemIdentifier copy];
+    objc_setAssociatedObject(self, @selector(cyl_tabBarItemIdentifier), identifier, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    // Also on the content view controller (e.g. a navigation controller's root), where app code usually is.
+    UIViewController *contentViewController = [self cyl_getViewControllerInsteadOfNavigationController];
+    if (contentViewController && contentViewController != self) {
+        objc_setAssociatedObject(contentViewController, @selector(cyl_tabBarItemIdentifier), identifier, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
 }
 
 - (void)cyl_setTabButton:(UIControl *)tabButton {

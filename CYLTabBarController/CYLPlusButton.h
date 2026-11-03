@@ -104,6 +104,18 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
 + (NSString *)tabBarContext;
 
 /*!
+ * FIX: issue #408
+ * [EN] The plus button's identifier, like `CYLTabBarItemIdentifier` for the other tabs, e.g. @"plus". Every tab bar
+ *      controller's copy of the plus button gets it, so it also works with several tab bar controllers. Read it as
+ *      `control.cyl_tabBarItemIdentifier` in `-tabBarController:didSelectControl:`. Optional: without it, the identifier
+ *      is the class name, e.g. @"CYLPlusButtonSubclass".
+ * [CN] PlusButton 的标识，作用与其他 Tab 的 `CYLTabBarItemIdentifier` 相同，例如 @"plus"。每个 TabBarController 中的 PlusButton
+ *      副本都会带上它，多 TabBar 场景同样适用。在 `-tabBarController:didSelectControl:` 中通过 `control.cyl_tabBarItemIdentifier` 读取。
+ *      可选：未实现时标识为类名，例如 @"CYLPlusButtonSubclass"。
+ */
++ (NSString *)tabBarItemIdentifier;
+
+/*!
 * 可点击的范围,
  //TODO:  更换使用 padding 会更直观。
  * [EN] Returns the plus button's touchable area, used for hit testing when it extends beyond the tab bar.

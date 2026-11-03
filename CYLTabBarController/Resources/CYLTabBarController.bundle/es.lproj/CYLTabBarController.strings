@@ -134,3 +134,5 @@
 "保留：当前选中" = "conservada: seleccionada";
 "保留：shouldUnload 返回 NO" = "conservada: shouldUnload devolvió NO";
 "保留" = "conservada";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "Seleccionar la pestaña con identificador «%@» («%@», índice %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop de la pila actual, seleccionar la pestaña con identificador «%@» y luego push de una nueva página de demostración en esa pestaña";

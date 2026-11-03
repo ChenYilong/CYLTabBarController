@@ -404,6 +404,12 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 //    return 2;
 //}
 
+// #408: the plus button's identifier, read as `control.cyl_tabBarItemIdentifier` in `-tabBarController:didSelectControl:`.
+// PlusButton 的标识，在 `-tabBarController:didSelectControl:` 中通过 `control.cyl_tabBarItemIdentifier` 读取。
++ (NSString *)tabBarItemIdentifier {
+    return @"plus";
+}
+
 + (BOOL)shouldSelectPlusChildViewController {
     BOOL isSelected = [CYLPlusButton plusButtonForTabBarContext:[self matchedTabBarContext]].selected;
     if  (isSelected) {
@@ -477,6 +483,11 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
  */
 + (NSString *)tabBarContext {
     return @"CYLSecondPlusButtonContext";
+}
+
+// #408: another context, another plus button, another identifier. 另一个 context 的 PlusButton，标识也不同。
++ (NSString *)tabBarItemIdentifier {
+    return @"camera";
 }
 
 + (NSString *)plusButtonTitle {

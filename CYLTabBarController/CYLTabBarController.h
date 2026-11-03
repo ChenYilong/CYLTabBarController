@@ -142,6 +142,24 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemImageInsets;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitlePositionAdjustment;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImagePositionAdjustment;
 /*!
+ * FIX: issue #408
+ * [EN] Optional identifier of a tab (an NSString), like a tag. When tabs come and go (e.g. the server hides the second
+ *      or third one), `selectedIndex` no longer tells which tab it is; the identifier does. Read it as
+ *      `viewController.cyl_tabBarItemIdentifier` or `control.cyl_tabBarItemIdentifier` in the delegate methods, and see
+ *      `CYLTabBarController (CYLTabBarItemIdentifier)` for lookups by identifier.
+ *      Optional: a tab without one gets a default, its content view controller's class name (a navigation controller's
+ *      root), e.g. @"CYLHomeViewController", with "_2", "_3"... for the next tabs of the same class; a plus button gets
+ *      its class name, e.g. @"CYLPlusButtonSubclass" (see `+cyl_defaultTabBarItemIdentifierForClass:`). Class names stay
+ *      the same when tabs are added or removed and in every language, unlike an index or a title.
+ * [CN] 可选的 Tab 标识（NSString），类似 tag。Tab 会增减时（例如由后台控制隐藏第二个或第三个），`selectedIndex` 无法确定是哪个 Tab，
+ *      标识可以。在代理方法中通过 `viewController.cyl_tabBarItemIdentifier` 或 `control.cyl_tabBarItemIdentifier` 读取；按标识查找见
+ *      `CYLTabBarController (CYLTabBarItemIdentifier)`。
+ *      可选：未设置时自动生成默认值，即内容控制器的类名（导航控制器取其根控制器），例如 @"CYLHomeViewController"；同一 TabBar 中
+ *      后续同类的 Tab 依次加 "_2"、"_3"……；PlusButton 的默认值为其类名，例如 @"CYLPlusButtonSubclass"（见
+ *      `+cyl_defaultTabBarItemIdentifierForClass:`）。与下标或标题不同，类名不会因增减 Tab 或切换语言而改变。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifier;
+/*!
  * [EN] These globals hold what was written LAST, by whichever tab bar controller or plus button wrote last. The library
  *      no longer lays out with them: with several tab bar controllers they overwrote each other (a tab bar with 5 items
  *      was laid out with the 3 of the one pushed after it, issues #414, #489). Each tab bar keeps its own values:
@@ -680,6 +698,79 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 //@property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
 
 #endif
+
+@end
+
+/*!
+ * FIX: issue #408
+ * [EN] Tabs by identifier (`CYLTabBarItemIdentifier`), which stays right when tabs are added or removed at run time:
+ *
+ *          - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+ *              if ([control.cyl_tabBarItemIdentifier isEqualToString:@"message"]) { ... }
+ *          }
+ *          [tabBarController cyl_selectTabBarItemWithIdentifier:@"message"];
+ *
+ *      The plus button counts too, with `+[CYLPlusButtonSubclassing tabBarItemIdentifier]`. Each method works on the
+ *      receiver's own tabs and plus button, so with several tab bar controllers (other contexts, or a pushed one) each
+ *      answers for itself.
+ * [CN] 按标识（`CYLTabBarItemIdentifier`）访问 Tab，运行时增减 Tab 后依然准确（示例见上）。PlusButton 也包括在内，其标识来自
+ *      `+[CYLPlusButtonSubclassing tabBarItemIdentifier]`。每个方法只处理接收者自己的 Tab 和 PlusButton，因此存在多个 TabBarController
+ *      （其他 context，或 push 出来的）时各自独立。
+ */
+@interface CYLTabBarController (CYLTabBarItemIdentifier)
+
+/*!
+ * [EN] The identifier of the selected tab, nil when it has none.
+ * [CN] 当前选中 Tab 的标识，没有设置时为 nil。
+ */
+@property (nonatomic, copy, readonly, nullable) NSString *cyl_selectedTabBarItemIdentifier;
+
+/*!
+ * [EN] The index in `viewControllers` of the tab with `identifier`, NSNotFound when there is none.
+ * [CN] 标识为 `identifier` 的 Tab 在 `viewControllers` 中的下标，不存在时为 NSNotFound。
+ */
+- (NSUInteger)cyl_indexOfTabBarItemIdentifier:(NSString *)identifier NS_SWIFT_NAME(cyl_index(ofTabBarItemIdentifier:));
+
+/*!
+ * [EN] The view controller (as in `viewControllers`, e.g. a navigation controller) of the tab with `identifier`, or nil.
+ * [CN] 标识为 `identifier` 的 Tab 对应的控制器（即 `viewControllers` 中的元素，例如导航控制器），不存在时为 nil。
+ */
+- (nullable UIViewController *)cyl_viewControllerWithTabBarItemIdentifier:(NSString *)identifier NS_SWIFT_NAME(cyl_viewController(withTabBarItemIdentifier:));
+
+/*!
+ * [EN] Selects the tab with `identifier` (as setting `selectedIndex` does) and returns its view controller; does nothing
+ *      and returns nil when there is none.
+ * [CN] 选中标识为 `identifier` 的 Tab（与设置 `selectedIndex` 相同）并返回其控制器；不存在时不做处理并返回 nil。
+ */
+- (nullable UIViewController *)cyl_selectTabBarItemWithIdentifier:(NSString *)identifier NS_SWIFT_NAME(cyl_selectTabBarItem(withIdentifier:));
+
+/*!
+ * [EN] Every identifier of this tab bar controller, in `viewControllers` order; the identifier of a plus button without a
+ *      plus child view controller (which has no view controller) comes last. Tabs without an identifier are skipped.
+ * [CN] 该 TabBarController 的全部标识，按 `viewControllers` 的顺序排列；没有 PlusButton 子控制器的 PlusButton（没有对应的控制器）
+ *      其标识排在最后。没有标识的 Tab 不包含在内。
+ */
+@property (nonatomic, copy, readonly) NSArray<NSString *> *cyl_tabBarItemIdentifiers;
+
+/*!
+ * [EN] The tab button, or the plus button, with `identifier`; nil when there is none or its button is not created yet.
+ * [CN] 标识为 `identifier` 的 Tab 按钮或 PlusButton；不存在或按钮尚未创建时为 nil。
+ */
+- (nullable UIControl *)cyl_controlWithTabBarItemIdentifier:(NSString *)identifier NS_SWIFT_NAME(cyl_control(withTabBarItemIdentifier:));
+
+/*!
+ * [EN] The identifier a tab of this tab bar controller gets when none is set: see `CYLTabBarItemIdentifier`. nil when
+ *      `viewController` (or its navigation controller) is not one of `viewControllers`.
+ * [CN] 未设置标识时，该 TabBarController 中某个 Tab 的默认标识，规则见 `CYLTabBarItemIdentifier`。`viewController`（或其导航控制器）
+ *      不在 `viewControllers` 中时为 nil。
+ */
+- (nullable NSString *)cyl_defaultTabBarItemIdentifierForViewController:(UIViewController *)viewController NS_SWIFT_NAME(cyl_defaultTabBarItemIdentifier(for:));
+
+/*!
+ * [EN] The default identifier for a class: its name, without the Swift module, e.g. @"HomeViewController".
+ * [CN] 某个类的默认标识：类名，不含 Swift 模块名，例如 @"HomeViewController"。
+ */
++ (NSString *)cyl_defaultTabBarItemIdentifierForClass:(Class)aClass NS_SWIFT_NAME(cyl_defaultTabBarItemIdentifier(for:));
 
 @end
 

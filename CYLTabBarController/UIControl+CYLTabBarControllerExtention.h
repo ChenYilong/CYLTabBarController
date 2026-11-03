@@ -49,6 +49,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, getter=cyl_tabBarChildViewControllerIndex, setter=cyl_setTabBarChildViewControllerIndex:) NSInteger cyl_tabBarChildViewControllerIndex;
 
 /*!
+ * FIX: issue #408
+ * [EN] The identifier of this tab button or plus button, nil when it has none. Use it in
+ *      `-tabBarController:didSelectControl:`. In order: a value set here; for a plus button,
+ *      `+[CYLPlusButtonSubclassing tabBarItemIdentifier]`, else its class name (e.g. @"CYLPlusButtonSubclass"); the
+ *      identifier of the tab it selects (`CYLTabBarItemIdentifier`, else the default).
+ * [CN] 该 Tab 按钮或 PlusButton 的标识，没有时为 nil，可在 `-tabBarController:didSelectControl:` 中使用。依次取：这里设置的值；
+ *      PlusButton 的 `+[CYLPlusButtonSubclassing tabBarItemIdentifier]`，未实现时为其类名（如 @"CYLPlusButtonSubclass"）；
+ *      所选 Tab 的标识（`CYLTabBarItemIdentifier`，未设置时为默认值）。
+ */
+@property (nonatomic, copy, nullable, getter=cyl_tabBarItemIdentifier, setter=cyl_setTabBarItemIdentifier:) NSString *cyl_tabBarItemIdentifier;
+
+/*!
  * PlusButton has its own visible index,
  * in this case PlusButton is same as TabBarItem
  */

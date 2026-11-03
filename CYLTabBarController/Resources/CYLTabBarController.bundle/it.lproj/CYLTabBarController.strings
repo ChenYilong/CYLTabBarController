@@ -134,3 +134,5 @@
 "保留：当前选中" = "mantenuto: selezionato";
 "保留：shouldUnload 返回 NO" = "mantenuto: shouldUnload ha restituito NO";
 "保留" = "mantenuto";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "Selezione del tab con identificatore «%@» («%@», indice %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop dello stack corrente, selezione del tab con identificatore «%@», poi push di una nuova pagina demo in quel tab";
