@@ -27,6 +27,8 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 @interface CYLTabBar () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) NSMutableSet<UIView *> *observedViews;
+/// Whether the last layout found the tab buttons in the iOS 27.1 vertical bar, see `-cyl_refreshTabButtonsAfterVerticalBar`.
+@property (nonatomic, assign) BOOL cyl_wasShowingVerticalBar;
 /// Receives the `UIScrollEdgeElementContainerInteraction`s added to the tab bar, see `-addInteraction:`.
 @property (nonatomic, strong, nullable) UIView *cyl_scrollEdgeElementContainerView;
 /// FIX: issue #488. The token of the block-based Lottie observer: `-removeObserver:self` cannot remove it.
@@ -264,6 +266,11 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self cyl_layoutTabBarSubviews];
+    BOOL showsVerticalBar = [self cyl_verticalBarTabButtonAtIndex:0] != nil;
+    if (self.cyl_wasShowingVerticalBar && !showsVerticalBar) {
+        [self cyl_refreshTabButtonsAfterVerticalBar];
+    }
+    self.cyl_wasShowingVerticalBar = showsVerticalBar;
     // FIX: issue #610 — UIKit replaces the tab buttons when an item's image changes and lays out only the tab bar,
     // so bind the tap action here as well, not only in the controller's -viewDidLayoutSubviews. Done after the layout
     // above, which sets each new button's visible index (used to recognise the plus child view controller's button).
@@ -684,6 +691,41 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     [[CYLPlusButton plusButtonForOwner:self] cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
 
     return plusButtonIndex;
+}
+
+/*!
+ * FIX: issue #653 (follow-up)
+ * [EN] The iOS 27.1 vertical bar (folded iPhone Duo in landscape, `allowsVerticalBar = YES`) shows the tabs without
+ *      titles. Back in the horizontal bar (e.g. rotated to portrait), the tabs kept that layout, without titles, until
+ *      a tab was tapped. So when the tab buttons come back, every tab item is updated once, as a tap does: its title is
+ *      set again and the tab buttons are laid out again. Runs on the next run loop and once more after the rotation.
+ * [CN] iOS 27.1 竖向栏（iPhone Duo 折叠横屏，`allowsVerticalBar = YES`）中 Tab 不显示标题。回到横向栏（如转回竖屏）后，Tab 仍保持
+ *      没有标题的布局，直到点击某个 Tab 才恢复。因此 Tab 按钮回到横向栏时，像点击一样把每个 TabBarItem 更新一次：重新设置标题，
+ *      并重新布局 Tab 按钮。在下一个 run loop 执行，旋转动画结束后再执行一次。
+ */
+- (void)cyl_refreshTabButtonsAfterVerticalBar {
+    __weak typeof(self) weakSelf = self;
+    void (^refresh)(void) = ^{
+        __strong typeof(weakSelf) self = weakSelf;
+        if (!self || [self cyl_verticalBarTabButtonAtIndex:0]) {
+            return;
+        }
+        for (UITabBarItem *item in self.items) {
+            NSString *title = item.title;
+            item.title = nil;
+            item.title = title;
+        }
+        NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:self];
+        while (views.count > 0) {
+            UIView *view = views.lastObject;
+            [views removeLastObject];
+            [view setNeedsLayout];
+            [views addObjectsFromArray:view.subviews];
+        }
+        [self layoutIfNeeded];
+    };
+    dispatch_async(dispatch_get_main_queue(), refresh);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), refresh);
 }
 
 /*!
