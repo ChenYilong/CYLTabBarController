@@ -704,10 +704,36 @@ UISearchTab 会从 TabBar 分离出来单独显示。
  *      并重新布局 Tab 按钮。在下一个 run loop 执行，旋转动画结束后再执行一次。
  */
 - (void)cyl_refreshTabButtonsAfterVerticalBar {
+    [self cyl_reloadTabButtons];
+}
+
+/*!
+ * FIX: issue #601, #653
+ * [EN] Updates every tab item once, as a tap does: its title is set again and the tab buttons are laid out again.
+ *      Liquid Glass may keep the previous layout of the tab buttons after their titles change (a longer title then
+ *      overlaps the plus button and the next tab) or after the vertical bar, until a tab is tapped. Runs on the next
+ *      run loop and once more 0.5 s later (after a rotation or a title change has been laid out); calls made meanwhile
+ *      are merged. Does nothing while the tab buttons are in the iOS 27.1 vertical bar.
+ * [CN] 像点击一样把每个 TabBarItem 更新一次：重新设置标题，并重新布局 Tab 按钮。液态玻璃在 Tab 标题改变后（较长的标题会与
+ *      PlusButton 及后一个 Tab 重叠），或从竖向栏返回后，可能保持 Tab 按钮原来的布局，直到点击某个 Tab。在下一个 run loop 执行，
+ *      0.5 秒后（旋转或标题改变已布局后）再执行一次；期间的多次调用会合并。Tab 按钮位于 iOS 27.1 竖向栏时不执行。
+ */
+- (void)cyl_reloadTabButtons {
+    static char CYLTabButtonsReloadPendingKey;
+    if ([objc_getAssociatedObject(self, &CYLTabButtonsReloadPendingKey) boolValue]) {
+        return;
+    }
+    objc_setAssociatedObject(self, &CYLTabButtonsReloadPendingKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     __weak typeof(self) weakSelf = self;
-    void (^refresh)(void) = ^{
+    void (^reload)(BOOL) = ^(BOOL isLast) {
         __strong typeof(weakSelf) self = weakSelf;
-        if (!self || [self cyl_verticalBarTabButtonAtIndex:0]) {
+        if (!self) {
+            return;
+        }
+        if (isLast) {
+            objc_setAssociatedObject(self, &CYLTabButtonsReloadPendingKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        if ([self cyl_verticalBarTabButtonAtIndex:0]) {
             return;
         }
         for (UITabBarItem *item in self.items) {
@@ -724,8 +750,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         }
         [self layoutIfNeeded];
     };
-    dispatch_async(dispatch_get_main_queue(), refresh);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), refresh);
+    dispatch_async(dispatch_get_main_queue(), ^{ reload(NO); });
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ reload(YES); });
 }
 
 /*!

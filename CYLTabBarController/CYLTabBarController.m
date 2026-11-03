@@ -1888,6 +1888,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
     }
+    // Liquid Glass may keep the tab buttons' previous layout (a longer title overlapping the plus button and the next
+    // tab) until a tab is tapped: reload them as a tap does. 液态玻璃可能保持 Tab 按钮原来的布局（较长的标题与 PlusButton 及
+    // 后一个 Tab 重叠），直到点击某个 Tab：像点击一样重新加载它们。
+    if ([self.tabBar isKindOfClass:[CYLTabBar class]]) {
+        [(CYLTabBar *)self.tabBar cyl_reloadTabButtons];
+    }
     return YES;
 }
 

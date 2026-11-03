@@ -62,6 +62,15 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 - (NSUInteger)plusButtonIndex;
 
 /*!
+ * [EN] Updates every tab item once, as a tap does, and lays the tab buttons out again (on the next run loop and 0.5 s
+ *      later). Called after a tab item's title or image changes (`-updateTabBarItemAtIndex:attributes:`) and after the
+ *      iOS 27.1 vertical bar. Liquid Glass may otherwise keep the previous layout of the tab buttons until a tab is tapped.
+ * [CN] 像点击一样把每个 TabBarItem 更新一次，并重新布局 Tab 按钮（下一个 run loop 及 0.5 秒后）。在 TabBarItem 的标题或图片改变后
+ *      （`-updateTabBarItemAtIndex:attributes:`）及离开 iOS 27.1 竖向栏后调用。否则液态玻璃可能保持 Tab 按钮原来的布局，直到点击某个 Tab。
+ */
+- (void)cyl_reloadTabButtons;
+
+/*!
  * [EN] Returns YES if the registered plus button's context matches this tab bar's context.
  * [CN] 判断已注册 PlusButton 的 context 是否与当前 TabBar 的 context 一致。
  */
