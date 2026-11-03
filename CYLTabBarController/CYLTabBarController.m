@@ -2100,7 +2100,19 @@ static char CYLTabBarItemIconViewsProviderKey;
         // above it. Tab 自身图标保持隐藏（切换 Tab 时系统可能重新显示它）；其角标仍显示在它上方。
         tabButton.cyl_tabImageView.hidden = YES;
         lottieView.hidden = YES;
-        [self cyl_setTabImageView:tabButton.cyl_tabImageView lottieView:lottieView replacedByIconView:YES];
+        // Under a cover the badge stays as the cover left it (cleared). 有封面时角标保持封面设置的状态（已清除）。
+        [self cyl_setTabImageView:tabButton.cyl_tabImageView lottieView:lottieView replacedByIconView:!isCovered];
+        // Below the tab's own icon, or the subview of the tab button holding it (Liquid Glass), so the badge shown above
+        // that icon stays above this view too. 位于 Tab 自身图标（或液态玻璃中包含它的 Tab 按钮子视图）之下，使该图标上方的角标也位于此视图之上。
+        UIView *iconHolder = lottieView ?: tabButton.cyl_tabImageView;
+        while (iconHolder && iconHolder.superview != tabButton) {
+            iconHolder = iconHolder.superview;
+        }
+        for (UIView *iconView in iconViews.allValues) {
+            if (iconHolder && iconView.superview == tabButton) {
+                [tabButton insertSubview:iconView belowSubview:iconHolder];
+            }
+        }
         UIView *unselectedView = iconViews[@NO];
         UIView *selectedView = iconViews[@YES];
         if (unselectedView && selectedView) {

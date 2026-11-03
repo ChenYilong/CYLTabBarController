@@ -148,18 +148,20 @@ static char CYLBadgeHostOverlayTokenKey;
         [container insertSubview:self aboveSubview:host];
     }
     self.frame = host.frame;
-    self.layer.zPosition = host.layer.zPosition;
     [self cyl_followHostVisibility];
 }
 
 - (void)cyl_followHostVisibility {
     CALayer *hostLayer = _observedLayer;
     // FIX: issue #601 — a host hidden for the view shown in its place keeps its badge visible. 被替换显示而隐藏的宿主，角标仍可见。
+    // Above the view shown in its place too, which is added to the tab button later. 也位于之后添加到 Tab 按钮中的替换视图之上。
     if (_host.cyl_isBadgeHostReplacedByIconView) {
+        self.layer.zPosition = hostLayer.zPosition + 1;
         self.hidden = NO;
         self.alpha = 1;
         return;
     }
+    self.layer.zPosition = hostLayer.zPosition;
     self.hidden = hostLayer.hidden;
     self.alpha = hostLayer.opacity;
 }

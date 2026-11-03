@@ -485,7 +485,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
             [self.viewControllers[0] cyl_clearBadge];
             //            [tabBarButton insertSubview:tabBarButton.cyl_lottieAnimationView belowSubview:selectedTabButton];
             //            [tabBarButton bringSubviewToFront:newView];
-            [tabBarButton cyl_bringSubviewToTop:newView];
+            // The cover is kept on top by -cyl_coverVisiableTabImageViewOrTabButton:. 封面由该方法保持在最上层。
             if (![CYLConstants isLiquidGlassActive]) {
                 // LiquidGlass 已经自带缩放动画， 无需缩放
                 [self addOnceScaleAnimationOnView:newView];
