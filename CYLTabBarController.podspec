@@ -71,18 +71,22 @@ Pod::Spec.new do |s|
   
   s.subspec "LottieSwift" do |lottieswift|
     lottieswift.source_files = 'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}'
-    #使用 swift 版本 lottie
-    lottieswift.dependency 'lottie-ios', '>= 4.0.0'
+    #使用 swift 版本 lottie；4.5.1 起提供 `removeValueProvider(for:)`（#442 的 Dark Mode 颜色恢复会用到）
+    lottieswift.dependency 'lottie-ios', '>= 4.5.1'
+    # lottie-ios 4.5.1 起要求 iOS 13
+    lottieswift.ios.deployment_target = '13.0'
     lottieswift.dependency 'CYLTabBarController/Core'
   end
   
   s.subspec 'CYLFlatDesignTabBar' do |flatdesign|
     flatdesign.dependency "CYLTabBarController/CYLFlatDesignTabBar-ObjectiveC"
+    flatdesign.ios.deployment_target = '13.0' # depends on LottieSwift
   end
   
 
   s.subspec 'CYLFlatDesignTabBar-ObjectiveC' do |flatdesign|
     flatdesign.dependency "CYLTabBarController/LottieSwift"
+    flatdesign.ios.deployment_target = '13.0' # depends on LottieSwift
     flatdesign.source_files = 'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{h,m,swift}'
 #    flatdesign.resource = 'CYLTabBarController/**/CYLFlatDesignUITabBarController.bundle'
 

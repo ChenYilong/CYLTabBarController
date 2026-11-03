@@ -134,6 +134,26 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (UIImage *)cyl_tabItemPlaceholderImage;
 
+/*!
+ * FIX: issue #605, #215
+ * [EN] An animated image from GIF data, playing for the total duration of its frames (shared evenly between them), e.g. for the icon view of
+ *      `-[CYLTabBarController setTabBarItemIconViewProvider:atIndex:]`: `[[UIImageView alloc] initWithImage:image]`
+ *      plays it. The first frame when the data has one frame; nil when it is not an image.
+ * [CN] 由 GIF 数据生成动图，播放时长为各帧时长之和（平均分配给每帧），例如用于 `-[CYLTabBarController setTabBarItemIconViewProvider:atIndex:]` 的图标视图：
+ *      `[[UIImageView alloc] initWithImage:image]` 即可播放。只有一帧时返回该帧；不是图片时返回 nil。
+ */
++ (nullable UIImage *)cyl_animatedImageWithGIFData:(NSData *)data;
+
+/*!
+ * FIX: issue #601, #337, #215
+ * [EN] Loads an image from `URL`: from memory, else from the disk cache (7 days), else downloads it. A GIF becomes an
+ *      animated image (`+cyl_animatedImageWithGIFData:`). `completion` runs on the main queue, with nil on failure. Used by
+ *      `-[CYLTabBarController setTabBarItemIconWithURL:selectedURL:size:atIndex:]`.
+ * [CN] 从 `URL` 加载图片：先查内存，再查磁盘缓存（7 天），否则下载。GIF 会生成动图（`+cyl_animatedImageWithGIFData:`）。`completion`
+ *      在主队列回调，失败时为 nil。供 `-[CYLTabBarController setTabBarItemIconWithURL:selectedURL:size:atIndex:]` 使用。
+ */
++ (void)cyl_loadImageWithURL:(NSURL *)URL completion:(void (^)(UIImage * _Nullable image))completion;
+
 @end
 
 NS_ASSUME_NONNULL_END

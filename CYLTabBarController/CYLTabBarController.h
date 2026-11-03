@@ -31,6 +31,7 @@
 #endif
 #import "UITableViewCell+CYLBadgeExtention.h"
 #import "UIViewController+CYLMemoryWarning.h"
+#import "UIViewController+CYLTabBarItemUpdate.h"
 #import "UIViewController+CYLSettingsSection.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
@@ -380,6 +381,13 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  * [CN] 使用子控制器数组与对应的 TabBarItem 属性数组初始化。
  */
 - (nonnull instancetype)initWithViewControllers:(nonnull NSArray<UIViewController *> *)viewControllers
+                          tabBarItemsAttributes:(nonnull NSArray<NSDictionary *> *)tabBarItemsAttributes;
+
+/*!
+ * [EN] The same as `-initWithViewControllers:tabBarItemsAttributes:`; kept for the code written with this spelling.
+ * [CN] 与 `-initWithViewControllers:tabBarItemsAttributes:` 相同；保留给使用这种拼写的已有代码。
+ */
+- (nonnull instancetype)initWithViewControllers:(nonnull NSArray<UIViewController *> *)viewControllers
                           tabBaritemsAttributes:(nonnull NSArray<NSDictionary *> *)tabBarItemsAttributes;
 
 /*!
@@ -528,6 +536,90 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  * [CN] 使用新的属性数组刷新 TabBarItems，内部会重新设置 viewControllers。
  */
 - (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
+
+/*!
+ * FIX: issue #601, #337, #247
+ * [EN] Updates one tab's title and icons in place, without rebuilding the tab bar or setting the view controllers again
+ *      (unlike `-reloadTabBarItemsWithAttributes:`), in every tab bar style: Liquid Glass, the system tab bar and
+ *      FlatDesign. E.g. after a purchase, or once icons downloaded from the network are ready.
+ *      `attributes` takes the keys of `tabBarItemsAttributes`: `CYLTabBarItemTitle`, `CYLTabBarItemImage`,
+ *      `CYLTabBarItemSelectedImage`, `CYLTabBarItemDarkImage`, `CYLTabBarItemSelectedDarkImage`; a missing key keeps the
+ *      current value. An image is a name or the absolute path of a file (drawn as is, #535) or a `UIImage` (drawn with its own rendering mode: pass
+ *      `[image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]` to keep its colors), shown at its own size, so
+ *      scale a downloaded image first. The values are also merged into `tabBarItemsAttributes`, so a later reload keeps
+ *      them. A tab with a Lottie animation keeps showing the animation.
+ * [CN] 不重建 TabBar、不重新设置 viewControllers（与 `-reloadTabBarItemsWithAttributes:` 不同），原地更新一个 Tab 的标题和图标，适用于
+ *      所有样式：液态玻璃、系统 TabBar、扁平样式。例如购买课程后，或从网络下载的图标就绪后。
+ *      `attributes` 使用 `tabBarItemsAttributes` 的 key：`CYLTabBarItemTitle`、`CYLTabBarItemImage`、`CYLTabBarItemSelectedImage`、
+ *      `CYLTabBarItemDarkImage`、`CYLTabBarItemSelectedDarkImage`；未提供的 key 保持当前值。图片可以是图片名或文件的绝对路径（按原图绘制，#535）或
+ *      `UIImage`（按其自身渲染模式绘制：要保持原色请传 `[image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]`），按其自身
+ *      尺寸显示，网络图片请先缩放。这些值也会合并进 `tabBarItemsAttributes`，之后重新加载时仍保留。使用 Lottie 动画的 Tab 仍显示动画。
+ * @param index [EN] The tab's index in `viewControllers`, as `selectedIndex`. [CN] Tab 在 `viewControllers` 中的索引，与 `selectedIndex` 相同。
+ * @return [EN] NO when there is no such tab, or it is the plus button's (see `CYLPlusButton`). [CN] 没有该 Tab，或是 PlusButton 的 Tab（见 `CYLPlusButton`）时返回 NO。
+ */
+- (BOOL)updateTabBarItemAtIndex:(NSUInteger)index attributes:(NSDictionary<NSString *, id> *)attributes;
+
+/*!
+ * [EN] `-updateTabBarItemAtIndex:attributes:` for the tab of `viewController` (one of `viewControllers`, or the root of
+ *      one of them).
+ * [CN] 按 `viewController`（`viewControllers` 之一，或其中某个导航控制器的根控制器）更新其 Tab，见 `-updateTabBarItemAtIndex:attributes:`。
+ */
+- (BOOL)updateTabBarItemForViewController:(UIViewController *)viewController attributes:(NSDictionary<NSString *, id> *)attributes;
+
+/*!
+ * FIX: issue #217, #276
+ * [EN] `-updateTabBarItemAtIndex:attributes:` for every tab at once, e.g. the titles after the app's language changed.
+ *      `tabBarItemsAttributes` has the shape of the one the tab bar controller was created with: one entry per tab, in
+ *      order, none for the plus button. Extra entries are ignored, and missing ones leave their tabs as they are.
+ * [CN] 一次更新所有 Tab，见 `-updateTabBarItemAtIndex:attributes:`，例如 App 切换语言后更新标题。`tabBarItemsAttributes` 与创建
+ *      TabBarController 时传入的结构相同：每个 Tab 一项、按顺序、PlusButton 不占项。多出的项被忽略，缺少的项对应的 Tab 保持不变。
+ */
+- (void)updateTabBarItemsWithAttributes:(NSArray<NSDictionary<NSString *, id> *> *)tabBarItemsAttributes;
+
+/*!
+ * [EN] Returns the view that shows a tab's icon: `selected` NO for the unselected look, YES for the selected one. Called
+ *      again whenever the tab button is created again. Return nil to keep the tab's own icon for that look.
+ * [CN] 返回显示 Tab 图标的视图：`selected` 为 NO 时是未选中样式，为 YES 时是选中样式。Tab 按钮重新创建时会再次调用。返回 nil 则该样式
+ *      保留 Tab 自身的图标。
+ */
+typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
+
+/*!
+ * FIX: issue #601, #337, #215, #605, #604, #136
+ * [EN] Shows a view of yours in place of a tab's icon, without rebuilding the tab bar, in every style, also for a tab
+ *      with a Lottie animation: the icon (or the Lottie view) is hidden and the view takes its place, as the Lottie
+ *      animation does. The view can be anything: a `UIImageView` filled by SDWebImage or Kingfisher from a URL, an
+ *      animated GIF (`+[UIImage cyl_animatedImageWithGIFData:]`), a PAG view, a themed image... CYLTabBarController
+ *      depends on none of them. Size the view, or leave it zero-sized to get the icon's size.
+ *      Liquid Glass shows the selected look through the lens, in another layer: that layer gets the `selected` YES view.
+ *      The other styles show the YES view while the tab is selected. Pass nil to show the tab's own icon again.
+ * [CN] 不重建 TabBar，用你的视图替换 Tab 的图标，适用于所有样式，包括使用 Lottie 动画的 Tab：与 Lottie 动画相同，隐藏图标（或 Lottie
+ *      视图），由你的视图代替。视图可以是任意类型：用 SDWebImage 或 Kingfisher 从 URL 加载的 `UIImageView`、GIF 动图
+ *      （`+[UIImage cyl_animatedImageWithGIFData:]`）、PAG 视图、主题图片……CYLTabBarController 不依赖它们。请设置视图尺寸；尺寸为零时
+ *      使用图标的尺寸。液态玻璃的选中样式通过放大镜显示在另一个图层中，该图层使用 `selected` 为 YES 的视图；其他样式在 Tab 选中时显示
+ *      YES 的视图。传入 nil 则恢复显示 Tab 自身的图标。
+ * @param index [EN] The tab's index in `viewControllers`. [CN] Tab 在 `viewControllers` 中的索引。
+ * @return [EN] NO when there is no such tab, or it is the plus button's. [CN] 没有该 Tab，或是 PlusButton 的 Tab 时返回 NO。
+ */
+- (BOOL)setTabBarItemIconViewProvider:(nullable CYLTabBarItemIconViewProvider)provider atIndex:(NSUInteger)index;
+
+/*!
+ * FIX: issue #601, #337, #215, #605
+ * [EN] Shows images downloaded from `URL` (unselected) and `selectedURL` (selected; nil uses `URL`) in place of a tab's
+ *      icon, through `-setTabBarItemIconViewProvider:atIndex:`: every style, also over a Lottie icon. The images are
+ *      cached (`+[UIImage cyl_loadImageWithURL:completion:]`), drawn as is (their own colors, #337), a GIF animates (#605),
+ *      and they fit `size` (zero: the icon's size). The tab keeps its own icon until the images are ready, and when the
+ *      unselected one cannot be loaded.
+ * [CN] 将从 `URL`（未选中）和 `selectedURL`（选中；为 nil 时使用 `URL`）下载的图片显示在 Tab 图标的位置，基于
+ *      `-setTabBarItemIconViewProvider:atIndex:`：适用于所有样式，也能覆盖 Lottie 图标。图片会被缓存
+ *      （`+[UIImage cyl_loadImageWithURL:completion:]`），按原图绘制（保持自身颜色，#337），GIF 会播放动画（#605），并按 `size`
+ *      缩放（为零时使用图标尺寸）。图片就绪前，以及未选中图片加载失败时，Tab 保持自身图标。
+ * @return [EN] NO when there is no such tab, or it is the plus button's. [CN] 没有该 Tab，或是 PlusButton 的 Tab 时返回 NO。
+ */
+- (BOOL)setTabBarItemIconWithURL:(NSURL *)URL
+                     selectedURL:(nullable NSURL *)selectedURL
+                            size:(CGSize)size
+                         atIndex:(NSUInteger)index;
 
 /*!
  * [EN] Returns the visible tab bar size (see `-[UITabBar cyl_boundsSize]`).

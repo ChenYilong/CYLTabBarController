@@ -8,7 +8,126 @@
 
 #import "UIImage+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
+#import <ImageIO/ImageIO.h>
+#import <CommonCrypto/CommonDigest.h>
+
+/// Memory cache of `+cyl_loadImageWithURL:completion:`. 网络图片的内存缓存。
+static NSCache<NSString *, UIImage *> *CYLRemoteImageMemoryCache(void) {
+    static NSCache *cache;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        cache = [[NSCache alloc] init];
+        cache.countLimit = 100;
+    });
+    return cache;
+}
+
+/// Disk cache directory of `+cyl_loadImageWithURL:completion:`. 网络图片的磁盘缓存目录。
+static NSURL *CYLRemoteImageCacheDirectory(void) {
+    NSURL *caches = [[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask].firstObject;
+    return [caches URLByAppendingPathComponent:@"CYLTabBarController/RemoteImages" isDirectory:YES];
+}
+
+/// The cache key of a URL: its SHA-256. URL 的缓存 key：其 SHA-256。
+static NSString *CYLRemoteImageCacheKey(NSURL *URL) {
+    NSData *data = [URL.absoluteString dataUsingEncoding:NSUTF8StringEncoding];
+    unsigned char digest[CC_SHA256_DIGEST_LENGTH];
+    CC_SHA256(data.bytes, (CC_LONG)data.length, digest);
+    NSMutableString *key = [NSMutableString stringWithCapacity:CC_SHA256_DIGEST_LENGTH * 2];
+    for (int index = 0; index < CC_SHA256_DIGEST_LENGTH; index++) {
+        [key appendFormat:@"%02x", digest[index]];
+    }
+    return key;
+}
+
+/// An image from downloaded data: animated for a GIF, at the screen scale otherwise. 由数据生成图片：GIF 为动图，其他按屏幕倍数。
+static UIImage *CYLRemoteImageWithData(NSData *data) {
+    const char *bytes = data.bytes;
+    if (data.length > 4 && memcmp(bytes, "GIF8", 4) == 0) {
+        return [UIImage cyl_animatedImageWithGIFData:data];
+    }
+    return [UIImage imageWithData:data scale:[UIScreen mainScreen].scale];
+}
+
 @implementation UIImage (CYLTabBarControllerExtention)
+
++ (void)cyl_loadImageWithURL:(NSURL *)URL completion:(void (^)(UIImage *))completion {
+    void (^finish)(UIImage *) = ^(UIImage *image) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            !completion ?: completion(image);
+        });
+    };
+    if (!URL) {
+        finish(nil);
+        return;
+    }
+    NSString *key = CYLRemoteImageCacheKey(URL);
+    UIImage *cachedImage = [CYLRemoteImageMemoryCache() objectForKey:key];
+    if (cachedImage) {
+        finish(cachedImage);
+        return;
+    }
+    NSURL *fileURL = [CYLRemoteImageCacheDirectory() URLByAppendingPathComponent:key];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+        NSDate *modificationDate = nil;
+        [fileURL getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:NULL];
+        BOOL isFresh = modificationDate && -[modificationDate timeIntervalSinceNow] < 7 * 24 * 60 * 60;
+        NSData *cachedData = isFresh ? [NSData dataWithContentsOfURL:fileURL] : nil;
+        UIImage *diskImage = cachedData ? CYLRemoteImageWithData(cachedData) : nil;
+        if (diskImage) {
+            [CYLRemoteImageMemoryCache() setObject:diskImage forKey:key];
+            finish(diskImage);
+            return;
+        }
+        [[[NSURLSession sharedSession] dataTaskWithURL:URL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            NSInteger statusCode = [response isKindOfClass:[NSHTTPURLResponse class]] ? ((NSHTTPURLResponse *)response).statusCode : 200;
+            UIImage *image = (!error && data && statusCode / 100 == 2) ? CYLRemoteImageWithData(data) : nil;
+            if (image) {
+                [CYLRemoteImageMemoryCache() setObject:image forKey:key];
+                [[NSFileManager defaultManager] createDirectoryAtURL:CYLRemoteImageCacheDirectory()
+                                         withIntermediateDirectories:YES attributes:nil error:NULL];
+                [data writeToURL:fileURL atomically:YES];
+            }
+            finish(image);
+        }] resume];
+    });
+}
+
++ (UIImage *)cyl_animatedImageWithGIFData:(NSData *)data {
+    if (data.length == 0) {
+        return nil;
+    }
+    CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
+    if (!source) {
+        return nil;
+    }
+    size_t count = CGImageSourceGetCount(source);
+    CGFloat scale = [UIScreen mainScreen].scale;
+    NSMutableArray<UIImage *> *frames = [NSMutableArray arrayWithCapacity:count];
+    NSTimeInterval duration = 0;
+    for (size_t index = 0; index < count; index++) {
+        CGImageRef imageRef = CGImageSourceCreateImageAtIndex(source, index, NULL);
+        if (!imageRef) {
+            continue;
+        }
+        [frames addObject:[UIImage imageWithCGImage:imageRef scale:scale orientation:UIImageOrientationUp]];
+        CGImageRelease(imageRef);
+        // The frame's delay, unclamped first; browsers treat very short delays as 0.1 s.
+        // 帧时长，优先使用未修正值；与浏览器一致，过短的时长按 0.1 秒处理。
+        NSDictionary *properties = (__bridge_transfer NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, index, NULL);
+        NSDictionary *gifProperties = properties[(__bridge NSString *)kCGImagePropertyGIFDictionary];
+        NSNumber *delay = gifProperties[(__bridge NSString *)kCGImagePropertyGIFUnclampedDelayTime];
+        if (delay.doubleValue <= 0) {
+            delay = gifProperties[(__bridge NSString *)kCGImagePropertyGIFDelayTime];
+        }
+        duration += (delay.doubleValue < 0.011) ? 0.1 : delay.doubleValue;
+    }
+    CFRelease(source);
+    if (frames.count <= 1) {
+        return frames.firstObject;
+    }
+    return [UIImage animatedImageWithImages:frames duration:duration];
+}
 
 + (nullable UIImage *)cyl_imageWithColor:(UIColor *)color size:(CGSize)size {
     if (!color || size.width <= 0 || size.height <= 0) { return nil; }
@@ -109,13 +228,27 @@ static BOOL CYLImageHasDarkAppearance(UIImage *image) {
  * [CN] 名为 `name` 的图片，并带上它的深色图片（如果有）：优先使用 asset 自身的 Dark 外观（同一张图不会有两个深色来源），
  *      否则使用名为 `name` + `cyl_darkImageNameSuffix` 的图片。
  */
+/*!
+ * FIX: issue #535, #601
+ * [EN] An image by name, or by the absolute path of a file anywhere (e.g. an icon downloaded to the Documents directory):
+ *      a path is loaded with `+imageWithContentsOfFile:`, which does not keep it in the system image cache.
+ * [CN] 按名称加载图片，或按任意位置文件的绝对路径加载（例如下载到 Documents 目录的图标）：路径使用 `+imageWithContentsOfFile:` 加载，
+ *      不会进入系统图片缓存。
+ */
+static UIImage *CYLImageNamedOrAtPath(NSString *name) {
+    if (name.isAbsolutePath) {
+        return [UIImage imageWithContentsOfFile:name];
+    }
+    return [UIImage imageNamed:name];
+}
+
 + (nullable UIImage *)cyl_imageNamedFollowingDarkMode:(NSString *)name renderingMode:(UIImageRenderingMode)renderingMode {
-    UIImage *image = [UIImage imageNamed:name];
+    UIImage *image = CYLImageNamedOrAtPath(name);
     if (!image || CYLImageHasDarkAppearance(image)) {
         return [image imageWithRenderingMode:renderingMode];
     }
     NSString *darkName = CYLDarkImageNameForName(name);
-    UIImage *darkImage = darkName ? [UIImage imageNamed:darkName] : nil;
+    UIImage *darkImage = darkName ? CYLImageNamedOrAtPath(darkName) : nil;
     image = [image imageWithRenderingMode:renderingMode];
     if (!darkImage) {
         return image;

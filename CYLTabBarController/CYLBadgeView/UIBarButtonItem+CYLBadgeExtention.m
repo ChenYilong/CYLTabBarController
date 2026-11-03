@@ -464,7 +464,7 @@ static void CYLAnimateSystemBarButtonBadge(UIBarButtonItem *item, UIView *host, 
 - (CYLBadgeAnimationType)cyl_badgeAnimationType {
     // The system badge (iOS 26+) has no view of the library to keep it in. 系统角标（iOS 26+）没有本库的视图来保存它。
     NSNumber *animationType = CYLBarButtonItemUsesSystemBadge() ? objc_getAssociatedObject(self, @selector(cyl_badgeAnimationType)) : nil;
-    return animationType ? (CYLBadgeAnimationType)animationType.unsignedIntegerValue : [CYL_ACTUAL_BARBUTTON cyl_badgeAnimationType];
+    return animationType != nil ? (CYLBadgeAnimationType)animationType.unsignedIntegerValue : [CYL_ACTUAL_BARBUTTON cyl_badgeAnimationType];
 }
 
 - (void)cyl_setBadgeAnimationType:(CYLBadgeAnimationType)animationType {

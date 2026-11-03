@@ -579,6 +579,8 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
+    // Issue #601: tab buttons created again (e.g. after a rotation) get their icon views again.
+    [self cyl_setNeedsUpdateTabBarItemIconViews];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         // FIX: issue #585, #543 (follow-up to #93, #392)
         // [EN] The forced `-layoutSubviews` below is an iOS 10 workaround: #93 (iOS 10.0–10.2) and #392 (iOS 10.3.x, items
@@ -1273,6 +1275,11 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 #pragma mark - public Methods
 - (nonnull instancetype)initWithViewControllers:(nonnull NSArray<__kindof UIViewController *> *)viewControllers
                           tabBaritemsAttributes:(nonnull NSArray<NSDictionary *> *)tabBarItemsAttributes {
+    return [self initWithViewControllers:viewControllers tabBarItemsAttributes:tabBarItemsAttributes];
+}
+
+- (nonnull instancetype)initWithViewControllers:(nonnull NSArray<__kindof UIViewController *> *)viewControllers
+                          tabBarItemsAttributes:(nonnull NSArray<NSDictionary *> *)tabBarItemsAttributes {
     NSString *context = nil;
     CYLTabBarStyleType type = CYLTabBarStyleTypeDefault;
     return [self initWithViewControllers:viewControllers
@@ -1789,6 +1796,282 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (id<UIApplicationDelegate>)appDelegate {
     return [UIApplication sharedApplication].delegate;
+}
+
+#pragma mark - Update a tab item in place (issue #601)
+
+- (BOOL)updateTabBarItemForViewController:(UIViewController *)viewController attributes:(NSDictionary<NSString *, id> *)attributes {
+    NSUInteger index = viewController ? [_viewControllers indexOfObject:viewController] : NSNotFound;
+    if (index == NSNotFound) {
+        index = [_viewControllers indexOfObjectPassingTest:^BOOL(UIViewController *obj, NSUInteger idx, BOOL *stop) {
+            return [obj cyl_getViewControllerInsteadOfNavigationController] == viewController;
+        }];
+    }
+    return index != NSNotFound && [self updateTabBarItemAtIndex:index attributes:attributes];
+}
+
+- (void)updateTabBarItemsWithAttributes:(NSArray<NSDictionary<NSString *, id> *> *)tabBarItemsAttributes {
+    NSUInteger attributesIndex = 0;
+    for (NSUInteger index = 0; index < _viewControllers.count && attributesIndex < tabBarItemsAttributes.count; index++) {
+        UIViewController *viewController = _viewControllers[index];
+        // The plus button's tab has no entry. PlusButton 的 Tab 不占项。
+        if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
+            continue;
+        }
+        [self updateTabBarItemAtIndex:index attributes:tabBarItemsAttributes[attributesIndex]];
+        attributesIndex++;
+    }
+}
+
+- (BOOL)updateTabBarItemAtIndex:(NSUInteger)index attributes:(NSDictionary<NSString *, id> *)attributes {
+    if (index >= _viewControllers.count || attributes.count == 0) {
+        return NO;
+    }
+    UIViewController *viewController = _viewControllers[index];
+    // The plus button's tab shows the plus button (its own title and image); a placeholder has nothing to show.
+    if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
+        return NO;
+    }
+    NSUInteger attributesIndex = [self cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:index];
+    NSDictionary *oldAttributes = (attributesIndex < _tabBarItemsAttributes.count) ? _tabBarItemsAttributes[attributesIndex] : @{};
+    NSMutableDictionary *newAttributes = [oldAttributes mutableCopy];
+    [newAttributes addEntriesFromDictionary:attributes];
+    if (attributesIndex < _tabBarItemsAttributes.count) {
+        NSMutableArray *tabBarItemsAttributes = [_tabBarItemsAttributes mutableCopy];
+        tabBarItemsAttributes[attributesIndex] = [newAttributes copy];
+        _tabBarItemsAttributes = [tabBarItemsAttributes copy];
+    }
+
+    // As when the tab was set up (`-setViewControllers:`), so a dark image is combined with its light one (#620).
+    NSString *title = attributes[CYLTabBarItemTitle];
+    BOOL updatesImage = attributes[CYLTabBarItemImage] || attributes[CYLTabBarItemDarkImage];
+    BOOL updatesSelectedImage = attributes[CYLTabBarItemSelectedImage] || attributes[CYLTabBarItemSelectedDarkImage];
+    UIImage *image = updatesImage ? [UIImage cyl_imageNamed:[UIImage cyl_imageWithImageInfo:newAttributes[CYLTabBarItemImage]
+                                                                               darkImageInfo:newAttributes[CYLTabBarItemDarkImage]]] : nil;
+    UIImage *selectedImage = updatesSelectedImage ?
+        [UIImage cyl_imageNamed:[UIImage cyl_imageWithImageInfo:newAttributes[CYLTabBarItemSelectedImage]
+                                                  darkImageInfo:newAttributes[CYLTabBarItemSelectedDarkImage]]] : nil;
+
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+#if CYL_FLATDESIGN_AVAILABLE
+        // Each change posts `CYLFlatDesignTabBarItemDidChange`, and its button lays itself out again.
+        CYLFlatDesignTabBarItem *tabBarItem = viewController.cyl_tabBarItem;
+        if (![tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
+            return NO;
+        }
+        if (title) { tabBarItem.title = title; }
+        if (image) { tabBarItem.image = image; }
+        if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
+        return YES;
+#else
+        return NO;
+#endif
+    }
+    // Liquid Glass and the system tab bar: `UITabBarItem` redraws its tab when a property changes.
+    NSMutableArray<UITabBarItem *> *tabBarItems = [NSMutableArray arrayWithObject:viewController.tabBarItem];
+    UITabBarItem *rootTabBarItem = [viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem;
+    if (rootTabBarItem && rootTabBarItem != viewController.tabBarItem) {
+        [tabBarItems addObject:rootTabBarItem];
+    }
+    for (UITabBarItem *tabBarItem in tabBarItems) {
+        if (title) { tabBarItem.title = title; }
+        if (image) { tabBarItem.image = image; }
+        if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
+    }
+    return YES;
+}
+
+#pragma mark - A view of yours in place of a tab's icon (issue #601)
+
+static char CYLTabBarItemIconViewProvidersKey;
+static char CYLTabBarItemIconViewsKey;
+static char CYLTabBarItemIconViewsProviderKey;
+
+/// The icon view providers by view controller (weak). 按子控制器（弱引用）保存的图标视图 provider。
+- (NSMapTable<UIViewController *, CYLTabBarItemIconViewProvider> *)cyl_tabBarItemIconViewProviders {
+    NSMapTable *providers = objc_getAssociatedObject(self, &CYLTabBarItemIconViewProvidersKey);
+    if (!providers) {
+        providers = [NSMapTable weakToStrongObjectsMapTable];
+        objc_setAssociatedObject(self, &CYLTabBarItemIconViewProvidersKey, providers, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return providers;
+}
+
+- (BOOL)setTabBarItemIconViewProvider:(CYLTabBarItemIconViewProvider)provider atIndex:(NSUInteger)index {
+    if (index >= _viewControllers.count) {
+        return NO;
+    }
+    UIViewController *viewController = _viewControllers[index];
+    if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
+        return NO;
+    }
+    NSMapTable *providers = [self cyl_tabBarItemIconViewProviders];
+    if (provider) {
+        [providers setObject:[provider copy] forKey:viewController];
+    } else {
+        [providers removeObjectForKey:viewController];
+    }
+    [self cyl_updateTabBarItemIconViewsOfViewController:viewController];
+    // The tab bar lays its buttons out again, as when a tab is selected. TabBar 重新布局其按钮，与选中 Tab 时相同。
+    [self.tabBar setNeedsLayout];
+    [self cyl_setNeedsUpdateTabBarItemIconViews];
+    return YES;
+}
+
+- (BOOL)setTabBarItemIconWithURL:(NSURL *)URL selectedURL:(NSURL *)selectedURL size:(CGSize)size atIndex:(NSUInteger)index {
+    if (index >= _viewControllers.count || !URL) {
+        return NO;
+    }
+    UIViewController *viewController = _viewControllers[index];
+    if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
+        return NO;
+    }
+    __weak __typeof(self) weakSelf = self;
+    __weak UIViewController *weakViewController = viewController;
+    [UIImage cyl_loadImageWithURL:URL completion:^(UIImage *image) {
+        if (!image) {
+            return;
+        }
+        void (^show)(UIImage *) = ^(UIImage *selectedImage) {
+            __strong __typeof(weakSelf) self = weakSelf;
+            // Still a tab of this controller (the view controllers may have changed meanwhile). 仍是本控制器的 Tab。
+            NSUInteger currentIndex = weakViewController ? [self.viewControllers indexOfObject:weakViewController] : NSNotFound;
+            if (!self || currentIndex == NSNotFound) {
+                return;
+            }
+            UIImage *originalImage = [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+            UIImage *originalSelectedImage = [(selectedImage ?: image) imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+            [self setTabBarItemIconViewProvider:^UIView *(BOOL selected) {
+                UIImageView *iconView = [[UIImageView alloc] initWithImage:(selected ? originalSelectedImage : originalImage)];
+                iconView.contentMode = UIViewContentModeScaleAspectFit;
+                CGSize iconSize = CGSizeEqualToSize(size, CGSizeZero) ?
+                    CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight) : size;
+                iconView.frame = (CGRect){CGPointZero, iconSize};
+                return iconView;
+            } atIndex:currentIndex];
+        };
+        if (!selectedURL || [selectedURL isEqual:URL]) {
+            show(nil);
+        } else {
+            [UIImage cyl_loadImageWithURL:selectedURL completion:show];
+        }
+    }];
+    return YES;
+}
+
+/*!
+ * [EN] The tab buttons of `viewController`: the tab button, and with Liquid Glass the one in the selected layer (lens).
+ * [CN] `viewController` 的 Tab 按钮：Tab 按钮本身，液态玻璃下还有选中图层（放大镜）中的那个。
+ */
+- (NSArray<UIControl *> *)cyl_tabButtonsOfViewController:(UIViewController *)viewController {
+    UIControl *tabButton = nil;
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+        tabButton = viewController.cyl_tabButton;
+    } else {
+        tabButton = viewController.tabBarItem.cyl_tabButton;
+    }
+    if (![tabButton isKindOfClass:[UIControl class]]) {
+        return @[];
+    }
+    UIControl *selectedLayerTabButton = [CYLConstants isLiquidGlassActive] ? tabButton.cyl_platterSelectedControl : nil;
+    if (selectedLayerTabButton && selectedLayerTabButton != tabButton) {
+        return @[tabButton, selectedLayerTabButton];
+    }
+    return @[tabButton];
+}
+
+/// After layout and selection changes, on the next run loop: UIKit has updated the tab buttons by then.
+/// 布局与选中变化后，在下一个 run loop 执行：此时 UIKit 已更新 Tab 按钮。
+- (void)cyl_setNeedsUpdateTabBarItemIconViews {
+    if ([self cyl_tabBarItemIconViewProviders].count == 0) {
+        return;
+    }
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf cyl_updateTabBarItemIconViews];
+    });
+}
+
+/// Installs, removes or shows the icon views of every tab with a provider. 安装、移除或显示所有设置了 provider 的 Tab 的图标视图。
+- (void)cyl_updateTabBarItemIconViews {
+    for (UIViewController *viewController in [self cyl_tabBarItemIconViewProviders].keyEnumerator.allObjects) {
+        [self cyl_updateTabBarItemIconViewsOfViewController:viewController];
+    }
+}
+
+- (void)cyl_updateTabBarItemIconViewsOfViewController:(UIViewController *)viewController {
+    CYLTabBarItemIconViewProvider provider = [[self cyl_tabBarItemIconViewProviders] objectForKey:viewController];
+    NSArray<UIControl *> *tabButtons = [self cyl_tabButtonsOfViewController:viewController];
+    BOOL isSelected = (viewController == self.selectedViewController);
+    [tabButtons enumerateObjectsUsingBlock:^(UIControl *tabButton, NSUInteger idx, BOOL *stop) {
+        NSMutableDictionary<NSNumber *, UIView *> *iconViews = objc_getAssociatedObject(tabButton, &CYLTabBarItemIconViewsKey);
+        id installedProvider = objc_getAssociatedObject(tabButton, &CYLTabBarItemIconViewsProviderKey);
+        UIView *lottieView = tabButton.cyl_lottieAnimationView;
+        if (installedProvider != provider) {
+            // Another provider, or none: remove the views of the previous one. 换了 provider 或已移除：移除之前的视图。
+            for (UIView *iconView in iconViews.allValues) {
+                [iconView removeFromSuperview];
+            }
+            iconViews = nil;
+            objc_setAssociatedObject(tabButton, &CYLTabBarItemIconViewsKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            objc_setAssociatedObject(tabButton, &CYLTabBarItemIconViewsProviderKey, provider, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            if (!provider) {
+                tabButton.cyl_tabImageView.hidden = (lottieView != nil);
+                lottieView.hidden = NO;
+                return;
+            }
+        }
+        if (!provider) {
+            return;
+        }
+        if (!iconViews) {
+            iconViews = [NSMutableDictionary dictionary];
+            // Liquid Glass: one look per layer (the second button is the selected layer); other styles: both looks here.
+            // 液态玻璃：每个图层一种样式（第二个按钮是选中图层）；其他样式：两种样式都在这个按钮上。
+            NSArray<NSNumber *> *looks = (tabButtons.count > 1) ? @[@(idx == 1)] : @[@NO, @YES];
+            for (NSNumber *look in looks) {
+                UIView *iconView = provider(look.boolValue);
+                if (!iconView) {
+                    continue;
+                }
+                iconView.userInteractionEnabled = NO;
+                iconView.cyl_tabBarItemIconView = YES;
+                [tabButton cyl_replaceTabImageViewWithNewView:iconView show:YES];
+                if (iconView.superview == tabButton) {
+                    iconViews[look] = iconView;
+                }
+            }
+            objc_setAssociatedObject(tabButton, &CYLTabBarItemIconViewsKey, iconViews, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        if (iconViews.count == 0) {
+            return;
+        }
+        // The tab's own icon stays hidden (the system may show it again when the tab changes). Tab 自身图标保持隐藏。
+        tabButton.cyl_tabImageView.hidden = YES;
+        lottieView.hidden = YES;
+        UIView *unselectedView = iconViews[@NO];
+        UIView *selectedView = iconViews[@YES];
+        if (unselectedView && selectedView) {
+            unselectedView.hidden = isSelected;
+            selectedView.hidden = !isSelected;
+        }
+    }];
+}
+
+/*!
+ * [EN] Index into `tabBarItemsAttributes` of the tab at `index` in `viewControllers`, as `-setViewControllers:` pairs them:
+ *      with a plus button, Liquid Glass and FlatDesign insert an entry for the plus button's tab; the system tab bar has
+ *      none for a plus child view controller.
+ * [CN] `viewControllers` 中第 `index` 个 Tab 在 `tabBarItemsAttributes` 中的索引，与 `-setViewControllers:` 的对应方式一致：有 PlusButton
+ *      时，液态玻璃与扁平样式会为其 Tab 插入一项；系统 TabBar 不为 PlusButton 子控制器保留一项。
+ */
+- (NSUInteger)cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:(NSUInteger)index {
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType || ([CYLConstants isLiquidGlassActive] && [self hasPlusButton])) {
+        return index;
+    }
+    UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
+    NSUInteger plusIndex = plusChildViewController ? [_viewControllers indexOfObject:plusChildViewController] : NSNotFound;
+    return (plusIndex != NSNotFound && plusIndex < index) ? index - 1 : index;
 }
 
 - (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
@@ -2472,6 +2755,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 }
 
 - (void)didSelectControl:(UIControl *)control {
+    [self cyl_setNeedsUpdateTabBarItemIconViews];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     
     SEL actin = @selector(tabBarController:didSelectControl:);
@@ -2900,6 +3184,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 #pragma mark - Override selectedViewController (User initiated)
 
 - (void)setSelectedViewController:(__kindof UIViewController *)selectedViewController {
+    [self cyl_setNeedsUpdateTabBarItemIconViews];
     NSUInteger indexOfSelectedViewController = [self.childViewControllers indexOfObject:selectedViewController];
     if (NSNotFound == indexOfSelectedViewController) { return; }
     [super setSelectedViewController:selectedViewController];
@@ -3061,6 +3346,7 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
 #pragma mark - Override selectedIndex (Programmatic changes)
 
 - (void)setSelectedIndex:(NSUInteger)selectedIndex {
+    [self cyl_setNeedsUpdateTabBarItemIconViews];
     //    if (self.selectedIndex == selectedIndex) { return; }
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         [super setSelectedIndex:selectedIndex];
@@ -3971,7 +4257,10 @@ static CYLTabBarController *CYLTabBarControllerOwningTabBar(UIResponder *respond
 
 /// The identifier of one of this controller's tabs: the one set, else the default. 已设置的标识，否则为默认值。
 - (NSString *)cyl_tabBarItemIdentifierForViewController:(UIViewController *)viewController {
-    NSString *identifier = viewController ? objc_getAssociatedObject(viewController, @selector(cyl_tabBarItemIdentifier)) : nil;
+    if (!viewController) {
+        return nil;
+    }
+    NSString *identifier = objc_getAssociatedObject(viewController, @selector(cyl_tabBarItemIdentifier));
     return identifier ?: [self cyl_defaultTabBarItemIdentifierForViewController:viewController];
 }
 
