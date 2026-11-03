@@ -8,13 +8,12 @@
 
 #import "UIBarButtonItem+CYLBadgeExtention.h"
 #import <objc/runtime.h>
-#import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIControl+CYLBadgeExtention.h"
-#import "CYLConstants.h"
+// FIX: issue #535 — no Core header needed; see CYLBadgeViewDefines.h. 不再依赖 Core 头文件，见 CYLBadgeViewDefines.h。
+#import "CYLBadgeViewDefines.h"
 
 #define kActualView ((UIView *)[self cyl_getActualBadgeSuperView])
 #define CYL_ACTUAL_BARBUTTON kActualView
-
 
 @implementation UIBarButtonItem (CYLBadgeExtention)
 
@@ -108,7 +107,6 @@
     });
 }
 
-
 /**
  *  Because UIBarButtonItem is kind of NSObject, it is not able to directly attach badge.
     This method is used to find actual view (non-nil) inside UIBarButtonItem instance.
@@ -166,18 +164,6 @@
     (
      [self performSelector:aSelector withObject:object1 withObject:object2];
      )
-}
-
-/*!
- *  @warning 仅对 UIBarButtonItem、UITabBarItem 有效
- *   UIBarItem 本身没有 view 属性，只有子类 UIBarButtonItem 和 UITabBarItem 才有
- *   iOS11改成了类似懒加载机制，要等到UIBarButtonItem被展示后才能获取到_view
- */
-- (UIView *)cyl_view {
-    if ([self respondsToSelector:@selector(view)]) {
-        return [self cyl_valueForKey:@"view"];
-    }
-    return nil;
 }
 
 #pragma mark -- KVC bridge accessors required by CYLBadgeProtocol

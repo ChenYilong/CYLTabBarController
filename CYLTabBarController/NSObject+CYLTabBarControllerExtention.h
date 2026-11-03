@@ -7,6 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+// FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+#if __has_include("CYLUtils/NSObject+CYLUtils.h")
+#import "CYLUtils/NSObject+CYLUtils.h"
+#else
+#import "NSObject+CYLUtils.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -47,18 +53,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)cyl_dismissAll:(void (^ __nullable)(void))completion;
 
 /*!
- * [EN] KVC `valueForKey:` that catches exceptions and returns nil instead of crashing.
- * [CN] 安全的 KVC 取值，捕获异常，失败时返回 nil 而不是崩溃。
- */
-- (id)cyl_valueForKey:(NSString *)key;
-
-/*!
- * [EN] KVC `setValue:forKey:` that catches exceptions instead of crashing.
- * [CN] 安全的 KVC 赋值，捕获异常而不是崩溃。
- */
-- (void)cyl_setValue:(id)value forKey:(NSString *)key;
-
-/*!
  * [EN] Returns a readable list of the object's ivars (debugging aid, uses a private API).
  * [CN] 返回对象成员变量列表的可读字符串（调试用，依赖私有 API）。
  */
@@ -81,7 +75,6 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 判断 viewControllers 中是否包含 PlusButton 子控制器（直接包含或被导航控制器包裹）。
  */
 - (BOOL)cyl_isPlusViewControllerAdded:(nullable NSArray *)viewControllers;
-@property (nonatomic, assign, getter=cyl_isPlaceholder, setter=cyl_setIsPlaceholder:) BOOL cyl_isPlaceholder;
 
 /*!
  * [EN] `removeObserver:forKeyPath:` that catches exceptions (e.g. when the observer was not registered).

@@ -20,6 +20,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         // Rebuilt after a language change, so every text shows in the new language.
+        // #535: a plus button, registered before the tab bar controller is created, to show its badge (MainTabBarController.swift).
+        // #535：在创建 TabBarController 之前注册 PlusButton，用于演示其角标（见 MainTabBarController.swift）。
+        DemoPlusButton.register()
         window.cyl_setRootViewControllerProvider { MainTabBarController() }
         window.makeKeyAndVisible()
         self.window = window

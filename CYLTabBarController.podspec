@@ -13,19 +13,47 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.default_subspec = 'Core'
   s.static_framework = true
+  # FIX: issue #535 — what Core and CYLBadgeView share: macros, helpers (`-cyl_setHidden:`, `-cyl_valueForKey:`,
+  # `-cyl_tabButton`...), `+[CYLUtils isLiquidGlassActive]`, the string table (`CYLLocalizedString()`) and the resource
+  # bundle. Both depend on it. Core 与 CYLBadgeView 共用的宏、工具方法、字符串表与资源包，二者都依赖它。
+  s.subspec 'CYLUtils' do |utils|
+    utils.source_files = 'CYLTabBarController/CYLUtils/**/*.{h,m}'
+    utils.public_header_files = 'CYLTabBarController/CYLUtils/**/*.h'
+    # The library's resource bundle (localized strings now, images can go in it too), shipped as is, so its layout is
+    # the same in every integration (see `CYLResourceBundle()`).
+    utils.resources = ['CYLTabBarController/Resources/CYLTabBarController.bundle']
+    utils.frameworks = 'UIKit'
+  end
+
+  # FIX: issue #535 — the badge component on its own: `pod 'CYLTabBarController/CYLBadgeView'`.
+  # Badges with animations for any UIView, UIControl, UIBarButtonItem and UITabBarItem; no tab bar code.
+  # Core depends on it, so every other subspec includes it and existing Podfiles need no change.
+  # 单独使用角标组件：`pod 'CYLTabBarController/CYLBadgeView'`。为任意 UIView、UIControl、UIBarButtonItem、UITabBarItem 添加带动画的角标，
+  # 不包含 TabBar 代码。Core 依赖它，因此其他所有 subspec 都已包含，现有 Podfile 无需修改。
+  s.subspec 'CYLBadgeView' do |badge|
+    badge.dependency 'CYLTabBarController/CYLUtils'
+    badge.source_files = 'CYLTabBarController/CYLBadgeView/**/*.{h,m}'
+    badge.public_header_files = 'CYLTabBarController/CYLBadgeView/**/*.h'
+    # Shared by the badge sources only; tells a standalone build from one with Core (tab bar). 仅供角标源文件使用，用于区分是否包含 Core。
+    badge.private_header_files = 'CYLTabBarController/CYLBadgeView/CYLBadgeViewDefines.h'
+    badge.frameworks = 'UIKit', 'QuartzCore'
+  end
+
   s.subspec 'Core' do |core|
+    core.dependency 'CYLTabBarController/CYLUtils'
+    core.dependency 'CYLTabBarController/CYLBadgeView'
     core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}'
     core.exclude_files = [
     'CYLTabBarController/include/**/*', # SPM-only module map and header shims
+    'CYLTabBarController/CYLUtils/**/*', # the CYLUtils subspec above
+    'CYLTabBarController/CYLBadgeView/**/*', # the CYLBadgeView subspec above
     'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}',
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{swift}',
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{h,m}',
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/**/*.{h,m,swift}'
     ]
     core.public_header_files = 'CYLTabBarController/**/*.h'
-    # The library's resource bundle (localized strings now, images can go in it too), part of Core so no extra import
-    # is needed. Shipped as is, so its layout is the same in every integration (see `CYLResourceBundle()`).
-    core.resources = ['CYLTabBarController/Resources/CYLTabBarController.bundle']
+    # The resource bundle is part of CYLUtils (see above), which Core depends on. 资源包属于 Core 依赖的 CYLUtils。
 
     
   end

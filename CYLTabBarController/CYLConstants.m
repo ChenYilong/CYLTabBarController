@@ -39,18 +39,8 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
 }
 
 + (BOOL)isUsedLiquidGlass {
-    static BOOL result = NO;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if (@available(iOS 27.0, *)) {
-            result = YES;
-        } else if (@available(iOS 26.0, *)) {
-            result = ![[NSBundle.mainBundle objectForInfoDictionaryKey:@"UIDesignRequiresCompatibility"] boolValue];
-        } else {
-            result = NO;
-        }
-    });
-    return result;
+    // FIX: issue #535 — one implementation, in CYLUtils, shared with CYLBadgeView. 唯一实现位于 CYLUtils，与 CYLBadgeView 共用。
+    return [CYLUtils isLiquidGlassActive];
 }
 
 + (NSValue *)cyl_getTureLottieSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage {

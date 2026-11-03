@@ -193,6 +193,7 @@ class MainTabBarController: CYLTabBarController {
     }
 
     override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
+        demoPlusButtonDidTap(control)
         issue610CallbackCount += 1
         let index = selectedIndex
         issue610Label.text = "#610 didSelectControl: \(issue610CallbackCount) (index \(index))"
@@ -218,6 +219,13 @@ class MainTabBarController: CYLTabBarController {
     
     
     
+
+    // #535: the plus button's badge, shared by every Swift demo (Example-Shared/CYLPlusButtonBadgeDemo.swift).
+    // #535：PlusButton 的角标，所有 Swift Demo 共用（Example-Shared/CYLPlusButtonBadgeDemo.swift）。
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        demoShowPlusButtonBadgeAfterLayout()
+    }
 }
 
 // MARK: - Delegate

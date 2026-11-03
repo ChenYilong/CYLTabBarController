@@ -6,7 +6,18 @@
 //  Copyright © 2026年 https://github.com/ChenYilong .All rights reserved.
 //
 
+// FIX: issue #535 — see CYLTabBarController.h. 见 CYLTabBarController.h。
+#if __has_include("CYLBadgeView/CYLBadgeProtocol.h")
+// FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+#if __has_include("CYLUtils/UIViewController+CYLUtils.h")
+#import "CYLUtils/UIViewController+CYLUtils.h"
+#else
+#import "UIViewController+CYLUtils.h"
+#endif
+#import "CYLBadgeView/CYLBadgeProtocol.h"
+#else
 #import "CYLBadgeProtocol.h"
+#endif
 #import "CYLConstants.h"
 #if CYL_FLATDESIGN_AVAILABLE
 #import <CYLTabBarController/CYLFlatDesignTabBar.h>
@@ -37,9 +48,6 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 // [EN] Shares one lookup with `-cyl_tabBarController`, see `-[NSObject cyl_tabBarControllerForStyleType:]` in CYLTabBarController.h.
 // [CN] 与 `-cyl_tabBarController` 共用同一个查找，见 CYLTabBarController.h 中的 `-[NSObject cyl_tabBarControllerForStyleType:]`。
 @property (nullable, nonatomic, weak, getter=cylflatdesign_tabBarController, setter=cylflatdesign_setTabBarController:) UIViewController __kindof *cylflatdesign_tabBarController;
-
-
-
 
 #endif
 
@@ -101,7 +109,6 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  }
  // ====================== end ======================
 
-
  
  * [EN] Shows a red-dot badge on this view controller's tab, with no animation.
  * [CN] 在当前控制器对应的 Tab 上显示红点角标，无动画。
@@ -140,7 +147,6 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  * [CN] 判断当前控制器对应 Tab 上的角标是否处于暂停（隐藏但保留）状态。
  */
 - (BOOL)cyl_isPauseBadge;
-
 
 /*!
  * Pop 到当前 `NavigationController` 的栈底，并改变 `TabBarController` 的 `selectedViewController` 属性，并将被选择的控制器作为返回值返回。
@@ -273,12 +279,6 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  * [CN] Push viewController；若栈顶已是同类型控制器则忽略，防止重复 Push。
  */
 - (void)cyl_pushViewController:(UIViewController *)viewController animated:(BOOL)animated;
-
-/*!
- * [EN] Returns the first view controller of a navigation controller, or the receiver itself if it is not one.
- * [CN] 若自身是导航控制器则返回其第一个子控制器，否则返回自身。
- */
-- (UIViewController *)cyl_getViewControllerInsteadOfNavigationController;
 
 /*!
  * [EN] Handles the back action with animation: pops, or dismisses when presented at the root.

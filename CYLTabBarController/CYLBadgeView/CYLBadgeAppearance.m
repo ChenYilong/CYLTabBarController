@@ -7,7 +7,7 @@
  */
 
 #import "CYLBadgeAppearance.h"
-#import "CYLBadge/CYLTabBarBadgeView.h"
+#import "CYLTabBarBadgeView.h"
 
 static const CGFloat kCYLBadgeAppearanceDefaultRadius = 4.f;
 static const CGFloat kCYLBadgeAppearanceDefaultMargin = 8.f;

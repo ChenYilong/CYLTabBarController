@@ -1045,6 +1045,39 @@ tabBarController.cyl_selectTabBarItem(withIdentifier: "message")
 }
  ```
 
+### [CN]单独使用角标组件 CYLBadgeView
+### [EN]Using the badge component on its own: CYLBadgeView
+
+| 中文 | English |
+|:---|:---|
+| 角标功能是一个独立的 subspec：`CYLTabBarController/CYLBadgeView`（#535）。它不依赖 TabBar 代码，可以单独引入，为任意 `UIView`、`UIControl`（如 `UIButton`）、`UIBarButtonItem`、`UITabBarItem` 添加带动画的角标（红点、数字、文字、图片、自定义视图）。 | The badges are their own subspec, `CYLTabBarController/CYLBadgeView` (#535). It has no tab bar code, so you can use it alone to add animated badges (red dot, number, text, image, custom view) to any `UIView`, `UIControl` (e.g. `UIButton`), `UIBarButtonItem` and `UITabBarItem`. |
+| Core 与 CYLBadgeView 共用的部分放在 subspec `CYLTabBarController/CYLUtils` 中，二者都依赖它：通用宏、工具方法（如 `-cyl_setHidden:`、`-cyl_valueForKey:`、`-cyl_tabButton`）、`+[CYLUtils isLiquidGlassActive]`、字符串表（`CYLLocalizedString()`）与资源包。引入 CYLBadgeView 时会自动带上 CYLUtils。 | What Core and CYLBadgeView share lives in the subspec `CYLTabBarController/CYLUtils`, which both depend on: generic macros, helpers (e.g. `-cyl_setHidden:`, `-cyl_valueForKey:`, `-cyl_tabButton`), `+[CYLUtils isLiquidGlassActive]`, the string table (`CYLLocalizedString()`) and the resource bundle. CYLBadgeView brings it in automatically. |
+| Core 依赖 CYLUtils 和 CYLBadgeView，所以 `pod 'CYLTabBarController'` 以及其他所有 subspec、SPM、Carthage 都已包含它们，已有的 Podfile 和代码无需任何修改。 | Core depends on CYLUtils and CYLBadgeView, so `pod 'CYLTabBarController'`, every other subspec, SPM and Carthage include them already; existing Podfiles and code need no change. |
+
+ ```ruby
+ # 只引入角标 / badges only
+ pod 'CYLTabBarController/CYLBadgeView'
+ ```
+
+ ```Objective-C
+#import <CYLTabBarController/CYLBadgeView.h>   // Swift: import CYLTabBarController
+
+[self.avatarView cyl_showBadge];                                                     // 红点 / red dot
+[self.messageButton cyl_showBadgeValue:@"99+" animationType:CYLBadgeAnimationTypeShake];
+[self.navigationItem.rightBarButtonItem cyl_showBadgeValue:@"new" animationType:CYLBadgeAnimationTypeNone];
+[self.tabBarItem cyl_showBadgeValue:@"3" animationType:CYLBadgeAnimationTypeBounce];  // 系统 UITabBar 也可以 / a system UITabBar too
+[self.messageButton cyl_clearBadge];
+
+// 配合 CYLTabBarController 时，PlusButton 也可以显示角标，与 Tab 角标效果一致（Demo：每次点击数字加 1）。
+// With CYLTabBarController, the plus button can show a badge too, like the tabs (demo: each tap adds 1).
+[[CYLPlusButton plusButtonForOwner:tabBarController] cyl_showBadgeValue:@"1" animationType:CYLBadgeAnimationTypeBounce];
+ ```
+
+| 中文 | English |
+|:---|:---|
+| 单独使用与配合 CYLTabBarController 使用时 API 完全相同，区别只在 TabBar 相关的部分：`UIControl` 的角标显示在控件本身上（配合 CYLTabBarController 时，Tab 按钮的角标显示在图标或 Lottie 视图上，并同步到液态玻璃 platter）；`UITabBarItem` 的角标显示在 Tab 图标上。无障碍朗读文案两种情况下相同，都使用 CYLUtils 内置的 33 种语言。 | The API is the same alone or with CYLTabBarController; only the tab bar parts differ. A `UIControl` gets its badge on the control itself (with CYLTabBarController, a tab button's badge goes on its icon or Lottie view and is mirrored to the Liquid Glass platter). A `UITabBarItem` gets its badge on the tab icon. VoiceOver texts are the same either way, in CYLUtils' 33 built-in languages. |
+| SPM 和 Carthage 只提供完整的 CYLTabBarController（包含角标）。 | SPM and Carthage only provide the whole of CYLTabBarController, badges included. |
+
 ### [CN]全局设置角标样式
 ### [EN]Setting the badge style globally
 
@@ -1247,7 +1280,7 @@ CYLTabBarLottieDarkColors: [
 | 中文 | English |
 |:---|:---|
 | 本库与所有 Demo 中用户可见的文字都已本地化，支持 33 种语言：English、简体中文、繁體中文、日本語、한국어、Français、Deutsch、Español、Italiano、Português (Brasil)、Русский、العربية、ไทย、Tiếng Việt、Bahasa Indonesia、Türkçe、Nederlands、Polski、Svenska、Dansk、Norsk bokmål、Suomi、Čeština、Slovenčina、Magyar、Română、Hrvatski、Català、Bahasa Melayu、Українська、Ελληνικά、עברית、हिन्दी。 | Every user-visible text in the library and in all demos is localized into 33 languages: English, Simplified Chinese, Traditional Chinese, Japanese, Korean, French, German, Spanish, Italian, Portuguese (Brazil), Russian, Arabic, Thai, Vietnamese, Indonesian, Turkish, Dutch, Polish, Swedish, Danish, Norwegian Bokmål, Finnish, Czech, Slovak, Hungarian, Romanian, Croatian, Catalan, Malay, Ukrainian, Greek, Hebrew and Hindi. |
-| 译文放在 Core 的资源包 `CYLTabBarController.bundle` 中（`*.lproj/CYLTabBarController.strings`），CocoaPods、SPM、Carthage 都原样带上，无需额外导入。`CYLResourceBundle()` 返回该资源包，图片等资源也可以放进去，例如 `[UIImage imageNamed:@"icon" inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil]`。 | The translations live in Core's resource bundle, `CYLTabBarController.bundle` (`*.lproj/CYLTabBarController.strings`), shipped as is by CocoaPods, SPM and Carthage; no extra import. `CYLResourceBundle()` returns it, and images can go in it too, e.g. `[UIImage imageNamed:@"icon" inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil]`. |
+| 译文放在资源包 `CYLTabBarController.bundle` 中（`*.lproj/CYLTabBarController.strings`，属于 Core 依赖的 CYLUtils），CocoaPods、SPM、Carthage 都原样带上，无需额外导入。`CYLResourceBundle()` 返回该资源包，图片等资源也可以放进去，例如 `[UIImage imageNamed:@"icon" inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil]`。 | The translations live in the resource bundle of CYLUtils (which Core depends on), `CYLTabBarController.bundle` (`*.lproj/CYLTabBarController.strings`), shipped as is by CocoaPods, SPM and Carthage; no extra import. `CYLResourceBundle()` returns it, and images can go in it too, e.g. `[UIImage imageNamed:@"icon" inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil]`. |
 | App 内切换语言：列表中加入 `-cyl_languageCellForTableView:` 这一行，点击时调用 `-cyl_presentLanguagePicker`（英语、中文、印地语、西班牙语、阿拉伯语，国旗加语言名称，以及“跟随系统”）。副标题始终使用设备语言，切换到任何语言都能看懂。用 `[window cyl_setRootViewControllerProvider:^{ … }]` 代替设置 `rootViewController`，切换后界面立即用新语言重建，阿拉伯语等从右到左的语言同时翻转布局。 | In-app language setting: add the row from `-cyl_languageCellForTableView:` and call `-cyl_presentLanguagePicker` on tap (English, Chinese, Hindi, Spanish, Arabic with flag and own name, plus "Follow system"). Its subtitle is always in the device language, so it stays readable after any switch. Set the root with `[window cyl_setRootViewControllerProvider:^{ … }]` instead of `rootViewController`: the screen is rebuilt in the new language at once, and right-to-left languages such as Arabic flip the layout. |
 | VoiceOver：切换语言时同时设置 App 的 `accessibilityLanguage`，VoiceOver 使用对应语言的语音。角标会被读出（“消息，3 条新消息”“有新内容”），即使角标 label 位于 Tab 按钮或 cell 内部；加号按钮下方的占位 Tab 读作加号按钮；仅有图标的 PlusButton 读作其标题或“加号按钮”。 | VoiceOver: switching the language also sets the app's `accessibilityLanguage`, so VoiceOver uses a matching voice. Badges are read ("Messages, 3 new messages", "New content") even though the badge label sits inside a tab button or cell; the placeholder tab under the plus button reads as the plus button; an icon-only plus button reads as its title or "Plus button". |
 | 所有文字使用同一种语言：取 App 自身当前显示的语言（`[NSBundle mainBundle].preferredLocalizations`），匹配最接近的译文，没有时使用英文。因此本库不会显示 App 本身不支持的语言。想让 App 跟随设备语言，在 Info.plist 中声明 `CFBundleLocalizations`（Demo 已声明）。 | All text uses one language: the one the app itself is displayed in (`[NSBundle mainBundle].preferredLocalizations`), matched to the closest translation, else English. So the library never shows a language the app doesn't. To follow the device language, declare `CFBundleLocalizations` in Info.plist (the demos do). |
