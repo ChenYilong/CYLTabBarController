@@ -29,15 +29,18 @@ void _CYLFlatDesignTabBarSwizzleMethod(Class class, SEL originalSelector, SEL sw
 
 @interface UINavigationController ()
 
-// UINavigationController扩展代理
+// [CN] UINavigationController扩展代理
+// [EN] UINavigationController extension delegate
 @property (nonatomic, weak, getter=cylflatdesign_extensionDelegate, setter=cylflatdesign_setExtensionDelegate:) id<UINavigationControllerExtensionDelegate> cylflatdesign_extensionDelegate;
 
-// 是否嵌套在CYLTabBarController中
+// [CN] 是否嵌套在CYLTabBarController中
+// [EN] Whether it is embedded in a CYLTabBarController
 
 @property (nonatomic, assign, getter=cylflatdesign_nestedInCYLFlatDesignUITabBarController, setter=cylflatdesign_setNestedInCYLFlatDesignUITabBarController:) BOOL cylflatdesign_nestedInCYLFlatDesignUITabBarController;
 
 
-// 标志导航控制器Pop手势是否注册
+// [CN] 标志导航控制器Pop手势是否注册
+// [EN] Flag indicating whether the navigation controller's Pop gesture has been registered
 @property (nonatomic, assign, getter=cylflatdesign_interactivePopGestureRecognizerRegistered, setter=cylflatdesign_setInteractivePopGestureRecognizerRegistered:) BOOL cylflatdesign_interactivePopGestureRecognizerRegistered;
 
 @end
@@ -88,7 +91,9 @@ void _CYLFlatDesignTabBarSwizzleMethod(Class class, SEL originalSelector, SEL sw
 
 #pragma mark - 主流程
 /*!
- *该方法会在 CYLFlatDesignTabBar 手动调用， 减少侵入性。否则可能导致液态样式也被影响。
+ * [CN] 该方法会在 CYLFlatDesignTabBar 手动调用， 减少侵入性。否则可能导致液态样式也被影响。
+ * [EN] This method is called manually by CYLFlatDesignTabBar to reduce intrusiveness. Otherwise the Liquid Glass
+ *      style might also be affected.
  * //+ (void)load {
     //    if (![CYLConstants isLiquidGlassActive]) {
     //        return;
@@ -184,7 +189,8 @@ void _CYLFlatDesignTabBarSwizzleMethod(Class class, SEL originalSelector, SEL sw
     UIViewController *previousViewController = self.topViewController;
     UIViewController *toViewController = viewControllers.lastObject;
     
-    // TODO: 这里判断是Push还是Pop不知道准不准确
+    // [CN] TODO: 这里判断是Push还是Pop不知道准不准确
+    // [EN] TODO: Not sure whether this check for Push vs. Pop is accurate
     BOOL isPush = NO;
     if (![self.viewControllers containsObject:toViewController]) {
         isPush = YES;
@@ -369,9 +375,10 @@ void _CYLFlatDesignTabBarSwizzleMethod(Class class, SEL originalSelector, SEL sw
     id<UIViewControllerTransitionCoordinator> transitionCoordinator = self.transitionCoordinator;
     if (fromVC && fromVC == toVC) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!");
+        NSLog(CYLLocalizedString(@"UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!"));
 #endif
-        // 解决连续 pop 操作，toVC不准确的问题
+        // [CN] 解决连续 pop 操作，toVC不准确的问题
+        // [EN] Fix toVC being inaccurate during consecutive pop operations
         NSInteger index = [self.viewControllers indexOfObject:toVC];
         NSInteger toIndex = index - 1;
         if (toIndex >= 0) {

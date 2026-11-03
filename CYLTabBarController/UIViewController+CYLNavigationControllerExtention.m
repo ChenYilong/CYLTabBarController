@@ -61,7 +61,8 @@
 
 //viewWillDisappear
 //dealloc
-// 在左滑动的过渡的时间段内禁用interactivePopGestureRecognizer
+// [CN] 在左滑动的过渡的时间段内禁用interactivePopGestureRecognizer
+// [EN] Disable interactivePopGestureRecognizer during the swipe-back transition.
 - (void)cyl_disableInteractivePopGestureRecognizer {
     if (![self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
         return;
@@ -81,7 +82,8 @@
 }
 
 //viewDidDisappear
-// 在左滑动的结束后启用interactivePopGestureRecognizer
+// [CN] 在左滑动的结束后启用interactivePopGestureRecognizer
+// [EN] Enable interactivePopGestureRecognizer after the swipe-back ends.
 - (void)cyl_enableInteractivePopGestureRecognizer {
     if (![self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
         return;
@@ -102,7 +104,8 @@
 }
 
 //viewDidAppear
-// 当新的视图控制器加载完成后再启用
+// [CN] 当新的视图控制器加载完成后再启用
+// [EN] Enable it again once the new view controller has finished loading.
 - (void)cyl_resetInteractivePopGestureRecognizer {
     if (![self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
         return;
@@ -128,7 +131,8 @@
     [self cyl_resetTabBarHidden];
 }
 
-static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项目定义
+static const NSTimeInterval kFullScreenAnimationTime = 0.3; // [CN] 根据你的项目定义
+// [EN] Define according to your project.
 
 
 #pragma mark - TabBar Show / Hide
@@ -243,15 +247,20 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
     }
 }
 
-/// 显示或隐藏 TabBar（带屏幕外滑入/滑出动画）
+/// [CN] 显示或隐藏 TabBar（带屏幕外滑入/滑出动画）
 /// @param visible YES=显示（从底部升上来），NO=隐藏（降到底部屏幕外）
 /// @param animated 是否使用动画
 /// @param completion 完成回调
+/// [EN] Show or hide the TabBar (with an off-screen slide-in/slide-out animation).
+///      @param visible YES = show (rise from the bottom), NO = hide (drop off-screen at the bottom)
+///      @param animated Whether to animate
+///      @param completion Completion callback
 - (void)cyl_setTabBarVisible:(BOOL)visible
                     animated:(BOOL)animated
                   completion:(void (^ _Nullable)(BOOL finished))completion {
     
-    // 如果当前状态与目标状态相同，直接返回
+    // [CN] 如果当前状态与目标状态相同，直接返回
+    // [EN] If the current state equals the target state, return right away.
     if (self.hidesBottomBarWhenPushed == !visible) {
         if (completion) {
             completion(YES);
@@ -270,36 +279,45 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
     CGSize screenSize = CYLScreenSize();
     CGFloat tabBarHeight = CYLGetTabBarFullH(CGRectGetHeight(tabBar.frame));
     
-    // 计算关键位置
+    // [CN] 计算关键位置
+    // [EN] Compute the key positions
     CGRect visibleFrame = CGRectMake(0,
                                      screenSize.height - tabBarHeight,
                                      screenSize.width,
                                      tabBarHeight);
     
     CGRect hiddenFrame = CGRectMake(0,
-                                    screenSize.height,  // 完全移到屏幕外
+                                    screenSize.height,  // [CN] 完全移到屏幕外
+                                    // [EN] Move completely off-screen
                                     screenSize.width,
                                     tabBarHeight);
     
     NSTimeInterval duration = animated ? kFullScreenAnimationTime : 0.0;
     
-    // 设置动画的起始帧
+    // [CN] 设置动画的起始帧
+    // [EN] Set the animation's starting frame
     if (visible) {
-        // 显示动画：起始位置在屏幕外（底部下方）
+        // [CN] 显示动画：起始位置在屏幕外（底部下方）
+        // [EN] Show animation: starts off-screen (below the bottom)
         tabBar.frame = hiddenFrame;
     } else {
-        // 隐藏动画：起始位置在可见位置
+        // [CN] 隐藏动画：起始位置在可见位置
         // 注意：如果当前 TabBar 已经在可见位置，无需设置
         // 如果不在，先设置到可见位置再开始隐藏动画
+        // [EN] Hide animation: starts at the visible position.
+        //      Note: if the TabBar is already at the visible position, nothing needs to be set.
+        //      If it is not, move it to the visible position first, then start the hide animation.
         if (!CGRectEqualToRect(tabBar.frame, visibleFrame)) {
             tabBar.frame = visibleFrame;
         }
     }
     
-    // 目标帧
+    // [CN] 目标帧
+    // [EN] Target frame
     CGRect targetFrame = visible ? visibleFrame : hiddenFrame;
     
-    // 执行动画
+    // [CN] 执行动画
+    // [EN] Run the animation
     [UIView animateWithDuration:duration
                           delay:0
                         options:UIViewAnimationOptionCurveEaseInOut
@@ -315,8 +333,10 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
 
 #pragma mark - 判断 TabBar 是否可见
 
-/// 判断 TabBar 是否可见（基于位置判断）
+/// [CN] 判断 TabBar 是否可见（基于位置判断）
 /// @return YES=可见，NO=不可见
+/// [EN] Whether the TabBar is visible (based on its position).
+///      @return YES = visible, NO = not visible
 - (BOOL)cyl_tabBarIsVisible {
     CYLTabBar *tabBar = self.cyl_tabBarController.tabBar;
     if (![tabBar isKindOfClass:[CYLTabBar class]]) {
@@ -326,27 +346,32 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
     CGRect tabBarFrame = tabBar.frame;
     CGSize screenSize = CYLScreenSize();
     
-    // 判断逻辑：TabBar 的顶部是否在屏幕范围内
+    // [CN] 判断逻辑：TabBar 的顶部是否在屏幕范围内
     // 如果 minY < 屏幕高度，说明至少有一部分可见
+    // [EN] Logic: whether the top of the TabBar is within the screen bounds.
+    //      If minY < screen height, at least part of it is visible.
     return CGRectGetMinY(tabBarFrame) < screenSize.height;
 }
 
 
 #pragma mark - 便捷方法（可选）
 
-/// 显示 TabBar（从底部升上来）
+/// [CN] 显示 TabBar（从底部升上来）
+/// [EN] Show the TabBar (rise from the bottom)
 - (void)cyl_showTabBarAnimated:(BOOL)animated
                     completion:(void (^ _Nullable)(BOOL finished))completion {
     [self cyl_setTabBarVisible:YES animated:animated completion:completion];
 }
 
-/// 隐藏 TabBar（降到底部屏幕外）
+/// [CN] 隐藏 TabBar（降到底部屏幕外）
+/// [EN] Hide the TabBar (drop off-screen at the bottom)
 - (void)cyl_hideTabBarAnimated:(BOOL)animated
                     completion:(void (^ _Nullable)(BOOL finished))completion {
     [self cyl_setTabBarVisible:NO animated:animated completion:completion];
 }
 
-/// 切换 TabBar 可见性
+/// [CN] 切换 TabBar 可见性
+/// [EN] Toggle TabBar visibility
 - (void)cyl_toggleTabBarAnimated:(BOOL)animated
                       completion:(void (^ _Nullable)(BOOL finished))completion {
     BOOL currentlyVisible = [self cyl_tabBarIsVisible];
@@ -363,7 +388,8 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
     }
 }
 
-//在viewwilldisappear使用
+// [CN] 在viewwilldisappear使用
+// [EN] Use in viewwilldisappear
 - (BOOL)cyl_shouldNavigationBarVisible {
     BOOL shouldSetNo = YES;
     
@@ -371,8 +397,10 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
     if (!self.navigationController) {
         return shouldSetNo;
     }
-    //push的时候会先将vc添加到viewControllers，再调用viewWillDisappear
+    // [CN] push的时候会先将vc添加到viewControllers，再调用viewWillDisappear
     //pop的时候会先将vc从viewControllers移除，再调用viewWillDisappear
+    // [EN] On push, the vc is added to viewControllers first, then viewWillDisappear is called.
+    //      On pop, the vc is removed from viewControllers first, then viewWillDisappear is called.
     NSInteger selfIndex = -1;
     if (self.navigationController.viewControllers.count > 0) {
         NSArray *vcList = self.navigationController.viewControllers;
@@ -381,7 +409,9 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // 根据你的项�
             if (vc == self) {
                 selfIndex = i;
                 if (selfIndex == vcList.count - 1) {
-                    //这种情况是navigationController push第一个vc或者present，不需要特殊处理，直接return
+                    // [CN] 这种情况是navigationController push第一个vc或者present，不需要特殊处理，直接return
+                    // [EN] This case is the navigationController pushing its first vc, or a present; no special handling is needed, just
+                    //      return.
                     return YES;
                 }
                 isPop = NO;

@@ -153,6 +153,22 @@
 "「%@」需要登录后才能查看" = "Ak chcete zobraziť „%@“, prihláste sa";
 "登录" = "Prihlásiť";
 "、" = ", ";
+"UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!" = "UINavigationController+CYLFlatDesignTabBarPrivate: niekoľko operácií pop po sebe? To môže spôsobiť problémy!";
+"[DEBUG INFO] 如果 CYLTabBarController 的子控制器个数是奇数，你必须在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Ak je počet podriadených view controllerov CYLTabBarController nepárny, musíte vo svojej vlastnej triede plusButton implementovať `+indexOfPlusButtonInTabBar` a určiť tak pozíciu plusButton.";
+"[DEBUG INFO] 如果你想使用 PlusChildViewController 样式，你必须同时在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Ak chcete použiť PlusChildViewController, musíte vo svojej vlastnej triede plusButton tiež implementovať `+indexOfPlusButtonInTabBar` a určiť tak pozíciu plusButton.";
+"[DEBUG] 设置 tabBarItemsAttributes 时，请确保元素个数与控制器的个数相同，并在 `-setViewControllers:` 之前设置。" = "[DEBUG] Pri nastavovaní tabBarItemsAttributes zabezpečte, aby mal rovnaký počet prvkov ako počet view controllerov, a nastavte ho pred `-setViewControllers:`.";
+"不允许更改由 tabBarController 管理的 tabBar 的代理" = "Delegáta panela kariet spravovaného tabBarController nie je možné zmeniť.";
+"我是第%@行" = "Riadok %@";
+"类：%@ 行：[%@] 方法：%@ 数据：%@" = "Trieda: %@ Riadok: [%@] Metóda: %@ Údaje: %@";
+"系统TabBarController不支持" = "Systémový TabBarController toto nepodporuje";
+"需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法 -tabBarController:presentLoginForViewController:completion:。" = "Bola ťuknutá karta vyžadujúca prihlásenie, ale nie je nastavený cyl_loginHandler ani -tabBarController:presentLoginForViewController:completion:.";
+"🔴类名与方法名：%@（在第%@行）, KVC failed：%@" = "🔴 Trieda a metóda: %@ (riadok %@), KVC zlyhalo: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@" = "🔴 Trieda a metóda: %@ (riadok %@), popis: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@" = "🔴 Trieda a metóda: %@ (riadok %@), popis: %@: dôvod %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。" = "🔴 Trieda a metóda: %@ (riadok %@), popis: %@. [DEBUG] Uistite sa, že vaša podtrieda CYLTabBarController volá `super.viewDidLoad()` na poslednom riadku `viewDidLoad`; inak nastavenie KVC pre CYLTabBar zlyhá.";
+"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 Trieda a metóda: %@ (riadok %@), popis: index %@ názov %@";
+"暂无数据" = "Žiadne údaje";
+"网络连接已断开" = "Sieťové pripojenie bolo prerušené";
 
 /* Issue #91: plus button touchable area demo row. */
 "PlusButton 点击范围（issue #91）" = "Dotyková oblasť PlusButton (issue #91)";

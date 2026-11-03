@@ -17,6 +17,7 @@
 #define CYLUtilsMacros_h
 
 #import <UIKit/UIKit.h>
+#import "CYLLocalizedString.h"
 
 /*!
  * [EN] 1 when the flat design subspec (CYLFlatDesignTabBar) is part of the build, 0 otherwise. The one place that asks
@@ -84,7 +85,7 @@ _Pragma("clang diagnostic ignored \"-Warc-performSelector-leaks\"") \
 @try { \
 Stuff; \
 } @catch (NSException *exception) { \
-NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", \
+NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), \
 @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason); \
 } \
 _Pragma("clang diagnostic pop") \

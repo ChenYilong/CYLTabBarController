@@ -22,7 +22,8 @@ extension UIColor {
         return colorWithHexString(hex, alpha: 1)
     }
     
-    //常用颜色
+    // [CN] 常用颜色
+    // [EN] Common colors
     class func color3() -> UIColor {
         return hexColor("#333333")
     }
@@ -35,7 +36,8 @@ extension UIColor {
         return hexColor("#999999")
     }
     
-    //分割线
+    // [CN] 分割线
+    // [EN] Separator line
     class func lineColor() -> UIColor {
         return hexColor("#eeeeee")
     }
@@ -65,14 +67,16 @@ extension UIColor {
         return UIColor(red: CGFloat(r) / 255.0, green: CGFloat(g) / 255.0, blue: CGFloat(b) / 255.0, alpha: alpha)
     }
     
-    //使用rgb方式生成自定义颜色
+    // [CN] 使用rgb方式生成自定义颜色
+    // [EN] Create a custom color from RGB
     convenience init(_ r: CGFloat, _ g : CGFloat, _ b : CGFloat) {
         let red = r / 255.0
         let green = g / 255.0
         let blue = b / 255.0
         self.init(red: red, green: green, blue: blue, alpha: 1)
     }
-    //使用rgba方式生成自定义颜色
+    // [CN] 使用rgba方式生成自定义颜色
+    // [EN] Create a custom color from RGBA
     convenience init(_ r: CGFloat, _ g : CGFloat, _ b : CGFloat, _ a: CGFloat) {
         let red = r / 255.0
         let green = g / 255.0

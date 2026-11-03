@@ -153,6 +153,22 @@
 "「%@」需要登录后才能查看" = "Pro zobrazení „%@“ se přihlaste";
 "登录" = "Přihlásit";
 "、" = ", ";
+"UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!" = "UINavigationController+CYLFlatDesignTabBarPrivate: několik operací pop po sobě? To může způsobit problémy!";
+"[DEBUG INFO] 如果 CYLTabBarController 的子控制器个数是奇数，你必须在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Pokud je počet podřízených view controllerů CYLTabBarController lichý, musíte ve své vlastní třídě plusButton implementovat `+indexOfPlusButtonInTabBar` a určit tak pozici plusButton.";
+"[DEBUG INFO] 如果你想使用 PlusChildViewController 样式，你必须同时在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Chcete-li použít PlusChildViewController, musíte ve své vlastní třídě plusButton také implementovat `+indexOfPlusButtonInTabBar` a určit tak pozici plusButton.";
+"[DEBUG] 设置 tabBarItemsAttributes 时，请确保元素个数与控制器的个数相同，并在 `-setViewControllers:` 之前设置。" = "[DEBUG] Při nastavování tabBarItemsAttributes zajistěte, aby měl stejný počet prvků jako počet view controllerů, a nastavte jej před `-setViewControllers:`.";
+"不允许更改由 tabBarController 管理的 tabBar 的代理" = "Delegáta panelu záložek spravovaného tabBarController nelze změnit.";
+"我是第%@行" = "Řádek %@";
+"类：%@ 行：[%@] 方法：%@ 数据：%@" = "Třída: %@ Řádek: [%@] Metoda: %@ Data: %@";
+"系统TabBarController不支持" = "Systémový TabBarController toto nepodporuje";
+"需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法 -tabBarController:presentLoginForViewController:completion:。" = "Byla klepnuta záložka vyžadující přihlášení, ale není nastaven cyl_loginHandler ani -tabBarController:presentLoginForViewController:completion:.";
+"🔴类名与方法名：%@（在第%@行）, KVC failed：%@" = "🔴 Třída a metoda: %@ (řádek %@), KVC selhalo: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@" = "🔴 Třída a metoda: %@ (řádek %@), popis: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@" = "🔴 Třída a metoda: %@ (řádek %@), popis: %@: důvod %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。" = "🔴 Třída a metoda: %@ (řádek %@), popis: %@. [DEBUG] Ujistěte se, že vaše podtřída CYLTabBarController volá `super.viewDidLoad()` na posledním řádku `viewDidLoad`; jinak nastavení KVC pro CYLTabBar selže.";
+"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 Třída a metoda: %@ (řádek %@), popis: index %@ název %@";
+"暂无数据" = "Žádná data";
+"网络连接已断开" = "Síťové připojení bylo přerušeno";
 
 /* Issue #91: plus button touchable area demo row. */
 "PlusButton 点击范围（issue #91）" = "Dotyková oblast PlusButton (issue #91)";

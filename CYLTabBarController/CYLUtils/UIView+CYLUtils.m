@@ -27,7 +27,9 @@
 
 - (BOOL)cyl_isInvisiable {
     BOOL isSizeZero = CGSizeEqualToSize(CGSizeZero, self.frame.size);
-    //这里删除(NO == obj.opaque) ，因为iOS27以上的视图，渲染会通过通过 opaque 设置为 NO 进行，所以这里删除涉及关于 opaque 的判断。
+    // [CN] 这里删除(NO == obj.opaque) ，因为iOS27以上的视图，渲染会通过通过 opaque 设置为 NO 进行，所以这里删除涉及关于 opaque 的判断。
+    // [EN] The (NO == obj.opaque) check is removed here, because on iOS27 and later views are rendered with opaque set to
+    //      NO, so the opaque-related check is removed.
     BOOL isInvisible = (YES == self.hidden ) || (self.alpha <= 0.01f)  || (!self.superview) || isSizeZero;
     return isInvisible;
 }

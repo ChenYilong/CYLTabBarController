@@ -32,7 +32,8 @@
     // #425: the red background and the (-5, 3) offset come from CYLBadgeAppearance (SceneDelegate.m -setUpBadgeAppearance).
     // #425：红色背景和 (-5, 3) 偏移来自 CYLBadgeAppearance（SceneDelegate.m -setUpBadgeAppearance）。
     //                [viewController0 cyl_setBadgeRadius:11/2];
-    //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
+    // [CN] 以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
+    // [EN] The Badge settings above must be applied before cyl_showBadgeValue is called.
     [self.navigationItem.backBarButtonItem cyl_showBadge];
     [self.navigationItem.backBarButtonItem cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScale];
 
@@ -55,7 +56,7 @@
         @try {
             [mineViewController testPush];
         } @catch (NSException *exception) {
-            NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
         }
     }];
 }

@@ -22,7 +22,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
 
         //tabbar背景色
 //        UITabBar.appearance().backgroundColor = UIColor.white
-        //tabbar字体颜色
+        // [CN] tabbar字体颜色
+        // [EN] tabbar font color
         UITabBar.appearance().tintColor = UIColor(red: 1.0, green: 102.0 / 255.0, blue: 0, alpha: 1.0)
 
         return true

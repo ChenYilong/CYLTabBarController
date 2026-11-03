@@ -348,16 +348,21 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
 }
 
 /*!
- * 三个地方 ， 都要调用：
+ * [CN] 三个地方 ， 都要调用：
  *  选中状态下的重新点击，（iOS26 需要在手势代理方法中进行hook追加该方法）
  *  用户切换index时
  *  代码切换index 时。
+ * [EN] Must be called from all three places:
+ *      Re-tapping an already selected tab (on iOS26 this needs to be hooked in via the gesture delegate method)
+ *      When the user switches the index
+ *      When the index is switched in code.
  */
 - (void)tabChangedToSelectedIndex:(NSUInteger)selectedIndex
                    viewController:(UIViewController *)viewController
                           control:(UIControl *)control {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    //扁平样式，与玻璃样式均可使用
+    // [CN] 扁平样式，与玻璃样式均可使用
+    // [EN] Available for both the flat design style and the glass style
     if (![self.cyl_tabBar isKindOfClass:[UITabBar class]] && ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
     }
@@ -388,7 +393,9 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
     BOOL isLottieEnabled = [self isLottieEnabled];
     
     if (isLottieEnabled && !isChildViewControllerPlusButton) {
-        //非液态玻璃 与 液态玻璃逻辑共用，Lottie 播放逻辑都在 tabChangedToSelectedIndex 中。
+        // [CN] 非液态玻璃 与 液态玻璃逻辑共用，Lottie 播放逻辑都在 tabChangedToSelectedIndex 中。
+        // [EN] Shared logic for non-Liquid Glass and Liquid Glass; all Lottie playback logic lives in
+        //      tabChangedToSelectedIndex.
         if (NO == self.selectedViewController.cyl_isPlaceholder) {
             [self addLottieImageWithControl:control lottieURL:item.cyl_lottieURL lottieSizeValue:item.cyl_lottieSizeValue animation:YES];
         }
@@ -547,7 +554,8 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
  */
 - (void)cyl_bindTabControlActions {
     if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]] || [CYLConstants isLiquidGlassActive]) {
-        //液态玻璃无法添加事件 放进手势响代理里处理。
+        // [CN] 液态玻璃无法添加事件 放进手势响代理里处理。
+        // [EN] Liquid Glass does not allow adding events, so this is handled in the gesture recognizer delegate.
         return;
     }
     CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
@@ -592,7 +600,9 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
         UILabel *tabLabel = control.cyl_tabLabel;
         tabLabel.textAlignment = NSTextAlignmentCenter;
         
-        //FIX: iOS26 之前也不再使用点击事件， 而是在 `-setSelectedViewController` and `-setSelectedIndex`中处理
+        // [CN] FIX: iOS26 之前也不再使用点击事件， 而是在 `-setSelectedViewController` and `-setSelectedIndex`中处理
+        // [EN] FIX: Before iOS26 tap events are no longer used either; this is handled in
+        //      `-setSelectedViewController` and `-setSelectedIndex` instead
         [control addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
         
         // `selectedIndex` is NSNotFound while the "More" tab is selected; leave the buttons to UIKit then.
@@ -652,7 +662,9 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
                 BOOL isLottieEnabled = [self isLottieEnabled];
             
                 if (![CYLConstants isLiquidGlassActive]) {
-                    // 因为液态玻璃， 补全了所有的缺失的lottieURLs，所以一定保持一致， 无需要处理。
+                    // [CN] 因为液态玻璃， 补全了所有的缺失的lottieURLs，所以一定保持一致， 无需要处理。
+                    // [EN] Because Liquid Glass fills in all missing lottieURLs, they always stay consistent, so nothing needs
+                    //      to be handled.
                     if(!isLottieEnabled || (subTabBarButtonsWithoutPlusButton.count != self.lottieURLs.count)) {
                         self.lottieViewAdded = YES;
                         break;
@@ -685,7 +697,9 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
             NSTimeInterval delaySecondsForSelectedContentView = 0.5;
             if ([self hasPlusChildViewController]) {
                 /*!
-                 *我要求 selectedCover 的中心坐标 强制与 CYLExternPlusButton坐标一致。 坐标系转换
+                 * [CN] 我要求 selectedCover 的中心坐标 强制与 CYLExternPlusButton坐标一致。 坐标系转换
+                 * [EN] Force the center of selectedCover to match the CYLExternPlusButton position. Converts between
+                 *      coordinate systems
                  * _UITabBarPlatterView
                  ├── SelectedContentView
                  │    └── selectedCover
@@ -723,12 +737,15 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
                                                                completion:centerOnPlusButton];
                 }
             } else {
-                //由于有几率无法获取到cyl_tabImageView， 只有延迟获取，才能避免获取为空nil。
+                // [CN] 由于有几率无法获取到cyl_tabImageView， 只有延迟获取，才能避免获取为空nil。
+                // [EN] cyl_tabImageView sometimes cannot be obtained; only fetching it after a delay avoids getting nil.
                 dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySecondsForSelectedContentView * NSEC_PER_SEC));
                 dispatch_after(when, dispatch_get_main_queue(), ^{
-                    //imageView 是主要的
+                    // [CN] imageView 是主要的
+                    // [EN] imageView is the main one
                     [plusSelectedControl.cyl_tabImageView cyl_setHidden:YES];
-                    //cyl_swappableImageViewViewInTabBarButton这个是防御性的， 理论上可以不隐藏。
+                    // [CN] cyl_swappableImageViewViewInTabBarButton这个是防御性的， 理论上可以不隐藏。
+                    // [EN] cyl_swappableImageViewViewInTabBarButton is defensive; in theory it does not need to be hidden.
                     [plusSelectedControl.cyl_swappableImageViewViewInTabBarButton cyl_setHidden:YES];
                 });
             }
@@ -754,7 +771,9 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
     [self cyl_runPendingReloadBadgesBlocksIfReady];
 
     if (self.shouldInvokeOnceViewDidLayoutSubViewsBlock) {
-        //在对象生命周期内，不添加 flag 属性的情况下，防止多次调进这个方法
+        // [CN] 在对象生命周期内，不添加 flag 属性的情况下，防止多次调进这个方法
+        // [EN] Prevents this method from being called more than once during the object's lifetime, without adding a
+        //      flag property
         if (objc_getAssociatedObject(self, _cmd)) {
             return;
         } else {
@@ -802,7 +821,8 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
 
-/// 控制器支持方向
+/// [CN] 控制器支持方向
+/// [EN] Orientations supported by the view controller
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         UIViewController *controller = self.selectedViewController;
@@ -889,7 +909,8 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
         //    if (isAdded && hasPlusChildViewController && [self cyl_contextPlusChildViewController].cyl_plusViewControllerEverAdded == YES) {
         //        [[self cyl_contextPlusChildViewController] cyl_setPlusViewControllerEverAdded:NO];
         //    }
-        // KVO反注册
+        // [CN] KVO反注册
+        // [EN] Remove KVO observers
         [self cyl_stopObservingTabImageViewDefaultOffset];
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 
@@ -923,7 +944,8 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
 #if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
                 
-        // 隐藏系统 tabBar
+        // [CN] 隐藏系统 tabBar
+        // [EN] Hide the system tabBar
         if (@available(iOS 18.0, *)) {
             [super setTabBarHidden:YES animated:animated];
         } else {
@@ -955,7 +977,8 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
         if (self.cyl_tabBar.hidden != hidden) {
             BOOL canShowsBottomBar = [self _checkHidesBottomBarWhenPushed];
             if (!canShowsBottomBar) {
-                // 让 hidesBottomBarWhenPushed 优先级更高
+                // [CN] 让 hidesBottomBarWhenPushed 优先级更高
+                // [EN] Give hidesBottomBarWhenPushed higher priority
                 return;
             }
             // FIX: issue #662 — a bar hidden before the first layout can still have a stale (zero-height)
@@ -1198,9 +1221,13 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
             }
                     
         } else {
-            /**如果是CYLPlusChildViewController ，title设置为空字符串，解决把第一个tabbarItem设置成plusButton后，其他的
+            /** [CN] 如果是CYLPlusChildViewController ，title设置为空字符串，解决把第一个tabbarItem设置成plusButton后，其他的
              tabbarItem会不显示title问题
               见： https://github.com/ChenYilong/CYLTabBarController/issues/563
+             * [EN] If it is a CYLPlusChildViewController, set the title to an empty string. This fixes an issue where,
+             *      after making the
+             *      first tabbarItem the plusButton, the other tabbarItems would not show their titles
+             *      See: https://github.com/ChenYilong/CYLTabBarController/issues/563
              **/
             title = @"";
             if ([CYLConstants isLiquidGlassActive] && ([self hasPlusButton])) {
@@ -1226,12 +1253,17 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
 
 
 /**
- *  添加一个子控制器
+ * [CN] 添加一个子控制器
+ * [EN] Add a child view controller
  *
- *  @param viewController    控制器
+ * [CN] @param viewController    控制器
  *  @param title             标题
  *  @param normalImageInfo   图片
  *  @param selectedImageInfo 选中图片
+ * [EN] @param viewController    view controller
+ *      @param title             title
+ *      @param normalImageInfo   image
+ *      @param selectedImageInfo selected image
  */
 - (void)addOneChildViewController:(UIViewController *)viewController
                               idx:(NSUInteger)idx
@@ -1275,7 +1307,10 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
             [self.lottieURLs addObject:lottieURL];
             NSValue *tureLottieSizeValue = [CYLConstants cyl_getTureLottieSizeValue:lottieSizeValue fromNormalImage:normalImage];
             [self.lottieSizes addObject:tureLottieSizeValue];
-        }        //cyl_setTabBarItem 方法内部需要获取到tabbarvc但是， cyl_setTabBarItem是在初始化完成前的配置， 所以需要手动指定tabbarvc，否则cyl_setTabBarItem会初始化失败。
+        }        // [CN] cyl_setTabBarItem 方法内部需要获取到tabbarvc但是， cyl_setTabBarItem是在初始化完成前的配置， 所以需要手动指定tabbarvc，否则cyl_setTabBarItem会初始化失败。
+        // [EN] cyl_setTabBarItem needs the tabbarvc internally, but cyl_setTabBarItem is configured before
+        //      initialization is complete,
+        //      so the tabbarvc must be specified manually, otherwise cyl_setTabBarItem fails to initialize.
         CYLFlatDesignTabBarItem *cyl_tabBarItem = [[CYLFlatDesignTabBarItem alloc] initWithTitle:title
                                                                                            image:normalImage
                                                                                    selectedImage:selectedImage
@@ -1379,11 +1414,19 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
         // 仅用于扁平样式。在子类自定义 TabBar 之前：用于区分 App 设置的 `standardAppearance` 与默认值。
         [self cyl_recordDefaultStandardAppearance];
 #endif
-        //以下为重要步骤，谨慎修改顺序：
-        self.tabBarStyleType = styleType;// 步骤1 must use setter 必须在 self.viewControllers之前设置， 因为 self.viewControllers直接涉及到样式判断逻辑。
+        // [CN] 以下为重要步骤，谨慎修改顺序：
+        // [EN] The following steps are important; be careful when changing their order:
+        self.tabBarStyleType = styleType;// [CN] 步骤1 must use setter 必须在 self.viewControllers之前设置， 因为 self.viewControllers直接涉及到样式判断逻辑。
+        // [EN] Step 1: must use the setter and must be set before self.viewControllers,
+        //      because self.viewControllers directly involves the style detection logic.
         [self cyl_tabBar];
-        self.context = context; // 步骤2 must use setter 必须在 self.viewControllers之前设置， 因为 self.viewControllers 直接涉及样式contxt 与 PlusButton的判断逻辑。否则 contxt 永远是默认值
-        self.viewControllers = viewControllers;// 步骤3 must use setter,必须在 self.tabBarStyleType之后设置， 因为 self.viewControllers 直接涉及到扁平TabBar样式KVC逻辑。
+        self.context = context; // [CN] 步骤2 must use setter 必须在 self.viewControllers之前设置， 因为 self.viewControllers 直接涉及样式contxt 与 PlusButton的判断逻辑。否则 contxt 永远是默认值
+        // [EN] Step 2: must use the setter and must be set before self.viewControllers, because
+        //      self.viewControllers directly involves
+        //      the style context and PlusButton detection logic. Otherwise the context always stays at its default value
+        self.viewControllers = viewControllers;// [CN] 步骤3 must use setter,必须在 self.tabBarStyleType之后设置， 因为 self.viewControllers 直接涉及到扁平TabBar样式KVC逻辑。
+        // [EN] Step 3: must use the setter and must be set after self.tabBarStyleType,
+        //      because self.viewControllers directly involves the KVC logic of the flat TabBar style.
         
     }
     return self;
@@ -1471,10 +1514,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 #pragma mark -  *  iOS26+ , 有 plusButton
 
-// MARK:  *  iOS26+ , 有 plusButton
+// [CN] MARK:  *  iOS26+ , 有 plusButton
+// [EN] MARK:  *  iOS26+, with plusButton
 
 /*!
- *  iOS26+ , 有 plusButton
+ * [CN] iOS26+ , 有 plusButton
+ * [EN] iOS26+, with plusButton
  */
 - (void)alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:(NSArray *)viewControllers {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
@@ -1528,7 +1573,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 /*!
- *  iOS26+ , 有 plusButton
+ * [CN] iOS26+ , 有 plusButton
+ * [EN] iOS26+, with plusButton
  */
 - (NSMutableArray *)alignViewControllers:(NSArray *)arrayWithoutPlusButton withPlusButtonViewControllerPlaceholder:(id)plusButtonViewControllerPlaceholder {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
@@ -1554,7 +1600,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     
         if (arrayWithPlusButton.count > plusButtonIndex) {
             [arrayWithPlusButton insertObject:plusButtonViewControllerPlaceholder atIndex:plusButtonIndex];
-            //FIXME:  to delete 液态玻璃暂时不支持自定义PlusButton位置。
+            // [CN] FIXME:  to delete 液态玻璃暂时不支持自定义PlusButton位置。
+            // [EN] FIXME:  to delete Liquid Glass does not support custom PlusButton positions for now.
             [[self cyl_contextPlusButton] cyl_setTabBarItemVisibleIndex:plusButtonIndex];
             [self cyl_addChildViewController:plusButtonViewControllerPlaceholder];
         }
@@ -1602,7 +1649,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return [arrayWithoutPlusButton mutableCopy];
 }
 /*!
- *  iOS26+ , 有 plusButton
+ * [CN] iOS26+ , 有 plusButton
+ * [EN] iOS26+, with plusButton
  */
 - (void)alignTabControlIfNeededWithViewControllers:(NSArray *)viewControllers {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
@@ -1644,7 +1692,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             return;
         }
     
-        // iOS26+ , 有 plusButton
+        // [CN] iOS26+ , 有 plusButton
+        // [EN] iOS26+, with plusButton
         if ([self hasPlusButton] && [CYLConstants isLiquidGlassActive]) {
             [self alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:viewControllers];
             NSDictionary *plusInfo =
@@ -1699,7 +1748,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             return;
         }
         
-        // iOS26+ , 有 plusButton
+        // [CN] iOS26+ , 有 plusButton
+        // [EN] iOS26+, with plusButton
         //        if ([self hasPlusButton] && [CYLConstants isLiquidGlassActive]) {
         if ([self hasPlusButton]) {
 
@@ -1725,7 +1775,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     }
     if ((!_tabBarItemsAttributes) || (_tabBarItemsAttributes.count != viewControllers.count)) {
 #if defined(DEBUG) || defined(BETA)
-        NSAssert(NO, @" [DEBUG] The count of CYLTabBarControllers is not equal to the count of tabBarItemsAttributes.【Chinese】【仅为调试阶段的提示信息】设置_tabBarItemsAttributes属性时，请确保元素个数与控制器的个数相同，并在方法`-setViewControllers:`之前设置");
+        NSAssert(NO, CYLLocalizedString(@"[DEBUG] 设置 tabBarItemsAttributes 时，请确保元素个数与控制器的个数相同，并在 `-setViewControllers:` 之前设置。"));
 #endif
         return;
     }
@@ -1739,8 +1789,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
  *
  * double-check if to use CYLTabBarStyleTypeLiquidGlass or not:
  * UIDesignCompatibility == FlatDesign , noNeedUIDesignCompatibility == noNeed FlatDesign == LiquidGlass
- * 设置为 NO，表示扁平化设计， 本属性相当于UI兼容模式的代码替代版本，仅仅在 iOS26+ 系统有效。
+ * [CN] 设置为 NO，表示扁平化设计， 本属性相当于UI兼容模式的代码替代版本，仅仅在 iOS26+ 系统有效。
  * 由于 UI 兼容模式的命名晦涩， 更优雅直观的方式为 设置 CYLTabBarStyleType，其内部会设置该属性用于决定是否使用扁平设计。
+ * [EN] Setting this to NO means flat design. This property is a code replacement for the UI compatibility
+ *      mode and only takes
+ *      effect on iOS26+. Since the name of the UI compatibility mode is obscure, a more elegant and
+ *      intuitive approach is to
+ *      set CYLTabBarStyleType, which sets this property internally to decide whether to use flat design.
  
  * @return means  CYLTabBarStyleType == CYLTabBarStyleTypeFlatDesign if return NO, means  CYLTabBarStyleType == CYLTabBarStyleTypeLiquidGlass if return YES;
  * @attention better switch to property CYLTabBarStyleType
@@ -1750,7 +1805,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         return YES;
     }
     BOOL isLiquidGlass = [CYLConstants isLiquidGlassActive];
-    //， 这个表示requiresCompatibility，必须使用， 否则iOS26里的兼容模式会错乱。
+    // [CN] ， 这个表示requiresCompatibility，必须使用， 否则iOS26里的兼容模式会错乱。
+    // [EN] This means requiresCompatibility and must be used, otherwise the compatibility mode on iOS26 breaks.
     if (!isLiquidGlass) {
         return YES;
     }
@@ -1860,9 +1916,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 /**
- *  利用 KVC 把系统的 tabBar 类型改为自定义类型。
+ * [CN] 利用 KVC 把系统的 tabBar 类型改为自定义类型。
  *  仅限 CYLTabBar，在ViewDidLoad中调用
  *  不涉及 CYLTabBarStyleTypeFlatDesign样式（ 会在 setViewControllers 内部设置。）
+ * [EN] Use KVC to change the system tabBar's type to a custom type.
+ *      CYLTabBar only; called in ViewDidLoad
+ *      Does not cover the CYLTabBarStyleTypeFlatDesign style (that is set inside setViewControllers.)
  */
 - (void)setUpDefaultStyleTabBar {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
@@ -1871,10 +1930,17 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 /**
- *  利用 KVC 把系统的 tabBar 类型改为自定义类型。
+ * [CN] 利用 KVC 把系统的 tabBar 类型改为自定义类型。
  *  包含所有样式类型：
  *   CYLTabBar，在ViewDidLoad中调用；因为考虑到PlusButton的逻辑， 涉及坐标计算，还有运行中增删 PlusButton的逻辑，需要涉及重新布局，需要layoutSubviews中进行。故延迟调用。
  *   CYLTabBarStyleTypeFlatDesign样式 会在 setViewControllers 内部调用，调用时机靠前。
+ * [EN] Use KVC to change the system tabBar's type to a custom type.
+ *      Covers all style types:
+ *      CYLTabBar: called in ViewDidLoad. Because the PlusButton logic involves coordinate calculation, plus
+ *      adding and removing
+ *      the PlusButton at runtime, which requires relayout, this must happen in layoutSubviews, so the call
+ *      is deferred.
+ *      CYLTabBarStyleTypeFlatDesign style: called inside setViewControllers, which happens earlier.
  */
 - (void)setUpTabBar:(UIView __kindof *)_tabBar {
     CYL_IF_NOT_FLATDESIGN_BEGIN //Not CYLTabBarStyleTypeFlatDesign
@@ -1889,13 +1955,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         [self setUpIPADForTabBar:tabBar];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@", @(__PRETTY_FUNCTION__), @(__LINE__), @"setUpTabBar failed", exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"setUpTabBar failed", exception.reason);
 #endif
     }
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
 
-/** ipados 18 固定tabbar 在底部 */
+/** [CN] ipados 18 固定tabbar 在底部 */
+/* [EN] Pin the tabbar to the bottom on iPadOS 18 */
 - (void)setUpIPADForTabBar:(CYLTabBar *)tabBar {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     if (@available(iOS 18.0, *)) {
@@ -1912,7 +1979,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                 }
             }
             if (!setupSuccess) {
-                //防止未来类名变动， 暂时不会调用。
+                // [CN] 防止未来类名变动， 暂时不会调用。
+                // [EN] Guards against future class name changes; not called for now.
                 [self.cyl_tabBar removeFromSuperview];
                 [self.view addSubview:self.cyl_tabBar];
             }
@@ -2120,9 +2188,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                     imageInsets = insets;
                 }
             } else {
-                /**如果是CYLPlusChildViewController ，title设置为空字符串，解决把第一个tabbarItem设置成plusButton后，其他的
+                /** [CN] 如果是CYLPlusChildViewController ，title设置为空字符串，解决把第一个tabbarItem设置成plusButton后，其他的
                  tabbarItem会不显示title问题
                   见： https://github.com/ChenYilong/CYLTabBarController/issues/563
+                 * [EN] If it is a CYLPlusChildViewController, set the title to an empty string. This fixes an issue where,
+                 *      after making the
+                 *      first tabbarItem the plusButton, the other tabbarItems would not show their titles
+                 *      See: https://github.com/ChenYilong/CYLTabBarController/issues/563
                  **/
                 title = @"";
                 if ([CYLConstants isLiquidGlassActive] && ([self hasPlusButton])) {
@@ -2145,7 +2217,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         
         
             //        if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-            //            //已经在addOneChildViewController 中操作， 这里无需重复处理
+            // [CN] //已经在addOneChildViewController 中操作， 这里无需重复处理
+            // [EN] Already handled in addOneChildViewController, no need to handle it again here
             //            // [self addChildViewController:viewController];
             //
             //            if (!viewController.cyl_isPlaceholder && ![viewController cyl_isEqualToViewController:[self cyl_contextPlusChildViewController]]) {
@@ -2227,12 +2300,17 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 /**
- *  添加一个子控制器
+ * [CN] 添加一个子控制器
+ * [EN] Add a child view controller
  *
- *  @param viewController    控制器
+ * [CN] @param viewController    控制器
  *  @param title             标题
  *  @param normalImageInfo   图片
  *  @param selectedImageInfo 选中图片
+ * [EN] @param viewController    view controller
+ *      @param title             title
+ *      @param normalImageInfo   image
+ *      @param selectedImageInfo selected image
  */
 - (void)addOneChildViewController:(UIViewController *)viewController
                         WithTitle:(NSString *)title
@@ -2515,7 +2593,8 @@ static char CYLObservedStandardAppearanceTabBarKey;
 }
 
 /// `UITabBar.scrollEdgeAppearance` exists from iOS 15, `standardAppearance` from iOS 13.
-/// `UITabBar.scrollEdgeAppearance` 自 iOS 15 起提供，`standardAppearance` 自 iOS 13 起提供。
+/// [CN] `UITabBar.scrollEdgeAppearance` 自 iOS 15 起提供，`standardAppearance` 自 iOS 13 起提供。
+/// [EN] `UITabBar.scrollEdgeAppearance` is available since iOS 15, `standardAppearance` since iOS 13.
 static NSArray<NSString *> *CYLObservedAppearanceKeyPaths(void) {
     if (@available(iOS 15.0, *)) {
         return @[ @"standardAppearance", @"scrollEdgeAppearance" ];
@@ -2800,7 +2879,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             //      视图变化做动画，切换被拒绝时不产生任何变化。
             UIView *containerView = fromView.superview ?: self.view;
             [UIView transitionWithView:containerView
-                              duration:0.01   // 几乎立即
+                              duration:0.01   // [CN] 几乎立即
+                              // [EN] Almost immediate
                                options:UIViewAnimationOptionTransitionCrossDissolve
                             animations:nil
                             completion:nil];
@@ -2898,7 +2978,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         shouldSelectViewController = (!control.cyl_userInteractionDisabled) && (!control.hidden) ;
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     UIControl *contentControl = control;
@@ -2923,7 +3003,9 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             }];
             contentControl.selected = YES;
             selectedContentControl.selected = YES;
-            //非液态玻璃 与 液态玻璃逻辑共用，Lottie播放逻辑都在 tabChangedToSelectedIndex 中。
+            // [CN] 非液态玻璃 与 液态玻璃逻辑共用，Lottie播放逻辑都在 tabChangedToSelectedIndex 中。
+            // [EN] Shared logic for non-Liquid Glass and Liquid Glass; all Lottie playback logic lives in
+            //      tabChangedToSelectedIndex.
         }
     }
     UIControl *control_ = control ?: self.selectedViewController.cyl_tabButton;
@@ -3104,7 +3186,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             }
         } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-            NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
         }
     }
@@ -3164,16 +3246,19 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 #endif
     
         if (!_cyl_tabBar) {
-            // 处理tabBar，使用自定义 tabBar 并添加 发布按钮。仅限 CYLTabBar，CYLTabBarStyleTypeFlatDesign 会在 setViewControllers 内部设置。
+            // [CN] 处理tabBar，使用自定义 tabBar 并添加 发布按钮。仅限 CYLTabBar，CYLTabBarStyleTypeFlatDesign 会在 setViewControllers 内部设置。
+            // [EN] Set up the tabBar: use the custom tabBar and add the publish button. CYLTabBar only;
+            //      CYLTabBarStyleTypeFlatDesign is set inside setViewControllers.
             [self setUpDefaultStyleTabBar];
-            // KVO注册监听
+            // [CN] KVO注册监听
+            // [EN] Register KVO observers
             if (!self.isObservingTabImageViewDefaultOffset) {
                 @try {
                     //CYLTabBarController may crash when deallocating
                     [_cyl_tabBar addObserver:self forKeyPath:@"tabImageViewDefaultOffset" options:NSKeyValueObservingOptionNew context:CYLTabImageViewDefaultOffsetContext];
                 } @catch(NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-                    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+                    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
                 }
                 self.observingTabImageViewDefaultOffset = YES;
@@ -3187,7 +3272,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 
     }
     /*!
-     *添加自定义的 CYLFlatDesignTabBar
+     * [CN] 添加自定义的 CYLFlatDesignTabBar
+     * [EN] Add the custom CYLFlatDesignTabBar
      */
 
 
@@ -3200,7 +3286,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             _cyl_tabBar = nil;
         }
         if (!_cyl_tabBar) {
-            // 通过KVC 换成 CYLFlatDesignTabBarHideTabBar 控制系统 UITabBar 永久隐藏
+            // [CN] 通过KVC 换成 CYLFlatDesignTabBarHideTabBar 控制系统 UITabBar 永久隐藏
+            // [EN] Swap in CYLFlatDesignTabBarHideTabBar via KVC to keep the system UITabBar permanently hidden
             CYLFlatDesignTabBarHideTabBar *tabBar = [[CYLFlatDesignTabBarHideTabBar alloc] init];
             [self cyl_setValue:tabBar forKey:@"tabBar"];
             // KVC can fail silently. Hide the actual system bar, not just the
@@ -3252,7 +3339,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
             //fix [bug]: #556
-            NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] Please ensure that your custom CYLTabBarController subclass calls `super.viewDidLoad()` in the `viewDidLoad` method, and that this call is placed on the last line of the `viewDidLoad` method; otherwise, CYLTabBar KVC settings will fail.【DEBUG】请确保你的自定义 CYLTabBarController 的子类，在viewDidLoad中调用了 `super.viewDidLoad()`，且在viewDidLoad方法中最后一行调用，否则 CYLTabBar KVC 设置会失败。", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
         }
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
@@ -3271,7 +3358,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
             //fix [bug]: #556
-            NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@，【DEBUG】请确保你的自定义 CYLTabBarController 的子类，在viewDidLoad中调用了 `super.viewDidLoad()`，且在viewDidLoad方法中最后一行调用，否则 CYLTabBar KVC 设置会失败。", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
         }
         
@@ -3416,15 +3503,19 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     //            if (NSNotFound == indexOfSelectedViewController) { return; }
     
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        //必须调用父类逻辑。
+        // [CN] 必须调用父类逻辑。
+        // [EN] Must call the superclass logic.
         //    _selectedViewController = selectedViewController;
         //
         //    [super setSelectedViewController:selectedViewController];
-        // Fix: #574 解决iOS15 扁平风格， 有时候TabBar会变透明的问题
+        // [CN] Fix: #574 解决iOS15 扁平风格， 有时候TabBar会变透明的问题
+        // [EN] Fix: #574 Fixes an issue where the TabBar sometimes became transparent with the flat style on iOS15
         if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0") && ![CYLConstants isLiquidGlassActive]) {
             if (nil == [UITabBar appearance].backgroundImage) {
                 @try {
-                    //因为非核心功能， 仅为部分版本的细节修复， 所以用try catch 防止异常， 防止影响主要功能。
+                    // [CN] 因为非核心功能， 仅为部分版本的细节修复， 所以用try catch 防止异常， 防止影响主要功能。
+                    // [EN] Since this is not a core feature, only a detail fix for some versions, use try catch to prevent exceptions
+                    //      from affecting the main functionality.
                     if (self.cyl_tabBar.cyl_tabBackgroundView && self.cyl_tabBar.cyl_tabBackgroundView.cyl_tabEffectView) {
                         self.cyl_tabBar.cyl_tabBackgroundView.cyl_tabEffectView.alpha = 1;
                     }
@@ -3433,7 +3524,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
                     }
                 } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-                    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+                    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
                 }
             }
@@ -3564,8 +3655,11 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             selectedViewController = [self.viewControllers objectAtIndex:selectedIndex];
             self.selectedViewController = selectedViewController;
         }
-        //  iOS26 液态玻璃样式 不再使用点击事件， 而是在 `-setSelectedViewController` and `-setSelectedIndex`中处理
+        // [CN] iOS26 液态玻璃样式 不再使用点击事件， 而是在 `-setSelectedViewController` and `-setSelectedIndex`中处理
         // 代码切换 tab 时会触发
+        // [EN] The iOS26 Liquid Glass style no longer uses tap events; this is handled in
+        //      `-setSelectedViewController` and `-setSelectedIndex` instead
+        //      Triggered when the tab is switched in code
         if (YES == _selectedViewController.cyl_isPlaceholder) {
             return;
         }
@@ -3593,7 +3687,9 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
                 [self.cyl_tabBar setItems:self.items];
                 _needsReloadItems = NO;
             }
-            //TODO:  这里避免使用selectedViewController，因为 self.viewControllers 被经过PlusButton补充，
+            // [CN] TODO:  这里避免使用selectedViewController，因为 self.viewControllers 被经过PlusButton补充，
+            // [EN] TODO:  Avoid using selectedViewController here, because self.viewControllers has been supplemented
+            //      with the PlusButton,
             //        self.cyl_tabBar.selectedItem = selectedItem;
             [self tabChangedToSelectedIndex:selectedIndex viewController:nil selectedItem:nil];
             
@@ -3611,10 +3707,14 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 }
 
 /*!
- * 三个地方 ， 都要调用：
+ * [CN] 三个地方 ， 都要调用：
  *  选中状态下的重新点击，（iOS26 需要在手势代理方法中进行hook追加该方法）
  *  用户切换index时
  *  代码切换index 时。
+ * [EN] Must be called from all three places:
+ *      Re-tapping an already selected tab (on iOS26 this needs to be hooked in via the gesture delegate method)
+ *      When the user switches the index
+ *      When the index is switched in code.
  **/
 #if CYL_FLATDESIGN_AVAILABLE
 - (void)tabChangedToSelectedIndex:(NSUInteger)selectedIndex
@@ -3623,14 +3723,17 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     
     CYL_IF_FLATDESIGN_BEGIN
     
-    //扁平样式可使用
+    // [CN] 扁平样式可使用
+    // [EN] Available for the flat design style
     if (![self.tabBar isKindOfClass:[UITabBar class]] && ![self.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
         return;
     }
     //    BOOL isChildViewControllerPlusButton = [control cyl_isChildViewControllerPlusButton];
     //    BOOL isLottieEnabled = [self isLottieEnabled];
     
-    //TODO:  setSelectedIndex 这里避免使用selectedViewController，因为 self.viewControllers 被经过PlusButton补充，
+    // [CN] TODO:  setSelectedIndex 这里避免使用selectedViewController，因为 self.viewControllers 被经过PlusButton补充，
+    // [EN] TODO:  setSelectedIndex Avoid using selectedViewController here, because self.viewControllers has been
+    //      supplemented with the PlusButton,
     
     if (!self.items || self.items.count == 0) {
         return;
@@ -3656,7 +3759,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 
 #pragma mark -
 #pragma mark - 状态栏
-// MARK: 状态栏
+// [CN] MARK: 状态栏
+// [EN] MARK: Status bar
 
 - (UIViewController *)childViewControllerForStatusBarStyle {
     UIViewController *childViewController = self.selectedViewController;
@@ -3992,7 +4096,8 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 #if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         
-        // 转场或pop手势返回时禁止用户交互
+        // [CN] 转场或pop手势返回时禁止用户交互
+        // [EN] Disable user interaction during transitions or the interactive pop gesture
         self.view.userInteractionEnabled = NO;
         UIEdgeInsets additionalSafeAreaInsets = self.selectedViewController.additionalSafeAreaInsets;
         //FIX:  issue#652
@@ -4103,7 +4208,8 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 }
 
 - (BOOL)_showsMoreNavigationController {
-    // 用 self.viewControllers.count > 5 判断行不行？
+    // [CN] 用 self.viewControllers.count > 5 判断行不行？
+    // [EN] Would checking self.viewControllers.count > 5 work?
     BOOL _showsMoreNavigationController = NO;
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
 #if CYL_FLATDESIGN_AVAILABLE
@@ -5015,7 +5121,7 @@ static char CYLLoginInterceptedViewControllerKey;
         return;
     }
 #if defined(DEBUG) || defined(BETA)
-    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"A tab that needs login was tapped, but neither cyl_loginHandler nor -tabBarController:presentLoginForViewController:completion: is set. 需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法。");
+    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), CYLLocalizedString(@"需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法 -tabBarController:presentLoginForViewController:completion:。"));
 #endif
 }
 

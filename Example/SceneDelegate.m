@@ -29,7 +29,10 @@ NS_ASSUME_NONNULL_BEGIN
         return [[CYLMainRootViewController alloc] init];
     }];
     [self.window makeKeyAndVisible];
-    //要根据你的window与tabbar的关系，来设置， 如果你 设置了 self.window.rootViewController = rootViewController; 那么你应该用下面的方式来设置暗黑模式, 否则 window的overrideUserInterfaceStyle 不认, 只跟随系统
+    // [CN] 要根据你的window与tabbar的关系，来设置， 如果你 设置了 self.window.rootViewController = rootViewController; 那么你应该用下面的方式来设置暗黑模式, 否则 window的overrideUserInterfaceStyle 不认, 只跟随系统
+    // [EN] Set this according to the relationship between your window and tabbar. If you set
+    //      self.window.rootViewController = rootViewController; then you should set Dark Mode as below; otherwise the
+    //      window's overrideUserInterfaceStyle is ignored and it only follows the system.
 //    self.window.rootViewController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
 
 //    [UIWindow appearance].overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
@@ -47,7 +50,8 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 /**
- *  设置navigationBar样式
+ * [CN] 设置navigationBar样式
+ * [EN] Set the navigationBar style
  */
 - (void)setUpNavigationBarAppearance {
 //    UINavigationBar *navigationBarAppearance = [UINavigationBar appearance];

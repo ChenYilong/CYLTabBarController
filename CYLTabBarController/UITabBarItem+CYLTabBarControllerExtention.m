@@ -54,7 +54,8 @@
     return [self.cyl_view cyl_tabImageView];
 }
 
-// 如果使用了液态玻璃，则返回 UITabBarPlatterView 中的 SelectedContentView 中的 subviews 中的 view
+// [CN] 如果使用了液态玻璃，则返回 UITabBarPlatterView 中的 SelectedContentView 中的 subviews 中的 view
+// [EN] If Liquid Glass is used, return the view among the subviews of SelectedContentView in UITabBarPlatterView
 - (nullable UIControl *)cyl_selectedTabButton {
     if ([CYLConstants isLiquidGlassActive]) {
         if (![self isKindOfClass:UITabBarItem.class]) {

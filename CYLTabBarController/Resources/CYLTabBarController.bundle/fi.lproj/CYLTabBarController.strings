@@ -153,6 +153,22 @@
 "「%@」需要登录后才能查看" = "Kirjaudu nähdäksesi “%@”";
 "登录" = "Kirjaudu";
 "、" = ", ";
+"UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!" = "UINavigationController+CYLFlatDesignTabBarPrivate: peräkkäisiä pop-toimintoja? Tämä voi aiheuttaa ongelmia!";
+"[DEBUG INFO] 如果 CYLTabBarController 的子控制器个数是奇数，你必须在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Jos CYLTabBarControllerin alinäkymäohjainten määrä on pariton, sinun on toteutettava `+indexOfPlusButtonInTabBar` omassa plusButton-luokassasi plusButtonin sijainnin määrittämiseksi.";
+"[DEBUG INFO] 如果你想使用 PlusChildViewController 样式，你必须同时在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Jotta voit käyttää PlusChildViewControlleria, sinun on lisäksi toteutettava `+indexOfPlusButtonInTabBar` omassa plusButton-luokassasi plusButtonin sijainnin määrittämiseksi.";
+"[DEBUG] 设置 tabBarItemsAttributes 时，请确保元素个数与控制器的个数相同，并在 `-setViewControllers:` 之前设置。" = "[DEBUG] Kun asetat tabBarItemsAttributes-arvon, varmista, että siinä on yhtä monta elementtiä kuin näkymäohjaimia, ja aseta se ennen kutsua `-setViewControllers:`.";
+"不允许更改由 tabBarController 管理的 tabBar 的代理" = "tabBarControllerin hallinnoiman välilehtipalkin delegaattia ei voi muuttaa.";
+"我是第%@行" = "Rivi %@";
+"类：%@ 行：[%@] 方法：%@ 数据：%@" = "Luokka: %@ Rivi: [%@] Metodi: %@ Tiedot: %@";
+"系统TabBarController不支持" = "Järjestelmän TabBarController ei tue tätä";
+"需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法 -tabBarController:presentLoginForViewController:completion:。" = "Kirjautumista vaativaa välilehteä napautettiin, mutta cyl_loginHandleria tai metodia -tabBarController:presentLoginForViewController:completion: ei ole asetettu.";
+"🔴类名与方法名：%@（在第%@行）, KVC failed：%@" = "🔴 Luokka ja metodi: %@ (rivi %@), KVC epäonnistui: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@" = "🔴 Luokka ja metodi: %@ (rivi %@), kuvaus: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@" = "🔴 Luokka ja metodi: %@ (rivi %@), kuvaus: %@: syy %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。" = "🔴 Luokka ja metodi: %@ (rivi %@), kuvaus: %@. [DEBUG] Varmista, että CYLTabBarController-aliluokkasi kutsuu `super.viewDidLoad()` metodin `viewDidLoad` viimeisellä rivillä; muuten CYLTabBarin KVC-määritys epäonnistuu.";
+"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 Luokka ja metodi: %@ (rivi %@), kuvaus: indeksi %@ otsikko %@";
+"暂无数据" = "Ei tietoja";
+"网络连接已断开" = "Verkkoyhteys katkesi";
 
 /* Issue #91: plus button touchable area demo row. */
 "PlusButton 点击范围（issue #91）" = "PlusButtonin kosketusalue (issue #91)";

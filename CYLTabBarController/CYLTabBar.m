@@ -36,7 +36,8 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 
 @end
 
-/// See `cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h. 见 CYLPlusButton.h 中的 `cyl_appliesCenterYOffsetWithoutTitle`。
+/// [CN] See `cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h. 见 CYLPlusButton.h 中的 `cyl_appliesCenterYOffsetWithoutTitle`。
+/// [EN] See `cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h.
 @interface CYLPlusButton (CYLTabBarLayout)
 - (BOOL)cyl_isCenteredWithoutTitle;
 - (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center;
@@ -74,7 +75,8 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 }
 
 - (instancetype)sharedInit {
-    // KVO注册监听
+    // [CN] KVO注册监听
+    // [EN] Register KVO observers
     _tabBarItemWidth = self.cyl_tabBarItemWidth;
     [self addObserver:self forKeyPath:@"tabBarItemWidth" options:NSKeyValueObservingOptionNew context:CYLTabBarContext];
     // Only with a Lottie library: without one there is no Lottie view to stop (#488).
@@ -210,7 +212,9 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
         BOOL isFirstAdded = (_plusButton.superview == nil);
         BOOL isSameContext = [self hasPlusButton];
         if (_plusButton && isSameContext && isFirstAdded) {
-            //TODO:  iOS26 考虑应该放进选中图层，而非粗暴放进最底层，这样未来可以 PlusButton 支持自定义index
+            // [CN] TODO:  iOS26 考虑应该放进选中图层，而非粗暴放进最底层，这样未来可以 PlusButton 支持自定义index
+            // [EN] TODO:  On iOS26, consider putting this into the selected layer instead of crudely putting it at the bottom,
+            //      so that PlusButton can support a custom index in the future.
             [self cyl_addPlatterViewThenBringSubviewToFront:(UIButton *)_plusButton];
             self.plusButtonActive = YES;
             [_plusButton cyl_setTabBarController:[self cyl_tabBarController]];
@@ -251,7 +255,7 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
                             }
                         } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-                            NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+                            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
                         }
                     }
@@ -290,7 +294,10 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
         [self setupTabImageViewDefaultOffset:self.tabBarButtonArray[0]];
     }
     
-    // FIX: iOS15有时候会导致TaBar透明的问题 但是这样会导致无法主动让TabBar透明 考虑以后添加属性 // 现在通过判断isHidden来处理，如果隐藏了就不再修改alpha
+    // [CN] FIX: iOS15有时候会导致TaBar透明的问题 但是这样会导致无法主动让TabBar透明 考虑以后添加属性 // 现在通过判断isHidden来处理，如果隐藏了就不再修改alpha
+    // [EN] FIX: On iOS15 this sometimes makes the TaBar transparent, but it then prevents making the TabBar transparent
+    //      on purpose; consider adding a property later // Now handled by checking isHidden: if hidden, alpha is no
+    //      longer modified
     if (CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0") && ![CYLConstants isLiquidGlassActive]) {
         [self removeAlphaObserver];
         UIView *backgroundView = self.cyl_tabBackgroundView;
@@ -327,7 +334,8 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
     if (!addedToTabBar && self.hasPlusButton) {
         [self cyl_setTabBarItemWidth:(tabBarWidth) / self.cyl_tabbarItemsCount];
         [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIControl * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
-            //仅修改childView的x和宽度,yh值不变
+            // [CN] 仅修改childView的x和宽度,yh值不变
+            // [EN] Only change childView's x and width; the y and height values stay the same
             CGFloat childViewX = buttonIndex * self.cyl_tabBarItemWidth;
             [self changeXForChildView:childView
                            childViewX:childViewX
@@ -341,10 +349,13 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
         return;
     }
     [self cyl_setTabBarItemWidth:(tabBarWidth - self.cyl_plusButtonWidth) / self.cyl_tabbarItemsCount];
-   //plusButtonIndex内部调整 PlusButton 的中心坐标，不能直接修改 center，否则会造成点击动画时的闪动bug，需要借助坐标系转换。
+   // [CN] plusButtonIndex内部调整 PlusButton 的中心坐标，不能直接修改 center，否则会造成点击动画时的闪动bug，需要借助坐标系转换。
+   // [EN] plusButtonIndex adjusts the PlusButton's center internally. Do not modify center directly, otherwise the
+   //      button flickers during the tap animation; use a coordinate-space conversion instead.
     NSUInteger plusButtonIndex = [self plusButtonIndex];
     [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIControl * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
-        //调整UITabBarItem的位置
+        // [CN] 调整UITabBarItem的位置
+        // [EN] Adjust the position of the UITabBarItem
         CGFloat childViewX;
         CGFloat visiableTabIndex = buttonIndex;
         CGFloat tabBarItemWidth = self.cyl_tabBarItemWidth;
@@ -371,7 +382,8 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
         UIControl *selectedContentControl = [self cyl_selectedContentControlFromContentControl:childView];
         
         [selectedContentControl cyl_setTabBarChildViewControllerIndex:buttonIndex];
-        //仅修改childView的x和宽度,yh值不变
+        // [CN] 仅修改childView的x和宽度,yh值不变
+        // [EN] Only change childView's x and width; the y and height values stay the same
         [self changeXForChildView:childView
                        childViewX:childViewX
                   tabBarItemWidth:tabBarItemWidth
@@ -384,18 +396,22 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 }
 
 /*!
- * iOS26+ 玻璃效果不能使用 frame 进行修改， 否则 会引发 手势的 lifted 状态变更后，点击后左右闪动bug。
+ * [CN] iOS26+ 玻璃效果不能使用 frame 进行修改， 否则 会引发 手势的 lifted 状态变更后，点击后左右闪动bug。
+ * [EN] On iOS26+ the glass effect must not be modified via frame, otherwise after the gesture's lifted state changes,
+ *      a tap causes a left-right flicker bug.
  */
 - (void)changeXForChildView:(UIControl *)childView
                  childViewX:(CGFloat)childViewX
             tabBarItemWidth:(CGFloat)tabBarItemWidth
                       index:(NSUInteger)index {
     if (![CYLConstants isLiquidGlassActive]) {
-        //RTL（如阿语）下镜像 x 坐标，使第 0 个 Tab 位于最右侧
+        // [CN] RTL（如阿语）下镜像 x 坐标，使第 0 个 Tab 位于最右侧
+        // [EN] Mirror the x coordinate under RTL (e.g. Arabic) so that tab 0 is on the far right
         if ([self cyl_isRightToLeftLayout]) {
             childViewX = self.cyl_boundsSize.width - childViewX - tabBarItemWidth;
         }
-        //仅修改childView的x和宽度,yh值不变
+        // [CN] 仅修改childView的x和宽度,yh值不变
+        // [EN] Only change childView's x and width; the y and height values stay the same
         childView.frame = CGRectMake(childViewX,
                                      CGRectGetMinY(childView.frame),
                                      tabBarItemWidth,
@@ -405,8 +421,12 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
     UIControl *selectedContentControl = [self cyl_selectedContentControlFromContentControl:childView];
     [childView cyl_setTabBarItemVisibleIndex:index];
     if (!selectedContentControl) { return; }
-    //只有玻璃效果有 selectedContentControl，所以可以代替玻璃效果判断。
+    // [CN] 只有玻璃效果有 selectedContentControl，所以可以代替玻璃效果判断。
     //非常重要的 transform 设置， 请勿删除， iOS26+ 玻璃效果+Lottie动画需要禁用形变，否则会引发手势的 lifted 状态变更后的闪动bug。因静态图片场景下不会引起异常， 故未判断是否为Lottie场景
+    // [EN] Only the glass effect has selectedContentControl, so it can be used to detect the glass effect.
+    //      Very important transform setting, do not delete. On iOS26+, glass effect + Lottie animation needs the
+    //      transform disabled, otherwise a flicker bug occurs after the gesture's lifted state changes. Static images
+    //      do not cause the problem, so there is no check for whether this is a Lottie scenario.
     selectedContentControl.transform = CGAffineTransformIdentity;//(1, 1);
 }
 
@@ -455,12 +475,20 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
     return NO;
 }
 
-// KVO监听执行
+// [CN] KVO监听执行
+// [EN] Handle KVO notifications
 /*!
- //TODO:   iOS26 适配以下接口， 思路是监听， 特定窗口的缩小尺寸变动。执行隐藏和现实PlusButton操作。
+ [CN] //TODO:   iOS26 适配以下接口， 思路是监听， 特定窗口的缩小尺寸变动。执行隐藏和现实PlusButton操作。
  * 增加了类型为UITabBarController.MinimizeBehavior的tabBarMinimizeBehavior属性，用于设置 Tabbar 最小化时的行为。
 增加了类型为UITabAccessory的bottomAccessory属性，用于在 Tabbar 的上方再添加一个 UITabAccessory（辅助内容）。
 UISearchTab 会从 TabBar 分离出来单独显示。
+ [EN] TODO:   Adapt to the following iOS26 APIs. The idea is to observe size changes when a specific window
+      minimizes, and hide or show the PlusButton accordingly.
+      Added the tabBarMinimizeBehavior property of type UITabBarController.MinimizeBehavior, which sets the
+      behavior when the Tabbar is minimized.
+      Added the bottomAccessory property of type UITabAccessory, which adds a UITabAccessory (accessory content)
+      above the Tabbar.
+      UISearchTab is separated from the TabBar and shown on its own.
  */
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if (context == CYLTabBarAlpha) {
@@ -488,7 +516,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     if (_cyl_lottieAnimationPlayingObserver) {
         [[NSNotificationCenter defaultCenter] removeObserver:_cyl_lottieAnimationPlayingObserver];
     }
-    // KVO反注册
+    // [CN] KVO反注册
+    // [EN] Unregister KVO observers
     [self cyl_removeObserver:self forKeyPath:@"tabBarItemWidth" context:CYLTabBarContext];
     [self removeAlphaObserver];
 }
@@ -610,7 +639,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         CYLPlusButtonIndex = plusButtonIndex;
     } else {
         CYLPlusButtonIndex = plusButtonIndex;
-        //FIXME:  to delete 液态玻璃暂时不支持自定义PlusButton位置。
+        // [CN] FIXME:  to delete 液态玻璃暂时不支持自定义PlusButton位置。
+        // [EN] FIXME:  to delete Liquid Glass does not support a custom PlusButton position for now.
 //        [self.plusButton cyl_setTabBarItemVisibleIndex:CYLPlusButtonIndex];
         
         // FIX: issue #653 — iOS 27.1 vertical bar (folded iPhone Duo, `allowsVerticalBar = YES`).
@@ -641,7 +671,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         
         UIView *platterView = self.cyl_contentView;
         
-        // 系统默认参数
+        // [CN] 系统默认参数
+        // [EN] System default parameters
         CGFloat multiplierOfTabBarHeight =
         [self multiplierOfTabBarHeight];
         
@@ -649,14 +680,16 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         [self constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
         
         // ===============================
-        // 计算 platterView 中心
+        // [CN] 计算 platterView 中心
+        // [EN] Compute the platterView center
         // ===============================
         CGPoint platterCenter =
         [platterView.superview convertPoint:platterView.center
                                      toView:self];
         
         // ===============================
-        // 叠加系统默认 Y 逻辑
+        // [CN] 叠加系统默认 Y 逻辑
+        // [EN] Add the system's default Y logic on top
         // ===============================
         CGFloat systemDefaultY =
         tabBarHeight * multiplierOfTabBarHeight
@@ -669,7 +702,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
             systemDefaultY = platterCenter.y;
         }
         
-        // 计算最终中心
+        // [CN] 计算最终中心
+        // [EN] Compute the final center
         CGPoint finalCenter = CGPointMake(
                                           platterCenter.x ,
                                           systemDefaultY
@@ -679,7 +713,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         finalCenter = [[CYLPlusButton plusButtonForOwner:self] cyl_alignedCenterForCenter:finalCenter];
         
         // ===============================
-        // 禁止隐式动画
+        // [CN] 禁止隐式动画
+        // [EN] Disable implicit animations
         // ===============================
         [CATransaction begin];
         [CATransaction setDisableActions:YES];
@@ -855,16 +890,20 @@ UISearchTab 会从 TabBar 分离出来单独显示。
  *  Capturing touches on a subview outside the frame of its superview.
  */
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-    //1. 边界情况：不能响应点击事件
+    // [CN] 1. 边界情况：不能响应点击事件
+    // [EN] 1. Edge cases: cannot respond to tap events
     
     BOOL canNotResponseEvent = self.cyl_canNotResponseEvent;
     if (canNotResponseEvent) {
         return [super hitTest:point withEvent:event];
     }
     
-    //2. 优先处理 PlusButton （包括其突出的部分）、TabBarItems 未凸出的部分
+    // [CN] 2. 优先处理 PlusButton （包括其突出的部分）、TabBarItems 未凸出的部分
     //这一步主要是在处理只有两个 TabBarItems 的场景。
     // 2.1先考虑clipsToBounds情况：子view超出部分没有显示出来
+    // [EN] 2. First handle the PlusButton (including its protruding part) and the non-protruding part of TabBarItems
+    //      This step mainly handles the case where there are only two TabBarItems.
+    //      2.1 First consider the clipsToBounds case: the parts of subviews outside the bounds are not shown
     if (self.clipsToBounds && ![self pointInside:point withEvent:event]) {
         return [super hitTest:point withEvent:event];
     }
@@ -909,9 +948,12 @@ UISearchTab 会从 TabBar 分离出来单独显示。
             return selectedTabBarButton;
         }
     }
-    //CYLFlatDesignTabBar 已经封装在该类内部，不需要在这里处理
+    // [CN] CYLFlatDesignTabBar 已经封装在该类内部，不需要在这里处理
+    // [EN] CYLFlatDesignTabBar is already handled inside that class, so there is no need to handle it here
     
-    //3. 最后处理 TabBarItems 凸出的部分、添加到 TabBar 上的自定义视图、点击到 TabBar 上的空白区域
+    // [CN] 3. 最后处理 TabBarItems 凸出的部分、添加到 TabBar 上的自定义视图、点击到 TabBar 上的空白区域
+    // [EN] 3. Finally handle the protruding parts of TabBarItems, custom views added to the TabBar, and taps on empty
+    //      areas of the TabBar
     UIView *result = [super hitTest:point withEvent:event];
     if (result) {
         return result;
@@ -931,7 +973,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     if ([view cyl_isPlatterView]) {
         [self cyl_setPlatterView:view];
         UIView * container = view;
-        //  从 PlatterView 中，找真正承载 UITabBarButton 的 ContentView
+        // [CN] 从 PlatterView 中，找真正承载 UITabBarButton 的 ContentView
+        // [EN] Find, inside the PlatterView, the ContentView that actually holds the UITabBarButton
         UIView *contentView = nil;
         for (UIView *sub in container.subviews) {
             if ([sub cyl_isPlatterContentView]) {
@@ -944,7 +987,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
             [self cyl_setPlatterContentView:contentView];
         }
     }
-    //点击后的聚焦瞬间遮罩
+    // [CN] 点击后的聚焦瞬间遮罩
+    // [EN] Momentary focus overlay shown after a tap
     if ([view cyl_isPlatterPortalView]) {
         
         if (!self.cyl_portalView) {
@@ -1009,7 +1053,9 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     [super removeInteraction:interaction];
 }
 
-// 识别ContinuousSelection手势，需要代理长按等其他，处理PlusButton事件响应优先级为最优。
+// [CN] 识别ContinuousSelection手势，需要代理长按等其他，处理PlusButton事件响应优先级为最优。
+// [EN] Recognize the ContinuousSelection gesture; needs a delegate for long press etc., so that PlusButton event
+//      handling gets the highest priority.
 - (void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
     if (![CYLConstants isLiquidGlassActive] || ![self isKindOfClass:[CYLTabBar class]]) {
         [super addGestureRecognizer:gestureRecognizer];
@@ -1129,7 +1175,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     return self.cyl_tabBarController;
 }
 
-//处理PlusButton事件响应优先级为最优。
+// [CN] 处理PlusButton事件响应优先级为最优。
+// [EN] Give PlusButton event handling the highest priority.
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     if (![CYLConstants isLiquidGlassActive] || ![self isKindOfClass:[CYLTabBar class]]) {
@@ -1151,15 +1198,21 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         (
          UIControl *control = (UIControl *)hitView;
          if (control.selected) {
-             //FIX: iOS26 无法追加点击事件， 导致无法在选中状态下， 二次点击回调, 被系统手势拦截需要禁用特定手势，因为手势优先级高于 ControlEvents;
+             // [CN] FIX: iOS26 无法追加点击事件， 导致无法在选中状态下， 二次点击回调, 被系统手势拦截需要禁用特定手势，因为手势优先级高于 ControlEvents;
+             // [EN] FIX: On iOS26 tap events cannot be added, so there is no callback for a second tap in the selected state;
+             //      the system gesture intercepts it, so specific gestures must be disabled, because gestures take priority
+             //      over ControlEvents;
              [tabBarController performSelector:actin withObject:control];
          }
          )
     }
     
     if ([hitView isKindOfClass:[CYLPlusButton class]] && ![CYLPlusButton plusChildViewControllerForOwner:self]) {
-        // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
+        // [CN] 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
         // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
+        // [EN] Even if the PlusButton has its own tap event, tapping the PlusButton still triggers this delegate method.
+        //      Set CYLExternPlusButton.cyl_userInteractionDisabled = YES; when initializing the PlusButton to stop this
+        //      protocol method from firing the plusButton callback
         if (![CYLPlusButton plusButtonForOwner:self].cyl_userInteractionDisabled) {
             if ([tabBarController respondsToSelector:actin]) {
                 CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS

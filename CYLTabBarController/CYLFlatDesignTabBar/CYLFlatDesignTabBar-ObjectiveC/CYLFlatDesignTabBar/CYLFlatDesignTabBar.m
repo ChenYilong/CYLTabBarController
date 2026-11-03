@@ -68,11 +68,13 @@
 
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
-        // 引入CYLFlatDesignTabBar，即表示同意 hook push行为
+        // [CN] 引入CYLFlatDesignTabBar，即表示同意 hook push行为
+        // [EN] Importing CYLFlatDesignTabBar means you agree to hooking the push behavior.
         [UINavigationController cyl_navigationBarActionHook];
         [self commonInit];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_tabBarItemDidChange:) name:CYLFlatDesignTabBarItemDidChange object:nil];
-        // Only with a Lottie library. 仅在引入 Lottie 库时监听。
+        // [CN] Only with a Lottie library. 仅在引入 Lottie 库时监听。
+        // [EN] Only with a Lottie library. Observe only when the Lottie library is imported.
 #if CYL_LOTTIE_AVAILABLE
         __weak __typeof(self) weakSelf = self;
         void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
@@ -108,11 +110,12 @@
         [[NSNotificationCenter defaultCenter] removeObserver:_lottieAnimationPlayingObserver];
     }
     @try {
-        //iOS9之后， 不再必须， 因此， 并非核心逻辑， 未来考虑删除。
+        // [CN] iOS9之后， 不再必须， 因此， 并非核心逻辑， 未来考虑删除。
+        // [EN] No longer required since iOS 9, so it is not core logic; consider removing it in the future.
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
 }
@@ -139,13 +142,16 @@
 
 - (void)safeAreaInsetsDidChange {
     [super safeAreaInsetsDidChange];
-    //FIX: issue #662 iPhone Duo 折叠/展开、横竖屏切换时安全区会变化（如右侧 84pt 的竖向状态栏），需重新排列按钮
+    // [CN] FIX: issue #662 iPhone Duo 折叠/展开、横竖屏切换时安全区会变化（如右侧 84pt 的竖向状态栏），需重新排列按钮
+    // [EN] FIX: issue #662 The safe area changes when an iPhone Duo folds/unfolds or rotates (e.g. the 84pt
+    //      vertical status bar on the right), so the buttons need to be laid out again.
     [self setNeedsLayout];
 }
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
-    //RTL（如阿语）切换布局方向后需重新排列按钮
+    // [CN] RTL（如阿语）切换布局方向后需重新排列按钮
+    // [EN] After switching the layout direction for RTL (e.g. Arabic), the buttons need to be laid out again.
     if (previousTraitCollection.layoutDirection != self.traitCollection.layoutDirection) {
         [self setNeedsLayout];
     }
@@ -174,11 +180,16 @@
     self.barTintColor = [UIColor clearColor];
     self.tintColor = [UIColor systemBlueColor];
     // FIX: issue #662 (iPhone Duo follow-up, PR #665)
-    // 与头文件声明的默认值保持一致（default is YES）。
+    // [CN] 与头文件声明的默认值保持一致（default is YES）。
     // 按钮必须避开左右安全区：iPhone Duo（iOS 27.1 SDK）右侧有 84pt 的竖向状态栏，
     // 若忽略，最后一个 Tab 会被盖住，并在 push/pop 转场中被裁掉一截。
+    // [EN] Keep consistent with the default value declared in the header (default is YES).
+    //      Buttons must avoid the left/right safe areas: iPhone Duo (iOS 27.1 SDK) has an 84pt vertical status bar on the right;
+    //      if ignored, the last tab gets covered and part of it is clipped during push/pop transitions.
     _useLayoutSafeAreaInsets = YES;
-    // FIX: issue #672 默认忽略竖向状态栏（iPhone Duo 折叠竖屏右侧竖列）产生的单侧安全区，保持按钮居中
+    // [CN] FIX: issue #672 默认忽略竖向状态栏（iPhone Duo 折叠竖屏右侧竖列）产生的单侧安全区，保持按钮居中
+    // [EN] FIX: issue #672 By default, ignore the one-sided safe area created by the vertical status bar
+    //      (the right-side column on a folded iPhone Duo in portrait) and keep the buttons centered.
     _respectsVerticalStatusBarSafeArea = NO;
 }
 
@@ -217,7 +228,7 @@
             /*!
              *             if (self.tabBarController || self.customTabBarController) {
             #if defined(DEBUG) || defined(BETA)
-                            NSAssert(NO, @"不允许更改由 tabBarController 管理的 tabBar 的代理");
+                            NSAssert(NO, CYLLocalizedString(@"不允许更改由 tabBarController 管理的 tabBar 的代理"));
             #endif
                             return;
                         }
@@ -225,7 +236,7 @@
              */
             if (self.tabBarController) {
 #if defined(DEBUG) || defined(BETA)
-                NSAssert(NO, @"不允许更改由 tabBarController 管理的 tabBar 的代理");
+                NSAssert(NO, CYLLocalizedString(@"不允许更改由 tabBarController 管理的 tabBar 的代理"));
 #endif
                 return;
             }
@@ -493,7 +504,8 @@
     NSString *clickSelectorFromString = [NSString stringWithFormat:@"%@BarItem%@", @"_tab", @"Clicked"];
     
     if (self.tabBarController) {
-        // 系统方法
+        // [CN] 系统方法
+        // [EN] System method
         SEL sel = NSSelectorFromString(clickSelectorFromString);
         if ([self.tabBarController respondsToSelector:sel]) {
             //FIXME:  to delete cylflatdesign_tabBarController
@@ -503,7 +515,8 @@
              [self.tabBarController performSelector:sel withObject:systemItem];
              );
         } else {
-            // 容错处理, 防止版本系统修改方法名称
+            // [CN] 容错处理, 防止版本系统修改方法名称
+            // [EN] Fault tolerance, in case a system version renames the method
             SEL customSEL = NSSelectorFromString(@"_cyltabBarItemClicked:");
             if ([self.tabBarController respondsToSelector:customSEL]) {
                 CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
@@ -547,13 +560,16 @@
     for (NSInteger index = 0; index < self.items.count; index++) {
         CYLFlatDesignTabBarItem *item = self.items[index];
         CYLFlatDesignTabBarButton *button = [[CYLFlatDesignTabBarButton alloc] initWithTabBarItem:item];
-        //FIXME:  to delete ， 二选一， weak。
+        // [CN] FIXME:  to delete ， 二选一， weak。
+        // [EN] FIXME:  to delete, choose one of the two, weak.
 //        item.tabBarButton = button;
 //        [button setTabBarItem:item];
         button.tintColor = self.tintColor;
         button.selected = (item == self.selectedItem);
         [button addTarget:self action:@selector(_tabBarDidSelectButton:) forControlEvents:UIControlEventTouchUpInside];
-        //TODO:  对齐方案， 最简单。 移除PlusButton对应的item， 重新从 self.contentView 插入对齐。
+        // [CN] TODO:  对齐方案， 最简单。 移除PlusButton对应的item， 重新从 self.contentView 插入对齐。
+        // [EN] TODO:  Alignment approach, the simplest one: remove the item corresponding to the PlusButton and re-insert
+        //      it into self.contentView for alignment.
         button.clipsToBounds = NO;
         [self.contentView insertSubview:button atIndex:0];
         [_buttons addObject:button];
@@ -565,7 +581,9 @@
 
 - (void)_setSelectedIndex:(NSInteger)selectedIndex {
     if (_selectedItemIndex != selectedIndex) {
-        //统一使用CYLTabBarItemLottieAnimationPlayingNotification进行动画重置， 故删除手动重置。
+        // [CN] 统一使用CYLTabBarItemLottieAnimationPlayingNotification进行动画重置， 故删除手动重置。
+        // [EN] Animation reset is handled uniformly via CYLTabBarItemLottieAnimationPlayingNotification,
+        //      so the manual reset was removed.
 //         [self stopAnimationOfAllLottieView];
         [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
         _selectedItemIndex = selectedIndex;
@@ -591,7 +609,9 @@
         _backgroundEffectView.frame = _backgroundView.bounds;
     }
     
-    // 像素比例取自当前 trait，而非 UIScreen.mainScreen（iPhone Duo 内外屏可能不同）
+    // [CN] 像素比例取自当前 trait，而非 UIScreen.mainScreen（iPhone Duo 内外屏可能不同）
+    // [EN] The pixel scale is taken from the current trait rather than UIScreen.mainScreen
+    //      (the inner and outer screens of an iPhone Duo may differ).
     CGFloat displayScale = self.traitCollection.displayScale > 0 ? self.traitCollection.displayScale : 1.0;
     CGFloat hairlineHeight = 1.0 / displayScale;
     if (_shadowImageView) {
@@ -606,7 +626,8 @@
         _appearanceShadowLineView.frame = CGRectMake(0, -hairlineHeight, CGRectGetWidth(_backgroundView.frame), hairlineHeight);
     }
     
-    // 放在UITabBarController里
+    // [CN] 放在UITabBarController里
+    // [EN] Placed in UITabBarController
     UIEdgeInsets layoutInsets = [self _safeAreaInsetsForLayout];
     CGFloat contentHeight = CGRectGetHeight(self.bounds) - layoutInsets.bottom;
 //    if (self.useLayoutSafeAreaInsets) {
@@ -624,7 +645,8 @@
     CGFloat rightInset = buttonInsets.right;
     contentWidth -= (leftInset + rightInset);
     
-//    系统间距
+// [CN] 系统间距
+// [EN] System spacing
 //    CGFloat margin = 2.0;
 //    CGFloat buttonSpace = 4.0;
 //    CGFloat buttonY = 1.0;
@@ -663,7 +685,8 @@
         //        button.tabBarItem = self.items[i];
         [button setTabBarItem:self.items[i]];
         
-        //RTL（如阿语）下按钮从右到左排列，第 0 个 Tab 位于最右侧
+        // [CN] RTL（如阿语）下按钮从右到左排列，第 0 个 Tab 位于最右侧
+        // [EN] In RTL (e.g. Arabic), buttons are laid out right to left, and tab 0 is on the far right.
         NSInteger visibleIndex = isRightToLeft ? (itemCount - 1 - i) : i;
         CGFloat buttonX = margin + visibleIndex * (buttonWidth + buttonSpace);
         buttonX += leftInset;
@@ -692,7 +715,8 @@
             [plusButton removeTarget:owningTabBarController action:plusButtonTapSelector forControlEvents:UIControlEventTouchUpInside];
             [plusButton addTarget:owningTabBarController action:plusButtonTapSelector forControlEvents:UIControlEventTouchUpInside];
         }
-        //FIXME:  to delete 自定义的index。
+        // [CN] FIXME:  to delete 自定义的index。
+        // [EN] FIXME:  to delete the custom index.
 //        [self cyl_replace];(
         CYLFlatDesignTabBarButton *plusButtonIndexPlaceholder = _buttons[self.cyl_plusButtonIndex];
         if (![plusButtonIndexPlaceholder.tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
@@ -741,7 +765,8 @@
 //       //            [tabBarButton bringSubviewToFront:newView];
 //                   [tabBarButton cyl_bringSubviewToTop:newView];
 //                   if (![CYLConstants isLiquidGlassActive]) {
-//                       // LiquidGlass 已经自带缩放动画， 无需缩放
+// [CN] // LiquidGlass 已经自带缩放动画， 无需缩放
+// [EN] // LiquidGlass already has a built-in scale animation, so no scaling is needed
 //                       [self addOnceScaleAnimationOnView:newView];
 //                   }
 //               }
@@ -864,16 +889,20 @@
  *  Capturing touches on a subview outside the frame of its superview.
  
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-    //1. 边界情况：不能响应点击事件
+    [CN] //1. 边界情况：不能响应点击事件
+    [EN] //1. Edge case: cannot respond to tap events
     
     BOOL canNotResponseEvent = self.cyl_canNotResponseEvent;
     if (canNotResponseEvent) {
         return [super hitTest:point withEvent:event];
     }
     
-    //2. 优先处理 PlusButton （包括其突出的部分）、TabBarItems 未凸出的部分
+    [CN] //2. 优先处理 PlusButton （包括其突出的部分）、TabBarItems 未凸出的部分
     //这一步主要是在处理只有两个 TabBarItems 的场景。
     // 2.1先考虑clipsToBounds情况：子view超出部分没有显示出来
+    [EN] //2. First handle the PlusButton (including its protruding part) and the non-protruding parts of the TabBarItems
+         //This step mainly handles the case with only two TabBarItems.
+         // 2.1 First consider clipsToBounds: the parts of subviews outside the bounds are not displayed
     if (self.clipsToBounds && ![self pointInside:point withEvent:event]) {
         return [super hitTest:point withEvent:event];
     }
@@ -897,9 +926,12 @@
             return selectedTabBarButton;
         }
     }
-    //CYLFlatDesignTabBar 已经封装在该类内部，不需要在这里处理
+    [CN] //CYLFlatDesignTabBar 已经封装在该类内部，不需要在这里处理
+    [EN] //CYLFlatDesignTabBar is already encapsulated inside this class, no need to handle it here
     
-    //3. 最后处理 TabBarItems 凸出的部分、添加到 TabBar 上的自定义视图、点击到 TabBar 上的空白区域
+    [CN] //3. 最后处理 TabBarItems 凸出的部分、添加到 TabBar 上的自定义视图、点击到 TabBar 上的空白区域
+    [EN] //3. Finally handle the protruding parts of TabBarItems, custom views added to the TabBar,
+         and taps on empty areas of the TabBar
     UIView *result = [super hitTest:point withEvent:event];
     if (result) {
         return result;
@@ -915,18 +947,23 @@
     return [super hitTest:point withEvent:event];
 }
  */
-// 如果imageView超出TabBar范围，增加imageView响应区域
+// [CN] 如果imageView超出TabBar范围，增加imageView响应区域
+// [EN] If the imageView extends beyond the TabBar, enlarge the imageView's touch area
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-    //1. 边界情况：不能响应点击事件
+    // [CN] 1. 边界情况：不能响应点击事件
+    // [EN] 1. Edge case: cannot respond to tap events
     
     BOOL canNotResponseEvent = self.cyl_canNotResponseEvent;
     if (canNotResponseEvent) {
         return [super hitTest:point withEvent:event];
     }
     
-    //2. 优先处理 PlusButton （包括其突出的部分）、TabBarItems 未凸出的部分
+    // [CN] 2. 优先处理 PlusButton （包括其突出的部分）、TabBarItems 未凸出的部分
     //这一步主要是在处理只有两个 TabBarItems 的场景。
     // 2.1先考虑clipsToBounds情况：子view超出部分没有显示出来
+    // [EN] 2. First handle the PlusButton (including its protruding part) and the non-protruding parts of the TabBarItems
+    //      This step mainly handles the case with only two TabBarItems.
+    //      2.1 First consider clipsToBounds: the parts of subviews outside the bounds are not displayed
     if (self.clipsToBounds && ![self pointInside:point withEvent:event]) {
         return [super hitTest:point withEvent:event];
     }
@@ -959,7 +996,9 @@
         }
         BOOL isInPlusButtonSuperFrame = CGRectContainsPoint(self.plusButton.superview.frame, point);
         if (isInPlusButtonSuperFrame && self.plusButton.superview.cyl_isPlaceholder && self.plusButton.superview.cyl_canNotResponseEvent && !self.plusButton.cyl_canNotResponseEvent) {
-            //防止误触PlusButton轮廓外， 且在tabBarButton范围内。否则， 会切换到PlusButton 对应的空白placeholder vc上。
+            // [CN] 防止误触PlusButton轮廓外， 且在tabBarButton范围内。否则， 会切换到PlusButton 对应的空白placeholder vc上。
+            // [EN] Prevent accidental taps outside the PlusButton outline but within the tabBarButton. Otherwise it would switch
+            //      to the blank placeholder VC corresponding to the PlusButton.
             return self.plusButton;
         }
     }
@@ -969,13 +1008,18 @@
         if (isTabBarButtonFrame && !selectedTabBarButton.cyl_canNotResponseEvent) {
             return selectedTabBarButton;
         }
-        // 防止误触PlusButton轮廓外， 且在tabBarButton范围内。否则， 会切换到PlusButton 对应的空白placeholder vc上。已经在(self.plusButton)判断逻辑内处理， 这里无需重复处理。
+        // [CN] 防止误触PlusButton轮廓外， 且在tabBarButton范围内。否则， 会切换到PlusButton 对应的空白placeholder vc上。已经在(self.plusButton)判断逻辑内处理， 这里无需重复处理。
+        // [EN] Prevent accidental taps outside the PlusButton outline but within the tabBarButton. Otherwise it would switch
+        //      to the blank placeholder VC corresponding to the PlusButton. This is already handled in the (self.plusButton)
+        //      check, so there is no need to repeat it here.
         //        else if (selectedTabBarButton.cyl_isPlaceholder && (self.plusButton)) {
         //            return self.plusButton;
         //        }
     }
     
-    //3. 最后处理 TabBarItems 凸出的部分、添加到 TabBar 上的自定义视图、点击到 TabBar 上的空白区域
+    // [CN] 3. 最后处理 TabBarItems 凸出的部分、添加到 TabBar 上的自定义视图、点击到 TabBar 上的空白区域
+    // [EN] 3. Finally handle the protruding parts of TabBarItems, custom views added to the TabBar,
+    //      and taps on empty areas of the TabBar
     UIView *result = [super hitTest:point withEvent:event];
     if (result) {
         return result;

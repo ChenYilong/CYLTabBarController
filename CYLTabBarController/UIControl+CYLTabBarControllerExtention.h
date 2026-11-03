@@ -67,16 +67,24 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, getter=cyl_tabBarItemVisibleIndex, setter=cyl_setTabBarItemVisibleIndex:) NSInteger cyl_tabBarItemVisibleIndex;
 /*!
  *
- *对于- (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
+ * [CN] 对于- (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
  *   // 即使 PlusButton 也添加了自定义点击事件，点击 PlusButton 后也会触发该代理方法。
     // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_shouldNotSelect = YES; 来禁止该协议方法触发plusButton回调
+ [EN] For - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
+      Even if the PlusButton has its own custom tap event, tapping the PlusButton still triggers this delegate method.
+      Set CYLExternPlusButton.cyl_shouldNotSelect = YES; when initializing the PlusButton to stop this protocol
+      method from firing the plusButton callback
  */
 @property (nonatomic, assign, getter=cyl_shouldNotSelect, setter=cyl_setShouldNotSelect:) BOOL cyl_shouldNotSelect;
 /*!
  * same as cyl_userInteractionDisabled.
- *对于- (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
+ * [CN] 对于- (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
  *   // 即使 PlusButton 也添加了自定义点击事件，点击 PlusButton 后也会触发该代理方法。
     // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
+ [EN] For - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
+      Even if the PlusButton has its own custom tap event, tapping the PlusButton still triggers this delegate method.
+      Set CYLExternPlusButton.cyl_userInteractionDisabled = YES; when initializing the PlusButton to stop this
+      protocol method from firing the plusButton callback
  */
 @property (nonatomic, assign, getter=cyl_userInteractionDisabled, setter=cyl_setUserInteractionDisabled:) BOOL cyl_userInteractionDisabled;
 

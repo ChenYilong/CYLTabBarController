@@ -19,17 +19,19 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.rowHeight = CYLBadgeRowHeight;
-    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), self);
+    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
 
     self.view.backgroundColor = [UIColor whiteColor];
 
 //    self.navigationItem.title = @"我的";
 //    self.tabBarItem.title = @"我的";
 
-    // ✅ 关键代码：设置 NavigationBar 为白色背景（非透明）
+    // [CN] ✅ 关键代码：设置 NavigationBar 为白色背景（非透明）
+    // [EN] ✅ Key code: give the NavigationBar a white (non-transparent) background
     if (@available(iOS 13.0, *)) {
         UINavigationBarAppearance *appearance = [[UINavigationBarAppearance alloc] init];
-        [appearance configureWithOpaqueBackground];   // ⚠️ 非透明关键
+        [appearance configureWithOpaqueBackground];   // [CN] ⚠️ 非透明关键
+        // [EN] ⚠️ Key to being non-transparent
 //        appearance.backgroundColor = [UIColor whiteColor];
         appearance.backgroundColor = [UIColor cyl_systemBackgroundColor];
 
@@ -41,7 +43,8 @@
         self.navigationController.navigationBar.scrollEdgeAppearance = appearance;
         self.navigationController.navigationBar.compactAppearance = appearance;
     } else {
-        // iOS 12 及以下
+        // [CN] iOS 12 及以下
+        // [EN] iOS 12 and below
         self.navigationController.navigationBar.translucent = NO;
         self.navigationController.navigationBar.barTintColor = [UIColor cyl_systemBackgroundColor];
 
@@ -58,7 +61,8 @@
         });
     }];
     if (@available(iOS 13.0, *)) {
-        //触发暗黑模式切换， 会引起 tabBar 的 重新布局 ，可以用来测试常见的 tabBar 布局bug
+        // [CN] 触发暗黑模式切换， 会引起 tabBar 的 重新布局 ，可以用来测试常见的 tabBar 布局bug
+        // [EN] Triggers a dark mode switch, which relayouts the tabBar; useful for testing common tabBar layout bugs
         self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
     }
 }
@@ -113,7 +117,8 @@
         return;
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-//    展示红点
+// [CN] 展示红点
+// [EN] Show the red dot
     [self cyl_setBadgeCenterOffset:CGPointZero];
 
     [self cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(indexPath.row)] animationType:CYLBadgeAnimationTypeNone];

@@ -3,7 +3,8 @@
 //  CYLTabBarController
 //
 //  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 16/2/26.
-//  Copyright © 2026年 https://github.com/ChenYilong .All rights reserved.
+// [CN] Copyright © 2026年 https://github.com/ChenYilong .All rights reserved.
+// [EN] Copyright © 2026 https://github.com/ChenYilong .All rights reserved.
 //
 
 #import "UIViewController+CYLTabBarControllerExtention.h"
@@ -271,7 +272,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
     return [self.cyl_tabButton cyl_setTabBadgePointViewOffset:tabBadgePointViewOffset];
 }
 
-//offset如果都是整数，则往右下偏移
+// [CN] offset如果都是整数，则往右下偏移
+// [EN] If the offsets are both positive, shift toward the bottom right
 - (UIOffset)cyl_tabBadgePointViewOffset {
     if (self.cyl_isPlusChildViewController) {
         return UIOffsetZero;
@@ -361,13 +363,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                 tabBarItem = self.cyl_tabBarController.tabBar.items[self.cyl_tabIndex];
                 control = [tabBarItem cyl_tabButton];
             } else if (self.cyl_isPlaceholder || (self.cyl_getViewControllerInsteadOfNavigationController.cyl_isPlaceholder)){
-                //说明是PlusChildViewController， PlusChildViewController对应的cyl_tabButton为PlusButton
+                // [CN] 说明是PlusChildViewController， PlusChildViewController对应的cyl_tabButton为PlusButton
+                // [EN] This means it is the PlusChildViewController; the cyl_tabButton of PlusChildViewController is the PlusButton
                 //    if (!self.cyl_isEmbedInTabBarController) {
                 control = (UIControl *)[CYLPlusButton plusButtonForOwner:self];
             }
         } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-            NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
         }
         if (control) {
@@ -379,7 +382,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             control = self.cyl_tabBarItem.tabBarButton;
         } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-            NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
         }
         if (control) {
@@ -394,7 +397,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                 control = [tabBarItem cyl_tabButton];
             } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-                NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+                NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
             }
         }
@@ -410,7 +413,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                 control = [tabBarItem cyl_tabButton];
             } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-                NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+                NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
             }
             
@@ -511,7 +514,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         NSString *reason = [NSString stringWithFormat:formatString,
                             @(__PRETTY_FUNCTION__),
                             @(__LINE__)];
-        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), reason);
 #endif
     }
 }
@@ -646,7 +649,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         return navigationViewControllerItem;
     }
     if (viewControllerControl) {
-        [viewControllerControl layoutIfNeeded];//建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用
+        [viewControllerControl layoutIfNeeded];// [CN] 建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用
+        // [EN] After the autolayout code, call layoutIfNeeded before trying to get the frame. For an autolayout cell, call
+        //      [self layoutIfNeeded] so the frame has a value and the badge can find its position. Make sure the view's
+        //      showBadge method is called after layoutIfNeeded
         return viewControllerControl.cyl_getActualBadgeSuperView;
     }
     return navigationViewControllerItem.cyl_getActualBadgeSuperView;
@@ -883,7 +889,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (tabBarItem == nil) {
         tabBarItem = [[CYLFlatDesignTabBarItem alloc] initWithTitle:self.title image:nil];
     }
-    //FIXME:  [CYLFlatDesignTabBarButton setTabBarItem:] 需要在cyl_setTabBarItem之前调用。否则无法获取到 [tabBarItem view]
+    // [CN] FIXME:  [CYLFlatDesignTabBarButton setTabBarItem:] 需要在cyl_setTabBarItem之前调用。否则无法获取到 [tabBarItem view]
+    // [EN] FIXME:  [CYLFlatDesignTabBarButton setTabBarItem:] must be called before cyl_setTabBarItem, otherwise
+    //      [tabBarItem view] cannot be obtained
     CYLFlatDesignTabBarItem *oldItem = self.cyl_tabBarItem;
     
     
@@ -891,14 +899,20 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         oldItem = self.cyl_getViewControllerInsteadOfNavigationController.cyl_tabBarItem;
     }
     
-    //TODO:          可以通过 [self cyl_valueForKey:@"view"]; 获得绑定的 UIControl 。
+    // [CN] TODO:          可以通过 [self cyl_valueForKey:@"view"]; 获得绑定的 UIControl 。
+    // [EN] TODO:          The bound UIControl can be obtained via [self cyl_valueForKey:@"view"];.
     UIControl *tabBarControl = nil;
     UIViewController *cylflatdesign_tabBarController = self.cylflatdesign_tabBarController;
 
-    // PATCH(aifirx): 原本这里在 tabBarController 为 nil 时直接 return，会跳过下面的关联对象设置。
+    // [CN] PATCH(aifirx): 原本这里在 tabBarController 为 nil 时直接 return，会跳过下面的关联对象设置。
     // 由于 cylflatdesign_tabBarController 现在是 weak 引用（tabBarController 释放后为 nil），
     // 这里改为：无论 tabBarController 是否存在，都必须把 tabBarItem 绑定到 self 上，
     // 否则 controller 会拿不到自己的 item，导致 tab 图标/标题丢失。
+    // [EN] PATCH(aifirx): Previously this returned early when tabBarController was nil, skipping the associated-object
+    //      setup below.
+    //      Since cylflatdesign_tabBarController is now a weak reference (nil after tabBarController is deallocated),
+    //      this now always binds tabBarItem to self, whether or not tabBarController exists,
+    //      otherwise the controller cannot get its own item, and the tab icon/title is lost.
     if (cylflatdesign_tabBarController && [cylflatdesign_tabBarController cyl_isFlatDesignStyleTabBar]) {
         CYLTabBarController *tabBarController = (CYLTabBarController *)cylflatdesign_tabBarController;
         [tabBarController changeItem:oldItem toItem:tabBarItem];

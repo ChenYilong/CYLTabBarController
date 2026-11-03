@@ -3,12 +3,15 @@
 //  CYLTabBarController
 //
 //  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 16/2/26.
-//  Copyright © 2026年 https://github.com/ChenYilong .All rights reserved.
+// [CN] Copyright © 2026年 https://github.com/ChenYilong .All rights reserved.
+// [EN] Copyright © 2026 https://github.com/ChenYilong .All rights reserved.
 //
 
-// FIX: issue #535 — see CYLTabBarController.h. 见 CYLTabBarController.h。
+// [CN] FIX: issue #535 — see CYLTabBarController.h. 见 CYLTabBarController.h。
+// [EN] FIX: issue #535 — see CYLTabBarController.h.
 #if __has_include("CYLBadgeView/CYLBadgeProtocol.h")
-// FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+// [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+// [EN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils.
 #if __has_include("CYLUtils/UIViewController+CYLUtils.h")
 #import "CYLUtils/UIViewController+CYLUtils.h"
 #else
@@ -39,9 +42,11 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 #if CYL_FLATDESIGN_AVAILABLE
 
-//TODO: 分类统一放置到一个独立的文件中， 方便管理。
+// [CN] TODO: 分类统一放置到一个独立的文件中， 方便管理。
+// [EN] TODO: Put the categories in one separate file for easier management.
 
-// 如果未显式设置，则根据视图控制器的标题自动延迟创建
+// [CN] 如果未显式设置，则根据视图控制器的标题自动延迟创建
+// [EN] If not set explicitly, it is created lazily from the view controller's title.
 @property (null_resettable, nonatomic, strong, getter=cyl_tabBarItem, setter=cyl_setTabBarItem:) CYLFlatDesignTabBarItem *cyl_tabBarItem;
 
 // 返回控制器的tabBarController，可能为nil

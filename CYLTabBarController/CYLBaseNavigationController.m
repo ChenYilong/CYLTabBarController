@@ -17,17 +17,24 @@
 @implementation CYLBaseNavigationController
 
 /**
- * TabBar内的ViewControllers会懒加载
+ * [CN] TabBar内的ViewControllers会懒加载
+ * [EN] ViewControllers inside the TabBar are lazily loaded
  */
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
-    // 当前导航栏, 只有第一个viewController push的时候设置隐藏
+    // [CN] 当前导航栏, 只有第一个viewController push的时候设置隐藏
+    // [EN] For the current navigation bar, only hide it when the first viewController is pushed
     if (self.viewControllers.count == 1) {
         viewController.cyl_hidesBottomBarWhenPushed = YES;
     } else {
         viewController.cyl_hidesBottomBarWhenPushed = NO;
     }
-    //在ios26.1，如果rootVC是TabbarController，并且通过UINavigationControllert跳转，UINavigationControllery页面的布局会多出来一个动画，这个问题请问怎么处理？
+    // [CN] 在ios26.1，如果rootVC是TabbarController，并且通过UINavigationControllert跳转，UINavigationControllery页面的布局会多出来一个动画，这个问题请问怎么处理？
     //FIXME: #632 如果你想避免闪动，可以通过提前加载 viewController 来解决。但是负作用是 viewController viewDidLoad 会提前加载， 所以不推荐该默认操作， 如果你可以接受 viewDidLoad 提前加载， 请pushViewController 后，自行调用该方法，解决闪动问题。
+    // [EN] On iOS 26.1, if rootVC is a TabbarController and navigation goes through a UINavigationController, the
+    //      UINavigationController page layout gets an extra animation. How should this be handled?
+    //      FIXME: #632 To avoid the flicker, you can preload the viewController. The side effect is that viewController
+    //      viewDidLoad is called early, so this is not recommended as the default. If you can accept viewDidLoad being
+    //      called early, call this method yourself after pushViewController to fix the flicker.
     // [viewController.view layoutIfNeeded];
     [super pushViewController:viewController animated:animated];
 }
@@ -63,7 +70,7 @@
         viewController = [self.viewControllers lastObject];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif  
     }
     viewController.cyl_hidesBottomBarWhenPushed = isHidden;

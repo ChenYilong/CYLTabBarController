@@ -480,7 +480,8 @@ CAAnimation *CYLBadgeAnimationForType(CYLBadgeAnimationType animationType, CGSiz
         case CYLBadgeAnimationTypeScale:
             return [CAAnimation cyl_scaleAnimationFromScale:1.4 toScale:0.6 duration:1 repeatTimes:MAXFLOAT];
         case CYLBadgeAnimationTypeBounce: {
-            // Relative (`transform.translation.y`), see Shake. 相对位移，见 Shake。
+            // [CN] Relative (`transform.translation.y`), see Shake. 相对位移，见 Shake。
+            // [EN] Relative (`transform.translation.y`), see Shake.
             CAAnimation *animation = [CAAnimation cyl_bounceAnimationRepeatTimes:HUGE_VALF duration:1 offset:badgeSize.height / 4];
             animation.removedOnCompletion = NO;
             return animation;

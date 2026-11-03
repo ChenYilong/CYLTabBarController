@@ -153,6 +153,22 @@
 "「%@」需要登录后才能查看" = "Συνδεθείτε για να δείτε «%@»";
 "登录" = "Σύνδεση";
 "、" = ", ";
+"UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!" = "UINavigationController+CYLFlatDesignTabBarPrivate: διαδοχικές λειτουργίες pop; Αυτό μπορεί να προκαλέσει προβλήματα!";
+"[DEBUG INFO] 如果 CYLTabBarController 的子控制器个数是奇数，你必须在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Αν ο αριθμός των θυγατρικών ελεγκτών προβολής του CYLTabBarController είναι περιττός, πρέπει να υλοποιήσετε το `+indexOfPlusButtonInTabBar` στη δική σας κλάση plusButton για να ορίσετε τη θέση του plusButton.";
+"[DEBUG INFO] 如果你想使用 PlusChildViewController 样式，你必须同时在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Για να χρησιμοποιήσετε ένα PlusChildViewController, πρέπει επίσης να υλοποιήσετε το `+indexOfPlusButtonInTabBar` στη δική σας κλάση plusButton για να ορίσετε τη θέση του plusButton.";
+"[DEBUG] 设置 tabBarItemsAttributes 时，请确保元素个数与控制器的个数相同，并在 `-setViewControllers:` 之前设置。" = "[DEBUG] Κατά τον ορισμό του tabBarItemsAttributes, βεβαιωθείτε ότι έχει τόσα στοιχεία όσοι είναι οι ελεγκτές προβολής και ορίστε το πριν από το `-setViewControllers:`.";
+"不允许更改由 tabBarController 管理的 tabBar 的代理" = "Ο delegate μιας γραμμής καρτελών που διαχειρίζεται ένα tabBarController δεν μπορεί να αλλάξει.";
+"我是第%@行" = "Γραμμή %@";
+"类：%@ 行：[%@] 方法：%@ 数据：%@" = "Κλάση: %@ Γραμμή: [%@] Μέθοδος: %@ Δεδομένα: %@";
+"系统TabBarController不支持" = "Δεν υποστηρίζεται από το TabBarController του συστήματος";
+"需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法 -tabBarController:presentLoginForViewController:completion:。" = "Πατήθηκε μια καρτέλα που απαιτεί σύνδεση, αλλά δεν έχει οριστεί ούτε το cyl_loginHandler ούτε το -tabBarController:presentLoginForViewController:completion:.";
+"🔴类名与方法名：%@（在第%@行）, KVC failed：%@" = "🔴 Κλάση και μέθοδος: %@ (γραμμή %@), αποτυχία KVC: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@" = "🔴 Κλάση και μέθοδος: %@ (γραμμή %@), περιγραφή: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@" = "🔴 Κλάση και μέθοδος: %@ (γραμμή %@), περιγραφή: %@: αιτία %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。" = "🔴 Κλάση και μέθοδος: %@ (γραμμή %@), περιγραφή: %@. [DEBUG] Βεβαιωθείτε ότι η υποκλάση σας του CYLTabBarController καλεί το `super.viewDidLoad()` ως τελευταία γραμμή του `viewDidLoad`· διαφορετικά η ρύθμιση KVC του CYLTabBar αποτυγχάνει.";
+"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 Κλάση και μέθοδος: %@ (γραμμή %@), περιγραφή: δείκτης %@ τίτλος %@";
+"暂无数据" = "Δεν υπάρχουν δεδομένα";
+"网络连接已断开" = "Η σύνδεση δικτύου χάθηκε";
 
 /* Issue #91: plus button touchable area demo row. */
 "PlusButton 点击范围（issue #91）" = "Περιοχή αφής του PlusButton (issue #91)";

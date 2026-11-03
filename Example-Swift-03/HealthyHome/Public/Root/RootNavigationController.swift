@@ -13,9 +13,11 @@ class RootNavigationController: CYLBaseNavigationController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        //背景颜色
+        // [CN] 背景颜色
+        // [EN] Background color
         self.navigationBar.barTintColor = .hexColor("3A57ED")
-        //标题设置
+        // [CN] 标题设置
+        // [EN] Title settings
         let dict: NSDictionary = [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 15)]
         self.navigationBar.titleTextAttributes = dict as? [NSAttributedString.Key: AnyObject]
 
@@ -27,10 +29,12 @@ class RootNavigationController: CYLBaseNavigationController {
          self.isNavigationBarHidden = isHidden
      }
      
-     //MARK:重写跳转
+     // [CN] MARK:重写跳转
+     // [EN] MARK: Override push
      override func pushViewController(_ viewController: UIViewController, animated: Bool) {
          if self.viewControllers.count > 0 {
-             //跳转后隐藏
+             // [CN] 跳转后隐藏
+             // [EN] Hide after pushing
              viewController.hidesBottomBarWhenPushed = true
          }
          

@@ -223,7 +223,8 @@ static void CYLAnimateSystemBarButtonBadge(UIBarButtonItem *item, UIView *host, 
 #if CYL_SYSTEM_BAR_BUTTON_BADGE_SDK
     if (@available(iOS 26.0, *)) {
         if (self.badge) {
-            // Kept for -cyl_resumeBadge. 保留，供 -cyl_resumeBadge 恢复。
+            // [CN] Kept for -cyl_resumeBadge. 保留，供 -cyl_resumeBadge 恢复。
+            // [EN] Kept for -cyl_resumeBadge.
             objc_setAssociatedObject(self, @selector(cyl_resumeBadge), self.badge, OBJC_ASSOCIATION_COPY_NONATOMIC);
             self.badge = nil;
         }
@@ -314,7 +315,8 @@ static void CYLAnimateSystemBarButtonBadge(UIBarButtonItem *item, UIView *host, 
     UIButton *barButtonContentView = (UIButton *)self.cyl_view.cyl_findBarButtonContentView;
     UIView *actualBadgeSuperView = barButtonContentView;
 
-    // 不管 image 还是 text 的 UIBarButtonItem 都获取内部的 _UI+ModernBarButton 即可
+    // [CN] 不管 image 还是 text 的 UIBarButtonItem 都获取内部的 _UI+ModernBarButton 即可
+    // [EN] For a UIBarButtonItem with either an image or text, just get the internal _UI+ModernBarButton
     do {
         if (barButtonContentView.imageView && (barButtonContentView.imageView.frame.size.width > 10)) {
             actualBadgeSuperView = barButtonContentView.imageView;
@@ -327,7 +329,10 @@ static void CYLAnimateSystemBarButtonBadge(UIBarButtonItem *item, UIView *host, 
         }
         
     } while (false); // same as : 0, NO
-    //建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用 
+    // [CN] 建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用 
+    // [EN] After the autolayout code, call layoutIfNeeded before trying to get the frame. For an autolayout cell, call
+    //      [self layoutIfNeeded] so the frame has a value and the badge can find its position. Make sure the view's
+    //      showBadge method is called after layoutIfNeeded
     [actualBadgeSuperView layoutIfNeeded];//建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame
     return actualBadgeSuperView;//use KVC to hack actual view
 }

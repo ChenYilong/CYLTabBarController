@@ -153,6 +153,22 @@
 "「%@」需要登录后才能查看" = "Войдите, чтобы открыть «%@»";
 "登录" = "Войти";
 "、" = ", ";
+"UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!" = "UINavigationController+CYLFlatDesignTabBarPrivate: несколько операций pop подряд? Это может вызвать проблемы!";
+"[DEBUG INFO] 如果 CYLTabBarController 的子控制器个数是奇数，你必须在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Если число дочерних контроллеров CYLTabBarController нечётное, необходимо реализовать `+indexOfPlusButtonInTabBar` в вашем собственном классе plusButton, чтобы задать положение plusButton.";
+"[DEBUG INFO] 如果你想使用 PlusChildViewController 样式，你必须同时在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Чтобы использовать PlusChildViewController, необходимо также реализовать `+indexOfPlusButtonInTabBar` в вашем собственном классе plusButton, чтобы задать положение plusButton.";
+"[DEBUG] 设置 tabBarItemsAttributes 时，请确保元素个数与控制器的个数相同，并在 `-setViewControllers:` 之前设置。" = "[DEBUG] При установке tabBarItemsAttributes убедитесь, что число элементов совпадает с числом контроллеров, и задавайте его до вызова `-setViewControllers:`.";
+"不允许更改由 tabBarController 管理的 tabBar 的代理" = "Нельзя изменить делегат панели вкладок, управляемой tabBarController.";
+"我是第%@行" = "Строка %@";
+"类：%@ 行：[%@] 方法：%@ 数据：%@" = "Класс: %@ Строка: [%@] Метод: %@ Данные: %@";
+"系统TabBarController不支持" = "Не поддерживается системным TabBarController";
+"需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法 -tabBarController:presentLoginForViewController:completion:。" = "Нажата вкладка, требующая входа, но не задан ни cyl_loginHandler, ни -tabBarController:presentLoginForViewController:completion:.";
+"🔴类名与方法名：%@（在第%@行）, KVC failed：%@" = "🔴 Класс и метод: %@ (строка %@), ошибка KVC: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@" = "🔴 Класс и метод: %@ (строка %@), описание: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@" = "🔴 Класс и метод: %@ (строка %@), описание: %@: причина %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。" = "🔴 Класс и метод: %@ (строка %@), описание: %@. [DEBUG] Убедитесь, что ваш подкласс CYLTabBarController вызывает `super.viewDidLoad()` последней строкой в `viewDidLoad`; иначе настройка KVC для CYLTabBar завершится ошибкой.";
+"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 Класс и метод: %@ (строка %@), описание: индекс %@ заголовок %@";
+"暂无数据" = "Нет данных";
+"网络连接已断开" = "Сетевое подключение потеряно";
 
 /* Issue #91: plus button touchable area demo row. */
 "PlusButton 点击范围（issue #91）" = "Область нажатия PlusButton (issue #91)";
