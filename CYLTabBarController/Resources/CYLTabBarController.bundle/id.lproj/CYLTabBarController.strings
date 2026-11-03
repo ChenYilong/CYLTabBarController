@@ -145,3 +145,11 @@
 "深色" = "Gelap";
 "居中胶囊" = "Kapsul di tengah";
 "绿色描边" = "Garis hijau";
+"登录状态：已登录" = "Status masuk: sudah masuk";
+"登录状态：未登录" = "Status masuk: belum masuk";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Sakelar aktif berarti sudah masuk, nonaktif berarti belum masuk (disimpan secara lokal). Saat belum masuk, mengetuk “%@” menampilkan layar masuk terlebih dahulu, lalu beralih ke tab tersebut setelah masuk; saat sudah masuk, langsung beralih.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Sakelar aktif berarti sudah masuk, nonaktif berarti belum masuk (disimpan secara lokal). Tidak ada tab yang memerlukan masuk.";
+"需要登录" = "Perlu masuk";
+"「%@」需要登录后才能查看" = "Masuk untuk melihat “%@”";
+"登录" = "Masuk";
+"、" = ", ";

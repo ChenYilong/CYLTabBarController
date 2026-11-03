@@ -1,0 +1,207 @@
+# 需要登录的 Tab / Tabs That Need Login
+
+| 中文 | English |
+|:---|:---|
+| [#19](https://github.com/ChenYilong/CYLTabBarController/issues/19)：未登录时点击某些 Tab，不切换、不播放动画，而是弹出登录页；登录成功后自动切换到刚才点击的 Tab。登录状态缓存在本地，App 重启后仍然有效。经典样式、液态玻璃与扁平样式都支持。 | [#19](https://github.com/ChenYilong/CYLTabBarController/issues/19): while logged out, tapping certain tabs does not switch or animate; it shows the login screen instead, and after a successful login the tapped tab is selected. The login state is cached locally and survives a relaunch. Works in the classic style, Liquid Glass and FlatDesign. |
+
+![Login flow](assets/login-required-tabs-flow.svg)
+
+```mermaid
+flowchart LR
+    T["点击 Tab<br/>Tap a tab"] --> Q{"需要登录且未登录？<br/>Needs login and logged out?"}
+    Q -- "否 / No" --> S["正常切换 Tab<br/>Select the tab (as before)"]
+    Q -- "是 / Yes" --> R["拒绝：不切换、无动画<br/>Refuse: no switch, no animation<br/>cyl_loginHandler / 代理 delegate 弹出登录页"]
+    R --> Y["completion(YES)<br/>缓存登录状态并选中所点击的 Tab<br/>cache the state, select the tapped tab"]
+    R --> N["completion(NO)<br/>停留在当前 Tab<br/>stay on the current tab"]
+```
+
+## 用法 / Usage
+
+| 中文 | English |
+|:---|:---|
+| 三步：指定需要登录的 Tab、提供登录页、在登录或退出时更新登录状态。每一步都可以用 block，也可以用代理；同时设置时 block 优先。 | Three steps: say which tabs need login, show the login screen, and update the login state on login or logout. Each step works with a block or a delegate method; when both are set, the block wins. |
+
+### Block
+
+```objc
+// 1. 需要登录的 Tab（CYLTabBarItemIdentifier；未设置标识时为类名）。
+//    Tabs that need login (CYLTabBarItemIdentifier; the class name when none is set).
+tabBarController.cyl_loginRequiredTabBarItemIdentifiers = @[ @"message", @"CYLMineViewController" ];
+// 或 / or:
+tabBarController.cyl_loginRequiredBlock = ^BOOL(CYLTabBarController *tabBarController, UIViewController *viewController) {
+    return [viewController.cyl_tabBarItemIdentifier isEqualToString:@"message"];
+};
+
+// 2. 展示登录页，并用结果调用 completion。Show the login screen and call completion with the result.
+tabBarController.cyl_loginHandler = ^(CYLTabBarController *tabBarController, UIViewController *viewController,
+                                      CYLTabBarLoginCompletion completion) {
+    [LoginViewController presentFrom:tabBarController completion:^(BOOL success) {
+        completion(success); // YES: 缓存登录状态并选中所点击的 Tab。YES: caches the state and selects the tapped tab.
+    }];
+};
+
+// 3. 退出登录。Log out.
+tabBarController.cyl_loggedIn = NO;
+```
+
+### Delegate
+
+```objc
+- (BOOL)tabBarController:(CYLTabBarController *)tabBarController requiresLoginToSelectViewController:(UIViewController *)viewController {
+    return [viewController isKindOfClass:[MineViewController class]];
+}
+
+- (void)tabBarController:(CYLTabBarController *)tabBarController
+presentLoginForViewController:(UIViewController *)viewController
+              completion:(CYLTabBarLoginCompletion)completion {
+    [LoginViewController presentFrom:tabBarController completion:completion];
+}
+```
+
+### Swift
+
+```swift
+tabBarController.cyl_loginRequiredTabBarItemIdentifiers = ["message", "MineViewController"]
+tabBarController.cyl_loginHandler = { tabBarController, viewController, completion in
+    LoginViewController.present(from: tabBarController, completion: completion)
+}
+tabBarController.cyl_loggedIn = false // 退出登录 / log out
+```
+
+## API
+
+| API | 中文 | English |
+|:---|:---|:---|
+| `cyl_loggedIn` | 是否已登录。设置时保存到 NSUserDefaults（所有 TabBarController 共享，重启后有效），并发送 `CYLTabBarLoginStateDidChangeNotification`。在需要登录的 Tab 上设为 NO 时，自动切换到第一个不需要登录的 Tab。 | Whether the user is logged in. Setting it saves it in NSUserDefaults (shared by every tab bar controller, survives a relaunch) and posts `CYLTabBarLoginStateDidChangeNotification`. Setting NO on a tab that needs login switches to the first tab that does not. |
+| `cyl_loginStateProvider` | 可选：App 自己的登录状态，设置后 `cyl_loggedIn` 返回它。 | Optional: your app's own login state; `cyl_loggedIn` returns it when set. |
+| `cyl_loginRequiredTabBarItemIdentifiers` | 需要登录的 Tab 的标识。 | Identifiers of the tabs that need login. |
+| `cyl_loginRequiredBlock` / `-tabBarController:requiresLoginToSelectViewController:` | 自定义判断，优先级：block → 代理 → 标识列表。 | Custom check; order: block → delegate → identifiers. |
+| `cyl_loginHandler` / `-tabBarController:presentLoginForViewController:completion:` | 展示登录页；block 优先。都没有时只拒绝这次点击。 | Shows the login screen; the block wins. Without either, the tap is only refused. |
+| `-cyl_isLoginRequiredForViewController:` | 是否需要登录（与当前登录状态无关）。 | Whether login is needed, whatever the current state. |
+| `-cyl_interceptLoginIfNeededForViewController:` | 需要拦截时发起登录并返回 YES。代理不是 TabBarController 自身，或重写 `-tabBarController:shouldSelectViewController:` 时没有调用 super，请在该方法开头调用。 | Starts the login and returns YES when the tap must be refused. Call it first in `-tabBarController:shouldSelectViewController:` when the delegate is another object, or when an override of that method does not call super. |
+
+| 中文 | English |
+|:---|:---|
+| 被拦截的点击不会切换 Tab、不会播放 Lottie 或选中动画，也不会回调 `tabBarController:didSelectControl:`（修复 #19 评论中“拦截了但动画仍然执行”的问题）。 | An intercepted tap does not switch tabs, play Lottie or selection animations, or call `tabBarController:didSelectControl:` (fixes "intercepted, but the animation still runs" from the #19 comments). |
+| 一次点击只发起一次登录。`completion` 只有第一次调用有效，可以在任意线程调用。 | One tap starts one login. Only the first call of `completion` counts; it can be called on any thread. |
+
+## 关系图 / Relationship map
+
+| 中文 | English |
+|:---|:---|
+| 下图列出本功能涉及的所有 API、入口、存储与 Demo，以及它们之间的关系。 | The map below shows every API, entry point, storage and demo piece of this feature, and how they relate. |
+
+```mermaid
+flowchart TB
+    subgraph APP["App 配置 / App configuration"]
+        direction TB
+        IDS["cyl_loginRequiredTabBarItemIdentifiers"]
+        RB["cyl_loginRequiredBlock"]
+        RD["delegate: requiresLoginToSelectViewController:"]
+        LH["cyl_loginHandler"]
+        LD["delegate: presentLoginForViewController:completion:"]
+        SP["cyl_loginStateProvider"]
+        IDS ~~~ RB ~~~ RD
+        LH ~~~ LD ~~~ SP
+    end
+
+    subgraph ENTRY["拦截入口 / Entry points (every tap)"]
+        direction TB
+        E1["-tabBarController:shouldSelectViewController:<br/>(controller is its own delegate)"]
+        E2["classic tab button action<br/>-tabChangedToControl:"]
+        E3["FlatDesign<br/>-[CYLFlatDesignTabBar _tabBarDidSelectButton:]"]
+        E4["other delegate object<br/>calls it itself"]
+        E1 ~~~ E2 ~~~ E3 ~~~ E4
+    end
+
+    subgraph CORE["CYLTabBarController (CYLLogin)"]
+        direction TB
+        INT["-cyl_interceptLoginIfNeededForViewController:<br/>once per tap"]
+        REQ["-cyl_isLoginRequiredForViewController:<br/>block → delegate → identifiers"]
+        LOG["cyl_loggedIn"]
+        START["start login<br/>handler block → delegate"]
+        COMP["CYLTabBarLoginCompletion<br/>first call only, any thread"]
+        LEAVE["logout on a protected tab →<br/>first tab without login"]
+    end
+
+    subgraph STORE["存储与通知 / Storage and notification"]
+        UD[("NSUserDefaults<br/>CYLTabBarControllerLoggedIn")]
+        NOTE(["CYLTabBarLoginStateDidChangeNotification"])
+    end
+
+    subgraph DEMO["Demo"]
+        direction TB
+        MAIN["MainTabBarController<br/>block API: Messages, Me"]
+        FLAT["CYLFlatDesignMainTabBarController<br/>delegate API: last two tabs"]
+        ALERT["shared login alert<br/>-cyl_demo_presentLoginForViewController:completion:"]
+        ROW["settings row 「登录状态」<br/>CYLLoginStateSwitch"]
+        MAIN ~~~ FLAT ~~~ ALERT ~~~ ROW
+    end
+
+    E1 --> INT
+    E2 --> INT
+    E3 --> INT
+    E4 --> INT
+    INT --> REQ
+    INT --> LOG
+    RB --> REQ
+    RD --> REQ
+    IDS --> REQ
+    SP --> LOG
+    LOG <--> UD
+    INT -- "needs login and logged out<br/>refuse: no switch, no animation" --> START
+    LH --> START
+    LD --> START
+    START --> COMP
+    COMP -- "YES: cache + select tapped tab" --> LOG
+    LOG -- "set" --> NOTE
+    LOG -- "set NO" --> LEAVE
+    MAIN -. "sets" .-> IDS
+    MAIN -. "sets" .-> LH
+    FLAT -. "implements" .-> RD
+    FLAT -. "implements" .-> LD
+    LH -. "demo" .-> ALERT
+    LD -. "demo" .-> ALERT
+    ROW -- "switch toggles" --> LOG
+    NOTE -- "switch follows" --> ROW
+```
+
+| 中文 | English |
+|:---|:---|
+| 一次未登录点击的时序： | The sequence of one tap while logged out: |
+
+```mermaid
+sequenceDiagram
+    actor U as 用户 / User
+    participant TB as Tab bar
+    participant C as CYLTabBarController
+    participant H as cyl_loginHandler / delegate
+    participant D as NSUserDefaults
+    U->>TB: tap a tab that needs login
+    TB->>C: shouldSelect / tab action / flat tap
+    C->>C: cyl_interceptLoginIfNeededForViewController:
+    Note over C: needs login, cyl_loggedIn == NO<br/>refuse: no switch, no animation, no didSelectControl:
+    C->>H: show login (viewController, completion)
+    alt 登录成功 / logged in
+        H->>C: completion(YES)
+        C->>D: cyl_loggedIn = YES (cached)
+        C-->>U: CYLTabBarLoginStateDidChangeNotification
+        C->>TB: select the tapped tab
+    else 取消 / cancelled
+        H->>C: completion(NO)
+        Note over C,TB: stay on the current tab
+    end
+```
+
+## Demo
+
+| 中文 | English |
+|:---|:---|
+| 列表顶部设置分组新增「登录状态」行，右侧是一个开关：打开表示已登录，关闭表示未登录，切换后缓存到本地（点击该行同样会拨动开关）。通过登录弹窗登录后，开关会自动打开。说明文字会列出需要登录的 Tab：未登录时点击这些 Tab 会弹出登录弹窗，点「登录」后自动切换到该 Tab，点「取消」则停留在当前 Tab；已登录时直接切换。 | The settings section at the top of the lists has a new "Login state" row with a switch: on means logged in, off means logged out, and the state is cached locally (tapping the row flips the switch too). After logging in from the login alert, the switch turns on by itself. Its text names the tabs that need login: while logged out, tapping them shows a login alert; "Log in" then switches to that tab, "Cancel" stays on the current one. While logged in they switch right away. |
+| 液态玻璃 / 经典样式（`MainTabBarController`）用 block 方式：「消息」「我的」需要登录。扁平样式（`CYLFlatDesignMainTabBarController`）用代理方式：最后两个 Tab 需要登录。 | Liquid Glass / classic (`MainTabBarController`) uses the block API: "Messages" and "Me" need login. FlatDesign (`CYLFlatDesignMainTabBarController`) uses the delegate API: the last two tabs need login. |
+
+## 截图 / Screenshots
+
+| 中文 | English |
+|:---|:---|
+| 本次开发环境没有 iOS 模拟器或真机，无法运行 Demo，因此暂无测试截图；上方为流程示意图。在设备上验证后，请将截图放入 `docs/assets/` 并在此引用，例如 `![未登录时点击「我的」](assets/login-required-tabs-alert.png)`。 | This change was developed without an iOS simulator or device, so there are no test screenshots yet; the figure above is a flow diagram. After testing on a device, put screenshots in `docs/assets/` and reference them here, e.g. `![Tapping "Me" while logged out](assets/login-required-tabs-alert.png)`. |

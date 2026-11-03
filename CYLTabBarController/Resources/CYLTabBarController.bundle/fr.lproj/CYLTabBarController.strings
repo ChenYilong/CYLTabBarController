@@ -145,3 +145,11 @@
 "深色" = "Sombre";
 "居中胶囊" = "Capsule centrée";
 "绿色描边" = "Ligne verte";
+"登录状态：已登录" = "État de connexion : connecté";
+"登录状态：未登录" = "État de connexion : déconnecté";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Interrupteur activé : connecté ; désactivé : déconnecté (enregistré localement). Déconnecté, toucher « %@ » affiche d’abord l’écran de connexion, puis bascule sur cet onglet après connexion ; connecté, le changement est immédiat.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Interrupteur activé : connecté ; désactivé : déconnecté (enregistré localement). Aucun onglet ne nécessite de connexion.";
+"需要登录" = "Connexion requise";
+"「%@」需要登录后才能查看" = "Connectez-vous pour voir « %@ »";
+"登录" = "Se connecter";
+"、" = ", ";

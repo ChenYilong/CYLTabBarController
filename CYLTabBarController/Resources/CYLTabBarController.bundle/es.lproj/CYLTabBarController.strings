@@ -145,3 +145,11 @@
 "深色" = "Oscuro";
 "居中胶囊" = "Cápsula centrada";
 "绿色描边" = "Línea verde";
+"登录状态：已登录" = "Estado de sesión: sesión iniciada";
+"登录状态：未登录" = "Estado de sesión: sin sesión";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Interruptor activado significa sesión iniciada; desactivado, sin sesión (guardado localmente). Sin sesión, al tocar “%@” se muestra primero el inicio de sesión y luego se cambia a esa pestaña; con sesión, se cambia de inmediato.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Interruptor activado significa sesión iniciada; desactivado, sin sesión (guardado localmente). Ninguna pestaña requiere iniciar sesión.";
+"需要登录" = "Inicio de sesión requerido";
+"「%@」需要登录后才能查看" = "Inicia sesión para ver “%@”";
+"登录" = "Iniciar sesión";
+"、" = ", ";

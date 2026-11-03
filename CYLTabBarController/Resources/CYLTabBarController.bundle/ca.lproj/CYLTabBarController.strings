@@ -145,3 +145,11 @@
 "深色" = "Fosc";
 "居中胶囊" = "Càpsula centrada";
 "绿色描边" = "Línia verda";
+"登录状态：已登录" = "Estat de sessió: sessió iniciada";
+"登录状态：未登录" = "Estat de sessió: sense sessió";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Commutador activat vol dir sessió iniciada; desactivat, sense sessió (desat localment). Sense sessió, tocar “%@” mostra primer la pantalla d’inici de sessió i després canvia a aquella pestanya; amb sessió, canvia directament.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Commutador activat vol dir sessió iniciada; desactivat, sense sessió (desat localment). Cap pestanya requereix iniciar sessió.";
+"需要登录" = "Cal iniciar sessió";
+"「%@」需要登录后才能查看" = "Inicia sessió per veure “%@”";
+"登录" = "Inicia sessió";
+"、" = ", ";

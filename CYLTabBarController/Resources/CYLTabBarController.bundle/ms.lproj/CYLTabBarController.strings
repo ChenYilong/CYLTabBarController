@@ -145,3 +145,11 @@
 "深色" = "Gelap";
 "居中胶囊" = "Kapsul di tengah";
 "绿色描边" = "Garisan hijau";
+"登录状态：已登录" = "Status log masuk: telah log masuk";
+"登录状态：未登录" = "Status log masuk: telah log keluar";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Suis dihidupkan bermaksud telah log masuk, dimatikan bermaksud telah log keluar (disimpan secara setempat). Apabila log keluar, mengetik “%@” memaparkan skrin log masuk dahulu, kemudian bertukar ke tab itu selepas log masuk; apabila log masuk, ia bertukar serta-merta.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Suis dihidupkan bermaksud telah log masuk, dimatikan bermaksud telah log keluar (disimpan secara setempat). Tiada tab yang memerlukan log masuk.";
+"需要登录" = "Log masuk diperlukan";
+"「%@」需要登录后才能查看" = "Log masuk untuk melihat “%@”";
+"登录" = "Log masuk";
+"、" = ", ";
