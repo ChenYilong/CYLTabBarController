@@ -11,23 +11,6 @@
 #import <ImageIO/ImageIO.h>
 #import <CommonCrypto/CommonDigest.h>
 
-/// Memory cache of `+cyl_loadImageWithURL:completion:`. 网络图片的内存缓存。
-static NSCache<NSString *, UIImage *> *CYLRemoteImageMemoryCache(void) {
-    static NSCache *cache;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        cache = [[NSCache alloc] init];
-        cache.countLimit = 100;
-    });
-    return cache;
-}
-
-/// Disk cache directory of `+cyl_loadImageWithURL:completion:`. 网络图片的磁盘缓存目录。
-static NSURL *CYLRemoteImageCacheDirectory(void) {
-    NSURL *caches = [[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask].firstObject;
-    return [caches URLByAppendingPathComponent:@"CYLTabBarController/RemoteImages" isDirectory:YES];
-}
-
 /// The cache key of a URL: its SHA-256. URL 的缓存 key：其 SHA-256。
 static NSString *CYLRemoteImageCacheKey(NSURL *URL) {
     NSData *data = [URL.absoluteString dataUsingEncoding:NSUTF8StringEncoding];
@@ -49,9 +32,290 @@ static UIImage *CYLRemoteImageWithData(NSData *data) {
     return [UIImage imageWithData:data scale:[UIScreen mainScreen].scale];
 }
 
+#pragma mark - CYLImageCache
+
+/// Bytes an image takes in memory: its pixels, 4 bytes each. 图片在内存中占用的字节数：像素数 × 4。
+static NSUInteger CYLRemoteImageCost(UIImage *image) {
+    NSUInteger frames = MAX(image.images.count, 1);
+    return (NSUInteger)(image.size.width * image.scale * image.size.height * image.scale * 4) * frames;
+}
+
+@interface CYLImageCache ()
+@property (nonatomic, strong) NSCache<NSString *, UIImage *> *memoryCache;
+@property (nonatomic, strong) dispatch_queue_t ioQueue;
+@end
+
+@implementation CYLImageCache
+
++ (instancetype)sharedImageCache {
+    static CYLImageCache *cache;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        cache = [[self alloc] init];
+    });
+    return cache;
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _memoryCache = [[NSCache alloc] init];
+        _ioQueue = dispatch_queue_create("com.chenyilong.CYLTabBarController.CYLImageCache", DISPATCH_QUEUE_SERIAL);
+        _shouldCacheImagesInMemory = YES;
+        _shouldCacheImagesOnDisk = YES;
+        self.maxMemoryCount = 100;
+        _maxDiskAge = 7 * 24 * 60 * 60;
+        _diskCacheExpireType = CYLImageCacheExpireTypeAccessDate;
+        _downloadTimeout = 15;
+        NSString *caches = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
+        _diskCachePath = [caches stringByAppendingPathComponent:@"CYLTabBarController/RemoteImages"];
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        [center addObserver:self selector:@selector(clearMemory) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
+        [center addObserver:self selector:@selector(cyl_applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [center addObserver:self selector:@selector(cyl_applicationWillTerminate) name:UIApplicationWillTerminateNotification object:nil];
+    }
+    return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)setMaxMemoryCount:(NSUInteger)maxMemoryCount {
+    _maxMemoryCount = maxMemoryCount;
+    self.memoryCache.countLimit = maxMemoryCount;
+}
+
+- (void)setMaxMemoryCost:(NSUInteger)maxMemoryCost {
+    _maxMemoryCost = maxMemoryCost;
+    self.memoryCache.totalCostLimit = maxMemoryCost;
+}
+
+- (NSString *)cyl_filePathForKey:(NSString *)key {
+    return [self.diskCachePath stringByAppendingPathComponent:key];
+}
+
+- (nullable UIImage *)cyl_memoryImageForKey:(NSString *)key {
+    return [self.memoryCache objectForKey:key];
+}
+
+- (void)cyl_storeImageInMemory:(UIImage *)image forKey:(NSString *)key {
+    if (self.shouldCacheImagesInMemory) {
+        [self.memoryCache setObject:image forKey:key cost:CYLRemoteImageCost(image)];
+    }
+}
+
+/// Whether the file at `path` expired, by `diskCacheExpireType`. 按 `diskCacheExpireType` 判断文件是否过期。
+- (BOOL)cyl_isExpiredFileAtURL:(NSURL *)fileURL {
+    if (self.maxDiskAge <= 0) {
+        return NO;
+    }
+    NSURLResourceKey dateKey = (self.diskCacheExpireType == CYLImageCacheExpireTypeAccessDate) ?
+        NSURLContentAccessDateKey : NSURLContentModificationDateKey;
+    NSDate *date = nil;
+    [fileURL getResourceValue:&date forKey:dateKey error:NULL];
+    return !date || -[date timeIntervalSinceNow] > self.maxDiskAge;
+}
+
+/// Disk data of `key` when not expired; a hit renews its access date. Called on `ioQueue`. 未过期的磁盘数据；命中时更新访问时间。
+- (nullable NSData *)cyl_diskDataForKey:(NSString *)key {
+    NSURL *fileURL = [NSURL fileURLWithPath:[self cyl_filePathForKey:key]];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path] || [self cyl_isExpiredFileAtURL:fileURL]) {
+        return nil;
+    }
+    NSData *data = [NSData dataWithContentsOfURL:fileURL];
+    if (data) {
+        // The access date is not updated by every file system: set it, so `CYLImageCacheExpireTypeAccessDate` renews.
+        [fileURL setResourceValue:[NSDate date] forKey:NSURLContentAccessDateKey error:NULL];
+    }
+    return data;
+}
+
+- (void)cyl_storeData:(NSData *)data forKey:(NSString *)key {
+    if (!self.shouldCacheImagesOnDisk || data.length == 0) {
+        return;
+    }
+    dispatch_async(self.ioQueue, ^{
+        [[NSFileManager defaultManager] createDirectoryAtPath:self.diskCachePath withIntermediateDirectories:YES attributes:nil error:NULL];
+        [data writeToFile:[self cyl_filePathForKey:key] atomically:YES];
+    });
+}
+
+- (nullable UIImage *)imageFromCacheForURL:(NSURL *)URL {
+    if (!URL) {
+        return nil;
+    }
+    NSString *key = CYLRemoteImageCacheKey(URL);
+    UIImage *image = [self cyl_memoryImageForKey:key];
+    if (image) {
+        return image;
+    }
+    __block NSData *data = nil;
+    dispatch_sync(self.ioQueue, ^{
+        data = [self cyl_diskDataForKey:key];
+    });
+    image = data ? CYLRemoteImageWithData(data) : nil;
+    if (image) {
+        [self cyl_storeImageInMemory:image forKey:key];
+    }
+    return image;
+}
+
+- (void)removeImageForURL:(NSURL *)URL {
+    if (!URL) {
+        return;
+    }
+    NSString *key = CYLRemoteImageCacheKey(URL);
+    [self.memoryCache removeObjectForKey:key];
+    dispatch_async(self.ioQueue, ^{
+        [[NSFileManager defaultManager] removeItemAtPath:[self cyl_filePathForKey:key] error:NULL];
+    });
+}
+
+- (void)clearMemory {
+    [self.memoryCache removeAllObjects];
+}
+
+- (void)clearDiskOnCompletion:(void (^)(void))completion {
+    dispatch_async(self.ioQueue, ^{
+        [[NSFileManager defaultManager] removeItemAtPath:self.diskCachePath error:NULL];
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), completion);
+        }
+    });
+}
+
+- (void)deleteOldFilesWithCompletion:(void (^)(void))completion {
+    dispatch_async(self.ioQueue, ^{
+        [self cyl_deleteOldFiles];
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), completion);
+        }
+    });
+}
+
+/// Called on `ioQueue`, as SDWebImage's `-deleteOldFilesWithCompletionBlock:`. 在 `ioQueue` 上执行。
+- (void)cyl_deleteOldFiles {
+    NSURL *directoryURL = [NSURL fileURLWithPath:self.diskCachePath isDirectory:YES];
+    NSArray<NSURLResourceKey> *keys = @[ NSURLIsDirectoryKey, NSURLContentAccessDateKey, NSURLContentModificationDateKey,
+                                         NSURLTotalFileAllocatedSizeKey ];
+    NSArray<NSURL *> *fileURLs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:directoryURL
+                                                                includingPropertiesForKeys:keys
+                                                                                   options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                                                     error:NULL];
+    NSURLResourceKey dateKey = (self.diskCacheExpireType == CYLImageCacheExpireTypeAccessDate) ?
+        NSURLContentAccessDateKey : NSURLContentModificationDateKey;
+    NSMutableDictionary<NSURL *, NSDictionary<NSURLResourceKey, id> *> *remainingFiles = [NSMutableDictionary dictionary];
+    NSUInteger totalSize = 0;
+    for (NSURL *fileURL in fileURLs) {
+        NSDictionary<NSURLResourceKey, id> *values = [fileURL resourceValuesForKeys:keys error:NULL];
+        if ([values[NSURLIsDirectoryKey] boolValue]) {
+            continue;
+        }
+        if ([self cyl_isExpiredFileAtURL:fileURL]) {
+            [[NSFileManager defaultManager] removeItemAtURL:fileURL error:NULL];
+            continue;
+        }
+        totalSize += [values[NSURLTotalFileAllocatedSizeKey] unsignedIntegerValue];
+        remainingFiles[fileURL] = values;
+    }
+    if (self.maxDiskSize == 0 || totalSize <= self.maxDiskSize) {
+        return;
+    }
+    // Least recently used first, down to half of the limit. 先删除最久未用的文件，直到降到上限的一半。
+    NSUInteger targetSize = self.maxDiskSize / 2;
+    NSArray<NSURL *> *sortedFiles = [remainingFiles keysSortedByValueWithOptions:NSSortConcurrent
+                                                                 usingComparator:^NSComparisonResult(NSDictionary *a, NSDictionary *b) {
+        return [a[dateKey] ?: [NSDate distantPast] compare:b[dateKey] ?: [NSDate distantPast]];
+    }];
+    for (NSURL *fileURL in sortedFiles) {
+        if (totalSize <= targetSize) {
+            break;
+        }
+        if ([[NSFileManager defaultManager] removeItemAtURL:fileURL error:NULL]) {
+            totalSize -= MIN(totalSize, [remainingFiles[fileURL][NSURLTotalFileAllocatedSizeKey] unsignedIntegerValue]);
+        }
+    }
+}
+
+- (NSUInteger)totalDiskSize {
+    __block NSUInteger size = 0;
+    dispatch_sync(self.ioQueue, ^{
+        NSDirectoryEnumerator *enumerator = [[NSFileManager defaultManager] enumeratorAtPath:self.diskCachePath];
+        for (NSString *fileName in enumerator) {
+            NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[self cyl_filePathForKey:fileName] error:NULL];
+            size += [attributes fileSize];
+        }
+    });
+    return size;
+}
+
+- (void)cyl_applicationDidEnterBackground {
+    UIApplication *application = [UIApplication sharedApplication];
+    __block UIBackgroundTaskIdentifier taskIdentifier = [application beginBackgroundTaskWithExpirationHandler:^{
+        [application endBackgroundTask:taskIdentifier];
+        taskIdentifier = UIBackgroundTaskInvalid;
+    }];
+    [self deleteOldFilesWithCompletion:^{
+        [application endBackgroundTask:taskIdentifier];
+        taskIdentifier = UIBackgroundTaskInvalid;
+    }];
+}
+
+- (void)cyl_applicationWillTerminate {
+    [self deleteOldFilesWithCompletion:nil];
+}
+
+/// Loads `URL` with `options`; `finish` runs once, on any queue. 按 `options` 加载 `URL`；`finish` 只调用一次，可在任意队列。
+- (void)cyl_loadImageWithURL:(NSURL *)URL options:(CYLImageLoadOptions)options finish:(void (^)(UIImage *))finish {
+    NSString *key = CYLRemoteImageCacheKey(URL);
+    BOOL refreshes = (options & CYLImageLoadOptionsRefreshCached) != 0;
+    BOOL keepsInMemory = (options & CYLImageLoadOptionsAvoidMemoryCache) == 0;
+    UIImage *memoryImage = refreshes ? nil : [self cyl_memoryImageForKey:key];
+    if (memoryImage) {
+        finish(memoryImage);
+        return;
+    }
+    dispatch_async(self.ioQueue, ^{
+        NSData *diskData = refreshes ? nil : [self cyl_diskDataForKey:key];
+        UIImage *diskImage = diskData ? CYLRemoteImageWithData(diskData) : nil;
+        if (diskImage) {
+            if (keepsInMemory) {
+                [self cyl_storeImageInMemory:diskImage forKey:key];
+            }
+            finish(diskImage);
+            return;
+        }
+        if (options & CYLImageLoadOptionsFromCacheOnly) {
+            finish(nil);
+            return;
+        }
+        NSURLRequestCachePolicy cachePolicy = refreshes ? NSURLRequestReloadIgnoringLocalCacheData : NSURLRequestUseProtocolCachePolicy;
+        NSURLRequest *request = [NSURLRequest requestWithURL:URL cachePolicy:cachePolicy timeoutInterval:self.downloadTimeout];
+        [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            NSInteger statusCode = [response isKindOfClass:[NSHTTPURLResponse class]] ? ((NSHTTPURLResponse *)response).statusCode : 200;
+            UIImage *image = (!error && data && statusCode / 100 == 2) ? CYLRemoteImageWithData(data) : nil;
+            if (image) {
+                if (keepsInMemory) {
+                    [self cyl_storeImageInMemory:image forKey:key];
+                }
+                if ((options & CYLImageLoadOptionsMemoryCacheOnly) == 0) {
+                    [self cyl_storeData:data forKey:key];
+                }
+            }
+            finish(image);
+        }] resume];
+    });
+}
+
+@end
+
 @implementation UIImage (CYLTabBarControllerExtention)
 
 + (void)cyl_loadImageWithURL:(NSURL *)URL completion:(void (^)(UIImage *))completion {
+    [self cyl_loadImageWithURL:URL options:CYLImageLoadOptionsDefault completion:completion];
+}
+
++ (void)cyl_loadImageWithURL:(NSURL *)URL options:(CYLImageLoadOptions)options completion:(void (^)(UIImage *))completion {
     void (^finish)(UIImage *) = ^(UIImage *image) {
         dispatch_async(dispatch_get_main_queue(), ^{
             !completion ?: completion(image);
@@ -61,36 +325,7 @@ static UIImage *CYLRemoteImageWithData(NSData *data) {
         finish(nil);
         return;
     }
-    NSString *key = CYLRemoteImageCacheKey(URL);
-    UIImage *cachedImage = [CYLRemoteImageMemoryCache() objectForKey:key];
-    if (cachedImage) {
-        finish(cachedImage);
-        return;
-    }
-    NSURL *fileURL = [CYLRemoteImageCacheDirectory() URLByAppendingPathComponent:key];
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
-        NSDate *modificationDate = nil;
-        [fileURL getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:NULL];
-        BOOL isFresh = modificationDate && -[modificationDate timeIntervalSinceNow] < 7 * 24 * 60 * 60;
-        NSData *cachedData = isFresh ? [NSData dataWithContentsOfURL:fileURL] : nil;
-        UIImage *diskImage = cachedData ? CYLRemoteImageWithData(cachedData) : nil;
-        if (diskImage) {
-            [CYLRemoteImageMemoryCache() setObject:diskImage forKey:key];
-            finish(diskImage);
-            return;
-        }
-        [[[NSURLSession sharedSession] dataTaskWithURL:URL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            NSInteger statusCode = [response isKindOfClass:[NSHTTPURLResponse class]] ? ((NSHTTPURLResponse *)response).statusCode : 200;
-            UIImage *image = (!error && data && statusCode / 100 == 2) ? CYLRemoteImageWithData(data) : nil;
-            if (image) {
-                [CYLRemoteImageMemoryCache() setObject:image forKey:key];
-                [[NSFileManager defaultManager] createDirectoryAtURL:CYLRemoteImageCacheDirectory()
-                                         withIntermediateDirectories:YES attributes:nil error:NULL];
-                [data writeToURL:fileURL atomically:YES];
-            }
-            finish(image);
-        }] resume];
-    });
+    [[CYLImageCache sharedImageCache] cyl_loadImageWithURL:URL options:options finish:finish];
 }
 
 + (UIImage *)cyl_animatedImageWithGIFData:(NSData *)data {

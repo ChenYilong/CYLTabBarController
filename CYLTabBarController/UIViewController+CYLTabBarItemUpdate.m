@@ -137,7 +137,7 @@ static char CYLTabBarItemAllNetworkIconsKey;
        inTabBarController:(CYLTabBarController *)tabBarController {
     NSNumber *activeRow = objc_getAssociatedObject(tabViewController, &CYLTabBarItemActiveIconRowKey);
     if (activeRow && activeRow.integerValue == row) {
-        [tabBarController setTabBarItemIconViewProvider:nil atIndex:index];
+        [self cyl_restoreInitialIconOfTabViewController:tabViewController atIndex:index inTabBarController:tabBarController];
         objc_setAssociatedObject(tabViewController, &CYLTabBarItemActiveIconRowKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         return;
     }
@@ -220,7 +220,7 @@ static char CYLTabBarItemAllNetworkIconsKey;
         // Replaces this tab's own icon row as well. 同时取代该 Tab 单独设置的图标行。
         objc_setAssociatedObject(viewController, &CYLTabBarItemActiveIconRowKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         if (isActive) {
-            [tabBarController setTabBarItemIconViewProvider:nil atIndex:index];
+            [self cyl_restoreInitialIconOfTabViewController:viewController atIndex:index inTabBarController:tabBarController];
         } else {
             NSArray<NSString *> *URLs = iconURLs[tabIndex % iconURLs.count];
             [tabBarController setTabBarItemIconWithURL:[NSURL URLWithString:URLs[0]]
@@ -235,14 +235,20 @@ static char CYLTabBarItemAllNetworkIconsKey;
 
 #pragma mark - Helpers
 
-/// The `tabBarItemsAttributes` given at initialization, copied before the first change of these rows: the tab bar
-/// controller merges each update into its `tabBarItemsAttributes`. One entry per view controller.
-/// 初始化时传入的 `tabBarItemsAttributes`，在这些行第一次修改前复制：TabBarController 会把每次更新合并进
-/// `tabBarItemsAttributes`。每个视图控制器一项。
-- (NSArray<NSDictionary *> *)cyl_initialTabBarItemsAttributesOfTabBarController:(CYLTabBarController *)tabBarController {
-    NSArray<NSDictionary *> *attributes = objc_getAssociatedObject(tabBarController, &CYLTabBarItemInitialAttributesKey);
+/// The `tabBarItemsAttributes` given at initialization, one entry per tab (its view controller), copied before the
+/// first change of these rows: the tab bar controller merges each update into its `tabBarItemsAttributes`.
+/// 初始化时传入的 `tabBarItemsAttributes`，每个 Tab（其视图控制器）一项，在这些行第一次修改前复制：TabBarController 会把每次更新合并进
+/// `tabBarItemsAttributes`。
+- (NSMapTable<UIViewController *, NSDictionary *> *)cyl_initialTabBarItemsAttributesOfTabBarController:(CYLTabBarController *)tabBarController {
+    NSMapTable *attributes = objc_getAssociatedObject(tabBarController, &CYLTabBarItemInitialAttributesKey);
     if (!attributes) {
-        attributes = [tabBarController.tabBarItemsAttributes copy] ?: @[];
+        attributes = [NSMapTable weakToStrongObjectsMapTable];
+        [tabBarController.viewControllers enumerateObjectsUsingBlock:^(UIViewController *viewController, NSUInteger index, BOOL *stop) {
+            NSDictionary *tabAttributes = [tabBarController tabBarItemAttributesAtIndex:index];
+            if (tabAttributes) {
+                [attributes setObject:[tabAttributes copy] forKey:viewController];
+            }
+        }];
         objc_setAssociatedObject(tabBarController, &CYLTabBarItemInitialAttributesKey, attributes, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     return attributes;
@@ -251,12 +257,26 @@ static char CYLTabBarItemAllNetworkIconsKey;
 /// The title of the `tabBarItemsAttributes` given at initialization. 初始化时传入的 `tabBarItemsAttributes` 中的标题。
 - (NSString *)cyl_initialTitleOfTabViewController:(UIViewController *)tabViewController
                                inTabBarController:(CYLTabBarController *)tabBarController {
-    NSArray<NSDictionary *> *attributes = [self cyl_initialTabBarItemsAttributesOfTabBarController:tabBarController];
-    NSUInteger index = [tabBarController.viewControllers indexOfObject:tabViewController];
-    if (index == NSNotFound || index >= attributes.count) {
-        return [self cyl_titleOfTabViewController:tabViewController inTabBarController:tabBarController];
+    NSDictionary *attributes = [[self cyl_initialTabBarItemsAttributesOfTabBarController:tabBarController] objectForKey:tabViewController];
+    return attributes[CYLTabBarItemTitle] ?: [self cyl_titleOfTabViewController:tabViewController inTabBarController:tabBarController];
+}
+
+/// The icon of the `tabBarItemsAttributes` given at initialization, back on the tab at `index`: its icons from the
+/// network when it has `CYLTabBarItemImageURL`, else its own icon (`nil` provider).
+/// 将 Tab 恢复为初始化时传入的 `tabBarItemsAttributes` 中的图标：有 `CYLTabBarItemImageURL` 时为网络图标，否则为 Tab 自身的图标（provider 传 nil）。
+- (void)cyl_restoreInitialIconOfTabViewController:(UIViewController *)tabViewController
+                                          atIndex:(NSUInteger)index
+                               inTabBarController:(CYLTabBarController *)tabBarController {
+    NSDictionary *attributes = [[self cyl_initialTabBarItemsAttributesOfTabBarController:tabBarController] objectForKey:tabViewController];
+    NSMutableDictionary *URLAttributes = [NSMutableDictionary dictionary];
+    for (NSString *key in @[ CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize ]) {
+        URLAttributes[key] = attributes[key];
     }
-    return attributes[index][CYLTabBarItemTitle];
+    if (URLAttributes[CYLTabBarItemImageURL]) {
+        [tabBarController updateTabBarItemAtIndex:index attributes:URLAttributes];
+    } else {
+        [tabBarController setTabBarItemIconViewProvider:nil atIndex:index];
+    }
 }
 
 - (CYLTabBarController *)cyl_tabBarItemUpdateTabBarController {

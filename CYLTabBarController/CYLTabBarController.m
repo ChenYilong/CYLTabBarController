@@ -65,6 +65,9 @@ NSString *const CYLTabBarItemImage = @"CYLTabBarItemImage";
 NSString *const CYLTabBarItemSelectedImage = @"CYLTabBarItemSelectedImage";
 NSString *const CYLTabBarItemDarkImage = @"CYLTabBarItemDarkImage";
 NSString *const CYLTabBarItemSelectedDarkImage = @"CYLTabBarItemSelectedDarkImage";
+NSString *const CYLTabBarItemImageURL = @"CYLTabBarItemImageURL";
+NSString *const CYLTabBarItemSelectedImageURL = @"CYLTabBarItemSelectedImageURL";
+NSString *const CYLTabBarItemImageURLSize = @"CYLTabBarItemImageURLSize";
 NSString *const CYLTabBarItemImageInsets = @"CYLTabBarItemImageInsets";
 NSString *const CYLTabBarItemTitlePositionAdjustment = @"CYLTabBarItemTitlePositionAdjustment";
 NSString *const CYLTabBarItemImagePositionAdjustment = @"CYLTabBarItemImagePositionAdjustment";
@@ -1907,6 +1910,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         if (title) { tabBarItem.title = title; }
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
+        if (attributes[CYLTabBarItemImageURL] || attributes[CYLTabBarItemSelectedImageURL] || attributes[CYLTabBarItemImageURLSize]) {
+            [self cyl_loadImageURLsOfAttributes:newAttributes atIndex:index];
+        }
         return YES;
 #else
         return NO;
@@ -1928,6 +1934,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     // 后一个 Tab 重叠），直到点击某个 Tab：像点击一样重新加载它们。
     if ([self.tabBar isKindOfClass:[CYLTabBar class]]) {
         [(CYLTabBar *)self.tabBar cyl_reloadTabButtons];
+    }
+    // Icons from the network replace the images once downloaded (`CYLTabBarItemImageURL`). 网络图标下载完成后覆盖图片。
+    if (attributes[CYLTabBarItemImageURL] || attributes[CYLTabBarItemSelectedImageURL] || attributes[CYLTabBarItemImageURLSize]) {
+        [self cyl_loadImageURLsOfAttributes:newAttributes atIndex:index];
     }
     return YES;
 }
@@ -2167,6 +2177,18 @@ static char CYLTabBarItemIconViewsProviderKey;
     UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
     NSUInteger plusIndex = plusChildViewController ? [_viewControllers indexOfObject:plusChildViewController] : NSNotFound;
     return (plusIndex != NSNotFound && plusIndex < index) ? index - 1 : index;
+}
+
+- (NSDictionary<NSString *, id> *)tabBarItemAttributesAtIndex:(NSUInteger)index {
+    if (index >= _viewControllers.count) {
+        return nil;
+    }
+    UIViewController *viewController = _viewControllers[index];
+    if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
+        return nil;
+    }
+    NSUInteger attributesIndex = [self cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:index];
+    return (attributesIndex < _tabBarItemsAttributes.count) ? _tabBarItemsAttributes[attributesIndex] : nil;
 }
 
 - (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
@@ -2546,6 +2568,43 @@ static char CYLTabBarItemIconViewsProviderKey;
 #endif
         
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
+    [self cyl_loadTabBarItemImageURLs];
+}
+
+/// An NSURL from an NSURL or a URL string. 由 NSURL 或 URL 字符串得到 NSURL。
+static NSURL *_Nullable CYLURLFromValue(id value) {
+    if ([value isKindOfClass:[NSURL class]]) {
+        return value;
+    }
+    return ([value isKindOfClass:[NSString class]] && [value length] > 0) ? [NSURL URLWithString:value] : nil;
+}
+
+/*!
+ * FIX: issue #601
+ * [EN] Every tab whose attributes have `CYLTabBarItemImageURL` shows the downloaded icons once ready; until then, and on
+ *      failure, its `CYLTabBarItemImage` (the placeholder).
+ * [CN] 属性中带 `CYLTabBarItemImageURL` 的 Tab，在下载完成后显示下载的图标；此前及失败时显示其 `CYLTabBarItemImage`（占位图）。
+ */
+- (void)cyl_loadTabBarItemImageURLs {
+    for (NSUInteger index = 0; index < _viewControllers.count; index++) {
+        NSUInteger attributesIndex = [self cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:index];
+        if (attributesIndex < _tabBarItemsAttributes.count) {
+            [self cyl_loadImageURLsOfAttributes:_tabBarItemsAttributes[attributesIndex] atIndex:index];
+        }
+    }
+}
+
+- (BOOL)cyl_loadImageURLsOfAttributes:(NSDictionary *)attributes atIndex:(NSUInteger)index {
+    NSURL *URL = CYLURLFromValue(attributes[CYLTabBarItemImageURL]);
+    if (!URL) {
+        return NO;
+    }
+    NSValue *sizeValue = attributes[CYLTabBarItemImageURLSize];
+    CGSize size = [sizeValue isKindOfClass:[NSValue class]] ? sizeValue.CGSizeValue : CGSizeZero;
+    return [self setTabBarItemIconWithURL:URL
+                              selectedURL:CYLURLFromValue(attributes[CYLTabBarItemSelectedImageURL])
+                                     size:size
+                                  atIndex:index];
 }
 
 - (void)setTintColor:(UIColor *)tintColor {

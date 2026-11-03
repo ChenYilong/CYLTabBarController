@@ -84,6 +84,31 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedImage;
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarItemDarkImage;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedDarkImage;
+/*!
+ * FIX: issue #601, #337, #215
+ * [EN] Optional icons from the network, an NSURL or a URL string: unselected (`CYLTabBarItemImageURL`) and selected
+ *      (`CYLTabBarItemSelectedImageURL`; without it the unselected one is used). `CYLTabBarItemImage` /
+ *      `CYLTabBarItemSelectedImage` stay the default icons and the placeholders: the tab shows them until the download
+ *      ends, and keeps them when it fails. The downloaded images then replace them, in every style, also over a Lottie
+ *      icon, through `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`, drawn with their own colors, a GIF animating.
+ *      `CYLTabBarItemImageURLSize` (an NSValue of CGSize) sets their size, the placeholder's by default. They are cached
+ *      in memory and in the sandbox, see `CYLImageCache` to set how long and how much.
+ *
+ *          @{ CYLTabBarItemTitle : @"Home",
+ *             CYLTabBarItemImage : @"home_normal",                     // default and placeholder
+ *             CYLTabBarItemSelectedImage : @"home_selected",
+ *             CYLTabBarItemImageURL : @"https://example.com/home.png", // replaces them once downloaded
+ *             CYLTabBarItemSelectedImageURL : @"https://example.com/home_selected.png" }
+ *
+ * [CN] 可选的网络图标，NSURL 或 URL 字符串：未选中（`CYLTabBarItemImageURL`）与选中（`CYLTabBarItemSelectedImageURL`；未设置时使用
+ *      未选中的）。`CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` 仍是默认图标及占位图：下载完成前 Tab 显示它们，下载失败时保留
+ *      它们。下载完成后由下载的图片覆盖，适用于所有样式，也能覆盖 Lottie 图标，基于 `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`，
+ *      按原图颜色绘制，GIF 会播放动画。`CYLTabBarItemImageURLSize`（CGSize 的 NSValue）设置其尺寸，默认与占位图相同。图片缓存在内存及
+ *      沙盒中，缓存时长与大小见 `CYLImageCache`。示例见上。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemImageURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedImageURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemImageURLSize;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieFilePath;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieURL;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize;
@@ -611,8 +636,8 @@ presentLoginForViewController:(UIViewController *)viewController
  *      (unlike `-reloadTabBarItemsWithAttributes:`), in every tab bar style: Liquid Glass, the system tab bar and
  *      FlatDesign. E.g. after a purchase, or once icons downloaded from the network are ready.
  *      `attributes` takes the keys of `tabBarItemsAttributes`: `CYLTabBarItemTitle`, `CYLTabBarItemImage`,
- *      `CYLTabBarItemSelectedImage`, `CYLTabBarItemDarkImage`, `CYLTabBarItemSelectedDarkImage`; a missing key keeps the
- *      current value. An image is a name or the absolute path of a file (drawn as is, #535) or a `UIImage` (drawn with its own rendering mode: pass
+ *      `CYLTabBarItemSelectedImage`, `CYLTabBarItemDarkImage`, `CYLTabBarItemSelectedDarkImage`, `CYLTabBarItemImageURL`,
+ *      `CYLTabBarItemSelectedImageURL`, `CYLTabBarItemImageURLSize`; a missing key keeps the current value. An image is a name or the absolute path of a file (drawn as is, #535) or a `UIImage` (drawn with its own rendering mode: pass
  *      `[image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]` to keep its colors), shown at its own size, so
  *      scale a downloaded image first. The values are also merged into `tabBarItemsAttributes`, so a later reload keeps
  *      them. A tab with a Lottie animation keeps showing the animation.
@@ -633,6 +658,15 @@ presentLoginForViewController:(UIViewController *)viewController
  * [CN] 按 `viewController`（`viewControllers` 之一，或其中某个导航控制器的根控制器）更新其 Tab，见 `-updateTabBarItemAtIndex:attributes:`。
  */
 - (BOOL)updateTabBarItemForViewController:(UIViewController *)viewController attributes:(NSDictionary<NSString *, id> *)attributes;
+
+/*!
+ * [EN] The entry of `tabBarItemsAttributes` for the tab at `index` in `viewControllers`, with the updates of
+ *      `-updateTabBarItemAtIndex:attributes:` merged in; nil for the plus button's tab or when there is none. The indexes
+ *      of the two arrays differ when the system tab bar has a plus child view controller: this maps them.
+ * [CN] `viewControllers` 中第 `index` 个 Tab 在 `tabBarItemsAttributes` 中对应的项，已合并 `-updateTabBarItemAtIndex:attributes:`
+ *      的更新；PlusButton 的 Tab 或没有对应项时为 nil。系统 TabBar 有 PlusButton 子控制器时两个数组的索引不同，本方法负责对应。
+ */
+- (nullable NSDictionary<NSString *, id> *)tabBarItemAttributesAtIndex:(NSUInteger)index;
 
 /*!
  * FIX: issue #217, #276
