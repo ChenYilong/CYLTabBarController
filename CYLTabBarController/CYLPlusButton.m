@@ -109,7 +109,8 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 @property (nonatomic, weak) UIButton *selectedContentView;
 @property (nonatomic, strong) UIImage *selectedContentImage;
 @property (nonatomic, strong) UIImage *contentImage;
-/// Issue #91: the overlay of `showsTouchableArea`, in the superview, under the plus button. 可点击区域的调试覆盖层。
+/// [EN] Issue #91: the overlay of `showsTouchableArea`, in the superview, under the plus button.
+/// [CN] 可点击区域的调试覆盖层。
 @property (nonatomic, strong, nullable) UIView *cyl_touchableAreaView;
 
 @end
@@ -131,7 +132,8 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
 
 @implementation CYLPlusButton
 //@synthesize selected = _selected;
-// Custom getter and setter: no automatic ivar. 自定义了 getter 与 setter，不会自动合成实例变量。
+// [EN] Custom getter and setter: no automatic ivar.
+// [CN] 自定义了 getter 与 setter，不会自动合成实例变量。
 @synthesize touchableAreaScale = _touchableAreaScale;
 
 /*!
@@ -757,7 +759,8 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
 /// The image-above-title layout of `+cyl_plusButtonWithImage:…`; other plus buttons keep UIButton's layout.
 - (void)layoutSubviews {
     [super layoutSubviews];
-    // Issue #91: keep the touchable area overlay on the button. 保持可点击区域覆盖层与按钮一致。
+    // [EN] Issue #91: keep the touchable area overlay on the button.
+    // [CN] 保持可点击区域覆盖层与按钮一致。
     if (_showsTouchableArea) {
         [self cyl_updateTouchableAreaView];
     }
@@ -1094,7 +1097,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     [self cyl_updateTouchableAreaView];
 }
 
-/// Adds, moves or removes the overlay so it always covers `-touchableRect`. 添加、移动或移除覆盖层，使其始终覆盖可点击区域。
+/// [EN] Adds, moves or removes the overlay so it always covers `-touchableRect`.
+/// [CN] 添加、移动或移除覆盖层，使其始终覆盖可点击区域。
 - (void)cyl_updateTouchableAreaView {
     UIView *superview = self.superview;
     if (!_showsTouchableArea || !superview) {
