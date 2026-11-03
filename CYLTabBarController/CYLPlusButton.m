@@ -110,6 +110,10 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 // `-setSelectedIndex:` (see `-plusChildViewControllerButtonClicked:`).
 @interface CYLTabBarController (CYLPlusButtonSelection)
 - (UIControl *)cyl_plusButtonControlIfSelectingPlusChildViewController:(UIViewController *)viewController;
+#if CYL_FLATDESIGN_AVAILABLE
+// FIX: issue #610 — implemented in CYLTabBarController.m.
+- (void)cyl_flatDesignReportDidSelectControl:(UIControl *)control;
+#endif
 @end
 
 @implementation CYLPlusButton
@@ -283,6 +287,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     }
 #if CYL_FLATDESIGN_AVAILABLE
     if ([tabBarController.cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        // FIX: issue #610 reported through `tabBarController:didSelectControl:` like the other styles, before selecting
+        // (as for the tab buttons). 与其他样式一样回调 `tabBarController:didSelectControl:`，先回调再选中（与 Tab 按钮一致）。
+        [tabBarController cyl_flatDesignReportDidSelectControl:sender];
         [(CYLFlatDesignTabBar *)tabBarController.cyl_tabBar setSelectedIndex:index];
         [tabBarController setSelectedViewController:plusChildViewController];
         return;

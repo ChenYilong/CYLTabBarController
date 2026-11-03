@@ -134,3 +134,5 @@
 "保留：当前选中" = "säilytetty: valittu";
 "保留：shouldUnload 返回 NO" = "säilytetty: shouldUnload palautti NO";
 "保留" = "säilytetty";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "Valitse välilehti, jonka tunniste on ”%@” (”%@”, indeksi %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop nykyinen pino, valitse välilehti, jonka tunniste on ”%@”, ja push uusi esittelysivu kyseiselle välilehdelle";

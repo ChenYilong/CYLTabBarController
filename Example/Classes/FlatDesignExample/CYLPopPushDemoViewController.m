@@ -104,6 +104,10 @@ typedef void (^CYLPopPushDemoAction)(void);
         classIndex++;
     }
 
+    // #408: the last tab by its identifier (a default is generated when none is set), which stays right when tabs come
+    // and go, unlike an index. 最后一个 Tab 的标识（未设置时自动生成默认值），增减 Tab 后依然准确，不像下标。
+    NSString *lastIdentifier = [self demoTabBarController].viewControllers.lastObject.cyl_tabBarItemIdentifier ?: @"";
+
     NSArray<CYLPopPushDemoRow *> *popSelectRows = @[
         [CYLPopPushDemoRow rowWithTitle:@"cyl_popSelectTabBarChildViewControllerAtIndex:"
                                  detail:[NSString stringWithFormat:CYLLocalizedString(@"Pop 当前导航栈到栈底，并选中「%@」（index %@），无动画"), lastTitle, @(lastIndex)]
@@ -131,6 +135,24 @@ typedef void (^CYLPopPushDemoAction)(void);
                 next.hidesBottomBarWhenPushed = YES;
                 [selectedTabBarChildViewController.navigationController pushViewController:next animated:YES];
             }];
+        }],
+        [CYLPopPushDemoRow rowWithTitle:@"…ForTabBarItemIdentifier:"
+                                 detail:[NSString stringWithFormat:CYLLocalizedString(@"选中标识为「%@」的 Tab（「%@」，index %@）"), lastIdentifier, lastTitle, @(lastIndex)]
+                                 action:^{ [weakSelf cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:lastIdentifier]; }],
+        [CYLPopPushDemoRow rowWithTitle:@"…ForTabBarItemIdentifier:completion:"
+                                 detail:CYLLocalizedString(@"同上，并在 completion 中向该 Tab push 一个新的演示页")
+                                 action:^{
+            [weakSelf cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:lastIdentifier completion:^(__kindof UIViewController *selectedTabBarChildViewController) {
+                CYLPopPushDemoViewController *next = [[CYLPopPushDemoViewController alloc] init];
+                next.hidesBottomBarWhenPushed = YES;
+                [selectedTabBarChildViewController.navigationController pushViewController:next animated:YES];
+            }];
+        }],
+        [CYLPopPushDemoRow rowWithTitle:@"…ForTabBarItemIdentifier:@\"unknown\""
+                                 detail:CYLLocalizedString(@"返回 nil：不 pop、不切换 Tab")
+                                 action:^{
+            UIViewController *selected = [weakSelf cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:@"unknown"];
+            [weakSelf showMessage:[NSString stringWithFormat:CYLLocalizedString(@"返回值：%@"), selected ?: @"nil"]];
         }],
         [CYLPopPushDemoRow rowWithTitle:CYLLocalizedString(@"…AtIndex:99（无效 index）")
                                  detail:CYLLocalizedString(@"返回 nil：不 pop、不切换 Tab")
@@ -182,6 +204,16 @@ typedef void (^CYLPopPushDemoAction)(void);
             next.hidesBottomBarWhenPushed = YES;
             [weakSelf cyl_pushOrPopToViewController:next animated:YES callback:^(NSArray<__kindof UIViewController *> *viewControllers, CYLPushOrPopCompletionHandler completionHandler) {
                 completionHandler(NO, nil, YES, lastIndex);
+            }];
+        }],
+        [CYLPopPushDemoRow rowWithTitle:@"cyl_pushOrPopToViewController:…tabBarItemIdentifier:callback:"
+                                 detail:[NSString stringWithFormat:CYLLocalizedString(@"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页"), lastIdentifier]
+                                 action:^{
+            CYLPopPushDemoViewController *next = [[CYLPopPushDemoViewController alloc] init];
+            next.hidesBottomBarWhenPushed = YES;
+            [weakSelf cyl_pushOrPopToViewController:next animated:YES tabBarItemIdentifier:lastIdentifier callback:^(NSArray<__kindof UIViewController *> *viewControllers, CYLPushOrPopCompletionHandler completionHandler) {
+                // The index is ignored: the tab is selected by its identifier. index 被忽略：按标识选中 Tab。
+                completionHandler(NO, nil, YES, 0);
             }];
         }],
     ];

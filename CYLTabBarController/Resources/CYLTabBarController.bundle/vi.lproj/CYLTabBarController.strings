@@ -134,3 +134,5 @@
 "保留：当前选中" = "giữ lại: đang chọn";
 "保留：shouldUnload 返回 NO" = "giữ lại: shouldUnload trả về NO";
 "保留" = "giữ lại";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "Chọn tab có định danh “%@” (“%@”, index %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop ngăn xếp hiện tại, chọn tab có định danh “%@”, rồi push một trang demo mới vào tab đó";

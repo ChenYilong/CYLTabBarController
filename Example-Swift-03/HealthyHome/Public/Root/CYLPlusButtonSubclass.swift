@@ -43,6 +43,11 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
      * @return 指定 PlusButton 点击后跳转的 UIViewController。
      *
      */
+    // #408: the plus button's identifier, read as `control.cyl_tabBarItemIdentifier`. PlusButton 的标识。
+    static func tabBarItemIdentifier() -> String {
+        return "plus"
+    }
+
     static func plusChildViewController() -> UIViewController {
         let wisdom = WisdomVC()
         //        wisdom.title = "菜单"

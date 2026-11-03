@@ -59,6 +59,18 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 @property (nonatomic, readonly, getter=cyl_tabIndex) NSInteger cyl_tabIndex;
 
+/*!
+ * FIX: issue #408
+ * [EN] The tab's identifier: `CYLTabBarItemIdentifier` from `tabBarItemsAttributes`, set on the view controller in
+ *      `viewControllers` and on its content view controller (e.g. a navigation controller's root), or set here directly
+ *      (e.g. on the plus child view controller, which has no attributes). When none is set, the default of the tab bar
+ *      controller it belongs to (its class name, see `CYLTabBarItemIdentifier`); nil outside a tab bar controller.
+ * [CN] Tab 的标识：来自 `tabBarItemsAttributes` 的 `CYLTabBarItemIdentifier`，会同时设置在 `viewControllers` 中的控制器及其内容控制器
+ *      （如导航控制器的根控制器）上；也可以在这里直接设置（例如没有属性字典的 PlusButton 子控制器）。未设置时返回所属
+ *      TabBarController 生成的默认值（类名，见 `CYLTabBarItemIdentifier`）；不在 TabBarController 中时为 nil。
+ */
+@property (nonatomic, copy, nullable, getter=cyl_tabBarItemIdentifier, setter=cyl_setTabBarItemIdentifier:) NSString *cyl_tabBarItemIdentifier;
+
 @property (nonatomic, strong, getter=cyl_tabButton, setter=cyl_setTabButton:, nullable) UIControl *cyl_tabButton;
 
 @property (nonatomic, assign, setter=cyl_setPlusViewControllerEverAdded:, getter=cyl_plusViewControllerEverAdded) BOOL cyl_plusViewControllerEverAdded;
@@ -187,6 +199,36 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
                                                 completion:(CYLPopSelectTabBarChildViewControllerCompletion)completion;
 
 /*!
+ * FIX: issue #408
+ * Pop 到当前 `NavigationController` 的栈底，并选中 `CYLTabBarItemIdentifier` 为 `identifier` 的 Tab，并将被选择的控制器作为返回值返回。
+ @param identifier 需要选择的 Tab 的标识（`CYLTabBarItemIdentifier`，未设置时为默认值，见 `-cyl_tabBarItemIdentifier`），PlusButton 子控制器的标识即 PlusButton 的标识。
+ @return 最终被选择的控制器；找不到该标识的 Tab 时返回 nil，且不 pop、不切换 Tab。
+ @attention 注意：与 `-cyl_popSelectTabBarChildViewControllerForClassType:` 相同，无 pop 动画；增减 Tab 后依然准确，不依赖下标。
+ * [EN] Pops to the root of the current navigation stack and selects the tab whose `CYLTabBarItemIdentifier` is `identifier`
+ *      (the default when none is set, see `-cyl_tabBarItemIdentifier`; the plus child view controller has the plus
+ *      button's), without animation, and returns the selected view controller. nil when no tab has that identifier;
+ *      nothing is popped or selected then. Like `-cyl_popSelectTabBarChildViewControllerForClassType:`, but by identifier,
+ *      so it stays right when tabs are added or removed.
+ * [CN] Pop 到当前导航栈底，无动画地选中标识为 identifier 的 Tab，并返回被选中的控制器；找不到时返回 nil。
+ */
+- (nullable UIViewController *)cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:(NSString *)identifier NS_SWIFT_NAME(cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier:));
+
+/*!
+ * [EN] Same as `-cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:`, with `animated` for the pop.
+ * [CN] 同 `-cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:`，可指定 pop 是否带动画。
+ */
+- (nullable UIViewController *)cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:(NSString *)identifier
+                                                                                    animated:(BOOL)animated NS_SWIFT_NAME(cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier:animated:));
+
+/*!
+ * [EN] Same as `-cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:`, passing the selected view controller
+ *      to `completion` (nil when no tab has the identifier).
+ * [CN] 同 `-cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:`，被选中的控制器在 completion 中返回（找不到该标识时为 nil）。
+ */
+- (void)cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:(NSString *)identifier
+                                                           completion:(CYLPopSelectTabBarChildViewControllerCompletion)completion NS_SWIFT_NAME(cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier:completion:));
+
+/*!
  *@brief 如果当前的 `NavigationViewController` 栈中包含有准备 Push 到的目标控制器，可以选择 Pop 而非 Push。
  *@param viewController Pop 或 Push 到的“目标控制器”，由 completionHandler 的参数控制 Pop 和 Push 的细节。
  *@param animated Pop 或 Push 时是否带动画
@@ -208,6 +250,21 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 - (void)cyl_pushOrPopToViewController:(UIViewController *)viewController
                              animated:(BOOL)animated
                              callback:(CYLPushOrPopCallback)callback;
+
+/*!
+ * FIX: issue #408
+ * [EN] Same as `-cyl_pushOrPopToViewController:animated:callback:`, but the tab to select before pushing is given by its
+ *      `CYLTabBarItemIdentifier` instead of the `index` the completion handler is called with (that `index` is ignored).
+ *      When `shouldPopSelectTabBarChildViewController` is YES and no tab has `identifier`, nothing is selected and
+ *      `viewController` is pushed onto the current stack, as for an invalid index.
+ * [CN] 同 `-cyl_pushOrPopToViewController:animated:callback:`，但 Push 之前要选中的 Tab 由其 `CYLTabBarItemIdentifier` 指定，
+ *      completion handler 里的 `index` 参数被忽略。`shouldPopSelectTabBarChildViewController` 为 YES 而找不到 `identifier` 对应的 Tab 时，
+ *      不切换 Tab，直接 Push 到当前导航栈（与 index 无效时相同）。
+ */
+- (void)cyl_pushOrPopToViewController:(UIViewController *)viewController
+                             animated:(BOOL)animated
+                 tabBarItemIdentifier:(NSString *)identifier
+                             callback:(CYLPushOrPopCallback)callback NS_SWIFT_NAME(cyl_pushOrPop(to:animated:tabBarItemIdentifier:callback:));
 
 /*!
  * 如果正要 Push 的页面与当前栈顶的页面类型相同则取消 Push

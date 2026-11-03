@@ -292,6 +292,14 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     }
     
     // MARK: - Delegate
+
+    /// #610 / #408: called for every tab button and for the plus button in the flat design style too; the identifier
+    /// (a default, the class name, when none is set) tells which one was tapped.
+    /// 扁平样式下点击每个 Tab 按钮和 PlusButton 也会调用；用标识（未设置时为默认值，即类名）区分是哪一个。
+    override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
+        NSLog("[#610] flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier ?? "nil", control.cyl_isPlusButton() ? "plus button" : "tab button")
+    }
+
     override func tabBarController(_ _: UITabBarController, didSelect viewController: UIViewController) {
         // flatDesign 下点击时 selectedIndex 可能仍是旧值，用 VC 判断更准
         let root = viewController.cyl_getViewControllerInsteadOfNavigation()

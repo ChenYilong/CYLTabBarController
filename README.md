@@ -821,6 +821,7 @@ carthage update --use-xcframeworks
 |:---|:---|
 | 下面的方法可以捕获 `TabBar` 上被点击的控件，包括 `UITabBarButton`、PlusButton 或其他 `UIControl`。 | This method reports the selected control, including `UITabBarButton`, PlusButton, or any other `UIControl`. |
 | 如果 PlusButton 自身添加了点击事件，点击它时不会触发该代理方法。 | It is not called for PlusButton when PlusButton has its own action. |
+| 扁平样式（`CYLTabBarStyleTypeFlatDesign`）同样会回调（[#610](https://github.com/ChenYilong/CYLTabBarController/issues/610)）：点击每个 Tab 按钮和 PlusButton（有或没有子控制器）都会调用一次，传入的 `control` 为被点击的按钮；点在有子控制器的 PlusButton 下方的占位 Tab 上时，传入的是 PlusButton。 | The flat design style (`CYLTabBarStyleTypeFlatDesign`) calls it too ([#610](https://github.com/ChenYilong/CYLTabBarController/issues/610)): once for each tap on a tab button or the plus button (with or without a child view controller), with the tapped button as `control`; a tap on the tab under a plus button with a child view controller passes the plus button. |
 
  ```Objective-C
 //CYLTabBarController.h
@@ -882,6 +883,76 @@ carthage update --use-xcframeworks
     return YES;
 }
  ```
+
+#### [CN]用标识区分 Tab
+#### [EN]Telling tabs apart by identifier
+
+| 中文 | English |
+|:---|:---|
+| Tab 会在运行时增减（例如由后台控制隐藏第二个或第三个）时，`selectedIndex` 无法确定是哪个 Tab（[#408](https://github.com/ChenYilong/CYLTabBarController/issues/408)）。在 `tabBarItemsAttributes` 中加上 `CYLTabBarItemIdentifier`（NSString，类似 tag），之后按标识判断和查找。 | When tabs come and go at run time (e.g. the server hides the second or third one), `selectedIndex` no longer tells which tab it is ([#408](https://github.com/ChenYilong/CYLTabBarController/issues/408)). Add `CYLTabBarItemIdentifier` (an NSString, like a tag) to `tabBarItemsAttributes`, then check and look tabs up by it. |
+| 读取：`control.cyl_tabBarItemIdentifier`（代理方法中的 Tab 按钮或 PlusButton）、`viewController.cyl_tabBarItemIdentifier`（`viewControllers` 中的控制器及其内容控制器）、`tabBarController.cyl_selectedTabBarItemIdentifier`。 | Read it with `control.cyl_tabBarItemIdentifier` (the tab button or plus button in the delegate methods), `viewController.cyl_tabBarItemIdentifier` (a view controller in `viewControllers` and its content view controller), or `tabBarController.cyl_selectedTabBarItemIdentifier`. |
+| 查找：`-cyl_indexOfTabBarItemIdentifier:`（不存在时为 NSNotFound）、`-cyl_viewControllerWithTabBarItemIdentifier:`、`-cyl_selectTabBarItemWithIdentifier:`（选中并返回控制器）、`-cyl_controlWithTabBarItemIdentifier:`（Tab 按钮或 PlusButton）；`cyl_tabBarItemIdentifiers` 列出全部标识。 | Look up with `-cyl_indexOfTabBarItemIdentifier:` (NSNotFound when missing), `-cyl_viewControllerWithTabBarItemIdentifier:`, `-cyl_selectTabBarItemWithIdentifier:` (selects and returns the view controller) and `-cyl_controlWithTabBarItemIdentifier:` (tab button or plus button); `cyl_tabBarItemIdentifiers` lists them all. |
+| Pop / Push：与 `…ForClassType:` 对应，`-cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:`（及 `animated:`、`completion:` 版本）Pop 到当前导航栈底并选中该标识的 Tab，找不到时返回 nil 且不 pop、不切换；`-cyl_pushOrPopToViewController:animated:tabBarItemIdentifier:callback:` 在 Push 前按标识选中 Tab（completion handler 的 `index` 被忽略）。 | Pop / Push: like `…ForClassType:`, `-cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:` (and its `animated:` and `completion:` versions) pops to the root and selects the tab with that identifier, returning nil and doing nothing when there is none; `-cyl_pushOrPopToViewController:animated:tabBarItemIdentifier:callback:` selects the tab by identifier before pushing (the completion handler's `index` is ignored). |
+| PlusButton：在 `CYLPlusButtonSubclassing` 子类中实现 `+tabBarItemIdentifier`（例如返回 @"plus"）。点击 PlusButton 同样会回调 `-tabBarController:didSelectControl:`，`control.cyl_tabBarItemIdentifier` 即为该标识；有 PlusButton 子控制器时，按标识查找、选中也包括它。 | Plus button: implement `+tabBarItemIdentifier` in the `CYLPlusButtonSubclassing` subclass (e.g. return @"plus"). A tap on it also calls `-tabBarController:didSelectControl:`, where `control.cyl_tabBarItemIdentifier` is that identifier; with a plus child view controller, lookups and selection by identifier include it. |
+| 多 TabBar：每个 TabBarController（不同 context，或 push 出来的）只处理自己的 Tab 和 PlusButton；每个 TabBarController 的 PlusButton 副本都带有同一个标识。不同 context 的 PlusButton 可以返回不同的标识（Demo 中为 @"plus" 和 @"camera"）。 | Several tab bar controllers: each one (another context, or a pushed one) answers for its own tabs and plus button, and every copy of the plus button carries the identifier. Plus buttons of different contexts can return different identifiers (@"plus" and @"camera" in the demo). |
+| 默认值（不设置时）：普通 Tab 为内容控制器的类名（导航控制器取根控制器，Swift 类不含模块名），例如 `CYLHomeViewController`；同一 TabBar 中后续同类的 Tab 依次加 `_2`、`_3`；PlusButton 为其类名，例如 `CYLPlusButtonSubclass`；PlusButton 子控制器沿用 PlusButton 的标识。类名不会因增减 Tab 或切换语言而改变。`-cyl_defaultTabBarItemIdentifierForViewController:` 返回某个 Tab 的默认值。 | Defaults (when none is set): a tab gets its content view controller's class name (a navigation controller's root; Swift classes without the module), e.g. `CYLHomeViewController`, with `_2`, `_3`... for the next tabs of the same class in one tab bar; a plus button gets its class name, e.g. `CYLPlusButtonSubclass`, and the plus child view controller shares it. Class names do not change when tabs are added or removed, or with the language. `-cyl_defaultTabBarItemIdentifierForViewController:` returns a tab's default. |
+
+```Objective-C
+NSDictionary *messageAttributes = @{
+    CYLTabBarItemTitle : @"消息",
+    CYLTabBarItemImage : @"message_normal",
+    CYLTabBarItemIdentifier : @"message",
+};
+
+// CYLPlusButtonSubclass.m
++ (NSString *)tabBarItemIdentifier {
+    return @"plus";
+}
+
+// Called for every tab button and the plus button. 点击任意 Tab 按钮和 PlusButton 都会调用。
+- (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control {
+    NSString *identifier = control.cyl_tabBarItemIdentifier;
+    NSLog(@"[%@] tapped %@", tabBarController.context, identifier);
+    for (NSString *eachIdentifier in tabBarController.cyl_tabBarItemIdentifiers) {
+        UIControl *eachControl = [tabBarController cyl_controlWithTabBarItemIdentifier:eachIdentifier];
+        NSLog(@"%@: index %@, plus button %@", eachIdentifier,
+              @([tabBarController cyl_indexOfTabBarItemIdentifier:eachIdentifier]), @([eachControl cyl_isPlusButton]));
+    }
+    if ([identifier isEqualToString:@"plus"]) {
+        // the plus button
+    } else if ([identifier isEqualToString:@"message"]) {
+        // the message tab, wherever it is
+    }
+}
+
+[tabBarController cyl_selectTabBarItemWithIdentifier:@"message"];
+
+// From any page: pop to the root and select the message tab, wherever it is. 从任意页面 Pop 到栈底并选中“消息”，无论它在第几个。
+[self cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:@"message" completion:^(__kindof UIViewController *selected) {
+    [selected.navigationController pushViewController:detailViewController animated:YES];
+}];
+```
+
+```Swift
+let messageAttributes: [String: Any] = [
+    CYLTabBarItemTitle: "消息",
+    CYLTabBarItemImage: "message_normal",
+    CYLTabBarItemIdentifier: "message",
+]
+
+// CYLPlusButtonSubclass.swift
+static func tabBarItemIdentifier() -> String { "plus" }
+
+override func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
+    switch control.cyl_tabBarItemIdentifier {
+    case "plus": break     // the plus button
+    case "message": break  // the message tab, wherever it is
+    default: break
+    }
+}
+
+tabBarController.cyl_selectTabBarItem(withIdentifier: "message")
+```
 
 ### [CN]点击 TabBarButton 时添加动画
 ### [EN]Adding animations when a TabBar button is tapped

@@ -431,6 +431,9 @@
     
 #if defined(DEBUG) || defined(BETA)
 NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), control);
+    // #610 / #408: called for every tab button and for the plus button in the flat design style too; the identifier tells
+    // which one was tapped. 扁平样式下点击每个 Tab 按钮和 PlusButton 也会调用；用标识区分是哪一个。
+    NSLog(@"🟢 #610 flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier, [control cyl_isPlusButton] ? @"plus button" : @"tab button");
 #endif
     if ([control cyl_isTabButton]) {
         //更改红标状态

@@ -40,6 +40,12 @@
 
 @end
 
+// FIX: issue #610 — implemented in CYLTabBarController.m.
+@interface CYLTabBarController (CYLFlatDesignPlusButtonReport)
+- (void)cyl_flatDesignReportDidSelectControl:(UIControl *)control;
+- (void)cyl_flatDesignPlusButtonTouchUpInside:(UIControl *)plusButton;
+@end
+
 @implementation CYLFlatDesignTabBar {
     NSInteger _selectedItemIndex;
     NSMutableArray *_buttons;
@@ -358,6 +364,31 @@
     
     if (!item.isEnabled) { return; }
     
+    // FIX: issue #610
+    // [EN] Report the tap through `tabBarController:didSelectControl:`, as the other styles do, here where every tab
+    //      button tap arrives: the selection below takes one of three paths (UIKit's private `_tabBarItemClicked`, the
+    //      library's `_cyltabBarItemClicked:`, or `_setSelectedIndex:` without a tab bar controller), and only one of them
+    //      reported it. The button under the plus button (a plus button with a child view controller, tapped outside its
+    //      own outline) reports the plus button, which is what the user tapped.
+    // [CN] 与其他样式一样，通过 `tabBarController:didSelectControl:` 上报点击。放在每次点击 Tab 按钮都会经过的这里：下面的选中逻辑
+    //      有三条路径（UIKit 私有的 `_tabBarItemClicked`、本库的 `_cyltabBarItemClicked:`、没有 TabBarController 时的
+    //      `_setSelectedIndex:`），以前只有其中一条会回调。PlusButton 下方的占位按钮（有子控制器的 PlusButton，点在其轮廓外）上报的是
+    //      PlusButton，即用户点击的按钮。
+    UITabBarController *owningTabBarController = self.tabBarController;
+    if ([owningTabBarController isKindOfClass:[CYLTabBarController class]] &&
+        [owningTabBarController respondsToSelector:@selector(cyl_flatDesignReportDidSelectControl:)]) {
+        UIControl *control = tabBarButton;
+        if (tabBarButton.cyl_isPlaceholder) {
+            // Only a plus button with a child view controller selects a tab from here; one without has its own action,
+            // which reports it (`-cyl_flatDesignPlusButtonTouchUpInside:`). 只有带子控制器的 PlusButton 会在这里选中 Tab；
+            // 没有子控制器的 PlusButton 有自己的事件，由 `-cyl_flatDesignPlusButtonTouchUpInside:` 上报。
+            control = (self.plusButton && [self hasPlusChildViewController]) ? self.plusButton : nil;
+        }
+        if (control) {
+            [(CYLTabBarController *)owningTabBarController cyl_flatDesignReportDidSelectControl:control];
+        }
+    }
+    
     if ([self.delegate respondsToSelector:@selector(tabBar:didSelectItem:)]) {
         [self.delegate tabBar:self didSelectItem:item];
     }
@@ -526,6 +557,16 @@
 //        plusButton.clipsToBounds = NO;
 //        [self.contentView cyl_bringSubviewToTop:plusButton];
         self.plusButton = plusButton;
+        // FIX: issue #610 a plus button without a child view controller has no action here: report its taps through
+        // `tabBarController:didSelectControl:` too. 没有子控制器的 PlusButton 在这里没有事件：同样回调 `tabBarController:didSelectControl:`。
+        UITabBarController *owningTabBarController = self.tabBarController;
+        SEL plusButtonTapSelector = @selector(cyl_flatDesignPlusButtonTouchUpInside:);
+        if ([owningTabBarController isKindOfClass:[CYLTabBarController class]] &&
+            ![CYLPlusButton plusChildViewControllerForOwner:owningTabBarController] &&
+            [owningTabBarController respondsToSelector:plusButtonTapSelector]) {
+            [plusButton removeTarget:owningTabBarController action:plusButtonTapSelector forControlEvents:UIControlEventTouchUpInside];
+            [plusButton addTarget:owningTabBarController action:plusButtonTapSelector forControlEvents:UIControlEventTouchUpInside];
+        }
         //FIXME:  to delete 自定义的index。
 //        [self cyl_replace];(
         CYLFlatDesignTabBarButton *plusButtonIndexPlaceholder = _buttons[self.cyl_plusButtonIndex];

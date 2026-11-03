@@ -134,3 +134,5 @@
 "保留：当前选中" = "zachowana: wybrana";
 "保留：shouldUnload 返回 NO" = "zachowana: shouldUnload zwróciło NO";
 "保留" = "zachowana";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "Wybierz kartę o identyfikatorze „%@” („%@”, indeks %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop bieżącego stosu, wybór karty o identyfikatorze „%@”, a następnie push nowej strony demonstracyjnej na tę kartę";

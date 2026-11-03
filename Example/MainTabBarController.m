@@ -181,6 +181,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //    CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
         CYLTabBarItemTitle : CYLLocalizedString(@"首页"),
+        CYLTabBarItemIdentifier : @"home",  // #408: stays right when tabs are added or removed. Tab 增减后依然准确。
         // A name also loads "<name>_dark" when that image exists: here home_normal_dark (UIImage.cyl_darkImageNameSuffix).
         // 图片名会同时加载存在的「<name>_dark」：这里是 home_normal_dark（UIImage.cyl_darkImageNameSuffix）。
         CYLTabBarItemImage : @"home_normal",  /* NSString and UIImage are supported*/
@@ -196,6 +197,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //    CGFloat secondXOffset = (-25+2)/2;
     NSDictionary *secondTabBarItemsAttributes = @{
         CYLTabBarItemTitle : CYLLocalizedString(@"同城"),
+        CYLTabBarItemIdentifier : @"city",
         CYLTabBarItemImage :@"fishpond_normal",
         CYLTabBarItemSelectedImage : @"fishpond_highlight",
         //                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)],
@@ -207,6 +209,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
     NSDictionary *thirdTabBarItemsAttributes = @{
         CYLTabBarItemTitle : CYLLocalizedString(@"消息"),
+        CYLTabBarItemIdentifier : @"message",
         // A dark image under any name. Names are the prepared form (rendered as original, #465); a UIImage object for
         // the same is `[UIImage cyl_imageWithImageInfo:@"message_normal" darkImageInfo:@"message_normal_night"]`.
         // 任意名称的深色图片。图片名是库预先处理好的形式（按原图渲染，#465）；同样效果的 UIImage 对象为
@@ -222,6 +225,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     };
     NSDictionary *fourthTabBarItemsAttributes = @{
         CYLTabBarItemTitle : CYLLocalizedString(@"我的"),
+        // No CYLTabBarItemIdentifier: the default is the class name, "CYLMineViewController" (#408).
+        // 未设置 CYLTabBarItemIdentifier：默认值为类名 "CYLMineViewController"（#408）。
         // account_normal has its own Dark appearance in Images.xcassets; it wins over any "_dark" image.
         // account_normal 在 Images.xcassets 中自带 Dark 外观，优先于任何「_dark」图片。
         CYLTabBarItemImage : @"account_normal",
@@ -627,8 +632,34 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 #pragma mark - CYLFlatDesignTabBarDelegate
 
 
+/*!
+ * #408: tabs by identifier, not by index, so it stays right when tabs are added or removed. Called for every tab button
+ * and for the plus button. Each tab bar controller (this context, the "CYLSecondPlusButtonContext" one, a pushed one)
+ * answers for its own tabs and plus button.
+ * #408：按标识而不是下标区分 Tab，增减 Tab 后依然准确。点击任意 Tab 按钮和 PlusButton 都会调用。每个 TabBarController
+ * （当前 context、"CYLSecondPlusButtonContext"、push 出来的）只处理自己的 Tab 和 PlusButton。
+ */
+- (void)cyl_logTabBarItemIdentifiersForTabBarController:(CYLTabBarController *)tabBarController selectedControl:(UIControl *)control {
+    // 1. Print: the tapped control and all of this tab bar controller's identifiers. 打印：点击的按钮及全部标识。
+    NSString *identifier = control.cyl_tabBarItemIdentifier;
+    NSLog(@"🟢 #408 [%@] tapped \"%@\" (selected \"%@\")", tabBarController.context, identifier, tabBarController.cyl_selectedTabBarItemIdentifier);
+    for (NSString *eachIdentifier in tabBarController.cyl_tabBarItemIdentifiers) {
+        UIControl *eachControl = [tabBarController cyl_controlWithTabBarItemIdentifier:eachIdentifier];
+        NSLog(@"   \"%@\": index %@, %@", eachIdentifier, @([tabBarController cyl_indexOfTabBarItemIdentifier:eachIdentifier]),
+              [eachControl cyl_isPlusButton] ? @"plus button" : @"tab button");
+    }
+    // 2. Use: handle each tab by identifier. 使用：按标识处理每个 Tab。
+    if ([identifier isEqualToString:@"plus"] || [identifier isEqualToString:@"camera"]) {
+        NSLog(@"   plus button of context %@", tabBarController.context);
+    } else if ([identifier isEqualToString:@"message"]) {
+        NSLog(@"   message tab, wherever it is now");
+    } else if ([identifier isEqualToString:@"CYLMineViewController"]) {
+        NSLog(@"   mine tab, by its default identifier (class name)");
+    }
+}
+
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control {
-    
+    [self cyl_logTabBarItemIdentifiersForTabBarController:tabBarController selectedControl:control];
     UIView *animationView;
     
     if ([control cyl_isTabButton]) {

@@ -206,6 +206,40 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     objc_setAssociatedObject(self, @selector(cyl_tabBarChildViewControllerIndex), tabBarChildViewControllerIndexObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+- (void)cyl_setTabBarItemIdentifier:(NSString *)tabBarItemIdentifier {
+    objc_setAssociatedObject(self, @selector(cyl_tabBarItemIdentifier), [tabBarItemIdentifier copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSString *)cyl_tabBarItemIdentifier {
+    NSString *identifier = objc_getAssociatedObject(self, @selector(cyl_tabBarItemIdentifier));
+    if (identifier) {
+        return identifier;
+    }
+    // A plus button: its class's identifier, the same for every tab bar controller's copy. 多 TabBar 的副本共用。
+    if ([self cyl_isPlusButton]) {
+        if ([self.class respondsToSelector:@selector(tabBarItemIdentifier)]) {
+            identifier = [(Class<CYLPlusButtonSubclassing>)self.class tabBarItemIdentifier];
+        }
+        // Not implemented: the class name, e.g. "CYLPlusButtonSubclass". 未实现时为类名。
+        return identifier.length > 0 ? identifier : [CYLTabBarController cyl_defaultTabBarItemIdentifierForClass:self.class];
+    }
+#if CYL_FLATDESIGN_AVAILABLE
+    // A flat design tab button knows its tab through its item: it has no `cyl_tabBarChildViewControllerIndex`, and is not a
+    // `cyl_isTabButton` under Liquid Glass. The one under the plus button is the plus child view controller's tab, whose
+    // identifier is the plus button's. 扁平样式的 Tab 按钮通过其 item 找到 Tab：它没有 `cyl_tabBarChildViewControllerIndex`，
+    // 液态玻璃下也不算 `cyl_isTabButton`。PlusButton 下方的按钮对应 PlusButton 子控制器，其标识即 PlusButton 的标识。
+    if ([self isKindOfClass:[CYLFlatDesignTabBarButton class]]) {
+        return ((CYLFlatDesignTabBarButton *)self).tabBarItem.childViewController.cyl_tabBarItemIdentifier;
+    }
+#endif
+    NSInteger index = self.cyl_tabBarChildViewControllerIndex;
+    NSArray<UIViewController *> *viewControllers = self.cyl_tabBarController.viewControllers;
+    if (index < 0 || index == NSNotFound || index >= (NSInteger)viewControllers.count) {
+        return nil;
+    }
+    return viewControllers[index].cyl_tabBarItemIdentifier;
+}
+
 - (BOOL)cyl_isLottieReady {
     if (self.cyl_tabBarController.lottieURLs.count > 0) {
         return self.cyl_tabBarController.lottieViewAdded;

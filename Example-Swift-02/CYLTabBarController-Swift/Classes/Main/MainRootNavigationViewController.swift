@@ -45,7 +45,13 @@ class MainRootNavigationViewController: UINavigationController {
                                                            [2: "message_normal_night"])
         // #442: Lottie icons, with their Dark Mode versions (<name>_dark.json → CYLTabBarLottieDarkFilePath).
         // Lottie 图标及其深色版本（<名称>_dark.json → CYLTabBarLottieDarkFilePath）。
-        return CYLTabBarItemsAttributesAddingLottieFiles(attributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
+        let lottieAttributes = CYLTabBarItemsAttributesAddingLottieFiles(attributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
+        // #408: an identifier per tab (the plus button's is `CYLPlusButtonSubclass.tabBarItemIdentifier()`). 每个 Tab 的标识。
+        return zip(lottieAttributes, ["home", "city", "message", "mine"]).map { item, identifier in
+            var item = item
+            item[CYLTabBarItemIdentifier] = identifier
+            return item
+        }
     }
 }
 

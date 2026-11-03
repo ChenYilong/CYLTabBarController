@@ -134,3 +134,5 @@
 "保留：当前选中" = "megtartva: kiválasztva";
 "保留：shouldUnload 返回 NO" = "megtartva: a shouldUnload NO értéket adott";
 "保留" = "megtartva";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "A(z) „%@” azonosítójú lap kiválasztása („%@”, index: %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "A jelenlegi verem pop-olása, a(z) „%@” azonosítójú lap kiválasztása, majd új bemutató oldal push-olása erre a lapra";
