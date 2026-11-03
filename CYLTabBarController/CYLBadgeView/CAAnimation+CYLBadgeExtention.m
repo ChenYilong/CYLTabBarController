@@ -7,6 +7,7 @@
  */
 
 #import "CAAnimation+CYLBadgeExtention.h"
+#import "CYLBadgeViewDefines.h"
 #import <QuartzCore/QuartzCore.h>
 
 @implementation CAAnimation (CYLBadgeExtention)
@@ -454,4 +455,48 @@ static CGFloat CYLBadgeSafeOffset(CGFloat offset) {
     return [self cyl_badge_once_rolling_AnimationRepeatTimes:repeatTimes duration:time];
 }
 
+
 @end
+
+/*!
+ * FIX: issue #583, #271 (moved here from `-[UIView cyl_keepBadgeAnimationAfterBackground:]`)
+ * [EN] Shake and Bounce set `removedOnCompletion = NO`: with the default YES, Core Animation removes them when the app goes
+ *      to the background, and after returning a badge stopped shaking/bouncing. Set here, not in the public factories
+ *      (`+cyl_shakeAnimationRepeatTimes:…`, `+cyl_bounceAnimationRepeatTimes:…`), so apps that use those see no change.
+ * [CN] 抖动、弹跳动画设置 `removedOnCompletion = NO`：默认的 YES 会让 App 进入后台时 Core Animation 移除动画，回到前台后角标不再
+ *      抖动/弹跳。在这里设置而不修改公开的工厂方法，App 自行使用那些方法时行为不变。
+ */
+CAAnimation *CYLBadgeAnimationForType(CYLBadgeAnimationType animationType, CGSize badgeSize) {
+    CGFloat moveDistance = badgeSize.width * 1.5;
+    switch (animationType) {
+        case CYLBadgeAnimationTypeBreathe:
+            return [CAAnimation cyl_opacityForeverAnimationWithDuration:1.4];
+        case CYLBadgeAnimationTypeShake: {
+            // Relative (`transform.translation.x`), so an anchored badge can still move with its host while shaking.
+            CAAnimation *animation = [CAAnimation cyl_shakeAnimationRepeatTimes:HUGE_VALF duration:1 offset:badgeSize.width / 4];
+            animation.removedOnCompletion = NO;   // keeps running after the app comes back from the background
+            return animation;
+        }
+        case CYLBadgeAnimationTypeScale:
+            return [CAAnimation cyl_scaleAnimationFromScale:1.4 toScale:0.6 duration:1 repeatTimes:MAXFLOAT];
+        case CYLBadgeAnimationTypeBounce: {
+            // Relative (`transform.translation.y`), see Shake. 相对位移，见 Shake。
+            CAAnimation *animation = [CAAnimation cyl_bounceAnimationRepeatTimes:HUGE_VALF duration:1 offset:badgeSize.height / 4];
+            animation.removedOnCompletion = NO;
+            return animation;
+        }
+        case CYLBadgeAnimationTypeLeftRightOnce:
+            return [CAAnimation cyl_badge_once_leftRight_AnimationMoveDistance:moveDistance repeatTimes:1 duration:0.5];
+        case CYLBadgeAnimationTypeRightLeftOnce:
+            return [CAAnimation cyl_badge_once_rightLeft_AnimationMoveDistance:moveDistance repeatTimes:1 duration:0.5];
+        case CYLBadgeAnimationTypeFadeInOnce:
+            return [CAAnimation cyl_badge_once_fadeIn_AnimationRepeatTimes:1 duration:1.5];
+        case CYLBadgeAnimationTypeRollingOnce:
+            return [CAAnimation cyl_badge_once_rolling_AnimationRepeatTimes:1 duration:0.5];
+        case CYLBadgeAnimationTypeScaleOnce:
+            return [CAAnimation cyl_badge_once_scale_AnimationRepeatTimes:1 duration:0.5];
+        case CYLBadgeAnimationTypeNone:
+        default:
+            return nil;
+    }
+}
