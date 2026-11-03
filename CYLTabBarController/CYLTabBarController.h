@@ -524,6 +524,15 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 - (BOOL)hasPlusButton;
 
 /*!
+ * [EN] Returns YES if the plus button has a child view controller (`+plusChildViewController`) in this tab bar
+ *      controller. Then the plus button has two layers: the plus button and, under it, the system tab button of that
+ *      view controller. Use it as a guard before touching `plusChildViewController`.
+ * [CN] PlusButton 在本 TabBarController 中有子控制器（`+plusChildViewController`）时返回 YES。此时 PlusButton 有两个图层：
+ *      PlusButton 本身，以及其下方该子控制器的系统 Tab 按钮。处理 `plusChildViewController` 之前用它判断。
+ */
+- (BOOL)hasPlusChildViewController;
+
+/*!
  * @attention Include plusButton if exists.
  * [EN] Returns the number of tab bar items, plus one when there is a plus button.
  * [CN] 返回 TabBar 按钮总数，含 PlusButton 时加 1。

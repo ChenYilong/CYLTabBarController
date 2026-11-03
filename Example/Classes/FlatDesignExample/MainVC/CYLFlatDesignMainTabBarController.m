@@ -453,10 +453,14 @@ NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_F
 #endif
     // #535: the plus button's badge changes on every tap. Checked first: before iOS 26 `-cyl_isTabButton` is YES for the
     // plus button too. #535：每次点击 PlusButton，角标都会变化。需先判断：iOS 26 以前 `-cyl_isTabButton` 对 PlusButton 也返回 YES。
-    if ([control cyl_isPlusButton]) {
+    // `-cyl_isPlusControl` also covers the system tab button of the plus child view controller (the layer under the
+    // plus button). `-cyl_isPlusControl` 也包括 PlusButton 子控制器的系统 Tab 按钮（PlusButton 下方的图层）。
+    // Guard: plus button code only when this tab bar controller has one. 仅在有 PlusButton 时处理 PlusButton。
+    BOOL isPlusControl = [tabBarController hasPlusButton] && [control cyl_isPlusControl];
+    if (isPlusControl) {
         [tabBarController cyl_demo_plusButtonDidTap];
     }
-    if ([control cyl_isTabButton] && ![control cyl_isPlusButton]) {
+    if ([control cyl_isTabButton] && !isPlusControl) {
         //更改红标状态
         if ([control cyl_isShowBadge]) {
             if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
