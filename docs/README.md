@@ -14,6 +14,8 @@
 | 中文 | English |
 |:---|:---|
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
+| [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
+| [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
@@ -37,6 +39,8 @@
 ```text
 docs/
 ├── Bilingual-Documentation.md
+├── Carthage-Example.md
+├── Carthage.md
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
 ├── Login-Required-Tabs.md

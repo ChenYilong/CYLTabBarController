@@ -230,6 +230,8 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 |:---|:---|
 | [文档导航（全部文档与目录结构）](docs/README.md) | [Documentation index (all documents and folder layout)](docs/README.md) |
 | [中英文双语文档](docs/Bilingual-Documentation.md) | [Bilingual Documentation](docs/Bilingual-Documentation.md) |
+| [Carthage 集成演示工程](docs/Carthage-Example.md) | [Carthage integration demo project](docs/Carthage-Example.md) |
+| [使用 Carthage 集成](docs/Carthage.md) | [Integrating with Carthage](docs/Carthage.md) |
 | [CYLTabBarController 常见问题](docs/FAQ.md) | [CYLTabBarController FAQ](docs/FAQ.md) |
 | [FlatDesign × UITabBarAppearance](docs/FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](docs/FlatDesign-StandardAppearance.md) |
 | [需要登录的 Tab](docs/Login-Required-Tabs.md) | [Tabs That Need Login](docs/Login-Required-Tabs.md) |
@@ -518,7 +520,7 @@ github "ChenYilong/CYLTabBarController"
 | 然后执行： | Then run: |
 
 ```
-carthage update --use-xcframeworks
+carthage update --use-xcframeworks --platform iOS
 ```
 
 | 中文 | English |
@@ -527,7 +529,8 @@ carthage update --use-xcframeworks
 
 | 中文 | English |
 |:---|:---|
-| 说明：Carthage 构建的是不含 Lottie 动画相关文件（`LottieSwift` 目录）的核心功能集，与 CocoaPods 的 `Core`子规范（subspec）范围一致。 | Note: Carthage builds the core feature set without the Lottie animation files in the `LottieSwift` directory, matching the scope of the CocoaPods `Core` subspec. |
+| 说明：Carthage 构建的 framework 包含核心功能、角标、扁平样式与资源包（多语言文案），不含 Lottie 动画（`LottieSwift` 目录，需要时请使用 CocoaPods 或 SPM）；最低支持 iOS 15.0（当前 Xcode 支持的最低版本）。发布新版本时，`scripts/pod-lint.sh push` 会顺便更新演示工程 `Cartfile` 中的版本。详见 [docs/Carthage.md](docs/Carthage.md)（[#384](https://github.com/ChenYilong/CYLTabBarController/issues/384)）。 | Note: the framework Carthage builds contains the core, badges, the flat design style and the resource bundle (localized strings), without Lottie animations (the `LottieSwift` folder; use CocoaPods or SPM for them); it supports iOS 15.0 and later (the lowest version current Xcode supports). On release, `scripts/pod-lint.sh push` also updates the version in the demo's `Cartfile`. See [docs/Carthage.md](docs/Carthage.md) ([#384](https://github.com/ChenYilong/CYLTabBarController/issues/384)). |
+| 演示工程：`Example-Swift-Carthage`（复制自 `Example-Swift-03`，改用 Carthage 集成），运行步骤与差异见 [docs/Carthage-Example.md](docs/Carthage-Example.md)。 | Demo project: `Example-Swift-Carthage` (a copy of `Example-Swift-03` integrated with Carthage); see [docs/Carthage-Example.md](docs/Carthage-Example.md) for how to run it and what differs. |
 
 ### [CN]第二步：设置 CYLTabBarController 的两个数组
 ### [EN]Step 2: Configure the view controller and tab bar item attribute arrays
