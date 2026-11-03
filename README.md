@@ -1559,6 +1559,7 @@ cell.textLabel?.text = String(format: CYLLocalizedString("我是第%ld行"), ind
 | 中文 | English |
 |:---|:---|
 | 仓库提供了 Swift Demo，目录为 `Example-Swift`。 | The repository includes a Swift demo in `Example-Swift`. |
+| 完整的中英文 Swift 使用指南（`import` 报错排查、初始化、PlusButton、代理、角标、Lottie、深色模式等 API 示例）：[docs/Swift-Guide.md](docs/Swift-Guide.md)。 | A full bilingual Swift guide (fixing `import` errors, initializers, PlusButton, delegates, badges, Lottie, Dark Mode and more, with code): [docs/Swift-Guide.md](docs/Swift-Guide.md). |
 
 | 中文 | English |
 |:---|:---|

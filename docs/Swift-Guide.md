@@ -1,0 +1,943 @@
+# [CN]在 Swift 项目中使用 CYLTabBarController
+# [EN]Using CYLTabBarController in Swift
+
+| 中文 | English |
+|:---|:---|
+| 本文回答 [#282](https://github.com/ChenYilong/CYLTabBarController/issues/282)：「Swift 项目导入 CYLTabBarController 后 import 报错，Swift 与 OC 混用需要配置什么？」并结合仓库中的 Swift Demo（`Example-Swift*` 目录）给出完整的 Swift API 用法。 | This page answers [#282](https://github.com/ChenYilong/CYLTabBarController/issues/282) ("I added CYLTabBarController to a Swift project and `import` fails. What do I need to configure to mix Swift and Objective-C?") and walks through the Swift API with code from the Swift demos in this repository (the `Example-Swift*` directories). |
+| 本库用 Objective-C 编写，Swift 通过 Clang module 直接调用，**不需要**任何 Swift 封装层。所有示例代码都取自或对应仓库中可运行的 Demo。 | The library is written in Objective-C. Swift calls it directly through its Clang module; **no** Swift wrapper is needed. Every snippet here comes from, or matches, a demo in the repository that builds and runs. |
+
+## [CN]目录
+## [EN]Contents
+
+| 中文 | English |
+|:---|:---|
+| [1. 导入：`import CYLTabBarController` 报错怎么办](#cn1-导入import-cyltabbarcontroller-报错怎么办) | [1. Importing: when `import CYLTabBarController` fails](#en1-importing-when-import-cyltabbarcontroller-fails) |
+| [2. 五分钟上手](#cn2-五分钟上手) | [2. Quick start](#en2-quick-start) |
+| [3. 继承 CYLTabBarController](#cn3-继承-cyltabbarcontroller) | [3. Subclassing CYLTabBarController](#en3-subclassing-cyltabbarcontroller) |
+| [4. tabBarItemsAttributes 全部 key](#cn4-tabbaritemsattributes-全部-key) | [4. All tabBarItemsAttributes keys](#en4-all-tabbaritemsattributes-keys) |
+| [5. PlusButton（中间凸起按钮）](#cn5-plusbutton中间凸起按钮) | [5. PlusButton (the raised center button)](#en5-plusbutton-the-raised-center-button) |
+| [6. TabBar 样式：Liquid Glass / FlatDesign](#cn6-tabbar-样式liquid-glass--flatdesign) | [6. Tab bar styles: Liquid Glass / FlatDesign](#en6-tab-bar-styles-liquid-glass--flatdesign) |
+| [7. 代理回调](#cn7-代理回调) | [7. Delegate callbacks](#en7-delegate-callbacks) |
+| [8. Tab 标识（按标识而不是下标定位 Tab）](#cn8-tab-标识按标识而不是下标定位-tab) | [8. Tab identifiers (find tabs by identifier, not index)](#en8-tab-identifiers-find-tabs-by-identifier-not-index) |
+| [9. 跨 Tab 跳转：Pop / Push / 选中](#cn9-跨-tab-跳转pop--push--选中) | [9. Moving between tabs: pop / push / select](#en9-moving-between-tabs-pop--push--select) |
+| [10. 角标 Badge](#cn10-角标-badge) | [10. Badges](#en10-badges) |
+| [11. Lottie 动画](#cn11-lottie-动画) | [11. Lottie animations](#en11-lottie-animations) |
+| [12. 深色模式](#cn12-深色模式) | [12. Dark Mode](#en12-dark-mode) |
+| [13. 多语言与切换根控制器](#cn13-多语言与切换根控制器) | [13. Localization and replacing the root view controller](#en13-localization-and-replacing-the-root-view-controller) |
+| [14. 隐藏 TabBar 与其他常用 API](#cn14-隐藏-tabbar-与其他常用-api) | [14. Hiding the tab bar and other common APIs](#en14-hiding-the-tab-bar-and-other-common-apis) |
+| [15. Objective-C → Swift 命名对照表](#cn15-objective-c--swift-命名对照表) | [15. Objective-C → Swift name map](#en15-objective-c--swift-name-map) |
+| [16. Swift Demo 索引](#cn16-swift-demo-索引) | [16. Swift demo index](#en16-swift-demo-index) |
+
+---
+
+## [CN]1. 导入：`import CYLTabBarController` 报错怎么办
+## [EN]1. Importing: when `import CYLTabBarController` fails
+
+| 中文 | English |
+|:---|:---|
+| Swift 只能 `import` **模块**（module）。#282 的报错（`No such module 'CYLTabBarController'` 或桥接头文件中 `'CYLTabBarController.h' file not found`）几乎都是因为本库没有以模块形式被 Swift 看到。按你的集成方式选择下面**一种**配置即可，**不需要**桥接头文件（Bridging Header）。 | Swift can only `import` a **module**. The errors in #282 (`No such module 'CYLTabBarController'`, or `'CYLTabBarController.h' file not found` in a bridging header) almost always mean Swift does not see the library as a module. Pick **one** of the setups below for your integration method; **no** bridging header is needed. |
+
+### [CN]方式 A：CocoaPods + `use_frameworks!`（推荐，所有 Swift Demo 都用这种）
+### [EN]Option A: CocoaPods + `use_frameworks!` (recommended; every Swift demo uses it)
+
+| 中文 | English |
+|:---|:---|
+| 摘自 [`Example-Swift/Podfile`](../Example-Swift/Podfile)。按需要选择一个 subspec： | From [`Example-Swift/Podfile`](../Example-Swift/Podfile). Pick one subspec: |
+
+```ruby
+platform :ios, '15.0'
+
+target 'YourApp' do
+  use_frameworks!   # [CN] 关键：让 Pod 以 framework（模块）形式构建  [EN] the key line: builds pods as frameworks (modules)
+
+  pod 'CYLTabBarController'                       # [CN] 默认 Core，不依赖 Lottie        [EN] Core only, no Lottie
+  # pod 'CYLTabBarController/LottieSwift'         # [CN] + Lottie 4.x（Swift 版）         [EN] + Lottie 4.x (Swift)
+  # pod 'CYLTabBarController/Lottie'              # [CN] + Lottie 2.5.x（ObjC 版）        [EN] + Lottie 2.5.x (Objective-C)
+  # pod 'CYLTabBarController/CYLFlatDesignTabBar' # [CN] 扁平样式，含 Lottie 4.x           [EN] flat design style, includes Lottie 4.x
+  # pod 'CYLTabBarController/CYLBadgeView'        # [CN] 只要角标组件，不含 TabBar         [EN] badges only, no tab bar
+end
+```
+
+| 中文 | English |
+|:---|:---|
+| 然后执行 `pod install`，**打开 `.xcworkspace`**（不是 `.xcodeproj`），在 Swift 文件中： | Then run `pod install`, **open the `.xcworkspace`** (not the `.xcodeproj`), and in your Swift files write: |
+
+```swift
+import UIKit
+import CYLTabBarController
+```
+
+### [CN]方式 B：CocoaPods 静态库（不使用 `use_frameworks!`）
+### [EN]Option B: CocoaPods as a static library (no `use_frameworks!`)
+
+| 中文 | English |
+|:---|:---|
+| 不想用动态 framework 时，开启 modular headers，CocoaPods 会为本库生成 module map，Swift 同样可以 `import CYLTabBarController`： | Without dynamic frameworks, turn on modular headers. CocoaPods then generates a module map for the library and Swift can still `import CYLTabBarController`: |
+
+```ruby
+platform :ios, '15.0'
+# use_modular_headers!            # [CN] 对所有 Pod 生效  [EN] for every pod
+pod 'CYLTabBarController', :modular_headers => true
+```
+
+### [CN]方式 C：Swift Package Manager
+### [EN]Option C: Swift Package Manager
+
+| 中文 | English |
+|:---|:---|
+| Xcode → File → Add Package Dependencies…，输入 `https://github.com/ChenYilong/CYLTabBarController.git`。SPM 产品等同于 CocoaPods 的 `CYLFlatDesignTabBar`（Core + FlatDesign + Lottie 4.x），最低 iOS 13。参考 [`Example-Swift-SwiftManager-FlatDesign`](../Example-Swift-SwiftManager-FlatDesign)。 | Xcode → File → Add Package Dependencies…, enter `https://github.com/ChenYilong/CYLTabBarController.git`. The SPM product matches the CocoaPods `CYLFlatDesignTabBar` subspec (Core + FlatDesign + Lottie 4.x) and needs iOS 13. See [`Example-Swift-SwiftManager-FlatDesign`](../Example-Swift-SwiftManager-FlatDesign). |
+
+```swift
+// Package.swift
+dependencies: [
+    .package(url: "https://github.com/ChenYilong/CYLTabBarController.git", from: "1.99.72"),
+],
+targets: [
+    .target(name: "YourApp", dependencies: [
+        .product(name: "CYLTabBarController", package: "CYLTabBarController"),
+    ]),
+]
+```
+
+### [CN]方式 D：Carthage
+### [EN]Option D: Carthage
+
+| 中文 | English |
+|:---|:---|
+| `Cartfile` 中添加 `github "ChenYilong/CYLTabBarController"`，执行 `carthage update --use-xcframeworks --platform iOS`，把生成的 `CYLTabBarController.xcframework` 拖入工程（Embed & Sign）。Carthage 构建范围与 Core 相同（不含 Lottie）。 | Add `github "ChenYilong/CYLTabBarController"` to `Cartfile`, run `carthage update --use-xcframeworks --platform iOS`, and drag the built `CYLTabBarController.xcframework` into the project (Embed & Sign). Carthage builds the same scope as Core (no Lottie). |
+
+### [CN]已有桥接头文件的混编工程
+### [EN]Mixed projects that already have a bridging header
+
+| 中文 | English |
+|:---|:---|
+| 如果工程本来就有自己的 OC 代码和 Bridging Header，也**不要**在里面写 `#import "CYLTabBarController.h"`（引号形式要求头文件在工程的 Header Search Paths 中，用 framework 集成时找不到）。任选一种写法： | If your project already has its own Objective-C code and a bridging header, do **not** write `#import "CYLTabBarController.h"` there: the quoted form needs the header on the project's Header Search Paths, which a framework integration does not set. Use one of these instead: |
+
+```objc
+// YourApp-Bridging-Header.h
+@import CYLTabBarController;                              // [CN] 推荐，见 Example-Swift-SwiftManager  [EN] recommended, as in Example-Swift-SwiftManager
+// #import <CYLTabBarController/CYLTabBarController.h>    // [CN] 等价的尖括号写法                      [EN] the equivalent angle-bracket form
+```
+
+| 中文 | English |
+|:---|:---|
+| 更简单的做法：Swift 文件直接 `import CYLTabBarController`，桥接头只放你自己的 OC 头文件。 | Simpler still: `import CYLTabBarController` in Swift files directly, and keep only your own Objective-C headers in the bridging header. |
+
+### [CN]常见报错速查
+### [EN]Error lookup
+
+| 中文 | English |
+|:---|:---|
+| **`No such module 'CYLTabBarController'`**：① 打开的是 `.xcodeproj` 而不是 `.xcworkspace`；② Podfile 没有 `use_frameworks!` 也没有 `:modular_headers => true`；③ 改完 Podfile 没有重新 `pod install`；④ 先 Product → Build 一次（模块要编译后才可见），仍不行就 Clean Build Folder（⇧⌘K）并删除 DerivedData。 | **`No such module 'CYLTabBarController'`**: ① you opened the `.xcodeproj` instead of the `.xcworkspace`; ② the Podfile has neither `use_frameworks!` nor `:modular_headers => true`; ③ you changed the Podfile without running `pod install` again; ④ build once (Product → Build; a module is visible only after it is built). If it still fails, Clean Build Folder (⇧⌘K) and delete DerivedData. |
+| **桥接头中 `'CYLTabBarController.h' file not found`**：改为 `@import CYLTabBarController;` 或尖括号形式，见上。 | **`'CYLTabBarController.h' file not found` in the bridging header**: switch to `@import CYLTabBarController;` or the angle-bracket form, see above. |
+| **`Use of unimplemented initializer 'init(nibName:bundle:)'` 或启动时栈溢出**：Swift 子类的初始化方法写法不对，见 [第 3 节](#cn3-继承-cyltabbarcontroller)。 | **`Use of unimplemented initializer 'init(nibName:bundle:)'`, or a stack overflow at launch**: the Swift subclass's initializers are wrong; see [section 3](#en3-subclassing-cyltabbarcontroller). |
+| **`Cannot find 'CYLTabBarLottieURL' in scope`** 等 Lottie / FlatDesign 符号找不到：只引入了 Core。改用对应 subspec（`LottieSwift`、`CYLFlatDesignTabBar`）或 SPM。 | **`Cannot find 'CYLTabBarLottieURL' in scope`** or other Lottie / FlatDesign symbols missing: only Core is installed. Use the matching subspec (`LottieSwift`, `CYLFlatDesignTabBar`) or SPM. |
+| **PlusButton 不显示**：`CYLPlusButtonSubclass.register()` 必须在创建 TabBarController **之前**调用。 | **The PlusButton does not show**: call `CYLPlusButtonSubclass.register()` **before** creating the tab bar controller. |
+
+---
+
+## [CN]2. 五分钟上手
+## [EN]2. Quick start
+
+| 中文 | English |
+|:---|:---|
+| 完整工程见 [`Example-Swift`](../Example-Swift)。三步：注册 PlusButton（可选）→ 准备子控制器和 `tabBarItemsAttributes` → 创建 `CYLTabBarController` 作为根控制器。 | The full project is [`Example-Swift`](../Example-Swift). Three steps: register a PlusButton (optional) → prepare the child view controllers and `tabBarItemsAttributes` → create a `CYLTabBarController` as the root. |
+
+### [CN]第 1 步：AppDelegate 中注册 PlusButton
+### [EN]Step 1: register the PlusButton in AppDelegate
+
+```swift
+import UIKit
+import CYLTabBarController
+
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // [CN] 必须在创建 CYLTabBarController 之前调用；不需要中间按钮就不调用。
+        // [EN] Must run before any CYLTabBarController is created; skip it if you need no center button.
+        CYLPlusButtonSubclass.register()
+        return true
+    }
+
+    func application(_ application: UIApplication,
+                     configurationForConnecting connectingSceneSession: UISceneSession,
+                     options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
+}
+```
+
+### [CN]第 2 步：子控制器与 Tab 属性
+### [EN]Step 2: child view controllers and tab attributes
+
+```swift
+func makeViewControllers() -> [UIViewController] {
+    [HomeViewController(), ConnectionViewController(), MessageViewController(), PersonalViewController()]
+        .map { UINavigationController(rootViewController: $0) }
+}
+
+// [CN] 写法一：手写字典（key 见第 4 节）
+// [EN] Form 1: dictionaries by hand (keys in section 4)
+func makeTabBarItemsAttributes() -> [[AnyHashable: Any]] {
+    [
+        [CYLTabBarItemTitle: "首页", CYLTabBarItemImage: "home_normal",     CYLTabBarItemSelectedImage: "home_highlight"],
+        [CYLTabBarItemTitle: "鱼塘", CYLTabBarItemImage: "fishpond_normal", CYLTabBarItemSelectedImage: "fishpond_highlight"],
+        [CYLTabBarItemTitle: "消息", CYLTabBarItemImage: "message_normal",  CYLTabBarItemSelectedImage: "message_highlight"],
+        [CYLTabBarItemTitle: "我的", CYLTabBarItemImage: "account_normal",  CYLTabBarItemSelectedImage: "account_highlight"],
+    ]
+}
+
+// [CN] 写法二：并列数组 + 自动本地化标题 + 深色图（Example-Swift/MainTabBarController.swift）
+// [EN] Form 2: parallel arrays, localized titles and dark images (Example-Swift/MainTabBarController.swift)
+let attributes = CYLLocalizedTabBarItemsAttributes(
+    ["首页", "鱼塘", "消息", "我的"],                                                 // titles → CYLLocalizedString()
+    ["home_normal", "fishpond_normal", "message_normal", "account_normal"],          // images
+    ["home_highlight", "fishpond_highlight", "message_highlight", "account_highlight"], // selected images
+    [2: "message_normal_night"])                                                     // index → dark image (or nil)
+```
+
+| 中文 | English |
+|:---|:---|
+| `viewControllers` 与 `tabBarItemsAttributes` 数量必须一致；PlusButton **不**计入其中。 | `viewControllers` and `tabBarItemsAttributes` must have the same count; the PlusButton is **not** part of either. |
+
+### [CN]第 3 步：SceneDelegate 中设置根控制器
+### [EN]Step 3: set the root view controller in SceneDelegate
+
+```swift
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    var window: UIWindow?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let windowScene = scene as? UIWindowScene else { return }
+        let window = UIWindow(windowScene: windowScene)
+
+        // [CN] 最简单的写法
+        // [EN] The simplest form
+        // window.rootViewController = CYLTabBarController(viewControllers: makeViewControllers(),
+        //                                                 tabBarItemsAttributes: makeTabBarItemsAttributes())
+
+        // [CN] 推荐：用 provider，App 内切换语言后会自动重建，所有文字立即变为新语言（见第 13 节）
+        // [EN] Recommended: a provider, rebuilt after an in-app language change so every text updates (section 13)
+        window.cyl_setRootViewControllerProvider {
+            let tabBarController = CYLTabBarController(viewControllers: makeViewControllers(),
+                                                       tabBarItemsAttributes: makeTabBarItemsAttributes())
+            tabBarController.tabBarStyleType = .liquidGlass
+            return tabBarController
+        }
+        window.makeKeyAndVisible()
+        self.window = window
+    }
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 所有可用的初始化方法（Swift 签名）： | Every initializer (Swift signatures): |
+
+```swift
+CYLTabBarController(viewControllers: vcs, tabBarItemsAttributes: attrs)
+CYLTabBarController(viewControllers: vcs, tabBarItemsAttributes: attrs, context: "home")
+CYLTabBarController(viewControllers: vcs, tabBarItemsAttributes: attrs,
+                    imageInsets: .zero,
+                    titlePositionAdjustment: UIOffset(horizontal: 0, vertical: -3.5))
+CYLTabBarController(viewControllers: vcs, tabBarItemsAttributes: attrs,
+                    imageInsets: .zero,
+                    titlePositionAdjustment: UIOffset(horizontal: 0, vertical: -3.5),
+                    context: "")
+CYLTabBarController(viewControllers: vcs, tabBarItemsAttributes: attrs,
+                    imageInsets: .zero,
+                    titlePositionAdjustment: .zero,
+                    styleType: .liquidGlass,
+                    context: "")
+```
+
+---
+
+## [CN]3. 继承 CYLTabBarController
+## [EN]3. Subclassing CYLTabBarController
+
+| 中文 | English |
+|:---|:---|
+| 需要重写代理方法、改样式时一般会继承。Swift 子类有两个坑：① OC 的便利初始化方法会通过 `self` 转发到带 `styleType:` 的指定初始化方法，**两个都要 override**，否则运行时报 `Use of unimplemented initializer`；② `init(nibName:bundle:)` **只能**转发给 `super.init(nibName:bundle:)`，在里面调用 `super.init(viewControllers:...)` 会无限递归导致栈溢出。以下摘自 [`Example-Swift-02/.../MainTabBarController.swift`](../Example-Swift-02/CYLTabBarController-Swift/Classes/Main/MainTabBarController.swift)： | You usually subclass to override delegate methods or change the style. Two traps in Swift: ① the Objective-C convenience initializers forward through `self` to the designated one with `styleType:`, so **override both**, or you get `Use of unimplemented initializer` at run time; ② `init(nibName:bundle:)` must **only** forward to `super.init(nibName:bundle:)`; calling `super.init(viewControllers:...)` from it recurses until the stack overflows. From [`Example-Swift-02/.../MainTabBarController.swift`](../Example-Swift-02/CYLTabBarController-Swift/Classes/Main/MainTabBarController.swift): |
+
+```swift
+import UIKit
+import CYLTabBarController
+
+class MainTabBarController: CYLTabBarController {
+
+    override init(viewControllers: [UIViewController],
+                  tabBarItemsAttributes: [[AnyHashable: Any]],
+                  imageInsets: UIEdgeInsets,
+                  titlePositionAdjustment: UIOffset,
+                  context: String?) {
+        super.init(viewControllers: viewControllers, tabBarItemsAttributes: tabBarItemsAttributes,
+                   imageInsets: imageInsets, titlePositionAdjustment: titlePositionAdjustment, context: context)
+    }
+
+    // [CN] 上面的方法会经 `self` 转发到这里，所以也必须 override
+    // [EN] The initializer above forwards here through `self`, so it must be overridden too
+    override init(viewControllers: [UIViewController],
+                  tabBarItemsAttributes: [[AnyHashable: Any]],
+                  imageInsets: UIEdgeInsets,
+                  titlePositionAdjustment: UIOffset,
+                  styleType: CYLTabBarStyleType,
+                  context: String?) {
+        super.init(viewControllers: viewControllers, tabBarItemsAttributes: tabBarItemsAttributes,
+                   imageInsets: imageInsets, titlePositionAdjustment: titlePositionAdjustment,
+                   styleType: styleType, context: context)
+    }
+
+    // [CN] 只转发给 super，不要在这里构建 Tab
+    // [EN] Only forward to super; don't build tabs here
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // [CN] 便利构造：外部只需 MainTabBarController()
+    // [EN] Convenience: callers just write MainTabBarController()
+    convenience init(context: String = "") {
+        self.init(viewControllers: Self.makeViewControllers(),
+                  tabBarItemsAttributes: Self.makeTabBarItemsAttributes(),
+                  imageInsets: .zero,
+                  titlePositionAdjustment: UIOffset(horizontal: 0, vertical: -3.5),
+                  context: context)
+    }
+
+    override func viewDidLoad() {
+        // [CN] 样式、Lottie 速度要在 super.viewDidLoad() 之前设置
+        // [EN] Set the style and Lottie speed before super.viewDidLoad()
+        tabBarStyleType = .liquidGlass
+        lottieAnimationSpeed = 1.5
+        super.viewDidLoad()
+        delegate = self
+    }
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 不继承也可以：直接创建 `CYLTabBarController`，再设置 `delegate` 为你自己的对象（遵守 `CYLTabBarControllerDelegate`，见第 7 节）。 | Subclassing is optional: create a `CYLTabBarController` and set its `delegate` to your own object (conforming to `CYLTabBarControllerDelegate`, section 7). |
+
+---
+
+## [CN]4. tabBarItemsAttributes 全部 key
+## [EN]4. All tabBarItemsAttributes keys
+
+| 中文 | English |
+|:---|:---|
+| 每个 Tab 一个字典，key 是全局 `String` 常量，Swift 中直接使用。图片既可以是图片名（`String`），也可以是 `UIImage`。 | One dictionary per tab. The keys are global `String` constants, used as is in Swift. An image is either a name (`String`) or a `UIImage`. |
+
+| Key | 中文说明 | English |
+|:---|:---|:---|
+| `CYLTabBarItemTitle` | 标题（`String`），不设置则只显示图标 | Title (`String`); without one only the icon shows |
+| `CYLTabBarItemImage` | 未选中图标 | Unselected icon |
+| `CYLTabBarItemSelectedImage` | 选中图标 | Selected icon |
+| `CYLTabBarItemDarkImage` | 深色模式未选中图标 | Unselected icon in Dark Mode |
+| `CYLTabBarItemSelectedDarkImage` | 深色模式选中图标 | Selected icon in Dark Mode |
+| `CYLTabBarItemImageInsets` | 图标内边距，`NSValue(uiEdgeInsets:)` | Icon insets, `NSValue(uiEdgeInsets:)` |
+| `CYLTabBarItemTitlePositionAdjustment` | 标题偏移，`NSValue(uiOffset:)` | Title offset, `NSValue(uiOffset:)` |
+| `CYLTabBarItemImagePositionAdjustment` | 图标偏移，`NSValue(uiOffset:)` | Icon offset, `NSValue(uiOffset:)` |
+| `CYLTabBarItemIdentifier` | Tab 标识（`String`），见第 8 节 | Tab identifier (`String`), section 8 |
+| `CYLTabBarLottieURL` | Lottie 文件 `URL` | Lottie file `URL` |
+| `CYLTabBarLottieFilePath` | Lottie 文件路径（`String`） | Lottie file path (`String`) |
+| `CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath` | 深色模式 Lottie 文件 | Dark Mode Lottie file |
+| `CYLTabBarLottieDarkColors` | `[keypath: UIColor]`，一份 Lottie 文件适配深色（仅 Lottie 4.x） | `[keypath: UIColor]`: one Lottie file follows Dark Mode (Lottie 4.x only) |
+| `CYLTabBarLottieSize` | Lottie 视图尺寸，`NSValue(cgSize:)` | Lottie view size, `NSValue(cgSize:)` |
+
+```swift
+// [CN] 一个"满配" Tab，摘自 Example-Swift-SwiftManager-FlatDesign/MainTabBarController.swift
+// [EN] A tab using most keys, from Example-Swift-SwiftManager-FlatDesign/MainTabBarController.swift
+var attrs: [String: Any] = [
+    CYLTabBarItemTitle: CYLLocalizedString("首页"),
+    CYLTabBarItemImage: "home_normal",
+    CYLTabBarItemSelectedImage: "home_highlight",
+    CYLTabBarItemDarkImage: "home_normal_night",
+    CYLTabBarItemImagePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: 1.5)),
+    CYLTabBarItemTitlePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: -1.5)),
+    CYLTabBarItemIdentifier: "home",
+]
+if let url = Bundle.main.url(forResource: "tabbar_home_normal", withExtension: "json") {
+    attrs[CYLTabBarLottieURL] = url
+    attrs[CYLTabBarLottieSize] = NSValue(cgSize: CGSize(width: 33, height: 33))
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 运行时整体替换 Tab（例如服务端下发配置后）：`reloadTabBarItems(withAttributes:)`。 | To replace all tabs at run time (e.g. after the server sends a new configuration): `reloadTabBarItems(withAttributes:)`. |
+
+```swift
+tabBarController.tabBarItemsAttributes = newAttributes
+tabBarController.reloadTabBarItems(withAttributes: newAttributes)
+```
+
+---
+
+## [CN]5. PlusButton（中间凸起按钮）
+## [EN]5. PlusButton (the raised center button)
+
+| 中文 | English |
+|:---|:---|
+| 继承 `CYLPlusButton` 并遵守 `CYLPlusButtonSubclassing`。只有 `plusButton()` 是必须的，其余都是可选的 `static func`。摘自 [`Example-Swift/View/CYLPlusButtonSubclass.swift`](../Example-Swift/View/CYLPlusButtonSubclass.swift)： | Subclass `CYLPlusButton` and conform to `CYLPlusButtonSubclassing`. Only `plusButton()` is required; everything else is an optional `static func`. From [`Example-Swift/View/CYLPlusButtonSubclass.swift`](../Example-Swift/View/CYLPlusButtonSubclass.swift): |
+
+```swift
+import UIKit
+import CYLTabBarController
+
+class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
+
+    // [CN] 必须：返回按钮实例（每次调用都返回新实例）
+    // [EN] Required: return the button (a new instance on every call)
+    static func plusButton() -> Any {
+        CYLPlusButtonSubclass.cyl_plusButton(with: UIImage(named: "post_normal")!,
+                                             title: "发布",
+                                             selectedTitle: "选中",
+                                             selectedTitleColor: .blue)
+    }
+
+    // [CN] 在 TabBar 中的位置（下标从 0 开始）；实现 plusChildViewController() 时必须实现
+    // [EN] Position in the tab bar (0-based); required when you implement plusChildViewController()
+    static func indexOfPlusButtonInTabBar() -> UInt { 2 }
+
+    // [CN] 中心点 Y = multiplier × TabBar 高度 + constant；0.5 为居中，越小越靠上
+    // [EN] centerY = multiplier × tab bar height + constant; 0.5 is centered, smaller is higher
+    static func multiplier(ofTabBarHeight tabBarHeight: CGFloat) -> CGFloat { 0.3 }
+    static func constantOfPlusButtonCenterYOffset(forTabBarHeight tabBarHeight: CGFloat) -> CGFloat { -10 }
+
+    // [CN] 点击后像普通 Tab 一样切换到这个控制器
+    // [EN] Tapping selects this view controller like a normal tab
+    static func plusChildViewController() -> UIViewController {
+        UINavigationController(rootViewController: PublishViewController())
+    }
+    static func shouldSelectPlusChildViewController() -> Bool { true }
+
+    // [CN] 标题与其他 Tab 标题对齐在同一条中线上
+    // [EN] Align the title with the other tab titles
+    static func alignsTitleWithTabBarItemTitles() -> Bool { true }
+
+    // [CN] 标识，用于代理回调中区分（第 8 节）
+    // [EN] Identifier used in delegate callbacks (section 8)
+    static func tabBarItemIdentifier() -> String { "plus" }
+
+    // [CN] 多个 TabBarController 各自使用不同的 PlusButton 时，返回与 controller.context 相同的值
+    // [EN] With several tab bar controllers, return the same value as that controller's context
+    // static func tabBarContext() -> String { "home" }
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 不用 `cyl_plusButton(with:...)`，也可以完全自定义按钮（[`Example-Swift-03`](../Example-Swift-03/HealthyHome/Public/Root/CYLPlusButtonSubclass.swift)）： | Instead of `cyl_plusButton(with:...)` you can build the button yourself ([`Example-Swift-03`](../Example-Swift-03/HealthyHome/Public/Root/CYLPlusButtonSubclass.swift)): |
+
+```swift
+static func plusButton() -> Any {
+    let button = CYLPlusButtonSubclass()
+    button.setBackgroundImage(UIImage(named: "tabbar_database"), for: .normal)
+    button.setBackgroundImage(button.backgroundImage(for: .normal), for: .highlighted) // [CN] 按下不变暗 [EN] no dimming on touch
+    button.titleLabel?.font = .systemFont(ofSize: 15)
+    button.setTitle(CYLLocalizedString("菜单"), for: .normal)
+    button.setTitleColor(.white, for: .normal)
+    button.sizeToFit()                          // [CN] 必须有尺寸，否则点不到 [EN] needs a size, or taps are lost
+    button.cyl_keepShowingPlusButtonLabel = true
+    return button
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 注册 / 移除 / 读取： | Register / remove / read: |
+
+```swift
+CYLPlusButtonSubclass.register()                 // [CN] 创建 TabBarController 之前  [EN] before creating the tab bar controller
+CYLPlusButton.removePlusButton()                 // [CN] 移除最后注册的那个           [EN] remove the one registered last
+CYLPlusButton.removePlusButton(forTabBarContext: "home")
+
+CYLExternPlusButton.isSelected = true            // [CN] 最后注册的 PlusButton 实例    [EN] the last registered PlusButton
+CYLPlusChildViewController                       // [CN] 它对应的子控制器              [EN] its child view controller
+CYLPlusButton.plusButton(forTabBarContext: "home")
+CYLPlusButton.plusChildViewController(forTabBarContext: "home")
+
+control.cyl_isPlusButton()                       // [CN] 回调里判断是否为 PlusButton   [EN] is this control the plus button?
+```
+
+---
+
+## [CN]6. TabBar 样式：Liquid Glass / FlatDesign
+## [EN]6. Tab bar styles: Liquid Glass / FlatDesign
+
+| `CYLTabBarStyleType` | 中文 | English |
+|:---|:---|:---|
+| `.default` | 默认，本库自定义的 `CYLTabBar` | Default: the library's own `CYLTabBar` |
+| `.system` | 系统 `UITabBar` 外观 | System `UITabBar` look |
+| `.liquidGlass` | iOS 26 液态玻璃效果 | iOS 26 Liquid Glass |
+| `.flatDesign` | 扁平化 TabBar（需 `CYLFlatDesignTabBar` subspec 或 SPM） | Flat design tab bar (needs the `CYLFlatDesignTabBar` subspec or SPM) |
+
+```swift
+// [CN] 必须在 super.viewDidLoad() 之前设置，否则会走默认逻辑
+// [EN] Must be set before super.viewDidLoad(); otherwise the default style is used
+override func viewDidLoad() {
+    tabBarStyleType = .liquidGlass
+    super.viewDidLoad()
+}
+```
+
+```swift
+// [CN] FlatDesign：在 init 中设置，并先触发 cyl_tabBar 创建（Example-Swift-SwiftManager-FlatDesign）
+// [EN] FlatDesign: set it in init and create cyl_tabBar first (Example-Swift-SwiftManager-FlatDesign)
+class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarControllerDelegate {
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        delegate = self
+        tabBarStyleType = .flatDesign
+        _ = cyl_tabBar            // [CN] 先创建扁平 TabBar  [EN] create the flat tab bar first
+        tabBarHeight = 60         // [CN] 之后才能设置高度    [EN] only then can the height be set
+        tabBarItemsAttributes = makeAttributes()
+        viewControllers = makeViewControllers()
+    }
+    required init?(coder: NSCoder) { fatalError() }
+
+    func applyFlatTheme() {
+        // [CN] 扁平样式下系统 tabBar 已隐藏，外观要设置在 cyl_tabBar 上
+        // [EN] In flat design the system tabBar is hidden; style cyl_tabBar instead
+        guard let flatTabBar = cyl_tabBar as? CYLFlatDesignTabBar else { return }
+        flatTabBar.tintColor = UIColor.cyl_color(withLight: .black, dark: .white)
+        flatTabBar.backgroundColor = UIColor.cyl_color(withLight: .white, dark: .black)
+        flatTabBar.backgroundImage = UIImage()
+        flatTabBar.shadowImage = UIImage.cyl_image(with: .lightGray, size: CGSize(width: 1, height: 1)) ?? UIImage()
+    }
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 非扁平样式下用系统 API 设置外观即可（iOS 26 液态玻璃中不建议设置 `UITabBar.appearance().backgroundColor`，它会干扰未选中文字颜色）： | Outside flat design, style it with the system API. (With iOS 26 Liquid Glass, avoid `UITabBar.appearance().backgroundColor`: it disturbs the unselected title color.) |
+
+```swift
+tabBar.tintColor = .systemBlue
+tabBar.unselectedItemTintColor = .gray
+
+let appearance = UITabBarAppearance()
+appearance.configureWithOpaqueBackground()
+appearance.backgroundColor = .systemBackground
+appearance.shadowColor = .clear                    // [CN] 去掉顶部分割线 [EN] remove the top separator
+tabBar.standardAppearance = appearance
+tabBar.scrollEdgeAppearance = appearance
+
+hideTabBarShadowImageView()                         // [CN] 或用本库方法隐藏分割线 [EN] or hide it with the library
+```
+
+---
+
+## [CN]7. 代理回调
+## [EN]7. Delegate callbacks
+
+| 中文 | English |
+|:---|:---|
+| `CYLTabBarController` 自己就是 `UITabBarControllerDelegate`，子类直接 `override`；不继承时让你的对象遵守 `CYLTabBarControllerDelegate`。**注意：`didSelect control` 回调需要设置 `delegate`**（例如在子类中 `delegate = self`）。 | `CYLTabBarController` is its own `UITabBarControllerDelegate`, so a subclass just `override`s; without a subclass, make your object conform to `CYLTabBarControllerDelegate`. **The `didSelect control` callback needs a `delegate`** (e.g. `delegate = self` in the subclass). |
+
+```swift
+extension MainTabBarController {
+
+    // [CN] 每次点击 Tab 按钮或 PlusButton（包括再次点击已选中的 Tab）
+    // [EN] Every tap on a tab button or the plus button (including the selected tab again)
+    override func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
+        if control.cyl_isPlusButton() {
+            print("plus button")
+        }
+        print("tapped", control.cyl_tabBarItemIdentifier ?? "nil",
+              "index", control.cyl_tabBarChildViewControllerIndex)
+    }
+
+    // [CN] 是否允许切换；调用 updateSelectionStatusIfNeeded 以保持 PlusButton 选中状态正确
+    // [EN] Allow the switch; call updateSelectionStatusIfNeeded so the plus button's selected state stays right
+    override func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        updateSelectionStatusIfNeeded(for: tabBarController, shouldSelect: viewController)
+        return true
+    }
+
+    // [CN] 液态玻璃下是否显示选中"透镜"
+    // [EN] Show the Liquid Glass selection lens?
+    override func tabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor control: UIControl) -> Bool {
+        true
+    }
+
+    override func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        let content = viewController.cyl_getViewControllerInsteadOfNavigation() // [CN] 跳过导航控制器 [EN] skips the navigation controller
+        print("selected", content)
+    }
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 不继承时： | Without a subclass: |
+
+```swift
+final class TabBarCoordinator: NSObject, CYLTabBarControllerDelegate {
+    func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
+        print(control.cyl_tabBarItemIdentifier ?? "")
+    }
+}
+
+let coordinator = TabBarCoordinator()   // [CN] 需强引用，delegate 是 weak [EN] keep it alive; delegate is weak
+tabBarController.delegate = coordinator
+```
+
+---
+
+## [CN]8. Tab 标识（按标识而不是下标定位 Tab）
+## [EN]8. Tab identifiers (find tabs by identifier, not index)
+
+| 中文 | English |
+|:---|:---|
+| Tab 会动态增减时（例如服务端隐藏某个 Tab），下标不可靠。给每个 Tab 一个 `CYLTabBarItemIdentifier`，PlusButton 实现 `tabBarItemIdentifier()`。不设置时默认值为内容控制器的类名（Swift 类不含模块名）。摘自 [`Example-Swift-02`](../Example-Swift-02/CYLTabBarController-Swift/Classes/Main/MainRootNavigationViewController.swift)： | When tabs come and go (e.g. the server hides one), indexes are unreliable. Give each tab a `CYLTabBarItemIdentifier`, and implement `tabBarItemIdentifier()` on the PlusButton. Without one, the default is the content view controller's class name (Swift classes without the module). From [`Example-Swift-02`](../Example-Swift-02/CYLTabBarController-Swift/Classes/Main/MainRootNavigationViewController.swift): |
+
+```swift
+let withIdentifiers = zip(attributes, ["home", "city", "message", "mine"]).map { item, identifier in
+    var item = item
+    item[CYLTabBarItemIdentifier] = identifier
+    return item
+}
+```
+
+```swift
+tabBarController.cyl_tabBarItemIdentifiers                          // ["home", "city", "plus", "message", "mine"]
+tabBarController.cyl_selectedTabBarItemIdentifier                   // "home"
+tabBarController.cyl_index(ofTabBarItemIdentifier: "message")      // 3 (NSNotFound if missing)
+tabBarController.cyl_viewController(withTabBarItemIdentifier: "message")
+tabBarController.cyl_control(withTabBarItemIdentifier: "plus")     // UIControl?
+tabBarController.cyl_selectTabBarItem(withIdentifier: "message")   // [CN] 选中并返回控制器 [EN] selects and returns it
+tabBarController.cyl_defaultTabBarItemIdentifier(for: someViewController)
+
+// [CN] 在回调中区分
+// [EN] Tell tabs apart in a callback
+override func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
+    switch control.cyl_tabBarItemIdentifier {
+    case "plus":    print("plus button")
+    case "message": print("message tab, wherever it is now")
+    default: break
+    }
+}
+```
+
+---
+
+## [CN]9. 跨 Tab 跳转：Pop / Push / 选中
+## [EN]9. Moving between tabs: pop / push / select
+
+| 中文 | English |
+|:---|:---|
+| 以下方法定义在 `UIViewController` 的扩展上，在任意子页面中调用即可。摘自 [`Example-Swift-02/.../NextHomeViewController.swift`](../Example-Swift-02/CYLTabBarController-Swift/Classes/Home/NextHomeViewController.swift)： | These are `UIViewController` extension methods; call them from any page. From [`Example-Swift-02/.../NextHomeViewController.swift`](../Example-Swift-02/CYLTabBarController-Swift/Classes/Home/NextHomeViewController.swift): |
+
+```swift
+// [CN] Pop 到当前导航栈底，并选中第 1 个 Tab
+// [EN] Pop to the root of the current stack and select tab 1
+cyl_popSelectTabBarChildViewController(at: 1)
+
+// [CN] 按标识：Pop 到栈底并选中"消息"，带 pop 动画
+// [EN] By identifier: pop to the root and select "message", animated
+cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier: "message", animated: true)
+
+// [CN] 选中"我的"后，在 completion 中向该 Tab push 页面
+// [EN] Select "mine", then push a page onto it in the completion
+cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier: "mine") { selected in
+    let detail = DetailViewController()
+    detail.hidesBottomBarWhenPushed = true
+    selected.navigationController?.pushViewController(detail, animated: true)
+}
+
+// [CN] Pop 当前栈、选中"同城"，再 push 一个页面
+// [EN] Pop the current stack, select "city", then push a page
+let next = DetailViewController()
+next.hidesBottomBarWhenPushed = true
+cyl_pushOrPop(to: next, animated: true, tabBarItemIdentifier: "city") { _, completionHandler in
+    // (shouldPop, viewControllerPopTo, shouldPopSelectTabBarChildViewController, index)
+    // [CN] 按标识选中时 index 被忽略 [EN] index is ignored when selecting by identifier
+    completionHandler(false, nil, true, 0)
+}
+
+// [CN] 未知标识返回 nil，什么都不做
+// [EN] An unknown identifier returns nil and does nothing
+let selected = cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier: "unknown") // nil
+```
+
+| 中文 | English |
+|:---|:---|
+| 在任意子页面中拿到 TabBarController 及相关信息： | Reach the tab bar controller and related info from any page: |
+
+```swift
+self.cyl_tabBarController                       // CYLTabBarController?
+self.cyl_tabBarController?.selectedIndex = 0
+viewController.cyl_getViewControllerInsteadOfNavigation() // [CN] 导航控制器则返回其根控制器 [EN] a navigation controller's root
+viewController.cyl_isPlaceholder                // [CN] 是否为 PlusButton 占位控制器 [EN] the plus button's placeholder?
+```
+
+---
+
+## [CN]10. 角标 Badge
+## [EN]10. Badges
+
+| 中文 | English |
+|:---|:---|
+| 角标 API 可用于 `UIViewController`（即它的 Tab）、`UITabBarItem`、`UIBarButtonItem`、`UIControl`（包括 PlusButton）和任意 `UIView`。传 `""` 显示红点。 | The badge API works on `UIViewController` (its tab), `UITabBarItem`, `UIBarButtonItem`, `UIControl` (including the plus button) and any `UIView`. Pass `""` for a red dot. |
+
+```swift
+// [CN] Tab 按钮布局完成后执行（无需 dispatch_after），可任意多次调用
+// [EN] Runs once the tab buttons are laid out (no dispatch_after); call it as often as you like
+tabBarController.reloadBadges { tabBarController in
+    tabBarController.viewControllers?[0].cyl_showBadgeValue("", animationType: .breathe)  // red dot
+    tabBarController.viewControllers?[1].cyl_showBadgeValue("new", animationType: .scale)
+    tabBarController.viewControllers?[2].cyl_showBadgeValue("99+", animationType: .shake)
+    tabBarController.viewControllers?[3].cyl_showBadgeValue("8", animationType: .bounce)
+}
+
+// [CN] 在 Tab 的根页面中直接调用（导航控制器或其根控制器都指向同一个 Tab）
+// [EN] From a tab's root page (the navigation controller and its root both map to the same tab)
+self.cyl_showBadgeValue("3", animationType: .none)
+self.cyl_clearBadge()
+
+// [CN] 任意视图 / 控件 / 导航栏按钮
+// [EN] Any view / control / bar button item
+avatarView.cyl_showBadgeValue("1")
+avatarView.cyl_showBadge()            // [CN] 红点 [EN] red dot
+avatarView.cyl_clearBadge()
+avatarView.cyl_resumeBadge()          // [CN] 重新显示被隐藏的角标 [EN] show a hidden badge again
+avatarView.cyl_isShowBadge()
+navigationItem.rightBarButtonItem?.cyl_showBadgeValue("5", animationType: .bounce)
+navigationItem.rightBarButtonItem?.cyl_showBadgeValue("", animationType: .shake, backgroundColor: .cyl_randomColor)
+
+// [CN] PlusButton 的角标（Example-Shared/CYLPlusButtonBadgeDemo.swift）
+// [EN] A badge on the plus button (Example-Shared/CYLPlusButtonBadgeDemo.swift)
+if let plus = tabBarController.cyl_control(withTabBarItemIdentifier: "plus"), plus.cyl_isPlusButton() {
+    plus.cyl_showBadgeValue("1", animationType: .bounce)
+}
+```
+
+| `CYLBadgeAnimationType` | 中文 | English |
+|:---|:---|:---|
+| `.none` | 无动画 | No animation |
+| `.scale` / `.shake` / `.bounce` / `.breathe` | 循环：缩放 / 摇晃 / 弹跳 / 呼吸 | Repeating: scale / shake / bounce / breathe |
+| `.leftRightOnce` / `.rightLeftOnce` / `.fadeInOnce` / `.rollingOnce` / `.scaleOnce` | 播放一次 | Play once |
+
+```swift
+// [CN] 全局样式（在显示角标之前设置）
+// [EN] Global style (set before showing badges)
+CYLBadgeAppearance.global.backgroundColor = .systemPink
+CYLBadgeAppearance.global.textColor = .white
+CYLBadgeAppearance.global.font = .boldSystemFont(ofSize: 10)
+CYLBadgeAppearance.global.centerOffset = CGPoint(x: -5, y: 3)
+CYLBadgeAppearance.global.maximumBadgeNumber = 99      // [CN] 超过显示 "99+" [EN] larger shows "99+"
+
+// [CN] 单个对象的样式优先于全局
+// [EN] Per-object values win over global ones
+viewController.cyl_badgeBackgroundColor = .systemOrange
+cell.contentView.cyl_resetBadgeAppearance()             // [CN] 复用视图先重置 [EN] reset reused views first
+
+// [CN] 导航栏铃铛按钮 + 角标（HomeViewController.swift）
+// [EN] Bell button with a badge on the navigation bar (HomeViewController.swift)
+cyl_showNavigationBadge(value: "new", animationType: .breathe, backgroundColor: UIColor.cyl_randomColor)
+```
+
+| 中文 | English |
+|:---|:---|
+| 只要角标、不要 TabBar：`pod 'CYLTabBarController/CYLBadgeView'`，同样 `import CYLTabBarController`。 | Badges only, no tab bar: `pod 'CYLTabBarController/CYLBadgeView'`, still `import CYLTabBarController`. |
+
+---
+
+## [CN]11. Lottie 动画
+## [EN]11. Lottie animations
+
+| 中文 | English |
+|:---|:---|
+| 需要 `LottieSwift`（Lottie 4.x）、`Lottie`（2.5.x）、`CYLFlatDesignTabBar` subspec 或 SPM。只装 Core 时这些 key 被忽略，仍显示图片。 | Needs the `LottieSwift` (Lottie 4.x), `Lottie` (2.5.x) or `CYLFlatDesignTabBar` subspec, or SPM. With Core only, these keys are ignored and images show instead. |
+
+```swift
+// [CN] 一行为每个 Tab 加上 Lottie：main bundle 中的 <name>.json；存在 <name>_dark.json 时自动作为深色版本
+// [EN] One call adds Lottie to every tab: <name>.json in the main bundle; <name>_dark.json becomes the dark version
+let lottieAttributes = CYLTabBarItemsAttributesAddingLottieFiles(
+    attributes,
+    ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"],
+    nil) // [CN] bundle，nil 为 main bundle [EN] bundle; nil means main
+
+// [CN] 或手动设置
+// [EN] Or by hand
+item[CYLTabBarLottieURL] = Bundle.main.url(forResource: "tabbar_home", withExtension: "json")
+item[CYLTabBarLottieSize] = NSValue(cgSize: CGSize(width: 33, height: 33))
+```
+
+```swift
+// [CN] 播放速度：在 super.viewDidLoad() 之前设置
+// [EN] Playback speed: set before super.viewDidLoad()
+override func viewDidLoad() {
+    lottieAnimationSpeed = 1.5
+    super.viewDidLoad()
+    observeLottieAnimationViewDidAdd()
+}
+
+// [CN] 单独给某个 Tab 设置速度（Example-Swift/MainTabBarController.swift）
+// [EN] A speed for one tab only (Example-Swift/MainTabBarController.swift)
+private func observeLottieAnimationViewDidAdd() {
+    _ = NotificationCenter.default.addObserver(forName: .CYLTabBarItemLottieAnimationViewDidAdd,
+                                               object: nil, queue: .main) { [weak self] note in
+        guard let tabButton = note.object as? UIControl,
+              tabButton.cyl_tabBarController === self else { return }
+        if tabButton.cyl_tabBarChildViewControllerIndex == 0 {
+            tabButton.cyl_setLottieAnimationSpeed(2.0)
+        }
+    }
+}
+```
+
+---
+
+## [CN]12. 深色模式
+## [EN]12. Dark Mode
+
+| 中文 | English |
+|:---|:---|
+| 图片三种方式（优先级从低到高）：① Asset Catalog 中给图片设置 Dark 外观；② 命名约定：`home_normal` 会自动查找 `home_normal_dark`；③ 显式指定 `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage`。 | Three ways for images (lowest to highest priority): ① a Dark appearance in the Asset Catalog; ② naming convention: `home_normal` also finds `home_normal_dark`; ③ name it with `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage`. |
+
+```swift
+// [CN] 动态颜色 / 图片
+// [EN] Dynamic colors / images
+let color = UIColor.cyl_color(withLight: .black, dark: .white)
+let image = UIImage.cyl_image(withLight: UIImage(named: "logo"), dark: UIImage(named: "logo_night"))
+
+// [CN] Lottie 4.x：一份文件 + 深色颜色（keypath → UIColor）
+// [EN] Lottie 4.x: one file plus dark colors (keypath → UIColor)
+item[CYLTabBarLottieDarkColors] = [
+    "Icon_Shop_Normal.**.Color": UIColor(white: 0.78, alpha: 1),
+    "Icon_Shop_Active_Main.**.Color": UIColor(red: 0.15, green: 0.39, blue: 0.16, alpha: 1),
+]
+// [CN] 或一份深色文件
+// [EN] Or a separate dark file
+item[CYLTabBarLottieDarkURL] = Bundle.main.url(forResource: "tabbar_home_dark", withExtension: "json")
+```
+
+---
+
+## [CN]13. 多语言与切换根控制器
+## [EN]13. Localization and replacing the root view controller
+
+```swift
+// [CN] 本库的字符串表；标题经过它即可随 App 内语言切换
+// [EN] The library's string table; titles that go through it follow in-app language changes
+CYLLocalizedString("首页")
+
+// [CN] 翻译 xib / storyboard 中的 UILabel、UIButton、UITextField 文字
+// [EN] Translate the texts of UILabels, UIButtons and UITextFields from a xib / storyboard
+view.cyl_localizeTexts()
+
+// [CN] 替换根控制器：语言切换后自动重建；DEBUG 下旧 TabBarController 未释放会打印警告（#488）
+// [EN] Replace the root: rebuilt after a language change; in DEBUG, warns if the old controller leaks (#488)
+window.cyl_setRootViewControllerProvider {
+    MainTabBarController()
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 例如登录后进入主界面（[`Example-Swift-03/.../TabBarCommon.swift`](../Example-Swift-03/HealthyHome/Tool/TabBarCommon.swift)）： | For example, entering the main UI after login ([`Example-Swift-03/.../TabBarCommon.swift`](../Example-Swift-03/HealthyHome/Tool/TabBarCommon.swift)): |
+
+```swift
+class func tabBarSelectIndex(_ selectIndex: Int) {
+    CYLPlusButtonSubclass.register()
+    UIApplication.shared.delegate?.window??.cyl_setRootViewControllerProvider {
+        let tabBarController = RootTabBarController(viewControllers: viewControllers(),
+                                                    tabBarItemsAttributes: tabBarItemsAttributesForController())
+        tabBarController.tabBarStyleType = .liquidGlass
+        tabBarController.selectedIndex = selectIndex
+        return tabBarController
+    }
+}
+```
+
+---
+
+## [CN]14. 隐藏 TabBar 与其他常用 API
+## [EN]14. Hiding the tab bar and other common APIs
+
+```swift
+// [CN] push 时隐藏底部 TabBar（系统属性）
+// [EN] Hide the tab bar on push (system property)
+detail.hidesBottomBarWhenPushed = true
+
+// [CN] 扁平样式下显示 / 隐藏 TabBar；hidesBottomBarWhenPushed 优先
+// [EN] Show / hide the flat-design tab bar; hidesBottomBarWhenPushed wins
+tabBarController.setTabBarHidden(true, animated: true)
+tabBarController.isTabBarHidden
+
+// [CN] 高度、PlusButton、布局完成回调
+// [EN] Height, plus button, layout callback
+tabBarController.tabBarHeight = 60
+tabBarController.hasPlusButton()
+tabBarController.allItemsInTabBarCount()
+tabBarController.setViewDidLayoutSubViewsBlockInvokeOnce(true) { tabBarController in
+    print("tab bar laid out")
+}
+
+// [CN] 工具方法
+// [EN] Utilities
+CYLUtils.isLiquidGlassActive()       // [CN] 当前是否为液态玻璃 [EN] Liquid Glass active?
+tabBar.cyl_visibleControls()         // [CN] 可见的 Tab 按钮 [EN] visible tab buttons
+control.cyl_isPlusControl()          // [CN] PlusButton 或其子控制器的按钮 [EN] plus button or its child's button
+```
+
+---
+
+## [CN]15. Objective-C → Swift 命名对照表
+## [EN]15. Objective-C → Swift name map
+
+| 中文 | English |
+|:---|:---|
+| 规律：OC 的 `With...`、`For...` 介词变成 Swift 的参数标签，枚举去掉类型前缀（`CYLBadgeAnimationTypeBounce` → `.bounce`），通知名去掉 `Notification` 后缀。在 Xcode 中按住 ⌥ 点击 API 或打开头文件后选 "Generated Interface" 可查看 Swift 签名。 | Pattern: Objective-C prepositions like `With...` and `For...` become Swift argument labels, enum cases lose their type prefix (`CYLBadgeAnimationTypeBounce` → `.bounce`), and notification names lose the `Notification` suffix. ⌥-click an API in Xcode, or open a header and choose "Generated Interface", to see its Swift signature. |
+
+| Objective-C | Swift |
+|:---|:---|
+| `[[CYLTabBarController alloc] initWithViewControllers:vcs tabBarItemsAttributes:attrs]` | `CYLTabBarController(viewControllers: vcs, tabBarItemsAttributes: attrs)` |
+| `[CYLPlusButtonSubclass registerPlusButton]` | `CYLPlusButtonSubclass.register()` |
+| `+[CYLPlusButton cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:]` | `cyl_plusButton(with:title:selectedTitle:selectedTitleColor:)` |
+| `+multiplierOfTabBarHeight:` | `static func multiplier(ofTabBarHeight:)` |
+| `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` | `static func constantOfPlusButtonCenterYOffset(forTabBarHeight:)` |
+| `-tabBarController:didSelectControl:` | `tabBarController(_:didSelect:)` |
+| `-tabBarController:shouldShowPlatterLiquidLensViewForControl:` | `tabBarController(_:shouldShowPlatterLiquidLensViewFor:)` |
+| `-updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:` | `updateSelectionStatusIfNeeded(for:shouldSelect:)` |
+| `-reloadTabBarItemsWithAttributes:` | `reloadTabBarItems(withAttributes:)` |
+| `-reloadBadgesWithBlock:` | `reloadBadges { tabBarController in ... }` |
+| `-cyl_showBadgeValue:animationType:` | `cyl_showBadgeValue(_:animationType:)` |
+| `-cyl_popSelectTabBarChildViewControllerAtIndex:` | `cyl_popSelectTabBarChildViewController(at:)` |
+| `-cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:completion:` | `cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier:completion:)` |
+| `-cyl_selectTabBarItemWithIdentifier:` | `cyl_selectTabBarItem(withIdentifier:)` |
+| `-cyl_indexOfTabBarItemIdentifier:` | `cyl_index(ofTabBarItemIdentifier:)` |
+| `-cyl_controlWithTabBarItemIdentifier:` | `cyl_control(withTabBarItemIdentifier:)` |
+| `+[UIColor cyl_colorWithLightColor:darkColor:]` | `UIColor.cyl_color(withLight:dark:)` |
+| `+[UIImage cyl_imageWithLightImage:darkImage:]` | `UIImage.cyl_image(withLight:dark:)` |
+| `[CYLBadgeAppearance globalAppearance]` | `CYLBadgeAppearance.global` |
+| `CYLTabBarStyleTypeLiquidGlass` | `.liquidGlass` |
+| `CYLTabBarItemLottieAnimationViewDidAddNotification` | `.CYLTabBarItemLottieAnimationViewDidAdd` |
+
+---
+
+## [CN]16. Swift Demo 索引
+## [EN]16. Swift demo index
+
+| Demo | 集成方式 / Integration | 中文：演示内容 | English: what it shows |
+|:---|:---|:---|:---|
+| [`Example-Swift`](../Example-Swift) | CocoaPods `LottieSwift` + `use_frameworks!` | 子类初始化、Liquid Glass、Lottie 速度与深色颜色、PlusButton、SceneDelegate | Subclass initializers, Liquid Glass, Lottie speed and dark colors, PlusButton, SceneDelegate |
+| [`Example-Swift-02`](../Example-Swift-02) | CocoaPods + `use_frameworks!` | Tab 标识、按标识 Pop / Push、`didSelect control` 回调 | Tab identifiers, pop / push by identifier, `didSelect control` callback |
+| [`Example-Swift-03`](../Example-Swift-03) | CocoaPods Core + 桥接头 / bridging header | 自定义 PlusButton、手写属性字典、切换根控制器 | Custom PlusButton, attribute dictionaries by hand, replacing the root |
+| [`Example-Swift-04`](../Example-Swift-04) | CocoaPods + `use_frameworks!` | AppDelegate 中构建、`UITabBar.appearance()` | Building in AppDelegate, `UITabBar.appearance()` |
+| [`Example-Swift-SwiftManager`](../Example-Swift-SwiftManager) | SPM + `@import` 桥接头 / bridging header | SPM 混编、单元测试 | SPM in a mixed project, unit tests |
+| [`Example-Swift-SwiftManager-FlatDesign`](../Example-Swift-SwiftManager-FlatDesign) | SPM（本地包 / local package） | FlatDesign、主题切换、Lottie URL、导航栏角标 | FlatDesign, theme switching, Lottie URLs, navigation bar badges |
+| [`Example-Shared/CYLPlusButtonBadgeDemo.swift`](../Example-Shared/CYLPlusButtonBadgeDemo.swift) | — | 所有 Swift Demo 共用的 PlusButton 角标 | The plus button badge shared by every Swift demo |
+
+| 中文 | English |
+|:---|:---|
+| 运行 Demo：进入对应目录执行 `pod install`，打开生成的 `.xcworkspace`；SPM 的 Demo 直接打开 `.xcodeproj`。 | To run a demo: `pod install` in its directory and open the generated `.xcworkspace`; for the SPM demos open the `.xcodeproj` directly. |
+| 更多问题见 [FAQ](FAQ.md) 与 [README](../README.md)。 | See the [FAQ](FAQ.md) and the [README](../README.md) for more. |
