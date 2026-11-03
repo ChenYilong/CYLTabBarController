@@ -387,14 +387,8 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     return [tabBar isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)tabBar cyl_showsVerticalBar];
 }
 
-/*!
- * FIX: issue #636
- * [EN] Shows the moved title in the tab item under the plus button, except in the iOS 27.1 vertical bar: there the plus
- *      button is centered on its tab item, as without a title (`-[CYLTabBar plusButtonIndex]`), so the title would be
- *      under its image. The title comes back when the tab bar is horizontal again.
- * [CN] 在 PlusButton 下方的 TabBarItem 中显示移过去的标题；iOS 27.1 竖向栏除外：那里 PlusButton 与没有标题时一样居中于该 Tab
- *      （见 `-[CYLTabBar plusButtonIndex]`），标题会与图片重叠，因此隐藏；TabBar 恢复横向时标题重新显示。
- */
+/// Issue #636: the moved title in the tab item under the plus button (a new placeholder doesn't have it yet).
+/// 在 PlusButton 下方的 TabBarItem 中显示移过去的标题（新的占位控制器还没有标题）。
 - (void)cyl_updateTitleInTabBarItem {
     NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
     // The stand-in in the selected layer shares the tab item with the plus button. 选中图层中的替身与 PlusButton 共用 TabBarItem。
@@ -402,10 +396,8 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
         return;
     }
     UITabBarItem *tabBarItem = [self cyl_viewControllerOfTabBarItem].tabBarItem;
-    NSString *title = [self cyl_isInVerticalBar] ? nil : movedTitle;
-    BOOL isShown = title ? [tabBarItem.title isEqualToString:title] : tabBarItem.title == nil;
-    if (tabBarItem && !isShown) {
-        tabBarItem.title = title;
+    if (tabBarItem && ![tabBarItem.title isEqualToString:movedTitle]) {
+        tabBarItem.title = movedTitle;
     }
 }
 

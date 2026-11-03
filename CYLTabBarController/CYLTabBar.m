@@ -37,7 +37,6 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 /// See `cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h. 见 CYLPlusButton.h 中的 `cyl_appliesCenterYOffsetWithoutTitle`。
 @interface CYLPlusButton (CYLTabBarLayout)
 - (BOOL)cyl_isCenteredWithoutTitle;
-- (void)cyl_updateTitleInTabBarItem;
 - (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center;
 @end
 
@@ -612,9 +611,10 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         //      plus button stays here. Centre it on its placeholder tab button instead of the horizontal position.
         // [CN] 系统把 Tab 按钮移出本 TabBar，放进右侧竖向栏，而加号按钮仍在本 TabBar 上，需对齐到它的占位 Tab 按钮中心。
         UIView *verticalBarSlot = [self cyl_verticalBarTabButtonAtIndex:plusButtonIndex];
-        // Issue #636: no title in the vertical bar, where the plus button is centered on it; back in the horizontal bar.
-        // 竖向栏中 PlusButton 居中于该 Tab，隐藏其标题；恢复横向时重新显示。
-        [[CYLPlusButton plusButtonForOwner:self] cyl_updateTitleInTabBarItem];
+        // Issue #636: the plus button is centered on its tab in the vertical bar, so that tab's title is hidden in the
+        // selected layer there, and shown again in the horizontal bar. 竖向栏中 PlusButton 居中于该 Tab：隐藏选中图层中该 Tab
+        // 的标题，恢复横向时重新显示。
+        [self cyl_setPlusTabSelectedTitleHidden:(verticalBarSlot != nil) atIndex:plusButtonIndex];
         if (verticalBarSlot) {
             // Issue #636: centered on the slot, with or without a title, like a plus button without a title. The height
             // methods and the title alignment (`-cyl_alignedCenterForCenter:`) don't apply to the vertical bar.
@@ -688,6 +688,38 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     [[CYLPlusButton plusButtonForOwner:self] cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
 
     return plusButtonIndex;
+}
+
+/*!
+ * FIX: issue #636
+ * [EN] Hides the title of the plus button's tab in the selected layer (`-cyl_selectedContentControlFromContentControl:`)
+ *      while the tab bar is vertical, where the plus button is centered on that tab and the title would be under its image.
+ *      Shows it again when the tab bar is horizontal. Only that one label changes, and only a label hidden here is
+ *      shown again: the other titles keep their state.
+ * [CN] 竖向栏中 PlusButton 居中于该 Tab，标题会与图片重叠：隐藏选中图层（`-cyl_selectedContentControlFromContentControl:`）中
+ *      PlusButton 所在 Tab 的标题；恢复横向时重新显示。只改这一个标签，且只重新显示由这里隐藏的标签，其他标题保持原状态。
+ */
+- (void)cyl_setPlusTabSelectedTitleHidden:(BOOL)hidden atIndex:(NSUInteger)index {
+    static char CYLHiddenInVerticalBarKey;
+    if (![[CYLPlusButton plusButtonForOwner:self] cyl_showsTitleInTabBarItem]) {
+        return;
+    }
+    NSArray<UIControl *> *tabButtons = [self cyl_tabBarSubviews];
+    if (index == NSNotFound || index >= tabButtons.count) {
+        return;
+    }
+    UILabel *titleLabel = [self cyl_selectedContentControlFromContentControl:tabButtons[index]].cyl_tabLabel;
+    if (!titleLabel) {
+        return;
+    }
+    BOOL hiddenHere = [objc_getAssociatedObject(titleLabel, &CYLHiddenInVerticalBarKey) boolValue];
+    if (!hidden && !hiddenHere) {
+        return;
+    }
+    // Applied on every layout while vertical: the system may show the label again. 竖向时每次布局都设置：系统可能重新显示它。
+    titleLabel.hidden = hidden;
+    titleLabel.alpha = hidden ? 0 : 1;
+    objc_setAssociatedObject(titleLabel, &CYLHiddenInVerticalBarKey, @(hidden), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 /*!
