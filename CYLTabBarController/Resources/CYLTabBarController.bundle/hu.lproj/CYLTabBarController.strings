@@ -153,3 +153,8 @@
 "「%@」需要登录后才能查看" = "Jelentkezzen be a(z) „%@” megtekintéséhez";
 "登录" = "Bejelentkezés";
 "、" = ", ";
+
+/* Issue #91: plus button touchable area demo row. */
+"PlusButton 点击范围（issue #91）" = "A PlusButton érintési területe (issue #91)";
+"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Kapcsolja be a kapcsolót az érintési terület áttetsző pirossal való megjelenítéséhez, kapcsolja ki a normál megjelenéshez; a csúszkával megsokszorozhatja a területet. Most: %@x";
+"当前 TabBar 没有 PlusButton" = "Ezen a lapsávon nincs PlusButton";

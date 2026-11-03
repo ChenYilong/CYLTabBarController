@@ -153,3 +153,8 @@
 "「%@」需要登录后才能查看" = "Log ind for at se “%@”";
 "登录" = "Log ind";
 "、" = ", ";
+
+/* Issue #91: plus button touchable area demo row. */
+"PlusButton 点击范围（issue #91）" = "PlusButtons trykområde (issue #91)";
+"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Slå kontakten til for at vise trykområdet i halvgennemsigtig rød, fra for normalt udseende; træk i skyderen for at gange området. Nu: %@x";
+"当前 TabBar 没有 PlusButton" = "Denne fanelinje har ingen PlusButton";

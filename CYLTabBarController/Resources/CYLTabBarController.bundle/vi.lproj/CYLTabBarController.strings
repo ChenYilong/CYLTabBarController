@@ -153,3 +153,8 @@
 "「%@」需要登录后才能查看" = "Đăng nhập để xem “%@”";
 "登录" = "Đăng nhập";
 "、" = ", ";
+
+/* Issue #91: plus button touchable area demo row. */
+"PlusButton 点击范围（issue #91）" = "Vùng chạm của PlusButton (issue #91)";
+"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Bật công tắc để hiển thị vùng chạm màu đỏ trong mờ, tắt để trở lại bình thường; kéo thanh trượt để nhân vùng chạm. Hiện tại: %@x";
+"当前 TabBar 没有 PlusButton" = "Thanh tab này không có PlusButton";

@@ -153,3 +153,8 @@
 "「%@」需要登录后才能查看" = "Ak chcete zobraziť „%@“, prihláste sa";
 "登录" = "Prihlásiť";
 "、" = ", ";
+
+/* Issue #91: plus button touchable area demo row. */
+"PlusButton 点击范围（issue #91）" = "Dotyková oblasť PlusButton (issue #91)";
+"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Zapnutím prepínača zobrazíte dotykovú oblasť polopriehľadnou červenou, vypnutím obnovíte normálny vzhľad; posuvníkom oblasť znásobíte. Teraz: %@x";
+"当前 TabBar 没有 PlusButton" = "Tento panel kariet nemá PlusButton";
