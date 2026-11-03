@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="330" viewBox="0 0 760 330" font-family="-apple-system, Helvetica, Arial, sans-serif">
+  <rect width="760" height="330" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#555"/>
+    </marker>
+  </defs>
+  <rect x="20" y="20" width="300" height="290" rx="12" fill="#eef4ff" stroke="#3b6fd8" stroke-width="2"/>
+  <text x="170" y="48" text-anchor="middle" font-size="16" font-weight="700" fill="#1d3f87">tabBar.standardAppearance</text>
+  <text x="170" y="68" text-anchor="middle" font-size="12" fill="#1d3f87">UITabBarAppearance (one object)</text>
+  <g font-size="12" fill="#222">
+    <text x="36" y="98">backgroundEffect / Color / Image</text>
+    <text x="36" y="120">shadowColor / shadowImage</text>
+    <text x="36" y="142">selectionIndicatorImage / TintColor</text>
+    <text x="36" y="164">stackedItemPositioning / Width / Spacing</text>
+    <text x="36" y="192" font-weight="700">stackedLayoutAppearance</text>
+    <text x="46" y="212">.normal / .selected / .disabled</text>
+    <text x="56" y="232">titleTextAttributes · iconColor</text>
+    <text x="56" y="252">titlePositionAdjustment</text>
+    <text x="56" y="272">badgeBackgroundColor · badgeTextAttributes</text>
+    <text x="56" y="292">badgePositionAdjustment</text>
+  </g>
+  <rect x="460" y="40" width="280" height="100" rx="12" fill="#f3f3f3" stroke="#777" stroke-width="2"/>
+  <text x="600" y="78" text-anchor="middle" font-size="15" font-weight="700" fill="#222">UITabBar</text>
+  <text x="600" y="100" text-anchor="middle" font-size="12" fill="#444">Liquid Glass (iOS 26+) / classic</text>
+  <text x="600" y="120" text-anchor="middle" font-size="12" fill="#444">rendered by UIKit</text>
+  <rect x="460" y="190" width="280" height="100" rx="12" fill="#edf9ef" stroke="#2f9a46" stroke-width="2"/>
+  <text x="600" y="228" text-anchor="middle" font-size="15" font-weight="700" fill="#1f6b31">CYLFlatDesignTabBar</text>
+  <text x="600" y="250" text-anchor="middle" font-size="12" fill="#1f6b31">FlatDesign: mirrored by CYLTabBarController</text>
+  <text x="600" y="270" text-anchor="middle" font-size="12" fill="#1f6b31">mapped onto its own views</text>
+  <path d="M320 120 C 390 100, 400 90, 455 90" fill="none" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M320 210 C 390 230, 400 240, 455 240" fill="none" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+</svg>

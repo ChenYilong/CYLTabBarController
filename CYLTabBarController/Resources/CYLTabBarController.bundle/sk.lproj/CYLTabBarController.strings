@@ -154,3 +154,11 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Zobrazí animovaný GIF ako ikonu karty; ťuknutím znova obnovíte";
 "批量更换标题" = "Zmeniť všetky názvy";
 "一次更新所有 Tab 的标题，再点恢复" = "Aktualizuje názvy všetkých kariet naraz; ťuknutím znova obnovíte";
+"标题偏移（titlePositionAdjustment）" = "Posun titulku (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Klepnutím prepnete zvislý posun titulkov všetkých kariet, aktuálny: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "Motív standardAppearance (spoločný pre Liquid Glass a FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Klepnutím prepnete tabBar.standardAppearance, aktuálny: %@";
+"原始" = "Pôvodný";
+"深色" = "Tmavý";
+"居中胶囊" = "Kapsula v strede";
+"绿色描边" = "Zelená linka";

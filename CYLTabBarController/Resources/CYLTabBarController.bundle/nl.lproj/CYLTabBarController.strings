@@ -154,3 +154,11 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Toont een geanimeerde GIF als tabsymbool; tik opnieuw om te herstellen";
 "批量更换标题" = "Alle titels wijzigen";
 "一次更新所有 Tab 的标题，再点恢复" = "Werkt de titels van alle tabs tegelijk bij; tik opnieuw om te herstellen";
+"标题偏移（titlePositionAdjustment）" = "Titelverschuiving (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Tik om de verticale verschuiving van alle tabtitels te wisselen, huidig: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance-thema (gedeeld door Liquid Glass en FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Tik om tabBar.standardAppearance te wisselen, huidig: %@";
+"原始" = "Origineel";
+"深色" = "Donker";
+"居中胶囊" = "Gecentreerde capsule";
+"绿色描边" = "Groene lijn";

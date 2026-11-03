@@ -154,3 +154,11 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "このページのタブに GIF アニメを表示。もう一度タップで元に戻す";
 "批量更换标题" = "すべてのタイトルを変更";
 "一次更新所有 Tab 的标题，再点恢复" = "すべてのタブのタイトルを一度に更新。もう一度タップで元に戻す";
+"标题偏移（titlePositionAdjustment）" = "タイトルのオフセット（titlePositionAdjustment）";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "タップしてすべてのタブタイトルの垂直オフセットを切り替え、現在：%@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance テーマ（Liquid Glass と FlatDesign で共通）";
+"点击切换 tabBar.standardAppearance，当前：%@" = "タップして tabBar.standardAppearance を切り替え、現在：%@";
+"原始" = "オリジナル";
+"深色" = "ダーク";
+"居中胶囊" = "中央のカプセル";
+"绿色描边" = "緑のライン";

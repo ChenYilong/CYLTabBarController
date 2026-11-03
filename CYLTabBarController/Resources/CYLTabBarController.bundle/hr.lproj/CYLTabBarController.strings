@@ -154,3 +154,11 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Prikazuje animirani GIF kao ikonu kartice; dodirnite ponovno za vraćanje";
 "批量更换标题" = "Promijeni sve naslove";
 "一次更新所有 Tab 的标题，再点恢复" = "Ažurira naslove svih kartica odjednom; dodirnite ponovno za vraćanje";
+"标题偏移（titlePositionAdjustment）" = "Pomak naslova (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Dodirnite za promjenu okomitog pomaka naslova svih kartica, trenutačno: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "Tema standardAppearance (zajednička za Liquid Glass i FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Dodirnite za promjenu tabBar.standardAppearance, trenutačno: %@";
+"原始" = "Izvorno";
+"深色" = "Tamno";
+"居中胶囊" = "Centrirana kapsula";
+"绿色描边" = "Zelena linija";

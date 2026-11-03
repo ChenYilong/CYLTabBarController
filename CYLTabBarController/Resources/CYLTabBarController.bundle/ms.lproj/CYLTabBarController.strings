@@ -154,3 +154,11 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Memaparkan GIF animasi sebagai ikon tab; ketik lagi untuk memulihkan";
 "批量更换标题" = "Tukar semua tajuk";
 "一次更新所有 Tab 的标题，再点恢复" = "Mengemas kini tajuk semua tab sekali gus; ketik lagi untuk memulihkan";
+"标题偏移（titlePositionAdjustment）" = "Ofset tajuk (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Ketik untuk menukar ofset menegak tajuk semua tab, semasa: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "Tema standardAppearance (dikongsi oleh Liquid Glass dan FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Ketik untuk menukar tabBar.standardAppearance, semasa: %@";
+"原始" = "Asal";
+"深色" = "Gelap";
+"居中胶囊" = "Kapsul di tengah";
+"绿色描边" = "Garisan hijau";

@@ -154,3 +154,11 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Hiện ảnh GIF động làm biểu tượng tab; chạm lại để khôi phục";
 "批量更换标题" = "Đổi mọi tiêu đề";
 "一次更新所有 Tab 的标题，再点恢复" = "Cập nhật tiêu đề mọi tab cùng lúc; chạm lại để khôi phục";
+"标题偏移（titlePositionAdjustment）" = "Độ lệch tiêu đề (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Chạm để chuyển độ lệch dọc của tiêu đề tất cả các tab, hiện tại: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "Chủ đề standardAppearance (dùng chung cho Liquid Glass và FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Chạm để chuyển tabBar.standardAppearance, hiện tại: %@";
+"原始" = "Gốc";
+"深色" = "Tối";
+"居中胶囊" = "Viên nang ở giữa";
+"绿色描边" = "Đường viền xanh lá";

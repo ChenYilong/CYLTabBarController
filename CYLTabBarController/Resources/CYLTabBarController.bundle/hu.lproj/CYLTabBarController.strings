@@ -154,3 +154,11 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Animált GIF-et mutat lapikonként; koppintson újra a visszaállításhoz";
 "批量更换标题" = "Minden cím módosítása";
 "一次更新所有 Tab 的标题，再点恢复" = "Egyszerre frissíti az összes lap címét; koppintson újra a visszaállításhoz";
+"标题偏移（titlePositionAdjustment）" = "Címeltolás (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Koppintson az összes lap címének függőleges eltolásának váltásához, jelenlegi: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance téma (közös a Liquid Glass és a FlatDesign számára)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Koppintson a tabBar.standardAppearance váltásához, jelenlegi: %@";
+"原始" = "Eredeti";
+"深色" = "Sötét";
+"居中胶囊" = "Középre igazított kapszula";
+"绿色描边" = "Zöld vonal";

@@ -250,6 +250,45 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 /**
  *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性等等
  */
++ (UITabBarAppearance *)demoStandardAppearanceWithTitlePositionAdjustment:(UIOffset)titlePositionAdjustment {
+    // set the text color for unselected state
+    // 普通状态下的文字属性
+    NSDictionary *normalAttrs = @{
+        NSForegroundColorAttributeName : [UIColor redColor],
+        NSFontAttributeName : [UIFont systemFontOfSize:10],
+    };
+    // set the text color for selected state
+    // 选中状态下的文字属性
+    NSDictionary *selectedAttrs = @{
+        NSForegroundColorAttributeName : [UIColor cyl_systemGreenColor],
+        NSFontAttributeName : [UIFont systemFontOfSize:10],
+    };
+    UITabBarItemAppearance *stackedLayoutAppearance = [[UITabBarItemAppearance alloc] init];
+    // fix https://github.com/ChenYilong/CYLTabBarController/issues/456
+    stackedLayoutAppearance.normal.titlePositionAdjustment = titlePositionAdjustment;
+    // set the text Attributes
+    // 设置文字属性
+    [stackedLayoutAppearance.normal setTitleTextAttributes:normalAttrs];
+    [stackedLayoutAppearance.selected setTitleTextAttributes:selectedAttrs];
+    // The icon colors follow the titles (template images); FlatDesign maps them too.
+    // 图标颜色与标题一致（模板图片）；扁平样式同样映射。
+    stackedLayoutAppearance.selected.iconColor = [UIColor cyl_systemGreenColor];
+
+    UITabBarAppearance *standardAppearance = [[UITabBarAppearance alloc] init];
+    standardAppearance.stackedLayoutAppearance = stackedLayoutAppearance;
+    standardAppearance.inlineLayoutAppearance = stackedLayoutAppearance;
+    standardAppearance.compactInlineLayoutAppearance = stackedLayoutAppearance;
+    //FIX: #581 iOS15以上，iOS26以下，可以设置。
+    //iOS26 不推荐设置 `UITabBar.appearance().backgroundColor`。因为玻璃效果下，不仅无法设置背景，同时会干扰 TabBar 里的 Label 未选中颜色，因为 iOS26 里的未选中时的 Label 颜色为系统内部逻辑， 无法自定义。所以如果背景颜色， 与Label颜色一致，白底白字， 用户将无法辨认。暗黑模式下， 也会有类似问题。
+    if (!CYL_IS_IOS_26) {
+        //            standardAppearance.backgroundColor = [UIColor cyl_systemBackgroundColor];
+    }
+    //shadowColor和shadowImage均可以自定义颜色, shadowColor默认高度为1, shadowImage可以自定义高度.
+    standardAppearance.shadowColor = [UIColor cyl_systemGreenColor];
+    // standardAppearance.shadowImage = [[self class] imageWithColor:[UIColor cyl_systemGreenColor] size:CGSizeMake(self.cyl_tabBarController.visiableTabBarSize.width, 1)];
+    return standardAppearance;
+}
+
 - (void)customizeTabBarAppearanceWithTitlePositionAdjustment:(UIOffset)titlePositionAdjustment {
     //    if ([CYLConstants isLiquidGlassActive]) {
     //        return;
@@ -312,27 +351,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     if (@available(iOS 13.0, *)) {
         self.tabBar.unselectedItemTintColor = normalAttrs[NSForegroundColorAttributeName];
         
-        UITabBarItemAppearance *stackedLayoutAppearance = [[UITabBarItemAppearance alloc] init];
-        // fix https://github.com/ChenYilong/CYLTabBarController/issues/456
-        stackedLayoutAppearance.normal.titlePositionAdjustment = titlePositionAdjustment;
-        
-        // set the text Attributes
-        // 设置文字属性
-        [stackedLayoutAppearance.normal setTitleTextAttributes:normalAttrs];
-        [stackedLayoutAppearance.selected setTitleTextAttributes:selectedAttrs];
-        
-        UITabBarAppearance *standardAppearance = [[UITabBarAppearance alloc] init];
-        standardAppearance.stackedLayoutAppearance = stackedLayoutAppearance;
-        standardAppearance.inlineLayoutAppearance = stackedLayoutAppearance;
-        standardAppearance.compactInlineLayoutAppearance = stackedLayoutAppearance;
-        //FIX: #581 iOS15以上，iOS26以下，可以设置。
-        //iOS26 不推荐设置 `UITabBar.appearance().backgroundColor`。因为玻璃效果下，不仅无法设置背景，同时会干扰 TabBar 里的 Label 未选中颜色，因为 iOS26 里的未选中时的 Label 颜色为系统内部逻辑， 无法自定义。所以如果背景颜色， 与Label颜色一致，白底白字， 用户将无法辨认。暗黑模式下， 也会有类似问题。
-        if (!CYL_IS_IOS_26) {
-            //            standardAppearance.backgroundColor = [UIColor cyl_systemBackgroundColor];
-        }
-        //shadowColor和shadowImage均可以自定义颜色, shadowColor默认高度为1, shadowImage可以自定义高度.
-        standardAppearance.shadowColor = [UIColor cyl_systemGreenColor];
-        // standardAppearance.shadowImage = [[self class] imageWithColor:[UIColor cyl_systemGreenColor] size:CGSizeMake(self.cyl_tabBarController.visiableTabBarSize.width, 1)];
+        // The same appearance also styles the FlatDesign tab bar, see CYLFlatDesignMainTabBarController.
+        // 同一个 appearance 同样作用于扁平样式 TabBar，见 CYLFlatDesignMainTabBarController。
+        UITabBarAppearance *standardAppearance = [[self class] demoStandardAppearanceWithTitlePositionAdjustment:titlePositionAdjustment];
         self.tabBar.standardAppearance = standardAppearance;
         self.tabBar.scrollEdgeAppearance = standardAppearance;
         
@@ -668,10 +689,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
     // #535: the plus button's badge changes on every tap. Checked first: before iOS 26 `-cyl_isTabButton` is YES for the
     // plus button too. #535：每次点击 PlusButton，角标都会变化。需先判断：iOS 26 以前 `-cyl_isTabButton` 对 PlusButton 也返回 YES。
-    if ([control cyl_isPlusButton]) {
+    // `-cyl_isPlusControl` also covers the system tab button of the plus child view controller (the layer under the
+    // plus button). `-cyl_isPlusControl` 也包括 PlusButton 子控制器的系统 Tab 按钮（PlusButton 下方的图层）。
+    // Guard: plus button code only when this tab bar controller has one. 仅在有 PlusButton 时处理 PlusButton。
+    BOOL isPlusControl = [tabBarController hasPlusButton] && [control cyl_isPlusControl];
+    if (isPlusControl) {
         [tabBarController cyl_demo_plusButtonDidTap];
     }
-    if ([control cyl_isTabButton] && ![control cyl_isPlusButton]) {
+    if ([control cyl_isTabButton] && !isPlusControl) {
         //更改红标状态
         if ([control cyl_isShowBadge]) {
             if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
@@ -692,7 +717,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
     // The plus button of this tab bar controller's context (`CYLExternPlusButton` is the one registered last).
     UIButton *button = [CYLPlusButton plusButtonForOwner:tabBarController];
-    BOOL isPlusButton = [control cyl_isPlusButton];
+    BOOL isPlusButton = [tabBarController hasPlusButton] && [control cyl_isPlusControl];
     // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
     // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
     if (isPlusButton) {
@@ -829,6 +854,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (void)cyl_demo_showPlusButtonBadge {
     // The plus button of this tab bar controller's context. 当前 TabBarController 所在 context 的 PlusButton。
+    // Guard: only with a plus button. 仅在有 PlusButton 时处理。
+    if (![self hasPlusButton]) {
+        return;
+    }
     UIButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
     if (!plusButton) {
         return;
@@ -837,7 +866,17 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [self cyl_demo_setPlusButtonBadgeCount:count];
     // Same API and look as the tabs' badges (shared style: SceneDelegate.m -setUpBadgeAppearance).
     // 与 Tab 角标相同的 API 和样式（共用样式见 SceneDelegate.m -setUpBadgeAppearance）。
-    [plusButton cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(count)] animationType:CYLBadgeAnimationTypeBounce];
+    NSString *badgeValue = [NSString stringWithFormat:@"%@", @(count)];
+    [plusButton cyl_showBadgeValue:badgeValue animationType:CYLBadgeAnimationTypeBounce];
+    // With a plus child view controller there is a second layer: the system tab button of that view controller, under
+    // the plus button. Update it too, the way the other tabs' badges are set (on the view controller), so both always
+    // show the same value. 有 PlusButton 子控制器时还有第二个图层：PlusButton 下方该子控制器的系统 Tab 按钮。与其他 Tab 一样
+    // （在控制器上设置）同时更新它，两者始终显示相同的值。
+    // Guard: the second layer only exists with a plus child view controller. 仅在有 PlusButton 子控制器时存在第二个图层。
+    if ([self hasPlusChildViewController]) {
+        UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:self];
+        [plusChildViewController cyl_showBadgeValue:badgeValue animationType:CYLBadgeAnimationTypeBounce];
+    }
 #if defined(DEBUG) || defined(BETA)
     NSLog(@"🟣 #535 plus button badge %@ (Liquid Glass: %@, from CYLUtils)", @(count), [CYLUtils isLiquidGlassActive] ? @"YES" : @"NO");
 #endif

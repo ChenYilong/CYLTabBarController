@@ -96,6 +96,10 @@ class MainTabBarController: CYLTabBarController {
         
         
         super.viewDidLoad()
+        // `tabBarController(_:didSelect:)` (the plus button's badge, below) is a CYLTabBarControllerDelegate method:
+        // without a delegate it is never called and the badge never changes.
+        // `tabBarController(_:didSelect:)`（下方 PlusButton 的角标）是 CYLTabBarControllerDelegate 的方法：不设置 delegate 就不会回调，角标也不会变化。
+        delegate = self
         observeLottieAnimationViewDidAdd()
     }
 

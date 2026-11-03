@@ -55,6 +55,16 @@
         //        self.adjustTabBarItemImageViewSizeDependOnSuperView = NO;
         
         //        [self customizeTabBarAppearanceWithTitlePositionAdjustment:titlePositionAdjustment];
+        // One UITabBarAppearance for every style: the same object MainTabBarController gives the Liquid Glass tab bar.
+        // CYLTabBarController maps it onto the FlatDesign tab bar (background, shadow, title and icon colors, badges...),
+        // see `-[CYLFlatDesignTabBar standardAppearance]`.
+        // 所有样式共用一个 UITabBarAppearance：与 MainTabBarController 赋给液态玻璃 TabBar 的是同一个对象。CYLTabBarController 会将其
+        // 映射到扁平样式 TabBar（背景、阴影、标题与图标颜色、角标等），见 `-[CYLFlatDesignTabBar standardAppearance]`。
+#if CYL_FLATDESIGN_AVAILABLE
+        if (@available(iOS 13.0, *)) {
+            self.tabBar.standardAppearance = [MainTabBarController demoStandardAppearanceWithTitlePositionAdjustment:titlePositionAdjustment];
+        }
+#endif
         self.delegate = self;
         //        self.navigationController.navigationBar.hidden = YES;
     }
@@ -78,6 +88,8 @@
     //    [self setValue:tabBar forKey:@"cyl_tabBar"];
     CYLFlatDesignTabBar *cyl_tabBar = (CYLFlatDesignTabBar *)self.cyl_tabBar;
     
+    // Used only while no `standardAppearance` is set: the appearance assigned in `-init…` takes precedence.
+    // 仅在没有设置 `standardAppearance` 时使用：`-init…` 中赋值的 appearance 优先。
     cyl_tabBar.barTintColor = [UIColor whiteColor];
     cyl_tabBar.shadowImage = [UIImage cyl_imageWithColor:[UIColor.lightGrayColor colorWithAlphaComponent:0.5] size:CGSizeMake(1, 1)];
     
@@ -441,10 +453,14 @@ NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_F
 #endif
     // #535: the plus button's badge changes on every tap. Checked first: before iOS 26 `-cyl_isTabButton` is YES for the
     // plus button too. #535：每次点击 PlusButton，角标都会变化。需先判断：iOS 26 以前 `-cyl_isTabButton` 对 PlusButton 也返回 YES。
-    if ([control cyl_isPlusButton]) {
+    // `-cyl_isPlusControl` also covers the system tab button of the plus child view controller (the layer under the
+    // plus button). `-cyl_isPlusControl` 也包括 PlusButton 子控制器的系统 Tab 按钮（PlusButton 下方的图层）。
+    // Guard: plus button code only when this tab bar controller has one. 仅在有 PlusButton 时处理 PlusButton。
+    BOOL isPlusControl = [tabBarController hasPlusButton] && [control cyl_isPlusControl];
+    if (isPlusControl) {
         [tabBarController cyl_demo_plusButtonDidTap];
     }
-    if ([control cyl_isTabButton] && ![control cyl_isPlusButton]) {
+    if ([control cyl_isTabButton] && !isPlusControl) {
         //更改红标状态
         if ([control cyl_isShowBadge]) {
             if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {

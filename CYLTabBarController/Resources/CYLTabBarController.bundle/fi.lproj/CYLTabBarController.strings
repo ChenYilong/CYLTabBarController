@@ -154,3 +154,11 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Näyttää animoidun GIF-kuvan välilehden kuvakkeena; palauta napauttamalla uudelleen";
 "批量更换标题" = "Muuta kaikki otsikot";
 "一次更新所有 Tab 的标题，再点恢复" = "Päivittää kaikkien välilehtien otsikot kerralla; palauta napauttamalla uudelleen";
+"标题偏移（titlePositionAdjustment）" = "Otsikon siirtymä (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Napauta vaihtaaksesi kaikkien välilehtien otsikoiden pystysiirtymää, nykyinen: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance-teema (yhteinen Liquid Glassille ja FlatDesignille)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Napauta vaihtaaksesi tabBar.standardAppearance, nykyinen: %@";
+"原始" = "Alkuperäinen";
+"深色" = "Tumma";
+"居中胶囊" = "Keskitetty kapseli";
+"绿色描边" = "Vihreä viiva";

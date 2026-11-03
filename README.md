@@ -95,6 +95,7 @@ Update to CYLTabBarController 1.99.66 to see the demo:
 | ✅ iOS 27 下无需新增代码即可启用扁平风格；保留 `UIDesignRequiresCompatibility` 时会自动切换到扁平样式。 | ✅ Enable the flat style on iOS 27 without adding code; `UIDesignRequiresCompatibility` automatically selects the flat style. |
 | ✅ 扁平风格作为独立组件集成，降低耦合并减小包体积。 | ✅ The flat style is integrated as an independent component for lower coupling and a smaller package size. |
 | ✅ 扁平风格与液态玻璃样式共享 API，只需修改样式属性即可切换。 | ✅ The flat and Liquid Glass styles share the same APIs; switch styles by changing the appearance property. |
+| ✅ 一个 `UITabBarAppearance` 同时控制液态玻璃与扁平样式：设置 `tabBar.standardAppearance` 即可自定义扁平样式 TabBar 的背景、阴影、标题、图标与角标等，详见 [docs/FlatDesign-StandardAppearance.md](docs/FlatDesign-StandardAppearance.md)。 | ✅ One `UITabBarAppearance` styles both Liquid Glass and FlatDesign: set `tabBar.standardAppearance` to customize the flat design tab bar's background, shadow, titles, icons, badges and more, see [docs/FlatDesign-StandardAppearance.md](docs/FlatDesign-StandardAppearance.md). |
 | ✅ 支持运行期间在两种样式之间切换，适合 A/B 测试和灰度发布。 | ✅ Switch between styles at runtime for A/B testing and staged rollout. |
 | ✅ 液态玻璃样式继承自 `UITabBar`，支持系统样式设置，并提供 PlusButton。 | ✅ The Liquid Glass style inherits from `UITabBar`, supports system appearance settings, and adds PlusButton support. |
 | ✅ 支持同时展示 Lottie 动画、液态玻璃效果和红点角标动画。 | ✅ Display Lottie animations, Liquid Glass effects, and animated badges together. |
@@ -1500,6 +1501,7 @@ cell.textLabel?.text = String(format: CYLLocalizedString("我是第%ld行"), ind
 | 中文 | English |
 |:---|:---|
 | 如需手动设置偏移量，可在 `-setViewControllers:` 前设置 `imageInsets` 和 `titlePositionAdjustment`。 | To adjust the offset manually, set `imageInsets` and `titlePositionAdjustment` before `-setViewControllers:`. |
+| `titlePositionAdjustment` 也可以在运行时修改（`tabBarController.titlePositionAdjustment = UIOffsetMake(0, -3);`），已添加的 Tab 会立即更新，所有 TabBar 样式均适用。iOS 13+ 上设置了 `tabBar.standardAppearance`（`UITabBarAppearance`）时，偏移会同步写入 appearance，不再失效（[#475](https://github.com/ChenYilong/CYLTabBarController/issues/475)）。Demo 列表顶部设置分组中的「标题偏移」行演示了该用法。 | `titlePositionAdjustment` can also be changed at runtime (`tabBarController.titlePositionAdjustment = UIOffsetMake(0, -3);`): the tabs already added update right away, on every tab bar style. On iOS 13+, when `tabBar.standardAppearance` (`UITabBarAppearance`) is set, the offset is written into the appearance too, so it no longer has no effect ([#475](https://github.com/ChenYilong/CYLTabBarController/issues/475)). The "Title offset" row in the demo's settings section shows it. |
 
 | 中文 | English |
 |:---|:---|
@@ -1559,6 +1561,7 @@ cell.textLabel?.text = String(format: CYLLocalizedString("我是第%ld行"), ind
 | 中文 | English |
 |:---|:---|
 | 仓库提供了 Swift Demo，目录为 `Example-Swift`。 | The repository includes a Swift demo in `Example-Swift`. |
+| 完整的中英文 Swift 使用指南（`import` 报错排查、初始化、PlusButton、代理、角标、Lottie、深色模式等 API 示例）：[docs/Swift-Guide.md](docs/Swift-Guide.md)。 | A full bilingual Swift guide (fixing `import` errors, initializers, PlusButton, delegates, badges, Lottie, Dark Mode and more, with code): [docs/Swift-Guide.md](docs/Swift-Guide.md). |
 
 | 中文 | English |
 |:---|:---|

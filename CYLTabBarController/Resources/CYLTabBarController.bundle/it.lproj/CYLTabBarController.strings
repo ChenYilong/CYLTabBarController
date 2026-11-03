@@ -154,3 +154,11 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Mostra una GIF animata come icona della scheda; tocca di nuovo per ripristinare";
 "批量更换标题" = "Cambia tutti i titoli";
 "一次更新所有 Tab 的标题，再点恢复" = "Aggiorna i titoli di tutte le schede insieme; tocca di nuovo per ripristinare";
+"标题偏移（titlePositionAdjustment）" = "Spostamento del titolo (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Tocca per cambiare lo spostamento verticale dei titoli di tutte le schede, attuale: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "Tema standardAppearance (condiviso da Liquid Glass e FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Tocca per cambiare tabBar.standardAppearance, attuale: %@";
+"原始" = "Originale";
+"深色" = "Scuro";
+"居中胶囊" = "Capsula centrata";
+"绿色描边" = "Linea verde";
