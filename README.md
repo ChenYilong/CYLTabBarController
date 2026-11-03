@@ -821,6 +821,7 @@ carthage update --use-xcframeworks
 |:---|:---|
 | 下面的方法可以捕获 `TabBar` 上被点击的控件，包括 `UITabBarButton`、PlusButton 或其他 `UIControl`。 | This method reports the selected control, including `UITabBarButton`, PlusButton, or any other `UIControl`. |
 | 如果 PlusButton 自身添加了点击事件，点击它时不会触发该代理方法。 | It is not called for PlusButton when PlusButton has its own action. |
+| 扁平样式（`CYLTabBarStyleTypeFlatDesign`）同样会回调（[#610](https://github.com/ChenYilong/CYLTabBarController/issues/610)）：点击每个 Tab 按钮和 PlusButton（有或没有子控制器）都会调用一次，传入的 `control` 为被点击的按钮；点在有子控制器的 PlusButton 下方的占位 Tab 上时，传入的是 PlusButton。 | The flat design style (`CYLTabBarStyleTypeFlatDesign`) calls it too ([#610](https://github.com/ChenYilong/CYLTabBarController/issues/610)): once for each tap on a tab button or the plus button (with or without a child view controller), with the tapped button as `control`; a tap on the tab under a plus button with a child view controller passes the plus button. |
 
  ```Objective-C
 //CYLTabBarController.h
@@ -882,6 +883,76 @@ carthage update --use-xcframeworks
     return YES;
 }
  ```
+
+#### [CN]用标识区分 Tab
+#### [EN]Telling tabs apart by identifier
+
+| 中文 | English |
+|:---|:---|
+| Tab 会在运行时增减（例如由后台控制隐藏第二个或第三个）时，`selectedIndex` 无法确定是哪个 Tab（[#408](https://github.com/ChenYilong/CYLTabBarController/issues/408)）。在 `tabBarItemsAttributes` 中加上 `CYLTabBarItemIdentifier`（NSString，类似 tag），之后按标识判断和查找。 | When tabs come and go at run time (e.g. the server hides the second or third one), `selectedIndex` no longer tells which tab it is ([#408](https://github.com/ChenYilong/CYLTabBarController/issues/408)). Add `CYLTabBarItemIdentifier` (an NSString, like a tag) to `tabBarItemsAttributes`, then check and look tabs up by it. |
+| 读取：`control.cyl_tabBarItemIdentifier`（代理方法中的 Tab 按钮或 PlusButton）、`viewController.cyl_tabBarItemIdentifier`（`viewControllers` 中的控制器及其内容控制器）、`tabBarController.cyl_selectedTabBarItemIdentifier`。 | Read it with `control.cyl_tabBarItemIdentifier` (the tab button or plus button in the delegate methods), `viewController.cyl_tabBarItemIdentifier` (a view controller in `viewControllers` and its content view controller), or `tabBarController.cyl_selectedTabBarItemIdentifier`. |
+| 查找：`-cyl_indexOfTabBarItemIdentifier:`（不存在时为 NSNotFound）、`-cyl_viewControllerWithTabBarItemIdentifier:`、`-cyl_selectTabBarItemWithIdentifier:`（选中并返回控制器）、`-cyl_controlWithTabBarItemIdentifier:`（Tab 按钮或 PlusButton）；`cyl_tabBarItemIdentifiers` 列出全部标识。 | Look up with `-cyl_indexOfTabBarItemIdentifier:` (NSNotFound when missing), `-cyl_viewControllerWithTabBarItemIdentifier:`, `-cyl_selectTabBarItemWithIdentifier:` (selects and returns the view controller) and `-cyl_controlWithTabBarItemIdentifier:` (tab button or plus button); `cyl_tabBarItemIdentifiers` lists them all. |
+| Pop / Push：与 `…ForClassType:` 对应，`-cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:`（及 `animated:`、`completion:` 版本）Pop 到当前导航栈底并选中该标识的 Tab，找不到时返回 nil 且不 pop、不切换；`-cyl_pushOrPopToViewController:animated:tabBarItemIdentifier:callback:` 在 Push 前按标识选中 Tab（completion handler 的 `index` 被忽略）。 | Pop / Push: like `…ForClassType:`, `-cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:` (and its `animated:` and `completion:` versions) pops to the root and selects the tab with that identifier, returning nil and doing nothing when there is none; `-cyl_pushOrPopToViewController:animated:tabBarItemIdentifier:callback:` selects the tab by identifier before pushing (the completion handler's `index` is ignored). |
+| PlusButton：在 `CYLPlusButtonSubclassing` 子类中实现 `+tabBarItemIdentifier`（例如返回 @"plus"）。点击 PlusButton 同样会回调 `-tabBarController:didSelectControl:`，`control.cyl_tabBarItemIdentifier` 即为该标识；有 PlusButton 子控制器时，按标识查找、选中也包括它。 | Plus button: implement `+tabBarItemIdentifier` in the `CYLPlusButtonSubclassing` subclass (e.g. return @"plus"). A tap on it also calls `-tabBarController:didSelectControl:`, where `control.cyl_tabBarItemIdentifier` is that identifier; with a plus child view controller, lookups and selection by identifier include it. |
+| 多 TabBar：每个 TabBarController（不同 context，或 push 出来的）只处理自己的 Tab 和 PlusButton；每个 TabBarController 的 PlusButton 副本都带有同一个标识。不同 context 的 PlusButton 可以返回不同的标识（Demo 中为 @"plus" 和 @"camera"）。 | Several tab bar controllers: each one (another context, or a pushed one) answers for its own tabs and plus button, and every copy of the plus button carries the identifier. Plus buttons of different contexts can return different identifiers (@"plus" and @"camera" in the demo). |
+| 默认值（不设置时）：普通 Tab 为内容控制器的类名（导航控制器取根控制器，Swift 类不含模块名），例如 `CYLHomeViewController`；同一 TabBar 中后续同类的 Tab 依次加 `_2`、`_3`；PlusButton 为其类名，例如 `CYLPlusButtonSubclass`；PlusButton 子控制器沿用 PlusButton 的标识。类名不会因增减 Tab 或切换语言而改变。`-cyl_defaultTabBarItemIdentifierForViewController:` 返回某个 Tab 的默认值。 | Defaults (when none is set): a tab gets its content view controller's class name (a navigation controller's root; Swift classes without the module), e.g. `CYLHomeViewController`, with `_2`, `_3`... for the next tabs of the same class in one tab bar; a plus button gets its class name, e.g. `CYLPlusButtonSubclass`, and the plus child view controller shares it. Class names do not change when tabs are added or removed, or with the language. `-cyl_defaultTabBarItemIdentifierForViewController:` returns a tab's default. |
+
+```Objective-C
+NSDictionary *messageAttributes = @{
+    CYLTabBarItemTitle : @"消息",
+    CYLTabBarItemImage : @"message_normal",
+    CYLTabBarItemIdentifier : @"message",
+};
+
+// CYLPlusButtonSubclass.m
++ (NSString *)tabBarItemIdentifier {
+    return @"plus";
+}
+
+// Called for every tab button and the plus button. 点击任意 Tab 按钮和 PlusButton 都会调用。
+- (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control {
+    NSString *identifier = control.cyl_tabBarItemIdentifier;
+    NSLog(@"[%@] tapped %@", tabBarController.context, identifier);
+    for (NSString *eachIdentifier in tabBarController.cyl_tabBarItemIdentifiers) {
+        UIControl *eachControl = [tabBarController cyl_controlWithTabBarItemIdentifier:eachIdentifier];
+        NSLog(@"%@: index %@, plus button %@", eachIdentifier,
+              @([tabBarController cyl_indexOfTabBarItemIdentifier:eachIdentifier]), @([eachControl cyl_isPlusButton]));
+    }
+    if ([identifier isEqualToString:@"plus"]) {
+        // the plus button
+    } else if ([identifier isEqualToString:@"message"]) {
+        // the message tab, wherever it is
+    }
+}
+
+[tabBarController cyl_selectTabBarItemWithIdentifier:@"message"];
+
+// From any page: pop to the root and select the message tab, wherever it is. 从任意页面 Pop 到栈底并选中“消息”，无论它在第几个。
+[self cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:@"message" completion:^(__kindof UIViewController *selected) {
+    [selected.navigationController pushViewController:detailViewController animated:YES];
+}];
+```
+
+```Swift
+let messageAttributes: [String: Any] = [
+    CYLTabBarItemTitle: "消息",
+    CYLTabBarItemImage: "message_normal",
+    CYLTabBarItemIdentifier: "message",
+]
+
+// CYLPlusButtonSubclass.swift
+static func tabBarItemIdentifier() -> String { "plus" }
+
+override func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
+    switch control.cyl_tabBarItemIdentifier {
+    case "plus": break     // the plus button
+    case "message": break  // the message tab, wherever it is
+    default: break
+    }
+}
+
+tabBarController.cyl_selectTabBarItem(withIdentifier: "message")
+```
 
 ### [CN]点击 TabBarButton 时添加动画
 ### [EN]Adding animations when a TabBar button is tapped
@@ -974,6 +1045,39 @@ carthage update --use-xcframeworks
 }
  ```
 
+### [CN]单独使用角标组件 CYLBadgeView
+### [EN]Using the badge component on its own: CYLBadgeView
+
+| 中文 | English |
+|:---|:---|
+| 角标功能是一个独立的 subspec：`CYLTabBarController/CYLBadgeView`（#535）。它不依赖 TabBar 代码，可以单独引入，为任意 `UIView`、`UIControl`（如 `UIButton`）、`UIBarButtonItem`、`UITabBarItem` 添加带动画的角标（红点、数字、文字、图片、自定义视图）。 | The badges are their own subspec, `CYLTabBarController/CYLBadgeView` (#535). It has no tab bar code, so you can use it alone to add animated badges (red dot, number, text, image, custom view) to any `UIView`, `UIControl` (e.g. `UIButton`), `UIBarButtonItem` and `UITabBarItem`. |
+| Core 与 CYLBadgeView 共用的部分放在 subspec `CYLTabBarController/CYLUtils` 中，二者都依赖它：通用宏、工具方法（如 `-cyl_setHidden:`、`-cyl_valueForKey:`、`-cyl_tabButton`）、`+[CYLUtils isLiquidGlassActive]`、字符串表（`CYLLocalizedString()`）与资源包。引入 CYLBadgeView 时会自动带上 CYLUtils。 | What Core and CYLBadgeView share lives in the subspec `CYLTabBarController/CYLUtils`, which both depend on: generic macros, helpers (e.g. `-cyl_setHidden:`, `-cyl_valueForKey:`, `-cyl_tabButton`), `+[CYLUtils isLiquidGlassActive]`, the string table (`CYLLocalizedString()`) and the resource bundle. CYLBadgeView brings it in automatically. |
+| Core 依赖 CYLUtils 和 CYLBadgeView，所以 `pod 'CYLTabBarController'` 以及其他所有 subspec、SPM、Carthage 都已包含它们，已有的 Podfile 和代码无需任何修改。 | Core depends on CYLUtils and CYLBadgeView, so `pod 'CYLTabBarController'`, every other subspec, SPM and Carthage include them already; existing Podfiles and code need no change. |
+
+ ```ruby
+ # 只引入角标 / badges only
+ pod 'CYLTabBarController/CYLBadgeView'
+ ```
+
+ ```Objective-C
+#import <CYLTabBarController/CYLBadgeView.h>   // Swift: import CYLTabBarController
+
+[self.avatarView cyl_showBadge];                                                     // 红点 / red dot
+[self.messageButton cyl_showBadgeValue:@"99+" animationType:CYLBadgeAnimationTypeShake];
+[self.navigationItem.rightBarButtonItem cyl_showBadgeValue:@"new" animationType:CYLBadgeAnimationTypeNone];
+[self.tabBarItem cyl_showBadgeValue:@"3" animationType:CYLBadgeAnimationTypeBounce];  // 系统 UITabBar 也可以 / a system UITabBar too
+[self.messageButton cyl_clearBadge];
+
+// 配合 CYLTabBarController 时，PlusButton 也可以显示角标，与 Tab 角标效果一致（Demo：每次点击数字加 1）。
+// With CYLTabBarController, the plus button can show a badge too, like the tabs (demo: each tap adds 1).
+[[CYLPlusButton plusButtonForOwner:tabBarController] cyl_showBadgeValue:@"1" animationType:CYLBadgeAnimationTypeBounce];
+ ```
+
+| 中文 | English |
+|:---|:---|
+| 单独使用与配合 CYLTabBarController 使用时 API 完全相同，区别只在 TabBar 相关的部分：`UIControl` 的角标显示在控件本身上（配合 CYLTabBarController 时，Tab 按钮的角标显示在图标或 Lottie 视图上，并同步到液态玻璃 platter）；`UITabBarItem` 的角标显示在 Tab 图标上。无障碍朗读文案两种情况下相同，都使用 CYLUtils 内置的 33 种语言。 | The API is the same alone or with CYLTabBarController; only the tab bar parts differ. A `UIControl` gets its badge on the control itself (with CYLTabBarController, a tab button's badge goes on its icon or Lottie view and is mirrored to the Liquid Glass platter). A `UITabBarItem` gets its badge on the tab icon. VoiceOver texts are the same either way, in CYLUtils' 33 built-in languages. |
+| SPM 和 Carthage 只提供完整的 CYLTabBarController（包含角标）。 | SPM and Carthage only provide the whole of CYLTabBarController, badges included. |
+
 ### [CN]全局设置角标样式
 ### [EN]Setting the badge style globally
 
@@ -1001,6 +1105,7 @@ CYLBadgeAppearance.global.centerOffset = CGPoint(x: -5, y: 3)
 | 可设置的属性：`backgroundColor`、`textColor`、`font`、`centerOffset`、`radius`（红点半径，默认 4）、`margin`（文字四周的空间，默认 8）、`maximumBadgeNumber`（默认 99，超过显示 "99+"）、`cornerRadius`（默认 0，即胶囊形）、`borderColor`、`borderWidth`。`-reset` 恢复全部默认值。 | Properties: `backgroundColor`, `textColor`, `font`, `centerOffset`, `radius` (red dot radius, 4 by default), `margin` (space around the text, 8 by default), `maximumBadgeNumber` (99 by default; larger numbers show "99+"), `cornerRadius` (0 by default, a capsule), `borderColor`, `borderWidth`. `-reset` restores all defaults. |
 | 复用的视图（如 cell）先调用 `-[UIView cyl_resetBadgeAppearance]`，清除上一次单独设置的角标属性、恢复跟随全局样式，再只设置本次不同的部分，不必把每个属性手动设回默认值。 | For reused views such as cells, call `-[UIView cyl_resetBadgeAppearance]` first: it drops the badge properties set for the previous content so they follow the global style again; then set only what differs, instead of setting every property back to a default by hand. |
 | 请在显示角标之前设置。之后再修改全局值，已显示的角标会在下次显示（`-cyl_showBadgeValue:animationType:`）时使用新的颜色、字体和边框。对象上设为 nil 的颜色、字体会恢复使用全局值。 | Set it before showing badges. If you change it later, a badge already on screen uses the new colors, font and border the next time it is shown (`-cyl_showBadgeValue:animationType:`). Setting a color or font to nil on an object goes back to the global value. |
+| **iOS 26+ 液态玻璃下的导航栏 / 工具栏按钮**：系统会以导航栏的 tint 单色绘制 bar button 的内容，放在其中的自定义角标颜色会被替换（例如随机色变成黑点）。因此液态玻璃生效时，`UIBarButtonItem` 的角标改用系统角标 `UIBarButtonItemBadge`，并使用 `cyl_badgeBackgroundColor`、`cyl_badgeTextColor`、`cyl_badgeFont`（未设置时取全局值），颜色不再受 tint 影响。取值规则与动画类型不变；动画在能找到系统角标视图时添加。iOS 26 以前以及设置了 `UIDesignRequiresCompatibility` 时不受影响。 | **Navigation bar / toolbar buttons on iOS 26+ with Liquid Glass**: the system draws a bar button's content monochrome in the bar's tint, so a custom badge inside it lost its colors (e.g. a random color became a black dot). With Liquid Glass active, a `UIBarButtonItem`'s badge is now the system `UIBarButtonItemBadge`, with `cyl_badgeBackgroundColor`, `cyl_badgeTextColor` and `cyl_badgeFont` (global values when unset), so the tint no longer changes its colors. Values and animation types work as before; the animation is added when the system badge view can be found. Before iOS 26, and with `UIDesignRequiresCompatibility`, nothing changes. |
 
 ### [CN]更新 Tab 角标
 ### [EN]Updating tab badges
@@ -1101,6 +1206,70 @@ let messageAttributes: [String: Any] = [
 |:---|:---|
 | 需要同样的图片作为 UIImage 对象（例如用于其他视图）时，用 `+[UIImage cyl_imageWithImageInfo:darkImageInfo:]`，参数与这两个键的取值相同。 | To get the same image as a UIImage object (e.g. for another view), use `+[UIImage cyl_imageWithImageInfo:darkImageInfo:]`, which takes the same values as these keys. |
 
+#### [CN]Lottie 图标的深色模式
+#### [EN]Lottie icons in Dark Mode
+
+| 中文 | English |
+|:---|:---|
+| 设置了 `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath` 的 Tab，图标由 Lottie 动画绘制，上面的图片不会显示；动画的颜色写在 JSON 中，不会随深色模式变化（[#442](https://github.com/ChenYilong/CYLTabBarController/issues/442)）。 | A tab with `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath` draws its icon with the Lottie animation, not the images above, and the animation's colors are fixed in its JSON, so they do not follow Dark Mode ([#442](https://github.com/ChenYilong/CYLTabBarController/issues/442)). |
+| 加上 `CYLTabBarLottieDarkURL`（NSURL）或 `CYLTabBarLottieDarkFilePath`（文件路径）指定深色动画。界面风格为深色时（系统设置或 `overrideUserInterfaceStyle`）显示深色动画，切换时自动替换，选中状态和播放进度保持不变。普通、液态玻璃与扁平样式都支持。 | Add `CYLTabBarLottieDarkURL` (an NSURL) or `CYLTabBarLottieDarkFilePath` (a file path) for the dark animation. It is shown where the interface style is dark (system setting or `overrideUserInterfaceStyle`) and swapped in when the style changes, keeping the selected state and progress. Classic, Liquid Glass and flat design styles are supported. |
+
+```Objective-C
+NSDictionary *homeAttributes = @{
+    CYLTabBarItemTitle : @"首页",
+    CYLTabBarItemImage : @"home_normal",
+    CYLTabBarItemSelectedImage : @"home_highlight",
+    CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"tab_home" ofType:@"json"],
+    CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"tab_home_dark" ofType:@"json"],
+};
+```
+
+```Swift
+let homeAttributes: [String: Any] = [
+    CYLTabBarItemTitle: "首页",
+    CYLTabBarItemImage: "home_normal",
+    CYLTabBarItemSelectedImage: "home_highlight",
+    CYLTabBarLottieURL: Bundle.main.url(forResource: "tab_home", withExtension: "json")!,
+    CYLTabBarLottieDarkURL: Bundle.main.url(forResource: "tab_home_dark", withExtension: "json")!,
+]
+```
+
+| 中文 | English |
+|:---|:---|
+| 两种方式：**深色文件**（上面的 `CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath`，Lottie 2.x 与 4.x 都支持）；**一份文件 + 深色颜色**（`CYLTabBarLottieDarkColors`，仅 Lottie 4.x：`CYLTabBarController/LottieSwift`、`CYLFlatDesignTabBar`、SPM）。Lottie 文件本身不能同时包含两种配色：JSON 中的颜色是固定值，dotLottie 的主题只有 LottieFiles 的播放器支持，lottie-ios 不支持。 | Two ways: **a dark file** (`CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath` above, Lottie 2.x and 4.x), or **one file plus dark colors** (`CYLTabBarLottieDarkColors`, Lottie 4.x only: `CYLTabBarController/LottieSwift`, `CYLFlatDesignTabBar`, SPM). A Lottie file cannot hold both palettes itself: colors in the JSON are fixed values, and dotLottie themes only work in LottieFiles' players, not lottie-ios. |
+| `CYLTabBarLottieDarkColors` 是 keypath -> UIColor 的字典：深色模式下用 Lottie 官方的 value provider（`setValueProvider(_:keypath:)` + `ColorValueProvider`，两种渲染引擎都支持）设置这些颜色，浅色模式下移除，恢复动画自身颜色；切换时保留原视图和播放进度。keypath 由图层、组、元素名称以 "." 连接，"*" 匹配一个名称，"**" 匹配任意多个；可用 `logHierarchyKeypaths()` 打印。 | `CYLTabBarLottieDarkColors` is a keypath -> UIColor dictionary: in Dark Mode the colors are set with Lottie's official value providers (`setValueProvider(_:keypath:)` with a `ColorValueProvider`, supported by both rendering engines), and removed in light mode, so the animation shows its own colors again; switching keeps the view and its progress. Keypaths join layer, group and item names with "."; "*" matches one name, "**" any number; print them with `logHierarchyKeypaths()`. |
+| 按命名规范批量设置：`CYLTabBarItemsAttributesAddingLottieFiles()` 为每个 item 加上「<名称>.json」，存在「<名称>_dark.json」时自动加上 `CYLTabBarLottieDarkFilePath`（后缀与图片相同，为 `UIImage.cyl_darkImageNameSuffix`）。 | By naming convention: `CYLTabBarItemsAttributesAddingLottieFiles()` adds "<name>.json" to each item, and `CYLTabBarLottieDarkFilePath` when "<name>_dark.json" exists (the same suffix as images, `UIImage.cyl_darkImageNameSuffix`). |
+
+```Objective-C
+// green_lottie_tab_home.json + green_lottie_tab_home_dark.json, ...
+NSArray *attributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes,
+    @[@"green_lottie_tab_home", @"green_lottie_tab_discover", @"green_lottie_tab_news", @"green_lottie_tab_mine"], nil);
+```
+
+```Swift
+let attributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes,
+    ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
+```
+
+```Objective-C
+// Lottie 4.x: one file, dark colors by keypath. Lottie 4.x：一份文件，按 keypath 指定深色颜色。
+NSDictionary *homeAttributes = @{
+    CYLTabBarItemTitle : @"首页",
+    CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"],
+    CYLTabBarLottieDarkColors : @{
+        @"Icon_Shop_Normal.**.Color" : [UIColor colorWithWhite:0.78 alpha:1],                          // gray outline → light gray
+        @"Icon_Shop_Active_Main.**.Color" : [UIColor colorWithRed:0.15 green:0.39 blue:0.16 alpha:1], // pale fill → dark green
+    },
+};
+```
+
+```Swift
+CYLTabBarLottieDarkColors: [
+    "Icon_Shop_Normal.**.Color": UIColor(white: 0.78, alpha: 1),
+    "Icon_Shop_Active_Main.**.Color": UIColor(red: 0.15, green: 0.39, blue: 0.16, alpha: 1),
+],
+```
+
 | 中文 | English |
 |:---|:---|
 | 不要在设置颜色或图片时自行判断当前是深色还是浅色再二选一：此时 `UITraitCollection.currentTraitCollection` 往往是 unspecified，window scene 和屏幕的 trait 不认 `overrideUserInterfaceStyle`，而且之后切换风格时不会更新。需要在风格变化时执行代码，请在 `-traitCollectionDidChange:` 中比较 `self.traitCollection`。 | Don't check whether the style is dark or light yourself and pick one when you set a color or image: at that moment `UITraitCollection.currentTraitCollection` is often unspecified, the window scene's and the screen's traits ignore `overrideUserInterfaceStyle`, and nothing updates when the style changes later. To run code when it changes, compare `self.traitCollection` in `-traitCollectionDidChange:`. |
@@ -1112,7 +1281,7 @@ let messageAttributes: [String: Any] = [
 | 中文 | English |
 |:---|:---|
 | 本库与所有 Demo 中用户可见的文字都已本地化，支持 33 种语言：English、简体中文、繁體中文、日本語、한국어、Français、Deutsch、Español、Italiano、Português (Brasil)、Русский、العربية、ไทย、Tiếng Việt、Bahasa Indonesia、Türkçe、Nederlands、Polski、Svenska、Dansk、Norsk bokmål、Suomi、Čeština、Slovenčina、Magyar、Română、Hrvatski、Català、Bahasa Melayu、Українська、Ελληνικά、עברית、हिन्दी。 | Every user-visible text in the library and in all demos is localized into 33 languages: English, Simplified Chinese, Traditional Chinese, Japanese, Korean, French, German, Spanish, Italian, Portuguese (Brazil), Russian, Arabic, Thai, Vietnamese, Indonesian, Turkish, Dutch, Polish, Swedish, Danish, Norwegian Bokmål, Finnish, Czech, Slovak, Hungarian, Romanian, Croatian, Catalan, Malay, Ukrainian, Greek, Hebrew and Hindi. |
-| 译文放在 Core 的资源包 `CYLTabBarController.bundle` 中（`*.lproj/CYLTabBarController.strings`），CocoaPods、SPM、Carthage 都原样带上，无需额外导入。`CYLResourceBundle()` 返回该资源包，图片等资源也可以放进去，例如 `[UIImage imageNamed:@"icon" inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil]`。 | The translations live in Core's resource bundle, `CYLTabBarController.bundle` (`*.lproj/CYLTabBarController.strings`), shipped as is by CocoaPods, SPM and Carthage; no extra import. `CYLResourceBundle()` returns it, and images can go in it too, e.g. `[UIImage imageNamed:@"icon" inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil]`. |
+| 译文放在资源包 `CYLTabBarController.bundle` 中（`*.lproj/CYLTabBarController.strings`，属于 Core 依赖的 CYLUtils），CocoaPods、SPM、Carthage 都原样带上，无需额外导入。`CYLResourceBundle()` 返回该资源包，图片等资源也可以放进去，例如 `[UIImage imageNamed:@"icon" inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil]`。 | The translations live in the resource bundle of CYLUtils (which Core depends on), `CYLTabBarController.bundle` (`*.lproj/CYLTabBarController.strings`), shipped as is by CocoaPods, SPM and Carthage; no extra import. `CYLResourceBundle()` returns it, and images can go in it too, e.g. `[UIImage imageNamed:@"icon" inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil]`. |
 | App 内切换语言：列表中加入 `-cyl_languageCellForTableView:` 这一行，点击时调用 `-cyl_presentLanguagePicker`（英语、中文、印地语、西班牙语、阿拉伯语，国旗加语言名称，以及“跟随系统”）。副标题始终使用设备语言，切换到任何语言都能看懂。用 `[window cyl_setRootViewControllerProvider:^{ … }]` 代替设置 `rootViewController`，切换后界面立即用新语言重建，阿拉伯语等从右到左的语言同时翻转布局。 | In-app language setting: add the row from `-cyl_languageCellForTableView:` and call `-cyl_presentLanguagePicker` on tap (English, Chinese, Hindi, Spanish, Arabic with flag and own name, plus "Follow system"). Its subtitle is always in the device language, so it stays readable after any switch. Set the root with `[window cyl_setRootViewControllerProvider:^{ … }]` instead of `rootViewController`: the screen is rebuilt in the new language at once, and right-to-left languages such as Arabic flip the layout. |
 | VoiceOver：切换语言时同时设置 App 的 `accessibilityLanguage`，VoiceOver 使用对应语言的语音。角标会被读出（“消息，3 条新消息”“有新内容”），即使角标 label 位于 Tab 按钮或 cell 内部；加号按钮下方的占位 Tab 读作加号按钮；仅有图标的 PlusButton 读作其标题或“加号按钮”。 | VoiceOver: switching the language also sets the app's `accessibilityLanguage`, so VoiceOver uses a matching voice. Badges are read ("Messages, 3 new messages", "New content") even though the badge label sits inside a tab button or cell; the placeholder tab under the plus button reads as the plus button; an icon-only plus button reads as its title or "Plus button". |
 | 所有文字使用同一种语言：取 App 自身当前显示的语言（`[NSBundle mainBundle].preferredLocalizations`），匹配最接近的译文，没有时使用英文。因此本库不会显示 App 本身不支持的语言。想让 App 跟随设备语言，在 Info.plist 中声明 `CFBundleLocalizations`（Demo 已声明）。 | All text uses one language: the one the app itself is displayed in (`[NSBundle mainBundle].preferredLocalizations`), matched to the closest translation, else English. So the library never shows a language the app doesn't. To follow the device language, declare `CFBundleLocalizations` in Info.plist (the demos do). |
@@ -1556,6 +1725,42 @@ use_frameworks!
 //#import "CYLTabBarController.h"
     [[self cyl_tabBarController] rootWindow].backgroundColor = [UIColor whiteColor];
  ```
+
+### [CN]iPhone Duo 展开横屏时左右出现黑边
+### [EN]Black bars on the left and right of the unfolded iPhone Duo in landscape
+
+| 中文 | English |
+|:---|:---|
+| 这是系统行为，与 TabBar 无关（#719、#680）。App 不支持横屏时，展开的 iPhone Duo 横放会把 App 当作竖屏窗口显示在屏幕中间，两侧留黑。只勾选 Portrait 时就是这种情况。 | This is system behavior, not the tab bar (#719, #680). When an app does not support landscape, the unfolded iPhone Duo held in landscape shows it as a portrait window in the middle of the screen, with black bars on both sides. Checking only Portrait does exactly this. |
+| 要铺满内屏，需要同时满足下面三项： | To fill the inner screen, do all three: |
+| 1. **启动屏有效**：`Info.plist` 使用 `UILaunchScreen`（iOS 14+），或者 `UILaunchStoryboardName` 指向一个专用的启动 storyboard。名称不带 `.storyboard` 扩展名，storyboard 里不能有自定义类，并且用 Auto Layout 适配任意尺寸。不要把 `Main.storyboard` 当作启动屏。 | 1. **A valid launch screen**: `UILaunchScreen` in `Info.plist` (iOS 14+), or `UILaunchStoryboardName` naming a dedicated launch storyboard. Give the name without the `.storyboard` extension, use no custom classes, and lay it out with Auto Layout for any size. Do not use `Main.storyboard` as the launch screen. |
+| 2. **`Info.plist` 声明横屏**：`UISupportedInterfaceOrientations` 包含 `LandscapeLeft` 和 `LandscapeRight`。系统只会在这里声明过的方向中选择，代码返回的方向不能超出这个范围。 | 2. **Landscape in `Info.plist`**: `UISupportedInterfaceOrientations` includes `LandscapeLeft` and `LandscapeRight`. The system only picks from these, so code cannot return an orientation missing here. |
+| 3. **运行时允许横屏**：如果实现了 `application:supportedInterfaceOrientationsForWindow:` 或 `supportedInterfaceOrientations`，在可折叠设备上返回包含横屏的值。 | 3. **Allow landscape at run time**: if you implement `application:supportedInterfaceOrientationsForWindow:` or `supportedInterfaceOrientations`, return a mask with landscape on foldable devices. |
+| 普通 iPhone 仍想只用竖屏：在 `Info.plist` 中保留横屏，在代码中默认返回竖屏，检测到铰链（只有可折叠设备会报告）后再放开横屏。Demo 就是这样做的，见 `Example/CYLMainRootViewController.m` 和 `Example/ AppDelegate.m`： | To keep other iPhones portrait-only, keep landscape in `Info.plist`, return portrait in code by default, and allow landscape once a hinge is reported (only foldable devices report one). The demo does this; see `Example/CYLMainRootViewController.m` and `Example/ AppDelegate.m`: |
+
+ ```Objective-C
+// AppDelegate.m
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+    return self.supportsLandscapeOnFoldableDevice ? UIInterfaceOrientationMaskAllButUpsideDown : UIInterfaceOrientationMaskPortrait;
+}
+
+// Root view controller, -viewDidLoad
+if (@available(iOS 27.1, *)) {
+    __weak __typeof(self) weakSelf = self;
+    UIHingeInteraction *hingeInteraction = [[UIHingeInteraction alloc] initWithUpdateHandler:^(UIHingeInteraction *interaction, UIHingeInteractionUpdate *update) {
+        AppDelegate *appDelegate = (AppDelegate *)UIApplication.sharedApplication.delegate;
+        if (!update.hinge || appDelegate.supportsLandscapeOnFoldableDevice) { return; }
+        appDelegate.supportsLandscapeOnFoldableDevice = YES;
+        [weakSelf setNeedsUpdateOfSupportedInterfaceOrientations];
+    }];
+    [self.view addInteraction:hingeInteraction];
+}
+ ```
+
+| 中文 | English |
+|:---|:---|
+| 横屏时希望 TabBar 显示在右侧竖向栏，再设置 `tabBarController.allowsVerticalBar = YES;`。 | To show the tab bar in the trailing vertical bar in landscape, also set `tabBarController.allowsVerticalBar = YES;`. |
+
 ### [CN]凸起的图标超出 49pt 后无法响应
 ### [EN]A raised icon does not respond above 49pt
 

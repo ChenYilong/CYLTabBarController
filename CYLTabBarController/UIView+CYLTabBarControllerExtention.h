@@ -6,6 +6,12 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+#if __has_include("CYLUtils/UIView+CYLUtils.h")
+#import "CYLUtils/UIView+CYLUtils.h"
+#else
+#import "UIView+CYLUtils.h"
+#endif
 #import <Foundation/Foundation.h>
 #import "CYLConstants.h"
 
@@ -225,13 +231,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable UIImage *)cyl_takeSnapshotWithoutViews:(NSArray<UIView __kindof *> *)hideViews;
 
-/*!
- * [EN] Hides or shows the receiver, also updating alpha, opaque and userInteractionEnabled together.
- * [CN] 隐藏或显示当前视图，同时联动修改 alpha、opaque 与 userInteractionEnabled。
- */
-- (void)cyl_setHidden:(BOOL)hidden;
-
-
 @end
 
 @interface UIView (CYLTabBarControllerExtentionDeprecated)
@@ -296,6 +295,5 @@ NS_ASSUME_NONNULL_BEGIN
 - (CGFloat)cyl_plusButtonWidth;
 
 @end
-
 
 NS_ASSUME_NONNULL_END

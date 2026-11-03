@@ -35,6 +35,11 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         return -10
     }
 
+    // #408: the plus button's identifier, read as `control.cyl_tabBarItemIdentifier`. PlusButton 的标识。
+    static func tabBarItemIdentifier() -> String {
+        return "plus"
+    }
+
     static func plusChildViewController() -> UIViewController {
         let vc = PublishViewController()
         let nav = UINavigationController(rootViewController: vc)

@@ -8,12 +8,21 @@
 
 #import <UIKit/UIKit.h>
 
+// FIX: issue #535 — CYLLocalizedString(), CYLResourceBundle(), CYLSetLocalizationLanguage() and the rest of the string
+// table live in CYLUtils, shared with CYLBadgeView. 字符串表相关函数位于 CYLUtils，与 CYLBadgeView 共用。
+#if __has_include("CYLUtils/CYLLocalizedString.h")
+#import "CYLUtils/CYLLocalizedString.h"
+#else
+#import "CYLLocalizedString.h"
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 /// Marks a function that returns translated text, for the static analyzer's localizability checker.
 #define CYL_RETURNS_LOCALIZED_STRING __attribute__((annotate("returns_localized_nsstring")))
 
 /*!
+<<<<<<< HEAD
  * [EN] Returns the translation of `key` from the library's string table (`CYLTabBarController.strings`, shipped in the
  *      Core subspec, so no extra import or resource is needed), or `key` itself when there is none. The key is the
  *      original text, so wrapping a literal is all a call site needs:
@@ -79,6 +88,8 @@ FOUNDATION_EXTERN NSString *const CYLLocalizationLanguageDidChangeNotification;
 FOUNDATION_EXTERN NSString *CYLLocalizedStringForLanguage(NSString *key, NSString * _Nullable language) CYL_RETURNS_LOCALIZED_STRING;
 
 /*!
+=======
+>>>>>>> master
  * [EN] Builds `tabBarItemsAttributes` from parallel arrays, with every title passed through `CYLLocalizedString()`.
  *      `images` / `selectedImages` hold image names or `UIImage`s; `darkImages` maps an item index to its Dark Mode image.
  *
@@ -91,12 +102,6 @@ FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLLocalizedTabBarItemsAttributes(NSA
                                                                             NSArray *images,
                                                                             NSArray *selectedImages,
                                                                             NSDictionary<NSNumber *, id> * _Nullable darkImages);
-
-/*!
- * [EN] The language `CYLLocalizedString()` currently uses, e.g. @"zh-Hans".
- * [CN] `CYLLocalizedString()` 当前使用的语言，例如 @"zh-Hans"。
- */
-FOUNDATION_EXTERN NSString *CYLLocalizationLanguage(void);
 
 @interface UIView (CYLLocalization)
 

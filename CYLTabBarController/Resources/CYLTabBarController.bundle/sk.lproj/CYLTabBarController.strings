@@ -134,3 +134,6 @@
 "保留：当前选中" = "ponechané: vybrané";
 "保留：shouldUnload 返回 NO" = "ponechané: shouldUnload vrátilo NO";
 "保留" = "ponechané";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "Vybrať kartu s identifikátorom „%@“ („%@“, index %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop aktuálneho zásobníka, výber karty s identifikátorom „%@“ a potom push novej ukážkovej stránky na túto kartu";
+"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Ako vyššie, výber karty s identifikátorom „%@“ („%@“) s animáciou pop";

@@ -1,0 +1,37 @@
+//
+//  CYLUtils.h
+//  CYLUtils
+//
+//  Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 03/06/19.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
+//
+
+/*!
+ * FIX: issue #535
+ * [EN] CYLUtils: the macros, helpers, string table and resource bundle that Core and CYLBadgeView share. Both subspecs depend on it (`pod 'CYLTabBarController/CYLUtils'`), and `CYLTabBarController.h` and `CYLBadgeView.h` import it.
+ * [CN] CYLUtils：Core 与 CYLBadgeView 共用的宏、工具方法、字符串表与资源包。两个 subspec 都依赖它（`pod 'CYLTabBarController/CYLUtils'`），`CYLTabBarController.h` 与 `CYLBadgeView.h` 都会导入它。
+ */
+
+#import <UIKit/UIKit.h>
+#import "CYLUtilsMacros.h"
+#import "CYLLocalizedString.h"
+#import "NSObject+CYLUtils.h"
+#import "UIView+CYLUtils.h"
+#import "UIViewController+CYLUtils.h"
+#import "UIBarItem+CYLUtils.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface CYLUtils : NSObject
+
+/*!
+ * [EN] YES when the system draws Liquid Glass bars: always on iOS 27, and on iOS 26 unless the app opts out with
+ *      `UIDesignRequiresCompatibility`. Computed once. `+[CYLConstants isLiquidGlassActive]` returns the same.
+ * [CN] 系统是否使用液态玻璃样式：iOS 27 始终是；iOS 26 上除非 App 通过 `UIDesignRequiresCompatibility` 关闭。只计算一次。
+ *      `+[CYLConstants isLiquidGlassActive]` 返回相同结果。
+ */
++ (BOOL)isLiquidGlassActive;
+
+@end
+
+NS_ASSUME_NONNULL_END

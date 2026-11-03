@@ -49,6 +49,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, getter=cyl_tabBarChildViewControllerIndex, setter=cyl_setTabBarChildViewControllerIndex:) NSInteger cyl_tabBarChildViewControllerIndex;
 
 /*!
+ * FIX: issue #408
+ * [EN] The identifier of this tab button or plus button, nil when it has none. Use it in
+ *      `-tabBarController:didSelectControl:`. In order: a value set here; for a plus button,
+ *      `+[CYLPlusButtonSubclassing tabBarItemIdentifier]`, else its class name (e.g. @"CYLPlusButtonSubclass"); the
+ *      identifier of the tab it selects (`CYLTabBarItemIdentifier`, else the default).
+ * [CN] 该 Tab 按钮或 PlusButton 的标识，没有时为 nil，可在 `-tabBarController:didSelectControl:` 中使用。依次取：这里设置的值；
+ *      PlusButton 的 `+[CYLPlusButtonSubclassing tabBarItemIdentifier]`，未实现时为其类名（如 @"CYLPlusButtonSubclass"）；
+ *      所选 Tab 的标识（`CYLTabBarItemIdentifier`，未设置时为默认值）。
+ */
+@property (nonatomic, copy, nullable, getter=cyl_tabBarItemIdentifier, setter=cyl_setTabBarItemIdentifier:) NSString *cyl_tabBarItemIdentifier;
+
+/*!
  * PlusButton has its own visible index,
  * in this case PlusButton is same as TabBarItem
  */
@@ -103,6 +115,16 @@ NS_ASSUME_NONNULL_BEGIN
  *      不做处理。为所有 Tab 设置时，请改为设置 `-[CYLTabBarController lottieAnimationSpeed]`（issue #428）。
  */
 - (void)cyl_setLottieAnimationSpeed:(CGFloat)animationSpeed;
+
+/*!
+ * FIX: issue #442
+ * [EN] Swaps this tab's Lottie view for the version of its animation that matches the current interface style
+ *      (`CYLTabBarLottieDarkURL`), keeping its position and playback state. Does nothing when it already matches, has no
+ *      dark version, or Lottie is not integrated. CYLTabBarController calls it when the style changes.
+ * [CN] 将当前 Tab 的 Lottie 视图替换为与当前界面风格相符的动画版本（`CYLTabBarLottieDarkURL`），保持位置和播放状态。已相符、
+ *      没有深色版本或未集成 Lottie 时不做处理。CYLTabBarController 在风格变化时会自动调用。
+ */
+- (void)cyl_reloadLottieAnimationViewForCurrentStyle;
 
 /*!
  * [EN] Plays the Lottie animation for this tab (adding the view if needed); shows the final frame instead when `defaultSelected` is YES.

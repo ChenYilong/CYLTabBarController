@@ -9,22 +9,15 @@
 #import "UIView+CYLBadgeExtention.h"
 #import <objc/runtime.h>
 #import "CAAnimation+CYLBadgeExtention.h"
-#import "UITabBarItem+CYLTabBarControllerExtention.h"
-#import "CYLConstants.h"
-#import "UIView+CYLTabBarControllerExtention.h"
-#import "UIImage+CYLTabBarControllerExtention.h"
-#import "CYLBadge/CYLTabBarBadgeView.h"
+#import "CYLTabBarBadgeView.h"
 #import "CYLBadgeAppearance.h"
-#if __has_include(<CYLTabBarController/CYLTabBarController.h>)
-#import <CYLTabBarController/CYLTabBarController.h>
-#else
-#import "CYLTabBarController.h"
-#endif
+// FIX: issue #535 — Core (tab bar) code only when CYLTabBarController is part of the build; see CYLBadgeViewDefines.h.
+// FIX: issue #535 — 只有 CYLTabBarController 参与编译时才使用 Core（TabBar）代码，见 CYLBadgeViewDefines.h。
+#import "CYLBadgeViewDefines.h"
 
-#if CYL_FLATDESIGN_AVAILABLE
+#if CYL_BADGE_CORE_AVAILABLE && CYL_FLATDESIGN_AVAILABLE
 #import <CYLTabBarController/CYLFlatDesignTabBar.h>
 #endif
-
 
 static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
 static const NSTimeInterval kCYLBadgeDefaultDelayIfNeededForSeconds = 0.5;
@@ -291,7 +284,6 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
     [self layoutIfNeeded];
     return self;
 }
-
 
 - (void)cyl_performSelector:(SEL)aSelector {
     if (aSelector == NULL) { return; }
@@ -706,33 +698,12 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
 
 #pragma mark -- animation
 
-/*!
- * FIX: issue #583, #271
- * [EN] The badge's Shake and Bounce animations (`+cyl_shake_AnimationRepeatTimes:…`, `+cyl_bounce_AnimationRepeatTimes:…`)
- *      kept the default `removedOnCompletion = YES`, unlike Breathe and Scale. Core Animation removes such animations when
- *      the app goes to the background, so after returning a badge with text stopped shaking/bouncing. Keep them. Set here,
- *      not in those public factories, so apps that use the factories themselves see no change.
- *      Scope: every badge, whatever the tab bar style (classic, iOS 26 UI compatibility mode, Liquid Glass on iOS 26+ and
- *      the iPhone Duo, FlatDesign): they all share this code, and the problem does not depend on the style. No style check
- *      on purpose: looking up the tab bar controller from a badge finds the root one, which can be the wrong one with
- *      nested tab bar controllers.
- * [CN] 角标的 Shake、Bounce 动画（`+cyl_shake_AnimationRepeatTimes:…`、`+cyl_bounce_AnimationRepeatTimes:…`）与 Breathe、Scale 不同，
- *      保留了默认的 `removedOnCompletion = YES`。App 进入后台时 Core Animation 会移除这类动画，回到前台后带文字的角标不再抖动/弹跳。
- *      这里将其保留。在此处设置而不修改这两个公开的工厂方法，App 自行使用这些方法时行为不变。
- *      范围：所有角标，与 TabBar 样式无关（经典、iOS 26 UI 兼容模式、iOS 26+ 液态玻璃与 iPhone Duo、扁平样式）：它们共用这段代码，
- *      且该问题与样式无关。有意不判断样式：从角标查找 TabBarController 会找到根控制器，嵌套 TabBarController 时可能找错。
- */
-- (void)cyl_keepBadgeAnimationAfterBackground:(CAAnimation *)animation {
-    animation.removedOnCompletion = NO;
-}
-
 //if u want to add badge animation type, follow steps bellow:
 //1. go to definition of CYLBadgeAnimationType and add new type, with its key (see the note above the keys in
 //   CYLBadgeProtocol.h: CYLBadgeAnimationKeyForType, CYLBadgeAnimationTypeRepeats, CYLBadgeAllAnimationKeys)
 //2. go to category of CAAnimation+CYLBadgeExtention to add new animation interface
 //3. call that new interface here
 - (void)cyl_beginAnimation {
-    CGFloat moveDistance = self.cyl_badge.frame.size.width * 1.5;
     if (!self.cyl_badge) {
         return;
     }
@@ -741,101 +712,15 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
     if ([self cyl_shouldReduceBadgeMotion]) {
         return;
     }
-    switch(self.cyl_badgeAnimationType) {
-        case CYLBadgeAnimationTypeBreathe:
-            [self.cyl_badge.layer addAnimation:[CAAnimation cyl_opacityForeverAnimationWithDuration:1.4]
-                                        forKey:CYLBadgeBreatheAnimationKey];
-            break;
-        case CYLBadgeAnimationTypeShake: {
-            // Relative (`transform.translation.x`), so the anchored badge can still move with its host while shaking;
-            // `-cyl_shake_AnimationRepeatTimes:…` animated `position` and pinned it to where it was. Same amplitude.
-            CAAnimation *animation = [CAAnimation cyl_shakeAnimationRepeatTimes:HUGE_VALF
-                                                                       duration:1
-                                                                         offset:CGRectGetWidth(self.cyl_badge.bounds) / 4];
-            [self cyl_keepBadgeAnimationAfterBackground:animation];
-            [self.cyl_badge.layer addAnimation:animation forKey:CYLBadgeShakeAnimationKey];
-            break;
-        }
-        case CYLBadgeAnimationTypeScale:
-            [self.cyl_badge.layer addAnimation:[CAAnimation cyl_scaleAnimationFromScale:1.4
-                                                                  toScale:0.6
-                                                                 duration:1
-                                                              repeatTimes:MAXFLOAT]
-                                        forKey:CYLBadgeScaleAnimationKey];
-            break;
-        case CYLBadgeAnimationTypeBounce: {
-            // Relative (`transform.translation.y`), see Shake. Same amplitude.
-            CAAnimation *animation = [CAAnimation cyl_bounceAnimationRepeatTimes:HUGE_VALF
-                                                                        duration:1
-                                                                          offset:CGRectGetHeight(self.cyl_badge.bounds) / 4];
-            [self cyl_keepBadgeAnimationAfterBackground:animation];
-            [self.cyl_badge.layer addAnimation:animation forKey:CYLBadgeBounceAnimationKey];
-            break;
-        }
-            
-            
-            /*!
-             *
-             
-             
-             
-             
-             
-             
-             
-             
-             */
-        case CYLBadgeAnimationTypeLeftRightOnce:        /* left to right animation*/
-            
-            [self.cyl_badge.layer addAnimation:
-             [CAAnimation cyl_badge_once_leftRight_AnimationMoveDistance:moveDistance
-                                                             repeatTimes:1
-                                                                duration:0.5]
-                                        forKey:CYLBadgeLeftRightOnceAnimationKey];
-            break;
-            
-        case CYLBadgeAnimationTypeRightLeftOnce:        /* right to left animation*/
-            
-            [self.cyl_badge.layer addAnimation:
-             [CAAnimation cyl_badge_once_rightLeft_AnimationMoveDistance:moveDistance
-                                                             repeatTimes:1
-                                                                duration:0.5]
-                                        forKey:CYLBadgeRightLeftOnceAnimationKey];
-            break;
-            
-        case CYLBadgeAnimationTypeFadeInOnce:           /* fade in animation */
-            
-            [self.cyl_badge.layer addAnimation:
-             [CAAnimation cyl_badge_once_fadeIn_AnimationRepeatTimes:1
-                                                            duration:1.5]
-                                        forKey:CYLBadgeFadeInOnceAnimationKey];
-            break;
-            
-        case CYLBadgeAnimationTypeRollingOnce:           /*rolling animation*/
-            [self.cyl_badge.layer addAnimation:
-             [CAAnimation cyl_badge_once_rolling_AnimationRepeatTimes:1
-                                                             duration:0.5]
-                                        forKey:CYLBadgeRollingOnceAnimationKey];
-            break;
-            
-        case CYLBadgeAnimationTypeScaleOnce:           /*ScaleOnce animation*/
-            [self.cyl_badge.layer addAnimation:
-             [CAAnimation cyl_badge_once_scale_AnimationRepeatTimes:1
-                                                           duration:0.5]
-                                        forKey:CYLBadgeScaleOnceAnimationKey];
-            
-            
-            break;
-            
-            
-            
-        case CYLBadgeAnimationTypeNone:
-        default:
-            
-            break;
+    // One factory for every badge, also the system badge of a bar button item on iOS 26+ (CYLBadgeViewDefines.h).
+    // 所有角标共用同一个工厂方法，包括 iOS 26+ 上 bar button item 的系统角标。
+    CYLBadgeAnimationType animationType = self.cyl_badgeAnimationType;
+    CAAnimation *animation = CYLBadgeAnimationForType(animationType, self.cyl_badge.bounds.size);
+    NSString *animationKey = CYLBadgeAnimationKeyForType(animationType);
+    if (animation && animationKey) {
+        [self.cyl_badge.layer addAnimation:animation forKey:animationKey];
     }
 }
-
 
 - (void)cyl_removeAnimation {
     if (self.cyl_badge) {
@@ -1132,24 +1017,22 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
     return self.cyl_isInvisiable;
 }
 
-- (BOOL)cyl_isInvisiable {
-    BOOL isSizeZero = CGSizeEqualToSize(CGSizeZero, self.frame.size);
-    //这里删除(NO == obj.opaque) ，因为iOS27以上的视图，渲染会通过通过 opaque 设置为 NO 进行，所以这里删除涉及关于 opaque 的判断。
-    BOOL isInvisible = (YES == self.hidden ) || (self.alpha <= 0.01f)  || (!self.superview) || isSizeZero;
-    return isInvisible;
-}
-
-- (BOOL)cyl_canNotResponseEvent {
-    return self.cyl_isInvisiable || (NO == self.userInteractionEnabled ) || self.cyl_isPlaceholder;
-}
-
 // 不管 image 还是 text 的 UIBarButtonItem 都获取内部的 _UIModernBarButton 即可
 - (UIView *)cyl_findBarButtonContentView {
     NSString *classString = NSStringFromClass(self.class);
     if ([classString isEqualToString:@"UITabBarButton"] || [classString isEqualToString:@"_UITabButton"]) {
         // 特别的，对于 UITabBarItem，将 imageView 作为参考 view
+#if CYL_BADGE_CORE_AVAILABLE
         UIView *imageView = [self cyl_tabImageView];
         return imageView;
+#else
+        for (UIView *subview in self.subviews) {
+            if ([subview isKindOfClass:[UIImageView class]]) {
+                return subview;
+            }
+        }
+        return self;
+#endif
     }
     
     if ([classString isEqualToString:@"_UIButtonBarButton"]) {
@@ -1186,7 +1069,7 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
 }
 
 - (BOOL)cyl_isCYLTabBarStyleTypeLiquidGlass {
-    if (![CYLConstants isLiquidGlassActive]) {
+    if (![CYLUtils isLiquidGlassActive]) {
         return NO;
     }
     return YES;
@@ -1196,7 +1079,7 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
     
 //    return YES;
 
-    if (![CYLConstants isLiquidGlassActive]) {
+    if (![CYLUtils isLiquidGlassActive]) {
         return NO;
     }
     if (CYL_IS_IOS_27 && ![self.cyl_badge isKindOfClass:[UILabel class]]) {

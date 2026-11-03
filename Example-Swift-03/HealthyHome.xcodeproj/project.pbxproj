@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */; };
+		61DAEAC8826B3FA13591202F /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */; };
+		7E36C3D378B559F4FFC753C7 /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */; };
+		A520A43B0231F8A9A36D72A4 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */; };
+		727E633E0971BFF96CD5500C /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = 6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */; };
 		184C1C9223F65A2800B23C7F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1C9123F65A2800B23C7F /* ViewController.swift */; };
 		184C1C9523F65A2800B23C7F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 184C1C9323F65A2800B23C7F /* Main.storyboard */; };
 		184C1C9723F65A2A00B23C7F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 184C1C9623F65A2A00B23C7F /* Assets.xcassets */; };
@@ -60,6 +65,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
+		4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home.json; path = "../Example/Classes/Other/LottieResources/green_lottie_tab_home.json"; sourceTree = SOURCE_ROOT; };
+		A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover.json; path = "../Example/Classes/Other/LottieResources/green_lottie_tab_discover.json"; sourceTree = SOURCE_ROOT; };
+		346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_news.json; path = "../Example/Classes/Other/LottieResources/green_lottie_tab_news.json"; sourceTree = SOURCE_ROOT; };
+		6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine.json; path = "../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json"; sourceTree = SOURCE_ROOT; };
+		A2A9C3F58E83E7420A5303DB /* LottieResources */ = {isa = PBXGroup; children = (
+				4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */,
+				A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */,
+				346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */,
+				6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */,
+			); name = LottieResources; sourceTree = "<group>"; };
 		184C1C8A23F65A2800B23C7F /* HealthyHome.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthyHome.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		184C1C9123F65A2800B23C7F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		184C1C9423F65A2800B23C7F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -151,6 +167,8 @@
 		184C1C8123F65A2800B23C7F = {
 			isa = PBXGroup;
 			children = (
+				78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */,
+				A2A9C3F58E83E7420A5303DB /* LottieResources */,
 				184C1C8C23F65A2800B23C7F /* HealthyHome */,
 				184C1CA323F65A2A00B23C7F /* HealthyHomeTests */,
 				184C1CAE23F65A2A00B23C7F /* HealthyHomeUITests */,
@@ -476,6 +494,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				61DAEAC8826B3FA13591202F /* green_lottie_tab_home.json in Resources */,
+				7E36C3D378B559F4FFC753C7 /* green_lottie_tab_discover.json in Resources */,
+				A520A43B0231F8A9A36D72A4 /* green_lottie_tab_news.json in Resources */,
+				727E633E0971BFF96CD5500C /* green_lottie_tab_mine.json in Resources */,
 				184C1C9A23F65A2A00B23C7F /* LaunchScreen.storyboard in Resources */,
 				184C1C9723F65A2A00B23C7F /* Assets.xcassets in Resources */,
 				184C1C9523F65A2800B23C7F /* Main.storyboard in Resources */,
@@ -572,6 +594,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				184C1CCC23F65A6700B23C7F /* FriendsVC.swift in Sources */,
 				184F198723F7C811002DBAE4 /* UIColor+Extension.swift in Sources */,
 				184C1CE623F65A9A00B23C7F /* RootTabBarController.swift in Sources */,

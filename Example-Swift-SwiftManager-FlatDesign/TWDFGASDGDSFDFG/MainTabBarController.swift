@@ -43,6 +43,14 @@ public enum AnimationSource {
 }
 
 class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarControllerDelegate {
+
+    // #535: the plus button's badge, shared by every Swift demo (Example-Shared/CYLPlusButtonBadgeDemo.swift).
+    // #535：PlusButton 的角标，所有 Swift Demo 共用（Example-Shared/CYLPlusButtonBadgeDemo.swift）。
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        demoShowPlusButtonBadgeAfterLayout()
+    }
+
     
     // MARK: - Theme Design
     private enum Theme {
@@ -166,6 +174,11 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         func animation(for theme: Theme) -> AnimationSource? {
             return .native("tabbar_\(self)_\(theme)")
         }
+
+        // 4.1 深色模式动效（#442）：LottieResources/tabbar_<模块>_<主题>_dark.json，不存在时沿用上面的动效
+        func darkAnimation(for theme: Theme) -> AnimationSource? {
+            return .native("tabbar_\(self)_\(theme)_dark")
+        }
         
         // 5. 控制器配置 (使用原生 UIViewController 占位)
         var controller: UIViewController {
@@ -224,6 +237,9 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             
             if let anim = module.animation(for: theme), let url = anim.resolvedURL {
                 attrs[CYLTabBarLottieURL] = url
+                if let darkURL = module.darkAnimation(for: theme)?.resolvedURL {
+                    attrs[CYLTabBarLottieDarkURL] = darkURL
+                }
                 attrs[CYLTabBarLottieSize] = NSValue(cgSize: theme.lottieSize)
             }
             return attrs
@@ -284,6 +300,15 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     }
     
     // MARK: - Delegate
+
+    /// #610 / #408: called for every tab button and for the plus button in the flat design style too; the identifier
+    /// (a default, the class name, when none is set) tells which one was tapped.
+    /// 扁平样式下点击每个 Tab 按钮和 PlusButton 也会调用；用标识（未设置时为默认值，即类名）区分是哪一个。
+    override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
+        demoPlusButtonDidTap(control)
+        NSLog("[#610] flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier ?? "nil", control.cyl_isPlusButton() ? "plus button" : "tab button")
+    }
+
     override func tabBarController(_ _: UITabBarController, didSelect viewController: UIViewController) {
         // flatDesign 下点击时 selectedIndex 可能仍是旧值，用 VC 判断更准
         let root = viewController.cyl_getViewControllerInsteadOfNavigation()

@@ -7,11 +7,28 @@
  */
 
 #import "UITabBarItem+CYLBadgeExtention.h"
-#import "CYLTabBarController.h"
 #import <objc/runtime.h>
-#import "UITabBarItem+CYLTabBarControllerExtention.h"
 #import "CYLBadgeProtocol.h"
 #import "UIControl+CYLBadgeExtention.h"
+// FIX: issue #535 — Core (tab bar) code only when CYLTabBarController is part of the build; see CYLBadgeViewDefines.h.
+// FIX: issue #535 — 只有 CYLTabBarController 参与编译时才使用 Core（TabBar）代码，见 CYLBadgeViewDefines.h。
+#import "CYLBadgeViewDefines.h"
+
+#if !CYL_BADGE_CORE_AVAILABLE
+/// The icon inside a tab button, where the badge goes; the button itself when there is none. 角标所在的 Tab 图标；没有时为按钮本身。
+static UIView *CYLBadgeIconViewInView(UIView *view) {
+    for (UIView *subview in view.subviews) {
+        if ([subview isKindOfClass:[UIImageView class]] && !subview.hidden && subview.frame.size.width > 0) {
+            return subview;
+        }
+        UIView *iconView = CYLBadgeIconViewInView(subview);
+        if (iconView != subview) {
+            return iconView;
+        }
+    }
+    return view;
+}
+#endif
 
 #define kActualView ((UIView *)[self cyl_getActualBadgeSuperView])
 #define CYL_ACTUAL_BARBUTTON kActualView
@@ -19,18 +36,22 @@
 @implementation UITabBarItem (CYLBadgeExtention) 
 
 - (void)cyl_setBadgeValue:(NSString *)badgeValue {
+#if CYL_BADGE_CORE_AVAILABLE
+    UIControl *tabButton = self.cyl_tabButton;
     CYL_DEPRECATED_DECLARATIONS_PUSH
     CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
     (
      // 不再必须， 因此， 并非核心逻辑， 未来考虑删除。
-     if (self.cyl_tabButton && [self.cyl_tabButton respondsToSelector:@selector(cyl_removeTabBadgePoint)]) {
-         [self.cyl_tabButton cyl_removeTabBadgePoint];
+     if (tabButton && [tabButton respondsToSelector:@selector(cyl_removeTabBadgePoint)]) {
+         [tabButton cyl_removeTabBadgePoint];
      }
      );
     CYL_DEPRECATED_DECLARATIONS_POP
+#endif
     
     [self cyl_clearBadge];
-    [self cyl_setBadgeValue:badgeValue];
+    // FIX: this used to call itself and never return. 之前这里调用自身，导致无限递归。
+    [self cyl_showBadgeValue:badgeValue animationType:CYLBadgeAnimationTypeNone];
 }
 
 - (void)cyl_setBadgeAnimationTypeValue:(NSNumber *)cyl_badgeAnimationTypeValue {
@@ -139,12 +160,16 @@
  */
 - (UIView *)cyl_getActualBadgeSuperView {
     //_UITabButton
-    UIControl *tabButton = [self cyl_tabButton];
+    UIControl *tabButton = self.cyl_tabButton;
 //    UIView *actualBadgeSuperView = [self cyl_getActualBadgeSuperViewFromControl:tabButton];
     UIView *actualBadgeSuperView;
     if ([tabButton isKindOfClass:[UIControl class]]) {
+#if CYL_BADGE_CORE_AVAILABLE
         actualBadgeSuperView = [tabButton cyl_getActualBadgeSuperView];
-        if (![CYLConstants isLiquidGlassActive]) {
+#else
+        actualBadgeSuperView = CYLBadgeIconViewInView(tabButton);
+#endif
+        if (![CYLUtils isLiquidGlassActive]) {
             return actualBadgeSuperView;
         }
     }
@@ -172,12 +197,19 @@
 
 - (void)cyl_performSelector:(SEL)aSelector withObject:(nullable id)object1 withObject:(nullable id)object2 {
     if (aSelector == NULL) { return; }
+#if !CYL_BADGE_CORE_AVAILABLE
+    // On its own there is no Liquid Glass platter to mirror. 单独使用时没有需要同步的液态玻璃 platter。
+    UIView *actualBadgeSuperView = [self cyl_getActualBadgeSuperView];
+    CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+    (
+     [actualBadgeSuperView performSelector:aSelector withObject:object1 withObject:object2];
+     )
+#else
     UIControl *normalControl = nil;
     UIControl *selectedControl = nil;
     
-    UIControl *selfControl = [self cyl_tabButton];
-    
-    if (![selfControl isKindOfClass:[UIControl class]] || ![CYLConstants isLiquidGlassActive]) {
+    UIControl *selfControl = self.cyl_tabButton;
+    if (![selfControl isKindOfClass:[UIControl class]] || ![CYLUtils isLiquidGlassActive]) {
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
         (
          [selfControl performSelector:aSelector withObject:object1 withObject:object2];
@@ -213,11 +245,26 @@
          }
      }
      );
+#endif
 }
 
+/*!
+ * FIX: issue #535
+ * [EN] Returns YES once the item's image view or title label has been laid out (width > 10). This was implemented both
+ *      here and in Core's `UITabBarItem+CYLTabBarControllerExtention.m`, and the one that ran depended on link order
+ *      (Core's, in CocoaPods builds). It is now this single implementation, keeping Core's check; without Core it asks
+ *      the tab button.
+ * [CN] 该 Item 的图片视图或标题 Label 完成布局（宽度大于 10）后返回 YES。此方法原先在这里和 Core 的
+ *      `UITabBarItem+CYLTabBarControllerExtention.m` 中各实现了一次，实际生效的取决于链接顺序（CocoaPods 构建中为 Core 的实现）。
+ *      现在只保留这一个实现，沿用 Core 的判断；没有 Core 时询问 Tab 按钮。
+ */
 - (BOOL)cyl_isReady {
-    UIControl *selfControl = [self cyl_tabButton];
+#if CYL_BADGE_CORE_AVAILABLE
+    return self.cyl_imageView.frame.size.width > 10 || self.cyl_view.cyl_tabLabel.frame.size.width > 10 ;
+#else
+    UIControl *selfControl = self.cyl_tabButton;
     return selfControl.cyl_isReady;
+#endif
 }
 
 #pragma mark -- setter/getter
