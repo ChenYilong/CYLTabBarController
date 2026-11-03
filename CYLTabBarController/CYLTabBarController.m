@@ -434,10 +434,14 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
             NSArray *subTabBarButtonsWithoutPlusButton = tabBar.cyl_subTabBarButtonsWithoutPlusButton;
             [subTabBarButtonsWithoutPlusButton enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
                 UIControl *tabButton = control;
-                BOOL defaultSelected = NO;
-                if (idx == self.selectedIndex) {
-                    defaultSelected = YES;
-                }
+                // FIX: issue #423 — `idx` counts the buttons without the plus button, `selectedIndex` counts the view
+                // controllers, which hold the plus child view controller too. With one before the selected tab, the
+                // launch animation played on the wrong tab. Compare the button's own tab item instead; the position is
+                // only a fallback. `idx` 不含 PlusButton，`selectedIndex` 却包含 PlusButton 子控制器；子控制器在选中 Tab
+                // 之前时，启动动画会播在错的 Tab 上。改为比较按钮所属的 tabBarItem，按位置比较仅作兜底。
+                UITabBarItem *tabBarItem = [self cyl_tabBarItemForTabButton:tabButton];
+                BOOL defaultSelected = tabBarItem ? (tabBarItem == self.selectedViewController.tabBarItem)
+                                                  : (idx == self.selectedIndex);
                 //TODO:  selected content, double add
                 [self addLottieImageWithControl:tabButton animation:defaultSelected defaultSelected:defaultSelected];
                 self.lottieViewAdded = YES;
@@ -2990,6 +2994,35 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 }
 
 //TODO:  selected content, double add
+/*!
+ * Issue #423 (hardening)
+ * [EN] The tab bar item a tab button belongs to, found through the view controllers instead of the button's position.
+ *      Each item keeps its own Lottie file (`cyl_lottieURL` / `cyl_lottieSizeValue`, from `CYLTabBarLottieURL`, or
+ *      `CYLTabBarLottieFilePath` turned into a file URL), the same value `lottieURLs` holds, so this never shifts.
+ *      Selecting a tab already uses the item (`-tabChangedToSelectedIndex:…`). The position-based lookups below only run
+ *      at launch, where the counts are checked first, so they were aligned; this makes them independent of the plus
+ *      button and of tabs without Lottie.
+ * [CN] 通过子控制器（而不是按钮的位置）找到 Tab 按钮所属的 tabBarItem。每个 item 保存着自己的 Lottie 文件
+ *      （`cyl_lottieURL` / `cyl_lottieSizeValue`，来自 `CYLTabBarLottieURL`，或由 `CYLTabBarLottieFilePath` 转成的文件 URL），
+ *      与 `lottieURLs` 中的值相同，不会错位。选中 Tab 时本来就按 item 取（`-tabChangedToSelectedIndex:…`）；下面按位置取的代码只在
+ *      启动时执行，且事先校验了数量，因此是对齐的。这里让它们不再依赖 PlusButton 和未设置 Lottie 的 Tab。
+ */
+- (nullable UITabBarItem *)cyl_tabBarItemForTabButton:(nullable UIControl *)control {
+    if (!control || [control cyl_isPlusControl]) {
+        return nil;
+    }
+    for (UIViewController *viewController in self.viewControllers) {
+        if (viewController.cyl_isPlaceholder) {
+            continue;
+        }
+        UITabBarItem *item = viewController.tabBarItem;
+        if (item.cyl_tabButton == control || viewController.cyl_tabButton == control) {
+            return item;
+        }
+    }
+    return nil;
+}
+
 - (void)addLottieImageWithControl:(UIControl *)control
                         animation:(BOOL)animation
                   defaultSelected:(BOOL)defaultSelected {
@@ -3006,13 +3039,20 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         if (control.cyl_isPlusButton) {
             return;
         }
-        // FIX: issue #618 — a tab button without a matching Lottie entry (more tab buttons than
-        // `tabBarItemsAttributes`) used to raise NSRangeException here.
-        if (index >= self.lottieURLs.count || index >= self.lottieSizes.count) {
-            return;
+        // Issue #423 (hardening) — the file of this button's own tab item first; the position is only a fallback.
+        // 优先使用该按钮所属 tabBarItem 的 Lottie 文件，按位置取仅作为兜底。
+        UITabBarItem *tabBarItem = [self cyl_tabBarItemForTabButton:control];
+        NSURL *lottieURL = tabBarItem.cyl_lottieURL;
+        NSValue *lottieSizeValue = tabBarItem.cyl_lottieSizeValue;
+        if (!lottieURL) {
+            // FIX: issue #618 — a tab button without a matching Lottie entry (more tab buttons than
+            // `tabBarItemsAttributes`) used to raise NSRangeException here.
+            if (index >= self.lottieURLs.count || index >= self.lottieSizes.count) {
+                return;
+            }
+            lottieURL = self.lottieURLs[index];
+            lottieSizeValue = self.lottieSizes[index];
         }
-        NSURL *lottieURL = self.lottieURLs[index];
-        NSValue *lottieSizeValue = self.lottieSizes[index];
         CGSize lottieSize = [lottieSizeValue CGSizeValue];
         [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode animationSpeed:self.lottieAnimationSpeed];
         if (animation) {
@@ -3032,21 +3072,29 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     UIControl *contentControl = control;
     UIControl *selectedContentControl;
     //FIXME:  必须为 cyl_subTabBarButtonsWithoutPlusButton （不能 cyl_subTabBarButtons）否则Lottie选中动画不显示，因为Lottie文件数量与tabbaritems 的数量少一个。
-    //TODO: selectedContentControl不对，plusButton 下一个会添加失败，添加的是 plusButton对应的lottie， 顺延了。
+    // The plus button offset ("顺延") is fixed by `-cyl_tabBarItemForTabButton:` below (#423).
     if (control.cyl_isPlusControl) {
         return;
     }
     
     NSURL *lottieURL = theLottieURL;
     NSValue *lottieSizeValue = theLottieSizeValue;
-    if ([self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+    // Issue #423 (hardening) — no file given: take the one of this button's own tab item, not the one at its position.
+    // 未传入文件时，使用该按钮所属 tabBarItem 的 Lottie 文件，而不是按位置取。
+    if (!lottieURL || !lottieSizeValue) {
+        UITabBarItem *tabBarItem = [self cyl_tabBarItemForTabButton:contentControl];
+        lottieURL = lottieURL ?: tabBarItem.cyl_lottieURL;
+        lottieSizeValue = lottieSizeValue ?: tabBarItem.cyl_lottieSizeValue;
+    }
+    if ((!lottieURL || !lottieSizeValue) && [self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         
         @try {
             CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
             NSUInteger index = contentControl ? [cyl_tabBar.cyl_subTabBarButtons indexOfObject:contentControl] : NSNotFound;
             if (NSNotFound != index) {
                 if (!lottieURL) {
-                    //TODO:lottieURLs 与 Control对应的index不一致， 因为 lottieURLs 可能会少一个 plusButton 对应的。如何能够不通过index就获取到 lottieURLs ?
+                    // Fallback only: the position can be off by the plus button; `-cyl_tabBarItemForTabButton:` above is used first.
+                    // 仅作兜底：按位置可能因 PlusButton 错位，上面优先使用 `-cyl_tabBarItemForTabButton:`。
                     lottieURL = self.lottieURLs[index];
                 }
                 
