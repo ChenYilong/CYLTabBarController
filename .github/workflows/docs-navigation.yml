@@ -1,0 +1,29 @@
+# Fails when the documentation navigation or the doc-class bindings are out of date.
+# Fix it locally with: python3 scripts/update-docs-navigation.py
+name: Docs navigation
+
+on:
+  pull_request:
+    paths:
+      - "README.md"
+      - "docs/**"
+      - "CYLTabBarController/**/*.h"
+      - "scripts/update-docs-navigation.py"
+  push:
+    branches: [master]
+    paths:
+      - "README.md"
+      - "docs/**"
+      - "CYLTabBarController/**/*.h"
+      - "scripts/update-docs-navigation.py"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the navigation
+        run: python3 scripts/update-docs-navigation.py --check
