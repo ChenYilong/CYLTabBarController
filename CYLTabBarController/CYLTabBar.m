@@ -34,6 +34,13 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 
 @end
 
+/// See `cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h. 见 CYLPlusButton.h 中的 `cyl_appliesCenterYOffsetWithoutTitle`。
+@interface CYLPlusButton (CYLTabBarLayout)
+- (BOOL)cyl_isCenteredWithoutTitle;
+- (CGPoint)cyl_centerInTabButton:(UIView *)tabButton inView:(UIView *)view aligned:(BOOL *)aligned;
+- (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center;
+@end
+
 @implementation CYLTabBar
 @synthesize plusButton = _plusButton;
 
@@ -607,7 +614,23 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         UIView *verticalBarSlot = [self cyl_verticalBarTabButtonAtIndex:plusButtonIndex];
         if (verticalBarSlot) {
             CGPoint slotCenter = [verticalBarSlot.superview convertPoint:verticalBarSlot.center toView:self];
-            if (!CGPointEqualToPoint(self.plusButton.center, slotCenter)) {
+            // Issue #636: the slot shows the plus button's title; its image goes above that title, as on the horizontal
+            // bar. Without a title the plus button stays centered on the slot.
+            // 竖向栏中该 Tab 显示 PlusButton 的标题：图片放在标题上方，与横向栏一致；没有标题时仍居中于该 Tab。
+            CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
+            BOOL needsTitleLayout = NO;
+            if ([plusButton cyl_showsTitleInTabBarItem]) {
+                BOOL aligned = NO;
+                slotCenter = [plusButton cyl_centerInTabButton:verticalBarSlot inView:self aligned:&aligned];
+                // The slot's title may be laid out after this pass (the title has just moved): try again a few times.
+                // 该 Tab 的标题可能在本次布局之后才排好（标题刚移过去）：再尝试几次。
+                static char CYLVerticalBarTitleRetriesKey;
+                NSInteger retries = [objc_getAssociatedObject(self, &CYLVerticalBarTitleRetriesKey) integerValue];
+                needsTitleLayout = !aligned && retries < 5;
+                objc_setAssociatedObject(self, &CYLVerticalBarTitleRetriesKey, @(aligned ? 0 : retries + 1),
+                                         OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
+            if (!CGPointEqualToPoint(self.plusButton.center, slotCenter) || needsTitleLayout) {
                 [CATransaction begin];
                 [CATransaction setDisableActions:YES];
                 self.plusButton.center = slotCenter;
@@ -646,11 +669,21 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         tabBarHeight * multiplierOfTabBarHeight
         + constantOfPlusButtonCenterYOffset;
         
+        // A plus button without a title replaces the whole tab item: centered on the platter (the tab items' center),
+        // not on the tab bar (`cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h).
+        // 没有标题的 PlusButton 替换整个 TabBarItem：居中于 platter（即 Tab 的中心），而不是 TabBar 的中心。
+        if ([[CYLPlusButton plusButtonForOwner:self] cyl_isCenteredWithoutTitle]) {
+            systemDefaultY = platterCenter.y;
+        }
+        
         // 计算最终中心
         CGPoint finalCenter = CGPointMake(
                                           platterCenter.x ,
                                           systemDefaultY
                                           );
+        // Issue #636: with the title in the tab item, the image above its title, on the title's vertical center line.
+        // 标题由 TabBarItem 显示时：图片位于标题上方，与标题竖向中心线对齐。
+        finalCenter = [[CYLPlusButton plusButtonForOwner:self] cyl_alignedCenterForCenter:finalCenter];
         
         // ===============================
         // 禁止隐式动画
@@ -1066,14 +1099,6 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     }
     SEL actin = @selector(tabChangedToControl:);
     CYLTabBarController *tabBarController = [self tabBarController];
-    if ([self cyl_shouldUpdateHiddenStatueForPlusButtonLabel] && [hitView isKindOfClass:[CYLPlusButton class]] && [tabBarController.selectedViewController isEqual:[CYLPlusButton plusChildViewControllerForOwner:self]]) {
-        //如果在选中CYLPlusChildViewController的状态下，  重复点击，或者滑动手势，又选中CYLPlusChildViewController。 相当于重复点击CYLPlusChildViewController， 则不显示未选中状态的Label， 仅仅在切换到其他tab的情况下， 显示未选中状态的Label。 否则会出现Label重叠的情况。
-        //TODO:   选中center按钮 长按玻璃遮罩 向左或者向右 稍微移动一点距离 回到原位center 按钮标题 会变模糊. 由于无法解决， 故暂时禁止在选中PlusVC时的 用户滑动手势。等未来找到合适方案再处理.
-//        [[CYLPlusButton plusButtonForOwner:self] setTabLabelHidden:NO];
-        if (![CYLPlusButton plusButtonForOwner:self].cyl_keepShowingPlusButtonLabel) {
-            return NO;
-        }
-    }
     if (([hitView cyl_isTabButton] || [hitView isKindOfClass:[CYLPlusButton class]] ) && [tabBarController respondsToSelector:actin]) {
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
         (

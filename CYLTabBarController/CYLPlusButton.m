@@ -112,6 +112,11 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 - (UIControl *)cyl_plusButtonControlIfSelectingPlusChildViewController:(UIViewController *)viewController;
 @end
 
+/// Issue #636: the title moved into the tab item, and the image-to-title distance measured before (see
+/// `-cyl_showsTitleInTabBarItem`).
+static const void *CYLPlusButtonMovedTitleKey = &CYLPlusButtonMovedTitleKey;
+static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
+
 @implementation CYLPlusButton
 //@synthesize selected = _selected;
 
@@ -126,7 +131,7 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
     if (label.length > 0) {
         return label;
     }
-    NSString *title = self.currentTitle ?: self.titleLabel.text;
+    NSString *title = self.currentTitle ?: objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey) ?: self.titleLabel.text;
     return title.length > 0 ? title : CYLLocalizedString(@"加号按钮");
 }
 
@@ -144,6 +149,12 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
     [button setImage:image forState:UIControlStateNormal];
     // An explicit highlighted image is drawn as is, so the button does not darken on touch.
     [button setImage:image forState:UIControlStateHighlighted];
+    // Issue #636: Liquid Glass with a title, the selected states too, so the selected plus button is not dimmed either.
+    // 液态玻璃下有标题时（issue #636）选中状态也显式设置，选中后不会变暗。
+    if ([CYLConstants isLiquidGlassActive] && title.length > 0) {
+        [button setImage:image forState:UIControlStateSelected];
+        [button setImage:image forState:(UIControlStateSelected | UIControlStateHighlighted)];
+    }
     button.titleLabel.textAlignment = NSTextAlignmentCenter;
     button.titleLabel.font = [UIFont systemFontOfSize:10];
     [button setTitle:CYLLocalizedString(title) forState:UIControlStateNormal];
@@ -153,6 +164,25 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
     objc_setAssociatedObject(button, @selector(cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:), @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     [button sizeToFit];
     return button;
+}
+
+#pragma mark - Image rendering
+
+/*!
+ * Issue #636
+ * [EN] With the title in the tab item (`-cyl_showsTitleInTabBarItem`), the plus button's icon is drawn as is
+ *      (`UIImageRenderingModeAlwaysOriginal`): an image with the default rendering mode can be tinted, e.g. by the tab
+ *      bar's tint or by Liquid Glass in the selected layer, so the stand-in seen through the lens and the plus button
+ *      showed the same icon in different colors. Other plus buttons keep their images as set.
+ * [CN] 标题由 TabBarItem 显示时（`-cyl_showsTitleInTabBarItem`），PlusButton 的图标按原图绘制（`UIImageRenderingModeAlwaysOriginal`）：
+ *      默认渲染模式的图片可能被染色（如 TabBar 的 tint，或液态玻璃选中图层），导致放大镜中的替身与 PlusButton 的同一图标颜色不一致。
+ *      其他 PlusButton 保持原样。
+ */
+- (void)setImage:(UIImage *)image forState:(UIControlState)state {
+    if ([self cyl_showsTitleInTabBarItem]) {
+        image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+    }
+    [super setImage:image forState:state];
 }
 
 #pragma mark - Title alignment
@@ -192,10 +222,12 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 /// Moving the plus button does not lay it out again, but moves its title off the tab titles' line: e.g. after the Flat
 /// style's tab bar height changes, the plus button is re-centered on its placeholder tab after the tab bar's layout.
 - (void)setCenter:(CGPoint)center {
+    center = [self cyl_centerOfStandInForCenter:center];
     BOOL moved = !CGPointEqualToPoint(center, self.center);
     [super setCenter:center];
     if (moved) {
         [self cyl_setNeedsTitleAlignment];
+        [self cyl_moveSelectedContentViewWithPlusButton];
     }
 }
 
@@ -204,12 +236,268 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
     [super setFrame:frame];
     if (moved) {
         [self cyl_setNeedsTitleAlignment];
+        // A stand-in placed by frame (e.g. by the tab button layout tracker) goes back onto the plus button's position.
+        CGPoint center = [self cyl_centerOfStandInForCenter:self.center];
+        if (!CGPointEqualToPoint(center, self.center)) {
+            [super setCenter:center];
+        }
+    }
+}
+
+/*!
+ * FIX: issue #636
+ * [EN] With a plus child view controller, Liquid Glass shows this plus button's stand-in (`-selectedContentView`) in the
+ *      selected layer, through the lens. Its center must be the plus button's, converted from the other layer; the tab
+ *      button layout tracker re-centered it on the tab icon after `CYLTabBarController` had placed it, so the lens showed
+ *      the plus image off the plus button. Returns `center` for any other view.
+ * [CN] 有 PlusButton 子控制器时，液态玻璃在选中图层（透过放大镜）显示 PlusButton 的替身（`-selectedContentView`）。替身中心必须与
+ *      PlusButton 一致（在两个图层之间坐标转换）；`CYLTabBarController` 设置之后，Tab 按钮布局跟踪又会把它重新居中到 Tab 图标上，
+ *      导致放大镜里的加号图片偏离 PlusButton。对其他视图原样返回 `center`。
+ */
+- (CGPoint)cyl_centerOfStandInForCenter:(CGPoint)center {
+    if (!self.superview || ![CYLConstants isLiquidGlassActive] || ![self cyl_isInPlatterSelectedLayer]) {
+        return center;
+    }
+    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    if (!plusButton || plusButton == self || !plusButton.superview || ![CYLPlusButton plusChildViewControllerForOwner:self]) {
+        return center;
+    }
+    if (![plusButton cyl_showsTitleInTabBarItem] && ![plusButton cyl_hasNoTitleInLiquidGlass]) {
+        return center;
+    }
+    return [self.superview convertPoint:plusButton.center fromView:plusButton.superview];
+}
+
+#pragma mark - Liquid Glass: the title in the tab item (issue #636)
+
+
+/*!
+ * FIX: issue #636
+ * [EN] Liquid Glass, a plus button with a title, and `+alignsTitleWithTabBarItemTitles` returning YES; with or without
+ *      its own view controller (without one, the tab item under the plus button is a placeholder's). A plus button without
+ *      a title keeps covering the whole tab item. Laid over the whole tab item, the plus button's own title could not match the tab titles: Liquid
+ *      Glass draws them in two layers (normal, and selected through the lens), through the glass, and the lens showed the
+ *      plus button's stand-in (`-selectedContentView`) as a smaller copy. Instead, the title moves into the tab item under
+ *      the plus button (`tabBarItem.title` of `-cyl_viewControllerOfTabBarItem`), which the system draws in both layers
+ *      with the tab font, position and colors, and the plus button keeps only its image, in place of the tab icon.
+ * [CN] 液态玻璃下，PlusButton 有标题，且 `+alignsTitleWithTabBarItemTitles` 返回 YES；有无子控制器均可（没有子控制器时，PlusButton
+ *      下方是占位控制器的 TabBarItem）。没有标题的 PlusButton 仍覆盖整个 TabBarItem。PlusButton 覆盖整个 TabBarItem
+ *      时，其自带标题无法与 Tab 标题一致：液态玻璃在两个图层（普通图层，以及透过放大镜显示的选中图层）中透过玻璃绘制 Tab 标题，放大镜中
+ *      显示的是 PlusButton 的替身（`-selectedContentView`），会变成更小的副本。现在标题改由 PlusButton 下方的 TabBarItem 显示（
+ *      `-cyl_viewControllerOfTabBarItem` 的 `tabBarItem.title`），系统在两个图层中以 Tab 的字体、位置和颜色绘制；PlusButton 只保留图片，替换 Tab 的图标。
+ */
+- (BOOL)cyl_showsTitleInTabBarItem {
+    if (![CYLConstants isLiquidGlassActive] || ![self cyl_viewControllerOfTabBarItem]) {
+        return NO;
+    }
+    NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
+    if (movedTitle.length == 0 && self.currentTitle.length == 0) {
+        return NO;
+    }
+    UIView *systemTabBar = self.superview;
+    while (systemTabBar && ![systemTabBar isKindOfClass:[UITabBar class]]) {
+        systemTabBar = systemTabBar.superview;
+    }
+    return systemTabBar != nil;
+}
+
+/// The view controller of the tab item under the plus button: the plus button's own, else the placeholder.
+/// PlusButton 下方 TabBarItem 的控制器：PlusButton 的子控制器，没有时为占位控制器。
+- (UIViewController *)cyl_viewControllerOfTabBarItem {
+    UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:self];
+    if (plusChildViewController) {
+        return plusChildViewController;
+    }
+    for (UIViewController *viewController in [self cyl_owningTabBarController].viewControllers) {
+        if (viewController.cyl_isPlaceholder) {
+            return viewController;
+        }
+    }
+    return nil;
+}
+
+- (void)cyl_layOutForTitleInTabBarItem {
+    UIImageView *imageView = self.imageView;
+    if (!imageView.superview) {
+        return;
+    }
+    if (!objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey)) {
+        // Measured while the title is still laid out, so the image keeps the distance from the title it has in the Flat
+        // style, where the whole plus button is centered on its tab item.
+        UILabel *titleLabel = self.titleLabel;
+        CGFloat imageToTitle = [titleLabel.superview convertPoint:titleLabel.center toView:self].y -
+                               [imageView.superview convertPoint:imageView.center toView:self].y;
+        NSString *title = self.currentTitle;
+        objc_setAssociatedObject(self, CYLPlusButtonMovedTitleKey, title, OBJC_ASSOCIATION_COPY_NONATOMIC);
+        objc_setAssociatedObject(self, CYLPlusButtonImageToTitleKey, @(imageToTitle), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        // The stand-in in the selected layer is a second plus button: it drops its title too, the tab item has it.
+        if (![self cyl_isInPlatterSelectedLayer]) {
+            [self cyl_viewControllerOfTabBarItem].tabBarItem.title = title;
+        }
+        for (NSNumber *state in @[@(UIControlStateNormal), @(UIControlStateHighlighted), @(UIControlStateSelected),
+                                  @(UIControlStateSelected | UIControlStateHighlighted)]) {
+            UIControlState controlState = state.unsignedIntegerValue;
+            [self setTitle:nil forState:controlState];
+            // The images set before this mode applied are drawn as is too (see `-setImage:forState:`).
+            UIImage *image = [self imageForState:controlState];
+            if (image && image.renderingMode != UIImageRenderingModeAlwaysOriginal) {
+                [self setImage:image forState:controlState];
+            }
+        }
+        if (@available(iOS 15.0, *)) {
+            UIButtonConfiguration *configuration = self.configuration;
+            if (configuration) {
+                configuration.title = nil;
+                configuration.attributedTitle = nil;
+                self.configuration = configuration;
+            }
+        }
+        [self setNeedsLayout];
+        // The tab bar places the plus button from the moved title in the iOS 27.1 vertical bar (`-cyl_centerInTabButton:inView:aligned:`).
+        [self.superview setNeedsLayout];
+        return;
+    }
+    // The stand-in is placed from the plus button (`-cyl_moveSelectedContentViewWithPlusButton`).
+    if ([self cyl_isInPlatterSelectedLayer]) {
+        return;
+    }
+    // New view controllers bring a new placeholder, without the title. 重设子控制器后占位控制器是新的，没有标题。
+    NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
+    UITabBarItem *tabBarItem = [self cyl_viewControllerOfTabBarItem].tabBarItem;
+    if (tabBarItem && ![tabBarItem.title isEqualToString:movedTitle]) {
+        tabBarItem.title = movedTitle;
+    }
+    // Recompute the center without the title (also done by the tab bar, `-cyl_alignedCenterForCenter:`).
+    // 去掉标题后重新计算中心（TabBar 布局时也会计算）。
+    if (!self.superview) {
+        return;
+    }
+    CGPoint center = [self cyl_alignedCenterForCenter:self.center];
+    if (fabs(center.x - self.center.x) >= 0.5 || fabs(center.y - self.center.y) >= 0.5) {
+        self.center = center;
+    }
+}
+
+/*!
+ * FIX: issue #636
+ * [EN] With the title in the tab item, the center (in the plus button's superview) that puts the image `imageToTitle`
+ *      (measured before the title moved) above the tab titles' center line, and on the vertical center line of its own
+ *      title, which the system lays out. Returns `center` in any other case, or while the titles are not laid out.
+ * [CN] 标题由 TabBarItem 显示时，PlusButton 在其父视图中的中心：图片位于 Tab 标题中心线上方 `imageToTitle`（标题移走前测得）处，
+ *      并与它自己的标题（由系统布局）竖向中心线对齐。其他情况，或标题尚未布局时，原样返回 `center`。
+ */
+- (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center {
+    UIView *container = self.superview;
+    UIImageView *imageView = self.imageView;
+    NSNumber *imageToTitle = objc_getAssociatedObject(self, CYLPlusButtonImageToTitleKey);
+    if (!container || !imageView.superview || imageToTitle == nil || [self cyl_isInPlatterSelectedLayer] ||
+        ![self cyl_showsTitleInTabBarItem]) {
+        return center;
+    }
+    // The image's offset from the plus button's center. 图片中心相对 PlusButton 中心的偏移。
+    CGPoint imageCenter = [imageView.superview convertPoint:imageView.center toView:self];
+    CGFloat imageOffsetX = imageCenter.x - CGRectGetMidX(self.bounds);
+    CGFloat imageOffsetY = imageCenter.y - CGRectGetMidY(self.bounds);
+    // Its own title first (the tab item's), else the other tab titles, which share its center line.
+    // 优先用它自己的标题（TabBarItem 的），没有时用其他 Tab 标题（中心线相同）。
+    UILabel *ownTitleLabel = [self cyl_ownTitleLabelInTabBarItem];
+    UILabel *itemTitleLabel = ownTitleLabel ?: [self cyl_tabBarItemTitleLabels].firstObject;
+    if (itemTitleLabel) {
+        [itemTitleLabel.superview layoutIfNeeded];
+        CGFloat itemTitleCenterY = [itemTitleLabel.superview convertPoint:itemTitleLabel.center toView:container].y;
+        center.y = itemTitleCenterY - imageToTitle.doubleValue - imageOffsetY;
+    }
+    if (ownTitleLabel) {
+        center.x = [ownTitleLabel.superview convertPoint:ownTitleLabel.center toView:container].x - imageOffsetX;
+    }
+    return center;
+}
+
+/// The tab item's label that shows the plus button's title, in the normal layer. 普通图层中显示 PlusButton 标题的 TabBarItem 标签。
+- (UILabel *)cyl_ownTitleLabelInTabBarItem {
+    NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
+    UIView *systemTabBar = self.superview;
+    while (systemTabBar && ![systemTabBar isKindOfClass:[UITabBar class]]) {
+        systemTabBar = systemTabBar.superview;
+    }
+    if (movedTitle.length == 0 || !systemTabBar) {
+        return nil;
+    }
+    NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:systemTabBar];
+    while (views.count > 0) {
+        UIView *view = views.firstObject;
+        [views removeObjectAtIndex:0];
+        if (view == self || view.cyl_isPlatterSelectedContentView) {
+            continue;
+        }
+        if ([view isKindOfClass:[UILabel class]] && [((UILabel *)view).text isEqualToString:movedTitle] && !view.hidden &&
+            view.window) {
+            return (UILabel *)view;
+        }
+        [views addObjectsFromArray:view.subviews];
+    }
+    return nil;
+}
+
+/*!
+ * FIX: issue #636, #653
+ * [EN] The plus button's center in `view` that puts its image `imageToTitle` (measured before the title moved) above the
+ *      title of `tabButton`, used for the iOS 27.1 vertical bar, whose tab buttons are outside the tab bar. The center of
+ *      `tabButton` until the title has moved, or when `tabButton` has no laid-out title; `aligned` tells which.
+ * [CN] PlusButton 在 `view` 中的中心：使其图片位于 `tabButton` 标题上方 `imageToTitle`（标题移走前测得）处，用于 iOS 27.1 竖向栏
+ *      （其 Tab 按钮不在 TabBar 内）。标题尚未移走，或 `tabButton` 没有已布局的标题时，返回 `tabButton` 的中心；`aligned` 表示是哪种。
+ */
+- (CGPoint)cyl_centerInTabButton:(UIView *)tabButton inView:(UIView *)view aligned:(BOOL *)aligned {
+    CGPoint center = [tabButton.superview convertPoint:tabButton.center toView:view];
+    if (aligned) {
+        *aligned = NO;
+    }
+    NSNumber *imageToTitle = objc_getAssociatedObject(self, CYLPlusButtonImageToTitleKey);
+    UILabel *titleLabel = tabButton.cyl_tabLabel;
+    UIImageView *imageView = self.imageView;
+    if (imageToTitle == nil || titleLabel.text.length == 0 || !titleLabel.superview || !imageView.superview) {
+        return center;
+    }
+    CGPoint titleCenter = [titleLabel.superview convertPoint:titleLabel.center toView:view];
+    // The image's distance from the plus button's center. 图片中心相对 PlusButton 中心的偏移。
+    CGPoint imageCenter = [imageView.superview convertPoint:imageView.center toView:self];
+    CGFloat imageOffsetX = imageCenter.x - CGRectGetMidX(self.bounds);
+    CGFloat imageOffsetY = imageCenter.y - CGRectGetMidY(self.bounds);
+    if (aligned) {
+        *aligned = YES;
+    }
+    // Above its title, on the title's vertical center line. 位于标题上方，与标题竖向中心线对齐。
+    return CGPointMake(titleCenter.x - imageOffsetX, titleCenter.y - imageToTitle.doubleValue - imageOffsetY);
+}
+
+/*!
+ * [EN] Liquid Glass shows the plus button's stand-in (`-selectedContentView`) in the selected layer, another view
+ *      hierarchy: keep it on the plus button's position (converted between the two layers) whenever the plus button moves.
+ * [CN] 液态玻璃在选中图层（另一个视图层级）中显示 PlusButton 的替身（`-selectedContentView`）：PlusButton 每次移动时，通过坐标转换让替身
+ *      保持在 PlusButton 的位置。
+ */
+- (void)cyl_moveSelectedContentViewWithPlusButton {
+    UIButton *selectedContentView = _selectedContentView;
+    if (!selectedContentView.superview || !self.superview || selectedContentView == self) {
+        return;
+    }
+    // Only for the layouts of this change: the title in the tab item, or no title.
+    if (![self cyl_showsTitleInTabBarItem] && ![self cyl_hasNoTitleInLiquidGlass]) {
+        return;
+    }
+    CGPoint center = [selectedContentView.superview convertPoint:self.center fromView:self.superview];
+    if (!CGPointEqualToPoint(center, selectedContentView.center)) {
+        selectedContentView.center = center;
     }
 }
 
 /// See `+alignsTitleWithTabBarItemTitles`.
 - (void)cyl_alignTitleWithTabBarItemTitlesIfNeeded {
     if (![self cyl_alignsTitleWithTabBarItemTitles]) {
+        return;
+    }
+    if ([self cyl_showsTitleInTabBarItem]) {
+        [self cyl_layOutForTitleInTabBarItem];
         return;
     }
     if (self.currentTitle.length == 0 && self.currentAttributedTitle.length == 0) {
@@ -649,9 +937,37 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return [self multiplierOfTabBarHeight:tabBarHeight plusButtonHeight:self.frame.size.height];
 }
 
+/// Liquid Glass and no title: the plus button replaces the whole tab item. 液态玻璃下没有标题：PlusButton 替换整个 TabBarItem。
+- (BOOL)cyl_hasNoTitleInLiquidGlass {
+    if (![CYLConstants isLiquidGlassActive]) {
+        return NO;
+    }
+    NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
+    return movedTitle.length == 0 && self.currentTitle.length == 0 && self.currentAttributedTitle.length == 0;
+}
+
+- (BOOL)cyl_appliesCenterYOffsetWithoutTitle {
+    return [objc_getAssociatedObject(self, @selector(cyl_appliesCenterYOffsetWithoutTitle)) boolValue];
+}
+
+- (void)cyl_setAppliesCenterYOffsetWithoutTitle:(BOOL)appliesCenterYOffsetWithoutTitle {
+    objc_setAssociatedObject(self, @selector(cyl_appliesCenterYOffsetWithoutTitle), @(appliesCenterYOffsetWithoutTitle),
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self.superview setNeedsLayout];
+}
+
+/// Centered on the tab item, the height methods ignored (see `cyl_appliesCenterYOffsetWithoutTitle`).
+/// 居中于 TabBarItem，忽略高度相关的代理方法（见 `cyl_appliesCenterYOffsetWithoutTitle`）。
+- (BOOL)cyl_isCenteredWithoutTitle {
+    return [self cyl_hasNoTitleInLiquidGlass] && !self.cyl_appliesCenterYOffsetWithoutTitle;
+}
+
 - (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight plusButtonHeight:(CGFloat)plusButtonHeight {
     CGFloat multiplierOfTabBarHeight;
-    if ([[self class] respondsToSelector:@selector(multiplierOfTabBarHeight:)]) {
+    if ([self cyl_isCenteredWithoutTitle]) {
+        multiplierOfTabBarHeight = 0.5;
+    }
+    else if ([[self class] respondsToSelector:@selector(multiplierOfTabBarHeight:)]) {
         multiplierOfTabBarHeight = [[self class] multiplierOfTabBarHeight:tabBarHeight];
     }
     
@@ -687,6 +1003,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight {
     CGFloat constantOfPlusButtonCenterYOffset = 0.f;
+    if ([self cyl_isCenteredWithoutTitle]) {
+        return constantOfPlusButtonCenterYOffset;
+    }
     if ([[self class] respondsToSelector:@selector(constantOfPlusButtonCenterYOffsetForTabBarHeight:)]) {
         constantOfPlusButtonCenterYOffset = [[self class] constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
     }

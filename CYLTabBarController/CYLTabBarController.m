@@ -604,7 +604,11 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
             // 必须是 NSTimeInterval：用 NSUInteger 会把 0.5 截断为 0，导致这里从未延迟。
             NSTimeInterval delaySecondsForSelectedContentView = 0.5;
             if ([self hasPlusChildViewController]) {
-                [plusSelectedControl cyl_coverTabImageViewOrTabButton:YES
+                // FIX: issue #636 — when the tab item shows the plus button's title (`-cyl_showsTitleInTabBarItem`), the
+                // stand-in replaces only the tab icon, and the tab item keeps its title; otherwise the whole tab button.
+                // TabBarItem 显示 PlusButton 的标题时，替身只替换 Tab 图标，保留 TabBarItem 的标题；否则替换整个 Tab 按钮。
+                BOOL coversTabButton = ![contextPlusButton cyl_showsTitleInTabBarItem];
+                [plusSelectedControl cyl_coverTabImageViewOrTabButton:coversTabButton
                                                               newView:selectedCover
                                                                offset:UIOffsetZero
                                                                  show:YES
@@ -630,6 +634,12 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
                                                    fromView:platterView];
                     
                         selectedCover.center = convertedCenter;
+                    }
+                    // FIX: issue #636 — the cover also hides the other subviews of the tab button, so show the title again.
+                    // 替换时也会隐藏 Tab 按钮的其他子视图，这里恢复显示标题。
+                    if (!coversTabButton) {
+                        [tabBarButton.cyl_tabLabel cyl_setHidden:NO];
+                        tabBarButton.cyl_tabLabel.alpha = 1;
                     }
                 }];
             } else {

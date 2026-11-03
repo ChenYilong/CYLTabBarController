@@ -406,6 +406,12 @@
     if (!plusButton) {
         return NO;
     }
+    // FIX: issue #636, #641 — the tab item shows the plus button's title (`-cyl_showsTitleInTabBarItem`), drawn by the
+    // system in both Liquid Glass layers: there is no plus button label to hide or show, and no swipe to block.
+    // TabBarItem 显示 PlusButton 的标题，由系统在液态玻璃两个图层中绘制：无需隐藏/显示 PlusButton 的 Label，也无需禁止滑动。
+    if ([plusButton cyl_showsTitleInTabBarItem]) {
+        return NO;
+    }
     if (!plusButton.cyl_tabLabel) {
         return NO;
     }

@@ -226,6 +226,30 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 - (void)cyl_setNeedsTitleAlignment;
 
 /*!
+ * [EN] Issue #636. YES with Liquid Glass when the plus button has a title and its class returns YES from
+ *      `+alignsTitleWithTabBarItemTitles`: the title is shown by the tab item under the plus button (`tabBarItem.title` of
+ *      the plus button's view controller, or of the placeholder without one, drawn by the system in both Liquid Glass
+ *      layers), and the plus button keeps only its image, in place of the tab icon. NO without a title: the plus button
+ *      keeps covering the whole tab item.
+ * [CN] Issue #636。液态玻璃下，PlusButton 有标题，且其类的 `+alignsTitleWithTabBarItemTitles` 返回 YES 时为 YES：标题由 PlusButton
+ *      下方的 TabBarItem 显示（PlusButton 子控制器的 `tabBarItem.title`，没有子控制器时为占位控制器的，由系统在液态玻璃的两个图层中
+ *      绘制），PlusButton 只保留图片，替换 Tab 的图标。没有标题时为 NO：PlusButton 仍覆盖整个 TabBarItem。
+ */
+- (BOOL)cyl_showsTitleInTabBarItem;
+
+/*!
+ * [EN] Liquid Glass, a plus button without a title: it replaces the whole tab item and is centered on it, ignoring
+ *      `+multiplierOfTabBarHeight:` and `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` (NO, the default). Set YES
+ *      (e.g. in `+plusButton`) to place it with those methods. No effect with a title or in another style, where those
+ *      methods always apply, nor in the iOS 27.1 vertical bar (iPhone Duo), where the plus button is always centered on
+ *      its tab.
+ * [CN] 液态玻璃下没有标题的 PlusButton：替换整个 TabBarItem 并居中，忽略 `+multiplierOfTabBarHeight:` 与
+ *      `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`（NO，默认值）。设为 YES（如在 `+plusButton` 中）则用这两个方法计算
+ *      高度。有标题或其他样式时无效，始终使用这两个方法；iOS 27.1 竖向栏（iPhone Duo）中也无效，PlusButton 始终居中于其 Tab。
+ */
+@property (nonatomic, assign, getter=cyl_appliesCenterYOffsetWithoutTitle, setter=cyl_setAppliesCenterYOffsetWithoutTitle:) BOOL cyl_appliesCenterYOffsetWithoutTitle;
+
+/*!
  * [EN] A plus button with `image` above its title, both centered (the image 70 % of the button's width). The titles go
  *      through `CYLLocalizedString()`; the normal title is gray, the selected one `selectedTitleColor` (default blue).
  *      The button does not darken on touch and is sized to fit. Call it on your subclass in `+plusButton`:
