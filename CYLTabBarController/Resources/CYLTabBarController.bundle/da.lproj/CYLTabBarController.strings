@@ -145,3 +145,11 @@
 "深色" = "Mørk";
 "居中胶囊" = "Centreret kapsel";
 "绿色描边" = "Grøn linje";
+"登录状态：已登录" = "Login-status: logget ind";
+"登录状态：未登录" = "Login-status: logget ud";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Kontakten slået til betyder logget ind, slået fra logget ud (gemt lokalt). Når du er logget ud, viser et tryk på “%@” først login-skærmen og skifter derefter til fanen efter login; når du er logget ind, skiftes der med det samme.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Kontakten slået til betyder logget ind, slået fra logget ud (gemt lokalt). Ingen faner kræver login.";
+"需要登录" = "Login påkrævet";
+"「%@」需要登录后才能查看" = "Log ind for at se “%@”";
+"登录" = "Log ind";
+"、" = ", ";

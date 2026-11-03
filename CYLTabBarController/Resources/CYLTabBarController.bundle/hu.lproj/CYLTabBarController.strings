@@ -145,3 +145,11 @@
 "深色" = "Sötét";
 "居中胶囊" = "Középre igazított kapszula";
 "绿色描边" = "Zöld vonal";
+"登录状态：已登录" = "Bejelentkezési állapot: bejelentkezve";
+"登录状态：未登录" = "Bejelentkezési állapot: kijelentkezve";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Bekapcsolt kapcsoló: bejelentkezve; kikapcsolt: kijelentkezve (helyben mentve). Kijelentkezve a(z) „%@” megérintése először a bejelentkezést mutatja, majd bejelentkezés után erre a lapra vált; bejelentkezve azonnal vált.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Bekapcsolt kapcsoló: bejelentkezve; kikapcsolt: kijelentkezve (helyben mentve). Egyik lap sem igényel bejelentkezést.";
+"需要登录" = "Bejelentkezés szükséges";
+"「%@」需要登录后才能查看" = "Jelentkezzen be a(z) „%@” megtekintéséhez";
+"登录" = "Bejelentkezés";
+"、" = ", ";

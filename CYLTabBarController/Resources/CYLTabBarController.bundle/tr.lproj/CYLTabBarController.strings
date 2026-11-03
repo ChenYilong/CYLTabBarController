@@ -145,3 +145,11 @@
 "深色" = "Koyu";
 "居中胶囊" = "Ortalanmış kapsül";
 "绿色描边" = "Yeşil çizgi";
+"登录状态：已登录" = "Oturum durumu: oturum açık";
+"登录状态：未登录" = "Oturum durumu: oturum kapalı";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Anahtar açık oturum açık, kapalı oturum kapalı demektir (yerel olarak kaydedilir). Oturum kapalıyken “%@” öğesine dokunmak önce giriş ekranını gösterir, giriş yaptıktan sonra o sekmeye geçer; oturum açıkken hemen geçer.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Anahtar açık oturum açık, kapalı oturum kapalı demektir (yerel olarak kaydedilir). Giriş gerektiren sekme yok.";
+"需要登录" = "Giriş gerekli";
+"「%@」需要登录后才能查看" = "“%@” öğesini görmek için giriş yapın";
+"登录" = "Giriş yap";
+"、" = ", ";

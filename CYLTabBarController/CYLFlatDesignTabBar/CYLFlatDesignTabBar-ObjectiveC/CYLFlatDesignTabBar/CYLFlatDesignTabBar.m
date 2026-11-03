@@ -449,6 +449,16 @@
     //    tabBarButton.tabBarItem = item;
     
     if (!item.isEnabled) { return; }
+
+    // FIX: issue #19 — a tab that needs login, tapped while logged out: the button is not selected (no Lottie or
+    // selection animation), the tap is not reported as a selection, and the login starts instead.
+    // 需要登录的 Tab 在未登录时被点击：按钮不会被选中（不播放 Lottie 与选中动画），不作为选中上报，改为发起登录。
+    CYLTabBarController *loginTabBarController = [self cyl_owningTabBarController];
+    if (loginTabBarController && !tabBarButton.cyl_isPlaceholder &&
+        selectedIndex < (NSInteger)loginTabBarController.viewControllers.count &&
+        [loginTabBarController cyl_interceptLoginIfNeededForViewController:loginTabBarController.viewControllers[(NSUInteger)selectedIndex]]) {
+        return;
+    }
     
     // FIX: issue #610
     // [EN] Report the tap through `tabBarController:didSelectControl:`, as the other styles do, here where every tab

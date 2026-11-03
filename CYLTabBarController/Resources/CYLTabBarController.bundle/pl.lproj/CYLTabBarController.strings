@@ -145,3 +145,11 @@
 "深色" = "Ciemny";
 "居中胶囊" = "Kapsuła na środku";
 "绿色描边" = "Zielona linia";
+"登录状态：已登录" = "Stan logowania: zalogowano";
+"登录状态：未登录" = "Stan logowania: wylogowano";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Włączony przełącznik oznacza zalogowano, wyłączony – wylogowano (zapisywany lokalnie). Po wylogowaniu stuknięcie „%@” najpierw pokazuje logowanie, a po zalogowaniu przełącza na tę kartę; po zalogowaniu przełącza od razu.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Włączony przełącznik oznacza zalogowano, wyłączony – wylogowano (zapisywany lokalnie). Żadna karta nie wymaga logowania.";
+"需要登录" = "Wymagane logowanie";
+"「%@」需要登录后才能查看" = "Zaloguj się, aby zobaczyć „%@”";
+"登录" = "Zaloguj";
+"、" = ", ";
