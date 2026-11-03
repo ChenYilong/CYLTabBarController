@@ -127,7 +127,7 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
  */
 + (BOOL)alignsTitleWithTabBarItemTitles;
 
-/*
+/*!
  * FIX: issue #408
  * [EN] The plus button's identifier, like `CYLTabBarItemIdentifier` for the other tabs, e.g. @"plus". Every tab bar
  *      controller's copy of the plus button gets it, so it also works with several tab bar controllers. Read it as
