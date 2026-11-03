@@ -136,3 +136,4 @@
 "保留" = "behållen";
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Välj fliken med identifieraren ”%@” (”%@”, index %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop den aktuella stacken, välj fliken med identifieraren ”%@” och push sedan en ny demosida till fliken";
+"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Som ovan, välj fliken med identifieraren ”%@” (”%@”), med pop-animering";

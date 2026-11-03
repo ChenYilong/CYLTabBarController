@@ -107,6 +107,9 @@ typedef void (^CYLPopPushDemoAction)(void);
     // #408: the last tab by its identifier (a default is generated when none is set), which stays right when tabs come
     // and go, unlike an index. 最后一个 Tab 的标识（未设置时自动生成默认值），增减 Tab 后依然准确，不像下标。
     NSString *lastIdentifier = [self demoTabBarController].viewControllers.lastObject.cyl_tabBarItemIdentifier ?: @"";
+    // The second tab, for the `animated:` version (like `…AtIndex:animated:`). 第二个 Tab，用于 `animated:` 版本（同 `…AtIndex:animated:`）。
+    NSArray<UIViewController *> *tabViewControllers = [self demoTabBarController].viewControllers;
+    NSString *secondIdentifier = (tabViewControllers.count > 1 ? tabViewControllers[1].cyl_tabBarItemIdentifier : nil) ?: lastIdentifier;
 
     NSArray<CYLPopPushDemoRow *> *popSelectRows = @[
         [CYLPopPushDemoRow rowWithTitle:@"cyl_popSelectTabBarChildViewControllerAtIndex:"
@@ -139,6 +142,9 @@ typedef void (^CYLPopPushDemoAction)(void);
         [CYLPopPushDemoRow rowWithTitle:@"…ForTabBarItemIdentifier:"
                                  detail:[NSString stringWithFormat:CYLLocalizedString(@"选中标识为「%@」的 Tab（「%@」，index %@）"), lastIdentifier, lastTitle, @(lastIndex)]
                                  action:^{ [weakSelf cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:lastIdentifier]; }],
+        [CYLPopPushDemoRow rowWithTitle:@"…ForTabBarItemIdentifier:animated:"
+                                 detail:[NSString stringWithFormat:CYLLocalizedString(@"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画"), secondIdentifier, secondTitle]
+                                 action:^{ [weakSelf cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:secondIdentifier animated:YES]; }],
         [CYLPopPushDemoRow rowWithTitle:@"…ForTabBarItemIdentifier:completion:"
                                  detail:CYLLocalizedString(@"同上，并在 completion 中向该 Tab push 一个新的演示页")
                                  action:^{

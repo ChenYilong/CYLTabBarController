@@ -136,3 +136,4 @@
 "保留" = "giữ lại";
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Chọn tab có định danh “%@” (“%@”, index %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop ngăn xếp hiện tại, chọn tab có định danh “%@”, rồi push một trang demo mới vào tab đó";
+"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Như trên, chọn tab có định danh “%@” (“%@”), có hiệu ứng pop";
