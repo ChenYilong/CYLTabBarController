@@ -19,7 +19,8 @@ class NextHomeViewController: UIViewController {
         
         self.cyl_popSelectTabBarChildViewController(at: 2)
 
-        //重要：改变选中字体的颜色
+        // [CN] 重要：改变选中字体的颜色
+        // [EN] Important: change the color of the selected title text.
         CYLExternPlusButton.isSelected = true
 
         

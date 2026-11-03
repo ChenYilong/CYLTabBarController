@@ -56,7 +56,9 @@
         return;
     }
     if ([view isKindOfClass:[UITabBar class]]) {
-        //为了防止类似这样的异常代码，自己添加自己：`[self.tabBar addSubview:myTabBar]`(这是异常逻辑， 解决办法是请使用  KVC: `[self cyl_setValue:myTabBar forKey:@"tabBar"]`)
+        // [CN] 为了防止类似这样的异常代码，自己添加自己：`[self.tabBar addSubview:myTabBar]`(这是异常逻辑， 解决办法是请使用  KVC: `[self cyl_setValue:myTabBar forKey:@"tabBar"]`)
+        // [EN] To prevent abnormal code like this, which adds itself to itself: `[self.tabBar addSubview:myTabBar]` (this is
+        //      invalid logic; the fix is to use KVC: `[self cyl_setValue:myTabBar forKey:@"tabBar"]`)
         return;
     }
   

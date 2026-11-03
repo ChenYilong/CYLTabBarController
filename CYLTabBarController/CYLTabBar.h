@@ -19,17 +19,23 @@
 
 NS_ASSUME_NONNULL_BEGIN
 @class CYLTabBar;
-// CYLConstants.h 里的前向声明被包在 `#if CYL_FLATDESIGN_AVAILABLE`（即 `__has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)`）
+// [CN] CYLConstants.h 里的前向声明被包在 `#if CYL_FLATDESIGN_AVAILABLE`（即 `__has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)`）
 // 里，未引入 CYLFlatDesignTabBar 子库的用法（如 LottieSwift subspec）拿不到该类型，
 // 因此这里显式再声明一次，保证本头文件可独立编译。
+// [EN] The forward declaration in CYLConstants.h is wrapped in `#if CYL_FLATDESIGN_AVAILABLE`
+//      (i.e. `__has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)`), so setups that do not import the
+//      CYLFlatDesignTabBar subspec (e.g. the LottieSwift subspec) cannot see this type;
+//      so it is declared again explicitly here to make this header compile on its own.
 @class CYLTabBarController;
 typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 
 @interface CYLTabBar : UITabBar
 
 /*!
- * 让 `TabImageView` 垂直居中时，所需要的默认偏移量。
+ * [CN] 让 `TabImageView` 垂直居中时，所需要的默认偏移量。
  * @attention 该值将在设置 top 和 bottom 时被同时使用，具体的操作等价于如下行为：
+ * [EN] The default offset needed to vertically center the `TabImageView`.
+ *      @attention This value is used for both top and bottom; the operation is equivalent to the following:
  * `viewController.tabBarItem.imageInsets = UIEdgeInsetsMake(tabImageViewDefaultOffset, 0, -tabImageViewDefaultOffset, 0);`
  */
 @property (nonatomic, assign, readonly) CGFloat tabImageViewDefaultOffset;
@@ -43,7 +49,8 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 
 @property (nonatomic, copy, nullable) CYLTabBarDidLayoutSubViewsBlock didLayoutSubViewsBlock;
 
-/** 发布按钮 */
+/** [CN] 发布按钮 */
+/* [EN] Publish button */
 @property (nonatomic, strong, nullable) CYLPlusButton<CYLPlusButtonSubclassing> *plusButton;
 @property (nonatomic, assign) CGFloat tabBarItemWidth;
 @property (nonatomic, copy) NSArray<UIControl *> *tabBarButtonArray;
@@ -58,7 +65,9 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 
 /*!
  *TODO:
- * 之前 tabbar 上有长按手势，iOS 26 液态玻璃，长按手势都不起作用了，需要重新增加自定义手势。
+ * [CN] 之前 tabbar 上有长按手势，iOS 26 液态玻璃，长按手势都不起作用了，需要重新增加自定义手势。
+ * [EN] The tabbar used to have a long-press gesture; with iOS 26 Liquid Glass, long-press gestures no longer work,
+ *      so a custom gesture needs to be added again.
   */
 @property (nonatomic, strong) UIGestureRecognizer *liquidGlassLongGestureRecognizer;
 

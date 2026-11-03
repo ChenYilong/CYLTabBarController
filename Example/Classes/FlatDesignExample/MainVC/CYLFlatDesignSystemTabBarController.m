@@ -41,7 +41,8 @@
         } else if (i == 4) {
             nav.tabBarItem.badgeValue = @"11";
             nav.tabBarItem.badgeColor = UIColor.systemRedColor;
-            // 让文字颜色和badgeColor一样，就变成一个点了
+            // [CN] 让文字颜色和badgeColor一样，就变成一个点了
+            // [EN] Make the text color the same as badgeColor, and the badge becomes a dot
             [nav.tabBarItem setBadgeTextAttributes:@{NSForegroundColorAttributeName:UIColor.systemRedColor} forState:UIControlStateNormal];
         }
         

@@ -23,7 +23,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 // docs-binding:end
 
-// FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+// [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+// [EN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils.
 #if __has_include("CYLUtils/CYLUtils.h")
 #import "CYLUtils/CYLUtils.h"
 #else
@@ -277,9 +278,15 @@ presentLoginForViewController:(UIViewController *)viewController
 
 
 /*!
- * 设置为CYLTabBarStyleTypeFlatDesign，表示扁平化设计， 本属性相当于UI兼容模式的代码替代版本，仅仅在 iOS26+ 系统有效。   其内部会设置noNeedUIDesignCompatibility该属性用于决定是否使用扁平设计。
+ * [CN] 设置为CYLTabBarStyleTypeFlatDesign，表示扁平化设计， 本属性相当于UI兼容模式的代码替代版本，仅仅在 iOS26+ 系统有效。   其内部会设置noNeedUIDesignCompatibility该属性用于决定是否使用扁平设计。
+ * [EN] Setting CYLTabBarStyleTypeFlatDesign means flat design. This property is the code alternative to the UI
+ *      compatibility mode and only takes effect on iOS26+. Internally it sets noNeedUIDesignCompatibility, which
+ *      decides whether flat design is used.
  * @return means noNeedUIDesignCompatibility == YES if return CYLTabBarStyleTypeLiquidGlass, means noNeedUIDesignCompatibility == NO if return CYLTabBarStyleTypeFlatDesign;
- * @attention 请在父类的 ViewDidLoad 调用之前设置 CYLTabBarStyleType 。也就是在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
+ * [CN] @attention 请在父类的 ViewDidLoad 调用之前设置 CYLTabBarStyleType 。也就是在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
+ * [EN] @attention Set CYLTabBarStyleType before the superclass's ViewDidLoad is called, i.e. before
+ *      `-[super viewDidLoad];`. The custom style must be decided before the tabBar KVC operation; otherwise the
+ *      default logic runs and your custom style may not take effect.
  */
 @property (nonatomic, assign) CYLTabBarStyleType tabBarStyleType;
 
@@ -436,7 +443,9 @@ presentLoginForViewController:(UIViewController *)viewController
 @property (nonatomic, readonly, assign) UIOffset imagePositionAdjustment;
 
 /*!
- * /// 如果用户设置的TabBarItemImageViewSize不合规，则依据父视图大小来调整，否则依据默认的imageView的大小来调整
+ * [CN] /// 如果用户设置的TabBarItemImageViewSize不合规，则依据父视图大小来调整，否则依据默认的imageView的大小来调整
+ * [EN] If the TabBarItemImageViewSize set by the user is invalid, adjust based on the superview's size; otherwise adjust
+ *      based on the default imageView size.
  */
 @property (nonatomic, assign) BOOL adjustTabBarItemImageViewSizeDependOnSuperView;
 
@@ -628,8 +637,12 @@ presentLoginForViewController:(UIViewController *)viewController
 /*!
  * double-check if to use CYLTabBarStyleTypeLiquidGlass or not:
  * UIDesignCompatibility == FlatDesign , noNeedUIDesignCompatibility == noNeed FlatDesign == LiquidGlass
- * 设置为 NO，表示扁平化设计， 本属性相当于UI兼容模式的代码替代版本，仅仅在 iOS26+ 系统有效。
+ * [CN] 设置为 NO，表示扁平化设计， 本属性相当于UI兼容模式的代码替代版本，仅仅在 iOS26+ 系统有效。
  * 由于 UI 兼容模式的命名晦涩， 更优雅直观的方式为 设置 CYLTabBarStyleType，其内部会设置该属性用于决定是否使用扁平设计。
+ * [EN] Setting NO means flat design. This property is the code alternative to the UI compatibility mode and only takes
+ *      effect on iOS26+.
+ *      Since the name of the UI compatibility mode is obscure, the more elegant and intuitive way is to set
+ *      CYLTabBarStyleType, which internally sets this property to decide whether flat design is used.
  
  * @return means  CYLTabBarStyleType == CYLTabBarStyleTypeFlatDesign if return NO, means  CYLTabBarStyleType == CYLTabBarStyleTypeLiquidGlass if return YES;
  * @attention better switch to property CYLTabBarStyleType
@@ -686,12 +699,15 @@ presentLoginForViewController:(UIViewController *)viewController
 
 //TODO:  , CYLFlatDesignUITabBarControllerDelegate
 
-// 代理
+// [CN] 代理
+// [EN] Delegate
 @property (nonatomic, weak, nullable) id<CYLTabBarControllerDelegate, CYLFlatDesignUITabBarControllerDelegate> delegate;
 
 /**
- 设置CYLFlatDesignTabBar显示或隐藏
+ [CN] 设置CYLFlatDesignTabBar显示或隐藏
  如果设置了 hidesBottomBarWhenPushed，则 hidesBottomBarWhenPushed 优先级更高
+ [EN] Show or hide CYLFlatDesignTabBar.
+      If hidesBottomBarWhenPushed is set, hidesBottomBarWhenPushed takes priority.
  */
 @property (nonatomic, assign, getter=isTabBarHidden) BOOL tabBarHidden;
 
@@ -780,7 +796,9 @@ presentLoginForViewController:(UIViewController *)viewController
 //@property (nonatomic, readonly, assign) UIOffset imagePositionAdjustment;
 
 /*!
- * /// 如果用户设置的TabBarItemImageViewSize不合规，则依据父视图大小来调整，否则依据默认的imageView的大小来调整
+ * [CN] /// 如果用户设置的TabBarItemImageViewSize不合规，则依据父视图大小来调整，否则依据默认的imageView的大小来调整
+ * [EN] If the TabBarItemImageViewSize set by the user is invalid, adjust based on the superview's size; otherwise adjust
+ *      based on the default imageView size.
  */
 //@property (nonatomic, assign) BOOL adjustTabBarItemImageViewSizeDependOnSuperView;
 
@@ -1075,7 +1093,8 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotificatio
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification;
 
-// * 液态玻璃开关变化
+// [CN] * 液态玻璃开关变化
+// [EN] Liquid Glass toggle changed
  //TODO:  
  FOUNDATION_EXTERN NSString *const CYLTabBarStyleTypeDidChangeNotification;
 // FxxOUNDATION_EXTERN NSString *const CYLTabBarDarkModeShowDarkDidChangeNotification;

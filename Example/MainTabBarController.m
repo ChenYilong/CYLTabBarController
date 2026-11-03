@@ -34,15 +34,19 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (instancetype)initWithContext:(NSString *)context {
     /**
-     * 以下两行代码目的在于手动设置让TabBarItem只显示图标，不显示文字，并让图标垂直居中。
+     * [CN] 以下两行代码目的在于手动设置让TabBarItem只显示图标，不显示文字，并让图标垂直居中。
      * 等 效于在 `-tabBarItemsAttributesForController` 方法中不传 `CYLTabBarItemTitle` 字段。
      * 更推荐后一种做法。
+     * [EN] The two lines below manually make the TabBarItem show only its icon, without a title, and center the icon vertically.
+     *      This is equivalent to not passing the `CYLTabBarItemTitle` key in the `-tabBarItemsAttributesForController` method.
+     *      The latter approach is recommended.
      */
     UIEdgeInsets imageInsets = UIEdgeInsetsZero;//UIEdgeInsetsMake(4.5, 0, -4.5, 0);
     UIOffset titlePositionAdjustment = UIOffsetMake(0, -3.5);
     CYLTabBarStyleType tabBarStyleType;
     //    tabBarStyleType = CYLTabBarStyleTypeFlatDesign;
-    // 设置 TabBar 样式：液态玻璃效果（覆盖上一行）
+    // [CN] 设置 TabBar 样式：液态玻璃效果（覆盖上一行）
+    // [EN] Set the TabBar style: Liquid Glass effect (overrides the previous line).
     //    tabBarStyleType = CYLTabBarStyleTypeLiquidGlass;
     tabBarStyleType = CYLTabBarStyleTypeDefault;
     
@@ -77,7 +81,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 }
 
 - (void)viewDidLoad {
-    // * @attention 请在父类的 ViewDidLoad 调用之前设置CYLTabBarStyleType。最佳位置是initWithViewControllers方法内部， 最晚在在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
+    // [CN] * @attention 请在父类的 ViewDidLoad 调用之前设置CYLTabBarStyleType。最佳位置是initWithViewControllers方法内部， 最晚在在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
+    // [EN] @attention Set CYLTabBarStyleType before the superclass's ViewDidLoad is called. The best place is inside the
+    //      initWithViewControllers method, and at the latest before `-[super viewDidLoad];`. The custom style must be decided
+    //      before the tabBar KVC operation; otherwise the default logic runs and your custom style may not take effect.
     //    self.tabBarStyleType = CYLTabBarStyleTypeFlatDesign;
     [[UIApplication sharedApplication] setApplicationSupportsShakeToEdit:YES];
     [self becomeFirstResponder];
@@ -173,7 +180,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //            nav.cyl_tabBarItem.badgeValue = @"新消息";
         //            [nav.cyl_tabBarItem setBadgeTextAttributes:@{NSForegroundColorAttributeName:UIColor.greenColor} forState:UIControlStateNormal];
         //        } else if (i == 4) {
-        //            // 设置badgeSize不为CGSizeZero、badgeValue为nil，就变成一个点了
+        // [CN] // 设置badgeSize不为CGSizeZero、badgeValue为nil，就变成一个点了
+        // [EN] If badgeSize is not CGSizeZero and badgeValue is nil, the badge becomes a dot.
         //            nav.cyl_tabBarItem.badgeValue = nil;
         //            nav.cyl_tabBarItem.badgeSize = CGSizeMake(10, 10);
         //            nav.cyl_tabBarItem.badgeColor = UIColor.systemRedColor;
@@ -204,7 +212,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         CYLTabBarItemSelectedImage : @"home_highlight",  /* NSString and UIImage are supported*/
         //                                                 CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         //                                                 CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
-        //第一位 右大，下大
+        // [CN] 第一位 右大，下大
+        // [EN] First item: larger to the right, larger downward.
                 CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"],
                 // #442: the Dark Mode version of the animation; switches with the style. 深色模式下的动画，随风格自动切换。
                 CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home_dark" ofType:@"json"],
@@ -228,7 +237,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         CYLTabBarItemIdentifier : @"message",
         // A dark image under any name. Names are the prepared form (rendered as original, #465); a UIImage object for
         // the same is `[UIImage cyl_imageWithImageInfo:@"message_normal" darkImageInfo:@"message_normal_night"]`.
-        // 任意名称的深色图片。图片名是库预先处理好的形式（按原图渲染，#465）；同样效果的 UIImage 对象为
+        // [CN] 任意名称的深色图片。图片名是库预先处理好的形式（按原图渲染，#465）；同样效果的 UIImage 对象为
+        // [EN] A dark image under any name. The image name is in the form the library has already prepared (rendered as
+        //      original, #465); a UIImage object with the same effect is
         // `[UIImage cyl_imageWithImageInfo:@"message_normal" darkImageInfo:@"message_normal_night"]`。
         CYLTabBarItemImage : @"message_normal",
         CYLTabBarItemDarkImage : @"message_normal_night",
@@ -263,7 +274,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 }
 
 /**
- *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性等等
+ * [CN] 更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性等等
+ * [EN] More TabBar customization: e.g. selected and unselected title and background image attributes of tabBarItem,
+ *      the tabbar background image, and so on.
  */
 + (UITabBarAppearance *)demoStandardAppearanceWithTitlePositionAdjustment:(UIOffset)titlePositionAdjustment {
     // set the text color for unselected state
@@ -293,12 +306,19 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     standardAppearance.stackedLayoutAppearance = stackedLayoutAppearance;
     standardAppearance.inlineLayoutAppearance = stackedLayoutAppearance;
     standardAppearance.compactInlineLayoutAppearance = stackedLayoutAppearance;
-    //FIX: #581 iOS15以上，iOS26以下，可以设置。
+    // [CN] FIX: #581 iOS15以上，iOS26以下，可以设置。
     //iOS26 不推荐设置 `UITabBar.appearance().backgroundColor`。因为玻璃效果下，不仅无法设置背景，同时会干扰 TabBar 里的 Label 未选中颜色，因为 iOS26 里的未选中时的 Label 颜色为系统内部逻辑， 无法自定义。所以如果背景颜色， 与Label颜色一致，白底白字， 用户将无法辨认。暗黑模式下， 也会有类似问题。
+    // [EN] FIX: #581 Can be set on iOS15 and later, below iOS26.
+    //      Setting `UITabBar.appearance().backgroundColor` is not recommended on iOS26. With the glass effect the background
+    //      cannot be set, and it also interferes with the unselected color of the Labels in the TabBar, because on iOS26 the
+    //      unselected Label color is decided by internal system logic and cannot be customized. So if the background color
+    //      matches the Label color (white text on white), users cannot read it. Dark Mode has similar problems.
     if (!CYL_IS_IOS_26) {
         //            standardAppearance.backgroundColor = [UIColor cyl_systemBackgroundColor];
     }
-    //shadowColor和shadowImage均可以自定义颜色, shadowColor默认高度为1, shadowImage可以自定义高度.
+    // [CN] shadowColor和shadowImage均可以自定义颜色, shadowColor默认高度为1, shadowImage可以自定义高度.
+    // [EN] Both shadowColor and shadowImage can use a custom color; shadowColor has a default height of 1, while
+    //      shadowImage can have a custom height.
     standardAppearance.shadowColor = [UIColor cyl_systemGreenColor];
     // standardAppearance.shadowImage = [[self class] imageWithColor:[UIColor cyl_systemGreenColor] size:CGSizeMake(self.cyl_tabBarController.visiableTabBarSize.width, 1)];
     return standardAppearance;
@@ -309,7 +329,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //        return;
     //    }
     // Customize UITabBar height
-    // 自定义 TabBar 高度
+    // [CN] 自定义 TabBar 高度
+    // [EN] Custom TabBar height
     //     [self cyl_tabBarController].tabBarHeight = CYL_IS_IPHONE_X ? 65 : 40;
     
     [self rootWindow].backgroundColor = [UIColor cyl_systemBackgroundColor];
@@ -333,11 +354,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // update TabBar when TabBarItem width did update
     // If your app need support UIDeviceOrientationLandscapeLeft or UIDeviceOrientationLandscapeRight，
     // remove the comment '//'
-    // 如果你的App需要支持横竖屏，请使用该方法移除注释 '//'
+    // [CN] 如果你的App需要支持横竖屏，请使用该方法移除注释 '//'
+    // [EN] If your App needs to support both landscape and portrait, remove the '//' to use this method.
     //     [self updateTabBarCustomizationWhenTabBarItemWidthDidUpdate];
     
-    // 半透明， 需要注意：iOS26 液态玻璃下， 具有特殊效果， View 将延伸至TabBar以外区域。
+    // [CN] 半透明， 需要注意：iOS26 液态玻璃下， 具有特殊效果， View 将延伸至TabBar以外区域。
     //如果想固定 TabBar 的背景色，就通过控制 translucent，否则默认一直都是透视的
+    // [EN] Translucent. Note: under iOS26 Liquid Glass this has a special effect: the View extends beyond the TabBar area.
+    //      To fix the TabBar background color, control translucent; otherwise it is always see-through by default.
     
     if (CYL_IS_IOS_26) {
         //        [UITabBar appearance].translucent = NO;
@@ -389,7 +413,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         [[UITabBar appearance] setBackgroundImage:[[UIImage alloc] init]];
         //FIX: #581
         // set background color
-        // 设置 TabBar 背景
+        // [CN] 设置 TabBar 背景
+        // [EN] Set the TabBar background
         [[UITabBar appearance] setBarTintColor:[UIColor cyl_systemBackgroundColor]];
         [[UITabBar appearance] setBackgroundColor:[UIColor cyl_systemBackgroundColor]];
         
@@ -401,7 +426,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //    [[UITabBar appearance] setBackgroundColor:[UIColor clearColor]];
     
     if (!CYL_IS_IOS_26) {
-        //iOS26 不推荐设置 `UITabBar.appearance().backgroundColor` 玻璃效果下，不仅无法设置背景，同时会干扰 TabBar 里的 Label 未选中颜色，因为 iOS26 里的未选中时的 Label 颜色为系统内部逻辑， 无法自定义。所以如果背景颜色， 与Label颜色一致，白底白字， 用户将无法辨认。暗黑模式下， 也会有类似问题。
+        // [CN] iOS26 不推荐设置 `UITabBar.appearance().backgroundColor` 玻璃效果下，不仅无法设置背景，同时会干扰 TabBar 里的 Label 未选中颜色，因为 iOS26 里的未选中时的 Label 颜色为系统内部逻辑， 无法自定义。所以如果背景颜色， 与Label颜色一致，白底白字， 用户将无法辨认。暗黑模式下， 也会有类似问题。
+        // [EN] Setting `UITabBar.appearance().backgroundColor` is not recommended on iOS26. With the glass effect the background
+        //      cannot be set, and it also interferes with the unselected color of the Labels in the TabBar, because on iOS26 the
+        //      unselected Label color is decided by internal system logic and cannot be customized. So if the background color
+        //      matches the Label color (white text on white), users cannot read it. Dark Mode has similar problems.
         [UITabBar appearance].translucent = NO;
     }
     
@@ -448,11 +477,12 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (void)dealloc {
     @try {
-        //iOS9之后， 不再必须， 因此， 并非核心逻辑， 未来考虑删除。
+        // [CN] iOS9之后， 不再必须， 因此， 并非核心逻辑， 未来考虑删除。
+        // [EN] No longer required since iOS9, so it is not core logic; consider removing it in the future.
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
 }
@@ -484,7 +514,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 - (void)setSelectedCoverShow:(BOOL)show {
     UIControl *selectedTabButton = [self.viewControllers[0] cyl_tabButton];
     __weak __typeof(self) weakSelf = self;
-    //TODO:  如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
+    // [CN] TODO:  如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
+    // [EN] TODO:  Lottie animation icons need a delay; otherwise the replacement happens before the lottie animation has
+    //      finished initializing, and the position is wrong.
     [selectedTabButton cyl_coverVisiableTabImageViewOrTabButton:YES
                                                  contentNewView:self.selectedCover
                                           seclectContentNewView:self.selectedCover
@@ -502,16 +534,19 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
             //            [tabBarButton bringSubviewToFront:newView];
             [tabBarButton cyl_bringSubviewToTop:newView];
             if (![CYLConstants isLiquidGlassActive]) {
-                // LiquidGlass 已经自带缩放动画， 无需缩放
+                // [CN] LiquidGlass 已经自带缩放动画， 无需缩放
+                // [EN] LiquidGlass already has its own scale animation, so no scaling is needed.
                 [self addOnceScaleAnimationOnView:newView];
             }
         }
     }];
 }
 
-//缩放动画
+// [CN] 缩放动画
+// [EN] Scale animation
 - (void)addOnceScaleAnimationOnView:(UIView *)animationView {
-    //需要实现的帧动画，这里根据需求自定义
+    // [CN] 需要实现的帧动画，这里根据需求自定义
+    // [EN] The keyframe animation to implement; customize it here as needed.
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animation];
     animation.keyPath = @"transform.scale";
     animation.values = @[@1.5, @1.0];
@@ -542,7 +577,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 }
 
 - (void)customizeInterface {
-    //设置导航栏
+    // [CN] 设置导航栏
+    // [EN] Set up the navigation bar
     //    [self setUpNavigationBarAppearance];
     //     [self hideTabBarShadowImageView];
     //#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
@@ -550,8 +586,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //        tabBarController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
     //    }
     //#endif
-    //添加小红点
+    // [CN] 添加小红点
     //添加提示动画，引导用户点击
+    // [EN] Add a red dot.
+    //      Add a hint animation to guide the user to tap.
     __weak __typeof(self) weakSelf = self;
     [self setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *tabBarController) {
         __strong typeof(self) self = weakSelf;
@@ -565,8 +603,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         }
         
         
-        //延迟是为了演示demo的时候， 方便看清楚badge动画。 非必须。可删除延迟。
+        // [CN] 延迟是为了演示demo的时候， 方便看清楚badge动画。 非必须。可删除延迟。
         //@try是为了demo演示的时候， 随时调整减少 tabbar items 个数，而不导致崩溃， 非必须， 可删除。
+        // [EN] The delay is only so the badge animation is easy to see in the demo. Not required; the delay can be removed.
+        //      @try is only so the number of tabbar items can be reduced at any time in the demo without crashing. Not
+        //      required; it can be removed.
         NSTimeInterval delaySeconds = 1.5;
         dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
         dispatch_after(when, dispatch_get_main_queue(), ^{
@@ -582,7 +623,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                 [viewController0 cyl_setBadgeRadius:11/2];
                 [viewController0 cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeBreathe];
                 [self setSelectedCoverShow:YES];
-                //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
+                // [CN] 以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
+                // [EN] The Badge settings above must be applied before cyl_showBadgeValue is called.
                 //                [viewController0 cyl_showBadge];
                 
                 //                                [tabBarController.viewControllers[1] cyl_setBadgeMargin:1.0];
@@ -611,10 +653,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                 // #535：PlusButton 也显示角标，与 Tab 一致；每次点击数字加 1（见 -didSelectControl:）。
                 [tabBarController cyl_demo_showPlusButtonBadge];
             } @catch (NSException *exception) {
-                NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+                NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
             }
             
-            //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+            // [CN] 添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+            // [EN] Add a Taobao-style tabbar: after the first tab is selected, an icon covers it.
             if (self.selectedIndex != 0) {
                 return;
             }
@@ -635,10 +678,13 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // test for issue #642
     //    self.selectedIndex = [self.viewControllers indexOfObject:viewController];
     
-    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@", @(__PRETTY_FUNCTION__), @(__LINE__), @([self.viewControllers indexOfObject:viewController]), viewController.title);
+    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @([self.viewControllers indexOfObject:viewController]), viewController.title);
 #endif
     if ([tabButton cyl_isPlusControl]) {
-        //FIXME:  to delete 玻璃效果下， 不能调用 updateSelectionStatusIfNeededForTabBarController，selectedViewController， selectedIndex 否则无法实现plusButton的点击事件响应， 响应的仅仅是tabButton
+        // [CN] FIXME:  to delete 玻璃效果下， 不能调用 updateSelectionStatusIfNeededForTabBarController，selectedViewController， selectedIndex 否则无法实现plusButton的点击事件响应， 响应的仅仅是tabButton
+        // [EN] FIXME:  to delete With the glass effect, updateSelectionStatusIfNeededForTabBarController, selectedViewController
+        //      and selectedIndex must not be called; otherwise the plusButton tap event cannot be handled, and only the
+        //      tabButton responds.
         //         [self updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
         // tabBarController.selectedViewController = viewController;
         // tabBarController.selectedIndex = control.cyl_tabBarItemVisibleIndex;
@@ -655,7 +701,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
     UIControl *selectedTabButton = [viewController.tabBarItem cyl_tabButton];
     if (selectedTabButton.selected && [[[self class] cyl_topmostViewController] respondsToSelector:@selector(refresh)]) {
-        //双重点击， 触发刷新。
+        // [CN] 双重点击， 触发刷新。
+        // [EN] Double tap triggers a refresh.
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(
                                                 [[[self class] cyl_topmostViewController] performSelector:@selector(refresh)];
                                                 
@@ -712,7 +759,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         [tabBarController cyl_demo_plusButtonDidTap];
     }
     if ([control cyl_isTabButton] && !isPlusControl) {
-        //更改红标状态
+        // [CN] 更改红标状态
+        // [EN] Change the red badge state.
         if ([control cyl_isShowBadge]) {
             if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
                 [control cyl_clearBadge];
@@ -733,28 +781,38 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // The plus button of this tab bar controller's context (`CYLExternPlusButton` is the one registered last).
     UIButton *button = [CYLPlusButton plusButtonForOwner:tabBarController];
     BOOL isPlusButton = [tabBarController hasPlusButton] && [control cyl_isPlusControl];
-    // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
+    // [CN] 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
     // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
+    // [EN] Even if the PlusButton has its own tap action, tapping the PlusButton still triggers this delegate method.
+    //      Use CYLExternPlusButton.cyl_userInteractionDisabled = YES; when initializing the PlusButton to stop this
+    //      protocol method from triggering the plusButton callback.
     if (isPlusButton) {
         animationView = button.imageView;
     }
     
     [self addScaleAnimationOnView:animationView repeatCount:1];
-    // [self addRotateAnimationOnView:animationView];//暂时不推荐用旋转方式，badge也会旋转。
+    // [CN] [self addRotateAnimationOnView:animationView];//暂时不推荐用旋转方式，badge也会旋转。
+    // [EN] [self addRotateAnimationOnView:animationView];// The rotation approach is not recommended for now: the badge
+    //      would rotate too.
     
-    //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+    // [CN] 添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+    // [EN] Add a Taobao-style tabbar: after the first tab is selected, an icon covers it.
     if ([control cyl_isTabButton] || [control cyl_isPlusButton]) {
         //        BOOL shouldSelectedCoverShow = (self.selectedIndex == 0);
         //        [self setSelectedCoverShow:shouldSelectedCoverShow];
     }
 }
-//缩放动画
+// [CN] 缩放动画
+// [EN] Scale animation
 - (void)addScaleAnimationOnView:(UIView *)animationView repeatCount:(float)repeatCount {
     if (CYL_IS_IOS_26) {
-        //不建议在iOS26上给PlusButton添加动画， 因为在玻璃遮罩显示时， 玻璃遮罩本身就有缩放动画， 再添加动画， 会非常冗余。
+        // [CN] 不建议在iOS26上给PlusButton添加动画， 因为在玻璃遮罩显示时， 玻璃遮罩本身就有缩放动画， 再添加动画， 会非常冗余。
+        // [EN] Adding an animation to the PlusButton on iOS26 is not recommended: when the glass overlay is shown, the overlay
+        //      already has its own scale animation, so another animation would be very redundant.
         return;
     }
-    //需要实现的帧动画，这里根据需求自定义
+    // [CN] 需要实现的帧动画，这里根据需求自定义
+    // [EN] The keyframe animation to implement; customize it here as needed.
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animation];
     animation.keyPath = @"transform.scale";
     animation.values = @[@1.0,@1.3,@0.9,@1.15,@0.95,@1.02,@1.0];
@@ -764,15 +822,22 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [animationView.layer addAnimation:animation forKey:nil];
 }
 
-//旋转动画
+// [CN] 旋转动画
+// [EN] Rotation animation
 - (void)addRotateAnimationOnView:(UIView *)animationView {
     if (CYL_IS_IOS_26) {
-        //不建议在iOS26上给PlusButton添加动画， 因为在玻璃遮罩显示时， 玻璃遮罩本身就有缩放动画， 再添加动画， 会非常冗余。
+        // [CN] 不建议在iOS26上给PlusButton添加动画， 因为在玻璃遮罩显示时， 玻璃遮罩本身就有缩放动画， 再添加动画， 会非常冗余。
+        // [EN] Adding an animation to the PlusButton on iOS26 is not recommended: when the glass overlay is shown, the overlay
+        //      already has its own scale animation, so another animation would be very redundant.
         return;
     }
-    // 针对旋转动画，需要将旋转轴向屏幕外侧平移，最大图片宽度的一半
+    // [CN] 针对旋转动画，需要将旋转轴向屏幕外侧平移，最大图片宽度的一半
     // 否则背景与按钮图片处于同一层次，当按钮图片旋转时，转轴就在背景图上，动画时会有一部分在背景图之下。
     // 动画结束后复位
+    // [EN] For the rotation animation, move the rotation axis outward from the screen by half the maximum image width.
+    //      Otherwise the background and the button image are on the same layer; when the button image rotates, the axis
+    //      lies on the background image and part of the animation ends up below the background.
+    //      Reset after the animation ends.
     animationView.layer.zPosition = 65.f / 2;
     [UIView animateWithDuration:0.32 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
         animationView.layer.transform = CATransform3DMakeRotation(M_PI, 0, 1, 0);
@@ -785,19 +850,27 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     });
     CABasicAnimation *rotateAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.y"];
     
-    // 设定动画选项
-    rotateAnimation.duration = 1.2; // 持续时间
-    rotateAnimation.repeatCount = 1; // 重复次数
+    // [CN] 设定动画选项
+    // [EN] Set the animation options
+    rotateAnimation.duration = 1.2; // [CN] 持续时间
+    // [EN] Duration
+    rotateAnimation.repeatCount = 1; // [CN] 重复次数
+    // [EN] Repeat count
     
-    // 设定旋转角度
-    rotateAnimation.fromValue = [NSNumber numberWithFloat:0.0]; // 起始角度
-    rotateAnimation.toValue = [NSNumber numberWithFloat:2 * M_PI]; // 终止角度
+    // [CN] 设定旋转角度
+    // [EN] Set the rotation angle
+    rotateAnimation.fromValue = [NSNumber numberWithFloat:0.0]; // [CN] 起始角度
+    // [EN] Start angle
+    rotateAnimation.toValue = [NSNumber numberWithFloat:2 * M_PI]; // [CN] 终止角度
+    // [EN] End angle
     
     [animationView.layer addAnimation:rotateAnimation forKey:@"rotateAnimation"];
 }
 
 //- (void)tabBar:(CYLFlatDesignTabBar *)tabBar didSelectItemAt:(NSInteger)index {
-// //子类实现代理方法会， 覆盖父类的默认实现， 所以请先调用父类方法。
+// [CN] //子类实现代理方法会， 覆盖父类的默认实现， 所以请先调用父类方法。
+// [EN] A subclass implementing the delegate method overrides the superclass's default implementation, so call the
+//      superclass method first.
 //    [super tabBar:tabBar didSelectItemAt:index];
 //}
 
@@ -808,7 +881,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 //
 //    CGRect newBounds = self.tabBar.bounds;
 //
-//    // 等价于 Swift 的 didSet + guard
+// [CN] // 等价于 Swift 的 didSet + guard
+// [EN] Equivalent to Swift's didSet + guard
 //    if (!CGRectEqualToRect(newBounds, _tabBarBounds)) {
 //        _tabBarBounds = newBounds;
 //        [self updateSelectionIndicatorColor:[UIColor greenColor]];
@@ -830,7 +904,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     UIImage *selectionImage = [UIImage cyl_imageWithColor:tintColor
                                                      size:tabSize];
     
-    // 再次绘制，等价 Swift 逻辑
+    // [CN] 再次绘制，等价 Swift 逻辑
+    // [EN] Draw again, equivalent to the Swift logic
     UIGraphicsBeginImageContext(tabSize);
     [selectionImage drawInRect:CGRectMake(0, 0, tabSize.width, tabSize.height)];
     UIImage *finalImage = UIGraphicsGetImageFromCurrentImageContext();

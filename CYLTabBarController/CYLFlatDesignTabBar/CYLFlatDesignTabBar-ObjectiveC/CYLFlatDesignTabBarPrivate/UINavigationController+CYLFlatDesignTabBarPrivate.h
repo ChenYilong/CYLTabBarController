@@ -73,8 +73,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface UINavigationController (CYLFlatDesignTabBarPrivate)
 
 /**
- 当有自定义全屏返回手势时，需要设置该值（比如一些第三方实现的全屏返回手势）
+ [CN] 当有自定义全屏返回手势时，需要设置该值（比如一些第三方实现的全屏返回手势）
  用系统自带pop返回手势，则不用管
+ [EN] Set this value when there is a custom full-screen back gesture (e.g. one implemented by a third party).
+      If you use the system's built-in pop back gesture, you can ignore it.
  */
 @property (nonatomic, strong, nullable, getter=cylflatdesign_customPopGestureRecognizer, setter=cylflatdesign_setCustomPopGestureRecognizer:) UIGestureRecognizer *cylflatdesign_customPopGestureRecognizer;
 

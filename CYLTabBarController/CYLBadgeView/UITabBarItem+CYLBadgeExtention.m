@@ -41,7 +41,8 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
     CYL_DEPRECATED_DECLARATIONS_PUSH
     CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
     (
-     // 不再必须， 因此， 并非核心逻辑， 未来考虑删除。
+     // [CN] 不再必须， 因此， 并非核心逻辑， 未来考虑删除。
+     // [EN] No longer required, so this is not core logic; may be removed in the future.
      if (tabButton && [tabButton respondsToSelector:@selector(cyl_removeTabBadgePoint)]) {
          [tabButton cyl_removeTabBadgePoint];
      }

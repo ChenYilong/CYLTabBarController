@@ -48,7 +48,8 @@ configurationForConnectingSceneSession:(UISceneSession *)sceneSession
 // Orientations: not implemented, so the ones set in Xcode (Info.plist) apply, with no restriction in code.
 // 屏幕方向：不实现 `-application:supportedInterfaceOrientationsForWindow:`，以 Xcode 中的设置（Info.plist）为准，代码中不做任何限制。
 /**
- *  设置navigationBar样式
+ * [CN] 设置navigationBar样式
+ * [EN] Set the navigationBar style
  */
 - (void)setUpNavigationBarAppearance {
 //    UINavigationBar *navigationBarAppearance = [UINavigationBar appearance];

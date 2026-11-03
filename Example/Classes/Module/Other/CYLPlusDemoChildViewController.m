@@ -25,7 +25,7 @@
 }
 
 - (void)dealloc {
-    NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"");
+    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 }
 /*
 #pragma mark - Navigation

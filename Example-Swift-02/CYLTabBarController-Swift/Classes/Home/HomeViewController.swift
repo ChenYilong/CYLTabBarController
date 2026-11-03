@@ -15,7 +15,7 @@ final class HomeViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = "首页"
+        self.navigationItem.title = CYLLocalizedString("首页")
         self.navigationController?.tabBarItem.badgeValue = "3"
         // No navigation bar button here: a bell button is added, with an animated badge in a random color.
         // 没有导航栏按钮：先添加铃铛按钮，再显示随机颜色的动画角标。
@@ -29,7 +29,7 @@ extension HomeViewController{
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-        cell.textLabel?.text = "我是第\(indexPath.row)行"
+        cell.textLabel?.text = String(format: CYLLocalizedString("我是第%@行"), "\(indexPath.row)")
         return cell
     }
     

@@ -25,7 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol CYLFlatDesignTabBarDelegate<NSObject>
 @optional
 
-// 当用户点击时调用（而非通过编程）
+// [CN] 当用户点击时调用（而非通过编程）
+// [EN] Called when the user taps (not programmatically)
 
 /*!
  * [EN] Called when the user taps an item (not when selection changes in code).

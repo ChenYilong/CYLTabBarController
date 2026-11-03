@@ -133,7 +133,8 @@
         //            nav.cyl_tabBarItem.badgeValue = @"新消息";
         //            [nav.cyl_tabBarItem setBadgeTextAttributes:@{NSForegroundColorAttributeName:UIColor.greenColor} forState:UIControlStateNormal];
         //        } else if (i == 4) {
-        //            // 设置badgeSize不为CGSizeZero、badgeValue为nil，就变成一个点了
+        // [CN] // 设置badgeSize不为CGSizeZero、badgeValue为nil，就变成一个点了
+        // [EN] If badgeSize is not CGSizeZero and badgeValue is nil, the badge becomes a dot.
         //            nav.cyl_tabBarItem.badgeValue = nil;
         //            nav.cyl_tabBarItem.badgeSize = CGSizeMake(10, 10);
         //            nav.cyl_tabBarItem.badgeColor = UIColor.systemRedColor;

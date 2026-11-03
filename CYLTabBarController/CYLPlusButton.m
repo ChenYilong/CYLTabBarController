@@ -11,7 +11,8 @@
 #import "CYLTabBarController.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"
 
-/// See `-[CYLTabBar plusButtonIndex]`. 见 `-[CYLTabBar plusButtonIndex]`。
+/// [CN] See `-[CYLTabBar plusButtonIndex]`. 见 `-[CYLTabBar plusButtonIndex]`。
+/// [EN] See `-[CYLTabBar plusButtonIndex]`.
 @interface CYLTabBar (CYLPlusButtonLayout)
 - (BOOL)cyl_showsVerticalBar;
 @end
@@ -790,7 +791,8 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
         registration.plusButton = plusButton;
         registration.plusButtonWidth = plusButton.frame.size.width;
         [[self class] addSelectViewControllerTarget:plusButton];
-        //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
+        // [CN] 液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
+        // [EN] With the Liquid Glass effect, custom tap effects are not allowed; only the system glass effect can be used.
         if ([CYLConstants isLiquidGlassActive]) {
             //            plusButton.cyl_userInteractionDisabled = YES;
         }
@@ -799,7 +801,7 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
             CYLPlusButtonIndex = [[self class] indexOfPlusButtonInTabBar];
         } else {
 #if defined(DEBUG) || defined(BETA)
-            NSAssert(NO, @"[DEBUG INFO]If you want to add PlusChildViewController, you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】[DEBUG INFO]如果你想使用PlusChildViewController样式，你必须同时在你自定义的plusButton中实现 `+indexOfPlusButtonInTabBar`，来指定plusButton的位置");
+            NSAssert(NO, CYLLocalizedString(@"[DEBUG INFO] 如果你想使用 PlusChildViewController 样式，你必须同时在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。"));
 #endif
         }
     } else {
@@ -1021,8 +1023,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 /**
- *  按钮选中状态下点击先显示normal状态的颜色，松开时再回到selected状态下颜色。
+ * [CN] 按钮选中状态下点击先显示normal状态的颜色，松开时再回到selected状态下颜色。
  *  重写此方法即不会出现上述情况，与 UITabBarButton 相似
+ * [EN] When the button is selected, a tap first shows the normal-state color, then returns to the selected-state color
+ *      on release. Overriding this method avoids that, similar to UITabBarButton.
  */
 //- (void)setHighlighted:(BOOL)highlighted {}
 
@@ -1167,12 +1171,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     Class<CYLPlusButtonSubclassing> class = self;
     CYLPlusButton *registeredPlusButton = [CYLPlusButton plusButtonForTabBarContext:[self matchedTabBarContext]];
     if (registeredPlusButton) {
-        // 不使用selected 以避免选中背景
+        // [CN] 不使用selected 以避免选中背景
+        // [EN] Do not use selected, to avoid the selected background
         registeredPlusButton.highlighted = YES;
     }
     UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
     if (NO == plusButton.cyl_userInteractionDisabled) {
-        // 不使用selected 以避免选中背景
+        // [CN] 不使用selected 以避免选中背景
+        // [EN] Do not use selected, to avoid the selected background
         plusButton.highlighted = YES;
     }
     return plusButton;
@@ -1210,7 +1216,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     selectedContentView.userInteractionEnabled = false;
     [selectedContentView sizeToFit];
     if (NO == self.cyl_userInteractionDisabled) {
-        // 不使用selected 以避免选中背景
+        // [CN] 不使用selected 以避免选中背景
+        // [EN] Do not use selected, to avoid the selected background
         selectedContentView.highlighted = YES;
     }
     _selectedContentView = selectedContentView;
@@ -1488,7 +1495,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     } else {
         if (tabbarItemsCount % 2 != 0) {
 #if defined(DEBUG) || defined(BETA)
-            NSAssert(NO, @"[DEBUG INFO]If the count of CYLTabbarControllers is odd,you must realizse `+indexOfPlusButtonInTabBar` in your custom plusButton class.【Chinese】[DEBUG INFO] 如果CYLTabbarControllers的个数是奇数，你必须在你自定义的plusButton中实现`+indexOfPlusButtonInTabBar`，来指定plusButton的位置");
+            NSAssert(NO, CYLLocalizedString(@"[DEBUG INFO] 如果 CYLTabBarController 的子控制器个数是奇数，你必须在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。"));
 #endif
         } else {
             plusButtonIndex = tabbarItemsCount * 0.5;

@@ -64,11 +64,16 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
 @property (nullable, nonatomic, copy) NSString *title;
 @property (nullable, nonatomic, strong) UIImage *image;
 @property (nullable, nonatomic, strong) UIImage *selectedImage;
-// ⚠️ PATCH(aifirx): 原本是 strong，与 UIViewController.cyl_tabBarItem 的关联对象（RETAIN）构成
+// [CN] ⚠️ PATCH(aifirx): 原本是 strong，与 UIViewController.cyl_tabBarItem 的关联对象（RETAIN）构成
 // <ViewController> → <CYLFlatDesignTabBarItem> → <childViewController> 的自我强引用闭环，
 // 导致 tab 子控制器在 pop 之后永远无法释放。改为 weak。
+// [EN] ⚠️ PATCH(aifirx): This used to be strong, which together with the associated object (RETAIN) of
+//      UIViewController.cyl_tabBarItem formed the retain cycle
+//      <ViewController> → <CYLFlatDesignTabBarItem> → <childViewController>,
+//      so tab child controllers were never released after being popped. Changed to weak.
 @property (nullable, nonatomic, weak) UIViewController *childViewController;
-// default is nil, badgeValue为nil并且badgeSize为CGSizeZero时，badge隐藏
+// [CN] default is nil, badgeValue为nil并且badgeSize为CGSizeZero时，badge隐藏
+// [EN] default is nil; the badge is hidden when badgeValue is nil and badgeSize is CGSizeZero
 @property (nullable, nonatomic, copy) NSString *badgeValue;
 @property (nonatomic, readwrite, copy, nullable) UIColor *badgeColor;
 
@@ -112,7 +117,8 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
 - (nullable NSDictionary<NSAttributedStringKey,id> *)badgeTextAttributesForState:(UIControlState)state;
 
 #pragma mark - CYLFlatDesignTabBarItem 新增属性
-// 若设置badgeSize为CGSizeZero，则badge自动计算大小，默认为CGSizeZero
+// [CN] 若设置badgeSize为CGSizeZero，则badge自动计算大小，默认为CGSizeZero
+// [EN] If badgeSize is CGSizeZero, the badge size is calculated automatically. Defaults to CGSizeZero
 @property (nonatomic, readwrite, assign) CGSize badgeSize;
 // default {1, 6, 1, 6}
 @property (nonatomic, readwrite, assign) UIEdgeInsets badgeContentInset UI_APPEARANCE_SELECTOR;
@@ -120,8 +126,10 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
 @property (nonatomic, readwrite, assign) UIOffset imagePositionAdjustment UI_APPEARANCE_SELECTOR;
 
 /*
- 没有image时，title是否居中显示
+ [CN] 没有image时，title是否居中显示
  或没有title时，image是否居中显示，默认为NO
+ [EN] Whether the title is centered when there is no image,
+      or the image is centered when there is no title. Defaults to NO
  */
 @property (nonatomic, readwrite, assign) BOOL layoutCentered UI_APPEARANCE_SELECTOR;
 

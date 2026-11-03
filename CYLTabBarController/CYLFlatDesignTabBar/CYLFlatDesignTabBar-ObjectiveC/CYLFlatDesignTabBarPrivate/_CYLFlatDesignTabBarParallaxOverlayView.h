@@ -11,8 +11,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- UINavigationController Push / Pop 转场时，临时将CYLFlatDesignTabBar添加到ParallaxOverlayView上
+ [CN] UINavigationController Push / Pop 转场时，临时将CYLFlatDesignTabBar添加到ParallaxOverlayView上
  使其效果和系统转场效果一致
+ [EN] During UINavigationController Push / Pop transitions, temporarily add CYLFlatDesignTabBar to
+      ParallaxOverlayView so the effect matches the system transition.
  */
 @interface _CYLFlatDesignTabBarParallaxOverlayView : UIView
 

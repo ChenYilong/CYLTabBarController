@@ -11,7 +11,8 @@ import UIKit
 class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
     
     
-    /// MARK: 添加按钮
+    /// [CN] MARK: 添加按钮
+    /// [EN] MARK: Add the button
     static func plusButton() -> Any {
         
         let button = CYLPlusButtonSubclass()
@@ -38,9 +39,13 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
     }
     
     /*!
-     * 实现该方法后，能让 PlusButton 的点击效果与跟点击其他 TabBar 按钮效果一样，跳转到该方法指定的 UIViewController 。
+     * [CN] 实现该方法后，能让 PlusButton 的点击效果与跟点击其他 TabBar 按钮效果一样，跳转到该方法指定的 UIViewController 。
      * @attention 必须同时实现 `+indexOfPlusButtonInTabBar` 来指定 PlusButton 的位置。
      * @return 指定 PlusButton 点击后跳转的 UIViewController。
+     * [EN] Implementing this method makes tapping the PlusButton behave like tapping other TabBar buttons, switching to
+     *      the UIViewController specified by this method.
+     *      @attention You must also implement `+indexOfPlusButtonInTabBar` to specify the PlusButton's position.
+     *      @return The UIViewController to switch to when the PlusButton is tapped.
      *
      */
     // #408: the plus button's identifier, read as `control.cyl_tabBarItemIdentifier`. PlusButton 的标识。
@@ -67,12 +72,20 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
     
     
     /*!
-     * 该方法是为了调整 PlusButton 中心点Y轴方向的位置，建议在按钮超出了 tabbar 的边界时实现该方法。
+     * [CN] 该方法是为了调整 PlusButton 中心点Y轴方向的位置，建议在按钮超出了 tabbar 的边界时实现该方法。
      * @attention 如果不实现该方法，内部会自动进行比对，预设一个较为合适的位置，如果实现了该方法，预设的逻辑将失效。
      * @return 返回值是自定义按钮中心点Y轴方向的坐标除以 tabbar 的高度，
      内部实现时，会使用该返回值来设置 PlusButton 的 centerY 坐标，公式如下：
+     [EN] This method adjusts the Y-axis position of the PlusButton's center; it is recommended when the button extends
+          beyond the tabbar's bounds.
+          @attention If not implemented, a suitable position is preset internally by comparison; if implemented,
+          the preset logic no longer applies.
+          @return The Y coordinate of the custom button's center divided by the tabbar's height.
+          Internally, this return value is used to set the PlusButton's centerY with the following formula:
      `PlusButtonCenterY = multiplierOfTabBarHeight * tabBarHeight + constantOfPlusButtonCenterYOffset;`
-     也就是说：如果 constantOfPlusButtonCenterYOffset 为0，同时 multiplierOfTabBarHeight 的值是0.5，表示 PlusButton 居中，小于0.5表示 PlusButton 偏上，大于0.5则表示偏下。
+     [CN] 也就是说：如果 constantOfPlusButtonCenterYOffset 为0，同时 multiplierOfTabBarHeight 的值是0.5，表示 PlusButton 居中，小于0.5表示 PlusButton 偏上，大于0.5则表示偏下。
+     [EN] In other words: if constantOfPlusButtonCenterYOffset is 0 and multiplierOfTabBarHeight is 0.5, the PlusButton is
+          centered; below 0.5 it sits higher, and above 0.5 it sits lower.
      *
      */
     static func multiplier(ofTabBarHeight _: CGFloat) -> CGFloat {
@@ -85,10 +98,14 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
     
     
     /*!
-     * 见 `+multiplierOfTabBarHeight:` 注释：
+     * [CN] 见 `+multiplierOfTabBarHeight:` 注释：
+     * [EN] See the `+multiplierOfTabBarHeight:` comment:
      * `PlusButtonCenterY = multiplierOfTabBarHeight * tabBarHeight + constantOfPlusButtonCenterYOffset;`
-     * 也就是说： constantOfPlusButtonCenterYOffset 大于0会向下偏移，小于0会向上偏移。
+     * [CN] 也就是说： constantOfPlusButtonCenterYOffset 大于0会向下偏移，小于0会向上偏移。
      * @attention 实现了该方法，但没有实现 `+multiplierOfTabBarHeight:` 方法，在这种情况下，会在预设逻辑的基础上进行偏移。
+     * [EN] In other words: a constantOfPlusButtonCenterYOffset greater than 0 shifts down, less than 0 shifts up.
+     *      @attention If this method is implemented but `+multiplierOfTabBarHeight:` is not, the offset is applied on top
+     *      of the preset logic.
      */
     static func constantOfPlusButtonCenterYOffset(forTabBarHeight _: CGFloat) -> CGFloat {
         let screenHeight = currentWindowScene()?.screen.nativeBounds.size.height ?? 0

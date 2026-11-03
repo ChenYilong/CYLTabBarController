@@ -203,7 +203,8 @@ static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *C
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     if ([fileManager fileExistsAtPath:string]){
-        // URL = [NSURL URLWithString:string]; 会无法识别中文， 故改用 fileURLWithPath
+        // [CN] URL = [NSURL URLWithString:string]; 会无法识别中文， 故改用 fileURLWithPath
+        // [EN] URL = [NSURL URLWithString:string]; cannot handle Chinese characters, so use fileURLWithPath instead
         URL = [NSURL fileURLWithPath:string];
     }
     
@@ -225,7 +226,7 @@ static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *C
             isLottieEnabledFromAttributes = tabBarItemsAttributes[0][CYLTabBarLottieURL] || tabBarItemsAttributes[0][CYLTabBarLottieFilePath];
         } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
         }
     }

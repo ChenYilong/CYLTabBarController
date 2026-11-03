@@ -134,14 +134,17 @@
 }
 
 /*!
- * cyl_subTabBarButtons也就是与 VC匹配的Control集合，
+ * [CN] cyl_subTabBarButtons也就是与 VC匹配的Control集合，
+ * [EN] cyl_subTabBarButtons is the collection of controls that match the VCs,
  */
 - (NSArray<UIControl *> *)cyl_subTabBarButtons {
     if ([CYLConstants isLiquidGlassActive]) {
         return self.cyl_tabBarSubviews;
     }
-    //FIXME:  to delete 这个逻辑是不是和cyl_subTabBarButtonsWithoutPlusButton一样子？
+    // [CN] FIXME:  to delete 这个逻辑是不是和cyl_subTabBarButtonsWithoutPlusButton一样子？
     //不一样，仅限 cyl_isChildViewControllerPlusButton
+    // [EN] FIXME:  to delete Is this logic the same as cyl_subTabBarButtonsWithoutPlusButton?
+    //      No, it is limited to cyl_isChildViewControllerPlusButton
     NSMutableArray *subControls = [NSMutableArray arrayWithCapacity:self.cyl_visibleControls.count];
     [self.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([control cyl_isPlusButton] && ![CYLPlusButton plusChildViewControllerForOwner:self].cyl_plusViewControllerEverAdded) {
@@ -153,7 +156,8 @@
 }
 
 /*!
- * cyl_subTabBarButtonsWithoutPlusButton也就是与 系统风格tabbbaritem样式匹配的Control集合，
+ * [CN] cyl_subTabBarButtonsWithoutPlusButton也就是与 系统风格tabbbaritem样式匹配的Control集合，
+ * [EN] cyl_subTabBarButtonsWithoutPlusButton is the collection of controls that match the system-style tab bar items,
  */
 - (NSArray<UIControl *> *)cyl_subTabBarButtonsWithoutPlusButton {
     NSMutableArray *subControls = [NSMutableArray arrayWithCapacity:self.cyl_visibleControls.count];
@@ -180,7 +184,7 @@
         selectedControl = [self cyl_subTabBarButtonsWithoutPlusButton][tabIndex];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     return selectedControl;
@@ -193,7 +197,7 @@
         selectedControl = subControls[index];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     return selectedControl;
@@ -208,7 +212,9 @@
     if (!lottieURL) {
         return;
     }
-    // 统一使用CYLTabBarItemLottieAnimationPlayingNotification进行动画重置， 故删除手动重置。
+    // [CN] 统一使用CYLTabBarItemLottieAnimationPlayingNotification进行动画重置， 故删除手动重置。
+    // [EN] Animation reset is handled uniformly via CYLTabBarItemLottieAnimationPlayingNotification,
+    //      so the manual reset was removed.
     // [self cyl_stopAnimationOfAllLottieView];
     [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected contentMode:contentMode];
     
@@ -218,7 +224,9 @@
     if (!lottieURL) {
         return;
     }
-    // 统一使用CYLTabBarItemLottieAnimationPlayingNotification进行动画重置， 故删除手动重置。
+    // [CN] 统一使用CYLTabBarItemLottieAnimationPlayingNotification进行动画重置， 故删除手动重置。
+    // [EN] Animation reset is handled uniformly via CYLTabBarItemLottieAnimationPlayingNotification,
+    //      so the manual reset was removed.
     // [self cyl_stopAnimationOfAllLottieView];
     [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected contentMode:contentMode];
 #endif
@@ -269,20 +277,30 @@
 }
 
 /*!
- * 思路为： 从当前图层的control，获得index， 再从另外的图层中的index位置， 获取control。以此来避免直接使用 index 来获取不同图层的。因为有可能存在plusButton， 导致，index的数值变动， 降级复杂度。以control为锚点， index仅辅助。
+ * [CN] 思路为： 从当前图层的control，获得index， 再从另外的图层中的index位置， 获取control。以此来避免直接使用 index 来获取不同图层的。因为有可能存在plusButton， 导致，index的数值变动， 降级复杂度。以control为锚点， index仅辅助。
+ * [EN] Approach: get the index from the control in the current layer, then get the control at that index in the other
+ *      layer. This avoids using the index directly to look up controls across layers, because a plusButton may shift
+ *      the index values; it reduces complexity. The control is the anchor; the index only assists.
  */
 - (nullable UIControl *)cyl_selectedContentControlFromContentControl:(nullable UIControl *)contentControl {
 //    if ([contentControl cyl_isPlusControl]) {
 //        return nil;
 //    }
     UIControl *selectedContentControl = nil;
-    //FIXME:  必须为 cyl_subTabBarButtonsWithoutPlusButton （不能 cyl_subTabBarButtons）否则Lottie选中动画不显示，因为Lottie文件数量与tabbaritems 的数量少一个。
+    // [CN] FIXME:  必须为 cyl_subTabBarButtonsWithoutPlusButton （不能 cyl_subTabBarButtons）否则Lottie选中动画不显示，因为Lottie文件数量与tabbaritems 的数量少一个。
+    // [EN] FIXME:  Must be cyl_subTabBarButtonsWithoutPlusButton (not cyl_subTabBarButtons), otherwise the Lottie selected
+    //      animation does not show, because there is one fewer Lottie file than tab bar items.
     NSUInteger index = [self.cyl_subTabBarButtons indexOfObject:contentControl];
     if (NSNotFound == index) {
         return nil;
     }
-    //FIXME:  to delete  必须为 cyl_platterSelectedContentViewWithoutPlusButttonWithIndex （不能cyl_platterSelectedContentViewWithIndex）否则Lottie选中动画不显示，，因为Lottie文件数量与tabbaritems 的数量少一个。
+    // [CN] FIXME:  to delete  必须为 cyl_platterSelectedContentViewWithoutPlusButttonWithIndex （不能cyl_platterSelectedContentViewWithIndex）否则Lottie选中动画不显示，，因为Lottie文件数量与tabbaritems 的数量少一个。
     //TODO: selectedContentControl不对，plusButton 下一个会添加失败，添加的是 plusButton对应的lottie， 顺延了。
+    // [EN] FIXME:  to delete  Must be cyl_platterSelectedContentViewWithoutPlusButttonWithIndex
+    //      (not cyl_platterSelectedContentViewWithIndex), otherwise the Lottie selected animation does not show,
+    //      because there is one fewer Lottie file than tab bar items.
+    //      TODO: selectedContentControl is wrong; adding to the one after the plusButton fails: it adds the Lottie
+    //      for the plusButton instead, shifted by one.
     selectedContentControl = [self cyl_platterSelectedContentViewWithIndex:index];
     if (!selectedContentControl) {
         return nil;
@@ -305,7 +323,7 @@
         contentControl = [self.cyl_subTabBarButtons objectAtIndex:index];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     if (!contentControl) {
@@ -359,7 +377,7 @@
             } while (false); // same as : 0, NO
         } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-            NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
         }
     }
@@ -429,7 +447,10 @@
                                             
                                             );
     
-    //如果在选中CYLPlusChildViewController的状态下，  重复点击，或者滑动手势，又选中CYLPlusChildViewController。 相当于重复点击CYLPlusChildViewController， 则不显示未选中状态的Label， 仅仅在切换到其他tab的情况下， 显示未选中状态的Label。 否则会出现Label重叠的情况。
+    // [CN] 如果在选中CYLPlusChildViewController的状态下，  重复点击，或者滑动手势，又选中CYLPlusChildViewController。 相当于重复点击CYLPlusChildViewController， 则不显示未选中状态的Label， 仅仅在切换到其他tab的情况下， 显示未选中状态的Label。 否则会出现Label重叠的情况。
+    // [EN] If CYLPlusChildViewController is already selected and it is selected again by a repeated tap or a swipe gesture,
+    //      this counts as tapping CYLPlusChildViewController again, so the unselected-state Label is not shown. The
+    //      unselected-state Label is shown only when switching to another tab; otherwise the Labels would overlap.
     if (shouldShowPlatterLiquidLensViewForControl && ![tabBar isPlusButtonLayoutCentered]  ) {
         return YES;
     }
@@ -511,12 +532,16 @@
  *CYLTabBar
  └── UIFocusContainerGuide
  └── _UITabBarPlatterView
- ├── SelectedContentView        ❌ 状态壳
+ [CN] ├── SelectedContentView        ❌ 状态壳
  ├── _UILiquidLensView          ❌ 视觉
  └── ContentView                ✅ 真正容器
+ [EN] ├── SelectedContentView        ❌ state shell
+      ├── _UILiquidLensView          ❌ visual
+      └── ContentView                ✅ the real container
  ├── _UITabButton           ✅
  ├── _UITabButton           ✅
- ├── _UITabButton           ❌ hidden / disabled（中间占位）
+ [CN] ├── _UITabButton           ❌ hidden / disabled（中间占位）
+ [EN] ├── _UITabButton           ❌ hidden / disabled (middle placeholder)
  ├── _UITabButton           ✅
  ├── _UITabButton           ✅
  └── DestOutView            ❌
@@ -528,7 +553,8 @@
         return self.subviews;
         
     }
-    // iOS 26 以前，保持原逻辑
+    // [CN] iOS 26 以前，保持原逻辑
+    // [EN] Before iOS 26, keep the original logic
     if (CYL_UIDesignOldVersionCYLTabBarWithoutiOS26) {
         return self.subviews;
     }
@@ -539,12 +565,14 @@
         return self.subviews;
     }
     
-    // 记录 platter 尺寸
+    // [CN] 记录 platter 尺寸
+    // [EN] Record the platter size
     [self cyl_setPlatterViewWidth:platterView.bounds.size.width];
     [self cyl_setPlatterViewSize:[NSValue valueWithCGSize:platterView.bounds.size]];
     
     UIView * container = platterView;
-    // 3️⃣ 从 PlatterView 中，找真正承载 UITabBarButton 的 ContentView
+    // [CN] 3️⃣ 从 PlatterView 中，找真正承载 UITabBarButton 的 ContentView
+    // [EN] 3️⃣ In the PlatterView, find the ContentView that actually hosts the UITabBarButtons
     UIView *contentView = nil;
     for (UIView *sub in container.subviews) {
         if ([sub cyl_isPlatterContentView]) {
@@ -572,7 +600,8 @@
         return nil;
     }
 
-    // 4️⃣ 收集所有 UITabBarItem 对应 view UITabButton 的 frame
+    // [CN] 4️⃣ 收集所有 UITabBarItem 对应 view UITabButton 的 frame
+    // [EN] 4️⃣ Collect the frames of the UITabButton views corresponding to all UITabBarItems
     NSMutableArray<UIView *> *itemViews = [NSMutableArray array];
     for (UIView *sub in contentView.subviews) {
         if ([sub isKindOfClass:UIControl.class]) {
@@ -602,7 +631,8 @@
     
 #if defined(DEBUG) || defined(BETA)
     
-    // 6️⃣ 转成 frame 数组
+    // [CN] 6️⃣ 转成 frame 数组
+    // [EN] 6️⃣ Convert to an array of frames
 //    NSMutableArray<NSValue *> *frames = [NSMutableArray array];
 //    for (UIView *v in itemViews) {
 //        [frames addObject:[NSValue valueWithCGRect:v.frame]];
@@ -657,7 +687,7 @@
         view = self.cyl_platterViews[index];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     return view;
@@ -672,7 +702,7 @@
         view = self.cyl_platterContentViews[index];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     return  view;
@@ -682,7 +712,8 @@
     UIView *contentView = nil;
     for (UIView *sub in self.cyl_platterView.subviews) {
         
-        //TODO:  找到罩子的真正view， 修改frame
+        // [CN] TODO:  找到罩子的真正view， 修改frame
+        // [EN] TODO:  Find the actual view of the overlay and modify its frame
         if ([sub cyl_isPlatterSelectedContentView]) {
             contentView = sub;
             break;
@@ -803,7 +834,8 @@
 - (nullable UIView *)cyl_platterDestOutView {
     UIView *contentView = nil;
     for (UIView *sub in self.cyl_platterView.subviews) {
-        //TODO:  找到罩子的真正view， 修改frame
+        // [CN] TODO:  找到罩子的真正view， 修改frame
+        // [EN] TODO:  Find the actual view of the overlay and modify its frame
         if ([sub cyl_isPlatterDestOutView]) {
             contentView = sub;
             break;
@@ -826,7 +858,7 @@
         view = self.cyl_platterSelectedContentViewsWithoutPlusButton[index];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     return view;
@@ -839,7 +871,7 @@
         view = self.cyl_platterSelectedContentViews[index];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     return view;
@@ -856,7 +888,7 @@
         view = self.cyl_platterPortalViews[index];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     return view;

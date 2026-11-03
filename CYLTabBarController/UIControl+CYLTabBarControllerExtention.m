@@ -366,7 +366,9 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     NSTimeInterval delaySeconds = selectedTabButton.cyl_isReady ? 0 : MAX(delay, 0);
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
-        //如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
+        // [CN] 如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
+        // [EN] Lottie animation icons need a delay; otherwise the replacement happens before the lottie animation has
+        //      finished initializing, and the position is wrong.
         [self cyl_replaceTabImageViewOrTabButton:isTabButton newView:newView offset:offset show:theShow shouldAutoHideNewView:NO shouldHideOriginalView:NO completion:^(BOOL isReplaced, UIControl *tabBarButton, UIView *newView) {
             //FIXME:  #480
             if (isReplaced) {
@@ -421,9 +423,15 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
         !completion?:completion(NO, self, nil);
         return;
     }
-    //        //TODO: 区分cover 与 replace 两个场景， 获取到真实的view，可能是lottie，决定是否限制新视图的尺寸， 目前暂不限制尺寸。 因为主要场景为 cover 场景。cover =( adjustTabBarItemImageViewSizeDependOnSuperView == yes), replace =( adjustTabBarItemImageViewSizeDependOnSuperView == NO)
+    // [CN] //TODO: 区分cover 与 replace 两个场景， 获取到真实的view，可能是lottie，决定是否限制新视图的尺寸， 目前暂不限制尺寸。 因为主要场景为 cover 场景。cover =( adjustTabBarItemImageViewSizeDependOnSuperView == yes), replace =( adjustTabBarItemImageViewSizeDependOnSuperView == NO)
+    // [EN] TODO: Distinguish the cover and replace cases, get the real view (it may be lottie), and decide whether to limit
+    //      the new view's size. For now the size is not limited, because cover is the main case.
+    //      cover =( adjustTabBarItemImageViewSizeDependOnSuperView == yes), replace =(
+    //      adjustTabBarItemImageViewSizeDependOnSuperView == NO)
     if (newView.frame.size.width == 0 || newView.frame.size.height == 0) {
-        //        不再限制newView 是否能超过父视图，因为你可以通过设置size来控制newView的展示大小。
+        // [CN] 不再限制newView 是否能超过父视图，因为你可以通过设置size来控制newView的展示大小。
+        // [EN] No longer restricts whether newView may exceed its superview, because you can control newView's displayed size
+        //      by setting size.
         //        if (newView.frame.size.width > tabBarButton.frame.size.width || newView.frame.size.height > tabBarButton.frame.size.height) {
         newView.frame = ({
             CGRect frame = newView.frame;
@@ -805,7 +813,8 @@ static void CYLApplyLottieDarkColors(UIView *lottieView, UITraitCollection *trai
     dispatch_async(dispatch_get_main_queue(),^{
         
         if (defaultSelected) {
-            //Avoid triggering Lottie animation when index == 0 on app startup. 希望Lottie icon 启动后 index== 0 不执行动画 #389
+            // [CN] Avoid triggering Lottie animation when index == 0 on app startup. 希望Lottie icon 启动后 index== 0 不执行动画 #389
+            // [EN] Avoid triggering Lottie animation when index == 0 on app startup. #389
             lottieView.animationProgress = 1;
             [lottieView forceDrawingUpdate];
         } else {
@@ -830,15 +839,19 @@ static void CYLApplyLottieDarkColors(UIView *lottieView, UITraitCollection *trai
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
 
-//    dispatch_async(dispatch_get_main_queue(),^{  不能增加dispatch_get_main_queue判断，否则暂停与播放，可能错乱。
+// [CN] dispatch_async(dispatch_get_main_queue(),^{  不能增加dispatch_get_main_queue判断，否则暂停与播放，可能错乱。
+// [EN] dispatch_async(dispatch_get_main_queue(),^{  The dispatch_get_main_queue check must not be added; otherwise pause
+//      and play may get out of order.
 
         if (defaultSelected) {
-            //Avoid triggering Lottie animation when index == 0 on app startup. 希望Lottie icon 启动后 index== 0 不执行动画 #389
+            // [CN] Avoid triggering Lottie animation when index == 0 on app startup. 希望Lottie icon 启动后 index== 0 不执行动画 #389
+            // [EN] Avoid triggering Lottie animation when index == 0 on app startup. #389
             lottieView.animationProgress = 1;
             [lottieView forceDrawingUpdate];
         } else {
             lottieView.animationProgress = 0;
-            ///播放到指定进度（0-1）
+            /// [CN] 播放到指定进度（0-1）
+            /// [EN] Play to the given progress (0-1)
             [lottieView play];
         }
 //    });
@@ -846,9 +859,14 @@ static void CYLApplyLottieDarkColors(UIView *lottieView, UITraitCollection *trai
 }
 
 /*!
-  通过(lottieView.animationProgress > 0) 判断，以及放置在 dispatch_get_main_queue， 尝试 修复扁平风格 CYLFlatDesignTabBar 第一次初始化时，可能展示失败的问题。
+  [CN] 通过(lottieView.animationProgress > 0) 判断，以及放置在 dispatch_get_main_queue， 尝试 修复扁平风格 CYLFlatDesignTabBar 第一次初始化时，可能展示失败的问题。
  其中 通过(lottieView.animationProgress > 0) 判断 ， 可以降低80%的发生几率， 但并不保证100%完全避免，
  不能增加dispatch_get_main_queue判断，否则暂停与播放，可能错乱。
+  [EN] The (lottieView.animationProgress > 0) check, plus running on dispatch_get_main_queue, try to fix an issue where
+       the flat design style CYLFlatDesignTabBar may fail to display on its first initialization.
+       The (lottieView.animationProgress > 0) check lowers the chance of it happening by 80%, but does not guarantee
+       avoiding it 100%.
+       The dispatch_get_main_queue check must not be added; otherwise pause and play may get out of order.
  */
 - (void)cyl_stopAnimationOfLottieView {
     //    dispatch_async(dispatch_get_main_queue(),^{
@@ -1029,7 +1047,8 @@ CYL_DEPRECATED_DECLARATIONS_PUSH
     objc_setAssociatedObject(self, @selector(cyl_tabBadgePointViewOffset), [NSValue valueWithUIOffset:tabBadgePointViewOffset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-//offset如果都是正数，则往右下偏移
+// [CN] offset如果都是正数，则往右下偏移
+// [EN] If both offsets are positive, it shifts toward the bottom right.
 - (UIOffset)cyl_tabBadgePointViewOffset {
     id tabBadgePointViewOffsetObject = objc_getAssociatedObject(self, @selector(cyl_tabBadgePointViewOffset));
     UIOffset tabBadgePointViewOffset = [tabBadgePointViewOffsetObject UIOffsetValue];

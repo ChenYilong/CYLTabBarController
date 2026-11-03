@@ -36,7 +36,8 @@ class RootTabBarController: CYLTabBarController {
 
     }
     
-    /// MARK:TabBard底部标签设置
+    /// [CN] MARK:TabBard底部标签设置
+    /// [EN] MARK: TabBar bottom tab settings
     func customizeInterface() {
         
         if #available(iOS 11.0, *) {
@@ -50,9 +51,11 @@ class RootTabBarController: CYLTabBarController {
             self.tabBarItem.setTitleTextAttributes(selectAttrs as? [NSAttributedString.Key: AnyObject], for: .selected)
         }
         
-        //MARK:设置背景图片
+        // [CN] MARK:设置背景图片
+        // [EN] MARK: Set the background image
         tabBar.backgroundImage = UIImage.imageWithColor(.white)
-        //MARK:去除 TabBar 自带的顶部阴影
+        // [CN] MARK:去除 TabBar 自带的顶部阴影
+        // [EN] MARK: Remove the TabBar's built-in top shadow
         self.tabBar.shadowImage = UIImage()
         
 //        appearanceShawIamge()

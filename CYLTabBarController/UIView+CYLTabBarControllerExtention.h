@@ -6,7 +6,8 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
-// FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+// [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+// [EN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils.
 #if __has_include("CYLUtils/UIView+CYLUtils.h")
 #import "CYLUtils/UIView+CYLUtils.h"
 #else

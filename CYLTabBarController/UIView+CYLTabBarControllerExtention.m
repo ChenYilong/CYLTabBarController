@@ -45,7 +45,8 @@
     if (isTabButton) { return isTabButton; }
     
     if (![CYLConstants isLiquidGlassActive]) {
-        // iOS 26 以前，保持原逻辑
+        // [CN] iOS 26 以前，保持原逻辑
+        // [EN] Before iOS 26, keep the original logic
         //UIControl
         NSString *classString = NSStringFromClass([self class]);
         BOOL isTabButton = [classString hasSuffix:@"BarButton"] && [classString hasPrefix:@"UITab"];
@@ -57,13 +58,15 @@
         //        BOOL result = isKindOfButton && (self.hidden == NO);
         return isKindOfButton;
     }
-    //UIControl 扁平或者玻璃样式共用
+    // [CN] UIControl 扁平或者玻璃样式共用
+    // [EN] UIControl is shared by the flat design and glass styles
     return [self isKindOfClass:[UIControl class]];
 }
 
 - (BOOL)cyl_isPlatterView {
     if (![CYLConstants isLiquidGlassActive]) {
-        // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [CN] iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [EN] Before iOS 26, or in UI compatibility mode, skip the remaining checks
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
@@ -74,7 +77,8 @@
 
 - (BOOL)cyl_isPlatterPortalView {
     if (![CYLConstants isLiquidGlassActive]) {
-        // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [CN] iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [EN] Before iOS 26, or in UI compatibility mode, skip the remaining checks
         return NO;
     }
 
@@ -98,7 +102,8 @@
 
 - (BOOL)cyl_isPlatterContentView {
     if (![CYLConstants isLiquidGlassActive]) {
-        // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [CN] iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [EN] Before iOS 26, or in UI compatibility mode, skip the remaining checks
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
@@ -109,7 +114,8 @@
 
 - (BOOL)cyl_isPlatterSelectedContentView {
     if (![CYLConstants isLiquidGlassActive]) {
-        // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [CN] iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [EN] Before iOS 26, or in UI compatibility mode, skip the remaining checks
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
@@ -119,7 +125,8 @@
 
 - (BOOL)cyl_isPlatterVisualProviderFloatingSelectedContentView {
     if (![CYLConstants isLiquidGlassActive]) {
-        // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [CN] iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [EN] Before iOS 26, or in UI compatibility mode, skip the remaining checks
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
@@ -130,7 +137,8 @@
 
 - (BOOL)cyl_isPlatterLiquidLensView {
     if (![CYLConstants isLiquidGlassActive]) {
-        // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [CN] iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [EN] Before iOS 26, or in UI compatibility mode, skip the remaining checks
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
@@ -141,7 +149,8 @@
 
 - (BOOL) cyl_isPlatterLiquidLensClearGlassView {
     if (![CYLConstants isLiquidGlassActive]) {
-        // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [CN] iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [EN] Before iOS 26, or in UI compatibility mode, skip the remaining checks
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
@@ -152,7 +161,8 @@
 
 - (BOOL)cyl_isPlatterLiquidLensTabSelectionView {
     if (![CYLConstants isLiquidGlassActive]) {
-        // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [CN] iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [EN] Before iOS 26, or in UI compatibility mode, skip the remaining checks
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
@@ -163,7 +173,8 @@
 
 - (BOOL)cyl_isPlatterLiquidLensBackdropView {
     if (![CYLConstants isLiquidGlassActive]) {
-        // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [CN] iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [EN] Before iOS 26, or in UI compatibility mode, skip the remaining checks
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
@@ -174,7 +185,8 @@
 
 - (BOOL)cyl_isPlatterDestOutView {
     if (![CYLConstants isLiquidGlassActive]) {
-        // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [CN] iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
+        // [EN] Before iOS 26, or in UI compatibility mode, skip the remaining checks
         return NO;
     }
     NSString *classString = NSStringFromClass([self class]);
@@ -196,7 +208,8 @@
 
 - (BOOL)cyl_isTabLabel {
     BOOL isKindOfLabel;
-    // iOS 26 以前，保持原逻辑
+    // [CN] iOS 26 以前，保持原逻辑
+    // [EN] Before iOS 26, keep the original logic
     if (![CYLConstants isLiquidGlassActive]) {
         return [self cyl_isKindOfClass:[UILabel class]];
     }
@@ -211,7 +224,8 @@
 
 - (BOOL)cyl_isButtonLabel {
     BOOL isButtonLabel;
-    // iOS 26 以前，保持原逻辑
+    // [CN] iOS 26 以前，保持原逻辑
+    // [EN] Before iOS 26, keep the original logic
     NSString *classString = NSStringFromClass([self class]);
     isButtonLabel = [classString hasSuffix:@"Label"] && [classString hasPrefix:@"UIButton"];
     return isButtonLabel;
@@ -269,7 +283,8 @@
     return imageView;
 }
 /*!
- * 只有在TabBar选中状态下才能取到 SwappableImageView
+ * [CN] 只有在TabBar选中状态下才能取到 SwappableImageView
+ * [EN] SwappableImageView can only be obtained when the TabBar item is selected
  */
 - (nullable UIImageView *)cyl_swappableImageViewViewInTabBarButton {
     if (![self isKindOfClass:[UIView class]]) {
@@ -277,11 +292,13 @@
     }
     
     UIImageView *imageView = nil;
-    // ② 遍历 subviews 查找
+    // [CN] ② 遍历 subviews 查找
+    // [EN] ② Search through subviews
     for (UIView *subview in self.subviews) {
         NSString *classString = NSStringFromClass(subview.class);
         
-        // iOS10+ 官方使用 UITabBarSwappableImageView
+        // [CN] iOS10+ 官方使用 UITabBarSwappableImageView
+        // [EN] iOS10+ officially uses UITabBarSwappableImageView
         if ([classString hasSuffix:@"ImageView"] && [classString hasPrefix:@"UITabB"]) {
             return (UIImageView *)subview;
         }
@@ -291,7 +308,9 @@
 }
 
 /*!
- * 只有在TabBar选中状态下才能取到UITabBar+SwappableImageView, 未选中状态就使用这个。
+ * [CN] 只有在TabBar选中状态下才能取到UITabBar+SwappableImageView, 未选中状态就使用这个。
+ * [EN] UITabBar+SwappableImageView can only be obtained when the TabBar item is selected; use this one when it is
+ *      not selected.
  */
 - (UIImageView *)cyl_otherImageViewViewInTabBarButton {
     if (![self isKindOfClass:[UIView class]]) {
@@ -299,16 +318,19 @@
     }
     
     UIImageView *imageView = nil;
-    // ② 遍历 subviews 查找
+    // [CN] ② 遍历 subviews 查找
+    // [EN] ② Search through subviews
     for (UIView *subview in self.subviews) {
         NSString *classString = NSStringFromClass(subview.class);
         
-        // iOS10+ 官方使用 SwappableImageView
+        // [CN] iOS10+ 官方使用 SwappableImageView
+        // [EN] iOS10+ officially uses SwappableImageView
         if ([classString hasSuffix:@"ImageView"] && [classString hasPrefix:@"UITabB"]) {
             return (UIImageView *)subview;
         }
         
-        // 过滤掉选中背景, UITabBar+SelectionIndicatorView
+        // [CN] 过滤掉选中背景, UITabBar+SelectionIndicatorView
+        // [EN] Filter out the selection background, UITabBar+SelectionIndicatorView
         if ([subview isKindOfClass:[UIImageView class]] &&
             ![classString containsString:@"SelectionIndicatorView"]) {
             imageView = (UIImageView *)subview;
@@ -324,9 +346,12 @@
     
     UIImageView *imageView = nil;
     
-    // ① 优先尝试 KVC 直接获取（iOS 13+ 常见）
+    // [CN] ① 优先尝试 KVC 直接获取（iOS 13+ 常见）
     // iOS 26+ 的 _UITabButton 没有 imageView 这个 KVC key，valueForKey: 会抛 NSUnknownKeyException。
     // 后面的子视图查找仍然适用，这里直接跳过。
+    // [EN] ① First try to get it directly via KVC (common on iOS 13+)
+    //      On iOS 26+, _UITabButton has no imageView KVC key, so valueForKey: throws NSUnknownKeyException.
+    //      The subview search below still works, so skip this step here.
     if (![NSStringFromClass(self.class) isEqualToString:@"_UITabButton"]) {
         imageView = [self cyl_valueForKey:@"imageView"];
         if ([imageView isKindOfClass:[UIImageView class]]) {
@@ -334,16 +359,19 @@
         }
     }
     
-    // ② 遍历 subviews 查找
+    // [CN] ② 遍历 subviews 查找
+    // [EN] ② Search through subviews
     for (UIView *subview in self.subviews) {
         NSString *classString = NSStringFromClass(subview.class);
         
-        // iOS10+ 官方使用 UITabBar+SwappableImageView
+        // [CN] iOS10+ 官方使用 UITabBar+SwappableImageView
+        // [EN] iOS10+ officially uses UITabBar+SwappableImageView
         if ([classString hasPrefix:@"UITabBar"] && [classString hasSuffix:@"SwappableImageView"]) {
             return (UIImageView *)subview;
         }
         
-        // 过滤掉选中背景, UITabBar+SelectionIndicatorView
+        // [CN] 过滤掉选中背景, UITabBar+SelectionIndicatorView
+        // [EN] Filter out the selection background, UITabBar+SelectionIndicatorView
         if ([subview isKindOfClass:[UIImageView class]] &&
             ![classString hasSuffix:@"SelectionIndicatorView"]&& ![classString hasPrefix:@"UITabBar"]  ) {
             imageView = (UIImageView *)subview;
@@ -416,13 +444,15 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (nullable UIImageView *)cyl_tabShadowImageView {
     if (@available(iOS 10.0, *)) {
-        //iOS10及以上这样获取ShadowImageView：
+        // [CN] iOS10及以上这样获取ShadowImageView：
+        // [EN] On iOS10 and later, get the ShadowImageView like this:
         UIView *subview = [self cyl_tabBackgroundView];
         if (!subview) {
             return nil;
         }
         NSArray<__kindof UIView *> *backgroundSubviews = subview.subviews;
-        //iOS13系统backgroundSubviews.count > 1可行，12及以下就不可行了
+        // [CN] iOS13系统backgroundSubviews.count > 1可行，12及以下就不可行了
+        // [EN] backgroundSubviews.count > 1 works on iOS13, but not on iOS12 and earlier
         if (backgroundSubviews.count >= 1) {
             for (UIView *subview in backgroundSubviews) {
                 if (CGRectGetHeight(subview.bounds) <= 1.0 ) {
@@ -431,7 +461,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             }
         }
     } else {
-        //iOS9这样获取ShadowImageView：
+        // [CN] iOS9这样获取ShadowImageView：
+        // [EN] On iOS9, get the ShadowImageView like this:
         for (UIView *subview in self.subviews) {
             if (CGRectGetHeight(subview.bounds) <= 1.0 ) {
                 return (UIImageView *)subview;
@@ -516,9 +547,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 /*!
- *  @warning 仅对 UIBarButtonItem、UITabBarItem 有效
+ * [CN] @warning 仅对 UIBarButtonItem、UITabBarItem 有效
  *   UIBarItem 本身没有 view 属性，只有子类 UIBarButtonItem 和 UITabBarItem 才有
  *   iOS11改成了类似懒加载机制，要等到UIBarButtonItem被展示后才能获取到_view
+ * [EN] @warning Only works for UIBarButtonItem and UITabBarItem
+ *      UIBarItem itself has no view property; only its subclasses UIBarButtonItem and UITabBarItem do
+ *      Since iOS11 this works like lazy loading: _view is only available after the UIBarButtonItem is displayed
  */
 - (UIView *)cyl_contentView {
     if ([self respondsToSelector:@selector(view)]) {

@@ -8,9 +8,11 @@
 
 import UIKit
 
-//Toast默认停留时间
+// [CN] Toast默认停留时间
+// [EN] Default Toast display duration
 let toastDispalyDuration: CGFloat = 2.0
-//Toast背景颜色
+// [CN] Toast背景颜色
+// [EN] Toast background color
 let toastBackgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.6)
 
 class ToastView: NSObject {
@@ -35,7 +37,8 @@ class ToastView: NSObject {
         contenButton.autoresizingMask = UIView.AutoresizingMask.flexibleWidth
         super.init()
         contenButton.addTarget(self, action: #selector(toastTaped), for: .touchDown)
-        //添加通知获取手机旋转状态.保证正确的显示效果
+        // [CN] 添加通知获取手机旋转状态.保证正确的显示效果
+        // [EN] Add a notification to get the device rotation state, to ensure correct display
         NotificationCenter.default.addObserver(self, selector: #selector(toastTaped), name: UIDevice.orientationDidChangeNotification, object: UIDevice.current)
     }
     
@@ -43,21 +46,25 @@ class ToastView: NSObject {
         self.hideAnimation()
     }
     
-    //移除
+    // [CN] 移除
+    // [EN] Remove
     @objc func dismissToast() {
         contenButton.removeFromSuperview()
     }
     
-    //屏幕更改监听
+    // [CN] 屏幕更改监听
+    // [EN] Screen change observer
     func deviceOrientationDidChanged(notify _: NSNotification) {
         self.hideAnimation()
     }
     
-    //设置时长
+    // [CN] 设置时长
+    // [EN] Set the duration
     func setDuration(duration: CGFloat) {
         self.duration = duration
     }
-    //居中显示
+    // [CN] 居中显示
+    // [EN] Show in the center
     func show() {
         guard let window = ToastView.lastWindow else { return }
         contenButton.center = window.center
@@ -65,7 +72,8 @@ class ToastView: NSObject {
         self.showAnimation()
         self.perform(#selector(hideAnimation), with: nil, afterDelay: TimeInterval(duration))
     }
-    //顶部显示
+    // [CN] 顶部显示
+    // [EN] Show at the top
     func showFromTopOffset(top: CGFloat) {
         guard let window = ToastView.lastWindow else { return }
         contenButton.center = CGPoint(x: window.center.x, y: top + contenButton.frame.size.height / 2)
@@ -73,7 +81,8 @@ class ToastView: NSObject {
         self.showAnimation()
         self.perform(#selector(hideAnimation), with: nil, afterDelay: TimeInterval(duration))
     }
-    //底部显示
+    // [CN] 底部显示
+    // [EN] Show at the bottom
     func showFromBottomOffset(bottom: CGFloat) {
         guard let window = ToastView.lastWindow else { return }
         contenButton.center = CGPoint(x: window.center.x, y: window.frame.size.height - (bottom + contenButton.frame.size.height/2))
@@ -82,7 +91,8 @@ class ToastView: NSObject {
         self.perform(#selector(hideAnimation), with: nil, afterDelay: TimeInterval(duration))
     }
     
-    //MARK: 中间显示
+    // [CN] MARK: 中间显示
+    // [EN] MARK: Show in the center
     class func showCenterWithText(text: String) {
         let toast: ToastView = ToastView(text: text)
         toast.show()
@@ -93,7 +103,8 @@ class ToastView: NSObject {
         toast.show()
     }
     
-    // MARK: 上方显示
+    // [CN] MARK: 上方显示
+    // [EN] MARK: Show at the top
     class func showTopWithText(text: String) {
         ToastView.showTopWithText(text: text, topOffset: 100.0, duration: toastDispalyDuration)
     }
@@ -109,7 +120,8 @@ class ToastView: NSObject {
         toast.showFromTopOffset(top: topOffset)
     }
     
-    // MARK: 下方显示
+    // [CN] MARK: 下方显示
+    // [EN] MARK: Show at the bottom
     class func showBottomWithText(text: String) {
         ToastView.showBottomWithText(text: text, bottomOffset: 100.0, duration: toastDispalyDuration)
     }
@@ -133,17 +145,21 @@ class ToastView: NSObject {
             .last
     }
 
-    //显示动画
+    // [CN] 显示动画
+    // [EN] Show animation
     @objc func showAnimation() {
-        //慢到快的进入
+        // [CN] 慢到快的进入
+        // [EN] Enter from slow to fast
         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseIn) {
             self.contenButton.alpha = 1
         }
     }
     
-    //隐藏动画
+    // [CN] 隐藏动画
+    // [EN] Hide animation
     @objc func hideAnimation() {
-        //快到慢的退出
+        // [CN] 快到慢的退出
+        // [EN] Exit from fast to slow
         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut, animations: {
             self.contenButton.alpha = 0.0
         }, completion: { _ in

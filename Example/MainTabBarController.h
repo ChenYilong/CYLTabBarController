@@ -3,7 +3,8 @@
 //  CYLTabBarController
 //
 //  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 15/11/3.
-//  Copyright © 2026年 https://github.com/ChenYilong .All rights reserved.
+// [CN] Copyright © 2026年 https://github.com/ChenYilong .All rights reserved.
+// [EN] Copyright © 2026 https://github.com/ChenYilong .All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -31,8 +32,11 @@
 /*!
  * #535 demo: a badge on the plus button, like the tabs' badges: a number with a continuous animation. Each tap on the
  * plus button adds 1. Used by MainTabBarController and CYLFlatDesignMainTabBarController.
- * #535 演示：PlusButton 的角标，与其他 Tab 的角标效果一致：带持续动画的数字。每点击一次 PlusButton，数字加 1。
+ * [CN] #535 演示：PlusButton 的角标，与其他 Tab 的角标效果一致：带持续动画的数字。每点击一次 PlusButton，数字加 1。
  * MainTabBarController 与 CYLFlatDesignMainTabBarController 共用。
+ * [EN] #535 demo: a badge on the PlusButton, with the same effect as the other tabs' badges: a number with a continuous
+ *      animation. Each tap on the PlusButton adds 1 to the number.
+ *      Shared by MainTabBarController and CYLFlatDesignMainTabBarController.
  */
 @interface CYLTabBarController (CYLPlusButtonBadgeDemo)
 
