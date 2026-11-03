@@ -3971,7 +3971,10 @@ static CYLTabBarController *CYLTabBarControllerOwningTabBar(UIResponder *respond
 
 /// The identifier of one of this controller's tabs: the one set, else the default. 已设置的标识，否则为默认值。
 - (NSString *)cyl_tabBarItemIdentifierForViewController:(UIViewController *)viewController {
-    NSString *identifier = viewController ? objc_getAssociatedObject(viewController, @selector(cyl_tabBarItemIdentifier)) : nil;
+    if (!viewController) {
+        return nil;
+    }
+    NSString *identifier = objc_getAssociatedObject(viewController, @selector(cyl_tabBarItemIdentifier));
     return identifier ?: [self cyl_defaultTabBarItemIdentifierForViewController:viewController];
 }
 
