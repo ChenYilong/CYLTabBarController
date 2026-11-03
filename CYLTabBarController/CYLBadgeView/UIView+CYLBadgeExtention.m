@@ -82,13 +82,7 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
  *      用约束与宿主的 frame 对齐，因此角标仍在原位置、绘制在宿主之上且不被裁剪，宿主自身的裁剪不受影响。它跟随宿主的 `hidden`、
  *      `alpha`（KVO 宿主的 layer），并随宿主一起销毁。不裁剪的宿主仍把角标放在自身内部，与以前相同。
  */
-@interface CYLBadgeHostOverlayView : UIView
-@property (nonatomic, weak, readonly) UIView *host;
-- (void)cyl_attachToHost:(UIView *)host;
-- (void)cyl_detach;
-@end
-
-/// Removes the overlay when its host is deallocated (an associated object of the host). 宿主销毁时移除浮层（宿主的关联对象）。
+/// Removes the overlay when its owner is deallocated (an associated object of the owner). 所属对象销毁时移除浮层（所属对象的关联对象）。
 @interface CYLBadgeHostOverlayToken : NSObject
 @property (nonatomic, weak) CYLBadgeHostOverlayView *overlay;
 @end
@@ -106,7 +100,7 @@ static char CYLBadgeHostOverlayTokenKey;
 
 @implementation CYLBadgeHostOverlayView {
     __weak UIView *_host;
-    CALayer *_observedLayer;    // strong, so the observers are always removed from a live layer
+    NSArray<CALayer *> *_observedLayers;    // strong, so the observers are always removed from live layers
     NSArray<NSLayoutConstraint *> *_hostConstraints;
 }
 
@@ -130,42 +124,87 @@ static char CYLBadgeHostOverlayTokenKey;
     if (!container) {
         return;
     }
-    if (self.host != host || self.superview != container || !_hostConstraints.firstObject.active) {
-        [self cyl_detach];
-        _host = host;
-        [container insertSubview:self aboveSubview:host];
-        _hostConstraints = @[
-            [self.leadingAnchor constraintEqualToAnchor:host.leadingAnchor],
-            [self.topAnchor constraintEqualToAnchor:host.topAnchor],
-            [self.widthAnchor constraintEqualToAnchor:host.widthAnchor],
-            [self.heightAnchor constraintEqualToAnchor:host.heightAnchor],
-        ];
-        [NSLayoutConstraint activateConstraints:_hostConstraints];
-        _observedLayer = host.layer;
-        [_observedLayer addObserver:self forKeyPath:@"hidden" options:0 context:CYLBadgeHostOverlayKVOContext];
-        [_observedLayer addObserver:self forKeyPath:@"opacity" options:0 context:CYLBadgeHostOverlayKVOContext];
-    } else {
-        [container insertSubview:self aboveSubview:host];
-    }
-    self.frame = host.frame;
-    self.layer.zPosition = host.layer.zPosition;
-    [self cyl_followHostVisibility];
+    [self cyl_attachToContainer:container aboveSubview:host alignedToView:host followingVisibilityOfViews:@[host]];
 }
 
-- (void)cyl_followHostVisibility {
-    CALayer *hostLayer = _observedLayer;
-    self.hidden = hostLayer.hidden;
-    self.alpha = hostLayer.opacity;
+- (void)cyl_attachToContainer:(UIView *)container
+                 aboveSubview:(UIView *)sibling
+                alignedToView:(UIView *)alignView
+    followingVisibilityOfViews:(NSArray<UIView *> *)views {
+    if (sibling && sibling.superview != container) {
+        return;
+    }
+    if (self.superview != container) {
+        [self removeFromSuperview];
+    }
+    if (sibling) {
+        [container insertSubview:self aboveSubview:sibling];
+        self.layer.zPosition = sibling.layer.zPosition;
+    } else {
+        [container addSubview:self];
+        [container bringSubviewToFront:self];
+        // Above content the container adds later too. 容器之后添加的内容也位于其下。
+        self.layer.zPosition = MAXFLOAT;
+    }
+    if (_host != alignView || !_hostConstraints.firstObject.active) {
+        [NSLayoutConstraint deactivateConstraints:_hostConstraints ?: @[]];
+        _host = alignView;
+        _hostConstraints = @[
+            [self.leadingAnchor constraintEqualToAnchor:alignView.leadingAnchor],
+            [self.topAnchor constraintEqualToAnchor:alignView.topAnchor],
+            [self.widthAnchor constraintEqualToAnchor:alignView.widthAnchor],
+            [self.heightAnchor constraintEqualToAnchor:alignView.heightAnchor],
+        ];
+        [NSLayoutConstraint activateConstraints:_hostConstraints];
+    }
+    NSMutableArray<CALayer *> *layers = [NSMutableArray arrayWithCapacity:views.count];
+    for (UIView *view in views) {
+        [layers addObject:view.layer];
+    }
+    if (![layers isEqualToArray:_observedLayers ?: @[]]) {
+        [self cyl_stopObserving];
+        for (CALayer *layer in layers) {
+            [layer addObserver:self forKeyPath:@"hidden" options:0 context:CYLBadgeHostOverlayKVOContext];
+            [layer addObserver:self forKeyPath:@"opacity" options:0 context:CYLBadgeHostOverlayKVOContext];
+        }
+        _observedLayers = [layers copy];
+    }
+    // Right away too, so the badge can be laid out before the next layout pass. 同时立即设置 frame，无需等待下一次布局。
+    self.frame = [alignView convertRect:alignView.bounds toView:container];
+    [self cyl_followVisibility];
+}
+
+- (void)cyl_followVisibility {
+    BOOL hidden = NO;
+    CGFloat alpha = 1;
+    for (CALayer *layer in _observedLayers) {
+        hidden = hidden || layer.hidden;
+        alpha *= layer.opacity;
+    }
+    self.hidden = hidden;
+    self.alpha = alpha;
+}
+
+- (void)cyl_stopObserving {
+    for (CALayer *layer in _observedLayers) {
+        [layer removeObserver:self forKeyPath:@"hidden" context:CYLBadgeHostOverlayKVOContext];
+        [layer removeObserver:self forKeyPath:@"opacity" context:CYLBadgeHostOverlayKVOContext];
+    }
+    _observedLayers = nil;
 }
 
 - (void)cyl_detach {
-    if (_observedLayer) {
-        [_observedLayer removeObserver:self forKeyPath:@"hidden" context:CYLBadgeHostOverlayKVOContext];
-        [_observedLayer removeObserver:self forKeyPath:@"opacity" context:CYLBadgeHostOverlayKVOContext];
-        _observedLayer = nil;
-    }
+    [self cyl_stopObserving];
     [NSLayoutConstraint deactivateConstraints:_hostConstraints ?: @[]];
     _hostConstraints = nil;
+    _host = nil;
+}
+
+- (void)cyl_removeWhenDeallocated:(id)owner {
+    CYLBadgeHostOverlayToken *token = [[CYLBadgeHostOverlayToken alloc] init];
+    token.overlay = self;
+    // One token per overlay: the overlay's address is the key. 每个浮层一个 token，以浮层地址为 key。
+    objc_setAssociatedObject(owner, (__bridge const void *)self, token, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -173,11 +212,11 @@ static char CYLBadgeHostOverlayTokenKey;
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         return;
     }
-    [self cyl_followHostVisibility];
+    [self cyl_followVisibility];
 }
 
 - (void)dealloc {
-    [self cyl_detach];
+    [self cyl_stopObserving];
 }
 
 @end
@@ -700,8 +739,11 @@ static UIView *CYLBadgeContainerForHost(UIView *host) {
 /// Called by the badge view itself (`CYLBadgeLabel`, `CYLTabBarBadgeView`) when it enters a window or its traits change.
 - (void)cyl_notifyBadgeHostOfEnvironmentChange {
     UIView *host = self.superview;
-    if ([host isKindOfClass:[CYLBadgeHostOverlayView class]]) {
-        host = ((CYLBadgeHostOverlayView *)host).host;
+    // An overlay above a clipping host holds that host's badge; a control's anchor owns its badge itself.
+    // 裁剪宿主之上的浮层承载的是宿主的角标；控件的锚点视图自己拥有角标。
+    UIView *overlayHost = [host isKindOfClass:[CYLBadgeHostOverlayView class]] ? ((CYLBadgeHostOverlayView *)host).host : nil;
+    if (overlayHost.cyl_badge == self) {
+        host = overlayHost;
     }
     if (host && host.cyl_badge == self) {
         [host cyl_badgeEnvironmentDidChange];
