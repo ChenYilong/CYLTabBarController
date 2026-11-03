@@ -136,3 +136,4 @@
 "保留" = "megtartva";
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "A(z) „%@” azonosítójú lap kiválasztása („%@”, index: %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "A jelenlegi verem pop-olása, a(z) „%@” azonosítójú lap kiválasztása, majd új bemutató oldal push-olása erre a lapra";
+"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Mint fent, a(z) „%@” azonosítójú lap kiválasztása („%@”), pop animációval";

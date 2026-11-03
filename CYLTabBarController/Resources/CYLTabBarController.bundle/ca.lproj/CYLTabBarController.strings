@@ -136,3 +136,4 @@
 "保留" = "mantinguda";
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Selecciona la pestanya amb identificador «%@» («%@», índex %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop de la pila actual, selecciona la pestanya amb identificador «%@» i després push d’una nova pàgina de demostració a aquesta pestanya";
+"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Com a dalt, selecciona la pestanya amb identificador «%@» («%@»), amb animació pop";

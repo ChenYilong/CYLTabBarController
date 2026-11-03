@@ -136,3 +136,4 @@
 "保留" = "behalten";
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Tab mit der Kennung „%@“ wählen („%@“, Index %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Aktuellen Stapel poppen, den Tab mit der Kennung „%@“ wählen und dann eine neue Demoseite in diesen Tab pushen";
+"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Wie oben, Tab mit der Kennung „%@“ („%@“) wählen, mit Pop-Animation";

@@ -136,3 +136,4 @@
 "保留" = "mantida";
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Selecionar a aba com identificador “%@” (“%@”, índice %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop da pilha atual, selecionar a aba com identificador “%@” e então push de uma nova página de demonstração nessa aba";
+"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Igual ao acima, selecionar a aba com identificador “%@” (“%@”), com animação de pop";

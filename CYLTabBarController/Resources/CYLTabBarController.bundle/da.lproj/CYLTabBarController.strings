@@ -136,3 +136,4 @@
 "保留" = "beholdt";
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Vælg fanen med identifikatoren “%@” (“%@”, indeks %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop den aktuelle stak, vælg fanen med identifikatoren “%@” og push derefter en ny demoside til fanen";
+"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Som ovenfor, vælg fanen med identifikatoren “%@” (“%@”) med pop-animation";
