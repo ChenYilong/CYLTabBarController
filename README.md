@@ -1691,6 +1691,42 @@ use_frameworks!
 //#import "CYLTabBarController.h"
     [[self cyl_tabBarController] rootWindow].backgroundColor = [UIColor whiteColor];
  ```
+
+### [CN]iPhone Duo 展开横屏时左右出现黑边
+### [EN]Black bars on the left and right of the unfolded iPhone Duo in landscape
+
+| 中文 | English |
+|:---|:---|
+| 这是系统行为，与 TabBar 无关（#719、#680）。App 不支持横屏时，展开的 iPhone Duo 横放会把 App 当作竖屏窗口显示在屏幕中间，两侧留黑。只勾选 Portrait 时就是这种情况。 | This is system behavior, not the tab bar (#719, #680). When an app does not support landscape, the unfolded iPhone Duo held in landscape shows it as a portrait window in the middle of the screen, with black bars on both sides. Checking only Portrait does exactly this. |
+| 要铺满内屏，需要同时满足下面三项： | To fill the inner screen, do all three: |
+| 1. **启动屏有效**：`Info.plist` 使用 `UILaunchScreen`（iOS 14+），或者 `UILaunchStoryboardName` 指向一个专用的启动 storyboard。名称不带 `.storyboard` 扩展名，storyboard 里不能有自定义类，并且用 Auto Layout 适配任意尺寸。不要把 `Main.storyboard` 当作启动屏。 | 1. **A valid launch screen**: `UILaunchScreen` in `Info.plist` (iOS 14+), or `UILaunchStoryboardName` naming a dedicated launch storyboard. Give the name without the `.storyboard` extension, use no custom classes, and lay it out with Auto Layout for any size. Do not use `Main.storyboard` as the launch screen. |
+| 2. **`Info.plist` 声明横屏**：`UISupportedInterfaceOrientations` 包含 `LandscapeLeft` 和 `LandscapeRight`。系统只会在这里声明过的方向中选择，代码返回的方向不能超出这个范围。 | 2. **Landscape in `Info.plist`**: `UISupportedInterfaceOrientations` includes `LandscapeLeft` and `LandscapeRight`. The system only picks from these, so code cannot return an orientation missing here. |
+| 3. **运行时允许横屏**：如果实现了 `application:supportedInterfaceOrientationsForWindow:` 或 `supportedInterfaceOrientations`，在可折叠设备上返回包含横屏的值。 | 3. **Allow landscape at run time**: if you implement `application:supportedInterfaceOrientationsForWindow:` or `supportedInterfaceOrientations`, return a mask with landscape on foldable devices. |
+| 普通 iPhone 仍想只用竖屏：在 `Info.plist` 中保留横屏，在代码中默认返回竖屏，检测到铰链（只有可折叠设备会报告）后再放开横屏。Demo 就是这样做的，见 `Example/CYLMainRootViewController.m` 和 `Example/ AppDelegate.m`： | To keep other iPhones portrait-only, keep landscape in `Info.plist`, return portrait in code by default, and allow landscape once a hinge is reported (only foldable devices report one). The demo does this; see `Example/CYLMainRootViewController.m` and `Example/ AppDelegate.m`: |
+
+ ```Objective-C
+// AppDelegate.m
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+    return self.supportsLandscapeOnFoldableDevice ? UIInterfaceOrientationMaskAllButUpsideDown : UIInterfaceOrientationMaskPortrait;
+}
+
+// Root view controller, -viewDidLoad
+if (@available(iOS 27.1, *)) {
+    __weak __typeof(self) weakSelf = self;
+    UIHingeInteraction *hingeInteraction = [[UIHingeInteraction alloc] initWithUpdateHandler:^(UIHingeInteraction *interaction, UIHingeInteractionUpdate *update) {
+        AppDelegate *appDelegate = (AppDelegate *)UIApplication.sharedApplication.delegate;
+        if (!update.hinge || appDelegate.supportsLandscapeOnFoldableDevice) { return; }
+        appDelegate.supportsLandscapeOnFoldableDevice = YES;
+        [weakSelf setNeedsUpdateOfSupportedInterfaceOrientations];
+    }];
+    [self.view addInteraction:hingeInteraction];
+}
+ ```
+
+| 中文 | English |
+|:---|:---|
+| 横屏时希望 TabBar 显示在右侧竖向栏，再设置 `tabBarController.allowsVerticalBar = YES;`。 | To show the tab bar in the trailing vertical bar in landscape, also set `tabBarController.allowsVerticalBar = YES;`. |
+
 ### [CN]凸起的图标超出 49pt 后无法响应
 ### [EN]A raised icon does not respond above 49pt
 
