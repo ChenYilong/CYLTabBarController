@@ -124,6 +124,10 @@ targets: [
 ]
 ```
 
+| 中文 | English |
+|:---|:---|
+| SPM 的版本就是 git tag，`Package.swift` 中没有版本号。发布时 `scripts/pod-lint.sh push` 会在 `pod trunk push` 成功后，把 `README.md` 与 `docs/` 中本库的 `from: "..."` 更新为 podspec 的 `s.version`；也可以单独执行 `scripts/pod-lint.sh spm`。 | An SPM version is a git tag; `Package.swift` has no version. On release, after `pod trunk push` succeeds, `scripts/pod-lint.sh push` moves this library's `from: "..."` in `README.md` and `docs/` to the podspec's `s.version`; `scripts/pod-lint.sh spm` does only that step. |
+
 ### [CN]方式 D：Carthage
 ### [EN]Option D: Carthage
 
