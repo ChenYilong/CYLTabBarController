@@ -91,7 +91,7 @@
 		9AD7F5C022B7D695004BF0A0 /* img_tab_me_0.png in Resources */ = {isa = PBXBuildFile; fileRef = 9AD7F5B922B7D695004BF0A0 /* img_tab_me_0.png */; };
 		9AE0BD3122303BA800302A35 /* CYLMainRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE0BD3022303BA800302A35 /* CYLMainRootViewController.m */; };
 		9AE51DDC2F90C9D000BB0831 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE51DDB2F90C9D000BB0831 /* SceneDelegate.m */; };
-		9AE942E81BDC933E00354519 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942CD1BDC933E00354519 /* Main.storyboard */; };
+		9AE942E81BDC933E00354519 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942CD1BDC933E00354519 /* LaunchScreen.storyboard */; };
 		9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942E31BDC933E00354519 /* Images.xcassets */; };
 		9AE942F11BDC933E00354519 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E51BDC933E00354519 /* main.m */; };
 		9D9B22007B3D39D38DC6EA83 /* _CYLFlatDesignTabBarControllerTransitionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DBDB36FCFF032EEBBF40B92 /* _CYLFlatDesignTabBarControllerTransitionContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -253,7 +253,7 @@
 		9AE942741BDC91B800354519 /* CYLTabBarController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CYLTabBarController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AE942921BDC91B900354519 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9AE942931BDC91B900354519 /* CYLTabBarControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarControllerTests.m; sourceTree = "<group>"; };
-		9AE942CE1BDC933E00354519 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		9AE942CE1BDC933E00354519 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9AE942E31BDC933E00354519 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9AE942E41BDC933E00354519 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9AE942E51BDC933E00354519 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -554,7 +554,7 @@
 				9AE0BD2F22303BA800302A35 /* CYLMainRootViewController.h */,
 				9AE0BD3022303BA800302A35 /* CYLMainRootViewController.m */,
 				9AE942CF1BDC933E00354519 /* Classes */,
-				9AE942CD1BDC933E00354519 /* Main.storyboard */,
+				9AE942CD1BDC933E00354519 /* LaunchScreen.storyboard */,
 				9AE942E31BDC933E00354519 /* Images.xcassets */,
 				9AE942E41BDC933E00354519 /* Info.plist */,
 				9AE942E51BDC933E00354519 /* main.m */,
@@ -851,7 +851,7 @@
 				9AD7F5B222B7D4B6004BF0A0 /* gray_tabbar_message_animation.json in Resources */,
 				9A98017E2461249F00E65289 /* green_lottie_tab_discover.json in Resources */,
 				9AD7F5C022B7D695004BF0A0 /* img_tab_me_0.png in Resources */,
-				9AE942E81BDC933E00354519 /* Main.storyboard in Resources */,
+				9AE942E81BDC933E00354519 /* LaunchScreen.storyboard in Resources */,
 				9A3865F92266FA3C008EE46F /* tab_me_animate.json in Resources */,
 				9A3865F72266FA3C008EE46F /* tab_home_animate.json in Resources */,
 				9AD7F5BC22B7D695004BF0A0 /* img_tab_home_1.png in Resources */,
@@ -1006,12 +1006,12 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		9AE942CD1BDC933E00354519 /* Main.storyboard */ = {
+		9AE942CD1BDC933E00354519 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				9AE942CE1BDC933E00354519 /* Base */,
 			);
-			name = Main.storyboard;
+			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

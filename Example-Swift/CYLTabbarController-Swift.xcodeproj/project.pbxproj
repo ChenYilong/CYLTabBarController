@@ -22,7 +22,7 @@
 		9AF5961221C8E7B100C6AF2B /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF595FE21C8E7B000C6AF2B /* MessageViewController.swift */; };
 		9AF5961321C8E7B100C6AF2B /* PublishViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF5960421C8E7B000C6AF2B /* PublishViewController.swift */; };
 		9AF5961421C8E7B100C6AF2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AF5960821C8E7B100C6AF2B /* Assets.xcassets */; };
-		9AF5961621C8E7B100C6AF2B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AF5960B21C8E7B100C6AF2B /* Main.storyboard */; };
+		9AF5961621C8E7B100C6AF2B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AF5960B21C8E7B100C6AF2B /* LaunchScreen.storyboard */; };
 		C0196AB673A3C11A8689ED66 /* Pods_CYLTabBarController_Swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DEC604443F0BED5845C1590 /* Pods_CYLTabBarController_Swift.framework */; };
 /* End PBXBuildFile section */
 
@@ -50,7 +50,7 @@
 		9AF595FE21C8E7B000C6AF2B /* MessageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
 		9AF5960421C8E7B000C6AF2B /* PublishViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PublishViewController.swift; sourceTree = "<group>"; };
 		9AF5960821C8E7B100C6AF2B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		9AF5960C21C8E7B100C6AF2B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		9AF5960C21C8E7B100C6AF2B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9AF5960D21C8E7B100C6AF2B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9DEC604443F0BED5845C1590 /* Pods_CYLTabBarController_Swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CYLTabBarController_Swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7C15F27AFB129417A291CF9 /* Pods-CYLTabBarController-Swift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTabBarController-Swift.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift.debug.xcconfig"; sourceTree = "<group>"; };
@@ -205,7 +205,7 @@
 			isa = PBXGroup;
 			children = (
 				9AF5960821C8E7B100C6AF2B /* Assets.xcassets */,
-				9AF5960B21C8E7B100C6AF2B /* Main.storyboard */,
+				9AF5960B21C8E7B100C6AF2B /* LaunchScreen.storyboard */,
 				9AF5960D21C8E7B100C6AF2B /* Info.plist */,
 			);
 			path = Other;
@@ -287,7 +287,7 @@
 				689A1BB4893C508E8EF029A2 /* green_lottie_tab_news.json in Resources */,
 				89052FD74C2869B9C0551B5F /* green_lottie_tab_mine.json in Resources */,
 				9AF5961421C8E7B100C6AF2B /* Assets.xcassets in Resources */,
-				9AF5961621C8E7B100C6AF2B /* Main.storyboard in Resources */,
+				9AF5961621C8E7B100C6AF2B /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,12 +353,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		9AF5960B21C8E7B100C6AF2B /* Main.storyboard */ = {
+		9AF5960B21C8E7B100C6AF2B /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				9AF5960C21C8E7B100C6AF2B /* Base */,
 			);
-			name = Main.storyboard;
+			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
