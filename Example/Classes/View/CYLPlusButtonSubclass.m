@@ -404,16 +404,15 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 //    return 2;
 //}
 
-<<<<<<< HEAD
 /// The plus button's title stays on the same center line as the tab item titles, in every tab bar style.
 + (BOOL)alignsTitleWithTabBarItemTitles {
     return YES;
-=======
+}
+
 // #408: the plus button's identifier, read as `control.cyl_tabBarItemIdentifier` in `-tabBarController:didSelectControl:`.
 // PlusButton 的标识，在 `-tabBarController:didSelectControl:` 中通过 `control.cyl_tabBarItemIdentifier` 读取。
 + (NSString *)tabBarItemIdentifier {
     return @"plus";
->>>>>>> master
 }
 
 + (BOOL)shouldSelectPlusChildViewController {
