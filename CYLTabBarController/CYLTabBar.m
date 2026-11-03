@@ -700,7 +700,18 @@ UISearchTab 会从 TabBar 分离出来单独显示。
  *      PlusButton 所在 Tab 的标题；恢复横向时重新显示。只改这一个标签，且只重新显示由这里隐藏的标签，其他标题保持原状态。
  */
 - (void)cyl_setPlusTabSelectedTitleHidden:(BOOL)hidden atIndex:(NSUInteger)index {
-    static char CYLHiddenInVerticalBarKey;
+    // The labels hidden here, kept weakly: the system may hand out another label after rotating, so the hidden one is
+    // restored, not the one found then. 由这里隐藏的标签（弱引用）：旋转后系统可能返回另一个标签，因此恢复的是被隐藏的那个。
+    static char CYLHiddenTitleLabelsKey;
+    NSHashTable<UILabel *> *hiddenLabels = objc_getAssociatedObject(self, &CYLHiddenTitleLabelsKey);
+    if (!hidden) {
+        for (UILabel *titleLabel in hiddenLabels.allObjects) {
+            titleLabel.hidden = NO;
+            titleLabel.alpha = 1;
+        }
+        [hiddenLabels removeAllObjects];
+        return;
+    }
     if (![[CYLPlusButton plusButtonForOwner:self] cyl_showsTitleInTabBarItem]) {
         return;
     }
@@ -712,14 +723,14 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     if (!titleLabel) {
         return;
     }
-    BOOL hiddenHere = [objc_getAssociatedObject(titleLabel, &CYLHiddenInVerticalBarKey) boolValue];
-    if (!hidden && !hiddenHere) {
-        return;
+    if (!hiddenLabels) {
+        hiddenLabels = [NSHashTable weakObjectsHashTable];
+        objc_setAssociatedObject(self, &CYLHiddenTitleLabelsKey, hiddenLabels, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
+    [hiddenLabels addObject:titleLabel];
     // Applied on every layout while vertical: the system may show the label again. 竖向时每次布局都设置：系统可能重新显示它。
-    titleLabel.hidden = hidden;
-    titleLabel.alpha = hidden ? 0 : 1;
-    objc_setAssociatedObject(titleLabel, &CYLHiddenInVerticalBarKey, @(hidden), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    titleLabel.hidden = YES;
+    titleLabel.alpha = 0;
 }
 
 /*!
