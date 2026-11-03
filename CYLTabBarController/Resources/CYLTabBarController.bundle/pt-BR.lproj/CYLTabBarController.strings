@@ -162,3 +162,11 @@
 "深色" = "Escuro";
 "居中胶囊" = "Cápsula centralizada";
 "绿色描边" = "Linha verde";
+"登录状态：已登录" = "Estado de login: conectado";
+"登录状态：未登录" = "Estado de login: desconectado";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Chave ligada significa conectado; desligada, desconectado (salvo localmente). Desconectado, tocar em “%@” mostra primeiro a tela de login e depois muda para essa aba após o login; conectado, muda imediatamente.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Chave ligada significa conectado; desligada, desconectado (salvo localmente). Nenhuma aba exige login.";
+"需要登录" = "Login necessário";
+"「%@」需要登录后才能查看" = "Faça login para ver “%@”";
+"登录" = "Entrar";
+"、" = ", ";

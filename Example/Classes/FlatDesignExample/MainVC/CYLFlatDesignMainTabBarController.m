@@ -171,8 +171,13 @@
 
 #pragma mark - CYLFlatDesignUITabBarControllerDelegate
 - (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    // #19: this override does not call super, so ask for the login check itself (tabs that need login, see below).
+    // #19：此重写没有调用 super，因此自行调用登录检查（需要登录的 Tab 见下方）。
+    if ([self cyl_interceptLoginIfNeededForViewController:viewController]) {
+        return NO;
+    }
 #if CYL_FLATDESIGN_AVAILABLE
-    NSInteger index = [tabBarController.viewControllers indexOfObject:viewController];
+    NSUInteger index = [tabBarController.viewControllers indexOfObject:viewController];
     if (index != NSNotFound) {
         
         CYLFlatDesignTabBar *tabBar;
@@ -182,17 +187,38 @@
         
         [self springAnimationForView:tabBar.tabBarButtons[index].imageView];
     }
-#else
-#endif
     //    if (0 == [tabBarController.viewControllers indexOfObject:viewController]) {
     //        [self setSelectedCoverShow:YES];
     //    } else {
     //        [self setSelectedCoverShow:NO];
     //    }
+    // `index` only exists with FlatDesign: it was used after the guard, which did not build without it.
+    // `index` 仅在有扁平样式时存在：以前在 guard 之后使用，没有扁平样式时无法编译。
     if (index == 2) {
         return NO;
     }
+#endif
     return YES;
+}
+
+#pragma mark - #19 tabs that need login (delegate API)
+
+/*!
+ * #19, delegate API (MainTabBarController shows the block API): the last two tabs need login. The flat demo's tabs are
+ * all the same class, so their default identifiers are equal; the delegate decides by position instead.
+ * #19 代理方式（MainTabBarController 演示 block 方式）：最后两个 Tab 需要登录。扁平 Demo 的 Tab 都是同一个类，默认标识相同，
+ * 因此由代理按位置判断。
+ */
+- (BOOL)tabBarController:(CYLTabBarController *)tabBarController requiresLoginToSelectViewController:(UIViewController *)viewController {
+    NSUInteger index = [tabBarController.viewControllers indexOfObject:viewController];
+    NSUInteger count = tabBarController.viewControllers.count;
+    return index != NSNotFound && count >= 2 && index >= count - 2;
+}
+
+- (void)tabBarController:(CYLTabBarController *)tabBarController
+presentLoginForViewController:(UIViewController *)viewController
+              completion:(CYLTabBarLoginCompletion)completion {
+    [tabBarController cyl_demo_presentLoginForViewController:viewController completion:completion];
 }
 
 

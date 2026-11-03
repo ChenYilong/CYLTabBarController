@@ -21,6 +21,7 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowMemoryWarning,
     CYLSettingsRowTitlePositionAdjustment,
     CYLSettingsRowStandardAppearance,
+    CYLSettingsRowLoginState,
     CYLSettingsRowTabBarItemUpdate,     // then one row per tab item update, see UIViewController+CYLTabBarItemUpdate.h
 };
 
@@ -222,6 +223,113 @@ static void CYLSwitchStandardAppearance(CYLTabBarController *_Nullable owningTab
     }
 }
 
+#pragma mark - Login state (issue #19)
+
+static NSString *const CYLLoginStateCellIdentifier = @"CYLLoginStateCell";
+
+/// The titles of the tabs that need login, joined for display. 需要登录的 Tab 的标题，拼接后用于显示。
+static NSString *CYLLoginRequiredTabTitles(CYLTabBarController *_Nullable owningTabBarController) {
+    CYLTabBarController *tabBarController = owningTabBarController;
+    if (!tabBarController) {
+        return @"";
+    }
+    NSMutableArray<NSString *> *titles = [NSMutableArray array];
+    for (UIViewController *viewController in tabBarController.viewControllers) {
+        if (![tabBarController cyl_isLoginRequiredForViewController:viewController]) {
+            continue;
+        }
+        NSString *title = viewController.tabBarItem.title ?: [viewController cyl_getViewControllerInsteadOfNavigationController].title;
+        if (title.length > 0) {
+            [titles addObject:title];
+        }
+    }
+    return [titles componentsJoinedByString:CYLLocalizedString(@"、")];
+}
+
+/// Fills the login state cell: icon, state, and which tabs need login. 填充登录状态 cell：图标、状态，以及需要登录的 Tab。
+static void CYLConfigureLoginStateCell(UITableViewCell *cell, CYLTabBarController *_Nullable owningTabBarController) {
+    BOOL loggedIn = owningTabBarController.cyl_loggedIn;
+    if (@available(iOS 13.0, *)) {
+        cell.imageView.image = [UIImage systemImageNamed:loggedIn ? @"person.crop.circle.badge.checkmark" : @"person.crop.circle.badge.xmark"];
+    }
+    cell.textLabel.text = loggedIn ? CYLLocalizedString(@"登录状态：已登录") : CYLLocalizedString(@"登录状态：未登录");
+    NSString *titles = CYLLoginRequiredTabTitles(owningTabBarController);
+    if (titles.length > 0) {
+        cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。"), titles];
+    } else {
+        cell.detailTextLabel.text = CYLLocalizedString(@"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。");
+    }
+}
+
+/*!
+ * [EN] The switch of the login state row: on means logged in. Flipping it sets `cyl_loggedIn`; it also follows
+ *      `CYLTabBarLoginStateDidChangeNotification`, so it stays right after logging in from the login alert or in
+ *      another list.
+ * [CN] 登录状态行的开关：打开表示已登录。拨动开关会设置 `cyl_loggedIn`；同时监听 `CYLTabBarLoginStateDidChangeNotification`，
+ *      通过登录弹窗登录或在其他列表中切换后也保持正确。
+ */
+@interface CYLLoginStateSwitch : UISwitch
+@property (nonatomic, weak, nullable) CYLTabBarController *tabBarController;
+@property (nonatomic, weak, nullable) UITableViewCell *cell;
+@end
+
+@implementation CYLLoginStateSwitch
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        [self addTarget:self action:@selector(cyl_valueDidChange) forControlEvents:UIControlEventValueChanged];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cyl_loginStateDidChange) name:CYLTabBarLoginStateDidChangeNotification object:nil];
+    }
+    return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)cyl_valueDidChange {
+    self.tabBarController.cyl_loggedIn = self.isOn;
+}
+
+- (void)cyl_loginStateDidChange {
+    CYLTabBarController *tabBarController = self.tabBarController;
+    BOOL loggedIn = tabBarController.cyl_loggedIn;
+    if (self.isOn != loggedIn) {
+        [self setOn:loggedIn animated:YES];
+    }
+    UITableViewCell *cell = self.cell;
+    if (cell) {
+        CYLConfigureLoginStateCell(cell, tabBarController);
+    }
+}
+
+@end
+
+static UITableViewCell *CYLLoginStateCell(UITableView *tableView, CYLTabBarController *_Nullable owningTabBarController) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLLoginStateCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLLoginStateCellIdentifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+        cell.detailTextLabel.numberOfLines = 0;
+        cell.accessoryView = [[CYLLoginStateSwitch alloc] initWithFrame:CGRectZero];
+    }
+    CYLLoginStateSwitch *loginSwitch = (CYLLoginStateSwitch *)cell.accessoryView;
+    if ([loginSwitch isKindOfClass:[CYLLoginStateSwitch class]]) {
+        loginSwitch.tabBarController = owningTabBarController;
+        loginSwitch.cell = cell;
+        loginSwitch.on = owningTabBarController.cyl_loggedIn;
+    }
+    CYLConfigureLoginStateCell(cell, owningTabBarController);
+    return cell;
+}
+
+/// A tap on the row flips the switch too. 点击该行同样会拨动开关。
+static void CYLToggleLoginState(CYLTabBarController *_Nullable owningTabBarController) {
+    CYLTabBarController *tabBarController = owningTabBarController;
+    tabBarController.cyl_loggedIn = !tabBarController.cyl_loggedIn;
+}
+
 @implementation UIViewController (CYLSettingsSection)
 
 - (NSInteger)cyl_settingsRowCount {
@@ -237,6 +345,9 @@ static void CYLSwitchStandardAppearance(CYLTabBarController *_Nullable owningTab
     }
     if (indexPath.row == CYLSettingsRowStandardAppearance) {
         return CYLStandardAppearanceCell(tableView, CYLSettingsTabBarController(self));
+    }
+    if (indexPath.row == CYLSettingsRowLoginState) {
+        return CYLLoginStateCell(tableView, CYLSettingsTabBarController(self));
     }
     if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdate];
@@ -254,6 +365,10 @@ static void CYLSwitchStandardAppearance(CYLTabBarController *_Nullable owningTab
     } else if (indexPath.row == CYLSettingsRowStandardAppearance) {
         CYLSwitchStandardAppearance(CYLSettingsTabBarController(self));
         [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    } else if (indexPath.row == CYLSettingsRowLoginState) {
+        // The switch and the text follow the notification, so the row is not reloaded (the switch animates).
+        // 开关与文字随通知更新，因此不重新加载该行（开关会带动画切换）。
+        CYLToggleLoginState(CYLSettingsTabBarController(self));
     } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdate];
         // The rows show which changes are on (a checkmark). 各行用勾号显示已应用的更改。

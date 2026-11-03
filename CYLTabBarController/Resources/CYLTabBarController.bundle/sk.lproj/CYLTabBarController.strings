@@ -162,3 +162,11 @@
 "深色" = "Tmavý";
 "居中胶囊" = "Kapsula v strede";
 "绿色描边" = "Zelená linka";
+"登录状态：已登录" = "Stav prihlásenia: prihlásený";
+"登录状态：未登录" = "Stav prihlásenia: neprihlásený";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Zapnutý prepínač znamená prihlásený, vypnutý neprihlásený (uložené lokálne). Bez prihlásenia sa po klepnutí na „%@“ najprv zobrazí prihlásenie a po prihlásení sa prepne na túto kartu; po prihlásení sa prepne hneď.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Zapnutý prepínač znamená prihlásený, vypnutý neprihlásený (uložené lokálne). Žiadna karta nevyžaduje prihlásenie.";
+"需要登录" = "Vyžaduje sa prihlásenie";
+"「%@」需要登录后才能查看" = "Ak chcete zobraziť „%@“, prihláste sa";
+"登录" = "Prihlásiť";
+"、" = ", ";

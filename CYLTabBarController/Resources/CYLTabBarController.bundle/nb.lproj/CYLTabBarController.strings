@@ -162,3 +162,11 @@
 "深色" = "Mørk";
 "居中胶囊" = "Sentrert kapsel";
 "绿色描边" = "Grønn linje";
+"登录状态：已登录" = "Innloggingsstatus: logget inn";
+"登录状态：未登录" = "Innloggingsstatus: logget ut";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Bryteren på betyr logget inn, av betyr logget ut (lagret lokalt). Når du er logget ut, viser et trykk på «%@» først innloggingen og bytter deretter til fanen etter innlogging; når du er logget inn, byttes det med en gang.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Bryteren på betyr logget inn, av betyr logget ut (lagret lokalt). Ingen faner krever innlogging.";
+"需要登录" = "Innlogging kreves";
+"「%@」需要登录后才能查看" = "Logg inn for å se «%@»";
+"登录" = "Logg inn";
+"、" = ", ";

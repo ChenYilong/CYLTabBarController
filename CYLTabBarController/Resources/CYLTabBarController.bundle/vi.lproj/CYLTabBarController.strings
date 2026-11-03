@@ -162,3 +162,11 @@
 "深色" = "Tối";
 "居中胶囊" = "Viên nang ở giữa";
 "绿色描边" = "Đường viền xanh lá";
+"登录状态：已登录" = "Trạng thái đăng nhập: đã đăng nhập";
+"登录状态：未登录" = "Trạng thái đăng nhập: chưa đăng nhập";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Bật công tắc nghĩa là đã đăng nhập, tắt nghĩa là chưa đăng nhập (lưu cục bộ). Khi chưa đăng nhập, chạm vào “%@” sẽ hiển thị màn hình đăng nhập trước, sau khi đăng nhập sẽ chuyển sang tab đó; khi đã đăng nhập sẽ chuyển ngay.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Bật công tắc nghĩa là đã đăng nhập, tắt nghĩa là chưa đăng nhập (lưu cục bộ). Không có tab nào yêu cầu đăng nhập.";
+"需要登录" = "Cần đăng nhập";
+"「%@」需要登录后才能查看" = "Đăng nhập để xem “%@”";
+"登录" = "Đăng nhập";
+"、" = ", ";

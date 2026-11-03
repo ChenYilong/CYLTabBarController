@@ -162,3 +162,11 @@
 "深色" = "Donker";
 "居中胶囊" = "Gecentreerde capsule";
 "绿色描边" = "Groene lijn";
+"登录状态：已登录" = "Inlogstatus: ingelogd";
+"登录状态：未登录" = "Inlogstatus: uitgelogd";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Schakelaar aan betekent ingelogd, uit betekent uitgelogd (lokaal opgeslagen). Uitgelogd toont een tik op ‘%@’ eerst het inlogscherm en wisselt na het inloggen naar dat tabblad; ingelogd wisselt het direct.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Schakelaar aan betekent ingelogd, uit betekent uitgelogd (lokaal opgeslagen). Geen enkel tabblad vereist inloggen.";
+"需要登录" = "Inloggen vereist";
+"「%@」需要登录后才能查看" = "Log in om ‘%@’ te bekijken";
+"登录" = "Inloggen";
+"、" = ", ";

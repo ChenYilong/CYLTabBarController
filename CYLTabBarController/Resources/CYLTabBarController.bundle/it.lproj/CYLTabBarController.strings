@@ -162,3 +162,11 @@
 "深色" = "Scuro";
 "居中胶囊" = "Capsula centrata";
 "绿色描边" = "Linea verde";
+"登录状态：已登录" = "Stato di accesso: connesso";
+"登录状态：未登录" = "Stato di accesso: disconnesso";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Interruttore attivo significa connesso, disattivo disconnesso (salvato localmente). Da disconnesso, toccare “%@” mostra prima la schermata di accesso e poi passa a quella scheda dopo l’accesso; da connesso, passa subito.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Interruttore attivo significa connesso, disattivo disconnesso (salvato localmente). Nessuna scheda richiede l’accesso.";
+"需要登录" = "Accesso richiesto";
+"「%@」需要登录后才能查看" = "Accedi per vedere “%@”";
+"登录" = "Accedi";
+"、" = ", ";

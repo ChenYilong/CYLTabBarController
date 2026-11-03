@@ -162,3 +162,11 @@
 "深色" = "Mörk";
 "居中胶囊" = "Centrerad kapsel";
 "绿色描边" = "Grön linje";
+"登录状态：已登录" = "Inloggningsstatus: inloggad";
+"登录状态：未登录" = "Inloggningsstatus: utloggad";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Reglaget på betyder inloggad, av betyder utloggad (sparas lokalt). Utloggad visar ett tryck på ”%@” först inloggningen och växlar sedan till fliken efter inloggning; inloggad växlar direkt.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Reglaget på betyder inloggad, av betyder utloggad (sparas lokalt). Ingen flik kräver inloggning.";
+"需要登录" = "Inloggning krävs";
+"「%@」需要登录后才能查看" = "Logga in för att visa ”%@”";
+"登录" = "Logga in";
+"、" = ", ";

@@ -57,8 +57,23 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         [self customizeTabBarAppearanceWithTitlePositionAdjustment:titlePositionAdjustment];
         self.delegate = self;
         self.navigationController.navigationBar.hidden = YES;
+        [self setUpLoginRequiredTabs];
     }
     return self;
+}
+
+/*!
+ * #19: "Messages" and "Me" need login (block API). While logged out, tapping them shows the login alert; after logging in
+ * the tapped tab is selected. Toggle the state with the "Login state" row of the settings section.
+ * #19：「消息」「我的」需要登录（block 方式）。未登录时点击会弹出登录弹窗，登录后选中所点击的 Tab。通过设置分组中的「登录状态」行切换。
+ */
+- (void)setUpLoginRequiredTabs {
+    // "message" is set in -tabBarItemsAttributesForTabBar; "Me" has no identifier, so it uses its class name (#408).
+    // "message" 在 -tabBarItemsAttributesForTabBar 中设置；「我的」没有设置标识，使用类名（#408）。
+    self.cyl_loginRequiredTabBarItemIdentifiers = @[ @"message", NSStringFromClass([CYLMineViewController class]) ];
+    self.cyl_loginHandler = ^(CYLTabBarController *tabBarController, UIViewController *viewController, CYLTabBarLoginCompletion completion) {
+        [tabBarController cyl_demo_presentLoginForViewController:viewController completion:completion];
+    };
 }
 
 - (void)viewDidLoad {
@@ -885,6 +900,29 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 - (void)cyl_demo_plusButtonDidTap {
     [self cyl_demo_setPlusButtonBadgeCount:[self cyl_demo_plusButtonBadgeCount] + 1];
     [self cyl_demo_showPlusButtonBadge];
+}
+
+@end
+
+@implementation CYLTabBarController (CYLLoginDemo)
+
+- (void)cyl_demo_presentLoginForViewController:(UIViewController *)viewController completion:(CYLTabBarLoginCompletion)completion {
+    NSString *title = viewController.tabBarItem.title ?: [viewController cyl_getViewControllerInsteadOfNavigationController].title ?: @"";
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:CYLLocalizedString(@"需要登录")
+                                                                   message:[NSString stringWithFormat:CYLLocalizedString(@"「%@」需要登录后才能查看"), title]
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        completion(NO);
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"登录") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        // A real app logs in here first. 实际 App 在这里先完成登录。
+        completion(YES);
+    }]];
+    UIViewController *presenter = self;
+    while (presenter.presentedViewController) {
+        presenter = presenter.presentedViewController;
+    }
+    [presenter presentViewController:alert animated:YES completion:nil];
 }
 
 @end

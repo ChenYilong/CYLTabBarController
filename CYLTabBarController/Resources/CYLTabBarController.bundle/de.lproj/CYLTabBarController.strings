@@ -162,3 +162,11 @@
 "深色" = "Dunkel";
 "居中胶囊" = "Zentrierte Kapsel";
 "绿色描边" = "Grüne Linie";
+"登录状态：已登录" = "Anmeldestatus: angemeldet";
+"登录状态：未登录" = "Anmeldestatus: abgemeldet";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Schalter an bedeutet angemeldet, aus bedeutet abgemeldet (lokal gespeichert). Abgemeldet zeigt ein Tippen auf „%@“ zuerst die Anmeldung und wechselt danach zu diesem Tab; angemeldet wird sofort gewechselt.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Schalter an bedeutet angemeldet, aus bedeutet abgemeldet (lokal gespeichert). Kein Tab erfordert eine Anmeldung.";
+"需要登录" = "Anmeldung erforderlich";
+"「%@」需要登录后才能查看" = "Melde dich an, um „%@“ zu sehen";
+"登录" = "Anmelden";
+"、" = ", ";

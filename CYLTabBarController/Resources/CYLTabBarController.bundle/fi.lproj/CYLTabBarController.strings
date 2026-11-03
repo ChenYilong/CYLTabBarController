@@ -162,3 +162,11 @@
 "深色" = "Tumma";
 "居中胶囊" = "Keskitetty kapseli";
 "绿色描边" = "Vihreä viiva";
+"登录状态：已登录" = "Kirjautumistila: kirjautunut";
+"登录状态：未登录" = "Kirjautumistila: kirjautunut ulos";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Kytkin päällä tarkoittaa kirjautunutta, pois päältä uloskirjautunutta (tallennetaan paikallisesti). Uloskirjautuneena “%@” näyttää ensin kirjautumisen ja siirtyy välilehdelle kirjautumisen jälkeen; kirjautuneena siirtyminen tapahtuu heti.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Kytkin päällä tarkoittaa kirjautunutta, pois päältä uloskirjautunutta (tallennetaan paikallisesti). Mikään välilehti ei vaadi kirjautumista.";
+"需要登录" = "Kirjautuminen vaaditaan";
+"「%@」需要登录后才能查看" = "Kirjaudu nähdäksesi “%@”";
+"登录" = "Kirjaudu";
+"、" = ", ";

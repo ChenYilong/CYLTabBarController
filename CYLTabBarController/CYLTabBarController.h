@@ -187,8 +187,45 @@ FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
+/*!
+ * FIX: issue #19
+ * [EN] Called once a login started by `-cyl_loginHandler` / `-tabBarController:presentLoginForViewController:completion:`
+ *      ends: YES when the user logged in (the tab they tapped is then selected), NO when they cancelled.
+ * [CN] 由 `-cyl_loginHandler` / `-tabBarController:presentLoginForViewController:completion:` 发起的登录结束时调用：用户登录成功
+ *      为 YES（随后选中用户点击的 Tab），取消为 NO。
+ */
+typedef void (^CYLTabBarLoginCompletion)(BOOL loggedIn);
+
+/*!
+ * [EN] Posted when `-[CYLTabBarController cyl_loggedIn]` is set; `object` is the tab bar controller it was set on.
+ * [CN] 设置 `-[CYLTabBarController cyl_loggedIn]` 时发送；`object` 为被设置的 TabBarController。
+ */
+FOUNDATION_EXTERN NSNotificationName const CYLTabBarLoginStateDidChangeNotification;
+
 @protocol CYLTabBarControllerDelegate <NSObject, UITabBarControllerDelegate>
 @optional
+
+/*!
+ * FIX: issue #19
+ * [EN] Whether selecting `viewController` needs the user to be logged in. Asked only when `-cyl_loginRequiredBlock` is
+ *      nil; without either, the tabs in `-cyl_loginRequiredTabBarItemIdentifiers` need login. See `CYLTabBarController (CYLLogin)`.
+ * [CN] 选中 `viewController` 是否需要已登录。仅在 `-cyl_loginRequiredBlock` 为 nil 时询问；二者都没有时，
+ *      `-cyl_loginRequiredTabBarItemIdentifiers` 中的 Tab 需要登录。见 `CYLTabBarController (CYLLogin)`。
+ */
+- (BOOL)tabBarController:(CYLTabBarController *)tabBarController requiresLoginToSelectViewController:(UIViewController *)viewController;
+
+/*!
+ * FIX: issue #19
+ * [EN] The user tapped `viewController`, which needs login, while logged out: show your login screen and call `completion`
+ *      (YES after a successful login: the library caches the state and selects `viewController`; NO when cancelled).
+ *      Called only when `-cyl_loginHandler` is nil.
+ * [CN] 用户在未登录时点击了需要登录的 `viewController`：请展示登录页并调用 `completion`（登录成功传 YES：本库缓存登录状态并选中
+ *      `viewController`；取消传 NO）。仅在 `-cyl_loginHandler` 为 nil 时调用。
+ */
+- (void)tabBarController:(CYLTabBarController *)tabBarController
+presentLoginForViewController:(UIViewController *)viewController
+              completion:(CYLTabBarLoginCompletion)completion;
+
 /*!
  * @param tabBarController The tab bar controller containing viewController.
  * @param control Selected UIControl in TabBar. 与 `-[UITaBar  tabBar: didSelectItem:]` 相比，差别在于该参数UIControl可能包含自定义加号➕按钮。且支持如果是代码或者用户交互切换index时都进行回调。弥补了 `-[UITaBar  tabBar: didSelectItem:]` 仅在用户点击时调用的不足。
@@ -902,6 +939,91 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  * [CN] 某个类的默认标识：类名，不含 Swift 模块名，例如 @"HomeViewController"。
  */
 + (NSString *)cyl_defaultTabBarItemIdentifierForClass:(Class)aClass NS_SWIFT_NAME(cyl_defaultTabBarItemIdentifier(for:));
+
+@end
+
+/*!
+ * FIX: issue #19 (tabs that need login)
+ * [EN] Tabs that can only be shown to a logged-in user. A tap on such a tab while logged out selects nothing (no tab
+ *      switch, no Lottie or selection animation, no `tabBarController:didSelectControl:`) and starts the login instead;
+ *      after a successful login the tapped tab is selected. Works for the classic style, Liquid Glass and FlatDesign.
+ *
+ *          // 1. Which tabs need login: identifiers (CYLTabBarItemIdentifier), a block, or the delegate method.
+ *          tabBarController.cyl_loginRequiredTabBarItemIdentifiers = @[ @"message", @"mine" ];
+ *          // 2. Show the login screen: a block, or `-tabBarController:presentLoginForViewController:completion:`.
+ *          tabBarController.cyl_loginHandler = ^(CYLTabBarController *tabBarController, UIViewController *viewController,
+ *                                                CYLTabBarLoginCompletion completion) {
+ *              [LoginViewController presentFrom:tabBarController completion:completion]; // completion(YES) after login
+ *          };
+ *          // 3. The login state, cached in NSUserDefaults (or `cyl_loginStateProvider` for your own source of truth).
+ *          tabBarController.cyl_loggedIn = NO; // e.g. on logout
+ *
+ *      Blocks take precedence over the delegate methods; both can be used. The checks run in the controller's own
+ *      `-tabBarController:shouldSelectViewController:` (a subclass that overrides it must call super, as for the other
+ *      features) and on the tab buttons' taps. With a delegate that is another object, call
+ *      `-cyl_interceptLoginIfNeededForViewController:` at the start of its `-tabBarController:shouldSelectViewController:`.
+ * [CN] 只能向已登录用户展示的 Tab。未登录时点击这类 Tab 不会选中任何内容（不切换 Tab、不播放 Lottie 与选中动画、不回调
+ *      `tabBarController:didSelectControl:`），而是发起登录；登录成功后选中用户点击的 Tab。适用于经典样式、液态玻璃与扁平样式。
+ *      （示例见上：1. 指定需要登录的 Tab：标识、block 或代理方法；2. 展示登录页：block 或代理方法；3. 登录状态缓存在 NSUserDefaults，
+ *      也可以用 `cyl_loginStateProvider` 提供自己的登录状态。）
+ *      block 优先于代理方法，二者可以同时使用。检查在控制器自身的 `-tabBarController:shouldSelectViewController:`（子类重写时须调用 super，
+ *      与其他功能相同）以及 Tab 按钮的点击中进行。代理是其他对象时，请在其 `-tabBarController:shouldSelectViewController:` 开头调用
+ *      `-cyl_interceptLoginIfNeededForViewController:`。
+ */
+@interface CYLTabBarController (CYLLogin)
+
+/*!
+ * [EN] Whether the user is logged in. Without `cyl_loginStateProvider` it is the cached value: setting it saves it in
+ *      NSUserDefaults, shared by every tab bar controller, so it survives a relaunch (default NO). Setting NO while a tab
+ *      that needs login is selected selects the first tab that does not. Posts `CYLTabBarLoginStateDidChangeNotification`.
+ * [CN] 用户是否已登录。没有 `cyl_loginStateProvider` 时为缓存值：设置时保存到 NSUserDefaults，所有 TabBarController 共享，App 重启后
+ *      仍然有效（默认 NO）。在选中需要登录的 Tab 时设为 NO，会切换到第一个不需要登录的 Tab。会发送 `CYLTabBarLoginStateDidChangeNotification`。
+ */
+@property (nonatomic, assign, setter=cyl_setLoggedIn:) BOOL cyl_loggedIn;
+
+/*!
+ * [EN] Optional: your app's own login state. When set, `cyl_loggedIn` returns it instead of the cached value.
+ * [CN] 可选：App 自己的登录状态。设置后 `cyl_loggedIn` 返回它，而不是缓存值。
+ */
+@property (nonatomic, copy, nullable, setter=cyl_setLoginStateProvider:) BOOL (^cyl_loginStateProvider)(void);
+
+/*!
+ * [EN] The identifiers (`CYLTabBarItemIdentifier`, or the default, see `-cyl_tabBarItemIdentifier`) of the tabs that need
+ *      login. Used when neither `cyl_loginRequiredBlock` nor the delegate method decides.
+ * [CN] 需要登录的 Tab 的标识（`CYLTabBarItemIdentifier`，未设置时为默认值，见 `-cyl_tabBarItemIdentifier`）。
+ *      `cyl_loginRequiredBlock` 与代理方法都没有提供时使用。
+ */
+@property (nonatomic, copy, nullable, setter=cyl_setLoginRequiredTabBarItemIdentifiers:) NSArray<NSString *> *cyl_loginRequiredTabBarItemIdentifiers;
+
+/*!
+ * [EN] Optional: whether `viewController` needs login. Takes precedence over the delegate method and the identifiers.
+ * [CN] 可选：`viewController` 是否需要登录。优先于代理方法与标识列表。
+ */
+@property (nonatomic, copy, nullable, setter=cyl_setLoginRequiredBlock:) BOOL (^cyl_loginRequiredBlock)(CYLTabBarController *tabBarController, UIViewController *viewController);
+
+/*!
+ * [EN] Shows the login screen when a tab that needs login is tapped while logged out; call `completion` with the result.
+ *      Takes precedence over `-tabBarController:presentLoginForViewController:completion:`. Without either, the tap is
+ *      only refused.
+ * [CN] 未登录时点击需要登录的 Tab 时展示登录页；请用结果调用 `completion`。优先于
+ *      `-tabBarController:presentLoginForViewController:completion:`。二者都没有时只拒绝这次点击。
+ */
+@property (nonatomic, copy, nullable, setter=cyl_setLoginHandler:) void (^cyl_loginHandler)(CYLTabBarController *tabBarController, UIViewController *viewController, CYLTabBarLoginCompletion completion);
+
+/*!
+ * [EN] Whether `viewController` needs login, whatever the current login state (block, delegate, then identifiers).
+ * [CN] `viewController` 是否需要登录，与当前登录状态无关（依次判断 block、代理、标识列表）。
+ */
+- (BOOL)cyl_isLoginRequiredForViewController:(UIViewController *)viewController NS_SWIFT_NAME(cyl_isLoginRequired(for:));
+
+/*!
+ * [EN] If `viewController` needs login and the user is logged out, starts the login (once per tap) and returns YES: the
+ *      selection must be refused. Otherwise returns NO. For a delegate that is not the tab bar controller itself:
+ *          if ([tabBarController cyl_interceptLoginIfNeededForViewController:viewController]) { return NO; }
+ * [CN] `viewController` 需要登录且用户未登录时，发起登录（每次点击一次）并返回 YES：应拒绝这次选中；否则返回 NO。代理不是 TabBarController
+ *      自身时，在其 `-tabBarController:shouldSelectViewController:` 开头调用（见上）。
+ */
+- (BOOL)cyl_interceptLoginIfNeededForViewController:(UIViewController *)viewController NS_SWIFT_NAME(cyl_interceptLoginIfNeeded(for:));
 
 @end
 

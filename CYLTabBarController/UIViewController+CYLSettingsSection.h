@@ -13,12 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Section index of the settings rows at the top of a list: row 0 is the language setting
  *      (`-cyl_languageCellForTableView:`), row 1 the memory warning check (`-cyl_memoryWarningCellForTableView:`),
  *      row 2 switches the title offset of all tabs (`CYLTabBarController.titlePositionAdjustment`, issue #475),
- *      row 3 switches `tabBar.standardAppearance` themes, shared by Liquid Glass and FlatDesign, then the in-place tab
- *      item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon, all network icons,
- *      GIF icon, all titles.
+ *      row 3 switches `tabBar.standardAppearance` themes, shared by Liquid Glass and FlatDesign,
+ *      row 4 toggles the cached login state (`cyl_loggedIn`) and names the tabs that need login (issue #19), then the
+ *      in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon, all network
+ *      icons, GIF icon, all titles.
  * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
  *      （`-cyl_memoryWarningCellForTableView:`），第 2 行切换所有 Tab 的标题偏移（`CYLTabBarController.titlePositionAdjustment`，
- *      issue #475），第 3 行切换 `tabBar.standardAppearance` 主题（液态玻璃与扁平样式共用），之后是原地更新 Tab 的若干行
+ *      issue #475），第 3 行切换 `tabBar.standardAppearance` 主题（液态玻璃与扁平样式共用），
+ *      第 4 行切换缓存的登录状态（`cyl_loggedIn`），并列出需要登录的 Tab（issue #19），之后是原地更新 Tab 的若干行
  *      （`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、所有网络图标、GIF 图标、所有标题。
  */
 FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
@@ -48,8 +50,8 @@ FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 
 /*!
  * [EN] Deselects the row and runs it: the language picker, the memory warning check, the next title offset, the next
- *      appearance theme or the tab item update.
- * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题或更新 Tab。
+ *      appearance theme, the login state or the tab item update.
+ * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题、登录状态或更新 Tab。
  */
 - (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
 

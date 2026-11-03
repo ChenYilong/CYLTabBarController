@@ -72,6 +72,7 @@ NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
 NSString *const CYLTabBarItemIdentifier = @"CYLTabBarItemIdentifier";
+NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
 NSString *const CYLTabBarLottieDarkColors = @"CYLTabBarLottieDarkColors";
@@ -323,6 +324,16 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
 
 - (void)tabChangedToControl:(UIControl *)control {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
+    // FIX: issue #19 — this action runs after UIKit asked `-tabBarController:shouldSelectViewController:`, also when it was
+    // refused: a tab that needs login must not be marked selected or play its animation here. Starting the login again is
+    // avoided (once per tap); a delegate that is another object gets it started here.
+    // 该事件在 UIKit 询问 `-tabBarController:shouldSelectViewController:` 之后执行，即使被拒绝也会执行：需要登录的 Tab 不能在这里被设为选中
+    // 或播放动画。不会重复发起登录（每次点击一次）；代理是其他对象时，由这里发起。
+    NSInteger tappedIndex = control.cyl_tabBarChildViewControllerIndex;
+    if (![control cyl_isPlusControl] && tappedIndex >= 0 && tappedIndex < (NSInteger)self.viewControllers.count &&
+        [self cyl_interceptLoginIfNeededForViewController:self.viewControllers[(NSUInteger)tappedIndex]]) {
+        return;
+    }
     UIViewController *vc = nil;
     [self tabChangedToSelectedViewController:vc control:control];
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
@@ -423,10 +434,14 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
             NSArray *subTabBarButtonsWithoutPlusButton = tabBar.cyl_subTabBarButtonsWithoutPlusButton;
             [subTabBarButtonsWithoutPlusButton enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
                 UIControl *tabButton = control;
-                BOOL defaultSelected = NO;
-                if (idx == self.selectedIndex) {
-                    defaultSelected = YES;
-                }
+                // FIX: issue #423 — `idx` counts the buttons without the plus button, `selectedIndex` counts the view
+                // controllers, which hold the plus child view controller too. With one before the selected tab, the
+                // launch animation played on the wrong tab. Compare the button's own tab item instead; the position is
+                // only a fallback. `idx` 不含 PlusButton，`selectedIndex` 却包含 PlusButton 子控制器；子控制器在选中 Tab
+                // 之前时，启动动画会播在错的 Tab 上。改为比较按钮所属的 tabBarItem，按位置比较仅作兜底。
+                UITabBarItem *tabBarItem = [self cyl_tabBarItemForTabButton:tabButton];
+                BOOL defaultSelected = tabBarItem ? (tabBarItem == self.selectedViewController.tabBarItem)
+                                                  : (idx == self.selectedIndex);
                 //TODO:  selected content, double add
                 [self addLottieImageWithControl:tabButton animation:defaultSelected defaultSelected:defaultSelected];
                 self.lottieViewAdded = YES;
@@ -3088,6 +3103,11 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 }
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    // FIX: issue #19 — a tab that needs login, tapped while logged out: refuse it before anything changes (no transition,
+    // no selection state) and start the login. 需要登录的 Tab 在未登录时被点击：在任何变化之前拒绝（无转场、不改选中状态），并发起登录。
+    if ([self cyl_interceptLoginIfNeededForViewController:viewController]) {
+        return NO;
+    }
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     if (YES == viewController.cyl_isPlaceholder) {
         return NO;
@@ -3308,6 +3328,35 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 }
 
 //TODO:  selected content, double add
+/*!
+ * Issue #423 (hardening)
+ * [EN] The tab bar item a tab button belongs to, found through the view controllers instead of the button's position.
+ *      Each item keeps its own Lottie file (`cyl_lottieURL` / `cyl_lottieSizeValue`, from `CYLTabBarLottieURL`, or
+ *      `CYLTabBarLottieFilePath` turned into a file URL), the same value `lottieURLs` holds, so this never shifts.
+ *      Selecting a tab already uses the item (`-tabChangedToSelectedIndex:…`). The position-based lookups below only run
+ *      at launch, where the counts are checked first, so they were aligned; this makes them independent of the plus
+ *      button and of tabs without Lottie.
+ * [CN] 通过子控制器（而不是按钮的位置）找到 Tab 按钮所属的 tabBarItem。每个 item 保存着自己的 Lottie 文件
+ *      （`cyl_lottieURL` / `cyl_lottieSizeValue`，来自 `CYLTabBarLottieURL`，或由 `CYLTabBarLottieFilePath` 转成的文件 URL），
+ *      与 `lottieURLs` 中的值相同，不会错位。选中 Tab 时本来就按 item 取（`-tabChangedToSelectedIndex:…`）；下面按位置取的代码只在
+ *      启动时执行，且事先校验了数量，因此是对齐的。这里让它们不再依赖 PlusButton 和未设置 Lottie 的 Tab。
+ */
+- (nullable UITabBarItem *)cyl_tabBarItemForTabButton:(nullable UIControl *)control {
+    if (!control || [control cyl_isPlusControl]) {
+        return nil;
+    }
+    for (UIViewController *viewController in self.viewControllers) {
+        if (viewController.cyl_isPlaceholder) {
+            continue;
+        }
+        UITabBarItem *item = viewController.tabBarItem;
+        if (item.cyl_tabButton == control || viewController.cyl_tabButton == control) {
+            return item;
+        }
+    }
+    return nil;
+}
+
 - (void)addLottieImageWithControl:(UIControl *)control
                         animation:(BOOL)animation
                   defaultSelected:(BOOL)defaultSelected {
@@ -3324,13 +3373,20 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         if (control.cyl_isPlusButton) {
             return;
         }
-        // FIX: issue #618 — a tab button without a matching Lottie entry (more tab buttons than
-        // `tabBarItemsAttributes`) used to raise NSRangeException here.
-        if (index >= self.lottieURLs.count || index >= self.lottieSizes.count) {
-            return;
+        // Issue #423 (hardening) — the file of this button's own tab item first; the position is only a fallback.
+        // 优先使用该按钮所属 tabBarItem 的 Lottie 文件，按位置取仅作为兜底。
+        UITabBarItem *tabBarItem = [self cyl_tabBarItemForTabButton:control];
+        NSURL *lottieURL = tabBarItem.cyl_lottieURL;
+        NSValue *lottieSizeValue = tabBarItem.cyl_lottieSizeValue;
+        if (!lottieURL) {
+            // FIX: issue #618 — a tab button without a matching Lottie entry (more tab buttons than
+            // `tabBarItemsAttributes`) used to raise NSRangeException here.
+            if (index >= self.lottieURLs.count || index >= self.lottieSizes.count) {
+                return;
+            }
+            lottieURL = self.lottieURLs[index];
+            lottieSizeValue = self.lottieSizes[index];
         }
-        NSURL *lottieURL = self.lottieURLs[index];
-        NSValue *lottieSizeValue = self.lottieSizes[index];
         CGSize lottieSize = [lottieSizeValue CGSizeValue];
         [control cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode animationSpeed:self.lottieAnimationSpeed];
         if (animation) {
@@ -3350,21 +3406,29 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     UIControl *contentControl = control;
     UIControl *selectedContentControl;
     //FIXME:  必须为 cyl_subTabBarButtonsWithoutPlusButton （不能 cyl_subTabBarButtons）否则Lottie选中动画不显示，因为Lottie文件数量与tabbaritems 的数量少一个。
-    //TODO: selectedContentControl不对，plusButton 下一个会添加失败，添加的是 plusButton对应的lottie， 顺延了。
+    // The plus button offset ("顺延") is fixed by `-cyl_tabBarItemForTabButton:` below (#423).
     if (control.cyl_isPlusControl) {
         return;
     }
     
     NSURL *lottieURL = theLottieURL;
     NSValue *lottieSizeValue = theLottieSizeValue;
-    if ([self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+    // Issue #423 (hardening) — no file given: take the one of this button's own tab item, not the one at its position.
+    // 未传入文件时，使用该按钮所属 tabBarItem 的 Lottie 文件，而不是按位置取。
+    if (!lottieURL || !lottieSizeValue) {
+        UITabBarItem *tabBarItem = [self cyl_tabBarItemForTabButton:contentControl];
+        lottieURL = lottieURL ?: tabBarItem.cyl_lottieURL;
+        lottieSizeValue = lottieSizeValue ?: tabBarItem.cyl_lottieSizeValue;
+    }
+    if ((!lottieURL || !lottieSizeValue) && [self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         
         @try {
             CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
             NSUInteger index = contentControl ? [cyl_tabBar.cyl_subTabBarButtons indexOfObject:contentControl] : NSNotFound;
             if (NSNotFound != index) {
                 if (!lottieURL) {
-                    //TODO:lottieURLs 与 Control对应的index不一致， 因为 lottieURLs 可能会少一个 plusButton 对应的。如何能够不通过index就获取到 lottieURLs ?
+                    // Fallback only: the position can be off by the plus button; `-cyl_tabBarItemForTabButton:` above is used first.
+                    // 仅作兜底：按位置可能因 PlusButton 错位，上面优先使用 `-cyl_tabBarItemForTabButton:`。
                     lottieURL = self.lottieURLs[index];
                 }
                 
@@ -5148,5 +5212,163 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
     return nil;
 }
 #endif
+
+@end
+
+#pragma mark - CYLLogin (issue #19)
+
+static NSString *const CYLTabBarLoggedInUserDefaultsKey = @"CYLTabBarControllerLoggedIn";
+static char CYLLoginStateProviderKey;
+static char CYLLoginRequiredTabBarItemIdentifiersKey;
+static char CYLLoginRequiredBlockKey;
+static char CYLLoginHandlerKey;
+static char CYLLoginInterceptedViewControllerKey;
+
+@implementation CYLTabBarController (CYLLogin)
+
+- (BOOL)cyl_loggedIn {
+    BOOL (^loginStateProvider)(void) = self.cyl_loginStateProvider;
+    if (loginStateProvider) {
+        return loginStateProvider();
+    }
+    return [[NSUserDefaults standardUserDefaults] boolForKey:CYLTabBarLoggedInUserDefaultsKey];
+}
+
+- (void)cyl_setLoggedIn:(BOOL)loggedIn {
+    [[NSUserDefaults standardUserDefaults] setBool:loggedIn forKey:CYLTabBarLoggedInUserDefaultsKey];
+    if (!loggedIn) {
+        [self cyl_leaveTabRequiringLoginIfNeeded];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarLoginStateDidChangeNotification object:self];
+}
+
+- (BOOL (^)(void))cyl_loginStateProvider {
+    return objc_getAssociatedObject(self, &CYLLoginStateProviderKey);
+}
+
+- (void)cyl_setLoginStateProvider:(BOOL (^)(void))loginStateProvider {
+    objc_setAssociatedObject(self, &CYLLoginStateProviderKey, loginStateProvider, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (NSArray<NSString *> *)cyl_loginRequiredTabBarItemIdentifiers {
+    return objc_getAssociatedObject(self, &CYLLoginRequiredTabBarItemIdentifiersKey);
+}
+
+- (void)cyl_setLoginRequiredTabBarItemIdentifiers:(NSArray<NSString *> *)loginRequiredTabBarItemIdentifiers {
+    objc_setAssociatedObject(self, &CYLLoginRequiredTabBarItemIdentifiersKey, loginRequiredTabBarItemIdentifiers, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (BOOL (^)(CYLTabBarController *, UIViewController *))cyl_loginRequiredBlock {
+    return objc_getAssociatedObject(self, &CYLLoginRequiredBlockKey);
+}
+
+- (void)cyl_setLoginRequiredBlock:(BOOL (^)(CYLTabBarController *, UIViewController *))loginRequiredBlock {
+    objc_setAssociatedObject(self, &CYLLoginRequiredBlockKey, loginRequiredBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (void (^)(CYLTabBarController *, UIViewController *, CYLTabBarLoginCompletion))cyl_loginHandler {
+    return objc_getAssociatedObject(self, &CYLLoginHandlerKey);
+}
+
+- (void)cyl_setLoginHandler:(void (^)(CYLTabBarController *, UIViewController *, CYLTabBarLoginCompletion))loginHandler {
+    objc_setAssociatedObject(self, &CYLLoginHandlerKey, loginHandler, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (BOOL)cyl_isLoginRequiredForViewController:(UIViewController *)viewController {
+    if (!viewController || viewController.cyl_isPlaceholder) {
+        return NO;
+    }
+    BOOL (^loginRequiredBlock)(CYLTabBarController *, UIViewController *) = self.cyl_loginRequiredBlock;
+    if (loginRequiredBlock) {
+        return loginRequiredBlock(self, viewController);
+    }
+    id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)self.delegate;
+    if ([delegate respondsToSelector:@selector(tabBarController:requiresLoginToSelectViewController:)]) {
+        return [delegate tabBarController:self requiresLoginToSelectViewController:viewController];
+    }
+    NSArray<NSString *> *identifiers = self.cyl_loginRequiredTabBarItemIdentifiers;
+    NSString *identifier = viewController.cyl_tabBarItemIdentifier;
+    return identifier.length > 0 && [identifiers containsObject:identifier];
+}
+
+- (BOOL)cyl_interceptLoginIfNeededForViewController:(UIViewController *)viewController {
+    if (![self cyl_isLoginRequiredForViewController:viewController] || self.cyl_loggedIn) {
+        return NO;
+    }
+    // One tap reaches here up to twice (`-tabBarController:shouldSelectViewController:`, then the tab button's action):
+    // start the login only once per run loop turn. 一次点击最多到达这里两次：每个 runloop 只发起一次登录。
+    if (objc_getAssociatedObject(self, &CYLLoginInterceptedViewControllerKey) == viewController) {
+        return YES;
+    }
+    objc_setAssociatedObject(self, &CYLLoginInterceptedViewControllerKey, viewController, OBJC_ASSOCIATION_ASSIGN);
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf) {
+            objc_setAssociatedObject(strongSelf, &CYLLoginInterceptedViewControllerKey, nil, OBJC_ASSOCIATION_ASSIGN);
+        }
+    });
+    [self cyl_startLoginForViewController:viewController];
+    return YES;
+}
+
+- (void)cyl_startLoginForViewController:(UIViewController *)viewController {
+    __weak __typeof(self) weakSelf = self;
+    __weak UIViewController *weakViewController = viewController;
+    __block BOOL completed = NO;
+    CYLTabBarLoginCompletion completion = ^(BOOL loggedIn) {
+        void (^finish)(void) = ^{
+            // Only the first call counts. 只有第一次调用有效。
+            if (completed) {
+                return;
+            }
+            completed = YES;
+            __strong __typeof(weakSelf) strongSelf = weakSelf;
+            UIViewController *strongViewController = weakViewController;
+            if (!strongSelf || !loggedIn) {
+                return;
+            }
+            strongSelf.cyl_loggedIn = YES;
+            NSUInteger index = strongViewController ? [strongSelf.viewControllers indexOfObject:strongViewController] : NSNotFound;
+            if (index != NSNotFound) {
+                strongSelf.selectedIndex = index;
+            }
+        };
+        if ([NSThread isMainThread]) {
+            finish();
+        } else {
+            dispatch_async(dispatch_get_main_queue(), finish);
+        }
+    };
+    void (^loginHandler)(CYLTabBarController *, UIViewController *, CYLTabBarLoginCompletion) = self.cyl_loginHandler;
+    if (loginHandler) {
+        loginHandler(self, viewController, completion);
+        return;
+    }
+    id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)self.delegate;
+    if ([delegate respondsToSelector:@selector(tabBarController:presentLoginForViewController:completion:)]) {
+        [delegate tabBarController:self presentLoginForViewController:viewController completion:completion];
+        return;
+    }
+#if defined(DEBUG) || defined(BETA)
+    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"A tab that needs login was tapped, but neither cyl_loginHandler nor -tabBarController:presentLoginForViewController:completion: is set. 需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法。");
+#endif
+}
+
+/// Logged out on a tab that needs login: select the first tab that does not. 在需要登录的 Tab 上退出登录：切换到第一个不需要登录的 Tab。
+- (void)cyl_leaveTabRequiringLoginIfNeeded {
+    UIViewController *selectedViewController = self.selectedViewController;
+    if (!selectedViewController || ![self cyl_isLoginRequiredForViewController:selectedViewController]) {
+        return;
+    }
+    NSArray<UIViewController *> *viewControllers = self.viewControllers;
+    for (NSUInteger index = 0; index < viewControllers.count; index++) {
+        UIViewController *viewController = viewControllers[index];
+        if (!viewController.cyl_isPlaceholder && ![self cyl_isLoginRequiredForViewController:viewController]) {
+            self.selectedIndex = index;
+            return;
+        }
+    }
+}
 
 @end

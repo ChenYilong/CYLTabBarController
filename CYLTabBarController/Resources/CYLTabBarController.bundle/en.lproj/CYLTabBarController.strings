@@ -162,3 +162,11 @@
 "深色" = "Dark";
 "居中胶囊" = "Centered capsule";
 "绿色描边" = "Green line";
+"登录状态：已登录" = "Login state: logged in";
+"登录状态：未登录" = "Login state: logged out";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Switch on means logged in, off means logged out (cached locally). While logged out, tapping “%@” shows the login screen first, then switches to that tab after logging in; while logged in, it switches right away.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Switch on means logged in, off means logged out (cached locally). No tab needs login.";
+"需要登录" = "Login required";
+"「%@」需要登录后才能查看" = "Log in to view “%@”";
+"登录" = "Log in";
+"、" = ", ";

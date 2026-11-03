@@ -43,3 +43,18 @@
 - (void)cyl_demo_plusButtonDidTap;
 
 @end
+
+/*!
+ * #19 demo: tabs that need login. The login screen is an alert (Log in / Cancel) shared by MainTabBarController (block
+ * API: `cyl_loginHandler`) and CYLFlatDesignMainTabBarController (delegate API). Toggle the cached login state with the
+ * "Login state" row of the settings section.
+ * #19 演示：需要登录的 Tab。登录页是一个弹窗（登录 / 取消），MainTabBarController（block 方式：`cyl_loginHandler`）与
+ * CYLFlatDesignMainTabBarController（代理方式）共用。通过设置分组中的「登录状态」行切换缓存的登录状态。
+ */
+@interface CYLTabBarController (CYLLoginDemo)
+
+/// Presents the demo login alert for `viewController`; calls `completion` with YES after "Log in", NO after "Cancel".
+/// 为 `viewController` 展示演示登录弹窗；点击「登录」回调 YES，点击「取消」回调 NO。
+- (void)cyl_demo_presentLoginForViewController:(UIViewController *)viewController completion:(CYLTabBarLoginCompletion)completion;
+
+@end

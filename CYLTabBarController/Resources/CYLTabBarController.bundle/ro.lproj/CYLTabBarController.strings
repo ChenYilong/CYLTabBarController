@@ -162,3 +162,11 @@
 "深色" = "Întunecat";
 "居中胶囊" = "Capsulă centrată";
 "绿色描边" = "Linie verde";
+"登录状态：已登录" = "Stare autentificare: autentificat";
+"登录状态：未登录" = "Stare autentificare: neautentificat";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。" = "Comutator pornit înseamnă autentificat, oprit înseamnă neautentificat (salvat local). Neautentificat, atingerea „%@” afișează întâi ecranul de autentificare, apoi trece la acea filă după autentificare; autentificat, trece imediat.";
+"打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。" = "Comutator pornit înseamnă autentificat, oprit înseamnă neautentificat (salvat local). Nicio filă nu necesită autentificare.";
+"需要登录" = "Autentificare necesară";
+"「%@」需要登录后才能查看" = "Autentificați-vă pentru a vedea „%@”";
+"登录" = "Autentificare";
+"、" = ", ";
