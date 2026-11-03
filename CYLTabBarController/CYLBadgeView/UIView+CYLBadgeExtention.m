@@ -1036,7 +1036,7 @@ static UIView *CYLBadgeContainerForHost(UIView *host) {
 
 - (CGFloat)cyl_badgeCornerRadius {
     NSNumber *badgeCornerRadiusObject = objc_getAssociatedObject(self, @selector(cyl_badgeCornerRadius));
-    return badgeCornerRadiusObject ? [badgeCornerRadiusObject doubleValue] : [CYLBadgeAppearance globalAppearance].cornerRadius;
+    return badgeCornerRadiusObject != nil ? [badgeCornerRadiusObject doubleValue] : [CYLBadgeAppearance globalAppearance].cornerRadius;
 }
 
 - (void)cyl_setBadgeCornerRadius:(CGFloat)badgeCornerRadius {
@@ -1106,7 +1106,7 @@ static UIView *CYLBadgeContainerForHost(UIView *host) {
 
 - (CGFloat)cyl_badgeRadius {
     NSNumber *badgeRadiusObject = objc_getAssociatedObject(self, @selector(cyl_badgeRadius));
-    return badgeRadiusObject ? [badgeRadiusObject doubleValue] : [CYLBadgeAppearance globalAppearance].radius;
+    return badgeRadiusObject != nil ? [badgeRadiusObject doubleValue] : [CYLBadgeAppearance globalAppearance].radius;
 }
 
 - (void)cyl_setBadgeMargin:(CGFloat)badgeMargin {
@@ -1166,7 +1166,7 @@ static UIView *CYLBadgeContainerForHost(UIView *host) {
 
 - (CGFloat)cyl_badgeBorderWidth {
     NSNumber *badgeBorderWidthObject = objc_getAssociatedObject(self, @selector(cyl_badgeBorderWidth));
-    return badgeBorderWidthObject ? [badgeBorderWidthObject doubleValue] : [CYLBadgeAppearance globalAppearance].borderWidth;
+    return badgeBorderWidthObject != nil ? [badgeBorderWidthObject doubleValue] : [CYLBadgeAppearance globalAppearance].borderWidth;
 }
 
 - (void)cyl_setBadgeBorderWidth:(CGFloat)badgeBorderWidth {
