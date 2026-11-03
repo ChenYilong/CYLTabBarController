@@ -39,7 +39,6 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 /// See `cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h. 见 CYLPlusButton.h 中的 `cyl_appliesCenterYOffsetWithoutTitle`。
 @interface CYLPlusButton (CYLTabBarLayout)
 - (BOOL)cyl_isCenteredWithoutTitle;
-- (CGPoint)cyl_centerInTabButton:(UIView *)tabButton inView:(UIView *)view aligned:(BOOL *)aligned;
 - (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center;
 @end
 
@@ -620,24 +619,11 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         // [CN] 系统把 Tab 按钮移出本 TabBar，放进右侧竖向栏，而加号按钮仍在本 TabBar 上，需对齐到它的占位 Tab 按钮中心。
         UIView *verticalBarSlot = [self cyl_verticalBarTabButtonAtIndex:plusButtonIndex];
         if (verticalBarSlot) {
+            // Issue #636: centered on the slot, with or without a title, like a plus button without a title. The height
+            // methods and the title alignment (`-cyl_alignedCenterForCenter:`) don't apply to the vertical bar.
+            // 竖向栏中，无论有没有标题，都与没有标题时一样居中于该 Tab；高度相关的代理方法和标题对齐都不适用于竖向栏。
             CGPoint slotCenter = [verticalBarSlot.superview convertPoint:verticalBarSlot.center toView:self];
-            // Issue #636: the slot shows the plus button's title; its image goes above that title, as on the horizontal
-            // bar. Without a title the plus button stays centered on the slot.
-            // 竖向栏中该 Tab 显示 PlusButton 的标题：图片放在标题上方，与横向栏一致；没有标题时仍居中于该 Tab。
-            CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
-            BOOL needsTitleLayout = NO;
-            if ([plusButton cyl_showsTitleInTabBarItem]) {
-                BOOL aligned = NO;
-                slotCenter = [plusButton cyl_centerInTabButton:verticalBarSlot inView:self aligned:&aligned];
-                // The slot's title may be laid out after this pass (the title has just moved): try again a few times.
-                // 该 Tab 的标题可能在本次布局之后才排好（标题刚移过去）：再尝试几次。
-                static char CYLVerticalBarTitleRetriesKey;
-                NSInteger retries = [objc_getAssociatedObject(self, &CYLVerticalBarTitleRetriesKey) integerValue];
-                needsTitleLayout = !aligned && retries < 5;
-                objc_setAssociatedObject(self, &CYLVerticalBarTitleRetriesKey, @(aligned ? 0 : retries + 1),
-                                         OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            }
-            if (!CGPointEqualToPoint(self.plusButton.center, slotCenter) || needsTitleLayout) {
+            if (!CGPointEqualToPoint(self.plusButton.center, slotCenter)) {
                 [CATransaction begin];
                 [CATransaction setDisableActions:YES];
                 self.plusButton.center = slotCenter;
@@ -744,15 +730,26 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 
 /*!
  * FIX: issue #653
+ * [EN] Whether the system shows the tab buttons in the iOS 27.1 vertical bar (unfolded iPhone Duo in landscape,
+ *      `allowsVerticalBar = YES`): the platter is no longer inside this tab bar.
+ * [CN] 系统是否把 Tab 按钮放在 iOS 27.1 竖向栏中（iPhone Duo 展开横屏，`allowsVerticalBar = YES`）：platter 已不在本 TabBar 内。
+ */
+- (BOOL)cyl_showsVerticalBar {
+    UIView *platterView = self.cyl_platterView;
+    return platterView.window && platterView.window == self.window && ![platterView isDescendantOfView:self];
+}
+
+/*!
+ * FIX: issue #653
  * [EN] The tab button at `index` when the system shows the tab buttons in the iOS 27.1 vertical bar, i.e. when the
  *      platter is no longer inside this tab bar; nil otherwise.
  * [CN] iOS 27.1 竖向栏中（platter 已不在本 TabBar 内）第 `index` 个 Tab 按钮；其他情况返回 nil。
  */
 - (UIView *)cyl_verticalBarTabButtonAtIndex:(NSUInteger)index {
-    UIView *platterView = self.cyl_platterView;
-    if (!platterView || !platterView.window || platterView.window != self.window || [platterView isDescendantOfView:self]) {
+    if (![self cyl_showsVerticalBar]) {
         return nil;
     }
+    UIView *platterView = self.cyl_platterView;
     NSArray<UIControl *> *tabButtons = [self cyl_tabBarSubviews];
     if (index == NSNotFound || index >= tabButtons.count) {
         return nil;

@@ -45,21 +45,8 @@ configurationForConnectingSceneSession:(UISceneSession *)sceneSession
 }
 
 
-CYL_METHOD_SIGNATURES_PUSH
-- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
-    //设置强制旋转屏幕
-    if (self.cyl_isForceLandscape) {
-        //只支持横屏
-        return UIInterfaceOrientationMaskLandscape;
-    }
-    // FIX: issue #680 可折叠设备（iPhone Duo）跟随设备横竖屏，展开内屏横屏时铺满屏幕
-    if (self.supportsLandscapeOnFoldableDevice) {
-        return UIInterfaceOrientationMaskAllButUpsideDown;
-    }
-    //只支持竖屏
-    return UIInterfaceOrientationMaskPortrait;
-}
-CYL_METHOD_SIGNATURES_POP
+// Orientations: not implemented, so the ones set in Xcode (Info.plist) apply, with no restriction in code.
+// 屏幕方向：不实现 `-application:supportedInterfaceOrientationsForWindow:`，以 Xcode 中的设置（Info.plist）为准，代码中不做任何限制。
 /**
  *  设置navigationBar样式
  */

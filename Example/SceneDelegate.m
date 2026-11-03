@@ -46,18 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
     [CYLBadgeAppearance globalAppearance].centerOffset = CGPointMake(-5, 3);
 }
 
-CYL_METHOD_SIGNATURES_PUSH
-- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
-    //设置强制旋转屏幕
-    if (self.cyl_isForceLandscape) {
-        //只支持横屏
-        return UIInterfaceOrientationMaskLandscape;
-    } else {
-        //只支持竖屏
-        return UIInterfaceOrientationMaskPortrait;
-    }
-}
-CYL_METHOD_SIGNATURES_POP
 /**
  *  设置navigationBar样式
  */
