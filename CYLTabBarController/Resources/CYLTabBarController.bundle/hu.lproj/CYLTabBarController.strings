@@ -150,6 +150,8 @@
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Letölti a lap ikonját a hálózatról (gyorsítótárazva); koppintson újra a visszaállításhoz";
 "批量下载网络图标" = "Összes hálózati ikon módosítása";
 "下载并更新所有 Tab 的图标，再点恢复" = "Letölti és frissíti az összes lap ikonját; koppintson újra a visszaállításhoz";
+"批量使用本地图标" = "Összes helyi ikon módosítása";
+"用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复" = "Frissíti az összes lap ikonját helyi képekkel (név, fájlútvonal, UIImage, fájl URL); koppintson újra a visszaállításhoz";
 "GIF 动图图标" = "GIF-ikon";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Animált GIF-et mutat lapikonként; koppintson újra a visszaállításhoz";
 "批量更换标题" = "Minden cím módosítása";

@@ -108,7 +108,8 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedDarkImage;
  *      (`CYLTabBarItemSelectedImageURL`; without it the unselected one is used). `CYLTabBarItemImage` /
  *      `CYLTabBarItemSelectedImage` stay the default icons and the placeholders: the tab shows them until the download
  *      ends, and keeps them when it fails. The downloaded images then replace them, in every style, also over a Lottie
- *      icon, through `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`, drawn with their own colors, a GIF animating.
+ *      icon, through `-setTabBarItemIcon:selectedIcon:size:atIndex:`, drawn with their own colors, a GIF animating. Any
+ *      source that method takes works too (a file path, a UIImage...).
  *      `CYLTabBarItemImageURLSize` (an NSValue of CGSize) sets their size, the placeholder's by default. They are cached
  *      in memory and in the sandbox, see `CYLImageCache` to set how long and how much.
  *
@@ -120,7 +121,7 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedDarkImage;
  *
  * [CN] 可选的网络图标，NSURL 或 URL 字符串：未选中（`CYLTabBarItemImageURL`）与选中（`CYLTabBarItemSelectedImageURL`；未设置时使用
  *      未选中的）。`CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` 仍是默认图标及占位图：下载完成前 Tab 显示它们，下载失败时保留
- *      它们。下载完成后由下载的图片覆盖，适用于所有样式，也能覆盖 Lottie 图标，基于 `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`，
+ *      它们。下载完成后由下载的图片覆盖，适用于所有样式，也能覆盖 Lottie 图标，基于 `-setTabBarItemIcon:selectedIcon:size:atIndex:`（也支持该方法的其他图片来源，如文件路径、UIImage），
  *      按原图颜色绘制，GIF 会播放动画。`CYLTabBarItemImageURLSize`（CGSize 的 NSValue）设置其尺寸，默认与占位图相同。图片缓存在内存及
  *      沙盒中，缓存时长与大小见 `CYLImageCache`。示例见上。
  */
@@ -748,6 +749,24 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
                      selectedURL:(nullable NSURL *)selectedURL
                             size:(CGSize)size
                          atIndex:(NSUInteger)index;
+
+/*!
+ * FIX: issue #601, #535
+ * [EN] `-setTabBarItemIconWithURL:selectedURL:size:atIndex:` for any image source, local or remote: `icon` (unselected)
+ *      and `selectedIcon` (selected; nil uses `icon`) are each a `UIImage`, an image name (as `CYLTabBarItemImage`), the
+ *      absolute path of an image file (#535), an `NSURL` (a file URL or a network one), or a URL string
+ *      (`http://` / `https://`). Network images are downloaded and cached (`CYLImageCache`); local ones are shown at once.
+ *      Every image is drawn with its own colors, a GIF animates, and it fits `size` (zero: the icon's size).
+ * [CN] 适用于任意图片来源（本地或网络）的 `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`：`icon`（未选中）与 `selectedIcon`
+ *      （选中；为 nil 时使用 `icon`）可以是 `UIImage`、图片名（与 `CYLTabBarItemImage` 相同）、图片文件的绝对路径（#535）、`NSURL`
+ *      （文件 URL 或网络 URL），或 URL 字符串（`http://` / `https://`）。网络图片会下载并缓存（`CYLImageCache`）；本地图片立即显示。
+ *      所有图片按原图颜色绘制，GIF 会播放动画，并按 `size` 缩放（为零时使用图标尺寸）。
+ * @return [EN] NO when there is no such tab, it is the plus button's, or `icon` is nil. [CN] 没有该 Tab、是 PlusButton 的 Tab，或 `icon` 为 nil 时返回 NO。
+ */
+- (BOOL)setTabBarItemIcon:(id)icon
+             selectedIcon:(nullable id)selectedIcon
+                     size:(CGSize)size
+                  atIndex:(NSUInteger)index;
 
 /*!
  * [EN] Returns the visible tab bar size (see `-[UITabBar cyl_boundsSize]`).

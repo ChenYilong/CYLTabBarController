@@ -150,6 +150,8 @@
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Tải biểu tượng tab từ mạng (có bộ nhớ đệm); chạm lại để khôi phục";
 "批量下载网络图标" = "Đổi tất cả biểu tượng mạng";
 "下载并更新所有 Tab 的图标，再点恢复" = "Tải xuống và cập nhật biểu tượng của mọi tab; chạm lần nữa để khôi phục";
+"批量使用本地图标" = "Đổi tất cả biểu tượng cục bộ";
+"用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复" = "Cập nhật biểu tượng của mọi tab bằng ảnh cục bộ (tên, đường dẫn, UIImage, URL tệp); chạm lần nữa để khôi phục";
 "GIF 动图图标" = "Biểu tượng GIF";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Hiện ảnh GIF động làm biểu tượng tab; chạm lại để khôi phục";
 "批量更换标题" = "Đổi mọi tiêu đề";

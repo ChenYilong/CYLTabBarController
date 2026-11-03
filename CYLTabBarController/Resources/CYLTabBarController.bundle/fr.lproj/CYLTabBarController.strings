@@ -150,6 +150,8 @@
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Télécharge l’icône de l’onglet depuis le réseau (en cache) ; touchez à nouveau pour rétablir";
 "批量下载网络图标" = "Changer toutes les icônes réseau";
 "下载并更新所有 Tab 的图标，再点恢复" = "Télécharge et met à jour les icônes de tous les onglets ; touchez à nouveau pour restaurer";
+"批量使用本地图标" = "Changer toutes les icônes locales";
+"用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复" = "Met à jour les icônes de tous les onglets avec des images locales (nom, chemin, UIImage, URL de fichier) ; touchez à nouveau pour restaurer";
 "GIF 动图图标" = "Icône GIF";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Affiche un GIF animé comme icône de l’onglet ; touchez à nouveau pour rétablir";
 "批量更换标题" = "Modifier tous les titres";

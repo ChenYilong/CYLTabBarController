@@ -150,6 +150,8 @@
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Laster ned fanesymbolet fra nettet (bufret); trykk igjen for å gjenopprette";
 "批量下载网络图标" = "Endre alle nettverksikoner";
 "下载并更新所有 Tab 的图标，再点恢复" = "Laster ned og oppdaterer ikonene for alle faner; trykk igjen for å gjenopprette";
+"批量使用本地图标" = "Endre alle lokale ikoner";
+"用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复" = "Oppdaterer ikonene for alle faner med lokale bilder (navn, filbane, UIImage, fil-URL); trykk igjen for å gjenopprette";
 "GIF 动图图标" = "GIF-symbol";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Viser en animert GIF som fanesymbol; trykk igjen for å gjenopprette";
 "批量更换标题" = "Endre alle titler";

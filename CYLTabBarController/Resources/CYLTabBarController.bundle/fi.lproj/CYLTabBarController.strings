@@ -150,6 +150,8 @@
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Lataa välilehden kuvakkeen verkosta (välimuistiin); palauta napauttamalla uudelleen";
 "批量下载网络图标" = "Vaihda kaikki verkkokuvakkeet";
 "下载并更新所有 Tab 的图标，再点恢复" = "Lataa ja päivittää kaikkien välilehtien kuvakkeet; palauta napauttamalla uudelleen";
+"批量使用本地图标" = "Vaihda kaikki paikalliset kuvakkeet";
+"用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复" = "Päivittää kaikkien välilehtien kuvakkeet paikallisilla kuvilla (nimi, polku, UIImage, tiedosto-URL); palauta napauttamalla uudelleen";
 "GIF 动图图标" = "GIF-kuvake";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Näyttää animoidun GIF-kuvan välilehden kuvakkeena; palauta napauttamalla uudelleen";
 "批量更换标题" = "Muuta kaikki otsikot";

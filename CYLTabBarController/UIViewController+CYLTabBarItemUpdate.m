@@ -17,6 +17,7 @@ typedef NS_ENUM(NSInteger, CYLTabBarItemUpdateRow) {
     CYLTabBarItemUpdateRowIconView,     // `-setTabBarItemIconViewProvider:atIndex:`
     CYLTabBarItemUpdateRowNetworkIcon,  // `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`
     CYLTabBarItemUpdateRowAllNetworkIcons, // the same, for every tab
+    CYLTabBarItemUpdateRowAllLocalIcons,   // `-setTabBarItemIcon:selectedIcon:size:atIndex:`, local images, for every tab
     CYLTabBarItemUpdateRowGIFIcon,      // the same, with a GIF
     CYLTabBarItemUpdateRowAllTitles,    // `-updateTabBarItemsWithAttributes:`
     CYLTabBarItemUpdateRowCount,
@@ -27,6 +28,7 @@ static char CYLTabBarItemTitleUpdatedKey;
 static char CYLTabBarItemActiveIconRowKey;
 static char CYLTabBarItemAllTitlesUpdatedKey;
 static char CYLTabBarItemAllNetworkIconsKey;
+static char CYLTabBarItemAllLocalIconsKey;
 
 @implementation UIViewController (CYLTabBarItemUpdate)
 
@@ -66,6 +68,11 @@ static char CYLTabBarItemAllNetworkIconsKey;
             title = CYLLocalizedString(@"批量下载网络图标");
             subtitle = CYLLocalizedString(@"下载并更新所有 Tab 的图标，再点恢复");
             symbolName = @"square.and.arrow.down.on.square";
+            break;
+        case CYLTabBarItemUpdateRowAllLocalIcons:
+            title = CYLLocalizedString(@"批量使用本地图标");
+            subtitle = CYLLocalizedString(@"用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复");
+            symbolName = @"photo.on.rectangle";
             break;
         case CYLTabBarItemUpdateRowGIFIcon:
             title = CYLLocalizedString(@"GIF 动图图标");
@@ -107,7 +114,8 @@ static char CYLTabBarItemAllNetworkIconsKey;
             [self cyl_toggleIconRow:row ofTabViewController:tabViewController atIndex:index inTabBarController:tabBarController];
             break;
         case CYLTabBarItemUpdateRowAllNetworkIcons:
-            [self cyl_toggleAllNetworkIconsInTabBarController:tabBarController];
+        case CYLTabBarItemUpdateRowAllLocalIcons:
+            [self cyl_toggleAllIconsRow:row inTabBarController:tabBarController];
             break;
         default:
             [self cyl_toggleAllTitlesInTabBarController:tabBarController];
@@ -196,20 +204,58 @@ static char CYLTabBarItemAllNetworkIconsKey;
     objc_setAssociatedObject(tabBarController, &CYLTabBarItemAllTitlesUpdatedKey, (isUpdated ? nil : @YES), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-/// Downloads and updates the icon of every tab; tapped again, the icons of the `tabBarItemsAttributes` given at
-/// initialization (`nil` restores each tab's own icon).
-/// 下载并更新所有 Tab 的图标；再次点击，恢复为初始化时传入的 `tabBarItemsAttributes` 中的图标（传 `nil` 即恢复各 Tab 自身的图标）。
-- (void)cyl_toggleAllNetworkIconsInTabBarController:(CYLTabBarController *)tabBarController {
-    UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:tabBarController];
-    BOOL isActive = [objc_getAssociatedObject(tabBarController, &CYLTabBarItemAllNetworkIconsKey) boolValue];
-    // The normal and selected icon of each tab, in order (repeated past the fourth tab).
-    // 每个 Tab 的普通、选中图标，按顺序（超过 4 个 Tab 时循环使用）。
-    NSArray<NSArray<NSString *> *> *iconURLs = @[
-        @[ @"https://cdn-icons-png.flaticon.com/512/1946/1946488.png", @"https://cdn-icons-png.flaticon.com/512/1946/1946436.png" ],
-        @[ @"https://cdn-icons-png.flaticon.com/512/2099/2099085.png", @"https://cdn-icons-png.flaticon.com/512/2099/2099085.png" ],
-        @[ @"https://cdn-icons-png.flaticon.com/512/2099/2099100.png", @"https://cdn-icons-png.flaticon.com/512/2099/2099100.png" ],
-        @[ @"https://cdn-icons-png.flaticon.com/512/1077/1077063.png", @"https://cdn-icons-png.flaticon.com/512/1077/1077114.png" ],
+/*!
+ * [EN] The icons of every tab, in order (repeated past the fourth tab), unselected then selected. From the network
+ *      (`CYLTabBarItemUpdateRowAllNetworkIcons`), or local (`CYLTabBarItemUpdateRowAllLocalIcons`), one kind of source
+ *      per tab: an image name, the absolute path of a file, a `UIImage`, a file `NSURL` (a GIF). A local image the app
+ *      does not have falls back to a symbol.
+ * [CN] 每个 Tab 的图标，按顺序（超过 4 个 Tab 时循环使用），先未选中后选中。来自网络（`CYLTabBarItemUpdateRowAllNetworkIcons`），或来自本地
+ *      （`CYLTabBarItemUpdateRowAllLocalIcons`），每个 Tab 一种来源：图片名、文件绝对路径、`UIImage`、文件 `NSURL`（GIF）。App 中没有的本地
+ *      图片改用系统符号。
+ */
+- (NSArray<NSArray *> *)cyl_iconsOfAllIconsRow:(NSInteger)row {
+    if (row == CYLTabBarItemUpdateRowAllNetworkIcons) {
+        return @[
+            @[ @"https://cdn-icons-png.flaticon.com/512/1946/1946488.png", @"https://cdn-icons-png.flaticon.com/512/1946/1946436.png" ],
+            @[ @"https://cdn-icons-png.flaticon.com/512/2099/2099085.png", @"https://cdn-icons-png.flaticon.com/512/2099/2099085.png" ],
+            @[ @"https://cdn-icons-png.flaticon.com/512/2099/2099100.png", @"https://cdn-icons-png.flaticon.com/512/2099/2099100.png" ],
+            @[ @"https://cdn-icons-png.flaticon.com/512/1077/1077063.png", @"https://cdn-icons-png.flaticon.com/512/1077/1077114.png" ],
+        ];
+    }
+    id (^symbol)(NSString *, UIColor *) = ^id(NSString *name, UIColor *color) {
+        if (@available(iOS 13.0, *)) {
+            return [[UIImage systemImageNamed:name] imageWithTintColor:color renderingMode:UIImageRenderingModeAlwaysOriginal];
+        }
+        return name;
+    };
+    // [EN] An image name, as `CYLTabBarItemImage`. [CN] 图片名，与 `CYLTabBarItemImage` 相同。
+    id named = [UIImage imageNamed:@"img_tab_home_0"] ? @"img_tab_home_0" : symbol(@"house", UIColor.systemGrayColor);
+    id namedSelected = [UIImage imageNamed:@"img_tab_home_1"] ? @"img_tab_home_1" : symbol(@"house.fill", UIColor.systemOrangeColor);
+    // [EN] The absolute path of a file (#535). [CN] 文件的绝对路径（#535）。
+    id path = [[NSBundle mainBundle] pathForResource:@"img_tab_message_0" ofType:@"png"] ?: symbol(@"envelope", UIColor.systemGrayColor);
+    id pathSelected = [[NSBundle mainBundle] pathForResource:@"img_tab_message_1" ofType:@"png"] ?: symbol(@"envelope.fill", UIColor.systemOrangeColor);
+    // [EN] A file URL of a GIF, in the library's resource bundle. [CN] 本库资源包中 GIF 的文件 URL。
+    id fileURL = [CYLResourceBundle() URLForResource:@"cyl_tab_sample_animated" withExtension:@"gif"] ?: symbol(@"sparkles", UIColor.systemPurpleColor);
+    return @[
+        @[ named, namedSelected ],
+        @[ path, pathSelected ],
+        @[ symbol(@"heart", UIColor.systemGrayColor), symbol(@"heart.fill", UIColor.systemRedColor) ], // [EN] A UIImage. [CN] UIImage。
+        @[ fileURL, fileURL ],
     ];
+}
+
+/*!
+ * [EN] Updates the icon of every tab with the icons of `row`, network or local (`-setTabBarItemIcon:selectedIcon:size:atIndex:`);
+ *      tapped again, the icons of the `tabBarItemsAttributes` given at initialization.
+ * [CN] 用 `row` 的图标（网络或本地，`-setTabBarItemIcon:selectedIcon:size:atIndex:`）更新所有 Tab 的图标；再次点击，恢复为初始化时传入的
+ *      `tabBarItemsAttributes` 中的图标。
+ */
+- (void)cyl_toggleAllIconsRow:(NSInteger)row inTabBarController:(CYLTabBarController *)tabBarController {
+    UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:tabBarController];
+    const void *key = (row == CYLTabBarItemUpdateRowAllNetworkIcons) ? &CYLTabBarItemAllNetworkIconsKey : &CYLTabBarItemAllLocalIconsKey;
+    const void *otherKey = (key == &CYLTabBarItemAllNetworkIconsKey) ? &CYLTabBarItemAllLocalIconsKey : &CYLTabBarItemAllNetworkIconsKey;
+    BOOL isActive = [objc_getAssociatedObject(tabBarController, key) boolValue];
+    NSArray<NSArray *> *icons = [self cyl_iconsOfAllIconsRow:row];
     NSUInteger tabIndex = 0;
     NSArray<UIViewController *> *viewControllers = tabBarController.viewControllers;
     for (NSUInteger index = 0; index < viewControllers.count; index++) {
@@ -217,20 +263,19 @@ static char CYLTabBarItemAllNetworkIconsKey;
         if (viewController.cyl_isPlaceholder || viewController == plusChildViewController) {
             continue;
         }
-        // Replaces this tab's own icon row as well. 同时取代该 Tab 单独设置的图标行。
+        // [EN] Replaces this tab's own icon row as well. [CN] 同时取代该 Tab 单独设置的图标行。
         objc_setAssociatedObject(viewController, &CYLTabBarItemActiveIconRowKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         if (isActive) {
             [self cyl_restoreInitialIconOfTabViewController:viewController atIndex:index inTabBarController:tabBarController];
         } else {
-            NSArray<NSString *> *URLs = iconURLs[tabIndex % iconURLs.count];
-            [tabBarController setTabBarItemIconWithURL:[NSURL URLWithString:URLs[0]]
-                                           selectedURL:[NSURL URLWithString:URLs[1]]
-                                                  size:CGSizeMake(24, 24)
-                                               atIndex:index];
+            NSArray *tabIcons = icons[tabIndex % icons.count];
+            [tabBarController setTabBarItemIcon:tabIcons[0] selectedIcon:tabIcons[1] size:CGSizeMake(24, 24) atIndex:index];
         }
         tabIndex++;
     }
-    objc_setAssociatedObject(tabBarController, &CYLTabBarItemAllNetworkIconsKey, (isActive ? nil : @YES), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    // [EN] One of the two rows at a time. [CN] 两行同一时间只有一行生效。
+    objc_setAssociatedObject(tabBarController, key, (isActive ? nil : @YES), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(tabBarController, otherKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 #pragma mark - Helpers
@@ -313,6 +358,8 @@ static char CYLTabBarItemAllNetworkIconsKey;
         }
         case CYLTabBarItemUpdateRowAllNetworkIcons:
             return [objc_getAssociatedObject([self cyl_tabBarItemUpdateTabBarController], &CYLTabBarItemAllNetworkIconsKey) boolValue];
+        case CYLTabBarItemUpdateRowAllLocalIcons:
+            return [objc_getAssociatedObject([self cyl_tabBarItemUpdateTabBarController], &CYLTabBarItemAllLocalIconsKey) boolValue];
         default:
             return [objc_getAssociatedObject([self cyl_tabBarItemUpdateTabBarController], &CYLTabBarItemAllTitlesUpdatedKey) boolValue];
     }

@@ -150,6 +150,8 @@
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Downloads this page's tab icon from the network (cached); tap again to restore";
 "批量下载网络图标" = "Change all network icons";
 "下载并更新所有 Tab 的图标，再点恢复" = "Downloads and updates the icons of all tabs; tap again to restore the initial icons";
+"批量使用本地图标" = "Change all local icons";
+"用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复" = "Updates the icons of all tabs with local images (name, file path, UIImage, file URL); tap again to restore";
 "GIF 动图图标" = "GIF icon";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Shows an animated GIF as this page's tab icon; tap again to restore";
 "批量更换标题" = "Change all titles";

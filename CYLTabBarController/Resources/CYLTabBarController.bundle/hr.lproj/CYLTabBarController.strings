@@ -150,6 +150,8 @@
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Preuzima ikonu kartice s mreže (u predmemoriji); dodirnite ponovno za vraćanje";
 "批量下载网络图标" = "Promijeni sve mrežne ikone";
 "下载并更新所有 Tab 的图标，再点恢复" = "Preuzima i ažurira ikone svih kartica; dodirnite ponovno za vraćanje";
+"批量使用本地图标" = "Promijeni sve lokalne ikone";
+"用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复" = "Ažurira ikone svih kartica lokalnim slikama (naziv, putanja, UIImage, URL datoteke); dodirnite ponovno za vraćanje";
 "GIF 动图图标" = "GIF ikona";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Prikazuje animirani GIF kao ikonu kartice; dodirnite ponovno za vraćanje";
 "批量更换标题" = "Promijeni sve naslove";

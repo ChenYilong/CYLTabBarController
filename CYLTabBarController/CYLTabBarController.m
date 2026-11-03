@@ -2037,7 +2037,33 @@ static char CYLTabBarItemIconViewsProviderKey;
 }
 
 - (BOOL)setTabBarItemIconWithURL:(NSURL *)URL selectedURL:(NSURL *)selectedURL size:(CGSize)size atIndex:(NSUInteger)index {
-    if (index >= _viewControllers.count || !URL) {
+    return URL && [self setTabBarItemIcon:URL selectedIcon:selectedURL size:size atIndex:index];
+}
+
+/*!
+ * [EN] The image of `icon`, on the main queue: a `UIImage` as it is; an `NSURL` or an `http(s)` string loaded through
+ *      `CYLImageCache`; any other string by name or absolute path (`+[UIImage cyl_imageNamed:]`, #535). nil when there is none.
+ * [CN] 在主队列返回 `icon` 对应的图片：`UIImage` 原样返回；`NSURL` 或 `http(s)` 字符串通过 `CYLImageCache` 加载；其他字符串按图片名或
+ *      绝对路径加载（`+[UIImage cyl_imageNamed:]`，#535）。没有图片时为 nil。
+ */
+static void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completion)(UIImage *_Nullable image)) {
+    if ([icon isKindOfClass:[UIImage class]]) {
+        completion(icon);
+        return;
+    }
+    NSURL *URL = [icon isKindOfClass:[NSURL class]] ? icon : nil;
+    if ([icon isKindOfClass:[NSString class]] && ([icon hasPrefix:@"http://"] || [icon hasPrefix:@"https://"])) {
+        URL = [NSURL URLWithString:icon];
+    }
+    if (URL) {
+        [UIImage cyl_loadImageWithURL:URL completion:completion];
+        return;
+    }
+    completion([icon isKindOfClass:[NSString class]] ? [UIImage cyl_imageNamed:icon] : nil);
+}
+
+- (BOOL)setTabBarItemIcon:(id)icon selectedIcon:(id)selectedIcon size:(CGSize)size atIndex:(NSUInteger)index {
+    if (index >= _viewControllers.count || !icon) {
         return NO;
     }
     UIViewController *viewController = _viewControllers[index];
@@ -2046,13 +2072,14 @@ static char CYLTabBarItemIconViewsProviderKey;
     }
     __weak __typeof(self) weakSelf = self;
     __weak UIViewController *weakViewController = viewController;
-    [UIImage cyl_loadImageWithURL:URL completion:^(UIImage *image) {
+    CYLLoadTabBarItemIcon(icon, ^(UIImage *image) {
         if (!image) {
             return;
         }
         void (^show)(UIImage *) = ^(UIImage *selectedImage) {
             __strong __typeof(weakSelf) self = weakSelf;
-            // Still a tab of this controller (the view controllers may have changed meanwhile). 仍是本控制器的 Tab。
+            // [EN] Still a tab of this controller (the view controllers may have changed meanwhile).
+            // [CN] 仍是本控制器的 Tab（期间视图控制器可能已改变）。
             NSUInteger currentIndex = weakViewController ? [self.viewControllers indexOfObject:weakViewController] : NSNotFound;
             if (!self || currentIndex == NSNotFound) {
                 return;
@@ -2068,12 +2095,12 @@ static char CYLTabBarItemIconViewsProviderKey;
                 return iconView;
             } atIndex:currentIndex];
         };
-        if (!selectedURL || [selectedURL isEqual:URL]) {
+        if (!selectedIcon || [selectedIcon isEqual:icon]) {
             show(nil);
         } else {
-            [UIImage cyl_loadImageWithURL:selectedURL completion:show];
+            CYLLoadTabBarItemIcon(selectedIcon, show);
         }
-    }];
+    });
     return YES;
 }
 
@@ -2645,14 +2672,6 @@ static char CYLTabBarItemIconViewsProviderKey;
     [self cyl_loadTabBarItemImageURLs];
 }
 
-/// An NSURL from an NSURL or a URL string. 由 NSURL 或 URL 字符串得到 NSURL。
-static NSURL *_Nullable CYLURLFromValue(id value) {
-    if ([value isKindOfClass:[NSURL class]]) {
-        return value;
-    }
-    return ([value isKindOfClass:[NSString class]] && [value length] > 0) ? [NSURL URLWithString:value] : nil;
-}
-
 /*!
  * FIX: issue #601
  * [EN] Every tab whose attributes have `CYLTabBarItemImageURL` shows the downloaded icons once ready; until then, and on
@@ -2669,16 +2688,15 @@ static NSURL *_Nullable CYLURLFromValue(id value) {
 }
 
 - (BOOL)cyl_loadImageURLsOfAttributes:(NSDictionary *)attributes atIndex:(NSUInteger)index {
-    NSURL *URL = CYLURLFromValue(attributes[CYLTabBarItemImageURL]);
-    if (!URL) {
+    id icon = attributes[CYLTabBarItemImageURL];
+    if (!icon) {
         return NO;
     }
     NSValue *sizeValue = attributes[CYLTabBarItemImageURLSize];
     CGSize size = [sizeValue isKindOfClass:[NSValue class]] ? sizeValue.CGSizeValue : CGSizeZero;
-    return [self setTabBarItemIconWithURL:URL
-                              selectedURL:CYLURLFromValue(attributes[CYLTabBarItemSelectedImageURL])
-                                     size:size
-                                  atIndex:index];
+    // [EN] The same sources as `-setTabBarItemIcon:selectedIcon:size:atIndex:`: a URL, and also a local image.
+    // [CN] 与 `-setTabBarItemIcon:selectedIcon:size:atIndex:` 相同的来源：URL，也可以是本地图片。
+    return [self setTabBarItemIcon:icon selectedIcon:attributes[CYLTabBarItemSelectedImageURL] size:size atIndex:index];
 }
 
 - (void)setTintColor:(UIColor *)tintColor {

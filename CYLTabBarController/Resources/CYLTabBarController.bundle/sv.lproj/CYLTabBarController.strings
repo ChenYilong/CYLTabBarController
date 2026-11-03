@@ -150,6 +150,8 @@
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Hämtar fliksymbolen från nätet (cachad); tryck igen för att återställa";
 "批量下载网络图标" = "Ändra alla nätverksikoner";
 "下载并更新所有 Tab 的图标，再点恢复" = "Hämtar och uppdaterar ikonerna för alla flikar; tryck igen för att återställa";
+"批量使用本地图标" = "Ändra alla lokala ikoner";
+"用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复" = "Uppdaterar ikonerna för alla flikar med lokala bilder (namn, filsökväg, UIImage, fil-URL); tryck igen för att återställa";
 "GIF 动图图标" = "GIF-symbol";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Visar en animerad GIF som fliksymbol; tryck igen för att återställa";
 "批量更换标题" = "Ändra alla titlar";
