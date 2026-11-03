@@ -148,6 +148,8 @@
 "用自定义视图替换当前页 Tab 的图标，再点恢复" = "Sekme simgesi olarak özel bir görünüm gösterir; geri almak için yeniden dokunun";
 "下载网络图标" = "Ağdan simge indir";
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Sekme simgesini ağdan indirir (önbellekli); geri almak için yeniden dokunun";
+"批量下载网络图标" = "Tüm ağ simgelerini değiştir";
+"下载并更新所有 Tab 的图标，再点恢复" = "Tüm sekmelerin simgelerini indirir ve günceller; geri yüklemek için tekrar dokunun";
 "GIF 动图图标" = "GIF simgesi";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Sekme simgesi olarak hareketli GIF gösterir; geri almak için yeniden dokunun";
 "批量更换标题" = "Tüm başlıkları değiştir";

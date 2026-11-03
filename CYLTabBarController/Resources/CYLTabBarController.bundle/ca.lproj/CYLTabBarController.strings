@@ -148,6 +148,8 @@
 "用自定义视图替换当前页 Tab 的图标，再点恢复" = "Mostra una vista pròpia com a icona de la pestanya; toca de nou per restaurar";
 "下载网络图标" = "Baixa una icona de la xarxa";
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Baixa la icona de la pestanya de la xarxa (en memòria cau); toca de nou per restaurar";
+"批量下载网络图标" = "Canvia totes les icones de xarxa";
+"下载并更新所有 Tab 的图标，再点恢复" = "Baixa i actualitza les icones de totes les pestanyes; toca de nou per restaurar";
 "GIF 动图图标" = "Icona GIF";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Mostra un GIF animat com a icona de la pestanya; toca de nou per restaurar";
 "批量更换标题" = "Canvia tots els títols";

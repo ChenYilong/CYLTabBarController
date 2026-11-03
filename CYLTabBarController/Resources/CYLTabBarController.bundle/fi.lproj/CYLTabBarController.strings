@@ -148,6 +148,8 @@
 "用自定义视图替换当前页 Tab 的图标，再点恢复" = "Näyttää oman näkymän välilehden kuvakkeena; palauta napauttamalla uudelleen";
 "下载网络图标" = "Lataa kuvake verkosta";
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Lataa välilehden kuvakkeen verkosta (välimuistiin); palauta napauttamalla uudelleen";
+"批量下载网络图标" = "Vaihda kaikki verkkokuvakkeet";
+"下载并更新所有 Tab 的图标，再点恢复" = "Lataa ja päivittää kaikkien välilehtien kuvakkeet; palauta napauttamalla uudelleen";
 "GIF 动图图标" = "GIF-kuvake";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Näyttää animoidun GIF-kuvan välilehden kuvakkeena; palauta napauttamalla uudelleen";
 "批量更换标题" = "Muuta kaikki otsikot";

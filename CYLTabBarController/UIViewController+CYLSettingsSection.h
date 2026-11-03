@@ -12,10 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  * [EN] Section index of the settings rows at the top of a list: row 0 is the language setting
  *      (`-cyl_languageCellForTableView:`), row 1 the memory warning check (`-cyl_memoryWarningCellForTableView:`), then
- *      the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon, GIF icon,
- *      all titles.
+ *      the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon, all network icons,
+ *      GIF icon, all titles.
  * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
- *      （`-cyl_memoryWarningCellForTableView:`），之后是原地更新 Tab 的若干行（`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、GIF 图标、所有标题。
+ *      （`-cyl_memoryWarningCellForTableView:`），之后是原地更新 Tab 的若干行（`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、所有网络图标、GIF 图标、所有标题。
  */
 FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 

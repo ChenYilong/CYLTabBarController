@@ -370,6 +370,8 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
         [self cyl_replaceTabImageViewOrTabButton:isTabButton newView:newView offset:offset show:theShow shouldAutoHideNewView:NO shouldHideOriginalView:NO completion:^(BOOL isReplaced, UIControl *tabBarButton, UIView *newView) {
             //FIXME:  #480
             if (isReplaced) {
+                // Issue #601: the views shown in place of the tab's icon stay hidden under the cover. 替换图标的视图在封面下保持隐藏。
+                newView.cyl_tabButtonCoverView = theShow;
                 tabBarButton.cyl_swappableImageViewViewInTabBarButton.hidden = YES;
                 // tabBarButton.cyl_platterNormalControl.cyl_swappableImageViewViewInTabBarButton.hidden = YES;
                 [tabBarButton.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {

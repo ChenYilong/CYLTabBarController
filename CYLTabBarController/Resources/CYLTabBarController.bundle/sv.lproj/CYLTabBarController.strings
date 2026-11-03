@@ -148,6 +148,8 @@
 "用自定义视图替换当前页 Tab 的图标，再点恢复" = "Visar en egen vy som fliksymbol; tryck igen för att återställa";
 "下载网络图标" = "Hämta symbol från nätet";
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Hämtar fliksymbolen från nätet (cachad); tryck igen för att återställa";
+"批量下载网络图标" = "Ändra alla nätverksikoner";
+"下载并更新所有 Tab 的图标，再点恢复" = "Hämtar och uppdaterar ikonerna för alla flikar; tryck igen för att återställa";
 "GIF 动图图标" = "GIF-symbol";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Visar en animerad GIF som fliksymbol; tryck igen för att återställa";
 "批量更换标题" = "Ändra alla titlar";

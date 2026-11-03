@@ -148,6 +148,8 @@
 "用自定义视图替换当前页 Tab 的图标，再点恢复" = "Zobrazí vlastní pohled jako ikonu panelu; klepnutím znovu obnovíte";
 "下载网络图标" = "Stáhnout ikonu ze sítě";
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Stáhne ikonu panelu ze sítě (s mezipamětí); klepnutím znovu obnovíte";
+"批量下载网络图标" = "Změnit všechny síťové ikony";
+"下载并更新所有 Tab 的图标，再点恢复" = "Stáhne a aktualizuje ikony všech karet; dalším klepnutím obnovíte";
 "GIF 动图图标" = "Ikona GIF";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Zobrazí animovaný GIF jako ikonu panelu; klepnutím znovu obnovíte";
 "批量更换标题" = "Změnit všechny názvy";

@@ -148,6 +148,8 @@
 "用自定义视图替换当前页 Tab 的图标，再点恢复" = "Zeigt eine eigene Ansicht als Tab-Symbol; erneut tippen zum Zurücksetzen";
 "下载网络图标" = "Netzwerksymbol laden";
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Lädt das Tab-Symbol aus dem Netz (zwischengespeichert); erneut tippen zum Zurücksetzen";
+"批量下载网络图标" = "Alle Netzwerk-Symbole ändern";
+"下载并更新所有 Tab 的图标，再点恢复" = "Lädt die Symbole aller Tabs herunter und aktualisiert sie; erneut tippen zum Wiederherstellen";
 "GIF 动图图标" = "GIF-Symbol";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Zeigt ein animiertes GIF als Tab-Symbol; erneut tippen zum Zurücksetzen";
 "批量更换标题" = "Alle Titel ändern";

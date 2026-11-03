@@ -148,6 +148,8 @@
 "用自定义视图替换当前页 Tab 的图标，再点恢复" = "Memaparkan paparan tersuai sebagai ikon tab; ketik lagi untuk memulihkan";
 "下载网络图标" = "Muat turun ikon rangkaian";
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Memuat turun ikon tab dari rangkaian (dicache); ketik lagi untuk memulihkan";
+"批量下载网络图标" = "Tukar semua ikon rangkaian";
+"下载并更新所有 Tab 的图标，再点恢复" = "Memuat turun dan mengemas kini ikon semua tab; ketik sekali lagi untuk memulihkan";
 "GIF 动图图标" = "Ikon GIF";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Memaparkan GIF animasi sebagai ikon tab; ketik lagi untuk memulihkan";
 "批量更换标题" = "Tukar semua tajuk";

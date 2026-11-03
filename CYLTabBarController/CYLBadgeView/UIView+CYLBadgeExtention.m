@@ -154,6 +154,12 @@ static char CYLBadgeHostOverlayTokenKey;
 
 - (void)cyl_followHostVisibility {
     CALayer *hostLayer = _observedLayer;
+    // FIX: issue #601 — a host hidden for the view shown in its place keeps its badge visible. 被替换显示而隐藏的宿主，角标仍可见。
+    if (_host.cyl_isBadgeHostReplacedByIconView) {
+        self.hidden = NO;
+        self.alpha = 1;
+        return;
+    }
     self.hidden = hostLayer.hidden;
     self.alpha = hostLayer.opacity;
 }
@@ -182,11 +188,12 @@ static char CYLBadgeHostOverlayTokenKey;
 
 @end
 
-/// The view the badge of `host` is added to: `host` itself, or an overlay above it when `host` clips. 承载 `host` 角标的视图。
+/// The view the badge of `host` is added to: `host` itself, or an overlay above it when `host` clips or is hidden for
+/// the view shown in its place (#601). 承载 `host` 角标的视图：`host` 本身，或在 `host` 会裁剪、或被替换显示而隐藏时（#601）位于其上方的浮层。
 static UIView *CYLBadgeContainerForHost(UIView *host) {
     CYLBadgeHostOverlayToken *token = objc_getAssociatedObject(host, &CYLBadgeHostOverlayTokenKey);
     BOOL hostClips = host.clipsToBounds || host.layer.masksToBounds || host.layer.mask != nil;
-    if (!hostClips || !host.superview) {
+    if ((!hostClips && !host.cyl_isBadgeHostReplacedByIconView) || !host.superview) {
         if (token.overlay) {
             [token.overlay cyl_detach];
             [token.overlay removeFromSuperview];
@@ -747,6 +754,15 @@ static UIView *CYLBadgeContainerForHost(UIView *host) {
     [container bringSubviewToFront:badge];
     [self cyl_layoutBadgeAtTopRightCorner];
     [self cyl_badgeEnvironmentDidChange];
+}
+
+- (BOOL)cyl_isBadgeHostReplacedByIconView {
+    return [objc_getAssociatedObject(self, @selector(cyl_isBadgeHostReplacedByIconView)) boolValue];
+}
+
+- (void)cyl_setBadgeHostReplacedByIconView:(BOOL)badgeHostReplacedByIconView {
+    objc_setAssociatedObject(self, @selector(cyl_isBadgeHostReplacedByIconView), (badgeHostReplacedByIconView ? @YES : nil),
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)cyl_resetBadgeAppearance {

@@ -2023,6 +2023,16 @@ static char CYLTabBarItemIconViewsProviderKey;
         NSMutableDictionary<NSNumber *, UIView *> *iconViews = objc_getAssociatedObject(tabButton, &CYLTabBarItemIconViewsKey);
         id installedProvider = objc_getAssociatedObject(tabButton, &CYLTabBarItemIconViewsProviderKey);
         UIView *lottieView = tabButton.cyl_lottieAnimationView;
+        // A cover over the tab button (e.g. a logo over the first tab) hides its other views, the tab's own icon too:
+        // the views shown in place of the icon stay hidden under it. 覆盖 Tab 按钮的封面（如第一个 Tab 上的 Logo）会隐藏按钮
+        // 中的其他视图，包括 Tab 自身的图标：替换图标的视图在其下方保持隐藏。
+        BOOL isCovered = NO;
+        for (UIView *subview in tabButton.subviews) {
+            if (subview.cyl_isTabButtonCoverView && !subview.cyl_isInvisiable) {
+                isCovered = YES;
+                break;
+            }
+        }
         if (installedProvider != provider) {
             // Another provider, or none: remove the views of the previous one. 换了 provider 或已移除：移除之前的视图。
             for (UIView *iconView in iconViews.allValues) {
@@ -2032,8 +2042,12 @@ static char CYLTabBarItemIconViewsProviderKey;
             objc_setAssociatedObject(tabButton, &CYLTabBarItemIconViewsKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             objc_setAssociatedObject(tabButton, &CYLTabBarItemIconViewsProviderKey, provider, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             if (!provider) {
-                tabButton.cyl_tabImageView.hidden = (lottieView != nil);
-                lottieView.hidden = NO;
+                // The tab's own icon and its badge come back, unless the cover hides them. Tab 自身的图标及其角标恢复，除非被封面隐藏。
+                [self cyl_setTabImageView:tabButton.cyl_tabImageView lottieView:lottieView replacedByIconView:NO];
+                if (!isCovered) {
+                    tabButton.cyl_tabImageView.hidden = (lottieView != nil);
+                    lottieView.hidden = NO;
+                }
                 return;
             }
         }
@@ -2062,16 +2076,34 @@ static char CYLTabBarItemIconViewsProviderKey;
         if (iconViews.count == 0) {
             return;
         }
-        // The tab's own icon stays hidden (the system may show it again when the tab changes). Tab 自身图标保持隐藏。
+        // The tab's own icon stays hidden (the system may show it again when the tab changes); its badge stays visible
+        // above it. Tab 自身图标保持隐藏（切换 Tab 时系统可能重新显示它）；其角标仍显示在它上方。
         tabButton.cyl_tabImageView.hidden = YES;
         lottieView.hidden = YES;
+        [self cyl_setTabImageView:tabButton.cyl_tabImageView lottieView:lottieView replacedByIconView:YES];
         UIView *unselectedView = iconViews[@NO];
         UIView *selectedView = iconViews[@YES];
         if (unselectedView && selectedView) {
-            unselectedView.hidden = isSelected;
-            selectedView.hidden = !isSelected;
+            unselectedView.hidden = isCovered || isSelected;
+            selectedView.hidden = isCovered || !isSelected;
+        } else {
+            for (UIView *iconView in iconViews.allValues) {
+                iconView.hidden = isCovered;
+            }
         }
     }];
+}
+
+/// Marks the tab's own icon as hidden for the view shown in its place, or not, and moves its badge accordingly: onto
+/// an overlay above it, or back into it. 标记 Tab 自身的图标是否因替换显示而隐藏，并相应移动其角标：移到其上方的浮层，或移回图标中。
+- (void)cyl_setTabImageView:(UIView *)tabImageView lottieView:(UIView *)lottieView replacedByIconView:(BOOL)replaced {
+    for (UIView *host in @[ tabImageView ?: (id)[NSNull null], lottieView ?: (id)[NSNull null] ]) {
+        if (![host isKindOfClass:[UIView class]] || host.cyl_isBadgeHostReplacedByIconView == replaced) {
+            continue;
+        }
+        host.cyl_badgeHostReplacedByIconView = replaced;
+        [host cyl_refreshBadge];
+    }
 }
 
 /*!

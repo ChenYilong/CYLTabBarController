@@ -148,6 +148,8 @@
 "用自定义视图替换当前页 Tab 的图标，再点恢复" = "Afișează o vizualizare proprie ca pictogramă a filei; atinge din nou pentru a restabili";
 "下载网络图标" = "Descarcă pictograma din rețea";
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Descarcă pictograma filei din rețea (în cache); atinge din nou pentru a restabili";
+"批量下载网络图标" = "Schimbă toate pictogramele de rețea";
+"下载并更新所有 Tab 的图标，再点恢复" = "Descarcă și actualizează pictogramele tuturor filelor; atinge din nou pentru a restaura";
 "GIF 动图图标" = "Pictogramă GIF";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Afișează un GIF animat ca pictogramă a filei; atinge din nou pentru a restabili";
 "批量更换标题" = "Schimbă toate titlurile";

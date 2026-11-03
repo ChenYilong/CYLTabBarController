@@ -148,6 +148,8 @@
 "用自定义视图替换当前页 Tab 的图标，再点恢复" = "Mostra uma view própria como ícone da aba; toque de novo para restaurar";
 "下载网络图标" = "Baixar ícone da rede";
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Baixa o ícone da aba da rede (com cache); toque de novo para restaurar";
+"批量下载网络图标" = "Alterar todos os ícones de rede";
+"下载并更新所有 Tab 的图标，再点恢复" = "Baixa e atualiza os ícones de todas as abas; toque novamente para restaurar";
 "GIF 动图图标" = "Ícone GIF";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Mostra um GIF animado como ícone da aba; toque de novo para restaurar";
 "批量更换标题" = "Mudar todos os títulos";

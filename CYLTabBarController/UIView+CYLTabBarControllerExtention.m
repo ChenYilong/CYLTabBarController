@@ -191,6 +191,14 @@
     objc_setAssociatedObject(self, @selector(cyl_isTabBarItemIconView), @(tabBarItemIconView), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+- (BOOL)cyl_isTabButtonCoverView {
+    return [objc_getAssociatedObject(self, @selector(cyl_isTabButtonCoverView)) boolValue];
+}
+
+- (void)cyl_setTabButtonCoverView:(BOOL)tabButtonCoverView {
+    objc_setAssociatedObject(self, @selector(cyl_isTabButtonCoverView), (tabButtonCoverView ? @YES : nil), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 - (BOOL)cyl_isTabImageView {
     BOOL isKindOfImageView = [self cyl_isKindOfClass:[UIImageView class]];
     if (!isKindOfImageView) {

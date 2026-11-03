@@ -148,6 +148,8 @@
 "用自定义视图替换当前页 Tab 的图标，再点恢复" = "Viser en egen visning som fanesymbol; tryk igen for at gendanne";
 "下载网络图标" = "Hent symbol fra netværket";
 "从网络下载当前页 Tab 的图标（带缓存），再点恢复" = "Henter fanesymbolet fra netværket (cachet); tryk igen for at gendanne";
+"批量下载网络图标" = "Skift alle netværksikoner";
+"下载并更新所有 Tab 的图标，再点恢复" = "Henter og opdaterer ikonerne for alle faner; tryk igen for at gendanne";
 "GIF 动图图标" = "GIF-symbol";
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Viser en animeret GIF som fanesymbol; tryk igen for at gendanne";
 "批量更换标题" = "Skift alle titler";
