@@ -24,6 +24,8 @@ extension CYLTabBarController {
 
     /// This tab bar controller's plus button, found by its #408 identifier. 通过 #408 的标识找到的 PlusButton。
     var demoPlusButton: UIControl? {
+        // Guard: only with a plus button. 仅在有 PlusButton 时处理。
+        guard hasPlusButton() else { return nil }
         return cyl_tabBarItemIdentifiers.lazy
             .compactMap { self.cyl_control(withTabBarItemIdentifier: $0) }
             .first { $0.cyl_isPlusButton() }
@@ -37,9 +39,13 @@ extension CYLTabBarController {
         }
     }
 
-    /// A tap on the plus button adds 1 to its badge. 点击 PlusButton 时角标数字加 1。
+    /// A tap on the plus button adds 1 to its badge. Call it from `tabBarController(_:didSelect:)`. `cyl_isPlusControl()`
+    /// also covers the system tab button of the plus child view controller (the layer under the plus button).
+    /// 点击 PlusButton 时角标数字加 1，在 `tabBarController(_:didSelect:)` 中调用。`cyl_isPlusControl()` 也包括 PlusButton
+    /// 子控制器的系统 Tab 按钮（PlusButton 下方的图层）。
     func demoPlusButtonDidTap(_ control: UIControl) {
-        guard control.cyl_isPlusButton() else { return }
+        // Guard: plus button code only when this tab bar controller has one. 仅在有 PlusButton 时处理 PlusButton。
+        guard hasPlusButton(), control.cyl_isPlusControl() else { return }
         demoUpdatePlusButtonBadge(addingOne: true)
     }
 
@@ -50,7 +56,15 @@ extension CYLTabBarController {
             return
         }
         plusButton.tag = max(plusButton.tag, 0) + 1
-        plusButton.cyl_showBadgeValue("\(plusButton.tag)", animationType: .bounce)
+        let badgeValue = "\(plusButton.tag)"
+        plusButton.cyl_showBadgeValue(badgeValue, animationType: .bounce)
+        // With a plus child view controller there is a second layer: its system tab button, under the plus button. Update
+        // it too, the way the other tabs' badges are set (on the view controller), so both always show the same value.
+        // 有 PlusButton 子控制器时还有第二个图层：PlusButton 下方该子控制器的系统 Tab 按钮。与其他 Tab 一样（在控制器上设置）
+        // 同时更新它，两者始终显示相同的值。
+        if hasPlusChildViewController() {
+            CYLPlusButton.plusChildViewController(forOwner: self)?.cyl_showBadgeValue(badgeValue, animationType: .bounce)
+        }
         NSLog("[#535] plus button badge %ld (Liquid Glass: %@, from CYLUtils)", plusButton.tag, CYLUtils.isLiquidGlassActive() ? "YES" : "NO")
     }
 }

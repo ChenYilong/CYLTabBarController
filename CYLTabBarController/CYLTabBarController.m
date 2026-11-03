@@ -166,6 +166,9 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @property (nonatomic, assign, getter=shouldInvokeOnceViewDidLayoutSubViewsBlock) BOOL invokeOnceViewDidLayoutSubViewsBlock;
 /// Blocks passed to `-reloadBadgesWithBlock:` that wait for the tab buttons (#404).
 @property (nonatomic, strong) NSMutableArray<CYLViewDidLayoutSubViewsBlock> *pendingReloadBadgesBlocks;
+/// The control last reported through `tabBarController:didSelectControl:` in the current run loop turn (one report per tap).
+/// 当前 runloop 中已通过 `tabBarController:didSelectControl:` 上报的控件（每次点击只上报一次）。
+@property (nonatomic, weak) UIControl *cyl_controlReportedInCurrentRunLoop;
 @property (nonatomic, strong) NSMutableArray<NSURL *> *lottieURLs;
 @property (nonatomic, strong) NSMutableArray *lottieSizes;
 @property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
@@ -2481,6 +2484,36 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     return [CYLConstants isLottieEnabledFromlottieURLs:self.lottieURLs tabBarItemsAttributes:self.tabBarItemsAttributes];
 }
 
+/*!
+ * [EN] The control to report for `control`: the plus button for the system tab button of its child view controller (the
+ *      layer under the plus button), `control` otherwise.
+ * [CN] 上报给代理的控件：PlusButton 子控制器的系统 Tab 按钮（PlusButton 下方的图层）换成 PlusButton 本身，其他控件不变。
+ */
+- (nullable UIControl *)cyl_reportedControlForControl:(nullable UIControl *)control {
+    // Guards: only with a plus button, and only when it has a child view controller (the second layer).
+    // 仅在有 PlusButton，且其有子控制器（第二个图层）时处理。
+    if (!control || ![self hasPlusButton] || ![self hasPlusChildViewController]) {
+        return control;
+    }
+    UIControl *plusButton = [self cyl_contextPlusButton];
+    if (!plusButton || control == plusButton || [control cyl_isPlusButton]) {
+        return control;
+    }
+    UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
+    BOOL isPlusChildTabButton = (control == plusChildViewController.cyl_tabButton) ||
+        (control == [plusChildViewController cyl_getViewControllerInsteadOfNavigationController].cyl_tabButton);
+    return isPlusChildTabButton ? plusButton : control;
+}
+
+/// Remembers `control` until the end of the current run loop turn. 记住 `control`，直到当前 runloop 结束。
+- (void)cyl_markControlReportedInCurrentRunLoop:(UIControl *)control {
+    self.cyl_controlReportedInCurrentRunLoop = control;
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        weakSelf.cyl_controlReportedInCurrentRunLoop = nil;
+    });
+}
+
 - (void)didSelectControl:(UIControl *)control {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     
@@ -2522,11 +2555,44 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
     UIControl *control_ = control ?: self.selectedViewController.cyl_tabButton;
     [self tabBarController:self beginShowPlatterLiquidLensViewForControl:control_];
     
-    if (shouldSelectViewController){
+    // FIX: plus button badge does not change on tap
+    // [EN] A plus button with a child view controller has two layers: the plus button and, under it, the system tab button
+    //      of `plusChildViewController`. A tap could be reported with that system tab button, which `-cyl_isPlusButton`
+    //      does not recognize, or not at all: when the plus child view controller is already selected,
+    //      `-updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:` disables that tab button and the
+    //      check above skipped the report. Report the plus button itself instead (its own `cyl_userInteractionDisabled`
+    //      still opts out), so the delegate always gets the same control for the plus button, as in a direct tap.
+    // [CN] 带子控制器的 PlusButton 有两个图层：PlusButton 本身，以及其下方 `plusChildViewController` 的系统 Tab 按钮。点击时可能上报
+    //      的是该系统 Tab 按钮（`-cyl_isPlusButton` 不认识它），或者根本不上报：子控制器已选中时，
+    //      `-updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:` 会禁用该 Tab 按钮，上面的判断就跳过了回调。
+    //      这里统一上报 PlusButton 本身（其 `cyl_userInteractionDisabled` 仍可关闭回调），代理每次都拿到同一个控件。
+    UIControl *reportedControl = [self cyl_reportedControlForControl:control_];
+    BOOL shouldReport = shouldSelectViewController;
+    if (reportedControl != control_) {
+        shouldReport = !reportedControl.cyl_userInteractionDisabled;
+    }
+    // [EN] One report per tap, only for a plus button with a child view controller. On Liquid Glass a tap on a plus button with a child view controller runs
+    //      `-plusChildViewControllerButtonClicked:` → `-setSelectedIndex:`, which reports through the
+    //      `selectedViewController` setter and then again itself; the gesture path for a selected control can add one more.
+    //      A badge that toggles on each callback was then flipped twice and looked unchanged. Reports of the same control
+    //      within one run loop turn belong to the same tap, so only the first one is sent. Tab buttons are not affected.
+    // [CN] 每次点击只上报一次，仅限带子控制器的 PlusButton，普通 Tab 按钮不受影响。液态玻璃下点击带子控制器的 PlusButton 会执行 `-plusChildViewControllerButtonClicked:` →
+    //      `-setSelectedIndex:`，它先通过 `selectedViewController` 的 setter 上报一次，自己又上报一次；选中状态下的手势路径还可能再上报。
+    //      每次回调切换一次的角标因此被切换两次，看起来没有变化。同一 runloop 内对同一控件的多次上报属于同一次点击，只发送第一次。
+    BOOL isPlusButtonWithChildViewController = [self hasPlusButton] && [self hasPlusChildViewController] &&
+        reportedControl && (reportedControl == [self cyl_contextPlusButton]);
+    if (shouldReport && isPlusButtonWithChildViewController &&
+        reportedControl == self.cyl_controlReportedInCurrentRunLoop) {
+        shouldReport = NO;
+    }
+    if (shouldReport) {
+        if (isPlusButtonWithChildViewController) {
+            [self cyl_markControlReportedInCurrentRunLoop:reportedControl];
+        }
         if ([self.delegate respondsToSelector:actin]) {
             CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
             (
-             [self.delegate performSelector:actin withObject:self withObject:control_];
+             [self.delegate performSelector:actin withObject:self withObject:reportedControl];
              );
         }
     }

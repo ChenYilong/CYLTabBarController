@@ -668,10 +668,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
     // #535: the plus button's badge changes on every tap. Checked first: before iOS 26 `-cyl_isTabButton` is YES for the
     // plus button too. #535：每次点击 PlusButton，角标都会变化。需先判断：iOS 26 以前 `-cyl_isTabButton` 对 PlusButton 也返回 YES。
-    if ([control cyl_isPlusButton]) {
+    // `-cyl_isPlusControl` also covers the system tab button of the plus child view controller (the layer under the
+    // plus button). `-cyl_isPlusControl` 也包括 PlusButton 子控制器的系统 Tab 按钮（PlusButton 下方的图层）。
+    // Guard: plus button code only when this tab bar controller has one. 仅在有 PlusButton 时处理 PlusButton。
+    BOOL isPlusControl = [tabBarController hasPlusButton] && [control cyl_isPlusControl];
+    if (isPlusControl) {
         [tabBarController cyl_demo_plusButtonDidTap];
     }
-    if ([control cyl_isTabButton] && ![control cyl_isPlusButton]) {
+    if ([control cyl_isTabButton] && !isPlusControl) {
         //更改红标状态
         if ([control cyl_isShowBadge]) {
             if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
@@ -692,7 +696,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     
     // The plus button of this tab bar controller's context (`CYLExternPlusButton` is the one registered last).
     UIButton *button = [CYLPlusButton plusButtonForOwner:tabBarController];
-    BOOL isPlusButton = [control cyl_isPlusButton];
+    BOOL isPlusButton = [tabBarController hasPlusButton] && [control cyl_isPlusControl];
     // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
     // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
     if (isPlusButton) {
@@ -829,6 +833,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (void)cyl_demo_showPlusButtonBadge {
     // The plus button of this tab bar controller's context. 当前 TabBarController 所在 context 的 PlusButton。
+    // Guard: only with a plus button. 仅在有 PlusButton 时处理。
+    if (![self hasPlusButton]) {
+        return;
+    }
     UIButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
     if (!plusButton) {
         return;
@@ -837,7 +845,17 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [self cyl_demo_setPlusButtonBadgeCount:count];
     // Same API and look as the tabs' badges (shared style: SceneDelegate.m -setUpBadgeAppearance).
     // 与 Tab 角标相同的 API 和样式（共用样式见 SceneDelegate.m -setUpBadgeAppearance）。
-    [plusButton cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(count)] animationType:CYLBadgeAnimationTypeBounce];
+    NSString *badgeValue = [NSString stringWithFormat:@"%@", @(count)];
+    [plusButton cyl_showBadgeValue:badgeValue animationType:CYLBadgeAnimationTypeBounce];
+    // With a plus child view controller there is a second layer: the system tab button of that view controller, under
+    // the plus button. Update it too, the way the other tabs' badges are set (on the view controller), so both always
+    // show the same value. 有 PlusButton 子控制器时还有第二个图层：PlusButton 下方该子控制器的系统 Tab 按钮。与其他 Tab 一样
+    // （在控制器上设置）同时更新它，两者始终显示相同的值。
+    // Guard: the second layer only exists with a plus child view controller. 仅在有 PlusButton 子控制器时存在第二个图层。
+    if ([self hasPlusChildViewController]) {
+        UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:self];
+        [plusChildViewController cyl_showBadgeValue:badgeValue animationType:CYLBadgeAnimationTypeBounce];
+    }
 #if defined(DEBUG) || defined(BETA)
     NSLog(@"🟣 #535 plus button badge %@ (Liquid Glass: %@, from CYLUtils)", @(count), [CYLUtils isLiquidGlassActive] ? @"YES" : @"NO");
 #endif
