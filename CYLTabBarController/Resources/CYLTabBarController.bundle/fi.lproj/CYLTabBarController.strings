@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Valitse välilehti, jonka tunniste on ”%@” (”%@”, indeksi %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop nykyinen pino, valitse välilehti, jonka tunniste on ”%@”, ja push uusi esittelysivu kyseiselle välilehdelle";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Kuten yllä, valitse välilehti, jonka tunniste on ”%@” (”%@”), pop-animaatiolla";
+"标题偏移（titlePositionAdjustment）" = "Otsikon siirtymä (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Napauta vaihtaaksesi kaikkien välilehtien otsikoiden pystysiirtymää, nykyinen: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance-teema (yhteinen Liquid Glassille ja FlatDesignille)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Napauta vaihtaaksesi tabBar.standardAppearance, nykyinen: %@";
+"原始" = "Alkuperäinen";
+"深色" = "Tumma";
+"居中胶囊" = "Keskitetty kapseli";
+"绿色描边" = "Vihreä viiva";

@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Välj fliken med identifieraren ”%@” (”%@”, index %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop den aktuella stacken, välj fliken med identifieraren ”%@” och push sedan en ny demosida till fliken";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Som ovan, välj fliken med identifieraren ”%@” (”%@”), med pop-animering";
+"标题偏移（titlePositionAdjustment）" = "Titelförskjutning (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Tryck för att växla den lodräta förskjutningen av alla fliktitlar, aktuell: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance-tema (gemensamt för Liquid Glass och FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Tryck för att växla tabBar.standardAppearance, aktuell: %@";
+"原始" = "Original";
+"深色" = "Mörk";
+"居中胶囊" = "Centrerad kapsel";
+"绿色描边" = "Grön linje";

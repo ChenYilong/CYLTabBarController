@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Pilih tab dengan pengecam “%@” (“%@”, indeks %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop tindanan semasa, pilih tab dengan pengecam “%@”, kemudian push halaman demo baharu ke tab itu";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Sama seperti di atas, pilih tab dengan pengecam “%@” (“%@”), dengan animasi pop";
+"标题偏移（titlePositionAdjustment）" = "Ofset tajuk (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Ketik untuk menukar ofset menegak tajuk semua tab, semasa: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "Tema standardAppearance (dikongsi oleh Liquid Glass dan FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Ketik untuk menukar tabBar.standardAppearance, semasa: %@";
+"原始" = "Asal";
+"深色" = "Gelap";
+"居中胶囊" = "Kapsul di tengah";
+"绿色描边" = "Garisan hijau";

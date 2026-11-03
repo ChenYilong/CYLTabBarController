@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "“%@” tanımlayıcılı sekmeyi seç (“%@”, dizin %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Geçerli yığını pop et, “%@” tanımlayıcılı sekmeyi seç, sonra o sekmeye yeni bir demo sayfası push et";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Yukarıdakiyle aynı, “%@” tanımlayıcılı sekmeyi seç (“%@”), pop animasyonlu";
+"标题偏移（titlePositionAdjustment）" = "Başlık kaydırması (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Tüm sekme başlıklarının dikey kaydırmasını değiştirmek için dokunun, geçerli: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance teması (Liquid Glass ve FlatDesign için ortak)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "tabBar.standardAppearance'ı değiştirmek için dokunun, geçerli: %@";
+"原始" = "Orijinal";
+"深色" = "Koyu";
+"居中胶囊" = "Ortalanmış kapsül";
+"绿色描边" = "Yeşil çizgi";

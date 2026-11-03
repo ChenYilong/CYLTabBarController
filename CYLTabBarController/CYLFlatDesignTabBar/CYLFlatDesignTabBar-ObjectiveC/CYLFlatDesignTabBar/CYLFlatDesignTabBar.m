@@ -40,6 +40,12 @@
 
 @end
 
+// Implemented in CYLFlatDesignTabBarButton.m: refreshes the button from its item and the bar's appearance.
+// 在 CYLFlatDesignTabBarButton.m 中实现：根据 item 与 TabBar 的 appearance 刷新按钮。
+@interface CYLFlatDesignTabBarButton (CYLFlatDesignAppearance)
+- (void)_updateTabBarButton;
+@end
+
 // FIX: issue #610 — implemented in CYLTabBarController.m.
 @interface CYLTabBarController (CYLFlatDesignPlusButtonReport)
 - (void)cyl_flatDesignReportDidSelectControl:(UIControl *)control;
@@ -51,6 +57,12 @@
     NSMutableArray *_buttons;
     /// FIX: issue #488. The token of the block-based Lottie observer: `-removeObserver:self` cannot remove it.
     id<NSObject> _lottieAnimationPlayingObserver;
+    /// The appearance the bar was last drawn with (`-_effectiveAppearance`), to refresh only when it changes.
+    /// 上次绘制所用的 appearance（`-_effectiveAppearance`），仅在改变时刷新。
+    id _appliedAppearance;
+    /// The top hairline drawn for `UIBarAppearance.shadowColor` when there is no shadow image.
+    /// 没有阴影图片时，按 `UIBarAppearance.shadowColor` 绘制的顶部细线。
+    UIView *_appearanceShadowLineView;
 }
 //@synthesize context = _context;
 
@@ -112,6 +124,8 @@
     if (itemIndex != NSNotFound) {
         CYLFlatDesignTabBarButton *tabBarButton = _buttons[itemIndex];
         tabBarButton.tabBarItem = changedItem;
+        // The selected item's own `standardAppearance` styles the whole bar. 选中 item 自身的 `standardAppearance` 作用于整个 TabBar。
+        [self _updateAppearanceIfNeeded];
     }
 }
 
@@ -278,65 +292,134 @@
 - (void)setBarTintColor:(UIColor *)barTintColor {
     if (_barTintColor != barTintColor) {
         _barTintColor = barTintColor;
-        _backgroundImageView.image = _backgroundImage;
-        if (_backgroundImage) {
-            if (_backgroundEffectView) {
-                [_backgroundEffectView removeFromSuperview];
-                _backgroundEffectView = nil;
-            }
-            _backgroundImageView.backgroundColor = [UIColor clearColor];
-        } else {
-            _backgroundImageView.backgroundColor = self.barTintColor;
-            if (!_backgroundEffectView) {
-                UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleProminent];
-                _backgroundEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-            }
-            [_backgroundView insertSubview:_backgroundEffectView atIndex:0];
-        }
-        [self setNeedsLayout];
+        [self _updateBackground];
     }
 }
 
 - (void)setBackgroundImage:(UIImage *)backgroundImage {
-
     if (_backgroundImage != backgroundImage) {
         _backgroundImage = backgroundImage;
-        _backgroundImageView.image = backgroundImage;
-        if (backgroundImage) {
-            if (_backgroundEffectView) {
-                [_backgroundEffectView removeFromSuperview];
-                _backgroundEffectView = nil;
-            }
-            _backgroundImageView.backgroundColor = [UIColor clearColor];
-        } else {
-            _backgroundImageView.backgroundColor = self.barTintColor;
-            if (!_backgroundEffectView) {
-                UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleProminent];
-                _backgroundEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-            }
-            [_backgroundView insertSubview:_backgroundEffectView atIndex:0];
-        }
-        [self setNeedsLayout];
+        [self _updateBackground];
     }
 }
 
 - (void)setShadowImage:(UIImage *)shadowImage {
     if (_shadowImage != shadowImage) {
         _shadowImage = shadowImage;
-        if (shadowImage) {
-            if (!_shadowImageView) {
-                _shadowImageView = [[UIImageView alloc] init];
-            }
-            _shadowImageView.image = shadowImage;
-            [_backgroundView addSubview:_shadowImageView];
-        } else {
-            if (_shadowImageView) {
-                [_shadowImageView removeFromSuperview];
-                _shadowImageView = nil;
-            }
-        }
-        [self setNeedsLayout];
+        [self _updateBackground];
     }
+}
+
+- (void)setStandardAppearance:(UITabBarAppearance *)standardAppearance {
+    if (_standardAppearance != standardAppearance) {
+        _standardAppearance = [standardAppearance copy];
+        [self _updateAppearanceIfNeeded];
+    }
+}
+
+#pragma mark - UITabBarAppearance mapping
+
+/*!
+ * [EN] The appearance the bar is drawn with: the selected item's own one, else `standardAppearance`; nil before iOS 13
+ *      or when neither is set (the flat design look and `barTintColor` / `backgroundImage` / `shadowImage`).
+ * [CN] TabBar 绘制所用的 appearance：选中 item 自身的，否则为 `standardAppearance`；iOS 13 以前或二者都未设置时为 nil
+ *      （使用扁平样式外观及 `barTintColor` / `backgroundImage` / `shadowImage`）。
+ */
+- (nullable UITabBarAppearance *)_effectiveAppearance API_AVAILABLE(ios(13.0)) {
+    return self.selectedItem.standardAppearance ?: _standardAppearance;
+}
+
+/// Redraws the background and every button when the effective appearance changed. 有效 appearance 改变时重绘背景与所有按钮。
+- (void)_updateAppearanceIfNeeded {
+    id appearance = nil;
+    if (@available(iOS 13.0, *)) {
+        appearance = [self _effectiveAppearance];
+    }
+    if (appearance == _appliedAppearance) {
+        return;
+    }
+    _appliedAppearance = appearance;
+    [self _updateBackground];
+    for (CYLFlatDesignTabBarButton *button in _buttons) {
+        [button _updateTabBarButton];
+    }
+    [self setNeedsLayout];
+}
+
+- (void)_setBackgroundEffect:(nullable UIVisualEffect *)effect {
+    if (!effect) {
+        [_backgroundEffectView removeFromSuperview];
+        _backgroundEffectView = nil;
+        return;
+    }
+    if (!_backgroundEffectView) {
+        _backgroundEffectView = [[UIVisualEffectView alloc] initWithEffect:effect];
+    } else {
+        _backgroundEffectView.effect = effect;
+    }
+    [_backgroundView insertSubview:_backgroundEffectView atIndex:0];
+}
+
+- (void)_setShadowImage:(nullable UIImage *)shadowImage tintColor:(nullable UIColor *)tintColor {
+    if (!shadowImage) {
+        [_shadowImageView removeFromSuperview];
+        _shadowImageView = nil;
+        return;
+    }
+    if (!_shadowImageView) {
+        _shadowImageView = [[UIImageView alloc] init];
+    }
+    _shadowImageView.image = shadowImage;
+    _shadowImageView.tintColor = tintColor;
+    [_backgroundView addSubview:_shadowImageView];
+}
+
+- (void)_setShadowLineColor:(nullable UIColor *)color {
+    if (!color) {
+        [_appearanceShadowLineView removeFromSuperview];
+        _appearanceShadowLineView = nil;
+        return;
+    }
+    if (!_appearanceShadowLineView) {
+        _appearanceShadowLineView = [[UIView alloc] init];
+    }
+    _appearanceShadowLineView.backgroundColor = color;
+    [_backgroundView addSubview:_appearanceShadowLineView];
+}
+
+/*!
+ * [EN] Draws the background and the top shadow, from the effective `UITabBarAppearance` if there is one, else from the
+ *      flat design properties (unchanged behavior: an image hides the blur; otherwise `barTintColor` over a blur).
+ * [CN] 绘制背景与顶部阴影：有有效的 `UITabBarAppearance` 时按其绘制，否则按扁平样式属性（行为不变：有背景图时不显示模糊，
+ *      否则在模糊之上显示 `barTintColor`）。
+ */
+- (void)_updateBackground {
+    if (@available(iOS 13.0, *)) {
+        UITabBarAppearance *appearance = [self _effectiveAppearance];
+        if (appearance) {
+            [self _setBackgroundEffect:appearance.backgroundEffect];
+            _backgroundImageView.image = appearance.backgroundImage;
+            _backgroundImageView.contentMode = appearance.backgroundImageContentMode;
+            _backgroundImageView.backgroundColor = appearance.backgroundColor ?: [UIColor clearColor];
+            UIImage *shadowImage = appearance.shadowImage;
+            [self _setShadowImage:shadowImage tintColor:appearance.shadowColor];
+            [self _setShadowLineColor:shadowImage ? nil : appearance.shadowColor];
+            [self setNeedsLayout];
+            return;
+        }
+    }
+    _backgroundImageView.image = _backgroundImage;
+    _backgroundImageView.contentMode = UIViewContentModeScaleToFill;
+    if (_backgroundImage) {
+        [self _setBackgroundEffect:nil];
+        _backgroundImageView.backgroundColor = [UIColor clearColor];
+    } else {
+        _backgroundImageView.backgroundColor = self.barTintColor;
+        [self _setBackgroundEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleProminent]];
+    }
+    [self _setShadowImage:_shadowImage tintColor:nil];
+    [self _setShadowLineColor:nil];
+    [self setNeedsLayout];
 }
 
 - (void)setRespectsVerticalStatusBarSafeArea:(BOOL)respectsVerticalStatusBarSafeArea {
@@ -465,6 +548,8 @@
         [self.contentView insertSubview:button atIndex:0];
         [_buttons addObject:button];
     }
+    // A different item may be selected now. 现在选中的可能是另一个 item。
+    [self _updateAppearanceIfNeeded];
     [self setNeedsLayout];
 }
 
@@ -478,6 +563,8 @@
             CYLFlatDesignTabBarButton *tabBarButton = _buttons[i];
             tabBarButton.selected = (i == selectedIndex);
         }
+        // The newly selected item may bring its own appearance. 新选中的 item 可能有自己的 appearance。
+        [self _updateAppearanceIfNeeded];
     }
 }
 
@@ -494,11 +581,19 @@
         _backgroundEffectView.frame = _backgroundView.bounds;
     }
     
+    // 像素比例取自当前 trait，而非 UIScreen.mainScreen（iPhone Duo 内外屏可能不同）
+    CGFloat displayScale = self.traitCollection.displayScale > 0 ? self.traitCollection.displayScale : 1.0;
+    CGFloat hairlineHeight = 1.0 / displayScale;
     if (_shadowImageView) {
-        // 像素比例取自当前 trait，而非 UIScreen.mainScreen（iPhone Duo 内外屏可能不同）
-        CGFloat displayScale = self.traitCollection.displayScale > 0 ? self.traitCollection.displayScale : 1.0;
-        CGFloat shadowImageHeight = 1.0 / displayScale;
+        CGFloat shadowImageHeight = hairlineHeight;
+        // An appearance's shadow image keeps its own height, as on `UITabBar`. appearance 的阴影图片保持自身高度，与 `UITabBar` 相同。
+        if (_appliedAppearance && _shadowImageView.image.size.height > 0) {
+            shadowImageHeight = _shadowImageView.image.size.height;
+        }
         _shadowImageView.frame = CGRectMake(0, -shadowImageHeight, CGRectGetWidth(_backgroundView.frame), shadowImageHeight);
+    }
+    if (_appearanceShadowLineView) {
+        _appearanceShadowLineView.frame = CGRectMake(0, -hairlineHeight, CGRectGetWidth(_backgroundView.frame), hairlineHeight);
     }
     
     // 放在UITabBarController里
@@ -532,6 +627,23 @@
         buttonWidth = contentWidth - margin * 2;
     } else {
         buttonWidth = (contentWidth - margin * 2 - (itemCount - 1) * buttonSpace) / itemCount;
+    }
+    // `UITabBarAppearance.stackedItemPositioning == .centered`: items of `stackedItemWidth` (or an equal share), spaced by
+    // `stackedItemSpacing`, centered; when they do not fit, they fill the width as before.
+    // `stackedItemPositioning` 为 `.centered` 时：item 宽度为 `stackedItemWidth`（或平分宽度），间距为 `stackedItemSpacing`，
+    // 整体居中；放不下时与之前一样铺满宽度。
+    if (@available(iOS 13.0, *)) {
+        UITabBarAppearance *appearance = [self _effectiveAppearance];
+        if (appearance.stackedItemPositioning == UITabBarItemPositioningCentered) {
+            CGFloat centeredSpace = MAX(appearance.stackedItemSpacing, 0);
+            CGFloat centeredWidth = appearance.stackedItemWidth > 0 ? appearance.stackedItemWidth : (contentWidth - (itemCount - 1) * centeredSpace) / itemCount;
+            CGFloat totalWidth = itemCount * centeredWidth + (itemCount - 1) * centeredSpace;
+            if (centeredWidth > 0 && totalWidth <= contentWidth) {
+                buttonWidth = centeredWidth;
+                buttonSpace = centeredSpace;
+                margin = (contentWidth - totalWidth) / 2;
+            }
+        }
     }
     CGFloat buttonHeight = CGRectGetHeight(self.contentView.frame) - buttonY;
     BOOL isRightToLeft = [self cyl_isRightToLeftLayout];

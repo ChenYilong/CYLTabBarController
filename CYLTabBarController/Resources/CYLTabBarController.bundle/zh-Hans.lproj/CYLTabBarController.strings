@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "选中标识为「%@」的 Tab（「%@」，index %@）";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "同上，选中标识为「%@」的 Tab（「%@」），带弹出动画";
+"标题偏移（titlePositionAdjustment）" = "标题偏移（titlePositionAdjustment）";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "点击切换所有 Tab 标题的垂直偏移，当前：%@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance 主题（液态玻璃与扁平样式共用）";
+"点击切换 tabBar.standardAppearance，当前：%@" = "点击切换 tabBar.standardAppearance，当前：%@";
+"原始" = "原始";
+"深色" = "深色";
+"居中胶囊" = "居中胶囊";
+"绿色描边" = "绿色描边";

@@ -350,8 +350,30 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 /*!
  * To set both Item label text attributes in the tabBar,
  * use the following to tweak the relative position of the label within the tab button (for handling visual centering corrections if needed because of custom text attributes)
+ *
+ * FIX: issue #475
+ * [EN] The title offset of every tab. A tab's own `CYLTabBarItemTitlePositionAdjustment` takes precedence over it.
+ *      Settable at runtime: setting it re-applies the offset to the tabs already added and lays them out again.
+ *      On iOS 13+ UIKit ignores `-[UITabBarItem titlePositionAdjustment]` once the tab bar uses `UITabBarAppearance`
+ *      (e.g. after `tabBar.standardAppearance = ...`), so the offset is also written into a copy of the tab bar's
+ *      `standardAppearance` (and `scrollEdgeAppearance` on iOS 15+) installed on each tab with an offset. Changes the
+ *      app makes to the tab bar's appearance later are picked up on the next layout. `UIOffsetZero` leaves the tabs
+ *      untouched, so an offset set through the appearance proxy or `UITabBarAppearance` still applies (issue #583).
+ *      Works for all tab bar styles: the classic system tab bar, Liquid Glass (iOS 26+) and FlatDesign.
+ * [CN] 所有 Tab 的标题偏移，Tab 自身的 `CYLTabBarItemTitlePositionAdjustment` 优先。
+ *      可在运行时设置：设置后会对已添加的 Tab 重新应用偏移并重新布局。
+ *      iOS 13+ 上，TabBar 使用 `UITabBarAppearance` 后（如 `tabBar.standardAppearance = ...`），UIKit 会忽略
+ *      `-[UITabBarItem titlePositionAdjustment]`，因此偏移同时写入 TabBar `standardAppearance`（iOS 15+ 还有 `scrollEdgeAppearance`）
+ *      的副本，安装到有偏移的 Tab 上。之后 App 对 TabBar appearance 的修改会在下次布局时同步。`UIOffsetZero` 不会修改 Tab，
+ *      通过 appearance 代理或 `UITabBarAppearance` 设置的偏移仍然生效（issue #583）。
+ *      适用于所有 TabBar 样式：经典系统 TabBar、液态玻璃（iOS 26+）与扁平样式。
+ *
+ *          // Objective-C
+ *          tabBarController.titlePositionAdjustment = UIOffsetMake(0, -3);
+ *          // Swift
+ *          tabBarController.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3)
  */
-@property (nonatomic, readonly, assign) UIOffset titlePositionAdjustment;
+@property (nonatomic, readwrite, assign) UIOffset titlePositionAdjustment;
 
 /*!
  * To set both Item label text attributes in the tabBar,

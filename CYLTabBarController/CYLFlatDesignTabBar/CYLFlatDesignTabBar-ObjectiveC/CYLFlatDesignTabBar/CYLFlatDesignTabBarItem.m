@@ -122,6 +122,13 @@ NSString *const CYLFlatDesignTabBarItemDidChange = @"CYLFlatDesignTabBarItemDidC
     }
 }
 
+- (void)setStandardAppearance:(UITabBarAppearance *)standardAppearance {
+    if (_standardAppearance != standardAppearance) {
+        _standardAppearance = [standardAppearance copy];
+        [[NSNotificationCenter defaultCenter] postNotificationName:CYLFlatDesignTabBarItemDidChange object:self];
+    }
+}
+
 - (void)setBadgeColor:(UIColor *)badgeColor {
     if (_badgeColor != badgeColor) {
         _badgeColor = badgeColor;

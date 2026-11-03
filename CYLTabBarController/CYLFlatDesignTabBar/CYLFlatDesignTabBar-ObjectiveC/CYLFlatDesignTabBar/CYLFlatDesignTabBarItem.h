@@ -70,6 +70,17 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
 @property (nonatomic, readwrite, assign) UIOffset titlePositionAdjustment UI_APPEARANCE_SELECTOR;
 
 /*!
+ * [EN] Like `-[UITabBarItem standardAppearance]`: while this item is selected, the whole flat design tab bar uses this
+ *      appearance instead of `-[CYLFlatDesignTabBar standardAppearance]`. `CYLTabBarController` assigns the child view
+ *      controller's `tabBarItem.standardAppearance` here when the app has set one. See
+ *      `-[CYLFlatDesignTabBar standardAppearance]` for what is mapped.
+ * [CN] 与 `-[UITabBarItem standardAppearance]` 相同：该 item 选中期间，整个扁平样式 TabBar 使用此 appearance，而不是
+ *      `-[CYLFlatDesignTabBar standardAppearance]`。App 设置了子控制器的 `tabBarItem.standardAppearance` 时，`CYLTabBarController`
+ *      会将其赋给这里。映射关系见 `-[CYLFlatDesignTabBar standardAppearance]`。
+ */
+@property (nullable, nonatomic, copy) UITabBarAppearance *standardAppearance API_AVAILABLE(ios(13.0));
+
+/*!
  * [EN] Sets the title text attributes for `state` (like UITabBarItem).
  * [CN] 设置指定状态下的标题文字属性（同 UITabBarItem）。
  */

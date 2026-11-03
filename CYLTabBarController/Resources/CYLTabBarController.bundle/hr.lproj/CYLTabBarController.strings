@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Odaberi karticu s identifikatorom „%@” („%@”, indeks %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop trenutnog stoga, odabir kartice s identifikatorom „%@”, zatim push nove demo stranice na tu karticu";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Kao gore, odaberi karticu s identifikatorom „%@” („%@”), s pop animacijom";
+"标题偏移（titlePositionAdjustment）" = "Pomak naslova (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Dodirnite za promjenu okomitog pomaka naslova svih kartica, trenutačno: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "Tema standardAppearance (zajednička za Liquid Glass i FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Dodirnite za promjenu tabBar.standardAppearance, trenutačno: %@";
+"原始" = "Izvorno";
+"深色" = "Tamno";
+"居中胶囊" = "Centrirana kapsula";
+"绿色描边" = "Zelena linija";

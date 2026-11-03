@@ -55,6 +55,75 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly) NSArray<CYLFlatDesignTabBarButton *> *tabBarButtons;
 
+/*!
+ * [EN] The `UITabBarAppearance` of the flat design tab bar, like `-[UITabBar standardAppearance]`: one appearance object
+ *      styles the system tab bar (Liquid Glass and the classic style) and this tab bar alike. Nil (the default) keeps the
+ *      flat design look and the properties below.
+ *      `CYLTabBarController` assigns `tabBarController.tabBar.standardAppearance` here when the app has set one, so
+ *      setting the system tab bar's appearance is enough; assigning this property directly also works.
+ *      When the selected item has its own `-[CYLFlatDesignTabBarItem standardAppearance]`, the whole bar uses that one
+ *      while it is selected, as `UITabBar` does.
+ *
+ *      Mapping (UITabBarAppearance → flat design tab bar):
+ *          backgroundEffect                 → the background blur (nil: no blur)
+ *          backgroundColor                  → the background color
+ *          backgroundImage                  → the background image
+ *          backgroundImageContentMode       → the background image's content mode
+ *          shadowImage                      → the top shadow line (its own height; tinted by shadowColor if template)
+ *          shadowColor                      → a hairline at the top when there is no shadowImage (nil/clear: none)
+ *          selectionIndicatorImage          → drawn behind the selected item
+ *          selectionIndicatorTintColor      → tints the selection indicator image
+ *          stackedItemPositioning           → .centered lays the items out centered; .fill / .automatic fill the width
+ *          stackedItemWidth                 → the item width when centered (0: equal share of the width)
+ *          stackedItemSpacing               → the spacing between items when centered
+ *          stackedLayoutAppearance.normal / .selected / .disabled (UITabBarItemStateAppearance):
+ *              titleTextAttributes          → title font, color and other attributes (they override the item's own)
+ *              titlePositionAdjustment      → the title offset when the item has none (`CYLTabBarController.titlePositionAdjustment` wins, as on the system tab bar)
+ *              iconColor                    → the icon tint color (template images)
+ *              badgeBackgroundColor         → the badge background color
+ *              badgeTextAttributes          → the badge font and text color
+ *              badgePositionAdjustment      → the badge center offset
+ *      Not mapped: inline/compact inline layouts (the flat design bar is always stacked), scroll edge appearances,
+ *      `badgeTitlePositionAdjustment` and the focused state. Badge values a state does not customize (equal to a new
+ *      `UITabBarAppearance`) leave the badge's own settings and `CYLBadgeAppearance` in place.
+ * [CN] 扁平样式 TabBar 的 `UITabBarAppearance`，与 `-[UITabBar standardAppearance]` 相同：同一个 appearance 对象即可同时
+ *      设置系统 TabBar（液态玻璃与经典样式）和本 TabBar。默认 nil，保持扁平样式外观及下列属性。
+ *      App 设置了 `tabBarController.tabBar.standardAppearance` 时，`CYLTabBarController` 会将其赋给这里，所以只需设置系统 TabBar
+ *      的 appearance；也可以直接设置本属性。
+ *      选中的 item 有自己的 `-[CYLFlatDesignTabBarItem standardAppearance]` 时，选中期间整个 TabBar 使用它，与 `UITabBar` 相同。
+ *
+ *      映射关系（UITabBarAppearance → 扁平样式 TabBar）：
+ *          backgroundEffect                 → 背景模糊效果（nil：无模糊）
+ *          backgroundColor                  → 背景色
+ *          backgroundImage                  → 背景图
+ *          backgroundImageContentMode       → 背景图的 contentMode
+ *          shadowImage                      → 顶部阴影线（使用图片自身高度；为模板图时由 shadowColor 着色）
+ *          shadowColor                      → 没有 shadowImage 时顶部的细线（nil / 透明：无）
+ *          selectionIndicatorImage          → 绘制在选中 item 背后
+ *          selectionIndicatorTintColor      → 选中指示图的着色
+ *          stackedItemPositioning           → .centered 时 item 居中排列；.fill / .automatic 铺满宽度
+ *          stackedItemWidth                 → 居中排列时的 item 宽度（0：平分宽度）
+ *          stackedItemSpacing               → 居中排列时 item 的间距
+ *          stackedLayoutAppearance.normal / .selected / .disabled（UITabBarItemStateAppearance）：
+ *              titleTextAttributes          → 标题字体、颜色等属性（覆盖 item 自身的设置）
+ *              titlePositionAdjustment      → item 没有标题偏移时使用（`CYLTabBarController.titlePositionAdjustment` 优先，与系统 TabBar 相同）
+ *              iconColor                    → 图标着色（模板图片）
+ *              badgeBackgroundColor         → 角标背景色
+ *              badgeTextAttributes          → 角标字体与文字颜色
+ *              badgePositionAdjustment      → 角标中心偏移
+ *      未映射：inline / compact inline 布局（扁平样式 TabBar 始终为 stacked）、scroll edge appearance、`badgeTitlePositionAdjustment`
+ *      与 focused 状态。某状态未自定义的角标值（与新建的 `UITabBarAppearance` 相同）不会修改角标自身设置与 `CYLBadgeAppearance`。
+ *
+ *          // One appearance for Liquid Glass and FlatDesign. 同一个 appearance 同时用于液态玻璃与扁平样式。
+ *          UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
+ *          appearance.backgroundColor = UIColor.systemBackgroundColor;
+ *          appearance.shadowColor = UIColor.systemGreenColor;
+ *          appearance.stackedLayoutAppearance.selected.iconColor = UIColor.systemGreenColor;
+ *          appearance.stackedLayoutAppearance.selected.titleTextAttributes = @{ NSForegroundColorAttributeName : UIColor.systemGreenColor };
+ *          tabBarController.tabBar.standardAppearance = appearance;
+ */
+@property (nullable, nonatomic, copy) UITabBarAppearance *standardAppearance API_AVAILABLE(ios(13.0));
+
 @property (null_resettable, nonatomic, strong) UIColor *tintColor;
 @property (nullable, nonatomic, strong) UIColor *barTintColor UI_APPEARANCE_SELECTOR;  // default is nil
 

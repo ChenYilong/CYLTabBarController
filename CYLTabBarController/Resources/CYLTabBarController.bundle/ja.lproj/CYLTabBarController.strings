@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "識別子が「%@」のタブを選択（「%@」、index %@）";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "現在のスタックを Pop し、識別子が「%@」のタブを選択して、そのタブに新しいデモ画面を push";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "上と同じ。識別子が「%@」のタブ（「%@」）を選択、ポップアニメーションあり";
+"标题偏移（titlePositionAdjustment）" = "タイトルのオフセット（titlePositionAdjustment）";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "タップしてすべてのタブタイトルの垂直オフセットを切り替え、現在：%@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance テーマ（Liquid Glass と FlatDesign で共通）";
+"点击切换 tabBar.standardAppearance，当前：%@" = "タップして tabBar.standardAppearance を切り替え、現在：%@";
+"原始" = "オリジナル";
+"深色" = "ダーク";
+"居中胶囊" = "中央のカプセル";
+"绿色描边" = "緑のライン";
