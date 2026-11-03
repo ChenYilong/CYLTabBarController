@@ -14,6 +14,28 @@
 @property (nonatomic, strong) NSMutableData *data;
 @end
 
+UIInterfaceOrientationMask CYLInfoPlistSupportedInterfaceOrientations(void) {
+    NSDictionary *info = NSBundle.mainBundle.infoDictionary;
+    NSArray<NSString *> *orientations = nil;
+    if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        orientations = info[@"UISupportedInterfaceOrientations~ipad"];
+    }
+    if (orientations.count == 0) {
+        orientations = info[@"UISupportedInterfaceOrientations"];
+    }
+    NSDictionary<NSString *, NSNumber *> *masks = @{
+        @"UIInterfaceOrientationPortrait": @(UIInterfaceOrientationMaskPortrait),
+        @"UIInterfaceOrientationPortraitUpsideDown": @(UIInterfaceOrientationMaskPortraitUpsideDown),
+        @"UIInterfaceOrientationLandscapeLeft": @(UIInterfaceOrientationMaskLandscapeLeft),
+        @"UIInterfaceOrientationLandscapeRight": @(UIInterfaceOrientationMaskLandscapeRight),
+    };
+    UIInterfaceOrientationMask mask = 0;
+    for (NSString *orientation in orientations) {
+        mask |= masks[orientation].unsignedIntegerValue;
+    }
+    return mask ?: UIInterfaceOrientationMaskAllButUpsideDown;
+}
+
 @implementation AppDelegate
 
 //- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -52,12 +74,8 @@ CYL_METHOD_SIGNATURES_PUSH
         //只支持横屏
         return UIInterfaceOrientationMaskLandscape;
     }
-    // FIX: issue #680 可折叠设备（iPhone Duo）跟随设备横竖屏，展开内屏横屏时铺满屏幕
-    if (self.supportsLandscapeOnFoldableDevice) {
-        return UIInterfaceOrientationMaskAllButUpsideDown;
-    }
-    //只支持竖屏
-    return UIInterfaceOrientationMaskPortrait;
+    // Otherwise the orientations set in Xcode (Info.plist). 其他情况以 Xcode 中的设置（Info.plist）为准。
+    return CYLInfoPlistSupportedInterfaceOrientations();
 }
 CYL_METHOD_SIGNATURES_POP
 /**
