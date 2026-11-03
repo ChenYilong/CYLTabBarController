@@ -166,6 +166,11 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         func animation(for theme: Theme) -> AnimationSource? {
             return .native("tabbar_\(self)_\(theme)")
         }
+
+        // 4.1 深色模式动效（#442）：LottieResources/tabbar_<模块>_<主题>_dark.json，不存在时沿用上面的动效
+        func darkAnimation(for theme: Theme) -> AnimationSource? {
+            return .native("tabbar_\(self)_\(theme)_dark")
+        }
         
         // 5. 控制器配置 (使用原生 UIViewController 占位)
         var controller: UIViewController {
@@ -224,6 +229,9 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             
             if let anim = module.animation(for: theme), let url = anim.resolvedURL {
                 attrs[CYLTabBarLottieURL] = url
+                if let darkURL = module.darkAnimation(for: theme)?.resolvedURL {
+                    attrs[CYLTabBarLottieDarkURL] = darkURL
+                }
                 attrs[CYLTabBarLottieSize] = NSValue(cgSize: theme.lottieSize)
             }
             return attrs

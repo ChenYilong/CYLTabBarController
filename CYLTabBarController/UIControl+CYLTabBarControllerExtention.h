@@ -105,6 +105,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_setLottieAnimationSpeed:(CGFloat)animationSpeed;
 
 /*!
+ * FIX: issue #442
+ * [EN] Swaps this tab's Lottie view for the version of its animation that matches the current interface style
+ *      (`CYLTabBarLottieDarkURL`), keeping its position and playback state. Does nothing when it already matches, has no
+ *      dark version, or Lottie is not integrated. CYLTabBarController calls it when the style changes.
+ * [CN] 将当前 Tab 的 Lottie 视图替换为与当前界面风格相符的动画版本（`CYLTabBarLottieDarkURL`），保持位置和播放状态。已相符、
+ *      没有深色版本或未集成 Lottie 时不做处理。CYLTabBarController 在风格变化时会自动调用。
+ */
+- (void)cyl_reloadLottieAnimationViewForCurrentStyle;
+
+/*!
  * [EN] Plays the Lottie animation for this tab (adding the view if needed); shows the final frame instead when `defaultSelected` is YES.
  * [CN] 播放当前 Tab 的 Lottie 动画（必要时先添加视图）；defaultSelected 为 YES 时直接显示最后一帧。
  */

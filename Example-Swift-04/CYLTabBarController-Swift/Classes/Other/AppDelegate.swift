@@ -39,7 +39,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
                                                                       ["home_normal", "mycity_normal", "message_normal", "account_normal"],
                                                                       ["home_highlight", "mycity_highlight", "message_highlight", "account_highlight"],
                                                                       [2: "message_normal_night"])
-        return MainTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributes)
+        // #442: Lottie icons, with their Dark Mode versions (<name>_dark.json → CYLTabBarLottieDarkFilePath).
+        // Lottie 图标及其深色版本（<名称>_dark.json → CYLTabBarLottieDarkFilePath）。
+        // Shown with a Lottie subspec (e.g. pod 'CYLTabBarController/LottieSwift'); the Core subspec keeps the images.
+        // 需引入 Lottie 子库（如 pod 'CYLTabBarController/LottieSwift'）才显示；只引入 Core 时仍显示图片。
+        let lottieTabBarItemsAttributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
+        return MainTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: lottieTabBarItemsAttributes)
     }
 
 

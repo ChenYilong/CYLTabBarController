@@ -135,9 +135,27 @@ extension MainTabBarController {
     static func makeTabBarItemsAttributes() -> [[AnyHashable: Any]] {
         // Dark Mode (#620): "home_normal" also loads home_normal_dark (naming convention), the message tab names its dark
         // image, account_normal has its own Dark appearance. 深色模式：见 README「适配深色模式」。
-        return CYLLocalizedTabBarItemsAttributes(["首页", "鱼塘", "消息", "我的"],
-                                                 ["home_normal", "fishpond_normal", "message_normal", "account_normal"],
-                                                 ["home_highlight", "fishpond_highlight", "message_highlight", "account_highlight"],
-                                                 [2: "message_normal_night"])
+        let attributes = CYLLocalizedTabBarItemsAttributes(["首页", "鱼塘", "消息", "我的"],
+                                                           ["home_normal", "fishpond_normal", "message_normal", "account_normal"],
+                                                           ["home_highlight", "fishpond_highlight", "message_highlight", "account_highlight"],
+                                                           [2: "message_normal_night"])
+        let lottieAttributes = CYLTabBarItemsAttributesAddingLottieFiles(attributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
+        // #442 (Lottie 4.x): one file per tab follows Dark Mode, its colors set with Lottie's value providers.
+        // 每个 Tab 一份 Lottie 文件适配深色模式，颜色通过 Lottie 的 value provider 设置。
+        return zip(lottieAttributes, lottieDarkColors()).map { item, darkColors in
+            var item = item
+            item[CYLTabBarLottieDarkColors] = darkColors
+            return item
+        }
+    }
+
+    /// Dark Mode colors of the green Lottie icons (keypath -> color): the gray outline of the unselected icon turns
+    /// light gray, the pale fill of the selected one dark green; the green outline is kept.
+    /// 绿色 Lottie 图标的深色颜色（keypath -> 颜色）：未选中的灰色描边改为浅灰，选中的浅色填充改为深绿，绿色描边不变。
+    static func lottieDarkColors() -> [[String: UIColor]] {
+        return ["Icon_Shop", "Icon_Discovery", "Icon_Knowledge", "Icon_Mine"].map { layer in
+            ["\(layer)_Normal.**.Color": UIColor(white: 0.78, alpha: 1),
+             "\(layer)_Active_Main.**.Color": UIColor(red: 0.15, green: 0.39, blue: 0.16, alpha: 1)]
+        }
     }
 }
