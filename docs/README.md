@@ -23,6 +23,7 @@
 | [有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应](PlusButton-Lottie-TabIcon.md) | [Lottie tab icons and their files when there is a PlusButton](PlusButton-Lottie-TabIcon.md) |
 | [PlusButton 点击范围：扩大、按倍数放大与调试显示](PlusButton-Touchable-Area.md) | [PlusButton touchable area: grow it, scale it, and see it](PlusButton-Touchable-Area.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
+| [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
 
 <!-- navigation:end -->
 
@@ -49,6 +50,7 @@ docs/
 ├── PlusButton-Touchable-Area.md
 ├── README.md
 ├── Swift-Guide.md
+├── SwiftUI-Integration.md
 └── assets/
     ├── docs-navigation-index.png
     ├── flatdesign-standard-appearance-mapping.svg

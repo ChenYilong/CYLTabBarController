@@ -15,6 +15,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Touchable-Area.md
 //   - Using CYLTabBarController in Swift / 在 Swift 项目中使用 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
+//   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
 // docs-binding:end
 
 #import "CYLConstants.h"
