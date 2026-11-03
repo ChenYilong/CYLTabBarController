@@ -53,29 +53,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 FOUNDATION_EXTERN CAAnimation *_Nullable CYLBadgeAnimationForType(CYLBadgeAnimationType animationType, CGSize badgeSize);
 
-/*!
- * [EN] A transparent view that holds a badge outside the view the badge belongs to, so nothing clips or covers it. It is
- *      either the top-most subview of a container, or sits right above a given sibling; constraints keep it on
- *      `alignView`'s frame, and it follows the `hidden` and `alpha` of the views it is told to follow (KVO on their
- *      layers). Used for hosts that clip (UIView+CYLBadgeExtention) and for the badges of controls (UIControl+CYLBadgeExtention).
- * [CN] 透明视图，在角标所属视图之外承载角标，使其不被裁剪或遮挡。它要么是容器最上层的子视图，要么紧贴某个兄弟视图之上；约束使其与
- *      `alignView` 的 frame 对齐，并跟随指定视图的 `hidden`、`alpha`（KVO 其 layer）。用于会裁剪的宿主（UIView+CYLBadgeExtention）
- *      以及控件的角标（UIControl+CYLBadgeExtention）。
- */
-@interface CYLBadgeHostOverlayView : UIView
-/// The view it is aligned to. 对齐的视图。
-@property (nonatomic, weak, readonly, nullable) UIView *host;
-- (void)cyl_attachToContainer:(UIView *)container
-                 aboveSubview:(nullable UIView *)sibling
-                alignedToView:(UIView *)alignView
-    followingVisibilityOfViews:(NSArray<UIView *> *)views;
-/// Right above `host` in its superview, aligned to it and following its visibility. 紧贴 `host` 之上，与其对齐并跟随其可见性。
-- (void)cyl_attachToHost:(UIView *)host;
-- (void)cyl_detach;
-/// Removes this view from its superview when `owner` is deallocated. `owner` 销毁时将本视图移除。
-- (void)cyl_removeWhenDeallocated:(id)owner;
-@end
-
 NS_ASSUME_NONNULL_END
 
 #endif /* CYLBadgeViewDefines_h */

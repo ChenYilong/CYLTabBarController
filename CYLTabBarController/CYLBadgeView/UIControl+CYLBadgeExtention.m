@@ -26,46 +26,6 @@
 #define kActualView ((UIView *)[self cyl_getActualBadgeSuperView])
 #define CYL_ACTUAL_BARBUTTON kActualView
 
-/// The icon a control's badge sits on: its Lottie view, else its tab image view, when visible. 角标所在的图标：Lottie 视图或 Tab 图片视图。
-static UIView *CYLBadgeIconViewOfControl(UIControl *control) {
-    UIView *lottieAnimationView = (UIView *)control.cyl_lottieAnimationView;
-    if (lottieAnimationView && !lottieAnimationView.cyl_isInvisiable) {
-        return lottieAnimationView;
-    }
-    UIImageView *tabImageView = [control cyl_tabImageView];
-    if (tabImageView && !tabImageView.cyl_isInvisiable) {
-        return tabImageView;
-    }
-    return nil;
-}
-
-/*!
- * [EN] The outermost view from `view` up that clips (clipsToBounds, masksToBounds or a mask), inside the tab bar
- *      (UITabBar or CYLFlatDesignTabBar) that holds `view`: the badge may leave the views of its tab bar, never the tab bar
- *      itself, so it still moves and hides with it. With Liquid Glass this is the platter (`cyl_platterView`). Outside a
- *      tab bar only `view` itself counts, so a button elsewhere (e.g. in a sheet that animates) keeps its anchor close.
- * [CN] 从 `view` 向上、在包含它的 TabBar（UITabBar 或 CYLFlatDesignTabBar）之内最外层会裁剪（clipsToBounds、masksToBounds 或 mask）
- *      的视图：角标可以离开 TabBar 内部的视图，但不会离开 TabBar 本身，因此仍随 TabBar 移动、隐藏。液态玻璃下即 platter
- *      （`cyl_platterView`）。不在 TabBar 中时只考虑 `view` 本身，其他位置的按钮（例如位于带动画的 sheet 中）锚点不会离得太远。
- */
-static UIView *CYLBadgeOutermostClippingView(UIView *view) {
-    Class flatDesignTabBarClass = NSClassFromString(@"CYLFlatDesignTabBar");
-    BOOL viewClips = view.clipsToBounds || view.layer.masksToBounds || view.layer.mask;
-    UIView *clippingView = nil;
-    for (UIView *ancestor = view; ancestor; ancestor = ancestor.superview) {
-        if ([ancestor isKindOfClass:[UITabBar class]] || (flatDesignTabBarClass && [ancestor isKindOfClass:flatDesignTabBarClass])) {
-            return clippingView;    // inside a tab bar 位于 TabBar 中
-        }
-        if ([ancestor isKindOfClass:[UIScrollView class]] || [ancestor isKindOfClass:[UIWindow class]]) {
-            break;
-        }
-        if (ancestor.clipsToBounds || ancestor.layer.masksToBounds || ancestor.layer.mask) {
-            clippingView = ancestor;
-        }
-    }
-    return viewClips ? view : nil;
-}
-
 @implementation UIControl (CYLBadgeExtention) 
 
 - (void)cyl_setBadgeValue:(NSString *)badgeValue {
@@ -191,7 +151,23 @@ static UIView *CYLBadgeOutermostClippingView(UIView *view) {
     // badge label will be added onto imageView
     //只有在TabBar选中状态下才能取到SwappableImageView
     UIControl *tabButton = self;
-    UIView *actualBadgeSuperView = CYLBadgeIconViewOfControl(tabButton);
+    UIImageView *tabImageView = [tabButton cyl_tabImageView];
+    UIView *lottieAnimationView = (UIView *)tabButton.cyl_lottieAnimationView;
+    
+    UIView *actualBadgeSuperView = nil;
+    
+    do {
+        if (lottieAnimationView && !lottieAnimationView.cyl_isInvisiable) {
+            actualBadgeSuperView = lottieAnimationView;
+
+            break;
+        }
+        if (tabImageView && !tabImageView.cyl_isInvisiable) {
+            actualBadgeSuperView = tabImageView;
+
+            break;
+        }
+    } while (NO);
     // By class name: `-cyl_isTabButton` is YES for every UIControl before iOS 26. UITabBarButton, _UITabButton and
     // CYLFlatDesignTabBarButton are tab buttons. 按类名判断：iOS 26 以前 `-cyl_isTabButton` 对所有 UIControl 都返回 YES。
     NSString *controlClassName = NSStringFromClass(tabButton.class);
@@ -205,39 +181,17 @@ static UIView *CYLBadgeOutermostClippingView(UIView *view) {
          *      icon's `clipsToBounds`. The badge now goes on a transparent anchor that is the control's top-most
          *      subview (zPosition MAXFLOAT, so content the control adds later stays below it), aligned to the icon or,
          *      without one, to the whole control: it is always drawn above everything in the control, at the icon's
-         *      top-right corner as before. When the control or, inside a tab bar, a view above it clips (clipsToBounds,
-         *      masksToBounds or a mask), the anchor goes right above the outermost such view instead, so the clipping
-         *      does not cut the badge (see `-cyl_badgeAnchorViewAlignedToView:`).
+         *      top-right corner as before. When the control clips (clipsToBounds, masksToBounds or a mask), the anchor
+         *      goes right above the control in its superview instead, so the clipping does not cut the badge. Tab
+         *      buttons are unchanged.
          * [CN] 非 Tab 按钮的控件（PlusButton、任意 UIButton）的角标原先放在其图标视图中。该视图可能位于控件其他内容之下：使用
          *      configuration 的 UIButton 会在找到的第一个图片视图之上绘制图片，因此 PlusButton 的「+」遮住了大部分角标；原逻辑还会
          *      修改图标的 `clipsToBounds`。现在角标放在一个透明的锚点视图上，它是控件最上层的子视图（zPosition 为 MAXFLOAT，控件之后
          *      添加的内容也位于其下），与图标对齐，没有图标时与整个控件对齐：角标总是绘制在控件所有内容之上，位置仍在图标右上角。
-         *      控件本身或（位于 TabBar 中时）其上层视图会裁剪（clipsToBounds、masksToBounds 或 mask）时，锚点改为紧贴最外层的
-         *      这类视图之上，角标不再被裁剪（见 `-cyl_badgeAnchorViewAlignedToView:`）。
+         *      控件本身会裁剪（clipsToBounds、masksToBounds 或 mask）时，锚点改为放在父视图中、紧贴控件之上，角标不再被裁剪。
+         *      Tab 按钮不变。
          */
         return [tabButton cyl_badgeAnchorViewAlignedToView:actualBadgeSuperView];
-    }
-    UIView *clippingView = actualBadgeSuperView ? CYLBadgeOutermostClippingView(tabButton) : nil;
-    if (clippingView.superview) {
-        /*!
-         * FIX: tab badges cut by the Liquid Glass platter
-         * [EN] With Liquid Glass the tab buttons are inside the platter (`cyl_platterView`), which clips them to its capsule,
-         *      so a badge near its edge was cut, e.g. "NEW" on the last tab of the vertical bar on the iPhone Duo. The badge
-         *      now goes on an anchor right above the platter in its superview, aligned to the icon; it follows the
-         *      visibility of the tab button and of the views up to the platter. Both copies of a tab (the normal one and
-         *      the platter's selected copy, which the badge methods are mirrored to) use the normal tab button's anchor,
-         *      so the tab shows one badge. Tab bars without a clipping view keep the badge on the icon.
-         * [CN] 液态玻璃下 Tab 按钮位于 platter（`cyl_platterView`）中，platter 会把内容裁剪为胶囊形，因此靠近边缘的角标会被裁掉，例如
-         *      iPhone Duo 竖向栏最后一个 Tab 的 "NEW"。现在角标放在 platter 父视图中、紧贴 platter 之上的锚点视图上，与图标对齐，并跟随
-         *      Tab 按钮及其到 platter 之间各视图的可见性。同一个 Tab 的两份副本（普通副本，以及角标方法同步到的 platter 选中副本）共用普通
-         *      Tab 按钮的锚点视图，因此每个 Tab 只显示一个角标。没有裁剪视图的 TabBar 仍把角标放在图标上。
-         */
-        UIControl *owner = tabButton;
-        if ([tabButton cyl_isPlatterSelectedControl] && tabButton.cyl_platterNormalControl) {
-            owner = tabButton.cyl_platterNormalControl;
-        }
-        UIView *ownerIcon = owner == tabButton ? actualBadgeSuperView : (CYLBadgeIconViewOfControl(owner) ?: actualBadgeSuperView);
-        return [owner cyl_badgeAnchorViewAlignedToView:ownerIcon];
     }
     if (actualBadgeSuperView) {
         [actualBadgeSuperView setClipsToBounds:NO];
@@ -248,37 +202,54 @@ static UIView *CYLBadgeOutermostClippingView(UIView *view) {
     return actualBadgeSuperView;
 }
 
-/*!
- * [EN] The transparent view that holds a control's badge, aligned to `referenceView` (the icon) or to the whole control.
- *      It is the control's top-most subview; when the control or a view above it clips (up to the tab bar, see
- *      `CYLBadgeOutermostClippingView`), it sits right above the outermost such view instead and follows the visibility of
- *      the views from the control up to it.
- * [CN] 承载控件角标的透明视图，与 `referenceView`（图标）或整个控件对齐。它是控件最上层的子视图；控件或其上层视图会裁剪时（最多到
- *      TabBar，见 `CYLBadgeOutermostClippingView`），改为紧贴最外层的这类视图之上，并跟随从控件到该视图之间各视图的可见性。
- */
+/// The transparent view that holds the badge of a control that is not a tab button, aligned to `referenceView` (the
+/// icon) or to the whole control. 承载非 Tab 按钮控件角标的透明视图，与 `referenceView`（图标）或整个控件对齐。
 - (UIView *)cyl_badgeAnchorViewAlignedToView:(UIView *)referenceView {
-    CYLBadgeHostOverlayView *anchorView = objc_getAssociatedObject(self, @selector(cyl_badgeAnchorViewAlignedToView:));
+    UIView *anchorView = objc_getAssociatedObject(self, @selector(cyl_badgeAnchorViewAlignedToView:));
     if (!anchorView) {
-        anchorView = [[CYLBadgeHostOverlayView alloc] initWithFrame:self.bounds];
-        // It can live outside the control, so it goes away with the control. 它可能位于控件之外，因此随控件一起移除。
-        [anchorView cyl_removeWhenDeallocated:self];
+        anchorView = [[UIView alloc] initWithFrame:self.bounds];
+        anchorView.backgroundColor = UIColor.clearColor;
+        anchorView.userInteractionEnabled = NO;
+        anchorView.clipsToBounds = NO;
+        anchorView.isAccessibilityElement = NO;
+        anchorView.translatesAutoresizingMaskIntoConstraints = NO;
         objc_setAssociatedObject(self, @selector(cyl_badgeAnchorViewAlignedToView:), anchorView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
-    UIView *alignView = (referenceView && referenceView != anchorView) ? referenceView : self;
-    UIView *clippingView = CYLBadgeOutermostClippingView(self);
-    UIView *clippingContainer = clippingView.superview;
-    if (clippingContainer) {
-        NSMutableArray<UIView *> *views = [NSMutableArray array];
-        for (UIView *view = self; view; view = view.superview) {
-            [views addObject:view];
-            if (view == clippingView) {
-                break;
-            }
+    BOOL controlClips = self.clipsToBounds || self.layer.masksToBounds || self.layer.mask;
+    UIView *container = (controlClips && self.superview) ? self.superview : self;
+    if (container == self) {
+        if (anchorView.superview != self) {
+            [anchorView removeFromSuperview];
+            [self addSubview:anchorView];
         }
-        [anchorView cyl_attachToContainer:clippingContainer aboveSubview:clippingView alignedToView:alignView followingVisibilityOfViews:views];
+        [self bringSubviewToFront:anchorView];
+        anchorView.layer.zPosition = MAXFLOAT;
     } else {
-        [anchorView cyl_attachToContainer:self aboveSubview:nil alignedToView:alignView followingVisibilityOfViews:@[]];
+        if (anchorView.superview != container) {
+            [anchorView removeFromSuperview];
+        }
+        [container insertSubview:anchorView aboveSubview:self];
+        anchorView.layer.zPosition = self.layer.zPosition;
+        anchorView.hidden = self.hidden;
+        anchorView.alpha = self.alpha;
     }
+    UIView *target = (referenceView && referenceView != anchorView) ? referenceView : self;
+    NSArray<NSLayoutConstraint *> *constraints = objc_getAssociatedObject(anchorView, @selector(cyl_badgeAnchorViewAlignedToView:));
+    BOOL isPinnedToTarget = constraints.count > 0 && constraints.firstObject.active && constraints.firstObject.secondItem == target;
+    if (!isPinnedToTarget) {
+        [NSLayoutConstraint deactivateConstraints:constraints ?: @[]];
+        // Constraints keep the anchor on the icon as the control lays out again. 约束让锚点在控件重新布局后仍与图标对齐。
+        constraints = @[
+            [anchorView.leadingAnchor constraintEqualToAnchor:target.leadingAnchor],
+            [anchorView.topAnchor constraintEqualToAnchor:target.topAnchor],
+            [anchorView.widthAnchor constraintEqualToAnchor:target.widthAnchor],
+            [anchorView.heightAnchor constraintEqualToAnchor:target.heightAnchor],
+        ];
+        [NSLayoutConstraint activateConstraints:constraints];
+        objc_setAssociatedObject(anchorView, @selector(cyl_badgeAnchorViewAlignedToView:), constraints, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    // Right away too, so the badge can be laid out before the next layout pass. 同时立即设置 frame，角标无需等到下一次布局。
+    anchorView.frame = [target convertRect:target.bounds toView:container];
     return anchorView;
 }
 
