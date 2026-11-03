@@ -189,6 +189,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                 CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         //第一位 右大，下大
                 CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"],
+                // #442: the Dark Mode version of the animation; switches with the style. 深色模式下的动画，随风格自动切换。
+                CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home_dark" ofType:@"json"],
         //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     //    CGFloat secondXOffset = (-25+2)/2;
@@ -199,6 +201,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)],
         //                                                  CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"],
+        CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover_dark" ofType:@"json"],
         //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     
@@ -214,6 +217,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                 CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-secondXOffset, -3.5)],
         //                                                 CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news" ofType:@"json"],
+        CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news_dark" ofType:@"json"],
         //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     NSDictionary *fourthTabBarItemsAttributes = @{
@@ -225,6 +229,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-firstXOffset, -3.5)],
         //                                                  CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine" ofType:@"json"],
+        CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine_dark" ofType:@"json"],
         //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     NSArray *tabBarItemsAttributes = @[

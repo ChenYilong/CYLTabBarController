@@ -71,6 +71,60 @@ NSString *const CYLTabBarItemImagePositionAdjustment = @"CYLTabBarItemImagePosit
 NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
+NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
+NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
+NSString *const CYLTabBarLottieDarkColors = @"CYLTabBarLottieDarkColors";
+
+NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingLottieFiles(NSArray<NSDictionary *> *attributes,
+                                                                    NSArray<NSString *> *lottieFileNames,
+                                                                    NSBundle *bundle) {
+    if (lottieFileNames.count == 0) {
+        return attributes;
+    }
+    bundle = bundle ?: [NSBundle mainBundle];
+    NSString *darkSuffix = [UIImage cyl_darkImageNameSuffix];
+    NSMutableArray<NSDictionary *> *result = [NSMutableArray arrayWithCapacity:attributes.count];
+    [attributes enumerateObjectsUsingBlock:^(NSDictionary *item, NSUInteger idx, BOOL *stop) {
+        (void)stop;
+        NSString *name = idx < lottieFileNames.count ? lottieFileNames[idx] : nil;
+        NSString *path = name.length > 0 ? [bundle pathForResource:name ofType:@"json"] : nil;
+        if (!path) {
+            [result addObject:item];
+            return;
+        }
+        NSMutableDictionary *lottieItem = [item mutableCopy];
+        lottieItem[CYLTabBarLottieFilePath] = path;
+        NSString *darkPath = darkSuffix.length > 0 ? [bundle pathForResource:[name stringByAppendingString:darkSuffix] ofType:@"json"] : nil;
+        if (darkPath) {
+            lottieItem[CYLTabBarLottieDarkFilePath] = darkPath;
+        }
+        [result addObject:[lottieItem copy]];
+    }];
+    return [result copy];
+}
+
+/// FIX: issue #442 — registers the item's dark Lottie animation (`CYLTabBarLottieDarkURL`, else
+/// `CYLTabBarLottieDarkFilePath`) for `lottieURL`, the light one. 为浅色动画 `lottieURL` 注册该 item 的深色 Lottie 动画。
+static void CYLRegisterDarkLottieURLFromAttributes(NSURL *lottieURL, NSDictionary *attributes) {
+    if (!lottieURL) {
+        return;
+    }
+    // First: the #442 keys and whether their values are usable. Without any, and with nothing registered before for this
+    // animation, nothing else runs. 首先判断 #442 新增的 key 是否存在、值是否有效；都没有且此前也未注册时，直接返回。
+    id darkURLValue = attributes[CYLTabBarLottieDarkURL];
+    id darkFilePathValue = attributes[CYLTabBarLottieDarkFilePath];
+    id darkColorsValue = attributes[CYLTabBarLottieDarkColors];
+    NSURL *darkLottieURL = [darkURLValue isKindOfClass:[NSURL class]] ? darkURLValue : nil;
+    if (!darkLottieURL && [darkFilePathValue isKindOfClass:[NSString class]] && [(NSString *)darkFilePathValue length] > 0) {
+        darkLottieURL = [CYLConstants cyl_getURLFromString:darkFilePathValue];
+    }
+    NSDictionary *darkColors = ([darkColorsValue isKindOfClass:[NSDictionary class]] && [(NSDictionary *)darkColorsValue count] > 0) ? darkColorsValue : nil;
+    if (!darkLottieURL && !darkColors && ![CYLConstants cyl_hasDarkLottieForLottieURL:lottieURL]) {
+        return;
+    }
+    [CYLConstants cyl_registerDarkLottieURL:darkLottieURL forLottieURL:lottieURL];
+    [CYLConstants cyl_registerLottieDarkColors:darkColors forLottieURL:lottieURL];
+}
 
 NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;
@@ -1083,6 +1137,8 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
                 if (!lottieURL) {
                     lottieURL = [CYLConstants cyl_getURLFromString:lottieFilePath];
                 }
+                        
+                CYLRegisterDarkLottieURLFromAttributes(lottieURL, _tabBarItemsAttributes[idx]);
                 lottieSizeValue = _tabBarItemsAttributes[idx][CYLTabBarLottieSize];
                         
                 NSValue *offsetValue = _tabBarItemsAttributes[idx][CYLTabBarItemTitlePositionAdjustment];
@@ -1997,6 +2053,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                     if (!lottieURL) {
                         lottieURL = [CYLConstants cyl_getURLFromString:lottieFilePath];
                     }
+                
+                    CYLRegisterDarkLottieURLFromAttributes(lottieURL, _tabBarItemsAttributes[idx]);
                     lottieSizeValue = _tabBarItemsAttributes[idx][CYLTabBarLottieSize];
                 
                     NSValue *offsetValue = _tabBarItemsAttributes[idx][CYLTabBarItemTitlePositionAdjustment];
@@ -3243,6 +3301,52 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
     return NO;
 }
 #endif
+
+#pragma mark - Dark Mode Lottie (#442)
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    // First: only when a #442 key (dark Lottie file or colors) is in use. 首先：仅在使用了 #442 新增的 key 时处理。
+    if (![CYLConstants cyl_hasDarkLottieURLs]) {
+        return;
+    }
+    // Then: only with a Lottie library (Lottie ObjC or Lottie Swift). 其次：仅在引入 Lottie 库（ObjC 或 Swift）时处理。
+#if CYL_LOTTIE_AVAILABLE
+    if (@available(iOS 13.0, *)) {
+        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            // Next run loop: the tab buttons have the new traits by then. 下一个 runloop：此时 Tab 按钮已更新为新的 trait。
+            __weak __typeof(self) weakSelf = self;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf cyl_reloadLottieAnimationViewsForCurrentStyle];
+            });
+        }
+    }
+#endif
+}
+#pragma clang diagnostic pop
+
+/// FIX: issue #442 — every tab's Lottie view (classic, Liquid Glass and flat design tab bars) follows the new style.
+/// 所有 Tab 的 Lottie 视图（经典、液态玻璃、扁平样式）切换为新风格的动画。
+- (void)cyl_reloadLottieAnimationViewsForCurrentStyle {
+    if (![CYLConstants cyl_hasDarkLottieURLs]) {
+        return;
+    }
+    NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:self.tabBar];
+    if (_cyl_tabBar && _cyl_tabBar != self.tabBar) {
+        [views addObject:_cyl_tabBar];
+    }
+    while (views.count > 0) {
+        UIView *view = views.lastObject;
+        [views removeLastObject];
+        if ([view isKindOfClass:[UIControl class]] && [view respondsToSelector:@selector(cyl_reloadLottieAnimationViewForCurrentStyle)]) {
+            [view cyl_performSelector:@selector(cyl_reloadLottieAnimationViewForCurrentStyle)];
+        }
+        [views addObjectsFromArray:view.subviews];
+    }
+}
 
 #pragma mark - UIContentContainer
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {

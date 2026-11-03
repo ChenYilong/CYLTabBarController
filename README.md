@@ -1101,6 +1101,70 @@ let messageAttributes: [String: Any] = [
 |:---|:---|
 | 需要同样的图片作为 UIImage 对象（例如用于其他视图）时，用 `+[UIImage cyl_imageWithImageInfo:darkImageInfo:]`，参数与这两个键的取值相同。 | To get the same image as a UIImage object (e.g. for another view), use `+[UIImage cyl_imageWithImageInfo:darkImageInfo:]`, which takes the same values as these keys. |
 
+#### [CN]Lottie 图标的深色模式
+#### [EN]Lottie icons in Dark Mode
+
+| 中文 | English |
+|:---|:---|
+| 设置了 `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath` 的 Tab，图标由 Lottie 动画绘制，上面的图片不会显示；动画的颜色写在 JSON 中，不会随深色模式变化（[#442](https://github.com/ChenYilong/CYLTabBarController/issues/442)）。 | A tab with `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath` draws its icon with the Lottie animation, not the images above, and the animation's colors are fixed in its JSON, so they do not follow Dark Mode ([#442](https://github.com/ChenYilong/CYLTabBarController/issues/442)). |
+| 加上 `CYLTabBarLottieDarkURL`（NSURL）或 `CYLTabBarLottieDarkFilePath`（文件路径）指定深色动画。界面风格为深色时（系统设置或 `overrideUserInterfaceStyle`）显示深色动画，切换时自动替换，选中状态和播放进度保持不变。普通、液态玻璃与扁平样式都支持。 | Add `CYLTabBarLottieDarkURL` (an NSURL) or `CYLTabBarLottieDarkFilePath` (a file path) for the dark animation. It is shown where the interface style is dark (system setting or `overrideUserInterfaceStyle`) and swapped in when the style changes, keeping the selected state and progress. Classic, Liquid Glass and flat design styles are supported. |
+
+```Objective-C
+NSDictionary *homeAttributes = @{
+    CYLTabBarItemTitle : @"首页",
+    CYLTabBarItemImage : @"home_normal",
+    CYLTabBarItemSelectedImage : @"home_highlight",
+    CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"tab_home" ofType:@"json"],
+    CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"tab_home_dark" ofType:@"json"],
+};
+```
+
+```Swift
+let homeAttributes: [String: Any] = [
+    CYLTabBarItemTitle: "首页",
+    CYLTabBarItemImage: "home_normal",
+    CYLTabBarItemSelectedImage: "home_highlight",
+    CYLTabBarLottieURL: Bundle.main.url(forResource: "tab_home", withExtension: "json")!,
+    CYLTabBarLottieDarkURL: Bundle.main.url(forResource: "tab_home_dark", withExtension: "json")!,
+]
+```
+
+| 中文 | English |
+|:---|:---|
+| 两种方式：**深色文件**（上面的 `CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath`，Lottie 2.x 与 4.x 都支持）；**一份文件 + 深色颜色**（`CYLTabBarLottieDarkColors`，仅 Lottie 4.x：`CYLTabBarController/LottieSwift`、`CYLFlatDesignTabBar`、SPM）。Lottie 文件本身不能同时包含两种配色：JSON 中的颜色是固定值，dotLottie 的主题只有 LottieFiles 的播放器支持，lottie-ios 不支持。 | Two ways: **a dark file** (`CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath` above, Lottie 2.x and 4.x), or **one file plus dark colors** (`CYLTabBarLottieDarkColors`, Lottie 4.x only: `CYLTabBarController/LottieSwift`, `CYLFlatDesignTabBar`, SPM). A Lottie file cannot hold both palettes itself: colors in the JSON are fixed values, and dotLottie themes only work in LottieFiles' players, not lottie-ios. |
+| `CYLTabBarLottieDarkColors` 是 keypath -> UIColor 的字典：深色模式下用 Lottie 官方的 value provider（`setValueProvider(_:keypath:)` + `ColorValueProvider`，两种渲染引擎都支持）设置这些颜色，浅色模式下移除，恢复动画自身颜色；切换时保留原视图和播放进度。keypath 由图层、组、元素名称以 "." 连接，"*" 匹配一个名称，"**" 匹配任意多个；可用 `logHierarchyKeypaths()` 打印。 | `CYLTabBarLottieDarkColors` is a keypath -> UIColor dictionary: in Dark Mode the colors are set with Lottie's official value providers (`setValueProvider(_:keypath:)` with a `ColorValueProvider`, supported by both rendering engines), and removed in light mode, so the animation shows its own colors again; switching keeps the view and its progress. Keypaths join layer, group and item names with "."; "*" matches one name, "**" any number; print them with `logHierarchyKeypaths()`. |
+| 按命名规范批量设置：`CYLTabBarItemsAttributesAddingLottieFiles()` 为每个 item 加上「<名称>.json」，存在「<名称>_dark.json」时自动加上 `CYLTabBarLottieDarkFilePath`（后缀与图片相同，为 `UIImage.cyl_darkImageNameSuffix`）。 | By naming convention: `CYLTabBarItemsAttributesAddingLottieFiles()` adds "<name>.json" to each item, and `CYLTabBarLottieDarkFilePath` when "<name>_dark.json" exists (the same suffix as images, `UIImage.cyl_darkImageNameSuffix`). |
+
+```Objective-C
+// green_lottie_tab_home.json + green_lottie_tab_home_dark.json, ...
+NSArray *attributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes,
+    @[@"green_lottie_tab_home", @"green_lottie_tab_discover", @"green_lottie_tab_news", @"green_lottie_tab_mine"], nil);
+```
+
+```Swift
+let attributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes,
+    ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
+```
+
+```Objective-C
+// Lottie 4.x: one file, dark colors by keypath. Lottie 4.x：一份文件，按 keypath 指定深色颜色。
+NSDictionary *homeAttributes = @{
+    CYLTabBarItemTitle : @"首页",
+    CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"],
+    CYLTabBarLottieDarkColors : @{
+        @"Icon_Shop_Normal.**.Color" : [UIColor colorWithWhite:0.78 alpha:1],                          // gray outline → light gray
+        @"Icon_Shop_Active_Main.**.Color" : [UIColor colorWithRed:0.15 green:0.39 blue:0.16 alpha:1], // pale fill → dark green
+    },
+};
+```
+
+```Swift
+CYLTabBarLottieDarkColors: [
+    "Icon_Shop_Normal.**.Color": UIColor(white: 0.78, alpha: 1),
+    "Icon_Shop_Active_Main.**.Color": UIColor(red: 0.15, green: 0.39, blue: 0.16, alpha: 1),
+],
+```
+
 | 中文 | English |
 |:---|:---|
 | 不要在设置颜色或图片时自行判断当前是深色还是浅色再二选一：此时 `UITraitCollection.currentTraitCollection` 往往是 unspecified，window scene 和屏幕的 trait 不认 `overrideUserInterfaceStyle`，而且之后切换风格时不会更新。需要在风格变化时执行代码，请在 `-traitCollectionDidChange:` 中比较 `self.traitCollection`。 | Don't check whether the style is dark or light yourself and pick one when you set a color or image: at that moment `UITraitCollection.currentTraitCollection` is often unspecified, the window scene's and the screen's traits ignore `overrideUserInterfaceStyle`, and nothing updates when the style changes later. To run code when it changes, compare `self.traitCollection` in `-traitCollectionDidChange:`. |

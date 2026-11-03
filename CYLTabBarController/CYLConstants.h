@@ -140,6 +140,52 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
 + (NSURL *)cyl_getURLFromString:(NSString *)string;
 
 /*!
+ * FIX: issue #442
+ * [EN] Registers `darkLottieURL` as the Dark Mode version of the Lottie animation at `lottieURL` (nil removes it).
+ *      `CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath` in `tabBarItemsAttributes` call it for you.
+ * [CN] 将 `darkLottieURL` 注册为 `lottieURL` 处 Lottie 动画的深色模式版本（传 nil 移除）。`tabBarItemsAttributes` 中的
+ *      `CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath` 会自动调用。
+ */
++ (void)cyl_registerDarkLottieURL:(NSURL *)darkLottieURL forLottieURL:(NSURL *)lottieURL;
+
+/*!
+ * [EN] The Lottie animation to show for `traitCollection`: the registered dark version where the style is dark,
+ *      `lottieURL` otherwise (and always before iOS 13). nil `lottieURL` returns nil; nil `traitCollection` means light.
+ * [CN] 在 `traitCollection` 下应显示的 Lottie 动画：风格为深色时返回已注册的深色版本，否则（以及 iOS 13 以下）返回 `lottieURL`。
+ *      `lottieURL` 为 nil 时返回 nil；`traitCollection` 为 nil 时按浅色处理。
+ */
++ (NSURL *)cyl_lottieURL:(NSURL *)lottieURL forTraitCollection:(UITraitCollection *)traitCollection;
+
+/*!
+ * FIX: issue #442 (Lottie 4.x)
+ * [EN] Registers `darkColors` (keypath -> UIColor) for the Lottie animation at `lottieURL`: one animation file that
+ *      follows Dark Mode (nil removes them). `CYLTabBarLottieDarkColors` in `tabBarItemsAttributes` calls it for you.
+ * [CN] 为 `lottieURL` 处的 Lottie 动画注册 `darkColors`（keypath -> UIColor）：一份动画文件即可适配深色模式（传 nil 移除）。
+ *      `tabBarItemsAttributes` 中的 `CYLTabBarLottieDarkColors` 会自动调用。
+ */
++ (void)cyl_registerLottieDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forLottieURL:(NSURL *)lottieURL;
+
+/*!
+ * [EN] The dark colors registered for `lottieURL`, nil when there are none.
+ * [CN] 为 `lottieURL` 注册的深色颜色，没有时为 nil。
+ */
++ (NSDictionary<NSString *, UIColor *> *)cyl_lottieDarkColorsForLottieURL:(NSURL *)lottieURL;
+
+/*!
+ * [EN] YES once a dark Lottie animation or dark Lottie colors have been registered: only then does a change of style
+ *      reload Lottie icons.
+ * [CN] 注册过深色 Lottie 动画或深色 Lottie 颜色后为 YES：只有这时切换深浅色才会重新加载 Lottie 图标。
+ */
++ (BOOL)cyl_hasDarkLottieURLs;
+
+/*!
+ * [EN] YES when a dark animation or dark colors are registered for `lottieURL`. Lottie icons without them never run
+ *      any of the #442 code.
+ * [CN] 为 `lottieURL` 注册了深色动画或深色颜色时为 YES。没有注册的 Lottie 图标不会执行任何 #442 相关代码。
+ */
++ (BOOL)cyl_hasDarkLottieForLottieURL:(NSURL *)lottieURL;
+
+/*!
  * [EN] Returns YES if Lottie is linked and either `lottieURLs` is non-empty or the first item attributes specify a Lottie URL or file path.
  * [CN] 判断是否启用 Lottie：需集成 Lottie，且 lottieURLs 非空或第一个 TabBarItem 属性中指定了 Lottie URL / 文件路径。
  */

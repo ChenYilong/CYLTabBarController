@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CA869DE29E041F70CA39174D /* green_lottie_tab_mine_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 03B1BCBF0EEDBBE6ABF3CF72 /* green_lottie_tab_mine_dark.json */; };
+		8ABC9F699A90C4F661803F89 /* green_lottie_tab_news_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = D2534A69F5FC89B62CD7252E /* green_lottie_tab_news_dark.json */; };
+		8BFA3AA7E7243BEFC8252DDD /* green_lottie_tab_discover_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 46E3ADC5FFB3DA1356B92E06 /* green_lottie_tab_discover_dark.json */; };
+		9F683CC12AF7F4A5CB5652B4 /* green_lottie_tab_home_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 7F01DDCC6E3492E356050263 /* green_lottie_tab_home_dark.json */; };
 		002ACFDEC3236108A0445E6F /* UIColor+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = A494E02A66D2AE6B5B42B9E8 /* UIColor+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		028FAD0320AE983F53C7A9E6 /* CYLTabBar+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = 120EBF27E7ADE9A221F1993A /* CYLTabBar+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0449CC45FB05A319E018D55D /* CYLTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DC11E059CBAAB32DA0354D3 /* CYLTabBarController.m */; };
@@ -132,6 +136,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		03B1BCBF0EEDBBE6ABF3CF72 /* green_lottie_tab_mine_dark.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_mine_dark.json; sourceTree = "<group>"; };
+		D2534A69F5FC89B62CD7252E /* green_lottie_tab_news_dark.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_news_dark.json; sourceTree = "<group>"; };
+		46E3ADC5FFB3DA1356B92E06 /* green_lottie_tab_discover_dark.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_discover_dark.json; sourceTree = "<group>"; };
+		7F01DDCC6E3492E356050263 /* green_lottie_tab_home_dark.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_home_dark.json; sourceTree = "<group>"; };
 		021F00425FA55C661271AEF0 /* CYLTabBar.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLTabBar.h; sourceTree = "<group>"; };
 		04C2AF4F5157DB1DB2A68D1B /* _CYLFlatDesignTabBarControllerTransitionAnimator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = _CYLFlatDesignTabBarControllerTransitionAnimator.h; sourceTree = "<group>"; };
 		06F2A7A4CD876B9201D6FBCF /* CYLBaseTableViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLBaseTableViewController.h; sourceTree = "<group>"; };
@@ -450,6 +458,10 @@
 				9A3865F42266FA3C008EE46F /* tab_search_animate.json */,
 				9A98017A2461249F00E65289 /* green_lottie_tab_discover.json */,
 				9A98017C2461249F00E65289 /* green_lottie_tab_home.json */,
+				03B1BCBF0EEDBBE6ABF3CF72 /* green_lottie_tab_mine_dark.json */,
+				D2534A69F5FC89B62CD7252E /* green_lottie_tab_news_dark.json */,
+				46E3ADC5FFB3DA1356B92E06 /* green_lottie_tab_discover_dark.json */,
+				7F01DDCC6E3492E356050263 /* green_lottie_tab_home_dark.json */,
 				9A9801792461249F00E65289 /* green_lottie_tab_mine.json */,
 				9A98017B2461249F00E65289 /* green_lottie_tab_news.json */,
 			);
@@ -824,6 +836,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A9801802461249F00E65289 /* green_lottie_tab_home.json in Resources */,
+				CA869DE29E041F70CA39174D /* green_lottie_tab_mine_dark.json in Resources */,
+				8ABC9F699A90C4F661803F89 /* green_lottie_tab_news_dark.json in Resources */,
+				8BFA3AA7E7243BEFC8252DDD /* green_lottie_tab_discover_dark.json in Resources */,
+				9F683CC12AF7F4A5CB5652B4 /* green_lottie_tab_home_dark.json in Resources */,
 				9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */,
 				9A98017F2461249F00E65289 /* green_lottie_tab_news.json in Resources */,
 				9AD7F5BE22B7D695004BF0A0 /* img_tab_home_0.png in Resources */,
