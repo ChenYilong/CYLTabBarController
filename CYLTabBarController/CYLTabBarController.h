@@ -6,6 +6,12 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+#if __has_include("CYLUtils/CYLUtils.h")
+#import "CYLUtils/CYLUtils.h"
+#else
+#import "CYLUtils.h"
+#endif
 #import "CYLPlusButton.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "UIViewController+CYLNavigationControllerExtention.h"
@@ -16,14 +22,16 @@
 #import "CYLBaseTableViewController.h"
 #import "CYLBaseNavigationController.h"
 #import "CYLTabBar+CYLTabBarControllerExtention.h"
-#import "UITabBarItem+CYLBadgeExtention.h"
-#import "UIControl+CYLBadgeExtention.h"
-#import "UIBarButtonItem+CYLBadgeExtention.h"
-#import "UIView+CYLBadgeExtention.h"
+// FIX: issue #535 — the badge APIs are the CYLBadgeView subspec, which Core depends on (`CYLBadgeView/` in the repository,
+// flattened by CocoaPods). 角标 API 位于 Core 依赖的 CYLBadgeView subspec（仓库中的 `CYLBadgeView/` 目录，CocoaPods 会展平）。
+#if __has_include("CYLBadgeView/CYLBadgeView.h")
+#import "CYLBadgeView/CYLBadgeView.h"
+#else
+#import "CYLBadgeView.h"
+#endif
 #import "UITableViewCell+CYLBadgeExtention.h"
 #import "UIViewController+CYLMemoryWarning.h"
 #import "UIViewController+CYLSettingsSection.h"
-#import "CYLBadgeAppearance.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"

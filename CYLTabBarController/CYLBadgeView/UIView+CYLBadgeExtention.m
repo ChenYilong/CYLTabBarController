@@ -9,22 +9,15 @@
 #import "UIView+CYLBadgeExtention.h"
 #import <objc/runtime.h>
 #import "CAAnimation+CYLBadgeExtention.h"
-#import "UITabBarItem+CYLTabBarControllerExtention.h"
-#import "CYLConstants.h"
-#import "UIView+CYLTabBarControllerExtention.h"
-#import "UIImage+CYLTabBarControllerExtention.h"
-#import "CYLBadge/CYLTabBarBadgeView.h"
+#import "CYLTabBarBadgeView.h"
 #import "CYLBadgeAppearance.h"
-#if __has_include(<CYLTabBarController/CYLTabBarController.h>)
-#import <CYLTabBarController/CYLTabBarController.h>
-#else
-#import "CYLTabBarController.h"
-#endif
+// FIX: issue #535 — Core (tab bar) code only when CYLTabBarController is part of the build; see CYLBadgeViewDefines.h.
+// FIX: issue #535 — 只有 CYLTabBarController 参与编译时才使用 Core（TabBar）代码，见 CYLBadgeViewDefines.h。
+#import "CYLBadgeViewDefines.h"
 
-#if CYL_FLATDESIGN_AVAILABLE
+#if CYL_BADGE_CORE_AVAILABLE && CYL_FLATDESIGN_AVAILABLE
 #import <CYLTabBarController/CYLFlatDesignTabBar.h>
 #endif
-
 
 static const CGFloat kCYLBadgeDefaultRedDotRadius = 4.f;
 static const NSTimeInterval kCYLBadgeDefaultDelayIfNeededForSeconds = 0.5;
@@ -291,7 +284,6 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
     [self layoutIfNeeded];
     return self;
 }
-
 
 - (void)cyl_performSelector:(SEL)aSelector {
     if (aSelector == NULL) { return; }
@@ -836,7 +828,6 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
     }
 }
 
-
 - (void)cyl_removeAnimation {
     if (self.cyl_badge) {
         [self.cyl_badge.layer removeAllAnimations];
@@ -1132,24 +1123,22 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
     return self.cyl_isInvisiable;
 }
 
-- (BOOL)cyl_isInvisiable {
-    BOOL isSizeZero = CGSizeEqualToSize(CGSizeZero, self.frame.size);
-    //这里删除(NO == obj.opaque) ，因为iOS27以上的视图，渲染会通过通过 opaque 设置为 NO 进行，所以这里删除涉及关于 opaque 的判断。
-    BOOL isInvisible = (YES == self.hidden ) || (self.alpha <= 0.01f)  || (!self.superview) || isSizeZero;
-    return isInvisible;
-}
-
-- (BOOL)cyl_canNotResponseEvent {
-    return self.cyl_isInvisiable || (NO == self.userInteractionEnabled ) || self.cyl_isPlaceholder;
-}
-
 // 不管 image 还是 text 的 UIBarButtonItem 都获取内部的 _UIModernBarButton 即可
 - (UIView *)cyl_findBarButtonContentView {
     NSString *classString = NSStringFromClass(self.class);
     if ([classString isEqualToString:@"UITabBarButton"] || [classString isEqualToString:@"_UITabButton"]) {
         // 特别的，对于 UITabBarItem，将 imageView 作为参考 view
+#if CYL_BADGE_CORE_AVAILABLE
         UIView *imageView = [self cyl_tabImageView];
         return imageView;
+#else
+        for (UIView *subview in self.subviews) {
+            if ([subview isKindOfClass:[UIImageView class]]) {
+                return subview;
+            }
+        }
+        return self;
+#endif
     }
     
     if ([classString isEqualToString:@"_UIButtonBarButton"]) {
@@ -1186,7 +1175,7 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
 }
 
 - (BOOL)cyl_isCYLTabBarStyleTypeLiquidGlass {
-    if (![CYLConstants isLiquidGlassActive]) {
+    if (![CYLUtils isLiquidGlassActive]) {
         return NO;
     }
     return YES;
@@ -1196,7 +1185,7 @@ NSString *CYLBadgeAccessibilityDescription(NSString *value) {
     
 //    return YES;
 
-    if (![CYLConstants isLiquidGlassActive]) {
+    if (![CYLUtils isLiquidGlassActive]) {
         return NO;
     }
     if (CYL_IS_IOS_27 && ![self.cyl_badge isKindOfClass:[UILabel class]]) {

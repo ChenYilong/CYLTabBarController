@@ -7,6 +7,7 @@
 //
 #import "MainTabBarController.h"
 #import <UIKit/UIKit.h>
+#import <objc/runtime.h>
 #if __has_include(<CYLTabBarController/CYLTabBarController.h>)
 #import <CYLTabBarController/UIImage+CYLTabBarControllerExtention.h>
 #else
@@ -570,6 +571,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                     [tabBarController.viewControllers[4] cyl_setBadgeCenterOffset:CGPointMake(-1, 3)];
                     [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
                 }
+                // #535: the plus button gets a badge too, like the tabs; each tap adds 1 (see -didSelectControl:).
+                // #535：PlusButton 也显示角标，与 Tab 一致；每次点击数字加 1（见 -didSelectControl:）。
+                [tabBarController cyl_demo_showPlusButtonBadge];
             } @catch (NSException *exception) {
                 NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
             }
@@ -662,7 +666,12 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     [self cyl_logTabBarItemIdentifiersForTabBarController:tabBarController selectedControl:control];
     UIView *animationView;
     
-    if ([control cyl_isTabButton]) {
+    // #535: the plus button's badge changes on every tap. Checked first: before iOS 26 `-cyl_isTabButton` is YES for the
+    // plus button too. #535：每次点击 PlusButton，角标都会变化。需先判断：iOS 26 以前 `-cyl_isTabButton` 对 PlusButton 也返回 YES。
+    if ([control cyl_isPlusButton]) {
+        [tabBarController cyl_demo_plusButtonDidTap];
+    }
+    if ([control cyl_isTabButton] && ![control cyl_isPlusButton]) {
         //更改红标状态
         if ([control cyl_isShowBadge]) {
             if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
@@ -804,6 +813,39 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (UIViewContentMode)lottieAnimationViewContentMode {
     return UIViewContentModeScaleAspectFit;
+}
+
+@end
+
+@implementation CYLTabBarController (CYLPlusButtonBadgeDemo)
+
+- (NSInteger)cyl_demo_plusButtonBadgeCount {
+    return [objc_getAssociatedObject(self, @selector(cyl_demo_plusButtonBadgeCount)) integerValue];
+}
+
+- (void)cyl_demo_setPlusButtonBadgeCount:(NSInteger)count {
+    objc_setAssociatedObject(self, @selector(cyl_demo_plusButtonBadgeCount), @(count), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)cyl_demo_showPlusButtonBadge {
+    // The plus button of this tab bar controller's context. 当前 TabBarController 所在 context 的 PlusButton。
+    UIButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    if (!plusButton) {
+        return;
+    }
+    NSInteger count = MAX([self cyl_demo_plusButtonBadgeCount], 1);
+    [self cyl_demo_setPlusButtonBadgeCount:count];
+    // Same API and look as the tabs' badges (shared style: SceneDelegate.m -setUpBadgeAppearance).
+    // 与 Tab 角标相同的 API 和样式（共用样式见 SceneDelegate.m -setUpBadgeAppearance）。
+    [plusButton cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(count)] animationType:CYLBadgeAnimationTypeBounce];
+#if defined(DEBUG) || defined(BETA)
+    NSLog(@"🟣 #535 plus button badge %@ (Liquid Glass: %@, from CYLUtils)", @(count), [CYLUtils isLiquidGlassActive] ? @"YES" : @"NO");
+#endif
+}
+
+- (void)cyl_demo_plusButtonDidTap {
+    [self cyl_demo_setPlusButtonBadgeCount:[self cyl_demo_plusButtonBadgeCount] + 1];
+    [self cyl_demo_showPlusButtonBadge];
 }
 
 @end

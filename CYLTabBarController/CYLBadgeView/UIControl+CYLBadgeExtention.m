@@ -7,10 +7,21 @@
  */
 
 #import "UIControl+CYLBadgeExtention.h"
-#import "CYLTabBarController.h"
 #import <objc/runtime.h>
-#import "UIControl+CYLTabBarControllerExtention.h"
 #import "CYLBadgeProtocol.h"
+#import "CYLBadgeViewDefines.h"
+
+/*!
+ * FIX: issue #535
+ * [EN] This category puts a tab button's badge on its icon (image or Lottie view) and mirrors it to the Liquid Glass
+ *      platter, which needs Core. Without Core (`pod 'CYLTabBarController/CYLBadgeView'`) it is left out, and every
+ *      `UIControl`, e.g. a `UIButton`, uses the `UIView (CYLBadgeExtention)` implementation: the badge goes on the
+ *      control itself.
+ * [CN] 该分类把 Tab 按钮的角标放在图标（图片或 Lottie 视图）上，并同步到液态玻璃 platter，这些都依赖 Core。没有 Core 时
+ *      （`pod 'CYLTabBarController/CYLBadgeView'`）不编译该分类，所有 `UIControl`（例如 `UIButton`）使用
+ *      `UIView (CYLBadgeExtention)` 的实现，角标显示在控件本身上。
+ */
+#if CYL_BADGE_CORE_AVAILABLE
 
 #define kActualView ((UIView *)[self cyl_getActualBadgeSuperView])
 #define CYL_ACTUAL_BARBUTTON kActualView
@@ -32,7 +43,8 @@
     CYL_DEPRECATED_DECLARATIONS_POP
     
     [self cyl_clearBadge];
-    [self cyl_setBadgeValue:badgeValue];
+    // FIX: this used to call itself and never return. 之前这里调用自身，导致无限递归。
+    [self cyl_showBadgeValue:badgeValue animationType:CYLBadgeAnimationTypeNone];
 }
 
 - (void)cyl_setBadgeAnimationTypeValue:(NSNumber *)cyl_badgeAnimationTypeValue {
@@ -156,6 +168,18 @@
             break;
         }
     } while (NO);
+    // FIX: a control that is not a tab button and has no visible icon (e.g. a plus button drawn with a background
+    // image only) used to get no badge at all. Its badge now goes on a transparent view that fills it, so the badge sits
+    // at the control's top-right corner like a tab icon's. Tab buttons are unchanged: they wait for their icon.
+    // 不是 Tab 按钮且没有可见图标的控件（例如只设置了背景图的 PlusButton）原先无法显示角标；现在角标放在一个铺满控件的透明视图上，
+    // 位于控件右上角，与 Tab 图标的角标一致。Tab 按钮不变，仍等待其图标。
+    // By class name: `-cyl_isTabButton` is YES for every UIControl before iOS 26. UITabBarButton, _UITabButton and
+    // CYLFlatDesignTabBarButton are tab buttons. 按类名判断：iOS 26 以前 `-cyl_isTabButton` 对所有 UIControl 都返回 YES。
+    NSString *controlClassName = NSStringFromClass(tabButton.class);
+    BOOL isTabBarButton = [controlClassName containsString:@"TabButton"] || [controlClassName containsString:@"TabBarButton"];
+    if (!actualBadgeSuperView && !isTabBarButton) {
+        actualBadgeSuperView = [tabButton cyl_badgeAnchorView];
+    }
     if (actualBadgeSuperView) {
         [actualBadgeSuperView setClipsToBounds:NO];
         //建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用
@@ -163,6 +187,24 @@
     }
 
     return actualBadgeSuperView;
+}
+
+/// A transparent view that fills the control and holds its badge when the control has no icon. 控件没有图标时承载角标的透明视图，铺满控件。
+- (UIView *)cyl_badgeAnchorView {
+    UIView *anchorView = objc_getAssociatedObject(self, @selector(cyl_badgeAnchorView));
+    if (!anchorView) {
+        anchorView = [[UIView alloc] initWithFrame:self.bounds];
+        anchorView.backgroundColor = UIColor.clearColor;
+        anchorView.userInteractionEnabled = NO;
+        anchorView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        objc_setAssociatedObject(self, @selector(cyl_badgeAnchorView), anchorView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    if (anchorView.superview != self) {
+        [self addSubview:anchorView];
+    }
+    anchorView.frame = self.bounds;
+    [self bringSubviewToFront:anchorView];
+    return anchorView;
 }
 
 - (void)cyl_performSelector:(SEL)aSelector {
@@ -181,7 +223,7 @@
     if (aSelector == NULL) { return; }
     UIControl *normalControl = nil;
     UIControl *selectedControl = nil;
-    if (![self isKindOfClass:[UIControl class]] || ![CYLConstants isLiquidGlassActive]) {
+    if (![self isKindOfClass:[UIControl class]] || ![CYLUtils isLiquidGlassActive]) {
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
         (
          [self performSelector:aSelector withObject:object1 withObject:object2];
@@ -212,7 +254,7 @@
 }
  
 - (BOOL)cyl_isReady {
-    if (![CYLConstants isLiquidGlassActive]) {
+    if (![CYLUtils isLiquidGlassActive]) {
         return YES;
     }
     //由于 SelectedControl 所在图层的渲染比未选中图层有延迟， 所以必须加延迟，如果不加延迟，可能无法获取到正确的子视图， 有概率获取的子视图为nil
@@ -376,3 +418,4 @@
 
 @end
 
+#endif /* CYL_BADGE_CORE_AVAILABLE */

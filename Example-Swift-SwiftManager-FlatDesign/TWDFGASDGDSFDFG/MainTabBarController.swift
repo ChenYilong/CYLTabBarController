@@ -43,6 +43,14 @@ public enum AnimationSource {
 }
 
 class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarControllerDelegate {
+
+    // #535: the plus button's badge, shared by every Swift demo (Example-Shared/CYLPlusButtonBadgeDemo.swift).
+    // #535：PlusButton 的角标，所有 Swift Demo 共用（Example-Shared/CYLPlusButtonBadgeDemo.swift）。
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        demoShowPlusButtonBadgeAfterLayout()
+    }
+
     
     // MARK: - Theme Design
     private enum Theme {
@@ -297,6 +305,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     /// (a default, the class name, when none is set) tells which one was tapped.
     /// 扁平样式下点击每个 Tab 按钮和 PlusButton 也会调用；用标识（未设置时为默认值，即类名）区分是哪一个。
     override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
+        demoPlusButtonDidTap(control)
         NSLog("[#610] flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier ?? "nil", control.cyl_isPlusButton() ? "plus button" : "tab button")
     }
 

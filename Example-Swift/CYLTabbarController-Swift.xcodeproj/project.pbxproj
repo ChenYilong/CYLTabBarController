@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BB208C52C920405FAAD3EA6A /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDCED1DA23994595818FD2A6 /* CYLPlusButtonBadgeDemo.swift */; };
 		3B72288BE2FD3D0B08139445 /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 21A11829269AE46006F8CBDA /* green_lottie_tab_home.json */; };
 		647C760BA8C6CCF7A5B0D1F7 /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = 6535764CA65F33A06164E9B0 /* green_lottie_tab_discover.json */; };
 		689A1BB4893C508E8EF029A2 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 3FF2145E4041DCF14BAF84CB /* green_lottie_tab_news.json */; };
@@ -27,6 +28,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DDCED1DA23994595818FD2A6 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
 		21A11829269AE46006F8CBDA /* green_lottie_tab_home.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home.json; path = "../Example/Classes/Other/LottieResources/green_lottie_tab_home.json"; sourceTree = SOURCE_ROOT; };
 		6535764CA65F33A06164E9B0 /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover.json; path = "../Example/Classes/Other/LottieResources/green_lottie_tab_discover.json"; sourceTree = SOURCE_ROOT; };
 		3FF2145E4041DCF14BAF84CB /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_news.json; path = "../Example/Classes/Other/LottieResources/green_lottie_tab_news.json"; sourceTree = SOURCE_ROOT; };
@@ -79,6 +81,7 @@
 		922DCED41FF63399005C89BE = {
 			isa = PBXGroup;
 			children = (
+				DDCED1DA23994595818FD2A6 /* CYLPlusButtonBadgeDemo.swift */,
 				290BE55989ECAEC679C254A1 /* LottieResources */,
 				9AF595DF21C8E63C00C6AF2B /* AppDelegate.swift */,
 				C1A5CE0E2E000000000000B2 /* SceneDelegate.swift */,
@@ -337,6 +340,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB208C52C920405FAAD3EA6A /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				9AF5961021C8E7B100C6AF2B /* HomeViewController.swift in Sources */,
 				9AF595E221C8E63C00C6AF2B /* AppDelegate.swift in Sources */,
 				C1A5CE0E2E000000000000B1 /* SceneDelegate.swift in Sources */,

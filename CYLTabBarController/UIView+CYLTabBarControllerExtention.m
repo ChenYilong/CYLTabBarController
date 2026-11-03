@@ -117,7 +117,6 @@
     return isPlatterSelectedContentView && (self.hidden == NO);
 }
 
-
 - (BOOL)cyl_isPlatterVisualProviderFloatingSelectedContentView {
     if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
@@ -162,7 +161,6 @@
     return isPlatterLiquidLensView && (self.hidden == NO);
 }
 
-
 - (BOOL)cyl_isPlatterLiquidLensBackdropView {
     if (![CYLConstants isLiquidGlassActive]) {
         // iOS 26 以前，或者UI兼容模式，不再继续判断逻辑
@@ -173,7 +171,6 @@
     
     return isPlatterLiquidLensView && (self.hidden == NO);
 }
-
 
 - (BOOL)cyl_isPlatterDestOutView {
     if (![CYLConstants isLiquidGlassActive]) {
@@ -561,22 +558,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     view.layer.zPosition = MAXFLOAT;
 }
 
-- (void)cyl_setHidden:(BOOL)hidden {
-    if (hidden) {
-        self.opaque = NO;
-        self.hidden = YES;
-        self.alpha = 0.0f;
-        self.userInteractionEnabled = NO;
-        [self cyl_setIsPlaceholder:NO];
-    } else {
-        self.opaque = YES;
-        self.hidden = NO;
-        self.alpha = 1.0f;
-        self.userInteractionEnabled = YES;
-        [self cyl_setIsPlaceholder:YES];
-    }
-}
-
 // helper to get pre transform frame
 - (CGRect)cyl_originalFrame {
    CGAffineTransform currentTransform = self.transform;
@@ -762,7 +743,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return image;
 }
 
-
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 + (UIView *)cyl_tabBadgePointViewWithClolor:(UIColor *)color radius:(CGFloat)radius {
     // FIX: issue #653 — fixed frame instead of width/height constraints (constraints inside a tab button break
@@ -814,5 +794,4 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 @end
-
 

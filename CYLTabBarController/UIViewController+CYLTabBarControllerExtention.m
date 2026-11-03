@@ -219,14 +219,6 @@
     [fromViewController.navigationController pushViewController:viewController animated:animated];
 }
 
-- (UIViewController *)cyl_getViewControllerInsteadOfNavigationController {
-    BOOL isNavigationController = [[self class] isSubclassOfClass:[UINavigationController class]];
-    if (isNavigationController && ((UINavigationController *)self).viewControllers.count > 0) {
-        return ((UINavigationController *)self).viewControllers[0];
-    }
-    return self;
-}
-
 #pragma mark - public method
 
 - (BOOL)cyl_isPlusChildViewController {
@@ -664,7 +656,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return YES;
 }
 
-
 - (void)cyl_performSelector:(SEL)aSelector {
     if (aSelector == NULL) { return; }
     NSObject *object2 = nil;
@@ -685,7 +676,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
      [self performSelector:aSelector withObject:object1 withObject:object2];
      )
 }
-
 
 - (UIControl *)cyl_visiableTabButton {
     if ([CYLConstants isLiquidGlassActive]) {
@@ -787,7 +777,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     [kActualView cyl_performSelector:selector withObject:cyl_setBadgeMaximumBadgeNumberValue];
 }
 
-
 - (CGFloat)cyl_badgeMargin {
     return [kActualView cyl_badgeMargin];
 }
@@ -869,9 +858,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 #if CYL_FLATDESIGN_AVAILABLE
 
-
-
-
 - (CYLFlatDesignTabBarItem *)cyl_tabBarItem {
     CYLFlatDesignTabBarItem *tabBarItem = objc_getAssociatedObject(self, @selector(cyl_tabBarItem));
     if (!tabBarItem) {
@@ -949,5 +935,4 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 #endif
 
 @end
-
 

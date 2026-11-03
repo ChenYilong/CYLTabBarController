@@ -7,6 +7,12 @@
  */
 
 #import <UIKit/UIKit.h>
+// FIX: issue #535 — shared with Core through CYLUtils. 通过 CYLUtils 与 Core 共用。
+#if __has_include("../CYLUtils/UIView+CYLUtils.h")
+#import "../CYLUtils/UIView+CYLUtils.h"
+#else
+#import "UIView+CYLUtils.h"
+#endif
 #import "CYLBadgeProtocol.h"
 @protocol CYLBadgeTextDisplaying;
 
@@ -89,22 +95,10 @@ FOUNDATION_EXTERN NSString * _Nullable CYLBadgeAccessibilityDescription(NSString
 - (BOOL)cyl_isPauseBadge;
 
 /*!
- * [EN] Returns YES if the view is effectively invisible: hidden, alpha ≈ 0, zero size, or not in a superview.
- * [CN] 判断视图是否实际不可见：hidden、alpha 接近 0、尺寸为零或没有父视图。
- */
-- (BOOL)cyl_isInvisiable;
-
-/*!
  * [EN] Same as `-cyl_isInvisiable`.
  * [CN] 同 -cyl_isInvisiable。
  */
 - (BOOL)cyl_isHidden;
-
-/*!
- * [EN] Returns YES if the view cannot receive touches: invisible, interaction disabled, or a placeholder.
- * [CN] 判断视图是否无法响应事件：不可见、禁用交互或为占位视图。
- */
-- (BOOL)cyl_canNotResponseEvent;
 
 /*!
  * 在 cyl_getActualBadgeSuperView方法中使用

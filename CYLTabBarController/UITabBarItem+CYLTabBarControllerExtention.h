@@ -7,12 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
+// FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+#if __has_include("CYLUtils/UIBarItem+CYLUtils.h")
+#import "CYLUtils/UIBarItem+CYLUtils.h"
+#else
+#import "UIBarItem+CYLUtils.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface UITabBarItem (CYLTabBarControllerExtention)
 
-@property (nonatomic, readonly) UIControl *cyl_tabButton;
 @property (nonatomic, readonly, nullable) UIControl *cyl_selectedTabButton;
 @property (nonatomic, readonly) UIControl *cyl_visiableTabButton;
 @property (nonatomic, strong, getter=cyl_lottieURL, setter=cyl_setLottieURL:) NSURL *cyl_lottieURL;
@@ -32,12 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 同 -cyl_imageView。
  */
 - (nullable UIImageView *)cyl_imageViewInTabBarButton;
-
-/*!
- * [EN] Returns YES once the item's image view or title label has been laid out (width > 10).
- * [CN] 判断该 Item 的图片视图或标题 Label 是否已完成布局（宽度大于 10）。
- */
-- (BOOL)cyl_isReady;
 
 @end
 
