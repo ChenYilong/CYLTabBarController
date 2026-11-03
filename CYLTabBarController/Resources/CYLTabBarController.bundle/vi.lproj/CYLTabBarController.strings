@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Chọn tab có định danh “%@” (“%@”, index %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop ngăn xếp hiện tại, chọn tab có định danh “%@”, rồi push một trang demo mới vào tab đó";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Như trên, chọn tab có định danh “%@” (“%@”), có hiệu ứng pop";
+"标题偏移（titlePositionAdjustment）" = "Độ lệch tiêu đề (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Chạm để chuyển độ lệch dọc của tiêu đề tất cả các tab, hiện tại: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "Chủ đề standardAppearance (dùng chung cho Liquid Glass và FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Chạm để chuyển tabBar.standardAppearance, hiện tại: %@";
+"原始" = "Gốc";
+"深色" = "Tối";
+"居中胶囊" = "Viên nang ở giữa";
+"绿色描边" = "Đường viền xanh lá";

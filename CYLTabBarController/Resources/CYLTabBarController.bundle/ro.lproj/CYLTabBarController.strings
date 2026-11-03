@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Selectează fila cu identificatorul „%@” („%@”, indice %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop al stivei curente, selectează fila cu identificatorul „%@”, apoi push al unei pagini demo noi în acea filă";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Ca mai sus, selectează fila cu identificatorul „%@” („%@”), cu animație pop";
+"标题偏移（titlePositionAdjustment）" = "Decalajul titlului (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Atingeți pentru a comuta decalajul vertical al titlurilor tuturor filelor, curent: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "Temă standardAppearance (comună pentru Liquid Glass și FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Atingeți pentru a comuta tabBar.standardAppearance, curent: %@";
+"原始" = "Original";
+"深色" = "Întunecat";
+"居中胶囊" = "Capsulă centrată";
+"绿色描边" = "Linie verde";

@@ -140,6 +140,9 @@ NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification = @"CYLTabBar
 NSString *const CYLTabBarStyleTypeDidChangeNotification = @"CYLTabBarStyleTypeDidChangeNotification";
 static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageViewDefaultOffsetContext;
 static void * const CYLFlatDesignTabBarContext = (void*)&CYLFlatDesignTabBarContext;
+/// The system tab bar's `standardAppearance` / `scrollEdgeAppearance`: synced to the tabs' title offsets (issue #475) and to
+/// the flat design tab bar. 系统 TabBar 的 `standardAppearance` / `scrollEdgeAppearance`：同步到 Tab 的标题偏移（issue #475）与扁平样式 TabBar。
+static void * const CYLStandardAppearanceContext = (void*)&CYLStandardAppearanceContext;
 //static void * const CYLTabBarControllerVisiableItemsCountContext = (void*)&CYLTabBarControllerVisiableItemsCountContext;
 
 #if CYL_FLATDESIGN_AVAILABLE
@@ -193,6 +196,10 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 + (void)cyl_markTabBarControllerActive:(CYLTabBarController *)tabBarController;
 + (CYLTabBarController *)cyl_tabBarControllerForContext:(NSString *)context matching:(CYLTabBarControllerMatcher)matcher;
 @end
+
+/// FIX: issue #475. The title offset a tab asked for itself; see `-setTitlePositionAdjustment:`.
+/// Tab 自身设置的标题偏移，见 `-setTitlePositionAdjustment:`。
+static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset offset);
 
 @implementation CYLTabBarController {
 #if CYL_FLATDESIGN_AVAILABLE
@@ -744,6 +751,8 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
+    [self cyl_startObservingStandardAppearance];
+    [self cyl_syncTabBarAppearances];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     if ([CYLConstants isLiquidGlassActive]) {
         //如果不是扁平设计风格，也就是液态玻璃不支持自定义高度， 液态玻璃系统样式是固定高度的。// Unless it's a flat design style—in which case Liquid Glass does not support custom heights—the Liquid Glass system style has a fixed height.
@@ -844,6 +853,9 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 }
 
 - (void)dealloc {
+    // Whatever the style is now: the style can change after the observation started.
+    // 与当前样式无关：开始观察后样式可能已改变。
+    [self cyl_stopObservingStandardAppearance];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     
         // `-removePlusButtonIfNeeded` used to run here: it removed the registered plus button when its context differed from
@@ -1256,7 +1268,7 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
                                                                                   lottieFilePath:lottieFilePath
                                                                                  lottieSizeValue:lottieSizeValue];
         cyl_tabBarItem.lottieURL = lottieURL;
-                
+        CYLRememberItemTitlePositionAdjustment(cyl_tabBarItem, titlePositionAdjustment);
                 
         [cyl_tabBarItem cylflatdesign_setTabBarController:self];
         cyl_tabBarItem.childViewController = viewController;
@@ -1344,6 +1356,11 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
         _titlePositionAdjustment = titlePositionAdjustment;
         _tabBarItemsAttributes = tabBarItemsAttributes;
         _adjustTabBarItemImageViewSizeDependOnSuperView = YES;
+#if CYL_FLATDESIGN_AVAILABLE
+        // FlatDesign only. Before a subclass customizes the tab bar: tells an app's `standardAppearance` from the default one.
+        // 仅用于扁平样式。在子类自定义 TabBar 之前：用于区分 App 设置的 `standardAppearance` 与默认值。
+        [self cyl_recordDefaultStandardAppearance];
+#endif
         //以下为重要步骤，谨慎修改顺序：
         self.tabBarStyleType = styleType;// 步骤1 must use setter 必须在 self.viewControllers之前设置， 因为 self.viewControllers直接涉及到样式判断逻辑。
         [self cyl_tabBar];
@@ -2229,6 +2246,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     if (shouldCustomizeTitlePositionAdjustment) {
         offset = titlePositionAdjustment;
     }
+    CYLRememberItemTitlePositionAdjustment(viewController.tabBarItem, titlePositionAdjustment);
     [self cyl_applyTitlePositionAdjustment:offset toTabBarItem:viewController.tabBarItem];
     
     UIOffset imageoffset = self.imagePositionAdjustment;
@@ -2273,13 +2291,342 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
         return;
     }
     BOOL isZero = UIOffsetEqualToOffset(UIOffsetZero, offset);
-    BOOL wasSetByCYL = [objc_getAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey) boolValue];
+    BOOL wasSetByCYL = (objc_getAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey) != nil);
     if (isZero && !wasSetByCYL) {
         return;
     }
     tabBarItem.titlePositionAdjustment = offset;
-    objc_setAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey, isZero ? nil : @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey, isZero ? nil : [NSValue valueWithUIOffset:offset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncTitlePositionAdjustmentAppearanceOfTabBarItem:tabBarItem];
+    }
 }
+
+#pragma mark - Title position adjustment (issue #475)
+
+/*!
+ * FIX: issue #475 (titlePositionAdjustment has no effect on iOS 13)
+ * [EN] Since iOS 13 a tab bar that uses `UITabBarAppearance` (any `tabBar.standardAppearance = ...`, which most apps do
+ *      for dark mode or iOS 15's transparent bar) ignores `-[UITabBarItem titlePositionAdjustment]`: the title offset
+ *      comes from the item appearances of the bar appearance instead. So a tab with an offset also gets its own
+ *      `standardAppearance` (and `scrollEdgeAppearance` on iOS 15+): a copy of the tab bar's, with the offset written
+ *      into every layout and state. The copy is rebuilt when the tab bar's appearance changes (checked on layout), and an
+ *      appearance the app installed on the item itself is kept as the base and restored when the offset is reset.
+ * [CN] iOS 13 起，使用 `UITabBarAppearance` 的 TabBar（任何 `tabBar.standardAppearance = ...`，多数 App 为深色模式或 iOS 15
+ *      透明 TabBar 都会这样设置）会忽略 `-[UITabBarItem titlePositionAdjustment]`，标题偏移改由 bar appearance 中的 item
+ *      appearance 决定。因此有偏移的 Tab 还会得到自己的 `standardAppearance`（iOS 15+ 还有 `scrollEdgeAppearance`）：TabBar
+ *      appearance 的副本，偏移写入每种布局与状态。TabBar 的 appearance 改变时（布局时检查）会重建副本；App 自己在 item 上
+ *      设置的 appearance 会作为基础保留，偏移重置时恢复。
+ */
+static char CYLTitlePositionAdjustmentItemOffsetKey;
+static char CYLTitlePositionAdjustmentStandardAppearanceKey;
+static char CYLTitlePositionAdjustmentScrollEdgeAppearanceKey;
+
+/// The offset a tab asked for itself (`CYLTabBarItemTitlePositionAdjustment`), so a new controller-level offset does not
+/// replace it. 记录 Tab 自身设置的偏移，避免被控制器级别的新偏移覆盖。
+static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset offset) {
+    id object = item;
+    if (!object) {
+        return;
+    }
+    BOOL isZero = UIOffsetEqualToOffset(UIOffsetZero, offset);
+    objc_setAssociatedObject(object, &CYLTitlePositionAdjustmentItemOffsetKey, isZero ? nil : [NSValue valueWithUIOffset:offset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+static UIOffset CYLTitlePositionAdjustmentForItem(id _Nullable item, UIOffset controllerOffset) {
+    id object = item;
+    NSValue *itemOffset = object ? objc_getAssociatedObject(object, &CYLTitlePositionAdjustmentItemOffsetKey) : nil;
+    return itemOffset ? itemOffset.UIOffsetValue : controllerOffset;
+}
+
+API_AVAILABLE(ios(13.0))
+static void CYLSetTitlePositionAdjustmentOfItemAppearance(UITabBarItemAppearance *itemAppearance, UIOffset offset) {
+    for (UITabBarItemStateAppearance *state in @[ itemAppearance.normal, itemAppearance.selected, itemAppearance.disabled, itemAppearance.focused ]) {
+        state.titlePositionAdjustment = offset;
+    }
+}
+
+API_AVAILABLE(ios(13.0))
+static UITabBarAppearance *CYLTabBarAppearanceWithTitlePositionAdjustment(UITabBarAppearance *base, UIOffset offset) {
+    UITabBarAppearance *appearance = [base copy];
+    CYLSetTitlePositionAdjustmentOfItemAppearance(appearance.stackedLayoutAppearance, offset);
+    CYLSetTitlePositionAdjustmentOfItemAppearance(appearance.inlineLayoutAppearance, offset);
+    CYLSetTitlePositionAdjustmentOfItemAppearance(appearance.compactInlineLayoutAppearance, offset);
+    return appearance;
+}
+
+/*!
+ * [EN] Keeps one appearance of `tabBarItem` (`standardAppearance` or `scrollEdgeAppearance`) in step with its offset.
+ *      `barAppearance` is the tab bar's appearance it is built from; `transparent` builds it with a transparent
+ *      background. The associated state is `@[installed, barAppearance, appBase or NSNull]`: the bar appearance itself is
+ *      kept (not a copy), so an unchanged tab bar is recognized by identity and nothing is installed again on layout.
+ * [CN] 使 `tabBarItem` 的某个 appearance（`standardAppearance` 或 `scrollEdgeAppearance`）与偏移保持一致。`barAppearance`
+ *      为其所基于的 TabBar appearance，`transparent` 表示以透明背景构建。关联状态为 `@[installed, barAppearance, appBase 或 NSNull]`：
+ *      保存的是 bar appearance 本身（不是副本），TabBar 未改变时按对象身份即可识别，布局时不会重复安装。
+ */
+API_AVAILABLE(ios(13.0))
+static void CYLSyncTitlePositionAdjustmentAppearance(UITabBarItem *tabBarItem, const void *stateKey, UITabBarAppearance *_Nullable current, UITabBarAppearance *_Nullable barAppearance, BOOL transparent, NSValue *_Nullable offsetValue, void (^setter)(UITabBarAppearance *_Nullable appearance), UITabBarAppearance *_Nullable (^getter)(void)) {
+    NSArray *state = objc_getAssociatedObject(tabBarItem, stateKey);
+    UITabBarAppearance *installed = state.firstObject;
+    id storedAppBase = state.lastObject;
+    UITabBarAppearance *appBase = [storedAppBase isKindOfClass:[UITabBarAppearance class]] ? storedAppBase : nil;
+    BOOL installedByCYL = installed && (current == installed || [current isEqual:installed]);
+    if (current && !installedByCYL) {
+        // The app installed its own appearance on the item: build on it.
+        // App 在 item 上安装了自己的 appearance：在其基础上构建。
+        appBase = current;
+    }
+    if (!offsetValue) {
+        if (state) {
+            setter(appBase);
+            objc_setAssociatedObject(tabBarItem, stateKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        return;
+    }
+    id source = appBase ?: barAppearance;
+    if (!source) {
+        return;
+    }
+    UIOffset offset = offsetValue.UIOffsetValue;
+    id storedSource = state.count > 1 ? state[1] : nil;
+    BOOL upToDate = installedByCYL && (storedSource == source || [storedSource isEqual:source]) &&
+                    UIOffsetEqualToOffset(installed.stackedLayoutAppearance.normal.titlePositionAdjustment, offset);
+    if (upToDate) {
+        return;
+    }
+    UITabBarAppearance *base = source;
+    if (!appBase && transparent) {
+        base = [source copy];
+        [base configureWithTransparentBackground];
+    }
+    setter(CYLTabBarAppearanceWithTitlePositionAdjustment(base, offset));
+    UITabBarAppearance *newInstalled = getter();
+    if (!newInstalled) {
+        return;
+    }
+    objc_setAssociatedObject(tabBarItem, stateKey, @[ newInstalled, source, appBase ?: [NSNull null] ], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)cyl_syncTitlePositionAdjustmentAppearanceOfTabBarItem:(UITabBarItem *)tabBarItem API_AVAILABLE(ios(13.0)) {
+    NSValue *offsetValue = objc_getAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey);
+    UITabBar *tabBar = self.tabBar;
+    UITabBarAppearance *standardAppearance = tabBar.standardAppearance;
+    CYLSyncTitlePositionAdjustmentAppearance(tabBarItem, &CYLTitlePositionAdjustmentStandardAppearanceKey, tabBarItem.standardAppearance, standardAppearance, NO, offsetValue, ^(UITabBarAppearance *appearance) {
+        tabBarItem.standardAppearance = appearance;
+    }, ^UITabBarAppearance *{
+        return tabBarItem.standardAppearance;
+    });
+    if (@available(iOS 15.0, *)) {
+        // Without a scroll edge appearance the tab bar shows its standard one with a transparent background at the
+        // scroll edge: build the same, so the item's opaque standard copy is not used there.
+        // 没有 scrollEdgeAppearance 时，TabBar 在滚动边缘显示透明背景的 standardAppearance：按相同方式构建，避免在此处使用
+        // item 的不透明副本。
+        UITabBarAppearance *scrollEdgeAppearance = tabBar.scrollEdgeAppearance;
+        BOOL transparent = (scrollEdgeAppearance == nil);
+        CYLSyncTitlePositionAdjustmentAppearance(tabBarItem, &CYLTitlePositionAdjustmentScrollEdgeAppearanceKey, tabBarItem.scrollEdgeAppearance, scrollEdgeAppearance ?: standardAppearance, transparent, offsetValue, ^(UITabBarAppearance *appearance) {
+            tabBarItem.scrollEdgeAppearance = appearance;
+        }, ^UITabBarAppearance *{
+            return tabBarItem.scrollEdgeAppearance;
+        });
+    }
+}
+
+/// Picks up changes the app made to the tab bar's appearance since the offsets were applied.
+/// 同步 App 在应用偏移后对 TabBar appearance 所做的修改。
+- (void)cyl_syncTitlePositionAdjustmentAppearances {
+    if (@available(iOS 13.0, *)) {
+        for (UITabBarItem *tabBarItem in self.tabBar.items) {
+            if (objc_getAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey) ||
+                objc_getAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentStandardAppearanceKey)) {
+                [self cyl_syncTitlePositionAdjustmentAppearanceOfTabBarItem:tabBarItem];
+            }
+        }
+    }
+}
+
+- (void)setTitlePositionAdjustment:(UIOffset)titlePositionAdjustment {
+    _titlePositionAdjustment = titlePositionAdjustment;
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+#if CYL_FLATDESIGN_AVAILABLE
+        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
+        for (UIViewController *viewController in self.viewControllers) {
+            // Read the stored item: the getter creates a placeholder item when there is none.
+            // 读取已保存的 item：没有时 getter 会创建占位 item。
+            CYLFlatDesignTabBarItem *flatItem = objc_getAssociatedObject(viewController, @selector(cyl_tabBarItem));
+            if (![flatItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
+                continue;
+            }
+            flatItem.titlePositionAdjustment = CYLTitlePositionAdjustmentForItem(flatItem, titlePositionAdjustment);
+        }
+        // The tab buttons read the offset in `-layoutSubviews`. Tab 按钮在 `-layoutSubviews` 中读取偏移。
+        for (UIView *subview in _cyl_tabBar.subviews) {
+            [subview setNeedsLayout];
+        }
+        [_cyl_tabBar setNeedsLayout];
+#endif
+        return;
+    }
+    for (UIViewController *viewController in self.viewControllers) {
+        UITabBarItem *tabBarItem = viewController.tabBarItem;
+        [self cyl_applyTitlePositionAdjustment:CYLTitlePositionAdjustmentForItem(tabBarItem, titlePositionAdjustment) toTabBarItem:tabBarItem];
+    }
+}
+
+#pragma mark - tabBar.standardAppearance (all styles)
+
+/// Observed tab bar, see `-cyl_startObservingStandardAppearance`. 被观察的 TabBar，见 `-cyl_startObservingStandardAppearance`。
+static char CYLObservedStandardAppearanceTabBarKey;
+
+/*!
+ * [EN] Brings everything built from the system tab bar's appearances up to date: the title offset copies of the tabs
+ *      (issue #475) or, for FlatDesign (only when CYLFlatDesignTabBar is integrated), the flat design tab bar. Runs on layout and when `tabBar.standardAppearance` /
+ *      `scrollEdgeAppearance` is assigned (KVO), so a new appearance applies at once.
+ * [CN] 更新所有基于系统 TabBar appearance 构建的内容：Tab 的标题偏移副本（issue #475），扁平样式时（仅在集成了 CYLFlatDesignTabBar 时）为扁平样式 TabBar。在布局时以及
+ *      `tabBar.standardAppearance` / `scrollEdgeAppearance` 被赋值时（KVO）执行，新的 appearance 立即生效。
+ */
+- (void)cyl_syncTabBarAppearances {
+    if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) {
+        // FIX: issue #475
+        [self cyl_syncTitlePositionAdjustmentAppearances];
+    } else {
+#if CYL_FLATDESIGN_AVAILABLE
+        // `tabBar.standardAppearance` also styles the flat design tab bar. `tabBar.standardAppearance` 同样作用于扁平样式 TabBar。
+        [self cyl_syncFlatDesignStandardAppearance];
+#endif
+    }
+}
+
+/// `UITabBar.scrollEdgeAppearance` exists from iOS 15, `standardAppearance` from iOS 13.
+/// `UITabBar.scrollEdgeAppearance` 自 iOS 15 起提供，`standardAppearance` 自 iOS 13 起提供。
+static NSArray<NSString *> *CYLObservedAppearanceKeyPaths(void) {
+    if (@available(iOS 15.0, *)) {
+        return @[ @"standardAppearance", @"scrollEdgeAppearance" ];
+    }
+    return @[ @"standardAppearance" ];
+}
+
+- (void)cyl_startObservingStandardAppearance {
+    UITabBar *tabBar = self.tabBar;
+    UITabBar *observedTabBar = objc_getAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey);
+    if (observedTabBar == tabBar) {
+        return;
+    }
+    // The tab bar was replaced (`-setUpTabBar:` swaps in CYLTabBar): observe the current one.
+    // TabBar 已被替换（`-setUpTabBar:` 会换成 CYLTabBar）：改为观察当前的 TabBar。
+    [self cyl_stopObservingStandardAppearance];
+    if (!tabBar) {
+        return;
+    }
+    // The appearances exist from iOS 13. appearance 自 iOS 13 起提供。
+    if (@available(iOS 13.0, *)) {
+        for (NSString *keyPath in CYLObservedAppearanceKeyPaths()) {
+            [tabBar addObserver:self forKeyPath:keyPath options:NSKeyValueObservingOptionNew context:CYLStandardAppearanceContext];
+        }
+        objc_setAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey, tabBar, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+}
+
+- (void)cyl_stopObservingStandardAppearance {
+    UITabBar *tabBar = objc_getAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey);
+    if (!tabBar) {
+        return;
+    }
+    for (NSString *keyPath in CYLObservedAppearanceKeyPaths()) {
+        [tabBar cyl_removeObserver:self forKeyPath:keyPath context:CYLStandardAppearanceContext];
+    }
+    objc_setAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+#pragma mark - FlatDesign standardAppearance
+
+/*!
+ * [EN] Only compiled when the CYLFlatDesignTabBar subspec is integrated (`CYL_FLATDESIGN_AVAILABLE`), and only run for
+ *      `CYLTabBarStyleTypeFlatDesign`: Liquid Glass and the classic style never reach it.
+ * [CN] 仅在集成了 CYLFlatDesignTabBar 子库时编译（`CYL_FLATDESIGN_AVAILABLE`），且仅在 `CYLTabBarStyleTypeFlatDesign` 时执行：
+ *      液态玻璃与经典样式不会执行这里的代码。
+ */
+#if CYL_FLATDESIGN_AVAILABLE
+
+/*!
+ * [EN] One `UITabBarAppearance` for every style: what the app assigns to `tabBar.standardAppearance` (and to a child's
+ *      `tabBarItem.standardAppearance`) is mirrored to the flat design tab bar (and its item), which maps it onto its own
+ *      views, see `-[CYLFlatDesignTabBar standardAppearance]`. The system tab bar's default appearance is not mirrored,
+ *      so without one the flat design look stays as it was. Synced on layout and, through KVO, as soon as
+ *      `tabBar.standardAppearance` is assigned (layout still catches it if KVO is not delivered).
+ * [CN] 所有样式共用一个 `UITabBarAppearance`：App 赋给 `tabBar.standardAppearance`（以及子控制器 `tabBarItem.standardAppearance`）
+ *      的值会同步到扁平样式 TabBar（及其 item），由其映射到自身视图，见 `-[CYLFlatDesignTabBar standardAppearance]`。系统 TabBar
+ *      的默认 appearance 不会同步，因此未设置时扁平样式外观保持不变。在布局时同步；并通过 KVO 在 `tabBar.standardAppearance` 赋值后
+ *      立即同步（若未收到 KVO，布局时仍会同步）。
+ */
+static char CYLDefaultStandardAppearanceKey;
+static char CYLSyncedStandardAppearanceKey;
+static char CYLSyncedItemStandardAppearanceKey;
+
+- (void)cyl_recordDefaultStandardAppearance {
+    if (@available(iOS 13.0, *)) {
+        if (!objc_getAssociatedObject(self, &CYLDefaultStandardAppearanceKey)) {
+            UITabBarAppearance *standardAppearance = self.tabBar.standardAppearance;
+            if (standardAppearance) {
+                objc_setAssociatedObject(self, &CYLDefaultStandardAppearanceKey, standardAppearance, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
+        }
+    }
+}
+
+/// YES when `appearance` is not the system tab bar's default one. `appearance` 不是系统 TabBar 的默认值时为 YES。
+- (BOOL)cyl_isCustomizedStandardAppearance:(nullable UITabBarAppearance *)appearance API_AVAILABLE(ios(13.0)) {
+    if (!appearance) {
+        return NO;
+    }
+    UITabBarAppearance *defaultAppearance = objc_getAssociatedObject(self, &CYLDefaultStandardAppearanceKey) ?: [[UITabBarAppearance alloc] init];
+    return appearance != defaultAppearance && ![appearance isEqual:defaultAppearance];
+}
+
+static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedAppearance) {
+    if (appearance == syncedAppearance) {
+        return NO;
+    }
+    return !(appearance && [appearance isEqual:syncedAppearance]);
+}
+
+- (void)cyl_syncFlatDesignStandardAppearance {
+    if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType || ![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        CYLFlatDesignTabBar *flatDesignTabBar = (CYLFlatDesignTabBar *)_cyl_tabBar;
+        UITabBarAppearance *standardAppearance = self.tabBar.standardAppearance;
+        id syncedAppearance = objc_getAssociatedObject(self, &CYLSyncedStandardAppearanceKey);
+        // Back to the default appearance: give the flat design look back, unless the app set the flat bar's own.
+        // 恢复为默认 appearance：还原扁平样式外观，除非 App 直接设置了扁平 TabBar 自身的 appearance。
+        UITabBarAppearance *mirroredAppearance = [self cyl_isCustomizedStandardAppearance:standardAppearance] ? standardAppearance : nil;
+        if (CYLAppearanceChanged(mirroredAppearance, syncedAppearance)) {
+            UITabBarAppearance *flatAppearance = flatDesignTabBar.standardAppearance;
+            BOOL flatAppearanceIsMirrored = !flatAppearance || [flatAppearance isEqual:syncedAppearance];
+            if (mirroredAppearance || flatAppearanceIsMirrored) {
+                flatDesignTabBar.standardAppearance = mirroredAppearance;
+            }
+            objc_setAssociatedObject(self, &CYLSyncedStandardAppearanceKey, mirroredAppearance, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        for (UIViewController *viewController in self.viewControllers) {
+            // Read the stored item: the getter creates a placeholder item when there is none.
+            // 读取已保存的 item：没有时 getter 会创建占位 item。
+            CYLFlatDesignTabBarItem *flatItem = objc_getAssociatedObject(viewController, @selector(cyl_tabBarItem));
+            if (![flatItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
+                continue;
+            }
+            UITabBarAppearance *itemAppearance = viewController.tabBarItem.standardAppearance;
+            id syncedItemAppearance = objc_getAssociatedObject(flatItem, &CYLSyncedItemStandardAppearanceKey);
+            if (CYLAppearanceChanged(itemAppearance, syncedItemAppearance)) {
+                flatItem.standardAppearance = itemAppearance;
+                objc_setAssociatedObject(flatItem, &CYLSyncedItemStandardAppearanceKey, itemAppearance, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
+        }
+    }
+}
+
+
+#endif // CYL_FLATDESIGN_AVAILABLE
 
 - (UIImage *)getImageFromImageInfo:(id)imageInfo {
     UIImage *image = [UIImage cyl_getImageFromImageInfo:imageInfo];
@@ -2301,6 +2648,10 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
         } else {/**  CYLTabBarStyleTypeFlatDesign*/}
         return;
     }
+    if (context == CYLStandardAppearanceContext) {
+        [self cyl_syncTabBarAppearances];
+        return;
+    }
     if (context == CYLFlatDesignTabBarContext) {
 #if CYL_FLATDESIGN_AVAILABLE
         if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType || ![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
@@ -2312,6 +2663,9 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
         // `-cyl_setTabBar:` 已经保存了 `newTabBar`，在这里再次赋值会无限重入本回调。
         if (oldTabBar == newTabBar) { return; }
         [oldTabBar removeFromSuperview];
+        if (@available(iOS 13.0, *)) {
+            newTabBar.standardAppearance = newTabBar.standardAppearance ?: oldTabBar.standardAppearance;
+        }
         newTabBar.delegate = self;
         newTabBar.items = oldTabBar.items;
         newTabBar.selectedItem = oldTabBar.selectedItem;

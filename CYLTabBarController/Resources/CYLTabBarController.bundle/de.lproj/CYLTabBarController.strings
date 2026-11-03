@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Tab mit der Kennung „%@“ wählen („%@“, Index %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Aktuellen Stapel poppen, den Tab mit der Kennung „%@“ wählen und dann eine neue Demoseite in diesen Tab pushen";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Wie oben, Tab mit der Kennung „%@“ („%@“) wählen, mit Pop-Animation";
+"标题偏移（titlePositionAdjustment）" = "Titelversatz (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Tippen, um den vertikalen Versatz aller Tab-Titel zu wechseln, aktuell: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance-Design (gemeinsam für Liquid Glass und FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Tippen, um tabBar.standardAppearance zu wechseln, aktuell: %@";
+"原始" = "Original";
+"深色" = "Dunkel";
+"居中胶囊" = "Zentrierte Kapsel";
+"绿色描边" = "Grüne Linie";

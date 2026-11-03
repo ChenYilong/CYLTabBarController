@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "식별자가 ‘%@’인 탭 선택(‘%@’, index %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "현재 스택을 Pop하고 식별자가 ‘%@’인 탭을 선택한 뒤 그 탭에 새 데모 화면을 push";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "위와 같음. 식별자가 ‘%@’인 탭(‘%@’) 선택, 팝 애니메이션 있음";
+"标题偏移（titlePositionAdjustment）" = "제목 오프셋(titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "탭하여 모든 탭 제목의 세로 오프셋 전환, 현재: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance 테마(Liquid Glass와 FlatDesign 공용)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "탭하여 tabBar.standardAppearance 전환, 현재: %@";
+"原始" = "원본";
+"深色" = "다크";
+"居中胶囊" = "가운데 캡슐";
+"绿色描边" = "녹색 선";

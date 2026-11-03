@@ -8,6 +8,7 @@
 
 #import "CYLFlatDesignTabBarButton.h"
 #import "CYLFlatDesignTabBarItem.h"
+#import "CYLFlatDesignTabBar.h"
 #if __has_include(<CYLTabBarController/CYLTabBarController.h>)
 #import <CYLTabBarController/CYLTabBarController.h>
 #else
@@ -16,7 +17,48 @@
 
 @interface CYLFlatDesignTabBarButton ()
 
+/// Drawn behind the selected item for `UITabBarAppearance.selectionIndicatorImage`.
+/// 按 `UITabBarAppearance.selectionIndicatorImage` 绘制在选中 item 背后。
+@property (nonatomic, strong, nullable) UIImageView *selectionIndicatorView;
+/// The badge values this button set from an appearance, so they can be given back when it no longer sets them.
+/// 本按钮按 appearance 设置过的角标属性，appearance 不再设置时可以还原。
+@property (nonatomic, assign) BOOL appliedAppearanceBadgeBackgroundColor;
+@property (nonatomic, assign) BOOL appliedAppearanceBadgeTextColor;
+@property (nonatomic, assign) BOOL appliedAppearanceBadgeFont;
+@property (nonatomic, assign) BOOL appliedAppearanceBadgeOffset;
+
 @end
+
+#pragma mark - UITabBarAppearance
+
+/// A `UITabBarAppearance` as created, to tell values an app customized from the defaults. 新建的 `UITabBarAppearance`，用于区分 App 自定义的值与默认值。
+API_AVAILABLE(ios(13.0))
+static UITabBarItemAppearance *CYLDefaultTabBarItemAppearance(void) {
+    static UITabBarItemAppearance *defaultAppearance;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        defaultAppearance = [[UITabBarAppearance alloc] init].stackedLayoutAppearance;
+    });
+    return defaultAppearance;
+}
+
+API_AVAILABLE(ios(13.0))
+static UITabBarItemStateAppearance *CYLStateAppearanceForState(UITabBarItemAppearance *itemAppearance, UIControlState state) {
+    if (state & UIControlStateDisabled) {
+        return itemAppearance.disabled;
+    }
+    if (state & UIControlStateSelected) {
+        return itemAppearance.selected;
+    }
+    return itemAppearance.normal;
+}
+
+static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defaultValue) {
+    if (!value) {
+        return NO;
+    }
+    return !(defaultValue && [value isEqual:defaultValue]);
+}
 
 @implementation CYLFlatDesignTabBarButton
 @synthesize selected = _selected;
@@ -59,7 +101,159 @@
     [super tintColorDidChange];
     if (self.isSelected) {
         _titleLabel.textColor = [self _titleTextAttributesForState][NSForegroundColorAttributeName];
-        _imageView.tintColor = self.tintColor;
+        _imageView.tintColor = [self _iconColorForState];
+    }
+}
+
+#pragma mark - UITabBarAppearance mapping
+
+/// The flat design tab bar this button is on. 本按钮所在的扁平样式 TabBar。
+- (nullable CYLFlatDesignTabBar *)_owningFlatDesignTabBar {
+    UIView *view = self.superview;
+    while (view && ![view isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        view = view.superview;
+    }
+    return (CYLFlatDesignTabBar *)view;
+}
+
+/*!
+ * [EN] The appearance the bar is drawn with, see `-[CYLFlatDesignTabBar standardAppearance]`: the selected item's own,
+ *      else the bar's. The selected item comes from the bar, so every button follows it.
+ * [CN] TabBar 绘制所用的 appearance，见 `-[CYLFlatDesignTabBar standardAppearance]`：选中 item 自身的，否则为 TabBar 的。
+ *      选中 item 取自 TabBar，因此所有按钮保持一致。
+ */
+- (nullable UITabBarAppearance *)_effectiveAppearance API_AVAILABLE(ios(13.0)) {
+    CYLFlatDesignTabBar *tabBar = [self _owningFlatDesignTabBar];
+    if (!tabBar) {
+        return _tabBarItem.standardAppearance;
+    }
+    return tabBar.selectedItem.standardAppearance ?: tabBar.standardAppearance;
+}
+
+/// The state appearance of the current state, nil without an appearance. 当前状态的 state appearance，没有 appearance 时为 nil。
+- (nullable UITabBarItemStateAppearance *)_stateAppearance API_AVAILABLE(ios(13.0)) {
+    UITabBarAppearance *appearance = [self _effectiveAppearance];
+    if (!appearance) {
+        return nil;
+    }
+    return CYLStateAppearanceForState(appearance.stackedLayoutAppearance, [self _currentState]);
+}
+
+- (nullable UITabBarItemStateAppearance *)_defaultStateAppearance API_AVAILABLE(ios(13.0)) {
+    return CYLStateAppearanceForState(CYLDefaultTabBarItemAppearance(), [self _currentState]);
+}
+
+/// `iconColor` of the appearance, else the flat design default (tint color when selected, gray otherwise).
+/// appearance 的 `iconColor`，否则使用扁平样式默认值（选中为 tintColor，否则为灰色）。
+- (UIColor *)_iconColorForState {
+    if (@available(iOS 13.0, *)) {
+        UIColor *iconColor = [self _stateAppearance].iconColor;
+        if (iconColor) {
+            return iconColor;
+        }
+    }
+    return self.isSelected ? self.tintColor : [UIColor systemGrayColor];
+}
+
+/// `titlePositionAdjustment` of the appearance, used when the item has no offset of its own. item 没有自身偏移时使用的 appearance `titlePositionAdjustment`。
+- (UIOffset)_appearanceTitlePositionAdjustment {
+    if (@available(iOS 13.0, *)) {
+        UITabBarItemStateAppearance *stateAppearance = [self _stateAppearance];
+        if (stateAppearance) {
+            return stateAppearance.titlePositionAdjustment;
+        }
+    }
+    return UIOffsetZero;
+}
+
+/*!
+ * [EN] `selectionIndicatorImage` / `selectionIndicatorTintColor` of the appearance, behind the selected item. A resizable
+ *      image fills the button, any other is centered. Only shown while selected.
+ * [CN] appearance 的 `selectionIndicatorImage` / `selectionIndicatorTintColor`，绘制在选中 item 背后。可拉伸图片铺满按钮，其他图片居中。
+ *      仅在选中时显示。
+ */
+- (void)_updateSelectionIndicator {
+    UIImage *image = nil;
+    UIColor *tintColor = nil;
+    if (@available(iOS 13.0, *)) {
+        UITabBarAppearance *appearance = [self _effectiveAppearance];
+        if (self.isSelected) {
+            image = appearance.selectionIndicatorImage;
+            tintColor = appearance.selectionIndicatorTintColor;
+        }
+    }
+    if (!image) {
+        [_selectionIndicatorView removeFromSuperview];
+        _selectionIndicatorView = nil;
+        return;
+    }
+    if (tintColor && image.renderingMode != UIImageRenderingModeAlwaysOriginal) {
+        image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    }
+    UIImageView *selectionIndicatorView = _selectionIndicatorView;
+    if (!selectionIndicatorView) {
+        selectionIndicatorView = [[UIImageView alloc] init];
+        selectionIndicatorView.userInteractionEnabled = NO;
+        _selectionIndicatorView = selectionIndicatorView;
+    }
+    selectionIndicatorView.image = image;
+    selectionIndicatorView.tintColor = tintColor;
+    BOOL isResizable = !UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero);
+    selectionIndicatorView.contentMode = isResizable ? UIViewContentModeScaleToFill : UIViewContentModeCenter;
+    selectionIndicatorView.frame = self.bounds;
+    [self insertSubview:selectionIndicatorView atIndex:0];
+}
+
+/*!
+ * [EN] Badge values of the appearance: background color, text color and font, center offset. A value that is not
+ *      customized (equal to a new `UITabBarAppearance`) is left to the badge's own settings and `CYLBadgeAppearance`; one
+ *      set here earlier is given back to them (nil restores the global value).
+ * [CN] appearance 的角标属性：背景色、文字颜色与字体、中心偏移。未自定义的值（与新建的 `UITabBarAppearance` 相同）交给角标自身设置
+ *      与 `CYLBadgeAppearance`；之前在这里设置过的会还给它们（nil 恢复全局值）。
+ */
+- (void)_updateBadgeAppearance {
+    UIColor *backgroundColor = nil;
+    UIColor *textColor = nil;
+    UIFont *font = nil;
+    NSValue *offsetValue = nil;
+    if (@available(iOS 13.0, *)) {
+        UITabBarItemStateAppearance *stateAppearance = [self _stateAppearance];
+        UITabBarItemStateAppearance *defaultStateAppearance = [self _defaultStateAppearance];
+        if (stateAppearance) {
+            if (CYLAppearanceValueIsCustomized(stateAppearance.badgeBackgroundColor, defaultStateAppearance.badgeBackgroundColor)) {
+                backgroundColor = stateAppearance.badgeBackgroundColor;
+            }
+            NSDictionary<NSAttributedStringKey, id> *badgeTextAttributes = stateAppearance.badgeTextAttributes;
+            NSDictionary<NSAttributedStringKey, id> *defaultBadgeTextAttributes = defaultStateAppearance.badgeTextAttributes;
+            if (CYLAppearanceValueIsCustomized(badgeTextAttributes[NSForegroundColorAttributeName], defaultBadgeTextAttributes[NSForegroundColorAttributeName])) {
+                textColor = badgeTextAttributes[NSForegroundColorAttributeName];
+            }
+            if (CYLAppearanceValueIsCustomized(badgeTextAttributes[NSFontAttributeName], defaultBadgeTextAttributes[NSFontAttributeName])) {
+                font = badgeTextAttributes[NSFontAttributeName];
+            }
+            UIOffset offset = stateAppearance.badgePositionAdjustment;
+            if (!UIOffsetEqualToOffset(offset, UIOffsetZero)) {
+                offsetValue = [NSValue valueWithUIOffset:offset];
+            }
+        }
+    }
+    UIView *badgeSuperView = self.actualBadgeSuperView;
+    if (backgroundColor || self.appliedAppearanceBadgeBackgroundColor) {
+        [badgeSuperView cyl_setBadgeBackgroundColor:backgroundColor];
+        self.appliedAppearanceBadgeBackgroundColor = (backgroundColor != nil);
+    }
+    if (textColor || self.appliedAppearanceBadgeTextColor) {
+        [badgeSuperView cyl_setBadgeTextColor:textColor];
+        self.appliedAppearanceBadgeTextColor = (textColor != nil);
+    }
+    if (font || self.appliedAppearanceBadgeFont) {
+        [badgeSuperView cyl_setBadgeFont:font];
+        self.appliedAppearanceBadgeFont = (font != nil);
+    }
+    if (offsetValue || self.appliedAppearanceBadgeOffset) {
+        UIOffset offset = offsetValue ? offsetValue.UIOffsetValue : UIOffsetZero;
+        [badgeSuperView cyl_setBadgeCenterOffset:CGPointMake(offset.horizontal, offset.vertical)];
+        self.appliedAppearanceBadgeOffset = (offsetValue != nil);
     }
 }
 
@@ -118,11 +312,7 @@
         image = _tabBarItem.selectedImage;
     }
     _imageView.image = image;
-    if (self.isSelected) {
-        _imageView.tintColor = self.tintColor;
-    } else {
-        _imageView.tintColor = [UIColor systemGrayColor];
-    }
+    _imageView.tintColor = [self _iconColorForState];
 
     // title
     _titleLabel.text = _tabBarItem.title;
@@ -137,6 +327,8 @@
         }
         self.backgroundColor = backgroundColor;
     }
+    [self _updateSelectionIndicator];
+    [self _updateBadgeAppearance];
     [self updateLottie];
     [self setNeedsLayout];
 //    [self layoutIfNeeded];
@@ -146,6 +338,7 @@
     if (CGRectIsEmpty(self.bounds)) {
         return;
     }
+    _selectionIndicatorView.frame = self.bounds;
     
     // A Lottie-only item has no image, but the Lottie view is centered on `_imageView`,
     // so still lay the image slot out, sized to the Lottie size; otherwise it collapses to
@@ -172,8 +365,16 @@
     if (!isShowImageView && _tabBarItem.layoutCentered) {
         titleLabelY = (CGRectGetHeight(self.bounds) - titleLabelHeight) / 2;
     }
-    titleLabelX += _tabBarItem.titlePositionAdjustment.horizontal;
-    titleLabelY += _tabBarItem.titlePositionAdjustment.vertical;
+    // The item's own offset (CYLTabBarController's `titlePositionAdjustment`) wins, else the appearance's: on the system
+    // tab bar CYL writes its offset into the appearance (issue #475), so both styles show the same offset.
+    // item 自身的偏移（CYLTabBarController 的 `titlePositionAdjustment`）优先，否则使用 appearance 的：系统 TabBar 上 CYL 会把偏移
+    // 写入 appearance（issue #475），两种样式显示的偏移一致。
+    UIOffset titlePositionAdjustment = _tabBarItem.titlePositionAdjustment;
+    if (UIOffsetEqualToOffset(titlePositionAdjustment, UIOffsetZero)) {
+        titlePositionAdjustment = [self _appearanceTitlePositionAdjustment];
+    }
+    titleLabelX += titlePositionAdjustment.horizontal;
+    titleLabelY += titlePositionAdjustment.vertical;
     _titleLabel.frame = CGRectMake(titleLabelX, titleLabelY, titleLabelWidth, titleLabelHeight);
     
     if (isShowImageView) {
@@ -213,6 +414,15 @@
     NSMutableDictionary *titleAttributes = [_tabBarItem titleTextAttributesForState:state].mutableCopy;
     if (!titleAttributes) {
         titleAttributes = [_tabBarItem titleTextAttributesForState:UIControlStateNormal].mutableCopy;
+    }
+    if (@available(iOS 13.0, *)) {
+        // The appearance's attributes override the item's, as on `UITabBar` (which ignores the item's once it has an
+        // appearance). appearance 的属性覆盖 item 的属性，与 `UITabBar` 相同（有 appearance 后忽略 item 的属性）。
+        NSDictionary<NSAttributedStringKey, id> *appearanceAttributes = [self _stateAppearance].titleTextAttributes;
+        if (appearanceAttributes.count > 0) {
+            titleAttributes = titleAttributes ?: [NSMutableDictionary dictionary];
+            [titleAttributes addEntriesFromDictionary:appearanceAttributes];
+        }
     }
     if (!titleAttributes) {
         if (state == UIControlStateSelected) {

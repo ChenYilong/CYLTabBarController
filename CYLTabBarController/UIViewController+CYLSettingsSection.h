@@ -11,9 +11,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 /*!
  * [EN] Section index of the settings rows at the top of a list: row 0 is the language setting
- *      (`-cyl_languageCellForTableView:`), row 1 the memory warning check (`-cyl_memoryWarningCellForTableView:`).
+ *      (`-cyl_languageCellForTableView:`), row 1 the memory warning check (`-cyl_memoryWarningCellForTableView:`),
+ *      row 2 switches the title offset of all tabs (`CYLTabBarController.titlePositionAdjustment`, issue #475),
+ *      row 3 switches `tabBar.standardAppearance` themes, shared by Liquid Glass and FlatDesign.
  * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
- *      （`-cyl_memoryWarningCellForTableView:`）。
+ *      （`-cyl_memoryWarningCellForTableView:`），第 2 行切换所有 Tab 的标题偏移（`CYLTabBarController.titlePositionAdjustment`，
+ *      issue #475），第 3 行切换 `tabBar.standardAppearance` 主题（液态玻璃与扁平样式共用）。
  */
 FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 
@@ -41,8 +44,8 @@ FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 - (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath;
 
 /*!
- * [EN] Deselects the row and runs it: the language picker or the memory warning check.
- * [CN] 取消选中并执行该行：语言选择或内存警告检查。
+ * [EN] Deselects the row and runs it: the language picker, the memory warning check, the next title offset or the next appearance theme.
+ * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移或下一个 appearance 主题。
  */
 - (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
 
