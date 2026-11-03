@@ -11,6 +11,11 @@
 #import "CYLTabBarController.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"
 
+/// See `-[CYLTabBar plusButtonIndex]`. 见 `-[CYLTabBar plusButtonIndex]`。
+@interface CYLTabBar (CYLPlusButtonLayout)
+- (BOOL)cyl_showsVerticalBar;
+@end
+
 CGFloat CYLPlusButtonWidth = 0.0f;
 CYLPlusButton<CYLPlusButtonSubclassing> *CYLExternPlusButton = nil;
 UIViewController *CYLPlusChildViewController = nil;
@@ -357,7 +362,6 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
             }
         }
         [self setNeedsLayout];
-        // The tab bar places the plus button from the moved title in the iOS 27.1 vertical bar (`-cyl_centerInTabButton:inView:aligned:`).
         [self.superview setNeedsLayout];
         return;
     }
@@ -396,6 +400,11 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     NSNumber *imageToTitle = objc_getAssociatedObject(self, CYLPlusButtonImageToTitleKey);
     if (!container || !imageView.superview || imageToTitle == nil || [self cyl_isInPlatterSelectedLayer] ||
         ![self cyl_showsTitleInTabBarItem]) {
+        return center;
+    }
+    // The iOS 27.1 vertical bar: centered on its tab item, as without a title (`-[CYLTabBar plusButtonIndex]`).
+    // iOS 27.1 竖向栏：与没有标题时一样，居中于它的 TabBarItem（见 `-[CYLTabBar plusButtonIndex]`）。
+    if ([container isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)container cyl_showsVerticalBar]) {
         return center;
     }
     // The image's offset from the plus button's center. 图片中心相对 PlusButton 中心的偏移。
@@ -441,37 +450,6 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
         [views addObjectsFromArray:view.subviews];
     }
     return nil;
-}
-
-/*!
- * FIX: issue #636, #653
- * [EN] The plus button's center in `view` that puts its image `imageToTitle` (measured before the title moved) above the
- *      title of `tabButton`, used for the iOS 27.1 vertical bar, whose tab buttons are outside the tab bar. The center of
- *      `tabButton` until the title has moved, or when `tabButton` has no laid-out title; `aligned` tells which.
- * [CN] PlusButton 在 `view` 中的中心：使其图片位于 `tabButton` 标题上方 `imageToTitle`（标题移走前测得）处，用于 iOS 27.1 竖向栏
- *      （其 Tab 按钮不在 TabBar 内）。标题尚未移走，或 `tabButton` 没有已布局的标题时，返回 `tabButton` 的中心；`aligned` 表示是哪种。
- */
-- (CGPoint)cyl_centerInTabButton:(UIView *)tabButton inView:(UIView *)view aligned:(BOOL *)aligned {
-    CGPoint center = [tabButton.superview convertPoint:tabButton.center toView:view];
-    if (aligned) {
-        *aligned = NO;
-    }
-    NSNumber *imageToTitle = objc_getAssociatedObject(self, CYLPlusButtonImageToTitleKey);
-    UILabel *titleLabel = tabButton.cyl_tabLabel;
-    UIImageView *imageView = self.imageView;
-    if (imageToTitle == nil || titleLabel.text.length == 0 || !titleLabel.superview || !imageView.superview) {
-        return center;
-    }
-    CGPoint titleCenter = [titleLabel.superview convertPoint:titleLabel.center toView:view];
-    // The image's distance from the plus button's center. 图片中心相对 PlusButton 中心的偏移。
-    CGPoint imageCenter = [imageView.superview convertPoint:imageView.center toView:self];
-    CGFloat imageOffsetX = imageCenter.x - CGRectGetMidX(self.bounds);
-    CGFloat imageOffsetY = imageCenter.y - CGRectGetMidY(self.bounds);
-    if (aligned) {
-        *aligned = YES;
-    }
-    // Above its title, on the title's vertical center line. 位于标题上方，与标题竖向中心线对齐。
-    return CGPointMake(titleCenter.x - imageOffsetX, titleCenter.y - imageToTitle.doubleValue - imageOffsetY);
 }
 
 /*!
