@@ -393,7 +393,7 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 + (UIViewController *)plusChildViewController {
     UIViewController *plusChildViewController = [[UIViewController alloc] init];
 //    plusChildViewController.view.backgroundColor = [UIColor redColor];
-    plusChildViewController.navigationItem.title = @"PlusChildViewController";
+    plusChildViewController.navigationItem.title = CYLLocalizedString(@"PlusChildViewController");
     UIViewController *plusChildNavigationController = [[UINavigationController alloc]
                                                    initWithRootViewController:plusChildViewController];
     plusChildNavigationController.title = NSLocalizedString(@"发布", nil);
