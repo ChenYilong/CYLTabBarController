@@ -9,16 +9,143 @@
 #import "UIBarButtonItem+CYLBadgeExtention.h"
 #import <objc/runtime.h>
 #import "UIControl+CYLBadgeExtention.h"
+#import "CYLBadgeAppearance.h"
 // FIX: issue #535 — no Core header needed; see CYLBadgeViewDefines.h. 不再依赖 Core 头文件，见 CYLBadgeViewDefines.h。
 #import "CYLBadgeViewDefines.h"
 
 #define kActualView ((UIView *)[self cyl_getActualBadgeSuperView])
 #define CYL_ACTUAL_BARBUTTON kActualView
 
+/*!
+ * FIX: badge colors of bar button items on iOS 26+ (Liquid Glass)
+ * [EN] On iOS 26+ the content of a bar button item (`_UIModernBarButton`, with
+ *      `_enableMonochromaticTreatmentOnImageAndTitle`) is drawn monochrome in the bar's tint, and colors drawn by layers
+ *      inside it are lost (Apple Developer Forums 794886, 795908; "Liquid Glass – A Field Guide to UIKit Compatibility
+ *      Pitfalls"). The library's badge sits inside that content, so `cyl_badgeBackgroundColor` (e.g. a random color)
+ *      was replaced by the tint: a black dot on a light bar.
+ *      With Liquid Glass active, the badge of a `UIBarButtonItem` is now the system badge (`UIBarButtonItemBadge`,
+ *      iOS 26), whose colors UIKit keeps: background `cyl_badgeBackgroundColor`, text `cyl_badgeTextColor`, font
+ *      `cyl_badgeFont` (default: `CYLBadgeAppearance`). The value works as before: "" a dot, a number (capped at
+ *      `cyl_badgeMaximumBadgeNumber`, e.g. "99+"), "new"/"NEW" localized, any other text. The animation type is applied
+ *      to the system badge view when it can be found in the bar. `item.badge` is a copy, so the badge is configured
+ *      first and then assigned. Before iOS 26, and with `UIDesignRequiresCompatibility`, nothing changes.
+ * [CN] iOS 26+ 上 bar button item 的内容（`_UIModernBarButton`，`_enableMonochromaticTreatmentOnImageAndTitle`）会按导航栏的
+ *      tint 以单色绘制，其中由 layer 绘制的颜色会丢失（Apple 开发者论坛 794886、795908；《Liquid Glass – A Field Guide to UIKit
+ *      Compatibility Pitfalls》）。本库的角标位于该内容中，因此 `cyl_badgeBackgroundColor`（例如随机色）被 tint 替换：浅色导航栏上
+ *      显示为黑点。
+ *      现在液态玻璃生效时，`UIBarButtonItem` 的角标改用系统角标（iOS 26 的 `UIBarButtonItemBadge`），UIKit 会保留其颜色：背景色
+ *      `cyl_badgeBackgroundColor`、文字颜色 `cyl_badgeTextColor`、字体 `cyl_badgeFont`（默认取 `CYLBadgeAppearance`）。取值规则不变：
+ *      "" 为红点，数字（超过 `cyl_badgeMaximumBadgeNumber` 显示如 "99+"），"new"/"NEW" 按语言本地化，其他文字原样显示。能在导航栏中
+ *      找到系统角标视图时，会为其添加动画。`item.badge` 返回的是副本，因此先设置好角标再赋值。iOS 26 以前以及设置了
+ *      `UIDesignRequiresCompatibility` 时行为不变。
+ */
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+#define CYL_SYSTEM_BAR_BUTTON_BADGE_SDK 1
+#else
+#define CYL_SYSTEM_BAR_BUTTON_BADGE_SDK 0
+#endif
+
+/*!
+ * [EN] YES when bar button item badges are the system ones: iOS 26+ with Liquid Glass active. A plain function, not a
+ *      method: it does not depend on the item, and it adds nothing to UIBarButtonItem besides `CYLBadgeProtocol`.
+ * [CN] bar button item 的角标使用系统角标：iOS 26+ 且液态玻璃生效。使用函数而不是方法：与具体 item 无关，且除 `CYLBadgeProtocol`
+ *      外不给 UIBarButtonItem 增加任何方法。
+ */
+static BOOL CYLBarButtonItemUsesSystemBadge(void) {
+#if CYL_SYSTEM_BAR_BUTTON_BADGE_SDK
+    if (@available(iOS 26.0, *)) {
+        return [CYLUtils isLiquidGlassActive];
+    }
+#endif
+    return NO;
+}
+
+#if CYL_SYSTEM_BAR_BUTTON_BADGE_SDK
+/// The system badge for `value`, with the library's rules; nil hides it. 按本库规则生成的系统角标；nil 表示隐藏。
+static UIBarButtonItemBadge *CYLSystemBarButtonBadge(NSString *value, NSInteger maximumBadgeNumber) API_AVAILABLE(ios(26.0)) {
+    if (value.length == 0) {
+        return [UIBarButtonItemBadge indicatorBadge];
+    }
+    NSCharacterSet *nonDigits = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+    if ([value rangeOfCharacterFromSet:nonDigits].location == NSNotFound) {
+        NSInteger number = value.integerValue;
+        if (number <= 0) {
+            return nil;
+        }
+        NSInteger maximum = MAX(1, maximumBadgeNumber);
+        NSString *text = number > maximum ? [NSString stringWithFormat:@"%@+", @(maximum)] : [NSString stringWithFormat:@"%@", @(number)];
+        return [UIBarButtonItemBadge badgeWithString:text];
+    }
+    if ([value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length == 0) {
+        return nil;
+    }
+    if ([value isEqualToString:@"new"] || [value isEqualToString:@"NEW"]) {
+        value = CYLLocalizedString(value);
+    }
+    return [UIBarButtonItemBadge badgeWithString:value];
+}
+
+/// The system badge view inside `view` (a view whose class name has "Badge", not one of the library's). 系统角标视图。
+static UIView *CYLSystemBadgeViewInView(UIView *view, CGRect itemFrameInWindow) {
+    for (UIView *subview in view.subviews) {
+        NSString *className = NSStringFromClass(subview.class);
+        if ([className containsString:@"Badge"] && ![className hasPrefix:@"CYL"] && !subview.hidden) {
+            CGRect frameInWindow = [subview convertRect:subview.bounds toView:nil];
+            if (CGRectIsEmpty(itemFrameInWindow) || CGRectIntersectsRect(CGRectInset(frameInWindow, -8, -8), itemFrameInWindow)) {
+                return subview;
+            }
+        }
+        UIView *badgeView = CYLSystemBadgeViewInView(subview, itemFrameInWindow);
+        if (badgeView) {
+            return badgeView;
+        }
+    }
+    return nil;
+}
+
+/// Applies `animationType` to the system badge view once the bar has laid it out. 导航栏布局出系统角标视图后为其添加动画。
+static void CYLAnimateSystemBarButtonBadge(UIBarButtonItem *item, UIView *host, CYLBadgeAnimationType animationType) {
+    if (animationType == CYLBadgeAnimationTypeNone) {
+        return;
+    }
+    if (host.cyl_badgeRespectsReduceMotion && UIAccessibilityIsReduceMotionEnabled()) {
+        return;
+    }
+    __weak UIBarButtonItem *weakItem = item;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIView *itemView = weakItem.cyl_view;
+        // The bar that holds the item; its badge may be outside the item's own view. item 所在的 bar；系统角标可能不在 item 自身的视图中。
+        UIView *barView = itemView;
+        while (barView.superview && ![barView isKindOfClass:[UINavigationBar class]] && ![barView isKindOfClass:[UIToolbar class]]) {
+            barView = barView.superview;
+        }
+        [barView layoutIfNeeded];
+        CGRect itemFrameInWindow = itemView ? [itemView convertRect:itemView.bounds toView:nil] : CGRectZero;
+        UIView *badgeView = itemView ? CYLSystemBadgeViewInView(itemView, itemFrameInWindow) : nil;
+        badgeView = badgeView ?: (barView ? CYLSystemBadgeViewInView(barView, itemFrameInWindow) : nil);
+        if (!badgeView) {
+            return;
+        }
+        for (NSString *key in CYLBadgeAllAnimationKeys()) {
+            [badgeView.layer removeAnimationForKey:key];
+        }
+        CAAnimation *animation = CYLBadgeAnimationForType(animationType, badgeView.bounds.size);
+        NSString *animationKey = CYLBadgeAnimationKeyForType(animationType);
+        if (animation && animationKey) {
+            [badgeView.layer addAnimation:animation forKey:animationKey];
+        }
+    });
+}
+#endif
+
 @implementation UIBarButtonItem (CYLBadgeExtention)
 
 #pragma mark -- public methods
 - (BOOL)cyl_isReady {
+    // The system badge (iOS 26+) needs no laid-out view, so nothing waits for it. 系统角标（iOS 26+）不依赖已布局的视图，无需等待。
+    if (CYLBarButtonItemUsesSystemBadge()) {
+        return YES;
+    }
     UIView *view = [self cyl_getActualBadgeSuperView];
     if (view && [view isKindOfClass:[UIView class]]) {
         return view.frame.size.width > 10;
@@ -34,6 +161,10 @@
  * [CN] `delaySeconds` 原为 `NSUInteger`，尚未完成布局的 bar button 本应等待 0.5 秒，实际变成了 0 秒。
  */
 - (void)cyl_showBadge {
+    if (CYLBarButtonItemUsesSystemBadge()) {
+        [self cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeNone];
+        return;
+    }
     if (@available(iOS 11.0, *)) {
         [self swizzling_willMoveToSuperview];
     }
@@ -47,6 +178,28 @@
 
 - (void)cyl_showBadgeValue:(NSString *)value
              animationType:(CYLBadgeAnimationType)animationType {
+#if CYL_SYSTEM_BAR_BUTTON_BADGE_SDK
+    if (@available(iOS 26.0, *)) {
+        if (CYLBarButtonItemUsesSystemBadge()) {
+            UIView *host = CYL_ACTUAL_BARBUTTON;
+            // The library's own badge would be drawn monochrome here, so it is not shown. 本库自己的角标在这里会被单色绘制，因此不显示。
+            [host cyl_clearBadge];
+            objc_setAssociatedObject(self, @selector(cyl_resumeBadge), nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+            objc_setAssociatedObject(self, @selector(cyl_badgeAnimationType), @(animationType), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            NSInteger maximumBadgeNumber = host ? host.cyl_badgeMaximumBadgeNumber : [CYLBadgeAppearance globalAppearance].maximumBadgeNumber;
+            UIBarButtonItemBadge *badge = CYLSystemBarButtonBadge(value, maximumBadgeNumber);
+            badge.backgroundColor = self.cyl_badgeBackgroundColor;
+            badge.foregroundColor = self.cyl_badgeTextColor;
+            badge.font = self.cyl_badgeFont;
+            // `badge` is a copy: configure it first, then assign it. `badge` 为副本：先设置好再赋值。
+            self.badge = badge;
+            if (badge) {
+                CYLAnimateSystemBarButtonBadge(self, host, animationType);
+            }
+            return;
+        }
+    }
+#endif
     if (@available(iOS 11.0, *)) {
         [self swizzling_willMoveToSuperview];
     }
@@ -67,18 +220,52 @@
 }
 
 - (void)cyl_clearBadge {
+#if CYL_SYSTEM_BAR_BUTTON_BADGE_SDK
+    if (@available(iOS 26.0, *)) {
+        if (self.badge) {
+            // Kept for -cyl_resumeBadge. 保留，供 -cyl_resumeBadge 恢复。
+            objc_setAssociatedObject(self, @selector(cyl_resumeBadge), self.badge, OBJC_ASSOCIATION_COPY_NONATOMIC);
+            self.badge = nil;
+        }
+    }
+#endif
     [CYL_ACTUAL_BARBUTTON cyl_clearBadge];
 }
 
 - (void)cyl_resumeBadge {
+#if CYL_SYSTEM_BAR_BUTTON_BADGE_SDK
+    if (@available(iOS 26.0, *)) {
+        UIBarButtonItemBadge *pausedBadge = objc_getAssociatedObject(self, @selector(cyl_resumeBadge));
+        if (pausedBadge && !self.badge) {
+            self.badge = pausedBadge;
+            objc_setAssociatedObject(self, @selector(cyl_resumeBadge), nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+            CYLAnimateSystemBarButtonBadge(self, CYL_ACTUAL_BARBUTTON, self.cyl_badgeAnimationType);
+            return;
+        }
+    }
+#endif
     [CYL_ACTUAL_BARBUTTON cyl_resumeBadge];
 }
 
 - (BOOL)cyl_isPauseBadge {
+#if CYL_SYSTEM_BAR_BUTTON_BADGE_SDK
+    if (@available(iOS 26.0, *)) {
+        if (!self.badge && objc_getAssociatedObject(self, @selector(cyl_resumeBadge))) {
+            return YES;
+        }
+    }
+#endif
     return [CYL_ACTUAL_BARBUTTON cyl_isPauseBadge];
 }
 
 - (BOOL)cyl_isShowBadge {
+#if CYL_SYSTEM_BAR_BUTTON_BADGE_SDK
+    if (@available(iOS 26.0, *)) {
+        if (self.badge) {
+            return YES;
+        }
+    }
+#endif
     return [CYL_ACTUAL_BARBUTTON cyl_isShowBadge];
 }
 
@@ -242,34 +429,46 @@
 }
 
 - (UIFont *)cyl_badgeFont {
-	return CYL_ACTUAL_BARBUTTON.cyl_badgeFont;
+    // Remembered on the item too, for the system badge (iOS 26+) and before the bar button is laid out.
+    // 同时保存在 item 上，供系统角标（iOS 26+）以及 bar button 尚未布局时使用。
+    return objc_getAssociatedObject(self, @selector(cyl_badgeFont)) ?: (CYL_ACTUAL_BARBUTTON.cyl_badgeFont ?: [CYLBadgeAppearance globalAppearance].font);
 }
 
 - (void)cyl_setBadgeFont:(UIFont *)badgeFont {
-	[self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeFont:badgeFont]; }];
+    objc_setAssociatedObject(self, @selector(cyl_badgeFont), badgeFont, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeFont:badgeFont]; }];
 }
 
 - (UIColor *)cyl_badgeBackgroundColor {
-    return [CYL_ACTUAL_BARBUTTON cyl_badgeBackgroundColor];
+    // Remembered on the item too, for the system badge (iOS 26+) and before the bar button is laid out.
+    // 同时保存在 item 上，供系统角标（iOS 26+）以及 bar button 尚未布局时使用。
+    return objc_getAssociatedObject(self, @selector(cyl_badgeBackgroundColor)) ?: (CYL_ACTUAL_BARBUTTON.cyl_badgeBackgroundColor ?: [CYLBadgeAppearance globalAppearance].backgroundColor);
 }
 
 - (void)cyl_setBadgeBackgroundColor:(UIColor *)badgeBackgroundColor {
+    objc_setAssociatedObject(self, @selector(cyl_badgeBackgroundColor), badgeBackgroundColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeBackgroundColor:badgeBackgroundColor]; }];
 }
 
 - (UIColor *)cyl_badgeTextColor {
-    return [CYL_ACTUAL_BARBUTTON cyl_badgeTextColor];
+    // Remembered on the item too, for the system badge (iOS 26+) and before the bar button is laid out.
+    // 同时保存在 item 上，供系统角标（iOS 26+）以及 bar button 尚未布局时使用。
+    return objc_getAssociatedObject(self, @selector(cyl_badgeTextColor)) ?: (CYL_ACTUAL_BARBUTTON.cyl_badgeTextColor ?: [CYLBadgeAppearance globalAppearance].textColor);
 }
 
 - (void)cyl_setBadgeTextColor:(UIColor *)badgeTextColor {
+    objc_setAssociatedObject(self, @selector(cyl_badgeTextColor), badgeTextColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeTextColor:badgeTextColor]; }];
 }
 
 - (CYLBadgeAnimationType)cyl_badgeAnimationType {
-    return [CYL_ACTUAL_BARBUTTON cyl_badgeAnimationType];
+    // The system badge (iOS 26+) has no view of the library to keep it in. 系统角标（iOS 26+）没有本库的视图来保存它。
+    NSNumber *animationType = CYLBarButtonItemUsesSystemBadge() ? objc_getAssociatedObject(self, @selector(cyl_badgeAnimationType)) : nil;
+    return animationType ? (CYLBadgeAnimationType)animationType.unsignedIntegerValue : [CYL_ACTUAL_BARBUTTON cyl_badgeAnimationType];
 }
 
 - (void)cyl_setBadgeAnimationType:(CYLBadgeAnimationType)animationType {
+    objc_setAssociatedObject(self, @selector(cyl_badgeAnimationType), @(animationType), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     [self cyl_performWithBadgeSuperView:^(UIView *view) { [view cyl_setBadgeAnimationType:animationType]; }];
 }
 

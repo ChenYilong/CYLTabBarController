@@ -38,4 +38,21 @@
 #define CYL_BADGE_CORE_AVAILABLE 0
 #endif
 
+#import "CYLBadgeProtocol.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+/*!
+ * [EN] The animation a badge plays for `animationType`, sized for a badge of `badgeSize`; nil for
+ *      `CYLBadgeAnimationTypeNone`. Add it with the key `CYLBadgeAnimationKeyForType(animationType)`. Shared by the
+ *      library's badges (`-[UIView cyl_beginAnimation]`) and the system badge of a bar button item on iOS 26+; private to
+ *      CYLBadgeView, not public API.
+ * [CN] 角标在 `animationType` 下播放的动画，按 `badgeSize` 计算幅度；`CYLBadgeAnimationTypeNone` 时为 nil。使用
+ *      `CYLBadgeAnimationKeyForType(animationType)` 作为 key 添加。由本库角标（`-[UIView cyl_beginAnimation]`）与 iOS 26+ 上
+ *      bar button item 的系统角标共用；仅供 CYLBadgeView 内部使用，不是公开 API。
+ */
+FOUNDATION_EXTERN CAAnimation *_Nullable CYLBadgeAnimationForType(CYLBadgeAnimationType animationType, CGSize badgeSize);
+
+NS_ASSUME_NONNULL_END
+
 #endif /* CYLBadgeViewDefines_h */
