@@ -192,6 +192,18 @@ static UIColor *CYLBadgeHelperDynamicBorderColor(void) {
     return items[(NSUInteger)MAX(row, 0) % items.count];
 }
 
+- (void)cyl_wrapsTextLabels {
+    for (UILabel *label in @[ self.textLabel ?: [UILabel new], self.detailTextLabel ?: [UILabel new] ]) {
+        label.numberOfLines = 0;
+        label.lineBreakMode = NSLineBreakByWordWrapping;
+    }
+}
+
++ (void)cyl_setUpAutomaticRowHeightForTableView:(UITableView *)tableView {
+    tableView.rowHeight = UITableViewAutomaticDimension;
+    tableView.estimatedRowHeight = CYLBadgeRowHeight;
+}
+
 + (NSString *)cyl_badgeTitleForRow:(NSInteger)row {
     NSDictionary *item = [self cyl_badgeItemForRow:row];
     NSString *title = item[CYLBadgeItemTitle];
@@ -293,7 +305,7 @@ static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationItem.title = CYLLocalizedString(@"Badge");
-    self.tableView.rowHeight = CYLBadgeRowHeight;
+    [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CYLBadgeHelperCellIdentifier];
 }
 
@@ -311,7 +323,7 @@ static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
     }
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLBadgeHelperCellIdentifier forIndexPath:indexPath];
     cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
-    cell.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
+    [cell cyl_wrapsTextLabels];
     [cell cyl_showBadgeForRow:indexPath.row];
     return cell;
 }

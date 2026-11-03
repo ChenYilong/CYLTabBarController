@@ -9,6 +9,7 @@
 #import "CYLLocalization.h"
 #import "UIViewController+CYLMemoryWarning.h"
 #import "UIViewController+CYLTabBarItemUpdate.h"
+#import "UITableViewCell+CYLBadgeExtention.h"
 #import "CYLTabBarController.h"
 #import <objc/runtime.h>
 
@@ -337,6 +338,13 @@ static void CYLToggleLoginState(CYLTabBarController *_Nullable owningTabBarContr
 }
 
 - (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [self cyl_settingsRowCellForTableView:tableView atIndexPath:indexPath];
+    // Every row shows its whole text, wrapped, never an ellipsis. 每行完整显示文字（换行），不出现省略号。
+    [cell cyl_wrapsTextLabels];
+    return cell;
+}
+
+- (UITableViewCell *)cyl_settingsRowCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row == CYLSettingsRowMemoryWarning) {
         return [self cyl_memoryWarningCellForTableView:tableView];
     }

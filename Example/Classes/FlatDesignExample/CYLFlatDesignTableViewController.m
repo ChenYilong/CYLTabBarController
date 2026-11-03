@@ -42,7 +42,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.tableView.rowHeight = CYLBadgeRowHeight;
+    [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
     NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), self);
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = self.title; //✅sets navigation bar title.The right way to set the title of the navigation
@@ -154,7 +154,12 @@
         title = CYLLocalizedString(@"cyl_pop / cyl_push 系列方法演示");
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
-    cell.textLabel.text = title;
+    // The action is the title; the other rows show the badge sample as the title and the page as the subtitle, as in
+    // the other demos. 操作行以操作为主标题；其余行与其他演示一致，以角标样例为主标题、页面为副标题。
+    BOOL isActionRow = indexPath.row <= 8;
+    cell.textLabel.text = isActionRow ? title : [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
+    cell.detailTextLabel.text = isActionRow ? [UITableViewCell cyl_badgeTitleForRow:indexPath.row] : title;
+    [cell cyl_wrapsTextLabels];
     [cell cyl_showBadgeForRow:indexPath.row];
 
     return cell;

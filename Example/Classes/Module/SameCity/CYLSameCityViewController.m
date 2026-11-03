@@ -16,7 +16,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.tableView.rowHeight = CYLBadgeRowHeight;
+    [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
     NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), self);
 
     self.view.backgroundColor = [UIColor whiteColor];
@@ -49,8 +49,10 @@
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
     [cell cyl_showBadgeForRow:indexPath.row];
-    cell.detailTextLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
-    [[cell textLabel] setText:[NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
+    // The badge sample is the title, the page the subtitle; both wrap. 角标样例为主标题，页面为副标题；均可换行。
+    cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
+    [cell cyl_wrapsTextLabels];
 }
 
 #pragma mark - Table view

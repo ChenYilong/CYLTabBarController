@@ -20,7 +20,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.tableView.rowHeight = CYLBadgeRowHeight;
+    [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
     NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), self);
 
     self.view.backgroundColor = [UIColor whiteColor];
@@ -57,13 +57,15 @@
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
     [cell cyl_showBadgeForRow:indexPath.row];
-    cell.detailTextLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
+    // The badge sample is the title, the page the subtitle; both wrap. 角标样例为主标题，页面为副标题；均可换行。
+    cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
+    [cell cyl_wrapsTextLabels];
     if (0 == indexPath.row) {
         // The second row of the demo pushes a tab bar controller of the SAME context, see `-tableView:didSelectRowAtIndexPath:`.
-        [[cell textLabel] setText:CYLLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）")];
+        cell.detailTextLabel.text = CYLLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）");
         return;
     }
-    [[cell textLabel] setText:[NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
 
 }
 
