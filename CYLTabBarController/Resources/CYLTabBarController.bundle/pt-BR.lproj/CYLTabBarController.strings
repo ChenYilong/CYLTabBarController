@@ -153,3 +153,8 @@
 "「%@」需要登录后才能查看" = "Faça login para ver “%@”";
 "登录" = "Entrar";
 "、" = ", ";
+
+/* Issue #91: plus button touchable area demo row. */
+"PlusButton 点击范围（issue #91）" = "Área de toque do PlusButton (issue #91)";
+"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Ative o botão para mostrar a área de toque em vermelho translúcido e desative para voltar ao normal; arraste o controle deslizante para multiplicar a área. Atual: %@x";
+"当前 TabBar 没有 PlusButton" = "Esta barra de abas não tem PlusButton";

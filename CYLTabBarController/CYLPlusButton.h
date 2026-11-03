@@ -140,11 +140,12 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
 + (NSString *)tabBarItemIdentifier;
 
 /*!
-* 可点击的范围,
- //TODO:  更换使用 padding 会更直观。
- * [EN] Returns the plus button's touchable area, used for hit testing when it extends beyond the tab bar.
- * [CN] 返回 PlusButton 的可点击区域，用于按钮超出 TabBar 时的点击判断。
-*/
+ * [EN] Returns the plus button's touchable area, in its superview's coordinates, used for hit testing when it extends
+ *      beyond the tab bar. By default: the frame scaled by `touchableAreaScale`, then grown by `touchableAreaOutsets`
+ *      (issue #91). Override it for any other shape; the tab bars convert it to their own coordinates.
+ * [CN] 返回 PlusButton 的可点击区域（父视图坐标系），用于按钮超出 TabBar 时的点击判断。默认：frame 先按 `touchableAreaScale`
+ *      放大，再按 `touchableAreaOutsets` 向外扩展（issue #91）。需要其他形状时可重写；TabBar 会将其转换到自身坐标系。
+ */
 - (CGRect)touchableRect;
 
 /*!
@@ -236,6 +237,51 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
  *      在自身布局后会调用；自行移动 Tab 标题后也可以调用。其他情况不做处理。
  */
 - (void)cyl_setNeedsTitleAlignment;
+
+#pragma mark - Touchable area (issue #91)
+
+/*!
+ * [EN] Issue #91: extra touchable area around the plus button, in points, without changing its frame. Positive values
+ *      grow it outward (top, left, bottom, right), e.g. `UIEdgeInsetsMake(0, 10, 20, 10)` also takes the 20-pt gap below
+ *      a raised plus button, so a tap there no longer falls through to the page behind. Default: zero. Every style
+ *      (classic, Liquid Glass, FlatDesign). Set it in `+plusButton`, or later on the instance.
+ * [CN] Issue #91：在不改变 frame 的情况下，扩大 PlusButton 四周的可点击区域（单位：点）。正值向外扩展（上、左、下、右），例如
+ *      `UIEdgeInsetsMake(0, 10, 20, 10)` 会把凸起 PlusButton 下方 20 点的间隙也纳入点击范围，点在那里不再穿透到后面的页面。
+ *      默认为 0。适用于所有样式（经典、液态玻璃、扁平）。可在 `+plusButton` 中设置，也可之后在实例上修改。
+ */
+@property (nonatomic, assign) UIEdgeInsets touchableAreaOutsets;
+
+/*!
+ * [EN] Scales the touchable area around the plus button's center, before `touchableAreaOutsets`: 1 is the frame
+ *      (default), 2 doubles its width and height. Values below 1 count as 1, so the area never gets smaller than the
+ *      button.
+ * [CN] 以 PlusButton 中心为基准按倍数放大可点击区域，先于 `touchableAreaOutsets` 生效：1 为 frame 本身（默认），2 表示宽高各放大一倍。
+ *      小于 1 的值按 1 处理，可点击区域不会小于按钮本身。
+ */
+@property (nonatomic, assign) CGFloat touchableAreaScale;
+
+/*!
+ * [EN] Debugging aid: shows the touchable area as a translucent overlay under the plus button (it takes no touches).
+ *      Default: NO. Turn it off again to restore the normal look. A superview that clips its bounds also clips the
+ *      overlay, while the hit test still uses the whole area.
+ * [CN] 调试用：在 PlusButton 下方以半透明背景显示可点击区域（不响应点击）。默认 NO。设为 NO 即恢复正常外观。父视图裁剪时，
+ *      覆盖层也会被裁剪，但点击判断仍使用完整区域。
+ */
+@property (nonatomic, assign) BOOL showsTouchableArea;
+
+/*!
+ * [EN] The overlay color of `showsTouchableArea`. nil: translucent red.
+ * [CN] `showsTouchableArea` 覆盖层的颜色。nil 时为半透明红色。
+ */
+@property (nonatomic, strong, nullable) UIColor *touchableAreaColor;
+
+/*!
+ * [EN] `-touchableRect` converted to `view`'s coordinates (from the plus button's superview). The tab bars hit-test with
+ *      it: in Liquid Glass and FlatDesign the plus button is not a direct subview of the tab bar.
+ * [CN] 将 `-touchableRect` 从 PlusButton 的父视图坐标系转换到 `view` 的坐标系。TabBar 用它做点击判断：液态玻璃与扁平样式下，
+ *      PlusButton 并不是 TabBar 的直接子视图。
+ */
+- (CGRect)touchableRectInView:(nullable UIView *)view;
 
 /*!
  * [EN] Issue #636. YES with Liquid Glass when the plus button has a title and its class returns YES from

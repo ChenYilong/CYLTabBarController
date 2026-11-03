@@ -9,6 +9,7 @@
 #import "CYLLocalization.h"
 #import "UIViewController+CYLMemoryWarning.h"
 #import "CYLTabBarController.h"
+#import "CYLPlusButton.h"
 #import <objc/runtime.h>
 
 const NSInteger CYLSettingsSection = 0;
@@ -20,6 +21,7 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowTitlePositionAdjustment,
     CYLSettingsRowStandardAppearance,
     CYLSettingsRowLoginState,
+    CYLSettingsRowPlusButtonTouchableArea,
     CYLSettingsRowCount,
 };
 
@@ -328,6 +330,111 @@ static void CYLToggleLoginState(CYLTabBarController *_Nullable owningTabBarContr
     tabBarController.cyl_loggedIn = !tabBarController.cyl_loggedIn;
 }
 
+#pragma mark - PlusButton touchable area (issue #91)
+
+static NSString *const CYLTouchableAreaCellIdentifier = @"CYLTouchableAreaCell";
+
+/*!
+ * [EN] Issue #91 demo row: a switch shows the plus button's touchable area as a translucent overlay (off restores the
+ *      normal look), and a slider multiplies the area from 1x to 3x (`touchableAreaScale`). Works in every style; only
+ *      when the tab bar controller has a plus button.
+ * [CN] Issue #91 演示行：开关以半透明覆盖层显示 PlusButton 的可点击区域（关闭即恢复正常外观），滑块按 1 至 3 倍扩大可点击区域
+ *      （`touchableAreaScale`）。适用于所有样式；仅在 TabBarController 有 PlusButton 时可用。
+ */
+@interface CYLTouchableAreaCell : UITableViewCell
+@property (nonatomic, weak, nullable) CYLTabBarController *tabBarController;
+@property (nonatomic, strong) UILabel *titleLabel;
+@property (nonatomic, strong) UILabel *summaryLabel;
+@property (nonatomic, strong) UISlider *scaleSlider;
+@property (nonatomic, strong) UISwitch *overlaySwitch;
+@end
+
+@implementation CYLTouchableAreaCell
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+        _titleLabel = [[UILabel alloc] init];
+        _titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        _titleLabel.numberOfLines = 0;
+        _summaryLabel = [[UILabel alloc] init];
+        _summaryLabel.font = [UIFont systemFontOfSize:12];
+        _summaryLabel.textColor = [UIColor grayColor];
+        _summaryLabel.numberOfLines = 0;
+        _scaleSlider = [[UISlider alloc] init];
+        _scaleSlider.minimumValue = 1.0;
+        _scaleSlider.maximumValue = 3.0;
+        [_scaleSlider addTarget:self action:@selector(cyl_scaleDidChange) forControlEvents:UIControlEventValueChanged];
+        _overlaySwitch = [[UISwitch alloc] init];
+        [_overlaySwitch addTarget:self action:@selector(cyl_overlayDidChange) forControlEvents:UIControlEventValueChanged];
+        self.accessoryView = _overlaySwitch;
+
+        UIStackView *stackView = [[UIStackView alloc] initWithArrangedSubviews:@[ _titleLabel, _summaryLabel, _scaleSlider ]];
+        stackView.axis = UILayoutConstraintAxisVertical;
+        stackView.spacing = 6;
+        stackView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.contentView addSubview:stackView];
+        UILayoutGuide *margins = self.contentView.layoutMarginsGuide;
+        [NSLayoutConstraint activateConstraints:@[
+            [stackView.leadingAnchor constraintEqualToAnchor:margins.leadingAnchor],
+            [stackView.trailingAnchor constraintEqualToAnchor:margins.trailingAnchor],
+            [stackView.topAnchor constraintEqualToAnchor:margins.topAnchor],
+            [stackView.bottomAnchor constraintEqualToAnchor:margins.bottomAnchor],
+        ]];
+    }
+    return self;
+}
+
+/// The plus button of this tab bar controller, guarded by `-hasPlusButton`. 本 TabBarController 的 PlusButton，先判断 `-hasPlusButton`。
+- (nullable CYLPlusButton *)cyl_touchableAreaPlusButton {
+    CYLTabBarController *tabBarController = self.tabBarController;
+    if (!tabBarController || ![tabBarController hasPlusButton]) {
+        return nil;
+    }
+    return [CYLPlusButton plusButtonForOwner:tabBarController];
+}
+
+- (void)cyl_reloadTouchableArea {
+    CYLPlusButton *plusButton = [self cyl_touchableAreaPlusButton];
+    self.titleLabel.text = CYLLocalizedString(@"PlusButton 点击范围（issue #91）");
+    self.scaleSlider.enabled = (plusButton != nil);
+    self.overlaySwitch.enabled = (plusButton != nil);
+    if (!plusButton) {
+        self.summaryLabel.text = CYLLocalizedString(@"当前 TabBar 没有 PlusButton");
+        self.scaleSlider.value = 1.0;
+        self.overlaySwitch.on = NO;
+        return;
+    }
+    self.scaleSlider.value = plusButton.touchableAreaScale;
+    self.overlaySwitch.on = plusButton.showsTouchableArea;
+    NSString *scaleText = [NSString stringWithFormat:@"%.1f", plusButton.touchableAreaScale];
+    self.summaryLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍"), scaleText];
+}
+
+- (void)cyl_scaleDidChange {
+    // Steps of 0.1. 以 0.1 为步长。
+    CGFloat scale = round(self.scaleSlider.value * 10.0) / 10.0;
+    [self cyl_touchableAreaPlusButton].touchableAreaScale = scale;
+    [self cyl_reloadTouchableArea];
+}
+
+- (void)cyl_overlayDidChange {
+    [self cyl_touchableAreaPlusButton].showsTouchableArea = self.overlaySwitch.isOn;
+    [self cyl_reloadTouchableArea];
+}
+
+@end
+
+static UITableViewCell *CYLTouchableAreaCellForTableView(UITableView *tableView, CYLTabBarController *_Nullable tabBarController) {
+    CYLTouchableAreaCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLTouchableAreaCellIdentifier];
+    if (![cell isKindOfClass:[CYLTouchableAreaCell class]]) {
+        cell = [[CYLTouchableAreaCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CYLTouchableAreaCellIdentifier];
+    }
+    cell.tabBarController = tabBarController;
+    [cell cyl_reloadTouchableArea];
+    return cell;
+}
+
 @implementation UIViewController (CYLSettingsSection)
 
 - (NSInteger)cyl_settingsRowCount {
@@ -347,6 +454,9 @@ static void CYLToggleLoginState(CYLTabBarController *_Nullable owningTabBarContr
     if (indexPath.row == CYLSettingsRowLoginState) {
         return CYLLoginStateCell(tableView, CYLSettingsTabBarController(self));
     }
+    if (indexPath.row == CYLSettingsRowPlusButtonTouchableArea) {
+        return CYLTouchableAreaCellForTableView(tableView, CYLSettingsTabBarController(self));
+    }
     return [self cyl_languageCellForTableView:tableView];
 }
 
@@ -364,6 +474,8 @@ static void CYLToggleLoginState(CYLTabBarController *_Nullable owningTabBarContr
         // The switch and the text follow the notification, so the row is not reloaded (the switch animates).
         // 开关与文字随通知更新，因此不重新加载该行（开关会带动画切换）。
         CYLToggleLoginState(CYLSettingsTabBarController(self));
+    } else if (indexPath.row == CYLSettingsRowPlusButtonTouchableArea) {
+        // The switch and the slider act on their own; a tap on the row does nothing. 开关与滑块各自生效，点击该行不做处理。
     } else {
         [self cyl_presentLanguagePicker];
     }

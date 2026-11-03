@@ -153,3 +153,8 @@
 "「%@」需要登录后才能查看" = "Autentificați-vă pentru a vedea „%@”";
 "登录" = "Autentificare";
 "、" = ", ";
+
+/* Issue #91: plus button touchable area demo row. */
+"PlusButton 点击范围（issue #91）" = "Zona de atingere PlusButton (issue #91)";
+"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Activați comutatorul pentru a afișa zona de atingere în roșu translucid, dezactivați-l pentru aspectul normal; trageți glisorul pentru a multiplica zona. Acum: %@x";
+"当前 TabBar 没有 PlusButton" = "Această bară de file nu are PlusButton";
