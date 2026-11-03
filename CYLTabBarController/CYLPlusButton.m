@@ -340,9 +340,7 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
         objc_setAssociatedObject(self, CYLPlusButtonMovedTitleKey, title, OBJC_ASSOCIATION_COPY_NONATOMIC);
         objc_setAssociatedObject(self, CYLPlusButtonImageToTitleKey, @(imageToTitle), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         // The stand-in in the selected layer is a second plus button: it drops its title too, the tab item has it.
-        if (![self cyl_isInPlatterSelectedLayer]) {
-            [self cyl_viewControllerOfTabBarItem].tabBarItem.title = title;
-        }
+        [self cyl_updateTitleInTabBarItem];
         for (NSNumber *state in @[@(UIControlStateNormal), @(UIControlStateHighlighted), @(UIControlStateSelected),
                                   @(UIControlStateSelected | UIControlStateHighlighted)]) {
             UIControlState controlState = state.unsignedIntegerValue;
@@ -370,11 +368,7 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
         return;
     }
     // New view controllers bring a new placeholder, without the title. 重设子控制器后占位控制器是新的，没有标题。
-    NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
-    UITabBarItem *tabBarItem = [self cyl_viewControllerOfTabBarItem].tabBarItem;
-    if (tabBarItem && ![tabBarItem.title isEqualToString:movedTitle]) {
-        tabBarItem.title = movedTitle;
-    }
+    [self cyl_updateTitleInTabBarItem];
     // Recompute the center without the title (also done by the tab bar, `-cyl_alignedCenterForCenter:`).
     // 去掉标题后重新计算中心（TabBar 布局时也会计算）。
     if (!self.superview) {
@@ -383,6 +377,35 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     CGPoint center = [self cyl_alignedCenterForCenter:self.center];
     if (fabs(center.x - self.center.x) >= 0.5 || fabs(center.y - self.center.y) >= 0.5) {
         self.center = center;
+    }
+}
+
+/// Whether the tab bar shows its tab buttons in the iOS 27.1 vertical bar (unfolded iPhone Duo in landscape,
+/// `allowsVerticalBar = YES`). 系统是否把 Tab 按钮放在 iOS 27.1 竖向栏中（iPhone Duo 展开横屏）。
+- (BOOL)cyl_isInVerticalBar {
+    UIView *tabBar = self.superview;
+    return [tabBar isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)tabBar cyl_showsVerticalBar];
+}
+
+/*!
+ * FIX: issue #636
+ * [EN] Shows the moved title in the tab item under the plus button, except in the iOS 27.1 vertical bar: there the plus
+ *      button is centered on its tab item, as without a title (`-[CYLTabBar plusButtonIndex]`), so the title would be
+ *      under its image. The title comes back when the tab bar is horizontal again.
+ * [CN] 在 PlusButton 下方的 TabBarItem 中显示移过去的标题；iOS 27.1 竖向栏除外：那里 PlusButton 与没有标题时一样居中于该 Tab
+ *      （见 `-[CYLTabBar plusButtonIndex]`），标题会与图片重叠，因此隐藏；TabBar 恢复横向时标题重新显示。
+ */
+- (void)cyl_updateTitleInTabBarItem {
+    NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
+    // The stand-in in the selected layer shares the tab item with the plus button. 选中图层中的替身与 PlusButton 共用 TabBarItem。
+    if (movedTitle.length == 0 || [self cyl_isInPlatterSelectedLayer]) {
+        return;
+    }
+    UITabBarItem *tabBarItem = [self cyl_viewControllerOfTabBarItem].tabBarItem;
+    NSString *title = [self cyl_isInVerticalBar] ? nil : movedTitle;
+    BOOL isShown = title ? [tabBarItem.title isEqualToString:title] : tabBarItem.title == nil;
+    if (tabBarItem && !isShown) {
+        tabBarItem.title = title;
     }
 }
 
@@ -404,7 +427,7 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     }
     // The iOS 27.1 vertical bar: centered on its tab item, as without a title (`-[CYLTabBar plusButtonIndex]`).
     // iOS 27.1 竖向栏：与没有标题时一样，居中于它的 TabBarItem（见 `-[CYLTabBar plusButtonIndex]`）。
-    if ([container isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)container cyl_showsVerticalBar]) {
+    if ([self cyl_isInVerticalBar]) {
         return center;
     }
     // The image's offset from the plus button's center. 图片中心相对 PlusButton 中心的偏移。

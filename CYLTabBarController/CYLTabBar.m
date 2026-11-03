@@ -37,6 +37,7 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 /// See `cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h. 见 CYLPlusButton.h 中的 `cyl_appliesCenterYOffsetWithoutTitle`。
 @interface CYLPlusButton (CYLTabBarLayout)
 - (BOOL)cyl_isCenteredWithoutTitle;
+- (void)cyl_updateTitleInTabBarItem;
 - (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center;
 @end
 
@@ -611,6 +612,9 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         //      plus button stays here. Centre it on its placeholder tab button instead of the horizontal position.
         // [CN] 系统把 Tab 按钮移出本 TabBar，放进右侧竖向栏，而加号按钮仍在本 TabBar 上，需对齐到它的占位 Tab 按钮中心。
         UIView *verticalBarSlot = [self cyl_verticalBarTabButtonAtIndex:plusButtonIndex];
+        // Issue #636: no title in the vertical bar, where the plus button is centered on it; back in the horizontal bar.
+        // 竖向栏中 PlusButton 居中于该 Tab，隐藏其标题；恢复横向时重新显示。
+        [[CYLPlusButton plusButtonForOwner:self] cyl_updateTitleInTabBarItem];
         if (verticalBarSlot) {
             // Issue #636: centered on the slot, with or without a title, like a plus button without a title. The height
             // methods and the title alignment (`-cyl_alignedCenterForCenter:`) don't apply to the vertical bar.
