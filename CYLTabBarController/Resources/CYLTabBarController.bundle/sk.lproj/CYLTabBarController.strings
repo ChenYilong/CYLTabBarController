@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "Vybrať kartu s identifikátorom „%@“ („%@“, index %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop aktuálneho zásobníka, výber karty s identifikátorom „%@“ a potom push novej ukážkovej stránky na túto kartu";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Ako vyššie, výber karty s identifikátorom „%@“ („%@“) s animáciou pop";
+"标题偏移（titlePositionAdjustment）" = "Posun titulku (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Klepnutím prepnete zvislý posun titulkov všetkých kariet, aktuálny: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "Motív standardAppearance (spoločný pre Liquid Glass a FlatDesign)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Klepnutím prepnete tabBar.standardAppearance, aktuálny: %@";
+"原始" = "Pôvodný";
+"深色" = "Tmavý";
+"居中胶囊" = "Kapsula v strede";
+"绿色描边" = "Zelená linka";

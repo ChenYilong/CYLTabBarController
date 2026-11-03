@@ -137,3 +137,11 @@
 "选中标识为「%@」的 Tab（「%@」，index %@）" = "A(z) „%@” azonosítójú lap kiválasztása („%@”, index: %@)";
 "Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "A jelenlegi verem pop-olása, a(z) „%@” azonosítójú lap kiválasztása, majd új bemutató oldal push-olása erre a lapra";
 "同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Mint fent, a(z) „%@” azonosítójú lap kiválasztása („%@”), pop animációval";
+"标题偏移（titlePositionAdjustment）" = "Címeltolás (titlePositionAdjustment)";
+"点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Koppintson az összes lap címének függőleges eltolásának váltásához, jelenlegi: %@";
+"standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance téma (közös a Liquid Glass és a FlatDesign számára)";
+"点击切换 tabBar.standardAppearance，当前：%@" = "Koppintson a tabBar.standardAppearance váltásához, jelenlegi: %@";
+"原始" = "Eredeti";
+"深色" = "Sötét";
+"居中胶囊" = "Középre igazított kapszula";
+"绿色描边" = "Zöld vonal";

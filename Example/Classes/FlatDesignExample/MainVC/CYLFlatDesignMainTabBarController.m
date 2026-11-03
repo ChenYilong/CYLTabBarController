@@ -55,6 +55,16 @@
         //        self.adjustTabBarItemImageViewSizeDependOnSuperView = NO;
         
         //        [self customizeTabBarAppearanceWithTitlePositionAdjustment:titlePositionAdjustment];
+        // One UITabBarAppearance for every style: the same object MainTabBarController gives the Liquid Glass tab bar.
+        // CYLTabBarController maps it onto the FlatDesign tab bar (background, shadow, title and icon colors, badges...),
+        // see `-[CYLFlatDesignTabBar standardAppearance]`.
+        // 所有样式共用一个 UITabBarAppearance：与 MainTabBarController 赋给液态玻璃 TabBar 的是同一个对象。CYLTabBarController 会将其
+        // 映射到扁平样式 TabBar（背景、阴影、标题与图标颜色、角标等），见 `-[CYLFlatDesignTabBar standardAppearance]`。
+#if CYL_FLATDESIGN_AVAILABLE
+        if (@available(iOS 13.0, *)) {
+            self.tabBar.standardAppearance = [MainTabBarController demoStandardAppearanceWithTitlePositionAdjustment:titlePositionAdjustment];
+        }
+#endif
         self.delegate = self;
         //        self.navigationController.navigationBar.hidden = YES;
     }
@@ -78,6 +88,8 @@
     //    [self setValue:tabBar forKey:@"cyl_tabBar"];
     CYLFlatDesignTabBar *cyl_tabBar = (CYLFlatDesignTabBar *)self.cyl_tabBar;
     
+    // Used only while no `standardAppearance` is set: the appearance assigned in `-init…` takes precedence.
+    // 仅在没有设置 `standardAppearance` 时使用：`-init…` 中赋值的 appearance 优先。
     cyl_tabBar.barTintColor = [UIColor whiteColor];
     cyl_tabBar.shadowImage = [UIImage cyl_imageWithColor:[UIColor.lightGrayColor colorWithAlphaComponent:0.5] size:CGSizeMake(1, 1)];
     

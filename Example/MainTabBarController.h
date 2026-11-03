@@ -17,6 +17,15 @@
 
 - (instancetype)initWithContext:(NSString *)context;
 + (NSArray *)tabBarItemsAttributesForTabBar;
+
+/*!
+ * [EN] The demo's one `UITabBarAppearance`: assigned to `tabBar.standardAppearance` by MainTabBarController (Liquid Glass
+ *      and the classic style) and by CYLFlatDesignMainTabBarController (FlatDesign), so a single appearance styles
+ *      every tab bar style.
+ * [CN] Demo 中唯一的 `UITabBarAppearance`：MainTabBarController（液态玻璃与经典样式）与 CYLFlatDesignMainTabBarController（扁平样式）
+ *      都把它赋给 `tabBar.standardAppearance`，一个 appearance 即可设置所有 TabBar 样式。
+ */
++ (UITabBarAppearance *)demoStandardAppearanceWithTitlePositionAdjustment:(UIOffset)titlePositionAdjustment API_AVAILABLE(ios(13.0));
 @end
 
 /*!
