@@ -27,11 +27,20 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 @interface CYLTabBar () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) NSMutableSet<UIView *> *observedViews;
+/// Whether the last layout found the tab buttons in the iOS 27.1 vertical bar, see `-cyl_refreshTabButtonsAfterVerticalBar`.
+@property (nonatomic, assign) BOOL cyl_wasShowingVerticalBar;
 /// Receives the `UIScrollEdgeElementContainerInteraction`s added to the tab bar, see `-addInteraction:`.
 @property (nonatomic, strong, nullable) UIView *cyl_scrollEdgeElementContainerView;
 /// FIX: issue #488. The token of the block-based Lottie observer: `-removeObserver:self` cannot remove it.
 @property (nonatomic, strong, nullable) id<NSObject> cyl_lottieAnimationPlayingObserver;
 
+@end
+
+/// See `cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h. 见 CYLPlusButton.h 中的 `cyl_appliesCenterYOffsetWithoutTitle`。
+@interface CYLPlusButton (CYLTabBarLayout)
+- (BOOL)cyl_isCenteredWithoutTitle;
+- (CGPoint)cyl_centerInTabButton:(UIView *)tabButton inView:(UIView *)view aligned:(BOOL *)aligned;
+- (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center;
 @end
 
 @implementation CYLTabBar
@@ -258,12 +267,20 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self cyl_layoutTabBarSubviews];
+    BOOL showsVerticalBar = [self cyl_verticalBarTabButtonAtIndex:0] != nil;
+    if (self.cyl_wasShowingVerticalBar && !showsVerticalBar) {
+        [self cyl_refreshTabButtonsAfterVerticalBar];
+    }
+    self.cyl_wasShowingVerticalBar = showsVerticalBar;
     // FIX: issue #610 — UIKit replaces the tab buttons when an item's image changes and lays out only the tab bar,
     // so bind the tap action here as well, not only in the controller's -viewDidLayoutSubviews. Done after the layout
     // above, which sets each new button's visible index (used to recognise the plus child view controller's button).
     // 修改 item 图片后 UIKit 会重建 Tab 按钮且只重新布局 TabBar，所以这里也要为新按钮添加点击事件。放在上面的布局之后，
     // 因为布局时才会设置新按钮的 visible index（用于识别加号子控制器对应的按钮）。
     [self.tabBarController cyl_bindTabControlActions];
+    // The tab titles may have moved: lay the plus button out again so its title follows them
+    // (`+alignsTitleWithTabBarItemTitles`).
+    [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];
 }
 
 - (void)cyl_layoutTabBarSubviews {
@@ -604,7 +621,23 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         UIView *verticalBarSlot = [self cyl_verticalBarTabButtonAtIndex:plusButtonIndex];
         if (verticalBarSlot) {
             CGPoint slotCenter = [verticalBarSlot.superview convertPoint:verticalBarSlot.center toView:self];
-            if (!CGPointEqualToPoint(self.plusButton.center, slotCenter)) {
+            // Issue #636: the slot shows the plus button's title; its image goes above that title, as on the horizontal
+            // bar. Without a title the plus button stays centered on the slot.
+            // 竖向栏中该 Tab 显示 PlusButton 的标题：图片放在标题上方，与横向栏一致；没有标题时仍居中于该 Tab。
+            CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
+            BOOL needsTitleLayout = NO;
+            if ([plusButton cyl_showsTitleInTabBarItem]) {
+                BOOL aligned = NO;
+                slotCenter = [plusButton cyl_centerInTabButton:verticalBarSlot inView:self aligned:&aligned];
+                // The slot's title may be laid out after this pass (the title has just moved): try again a few times.
+                // 该 Tab 的标题可能在本次布局之后才排好（标题刚移过去）：再尝试几次。
+                static char CYLVerticalBarTitleRetriesKey;
+                NSInteger retries = [objc_getAssociatedObject(self, &CYLVerticalBarTitleRetriesKey) integerValue];
+                needsTitleLayout = !aligned && retries < 5;
+                objc_setAssociatedObject(self, &CYLVerticalBarTitleRetriesKey, @(aligned ? 0 : retries + 1),
+                                         OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
+            if (!CGPointEqualToPoint(self.plusButton.center, slotCenter) || needsTitleLayout) {
                 [CATransaction begin];
                 [CATransaction setDisableActions:YES];
                 self.plusButton.center = slotCenter;
@@ -643,11 +676,21 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         tabBarHeight * multiplierOfTabBarHeight
         + constantOfPlusButtonCenterYOffset;
         
+        // A plus button without a title replaces the whole tab item: centered on the platter (the tab items' center),
+        // not on the tab bar (`cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h).
+        // 没有标题的 PlusButton 替换整个 TabBarItem：居中于 platter（即 Tab 的中心），而不是 TabBar 的中心。
+        if ([[CYLPlusButton plusButtonForOwner:self] cyl_isCenteredWithoutTitle]) {
+            systemDefaultY = platterCenter.y;
+        }
+        
         // 计算最终中心
         CGPoint finalCenter = CGPointMake(
                                           platterCenter.x ,
                                           systemDefaultY
                                           );
+        // Issue #636: with the title in the tab item, the image above its title, on the title's vertical center line.
+        // 标题由 TabBarItem 显示时：图片位于标题上方，与标题竖向中心线对齐。
+        finalCenter = [[CYLPlusButton plusButtonForOwner:self] cyl_alignedCenterForCenter:finalCenter];
         
         // ===============================
         // 禁止隐式动画
@@ -662,6 +705,41 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     [[CYLPlusButton plusButtonForOwner:self] cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
 
     return plusButtonIndex;
+}
+
+/*!
+ * FIX: issue #653 (follow-up)
+ * [EN] The iOS 27.1 vertical bar (folded iPhone Duo in landscape, `allowsVerticalBar = YES`) shows the tabs without
+ *      titles. Back in the horizontal bar (e.g. rotated to portrait), the tabs kept that layout, without titles, until
+ *      a tab was tapped. So when the tab buttons come back, every tab item is updated once, as a tap does: its title is
+ *      set again and the tab buttons are laid out again. Runs on the next run loop and once more after the rotation.
+ * [CN] iOS 27.1 竖向栏（iPhone Duo 折叠横屏，`allowsVerticalBar = YES`）中 Tab 不显示标题。回到横向栏（如转回竖屏）后，Tab 仍保持
+ *      没有标题的布局，直到点击某个 Tab 才恢复。因此 Tab 按钮回到横向栏时，像点击一样把每个 TabBarItem 更新一次：重新设置标题，
+ *      并重新布局 Tab 按钮。在下一个 run loop 执行，旋转动画结束后再执行一次。
+ */
+- (void)cyl_refreshTabButtonsAfterVerticalBar {
+    __weak typeof(self) weakSelf = self;
+    void (^refresh)(void) = ^{
+        __strong typeof(weakSelf) self = weakSelf;
+        if (!self || [self cyl_verticalBarTabButtonAtIndex:0]) {
+            return;
+        }
+        for (UITabBarItem *item in self.items) {
+            NSString *title = item.title;
+            item.title = nil;
+            item.title = title;
+        }
+        NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:self];
+        while (views.count > 0) {
+            UIView *view = views.lastObject;
+            [views removeLastObject];
+            [view setNeedsLayout];
+            [views addObjectsFromArray:view.subviews];
+        }
+        [self layoutIfNeeded];
+    };
+    dispatch_async(dispatch_get_main_queue(), refresh);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), refresh);
 }
 
 /*!
@@ -1063,14 +1141,6 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     }
     SEL actin = @selector(tabChangedToControl:);
     CYLTabBarController *tabBarController = [self tabBarController];
-    if ([self cyl_shouldUpdateHiddenStatueForPlusButtonLabel] && [hitView isKindOfClass:[CYLPlusButton class]] && [tabBarController.selectedViewController isEqual:[CYLPlusButton plusChildViewControllerForOwner:self]]) {
-        //如果在选中CYLPlusChildViewController的状态下，  重复点击，或者滑动手势，又选中CYLPlusChildViewController。 相当于重复点击CYLPlusChildViewController， 则不显示未选中状态的Label， 仅仅在切换到其他tab的情况下， 显示未选中状态的Label。 否则会出现Label重叠的情况。
-        //TODO:   选中center按钮 长按玻璃遮罩 向左或者向右 稍微移动一点距离 回到原位center 按钮标题 会变模糊. 由于无法解决， 故暂时禁止在选中PlusVC时的 用户滑动手势。等未来找到合适方案再处理.
-//        [[CYLPlusButton plusButtonForOwner:self] setTabLabelHidden:NO];
-        if (![CYLPlusButton plusButtonForOwner:self].cyl_keepShowingPlusButtonLabel) {
-            return NO;
-        }
-    }
     if (([hitView cyl_isTabButton] || [hitView isKindOfClass:[CYLPlusButton class]] ) && [tabBarController respondsToSelector:actin]) {
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
         (
