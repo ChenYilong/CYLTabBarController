@@ -12,12 +12,5 @@
 
 @property (strong, nonatomic) UIWindow *window;
 
-/*!
- * [EN] The orientations set in Xcode (Deployment Info), i.e. `UISupportedInterfaceOrientations` in Info.plist (its
- *      `~ipad` variant on iPad).
- * [CN] Xcode 中设置的方向（Deployment Info），即 Info.plist 的 `UISupportedInterfaceOrientations`（iPad 上为 `~ipad`）。
- */
-FOUNDATION_EXTERN UIInterfaceOrientationMask CYLInfoPlistSupportedInterfaceOrientations(void);
-
 @end
 

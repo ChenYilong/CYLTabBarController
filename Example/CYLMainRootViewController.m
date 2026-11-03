@@ -27,6 +27,12 @@
 
 }
 
+/// Every orientation, with no restriction (a navigation controller allows all but upside down by default on iPhone).
+/// 允许所有方向，没有任何限制（导航控制器在 iPhone 上默认不允许倒置竖屏）。
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskAll;
+}
+
 #pragma mark -
 #pragma mark - createLiquidGlassTabBar
 // MARK: createLiquidGlassTabBar
