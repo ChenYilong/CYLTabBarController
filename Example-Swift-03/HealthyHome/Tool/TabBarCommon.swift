@@ -26,19 +26,22 @@ class TabBarCommon: NSObject {
         }
     }
     
-    /// MARK: 切换跳转主界面 操作其他事件
+    /// [CN] MARK: 切换跳转主界面 操作其他事件
+    /// [EN] MARK: Switch to the main screen and handle other events
     class func completionhandler(_ selectIndex: Int, _ completion: (() -> Void)? = nil) {
         tabBarSelectIndex(selectIndex)
         completion?()
     }
     
-    /// MARK: 进入APP
+    /// [CN] MARK: 进入APP
+    /// [EN] MARK: Enter the app
     class func enterApp(_ completion: (() -> Void)? = nil) {
         setUpRootTabBarController()
         completion?()
     }
     
-    /// MARK: 创建根视图
+    /// [CN] MARK: 创建根视图
+    /// [EN] MARK: Create the root view
     class func setUpRootTabBarController() {
         CYLPlusButtonSubclass.register()
         // Rebuilt after a language change, so every text shows in the new language.
@@ -47,7 +50,8 @@ class TabBarCommon: NSObject {
         }
     }
     
-    //MARK:主界面
+    // [CN] MARK:主界面
+    // [EN] MARK: Main screen
     class func viewControllers() -> [RootNavigationController] {
 
         let home = RootNavigationController(rootViewController: HomeVC())

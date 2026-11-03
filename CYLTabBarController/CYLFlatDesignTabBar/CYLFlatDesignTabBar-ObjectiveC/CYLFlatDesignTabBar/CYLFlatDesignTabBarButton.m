@@ -283,7 +283,8 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
 }
 
 /*!
- * // badge 请使用VC 调用， 暂不支持 _tabBarItem 设置。
+ * [CN] // badge 请使用VC 调用， 暂不支持 _tabBarItem 设置。
+ * [EN] // For badges, call through the VC; setting via _tabBarItem is not supported yet.
  if (self.actualBadgeSuperView.cyl_isShowBadge) {
      if (_tabBarItem.badgeColor) {
          [self cyl_setBadgeBackgroundColor:_tabBarItem.badgeColor];
@@ -394,7 +395,8 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
         
         UIEdgeInsets imageInsets = _tabBarItem.imageInsets;
         if (!UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, imageInsets)) {
-            //仅修改的size,xy值不变
+            // [CN] 仅修改的size,xy值不变
+            // [EN] Only the size is changed; x and y stay the same
             _imageView.frame = ({
                 CGRect frame = _imageView.frame;
                 frame.size.width = frame.size.width - imageInsets.left - imageInsets.right;

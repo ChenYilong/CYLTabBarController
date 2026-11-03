@@ -100,7 +100,8 @@ static UIInterfaceOrientationMask CYLMaskFromOrientation(UIInterfaceOrientation 
             
             if (!topVC) { return; }
             
-            // ✅ 将 (UIInterfaceOrientation)orientation 转换为 Mask
+            // [CN] ✅ 将 (UIInterfaceOrientation)orientation 转换为 Mask
+            // [EN] ✅ Convert (UIInterfaceOrientation)orientation to a Mask
             
             
             UIInterfaceOrientationMask targetMask = CYLMaskFromOrientation(orientation);
@@ -108,7 +109,8 @@ static UIInterfaceOrientationMask CYLMaskFromOrientation(UIInterfaceOrientation 
             UIInterfaceOrientationMask supportedMask =
             [topVC supportedInterfaceOrientations];
             
-            //如果不支持则强制 fallback
+            // [CN] 如果不支持则强制 fallback
+            // [EN] If not supported, force a fallback
             if (!(supportedMask & targetMask)) {
                 targetMask = supportedMask;
             }
@@ -247,10 +249,12 @@ static UIInterfaceOrientationMask CYLMaskFromOrientation(UIInterfaceOrientation 
     NSMutableArray<NSString *> *lines = [systemResult componentsSeparatedByString:@"\n"].mutableCopy;
     [lines enumerateObjectsUsingBlock:^(NSString *line, NSUInteger idx, BOOL * _Nonnull stop) {
         
-        // 过滤掉空行或者 struct 结尾的"}"
+        // [CN] 过滤掉空行或者 struct 结尾的"}"
+        // [EN] Filter out empty lines and the closing "}" of structs
         if (line.cyl_trim.length <= 2) return;
         
-        // 有些 struct 类型的变量，会把 struct 的成员也缩进打出来，所以用这种方式过滤掉
+        // [CN] 有些 struct 类型的变量，会把 struct 的成员也缩进打出来，所以用这种方式过滤掉
+        // [EN] Some struct variables also print their members indented, so filter them out this way
         if ([line hasPrefix:@"\t\t"]) return;
         
         NSTextCheckingResult *regxResult = [regx firstMatchInString:line options:NSMatchingReportCompletion range:NSMakeRange(0, line.length)];
@@ -318,7 +322,7 @@ static UIInterfaceOrientationMask CYLMaskFromOrientation(UIInterfaceOrientation 
         [self removeObserver:observer forKeyPath:keyPath];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
 }
@@ -328,7 +332,7 @@ static UIInterfaceOrientationMask CYLMaskFromOrientation(UIInterfaceOrientation 
         [self removeObserver:observer forKeyPath:keyPath context:context];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
 }

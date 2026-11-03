@@ -33,7 +33,8 @@
     
     CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
     (
-     // 不再必须， 因此， 并非核心逻辑， 未来考虑删除。
+     // [CN] 不再必须， 因此， 并非核心逻辑， 未来考虑删除。
+     // [EN] No longer required, so this is not core logic; may be removed in the future.
      if (self && [self respondsToSelector:@selector(cyl_removeTabBadgePoint)]) {
          [self cyl_removeTabBadgePoint];
      }
@@ -196,8 +197,13 @@
     }
     if (actualBadgeSuperView) {
         [actualBadgeSuperView setClipsToBounds:NO];
-        //建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用
-        [actualBadgeSuperView layoutIfNeeded];//建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame
+        // [CN] 建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用
+        // [EN] It is recommended to call layoutIfNeeded after the autolayout code before trying to read the frame.
+        //      Auto layout cells
+        //      need [self layoutIfNeeded] for the frame to have a value, so the badge can find its position.
+        //      Make sure the view's showBadge method is called after layoutIfNeeded
+        [actualBadgeSuperView layoutIfNeeded];// [CN] 建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame
+        // [EN] It is recommended to call layoutIfNeeded after the autolayout code before trying to read the frame
     }
 
     return actualBadgeSuperView;
@@ -304,8 +310,12 @@
     if (![CYLUtils isLiquidGlassActive]) {
         return YES;
     }
-    //由于 SelectedControl 所在图层的渲染比未选中图层有延迟， 所以必须加延迟，如果不加延迟，可能无法获取到正确的子视图， 有概率获取的子视图为nil
+    // [CN] 由于 SelectedControl 所在图层的渲染比未选中图层有延迟， 所以必须加延迟，如果不加延迟，可能无法获取到正确的子视图， 有概率获取的子视图为nil
     //由于有几率无法获取到cyl_tabImageView， 只有延迟获取，才能避免获取为空nil。
+    // [EN] Because the layer of the SelectedControl renders later than the unselected layer, a delay is
+    //      required. Without it
+    //      the correct subview may not be obtained, and the subview may sometimes be nil
+    //      cyl_tabImageView sometimes cannot be obtained; only fetching it after a delay avoids getting nil.
     
     UIView *view = self.cyl_platterSelectedControl.cyl_tabImageView;
     if (!view) {

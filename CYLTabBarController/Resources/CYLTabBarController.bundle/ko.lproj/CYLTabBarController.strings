@@ -170,6 +170,22 @@
 "「%@」需要登录后才能查看" = "“%@”을(를) 보려면 로그인하세요";
 "登录" = "로그인";
 "、" = ", ";
+"UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!" = "UINavigationController+CYLFlatDesignTabBarPrivate: 연속 pop 작업인가요? 문제가 발생할 수 있습니다!";
+"[DEBUG INFO] 如果 CYLTabBarController 的子控制器个数是奇数，你必须在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] CYLTabBarController의 하위 뷰 컨트롤러 수가 홀수이면 사용자 정의 plusButton 클래스에서 `+indexOfPlusButtonInTabBar`를 구현하여 plusButton의 위치를 지정해야 합니다.";
+"[DEBUG INFO] 如果你想使用 PlusChildViewController 样式，你必须同时在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] PlusChildViewController를 사용하려면 사용자 정의 plusButton 클래스에서 `+indexOfPlusButtonInTabBar`도 구현하여 plusButton의 위치를 지정해야 합니다.";
+"[DEBUG] 设置 tabBarItemsAttributes 时，请确保元素个数与控制器的个数相同，并在 `-setViewControllers:` 之前设置。" = "[DEBUG] tabBarItemsAttributes를 설정할 때 요소 수가 뷰 컨트롤러 수와 같은지 확인하고 `-setViewControllers:` 이전에 설정하세요.";
+"不允许更改由 tabBarController 管理的 tabBar 的代理" = "tabBarController가 관리하는 탭 바의 delegate는 변경할 수 없습니다.";
+"我是第%@行" = "%@번째 행";
+"类：%@ 行：[%@] 方法：%@ 数据：%@" = "클래스: %@ 줄: [%@] 메서드: %@ 데이터: %@";
+"系统TabBarController不支持" = "시스템 TabBarController에서는 지원되지 않습니다";
+"需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法 -tabBarController:presentLoginForViewController:completion:。" = "로그인이 필요한 탭을 탭했지만 cyl_loginHandler나 -tabBarController:presentLoginForViewController:completion:이 설정되어 있지 않습니다.";
+"🔴类名与方法名：%@（在第%@行）, KVC failed：%@" = "🔴 클래스 및 메서드: %@ (%@번째 줄), KVC 실패: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@" = "🔴 클래스 및 메서드: %@ (%@번째 줄), 설명: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@" = "🔴 클래스 및 메서드: %@ (%@번째 줄), 설명: %@: 이유 %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。" = "🔴 클래스 및 메서드: %@ (%@번째 줄), 설명: %@. [DEBUG] CYLTabBarController 하위 클래스가 `viewDidLoad`의 마지막 줄에서 `super.viewDidLoad()`를 호출하는지 확인하세요. 그렇지 않으면 CYLTabBar의 KVC 설정이 실패합니다.";
+"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 클래스 및 메서드: %@ (%@번째 줄), 설명: 인덱스 %@ 제목 %@";
+"暂无数据" = "데이터 없음";
+"网络连接已断开" = "네트워크 연결이 끊어졌습니다";
 
 /* Issue #91: plus button touchable area demo row. */
 "PlusButton 点击范围（issue #91）" = "PlusButton 터치 영역 (issue #91)";

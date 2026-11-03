@@ -21,9 +21,11 @@ func isFirst() -> Bool {
 
 
 
-//应用启动第一次 当前版本第一次重新启动
+// [CN] 应用启动第一次 当前版本第一次重新启动
+// [EN] First app launch / first launch of the current version
 extension UserDefaults {
-    //应用启动第一次
+    // [CN] 应用启动第一次
+    // [EN] First app launch
     static func isFirstLaunch() -> Bool {
         let hasBeenLaunch = "hasBeenLaunch"
         let isFirestLaunch = UserDefaults.standard.bool(forKey: hasBeenLaunch)
@@ -34,14 +36,18 @@ extension UserDefaults {
         return isFirestLaunch
     }
     
-    //当前版本第一次重新启动
+    // [CN] 当前版本第一次重新启动
+    // [EN] First launch of the current version
     static func isFirstLaunchOfNewVersion() -> Bool {
-        //主程序此版本好
+        // [CN] 主程序此版本好
+        // [EN] Current version of the main app
         let majorVersion = appVersion as! String
-        //上次启动的版本号
+        // [CN] 上次启动的版本号
+        // [EN] Version from the last launch
         let hasBeenLaunchOfNewVersion = "hasBeenLaunchOfNewVersion"
         let lastVersion = UserDefaults.standard.string(forKey: hasBeenLaunchOfNewVersion)
-        //版本号比较
+        // [CN] 版本号比较
+        // [EN] Version comparison
         let isFirstLaunchOfNewVersion = majorVersion != lastVersion
         if isFirstLaunchOfNewVersion {
             UserDefaults.standard.set(majorVersion, forKey: hasBeenLaunchOfNewVersion)

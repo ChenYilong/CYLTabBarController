@@ -87,7 +87,10 @@ class MainTabBarController: CYLTabBarController {
     
     override func viewDidLoad() {
         lottieAnimationSpeed = 1.5 // Issue #428: Lottie tab icons at 1.5x (no effect without Lottie) Lottie 图标 1.5 倍速
-        // * @attention 请在父类的 ViewDidLoad 调用之前设置CYLTabBarStyleType。也就是在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
+        // [CN] * @attention 请在父类的 ViewDidLoad 调用之前设置CYLTabBarStyleType。也就是在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
+        // [EN] * @attention Set CYLTabBarStyleType before the superclass's ViewDidLoad is called, i.e. before
+        //      `-[super viewDidLoad];`. The custom style must be determined before the tabBar's KVC operations; otherwise
+        //      the default logic runs, which may cause your custom style to have no effect.
 
         self.tabBarStyleType = .liquidGlass
 

@@ -26,7 +26,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
-    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), self);
+    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
     self.view.backgroundColor = [UIColor whiteColor];
 //    self.navigationItem.title = @"首页"; //✅sets navigation bar title.The right way to set the title of the navigation
 //    self.tabBarItem.title = @"首页";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
@@ -36,7 +36,8 @@
 //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
     
     UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"FlatDesign") style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
-//    leftBarButtonItem.tintColor = UIColor.redColor; // 确保使用原图色
+// [CN] leftBarButtonItem.tintColor = UIColor.redColor; // 确保使用原图色
+// [EN] leftBarButtonItem.tintColor = UIColor.redColor; // Make sure the original image color is used
     self.navigationItem.leftBarButtonItem = leftBarButtonItem;
 
 

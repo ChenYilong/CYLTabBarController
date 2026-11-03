@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-// FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+// [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+// [EN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils.
 #if __has_include("CYLUtils/NSObject+CYLUtils.h")
 #import "CYLUtils/NSObject+CYLUtils.h"
 #else

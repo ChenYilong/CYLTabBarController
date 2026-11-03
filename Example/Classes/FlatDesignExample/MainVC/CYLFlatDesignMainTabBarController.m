@@ -35,15 +35,20 @@
                   tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
                                 context:(NSString *)context {
     /**
-     * 以下两行代码目的在于手动设置让TabBarItem只显示图标，不显示文字，并让图标垂直居中。
+     * [CN] 以下两行代码目的在于手动设置让TabBarItem只显示图标，不显示文字，并让图标垂直居中。
      * 等 效于在 `-tabBarItemsAttributesForController` 方法中不传 `CYLTabBarItemTitle` 字段。
      * 更推荐后一种做法。
+     * [EN] The following two lines manually make the TabBarItem show only the icon, without text, and center the icon
+     *      vertically.
+     *      This is equivalent to not passing the `CYLTabBarItemTitle` field in `-tabBarItemsAttributesForController`.
+     *      The latter approach is recommended.
      */
     UIEdgeInsets imageInsets = UIEdgeInsetsZero;//UIEdgeInsetsMake(4.5, 0, -4.5, 0);
     UIOffset titlePositionAdjustment = UIOffsetMake(0, -3.5);
     CYLTabBarStyleType tabBarStyleType;
     tabBarStyleType = CYLTabBarStyleTypeFlatDesign;
-    // 设置 TabBar 样式：液态玻璃效果（覆盖上一行）
+    // [CN] 设置 TabBar 样式：液态玻璃效果（覆盖上一行）
+    // [EN] Set the TabBar style: Liquid Glass effect (overrides the previous line)
     //    tabBarStyleType = CYLTabBarStyleTypeLiquidGlass;
     
     if (self = [super initWithViewControllers:viewControllers
@@ -79,11 +84,13 @@
     
 #if CYL_FLATDESIGN_AVAILABLE
     
-    // 设置代理
+    // [CN] 设置代理
+    // [EN] Set the delegate
     self.delegate = self;
     [self customizeInterface];
     
-    // 可以通过KVC自定义CYLFlatDesignTabBar
+    // [CN] 可以通过KVC自定义CYLFlatDesignTabBar
+    // [EN] CYLFlatDesignTabBar can be customized via KVC
     //    CYLFlatDesigMainTabBar *tabBar = [[CYLFlatDesigMainTabBar alloc] init];
     //    [self setValue:tabBar forKey:@"cyl_tabBar"];
     CYLFlatDesignTabBar *cyl_tabBar = (CYLFlatDesignTabBar *)self.cyl_tabBar;
@@ -100,7 +107,9 @@
     //    NSMutableArray *lottieFilePaths = @[[[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"], [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"], @"post_highlight", [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news" ofType:@"json"], [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine" ofType:@"json"]].mutableCopy;
     //
     //
-    //    // 测试超过5个子控制器显示 moreNavigationController，继承自 CYLTabBarController 才会显示
+    // [CN] // 测试超过5个子控制器显示 moreNavigationController，继承自 CYLTabBarController 才会显示
+    // [EN] Test showing moreNavigationController with more than 5 child controllers; it only appears when subclassing
+    //      CYLTabBarController
     //    BOOL testMoreNav = NO;
     //    if (testMoreNav) {
     //        [titles addObject:@"测试"];
@@ -131,7 +140,8 @@
     ////            nav.cyl_tabBarItem.badgeValue = @"新消息";
     ////            [nav.cyl_tabBarItem setBadgeTextAttributes:@{NSForegroundColorAttributeName:UIColor.greenColor} forState:UIControlStateNormal];
     ////        } else if (i == 4) {
-    ////            // 设置badgeSize不为CGSizeZero、badgeValue为nil，就变成一个点了
+    //// [CN] // 设置badgeSize不为CGSizeZero、badgeValue为nil，就变成一个点了
+    //// [EN] With badgeSize not CGSizeZero and badgeValue nil, the badge becomes a dot
     ////            nav.cyl_tabBarItem.badgeValue = nil;
     ////            nav.cyl_tabBarItem.badgeSize = CGSizeMake(10, 10);
     ////            nav.cyl_tabBarItem.badgeColor = UIColor.systemRedColor;
@@ -149,7 +159,9 @@
                        imageName:(NSString *)imageName
                selectedImageName:(NSString *)selectedImageName
                   lottieFilePath:(NSString *)lottieFilePath {
-    //cyl_setTabBarItem 方法内部需要获取到tabbarvc但是， cyl_setTabBarItem是在初始化完成前的配置， 所以需要手动指定tabbarvc，否则cyl_setTabBarItem会初始化失败。
+    // [CN] cyl_setTabBarItem 方法内部需要获取到tabbarvc但是， cyl_setTabBarItem是在初始化完成前的配置， 所以需要手动指定tabbarvc，否则cyl_setTabBarItem会初始化失败。
+    // [EN] cyl_setTabBarItem needs the tabbarvc internally, but cyl_setTabBarItem is configured before initialization
+    //      finishes, so the tabbarvc must be set manually, otherwise cyl_setTabBarItem fails to initialize.
     //    [childVC cylflatdesign_setTabBarController:self];
     CYLFlatDesignTabBarItem *cyl_tabBarItem = [[CYLFlatDesignTabBarItem alloc] initWithTitle:title image:[UIImage imageNamed:imageName] selectedImage:[UIImage imageNamed:selectedImageName]];
     [cyl_tabBarItem cylflatdesign_setTabBarController:self];
@@ -223,7 +235,8 @@ presentLoginForViewController:(UIViewController *)viewController
 
 
 - (void)customizeInterface {
-    //设置导航栏
+    // [CN] 设置导航栏
+    // [EN] Set up the navigation bar
     //    [self setUpNavigationBarAppearance];
     //     [self hideTabBarShadowImageView];
     //#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
@@ -231,16 +244,21 @@ presentLoginForViewController:(UIViewController *)viewController
     //        tabBarController.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
     //    }
     //#endif
-    //添加小红点
+    // [CN] 添加小红点
     //添加提示动画，引导用户点击
+    // [EN] Add a red dot
+    //      Add a hint animation to guide the user to tap
     __weak __typeof(self) weakSelf = self;
     [self setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *tabBarController) {
         __strong typeof(self) self = weakSelf;
         if (!self) {
             return;
         }
-        //延迟是为了演示demo的时候， 方便看清楚badge动画。 非必须。可删除延迟。
+        // [CN] 延迟是为了演示demo的时候， 方便看清楚badge动画。 非必须。可删除延迟。
         //@try是为了demo演示的时候， 随时调整减少 tabbar items 个数，而不导致崩溃， 非必须， 可删除。
+        // [EN] The delay is only so the badge animation is easy to see in the demo. Not required; the delay can be removed.
+        //      @try is only so the number of tabbar items can be reduced at any time in the demo without crashing. Not
+        //      required; can be removed.
         NSTimeInterval delaySeconds = 1.5;
         dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
         dispatch_after(when, dispatch_get_main_queue(), ^{
@@ -252,7 +270,8 @@ presentLoginForViewController:(UIViewController *)viewController
                 [viewController0 cyl_setBadgeRadius:11/2];
                 [viewController0 cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeBreathe];
                 [self setSelectedCoverShow:YES];
-                //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
+                // [CN] 以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
+                // [EN] The Badge settings above must be applied before cyl_showBadgeValue is called.
                 //                [viewController0 cyl_showBadge];
                 
                 //                                [tabBarController.viewControllers[1] cyl_setBadgeMargin:1.0];
@@ -281,10 +300,11 @@ presentLoginForViewController:(UIViewController *)viewController
                 // #535：PlusButton 也显示角标，与 Tab 一致；每次点击数字加 1（见 -didSelectControl:）。
                 [tabBarController cyl_demo_showPlusButtonBadge];
             } @catch (NSException *exception) {
-                NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+                NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
             }
             
-            //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+            // [CN] 添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+            // [EN] Add a Taobao-style tabbar: when the first tab is selected, an icon covers it
             if (self.selectedIndex != 0) {
                 return;
             }
@@ -300,8 +320,11 @@ presentLoginForViewController:(UIViewController *)viewController
     CYLFlatDesignMainTabBarController *tabBarController = self;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{});
-    //延迟是为了演示demo的时候， 方便看清楚badge动画。 非必须。可删除延迟。
+    // [CN] 延迟是为了演示demo的时候， 方便看清楚badge动画。 非必须。可删除延迟。
     //@try是为了demo演示的时候， 随时调整减少 tabbar items 个数，而不导致崩溃， 非必须， 可删除。
+    // [EN] The delay is only so the badge animation is easy to see in the demo. Not required; the delay can be removed.
+    //      @try is only so the number of tabbar items can be reduced at any time in the demo without crashing. Not
+    //      required; can be removed.
     NSTimeInterval delaySeconds = 1.5;
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
@@ -314,7 +337,8 @@ presentLoginForViewController:(UIViewController *)viewController
             [viewController0 cyl_setBadgeRadius:11/2];
             [viewController0 cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeBreathe];
             [self setSelectedCoverShow:YES];
-            //以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
+            // [CN] 以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
+            // [EN] The Badge settings above must be applied before cyl_showBadgeValue is called.
             //                [viewController0 cyl_showBadge];
             
             //                                [tabBarController.viewControllers[1] cyl_setBadgeMargin:1.0];
@@ -340,7 +364,7 @@ presentLoginForViewController:(UIViewController *)viewController
                 [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
             }
         } @catch (NSException *exception) {
-            NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
         }
         
         
@@ -380,7 +404,9 @@ presentLoginForViewController:(UIViewController *)viewController
     //    selectedTabButton = self.viewControllers[0].cyl_tabBarItem.tabBarButton;
     __weak __typeof(self) weakSelf = self;
     
-    //TODO:  如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
+    // [CN] TODO:  如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
+    // [EN] TODO:  For a Lottie animation icon, a delay is needed; otherwise it is replaced before the lottie animation
+    //      finishes initializing, and ends up in the wrong position.
     [selectedTabButton cyl_coverVisiableTabImageViewOrTabButton:YES
                                                  contentNewView:self.selectedCover
                                           seclectContentNewView:self.selectedCover
@@ -402,7 +428,8 @@ presentLoginForViewController:(UIViewController *)viewController
             // The cover is kept on top by -cyl_coverVisiableTabImageViewOrTabButton:. 封面由该方法保持在最上层。
             
             if (![CYLConstants isLiquidGlassActive]) {
-                // LiquidGlass 已经自带缩放动画， 无需缩放
+                // [CN] LiquidGlass 已经自带缩放动画， 无需缩放
+                // [EN] LiquidGlass already has its own scale animation, so no scaling is needed
                 //                [self addOnceScaleAnimationOnView:newView];
                 [newView.layer addAnimation:
                  [CAAnimation cyl_badge_once_scale_AnimationRepeatTimes:1
@@ -420,7 +447,8 @@ presentLoginForViewController:(UIViewController *)viewController
 }
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController {
-    // 选择了 viewController
+    // [CN] 选择了 viewController
+    // [EN] A viewController was selected
 }
 
 #pragma mark - CYLFlatDesignTabBarDelegate
@@ -444,25 +472,25 @@ presentLoginForViewController:(UIViewController *)viewController
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController willShowTabBar:(CYLFlatDesignTabBar *)tabBar {
 #if defined(DEBUG) || defined(BETA)
-    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"");
+    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 #endif
 }
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController didShowTabBar:(CYLFlatDesignTabBar *)tabBar {
 #if defined(DEBUG) || defined(BETA)
-    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"");
+    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 #endif
 }
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController willHideTabBar:(CYLFlatDesignTabBar *)tabBar {
 #if defined(DEBUG) || defined(BETA)
-    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"");
+    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 #endif
 }
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController didHideTabBar:(CYLFlatDesignTabBar *)tabBar {
 #if defined(DEBUG) || defined(BETA)
-    NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"");
+    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 #endif
 }
 
@@ -472,7 +500,7 @@ presentLoginForViewController:(UIViewController *)viewController
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control {
     
 #if defined(DEBUG) || defined(BETA)
-NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), control);
+NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), control);
     // #610 / #408: called for every tab button and for the plus button in the flat design style too; the identifier tells
     // which one was tapped. 扁平样式下点击每个 Tab 按钮和 PlusButton 也会调用；用标识区分是哪一个。
     NSLog(@"🟢 #610 flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier, [control cyl_isPlusButton] ? @"plus button" : @"tab button");
@@ -487,7 +515,8 @@ NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_F
         [tabBarController cyl_demo_plusButtonDidTap];
     }
     if ([control cyl_isTabButton] && !isPlusControl) {
-        //更改红标状态
+        // [CN] 更改红标状态
+        // [EN] Update the red badge state
         if ([control cyl_isShowBadge]) {
             if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
                 [control cyl_clearBadge];
@@ -512,7 +541,8 @@ NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_F
     //    UIView *animationView = [control cyl_isPlusButton] ? [CYLPlusButton plusButtonForOwner:tabBarController].imageView : [control cyl_tabImageView];
     //    [self addRotateAnimationOnView:animationView];
     
-    //添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+    // [CN] 添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+    // [EN] Add a Taobao-style tabbar: when the first tab is selected, an icon covers it
     if ([control cyl_isTabButton] || [control cyl_isPlusButton]) {
         //        BOOL shouldSelectedCoverShow = (self.selectedIndex == 0);
         //        [self setSelectedCoverShow:shouldSelectedCoverShow];

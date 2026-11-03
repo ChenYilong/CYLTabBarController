@@ -170,6 +170,22 @@
 "「%@」需要登录后才能查看" = "“%@” देखने के लिए लॉग इन करें";
 "登录" = "लॉग इन";
 "、" = ", ";
+"UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!" = "UINavigationController+CYLFlatDesignTabBarPrivate: लगातार pop ऑपरेशन? इससे समस्याएँ हो सकती हैं!";
+"[DEBUG INFO] 如果 CYLTabBarController 的子控制器个数是奇数，你必须在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] यदि CYLTabBarController के चाइल्ड व्यू कंट्रोलर की संख्या विषम है, तो plusButton की स्थिति तय करने के लिए आपको अपनी कस्टम plusButton क्लास में `+indexOfPlusButtonInTabBar` लागू करना होगा।";
+"[DEBUG INFO] 如果你想使用 PlusChildViewController 样式，你必须同时在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] PlusChildViewController का उपयोग करने के लिए, plusButton की स्थिति तय करने हेतु आपको अपनी कस्टम plusButton क्लास में `+indexOfPlusButtonInTabBar` भी लागू करना होगा।";
+"[DEBUG] 设置 tabBarItemsAttributes 时，请确保元素个数与控制器的个数相同，并在 `-setViewControllers:` 之前设置。" = "[DEBUG] tabBarItemsAttributes सेट करते समय सुनिश्चित करें कि इसमें उतने ही एलिमेंट हों जितने व्यू कंट्रोलर हैं, और इसे `-setViewControllers:` से पहले सेट करें।";
+"不允许更改由 tabBarController 管理的 tabBar 的代理" = "tabBarController द्वारा प्रबंधित टैब बार का delegate बदला नहीं जा सकता।";
+"我是第%@行" = "पंक्ति %@";
+"类：%@ 行：[%@] 方法：%@ 数据：%@" = "क्लास: %@ लाइन: [%@] मेथड: %@ डेटा: %@";
+"系统TabBarController不支持" = "सिस्टम TabBarController द्वारा समर्थित नहीं";
+"需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法 -tabBarController:presentLoginForViewController:completion:。" = "लॉगिन की आवश्यकता वाले टैब पर टैप किया गया, लेकिन न तो cyl_loginHandler और न ही -tabBarController:presentLoginForViewController:completion: सेट है।";
+"🔴类名与方法名：%@（在第%@行）, KVC failed：%@" = "🔴 क्लास और मेथड: %@ (लाइन %@), KVC विफल: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@" = "🔴 क्लास और मेथड: %@ (लाइन %@), विवरण: %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@" = "🔴 क्लास और मेथड: %@ (लाइन %@), विवरण: %@: कारण %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。" = "🔴 क्लास और मेथड: %@ (लाइन %@), विवरण: %@। [DEBUG] सुनिश्चित करें कि आपकी CYLTabBarController सबक्लास `viewDidLoad` की अंतिम लाइन में `super.viewDidLoad()` को कॉल करती है; अन्यथा CYLTabBar का KVC सेटअप विफल हो जाएगा।";
+"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 क्लास और मेथड: %@ (लाइन %@), विवरण: इंडेक्स %@ शीर्षक %@";
+"暂无数据" = "कोई डेटा नहीं";
+"网络连接已断开" = "नेटवर्क कनेक्शन टूट गया";
 
 /* Issue #91: plus button touchable area demo row. */
 "PlusButton 点击范围（issue #91）" = "PlusButton टच क्षेत्र (issue #91)";

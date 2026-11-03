@@ -10,7 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// 继承自 CYLTabBarController
+// [CN] 继承自 CYLTabBarController
+// [EN] Inherits from CYLTabBarController
 @interface CYLFlatDesignMainTabBarController : CYLTabBarController
 
 

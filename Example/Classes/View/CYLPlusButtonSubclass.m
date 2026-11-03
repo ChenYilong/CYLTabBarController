@@ -3,7 +3,8 @@
 //  CYLTabBarControllerDemo
 //
 //  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 15/10/24.
-//  Copyright (c) 2026年 https://github.com/ChenYilong . All rights reserved.
+// [CN] Copyright (c) 2026年 https://github.com/ChenYilong . All rights reserved.
+// [EN] Copyright (c) 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
 #import "CYLPlusButtonSubclass.h"
@@ -29,7 +30,9 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 #pragma mark - Life Cycle
 
 + (void)load {
-    //请在 `-[AppDelegate application:didFinishLaunchingWithOptions:]` 中进行注册，否则iOS10系统下存在Crash风险。
+    // [CN] 请在 `-[AppDelegate application:didFinishLaunchingWithOptions:]` 中进行注册，否则iOS10系统下存在Crash风险。
+    // [EN] Register it in `-[AppDelegate application:didFinishLaunchingWithOptions:]`, otherwise there is a risk of
+    //      crashing on iOS 10.
     //    [super registerPlusButton];
 }
 
@@ -74,7 +77,8 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 #pragma mark - CYLPlusButtonSubclassing Methods
 
 
-//上下结构的 button
+// [CN] 上下结构的 button
+// [EN] A button with a vertical (top/bottom) layout
 
 /*!
  * [EN] 9.5 pt, or smaller when the localized title is wider than `width` (e.g. German, Russian), so it stays on one line.
@@ -111,9 +115,11 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
     if (@available(iOS 15.0, *)) {
         UIButtonConfiguration *config = [UIButtonConfiguration plainButtonConfiguration];
         config.baseBackgroundColor = [UIColor clearColor];
-        config.baseForegroundColor = isSelectedAndHighlighted ? selectedHighlightedTitleColor : [UIColor labelColor]; // ← 加这一行，控制图片 tint 和文字颜色
+        config.baseForegroundColor = isSelectedAndHighlighted ? selectedHighlightedTitleColor : [UIColor labelColor]; // [CN] ← 加这一行，控制图片 tint 和文字颜色
+        // [EN] ← Add this line to control the image tint and text color
 
-        // ===== 核心：图片在上，文字在下 =====
+        // [CN] ===== 核心：图片在上，文字在下 =====
+        // [EN] ===== Core: image on top, text below =====
         config.imagePlacement = NSDirectionalRectEdgeTop;
         //        config.imagePadding = 1.0;
 
@@ -138,7 +144,8 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
         config.titleLineBreakMode = NSLineBreakByClipping;
         button.configuration = config;
 
-        // ===== 禁用高亮变暗效果 =====
+        // [CN] ===== 禁用高亮变暗效果 =====
+        // [EN] ===== Disable the darkening effect on highlight =====
         button.configurationUpdateHandler = ^(UIButton *btn) {
             btn.tintAdjustmentMode = UIViewTintAdjustmentModeNormal;
             btn.imageView.alpha = 1.0;
@@ -149,7 +156,8 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
     {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        // ===== iOS 15 以下：手动布局 =====
+        // [CN] ===== iOS 15 以下：手动布局 =====
+        // [EN] ===== Below iOS 15: manual layout =====
         button.adjustsImageWhenHighlighted = NO;
         button.backgroundColor = UIColor.clearColor;
         button.titleLabel.font = [self titleFontFittingWidth:CYLDemoPlusButtonWidth];
@@ -158,11 +166,15 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 
     [button setTitle:[self plusButtonTitle] forState:UIControlStateNormal];
     [button setTitle:[self plusButtonTitle] forState:(UIControlStateSelected | UIControlStateHighlighted)];
-    // iOS 15 以下走 titleColor，iOS 15+ 由上面的 transformer 接管（此处调用无副作用）
+    // [CN] iOS 15 以下走 titleColor，iOS 15+ 由上面的 transformer 接管（此处调用无副作用）
+    // [EN] Below iOS 15 titleColor is used; on iOS 15+ the transformer above takes over (this call has no side effects)
     [button setTitleColor:selectedHighlightedTitleColor forState:(UIControlStateSelected | UIControlStateHighlighted)];
-    //    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];   // ← 加这一行
+    // [CN] [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];   // ← 加这一行
     //    [button setTitleColor:[UIColor blackColor] forState:UIControlStateSelected]; // ← 加这一行
     //    [button setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted]; // ← 加这一行
+    // [EN] [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];   // ← Add this line
+    //      [button setTitleColor:[UIColor blackColor] forState:UIControlStateSelected]; // ← Add this line
+    //      [button setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted]; // ← Add this line
     //    button.frame = CGRectMake(0.0, 0.0, 55, 80);
     button.bounds = CGRectMake(0.0, 0.0, CYLDemoPlusButtonWidth, 80);
     
@@ -177,10 +189,12 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
         [button cyl_setUserInteractionDisabled:YES];
     }
     
-    // ===== iOS 15 以下：手动设置 imageView / titleLabel 位置 =====
+    // [CN] ===== iOS 15 以下：手动设置 imageView / titleLabel 位置 =====
+    // [EN] ===== Below iOS 15: manually set the imageView / titleLabel positions =====
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000
     if (@available(iOS 15.0, *)) {
-        // iOS 15+ 由 UIButtonConfiguration 自动处理，无需手动布局
+        // [CN] iOS 15+ 由 UIButtonConfiguration 自动处理，无需手动布局
+        // [EN] On iOS 15+ UIButtonConfiguration handles this automatically, no manual layout needed
     } else
 #endif
     {
@@ -294,7 +308,8 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 //    CYL_DEPRECATED_DECLARATIONS_POP
 //
 //    [self addScaleAnimationOnView:self.imageView repeatCount:1];
-//    //暂时不推荐用旋转方式，badge也会旋转。
+// [CN] //暂时不推荐用旋转方式，badge也会旋转。
+// [EN] //Rotation is not recommended for now, since the badge would rotate too.
 //
 ////    [self addRotateAnimationOnPlusButton:self.imageView repeatCount:1];
 //
@@ -354,13 +369,16 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
     [self addScaleAnimationOnView:self.imageView repeatCount:1];
 }
 
-//缩放动画
+// [CN] 缩放动画
+// [EN] Scale animation
 - (void)addScaleAnimationOnView:(UIView *)animationView repeatCount:(float)repeatCount {
     if ([CYLConstants isLiquidGlassActive]) {
-        //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
+        // [CN] 液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
+        // [EN] With the Liquid Glass effect, custom tap effects are not allowed; only the system glass effect can be used.
         return;
     }
-    //需要实现的帧动画，这里根据需求自定义
+    // [CN] 需要实现的帧动画，这里根据需求自定义
+    // [EN] The keyframe animation to implement; customize it here as needed
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animation];
     animation.keyPath = @"transform.scale";
     animation.values = @[@1.0,@1.1,@0.9,@1.15,@0.95,@1.02,@1.0];
@@ -372,7 +390,8 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 
 - (void)addRotateAnimationOnPlusButton:(UIView *)animationView repeatCount:(float)repeatCount {
     if ([CYLConstants isLiquidGlassActive]) {
-        //液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
+        // [CN] 液态玻璃效果，不允许点击后的特效， 仅能使用系统的玻璃效果。
+        // [EN] With the Liquid Glass effect, custom tap effects are not allowed; only the system glass effect can be used.
         return;
     }
     NSLog(@"plusButton.frame = %@", NSStringFromCGRect(animationView.frame));
@@ -425,9 +444,9 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 + (BOOL)shouldSelectPlusChildViewController {
     BOOL isSelected = [CYLPlusButton plusButtonForTabBarContext:[self matchedTabBarContext]].selected;
     if  (isSelected) {
-        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
     } else {
-        NSLog(@"🔴类名与方法名：%@（在第%@行），描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
     }
     return YES;
 }

@@ -170,6 +170,22 @@
 "「%@」需要登录后才能查看" = "Connectez-vous pour voir « %@ »";
 "登录" = "Se connecter";
 "、" = ", ";
+"UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!" = "UINavigationController+CYLFlatDesignTabBarPrivate : opérations pop consécutives ? Cela peut poser problème !";
+"[DEBUG INFO] 如果 CYLTabBarController 的子控制器个数是奇数，你必须在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Si le nombre de contrôleurs de vue enfants de CYLTabBarController est impair, vous devez implémenter `+indexOfPlusButtonInTabBar` dans votre classe plusButton personnalisée pour définir la position du plusButton.";
+"[DEBUG INFO] 如果你想使用 PlusChildViewController 样式，你必须同时在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。" = "[DEBUG INFO] Pour utiliser un PlusChildViewController, vous devez également implémenter `+indexOfPlusButtonInTabBar` dans votre classe plusButton personnalisée pour définir la position du plusButton.";
+"[DEBUG] 设置 tabBarItemsAttributes 时，请确保元素个数与控制器的个数相同，并在 `-setViewControllers:` 之前设置。" = "[DEBUG] Lors de la définition de tabBarItemsAttributes, assurez-vous qu’il contient autant d’éléments qu’il y a de contrôleurs de vue, et définissez-le avant `-setViewControllers:`.";
+"不允许更改由 tabBarController 管理的 tabBar 的代理" = "Le délégué d’une barre d’onglets gérée par un tabBarController ne peut pas être modifié.";
+"我是第%@行" = "Ligne %@";
+"类：%@ 行：[%@] 方法：%@ 数据：%@" = "Classe : %@ Ligne : [%@] Méthode : %@ Données : %@";
+"系统TabBarController不支持" = "Non pris en charge par le TabBarController du système";
+"需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法 -tabBarController:presentLoginForViewController:completion:。" = "Un onglet nécessitant une connexion a été touché, mais ni cyl_loginHandler ni -tabBarController:presentLoginForViewController:completion: n’est défini.";
+"🔴类名与方法名：%@（在第%@行）, KVC failed：%@" = "🔴 Classe et méthode : %@ (ligne %@), échec KVC : %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@" = "🔴 Classe et méthode : %@ (ligne %@), description : %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@" = "🔴 Classe et méthode : %@ (ligne %@), description : %@ : raison %@";
+"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。" = "🔴 Classe et méthode : %@ (ligne %@), description : %@. [DEBUG] Assurez-vous que votre sous-classe de CYLTabBarController appelle `super.viewDidLoad()` à la dernière ligne de `viewDidLoad` ; sinon, la configuration KVC de CYLTabBar échoue.";
+"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 Classe et méthode : %@ (ligne %@), description : index %@ titre %@";
+"暂无数据" = "Aucune donnée";
+"网络连接已断开" = "La connexion réseau a été perdue";
 
 /* Issue #91: plus button touchable area demo row. */
 "PlusButton 点击范围（issue #91）" = "Zone tactile du PlusButton (issue #91)";

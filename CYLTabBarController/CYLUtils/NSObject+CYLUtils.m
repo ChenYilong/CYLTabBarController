@@ -6,6 +6,7 @@
 //
 
 #import "NSObject+CYLUtils.h"
+#import "CYLLocalizedString.h"
 #import <objc/runtime.h>
 #import "UIViewController+CYLUtils.h"
 
@@ -18,7 +19,7 @@
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
         if (![key isEqualToString:@"imageView"]) {
-            NSLog(@"🔴类名与方法名：%@（在第%@行）, KVC failed：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, KVC failed：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
         }
 #endif
     }
@@ -30,7 +31,7 @@
         [self setValue:value forKey:key];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
 }

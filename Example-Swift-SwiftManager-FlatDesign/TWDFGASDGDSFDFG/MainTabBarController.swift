@@ -10,11 +10,15 @@ import CYLTabBarController
 
 // MARK: - Resource Definitions
 
-/// 静态资源类型
+/// [CN] 静态资源类型
+/// [EN] Static resource type
 public enum AssetType {
-    case native(String) // 对应原 bundle
-    case web(String)    // 对应原 online
-    case disk(String)   // 对应原 localFile
+    case native(String) // [CN] 对应原 bundle
+    // [EN] Corresponds to the original bundle
+    case web(String)    // [CN] 对应原 online
+    // [EN] Corresponds to the original online
+    case disk(String)   // [CN] 对应原 localFile
+    // [EN] Corresponds to the original localFile
     
     var identifier: String {
         switch self {
@@ -24,7 +28,8 @@ public enum AssetType {
     }
 }
 
-/// 动效资源类型(lottie 动画)
+/// [CN] 动效资源类型(lottie 动画)
+/// [EN] Animated resource type (Lottie animation)
 public enum AnimationSource {
     case native(String)
     case web(String)
@@ -57,7 +62,8 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         case normal
         case roomStyle
         
-        // 动态：常态颜色
+        // [CN] 动态：常态颜色
+        // [EN] Dynamic: normal color
         var normalColor: UIColor {
             switch self {
             case .normal, .roomStyle:
@@ -75,7 +81,8 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             }
         }
         
-        // 动态：TabBar 背景颜色
+        // [CN] 动态：TabBar 背景颜色
+        // [EN] Dynamic: TabBar background color
         var tabBarBackground: UIColor {
             switch self {
             case .normal:
@@ -85,7 +92,8 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             }
         }
         
-        // 动态：常态字体
+        // [CN] 动态：常态字体
+        // [EN] Dynamic: normal font
         var normalFont: UIFont {
             switch self {
             case .normal, .roomStyle:
@@ -93,7 +101,8 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             }
         }
         
-        // 动态：选中字体
+        // [CN] 动态：选中字体
+        // [EN] Dynamic: selected font
         var activeFont: UIFont {
             switch self {
             case .normal, .roomStyle:
@@ -101,7 +110,8 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             }
         }
         
-        // 下划线颜色
+        // [CN] 下划线颜色
+        // [EN] Underline color
         var shadowColor: UIColor {
             switch self {
             case .normal:
@@ -111,7 +121,8 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             }
         }
         
-        // 动态：Lottie 动效尺寸
+        // [CN] 动态：Lottie 动效尺寸
+        // [EN] Dynamic: Lottie animation size
         var lottieSize: CGSize {
             switch self {
             case .normal, .roomStyle:
@@ -120,7 +131,8 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         }
     }
     
-    // 当前 TabBar 主题状态，属性观察器自动刷新 UI
+    // [CN] 当前 TabBar 主题状态，属性观察器自动刷新 UI
+    // [EN] Current TabBar theme state; the property observer refreshes the UI automatically
     private var currentTheme: Theme = .normal {
         didSet {
             guard currentTheme != oldValue else { return }
@@ -134,7 +146,8 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     private enum Module: CaseIterable {
         case home, room, chat, mine
         
-        // 1. 标题配置
+        // [CN] 1. 标题配置
+        // [EN] 1. Title configuration
         var title: String {
             switch self {
             case .home: return CYLLocalizedString("首页")
@@ -160,27 +173,34 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             return .native("\(iconName)_normal")
         }
 
-        // 2.1 深色模式常态图标，nil 表示沿用 Asset Catalog 的 Dark 外观或命名规范
+        // [CN] 2.1 深色模式常态图标，nil 表示沿用 Asset Catalog 的 Dark 外观或命名规范
+        // [EN] 2.1 Normal icon for dark mode; nil means falling back to the Asset Catalog's Dark appearance or the
+        //      naming convention
         var darkIcon: AssetType? {
             return self == .chat ? .native("message_normal_night") : nil
         }
         
-        // 3. 选中图标 (替换为你的占位图或实际图片名)
+        // [CN] 3. 选中图标 (替换为你的占位图或实际图片名)
+        // [EN] 3. Selected icon (replace with your placeholder or actual image name)
         var activeIcon: AssetType {
             return .native("\(iconName)_highlight")
         }
         
-        // 4. 动效配置：LottieResources/tabbar_<模块>_<主题>.json，例如 tabbar_home_normal.json
+        // [CN] 4. 动效配置：LottieResources/tabbar_<模块>_<主题>.json，例如 tabbar_home_normal.json
+        // [EN] 4. Animation configuration: LottieResources/tabbar_<module>_<theme>.json, e.g. tabbar_home_normal.json
         func animation(for theme: Theme) -> AnimationSource? {
             return .native("tabbar_\(self)_\(theme)")
         }
 
-        // 4.1 深色模式动效（#442）：LottieResources/tabbar_<模块>_<主题>_dark.json，不存在时沿用上面的动效
+        // [CN] 4.1 深色模式动效（#442）：LottieResources/tabbar_<模块>_<主题>_dark.json，不存在时沿用上面的动效
+        // [EN] 4.1 Dark mode animation (#442): LottieResources/tabbar_<module>_<theme>_dark.json;
+        //      falls back to the animation above if it does not exist
         func darkAnimation(for theme: Theme) -> AnimationSource? {
             return .native("tabbar_\(self)_\(theme)_dark")
         }
         
-        // 5. 控制器配置 (使用原生 UIViewController 占位)
+        // [CN] 5. 控制器配置 (使用原生 UIViewController 占位)
+        // [EN] 5. View controller configuration (using plain UIViewController placeholders)
         var controller: UIViewController {
             return self == .home ? HomeViewController() : CYLBadgeHelperTableViewController()
         }
@@ -191,8 +211,12 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     init() {
         super.init(nibName: nil, bundle: nil)
         self.delegate = self
-        // flatDesign 必须在 setViewControllers 之前；且需先触发 cyl_tabBar 创建扁平 TabBar
+        // [CN] flatDesign 必须在 setViewControllers 之前；且需先触发 cyl_tabBar 创建扁平 TabBar
         // flatDesign 的 setTabBarHeight 要求 cyl_tabBar 已是 CYLFlatDesignTabBar，否则会直接 return
+        // [EN] flatDesign must come before setViewControllers, and cyl_tabBar must first be triggered to create the
+        //      flat TabBar
+        //      flatDesign's setTabBarHeight requires cyl_tabBar to already be a CYLFlatDesignTabBar, otherwise it
+        //      returns immediately
         tabBarStyleType = .flatDesign
         _ = cyl_tabBar
         tabBarHeight = 60
@@ -208,17 +232,20 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     
     private func buildArchitecture() {
         
-        // 构建 Tab 属性字典
+        // [CN] 构建 Tab 属性字典
+        // [EN] Build the tab attribute dictionaries
         buildTabBars(theme: currentTheme)
         
-        // 构建 Controllers (使用原生 UINavigationController)
+        // [CN] 构建 Controllers (使用原生 UINavigationController)
+        // [EN] Build the controllers (using plain UINavigationController)
         viewControllers = Module.allCases.map { module in
             let vc = module.controller
             vc.navigationItem.title = module.title
             return UINavigationController(rootViewController: vc)
         }
         
-        // 初始化应用主题
+        // [CN] 初始化应用主题
+        // [EN] Initialize the app theme
         applyTheme(theme: currentTheme)
     }
     
@@ -259,7 +286,9 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             .font: theme.activeFont
         ]
         
-        // flatDesign 实际显示的是 cyl_tabBar，系统 tabBar 已被隐藏，appearance 无效
+        // [CN] flatDesign 实际显示的是 cyl_tabBar，系统 tabBar 已被隐藏，appearance 无效
+        // [EN] With flatDesign, what is actually shown is cyl_tabBar; the system tabBar is hidden, so appearance
+        //      has no effect
         if let flatTabBar = cyl_tabBar as? CYLFlatDesignTabBar {
             flatTabBar.tintColor = theme.activeColor
             flatTabBar.backgroundImage = UIImage()
@@ -310,9 +339,11 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     }
 
     override func tabBarController(_ _: UITabBarController, didSelect viewController: UIViewController) {
-        // flatDesign 下点击时 selectedIndex 可能仍是旧值，用 VC 判断更准
+        // [CN] flatDesign 下点击时 selectedIndex 可能仍是旧值，用 VC 判断更准
+        // [EN] With flatDesign, selectedIndex may still hold the old value on tap; checking the VC is more accurate
         let root = viewController.cyl_getViewControllerInsteadOfNavigation()
-        // 此处判断逻辑已根据 ViewController 标题解耦
+        // [CN] 此处判断逻辑已根据 ViewController 标题解耦
+        // [EN] The check here has been decoupled based on the ViewController title
         currentTheme = (root.navigationItem.title == CYLLocalizedString("房间")) ? .roomStyle : .normal
     }
 }

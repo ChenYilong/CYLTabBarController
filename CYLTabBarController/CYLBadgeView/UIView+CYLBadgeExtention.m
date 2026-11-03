@@ -427,7 +427,10 @@ static UIView *CYLBadgeContainerForHost(UIView *host) {
 }
 
 - (nullable id)cyl_getActualBadgeSuperView {
-    //建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用
+    // [CN] 建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用
+    // [EN] It is recommended to add a layoutIfNeeded call after the autolayout code before trying to get the frame. Auto
+    //      layout cells must call [self layoutIfNeeded] for the frame to have a value, so the badge can find its position.
+    //      Make sure the view's showBadge method is called after layoutIfNeeded.
     [self layoutIfNeeded];
     return self;
 }
@@ -637,7 +640,8 @@ static UIView *CYLBadgeContainerForHost(UIView *host) {
     }
     CGRect frame = CGRectMake(CGRectGetWidth(self.bounds), -redotWidth, redotWidth, redotWidth);
     self.cyl_badge.frame = frame;
-    //更新frame
+    // [CN] 更新frame
+    // [EN] Update the frame
     [self.cyl_badge layoutIfNeeded];
     [self cyl_layoutBadgeAtTopRightCorner];
     self.cyl_badge.layer.masksToBounds = YES;//very important
@@ -803,8 +807,11 @@ static UIView *CYLBadgeContainerForHost(UIView *host) {
     if (!badgeSuperView) {
         return;
     }
-    //获得子视图的Label以获得字符长度。用以拉伸父视图
+    // [CN] 获得子视图的Label以获得字符长度。用以拉伸父视图
     //UILabel 与 CYLTabBarBadgeView 没有继承关系，各自检查类型后再向下转换（两者都是 UIView 的子类）。
+    // [EN] Get the subview's Label to get the text length, used to stretch the superview.
+    //      UILabel and CYLTabBarBadgeView are unrelated by inheritance; check each type before downcasting (both are
+    //      UIView subclasses).
     UILabel *label = nil;
     if ([badgeSuperView isKindOfClass:[UILabel class]]) {
         label = (UILabel *)badgeSuperView;
@@ -821,7 +828,9 @@ static UIView *CYLBadgeContainerForHost(UIView *host) {
 //    CGSize labelsize = [self sizeThatFits:CGSizeMake(CYLScreenWidth() ,CYLScreenHeight())];
     CGRect frame = label.frame;
     frame.size = CGSizeMake(ceil(labelsize.width), ceil(labelsize.height));
-//    获得字符长度后， 需要修改父视图的宽度， 仅仅修改Label无法达到真正的拉伸效果
+// [CN] 获得字符长度后， 需要修改父视图的宽度， 仅仅修改Label无法达到真正的拉伸效果
+// [EN] After getting the text length, the superview's width must be changed; changing only the Label does not
+//      actually stretch it.
         [label setFrame:frame];
 
     [badgeSuperView setFrame:frame];
@@ -1055,7 +1064,8 @@ static UIView *CYLBadgeContainerForHost(UIView *host) {
     if ([self cyl_shouldUpdateBadgeSubviews]) {
         return;
     }
-    //FIXME:  to delete 如果在这里提前初始化， 那么就会导致
+    // [CN] FIXME:  to delete 如果在这里提前初始化， 那么就会导致
+    // [EN] FIXME:  to delete If it is initialized early here, it will cause
     if (!self.cyl_badge) {
         [self cyl_badgeInit];
     }
@@ -1186,11 +1196,13 @@ static UIView *CYLBadgeContainerForHost(UIView *host) {
     return self.cyl_isInvisiable;
 }
 
-// 不管 image 还是 text 的 UIBarButtonItem 都获取内部的 _UIModernBarButton 即可
+// [CN] 不管 image 还是 text 的 UIBarButtonItem 都获取内部的 _UIModernBarButton 即可
+// [EN] For UIBarButtonItem, whether image or text, just get the inner _UIModernBarButton.
 - (UIView *)cyl_findBarButtonContentView {
     NSString *classString = NSStringFromClass(self.class);
     if ([classString isEqualToString:@"UITabBarButton"] || [classString isEqualToString:@"_UITabButton"]) {
-        // 特别的，对于 UITabBarItem，将 imageView 作为参考 view
+        // [CN] 特别的，对于 UITabBarItem，将 imageView 作为参考 view
+        // [EN] In particular, for UITabBarItem, use the imageView as the reference view.
 #if CYL_BADGE_CORE_AVAILABLE
         UIView *imageView = [self cyl_tabImageView];
         return imageView;

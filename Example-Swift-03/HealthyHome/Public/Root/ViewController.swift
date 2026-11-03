@@ -11,10 +11,12 @@ import UIKit
 class ViewController: UIViewController {
 
     var isShowBackBtn: Bool? {
-        willSet {//变化前默认false
+        willSet {// [CN] 变化前默认false
+        // [EN] Defaults to false before the change
             addleftBarButtonItem()
         }
-        didSet {//isShowBackBtn属性改变后，更新方法
+        didSet {// [CN] isShowBackBtn属性改变后，更新方法
+        // [EN] Update method called after the isShowBackBtn property changes
             addleftBarButtonItem()
         }
     }
@@ -27,7 +29,8 @@ class ViewController: UIViewController {
 
     }
 
-    ///MARK: 导航栏左侧返回按钮
+    /// [CN] MARK: 导航栏左侧返回按钮
+    /// [EN] MARK: Back button on the left side of the navigation bar
     func addleftBarButtonItem() {
         let vces: Int = (self.navigationController?.viewControllers.count)!
         if vces > 1 && isShowBackBtn == true {
@@ -37,7 +40,8 @@ class ViewController: UIViewController {
         }
     }
 
-    ///MARK: 导航栏右侧添加按钮（文字）
+    /// [CN] MARK: 导航栏右侧添加按钮（文字）
+    /// [EN] MARK: Add button on the right side of the navigation bar (text)
     func addRightBarButtonItemTitle(_ title: String, _ color: String, _ target: Any, action: Selector) {
     
         if isEmptyStr(str: title) {
@@ -55,7 +59,8 @@ class ViewController: UIViewController {
         
     }
     
-    ///MARK: 导航栏右侧添加按钮（图片）
+    /// [CN] MARK: 导航栏右侧添加按钮（图片）
+    /// [EN] MARK: Add button on the right side of the navigation bar (image)
     func addRightBarButtonItemImage(_ imageName: String, _ target: Any, action: Selector) {
         
         let button = UIButton()

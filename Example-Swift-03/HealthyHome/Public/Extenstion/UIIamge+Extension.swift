@@ -10,7 +10,8 @@ import UIKit
 
 extension UIImage {
     
-    ///MARK:图片颜色
+    /// [CN] MARK:图片颜色
+    /// [EN] MARK: Image color
     class func imageWithColor(_ color: UIColor) -> UIImage {
         let rect = CGRect(x: 0, y: 0, width: 1.0, height: 1.0)
         UIGraphicsBeginImageContext(rect.size)
