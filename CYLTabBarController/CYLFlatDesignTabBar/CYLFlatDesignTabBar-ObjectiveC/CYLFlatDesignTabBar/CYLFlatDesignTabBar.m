@@ -969,12 +969,13 @@
     }
     
     UIButton<CYLPlusButtonSubclassing> *plusButton = self.plusButton;
-    // Guard: only with a plus button. 仅在有 PlusButton 时处理。
+    // [EN] Guard: only with a plus button.
+    // [CN] 仅在有 PlusButton 时处理。
     if (plusButton) {
-        // FIX: issue #91 — `-touchableRect` is in the plus button's SUPERVIEW coordinates (by default its frame, grown by
+        // [EN] FIX: issue #91 — `-touchableRect` is in the plus button's SUPERVIEW coordinates (by default its frame, grown by
         // `touchableAreaOutsets` / `touchableAreaScale`). It used to be converted from the plus button's own coordinates,
         // which added the frame's origin twice and moved the area away from the button.
-        // `-touchableRect` 位于 PlusButton 父视图坐标系（默认为 frame，按 `touchableAreaOutsets` / `touchableAreaScale` 扩大）。
+        // [CN] `-touchableRect` 位于 PlusButton 父视图坐标系（默认为 frame，按 `touchableAreaOutsets` / `touchableAreaScale` 扩大）。
         // 以前按 PlusButton 自身坐标系转换，frame 的原点被加了两次，可点击区域偏离按钮。
         CGRect plusButtonFrameToSuperview = CGRectZero;
         if ([plusButton isKindOfClass:[CYLPlusButton class]]) {
@@ -985,10 +986,10 @@
         }
 
         BOOL isInPlusButtonFrame = CGRectContainsPoint(plusButtonFrameToSuperview, point);
-        // With a plus child view controller, a touch inside the bar keeps going to the tab button under the plus button
+        // [EN] With a plus child view controller, a touch inside the bar keeps going to the tab button under the plus button
         // (as before); a touch in the part of the area outside the bar (the raised part, or the extra area) goes to the
         // plus button, which selects the child view controller. It used to fall through to the page behind (#91).
-        // 有 PlusButton 子控制器时，TabBar 内的点击仍交给 PlusButton 下方的 Tab 按钮（与以前一致）；可点击区域中位于 TabBar 之外的部分
+        // [CN] 有 PlusButton 子控制器时，TabBar 内的点击仍交给 PlusButton 下方的 Tab 按钮（与以前一致）；可点击区域中位于 TabBar 之外的部分
         // （凸起部分或扩展区域）交给 PlusButton，由它选中子控制器。以前会穿透到后面的页面（#91）。
         BOOL isOutsideBar = ![self pointInside:point withEvent:event];
         if (isInPlusButtonFrame && (![self hasPlusChildViewController] || isOutsideBar)) {

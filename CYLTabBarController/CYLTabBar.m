@@ -988,14 +988,15 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         return [super hitTest:point withEvent:event];
     }
     
-    // Guard: only with a plus button. 仅在有 PlusButton 时处理。
+    // [EN] Guard: only with a plus button.
+    // [CN] 仅在有 PlusButton 时处理。
     CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = self.plusButton;
     if (plusButton) {
-        // FIX: issue #91 — the touchable area (`touchableAreaOutsets`, `touchableAreaScale`, or an overridden
+        // [EN] FIX: issue #91 — the touchable area (`touchableAreaOutsets`, `touchableAreaScale`, or an overridden
         // `-touchableRect`) is in the plus button's superview coordinates. In Liquid Glass that superview is the platter,
         // not this tab bar, so convert it first (as for the tab buttons, #653). A point outside this tab bar still
         // reaches here, so an area above or below the bar takes the touch instead of the page behind.
-        // 可点击区域位于 PlusButton 父视图坐标系；液态玻璃下父视图是 platter 而不是本 TabBar，需要先转换（与 #653 的 Tab 按钮相同）。
+        // [CN] 可点击区域位于 PlusButton 父视图坐标系；液态玻璃下父视图是 platter 而不是本 TabBar，需要先转换（与 #653 的 Tab 按钮相同）。
         // 本 TabBar 之外的点也会走到这里，因此 TabBar 上方或下方的扩展区域会接收点击，而不再穿透到后面的页面。
         CGRect plusButtonFrame = [plusButton touchableRectInView:self];
         BOOL isInPlusButtonFrame = CGRectContainsPoint(plusButtonFrame, point);

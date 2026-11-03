@@ -220,14 +220,16 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
         button.titleLabel.center = CGPointMake(centerOfView, centerOfTitleLabel);
 #pragma clang diagnostic pop
     }
-    // Issue #91: a larger touchable area without changing the frame, e.g. the gap below a raised plus button, so a tap
+    // [EN] Issue #91: a larger touchable area without changing the frame, e.g. the gap below a raised plus button, so a tap
     // there no longer falls through to the page behind. Positive values grow it outward. Shown and scaled at runtime by
     // the "PlusButton touchable area" row of the settings section.
-    // Issue #91：不改变 frame 即可扩大点击范围，例如凸起 PlusButton 下方的间隙，点在那里不再穿透到后面的页面。正值向外扩展。
+    // [CN] Issue #91：不改变 frame 即可扩大点击范围，例如凸起 PlusButton 下方的间隙，点在那里不再穿透到后面的页面。正值向外扩展。
     // 设置分组中的「PlusButton 点击范围」行可在运行时显示并按倍数调整。
     button.touchableAreaOutsets = UIEdgeInsetsMake(0, 8, 12, 8);
-    // button.touchableAreaScale = 1.5;      // or scale the area around the center 或以中心按倍数放大
-    // button.showsTouchableArea = YES;      // debugging: show the area 调试：显示可点击区域
+    // [EN] Or scale the area around the center; while debugging, show the area.
+    // [CN] 或以中心按倍数放大；调试时可显示可点击区域。
+    // button.touchableAreaScale = 1.5;
+    // button.showsTouchableArea = YES;
     return button;
 }
 

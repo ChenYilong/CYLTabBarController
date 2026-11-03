@@ -388,7 +388,8 @@ static NSString *const CYLTouchableAreaCellIdentifier = @"CYLTouchableAreaCell";
     return self;
 }
 
-/// The plus button of this tab bar controller, guarded by `-hasPlusButton`. 本 TabBarController 的 PlusButton，先判断 `-hasPlusButton`。
+/// [EN] The plus button of this tab bar controller, guarded by `-hasPlusButton`.
+/// [CN] 本 TabBarController 的 PlusButton，先判断 `-hasPlusButton`。
 - (nullable CYLPlusButton *)cyl_touchableAreaPlusButton {
     CYLTabBarController *tabBarController = self.tabBarController;
     if (!tabBarController || ![tabBarController hasPlusButton]) {
@@ -415,7 +416,8 @@ static NSString *const CYLTouchableAreaCellIdentifier = @"CYLTouchableAreaCell";
 }
 
 - (void)cyl_scaleDidChange {
-    // Steps of 0.1. 以 0.1 为步长。
+    // [EN] Steps of 0.1.
+    // [CN] 以 0.1 为步长。
     CGFloat scale = round(self.scaleSlider.value * 10.0) / 10.0;
     [self cyl_touchableAreaPlusButton].touchableAreaScale = scale;
     [self cyl_reloadTouchableArea];
@@ -488,10 +490,12 @@ static UITableViewCell *CYLTouchableAreaCellForTableView(UITableView *tableView,
         // 开关与文字随通知更新，因此不重新加载该行（开关会带动画切换）。
         CYLToggleLoginState(CYLSettingsTabBarController(self));
     } else if (indexPath.row == CYLSettingsRowPlusButtonTouchableArea) {
-        // The switch and the slider act on their own; a tap on the row does nothing. 开关与滑块各自生效，点击该行不做处理。
+        // [EN] The switch and the slider act on their own; a tap on the row does nothing.
+        // [CN] 开关与滑块各自生效，点击该行不做处理。
     } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdate];
-        // The rows show which changes are on (a checkmark). 各行用勾号显示已应用的更改。
+        // [EN] The rows show which changes are on (a checkmark).
+        // [CN] 各行用勾号显示已应用的更改。
         NSMutableArray<NSIndexPath *> *indexPaths = [NSMutableArray array];
         for (NSInteger row = CYLSettingsRowTabBarItemUpdate; row < [self cyl_settingsRowCount]; row++) {
             [indexPaths addObject:[NSIndexPath indexPathForRow:row inSection:indexPath.section]];

@@ -173,8 +173,8 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @property (nonatomic, assign, getter=shouldInvokeOnceViewDidLayoutSubViewsBlock) BOOL invokeOnceViewDidLayoutSubViewsBlock;
 /// Blocks passed to `-reloadBadgesWithBlock:` that wait for the tab buttons (#404).
 @property (nonatomic, strong) NSMutableArray<CYLViewDidLayoutSubViewsBlock> *pendingReloadBadgesBlocks;
-/// The control last reported through `tabBarController:didSelectControl:` in the current run loop turn (one report per tap).
-/// 当前 runloop 中已通过 `tabBarController:didSelectControl:` 上报的控件（每次点击只上报一次）。
+/// [EN] The control last reported through `tabBarController:didSelectControl:` in the current run loop turn (one report per tap).
+/// [CN] 当前 runloop 中已通过 `tabBarController:didSelectControl:` 上报的控件（每次点击只上报一次）。
 @property (nonatomic, weak) UIControl *cyl_controlReportedInCurrentRunLoop;
 @property (nonatomic, strong) NSMutableArray<NSURL *> *lottieURLs;
 @property (nonatomic, strong) NSMutableArray *lottieSizes;
@@ -444,10 +444,11 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
             NSArray *subTabBarButtonsWithoutPlusButton = tabBar.cyl_subTabBarButtonsWithoutPlusButton;
             [subTabBarButtonsWithoutPlusButton enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
                 UIControl *tabButton = control;
-                // FIX: issue #423 — `idx` counts the buttons without the plus button, `selectedIndex` counts the view
+                // [EN] FIX: issue #423 — `idx` counts the buttons without the plus button, `selectedIndex` counts the view
                 // controllers, which hold the plus child view controller too. With one before the selected tab, the
                 // launch animation played on the wrong tab. Compare the button's own tab item instead; the position is
-                // only a fallback. `idx` 不含 PlusButton，`selectedIndex` 却包含 PlusButton 子控制器；子控制器在选中 Tab
+                // only a fallback.
+                // [CN] `idx` 不含 PlusButton，`selectedIndex` 却包含 PlusButton 子控制器；子控制器在选中 Tab
                 // 之前时，启动动画会播在错的 Tab 上。改为比较按钮所属的 tabBarItem，按位置比较仅作兜底。
                 UITabBarItem *tabBarItem = [self cyl_tabBarItemForTabButton:tabButton];
                 BOOL defaultSelected = tabBarItem ? (tabBarItem == self.selectedViewController.tabBarItem)
@@ -3336,8 +3337,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
  * [CN] 上报给代理的控件：PlusButton 子控制器的系统 Tab 按钮（PlusButton 下方的图层）换成 PlusButton 本身，其他控件不变。
  */
 - (nullable UIControl *)cyl_reportedControlForControl:(nullable UIControl *)control {
-    // Guards: only with a plus button, and only when it has a child view controller (the second layer).
-    // 仅在有 PlusButton，且其有子控制器（第二个图层）时处理。
+    // [EN] Guards: only with a plus button, and only when it has a child view controller (the second layer).
+    // [CN] 仅在有 PlusButton，且其有子控制器（第二个图层）时处理。
     if (!control || ![self hasPlusButton] || ![self hasPlusChildViewController]) {
         return control;
     }
@@ -3351,7 +3352,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     return isPlusChildTabButton ? plusButton : control;
 }
 
-/// Remembers `control` until the end of the current run loop turn. 记住 `control`，直到当前 runloop 结束。
+/// [EN] Remembers `control` until the end of the current run loop turn.
+/// [CN] 记住 `control`，直到当前 runloop 结束。
 - (void)cyl_markControlReportedInCurrentRunLoop:(UIControl *)control {
     self.cyl_controlReportedInCurrentRunLoop = control;
     __weak __typeof(self) weakSelf = self;
@@ -3514,8 +3516,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         if (control.cyl_isPlusButton) {
             return;
         }
-        // Issue #423 (hardening) — the file of this button's own tab item first; the position is only a fallback.
-        // 优先使用该按钮所属 tabBarItem 的 Lottie 文件，按位置取仅作为兜底。
+        // [EN] Issue #423 (hardening) — the file of this button's own tab item first; the position is only a fallback.
+        // [CN] 优先使用该按钮所属 tabBarItem 的 Lottie 文件，按位置取仅作为兜底。
         UITabBarItem *tabBarItem = [self cyl_tabBarItemForTabButton:control];
         NSURL *lottieURL = tabBarItem.cyl_lottieURL;
         NSValue *lottieSizeValue = tabBarItem.cyl_lottieSizeValue;
@@ -3554,8 +3556,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     
     NSURL *lottieURL = theLottieURL;
     NSValue *lottieSizeValue = theLottieSizeValue;
-    // Issue #423 (hardening) — no file given: take the one of this button's own tab item, not the one at its position.
-    // 未传入文件时，使用该按钮所属 tabBarItem 的 Lottie 文件，而不是按位置取。
+    // [EN] Issue #423 (hardening) — no file given: take the one of this button's own tab item, not the one at its position.
+    // [CN] 未传入文件时，使用该按钮所属 tabBarItem 的 Lottie 文件，而不是按位置取。
     if (!lottieURL || !lottieSizeValue) {
         UITabBarItem *tabBarItem = [self cyl_tabBarItemForTabButton:contentControl];
         lottieURL = lottieURL ?: tabBarItem.cyl_lottieURL;
@@ -3568,8 +3570,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             NSUInteger index = contentControl ? [cyl_tabBar.cyl_subTabBarButtons indexOfObject:contentControl] : NSNotFound;
             if (NSNotFound != index) {
                 if (!lottieURL) {
-                    // Fallback only: the position can be off by the plus button; `-cyl_tabBarItemForTabButton:` above is used first.
-                    // 仅作兜底：按位置可能因 PlusButton 错位，上面优先使用 `-cyl_tabBarItemForTabButton:`。
+                    // [EN] Fallback only: the position can be off by the plus button; `-cyl_tabBarItemForTabButton:` above is used first.
+                    // [CN] 仅作兜底：按位置可能因 PlusButton 错位，上面优先使用 `-cyl_tabBarItemForTabButton:`。
                     lottieURL = self.lottieURLs[index];
                 }
                 
