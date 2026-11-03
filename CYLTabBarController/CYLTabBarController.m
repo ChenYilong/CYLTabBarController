@@ -659,44 +659,44 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
             // 必须是 NSTimeInterval：用 NSUInteger 会把 0.5 截断为 0，导致这里从未延迟。
             NSTimeInterval delaySecondsForSelectedContentView = 0.5;
             if ([self hasPlusChildViewController]) {
-                // FIX: issue #636 — when the tab item shows the plus button's title (`-cyl_showsTitleInTabBarItem`), the
-                // stand-in replaces only the tab icon, and the tab item keeps its title; otherwise the whole tab button.
-                // TabBarItem 显示 PlusButton 的标题时，替身只替换 Tab 图标，保留 TabBarItem 的标题；否则替换整个 Tab 按钮。
-                BOOL coversTabButton = ![contextPlusButton cyl_showsTitleInTabBarItem];
-                [plusSelectedControl cyl_coverTabImageViewOrTabButton:coversTabButton
-                                                              newView:selectedCover
-                                                               offset:UIOffsetZero
-                                                                 show:YES
-                                              delayIfNeededForSeconds:delaySecondsForSelectedContentView
-                                                           completion:^(BOOL isReplaced, UIControl * _Nonnull tabBarButton, UIView * _Nonnull selectedCover) {
-                
-                    /*!
-                     *
-                     *我要求 selectedCover 的中心坐标 强制与 CYLExternPlusButton坐标一致。 坐标系转换
-                     * _UITabBarPlatterView
-                     ├── SelectedContentView
-                     │    └── selectedCover
-                     │
-                     └── CYLPlusButtonSubclass
-                     */
+                /*!
+                 *我要求 selectedCover 的中心坐标 强制与 CYLExternPlusButton坐标一致。 坐标系转换
+                 * _UITabBarPlatterView
+                 ├── SelectedContentView
+                 │    └── selectedCover
+                 │
+                 └── CYLPlusButtonSubclass
+                 */
+                void (^centerOnPlusButton)(BOOL, UIControl *, UIView *) = ^(BOOL isReplaced, UIControl *tabBarButton, UIView *selectedCover) {
                     UIView *platterView = contextPlusButton.superview;
                     UIView *selectedContainerView = selectedCover.superview;
-                
                     if (platterView && selectedContainerView) {
-                    
-                        CGPoint convertedCenter =
-                        [selectedContainerView convertPoint:contextPlusButton.center
-                                                   fromView:platterView];
-                    
-                        selectedCover.center = convertedCenter;
+                        selectedCover.center = [selectedContainerView convertPoint:contextPlusButton.center fromView:platterView];
                     }
-                    // FIX: issue #636 — the cover also hides the other subviews of the tab button, so show the title again.
-                    // 替换时也会隐藏 Tab 按钮的其他子视图，这里恢复显示标题。
-                    if (!coversTabButton) {
-                        [tabBarButton.cyl_tabLabel cyl_setHidden:NO];
-                        tabBarButton.cyl_tabLabel.alpha = 1;
-                    }
-                }];
+                };
+                if ([contextPlusButton cyl_showsTitleInTabBarItem]) {
+                    // FIX: issue #636 — the tab item shows the plus button's title (`-cyl_showsTitleInTabBarItem`): as the
+                    // plus button does in the normal layer, its stand-in replaces only the tab icon, and the tab's title
+                    // and the rest of the tab button stay as the system lays them out. Covering the whole tab button hid
+                    // all its other subviews, the title's container included, so the title stayed hidden.
+                    // TabBarItem 显示 PlusButton 的标题：与普通图层中的 PlusButton 一样，替身只替换 Tab 图标，Tab 的标题及按钮的
+                    // 其他子视图保持系统布局。覆盖整个 Tab 按钮会隐藏它的其他全部子视图（包括标题的容器），标题因此一直不显示。
+                    NSTimeInterval delaySeconds = plusSelectedControl.cyl_isReady ? 0 : delaySecondsForSelectedContentView;
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                        [plusSelectedControl cyl_replaceTabImageViewWithNewView:selectedCover
+                                                                         offset:UIOffsetZero
+                                                                           show:YES
+                                                                     completion:centerOnPlusButton];
+                        [plusSelectedControl.cyl_swappableImageViewViewInTabBarButton cyl_setHidden:YES];
+                    });
+                } else {
+                    [plusSelectedControl cyl_coverTabImageViewOrTabButton:YES
+                                                                  newView:selectedCover
+                                                                   offset:UIOffsetZero
+                                                                     show:YES
+                                                  delayIfNeededForSeconds:delaySecondsForSelectedContentView
+                                                               completion:centerOnPlusButton];
+                }
             } else {
                 //由于有几率无法获取到cyl_tabImageView， 只有延迟获取，才能避免获取为空nil。
                 dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySecondsForSelectedContentView * NSEC_PER_SEC));

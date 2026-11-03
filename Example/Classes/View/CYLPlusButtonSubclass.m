@@ -390,19 +390,19 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 #pragma clang diagnostic pop
 #pragma mark - CYLPlusButtonSubclassing
 
-//+ (UIViewController *)plusChildViewController {
-//    UIViewController *plusChildViewController = [[UIViewController alloc] init];
-////    plusChildViewController.view.backgroundColor = [UIColor redColor];
-//    plusChildViewController.navigationItem.title = @"PlusChildViewController";
-//    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
-//                                                   initWithRootViewController:plusChildViewController];
-//    plusChildNavigationController.title = NSLocalizedString(@"发布", nil);
-//    return plusChildNavigationController;
-//}
-//
-//+ (NSUInteger)indexOfPlusButtonInTabBar {
-//    return 2;
-//}
++ (UIViewController *)plusChildViewController {
+    UIViewController *plusChildViewController = [[UIViewController alloc] init];
+//    plusChildViewController.view.backgroundColor = [UIColor redColor];
+    plusChildViewController.navigationItem.title = CYLLocalizedString(@"PlusChildViewController");
+    UIViewController *plusChildNavigationController = [[UINavigationController alloc]
+                                                   initWithRootViewController:plusChildViewController];
+    plusChildNavigationController.title = NSLocalizedString(@"发布", nil);
+    return plusChildNavigationController;
+}
+
++ (NSUInteger)indexOfPlusButtonInTabBar {
+    return 2;
+}
 
 /// The plus button's title stays on the same center line as the tab item titles, in every tab bar style.
 + (BOOL)alignsTitleWithTabBarItemTitles {
