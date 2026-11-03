@@ -7,6 +7,7 @@
 //
 #import "MainTabBarController.h"
 #import <UIKit/UIKit.h>
+#import <objc/runtime.h>
 #if __has_include(<CYLTabBarController/CYLTabBarController.h>)
 #import <CYLTabBarController/UIImage+CYLTabBarControllerExtention.h>
 #else
@@ -181,6 +182,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //    CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
         CYLTabBarItemTitle : CYLLocalizedString(@"首页"),
+        CYLTabBarItemIdentifier : @"home",  // #408: stays right when tabs are added or removed. Tab 增减后依然准确。
         // A name also loads "<name>_dark" when that image exists: here home_normal_dark (UIImage.cyl_darkImageNameSuffix).
         // 图片名会同时加载存在的「<name>_dark」：这里是 home_normal_dark（UIImage.cyl_darkImageNameSuffix）。
         CYLTabBarItemImage : @"home_normal",  /* NSString and UIImage are supported*/
@@ -189,21 +191,26 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                 CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         //第一位 右大，下大
                 CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home" ofType:@"json"],
+                // #442: the Dark Mode version of the animation; switches with the style. 深色模式下的动画，随风格自动切换。
+                CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_home_dark" ofType:@"json"],
         //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     //    CGFloat secondXOffset = (-25+2)/2;
     NSDictionary *secondTabBarItemsAttributes = @{
         CYLTabBarItemTitle : CYLLocalizedString(@"同城"),
+        CYLTabBarItemIdentifier : @"city",
         CYLTabBarItemImage :@"fishpond_normal",
         CYLTabBarItemSelectedImage : @"fishpond_highlight",
         //                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(secondXOffset, -3.5)],
         //                                                  CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"],
+        CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover_dark" ofType:@"json"],
         //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     
     NSDictionary *thirdTabBarItemsAttributes = @{
         CYLTabBarItemTitle : CYLLocalizedString(@"消息"),
+        CYLTabBarItemIdentifier : @"message",
         // A dark image under any name. Names are the prepared form (rendered as original, #465); a UIImage object for
         // the same is `[UIImage cyl_imageWithImageInfo:@"message_normal" darkImageInfo:@"message_normal_night"]`.
         // 任意名称的深色图片。图片名是库预先处理好的形式（按原图渲染，#465）；同样效果的 UIImage 对象为
@@ -214,10 +221,13 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                 CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-secondXOffset, -3.5)],
         //                                                 CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news" ofType:@"json"],
+        CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_news_dark" ofType:@"json"],
         //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     NSDictionary *fourthTabBarItemsAttributes = @{
         CYLTabBarItemTitle : CYLLocalizedString(@"我的"),
+        // No CYLTabBarItemIdentifier: the default is the class name, "CYLMineViewController" (#408).
+        // 未设置 CYLTabBarItemIdentifier：默认值为类名 "CYLMineViewController"（#408）。
         // account_normal has its own Dark appearance in Images.xcassets; it wins over any "_dark" image.
         // account_normal 在 Images.xcassets 中自带 Dark 外观，优先于任何「_dark」图片。
         CYLTabBarItemImage : @"account_normal",
@@ -225,6 +235,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                  CYLTabBarItemTitlePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(-firstXOffset, -3.5)],
         //                                                  CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine" ofType:@"json"],
+        CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_mine_dark" ofType:@"json"],
         //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     NSArray *tabBarItemsAttributes = @[
@@ -560,6 +571,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                     [tabBarController.viewControllers[4] cyl_setBadgeCenterOffset:CGPointMake(-1, 3)];
                     [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
                 }
+                // #535: the plus button gets a badge too, like the tabs; each tap adds 1 (see -didSelectControl:).
+                // #535：PlusButton 也显示角标，与 Tab 一致；每次点击数字加 1（见 -didSelectControl:）。
+                [tabBarController cyl_demo_showPlusButtonBadge];
             } @catch (NSException *exception) {
                 NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
             }
@@ -622,11 +636,42 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 #pragma mark - CYLFlatDesignTabBarDelegate
 
 
+/*!
+ * #408: tabs by identifier, not by index, so it stays right when tabs are added or removed. Called for every tab button
+ * and for the plus button. Each tab bar controller (this context, the "CYLSecondPlusButtonContext" one, a pushed one)
+ * answers for its own tabs and plus button.
+ * #408：按标识而不是下标区分 Tab，增减 Tab 后依然准确。点击任意 Tab 按钮和 PlusButton 都会调用。每个 TabBarController
+ * （当前 context、"CYLSecondPlusButtonContext"、push 出来的）只处理自己的 Tab 和 PlusButton。
+ */
+- (void)cyl_logTabBarItemIdentifiersForTabBarController:(CYLTabBarController *)tabBarController selectedControl:(UIControl *)control {
+    // 1. Print: the tapped control and all of this tab bar controller's identifiers. 打印：点击的按钮及全部标识。
+    NSString *identifier = control.cyl_tabBarItemIdentifier;
+    NSLog(@"🟢 #408 [%@] tapped \"%@\" (selected \"%@\")", tabBarController.context, identifier, tabBarController.cyl_selectedTabBarItemIdentifier);
+    for (NSString *eachIdentifier in tabBarController.cyl_tabBarItemIdentifiers) {
+        UIControl *eachControl = [tabBarController cyl_controlWithTabBarItemIdentifier:eachIdentifier];
+        NSLog(@"   \"%@\": index %@, %@", eachIdentifier, @([tabBarController cyl_indexOfTabBarItemIdentifier:eachIdentifier]),
+              [eachControl cyl_isPlusButton] ? @"plus button" : @"tab button");
+    }
+    // 2. Use: handle each tab by identifier. 使用：按标识处理每个 Tab。
+    if ([identifier isEqualToString:@"plus"] || [identifier isEqualToString:@"camera"]) {
+        NSLog(@"   plus button of context %@", tabBarController.context);
+    } else if ([identifier isEqualToString:@"message"]) {
+        NSLog(@"   message tab, wherever it is now");
+    } else if ([identifier isEqualToString:@"CYLMineViewController"]) {
+        NSLog(@"   mine tab, by its default identifier (class name)");
+    }
+}
+
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control {
-    
+    [self cyl_logTabBarItemIdentifiersForTabBarController:tabBarController selectedControl:control];
     UIView *animationView;
     
-    if ([control cyl_isTabButton]) {
+    // #535: the plus button's badge changes on every tap. Checked first: before iOS 26 `-cyl_isTabButton` is YES for the
+    // plus button too. #535：每次点击 PlusButton，角标都会变化。需先判断：iOS 26 以前 `-cyl_isTabButton` 对 PlusButton 也返回 YES。
+    if ([control cyl_isPlusButton]) {
+        [tabBarController cyl_demo_plusButtonDidTap];
+    }
+    if ([control cyl_isTabButton] && ![control cyl_isPlusButton]) {
         //更改红标状态
         if ([control cyl_isShowBadge]) {
             if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
@@ -768,6 +813,39 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (UIViewContentMode)lottieAnimationViewContentMode {
     return UIViewContentModeScaleAspectFit;
+}
+
+@end
+
+@implementation CYLTabBarController (CYLPlusButtonBadgeDemo)
+
+- (NSInteger)cyl_demo_plusButtonBadgeCount {
+    return [objc_getAssociatedObject(self, @selector(cyl_demo_plusButtonBadgeCount)) integerValue];
+}
+
+- (void)cyl_demo_setPlusButtonBadgeCount:(NSInteger)count {
+    objc_setAssociatedObject(self, @selector(cyl_demo_plusButtonBadgeCount), @(count), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)cyl_demo_showPlusButtonBadge {
+    // The plus button of this tab bar controller's context. 当前 TabBarController 所在 context 的 PlusButton。
+    UIButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    if (!plusButton) {
+        return;
+    }
+    NSInteger count = MAX([self cyl_demo_plusButtonBadgeCount], 1);
+    [self cyl_demo_setPlusButtonBadgeCount:count];
+    // Same API and look as the tabs' badges (shared style: SceneDelegate.m -setUpBadgeAppearance).
+    // 与 Tab 角标相同的 API 和样式（共用样式见 SceneDelegate.m -setUpBadgeAppearance）。
+    [plusButton cyl_showBadgeValue:[NSString stringWithFormat:@"%@", @(count)] animationType:CYLBadgeAnimationTypeBounce];
+#if defined(DEBUG) || defined(BETA)
+    NSLog(@"🟣 #535 plus button badge %@ (Liquid Glass: %@, from CYLUtils)", @(count), [CYLUtils isLiquidGlassActive] ? @"YES" : @"NO");
+#endif
+}
+
+- (void)cyl_demo_plusButtonDidTap {
+    [self cyl_demo_setPlusButtonBadgeCount:[self cyl_demo_plusButtonBadgeCount] + 1];
+    [self cyl_demo_showPlusButtonBadge];
 }
 
 @end

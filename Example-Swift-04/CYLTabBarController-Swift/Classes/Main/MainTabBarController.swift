@@ -10,6 +10,18 @@ import UIKit
 import CYLTabBarController
 
 class MainTabBarController: CYLTabBarController {
+
+    // #535: the plus button's badge, shared by every Swift demo (Example-Shared/CYLPlusButtonBadgeDemo.swift).
+    // #535：PlusButton 的角标，所有 Swift Demo 共用（Example-Shared/CYLPlusButtonBadgeDemo.swift）。
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        demoShowPlusButtonBadgeAfterLayout()
+    }
+
+    override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
+        demoPlusButtonDidTap(control)
+    }
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,5 +42,3 @@ extension MainTabBarController{
     }
     
 }
-
-

@@ -341,6 +341,19 @@ public final class CYLCompatibleLOTAnimationView: UIView {
         animationView.setValueProvider(valueProvider, keypath: keypath.animationKeypath)
     }
     
+    /// FIX: issue #442 — `setColorValue(_:forKeypath:)` with a keypath string, e.g. "Icon_Home_Normal.**.Color".
+    @objc
+    public func setColorValue(_ color: UIColor, forKeypathString keypath: String) {
+        setColorValue(color, forKeypath: CompatibleAnimationKeypath(keypath: keypath))
+    }
+
+    /// FIX: issue #442 — removes the value provider set for `keypath`, restoring the animation's own value.
+    /// 移除为 `keypath` 设置的值，恢复动画自身的值。
+    @objc
+    public func removeValueProvider(forKeypathString keypath: String) {
+        animationView.removeValueProvider(for: AnimationKeypath(keypath: keypath))
+    }
+
     @objc
     public func getColorValue(for keypath: CompatibleAnimationKeypath, atFrame: CGFloat) -> UIColor? {
         let value = animationView.getValue(for: keypath.animationKeypath, atFrame: atFrame)

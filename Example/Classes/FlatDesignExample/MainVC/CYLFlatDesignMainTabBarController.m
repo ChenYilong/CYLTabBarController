@@ -7,6 +7,7 @@
 //
 
 #import "CYLFlatDesignMainTabBarController.h"
+#import "MainTabBarController.h"
 #import "CYLFlatDesignTableViewController.h"
 #import "CYLFlatDesignModalViewController.h"
 #import "UIImage+CYLTabBarControllerExtention.h"
@@ -238,6 +239,9 @@
                     [tabBarController.viewControllers[4] cyl_setBadgeCenterOffset:CGPointMake(-1, 3)];
                     [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
                 }
+                // #535: the plus button gets a badge too, like the tabs; each tap adds 1 (see -didSelectControl:).
+                // #535：PlusButton 也显示角标，与 Tab 一致；每次点击数字加 1（见 -didSelectControl:）。
+                [tabBarController cyl_demo_showPlusButtonBadge];
             } @catch (NSException *exception) {
                 NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
             }
@@ -431,8 +435,16 @@
     
 #if defined(DEBUG) || defined(BETA)
 NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), control);
+    // #610 / #408: called for every tab button and for the plus button in the flat design style too; the identifier tells
+    // which one was tapped. 扁平样式下点击每个 Tab 按钮和 PlusButton 也会调用；用标识区分是哪一个。
+    NSLog(@"🟢 #610 flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier, [control cyl_isPlusButton] ? @"plus button" : @"tab button");
 #endif
-    if ([control cyl_isTabButton]) {
+    // #535: the plus button's badge changes on every tap. Checked first: before iOS 26 `-cyl_isTabButton` is YES for the
+    // plus button too. #535：每次点击 PlusButton，角标都会变化。需先判断：iOS 26 以前 `-cyl_isTabButton` 对 PlusButton 也返回 YES。
+    if ([control cyl_isPlusButton]) {
+        [tabBarController cyl_demo_plusButtonDidTap];
+    }
+    if ([control cyl_isTabButton] && ![control cyl_isPlusButton]) {
         //更改红标状态
         if ([control cyl_isShowBadge]) {
             if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {

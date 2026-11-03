@@ -45,7 +45,11 @@ let package = Package(
             // (which enable FlatDesign and Lottie code) also resolve under SPM.
             cSettings: [
                 .headerSearchPath("."),
-                .headerSearchPath("CYLBadge"),
+                // FIX: issue #535 — the CYLBadgeView sources (the CocoaPods `CYLBadgeView` subspec), built as part of this target
+                // because they use Core when it is there; CocoaPods offers them on their own.
+                .headerSearchPath("CYLBadgeView"),
+                // FIX: issue #535 — the CYLUtils sources (CocoaPods `CYLUtils` subspec), shared by Core and CYLBadgeView.
+                .headerSearchPath("CYLUtils"),
                 .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar"),
                 .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBarPrivate"),
             ]

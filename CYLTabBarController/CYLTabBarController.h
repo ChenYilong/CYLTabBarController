@@ -6,6 +6,12 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
+#if __has_include("CYLUtils/CYLUtils.h")
+#import "CYLUtils/CYLUtils.h"
+#else
+#import "CYLUtils.h"
+#endif
 #import "CYLPlusButton.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "UIViewController+CYLNavigationControllerExtention.h"
@@ -16,14 +22,16 @@
 #import "CYLBaseTableViewController.h"
 #import "CYLBaseNavigationController.h"
 #import "CYLTabBar+CYLTabBarControllerExtention.h"
-#import "UITabBarItem+CYLBadgeExtention.h"
-#import "UIControl+CYLBadgeExtention.h"
-#import "UIBarButtonItem+CYLBadgeExtention.h"
-#import "UIView+CYLBadgeExtention.h"
+// FIX: issue #535 — the badge APIs are the CYLBadgeView subspec, which Core depends on (`CYLBadgeView/` in the repository,
+// flattened by CocoaPods). 角标 API 位于 Core 依赖的 CYLBadgeView subspec（仓库中的 `CYLBadgeView/` 目录，CocoaPods 会展平）。
+#if __has_include("CYLBadgeView/CYLBadgeView.h")
+#import "CYLBadgeView/CYLBadgeView.h"
+#else
+#import "CYLBadgeView.h"
+#endif
 #import "UITableViewCell+CYLBadgeExtention.h"
 #import "UIViewController+CYLMemoryWarning.h"
 #import "UIViewController+CYLSettingsSection.h"
-#import "CYLBadgeAppearance.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
@@ -78,9 +86,87 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedDarkImage;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieFilePath;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieURL;
 FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize;
+/*!
+ * FIX: issue #442
+ * [EN] Optional Dark Mode versions of `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath` (an NSURL / a file path). A
+ *      Lottie animation draws its own colors, so a tab with `CYLTabBarLottieURL` used to stay light in Dark Mode, whatever
+ *      its images. With one of these, the tab shows the dark animation where the interface style is dark (system setting
+ *      or `overrideUserInterfaceStyle`), and switches by itself, keeping the selected tab's state.
+ *
+ *          CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_home" ofType:@"json"]],
+ *          CYLTabBarLottieDarkURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_home_dark" ofType:@"json"]],
+ *
+ * [CN] 可选的深色模式 Lottie 动画，对应 `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath`（NSURL / 文件路径）。Lottie 动画自带颜色，
+ *      所以设置了 `CYLTabBarLottieURL` 的 Tab 以前在深色模式下保持浅色样式，与图片无关。设置后，界面风格为深色时（系统设置或
+ *      `overrideUserInterfaceStyle`）Tab 显示深色动画，并自动切换，选中状态保持不变。示例见上。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkFilePath;
+/*!
+ * FIX: issue #442 — Lottie 4.x (`CYLTabBarController/LottieSwift`, `CYLFlatDesignTabBar`, SPM)
+ * [EN] One Lottie file for both styles: an NSDictionary of keypath -> UIColor, the colors used where the interface style
+ *      is dark. They are set with Lottie's official value providers (`setValueProvider(_:keypath:)` with a
+ *      `ColorValueProvider`), which both rendering engines support, and removed in light mode, so the animation shows its
+ *      own colors again. Switching keeps the view and its progress. Keypaths use Lottie's syntax: layer, group and item
+ *      names joined by ".", with "*" for one name and "**" for any number (see `logHierarchyKeypaths()`):
+ *
+ *          CYLTabBarLottieDarkColors : @{
+ *              @"Icon_Shop_Normal.**.Color" : [UIColor colorWithWhite:0.78 alpha:1],     // gray strokes, lighter
+ *              @"Icon_Shop_Active_Main.**.Color" : [UIColor colorWithRed:0.15 green:0.39 blue:0.16 alpha:1],
+ *          },
+ *
+ *      Lottie 2.x (`CYLTabBarController/LottieObjectiveC`) ignores it; use `CYLTabBarLottieDarkFilePath` there. A dark
+ *      file and dark colors can be combined: the colors then apply to the dark file.
+ * [CN] 一份 Lottie 文件适配深浅两种风格：keypath -> UIColor 的 NSDictionary，即界面风格为深色时使用的颜色。通过 Lottie 官方的
+ *      value provider（`setValueProvider(_:keypath:)` + `ColorValueProvider`）设置，两种渲染引擎都支持；浅色模式下移除，动画恢复自身颜色。
+ *      切换时保留原视图及播放进度。keypath 使用 Lottie 的语法：图层、组、元素名称用 "." 连接，"*" 匹配一个名称，"**" 匹配任意多个
+ *      （见 `logHierarchyKeypaths()`），示例见上。
+ *      Lottie 2.x（`CYLTabBarController/LottieObjectiveC`）不支持，请使用 `CYLTabBarLottieDarkFilePath`。深色文件与深色颜色可同时设置，
+ *      此时颜色作用于深色文件。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkColors;
+
+/*!
+ * [EN] Returns `attributes` with a Lottie animation added to each item: `CYLTabBarLottieFilePath` for "<name>.json" in
+ *      `bundle` (nil: the main bundle), and `CYLTabBarLottieDarkFilePath` for "<name>_dark.json" when that file exists
+ *      (the suffix is `UIImage.cyl_darkImageNameSuffix`, as for images). Names are matched by position; an item without a
+ *      name, or whose file is missing, is left as it is.
+ *
+ *          // green_lottie_tab_home.json, green_lottie_tab_home_dark.json, ...
+ *          CYLTabBarItemsAttributesAddingLottieFiles(attributes, @[@"green_lottie_tab_home", @"green_lottie_tab_discover"], nil);
+ *
+ *      A Lottie file holds fixed colors and lottie-ios has no themes, so a dark version is a copy of the animation with
+ *      dark colors. With Lottie 4.x, one file can also follow Dark Mode by itself: see `CYLTabBarLottieDarkColors`.
+ * [CN] 返回为每个 item 添加了 Lottie 动画的 `attributes`：`CYLTabBarLottieFilePath` 为 `bundle`（nil 表示 main bundle）中的
+ *      「<名称>.json」；存在「<名称>_dark.json」时再加上 `CYLTabBarLottieDarkFilePath`（后缀与图片相同，为
+ *      `UIImage.cyl_darkImageNameSuffix`）。名称按位置对应；没有名称或文件不存在的 item 保持不变。示例见上。
+ *      Lottie 文件中的颜色是固定的，lottie-ios 也不支持主题，因此深色版本即改为深色配色的动画副本。使用 Lottie 4.x 时，也可以只用一份文件
+ *      适配深色模式，见 `CYLTabBarLottieDarkColors`。
+ */
+FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingLottieFiles(NSArray<NSDictionary *> *attributes,
+                                                                                    NSArray<NSString *> *lottieFileNames,
+                                                                                    NSBundle * _Nullable bundle);
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImageInsets;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitlePositionAdjustment;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImagePositionAdjustment;
+/*!
+ * FIX: issue #408
+ * [EN] Optional identifier of a tab (an NSString), like a tag. When tabs come and go (e.g. the server hides the second
+ *      or third one), `selectedIndex` no longer tells which tab it is; the identifier does. Read it as
+ *      `viewController.cyl_tabBarItemIdentifier` or `control.cyl_tabBarItemIdentifier` in the delegate methods, and see
+ *      `CYLTabBarController (CYLTabBarItemIdentifier)` for lookups by identifier.
+ *      Optional: a tab without one gets a default, its content view controller's class name (a navigation controller's
+ *      root), e.g. @"CYLHomeViewController", with "_2", "_3"... for the next tabs of the same class; a plus button gets
+ *      its class name, e.g. @"CYLPlusButtonSubclass" (see `+cyl_defaultTabBarItemIdentifierForClass:`). Class names stay
+ *      the same when tabs are added or removed and in every language, unlike an index or a title.
+ * [CN] 可选的 Tab 标识（NSString），类似 tag。Tab 会增减时（例如由后台控制隐藏第二个或第三个），`selectedIndex` 无法确定是哪个 Tab，
+ *      标识可以。在代理方法中通过 `viewController.cyl_tabBarItemIdentifier` 或 `control.cyl_tabBarItemIdentifier` 读取；按标识查找见
+ *      `CYLTabBarController (CYLTabBarItemIdentifier)`。
+ *      可选：未设置时自动生成默认值，即内容控制器的类名（导航控制器取其根控制器），例如 @"CYLHomeViewController"；同一 TabBar 中
+ *      后续同类的 Tab 依次加 "_2"、"_3"……；PlusButton 的默认值为其类名，例如 @"CYLPlusButtonSubclass"（见
+ *      `+cyl_defaultTabBarItemIdentifierForClass:`）。与下标或标题不同，类名不会因增减 Tab 或切换语言而改变。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifier;
 /*!
  * [EN] These globals hold what was written LAST, by whichever tab bar controller or plus button wrote last. The library
  *      no longer lays out with them: with several tab bar controllers they overwrote each other (a tab bar with 5 items
@@ -620,6 +706,79 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 //@property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
 
 #endif
+
+@end
+
+/*!
+ * FIX: issue #408
+ * [EN] Tabs by identifier (`CYLTabBarItemIdentifier`), which stays right when tabs are added or removed at run time:
+ *
+ *          - (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+ *              if ([control.cyl_tabBarItemIdentifier isEqualToString:@"message"]) { ... }
+ *          }
+ *          [tabBarController cyl_selectTabBarItemWithIdentifier:@"message"];
+ *
+ *      The plus button counts too, with `+[CYLPlusButtonSubclassing tabBarItemIdentifier]`. Each method works on the
+ *      receiver's own tabs and plus button, so with several tab bar controllers (other contexts, or a pushed one) each
+ *      answers for itself.
+ * [CN] 按标识（`CYLTabBarItemIdentifier`）访问 Tab，运行时增减 Tab 后依然准确（示例见上）。PlusButton 也包括在内，其标识来自
+ *      `+[CYLPlusButtonSubclassing tabBarItemIdentifier]`。每个方法只处理接收者自己的 Tab 和 PlusButton，因此存在多个 TabBarController
+ *      （其他 context，或 push 出来的）时各自独立。
+ */
+@interface CYLTabBarController (CYLTabBarItemIdentifier)
+
+/*!
+ * [EN] The identifier of the selected tab, nil when it has none.
+ * [CN] 当前选中 Tab 的标识，没有设置时为 nil。
+ */
+@property (nonatomic, copy, readonly, nullable) NSString *cyl_selectedTabBarItemIdentifier;
+
+/*!
+ * [EN] The index in `viewControllers` of the tab with `identifier`, NSNotFound when there is none.
+ * [CN] 标识为 `identifier` 的 Tab 在 `viewControllers` 中的下标，不存在时为 NSNotFound。
+ */
+- (NSUInteger)cyl_indexOfTabBarItemIdentifier:(NSString *)identifier NS_SWIFT_NAME(cyl_index(ofTabBarItemIdentifier:));
+
+/*!
+ * [EN] The view controller (as in `viewControllers`, e.g. a navigation controller) of the tab with `identifier`, or nil.
+ * [CN] 标识为 `identifier` 的 Tab 对应的控制器（即 `viewControllers` 中的元素，例如导航控制器），不存在时为 nil。
+ */
+- (nullable UIViewController *)cyl_viewControllerWithTabBarItemIdentifier:(NSString *)identifier NS_SWIFT_NAME(cyl_viewController(withTabBarItemIdentifier:));
+
+/*!
+ * [EN] Selects the tab with `identifier` (as setting `selectedIndex` does) and returns its view controller; does nothing
+ *      and returns nil when there is none.
+ * [CN] 选中标识为 `identifier` 的 Tab（与设置 `selectedIndex` 相同）并返回其控制器；不存在时不做处理并返回 nil。
+ */
+- (nullable UIViewController *)cyl_selectTabBarItemWithIdentifier:(NSString *)identifier NS_SWIFT_NAME(cyl_selectTabBarItem(withIdentifier:));
+
+/*!
+ * [EN] Every identifier of this tab bar controller, in `viewControllers` order; the identifier of a plus button without a
+ *      plus child view controller (which has no view controller) comes last. Tabs without an identifier are skipped.
+ * [CN] 该 TabBarController 的全部标识，按 `viewControllers` 的顺序排列；没有 PlusButton 子控制器的 PlusButton（没有对应的控制器）
+ *      其标识排在最后。没有标识的 Tab 不包含在内。
+ */
+@property (nonatomic, copy, readonly) NSArray<NSString *> *cyl_tabBarItemIdentifiers;
+
+/*!
+ * [EN] The tab button, or the plus button, with `identifier`; nil when there is none or its button is not created yet.
+ * [CN] 标识为 `identifier` 的 Tab 按钮或 PlusButton；不存在或按钮尚未创建时为 nil。
+ */
+- (nullable UIControl *)cyl_controlWithTabBarItemIdentifier:(NSString *)identifier NS_SWIFT_NAME(cyl_control(withTabBarItemIdentifier:));
+
+/*!
+ * [EN] The identifier a tab of this tab bar controller gets when none is set: see `CYLTabBarItemIdentifier`. nil when
+ *      `viewController` (or its navigation controller) is not one of `viewControllers`.
+ * [CN] 未设置标识时，该 TabBarController 中某个 Tab 的默认标识，规则见 `CYLTabBarItemIdentifier`。`viewController`（或其导航控制器）
+ *      不在 `viewControllers` 中时为 nil。
+ */
+- (nullable NSString *)cyl_defaultTabBarItemIdentifierForViewController:(UIViewController *)viewController NS_SWIFT_NAME(cyl_defaultTabBarItemIdentifier(for:));
+
+/*!
+ * [EN] The default identifier for a class: its name, without the Swift module, e.g. @"HomeViewController".
+ * [CN] 某个类的默认标识：类名，不含 Swift 模块名，例如 @"HomeViewController"。
+ */
++ (NSString *)cyl_defaultTabBarItemIdentifierForClass:(Class)aClass NS_SWIFT_NAME(cyl_defaultTabBarItemIdentifier(for:));
 
 @end
 

@@ -6,7 +6,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "CYLBadgeProtocol.h" // CYLBadgeAnimationType
+// CYLBadgeAnimationType. The badge headers are in CYLBadgeView/ (#535): this path works in the source tree (SPM clients,
+// Xcode) and flattened (CocoaPods). 角标头文件位于 CYLBadgeView/（#535），该写法在源码目录与 CocoaPods 展平后都能找到。
+#if __has_include("CYLBadgeView/CYLBadgeProtocol.h")
+#import "CYLBadgeView/CYLBadgeProtocol.h"
+#else
+#import "CYLBadgeProtocol.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

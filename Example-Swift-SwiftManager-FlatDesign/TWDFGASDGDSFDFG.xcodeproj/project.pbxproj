@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		46C63602F8CB46649B917608 /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9101A25334B4D8E86248871 /* CYLPlusButtonBadgeDemo.swift */; };
 		18016F35306CBB6200CD802B /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 18016F34306CBB6200CD802B /* Lottie */; };
 		18016F3A306CBBDC00CD802B /* CYLTabBarController in Frameworks */ = {isa = PBXBuildFile; productRef = 18016F39306CBBDC00CD802B /* CYLTabBarController */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E9101A25334B4D8E86248871 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
 		18016F16306CBA4900CD802B /* TWDFGASDGDSFDFG.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TWDFGASDGDSFDFG.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -50,6 +52,7 @@
 		18016F0D306CBA4900CD802B = {
 			isa = PBXGroup;
 			children = (
+				E9101A25334B4D8E86248871 /* CYLPlusButtonBadgeDemo.swift */,
 				18016F18306CBA4900CD802B /* TWDFGASDGDSFDFG */,
 				18016F17306CBA4900CD802B /* Products */,
 			);
@@ -138,6 +141,7 @@
 		18016F12306CBA4900CD802B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				46C63602F8CB46649B917608 /* CYLPlusButtonBadgeDemo.swift in Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */

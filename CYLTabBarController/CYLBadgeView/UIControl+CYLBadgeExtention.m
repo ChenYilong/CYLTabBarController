@@ -7,10 +7,21 @@
  */
 
 #import "UIControl+CYLBadgeExtention.h"
-#import "CYLTabBarController.h"
 #import <objc/runtime.h>
-#import "UIControl+CYLTabBarControllerExtention.h"
 #import "CYLBadgeProtocol.h"
+#import "CYLBadgeViewDefines.h"
+
+/*!
+ * FIX: issue #535
+ * [EN] This category puts a tab button's badge on its icon (image or Lottie view) and mirrors it to the Liquid Glass
+ *      platter, which needs Core. Without Core (`pod 'CYLTabBarController/CYLBadgeView'`) it is left out, and every
+ *      `UIControl`, e.g. a `UIButton`, uses the `UIView (CYLBadgeExtention)` implementation: the badge goes on the
+ *      control itself.
+ * [CN] 该分类把 Tab 按钮的角标放在图标（图片或 Lottie 视图）上，并同步到液态玻璃 platter，这些都依赖 Core。没有 Core 时
+ *      （`pod 'CYLTabBarController/CYLBadgeView'`）不编译该分类，所有 `UIControl`（例如 `UIButton`）使用
+ *      `UIView (CYLBadgeExtention)` 的实现，角标显示在控件本身上。
+ */
+#if CYL_BADGE_CORE_AVAILABLE
 
 #define kActualView ((UIView *)[self cyl_getActualBadgeSuperView])
 #define CYL_ACTUAL_BARBUTTON kActualView
@@ -32,7 +43,8 @@
     CYL_DEPRECATED_DECLARATIONS_POP
     
     [self cyl_clearBadge];
-    [self cyl_setBadgeValue:badgeValue];
+    // FIX: this used to call itself and never return. 之前这里调用自身，导致无限递归。
+    [self cyl_showBadgeValue:badgeValue animationType:CYLBadgeAnimationTypeNone];
 }
 
 - (void)cyl_setBadgeAnimationTypeValue:(NSNumber *)cyl_badgeAnimationTypeValue {
@@ -156,6 +168,31 @@
             break;
         }
     } while (NO);
+    // By class name: `-cyl_isTabButton` is YES for every UIControl before iOS 26. UITabBarButton, _UITabButton and
+    // CYLFlatDesignTabBarButton are tab buttons. 按类名判断：iOS 26 以前 `-cyl_isTabButton` 对所有 UIControl 都返回 YES。
+    NSString *controlClassName = NSStringFromClass(tabButton.class);
+    BOOL isTabBarButton = [controlClassName containsString:@"TabButton"] || [controlClassName containsString:@"TabBarButton"];
+    if (!isTabBarButton) {
+        /*!
+         * FIX: badges of plus buttons and other controls were covered or clipped
+         * [EN] The badge of a control that is not a tab button (a plus button, any UIButton) went inside its icon. That
+         *      view can lie under the control's other content: a UIButton with a configuration draws its image above
+         *      the first image view found, so the plus button's "+" covered most of its badge. It also changed the
+         *      icon's `clipsToBounds`. The badge now goes on a transparent anchor that is the control's top-most
+         *      subview (zPosition MAXFLOAT, so content the control adds later stays below it), aligned to the icon or,
+         *      without one, to the whole control: it is always drawn above everything in the control, at the icon's
+         *      top-right corner as before. When the control clips (clipsToBounds, masksToBounds or a mask), the anchor
+         *      goes right above the control in its superview instead, so the clipping does not cut the badge. Tab
+         *      buttons are unchanged.
+         * [CN] 非 Tab 按钮的控件（PlusButton、任意 UIButton）的角标原先放在其图标视图中。该视图可能位于控件其他内容之下：使用
+         *      configuration 的 UIButton 会在找到的第一个图片视图之上绘制图片，因此 PlusButton 的「+」遮住了大部分角标；原逻辑还会
+         *      修改图标的 `clipsToBounds`。现在角标放在一个透明的锚点视图上，它是控件最上层的子视图（zPosition 为 MAXFLOAT，控件之后
+         *      添加的内容也位于其下），与图标对齐，没有图标时与整个控件对齐：角标总是绘制在控件所有内容之上，位置仍在图标右上角。
+         *      控件本身会裁剪（clipsToBounds、masksToBounds 或 mask）时，锚点改为放在父视图中、紧贴控件之上，角标不再被裁剪。
+         *      Tab 按钮不变。
+         */
+        return [tabButton cyl_badgeAnchorViewAlignedToView:actualBadgeSuperView];
+    }
     if (actualBadgeSuperView) {
         [actualBadgeSuperView setClipsToBounds:NO];
         //建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame.自动布局 cell 需要调用 [self layoutIfNeeded] frame才有值，角标才能找到对应的位置。 需要确保view showBadge的方法 在layoutIfNeeded之后调用
@@ -163,6 +200,57 @@
     }
 
     return actualBadgeSuperView;
+}
+
+/// The transparent view that holds the badge of a control that is not a tab button, aligned to `referenceView` (the
+/// icon) or to the whole control. 承载非 Tab 按钮控件角标的透明视图，与 `referenceView`（图标）或整个控件对齐。
+- (UIView *)cyl_badgeAnchorViewAlignedToView:(UIView *)referenceView {
+    UIView *anchorView = objc_getAssociatedObject(self, @selector(cyl_badgeAnchorViewAlignedToView:));
+    if (!anchorView) {
+        anchorView = [[UIView alloc] initWithFrame:self.bounds];
+        anchorView.backgroundColor = UIColor.clearColor;
+        anchorView.userInteractionEnabled = NO;
+        anchorView.clipsToBounds = NO;
+        anchorView.isAccessibilityElement = NO;
+        anchorView.translatesAutoresizingMaskIntoConstraints = NO;
+        objc_setAssociatedObject(self, @selector(cyl_badgeAnchorViewAlignedToView:), anchorView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    BOOL controlClips = self.clipsToBounds || self.layer.masksToBounds || self.layer.mask;
+    UIView *container = (controlClips && self.superview) ? self.superview : self;
+    if (container == self) {
+        if (anchorView.superview != self) {
+            [anchorView removeFromSuperview];
+            [self addSubview:anchorView];
+        }
+        [self bringSubviewToFront:anchorView];
+        anchorView.layer.zPosition = MAXFLOAT;
+    } else {
+        if (anchorView.superview != container) {
+            [anchorView removeFromSuperview];
+        }
+        [container insertSubview:anchorView aboveSubview:self];
+        anchorView.layer.zPosition = self.layer.zPosition;
+        anchorView.hidden = self.hidden;
+        anchorView.alpha = self.alpha;
+    }
+    UIView *target = (referenceView && referenceView != anchorView) ? referenceView : self;
+    NSArray<NSLayoutConstraint *> *constraints = objc_getAssociatedObject(anchorView, @selector(cyl_badgeAnchorViewAlignedToView:));
+    BOOL isPinnedToTarget = constraints.count > 0 && constraints.firstObject.active && constraints.firstObject.secondItem == target;
+    if (!isPinnedToTarget) {
+        [NSLayoutConstraint deactivateConstraints:constraints ?: @[]];
+        // Constraints keep the anchor on the icon as the control lays out again. 约束让锚点在控件重新布局后仍与图标对齐。
+        constraints = @[
+            [anchorView.leadingAnchor constraintEqualToAnchor:target.leadingAnchor],
+            [anchorView.topAnchor constraintEqualToAnchor:target.topAnchor],
+            [anchorView.widthAnchor constraintEqualToAnchor:target.widthAnchor],
+            [anchorView.heightAnchor constraintEqualToAnchor:target.heightAnchor],
+        ];
+        [NSLayoutConstraint activateConstraints:constraints];
+        objc_setAssociatedObject(anchorView, @selector(cyl_badgeAnchorViewAlignedToView:), constraints, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    // Right away too, so the badge can be laid out before the next layout pass. 同时立即设置 frame，角标无需等到下一次布局。
+    anchorView.frame = [target convertRect:target.bounds toView:container];
+    return anchorView;
 }
 
 - (void)cyl_performSelector:(SEL)aSelector {
@@ -181,7 +269,7 @@
     if (aSelector == NULL) { return; }
     UIControl *normalControl = nil;
     UIControl *selectedControl = nil;
-    if (![self isKindOfClass:[UIControl class]] || ![CYLConstants isLiquidGlassActive]) {
+    if (![self isKindOfClass:[UIControl class]] || ![CYLUtils isLiquidGlassActive]) {
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
         (
          [self performSelector:aSelector withObject:object1 withObject:object2];
@@ -212,7 +300,7 @@
 }
  
 - (BOOL)cyl_isReady {
-    if (![CYLConstants isLiquidGlassActive]) {
+    if (![CYLUtils isLiquidGlassActive]) {
         return YES;
     }
     //由于 SelectedControl 所在图层的渲染比未选中图层有延迟， 所以必须加延迟，如果不加延迟，可能无法获取到正确的子视图， 有概率获取的子视图为nil
@@ -376,3 +464,4 @@
 
 @end
 
+#endif /* CYL_BADGE_CORE_AVAILABLE */

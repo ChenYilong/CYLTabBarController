@@ -46,38 +46,6 @@
     objc_setAssociatedObject(self, @selector(cyl_imagePositionAdjustment), imagePositionAdjustmentObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-/*!
- *     if ([classString isEqualToString:@"UITabBarButton"] || [classString isEqualToString:@"_UITabButton"]) {
- */
-- (UIControl *)cyl_tabButton {
-    UIControl *control;
-    @try {
-        control = (UIControl *)self.cyl_view;
-        
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴类名与方法名：%@（在第%@行）, 描述：%@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
-    
-    return control;
-}
-/*!
- *  @warning 仅对 UIBarButtonItem、UITabBarItem 有效
- *   UIBarItem 本身没有 view 属性，只有子类 UIBarButtonItem 和 UITabBarItem 才有
- *   iOS11改成了类似懒加载机制，要等到UIBarButtonItem被展示后才能获取到_view
- */
-- (UIView *)cyl_view {
-    if ([self respondsToSelector:@selector(view)]) {
-        return [self cyl_valueForKey:@"view"];
-    }
-    return nil;
-}
-
-- (BOOL)cyl_isReady {
-    return self.cyl_imageView.frame.size.width > 10 || self.cyl_view.cyl_tabLabel.frame.size.width > 10 ;
-}
-
 - (UIImageView *)cyl_imageView {
     return self.cyl_view.cyl_tabImageView;
 }

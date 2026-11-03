@@ -134,3 +134,6 @@
 "保留：当前选中" = "kept: selected";
 "保留：shouldUnload 返回 NO" = "kept: shouldUnload returned NO";
 "保留" = "kept";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "Select the tab with identifier “%@” (“%@”, index %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Pop the current stack, select the tab with identifier “%@”, then push a new demo page onto that tab";
+"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Same as above, select the tab with identifier “%@” (“%@”), with pop animation";

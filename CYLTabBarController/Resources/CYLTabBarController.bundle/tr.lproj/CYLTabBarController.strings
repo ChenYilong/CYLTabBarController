@@ -134,3 +134,6 @@
 "保留：当前选中" = "tutuldu: seçili";
 "保留：shouldUnload 返回 NO" = "tutuldu: shouldUnload NO döndürdü";
 "保留" = "tutuldu";
+"选中标识为「%@」的 Tab（「%@」，index %@）" = "“%@” tanımlayıcılı sekmeyi seç (“%@”, dizin %@)";
+"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页" = "Geçerli yığını pop et, “%@” tanımlayıcılı sekmeyi seç, sonra o sekmeye yeni bir demo sayfası push et";
+"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画" = "Yukarıdakiyle aynı, “%@” tanımlayıcılı sekmeyi seç (“%@”), pop animasyonlu";

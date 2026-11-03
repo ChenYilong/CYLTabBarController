@@ -39,18 +39,8 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
 }
 
 + (BOOL)isUsedLiquidGlass {
-    static BOOL result = NO;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if (@available(iOS 27.0, *)) {
-            result = YES;
-        } else if (@available(iOS 26.0, *)) {
-            result = ![[NSBundle.mainBundle objectForInfoDictionaryKey:@"UIDesignRequiresCompatibility"] boolValue];
-        } else {
-            result = NO;
-        }
-    });
-    return result;
+    // FIX: issue #535 — one implementation, in CYLUtils, shared with CYLBadgeView. 唯一实现位于 CYLUtils，与 CYLBadgeView 共用。
+    return [CYLUtils isLiquidGlassActive];
 }
 
 + (NSValue *)cyl_getTureLottieSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage {
@@ -127,6 +117,84 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
 }
 
 */
+#pragma mark - Dark Mode Lottie (#442)
+
+/// Light Lottie URL (`absoluteString`) -> its dark version. Main thread only, like the tab bar that uses it.
+static NSMutableDictionary<NSString *, NSURL *> *CYLDarkLottieURLs(void) {
+    static NSMutableDictionary<NSString *, NSURL *> *darkLottieURLs;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        darkLottieURLs = [NSMutableDictionary dictionary];
+    });
+    return darkLottieURLs;
+}
+
++ (void)cyl_registerDarkLottieURL:(NSURL *)darkLottieURL forLottieURL:(NSURL *)lottieURL {
+    NSString *key = [lottieURL isKindOfClass:[NSURL class]] ? lottieURL.absoluteString : nil;
+    if (key.length == 0) {
+        return;
+    }
+    // Only a real URL counts; anything else clears it. 只接受 NSURL，其他值视为清除。
+    CYLDarkLottieURLs()[key] = [darkLottieURL isKindOfClass:[NSURL class]] ? darkLottieURL : nil;
+}
+
++ (NSURL *)cyl_lottieURL:(NSURL *)lottieURL forTraitCollection:(UITraitCollection *)traitCollection {
+    if (!lottieURL) {
+        return nil;
+    }
+    if (@available(iOS 13.0, *)) {
+        if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return CYLDarkLottieURLs()[lottieURL.absoluteString] ?: lottieURL;
+        }
+    }
+    return lottieURL;
+}
+
+/// Light Lottie URL (`absoluteString`) -> keypath -> dark color (Lottie 4.x). Main thread only.
+static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *CYLLottieDarkColors(void) {
+    static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *lottieDarkColors;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        lottieDarkColors = [NSMutableDictionary dictionary];
+    });
+    return lottieDarkColors;
+}
+
++ (void)cyl_registerLottieDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forLottieURL:(NSURL *)lottieURL {
+    NSString *key = [lottieURL isKindOfClass:[NSURL class]] ? lottieURL.absoluteString : nil;
+    if (key.length == 0) {
+        return;
+    }
+    // Only keypath (non-empty NSString) -> UIColor pairs count. 只保留「非空 NSString keypath -> UIColor」。
+    NSMutableDictionary<NSString *, UIColor *> *validColors = [NSMutableDictionary dictionary];
+    if ([darkColors isKindOfClass:[NSDictionary class]]) {
+        [darkColors enumerateKeysAndObjectsUsingBlock:^(id keypath, id color, BOOL *stop) {
+            (void)stop;
+            if ([keypath isKindOfClass:[NSString class]] && [(NSString *)keypath length] > 0 && [color isKindOfClass:[UIColor class]]) {
+                validColors[keypath] = color;
+            }
+        }];
+    }
+    CYLLottieDarkColors()[key] = validColors.count > 0 ? [validColors copy] : nil;
+}
+
++ (BOOL)cyl_hasDarkLottieForLottieURL:(NSURL *)lottieURL {
+    NSString *key = [lottieURL isKindOfClass:[NSURL class]] ? lottieURL.absoluteString : nil;
+    if (key.length == 0) {
+        return NO;
+    }
+    return CYLDarkLottieURLs()[key] != nil || CYLLottieDarkColors()[key].count > 0;
+}
+
++ (NSDictionary<NSString *, UIColor *> *)cyl_lottieDarkColorsForLottieURL:(NSURL *)lottieURL {
+    NSString *key = lottieURL.absoluteString;
+    return key.length > 0 ? CYLLottieDarkColors()[key] : nil;
+}
+
++ (BOOL)cyl_hasDarkLottieURLs {
+    return CYLDarkLottieURLs().count > 0 || CYLLottieDarkColors().count > 0;
+}
+
 + (NSURL *)cyl_getURLFromString:(NSString *)string {
     if (!string) {
         return nil;
