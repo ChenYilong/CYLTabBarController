@@ -27,8 +27,9 @@
 
 }
 
-/// Every orientation, with no restriction (a navigation controller allows all but upside down by default on iPhone).
-/// 允许所有方向，没有任何限制（导航控制器在 iPhone 上默认不允许倒置竖屏）。
+/// No restriction in code: the orientations set in Xcode (Info.plist) apply. A navigation controller allows all but
+/// upside down by default on iPhone, which would leave one of them out.
+/// 代码中不做限制，以 Xcode 中的设置（Info.plist）为准。导航控制器在 iPhone 上默认不允许倒置竖屏，会漏掉这个方向。
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskAll;
 }
