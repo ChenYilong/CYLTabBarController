@@ -355,9 +355,10 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
                              leading:(CGFloat *)leading
                            itemWidth:(CGFloat *)itemWidth
                              spacing:(CGFloat *)spacing {
-    CGFloat availableWidth = self.cyl_boundsSize.width;
+    UIEdgeInsets edgeInsets = self.cyl_itemEdgeInsets;
+    CGFloat availableWidth = MAX(0, self.cyl_boundsSize.width - edgeInsets.left - edgeInsets.right);
     CGFloat fillWidth = count > 0 ? (availableWidth - plusWidth) / count : 0;
-    *leading = 0;
+    *leading = edgeInsets.left;
     *itemWidth = fillWidth;
     *spacing = 0;
     UITabBarItemPositioning positioning = UITabBarItemPositioningAutomatic;
@@ -374,9 +375,39 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
     if (totalWidth > availableWidth + 0.5) {
         return;
     }
-    *leading = (availableWidth - totalWidth) * 0.5;
+    *leading = edgeInsets.left + (availableWidth - totalWidth) * 0.5;
     *itemWidth = width;
     *spacing = customSpacing;
+}
+
+- (void)setCyl_itemEdgeInsets:(UIEdgeInsets)itemEdgeInsets {
+    if (UIEdgeInsetsEqualToEdgeInsets(_cyl_itemEdgeInsets, itemEdgeInsets)) {
+        return;
+    }
+    _cyl_itemEdgeInsets = itemEdgeInsets;
+    [self setNeedsLayout];
+}
+
+/*!
+ * [EN] Without a plus button UIKit lays the tab buttons out (and honors centered positioning itself). With
+ *      `cyl_itemEdgeInsets` they are laid out here instead, between the insets, the same way as with a plus button.
+ * [CN] 没有 PlusButton 时由 UIKit 布局 Tab 按钮（居中排列也由 UIKit 处理）。设置了 `cyl_itemEdgeInsets` 时改为在这里布局，
+ *      排列在两端空白之间，与有 PlusButton 时的方式相同。
+ */
+- (void)cyl_layoutTabButtonsWithItemEdgeInsetsIfNeeded {
+    UIEdgeInsets edgeInsets = self.cyl_itemEdgeInsets;
+    if ((edgeInsets.left == 0 && edgeInsets.right == 0) || [CYLConstants isLiquidGlassActive]) {
+        return;
+    }
+    NSArray<UIControl *> *tabButtons = self.tabBarButtonArray;
+    CGFloat leading = 0, itemWidth = 0, spacing = 0;
+    [self cyl_getItemLayoutForTabCount:tabButtons.count plusWidth:0 leading:&leading itemWidth:&itemWidth spacing:&spacing];
+    [tabButtons enumerateObjectsUsingBlock:^(UIControl * _Nonnull tabButton, NSUInteger index, BOOL * _Nonnull stop) {
+        [self changeXForChildView:tabButton
+                       childViewX:leading + index * (itemWidth + spacing)
+                  tabBarItemWidth:itemWidth
+                            index:index];
+    }];
 }
 
 - (void)cyl_layoutTabBarSubviews {
@@ -415,6 +446,7 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
         }
     }
     if (!self.plusButtonActive) {
+        [self cyl_layoutTabButtonsWithItemEdgeInsetsIfNeeded];
         if (self.didLayoutSubViewsBlock) {
             self.didLayoutSubViewsBlock(self);
         }

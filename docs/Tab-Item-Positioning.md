@@ -31,6 +31,7 @@ flowchart LR
 | 中文 | English |
 |:---|:---|
 | [用法](#用法--usage) | [Usage](#用法--usage) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [两端留白](#两端留白--space-at-both-ends) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Space at both ends](#两端留白--space-at-both-ends) |
 | [规则](#规则--rules) | [Rules](#规则--rules) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
@@ -52,6 +53,18 @@ tabBarController.tabBar.itemPositioning = UITabBarItemPositioningCentered;
 tabBarController.tabBar.itemWidth = 76;
 tabBarController.tabBar.itemSpacing = 24;
 ```
+
+### 两端留白 / Space at both ends
+
+```objc
+// Tab（及 PlusButton）排列在两端 16pt 之间；可与居中同时使用。
+// The tabs (and the plus button) are laid out 16 pt in from both ends; works together with centering.
+((CYLTabBar *)tabBarController.tabBar).cyl_itemEdgeInsets = UIEdgeInsetsMake(0, 16, 0, 16);
+```
+
+| 中文 | English |
+|:---|:---|
+| `cyl_itemEdgeInsets` 只使用 `left`（起始端）与 `right`（末端），从右到左布局时自动镜像。有无 PlusButton 均生效：没有 PlusButton 时，设置后由本库在两端留白之间布局 Tab 按钮（未设置时仍由 UIKit 布局）。 | `cyl_itemEdgeInsets` uses only `left` (the leading end) and `right` (the trailing end), mirrored in right-to-left layouts. It works with and without a plus button: without one, the library lays the tab buttons out between the insets once they are set (UIKit still lays them out otherwise). |
 
 ## 规则 / Rules
 

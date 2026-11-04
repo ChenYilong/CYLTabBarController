@@ -61,6 +61,20 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 
 @property (nonatomic, copy, nullable) CYLTabBarDidLayoutSubViewsBlock didLayoutSubViewsBlock;
 
+/*!
+ * [EN] Space kept free at the two ends of the classic tab bar: the tab buttons (and the plus button) are laid out between
+ *      `left` (the leading end, mirrored in right-to-left layouts) and `right` (the trailing end); `top` and `bottom` are
+ *      not used. Default `UIEdgeInsetsZero` (the layout is exactly as before). Works with and without a plus button, and
+ *      together with centered positioning (docs/Tab-Item-Positioning.md). Liquid Glass and FlatDesign are not affected.
+ *
+ *          ((CYLTabBar *)tabBarController.tabBar).cyl_itemEdgeInsets = UIEdgeInsetsMake(0, 16, 0, 16);
+ *
+ * [CN] 经典 TabBar 两端留出的空白：Tab 按钮（以及 PlusButton）排列在 `left`（起始端，从右到左布局时镜像）与 `right`（末端）之间；
+ *      不使用 `top` 与 `bottom`。默认 `UIEdgeInsetsZero`（布局与以前完全相同）。有无 PlusButton 均可，也可与居中排列同时使用
+ *      （docs/Tab-Item-Positioning.md）。液态玻璃与扁平样式不受影响。示例见上。
+ */
+@property (nonatomic, assign) UIEdgeInsets cyl_itemEdgeInsets;
+
 /** [CN] 发布按钮 */
 /* [EN] Publish button */
 @property (nonatomic, strong, nullable) CYLPlusButton<CYLPlusButtonSubclassing> *plusButton;
