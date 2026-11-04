@@ -2,42 +2,32 @@
 """
 [EN] Downloads the animation files of the demos, listed in Example-Shared/<Folder>/*-resources.json, pinned and checked
      against their SHA-256. The files are not kept in this repository: like the pods themselves, they are fetched when you
-     install, by `pod install` in Example-PAG / Example-Rive (a `pre_install` hook). Files already present with the right
-     SHA-256 are skipped. One script serves every animation library: a library added later adds a manifest (and, for a
-     new source, one line to ALLOWED_GITHUB_REPOSITORIES or ALLOWED_PUB_PACKAGES).
-
-     Two kinds of manifest:
-       - "files": single files from a GitHub repository at a full commit (PAG: libpag's sample repositories);
-       - "packages": a pub.dev package archive at a version, of which only the listed regular files are extracted
-         (Rive: rive_animated_icon).
+     install, by `pod install` in Example-PAG (a `pre_install` hook). Files already present with the right
+     SHA-256 are skipped. One script serves every animation library: a library added later adds a manifest
+     ("files": single files from a GitHub repository at a full commit) and, for a new repository, one line to
+     ALLOWED_GITHUB_REPOSITORIES.
 
      Some sources have restrictive or no licenses (see each manifest); the files are only downloaded to your machine,
      from their original location. Check the terms before you ship any of them.
 
 [CN] 下载 Demo 使用的动效文件（列在 Example-Shared/<目录>/*-resources.json 中），固定版本并校验 SHA-256。这些文件不保存在本仓库中：与 pod
-     本身一样，在安装时获取，即在 Example-PAG / Example-Rive 中执行 `pod install` 时（`pre_install` 钩子）。已存在且 SHA-256 正确的文件会跳过。
-     所有动画库共用这一个脚本：以后新增的动画库只需新增一个清单（来源是新的地址时，再在 ALLOWED_GITHUB_REPOSITORIES 或
-     ALLOWED_PUB_PACKAGES 中加一行）。
-
-     两种清单：
-       - "files"：GitHub 仓库中固定到完整 commit 的单个文件（PAG：libpag 的示例仓库）；
-       - "packages"：pub.dev 上固定版本的包归档，只解压其中列出的普通文件（Rive：rive_animated_icon）。
+     本身一样，在安装时获取，即在 Example-PAG 中执行 `pod install` 时（`pre_install` 钩子）。已存在且 SHA-256 正确的文件会跳过。
+     所有动画库共用这一个脚本：以后新增的动画库只需新增一个清单（"files"：GitHub 仓库中固定到完整 commit 的单个文件），来源是新的仓库时，
+     再在 ALLOWED_GITHUB_REPOSITORIES 中加一行。
 
      部分来源的许可有限制或没有许可（见各清单）；文件只是从原来的位置下载到你的电脑上。发布前请自行确认其使用条款。
 
 Usage / 用法:
     python3 scripts/fetch-animation-resources.py PAGResources            # download what is missing  下载缺少的文件
-    python3 scripts/fetch-animation-resources.py RiveResources --check   # exit 1 if a file is missing or wrong  缺失或不一致时退出码为 1
+    python3 scripts/fetch-animation-resources.py PAGResources --check    # exit 1 if a file is missing or wrong  缺失或不一致时退出码为 1
     python3 scripts/fetch-animation-resources.py --check                 # every folder  所有目录
 """
 
 import hashlib
-import io
 import json
 import os
 import re
 import sys
-import tarfile
 import tempfile
 import time
 import urllib.parse
@@ -54,18 +44,15 @@ ALLOWED_GITHUB_REPOSITORIES = {
         "pag-ios", "pag-enterprise-ios", "pag-android", "pag-flutter", "pag-enterprise-android", "pag-web",
     }),
 }
-ALLOWED_PUB_PACKAGES = frozenset({"rive_animated_icon"})
 GITHUB_RAW_PREFIX = "https://raw.githubusercontent.com/"
-PUB_ARCHIVE_PREFIX = "https://pub.dev/api/archives/"
 
 FOLDER_PATTERN = re.compile(r"[A-Za-z][A-Za-z0-9]*Resources")
 COMMIT_PATTERN = re.compile(r"[0-9a-f]{40}")
 SHA256_PATTERN = re.compile(r"[0-9a-f]{64}")
-VERSION_PATTERN = re.compile(r"\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?")
 # "<sub folder>/<name>": one folder level, plain file names only (no "..", no absolute path).
 # 「<子目录>/<文件名>」：只有一级目录，只允许普通文件名（不含 ".."，不是绝对路径）。
 FILE_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*/[A-Za-z0-9][A-Za-z0-9._-]*")
-# A path inside a repository or an archive: plain segments only. 仓库或归档中的路径：只允许普通的路径片段。
+# A path inside a repository: plain segments only. 仓库中的路径：只允许普通的路径片段。
 SOURCE_PATH_PATTERN = re.compile(r"[A-Za-z0-9_-][A-Za-z0-9._-]*(/[A-Za-z0-9_-][A-Za-z0-9._-]*)*")
 MAX_DOWNLOAD_SIZE = 64 * 1024 * 1024
 
@@ -98,14 +85,6 @@ def github_url(entry):
     return "{}{}/{}/{}/{}".format(GITHUB_RAW_PREFIX, owner, name, commit, urllib.parse.quote(path))
 
 
-def pub_url(package):
-    """[EN] The pub.dev archive of an allowed package at a version. [CN] 允许的包在 pub.dev 上固定版本的归档。"""
-    name, version = package.get("package", ""), package.get("version", "")
-    require(name in ALLOWED_PUB_PACKAGES, "package not allowed: {!r}".format(name))
-    require(isinstance(version, str) and VERSION_PATTERN.fullmatch(version), "invalid version: {!r}".format(version))
-    return "{}{}-{}.tar.gz".format(PUB_ARCHIVE_PREFIX, name, version)
-
-
 def check_sha256(value, what):
     require(SHA256_PATTERN.fullmatch(str(value)), "invalid sha256 for {!r}".format(what))
 
@@ -113,22 +92,13 @@ def check_sha256(value, what):
 def plan(folder, manifest):
     """
     [EN] Validates the whole manifest before anything is downloaded, then returns its downloads as
-         (url, sha256, [(member or None, sha256, destination)]).
-    [CN] 在下载之前先校验整个清单，然后以 (url, sha256, [(归档成员或 None, sha256, 目标路径)]) 的形式返回其下载项。
+         (url, sha256, [(None, sha256, destination)]).
+    [CN] 在下载之前先校验整个清单，然后以 (url, sha256, [(None, sha256, 目标路径)]) 的形式返回其下载项。
     """
     downloads = []
     for entry in manifest.get("files", []):
         check_sha256(entry.get("sha256"), entry.get("file"))
         downloads.append((github_url(entry), entry["sha256"], [(None, entry["sha256"], safe_destination(folder, entry["file"]))]))
-    for package in manifest.get("packages", []):
-        check_sha256(package.get("archive_sha256"), package.get("package"))
-        members = []
-        for entry in package["files"]:
-            require(isinstance(entry.get("member"), str) and SOURCE_PATH_PATTERN.fullmatch(entry["member"]),
-                    "invalid archive member: {!r}".format(entry.get("member")))
-            check_sha256(entry.get("sha256"), entry.get("file"))
-            members.append((entry["member"], entry["sha256"], safe_destination(folder, entry["file"])))
-        downloads.append((pub_url(package), package["archive_sha256"], members))
     return downloads
 
 
@@ -174,15 +144,6 @@ def write(destination, data, sha256):
     os.replace(temporary, destination)
 
 
-def archive_member(archive, member):
-    """[EN] One regular file of a .tar.gz (no links). [CN] .tar.gz 中的一个普通文件（不处理链接）。"""
-    with tarfile.open(fileobj=io.BytesIO(archive), mode="r:gz") as tar:
-        info = tar.getmember(member)
-        if not info.isfile():
-            raise ValueError("not a regular file in the archive: {}".format(member))
-        return tar.extractfile(info).read()
-
-
 def resource_folder(folder_name):
     """[EN] Example-Shared/<folder_name>, validated. [CN] 校验后的 Example-Shared/<folder_name>。"""
     require(FOLDER_PATTERN.fullmatch(folder_name), "invalid folder: {!r}".format(folder_name))
@@ -206,8 +167,8 @@ def download_missing(folder, url, sha256, missing):
     """[EN] Downloads `url` once and writes the missing targets. [CN] 下载 `url` 一次，并写入缺少的目标文件。"""
     print("{} <- {}".format(", ".join(os.path.relpath(target[2], folder) for target in missing), url))
     data = fetch(url, sha256)
-    for member, member_sha256, destination in missing:
-        write(destination, data if member is None else archive_member(data, member), member_sha256)
+    for _, target_sha256, destination in missing:
+        write(destination, data, target_sha256)
 
 
 def process(folder_name, check_only):

@@ -38,17 +38,37 @@ struct CYLRiveTabBarItemAnimationConfiguration {
     let activeDuration: TimeInterval
     let triggerPropertyPath: String?
     let lightColor: UIColor?
+    /// [EN] Legacy runtime (files without a view model): a state machine input, a trigger input, or a linear animation.
+    /// [CN] 旧版运行时（没有 view model 的文件）：状态机布尔输入、trigger 输入或线性动画。
+    let stateMachineInput: String?
+    let triggerInput: String?
+    let animationName: String?
+    /// [EN] Played through the legacy runtime even with none of the three above. [CN] 即使没有以上三项，也通过旧版运行时播放。
+    let forcesLegacyRuntime: Bool
+
+    /// [EN] Whether the file is played through Rive's legacy runtime. [CN] 是否通过 Rive 旧版运行时播放该文件。
+    var usesLegacyRuntime: Bool {
+        return forcesLegacyRuntime || stateMachineInput != nil || triggerInput != nil || animationName != nil
+    }
 
     init(fileURL: URL, options: [String: String]) {
         self.fileURL = fileURL
         artboardName = options[CYLTabBarAnimationOption.riveArtboard.rawValue]
         stateMachineName = options[CYLTabBarAnimationOption.riveStateMachine.rawValue]
         activePropertyPath = options[CYLTabBarAnimationOption.riveActiveProperty.rawValue] ?? "active"
-        // [EN] 1 second by default, at most a minute. [CN] 默认 1 秒，最长一分钟。
-        let duration = Double(options[CYLTabBarAnimationOption.riveActiveDuration.rawValue] ?? "") ?? 1
-        activeDuration = duration > 0 ? min(duration, 60) : 1
+        // [EN] 1 second by default, at most a minute; 0 keeps it YES until the animation stops.
+        // [CN] 默认 1 秒，最长一分钟；0 表示保持 YES，直到动画停止。
+        if let duration = Double(options[CYLTabBarAnimationOption.riveActiveDuration.rawValue] ?? ""), duration >= 0 {
+            activeDuration = min(duration, 60)
+        } else {
+            activeDuration = 1
+        }
         triggerPropertyPath = options[CYLTabBarAnimationOption.riveTriggerProperty.rawValue]
         lightColor = options[CYLTabBarAnimationOption.riveColor.rawValue].flatMap(Self.color(hex:))
+        stateMachineInput = options[CYLTabBarAnimationOption.riveInput.rawValue]
+        triggerInput = options[CYLTabBarAnimationOption.riveTriggerInput.rawValue]
+        animationName = options[CYLTabBarAnimationOption.riveAnimation.rawValue]
+        forcesLegacyRuntime = options[CYLTabBarAnimationOption.riveLegacyRuntime.rawValue] == "1"
     }
 
     /// [EN] "#RRGGBB" or "#RRGGBBAA" ("#" optional). [CN] "#RRGGBB" 或 "#RRGGBBAA"（"#" 可省略）。
@@ -101,8 +121,19 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayab
 
     // MARK: - [EN] CYLTabBarItemAnimationViewProviding [CN] 视图工厂接口
 
+    /// [EN] The legacy renderer, resolved by name only: it is deprecated with the legacy API it uses, and naming it here
+    ///      would warn. [CN] 旧版渲染器，只按名称解析：它与其使用的旧版 API 一起标记为废弃，在这里直接引用会产生警告。
+    private static let legacyProviderClassName = "CYLRiveLegacyTabBarItemAnimationView"
+
     static func makeAnimationView(fileURL: URL, options: [String: String], contentMode: UIView.ContentMode) -> (UIView & CYLTabBarItemAnimationPlayableView)? {
-        let view = CYLRiveTabBarItemAnimationView(configuration: CYLRiveTabBarItemAnimationConfiguration(fileURL: fileURL, options: options),
+        let configuration = CYLRiveTabBarItemAnimationConfiguration(fileURL: fileURL, options: options)
+        if configuration.usesLegacyRuntime {
+            // [EN] Another implementation of the same interface (strategy), chosen by the options.
+            // [CN] 同一接口的另一个实现（策略），根据选项选择。
+            let legacyProvider = NSClassFromString(legacyProviderClassName) as? CYLTabBarItemAnimationViewProviding.Type
+            return legacyProvider?.makeAnimationView(fileURL: fileURL, options: options, contentMode: contentMode)
+        }
+        let view = CYLRiveTabBarItemAnimationView(configuration: configuration,
                                                   fileProvider: CYLRiveTabBarItemAnimationFileCache.shared)
         view.contentMode = contentMode
         return view
@@ -152,6 +183,10 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayab
         }
         let activePropertyPath = configuration.activePropertyPath
         instance.setValue(of: BoolProperty(path: activePropertyPath), to: true)
+        guard configuration.activeDuration > 0 else {
+            // [EN] Held until the animation stops. [CN] 保持到动画停止。
+            return
+        }
         let nanoseconds = UInt64(configuration.activeDuration * 1_000_000_000)
         deactivateTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: nanoseconds)

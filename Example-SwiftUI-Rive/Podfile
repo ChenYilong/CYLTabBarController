@@ -1,0 +1,18 @@
+platform :ios, '15.4'
+
+target 'AnimatedApp' do
+  use_frameworks!
+
+  # Rive tab icons, the same way as `CYLTabBarController/LottieSwift` and `CYLTabBarController/PAG`; it also brings the
+  # RiveRuntime pod, so the app needs no Swift package. Rive Tab 图标，用法与 LottieSwift、PAG 相同；同时引入 RiveRuntime pod，
+  # 因此 App 不再需要 Swift Package。
+  pod 'CYLTabBarController/Rive', :path => '../'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.4'
+    end
+  end
+end

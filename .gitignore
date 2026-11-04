@@ -98,6 +98,7 @@ fastlane/screenshots
 # not kept in the repository. PAG 动效文件：由脚本下载（Example-PAG 中执行 `pod install`），不保存在仓库中。
 Example-Shared/PAGResources/*/
 
-# Rive animation files: downloaded by scripts/fetch-animation-resources.py (`pod install` in Example-Rive),
-# not kept in the repository. Rive 动效文件：由脚本下载（Example-Rive 中执行 `pod install`），不保存在仓库中。
-Example-Shared/RiveResources/*/
+# The rest of the downloaded "SwiftUI Animations" course (DesignCode): only its final app is kept, as
+# Example-SwiftUI-Rive/AnimatedApp. 下载的「SwiftUI Animations」课程的其余部分：只保留最终的 App。
+Example-SwiftUI-Rive/SwiftUI Animations/
+Example-SwiftUI-Rive/AnimatedApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/

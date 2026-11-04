@@ -34,13 +34,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CYLTabBarItemAnimationFactory : NSObject
 
 /// [EN] A ready view for the animation at `URL`, with its player attached; nil when no library plays it. [CN] `URL` 动画的视图（已绑定播放器）；没有动画库能播放时返回 nil。
-+ (nullable UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode;
++ (nullable UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode
+    NS_SWIFT_NAME(animationView(url:size:contentMode:));
 
 /// [EN] The player of `view`, nil when it is no library's view. [CN] `view` 的播放器；不是任何动画库的视图时返回 nil。
-+ (nullable id<CYLTabBarItemAnimationPlayer>)playerForView:(nullable UIView *)view;
++ (nullable id<CYLTabBarItemAnimationPlayer>)playerForView:(nullable UIView *)view NS_SWIFT_NAME(player(for:));
 
 /// [EN] YES for a view of any library. [CN] 任意动画库的视图返回 YES。
-+ (BOOL)isAnimationView:(nullable UIView *)view;
++ (BOOL)isAnimationView:(nullable UIView *)view NS_SWIFT_NAME(isAnimationView(_:));
 
 @end
 

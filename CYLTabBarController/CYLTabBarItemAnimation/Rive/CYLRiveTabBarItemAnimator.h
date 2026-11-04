@@ -76,6 +76,14 @@ FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkColors;
  *        to NO after `CYLTabBarAnimationOptionRiveActiveDuration` seconds (defaults @"active" and @"1").
  *      - `CYLTabBarAnimationOptionRiveTriggerProperty`: a view model trigger fired instead.
  *      - `CYLTabBarAnimationOptionRiveColor`: "#RRGGBB" or "#RRGGBBAA", set on the view model color @"color" (light mode).
+ *      For files made before data binding, which have no view model (Rive's legacy runtime, see docs/Rive-Animation.md):
+ *      - `CYLTabBarAnimationOptionRiveInput`: a state machine boolean input, set to YES when the tab plays and back to NO
+ *        after `CYLTabBarAnimationOptionRiveActiveDuration` seconds, or when it stops.
+ *      - `CYLTabBarAnimationOptionRiveTriggerInput`: a state machine trigger input fired when the tab plays.
+ *      - `CYLTabBarAnimationOptionRiveAnimation`: a linear animation played when the tab plays (no state machine).
+ *      - `CYLTabBarAnimationOptionRiveLegacyRuntime`: @"1" plays the file through the legacy runtime with none of the above,
+ *        e.g. a file without a state machine, whose default animation then loops.
+ *      `CYLTabBarAnimationOptionRiveActiveDuration` @"0" keeps the boolean (view model or input) YES until the animation stops.
  * [CN] Rive 用于 `CYLTabBarAnimationURLWithOptions()` 的选项（Swift：`.riveArtboard` 等），所有值都是字符串。
  *      - `CYLTabBarAnimationOptionRiveArtboard`：画板（默认为文件的默认画板）；一个 .riv 文件可以包含多个图标。
  *      - `CYLTabBarAnimationOptionRiveStateMachine`：状态机（默认为画板的默认状态机）。
@@ -83,6 +91,12 @@ FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkColors;
  *        恢复为 NO（默认 @"active" 与 @"1"）。
  *      - `CYLTabBarAnimationOptionRiveTriggerProperty`：改为触发的 view model trigger。
  *      - `CYLTabBarAnimationOptionRiveColor`："#RRGGBB" 或 "#RRGGBBAA"，设置到 view model 颜色 @"color"（浅色模式）。
+ *      数据绑定出现之前制作、没有 view model 的文件（Rive 旧版运行时，见 docs/Rive-Animation.md）：
+ *      - `CYLTabBarAnimationOptionRiveInput`：状态机布尔输入，播放时设为 YES，`CYLTabBarAnimationOptionRiveActiveDuration` 秒后或停止时恢复为 NO。
+ *      - `CYLTabBarAnimationOptionRiveTriggerInput`：播放时触发的状态机 trigger 输入。
+ *      - `CYLTabBarAnimationOptionRiveAnimation`：播放时播放的线性动画（不使用状态机）。
+ *      - `CYLTabBarAnimationOptionRiveLegacyRuntime`：@"1" 表示不使用以上选项、直接通过旧版运行时播放文件，例如没有状态机的文件，其默认动画会循环播放。
+ *      `CYLTabBarAnimationOptionRiveActiveDuration` 为 @"0" 时，布尔属性（view model 或输入）保持 YES，直到动画停止。
  */
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveArtboard;
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveStateMachine;
@@ -90,5 +104,9 @@ FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveAct
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveActiveDuration;
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerProperty;
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveColor;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveInput;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerInput;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveAnimation;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveLegacyRuntime;
 
 NS_ASSUME_NONNULL_END

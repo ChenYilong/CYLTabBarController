@@ -26,6 +26,10 @@ CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveActiveProperty = @"ac
 CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveActiveDuration = @"duration";
 CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerProperty = @"trigger";
 CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveColor = @"color";
+CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveInput = @"input";
+CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerInput = @"triggerInput";
+CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveAnimation = @"animation";
+CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveLegacyRuntime = @"legacy";
 
 @implementation CYLRiveTabBarItemAnimator
 
