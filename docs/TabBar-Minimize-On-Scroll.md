@@ -353,6 +353,7 @@ flowchart TD
 | 6 | 85 | 扩大审查范围（约 45 个场景）后发现：长按内容（上下文菜单、拖放、选择文字）不算打断 −1；侧滑菜单 / 抽屉移动控制器、容器转场没有回调 −2；Mac 上仍会隐藏 −1；顶部安全区变化（通话状态栏）−1；演示未覆盖子控制器 present、popover、抽屉、Scene 失活 −1；以及没有真机验证 −5、液态玻璃恢复方式未验证 −3、系统事件以通知模拟 −1 | 白名单会话的上下文可以继续扩展，新场景大多只需加入上下文比较 | 滚动视图上加入不拦截触摸的长按观察者；会话上下文加入控制器在窗口中的 frame 与顶部安全区；Mac Catalyst 与 Mac 上的 iOS App 不隐藏；演示新增 6 行（OverCurrentContext、popover、抽屉、顶部安全区、Scene 失活、手动长按），ObjC Demo 的角标行加入上下文菜单（共 29 行） |
 | 7 | 90 | 内容之外的点击（导航栏按钮、UIMenu 按钮、头部控件）不算打断，UIMenu 没有公开回调 −1；没有真机验证 −5（iPad 指针 / 触控板 / 鼠标滚轮滚动也需真机确认，计入此项）；液态玻璃恢复方式未验证 −3；系统事件以通知模拟 −1 | 长按、抽屉、安全区、Mac 已处理；29 行演示；43 个边界情况 | 控制器视图上加入不拦截触摸的点击观察者：TabBar 隐藏或缩小期间，所跟随滚动视图之外的点击结束会话；内容中的点击保持隐藏（与 Facebook 一致）；ObjC Demo 导航栏新增带 UIMenu 的按钮，演示新增“手动：点击导航栏按钮”（共 30 行） |
 | 8 | 92 | 没有真机验证 −5；液态玻璃：写入 Never 能否让系统恢复 TabBar 尚未验证 −2（恢复后被惯性再次缩小的风险已在本轮消除）；系统事件以通知模拟 −1 | 第 7 轮的点击观察者经复查无问题（不拦截触摸、内容中的点击保持隐藏）；进入本轮时为 91 分 | 液态玻璃：Never 保持到新的拖动开始（原为 0.35 秒），与其他样式的新拖动规则一致；App 设置新取值或离开液态玻璃时结束保持；演示新增“手动：恢复后不松手继续甩动”（共 31 行） |
+| 9 | 92 | 没有真机验证 −5；液态玻璃：写入 Never 能否恢复 TabBar 未验证 −2；真实来电与低电量弹框无法用代码触发 −1 | 复查第 6–8 轮：识别器的生命周期（控制器或视图释放时不会向已释放的目标发送消息）、恢复时的重入、嵌套 TabBarController 的点击观察者均无问题 | 演示新增 2 个真实触发（不是发送通知）：打开设置让 App 真正进入后台再回来；iPhone 上 tel:// 拨号提示这一真实系统弹框（共 33 行） |
 
 | Round | Score | Deductions | Positives | Changes in this round |
 |:---|:---|:---|:---|:---|
@@ -364,6 +365,7 @@ flowchart TD
 | 6 | 85 | a wider review (about 45 scenarios) found: a long press on the content (context menu, drag, text selection) did not count as an interruption −1; a side menu / drawer moving the controller, container transitions have no callback −2; still hides on a Mac −1; top safe area changes (in-call status bar) −1; the demo did not cover child presentations, popovers, drawers, scene deactivation −1; plus no device testing −5, Liquid Glass restore unverified −3, system events simulated with notifications −1 | the whitelist session's context can be extended; most new scenarios only need one more context comparison | a long-press observer on the scroll view that never blocks touches; the session context now includes the controller's frame in its window and its top safe area; never hides with Mac Catalyst or an iOS app on a Mac; 6 more demo rows (OverCurrentContext, popover, drawer, top safe area, scene deactivation, manual long press) and a context menu on the ObjC demo's badge rows (29 rows) |
 | 7 | 90 | taps outside the content (navigation bar buttons, UIMenu buttons, header controls) did not count as interruptions, and UIMenu has no public callback −1; no device testing −5 (pointer / trackpad / mouse wheel scrolling on iPad also needs a device and is counted here); Liquid Glass restore unverified −3; system events simulated with notifications −1 | long press, drawers, safe area and Mac handled; 29 demo rows; 43 edge cases | a tap observer on the controller's view that never blocks touches: while the bar is hidden or minimized, a tap outside the followed scroll view ends the session; taps inside the content keep it hidden (as in Facebook); the ObjC demo's navigation bar gets a button with a UIMenu, and a "Manual: tap a navigation bar button" row (30 rows) |
 | 8 | 92 | no device testing −5; Liquid Glass: whether writing Never expands the bar is unverified −2 (the risk of momentum minimizing it again after a restore is removed in this round); system events simulated with notifications −1 | round 7's tap observer reviewed with no issue (never blocks touches, taps inside the content keep it hidden); 91 on entering this round | Liquid Glass: Never is held until a new drag starts (was 0.35 s), the same new-drag rule as the other styles; a new value from the app or leaving Liquid Glass ends the hold; a "Manual: after a restore, fling on without lifting" row (31 rows) |
+| 9 | 92 | no device testing −5; Liquid Glass: whether writing Never expands the bar is unverified −2; a real call and the low battery alert cannot be triggered from code −1 | rounds 6–8 reviewed: recognizer lifetime (no message to a released target when the controller or view goes), re-entrancy on restore, the tap observer of nested tab bar controllers; no issue | 2 real triggers in the demo (not posted notifications): opening Settings really sends the app to the background and back; the tel:// call prompt on iPhone is a real system alert (33 rows) |
 
 ### [CN]边界情况清单
 ### [EN]Edge case list
@@ -380,9 +382,9 @@ flowchart TD
 | 4 | 内容变短不再能滚动 | 可滚动距离 < 100pt 时恢复；隐藏需要 ≥ 200pt（滞回，防止闪动） | ✅ |
 | 5 | 内容开头 | 滚入超过 50pt 才隐藏 | ✅ |
 | 6 | 恢复后的惯性滚动 | 恢复后需要新的拖动 | ✅ |
-| 7 | 前后台切换 | App 与 Scene 通知 | ✅🧪 |
+| 7 | 前后台切换 | App 与 Scene 通知；演示中另有真实触发（打开设置） | ✅🧪 |
 | 8 | 来电（接听） | WillResignActive | ✅🧪📱 |
-| 9 | 低电量弹框、系统弹框、权限请求 | WillResignActive | ✅🧪📱 |
+| 9 | 低电量弹框、系统弹框、权限请求 | WillResignActive；演示中另有真实系统弹框（iPhone 上的 tel:// 拨号提示） | ✅🧪📱 |
 | 10 | 控制中心、通知中心、App 切换器 | WillResignActive / DidEnterBackground | ✅📱 |
 | 11 | 点击推送打开 App 后 push | 前台通知 + 页面变化 | ✅🧪 |
 | 12 | push、pop、手势返回 | 会话上下文（页面）+ 转场中不隐藏 | ✅🧪 |
@@ -429,9 +431,9 @@ flowchart TD
 | 4 | Content that no longer scrolls | Shown below 100pt of scrollable distance; hiding needs 200pt (hysteresis, no flicker) | ✅ |
 | 5 | The start of the content | Hides only after 50pt into the content | ✅ |
 | 6 | Momentum after a restore | A new drag is needed after a restore | ✅ |
-| 7 | Background / foreground | App and scene notifications | ✅🧪 |
+| 7 | Background / foreground | App and scene notifications; the demo also triggers it for real (opening Settings) | ✅🧪 |
 | 8 | A call (answered) | WillResignActive | ✅🧪📱 |
-| 9 | Low battery alert, system alerts, permission requests | WillResignActive | ✅🧪📱 |
+| 9 | Low battery alert, system alerts, permission requests | WillResignActive; the demo also shows a real system alert (the tel:// call prompt on iPhone) | ✅🧪📱 |
 | 10 | Control Center, Notification Center, the app switcher | WillResignActive / DidEnterBackground | ✅📱 |
 | 11 | A push notification tap that opens the app and pushes a page | Foreground notifications + page change | ✅🧪 |
 | 12 | Push, pop, swipe back | Session context (page) + no hiding during a transition | ✅🧪 |
