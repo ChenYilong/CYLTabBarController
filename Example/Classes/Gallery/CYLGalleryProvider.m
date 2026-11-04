@@ -19,10 +19,6 @@ static NSString *const CYLGalleryPlusPageContext = @"CYLGalleryPlusPage";
 
 #pragma mark - Colors
 
-/// [EN] Declared before its first use (the "More than five tabs" scene); defined below with the other style helpers.
-/// [CN] 在首次使用（“超过五个 Tab”场景）之前声明；定义在下方其他样式辅助函数中。
-static CYLTabBarStyleType CYLGalleryFullWidthStyle(void);
-
 static UIColor *CYLGalleryRGB(CGFloat red, CGFloat green, CGFloat blue) {
     return [UIColor colorWithRed:red / 255.0 green:green / 255.0 blue:blue / 255.0 alpha:1.0];
 }
