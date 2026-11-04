@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigointi ja vertailut";
 "角标" = "Merkit";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass ei tue: järjestelmä määrää palkin korkeuden (FlatDesign ja klassinen tyyli tukevat)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Ulkoasu";
+"换肤（主题，issue #216）" = "Ulkoasu (teema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Valitse teema napauttamalla: TabBarin tausta, kuvakkeet ja tekstien värit vaihtuvat paikallaan kaikissa TabBar-tyyleissä. Nyt: %@";
+"选择主题" = "Valitse teema";
+"默认" = "Oletus";
+"西柚" = "Greippi";
+"青草" = "Ruoho";
+"玫瑰粉" = "Vaaleanpunainen ruusu";
+"春节" = "Kevätjuhla";
+"跟随系统深色模式" = "Seuraa järjestelmän tummaa tilaa";
 "默认点击声" = "Oletusnapsautus";
 "中等触感反馈" = "Keskivahva haptinen palaute";
 "无需继承基类与工具方法" = "Ilman perusluokkaa, ja apuvälineet";
@@ -279,6 +291,20 @@
 "长按（#152）" = "Pitkä painallus (#152)";
 "播放 / 停止" = "Toista / Pysäytä";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Joulu";
+"万圣节" = "Halloween";
+"情人节" = "Ystävänpäivä";
+"中秋节" = "Keskisyksyn juhla";
+"复活节" = "Pääsiäinen";
+"新年" = "Uusivuosi";
+"夏日" = "Kesä";
+"生日" = "Syntymäpäivä";
+"太空" = "Avaruus";
+"海洋" = "Valtameri";
+"换肤：节日与配色主题（%@ 种）" = "Ulkoasut: juhlapyhät ja värit (%@)";
+"节日图标与配色" = "Juhlakuvakkeet ja värit";
+"仅配色" = "Vain värit";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Napauta";
 

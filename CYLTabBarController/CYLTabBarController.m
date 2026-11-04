@@ -274,6 +274,14 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)cyl_updateTabBarMinimizeTracking;
 @end
 
+/// [EN] Implemented below (CYLTheme, issue #216). [CN] 实现见下方 CYLTheme（issue #216）。
+@interface CYLTabBarController (CYLThemePrivate)
+/// [EN] Once, when first shown: the theme chosen at launch. [CN] 首次显示时执行一次：应用启动时选择的主题。
+- (void)cyl_applyLaunchTabBarThemeIfNeeded;
+/// [EN] Implemented in the main implementation (tabBar.standardAppearance). [CN] 实现于主 implementation（tabBar.standardAppearance）。
+- (void)cyl_syncTabBarAppearances;
+@end
+
 // [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
 // [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
 @interface CYLTabBarController (CYLTabButtonHighlight)
@@ -477,6 +485,8 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [CYLTabBarController cyl_markTabBarControllerActive:self];
+    // FIX: issue #216
+    [self cyl_applyLaunchTabBarThemeIfNeeded];
     [self cyl_setNeedsUpdateSelectedBackgroundColors];
     // FIX: issue #152 — the long press, only when someone listens. 仅在有接收方时添加长按手势。
     [self cyl_installTabBarItemLongPressIfNeeded];
@@ -5640,6 +5650,18 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 #pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+    // FIX: issue #216
+    // [EN] Themes that follow the system Dark Mode (`respondsSystemStyleAutomatically`): next run loop, once UIKit has
+    //      finished passing the new traits down.
+    // [CN] 跟随系统深色模式的主题（`respondsSystemStyleAutomatically`）：在下一个 runloop 处理，此时 UIKit 已向下传递完新的 trait。
+    if (@available(iOS 13.0, *)) {
+        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            UITraitCollection *traitCollection = self.traitCollection;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [CYLThemeManagerCenter updateThemesForTraitCollection:traitCollection];
+            });
+        }
+    }
     // First: only when a #442 key (dark Lottie file or colors) is in use. 首先：仅在使用了 #442 新增的 key 时处理。
     if (![CYLTabBarItemAnimationDefaultStyleSource() hasStyleVariants]) {
         return;
@@ -7672,6 +7694,102 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
     return CYLTabBarMinimizeBehaviorAutomatic;
 }
 #endif
+
+#pragma mark - Theme switching (issue #216)
+
+/// [EN] What the app had set before the first theme changed it. [CN] 第一次被主题修改前 App 自己的设置。
+static char CYLThemeOriginalTabBarItemsAttributesKey;
+static char CYLThemeOriginalStandardAppearanceKey;
+static char CYLThemeOriginalScrollEdgeAppearanceKey;
+/// [EN] The launch theme was applied (or a theme change came first). [CN] 已应用启动时的主题（或已先收到主题切换）。
+static char CYLThemeLaunchThemeAppliedKey;
+
+@implementation CYLTabBarController (CYLTheme)
+
+- (void)cyl_themeDidChangeByManager:(CYLThemeManager *)manager identifier:(nullable __kindof NSObject<NSCopying> *)identifier theme:(nullable __kindof NSObject *)theme {
+    [super cyl_themeDidChangeByManager:manager identifier:identifier theme:theme];
+    // [EN] The default manager drives the tab bar; another manager (e.g. the themes of one page) only with a tab bar theme.
+    // [CN] 默认管理器决定 TabBar 外观；其他管理器（例如某个页面自己的主题）仅在其主题为 TabBar 主题时生效。
+    BOOL isDefaultManager = [manager.name isEqual:CYLThemeManagerNameDefault];
+    if (!isDefaultManager && ![theme conformsToProtocol:@protocol(CYLTabBarTheme)]) {
+        return;
+    }
+    [self cyl_applyTabBarTheme:theme];
+}
+
+- (void)cyl_applyLaunchTabBarThemeIfNeeded {
+    if (objc_getAssociatedObject(self, &CYLThemeLaunchThemeAppliedKey)) {
+        return;
+    }
+    objc_setAssociatedObject(self, &CYLThemeLaunchThemeAppliedKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    id theme = CYLThemeManagerCenter.defaultThemeManager.currentTheme;
+    // [EN] Nothing to restore yet: only a tab bar theme changes anything here.
+    // [CN] 此时尚无需恢复：只有 TabBar 主题才需要处理。
+    if ([theme conformsToProtocol:@protocol(CYLTabBarTheme)]) {
+        [self cyl_applyTabBarTheme:theme];
+    }
+}
+
+- (void)cyl_applyTabBarTheme:(id)theme {
+    objc_setAssociatedObject(self, &CYLThemeLaunchThemeAppliedKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    id<CYLTabBarTheme> tabBarTheme = [theme conformsToProtocol:@protocol(CYLTabBarTheme)] ? theme : nil;
+
+    // [EN] Titles and icons, in place (issue #601). [CN] 原地更新标题与图标（issue #601）。
+    NSArray<NSDictionary<NSString *, id> *> *itemsAttributes = nil;
+    if ([tabBarTheme respondsToSelector:@selector(cyl_tabBarItemsAttributesForTabBarController:)]) {
+        itemsAttributes = [tabBarTheme cyl_tabBarItemsAttributesForTabBarController:self];
+    }
+    NSArray *originalItemsAttributes = objc_getAssociatedObject(self, &CYLThemeOriginalTabBarItemsAttributesKey);
+    if (itemsAttributes.count > 0) {
+        if (!originalItemsAttributes) {
+            objc_setAssociatedObject(self, &CYLThemeOriginalTabBarItemsAttributesKey, [self.tabBarItemsAttributes copy] ?: @[], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        [self updateTabBarItemsWithAttributes:itemsAttributes];
+    } else if (originalItemsAttributes) {
+        [self updateTabBarItemsWithAttributes:originalItemsAttributes];
+        objc_setAssociatedObject(self, &CYLThemeOriginalTabBarItemsAttributesKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+
+    // [EN] The appearance: a new object for every theme, so every style (FlatDesign included) applies it.
+    // [CN] 外观：每个主题都是新对象，因此所有样式（包括扁平样式）都会应用。
+    if (@available(iOS 13.0, *)) {
+        UITabBar *tabBar = self.tabBar;
+        UITabBarAppearance *appearance = nil;
+        if ([tabBarTheme respondsToSelector:@selector(cyl_tabBarAppearanceForTabBarController:)]) {
+            appearance = [tabBarTheme cyl_tabBarAppearanceForTabBarController:self];
+        }
+        id originalStandardAppearance = objc_getAssociatedObject(self, &CYLThemeOriginalStandardAppearanceKey);
+        if (appearance) {
+            if (!originalStandardAppearance) {
+                objc_setAssociatedObject(self, &CYLThemeOriginalStandardAppearanceKey, tabBar.standardAppearance, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+                if (@available(iOS 15.0, *)) {
+                    objc_setAssociatedObject(self, &CYLThemeOriginalScrollEdgeAppearanceKey, tabBar.scrollEdgeAppearance ?: [NSNull null], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+                }
+            }
+            tabBar.standardAppearance = appearance;
+            if (@available(iOS 15.0, *)) {
+                tabBar.scrollEdgeAppearance = [appearance copy];
+            }
+        } else if ([originalStandardAppearance isKindOfClass:[UITabBarAppearance class]]) {
+            tabBar.standardAppearance = originalStandardAppearance;
+            if (@available(iOS 15.0, *)) {
+                id originalScrollEdgeAppearance = objc_getAssociatedObject(self, &CYLThemeOriginalScrollEdgeAppearanceKey);
+                tabBar.scrollEdgeAppearance = [originalScrollEdgeAppearance isKindOfClass:[UITabBarAppearance class]] ? originalScrollEdgeAppearance : nil;
+            }
+            objc_setAssociatedObject(self, &CYLThemeOriginalStandardAppearanceKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            objc_setAssociatedObject(self, &CYLThemeOriginalScrollEdgeAppearanceKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        // [EN] Bring the title offset copies (issue #475) and the flat design tab bar up to date now.
+        // [CN] 立即更新标题偏移副本（issue #475）与扁平样式 TabBar。
+        [self cyl_syncTabBarAppearances];
+    }
+
+    if ([tabBarTheme respondsToSelector:@selector(cyl_customizeTabBarController:)]) {
+        [tabBarTheme cyl_customizeTabBarController:self];
+    }
+}
+
+@end
 
 @implementation CYLTabBarController (CYLTabBarMinimize)
 

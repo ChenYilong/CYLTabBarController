@@ -255,6 +255,18 @@
 "跳转与对比" = "Gezinme ve karşılaştırmalar";
 "角标" = "Rozetler";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass desteklemiyor: sekme çubuğu yüksekliğini sistem belirler (FlatDesign ve klasik stil destekler)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Görünüm";
+"换肤（主题，issue #216）" = "Görünüm (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Tema seçmek için dokunun: TabBar arka planı, simgeleri ve metin renkleri her TabBar stilinde yerinde değişir. Şu an: %@";
+"选择主题" = "Tema seçin";
+"默认" = "Varsayılan";
+"西柚" = "Greyfurt";
+"青草" = "Çimen";
+"玫瑰粉" = "Pembe Gül";
+"春节" = "Bahar Bayramı";
+"跟随系统深色模式" = "Sistemin Karanlık Modunu izle";
 "默认点击声" = "Varsayılan tık";
 "中等触感反馈" = "Orta dokunsal geri bildirim";
 "无需继承基类与工具方法" = "Temel sınıfsız ve yardımcılar";
@@ -279,6 +291,20 @@
 "长按（#152）" = "Uzun basma (#152)";
 "播放 / 停止" = "Oynat / Durdur";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Noel";
+"万圣节" = "Cadılar Bayramı";
+"情人节" = "Sevgililer Günü";
+"中秋节" = "Sonbahar Ortası Festivali";
+"复活节" = "Paskalya";
+"新年" = "Yılbaşı";
+"夏日" = "Yaz";
+"生日" = "Doğum Günü";
+"太空" = "Uzay";
+"海洋" = "Okyanus";
+"换肤：节日与配色主题（%@ 种）" = "Görünümler: bayramlar ve renkler (%@)";
+"节日图标与配色" = "Bayram simgeleri ve renkler";
+"仅配色" = "Yalnızca renkler";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Dokun";
 

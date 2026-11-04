@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigare și comparații";
 "角标" = "Insigne";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Nu este acceptat de Liquid Glass: sistemul stabilește înălțimea barei (FlatDesign și stilul clasic acceptă)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Aspect";
+"换肤（主题，issue #216）" = "Aspect (temă, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Atingeți pentru a alege o temă: fundalul, pictogramele și culorile textului din TabBar se schimbă pe loc, în toate stilurile TabBar. Acum: %@";
+"选择主题" = "Alegeți o temă";
+"默认" = "Implicit";
+"西柚" = "Grepfrut";
+"青草" = "Iarbă";
+"玫瑰粉" = "Trandafir roz";
+"春节" = "Festivalul Primăverii";
+"跟随系统深色模式" = "Urmează modul întunecat al sistemului";
 "默认点击声" = "Clic implicit";
 "中等触感反馈" = "Feedback haptic mediu";
 "无需继承基类与工具方法" = "Fără clasă de bază, și utilitare";
@@ -279,6 +291,20 @@
 "长按（#152）" = "Apăsare lungă (#152)";
 "播放 / 停止" = "Redare / Oprire";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Crăciun";
+"万圣节" = "Halloween";
+"情人节" = "Ziua Îndrăgostiților";
+"中秋节" = "Festivalul de mijloc al toamnei";
+"复活节" = "Paște";
+"新年" = "Anul Nou";
+"夏日" = "Vară";
+"生日" = "Zi de naștere";
+"太空" = "Spațiu";
+"海洋" = "Ocean";
+"换肤：节日与配色主题（%@ 种）" = "Aspecte: sărbători și culori (%@)";
+"节日图标与配色" = "Pictograme de sărbătoare și culori";
+"仅配色" = "Doar culori";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Atinge";
 

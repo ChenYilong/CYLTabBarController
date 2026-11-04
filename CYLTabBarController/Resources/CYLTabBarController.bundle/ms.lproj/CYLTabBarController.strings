@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigasi dan perbandingan";
 "角标" = "Lencana";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Tidak disokong Liquid Glass: sistem menentukan ketinggian bar tab (FlatDesign dan gaya klasik menyokong)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Kulit";
+"换肤（主题，issue #216）" = "Kulit (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Ketik untuk memilih tema: latar, ikon dan warna teks TabBar bertukar di tempat, dalam semua gaya TabBar. Semasa: %@";
+"选择主题" = "Pilih tema";
+"默认" = "Lalai";
+"西柚" = "Limau Gedang";
+"青草" = "Rumput";
+"玫瑰粉" = "Mawar Merah Jambu";
+"春节" = "Tahun Baru Cina";
+"跟随系统深色模式" = "Ikut Mod Gelap sistem";
 "默认点击声" = "Klik lalai";
 "中等触感反馈" = "Haptik sederhana";
 "无需继承基类与工具方法" = "Tanpa kelas asas, dan utiliti";
@@ -279,6 +291,20 @@
 "长按（#152）" = "Tekan lama (#152)";
 "播放 / 停止" = "Main / Henti";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Krismas";
+"万圣节" = "Halloween";
+"情人节" = "Hari Valentine";
+"中秋节" = "Pesta Pertengahan Musim Luruh";
+"复活节" = "Easter";
+"新年" = "Tahun Baharu";
+"夏日" = "Musim Panas";
+"生日" = "Hari Jadi";
+"太空" = "Angkasa Lepas";
+"海洋" = "Lautan";
+"换肤：节日与配色主题（%@ 种）" = "Kulit: perayaan dan warna (%@)";
+"节日图标与配色" = "Ikon perayaan dan warna";
+"仅配色" = "Warna sahaja";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Ketik";
 

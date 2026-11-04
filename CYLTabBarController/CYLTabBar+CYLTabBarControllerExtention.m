@@ -300,7 +300,11 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
             }
         }
     }
-    return selectedControl;
+    // [EN] Still nil when the tab bar has no control yet. The header declares a nonnull return, and that public API stays as
+    //      released (making it nullable would change its Swift type), so the cast tells the static analyzer the nil is known.
+    // [CN] TabBar 还没有任何控件时仍为 nil。头文件声明的返回值为非空，该公开 API 保持已发布的样子（改为 nullable 会改变其 Swift 类型），
+    //      因此这里的转换告诉静态分析器：返回 nil 是已知的。
+    return (UIControl * _Nonnull)selectedControl;
 }
 
 - (void)cyl_setSelectedControl:(UIControl *)selectedControl {

@@ -49,6 +49,7 @@
 | [滚动时缩小或隐藏 TabBar](TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](TabBar-Minimize-On-Scroll.md) |
 | [TabBarItem 手势：再次点击、双击与长按](TabBarItem-Gestures.md) | [Tab bar item gestures: reselect, double tap and long press](TabBarItem-Gestures.md) |
 | [选中标题：选中的 Tab 显示不同文字（如京东「刷新」）](TabBarItem-Selected-Title.md) | [Selected title: a different title on the selected tab (like JD's "Refresh")](TabBarItem-Selected-Title.md) |
+| [换肤（主题切换）](Theme-Switching.md) | [Theme switching (skins)](Theme-Switching.md) |
 | [原地更新 Tab：标题、图标、网络图标与替换页面](Update-Tab-Bar-Items-In-Place.md) | [Update Tabs in Place: Titles, Icons, Network Icons and Pages](Update-Tab-Bar-Items-In-Place.md) |
 
 <!-- navigation:end -->
@@ -102,6 +103,7 @@ docs/
 ├── TabBar-Minimize-On-Scroll.md
 ├── TabBarItem-Gestures.md
 ├── TabBarItem-Selected-Title.md
+├── Theme-Switching.md
 ├── Update-Tab-Bar-Items-In-Place.md
 └── assets/
     ├── demo-test-list-objc-classic.png
@@ -135,6 +137,7 @@ docs/
     ├── tab-interactions-swipe-classic.png
     ├── tab-interactions-swipe-liquid-glass.png
     ├── tab-interactions-swipe-login-classic.png
+    ├── theme-switching-holiday-icons.png
     ├── update-tab-bar-items-all-local-icons.png
     ├── update-tab-bar-items-all-network-icons-badges.png
     ├── update-tab-bar-items-all-network-icons-restored.png

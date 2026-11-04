@@ -361,33 +361,45 @@ static char CYLTabBarDemoItemTitleKey;
 
 #pragma mark - CYLDemoSections
 
+/// [EN] The kinds of demo row, each with its own index. [CN] 演示行的种类，各有自己的序号。
+typedef NS_ENUM(NSInteger, CYLDemoRowKind) {
+    CYLDemoRowKindSettings,   ///< [EN] A settings row of the library. [CN] 库的设置行。
+    CYLDemoRowKindTabBarDemo, ///< [EN] A tab bar demo row of this demo. [CN] 本 Demo 的 TabBar 演示行。
+    CYLDemoRowKindTheme,      ///< [EN] A skin of the skin list (issue #216). [CN] 皮肤列表中的一个皮肤（issue #216）。
+};
+
 /*!
- * [EN] One row of a demo section: a settings row of the library, or a tab bar demo row of this demo. Two kinds of row, each
- *      with its own index, instead of one number that encodes both.
- * [CN] 演示 section 中的一行：库的设置行，或本 Demo 的 TabBar 演示行。两种行各有自己的序号，而不是用一个数字同时表示两者。
+ * [EN] One row of a demo section: a settings row of the library, a tab bar demo row of this demo, or a skin of the list.
+ *      Each kind has its own index, instead of one number that encodes them all.
+ * [CN] 演示 section 中的一行：库的设置行、本 Demo 的 TabBar 演示行，或皮肤列表中的一个皮肤。每种行各有自己的序号，而不是用一个数字同时表示它们。
  */
 @interface CYLDemoRow : NSObject
-@property (nonatomic, assign, readonly) BOOL isTabBarDemoRow;
+@property (nonatomic, assign, readonly) CYLDemoRowKind kind;
 @property (nonatomic, assign, readonly) NSInteger index;
 + (instancetype)settingsRow:(NSInteger)index;
 + (instancetype)tabBarDemoRow:(CYLTabBarDemoRow)index;
++ (instancetype)themeRow:(NSInteger)index;
 @end
 
 @implementation CYLDemoRow
 
-+ (instancetype)rowWithIndex:(NSInteger)index isTabBarDemoRow:(BOOL)isTabBarDemoRow {
++ (instancetype)rowWithIndex:(NSInteger)index kind:(CYLDemoRowKind)kind {
     CYLDemoRow *row = [[self alloc] init];
     row->_index = index;
-    row->_isTabBarDemoRow = isTabBarDemoRow;
+    row->_kind = kind;
     return row;
 }
 
 + (instancetype)settingsRow:(NSInteger)index {
-    return [self rowWithIndex:index isTabBarDemoRow:NO];
+    return [self rowWithIndex:index kind:CYLDemoRowKindSettings];
 }
 
 + (instancetype)tabBarDemoRow:(CYLTabBarDemoRow)index {
-    return [self rowWithIndex:index isTabBarDemoRow:YES];
+    return [self rowWithIndex:index kind:CYLDemoRowKindTabBarDemo];
+}
+
++ (instancetype)themeRow:(NSInteger)index {
+    return [self rowWithIndex:index kind:CYLDemoRowKindTheme];
 }
 
 @end
@@ -417,6 +429,15 @@ static char CYLTabBarDemoItemTitleKey;
                                          [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowItemBackgroundColor] ]];
         }
         [sections addObject:@{ @"title" : [self cyl_titleForSettingsGroup:settingsGroup], @"rows" : rows }];
+        if (settingsGroup == CYLSettingsGroupPlusButton) {
+            // [EN] Issue #216: every skin, one row each (color themes and holiday skins).
+            // [CN] Issue #216：所有皮肤，每行一个（配色主题与节日皮肤）。
+            NSMutableArray<CYLDemoRow *> *themeRows = [NSMutableArray array];
+            for (NSInteger themeRow = 0; themeRow < [self cyl_themeListRowCount]; themeRow++) {
+                [themeRows addObject:[CYLDemoRow themeRow:themeRow]];
+            }
+            [sections addObject:@{ @"title" : [self cyl_themeListSectionTitle], @"rows" : themeRows }];
+        }
     }
     [sections addObject:@{ @"title" : CYLLocalizedString(@"跳转与对比"),
                            @"rows" : @[ [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowCompareSystemTabBar],
@@ -444,17 +465,29 @@ static char CYLTabBarDemoItemTitleKey;
 
 - (UITableViewCell *)cyl_demoCellForTableView:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath {
     CYLDemoRow *row = [self cyl_demoRowAtIndexPath:indexPath];
-    if (row.isTabBarDemoRow) {
-        return [self cyl_tabBarDemoCellForTableView:tableView row:row.index];
+    switch (row.kind) {
+        case CYLDemoRowKindTabBarDemo:
+            return [self cyl_tabBarDemoCellForTableView:tableView row:row.index];
+        case CYLDemoRowKindTheme:
+            return [self cyl_themeListCellForTableView:tableView row:row.index];
+        case CYLDemoRowKindSettings:
+            return [self cyl_settingsCellForTableView:tableView row:row.index];
     }
-    return [self cyl_settingsCellForTableView:tableView row:row.index];
 }
 
 - (void)cyl_demoDidSelectRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     CYLDemoRow *row = [self cyl_demoRowAtIndexPath:indexPath];
-    if (row.isTabBarDemoRow) {
+    if (row.kind == CYLDemoRowKindTabBarDemo) {
         [self cyl_didSelectTabBarDemoRow:row.index inTableView:nil];
+        return;
+    }
+    if (row.kind == CYLDemoRowKindTheme) {
+        [self cyl_didSelectThemeListRow:row.index];
+        // [EN] The checkmarks of the list and the skin row follow the new theme. [CN] 列表勾号与换肤行随新主题更新。
+        if (tableView.window) {
+            [tableView reloadData];
+        }
         return;
     }
     // [EN] Run the row, then reload the demo sections (e.g. the checkmarks). [CN] 执行该行，然后刷新演示 section（如勾号）。
