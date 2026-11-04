@@ -184,6 +184,36 @@ static NSString *CYLTrimmed(NSString *string) {
     return [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }
 
+/*!
+ * [EN] UTF-16 and UTF-32 text with a BOM (as some Windows editors save it) re-encoded as UTF-8, so every parser and the
+ *      format detection read it; anything else is returned as it is (A16).
+ * [CN] 带 BOM 的 UTF-16 与 UTF-32 文本（部分 Windows 编辑器这样保存）重新编码为 UTF-8，使所有解析器与格式识别都能读取；其他数据原样返回（A16）。
+ */
+static NSData *CYLUTF8DataFromData(NSData *data) {
+    const uint8_t *bytes = data.bytes;
+    NSUInteger length = data.length;
+    NSStringEncoding encoding = 0;
+    NSUInteger bom = 0;
+    if (length >= 4 && bytes[0] == 0xFF && bytes[1] == 0xFE && bytes[2] == 0x00 && bytes[3] == 0x00) {
+        encoding = NSUTF32LittleEndianStringEncoding;
+        bom = 4;
+    } else if (length >= 4 && bytes[0] == 0x00 && bytes[1] == 0x00 && bytes[2] == 0xFE && bytes[3] == 0xFF) {
+        encoding = NSUTF32BigEndianStringEncoding;
+        bom = 4;
+    } else if (length >= 2 && bytes[0] == 0xFF && bytes[1] == 0xFE) {
+        encoding = NSUTF16LittleEndianStringEncoding;
+        bom = 2;
+    } else if (length >= 2 && bytes[0] == 0xFE && bytes[1] == 0xFF) {
+        encoding = NSUTF16BigEndianStringEncoding;
+        bom = 2;
+    }
+    if (!encoding) {
+        return data;
+    }
+    NSString *string = [[NSString alloc] initWithData:[data subdataWithRange:NSMakeRange(bom, length - bom)] encoding:encoding];
+    return [string dataUsingEncoding:NSUTF8StringEncoding] ?: data;
+}
+
 static NSString *_Nullable CYLStringFromData(NSData *data) {
     NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     if (string.length > 0 && [string characterAtIndex:0] == 0xFEFF) {
@@ -2227,6 +2257,7 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
 }
 
 + (CYLTabBarConfigurationFormat)formatBySniffingData:(NSData *)data {
+    data = CYLUTF8DataFromData(data);
     if (CYLDataHasPrefix(data, "bplist")) {
         return CYLTabBarConfigurationFormatPropertyList;
     }
@@ -2281,6 +2312,7 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
 + (NSDictionary<NSString *, id> *)dictionaryWithData:(NSData *)data
                                               format:(CYLTabBarConfigurationFormat)format
                                                error:(NSError **)error {
+    data = CYLUTF8DataFromData(data ?: [NSData data]);
     NSError *firstError = nil;
     NSDictionary<NSString *, id> *dictionary = [self cyl_dictionaryWithData:data format:format error:&firstError];
     if (dictionary || format == CYLTabBarConfigurationFormatUnknown ||

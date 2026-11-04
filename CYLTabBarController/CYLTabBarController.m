@@ -84,6 +84,8 @@ NSString *const CYLTabBarControllerTitlePositionAdjustment = @"CYLTabBarControll
 NSString *const CYLTabBarControllerStyleType = @"CYLTabBarControllerStyleType";
 NSString *const CYLTabBarControllerContext = @"CYLTabBarControllerContext";
 NSString *const CYLTabBarControllerNavigationControllerClass = @"CYLTabBarControllerNavigationControllerClass";
+/// [EN] Private: set by the parameter initializers, which keep an empty view controller list (C9). [CN] 私有：由参数初始化方法设置，保持空的子控制器列表（C9）。
+static NSString *const CYLTabBarControllerKeepsEmptyViewControllersKey = @"_CYLTabBarControllerKeepsEmptyViewControllers";
 NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
@@ -1609,6 +1611,9 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
     configuration[CYLTabBarControllerTitlePositionAdjustment] = [NSValue valueWithUIOffset:titlePositionAdjustment];
     configuration[CYLTabBarControllerStyleType] = @(styleType);
     configuration[CYLTabBarControllerContext] = context;
+    // These initializers keep an empty view controller list empty (C9 is for configurations).
+    // 这些初始化方法保持空的子控制器列表不变（C9 只针对配置）。
+    configuration[CYLTabBarControllerKeepsEmptyViewControllersKey] = @YES;
     return [self initWithConfiguration:configuration];
 }
 
@@ -1736,6 +1741,10 @@ static NSArray<UIViewController *> *CYLViewControllersFromConfiguration(NSDictio
     NSDictionary<NSString *, id> *normalized = [CYLTabBarController cyl_normalizedConfiguration:configuration ?: @{}];
     NSArray<NSDictionary *> *tabBarItemsAttributes = normalized[CYLTabBarControllerTabBarItemsAttributes] ?: @[];
     NSArray<UIViewController *> *viewControllers = normalized[CYLTabBarControllerViewControllers];
+    if (viewControllers.count == 0 && ![normalized[CYLTabBarControllerKeepsEmptyViewControllersKey] boolValue]) {
+        // An empty list (or one with no valid view controller) is treated as missing (C9). 空列表（或没有有效控制器的列表）视为未提供（C9）。
+        viewControllers = nil;
+    }
     if (!viewControllers) {
         // Created from the tabs: the placeholders of invalid entries are left out (B4). 根据 Tab 创建：跳过无效条目的占位（B4）。
         NSMutableArray<NSDictionary *> *validItems = [NSMutableArray array];

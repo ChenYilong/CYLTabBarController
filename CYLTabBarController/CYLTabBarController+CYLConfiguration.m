@@ -230,6 +230,28 @@ static BOOL CYLFileExists(NSString *path) {
 }
 
 /*!
+ * [EN] A local Lottie file that Lottie can read (B17): a .json file must be a JSON object with "layers", a .lottie file a
+ *      zip archive; other names are left to Lottie. A broken animation never reaches Lottie, whose parsers may assert.
+ * [CN] Lottie 可以读取的本地 Lottie 文件（B17）：.json 文件必须是含有 "layers" 的 JSON 对象，.lottie 文件必须是 zip 压缩包；其他文件名交给 Lottie。
+ *      损坏的动画不会传给 Lottie（其解析器可能触发断言）。
+ */
+static BOOL CYLIsReadableLottieFile(NSString *path) {
+    NSString *extension = path.pathExtension.lowercaseString;
+    if ([extension isEqualToString:@"lottie"]) {
+        NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath:path];
+        NSData *head = [handle readDataOfLength:4];
+        [handle closeFile];
+        return head.length == 4 && memcmp(head.bytes, "PK\x03\x04", 4) == 0;
+    }
+    if (![extension isEqualToString:@"json"]) {
+        return YES;
+    }
+    NSData *data = [NSData dataWithContentsOfFile:path];
+    id animation = data ? [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL] : nil;
+    return [animation isKindOfClass:[NSDictionary class]] && [animation[@"layers"] isKindOfClass:[NSArray class]];
+}
+
+/*!
  * [EN] An NSURL from a URL, a URL string, a path or a file name in the main bundle: only http(s) URLs and local files
  *      that exist; anything else is nil (B13).
  * [CN] 将 URL、URL 字符串、路径或 main bundle 中的文件名转换为 NSURL：只接受 http(s) URL 与存在的本地文件，其他情况返回 nil（B13）。
@@ -500,6 +522,9 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
         }
         BOOL isImage = [key isEqualToString:CYLTabBarItemImageURL] || [key isEqualToString:CYLTabBarItemSelectedImageURL];
         id checked = isImage ? CYLImageURLValue(value) : CYLURLValue(value);
+        if (!isImage && [(NSURL *)checked isFileURL] && !CYLIsReadableLottieFile([(NSURL *)checked path])) {
+            checked = nil;
+        }
         if (!checked) {
             CYLLogInvalidConfigurationValue(key, value);
         }
@@ -508,7 +533,7 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
     for (NSString *key in @[ CYLTabBarLottieFilePath, CYLTabBarLottieDarkFilePath ]) {
         id value = item[key];
         NSString *path = [value isKindOfClass:[NSString class]] ? CYLMainBundlePath(value) : nil;
-        if (value && !CYLFileExists(path)) {
+        if (value && (!CYLFileExists(path) || !CYLIsReadableLottieFile(path))) {
             CYLLogInvalidConfigurationValue(key, value);
             path = nil;
         }
@@ -574,7 +599,12 @@ static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id>
 @implementation CYLTabBarController (CYLConfiguration)
 
 + (NSDictionary<NSString *, id> *)cyl_normalizedConfiguration:(NSDictionary<NSString *, id> *)configuration {
-    NSMutableDictionary<NSString *, id> *normalized = [configuration mutableCopy] ?: [NSMutableDictionary dictionary];
+    if (![configuration isKindOfClass:[NSDictionary class]]) {
+        // E.g. an untyped JSON result that is a list (B18). 例如类型不明、实际为数组的 JSON 结果（B18）。
+        CYLLogInvalidConfigurationValue(@"configuration", configuration);
+        configuration = @{};
+    }
+    NSMutableDictionary<NSString *, id> *normalized = [configuration mutableCopy];
     for (NSString *key in configuration) {
         if ([configuration[key] isKindOfClass:[NSNull class]]) {
             [normalized removeObjectForKey:key];
