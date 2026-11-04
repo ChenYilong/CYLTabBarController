@@ -586,8 +586,16 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     }
 }
 
+/*!
+ * FIX: issue #257
+ * [EN] Every assignment sent a KVO notification, and `CYLTabBarController` then wrote `imageInsets` and
+ *      `titlePositionAdjustment` into every tab bar item again, which lays the tab bar out again. Notify only when the
+ *      value really changes.
+ * [CN] 以前每次赋值都会发出 KVO 通知，`CYLTabBarController` 随即重新写入所有 TabBarItem 的 `imageInsets` 和
+ *      `titlePositionAdjustment`，这又会导致 TabBar 重新布局。现在只在值真正改变时才通知。
+ */
 - (void)setTabImageViewDefaultOffset:(CGFloat)tabImageViewDefaultOffset {
-    if (tabImageViewDefaultOffset != 0.f) {
+    if (tabImageViewDefaultOffset != 0.f && tabImageViewDefaultOffset != _tabImageViewDefaultOffset) {
         [self willChangeValueForKey:@"tabImageViewDefaultOffset"];
         _tabImageViewDefaultOffset = tabImageViewDefaultOffset;
         [self didChangeValueForKey:@"tabImageViewDefaultOffset"];
@@ -1012,8 +1020,27 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     return (CGRectGetMinY(frame) + contentMaxY) * 0.5;
 }
 
+/*!
+ * FIX: issue #257, issue #522
+ * [EN] Measures, once, how far the image of an image-only tab (a tab button without a title label) has to move to be
+ *      vertically centered; `CYLTabBarController` observes the result and moves the images of its image-only tabs.
+ *      - The guard was `> 0`: a negative offset (an image below the center) was measured again on every layout pass
+ *        (any layout of the screen, e.g. after setting a label's text on a page), each time from the image that the
+ *        previous offset had already moved, so the icons jumped and the items were written again and again.
+ *        Any non-zero offset now ends the measurement.
+ *      - Nothing is measured when `CYLTabBarController.automaticallyAdjustsImageOnlyTabs` is NO.
+ * [CN] 只测量一次纯图标 Tab（没有标题 label 的 Tab 按钮）的图片需要移动多少才能垂直居中；`CYLTabBarController` 监听该结果，
+ *      并移动其纯图标 Tab 的图片。
+ *      - 以前的判断是 `> 0`：偏移为负（图片低于中心）时，每次布局（屏幕上任何布局，例如在页面上给 label 赋值后）都会重新测量，
+ *        且每次都基于已被上次偏移移动过的图片，于是图标跳动，item 被反复写入。现在任何非零偏移都会结束测量。
+ *      - `CYLTabBarController.automaticallyAdjustsImageOnlyTabs` 为 NO 时不做测量。
+ */
 - (void)setupTabImageViewDefaultOffset:(UIView *)tabBarButton {
-    if (self.tabImageViewDefaultOffset > 0) {
+    if (self.tabImageViewDefaultOffset != 0.f) {
+        return;
+    }
+    CYLTabBarController *tabBarController = self.tabBarController;
+    if ([tabBarController isKindOfClass:[CYLTabBarController class]] && !tabBarController.automaticallyAdjustsImageOnlyTabs) {
         return;
     }
     __block BOOL shouldCustomizeImageView = YES;

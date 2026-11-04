@@ -13,6 +13,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/FAQ.md
 //   - FlatDesign × UITabBarAppearance
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/FlatDesign-StandardAppearance.md
+//   - Automatic centering of image-only tabs / 纯图标 Tab 的自动居中
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Image-Only-Tabs.md
 //   - Tabs That Need Login / 需要登录的 Tab
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Login-Required-Tabs.md
 //   - PlusButton badge: changes on every tap / PlusButton 角标：每次点击都会变化
@@ -491,6 +493,26 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  */
 @property (nonatomic, readonly, assign) UIEdgeInsets imageInsets;
 
+/*!
+ * FIX: issue #95
+ * [EN] Sets `imageInsets` after the controller is created, e.g. when it was made with
+ *      `-initWithViewControllers:tabBarItemsAttributes:` and the insets are decided later. The insets are re-applied to
+ *      the tabs already added; a tab's own `CYLTabBarItemImageInsets` takes precedence. Non-zero insets turn off the
+ *      automatic centering of image-only tabs (`automaticallyAdjustsImageOnlyTabs`); `UIEdgeInsetsZero` gives it back.
+ *      Works for all tab bar styles: the classic system tab bar, Liquid Glass (iOS 26+) and FlatDesign.
+ *      `titlePositionAdjustment` is settable at any time too (issue #475).
+ * [CN] 在控制器创建之后设置 `imageInsets`，例如控制器通过 `-initWithViewControllers:tabBarItemsAttributes:` 创建、内边距稍后
+ *      才确定时。会对已添加的 Tab 重新应用；Tab 自身的 `CYLTabBarItemImageInsets` 优先。非零内边距会关闭纯图标 Tab 的自动居中
+ *      （`automaticallyAdjustsImageOnlyTabs`），`UIEdgeInsetsZero` 恢复自动居中。
+ *      适用于所有 TabBar 样式：经典系统 TabBar、液态玻璃（iOS 26+）与扁平样式。`titlePositionAdjustment` 同样可随时设置（issue #475）。
+ *
+ *          // Objective-C
+ *          [tabBarController updateImageInsets:UIEdgeInsetsMake(4, 0, -4, 0)];
+ *          // Swift
+ *          tabBarController.updateImageInsets(UIEdgeInsets(top: 4, left: 0, bottom: -4, right: 0))
+ */
+- (void)updateImageInsets:(UIEdgeInsets)imageInsets;
+
 @property (nonatomic, strong, readonly) CYLTabBar *tabBar;
 @property (nonatomic, strong, nullable, setter=cyl_setTabBar:) UIView __kindof *cyl_tabBar;
 
@@ -575,6 +597,35 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  *          tabBarController.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3)
  */
 @property (nonatomic, readwrite, assign) UIOffset titlePositionAdjustment;
+
+/*!
+ * FIX: issue #257, issue #522
+ * [EN] Whether image-only tabs (tabs without a title) are adjusted automatically. Default is YES.
+ *      When the first tab button has no title label, the classic tab bar measures once how far the image has to move to
+ *      be vertically centered (`-[CYLTabBar tabImageViewDefaultOffset]`), then, for every tab whose item has no title, sets
+ *      `imageInsets` to that offset and moves the empty title out of the way (`titlePositionAdjustment`).
+ *      A value of the app is never replaced: tabs with a title, an item with its own `imageInsets` or
+ *      `titlePositionAdjustment` (set on the item or with `CYLTabBarItemImageInsets` / `CYLTabBarItemTitlePositionAdjustment`),
+ *      and a non-zero controller-level `imageInsets` / `titlePositionAdjustment` are left as they are.
+ *      Set it to NO to turn the adjustment off and lay out the tabs yourself: the tab bar stops measuring, and the values
+ *      it had already written are restored. Set it before the tab bar is laid out (in `-init…` or `-viewDidLoad`) to
+ *      avoid seeing the icons move once. Classic tab bar only (including Liquid Glass); FlatDesign never adjusts tabs.
+ * [CN] 是否自动调整纯图标 Tab（没有标题的 Tab）。默认 YES。
+ *      当第一个 Tab 按钮没有标题 label 时，经典 TabBar 会测量一次图片需要移动多少才能垂直居中
+ *      （`-[CYLTabBar tabImageViewDefaultOffset]`），然后对每个没有标题的 item，把 `imageInsets` 设为该偏移，并把空标题移开
+ *      （`titlePositionAdjustment`）。
+ *      不会覆盖 App 设置的值：有标题的 Tab、item 自身设置了 `imageInsets` 或 `titlePositionAdjustment`（直接设置在 item 上，或通过
+ *      `CYLTabBarItemImageInsets` / `CYLTabBarItemTitlePositionAdjustment`）、以及控制器级别非零的 `imageInsets` /
+ *      `titlePositionAdjustment`，都保持不变。
+ *      设为 NO 可关闭该调整，自行布局 Tab：TabBar 不再测量，已经写入的值会被还原。请在 TabBar 布局之前（`-init…` 或
+ *      `-viewDidLoad` 中）设置，避免看到图标移动一次。仅适用于经典 TabBar（含液态玻璃）；扁平样式从不调整 Tab。
+ *
+ *          // Objective-C
+ *          tabBarController.automaticallyAdjustsImageOnlyTabs = NO;
+ *          // Swift
+ *          tabBarController.automaticallyAdjustsImageOnlyTabs = false
+ */
+@property (nonatomic, assign) BOOL automaticallyAdjustsImageOnlyTabs;
 
 /*!
  * To set both Item label text attributes in the tabBar,
