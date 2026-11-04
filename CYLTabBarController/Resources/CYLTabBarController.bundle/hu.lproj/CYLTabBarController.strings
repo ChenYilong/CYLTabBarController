@@ -179,3 +179,6 @@
 "子控件" = "Alnézet";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "TabBarController megjelenítése új környezettel (PlusButton koppintható X alnézettel, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Koppints a PlusButton jobb felső sarkában lévő X-re: az X véletlenszerű színt kap, a PlusButton nem reagál";
+
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Frissítés";

@@ -220,6 +220,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //    CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
         CYLTabBarItemTitle : CYLLocalizedString(@"首页"),
+        // [EN] #433: like JD, the selected Home tab reads "Refresh"; a re-tap replays its Lottie animation and is
+        //      reported to `cyl_tabBarItemGestureHandler` (-setUpTabBarItemGestures).
+        // [CN] #433：与京东一样，选中的「首页」显示「刷新」；再次点击重播 Lottie 动画，并回调 `cyl_tabBarItemGestureHandler`
+        //      （-setUpTabBarItemGestures）。
+        CYLTabBarItemSelectedTitle : CYLLocalizedString(@"刷新"),
         CYLTabBarItemIdentifier : @"home",  // #408: stays right when tabs are added or removed. Tab 增减后依然准确。
         // A name also loads "<name>_dark" when that image exists: here home_normal_dark (UIImage.cyl_darkImageNameSuffix).
         // 图片名会同时加载存在的「<name>_dark」：这里是 home_normal_dark（UIImage.cyl_darkImageNameSuffix）。

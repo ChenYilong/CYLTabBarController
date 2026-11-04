@@ -179,3 +179,6 @@
 "子控件" = "Podprikaz";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Prikaži TabBarController s novim kontekstom (PlusButton s X podprikazom koji se može dodirnuti, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Dodirnite X gore desno na PlusButtonu: X mijenja boju u nasumičnu, a PlusButton ne reagira";
+
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Osvježi";

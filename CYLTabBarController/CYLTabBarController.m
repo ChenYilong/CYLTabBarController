@@ -72,6 +72,89 @@ NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
 NSString *const CYLTabBarItemIdentifier = @"CYLTabBarItemIdentifier";
+NSString *const CYLTabBarItemSelectedTitle = @"CYLTabBarItemSelectedTitle";
+
+#pragma mark - Selected title (FIX: issue #433)
+
+static const void *CYLTabBarItemSelectedTitleKey = &CYLTabBarItemSelectedTitleKey;
+static const void *CYLTabBarItemNormalTitleKey = &CYLTabBarItemNormalTitleKey;
+
+/*!
+ * FIX: issue #433
+ * [EN] Remembers the tab's `CYLTabBarItemSelectedTitle` and its normal title on the view controller, or forgets them
+ *      when the attributes have no selected title (tabs set up again without it).
+ * [CN] 在控制器上记录 Tab 的 `CYLTabBarItemSelectedTitle` 与普通标题；属性中没有选中标题时清除（重新设置 Tab 时去掉了该键）。
+ */
+static void CYLRememberTabBarItemSelectedTitle(UIViewController *viewController, NSDictionary *attributes, NSString *normalTitle) {
+    if (!viewController) {
+        return;
+    }
+    id selectedTitle = attributes[CYLTabBarItemSelectedTitle];
+    if (![selectedTitle isKindOfClass:[NSString class]]) {
+        selectedTitle = nil;
+    }
+    objc_setAssociatedObject(viewController, CYLTabBarItemSelectedTitleKey, selectedTitle, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    objc_setAssociatedObject(viewController, CYLTabBarItemNormalTitleKey, selectedTitle ? (normalTitle ?: @"") : nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+/*!
+ * FIX: issue #433
+ * [EN] Shows the selected title on the selected tab and the normal title on the others. Idempotent and cheap: only tabs
+ *      that have a `CYLTabBarItemSelectedTitle` are touched, and a title is set only when it changes. FlatDesign sets
+ *      the title of its own item; the classic style and Liquid Glass set `tabBarItem.title` (and the one of the
+ *      navigation controller's root), which UIKit shows.
+ * [CN] 选中的 Tab 显示选中标题，其他 Tab 显示普通标题。可重复调用、开销很小：只处理设置了 `CYLTabBarItemSelectedTitle` 的 Tab，
+ *      标题变化时才设置。FlatDesign 设置其自身 item 的标题；经典样式与液态玻璃设置 `tabBarItem.title`（以及导航控制器根控制器的），
+ *      由 UIKit 显示。
+ */
+static void CYLApplyTabBarItemSelectedTitles(CYLTabBarController *tabBarController) {
+    if (!tabBarController) {
+        return;
+    }
+    UIViewController *selectedViewController = tabBarController.selectedViewController;
+    for (UIViewController *viewController in tabBarController.viewControllers) {
+        NSString *selectedTitle = objc_getAssociatedObject(viewController, CYLTabBarItemSelectedTitleKey);
+        if (!selectedTitle) {
+            continue;
+        }
+        NSString *normalTitle = objc_getAssociatedObject(viewController, CYLTabBarItemNormalTitleKey) ?: @"";
+        NSString *title = (viewController == selectedViewController) ? selectedTitle : normalTitle;
+        if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
+#if CYL_FLATDESIGN_AVAILABLE
+            CYLFlatDesignTabBarItem *item = viewController.cyl_tabBarItem;
+            if (item && ![item.title isEqualToString:title]) {
+                item.title = title;
+            }
+#endif
+            continue;
+        }
+        UIViewController *contentViewController = [viewController cyl_getViewControllerInsteadOfNavigationController];
+        if (![viewController.tabBarItem.title isEqualToString:title]) {
+            viewController.tabBarItem.title = title;
+        }
+        if (contentViewController && contentViewController != viewController &&
+            ![contentViewController.tabBarItem.title isEqualToString:title]) {
+            contentViewController.tabBarItem.title = title;
+        }
+    }
+}
+
+/*!
+ * FIX: issue #433
+ * [EN] Applies the selected titles now, and once more on the next main-queue turn: in the classic style the button's
+ *      action can run before UIKit has changed `selectedViewController`.
+ * [CN] 立即应用选中标题，并在主队列的下一轮再应用一次：经典样式中按钮事件可能在 UIKit 修改 `selectedViewController` 之前执行。
+ */
+static void CYLSetNeedsUpdateTabBarItemSelectedTitles(CYLTabBarController *tabBarController) {
+    if (!tabBarController) {
+        return;
+    }
+    CYLApplyTabBarItemSelectedTitles(tabBarController);
+    __weak CYLTabBarController *weakTabBarController = tabBarController;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        CYLApplyTabBarItemSelectedTitles(weakTabBarController);
+    });
+}
 NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
@@ -332,6 +415,10 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
     [CYLTabBarController cyl_markTabBarControllerActive:self];
     // FIX: issue #152 — the long press, only when someone listens. 仅在有接收方时添加长按手势。
     [self cyl_installTabBarItemLongPressIfNeeded];
+    // FIX: issue #433
+    // [EN] Show the selected title on the selected tab.
+    // [CN] 选中的 Tab 显示选中标题。
+    CYLApplyTabBarItemSelectedTitles(self);
 }
 
 
@@ -401,6 +488,10 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
         [self didSelectControl:control];
     }
     
+    // FIX: issue #433
+    // [EN] Classic taps come here, not always through `-setSelectedViewController:`.
+    // [CN] 经典样式的点击会到这里，不一定经过 `-setSelectedViewController:`。
+    CYLSetNeedsUpdateTabBarItemSelectedTitles(self);
     UITabBarItem *item = viewController.tabBarItem;
     BOOL isChildViewControllerPlusButton = [control cyl_isChildViewControllerPlusButton];
     BOOL isLottieEnabled = [self isLottieEnabled];
@@ -1220,6 +1311,10 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
                 lottieSizeValue = _tabBarItemsAttributes[idx][CYLTabBarLottieSize];
                 // FIX: issue #408 the tab's identifier. Tab 的标识。
                 viewController.cyl_tabBarItemIdentifier = _tabBarItemsAttributes[idx][CYLTabBarItemIdentifier];
+                // FIX: issue #433
+                // [EN] The title shown while the tab is selected.
+                // [CN] 选中时显示的标题。
+                CYLRememberTabBarItemSelectedTitle(viewController, _tabBarItemsAttributes[idx], title);
                         
                 NSValue *offsetValue = _tabBarItemsAttributes[idx][CYLTabBarItemTitlePositionAdjustment];
                 UIOffset offset = [offsetValue UIOffsetValue];
@@ -2188,6 +2283,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                     lottieSizeValue = _tabBarItemsAttributes[idx][CYLTabBarLottieSize];
                     // FIX: issue #408 the tab's identifier. Tab 的标识。
                     viewController.cyl_tabBarItemIdentifier = _tabBarItemsAttributes[idx][CYLTabBarItemIdentifier];
+                    // FIX: issue #433
+                    // [EN] The title shown while the tab is selected.
+                    // [CN] 选中时显示的标题。
+                    CYLRememberTabBarItemSelectedTitle(viewController, _tabBarItemsAttributes[idx], title);
                 
                     NSValue *offsetValue = _tabBarItemsAttributes[idx][CYLTabBarItemTitlePositionAdjustment];
                     UIOffset offset = [offsetValue UIOffsetValue];
@@ -3505,6 +3604,10 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     if (NSNotFound == indexOfSelectedViewController) { return; }
     [super setSelectedViewController:selectedViewController];
     _selectedViewController = selectedViewController;
+    // FIX: issue #433
+    // [EN] Show the selected title on the selected tab.
+    // [CN] 选中的 Tab 显示选中标题。
+    CYLSetNeedsUpdateTabBarItemSelectedTitles(self);
 
     if (selectedViewController.cyl_isPlaceholder) { return; }
 
@@ -3714,6 +3817,10 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             [self tabChangedToSelectedIndex:selectedIndex viewController:nil selectedItem:nil];
             
         }
+        // FIX: issue #433
+        // [EN] Show the selected title on the selected tab.
+        // [CN] 选中的 Tab 显示选中标题。
+        CYLSetNeedsUpdateTabBarItemSelectedTitles(self);
         [self _updateBottomBarShowHideIfNeeded];
 #else
 #endif

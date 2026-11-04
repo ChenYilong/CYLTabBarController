@@ -179,3 +179,6 @@
 "子控件" = "Widok podrzędny";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Pokaż TabBarController z nowym kontekstem (PlusButton z dotykalnym widokiem podrzędnym X, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Stuknij X w prawym górnym rogu PlusButton: X zmienia kolor na losowy, a PlusButton nie reaguje";
+
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Odśwież";

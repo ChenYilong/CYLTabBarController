@@ -179,3 +179,6 @@
 "子控件" = "Subvizualizare";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Afișează un TabBarController cu un context nou (PlusButton cu o subvizualizare X care poate fi atinsă, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Atinge X-ul din dreapta sus a PlusButton: X-ul primește o culoare aleatorie, iar PlusButton nu reacționează";
+
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Reîmprospătează";

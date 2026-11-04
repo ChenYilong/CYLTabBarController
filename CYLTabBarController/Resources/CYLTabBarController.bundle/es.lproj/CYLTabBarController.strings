@@ -179,3 +179,6 @@
 "子控件" = "Subvista";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Mostrar un TabBarController con un contexto nuevo (PlusButton con una subvista X que se puede tocar, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Toca la X arriba a la derecha del PlusButton: la X cambia a un color aleatorio y el PlusButton no reacciona";
+
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Actualizar";

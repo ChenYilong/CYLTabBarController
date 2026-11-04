@@ -25,6 +25,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
 //   - Tab bar item gestures: reselect, double tap and long press / TabBarItem 手势：再次点击、双击与长按
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBarItem-Gestures.md
+//   - Selected title: a different title on the selected tab (like JD's "Refresh") / 选中标题：选中的 Tab 显示不同文字（如京东「刷新」）
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBarItem-Selected-Title.md
 // docs-binding:end
 
 // [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
@@ -79,6 +81,18 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void(^CYLViewDidLayoutSubViewsBlock)(CYLTabBarController *tabBarController);
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitle;
+/*!
+ * FIX: issue #433
+ * [EN] Optional title (NSString) shown while the tab is selected, like JD's "Home" tab that reads "Refresh" when it is
+ *      selected; the tab shows `CYLTabBarItemTitle` again when another tab is selected. Works in every style (classic,
+ *      Liquid Glass, FlatDesign). Pair it with `CYLTabBarItemSelectedImage` (or a Lottie animation, which replays on a
+ *      re-tap) and with the reselect gesture (`cyl_tabBarItemGestureHandler`) to refresh on a second tap.
+ *      See docs/TabBarItem-Selected-Title.md.
+ * [CN] 可选的选中标题（NSString）：Tab 选中时显示，例如京东「首页」选中后显示「刷新」；选中其他 Tab 后恢复 `CYLTabBarItemTitle`。
+ *      支持所有样式（经典、液态玻璃、FlatDesign）。可搭配 `CYLTabBarItemSelectedImage`（或 Lottie 动画，再次点击会重新播放），
+ *      以及再次点击手势（`cyl_tabBarItemGestureHandler`），实现再次点击刷新。见 docs/TabBarItem-Selected-Title.md。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedTitle;
 /*!
  * FIX: issue #465
  * [EN] `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` (and the dark keys below) take an image name or a UIImage.

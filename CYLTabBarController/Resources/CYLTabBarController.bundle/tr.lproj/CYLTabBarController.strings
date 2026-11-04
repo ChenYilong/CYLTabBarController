@@ -179,3 +179,6 @@
 "子控件" = "Alt görünüm";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Yeni bağlamlı bir TabBarController göster (dokunulabilir X alt görünümlü PlusButton, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "PlusButton'ın sağ üstündeki X'e dokunun: X rastgele bir renge döner, PlusButton tepki vermez";
+
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Yenile";
