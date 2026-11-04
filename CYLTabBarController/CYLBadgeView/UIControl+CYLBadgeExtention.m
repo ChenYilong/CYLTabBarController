@@ -353,7 +353,13 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
         // [CN] 只在刚建立约束时设置一次 frame，角标无需等到下一次布局；每次调用都设置会与 Auto Layout 的像素取整冲突，导致 PlusButton 无限布局。
         CGRect visibleRect = CGRectMake(leading, top, CGRectGetWidth(unitRect) * targetSize.width,
                                         CGRectGetHeight(unitRect) * targetSize.height);
-        anchorView.frame = [target convertRect:visibleRect toView:container];
+        // [EN] On whole pixels, as Auto Layout will place it: the badge laid out on the unrounded frame stayed up to a
+        //      fraction of a point off where the same badge lands after a later layout (0.17 pt on a 3x screen).
+        // [CN] 对齐到整像素，与 Auto Layout 之后的位置一致：角标按未取整的 frame 布局时，会与之后再次布局的同一角标相差不到一个点（3x 屏上 0.17 pt）。
+        CGRect frame = [target convertRect:visibleRect toView:container];
+        CGFloat scale = container.traitCollection.displayScale > 0 ? container.traitCollection.displayScale : 1;
+        anchorView.frame = CGRectMake(round(CGRectGetMinX(frame) * scale) / scale, round(CGRectGetMinY(frame) * scale) / scale,
+                                      round(CGRectGetWidth(frame) * scale) / scale, round(CGRectGetHeight(frame) * scale) / scale);
     }
     return anchorView;
 }
