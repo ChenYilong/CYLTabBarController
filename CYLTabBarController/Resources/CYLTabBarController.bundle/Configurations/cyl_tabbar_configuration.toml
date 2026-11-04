@@ -1,0 +1,37 @@
+# TOML: one [[CYLTabBarControllerTabBarItemsAttributes]] table per tab.
+# TOML：每个 Tab 一个 [[CYLTabBarControllerTabBarItemsAttributes]] 表。
+CYLTabBarControllerContext = "CYLConfigurationDemo"
+CYLTabBarControllerStyleType = "default"
+CYLTabBarControllerImageInsets = "{0, 0, 0, 0}"
+CYLTabBarControllerTitlePositionAdjustment = "{0, -2}"
+CYLTabBarControllerNavigationControllerClass = "UINavigationController"
+
+[[CYLTabBarControllerTabBarItemsAttributes]]
+CYLTabBarItemTitle = "TOML"
+CYLTabBarItemImage = "system:house"
+CYLTabBarItemSelectedImage = "system:house.fill"
+CYLTabBarItemIdentifier = "home"
+CYLTabBarItemViewControllerClass = "UIViewController"
+
+[[CYLTabBarControllerTabBarItemsAttributes]]
+CYLTabBarItemTitle = "Message"
+CYLTabBarItemImage = "system:message"
+CYLTabBarItemSelectedImage = "system:message.fill"
+CYLTabBarItemIdentifier = "message"
+CYLTabBarItemViewControllerClass = "UIViewController"
+
+[[CYLTabBarControllerTabBarItemsAttributes]]
+CYLTabBarItemTitle = "Discover"
+CYLTabBarItemImage = "system:safari"
+CYLTabBarItemSelectedImage = "system:safari.fill"
+CYLTabBarItemIdentifier = "discover"
+CYLTabBarItemViewControllerClass = "UIViewController"
+CYLTabBarItemImageInsets = "{1, 0, -1, 0}"
+
+[[CYLTabBarControllerTabBarItemsAttributes]]
+CYLTabBarItemTitle = 'Me'                       # literal string 字面量字符串
+CYLTabBarItemImage = "system:person"
+CYLTabBarItemSelectedImage = "system:person.fill"
+CYLTabBarItemIdentifier = "me"
+CYLTabBarItemViewControllerClass = "UIViewController"
+CYLTabBarItemTitlePositionAdjustment = "{0, -1}"

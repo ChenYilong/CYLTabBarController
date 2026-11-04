@@ -1,0 +1,105 @@
+//
+//  CYLTabBarConfigurationParser.h
+//  CYLTabBarController
+//
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+/*!
+ * [EN] The key-value file formats a tab bar configuration can be written in (see
+ *      `-[CYLTabBarController initWithConfiguration:]`). Every format gives the same dictionary: its keys are the
+ *      configuration and item keys (`CYLTabBarControllerContext`, `CYLTabBarItemTitle`, ...).
+ * [CN] TabBar 配置文件支持的 key-value 格式（见 `-[CYLTabBarController initWithConfiguration:]`）。所有格式都解析为同样的字典，
+ *      其键即配置键与 item 键（`CYLTabBarControllerContext`、`CYLTabBarItemTitle` 等）。
+ */
+typedef NS_ENUM(NSInteger, CYLTabBarConfigurationFormat) {
+    /// [EN] Detected from the content. [CN] 根据内容自动识别。
+    CYLTabBarConfigurationFormatUnknown = 0,
+    /// .json
+    CYLTabBarConfigurationFormatJSON,
+    /// .json5 / .jsonc: JSON with comments, trailing commas, single quotes and unquoted keys.
+    /// JSON 加注释、尾逗号、单引号与不加引号的键。
+    CYLTabBarConfigurationFormatJSON5,
+    /// .plist / .strings: XML, binary or OpenStep (old-style) property lists. XML、二进制或 OpenStep（旧式）属性列表。
+    CYLTabBarConfigurationFormatPropertyList,
+    /// .yaml / .yml
+    CYLTabBarConfigurationFormatYAML,
+    /// .toml
+    CYLTabBarConfigurationFormatTOML,
+    /// .ini / .cfg / .conf: `[section.path]` and `key = value`. `[节.路径]` 与 `key = value`。
+    CYLTabBarConfigurationFormatINI,
+    /// .properties / .env: `dotted.key.path = value`. `点.分隔.路径 = value`。
+    CYLTabBarConfigurationFormatProperties,
+    /// .xml (not a plist): elements are keys, `<item>` children make an array. 非 plist 的 XML：元素即键，`<item>` 子元素组成数组。
+    CYLTabBarConfigurationFormatXML,
+};
+
+/// [EN] Error domain of the configuration parser and loaders. [CN] 配置解析与加载的错误域。
+FOUNDATION_EXTERN NSString *const CYLTabBarConfigurationErrorDomain;
+
+typedef NS_ENUM(NSInteger, CYLTabBarConfigurationErrorCode) {
+    /// [EN] The file does not exist. [CN] 文件不存在。
+    CYLTabBarConfigurationErrorFileNotFound = 1,
+    /// [EN] The format could not be detected. [CN] 无法识别格式。
+    CYLTabBarConfigurationErrorUnsupportedFormat = 2,
+    /// [EN] The content is not valid in its format; `NSLocalizedDescriptionKey` says where. [CN] 内容不符合格式，描述中说明位置。
+    CYLTabBarConfigurationErrorInvalidSyntax = 3,
+    /// [EN] The top level is not a dictionary. [CN] 顶层不是字典。
+    CYLTabBarConfigurationErrorNotADictionary = 4,
+    /// [EN] The download failed (`NSUnderlyingErrorKey` holds the network error). [CN] 下载失败（`NSUnderlyingErrorKey` 为网络错误）。
+    CYLTabBarConfigurationErrorNetwork = 5,
+};
+
+/*!
+ * [EN] Reads key-value configuration files into dictionaries, in every `CYLTabBarConfigurationFormat`. Foundation only,
+ *      no UIKit: the values stay strings, numbers, booleans, arrays and dictionaries; `CYLTabBarController` turns them
+ *      into insets, offsets, sizes, URLs and images (see `-[CYLTabBarController initWithConfiguration:]`).
+ *      Text formats are read as UTF-8. YAML, TOML, INI, .properties and XML give unquoted `true` / `false` as booleans and
+ *      numbers as NSNumber; YAML and TOML support the common subset used for configuration (no anchors, tags or
+ *      multi-line block scalars in YAML; no dates in TOML).
+ * [CN] 将各种 `CYLTabBarConfigurationFormat` 格式的 key-value 配置文件读取为字典。仅依赖 Foundation，不依赖 UIKit：值保持为字符串、
+ *      数字、布尔、数组与字典；由 `CYLTabBarController` 转换为内边距、偏移、尺寸、URL 与图片（见
+ *      `-[CYLTabBarController initWithConfiguration:]`）。
+ *      文本格式按 UTF-8 读取。YAML、TOML、INI、.properties 与 XML 中未加引号的 `true` / `false` 解析为布尔值，数字解析为 NSNumber；
+ *      YAML 与 TOML 支持配置中常用的子集（YAML 不支持锚点、标签与多行块标量；TOML 不支持日期）。
+ */
+@interface CYLTabBarConfigurationParser : NSObject
+
+/// [EN] The file name extensions recognized, lowercase, e.g. @"json", @"yaml". [CN] 可识别的扩展名（小写），如 @"json"、@"yaml"。
++ (NSArray<NSString *> *)supportedPathExtensions;
+
+/// [EN] The format of a file name extension (case-insensitive), or Unknown. [CN] 扩展名（不区分大小写）对应的格式，未知时为 Unknown。
++ (CYLTabBarConfigurationFormat)formatForPathExtension:(nullable NSString *)pathExtension;
+
+/// [EN] The format of an HTTP `Content-Type` (parameters ignored), or Unknown. [CN] HTTP `Content-Type` 对应的格式（忽略参数），未知时为 Unknown。
++ (CYLTabBarConfigurationFormat)formatForMIMEType:(nullable NSString *)MIMEType;
+
+/// [EN] The format guessed from the content, or Unknown. [CN] 根据内容推测的格式，无法推测时为 Unknown。
++ (CYLTabBarConfigurationFormat)formatBySniffingData:(NSData *)data;
+
+/// [EN] A short name of a format, e.g. @"YAML". [CN] 格式的简称，如 @"YAML"。
++ (NSString *)nameOfFormat:(CYLTabBarConfigurationFormat)format;
+
+/*!
+ * [EN] Parses `data` in `format`; `CYLTabBarConfigurationFormatUnknown` detects it from the content. Returns nil and sets
+ *      `error` when the content is invalid or its top level is not a dictionary.
+ * [CN] 按 `format` 解析 `data`；`CYLTabBarConfigurationFormatUnknown` 表示根据内容识别。内容无效或顶层不是字典时返回 nil 并设置 `error`。
+ */
++ (nullable NSDictionary<NSString *, id> *)dictionaryWithData:(NSData *)data
+                                                       format:(CYLTabBarConfigurationFormat)format
+                                                        error:(NSError *_Nullable *_Nullable)error;
+
+/*!
+ * [EN] Reads the file at `path`: the format comes from its extension, or from its content when the extension is unknown.
+ * [CN] 读取 `path` 处的文件：格式由扩展名决定，扩展名未知时根据内容识别。
+ */
++ (nullable NSDictionary<NSString *, id> *)dictionaryWithContentsOfFile:(NSString *)path
+                                                                  error:(NSError *_Nullable *_Nullable)error;
+
+@end
+
+NS_ASSUME_NONNULL_END

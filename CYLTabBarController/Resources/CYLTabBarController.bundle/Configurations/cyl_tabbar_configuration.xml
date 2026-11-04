@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XML: elements are keys; <item> children make a list; an <item> may also use attributes. -->
+<!-- XML：元素即键；<item> 子元素组成列表；<item> 也可以使用属性。 -->
+<CYLTabBarController>
+    <CYLTabBarControllerContext>CYLConfigurationDemo</CYLTabBarControllerContext>
+    <CYLTabBarControllerStyleType>default</CYLTabBarControllerStyleType>
+    <CYLTabBarControllerImageInsets>{0, 0, 0, 0}</CYLTabBarControllerImageInsets>
+    <CYLTabBarControllerTitlePositionAdjustment>{0, -2}</CYLTabBarControllerTitlePositionAdjustment>
+    <CYLTabBarControllerNavigationControllerClass>UINavigationController</CYLTabBarControllerNavigationControllerClass>
+    <CYLTabBarControllerTabBarItemsAttributes>
+        <item>
+            <CYLTabBarItemTitle>XML</CYLTabBarItemTitle>
+            <CYLTabBarItemImage>system:house</CYLTabBarItemImage>
+            <CYLTabBarItemSelectedImage>system:house.fill</CYLTabBarItemSelectedImage>
+            <CYLTabBarItemIdentifier>home</CYLTabBarItemIdentifier>
+            <CYLTabBarItemViewControllerClass>UIViewController</CYLTabBarItemViewControllerClass>
+        </item>
+        <item CYLTabBarItemTitle="Message" CYLTabBarItemImage="system:message" CYLTabBarItemSelectedImage="system:message.fill"
+              CYLTabBarItemIdentifier="message" CYLTabBarItemViewControllerClass="UIViewController"/>
+        <item CYLTabBarItemTitle="Discover" CYLTabBarItemImage="system:safari" CYLTabBarItemSelectedImage="system:safari.fill"
+              CYLTabBarItemIdentifier="discover" CYLTabBarItemViewControllerClass="UIViewController"
+              CYLTabBarItemImageInsets="{1, 0, -1, 0}"/>
+        <item CYLTabBarItemTitle="Me" CYLTabBarItemImage="system:person" CYLTabBarItemSelectedImage="system:person.fill"
+              CYLTabBarItemIdentifier="me" CYLTabBarItemViewControllerClass="UIViewController"
+              CYLTabBarItemTitlePositionAdjustment="{0, -1}"/>
+    </CYLTabBarControllerTabBarItemsAttributes>
+</CYLTabBarController>

@@ -1,0 +1,29 @@
+# YAML: block style. YAML：块样式。
+CYLTabBarControllerContext: CYLConfigurationDemo
+CYLTabBarControllerStyleType: default
+CYLTabBarControllerImageInsets: "{0, 0, 0, 0}"
+CYLTabBarControllerTitlePositionAdjustment: "{0, -2}"
+CYLTabBarControllerNavigationControllerClass: UINavigationController
+CYLTabBarControllerTabBarItemsAttributes:
+  - CYLTabBarItemTitle: YAML
+    CYLTabBarItemImage: system:house
+    CYLTabBarItemSelectedImage: system:house.fill
+    CYLTabBarItemIdentifier: home
+    CYLTabBarItemViewControllerClass: UIViewController
+  - CYLTabBarItemTitle: Message
+    CYLTabBarItemImage: system:message
+    CYLTabBarItemSelectedImage: system:message.fill
+    CYLTabBarItemIdentifier: message
+    CYLTabBarItemViewControllerClass: UIViewController
+  - CYLTabBarItemTitle: Discover
+    CYLTabBarItemImage: system:safari
+    CYLTabBarItemSelectedImage: system:safari.fill
+    CYLTabBarItemIdentifier: discover
+    CYLTabBarItemViewControllerClass: UIViewController
+    CYLTabBarItemImageInsets: "{1, 0, -1, 0}"
+  - CYLTabBarItemTitle: Me
+    CYLTabBarItemImage: system:person
+    CYLTabBarItemSelectedImage: system:person.fill
+    CYLTabBarItemIdentifier: me
+    CYLTabBarItemViewControllerClass: UIViewController
+    CYLTabBarItemTitlePositionAdjustment: "{0, -1}"
