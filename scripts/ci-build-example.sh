@@ -53,6 +53,13 @@ if [[ -z "$SCHEME" ]]; then
     exit 1
 fi
 
+# [EN] CocoaPods adds "${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}" to an app that links a static framework with Swift
+#      code. On the xcode-27 runner TOOLCHAIN_DIR resolves to an unmounted Metal toolchain, so an Objective-C app could not
+#      find the Swift back-deployment library (swiftCompatibility56). Point it at Xcode's default toolchain.
+# [CN] App 链接含 Swift 代码的静态 framework 时，CocoaPods 会添加 "${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}"。在 xcode-27 runner 上
+#      TOOLCHAIN_DIR 指向一个未挂载的 Metal 工具链，Objective-C App 因此找不到 Swift 向后兼容库（swiftCompatibility56）。这里改为指向 Xcode 默认工具链。
+DEFAULT_TOOLCHAIN_DIR="$(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain"
+
 echo "Building $DEMO_DIR/$CONTAINER, scheme $SCHEME"
 set +e
 xcodebuild build \
@@ -61,6 +68,7 @@ xcodebuild build \
     -destination 'generic/platform=iOS Simulator' \
     -derivedDataPath "$ROOT/build/DerivedData/$DEMO_DIR" \
     CODE_SIGNING_ALLOWED=NO \
+    TOOLCHAIN_DIR="$DEFAULT_TOOLCHAIN_DIR" \
     COMPILER_INDEX_STORE_ENABLE=NO 2>&1 | tee "$ROOT/build/$DEMO_DIR.log"
 STATUS=${PIPESTATUS[0]}
 set -e

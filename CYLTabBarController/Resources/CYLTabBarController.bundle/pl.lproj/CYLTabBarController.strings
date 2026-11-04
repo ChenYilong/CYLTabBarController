@@ -277,3 +277,6 @@
 "轻触感反馈" = "Lekka haptyka";
 "重触感反馈" = "Silna haptyka";
 "长按（#152）" = "Długie naciśnięcie (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Stuknij";

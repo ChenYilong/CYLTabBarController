@@ -277,3 +277,6 @@
 "轻触感反馈" = "Resposta tátil leve";
 "重触感反馈" = "Resposta tátil forte";
 "长按（#152）" = "Toque longo (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Toque aqui";
