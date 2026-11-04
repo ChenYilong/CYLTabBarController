@@ -13,7 +13,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 本文是一份调研报告：如何为本仓库配置 GitHub 上的 CI/CD，让构建、静态分析、Demo 与发布在 macOS 服务器上自动运行。目前仓库只有一个在 Linux 上运行的 `Docs navigation` 检查，Objective-C 代码从未在 CI 中编译过，静态分析警告与截图也只能在本机完成。本文给出可选方案、对比、推荐方案、流水线设计与需要维护者完成的步骤。已确认采用方案 A 与 `xcode-27` runner，CI workflow（`.github/workflows/ios.yml`）已添加；发布 workflow 仍为草稿，待添加 Secret 后再启用。调研日期：2026-11-04。 | This is a research report: how to set up CI/CD on GitHub for this repository so that builds, static analysis, the demos and releases run automatically on macOS servers. Today the repository has a single check, `Docs navigation`, which runs on Linux; the Objective-C code is never compiled in CI, and static-analyzer warnings and screenshots can only be produced on a local Mac. This page lists the options, compares them, recommends one, designs the pipeline and lists the steps the maintainer has to take. Option A with the `xcode-27` runner is confirmed and the CI workflow (`.github/workflows/ios.yml`) is added; the release workflow is still a draft, to be enabled once the secret is set. Researched on 2026-11-04. |
+| 本文是一份调研报告：如何为本仓库配置 GitHub 上的 CI/CD，让构建、静态分析、Demo 与发布在 macOS 服务器上自动运行。目前仓库只有一个在 Linux 上运行的 `Docs navigation` 检查，Objective-C 代码从未在 CI 中编译过，静态分析警告与截图也只能在本机完成。本文给出可选方案、对比、推荐方案、流水线设计与需要维护者完成的步骤。已确认采用方案 A 与 `xcode-27` runner，CI workflow（`.github/workflows/ios.yml`）已添加；发布 workflow（`.github/workflows/release.yml`）也已添加，Secret `COCOAPODS_TRUNK_TOKEN` 已配置。调研日期：2026-11-04。 | This is a research report: how to set up CI/CD on GitHub for this repository so that builds, static analysis, the demos and releases run automatically on macOS servers. Today the repository has a single check, `Docs navigation`, which runs on Linux; the Objective-C code is never compiled in CI, and static-analyzer warnings and screenshots can only be produced on a local Mac. This page lists the options, compares them, recommends one, designs the pipeline and lists the steps the maintainer has to take. Option A with the `xcode-27` runner is confirmed and the CI workflow (`.github/workflows/ios.yml`) is added; the release workflow (`.github/workflows/release.yml`) is added too, and the secret `COCOAPODS_TRUNK_TOKEN` is set. Researched on 2026-11-04. |
 
 ## [CN]目录
 ## [EN]Contents
@@ -27,7 +27,8 @@
 | [你的账号权益对照](#cn你的账号权益对照) | [What your accounts give you](#enwhat-your-accounts-give-you) |
 | [可选方案对比](#cn可选方案对比) | [Options compared](#enoptions-compared) |
 | [推荐流水线设计](#cn推荐流水线设计) | [Recommended pipeline](#enrecommended-pipeline) |
-| [已添加的 CI workflow 与发布草稿](#cn已添加的-ci-workflow-与发布草稿) | [The CI workflow and the release draft](#enthe-ci-workflow-and-the-release-draft) |
+| [已添加的 CI workflow](#cn已添加的-ci-workflow) | [The CI workflow](#enthe-ci-workflow) |
+| [发布流程](#cn发布流程) | [Releasing](#enreleasing) |
 | [首次运行结果](#cn首次运行结果) | [First run results](#enfirst-run-results) |
 | [风险与注意事项](#cn风险与注意事项) | [Risks and notes](#enrisks-and-notes) |
 | [TODO：维护者需要完成的步骤](#cntodo维护者需要完成的步骤) | [TODO: steps for the maintainer](#entodo-steps-for-the-maintainer) |
@@ -121,14 +122,14 @@ flowchart LR
     Push --> Runner
 ```
 
-## [CN]已添加的 CI workflow 与发布草稿
-## [EN]The CI workflow and the release draft
+## [CN]已添加的 CI workflow
+## [EN]The CI workflow
 
 | 中文 | English |
 |:---|:---|
 | `.github/workflows/ios.yml` 已添加，在每个 PR、push 到 master 以及手动触发（`workflow_dispatch`）时运行，包含四类 job：`pod lib lint`（完整）；`Framework build and analyze`（构建 Carthage 的 framework target 并静态分析，警告汇总写入 job summary，分析报告作为 artifact；本库源码出现构建或静态分析警告时该 job 失败）；`Carthage`（`carthage build --no-skip-current --use-xcframeworks`）；`Demo …` 矩阵（每个 Demo 一个 job，互不影响）。 | `.github/workflows/ios.yml` is added. It runs on every pull request, on pushes to master and on demand (`workflow_dispatch`), with four kinds of jobs: `pod lib lint` (full); `Framework build and analyze` (builds the Carthage framework target and runs the static analyzer; warnings are listed in the job summary and the analyzer report is an artifact; a build or analyzer warning in the library's sources fails the job); `Carthage` (`carthage build --no-skip-current --use-xcframeworks`); and the `Demo …` matrix (one job per demo, independent of each other). |
 | 大部分 Demo 没有共享 scheme，名称只有在 Mac 上才能得到，因此 `scripts/ci-build-example.sh` 在 runner 上运行 `xcodebuild -list -json` 选出 App 的 scheme，有 Podfile 时先 `pod install`（不修改 Podfile），并为 job summary 输出一行结果（scheme、是否成功、警告数）。 | Most demos have no shared scheme, so their names are only known on the Mac. `scripts/ci-build-example.sh` therefore runs `xcodebuild -list -json` on the runner to pick the app scheme, runs `pod install` first when there is a Podfile (without changing it), and writes a result line (scheme, success, warning count) for the job summary. |
-| 下面第一段为最初的草稿（仓库中的文件以 `.github/workflows/ios.yml` 为准），第二段为发布 workflow 草稿，尚未添加。 | The first block below is the original draft (the repository's `.github/workflows/ios.yml` is the source of truth); the second is the release workflow draft, not added yet. |
+| 下面第一段为最初的草稿（仓库中的文件以 `.github/workflows/ios.yml` 为准），第二段为发布 workflow 的最初草稿（仓库中的文件以 `.github/workflows/release.yml` 为准，见「发布流程」）。 | The first block below is the original draft (the repository's `.github/workflows/ios.yml` is the source of truth); the second is the release workflow's original draft (the repository's `.github/workflows/release.yml` is the source of truth; see "Releasing"). |
 
 ```yaml
 name: iOS
@@ -213,6 +214,17 @@ jobs:
         run: gh release create "$GITHUB_REF_NAME" --generate-notes
 ```
 
+## [CN]发布流程
+## [EN]Releasing
+
+| 中文 | English |
+|:---|:---|
+| `.github/workflows/release.yml` 在推送形如 `1.99.73` 的版本 tag 时运行（`xcode-27` runner），依次：检查 tag 与 podspec 的 `s.version` 一致，不一致即失败；用 Secret `COCOAPODS_TRUNK_TOKEN` 执行 `scripts/pod-lint.sh push`（`pod trunk push`，随后更新 Demo 与文档中 Carthage、SPM 的版本号并重新生成导航）；创建 GitHub Release（自动生成说明，已存在则跳过）；为版本号更新开一个 PR。 | `.github/workflows/release.yml` runs when a version tag such as `1.99.73` is pushed (`xcode-27` runner). In order: it checks that the tag equals the podspec's `s.version` and fails otherwise; runs `scripts/pod-lint.sh push` with the secret `COCOAPODS_TRUNK_TOKEN` (`pod trunk push`, then the Carthage and SPM versions in the demo and docs are updated and the navigation regenerated); creates a GitHub Release with generated notes (skipped if it exists); and opens a pull request with the version updates. |
+| **发布一个版本**：1. 通过 PR 把 podspec 的 `s.version` 改为新版本并合并到 master；2. 在合并后的 master 上打 tag 并推送：`git tag 1.99.73 && git push origin 1.99.73`；3. 在 Actions 中查看 Release 运行；4. 合并它开的「Carthage and SPM versions」PR。 | **To release**: 1. bump `s.version` in the podspec through a pull request and merge it into master; 2. tag the merged master and push the tag: `git tag 1.99.73 && git push origin 1.99.73`; 3. watch the Release run in Actions; 4. merge the "Carthage and SPM versions" pull request it opens. |
+| **设置**：自动开 PR 需要在 Settings → Actions → General 中开启「Allow GitHub Actions to create and approve pull requests」；未开启时分支仍会推送，运行日志中给出手动创建 PR 的链接。 | **Setting**: opening the pull request needs "Allow GitHub Actions to create and approve pull requests" in Settings → Actions → General; without it the branch is still pushed and the run log links to open the pull request by hand. |
+| **必需检查**：用 `GITHUB_TOKEN` 创建的 PR 不会触发其他 workflow，因此若 master 设置了必需检查，这个 PR 不会自动运行 CI。它只修改 Cartfile 与文档中的版本号；可以由管理员绕过合并（ruleset 的 Bypass list），或在本地向该分支推送一次提交以触发 CI。 | **Required checks**: pull requests created with `GITHUB_TOKEN` do not trigger other workflows, so if master requires checks, CI does not run on this pull request by itself. It only changes version numbers in the Cartfile and the docs; an admin can merge it through the ruleset's bypass list, or push one commit to its branch locally to trigger CI. |
+| **Token 过期**：trunk session 会过期（`pod trunk me` 可查看到期日）。过期后发布步骤会失败，需要重新 `pod trunk register` 并更新 Secret。 | **Token expiry**: trunk sessions expire (`pod trunk me` shows the date). Publishing then fails; run `pod trunk register` again and update the secret. |
+
 ## [CN]首次运行结果
 ## [EN]First run results
 
@@ -242,7 +254,7 @@ jobs:
 |:---|:---|
 | ~~**TODO 1**~~ 已完成：采用方案 A（GitHub 托管 runner），主 runner 为 `xcode-27`。 | ~~**TODO 1**~~ Done: option A (GitHub-hosted runners), with `xcode-27` as the main runner. |
 | **TODO 2** 仓库 Settings → Actions → General：允许 GitHub Actions；对外部贡献者的 fork PR 设置「需要批准」。 | **TODO 2** Repository Settings → Actions → General: allow GitHub Actions; require approval for workflows from fork pull requests by outside contributors. |
-| **TODO 3** 在本机运行 `pod trunk me` 取得 trunk token（`~/.netrc` 中 `trunk.cocoapods.org` 的 password），添加为仓库 Secret `COCOAPODS_TRUNK_TOKEN`（仅在需要 CD 时）。 | **TODO 3** On your Mac, get the trunk token after `pod trunk me` (the password for `trunk.cocoapods.org` in `~/.netrc`) and add it as the repository secret `COCOAPODS_TRUNK_TOKEN` (only for CD). |
+| ~~**TODO 3**~~ 已完成：仓库 Secret `COCOAPODS_TRUNK_TOKEN` 已添加（2026-11-04）。由于该 token 曾出现在对话中，建议重新 `pod trunk register` 生成新 token、更新 Secret，并用 `pod trunk me clean-sessions` 使旧 token 失效。 | ~~**TODO 3**~~ Done: the repository secret `COCOAPODS_TRUNK_TOKEN` is set (2026-11-04). As that token appeared in a chat, register a new trunk session, update the secret, and invalidate the old token with `pod trunk me clean-sessions`. |
 | ~~**TODO 4**~~ 已完成：CI 已在 PR #763 中运行，首次全部通过，结果见「首次运行结果」。 | ~~**TODO 4**~~ Done: CI runs in PR #763 and passed in full; see "First run results". |
 | **TODO 5** CI 稳定后，在仓库 Settings → Branches 中把这些检查设为 master 的必需检查。 | **TODO 5** Once CI is stable, make these checks required for master in Settings → Branches. |
 
