@@ -17,6 +17,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Touchable-Area.md
 //   - selectedIndex and the PlusButton: the selected title and image match / selectedIndex 与 PlusButton：选中的文字与图片一致
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SelectedIndex-PlusButton.md
+//   - Tab bar customization toolkit / TabBar 自定义工具集
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Customization-Toolkit.md
 //   - The tab bar's hitTest falls back to super instead of returning nil / TabBar 的 hitTest 不再返回 nil，交给 super 处理
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-HitTest-Super-Fallback.md
 //   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar

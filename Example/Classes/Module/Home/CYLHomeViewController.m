@@ -36,6 +36,14 @@
     [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
     NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
     self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
+    // [EN] Double tap on this tab while it is selected: back to the top, then refresh.
+    // [CN] 选中状态下双击本 Tab：回到顶部并刷新。
+    __weak __typeof(self) weakSelfForDoubleTap = self;
+    (self.navigationController ?: self).tabBarItem.cyl_doubleTapBlock = ^(UITabBarItem *tabBarItem, NSInteger index) {
+        UITableView *tableView = weakSelfForDoubleTap.tableView;
+        [tableView setContentOffset:CGPointMake(0, -tableView.adjustedContentInset.top) animated:YES];
+        [tableView.mj_header beginRefreshing];
+    };
 //    self.navigationItem.title = @"首页"; //✅sets navigation bar title.The right way to set the title of the navigation
 //    self.tabBarItem.title = @"首页";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
     //self.title = @"首页1";                //❌sets both of these. Do not do this‼️‼️This may cause something strange  .

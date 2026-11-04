@@ -29,6 +29,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
+//   - Tab bar customization toolkit / TabBar 自定义工具集
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Customization-Toolkit.md
 //   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Minimize-On-Scroll.md
 //   - Theme switching (skins) / 换肤（主题切换）
@@ -304,6 +306,18 @@ presentLoginForViewController:(UIViewController *)viewController
  */
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
 //- (void)tabBarController:(CYLTabBarController *)tabBarController didLongPressControl:(UIControl *)control;
+
+/*!
+ * [EN] The user tapped the selected tab twice in a row, quickly (within `CYLTabBarItemDoubleTapInterval`), e.g. to scroll
+ *      its list to the top and refresh it. Only taps on a tab that is already selected count, as in most apps: the
+ *      first tap that selects a tab does not. Every style (Liquid Glass, the system tab bar, FlatDesign); not for the
+ *      plus button. Called after `-[UITabBarItem cyl_doubleTapBlock]`. A subclass that overrides
+ *      `-tabBar:didSelectItem:` calls super.
+ * [CN] 用户快速（`CYLTabBarItemDoubleTapInterval` 内）连续两次点击当前选中的 Tab，例如让列表回到顶部并刷新。与大多数 App 一样，
+ *      只统计对已选中 Tab 的点击：选中 Tab 的那一次点击不计入。适用于所有样式（液态玻璃、系统 TabBar、扁平样式），PlusButton 除外。
+ *      在 `-[UITabBarItem cyl_doubleTapBlock]` 之后调用。重写 `-tabBar:didSelectItem:` 的子类请调用 super。
+ */
+- (void)tabBarController:(CYLTabBarController *)tabBarController didDoubleTapViewController:(UIViewController *)viewController atIndex:(NSUInteger)index;
 
 /*!
  * [EN] Asks whether the Liquid Glass lens (selection bubble) should be shown for `control`. Default: NO without Liquid Glass; NO when the plus child view controller is selected and the plus button is not centered; otherwise YES.
@@ -1395,6 +1409,12 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 #endif
 
 @end
+
+/*!
+ * [EN] The longest time between the two taps of a double tap on the selected tab, 0.3 s.
+ * [CN] 双击选中 Tab 时两次点击的最长间隔，0.3 秒。
+ */
+FOUNDATION_EXTERN const NSTimeInterval CYLTabBarItemDoubleTapInterval;
 
 #pragma mark - Theme switching (issue #216)
 

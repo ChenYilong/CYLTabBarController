@@ -93,5 +93,27 @@
     return self.cyl_tabButton;
 }
 
+#pragma mark - Double tap
+
+- (void (^)(UITabBarItem *, NSInteger))cyl_doubleTapBlock {
+    return objc_getAssociatedObject(self, @selector(cyl_doubleTapBlock));
+}
+
+- (void)cyl_setDoubleTapBlock:(void (^)(UITabBarItem *, NSInteger))doubleTapBlock {
+    objc_setAssociatedObject(self, @selector(cyl_doubleTapBlock), doubleTapBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
 @end
 
+@implementation UITabBarAppearance (CYLTabBarControllerExtention)
+
+- (void)cyl_applyItemAppearanceWithBlock:(void (NS_NOESCAPE ^)(UITabBarItemAppearance *))block {
+    if (!block) {
+        return;
+    }
+    block(self.stackedLayoutAppearance);
+    block(self.inlineLayoutAppearance);
+    block(self.compactInlineLayoutAppearance);
+}
+
+@end

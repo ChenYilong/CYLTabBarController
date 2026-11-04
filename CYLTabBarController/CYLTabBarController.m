@@ -236,6 +236,8 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)cyl_applyLaunchTabBarThemeIfNeeded;
 /// [EN] Implemented in the main implementation (tabBar.standardAppearance). [CN] 实现于主 implementation（tabBar.standardAppearance）。
 - (void)cyl_syncTabBarAppearances;
+/// [EN] Implemented in the main implementation: the plus button's child view controller. [CN] 实现于主 implementation：PlusButton 的子控制器。
+- (nullable UIViewController *)cyl_contextPlusChildViewController;
 @end
 
 /// Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
@@ -6638,6 +6640,71 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
     return CYLTabBarMinimizeBehaviorAutomatic;
 }
 #endif
+
+#pragma mark - Double tap on the selected tab
+
+const NSTimeInterval CYLTabBarItemDoubleTapInterval = 0.3;
+
+/// [EN] The first tap of a possible double tap: the tab's index and when. [CN] 可能的双击中第一次点击：Tab 下标与时间。
+static char CYLDoubleTapLastIndexKey;
+static char CYLDoubleTapLastTimeKey;
+
+@implementation CYLTabBarController (CYLDoubleTap)
+
+/*!
+ * [EN] Every tab tap arrives here, before the selection changes: from the system tab bar (Liquid Glass and the classic
+ *      style), whose delegate this controller is, and from the flat design tab bar, whose delegate protocol uses the same
+ *      selector. The system tab bar still needs UIKit's own handling (super), the flat design one does not have it.
+ * [CN] 每次点击 Tab 都会在选中状态改变之前到达这里：来自系统 TabBar（液态玻璃与经典样式，本控制器是其代理），以及扁平样式 TabBar
+ *      （其代理协议使用相同的方法名）。系统 TabBar 仍需 UIKit 自身的处理（super），扁平样式 TabBar 没有这一实现。
+ */
+- (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item {
+    NSUInteger index = [tabBar.items indexOfObject:item];
+    BOOL wasSelected = (index != NSNotFound && index == self.selectedIndex);
+    if ([tabBar isKindOfClass:[UITabBar class]] && [UITabBarController instancesRespondToSelector:@selector(tabBar:didSelectItem:)]) {
+        [super tabBar:tabBar didSelectItem:item];
+    }
+    [self cyl_handleTapOnTabAtIndex:index wasSelected:wasSelected];
+}
+
+/*!
+ * [EN] Two taps on the tab that was already selected, the same one, within `CYLTabBarItemDoubleTapInterval`.
+ * [CN] 在 `CYLTabBarItemDoubleTapInterval` 内两次点击同一个已选中的 Tab。
+ */
+- (void)cyl_handleTapOnTabAtIndex:(NSUInteger)index wasSelected:(BOOL)wasSelected {
+    NSNumber *lastIndex = objc_getAssociatedObject(self, &CYLDoubleTapLastIndexKey);
+    NSNumber *lastTime = objc_getAssociatedObject(self, &CYLDoubleTapLastTimeKey);
+    objc_setAssociatedObject(self, &CYLDoubleTapLastIndexKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, &CYLDoubleTapLastTimeKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (!wasSelected || index == NSNotFound || index >= self.viewControllers.count) {
+        return;
+    }
+    CFTimeInterval now = CACurrentMediaTime();
+    if (lastIndex && lastIndex.unsignedIntegerValue == index && now - lastTime.doubleValue <= CYLTabBarItemDoubleTapInterval) {
+        [self cyl_reportDoubleTapAtIndex:index];
+        return;
+    }
+    objc_setAssociatedObject(self, &CYLDoubleTapLastIndexKey, @(index), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, &CYLDoubleTapLastTimeKey, @(now), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)cyl_reportDoubleTapAtIndex:(NSUInteger)index {
+    UIViewController *viewController = self.viewControllers[index];
+    if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
+        return;
+    }
+    UITabBarItem *tabBarItem = viewController.tabBarItem;
+    void (^doubleTapBlock)(UITabBarItem *, NSInteger) = tabBarItem.cyl_doubleTapBlock ?: [viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem.cyl_doubleTapBlock;
+    if (doubleTapBlock) {
+        doubleTapBlock(tabBarItem, (NSInteger)index);
+    }
+    id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)self.delegate;
+    if ([delegate respondsToSelector:@selector(tabBarController:didDoubleTapViewController:atIndex:)]) {
+        [delegate tabBarController:self didDoubleTapViewController:viewController atIndex:index];
+    }
+}
+
+@end
 
 #pragma mark - Theme switching (issue #216)
 
