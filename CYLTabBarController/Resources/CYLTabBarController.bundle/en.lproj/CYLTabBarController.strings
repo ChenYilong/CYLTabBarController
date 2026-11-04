@@ -293,3 +293,18 @@
 "对照：启动时即有图片" = "Compare: image at launch";
 "对照：启动时即有更大的图片" = "Compare: larger image at launch";
 "对照：启动时即有背景图片" = "Compare: background image at launch";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Tap to pop or dismiss";
+"详情" = "Detail";
+"拍照" = "Take a photo";
+"从相册选择" = "Select from album";
+"设置" = "Settings";
+"关于我们" = "About us";
+"示例" = "Example";
+"撰写" = "Compose";
+"好" = "OK";
+"编辑更多" = "More editing";
+"新版本" = "New version";
+"打开 TabBar 场景展示" = "Open the tab bar gallery";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Every scene is a tab bar built with the public API: styles, animations, reminders, Lottie and the newer tab APIs";

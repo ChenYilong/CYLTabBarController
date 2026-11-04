@@ -293,3 +293,18 @@
 "对照：启动时即有图片" = "Jämför: bild vid start";
 "对照：启动时即有更大的图片" = "Jämför: större bild vid start";
 "对照：启动时即有背景图片" = "Jämför: bakgrundsbild vid start";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Tryck för att gå tillbaka eller stänga";
+"详情" = "Detaljer";
+"拍照" = "Ta en bild";
+"从相册选择" = "Välj från album";
+"设置" = "Inställningar";
+"关于我们" = "Om oss";
+"示例" = "Exempel";
+"撰写" = "Skriv";
+"好" = "OK";
+"编辑更多" = "Redigera Mer";
+"新版本" = "Ny version";
+"打开 TabBar 场景展示" = "Öppna flikfältsgalleriet";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Varje scen är ett flikfält byggt med det publika API:t: stilar, animationer, påminnelser, Lottie och de nyare flik-API:erna";

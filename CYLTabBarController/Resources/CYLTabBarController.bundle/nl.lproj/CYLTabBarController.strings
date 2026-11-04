@@ -293,3 +293,18 @@
 "对照：启动时即有图片" = "Vergelijk: afbeelding bij starten";
 "对照：启动时即有更大的图片" = "Vergelijk: grotere afbeelding bij starten";
 "对照：启动时即有背景图片" = "Vergelijk: achtergrondafbeelding bij starten";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Tik om terug te gaan of te sluiten";
+"详情" = "Details";
+"拍照" = "Foto maken";
+"从相册选择" = "Kies uit album";
+"设置" = "Instellingen";
+"关于我们" = "Over ons";
+"示例" = "Voorbeeld";
+"撰写" = "Opstellen";
+"好" = "OK";
+"编辑更多" = "Meer bewerken";
+"新版本" = "Nieuwe versie";
+"打开 TabBar 场景展示" = "Tabbalkgalerij openen";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Elke scène is een tabbalk gebouwd met de openbare API: stijlen, animaties, meldingen, Lottie en de nieuwere tab-API's";

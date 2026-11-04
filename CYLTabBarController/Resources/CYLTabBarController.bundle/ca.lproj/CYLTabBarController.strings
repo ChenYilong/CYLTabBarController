@@ -293,3 +293,18 @@
 "对照：启动时即有图片" = "Comparació: imatge en iniciar";
 "对照：启动时即有更大的图片" = "Comparació: imatge més gran en iniciar";
 "对照：启动时即有背景图片" = "Comparació: imatge de fons en iniciar";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Toca per tornar o tancar";
+"详情" = "Detall";
+"拍照" = "Fes una foto";
+"从相册选择" = "Tria de l’àlbum";
+"设置" = "Configuració";
+"关于我们" = "Sobre nosaltres";
+"示例" = "Exemple";
+"撰写" = "Redacta";
+"好" = "D’acord";
+"编辑更多" = "Edita Més";
+"新版本" = "Versió nova";
+"打开 TabBar 场景展示" = "Obre la galeria de barres de pestanyes";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Cada escena és una barra de pestanyes feta amb l’API pública: estils, animacions, avisos, Lottie i les API de pestanyes més noves";

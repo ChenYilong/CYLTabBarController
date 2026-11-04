@@ -293,3 +293,18 @@
 "对照：启动时即有图片" = "Összevetés: kép induláskor";
 "对照：启动时即有更大的图片" = "Összevetés: nagyobb kép induláskor";
 "对照：启动时即有背景图片" = "Összevetés: háttérkép induláskor";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Koppintson a visszalépéshez vagy bezáráshoz";
+"详情" = "Részletek";
+"拍照" = "Fénykép készítése";
+"从相册选择" = "Kiválasztás albumból";
+"设置" = "Beállítások";
+"关于我们" = "Rólunk";
+"示例" = "Példa";
+"撰写" = "Írás";
+"好" = "OK";
+"编辑更多" = "Továbbiak szerkesztése";
+"新版本" = "Új verzió";
+"打开 TabBar 场景展示" = "A lapsáv-galéria megnyitása";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Minden jelenet a nyilvános API-val épített lapsáv: stílusok, animációk, emlékeztetők, Lottie és az újabb lap-API-k";

@@ -293,3 +293,18 @@
 "对照：启动时即有图片" = "Bandingkan: imej semasa pelancaran";
 "对照：启动时即有更大的图片" = "Bandingkan: imej lebih besar semasa pelancaran";
 "对照：启动时即有背景图片" = "Bandingkan: imej latar semasa pelancaran";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Ketik untuk kembali atau tutup";
+"详情" = "Butiran";
+"拍照" = "Ambil foto";
+"从相册选择" = "Pilih daripada album";
+"设置" = "Tetapan";
+"关于我们" = "Tentang kami";
+"示例" = "Contoh";
+"撰写" = "Karang";
+"好" = "OK";
+"编辑更多" = "Edit Lagi";
+"新版本" = "Versi baharu";
+"打开 TabBar 场景展示" = "Buka galeri tab bar";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Setiap babak ialah tab bar yang dibina dengan API awam: gaya, animasi, peringatan, Lottie dan API tab yang lebih baharu";

@@ -142,8 +142,8 @@
     if ([self isGallerySection:indexPath.section]) {
         UITableViewCell *galleryCell = [tableView dequeueReusableCellWithIdentifier:@"GalleryCell"] ?:
             [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"GalleryCell"];
-        galleryCell.textLabel.text = @"Open the tab bar gallery";
-        galleryCell.detailTextLabel.text = @"Every scene is a tab bar built with the public API: styles, animations, reminders, Lottie and the newer tab APIs";
+        galleryCell.textLabel.text = CYLLocalizedString(@"打开 TabBar 场景展示");
+        galleryCell.detailTextLabel.text = CYLLocalizedString(@"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API");
         [galleryCell cyl_wrapsTextLabels];
         galleryCell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         return galleryCell;
