@@ -29,6 +29,7 @@ static char CYLTabBarItemActiveIconRowKey;
 static char CYLTabBarItemAllTitlesUpdatedKey;
 static char CYLTabBarItemAllNetworkIconsKey;
 static char CYLTabBarItemAllLocalIconsKey;
+static char CYLPlusButtonInitialAttributesKey;
 
 @implementation UIViewController (CYLTabBarItemUpdate)
 
@@ -104,6 +105,7 @@ static char CYLTabBarItemAllLocalIconsKey;
         return;
     }
     [self cyl_initialTabBarItemsAttributesOfTabBarController:tabBarController];
+    [self cyl_initialPlusButtonAttributesOfTabBarController:tabBarController];
     switch (row) {
         case CYLTabBarItemUpdateRowTitle:
             [self cyl_toggleTitleOfTabViewController:tabViewController inTabBarController:tabBarController];
@@ -201,6 +203,14 @@ static char CYLTabBarItemAllLocalIconsKey;
         [attributes addObject:@{CYLTabBarItemTitle : title ?: @""}];
     }
     [tabBarController updateTabBarItemsWithAttributes:attributes];
+    // [EN] The plus button's title too. [CN] PlusButton 的标题也一并修改。
+    NSString *plusTitle = [CYLPlusButton plusButtonForOwner:tabBarController].cyl_title;
+    NSString *initialPlusTitle = [self cyl_initialPlusButtonAttributesOfTabBarController:tabBarController][CYLTabBarItemTitle];
+    if (isUpdated && initialPlusTitle) {
+        [tabBarController updatePlusButtonWithAttributes:@{ CYLTabBarItemTitle : initialPlusTitle }];
+    } else if (!isUpdated && plusTitle) {
+        [tabBarController updatePlusButtonWithAttributes:@{ CYLTabBarItemTitle : [NSString stringWithFormat:@"★ %@", plusTitle] }];
+    }
     objc_setAssociatedObject(tabBarController, &CYLTabBarItemAllTitlesUpdatedKey, (isUpdated ? nil : @YES), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
@@ -244,6 +254,19 @@ static char CYLTabBarItemAllLocalIconsKey;
     ];
 }
 
+/// [EN] The plus button's normal and selected images of `row`: from the network, or a `UIImage`.
+/// [CN] `row` 中 PlusButton 的普通与选中图片：来自网络，或 `UIImage`。
+- (NSArray *)cyl_plusButtonIconsOfAllIconsRow:(NSInteger)row {
+    if (row == CYLTabBarItemUpdateRowAllNetworkIcons) {
+        return @[ @"https://cdn-icons-png.flaticon.com/512/992/992651.png", @"https://cdn-icons-png.flaticon.com/512/1828/1828817.png" ];
+    }
+    if (@available(iOS 13.0, *)) {
+        return @[ [[UIImage systemImageNamed:@"plus.circle"] imageWithTintColor:UIColor.systemOrangeColor renderingMode:UIImageRenderingModeAlwaysOriginal],
+                  [[UIImage systemImageNamed:@"plus.circle.fill"] imageWithTintColor:UIColor.systemOrangeColor renderingMode:UIImageRenderingModeAlwaysOriginal] ];
+    }
+    return @[ @"img_tab_home_0", @"img_tab_home_1" ];
+}
+
 /*!
  * [EN] Updates the icon of every tab with the icons of `row`, network or local (`-setTabBarItemIcon:selectedIcon:size:atIndex:`);
  *      tapped again, the icons of the `tabBarItemsAttributes` given at initialization.
@@ -273,6 +296,18 @@ static char CYLTabBarItemAllLocalIconsKey;
         }
         tabIndex++;
     }
+    // [EN] The plus button's images too: the row's, or the initial ones. [CN] PlusButton 的图片也一并修改：该行的，或初始的。
+    NSDictionary *initialPlusAttributes = [self cyl_initialPlusButtonAttributesOfTabBarController:tabBarController];
+    if (isActive) {
+        NSMutableDictionary *imageAttributes = [initialPlusAttributes mutableCopy];
+        [imageAttributes removeObjectForKey:CYLTabBarItemTitle];
+        if (imageAttributes.count > 0) {
+            [tabBarController updatePlusButtonWithAttributes:imageAttributes];
+        }
+    } else {
+        NSArray *plusIcons = [self cyl_plusButtonIconsOfAllIconsRow:row];
+        [tabBarController updatePlusButtonWithAttributes:@{ CYLTabBarItemImageURL : plusIcons[0], CYLTabBarItemSelectedImageURL : plusIcons[1] }];
+    }
     // [EN] One of the two rows at a time. [CN] 两行同一时间只有一行生效。
     objc_setAssociatedObject(tabBarController, key, (isActive ? nil : @YES), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     objc_setAssociatedObject(tabBarController, otherKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -297,6 +332,22 @@ static char CYLTabBarItemAllLocalIconsKey;
         objc_setAssociatedObject(tabBarController, &CYLTabBarItemInitialAttributesKey, attributes, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     return attributes;
+}
+
+/// [EN] The plus button's title and images before the first change of these rows (`-updatePlusButtonWithAttributes:` keys).
+/// [CN] 这些行第一次修改前 PlusButton 的标题与图片（`-updatePlusButtonWithAttributes:` 的 key）。
+- (NSDictionary *)cyl_initialPlusButtonAttributesOfTabBarController:(CYLTabBarController *)tabBarController {
+    NSDictionary *attributes = objc_getAssociatedObject(tabBarController, &CYLPlusButtonInitialAttributesKey);
+    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
+    if (!attributes && plusButton) {
+        NSMutableDictionary *initialAttributes = [NSMutableDictionary dictionary];
+        initialAttributes[CYLTabBarItemTitle] = plusButton.cyl_title;
+        initialAttributes[CYLTabBarItemImage] = [plusButton imageForState:UIControlStateNormal];
+        initialAttributes[CYLTabBarItemSelectedImage] = [plusButton imageForState:UIControlStateSelected];
+        attributes = [initialAttributes copy];
+        objc_setAssociatedObject(tabBarController, &CYLPlusButtonInitialAttributesKey, attributes, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return attributes ?: @{};
 }
 
 /// The title of the `tabBarItemsAttributes` given at initialization. 初始化时传入的 `tabBarItemsAttributes` 中的标题。

@@ -1283,14 +1283,10 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
  * [CN] 添加一个子控制器
  * [EN] Add a child view controller
  *
- * [CN] @param viewController    控制器
- *  @param title             标题
- *  @param normalImageInfo   图片
- *  @param selectedImageInfo 选中图片
- * [EN] @param viewController    view controller
- *      @param title             title
- *      @param normalImageInfo   image
- *      @param selectedImageInfo selected image
+ * @param viewController    [EN] View controller. [CN] 控制器。
+ * @param title             [EN] Title. [CN] 标题。
+ * @param normalImageInfo   [EN] Image. [CN] 图片。
+ * @param selectedImageInfo [EN] Selected image. [CN] 选中图片。
  */
 - (void)addOneChildViewController:(UIViewController *)viewController
                               idx:(NSUInteger)idx
@@ -2083,6 +2079,59 @@ static void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completion)(UIImage 
     completion([icon isKindOfClass:[NSString class]] ? [UIImage cyl_imageNamed:icon] : nil);
 }
 
+/// [EN] `image` drawn at `size` with its own colors, every frame of an animated one. [CN] 按 `size` 以原图颜色绘制 `image`，动图的每一帧都绘制。
+static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
+    if (!image || size.width <= 0 || size.height <= 0 || CGSizeEqualToSize(image.size, size)) {
+        return [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+    }
+    UIImage *(^scale)(UIImage *) = ^UIImage *(UIImage *frame) {
+        CGFloat ratio = MIN(size.width / frame.size.width, size.height / frame.size.height);
+        CGSize fittedSize = CGSizeMake(frame.size.width * ratio, frame.size.height * ratio);
+        UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:fittedSize];
+        return [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            [frame drawInRect:(CGRect){CGPointZero, fittedSize}];
+        }];
+    };
+    UIImage *scaledImage = nil;
+    if (image.images.count > 1) {
+        NSMutableArray<UIImage *> *frames = [NSMutableArray arrayWithCapacity:image.images.count];
+        for (UIImage *frame in image.images) {
+            [frames addObject:scale(frame)];
+        }
+        scaledImage = [UIImage animatedImageWithImages:frames duration:image.duration];
+    } else {
+        scaledImage = scale(image);
+    }
+    return [scaledImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+}
+
+- (BOOL)updatePlusButtonWithAttributes:(NSDictionary<NSString *, id> *)attributes {
+    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    if (!plusButton || attributes.count == 0) {
+        return NO;
+    }
+    NSString *title = attributes[CYLTabBarItemTitle];
+    if (title) {
+        [plusButton cyl_updateTitle:title image:nil selectedImage:nil];
+    }
+    id icon = attributes[CYLTabBarItemImageURL] ?: attributes[CYLTabBarItemImage];
+    id selectedIcon = attributes[CYLTabBarItemSelectedImageURL] ?: attributes[CYLTabBarItemSelectedImage];
+    NSValue *sizeValue = attributes[CYLTabBarItemImageURLSize];
+    CGSize size = [sizeValue isKindOfClass:[NSValue class]] ? sizeValue.CGSizeValue : [plusButton imageForState:UIControlStateNormal].size;
+    __weak CYLPlusButton *weakPlusButton = plusButton;
+    if (icon) {
+        CYLLoadTabBarItemIcon(icon, ^(UIImage *image) {
+            [weakPlusButton cyl_updateTitle:nil image:CYLImageScaledToSize(image, size) selectedImage:nil];
+        });
+    }
+    if (selectedIcon) {
+        CYLLoadTabBarItemIcon(selectedIcon, ^(UIImage *image) {
+            [weakPlusButton cyl_updateTitle:nil image:nil selectedImage:CYLImageScaledToSize(image, size)];
+        });
+    }
+    return YES;
+}
+
 - (BOOL)setTabBarItemIcon:(id)icon selectedIcon:(id)selectedIcon size:(CGSize)size atIndex:(NSUInteger)index {
     if (index >= _viewControllers.count || !icon) {
         return NO;
@@ -2735,14 +2784,10 @@ static void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completion)(UIImage 
  * [CN] 添加一个子控制器
  * [EN] Add a child view controller
  *
- * [CN] @param viewController    控制器
- *  @param title             标题
- *  @param normalImageInfo   图片
- *  @param selectedImageInfo 选中图片
- * [EN] @param viewController    view controller
- *      @param title             title
- *      @param normalImageInfo   image
- *      @param selectedImageInfo selected image
+ * @param viewController    [EN] View controller. [CN] 控制器。
+ * @param title             [EN] Title. [CN] 标题。
+ * @param normalImageInfo   [EN] Image. [CN] 图片。
+ * @param selectedImageInfo [EN] Selected image. [CN] 选中图片。
  */
 - (void)addOneChildViewController:(UIViewController *)viewController
                         WithTitle:(NSString *)title

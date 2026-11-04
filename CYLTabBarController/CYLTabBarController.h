@@ -794,6 +794,22 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
                   atIndex:(NSUInteger)index;
 
 /*!
+ * FIX: issue #601
+ * [EN] `-updateTabBarItemAtIndex:attributes:` for the plus button, in place, in every style: `CYLTabBarItemTitle`;
+ *      `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` and `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL`
+ *      (the URL keys win), each any source `-setTabBarItemIcon:selectedIcon:size:atIndex:` takes: a `UIImage`, an image
+ *      name, a file path, an `NSURL` or an `http(s)` string, downloaded and cached when remote. The images are scaled to
+ *      `CYLTabBarItemImageURLSize`, else to the plus button's current image size. See `-[CYLPlusButton cyl_updateTitle:image:selectedImage:]`.
+ * [CN] 适用于 PlusButton 的 `-updateTabBarItemAtIndex:attributes:`，原地更新，适用于所有样式：`CYLTabBarItemTitle`；
+ *      `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` 与 `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL`（URL 键优先），
+ *      均支持 `-setTabBarItemIcon:selectedIcon:size:atIndex:` 的所有来源：`UIImage`、图片名、文件路径、`NSURL` 或 `http(s)` 字符串，
+ *      网络图片会下载并缓存。图片缩放到 `CYLTabBarItemImageURLSize`，未设置时缩放到 PlusButton 当前图片的尺寸。见
+ *      `-[CYLPlusButton cyl_updateTitle:image:selectedImage:]`。
+ * @return [EN] NO without a plus button. [CN] 没有 PlusButton 时返回 NO。
+ */
+- (BOOL)updatePlusButtonWithAttributes:(NSDictionary<NSString *, id> *)attributes;
+
+/*!
  * [EN] Returns the visible tab bar size (see `-[UITabBar cyl_boundsSize]`).
  * [CN] 返回 TabBar 的可见尺寸（见 -[UITabBar cyl_boundsSize]）。
  */
