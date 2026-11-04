@@ -46,6 +46,12 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
 
 @interface CYLTabBar () <UIGestureRecognizerDelegate>
 
+/// [EN] YES between `-beginCustomizingItems:` and `-endCustomizingAnimated:` (More editing). Unlike `isCustomizing`, it is
+///      already NO while UIKit animates the end of editing, so the layout requested then installs the views again.
+/// [CN] 在 `-beginCustomizingItems:` 与 `-endCustomizingAnimated:` 之间为 YES（「More」编辑）。与 `isCustomizing` 不同，UIKit 播放结束
+///      编辑的动画时它已是 NO，因此此时请求的布局会重新安装这些视图。
+@property (nonatomic, assign) BOOL cyl_isCustomizingItems;
+
 @property (nonatomic, strong) NSMutableSet<UIView *> *observedViews;
 /// Whether the last layout found the tab buttons in the iOS 27.1 vertical bar, see `-cyl_refreshTabButtonsAfterVerticalBar`.
 @property (nonatomic, assign) BOOL cyl_wasShowingVerticalBar;
@@ -327,7 +333,12 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
     //      now rather than after a fixed delay. Idempotent; does nothing without Liquid Glass or a plus button.
     // [CN] 液态玻璃的选中层可能只在 TabBar 的布局中出现：此时就放入 PlusButton 的替身，而不是固定延迟之后。可重复调用；没有液态玻璃
     //      或 PlusButton 时不做任何事。
-    [self.tabBarController cyl_layOutPlusButtonInLiquidGlassLayers];
+    // [EN] Only for the controller that owns this tab bar: `-tabBarController` can fall back to another controller.
+    // [CN] 只针对拥有本 TabBar 的控制器：`-tabBarController` 可能回退到其他控制器。
+    CYLTabBarController *owningTabBarController = self.tabBarController;
+    if (owningTabBarController.cyl_tabBar == self) {
+        [owningTabBarController cyl_layOutPlusButtonInLiquidGlassLayers];
+    }
 }
 
 #pragma mark - More editing
@@ -343,14 +354,21 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
  *      新按钮。本库并不支持「More」编辑本身，这里只是避免它留下残留视图。
  */
 - (void)beginCustomizingItems:(NSArray<UITabBarItem *> *)items {
+    self.cyl_isCustomizingItems = YES;
     [self cyl_setInsertedViewsHiddenForCustomizing:YES];
     [super beginCustomizingItems:items];
 }
 
 - (BOOL)endCustomizingAnimated:(BOOL)animated {
     BOOL changed = [super endCustomizingAnimated:animated];
+    self.cyl_isCustomizingItems = NO;
     [self cyl_setInsertedViewsHiddenForCustomizing:NO];
     [self setNeedsLayout];
+    // [EN] Again after UIKit's end-of-editing pass, which can rebuild the buttons. [CN] UIKit 结束编辑的处理可能重建按钮，之后再布局一次。
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf setNeedsLayout];
+    });
     return changed;
 }
 
@@ -359,12 +377,12 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
 - (void)cyl_setInsertedViewsHiddenForCustomizing:(BOOL)hidden {
     NSMutableArray<UIView *> *views = [NSMutableArray array];
     for (UIView *view in [UIView cyl_insertedTabControlViews]) {
-        if ([view isDescendantOfView:self] || (!hidden && objc_getAssociatedObject(view, CYLHiddenBeforeCustomizingKey))) {
+        if ([view isDescendantOfView:self]) {
             [views addObject:view];
         }
     }
     UIView *plusButton = [CYLPlusButton plusButtonForOwner:self];
-    if (plusButton && ([plusButton isDescendantOfView:self] || objc_getAssociatedObject(plusButton, CYLHiddenBeforeCustomizingKey))) {
+    if ([plusButton isDescendantOfView:self]) {
         [views addObject:plusButton];
     }
     for (UIView *view in views) {

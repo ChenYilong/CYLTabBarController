@@ -395,13 +395,18 @@ static NSString *const CYLImageOnlyTabOriginalTitleKey = @"title";
 static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 
 
+/// [EN] Implemented in CYLTabBar.m: YES during More editing. [CN] 在 CYLTabBar.m 中实现：「More」编辑期间为 YES。
+@interface CYLTabBar (CYLCustomizingItems)
+@property (nonatomic, assign, readonly) BOOL cyl_isCustomizingItems;
+@end
+
 /*!
  * [EN] The object at `index`, or nil when `array` is nil or `index` is out of range. Used instead of `@try` / `@catch`
  *      around subscripts (under ARC an exception can leak).
  * [CN] 返回 `index` 处的对象；`array` 为 nil 或 `index` 越界时返回 nil。用来代替下标外的 `@try` / `@catch`（ARC 下抛出异常可能泄漏内存）。
  */
-static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSInteger index) {
-    return (array && index >= 0 && (NSUInteger)index < array.count) ? array[(NSUInteger)index] : nil;
+static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUInteger index) {
+    return index < array.count ? array[index] : nil;
 }
 
 @implementation CYLTabBarController {
@@ -920,12 +925,13 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
 /// [EN] `isRetry`: the fallback run, which acts without waiting for readiness and schedules nothing more, as the old
 ///      delayed block did. [CN] `isRetry`：兜底执行，与原来延迟执行的 block 一样，不再等待就绪，也不再安排新的重试。
 - (void)cyl_layOutPlusButtonInLiquidGlassLayersIsRetry:(BOOL)isRetry {
-    if (![CYLConstants isLiquidGlassActive] || ![self hasPlusButton] || ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType || ![CYLConstants isLiquidGlassActive] || ![self hasPlusButton] ||
+        ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
     }
     // [EN] More editing: the views are hidden until it ends (`-[CYLTabBar endCustomizingAnimated:]`).
     // [CN] 「More」编辑期间这些视图保持隐藏，直到编辑结束（`-[CYLTabBar endCustomizingAnimated:]`）。
-    if (((CYLTabBar *)self.cyl_tabBar).isCustomizing) {
+    if (((CYLTabBar *)self.cyl_tabBar).cyl_isCustomizingItems) {
         return;
     }
     // [EN] Re-entrancy guard: adding the stand-in can lay views out again. [CN] 防止重入：添加替身可能再次触发布局。
@@ -952,6 +958,12 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
         if (selectedCover.superview && selectedCover.cyl_insertedForTabControl != plusSelectedControl) {
             [selectedCover removeFromSuperview];
         }
+        // [EN] Already in this button: nothing to do (this runs on every layout pass, so nothing is queued again).
+        // [CN] 已在当前按钮中：无需处理（每次布局都会执行，因此不再重复排队）。
+        if (!isRetry && selectedCover.superview == plusSelectedControl && selectedCover.cyl_insertedForTabControl == plusSelectedControl) {
+            objc_setAssociatedObject(self, CYLLayingOutPlusButtonInGlassLayersKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            return;
+        }
         /*!
          * [CN] 我要求 selectedCover 的中心坐标 强制与 CYLExternPlusButton坐标一致。 坐标系转换
          * [EN] Force the center of selectedCover to match the CYLExternPlusButton position. Converts between
@@ -972,12 +984,12 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
             }
         };
         if ([contextPlusButton cyl_showsTitleInTabBarItem]) {
-            // FIX: issue #636 — the tab item shows the plus button's title (`-cyl_showsTitleInTabBarItem`): as the
-            // plus button does in the normal layer, its stand-in replaces only the tab icon, and the tab's title
-            // and the rest of the tab button stay as the system lays them out. Covering the whole tab button hid
-            // all its other subviews, the title's container included, so the title stayed hidden.
-            // TabBarItem 显示 PlusButton 的标题：与普通图层中的 PlusButton 一样，替身只替换 Tab 图标，Tab 的标题及按钮的
-            // 其他子视图保持系统布局。覆盖整个 Tab 按钮会隐藏它的其他全部子视图（包括标题的容器），标题因此一直不显示。
+            // [EN] FIX: issue #636 — the tab item shows the plus button's title (`-cyl_showsTitleInTabBarItem`): as the
+            //      plus button does in the normal layer, its stand-in replaces only the tab icon, and the tab's title
+            //      and the rest of the tab button stay as the system lays them out. Covering the whole tab button hid
+            //      all its other subviews, the title's container included, so the title stayed hidden.
+            // [CN] TabBarItem 显示 PlusButton 的标题：与普通图层中的 PlusButton 一样，替身只替换 Tab 图标，Tab 的标题及按钮的
+            //      其他子视图保持系统布局。覆盖整个 Tab 按钮会隐藏它的其他全部子视图（包括标题的容器），标题因此一直不显示。
             if (isRetry || plusSelectedControl.cyl_isReady) {
                 [plusSelectedControl cyl_replaceTabImageViewWithNewView:selectedCover
                                                                  offset:UIOffsetZero

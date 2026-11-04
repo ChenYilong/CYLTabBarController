@@ -30,8 +30,8 @@
  * [CN] 返回 `index` 处的对象；`array` 为 nil 或 `index` 越界（负数、`NSNotFound` 或过大）时返回 nil。用来代替下标外的
  *      `@try` / `@catch`：ARC 下抛出异常可能泄漏内存，而包住多次读取的 `@try` 会在第一次抛出后跳过其余全部读取。
  */
-static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSInteger index) {
-    return (array && index >= 0 && (NSUInteger)index < array.count) ? array[(NSUInteger)index] : nil;
+static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUInteger index) {
+    return index < array.count ? array[index] : nil;
 }
 
 @implementation CYLTabBar (CYLTabBarControllerExtention)
@@ -350,11 +350,17 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSInteger
     UIControl *selectedControl = objc_getAssociatedObject(self, @selector(cyl_selectedControl));
     if (!selectedControl) {
         // [EN] Each candidate is read with a bounds check: the old `@try` around `[0]` jumped to `@catch` on the first empty
-        //      array, so the fallbacks after it never ran and this returned nil.
+        //      array, so the fallbacks after it never ran and this returned nil. Only controls count: the first subview of a
+        //      tab bar that is not Liquid Glass can be a background view.
         // [CN] 每个候选都先检查下标再读取：原来 `[0]` 外的 `@try` 在第一个空数组处就跳到 `@catch`，后面的备选从未执行，结果返回 nil。
-        selectedControl = CYLObjectAtIndex(self.cyl_platterSelectedContentViews, 0)
-                          ?: CYLObjectAtIndex(self.cyl_platterContentViews, 0)
-                          ?: CYLObjectAtIndex(self.cyl_visibleControls, 0);
+        //      只接受控件：非液态玻璃 TabBar 的第一个子视图可能是背景视图。
+        for (NSArray *candidates in @[ self.cyl_platterSelectedContentViews ?: @[], self.cyl_platterContentViews ?: @[], self.cyl_visibleControls ?: @[] ]) {
+            id candidate = CYLObjectAtIndex(candidates, 0);
+            if ([candidate isKindOfClass:[UIControl class]]) {
+                selectedControl = candidate;
+                break;
+            }
+        }
     }
     return selectedControl;
 }
