@@ -277,3 +277,6 @@
 "轻触感反馈" = "Enyhe haptikus visszajelzés";
 "重触感反馈" = "Erős haptikus visszajelzés";
 "长按（#152）" = "Hosszú nyomás (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Koppints";
