@@ -226,6 +226,8 @@ static void CYLRegisterDarkLottieURLFromAttributes(NSURL *lottieURL, NSDictionar
     if (!darkLottieURL && !darkColors && ![CYLConstants cyl_hasDarkLottieForLottieURL:lottieURL]) {
         return;
     }
+    // [EN] The dark version is played by the same library as the light one. [CN] 深色版本与浅色版本由同一个动画库播放。
+    [CYLTabBarItemAnimationGetService() bindAnimationURL:darkLottieURL toAttributes:attributes];
     [CYLConstants cyl_registerDarkLottieURL:darkLottieURL forLottieURL:lottieURL];
     [CYLConstants cyl_registerLottieDarkColors:darkColors forLottieURL:lottieURL];
 }
@@ -1463,6 +1465,9 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
                 if (!lottieURL) {
                     lottieURL = [CYLConstants cyl_getURLFromString:lottieFilePath];
                 }
+                // [EN] The library is chosen by the tab's keys (e.g. `CYLTabBarRiveURL`), not by the file's extension.
+                // [CN] 由 Tab 的 key（例如 `CYLTabBarRiveURL`）选择动画库，而不是由文件扩展名决定。
+                [CYLTabBarItemAnimationGetService() bindAnimationURL:lottieURL toAttributes:_tabBarItemsAttributes[idx]];
                         
                 CYLRegisterDarkLottieURLFromAttributes(lottieURL, _tabBarItemsAttributes[idx]);
                 lottieSizeValue = CYLTabBarItemAttributesAnimationValue(_tabBarItemsAttributes[idx], CYLTabBarAnimationSize);
@@ -2966,6 +2971,9 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
                     if (!lottieURL) {
                         lottieURL = [CYLConstants cyl_getURLFromString:lottieFilePath];
                     }
+                    // [EN] The library is chosen by the tab's keys, not by the file's extension.
+                    // [CN] 由 Tab 的 key 选择动画库，而不是由文件扩展名决定。
+                    [CYLTabBarItemAnimationGetService() bindAnimationURL:lottieURL toAttributes:_tabBarItemsAttributes[idx]];
                 
                     CYLRegisterDarkLottieURLFromAttributes(lottieURL, _tabBarItemsAttributes[idx]);
                     lottieSizeValue = CYLTabBarItemAttributesAnimationValue(_tabBarItemsAttributes[idx], CYLTabBarAnimationSize);

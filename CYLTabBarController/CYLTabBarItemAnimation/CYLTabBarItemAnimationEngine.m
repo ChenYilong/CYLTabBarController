@@ -142,8 +142,11 @@ static void CYLApplyTabBarItemAnimationDarkColors(UIView *animationView, UITrait
 }
 
 - (void)addAnimationWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode toControl:(UIControl *)control {
-    // A local file that exists, as before. 与原来一样：必须是存在的本地文件。
-    NSURL *animationURL = [CYLConstants cyl_getURLFromString:URL.path];
+    // [EN] A local file that exists, as before, kept as given: its fragment holds a library's options (e.g. Rive's
+    //      artboard), and the URL is the key of its Dark Mode version and of its library binding.
+    // [CN] 与原来一样：必须是存在的本地文件，并保持原样：其 fragment 中保存动画库的选项（例如 Rive 的画板），且该 URL 是其深色模式版本与
+    //      动画库绑定的 key。
+    NSURL *animationURL = ([URL isKindOfClass:[NSURL class]] && URL.isFileURL && [CYLConstants cyl_getURLFromString:URL.path]) ? URL : nil;
     if (!animationURL || !control || [control cyl_isPlusControl]) {
         return;
     }
@@ -302,8 +305,12 @@ static void CYLApplyTabBarItemAnimationDarkColors(UIView *animationView, UITrait
 
 #pragma mark - Attributes
 
-- (NSArray<NSString *> *)attributeKeysForGenericKey:(NSString *)genericKey {
-    return [CYLTabBarItemAnimatorRegistry attributeKeysForGenericKey:genericKey];
+- (NSString *)attributeKeyForGenericKey:(NSString *)genericKey inAttributes:(NSDictionary *)attributes {
+    return [CYLTabBarItemAnimatorRegistry attributeKeyForGenericKey:genericKey inAttributes:attributes];
+}
+
+- (void)bindAnimationURL:(NSURL *)URL toAttributes:(NSDictionary *)attributes {
+    [CYLTabBarItemAnimatorRegistry bindURL:URL toAnimator:[CYLTabBarItemAnimatorRegistry animatorForAttributes:attributes]];
 }
 
 - (NSArray<NSString *> *)animationFileExtensions {

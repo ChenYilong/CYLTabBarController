@@ -1,0 +1,33 @@
+# Runs the tab bar item animation tests (Tests/CYLTabBarItemAnimation): several animation libraries registered at once,
+# each tab configured with one of them, with the real registry, view animator and Core functions.
+# Run them locally on a Mac with: Tests/CYLTabBarItemAnimation/run.sh
+name: Animation tests
+
+on:
+  pull_request:
+    paths:
+      - "CYLTabBarController/CYLTabBarItemAnimation/**"
+      - "CYLTabBarController/CYLTabBarItemAnimationService.h"
+      - "CYLTabBarController/UIControl+CYLTabBarItemAnimation.m"
+      - "CYLTabBarController/CYLTabBarController.m"
+      - "Tests/CYLTabBarItemAnimation/**"
+      - ".github/workflows/animation-tests.yml"
+  push:
+    branches: [master]
+    paths:
+      - "CYLTabBarController/CYLTabBarItemAnimation/**"
+      - "CYLTabBarController/CYLTabBarItemAnimationService.h"
+      - "CYLTabBarController/UIControl+CYLTabBarItemAnimation.m"
+      - "CYLTabBarController/CYLTabBarController.m"
+      - "Tests/CYLTabBarItemAnimation/**"
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the animation tests
+        run: Tests/CYLTabBarItemAnimation/run.sh

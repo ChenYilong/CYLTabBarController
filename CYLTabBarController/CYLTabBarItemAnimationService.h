@@ -61,11 +61,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stopAnimationInControl:(UIControl *)control;
 
 /*!
- * [EN] The keys of the libraries in the build that stand for a generic key (`CYLTabBarAnimationURL`…), e.g.
- *      `CYLTabBarLottieURL` and `CYLTabBarPAGURL`, in lookup order.
- * [CN] 构建中各动画库与某个通用 key（`CYLTabBarAnimationURL`…）对应的 key，例如 `CYLTabBarLottieURL`、`CYLTabBarPAGURL`，按查找顺序排列。
+ * [EN] The key that stands for `genericKey` (`CYLTabBarAnimationURL`…) in the library `attributes` choose by their keys
+ *      (e.g. `CYLTabBarRiveURL` when the tab uses Rive's keys); nil when it uses only generic keys.
+ * [CN] `attributes` 通过 key 选择的动画库中与 `genericKey`（`CYLTabBarAnimationURL`…）对应的 key（例如 Tab 使用 Rive 的 key 时为
+ *      `CYLTabBarRiveURL`）；只使用通用 key 时为 nil。
  */
-- (NSArray<NSString *> *)attributeKeysForGenericKey:(NSString *)genericKey;
+- (nullable NSString *)attributeKeyForGenericKey:(NSString *)genericKey inAttributes:(NSDictionary *)attributes;
+
+/*!
+ * [EN] Remembers that `URL` (a tab's file, or its dark version) is played by the library `attributes` choose by their
+ *      keys, whatever its extension; with generic keys only, the file decides.
+ * [CN] 记录 `URL`（Tab 的文件或其深色版本）由 `attributes` 通过 key 选择的动画库播放，与扩展名无关；只使用通用 key 时由文件决定。
+ */
+- (void)bindAnimationURL:(NSURL *)URL toAttributes:(NSDictionary *)attributes;
 
 /// [EN] The file extensions the libraries in the build play, in lookup order. [CN] 构建中各动画库能播放的文件扩展名，按查找顺序排列。
 - (NSArray<NSString *> *)animationFileExtensions;
@@ -85,10 +93,10 @@ static inline BOOL CYLTabBarItemAnimationIsAvailable(void) {
 
 /*!
  * [EN] The value of a generic animation key (`CYLTabBarAnimationURL`…) in a tab's attributes: the generic key first, then
- *      the keys of the libraries in the build (`CYLTabBarLottieURL`, `CYLTabBarPAGURL`…). Core reads tab attributes only
- *      through this, so a new library needs no change in Core.
- * [CN] Tab 属性中某个通用动画 key（`CYLTabBarAnimationURL`…）的值：先取通用 key，再取构建中各动画库的 key（`CYLTabBarLottieURL`、
- *      `CYLTabBarPAGURL`…）。Core 只通过它读取 Tab 属性，因此新增动画库时无需修改 Core。
+ *      the key of the one library the tab's keys choose (e.g. `CYLTabBarRiveURL`), never another library's. Core reads tab
+ *      attributes only through this, so a new library needs no change in Core.
+ * [CN] Tab 属性中某个通用动画 key（`CYLTabBarAnimationURL`…）的值：先取通用 key，再取 Tab 的 key 所选择的那一个动画库的 key（例如
+ *      `CYLTabBarRiveURL`），不会取其他动画库的 key。Core 只通过它读取 Tab 属性，因此新增动画库时无需修改 Core。
  */
 FOUNDATION_EXTERN id _Nullable CYLTabBarItemAttributesAnimationValue(NSDictionary * _Nullable attributes, NSString *genericKey);
 

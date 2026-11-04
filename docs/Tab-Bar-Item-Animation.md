@@ -31,6 +31,7 @@
 | 中文 | English |
 |:---|:---|
 | [如何选择子库](#cn如何选择子库) | [Which subspec to use](#enwhich-subspec-to-use) |
+| [注册与选择动画库](#cn注册与选择动画库) | [Registering and choosing a library](#enregistering-and-choosing-a-library) |
 | [两层依赖反转](#cn两层依赖反转) | [Dependency inversion on two levels](#endependency-inversion-on-two-levels) |
 | [协议与类](#cn协议与类) | [Protocols and classes](#enprotocols-and-classes) |
 | [新增一个动画库](#cn新增一个动画库) | [Adding an animation library](#enadding-an-animation-library) |
@@ -59,6 +60,27 @@ pod 'CYLTabBarController/Rive'
 | 中文 | English |
 |:---|:---|
 | `Lottie`、`LottieObjectiveC`、`LottieSwift`、`CYLFlatDesignTabBar`（依赖 `LottieSwift`）、`PAG`、`PAGEnterprise`、`Rive` 都依赖 `CYLTabBarItemAnimation`，现有 Podfile 无需修改。同一个 TabBar 中可以混用不同动画库的 Tab，也可以只让部分 Tab 有动画，见 [Per-Tab-Animation.md](Per-Tab-Animation.md)。 | `Lottie`, `LottieObjectiveC`, `LottieSwift`, `CYLFlatDesignTabBar` (through `LottieSwift`), `PAG`, `PAGEnterprise` and `Rive` depend on `CYLTabBarItemAnimation`, so existing Podfiles need no change. One tab bar can mix tabs of different libraries, and animate only some tabs, see [Per-Tab-Animation.md](Per-Tab-Animation.md). |
+
+## [CN]注册与选择动画库
+## [EN]Registering and choosing a library
+
+| 中文 | English |
+|:---|:---|
+| **注册：pod 引入即自动注册。** 与 PlusButton 的注册表（`+registerPlusButton`，每个 context 一条记录，TabBarController 只取自己的那条）相同，每个动画库的子库在 `+load` 中向 `CYLTabBarItemAnimatorRegistry` 注册一个 animator，无需任何代码；同时引入多个动画库时，它们同时注册、互不覆盖（同名 animator 才会替换）。注册本身没有任何副作用（不 hook、不创建渲染器），因此不需要像 FlatDesign 的 `+cyl_navigationBarActionHook` 那样延迟到使用时才执行；动画库真正的工作（加载文件、创建 Rive 的 `Worker` 等）只在某个 Tab 使用它时才发生。 | **Registration: a pod registers itself when it is installed.** As with the plus button's registry (`+registerPlusButton`, one entry per context, each tab bar controller takes only its own), each animation subspec registers an animator with `CYLTabBarItemAnimatorRegistry` in `+load`, with no code needed; several libraries installed together register side by side without replacing each other (only an animator with the same identifier replaces one). Registering has no side effect (no hook, no renderer is created), so it does not need to wait until the feature is used, as FlatDesign's `+cyl_navigationBarActionHook` does; a library's real work (loading files, creating Rive's `Worker`…) happens only when a tab uses it. |
+| **选择：由 Tab 属性中有值的 key 决定。** `-initWithViewControllers:tabBarItemsAttributes:` 中每个 Tab 的属性决定该 Tab 使用哪个动画库：某个动画库自己的 key 有值（例如 `CYLTabBarRiveURL`）时，该 Tab 只由这个动画库播放（`+animatorForAttributes:`），与文件扩展名无关（例如 CDN 上没有扩展名的 Rive 文件），并且该 Tab 的尺寸、深色版本等其他值也只从这个动画库的 key（以及通用 key）中读取，不会混用其他动画库的 key。只使用通用 key（`CYLTabBarAnimation…`）时，由文件扩展名决定（".riv" Rive、".pag" PAG，其他文件 Lottie）。 | **Choosing: the keys with a value in a tab's attributes decide.** Each tab's attributes in `-initWithViewControllers:tabBarItemsAttributes:` decide which library plays it: when one library's own key has a value (e.g. `CYLTabBarRiveURL`), the tab is played by that library only (`+animatorForAttributes:`), whatever the file's extension (e.g. a Rive file on a CDN without one), and the tab's other values, its size, dark version…, are read only from that library's keys (and the generic keys), never from another library's. With only the generic keys (`CYLTabBarAnimation…`), the file's extension decides (".riv" Rive, ".pag" PAG, any other file Lottie). |
+| **多个动画库同时存在、只使用其中一个**：没有被任何 Tab 使用的动画库不会参与播放；某个动画库的 key 在其子库未引入时被忽略（Tab 显示图片），不会交给其他动画库；同一个 Tab 同时设置了多个动画库的 key 时，按查找顺序使用第一个（DEBUG 下打印提示）。所有动画库代码都在各自子库的 `__has_include` 之内，Core 与 FlatDesign 中没有任何针对某个动画库的编译开关，因此不会因为多引入一个动画库而改变其他 Tab 的行为。这些情况都由 `Tests/CYLTabBarItemAnimation` 中的测试覆盖（GitHub Actions「Animation tests」在 macOS 上运行）。 | **Several libraries installed, one used**: a library no tab uses plays nothing; a library's keys are ignored when its subspec is not installed (the tab shows its images) and are not handed to another library; a tab with the keys of several libraries uses the first in lookup order (logged in DEBUG). Every library's code is inside its own subspec's `__has_include`, and Core and FlatDesign have no compile-time switch for any library, so installing one more library does not change how the other tabs behave. The tests in `Tests/CYLTabBarItemAnimation` cover these cases (the "Animation tests" GitHub Actions workflow runs them on macOS). |
+
+```mermaid
+flowchart LR
+    pods["pod 'CYLTabBarController/LottieSwift'<br/>pod 'CYLTabBarController/PAG'<br/>pod 'CYLTabBarController/Rive'"] -- "+load: registerAnimator:" --> registry["CYLTabBarItemAnimatorRegistry<br/>Lottie · PAG · Rive"]
+    attrs["tabBarItemsAttributes[i]"] --> choose{"a library's own key<br/>has a value?"}
+    choose -- "CYLTabBarRiveURL" --> rive["Rive (bound to the tab's URL)"]
+    choose -- "CYLTabBarPAGURL" --> pag["PAG"]
+    choose -- "CYLTabBarLottieURL" --> lottie["Lottie"]
+    choose -- "only CYLTabBarAnimation… keys" --> ext{"file extension"}
+    ext -- ".riv / .pag / other" --> registry
+    registry -.-> rive & pag & lottie
+```
 
 ## [CN]两层依赖反转
 ## [EN]Dependency inversion on two levels

@@ -75,7 +75,7 @@ pod 'CYLTabBarController/PAGEnterprise'    # libpag-enterprise: audio, 3D, movie
 
 | 中文 | English |
 |:---|:---|
-| 同一个 Tab 请使用 Lottie key 或 PAG key 之一；两者都设置时以 Lottie 为准。不同的 Tab 可以分别使用 Lottie 和 PAG（需同时引入两个子库）。 | Use either the Lottie keys or the PAG keys for a tab; with both, Lottie wins. Different tabs can use Lottie and PAG (with both subspecs installed). |
+| 同一个 Tab 请使用 Lottie key 或 PAG key 之一；有值的 key 决定使用哪个动画库，见 [注册与选择动画库](Tab-Bar-Item-Animation.md#cn注册与选择动画库)。不同的 Tab 可以分别使用 Lottie 和 PAG（需同时引入两个子库）。 | Use either the Lottie keys or the PAG keys for a tab; the keys with a value decide which library plays it, see [Registering and choosing a library](Tab-Bar-Item-Animation.md#enregistering-and-choosing-a-library). Different tabs can use Lottie and PAG (with both subspecs installed). |
 
 ## [CN]各项关系
 ## [EN]How the pieces relate

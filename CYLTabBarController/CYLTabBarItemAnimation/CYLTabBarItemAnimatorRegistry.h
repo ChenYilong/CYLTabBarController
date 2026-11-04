@@ -49,8 +49,41 @@ NS_ASSUME_NONNULL_BEGIN
 /// [EN] The animator with `identifier`, or nil. [CN] 名称为 `identifier` 的 animator；没有时为 nil。
 + (nullable id<CYLTabBarItemAnimator>)animatorWithIdentifier:(NSString *)identifier;
 
-/// [EN] The first animator, in lookup order, that plays the file at `URL`. [CN] 按查找顺序第一个能播放 `URL` 文件的 animator。
+/*!
+ * [EN] The animator that plays the file at `URL`: the one bound to it by a tab's keys (`+bindURL:toAnimator:`), else the
+ *      first one, in lookup order, that plays the file (by its extension; Lottie takes every other file).
+ * [CN] 播放 `URL` 文件的 animator：Tab 的 key 为其绑定的 animator（`+bindURL:toAnimator:`）；否则为按查找顺序第一个能播放该文件的 animator
+ *      （按扩展名；其他文件都由 Lottie 接收）。
+ */
 + (nullable id<CYLTabBarItemAnimator>)animatorForURL:(nullable NSURL *)URL;
+
+/*!
+ * [EN] The library a tab's attributes choose by their keys: the first animator, in lookup order, whose own key (one of its
+ *      `attributeKeys`, e.g. `CYLTabBarRiveURL`) has a value. nil when the tab uses only the generic keys
+ *      (`CYLTabBarAnimation…`), or none: its file then decides (`+animatorForURL:`). So several libraries can be
+ *      registered at once (each pod registers itself), and a tab configured with one library's keys is played by that
+ *      library only; a tab with the keys of several libraries uses the first (logged in DEBUG).
+ * [CN] Tab 属性通过 key 选择的动画库：按查找顺序，第一个自己的 key（其 `attributeKeys` 之一，例如 `CYLTabBarRiveURL`）有值的 animator。
+ *      Tab 只使用通用 key（`CYLTabBarAnimation…`）或没有动画时返回 nil，此时由文件决定（`+animatorForURL:`）。因此可以同时注册多个动画库
+ *      （每个 pod 自行注册），使用某个动画库 key 配置的 Tab 只由该动画库播放；同时使用多个动画库 key 的 Tab 使用第一个（DEBUG 下打印提示）。
+ */
++ (nullable id<CYLTabBarItemAnimator>)animatorForAttributes:(nullable NSDictionary *)attributes;
+
+/*!
+ * [EN] `animator`'s own key for `genericKey`, when `attributes` choose `animator` (`+animatorForAttributes:`); nil
+ *      otherwise. A tab's values are read only from the generic keys and the chosen library's keys, never mixed across
+ *      libraries.
+ * [CN] `attributes` 选择了某个 animator（`+animatorForAttributes:`）时，该 animator 与 `genericKey` 对应的 key；否则为 nil。Tab 的值只从通用 key
+ *      与所选动画库的 key 中读取，不会混用不同动画库的 key。
+ */
++ (nullable NSString *)attributeKeyForGenericKey:(NSString *)genericKey inAttributes:(nullable NSDictionary *)attributes;
+
+/*!
+ * [EN] Plays `URL` with `animator` whatever its file extension, because a tab gave it under that library's key; nil
+ *      removes the binding (the file decides again).
+ * [CN] 无论文件扩展名如何，都用 `animator` 播放 `URL`，因为 Tab 是通过该动画库的 key 提供它的；nil 移除绑定（重新由文件决定）。
+ */
++ (void)bindURL:(NSURL *)URL toAnimator:(nullable id<CYLTabBarItemAnimator>)animator;
 
 /// [EN] Every animator's key for `genericKey`, in lookup order (`-attributeKeys`). [CN] 各 animator 与 `genericKey` 对应的 key，按查找顺序（`-attributeKeys`）。
 + (NSArray<NSString *> *)attributeKeysForGenericKey:(NSString *)genericKey;

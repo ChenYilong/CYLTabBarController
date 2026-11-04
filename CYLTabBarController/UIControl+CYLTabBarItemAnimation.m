@@ -38,15 +38,10 @@ id CYLTabBarItemAttributesAnimationValue(NSDictionary *attributes, NSString *gen
     if (value) {
         return value;
     }
-    // [EN] The keys of the libraries in the build, e.g. `CYLTabBarLottieURL`, `CYLTabBarPAGURL`.
-    // [CN] 构建中各动画库的 key，例如 `CYLTabBarLottieURL`、`CYLTabBarPAGURL`。
-    for (NSString *key in [CYLTabBarItemAnimationGetService() attributeKeysForGenericKey:genericKey]) {
-        value = attributes[key];
-        if (value) {
-            return value;
-        }
-    }
-    return nil;
+    // [EN] The key of the library the tab's keys choose, e.g. `CYLTabBarRiveURL`; never another library's key.
+    // [CN] Tab 的 key 所选择的动画库的 key，例如 `CYLTabBarRiveURL`；不会取其他动画库的 key。
+    NSString *key = [CYLTabBarItemAnimationGetService() attributeKeyForGenericKey:genericKey inAttributes:attributes];
+    return key ? attributes[key] : nil;
 }
 
 #pragma mark - Categories
