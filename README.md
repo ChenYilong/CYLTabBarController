@@ -248,6 +248,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [FlatDesign × UITabBarAppearance](docs/FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](docs/FlatDesign-StandardAppearance.md) |
 | [纯图标 Tab 的自动居中](docs/Image-Only-Tabs.md) | [Automatic centering of image-only tabs](docs/Image-Only-Tabs.md) |
 | [需要登录的 Tab](docs/Login-Required-Tabs.md) | [Tabs That Need Login](docs/Login-Required-Tabs.md) |
+| [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](docs/Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](docs/Mac-CI-CD.md) |
 | [PlusButton 角标：每次点击都会变化](docs/PlusButton-Badge.md) | [PlusButton badge: changes on every tap](docs/PlusButton-Badge.md) |
 | [有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应](docs/PlusButton-Lottie-TabIcon.md) | [Lottie tab icons and their files when there is a PlusButton](docs/PlusButton-Lottie-TabIcon.md) |
 | [PlusButton 子控件响应各自的点击事件](docs/PlusButton-Subview-Touches.md) | [Subviews of the PlusButton receive their own touches](docs/PlusButton-Subview-Touches.md) |
