@@ -361,45 +361,73 @@ static char CYLTabBarDemoItemTitleKey;
 
 #pragma mark - CYLDemoSections
 
-/// [EN] A row of a demo section: a settings row (`CYLDemoRowSettings`) or a tab bar demo row (`CYLDemoRowTabBar`).
-/// [CN] 演示 section 中的一行：设置行（`CYLDemoRowSettings`）或 TabBar 演示行（`CYLDemoRowTabBar`）。
-static const NSInteger CYLDemoRowTabBar = 1000;
+/*!
+ * [EN] One row of a demo section: a settings row of the library, or a tab bar demo row of this demo. Two kinds of row, each
+ *      with its own index, instead of one number that encodes both.
+ * [CN] 演示 section 中的一行：库的设置行，或本 Demo 的 TabBar 演示行。两种行各有自己的序号，而不是用一个数字同时表示两者。
+ */
+@interface CYLDemoRow : NSObject
+@property (nonatomic, assign, readonly) BOOL isTabBarDemoRow;
+@property (nonatomic, assign, readonly) NSInteger index;
++ (instancetype)settingsRow:(NSInteger)index;
++ (instancetype)tabBarDemoRow:(CYLTabBarDemoRow)index;
+@end
+
+@implementation CYLDemoRow
+
++ (instancetype)rowWithIndex:(NSInteger)index isTabBarDemoRow:(BOOL)isTabBarDemoRow {
+    CYLDemoRow *row = [[self alloc] init];
+    row->_index = index;
+    row->_isTabBarDemoRow = isTabBarDemoRow;
+    return row;
+}
+
++ (instancetype)settingsRow:(NSInteger)index {
+    return [self rowWithIndex:index isTabBarDemoRow:NO];
+}
+
++ (instancetype)tabBarDemoRow:(CYLTabBarDemoRow)index {
+    return [self rowWithIndex:index isTabBarDemoRow:YES];
+}
+
+@end
 
 @implementation UIViewController (CYLDemoSections)
 
 /*!
- * [EN] The sections: the library's settings groups (`-cyl_settingsGroups`), with this demo's tab bar rows
- *      (`CYLDemoRowTabBar` + a tab bar demo row) added to the appearance group, and a last section for the navigation and
- *      comparison rows. Each row is a settings row index, or `CYLDemoRowTabBar` + a tab bar demo row.
- * [CN] 各 section：使用库提供的设置分组（`-cyl_settingsGroups`），本 Demo 的 TabBar 演示行（`CYLDemoRowTabBar` + 行号）加入外观分组，
- *      最后一个 section 放跳转与对比的行。每行为设置行的序号，或 `CYLDemoRowTabBar` + TabBar 演示行序号。
+ * [EN] The sections: the library's settings groups (`-cyl_settingsGroups`), with this demo's tab bar rows added to the
+ *      appearance group, and a last section for the navigation and comparison rows.
+ * [CN] 各 section：使用库提供的设置分组（`-cyl_settingsGroups`），本 Demo 的 TabBar 演示行加入外观分组，最后一个 section 放跳转与对比的行。
  */
 - (NSArray<NSDictionary *> *)cyl_demoSections {
     NSMutableArray<NSDictionary *> *sections = [NSMutableArray array];
     for (NSNumber *group in [self cyl_settingsGroups]) {
         CYLSettingsGroup settingsGroup = (CYLSettingsGroup)group.integerValue;
-        NSMutableArray<NSNumber *> *rows = [[self cyl_settingsRowsInGroup:settingsGroup] mutableCopy];
+        NSMutableArray<CYLDemoRow *> *rows = [NSMutableArray array];
+        for (NSNumber *row in [self cyl_settingsRowsInGroup:settingsGroup]) {
+            [rows addObject:[CYLDemoRow settingsRow:row.integerValue]];
+        }
         if (settingsGroup == CYLSettingsGroupTabBarAppearance) {
             // [EN] Show / hide, height, item layout and background color of the tab bar.
             // [CN] 显示 / 隐藏、高度、TabBarItem 布局与背景色。
-            [rows addObjectsFromArray:@[ @(CYLDemoRowTabBar + CYLTabBarDemoRowShowHideTabBar),
-                                         @(CYLDemoRowTabBar + CYLTabBarDemoRowTabBarHeight),
-                                         @(CYLDemoRowTabBar + CYLTabBarDemoRowItemNotCentered),
-                                         @(CYLDemoRowTabBar + CYLTabBarDemoRowItemCentered),
-                                         @(CYLDemoRowTabBar + CYLTabBarDemoRowItemBackgroundColor) ]];
+            [rows addObjectsFromArray:@[ [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowShowHideTabBar],
+                                         [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowTabBarHeight],
+                                         [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowItemNotCentered],
+                                         [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowItemCentered],
+                                         [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowItemBackgroundColor] ]];
         }
         [sections addObject:@{ @"title" : [self cyl_titleForSettingsGroup:settingsGroup], @"rows" : rows }];
     }
     [sections addObject:@{ @"title" : CYLLocalizedString(@"跳转与对比"),
-                           @"rows" : @[ @(CYLDemoRowTabBar + CYLTabBarDemoRowCompareSystemTabBar),
-                                        @(CYLDemoRowTabBar + CYLTabBarDemoRowPushSystemStyle),
-                                        @(CYLDemoRowTabBar + CYLTabBarDemoRowPushFlatDesign),
-                                        @(CYLDemoRowTabBar + CYLTabBarDemoRowPopPushDemo) ] }];
+                           @"rows" : @[ [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowCompareSystemTabBar],
+                                        [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowPushSystemStyle],
+                                        [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowPushFlatDesign],
+                                        [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowPopPushDemo] ] }];
     return sections;
 }
 
-- (NSInteger)cyl_demoRowAtIndexPath:(NSIndexPath *)indexPath {
-    return [[self cyl_demoSections][indexPath.section][@"rows"][indexPath.row] integerValue];
+- (CYLDemoRow *)cyl_demoRowAtIndexPath:(NSIndexPath *)indexPath {
+    return [self cyl_demoSections][indexPath.section][@"rows"][indexPath.row];
 }
 
 - (NSInteger)cyl_demoSectionCount {
@@ -415,22 +443,22 @@ static const NSInteger CYLDemoRowTabBar = 1000;
 }
 
 - (UITableViewCell *)cyl_demoCellForTableView:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath {
-    NSInteger row = [self cyl_demoRowAtIndexPath:indexPath];
-    if (row >= CYLDemoRowTabBar) {
-        return [self cyl_tabBarDemoCellForTableView:tableView row:row - CYLDemoRowTabBar];
+    CYLDemoRow *row = [self cyl_demoRowAtIndexPath:indexPath];
+    if (row.isTabBarDemoRow) {
+        return [self cyl_tabBarDemoCellForTableView:tableView row:row.index];
     }
-    return [self cyl_settingsCellForTableView:tableView row:row];
+    return [self cyl_settingsCellForTableView:tableView row:row.index];
 }
 
 - (void)cyl_demoDidSelectRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    NSInteger row = [self cyl_demoRowAtIndexPath:indexPath];
-    if (row >= CYLDemoRowTabBar) {
-        [self cyl_didSelectTabBarDemoRow:row - CYLDemoRowTabBar inTableView:nil];
+    CYLDemoRow *row = [self cyl_demoRowAtIndexPath:indexPath];
+    if (row.isTabBarDemoRow) {
+        [self cyl_didSelectTabBarDemoRow:row.index inTableView:nil];
         return;
     }
     // [EN] Run the row, then reload the demo sections (e.g. the checkmarks). [CN] 执行该行，然后刷新演示 section（如勾号）。
-    [self cyl_didSelectSettingsRow:row];
+    [self cyl_didSelectSettingsRow:row.index];
     if (tableView.window) {
         [tableView reloadSections:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, (NSUInteger)[self cyl_demoSectionCount])]
                  withRowAnimation:UITableViewRowAnimationNone];
