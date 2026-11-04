@@ -187,6 +187,7 @@ jobs:
           - Example-Swift-SwiftManager
           - Example-Swift-SwiftManager-FlatDesign
           - Example-network-download
+          - Example-Swift-Gallery
     steps:
       - uses: actions/checkout@v4
       - name: CocoaPods
