@@ -658,6 +658,15 @@ static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id>
 }
 
 - (instancetype)initWithConfigurationFile:(NSString *)filePath error:(NSError **)error {
+    if (![NSThread isMainThread]) {
+        // UIKit objects only on the main thread (E1). UIKit 对象只能在主线程创建（E1）。
+        if (error) {
+            *error = [NSError errorWithDomain:CYLTabBarConfigurationErrorDomain code:CYLTabBarConfigurationErrorMainThreadRequired userInfo:@{
+                NSLocalizedDescriptionKey : @"A tab bar controller can only be created on the main thread; read the dictionary in the background with +configurationWithContentsOfFile:error:.",
+            }];
+        }
+        return nil;
+    }
     NSDictionary<NSString *, id> *configuration = [[self class] configurationWithContentsOfFile:filePath error:error];
     if (!configuration) {
         return nil;
@@ -668,6 +677,9 @@ static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id>
 + (instancetype)tabBarControllerWithConfigurationFile:(NSString *)filePath error:(NSError **)error {
     return [[self alloc] initWithConfigurationFile:filePath error:error];
 }
+
+/// [EN] The timeout of `+loadConfigurationWithURL:completion:` (D5); the system default is 60 seconds. [CN] `+loadConfigurationWithURL:completion:` 的超时（D5）；系统默认 60 秒。
+static const NSTimeInterval CYLConfigurationRequestTimeout = 15;
 
 + (NSURLSessionDataTask *)loadConfigurationWithURL:(NSURL *)URL completion:(CYLTabBarConfigurationCompletion)completion {
     if (!completion) {
@@ -685,7 +697,19 @@ static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id>
         });
         return nil;
     }
-    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:URL completionHandler:^(NSData *data, NSURLResponse *response, NSError *networkError) {
+    NSURLRequest *request = [NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:CYLConfigurationRequestTimeout];
+    return [self loadConfigurationWithURLRequest:request completion:completion];
+}
+
++ (NSURLSessionDataTask *)loadConfigurationWithURLRequest:(NSURLRequest *)request completion:(CYLTabBarConfigurationCompletion)completion {
+    if (!completion) {
+        return nil;
+    }
+    NSURL *URL = request.URL;
+    if (![request isKindOfClass:[NSURLRequest class]] || !URL || URL.isFileURL) {
+        return [self loadConfigurationWithURL:URL completion:completion];
+    }
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *networkError) {
         NSDictionary *configuration = nil;
         NSError *error = nil;
         NSInteger statusCode = [response isKindOfClass:[NSHTTPURLResponse class]] ? [(NSHTTPURLResponse *)response statusCode] : 200;
@@ -712,6 +736,18 @@ static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id>
     }];
     [task resume];
     return task;
+}
+
++ (NSURLSessionDataTask *)loadTabBarControllerWithConfigurationURLRequest:(NSURLRequest *)request
+                                                               completion:(CYLTabBarControllerConfigurationCompletion)completion {
+    if (!completion) {
+        return nil;
+    }
+    Class tabBarControllerClass = self;
+    return [self loadConfigurationWithURLRequest:request completion:^(NSDictionary<NSString *, id> *configuration, NSError *error) {
+        CYLTabBarController *tabBarController = configuration ? [[tabBarControllerClass alloc] initWithConfiguration:configuration] : nil;
+        completion(tabBarController, error);
+    }];
 }
 
 + (NSURLSessionDataTask *)loadTabBarControllerWithConfigurationURL:(NSURL *)URL

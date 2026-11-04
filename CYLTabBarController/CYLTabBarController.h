@@ -1646,7 +1646,11 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
 
 /*!
  * [EN] A tab bar controller from a configuration file (see `+configurationWithContentsOfFile:error:`), or nil and `error`.
+ *      Main thread only (UIKit): elsewhere it returns nil and `CYLTabBarConfigurationErrorMainThreadRequired`; read the
+ *      dictionary in the background with `+configurationWithContentsOfFile:error:` instead.
  * [CN] 根据配置文件创建 TabBarController（见 `+configurationWithContentsOfFile:error:`），失败时返回 nil 并设置 `error`。
+ *      仅限主线程（UIKit）：在其他线程返回 nil 与 `CYLTabBarConfigurationErrorMainThreadRequired`；后台读取请使用
+ *      `+configurationWithContentsOfFile:error:`。
  */
 - (nullable instancetype)initWithConfigurationFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
 
@@ -1661,6 +1665,18 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
  *      返回可取消的任务（文件 URL 时为 nil）。请求遵循 URL 加载系统的缓存策略。
  */
 + (nullable NSURLSessionDataTask *)loadConfigurationWithURL:(NSURL *)URL completion:(CYLTabBarConfigurationCompletion)completion;
+
+/*!
+ * [EN] `+loadConfigurationWithURL:completion:` with a request of your own: its timeout, cache policy and headers (e.g.
+ *      an authorization token) are used as they are. `+loadConfigurationWithURL:completion:` uses a 15 second timeout.
+ * [CN] 使用自定义请求的 `+loadConfigurationWithURL:completion:`：请求的超时、缓存策略与请求头（例如授权 token）按原样使用。
+ *      `+loadConfigurationWithURL:completion:` 使用 15 秒超时。
+ */
++ (nullable NSURLSessionDataTask *)loadConfigurationWithURLRequest:(NSURLRequest *)request completion:(CYLTabBarConfigurationCompletion)completion;
+
+/// [EN] `+loadTabBarControllerWithConfigurationURL:completion:` with a request of your own. [CN] 使用自定义请求的 `+loadTabBarControllerWithConfigurationURL:completion:`。
++ (nullable NSURLSessionDataTask *)loadTabBarControllerWithConfigurationURLRequest:(NSURLRequest *)request
+                                                                        completion:(CYLTabBarControllerConfigurationCompletion)completion;
 
 /*!
  * [EN] Downloads a configuration (see `+loadConfigurationWithURL:completion:`) and creates the tab bar controller on the

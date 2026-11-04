@@ -1728,6 +1728,11 @@ static NSArray<UIViewController *> *CYLViewControllersFromConfiguration(NSDictio
 }
 
 - (instancetype)initWithConfiguration:(NSDictionary<NSString *, id> *)configuration {
+#if defined(DEBUG) || defined(BETA)
+    if (![NSThread isMainThread]) {
+        NSLog(@"🔴 CYLTabBarController: created off the main thread; UIKit objects must be created on the main thread.");
+    }
+#endif
     NSDictionary<NSString *, id> *normalized = [CYLTabBarController cyl_normalizedConfiguration:configuration ?: @{}];
     NSArray<NSDictionary *> *tabBarItemsAttributes = normalized[CYLTabBarControllerTabBarItemsAttributes] ?: @[];
     NSArray<UIViewController *> *viewControllers = normalized[CYLTabBarControllerViewControllers];

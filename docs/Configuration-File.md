@@ -261,6 +261,7 @@ flowchart TD
 | A13 | 语法错误 | A syntax error | 错误描述包含格式与行号 | The error names the format and the line | ✅ 第 1 轮 / round 1 |
 | A14 | XML 外部实体（XXE） | XML external entities (XXE) | 显式关闭外部实体解析 | External entities are explicitly not resolved | ✅ 第 4 轮 / round 4 |
 | A15 | 重复的键 | Duplicate keys | 后出现的值生效，不崩溃 | The last value wins, no crash | ✅ 第 1 轮 / round 1 |
+| A16 | UTF-16 / UTF-32 编码的文本文件（带 BOM） | A UTF-16 / UTF-32 text file (with a BOM) | 根据 BOM 识别编码 | The encoding is detected from the BOM | ❌ 未处理 / not yet |
 | B1 | 没有 Tab（缺少或为空的 `CYLTabBarControllerTabBarItemsAttributes`） | No tabs (missing or empty `CYLTabBarControllerTabBarItemsAttributes`) | 读取文件或 URL 时返回 NoTabs 错误；代码中初始化时保持原行为并输出警告 | Files and URLs: a NoTabs error; in code: unchanged behavior and a warning | ✅ 第 3 轮 / round 3 |
 | B2 | Tab 列表不是数组（字符串、数字） | The tab list is not a list (a string, a number) | 视为没有 Tab，见 B1 | Treated as no tabs, see B1 | ✅ 第 3 轮 / round 3 |
 | B3 | 只有一个 Tab 且写成字典（Protobuf 文本、XML） | A single tab written as a dictionary (Protobuf text, XML) | 自动包装为列表 | Wrapped into a list | ✅ 第 1 轮 / round 1 |
@@ -277,6 +278,7 @@ flowchart TD
 | B14 | 图片名称或 SF Symbol 不存在 | An image name or SF Symbol that does not exist | 该 Tab 没有图标，不崩溃 | The tab has no icon, no crash | ✅ 第 1 轮 / round 1 |
 | B15 | Tab 很多（超过 5 个） | Many tabs (more than 5) | 由 UIKit 处理（“更多”） | Handled by UIKit ("More") | ✅ 第 1 轮 / round 1 |
 | B16 | 超长标题 | A very long title | 不崩溃，由 UIKit 截断显示 | No crash; UIKit truncates it | ✅ 第 1 轮 / round 1 |
+| B17 | Lottie 文件不是合法的 JSON 动画 | A Lottie file that is not a valid JSON animation | 解析检查失败时移除，避免 Lottie 内部异常 | Removed when it does not parse as a JSON object, so Lottie never sees it | ❌ 未处理 / not yet |
 | C1 | 子控制器类不存在 | The view controller class does not exist | 使用 UIViewController 并输出警告 | UIViewController and a warning | ✅ 第 1 轮 / round 1 |
 | C2 | 类不是 UIViewController（如 NSString） | The class is not a UIViewController (e.g. NSString) | 使用 UIViewController 并输出警告 | UIViewController and a warning | ✅ 第 1 轮 / round 1 |
 | C3 | 子控制器类是 UITabBarController / UINavigationController / UIAlertController 等容器 | The class is a container: UITabBarController, UINavigationController, UIAlertController... | 拒绝并使用 UIViewController | Refused; UIViewController is used | ✅ 第 4 轮 / round 4 |
@@ -285,11 +287,12 @@ flowchart TD
 | C6 | `CYLTabBarControllerViewControllers` 中有非控制器对象 | `CYLTabBarControllerViewControllers` holds objects that are not view controllers | 移除这些对象；以前会崩溃 | They are removed; this used to crash | ✅ 第 2 轮 / round 2 |
 | C7 | 同一个子控制器出现两次 | The same view controller twice | 移除重复项；以前 UIKit 会抛异常 | The duplicate is removed; UIKit used to raise | ✅ 第 2 轮 / round 2 |
 | C8 | 子控制器数量与 Tab 数量不一致 | More or fewer view controllers than tabs | 本库按下标保护，不越界 | The library checks indexes, no out-of-bounds access | ✅ 第 1 轮 / round 1 |
+| C9 | `CYLTabBarControllerViewControllers` 为空数组 | `CYLTabBarControllerViewControllers` is an empty list | 视为未提供，根据 Tab 创建子控制器 | Treated as missing: the view controllers are created from the tabs | ❌ 未处理 / not yet |
 | D1 | URL 为 nil | A nil URL | 回调返回 FileNotFound 错误 | The completion gets a FileNotFound error | ✅ 第 1 轮 / round 1 |
 | D2 | 不支持的 scheme 或无效 URL | An unsupported scheme or an invalid URL | 回调返回 Network 错误 | The completion gets a Network error | ✅ 第 1 轮 / round 1 |
 | D3 | HTTP 4xx / 5xx | HTTP 4xx / 5xx | Network 错误，包含状态码 | A Network error with the status code | ✅ 第 1 轮 / round 1 |
 | D4 | 无网络、DNS 失败 | No network, a DNS failure | Network 错误（NSUnderlyingErrorKey 为原始错误） | A Network error (NSUnderlyingErrorKey holds the original) | ✅ 第 1 轮 / round 1 |
-| D5 | 服务器不响应 | The server does not answer | 默认 15 秒超时（以前为系统默认的 60 秒）；可传入自定义 NSURLRequest | A 15 s timeout by default (it was the system's 60 s); a custom NSURLRequest can be passed | ❌ 未处理 / not yet |
+| D5 | 服务器不响应 | The server does not answer | 默认 15 秒超时（以前为系统默认的 60 秒）；可传入自定义 NSURLRequest | A 15 s timeout by default (it was the system's 60 s); a custom NSURLRequest can be passed | ✅ 第 5 轮 / round 5 |
 | D6 | 响应体为空 | An empty response body | Empty 错误 | An Empty error | ✅ 第 3 轮 / round 3 |
 | D7 | 返回 HTML 页面（如公共 Wi-Fi 的登录页） | An HTML page instead (e.g. a captive Wi-Fi portal) | 识别为没有 Tab 的配置，返回 NoTabs 错误；以前会生成空的 TabBar | Detected as a configuration with no tabs: a NoTabs error; it used to give an empty tab bar | ✅ 第 3 轮 / round 3 |
 | D8 | 响应过大 | A huge response | 超过 5 MB 时返回 TooLarge 错误 | Over 5 MB: a TooLarge error | ✅ 第 3 轮 / round 3 |
@@ -297,7 +300,7 @@ flowchart TD
 | D10 | 请求被取消 | The request is cancelled | 回调仍会执行一次，返回 Network 错误 | The completion still runs once, with a Network error | ✅ 第 1 轮 / round 1 |
 | D11 | 回调线程与次数 | Completion thread and count | 总在主队列执行且只执行一次 | Always on the main queue, exactly once | ✅ 第 1 轮 / round 1 |
 | D12 | completion 为 nil | A nil completion | 不发起请求，返回 nil | No request is made; returns nil | ✅ 第 1 轮 / round 1 |
-| E1 | 在后台线程读取文件并创建控制器 | Reading a file and creating the controller on a background thread | 文件接口返回 MainThreadRequired 错误；代码初始化输出警告（与原行为一致） | The file APIs return a MainThreadRequired error; the code initializer warns (as before) | ❌ 未处理 / not yet |
+| E1 | 在后台线程读取文件并创建控制器 | Reading a file and creating the controller on a background thread | 文件接口返回 MainThreadRequired 错误；代码初始化输出警告（与原行为一致） | The file APIs return a MainThreadRequired error; the code initializer warns (as before) | ✅ 第 5 轮 / round 5 |
 | E2 | 在后台线程只解析配置字典 | Only parsing the dictionary on a background thread | 解析器只依赖 Foundation，线程安全 | The parser is Foundation only and thread-safe | ✅ 第 1 轮 / round 1 |
 
 | 轮次 Round | 分数 Score | 情况数 Cases | 说明 | Notes | 减分项 Deductions |
@@ -306,6 +309,7 @@ flowchart TD
 | 2 | 69 | 53 | 修复会崩溃的情况：值的类型检查、null、NaN / Infinity、尺寸范围、样式编号范围、非控制器对象、重复的控制器、嵌套深度限制。 | Crash fixes: value type checks, null, NaN / Infinity, size ranges, style number range, objects that are not view controllers, duplicate view controllers, nesting depth limit. | A3, A4, A7, A9, A14, B1, B2, B4, B10, B11, B12, B13, C3, C4, D5, D6, D7, D8, E1 |
 | 3 | 81 | 53 | 语义校验：空文件、没有 Tab、HTML 页面、文件 / 响应大小限制，新增错误码 Empty、TooLarge、TooDeep、NoTabs。 | Semantic checks: empty files, no tabs, HTML pages, file / response size limits; new error codes Empty, TooLarge, TooDeep, NoTabs. | A7, A14, B4, B10, B11, B12, B13, C3, C4, D5, E1 |
 | 4 | 96 | 53 | 容错：扩展名不符时重试、XXE、容器类与 -init 异常、无效 Tab 占位、FlatDesign 不可用、拼写错误提示、重复标识、URL 与本地文件检查。 | Tolerance: retry when the extension is wrong, XXE, container classes and -init exceptions, placeholders for invalid tabs, FlatDesign missing, typo hints, duplicate identifiers, URL and local file checks. | D5, E1 |
+| 5 | 95 | 56 | 网络超时与线程：默认 15 秒超时、可传入 NSURLRequest、后台线程保护。复查时新发现 4 个问题（A16、B17、C9），总分下降。 | Network timeout and threads: a 15 s default timeout, a custom NSURLRequest, background-thread protection. The review found new cases (A16, B17, C9), so the score dropped. | A16, B17, C9 |
 <!-- edge-cases:end -->
 
 ## [CN]限制
