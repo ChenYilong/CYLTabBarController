@@ -694,9 +694,7 @@ static void CYLInteractionDemoSwitchApply(CYLTabBarController *_Nullable tabBarC
         return;
     }
     tabBarController.cyl_didLongPressControlBlock = ^(CYLTabBarController *pressedTabBarController, UIControl *control) {
-        // [EN] The title the user sees first (an identifier can be a generated class name, e.g. a SwiftUI hosting controller's).
-        // [CN] 优先使用用户看到的标题（标识可能是自动生成的类名，例如 SwiftUI hosting controller 的类名）。
-        NSString *name = control.accessibilityLabel.length > 0 ? control.accessibilityLabel : (control.cyl_tabBarItemIdentifier ?: NSStringFromClass([control class]));
+        NSString *name = control.cyl_tabBarItemDisplayName;
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:CYLLocalizedString(@"长按了「%@」"), name]
                                                                        message:nil
                                                                 preferredStyle:UIAlertControllerStyleAlert];

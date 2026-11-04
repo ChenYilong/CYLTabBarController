@@ -108,9 +108,7 @@ extension CYLTabBarController {
         cyl_tabButtonTapAnimationType = .bounce
         cyl_swipeToSwitchTabEnabled = true
         cyl_didLongPressControlBlock = { tabBarController, control in
-            // [EN] The title the user sees first. [CN] 优先使用用户看到的标题。
-            let name = control.accessibilityLabel.flatMap { $0.isEmpty ? nil : $0 }
-                ?? control.cyl_tabBarItemIdentifier ?? NSStringFromClass(type(of: control))
+            let name = control.cyl_tabBarItemDisplayName
             let alert = UIAlertController(title: String(format: CYLLocalizedString("长按了「%@」"), name),
                                           message: nil, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))

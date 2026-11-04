@@ -230,11 +230,17 @@ static void CYLTabButtonPlayFireworks(UIView *view, UIImage *_Nullable image) {
 
 #pragma mark - CYLTabButtonFumeAnimation
 
+/// [EN] The animations Fume leaves on the button while it is selected. [CN] Tab 选中期间 Fume 留在按钮上的动画。
+static NSString *const CYLTabButtonFumeIconKey = @"cyl.tabButton.fume.icon";
+static NSString *const CYLTabButtonFumeMoveKey = @"cyl.tabButton.fume.move";
+static NSString *const CYLTabButtonFumeScaleKey = @"cyl.tabButton.fume.scale";
+static NSString *const CYLTabButtonFumeOpacityKey = @"cyl.tabButton.fume.opacity";
+
 static void CYLTabButtonFumeMoveIcon(UIView *iconView, NSArray *values) {
     CAKeyframeAnimation *animation = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathPositionY, values, CYLTabButtonAnimationDuration / 2.0);
     animation.fillMode = kCAFillModeForwards;
     animation.removedOnCompletion = NO;
-    [iconView.layer addAnimation:animation forKey:@"cyl.tabButton.fume.icon"];
+    [iconView.layer addAnimation:animation forKey:CYLTabButtonFumeIconKey];
 }
 
 @implementation CYLTabButtonFumeAnimation
@@ -246,32 +252,32 @@ static void CYLTabButtonFumeMoveIcon(UIView *iconView, NSArray *values) {
     }
     CGFloat y = titleLabel.layer.position.y;
     CAKeyframeAnimation *move = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathPositionY, @[ @(y), @(y - 60.0) ], CYLTabButtonAnimationDuration);
-    [titleLabel.layer addAnimation:move forKey:@"cyl.tabButton.fume.move"];
+    [titleLabel.layer addAnimation:move forKey:CYLTabButtonFumeMoveKey];
     CAKeyframeAnimation *scale = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathScale, @[ @1.0, @2.0 ], CYLTabButtonAnimationDuration);
-    [titleLabel.layer addAnimation:scale forKey:@"cyl.tabButton.fume.scale"];
+    [titleLabel.layer addAnimation:scale forKey:CYLTabButtonFumeScaleKey];
     CAKeyframeAnimation *opacity = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathOpacity, @[ @1.0, @0.0 ], CYLTabButtonAnimationDuration);
-    [titleLabel.layer addAnimation:opacity forKey:@"cyl.tabButton.fume.opacity"];
+    [titleLabel.layer addAnimation:opacity forKey:CYLTabButtonFumeOpacityKey];
     titleLabel.alpha = 0;
 }
 
 - (void)cyl_playDeselectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
     // [EN] Removing the forward-filled move puts the icon back where the layout placed it.
     // [CN] 移除保持在终点的位移动画，图标回到布局给出的位置。
-    [iconView.layer removeAnimationForKey:@"cyl.tabButton.fume.icon"];
+    [iconView.layer removeAnimationForKey:CYLTabButtonFumeIconKey];
     if (!titleLabel) {
         return;
     }
     CGFloat y = titleLabel.layer.position.y;
     CAKeyframeAnimation *move = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathPositionY, @[ @(y + 15.0), @(y) ], CYLTabButtonAnimationDuration);
-    [titleLabel.layer addAnimation:move forKey:@"cyl.tabButton.fume.move"];
+    [titleLabel.layer addAnimation:move forKey:CYLTabButtonFumeMoveKey];
     CAKeyframeAnimation *opacity = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathOpacity, @[ @0.0, @1.0 ], CYLTabButtonAnimationDuration);
-    [titleLabel.layer addAnimation:opacity forKey:@"cyl.tabButton.fume.opacity"];
+    [titleLabel.layer addAnimation:opacity forKey:CYLTabButtonFumeOpacityKey];
     titleLabel.alpha = 1;
 }
 
 - (void)cyl_resetTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
-    [iconView.layer removeAnimationForKey:@"cyl.tabButton.fume.icon"];
-    for (NSString *key in @[ @"cyl.tabButton.fume.move", @"cyl.tabButton.fume.scale", @"cyl.tabButton.fume.opacity" ]) {
+    [iconView.layer removeAnimationForKey:CYLTabButtonFumeIconKey];
+    for (NSString *key in @[ CYLTabButtonFumeMoveKey, CYLTabButtonFumeScaleKey, CYLTabButtonFumeOpacityKey ]) {
         [titleLabel.layer removeAnimationForKey:key];
     }
     titleLabel.alpha = 1;

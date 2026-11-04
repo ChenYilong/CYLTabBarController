@@ -197,6 +197,13 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     objc_setAssociatedObject(self, @selector(cyl_tabBarItemIdentifier), [tabBarItemIdentifier copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+- (NSString *)cyl_tabBarItemDisplayName {
+    if (self.accessibilityLabel.length > 0) {
+        return self.accessibilityLabel;
+    }
+    return self.cyl_tabBarItemIdentifier ?: NSStringFromClass([self class]);
+}
+
 - (NSString *)cyl_tabBarItemIdentifier {
     NSString *identifier = objc_getAssociatedObject(self, @selector(cyl_tabBarItemIdentifier));
     if (identifier) {

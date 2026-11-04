@@ -61,6 +61,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable, getter=cyl_tabBarItemIdentifier, setter=cyl_setTabBarItemIdentifier:) NSString *cyl_tabBarItemIdentifier;
 
 /*!
+ * [EN] A name to show for this tab button or plus button, e.g. in an alert or a log: the title the user sees (its
+ *      accessibility label), else `cyl_tabBarItemIdentifier`, else its class name. An identifier can be a generated
+ *      class name (e.g. a SwiftUI hosting controller's), so the title comes first.
+ * [CN] 用于显示该 Tab 按钮或 PlusButton 的名称（例如弹框或日志中）：依次取用户看到的标题（其 accessibility label）、
+ *      `cyl_tabBarItemIdentifier`、类名。标识可能是自动生成的类名（例如 SwiftUI hosting controller 的类名），因此优先使用标题。
+ */
+@property (nonatomic, copy, readonly, getter=cyl_tabBarItemDisplayName) NSString *cyl_tabBarItemDisplayName;
+
+/*!
  * PlusButton has its own visible index,
  * in this case PlusButton is same as TabBarItem
  */
