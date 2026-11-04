@@ -18,12 +18,17 @@
 static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext;
+/// [EN] KVO context of the items' `badgeValue` (badge-changed animations). [CN] item 的 `badgeValue` 的 KVO context（角标变化动画）。
+static void *const CYLTabBarItemBadgeValueContext = (void*)&CYLTabBarItemBadgeValueContext;
 
 
 // Implemented in CYLTabBarController.m, issue #610 (and #22 for the pending blocks).
 @interface CYLTabBarController (CYLTabControlActions)
 - (void)cyl_bindTabControlActions;
 - (void)cyl_runPendingReloadBadgesBlocksIfReady;
+// [EN] Implemented in CYLTabBarController+CYLInteraction.m: a tab item's `badgeValue` changed.
+// [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：某个 Tab item 的 `badgeValue` 发生了变化。
+- (void)cyl_tabBarItemBadgeValueDidChange:(UITabBarItem *)item;
 @end
 
 // [EN] FIX: issue #152 / #535 — implemented in CYLTabBarController+CYLInteraction.m.
@@ -666,6 +671,19 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         }
         return;
     }
+    if (context == CYLTabBarItemBadgeValueContext) {
+        // [EN] A badge appeared or changed (not removed): the tab's animation may play its badge-changed animation.
+        // [CN] 角标出现或变化（不是被移除）：该 Tab 的动画可以播放角标变化动画。
+        id oldValue = change[NSKeyValueChangeOldKey];
+        id newValue = change[NSKeyValueChangeNewKey];
+        BOOL hasNewValue = [newValue isKindOfClass:[NSString class]];
+        CYLTabBarController *tabBarController = [self tabBarController];
+        if (hasNewValue && ![oldValue isEqual:newValue] && [object isKindOfClass:[UITabBarItem class]] &&
+            [tabBarController respondsToSelector:@selector(cyl_tabBarItemBadgeValueDidChange:)]) {
+            [tabBarController cyl_tabBarItemBadgeValueDidChange:(UITabBarItem *)object];
+        }
+        return;
+    }
     if (context == CYLTabBarItemTitleContext) {
         id oldTitle = change[NSKeyValueChangeOldKey];
         id newTitle = change[NSKeyValueChangeNewKey];
@@ -1024,6 +1042,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     for (UITabBarItem *item in items) {
         [item addObserver:self forKeyPath:@"title" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew)
                   context:CYLTabBarItemTitleContext];
+        [item addObserver:self forKeyPath:@"badgeValue" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew)
+                  context:CYLTabBarItemBadgeValueContext];
     }
     self.cyl_titleObservedItems = items;
 }
@@ -1031,6 +1051,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 - (void)cyl_stopObservingItemTitles {
     for (UITabBarItem *item in _cyl_titleObservedItems) {
         [item removeObserver:self forKeyPath:@"title" context:CYLTabBarItemTitleContext];
+        [item removeObserver:self forKeyPath:@"badgeValue" context:CYLTabBarItemBadgeValueContext];
     }
     _cyl_titleObservedItems = nil;
 }

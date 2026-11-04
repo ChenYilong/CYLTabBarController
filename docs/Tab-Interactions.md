@@ -35,6 +35,7 @@
 | [不继承基类使用导航栏设置](#cn不继承基类使用导航栏设置) | [Navigation bar settings without base classes](#ennavigation-bar-settings-without-base-classes) |
 | [放进 CYLUtils 的通用工具](#cn放进-cylutils-的通用工具) | [Generic helpers in CYLUtils](#engeneric-helpers-in-cylutils) |
 | [演示](#cn演示) | [Demo](#endemo) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [角标变化动画](#cn角标变化动画) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Badge-changed animation](#enbadge-changed-animation) |
 | [API 一览](#cnapi-一览) | [API reference](#enapi-reference) |
 | [兼容性与隔离](#cn兼容性与隔离) | [Compatibility and guards](#encompatibility-and-guards) |
 | [各项关系图](#cn各项关系图) | [How the pieces relate](#enhow-the-pieces-relate) |
@@ -227,6 +228,32 @@ self.cyl_hidesAncestorNavigationBars = YES;
 | Swift Demo（Example-Swift、-02、-03、-04、Carthage、SwiftManager-FlatDesign、SwiftUI）：共享文件 `Example-Shared/CYLPlusButtonBadgeDemo.swift` 中的 `demoSetUpInteractions()` 开启弹性点击动画、长按弹窗与滑动切换；它由各 TabBarController 在 `viewDidAppear(_:)` 中已调用的 `demoShowPlusButtonBadgeAfterLayout()` 调用，因此各 Demo 的代码无需修改。 | Swift demos (Example-Swift, -02, -03, -04, Carthage, SwiftManager-FlatDesign, SwiftUI): `demoSetUpInteractions()` in the shared `Example-Shared/CYLPlusButtonBadgeDemo.swift` turns on the bounce tap animation, the long press alert and swiping; `demoShowPlusButtonBadgeAfterLayout()`, which each tab bar controller already calls in `viewDidAppear(_:)`, calls it, so the demos' own code is unchanged. |
 | 所有 Demo 仍只导入 CYLTabBarController，Podfile 与 Package 无需修改。演示文案已加入全部 33 种语言。 | Every demo still imports only CYLTabBarController; no Podfile or package changes. The demo texts are in all 33 languages. |
 
+### [CN]角标变化动画
+### [EN]Badge-changed animation
+
+| 中文 | English |
+|:---|:---|
+| `CYLTabButtonAnimation` 协议新增可选方法 `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:`：Tab 的 `UITabBarItem.badgeValue` 被设为新值（出现或改变，而不是移除）时，本库在下一个 runloop（UIKit 显示新角标之后）调用它，`badgeView` 为 UIKit 绘制的角标（`-cyl_tabBadgeView`），找不到时为 nil。适合「角标出现时图标跳动」或「角标缩放弹出」这类提醒效果，不需要在每处设置角标的代码中手动播放动画。经典 TabBar 与液态玻璃都支持（液态玻璃会在普通层与选中层上各播放一次）。 | The `CYLTabButtonAnimation` protocol has a new optional method, `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:`: when a tab's `UITabBarItem.badgeValue` is set to a new value (shown or changed, not removed), the library calls it on the next run loop turn, once UIKit shows the new badge. `badgeView` is the badge UIKit draws (`-cyl_tabBadgeView`), nil when it cannot be found. Use it for reminders such as "the icon jumps when a badge appears" or "the badge scales in", without playing an animation everywhere a badge is set. It works with the classic tab bar and Liquid Glass (Liquid Glass plays it on the normal and the selected layer). |
+
+```swift
+final class BadgeJump: NSObject, CYLTabButtonAnimation {
+    @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
+    func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {}
+
+    @objc(cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:)
+    func cyl_playBadgeChangedAnimation(withTabButton button: UIControl, iconView: UIView, badgeView: UIView?) {
+        // 图标跳动 / the icon jumps
+        let jump = CAKeyframeAnimation(keyPath: "transform.translation.y")
+        jump.values = [0, -8, 4, -4, 0]
+        jump.duration = 0.6
+        iconView.layer.add(jump, forKey: "badge")
+    }
+}
+
+viewController.cyl_tabButtonAnimation = BadgeJump()
+viewController.tabBarItem.badgeValue = "1"   // 播放动画 / plays the animation
+```
+
 ## [CN]API 一览
 ## [EN]API reference
 
@@ -239,6 +266,7 @@ self.cyl_hidesAncestorNavigationBars = YES;
 | `cyl_didLongPressControlBlock` / `-tabBarController:didLongPressControl:` | 长按回调 | `CYLTabBarController+CYLInteraction.h` / `CYLTabBarController.h` |
 | `cyl_tabButtonLongPressMinimumDuration` | 长按时长，默认 0.5 秒 | `CYLTabBarController+CYLInteraction.h` |
 | `cyl_swipeToSwitchTabEnabled` / `-cyl_switchToAdjacentTabWithStep:animated:` | 左右滑动切换 Tab / 代码切换到相邻 Tab | `CYLTabBarController+CYLInteraction.h` |
+| `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:` | 角标出现或变化时的动画（可选协议方法） | `CYLTabButtonAnimation.h` |
 | `<CYLTabButtonAnimation>` 与 `CYLTabButtonScaleAnimation`、`ZoomIn`、`Bounce`、`Rotation`、`Fume`、`Flip`、`Frame` | 动画协议与内置动画类 | `CYLTabButtonAnimation.h` |
 | `CYLTabBarSlideTransitionAnimator` / `CYLTabBarInteractiveTransition` | 滑动转场与跟手交互转场 | `CYLTabBarTransition.h` |
 | `UIViewController.cyl_automaticNavigationSettingEnabled` / `cyl_hidesAncestorNavigationBars` | 不继承基类的导航栏设置 / 同时隐藏外层导航栏 | `UIViewController+CYLNavigationControllerExtention.h` |
@@ -253,6 +281,7 @@ self.cyl_hidesAncestorNavigationBars = YES;
 | `cyl_didLongPressControlBlock` / `-tabBarController:didLongPressControl:` | The long press callback | `CYLTabBarController+CYLInteraction.h` / `CYLTabBarController.h` |
 | `cyl_tabButtonLongPressMinimumDuration` | How long a long press is, default 0.5 s | `CYLTabBarController+CYLInteraction.h` |
 | `cyl_swipeToSwitchTabEnabled` / `-cyl_switchToAdjacentTabWithStep:animated:` | Swipe to switch tabs / switch to the adjacent tab in code | `CYLTabBarController+CYLInteraction.h` |
+| `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:` | The animation when a badge appears or changes (optional protocol method) | `CYLTabButtonAnimation.h` |
 | `<CYLTabButtonAnimation>` and `CYLTabButtonScaleAnimation`, `ZoomIn`, `Bounce`, `Rotation`, `Fume`, `Flip`, `Frame` | The animation protocol and built-in classes | `CYLTabButtonAnimation.h` |
 | `CYLTabBarSlideTransitionAnimator` / `CYLTabBarInteractiveTransition` | The slide transition and its interactive driver | `CYLTabBarTransition.h` |
 | `UIViewController.cyl_automaticNavigationSettingEnabled` / `cyl_hidesAncestorNavigationBars` | Navigation bar settings without a base class / also hide the outer bars | `UIViewController+CYLNavigationControllerExtention.h` |

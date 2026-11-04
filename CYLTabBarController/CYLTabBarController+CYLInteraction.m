@@ -443,6 +443,32 @@ static const void *CYLHighlightedTabControlKey = &CYLHighlightedTabControlKey;
     }
 }
 
+#pragma mark - Badge-changed animation
+
+/*!
+ * [EN] Called by `CYLTabBar` when an item's `badgeValue` gets a new value: plays the badge-changed animation of that tab
+ *      (when its animation implements it) on the next run loop turn, on both Liquid Glass layers.
+ * [CN] 当 item 的 `badgeValue` 被设为新值时由 `CYLTabBar` 调用：在下一个 runloop 播放该 Tab 的角标变化动画（其动画实现了该方法时），
+ *      液态玻璃的两个图层都会播放。
+ */
+- (void)cyl_tabBarItemBadgeValueDidChange:(UITabBarItem *)item {
+    UIControl *control = item.cyl_tabButton;
+    if (!control) {
+        return;
+    }
+    id<CYLTabButtonAnimation> animation = [self cyl_animationForTabControl:control];
+    if (![animation respondsToSelector:@selector(cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:)]) {
+        return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (UIControl *layer in CYLTabButtonLayers(control)) {
+            [animation cyl_playBadgeChangedAnimationWithTabButton:layer
+                                                         iconView:CYLTabButtonIconView(layer)
+                                                        badgeView:[layer cyl_tabBadgeView]];
+        }
+    });
+}
+
 #pragma mark - Tap sound and haptic feedback
 
 - (BOOL)cyl_tabButtonTapSoundEnabled {

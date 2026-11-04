@@ -98,6 +98,17 @@ NS_ASSUME_NONNULL_BEGIN
                                          iconView:(UIView *)iconView
                                        titleLabel:(nullable UILabel *)titleLabel;
 
+/*!
+ * [EN] Plays the animation of a button whose badge appeared or changed (`UITabBarItem.badgeValue` set to a new value,
+ *      not removed), e.g. the icon jumps or the badge scales. `badgeView` is the badge UIKit draws (`-cyl_tabBadgeView`),
+ *      nil when it cannot be found. Called on the next run loop turn, once UIKit shows the new badge.
+ * [CN] 按钮的角标出现或变化时的动画（`UITabBarItem.badgeValue` 被设为新值，而不是被移除），例如图标跳动或角标缩放。`badgeView` 为 UIKit
+ *      绘制的角标（`-cyl_tabBadgeView`），找不到时为 nil。在下一个 runloop（UIKit 显示新角标之后）调用。
+ */
+- (void)cyl_playBadgeChangedAnimationWithTabButton:(UIControl *)button
+                                          iconView:(UIView *)iconView
+                                         badgeView:(nullable UIView *)badgeView;
+
 @end
 
 /*!

@@ -110,7 +110,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 自定义提醒动画：`-cyl_showBadgeValue:animationType:`（Scale、Shake、Bounce、Breathe 与 4 种单次动画），或在角标出现时对 `cyl_tabImageView` 播放动画。演示：Remind 6.3、6.4。 | Custom reminder animations: `-cyl_showBadgeValue:animationType:` (Scale, Shake, Bounce, Breathe and 4 one-shot types), or an animation on `cyl_tabImageView` when the badge appears. Demo: Remind 6.3, 6.4. |
+| 自定义提醒动画：`-cyl_showBadgeValue:animationType:`（Scale、Shake、Bounce、Breathe 与 4 种单次动画），或实现 `CYLTabButtonAnimation` 的可选方法 `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:`，在 `badgeValue` 出现或变化时自动播放（图标跳动 / 角标缩放）。演示：Remind 6.3、6.4。 | Custom reminder animations: `-cyl_showBadgeValue:animationType:` (Scale, Shake, Bounce, Breathe and 4 one-shot types), or the optional `CYLTabButtonAnimation` method `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:`, played automatically when `badgeValue` appears or changes (the icon jumps / the badge scales). Demo: Remind 6.3, 6.4. |
 | 自定义提醒样式：CYLBadge 的字体、颜色、偏移、圆角（[README](../README.md) 角标章节），或在 Tab 按钮上添加自己的视图。演示：Remind 6.5。 | Custom reminder styles: CYLBadge's font, colors, offset and corner radius (the badge sections of the [README](../README.md)), or your own view on the tab button. Demo: Remind 6.5. |
 
 ## 10. Lottie / Lottie
@@ -146,6 +146,8 @@
 | ✅ | 用循环动画暗示点击：新增 `CYLTabBarLottieLoopsWhenUnselected`。 | A looping animation that invites a tap: added `CYLTabBarLottieLoopsWhenUnselected`. |
 | ✅ | 玻璃模式下选中的 Tab 隐藏角标：新增 `cyl_hidesBadgeOfSelectedTab`。 | The selected tab hides its badge with glass: added `cyl_hidesBadgeOfSelectedTab`. |
 | ✅ | 被拦截的 Tab 在对话框显示期间显示为选中：Demo 用 `-replaceViewControllerAtIndex:withViewController:attributes:` 交换页面（各 Tab 保持自己的标题与图标），关闭对话框后恢复。 | An intercepted tab shown as selected while its dialog is up: the demo swaps the pages with `-replaceViewControllerAtIndex:withViewController:attributes:` (each tab keeps its title and icon) and restores them when the dialog closes. |
+| ✅ | 角标出现或变化时自动播放动画：`CYLTabButtonAnimation` 新增可选方法 `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:`（本库监听 `badgeValue`）。 | Animate automatically when a badge appears or changes: the optional `CYLTabButtonAnimation` method `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:` (the library observes `badgeValue`). |
+| ✅ | Swift 版图库：`Example-Swift-Gallery`，通过 Swift Package Manager 集成，场景与 ObjC 图库一致（见 [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md)）。 | A Swift gallery: `Example-Swift-Gallery`, integrated with Swift Package Manager, with the same scenes as the ObjC gallery (see [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md)). |
 | ✅ | 每个新增接口都有 ObjC Demo 演示行与文档。 | Every new API has a row in the ObjC demo and documentation. |
 
 ## 验证 / Verification
