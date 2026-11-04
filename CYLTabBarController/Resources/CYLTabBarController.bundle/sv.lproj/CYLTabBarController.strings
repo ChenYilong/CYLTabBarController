@@ -226,3 +226,4 @@
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Utlöses 1,5 s efter tryckningen. Förväntat: TabBar ändras inte av detta (döljs inte, och en TabBar som appen dolt visas inte).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Välj ett avbrott; det utlöses efter 1,5 s. Rulla först nedåt för att dölja TabBar.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manuellt: tryck för att slå på dölj vid rullning, rulla nedåt för att dölja TabBar och gör sedan det titeln säger. Förväntat: TabBar kommer tillbaka direkt.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Kör alla automatiska simuleringar i tur och ordning och rapporterar godkänt / underkänt (cirka 2 minuter), även i konsolen. Kan också köras med startargumentet -CYLScrollHideSelfTest YES.";

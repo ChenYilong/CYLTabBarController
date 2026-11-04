@@ -226,3 +226,4 @@
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "S'executa 1,5 s després del toc. Esperat: la TabBar no canvia per això (no s'amaga, i una TabBar amagada per l'app no es mostra).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Tria una interrupció; s'executa al cap d'1,5 s. Primer desplaça't cap avall per amagar la TabBar.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: toca per activar l'amagat en desplaçar, desplaça't cap avall per amagar la TabBar i fes el que diu el títol. Esperat: la TabBar torna de seguida.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Executa per ordre totes les simulacions automàtiques i informa d'èxits / errors (uns 2 minuts), també a la consola. També es pot executar amb l'argument d'inici -CYLScrollHideSelfTest YES.";

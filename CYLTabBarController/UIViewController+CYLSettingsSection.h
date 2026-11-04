@@ -84,6 +84,14 @@ FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 - (void)cyl_didSelectScrollHideSimulationRow:(NSInteger)row;
 /// [EN] Lists every simulation in an action sheet. [CN] 用操作表列出全部模拟。
 - (void)cyl_presentScrollHideSimulationMenu;
+/*!
+ * [EN] The automatic self-test: runs every automatic simulation on this page, checks the expected result and reports
+ *      PASS / FAIL / SKIP in the console and an alert (about 2 minutes). Launching the app with
+ *      `-CYLScrollHideSelfTest YES` runs it once on the first page.
+ * [CN] 自动自测：在本页面依次运行所有可自动化的模拟，检查预期结果，并在控制台和弹框中报告 PASS / FAIL / SKIP（约 2 分钟）。
+ *      以 `-CYLScrollHideSelfTest YES` 启动 App 时，会在第一个页面上自动运行一次。
+ */
+- (void)cyl_runScrollHideSelfTest;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -226,3 +226,4 @@
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Spustí se 1,5 s po klepnutí. Očekávání: TabBar se tím nezmění (neskryje se a TabBar skrytý aplikací se nezobrazí).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Vyberte přerušení; spustí se po 1,5 s. Nejprve posuňte dolů, aby se TabBar skryl.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Ručně: klepnutím zapněte skrývání při posouvání, posuňte dolů, aby se TabBar skryl, a proveďte, co říká název. Očekávání: TabBar se hned vrátí.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Postupně spustí všechny automatické simulace a nahlásí úspěch / selhání (asi 2 minuty), také v konzoli. Lze spustit i argumentem -CYLScrollHideSelfTest YES.";

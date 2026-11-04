@@ -715,6 +715,7 @@ typedef NS_ENUM(NSInteger, CYLScrollHideSimulationRow) {
     CYLScrollHideSimulationRowRealSystemAlert,
     CYLScrollHideSimulationRowOtherAppKeyboard,
     CYLScrollHideSimulationRowGuidedAccess,
+    CYLScrollHideSimulationRowSelfTest,
     CYLScrollHideSimulationRowCount,
 };
 
@@ -726,6 +727,8 @@ typedef NS_ENUM(NSInteger, CYLScrollHideSimulationKind) {
     CYLScrollHideSimulationKindKeep,
     /// [EN] Done by hand, as the title says; the bar comes back. [CN] 按标题手动操作；TabBar 恢复显示。
     CYLScrollHideSimulationKindManual,
+    /// [EN] Runs the automatic self-test. [CN] 运行自动自测。
+    CYLScrollHideSimulationKindSelfTest,
 };
 
 /// [EN] Seconds between the tap and the interruption. [CN] 点击到触发之间的秒数。
@@ -797,6 +800,9 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
             *kind = CYLScrollHideSimulationKindKeep;
             return @"UIKeyboardWillShow of another app (UIKeyboardIsLocalUserInfoKey = NO)";
         case CYLScrollHideSimulationRowGuidedAccess: return @"UIAccessibilityGuidedAccessStatusDidChangeNotification";
+        case CYLScrollHideSimulationRowSelfTest:
+            *kind = CYLScrollHideSimulationKindSelfTest;
+            return @"Self-test: run every automatic simulation, report PASS / FAIL";
         case CYLScrollHideSimulationRowCount: break;
     }
     return @"-";
@@ -824,6 +830,9 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
         case CYLScrollHideSimulationKindManual:
             cell.detailTextLabel.text = CYLLocalizedString(@"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。");
             break;
+        case CYLScrollHideSimulationKindSelfTest:
+            cell.detailTextLabel.text = CYLLocalizedString(@"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。");
+            break;
     }
     return cell;
 }
@@ -850,6 +859,10 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
     [self cyl_scrollHideSimulationTitleForRow:row kind:&kind];
     // [EN] A manual row only turns scroll hiding on; the user does the rest. [CN] 手动行只开启滚动隐藏，其余由用户操作。
     if (CYLScrollHideSimulationKindManual == kind) {
+        return;
+    }
+    if (CYLScrollHideSimulationKindSelfTest == kind) {
+        [self cyl_runScrollHideSelfTest];
         return;
     }
     __weak typeof(self) weakSelf = self;
@@ -1112,12 +1125,180 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
             [center postNotificationName:UIAccessibilityGuidedAccessStatusDidChangeNotification object:nil];
             break;
         }
+        case CYLScrollHideSimulationRowSelfTest:
         case CYLScrollHideSimulationRowManualLongPress:
         case CYLScrollHideSimulationRowManualTapOutside:
         case CYLScrollHideSimulationRowManualKeepDragging:
         case CYLScrollHideSimulationRowCount:
             break;
     }
+}
+
+#pragma mark Self-test
+
+/// [EN] What the self-test expects after a simulation. [CN] 自测在模拟之后的预期。
+typedef NS_ENUM(NSInteger, CYLScrollHideSelfTestExpectation) {
+    /// [EN] Not automatic (manual, real, leaves the app). [CN] 不能自动执行（手动、真实触发、会离开 App）。
+    CYLScrollHideSelfTestExpectationSkip,
+    /// [EN] The bar is shown again. [CN] TabBar 重新显示。
+    CYLScrollHideSelfTestExpectationRestored,
+    /// [EN] The bar stays hidden by scroll hiding. [CN] TabBar 保持被滚动隐藏。
+    CYLScrollHideSelfTestExpectationStillHidden,
+    /// [EN] The app took the bar over: hidden, but not by scroll hiding. [CN] App 接管了 TabBar：已隐藏，但不是滚动隐藏。
+    CYLScrollHideSelfTestExpectationAppHidden,
+};
+
+static CYLScrollHideSelfTestExpectation CYLScrollHideSelfTestExpectationForRow(NSInteger row) {
+    switch ((CYLScrollHideSimulationRow)row) {
+        case CYLScrollHideSimulationRowScrollDownInCode:
+        case CYLScrollHideSimulationRowOtherAppKeyboard:
+            return CYLScrollHideSelfTestExpectationStillHidden;
+        case CYLScrollHideSimulationRowAppHidesTabBar:
+            return CYLScrollHideSelfTestExpectationAppHidden;
+        case CYLScrollHideSimulationRowKeyboardWhileScrolling:
+        case CYLScrollHideSimulationRowRotation:
+        case CYLScrollHideSimulationRowManualLongPress:
+        case CYLScrollHideSimulationRowManualTapOutside:
+        case CYLScrollHideSimulationRowManualKeepDragging:
+        case CYLScrollHideSimulationRowRealBackground:
+        case CYLScrollHideSimulationRowRealSystemAlert:
+        case CYLScrollHideSimulationRowSelfTest:
+        case CYLScrollHideSimulationRowCount:
+            return CYLScrollHideSelfTestExpectationSkip;
+        case CYLScrollHideSimulationRowAlert:
+        case CYLScrollHideSimulationRowActionSheet:
+        case CYLScrollHideSimulationRowFullScreenModal:
+        case CYLScrollHideSimulationRowPageSheet:
+        case CYLScrollHideSimulationRowPushThenPop:
+        case CYLScrollHideSimulationRowPushHidesBottomBar:
+        case CYLScrollHideSimulationRowSwitchTab:
+        case CYLScrollHideSimulationRowResignActive:
+        case CYLScrollHideSimulationRowBackgroundForeground:
+        case CYLScrollHideSimulationRowNotificationTapPush:
+        case CYLScrollHideSimulationRowMemoryWarning:
+        case CYLScrollHideSimulationRowOverlayWindow:
+        case CYLScrollHideSimulationRowKeyboard:
+        case CYLScrollHideSimulationRowShareSheet:
+        case CYLScrollHideSimulationRowScrollToTopInCode:
+        case CYLScrollHideSimulationRowTurnOffAndOn:
+        case CYLScrollHideSimulationRowVoiceOverStatus:
+        case CYLScrollHideSimulationRowReduceMotionStatus:
+        case CYLScrollHideSimulationRowLowPowerMode:
+        case CYLScrollHideSimulationRowOverCurrentContext:
+        case CYLScrollHideSimulationRowPopover:
+        case CYLScrollHideSimulationRowDrawer:
+        case CYLScrollHideSimulationRowSafeAreaTop:
+        case CYLScrollHideSimulationRowSceneDeactivate:
+        case CYLScrollHideSimulationRowGuidedAccess:
+            return CYLScrollHideSelfTestExpectationRestored;
+    }
+    return CYLScrollHideSelfTestExpectationSkip;
+}
+
+/// [EN] When a simulation is checked, and when the next one starts. [CN] 检查模拟结果的时间，以及开始下一个模拟的时间。
+static const NSTimeInterval CYLScrollHideSelfTestCheckDelay = 2.7;
+static const NSTimeInterval CYLScrollHideSelfTestNextDelay = 1.5;
+
+/*!
+ * [EN] The automatic self-test: for every automatic simulation, scroll into the content, hide the bar as a downward
+ *      scroll would (`-cyl_simulateHideOnScrollForTesting`), run the simulation, check the expected result after
+ *      CYLScrollHideSelfTestCheckDelay, dismiss what it presented, and go on. Logs one line per simulation and shows a
+ *      summary. Liquid Glass cannot be hidden from code (the system minimizes it), so every row is SKIP there.
+ * [CN] 自动自测：对每个可自动化的模拟，先滚入内容，像向下滚动一样隐藏 TabBar（`-cyl_simulateHideOnScrollForTesting`），执行模拟，
+ *      CYLScrollHideSelfTestCheckDelay 之后检查预期结果，关闭它 present 的页面后继续下一个。每个模拟打印一行日志，最后显示汇总。
+ *      液态玻璃无法用代码隐藏（由系统缩小），因此其中每一行都为 SKIP。
+ */
+- (void)cyl_runScrollHideSelfTest {
+    CYLTabBarController *tabBarController = [self cyl_owningTabBarController] ?: [self cyl_tabBarController];
+    if (!tabBarController) {
+        return;
+    }
+    tabBarController.cyl_hidesTabBarOnScroll = YES;
+    NSLog(@"[CYLTabBarController] scroll hiding self-test: start (%@ simulations)", @(CYLScrollHideSimulationRowCount));
+    [self cyl_runScrollHideSelfTestRow:0 tabBarController:tabBarController results:[NSMutableArray array]];
+}
+
+- (void)cyl_runScrollHideSelfTestRow:(NSInteger)row tabBarController:(CYLTabBarController *)tabBarController results:(NSMutableArray<NSString *> *)results {
+    __weak typeof(self) weakSelf = self;
+    if (row >= CYLScrollHideSimulationRowCount) {
+        [self cyl_finishScrollHideSelfTestWithResults:results];
+        return;
+    }
+    CYLScrollHideSimulationKind kind = CYLScrollHideSimulationKindRestore;
+    NSString *title = [self cyl_scrollHideSimulationTitleForRow:row kind:&kind];
+    CYLScrollHideSelfTestExpectation expectation = CYLScrollHideSelfTestExpectationForRow(row);
+    void (^next)(void) = ^{
+        [weakSelf cyl_runScrollHideSelfTestRow:row + 1 tabBarController:tabBarController results:results];
+    };
+    // [EN] Scroll into the content (in code: does not hide by itself), then hide as a downward scroll would.
+    // [CN] 先滚入内容（代码滚动本身不会隐藏），再像向下滚动一样隐藏。
+    UIScrollView *scrollView = [self cyl_scrollHideSimulationScrollView];
+    CGFloat minOffsetY = -scrollView.adjustedContentInset.top;
+    CGFloat maxOffsetY = MAX(minOffsetY, scrollView.contentSize.height + scrollView.adjustedContentInset.bottom - CGRectGetHeight(scrollView.bounds));
+    [scrollView setContentOffset:CGPointMake(scrollView.contentOffset.x, MIN(maxOffsetY, minOffsetY + 600)) animated:NO];
+    if (CYLScrollHideSelfTestExpectationSkip == expectation || ![tabBarController cyl_simulateHideOnScrollForTesting]) {
+        NSString *line = [NSString stringWithFormat:@"SKIP %@", title];
+        [results addObject:line];
+        NSLog(@"[CYLTabBarController] scroll hiding self-test: %@", line);
+        next();
+        return;
+    }
+    [self cyl_runScrollHideSimulationRow:row tabBarController:tabBarController];
+    CYLScrollHideSimulationAfter(CYLScrollHideSelfTestCheckDelay, ^{
+        BOOL hiddenByScroll = tabBarController.cyl_isTabBarHiddenByScroll;
+        BOOL passed = NO;
+        switch (expectation) {
+            case CYLScrollHideSelfTestExpectationRestored:
+                passed = !hiddenByScroll;
+                break;
+            case CYLScrollHideSelfTestExpectationStillHidden:
+                passed = hiddenByScroll;
+                break;
+            case CYLScrollHideSelfTestExpectationAppHidden:
+                passed = !hiddenByScroll && tabBarController.isTabBarHidden;
+                break;
+            case CYLScrollHideSelfTestExpectationSkip:
+                break;
+        }
+        NSString *line = [NSString stringWithFormat:@"%@ %@", passed ? @"PASS" : @"FAIL", title];
+        [results addObject:line];
+        NSLog(@"[CYLTabBarController] scroll hiding self-test: %@", line);
+        // [EN] Clean up: dismiss what is still presented (alerts, share sheet), show a bar left hidden.
+        // [CN] 清理：关闭仍在显示的页面（弹框、分享面板），显示仍被隐藏的 TabBar。
+        UIViewController *presented = weakSelf.presentedViewController;
+        if (presented && !presented.isBeingDismissed) {
+            [presented dismissViewControllerAnimated:NO completion:nil];
+        }
+        NSTimeInterval wait = CYLScrollHideSelfTestNextDelay;
+        if (CYLScrollHideSelfTestExpectationAppHidden == expectation) {
+            wait += 2.0;
+        } else if (tabBarController.isTabBarHidden) {
+            [tabBarController setTabBarHidden:NO animated:NO];
+        }
+        CYLScrollHideSimulationAfter(wait, next);
+    });
+}
+
+- (void)cyl_finishScrollHideSelfTestWithResults:(NSArray<NSString *> *)results {
+    NSUInteger passed = 0;
+    NSUInteger failed = 0;
+    NSUInteger skipped = 0;
+    for (NSString *line in results) {
+        if ([line hasPrefix:@"PASS"]) {
+            passed++;
+        } else if ([line hasPrefix:@"FAIL"]) {
+            failed++;
+        } else {
+            skipped++;
+        }
+    }
+    NSString *summary = [NSString stringWithFormat:@"%@ passed, %@ failed, %@ skipped", @(passed), @(failed), @(skipped)];
+    NSLog(@"[CYLTabBarController] scroll hiding self-test: done: %@", summary);
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Scroll hiding self-test (#13)"
+                                                                   message:[NSString stringWithFormat:@"%@\n\n%@", summary, [results componentsJoinedByString:@"\n"]]
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 #pragma mark Settings row: all simulations in an action sheet

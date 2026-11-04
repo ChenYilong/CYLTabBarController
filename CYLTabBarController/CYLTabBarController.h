@@ -1495,6 +1495,24 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  */
 @property (nonatomic, assign) BOOL cyl_hidesTabBarOnScroll;
 
+/*!
+ * [EN] YES while scroll hiding hides the tab bar (FlatDesign, classic) or the system minimizes it (Liquid Glass) in a
+ *      hide session; NO when the bar is shown, or hidden by the app itself. Useful to move a floating button with the
+ *      bar, and for self-tests.
+ * [CN] 滚动隐藏在隐藏会话中隐藏了 TabBar（扁平样式、经典样式）或系统缩小了 TabBar（液态玻璃）时为 YES；TabBar 显示、或由 App 自己隐藏时
+ *      为 NO。可用于让悬浮按钮随 TabBar 移动，也用于自测。
+ */
+@property (nonatomic, assign, readonly) BOOL cyl_isTabBarHiddenByScroll;
+
+/*!
+ * [EN] For self-tests and demos only: hides the tab bar as a user's downward scroll would, starting a hide session, when
+ *      scroll hiding is on and the app allows hiding now. FlatDesign and classic only (Liquid Glass minimizing is up to
+ *      the system). Returns whether the bar is now hidden by scroll hiding.
+ * [CN] 仅用于自测与演示：在开启滚动隐藏且当前允许隐藏时，像用户向下滚动一样隐藏 TabBar 并开始隐藏会话。仅扁平样式与经典样式
+ *      （液态玻璃的缩小由系统决定）。返回 TabBar 现在是否被滚动隐藏。
+ */
+- (BOOL)cyl_simulateHideOnScrollForTesting;
+
 @end
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotification;

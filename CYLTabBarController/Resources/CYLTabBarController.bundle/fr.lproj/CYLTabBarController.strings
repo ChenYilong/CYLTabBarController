@@ -226,3 +226,4 @@
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Se déclenche 1,5 s après le toucher. Attendu : la TabBar ne change pas pour autant (elle n'est pas masquée, et une TabBar masquée par l'app n'est pas affichée).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Choisissez une interruption ; elle se déclenche après 1,5 s. Faites d'abord défiler vers le bas pour masquer la TabBar.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manuel : touchez pour activer le masquage au défilement, faites défiler vers le bas pour masquer la TabBar, puis faites ce qu'indique le titre. Attendu : la TabBar revient aussitôt.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Exécute tour à tour toutes les simulations automatiques et indique réussite / échec (environ 2 minutes), aussi dans la console. Peut aussi être lancé avec l'argument -CYLScrollHideSelfTest YES.";

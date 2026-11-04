@@ -8,6 +8,7 @@
 
 #import "CYLTabBarController.h"
 #import "CYLTabBar.h"
+#import "UIViewController+CYLSettingsSection.h"
 #import <objc/runtime.h>
 #import <dlfcn.h>
 #import "UIViewController+CYLTabBarControllerExtention.h"
@@ -384,6 +385,17 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
     [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
 #endif
     [self cyl_tabBarMinimizeLifecycleEvent];
+    // [EN] Scroll hiding self-test (issue #13), only when launched with `-CYLScrollHideSelfTest YES`: runs once, on the
+    //      page on screen. [CN] 滚动隐藏自测（issue #13），仅在以 `-CYLScrollHideSelfTest YES` 启动时：在当前页面上运行一次。
+    static BOOL cylDidStartScrollHideSelfTest = NO;
+    if (!cylDidStartScrollHideSelfTest && [[NSUserDefaults standardUserDefaults] boolForKey:@"CYLScrollHideSelfTest"]) {
+        cylDidStartScrollHideSelfTest = YES;
+        UIViewController *page = self.selectedViewController;
+        if ([page isKindOfClass:[UINavigationController class]]) {
+            page = ((UINavigationController *)page).topViewController;
+        }
+        [page cyl_runScrollHideSelfTest];
+    }
 }
 
 /*!
@@ -6459,6 +6471,8 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
 - (void)expandTabBar;
 - (void)restoreTabBar;
 - (void)restoreTabBarForReason:(NSString *)reason;
+- (BOOL)isTabBarHiddenOrMinimizedByScroll;
+- (BOOL)simulateHideForTesting;
 - (void)observeTapsInView:(UIView *)view;
 - (UIScrollView *)scrollViewForSelectedViewController:(UIViewController *)selectedViewController;
 - (void)validateHideSession;
@@ -6888,6 +6902,21 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
     return YES;
+}
+
+#pragma mark Testing
+
+/// [EN] Hides as a user's downward scroll would (FlatDesign, classic), for self-tests. [CN] 像用户向下滚动一样隐藏（扁平样式、经典样式），用于自测。
+- (BOOL)simulateHideForTesting {
+    if (CYLTabBarMinimizeModeFlatDesign != _mode && CYLTabBarMinimizeModeClassic != _mode) {
+        return NO;
+    }
+    if (![self environmentAllowsHiding]) {
+        return NO;
+    }
+    _needsNewDrag = NO;
+    [self minimizeTabBar];
+    return _hiddenByScroll;
 }
 
 #pragma mark Taps outside the content
@@ -7401,6 +7430,17 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
 }
 
 #pragma mark cyl_hidesTabBarOnScroll
+
+- (BOOL)cyl_isTabBarHiddenByScroll {
+    _CYLTabBarMinimizeScrollTracker *tracker = objc_getAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey);
+    return [tracker isTabBarHiddenOrMinimizedByScroll];
+}
+
+- (BOOL)cyl_simulateHideOnScrollForTesting {
+    [self cyl_updateTabBarMinimizeTracking];
+    _CYLTabBarMinimizeScrollTracker *tracker = objc_getAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey);
+    return [tracker simulateHideForTesting];
+}
 
 - (BOOL)cyl_hidesTabBarOnScroll {
     CYLTabBarMinimizeBehavior behavior = self.cyl_tabBarMinimizeBehavior;
