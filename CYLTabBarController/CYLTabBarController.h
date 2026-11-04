@@ -304,6 +304,7 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemAnimationHandler;
  *        images are tinted (`UIImageRenderingModeAlwaysTemplate`, SF Symbols); image names are drawn as original.
  *      - `CYLTabBarItemSelectedBackgroundColor`: fills the selected tab (classic tab bar and FlatDesign; Liquid Glass
  *        draws its own selection).
+ *      Title and icon colors need iOS 13+ (`UITabBarAppearance`) and are ignored on iOS 12.
  *      Classic and Liquid Glass: the colors are written into the tab's own `UITabBarItem.standardAppearance` (and
  *      `scrollEdgeAppearance` on iOS 15+), a copy of the tab bar's appearance that is rebuilt when that one changes, as
  *      for `CYLTabBarItemTitlePositionAdjustment`; an appearance you installed on the item is kept as the base. FlatDesign:
@@ -314,6 +315,7 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemAnimationHandler;
  *      - `CYLTabBarItemIconColor` / `CYLTabBarItemSelectedIconColor`：图标着色，未选中 / 选中。只对模板图片生效
  *        （`UIImageRenderingModeAlwaysTemplate`、SF Symbols）；图片名按原图绘制。
  *      - `CYLTabBarItemSelectedBackgroundColor`：选中 Tab 的背景色（经典 TabBar 与扁平样式；液态玻璃自带选中效果）。
+ *      标题与图标颜色需要 iOS 13+（`UITabBarAppearance`），iOS 12 上忽略。
  *      经典与液态玻璃：颜色写入该 Tab 自己的 `UITabBarItem.standardAppearance`（iOS 15+ 还有 `scrollEdgeAppearance`），即 TabBar
  *      appearance 的副本，TabBar 的 appearance 改变时会重建，与 `CYLTabBarItemTitlePositionAdjustment` 相同；你在 item 上设置的
  *      appearance 会作为基础保留。扁平样式：写入扁平 item 的标题属性与 `selectedBackgroundColor`。
@@ -425,11 +427,12 @@ presentLoginForViewController:(UIViewController *)viewController
  *      (classic, Liquid Glass, FlatDesign). Called once per tap, after `cyl_reselectBehavior` ran, and never for a change
  *      made in code or for the plus button. `tabBarController:didSelectControl:` is still called as before; this method
  *      tells a reselect apart from a selection. Typical use: refresh the page, or scroll to the top yourself.
- *      Liquid Glass reports it when the touch begins on the selected tab, the other styles when the tap ends.
+ *      Liquid Glass reports it when the gesture that began on the selected tab ends on it (not when the lens is dragged
+ *      to another tab), the other styles when the tap ends.
  * [CN] 用户点击了已选中的 `viewController` 对应的 Tab（"重复点击"），适用于所有样式（经典、液态玻璃、扁平样式）。每次点击调用一次，
  *      在 `cyl_reselectBehavior` 执行之后；代码切换与 PlusButton 不会调用。`tabBarController:didSelectControl:` 仍与以前一样回调；
  *      本方法用于区分重复点击与切换。常见用法：刷新页面，或自行滚动到顶部。
- *      液态玻璃在手指按下已选中的 Tab 时回调，其他样式在点击结束时回调。
+ *      液态玻璃在按下已选中 Tab 的手势结束且仍选中它时回调（拖动放大镜到其他 Tab 时不回调），其他样式在点击结束时回调。
  */
 - (void)tabBarController:(CYLTabBarController *)tabBarController didReselectViewController:(UIViewController *)viewController;
 

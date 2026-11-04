@@ -75,13 +75,14 @@ func tabBarController(_ tabBarController: CYLTabBarController, didReselect viewC
 | 中文 | English |
 |:---|:---|
 | `tabBarController:didSelectControl:` 的行为不变：重复点击时仍会回调。需要区分时，使用新的代理方法。 | `tabBarController:didSelectControl:` is unchanged: it is still called on a reselect. Use the new method to tell them apart. |
-| 实现：经典 TabBar 在 UIKit 修改选中状态之后才执行 Tab 按钮的点击事件，所以本库保存"上一个 runloop 结束时的选中控制器"，点击时与它比较；液态玻璃在手势代理中、仅对已选中的 Tab 回调（手指按下时）；扁平样式在 `-[CYLFlatDesignTabBar _tabBarDidSelectButton:]` 中、选中状态变化之前判断。同一 runloop 内只上报一次。 | Implementation: the classic tab bar runs the tab button's action after UIKit changed the selection, so the library keeps "the selected view controller as of the previous run loop turn" and compares with it; Liquid Glass reports from the gesture delegate, only for the selected tab (when the touch begins); FlatDesign checks in `-[CYLFlatDesignTabBar _tabBarDidSelectButton:]`, before the selection changes. Reported once per run loop turn. |
+| 实现：经典 TabBar 在 UIKit 修改选中状态之后才执行 Tab 按钮的点击事件，所以本库保存"上一个 runloop 结束时的选中控制器"，点击时与它比较；液态玻璃在手指按下已选中的 Tab 时记录，等手势结束且仍选中该 Tab 时才回调；扁平样式在 `-[CYLFlatDesignTabBar _tabBarDidSelectButton:]` 中、选中状态变化之前判断。同一 runloop 内只上报一次。 | Implementation: the classic tab bar runs the tab button's action after UIKit changed the selection, so the library keeps "the selected view controller as of the previous run loop turn" and compares with it; Liquid Glass records the selected tab when the touch begins and reports only when the gesture ends with that tab still selected; FlatDesign checks in `-[CYLFlatDesignTabBar _tabBarDidSelectButton:]`, before the selection changes. Reported once per run loop turn. |
 
 ## 限制 / Limits
 
 | 中文 | English |
 |:---|:---|
-| 液态玻璃在手指按下时回调，因此在已选中的 Tab 上按下后拖到别处也会被视为一次重复点击。 | Liquid Glass reports when the touch begins, so pressing the selected tab and dragging away also counts as a reselect. |
+| 液态玻璃中，在已选中的 Tab 上长按后松开（未拖到其他 Tab）也算一次重复点击；拖动放大镜到其他 Tab 不算。 | On Liquid Glass, a long press on the selected tab released on it also counts as a reselect; dragging the lens to another tab does not. |
+| 代理是 TabBarController 以外的对象、且对已选中的 Tab 在 `-tabBarController:shouldSelectViewController:` 中返回 YES 时，UIKit 会自己先返回根页面，`PopToRootThenScrollToTop` 可能在同一次点击中再滚动到顶部。这类代理请对已选中的 Tab 返回 NO（与本库默认行为一致）。 | With a delegate that is another object and returns YES for the selected tab in `-tabBarController:shouldSelectViewController:`, UIKit pops to the root itself first, and `PopToRootThenScrollToTop` may then also scroll to the top on the same tap. Such a delegate should return NO for the selected tab (as the library does by default). |
 | "更多"（More）Tab 中的页面不参与判断。 | Pages inside the "More" tab are not covered. |
 
 ## 截图 / Screenshots
