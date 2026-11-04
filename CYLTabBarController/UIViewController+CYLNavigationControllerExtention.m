@@ -248,13 +248,10 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // [CN] 根据你的
 }
 
 /// [CN] 显示或隐藏 TabBar（带屏幕外滑入/滑出动画）
-/// @param visible YES=显示（从底部升上来），NO=隐藏（降到底部屏幕外）
-/// @param animated 是否使用动画
-/// @param completion 完成回调
 /// [EN] Show or hide the TabBar (with an off-screen slide-in/slide-out animation).
-///      @param visible YES = show (rise from the bottom), NO = hide (drop off-screen at the bottom)
-///      @param animated Whether to animate
-///      @param completion Completion callback
+/// @param visible [EN] YES = show (rise from the bottom), NO = hide (drop off-screen at the bottom). [CN] YES=显示（从底部升上来），NO=隐藏（降到底部屏幕外）。
+/// @param animated [EN] Whether to animate. [CN] 是否使用动画。
+/// @param completion [EN] Completion callback. [CN] 完成回调。
 - (void)cyl_setTabBarVisible:(BOOL)visible
                     animated:(BOOL)animated
                   completion:(void (^ _Nullable)(BOOL finished))completion {

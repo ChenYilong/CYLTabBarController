@@ -262,6 +262,7 @@ typedef void (^CYLPopPushDemoAction)(void);
     CYLPopPushDemoRow *row = self.sections[indexPath.section][indexPath.row];
     cell.textLabel.text = row.title;
     cell.detailTextLabel.text = row.detail;
+    [cell cyl_wrapsTextLabels];
     [cell cyl_showBadgeForRow:indexPath.row];
     return cell;
 }

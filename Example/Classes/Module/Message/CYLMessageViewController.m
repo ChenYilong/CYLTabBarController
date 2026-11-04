@@ -7,6 +7,7 @@
 //
 
 #import "CYLMessageViewController.h"
+#import "CYLFlatDesignTableViewController.h"
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
 #import <CYLTabBarController/UIViewController+CYLSettingsSection.h>
 #import "CYLMainRootViewController.h"
@@ -16,14 +17,21 @@
 
 @implementation CYLMessageViewController
 
+
+- (instancetype)init {
+    // [EN] Inset grouped sections with rounded corners, as in the Settings app.
+    // [CN] 与系统“设置”App 相同的圆角分组（Inset Grouped）样式。
+    return [super initWithStyle:UITableViewStyleInsetGrouped];
+}
+
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.tableView.rowHeight = CYLBadgeRowHeight;
+    [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
     NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
 
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
 //    self.navigationItem.title = @"消息";    //✅sets navigation bar title.The right way to set the title of the navigation
 //    self.tabBarItem.title = @"消息";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
     //self.title = @"消息1";                //❌sets both of these. Do not do this‼️‼️ This may cause something strange
@@ -57,10 +65,15 @@
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
     [cell cyl_showBadgeForRow:indexPath.row];
-    cell.detailTextLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
+    // [EN] An action row shows the action as its title; the other rows the badge sample, the page as the subtitle.
+    //      Both wrap.
+    // [CN] 操作行以操作为主标题；其余行以角标样例为主标题、页面为副标题。均可换行。
+    [cell cyl_wrapsTextLabels];
     if (0 == indexPath.row) {
-        // The second row of the demo pushes a tab bar controller of the SAME context, see `-tableView:didSelectRowAtIndexPath:`.
-        [[cell textLabel] setText:CYLLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）")];
+        // [EN] Pushes a tab bar controller of the SAME context, see `-tableView:didSelectRowAtIndexPath:`.
+        // [CN] 推入同一个 context 的 TabBarController，见 `-tableView:didSelectRowAtIndexPath:`。
+        cell.textLabel.text = CYLLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）");
+        cell.detailTextLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
         return;
     }
     if (1 == indexPath.row) {
@@ -70,15 +83,15 @@
         cell.detailTextLabel.text = CYLLocalizedString(@"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应");
         return;
     }
-    [[cell textLabel] setText:[NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])]];
-
+    cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
 }
 
 #pragma mark - Table view
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == CYLSettingsSection) {
-        return [self cyl_settingsCellForTableView:tableView atIndexPath:indexPath];
+    if (indexPath.section < [self cyl_demoSectionCount]) {
+        return [self cyl_demoCellForTableView:tableView indexPath:indexPath];
     }
     static NSString * CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -90,8 +103,8 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == CYLSettingsSection) {
-        [self cyl_didSelectSettingsRowAtIndexPath:indexPath inTableView:tableView];
+    if (indexPath.section < [self cyl_demoSectionCount]) {
+        [self cyl_demoDidSelectRowAtIndexPath:indexPath inTableView:tableView];
         return;
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -133,12 +146,18 @@
 
 // Section 0: settings (language, memory warning). 第 0 组：设置（语言、内存警告）。
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 2;
+    // [EN] The grouped demo sections (shared with the FlatDesign page), then this page's rows.
+    // [CN] 分组的演示 section（与扁平样式页面共用），然后是本页面的行。
+    return [self cyl_demoSectionCount] + 1;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLLocalizedString(@"角标");
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (section == CYLSettingsSection) {
-        return [self cyl_settingsRowCount];
+    if (section < [self cyl_demoSectionCount]) {
+        return [self cyl_demoRowCountInSection:section];
     }
     return MAX(15, [UITableViewCell cyl_badgeStyleCount]); // every badge style has a row
 }

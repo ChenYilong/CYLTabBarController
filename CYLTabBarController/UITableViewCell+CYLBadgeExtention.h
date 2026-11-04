@@ -48,6 +48,19 @@ FOUNDATION_EXTERN const CGFloat CYLBadgeRowHeight;
  */
 + (NSInteger)cyl_badgeStyleCount;
 
+/*!
+ * [EN] Lets the title and the subtitle wrap onto as many lines as they need, never truncated with an ellipsis. Use it
+ *      with `+cyl_setUpAutomaticRowHeightForTableView:`.
+ * [CN] 标题与副标题按需换行，不会以省略号截断。与 `+cyl_setUpAutomaticRowHeightForTableView:` 一起使用。
+ */
+- (void)cyl_wrapsTextLabels;
+
+/*!
+ * [EN] Rows as high as their wrapped text (`-cyl_wrapsTextLabels`), estimated at `CYLBadgeRowHeight`.
+ * [CN] 行高随换行后的文字变化（`-cyl_wrapsTextLabels`），预估行高为 `CYLBadgeRowHeight`。
+ */
++ (void)cyl_setUpAutomaticRowHeightForTableView:(UITableView *)tableView;
+
 @end
 
 /*!

@@ -195,10 +195,33 @@
     return isPlatterLiquidLensView && (self.hidden == NO);
 }
 
+- (BOOL)cyl_isTabBarItemIconView {
+    return [objc_getAssociatedObject(self, @selector(cyl_isTabBarItemIconView)) boolValue];
+}
+
+- (void)cyl_setTabBarItemIconView:(BOOL)tabBarItemIconView {
+    objc_setAssociatedObject(self, @selector(cyl_isTabBarItemIconView), @(tabBarItemIconView), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (BOOL)cyl_isTabButtonCoverView {
+    return [objc_getAssociatedObject(self, @selector(cyl_isTabButtonCoverView)) boolValue];
+}
+
+- (void)cyl_setTabButtonCoverView:(BOOL)tabButtonCoverView {
+    objc_setAssociatedObject(self, @selector(cyl_isTabButtonCoverView), (tabButtonCoverView ? @YES : nil), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 - (BOOL)cyl_isTabImageView {
     BOOL isKindOfImageView = [self cyl_isKindOfClass:[UIImageView class]];
     if (!isKindOfImageView) {
         return NO;
+    }
+    // [EN] Issue #601: a view shown in place of the icon, or inside one, is not the tab's icon.
+    // [CN] 替换图标的视图（或其子视图）不是 Tab 的图标。
+    for (UIView *view = (UIView *)self; view && ![view isKindOfClass:[UIControl class]]; view = view.superview) {
+        if (view.cyl_isTabBarItemIconView) {
+            return NO;
+        }
     }
     NSString *subString = [NSString stringWithFormat:@"%@cat%@ew", @"Indi" , @"orVi"];
     BOOL isBackgroundImage = [self cyl_classStringHasSuffix:subString];
@@ -372,7 +395,8 @@
         
         // [CN] 过滤掉选中背景, UITabBar+SelectionIndicatorView
         // [EN] Filter out the selection background, UITabBar+SelectionIndicatorView
-        if ([subview isKindOfClass:[UIImageView class]] &&
+        // [EN] Not a view shown in place of the icon (issue #601). [CN] 不包括替换图标显示的视图。
+        if ([subview isKindOfClass:[UIImageView class]] && !subview.cyl_isTabBarItemIconView &&
             ![classString hasSuffix:@"SelectionIndicatorView"]&& ![classString hasPrefix:@"UITabBar"]  ) {
             imageView = (UIImageView *)subview;
         }
