@@ -1297,7 +1297,14 @@ static NSDictionary *_Nullable CYLDictionaryFromProperties(NSString *text, NSErr
             value = CYLTypedScalar(CYLUnescapedPropertiesString(rest), NO);
         }
         NSString *dotted = [key stringByReplacingOccurrencesOfString:@"__" withString:@"."];
-        NSArray<NSString *> *path = [dotted componentsSeparatedByString:@"."];
+        // A quoted part may contain dots, e.g. a Lottie keypath: a."Icon.**.Color". 带引号的部分可以包含点，例如 Lottie keypath。
+        NSArray<NSString *> *path = [dotted rangeOfString:@"\""].location != NSNotFound
+            ? CYLSplitDottedKey(dotted)
+            : [dotted componentsSeparatedByString:@"."];
+        if (path.count == 0) {
+            if (error) { *error = CYLConfigurationSyntaxError(@"Properties", number, @"invalid key"); }
+            return nil;
+        }
         for (NSString *part in path) {
             if (part.length == 0) {
                 if (error) { *error = CYLConfigurationSyntaxError(@"Properties", number, @"invalid key"); }
