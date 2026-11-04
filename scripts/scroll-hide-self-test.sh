@@ -1,8 +1,10 @@
 #!/bin/sh
 # Scroll hiding self-test (issue #13) on an iOS simulator, on a Mac with Xcode and CocoaPods.
 #
-#   scripts/scroll-hide-self-test.sh                 # first available iPhone simulator
-#   scripts/scroll-hide-self-test.sh "iPhone 16"     # a simulator by name
+#   scripts/scroll-hide-self-test.sh                          # newest iPhone simulator, default demo style
+#   scripts/scroll-hide-self-test.sh "iPhone 16"              # a simulator by name
+#   STYLE=FlatDesign scripts/scroll-hide-self-test.sh         # start on the FlatDesign tab bar
+#   RUNTIME=iOS-18 scripts/scroll-hide-self-test.sh           # an iPhone of a runtime (classic style before iOS 26)
 #
 # [EN] Builds the Objective-C demo, installs it on a booted simulator, launches it with -CYLScrollHideSelfTest YES and
 #      streams the console. The demo runs every automatic simulation (-[UIViewController cyl_runScrollHideSelfTest]) and
@@ -16,14 +18,25 @@
 set -eu
 cd "$(dirname "$0")/.."
 DEVICE_NAME="${1:-}"
+STYLE="${STYLE:-}"
+RUNTIME="${RUNTIME:-}"
 DERIVED=build/scroll-hide-self-test
 LOG="$DERIVED/self-test.log"
+BUILD_LOG="$DERIVED/build.log"
 TIMEOUT=600
+mkdir -p "$DERIVED"
 
+xcodebuild -version
 pod install
-xcodebuild -workspace CYLTabBarController.xcworkspace -scheme CYLTabBarController -configuration Debug \
+if ! xcodebuild -workspace CYLTabBarController.xcworkspace -scheme CYLTabBarController -configuration Debug \
   -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath "$DERIVED" \
-  CODE_SIGNING_ALLOWED=NO build | tail -n 20
+  CODE_SIGNING_ALLOWED=NO build > "$BUILD_LOG" 2>&1; then
+  echo "Build failed. Errors:"
+  grep -nE "(error|fatal error):" "$BUILD_LOG" | sort -u | head -n 60 || true
+  tail -n 30 "$BUILD_LOG"
+  exit 1
+fi
+echo "Build succeeded."
 
 APP=$(find "$DERIVED/Build/Products/Debug-iphonesimulator" -maxdepth 1 -name '*.app' | head -n 1)
 [ -n "$APP" ] || { echo "No .app was built"; exit 1; }
@@ -32,12 +45,15 @@ BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.pl
 if [ -z "$DEVICE_NAME" ]; then
   DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
 import json, sys
+wanted = sys.argv[1]
 devices = json.load(sys.stdin)["devices"]
 for runtime in sorted(devices, reverse=True):
+    if wanted and wanted not in runtime:
+        continue
     for device in devices[runtime]:
         if device["name"].startswith("iPhone"):
             print(device["udid"]); sys.exit(0)
-sys.exit(1)')
+sys.exit(1)' "$RUNTIME") || { echo "No iPhone simulator for runtime '$RUNTIME'"; xcrun simctl list runtimes; exit 1; }
 else
   DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
 import json, sys
@@ -55,7 +71,12 @@ xcrun simctl install "$DEVICE_ID" "$APP"
 
 mkdir -p "$DERIVED"
 : > "$LOG"
-xcrun simctl launch --console-pty --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLScrollHideSelfTest YES > "$LOG" 2>&1 &
+STYLE_ARGUMENTS=""
+if [ "$STYLE" = "FlatDesign" ]; then
+  STYLE_ARGUMENTS="-CYLScrollHideSelfTestFlatDesign YES"
+fi
+# shellcheck disable=SC2086
+xcrun simctl launch --console-pty --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLScrollHideSelfTest YES $STYLE_ARGUMENTS > "$LOG" 2>&1 &
 LAUNCH_PID=$!
 ELAPSED=0
 while ! grep -q "scroll hiding self-test: done" "$LOG"; do

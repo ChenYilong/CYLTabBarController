@@ -19,18 +19,39 @@ permissions:
 
 jobs:
   self-test:
+    name: self-test (${{ matrix.style }}${{ matrix.runtime && format(', {0}', matrix.runtime) || '' }})
     runs-on: macos-15
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # FlatDesign: code can hide it on every system, so this runs the whole self-test.
+          - style: FlatDesign
+            runtime: ""
+          # Classic style: the default demo before iOS 26 (needs an iOS 18 simulator runtime on the runner).
+          - style: Default
+            runtime: iOS-18
     steps:
       - uses: actions/checkout@v4
+      - name: Select the newest Xcode
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_*.app | sort -V | tail -n 1)
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+          xcrun simctl list runtimes
       - name: Run the self-test
         env:
           DEVICE: ${{ inputs.device }}
+          STYLE: ${{ matrix.style }}
+          RUNTIME: ${{ matrix.runtime }}
         run: scripts/scroll-hide-self-test.sh "$DEVICE"
-      - name: Keep the log
+      - name: Keep the logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: scroll-hide-self-test-log
-          path: build/scroll-hide-self-test/self-test.log
+          name: scroll-hide-self-test-${{ matrix.style }}${{ matrix.runtime && format('-{0}', matrix.runtime) || '' }}
+          path: |
+            build/scroll-hide-self-test/self-test.log
+            build/scroll-hide-self-test/build.log
           if-no-files-found: ignore
