@@ -219,3 +219,15 @@
 "跳转与对比" = "Navigation et comparaisons";
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Non pris en charge par Liquid Glass : le système fixe la hauteur de la barre (FlatDesign et le style classique la prennent en charge)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Habillage";
+"换肤（主题，issue #216）" = "Habillage (thème, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Touchez pour choisir un thème : le fond, les icônes et les couleurs du texte de la TabBar changent sur place, dans tous les styles de TabBar. Actuel : %@";
+"选择主题" = "Choisir un thème";
+"默认" = "Par défaut";
+"西柚" = "Pamplemousse";
+"青草" = "Herbe";
+"玫瑰粉" = "Rose";
+"春节" = "Fête du Printemps";
+"跟随系统深色模式" = "Suivre le mode sombre du système";

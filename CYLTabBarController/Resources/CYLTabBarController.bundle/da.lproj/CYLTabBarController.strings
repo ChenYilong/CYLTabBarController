@@ -219,3 +219,15 @@
 "跳转与对比" = "Navigation og sammenligninger";
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Understøttes ikke af Liquid Glass: systemet bestemmer fanelinjens højde (FlatDesign og klassisk stil understøtter det)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Udseende";
+"换肤（主题，issue #216）" = "Udseende (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Tryk for at vælge et tema: TabBar-baggrunden, ikonerne og tekstfarverne skifter på stedet, i alle TabBar-stilarter. Nu: %@";
+"选择主题" = "Vælg et tema";
+"默认" = "Standard";
+"西柚" = "Grapefrugt";
+"青草" = "Græs";
+"玫瑰粉" = "Lyserød rose";
+"春节" = "Forårsfestivalen";
+"跟随系统深色模式" = "Følg systemets mørke tilstand";

@@ -219,3 +219,15 @@
 "跳转与对比" = "Navigasi dan perbandingan";
 "角标" = "Lencana";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Tidak disokong Liquid Glass: sistem menentukan ketinggian bar tab (FlatDesign dan gaya klasik menyokong)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Kulit";
+"换肤（主题，issue #216）" = "Kulit (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Ketik untuk memilih tema: latar, ikon dan warna teks TabBar bertukar di tempat, dalam semua gaya TabBar. Semasa: %@";
+"选择主题" = "Pilih tema";
+"默认" = "Lalai";
+"西柚" = "Limau Gedang";
+"青草" = "Rumput";
+"玫瑰粉" = "Mawar Merah Jambu";
+"春节" = "Tahun Baru Cina";
+"跟随系统深色模式" = "Ikut Mod Gelap sistem";

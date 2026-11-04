@@ -219,3 +219,15 @@
 "跳转与对比" = "Navigace a srovnání";
 "角标" = "Odznaky";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nepodporuje: výšku panelu určuje systém (FlatDesign a klasický styl ano)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Vzhled";
+"换肤（主题，issue #216）" = "Vzhled (motiv, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Klepnutím vyberte motiv: pozadí, ikony a barvy textu TabBar se změní na místě, ve všech stylech TabBar. Nyní: %@";
+"选择主题" = "Vyberte motiv";
+"默认" = "Výchozí";
+"西柚" = "Grapefruit";
+"青草" = "Tráva";
+"玫瑰粉" = "Růžová růže";
+"春节" = "Svátky jara";
+"跟随系统深色模式" = "Řídit se tmavým režimem systému";

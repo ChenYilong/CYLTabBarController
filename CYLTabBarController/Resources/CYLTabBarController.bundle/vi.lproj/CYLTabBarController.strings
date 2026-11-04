@@ -219,3 +219,15 @@
 "跳转与对比" = "Điều hướng và so sánh";
 "角标" = "Huy hiệu";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass không hỗ trợ: hệ thống quyết định chiều cao thanh tab (FlatDesign và kiểu cổ điển hỗ trợ)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Giao diện";
+"换肤（主题，issue #216）" = "Giao diện (chủ đề, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Chạm để chọn chủ đề: nền, biểu tượng và màu chữ của TabBar đổi ngay tại chỗ, với mọi kiểu TabBar. Hiện tại: %@";
+"选择主题" = "Chọn chủ đề";
+"默认" = "Mặc định";
+"西柚" = "Bưởi";
+"青草" = "Cỏ";
+"玫瑰粉" = "Hồng phấn";
+"春节" = "Tết Nguyên Đán";
+"跟随系统深色模式" = "Theo chế độ tối của hệ thống";

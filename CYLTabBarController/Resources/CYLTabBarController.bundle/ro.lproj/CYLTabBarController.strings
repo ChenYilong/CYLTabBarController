@@ -219,3 +219,15 @@
 "跳转与对比" = "Navigare și comparații";
 "角标" = "Insigne";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Nu este acceptat de Liquid Glass: sistemul stabilește înălțimea barei (FlatDesign și stilul clasic acceptă)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Aspect";
+"换肤（主题，issue #216）" = "Aspect (temă, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Atingeți pentru a alege o temă: fundalul, pictogramele și culorile textului din TabBar se schimbă pe loc, în toate stilurile TabBar. Acum: %@";
+"选择主题" = "Alegeți o temă";
+"默认" = "Implicit";
+"西柚" = "Grepfrut";
+"青草" = "Iarbă";
+"玫瑰粉" = "Trandafir roz";
+"春节" = "Festivalul Primăverii";
+"跟随系统深色模式" = "Urmează modul întunecat al sistemului";

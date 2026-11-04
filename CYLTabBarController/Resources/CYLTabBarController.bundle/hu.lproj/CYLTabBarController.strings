@@ -219,3 +219,15 @@
 "跳转与对比" = "Navigáció és összehasonlítás";
 "角标" = "Jelvények";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nem támogatja: a lapsáv magasságát a rendszer adja meg (FlatDesign és a klasszikus stílus támogatja)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Megjelenés";
+"换肤（主题，issue #216）" = "Megjelenés (téma, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Koppintson egy téma kiválasztásához: a TabBar háttere, ikonjai és szövegszínei a helyükön változnak, minden TabBar-stílusban. Most: %@";
+"选择主题" = "Válasszon témát";
+"默认" = "Alapértelmezett";
+"西柚" = "Grépfrút";
+"青草" = "Fű";
+"玫瑰粉" = "Rózsaszín rózsa";
+"春节" = "Tavaszünnep";
+"跟随系统深色模式" = "A rendszer sötét módjának követése";

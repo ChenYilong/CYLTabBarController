@@ -50,6 +50,8 @@ let package = Package(
                 .headerSearchPath("CYLBadgeView"),
                 // FIX: issue #535 — the CYLUtils sources (CocoaPods `CYLUtils` subspec), shared by Core and CYLBadgeView.
                 .headerSearchPath("CYLUtils"),
+                // FIX: issue #216 — theme switching (skins), in CYLUtils/CYLComponents/CYLTheme.
+                .headerSearchPath("CYLUtils/CYLComponents/CYLTheme"),
                 .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar"),
                 .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBarPrivate"),
             ]

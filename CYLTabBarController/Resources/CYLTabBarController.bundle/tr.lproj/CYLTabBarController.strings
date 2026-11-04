@@ -219,3 +219,15 @@
 "跳转与对比" = "Gezinme ve karşılaştırmalar";
 "角标" = "Rozetler";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass desteklemiyor: sekme çubuğu yüksekliğini sistem belirler (FlatDesign ve klasik stil destekler)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Görünüm";
+"换肤（主题，issue #216）" = "Görünüm (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Tema seçmek için dokunun: TabBar arka planı, simgeleri ve metin renkleri her TabBar stilinde yerinde değişir. Şu an: %@";
+"选择主题" = "Tema seçin";
+"默认" = "Varsayılan";
+"西柚" = "Greyfurt";
+"青草" = "Çimen";
+"玫瑰粉" = "Pembe Gül";
+"春节" = "Bahar Bayramı";
+"跟随系统深色模式" = "Sistemin Karanlık Modunu izle";
