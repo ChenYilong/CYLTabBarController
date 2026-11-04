@@ -9,18 +9,10 @@
 #import <CYLTabBarController/CYLTabBarController.h>
 #import <CYLTabBarController/CYLTabBar.h>
 
-@interface CYLTabBarToolkitTests : XCTestCase <CYLTabBarControllerDelegate>
-@property (nonatomic, assign) NSInteger delegateDoubleTaps;
-@property (nonatomic, assign) NSUInteger delegateDoubleTapIndex;
+@interface CYLTabBarToolkitTests : XCTestCase
 @end
 
 @implementation CYLTabBarToolkitTests
-
-- (void)setUp {
-    [super setUp];
-    self.delegateDoubleTaps = 0;
-    self.delegateDoubleTapIndex = NSNotFound;
-}
 
 /// [EN] Two tabs in navigation controllers, laid out. [CN] 两个放在导航控制器中的 Tab，已布局。
 - (CYLTabBarController *)newTabBarController {
@@ -34,66 +26,18 @@
     return tabBarController;
 }
 
-- (void)tabBarController:(CYLTabBarController *)tabBarController didDoubleTapViewController:(UIViewController *)viewController atIndex:(NSUInteger)index {
-    self.delegateDoubleTaps++;
-    self.delegateDoubleTapIndex = index;
-}
-
 #pragma mark - Double tap
 
-- (void)testDoubleTapIntervalIsShort {
-    XCTAssertEqualWithAccuracy(CYLTabBarItemDoubleTapInterval, 0.3, 0.001);
-}
-
-- (void)testTwoQuickTapsOnTheSelectedTabFireOnce {
+/// [EN] The per-tab block; the taps themselves are recognized by the tab bar item gestures (docs/TabBarItem-Gestures.md).
+/// [CN] 单个 Tab 的 block；点击本身由 TabBarItem 手势识别（docs/TabBarItem-Gestures.md）。
+- (void)testDoubleTapBlockIsKeptOnTheItem {
     CYLTabBarController *tabBarController = [self newTabBarController];
-    UITabBar *tabBar = tabBarController.tabBar;
-    XCTAssertGreaterThanOrEqual(tabBar.items.count, 2u);
-    tabBarController.selectedIndex = 0;
-    tabBarController.delegate = self;
-    __block NSInteger blockDoubleTaps = 0;
-    __block NSInteger blockIndex = -1;
-    tabBarController.viewControllers[0].tabBarItem.cyl_doubleTapBlock = ^(UITabBarItem *tabBarItem, NSInteger index) {
-        blockDoubleTaps++;
-        blockIndex = index;
-    };
-
-    [tabBarController tabBar:tabBar didSelectItem:tabBar.items[0]];
-    XCTAssertEqual(blockDoubleTaps, 0, @"one tap is not a double tap");
-    [tabBarController tabBar:tabBar didSelectItem:tabBar.items[0]];
-    XCTAssertEqual(blockDoubleTaps, 1);
-    XCTAssertEqual(blockIndex, 0);
-    XCTAssertEqual(self.delegateDoubleTaps, 1);
-    XCTAssertEqual(self.delegateDoubleTapIndex, 0u);
-}
-
-- (void)testTapsTooFarApartDoNotFire {
-    CYLTabBarController *tabBarController = [self newTabBarController];
-    UITabBar *tabBar = tabBarController.tabBar;
-    XCTAssertGreaterThanOrEqual(tabBar.items.count, 2u);
-    tabBarController.selectedIndex = 0;
-    __block NSInteger doubleTaps = 0;
-    tabBarController.viewControllers[0].tabBarItem.cyl_doubleTapBlock = ^(UITabBarItem *tabBarItem, NSInteger index) {
-        doubleTaps++;
-    };
-    [tabBarController tabBar:tabBar didSelectItem:tabBar.items[0]];
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:CYLTabBarItemDoubleTapInterval + 0.15]];
-    [tabBarController tabBar:tabBar didSelectItem:tabBar.items[0]];
-    XCTAssertEqual(doubleTaps, 0);
-}
-
-- (void)testATapOnAnotherTabDoesNotCount {
-    CYLTabBarController *tabBarController = [self newTabBarController];
-    UITabBar *tabBar = tabBarController.tabBar;
-    XCTAssertGreaterThanOrEqual(tabBar.items.count, 2u);
-    tabBarController.selectedIndex = 0;
-    __block NSInteger doubleTaps = 0;
-    tabBarController.viewControllers[1].tabBarItem.cyl_doubleTapBlock = ^(UITabBarItem *tabBarItem, NSInteger index) {
-        doubleTaps++;
-    };
-    // [EN] The tab is not selected before this tap: it never counts. [CN] 点击前该 Tab 未选中：不计入。
-    [tabBarController tabBar:tabBar didSelectItem:tabBar.items[1]];
-    XCTAssertEqual(doubleTaps, 0);
+    UITabBarItem *item = tabBarController.viewControllers[0].tabBarItem;
+    XCTAssertNil(item.cyl_doubleTapBlock);
+    item.cyl_doubleTapBlock = ^(UITabBarItem *tabBarItem, NSInteger index) {};
+    XCTAssertNotNil(item.cyl_doubleTapBlock);
+    item.cyl_doubleTapBlock = nil;
+    XCTAssertNil(item.cyl_doubleTapBlock);
 }
 
 #pragma mark - Item appearance

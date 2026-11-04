@@ -14,7 +14,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 一组面向 TabBar 日常定制的小功能：双击选中的 Tab、一次设置所有布局的 item 样式等。每项功能都适用于液态玻璃、系统 TabBar 与扁平样式（另有说明的除外），并且不 hook 全局的 UIKit 方法。 | A set of small features for everyday tab bar customization: a double tap on the selected tab, item styles for every layout in one go, and more. Each one works in Liquid Glass, the system tab bar and FlatDesign (unless noted), without hooking global UIKit methods. |
+| 一组面向 TabBar 日常定制的小功能：单个 Tab 的双击 block、一次设置所有布局的 item 样式等。每项功能都适用于液态玻璃、系统 TabBar 与扁平样式（另有说明的除外），并且不 hook 全局的 UIKit 方法。 | A set of small features for everyday tab bar customization: a double tap block per tab, item styles for every layout in one go, and more. Each one works in Liquid Glass, the system tab bar and FlatDesign (unless noted), without hooking global UIKit methods. |
 
 ## [CN]目录
 ## [EN]Contents
@@ -24,7 +24,7 @@
 
 | 中文 | English |
 |:---|:---|
-| [双击选中的 Tab](#cn双击选中的-tab) | [Double tap on the selected tab](#endouble-tap-on-the-selected-tab) |
+| [单个 Tab 的双击 block](#cn单个-tab-的双击-block) | [A double tap block per tab](#ena-double-tap-block-per-tab) |
 | [一次设置所有布局的 item 样式](#cn一次设置所有布局的-item-样式) | [Item styles for every layout in one go](#enitem-styles-for-every-layout-in-one-go) |
 | [经典样式接口与 UITabBarAppearance 同时生效](#cn经典样式接口与-uitabbarappearance-同时生效) | [Classic styles and UITabBarAppearance together](#enclassic-styles-and-uitabbarappearance-together) |
 | [背景视图、阴影线与模糊效果](#cn背景视图阴影线与模糊效果) | [Background views, the shadow line and the blur](#enbackground-views-the-shadow-line-and-the-blur) |
@@ -38,29 +38,20 @@
 
 <!-- navigation:end -->
 
-## [CN]双击选中的 Tab
-## [EN]Double tap on the selected tab
+## [CN]单个 Tab 的双击 block
+## [EN]A double tap block per tab
 
 | 中文 | English |
 |:---|:---|
-| 快速（`CYLTabBarItemDoubleTapInterval`，0.3 秒内）连续两次点击当前选中的 Tab 时回调，常用于列表回到顶部并刷新。只统计对已选中 Tab 的点击，选中 Tab 的那一次点击不计入；PlusButton 不参与。两种写法：在该 Tab 的 `tabBarItem` 上设置 block，或实现代理方法。 | Called when the user taps the selected tab twice quickly (within `CYLTabBarItemDoubleTapInterval`, 0.3 s), typically to scroll a list to the top and refresh it. Only taps on a tab that is already selected count; the tap that selects a tab does not; the plus button never does. Two ways: a block on the tab's `tabBarItem`, or a delegate method. |
+| 双击由 [TabBarItem 手势](TabBarItem-Gestures.md)（`cyl_tabBarItemGestureHandler` / `-tabBarController:didRecognizeTabBarItemGesture:control:viewController:`）识别，适用于所有样式。`-[UITabBarItem cyl_doubleTapBlock]` 是其中 DoubleTap 的单个 Tab 快捷写法：直接设置在该 Tab 的 `tabBarItem` 上（导航控制器的 `tabBarItem`，根控制器的也可以），识别方式与间隔（`cyl_tabBarItemDoubleTapInterval`）完全相同，在手势 handler 与代理之后执行。只设置了 block、没有 handler 或代理时，同样会识别点击（长按手势仍只在有接收方时添加）。 | Double taps are recognized by the [tab bar item gestures](TabBarItem-Gestures.md) (`cyl_tabBarItemGestureHandler` / `-tabBarController:didRecognizeTabBarItemGesture:control:viewController:`), in every style. `-[UITabBarItem cyl_doubleTapBlock]` is a per-tab shortcut for their DoubleTap: set it on the tab's `tabBarItem` (the navigation controller's; the root view controller's also works); the recognition and the interval (`cyl_tabBarItemDoubleTapInterval`) are the same, and it runs after the gesture handler and the delegate. With only a block and no handler or delegate, taps are still recognized (the long press recognizer is still added only when someone listens for it). |
 
 ```Objective-C
-// Block: on the tab's item (the navigation controller's tabBarItem; the root view controller's also works).
 __weak __typeof(self) weakSelf = self;
 self.navigationController.tabBarItem.cyl_doubleTapBlock = ^(UITabBarItem *tabBarItem, NSInteger index) {
     [weakSelf.tableView setContentOffset:CGPointZero animated:YES];
     [weakSelf.tableView.mj_header beginRefreshing];
 };
-
-// Delegate: CYLTabBarControllerDelegate.
-- (void)tabBarController:(CYLTabBarController *)tabBarController didDoubleTapViewController:(UIViewController *)viewController atIndex:(NSUInteger)index {
-}
 ```
-
-| 中文 | English |
-|:---|:---|
-| 实现方式：系统 TabBar（液态玻璃、经典样式）与扁平样式 TabBar 的每次点击都会在选中状态改变之前调用 `-[CYLTabBarController tabBar:didSelectItem:]`，在这里判断点击的是否为已选中的 Tab。重写该方法的子类请调用 super。演示：ObjC 示例首页，双击“首页” Tab 回到顶部并刷新。 | How: every tap of the system tab bar (Liquid Glass, classic) and of the flat design tab bar reaches `-[CYLTabBarController tabBar:didSelectItem:]` before the selection changes, where the tap on an already selected tab is detected. A subclass that overrides that method calls super. Demo: the ObjC example's home page: double tap the Home tab to scroll to the top and refresh. |
 
 ## [CN]一次设置所有布局的 item 样式
 ## [EN]Item styles for every layout in one go
@@ -184,5 +175,5 @@ tabBarController.cyl_tabBarShadowColor = UIColor.clearColor; // no separator lin
 
 | 中文 | English |
 |:---|:---|
-| 在没有 Xcode 与模拟器的 Linux 环境中完成，无法运行示例，因此没有截图。新增代码已基于 UIKit 最小桩头文件通过 `clang -fsyntax-only -Wall -Wextra` 与 `clang --analyze`（无警告）。双击在液态玻璃（iOS 26）上的行为尚未在真机验证。 | Made on Linux without Xcode or a simulator, so the examples could not be run and there are no screenshots. The new code passes `clang -fsyntax-only -Wall -Wextra` and `clang --analyze` (no warnings) against minimal UIKit stub headers. The double tap on Liquid Glass (iOS 26) is not yet verified on a device. |
-| 单元测试：新增 `CYLTabBarControllerTests` 测试 target（链接 `CYLTabBarController-Framework`，已加入该 scheme），覆盖双击、经典样式同步、模糊效果、统一样式、TabBar 主题、主题管理器等。在 Mac 上运行：`xcodebuild test -project CYLTabBarController.xcodeproj -scheme CYLTabBarController-Framework -destination 'platform=iOS Simulator,name=iPhone 16'`（或在 Xcode 中选择该 scheme 后按 ⌘U）。这些测试尚未在本环境中运行。 | Unit tests: a new `CYLTabBarControllerTests` target (linking `CYLTabBarController-Framework`, part of that scheme) covers the double tap, the classic style sync, the blur, the styles in one place, tab bar themes and the theme manager. Run them on a Mac: `xcodebuild test -project CYLTabBarController.xcodeproj -scheme CYLTabBarController-Framework -destination 'platform=iOS Simulator,name=iPhone 16'` (or pick that scheme in Xcode and press ⌘U). They have not been run in this environment yet. |
+| 在没有 Xcode 与模拟器的 Linux 环境中完成，无法运行示例，因此没有截图。新增代码已基于 UIKit 最小桩头文件通过 `clang -fsyntax-only -Wall -Wextra` 与 `clang --analyze`（无警告）。 | Made on Linux without Xcode or a simulator, so the examples could not be run and there are no screenshots. The new code passes `clang -fsyntax-only -Wall -Wextra` and `clang --analyze` (no warnings) against minimal UIKit stub headers. |
+| 单元测试：新增 `CYLTabBarControllerTests` 测试 target（链接 `CYLTabBarController-Framework`，已加入该 scheme），覆盖单个 Tab 的双击 block、经典样式同步、模糊效果、统一样式、TabBar 主题、主题管理器等。在 Mac 上运行：`xcodebuild test -project CYLTabBarController.xcodeproj -scheme CYLTabBarController-Framework -destination 'platform=iOS Simulator,name=iPhone 16'`（或在 Xcode 中选择该 scheme 后按 ⌘U）。这些测试尚未在本环境中运行。 | Unit tests: a new `CYLTabBarControllerTests` target (linking `CYLTabBarController-Framework`, part of that scheme) covers the per-tab double tap block, the classic style sync, the blur, the styles in one place, tab bar themes and the theme manager. Run them on a Mac: `xcodebuild test -project CYLTabBarController.xcodeproj -scheme CYLTabBarController-Framework -destination 'platform=iOS Simulator,name=iPhone 16'` (or pick that scheme in Xcode and press ⌘U). They have not been run in this environment yet. |

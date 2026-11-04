@@ -321,8 +321,6 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)cyl_syncTabBarAppearances;
 /// [EN] Implemented in the main implementation: the plus button's child view controller. [CN] 实现于主 implementation：PlusButton 的子控制器。
 - (nullable UIViewController *)cyl_contextPlusChildViewController;
-/// [EN] Implemented below (CYLDoubleTap). [CN] 实现见下方（CYLDoubleTap）。
-- (void)cyl_rememberSelectedIndexForDoubleTap;
 /// [EN] Implemented below (CYLTabBarItemStyle). [CN] 实现见下方（CYLTabBarItemStyle）。
 - (void)cyl_applyTabBarItemStyles;
 /// [EN] Implemented below (CYLOpaqueTabBarSafeArea). [CN] 实现见下方（CYLOpaqueTabBarSafeArea）。
@@ -6460,6 +6458,32 @@ static char CYLTabBarItemGestureStateKey;
 }
 
 /*!
+ * [EN] Taps are recognized for the gesture receivers above, and also for a tab item's `-[UITabBarItem cyl_doubleTapBlock]`.
+ *      The long press keeps `-cyl_hasTabBarItemGestureReceiver`, so its recognizer is added only when someone listens.
+ * [CN] 除上面的手势接收方外，Tab item 的 `-[UITabBarItem cyl_doubleTapBlock]` 也需要识别点击。长按仍使用
+ *      `-cyl_hasTabBarItemGestureReceiver`，因此只有存在接收方时才添加长按手势。
+ */
+- (BOOL)cyl_hasTabBarItemTapReceiver {
+    if ([self cyl_hasTabBarItemGestureReceiver]) {
+        return YES;
+    }
+    for (UIViewController *viewController in self.viewControllers) {
+        if ([self cyl_doubleTapBlockForViewController:viewController]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// [EN] The double tap block of a tab: its item's, else its root view controller's item's. [CN] Tab 的双击 block：其 item 的，否则为根控制器 item 的。
+- (nullable void (^)(UITabBarItem *, NSInteger))cyl_doubleTapBlockForViewController:(nullable UIViewController *)viewController {
+    if (!viewController) {
+        return nil;
+    }
+    return viewController.tabBarItem.cyl_doubleTapBlock ?: [viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem.cyl_doubleTapBlock;
+}
+
+/*!
  * [EN] YES when `control` is one of this controller's tab buttons, or its plus button; `viewController` is then the tab's
  *      view controller (the plus child view controller for the plus button, nil without one).
  * [CN] `control` 为本控制器的 Tab 按钮或 PlusButton 时返回 YES；此时 `viewController` 为对应 Tab 的控制器（PlusButton 为其子控制器，
@@ -6500,10 +6524,18 @@ static char CYLTabBarItemGestureStateKey;
     if ([delegate respondsToSelector:@selector(tabBarController:didRecognizeTabBarItemGesture:control:viewController:)]) {
         [delegate tabBarController:self didRecognizeTabBarItemGesture:gesture control:control viewController:viewController];
     }
+    // [EN] The tab's own double tap block, after the handler and the delegate. [CN] Tab 自己的双击 block，在 handler 与代理之后。
+    if (CYLTabBarItemGestureDoubleTap == gesture) {
+        void (^doubleTapBlock)(UITabBarItem *, NSInteger) = [self cyl_doubleTapBlockForViewController:viewController];
+        NSUInteger index = viewController ? [self.viewControllers indexOfObject:viewController] : NSNotFound;
+        if (doubleTapBlock && index != NSNotFound) {
+            doubleTapBlock(viewController.tabBarItem, (NSInteger)index);
+        }
+    }
 }
 
 - (void)cyl_recognizeTabBarItemGestureForReportedControl:(UIControl *)control {
-    if (![self cyl_hasTabBarItemGestureReceiver]) {
+    if (![self cyl_hasTabBarItemTapReceiver]) {
         return;
     }
     // [EN] A CYLPlusButton counts its own taps (`-cyl_recognizePlusButtonTap:…`), tab buttons count before the selection
@@ -6553,7 +6585,7 @@ static char CYLTabBarItemGestureStateKey;
  *      TabBarController（代理是其他对象，或子类重写时未调用 super）也仍使用上报。
  */
 - (void)cyl_recognizeTabBarItemTapWillSelectViewController:(UIViewController *)viewController {
-    if (![self cyl_hasTabBarItemGestureReceiver] || !viewController || viewController.cyl_isPlaceholder) {
+    if (![self cyl_hasTabBarItemTapReceiver] || !viewController || viewController.cyl_isPlaceholder) {
         return;
     }
     UIControl *control = nil;
@@ -6613,7 +6645,7 @@ static char CYLTabBarItemGestureStateKey;
  *      时，即使系统在按下时已选中它，也算 Reselect。此后与 shouldSelect 入口一样，Tab 按钮不再使用 `didSelectControl` 上报计数。
  */
 - (void)cyl_recognizeLiquidGlassTapOnControl:(UIControl *)control selectedViewControllerAtTouchDown:(UIViewController *)selectedViewController {
-    if (![self cyl_hasTabBarItemGestureReceiver]) {
+    if (![self cyl_hasTabBarItemTapReceiver]) {
         return;
     }
     UIViewController *viewController = nil;
@@ -6627,7 +6659,7 @@ static char CYLTabBarItemGestureStateKey;
 
 - (void)cyl_recognizePlusButtonTap:(UIControl *)plusButton selectedViewControllerAtTouchDown:(UIViewController *)selectedViewController {
     // Guard: only with a plus button. 仅在有 PlusButton 时处理。
-    if (![self cyl_hasTabBarItemGestureReceiver] || ![self hasPlusButton]) {
+    if (![self cyl_hasTabBarItemTapReceiver] || ![self hasPlusButton]) {
         return;
     }
     UIViewController *viewController = nil;
@@ -7374,88 +7406,6 @@ static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
 
 @end
 
-#pragma mark - Double tap on the selected tab
-
-const NSTimeInterval CYLTabBarItemDoubleTapInterval = 0.3;
-
-/// [EN] The first tap of a possible double tap: the tab's index and when. [CN] 可能的双击中第一次点击：Tab 下标与时间。
-static char CYLDoubleTapLastIndexKey;
-static char CYLDoubleTapLastTimeKey;
-/// [EN] The selected index seen after the previous tap. [CN] 上一次点击之后看到的选中下标。
-static char CYLDoubleTapKnownSelectedIndexKey;
-
-@implementation CYLTabBarController (CYLDoubleTap)
-
-/*!
- * [EN] Every tab tap arrives here, before the selection changes: from the system tab bar (Liquid Glass and the classic
- *      style), whose delegate this controller is, and from the flat design tab bar, whose delegate protocol uses the same
- *      selector. The system tab bar still needs UIKit's own handling (super), the flat design one does not have it.
- * [CN] 每次点击 Tab 都会在选中状态改变之前到达这里：来自系统 TabBar（液态玻璃与经典样式，本控制器是其代理），以及扁平样式 TabBar
- *      （其代理协议使用相同的方法名）。系统 TabBar 仍需 UIKit 自身的处理（super），扁平样式 TabBar 没有这一实现。
- */
-- (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item {
-    NSUInteger index = [tabBar.items indexOfObject:item];
-    // [EN] Whether UIKit has already changed `selectedIndex` when this is called is not documented: the tab also has to
-    //      be the one seen selected after the previous tap, so the tap that selects a tab never counts.
-    // [CN] UIKit 调用本方法时是否已修改 `selectedIndex` 没有文档说明：该 Tab 还必须是上一次点击之后看到的选中 Tab，
-    //      因此选中 Tab 的那一次点击永远不会计入。
-    NSNumber *knownSelectedIndex = objc_getAssociatedObject(self, &CYLDoubleTapKnownSelectedIndexKey);
-    BOOL wasSelected = (index != NSNotFound && index == self.selectedIndex &&
-                        (!knownSelectedIndex || knownSelectedIndex.unsignedIntegerValue == index));
-    if ([tabBar isKindOfClass:[UITabBar class]] && [UITabBarController instancesRespondToSelector:@selector(tabBar:didSelectItem:)]) {
-        [super tabBar:tabBar didSelectItem:item];
-    }
-    [self cyl_handleTapOnTabAtIndex:index wasSelected:wasSelected];
-    // [EN] Next run loop: the selection this tap led to. [CN] 下一个 runloop：本次点击之后的选中状态。
-    __weak __typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [weakSelf cyl_rememberSelectedIndexForDoubleTap];
-    });
-}
-
-- (void)cyl_rememberSelectedIndexForDoubleTap {
-    objc_setAssociatedObject(self, &CYLDoubleTapKnownSelectedIndexKey, @(self.selectedIndex), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-/*!
- * [EN] Two taps on the tab that was already selected, the same one, within `CYLTabBarItemDoubleTapInterval`.
- * [CN] 在 `CYLTabBarItemDoubleTapInterval` 内两次点击同一个已选中的 Tab。
- */
-- (void)cyl_handleTapOnTabAtIndex:(NSUInteger)index wasSelected:(BOOL)wasSelected {
-    NSNumber *lastIndex = objc_getAssociatedObject(self, &CYLDoubleTapLastIndexKey);
-    NSNumber *lastTime = objc_getAssociatedObject(self, &CYLDoubleTapLastTimeKey);
-    objc_setAssociatedObject(self, &CYLDoubleTapLastIndexKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    objc_setAssociatedObject(self, &CYLDoubleTapLastTimeKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    if (!wasSelected || index == NSNotFound || index >= self.viewControllers.count) {
-        return;
-    }
-    CFTimeInterval now = CACurrentMediaTime();
-    if (lastIndex && lastIndex.unsignedIntegerValue == index && now - lastTime.doubleValue <= CYLTabBarItemDoubleTapInterval) {
-        [self cyl_reportDoubleTapAtIndex:index];
-        return;
-    }
-    objc_setAssociatedObject(self, &CYLDoubleTapLastIndexKey, @(index), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    objc_setAssociatedObject(self, &CYLDoubleTapLastTimeKey, @(now), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (void)cyl_reportDoubleTapAtIndex:(NSUInteger)index {
-    UIViewController *viewController = self.viewControllers[index];
-    if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
-        return;
-    }
-    UITabBarItem *tabBarItem = viewController.tabBarItem;
-    void (^doubleTapBlock)(UITabBarItem *, NSInteger) = tabBarItem.cyl_doubleTapBlock ?: [viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem.cyl_doubleTapBlock;
-    if (doubleTapBlock) {
-        doubleTapBlock(tabBarItem, (NSInteger)index);
-    }
-    id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)self.delegate;
-    if ([delegate respondsToSelector:@selector(tabBarController:didDoubleTapViewController:atIndex:)]) {
-        [delegate tabBarController:self didDoubleTapViewController:viewController atIndex:index];
-    }
-}
-
-@end
-
 #pragma mark - Theme switching (issue #216)
 
 /// [EN] What the app had set before the first theme changed it. [CN] 第一次被主题修改前 App 自己的设置。
@@ -7486,8 +7436,6 @@ static char CYLThemeLaunchThemeAppliedKey;
     // [EN] Styles set before the tab bar was replaced by the library's own (CYLTabBar) are written into the bar shown now.
     // [CN] 在 TabBar 被替换为本库的 CYLTabBar 之前设置的样式，写入当前显示的 TabBar。
     [self cyl_applyTabBarItemStyles];
-    // [EN] The tab shown first counts as selected for a double tap. [CN] 首次显示的 Tab 视为双击判断中已选中的 Tab。
-    [self cyl_rememberSelectedIndexForDoubleTap];
     id theme = CYLThemeManagerCenter.defaultThemeManager.currentTheme;
     // [EN] Nothing to restore yet: only a tab bar theme changes anything here.
     // [CN] 此时尚无需恢复：只有 TabBar 主题才需要处理。

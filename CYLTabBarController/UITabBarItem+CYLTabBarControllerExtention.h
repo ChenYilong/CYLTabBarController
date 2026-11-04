@@ -40,13 +40,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable UIImageView *)cyl_imageViewInTabBarButton;
 
 /*!
- * [EN] Runs when the user taps this tab twice quickly while it is selected, e.g. to scroll to the top and refresh.
- *      Set it on the tab's item: the navigation controller's `tabBarItem` (the root view controller's also works).
- *      `index` is the tab's index in `viewControllers`. See also
- *      `-[CYLTabBarControllerDelegate tabBarController:didDoubleTapViewController:atIndex:]`. Every style.
- * [CN] 该 Tab 处于选中状态时被快速连续点击两次时执行，例如回到顶部并刷新。设置在该 Tab 的 item 上：导航控制器的 `tabBarItem`
- *      （根控制器的也可以）。`index` 为该 Tab 在 `viewControllers` 中的下标。另见
- *      `-[CYLTabBarControllerDelegate tabBarController:didDoubleTapViewController:atIndex:]`。适用于所有样式。
+ * [EN] Runs when the user taps this tab twice quickly, e.g. to scroll to the top and refresh: a per-tab shortcut for the
+ *      DoubleTap of `-[CYLTabBarController cyl_tabBarItemGestureHandler]` (see docs/TabBarItem-Gestures.md), with the
+ *      same recognition and interval (`cyl_tabBarItemDoubleTapInterval`), in every style. Set it on the tab's item: the
+ *      navigation controller's `tabBarItem` (the root view controller's also works). Runs after the gesture handler and
+ *      the delegate. `index` is the tab's index in `viewControllers`.
+ * [CN] 快速连续两次点击该 Tab 时执行，例如回到顶部并刷新：是 `-[CYLTabBarController cyl_tabBarItemGestureHandler]` 中 DoubleTap 的
+ *      单个 Tab 快捷写法（见 docs/TabBarItem-Gestures.md），识别方式与间隔（`cyl_tabBarItemDoubleTapInterval`）相同，适用于所有样式。
+ *      设置在该 Tab 的 item 上：导航控制器的 `tabBarItem`（根控制器的也可以）。在手势 handler 与代理之后执行。`index` 为该 Tab 在
+ *      `viewControllers` 中的下标。
  */
 @property (nonatomic, copy, nullable, getter=cyl_doubleTapBlock, setter=cyl_setDoubleTapBlock:) void (^cyl_doubleTapBlock)(UITabBarItem *tabBarItem, NSInteger index);
 
