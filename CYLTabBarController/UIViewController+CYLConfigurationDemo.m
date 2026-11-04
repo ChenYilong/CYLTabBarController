@@ -21,7 +21,11 @@ static NSString *const CYLConfigurationDemoCellIdentifier = @"CYLConfigurationDe
 /// [CN] 页面显示的配置文件文本：文件本身；二进制文件则显示解析后的字典。
 static NSString *CYLConfigurationSourceText(NSString *_Nullable path, NSDictionary *_Nullable configuration) {
     NSString *text = path ? [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL] : nil;
-    if (text.length > 0) {
+    // Binary data (a protobuf message can be valid UTF-8) is shown as the parsed dictionary.
+    // 二进制数据（protobuf 消息也可能是合法的 UTF-8）显示为解析后的字典。
+    NSMutableCharacterSet *binary = [NSMutableCharacterSet controlCharacterSet];
+    [binary removeCharactersInString:@"\t\n\r"];
+    if (text.length > 0 && [text rangeOfCharacterFromSet:binary].location == NSNotFound) {
         return text;
     }
     return configuration ? configuration.description : @"";
@@ -34,8 +38,10 @@ static NSString *CYLConfigurationSourceText(NSString *_Nullable path, NSDictiona
     NSArray<NSString *> *names = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:NULL]
                                   sortedArrayUsingSelector:@selector(compare:)];
     NSMutableArray<NSString *> *paths = [NSMutableArray array];
+    NSArray<NSString *> *extensions = [CYLTabBarConfigurationParser supportedPathExtensions];
     for (NSString *name in names) {
-        if (![name hasPrefix:@"."]) {
+        // Configuration files only, not the .proto schema. 只列出配置文件，不包括 .proto 结构定义。
+        if (![name hasPrefix:@"."] && [extensions containsObject:name.pathExtension.lowercaseString]) {
             [paths addObject:[directory stringByAppendingPathComponent:name]];
         }
     }

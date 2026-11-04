@@ -1600,7 +1600,8 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
 /*!
  * [EN] One configuration file, one tab bar controller. The file holds the keys of `-initWithConfiguration:` in any
  *      key-value format: JSON, JSON5 / JSONC, property lists (XML, binary, OpenStep, .strings), YAML, TOML, INI (.ini,
- *      .cfg, .conf), .properties, .env or XML (see `CYLTabBarConfigurationFormat`). The format comes from the file name
+ *      .cfg, .conf), .properties, .env, XML or Protocol Buffers (text format, or binary with the built-in schema) (see
+ *      `CYLTabBarConfigurationFormat`). The format comes from the file name
  *      extension (or the HTTP Content-Type), else from the content. Every format becomes the same dictionary, whose values
  *      are then converted (insets, offsets, SF Symbols, URLs...), see `CYLTabBarControllerImageInsets` and
  *      `CYLTabBarItemViewControllerClass`.
@@ -1620,7 +1621,7 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
  *          let tabBarController = try CYLTabBarController(configurationFile: "tabbar.yaml")
  *
  * [CN] 一个配置文件生成一个 TabBarController。文件包含 `-initWithConfiguration:` 的键，可以使用任意 key-value 格式：JSON、JSON5 / JSONC、
- *      属性列表（XML、二进制、OpenStep、.strings）、YAML、TOML、INI（.ini、.cfg、.conf）、.properties、.env 或 XML（见
+ *      属性列表（XML、二进制、OpenStep、.strings）、YAML、TOML、INI（.ini、.cfg、.conf）、.properties、.env、XML 或 Protocol Buffers（文本格式，或使用内置结构定义的二进制）（见
  *      `CYLTabBarConfigurationFormat`）。格式由文件扩展名（或 HTTP Content-Type）决定，否则根据内容识别。所有格式都解析为同样的字典，再转换其中的值
  *      （内边距、偏移、SF Symbols、URL 等），见 `CYLTabBarControllerImageInsets` 与 `CYLTabBarItemViewControllerClass`。示例见上。
  */

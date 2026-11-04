@@ -43,6 +43,13 @@ typedef NS_ENUM(NSInteger, CYLTabBarConfigurationFormat) {
     CYLTabBarConfigurationFormatProperties,
     /// .xml (not a plist): elements are keys, `<item>` children make an array. 非 plist 的 XML：元素即键，`<item>` 子元素组成数组。
     CYLTabBarConfigurationFormatXML,
+    /// .textproto / .txtpb / .pbtxt / .prototxt: Protocol Buffers text format, no schema needed; a field written several
+    /// times makes an array. Protocol Buffers 文本格式，无需结构定义；同名字段写多次时组成数组。
+    CYLTabBarConfigurationFormatProtobufText,
+    /// .binpb / .pb / .protobuf: a binary `cyl.CYLTabBarConfiguration` message (schema built in, see
+    /// Configurations/cyl_tabbar_configuration.proto; no protobuf runtime needed).
+    /// 二进制 `cyl.CYLTabBarConfiguration` 消息（内置结构定义，见 Configurations/cyl_tabbar_configuration.proto；无需 protobuf 运行库）。
+    CYLTabBarConfigurationFormatProtobuf,
 };
 
 /// [EN] Error domain of the configuration parser and loaders. [CN] 配置解析与加载的错误域。
@@ -65,12 +72,14 @@ typedef NS_ENUM(NSInteger, CYLTabBarConfigurationErrorCode) {
  * [EN] Reads key-value configuration files into dictionaries, in every `CYLTabBarConfigurationFormat`. Foundation only,
  *      no UIKit: the values stay strings, numbers, booleans, arrays and dictionaries; `CYLTabBarController` turns them
  *      into insets, offsets, sizes, URLs and images (see `-[CYLTabBarController initWithConfiguration:]`).
+ *      Binary Protocol Buffers use the built-in schema of Configurations/cyl_tabbar_configuration.proto.
  *      Text formats are read as UTF-8. YAML, TOML, INI, .properties and XML give unquoted `true` / `false` as booleans and
  *      numbers as NSNumber; YAML and TOML support the common subset used for configuration (no anchors, tags or
  *      multi-line block scalars in YAML; no dates in TOML).
  * [CN] 将各种 `CYLTabBarConfigurationFormat` 格式的 key-value 配置文件读取为字典。仅依赖 Foundation，不依赖 UIKit：值保持为字符串、
  *      数字、布尔、数组与字典；由 `CYLTabBarController` 转换为内边距、偏移、尺寸、URL 与图片（见
  *      `-[CYLTabBarController initWithConfiguration:]`）。
+ *      二进制 Protocol Buffers 使用内置的结构定义 Configurations/cyl_tabbar_configuration.proto。
  *      文本格式按 UTF-8 读取。YAML、TOML、INI、.properties 与 XML 中未加引号的 `true` / `false` 解析为布尔值，数字解析为 NSNumber；
  *      YAML 与 TOML 支持配置中常用的子集（YAML 不支持锚点、标签与多行块标量；TOML 不支持日期）。
  */

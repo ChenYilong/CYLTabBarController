@@ -1438,6 +1438,467 @@ static NSDictionary *_Nullable CYLDictionaryFromXML(NSData *data, NSError **erro
     return nil;
 }
 
+#pragma mark - Protocol Buffers text format
+
+/*!
+ * [EN] Protocol Buffers text format, without a schema: `name: value`, `name { ... }` (or `< ... >`), `name: [a, b]`;
+ *      a name written several times makes an array; `#` comments; `,` or `;` between fields; strings with C escapes
+ *      (octal and \x escapes are bytes, decoded as UTF-8, as protoc writes non-ASCII text); `true` / `false` as booleans,
+ *      numbers as NSNumber, enum names as strings.
+ * [CN] Protocol Buffers 文本格式，无需结构定义：`name: value`、`name { ... }`（或 `< ... >`）、`name: [a, b]`；同名字段出现多次时组成数组；
+ *      `#` 注释；字段之间可用 `,` 或 `;`；字符串支持 C 转义（八进制与 \x 转义按字节处理，再按 UTF-8 解码，与 protoc 输出非 ASCII 文本的方式一致）；
+ *      `true` / `false` 为布尔值，数字为 NSNumber，枚举名为字符串。
+ */
+@interface CYLTextProtoParser : NSObject
+@property (nonatomic, copy) NSString *text;
+@property (nonatomic, assign) NSUInteger index;
+@property (nonatomic, strong, nullable) NSError *error;
+@end
+
+@implementation CYLTextProtoParser
+
+- (NSUInteger)currentLine {
+    NSUInteger line = 1;
+    for (NSUInteger i = 0; i < self.index && i < self.text.length; i++) {
+        if ([self.text characterAtIndex:i] == '\n') {
+            line++;
+        }
+    }
+    return line;
+}
+
+- (void)fail:(NSString *)reason {
+    if (!self.error) {
+        self.error = CYLConfigurationSyntaxError(@"Protobuf text", [self currentLine], reason);
+    }
+}
+
+- (BOOL)atEnd {
+    return self.index >= self.text.length;
+}
+
+- (unichar)peek {
+    return [self atEnd] ? 0 : [self.text characterAtIndex:self.index];
+}
+
+- (void)skipSpaceAndComments {
+    while (![self atEnd]) {
+        unichar c = [self peek];
+        if (CYLIsSpaceOrNewline(c)) {
+            self.index++;
+        } else if (c == '#') {
+            while (![self atEnd] && [self peek] != '\n') {
+                self.index++;
+            }
+        } else {
+            break;
+        }
+    }
+}
+
+static BOOL CYLIsTextProtoNameCharacter(unichar c) {
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == '.' || c == '/';
+}
+
+- (nullable NSString *)parseName {
+    if ([self peek] == '[') {
+        // An extension or Any type URL: [package.name]. 扩展或 Any 类型 URL：[package.name]。
+        NSRange end = [self.text rangeOfString:@"]" options:0 range:NSMakeRange(self.index, self.text.length - self.index)];
+        if (end.location == NSNotFound) {
+            [self fail:@"expected ']'"];
+            return nil;
+        }
+        NSString *name = [self.text substringWithRange:NSMakeRange(self.index + 1, end.location - self.index - 1)];
+        self.index = NSMaxRange(end);
+        return CYLTrimmed(name);
+    }
+    NSUInteger start = self.index;
+    while (![self atEnd] && CYLIsTextProtoNameCharacter([self peek])) {
+        self.index++;
+    }
+    if (self.index == start) {
+        [self fail:@"expected a field name"];
+        return nil;
+    }
+    return [self.text substringWithRange:NSMakeRange(start, self.index - start)];
+}
+
+/// [EN] One quoted string; escapes are bytes, so octal UTF-8 sequences become text. [CN] 一个带引号的字符串；转义按字节处理，八进制 UTF-8 序列可还原为文本。
+- (nullable NSString *)parseQuotedString {
+    unichar quote = [self peek];
+    self.index++;
+    NSMutableData *bytes = [NSMutableData data];
+    while (![self atEnd]) {
+        unichar c = [self peek];
+        if (c == quote) {
+            self.index++;
+            NSString *string = [[NSString alloc] initWithData:bytes encoding:NSUTF8StringEncoding];
+            if (!string) {
+                [self fail:@"a string is not valid UTF-8"];
+            }
+            return string;
+        }
+        if (c == '\n') {
+            break;
+        }
+        if (c != '\\') {
+            NSString *character = [NSString stringWithCharacters:&c length:1];
+            [bytes appendData:[character dataUsingEncoding:NSUTF8StringEncoding]];
+            self.index++;
+            continue;
+        }
+        self.index++;
+        unichar e = [self peek];
+        self.index++;
+        unsigned char byte = 0;
+        if (e >= '0' && e <= '7') {
+            unsigned int value = e - '0';
+            for (NSUInteger n = 0; n < 2 && ![self atEnd] && [self peek] >= '0' && [self peek] <= '7'; n++) {
+                value = value * 8 + ([self peek] - '0');
+                self.index++;
+            }
+            byte = (unsigned char)value;
+            [bytes appendBytes:&byte length:1];
+        } else if (e == 'x' || e == 'X') {
+            unsigned int value = 0;
+            NSUInteger digits = 0;
+            while (digits < 2 && ![self atEnd] && isxdigit((int)[self peek])) {
+                unichar h = [self peek];
+                value = value * 16 + (unsigned int)((h <= '9') ? h - '0' : (h | 0x20) - 'a' + 10);
+                self.index++;
+                digits++;
+            }
+            byte = (unsigned char)value;
+            [bytes appendBytes:&byte length:1];
+        } else if (e == 'u' || e == 'U') {
+            NSUInteger count = (e == 'u') ? 4 : 8;
+            if (self.index + count > self.text.length) {
+                [self fail:@"invalid unicode escape"];
+                return nil;
+            }
+            NSMutableString *character = [NSMutableString string];
+            if (!CYLAppendUnicodeEscape(character, [self.text substringWithRange:NSMakeRange(self.index, count)])) {
+                [self fail:@"invalid unicode escape"];
+                return nil;
+            }
+            self.index += count;
+            [bytes appendData:[character dataUsingEncoding:NSUTF8StringEncoding]];
+        } else {
+            const char *simple = NULL;
+            switch (e) {
+                case 'n': simple = "\n"; break;
+                case 't': simple = "\t"; break;
+                case 'r': simple = "\r"; break;
+                case 'a': simple = "\a"; break;
+                case 'b': simple = "\b"; break;
+                case 'f': simple = "\f"; break;
+                case 'v': simple = "\v"; break;
+                default: break;
+            }
+            if (simple) {
+                [bytes appendBytes:simple length:1];
+            } else {
+                NSString *character = [NSString stringWithCharacters:&e length:1];
+                [bytes appendData:[character dataUsingEncoding:NSUTF8StringEncoding]];
+            }
+        }
+    }
+    [self fail:@"unterminated string"];
+    return nil;
+}
+
+- (nullable id)parseScalar {
+    unichar c = [self peek];
+    if (c == '"' || c == '\'') {
+        // Adjacent strings are concatenated. 相邻的字符串会被连接。
+        NSMutableString *string = [NSMutableString string];
+        while (!self.error && ([self peek] == '"' || [self peek] == '\'')) {
+            NSString *part = [self parseQuotedString];
+            if (!part) {
+                return nil;
+            }
+            [string appendString:part];
+            [self skipSpaceAndComments];
+        }
+        return string;
+    }
+    NSUInteger start = self.index;
+    while (![self atEnd]) {
+        unichar d = [self peek];
+        if (CYLIsSpaceOrNewline(d) || d == ',' || d == ';' || d == '}' || d == '>' || d == ']' || d == '#') {
+            break;
+        }
+        self.index++;
+    }
+    NSString *token = [self.text substringWithRange:NSMakeRange(start, self.index - start)];
+    if (token.length == 0) {
+        [self fail:@"expected a value"];
+        return nil;
+    }
+    if ([token isEqualToString:@"true"] || [token isEqualToString:@"True"] || [token isEqualToString:@"t"]) {
+        return @(YES);
+    }
+    if ([token isEqualToString:@"false"] || [token isEqualToString:@"False"] || [token isEqualToString:@"f"]) {
+        return @(NO);
+    }
+    NSString *numeric = token;
+    if (numeric.length > 1 && ([numeric hasSuffix:@"f"] || [numeric hasSuffix:@"F"]) && ![numeric hasPrefix:@"0x"] && ![numeric hasPrefix:@"0X"]) {
+        numeric = [numeric substringToIndex:numeric.length - 1];
+    }
+    return CYLNumberFromString(numeric, NO) ?: token;
+}
+
+- (nullable id)parseValue {
+    [self skipSpaceAndComments];
+    unichar c = [self peek];
+    if (c == '{' || c == '<') {
+        self.index++;
+        NSMutableDictionary *message = [self parseFieldsUntil:(c == '{') ? '}' : '>'];
+        if (!message) {
+            return nil;
+        }
+        self.index++;
+        return message;
+    }
+    if (c == '[') {
+        self.index++;
+        NSMutableArray *array = [NSMutableArray array];
+        while (!self.error) {
+            [self skipSpaceAndComments];
+            if ([self peek] == ']') {
+                self.index++;
+                return array;
+            }
+            id value = [self parseValue];
+            if (!value) {
+                return nil;
+            }
+            [array addObject:value];
+            [self skipSpaceAndComments];
+            if ([self peek] == ',') {
+                self.index++;
+            } else if ([self peek] != ']') {
+                [self fail:@"expected ',' or ']'"];
+                return nil;
+            }
+        }
+        return nil;
+    }
+    return [self parseScalar];
+}
+
+/// [EN] Fields until `terminator` (0: the end of the text); the terminator is not consumed. [CN] 解析字段直到 `terminator`（0 表示文本结尾），不消耗结束符。
+- (nullable NSMutableDictionary *)parseFieldsUntil:(unichar)terminator {
+    NSMutableDictionary *message = [NSMutableDictionary dictionary];
+    NSMutableSet<NSString *> *repeated = [NSMutableSet set];
+    while (!self.error) {
+        [self skipSpaceAndComments];
+        if ([self atEnd]) {
+            if (terminator != 0) {
+                [self fail:@"unterminated message"];
+                return nil;
+            }
+            break;
+        }
+        if (terminator != 0 && [self peek] == terminator) {
+            break;
+        }
+        NSString *name = [self parseName];
+        if (!name) {
+            return nil;
+        }
+        [self skipSpaceAndComments];
+        BOOL hasColon = ([self peek] == ':');
+        if (hasColon) {
+            self.index++;
+            [self skipSpaceAndComments];
+        } else if ([self peek] != '{' && [self peek] != '<') {
+            [self fail:[NSString stringWithFormat:@"expected ':' or '{' after \"%@\"", name]];
+            return nil;
+        }
+        id value = [self parseValue];
+        if (!value) {
+            return nil;
+        }
+        id existing = message[name];
+        if (!existing) {
+            message[name] = value;
+        } else if ([repeated containsObject:name]) {
+            [(NSMutableArray *)existing addObject:value];
+        } else {
+            message[name] = [NSMutableArray arrayWithObjects:existing, value, nil];
+            [repeated addObject:name];
+        }
+        [self skipSpaceAndComments];
+        if ([self peek] == ',' || [self peek] == ';') {
+            self.index++;
+        }
+    }
+    return self.error ? nil : message;
+}
+
+@end
+
+#pragma mark - Protocol Buffers binary
+
+/*!
+ * [EN] The built-in schema of a binary configuration, the same as Configurations/cyl_tabbar_configuration.proto:
+ *      message name -> field number -> @[field name, kind]. Kinds: "string", "map" (map<string, string>), or
+ *      "repeated:<Message>". Field numbers never change; unknown fields are skipped.
+ * [CN] 二进制配置的内置结构定义，与 Configurations/cyl_tabbar_configuration.proto 相同：消息名 -> 字段编号 -> @[字段名, 类型]。
+ *      类型为 "string"、"map"（map<string, string>）或 "repeated:<消息名>"。字段编号永不改变；未知字段会被跳过。
+ */
+static NSDictionary<NSString *, NSDictionary<NSNumber *, NSArray<NSString *> *> *> *CYLProtobufSchema(void) {
+    // A literal each time (cheap, and thread-safe without dispatch_once). 每次返回字面量（开销小，且无需 dispatch_once 即线程安全）。
+    return @{
+            @"CYLTabBarConfiguration" : @{
+                @1 : @[ @"CYLTabBarControllerTabBarItemsAttributes", @"repeated:CYLTabBarItem" ],
+                @2 : @[ @"CYLTabBarControllerImageInsets", @"string" ],
+                @3 : @[ @"CYLTabBarControllerTitlePositionAdjustment", @"string" ],
+                @4 : @[ @"CYLTabBarControllerStyleType", @"string" ],
+                @5 : @[ @"CYLTabBarControllerContext", @"string" ],
+                @6 : @[ @"CYLTabBarControllerNavigationControllerClass", @"string" ],
+            },
+            @"CYLTabBarItem" : @{
+                @1 : @[ @"CYLTabBarItemTitle", @"string" ],
+                @2 : @[ @"CYLTabBarItemImage", @"string" ],
+                @3 : @[ @"CYLTabBarItemSelectedImage", @"string" ],
+                @4 : @[ @"CYLTabBarItemDarkImage", @"string" ],
+                @5 : @[ @"CYLTabBarItemSelectedDarkImage", @"string" ],
+                @6 : @[ @"CYLTabBarItemImageURL", @"string" ],
+                @7 : @[ @"CYLTabBarItemSelectedImageURL", @"string" ],
+                @8 : @[ @"CYLTabBarItemImageURLSize", @"string" ],
+                @9 : @[ @"CYLTabBarItemImageInsets", @"string" ],
+                @10 : @[ @"CYLTabBarItemTitlePositionAdjustment", @"string" ],
+                @11 : @[ @"CYLTabBarItemImagePositionAdjustment", @"string" ],
+                @12 : @[ @"CYLTabBarLottieFilePath", @"string" ],
+                @13 : @[ @"CYLTabBarLottieURL", @"string" ],
+                @14 : @[ @"CYLTabBarLottieSize", @"string" ],
+                @15 : @[ @"CYLTabBarItemIdentifier", @"string" ],
+                @16 : @[ @"CYLTabBarLottieDarkURL", @"string" ],
+                @17 : @[ @"CYLTabBarLottieDarkFilePath", @"string" ],
+                @18 : @[ @"CYLTabBarLottieDarkColors", @"map" ],
+                @19 : @[ @"CYLTabBarItemViewControllerClass", @"string" ],
+                @20 : @[ @"CYLTabBarItemNavigationControllerClass", @"string" ],
+            },
+            @"CYLMapEntry" : @{
+                @1 : @[ @"key", @"string" ],
+                @2 : @[ @"value", @"string" ],
+            },
+        };
+}
+
+/// [EN] Reads a base-128 varint at `*offset`. NO when it runs past `length` or is longer than 10 bytes.
+/// [CN] 读取 `*offset` 处的 base-128 varint。超出 `length` 或超过 10 字节时返回 NO。
+static BOOL CYLReadVarint(const uint8_t *bytes, NSUInteger length, NSUInteger *offset, uint64_t *value) {
+    uint64_t result = 0;
+    for (NSUInteger shift = 0; shift < 70; shift += 7) {
+        if (*offset >= length) {
+            return NO;
+        }
+        uint8_t byte = bytes[(*offset)++];
+        result |= (uint64_t)(byte & 0x7F) << shift;
+        if (!(byte & 0x80)) {
+            *value = result;
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/*!
+ * [EN] Decodes the bytes of one message of the built-in schema; nil on malformed data. Every field must fit in the
+ *      message, so random bytes are rejected.
+ * [CN] 按内置结构定义解码一个消息的字节；数据损坏时返回 nil。每个字段都必须在消息范围内，因此随机字节会被拒绝。
+ */
+static NSMutableDictionary *_Nullable CYLDecodeProtobufMessage(const uint8_t *bytes, NSUInteger length, NSString *messageName) {
+    NSDictionary<NSNumber *, NSArray<NSString *> *> *fields = CYLProtobufSchema()[messageName];
+    NSMutableDictionary *message = [NSMutableDictionary dictionary];
+    NSUInteger offset = 0;
+    while (offset < length) {
+        uint64_t key = 0;
+        if (!CYLReadVarint(bytes, length, &offset, &key) || key >> 3 == 0) {
+            return nil;
+        }
+        uint64_t fieldNumber = key >> 3;
+        uint32_t wireType = (uint32_t)(key & 0x7);
+        NSArray<NSString *> *field = fieldNumber <= INT32_MAX ? fields[@((NSInteger)fieldNumber)] : nil;
+        if (wireType == 0) {
+            uint64_t ignored = 0;
+            if (!CYLReadVarint(bytes, length, &offset, &ignored)) {
+                return nil;
+            }
+            continue; // No varint fields in the schema. 结构定义中没有 varint 字段。
+        }
+        if (wireType == 1 || wireType == 5) {
+            NSUInteger size = (wireType == 1) ? 8 : 4;
+            if (offset + size > length) {
+                return nil;
+            }
+            offset += size;
+            continue;
+        }
+        if (wireType != 2) {
+            return nil; // Groups (3, 4) are not used; other values are invalid. 不使用 group（3、4），其他值无效。
+        }
+        uint64_t size = 0;
+        if (!CYLReadVarint(bytes, length, &offset, &size) || size > length - offset) {
+            return nil;
+        }
+        const uint8_t *payload = bytes + offset;
+        offset += (NSUInteger)size;
+        if (!field) {
+            continue; // An unknown field, e.g. from a newer schema. 未知字段，例如来自更新的结构定义。
+        }
+        NSString *name = field[0];
+        NSString *kind = field[1];
+        if ([kind isEqualToString:@"string"]) {
+            NSString *string = [[NSString alloc] initWithBytes:payload length:(NSUInteger)size encoding:NSUTF8StringEncoding];
+            if (!string) {
+                return nil;
+            }
+            message[name] = string;
+        } else if ([kind isEqualToString:@"map"]) {
+            NSMutableDictionary *entry = CYLDecodeProtobufMessage(payload, (NSUInteger)size, @"CYLMapEntry");
+            if (!entry) {
+                return nil;
+            }
+            NSMutableDictionary *map = message[name] ?: [NSMutableDictionary dictionary];
+            map[entry[@"key"] ?: @""] = entry[@"value"] ?: @"";
+            message[name] = map;
+        } else if ([kind hasPrefix:@"repeated:"]) {
+            NSMutableDictionary *element = CYLDecodeProtobufMessage(payload, (NSUInteger)size, [kind substringFromIndex:9]);
+            if (!element) {
+                return nil;
+            }
+            NSMutableArray *array = message[name] ?: [NSMutableArray array];
+            [array addObject:element];
+            message[name] = array;
+        }
+    }
+    return message;
+}
+
+static NSDictionary *_Nullable CYLDictionaryFromProtobuf(NSData *data, NSError **error) {
+    NSDictionary *dictionary = CYLDecodeProtobufMessage(data.bytes, data.length, @"CYLTabBarConfiguration");
+    if (!dictionary && error) {
+        *error = CYLConfigurationSyntaxError(@"Protobuf", 0, @"the data is not a valid cyl.CYLTabBarConfiguration message (see cyl_tabbar_configuration.proto)");
+    }
+    return dictionary;
+}
+
+/// [EN] Control bytes other than tab and newlines: binary data, not text. [CN] 含有除制表符与换行之外的控制字节：二进制数据而非文本。
+static BOOL CYLDataLooksBinary(NSData *data) {
+    const uint8_t *bytes = data.bytes;
+    for (NSUInteger i = 0; i < data.length; i++) {
+        uint8_t byte = bytes[i];
+        if (byte < 0x20 && byte != '\t' && byte != '\n' && byte != '\r') {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 #pragma mark - CYLTabBarConfigurationParser
 
 static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
@@ -1463,6 +1924,13 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
         @"properties" : @(CYLTabBarConfigurationFormatProperties),
         @"env" : @(CYLTabBarConfigurationFormatProperties),
         @"xml" : @(CYLTabBarConfigurationFormatXML),
+        @"textproto" : @(CYLTabBarConfigurationFormatProtobufText),
+        @"txtpb" : @(CYLTabBarConfigurationFormatProtobufText),
+        @"pbtxt" : @(CYLTabBarConfigurationFormatProtobufText),
+        @"prototxt" : @(CYLTabBarConfigurationFormatProtobufText),
+        @"binpb" : @(CYLTabBarConfigurationFormatProtobuf),
+        @"pb" : @(CYLTabBarConfigurationFormatProtobuf),
+        @"protobuf" : @(CYLTabBarConfigurationFormatProtobuf),
     };
 }
 
@@ -1479,6 +1947,10 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
     NSString *type = CYLTrimmed([[MIMEType componentsSeparatedByString:@";"].firstObject lowercaseString] ?: @"");
     if (type.length == 0) {
         return CYLTabBarConfigurationFormatUnknown;
+    }
+    if ([type rangeOfString:@"protobuf"].location != NSNotFound || [type rangeOfString:@"textproto"].location != NSNotFound) {
+        // text/x-protobuf, text/x-textproto: text format; application/x-protobuf...: binary. 文本类型为文本格式，其他为二进制。
+        return [type hasPrefix:@"text/"] ? CYLTabBarConfigurationFormatProtobufText : CYLTabBarConfigurationFormatProtobuf;
     }
     if ([type hasSuffix:@"json5"]) {
         return CYLTabBarConfigurationFormatJSON5;
@@ -1518,6 +1990,8 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
         case CYLTabBarConfigurationFormatINI: return @"INI";
         case CYLTabBarConfigurationFormatProperties: return @"Properties";
         case CYLTabBarConfigurationFormatXML: return @"XML";
+        case CYLTabBarConfigurationFormatProtobufText: return @"Protobuf text";
+        case CYLTabBarConfigurationFormatProtobuf: return @"Protobuf";
         case CYLTabBarConfigurationFormatUnknown: break;
     }
     return @"Unknown";
@@ -1526,6 +2000,11 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
 + (CYLTabBarConfigurationFormat)formatBySniffingData:(NSData *)data {
     if (CYLDataHasPrefix(data, "bplist")) {
         return CYLTabBarConfigurationFormatPropertyList;
+    }
+    if (CYLDataLooksBinary(data)) {
+        // Binary data: only a protobuf message can be. 二进制数据：只可能是 protobuf 消息。
+        NSDictionary *dictionary = CYLDictionaryFromProtobuf(data, NULL);
+        return dictionary.count > 0 ? CYLTabBarConfigurationFormatProtobuf : CYLTabBarConfigurationFormatUnknown;
     }
     NSString *text = CYLStringFromData(data);
     NSString *trimmed = CYLTrimmed(text ?: @"");
@@ -1545,7 +2024,8 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
             // JSON5 only starts with '{', a comment, or '[' for a (rejected) array. JSON5 只能以 '{'、注释或 '['（数组，不接受）开头。
             [candidates addObject:@(CYLTabBarConfigurationFormatJSON5)];
         }
-        [candidates addObjectsFromArray:@[ @(CYLTabBarConfigurationFormatTOML), @(CYLTabBarConfigurationFormatYAML) ]];
+        [candidates addObjectsFromArray:@[ @(CYLTabBarConfigurationFormatTOML), @(CYLTabBarConfigurationFormatYAML),
+                                           @(CYLTabBarConfigurationFormatProtobufText) ]];
         // Without [sections], .properties first: it also reads .env (`export`, `__` paths). 没有 [节] 时先尝试 .properties：它也能读取 .env。
         BOOL hasSections = [trimmed hasPrefix:@"["] || [trimmed rangeOfString:@"\n["].location != NSNotFound;
         [candidates addObjectsFromArray:hasSections
@@ -1602,6 +2082,8 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
         }
     } else if (format == CYLTabBarConfigurationFormatXML) {
         result = CYLDictionaryFromXML(data, &parseError);
+    } else if (format == CYLTabBarConfigurationFormatProtobuf) {
+        result = CYLDictionaryFromProtobuf(data, &parseError);
     } else {
         NSString *text = CYLStringFromData(data);
         if (!text) {
@@ -1626,6 +2108,11 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
             result = CYLDictionaryFromINI(text, &parseError);
         } else if (format == CYLTabBarConfigurationFormatProperties) {
             result = CYLDictionaryFromProperties(text, &parseError);
+        } else if (format == CYLTabBarConfigurationFormatProtobufText) {
+            CYLTextProtoParser *parser = [[CYLTextProtoParser alloc] init];
+            parser.text = text;
+            result = [parser parseFieldsUntil:0];
+            parseError = parser.error;
         }
     }
     if (!result) {

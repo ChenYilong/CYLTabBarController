@@ -19,12 +19,12 @@ FOUNDATION_EXTERN NSString *const CYLSampleConfigurationURLString;
  * [EN] A demo row of the settings section (see `UIViewController+CYLSettingsSection.h`): one configuration file creates a
  *      whole `CYLTabBarController` (`+[CYLTabBarController tabBarControllerWithConfigurationFile:error:]`). The row offers
  *      the sample files, one per format (JSON, JSON5, JSONC, plist in XML, binary and OpenStep form, .strings, YAML, TOML,
- *      INI, .cfg, .properties, .env, XML), and a download from a URL
+ *      INI, .cfg, .properties, .env, XML, Protobuf text and binary), and a download from a URL
  *      (`+[CYLTabBarController loadTabBarControllerWithConfigurationURL:completion:]`). The tab bar controller it creates is
  *      presented full screen; every page shows the file it came from, and a Close button.
  * [CN] 设置分组中的一个演示行（见 `UIViewController+CYLSettingsSection.h`）：一个配置文件生成整个 `CYLTabBarController`
  *      （`+[CYLTabBarController tabBarControllerWithConfigurationFile:error:]`）。该行提供各格式的示例文件（JSON、JSON5、JSONC、XML / 二进制 /
- *      OpenStep 格式的 plist、.strings、YAML、TOML、INI、.cfg、.properties、.env、XML），以及从 URL 下载
+ *      OpenStep 格式的 plist、.strings、YAML、TOML、INI、.cfg、.properties、.env、XML、Protobuf 文本与二进制），以及从 URL 下载
  *      （`+[CYLTabBarController loadTabBarControllerWithConfigurationURL:completion:]`）。生成的 TabBarController 全屏展示，每个页面显示其来源文件，
  *      并带有关闭按钮。
  */

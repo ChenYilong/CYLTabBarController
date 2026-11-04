@@ -1,0 +1,39 @@
+# proto-file: cyl_tabbar_configuration.proto
+# proto-message: cyl.CYLTabBarConfiguration
+# Protocol Buffers text format: no schema needed; a repeated field is written once per element.
+# Protocol Buffers 文本格式：无需结构定义；重复字段每个元素写一次。
+CYLTabBarControllerTabBarItemsAttributes {
+  CYLTabBarItemTitle: "Textproto"
+  CYLTabBarItemImage: "system:house"
+  CYLTabBarItemSelectedImage: "system:house.fill"
+  CYLTabBarItemIdentifier: "home"
+  CYLTabBarItemViewControllerClass: "UIViewController"
+}
+CYLTabBarControllerTabBarItemsAttributes {
+  CYLTabBarItemTitle: "Message"
+  CYLTabBarItemImage: "system:message"
+  CYLTabBarItemSelectedImage: "system:message.fill"
+  CYLTabBarItemIdentifier: "message"
+  CYLTabBarItemViewControllerClass: "UIViewController"
+}
+CYLTabBarControllerTabBarItemsAttributes {
+  CYLTabBarItemTitle: "Discover"
+  CYLTabBarItemImage: "system:safari"
+  CYLTabBarItemSelectedImage: "system:safari.fill"
+  CYLTabBarItemImageInsets: "{1, 0, -1, 0}"
+  CYLTabBarItemIdentifier: "discover"
+  CYLTabBarItemViewControllerClass: "UIViewController"
+}
+CYLTabBarControllerTabBarItemsAttributes {
+  CYLTabBarItemTitle: "Me"
+  CYLTabBarItemImage: "system:person"
+  CYLTabBarItemSelectedImage: "system:person.fill"
+  CYLTabBarItemTitlePositionAdjustment: "{0, -1}"
+  CYLTabBarItemIdentifier: "me"
+  CYLTabBarItemViewControllerClass: "UIViewController"
+}
+CYLTabBarControllerImageInsets: "{0, 0, 0, 0}"
+CYLTabBarControllerTitlePositionAdjustment: "{0, -2}"
+CYLTabBarControllerStyleType: "default"
+CYLTabBarControllerContext: "CYLConfigurationDemo"
+CYLTabBarControllerNavigationControllerClass: "UINavigationController"

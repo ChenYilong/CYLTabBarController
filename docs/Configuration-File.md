@@ -14,7 +14,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 用一个参数初始化 `CYLTabBarController`：配置字典包含现有初始化方法的全部参数。同样的键可以写在配置文件中（JSON、JSON5、plist、YAML、TOML、INI、.properties、.env、XML 等），也可以从网络 URL 下载，一个文件即可生成整个 TabBar。 | Create a `CYLTabBarController` from one parameter: a configuration dictionary that holds every parameter of the existing initializers. The same keys can be written in a configuration file (JSON, JSON5, plist, YAML, TOML, INI, .properties, .env, XML and more) or downloaded from a URL: one file builds the whole tab bar. |
+| 用一个参数初始化 `CYLTabBarController`：配置字典包含现有初始化方法的全部参数。同样的键可以写在配置文件中（JSON、JSON5、plist、YAML、TOML、INI、.properties、.env、XML、Protocol Buffers 等），也可以从网络 URL 下载，一个文件即可生成整个 TabBar。 | Create a `CYLTabBarController` from one parameter: a configuration dictionary that holds every parameter of the existing initializers. The same keys can be written in a configuration file (JSON, JSON5, plist, YAML, TOML, INI, .properties, .env, XML, Protocol Buffers and more) or downloaded from a URL: one file builds the whole tab bar. |
 
 ## [CN]目录
 ## [EN]Contents
@@ -30,6 +30,7 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [新增的 item 键与文件中的写法](#cn新增的-item-键与文件中的写法) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [New item keys and file values](#ennew-item-keys-and-file-values) |
 | [从文件或 URL 创建](#cn从文件或-url-创建) | [From a file or a URL](#enfrom-a-file-or-a-url) |
 | [支持的格式](#cn支持的格式) | [Supported formats](#ensupported-formats) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [Protocol Buffers](#cnprotocol-buffers) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Protocol Buffers](#enprotocol-buffers) |
 | [流程](#cn流程) | [Flow](#enflow) |
 | [演示](#cn演示) | [Demo](#endemo) |
 | [限制](#cn限制) | [Limits](#enlimits) |
@@ -146,10 +147,12 @@ CYLTabBarController.loadTabBarController(withConfigurationURL: url) { tabBarCont
 | .properties | `.properties` | `cyl_tabbar_configuration.properties` | `点.分隔.路径 = 值`，支持 Java 转义与续行。 | `dotted.key.path = value`, Java escapes and line continuation. |
 | .env | `.env` | `cyl_tabbar_configuration.env` | `KEY=value`、`export`，用 `__` 分隔路径。 | `KEY=value`, `export`, `__` separates the path. |
 | XML | `.xml` | `cyl_tabbar_configuration.xml` | 元素即键，`<item>` 组成数组，`<item>` 也可以用属性。 | Elements are keys, `<item>` children make a list, an `<item>` can also use attributes. |
+| Protobuf 文本格式 / text format | `.textproto`、`.txtpb`、`.pbtxt`、`.prototxt` | `cyl_tabbar_configuration.textproto` | 无需结构定义：`name: value`、`name { … }`，同名字段写多次即数组。 | No schema needed: `name: value`, `name { … }`; a field written several times makes a list. |
+| Protobuf 二进制 / binary | `.binpb`、`.pb`、`.protobuf` | `cyl_tabbar_configuration.binpb` | `cyl.CYLTabBarConfiguration` 消息，结构定义内置（`cyl_tabbar_configuration.proto`），无需 protobuf 运行库。 | A `cyl.CYLTabBarConfiguration` message; the schema is built in (`cyl_tabbar_configuration.proto`), no protobuf runtime needed. |
 
 | 中文 | English |
 |:---|:---|
-| 示例文件位于 `CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations/`，都描述同一个 4 个 Tab 的 TabBar（第一个 Tab 的标题为格式名称）。解析器 `CYLTabBarConfigurationParser` 只依赖 Foundation，也可以单独使用。 | The sample files are in `CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations/`. They all describe the same 4-tab bar (the first tab's title is the name of the format). The parser, `CYLTabBarConfigurationParser`, uses Foundation only and can be used on its own. |
+| 示例文件位于 `CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations/`，都描述同一个 4 个 Tab 的 TabBar（另有 Protobuf 结构定义 `cyl_tabbar_configuration.proto`）（第一个 Tab 的标题为格式名称）。解析器 `CYLTabBarConfigurationParser` 只依赖 Foundation，也可以单独使用。 | The sample files are in `CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations/`. They all describe the same 4-tab bar (with the Protobuf schema `cyl_tabbar_configuration.proto` next to them) (the first tab's title is the name of the format). The parser, `CYLTabBarConfigurationParser`, uses Foundation only and can be used on its own. |
 
 A YAML file 一个 YAML 文件：
 
@@ -182,6 +185,29 @@ CYLTabBarItemImage = "system:house"
 CYLTabBarItemViewControllerClass = "HomeViewController"
 ```
 
+### [CN]Protocol Buffers
+### [EN]Protocol Buffers
+
+| 中文 | English |
+|:---|:---|
+| 二进制 protobuf 只保存字段编号，因此需要结构定义。本库内置了 `cyl_tabbar_configuration.proto`（位于示例文件目录），字段名即配置键，字段编号永不改变；解析器自带解码器，App 不需要引入 protobuf 运行库。服务器可以用任何语言的官方 protobuf 库生成 `.binpb`，`Content-Type` 为 `application/x-protobuf` 时也能识别。未知字段（例如更新的结构定义中新增的字段）会被跳过。 | Binary protobuf only stores field numbers, so it needs a schema. The library has `cyl_tabbar_configuration.proto` built in (in the sample folder): its field names are the configuration keys and its field numbers never change; the parser has its own decoder, so the app needs no protobuf runtime. A server can write `.binpb` with the official protobuf library of any language; a `Content-Type` of `application/x-protobuf` is recognized too. Unknown fields (e.g. added by a newer schema) are skipped. |
+| 文本格式不需要结构定义。protobuf 的 `map` 在文本格式中写作多个 `{ key: … value: … }` 条目，`CYLTabBarLottieDarkColors` 会自动转换为字典；只有一个 Tab 时（文本格式没有列表语法）也会自动当作列表。 | The text format needs no schema. A protobuf `map` is written as `{ key: … value: … }` entries in the text format: `CYLTabBarLottieDarkColors` turns them into a dictionary; with a single tab (the text format has no list syntax) the tab is taken as a list too. |
+| 用 protoc 由文本格式生成二进制：`protoc --encode=cyl.CYLTabBarConfiguration cyl_tabbar_configuration.proto < cyl_tabbar_configuration.textproto > cyl_tabbar_configuration.binpb` | Encode the text format with protoc: `protoc --encode=cyl.CYLTabBarConfiguration cyl_tabbar_configuration.proto < cyl_tabbar_configuration.textproto > cyl_tabbar_configuration.binpb` |
+
+```textproto
+# proto-message: cyl.CYLTabBarConfiguration
+CYLTabBarControllerContext: "CYLConfigurationDemo"
+CYLTabBarControllerTabBarItemsAttributes {
+  CYLTabBarItemTitle: "Home"
+  CYLTabBarItemImage: "system:house"
+  CYLTabBarItemViewControllerClass: "HomeViewController"
+}
+CYLTabBarControllerTabBarItemsAttributes {
+  CYLTabBarItemTitle: "Me"
+  CYLTabBarItemImage: "system:person"
+}
+```
+
 ## [CN]流程
 ## [EN]Flow
 
@@ -204,7 +230,7 @@ flowchart TD
 
 | 中文 | English |
 |:---|:---|
-| Example 的设置列表中“跳转与对比”分组的第一行“从配置文件创建 TabBarController”：选择 15 个示例文件之一（JSON、JSON5、JSONC、XML / 二进制 / OpenStep plist、.strings、YAML、YML、TOML、INI、CFG、.properties、.env、XML），或“从网络 URL 加载”（GitHub 上的 YAML 示例）。生成的 TabBarController 全屏展示，每个页面显示其来源文件的内容，左上角“关闭”返回。 | In the Example's settings list, the first row of the "Navigation and comparisons" section, "Create a TabBarController from a configuration file": choose one of the 15 sample files (JSON, JSON5, JSONC, XML / binary / OpenStep plist, .strings, YAML, YML, TOML, INI, CFG, .properties, .env, XML), or "Load from a URL" (the YAML sample on GitHub). The tab bar controller it creates is presented full screen; every page shows the file it came from, and Close (top left) goes back. |
+| Example 的设置列表中“跳转与对比”分组的第一行“从配置文件创建 TabBarController”：选择 17 个示例文件之一（JSON、JSON5、JSONC、XML / 二进制 / OpenStep plist、.strings、YAML、YML、TOML、INI、CFG、.properties、.env、XML、Protobuf 文本与二进制），或“从网络 URL 加载”（GitHub 上的 YAML 示例）。生成的 TabBarController 全屏展示，每个页面显示其来源文件的内容，左上角“关闭”返回。 | In the Example's settings list, the first row of the "Navigation and comparisons" section, "Create a TabBarController from a configuration file": choose one of the 17 sample files (JSON, JSON5, JSONC, XML / binary / OpenStep plist, .strings, YAML, YML, TOML, INI, CFG, .properties, .env, XML, Protobuf text and binary), or "Load from a URL" (the YAML sample on GitHub). The tab bar controller it creates is presented full screen; every page shows the file it came from, and Close (top left) goes back. |
 | 演示代码：`UIViewController+CYLConfigurationDemo.h/.m`；示例 URL 在合并到 master 后可用。 | Demo code: `UIViewController+CYLConfigurationDemo.h/.m`; the sample URL works once this is merged into master. |
 
 ## [CN]限制
@@ -221,4 +247,4 @@ flowchart TD
 
 | 中文 | English |
 |:---|:---|
-| 本次修改在 Linux 环境中完成，没有 Xcode、iOS SDK 与模拟器，因此没有截图，UIKit 部分也未能编译运行。已验证：解析器（仅依赖 Foundation）在 GNUstep 上编译运行，15 个示例文件按扩展名与按内容识别都解析为相同的字典，并测试了错误、转义、数字与数组顺序等情况；示例文件也用 Python 的标准解析器（PyYAML、tomllib、plistlib）交叉验证；新增的 UIKit 代码用 UIKit 头文件桩做了语法检查（`-Wall -Wextra` 无警告）。合并前请在 Example 中运行演示行并检查每种格式。 | This change was made on Linux without Xcode, the iOS SDK or a simulator, so there are no screenshots and the UIKit parts were not built or run. Verified: the parser (Foundation only) was built and run on GNUstep; the 15 sample files give the same dictionary whether the format comes from the extension or from the content, and errors, escapes, numbers and list order were tested; the samples were also cross-checked with Python's standard parsers (PyYAML, tomllib, plistlib); the new UIKit code was syntax-checked against UIKit header stubs (no warnings with `-Wall -Wextra`). Before merging, run the demo row in the Example and check every format. |
+| 本次修改在 Linux 环境中完成，没有 Xcode、iOS SDK 与模拟器，因此没有截图，UIKit 部分也未能编译运行。已验证：解析器（仅依赖 Foundation）在 GNUstep 上编译运行，17 个示例文件按扩展名与按内容识别都解析为相同的字典；Protobuf 样例由官方 protobuf 库生成，并测试了中文（UTF-8 与八进制转义）、map 字段、截断与无效的二进制数据，并测试了错误、转义、数字与数组顺序等情况；示例文件也用 Python 的标准解析器（PyYAML、tomllib、plistlib、protobuf）交叉验证；新增的 UIKit 代码用 UIKit 头文件桩做了语法检查（`-Wall -Wextra` 无警告）。合并前请在 Example 中运行演示行并检查每种格式。 | This change was made on Linux without Xcode, the iOS SDK or a simulator, so there are no screenshots and the UIKit parts were not built or run. Verified: the parser (Foundation only) was built and run on GNUstep; the 17 sample files give the same dictionary whether the format comes from the extension or from the content; the Protobuf samples were written by the official protobuf library, and Chinese text (UTF-8 and octal escapes), the map field, truncated and invalid binary data were tested, and errors, escapes, numbers and list order were tested; the samples were also cross-checked with Python's standard parsers (PyYAML, tomllib, plistlib, protobuf); the new UIKit code was syntax-checked against UIKit header stubs (no warnings with `-Wall -Wextra`). Before merging, run the demo row in the Example and check every format. |

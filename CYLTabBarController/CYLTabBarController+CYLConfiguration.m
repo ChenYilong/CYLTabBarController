@@ -196,7 +196,30 @@ static UIColor *_Nullable CYLColorFromHexString(NSString *string) {
                            alpha:(rgba & 0xFF) / 255.0];
 }
 
+/// [EN] A Protobuf text map: `{ key: "a" value: "b" }` entries (one entry, or a list of them) become one dictionary.
+/// [CN] Protobuf 文本格式的 map：`{ key: "a" value: "b" }` 条目（一个或一组）转换为一个字典。
+static id CYLDictionaryFromMapEntries(id value) {
+    NSArray *entries = [value isKindOfClass:[NSArray class]] ? value : nil;
+    if ([value isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *dictionary = value;
+        BOOL isEntry = dictionary.count == 2 && dictionary[@"key"] && dictionary[@"value"];
+        entries = isEntry ? @[ dictionary ] : nil;
+    }
+    if (!entries) {
+        return value;
+    }
+    NSMutableDictionary *map = [NSMutableDictionary dictionary];
+    for (id entry in entries) {
+        if (![entry isKindOfClass:[NSDictionary class]] || !entry[@"key"] || !entry[@"value"]) {
+            return value;
+        }
+        map[entry[@"key"]] = entry[@"value"];
+    }
+    return map;
+}
+
 static id CYLDarkColorsValue(id value) {
+    value = CYLDictionaryFromMapEntries(value);
     if (![value isKindOfClass:[NSDictionary class]]) {
         return value;
     }
@@ -272,6 +295,10 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
         [normalized removeObjectForKey:CYLTabBarControllerViewControllers];
     }
     id items = normalized[CYLTabBarControllerTabBarItemsAttributes];
+    if ([items isKindOfClass:[NSDictionary class]]) {
+        // One tab: formats without list syntax (Protobuf text, XML) give a dictionary. 只有一个 Tab：没有列表语法的格式（Protobuf 文本、XML）解析为字典。
+        items = @[ items ];
+    }
     if (items) {
         NSMutableArray<NSDictionary *> *normalizedItems = [NSMutableArray array];
         if ([items isKindOfClass:[NSArray class]]) {
