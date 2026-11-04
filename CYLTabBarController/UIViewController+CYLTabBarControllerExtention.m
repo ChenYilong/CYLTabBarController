@@ -948,5 +948,36 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 #endif
 
+
+#pragma mark - Tab bar spacing
+
+- (CGFloat)cyl_tabBarSpacingInViewCoordinator {
+    if (!self.isViewLoaded || !self.view.window) {
+        return 0;
+    }
+    UITabBarController *tabBarController = self.tabBarController;
+    if (!tabBarController) {
+        return 0;
+    }
+    UIView *tabBar = tabBarController.tabBar;
+    if ([tabBarController isKindOfClass:[CYLTabBarController class]]) {
+        // [EN] FlatDesign draws its own bar. [CN] 扁平样式使用自己的 TabBar。
+        tabBar = ((CYLTabBarController *)tabBarController).cyl_tabBar ?: tabBar;
+    }
+    if (!tabBar || !tabBar.superview || tabBar.hidden || tabBar.alpha <= 0.01) {
+        return 0;
+    }
+    UINavigationController *navigationController = self.navigationController;
+    if (self.hidesBottomBarWhenPushed && navigationController && navigationController.viewControllers.firstObject != self) {
+        return 0;
+    }
+    CGRect tabBarFrame = [self.view convertRect:tabBar.bounds fromView:tabBar];
+    CGRect overlap = CGRectIntersection(self.view.bounds, tabBarFrame);
+    if (CGRectIsNull(overlap) || CGRectIsEmpty(overlap)) {
+        return 0;
+    }
+    return CGRectGetMaxY(self.view.bounds) - CGRectGetMinY(overlap);
+}
+
 @end
 

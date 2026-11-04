@@ -935,9 +935,50 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
 
+/*!
+ * [EN] The view controller that decides the orientation now: one presented by this controller (not while it is being
+ *      dismissed, and never a `UIAlertController`, which asks its presenting view controller back and would loop), else
+ *      nil (the selected tab decides, below). The system's full screen video player (`AVFullScreenViewController`) is
+ *      presented too, so a video can turn to landscape in a portrait app.
+ * [CN] 当前决定方向的控制器：由本控制器 present 出的控制器（正在 dismiss 时除外，且不包括 `UIAlertController`：它会反过来询问
+ *      presenting 控制器，造成循环），否则为 nil（由选中的 Tab 决定，见下方）。系统的全屏视频播放器（`AVFullScreenViewController`）
+ *      同样是 present 出来的，因此竖屏 App 中的视频也能横屏。
+ */
+- (nullable UIViewController *)cyl_presentedViewControllerForOrientation {
+    UIViewController *presentedViewController = self.presentedViewController;
+    if (!presentedViewController || presentedViewController.isBeingDismissed ||
+        presentedViewController.presentingViewController != self ||
+        [presentedViewController isKindOfClass:[UIAlertController class]]) {
+        return nil;
+    }
+    return presentedViewController;
+}
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+/// [EN] Asks the presented view controller, else the selected tab (the top of its navigation stack).
+/// [CN] 询问 present 出的控制器，否则询问选中的 Tab（其导航栈的栈顶）。
+- (BOOL)shouldAutorotate {
+    UIViewController *presentedViewController = [self cyl_presentedViewControllerForOrientation];
+    if (presentedViewController) {
+        return presentedViewController.shouldAutorotate;
+    }
+    UIViewController *controller = self.selectedViewController;
+    if ([controller isKindOfClass:[UINavigationController class]]) {
+        controller = ((UINavigationController *)controller).topViewController;
+    }
+    return controller ? controller.shouldAutorotate : YES;
+}
+#pragma clang diagnostic pop
+
 /// [CN] 控制器支持方向
 /// [EN] Orientations supported by the view controller
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    UIViewController *presentedViewController = [self cyl_presentedViewControllerForOrientation];
+    if (presentedViewController) {
+        return presentedViewController.supportedInterfaceOrientations;
+    }
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         UIViewController *controller = self.selectedViewController;
         if ([controller isKindOfClass:[UINavigationController class]]) {
@@ -4786,6 +4827,16 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
     return childViewController;
+}
+
+/// [EN] The selected tab decides whether the home indicator hides. [CN] 由选中的 Tab 决定是否隐藏 Home Indicator。
+- (nullable UIViewController *)childViewControllerForHomeIndicatorAutoHidden {
+    return self.selectedViewController;
+}
+
+/// [EN] The selected tab decides which edges defer the system gestures. [CN] 由选中的 Tab 决定哪些边缘延迟系统手势。
+- (nullable UIViewController *)childViewControllerForScreenEdgesDeferringSystemGestures {
+    return self.selectedViewController;
 }
 
 - (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {

@@ -28,6 +28,8 @@
 | [一次设置所有布局的 item 样式](#cn一次设置所有布局的-item-样式) | [Item styles for every layout in one go](#enitem-styles-for-every-layout-in-one-go) |
 | [经典样式接口与 UITabBarAppearance 同时生效](#cn经典样式接口与-uitabbarappearance-同时生效) | [Classic styles and UITabBarAppearance together](#enclassic-styles-and-uitabbarappearance-together) |
 | [背景视图、阴影线与模糊效果](#cn背景视图阴影线与模糊效果) | [Background views, the shadow line and the blur](#enbackground-views-the-shadow-line-and-the-blur) |
+| [TabBar 占用的高度](#cntabbar-占用的高度) | [The height the tab bar covers](#enthe-height-the-tab-bar-covers) |
+| [屏幕方向、Home Indicator 与边缘手势](#cn屏幕方向home-indicator-与边缘手势) | [Orientation, the home indicator and edge gestures](#enorientation-the-home-indicator-and-edge-gestures) |
 | [测试](#cn测试) | [Testing](#entesting) |
 
 <!-- navigation:end -->
@@ -97,6 +99,28 @@ tabBarController.tabBar.cyl_backgroundEffect = [UIBlurEffect effectWithStyle:UIB
 tabBarController.tabBar.cyl_effectForegroundColor = [UIColor.systemPinkColor colorWithAlphaComponent:0.15];
 tabBarController.tabBar.cyl_shadowImageView.hidden = YES;
 ```
+
+## [CN]TabBar 占用的高度
+## [EN]The height the tab bar covers
+
+| 中文 | English |
+|:---|:---|
+| `-[UIViewController cyl_tabBarSpacingInViewCoordinator]`：TabBar 遮挡 `self.view` 底部的高度（`self.view` 坐标系），用于在 TabBar 上方放置悬浮按钮、底部工具条等。没有 TabBar、TabBar 隐藏或本页面隐藏 TabBar（`hidesBottomBarWhenPushed`）时为 0。适用于系统 TabBar（液态玻璃的悬浮 TabBar 也包含其下方的间距）与扁平样式自己的 TabBar。需要视图已在 window 上，请在 `-viewDidLayoutSubviews` 或 `-viewWillAppear:` 中使用。 | `-[UIViewController cyl_tabBarSpacingInViewCoordinator]`: how much of the bottom of `self.view` the tab bar covers, in `self.view`'s points, for placing a floating button or a bottom toolbar above it. 0 when there is no tab bar, it is hidden, or this page hides it (`hidesBottomBarWhenPushed`). Works with the system tab bar (for the floating Liquid Glass bar it includes the margin below it) and FlatDesign's own bar. The view must be in a window: use it in `-viewDidLayoutSubviews` or `-viewWillAppear:`. |
+
+```Objective-C
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    CGFloat bottom = self.cyl_tabBarSpacingInViewCoordinator ?: self.view.safeAreaInsets.bottom;
+    self.floatingButton.center = CGPointMake(CGRectGetMaxX(self.view.bounds) - 44, CGRectGetMaxY(self.view.bounds) - bottom - 44);
+}
+```
+
+## [CN]屏幕方向、Home Indicator 与边缘手势
+## [EN]Orientation, the home indicator and edge gestures
+
+| 中文 | English |
+|:---|:---|
+| `CYLTabBarController` 的 `supportedInterfaceOrientations` 与 `shouldAutorotate` 现在先询问由它 present 出的控制器（正在 dismiss 时除外），例如系统全屏视频播放器，竖屏 App 中的视频因此可以横屏；`UIAlertController` 不参与，避免它反过来询问 presenting 控制器造成循环。没有 present 时与之前一样由选中 Tab（导航栈栈顶）决定。`prefersHomeIndicatorAutoHidden` 与 `preferredScreenEdgesDeferringSystemGestures` 交给选中的 Tab 决定（全屏视频、游戏页面可隐藏 Home Indicator）。 | `CYLTabBarController`'s `supportedInterfaceOrientations` and `shouldAutorotate` now ask the view controller it presents first (unless it is being dismissed), e.g. the system's full screen video player, so a video can turn to landscape in a portrait app; a `UIAlertController` is left out, since it asks its presenting view controller back and would loop. Without a presented one, the selected tab (the top of its navigation stack) decides, as before. `prefersHomeIndicatorAutoHidden` and `preferredScreenEdgesDeferringSystemGestures` are left to the selected tab (a full screen video or a game page can hide the home indicator). |
 
 ## [CN]测试
 ## [EN]Testing
