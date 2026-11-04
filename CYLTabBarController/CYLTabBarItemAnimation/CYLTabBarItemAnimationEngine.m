@@ -9,14 +9,6 @@
 #import <objc/runtime.h>
 #import "CYLTabBarItemAnimatorRegistry.h"
 #import "CYLTabBarItemAnimationFactory.h"
-// Core, which this subspec depends on (the source tree, or flattened by CocoaPods). 本子库依赖的 Core（源码目录，或 CocoaPods 展平后）。
-#if __has_include("../CYLTabBarController.h")
-#import "../CYLTabBarController.h"
-#import "../UIControl+CYLTabBarItemAnimation.h"
-#else
-#import "CYLTabBarController.h"
-#import "UIControl+CYLTabBarItemAnimation.h"
-#endif
 
 static const void *CYLTabBarItemAnimationSourceURLKey = &CYLTabBarItemAnimationSourceURLKey;
 static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationShownURLKey;
@@ -33,8 +25,10 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
 
 - (instancetype)initWithRegistry:(id<CYLTabBarItemAnimatorRegistering>)registry
                          factory:(id<CYLTabBarItemAnimationViewMaking>)factory
-                     styleSource:(id<CYLTabBarItemAnimationStyleSource>)styleSource {
+                     styleSource:(id<CYLTabBarItemAnimationStyleSource>)styleSource
+                            host:(id<CYLTabBarItemAnimationHost>)host {
     if (self = [super init]) {
+        _host = host;
         _registry = registry;
         _factory = factory;
         _styleSource = styleSource;
@@ -47,7 +41,8 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
     CYLTabBarItemAnimatorRegistry *registry = [CYLTabBarItemAnimatorRegistry sharedRegistry];
     return [self initWithRegistry:registry
                           factory:[[CYLTabBarItemAnimationFactory alloc] initWithRegistry:registry]
-                      styleSource:CYLTabBarItemAnimationDefaultStyleSource()];
+                      styleSource:CYLTabBarItemAnimationDefaultStyleSource()
+                             host:CYLTabBarItemAnimationDefaultHost()];
 }
 
 #pragma mark - Helpers
@@ -105,7 +100,7 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
 #pragma mark - Views
 
 - (UIView *)animationViewInControl:(UIControl *)control {
-    if (!control || [control cyl_isPlusControl]) {
+    if (!control || [self.host isPlusControl:control]) {
         return nil;
     }
     for (UIView *subview in control.subviews) {
@@ -129,11 +124,7 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
 }
 
 - (BOOL)isAnimationReadyInControl:(UIControl *)control {
-    if (control.cyl_tabBarController.lottieURLs.count > 0) {
-        return control.cyl_tabBarController.lottieViewAdded;
-    }
-    UIView *view = [self animationViewInControl:control];
-    return view ? view.frame.size.width > 10 : NO;
+    return [self.host isAnimationView:[self animationViewInControl:control] readyInControl:control];
 }
 
 #pragma mark - Adding
@@ -159,13 +150,13 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
     //      动画库绑定的 key。
     BOOL isLocalFile = [URL isKindOfClass:[NSURL class]] && URL.isFileURL && URL.path.length > 0;
     NSURL *animationURL = (isLocalFile && [[NSFileManager defaultManager] fileExistsAtPath:URL.path]) ? URL : nil;
-    if (!animationURL || !control || [control cyl_isPlusControl]) {
+    if (!animationURL || !control || [self.host isPlusControl:control]) {
         return;
     }
     // FIX: Lottie icons invisible in FlatDesign. No size means a zero size; every animation view needs the placeholder
     // size, otherwise it is 0 x 0. 未设置尺寸时 size 为 0，所有动画视图都需要使用占位尺寸，否则为 0 x 0（扁平样式下图标不显示）。
     if (CGSizeEqualToSize(CGSizeZero, size)) {
-        size = CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
+        size = [self.host defaultAnimationSize];
     }
     // FIX: issue #442 — first: does this animation use a #442 key (`…DarkURL` / `…DarkFilePath` / `…DarkColors`)?
     // Without one, everything below is the original path. 首先判断该动画是否使用了 #442 新增的 key；没有时，下面的逻辑与原来完全相同。
@@ -189,7 +180,7 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
     if (followsDarkMode) {
         [self applyDarkColorsToAnimationView:animationView traitCollection:control.traitCollection];
     }
-    [control cyl_replaceTabImageViewWithNewView:animationView show:YES];
+    [self.host showAnimationView:animationView inControl:control];
     [self postAnimationViewDidAddNotificationForControl:control];
 }
 
@@ -203,7 +194,7 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
         if (!tabButton || ![weakSelf animationViewInControl:tabButton]) {
             return;
         }
-        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationViewDidAddNotification object:tabButton];
+        [weakSelf.host animationViewDidAddInControl:tabButton];
     });
 }
 
@@ -258,7 +249,7 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
     [self copyAnimationStateFromView:animationView toView:newAnimationView];
     [superview insertSubview:newAnimationView aboveSubview:animationView];
     // The layout tracking of Core (#653) moves to the new view. Core 的布局跟踪（#653）改为跟随新视图。
-    [superview cyl_replaceTrackedSubview:animationView withView:newAnimationView];
+    [self.host replaceTrackedSubview:animationView withView:newAnimationView inSuperview:superview];
     [animationView removeFromSuperview];
 }
 
@@ -285,7 +276,7 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
              defaultSelected:(BOOL)defaultSelected
                  contentMode:(UIViewContentMode)contentMode
                    inControl:(UIControl *)control {
-    if (!URL || !control || [control cyl_isPlusControl]) {
+    if (!URL || !control || [self.host isPlusControl:control]) {
         return;
     }
     //_UITabButton
@@ -299,9 +290,9 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
     if (!player) {
         return;
     }
-    // [CN] 统一使用 CYLTabBarItemLottieAnimationPlayingNotification 重置其他 Tab 的动画。
-    // [EN] The other tabs' animations are reset through CYLTabBarItemLottieAnimationPlayingNotification.
-    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:control];
+    // [CN] 由宿主通知其他 Tab 重置动画（Core 使用 CYLTabBarItemLottieAnimationPlayingNotification）。
+    // [EN] The host tells the other tabs to reset (Core posts CYLTabBarItemLottieAnimationPlayingNotification).
+    [self.host animationWillPlayInControl:control];
     // [CN] 启动时选中的 Tab 不播放动画，直接显示最后一帧 #389
     // [EN] The tab selected at launch shows its last frame instead of playing. #389
     if (defaultSelected) {

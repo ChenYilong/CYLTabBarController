@@ -29,6 +29,29 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /*!
+ * [EN] What the engine needs from the tab bar (Core): the engine depends on this protocol only, never on Core's classes,
+ *      categories, constants or notifications. Core provides the default (`CYLTabBarItemAnimationDefaultHost()`).
+ * [CN] 引擎对 Tab 栏（Core）的全部依赖：引擎只依赖本协议，不依赖 Core 的类、分类、常量或通知。默认实现由 Core 提供
+ *      （`CYLTabBarItemAnimationDefaultHost()`）。
+ */
+@protocol CYLTabBarItemAnimationHost <NSObject>
+/// [EN] YES for the plus button, which never animates. [CN] 加号按钮返回 YES，它不播放动画。
+- (BOOL)isPlusControl:(UIControl *)control;
+/// [EN] YES when `animationView` (nil: none) of `control` is laid out. [CN] `control` 的 `animationView`（nil 表示没有）已布局时返回 YES。
+- (BOOL)isAnimationView:(nullable UIView *)animationView readyInControl:(UIControl *)control;
+/// [EN] The size of an animation added without one. [CN] 未设置尺寸时动画视图的尺寸。
+- (CGSize)defaultAnimationSize;
+/// [EN] Shows `animationView` in place of the tab's image. [CN] 用 `animationView` 替换 Tab 的图片并显示。
+- (void)showAnimationView:(UIView *)animationView inControl:(UIControl *)control;
+/// [EN] Moves the layout tracking (#653) of `view` to `newView`. [CN] 把 `view` 的布局跟踪（#653）改为跟随 `newView`。
+- (void)replaceTrackedSubview:(UIView *)view withView:(UIView *)newView inSuperview:(UIView *)superview;
+/// [EN] Tells observers that `control` got its animation view (#428). [CN] 通知观察者 `control` 已添加动画视图（#428）。
+- (void)animationViewDidAddInControl:(UIControl *)control;
+/// [EN] Tells the other tabs that `control` starts playing, so they reset. [CN] 通知其他 Tab：`control` 开始播放，以便它们复位。
+- (void)animationWillPlayInControl:(UIControl *)control;
+@end
+
+/*!
  * FIX: issue #604 — private header of Core, not part of the public API.
  * [EN] The tab icon animation Core needs, as an abstraction Core owns (dependency inversion): Core calls only this
  *      protocol and knows no animation library. The `CYLTabBarItemAnimation` subspec, which comes only with an animation
@@ -103,6 +126,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// [EN] Core's style source, over the registrations of the `…DarkURL` / `…DarkFilePath` / `…DarkColors` keys.
 /// [CN] Core 的风格来源，基于 `…DarkURL` / `…DarkFilePath` / `…DarkColors` 等 key 的注册信息。
 FOUNDATION_EXTERN id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(void);
+
+/// [EN] Core's host. [CN] Core 提供的宿主实现。
+FOUNDATION_EXTERN id<CYLTabBarItemAnimationHost> CYLTabBarItemAnimationDefaultHost(void);
 
 FOUNDATION_EXTERN void CYLTabBarItemAnimationSetService(id<CYLTabBarItemAnimationService> _Nullable service);
 

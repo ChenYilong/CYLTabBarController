@@ -4,6 +4,9 @@
 //      CoreGraphics 的 CGSize / CGRect 随 Foundation 提供。
 #pragma once
 #import <Foundation/Foundation.h>
+#if __has_include(<CoreGraphics/CoreGraphics.h>)
+#import <CoreGraphics/CoreGraphics.h>
+#endif
 
 #ifndef NS_SWIFT_UI_ACTOR
 #define NS_SWIFT_UI_ACTOR
@@ -29,10 +32,29 @@ typedef NS_ENUM(NSInteger, UIUserInterfaceStyle) {
 - (UIColor *)resolvedColorWithTraitCollection:(UITraitCollection *)traitCollection;
 @end
 
+typedef NS_OPTIONS(NSUInteger, UIViewAutoresizing) {
+    UIViewAutoresizingNone = 0,
+};
+
 @interface UIView : NSObject
 @property (nonatomic) CGRect frame;
+@property (nonatomic, readonly) CGRect bounds;
+@property (nonatomic) CGPoint center;
+@property (nonatomic) CGAffineTransform transform;
+@property (nonatomic) UIViewAutoresizing autoresizingMask;
+@property (nonatomic, getter=isHidden) BOOL hidden;
+@property (nonatomic) CGFloat alpha;
+@property (nonatomic, strong) UITraitCollection *traitCollection;
+@property (nonatomic, weak, readonly) UIView *superview;
+@property (nonatomic, readonly) NSArray<UIView *> *subviews;
+- (void)addSubview:(UIView *)view;
+- (void)insertSubview:(UIView *)view aboveSubview:(UIView *)siblingSubview;
+- (void)removeFromSuperview;
 @property (nonatomic) UIViewContentMode contentMode;
 @property (nonatomic, getter=isUserInteractionEnabled) BOOL userInteractionEnabled;
 @property (nonatomic) BOOL translatesAutoresizingMaskIntoConstraints;
 @property (nonatomic) BOOL clipsToBounds;
+@end
+
+@interface UIControl : UIView
 @end

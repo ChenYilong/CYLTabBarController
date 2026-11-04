@@ -37,7 +37,8 @@ xcrun clang -fobjc-arc -fmodules -Wall -Wextra -Wno-unused-parameter -DDEBUG=1 \
     "$here/main.m" "$here/stub/UIKit.m" "$build/core.m" \
     "$animation/CYLTabBarItemAnimatorRegistry.m" \
     "$animation/CYLTabBarItemAnimationFactory.m" \
+    "$animation/CYLTabBarItemAnimationEngine.m" \
     "$animation/CYLTabBarItemViewAnimator.m" \
     "$animation/CYLTabBarItemAnimationPlayer.m" \
-    -framework Foundation -o "$build/tests"
+    -framework Foundation -framework CoreGraphics -o "$build/tests"
 "$build/tests"

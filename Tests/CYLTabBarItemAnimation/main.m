@@ -14,6 +14,7 @@
 #import <UIKit/UIKit.h>
 #import "CYLTabBarItemAnimatorRegistry.h"
 #import "CYLTabBarItemAnimationFactory.h"
+#import "CYLTabBarItemAnimationEngine.h"
 #import "CYLTabBarItemViewAnimator.h"
 
 // [EN] The keys, with their real values. [CN] 各 key，取值与真实的相同。
@@ -105,24 +106,66 @@ static CYLTestRiveView *CYLLastRiveView;
 - (void)cyl_stopAnimationView {}
 @end
 
-#pragma mark - The service Core talks to
+#pragma mark - What Core provides (fakes)
 
-/// [EN] Forwards to the registry exactly as `CYLTabBarItemAnimationEngine` does. [CN] 与 `CYLTabBarItemAnimationEngine` 一样转发给注册表。
-@interface CYLTestService : NSObject
-- (NSString *)attributeKeyForGenericKey:(NSString *)genericKey inAttributes:(NSDictionary *)attributes;
-@end
-@implementation CYLTestService
-- (NSString *)attributeKeyForGenericKey:(NSString *)genericKey inAttributes:(NSDictionary *)attributes {
-    return [CYLTabBarItemAnimatorRegistry attributeKeyForGenericKey:genericKey inAttributes:attributes];
+/// [EN] Core's service slot, as in UIControl+CYLTabBarItemAnimation.m; the real engine fills it in +load.
+/// [CN] Core 的服务槽位，与 UIControl+CYLTabBarItemAnimation.m 相同；真正的引擎在 +load 中填入。
+static id<CYLTabBarItemAnimationService> CYLTestCurrentService;
+void CYLTabBarItemAnimationSetService(id<CYLTabBarItemAnimationService> service) {
+    CYLTestCurrentService = service;
 }
+id<CYLTabBarItemAnimationService> CYLTabBarItemAnimationGetService(void) {
+    return CYLTestCurrentService;
+}
+
+/// [EN] A tab bar that records what the engine asked of it. [CN] 记录引擎调用的 Tab 栏替身。
+@interface CYLTestHost : NSObject <CYLTabBarItemAnimationHost>
+@property (nonatomic, assign) BOOL plus;
+@property (nonatomic, assign) BOOL ready;
+@property (nonatomic, strong) UIView *shownView;
+@property (nonatomic, assign) NSInteger willPlays;
+@property (nonatomic, assign) NSInteger trackedReplacements;
 @end
-CYLTestService *CYLTabBarItemAnimationGetService(void);
-CYLTestService *CYLTabBarItemAnimationGetService(void) {
-    static CYLTestService *service;
-    if (!service) {
-        service = [[CYLTestService alloc] init];
-    }
-    return service;
+@implementation CYLTestHost
+- (BOOL)isPlusControl:(UIControl *)control { return self.plus; }
+- (BOOL)isAnimationView:(UIView *)animationView readyInControl:(UIControl *)control { return self.ready && animationView != nil; }
+- (CGSize)defaultAnimationSize { return CGSizeMake(28, 28); }
+- (void)showAnimationView:(UIView *)animationView inControl:(UIControl *)control {
+    [control addSubview:animationView];
+    self.shownView = animationView;
+}
+- (void)replaceTrackedSubview:(UIView *)view withView:(UIView *)newView inSuperview:(UIView *)superview { self.trackedReplacements++; }
+- (void)animationViewDidAddInControl:(UIControl *)control {}
+- (void)animationWillPlayInControl:(UIControl *)control { self.willPlays++; }
+@end
+
+/// [EN] One light animation with a dark version. [CN] 一个带深色版本的浅色动画。
+@interface CYLTestStyleSource : NSObject <CYLTabBarItemAnimationStyleSource>
+@property (nonatomic, strong) NSURL *lightURL;
+@property (nonatomic, strong) NSURL *darkURL;
+@end
+@implementation CYLTestStyleSource
+- (BOOL)hasStyleVariants { return self.darkURL != nil; }
+- (BOOL)hasStyleVariantForURL:(NSURL *)URL { return self.darkURL != nil && [URL isEqual:self.lightURL]; }
+- (NSURL *)URL:(NSURL *)URL forTraitCollection:(UITraitCollection *)traitCollection {
+    BOOL dark = traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+    return (dark && [self hasStyleVariantForURL:URL]) ? self.darkURL : URL;
+}
+- (NSDictionary<NSString *, UIColor *> *)darkColorsForURL:(NSURL *)URL { return nil; }
+@end
+
+id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(void) {
+    return [[CYLTestStyleSource alloc] init];
+}
+id<CYLTabBarItemAnimationHost> CYLTabBarItemAnimationDefaultHost(void) {
+    return [[CYLTestHost alloc] init];
+}
+
+/// [EN] An existing local file, as the engine requires. [CN] 引擎要求的本地已存在文件。
+static NSURL *CYLTestFile(NSString *name) {
+    NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:name];
+    [@"test" writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+    return [NSURL fileURLWithPath:path];
 }
 
 #pragma mark - Tests
@@ -253,6 +296,61 @@ int main(void) {
         CHECK(![riveFactory isAnimationView:[[UIView alloc] init]], "a plain view is no animation view");
         CHECK([CYLTabBarItemAnimationFactory sharedFactory].registry == [CYLTabBarItemAnimatorRegistry sharedRegistry],
               "the shared factory uses the shared registry");
+
+        printf("\n# The engine, over injected fakes only (no Core)\n");
+        CHECK([(id)CYLTabBarItemAnimationGetService() isKindOfClass:[CYLTabBarItemAnimationEngine class]],
+              "the engine injects itself into Core's service slot at +load");
+        CYLTestHost *host = [[CYLTestHost alloc] init];
+        CYLTestStyleSource *styleSource = [[CYLTestStyleSource alloc] init];
+        CYLTabBarItemAnimationEngine *engine = [[CYLTabBarItemAnimationEngine alloc] initWithRegistry:riveOnly
+                                                                                              factory:riveFactory
+                                                                                          styleSource:styleSource
+                                                                                                 host:host];
+        NSURL *lightFile = CYLTestFile(@"cyl-engine-light.riv");
+        NSURL *darkFile = CYLTestFile(@"cyl-engine-dark.riv");
+        UIControl *tab = [[UIControl alloc] init];
+        [engine addAnimationWithURL:lightFile size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:tab];
+        UIView *added = [engine animationViewInControl:tab];
+        CHECK(added != nil && added == host.shownView, "the engine makes the view with the injected factory and the host shows it");
+        CHECK(added.frame.size.width == 28, "without a size, the host's default size is used");
+        CHECK([CYLLastRiveView.fileURL isEqual:lightFile], "no dark version: the light file is played");
+        [engine addAnimationWithURL:lightFile size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:tab];
+        CHECK(tab.subviews.count == 1, "adding again keeps the one view");
+        CHECK(![engine isAnimationReadyInControl:tab], "readiness is the host's decision (not ready)");
+        host.ready = YES;
+        CHECK([engine isAnimationReadyInControl:tab], "readiness is the host's decision (ready)");
+        [engine playAnimationWithURL:lightFile size:CGSizeZero defaultSelected:NO contentMode:UIViewContentModeScaleAspectFit inControl:tab];
+        CHECK(host.willPlays == 1 && ((CYLTestRiveView *)added).plays == 1, "play: the host tells the other tabs, then the player plays");
+        [engine stopAnimationInControl:tab];
+        CHECK(((CYLTestRiveView *)added).stops == 1, "stop goes through the player");
+        CHECK([[engine attributeKeyForGenericKey:CYLTabBarAnimationURL inAttributes:riveTab] isEqual:CYLTabBarRiveURL],
+              "attribute keys come from the injected registry");
+        CHECK([engine attributeKeyForGenericKey:CYLTabBarAnimationURL inAttributes:pagTab] == nil,
+              "a library missing from the injected registry is not chosen");
+
+        UIControl *plusButton = [[UIControl alloc] init];
+        host.plus = YES;
+        [engine addAnimationWithURL:lightFile size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:plusButton];
+        CHECK(plusButton.subviews.count == 0, "the host's plus button gets no animation");
+        host.plus = NO;
+
+        printf("\n# Dark Mode through the injected style source (#442)\n");
+        styleSource.lightURL = lightFile;
+        styleSource.darkURL = darkFile;
+        UIControl *darkTab = [[UIControl alloc] init];
+        darkTab.traitCollection = [[UITraitCollection alloc] init];
+        darkTab.traitCollection.userInterfaceStyle = UIUserInterfaceStyleDark;
+        [engine addAnimationWithURL:lightFile size:CGSizeMake(30, 30) contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:darkTab];
+        UIView *darkView = [engine animationViewInControl:darkTab];
+        CHECK(darkView && [CYLLastRiveView.fileURL isEqual:darkFile], "a dark style plays the dark version");
+        darkTab.traitCollection.userInterfaceStyle = UIUserInterfaceStyleLight;
+        [engine reloadAnimationForCurrentStyleInControl:darkTab];
+        UIView *lightView = [engine animationViewInControl:darkTab];
+        CHECK(lightView != darkView && [((CYLTestRiveView *)lightView).fileURL isEqual:lightFile],
+              "a style change swaps in the light version");
+        CHECK(darkTab.subviews.count == 1 && darkView.superview == nil, "the old view is removed");
+        CHECK(host.trackedReplacements == 1, "the host moves its layout tracking to the new view");
+        CHECK(lightView.frame.size.width == 30, "the new view keeps the size");
     }
     printf("\n%d checks, %d failures\n", CYLChecks, CYLFailures);
     return CYLFailures == 0 ? 0 : 1;

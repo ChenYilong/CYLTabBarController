@@ -14,6 +14,7 @@
 #import "UIControl+CYLTabBarItemAnimation.h"
 #import "CYLTabBar+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
+#import "CYLTabBarController.h"
 
 #pragma mark - Service
 
@@ -64,6 +65,57 @@ id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(v
         styleSource = [[CYLTabBarItemAnimationConstantsStyleSource alloc] init];
     });
     return styleSource;
+}
+
+#pragma mark - Host
+
+/// [EN] Core's side of the engine's needs: the tab bar's state, layout and notifications. [CN] Core 为引擎提供的能力：Tab 栏的状态、布局与通知。
+@interface CYLTabBarItemAnimationCoreHost : NSObject <CYLTabBarItemAnimationHost>
+@end
+
+@implementation CYLTabBarItemAnimationCoreHost
+
+- (BOOL)isPlusControl:(UIControl *)control {
+    return [control cyl_isPlusControl];
+}
+
+- (BOOL)isAnimationView:(UIView *)animationView readyInControl:(UIControl *)control {
+    CYLTabBarController *tabBarController = control.cyl_tabBarController;
+    if (tabBarController.lottieURLs.count > 0) {
+        return tabBarController.lottieViewAdded;
+    }
+    return animationView ? animationView.frame.size.width > 10 : NO;
+}
+
+- (CGSize)defaultAnimationSize {
+    return CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
+}
+
+- (void)showAnimationView:(UIView *)animationView inControl:(UIControl *)control {
+    [control cyl_replaceTabImageViewWithNewView:animationView show:YES];
+}
+
+- (void)replaceTrackedSubview:(UIView *)view withView:(UIView *)newView inSuperview:(UIView *)superview {
+    [superview cyl_replaceTrackedSubview:view withView:newView];
+}
+
+- (void)animationViewDidAddInControl:(UIControl *)control {
+    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationViewDidAddNotification object:control];
+}
+
+- (void)animationWillPlayInControl:(UIControl *)control {
+    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:control];
+}
+
+@end
+
+id<CYLTabBarItemAnimationHost> CYLTabBarItemAnimationDefaultHost(void) {
+    static CYLTabBarItemAnimationCoreHost *host;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        host = [[CYLTabBarItemAnimationCoreHost alloc] init];
+    });
+    return host;
 }
 
 id CYLTabBarItemAttributesAnimationValue(NSDictionary *attributes, NSString *genericKey) {
