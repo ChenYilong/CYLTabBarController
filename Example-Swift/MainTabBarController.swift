@@ -137,7 +137,9 @@ class MainTabBarController: CYLTabBarController {
 extension MainTabBarController {
     
     override func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-        self.updateSelectionStatusIfNeeded(for: tabBarController, shouldSelect: viewController)
+        // [EN] Call super: it also counts the tap for the tab bar item gestures (#152) and updates the selection status.
+        // [CN] 调用 super：它同时为 TabBarItem 手势计数（#152）并更新选中状态。
+        _ = super.tabBarController(tabBarController, shouldSelect: viewController)
         return true
     }
  
@@ -174,6 +176,45 @@ extension MainTabBarController {
         return ["Icon_Shop", "Icon_Discovery", "Icon_Knowledge", "Icon_Mine"].map { layer in
             ["\(layer)_Normal.**.Color": UIColor(white: 0.78, alpha: 1),
              "\(layer)_Active_Main.**.Color": UIColor(red: 0.15, green: 0.39, blue: 0.16, alpha: 1)]
+        }
+    }
+}
+
+// MARK: - Issue #152: tab bar item gestures (delegate method)
+
+// [EN] #152: re-tap, double tap and long press on the tabs and the plus button, with the delegate method. The ObjC
+//      demo (MainTabBarController.m) shows the block API, `cyl_tabBarItemGestureHandler`.
+// [CN] #152：Tab 与 PlusButton 上的再次点击、双击与长按，使用代理方法。ObjC Demo（MainTabBarController.m）演示 block 方式
+//      `cyl_tabBarItemGestureHandler`。
+extension MainTabBarController {
+
+    @objc(tabBarController:didRecognizeTabBarItemGesture:control:viewController:)
+    func tabBarController(_ _: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture,
+                                control: UIControl, viewController: UIViewController?) {
+        let content = viewController?.cyl_getViewControllerInsteadOfNavigationController()
+        switch gesture {
+        case .reselect:
+            // [EN] Tap the selected tab: scroll to the top.
+            // [CN] 点击已选中的 Tab：滚动到顶部。
+            (content as? UITableViewController)?.tableView.setContentOffset(.zero, animated: true)
+        case .doubleTap:
+            // [EN] Double tap: refresh, as Weibo does.
+            // [CN] 双击：像微博一样刷新。
+            (content as? UITableViewController)?.tableView.reloadData()
+            content?.navigationItem.prompt = "Refreshed (double tap, #152)"
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { content?.navigationItem.prompt = nil }
+        case .longPress:
+            // [EN] Long press: an action sheet for the tab.
+            // [CN] 长按：弹出该 Tab 的操作菜单。
+            let sheet = UIAlertController(title: control.cyl_tabBarItemIdentifier, message: "Long press (#152)", preferredStyle: .actionSheet)
+            sheet.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+            sheet.popoverPresentationController?.sourceView = control
+            sheet.popoverPresentationController?.sourceRect = control.bounds
+            if presentedViewController == nil {
+                present(sheet, animated: true)
+            }
+        @unknown default:
+            break
         }
     }
 }
