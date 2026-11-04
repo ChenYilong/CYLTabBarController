@@ -37,6 +37,23 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)cyl_canNotResponseEvent;
 
+/*!
+ * FIX: issue #535
+ * [EN] The keyframe animation suggested in the issue, for any view: scale 1.5, then 0.8, then back to 1.0 in 0.5 s,
+ *      with UIView keyframes (it sets `transform`, so use it on views whose transform you do not set yourself).
+ * [CN] issue 中建议的关键帧动画，可用于任意视图：0.5 秒内放大到 1.5 倍，缩小到 0.8 倍，再恢复到 1.0（使用 UIView 关键帧，会设置
+ *      `transform`，请勿用于自己设置了 transform 的视图）。
+ */
+- (void)cyl_addScaleBounceAnimationWithCompletion:(nullable void (^)(BOOL finished))completion;
+
+/*!
+ * [EN] The receiver or its nearest superview that is a `UIControl`, looking up to `stopView` but not at it (nil: up to the
+ *      window). For a hit-tested subview (an image view or a label inside a button), this is the button it belongs to.
+ * [CN] 接收者本身或最近的 `UIControl` 父视图，向上查找到 `stopView` 为止且不包括它（nil：一直查找到 window）。对 hitTest 得到的
+ *      子视图（按钮内的 imageView 或 label）而言，就是它所属的按钮。
+ */
+- (nullable UIControl *)cyl_nearestControlBelowView:(nullable UIView *)stopView;
+
 @end
 
 NS_ASSUME_NONNULL_END

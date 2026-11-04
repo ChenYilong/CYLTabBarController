@@ -38,4 +38,29 @@
     return self.cyl_isInvisiable || (NO == self.userInteractionEnabled ) || self.cyl_isPlaceholder;
 }
 
+
+- (UIControl *)cyl_nearestControlBelowView:(UIView *)stopView {
+    for (UIView *view = self; view && view != stopView; view = view.superview) {
+        if ([view isKindOfClass:[UIControl class]]) {
+            return (UIControl *)view;
+        }
+    }
+    return nil;
+}
+
+- (void)cyl_addScaleBounceAnimationWithCompletion:(void (^)(BOOL finished))completion {
+    self.transform = CGAffineTransformIdentity;
+    [UIView animateKeyframesWithDuration:0.5 delay:0 options:0 animations:^{
+        [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:1.0 / 3.0 animations:^{
+            self.transform = CGAffineTransformMakeScale(1.5, 1.5);
+        }];
+        [UIView addKeyframeWithRelativeStartTime:1.0 / 3.0 relativeDuration:1.0 / 3.0 animations:^{
+            self.transform = CGAffineTransformMakeScale(0.8, 0.8);
+        }];
+        [UIView addKeyframeWithRelativeStartTime:2.0 / 3.0 relativeDuration:1.0 / 3.0 animations:^{
+            self.transform = CGAffineTransformIdentity;
+        }];
+    } completion:completion];
+}
+
 @end

@@ -398,8 +398,9 @@ static const NSInteger CYLDemoRowScrollHideSimulation = 2000;
  * [EN] The sections, by function: each row is a settings row index, or `CYLDemoRowTabBar` + a tab bar demo row. The
  *      settings rows follow `UIViewController+CYLSettingsSection.m`: 0 language, 1 memory warning, 2 title offset,
  *      3 standardAppearance, 4 login state, 5 plus button touchable area, 6 selectedIndex (#515), 7 minimize / hide the
- *      tab bar on scroll (#13, next to the show / hide row), 8 the scroll hiding simulations (#13, in their own
- *      section), then the tab item
+ *      tab bar on scroll (#13, next to the show / hide row), 8–18 issue #535 (8 tap animation, 9 long press, 10 swipe,
+ *      11 outside the superview, 12 bundle images, 13 navigation bar without a base class, 14 slide transition, 15 tap
+ *      sound and haptic, 16 long press / double tap timing, 17 adjacent tab, 18 CYLUtils helpers), 19 the scroll hiding simulations (#13, in their own section), then the tab item
  *      updates (title, icon, network icon, all network icons, all local icons, GIF, all titles, replace neighbors).
  *      Settings rows not listed here (a newer library) go to the first section.
  * [CN] 按功能分组的 section：每行为设置行的序号，或 `CYLDemoRowTabBar` + TabBar 演示行序号。设置行顺序见
@@ -416,13 +417,19 @@ static const NSInteger CYLDemoRowScrollHideSimulation = 2000;
            @"rows" : @[ @(update + 0), @(update + 1), @(update + 2), @(update + 3), @(update + 4), @(update + 5), @(update + 6) ] },
         @{ @"title" : CYLLocalizedString(@"Tab 页面、选中与登录"), @"rows" : @[ @(update + 7), @6, @4 ] },
         @{ @"title" : @"PlusButton", @"rows" : @[ @5 ] },
+        // FIX: issue #535 — tap animation, tap sound and haptic, long press, long press / double tap timing, swipe,
+        // switch to the adjacent tab, slide transition. 点击动画、点击声音与触感、长按、长按与双击时长、滑动、切换相邻 Tab、滑动转场。
+        @{ @"title" : CYLLocalizedString(@"Tab 交互"), @"rows" : @[ @8, @15, @9, @16, @10, @17, @14 ] },
+        // FIX: issue #535 — navigation bar without a base class, outside the superview, bundle images, CYLUtils helpers.
+        // 不继承基类隐藏导航栏、超出父视图响应、bundle 图片、CYLUtils 工具方法。
+        @{ @"title" : CYLLocalizedString(@"无需继承基类与工具方法"), @"rows" : @[ @13, @11, @12, @18 ] },
         @{ @"title" : CYLLocalizedString(@"跳转与对比"),
            @"rows" : @[ @(CYLDemoRowTabBar + 5), @(CYLDemoRowTabBar + 6), @(CYLDemoRowTabBar + 7), @(CYLDemoRowTabBar + 8) ] },
     ] mutableCopy];
     // [EN] Scroll hiding (issue #13): one section of simulated interruptions. [CN] 滚动隐藏（issue #13）：模拟意外情况的 section。
-    // [EN] Settings row 8 (the same simulations in an action sheet) first, then one row per simulation.
-    // [CN] 先放设置第 8 行（操作表中的同样模拟），再每个模拟一行。
-    NSMutableArray<NSNumber *> *simulationRows = [NSMutableArray arrayWithObject:@8];
+    // [EN] Settings row 19 (the same simulations in an action sheet) first, then one row per simulation.
+    // [CN] 先放设置第 19 行（操作表中的同样模拟），再每个模拟一行。
+    NSMutableArray<NSNumber *> *simulationRows = [NSMutableArray arrayWithObject:@19];
     for (NSInteger row = 0; row < [self cyl_scrollHideSimulationRowCount]; row++) {
         [simulationRows addObject:@(CYLDemoRowScrollHideSimulation + row)];
     }

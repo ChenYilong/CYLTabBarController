@@ -202,9 +202,45 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Visa en TabBarController med ny kontext (PlusButton med en tryckbar X-undervy, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Tryck på X uppe till höger på PlusButton: X får en slumpmässig färg och PlusButton reagerar inte";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Uppdatera";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex och PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Tryck för att välja nästa flik. Index utan PlusButton: %1$@, selectedIndex: %2$@, nu: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Förstora och förminska";
+"从小放大" = "Zooma in";
+"弹性" = "Studs";
+"弹性 + 烟花" = "Studs + fyrverkeri";
+"旋转" = "Rotera";
+"翻转" = "Vänd";
+"飘散" = "Förflyktiga";
+"无" = "Ingen";
+"Tab 点击动画（issue #535）" = "Tryckanimering för flikar (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Tryck för att byta tryckanimering för flikarna och PlusButton. Nu: %@";
+"长按了「%@」" = "Höll ned ”%@”";
+"左右滑动切换 Tab（issue #535）" = "Svep för att byta flik (issue #535)";
+"长按 Tab（issue #535）" = "Håll ned flikar (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Slå på reglaget och svep åt vänster eller höger på sidan för att gå till nästa eller föregående flik.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Slå på reglaget och håll ned en flik eller PlusButton för att se dess identifierare.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Rotera (bara den här fliken: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Bildrutor + fyrverkeri (alla flikar: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Svara utanför överordnad vy (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Med reglaget på svarar även den del av knappen som ligger utanför den grå rutan; varje tryck spelar skalningsanimeringen. Tryck: %@";
+"已找到" = "Hittades";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Hittades inte (med use_frameworks ligger resurspaketet i frameworket)";
+"从 bundle 加载图片（issue #535）" = "Läs in bilder från ett bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Bilden till vänster läses från resurspaketet med CYLImageInBundle (utan cache). CYLBundleImage i huvudpaketet: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Det här är en vanlig UIViewController som inte ärver från CYLBaseViewController. Navigeringsfältet är dolt.";
+"不继承基类隐藏导航栏（issue #535）" = "Dölj navigeringsfältet utan basklass (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Reglaget ställer in cyl_automaticNavigationSettingEnabled; tryck på raden för att öppna en vanlig UIViewController som ställer in cyl_navigationBarHidden och cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Sida %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Glidande övergång (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Tryck för att öppna en UITabBarController från systemet: tryck på en flik eller dra sidan åt vänster eller höger, så glider sidan med fingret.";
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "Minimera / dölj TabBar vid rullning (issue #13)";
@@ -227,3 +263,25 @@
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Välj ett avbrott; det utlöses efter 1,5 s. Rulla först nedåt för att dölja TabBar.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manuellt: tryck för att slå på dölj vid rullning, rulla nedåt för att dölja TabBar och gör sedan det titeln säger. Förväntat: TabBar kommer tillbaka direkt.";
 "自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Kör alla automatiska simuleringar i tur och ordning och rapporterar godkänt / underkänt (cirka 2 minuter), även i konsolen. Kan också köras med startargumentet -CYLScrollHideSelfTest YES.";
+"默认点击声" = "Standardklick";
+"中等触感反馈" = "Medelstark haptik";
+"无需继承基类与工具方法" = "Utan basklass, och verktyg";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Föregående / nästa flik (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Svag referens: hittad vid liv %@, nil efter frigörning %@. Från %@ till den valda flikens knapp: %@";
+"点击声 + 触感反馈" = "Klick + haptik";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Studs + stjärnfyrverkeri (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Tryck på pilarna till höger för att anropa cyl_switchToAdjacentTabWithStep:-1 / 1. Som ett svep hoppar den över PlusButton och kontrollerar inloggning. Senaste resultat: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Tryck för att byta och tryck sedan på valfri flik eller PlusButton för att höra det. Haptik vibrerar bara på en riktig enhet. Nu: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Tryck för att köra: cyl_setWeakAssociatedObject:forKey: returnerar nil när objektet frigjorts; cyl_nearestControlBelowView: hittar den valda flikens knapp från dess symbol.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Tryck för att byta. cyl_tabBarItemLongPressDuration: %@ s, cyl_tabButtonLongPressMinimumDuration: %@ s, cyl_tabBarItemDoubleTapInterval: %@ s";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Egen ljudfil (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Rulla upp, ingen avmarkeringsanimering (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Långsamt förstora och förminska (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Långsam inzoomning (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: svaga associerade objekt och att hitta en knapp (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Längd för långt tryck och intervall för dubbeltryck (issue #535 / #152)";
+"Tab 交互" = "Flikinteraktioner";
+"Tab 点击声音与触感反馈（issue #535）" = "Flikens tryckljud och haptik (issue #535)";
+"轻触感反馈" = "Lätt haptik";
+"重触感反馈" = "Kraftig haptik";
+"长按（#152）" = "Långt tryck (#152)";

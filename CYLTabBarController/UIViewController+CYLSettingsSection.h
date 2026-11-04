@@ -18,7 +18,12 @@ NS_ASSUME_NONNULL_BEGIN
  *      row 5 shows the plus button's touchable area and scales it with a slider (issue #91),
  *      row 6 selects the next tab by its index without the plus button (`cyl_selectedIndexIgnoringPlusButton`, issue #515),
  *      row 7 switches how the tab bar minimizes or hides on scroll (`cyl_tabBarMinimizeBehavior`, issue #13),
- *      row 8 lists the scroll hiding simulations in an action sheet (`-cyl_presentScrollHideSimulationMenu`, issue #13),
+ *      row 8 switches the tap animation of the tabs, row 9 turns on the long press of the tabs, row 10 turns on swiping
+ *      to switch tabs, row 11 shows a subview that responds outside its superview, row 12 loads an image from a bundle,
+ *      row 13 hides the navigation bar without a base class, row 14 opens the slide transition demo, row 15 switches
+ *      the tap sound and haptic, row 16 switches the long press duration and double tap interval, row 17 switches to
+ *      the previous or next tab, row 18 runs the CYLUtils weak associated object and nearest control helpers (issue #535),
+ *      row 19 lists the scroll hiding simulations in an action sheet (`-cyl_presentScrollHideSimulationMenu`, issue #13),
  *      then the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon,
  *      all network icons, all local icons, GIF icon, all titles, replace neighboring tabs.
  * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
@@ -28,7 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
  *      第 5 行显示 PlusButton 的可点击区域，并用滑块按倍数扩大（issue #91），
  *      第 6 行按不含 PlusButton 的下标选中下一个 Tab（`cyl_selectedIndexIgnoringPlusButton`，issue #515），
  *      第 7 行切换滚动时 TabBar 缩小或隐藏的方式（`cyl_tabBarMinimizeBehavior`，issue #13），
- *      第 8 行用操作表列出滚动隐藏的模拟（`-cyl_presentScrollHideSimulationMenu`，issue #13），之后是原地更新 Tab 的若干行
+ *      第 8 行切换 Tab 的点击动画，第 9 行开启 Tab 长按，第 10 行开启左右滑动切换 Tab，第 11 行演示超出父视图的子视图响应点击，
+ *      第 12 行从 bundle 加载图片，第 13 行不继承基类隐藏导航栏，第 14 行打开滑动转场演示，第 15 行切换点击声音与触感反馈，
+ *      第 16 行切换长按时长与双击间隔，第 17 行切换到上一个或下一个 Tab，第 18 行运行 CYLUtils 弱引用关联对象与查找按钮的工具方法（issue #535），
+ *      第 19 行用操作表列出滚动隐藏的模拟（`-cyl_presentScrollHideSimulationMenu`，issue #13），
+ *      之后是原地更新 Tab 的若干行
  *      （`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、所有网络图标、所有本地图标、GIF 图标、所有标题、替换相邻 Tab 的页面。
  */
 FOUNDATION_EXTERN const NSInteger CYLSettingsSection;

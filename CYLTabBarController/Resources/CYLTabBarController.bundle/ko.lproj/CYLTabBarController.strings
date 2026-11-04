@@ -202,9 +202,45 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "새 컨텍스트의 TabBarController 푸시 (탭할 수 있는 X 하위 뷰가 있는 플러스 버튼, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "플러스 버튼 오른쪽 위의 X를 탭: X가 임의의 색으로 바뀌고 플러스 버튼은 반응하지 않습니다";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "새로고침";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex와 플러스 버튼 (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "탭하면 다음 탭을 선택합니다. 플러스 버튼을 제외한 인덱스: %1$@, selectedIndex: %2$@, 현재: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "확대 후 축소";
+"从小放大" = "확대";
+"弹性" = "바운스";
+"弹性 + 烟花" = "바운스 + 불꽃";
+"旋转" = "회전";
+"翻转" = "뒤집기";
+"飘散" = "흩어짐";
+"无" = "없음";
+"Tab 点击动画（issue #535）" = "탭 애니메이션 (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "탭하여 탭과 플러스 버튼의 탭 애니메이션을 전환합니다. 현재: %@";
+"长按了「%@」" = "\"%@\"을(를) 길게 눌렀습니다";
+"左右滑动切换 Tab（issue #535）" = "스와이프로 탭 전환 (issue #535)";
+"长按 Tab（issue #535）" = "탭 길게 누르기 (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "스위치를 켠 후 화면을 좌우로 스와이프하면 다음 또는 이전 탭으로 전환됩니다.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "스위치를 켠 후 탭이나 플러스 버튼을 길게 누르면 해당 식별자가 표시됩니다.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "회전 (현재 탭만: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "프레임 + 불꽃 (모든 탭: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "상위 뷰 밖에서 탭에 반응 (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "스위치를 켜면 회색 상자 밖의 버튼 부분도 반응합니다. 탭할 때마다 확대·축소 애니메이션이 재생됩니다. 탭 횟수: %@";
+"已找到" = "찾음";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "찾을 수 없음 (use_frameworks 사용 시 리소스 번들은 framework 안에 있음)";
+"从 bundle 加载图片（issue #535）" = "bundle에서 이미지 불러오기 (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "왼쪽 이미지는 CYLImageInBundle로 리소스 번들에서 읽었습니다(캐시 없음). 메인 bundle의 CYLBundleImage: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "CYLBaseViewController를 상속하지 않은 일반 UIViewController입니다. 내비게이션 바가 숨겨져 있습니다.";
+"不继承基类隐藏导航栏（issue #535）" = "기본 클래스 없이 내비게이션 바 숨기기 (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "스위치는 cyl_automaticNavigationSettingEnabled을(를) 설정합니다. 행을 탭하면 cyl_navigationBarHidden와(과) cyl_hidesAncestorNavigationBars을(를) 설정한 일반 UIViewController를 푸시합니다.";
+"页面 %@" = "페이지 %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "슬라이드 전환 (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "탭하면 시스템 UITabBarController가 열립니다. 탭을 누르거나 화면을 좌우로 드래그하면 페이지가 손가락을 따라 이동합니다.";
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "스크롤 시 TabBar 축소 / 숨기기 (issue #13)";
@@ -227,3 +263,25 @@
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "예외 상황을 선택하면 1.5초 후에 실행됩니다. 먼저 아래로 스크롤해 TabBar를 숨기세요.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "수동: 탭하여 스크롤 시 숨기기를 켜고, 아래로 스크롤해 TabBar를 숨긴 뒤 제목대로 조작하세요. 예상: TabBar가 즉시 다시 표시됩니다.";
 "自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "자동화할 수 있는 모든 시뮬레이션을 차례로 실행하고 통과 / 실패를 보고합니다(약 2분). 결과는 콘솔에도 출력됩니다. 실행 인수 -CYLScrollHideSelfTest YES로도 실행할 수 있습니다.";
+"默认点击声" = "기본 클릭음";
+"中等触感反馈" = "중간 햅틱";
+"无需继承基类与工具方法" = "기본 클래스 불필요 및 도구";
+"切换到上一个 / 下一个 Tab（issue #535）" = "이전 / 다음 탭으로 (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "약한 참조: 살아 있을 때 가져옴 %@, 해제 후 nil %@. %@에서 선택된 탭 버튼 찾기: %@";
+"点击声 + 触感反馈" = "클릭음 + 햅틱";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "바운스 + 별 불꽃 (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "오른쪽 화살표를 탭하여 cyl_switchToAdjacentTabWithStep:-1 / 1를 호출합니다. 스와이프처럼 PlusButton을 건너뛰고 로그인을 확인합니다. 마지막 결과: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "탭하여 전환한 다음 아무 탭이나 PlusButton을 탭해 들어 보세요. 햅틱은 실제 기기에서만 진동합니다. 현재: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "탭하여 실행: cyl_setWeakAssociatedObject:forKey:는 객체가 해제되면 nil을 반환합니다. cyl_nearestControlBelowView:는 선택된 탭의 아이콘에서 버튼을 찾습니다.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "탭하여 전환. cyl_tabBarItemLongPressDuration: %@초, cyl_tabButtonLongPressMinimumDuration: %@초, cyl_tabBarItemDoubleTapInterval: %@초";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "사용자 지정 사운드 파일 (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "위로 말아 올리기, 선택 해제 애니메이션 없음 (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "느린 확대 후 축소 (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "느린 줌인 (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils 약한 연관 객체와 버튼 찾기 (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "길게 누르기 시간과 두 번 탭 간격 (issue #535 / #152)";
+"Tab 交互" = "탭 상호작용";
+"Tab 点击声音与触感反馈（issue #535）" = "탭 클릭음과 햅틱 (issue #535)";
+"轻触感反馈" = "약한 햅틱";
+"重触感反馈" = "강한 햅틱";
+"长按（#152）" = "길게 누르기 (#152)";
