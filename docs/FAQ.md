@@ -143,6 +143,21 @@ unloadsUnselectedViewsOnMemoryWarning = true
 |:---|:---|
 | 来源：[#472](https://github.com/ChenYilong/CYLTabBarController/issues/472)、[#493](https://github.com/ChenYilong/CYLTabBarController/issues/493) | Source: [#472](https://github.com/ChenYilong/CYLTabBarController/issues/472), [#493](https://github.com/ChenYilong/CYLTabBarController/issues/493) |
 | 系统 `UITabBar` 最多显示 5 个 item，超过时会出现 More，这是系统逻辑，也是审核要求。PlusButton 不计入这 5 个，因此最多为 5 个 TabBarItem + 1 个 PlusButton，详见 README [为什么放置 6 个 TabBarItem 会显示异常？](../README.md#cn为什么放置-6-个-tabbaritem-会显示异常)。 | The system `UITabBar` shows at most five items and adds More beyond that; this is system behavior and an App Review requirement. The PlusButton does not count, so the limit is five TabBarItems plus one PlusButton; see [Why does placing six TabBarItems behave unexpectedly?](../README.md#enwhy-does-placing-six-tabbaritems-behave-unexpectedly) in the README. |
+| 不出现系统 More 的做法：More 是 UIKit 在视图控制器超过 5 个时自动添加的，无法关闭，所以只给 TabBarController 5 个视图控制器，第 5 个 Tab 作为「溢出位」。用劫持接口（`cyl_shouldHijackHandler` + `cyl_didHijackHandler`，见 [Tab-Hijack.md](Tab-Hijack.md)）让点击溢出位时弹出你自己的菜单，列出放不下的页面；选中后用 `-replaceViewControllerAtIndex:withViewController:attributes:` 把该页面连同它的标题、图标放进溢出位并选中。其他 Tab 选中时点击溢出位直接进入其中的页面，再次点击则重新弹出菜单。这样 TabBar 上始终只有 5 个 Tab，所有页面都能到达，也没有系统 More 列表。 | Avoiding the system More: UIKit adds More by itself once there are more than five view controllers, and it cannot be turned off, so give the tab bar controller five view controllers and use the fifth tab as an overflow slot. With the hijack API (`cyl_shouldHijackHandler` + `cyl_didHijackHandler`, see [Tab-Hijack.md](Tab-Hijack.md)), tapping the slot shows your own menu of the pages that do not fit; the chosen page goes into the slot with its own title and icon through `-replaceViewControllerAtIndex:withViewController:attributes:` and is selected. While another tab is selected, tapping the slot opens its page directly; tapping it again shows the menu. The tab bar always has five tabs, every page is reachable, and there is no system More list. |
+| 示例：ObjC Demo 的「Tab Bar Gallery」→「More than five tabs」→「8 tabs without the system "More"」（`+overflowMenuScene`，`Example/Classes/Gallery/CYLGalleryProvider.m`），同组第二行是系统 More 的对照。 | Example: the ObjC demo's "Tab Bar Gallery" → "More than five tabs" → "8 tabs without the system "More"" (`+overflowMenuScene` in `Example/Classes/Gallery/CYLGalleryProvider.m`); the second row of that section shows the system More for comparison. |
+
+```objc
+// [EN] Five view controllers; the fifth (identifier "overflow") is the slot. [CN] 五个视图控制器；第五个（identifier 为 "overflow"）是溢出位。
+tabBarController.cyl_shouldHijackHandler = ^BOOL(CYLTabBarController *controller, UIViewController *viewController) {
+    NSUInteger index = [controller.viewControllers indexOfObject:viewController];
+    return index == 4 && (viewController == placeholder || controller.selectedIndex == 4);
+};
+tabBarController.cyl_didHijackHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {
+    // [EN] Show a menu of the other pages; on a choice: [CN] 弹出其他页面的菜单；选中某项时：
+    [controller replaceViewControllerAtIndex:4 withViewController:page attributes:pageAttributes];
+    controller.selectedIndex = 4;
+};
+```
 
 ## [CN]3. PlusButton（中间凸起按钮）
 ## [EN]3. PlusButton (the raised center button)

@@ -941,7 +941,7 @@ static UIView *CYLGalleryStarView(void) {
 + (NSArray<CYLGallerySection *> *)sections {
     return @[ [self basicSection], [self embedSection], [self animationSection], [self irregularSection],
               [self customClickSection], [self remindSection], [self lottieSection], [self newAPISection],
-              [self liquidGlassRobustnessSection] ];
+              [self liquidGlassRobustnessSection], [self moreThanFiveTabsSection] ];
 }
 
 #pragma mark Basic
@@ -1453,6 +1453,82 @@ static UIView *CYLGalleryStarView(void) {
         }],
     ];
     return [CYLGallerySection sectionWithTitle:@"Liquid Glass robustness" scenes:scenes];
+}
+
+
+#pragma mark More than five tabs (issue #472)
+
+/*!
+ * [EN] Issue #472: more than five tabs without the system "More". UIKit adds "More" as soon as a tab bar controller has
+ *      more than five view controllers, and it cannot be turned off; so the controller gets five, and the fifth tab is an
+ *      overflow slot. Tapping it (or tapping it again while it is selected) is hijacked and shows your own menu of the
+ *      other pages; the chosen page is put in the slot with `-replaceViewControllerAtIndex:withViewController:attributes:`,
+ *      with its own title and icon, and selected. While another tab is selected, the slot selects its page directly.
+ * [CN] Issue #472：超过 5 个 Tab 而不出现系统的 "More"。TabBarController 的视图控制器超过 5 个时 UIKit 就会添加 "More"，且无法关闭；
+ *      因此只给控制器 5 个，第 5 个 Tab 作为溢出位。点击它（或在它选中时再次点击）会被劫持，弹出你自己的其他页面菜单；选中的页面通过
+ *      `-replaceViewControllerAtIndex:withViewController:attributes:` 放进该位置（使用它自己的标题与图标）并选中。其他 Tab 选中时，
+ *      点击溢出位直接选中其中的页面。
+ */
++ (UIViewController *)overflowMenuScene {
+    NSArray<NSArray<NSString *> *> *specs = CYLGalleryTabSpecs();
+    NSMutableArray<NSDictionary *> *attributes = [CYLGalleryAttributes(4, YES, 20, nil) mutableCopy];
+    [attributes addObject:@{ CYLTabBarItemTitle : @"More",
+                             CYLTabBarItemImage : CYLGallerySymbol(@"ellipsis.circle", NO, 20),
+                             CYLTabBarItemSelectedImage : CYLGallerySymbol(@"ellipsis.circle", YES, 20),
+                             CYLTabBarItemIdentifier : @"overflow" }];
+    NSMutableArray<UIViewController *> *pages = [CYLGalleryPages(4, NO) mutableCopy];
+    CYLGalleryPageViewController *placeholder = [[CYLGalleryPageViewController alloc] init];
+    [pages addObject:placeholder];
+    // [EN] The pages that do not fit: Me, Message, Shop, Cardboard. [CN] 放不下的页面：Me、Message、Shop、Cardboard。
+    NSMutableArray<UIViewController *> *overflowPages = [NSMutableArray array];
+    NSMutableArray<NSDictionary *> *overflowAttributes = [NSMutableArray array];
+    for (NSUInteger index = 4; index < specs.count; index++) {
+        [overflowPages addObject:[[CYLGalleryPageViewController alloc] init]];
+        [overflowAttributes addObject:@{ CYLTabBarItemTitle : specs[index][0],
+                                         CYLTabBarItemImage : CYLGallerySymbol(specs[index][1], NO, 20),
+                                         CYLTabBarItemSelectedImage : CYLGallerySymbol(specs[index][1], YES, 20),
+                                         CYLTabBarItemIdentifier : @"overflow" }];
+    }
+    CYLTabBarController *tabBarController = CYLGalleryTabBarController(pages, attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext);
+    tabBarController.cyl_hijackedTabBarItemIdentifiers = @[ @"overflow" ];
+    tabBarController.cyl_shouldHijackHandler = ^BOOL(CYLTabBarController *controller, UIViewController *viewController) {
+        NSUInteger index = [controller.viewControllers indexOfObject:viewController];
+        if (index != 4) {
+            return NO;
+        }
+        // [EN] The menu: from the placeholder, or when the slot is tapped again. [CN] 弹出菜单：溢出位还是占位页面，或再次点击该位置时。
+        return viewController == placeholder || controller.selectedIndex == 4;
+    };
+    tabBarController.cyl_didHijackHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {
+        UIAlertController *menu = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        [overflowPages enumerateObjectsUsingBlock:^(UIViewController *page, NSUInteger index, BOOL *stop) {
+            NSDictionary *pageAttributes = overflowAttributes[index];
+            [menu addAction:[UIAlertAction actionWithTitle:pageAttributes[CYLTabBarItemTitle] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                if (controller.viewControllers[4] != page) {
+                    [controller replaceViewControllerAtIndex:4 withViewController:page attributes:pageAttributes];
+                }
+                controller.selectedIndex = 4;
+            }]];
+        }];
+        [menu addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        UIControl *slotButton = controller.viewControllers.lastObject.cyl_tabButton;
+        menu.popoverPresentationController.sourceView = slotButton ?: controller.tabBar;
+        menu.popoverPresentationController.sourceRect = (slotButton ?: controller.tabBar).bounds;
+        [controller presentViewController:menu animated:YES completion:nil];
+    };
+    return tabBarController;
+}
+
++ (CYLGallerySection *)moreThanFiveTabsSection {
+    NSArray<CYLGalleryScene *> *scenes = @[
+        [CYLGalleryScene sceneWithTitle:@"8 tabs without the system \"More\"" subtitle:@"Issue #472: the fifth tab opens your own menu of the other pages; the chosen page takes that slot with its own title and icon" builder:^UIViewController *{
+            return [self overflowMenuScene];
+        }],
+        [CYLGalleryScene sceneWithTitle:@"For comparison: 8 tabs with the system \"More\"" subtitle:@"UIKit shows four tabs and \"More\" once there are more than five view controllers" builder:^UIViewController *{
+            return [self fullWidthTabBarControllerWithCount:8];
+        }],
+    ];
+    return [CYLGallerySection sectionWithTitle:@"More than five tabs" scenes:scenes];
 }
 
 @end
