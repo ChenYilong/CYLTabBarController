@@ -142,19 +142,14 @@ static NSString *CYLConfigurationSourceText(NSString *_Nullable path, NSDictiona
     } else {
         page.view.backgroundColor = [UIColor whiteColor];
     }
-    __weak CYLTabBarController *weakTabBarController = tabBarController;
-    UIBarButtonItem *close = nil;
-    if (@available(iOS 14.0, *)) {
-        close = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"关闭")
-                                                 image:nil
-                                       primaryAction:[UIAction actionWithHandler:^(__kindof UIAction *action) {
-            [weakTabBarController dismissViewControllerAnimated:YES completion:nil];
-        }]
-                                                  menu:nil];
-    } else {
-        close = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"关闭") style:UIBarButtonItemStylePlain
-                                                target:tabBarController action:@selector(cyl_dismissConfigurationDemo)];
-    }
+    // [EN] FIX: CI: -initWithTitle:image:primaryAction:menu: does not exist; target / action works on every iOS version.
+    // [CN] 修复 CI：-initWithTitle:image:primaryAction:menu: 不存在；target / action 适用于所有 iOS 版本。
+    // [EN] The bar button item keeps its target weak, so the tab bar controller is not retained.
+    // [CN] UIBarButtonItem 弱引用 target，不会造成循环引用。
+    UIBarButtonItem *close = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"关闭")
+                                                              style:UIBarButtonItemStylePlain
+                                                             target:tabBarController
+                                                             action:@selector(cyl_dismissConfigurationDemo)];
     page.navigationItem.leftBarButtonItem = close;
 
     UILabel *header = [[UILabel alloc] init];
@@ -432,7 +427,7 @@ static NSData *CYLEdgeCaseData(NSString *text) {
 
 @implementation CYLTabBarController (CYLConfigurationDemo)
 
-/// [EN] The Close button before iOS 14. [CN] iOS 14 之前的关闭按钮。
+/// [EN] The Close button of the configuration demo. [CN] 配置文件演示页的关闭按钮。
 - (void)cyl_dismissConfigurationDemo {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
