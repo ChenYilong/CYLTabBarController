@@ -13,6 +13,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Subview-Touches.md
 //   - PlusButton touchable area: grow it, scale it, and see it / PlusButton 点击范围：扩大、按倍数放大与调试显示
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Touchable-Area.md
+//   - selectedIndex and the PlusButton: the selected title and image match / selectedIndex 与 PlusButton：选中的文字与图片一致
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SelectedIndex-PlusButton.md
 //   - The tab bar's hitTest falls back to super instead of returning nil / TabBar 的 hitTest 不再返回 nil，交给 super 处理
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-HitTest-Super-Fallback.md
 // docs-binding:end

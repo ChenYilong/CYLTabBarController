@@ -179,3 +179,7 @@
 "子控件" = "하위 뷰";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "새 컨텍스트의 TabBarController 푸시 (탭할 수 있는 X 하위 뷰가 있는 플러스 버튼, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "플러스 버튼 오른쪽 위의 X를 탭: X가 임의의 색으로 바뀌고 플러스 버튼은 반응하지 않습니다";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex와 플러스 버튼 (issue #515)";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "탭하면 다음 탭을 선택합니다. 플러스 버튼을 제외한 인덱스: %1$@, selectedIndex: %2$@, 현재: %3$@";

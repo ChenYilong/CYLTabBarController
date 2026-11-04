@@ -625,6 +625,20 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     return constantOfPlusButtonCenterYOffset;
 }
 
+/*!
+ * FIX: issue #515
+ * [EN] The index in `viewControllers` of the plus button's placeholder or child view controller, or `fallback`.
+ * [CN] PlusButton 的占位控制器或子控制器在 `viewControllers` 中的下标，没有时返回 `fallback`。
+ */
+- (NSUInteger)cyl_plusButtonViewControllerIndexWithFallback:(NSUInteger)fallback {
+    NSArray<UIViewController *> *viewControllers = [self tabBarController].viewControllers;
+    UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:self];
+    NSUInteger index = [viewControllers indexOfObjectPassingTest:^BOOL(UIViewController * _Nonnull viewController, NSUInteger idx, BOOL * _Nonnull stop) {
+        return viewController.cyl_isPlaceholder || (plusChildViewController && viewController == plusChildViewController);
+    }];
+    return index != NSNotFound ? index : fallback;
+}
+
 - (NSUInteger)plusButtonIndex {
     NSUInteger plusButtonIndex = NSNotFound;
 //
@@ -657,6 +671,14 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         ];
         CYLPlusButtonIndex = plusButtonIndex;
     } else {
+        // FIX: issue #515
+        // [EN] Liquid Glass: the plus button covers the tab item of its placeholder (or plus child view controller), which
+        //      the tab bar controller puts in the middle. Use that tab's index, so the index stored on the plus button
+        //      (used to select its child view controller) is the right one when `+indexOfPlusButtonInTabBar` returns
+        //      another position.
+        // [CN] 液态玻璃：PlusButton 覆盖其占位控制器（或 PlusButton 子控制器）对应的 TabBarItem，TabBarController 把它放在中间。
+        //      这里使用该 Tab 的下标，使 PlusButton 上记录的下标（用于选中其子控制器）在 `+indexOfPlusButtonInTabBar` 返回其他位置时也正确。
+        plusButtonIndex = [self cyl_plusButtonViewControllerIndexWithFallback:plusButtonIndex];
         CYLPlusButtonIndex = plusButtonIndex;
         // [CN] FIXME:  to delete 液态玻璃暂时不支持自定义PlusButton位置。
         // [EN] FIXME:  to delete Liquid Glass does not support a custom PlusButton position for now.

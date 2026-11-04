@@ -179,3 +179,7 @@
 "子控件" = "子控制項";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "推入新上下文的 TabBarController（加號按鈕帶可點擊的 X 子按鈕，issue #202）";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "點擊加號按鈕右上角的 X：X 隨機改變顏色，加號按鈕不回應";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex 與加號按鈕（issue #515）";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "點擊切換到下一個 Tab。不含加號按鈕的索引：%1$@，selectedIndex：%2$@，目前：%3$@";

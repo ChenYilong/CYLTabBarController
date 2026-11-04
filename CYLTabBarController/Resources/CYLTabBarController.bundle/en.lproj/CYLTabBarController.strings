@@ -179,3 +179,7 @@
 "子控件" = "Subview";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Push a TabBarController with a new context (PlusButton with a tappable X subview, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Tap the X at the PlusButton's top right: the X changes to a random color, the PlusButton does not react";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex and the PlusButton (issue #515)";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Tap to select the next tab. Index without the PlusButton: %1$@, selectedIndex: %2$@, now: %3$@";
