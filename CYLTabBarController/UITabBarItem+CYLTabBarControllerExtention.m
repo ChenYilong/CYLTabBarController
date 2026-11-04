@@ -103,6 +103,16 @@
     objc_setAssociatedObject(self, @selector(cyl_doubleTapBlock), doubleTapBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
+- (void (^)(UITabBarItem *, UIView *))cyl_viewDidLayoutSubviewsBlock {
+    return objc_getAssociatedObject(self, @selector(cyl_viewDidLayoutSubviewsBlock));
+}
+
+- (void)cyl_setViewDidLayoutSubviewsBlock:(void (^)(UITabBarItem *, UIView *))viewDidLayoutSubviewsBlock {
+    objc_setAssociatedObject(self, @selector(cyl_viewDidLayoutSubviewsBlock), viewDidLayoutSubviewsBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    // [EN] Runs at the next layout. [CN] 在下一次布局时执行。
+    [self.cyl_tabButton.superview setNeedsLayout];
+}
+
 @end
 
 @implementation UITabBarAppearance (CYLTabBarControllerExtention)

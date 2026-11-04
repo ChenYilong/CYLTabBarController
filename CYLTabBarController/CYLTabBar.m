@@ -435,6 +435,58 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     // The tab titles may have moved: lay the plus button out again so its title follows them
     // (`+alignsTitleWithTabBarItemTitles`).
     [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];
+    [self cyl_fixTruncatedTabTitlesIfNeeded];
+    [self cyl_runItemLayoutBlocks];
+}
+
+/*!
+ * [EN] UIKit bug on iOS 13 and 14: a tab title styled through `UITabBarAppearance` with a font larger than the default
+ *      (iOS 13), or bold (iOS 13 and 14), keeps the width of the default font and is cut off ("Mi…"). After UIKit's
+ *      layout, a title narrower than its text is widened to fit (at most the button's width) around the same center.
+ *      Fixed by Apple in iOS 15; nothing is done there.
+ * [CN] iOS 13、14 的 UIKit bug：通过 `UITabBarAppearance` 设置的 Tab 标题字号大于默认值（iOS 13）或为粗体（iOS 13、14）时，仍按默认
+ *      字体的宽度布局，被截断（“我…”）。在 UIKit 布局之后，宽度不足以显示文字的标题会以原中心加宽到合适宽度（不超过按钮宽度）。
+ *      iOS 15 起系统已修复，不做处理。
+ */
+- (void)cyl_fixTruncatedTabTitlesIfNeeded {
+    if (@available(iOS 15.0, *)) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        BOOL onlyBold = NO;
+        if (@available(iOS 14.0, *)) {
+            onlyBold = YES;
+        }
+        for (UIControl *tabButton in self.tabBarButtonArray) {
+            UILabel *label = [tabButton cyl_tabLabel];
+            if (!label || label.text.length == 0) {
+                continue;
+            }
+            if (onlyBold && !(label.font.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold)) {
+                continue;
+            }
+            CGSize fittingSize = [label sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
+            if (fittingSize.width <= CGRectGetWidth(label.bounds) + 0.5) {
+                continue;
+            }
+            CGPoint center = label.center;
+            CGRect bounds = label.bounds;
+            bounds.size.width = MIN(ceil(fittingSize.width), CGRectGetWidth(tabButton.bounds));
+            label.bounds = bounds;
+            label.center = center;
+        }
+    }
+}
+
+/// [EN] `-[UITabBarItem cyl_viewDidLayoutSubviewsBlock]` of every item, after the layout. [CN] 布局之后执行各 item 的 `cyl_viewDidLayoutSubviewsBlock`。
+- (void)cyl_runItemLayoutBlocks {
+    for (UITabBarItem *item in self.items) {
+        void (^block)(UITabBarItem *, UIView *) = item.cyl_viewDidLayoutSubviewsBlock;
+        UIView *view = block ? item.cyl_tabButton : nil;
+        if (view) {
+            block(item, view);
+        }
+    }
 }
 
 - (void)cyl_layoutTabBarSubviews {

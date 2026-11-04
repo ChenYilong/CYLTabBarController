@@ -30,6 +30,8 @@
 | [背景视图、阴影线与模糊效果](#cn背景视图阴影线与模糊效果) | [Background views, the shadow line and the blur](#enbackground-views-the-shadow-line-and-the-blur) |
 | [TabBar 占用的高度](#cntabbar-占用的高度) | [The height the tab bar covers](#enthe-height-the-tab-bar-covers) |
 | [屏幕方向、Home Indicator 与边缘手势](#cn屏幕方向home-indicator-与边缘手势) | [Orientation, the home indicator and edge gestures](#enorientation-the-home-indicator-and-edge-gestures) |
+| [iOS 13、14 上粗体或大字号标题被截断](#cnios-1314-上粗体或大字号标题被截断) | [Bold or large titles cut off on iOS 13 and 14](#enbold-or-large-titles-cut-off-on-ios-13-and-14) |
+| [Tab 按钮布局后的回调](#cntab-按钮布局后的回调) | [A callback after the tab button is laid out](#ena-callback-after-the-tab-button-is-laid-out) |
 | [测试](#cn测试) | [Testing](#entesting) |
 
 <!-- navigation:end -->
@@ -121,6 +123,33 @@ tabBarController.tabBar.cyl_shadowImageView.hidden = YES;
 | 中文 | English |
 |:---|:---|
 | `CYLTabBarController` 的 `supportedInterfaceOrientations` 与 `shouldAutorotate` 现在先询问由它 present 出的控制器（正在 dismiss 时除外），例如系统全屏视频播放器，竖屏 App 中的视频因此可以横屏；`UIAlertController` 不参与，避免它反过来询问 presenting 控制器造成循环。没有 present 时与之前一样由选中 Tab（导航栈栈顶）决定。`prefersHomeIndicatorAutoHidden` 与 `preferredScreenEdgesDeferringSystemGestures` 交给选中的 Tab 决定（全屏视频、游戏页面可隐藏 Home Indicator）。 | `CYLTabBarController`'s `supportedInterfaceOrientations` and `shouldAutorotate` now ask the view controller it presents first (unless it is being dismissed), e.g. the system's full screen video player, so a video can turn to landscape in a portrait app; a `UIAlertController` is left out, since it asks its presenting view controller back and would loop. Without a presented one, the selected tab (the top of its navigation stack) decides, as before. `prefersHomeIndicatorAutoHidden` and `preferredScreenEdgesDeferringSystemGestures` are left to the selected tab (a full screen video or a game page can hide the home indicator). |
+
+## [CN]iOS 13、14 上粗体或大字号标题被截断
+## [EN]Bold or large titles cut off on iOS 13 and 14
+
+| 中文 | English |
+|:---|:---|
+| iOS 13、14 的 UIKit bug：通过 `UITabBarAppearance` 把 Tab 标题设为大于默认字号（iOS 13）或粗体（iOS 13、14）时，标题仍按默认字体的宽度布局，显示为“我…”。`CYLTabBar` 在 UIKit 布局之后，把宽度不足的标题以原中心加宽到合适宽度（不超过按钮宽度）。iOS 15 起系统已修复，不做处理。无需任何代码。 | UIKit bug on iOS 13 and 14: a tab title made larger than the default (iOS 13) or bold (iOS 13 and 14) through `UITabBarAppearance` keeps the width of the default font and shows as "Mi…". After UIKit's layout, `CYLTabBar` widens such a title to fit (at most the button's width) around the same center. Fixed by Apple in iOS 15, so nothing is done there. No code needed. |
+
+## [CN]Tab 按钮布局后的回调
+## [EN]A callback after the tab button is laid out
+
+| 中文 | English |
+|:---|:---|
+| `-[UITabBarItem cyl_viewDidLayoutSubviewsBlock]`：TabBar 每次布局之后执行，参数为 UIKit 为该 item 绘制的按钮，适合在按钮上添加或摆放自己的视图（例如自定义角标、装饰图），避免被 UIKit 的布局移动或遮挡。UIKit 重建按钮后（例如修改了 item 的图片）可能是新的按钮，因此每次都请重新查找子视图。适用于系统 TabBar（液态玻璃、经典样式）；扁平样式的 item 是本库自己的视图。 | `-[UITabBarItem cyl_viewDidLayoutSubviewsBlock]`: runs after every layout of the tab bar with the button UIKit draws for this item, to add or place a view of your own on it (a custom badge, a decoration) that UIKit's layout would otherwise move or cover. UIKit may build a new button (e.g. after the item's image changed), so look subviews up again each time. The system tab bar (Liquid Glass, classic); FlatDesign items are the library's own views. |
+
+```Objective-C
+viewController.tabBarItem.cyl_viewDidLayoutSubviewsBlock = ^(UITabBarItem *tabBarItem, UIView *view) {
+    UIView *ribbon = [view viewWithTag:2026] ?: ({
+        UIView *newRibbon = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 18, 4)];
+        newRibbon.tag = 2026;
+        newRibbon.backgroundColor = UIColor.systemRedColor;
+        [view addSubview:newRibbon];
+        newRibbon;
+    });
+    ribbon.center = CGPointMake(CGRectGetMidX(view.bounds), CGRectGetMaxY(view.bounds) - 3);
+};
+```
 
 ## [CN]测试
 ## [EN]Testing
