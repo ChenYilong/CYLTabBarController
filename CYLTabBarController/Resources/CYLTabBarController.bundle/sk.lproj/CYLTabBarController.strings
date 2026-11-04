@@ -180,6 +180,42 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Zobraziť TabBarController s novým kontextom (PlusButton s ťuknuteľným podzobrazením X, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Ťuknite na X vpravo hore pri PlusButton: X zmení farbu na náhodnú a PlusButton nereaguje";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Obnoviť";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex a PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Ťuknutím vyberiete ďalšiu kartu. Index bez PlusButton: %1$@, selectedIndex: %2$@, teraz: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Zväčšiť a zmenšiť";
+"从小放大" = "Priblížiť";
+"弹性" = "Odraz";
+"弹性 + 烟花" = "Odraz + ohňostroj";
+"旋转" = "Otočiť";
+"翻转" = "Prevrátiť";
+"飘散" = "Rozplynúť";
+"无" = "Žiadna";
+"Tab 点击动画（issue #535）" = "Animácia ťuknutia na karty (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Ťuknutím prepnete animáciu ťuknutia na karty a PlusButton. Teraz: %@";
+"长按了「%@」" = "Dlho podržané „%@“";
+"左右滑动切换 Tab（issue #535）" = "Prepínanie kariet potiahnutím (issue #535)";
+"长按 Tab（issue #535）" = "Dlhé podržanie kariet (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Zapnite prepínač a potiahnutím doľava alebo doprava po stránke prejdete na ďalšiu alebo predchádzajúcu kartu.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Zapnite prepínač a dlhým podržaním ľubovoľnej karty alebo PlusButton zobrazíte jej identifikátor.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Otočiť (len táto karta: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Snímky + ohňostroj (všetky karty: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Reagovať mimo nadradeného zobrazenia (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Pri zapnutom prepínači reaguje aj časť tlačidla mimo sivého rámčeka; každé ťuknutie prehrá animáciu zväčšenia. Ťuknutia: %@";
+"已找到" = "Nájdené";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Nenájdené (pri use_frameworks je balík zdrojov vo frameworku)";
+"从 bundle 加载图片（issue #535）" = "Načítať obrázky z bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Obrázok vľavo sa načíta z balíka zdrojov pomocou CYLImageInBundle (bez vyrovnávacej pamäte). CYLBundleImage v hlavnom bundle: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Toto je obyčajný UIViewController, ktorý nededí z CYLBaseViewController. Navigačný panel je skrytý.";
+"不继承基类隐藏导航栏（issue #535）" = "Skryť navigačný panel bez základnej triedy (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Prepínač nastavuje cyl_automaticNavigationSettingEnabled; ťuknutím na riadok otvoríte obyčajný UIViewController, ktorý nastavuje cyl_navigationBarHidden a cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Stránka %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Posuvný prechod (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Ťuknutím otvoríte systémový UITabBarController: ťuknite na kartu alebo potiahnite stránku doľava či doprava a stránka sa posúva s prstom.";

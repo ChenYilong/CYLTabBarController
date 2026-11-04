@@ -180,6 +180,42 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "دفع TabBarController بسياق جديد (زر PlusButton مع عرض فرعي X قابل للنقر، issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "انقر على X أعلى يمين PlusButton: يتغير لون X عشوائيًا ولا يستجيب PlusButton";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "تحديث";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex وPlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "انقر لتحديد علامة التبويب التالية. الفهرس دون PlusButton: %1$@، selectedIndex: %2$@، الحالية: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "تكبير ثم تصغير";
+"从小放大" = "تكبير تدريجي";
+"弹性" = "ارتداد";
+"弹性 + 烟花" = "ارتداد + ألعاب نارية";
+"旋转" = "تدوير";
+"翻转" = "قلب";
+"飘散" = "تلاشٍ";
+"无" = "بلا";
+"Tab 点击动画（issue #535）" = "حركة النقر على علامات التبويب (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "انقر لتبديل حركة النقر لعلامات التبويب وPlusButton. الحالية: %@";
+"长按了「%@」" = "تم الضغط مطولًا على \"%@\"";
+"左右滑动切换 Tab（issue #535）" = "التمرير لتبديل علامات التبويب (issue #535)";
+"长按 Tab（issue #535）" = "الضغط المطول على علامات التبويب (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "شغّل المفتاح، ثم مرّر يمينًا أو يسارًا على الصفحة للانتقال إلى علامة التبويب التالية أو السابقة.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "شغّل المفتاح، ثم اضغط مطولًا على أي علامة تبويب أو على PlusButton لعرض معرّفه.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "تدوير (علامة التبويب هذه فقط: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "إطارات + ألعاب نارية (كل علامات التبويب: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "الاستجابة خارج العرض الأب (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "عند تشغيل المفتاح، يستجيب جزء الزر الموجود خارج المربع الرمادي أيضًا؛ كل نقرة تشغّل حركة التكبير والتصغير. النقرات: %@";
+"已找到" = "تم العثور عليها";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "لم يتم العثور عليها (مع use_frameworks تكون حزمة الموارد داخل framework)";
+"从 bundle 加载图片（issue #535）" = "تحميل الصور من bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "الصورة على اليسار مقروءة من حزمة الموارد باستخدام CYLImageInBundle (بدون تخزين مؤقت). CYLBundleImage في الحزمة الرئيسية: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "هذا UIViewController عادي لا يرث من CYLBaseViewController. شريط التنقل مخفي.";
+"不继承基类隐藏导航栏（issue #535）" = "إخفاء شريط التنقل دون فئة أساسية (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "المفتاح يضبط cyl_automaticNavigationSettingEnabled؛ انقر على الصف لدفع UIViewController عادي يضبط cyl_navigationBarHidden وcyl_hidesAncestorNavigationBars.";
+"页面 %@" = "الصفحة %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "انتقال بالانزلاق (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "انقر لفتح UITabBarController من النظام: انقر على علامة تبويب أو اسحب الصفحة يمينًا أو يسارًا، فتنزلق الصفحة مع إصبعك.";

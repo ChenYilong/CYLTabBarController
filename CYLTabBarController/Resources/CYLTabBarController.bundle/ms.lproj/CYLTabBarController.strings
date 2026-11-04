@@ -180,6 +180,42 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Tolak TabBarController dengan konteks baharu (PlusButton dengan subpandangan X yang boleh diketik, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Ketik X di kanan atas PlusButton: X bertukar kepada warna rawak, PlusButton tidak bertindak balas";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Segar semula";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex dan PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Ketik untuk memilih tab seterusnya. Indeks tanpa PlusButton: %1$@, selectedIndex: %2$@, kini: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Besarkan dan kecilkan";
+"从小放大" = "Zum masuk";
+"弹性" = "Lantunan";
+"弹性 + 烟花" = "Lantunan + bunga api";
+"旋转" = "Putar";
+"翻转" = "Terbalikkan";
+"飘散" = "Pudar";
+"无" = "Tiada";
+"Tab 点击动画（issue #535）" = "Animasi ketik tab (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Ketik untuk menukar animasi ketik tab dan PlusButton. Kini: %@";
+"长按了「%@」" = "Ditekan lama \"%@\"";
+"左右滑动切换 Tab（issue #535）" = "Leret untuk menukar tab (issue #535)";
+"长按 Tab（issue #535）" = "Tekan lama tab (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Hidupkan suis, kemudian leret ke kiri atau kanan pada halaman untuk ke tab seterusnya atau sebelumnya.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Hidupkan suis, kemudian tekan lama mana-mana tab atau PlusButton untuk melihat pengecamnya.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Putar (tab ini sahaja: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Bingkai + bunga api (semua tab: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Bertindak balas di luar superview (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Apabila suis dihidupkan, bahagian butang di luar kotak kelabu juga bertindak balas; setiap ketikan memainkan animasi skala. Ketikan: %@";
+"已找到" = "Ditemui";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Tidak ditemui (dengan use_frameworks, bundle sumber berada di dalam framework)";
+"从 bundle 加载图片（issue #535）" = "Muatkan imej daripada bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Imej di sebelah kiri dibaca daripada bundle sumber dengan CYLImageInBundle (tanpa cache). CYLBundleImage dalam bundle utama: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Ini ialah UIViewController biasa yang tidak mewarisi CYLBaseViewController. Bar navigasi disembunyikan.";
+"不继承基类隐藏导航栏（issue #535）" = "Sembunyikan bar navigasi tanpa kelas asas (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Suis menetapkan cyl_automaticNavigationSettingEnabled; ketik baris untuk membuka UIViewController biasa yang menetapkan cyl_navigationBarHidden dan cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Halaman %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Peralihan leret (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Ketik untuk membuka UITabBarController sistem: ketik tab atau seret halaman ke kiri atau kanan, dan halaman bergerak mengikut jari anda.";

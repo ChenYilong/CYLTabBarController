@@ -136,4 +136,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+// [EN] FIX: issue #535 — `CYLImageNamed`, `CYLBundleImage` and the other image loading functions are in CYLUtils
+//      (`UIImage+CYLUtils.h`).
+// [CN] FIX: issue #535 — `CYLImageNamed`、`CYLBundleImage` 等图片加载函数位于 CYLUtils（`UIImage+CYLUtils.h`）。
+
 NS_ASSUME_NONNULL_END

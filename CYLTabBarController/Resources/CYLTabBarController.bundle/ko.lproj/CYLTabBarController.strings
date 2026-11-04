@@ -180,6 +180,42 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "새 컨텍스트의 TabBarController 푸시 (탭할 수 있는 X 하위 뷰가 있는 플러스 버튼, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "플러스 버튼 오른쪽 위의 X를 탭: X가 임의의 색으로 바뀌고 플러스 버튼은 반응하지 않습니다";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "새로고침";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex와 플러스 버튼 (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "탭하면 다음 탭을 선택합니다. 플러스 버튼을 제외한 인덱스: %1$@, selectedIndex: %2$@, 현재: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "확대 후 축소";
+"从小放大" = "확대";
+"弹性" = "바운스";
+"弹性 + 烟花" = "바운스 + 불꽃";
+"旋转" = "회전";
+"翻转" = "뒤집기";
+"飘散" = "흩어짐";
+"无" = "없음";
+"Tab 点击动画（issue #535）" = "탭 애니메이션 (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "탭하여 탭과 플러스 버튼의 탭 애니메이션을 전환합니다. 현재: %@";
+"长按了「%@」" = "\"%@\"을(를) 길게 눌렀습니다";
+"左右滑动切换 Tab（issue #535）" = "스와이프로 탭 전환 (issue #535)";
+"长按 Tab（issue #535）" = "탭 길게 누르기 (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "스위치를 켠 후 화면을 좌우로 스와이프하면 다음 또는 이전 탭으로 전환됩니다.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "스위치를 켠 후 탭이나 플러스 버튼을 길게 누르면 해당 식별자가 표시됩니다.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "회전 (현재 탭만: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "프레임 + 불꽃 (모든 탭: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "상위 뷰 밖에서 탭에 반응 (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "스위치를 켜면 회색 상자 밖의 버튼 부분도 반응합니다. 탭할 때마다 확대·축소 애니메이션이 재생됩니다. 탭 횟수: %@";
+"已找到" = "찾음";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "찾을 수 없음 (use_frameworks 사용 시 리소스 번들은 framework 안에 있음)";
+"从 bundle 加载图片（issue #535）" = "bundle에서 이미지 불러오기 (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "왼쪽 이미지는 CYLImageInBundle로 리소스 번들에서 읽었습니다(캐시 없음). 메인 bundle의 CYLBundleImage: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "CYLBaseViewController를 상속하지 않은 일반 UIViewController입니다. 내비게이션 바가 숨겨져 있습니다.";
+"不继承基类隐藏导航栏（issue #535）" = "기본 클래스 없이 내비게이션 바 숨기기 (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "스위치는 cyl_automaticNavigationSettingEnabled을(를) 설정합니다. 행을 탭하면 cyl_navigationBarHidden와(과) cyl_hidesAncestorNavigationBars을(를) 설정한 일반 UIViewController를 푸시합니다.";
+"页面 %@" = "페이지 %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "슬라이드 전환 (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "탭하면 시스템 UITabBarController가 열립니다. 탭을 누르거나 화면을 좌우로 드래그하면 페이지가 손가락을 따라 이동합니다.";

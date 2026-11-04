@@ -180,6 +180,42 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "พุช TabBarController ที่มีบริบทใหม่ (PlusButton ที่มีมุมมองย่อย X ซึ่งแตะได้, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "แตะ X ที่มุมขวาบนของ PlusButton: X เปลี่ยนเป็นสีสุ่ม และ PlusButton ไม่ตอบสนอง";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "รีเฟรช";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex และ PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "แตะเพื่อเลือกแท็บถัดไป ดัชนีที่ไม่นับ PlusButton: %1$@, selectedIndex: %2$@, ขณะนี้: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "ขยายแล้วย่อ";
+"从小放大" = "ซูมเข้า";
+"弹性" = "เด้ง";
+"弹性 + 烟花" = "เด้ง + พลุ";
+"旋转" = "หมุน";
+"翻转" = "พลิก";
+"飘散" = "จางหาย";
+"无" = "ไม่มี";
+"Tab 点击动画（issue #535）" = "แอนิเมชันการแตะแท็บ (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "แตะเพื่อเปลี่ยนแอนิเมชันการแตะของแท็บและ PlusButton ขณะนี้: %@";
+"长按了「%@」" = "กดค้างที่ \"%@\"";
+"左右滑动切换 Tab（issue #535）" = "ปัดเพื่อสลับแท็บ (issue #535)";
+"长按 Tab（issue #535）" = "กดแท็บค้างไว้ (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "เปิดสวิตช์ แล้วปัดซ้ายหรือขวาบนหน้าเพื่อไปยังแท็บถัดไปหรือก่อนหน้า";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "เปิดสวิตช์ แล้วกดแท็บใดก็ได้หรือ PlusButton ค้างไว้เพื่อดูตัวระบุ";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "หมุน (เฉพาะแท็บนี้: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "เฟรม + พลุ (ทุกแท็บ: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "ตอบสนองนอกมุมมองหลัก (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "เมื่อเปิดสวิตช์ ส่วนของปุ่มที่อยู่นอกกรอบสีเทาก็ตอบสนองด้วย ทุกครั้งที่แตะจะเล่นแอนิเมชันขยาย จำนวนครั้งที่แตะ: %@";
+"已找到" = "พบแล้ว";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "ไม่พบ (เมื่อใช้ use_frameworks ชุดทรัพยากรจะอยู่ใน framework)";
+"从 bundle 加载图片（issue #535）" = "โหลดรูปภาพจาก bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "รูปทางซ้ายอ่านจากชุดทรัพยากรด้วย CYLImageInBundle (ไม่แคช) CYLBundleImage ใน bundle หลัก: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "นี่คือ UIViewController ธรรมดาที่ไม่ได้สืบทอดจาก CYLBaseViewController แถบนำทางถูกซ่อนอยู่";
+"不继承基类隐藏导航栏（issue #535）" = "ซ่อนแถบนำทางโดยไม่ใช้คลาสฐาน (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "สวิตช์ตั้งค่า cyl_automaticNavigationSettingEnabled แตะแถวเพื่อเปิด UIViewController ธรรมดาที่ตั้งค่า cyl_navigationBarHidden และ cyl_hidesAncestorNavigationBars";
+"页面 %@" = "หน้า %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "การเปลี่ยนแบบเลื่อน (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "แตะเพื่อเปิด UITabBarController ของระบบ: แตะแท็บหรือลากหน้าไปทางซ้ายหรือขวา แล้วหน้าจะเลื่อนตามนิ้ว";

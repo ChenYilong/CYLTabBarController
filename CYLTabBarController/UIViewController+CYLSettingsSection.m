@@ -23,6 +23,13 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowLoginState,
     CYLSettingsRowPlusButtonTouchableArea,
     CYLSettingsRowSelectedIndexIgnoringPlusButton, // FIX: issue #515
+    CYLSettingsRowTabButtonTapAnimation,     // FIX: issue #535
+    CYLSettingsRowTabButtonLongPress,        // FIX: issue #535
+    CYLSettingsRowSwipeToSwitchTab,          // FIX: issue #535
+    CYLSettingsRowOutsideSuperviewBounds,    // FIX: issue #535
+    CYLSettingsRowBundleImage,               // FIX: issue #535
+    CYLSettingsRowNavigationWithoutBaseClass, // FIX: issue #535
+    CYLSettingsRowSlideTransition,           // FIX: issue #535
     CYLSettingsRowCount,
 };
 
@@ -481,6 +488,515 @@ static void CYLSelectNextTabIgnoringPlusButton(CYLTabBarController *_Nullable ta
     tabBarController.cyl_selectedIndexIgnoringPlusButton = next;
 }
 
+#pragma mark - Tap animation, long press, swipe (issue #535)
+
+static NSString *const CYLTabButtonTapAnimationCellIdentifier = @"CYLTabButtonTapAnimationCell";
+static NSString *const CYLInteractionSwitchCellIdentifier = @"CYLInteractionSwitchCell";
+
+/// [EN] The demo's name of each tap animation type. [CN] 每种点击动画在演示中的名称。
+static NSString *CYLTabButtonTapAnimationTypeName(CYLTabButtonTapAnimationType type) {
+    switch (type) {
+        case CYLTabButtonTapAnimationTypeScale: return CYLLocalizedString(@"放大再缩小");
+        case CYLTabButtonTapAnimationTypeZoomIn: return CYLLocalizedString(@"从小放大");
+        case CYLTabButtonTapAnimationTypeBounce: return CYLLocalizedString(@"弹性");
+        case CYLTabButtonTapAnimationTypeBounceWithFireworks: return CYLLocalizedString(@"弹性 + 烟花");
+        case CYLTabButtonTapAnimationTypeRotation: return CYLLocalizedString(@"旋转");
+        case CYLTabButtonTapAnimationTypeFlip: return CYLLocalizedString(@"翻转");
+        case CYLTabButtonTapAnimationTypeFume: return CYLLocalizedString(@"飘散");
+        case CYLTabButtonTapAnimationTypeNone:
+        default: return CYLLocalizedString(@"无");
+    }
+}
+
+/*!
+ * [EN] The demo cycles through every built-in type, then the two other ways to set an animation: one tab only
+ *      (`viewController.cyl_tabButtonAnimation`) and an object for every tab (`cyl_defaultTabButtonAnimation`).
+ * [CN] 演示依次切换所有内置类型，以及另外两种设置方式：只设置一个 Tab（`viewController.cyl_tabButtonAnimation`），
+ *      以及所有 Tab 共用一个对象（`cyl_defaultTabButtonAnimation`）。
+ */
+typedef NS_ENUM(NSInteger, CYLDemoTapAnimationStep) {
+    CYLDemoTapAnimationStepOneTabRotation = CYLTabButtonTapAnimationTypeFume + 1,
+    CYLDemoTapAnimationStepDefaultFrameAnimation,
+    CYLDemoTapAnimationStepCount,
+};
+
+static char CYLDemoTapAnimationStepKey;
+
+static NSInteger CYLCurrentDemoTapAnimationStep(CYLTabBarController *_Nullable tabBarController) {
+    NSNumber *step = tabBarController ? objc_getAssociatedObject(tabBarController, &CYLDemoTapAnimationStepKey) : nil;
+    return step ? step.integerValue : tabBarController.cyl_tabButtonTapAnimationType;
+}
+
+/// [EN] Frames for `CYLTabButtonFrameAnimation`: dots that grow. [CN] `CYLTabButtonFrameAnimation` 的帧：逐渐变大的圆点。
+static NSArray<UIImage *> *CYLDemoFrameImages(void) {
+    NSMutableArray<UIImage *> *images = [NSMutableArray array];
+    for (NSInteger idx = 1; idx <= 6; idx++) {
+        UIImage *image = [UIImage cyl_imageWithColor:[UIColor systemOrangeColor] size:CGSizeMake(6.0 * idx, 6.0 * idx) cornerRadius:3.0 * idx];
+        if (image) {
+            [images addObject:image];
+        }
+    }
+    return images;
+}
+
+static NSString *CYLDemoTapAnimationStepName(NSInteger step) {
+    if (step == CYLDemoTapAnimationStepOneTabRotation) {
+        return CYLLocalizedString(@"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）");
+    }
+    if (step == CYLDemoTapAnimationStepDefaultFrameAnimation) {
+        return CYLLocalizedString(@"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）");
+    }
+    return CYLTabButtonTapAnimationTypeName((CYLTabButtonTapAnimationType)step);
+}
+
+static UITableViewCell *CYLTabButtonTapAnimationCell(UITableView *tableView, CYLTabBarController *_Nullable tabBarController) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLTabButtonTapAnimationCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLTabButtonTapAnimationCellIdentifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+        cell.detailTextLabel.numberOfLines = 0;
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"sparkles"];
+        }
+    }
+    cell.textLabel.text = CYLLocalizedString(@"Tab 点击动画（issue #535）");
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"点击切换 Tab 与 PlusButton 的点击动画，当前：%@"), CYLDemoTapAnimationStepName(CYLCurrentDemoTapAnimationStep(tabBarController))];
+    return cell;
+}
+
+/*!
+ * [EN] Moves to the next built-in tap animation, and plays it on the selected tab so the change is visible at once.
+ * [CN] 切换到下一个内置点击动画，并在当前选中的 Tab 上播放，立即看到效果。
+ */
+static void CYLSwitchTabButtonTapAnimation(CYLTabBarController *_Nullable tabBarController) {
+    if (!tabBarController) {
+        return;
+    }
+    NSInteger next = (CYLCurrentDemoTapAnimationStep(tabBarController) + 1) % CYLDemoTapAnimationStepCount;
+    objc_setAssociatedObject(tabBarController, &CYLDemoTapAnimationStepKey, @(next), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    // [EN] Reset the other two ways first, so only the current step applies.
+    // [CN] 先清除另外两种设置，只保留当前步骤。
+    tabBarController.cyl_defaultTabButtonAnimation = nil;
+    for (UIViewController *viewController in tabBarController.viewControllers) {
+        viewController.cyl_tabButtonAnimation = nil;
+    }
+    if (next == CYLDemoTapAnimationStepOneTabRotation) {
+        tabBarController.cyl_tabButtonTapAnimationType = CYLTabButtonTapAnimationTypeNone;
+        tabBarController.selectedViewController.cyl_tabButtonAnimation = [[CYLTabButtonRotationAnimation alloc] init];
+    } else if (next == CYLDemoTapAnimationStepDefaultFrameAnimation) {
+        tabBarController.cyl_tabButtonTapAnimationType = CYLTabButtonTapAnimationTypeNone;
+        CYLTabButtonFrameAnimation *frameAnimation = [[CYLTabButtonFrameAnimation alloc] init];
+        frameAnimation.images = CYLDemoFrameImages();
+        frameAnimation.playsFireworks = YES;
+        tabBarController.cyl_defaultTabButtonAnimation = frameAnimation;
+    } else {
+        tabBarController.cyl_tabButtonTapAnimationType = (CYLTabButtonTapAnimationType)next;
+    }
+    UIControl *selectedTabButton = tabBarController.selectedViewController.cyl_tabButton;
+    if (selectedTabButton) {
+        [tabBarController cyl_playTabButtonAnimationForControl:selectedTabButton];
+    }
+}
+
+typedef NS_ENUM(NSInteger, CYLInteractionDemoSwitchKind) {
+    CYLInteractionDemoSwitchKindLongPress,
+    CYLInteractionDemoSwitchKindSwipe,
+};
+
+static BOOL CYLInteractionDemoSwitchIsOn(CYLTabBarController *_Nullable tabBarController, CYLInteractionDemoSwitchKind kind) {
+    if (kind == CYLInteractionDemoSwitchKindSwipe) {
+        return tabBarController.cyl_swipeToSwitchTabEnabled;
+    }
+    return tabBarController.cyl_didLongPressControlBlock != nil;
+}
+
+static void CYLInteractionDemoSwitchApply(CYLTabBarController *_Nullable tabBarController, CYLInteractionDemoSwitchKind kind, BOOL on) {
+    if (!tabBarController) {
+        return;
+    }
+    if (kind == CYLInteractionDemoSwitchKindSwipe) {
+        tabBarController.cyl_swipeToSwitchTabEnabled = on;
+        return;
+    }
+    if (!on) {
+        tabBarController.cyl_didLongPressControlBlock = nil;
+        return;
+    }
+    tabBarController.cyl_didLongPressControlBlock = ^(CYLTabBarController *pressedTabBarController, UIControl *control) {
+        NSString *name = control.cyl_tabBarItemIdentifier ?: NSStringFromClass([control class]);
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:CYLLocalizedString(@"长按了「%@」"), name]
+                                                                       message:nil
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil]];
+        [pressedTabBarController presentViewController:alert animated:YES completion:nil];
+    };
+}
+
+/*!
+ * [EN] The switch of the long press and swipe rows. Long press: the demo block shows the identifier of the pressed
+ *      button. Swipe: `cyl_swipeToSwitchTabEnabled`.
+ * [CN] 长按与滑动两行的开关。长按：演示 block 弹出被长按按钮的标识。滑动：`cyl_swipeToSwitchTabEnabled`。
+ */
+@interface CYLInteractionDemoSwitch : UISwitch
+@property (nonatomic, weak, nullable) CYLTabBarController *tabBarController;
+@property (nonatomic, assign) CYLInteractionDemoSwitchKind kind;
+@end
+
+@implementation CYLInteractionDemoSwitch
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        [self addTarget:self action:@selector(cyl_valueDidChange) forControlEvents:UIControlEventValueChanged];
+    }
+    return self;
+}
+
+- (void)cyl_valueDidChange {
+    CYLInteractionDemoSwitchApply(self.tabBarController, self.kind, self.isOn);
+}
+
+@end
+
+static UITableViewCell *CYLInteractionSwitchCell(UITableView *tableView, CYLTabBarController *_Nullable tabBarController, CYLInteractionDemoSwitchKind kind) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLInteractionSwitchCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLInteractionSwitchCellIdentifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+        cell.detailTextLabel.numberOfLines = 0;
+        cell.accessoryView = [[CYLInteractionDemoSwitch alloc] initWithFrame:CGRectZero];
+    }
+    CYLInteractionDemoSwitch *demoSwitch = (CYLInteractionDemoSwitch *)cell.accessoryView;
+    if ([demoSwitch isKindOfClass:[CYLInteractionDemoSwitch class]]) {
+        demoSwitch.tabBarController = tabBarController;
+        demoSwitch.kind = kind;
+        demoSwitch.on = CYLInteractionDemoSwitchIsOn(tabBarController, kind);
+    }
+    BOOL isSwipe = (kind == CYLInteractionDemoSwitchKindSwipe);
+    if (@available(iOS 13.0, *)) {
+        cell.imageView.image = [UIImage systemImageNamed:isSwipe ? @"hand.draw" : @"hand.tap"];
+    }
+    cell.textLabel.text = isSwipe ? CYLLocalizedString(@"左右滑动切换 Tab（issue #535）") : CYLLocalizedString(@"长按 Tab（issue #535）");
+    cell.detailTextLabel.text = isSwipe ? CYLLocalizedString(@"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。")
+                                        : CYLLocalizedString(@"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。");
+    return cell;
+}
+
+/// [EN] A tap on the row flips its switch. [CN] 点击该行同样会拨动开关。
+static void CYLToggleInteractionSwitch(UITableView *tableView, NSIndexPath *indexPath, CYLTabBarController *_Nullable tabBarController, CYLInteractionDemoSwitchKind kind) {
+    BOOL on = !CYLInteractionDemoSwitchIsOn(tabBarController, kind);
+    CYLInteractionDemoSwitchApply(tabBarController, kind, on);
+    UISwitch *demoSwitch = (UISwitch *)[tableView cellForRowAtIndexPath:indexPath].accessoryView;
+    if ([demoSwitch isKindOfClass:[UISwitch class]]) {
+        [demoSwitch setOn:on animated:YES];
+    }
+}
+
+#pragma mark - Subviews outside their superview (issue #535)
+
+static NSString *const CYLOutsideBoundsCellIdentifier = @"CYLOutsideBoundsCell";
+
+/*!
+ * [EN] Issue #535 demo row: a gray box with a button that sticks out of it to the right. With the switch off, only the
+ *      part inside the box responds; on sets `cyl_respondsOutsideSuperviewBounds` and the whole button responds. Each
+ *      tap plays `-cyl_addScaleBounceAnimationWithCompletion:` and counts.
+ * [CN] Issue #535 演示行：灰色方框中有一个向右超出方框的按钮。开关关闭时只有方框内的部分响应；打开即设置
+ *      `cyl_respondsOutsideSuperviewBounds`，整个按钮都能响应。每次点击播放 `-cyl_addScaleBounceAnimationWithCompletion:` 并计数。
+ */
+@interface CYLOutsideBoundsCell : UITableViewCell
+@property (nonatomic, strong) UILabel *titleLabel;
+@property (nonatomic, strong) UILabel *summaryLabel;
+@property (nonatomic, strong) UIView *boxView;
+@property (nonatomic, strong) UIButton *outsideButton;
+@property (nonatomic, strong) UISwitch *outsideSwitch;
+@property (nonatomic, assign) NSInteger tapCount;
+@end
+
+@implementation CYLOutsideBoundsCell
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+        _titleLabel = [[UILabel alloc] init];
+        _titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        _titleLabel.numberOfLines = 0;
+        _summaryLabel = [[UILabel alloc] init];
+        _summaryLabel.font = [UIFont systemFontOfSize:12];
+        _summaryLabel.textColor = [UIColor grayColor];
+        _summaryLabel.numberOfLines = 0;
+        _boxView = [[UIView alloc] init];
+        _boxView.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.25];
+        _boxView.translatesAutoresizingMaskIntoConstraints = NO;
+        _outsideButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        _outsideButton.backgroundColor = [UIColor systemBlueColor];
+        _outsideButton.layer.cornerRadius = 6;
+        [_outsideButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_outsideButton setTitle:@"Tap" forState:UIControlStateNormal];
+        // [EN] Inside the box (left half) and outside it (right half). [CN] 左半部分在方框内，右半部分在方框外。
+        _outsideButton.frame = CGRectMake(40, 8, 80, 28);
+        [_outsideButton addTarget:self action:@selector(cyl_outsideButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+        [_boxView addSubview:_outsideButton];
+        _outsideSwitch = [[UISwitch alloc] init];
+        [_outsideSwitch addTarget:self action:@selector(cyl_switchDidChange) forControlEvents:UIControlEventValueChanged];
+        self.accessoryView = _outsideSwitch;
+
+        UIStackView *stackView = [[UIStackView alloc] initWithArrangedSubviews:@[ _titleLabel, _summaryLabel, _boxView ]];
+        stackView.axis = UILayoutConstraintAxisVertical;
+        stackView.alignment = UIStackViewAlignmentLeading;
+        stackView.spacing = 6;
+        stackView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.contentView addSubview:stackView];
+        UILayoutGuide *margins = self.contentView.layoutMarginsGuide;
+        [NSLayoutConstraint activateConstraints:@[
+            [stackView.leadingAnchor constraintEqualToAnchor:margins.leadingAnchor],
+            [stackView.trailingAnchor constraintEqualToAnchor:margins.trailingAnchor],
+            [stackView.topAnchor constraintEqualToAnchor:margins.topAnchor],
+            [stackView.bottomAnchor constraintEqualToAnchor:margins.bottomAnchor],
+            [_boxView.widthAnchor constraintEqualToConstant:80],
+            [_boxView.heightAnchor constraintEqualToConstant:44],
+        ]];
+        [self cyl_reload];
+    }
+    return self;
+}
+
+- (void)cyl_reload {
+    self.titleLabel.text = CYLLocalizedString(@"超出父视图响应点击（issue #535）");
+    self.outsideSwitch.on = self.outsideButton.cyl_respondsOutsideSuperviewBounds;
+    self.summaryLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次"), @(self.tapCount)];
+}
+
+- (void)cyl_switchDidChange {
+    self.outsideButton.cyl_respondsOutsideSuperviewBounds = self.outsideSwitch.isOn;
+    [self cyl_reload];
+}
+
+- (void)cyl_outsideButtonTapped {
+    self.tapCount += 1;
+    [self.outsideButton cyl_addScaleBounceAnimationWithCompletion:nil];
+    [self cyl_reload];
+}
+
+@end
+
+static UITableViewCell *CYLOutsideBoundsCellForTableView(UITableView *tableView) {
+    CYLOutsideBoundsCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLOutsideBoundsCellIdentifier];
+    if (![cell isKindOfClass:[CYLOutsideBoundsCell class]]) {
+        cell = [[CYLOutsideBoundsCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CYLOutsideBoundsCellIdentifier];
+    }
+    return cell;
+}
+
+#pragma mark - Images from a bundle (issue #535)
+
+static NSString *const CYLBundleImageCellIdentifier = @"CYLBundleImageCell";
+
+/*!
+ * [EN] Issue #535 demo row: the icon is the library's sample image, read with `CYLImageInBundle` from its resource bundle
+ *      (not cached). The text says whether `CYLBundleImage` also finds it in the main bundle (it does not with
+ *      `use_frameworks!`, where the resource bundle is inside the framework).
+ * [CN] Issue #535 演示行：图标是本库的示例图片，由 `CYLImageInBundle` 从资源包读取（不缓存）。文字说明 `CYLBundleImage` 能否在主 bundle 中
+ *      找到它（使用 `use_frameworks!` 时资源包位于 framework 内，找不到）。
+ */
+static UITableViewCell *CYLBundleImageCell(UITableView *tableView) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLBundleImageCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLBundleImageCellIdentifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+        cell.detailTextLabel.numberOfLines = 0;
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    NSString *fileName = @"cyl_badge_sample_icon@3x.png";
+    cell.imageView.image = CYLImageInBundle(CYLResourceBundle(), nil, fileName);
+    UIImage *mainBundleImage = CYLBundleImage(nil, @"CYLTabBarController", nil, fileName);
+    NSString *mainBundleResult = mainBundleImage ? CYLLocalizedString(@"已找到") : CYLLocalizedString(@"未找到（use_frameworks 时资源包位于 framework 中）");
+    cell.textLabel.text = CYLLocalizedString(@"从 bundle 加载图片（issue #535）");
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@"), mainBundleResult];
+    return cell;
+}
+
+#pragma mark - Navigation bar without a base class (issue #535)
+
+static NSString *const CYLNavigationSettingCellIdentifier = @"CYLNavigationSettingCell";
+
+/*!
+ * [EN] A plain UIViewController (no CYLBaseViewController) that hides the navigation bar, and the outer one when the tab
+ *      bar controller is pushed. Its button goes back, since there is no bar.
+ * [CN] 一个普通的 UIViewController（没有继承 CYLBaseViewController），隐藏导航栏；TabBarController 被 push 时外层导航栏也隐藏。
+ *      由于没有导航栏，用页面上的按钮返回。
+ */
+@interface CYLNavigationSettingDemoViewController : UIViewController
+@end
+
+@implementation CYLNavigationSettingDemoViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor whiteColor];
+    self.cyl_navigationBarHidden = YES;
+    self.cyl_hidesAncestorNavigationBars = YES;
+    UILabel *label = [[UILabel alloc] init];
+    label.numberOfLines = 0;
+    label.textAlignment = NSTextAlignmentCenter;
+    label.text = CYLLocalizedString(@"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。");
+    UIButton *backButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [backButton setTitle:CYLLocalizedString(@"关闭") forState:UIControlStateNormal];
+    [backButton addTarget:self action:@selector(cyl_back) forControlEvents:UIControlEventTouchUpInside];
+    UIStackView *stackView = [[UIStackView alloc] initWithArrangedSubviews:@[ label, backButton ]];
+    stackView.axis = UILayoutConstraintAxisVertical;
+    stackView.spacing = 16;
+    stackView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:stackView];
+    [NSLayoutConstraint activateConstraints:@[
+        [stackView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
+        [stackView.leadingAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.leadingAnchor],
+        [stackView.trailingAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.trailingAnchor],
+    ]];
+}
+
+- (void)cyl_back {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+@end
+
+/*!
+ * [EN] The switch turns `cyl_automaticNavigationSettingEnabled` on or off; a tap on the row pushes the plain page.
+ * [CN] 开关打开或关闭 `cyl_automaticNavigationSettingEnabled`；点击该行 push 普通页面。
+ */
+@interface CYLNavigationSettingSwitch : UISwitch
+@end
+
+@implementation CYLNavigationSettingSwitch
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        [self addTarget:self action:@selector(cyl_valueDidChange) forControlEvents:UIControlEventValueChanged];
+    }
+    return self;
+}
+
+- (void)cyl_valueDidChange {
+    UIViewController.cyl_automaticNavigationSettingEnabled = self.isOn;
+}
+
+@end
+
+static UITableViewCell *CYLNavigationSettingCell(UITableView *tableView) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLNavigationSettingCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLNavigationSettingCellIdentifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+        cell.detailTextLabel.numberOfLines = 0;
+        cell.accessoryView = [[CYLNavigationSettingSwitch alloc] initWithFrame:CGRectZero];
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"menubar.rectangle"];
+        }
+    }
+    ((UISwitch *)cell.accessoryView).on = UIViewController.cyl_automaticNavigationSettingEnabled;
+    cell.textLabel.text = CYLLocalizedString(@"不继承基类隐藏导航栏（issue #535）");
+    cell.detailTextLabel.text = CYLLocalizedString(@"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。");
+    return cell;
+}
+
+#pragma mark - Slide transition classes (issue #535)
+
+static NSString *const CYLSlideTransitionCellIdentifier = @"CYLSlideTransitionCell";
+
+/*!
+ * [EN] A system UITabBarController whose delegate uses `CYLTabBarSlideTransitionAnimator`, driven by a pan through
+ *      `CYLTabBarInteractiveTransition`: the way to use the two classes with a delegate of your own.
+ * [CN] 一个系统 UITabBarController，其代理使用 `CYLTabBarSlideTransitionAnimator`，并由拖动手势通过 `CYLTabBarInteractiveTransition`
+ *      驱动：演示在自己的代理中使用这两个类。
+ */
+@interface CYLSlideTransitionDemoTabBarController : UITabBarController <UITabBarControllerDelegate>
+@property (nonatomic, strong) UIPanGestureRecognizer *panGestureRecognizer;
+@end
+
+@implementation CYLSlideTransitionDemoTabBarController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.delegate = self;
+    NSArray<UIColor *> *colors = @[ [UIColor systemRedColor], [UIColor systemGreenColor], [UIColor systemBlueColor] ];
+    NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
+    for (NSUInteger idx = 0; idx < colors.count; idx++) {
+        UIViewController *page = [[UIViewController alloc] init];
+        page.view.backgroundColor = colors[idx];
+        page.tabBarItem.title = [NSString stringWithFormat:CYLLocalizedString(@"页面 %@"), @(idx + 1)];
+        UIButton *closeButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        [closeButton setTitle:CYLLocalizedString(@"关闭") forState:UIControlStateNormal];
+        [closeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [closeButton addTarget:self action:@selector(cyl_close) forControlEvents:UIControlEventTouchUpInside];
+        closeButton.translatesAutoresizingMaskIntoConstraints = NO;
+        [page.view addSubview:closeButton];
+        [NSLayoutConstraint activateConstraints:@[
+            [closeButton.centerXAnchor constraintEqualToAnchor:page.view.centerXAnchor],
+            [closeButton.centerYAnchor constraintEqualToAnchor:page.view.centerYAnchor],
+        ]];
+        [viewControllers addObject:page];
+    }
+    self.viewControllers = viewControllers;
+    self.panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(cyl_pan:)];
+    [self.view addGestureRecognizer:self.panGestureRecognizer];
+}
+
+- (void)cyl_close {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+/// [EN] The pan only starts the switch; the interactive transition follows it. [CN] 拖动只负责开始切换，交互式转场跟随手势。
+- (void)cyl_pan:(UIPanGestureRecognizer *)panGestureRecognizer {
+    if (panGestureRecognizer.state != UIGestureRecognizerStateBegan || self.transitionCoordinator) {
+        return;
+    }
+    CGFloat velocityX = [panGestureRecognizer velocityInView:self.view].x;
+    if (velocityX < 0 && self.selectedIndex + 1 < self.viewControllers.count) {
+        self.selectedIndex += 1;
+    } else if (velocityX > 0 && self.selectedIndex > 0) {
+        self.selectedIndex -= 1;
+    }
+}
+
+- (id<UIViewControllerAnimatedTransitioning>)tabBarController:(UITabBarController *)tabBarController
+           animationControllerForTransitionFromViewController:(UIViewController *)fromVC
+                                             toViewController:(UIViewController *)toVC {
+    NSArray *viewControllers = tabBarController.viewControllers;
+    BOOL forward = [viewControllers indexOfObject:toVC] > [viewControllers indexOfObject:fromVC];
+    return [[CYLTabBarSlideTransitionAnimator alloc] initWithTargetEdge:forward ? UIRectEdgeLeft : UIRectEdgeRight];
+}
+
+- (id<UIViewControllerInteractiveTransitioning>)tabBarController:(UITabBarController *)tabBarController
+                     interactionControllerForAnimationController:(id<UIViewControllerAnimatedTransitioning>)animationController {
+    UIGestureRecognizerState state = self.panGestureRecognizer.state;
+    if (state == UIGestureRecognizerStateBegan || state == UIGestureRecognizerStateChanged) {
+        return [[CYLTabBarInteractiveTransition alloc] initWithGestureRecognizer:self.panGestureRecognizer];
+    }
+    return nil;
+}
+
+@end
+
+static UITableViewCell *CYLSlideTransitionCell(UITableView *tableView) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLSlideTransitionCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLSlideTransitionCellIdentifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+        cell.detailTextLabel.numberOfLines = 0;
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"rectangle.split.3x1"];
+        }
+    }
+    cell.textLabel.text = CYLLocalizedString(@"滑动转场（CYLTabBarSlideTransitionAnimator）");
+    cell.detailTextLabel.text = CYLLocalizedString(@"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。");
+    return cell;
+}
+
 @implementation UIViewController (CYLSettingsSection)
 
 - (NSInteger)cyl_settingsRowCount {
@@ -505,6 +1021,27 @@ static void CYLSelectNextTabIgnoringPlusButton(CYLTabBarController *_Nullable ta
     }
     if (indexPath.row == CYLSettingsRowSelectedIndexIgnoringPlusButton) {
         return CYLSelectedIndexCell(tableView, CYLSettingsTabBarController(self));
+    }
+    if (indexPath.row == CYLSettingsRowTabButtonTapAnimation) {
+        return CYLTabButtonTapAnimationCell(tableView, CYLSettingsTabBarController(self));
+    }
+    if (indexPath.row == CYLSettingsRowTabButtonLongPress) {
+        return CYLInteractionSwitchCell(tableView, CYLSettingsTabBarController(self), CYLInteractionDemoSwitchKindLongPress);
+    }
+    if (indexPath.row == CYLSettingsRowSwipeToSwitchTab) {
+        return CYLInteractionSwitchCell(tableView, CYLSettingsTabBarController(self), CYLInteractionDemoSwitchKindSwipe);
+    }
+    if (indexPath.row == CYLSettingsRowOutsideSuperviewBounds) {
+        return CYLOutsideBoundsCellForTableView(tableView);
+    }
+    if (indexPath.row == CYLSettingsRowBundleImage) {
+        return CYLBundleImageCell(tableView);
+    }
+    if (indexPath.row == CYLSettingsRowNavigationWithoutBaseClass) {
+        return CYLNavigationSettingCell(tableView);
+    }
+    if (indexPath.row == CYLSettingsRowSlideTransition) {
+        return CYLSlideTransitionCell(tableView);
     }
     return [self cyl_languageCellForTableView:tableView];
 }
@@ -533,6 +1070,29 @@ static void CYLSelectNextTabIgnoringPlusButton(CYLTabBarController *_Nullable ta
         if (tableView.window) {
             [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
         }
+    } else if (indexPath.row == CYLSettingsRowTabButtonTapAnimation) {
+        CYLSwitchTabButtonTapAnimation(CYLSettingsTabBarController(self));
+        [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    } else if (indexPath.row == CYLSettingsRowTabButtonLongPress) {
+        CYLToggleInteractionSwitch(tableView, indexPath, CYLSettingsTabBarController(self), CYLInteractionDemoSwitchKindLongPress);
+    } else if (indexPath.row == CYLSettingsRowSwipeToSwitchTab) {
+        CYLToggleInteractionSwitch(tableView, indexPath, CYLSettingsTabBarController(self), CYLInteractionDemoSwitchKindSwipe);
+    } else if (indexPath.row == CYLSettingsRowOutsideSuperviewBounds || indexPath.row == CYLSettingsRowBundleImage) {
+        // [EN] These rows act through their own controls; a tap on the row does nothing.
+        // [CN] 这些行通过自身的控件生效，点击该行不做处理。
+    } else if (indexPath.row == CYLSettingsRowNavigationWithoutBaseClass) {
+        CYLNavigationSettingDemoViewController *page = [[CYLNavigationSettingDemoViewController alloc] init];
+        page.hidesBottomBarWhenPushed = YES;
+        if (self.navigationController) {
+            [self.navigationController pushViewController:page animated:YES];
+        } else {
+            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:page];
+            [self presentViewController:navigationController animated:YES completion:nil];
+        }
+    } else if (indexPath.row == CYLSettingsRowSlideTransition) {
+        CYLSlideTransitionDemoTabBarController *demo = [[CYLSlideTransitionDemoTabBarController alloc] init];
+        demo.modalPresentationStyle = UIModalPresentationFullScreen;
+        [self presentViewController:demo animated:YES completion:nil];
     } else {
         [self cyl_presentLanguagePicker];
     }

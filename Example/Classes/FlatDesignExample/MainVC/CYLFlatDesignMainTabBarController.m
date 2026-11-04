@@ -497,6 +497,17 @@ presentLoginForViewController:(UIViewController *)viewController
 #else
 #endif
 
+/*!
+ * [EN] #152: the delegate method API of the tab bar item gestures (MainTabBarController shows the block API).
+ * [CN] #152：TabBarItem 手势的代理方法方式（MainTabBarController 演示 block 方式）。
+ */
+- (void)tabBarController:(CYLTabBarController *)tabBarController
+didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
+                 control:(UIControl *)control
+          viewController:(UIViewController *)viewController {
+    [tabBarController cyl_demo_handleTabBarItemGesture:gesture control:control viewController:viewController];
+}
+
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control {
     
 #if defined(DEBUG) || defined(BETA)

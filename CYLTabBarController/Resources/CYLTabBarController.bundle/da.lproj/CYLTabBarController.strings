@@ -180,6 +180,42 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Vis en TabBarController med en ny kontekst (PlusButton med en X-delvisning, der kan trykkes på, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Tryk på X øverst til højre på PlusButton: X skifter til en tilfældig farve, og PlusButton reagerer ikke";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Opdater";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex og PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Tryk for at vælge næste fane. Indeks uden PlusButton: %1$@, selectedIndex: %2$@, nu: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Forstør og formindsk";
+"从小放大" = "Zoom ind";
+"弹性" = "Hop";
+"弹性 + 烟花" = "Hop + fyrværkeri";
+"旋转" = "Rotér";
+"翻转" = "Vend";
+"飘散" = "Fordamp";
+"无" = "Ingen";
+"Tab 点击动画（issue #535）" = "Trykanimation for faner (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Tryk for at skifte trykanimation for fanerne og PlusButton. Nu: %@";
+"长按了「%@」" = "Holdt \"%@\" nede";
+"左右滑动切换 Tab（issue #535）" = "Stryg for at skifte fane (issue #535)";
+"长按 Tab（issue #535）" = "Hold faner nede (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Slå kontakten til, og stryg til venstre eller højre på siden for at gå til næste eller forrige fane.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Slå kontakten til, og hold en fane eller PlusButton nede for at se dens id.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Rotér (kun denne fane: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Billeder + fyrværkeri (alle faner: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Reagér uden for overvisningen (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Med kontakten slået til reagerer den del af knappen, der er uden for den grå boks, også; hvert tryk afspiller skaleringsanimationen. Tryk: %@";
+"已找到" = "Fundet";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Ikke fundet (med use_frameworks ligger ressourcebundtet i frameworket)";
+"从 bundle 加载图片（issue #535）" = "Indlæs billeder fra et bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Billedet til venstre læses fra ressourcebundtet med CYLImageInBundle (uden cache). CYLBundleImage i hovedbundtet: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Dette er en almindelig UIViewController, der ikke arver fra CYLBaseViewController. Navigationslinjen er skjult.";
+"不继承基类隐藏导航栏（issue #535）" = "Skjul navigationslinjen uden basisklasse (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Kontakten sætter cyl_automaticNavigationSettingEnabled; tryk på rækken for at vise en almindelig UIViewController, der sætter cyl_navigationBarHidden og cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Side %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Glidende overgang (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Tryk for at åbne en UITabBarController fra systemet: tryk på en fane, eller træk siden til venstre eller højre, så glider siden med fingeren.";

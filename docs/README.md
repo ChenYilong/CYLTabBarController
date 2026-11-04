@@ -14,6 +14,7 @@
 | 中文 | English |
 |:---|:---|
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
+| [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
@@ -27,7 +28,10 @@
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
+| [Tab 交互：点击动画、长按、滑动切换及其他](Tab-Interactions.md) | [Tab interactions: tap animations, long press, swipe, and more](Tab-Interactions.md) |
 | [TabBar 的 hitTest 不再返回 nil，交给 super 处理](TabBar-HitTest-Super-Fallback.md) | [The tab bar's hitTest falls back to super instead of returning nil](TabBar-HitTest-Super-Fallback.md) |
+| [TabBarItem 手势：再次点击、双击与长按](TabBarItem-Gestures.md) | [Tab bar item gestures: reselect, double tap and long press](TabBarItem-Gestures.md) |
+| [选中标题：选中的 Tab 显示不同文字（如京东「刷新」）](TabBarItem-Selected-Title.md) | [Selected title: a different title on the selected tab (like JD's "Refresh")](TabBarItem-Selected-Title.md) |
 
 <!-- navigation:end -->
 
@@ -44,6 +48,7 @@
 ```text
 docs/
 ├── Bilingual-Documentation.md
+├── CYLUtils-Helpers.md
 ├── Carthage-Example.md
 ├── Carthage.md
 ├── FAQ.md
@@ -58,7 +63,10 @@ docs/
 ├── SelectedIndex-PlusButton.md
 ├── Swift-Guide.md
 ├── SwiftUI-Integration.md
+├── Tab-Interactions.md
 ├── TabBar-HitTest-Super-Fallback.md
+├── TabBarItem-Gestures.md
+├── TabBarItem-Selected-Title.md
 └── assets/
     ├── docs-navigation-index.png
     ├── flatdesign-standard-appearance-mapping.svg

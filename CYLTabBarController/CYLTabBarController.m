@@ -72,6 +72,89 @@ NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
 NSString *const CYLTabBarItemIdentifier = @"CYLTabBarItemIdentifier";
+NSString *const CYLTabBarItemSelectedTitle = @"CYLTabBarItemSelectedTitle";
+
+#pragma mark - Selected title (FIX: issue #433)
+
+static const void *CYLTabBarItemSelectedTitleKey = &CYLTabBarItemSelectedTitleKey;
+static const void *CYLTabBarItemNormalTitleKey = &CYLTabBarItemNormalTitleKey;
+
+/*!
+ * FIX: issue #433
+ * [EN] Remembers the tab's `CYLTabBarItemSelectedTitle` and its normal title on the view controller, or forgets them
+ *      when the attributes have no selected title (tabs set up again without it).
+ * [CN] 在控制器上记录 Tab 的 `CYLTabBarItemSelectedTitle` 与普通标题；属性中没有选中标题时清除（重新设置 Tab 时去掉了该键）。
+ */
+static void CYLRememberTabBarItemSelectedTitle(UIViewController *viewController, NSDictionary *attributes, NSString *normalTitle) {
+    if (!viewController) {
+        return;
+    }
+    id selectedTitle = attributes[CYLTabBarItemSelectedTitle];
+    if (![selectedTitle isKindOfClass:[NSString class]]) {
+        selectedTitle = nil;
+    }
+    objc_setAssociatedObject(viewController, CYLTabBarItemSelectedTitleKey, selectedTitle, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    objc_setAssociatedObject(viewController, CYLTabBarItemNormalTitleKey, selectedTitle ? (normalTitle ?: @"") : nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+/*!
+ * FIX: issue #433
+ * [EN] Shows the selected title on the selected tab and the normal title on the others. Idempotent and cheap: only tabs
+ *      that have a `CYLTabBarItemSelectedTitle` are touched, and a title is set only when it changes. FlatDesign sets
+ *      the title of its own item; the classic style and Liquid Glass set `tabBarItem.title` (and the one of the
+ *      navigation controller's root), which UIKit shows.
+ * [CN] 选中的 Tab 显示选中标题，其他 Tab 显示普通标题。可重复调用、开销很小：只处理设置了 `CYLTabBarItemSelectedTitle` 的 Tab，
+ *      标题变化时才设置。FlatDesign 设置其自身 item 的标题；经典样式与液态玻璃设置 `tabBarItem.title`（以及导航控制器根控制器的），
+ *      由 UIKit 显示。
+ */
+static void CYLApplyTabBarItemSelectedTitles(CYLTabBarController *tabBarController) {
+    if (!tabBarController) {
+        return;
+    }
+    UIViewController *selectedViewController = tabBarController.selectedViewController;
+    for (UIViewController *viewController in tabBarController.viewControllers) {
+        NSString *selectedTitle = objc_getAssociatedObject(viewController, CYLTabBarItemSelectedTitleKey);
+        if (!selectedTitle) {
+            continue;
+        }
+        NSString *normalTitle = objc_getAssociatedObject(viewController, CYLTabBarItemNormalTitleKey) ?: @"";
+        NSString *title = (viewController == selectedViewController) ? selectedTitle : normalTitle;
+        if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
+#if CYL_FLATDESIGN_AVAILABLE
+            CYLFlatDesignTabBarItem *item = viewController.cyl_tabBarItem;
+            if (item && ![item.title isEqualToString:title]) {
+                item.title = title;
+            }
+#endif
+            continue;
+        }
+        UIViewController *contentViewController = [viewController cyl_getViewControllerInsteadOfNavigationController];
+        if (![viewController.tabBarItem.title isEqualToString:title]) {
+            viewController.tabBarItem.title = title;
+        }
+        if (contentViewController && contentViewController != viewController &&
+            ![contentViewController.tabBarItem.title isEqualToString:title]) {
+            contentViewController.tabBarItem.title = title;
+        }
+    }
+}
+
+/*!
+ * FIX: issue #433
+ * [EN] Applies the selected titles now, and once more on the next main-queue turn: in the classic style the button's
+ *      action can run before UIKit has changed `selectedViewController`.
+ * [CN] 立即应用选中标题，并在主队列的下一轮再应用一次：经典样式中按钮事件可能在 UIKit 修改 `selectedViewController` 之前执行。
+ */
+static void CYLSetNeedsUpdateTabBarItemSelectedTitles(CYLTabBarController *tabBarController) {
+    if (!tabBarController) {
+        return;
+    }
+    CYLApplyTabBarItemSelectedTitles(tabBarController);
+    __weak CYLTabBarController *weakTabBarController = tabBarController;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        CYLApplyTabBarItemSelectedTitles(weakTabBarController);
+    });
+}
 NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
@@ -195,10 +278,26 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController);
 
 /// Implemented below (CYLActiveTabBarController): the registry of live tab bar controllers.
+/// FIX: issue #152 — implemented in `CYLTabBarController (CYLTabBarItemGesture)` below. 实现见下方的分类。
+@interface CYLTabBarController (CYLTabBarItemGesturePrivate)
+- (void)cyl_recognizeTabBarItemGestureForReportedControl:(UIControl *)control;
+- (void)cyl_installTabBarItemLongPressIfNeeded;
+- (BOOL)cyl_isTabBarItemGestureControl:(UIControl *)control viewController:(UIViewController *__autoreleasing _Nullable *_Nullable)viewController;
+- (void)cyl_reportTabBarItemGesture:(CYLTabBarItemGesture)gesture control:(UIControl *)control viewController:(nullable UIViewController *)viewController;
+- (void)cyl_recognizeTapOnControl:(UIControl *)control viewController:(nullable UIViewController *)viewController isReselect:(BOOL)isReselect;
+- (void)cyl_recognizeTabBarItemTapWillSelectViewController:(UIViewController *)viewController;
+- (void)cyl_recognizeTabBarItemTapOnControl:(UIControl *)control viewController:(nullable UIViewController *)viewController isReselect:(BOOL)isReselect;
+@end
+
 @interface CYLTabBarController (CYLActiveTabBarControllerPrivate)
 + (void)cyl_registerTabBarController:(CYLTabBarController *)tabBarController;
 + (void)cyl_markTabBarControllerActive:(CYLTabBarController *)tabBarController;
 + (CYLTabBarController *)cyl_tabBarControllerForContext:(NSString *)context matching:(CYLTabBarControllerMatcher)matcher;
+@end
+
+/// [EN] FIX: issue #535 — implemented in CYLTabBarController+CYLInteraction.m. [CN] 实现位于 CYLTabBarController+CYLInteraction.m。
+@interface CYLTabBarController (CYLInteractionInstall)
+- (void)cyl_installInteractionGestureRecognizersIfNeeded;
 @end
 
 /// FIX: issue #475. The title offset a tab asked for itself; see `-setTitlePositionAdjustment:`.
@@ -319,6 +418,12 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [CYLTabBarController cyl_markTabBarControllerActive:self];
+    // FIX: issue #152 — the long press, only when someone listens. 仅在有接收方时添加长按手势。
+    [self cyl_installTabBarItemLongPressIfNeeded];
+    // FIX: issue #433
+    // [EN] Show the selected title on the selected tab.
+    // [CN] 选中的 Tab 显示选中标题。
+    CYLApplyTabBarItemSelectedTitles(self);
 }
 
 
@@ -408,6 +513,10 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
         [self didSelectControl:control];
     }
     
+    // FIX: issue #433
+    // [EN] Classic taps come here, not always through `-setSelectedViewController:`.
+    // [CN] 经典样式的点击会到这里，不一定经过 `-setSelectedViewController:`。
+    CYLSetNeedsUpdateTabBarItemSelectedTitles(self);
     UITabBarItem *item = viewController.tabBarItem;
     BOOL isChildViewControllerPlusButton = [control cyl_isChildViewControllerPlusButton];
     BOOL isLottieEnabled = [self isLottieEnabled];
@@ -635,6 +744,9 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
+    // [EN] FIX: issue #535 — long press and swipe to switch tabs, once the view exists (every style).
+    // [CN] FIX: issue #535 — view 已存在时安装长按与滑动切换手势（所有样式）。
+    [self cyl_installInteractionGestureRecognizersIfNeeded];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         // FIX: issue #585, #543 (follow-up to #93, #392)
         // [EN] The forced `-layoutSubviews` below is an iOS 10 workaround: #93 (iOS 10.0–10.2) and #392 (iOS 10.3.x, items
@@ -1227,6 +1339,10 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
                 lottieSizeValue = _tabBarItemsAttributes[idx][CYLTabBarLottieSize];
                 // FIX: issue #408 the tab's identifier. Tab 的标识。
                 viewController.cyl_tabBarItemIdentifier = _tabBarItemsAttributes[idx][CYLTabBarItemIdentifier];
+                // FIX: issue #433
+                // [EN] The title shown while the tab is selected.
+                // [CN] 选中时显示的标题。
+                CYLRememberTabBarItemSelectedTitle(viewController, _tabBarItemsAttributes[idx], title);
                         
                 NSValue *offsetValue = _tabBarItemsAttributes[idx][CYLTabBarItemTitlePositionAdjustment];
                 UIOffset offset = [offsetValue UIOffsetValue];
@@ -2219,6 +2335,10 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
                     lottieSizeValue = _tabBarItemsAttributes[idx][CYLTabBarLottieSize];
                     // FIX: issue #408 the tab's identifier. Tab 的标识。
                     viewController.cyl_tabBarItemIdentifier = _tabBarItemsAttributes[idx][CYLTabBarItemIdentifier];
+                    // FIX: issue #433
+                    // [EN] The title shown while the tab is selected.
+                    // [CN] 选中时显示的标题。
+                    CYLRememberTabBarItemSelectedTitle(viewController, _tabBarItemsAttributes[idx], title);
                 
                     NSValue *offsetValue = _tabBarItemsAttributes[idx][CYLTabBarItemTitlePositionAdjustment];
                     UIOffset offset = [offsetValue UIOffsetValue];
@@ -2894,6 +3014,9 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 }
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    // FIX: issue #152 — one user tap on a tab button, before the selection changes (also for a tab that needs login).
+    // 一次用户点击 Tab 按钮，在选中变化之前（需要登录的 Tab 也算）。
+    [self cyl_recognizeTabBarItemTapWillSelectViewController:viewController];
     // FIX: issue #19 — a tab that needs login, tapped while logged out: refuse it before anything changes (no transition,
     // no selection state) and start the login. 需要登录的 Tab 在未登录时被点击：在任何变化之前拒绝（无转场、不改选中状态），并发起登录。
     if ([self cyl_interceptLoginIfNeededForViewController:viewController]) {
@@ -3014,10 +3137,33 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     });
 }
 
+/*!
+ * [EN] Everything a reported tab tap does, the same in every style (`-didSelectControl:` for the classic style and Liquid
+ *      Glass, `-cyl_flatDesignReportDidSelectControl:` for FlatDesign), each once per reported tap and also without a
+ *      `didSelectControl` delegate:
+ *      1. the tap animation (issue #535);
+ *      2. `-tabBarController:didSelectControl:`;
+ *      3. Reselect / DoubleTap (issue #152).
+ * [CN] 每次上报的 Tab 点击要做的事，所有样式相同（经典样式与液态玻璃为 `-didSelectControl:`，扁平样式为
+ *      `-cyl_flatDesignReportDidSelectControl:`），每次上报各执行一次，没有实现 didSelectControl 代理时同样执行：
+ *      1. 点击动画（issue #535）；
+ *      2. `-tabBarController:didSelectControl:`；
+ *      3. Reselect / DoubleTap（issue #152）。
+ */
+- (void)cyl_sendDidSelectControl:(UIControl *)control {
+    [self cyl_playTabButtonAnimationForControl:control];
+    SEL action = @selector(tabBarController:didSelectControl:);
+    if ([self.delegate respondsToSelector:action]) {
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+        (
+         [self.delegate performSelector:action withObject:self withObject:control];
+         );
+    }
+    [self cyl_recognizeTabBarItemGestureForReportedControl:control];
+}
+
 - (void)didSelectControl:(UIControl *)control {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    
-    SEL actin = @selector(tabBarController:didSelectControl:);
     
     BOOL shouldSelectViewController =  YES;
     @try {
@@ -3091,12 +3237,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         if (isPlusButtonWithChildViewController) {
             [self cyl_markControlReportedInCurrentRunLoop:reportedControl];
         }
-        if ([self.delegate respondsToSelector:actin]) {
-            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-            (
-             [self.delegate performSelector:actin withObject:self withObject:reportedControl];
-             );
-        }
+        [self cyl_sendDidSelectControl:reportedControl];
     }
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
@@ -3531,6 +3672,10 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     if (NSNotFound == indexOfSelectedViewController) { return; }
     [super setSelectedViewController:selectedViewController];
     _selectedViewController = selectedViewController;
+    // FIX: issue #433
+    // [EN] Show the selected title on the selected tab.
+    // [CN] 选中的 Tab 显示选中标题。
+    CYLSetNeedsUpdateTabBarItemSelectedTitles(self);
 
     if (selectedViewController.cyl_isPlaceholder) { return; }
 
@@ -3754,6 +3899,10 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             [self tabChangedToSelectedIndex:selectedIndex viewController:nil selectedItem:nil];
             
         }
+        // FIX: issue #433
+        // [EN] Show the selected title on the selected tab.
+        // [CN] 选中的 Tab 显示选中标题。
+        CYLSetNeedsUpdateTabBarItemSelectedTitles(self);
         [self _updateBottomBarShowHideIfNeeded];
 #else
 #endif
@@ -4047,14 +4196,10 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
  *      （`-plusChildViewControllerButtonClicked:`，或其下方的 Tab 按钮）、没有子控制器的 PlusButton（`-cyl_flatDesignPlusButtonTouchUpInside:`）。
  */
 - (void)cyl_flatDesignReportDidSelectControl:(UIControl *)control {
-    SEL actin = @selector(tabBarController:didSelectControl:);
-    if (!control || control.cyl_userInteractionDisabled || ![self.delegate respondsToSelector:actin]) {
+    if (!control || control.cyl_userInteractionDisabled) {
         return;
     }
-    CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-    (
-     [self.delegate performSelector:actin withObject:self withObject:control];
-     )
+    [self cyl_sendDidSelectControl:control];
 }
 
 /// The target of a flat design plus button that has no child view controller (that one has no action of its own here).
@@ -4083,6 +4228,9 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
         }
         // FIX: issue #610 already reported by `-[CYLFlatDesignTabBar _tabBarDidSelectButton:]`, which every tap goes through.
         // 已由每次点击都会经过的 `-[CYLFlatDesignTabBar _tabBarDidSelectButton:]` 上报。
+        // FIX: issue #152 — one user tap on a tab button, before the selection changes, also without a delegate.
+        // 一次用户点击 Tab 按钮，在选中变化之前；没有代理时同样计数。
+        [self cyl_recognizeTabBarItemTapWillSelectViewController:didSelectViewController];
         if ([self.delegate respondsToSelector:@selector(tabBarController:shouldSelectViewController:)]) {
             BOOL sholudSelect = [self.delegate tabBarController:self shouldSelectViewController:didSelectViewController];
             if (!sholudSelect) {
@@ -4586,20 +4734,16 @@ static CYLTabBarControllerMatcher CYLTabBarControllerMatcherForStyleType(CYLTabB
     };
 }
 
-/// Unwraps the weak box stored by `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:`.
-static id CYLTabBarControllerFromWeakBox(id box) {
-    id (^block)(void) = box;
-    return block ? block() : nil;
-}
-
 /// The reference set on `object` with `-cyl_setTabBarController:` or `-cylflatdesign_setTabBarController:`, if accepted.
 static CYLTabBarController *CYLTabBarControllerExplicitReference(id object, CYLTabBarControllerMatcher matcher) {
-    id tabBarController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(object, @selector(cyl_tabBarController)));
+    // [EN] Weak references set by `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:` (CYLUtils).
+    // [CN] 由 `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:` 设置的弱引用（CYLUtils）。
+    id tabBarController = [object cyl_weakAssociatedObjectForKey:@selector(cyl_tabBarController)];
     if (CYLTabBarControllerMatches(tabBarController, matcher)) {
         return tabBarController;
     }
 #if CYL_FLATDESIGN_AVAILABLE
-    tabBarController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(object, @selector(cylflatdesign_tabBarController)));
+    tabBarController = [object cyl_weakAssociatedObjectForKey:@selector(cylflatdesign_tabBarController)];
     if (CYLTabBarControllerMatches(tabBarController, matcher)) {
         return tabBarController;
     }
@@ -4904,10 +5048,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
 @implementation NSObject (CYLTabBarControllerReferenceExtension)
 
 - (void)cyl_setTabBarController:(nullable CYLTabBarController *)tabBarController {
-    id __weak weakObject = tabBarController;
-    id (^block)(void) = ^{ return weakObject; };
-    objc_setAssociatedObject(self, @selector(cyl_tabBarController),
-                             block, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_setWeakAssociatedObject:tabBarController forKey:@selector(cyl_tabBarController)];
 }
 
 /*!
@@ -5008,7 +5149,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
     // retain cycle (tab bar controller -> child view controller -> tab bar controller)
     // and the whole FlatDesign tab tree is never deallocated after it is popped (#661).
     UIViewController *tabBarController_ = tabBarController;
-    objc_setAssociatedObject(self, @selector(cylflatdesign_tabBarController), [self cyl_cylflatdesign_weakBoxWithTarget:tabBarController_], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_setWeakAssociatedObject:tabBarController_ forKey:@selector(cylflatdesign_tabBarController)];
     UIViewController *referenceViewController = nil;
     if ([self isKindOfClass:[UIViewController class]]) {
         referenceViewController = (UIViewController *)self;
@@ -5017,7 +5158,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
         return;
     }
     if (referenceViewController.cyl_getViewControllerInsteadOfNavigationController) {
-        objc_setAssociatedObject(referenceViewController.cyl_getViewControllerInsteadOfNavigationController, @selector(cylflatdesign_tabBarController), [self cyl_cylflatdesign_weakBoxWithTarget:tabBarController_], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [referenceViewController.cyl_getViewControllerInsteadOfNavigationController cyl_setWeakAssociatedObject:tabBarController_ forKey:@selector(cylflatdesign_tabBarController)];
     }
     
     /*!
@@ -5038,12 +5179,6 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
      */
 }
 
-/// Wraps `target` in a block that only holds it weakly, matching `cyl_setTabBarController:`.
-/// The block itself is retained by the associated object, but the target is not.
-- (id)cyl_cylflatdesign_weakBoxWithTarget:(UIViewController *)target {
-    id __weak weakTarget = target;
-    return ^{ return weakTarget; };
-}
 
 /*!
  * [EN] Flat design. The same lookup as `-cyl_tabBarController`, `-cyl_tabBarControllerForStyleType:` with
@@ -5055,7 +5190,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
  *      TabBarController 内时返回 nil（调用方依此判断是否在其中）。
  */
 - (UIViewController __kindof *)cylflatdesign_tabBarController {
-    UIViewController *viewController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(self, @selector(cylflatdesign_tabBarController)));
+    UIViewController *viewController = [self cyl_weakAssociatedObjectForKey:@selector(cylflatdesign_tabBarController)];
     if (viewController) {
         return viewController;
     }
@@ -5251,6 +5386,278 @@ static char CYLLoginInterceptedViewControllerKey;
             return;
         }
     }
+}
+
+@end
+
+#pragma mark - Tab bar item gestures (issue #152)
+
+static char CYLTabBarItemGestureHandlerKey;
+static char CYLTabBarItemDoubleTapIntervalKey;
+static char CYLTabBarItemGestureStateKey;
+
+/*!
+ * [EN] What the gesture recognition remembers between taps: the last tapped control and when, the view controller that
+ *      was selected after the previous tap, and whether this run loop turn already reported a control (programmatic
+ *      selection can report the same control twice in one turn; that is not a second tap).
+ * [CN] 手势识别在两次点击之间记录的信息：上次点击的控件与时间、上次点击后选中的控制器，以及当前 runloop 是否已上报过控件
+ *      （代码切换时同一 runloop 内可能上报同一控件两次，这不是第二次点击）。
+ */
+@interface CYLTabBarItemGestureState : NSObject
+@property (nonatomic, weak, nullable) UIControl *lastControl;
+@property (nonatomic, assign) CFTimeInterval lastTapTime;
+@property (nonatomic, weak, nullable) UIViewController *selectedViewControllerBeforeTap;
+@property (nonatomic, weak, nullable) UIControl *controlReportedInCurrentRunLoop;
+/// [EN] YES once a tab tap came through `-cyl_recognizeTabBarItemTapWillSelectViewController:`.
+/// [CN] 一旦有 Tab 点击经过 `-cyl_recognizeTabBarItemTapWillSelectViewController:` 即为 YES。
+@property (nonatomic, assign) BOOL receivesTabTapsBeforeSelection;
+@end
+
+@implementation CYLTabBarItemGestureState
+@end
+
+@implementation CYLTabBarController (CYLTabBarItemGesture)
+
+- (CYLTabBarItemGestureHandler)cyl_tabBarItemGestureHandler {
+    return objc_getAssociatedObject(self, &CYLTabBarItemGestureHandlerKey);
+}
+
+- (void)cyl_setTabBarItemGestureHandler:(CYLTabBarItemGestureHandler)tabBarItemGestureHandler {
+    objc_setAssociatedObject(self, &CYLTabBarItemGestureHandlerKey, tabBarItemGestureHandler, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    if (self.isViewLoaded) {
+        [self cyl_installTabBarItemLongPressIfNeeded];
+    }
+}
+
+- (NSTimeInterval)cyl_tabBarItemDoubleTapInterval {
+    NSNumber *value = objc_getAssociatedObject(self, &CYLTabBarItemDoubleTapIntervalKey);
+    return value ? value.doubleValue : 0.35;
+}
+
+- (void)cyl_setTabBarItemDoubleTapInterval:(NSTimeInterval)tabBarItemDoubleTapInterval {
+    objc_setAssociatedObject(self, &CYLTabBarItemDoubleTapIntervalKey, @(MAX(tabBarItemDoubleTapInterval, 0)), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+/*!
+ * [EN] The same duration as `cyl_tabButtonLongPressMinimumDuration` (issue #535): one recognizer serves both long press
+ *      APIs, see `CYLTabBarController+CYLInteraction.m`.
+ * [CN] 与 `cyl_tabButtonLongPressMinimumDuration`（issue #535）是同一个时长：两套长按 API 共用一个手势，见
+ *      `CYLTabBarController+CYLInteraction.m`。
+ */
+- (NSTimeInterval)cyl_tabBarItemLongPressDuration {
+    return self.cyl_tabButtonLongPressMinimumDuration;
+}
+
+- (void)cyl_setTabBarItemLongPressDuration:(NSTimeInterval)tabBarItemLongPressDuration {
+    self.cyl_tabButtonLongPressMinimumDuration = tabBarItemLongPressDuration;
+}
+
+- (CYLTabBarItemGestureState *)cyl_tabBarItemGestureState {
+    CYLTabBarItemGestureState *state = objc_getAssociatedObject(self, &CYLTabBarItemGestureStateKey);
+    if (!state) {
+        state = [[CYLTabBarItemGestureState alloc] init];
+        state.selectedViewControllerBeforeTap = self.selectedViewController;
+        objc_setAssociatedObject(self, &CYLTabBarItemGestureStateKey, state, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return state;
+}
+
+- (BOOL)cyl_hasTabBarItemGestureReceiver {
+    return self.cyl_tabBarItemGestureHandler != nil ||
+        [self.delegate respondsToSelector:@selector(tabBarController:didRecognizeTabBarItemGesture:control:viewController:)];
+}
+
+/*!
+ * [EN] YES when `control` is one of this controller's tab buttons, or its plus button; `viewController` is then the tab's
+ *      view controller (the plus child view controller for the plus button, nil without one).
+ * [CN] `control` 为本控制器的 Tab 按钮或 PlusButton 时返回 YES；此时 `viewController` 为对应 Tab 的控制器（PlusButton 为其子控制器，
+ *      没有子控制器时为 nil）。
+ */
+- (BOOL)cyl_isTabBarItemGestureControl:(UIControl *)control viewController:(UIViewController *__autoreleasing _Nullable *_Nullable)viewController {
+    if (!control) {
+        return NO;
+    }
+    // Guard: the plus button only when there is one. 仅在有 PlusButton 时处理 PlusButton。
+    if ([self hasPlusButton] && [control cyl_isPlusButton]) {
+        if (viewController) {
+            // Guard: the child view controller only when there is one. 仅在有子控制器时取子控制器。
+            *viewController = [self hasPlusChildViewController] ? [CYLPlusButton plusChildViewControllerForOwner:self] : nil;
+        }
+        return YES;
+    }
+    for (UIViewController *eachViewController in self.viewControllers) {
+        if (eachViewController.cyl_isPlaceholder) {
+            continue;
+        }
+        if (eachViewController.tabBarItem.cyl_tabButton == control || eachViewController.cyl_tabButton == control) {
+            if (viewController) {
+                *viewController = eachViewController;
+            }
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)cyl_reportTabBarItemGesture:(CYLTabBarItemGesture)gesture control:(UIControl *)control viewController:(nullable UIViewController *)viewController {
+    CYLTabBarItemGestureHandler handler = self.cyl_tabBarItemGestureHandler;
+    if (handler) {
+        handler(self, gesture, control, viewController);
+    }
+    id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)self.delegate;
+    if ([delegate respondsToSelector:@selector(tabBarController:didRecognizeTabBarItemGesture:control:viewController:)]) {
+        [delegate tabBarController:self didRecognizeTabBarItemGesture:gesture control:control viewController:viewController];
+    }
+}
+
+- (void)cyl_recognizeTabBarItemGestureForReportedControl:(UIControl *)control {
+    if (![self cyl_hasTabBarItemGestureReceiver]) {
+        return;
+    }
+    // [EN] A CYLPlusButton counts its own taps (`-cyl_recognizePlusButtonTap:…`), tab buttons count before the selection
+    //      (`-cyl_recognizeTabBarItemTapWillSelectViewController:`) once that is reached. The reports remain the source
+    //      for a plus button that is not a CYLPlusButton, and for tab buttons when `shouldSelectViewController` is not reached.
+    // [CN] CYLPlusButton 自己计数（`-cyl_recognizePlusButtonTap:…`）；Tab 按钮在执行到 `-cyl_recognizeTabBarItemTapWillSelectViewController:`
+    //      后改为在选中之前计数。不是 CYLPlusButton 的 PlusButton，以及未执行到 `shouldSelectViewController` 时的 Tab 按钮，仍使用上报。
+    if ([control isKindOfClass:[CYLPlusButton class]]) {
+        return;
+    }
+    UIViewController *viewController = nil;
+    if (![self cyl_isTabBarItemGestureControl:control viewController:&viewController]) {
+        return;
+    }
+    CYLTabBarItemGestureState *state = [self cyl_tabBarItemGestureState];
+    BOOL isPlusButton = [self hasPlusButton] && [control cyl_isPlusButton];
+    if (!isPlusButton && state.receivesTabTapsBeforeSelection) {
+        return;
+    }
+    BOOL isReselect = viewController && (viewController == state.selectedViewControllerBeforeTap);
+    [self cyl_recognizeTabBarItemTapOnControl:control viewController:viewController isReselect:isReselect];
+    // After the selection settles (FlatDesign reports before selecting; a tab needing login may refuse it).
+    // 选中状态确定后再记录（扁平样式在选中之前上报；需要登录的 Tab 可能拒绝选中）。
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf) {
+            [strongSelf cyl_tabBarItemGestureState].selectedViewControllerBeforeTap = strongSelf.selectedViewController;
+        }
+    });
+}
+
+/*!
+ * FIX: issue #152 — the unified entry for taps on tab buttons, in every style.
+ * [EN] A user tap on a tab button is about to select `viewController`. Called from `-tabBarController:shouldSelectViewController:`
+ *      (classic and Liquid Glass: UIKit asks it once per user tap, for a new tab and for the selected tab alike, before
+ *      the selection changes, and never for a selection made in code) and from `-_cyltabBarItemClicked:` (FlatDesign).
+ *      So every tab tap is timed at the same moment and Reselect is simply "it is already selected", without the Liquid
+ *      Glass touch-down / lift split of the `didSelectControl` reports. Once this is called, those reports are no longer
+ *      used for tab buttons; they stay the source for tab bar controllers whose
+ *      `-tabBarController:shouldSelectViewController:` is not reached (another delegate object, or a subclass override
+ *      that does not call super).
+ * [CN] 用户点击 Tab 按钮、即将选中 `viewController`。由 `-tabBarController:shouldSelectViewController:`（经典与液态玻璃：UIKit 对每次
+ *      用户点击询问一次，无论是新 Tab 还是已选中的 Tab，都在选中变化之前，代码切换时不会询问）和 `-_cyltabBarItemClicked:`（扁平样式）调用。
+ *      因此每次 Tab 点击都在同一时刻计时，Reselect 就是"已经选中"，不再受 `didSelectControl` 上报在液态玻璃下"按下 / 抬起"两个时刻的影响。
+ *      一旦调用过本方法，Tab 按钮不再使用这些上报（PlusButton 通过 `-cyl_recognizePlusButtonTap:…` 进入同一入口）；未执行到 `-tabBarController:shouldSelectViewController:` 的
+ *      TabBarController（代理是其他对象，或子类重写时未调用 super）也仍使用上报。
+ */
+- (void)cyl_recognizeTabBarItemTapWillSelectViewController:(UIViewController *)viewController {
+    if (![self cyl_hasTabBarItemGestureReceiver] || !viewController || viewController.cyl_isPlaceholder) {
+        return;
+    }
+    UIControl *control = nil;
+    // Guard: the plus child view controller, selected from the tab button under the plus button: a tap on the plus button.
+    // PlusButton 子控制器（点击 PlusButton 下方的 Tab 按钮选中）：算作点击 PlusButton。
+    if ([self hasPlusButton] && [self hasPlusChildViewController] &&
+        viewController == [CYLPlusButton plusChildViewControllerForOwner:self]) {
+        control = [CYLPlusButton plusButtonForOwner:self];
+    } else {
+        control = viewController.tabBarItem.cyl_tabButton ?: viewController.cyl_tabButton;
+    }
+    if (!control) {
+        return;
+    }
+    CYLTabBarItemGestureState *state = [self cyl_tabBarItemGestureState];
+    BOOL isFirstTapFromHere = !state.receivesTabTapsBeforeSelection;
+    state.receivesTabTapsBeforeSelection = YES;
+    // The switch from the reports: in Liquid Glass a tap on the selected tab is reported on touch down, before UIKit asks
+    // here on lift. The first time, that report was already counted; do not count the same tap again.
+    // 从上报切换过来时：液态玻璃下点击已选中的 Tab 在手指按下时上报，UIKit 在抬起时才询问这里。第一次时该上报已计数，不再重复计数。
+    if (isFirstTapFromHere && state.lastControl == control && (CACurrentMediaTime() - state.lastTapTime) < 1.0) {
+        return;
+    }
+    BOOL isReselect = (viewController == self.selectedViewController);
+    [self cyl_recognizeTabBarItemTapOnControl:control viewController:viewController isReselect:isReselect];
+}
+
+/*!
+ * FIX: issue #152 — taps on the plus button, through the same entry as the tab buttons.
+ * [EN] Called by a CYLPlusButton on `UIControlEventTouchUpInside`, in every style, with and without a child view
+ *      controller: the moment a tap completes, like UIKit asking `shouldSelectViewController` for a tab. The plus button's
+ *      own path differs per style (`-plusChildViewControllerButtonClicked:` → `-setSelectedIndex:`, the tab control action,
+ *      `-gestureRecognizerShouldBegin:` on touch down in Liquid Glass, `-cyl_flatDesignPlusButtonTouchUpInside:`), so it is
+ *      not used for the gestures. `selectedViewController` is what was selected on touch down (the child view controller
+ *      may already be selected by the time this runs); nil when there was no touch down (actions sent by code).
+ * [CN] CYLPlusButton 在 `UIControlEventTouchUpInside` 时调用，适用于所有样式，有无子控制器均可：即一次点击完成的时刻，与 UIKit 为 Tab
+ *      询问 `shouldSelectViewController` 的时刻一致。PlusButton 自身的处理路径因样式而异（`-plusChildViewControllerButtonClicked:` →
+ *      `-setSelectedIndex:`、Tab 按钮事件、液态玻璃下手指按下时的 `-gestureRecognizerShouldBegin:`、`-cyl_flatDesignPlusButtonTouchUpInside:`），
+ *      因此手势不使用它们。`selectedViewController` 为手指按下时选中的控制器（执行到这里时子控制器可能已被选中）；没有按下（代码发送的事件）时为 nil。
+ */
+- (void)cyl_recognizePlusButtonTap:(UIControl *)plusButton selectedViewControllerAtTouchDown:(UIViewController *)selectedViewController {
+    // Guard: only with a plus button. 仅在有 PlusButton 时处理。
+    if (![self cyl_hasTabBarItemGestureReceiver] || ![self hasPlusButton]) {
+        return;
+    }
+    UIViewController *viewController = nil;
+    if (![self cyl_isTabBarItemGestureControl:plusButton viewController:&viewController]) {
+        return;
+    }
+    BOOL isReselect = viewController && (viewController == selectedViewController);
+    [self cyl_recognizeTabBarItemTapOnControl:plusButton viewController:viewController isReselect:isReselect];
+}
+
+/*!
+ * [EN] The core of the unified entry: one tap on a tab button or the plus button. Several calls for the same control in
+ *      one run loop turn are one tap.
+ * [CN] 统一入口的核心：Tab 按钮或 PlusButton 的一次点击。同一 runloop 内对同一控件的多次调用算一次点击。
+ */
+- (void)cyl_recognizeTabBarItemTapOnControl:(UIControl *)control viewController:(UIViewController *)viewController isReselect:(BOOL)isReselect {
+    CYLTabBarItemGestureState *state = [self cyl_tabBarItemGestureState];
+    if (state.controlReportedInCurrentRunLoop == control) {
+        return;
+    }
+    state.controlReportedInCurrentRunLoop = control;
+    [self cyl_recognizeTapOnControl:control viewController:viewController isReselect:isReselect];
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf cyl_tabBarItemGestureState].controlReportedInCurrentRunLoop = nil;
+    });
+}
+
+/// [EN] Reports Reselect and DoubleTap for one tap. [CN] 为一次点击上报 Reselect 与 DoubleTap。
+- (void)cyl_recognizeTapOnControl:(UIControl *)control viewController:(UIViewController *)viewController isReselect:(BOOL)isReselect {
+    CYLTabBarItemGestureState *state = [self cyl_tabBarItemGestureState];
+    CFTimeInterval now = CACurrentMediaTime();
+    BOOL isDoubleTap = (state.lastControl == control) && (now - state.lastTapTime) <= self.cyl_tabBarItemDoubleTapInterval;
+    // A third tap starts a new pair instead of making a second DoubleTap. 第三次点击重新开始计数，而不是再算一次 DoubleTap。
+    state.lastControl = control;
+    state.lastTapTime = isDoubleTap ? 0 : now;
+    if (isReselect) {
+        [self cyl_reportTabBarItemGesture:CYLTabBarItemGestureReselect control:control viewController:viewController];
+    }
+    if (isDoubleTap) {
+        [self cyl_reportTabBarItemGesture:CYLTabBarItemGestureDoubleTap control:control viewController:viewController];
+    }
+}
+
+- (void)cyl_installTabBarItemLongPressIfNeeded {
+    if (![self cyl_hasTabBarItemGestureReceiver] || !self.isViewLoaded) {
+        return;
+    }
+    // Remember what is selected before the first tap. 记录第一次点击之前选中的控制器。
+    [self cyl_tabBarItemGestureState];
+    // [EN] The long press recognizer is shared with issue #535 (`CYLTabBarController+CYLInteraction.m`).
+    // [CN] 长按手势与 issue #535 共用（`CYLTabBarController+CYLInteraction.m`）。
+    [self cyl_installInteractionGestureRecognizersIfNeeded];
 }
 
 @end

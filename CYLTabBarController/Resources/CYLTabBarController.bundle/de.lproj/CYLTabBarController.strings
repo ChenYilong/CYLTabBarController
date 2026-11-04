@@ -180,6 +180,42 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "TabBarController mit neuem Kontext pushen (PlusButton mit antippbarer X-Unteransicht, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Tippe auf das X oben rechts am PlusButton: Das X erhält eine zufällige Farbe, der PlusButton reagiert nicht";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Aktualisieren";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex und der PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Tippen, um den nächsten Tab zu wählen. Index ohne PlusButton: %1$@, selectedIndex: %2$@, aktuell: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Vergrößern und verkleinern";
+"从小放大" = "Hineinzoomen";
+"弹性" = "Federn";
+"弹性 + 烟花" = "Federn + Feuerwerk";
+"旋转" = "Drehen";
+"翻转" = "Umdrehen";
+"飘散" = "Verwehen";
+"无" = "Keine";
+"Tab 点击动画（issue #535）" = "Tipp-Animation der Tabs (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Tippen, um die Tipp-Animation der Tabs und des PlusButton zu wechseln. Aktuell: %@";
+"长按了「%@」" = "„%@“ lange gedrückt";
+"左右滑动切换 Tab（issue #535）" = "Wischen zum Tab-Wechsel (issue #535)";
+"长按 Tab（issue #535）" = "Tabs lange drücken (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Schalter einschalten und auf der Seite nach links oder rechts wischen, um zum nächsten oder vorherigen Tab zu wechseln.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Schalter einschalten und einen Tab oder den PlusButton lange drücken, um seine Kennung anzuzeigen.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Drehen (nur dieser Tab: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Einzelbilder + Feuerwerk (alle Tabs: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Außerhalb der Superview reagieren (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Bei eingeschaltetem Schalter reagiert auch der Teil der Taste außerhalb des grauen Kastens; jedes Tippen spielt die Skalierungsanimation. Tippen: %@";
+"已找到" = "Gefunden";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Nicht gefunden (mit use_frameworks liegt das Ressourcen-Bundle im Framework)";
+"从 bundle 加载图片（issue #535）" = "Bilder aus einem Bundle laden (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Das Bild links wird mit CYLImageInBundle aus dem Ressourcen-Bundle gelesen (ohne Cache). CYLBundleImage im Haupt-Bundle: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Dies ist ein normaler UIViewController, der nicht von CYLBaseViewController erbt. Die Navigationsleiste ist ausgeblendet.";
+"不继承基类隐藏导航栏（issue #535）" = "Navigationsleiste ohne Basisklasse ausblenden (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Der Schalter setzt cyl_automaticNavigationSettingEnabled; tippe auf die Zeile, um einen normalen UIViewController zu öffnen, der cyl_navigationBarHidden und cyl_hidesAncestorNavigationBars setzt.";
+"页面 %@" = "Seite %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Schiebeübergang (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Tippen öffnet einen System-UITabBarController: Tippe auf einen Tab oder ziehe die Seite nach links oder rechts, und die Seite folgt dem Finger.";
