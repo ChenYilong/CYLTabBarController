@@ -183,3 +183,7 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex ו-PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "הקישו כדי לבחור את הלשונית הבאה. אינדקס ללא PlusButton: %1$@, selectedIndex: %2$@, כעת: %3$@";
+
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "הקטנה / הסתרה של TabBar בגלילה (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar，扁平样式隐藏 TabBar。" = "הקש כדי לשנות את התנהגות הגלילה. כעת: %@. Liquid Glass (iOS 26+): המערכת מקטינה את TabBar; FlatDesign: TabBar מוסתר.";

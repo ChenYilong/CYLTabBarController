@@ -75,6 +75,34 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
     CYLTabBarStyleTypeLiquidGlass
 };
 
+/*!
+ * [EN] How the tab bar reacts to scrolling (issue #13). One value for every style, set with
+ *      `-[CYLTabBarController cyl_tabBarMinimizeBehavior]`:
+ *      - Liquid Glass (iOS 26+): passed to the native `UITabBarController.tabBarMinimizeBehavior`; the system minimizes
+ *        (shrinks) the tab bar.
+ *      - FlatDesign: the tab bar is hidden and shown with `-setTabBarHidden:animated:` while the current page scrolls.
+ *      - Other systems and styles: no effect yet.
+ *      The values match `UITabBarMinimizeBehavior` one to one.
+ * [CN] TabBar 随滚动的变化方式（issue #13）。所有样式共用一个值，通过 `-[CYLTabBarController cyl_tabBarMinimizeBehavior]` 设置：
+ *      - 液态玻璃（iOS 26+）：传给系统原生的 `UITabBarController.tabBarMinimizeBehavior`，由系统缩小 TabBar。
+ *      - 扁平样式：当前页面滚动时，通过 `-setTabBarHidden:animated:` 隐藏、显示 TabBar。
+ *      - 其他系统和样式：暂不生效。
+ *      各个取值与 `UITabBarMinimizeBehavior` 一一对应。
+ */
+typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
+    /// [EN] Liquid Glass: the system default. FlatDesign: same as Never. [CN] 液态玻璃：系统默认行为。扁平样式：等同于 Never。
+    CYLTabBarMinimizeBehaviorAutomatic = 0,
+    /// [EN] The tab bar never minimizes or hides on scroll. [CN] 滚动时 TabBar 不缩小、不隐藏。
+    CYLTabBarMinimizeBehaviorNever,
+    /// [EN] Minimizes (FlatDesign: hides) when scrolling down, expands when scrolling back up.
+    /// [CN] 向下滚动时缩小（扁平样式：隐藏），向上滚动时恢复。
+    CYLTabBarMinimizeBehaviorOnScrollDown,
+    /// [EN] Minimizes (FlatDesign: hides) when scrolling up, expands when scrolling back down; for content aligned to
+    ///      the bottom, such as a chat.
+    /// [CN] 向上滚动时缩小（扁平样式：隐藏），向下滚动时恢复；适合底部对齐的内容，如聊天页面。
+    CYLTabBarMinimizeBehaviorOnScrollUp,
+};
+
 @interface CYLConstants : NSObject
 
 /*!

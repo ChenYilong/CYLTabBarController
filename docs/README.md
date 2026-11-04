@@ -28,6 +28,7 @@
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
 | [TabBar 的 hitTest 不再返回 nil，交给 super 处理](TabBar-HitTest-Super-Fallback.md) | [The tab bar's hitTest falls back to super instead of returning nil](TabBar-HitTest-Super-Fallback.md) |
+| [滚动时缩小或隐藏 TabBar](TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](TabBar-Minimize-On-Scroll.md) |
 
 <!-- navigation:end -->
 
@@ -59,6 +60,7 @@ docs/
 ├── Swift-Guide.md
 ├── SwiftUI-Integration.md
 ├── TabBar-HitTest-Super-Fallback.md
+├── TabBar-Minimize-On-Scroll.md
 └── assets/
     ├── docs-navigation-index.png
     ├── flatdesign-standard-appearance-mapping.svg

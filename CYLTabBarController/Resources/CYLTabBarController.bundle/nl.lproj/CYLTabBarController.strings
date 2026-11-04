@@ -183,3 +183,7 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex en de PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Tik om het volgende tabblad te kiezen. Index zonder PlusButton: %1$@, selectedIndex: %2$@, nu: %3$@";
+
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "TabBar verkleinen / verbergen bij scrollen (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar，扁平样式隐藏 TabBar。" = "Tik om het scrollgedrag te wijzigen. Nu: %@. Liquid Glass (iOS 26+): het systeem verkleint de TabBar; FlatDesign: de TabBar wordt verborgen.";

@@ -21,6 +21,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
+//   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Minimize-On-Scroll.md
 // docs-binding:end
 
 #import "CYLConstants.h"

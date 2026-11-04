@@ -183,3 +183,7 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex와 플러스 버튼 (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "탭하면 다음 탭을 선택합니다. 플러스 버튼을 제외한 인덱스: %1$@, selectedIndex: %2$@, 현재: %3$@";
+
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "스크롤 시 TabBar 축소 / 숨기기 (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar，扁平样式隐藏 TabBar。" = "탭하여 스크롤 동작을 변경합니다. 현재: %@. Liquid Glass(iOS 26+)에서는 시스템이 TabBar를 축소하고, FlatDesign에서는 TabBar를 숨깁니다.";

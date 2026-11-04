@@ -27,6 +27,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
+//   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Minimize-On-Scroll.md
 // docs-binding:end
 
 // [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
@@ -1124,6 +1126,38 @@ presentLoginForViewController:(UIViewController *)viewController
  * [CN] 已废弃，请改用 -hideTabBarShadowImageView。
  */
 - (void)hideTabBadgeBackgroundSeparator CYL_DEPRECATED("Deprecated in 1.27.0. Use `-[CYLTabBarController hideTabBarShadowImageView]` instead.");
+
+@end
+
+/*!
+ * [EN] Minimize or hide the tab bar on scroll (issue #13): one API for Liquid Glass and FlatDesign.
+ *      See docs/TabBar-Minimize-On-Scroll.md.
+ * [CN] 滚动时缩小或隐藏 TabBar（issue #13）：液态玻璃与扁平样式共用一个接口。见 docs/TabBar-Minimize-On-Scroll.md。
+ */
+@interface CYLTabBarController (CYLTabBarMinimize)
+
+/*!
+ * [EN] How the tab bar reacts when the current page scrolls. Default `CYLTabBarMinimizeBehaviorAutomatic`.
+ *      - Liquid Glass on iOS 26+ (every style except FlatDesign): sets the native
+ *        `UITabBarController.tabBarMinimizeBehavior`. The system shrinks the tab bar and picks the scroll view; choose
+ *        it with `-[UIViewController setContentScrollView:forEdge:]` when a page has several.
+ *      - FlatDesign: hides the tab bar with `-setTabBarHidden:animated:` when the selected page (the top page of a
+ *        navigation controller) scrolls, and shows it again on the opposite scroll, when the page scrolls back to the
+ *        top (OnScrollDown), and when another tab or page appears. A tab bar hidden by your own `-setTabBarHidden:` is
+ *        left hidden. The scroll view is the page's `-contentScrollViewForEdge:NSDirectionalRectEdgeBottom`, otherwise
+ *        the first scroll view in its view hierarchy.
+ *      - iOS 25 and earlier with another style: no effect yet.
+ *      Can be set at any time, before or after the view loads.
+ * [CN] 当前页面滚动时 TabBar 的变化方式，默认 `CYLTabBarMinimizeBehaviorAutomatic`。
+ *      - iOS 26+ 液态玻璃（扁平样式以外的所有样式）：设置系统原生的 `UITabBarController.tabBarMinimizeBehavior`，由系统缩小
+ *        TabBar 并选择滚动视图；页面中有多个滚动视图时，用 `-[UIViewController setContentScrollView:forEdge:]` 指定。
+ *      - 扁平样式：选中页面（导航控制器的栈顶页面）滚动时用 `-setTabBarHidden:animated:` 隐藏 TabBar；反向滚动、滚回顶部
+ *        （OnScrollDown）、切换到其他 Tab 或页面时再显示。你自己用 `-setTabBarHidden:` 隐藏的 TabBar 保持隐藏。滚动视图为页面的
+ *        `-contentScrollViewForEdge:NSDirectionalRectEdgeBottom`，没有时取其视图层级中的第一个滚动视图。
+ *      - iOS 25 及以前的其他样式：暂不生效。
+ *      任何时候都可以设置，视图加载前后均可。
+ */
+@property (nonatomic, assign) CYLTabBarMinimizeBehavior cyl_tabBarMinimizeBehavior;
 
 @end
 
