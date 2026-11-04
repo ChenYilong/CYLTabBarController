@@ -289,3 +289,18 @@
 "轻触感反馈" = "Phản hồi xúc giác nhẹ";
 "重触感反馈" = "Phản hồi xúc giác mạnh";
 "长按（#152）" = "Nhấn giữ (#152)";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Giáng sinh";
+"万圣节" = "Halloween";
+"情人节" = "Lễ tình nhân";
+"中秋节" = "Tết Trung thu";
+"复活节" = "Lễ Phục sinh";
+"新年" = "Năm mới";
+"夏日" = "Mùa hè";
+"生日" = "Sinh nhật";
+"太空" = "Không gian";
+"海洋" = "Đại dương";
+"换肤：节日与配色主题（%@ 种）" = "Giao diện: ngày lễ và màu sắc (%@)";
+"节日图标与配色" = "Biểu tượng ngày lễ và màu sắc";
+"仅配色" = "Chỉ màu sắc";

@@ -289,3 +289,18 @@
 "轻触感反馈" = "Enyhe haptikus visszajelzés";
 "重触感反馈" = "Erős haptikus visszajelzés";
 "长按（#152）" = "Hosszú nyomás (#152)";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Karácsony";
+"万圣节" = "Halloween";
+"情人节" = "Valentin-nap";
+"中秋节" = "Holdünnep";
+"复活节" = "Húsvét";
+"新年" = "Újév";
+"夏日" = "Nyár";
+"生日" = "Születésnap";
+"太空" = "Világűr";
+"海洋" = "Óceán";
+"换肤：节日与配色主题（%@ 种）" = "Megjelenések: ünnepek és színek (%@)";
+"节日图标与配色" = "Ünnepi ikonok és színek";
+"仅配色" = "Csak színek";

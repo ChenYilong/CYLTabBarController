@@ -289,3 +289,18 @@
 "轻触感反馈" = "Resposta tátil leve";
 "重触感反馈" = "Resposta tátil forte";
 "长按（#152）" = "Toque longo (#152)";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Natal";
+"万圣节" = "Halloween";
+"情人节" = "Dia dos Namorados";
+"中秋节" = "Festival do Meio do Outono";
+"复活节" = "Páscoa";
+"新年" = "Ano-Novo";
+"夏日" = "Verão";
+"生日" = "Aniversário";
+"太空" = "Espaço";
+"海洋" = "Oceano";
+"换肤：节日与配色主题（%@ 种）" = "Temas visuais: festas e cores (%@)";
+"节日图标与配色" = "Ícones festivos e cores";
+"仅配色" = "Somente cores";
