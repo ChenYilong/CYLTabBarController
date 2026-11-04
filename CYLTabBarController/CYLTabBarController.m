@@ -486,6 +486,10 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
 #pragma mark - Reload badges (#404)
 
 - (void)reloadBadgesWithBlock:(CYLViewDidLayoutSubViewsBlock)block {
+    [self performWhenTabBarItemsReady:block];
+}
+
+- (void)performWhenTabBarItemsReady:(CYLViewDidLayoutSubViewsBlock)block {
     if (!block) {
         return;
     }
@@ -510,12 +514,29 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
     if (!self.isViewLoaded) {
         return NO;
     }
+    // FIX: issue #22
+    // [EN] `self.tabBar.items` too, for `-performWhenTabBarItemsReady:` (FlatDesign keeps its items in its own tab bar).
+    // [CN] 同时要求 `self.tabBar.items` 已生成，供 `-performWhenTabBarItemsReady:` 使用（扁平样式的 item 在其自己的 TabBar 中）。
+    if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && self.tabBar.items.count == 0) {
+        return NO;
+    }
+    // FIX: issue #22
+    // [EN] Any real tab, not only the first: a tab covered by a view (e.g. a logo over the first tab) has no visible
+    //      icon, so its badge host stays nil and the blocks never ran.
+    // [CN] 任一真实 Tab 即可，而不只是第一个：被覆盖的 Tab（如第一个 Tab 上的 Logo）没有可见图标，其角标宿主一直为 nil，block 从未执行。
     for (UIViewController *viewController in self.viewControllers) {
         if (viewController.cyl_isPlaceholder) {
             continue;
         }
         id host = [viewController cyl_getActualBadgeSuperView];
-        return [host isKindOfClass:[UIView class]] && CGRectGetWidth(((UIView *)host).bounds) > 10;
+        // [EN] Liquid Glass returns the tab's `UITabBarItem`: its view is the host once the tab button exists.
+        // [CN] 液态玻璃返回 Tab 的 `UITabBarItem`：Tab 按钮创建后，其视图即为宿主。
+        if ([host isKindOfClass:[UITabBarItem class]]) {
+            host = [(UITabBarItem *)host cyl_getActualBadgeSuperView];
+        }
+        if ([host isKindOfClass:[UIView class]] && CGRectGetWidth(((UIView *)host).bounds) > 10) {
+            return YES;
+        }
     }
     return NO;
 }

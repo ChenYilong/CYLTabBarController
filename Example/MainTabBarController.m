@@ -94,6 +94,14 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     self.unloadsUnselectedViewsOnMemoryWarning = YES;
     [super viewDidLoad];
     [self observeLottieAnimationViewDidAdd];
+    // FIX: issue #22
+    // [EN] `self.tabBar.items` is still empty here: customize the items once they exist.
+    // [CN] 此时 `self.tabBar.items` 仍为空：在 item 创建后再自定义。
+    [self performWhenTabBarItemsReady:^(CYLTabBarController *tabBarController) {
+        for (UITabBarItem *item in tabBarController.tabBar.items) {
+            item.accessibilityHint = item.title;
+        }
+    }];
 }
 
 /*!
