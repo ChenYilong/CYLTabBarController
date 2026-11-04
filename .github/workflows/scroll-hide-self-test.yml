@@ -22,7 +22,8 @@ jobs:
     name: self-test (${{ matrix.style }}${{ matrix.runtime && format(', {0}', matrix.runtime) || '' }})
     # Same runner label as the iOS workflow (ios.yml): the project needs Xcode 27, and macos-15 jobs were never given a runner.
     runs-on: xcode-27
-    timeout-minutes: 45
+    # Room for the iOS 18 runtime download (several GB).
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -30,8 +31,11 @@ jobs:
           # FlatDesign: code can hide it on every system, so this runs the whole self-test.
           - style: FlatDesign
             runtime: ""
-          # Default demo on the newest runtime: Liquid Glass, a smoke test (rows are SKIP, code cannot hide it). The runner has iOS 27
-          # simulators only; for the classic style before iOS 26, run RUNTIME=iOS-18 scripts/scroll-hide-self-test.sh locally.
+          # Classic style: the default demo before iOS 26. The xcode-27 runner only has iOS 27 simulators, so the script
+          # downloads the iOS 18 runtime (xcodebuild -downloadPlatform) and creates an iPhone for it.
+          - style: Default
+            runtime: iOS-18
+          # Default demo on the newest runtime: Liquid Glass, a smoke test (rows are SKIP, code cannot hide it).
           - style: Default
             runtime: ""
     steps:

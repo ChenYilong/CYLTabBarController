@@ -4,7 +4,8 @@
 #   scripts/scroll-hide-self-test.sh                          # newest iPhone simulator, default demo style
 #   scripts/scroll-hide-self-test.sh "iPhone 16"              # a simulator by name
 #   STYLE=FlatDesign scripts/scroll-hide-self-test.sh         # start on the FlatDesign tab bar
-#   RUNTIME=iOS-18 scripts/scroll-hide-self-test.sh           # an iPhone of a runtime (classic style before iOS 26)
+#   RUNTIME=iOS-18 scripts/scroll-hide-self-test.sh           # an iPhone of a runtime (classic style before iOS 26);
+#                                                             # a missing runtime is downloaded and an iPhone created
 #
 # [EN] Builds the Objective-C demo, installs it on a booted simulator, launches it with -CYLScrollHideSelfTest YES and
 #      streams the console. The demo runs every automatic simulation (-[UIViewController cyl_runScrollHideSelfTest]) and
@@ -26,8 +27,10 @@ BUILD_LOG="$DERIVED/build.log"
 TIMEOUT=600
 mkdir -p "$DERIVED"
 
-if [ -z "$DEVICE_NAME" ]; then
-  DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
+# [EN] Prints the UDID of the first available iPhone whose runtime identifier contains $1 (any runtime when empty).
+# [CN] 输出运行时标识包含 $1（为空时为任意运行时）的第一个可用 iPhone 的 UDID。
+find_iphone() {
+  xcrun simctl list devices available -j | python3 -c '
 import json, sys
 wanted = sys.argv[1]
 devices = json.load(sys.stdin)["devices"]
@@ -37,7 +40,56 @@ for runtime in sorted(devices, reverse=True):
     for device in devices[runtime]:
         if device["name"].startswith("iPhone"):
             print(device["udid"]); sys.exit(0)
-sys.exit(1)' "$RUNTIME") || { echo "No iPhone simulator for runtime '$RUNTIME'"; xcrun simctl list runtimes; exit 1; }
+sys.exit(1)' "$1"
+}
+
+# [EN] Creates an iPhone on the newest installed runtime whose identifier contains $1 and prints its UDID.
+# [CN] 在标识包含 $1 的最新已安装运行时上创建一台 iPhone，并输出其 UDID。
+create_iphone() {
+  PAIR=$(xcrun simctl list runtimes -j | python3 -c '
+import json, sys
+wanted = sys.argv[1]
+runtimes = [r for r in json.load(sys.stdin)["runtimes"]
+            if r.get("isAvailable") and r.get("platform", "iOS") == "iOS" and wanted in r["identifier"]]
+for runtime in sorted(runtimes, key=lambda r: [int(x) for x in r["version"].split(".")], reverse=True):
+    phones = [t for t in runtime.get("supportedDeviceTypes", []) if t.get("productFamily") == "iPhone"]
+    if phones:
+        print(runtime["identifier"], phones[-1]["identifier"]); sys.exit(0)
+sys.exit(1)' "$1") || return 1
+  # shellcheck disable=SC2086 # [EN] Two words on purpose. [CN] 有意拆成两个参数。
+  set -- $PAIR
+  xcrun simctl create "iPhone (scroll hiding self-test)" "$2" "$1"
+}
+
+# [EN] The version to download for a RUNTIME such as iOS-18 or iOS-17-5: a major version alone means its last release.
+# [CN] RUNTIME（如 iOS-18 或 iOS-17-5）对应的下载版本：只写主版本时取该版本的最后一个发布版。
+runtime_download_version() {
+  VERSION=$(printf '%s' "$1" | sed -e 's/^iOS-//' -e 's/-/./g')
+  case "$VERSION" in
+    18) echo 18.6 ;;
+    17) echo 17.5 ;;
+    16) echo 16.4 ;;
+    *) echo "$VERSION" ;;
+  esac
+}
+
+if [ -z "$DEVICE_NAME" ]; then
+  if ! DEVICE_ID=$(find_iphone "$RUNTIME"); then
+    if [ -z "$RUNTIME" ]; then
+      echo "No iPhone simulator"; xcrun simctl list runtimes; exit 1
+    fi
+    # [EN] The runner (or this Mac) lacks the runtime, e.g. the xcode-27 runner only has iOS 27: create an iPhone when the
+    #      runtime is installed, otherwise download it first (several GB, a few minutes).
+    # [CN] runner（或本机）没有该运行时，例如 xcode-27 runner 只有 iOS 27：已安装运行时则创建 iPhone，否则先下载（数 GB，需几分钟）。
+    if ! DEVICE_ID=$(create_iphone "$RUNTIME"); then
+      DOWNLOAD=$(runtime_download_version "$RUNTIME")
+      echo "Downloading the iOS $DOWNLOAD simulator runtime for RUNTIME=$RUNTIME"
+      xcodebuild -downloadPlatform iOS -buildVersion "$DOWNLOAD" || {
+        echo "Could not download the iOS $DOWNLOAD simulator runtime"; xcrun simctl list runtimes; exit 1; }
+      DEVICE_ID=$(create_iphone "$RUNTIME") || {
+        echo "No iPhone simulator for runtime '$RUNTIME' after the download"; xcrun simctl list runtimes; exit 1; }
+    fi
+  fi
 else
   DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
 import json, sys
