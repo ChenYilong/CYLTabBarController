@@ -202,9 +202,45 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Push a TabBarController with a new context (PlusButton with a tappable X subview, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Tap the X at the PlusButton's top right: the X changes to a random color, the PlusButton does not react";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Refresh";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex and the PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Tap to select the next tab. Index without the PlusButton: %1$@, selectedIndex: %2$@, now: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Scale up and down";
+"从小放大" = "Zoom in";
+"弹性" = "Bounce";
+"弹性 + 烟花" = "Bounce + fireworks";
+"旋转" = "Rotate";
+"翻转" = "Flip";
+"飘散" = "Fume";
+"无" = "None";
+"Tab 点击动画（issue #535）" = "Tab tap animation (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Tap to switch the tap animation of the tabs and the PlusButton. Now: %@";
+"长按了「%@」" = "Long-pressed \"%@\"";
+"左右滑动切换 Tab（issue #535）" = "Swipe to switch tabs (issue #535)";
+"长按 Tab（issue #535）" = "Long press on tabs (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Turn the switch on, then swipe left or right on the page to go to the next or previous tab.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Turn the switch on, then long-press any tab or the PlusButton to see its identifier.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Rotate (this tab only: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Frames + fireworks (all tabs: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Respond outside the superview (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "With the switch on, the part of the button outside the gray box responds too; each tap plays the scale animation. Taps: %@";
+"已找到" = "Found";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Not found (with use_frameworks the resource bundle is inside the framework)";
+"从 bundle 加载图片（issue #535）" = "Load images from a bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "The image on the left is read from the resource bundle with CYLImageInBundle (not cached). CYLBundleImage in the main bundle: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "This is a plain UIViewController that does not inherit from CYLBaseViewController. The navigation bar is hidden.";
+"不继承基类隐藏导航栏（issue #535）" = "Hide the navigation bar without a base class (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "The switch sets cyl_automaticNavigationSettingEnabled; tap the row to push a plain UIViewController that sets cyl_navigationBarHidden and cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Page %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Slide transition (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Tap to open a system UITabBarController: tap a tab or drag the page left or right, and the page slides with your finger.";
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "Minimize / hide the TabBar on scroll (issue #13)";
@@ -219,3 +255,25 @@
 "跳转与对比" = "Navigation and comparisons";
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Not supported by Liquid Glass: the system sets the tab bar height (FlatDesign and the classic style support it)";
+"默认点击声" = "Default click";
+"中等触感反馈" = "Medium haptic";
+"无需继承基类与工具方法" = "No base class, and helpers";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Previous / next tab (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Weak reference: found while alive %@, nil after release %@. From %@ to the selected tab button: %@";
+"点击声 + 触感反馈" = "Click + haptic";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Bounce + star fireworks (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Tap the arrows on the right to call cyl_switchToAdjacentTabWithStep:-1 / 1. Like a swipe, it skips the PlusButton and checks login. Last result: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Tap to switch, then tap any tab or the PlusButton to hear it. Haptics vibrate on a real device only. Now: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Tap to run: cyl_setWeakAssociatedObject:forKey: returns nil once the object is released; cyl_nearestControlBelowView: finds the selected tab's button from its icon.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Tap to switch. cyl_tabBarItemLongPressDuration: %@ s, cyl_tabButtonLongPressMinimumDuration: %@ s, cyl_tabBarItemDoubleTapInterval: %@ s";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Custom sound file (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Curl up, no deselect animation (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Slow scale up and down (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Slow zoom in (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils weak associated objects and finding a button (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Long press duration and double tap interval (issue #535 / #152)";
+"Tab 交互" = "Tab interactions";
+"Tab 点击声音与触感反馈（issue #535）" = "Tab tap sound and haptics (issue #535)";
+"轻触感反馈" = "Light haptic";
+"重触感反馈" = "Heavy haptic";
+"长按（#152）" = "Long press (#152)";
