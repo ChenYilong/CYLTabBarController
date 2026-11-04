@@ -379,6 +379,12 @@ static const NSInteger CYLDemoRowTabBar = 1000;
  */
 - (NSArray<NSDictionary *> *)cyl_demoSections {
     NSInteger update = [self cyl_settingsRowCount] - [self cyl_tabBarItemUpdateRowCount];
+    // The simulated failures of configurations come right before the in-place updates. 配置文件模拟意外情况位于原地更新之前。
+    NSInteger edgeCases = update - [self cyl_configurationEdgeCaseRowCount];
+    NSMutableArray<NSNumber *> *edgeCaseRows = [NSMutableArray array];
+    for (NSInteger row = edgeCases; row < update; row++) {
+        [edgeCaseRows addObject:@(row)];
+    }
     NSMutableArray<NSDictionary *> *sections = [@[
         @{ @"title" : CYLLocalizedString(@"通用"), @"rows" : @[ @0, @1 ] },
         @{ @"title" : CYLLocalizedString(@"TabBar 外观"),
@@ -390,6 +396,7 @@ static const NSInteger CYLDemoRowTabBar = 1000;
         @{ @"title" : @"PlusButton", @"rows" : @[ @5 ] },
         @{ @"title" : CYLLocalizedString(@"跳转与对比"),
            @"rows" : @[ @8, @(CYLDemoRowTabBar + 5), @(CYLDemoRowTabBar + 6), @(CYLDemoRowTabBar + 7), @(CYLDemoRowTabBar + 8) ] },
+        @{ @"title" : [UIViewController cyl_configurationEdgeCaseSectionTitle], @"rows" : edgeCaseRows },
     ] mutableCopy];
     NSMutableSet<NSNumber *> *listed = [NSMutableSet set];
     for (NSDictionary *section in sections) {

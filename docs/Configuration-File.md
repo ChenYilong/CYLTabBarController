@@ -33,6 +33,8 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Protocol Buffers](#cnprotocol-buffers) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Protocol Buffers](#enprotocol-buffers) |
 | [流程](#cn流程) | [Flow](#enflow) |
 | [演示](#cn演示) | [Demo](#endemo) |
+| [把代码中的配置导出为配置文件](#cn把代码中的配置导出为配置文件) | [Export the configuration written in code to files](#enexport-the-configuration-written-in-code-to-files) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [错误码](#cn错误码) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Error codes](#enerror-codes) |
 | [边界情况与评分](#cn边界情况与评分) | [Edge cases and score](#enedge-cases-and-score) |
 | [限制](#cn限制) | [Limits](#enlimits) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
@@ -233,6 +235,55 @@ flowchart TD
 |:---|:---|
 | Example 的设置列表中“跳转与对比”分组的第一行“从配置文件创建 TabBarController”：选择 17 个示例文件之一（JSON、JSON5、JSONC、XML / 二进制 / OpenStep plist、.strings、YAML、YML、TOML、INI、CFG、.properties、.env、XML、Protobuf 文本与二进制），或“从网络 URL 加载”（GitHub 上的 YAML 示例）。生成的 TabBarController 全屏展示，每个页面显示其来源文件的内容，左上角“关闭”返回。 | In the Example's settings list, the first row of the "Navigation and comparisons" section, "Create a TabBarController from a configuration file": choose one of the 17 sample files (JSON, JSON5, JSONC, XML / binary / OpenStep plist, .strings, YAML, YML, TOML, INI, CFG, .properties, .env, XML, Protobuf text and binary), or "Load from a URL" (the YAML sample on GitHub). The tab bar controller it creates is presented full screen; every page shows the file it came from, and Close (top left) goes back. |
 | 演示代码：`UIViewController+CYLConfigurationDemo.h/.m`；示例 URL 在合并到 master 后可用。 | Demo code: `UIViewController+CYLConfigurationDemo.h/.m`; the sample URL works once this is merged into master. |
+| “配置文件：模拟意外情况”分组：33 行，每行把一种损坏、恶意或特殊的输入交给真实 API（空文件、只有注释、语法错误、编码错误、UTF-16、嵌套 1 万层、6 MB 文件、没有 Tab、HTML 页面、错误的类型与 null、NaN、未知样式、不存在或错误的类、容器类、无效 URL 与 Lottie 文件、重复标识、拼写错误、截断的 protobuf、损坏的二进制 plist、XXE、文件不存在、后台线程、代码中的非控制器对象与非字典配置、空的子控制器列表、HTTP 404、域名无法解析、3 秒超时、请求取消、网络返回 HTML）。行标题以下方“边界情况与评分”表格中的编号开头；结果显示在该行下方并弹窗说明，成功创建的控制器可点“查看”打开。 | The "Configuration: simulated failures" section: 33 rows, each feeding one broken, hostile or unusual input to the real API (an empty file, comments only, a syntax error, a bad encoding, UTF-16, 10,000 levels of nesting, a 6 MB file, no tabs, an HTML page, wrong types and null, NaN, an unknown style, missing or wrong classes, a container class, invalid URLs and Lottie files, duplicate identifiers, typos, a truncated protobuf, a corrupted binary plist, XXE, a missing file, a background thread, objects that are not view controllers and a configuration that is not a dictionary in code, an empty view controller list, HTTP 404, an unknown host, a 3 s timeout, a cancelled request, HTML from the network). Each row starts with the ID of its case in the "Edge cases and score" table below; the outcome shows under the row and in an alert, and a controller that was created can be opened with "View". |
+
+## [CN]把代码中的配置导出为配置文件
+## [EN]Export the configuration written in code to files
+
+| 中文 | English |
+|:---|:---|
+| 网络配置不可信，最稳妥的做法是随 App 打包一份本地配置作为兜底。`scripts/export-tabbar-configurations.py`（仅依赖 Python 3 标准库）在 Objective-C 与 Swift 源码中查找 TabBar 配置并生成配置文件：`CYLTabBarItemTitle : ...` 字典字面量、`CYLLocalizedTabBarItemsAttributes(...)`、`CYLTabBarItemsAttributesAddingLottieFiles(...)`（自动找到 `_dark.json`）、用 `.map` 生成的 Lottie 深色颜色、子控制器类与导航控制器类，以及初始化参数（context、样式、内边距、标题偏移）。只在运行时才有的值（变量、枚举、方法调用）不会写入，并在报告中列出：文件只会不完整，不会出错。 | A downloaded configuration cannot be trusted; the safest setup ships a local configuration in the app as a fallback. `scripts/export-tabbar-configurations.py` (Python 3 standard library only) finds the tab bar configuration in Objective-C and Swift sources and writes configuration files: `CYLTabBarItemTitle : ...` dictionary literals, `CYLLocalizedTabBarItemsAttributes(...)`, `CYLTabBarItemsAttributesAddingLottieFiles(...)` (finding the `_dark.json` files), Lottie dark colors built with `.map`, the view controller and navigation controller classes, and the initializer parameters (context, style, insets, title offset). Values that only exist at runtime (variables, enums, method calls) are left out and listed in the report: a file can be incomplete, never wrong. |
+| 写法会被转换为文件中的形式：`CYLLocalizedString(@"首页")` 写入本地化 key `首页`，`[UIImage systemImageNamed:@"house"]` 写入 `system:house`，`[NSValue valueWithUIOffset:UIOffsetMake(0, -3)]` 写入 `{0, -3}`，`[[NSBundle mainBundle] pathForResource:@"a" ofType:@"json"]` 写入 `a.json`，`UIColor(white: 0.78, alpha: 1)` 写入 `#C7C7C7FF`。 | Expressions become their file form: `CYLLocalizedString(@"首页")` the localization key `首页`, `[UIImage systemImageNamed:@"house"]` `system:house`, `[NSValue valueWithUIOffset:UIOffsetMake(0, -3)]` `{0, -3}`, `[[NSBundle mainBundle] pathForResource:@"a" ofType:@"json"]` `a.json`, `UIColor(white: 0.78, alpha: 1)` `#C7C7C7FF`. |
+
+```sh
+python3 scripts/export-tabbar-configurations.py                       # every Example*/, JSON + YAML 所有 Example，JSON + YAML
+python3 scripts/export-tabbar-configurations.py --format all          # 12 formats 12 种格式
+python3 scripts/export-tabbar-configurations.py --format toml,binpb path/to/MyTabBarController.m
+python3 scripts/export-tabbar-configurations.py --stdout --format yaml path/to/MyTabBarController.swift
+python3 scripts/export-tabbar-configurations.py --check               # exit 1 when a file is out of date 文件过期时返回 1
+```
+
+| 中文 | English |
+|:---|:---|
+| 已对所有 Example 运行，结果（JSON 与 YAML）提交在各 Example 的 `Configurations/` 中：`Example/MainTabBarController.*`（4 个 Tab，Lottie 与深色 Lottie、子控制器类、`CYLBaseNavigationController`）、`Example-Swift`（4 个 Tab，Lottie 深色颜色、Liquid Glass）、`Example-Swift-02`、`Example-Swift-03`、`Example-Swift-04`、`Example-Swift-Carthage`、`Example-SwiftUI`（各 4 个 Tab）、`Example-network-download`（5 个 Tab，SF Symbol 与网络图标）。`Example-Swift-SwiftManager-FlatDesign` 的 Tab 由枚举在运行时生成，脚本报告无法导出而不生成文件。 | Run on every Example; the results (JSON and YAML) are committed in each Example's `Configurations/`: `Example/MainTabBarController.*` (4 tabs, Lottie and dark Lottie files, view controller classes, `CYLBaseNavigationController`), `Example-Swift` (4 tabs, Lottie dark colors, Liquid Glass), `Example-Swift-02`, `Example-Swift-03`, `Example-Swift-04`, `Example-Swift-Carthage`, `Example-SwiftUI` (4 tabs each), `Example-network-download` (5 tabs, SF Symbols and network icons). `Example-Swift-SwiftManager-FlatDesign` builds its tabs from an enum at runtime: the script reports that it cannot be exported and writes no file. |
+| 验证：所有 Example 的 12 种格式共 96 个文件，用本库的解析器读取（按扩展名与按内容识别）全部得到与 JSON 相同的配置。 | Verified: the 96 files of all Examples in all 12 formats, read with the library's parser (by extension and by content), all give the same configuration as the JSON one. |
+
+### [CN]错误码
+### [EN]Error codes
+
+| 错误码 Code | 名称 Name | 中文 | English |
+|:---|:---|:---|:---|
+| 1 | `FileNotFound` | 文件不存在、是目录或无法读取；URL 为 nil | The file is missing, a directory or unreadable; a nil URL |
+| 2 | `UnsupportedFormat` | 无法识别格式 | The format could not be detected |
+| 3 | `InvalidSyntax` | 内容不符合格式，描述中包含行号 | The content is invalid in its format; the description names the line |
+| 4 | `NotADictionary` | 顶层不是字典 | The top level is not a dictionary |
+| 5 | `Network` | 下载失败，`NSUnderlyingErrorKey` 为原始错误 | The download failed; `NSUnderlyingErrorKey` holds the original error |
+| 6 | `Empty` | 文件或响应为空，或只有空白与注释 | The file or response is empty, or only whitespace and comments |
+| 7 | `TooLarge` | 超过 5 MB（`CYLTabBarConfigurationMaximumLength`） | Over 5 MB (`CYLTabBarConfigurationMaximumLength`) |
+| 8 | `TooDeep` | 嵌套超过 64 层（`CYLTabBarConfigurationMaximumDepth`） | Nested deeper than 64 levels (`CYLTabBarConfigurationMaximumDepth`) |
+| 9 | `NoTabs` | 文件或 URL 中没有 Tab（例如下载到 HTML 页面） | A file or URL with no tab (e.g. an HTML page was downloaded) |
+| 10 | `MainThreadRequired` | 在非主线程通过文件接口创建控制器 | A controller created from a file off the main thread |
+
+```objc
+// A safe pattern: the remote configuration, else the one shipped in the app. 稳妥的写法：优先网络配置，失败时使用随 App 打包的配置。
+[CYLTabBarController loadTabBarControllerWithConfigurationURL:remoteURL completion:^(CYLTabBarController *tabBarController, NSError *error) {
+    if (!tabBarController) {
+        NSLog(@"Remote configuration refused: %@ (%ld)", error.localizedDescription, (long)error.code);
+        tabBarController = [CYLTabBarController tabBarControllerWithConfigurationFile:@"tabbar.json" error:NULL];
+    }
+    self.window.rootViewController = tabBarController;
+}];
+```
 
 ## [CN]边界情况与评分
 ## [EN]Edge cases and score
@@ -328,4 +379,4 @@ flowchart TD
 
 | 中文 | English |
 |:---|:---|
-| 本次修改在 Linux 环境中完成，没有 Xcode、iOS SDK 与模拟器，因此没有截图，UIKit 部分也未能编译运行。已验证：解析器（仅依赖 Foundation）在 GNUstep 上编译运行，17 个示例文件按扩展名与按内容识别都解析为相同的字典；Protobuf 样例由官方 protobuf 库生成，并测试了中文（UTF-8 与八进制转义）、map 字段、截断与无效的二进制数据，并测试了错误、转义、数字与数组顺序等情况；示例文件也用 Python 的标准解析器（PyYAML、tomllib、plistlib、protobuf）交叉验证；新增的 UIKit 代码用 UIKit 头文件桩做了语法检查（`-Wall -Wextra` 无警告）。合并前请在 Example 中运行演示行并检查每种格式。 | This change was made on Linux without Xcode, the iOS SDK or a simulator, so there are no screenshots and the UIKit parts were not built or run. Verified: the parser (Foundation only) was built and run on GNUstep; the 17 sample files give the same dictionary whether the format comes from the extension or from the content; the Protobuf samples were written by the official protobuf library, and Chinese text (UTF-8 and octal escapes), the map field, truncated and invalid binary data were tested, and errors, escapes, numbers and list order were tested; the samples were also cross-checked with Python's standard parsers (PyYAML, tomllib, plistlib, protobuf); the new UIKit code was syntax-checked against UIKit header stubs (no warnings with `-Wall -Wextra`). Before merging, run the demo row in the Example and check every format. |
+| 本次修改在 Linux 环境中完成，没有 Xcode、iOS SDK 与模拟器，因此没有截图，UIKit 部分也未能编译运行。已验证：解析器（仅依赖 Foundation）在 GNUstep 上编译运行，17 个示例文件按扩展名与按内容识别都解析为相同的字典；Protobuf 样例由官方 protobuf 库生成，并测试了中文（UTF-8 与八进制转义）、map 字段、截断与无效的二进制数据，并测试了错误、转义、数字与数组顺序等情况；示例文件也用 Python 的标准解析器（PyYAML、tomllib、plistlib、protobuf）交叉验证；新增的 UIKit 代码用 UIKit 头文件桩做了语法检查（`-Wall -Wextra`，Release 与 DEBUG 均无警告）。边界情况：解析器层面的情况（嵌套 10 万层的各种格式、损坏与超大文件、空文件、编码、XXE、扩展名不符等）均在 GNUstep 上运行验证；值的转换、子控制器与网络部分只做了代码审查与语法检查。合并前请在 Example 中运行演示行、每种格式，以及“模拟意外情况”分组的每一行。 | This change was made on Linux without Xcode, the iOS SDK or a simulator, so there are no screenshots and the UIKit parts were not built or run. Verified: the parser (Foundation only) was built and run on GNUstep; the 17 sample files give the same dictionary whether the format comes from the extension or from the content; the Protobuf samples were written by the official protobuf library, and Chinese text (UTF-8 and octal escapes), the map field, truncated and invalid binary data were tested, and errors, escapes, numbers and list order were tested; the samples were also cross-checked with Python's standard parsers (PyYAML, tomllib, plistlib, protobuf); the new UIKit code was syntax-checked against UIKit header stubs (no warnings with `-Wall -Wextra`, Release and DEBUG). Edge cases: those of the parser (100,000 levels of nesting in every format, corrupted and huge files, empty files, encodings, XXE, wrong extensions...) were run on GNUstep; the value conversion, view controller and network cases were only reviewed and syntax-checked. Before merging, run the demo row, every format, and every row of the "simulated failures" section in the Example. |

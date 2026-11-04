@@ -42,4 +42,21 @@ FOUNDATION_EXTERN NSString *const CYLSampleConfigurationURLString;
 
 @end
 
+@interface UIViewController (CYLConfigurationEdgeCases)
+
+/*!
+ * [EN] The "simulated failures" rows: each one feeds a broken, hostile or unusual configuration (a file, data, a URL, a
+ *      background thread...) to the real API and shows what happens: an error, or a tab bar controller created safely
+ *      (open it with "View"). Each row is named after its case in docs/Configuration-File.md ("Edge cases and score").
+ * [CN] “模拟意外情况”的若干行：每行把损坏、恶意或特殊的配置（文件、数据、URL、后台线程等）交给真实的 API，并显示结果：错误，或安全创建的
+ *      TabBarController（点击“查看”打开）。每行以 docs/Configuration-File.md（“边界情况与评分”）中对应情况的编号命名。
+ */
+- (NSInteger)cyl_configurationEdgeCaseRowCount;
+/// [EN] The localized title of the section. [CN] 该分组的本地化标题。
++ (NSString *)cyl_configurationEdgeCaseSectionTitle;
+- (UITableViewCell *)cyl_configurationEdgeCaseCellForTableView:(UITableView *)tableView row:(NSInteger)row;
+- (void)cyl_runConfigurationEdgeCaseAtRow:(NSInteger)row;
+
+@end
+
 NS_ASSUME_NONNULL_END

@@ -225,3 +225,6 @@
 "从网络 URL 加载" = "Tải từ URL";
 "无法创建 TabBarController" = "Không thể tạo TabBarController";
 "本页由配置文件 %@ 创建：" = "Trang này được tạo từ cấu hình %@:";
+"配置文件：模拟意外情况" = "Cấu hình: mô phỏng sự cố";
+"已安全创建 TabBarController：%@ 个 Tab" = "Đã tạo TabBarController an toàn: %@ tab";
+"查看" = "Xem";

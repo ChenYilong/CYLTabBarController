@@ -225,3 +225,6 @@
 "从网络 URL 加载" = "Načítať z URL";
 "无法创建 TabBarController" = "TabBarController nie je možné vytvoriť";
 "本页由配置文件 %@ 创建：" = "Táto stránka bola vytvorená z konfigurácie %@:";
+"配置文件：模拟意外情况" = "Konfigurácia: simulované chyby";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController bezpečne vytvorený: kariet: %@";
+"查看" = "Zobraziť";

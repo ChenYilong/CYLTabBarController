@@ -225,3 +225,6 @@
 "从网络 URL 加载" = "Laden van een URL";
 "无法创建 TabBarController" = "Kan de TabBarController niet maken";
 "本页由配置文件 %@ 创建：" = "Deze pagina is gemaakt van de configuratie %@:";
+"配置文件：模拟意外情况" = "Configuratie: gesimuleerde fouten";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController veilig gemaakt: %@ tabbladen";
+"查看" = "Bekijken";

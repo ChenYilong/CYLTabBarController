@@ -64,6 +64,7 @@
 #import "UITableViewCell+CYLBadgeExtention.h"
 #import "UIViewController+CYLMemoryWarning.h"
 #import "UIViewController+CYLTabBarItemUpdate.h"
+#import "UIViewController+CYLConfigurationDemo.h"
 #import "CYLTabBarConfigurationParser.h"
 #import "UIViewController+CYLSettingsSection.h"
 #import "NSObject+CYLTabBarControllerExtention.h"

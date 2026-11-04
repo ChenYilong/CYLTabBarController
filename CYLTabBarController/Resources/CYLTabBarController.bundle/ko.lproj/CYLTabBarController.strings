@@ -225,3 +225,6 @@
 "从网络 URL 加载" = "URL에서 불러오기";
 "无法创建 TabBarController" = "TabBarController를 만들 수 없습니다";
 "本页由配置文件 %@ 创建：" = "이 페이지는 구성 %@에서 만들어졌습니다:";
+"配置文件：模拟意外情况" = "구성 파일: 오류 상황 시뮬레이션";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController를 안전하게 만들었습니다: 탭 %@개";
+"查看" = "보기";

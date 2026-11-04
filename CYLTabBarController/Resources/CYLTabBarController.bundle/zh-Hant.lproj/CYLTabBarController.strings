@@ -225,3 +225,6 @@
 "从网络 URL 加载" = "從網路 URL 載入";
 "无法创建 TabBarController" = "無法建立 TabBarController";
 "本页由配置文件 %@ 创建：" = "本頁由設定檔 %@ 建立：";
+"配置文件：模拟意外情况" = "設定檔：模擬意外情況";
+"已安全创建 TabBarController：%@ 个 Tab" = "已安全建立 TabBarController：%@ 個 Tab";
+"查看" = "查看";

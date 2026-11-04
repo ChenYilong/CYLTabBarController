@@ -29,8 +29,14 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowSelectedIndexIgnoringPlusButton, // FIX: issue #515
     CYLSettingsRowTabBarMinimizeBehavior, // issue #13
     CYLSettingsRowConfigurationFile,      // one configuration file creates a tab bar controller 一个配置文件生成 TabBarController
-    CYLSettingsRowTabBarItemUpdate,     // then one row per tab item update, see UIViewController+CYLTabBarItemUpdate.h
+    CYLSettingsRowConfigurationEdgeCase,  // then one row per simulated failure, see UIViewController+CYLConfigurationDemo.h
+                                          // 然后每个模拟意外情况一行，之后每个原地更新一行（UIViewController+CYLTabBarItemUpdate.h）
 };
+
+/// [EN] The first in-place update row, after the simulated failures. [CN] 第一个原地更新行，位于模拟意外情况之后。
+static NSInteger CYLSettingsRowTabBarItemUpdateStart(UIViewController *viewController) {
+    return CYLSettingsRowConfigurationEdgeCase + [viewController cyl_configurationEdgeCaseRowCount];
+}
 
 static NSString *const CYLTitlePositionAdjustmentCellIdentifier = @"CYLTitlePositionAdjustmentCell";
 
@@ -563,7 +569,7 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
 @implementation UIViewController (CYLSettingsSection)
 
 - (NSInteger)cyl_settingsRowCount {
-    return CYLSettingsRowTabBarItemUpdate + [self cyl_tabBarItemUpdateRowCount];
+    return CYLSettingsRowTabBarItemUpdateStart(self) + [self cyl_tabBarItemUpdateRowCount];
 }
 
 - (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath {
@@ -599,8 +605,11 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     if (indexPath.row == CYLSettingsRowConfigurationFile) {
         return [self cyl_configurationDemoCellForTableView:tableView];
     }
-    if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
-        return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdate];
+    if (indexPath.row >= CYLSettingsRowTabBarItemUpdateStart(self)) {
+        return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdateStart(self)];
+    }
+    if (indexPath.row >= CYLSettingsRowConfigurationEdgeCase) {
+        return [self cyl_configurationEdgeCaseCellForTableView:tableView row:indexPath.row - CYLSettingsRowConfigurationEdgeCase];
     }
     return [self cyl_languageCellForTableView:tableView];
 }
@@ -634,12 +643,14 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
         [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
     } else if (indexPath.row == CYLSettingsRowConfigurationFile) {
         [self cyl_presentConfigurationDemo];
-    } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
-        [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdate];
+    } else if (indexPath.row >= CYLSettingsRowConfigurationEdgeCase && indexPath.row < CYLSettingsRowTabBarItemUpdateStart(self)) {
+        [self cyl_runConfigurationEdgeCaseAtRow:indexPath.row - CYLSettingsRowConfigurationEdgeCase];
+    } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdateStart(self)) {
+        [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdateStart(self)];
         // [EN] The rows show which changes are on (a checkmark).
         // [CN] 各行用勾号显示已应用的更改。
         NSMutableArray<NSIndexPath *> *indexPaths = [NSMutableArray array];
-        for (NSInteger row = CYLSettingsRowTabBarItemUpdate; row < [self cyl_settingsRowCount]; row++) {
+        for (NSInteger row = CYLSettingsRowTabBarItemUpdateStart(self); row < [self cyl_settingsRowCount]; row++) {
             [indexPaths addObject:[NSIndexPath indexPathForRow:row inSection:indexPath.section]];
         }
         [tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
