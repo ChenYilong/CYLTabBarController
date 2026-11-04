@@ -21,6 +21,12 @@
 - (BOOL)cyl_hasTabBarItemGestureReceiver;
 - (BOOL)cyl_isTabBarItemGestureControl:(UIControl *)control viewController:(UIViewController *__autoreleasing _Nullable *_Nullable)viewController;
 - (void)cyl_reportTabBarItemGesture:(CYLTabBarItemGesture)gesture control:(UIControl *)control viewController:(nullable UIViewController *)viewController;
+- (void)cyl_recognizeLiquidGlassTapOnControl:(UIControl *)control selectedViewControllerAtTouchDown:(nullable UIViewController *)selectedViewController;
+@end
+
+/// [EN] Implemented in CYLTabBar.m (iOS 27.1 vertical bar, #653). [CN] 实现位于 CYLTabBar.m（iOS 27.1 竖向栏，#653）。
+@interface CYLTabBar (CYLInteractionVerticalBar)
+- (nullable UIControl *)cyl_verticalBarTabButtonAtWindowPoint:(CGPoint)windowPoint;
 @end
 
 /// [EN] Used by the gesture handler below. [CN] 供下方的手势处理对象使用。
@@ -30,6 +36,8 @@
 - (nullable UIControl *)cyl_tabControlAtPoint:(CGPoint)touchPoint;
 - (void)cyl_reportLongPressOnControl:(UIControl *)control;
 - (void)cyl_installInteractionGestureRecognizersIfNeeded;
+- (BOOL)cyl_liquidGlassReceivesTabTouches;
+- (BOOL)cyl_liquidGlassTakesTabTaps;
 @end
 
 /*!
@@ -53,6 +61,34 @@
 @end
 
 /*!
+ * FIX: issue #152 / #535 — long press, Reselect and DoubleTap in Liquid Glass.
+ * [EN] One press on a tab button, followed through UIKit's own Liquid Glass gestures (the continuous selection and the
+ *      long press that lifts the lens), which `CYLTabBar` forwards: in Liquid Glass they receive every touch on the tab
+ *      buttons, and a gesture added by the library does not. The press is one tap when it ends where it began, a long
+ *      press when it is held for `cyl_tabButtonLongPressMinimumDuration`, and neither when the finger moves to switch tabs.
+ *      The idea of one tracker for tap, long tap and double tap, with the item found by its position rather than by
+ *      `hitTest`, follows Telegram-iOS's tab bar (`TapLongTapOrDoubleTapGestureRecognizer`); no code is taken from it.
+ * [CN] 一次按在 Tab 按钮上的触摸，通过 `CYLTabBar` 转发的系统液态玻璃手势（连续选择手势与抬起 lens 的长按手势）跟踪：液态玻璃下
+ *      Tab 按钮上的每次触摸都由它们接收，库自己添加的手势收不到。在按下的位置结束算一次点击，按住
+ *      `cyl_tabButtonLongPressMinimumDuration` 算长按，手指移动去切换 Tab 时两者都不算。用一个跟踪器同时处理点击、长按与双击、
+ *      按位置而不是 `hitTest` 找到 Tab，这一思路参考 Telegram-iOS 的 TabBar（`TapLongTapOrDoubleTapGestureRecognizer`），未使用其代码。
+ */
+@interface CYLTabBarLiquidGlassPress : NSObject
+/// [EN] The UIKit gesture this press is followed through. [CN] 跟踪这次触摸所用的系统手势。
+@property (nonatomic, weak, nullable) UIGestureRecognizer *gestureRecognizer;
+@property (nonatomic, weak, nullable) UIControl *control;
+@property (nonatomic, weak, nullable) UIViewController *selectedViewControllerAtTouchDown;
+@property (nonatomic, assign) CGPoint windowStartPoint;
+@property (nonatomic, assign) BOOL moved;
+@property (nonatomic, assign) BOOL longPressReported;
+/// [EN] Tells a pending long press timer whether it still belongs to this press. [CN] 用于判断尚未触发的长按计时是否仍属于本次触摸。
+@property (nonatomic, assign) NSUInteger generation;
+@end
+
+@implementation CYLTabBarLiquidGlassPress
+@end
+
+/*!
  * [EN] The delegate and target of both gestures; it holds the tab bar controller weakly.
  * [CN] 两个手势的代理与响应者，弱引用 TabBarController。
  */
@@ -66,6 +102,10 @@
 
 static const void *CYLTabBarInteractionHandlerKey = &CYLTabBarInteractionHandlerKey;
 static const void *CYLPreviousAnimatedControlKey = &CYLPreviousAnimatedControlKey;
+static const void *CYLLiquidGlassPressKey = &CYLLiquidGlassPressKey;
+static const void *CYLLiquidGlassSeenKey = &CYLLiquidGlassSeenKey;
+/// [EN] How far the finger may move and still be a tap or a long press, in points. [CN] 仍算点击或长按时手指可移动的距离（pt）。
+static const CGFloat CYLLiquidGlassPressAllowableMovement = 10.0;
 
 #pragma mark - Views of a tab button
 
@@ -373,6 +413,191 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
     }
 }
 
+#pragma mark - Liquid Glass (issue #152 / #535)
+
+/*!
+ * [EN] YES in Liquid Glass with a `CYLTabBar` whose UIKit gestures were captured: tab button touches then come through
+ *      `-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:`, not through the library's own long press recognizer.
+ * [CN] 液态玻璃下、且 `CYLTabBar` 已拿到系统手势时为 YES：此时 Tab 按钮的触摸经由 `-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:`，
+ *      而不是库自己的长按手势。
+ */
+- (BOOL)cyl_liquidGlassReceivesTabTouches {
+    if (![CYLConstants isLiquidGlassActive] || ![self.tabBar isKindOfClass:[CYLTabBar class]]) {
+        return NO;
+    }
+    CYLTabBar *tabBar = (CYLTabBar *)self.tabBar;
+    return tabBar.liquidGlassContinuousGestureRecognizer != nil || tabBar.liquidGlassLongGestureRecognizer != nil;
+}
+
+/*!
+ * [EN] YES once a Liquid Glass press was followed: tab taps are then counted when the press ends
+ *      (`-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:`), which knows whether it was a tap, a long press or a drag;
+ *      `-tabBarController:shouldSelectViewController:` no longer counts them.
+ * [CN] 一旦跟踪过液态玻璃的触摸即为 YES：此后 Tab 的点击在触摸结束时计数（`-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:`），
+ *      那里知道这次是点击、长按还是拖动；`-tabBarController:shouldSelectViewController:` 不再计数。
+ */
+- (BOOL)cyl_liquidGlassTakesTabTaps {
+    return [self cyl_liquidGlassReceivesTabTouches] && [objc_getAssociatedObject(self, CYLLiquidGlassSeenKey) boolValue];
+}
+
+/*!
+ * [EN] The tab button under `windowPoint` in Liquid Glass, found by position (Liquid Glass layers can answer
+ *      `hitTest` instead of the buttons): the vertical bar's buttons (iOS 27.1), else a visible button whose frame holds
+ *      the point, else, inside the tab bar, the one whose center is closest horizontally. Placeholders are skipped; the
+ *      selected layer's copy and the tab under the plus button are reported as `-tabBarController:didSelectControl:` does.
+ * [CN] 液态玻璃下 `windowPoint` 处的 Tab 按钮，按位置查找（液态玻璃的图层可能代替按钮响应 `hitTest`）：先查竖向栏的按钮（iOS 27.1），
+ *      再查 frame 包含该点的可见按钮，最后在 TabBar 范围内取水平方向中心最近的按钮。跳过占位按钮；选中图层中的副本与 PlusButton 下方的
+ *      Tab 按 `-tabBarController:didSelectControl:` 的方式上报。
+ */
+- (nullable UIControl *)cyl_liquidGlassTabControlAtWindowPoint:(CGPoint)windowPoint {
+    CYLTabBar *tabBar = (CYLTabBar *)self.tabBar;
+    if (![tabBar isKindOfClass:[CYLTabBar class]] || !tabBar.window || tabBar.hidden) {
+        return nil;
+    }
+    UIControl *control = [tabBar cyl_verticalBarTabButtonAtWindowPoint:windowPoint];
+    if (!control) {
+        UIControl *closestControl = nil;
+        CGFloat closestDistance = CGFLOAT_MAX;
+        for (UIControl *candidate in [tabBar cyl_visibleControls]) {
+            if (candidate.hidden || candidate.alpha < 0.01 || !candidate.window || candidate.cyl_isPlaceholder) {
+                continue;
+            }
+            CGRect frame = [candidate convertRect:candidate.bounds toView:nil];
+            if (CGRectContainsPoint(frame, windowPoint)) {
+                control = candidate;
+                break;
+            }
+            CGFloat distance = fabs(CGRectGetMidX(frame) - windowPoint.x);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestControl = candidate;
+            }
+        }
+        if (!control && CGRectContainsPoint([tabBar convertRect:tabBar.bounds toView:nil], windowPoint)) {
+            control = closestControl;
+        }
+    }
+    if (!control) {
+        return nil;
+    }
+    if ([control cyl_isPlatterSelectedControl]) {
+        control = [control cyl_platterNormalControl];
+    }
+    return [self cyl_reportedControlForControl:control] ?: control;
+}
+
+- (nullable CYLTabBarLiquidGlassPress *)cyl_liquidGlassPress {
+    return objc_getAssociatedObject(self, CYLLiquidGlassPressKey);
+}
+
+/*!
+ * [EN] Called by `CYLTabBar` for every update of UIKit's Liquid Glass gestures. See `CYLTabBarLiquidGlassPress`.
+ *      A plus button keeps its own paths (its touch-up and the library's long press recognizer).
+ * [CN] `CYLTabBar` 对系统液态玻璃手势的每次更新调用。见 `CYLTabBarLiquidGlassPress`。PlusButton 仍走自己的路径（抬起事件与库的长按手势）。
+ */
+- (void)cyl_liquidGlassTabBarGestureRecognizerDidUpdate:(UIGestureRecognizer *)gestureRecognizer {
+    BOOL handlesLongPress = [self cyl_handlesTabButtonLongPress];
+    BOOL handlesTaps = [self cyl_hasTabBarItemGestureReceiver];
+    if ((!handlesLongPress && !handlesTaps) || ![self cyl_liquidGlassReceivesTabTouches]) {
+        return;
+    }
+    CYLTabBarLiquidGlassPress *press = [self cyl_liquidGlassPress];
+    UIWindow *window = self.view.window;
+    CGPoint windowPoint = [gestureRecognizer locationInView:window];
+    switch (gestureRecognizer.state) {
+        case UIGestureRecognizerStateBegan: {
+            // [EN] Both UIKit gestures can begin for the same touch: follow the first one.
+            // [CN] 同一次触摸中两个系统手势都可能开始：只跟踪先开始的那个。
+            UIGestureRecognizerState followedState = press.gestureRecognizer.state;
+            if (press.gestureRecognizer && press.gestureRecognizer != gestureRecognizer &&
+                (followedState == UIGestureRecognizerStateBegan || followedState == UIGestureRecognizerStateChanged)) {
+                return;
+            }
+            UIControl *control = [self cyl_liquidGlassTabControlAtWindowPoint:windowPoint];
+            if (!control || [control cyl_isPlusButton]) {
+                objc_setAssociatedObject(self, CYLLiquidGlassPressKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+                return;
+            }
+            objc_setAssociatedObject(self, CYLLiquidGlassSeenKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            CYLTabBarLiquidGlassPress *newPress = [[CYLTabBarLiquidGlassPress alloc] init];
+            newPress.gestureRecognizer = gestureRecognizer;
+            newPress.control = control;
+            newPress.selectedViewControllerAtTouchDown = self.selectedViewController;
+            newPress.windowStartPoint = windowPoint;
+            newPress.generation = press.generation + 1;
+            objc_setAssociatedObject(self, CYLLiquidGlassPressKey, newPress, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            if (handlesLongPress) {
+                [self cyl_scheduleLiquidGlassLongPressForPress:newPress];
+            }
+            break;
+        }
+        case UIGestureRecognizerStateChanged: {
+            if (press.gestureRecognizer != gestureRecognizer) {
+                return;
+            }
+            CGFloat dx = windowPoint.x - press.windowStartPoint.x;
+            CGFloat dy = windowPoint.y - press.windowStartPoint.y;
+            if (sqrt(dx * dx + dy * dy) > CYLLiquidGlassPressAllowableMovement) {
+                // [EN] A drag across the tabs (UIKit switches the tab on lift): neither a tap nor a long press.
+                // [CN] 在 Tab 间拖动（系统在抬起时切换）：既不算点击也不算长按。
+                press.moved = YES;
+            }
+            break;
+        }
+        case UIGestureRecognizerStateEnded: {
+            if (press.gestureRecognizer != gestureRecognizer) {
+                return;
+            }
+            objc_setAssociatedObject(self, CYLLiquidGlassPressKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            UIControl *control = press.control;
+            if (handlesTaps && control && !press.moved && !press.longPressReported) {
+                [self cyl_recognizeLiquidGlassTapOnControl:control selectedViewControllerAtTouchDown:press.selectedViewControllerAtTouchDown];
+            }
+            break;
+        }
+        case UIGestureRecognizerStateCancelled:
+        case UIGestureRecognizerStateFailed: {
+            if (press.gestureRecognizer == gestureRecognizer) {
+                objc_setAssociatedObject(self, CYLLiquidGlassPressKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+/*!
+ * [EN] Reports the long press when the press is still held, and has not moved, after the long press duration.
+ *      While a `didLongPressControl` listener is set, UIKit's gesture is then cancelled, so lifting the finger does not
+ *      select the tab, as that API documents (#535); with only `CYLTabBarItemGestureLongPress` it still does (#152).
+ * [CN] 经过长按时长后，触摸仍在按住且未移动时上报长按。设置了 `didLongPressControl` 监听时，随后取消系统手势，
+ *      抬起手指时不会选中该 Tab（与该 API 的文档一致，#535）；只使用 `CYLTabBarItemGestureLongPress` 时仍会选中（#152）。
+ */
+- (void)cyl_scheduleLiquidGlassLongPressForPress:(CYLTabBarLiquidGlassPress *)press {
+    NSUInteger generation = press.generation;
+    __weak __typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.cyl_tabButtonLongPressMinimumDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) strongSelf = weakSelf;
+        CYLTabBarLiquidGlassPress *currentPress = [strongSelf cyl_liquidGlassPress];
+        UIGestureRecognizer *gestureRecognizer = currentPress.gestureRecognizer;
+        UIControl *control = currentPress.control;
+        if (!strongSelf || currentPress.generation != generation || currentPress.moved || !control || !gestureRecognizer) {
+            return;
+        }
+        UIGestureRecognizerState state = gestureRecognizer.state;
+        if (state != UIGestureRecognizerStateBegan && state != UIGestureRecognizerStateChanged) {
+            return;
+        }
+        currentPress.longPressReported = YES;
+        [strongSelf cyl_reportLongPressOnControl:control];
+        if ([strongSelf cyl_handlesDidLongPressControl] && gestureRecognizer.enabled) {
+            gestureRecognizer.enabled = NO;
+            gestureRecognizer.enabled = YES;
+        }
+    });
+}
+
 #pragma mark - Swipe
 
 - (BOOL)cyl_swipeToSwitchTabEnabled {
@@ -525,6 +750,12 @@ static BOOL CYLViewIsInHorizontalScrollView(UIView *view, UIView *stopView) {
             return NO;
         }
         UIControl *control = [tabBarController cyl_tabControlAtPoint:[touch locationInView:tabBarController.view]];
+        // [EN] In Liquid Glass the tab buttons' long press comes from UIKit's own gestures
+        //      (`-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:`); this recognizer keeps only the plus button there.
+        // [CN] 液态玻璃下 Tab 按钮的长按来自系统手势（`-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:`）；此时本手势只处理 PlusButton。
+        if (control && ![control cyl_isPlusButton] && [tabBarController cyl_liquidGlassReceivesTabTouches]) {
+            return NO;
+        }
         self.longPressGestureRecognizer.cyl_pressedControl = control;
         // [EN] Lifting the finger after a long press selects the tab only without `didLongPressControl` listeners: those
         //      documented that it does not (issue #535); `CYLTabBarItemGestureLongPress` keeps the selection (issue #152).

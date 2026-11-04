@@ -33,6 +33,7 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Objective-C (delegate)](#objective-c-delegate) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Objective-C (delegate)](#objective-c-delegate) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Swift (delegate)](#swift-delegate) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Swift (delegate)](#swift-delegate) |
 | [Demo](#cndemo) | [Demos](#endemos) |
+| [液态玻璃下的手势](#cn液态玻璃下的手势) | [Gestures in Liquid Glass](#engestures-in-liquid-glass) |
 | [注意事项](#cn注意事项) | [Notes](#ennotes) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
@@ -235,6 +236,19 @@ tabBarController.cyl_tabBarItemGestureHandler = { _, gesture, control, viewContr
 | `Example`（ObjC，`MainTabBarController`） | block 方式：再次点击滚动到顶部，双击调用页面的 `-refresh`，长按弹出菜单（可选中该 Tab）。替换了以前在 `shouldSelectViewController` 中的"再次点击刷新"。 | Block API: reselect scrolls to the top, double tap calls the page's `-refresh`, long press shows a menu (with a way to select the tab). Replaces the old "re-tap to refresh" in `shouldSelectViewController`. |
 | `Example`（扁平样式，`CYLFlatDesignMainTabBarController`） | 代理方法，行为与上一行相同。 | The delegate method, with the same behavior. |
 | `Example-Swift` | Swift 代理方法：再次点击滚动到顶部，双击重新加载并在导航栏提示 1 秒，长按弹出菜单。 | The Swift delegate method: reselect scrolls to the top, double tap reloads and shows a 1-second prompt in the navigation bar, long press shows a menu. |
+
+## [CN]液态玻璃下的手势
+## [EN]Gestures in Liquid Glass
+
+| 中文 | English |
+|:---|:---|
+| **问题**：液态玻璃（iOS 26+）下，Tab 按钮上的触摸由系统自己的手势接收：连续选择手势，以及抬起 lens 的长按手势。库另外添加在 TabBarController 的 view 上的长按手势与它们竞争，收不到触摸，因此长按（以及依赖它的回调）在液态玻璃下不起作用。 | **The problem**: in Liquid Glass (iOS 26+), touches on the tab buttons go to UIKit's own gestures: the continuous selection gesture and the long press that lifts the lens. A long press recognizer that the library added to the tab bar controller's view competes with them and gets no touches, so the long press (and the callbacks built on it) did not work in Liquid Glass. |
+| **做法**：液态玻璃下不再另加手势。`CYLTabBar` 本来就拿到了这两个系统手势（`liquidGlassContinuousGestureRecognizer`、`liquidGlassLongGestureRecognizer`），现在把它们的每次状态变化转发给 TabBarController，由一个跟踪器判断这次触摸是什么：在按下的位置抬起是一次**点击**（Reselect / DoubleTap），按住 `cyl_tabBarItemLongPressDuration` 是**长按**，手指移动超过 10 pt 是在 Tab 间**拖动**切换（两者都不算）。 | **The approach**: in Liquid Glass no gesture is added. `CYLTabBar` already captures both UIKit gestures (`liquidGlassContinuousGestureRecognizer`, `liquidGlassLongGestureRecognizer`); it now forwards every state change to the tab bar controller, where one tracker decides what the press was: lifted where it began is a **tap** (Reselect / DoubleTap), held for `cyl_tabBarItemLongPressDuration` is a **long press**, and moved by more than 10 pt is a **drag** across the tabs (neither). |
+| **按位置找 Tab**：液态玻璃的图层可能代替按钮响应 `hitTest`，因此按位置查找：先查竖向栏的按钮（iOS 27.1），再查 frame 包含触摸点的可见按钮，最后在 TabBar 范围内取水平方向最近的按钮。 | **Finding the tab by position**: Liquid Glass layers can answer `hitTest` instead of the buttons, so the tab is found by position: the vertical bar's buttons (iOS 27.1) first, then a visible button whose frame holds the point, then, inside the tab bar, the horizontally closest one. |
+| **长按后是否选中**：只使用 `CYLTabBarItemGestureLongPress` 时，抬起手指仍会选中该 Tab；设置了 [Tab 交互](Tab-Interactions.md) 的 `didLongPressControl` 回调时，长按被识别后会取消系统手势，抬起手指不会选中该 Tab。与经典样式的规则相同。 | **Selection after a long press**: with only `CYLTabBarItemGestureLongPress`, lifting the finger still selects the tab; with a `didLongPressControl` callback of the [tab interactions](Tab-Interactions.md), UIKit's gesture is cancelled once the long press is recognized, so lifting the finger does not select the tab. The same rule as in the classic style. |
+| **PlusButton**：不经过这个跟踪器，仍使用自己的路径：点击由 PlusButton 的抬起事件计数，长按由库的长按手势识别（液态玻璃下该手势只处理 PlusButton）。 | **The plus button**: not followed by this tracker; it keeps its own paths: its taps are counted on its touch-up, and its long press comes from the library's long press recognizer (which, in Liquid Glass, only takes the plus button). |
+| **参考 Telegram-iOS 的评估**：Telegram 的玻璃 TabBar 不是 `UITabBar`，而是基于其自研 AsyncDisplayKit（`Display`）、ComponentFlow 与 `GlassControls` 绘制的组件，长按由放在自己容器上的 `TapLongTapOrDoubleTapGestureRecognizer` 识别。整体迁移需要用自绘 TabBar 替换 `UITabBar`（相当于本库的扁平样式），会失去系统的液态玻璃；而且 Telegram-iOS 使用 GPL-2.0 许可证，与本库的 MIT 不兼容，不能复制其代码。因此只借鉴了两个思路：一个跟踪器同时处理点击、长按与双击，以及按位置而不是 `hitTest` 找 Tab。 | **Evaluating Telegram-iOS**: Telegram's glass tab bar is not a `UITabBar` but a component drawn with its own AsyncDisplayKit (`Display`), ComponentFlow and `GlassControls`, and its long press comes from a `TapLongTapOrDoubleTapGestureRecognizer` on a container it owns. Moving it over would mean replacing `UITabBar` with a custom-drawn bar (what this library's FlatDesign style is) and losing the system Liquid Glass; and Telegram-iOS is GPL-2.0, which is not compatible with this library's MIT license, so none of its code can be copied. Only two ideas are taken: one tracker for tap, long press and double tap, and finding the tab by position rather than by `hitTest`. |
+| **未验证**：本次修改在没有 Xcode 和模拟器的环境中完成，未在液态玻璃设备上运行。依赖的前提是：系统手势在每次点击 Tab 时都会开始（库已有的「选中状态下再次点击」也依赖这一点）。如果某个系统版本的快速点击不触发它们，跟踪过一次后这些点击不会被计数。 | **Not verified**: this change was made without Xcode or a simulator and has not been run on a Liquid Glass device. It relies on UIKit's gestures beginning for every tap on a tab (the existing re-tap on the selected tab relies on that too). If on some system version a quick tap does not start them, such taps are not counted once a press has been followed. |
 
 ## [CN]注意事项
 ## [EN]Notes

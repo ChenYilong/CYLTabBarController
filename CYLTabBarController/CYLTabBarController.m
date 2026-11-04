@@ -298,6 +298,7 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 /// [EN] FIX: issue #535 — implemented in CYLTabBarController+CYLInteraction.m. [CN] 实现位于 CYLTabBarController+CYLInteraction.m。
 @interface CYLTabBarController (CYLInteractionInstall)
 - (void)cyl_installInteractionGestureRecognizersIfNeeded;
+- (BOOL)cyl_liquidGlassTakesTabTaps;
 @end
 
 /// FIX: issue #475. The title offset a tab asked for itself; see `-setTitlePositionAdjustment:`.
@@ -5576,6 +5577,14 @@ static char CYLTabBarItemGestureStateKey;
     if (!control) {
         return;
     }
+    // [EN] Liquid Glass: tab taps are counted when UIKit's own gesture ends (`-cyl_recognizeLiquidGlassTapOnControl:…`),
+    //      which knows whether the press was a tap, a long press or a drag. The plus child view controller is still counted
+    //      here, as before.
+    // [CN] 液态玻璃：Tab 的点击在系统手势结束时计数（`-cyl_recognizeLiquidGlassTapOnControl:…`），那里知道这次是点击、长按还是拖动。
+    //      PlusButton 子控制器仍和以前一样在这里计数。
+    if (![control cyl_isPlusButton] && [self cyl_liquidGlassTakesTabTaps]) {
+        return;
+    }
     CYLTabBarItemGestureState *state = [self cyl_tabBarItemGestureState];
     BOOL isFirstTapFromHere = !state.receivesTabTapsBeforeSelection;
     state.receivesTabTapsBeforeSelection = YES;
@@ -5602,6 +5611,29 @@ static char CYLTabBarItemGestureStateKey;
  *      `-setSelectedIndex:`、Tab 按钮事件、液态玻璃下手指按下时的 `-gestureRecognizerShouldBegin:`、`-cyl_flatDesignPlusButtonTouchUpInside:`），
  *      因此手势不使用它们。`selectedViewController` 为手指按下时选中的控制器（执行到这里时子控制器可能已被选中）；没有按下（代码发送的事件）时为 nil。
  */
+/*!
+ * FIX: issue #152 — taps on tab buttons in Liquid Glass.
+ * [EN] Called by `-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:` (CYLTabBarController+CYLInteraction.m) when UIKit's
+ *      Liquid Glass gesture ends where it began, without a long press: one tap. `selectedViewController` is what was
+ *      selected on touch down, so a tap on the selected tab is a Reselect even if UIKit already selected it on touch down.
+ *      From then on the `didSelectControl` reports are not counted for tab buttons, as for the shouldSelect entry.
+ * [CN] 系统液态玻璃手势在按下的位置结束、且不是长按时，由 `-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:`
+ *      （CYLTabBarController+CYLInteraction.m）调用：一次点击。`selectedViewController` 为手指按下时选中的控制器，因此点击已选中的 Tab
+ *      时，即使系统在按下时已选中它，也算 Reselect。此后与 shouldSelect 入口一样，Tab 按钮不再使用 `didSelectControl` 上报计数。
+ */
+- (void)cyl_recognizeLiquidGlassTapOnControl:(UIControl *)control selectedViewControllerAtTouchDown:(UIViewController *)selectedViewController {
+    if (![self cyl_hasTabBarItemGestureReceiver]) {
+        return;
+    }
+    UIViewController *viewController = nil;
+    if (![self cyl_isTabBarItemGestureControl:control viewController:&viewController]) {
+        return;
+    }
+    [self cyl_tabBarItemGestureState].receivesTabTapsBeforeSelection = YES;
+    BOOL isReselect = viewController && (viewController == selectedViewController);
+    [self cyl_recognizeTabBarItemTapOnControl:control viewController:viewController isReselect:isReselect];
+}
+
 - (void)cyl_recognizePlusButtonTap:(UIControl *)plusButton selectedViewControllerAtTouchDown:(UIViewController *)selectedViewController {
     // Guard: only with a plus button. 仅在有 PlusButton 时处理。
     if (![self cyl_hasTabBarItemGestureReceiver] || ![self hasPlusButton]) {
