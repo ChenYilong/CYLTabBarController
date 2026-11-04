@@ -61,8 +61,18 @@ fi
 echo "Build succeeded."
 
 echo "Simulator: $DEVICE_ID"
-APP=$(find "$DERIVED/Build/Products/Debug-iphonesimulator" -maxdepth 1 -name '*.app' | head -n 1)
-[ -n "$APP" ] || { echo "No .app was built"; exit 1; }
+# [EN] Where Xcode put the app (TARGET_BUILD_DIR / WRAPPER_NAME), else any .app under the products.
+# [CN] Xcode 生成 App 的位置（TARGET_BUILD_DIR / WRAPPER_NAME），没有时在产物目录中查找任意 .app。
+SETTINGS=$(xcodebuild -workspace CYLTabBarController.xcworkspace -scheme CYLTabBarController -configuration Debug \
+  -sdk iphonesimulator -destination "id=$DEVICE_ID" -derivedDataPath "$DERIVED" -showBuildSettings 2>/dev/null || true)
+TARGET_BUILD_DIR=$(echo "$SETTINGS" | awk -F' = ' '/^ *TARGET_BUILD_DIR = /{print $2; exit}')
+WRAPPER_NAME=$(echo "$SETTINGS" | awk -F' = ' '/^ *WRAPPER_NAME = /{print $2; exit}')
+APP="$TARGET_BUILD_DIR/$WRAPPER_NAME"
+if [ -z "$WRAPPER_NAME" ] || [ ! -d "$APP" ]; then
+  APP=$(find "$DERIVED/Build/Products" -maxdepth 4 -name '*.app' -not -path '*/PlugIns/*' | head -n 1)
+fi
+[ -n "$APP" ] && [ -d "$APP" ] || { echo "No .app was built"; find "$DERIVED/Build/Products" -maxdepth 3 | head -n 40; exit 1; }
+echo "App bundle: $APP"
 BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
 
 echo "App: $BUNDLE_ID"
