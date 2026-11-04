@@ -815,6 +815,39 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 }
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
+
+#pragma mark - Views inserted into tab buttons
+
+/// [EN] Key of the weak control a marked view was inserted for. [CN] 被标记视图所属控件（弱引用）的 key。
+static const void *const CYLInsertedForTabControlKey = &CYLInsertedForTabControlKey;
+
+/// [EN] Every marked view, held weakly. [CN] 所有被标记的视图（弱引用）。
+static NSHashTable<UIView *> *CYLInsertedTabControlViewTable(void) {
+    static NSHashTable<UIView *> *table;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        table = [NSHashTable weakObjectsHashTable];
+    });
+    return table;
+}
+
+- (void)cyl_markAsInsertedForTabControl:(UIControl *)control {
+    [self cyl_setWeakAssociatedObject:control forKey:CYLInsertedForTabControlKey];
+    if (control) {
+        [CYLInsertedTabControlViewTable() addObject:self];
+    } else {
+        [CYLInsertedTabControlViewTable() removeObject:self];
+    }
+}
+
+- (UIControl *)cyl_insertedForTabControl {
+    return [self cyl_weakAssociatedObjectForKey:CYLInsertedForTabControlKey];
+}
+
++ (NSArray<UIView *> *)cyl_insertedTabControlViews {
+    return CYLInsertedTabControlViewTable().allObjects;
+}
+
 @end
 
 @implementation UIView (CYLTabBarMetrics)

@@ -29,7 +29,14 @@ static void *const CYLTabBarItemBadgeValueContext = (void*)&CYLTabBarItemBadgeVa
 // [EN] Implemented in CYLTabBarController+CYLInteraction.m: a tab item's `badgeValue` changed.
 // [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：某个 Tab item 的 `badgeValue` 发生了变化。
 - (void)cyl_tabBarItemBadgeValueDidChange:(UITabBarItem *)item;
+// [EN] Implemented in CYLTabBarController.m: the plus button in the Liquid Glass layers, idempotent.
+// [CN] 在 CYLTabBarController.m 中实现：液态玻璃图层中的 PlusButton，可重复调用。
+- (void)cyl_layOutPlusButtonInLiquidGlassLayers;
 @end
+
+/// [EN] Key of the `hidden` value a view inserted by the library had before More editing hid it.
+/// [CN] 「More」编辑隐藏本库插入的视图之前，该视图原来的 `hidden` 值的 key。
+static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomizingKey;
 
 // [EN] FIX: issue #152 / #535 — implemented in CYLTabBarController+CYLInteraction.m.
 // [CN] FIX: issue #152 / #535 — 实现位于 CYLTabBarController+CYLInteraction.m。
@@ -316,6 +323,64 @@ static void *const CYLTabBarItemBadgeValueContext = (void*)&CYLTabBarItemBadgeVa
     // The tab titles may have moved: lay the plus button out again so its title follows them
     // (`+alignsTitleWithTabBarItemTitles`).
     [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];
+    // [EN] The Liquid Glass selected layer can appear in a tab bar layout pass only: put the plus button's stand-in in it
+    //      now rather than after a fixed delay. Idempotent; does nothing without Liquid Glass or a plus button.
+    // [CN] 液态玻璃的选中层可能只在 TabBar 的布局中出现：此时就放入 PlusButton 的替身，而不是固定延迟之后。可重复调用；没有液态玻璃
+    //      或 PlusButton 时不做任何事。
+    [self.tabBarController cyl_layOutPlusButtonInLiquidGlassLayers];
+}
+
+#pragma mark - More editing
+
+/*!
+ * [EN] More editing ("Edit" on the More page) lets the user drag items onto the tab bar, and UIKit moves and rebuilds the
+ *      tab buttons. The views the library inserted into them (`-cyl_markAsInsertedForTabControl:`) and the plus button
+ *      are hidden meanwhile, so none is left at a stale position, and they come back when editing ends; the next layout
+ *      puts the plus button's stand-in in the new buttons. The library does not support More editing as such: this only
+ *      keeps it from leaving views behind.
+ * [CN] 「More」编辑（More 页面中的 "Edit"）允许用户把 item 拖到 TabBar 上，UIKit 会移动并重建 Tab 按钮。编辑期间隐藏本库插入其中的视图
+ *      （`-cyl_markAsInsertedForTabControl:`）与 PlusButton，避免留在过时的位置；编辑结束后恢复，下一次布局会把 PlusButton 的替身放进
+ *      新按钮。本库并不支持「More」编辑本身，这里只是避免它留下残留视图。
+ */
+- (void)beginCustomizingItems:(NSArray<UITabBarItem *> *)items {
+    [self cyl_setInsertedViewsHiddenForCustomizing:YES];
+    [super beginCustomizingItems:items];
+}
+
+- (BOOL)endCustomizingAnimated:(BOOL)animated {
+    BOOL changed = [super endCustomizingAnimated:animated];
+    [self cyl_setInsertedViewsHiddenForCustomizing:NO];
+    [self setNeedsLayout];
+    return changed;
+}
+
+/// [EN] Hides (YES) or restores (NO) the plus button and every inserted view inside this tab bar, in one pass.
+/// [CN] 一次性隐藏（YES）或恢复（NO）PlusButton 与本 TabBar 中所有被插入的视图。
+- (void)cyl_setInsertedViewsHiddenForCustomizing:(BOOL)hidden {
+    NSMutableArray<UIView *> *views = [NSMutableArray array];
+    for (UIView *view in [UIView cyl_insertedTabControlViews]) {
+        if ([view isDescendantOfView:self] || (!hidden && objc_getAssociatedObject(view, CYLHiddenBeforeCustomizingKey))) {
+            [views addObject:view];
+        }
+    }
+    UIView *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    if (plusButton && ([plusButton isDescendantOfView:self] || objc_getAssociatedObject(plusButton, CYLHiddenBeforeCustomizingKey))) {
+        [views addObject:plusButton];
+    }
+    for (UIView *view in views) {
+        if (hidden) {
+            if (!objc_getAssociatedObject(view, CYLHiddenBeforeCustomizingKey)) {
+                objc_setAssociatedObject(view, CYLHiddenBeforeCustomizingKey, @(view.hidden), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
+            view.hidden = YES;
+        } else {
+            NSNumber *hiddenBefore = objc_getAssociatedObject(view, CYLHiddenBeforeCustomizingKey);
+            if (hiddenBefore) {
+                view.hidden = hiddenBefore.boolValue;
+                objc_setAssociatedObject(view, CYLHiddenBeforeCustomizingKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
+        }
+    }
 }
 
 #pragma mark - Item positioning (centered, item width, item spacing)

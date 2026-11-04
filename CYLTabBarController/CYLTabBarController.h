@@ -17,6 +17,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/FlatDesign-StandardAppearance.md
 //   - Automatic centering of image-only tabs / 纯图标 Tab 的自动居中
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Image-Only-Tabs.md
+//   - Liquid Glass Robustness / 液态玻璃的健壮性改进
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Liquid-Glass-Robustness.md
 //   - Tabs That Need Login / 需要登录的 Tab
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Login-Required-Tabs.md
 //   - PlusButton badge: changes on every tap / PlusButton 角标：每次点击都会变化

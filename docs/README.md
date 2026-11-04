@@ -21,6 +21,7 @@
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
+| [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
 | [PlusButton 角标：每次点击都会变化](PlusButton-Badge.md) | [PlusButton badge: changes on every tap](PlusButton-Badge.md) |
 | [有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应](PlusButton-Lottie-TabIcon.md) | [Lottie tab icons and their files when there is a PlusButton](PlusButton-Lottie-TabIcon.md) |
@@ -65,6 +66,7 @@ docs/
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
 ├── Image-Only-Tabs.md
+├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
 ├── PlusButton-Badge.md
 ├── PlusButton-Lottie-TabIcon.md
