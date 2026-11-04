@@ -208,6 +208,43 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex și PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Atingeți pentru a selecta fila următoare. Index fără PlusButton: %1$@, selectedIndex: %2$@, acum: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Mărește și micșorează";
+"从小放大" = "Apropiere";
+"弹性" = "Săritură";
+"弹性 + 烟花" = "Săritură + artificii";
+"旋转" = "Rotire";
+"翻转" = "Întoarcere";
+"飘散" = "Risipire";
+"无" = "Niciuna";
+"Tab 点击动画（issue #535）" = "Animația la atingerea filelor (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Atingeți pentru a schimba animația la atingerea filelor și a PlusButton. Acum: %@";
+"长按了「%@」" = "Apăsare lungă pe „%@”";
+"左右滑动切换 Tab（issue #535）" = "Glisare pentru schimbarea filei (issue #535)";
+"长按 Tab（issue #535）" = "Apăsare lungă pe file (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Activați comutatorul, apoi glisați la stânga sau la dreapta pe pagină pentru fila următoare sau anterioară.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Activați comutatorul, apoi apăsați lung orice filă sau PlusButton pentru a vedea identificatorul.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Rotire (doar această filă: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Cadre + artificii (toate filele: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Răspuns în afara vizualizării părinte (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Cu comutatorul activat, răspunde și partea butonului din afara casetei gri; fiecare atingere redă animația de scalare. Atingeri: %@";
+"已找到" = "Găsită";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Negăsită (cu use_frameworks pachetul de resurse este în framework)";
+"从 bundle 加载图片（issue #535）" = "Încărcarea imaginilor dintr-un bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Imaginea din stânga este citită din pachetul de resurse cu CYLImageInBundle (fără cache). CYLBundleImage în bundle-ul principal: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Acesta este un UIViewController obișnuit care nu moștenește CYLBaseViewController. Bara de navigare este ascunsă.";
+"不继承基类隐藏导航栏（issue #535）" = "Ascunderea barei de navigare fără clasă de bază (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Comutatorul setează cyl_automaticNavigationSettingEnabled; atingeți rândul pentru a deschide un UIViewController obișnuit care setează cyl_navigationBarHidden și cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Pagina %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Tranziție glisantă (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Atingeți pentru a deschide un UITabBarController de sistem: atingeți o filă sau trageți pagina la stânga sau la dreapta, iar pagina glisează odată cu degetul.";
+
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "Micșorează / ascunde TabBar la derulare (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "Atingeți pentru a schimba comportamentul la derulare. Acum: %@. Liquid Glass (iOS 26+): sistemul micșorează TabBar; FlatDesign și stilul clasic (iOS 25 și anterioare, modul de compatibilitate a interfeței din iOS 26): TabBar se ascunde.";
 "当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Nu este acceptat de acest stil de bară: doar FlatDesign (CYLFlatDesignTabBar)";
 "当前 TabBar 样式不支持" = "Nu este acceptat de acest stil de bară";
 "该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Necesită elemente de filă FlatDesign (CYLFlatDesignTabBarItem). În Liquid Glass și stilul clasic sistemul desenează elementele, deci aspectul și culoarea fundalului nu pot fi schimbate.";
@@ -218,3 +255,25 @@
 "跳转与对比" = "Navigare și comparații";
 "角标" = "Insigne";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Nu este acceptat de Liquid Glass: sistemul stabilește înălțimea barei (FlatDesign și stilul clasic acceptă)";
+"默认点击声" = "Clic implicit";
+"中等触感反馈" = "Feedback haptic mediu";
+"无需继承基类与工具方法" = "Fără clasă de bază, și utilitare";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Fila anterioară / următoare (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Referință slabă: obținută în viață %@, nil după eliberare %@. De la %@ la butonul filei selectate: %@";
+"点击声 + 触感反馈" = "Clic + haptic";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Săritură + artificii cu stele (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Atingeți săgețile din dreapta pentru a apela cyl_switchToAdjacentTabWithStep:-1 / 1. Ca o glisare, sare peste PlusButton și verifică autentificarea. Ultimul rezultat: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Atingeți pentru a comuta, apoi atingeți orice filă sau PlusButton pentru a-l auzi. Hapticul vibrează doar pe un dispozitiv real. Acum: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Atingeți pentru a rula: cyl_setWeakAssociatedObject:forKey: returnează nil după eliberarea obiectului; cyl_nearestControlBelowView: găsește butonul filei selectate din pictograma sa.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Atingeți pentru a comuta. cyl_tabBarItemLongPressDuration: %@ s, cyl_tabButtonLongPressMinimumDuration: %@ s, cyl_tabBarItemDoubleTapInterval: %@ s";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Fișier de sunet propriu (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Rulare în sus, fără animație la deselectare (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Mărire și micșorare lentă (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Apropiere lentă (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: obiecte asociate slab și găsirea unui buton (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Durata apăsării lungi și intervalul atingerii duble (issue #535 / #152)";
+"Tab 交互" = "Interacțiuni cu filele";
+"Tab 点击声音与触感反馈（issue #535）" = "Sunet și haptic la atingerea filelor (issue #535)";
+"轻触感反馈" = "Feedback haptic ușor";
+"重触感反馈" = "Feedback haptic puternic";
+"长按（#152）" = "Apăsare lungă (#152)";

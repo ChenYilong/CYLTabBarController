@@ -208,6 +208,43 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex és a PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Koppintson a következő lap kiválasztásához. Index PlusButton nélkül: %1$@, selectedIndex: %2$@, most: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Nagyítás és kicsinyítés";
+"从小放大" = "Ránagyítás";
+"弹性" = "Pattanás";
+"弹性 + 烟花" = "Pattanás + tűzijáték";
+"旋转" = "Forgatás";
+"翻转" = "Átfordítás";
+"飘散" = "Elillanás";
+"无" = "Nincs";
+"Tab 点击动画（issue #535）" = "Lapok koppintási animációja (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Koppintson a lapok és a PlusButton koppintási animációjának váltásához. Jelenleg: %@";
+"长按了「%@」" = "Hosszan megnyomva: „%@”";
+"左右滑动切换 Tab（issue #535）" = "Lapváltás legyintéssel (issue #535)";
+"长按 Tab（issue #535）" = "Lapok hosszú megnyomása (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Kapcsolja be a kapcsolót, majd legyintsen balra vagy jobbra az oldalon a következő vagy az előző laphoz.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Kapcsolja be a kapcsolót, majd nyomjon hosszan bármelyik lapra vagy a PlusButtonra az azonosítója megjelenítéséhez.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Forgatás (csak ez a lap: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Képkockák + tűzijáték (minden lap: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Reagálás a szülőnézeten kívül (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Bekapcsolt kapcsolónál a gomb szürke dobozon kívüli része is reagál; minden koppintás lejátssza a méretezési animációt. Koppintások: %@";
+"已找到" = "Megtalálva";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Nem található (use_frameworks esetén az erőforráscsomag a frameworkben van)";
+"从 bundle 加载图片（issue #535）" = "Képek betöltése bundle-ből (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "A bal oldali kép az erőforráscsomagból töltődik be CYLImageInBundle segítségével (gyorsítótár nélkül). CYLBundleImage a fő bundle-ben: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Ez egy egyszerű UIViewController, amely nem a CYLBaseViewController leszármazottja. A navigációs sáv el van rejtve.";
+"不继承基类隐藏导航栏（issue #535）" = "Navigációs sáv elrejtése alaposztály nélkül (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "A kapcsoló beállítja: cyl_automaticNavigationSettingEnabled; koppintson a sorra egy egyszerű UIViewController megnyitásához, amely beállítja: cyl_navigationBarHidden és cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "%@. oldal";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Csúszó átmenet (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Koppintson egy rendszer UITabBarController megnyitásához: koppintson egy lapra, vagy húzza az oldalt balra vagy jobbra, és az oldal követi az ujját.";
+
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "TabBar kicsinyítése / elrejtése görgetéskor (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "Koppintson a görgetési viselkedés módosításához. Most: %@. Liquid Glass (iOS 26+): a rendszer kicsinyíti a TabBart; FlatDesign és a klasszikus stílus (iOS 25 és korábbi, az iOS 26 UI-kompatibilitási módja): a TabBar elrejtődik.";
 "当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Ez a lapsávstílus nem támogatja: csak FlatDesign (CYLFlatDesignTabBar)";
 "当前 TabBar 样式不支持" = "Ez a lapsávstílus nem támogatja";
 "该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "FlatDesign lapelemek (CYLFlatDesignTabBarItem) szükségesek. Liquid Glass és a klasszikus stílus esetén a rendszer rajzolja az elemeket, így az elrendezés és a háttérszín nem módosítható.";
@@ -218,3 +255,25 @@
 "跳转与对比" = "Navigáció és összehasonlítás";
 "角标" = "Jelvények";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nem támogatja: a lapsáv magasságát a rendszer adja meg (FlatDesign és a klasszikus stílus támogatja)";
+"默认点击声" = "Alapértelmezett kattanás";
+"中等触感反馈" = "Közepes haptikus visszajelzés";
+"无需继承基类与工具方法" = "Alaposztály nélkül, és segédeszközök";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Előző / következő lap (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Gyenge hivatkozás: élve megvan %@, felszabadítás után nil %@. %@ elemtől a kijelölt lap gombjáig: %@";
+"点击声 + 触感反馈" = "Kattanás + haptika";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Pattanás + csillagtűzijáték (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Koppintson a jobb oldali nyilakra a(z) cyl_switchToAdjacentTabWithStep:-1 / 1 hívásához. A húzáshoz hasonlóan kihagyja a PlusButtont és ellenőrzi a bejelentkezést. Utolsó eredmény: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Koppintson a váltáshoz, majd koppintson bármelyik lapra vagy a PlusButtonra a meghallgatáshoz. A haptika csak valódi eszközön rezeg. Most: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Koppintson a futtatáshoz: a(z) cyl_setWeakAssociatedObject:forKey: nil-t ad vissza az objektum felszabadítása után; a(z) cyl_nearestControlBelowView: a kijelölt lap ikonjából megtalálja a gombját.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Koppintson a váltáshoz. cyl_tabBarItemLongPressDuration: %@ mp, cyl_tabButtonLongPressMinimumDuration: %@ mp, cyl_tabBarItemDoubleTapInterval: %@ mp";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Saját hangfájl (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Felfelé hajtás, kijelölés megszüntetése animáció nélkül (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Lassú nagyítás és kicsinyítés (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Lassú ránagyítás (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: gyenge társított objektumok és gomb keresése (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Hosszú nyomás időtartama és dupla koppintás időköze (issue #535 / #152)";
+"Tab 交互" = "Lapinterakciók";
+"Tab 点击声音与触感反馈（issue #535）" = "Lapkoppintás hangja és haptikája (issue #535)";
+"轻触感反馈" = "Enyhe haptikus visszajelzés";
+"重触感反馈" = "Erős haptikus visszajelzés";
+"长按（#152）" = "Hosszú nyomás (#152)";

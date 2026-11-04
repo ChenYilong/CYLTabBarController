@@ -208,6 +208,43 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex і PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Торкніться, щоб вибрати наступну вкладку. Індекс без PlusButton: %1$@, selectedIndex: %2$@, зараз: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Збільшити й зменшити";
+"从小放大" = "Наближення";
+"弹性" = "Відскок";
+"弹性 + 烟花" = "Відскок + феєрверк";
+"旋转" = "Обертання";
+"翻转" = "Перевертання";
+"飘散" = "Розвіювання";
+"无" = "Немає";
+"Tab 点击动画（issue #535）" = "Анімація натискання вкладок (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Торкніться, щоб змінити анімацію натискання вкладок і PlusButton. Зараз: %@";
+"长按了「%@」" = "Довге натискання на «%@»";
+"左右滑动切换 Tab（issue #535）" = "Перемикання вкладок гортанням (issue #535)";
+"长按 Tab（issue #535）" = "Довге натискання на вкладки (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Увімкніть перемикач і гортайте сторінку ліворуч або праворуч, щоб перейти до наступної чи попередньої вкладки.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Увімкніть перемикач і довго натисніть будь-яку вкладку або PlusButton, щоб побачити її ідентифікатор.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Обертання (лише ця вкладка: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Кадри + феєрверк (усі вкладки: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Реакція поза батьківським поданням (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Коли перемикач увімкнено, реагує й частина кнопки поза сірим прямокутником; кожне натискання запускає анімацію масштабу. Натискань: %@";
+"已找到" = "Знайдено";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Не знайдено (з use_frameworks пакет ресурсів розташований у framework)";
+"从 bundle 加载图片（issue #535）" = "Завантаження зображень із bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Зображення ліворуч прочитано з пакета ресурсів за допомогою CYLImageInBundle (без кешу). CYLBundleImage в основному bundle: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Це звичайний UIViewController, що не успадковує CYLBaseViewController. Панель навігації приховано.";
+"不继承基类隐藏导航栏（issue #535）" = "Приховати панель навігації без базового класу (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Перемикач задає cyl_automaticNavigationSettingEnabled; торкніться рядка, щоб відкрити звичайний UIViewController, який задає cyl_navigationBarHidden і cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Сторінка %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Перехід зсувом (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Торкніться, щоб відкрити системний UITabBarController: торкніться вкладки або потягніть сторінку ліворуч чи праворуч, і сторінка рухатиметься за пальцем.";
+
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "Згортати / приховувати TabBar під час прокручування (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "Торкніться, щоб змінити поведінку під час прокручування. Зараз: %@. Liquid Glass (iOS 26+): система згортає TabBar; FlatDesign і класичний стиль (iOS 25 і раніше, режим сумісності інтерфейсу iOS 26): TabBar приховується.";
 "当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Не підтримується цим стилем панелі: лише FlatDesign (CYLFlatDesignTabBar)";
 "当前 TabBar 样式不支持" = "Не підтримується цим стилем панелі";
 "该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Потрібні вкладки FlatDesign (CYLFlatDesignTabBarItem). У Liquid Glass і класичному стилі вкладки малює система, тож їхнє розташування й колір тла змінити не можна.";
@@ -218,3 +255,25 @@
 "跳转与对比" = "Навігація та порівняння";
 "角标" = "Бейджі";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Не підтримується в Liquid Glass: висоту панелі задає система (FlatDesign і класичний стиль підтримують)";
+"默认点击声" = "Стандартне клацання";
+"中等触感反馈" = "Середній тактильний відгук";
+"无需继承基类与工具方法" = "Без базового класу та утиліти";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Попередня / наступна вкладка (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Слабке посилання: отримано за життя %@, nil після звільнення %@. Від %@ до кнопки вибраної вкладки: %@";
+"点击声 + 触感反馈" = "Клацання + відгук";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Пружина + зоряний феєрверк (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Торкніться стрілок праворуч, щоб викликати cyl_switchToAdjacentTabWithStep:-1 / 1. Як і свайп, пропускає PlusButton і перевіряє вхід. Останній результат: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Торкніться, щоб перемкнути, потім торкніться будь-якої вкладки або PlusButton, щоб почути. Тактильний відгук працює лише на справжньому пристрої. Зараз: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Торкніться, щоб запустити: cyl_setWeakAssociatedObject:forKey: повертає nil після звільнення об’єкта; cyl_nearestControlBelowView: знаходить кнопку вибраної вкладки за її значком.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Торкніться, щоб перемкнути. cyl_tabBarItemLongPressDuration: %@ с, cyl_tabButtonLongPressMinimumDuration: %@ с, cyl_tabBarItemDoubleTapInterval: %@ с";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Власний звуковий файл (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Загин угору, без анімації зняття вибору (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Повільне збільшення та зменшення (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Повільне наближення (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: слабкі пов’язані об’єкти та пошук кнопки (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Тривалість довгого натискання та інтервал подвійного дотику (issue #535 / #152)";
+"Tab 交互" = "Взаємодія з вкладками";
+"Tab 点击声音与触感反馈（issue #535）" = "Звук і відгук під час натискання вкладок (issue #535)";
+"轻触感反馈" = "Легкий тактильний відгук";
+"重触感反馈" = "Сильний тактильний відгук";
+"长按（#152）" = "Довге натискання (#152)";

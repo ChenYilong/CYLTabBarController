@@ -208,6 +208,43 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex และ PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "แตะเพื่อเลือกแท็บถัดไป ดัชนีที่ไม่นับ PlusButton: %1$@, selectedIndex: %2$@, ขณะนี้: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "ขยายแล้วย่อ";
+"从小放大" = "ซูมเข้า";
+"弹性" = "เด้ง";
+"弹性 + 烟花" = "เด้ง + พลุ";
+"旋转" = "หมุน";
+"翻转" = "พลิก";
+"飘散" = "จางหาย";
+"无" = "ไม่มี";
+"Tab 点击动画（issue #535）" = "แอนิเมชันการแตะแท็บ (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "แตะเพื่อเปลี่ยนแอนิเมชันการแตะของแท็บและ PlusButton ขณะนี้: %@";
+"长按了「%@」" = "กดค้างที่ \"%@\"";
+"左右滑动切换 Tab（issue #535）" = "ปัดเพื่อสลับแท็บ (issue #535)";
+"长按 Tab（issue #535）" = "กดแท็บค้างไว้ (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "เปิดสวิตช์ แล้วปัดซ้ายหรือขวาบนหน้าเพื่อไปยังแท็บถัดไปหรือก่อนหน้า";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "เปิดสวิตช์ แล้วกดแท็บใดก็ได้หรือ PlusButton ค้างไว้เพื่อดูตัวระบุ";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "หมุน (เฉพาะแท็บนี้: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "เฟรม + พลุ (ทุกแท็บ: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "ตอบสนองนอกมุมมองหลัก (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "เมื่อเปิดสวิตช์ ส่วนของปุ่มที่อยู่นอกกรอบสีเทาก็ตอบสนองด้วย ทุกครั้งที่แตะจะเล่นแอนิเมชันขยาย จำนวนครั้งที่แตะ: %@";
+"已找到" = "พบแล้ว";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "ไม่พบ (เมื่อใช้ use_frameworks ชุดทรัพยากรจะอยู่ใน framework)";
+"从 bundle 加载图片（issue #535）" = "โหลดรูปภาพจาก bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "รูปทางซ้ายอ่านจากชุดทรัพยากรด้วย CYLImageInBundle (ไม่แคช) CYLBundleImage ใน bundle หลัก: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "นี่คือ UIViewController ธรรมดาที่ไม่ได้สืบทอดจาก CYLBaseViewController แถบนำทางถูกซ่อนอยู่";
+"不继承基类隐藏导航栏（issue #535）" = "ซ่อนแถบนำทางโดยไม่ใช้คลาสฐาน (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "สวิตช์ตั้งค่า cyl_automaticNavigationSettingEnabled แตะแถวเพื่อเปิด UIViewController ธรรมดาที่ตั้งค่า cyl_navigationBarHidden และ cyl_hidesAncestorNavigationBars";
+"页面 %@" = "หน้า %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "การเปลี่ยนแบบเลื่อน (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "แตะเพื่อเปิด UITabBarController ของระบบ: แตะแท็บหรือลากหน้าไปทางซ้ายหรือขวา แล้วหน้าจะเลื่อนตามนิ้ว";
+
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "ย่อ / ซ่อน TabBar เมื่อเลื่อน (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "แตะเพื่อเปลี่ยนการทำงานเมื่อเลื่อน ตอนนี้: %@ Liquid Glass (iOS 26+): ระบบย่อ TabBar; FlatDesign และสไตล์คลาสสิก (iOS 25 และก่อนหน้า, โหมดความเข้ากันได้ของ UI ใน iOS 26): ซ่อน TabBar";
 "当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "รูปแบบแถบแท็บนี้ไม่รองรับ: เฉพาะ FlatDesign (CYLFlatDesignTabBar)";
 "当前 TabBar 样式不支持" = "รูปแบบแถบแท็บนี้ไม่รองรับ";
 "该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "ต้องใช้รายการแท็บ FlatDesign (CYLFlatDesignTabBarItem) ใน Liquid Glass และรูปแบบคลาสสิก ระบบเป็นผู้วาดรายการ จึงเปลี่ยนเลย์เอาต์และสีพื้นหลังไม่ได้";
@@ -218,3 +255,25 @@
 "跳转与对比" = "การนำทางและการเปรียบเทียบ";
 "角标" = "ป้าย";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass ไม่รองรับ: ระบบกำหนดความสูงของแถบแท็บ (FlatDesign และรูปแบบคลาสสิกรองรับ)";
+"默认点击声" = "เสียงคลิกเริ่มต้น";
+"中等触感反馈" = "การสั่นตอบสนองระดับกลาง";
+"无需继承基类与工具方法" = "ไม่ต้องสืบทอดคลาสพื้นฐาน และเครื่องมือ";
+"切换到上一个 / 下一个 Tab（issue #535）" = "แท็บก่อนหน้า / ถัดไป (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "การอ้างอิงแบบอ่อน: พบขณะยังอยู่ %@, เป็น nil หลังปล่อย %@ จาก %@ ไปยังปุ่มแท็บที่เลือก: %@";
+"点击声 + 触感反馈" = "เสียงคลิก + การสั่น";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "เด้ง + พลุดาว (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "แตะลูกศรด้านขวาเพื่อเรียก cyl_switchToAdjacentTabWithStep:-1 / 1 เช่นเดียวกับการปัด จะข้าม PlusButton และตรวจสอบการเข้าสู่ระบบ ผลล่าสุด: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "แตะเพื่อสลับ แล้วแตะแท็บใดก็ได้หรือ PlusButton เพื่อฟัง การสั่นตอบสนองทำงานบนอุปกรณ์จริงเท่านั้น ปัจจุบัน: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "แตะเพื่อเรียกใช้: cyl_setWeakAssociatedObject:forKey: คืนค่า nil เมื่อวัตถุถูกปล่อย; cyl_nearestControlBelowView: หาปุ่มของแท็บที่เลือกจากไอคอน";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "แตะเพื่อสลับ cyl_tabBarItemLongPressDuration: %@ วินาที, cyl_tabButtonLongPressMinimumDuration: %@ วินาที, cyl_tabBarItemDoubleTapInterval: %@ วินาที";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "ไฟล์เสียงกำหนดเอง (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "ม้วนขึ้น ไม่มีแอนิเมชันเมื่อยกเลิกการเลือก (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "ขยายและย่อช้าๆ (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "ซูมเข้าช้าๆ (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils ออบเจ็กต์ที่เชื่อมแบบอ่อนและการหาปุ่ม (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "ระยะเวลากดค้างและช่วงแตะสองครั้ง (issue #535 / #152)";
+"Tab 交互" = "การโต้ตอบแท็บ";
+"Tab 点击声音与触感反馈（issue #535）" = "เสียงและการสั่นเมื่อแตะแท็บ (issue #535)";
+"轻触感反馈" = "การสั่นตอบสนองเบา";
+"重触感反馈" = "การสั่นตอบสนองแรง";
+"长按（#152）" = "กดค้าง (#152)";

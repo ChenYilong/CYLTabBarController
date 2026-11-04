@@ -208,6 +208,43 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex και PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Πατήστε για επιλογή της επόμενης καρτέλας. Δείκτης χωρίς PlusButton: %1$@, selectedIndex: %2$@, τώρα: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Μεγέθυνση και σμίκρυνση";
+"从小放大" = "Μεγέθυνση";
+"弹性" = "Αναπήδηση";
+"弹性 + 烟花" = "Αναπήδηση + πυροτεχνήματα";
+"旋转" = "Περιστροφή";
+"翻转" = "Αναστροφή";
+"飘散" = "Διάχυση";
+"无" = "Κανένα";
+"Tab 点击动画（issue #535）" = "Κίνηση πατήματος καρτελών (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Πατήστε για αλλαγή της κίνησης πατήματος των καρτελών και του PlusButton. Τώρα: %@";
+"长按了「%@」" = "Παρατεταμένο πάτημα στο «%@»";
+"左右滑动切换 Tab（issue #535）" = "Σάρωση για αλλαγή καρτέλας (issue #535)";
+"长按 Tab（issue #535）" = "Παρατεταμένο πάτημα καρτελών (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Ενεργοποιήστε τον διακόπτη και σαρώστε αριστερά ή δεξιά στη σελίδα για την επόμενη ή την προηγούμενη καρτέλα.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Ενεργοποιήστε τον διακόπτη και πατήστε παρατεταμένα μια καρτέλα ή το PlusButton για να δείτε το αναγνωριστικό του.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Περιστροφή (μόνο αυτή η καρτέλα: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Καρέ + πυροτεχνήματα (όλες οι καρτέλες: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Απόκριση εκτός της γονικής προβολής (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Με τον διακόπτη ενεργό, ανταποκρίνεται και το τμήμα του κουμπιού έξω από το γκρι πλαίσιο· κάθε πάτημα παίζει την κίνηση κλιμάκωσης. Πατήματα: %@";
+"已找到" = "Βρέθηκε";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Δεν βρέθηκε (με use_frameworks το πακέτο πόρων βρίσκεται μέσα στο framework)";
+"从 bundle 加载图片（issue #535）" = "Φόρτωση εικόνων από bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Η εικόνα αριστερά διαβάζεται από το πακέτο πόρων με CYLImageInBundle (χωρίς προσωρινή μνήμη). CYLBundleImage στο κύριο bundle: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Αυτό είναι ένα απλό UIViewController που δεν κληρονομεί από το CYLBaseViewController. Η γραμμή πλοήγησης είναι κρυφή.";
+"不继承基类隐藏导航栏（issue #535）" = "Απόκρυψη γραμμής πλοήγησης χωρίς βασική κλάση (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Ο διακόπτης ορίζει το cyl_automaticNavigationSettingEnabled· πατήστε τη γραμμή για να ανοίξει ένα απλό UIViewController που ορίζει τα cyl_navigationBarHidden και cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Σελίδα %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Μετάβαση ολίσθησης (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Πατήστε για να ανοίξει ένα UITabBarController του συστήματος: πατήστε μια καρτέλα ή σύρετε τη σελίδα αριστερά ή δεξιά, και η σελίδα ακολουθεί το δάχτυλο.";
+
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "Σμίκρυνση / απόκρυψη TabBar κατά την κύλιση (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "Πατήστε για αλλαγή της συμπεριφοράς κύλισης. Τώρα: %@. Liquid Glass (iOS 26+): το σύστημα σμικρύνει το TabBar· FlatDesign και κλασικό στυλ (iOS 25 και παλαιότερα, λειτουργία συμβατότητας UI του iOS 26): το TabBar αποκρύπτεται.";
 "当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Δεν υποστηρίζεται σε αυτό το στυλ: μόνο FlatDesign (CYLFlatDesignTabBar)";
 "当前 TabBar 样式不支持" = "Δεν υποστηρίζεται σε αυτό το στυλ";
 "该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Απαιτεί στοιχεία καρτέλας FlatDesign (CYLFlatDesignTabBarItem). Στο Liquid Glass και στο κλασικό στυλ τα σχεδιάζει το σύστημα, οπότε η διάταξη και το χρώμα φόντου δεν αλλάζουν.";
@@ -218,3 +255,25 @@
 "跳转与对比" = "Πλοήγηση και συγκρίσεις";
 "角标" = "Σήματα";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Δεν υποστηρίζεται στο Liquid Glass: το σύστημα ορίζει το ύψος (το υποστηρίζουν το FlatDesign και το κλασικό στυλ)";
+"默认点击声" = "Προεπιλεγμένο κλικ";
+"中等触感反馈" = "Μεσαία απτική ανάδραση";
+"无需继承基类与工具方法" = "Χωρίς βασική κλάση, και βοηθήματα";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Προηγούμενη / επόμενη καρτέλα (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Ασθενής αναφορά: βρέθηκε εν ζωή %@, nil μετά την αποδέσμευση %@. Από %@ στο κουμπί της επιλεγμένης καρτέλας: %@";
+"点击声 + 触感反馈" = "Κλικ + απτική";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Αναπήδηση + αστρικά πυροτεχνήματα (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Πατήστε τα βέλη δεξιά για να καλέσετε το cyl_switchToAdjacentTabWithStep:-1 / 1. Όπως η σάρωση, παραλείπει το PlusButton και ελέγχει τη σύνδεση. Τελευταίο αποτέλεσμα: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Πατήστε για εναλλαγή και μετά πατήστε οποιαδήποτε καρτέλα ή το PlusButton για να το ακούσετε. Η απτική δονείται μόνο σε πραγματική συσκευή. Τώρα: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Πατήστε για εκτέλεση: το cyl_setWeakAssociatedObject:forKey: επιστρέφει nil μόλις αποδεσμευτεί το αντικείμενο· το cyl_nearestControlBelowView: βρίσκει το κουμπί της επιλεγμένης καρτέλας από το εικονίδιό της.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Πατήστε για εναλλαγή. cyl_tabBarItemLongPressDuration: %@ δ, cyl_tabButtonLongPressMinimumDuration: %@ δ, cyl_tabBarItemDoubleTapInterval: %@ δ";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Δικό σας αρχείο ήχου (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Τύλιγμα προς τα πάνω, χωρίς κίνηση αποεπιλογής (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Αργή μεγέθυνση και σμίκρυνση (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Αργό ζουμ (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: ασθενή συσχετισμένα αντικείμενα και εύρεση κουμπιού (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Διάρκεια παρατεταμένου πατήματος και διάστημα διπλού πατήματος (issue #535 / #152)";
+"Tab 交互" = "Αλληλεπιδράσεις καρτελών";
+"Tab 点击声音与触感反馈（issue #535）" = "Ήχος και απτική στο πάτημα καρτέλας (issue #535)";
+"轻触感反馈" = "Ελαφριά απτική ανάδραση";
+"重触感反馈" = "Έντονη απτική ανάδραση";
+"长按（#152）" = "Παρατεταμένο πάτημα (#152)";

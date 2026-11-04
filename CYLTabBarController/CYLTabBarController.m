@@ -232,6 +232,33 @@ static void * const CYLFlatDesignTabBarContext = (void*)&CYLFlatDesignTabBarCont
 static void * const CYLStandardAppearanceContext = (void*)&CYLStandardAppearanceContext;
 //static void * const CYLTabBarControllerVisiableItemsCountContext = (void*)&CYLTabBarControllerVisiableItemsCountContext;
 
+/*!
+ * [EN] Classic tab bar before iOS 18 (not FlatDesign, not Liquid Glass): duration of the animated
+ *      `-setTabBarHidden:animated:`, the same as FlatDesign (`CYLFlatDesignUITabBarControllerHideShowBarDuration`), so
+ *      both styles hide and show alike. Outside the FlatDesign guard: the classic style needs it without that subspec.
+ * [CN] iOS 18 以前的经典 TabBar（非扁平样式、非液态玻璃）：带动画的 `-setTabBarHidden:animated:` 的时长，与扁平样式
+ *      （`CYLFlatDesignUITabBarControllerHideShowBarDuration`）相同，使两种样式的隐藏、显示效果一致。放在扁平样式的 guard 之外：
+ *      不含该子库时经典样式同样需要它。
+ */
+static const NSTimeInterval CYLClassicTabBarHideShowDuration = 0.2;
+
+/*!
+ * [EN] Classic tab bar before iOS 18: how far the tab bar moves down to leave the screen, as FlatDesign moves its bar by
+ *      its height: the tab bar's height (without a transform), plus the part of the plus button (or any subview) that
+ *      sticks up above it, so a raised plus button leaves the screen too.
+ * [CN] iOS 18 以前的经典 TabBar：TabBar 移出屏幕需要下移的距离。与扁平样式按 TabBar 高度下移相同：TabBar 的高度（不计 transform），
+ *      再加上 PlusButton（或任何子视图）高出 TabBar 的部分，使凸起的 PlusButton 也完全移出屏幕。
+ */
+static CGFloat CYLClassicTabBarHideDistance(UITabBar *tabBar) {
+    CGFloat overflowAbove = 0;
+    for (UIView *subview in tabBar.subviews) {
+        if (!subview.hidden) {
+            overflowAbove = MAX(overflowAbove, -CGRectGetMinY(subview.frame));
+        }
+    }
+    return CGRectGetHeight(tabBar.bounds) + overflowAbove;
+}
+
 #if CYL_FLATDESIGN_AVAILABLE
 CGFloat const CYLFlatDesignUITabBarControllerHideShowBarDuration = 0.2;
 
@@ -253,6 +280,9 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @interface CYLTabBarController () <UITabBarControllerDelegate>
 
 @property (nonatomic, assign, getter=isObservingTabImageViewDefaultOffset) BOOL observingTabImageViewDefaultOffset;
+/// [EN] Backing flag of `automaticallyAdjustsImageOnlyTabs`, negated so that the default (NO) means YES (issue #257, #522).
+/// [CN] `automaticallyAdjustsImageOnlyTabs` 的存储标记，取反存储，使默认值 NO 表示 YES（issue #257、#522）。
+@property (nonatomic, assign) BOOL cyl_imageOnlyTabsAdjustmentDisabled;
 @property (nonatomic, assign, getter=shouldInvokeOnceViewDidLayoutSubViewsBlock) BOOL invokeOnceViewDidLayoutSubViewsBlock;
 /// Blocks passed to `-reloadBadgesWithBlock:` that wait for the tab buttons (#404).
 @property (nonatomic, strong) NSMutableArray<CYLViewDidLayoutSubViewsBlock> *pendingReloadBadgesBlocks;
@@ -277,6 +307,12 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 #endif
 @end
 
+/// [EN] Implemented below (CYLTabBarMinimize, issue #13). [CN] 实现见下方 CYLTabBarMinimize（issue #13）。
+@interface CYLTabBarController (CYLTabBarMinimizePrivate)
+/// [EN] FlatDesign: observe the scroll view of the page on screen. [CN] 扁平样式：观察当前显示页面的滚动视图。
+- (void)cyl_updateTabBarMinimizeTracking;
+@end
+
 /// Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
 typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController);
 
@@ -298,9 +334,26 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 + (CYLTabBarController *)cyl_tabBarControllerForContext:(NSString *)context matching:(CYLTabBarControllerMatcher)matcher;
 @end
 
+/// [EN] FIX: issue #535 — implemented in CYLTabBarController+CYLInteraction.m. [CN] 实现位于 CYLTabBarController+CYLInteraction.m。
+@interface CYLTabBarController (CYLInteractionInstall)
+- (void)cyl_installInteractionGestureRecognizersIfNeeded;
+- (BOOL)cyl_liquidGlassTakesTabTaps;
+@end
+
 /// FIX: issue #475. The title offset a tab asked for itself; see `-setTitlePositionAdjustment:`.
 /// Tab 自身设置的标题偏移，见 `-setTitlePositionAdjustment:`。
 static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset offset);
+/// FIX: issue #95. The image insets a tab asked for itself; see `-updateImageInsets:`.
+/// Tab 自身设置的图片内边距，见 `-updateImageInsets:`。
+static void CYLRememberItemImageInsets(id _Nullable item, UIEdgeInsets insets);
+
+/// FIX: issue #257, #522. What the automatic adjustment of image-only tabs wrote into an item; see
+/// `-offsetTabBarTabImageViewToFit:`. 纯图标 Tab 自动调整写入 item 的记录，见 `-offsetTabBarTabImageViewToFit:`。
+static char CYLImageOnlyTabAdjustmentKey;
+static NSString *const CYLImageOnlyTabOriginalInsetsKey = @"insets";
+static NSString *const CYLImageOnlyTabAppliedInsetsKey = @"appliedInsets";
+static NSString *const CYLImageOnlyTabOriginalTitleKey = @"title";
+static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 
 @implementation CYLTabBarController {
 #if CYL_FLATDESIGN_AVAILABLE
@@ -326,6 +379,11 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
     _CYLFlatDesignTabBarParallaxOverlayView *_parallaxOverlayView;
 #else
 #endif
+    // [EN] Classic tab bar before iOS 18: the animated `-setTabBarHidden:animated:` (see `-cyl_setClassicTabBarHidden:animated:`).
+    // [CN] iOS 18 以前的经典 TabBar：带动画的 `-setTabBarHidden:animated:`（见 `-cyl_setClassicTabBarHidden:animated:`）。
+    BOOL _cylClassicTabBarIsAnimating;
+    BOOL _cylClassicTabBarHiddenRequest;
+    NSUInteger _cylClassicTabBarAnimationGeneration;
 }
 
 @synthesize viewControllers = _viewControllers;
@@ -763,6 +821,12 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
+    // [EN] FIX: issue #535 — long press and swipe to switch tabs, once the view exists (every style).
+    // [CN] FIX: issue #535 — view 已存在时安装长按与滑动切换手势（所有样式）。
+    [self cyl_installInteractionGestureRecognizersIfNeeded];
+    // [EN] FlatDesign `cyl_tabBarMinimizeBehavior` (issue #13): follow the scroll view of the page now on screen.
+    // [CN] 扁平样式的 `cyl_tabBarMinimizeBehavior`（issue #13）：跟随当前显示页面的滚动视图。
+    [self cyl_updateTabBarMinimizeTracking];
     // Issue #601: tab buttons created again (e.g. after a rotation) get their icon views again.
     [self cyl_setNeedsUpdateTabBarItemIconViews];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
@@ -1083,6 +1147,13 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
         if (@available(iOS 18.0, *)) {
             return [super isTabBarHidden];
         }
+        // [EN] Classic before iOS 18: while the hide / show animation runs, the request, not the bar's `hidden` (which
+        //      changes when the animation ends), so a caller asking again mid-animation does not restart it.
+        // [CN] iOS 18 以前的经典样式：动画进行中返回请求的状态，而不是 TabBar 的 `hidden`（动画结束时才改变），避免动画中途再次请求
+        //      时重新开始动画。
+        if (_cylClassicTabBarIsAnimating) {
+            return _cylClassicTabBarHiddenRequest;
+        }
         return self.tabBar.hidden;
     }
 #if CYL_FLATDESIGN_AVAILABLE
@@ -1257,9 +1328,69 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
         if (@available(iOS 18.0, *)) {
             [super setTabBarHidden:hidden animated:animated];
         } else {
-            self.tabBar.hidden = hidden;
+            [self cyl_setClassicTabBarHidden:hidden animated:animated];
         }
     }
+}
+
+/*!
+ * [EN] Classic tab bar before iOS 18 (UIKit's `-setTabBarHidden:animated:` arrives in iOS 18): hides or shows the system
+ *      tab bar, with its plus button, animated as FlatDesign does: the same duration
+ *      (`CYLClassicTabBarHideShowDuration`), the bar moves down out of the screen and back, and `hidden` is set when the
+ *      animation ends. The newest request wins: an older animation's completion does nothing. Not animated when
+ *      `animated` is NO or the bar is not on screen. Guards: never FlatDesign (its own path above) and never Liquid Glass
+ *      (iOS 26+, so UIKit's path), both checked again here.
+ * [CN] iOS 18 以前的经典 TabBar（UIKit 的 `-setTabBarHidden:animated:` 从 iOS 18 起才有）：隐藏或显示系统 TabBar 及其中的 PlusButton，
+ *      动画与扁平样式一致：相同时长（`CYLClassicTabBarHideShowDuration`），TabBar 向下移出屏幕再移回，动画结束时设置 `hidden`。以最新
+ *      请求为准：旧动画的完成回调不做处理。`animated` 为 NO 或 TabBar 不在屏幕上时不执行动画。Guard：不处理扁平样式（上方有自己的
+ *      路径）与液态玻璃（iOS 26+，走 UIKit 的路径），在这里再次检查。
+ */
+- (void)cyl_setClassicTabBarHidden:(BOOL)hidden animated:(BOOL)animated {
+    UITabBar *tabBar = self.tabBar;
+    // Guard: only the classic tab bar. 只处理经典 TabBar。
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType || [CYLConstants isLiquidGlassActive] || !tabBar) {
+        return;
+    }
+    // Guard: the same request is already animating. 同一请求的动画正在进行。
+    if (_cylClassicTabBarIsAnimating && _cylClassicTabBarHiddenRequest == hidden) {
+        return;
+    }
+    NSUInteger generation = ++_cylClassicTabBarAnimationGeneration;
+    if (!animated || !tabBar.window || CGRectIsEmpty(tabBar.bounds)) {
+        _cylClassicTabBarIsAnimating = NO;
+        tabBar.transform = CGAffineTransformIdentity;
+        tabBar.hidden = hidden;
+        return;
+    }
+    // Guard: already there, nothing animating. 已是目标状态且没有动画。
+    if (!_cylClassicTabBarIsAnimating && tabBar.hidden == hidden) {
+        return;
+    }
+    _cylClassicTabBarIsAnimating = YES;
+    _cylClassicTabBarHiddenRequest = hidden;
+    CGFloat distance = CYLClassicTabBarHideDistance(tabBar);
+    if (!hidden && tabBar.hidden) {
+        // [EN] Showing: start below the screen, as FlatDesign does. [CN] 显示：与扁平样式一样，从屏幕下方开始。
+        tabBar.transform = CGAffineTransformMakeTranslation(0, distance);
+        tabBar.hidden = NO;
+    }
+    CGAffineTransform endTransform = hidden ? CGAffineTransformMakeTranslation(0, distance) : CGAffineTransformIdentity;
+    [UIView animateWithDuration:CYLClassicTabBarHideShowDuration
+                          delay:0
+                        options:UIViewAnimationOptionBeginFromCurrentState
+                     animations:^{
+        tabBar.transform = endTransform;
+    } completion:^(BOOL __unused finished) {
+        // [EN] A newer request owns the tab bar now. [CN] 已有更新的请求接管 TabBar。
+        if (generation != self->_cylClassicTabBarAnimationGeneration) {
+            return;
+        }
+        self->_cylClassicTabBarIsAnimating = NO;
+        // [EN] Reset the transform, so later layouts by UIKit (e.g. rotation) never meet a moved tab bar.
+        // [CN] 还原 transform，使 UIKit 之后的布局（如旋转）不会遇到移动过的 TabBar。
+        tabBar.transform = CGAffineTransformIdentity;
+        tabBar.hidden = hidden;
+    }];
 }
 
 - (BOOL)_checkHidesBottomBarWhenPushed {
@@ -1489,7 +1620,8 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
                                                                                  lottieSizeValue:lottieSizeValue];
         cyl_tabBarItem.lottieURL = lottieURL;
         CYLRememberItemTitlePositionAdjustment(cyl_tabBarItem, titlePositionAdjustment);
-                
+        CYLRememberItemImageInsets(cyl_tabBarItem, imageInsets);
+
         [cyl_tabBarItem cylflatdesign_setTabBarController:self];
         cyl_tabBarItem.childViewController = viewController;
         [cyl_tabBarItem setTitleTextAttributes:
@@ -2188,6 +2320,18 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     // [CN] 选中的 Tab 显示选中标题，而不是新的普通标题。
     if (updatesSelectedTitle) {
         CYLApplyTabBarItemSelectedTitles(self);
+    }
+    // FIX: issue #257, #522
+    // [EN] An image-only tab that gets a title is no longer image-only: undo the automatic adjustment, or the title stays
+    //      off screen (`UIOffsetMake(0, MAXFLOAT)`). A tab whose title becomes empty gets it again.
+    // [CN] 纯图标 Tab 设置标题后就不再是纯图标 Tab：撤销自动调整，否则标题会一直在屏幕外（`UIOffsetMake(0, MAXFLOAT)`）。
+    //      标题被清空的 Tab 重新获得自动调整。
+    if (title) {
+        if (title.length > 0) {
+            [self cyl_restoreImageOnlyTabItems:tabBarItems];
+        } else if ([_cyl_tabBar isKindOfClass:[CYLTabBar class]] && ((CYLTabBar *)_cyl_tabBar).tabImageViewDefaultOffset != 0.f) {
+            [self offsetTabBarTabImageViewToFit:((CYLTabBar *)_cyl_tabBar).tabImageViewDefaultOffset];
+        }
     }
     // [EN] Liquid Glass may keep the tab buttons' previous layout (a longer title overlapping the plus button and the next
     //      tab) until a tab is tapped: reload them as a tap does.
@@ -3097,7 +3241,8 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         insets = imageInsets;
     }
     viewController.tabBarItem.imageInsets = insets;
-    
+    CYLRememberItemImageInsets(viewController.tabBarItem, imageInsets);
+
     UIOffset offset = self.titlePositionAdjustment;
     BOOL shouldCustomizeTitlePositionAdjustment= !(UIOffsetEqualToOffset(UIOffsetZero, titlePositionAdjustment));
     if (shouldCustomizeTitlePositionAdjustment) {
@@ -3329,6 +3474,83 @@ static void CYLSyncTitlePositionAdjustmentAppearance(UITabBarItem *tabBarItem, c
     }
 }
 
+#pragma mark - Image insets at runtime (issue #95)
+
+static char CYLImageInsetsItemKey;
+
+static void CYLRememberItemImageInsets(id _Nullable item, UIEdgeInsets insets) {
+    id object = item;
+    if (!object) {
+        return;
+    }
+    BOOL isZero = UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, insets);
+    objc_setAssociatedObject(object, &CYLImageInsetsItemKey, isZero ? nil : [NSValue valueWithUIEdgeInsets:insets], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+static UIEdgeInsets CYLImageInsetsForItem(id _Nullable item, UIEdgeInsets controllerInsets) {
+    id object = item;
+    NSValue *itemInsets = object ? objc_getAssociatedObject(object, &CYLImageInsetsItemKey) : nil;
+    return itemInsets ? itemInsets.UIEdgeInsetsValue : controllerInsets;
+}
+
+/*!
+ * FIX: issue #95
+ * [EN] `imageInsets` could only be passed to `-init…imageInsets:titlePositionAdjustment:…`, so an app that creates the
+ *      controller with `-initWithViewControllers:tabBarItemsAttributes:` (e.g. in a config class) had no way to set it.
+ *      This re-applies the insets to the tabs already added; a tab's own `CYLTabBarItemImageInsets` keeps precedence.
+ *      The automatic centering of image-only tabs (`automaticallyAdjustsImageOnlyTabs`) yields to non-zero insets, and
+ *      takes over again when they are reset to zero.
+ * [CN] 以前 `imageInsets` 只能通过 `-init…imageInsets:titlePositionAdjustment:…` 传入，使用
+ *      `-initWithViewControllers:tabBarItemsAttributes:` 创建控制器（例如在 config 类中）的 App 无法设置。
+ *      本方法会对已添加的 Tab 重新应用内边距；Tab 自身的 `CYLTabBarItemImageInsets` 仍然优先。
+ *      纯图标 Tab 的自动居中（`automaticallyAdjustsImageOnlyTabs`）在内边距非零时让出，重置为零后重新生效。
+ */
+- (void)updateImageInsets:(UIEdgeInsets)imageInsets {
+    _imageInsets = imageInsets;
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+#if CYL_FLATDESIGN_AVAILABLE
+        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
+        for (UIViewController *viewController in self.viewControllers) {
+            // Read the stored item: the getter creates a placeholder item when there is none.
+            // 读取已保存的 item：没有时 getter 会创建占位 item。
+            CYLFlatDesignTabBarItem *flatItem = objc_getAssociatedObject(viewController, @selector(cyl_tabBarItem));
+            if (![flatItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
+                continue;
+            }
+            flatItem.imageInsets = CYLImageInsetsForItem(flatItem, imageInsets);
+        }
+        for (UIView *subview in _cyl_tabBar.subviews) {
+            [subview setNeedsLayout];
+        }
+        [_cyl_tabBar setNeedsLayout];
+#endif
+        return;
+    }
+    for (UIViewController *viewController in self.viewControllers) {
+        UITabBarItem *tabBarItem = viewController.tabBarItem;
+        if (objc_getAssociatedObject(tabBarItem, &CYLImageInsetsItemKey)) {
+            continue;
+        }
+        // The controller's insets replace what the image-only adjustment wrote: forget that part of its record.
+        // 控制器的内边距替换纯图标自动调整写入的值：清除其记录中的这一部分。
+        NSDictionary<NSString *, NSValue *> *record = objc_getAssociatedObject(tabBarItem, &CYLImageOnlyTabAdjustmentKey);
+        if (record) {
+            NSMutableDictionary<NSString *, NSValue *> *newRecord = [record mutableCopy];
+            [newRecord removeObjectsForKeys:@[ CYLImageOnlyTabOriginalInsetsKey, CYLImageOnlyTabAppliedInsetsKey ]];
+            objc_setAssociatedObject(tabBarItem, &CYLImageOnlyTabAdjustmentKey, newRecord.count > 0 ? [newRecord copy] : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        if (!UIEdgeInsetsEqualToEdgeInsets(tabBarItem.imageInsets, imageInsets)) {
+            tabBarItem.imageInsets = imageInsets;
+        }
+    }
+    if (UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, imageInsets) && [_cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+        CGFloat offset = ((CYLTabBar *)_cyl_tabBar).tabImageViewDefaultOffset;
+        if (offset != 0.f) {
+            [self offsetTabBarTabImageViewToFit:offset];
+        }
+    }
+}
+
 #pragma mark - tabBar.standardAppearance (all styles)
 
 /// Observed tab bar, see `-cyl_startObservingStandardAppearance`. 被观察的 TabBar，见 `-cyl_startObservingStandardAppearance`。
@@ -3538,23 +3760,140 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 }
 
 
+#pragma mark - Image-only tabs (issue #257, #522)
+
+/*!
+ * FIX: issue #257, issue #522
+ * [EN] What the automatic adjustment of image-only tabs wrote into one tab bar item, so it is written only where the app
+ *      set nothing, never twice, and can be undone (`automaticallyAdjustsImageOnlyTabs = NO`). Keys:
+ *      `insets` / `appliedInsets`: the item's `imageInsets` before / after; `title` / `appliedTitle`: the same for
+ *      `titlePositionAdjustment`. A pair is missing when that value was left to the app.
+ * [CN] 纯图标 Tab 自动调整写入某个 TabBarItem 的内容：只在 App 未设置的地方写入、不会重复写入、并且可以撤销
+ *      （`automaticallyAdjustsImageOnlyTabs = NO`）。键：`insets` / `appliedInsets`：item 原来 / 写入后的 `imageInsets`；
+ *      `title` / `appliedTitle`：`titlePositionAdjustment` 的对应值。某一对缺失表示该值留给 App。
+ *      The keys are defined at the top of this file. 这些键定义在本文件顶部。
+ */
+
+- (BOOL)automaticallyAdjustsImageOnlyTabs {
+    return !self.cyl_imageOnlyTabsAdjustmentDisabled;
+}
+
+- (void)setAutomaticallyAdjustsImageOnlyTabs:(BOOL)automaticallyAdjustsImageOnlyTabs {
+    if (self.automaticallyAdjustsImageOnlyTabs == automaticallyAdjustsImageOnlyTabs) {
+        return;
+    }
+    self.cyl_imageOnlyTabsAdjustmentDisabled = !automaticallyAdjustsImageOnlyTabs;
+    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
+        // Read the stored tab bar: the getter would create one.
+        // 读取已保存的 TabBar：getter 会创建新的 TabBar。
+        if (![_cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+            return;
+        }
+        CYLTabBar *tabBar = (CYLTabBar *)_cyl_tabBar;
+        if (automaticallyAdjustsImageOnlyTabs) {
+            if (tabBar.tabImageViewDefaultOffset != 0.f) {
+                [self offsetTabBarTabImageViewToFit:tabBar.tabImageViewDefaultOffset];
+            } else {
+                // Not measured yet: the next layout measures it. 尚未测量：下次布局时测量。
+                [tabBar setNeedsLayout];
+            }
+        } else {
+            [self cyl_restoreImageOnlyTabItems:tabBar.items];
+        }
+    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
+}
+
+/// [EN] Undoes what `-offsetTabBarTabImageViewToFit:` wrote, where the app has not changed the value since.
+/// [CN] 撤销 `-offsetTabBarTabImageViewToFit:` 写入的值（App 之后未修改过的值）。
+- (void)cyl_restoreImageOnlyTabItems:(NSArray<UITabBarItem *> *)tabBarItems {
+    for (UITabBarItem *item in tabBarItems) {
+        NSDictionary<NSString *, NSValue *> *record = objc_getAssociatedObject(item, &CYLImageOnlyTabAdjustmentKey);
+        if (!record) {
+            continue;
+        }
+        NSValue *appliedInsets = record[CYLImageOnlyTabAppliedInsetsKey];
+        if (appliedInsets && UIEdgeInsetsEqualToEdgeInsets(item.imageInsets, appliedInsets.UIEdgeInsetsValue)) {
+            item.imageInsets = record[CYLImageOnlyTabOriginalInsetsKey].UIEdgeInsetsValue;
+        }
+        NSValue *appliedTitle = record[CYLImageOnlyTabAppliedTitleKey];
+        if (appliedTitle && UIOffsetEqualToOffset(item.titlePositionAdjustment, appliedTitle.UIOffsetValue)) {
+            item.titlePositionAdjustment = record[CYLImageOnlyTabOriginalTitleKey].UIOffsetValue;
+        }
+        objc_setAssociatedObject(item, &CYLImageOnlyTabAdjustmentKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+}
+
+/*!
+ * FIX: issue #257, issue #522
+ * [EN] Moves the images of the image-only tabs by `tabImageViewDefaultOffset` (measured once by `CYLTabBar`).
+ *      Before, every item was written, on every notification: the image and title offsets the app had set on an item
+ *      (directly or with `CYLTabBarItemImageInsets` / `CYLTabBarItemTitlePositionAdjustment`) were replaced, a tab with a
+ *      title had its title moved off screen (`UIOffsetMake(0, MAXFLOAT)`) as soon as the first tab had none (#522), and
+ *      writing the items laid the tab bar out again, which measured and wrote again (#257).
+ *      Now only items without a title are written, only values the app left at zero, and a value already written is not
+ *      written again. `automaticallyAdjustsImageOnlyTabs = NO` turns it off.
+ * [CN] 按 `tabImageViewDefaultOffset`（由 `CYLTabBar` 测量一次）移动纯图标 Tab 的图片。
+ *      以前每次通知都会写入所有 item：App 在 item 上设置的图片与标题偏移（直接设置，或通过 `CYLTabBarItemImageInsets` /
+ *      `CYLTabBarItemTitlePositionAdjustment`）被替换；只要第一个 Tab 没有标题，有标题的 Tab 的标题也会被移出屏幕
+ *      （`UIOffsetMake(0, MAXFLOAT)`，#522）；而写入 item 又会让 TabBar 重新布局，再次测量并写入（#257）。
+ *      现在只写入没有标题的 item，只写入 App 保持为零的值，已写入的值不会重复写入。`automaticallyAdjustsImageOnlyTabs = NO`
+ *      可关闭该功能。
+ */
 - (void)offsetTabBarTabImageViewToFit:(CGFloat)tabImageViewDefaultOffset {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
+    if (!self.automaticallyAdjustsImageOnlyTabs) {
+        return;
+    }
     BOOL shouldCustomizeTitlePositionAdjustment= !(UIOffsetEqualToOffset(UIOffsetZero, _titlePositionAdjustment));
     BOOL shouldCustomizeImageInsets = !(UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, _imageInsets));
     if (shouldCustomizeImageInsets) {
         return;
     }
     CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
+    UIEdgeInsets imageInset = UIEdgeInsetsMake(tabImageViewDefaultOffset, 0, -tabImageViewDefaultOffset, 0);
+    UIOffset hiddenTitleOffset = UIOffsetMake(0, MAXFLOAT);
 
-    NSArray<UITabBarItem *> *tabBarItems = cyl_tabBar.items;
-    [tabBarItems enumerateObjectsUsingBlock:^(UITabBarItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        UIEdgeInsets imageInset = UIEdgeInsetsMake(tabImageViewDefaultOffset, 0, -tabImageViewDefaultOffset, 0);
-        obj.imageInsets = imageInset;
-        if (!shouldCustomizeTitlePositionAdjustment) {
-            obj.titlePositionAdjustment = UIOffsetMake(0, MAXFLOAT);
+    for (UITabBarItem *item in cyl_tabBar.items) {
+        if (item.title.length > 0) {
+            // A tab with a title is not image-only. 有标题的 Tab 不是纯图标 Tab。
+            continue;
         }
-    }];
+        NSDictionary<NSString *, NSValue *> *record = objc_getAssociatedObject(item, &CYLImageOnlyTabAdjustmentKey);
+        NSMutableDictionary<NSString *, NSValue *> *newRecord = record ? [record mutableCopy] : [NSMutableDictionary dictionary];
+
+        NSValue *appliedInsets = record[CYLImageOnlyTabAppliedInsetsKey];
+        BOOL insetsAreOurs = appliedInsets && UIEdgeInsetsEqualToEdgeInsets(item.imageInsets, appliedInsets.UIEdgeInsetsValue);
+        // Each value is judged by its own entry: `-updateImageInsets:` forgets the insets entry but keeps the title one.
+        // 每个值按各自的记录判断：`-updateImageInsets:` 会清除内边距记录，但保留标题记录。
+        BOOL insetsAreFree = !appliedInsets && UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, item.imageInsets);
+        if (insetsAreOurs || insetsAreFree) {
+            if (!UIEdgeInsetsEqualToEdgeInsets(item.imageInsets, imageInset)) {
+                item.imageInsets = imageInset;
+            }
+            if (insetsAreFree) {
+                newRecord[CYLImageOnlyTabOriginalInsetsKey] = [NSValue valueWithUIEdgeInsets:UIEdgeInsetsZero];
+            }
+            newRecord[CYLImageOnlyTabAppliedInsetsKey] = [NSValue valueWithUIEdgeInsets:imageInset];
+        }
+
+        // The item's own offset, kept by CYL (`CYLTabBarItemTitlePositionAdjustment` or the controller-level offset).
+        // CYL 记录的 item 自身偏移（`CYLTabBarItemTitlePositionAdjustment` 或控制器级别的偏移）。
+        BOOL titleOffsetSetByCYL = (objc_getAssociatedObject(item, &CYLTitlePositionAdjustmentItemOffsetKey) != nil) ||
+                                   (objc_getAssociatedObject(item, &CYLTitlePositionAdjustmentSetByCYLKey) != nil);
+        NSValue *appliedTitle = record[CYLImageOnlyTabAppliedTitleKey];
+        BOOL titleIsOurs = appliedTitle && UIOffsetEqualToOffset(item.titlePositionAdjustment, appliedTitle.UIOffsetValue);
+        BOOL titleIsFree = !appliedTitle && !titleOffsetSetByCYL && UIOffsetEqualToOffset(UIOffsetZero, item.titlePositionAdjustment);
+        if (!shouldCustomizeTitlePositionAdjustment && (titleIsOurs || titleIsFree)) {
+            if (!UIOffsetEqualToOffset(item.titlePositionAdjustment, hiddenTitleOffset)) {
+                item.titlePositionAdjustment = hiddenTitleOffset;
+            }
+            if (titleIsFree) {
+                newRecord[CYLImageOnlyTabOriginalTitleKey] = [NSValue valueWithUIOffset:UIOffsetZero];
+            }
+            newRecord[CYLImageOnlyTabAppliedTitleKey] = [NSValue valueWithUIOffset:hiddenTitleOffset];
+        }
+        objc_setAssociatedObject(item, &CYLImageOnlyTabAdjustmentKey, newRecord.count > 0 ? [newRecord copy] : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
 
@@ -3733,11 +4072,35 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     });
 }
 
+/*!
+ * [EN] Everything a reported tab tap does, the same in every style (`-didSelectControl:` for the classic style and Liquid
+ *      Glass, `-cyl_flatDesignReportDidSelectControl:` for FlatDesign), each once per reported tap and also without a
+ *      `didSelectControl` delegate:
+ *      1. the tap animation, sound and haptic (issue #535);
+ *      2. `-tabBarController:didSelectControl:`;
+ *      3. Reselect / DoubleTap (issue #152).
+ * [CN] 每次上报的 Tab 点击要做的事，所有样式相同（经典样式与液态玻璃为 `-didSelectControl:`，扁平样式为
+ *      `-cyl_flatDesignReportDidSelectControl:`），每次上报各执行一次，没有实现 didSelectControl 代理时同样执行：
+ *      1. 点击动画、声音与触感反馈（issue #535）；
+ *      2. `-tabBarController:didSelectControl:`；
+ *      3. Reselect / DoubleTap（issue #152）。
+ */
+- (void)cyl_sendDidSelectControl:(UIControl *)control {
+    [self cyl_playTabButtonAnimationForControl:control];
+    [self cyl_playTabButtonTapFeedback];
+    SEL action = @selector(tabBarController:didSelectControl:);
+    if ([self.delegate respondsToSelector:action]) {
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+        (
+         [self.delegate performSelector:action withObject:self withObject:control];
+         );
+    }
+    [self cyl_recognizeTabBarItemGestureForReportedControl:control];
+}
+
 - (void)didSelectControl:(UIControl *)control {
     [self cyl_setNeedsUpdateTabBarItemIconViews];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    
-    SEL actin = @selector(tabBarController:didSelectControl:);
     
     BOOL shouldSelectViewController =  YES;
     @try {
@@ -3811,14 +4174,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         if (isPlusButtonWithChildViewController) {
             [self cyl_markControlReportedInCurrentRunLoop:reportedControl];
         }
-        if ([self.delegate respondsToSelector:actin]) {
-            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-            (
-             [self.delegate performSelector:actin withObject:self withObject:reportedControl];
-             );
-        }
-        // FIX: issue #152 — Reselect / DoubleTap, from the same taps. 由同样的点击得出 Reselect / DoubleTap。
-        [self cyl_recognizeTabBarItemGestureForReportedControl:reportedControl];
+        [self cyl_sendDidSelectControl:reportedControl];
     }
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
@@ -4779,18 +5135,10 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
  *      （`-plusChildViewControllerButtonClicked:`，或其下方的 Tab 按钮）、没有子控制器的 PlusButton（`-cyl_flatDesignPlusButtonTouchUpInside:`）。
  */
 - (void)cyl_flatDesignReportDidSelectControl:(UIControl *)control {
-    SEL actin = @selector(tabBarController:didSelectControl:);
     if (!control || control.cyl_userInteractionDisabled) {
         return;
     }
-    if ([self.delegate respondsToSelector:actin]) {
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-        (
-         [self.delegate performSelector:actin withObject:self withObject:control];
-         )
-    }
-    // FIX: issue #152 — Reselect / DoubleTap, also without a `didSelectControl` delegate. 没有实现 didSelectControl 时同样识别。
-    [self cyl_recognizeTabBarItemGestureForReportedControl:control];
+    [self cyl_sendDidSelectControl:control];
 }
 
 /// The target of a flat design plus button that has no child view controller (that one has no action of its own here).
@@ -5136,6 +5484,9 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
             self.cyl_tabBar.hidden = !showsTabBar;
         }
         [self _updateAdditionalSafeAreaInsetsWithAnimated:NO];
+        // [EN] A tab was selected or a push/pop ended: track the new page's scroll view (issue #13).
+        // [CN] 切换了 Tab 或 push/pop 结束：跟随新页面的滚动视图（issue #13）。
+        [self cyl_updateTabBarMinimizeTracking];
 #else
 #endif
     } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
@@ -5325,20 +5676,16 @@ static CYLTabBarControllerMatcher CYLTabBarControllerMatcherForStyleType(CYLTabB
     };
 }
 
-/// Unwraps the weak box stored by `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:`.
-static id CYLTabBarControllerFromWeakBox(id box) {
-    id (^block)(void) = box;
-    return block ? block() : nil;
-}
-
 /// The reference set on `object` with `-cyl_setTabBarController:` or `-cylflatdesign_setTabBarController:`, if accepted.
 static CYLTabBarController *CYLTabBarControllerExplicitReference(id object, CYLTabBarControllerMatcher matcher) {
-    id tabBarController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(object, @selector(cyl_tabBarController)));
+    // [EN] Weak references set by `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:` (CYLUtils).
+    // [CN] 由 `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:` 设置的弱引用（CYLUtils）。
+    id tabBarController = [object cyl_weakAssociatedObjectForKey:@selector(cyl_tabBarController)];
     if (CYLTabBarControllerMatches(tabBarController, matcher)) {
         return tabBarController;
     }
 #if CYL_FLATDESIGN_AVAILABLE
-    tabBarController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(object, @selector(cylflatdesign_tabBarController)));
+    tabBarController = [object cyl_weakAssociatedObjectForKey:@selector(cylflatdesign_tabBarController)];
     if (CYLTabBarControllerMatches(tabBarController, matcher)) {
         return tabBarController;
     }
@@ -5643,10 +5990,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
 @implementation NSObject (CYLTabBarControllerReferenceExtension)
 
 - (void)cyl_setTabBarController:(nullable CYLTabBarController *)tabBarController {
-    id __weak weakObject = tabBarController;
-    id (^block)(void) = ^{ return weakObject; };
-    objc_setAssociatedObject(self, @selector(cyl_tabBarController),
-                             block, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_setWeakAssociatedObject:tabBarController forKey:@selector(cyl_tabBarController)];
 }
 
 /*!
@@ -5747,7 +6091,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
     // retain cycle (tab bar controller -> child view controller -> tab bar controller)
     // and the whole FlatDesign tab tree is never deallocated after it is popped (#661).
     UIViewController *tabBarController_ = tabBarController;
-    objc_setAssociatedObject(self, @selector(cylflatdesign_tabBarController), [self cyl_cylflatdesign_weakBoxWithTarget:tabBarController_], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_setWeakAssociatedObject:tabBarController_ forKey:@selector(cylflatdesign_tabBarController)];
     UIViewController *referenceViewController = nil;
     if ([self isKindOfClass:[UIViewController class]]) {
         referenceViewController = (UIViewController *)self;
@@ -5756,7 +6100,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
         return;
     }
     if (referenceViewController.cyl_getViewControllerInsteadOfNavigationController) {
-        objc_setAssociatedObject(referenceViewController.cyl_getViewControllerInsteadOfNavigationController, @selector(cylflatdesign_tabBarController), [self cyl_cylflatdesign_weakBoxWithTarget:tabBarController_], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [referenceViewController.cyl_getViewControllerInsteadOfNavigationController cyl_setWeakAssociatedObject:tabBarController_ forKey:@selector(cylflatdesign_tabBarController)];
     }
     
     /*!
@@ -5777,12 +6121,6 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
      */
 }
 
-/// Wraps `target` in a block that only holds it weakly, matching `cyl_setTabBarController:`.
-/// The block itself is retained by the associated object, but the target is not.
-- (id)cyl_cylflatdesign_weakBoxWithTarget:(UIViewController *)target {
-    id __weak weakTarget = target;
-    return ^{ return weakTarget; };
-}
 
 /*!
  * [EN] Flat design. The same lookup as `-cyl_tabBarController`, `-cyl_tabBarControllerForStyleType:` with
@@ -5794,7 +6132,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
  *      TabBarController 内时返回 nil（调用方依此判断是否在其中）。
  */
 - (UIViewController __kindof *)cylflatdesign_tabBarController {
-    UIViewController *viewController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(self, @selector(cylflatdesign_tabBarController)));
+    UIViewController *viewController = [self cyl_weakAssociatedObjectForKey:@selector(cylflatdesign_tabBarController)];
     if (viewController) {
         return viewController;
     }
@@ -5998,9 +6336,7 @@ static char CYLLoginInterceptedViewControllerKey;
 
 static char CYLTabBarItemGestureHandlerKey;
 static char CYLTabBarItemDoubleTapIntervalKey;
-static char CYLTabBarItemLongPressDurationKey;
 static char CYLTabBarItemGestureStateKey;
-static char CYLTabBarItemLongPressHelperKey;
 
 /*!
  * [EN] What the gesture recognition remembers between taps: the last tapped control and when, the view controller that
@@ -6020,78 +6356,6 @@ static char CYLTabBarItemLongPressHelperKey;
 @end
 
 @implementation CYLTabBarItemGestureState
-@end
-
-/*!
- * [EN] Target and delegate of the long press recognizer, added to the tab bar controller's view. It only takes touches in
- *      the tab bar (or on the plus button), recognizes along with every other gesture and cancels no touch, so the tab
- *      bar, Liquid Glass and the pages behave as before.
- * [CN] 长按手势的 target 与 delegate，手势添加在 TabBarController 的 view 上。只接收 TabBar（或 PlusButton）上的触摸，与其他手势同时识别，
- *      且不取消任何触摸，因此 TabBar、液态玻璃与页面的行为都不变。
- */
-@interface CYLTabBarItemLongPressHelper : NSObject <UIGestureRecognizerDelegate>
-@property (nonatomic, weak, nullable) CYLTabBarController *tabBarController;
-@property (nonatomic, strong) UILongPressGestureRecognizer *recognizer;
-@end
-
-@implementation CYLTabBarItemLongPressHelper
-
-- (nullable UIView *)cyl_tabBarView {
-    CYLTabBarController *tabBarController = self.tabBarController;
-#if CYL_FLATDESIGN_AVAILABLE
-    if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
-        return tabBarController.cyl_tabBar;
-    }
-#endif
-    return tabBarController.tabBar;
-}
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    UIView *tabBarView = [self cyl_tabBarView];
-    if (!tabBarView || tabBarView.hidden || !touch.view) {
-        return NO;
-    }
-    if ([touch.view isDescendantOfView:tabBarView]) {
-        return YES;
-    }
-    // Guard: the plus button only when there is one; it can stick out of the tab bar. 仅在有 PlusButton 时处理，它可能凸出 TabBar。
-    CYLTabBarController *tabBarController = self.tabBarController;
-    if ([tabBarController hasPlusButton]) {
-        UIView *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
-        return plusButton && [touch.view isDescendantOfView:plusButton];
-    }
-    return NO;
-}
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    return YES;
-}
-
-- (void)cyl_longPress:(UILongPressGestureRecognizer *)recognizer {
-    if (recognizer.state != UIGestureRecognizerStateBegan) {
-        return;
-    }
-    UIView *tabBarView = [self cyl_tabBarView];
-    CYLTabBarController *tabBarController = self.tabBarController;
-    if (!tabBarView || !tabBarController) {
-        return;
-    }
-    // The tab bars' own hit test knows the plus button's touchable area and the Liquid Glass platter (#91, #653).
-    // TabBar 自己的 hitTest 已处理 PlusButton 可点击区域与液态玻璃 platter（#91、#653）。
-    UIView *view = [tabBarView hitTest:[recognizer locationInView:tabBarView] withEvent:nil];
-    while (view && view != tabBarView) {
-        if ([view isKindOfClass:[UIControl class]]) {
-            UIControl *control = (UIControl *)view;
-            UIViewController *viewController = nil;
-            if ([tabBarController cyl_isTabBarItemGestureControl:control viewController:&viewController]) {
-                [tabBarController cyl_reportTabBarItemGesture:CYLTabBarItemGestureLongPress control:control viewController:viewController];
-                return;
-            }
-        }
-        view = view.superview;
-    }
-}
-
 @end
 
 @implementation CYLTabBarController (CYLTabBarItemGesture)
@@ -6116,15 +6380,18 @@ static char CYLTabBarItemLongPressHelperKey;
     objc_setAssociatedObject(self, &CYLTabBarItemDoubleTapIntervalKey, @(MAX(tabBarItemDoubleTapInterval, 0)), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+/*!
+ * [EN] The same duration as `cyl_tabButtonLongPressMinimumDuration` (issue #535): one recognizer serves both long press
+ *      APIs, see `CYLTabBarController+CYLInteraction.m`.
+ * [CN] 与 `cyl_tabButtonLongPressMinimumDuration`（issue #535）是同一个时长：两套长按 API 共用一个手势，见
+ *      `CYLTabBarController+CYLInteraction.m`。
+ */
 - (NSTimeInterval)cyl_tabBarItemLongPressDuration {
-    NSNumber *value = objc_getAssociatedObject(self, &CYLTabBarItemLongPressDurationKey);
-    return value ? value.doubleValue : 0.5;
+    return self.cyl_tabButtonLongPressMinimumDuration;
 }
 
 - (void)cyl_setTabBarItemLongPressDuration:(NSTimeInterval)tabBarItemLongPressDuration {
-    objc_setAssociatedObject(self, &CYLTabBarItemLongPressDurationKey, @(MAX(tabBarItemLongPressDuration, 0.1)), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    CYLTabBarItemLongPressHelper *helper = objc_getAssociatedObject(self, &CYLTabBarItemLongPressHelperKey);
-    helper.recognizer.minimumPressDuration = self.cyl_tabBarItemLongPressDuration;
+    self.cyl_tabButtonLongPressMinimumDuration = tabBarItemLongPressDuration;
 }
 
 - (CYLTabBarItemGestureState *)cyl_tabBarItemGestureState {
@@ -6251,6 +6518,14 @@ static char CYLTabBarItemLongPressHelperKey;
     if (!control) {
         return;
     }
+    // [EN] Liquid Glass: tab taps are counted when UIKit's own gesture ends (`-cyl_recognizeLiquidGlassTapOnControl:…`),
+    //      which knows whether the press was a tap, a long press or a drag. The plus child view controller is still counted
+    //      here, as before.
+    // [CN] 液态玻璃：Tab 的点击在系统手势结束时计数（`-cyl_recognizeLiquidGlassTapOnControl:…`），那里知道这次是点击、长按还是拖动。
+    //      PlusButton 子控制器仍和以前一样在这里计数。
+    if (![control cyl_isPlusButton] && [self cyl_liquidGlassTakesTabTaps]) {
+        return;
+    }
     CYLTabBarItemGestureState *state = [self cyl_tabBarItemGestureState];
     BOOL isFirstTapFromHere = !state.receivesTabTapsBeforeSelection;
     state.receivesTabTapsBeforeSelection = YES;
@@ -6277,6 +6552,29 @@ static char CYLTabBarItemLongPressHelperKey;
  *      `-setSelectedIndex:`、Tab 按钮事件、液态玻璃下手指按下时的 `-gestureRecognizerShouldBegin:`、`-cyl_flatDesignPlusButtonTouchUpInside:`），
  *      因此手势不使用它们。`selectedViewController` 为手指按下时选中的控制器（执行到这里时子控制器可能已被选中）；没有按下（代码发送的事件）时为 nil。
  */
+/*!
+ * FIX: issue #152 — taps on tab buttons in Liquid Glass.
+ * [EN] Called by `-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:` (CYLTabBarController+CYLInteraction.m) when UIKit's
+ *      Liquid Glass gesture ends where it began, without a long press: one tap. `selectedViewController` is what was
+ *      selected on touch down, so a tap on the selected tab is a Reselect even if UIKit already selected it on touch down.
+ *      From then on the `didSelectControl` reports are not counted for tab buttons, as for the shouldSelect entry.
+ * [CN] 系统液态玻璃手势在按下的位置结束、且不是长按时，由 `-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:`
+ *      （CYLTabBarController+CYLInteraction.m）调用：一次点击。`selectedViewController` 为手指按下时选中的控制器，因此点击已选中的 Tab
+ *      时，即使系统在按下时已选中它，也算 Reselect。此后与 shouldSelect 入口一样，Tab 按钮不再使用 `didSelectControl` 上报计数。
+ */
+- (void)cyl_recognizeLiquidGlassTapOnControl:(UIControl *)control selectedViewControllerAtTouchDown:(UIViewController *)selectedViewController {
+    if (![self cyl_hasTabBarItemGestureReceiver]) {
+        return;
+    }
+    UIViewController *viewController = nil;
+    if (![self cyl_isTabBarItemGestureControl:control viewController:&viewController]) {
+        return;
+    }
+    [self cyl_tabBarItemGestureState].receivesTabTapsBeforeSelection = YES;
+    BOOL isReselect = viewController && (viewController == selectedViewController);
+    [self cyl_recognizeTabBarItemTapOnControl:control viewController:viewController isReselect:isReselect];
+}
+
 - (void)cyl_recognizePlusButtonTap:(UIControl *)plusButton selectedViewControllerAtTouchDown:(UIViewController *)selectedViewController {
     // Guard: only with a plus button. 仅在有 PlusButton 时处理。
     if (![self cyl_hasTabBarItemGestureReceiver] || ![self hasPlusButton]) {
@@ -6330,20 +6628,594 @@ static char CYLTabBarItemLongPressHelperKey;
     }
     // Remember what is selected before the first tap. 记录第一次点击之前选中的控制器。
     [self cyl_tabBarItemGestureState];
-    if (objc_getAssociatedObject(self, &CYLTabBarItemLongPressHelperKey)) {
+    // [EN] The long press recognizer is shared with issue #535 (`CYLTabBarController+CYLInteraction.m`).
+    // [CN] 长按手势与 issue #535 共用（`CYLTabBarController+CYLInteraction.m`）。
+    [self cyl_installInteractionGestureRecognizersIfNeeded];
+}
+
+@end
+
+#pragma mark - CYLTabBarMinimize (issue #13)
+
+// [EN] Minimize or hide the tab bar on scroll (issue #13). One API, three isolated paths, chosen by
+//      `CYLTabBarMinimizeModeForTabBarController()`; each path is behind its own guard:
+//      - FlatDesign (`#if CYL_FLATDESIGN_AVAILABLE`, FlatDesign style only): the selected page's scroll view is observed
+//        and the flat tab bar is hidden and shown with `-setTabBarHidden:animated:`.
+//      - Liquid Glass (iOS 26+ SDK and system, `+[CYLConstants isLiquidGlassActive]`): the native
+//        `UITabBarController.tabBarMinimizeBehavior`; the scroll view is observed only to keep the plus button centered
+//        while the system minimizes the bar (`-[CYLTabBar plusButtonIndex]`, as PR #728 does for the vertical bar).
+//      - Classic (not FlatDesign, Liquid Glass not active: iOS 25 and earlier, and iOS 26 in UI compatibility mode): the
+//        system tab bar (with its plus button) is hidden and shown while the page scrolls.
+//      FlatDesign and classic hide the bar through the same public `-setTabBarHidden:animated:`; only their guards differ.
+//      See docs/TabBar-Minimize-On-Scroll.md.
+// [CN] 滚动时缩小或隐藏 TabBar（issue #13）。一个接口，三条相互隔离的路径，由 `CYLTabBarMinimizeModeForTabBarController()` 选择，
+//      每条路径都在各自的 guard 之后：
+//      - 扁平样式（`#if CYL_FLATDESIGN_AVAILABLE`，仅扁平样式）：观察选中页面的滚动视图，用 `-setTabBarHidden:animated:` 隐藏、显示
+//        扁平 TabBar。
+//      - 液态玻璃（iOS 26+ SDK 与系统，`+[CYLConstants isLiquidGlassActive]`）：使用系统原生的
+//        `UITabBarController.tabBarMinimizeBehavior`；观察滚动视图只为在系统缩小 TabBar 时让 PlusButton 保持居中
+//        （`-[CYLTabBar plusButtonIndex]`，与 PR #728 对竖向栏的处理相同）。
+//      - 经典样式（非扁平样式且液态玻璃未启用：iOS 25 及以前，以及 iOS 26 的 UI 兼容模式）：页面滚动时，隐藏、显示系统 TabBar
+//        （连同 PlusButton）。
+//      扁平样式与经典样式都通过同一个公开接口 `-setTabBarHidden:animated:` 隐藏 TabBar，只是各自的 guard 不同。
+//      见 docs/TabBar-Minimize-On-Scroll.md。
+
+static const void *CYLTabBarMinimizeBehaviorKey = &CYLTabBarMinimizeBehaviorKey;
+static const void *CYLTabBarMinimizeScrollTrackerKey = &CYLTabBarMinimizeScrollTrackerKey;
+static void *CYLTabBarMinimizeContentOffsetContext = &CYLTabBarMinimizeContentOffsetContext;
+
+/// [EN] Implemented in CYLTabBar.m (issue #13). [CN] 实现见 CYLTabBar.m（issue #13）。
+@interface CYLTabBar (CYLTabBarMinimizeLayout)
+- (BOOL)cyl_showsMinimizedBar;
+@end
+
+/// [EN] Distance (pt) to scroll in one direction before the tab bar hides or shows, so small movements do not flicker it.
+/// [CN] 同一方向滚动超过该距离（pt）才隐藏或显示 TabBar，避免小幅滚动时闪动。
+static const CGFloat CYLTabBarMinimizeScrollDistance = 12.0;
+/// [EN] Content that scrolls less than this (pt) never hides the tab bar: hiding it would change the content's size.
+/// [CN] 可滚动距离小于该值（pt）的内容不隐藏 TabBar：隐藏 TabBar 本身就会改变内容的可滚动范围。
+static const CGFloat CYLTabBarMinimizeMinimumScrollableDistance = 100.0;
+/// [EN] Classic style: how often the page on screen is checked again (core has no push/pop hook outside FlatDesign).
+/// [CN] 经典样式：重新确认当前页面的间隔（FlatDesign 以外，Core 中没有 push/pop 回调）。
+static const NSTimeInterval CYLTabBarMinimizeClassicPageCheckInterval = 0.5;
+
+/// [EN] Which path handles `cyl_tabBarMinimizeBehavior`. [CN] 由哪条路径处理 `cyl_tabBarMinimizeBehavior`。
+typedef NS_ENUM(NSInteger, CYLTabBarMinimizeMode) {
+    /// [EN] Nothing to track (Automatic, Never, or the view is not loaded). [CN] 无需跟踪（Automatic、Never，或视图尚未加载）。
+    CYLTabBarMinimizeModeNone = 0,
+    CYLTabBarMinimizeModeFlatDesign,
+    CYLTabBarMinimizeModeLiquidGlass,
+    CYLTabBarMinimizeModeClassic,
+};
+
+/// [EN] The path for a tab bar controller, decided by guards in order. Never loads the view.
+/// [CN] 依次通过各个 guard 决定 TabBarController 使用的路径。不会触发视图加载。
+static CYLTabBarMinimizeMode CYLTabBarMinimizeModeForTabBarController(CYLTabBarController *tabBarController) {
+    CYLTabBarMinimizeBehavior behavior = tabBarController.cyl_tabBarMinimizeBehavior;
+    // Guard: only the scroll behaviors are tracked. 只跟踪滚动相关的取值。
+    if (CYLTabBarMinimizeBehaviorOnScrollDown != behavior && CYLTabBarMinimizeBehaviorOnScrollUp != behavior) {
+        return CYLTabBarMinimizeModeNone;
+    }
+    // Guard: the `cyl_tabBar` getter sets the tab bar up, so wait for the view. `cyl_tabBar` 的 getter 会创建 TabBar，需等视图加载。
+    if (!tabBarController.isViewLoaded) {
+        return CYLTabBarMinimizeModeNone;
+    }
+    // Guard: FlatDesign. 扁平样式。
+    if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
+#if CYL_FLATDESIGN_AVAILABLE
+        if ([tabBarController.cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+            return CYLTabBarMinimizeModeFlatDesign;
+        }
+#endif
+        return CYLTabBarMinimizeModeNone;
+    }
+    // Guard: Liquid Glass. 液态玻璃。
+    if ([CYLConstants isLiquidGlassActive]) {
+        return [tabBarController.cyl_tabBar isKindOfClass:[CYLTabBar class]] ? CYLTabBarMinimizeModeLiquidGlass : CYLTabBarMinimizeModeNone;
+    }
+    // [EN] Everything else is the classic system tab bar: iOS 25 and earlier, and iOS 26 in UI compatibility mode.
+    // [CN] 其余都是经典系统 TabBar：iOS 25 及以前，以及 iOS 26 的 UI 兼容模式。
+    return CYLTabBarMinimizeModeClassic;
+}
+
+/// [EN] The page the user sees in a tab: the top page of a navigation controller.
+/// [CN] 用户在 Tab 中看到的页面：导航控制器的栈顶页面。
+static UIViewController *CYLTabBarMinimizeVisibleViewController(UIViewController *viewController) {
+    if ([viewController isKindOfClass:[UINavigationController class]]) {
+        return ((UINavigationController *)viewController).topViewController;
+    }
+    return viewController;
+}
+
+/// [EN] The scroll view that drives the tab bar, chosen as UIKit does: the page's bottom content scroll view, otherwise the
+///      first visible scroll view in its view hierarchy (breadth first). Never loads a view.
+/// [CN] 控制 TabBar 的滚动视图，与 UIKit 的选择方式一致：页面底部的 content scroll view，没有时取其视图层级中第一个可见的滚动视图
+///      （广度优先）。不会触发视图加载。
+static UIScrollView *CYLTabBarMinimizeScrollViewForViewController(UIViewController *viewController) {
+    UIViewController *visibleViewController = CYLTabBarMinimizeVisibleViewController(viewController);
+    if (!visibleViewController.isViewLoaded) {
+        return nil;
+    }
+    if (@available(iOS 15.0, *)) {
+        UIScrollView *contentScrollView = [visibleViewController contentScrollViewForEdge:NSDirectionalRectEdgeBottom];
+        if (contentScrollView) {
+            return contentScrollView;
+        }
+    }
+    NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:visibleViewController.view];
+    for (NSUInteger index = 0; index < views.count; index++) {
+        UIView *view = views[index];
+        if (view.hidden) {
+            continue;
+        }
+        if ([view isKindOfClass:[UIScrollView class]] && ![view isKindOfClass:[UITextView class]]) {
+            return (UIScrollView *)view;
+        }
+        [views addObjectsFromArray:view.subviews];
+    }
+    return nil;
+}
+
+/// [EN] Classic style: whether the tab bar sits at the bottom of its superview (not, e.g., a tab bar shown at the top).
+/// [CN] 经典样式：TabBar 是否位于父视图底部（例如排除显示在顶部的 TabBar）。
+static BOOL CYLTabBarMinimizeClassicTabBarIsAtBottom(UITabBar *tabBar) {
+    UIView *container = tabBar.superview;
+    if (!container) {
+        return NO;
+    }
+    CGFloat bottom = tabBar.center.y + CGRectGetHeight(tabBar.bounds) * 0.5;
+    return bottom >= CGRectGetHeight(container.bounds) - 1.0;
+}
+
+/// [EN] Classic style: whether UIKit hides the tab bar for the page on screen (`hidesBottomBarWhenPushed` on a page pushed
+///      above the root of the selected navigation controller), so the bar is UIKit's to move, not ours.
+/// [CN] 经典样式：UIKit 是否因当前页面隐藏 TabBar（选中的导航控制器中，根页面之上被 push 的页面设置了 `hidesBottomBarWhenPushed`），
+///      此时 TabBar 由 UIKit 移动，而不是由这里处理。
+static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedViewController) {
+    if (![selectedViewController isKindOfClass:[UINavigationController class]]) {
+        return NO;
+    }
+    NSArray<UIViewController *> *viewControllers = ((UINavigationController *)selectedViewController).viewControllers;
+    for (NSUInteger index = 1; index < viewControllers.count; index++) {
+        if (viewControllers[index].hidesBottomBarWhenPushed) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// [EN] Observes the scroll view of the page on screen and runs the path's action. See the section comment above.
+/// [CN] 观察当前显示页面的滚动视图，并执行对应路径的处理。见上方说明。
+@interface _CYLTabBarMinimizeScrollTracker : NSObject
+@property (nonatomic, weak, readonly) CYLTabBarController *tabBarController;
+@property (nonatomic, weak, readonly) UIScrollView *scrollView;
+@property (nonatomic, assign, readonly) CYLTabBarMinimizeMode mode;
+- (instancetype)initWithTabBarController:(CYLTabBarController *)tabBarController;
+- (void)updateMode:(CYLTabBarMinimizeMode)mode;
+- (void)observeScrollView:(UIScrollView *)scrollView;
+- (void)expandTabBar;
+@end
+
+@implementation _CYLTabBarMinimizeScrollTracker {
+    /// [EN] Distance scrolled in the current direction (positive: content moves up). [CN] 当前方向的累计滚动距离（正值：内容上移）。
+    CGFloat _scrolledDistance;
+    /// [EN] YES when the tab bar was hidden by scrolling, not by the app. [CN] TabBar 是滚动隐藏的，而不是 App 自己隐藏的。
+    BOOL _hiddenByScroll;
+    /// [EN] Liquid Glass: the minimized state the tab bar was last laid out for. [CN] 液态玻璃：上次布局时 TabBar 的缩小状态。
+    BOOL _laidOutMinimized;
+    /// [EN] Classic: checks the page on screen again (see CYLTabBarMinimizeClassicPageCheckInterval). [CN] 经典样式：定时重新确认当前页面。
+    NSTimer *_classicPageCheckTimer;
+}
+
+- (instancetype)initWithTabBarController:(CYLTabBarController *)tabBarController {
+    self = [super init];
+    if (self) {
+        _tabBarController = tabBarController;
+    }
+    return self;
+}
+
+- (void)dealloc {
+    [_classicPageCheckTimer invalidate];
+    [self observeScrollView:nil];
+}
+
+- (void)updateMode:(CYLTabBarMinimizeMode)mode {
+    if (_mode == mode) {
         return;
     }
-    CYLTabBarItemLongPressHelper *helper = [[CYLTabBarItemLongPressHelper alloc] init];
-    helper.tabBarController = self;
-    UILongPressGestureRecognizer *recognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:helper action:@selector(cyl_longPress:)];
-    recognizer.minimumPressDuration = self.cyl_tabBarItemLongPressDuration;
-    recognizer.cancelsTouchesInView = NO;
-    recognizer.delaysTouchesBegan = NO;
-    recognizer.delaysTouchesEnded = NO;
-    recognizer.delegate = helper;
-    helper.recognizer = recognizer;
-    [self.view addGestureRecognizer:recognizer];
-    objc_setAssociatedObject(self, &CYLTabBarItemLongPressHelperKey, helper, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    // [EN] Leaving a path: give back a tab bar it hid. [CN] 离开某条路径：恢复它隐藏的 TabBar。
+    [self expandTabBar];
+    _mode = mode;
+    _scrolledDistance = 0;
+    _laidOutMinimized = NO;
+    // Guard: the page check timer runs for the classic path only. 定时检查只用于经典样式。
+    [_classicPageCheckTimer invalidate];
+    _classicPageCheckTimer = nil;
+    if (CYLTabBarMinimizeModeClassic == mode) {
+        __weak typeof(self) weakSelf = self;
+        _classicPageCheckTimer = [NSTimer scheduledTimerWithTimeInterval:CYLTabBarMinimizeClassicPageCheckInterval repeats:YES block:^(NSTimer *timer) {
+            CYLTabBarController *tabBarController = weakSelf.tabBarController;
+            if (!tabBarController) {
+                [timer invalidate];
+                return;
+            }
+            if (tabBarController.viewIfLoaded.window) {
+                [tabBarController cyl_updateTabBarMinimizeTracking];
+            }
+        }];
+        _classicPageCheckTimer.tolerance = CYLTabBarMinimizeClassicPageCheckInterval * 0.5;
+    }
+}
+
+- (void)observeScrollView:(UIScrollView *)scrollView {
+    UIScrollView *observedScrollView = _scrollView;
+    if (observedScrollView == scrollView) {
+        return;
+    }
+    // [EN] A scroll view that is already gone was nilled out by `weak`; KVO drops its observers itself (iOS 11+).
+    // [CN] 已释放的滚动视图会被 `weak` 置为 nil；KVO 会自行移除它的观察者（iOS 11+）。
+    [observedScrollView removeObserver:self forKeyPath:@"contentOffset" context:CYLTabBarMinimizeContentOffsetContext];
+    _scrollView = scrollView;
+    _scrolledDistance = 0;
+    [scrollView addObserver:self
+                 forKeyPath:@"contentOffset"
+                    options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+                    context:CYLTabBarMinimizeContentOffsetContext];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+    if (context != CYLTabBarMinimizeContentOffsetContext) {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
+    UIScrollView *scrollView = self.scrollView;
+    if (!scrollView || object != scrollView) {
+        return;
+    }
+    // Guard: Liquid Glass only follows the system; it never hides the bar itself. 液态玻璃只跟随系统，从不自行隐藏 TabBar。
+    if (CYLTabBarMinimizeModeLiquidGlass == _mode) {
+        [self layOutTabBarIfMinimizedStateChanged];
+        return;
+    }
+    NSValue *oldValue = change[NSKeyValueChangeOldKey];
+    NSValue *newValue = change[NSKeyValueChangeNewKey];
+    if (![oldValue isKindOfClass:[NSValue class]] || ![newValue isKindOfClass:[NSValue class]]) {
+        return;
+    }
+    [self scrollView:scrollView didScrollFromOffsetY:oldValue.CGPointValue.y toOffsetY:newValue.CGPointValue.y];
+}
+
+/// [EN] FlatDesign and classic: decide from the user's scrolling whether to hide or show the tab bar.
+/// [CN] 扁平样式与经典样式：根据用户的滚动决定隐藏或显示 TabBar。
+- (void)scrollView:(UIScrollView *)scrollView didScrollFromOffsetY:(CGFloat)oldOffsetY toOffsetY:(CGFloat)newOffsetY {
+    // Guard: the paths that hide the bar themselves. 只处理自行隐藏 TabBar 的路径。
+    if (CYLTabBarMinimizeModeFlatDesign != _mode && CYLTabBarMinimizeModeClassic != _mode) {
+        return;
+    }
+    CYLTabBarMinimizeBehavior behavior = self.tabBarController.cyl_tabBarMinimizeBehavior;
+    BOOL minimizesOnScrollDown = (CYLTabBarMinimizeBehaviorOnScrollDown == behavior);
+    BOOL minimizesOnScrollUp = (CYLTabBarMinimizeBehaviorOnScrollUp == behavior);
+    if (!minimizesOnScrollDown && !minimizesOnScrollUp) {
+        return;
+    }
+    // [EN] Only scrolling by the user counts. Offsets set in code, e.g. when the safe area changes because the tab bar
+    //      hides, are ignored.
+    // [CN] 只响应用户的滚动。代码设置的偏移（例如 TabBar 隐藏导致安全区变化）不处理。
+    if (!scrollView.isTracking && !scrollView.isDragging && !scrollView.isDecelerating) {
+        return;
+    }
+    UIEdgeInsets insets = scrollView.adjustedContentInset;
+    CGFloat minOffsetY = -insets.top;
+    CGFloat maxOffsetY = MAX(minOffsetY, scrollView.contentSize.height + insets.bottom - CGRectGetHeight(scrollView.bounds));
+    if (maxOffsetY - minOffsetY < CYLTabBarMinimizeMinimumScrollableDistance) {
+        return;
+    }
+    // [EN] Back at the edge the content starts from: show the tab bar, as the system does.
+    // [CN] 回到内容的起始边缘：与系统一致，显示 TabBar。
+    if ((minimizesOnScrollDown && newOffsetY <= minOffsetY) || (minimizesOnScrollUp && newOffsetY >= maxOffsetY)) {
+        _scrolledDistance = 0;
+        [self expandTabBar];
+        return;
+    }
+    // [EN] Ignore the rubber band beyond either edge: it bounces back in the opposite direction.
+    // [CN] 忽略超出边缘的回弹：回弹的方向与滚动方向相反。
+    if (oldOffsetY < minOffsetY || oldOffsetY > maxOffsetY || newOffsetY < minOffsetY || newOffsetY > maxOffsetY) {
+        return;
+    }
+    CGFloat delta = newOffsetY - oldOffsetY;
+    if (delta == 0) {
+        return;
+    }
+    if ((delta > 0) != (_scrolledDistance > 0)) {
+        _scrolledDistance = 0;
+    }
+    _scrolledDistance += delta;
+    if (fabs(_scrolledDistance) < CYLTabBarMinimizeScrollDistance) {
+        return;
+    }
+    // [EN] Positive: the content moves up, i.e. the user scrolls down to read on.
+    // [CN] 正值：内容上移，即用户向下滚动继续浏览。
+    BOOL scrollsDown = (_scrolledDistance > 0);
+    _scrolledDistance = 0;
+    if (scrollsDown == minimizesOnScrollDown) {
+        [self minimizeTabBar];
+    } else {
+        [self expandTabBar];
+    }
+}
+
+#pragma mark Liquid Glass
+
+/*!
+ * [EN] Liquid Glass: the system minimizes or expands the tab bar while the page scrolls, without a public callback. When
+ *      the platter's geometry (`-[CYLTabBar cyl_showsMinimizedBar]`) flips, lay the tab bar out so the plus button
+ *      follows: centered on its tab while minimized, the usual height-based position when expanded. Laid out once more
+ *      after the system's animation.
+ * [CN] 液态玻璃：页面滚动时系统会缩小或恢复 TabBar，没有公开的回调。当 platter 的几何尺寸（`-[CYLTabBar cyl_showsMinimizedBar]`）
+ *      发生变化时重新布局 TabBar，让 PlusButton 跟随：缩小时居中于它的 Tab，恢复后回到按 TabBar 高度计算的位置。系统动画结束后再布局一次。
+ */
+- (void)layOutTabBarIfMinimizedStateChanged {
+    UIView *tabBar = self.tabBarController.cyl_tabBar;
+    if (![tabBar isKindOfClass:[CYLTabBar class]]) {
+        return;
+    }
+    BOOL minimized = [(CYLTabBar *)tabBar cyl_showsMinimizedBar];
+    if (minimized == _laidOutMinimized) {
+        return;
+    }
+    _laidOutMinimized = minimized;
+    [tabBar setNeedsLayout];
+    __weak UIView *weakTabBar = tabBar;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [weakTabBar setNeedsLayout];
+    });
+}
+
+#pragma mark Hide / show
+
+/*!
+ * [EN] FlatDesign and classic: hide the tab bar through the public `-setTabBarHidden:animated:`, the same API the app
+ *      uses. Each path has its own guard: only a tab bar on screen is hidden, not one hidden by the app, nor by
+ *      `hidesBottomBarWhenPushed`.
+ * [CN] 扁平样式与经典样式：通过公开的 `-setTabBarHidden:animated:`（App 使用的同一个接口）隐藏 TabBar。每条路径都有自己的 guard：
+ *      只隐藏正在显示的 TabBar，App 自己隐藏的、`hidesBottomBarWhenPushed` 隐藏的都不处理。
+ */
+- (void)minimizeTabBar {
+    CYLTabBarController *tabBarController = self.tabBarController;
+    if (!tabBarController || tabBarController.isTabBarHidden) {
+        return;
+    }
+    switch (_mode) {
+        case CYLTabBarMinimizeModeFlatDesign:
+            if (![self flatDesignCanHideTabBar]) {
+                return;
+            }
+            break;
+        case CYLTabBarMinimizeModeClassic:
+            if (![self classicCanHideTabBar]) {
+                return;
+            }
+            break;
+        case CYLTabBarMinimizeModeLiquidGlass:
+        case CYLTabBarMinimizeModeNone:
+            return;
+    }
+    _hiddenByScroll = YES;
+    [tabBarController setTabBarHidden:YES animated:YES];
+}
+
+- (void)expandTabBar {
+    // Guard: only a tab bar hidden by scrolling is shown again. 只恢复被滚动隐藏的 TabBar。
+    if (!_hiddenByScroll) {
+        return;
+    }
+    // [EN] Guard (classic): a pushed page hides the bar through `hidesBottomBarWhenPushed`; keep it hidden by scrolling
+    //      until a page that shows the bar is back, then show it.
+    // [CN] Guard（经典样式）：被 push 的页面通过 `hidesBottomBarWhenPushed` 隐藏了 TabBar；保持“滚动隐藏”状态，等显示 TabBar
+    //      的页面回来后再显示。
+    if (CYLTabBarMinimizeModeClassic == _mode && CYLTabBarMinimizeClassicPageHidesTabBar(self.tabBarController.selectedViewController)) {
+        return;
+    }
+    _hiddenByScroll = NO;
+    if (CYLTabBarMinimizeModeFlatDesign != _mode && CYLTabBarMinimizeModeClassic != _mode) {
+        return;
+    }
+    CYLTabBarController *tabBarController = self.tabBarController;
+    if (tabBarController.isTabBarHidden) {
+        [tabBarController setTabBarHidden:NO animated:YES];
+    }
+}
+
+/// [EN] FlatDesign guard: the flat tab bar is on screen in the controller's view (not in a transition overlay).
+/// [CN] 扁平样式 guard：扁平 TabBar 正显示在控制器的视图中（不在转场 overlay 中）。
+- (BOOL)flatDesignCanHideTabBar {
+#if CYL_FLATDESIGN_AVAILABLE
+    CYLTabBarController *tabBarController = self.tabBarController;
+    UIView *tabBar = tabBarController.cyl_tabBar;
+    return [tabBar isKindOfClass:[CYLFlatDesignTabBar class]] && !tabBar.hidden && tabBar.superview == tabBarController.view;
+#else
+    return NO;
+#endif
+}
+
+/// [EN] Classic guard: the system tab bar is on screen at the bottom, and the page on screen does not hide it through
+///      `hidesBottomBarWhenPushed`.
+/// [CN] 经典样式 guard：系统 TabBar 正显示在底部，且当前页面没有通过 `hidesBottomBarWhenPushed` 隐藏它。
+- (BOOL)classicCanHideTabBar {
+    CYLTabBarController *tabBarController = self.tabBarController;
+    UITabBar *tabBar = tabBarController.tabBar;
+    if (!tabBar || tabBar.hidden || tabBar.alpha < 0.01 || !tabBar.window || !CYLTabBarMinimizeClassicTabBarIsAtBottom(tabBar)) {
+        return NO;
+    }
+    return !CYLTabBarMinimizeClassicPageHidesTabBar(tabBarController.selectedViewController);
+}
+@end
+
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+/// [EN] The native value for a CYLTabBarMinimizeBehavior. [CN] CYLTabBarMinimizeBehavior 对应的系统取值。
+static UITabBarMinimizeBehavior CYLSystemTabBarMinimizeBehavior(CYLTabBarMinimizeBehavior behavior) API_AVAILABLE(ios(26.0)) {
+    switch (behavior) {
+        case CYLTabBarMinimizeBehaviorNever:
+            return UITabBarMinimizeBehaviorNever;
+        case CYLTabBarMinimizeBehaviorOnScrollDown:
+            return UITabBarMinimizeBehaviorOnScrollDown;
+        case CYLTabBarMinimizeBehaviorOnScrollUp:
+            return UITabBarMinimizeBehaviorOnScrollUp;
+        case CYLTabBarMinimizeBehaviorAutomatic:
+            break;
+    }
+    return UITabBarMinimizeBehaviorAutomatic;
+}
+
+/// [EN] The CYLTabBarMinimizeBehavior for a native value. [CN] 系统取值对应的 CYLTabBarMinimizeBehavior。
+static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMinimizeBehavior behavior) API_AVAILABLE(ios(26.0)) {
+    switch (behavior) {
+        case UITabBarMinimizeBehaviorNever:
+            return CYLTabBarMinimizeBehaviorNever;
+        case UITabBarMinimizeBehaviorOnScrollDown:
+            return CYLTabBarMinimizeBehaviorOnScrollDown;
+        case UITabBarMinimizeBehaviorOnScrollUp:
+            return CYLTabBarMinimizeBehaviorOnScrollUp;
+        case UITabBarMinimizeBehaviorAutomatic:
+            break;
+    }
+    return CYLTabBarMinimizeBehaviorAutomatic;
+}
+#endif
+
+@implementation CYLTabBarController (CYLTabBarMinimize)
+
+- (CYLTabBarMinimizeBehavior)cyl_tabBarMinimizeBehavior {
+    NSNumber *behavior = objc_getAssociatedObject(self, CYLTabBarMinimizeBehaviorKey);
+    return (CYLTabBarMinimizeBehavior)behavior.integerValue;
+}
+
+- (void)setCyl_tabBarMinimizeBehavior:(CYLTabBarMinimizeBehavior)behavior {
+    objc_setAssociatedObject(self, CYLTabBarMinimizeBehaviorKey, @(behavior), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_updateTabBarMinimizeTracking];
+}
+
+#pragma mark cyl_hidesTabBarOnScroll
+
+- (BOOL)cyl_hidesTabBarOnScroll {
+    CYLTabBarMinimizeBehavior behavior = self.cyl_tabBarMinimizeBehavior;
+    return (CYLTabBarMinimizeBehaviorOnScrollDown == behavior || CYLTabBarMinimizeBehaviorOnScrollUp == behavior);
+}
+
+/*!
+ * [EN] The direct switch, one branch per style so it reads as what happens. All branches store the same value as
+ *      `cyl_tabBarMinimizeBehavior` (OnScrollDown or Never), so the two APIs always agree, also after a style change.
+ * [CN] 直接的开关，每种样式一个分支，读代码即可知道效果。所有分支保存的都是与 `cyl_tabBarMinimizeBehavior` 相同的取值
+ *      （OnScrollDown 或 Never），因此两个接口始终一致，样式改变后也一样。
+ */
+- (void)setCyl_hidesTabBarOnScroll:(BOOL)hidesTabBarOnScroll {
+    // 1. Liquid Glass (iOS 26+): Apple's own API; the system minimizes the tab bar.
+    //    液态玻璃（iOS 26+）：直接调用 Apple 自己的接口，由系统缩小 TabBar。
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    if (@available(iOS 26.0, *)) {
+        if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]) {
+            self.tabBarMinimizeBehavior = hidesTabBarOnScroll ? UITabBarMinimizeBehaviorOnScrollDown : UITabBarMinimizeBehaviorNever;
+            return;
+        }
+    }
+#endif
+    CYLTabBarMinimizeBehavior behavior = hidesTabBarOnScroll ? CYLTabBarMinimizeBehaviorOnScrollDown : CYLTabBarMinimizeBehaviorNever;
+    // 2. FlatDesign: CYLTabBarController follows the page's scroll view and hides the flat tab bar with
+    //    `-setTabBarHidden:animated:`.
+    //    扁平样式：CYLTabBarController 跟随页面的滚动视图，用 `-setTabBarHidden:animated:` 隐藏扁平 TabBar。
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+        self.cyl_tabBarMinimizeBehavior = behavior;
+        return;
+    }
+    // 3. Classic tab bar (iOS 25 and earlier such as iOS 17, and iOS 26 in UI compatibility mode): the same tracking; the
+    //    system tab bar is hidden with `-setTabBarHidden:animated:` (UIKit on iOS 18+, FlatDesign's animation before).
+    //    经典 TabBar（iOS 25 及以前如 iOS 17，以及 iOS 26 的 UI 兼容模式）：同样的跟随方式；用 `-setTabBarHidden:animated:` 隐藏系统
+    //    TabBar（iOS 18+ 由 UIKit 执行，更早的系统使用扁平样式的动画）。
+    self.cyl_tabBarMinimizeBehavior = behavior;
+}
+
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+/*!
+ * [EN] The same switch through Apple's own API (iOS 26+): `tabBarController.tabBarMinimizeBehavior = ...` turns scroll
+ *      hiding on and off in every style, exactly as `cyl_tabBarMinimizeBehavior`. Both read and write one stored value;
+ *      the value really given to UIKit (`Never` for FlatDesign and the classic tab bar) is written through `super`.
+ *      Use `cyl_tabBarMinimizeBehavior` where iOS 25 and earlier must be supported, since Apple's property does not
+ *      exist there.
+ * [CN] 通过 Apple 自己的接口（iOS 26+）使用同一个开关：`tabBarController.tabBarMinimizeBehavior = ...` 在所有样式下开启、关闭
+ *      滚动隐藏，与 `cyl_tabBarMinimizeBehavior` 完全相同。二者读写同一个保存的取值；真正交给 UIKit 的取值（扁平样式与经典
+ *      TabBar 为 `Never`）通过 `super` 写入。需要支持 iOS 25 及以前时请使用 `cyl_tabBarMinimizeBehavior`，因为这些系统上没有
+ *      Apple 的这个属性。
+ */
+- (void)setTabBarMinimizeBehavior:(UITabBarMinimizeBehavior)tabBarMinimizeBehavior {
+    if (@available(iOS 26.0, *)) {
+        self.cyl_tabBarMinimizeBehavior = CYLTabBarMinimizeBehaviorFromSystem(tabBarMinimizeBehavior);
+    }
+}
+
+- (UITabBarMinimizeBehavior)tabBarMinimizeBehavior {
+    if (@available(iOS 26.0, *)) {
+        // [EN] Not set by the app yet: UIKit's own value. [CN] App 尚未设置：返回 UIKit 自己的取值。
+        if (!objc_getAssociatedObject(self, CYLTabBarMinimizeBehaviorKey)) {
+            return [super tabBarMinimizeBehavior];
+        }
+        return CYLSystemTabBarMinimizeBehavior(self.cyl_tabBarMinimizeBehavior);
+    }
+    return 0;
+}
+#endif
+
+- (void)cyl_updateTabBarMinimizeTracking {
+    // [EN] Nothing to do until the app sets a value: UIKit's own default is left untouched.
+    // [CN] App 设置取值之前不做任何处理：不改动 UIKit 自身的默认值。
+    if (!objc_getAssociatedObject(self, CYLTabBarMinimizeBehaviorKey)) {
+        return;
+    }
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    if (@available(iOS 26.0, *)) {
+        // [EN] Only Liquid Glass lets the system minimize the tab bar. FlatDesign and the classic tab bar (UI compatibility
+        //      mode) hide it themselves, so the system is told never to minimize. Checked again on every layout, because
+        //      the style can change after the value is set; only a different value is written.
+        // [CN] 只有液态玻璃交给系统缩小 TabBar。扁平样式与经典 TabBar（UI 兼容模式）自行隐藏 TabBar，因此让系统不缩小。由于设置取值后
+        //      样式仍可能改变，每次布局都会重新检查；只有取值不同时才写入。
+        BOOL systemMinimizes = (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) && [CYLConstants isLiquidGlassActive];
+        UITabBarMinimizeBehavior systemBehavior = systemMinimizes ? CYLSystemTabBarMinimizeBehavior(self.cyl_tabBarMinimizeBehavior) : UITabBarMinimizeBehaviorNever;
+        // [EN] Through `super`: `-setTabBarMinimizeBehavior:` above is the app's switch, not UIKit's value.
+        // [CN] 通过 `super`：上面的 `-setTabBarMinimizeBehavior:` 是 App 的开关，而不是交给 UIKit 的取值。
+        if ([super tabBarMinimizeBehavior] != systemBehavior) {
+            [super setTabBarMinimizeBehavior:systemBehavior];
+        }
+    }
+#endif
+    _CYLTabBarMinimizeScrollTracker *tracker = objc_getAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey);
+    CYLTabBarMinimizeMode mode = CYLTabBarMinimizeModeForTabBarController(self);
+    if (CYLTabBarMinimizeModeNone == mode) {
+        if (tracker) {
+            CYLTabBarMinimizeMode previousMode = tracker.mode;
+            // [EN] Turned off: stop observing and give back a tab bar that scrolling hid.
+            // [CN] 已关闭：停止观察，并恢复被滚动隐藏的 TabBar。
+            [tracker observeScrollView:nil];
+            [tracker updateMode:CYLTabBarMinimizeModeNone];
+            objc_setAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            // [EN] Liquid Glass: put the plus button back at its usual position. [CN] 液态玻璃：让 PlusButton 回到常规位置。
+            if (CYLTabBarMinimizeModeLiquidGlass == previousMode && self.isViewLoaded) {
+                [self.cyl_tabBar setNeedsLayout];
+            }
+        }
+        return;
+    }
+    if (!tracker) {
+        tracker = [[_CYLTabBarMinimizeScrollTracker alloc] initWithTabBarController:self];
+        objc_setAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey, tracker, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    [tracker updateMode:mode];
+    UIScrollView *scrollView = CYLTabBarMinimizeScrollViewForViewController(self.selectedViewController);
+    if (scrollView != tracker.scrollView) {
+        // [EN] Another tab or page is on screen: show the tab bar again, as the system does.
+        // [CN] 切换到其他 Tab 或页面：与系统一致，重新显示 TabBar。
+        [tracker expandTabBar];
+        [tracker observeScrollView:scrollView];
+    }
 }
 
 @end

@@ -1078,11 +1078,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 - (void)cyl_demo_showActionsForControl:(UIControl *)control {
     NSString *identifier = control.cyl_tabBarItemIdentifier;
     UIAlertController *sheet = [UIAlertController alertControllerWithTitle:identifier
-                                                                    message:@"Long press (#152)"
+                                                                    message:CYLLocalizedString(@"长按（#152）")
                                                              preferredStyle:UIAlertControllerStyleActionSheet];
     __weak __typeof(self) weakSelf = self;
     if (identifier.length > 0 && ![control cyl_isPlusButton]) {
-        [sheet addAction:[UIAlertAction actionWithTitle:@"Select" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [sheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"选中") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
             [weakSelf cyl_selectTabBarItemWithIdentifier:identifier];
         }]];
     }

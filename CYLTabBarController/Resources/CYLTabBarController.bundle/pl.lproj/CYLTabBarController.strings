@@ -208,6 +208,43 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex i PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Stuknij, aby wybrać następną kartę. Indeks bez PlusButton: %1$@, selectedIndex: %2$@, teraz: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Powiększ i pomniejsz";
+"从小放大" = "Przybliżenie";
+"弹性" = "Odbicie";
+"弹性 + 烟花" = "Odbicie + fajerwerki";
+"旋转" = "Obrót";
+"翻转" = "Odwrócenie";
+"飘散" = "Rozwianie";
+"无" = "Brak";
+"Tab 点击动画（issue #535）" = "Animacja dotknięcia kart (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Stuknij, aby zmienić animację dotknięcia kart i PlusButton. Teraz: %@";
+"长按了「%@」" = "Przytrzymano „%@”";
+"左右滑动切换 Tab（issue #535）" = "Przesuń, aby zmienić kartę (issue #535)";
+"长按 Tab（issue #535）" = "Przytrzymanie kart (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Włącz przełącznik, a następnie przesuń stronę w lewo lub w prawo, aby przejść do następnej lub poprzedniej karty.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Włącz przełącznik, a następnie przytrzymaj dowolną kartę lub PlusButton, aby zobaczyć jego identyfikator.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Obrót (tylko ta karta: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Klatki + fajerwerki (wszystkie karty: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Reagowanie poza widokiem nadrzędnym (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Po włączeniu przełącznika reaguje też część przycisku poza szarym polem; każde stuknięcie odtwarza animację skalowania. Stuknięcia: %@";
+"已找到" = "Znaleziono";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Nie znaleziono (przy use_frameworks pakiet zasobów jest wewnątrz frameworka)";
+"从 bundle 加载图片（issue #535）" = "Wczytywanie obrazów z bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Obraz po lewej jest wczytywany z pakietu zasobów za pomocą CYLImageInBundle (bez pamięci podręcznej). CYLBundleImage w głównym bundle: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "To zwykły UIViewController, który nie dziedziczy po CYLBaseViewController. Pasek nawigacji jest ukryty.";
+"不继承基类隐藏导航栏（issue #535）" = "Ukrywanie paska nawigacji bez klasy bazowej (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Przełącznik ustawia cyl_automaticNavigationSettingEnabled; stuknij wiersz, aby otworzyć zwykły UIViewController, który ustawia cyl_navigationBarHidden i cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Strona %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Przejście przesuwane (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Stuknij, aby otworzyć systemowy UITabBarController: stuknij kartę lub przeciągnij stronę w lewo lub w prawo, a strona przesunie się za palcem.";
+
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "Zmniejszanie / ukrywanie TabBar podczas przewijania (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "Stuknij, aby zmienić zachowanie przy przewijaniu. Teraz: %@. Liquid Glass (iOS 26+): system zmniejsza TabBar; FlatDesign i styl klasyczny (iOS 25 i starsze, tryb zgodności interfejsu iOS 26): TabBar jest ukrywany.";
 "当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Ten styl paska kart tego nie obsługuje: tylko FlatDesign (CYLFlatDesignTabBar)";
 "当前 TabBar 样式不支持" = "Ten styl paska kart tego nie obsługuje";
 "该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Wymaga elementów kart FlatDesign (CYLFlatDesignTabBarItem). W Liquid Glass i stylu klasycznym elementy rysuje system, więc układu ani koloru tła nie można zmienić.";
@@ -218,3 +255,25 @@
 "跳转与对比" = "Nawigacja i porównania";
 "角标" = "Plakietki";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nie obsługuje: wysokość paska ustala system (FlatDesign i styl klasyczny obsługują)";
+"默认点击声" = "Domyślne kliknięcie";
+"中等触感反馈" = "Średnia haptyka";
+"无需继承基类与工具方法" = "Bez klasy bazowej i narzędzia";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Poprzednia / następna karta (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Słabe odwołanie: pobrane za życia %@, nil po zwolnieniu %@. Od %@ do przycisku wybranej karty: %@";
+"点击声 + 触感反馈" = "Kliknięcie + haptyka";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Odbicie + gwiezdne fajerwerki (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Stuknij strzałki po prawej, aby wywołać cyl_switchToAdjacentTabWithStep:-1 / 1. Jak przesunięcie, pomija PlusButton i sprawdza logowanie. Ostatni wynik: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Stuknij, aby przełączyć, a potem stuknij dowolną kartę lub PlusButton, aby usłyszeć. Haptyka wibruje tylko na prawdziwym urządzeniu. Teraz: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Stuknij, aby uruchomić: cyl_setWeakAssociatedObject:forKey: zwraca nil po zwolnieniu obiektu; cyl_nearestControlBelowView: znajduje przycisk wybranej karty na podstawie jej ikony.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Stuknij, aby przełączyć. cyl_tabBarItemLongPressDuration: %@ s, cyl_tabButtonLongPressMinimumDuration: %@ s, cyl_tabBarItemDoubleTapInterval: %@ s";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Własny plik dźwiękowy (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Zawinięcie w górę, bez animacji odznaczenia (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Powolne powiększanie i zmniejszanie (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Powolne przybliżanie (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: słabe obiekty powiązane i wyszukiwanie przycisku (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Czas długiego naciśnięcia i odstęp podwójnego stuknięcia (issue #535 / #152)";
+"Tab 交互" = "Interakcje kart";
+"Tab 点击声音与触感反馈（issue #535）" = "Dźwięk i haptyka stuknięcia karty (issue #535)";
+"轻触感反馈" = "Lekka haptyka";
+"重触感反馈" = "Silna haptyka";
+"长按（#152）" = "Długie naciśnięcie (#152)";

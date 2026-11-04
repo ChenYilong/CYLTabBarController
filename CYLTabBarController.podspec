@@ -54,6 +54,8 @@ Pod::Spec.new do |s|
     ]
     core.public_header_files = 'CYLTabBarController/**/*.h'
     # The resource bundle is part of CYLUtils (see above), which Core depends on. 资源包属于 Core 依赖的 CYLUtils。
+    # FIX: issue #535 — the tab tap sound. 点击 Tab 的音效。
+    core.frameworks = 'UIKit', 'AudioToolbox'
 
     
   end

@@ -208,6 +208,43 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex ja PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Napauta valitaksesi seuraavan välilehden. Indeksi ilman PlusButtonia: %1$@, selectedIndex: %2$@, nyt: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Suurenna ja pienennä";
+"从小放大" = "Lähennä";
+"弹性" = "Pomppu";
+"弹性 + 烟花" = "Pomppu + ilotulitus";
+"旋转" = "Kierrä";
+"翻转" = "Käännä";
+"飘散" = "Haihdu";
+"无" = "Ei mitään";
+"Tab 点击动画（issue #535）" = "Välilehtien napautusanimaatio (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Napauta vaihtaaksesi välilehtien ja PlusButtonin napautusanimaation. Nyt: %@";
+"长按了「%@」" = "Painettiin pitkään kohdetta ”%@”";
+"左右滑动切换 Tab（issue #535）" = "Vaihda välilehteä pyyhkäisemällä (issue #535)";
+"长按 Tab（issue #535）" = "Välilehtien pitkä painallus (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Ota kytkin käyttöön ja pyyhkäise sivulla vasemmalle tai oikealle siirtyäksesi seuraavaan tai edelliseen välilehteen.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Ota kytkin käyttöön ja paina pitkään välilehteä tai PlusButtonia nähdäksesi sen tunnisteen.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Kierrä (vain tämä välilehti: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Kehykset + ilotulitus (kaikki välilehdet: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Reagoi ylänäkymän ulkopuolella (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Kun kytkin on päällä, myös harmaan laatikon ulkopuolinen painikkeen osa reagoi; jokainen napautus toistaa skaalausanimaation. Napautuksia: %@";
+"已找到" = "Löytyi";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Ei löytynyt (use_frameworks-tilassa resurssipaketti on frameworkin sisällä)";
+"从 bundle 加载图片（issue #535）" = "Lataa kuvia bundlesta (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Vasemmanpuoleinen kuva luetaan resurssipaketista CYLImageInBundle-funktiolla (ei välimuistia). CYLBundleImage pääbundlessa: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Tämä on tavallinen UIViewController, joka ei peri CYLBaseViewControlleria. Navigointipalkki on piilotettu.";
+"不继承基类隐藏导航栏（issue #535）" = "Piilota navigointipalkki ilman kantaluokkaa (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Kytkin asettaa cyl_automaticNavigationSettingEnabled; napauta riviä avataksesi tavallisen UIViewControllerin, joka asettaa cyl_navigationBarHidden ja cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Sivu %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Liukuva siirtymä (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Napauta avataksesi järjestelmän UITabBarControllerin: napauta välilehteä tai vedä sivua vasemmalle tai oikealle, ja sivu liukuu sormen mukana.";
+
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "Pienennä / piilota TabBar vieritettäessä (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "Napauta vaihtaaksesi vierityksen toimintaa. Nyt: %@. Liquid Glass (iOS 26+): järjestelmä pienentää TabBarin; FlatDesign ja klassinen tyyli (iOS 25 ja aiemmat, iOS 26:n käyttöliittymän yhteensopivuustila): TabBar piilotetaan.";
 "当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Tämä välilehtipalkin tyyli ei tue tätä: vain FlatDesign (CYLFlatDesignTabBar)";
 "当前 TabBar 样式不支持" = "Tämä välilehtipalkin tyyli ei tue tätä";
 "该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Vaatii FlatDesign-välilehtikohteet (CYLFlatDesignTabBarItem). Liquid Glassissa ja klassisessa tyylissä järjestelmä piirtää kohteet, joten asettelua ja taustaväriä ei voi muuttaa.";
@@ -218,3 +255,25 @@
 "跳转与对比" = "Navigointi ja vertailut";
 "角标" = "Merkit";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass ei tue: järjestelmä määrää palkin korkeuden (FlatDesign ja klassinen tyyli tukevat)";
+"默认点击声" = "Oletusnapsautus";
+"中等触感反馈" = "Keskivahva haptinen palaute";
+"无需继承基类与工具方法" = "Ilman perusluokkaa, ja apuvälineet";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Edellinen / seuraava välilehti (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Heikko viittaus: löytyi elossa %@, nil vapautuksen jälkeen %@. Kohteesta %@ valitun välilehden painikkeeseen: %@";
+"点击声 + 触感反馈" = "Napsautus + haptiikka";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Pomppu + tähtiilotulitus (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Napauta oikealla olevia nuolia kutsuaksesi cyl_switchToAdjacentTabWithStep:-1 / 1. Pyyhkäisyn tavoin se ohittaa PlusButtonin ja tarkistaa kirjautumisen. Viimeisin tulos: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Vaihda napauttamalla ja napauta sitten mitä tahansa välilehteä tai PlusButtonia kuullaksesi sen. Haptiikka värisee vain oikeassa laitteessa. Nyt: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Suorita napauttamalla: cyl_setWeakAssociatedObject:forKey: palauttaa nil, kun olio on vapautettu; cyl_nearestControlBelowView: löytää valitun välilehden painikkeen sen kuvakkeesta.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Vaihda napauttamalla. cyl_tabBarItemLongPressDuration: %@ s, cyl_tabButtonLongPressMinimumDuration: %@ s, cyl_tabBarItemDoubleTapInterval: %@ s";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Oma äänitiedosto (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Rullaa ylös, ei valinnan poiston animaatiota (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Hidas suurennus ja pienennys (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Hidas lähennys (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: heikot liitetyt oliot ja painikkeen etsiminen (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Pitkän painalluksen kesto ja kaksoisnapautuksen väli (issue #535 / #152)";
+"Tab 交互" = "Välilehtien vuorovaikutus";
+"Tab 点击声音与触感反馈（issue #535）" = "Välilehden napautusääni ja haptiikka (issue #535)";
+"轻触感反馈" = "Kevyt haptinen palaute";
+"重触感反馈" = "Voimakas haptinen palaute";
+"长按（#152）" = "Pitkä painallus (#152)";
