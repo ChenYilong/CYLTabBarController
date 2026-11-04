@@ -308,3 +308,4 @@
 "新版本" = "Nouvelle version";
 "打开 TabBar 场景展示" = "Ouvrir la galerie de barres d’onglets";
 "每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Chaque scène est une barre d’onglets construite avec l’API publique : styles, animations, rappels, Lottie et les nouvelles API d’onglets";
+"TabBar 场景展示" = "Galerie de barres d’onglets";

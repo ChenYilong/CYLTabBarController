@@ -308,3 +308,4 @@
 "新版本" = "Nowa wersja";
 "打开 TabBar 场景展示" = "Otwórz galerię pasków kart";
 "每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Każda scena to pasek kart zbudowany za pomocą publicznego API: style, animacje, przypomnienia, Lottie i nowsze API kart";
+"TabBar 场景展示" = "Galeria pasków kart";

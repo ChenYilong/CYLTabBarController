@@ -308,3 +308,4 @@
 "新版本" = "Nová verze";
 "打开 TabBar 场景展示" = "Otevřít galerii panelů karet";
 "每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Každá scéna je panel karet vytvořený veřejným API: styly, animace, upozornění, Lottie a novější API karet";
+"TabBar 场景展示" = "Galerie panelů karet";

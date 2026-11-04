@@ -308,3 +308,4 @@
 "新版本" = "Ny version";
 "打开 TabBar 场景展示" = "Åbn fanelinjegalleriet";
 "每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Hver scene er en fanelinje bygget med det offentlige API: typografier, animationer, påmindelser, Lottie og de nyere fane-API'er";
+"TabBar 场景展示" = "Fanelinjegalleri";

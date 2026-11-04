@@ -308,3 +308,4 @@
 "新版本" = "Uusi versio";
 "打开 TabBar 场景展示" = "Avaa välilehtipalkkigalleria";
 "每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Jokainen näkymä on julkisella API:lla rakennettu välilehtipalkki: tyylit, animaatiot, muistutukset, Lottie ja uudemmat välilehti-API:t";
+"TabBar 场景展示" = "Välilehtipalkkigalleria";

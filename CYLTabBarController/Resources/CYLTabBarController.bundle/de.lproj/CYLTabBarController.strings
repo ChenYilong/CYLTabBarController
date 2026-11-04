@@ -308,3 +308,4 @@
 "新版本" = "Neue Version";
 "打开 TabBar 场景展示" = "Tab-Bar-Galerie öffnen";
 "每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Jede Szene ist eine Tab-Bar aus der öffentlichen API: Stile, Animationen, Hinweise, Lottie und die neueren Tab-APIs";
+"TabBar 场景展示" = "Tab-Bar-Galerie";

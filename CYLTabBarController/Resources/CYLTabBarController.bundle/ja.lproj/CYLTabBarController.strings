@@ -308,3 +308,4 @@
 "新版本" = "新しいバージョン";
 "打开 TabBar 场景展示" = "TabBar ギャラリーを開く";
 "每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "各シーンは公開 API で作った TabBar です：スタイル、アニメーション、通知、Lottie、新しい Tab API";
+"TabBar 场景展示" = "TabBar ギャラリー";
