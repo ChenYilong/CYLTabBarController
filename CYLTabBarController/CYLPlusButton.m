@@ -155,6 +155,73 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
 - (void)setAccessibilityLabel:(NSString *)accessibilityLabel {
     objc_setAssociatedObject(self, @selector(accessibilityLabel), accessibilityLabel, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
+
+/*!
+ * [EN] VoiceOver: the plus button is announced as selected while its page is shown, like a tab.
+ * [CN] VoiceOver：PlusButton 对应的页面显示时，与 Tab 一样朗读为"已选中"。
+ */
+- (UIAccessibilityTraits)accessibilityTraits {
+    UIAccessibilityTraits traits = [super accessibilityTraits] | UIAccessibilityTraitButton;
+    return self.isSelected ? (traits | UIAccessibilityTraitSelected) : traits;
+}
+
+/*!
+ * [EN] Defaults that system tab buttons already have: the iPad pointer hover effect (iOS 13.4+) and the Large Content
+ *      Viewer (iOS 13+: with the largest text sizes, a long press shows the title and image in the middle of the screen).
+ *      Set at creation, so the app can turn them off afterwards (`pointerInteractionEnabled = NO`,
+ *      `showsLargeContentViewer = NO`).
+ * [CN] 系统 Tab 按钮本来就有的默认行为：iPad 指针悬停效果（iOS 13.4+）与大内容查看器（iOS 13+：使用最大字号时，长按会在屏幕中央
+ *      显示标题与图片）。在创建时设置，App 之后可以关闭（`pointerInteractionEnabled = NO`、`showsLargeContentViewer = NO`）。
+ */
+- (instancetype)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        [self cyl_setUpTabLikeInteractions];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    if (self = [super initWithCoder:coder]) {
+        [self cyl_setUpTabLikeInteractions];
+    }
+    return self;
+}
+
+- (void)cyl_setUpTabLikeInteractions {
+    if (@available(iOS 13.4, *)) {
+        self.pointerInteractionEnabled = YES;
+    }
+    if (@available(iOS 13.0, *)) {
+        self.showsLargeContentViewer = YES;
+        self.scalesLargeContentImage = YES;
+    }
+}
+
+- (NSString *)largeContentTitle API_AVAILABLE(ios(13.0)) {
+    NSString *title = [super largeContentTitle];
+    return title.length > 0 ? title : self.accessibilityLabel;
+}
+
+- (UIImage *)largeContentImage API_AVAILABLE(ios(13.0)) {
+    return [super largeContentImage] ?: self.currentImage;
+}
+
+/// [EN] The Large Content Viewer needs an interaction on an ancestor; add one to the bar when it has none.
+/// [CN] 大内容查看器需要祖先视图上有对应的 interaction；所在的 TabBar 没有时为其添加一个。
+- (void)cyl_installLargeContentViewerInteractionIfNeeded {
+    if (@available(iOS 13.0, *)) {
+        UIView *bar = self.superview;
+        if (!bar || !self.showsLargeContentViewer) {
+            return;
+        }
+        for (id<UIInteraction> interaction in bar.interactions) {
+            if ([interaction isKindOfClass:[UILargeContentViewerInteraction class]]) {
+                return;
+            }
+        }
+        [bar addInteraction:[[UILargeContentViewerInteraction alloc] init]];
+    }
+}
 #pragma mark -
 #pragma mark - public Methods
 
@@ -1180,6 +1247,7 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
 - (void)didMoveToSuperview {
     [super didMoveToSuperview];
     [self cyl_updateTouchableAreaView];
+    [self cyl_installLargeContentViewerInteractionIfNeeded];
 }
 
 - (void)removeFromSuperview {
