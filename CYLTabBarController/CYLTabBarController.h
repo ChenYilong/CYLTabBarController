@@ -33,6 +33,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Hijack.md
 //   - Built-in Tab Icon Animations / Tab 图标的内置动画
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Item-Animations.md
+//   - Per-tab Colors / 单个 Tab 的颜色
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Item-Colors.md
 //   - Tapping the Selected Tab Again / 重复点击已选中的 Tab
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Reselect.md
 //   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar
@@ -293,6 +295,34 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemReselectAnimation;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemDeselectAnimation;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemHighlightAnimation;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemAnimationHandler;
+
+/*!
+ * [EN] Optional per-tab colors (UIColor), in `tabBarItemsAttributes` (or `-updateTabBarItemAtIndex:attributes:`). See
+ *      docs/Tab-Item-Colors.md.
+ *      - `CYLTabBarItemTitleColor` / `CYLTabBarItemSelectedTitleColor`: the title color, unselected / selected.
+ *      - `CYLTabBarItemIconColor` / `CYLTabBarItemSelectedIconColor`: the icon tint, unselected / selected. Only template
+ *        images are tinted (`UIImageRenderingModeAlwaysTemplate`, SF Symbols); image names are drawn as original.
+ *      - `CYLTabBarItemSelectedBackgroundColor`: fills the selected tab (classic tab bar and FlatDesign; Liquid Glass
+ *        draws its own selection).
+ *      Classic and Liquid Glass: the colors are written into the tab's own `UITabBarItem.standardAppearance` (and
+ *      `scrollEdgeAppearance` on iOS 15+), a copy of the tab bar's appearance that is rebuilt when that one changes, as
+ *      for `CYLTabBarItemTitlePositionAdjustment`; an appearance you installed on the item is kept as the base. FlatDesign:
+ *      the flat item's title attributes and `selectedBackgroundColor`.
+ * [CN] 可选的单个 Tab 颜色（UIColor），写在 `tabBarItemsAttributes`（或 `-updateTabBarItemAtIndex:attributes:`）中。见
+ *      docs/Tab-Item-Colors.md。
+ *      - `CYLTabBarItemTitleColor` / `CYLTabBarItemSelectedTitleColor`：标题颜色，未选中 / 选中。
+ *      - `CYLTabBarItemIconColor` / `CYLTabBarItemSelectedIconColor`：图标着色，未选中 / 选中。只对模板图片生效
+ *        （`UIImageRenderingModeAlwaysTemplate`、SF Symbols）；图片名按原图绘制。
+ *      - `CYLTabBarItemSelectedBackgroundColor`：选中 Tab 的背景色（经典 TabBar 与扁平样式；液态玻璃自带选中效果）。
+ *      经典与液态玻璃：颜色写入该 Tab 自己的 `UITabBarItem.standardAppearance`（iOS 15+ 还有 `scrollEdgeAppearance`），即 TabBar
+ *      appearance 的副本，TabBar 的 appearance 改变时会重建，与 `CYLTabBarItemTitlePositionAdjustment` 相同；你在 item 上设置的
+ *      appearance 会作为基础保留。扁平样式：写入扁平 item 的标题属性与 `selectedBackgroundColor`。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemTitleColor;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedTitleColor;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemIconColor;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedIconColor;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedBackgroundColor;
 /*!
  * [EN] These globals hold what was written LAST, by whichever tab bar controller or plus button wrote last. The library
  *      no longer lays out with them: with several tab bar controllers they overwrote each other (a tab bar with 5 items
