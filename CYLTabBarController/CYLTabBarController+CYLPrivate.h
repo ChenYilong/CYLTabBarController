@@ -11,6 +11,8 @@
 
 #import "CYLTabBarController.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /// [EN] Implemented in CYLTabBarController+CYLTabBarMinimize.m (issue #13). [CN] 实现见 CYLTabBarController+CYLTabBarMinimize.m（issue #13）。
 @interface CYLTabBarController (CYLTabBarMinimizePrivate)
 /// [EN] FlatDesign: observe the scroll view of the page on screen. [CN] 扁平样式：观察当前显示页面的滚动视图。
@@ -26,5 +28,24 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 @interface CYLTabBarController (CYLActiveTabBarControllerPrivate)
 + (void)cyl_registerTabBarController:(CYLTabBarController *)tabBarController;
 + (void)cyl_markTabBarControllerActive:(CYLTabBarController *)tabBarController;
-+ (CYLTabBarController *)cyl_tabBarControllerForContext:(NSString *)context matching:(CYLTabBarControllerMatcher)matcher;
++ (nullable CYLTabBarController *)cyl_tabBarControllerForContext:(nullable NSString *)context matching:(nullable CYLTabBarControllerMatcher)matcher;
 @end
+
+/// [EN] FIX: issue #152 — implemented in CYLTabBarController+CYLTabBarItemGesture.m. [CN] 实现见 CYLTabBarController+CYLTabBarItemGesture.m。
+@interface CYLTabBarController (CYLTabBarItemGesturePrivate)
+- (void)cyl_recognizeTabBarItemGestureForReportedControl:(UIControl *)control;
+- (void)cyl_installTabBarItemLongPressIfNeeded;
+- (BOOL)cyl_isTabBarItemGestureControl:(UIControl *)control viewController:(UIViewController *__autoreleasing _Nullable *_Nullable)viewController;
+- (void)cyl_reportTabBarItemGesture:(CYLTabBarItemGesture)gesture control:(UIControl *)control viewController:(nullable UIViewController *)viewController;
+- (void)cyl_recognizeTapOnControl:(UIControl *)control viewController:(nullable UIViewController *)viewController isReselect:(BOOL)isReselect;
+- (void)cyl_recognizeTabBarItemTapWillSelectViewController:(UIViewController *)viewController;
+- (void)cyl_recognizeTabBarItemTapOnControl:(UIControl *)control viewController:(nullable UIViewController *)viewController isReselect:(BOOL)isReselect;
+@end
+
+/// [EN] FIX: issue #535 — implemented in CYLTabBarController+CYLInteraction.m. [CN] 实现位于 CYLTabBarController+CYLInteraction.m。
+@interface CYLTabBarController (CYLInteractionInstall)
+- (void)cyl_installInteractionGestureRecognizersIfNeeded;
+- (BOOL)cyl_liquidGlassTakesTabTaps;
+@end
+
+NS_ASSUME_NONNULL_END

@@ -15,8 +15,167 @@
 #import "CYLTabBarController.h"
 #endif
 #import "UIView+CYLTabBarControllerExtention.h"
+#import "CYLBaseViewController.h"
+#import "CYLBaseTableViewController.h"
+
+/// [EN] FIX: issue #535 — see `cyl_automaticNavigationSettingEnabled`. [CN] 见 `cyl_automaticNavigationSettingEnabled`。
+static BOOL CYLAutomaticNavigationSettingEnabled = NO;
+
+/// [EN] The page shown inside `viewController`: the top of a navigation stack, the selected tab, recursively.
+/// [CN] `viewController` 中正在显示的页面：逐层取导航栈顶与选中的 Tab。
+static UIViewController *CYLVisibleLeafViewController(UIViewController *viewController) {
+    UIViewController *current = viewController;
+    while (YES) {
+        UIViewController *next = nil;
+        if ([current isKindOfClass:[UINavigationController class]]) {
+            next = ((UINavigationController *)current).topViewController;
+        } else if ([current isKindOfClass:[UITabBarController class]]) {
+            next = ((UITabBarController *)current).selectedViewController;
+        }
+        if (!next || next == current) {
+            return current;
+        }
+        current = next;
+    }
+}
 
 @implementation UIViewController (CYLNavigationControllerExtention)
+
+#pragma mark - FIX: issue #535 — navigation settings without a base class
+
++ (BOOL)cyl_automaticNavigationSettingEnabled {
+    return CYLAutomaticNavigationSettingEnabled;
+}
+
++ (void)cyl_setAutomaticNavigationSettingEnabled:(BOOL)automaticNavigationSettingEnabled {
+    CYLAutomaticNavigationSettingEnabled = automaticNavigationSettingEnabled;
+    if (!automaticNavigationSettingEnabled) {
+        return;
+    }
+    // [EN] Installed the first time it is turned on; turning it off only skips the calls.
+    // [CN] 第一次开启时安装；关闭后只是不再调用。
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        Class viewControllerClass = [UIViewController class];
+        SEL selectors[][2] = {
+            { @selector(viewWillAppear:), @selector(cyl_automaticNavigationViewWillAppear:) },
+            { @selector(viewDidAppear:), @selector(cyl_automaticNavigationViewDidAppear:) },
+            { @selector(viewWillDisappear:), @selector(cyl_automaticNavigationViewWillDisappear:) },
+            { @selector(viewDidDisappear:), @selector(cyl_automaticNavigationViewDidDisappear:) },
+        };
+        for (NSUInteger i = 0; i < sizeof(selectors) / sizeof(selectors[0]); i++) {
+            Method originalMethod = class_getInstanceMethod(viewControllerClass, selectors[i][0]);
+            Method swizzledMethod = class_getInstanceMethod(viewControllerClass, selectors[i][1]);
+            if (originalMethod && swizzledMethod) {
+                method_exchangeImplementations(originalMethod, swizzledMethod);
+            }
+        }
+    });
+}
+
+/*!
+ * [EN] YES when the automatic calls apply to this view controller: turned on, not one of the base classes (they call
+ *      the methods themselves), one of the properties set, and inside a navigation controller.
+ * [CN] 自动调用作用于本控制器时为 YES：已开启、不是基类（基类自己调用）、设置了其中任一属性，且位于导航控制器中。
+ */
+- (BOOL)cyl_needsAutomaticNavigationSetting {
+    if (!CYLAutomaticNavigationSettingEnabled) {
+        return NO;
+    }
+    if ([self isKindOfClass:[CYLBaseViewController class]] || [self isKindOfClass:[CYLBaseTableViewController class]]) {
+        return NO;
+    }
+    if (!self.cyl_navigationBarHidden && !self.cyl_hideNavigationBarSeparator && !self.cyl_disablePopGestureRecognizer && !self.cyl_hidesAncestorNavigationBars) {
+        return NO;
+    }
+    // [EN] As in the base classes: any view controller in a navigation controller, also a tab directly in a tab bar
+    //      controller that is itself pushed (issue #535).
+    // [CN] 与基类相同：任何位于导航控制器中的控制器，包括直接作为 Tab、而 TabBarController 本身被 push 的情况（issue #535）。
+    return self.navigationController != nil;
+}
+
+/// [EN] After the exchange these run as the UIViewController methods; the same selector calls the original.
+/// [CN] 交换后它们作为 UIViewController 的方法执行；调用同名选择子即调用原实现。
+- (void)cyl_automaticNavigationViewWillAppear:(BOOL)animated {
+    [self cyl_automaticNavigationViewWillAppear:animated];
+    if ([self cyl_needsAutomaticNavigationSetting]) {
+        [self cyl_viewWillAppearNavigationSetting:animated];
+    }
+}
+
+- (void)cyl_automaticNavigationViewDidAppear:(BOOL)animated {
+    [self cyl_automaticNavigationViewDidAppear:animated];
+    if ([self cyl_needsAutomaticNavigationSetting]) {
+        [self cyl_viewDidAppearNavigationSetting:animated];
+    }
+}
+
+- (void)cyl_automaticNavigationViewWillDisappear:(BOOL)animated {
+    [self cyl_automaticNavigationViewWillDisappear:animated];
+    if ([self cyl_needsAutomaticNavigationSetting]) {
+        [self cyl_viewWillDisappearNavigationSetting:animated];
+    }
+}
+
+- (void)cyl_automaticNavigationViewDidDisappear:(BOOL)animated {
+    [self cyl_automaticNavigationViewDidDisappear:animated];
+    if ([self cyl_needsAutomaticNavigationSetting]) {
+        [self cyl_viewDidDisappearNavigationSetting:animated];
+    }
+}
+
+#pragma mark - FIX: issue #535 — navigation bars of the navigation controllers around this one
+
+- (BOOL)cyl_hidesAncestorNavigationBars {
+    return [objc_getAssociatedObject(self, @selector(cyl_hidesAncestorNavigationBars)) boolValue];
+}
+
+- (void)cyl_setHidesAncestorNavigationBars:(BOOL)hidesAncestorNavigationBars {
+    objc_setAssociatedObject(self, @selector(cyl_hidesAncestorNavigationBars), @(hidesAncestorNavigationBars), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+/// [EN] The navigation controllers that contain this one's, innermost first. [CN] 包含本控制器所在导航控制器的外层导航控制器，由内向外。
+- (NSArray<UINavigationController *> *)cyl_ancestorNavigationControllers {
+    NSMutableArray<UINavigationController *> *navigationControllers = [NSMutableArray array];
+    UINavigationController *navigationController = self.navigationController.navigationController;
+    while (navigationController && ![navigationControllers containsObject:navigationController]) {
+        [navigationControllers addObject:navigationController];
+        navigationController = navigationController.navigationController;
+    }
+    return navigationControllers;
+}
+
+- (void)cyl_hideAncestorNavigationBarsIfNeeded:(BOOL)animated {
+    if (!self.cyl_hidesAncestorNavigationBars) {
+        return;
+    }
+    for (UINavigationController *navigationController in [self cyl_ancestorNavigationControllers]) {
+        if (!navigationController.navigationBarHidden) {
+            // [EN] Remember that this bar was hidden here, so only it is shown again.
+            // [CN] 记录该导航栏是在这里隐藏的，之后只恢复它。
+            objc_setAssociatedObject(navigationController, @selector(cyl_hideAncestorNavigationBarsIfNeeded:), @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            [navigationController setNavigationBarHidden:YES animated:animated];
+        }
+    }
+}
+
+- (void)cyl_showAncestorNavigationBarsIfNeeded:(BOOL)animated {
+    if (!self.cyl_hidesAncestorNavigationBars) {
+        return;
+    }
+    for (UINavigationController *navigationController in [self cyl_ancestorNavigationControllers]) {
+        if (![objc_getAssociatedObject(navigationController, @selector(cyl_hideAncestorNavigationBarsIfNeeded:)) boolValue]) {
+            continue;
+        }
+        // [EN] Keep it hidden while the page now shown inside asks for it (e.g. after switching to another such tab).
+        // [CN] 当前显示的内层页面仍要求隐藏时保持隐藏（例如切换到另一个同样设置的 Tab 后）。
+        if (CYLVisibleLeafViewController(navigationController).cyl_hidesAncestorNavigationBars) {
+            continue;
+        }
+        objc_setAssociatedObject(navigationController, @selector(cyl_hideAncestorNavigationBarsIfNeeded:), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [navigationController setNavigationBarHidden:NO animated:animated];
+    }
+}
 
 - (BOOL)cyl_disablePopGestureRecognizer {
     NSNumber *disablePopGestureRecognizerObject = objc_getAssociatedObject(self, @selector(cyl_disablePopGestureRecognizer));
@@ -449,6 +608,8 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // [CN] 根据你的
 - (void)cyl_viewWillAppearNavigationSetting:(BOOL)animated {
     [self cyl_hideNavigationBarSeparatorIfNeeded];
     [self cyl_setNavigationBarHiddenIfNeeded:animated];
+    // [EN] FIX: issue #535 — only with `cyl_hidesAncestorNavigationBars`. [CN] 仅在设置 `cyl_hidesAncestorNavigationBars` 时生效。
+    [self cyl_hideAncestorNavigationBarsIfNeeded:animated];
 }
 
 - (void)cyl_viewWillDisappearNavigationSetting:(BOOL)animated {
@@ -458,6 +619,8 @@ static const NSTimeInterval kFullScreenAnimationTime = 0.3; // [CN] 根据你的
 
 - (void)cyl_viewDidDisappearNavigationSetting:(BOOL)animated {
     [self cyl_enableInteractivePopGestureRecognizer];
+    // [EN] FIX: issue #535 — only with `cyl_hidesAncestorNavigationBars`. [CN] 仅在设置 `cyl_hidesAncestorNavigationBars` 时生效。
+    [self cyl_showAncestorNavigationBarsIfNeeded:animated];
 }
 
 - (void)cyl_viewDidAppearNavigationSetting:(BOOL)animated {

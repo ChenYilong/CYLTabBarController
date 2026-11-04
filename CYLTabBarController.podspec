@@ -60,6 +60,8 @@ Pod::Spec.new do |s|
     # 与 CYLTabBarItemAnimation 子库之间的接口，仅供内部使用，不属于公开 API。Core 不依赖该子库，而是在运行时检查它是否存在。
     core.private_header_files = 'CYLTabBarController/UIControl+CYLTabBarItemAnimation.h', 'CYLTabBarController/CYLTabBarItemAnimationService.h', 'CYLTabBarController/CYLTabBarController+CYLPrivate.h'
     # The resource bundle is part of CYLUtils (see above), which Core depends on. 资源包属于 Core 依赖的 CYLUtils。
+    # FIX: issue #535 — the tab tap sound. 点击 Tab 的音效。
+    core.frameworks = 'UIKit', 'AudioToolbox'
 
     
   end

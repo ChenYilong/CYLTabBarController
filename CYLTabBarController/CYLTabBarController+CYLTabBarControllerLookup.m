@@ -102,20 +102,16 @@ static CYLTabBarControllerMatcher CYLTabBarControllerMatcherForStyleType(CYLTabB
     };
 }
 
-/// Unwraps the weak box stored by `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:`.
-static id CYLTabBarControllerFromWeakBox(id box) {
-    id (^block)(void) = box;
-    return block ? block() : nil;
-}
-
 /// The reference set on `object` with `-cyl_setTabBarController:` or `-cylflatdesign_setTabBarController:`, if accepted.
 static CYLTabBarController *CYLTabBarControllerExplicitReference(id object, CYLTabBarControllerMatcher matcher) {
-    id tabBarController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(object, @selector(cyl_tabBarController)));
+    // [EN] Weak references set by `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:` (CYLUtils).
+    // [CN] 由 `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:` 设置的弱引用（CYLUtils）。
+    id tabBarController = [object cyl_weakAssociatedObjectForKey:@selector(cyl_tabBarController)];
     if (CYLTabBarControllerMatches(tabBarController, matcher)) {
         return tabBarController;
     }
 #if CYL_FLATDESIGN_AVAILABLE
-    tabBarController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(object, @selector(cylflatdesign_tabBarController)));
+    tabBarController = [object cyl_weakAssociatedObjectForKey:@selector(cylflatdesign_tabBarController)];
     if (CYLTabBarControllerMatches(tabBarController, matcher)) {
         return tabBarController;
     }
@@ -420,10 +416,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
 @implementation NSObject (CYLTabBarControllerReferenceExtension)
 
 - (void)cyl_setTabBarController:(nullable CYLTabBarController *)tabBarController {
-    id __weak weakObject = tabBarController;
-    id (^block)(void) = ^{ return weakObject; };
-    objc_setAssociatedObject(self, @selector(cyl_tabBarController),
-                             block, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_setWeakAssociatedObject:tabBarController forKey:@selector(cyl_tabBarController)];
 }
 
 /*!
@@ -524,7 +517,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
     // retain cycle (tab bar controller -> child view controller -> tab bar controller)
     // and the whole FlatDesign tab tree is never deallocated after it is popped (#661).
     UIViewController *tabBarController_ = tabBarController;
-    objc_setAssociatedObject(self, @selector(cylflatdesign_tabBarController), [self cyl_cylflatdesign_weakBoxWithTarget:tabBarController_], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_setWeakAssociatedObject:tabBarController_ forKey:@selector(cylflatdesign_tabBarController)];
     UIViewController *referenceViewController = nil;
     if ([self isKindOfClass:[UIViewController class]]) {
         referenceViewController = (UIViewController *)self;
@@ -533,7 +526,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
         return;
     }
     if (referenceViewController.cyl_getViewControllerInsteadOfNavigationController) {
-        objc_setAssociatedObject(referenceViewController.cyl_getViewControllerInsteadOfNavigationController, @selector(cylflatdesign_tabBarController), [self cyl_cylflatdesign_weakBoxWithTarget:tabBarController_], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [referenceViewController.cyl_getViewControllerInsteadOfNavigationController cyl_setWeakAssociatedObject:tabBarController_ forKey:@selector(cylflatdesign_tabBarController)];
     }
     
     /*!
@@ -554,12 +547,6 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
      */
 }
 
-/// Wraps `target` in a block that only holds it weakly, matching `cyl_setTabBarController:`.
-/// The block itself is retained by the associated object, but the target is not.
-- (id)cyl_cylflatdesign_weakBoxWithTarget:(UIViewController *)target {
-    id __weak weakTarget = target;
-    return ^{ return weakTarget; };
-}
 
 /*!
  * [EN] Flat design. The same lookup as `-cyl_tabBarController`, `-cyl_tabBarControllerForStyleType:` with
@@ -571,7 +558,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
  *      TabBarController 内时返回 nil（调用方依此判断是否在其中）。
  */
 - (UIViewController __kindof *)cylflatdesign_tabBarController {
-    UIViewController *viewController = CYLTabBarControllerFromWeakBox(objc_getAssociatedObject(self, @selector(cylflatdesign_tabBarController)));
+    UIViewController *viewController = [self cyl_weakAssociatedObjectForKey:@selector(cylflatdesign_tabBarController)];
     if (viewController) {
         return viewController;
     }
