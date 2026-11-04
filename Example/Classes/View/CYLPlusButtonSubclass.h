@@ -38,3 +38,22 @@
 @interface CYLSecondPlusButtonSubclass : CYLPlusButtonSubclass
 
 @end
+
+/*!
+ * [EN] Issue #202 demo: a third plus button, with its own context, that carries an X button as a subview at its top
+ *      right. Tapping the X gives it a random color and does not trigger the plus button; tapping the rest of the plus
+ *      button works as with `CYLPlusButtonSubclass`. Open it from the "Message" tab: "Push a TabBarController with a new
+ *      context". See docs/PlusButton-Subview-Touches.md.
+ * [CN] Issue #202 演示：第三个 PlusButton，使用自己的 context，右上角有一个 X 按钮子视图。点击 X 时 X 随机改变颜色，不触发
+ *      PlusButton；点击 PlusButton 其他位置与 `CYLPlusButtonSubclass` 相同。从“消息”页的“Push 新 context 的 TabBarController”一行打开。
+ *      见 docs/PlusButton-Subview-Touches.md。
+ */
+@interface CYLCloseSubviewPlusButtonSubclass : CYLPlusButtonSubclass
+
+/*!
+ * [EN] The X button, a subview of the plus button.
+ * [CN] X 按钮，PlusButton 的子视图。
+ */
+@property (nonatomic, strong, readonly) UIButton *closeButton;
+
+@end

@@ -1048,6 +1048,37 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     return UIEdgeInsetsInsetRect(rect, UIEdgeInsetsMake(-outsets.top, -outsets.left, -outsets.bottom, -outsets.right));
 }
 
+/// [EN] YES when `view`, or a superview of it below `plusButton`, takes touches itself (issue #202).
+/// [CN] `view` 或它在 `plusButton` 之下的某个父视图自己接收触摸时为 YES（issue #202）。
+static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
+    for (UIView *current = view; current && current != plusButton; current = current.superview) {
+        if ([current isKindOfClass:[UIControl class]] && ((UIControl *)current).enabled) {
+            return YES;
+        }
+        for (UIGestureRecognizer *gestureRecognizer in current.gestureRecognizers) {
+            if (gestureRecognizer.enabled) {
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
+- (UIView *)hitTestInteractiveSubview:(CGPoint)point withEvent:(UIEvent *)event {
+    if (self.hidden || self.alpha < 0.01 || !self.userInteractionEnabled) {
+        return nil;
+    }
+    // [EN] Front to back. Each subview hit-tests in its own bounds, so a subview outside the plus button is found too.
+    // [CN] 从前往后。每个子视图在自身范围内做 hitTest，因此超出 PlusButton 的子视图也能命中。
+    for (UIView *subview in self.subviews.reverseObjectEnumerator) {
+        UIView *hitView = [subview hitTest:[subview convertPoint:point fromView:self] withEvent:event];
+        if (hitView && CYLPlusButtonSubviewTakesTouches(hitView, self)) {
+            return hitView;
+        }
+    }
+    return nil;
+}
+
 - (CGRect)touchableRectInView:(UIView *)view {
     CGRect rect = [self touchableRect];
     UIView *superview = self.superview;

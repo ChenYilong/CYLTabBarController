@@ -106,6 +106,8 @@ Update to CYLTabBarController 1.99.66 to see the demo:
 | ✅ 扁平风格与液态玻璃样式共享 API，只需修改样式属性即可切换。 | ✅ The flat and Liquid Glass styles share the same APIs; switch styles by changing the appearance property. |
 | ✅ 一个 `UITabBarAppearance` 同时控制液态玻璃与扁平样式：设置 `tabBar.standardAppearance` 即可自定义扁平样式 TabBar 的背景、阴影、标题、图标与角标等，详见 [docs/FlatDesign-StandardAppearance.md](docs/FlatDesign-StandardAppearance.md)。 | ✅ One `UITabBarAppearance` styles both Liquid Glass and FlatDesign: set `tabBar.standardAppearance` to customize the flat design tab bar's background, shadow, titles, icons, badges and more, see [docs/FlatDesign-StandardAppearance.md](docs/FlatDesign-StandardAppearance.md). |
 | ✅ 需要登录的 Tab：未登录时点击会先弹出登录页（不切换、无动画），登录后自动切换到该 Tab；登录状态缓存在本地，支持 block 与代理，详见 [docs/Login-Required-Tabs.md](docs/Login-Required-Tabs.md)（[#19](https://github.com/ChenYilong/CYLTabBarController/issues/19)）。 | ✅ Tabs that need login: while logged out, a tap shows the login screen first (no switch, no animation), then selects that tab after logging in; the login state is cached locally, with block and delegate APIs, see [docs/Login-Required-Tabs.md](docs/Login-Required-Tabs.md) ([#19](https://github.com/ChenYilong/CYLTabBarController/issues/19)). |
+| ✅ SwiftUI 集成：用 `UIViewControllerRepresentable` 在 SwiftUI App 中使用 CYLTabBarController，各 Tab 与 PlusButton 页面可以是 SwiftUI 视图，示例 `Example-SwiftUI`，详见 [docs/SwiftUI-Integration.md](docs/SwiftUI-Integration.md)。 | ✅ SwiftUI integration: use CYLTabBarController in a SwiftUI app with `UIViewControllerRepresentable`; tabs and the plus button's page can be SwiftUI views. Example: `Example-SwiftUI`; see [docs/SwiftUI-Integration.md](docs/SwiftUI-Integration.md). |
+| ✅ PlusButton 子控件响应各自的点击：在加号按钮上添加的按钮或带手势的视图（如直播间封面与关闭按钮）不再被加号按钮拦截；Demo 中“消息”页第 2 行可体验带 X 子按钮的 PlusButton，详见 [docs/PlusButton-Subview-Touches.md](docs/PlusButton-Subview-Touches.md)。 | ✅ Subviews of the PlusButton get their own touches: buttons and views with gesture recognizers added to the plus button (e.g. a live room's cover and close button) are no longer swallowed by it; try the PlusButton with an X subview from row 2 of the demo's Message tab. See [docs/PlusButton-Subview-Touches.md](docs/PlusButton-Subview-Touches.md). |
 | ✅ 支持运行期间在两种样式之间切换，适合 A/B 测试和灰度发布。 | ✅ Switch between styles at runtime for A/B testing and staged rollout. |
 | ✅ 液态玻璃样式继承自 `UITabBar`，支持系统样式设置，并提供 PlusButton。 | ✅ The Liquid Glass style inherits from `UITabBar`, supports system appearance settings, and adds PlusButton support. |
 | ✅ 支持同时展示 Lottie 动画、液态玻璃效果和红点角标动画。 | ✅ Display Lottie animations, Liquid Glass effects, and animated badges together. |
@@ -230,13 +232,17 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 |:---|:---|
 | [文档导航（全部文档与目录结构）](docs/README.md) | [Documentation index (all documents and folder layout)](docs/README.md) |
 | [中英文双语文档](docs/Bilingual-Documentation.md) | [Bilingual Documentation](docs/Bilingual-Documentation.md) |
+| [Carthage 集成演示工程](docs/Carthage-Example.md) | [Carthage integration demo project](docs/Carthage-Example.md) |
+| [使用 Carthage 集成](docs/Carthage.md) | [Integrating with Carthage](docs/Carthage.md) |
 | [CYLTabBarController 常见问题](docs/FAQ.md) | [CYLTabBarController FAQ](docs/FAQ.md) |
 | [FlatDesign × UITabBarAppearance](docs/FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](docs/FlatDesign-StandardAppearance.md) |
 | [需要登录的 Tab](docs/Login-Required-Tabs.md) | [Tabs That Need Login](docs/Login-Required-Tabs.md) |
 | [PlusButton 角标：每次点击都会变化](docs/PlusButton-Badge.md) | [PlusButton badge: changes on every tap](docs/PlusButton-Badge.md) |
 | [有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应](docs/PlusButton-Lottie-TabIcon.md) | [Lottie tab icons and their files when there is a PlusButton](docs/PlusButton-Lottie-TabIcon.md) |
+| [PlusButton 子控件响应各自的点击事件](docs/PlusButton-Subview-Touches.md) | [Subviews of the PlusButton receive their own touches](docs/PlusButton-Subview-Touches.md) |
 | [PlusButton 点击范围：扩大、按倍数放大与调试显示](docs/PlusButton-Touchable-Area.md) | [PlusButton touchable area: grow it, scale it, and see it](docs/PlusButton-Touchable-Area.md) |
 | [在 Swift 项目中使用 CYLTabBarController](docs/Swift-Guide.md) | [Using CYLTabBarController in Swift](docs/Swift-Guide.md) |
+| [在 SwiftUI 项目中集成 CYLTabBarController](docs/SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](docs/SwiftUI-Integration.md) |
 
 <!-- navigation:end -->
 
@@ -518,7 +524,7 @@ github "ChenYilong/CYLTabBarController"
 | 然后执行： | Then run: |
 
 ```
-carthage update --use-xcframeworks
+carthage update --use-xcframeworks --platform iOS
 ```
 
 | 中文 | English |
@@ -527,7 +533,8 @@ carthage update --use-xcframeworks
 
 | 中文 | English |
 |:---|:---|
-| 说明：Carthage 构建的是不含 Lottie 动画相关文件（`LottieSwift` 目录）的核心功能集，与 CocoaPods 的 `Core`子规范（subspec）范围一致。 | Note: Carthage builds the core feature set without the Lottie animation files in the `LottieSwift` directory, matching the scope of the CocoaPods `Core` subspec. |
+| 说明：Carthage 构建的 framework 包含核心功能、角标、扁平样式与资源包（多语言文案），不含 Lottie 动画（`LottieSwift` 目录，需要时请使用 CocoaPods 或 SPM）；最低支持 iOS 15.0（当前 Xcode 支持的最低版本）。发布新版本时，`scripts/pod-lint.sh push` 会顺便更新演示工程 `Cartfile` 中的版本。详见 [docs/Carthage.md](docs/Carthage.md)（[#384](https://github.com/ChenYilong/CYLTabBarController/issues/384)）。 | Note: the framework Carthage builds contains the core, badges, the flat design style and the resource bundle (localized strings), without Lottie animations (the `LottieSwift` folder; use CocoaPods or SPM for them); it supports iOS 15.0 and later (the lowest version current Xcode supports). On release, `scripts/pod-lint.sh push` also updates the version in the demo's `Cartfile`. See [docs/Carthage.md](docs/Carthage.md) ([#384](https://github.com/ChenYilong/CYLTabBarController/issues/384)). |
+| 演示工程：`Example-Swift-Carthage`（复制自 `Example-Swift-03`，改用 Carthage 集成），运行步骤与差异见 [docs/Carthage-Example.md](docs/Carthage-Example.md)。 | Demo project: `Example-Swift-Carthage` (a copy of `Example-Swift-03` integrated with Carthage); see [docs/Carthage-Example.md](docs/Carthage-Example.md) for how to run it and what differs. |
 
 ### [CN]第二步：设置 CYLTabBarController 的两个数组
 ### [EN]Step 2: Configure the view controller and tab bar item attribute arrays
@@ -1615,6 +1622,7 @@ cell.textLabel?.text = String(format: CYLLocalizedString("我是第%ld行"), ind
 |:---|:---|
 | 仓库提供了 Swift Demo，目录为 `Example-Swift`。 | The repository includes a Swift demo in `Example-Swift`. |
 | 完整的中英文 Swift 使用指南（`import` 报错排查、初始化、PlusButton、代理、角标、Lottie、深色模式等 API 示例）：[docs/Swift-Guide.md](docs/Swift-Guide.md)。 | A full bilingual Swift guide (fixing `import` errors, initializers, PlusButton, delegates, badges, Lottie, Dark Mode and more, with code): [docs/Swift-Guide.md](docs/Swift-Guide.md). |
+| SwiftUI App 中的集成方式（`UIViewControllerRepresentable`、`UIHostingController`、在 SwiftUI 中控制 TabBar）：[docs/SwiftUI-Integration.md](docs/SwiftUI-Integration.md)，示例目录 `Example-SwiftUI`。 | Integrating it in a SwiftUI app (`UIViewControllerRepresentable`, `UIHostingController`, driving the tab bar from SwiftUI): [docs/SwiftUI-Integration.md](docs/SwiftUI-Integration.md), example in `Example-SwiftUI`. |
 
 | 中文 | English |
 |:---|:---|

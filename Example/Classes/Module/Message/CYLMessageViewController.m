@@ -57,16 +57,26 @@
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
     [cell cyl_showBadgeForRow:indexPath.row];
-    // The badge sample is the title, the page the subtitle; both wrap. 角标样例为主标题，页面为副标题；均可换行。
-    cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
+    // [EN] An action row shows the action as its title; the other rows the badge sample, the page as the subtitle.
+    //      Both wrap.
+    // [CN] 操作行以操作为主标题；其余行以角标样例为主标题、页面为副标题。均可换行。
     [cell cyl_wrapsTextLabels];
     if (0 == indexPath.row) {
-        // The second row of the demo pushes a tab bar controller of the SAME context, see `-tableView:didSelectRowAtIndexPath:`.
-        cell.detailTextLabel.text = CYLLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）");
+        // [EN] Pushes a tab bar controller of the SAME context, see `-tableView:didSelectRowAtIndexPath:`.
+        // [CN] 推入同一个 context 的 TabBarController，见 `-tableView:didSelectRowAtIndexPath:`。
+        cell.textLabel.text = CYLLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）");
+        cell.detailTextLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
         return;
     }
+    if (1 == indexPath.row) {
+        // [EN] Issue #202: pushes a tab bar controller whose plus button has a tappable X subview.
+        // [CN] 推入一个 TabBarController，其 PlusButton 带有可点击的 X 子按钮。
+        [[cell textLabel] setText:CYLLocalizedString(@"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）")];
+        cell.detailTextLabel.text = CYLLocalizedString(@"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应");
+        return;
+    }
+    cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
     cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
-
 }
 
 #pragma mark - Table view
@@ -114,6 +124,10 @@
         // 当前的 TabBarController 保留自己的 PlusButton。
         tabBarController = [[MainTabBarController alloc] initWithContext:self.cyl_tabBarController.cyl_context];
         tabBarController.allowsVerticalBar = YES;
+    } else if (1 == indexPath.row) {
+        // [EN] Issue #202: a new context with `CYLCloseSubviewPlusButtonSubclass`; the other plus buttons stay registered.
+        // [CN] Issue #202：新的 context，使用 `CYLCloseSubviewPlusButtonSubclass`；其他 PlusButton 保持注册。
+        tabBarController = [CYLMainRootViewController newLiquidGlassTabBarControllerWithPlusButtonClass:[CYLCloseSubviewPlusButtonSubclass class]];
     } else {
         Class plusButtonClass = [CYLPlusButtonSubclass alternatePlusButtonClassForOwner:self];
         tabBarController = [CYLMainRootViewController newLiquidGlassTabBarControllerWithPlusButtonClass:plusButtonClass];

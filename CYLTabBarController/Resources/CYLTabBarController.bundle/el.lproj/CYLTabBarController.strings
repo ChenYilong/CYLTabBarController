@@ -193,3 +193,8 @@
 "PlusButton 点击范围（issue #91）" = "Περιοχή αφής του PlusButton (issue #91)";
 "打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Ενεργοποιήστε τον διακόπτη για να εμφανιστεί η περιοχή αφής σε ημιδιαφανές κόκκινο, απενεργοποιήστε για κανονική εμφάνιση· σύρετε το ρυθμιστικό για να πολλαπλασιάσετε την περιοχή. Τώρα: %@x";
 "当前 TabBar 没有 PlusButton" = "Αυτή η γραμμή καρτελών δεν έχει PlusButton";
+
+/* Issue #202: plus button with a tappable X subview demo. */
+"子控件" = "Υποπροβολή";
+"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Ώθηση TabBarController με νέο πλαίσιο (PlusButton με υποπροβολή X που πατιέται, issue #202)";
+"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Πατήστε το X πάνω δεξιά στο PlusButton: το X αλλάζει σε τυχαίο χρώμα και το PlusButton δεν αντιδρά";

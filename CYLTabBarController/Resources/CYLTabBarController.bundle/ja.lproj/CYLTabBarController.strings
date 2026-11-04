@@ -193,3 +193,8 @@
 "PlusButton 点击范围（issue #91）" = "PlusButton のタップ範囲（issue #91）";
 "打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "スイッチをオンにするとタップ範囲を半透明の赤で表示し、オフで元に戻します。スライダーで範囲を倍率で拡大します。現在：%@ 倍";
 "当前 TabBar 没有 PlusButton" = "このタブバーには PlusButton がありません";
+
+/* Issue #202: plus button with a tappable X subview demo. */
+"子控件" = "サブビュー";
+"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "新しいコンテキストの TabBarController をプッシュ（タップできる X サブビュー付きプラスボタン、issue #202）";
+"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "プラスボタン右上の X をタップ：X がランダムな色に変わり、プラスボタンは反応しません";

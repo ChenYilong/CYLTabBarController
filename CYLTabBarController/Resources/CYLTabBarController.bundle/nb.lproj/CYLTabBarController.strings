@@ -193,3 +193,8 @@
 "PlusButton 点击范围（issue #91）" = "Trykkområdet til PlusButton (issue #91)";
 "打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Slå på bryteren for å vise trykkområdet i halvgjennomsiktig rødt, av for vanlig utseende; dra glidebryteren for å gange opp området. Nå: %@x";
 "当前 TabBar 没有 PlusButton" = "Denne fanelinjen har ingen PlusButton";
+
+/* Issue #202: plus button with a tappable X subview demo. */
+"子控件" = "Delvisning";
+"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Vis en TabBarController med ny kontekst (PlusButton med en X-delvisning som kan trykkes på, issue #202)";
+"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Trykk på X øverst til høyre på PlusButton: X får en tilfeldig farge, og PlusButton reagerer ikke";

@@ -11,10 +11,14 @@
 // [CN] 与此类绑定的文档：
 //   - PlusButton badge: changes on every tap / PlusButton 角标：每次点击都会变化
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Badge.md
+//   - Subviews of the PlusButton receive their own touches / PlusButton 子控件响应各自的点击事件
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Subview-Touches.md
 //   - PlusButton touchable area: grow it, scale it, and see it / PlusButton 点击范围：扩大、按倍数放大与调试显示
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Touchable-Area.md
 //   - Using CYLTabBarController in Swift / 在 Swift 项目中使用 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
+//   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
 // docs-binding:end
 
 #import "CYLConstants.h"
@@ -293,6 +297,20 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
  *      PlusButton 并不是 TabBar 的直接子视图。
  */
 - (CGRect)touchableRectInView:(nullable UIView *)view;
+
+/*!
+ * [EN] FIX: issue #202. The subview of the plus button that should take a touch at `point` (in the plus button's
+ *      coordinates), or nil. A subview takes touches when it, or one of its superviews below the plus button, is an
+ *      enabled `UIControl` or has an enabled gesture recognizer, and it is visible with `userInteractionEnabled`; a
+ *      subview that sticks out of the plus button counts too. The tab bars ask this first, so such subviews (e.g. the
+ *      cover and close button of a minimized live room) get their own touches; every other point still goes to the plus
+ *      button. Override to return nil and keep every touch on the plus button.
+ * [CN] FIX: issue #202。返回 `point`（PlusButton 自身坐标系）处应接收触摸的 PlusButton 子视图，没有时返回 nil。子视图本身或它在
+ *      PlusButton 之下的某个父视图是可用的 `UIControl`，或带有可用的手势，并且可见、`userInteractionEnabled` 为 YES 时接收触摸；
+ *      超出 PlusButton 范围的子视图同样有效。TabBar 会先询问此方法，所以这类子视图（如直播间最小化后的封面与关闭按钮）
+ *      能响应各自的事件；其他位置仍交给 PlusButton。如需所有触摸都交给 PlusButton，可重写并返回 nil。
+ */
+- (nullable UIView *)hitTestInteractiveSubview:(CGPoint)point withEvent:(nullable UIEvent *)event;
 
 /*!
  * [EN] Issue #636. YES with Liquid Glass when the plus button has a title and its class returns YES from

@@ -193,3 +193,8 @@
 "PlusButton 点击范围（issue #91）" = "PlusButton 點擊範圍（issue #91）";
 "打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "打開開關以半透明紅色顯示可點擊區域，關閉恢復正常；拖動滑桿按倍數擴大點擊範圍，目前：%@ 倍";
 "当前 TabBar 没有 PlusButton" = "目前 TabBar 沒有 PlusButton";
+
+/* Issue #202: plus button with a tappable X subview demo. */
+"子控件" = "子控制項";
+"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "推入新上下文的 TabBarController（加號按鈕帶可點擊的 X 子按鈕，issue #202）";
+"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "點擊加號按鈕右上角的 X：X 隨機改變顏色，加號按鈕不回應";

@@ -193,3 +193,8 @@
 "PlusButton 点击范围（issue #91）" = "PlusButton टच क्षेत्र (issue #91)";
 "打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "टच क्षेत्र को पारदर्शी लाल रंग में दिखाने के लिए स्विच चालू करें, सामान्य रूप के लिए बंद करें; क्षेत्र को गुना बढ़ाने के लिए स्लाइडर खींचें। अभी: %@x";
 "当前 TabBar 没有 PlusButton" = "इस टैब बार में PlusButton नहीं है";
+
+/* Issue #202: plus button with a tappable X subview demo. */
+"子控件" = "सबव्यू";
+"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "नए संदर्भ वाला TabBarController पुश करें (टैप करने योग्य X सबव्यू वाला PlusButton, issue #202)";
+"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "PlusButton के ऊपर दाईं ओर X पर टैप करें: X का रंग बेतरतीब बदलता है, PlusButton प्रतिक्रिया नहीं देता";
