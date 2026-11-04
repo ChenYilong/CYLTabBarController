@@ -108,7 +108,7 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
         // FIX: issue #488 keep the token and remove it in `-dealloc`; it was dropped, so every tab bar (one per tab bar
         // controller, e.g. each time `window.rootViewController` is replaced) left an observer behind for good.
         // 保存 token 并在 `-dealloc` 中移除；以前直接丢弃，每个 TabBar（每次替换 `window.rootViewController` 都会新建）都会永久留下一个观察者。
-        self.cyl_lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationPlayingNotification
+        self.cyl_lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemAnimationPlayingNotification
                                                                                                     object:nil
                                                                                                      queue:[NSOperationQueue mainQueue]
                                                                                                 usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];

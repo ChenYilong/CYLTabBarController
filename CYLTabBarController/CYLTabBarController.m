@@ -86,6 +86,9 @@ static const CGFloat kCYLDefaultTabBarHeight = 49.0f;
 NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDidChangeNotification";
 NSString *const CYLTabBarItemLottieAnimationPlayingNotification = @"CYLTabBarItemLottieAnimationPlayingNotification";
 NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification = @"CYLTabBarItemLottieAnimationViewDidAddNotification";
+// [EN] The same values as the Lottie names, so both names reach the same observers. [CN] 与 Lottie 名称取值相同，两个名称对应同一批观察者。
+NSNotificationName const CYLTabBarItemAnimationPlayingNotification = @"CYLTabBarItemLottieAnimationPlayingNotification";
+NSNotificationName const CYLTabBarItemAnimationViewDidAddNotification = @"CYLTabBarItemLottieAnimationViewDidAddNotification";
 
 NSString *const CYLTabBarStyleTypeDidChangeNotification = @"CYLTabBarStyleTypeDidChangeNotification";
 static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageViewDefaultOffsetContext;
@@ -3719,7 +3722,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         plusButton.selected = NO;
     }
     if (!shouldConfigureSelectionStatus) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemAnimationPlayingNotification object:self];
     }
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
@@ -4851,7 +4854,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
     // First: only when a #442 key (dark Lottie file or colors) is in use. 首先：仅在使用了 #442 新增的 key 时处理。
-    if (![CYLConstants cyl_hasDarkLottieURLs]) {
+    if (![CYLTabBarItemAnimationDefaultStyleSource() hasStyleVariants]) {
         return;
     }
     // Then: only with an animation library (#604), checked at runtime so that any library works. 其次：仅在引入动画库时处理（#604），
@@ -4874,7 +4877,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 /// FIX: issue #442 — every tab's Lottie view (classic, Liquid Glass and flat design tab bars) follows the new style.
 /// 所有 Tab 的 Lottie 视图（经典、液态玻璃、扁平样式）切换为新风格的动画。
 - (void)cyl_reloadLottieAnimationViewsForCurrentStyle {
-    if (![CYLConstants cyl_hasDarkLottieURLs]) {
+    if (![CYLTabBarItemAnimationDefaultStyleSource() hasStyleVariants]) {
         return;
     }
     NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:self.tabBar];
@@ -5004,7 +5007,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
         
         if (isCurrentViewController) {
             [plusButton setSelected:YES];
-            [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
+            [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemAnimationPlayingNotification object:self];
         } else {
             [plusButton setSelected:NO];
         }

@@ -88,7 +88,7 @@
                 [self stopAllTabBarItemAnimations];
             };
             // FIX: issue #488 keep the token, see `-dealloc`. 保存 token，见 `-dealloc`。
-            _lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationPlayingNotification
+            _lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemAnimationPlayingNotification
                                                                                                 object:nil
                                                                                                  queue:[NSOperationQueue mainQueue]
                                                                                             usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
@@ -588,7 +588,7 @@
         // [EN] Animation reset is handled uniformly via CYLTabBarItemLottieAnimationPlayingNotification,
         //      so the manual reset was removed.
 //         [self stopAnimationOfAllLottieView];
-        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemAnimationPlayingNotification object:self];
         _selectedItemIndex = selectedIndex;
         for (NSInteger i = 0; i < _buttons.count; i++) {
             CYLFlatDesignTabBarButton *tabBarButton = _buttons[i];

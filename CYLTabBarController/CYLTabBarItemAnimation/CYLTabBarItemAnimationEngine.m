@@ -290,8 +290,8 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
     if (!player) {
         return;
     }
-    // [CN] 由宿主通知其他 Tab 重置动画（Core 使用 CYLTabBarItemLottieAnimationPlayingNotification）。
-    // [EN] The host tells the other tabs to reset (Core posts CYLTabBarItemLottieAnimationPlayingNotification).
+    // [CN] 由宿主通知其他 Tab 重置动画（Core 发送 CYLTabBarItemAnimationPlayingNotification）。
+    // [EN] The host tells the other tabs to reset (Core posts CYLTabBarItemAnimationPlayingNotification).
     [self.host animationWillPlayInControl:control];
     // [CN] 启动时选中的 Tab 不播放动画，直接显示最后一帧 #389
     // [EN] The tab selected at launch shows its last frame instead of playing. #389

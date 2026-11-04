@@ -1586,6 +1586,15 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotificatio
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification;
 
+/*!
+ * FIX: issue #604
+ * [EN] Library-neutral names of the two notifications above, for any animation library (Lottie, PAG, Rive…). They have the
+ *      same values, so an observer of either name gets the notification; the Lottie names stay for compatibility.
+ * [CN] 上面两个通知的通用名称，适用于任意动画库（Lottie、PAG、Rive…）。取值相同，因此观察任一名称都能收到通知；Lottie 名称为兼容而保留。
+ */
+FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemAnimationPlayingNotification;
+FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemAnimationViewDidAddNotification;
+
 // [CN] * 液态玻璃开关变化
 // [EN] Liquid Glass toggle changed
  //TODO:  

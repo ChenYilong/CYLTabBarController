@@ -116,6 +116,12 @@ id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(v
     return CYLTabBarItemAnimationSharedStyleRegistry();
 }
 
+void CYLTabBarItemAnimationRegisterDarkStyle(NSURL *URL, NSURL *darkURL, NSDictionary<NSString *, UIColor *> *darkColors) {
+    CYLTabBarItemAnimationStyleRegistry *registry = CYLTabBarItemAnimationSharedStyleRegistry();
+    [registry registerDarkURL:darkURL forURL:URL];
+    [registry registerDarkColors:darkColors forURL:URL];
+}
+
 @implementation CYLConstants
 
 static CGFloat _basisWidthScale = 1.0;

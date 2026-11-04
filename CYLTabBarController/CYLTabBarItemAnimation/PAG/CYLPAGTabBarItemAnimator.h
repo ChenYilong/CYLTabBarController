@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Keys for a tab's PAG animation, used exactly like their Lottie twins and through the same pipeline: the view is
  *      added in place of the tab's icon, plays when the tab is selected, stops when another one is, follows
  *      `lottieAnimationViewContentMode`, is returned by `-[UIControl cyl_lottieAnimationView]` and posts
- *      `CYLTabBarItemLottieAnimationViewDidAddNotification`. Needs the `CYLTabBarController/PAG` subspec (the `libpag`
+ *      `CYLTabBarItemAnimationViewDidAddNotification`. Needs the `CYLTabBarController/PAG` subspec (the `libpag`
  *      pod), which declares them here, next to the PAG animator (Core declares no library's keys). Use either the
  *      Lottie keys or the PAG keys for a tab;
  *      PAG has no playback speed, so `lottieAnimationSpeed` does not apply to it.
@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  *      - `CYLTabBarPAGDarkURL` / `CYLTabBarPAGDarkFilePath`: the Dark Mode version, like `CYLTabBarLottieDarkURL`.
  * [CN] Tab 的 PAG 动画 key，用法与对应的 Lottie key 完全相同，并走同一套流程：替换 Tab 图标显示，选中时播放，选中其他 Tab 时停止，
  *      遵循 `lottieAnimationViewContentMode`，由 `-[UIControl cyl_lottieAnimationView]` 返回，并发送
- *      `CYLTabBarItemLottieAnimationViewDidAddNotification`。需要引入 `CYLTabBarController/PAG` 子库（依赖 `libpag` pod），这些 key 就声明在这里、
+ *      `CYLTabBarItemAnimationViewDidAddNotification`。需要引入 `CYLTabBarController/PAG` 子库（依赖 `libpag` pod），这些 key 就声明在这里、
  *      PAG animator 旁边（Core 不声明任何动画库的 key）。同一个 Tab 请使用 Lottie key 或 PAG key 之一；PAG 没有播放速度，`lottieAnimationSpeed` 对其无效。
  *      - `CYLTabBarPAGURL`：.pag 文件的 NSURL；`CYLTabBarPAGFilePath`：其路径（NSString）。URL 优先。
  *      - `CYLTabBarPAGSize`：视图尺寸，CGSize 的 NSValue（默认使用图标占位尺寸）。

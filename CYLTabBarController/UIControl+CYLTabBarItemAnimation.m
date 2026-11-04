@@ -64,11 +64,11 @@ id<CYLTabBarItemAnimationService> CYLTabBarItemAnimationGetService(void) {
 }
 
 - (void)animationViewDidAddInControl:(UIControl *)control {
-    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationViewDidAddNotification object:control];
+    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemAnimationViewDidAddNotification object:control];
 }
 
 - (void)animationWillPlayInControl:(UIControl *)control {
-    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:control];
+    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemAnimationPlayingNotification object:control];
 }
 
 @end
@@ -92,12 +92,12 @@ id<CYLTabBarItemAnimationHost> CYLTabBarItemAnimationDefaultHost(void) {
 ///      (any library, #477).
 /// [CN] 由 `CYLTabBarItemsAttributesAddingLottieFiles`（"json"）与 `CYLTabBarItemAttributesAddingAnimationFile`（任意动画库，#477）共用。
 static NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingFilesOfType(NSArray<NSDictionary *> *attributes,
-                                                                             NSArray<NSString *> *lottieFileNames,
+                                                                             NSArray<NSString *> *fileNames,
                                                                              NSBundle *bundle,
                                                                              NSString *fileType,
                                                                              NSString *filePathKey,
                                                                              NSString *darkFilePathKey) {
-    if (lottieFileNames.count == 0) {
+    if (fileNames.count == 0) {
         return attributes;
     }
     bundle = bundle ?: [NSBundle mainBundle];
@@ -107,20 +107,20 @@ static NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingFilesOfType(NSArra
         (void)stop;
         // FIX: issue #477 — an empty name or `NSNull` leaves that tab without an animation (it used to crash on NSNull).
         // 空名称或 `NSNull` 表示该 Tab 没有动画（以前遇到 NSNull 会崩溃）。
-        id rawName = idx < lottieFileNames.count ? lottieFileNames[idx] : nil;
+        id rawName = idx < fileNames.count ? fileNames[idx] : nil;
         NSString *name = [rawName isKindOfClass:[NSString class]] ? rawName : nil;
         NSString *path = name.length > 0 ? [bundle pathForResource:name ofType:fileType] : nil;
         if (!path) {
             [result addObject:item];
             return;
         }
-        NSMutableDictionary *lottieItem = [item mutableCopy];
-        lottieItem[filePathKey] = path;
+        NSMutableDictionary *animatedItem = [item mutableCopy];
+        animatedItem[filePathKey] = path;
         NSString *darkPath = darkSuffix.length > 0 ? [bundle pathForResource:[name stringByAppendingString:darkSuffix] ofType:fileType] : nil;
         if (darkPath) {
-            lottieItem[darkFilePathKey] = darkPath;
+            animatedItem[darkFilePathKey] = darkPath;
         }
-        [result addObject:[lottieItem copy]];
+        [result addObject:[animatedItem copy]];
     }];
     return [result copy];
 }
@@ -216,31 +216,30 @@ NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingAnimationFiles(NSArray<NS
     return [result copy];
 }
 
-/// FIX: issue #442 — registers the item's dark Lottie animation (`CYLTabBarLottieDarkURL`, else
-/// `CYLTabBarLottieDarkFilePath`) for `lottieURL`, the light one. 为浅色动画 `lottieURL` 注册该 item 的深色 Lottie 动画。
-static void CYLRegisterDarkLottieURLFromAttributes(NSURL *lottieURL, NSDictionary *attributes) {
-    if (!lottieURL) {
+/// FIX: issue #442 — registers the item's dark animation (`…DarkURL`, else `…DarkFilePath`) and dark colors (`…DarkColors`)
+/// for `animationURL`, the light one. 为浅色动画 `animationURL` 注册该 item 的深色动画（`…DarkURL`，否则 `…DarkFilePath`）与深色颜色。
+static void CYLRegisterDarkAnimationFromAttributes(NSURL *animationURL, NSDictionary *attributes) {
+    if (!animationURL) {
         return;
     }
     // First: the #442 keys and whether their values are usable. Without any, and with nothing registered before for this
     // animation, nothing else runs. 首先判断 #442 新增的 key 是否存在、值是否有效；都没有且此前也未注册时，直接返回。
-    // FIX: issue #604 — generic keys, or the keys of the libraries in the build (`CYLTabBarItemAttributesAnimationValue`).
-    // 通用 key，或构建中各动画库的 key。
+    // FIX: issue #604 — generic keys, or the keys of the library the tab's keys choose (`CYLTabBarItemAttributesAnimationValue`).
+    // 通用 key，或 Tab 的 key 选择的动画库的 key。
     id darkURLValue = CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationDarkURL);
     id darkFilePathValue = CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationDarkFilePath);
     id darkColorsValue = CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationDarkColors);
-    NSURL *darkLottieURL = [darkURLValue isKindOfClass:[NSURL class]] ? darkURLValue : nil;
-    if (!darkLottieURL && [darkFilePathValue isKindOfClass:[NSString class]] && [(NSString *)darkFilePathValue length] > 0) {
-        darkLottieURL = [CYLConstants cyl_getURLFromString:darkFilePathValue];
+    NSURL *darkURL = [darkURLValue isKindOfClass:[NSURL class]] ? darkURLValue : nil;
+    if (!darkURL && [darkFilePathValue isKindOfClass:[NSString class]] && [(NSString *)darkFilePathValue length] > 0) {
+        darkURL = [CYLConstants cyl_getURLFromString:darkFilePathValue];
     }
     NSDictionary *darkColors = ([darkColorsValue isKindOfClass:[NSDictionary class]] && [(NSDictionary *)darkColorsValue count] > 0) ? darkColorsValue : nil;
-    if (!darkLottieURL && !darkColors && ![CYLConstants cyl_hasDarkLottieForLottieURL:lottieURL]) {
+    if (!darkURL && !darkColors && ![CYLTabBarItemAnimationDefaultStyleSource() hasStyleVariantForURL:animationURL]) {
         return;
     }
     // [EN] The dark version is played by the same library as the light one. [CN] 深色版本与浅色版本由同一个动画库播放。
-    [CYLTabBarItemAnimationGetService() bindAnimationURL:darkLottieURL toAttributes:attributes];
-    [CYLConstants cyl_registerDarkLottieURL:darkLottieURL forLottieURL:lottieURL];
-    [CYLConstants cyl_registerLottieDarkColors:darkColors forLottieURL:lottieURL];
+    [CYLTabBarItemAnimationGetService() bindAnimationURL:darkURL toAttributes:attributes];
+    CYLTabBarItemAnimationRegisterDarkStyle(animationURL, darkURL, darkColors);
 }
 
 /*!
@@ -258,7 +257,7 @@ NSURL *CYLTabBarItemAnimationURLFromAttributes(NSDictionary *attributes, NSStrin
     }
     NSURL *animationURL = [URLValue isKindOfClass:[NSURL class]] ? URLValue : [CYLConstants cyl_getURLFromString:animationFilePath];
     [CYLTabBarItemAnimationGetService() bindAnimationURL:animationURL toAttributes:attributes];
-    CYLRegisterDarkLottieURLFromAttributes(animationURL, attributes);
+    CYLRegisterDarkAnimationFromAttributes(animationURL, attributes);
     return animationURL;
 }
 
@@ -338,8 +337,8 @@ id CYLTabBarItemAttributesAnimationValue(NSDictionary *attributes, NSString *gen
     if (!URL) {
         return;
     }
-    // [CN] 统一使用CYLTabBarItemLottieAnimationPlayingNotification进行动画重置， 故删除手动重置。
-    // [EN] Animation reset is handled uniformly via CYLTabBarItemLottieAnimationPlayingNotification, so the manual reset
+    // [CN] 统一使用CYLTabBarItemAnimationPlayingNotification进行动画重置， 故删除手动重置。
+    // [EN] Animation reset is handled uniformly via CYLTabBarItemAnimationPlayingNotification, so the manual reset
     //      was removed.
     [selectedControl cyl_playTabBarItemAnimationWithURL:URL size:size defaultSelected:defaultSelected contentMode:contentMode];
 }
