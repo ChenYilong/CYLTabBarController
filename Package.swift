@@ -54,6 +54,10 @@ let package = Package(
                 .headerSearchPath("CYLUtils/CYLComponents/CYLTheme"),
                 .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar"),
                 .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBarPrivate"),
+            ],
+            // FIX: issue #535 — the tab tap sound.
+            linkerSettings: [
+                .linkedFramework("AudioToolbox"),
             ]
         ),
     ],

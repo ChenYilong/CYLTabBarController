@@ -202,9 +202,45 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Mostra un TabBarController amb un context nou (PlusButton amb una subvista X que es pot tocar, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Toca la X a dalt a la dreta del PlusButton: la X canvia a un color aleatori i el PlusButton no reacciona";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Actualitza";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex i el PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Toca per seleccionar la pestanya següent. Índex sense el PlusButton: %1$@, selectedIndex: %2$@, ara: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Amplia i redueix";
+"从小放大" = "Apropa";
+"弹性" = "Rebot";
+"弹性 + 烟花" = "Rebot + focs artificials";
+"旋转" = "Gira";
+"翻转" = "Gira la icona";
+"飘散" = "Esvaeix";
+"无" = "Cap";
+"Tab 点击动画（issue #535）" = "Animació en tocar les pestanyes (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Toca per canviar l'animació en tocar les pestanyes i el PlusButton. Ara: %@";
+"长按了「%@」" = "S'ha mantingut premut «%@»";
+"左右滑动切换 Tab（issue #535）" = "Llisca per canviar de pestanya (issue #535)";
+"长按 Tab（issue #535）" = "Mantenir premudes les pestanyes (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Activa l'interruptor i llisca a l'esquerra o a la dreta a la pàgina per anar a la pestanya següent o anterior.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Activa l'interruptor i mantén premuda qualsevol pestanya o el PlusButton per veure'n l'identificador.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Gira (només aquesta pestanya: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Fotogrames + focs (totes les pestanyes: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Respondre fora de la supervista (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Amb l'interruptor activat, la part del botó fora del quadre gris també respon; cada toc reprodueix l'animació d'escala. Tocs: %@";
+"已找到" = "Trobada";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "No trobada (amb use_frameworks el paquet de recursos és dins del framework)";
+"从 bundle 加载图片（issue #535）" = "Carregar imatges d'un bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "La imatge de l'esquerra es llegeix del paquet de recursos amb CYLImageInBundle (sense memòria cau). CYLBundleImage al bundle principal: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Aquest és un UIViewController normal que no hereta de CYLBaseViewController. La barra de navegació està amagada.";
+"不继承基类隐藏导航栏（issue #535）" = "Amagar la barra de navegació sense classe base (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "L'interruptor estableix cyl_automaticNavigationSettingEnabled; toca la fila per mostrar un UIViewController normal que estableix cyl_navigationBarHidden i cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Pàgina %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Transició lliscant (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Toca per obrir un UITabBarController del sistema: toca una pestanya o arrossega la pàgina a l'esquerra o a la dreta, i la pàgina llisca amb el dit.";
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "Minimitza / amaga la TabBar en desplaçar (issue #13)";
@@ -231,3 +267,25 @@
 "玫瑰粉" = "Rosa";
 "春节" = "Festa de la Primavera";
 "跟随系统深色模式" = "Seguir el mode fosc del sistema";
+"默认点击声" = "Clic per defecte";
+"中等触感反馈" = "Resposta hàptica mitjana";
+"无需继承基类与工具方法" = "Sense classe base, i utilitats";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Pestanya anterior / següent (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Referència feble: trobada viva %@, nil després d’alliberar-se %@. De %@ al botó de la pestanya seleccionada: %@";
+"点击声 + 触感反馈" = "Clic + hàptica";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Rebot + focs d’estrelles (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Toca les fletxes de la dreta per cridar cyl_switchToAdjacentTabWithStep:-1 / 1. Com en lliscar, omet el PlusButton i comprova l’inici de sessió. Últim resultat: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Toca per canviar i després toca qualsevol pestanya o el PlusButton per sentir-ho. L’hàptica només vibra en un dispositiu real. Actual: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Toca per executar: cyl_setWeakAssociatedObject:forKey: retorna nil quan l’objecte s’allibera; cyl_nearestControlBelowView: troba el botó de la pestanya seleccionada a partir de la seva icona.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Toca per canviar. cyl_tabBarItemLongPressDuration: %@ s, cyl_tabButtonLongPressMinimumDuration: %@ s, cyl_tabBarItemDoubleTapInterval: %@ s";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Fitxer de so propi (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Enrotllar cap amunt, sense animació en desseleccionar (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Ampliar i reduir lentament (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Apropar lentament (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: objectes associats febles i cerca del botó (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Durada de la pulsació llarga i interval del doble toc (issue #535 / #152)";
+"Tab 交互" = "Interaccions de les pestanyes";
+"Tab 点击声音与触感反馈（issue #535）" = "So i hàptica en tocar pestanyes (issue #535)";
+"轻触感反馈" = "Resposta hàptica lleugera";
+"重触感反馈" = "Resposta hàptica forta";
+"长按（#152）" = "Pulsació llarga (#152)";
