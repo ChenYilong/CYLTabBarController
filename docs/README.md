@@ -33,7 +33,7 @@
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
 | [Tab 的无障碍与 UI 测试](Tab-Accessibility.md) | [Tab Accessibility and UI Tests](Tab-Accessibility.md) |
 | [TabBar 图库](Tab-Bar-Gallery.md) | [Tab Bar Gallery](Tab-Bar-Gallery.md) |
-| [劫持 Tab 点击](Tab-Hijack.md) | [Hijacked Tabs](Tab-Hijack.md) |
+| [自定义 Tab 点击操作](Tab-Custom-Action.md) | [Custom Tab Actions](Tab-Custom-Action.md) |
 | [Tab 交互：点击动画、长按、滑动切换及其他](Tab-Interactions.md) | [Tab interactions: tap animations, long press, swipe, and more](Tab-Interactions.md) |
 | [单个 Tab 的颜色](Tab-Item-Colors.md) | [Per-tab Colors](Tab-Item-Colors.md) |
 | [Tab 的排列方式](Tab-Item-Positioning.md) | [Tab Item Positioning](Tab-Item-Positioning.md) |
@@ -79,7 +79,7 @@ docs/
 ├── SwiftUI-Integration.md
 ├── Tab-Accessibility.md
 ├── Tab-Bar-Gallery.md
-├── Tab-Hijack.md
+├── Tab-Custom-Action.md
 ├── Tab-Interactions.md
 ├── Tab-Item-Colors.md
 ├── Tab-Item-Positioning.md

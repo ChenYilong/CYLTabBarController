@@ -534,10 +534,10 @@ static CYLTabBarController *CYLGalleryTabBarController(NSArray<UIViewController 
                                                                            tabBarItemsAttributes:attributes
                                                                                        styleType:styleType
                                                                                          context:context];
-    // [EN] The controller is its own delegate, so its `-tabBarController:shouldSelectViewController:` runs the hijack
+    // [EN] The controller is its own delegate, so its `-tabBarController:shouldSelectViewController:` runs the custom action
     //      (and login) checks before UIKit selects a tab, in every style. Cast to `id`: the delegate property also names
     //      the FlatDesign delegate protocol, whose methods are all optional.
-    // [CN] 控制器作为自己的代理，其 `-tabBarController:shouldSelectViewController:` 会在 UIKit 选中 Tab 之前执行劫持（及登录）检查，
+    // [CN] 控制器作为自己的代理，其 `-tabBarController:shouldSelectViewController:` 会在 UIKit 选中 Tab 之前执行自定义操作（及登录）检查，
     //      适用于所有样式。转为 `id`：代理属性还要求扁平样式的代理协议，其方法都是可选的。
     tabBarController.delegate = (id)tabBarController;
     return tabBarController;
@@ -556,7 +556,7 @@ static UITabBarController *CYLGallerySystemTabBarController(NSUInteger count) {
     return tabBarController;
 }
 
-/// [EN] The dialog of an intercepted tab; `dismissed` runs when any button closes it. [CN] 被拦截的 Tab 弹出的对话框；任一按钮关闭它时执行 `dismissed`。
+/// [EN] The dialog of a tab with a custom action; `dismissed` runs when any button closes it. [CN] 执行自定义操作的 Tab 弹出的对话框；任一按钮关闭它时执行 `dismissed`。
 static void CYLGalleryPresentMoreFeatures(UIViewController *presenter, void (^dismissed)(void)) {
     if (!presenter || presenter.presentedViewController) {
         dismissed();
@@ -592,13 +592,13 @@ static BOOL CYLGallerySwapPages(CYLTabBarController *tabBarController, NSUIntege
 }
 
 /*!
- * [EN] The "Photo" tab opens a dialog instead of a page: with the library through `cyl_hijackedTabBarItemIdentifiers`
- *      and `cyl_didHijackHandler`.
- * [CN] "Photo" Tab 打开对话框而不是页面：通过本库的 `cyl_hijackedTabBarItemIdentifiers` 与 `cyl_didHijackHandler` 实现。
+ * [EN] The "Photo" tab opens a dialog instead of a page: with the library through `cyl_customActionTabBarItemIdentifiers`
+ *      and `cyl_customTabActionHandler`.
+ * [CN] "Photo" Tab 打开对话框而不是页面：通过本库的 `cyl_customActionTabBarItemIdentifiers` 与 `cyl_customTabActionHandler` 实现。
  */
-static void CYLGalleryHijackPhotoTab(CYLTabBarController *tabBarController) {
-    tabBarController.cyl_hijackedTabBarItemIdentifiers = @[ @"photo" ];
-    tabBarController.cyl_didHijackHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {
+static void CYLGalleryUseCustomActionForPhotoTab(CYLTabBarController *tabBarController) {
+    tabBarController.cyl_customActionTabBarItemIdentifiers = @[ @"photo" ];
+    tabBarController.cyl_customTabActionHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {
         // [EN] Next run loop turn (outside the tap): "Photo" looks selected over the current page while the dialog is up,
         //      then everything is restored.
         // [CN] 在下一个 runloop（点击处理之外）执行：对话框显示期间，"Photo" 显示为选中而页面保持不变，关闭后全部恢复。
@@ -626,20 +626,20 @@ static void CYLGalleryHijackPhotoTab(CYLTabBarController *tabBarController) {
     };
 }
 
-/// [EN] The same interception for the system UITabBarController, through its delegate. [CN] 系统 UITabBarController 通过代理实现同样的拦截。
-@interface CYLGallerySystemPhotoInterceptor : NSObject <UITabBarControllerDelegate>
-+ (instancetype)sharedInterceptor;
+/// [EN] The same custom action for the system UITabBarController, through its delegate. [CN] 系统 UITabBarController 通过代理实现同样的自定义操作。
+@interface CYLGallerySystemPhotoActionDelegate : NSObject <UITabBarControllerDelegate>
++ (instancetype)sharedDelegate;
 @end
 
-@implementation CYLGallerySystemPhotoInterceptor
+@implementation CYLGallerySystemPhotoActionDelegate
 
-+ (instancetype)sharedInterceptor {
-    static CYLGallerySystemPhotoInterceptor *interceptor;
++ (instancetype)sharedDelegate {
+    static CYLGallerySystemPhotoActionDelegate *sharedDelegate;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        interceptor = [[self alloc] init];
+        sharedDelegate = [[self alloc] init];
     });
-    return interceptor;
+    return sharedDelegate;
 }
 
 /// [EN] Swaps two tabs' pages while each keeps its title and icon (UITab entries on iOS 18+ when the controller uses them).
@@ -673,7 +673,7 @@ static void CYLGalleryHijackPhotoTab(CYLTabBarController *tabBarController) {
 }
 
 /// [EN] "Photo" looks selected over the current page while the dialog is up, then it is restored. [CN] 对话框显示期间 "Photo" 显示为选中且页面不变，关闭后恢复。
-- (void)interceptPhotoAtIndex:(NSUInteger)photoIndex selectedIndex:(NSUInteger)currentIndex inTabBarController:(UITabBarController *)tabBarController {
+- (void)showPhotoActionAtIndex:(NSUInteger)photoIndex selectedIndex:(NSUInteger)currentIndex inTabBarController:(UITabBarController *)tabBarController {
     __weak UITabBarController *weakTabBarController = tabBarController;
     dispatch_async(dispatch_get_main_queue(), ^{
         UITabBarController *strongTabBarController = weakTabBarController;
@@ -697,7 +697,7 @@ static void CYLGalleryHijackPhotoTab(CYLTabBarController *tabBarController) {
     NSUInteger currentIndex = tabBarController.selectedIndex;
     if ([viewController.tabBarItem.title isEqualToString:@"Photo"] && photoIndex != NSNotFound &&
         currentIndex != NSNotFound && photoIndex != currentIndex) {
-        [self interceptPhotoAtIndex:photoIndex selectedIndex:currentIndex inTabBarController:tabBarController];
+        [self showPhotoActionAtIndex:photoIndex selectedIndex:currentIndex inTabBarController:tabBarController];
         return NO;
     }
     return YES;
@@ -707,7 +707,7 @@ static void CYLGalleryHijackPhotoTab(CYLTabBarController *tabBarController) {
     NSUInteger photoIndex = [tabBarController.tabs indexOfObject:tab];
     NSUInteger currentIndex = tabBarController.selectedTab ? [tabBarController.tabs indexOfObject:tabBarController.selectedTab] : NSNotFound;
     if ([tab.title isEqualToString:@"Photo"] && photoIndex != NSNotFound && currentIndex != NSNotFound && photoIndex != currentIndex) {
-        [self interceptPhotoAtIndex:photoIndex selectedIndex:currentIndex inTabBarController:tabBarController];
+        [self showPhotoActionAtIndex:photoIndex selectedIndex:currentIndex inTabBarController:tabBarController];
         return NO;
     }
     return YES;
@@ -972,14 +972,14 @@ static UIView *CYLGalleryStarView(void) {
             }
             return tabBarController;
         }],
-        [CYLGalleryScene sceneWithTitle:@"CYLTabBarController with Liquid Glass" subtitle:@"\"Photo\" opens a dialog (cyl_hijackedTabBarItemIdentifiers)" builder:^UIViewController *{
+        [CYLGalleryScene sceneWithTitle:@"CYLTabBarController with Liquid Glass" subtitle:@"\"Photo\" opens a dialog (cyl_customActionTabBarItemIdentifiers)" builder:^UIViewController *{
             CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
-            CYLGalleryHijackPhotoTab(tabBarController);
+            CYLGalleryUseCustomActionForPhotoTab(tabBarController);
             return tabBarController;
         }],
         [CYLGalleryScene sceneWithTitle:@"UITabBarController with 'More'" subtitle:@"Eight tabs; \"Photo\" opens a dialog (delegate)" builder:^UIViewController *{
             UITabBarController *tabBarController = CYLGallerySystemTabBarController(8);
-            tabBarController.delegate = [CYLGallerySystemPhotoInterceptor sharedInterceptor];
+            tabBarController.delegate = [CYLGallerySystemPhotoActionDelegate sharedDelegate];
             return tabBarController;
         }],
         [CYLGalleryScene sceneWithTitle:@"CYLTabBarController with 'More'" subtitle:@"Eight tabs, full width" builder:^UIViewController *{
@@ -1004,7 +1004,7 @@ static UIView *CYLGalleryStarView(void) {
         [CYLGalleryScene sceneWithTitle:@"Classic design on every system" subtitle:@"CYLTabBarStyleTypeFlatDesign, white bar; \"Photo\" opens a dialog" builder:^UIViewController *{
             CYLTabBarController *tabBarController = CYLGalleryTabBarController(CYLGalleryPages(5, NO), CYLGalleryAttributes(5, YES, 20, nil), CYLTabBarStyleTypeFlatDesign, CYLGalleryContext);
             CYLGallerySetTabBarBackgroundColor(tabBarController, UIColor.whiteColor);
-            CYLGalleryHijackPhotoTab(tabBarController);
+            CYLGalleryUseCustomActionForPhotoTab(tabBarController);
             return tabBarController;
         }],
         [CYLGalleryScene sceneWithTitle:@"Liquid Glass with badges" subtitle:@"New, 99+, a blue 1, a dot, none; the selected tab hides its badge" builder:^UIViewController *{
@@ -1043,7 +1043,7 @@ static UIView *CYLGalleryStarView(void) {
         }
         tabBarController.tabs = tabs;
         tabBarController.selectedTab = tabs[3];
-        tabBarController.delegate = [CYLGallerySystemPhotoInterceptor sharedInterceptor];
+        tabBarController.delegate = [CYLGallerySystemPhotoActionDelegate sharedDelegate];
         return tabBarController;
     }
     return CYLGallerySystemTabBarController(8);
@@ -1148,7 +1148,7 @@ static UIView *CYLGalleryStarView(void) {
 
 + (CYLGallerySection *)customClickSection {
     NSArray<CYLGalleryScene *> *scenes = @[
-        [CYLGalleryScene sceneWithTitle:@"Hijack the button click" subtitle:@"The center button shows an action sheet instead of a page" builder:^UIViewController *{
+        [CYLGalleryScene sceneWithTitle:@"Custom action for the button click" subtitle:@"The center button shows an action sheet instead of a page" builder:^UIViewController *{
             return [self irregularScene];
         }],
         [CYLGalleryScene sceneWithTitle:@"Add a special reminder bubble" subtitle:@"A bubble above \"Me\"; \"Photo\" opens a dialog" builder:^UIViewController *{
@@ -1158,7 +1158,7 @@ static UIView *CYLGalleryStarView(void) {
             CYLTabBarController *tabBarController = CYLGalleryTabBarController(CYLGalleryPages(5, NO), attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext);
             tabBarController.cyl_defaultTabButtonAnimation = [CYLGalleryBounceAnimation new];
             CYLGallerySetTabBarBackgroundColor(tabBarController, CYLGalleryRGB(10, 66, 91));
-            CYLGalleryHijackPhotoTab(tabBarController);
+            CYLGalleryUseCustomActionForPhotoTab(tabBarController);
             CYLGalleryForEachTabButton(tabBarController, ^(UIControl *button, NSUInteger index) {
                 UIView *tabBar = button.superview;
                 if (index != 4 || !tabBar) {
@@ -1280,9 +1280,9 @@ static UIView *CYLGalleryStarView(void) {
             tabBarController.cyl_defaultTabButtonAnimation = [CYLGalleryPressAndReselectAnimation new];
             return tabBarController;
         }],
-        [CYLGalleryScene sceneWithTitle:@"Hijack a regular tab" subtitle:@"cyl_hijackedTabBarItemIdentifiers + cyl_didHijackHandler" builder:^UIViewController *{
+        [CYLGalleryScene sceneWithTitle:@"Custom action on a regular tab" subtitle:@"cyl_customActionTabBarItemIdentifiers + cyl_customTabActionHandler" builder:^UIViewController *{
             CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
-            CYLGalleryHijackPhotoTab(tabBarController);
+            CYLGalleryUseCustomActionForPhotoTab(tabBarController);
             return tabBarController;
         }],
         [CYLGalleryScene sceneWithTitle:@"Per-tab colors, fonts and backgrounds" subtitle:@"Every tab has its own title color, font and background" builder:^UIViewController *{
@@ -1461,11 +1461,11 @@ static UIView *CYLGalleryStarView(void) {
 /*!
  * [EN] Issue #472: more than five tabs without the system "More". UIKit adds "More" as soon as a tab bar controller has
  *      more than five view controllers, and it cannot be turned off; so the controller gets five, and the fifth tab is an
- *      overflow slot. Tapping it (or tapping it again while it is selected) is hijacked and shows your own menu of the
+ *      overflow slot. Tapping it (or tapping it again while it is selected) runs a custom action that shows your own menu of the
  *      other pages; the chosen page is put in the slot with `-replaceViewControllerAtIndex:withViewController:attributes:`,
  *      with its own title and icon, and selected. While another tab is selected, the slot selects its page directly.
  * [CN] Issue #472：超过 5 个 Tab 而不出现系统的 "More"。TabBarController 的视图控制器超过 5 个时 UIKit 就会添加 "More"，且无法关闭；
- *      因此只给控制器 5 个，第 5 个 Tab 作为溢出位。点击它（或在它选中时再次点击）会被劫持，弹出你自己的其他页面菜单；选中的页面通过
+ *      因此只给控制器 5 个，第 5 个 Tab 作为溢出位。点击它（或在它选中时再次点击）会执行自定义操作，弹出你自己的其他页面菜单；选中的页面通过
  *      `-replaceViewControllerAtIndex:withViewController:attributes:` 放进该位置（使用它自己的标题与图标）并选中。其他 Tab 选中时，
  *      点击溢出位直接选中其中的页面。
  */
@@ -1490,8 +1490,8 @@ static UIView *CYLGalleryStarView(void) {
                                          CYLTabBarItemIdentifier : @"overflow" }];
     }
     CYLTabBarController *tabBarController = CYLGalleryTabBarController(pages, attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext);
-    tabBarController.cyl_hijackedTabBarItemIdentifiers = @[ @"overflow" ];
-    tabBarController.cyl_shouldHijackHandler = ^BOOL(CYLTabBarController *controller, UIViewController *viewController) {
+    tabBarController.cyl_customActionTabBarItemIdentifiers = @[ @"overflow" ];
+    tabBarController.cyl_shouldPerformCustomTabActionHandler = ^BOOL(CYLTabBarController *controller, UIViewController *viewController) {
         NSUInteger index = [controller.viewControllers indexOfObject:viewController];
         if (index != 4) {
             return NO;
@@ -1499,7 +1499,7 @@ static UIView *CYLGalleryStarView(void) {
         // [EN] The menu: from the placeholder, or when the slot is tapped again. [CN] 弹出菜单：溢出位还是占位页面，或再次点击该位置时。
         return viewController == placeholder || controller.selectedIndex == 4;
     };
-    tabBarController.cyl_didHijackHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {
+    tabBarController.cyl_customTabActionHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {
         UIAlertController *menu = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         [overflowPages enumerateObjectsUsingBlock:^(UIViewController *page, NSUInteger index, BOOL *stop) {
             NSDictionary *pageAttributes = overflowAttributes[index];

@@ -47,7 +47,7 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
             "A larger button in the middle",
         ],
         [
-            "Hijack the button click",
+            "Custom action for the button click",
             "Add a special reminder bubble",
         ],
         [
@@ -63,7 +63,7 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
         [
             "Reselect: pop to root, then scroll to top",
             "Press and reselect animations",
-            "Hijack a regular tab",
+            "Custom action on a regular tab",
             "Per-tab colors, fonts and backgrounds",
             "Accessibility identifiers",
             "Centered tabs around a plus button",
@@ -76,7 +76,7 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
             "The system tab bar, for comparison",
             "Three tabs; full width on iOS 26 (FlatDesign)",
             "Tabs 1, 3 and 5 bounce; tabs 2 and 4 are plain",
-            "\"Photo\" opens a dialog (cyl_hijackedTabBarItemIdentifiers)",
+            "\"Photo\" opens a dialog (cyl_customActionTabBarItemIdentifiers)",
             "Eight tabs; \"Photo\" opens a dialog (delegate)",
             "Eight tabs, full width",
             "Eight tabs; every other one bounces",
@@ -118,7 +118,7 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
         [
             "cyl_reselectBehavior = PopToRootThenScrollToTop",
             "CYLTabButtonPressAnimation + a reselect turn",
-            "cyl_hijackedTabBarItemIdentifiers + cyl_didHijackHandler",
+            "cyl_customActionTabBarItemIdentifiers + cyl_customTabActionHandler",
             "Every tab has its own title color, font and background",
             "Each tab is app.tabBars.buttons[\"home\"] etc. in UI tests",
             "itemPositioning = Centered, itemWidth 64, itemSpacing 12",
@@ -240,7 +240,7 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
         switch row {
         case 0: present(GalleryProvider.reselectStyle(), animated: true)
         case 1: present(GalleryProvider.pressAndReselectStyle(), animated: true)
-        case 2: present(GalleryProvider.hijackStyle(), animated: true)
+        case 2: present(GalleryProvider.customActionStyle(), animated: true)
         case 3: present(GalleryProvider.perTabStyle(), animated: true)
         case 4: present(GalleryProvider.accessibilityStyle(), animated: true)
         case 5: present(GalleryProvider.centeredStyle(), animated: true)
@@ -258,7 +258,7 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
               photoIndex != tabBarController.selectedIndex else {
             return true
         }
-        interceptPhoto(at: photoIndex, selectedIndex: tabBarController.selectedIndex, usesTabs: false, in: tabBarController)
+        showPhotoAction(at: photoIndex, selectedIndex: tabBarController.selectedIndex, usesTabs: false, in: tabBarController)
         return false
     }
 
@@ -271,13 +271,13 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
               photoIndex != currentIndex else {
             return true
         }
-        interceptPhoto(at: photoIndex, selectedIndex: currentIndex, usesTabs: true, in: tabBarController)
+        showPhotoAction(at: photoIndex, selectedIndex: currentIndex, usesTabs: true, in: tabBarController)
         return false
     }
 
     /// [EN] Swaps the two tabs' pages (each keeps its title and icon), selects "Photo", and restores after the dialog.
     /// [CN] 交换两个 Tab 的页面（各自保持标题与图标），选中 "Photo"，对话框关闭后恢复。
-    private func interceptPhoto(at photoIndex: Int, selectedIndex currentIndex: Int, usesTabs: Bool,
+    private func showPhotoAction(at photoIndex: Int, selectedIndex currentIndex: Int, usesTabs: Bool,
                                 in tabBarController: UITabBarController) {
         DispatchQueue.main.async { [weak self, weak tabBarController] in
             guard let self = self, let tabBarController = tabBarController else {

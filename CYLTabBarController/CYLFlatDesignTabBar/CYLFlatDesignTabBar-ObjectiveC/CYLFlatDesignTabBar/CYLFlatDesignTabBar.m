@@ -496,11 +496,11 @@
         [loginTabBarController cyl_interceptLoginIfNeededForViewController:loginTabBarController.viewControllers[(NSUInteger)selectedIndex]]) {
         return;
     }
-    // [EN] A hijacked tab (CYLHijack): not selected, not reported as a selection; its action runs instead.
-    // [CN] 被劫持的 Tab（CYLHijack）：不选中、不作为选中上报，改为执行对应操作。
+    // [EN] A custom action tab (CYLCustomTabAction): not selected, not reported as a selection; its action runs instead.
+    // [CN] 使用自定义点击操作的 Tab（CYLCustomTabAction）：不选中、不作为选中上报，改为执行对应操作。
     if (loginTabBarController && !tabBarButton.cyl_isPlaceholder &&
         selectedIndex < (NSInteger)loginTabBarController.viewControllers.count &&
-        [loginTabBarController cyl_interceptHijackIfNeededForViewController:loginTabBarController.viewControllers[(NSUInteger)selectedIndex]]) {
+        [loginTabBarController cyl_performCustomTabActionIfNeededForViewController:loginTabBarController.viewControllers[(NSUInteger)selectedIndex]]) {
         return;
     }
     

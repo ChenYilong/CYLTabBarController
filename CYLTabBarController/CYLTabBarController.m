@@ -550,17 +550,17 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
         [self cyl_interceptLoginIfNeededForViewController:self.viewControllers[(NSUInteger)tappedIndex]]) {
         return;
     }
-    // [EN] A hijacked tab (CYLHijack): runs the action instead (once per tap), like a tab that needs login. The view
+    // [EN] A custom action tab (CYLCustomTabAction): runs the action instead (once per tap), like a tab that needs login. The view
     //      controller is looked up from the button itself: on Liquid Glass without a plus button the button's stored
     //      index can be 0 for every tab.
-    // [CN] 被劫持的 Tab（CYLHijack）：改为执行对应操作（每次点击一次），与需要登录的 Tab 相同。控制器按按钮本身查找：
+    // [CN] 使用自定义点击操作的 Tab（CYLCustomTabAction）：改为执行对应操作（每次点击一次），与需要登录的 Tab 相同。控制器按按钮本身查找：
     //      液态玻璃且没有 PlusButton 时，按钮记录的下标可能都是 0。
     // [EN] Liquid Glass calls this from the gesture delegate when a touch begins; the tap itself reaches
     //      `-tabBarController:shouldSelectViewController:`, which checks it, so it is not checked here (it would run twice).
     // [CN] 液态玻璃在手指按下时从手势代理调用本方法；点击本身会到达 `-tabBarController:shouldSelectViewController:` 并在那里检查，
     //      因此这里不再检查（否则会执行两次）。
-    UIViewController *hijackCandidate = [CYLConstants isLiquidGlassActive] ? nil : [self cyl_viewControllerForTabControl:control];
-    if (hijackCandidate && [self cyl_interceptHijackIfNeededForViewController:hijackCandidate]) {
+    UIViewController *customActionCandidate = [CYLConstants isLiquidGlassActive] ? nil : [self cyl_viewControllerForTabControl:control];
+    if (customActionCandidate && [self cyl_performCustomTabActionIfNeededForViewController:customActionCandidate]) {
         return;
     }
     // FIX: issue #232
@@ -4518,9 +4518,9 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     if ([self cyl_interceptLoginIfNeededForViewController:viewController]) {
         return NO;
     }
-    // [EN] A hijacked tab (CYLHijack): refuse the selection and run the action instead.
-    // [CN] 被劫持的 Tab（CYLHijack）：拒绝选中，改为执行对应操作。
-    if ([self cyl_interceptHijackIfNeededForViewController:viewController]) {
+    // [EN] A custom action tab (CYLCustomTabAction): refuse the selection and run the action instead.
+    // [CN] 使用自定义点击操作的 Tab（CYLCustomTabAction）：拒绝选中，改为执行对应操作。
+    if ([self cyl_performCustomTabActionIfNeededForViewController:viewController]) {
         return NO;
     }
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
@@ -7879,81 +7879,81 @@ static char CYLReselectBehaviorKey;
 
 @end
 
-#pragma mark - CYLHijack (a tab that runs an action instead of being selected)
+#pragma mark - CYLCustomTabAction (a tab that runs an action instead of being selected)
 
-static char CYLHijackedTabBarItemIdentifiersKey;
-static char CYLShouldHijackHandlerKey;
-static char CYLDidHijackHandlerKey;
-static char CYLHijackInterceptedViewControllerKey;
+static char CYLCustomActionTabBarItemIdentifiersKey;
+static char CYLShouldPerformCustomTabActionHandlerKey;
+static char CYLCustomTabActionHandlerKey;
+static char CYLCustomTabActionViewControllerKey;
 
-@implementation CYLTabBarController (CYLHijack)
+@implementation CYLTabBarController (CYLCustomTabAction)
 
-- (NSArray<NSString *> *)cyl_hijackedTabBarItemIdentifiers {
-    return objc_getAssociatedObject(self, &CYLHijackedTabBarItemIdentifiersKey);
+- (NSArray<NSString *> *)cyl_customActionTabBarItemIdentifiers {
+    return objc_getAssociatedObject(self, &CYLCustomActionTabBarItemIdentifiersKey);
 }
 
-- (void)setCyl_hijackedTabBarItemIdentifiers:(NSArray<NSString *> *)hijackedTabBarItemIdentifiers {
-    objc_setAssociatedObject(self, &CYLHijackedTabBarItemIdentifiersKey, hijackedTabBarItemIdentifiers, OBJC_ASSOCIATION_COPY_NONATOMIC);
+- (void)setCyl_customActionTabBarItemIdentifiers:(NSArray<NSString *> *)customActionTabBarItemIdentifiers {
+    objc_setAssociatedObject(self, &CYLCustomActionTabBarItemIdentifiersKey, customActionTabBarItemIdentifiers, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
-- (BOOL (^)(CYLTabBarController *, UIViewController *))cyl_shouldHijackHandler {
-    return objc_getAssociatedObject(self, &CYLShouldHijackHandlerKey);
+- (BOOL (^)(CYLTabBarController *, UIViewController *))cyl_shouldPerformCustomTabActionHandler {
+    return objc_getAssociatedObject(self, &CYLShouldPerformCustomTabActionHandlerKey);
 }
 
-- (void)setCyl_shouldHijackHandler:(BOOL (^)(CYLTabBarController *, UIViewController *))shouldHijackHandler {
-    objc_setAssociatedObject(self, &CYLShouldHijackHandlerKey, shouldHijackHandler, OBJC_ASSOCIATION_COPY_NONATOMIC);
+- (void)setCyl_shouldPerformCustomTabActionHandler:(BOOL (^)(CYLTabBarController *, UIViewController *))shouldPerformCustomTabActionHandler {
+    objc_setAssociatedObject(self, &CYLShouldPerformCustomTabActionHandlerKey, shouldPerformCustomTabActionHandler, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
-- (void (^)(CYLTabBarController *, UIViewController *))cyl_didHijackHandler {
-    return objc_getAssociatedObject(self, &CYLDidHijackHandlerKey);
+- (void (^)(CYLTabBarController *, UIViewController *))cyl_customTabActionHandler {
+    return objc_getAssociatedObject(self, &CYLCustomTabActionHandlerKey);
 }
 
-- (void)setCyl_didHijackHandler:(void (^)(CYLTabBarController *, UIViewController *))didHijackHandler {
-    objc_setAssociatedObject(self, &CYLDidHijackHandlerKey, didHijackHandler, OBJC_ASSOCIATION_COPY_NONATOMIC);
+- (void)setCyl_customTabActionHandler:(void (^)(CYLTabBarController *, UIViewController *))customTabActionHandler {
+    objc_setAssociatedObject(self, &CYLCustomTabActionHandlerKey, customTabActionHandler, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
-- (BOOL)cyl_isHijackedViewController:(UIViewController *)viewController {
+- (BOOL)cyl_isCustomActionTabViewController:(UIViewController *)viewController {
     if (!viewController || viewController.cyl_isPlaceholder) {
         return NO;
     }
-    BOOL (^shouldHijackHandler)(CYLTabBarController *, UIViewController *) = self.cyl_shouldHijackHandler;
-    if (shouldHijackHandler) {
-        return shouldHijackHandler(self, viewController);
+    BOOL (^shouldPerformCustomTabActionHandler)(CYLTabBarController *, UIViewController *) = self.cyl_shouldPerformCustomTabActionHandler;
+    if (shouldPerformCustomTabActionHandler) {
+        return shouldPerformCustomTabActionHandler(self, viewController);
     }
     id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)self.delegate;
-    if ([delegate respondsToSelector:@selector(tabBarController:shouldHijackViewController:)]) {
-        return [delegate tabBarController:self shouldHijackViewController:viewController];
+    if ([delegate respondsToSelector:@selector(tabBarController:shouldPerformCustomActionForViewController:)]) {
+        return [delegate tabBarController:self shouldPerformCustomActionForViewController:viewController];
     }
     NSString *identifier = viewController.cyl_tabBarItemIdentifier;
-    return identifier.length > 0 && [self.cyl_hijackedTabBarItemIdentifiers containsObject:identifier];
+    return identifier.length > 0 && [self.cyl_customActionTabBarItemIdentifiers containsObject:identifier];
 }
 
-- (BOOL)cyl_interceptHijackIfNeededForViewController:(UIViewController *)viewController {
-    if (![self cyl_isHijackedViewController:viewController]) {
+- (BOOL)cyl_performCustomTabActionIfNeededForViewController:(UIViewController *)viewController {
+    if (![self cyl_isCustomActionTabViewController:viewController]) {
         return NO;
     }
     // [EN] One tap reaches here up to twice (`-tabBarController:shouldSelectViewController:`, then the tab button's action):
     //      run the action only once per run loop turn.
     // [CN] 一次点击最多到达这里两次（`-tabBarController:shouldSelectViewController:`，然后是 Tab 按钮的事件）：每个 runloop 只执行一次。
-    if (objc_getAssociatedObject(self, &CYLHijackInterceptedViewControllerKey) == viewController) {
+    if (objc_getAssociatedObject(self, &CYLCustomTabActionViewControllerKey) == viewController) {
         return YES;
     }
-    objc_setAssociatedObject(self, &CYLHijackInterceptedViewControllerKey, viewController, OBJC_ASSOCIATION_ASSIGN);
+    objc_setAssociatedObject(self, &CYLCustomTabActionViewControllerKey, viewController, OBJC_ASSOCIATION_ASSIGN);
     __weak __typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof(weakSelf) strongSelf = weakSelf;
         if (strongSelf) {
-            objc_setAssociatedObject(strongSelf, &CYLHijackInterceptedViewControllerKey, nil, OBJC_ASSOCIATION_ASSIGN);
+            objc_setAssociatedObject(strongSelf, &CYLCustomTabActionViewControllerKey, nil, OBJC_ASSOCIATION_ASSIGN);
         }
     });
-    void (^didHijackHandler)(CYLTabBarController *, UIViewController *) = self.cyl_didHijackHandler;
-    if (didHijackHandler) {
-        didHijackHandler(self, viewController);
+    void (^customTabActionHandler)(CYLTabBarController *, UIViewController *) = self.cyl_customTabActionHandler;
+    if (customTabActionHandler) {
+        customTabActionHandler(self, viewController);
         return YES;
     }
     id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)self.delegate;
-    if ([delegate respondsToSelector:@selector(tabBarController:didHijackViewController:)]) {
-        [delegate tabBarController:self didHijackViewController:viewController];
+    if ([delegate respondsToSelector:@selector(tabBarController:performCustomActionForViewController:)]) {
+        [delegate tabBarController:self performCustomActionForViewController:viewController];
     }
     return YES;
 }

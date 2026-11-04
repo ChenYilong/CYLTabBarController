@@ -95,9 +95,9 @@ enum Gallery {
 
     /*!
      * [EN] A CYLTabBarController that is its own delegate, so its `-tabBarController:shouldSelectViewController:` runs
-     *      the hijack checks before UIKit selects a tab. Assigned through `UITabBarController.delegate`, whose type the
+     *      the custom action checks before UIKit selects a tab. Assigned through `UITabBarController.delegate`, whose type the
      *      controller satisfies.
-     * [CN] 作为自己代理的 CYLTabBarController，其 `-tabBarController:shouldSelectViewController:` 会在 UIKit 选中 Tab 之前执行劫持检查。
+     * [CN] 作为自己代理的 CYLTabBarController，其 `-tabBarController:shouldSelectViewController:` 会在 UIKit 选中 Tab 之前执行自定义操作检查。
      *      通过 `UITabBarController.delegate` 赋值，控制器满足其类型要求。
      */
     static func tabBarController(pages: [UIViewController], attributes: [[String: Any]],
@@ -220,10 +220,10 @@ enum Gallery {
         return bubble
     }
 
-    // MARK: Intercepted "Photo" tab
+    // MARK: "Photo" tab with a custom action
 
-    /// [EN] The dialog of an intercepted tab; `dismissed` runs when any button closes it.
-    /// [CN] 被拦截的 Tab 弹出的对话框；任一按钮关闭它时执行 `dismissed`。
+    /// [EN] The dialog of a tab with a custom action; `dismissed` runs when any button closes it.
+    /// [CN] 执行自定义操作的 Tab 弹出的对话框；任一按钮关闭它时执行 `dismissed`。
     static func presentMoreFeatures(from presenter: UIViewController, dismissed: @escaping () -> Void) {
         guard presenter.presentedViewController == nil else {
             dismissed()
@@ -251,14 +251,14 @@ enum Gallery {
     }
 
     /*!
-     * [EN] "Photo" opens a dialog instead of its page (`cyl_hijackedTabBarItemIdentifiers` + `cyl_didHijackHandler`); while
+     * [EN] "Photo" opens a dialog instead of its page (`cyl_customActionTabBarItemIdentifiers` + `cyl_customTabActionHandler`); while
      *      the dialog is up, "Photo" looks selected over the current page, then everything is restored.
-     * [CN] "Photo" 打开对话框而不是页面（`cyl_hijackedTabBarItemIdentifiers` + `cyl_didHijackHandler`）；对话框显示期间，"Photo" 显示为
+     * [CN] "Photo" 打开对话框而不是页面（`cyl_customActionTabBarItemIdentifiers` + `cyl_customTabActionHandler`）；对话框显示期间，"Photo" 显示为
      *      选中而页面不变，关闭后全部恢复。
      */
-    static func hijackPhotoTab(of tabBarController: CYLTabBarController) {
-        tabBarController.cyl_hijackedTabBarItemIdentifiers = ["photo"]
-        tabBarController.cyl_didHijackHandler = { controller, photoPage in
+    static func useCustomActionForPhotoTab(of tabBarController: CYLTabBarController) {
+        tabBarController.cyl_customActionTabBarItemIdentifiers = ["photo"]
+        tabBarController.cyl_customTabActionHandler = { controller, photoPage in
             DispatchQueue.main.async { [weak controller, weak photoPage] in
                 guard let controller = controller, let photoPage = photoPage else {
                     return

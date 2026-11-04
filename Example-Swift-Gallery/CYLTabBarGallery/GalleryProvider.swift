@@ -35,7 +35,7 @@ enum GalleryProvider {
     /// [EN] Liquid Glass; "Photo" opens a dialog. [CN] 液态玻璃；"Photo" 打开对话框。
     static func customGlassStyle() -> CYLTabBarController {
         let controller = Gallery.tabBarController(pages: Gallery.pages(5), attributes: Gallery.attributes(5))
-        Gallery.hijackPhotoTab(of: controller)
+        Gallery.useCustomActionForPhotoTab(of: controller)
         return controller
     }
 
@@ -63,7 +63,7 @@ enum GalleryProvider {
     static func mandatoryOldDesignStyle() -> CYLTabBarController {
         let controller = Gallery.tabBarController(pages: Gallery.pages(5), attributes: Gallery.attributes(5), styleType: .flatDesign)
         Gallery.setBackgroundColor(of: controller, to: .white)
-        Gallery.hijackPhotoTab(of: controller)
+        Gallery.useCustomActionForPhotoTab(of: controller)
         return controller
     }
 
@@ -216,7 +216,7 @@ enum GalleryProvider {
         let controller = Gallery.tabBarController(pages: Gallery.pages(5), attributes: Gallery.attributes(5, extra: tealAttributes))
         controller.cyl_defaultTabButtonAnimation = GalleryBounceAnimation()
         Gallery.setBackgroundColor(of: controller, to: Gallery.darkTeal)
-        Gallery.hijackPhotoTab(of: controller)
+        Gallery.useCustomActionForPhotoTab(of: controller)
         // [EN] The bubble lives on the tab bar, not on the button, so it survives the page swaps of the "Photo" dialog.
         // [CN] 气泡加在 TabBar 上而不是按钮上，因此 "Photo" 对话框交换页面时不会丢失。
         Gallery.forEachTabButton(of: controller) { button, index in
@@ -326,9 +326,9 @@ enum GalleryProvider {
         return controller
     }
 
-    /// [EN] The same tab bar as `customGlassStyle()`: "Photo" is a hijacked regular tab. [CN] 与 `customGlassStyle()` 相同：
-    /// "Photo" 是被劫持的普通 Tab。
-    static func hijackStyle() -> CYLTabBarController {
+    /// [EN] The same tab bar as `customGlassStyle()`: "Photo" is a regular tab with a custom action. [CN] 与 `customGlassStyle()` 相同：
+    /// "Photo" 是执行自定义操作的普通 Tab。
+    static func customActionStyle() -> CYLTabBarController {
         return customGlassStyle()
     }
 
