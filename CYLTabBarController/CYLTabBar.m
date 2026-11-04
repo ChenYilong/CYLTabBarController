@@ -44,6 +44,10 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
 @property (nonatomic, assign) BOOL cyl_isSettingItemTitles;
 /// Receives the `UIScrollEdgeElementContainerInteraction`s added to the tab bar, see `-addInteraction:`.
 @property (nonatomic, strong, nullable) UIView *cyl_scrollEdgeElementContainerView;
+/// [EN] The x of the first slot and the gap between slots of the last layout with a plus button (0 unless centered).
+/// [CN] 上次带 PlusButton 布局时第一个位置的 x 与位置间距（未居中时均为 0）。
+@property (nonatomic, assign) CGFloat cyl_itemLayoutLeading;
+@property (nonatomic, assign) CGFloat cyl_itemLayoutSpacing;
 /// FIX: issue #488. The token of the block-based Lottie observer: `-removeObserver:self` cannot remove it.
 @property (nonatomic, strong, nullable) id<NSObject> cyl_lottieAnimationPlayingObserver;
 
@@ -306,6 +310,75 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
     [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];
 }
 
+#pragma mark - Item positioning (centered, item width, item spacing)
+
+/*!
+ * [EN] The classic tab bar lays its tab buttons out itself when there is a plus button, which used to fill the whole width
+ *      and ignore `itemPositioning`, `itemWidth` and `itemSpacing`. They are read as UIKit reads them: the
+ *      `standardAppearance` values (iOS 13+) when set, otherwise the tab bar's own properties.
+ * [CN] 有 PlusButton 时，经典 TabBar 自行布局 Tab 按钮，以前总是铺满整个宽度，忽略了 `itemPositioning`、`itemWidth`、`itemSpacing`。
+ *      这里按 UIKit 的方式读取：设置了 `standardAppearance` 中的值（iOS 13+）时使用它们，否则使用 TabBar 自身的属性。
+ */
+- (void)cyl_getItemPositioning:(UITabBarItemPositioning *)positioning itemWidth:(CGFloat *)itemWidth itemSpacing:(CGFloat *)itemSpacing {
+    UITabBarItemPositioning resolvedPositioning = self.itemPositioning;
+    CGFloat resolvedWidth = self.itemWidth;
+    CGFloat resolvedSpacing = self.itemSpacing;
+    if (@available(iOS 13.0, *)) {
+        UITabBarAppearance *appearance = self.standardAppearance;
+        if (appearance.stackedItemPositioning != UITabBarItemPositioningAutomatic) {
+            resolvedPositioning = appearance.stackedItemPositioning;
+        }
+        if (appearance.stackedItemWidth > 0) {
+            resolvedWidth = appearance.stackedItemWidth;
+        }
+        if (appearance.stackedItemSpacing > 0) {
+            resolvedSpacing = appearance.stackedItemSpacing;
+        }
+    }
+    *positioning = resolvedPositioning;
+    *itemWidth = resolvedWidth;
+    *itemSpacing = resolvedSpacing;
+}
+
+/*!
+ * [EN] The horizontal layout of `count` tab buttons plus, when `plusWidth` > 0, one plus button slot: the x of the first
+ *      slot (`leading`), the width of a tab slot and the gap between slots. Without centered positioning, an item width or
+ *      an item spacing it is the previous layout: leading 0, no gap, the tabs sharing the width left by the plus button.
+ *      Centered: the slots keep `itemWidth` (the shared width when 0) and `itemSpacing`, centered as a group; when they do
+ *      not fit, the previous layout is used.
+ * [CN] `count` 个 Tab 按钮（`plusWidth` > 0 时再加一个 PlusButton 位置）的横向布局：第一个位置的 x（`leading`）、Tab 位置的宽度、
+ *      位置之间的间距。未设置居中、item 宽度或间距时与以前的布局相同：leading 为 0、无间距，各 Tab 平分 PlusButton 之外的宽度。
+ *      居中时：各位置使用 `itemWidth`（为 0 时使用平分宽度）与 `itemSpacing`，整体居中；放不下时使用以前的布局。
+ */
+- (void)cyl_getItemLayoutForTabCount:(NSUInteger)count
+                           plusWidth:(CGFloat)plusWidth
+                             leading:(CGFloat *)leading
+                           itemWidth:(CGFloat *)itemWidth
+                             spacing:(CGFloat *)spacing {
+    CGFloat availableWidth = self.cyl_boundsSize.width;
+    CGFloat fillWidth = count > 0 ? (availableWidth - plusWidth) / count : 0;
+    *leading = 0;
+    *itemWidth = fillWidth;
+    *spacing = 0;
+    UITabBarItemPositioning positioning = UITabBarItemPositioningAutomatic;
+    CGFloat customWidth = 0;
+    CGFloat customSpacing = 0;
+    [self cyl_getItemPositioning:&positioning itemWidth:&customWidth itemSpacing:&customSpacing];
+    BOOL centered = (positioning == UITabBarItemPositioningCentered) || customWidth > 0 || customSpacing > 0;
+    if (!centered || count == 0) {
+        return;
+    }
+    CGFloat width = customWidth > 0 ? customWidth : fillWidth;
+    NSUInteger slots = count + (plusWidth > 0 ? 1 : 0);
+    CGFloat totalWidth = width * count + plusWidth + customSpacing * (CGFloat)(slots - 1);
+    if (totalWidth > availableWidth + 0.5) {
+        return;
+    }
+    *leading = (availableWidth - totalWidth) * 0.5;
+    *itemWidth = width;
+    *spacing = customSpacing;
+}
+
 - (void)cyl_layoutTabBarSubviews {
     self.tabBarButtonArray = [self cyl_originalTabBarButtons];
     
@@ -341,8 +414,6 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
             }
         }
     }
-    CGFloat tabBarWidth = self.cyl_boundsSize.width;
-    
     if (!self.plusButtonActive) {
         if (self.didLayoutSubViewsBlock) {
             self.didLayoutSubViewsBlock(self);
@@ -352,11 +423,13 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
     
     BOOL addedToTabBar = [_plusButton.superview isEqual:self];
     if (!addedToTabBar && self.hasPlusButton) {
-        [self cyl_setTabBarItemWidth:(tabBarWidth) / self.cyl_tabbarItemsCount];
+        CGFloat leading = 0, itemWidth = 0, spacing = 0;
+        [self cyl_getItemLayoutForTabCount:self.cyl_tabbarItemsCount plusWidth:0 leading:&leading itemWidth:&itemWidth spacing:&spacing];
+        [self cyl_setTabBarItemWidth:itemWidth];
         [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIControl * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
             // [CN] 仅修改childView的x和宽度,yh值不变
             // [EN] Only change childView's x and width; the y and height values stay the same
-            CGFloat childViewX = buttonIndex * self.cyl_tabBarItemWidth;
+            CGFloat childViewX = leading + buttonIndex * (self.cyl_tabBarItemWidth + spacing);
             [self changeXForChildView:childView
                            childViewX:childViewX
                       tabBarItemWidth:self.cyl_tabBarItemWidth
@@ -368,7 +441,12 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
         }
         return;
     }
-    [self cyl_setTabBarItemWidth:(tabBarWidth - self.cyl_plusButtonWidth) / self.cyl_tabbarItemsCount];
+    CGFloat itemLeading = 0, layoutItemWidth = 0, itemSpacing = 0;
+    [self cyl_getItemLayoutForTabCount:self.cyl_tabbarItemsCount plusWidth:self.cyl_plusButtonWidth
+                               leading:&itemLeading itemWidth:&layoutItemWidth spacing:&itemSpacing];
+    self.cyl_itemLayoutLeading = itemLeading;
+    self.cyl_itemLayoutSpacing = itemSpacing;
+    [self cyl_setTabBarItemWidth:layoutItemWidth];
    // [CN] plusButtonIndex内部调整 PlusButton 的中心坐标，不能直接修改 center，否则会造成点击动画时的闪动bug，需要借助坐标系转换。
    // [EN] plusButtonIndex adjusts the PlusButton's center internally. Do not modify center directly, otherwise the
    //      button flickers during the tap animation; use a coordinate-space conversion instead.
@@ -398,6 +476,10 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
             }
         }
         
+        // [EN] Centered positioning, item spacing (see `-cyl_getItemLayoutForTabCount:…`): 0 by default.
+        // [CN] 居中与间距（见 `-cyl_getItemLayoutForTabCount:…`）：默认均为 0。
+        NSUInteger slotIndex = [self cyl_hasPlusChildViewController] ? buttonIndex : (NSUInteger)visiableTabIndex;
+        childViewX += self.cyl_itemLayoutLeading + slotIndex * self.cyl_itemLayoutSpacing;
         [childView cyl_setTabBarChildViewControllerIndex:buttonIndex];
         UIControl *selectedContentControl = [self cyl_selectedContentControlFromContentControl:childView];
         
@@ -683,7 +765,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         CGFloat constantOfPlusButtonCenterYOffset = [self constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
         _plusButton.center = CGPointMake(tabBarWidth * 0.5, tabBarHeight * multiplierOfTabBarHeight + constantOfPlusButtonCenterYOffset);
         
-        CGFloat childViewX = plusButtonIndex * self.cyl_tabBarItemWidth;
+        CGFloat childViewX = self.cyl_itemLayoutLeading + plusButtonIndex * (self.cyl_tabBarItemWidth + self.cyl_itemLayoutSpacing);
         CGFloat tabBarItemWidth = CGRectGetWidth(self.plusButton.frame);
         [self changeXForChildView:self.plusButton
                        childViewX:childViewX

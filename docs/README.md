@@ -32,6 +32,7 @@
 | [劫持 Tab 点击](Tab-Hijack.md) | [Hijacked Tabs](Tab-Hijack.md) |
 | [Tab 图标的内置动画](Tab-Item-Animations.md) | [Built-in Tab Icon Animations](Tab-Item-Animations.md) |
 | [单个 Tab 的颜色](Tab-Item-Colors.md) | [Per-tab Colors](Tab-Item-Colors.md) |
+| [Tab 的排列方式](Tab-Item-Positioning.md) | [Tab Item Positioning](Tab-Item-Positioning.md) |
 | [重复点击已选中的 Tab](Tab-Reselect.md) | [Tapping the Selected Tab Again](Tab-Reselect.md) |
 | [TabBar 的 hitTest 不再返回 nil，交给 super 处理](TabBar-HitTest-Super-Fallback.md) | [The tab bar's hitTest falls back to super instead of returning nil](TabBar-HitTest-Super-Fallback.md) |
 | [滚动时缩小或隐藏 TabBar](TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](TabBar-Minimize-On-Scroll.md) |
@@ -71,6 +72,7 @@ docs/
 ├── Tab-Hijack.md
 ├── Tab-Item-Animations.md
 ├── Tab-Item-Colors.md
+├── Tab-Item-Positioning.md
 ├── Tab-Reselect.md
 ├── TabBar-HitTest-Super-Fallback.md
 ├── TabBar-Minimize-On-Scroll.md
