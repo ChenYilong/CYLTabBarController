@@ -40,7 +40,10 @@ else
         exit 2
     fi
     # GCC's libobjc headers. GCC 的 libobjc 头文件。
-    OBJC_INCLUDE=$(ls -d /usr/lib/gcc/*/*/include 2> /dev/null | tail -n 1)
+    OBJC_INCLUDE=""
+    for directory in /usr/lib/gcc/*/*/include; do
+        [ -d "$directory" ] && OBJC_INCLUDE="$directory"
+    done
     python3 "$HERE/lower.py" "$SOURCES/CYLTabBarConfigurationParser.m" > "$WORK/CYLTabBarConfigurationParser_lowered.m"
     # shellcheck disable=SC2046
     clang $(gnustep-config --objc-flags) -I"$OBJC_INCLUDE" -I"$SOURCES" -I"$HERE" -DFOUNDATION_EXTERN=extern \
