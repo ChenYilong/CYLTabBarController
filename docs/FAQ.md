@@ -313,8 +313,26 @@ if (@available(iOS 13.0, *)) {
 
 | 中文 | English |
 |:---|:---|
-| 来源：[#518](https://github.com/ChenYilong/CYLTabBarController/issues/518) | Source: [#518](https://github.com/ChenYilong/CYLTabBarController/issues/518) |
+| 来源：[#518](https://github.com/ChenYilong/CYLTabBarController/issues/518)、[#258](https://github.com/ChenYilong/CYLTabBarController/issues/258) | Source: [#518](https://github.com/ChenYilong/CYLTabBarController/issues/518), [#258](https://github.com/ChenYilong/CYLTabBarController/issues/258) |
 | `self.title` 会同时修改导航栏标题和 TabBarItem 标题。请改用 `self.navigationItem.title`，见 README [ViewController 标题与 TabBar 标题不一致](../README.md#cnviewcontroller-标题与-tabbar-标题不一致)。 | `self.title` sets both the navigation bar title and the TabBarItem title. Use `self.navigationItem.title` instead; see [The ViewController title does not match the TabBar title](../README.md#enthe-viewcontroller-title-does-not-match-the-tabbar-title) in the README. |
+| 典型现象（[#258](https://github.com/ChenYilong/CYLTabBarController/issues/258)）：第一次切换到某个 Tab 时，底部文字闪一下，然后变成这个页面的导航栏标题。原因是 Tab 的页面在第一次被选中时才执行 `viewDidLoad`，其中的 `self.title = ...` 由 UIKit 同步写入 `tabBarItem.title`（页面是导航控制器的根页面时，也会写入导航控制器的 `tabBarItem`），TabBar 随之重新布局，文字就变了。这是 UIKit 的行为，CYLTabBarController 在切换 Tab 时不会修改 Tab 的文字。 | Typical symptom ([#258](https://github.com/ChenYilong/CYLTabBarController/issues/258)): the first time a tab is selected, its title flickers and then turns into that page's navigation bar title. The tab's page runs `viewDidLoad` only when it is first selected, and the `self.title = ...` in it is copied by UIKit into `tabBarItem.title` (and into the navigation controller's `tabBarItem` when the page is its root), so the TabBar lays out again with the new text. This is UIKit behavior; CYLTabBarController does not change tab titles when switching tabs. |
+| 解决：在页面中只设置 `navigationItem.title`；Tab 的文字只通过 `tabBarItemsAttributes` 的 `CYLTabBarItemTitle` 设置。如果必须使用 `self.title`，请让它和 `CYLTabBarItemTitle` 完全相同。Swift Demo（`Example-Swift-03`、`Example-Swift-Carthage`、`Example-SwiftUI`）已改为 `navigationItem.title`。 | Fix: in the page, set only `navigationItem.title`; set the tab text only through `CYLTabBarItemTitle` in `tabBarItemsAttributes`. If you must use `self.title`, make it exactly equal to `CYLTabBarItemTitle`. The Swift demos (`Example-Swift-03`, `Example-Swift-Carthage`, `Example-SwiftUI`) now use `navigationItem.title`. |
+
+```Objective-C
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.navigationItem.title = CYLLocalizedString(@"首页"); // ✅ only the navigation bar
+    // self.title = @"首页";                                 // ❌ also rewrites the tab title (#258)
+}
+```
+
+```Swift
+override func viewDidLoad() {
+    super.viewDidLoad()
+    navigationItem.title = CYLLocalizedString("首页") // ✅ only the navigation bar
+    // title = "首页"                                 // ❌ also rewrites the tab title (#258)
+}
+```
 
 ## [CN]5. 外观：背景、分割线、阴影与深色模式
 ## [EN]5. Appearance: background, separator, shadow and Dark Mode

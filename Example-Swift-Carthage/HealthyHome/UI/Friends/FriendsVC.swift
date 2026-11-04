@@ -12,7 +12,7 @@ class FriendsVC: ViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = CYLLocalizedString("通讯录")
+        self.navigationItem.title = CYLLocalizedString("通讯录")
         self.view.backgroundColor = .purple
 
     }
