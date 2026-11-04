@@ -18,6 +18,28 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
+ * [EN] What the engine and the factory need from a registry. `CYLTabBarItemAnimatorRegistry` is the default; tests and
+ *      apps can inject their own instance, so nothing depends on global state.
+ * [CN] 引擎和工厂对注册表的全部依赖。默认实现为 `CYLTabBarItemAnimatorRegistry`；测试和应用可以注入自己的实例，不依赖全局状态。
+ */
+@protocol CYLTabBarItemAnimatorRegistering <NSObject>
+- (void)registerAnimator:(id<CYLTabBarItemAnimator>)animator;
+- (void)unregisterAnimatorWithIdentifier:(NSString *)identifier;
+/// [EN] By priority, then registration order. [CN] 按优先级、再按注册顺序。
+- (NSArray<id<CYLTabBarItemAnimator>> *)animators;
+- (nullable id<CYLTabBarItemAnimator>)animatorWithIdentifier:(NSString *)identifier;
+/// [EN] The animator bound to `URL`, else the first that can play its file. [CN] 绑定到 `URL` 的 animator，否则为第一个能播放该文件的。
+- (nullable id<CYLTabBarItemAnimator>)animatorForURL:(nullable NSURL *)URL;
+/// [EN] The first animator whose own keys have a value in `attributes`. [CN] 第一个在 `attributes` 中有值的自有 key 所属的 animator。
+- (nullable id<CYLTabBarItemAnimator>)animatorForAttributes:(nullable NSDictionary *)attributes;
+- (nullable NSString *)attributeKeyForGenericKey:(NSString *)genericKey inAttributes:(nullable NSDictionary *)attributes;
+/// [EN] Binds `URL` to `animator` (nil removes the binding). [CN] 把 `URL` 绑定到 `animator`（nil 移除绑定）。
+- (void)bindURL:(NSURL *)URL toAnimator:(nullable id<CYLTabBarItemAnimator>)animator;
+- (NSArray<NSString *> *)attributeKeysForGenericKey:(NSString *)genericKey;
+- (NSArray<NSString *> *)fileExtensions;
+@end
+
+/*!
  * FIX: issue #604 — public API of the `CYLTabBarItemAnimation` subspec.
  * [EN] The animation libraries in the app. Each animator registers itself (Lottie and PAG do it in `+load`, compiled only
  *      with their library), and the engine and `CYLTabBarItemAnimationFactory` only ask the registry, never a concrete library, so a library added later
@@ -35,7 +57,11 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] App 中的动画库。每个 animator 自行注册（Lottie 与 PAG 在 `+load` 中注册，并且仅在链接了对应库时编译）；引擎与 `CYLTabBarItemAnimationFactory` 只向注册表查询，
  *      从不直接使用某个具体的动画库，因此以后新增动画库时其他代码都无需修改。线程安全。示例见上。
  */
-@interface CYLTabBarItemAnimatorRegistry : NSObject
+@interface CYLTabBarItemAnimatorRegistry : NSObject <CYLTabBarItemAnimatorRegistering>
+
+/// [EN] The instance `+load` of each animation subspec registers into; the class methods below forward to it.
+/// [CN] 各动画子库在 `+load` 中注册到的实例；下面的类方法都转发给它。
++ (instancetype)sharedRegistry;
 
 /// [EN] Adds `animator`, replacing a registered one with the same identifier. [CN] 添加 `animator`；已注册同名 animator 时替换。
 + (void)registerAnimator:(id<CYLTabBarItemAnimator>)animator;

@@ -10,6 +10,25 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
+ * FIX: issue #442
+ * [EN] Where the animation for the current style comes from: the dark version and dark colors registered for a light
+ *      animation URL. Core owns the registrations and provides the default (`CYLTabBarItemAnimationDefaultStyleSource()`);
+ *      the engine only depends on this protocol.
+ * [CN] 当前风格下的动画从哪里来：为浅色动画 URL 注册的深色版本与深色颜色。注册信息由 Core 持有并提供默认实现
+ *      （`CYLTabBarItemAnimationDefaultStyleSource()`）；引擎只依赖本协议。
+ */
+@protocol CYLTabBarItemAnimationStyleSource <NSObject>
+/// [EN] YES when any animation has a dark version or dark colors. [CN] 任意动画有深色版本或深色颜色时返回 YES。
+- (BOOL)hasStyleVariants;
+/// [EN] YES when `URL` has a dark version or dark colors. [CN] `URL` 有深色版本或深色颜色时返回 YES。
+- (BOOL)hasStyleVariantForURL:(nullable NSURL *)URL;
+/// [EN] The version of `URL` for `traitCollection`. [CN] `URL` 在 `traitCollection` 下的版本。
+- (nullable NSURL *)URL:(nullable NSURL *)URL forTraitCollection:(nullable UITraitCollection *)traitCollection;
+/// [EN] Keypath -> dark color for `URL`. [CN] `URL` 的「keypath -> 深色颜色」。
+- (nullable NSDictionary<NSString *, UIColor *> *)darkColorsForURL:(nullable NSURL *)URL;
+@end
+
+/*!
  * FIX: issue #604 — private header of Core, not part of the public API.
  * [EN] The tab icon animation Core needs, as an abstraction Core owns (dependency inversion): Core calls only this
  *      protocol and knows no animation library. The `CYLTabBarItemAnimation` subspec, which comes only with an animation
@@ -81,6 +100,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /// [EN] Called by the `CYLTabBarItemAnimation` subspec when it loads. [CN] 由 `CYLTabBarItemAnimation` 子库在加载时调用。
+/// [EN] Core's style source, over the registrations of the `…DarkURL` / `…DarkFilePath` / `…DarkColors` keys.
+/// [CN] Core 的风格来源，基于 `…DarkURL` / `…DarkFilePath` / `…DarkColors` 等 key 的注册信息。
+FOUNDATION_EXTERN id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(void);
+
 FOUNDATION_EXTERN void CYLTabBarItemAnimationSetService(id<CYLTabBarItemAnimationService> _Nullable service);
 
 /// [EN] The service, or nil without an animation library. [CN] 动画服务；没有动画库时为 nil。

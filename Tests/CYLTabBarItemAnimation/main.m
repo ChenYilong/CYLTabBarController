@@ -13,6 +13,7 @@
 
 #import <UIKit/UIKit.h>
 #import "CYLTabBarItemAnimatorRegistry.h"
+#import "CYLTabBarItemAnimationFactory.h"
 #import "CYLTabBarItemViewAnimator.h"
 
 // [EN] The keys, with their real values. [CN] 各 key，取值与真实的相同。
@@ -225,6 +226,33 @@ int main(void) {
         rive.viewProvider = nil;
         CHECK(rive.viewProvider == [CYLTestRiveView class], "nil goes back to the default provider");
         CHECK(![rive canAnimateFileAtURL:json] && [rive canAnimateFileAtURL:optionURL], "the view animator takes its own extension only");
+
+        printf("\n# Injected registries are independent (no global state)\n");
+        CYLTabBarItemAnimatorRegistry *isolated = [[CYLTabBarItemAnimatorRegistry alloc] init];
+        CHECK(isolated != [CYLTabBarItemAnimatorRegistry sharedRegistry] && [isolated animators].count == 0,
+              "a new registry starts empty, apart from the shared one");
+        [isolated registerAnimator:[[CYLTestPAGAnimator alloc] init]];
+        CHECK([CYLIdentifier([isolated animatorForAttributes:pagTab]) isEqual:@"PAG"] && [isolated animatorForAttributes:riveTab] == nil,
+              "an injected registry only knows its own animators");
+        CHECK([isolated animatorForURL:cdnFile] == nil, "bindings in the shared registry do not leak into another one");
+        CHECK([[CYLTabBarItemAnimatorRegistry animators] count] == 3, "registering into another registry leaves the shared one unchanged");
+        CHECK([CYLTabBarItemAnimatorRegistry sharedRegistry] == [CYLTabBarItemAnimatorRegistry sharedRegistry], "the class methods use one shared registry");
+
+        printf("\n# The factory works over the registry it is given\n");
+        CYLTabBarItemAnimationFactory *emptyFactory = [[CYLTabBarItemAnimationFactory alloc] initWithRegistry:[[CYLTabBarItemAnimatorRegistry alloc] init]];
+        CHECK([emptyFactory animationViewWithURL:optionURL size:CGSizeMake(24, 24) contentMode:UIViewContentModeScaleAspectFit] == nil,
+              "a factory over an empty registry makes no view, whatever is registered elsewhere");
+        CYLTabBarItemAnimatorRegistry *riveOnly = [[CYLTabBarItemAnimatorRegistry alloc] init];
+        [riveOnly registerAnimator:rive];
+        CYLTabBarItemAnimationFactory *riveFactory = [[CYLTabBarItemAnimationFactory alloc] initWithRegistry:riveOnly];
+        CHECK(riveFactory.registry == riveOnly, "the factory keeps the injected registry");
+        UIView *madeView = [riveFactory animationViewWithURL:optionURL size:CGSizeMake(24, 24) contentMode:UIViewContentModeScaleAspectFit];
+        CHECK([madeView isKindOfClass:[CYLTestRiveView class]] && madeView.frame.size.width == 24 && !madeView.userInteractionEnabled,
+              "the injected registry's animator makes the view, set up by the factory");
+        CHECK([riveFactory playerForView:madeView] != nil && [riveFactory isAnimationView:madeView], "the made view has its player");
+        CHECK(![riveFactory isAnimationView:[[UIView alloc] init]], "a plain view is no animation view");
+        CHECK([CYLTabBarItemAnimationFactory sharedFactory].registry == [CYLTabBarItemAnimatorRegistry sharedRegistry],
+              "the shared factory uses the shared registry");
     }
     printf("\n%d checks, %d failures\n", CYLChecks, CYLFailures);
     return CYLFailures == 0 ? 0 : 1;

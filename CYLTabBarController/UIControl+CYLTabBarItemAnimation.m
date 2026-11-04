@@ -13,6 +13,7 @@
 
 #import "UIControl+CYLTabBarItemAnimation.h"
 #import "CYLTabBar+CYLTabBarControllerExtention.h"
+#import "CYLConstants.h"
 
 #pragma mark - Service
 
@@ -28,6 +29,41 @@ id<CYLTabBarItemAnimationService> CYLTabBarItemAnimationGetService(void) {
     @synchronized ([UIControl class]) {
         return CYLTabBarItemAnimationCurrentService;
     }
+}
+
+#pragma mark - Style source
+
+/// [EN] The default style source: the dark registrations kept by `CYLConstants`. [CN] 默认风格来源：`CYLConstants` 保存的深色注册信息。
+@interface CYLTabBarItemAnimationConstantsStyleSource : NSObject <CYLTabBarItemAnimationStyleSource>
+@end
+
+@implementation CYLTabBarItemAnimationConstantsStyleSource
+
+- (BOOL)hasStyleVariants {
+    return [CYLConstants cyl_hasDarkLottieURLs];
+}
+
+- (BOOL)hasStyleVariantForURL:(NSURL *)URL {
+    return [CYLConstants cyl_hasDarkLottieForLottieURL:URL];
+}
+
+- (NSURL *)URL:(NSURL *)URL forTraitCollection:(UITraitCollection *)traitCollection {
+    return [CYLConstants cyl_lottieURL:URL forTraitCollection:traitCollection];
+}
+
+- (NSDictionary<NSString *, UIColor *> *)darkColorsForURL:(NSURL *)URL {
+    return [CYLConstants cyl_lottieDarkColorsForLottieURL:URL];
+}
+
+@end
+
+id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(void) {
+    static CYLTabBarItemAnimationConstantsStyleSource *styleSource;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        styleSource = [[CYLTabBarItemAnimationConstantsStyleSource alloc] init];
+    });
+    return styleSource;
 }
 
 id CYLTabBarItemAttributesAnimationValue(NSDictionary *attributes, NSString *genericKey) {

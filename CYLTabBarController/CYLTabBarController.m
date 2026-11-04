@@ -232,6 +232,25 @@ static void CYLRegisterDarkLottieURLFromAttributes(NSURL *lottieURL, NSDictionar
     [CYLConstants cyl_registerLottieDarkColors:darkColors forLottieURL:lottieURL];
 }
 
+/*!
+ * [EN] The animation file of a tab item (`…URL`, else `…FilePath`, with `filePath` set to the latter), bound to the
+ *      library its keys choose (e.g. `CYLTabBarRiveURL`) rather than to its extension, with its Dark Mode version (#442).
+ * [CN] Tab item 的动画文件（`…URL`，否则为 `…FilePath`，并把后者写入 `filePath`），绑定到其 key 选择的动画库（例如 `CYLTabBarRiveURL`），
+ *      而不是由扩展名决定，并注册其深色模式版本（#442）。
+ */
+static NSURL *CYLTabBarItemAnimationURLFromAttributes(NSDictionary *attributes, NSString * __autoreleasing *filePath) {
+    id URLValue = CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationURL);
+    id filePathValue = CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationFilePath);
+    NSString *animationFilePath = [filePathValue isKindOfClass:[NSString class]] ? filePathValue : nil;
+    if (filePath) {
+        *filePath = animationFilePath;
+    }
+    NSURL *animationURL = [URLValue isKindOfClass:[NSURL class]] ? URLValue : [CYLConstants cyl_getURLFromString:animationFilePath];
+    [CYLTabBarItemAnimationGetService() bindAnimationURL:animationURL toAttributes:attributes];
+    CYLRegisterDarkLottieURLFromAttributes(animationURL, attributes);
+    return animationURL;
+}
+
 NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;
 CGFloat CYLTabBarItemWidth = 0.0f;
@@ -1473,17 +1492,7 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
                 selectedImageInfo = [UIImage cyl_imageWithImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage]
                         
                                                        darkImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemSelectedDarkImage]];
-                lottieURL = CYLTabBarItemAttributesAnimationValue(_tabBarItemsAttributes[idx], CYLTabBarAnimationURL);
-                lottieFilePath = CYLTabBarItemAttributesAnimationValue(_tabBarItemsAttributes[idx], CYLTabBarAnimationFilePath);
-                        
-                if (!lottieURL) {
-                    lottieURL = [CYLConstants cyl_getURLFromString:lottieFilePath];
-                }
-                // [EN] The library is chosen by the tab's keys (e.g. `CYLTabBarRiveURL`), not by the file's extension.
-                // [CN] 由 Tab 的 key（例如 `CYLTabBarRiveURL`）选择动画库，而不是由文件扩展名决定。
-                [CYLTabBarItemAnimationGetService() bindAnimationURL:lottieURL toAttributes:_tabBarItemsAttributes[idx]];
-                        
-                CYLRegisterDarkLottieURLFromAttributes(lottieURL, _tabBarItemsAttributes[idx]);
+                lottieURL = CYLTabBarItemAnimationURLFromAttributes(_tabBarItemsAttributes[idx], &lottieFilePath);
                 lottieSizeValue = CYLTabBarItemAttributesAnimationValue(_tabBarItemsAttributes[idx], CYLTabBarAnimationSize);
                 // FIX: issue #408 the tab's identifier. Tab 的标识。
                 viewController.cyl_tabBarItemIdentifier = _tabBarItemsAttributes[idx][CYLTabBarItemIdentifier];
@@ -2992,17 +3001,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
                     selectedImageInfo = [UIImage cyl_imageWithImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemSelectedImage]
                 
                                                            darkImageInfo:_tabBarItemsAttributes[idx][CYLTabBarItemSelectedDarkImage]];
-                    lottieURL = CYLTabBarItemAttributesAnimationValue(_tabBarItemsAttributes[idx], CYLTabBarAnimationURL);
-                    lottieFilePath = CYLTabBarItemAttributesAnimationValue(_tabBarItemsAttributes[idx], CYLTabBarAnimationFilePath);
-                
-                    if (!lottieURL) {
-                        lottieURL = [CYLConstants cyl_getURLFromString:lottieFilePath];
-                    }
-                    // [EN] The library is chosen by the tab's keys, not by the file's extension.
-                    // [CN] 由 Tab 的 key 选择动画库，而不是由文件扩展名决定。
-                    [CYLTabBarItemAnimationGetService() bindAnimationURL:lottieURL toAttributes:_tabBarItemsAttributes[idx]];
-                
-                    CYLRegisterDarkLottieURLFromAttributes(lottieURL, _tabBarItemsAttributes[idx]);
+                    lottieURL = CYLTabBarItemAnimationURLFromAttributes(_tabBarItemsAttributes[idx], &lottieFilePath);
                     lottieSizeValue = CYLTabBarItemAttributesAnimationValue(_tabBarItemsAttributes[idx], CYLTabBarAnimationSize);
                     // FIX: issue #408 the tab's identifier. Tab 的标识。
                     viewController.cyl_tabBarItemIdentifier = _tabBarItemsAttributes[idx][CYLTabBarItemIdentifier];

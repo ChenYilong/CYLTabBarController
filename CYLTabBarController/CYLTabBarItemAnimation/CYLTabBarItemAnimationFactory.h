@@ -14,8 +14,21 @@
 
 #import <UIKit/UIKit.h>
 #import "CYLTabBarItemAnimator.h"
+#import "CYLTabBarItemAnimatorRegistry.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+/*!
+ * [EN] What the engine needs to make animation views and find their players. `CYLTabBarItemAnimationFactory` is the
+ *      default; it can be replaced (e.g. in tests).
+ * [CN] 引擎创建动画视图、查找其播放器所需的全部能力。默认实现为 `CYLTabBarItemAnimationFactory`，可替换（例如在测试中）。
+ */
+@protocol CYLTabBarItemAnimationViewMaking <NSObject>
+- (nullable UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode
+    NS_SWIFT_NAME(animationView(url:size:contentMode:));
+- (nullable id<CYLTabBarItemAnimationPlayer>)playerForView:(nullable UIView *)view NS_SWIFT_NAME(player(for:));
+- (BOOL)isAnimationView:(nullable UIView *)view NS_SWIFT_NAME(isAnimationView(_:));
+@end
 
 /*!
  * FIX: issue #604 — public API of the `CYLTabBarItemAnimation` subspec.
@@ -31,7 +44,18 @@ NS_ASSUME_NONNULL_BEGIN
  *      不响应触摸、内容模式、基于 frame 的布局，#653），并绑定该视图的 `CYLTabBarItemAnimationPlayer`。也可以找到任意视图的播放器。引擎只在这里创建视图；
  *      App 也可以使用，例如制作带动画的 PlusButton。示例见上。
  */
-@interface CYLTabBarItemAnimationFactory : NSObject
+@interface CYLTabBarItemAnimationFactory : NSObject <CYLTabBarItemAnimationViewMaking>
+
+/// [EN] The animators this factory chooses from. [CN] 本工厂从中选择 animator 的注册表。
+@property (nonatomic, strong, readonly) id<CYLTabBarItemAnimatorRegistering> registry;
+
+/// [EN] A factory over `registry`. [CN] 基于 `registry` 的工厂。
+- (instancetype)initWithRegistry:(id<CYLTabBarItemAnimatorRegistering>)registry NS_DESIGNATED_INITIALIZER;
+/// [EN] A factory over the shared registry. [CN] 基于共享注册表的工厂。
+- (instancetype)init;
+
+/// [EN] The factory over the shared registry; the class methods below forward to it. [CN] 基于共享注册表的工厂；下面的类方法都转发给它。
++ (instancetype)sharedFactory;
 
 /// [EN] A ready view for the animation at `URL`, with its player attached; nil when no library plays it. [CN] `URL` 动画的视图（已绑定播放器）；没有动画库能播放时返回 nil。
 + (nullable UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode

@@ -31,4 +31,8 @@ typedef NS_ENUM(NSInteger, UIUserInterfaceStyle) {
 
 @interface UIView : NSObject
 @property (nonatomic) CGRect frame;
+@property (nonatomic) UIViewContentMode contentMode;
+@property (nonatomic, getter=isUserInteractionEnabled) BOOL userInteractionEnabled;
+@property (nonatomic) BOOL translatesAutoresizingMaskIntoConstraints;
+@property (nonatomic) BOOL clipsToBounds;
 @end

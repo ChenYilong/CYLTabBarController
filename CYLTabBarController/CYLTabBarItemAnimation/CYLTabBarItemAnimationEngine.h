@@ -33,7 +33,25 @@ NS_ASSUME_NONNULL_BEGIN
  *      协议，而不是本类）。它用同一套代码为所有动画库添加、播放、停止 Tab 动画并在深色模式下替换，只通过 `CYLTabBarItemAnimatorRegistry` 找到文件或
  *      视图对应的动画库，因此从不指定具体的动画库。
  */
+@protocol CYLTabBarItemAnimatorRegistering;
+@protocol CYLTabBarItemAnimationViewMaking;
+
 @interface CYLTabBarItemAnimationEngine : NSObject <CYLTabBarItemAnimationService>
+
+/// [EN] Chooses the library of a tab. [CN] 选择 Tab 使用的动画库。
+@property (nonatomic, strong, readonly) id<CYLTabBarItemAnimatorRegistering> registry;
+/// [EN] Makes the animation views and finds their players. [CN] 创建动画视图并查找其播放器。
+@property (nonatomic, strong, readonly) id<CYLTabBarItemAnimationViewMaking> factory;
+/// [EN] The animation for the current style (#442). [CN] 当前风格下的动画（#442）。
+@property (nonatomic, strong, readonly) id<CYLTabBarItemAnimationStyleSource> styleSource;
+
+/// [EN] An engine over the given dependencies (dependency injection). [CN] 基于给定依赖的引擎（依赖注入）。
+- (instancetype)initWithRegistry:(id<CYLTabBarItemAnimatorRegistering>)registry
+                         factory:(id<CYLTabBarItemAnimationViewMaking>)factory
+                     styleSource:(id<CYLTabBarItemAnimationStyleSource>)styleSource NS_DESIGNATED_INITIALIZER;
+/// [EN] The shared registry and factory, and Core's style source. [CN] 共享注册表与工厂，以及 Core 的风格来源。
+- (instancetype)init;
+
 @end
 
 NS_ASSUME_NONNULL_END
