@@ -100,6 +100,7 @@ docs/
     ├── readme-english-bilingual-contents.png
     ├── readme-english-header-badges.png
     ├── rive-animation-onboarding-button.png
+    ├── rive-animation-plus-button.png
     ├── rive-animation-search-tab-frames.png
     ├── rive-animation-swiftui-test-list.png
     ├── rive-animation-tab-icons.png

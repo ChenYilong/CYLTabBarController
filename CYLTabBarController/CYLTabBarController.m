@@ -2861,13 +2861,20 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         return;
     }
     NSUInteger tabCount = 0;
+    NSUInteger plusSlotCount = 0;
     for (UIViewController *viewController in _viewControllers) {
         if (viewController == [self cyl_contextPlusChildViewController] || viewController.cyl_isPlaceholder) {
+            plusSlotCount++;
             continue;
         }
         tabCount++;
     }
-    if (attributesCount == tabCount) {
+    // [EN] The attributes as given (no entry for the plus button), or as aligned by this controller on Liquid Glass and
+    //      FlatDesign, with one placeholder entry per plus slot (`-alignViewControllers:withPlusButtonViewControllerPlaceholder:`):
+    //      counting that entry as a tab logged a false mismatch whenever there was a plus button.
+    // [CN] 属性数组可能是传入的原样（不含 PlusButton 的项），也可能是本控制器在液态玻璃与扁平样式下对齐后的数组，每个 PlusButton 位置多一个占位项
+    //      （`-alignViewControllers:withPlusButtonViewControllerPlaceholder:`）：把该项算作 Tab，会在有 PlusButton 时误报数量不一致。
+    if (attributesCount == tabCount || attributesCount == tabCount + plusSlotCount) {
         return;
     }
     NSLog(@"🔴[CYL #618] tabBarItemsAttributes has %lu entries for %lu tab view controllers (the plus button's view controller not counted). Each tab needs exactly one entry; a mismatch shows tabs without a view controller, and tapping one can crash. See https://github.com/ChenYilong/CYLTabBarController/issues/618",

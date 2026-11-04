@@ -210,8 +210,75 @@
     return actualBadgeSuperView;
 }
 
-/// The transparent view that holds the badge of a control that is not a tab button, aligned to `referenceView` (the
-/// icon) or to the whole control. 承载非 Tab 按钮控件角标的透明视图，与 `referenceView`（图标）或整个控件对齐。
+/*!
+ * [EN] The part of `image` that is not transparent, as fractions of its size (the whole image without alpha, or when it
+ *      cannot be read). Measured once per image, on a copy of at most 64×64 pixels.
+ * [CN] `image` 中不透明的部分，以占其尺寸的比例表示（没有 alpha 或无法读取时为整张图片）。每张图片只测量一次，使用最大 64×64 像素的副本。
+ */
+static CGRect CYLBadgeOpaqueUnitRectOfImage(UIImage *image) {
+    static const char CYLBadgeOpaqueUnitRectKey = 0;
+    CGRect unitRect = CGRectMake(0, 0, 1, 1);
+    CGImageRef cgImage = image.CGImage;
+    if (!cgImage) {
+        return unitRect;
+    }
+    NSValue *cached = objc_getAssociatedObject(image, &CYLBadgeOpaqueUnitRectKey);
+    if (cached) {
+        return cached.CGRectValue;
+    }
+    CGImageAlphaInfo alphaInfo = CGImageGetAlphaInfo(cgImage);
+    BOOL hasAlpha = alphaInfo != kCGImageAlphaNone && alphaInfo != kCGImageAlphaNoneSkipFirst && alphaInfo != kCGImageAlphaNoneSkipLast;
+    size_t width = MIN(CGImageGetWidth(cgImage), (size_t)64);
+    size_t height = MIN(CGImageGetHeight(cgImage), (size_t)64);
+    if (hasAlpha && width > 0 && height > 0) {
+        NSMutableData *alphaData = [NSMutableData dataWithLength:width * height];
+        CGContextRef context = CGBitmapContextCreate(alphaData.mutableBytes, width, height, 8, width, NULL, (CGBitmapInfo)kCGImageAlphaOnly);
+        if (context) {
+            CGContextDrawImage(context, CGRectMake(0, 0, width, height), cgImage);
+            CGContextRelease(context);
+            // [EN] Row 0 of the buffer is the top of the image. [CN] 缓冲区第 0 行是图片顶部。
+            const uint8_t *alpha = alphaData.bytes;
+            size_t minX = width, minY = height, maxX = 0, maxY = 0;
+            for (size_t y = 0; y < height; y++) {
+                for (size_t x = 0; x < width; x++) {
+                    if (alpha[y * width + x] > 25) {
+                        minX = MIN(minX, x);
+                        maxX = MAX(maxX, x);
+                        minY = MIN(minY, y);
+                        maxY = MAX(maxY, y);
+                    }
+                }
+            }
+            if (minX <= maxX && minY <= maxY) {
+                unitRect = CGRectMake((CGFloat)minX / width, (CGFloat)minY / height,
+                                      (CGFloat)(maxX - minX + 1) / width, (CGFloat)(maxY - minY + 1) / height);
+            }
+        }
+    }
+    objc_setAssociatedObject(image, &CYLBadgeOpaqueUnitRectKey, [NSValue valueWithCGRect:unitRect], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    return unitRect;
+}
+
+/// [EN] The picture that fills `view`: an image view's image, or the background image of a button without an image.
+/// [CN] 填满 `view` 的图片：图片视图的图片，或没有图片的按钮的背景图片。
+static UIImage *CYLBadgeImageFillingView(UIView *view) {
+    if ([view isKindOfClass:[UIImageView class]]) {
+        return ((UIImageView *)view).image;
+    }
+    if ([view isKindOfClass:[UIButton class]] && !((UIButton *)view).currentImage) {
+        return ((UIButton *)view).currentBackgroundImage;
+    }
+    return nil;
+}
+
+/*!
+ * [EN] The transparent view that holds the badge of a control that is not a tab button, aligned to `referenceView` (the
+ *      icon) or to the whole control, and within it to the visible part of its picture: a picture with transparent
+ *      padding (e.g. Example-PAG's plus button, a 66 pt circle in a 90 pt image) put the badge at the padding's corner,
+ *      away from what is seen.
+ * [CN] 承载非 Tab 按钮控件角标的透明视图，与 `referenceView`（图标）或整个控件对齐，并进一步对齐到其图片的可见部分：图片带透明边距时
+ *      （例如 Example-PAG 的 PlusButton，90 pt 图片中是 66 pt 的圆形），角标原先位于边距的角上，离可见内容较远。
+ */
 - (UIView *)cyl_badgeAnchorViewAlignedToView:(UIView *)referenceView {
     UIView *anchorView = objc_getAssociatedObject(self, @selector(cyl_badgeAnchorViewAlignedToView:));
     if (!anchorView) {
@@ -242,22 +309,43 @@
         anchorView.alpha = self.alpha;
     }
     UIView *target = (referenceView && referenceView != anchorView) ? referenceView : self;
+    CGRect unitRect = CYLBadgeOpaqueUnitRectOfImage(CYLBadgeImageFillingView(target));
+    CGSize targetSize = target.bounds.size;
     NSArray<NSLayoutConstraint *> *constraints = objc_getAssociatedObject(anchorView, @selector(cyl_badgeAnchorViewAlignedToView:));
-    BOOL isPinnedToTarget = constraints.count > 0 && constraints.firstObject.active && constraints.firstObject.secondItem == target;
+    BOOL isPinnedToTarget = constraints.count == 4 && constraints.firstObject.active && constraints.firstObject.secondItem == target &&
+                            constraints[2].multiplier == CGRectGetWidth(unitRect) && constraints[3].multiplier == CGRectGetHeight(unitRect);
     if (!isPinnedToTarget) {
         [NSLayoutConstraint deactivateConstraints:constraints ?: @[]];
         // Constraints keep the anchor on the icon as the control lays out again. 约束让锚点在控件重新布局后仍与图标对齐。
         constraints = @[
             [anchorView.leadingAnchor constraintEqualToAnchor:target.leadingAnchor],
             [anchorView.topAnchor constraintEqualToAnchor:target.topAnchor],
-            [anchorView.widthAnchor constraintEqualToAnchor:target.widthAnchor],
-            [anchorView.heightAnchor constraintEqualToAnchor:target.heightAnchor],
+            [anchorView.widthAnchor constraintEqualToAnchor:target.widthAnchor multiplier:CGRectGetWidth(unitRect)],
+            [anchorView.heightAnchor constraintEqualToAnchor:target.heightAnchor multiplier:CGRectGetHeight(unitRect)],
         ];
         [NSLayoutConstraint activateConstraints:constraints];
         objc_setAssociatedObject(anchorView, @selector(cyl_badgeAnchorViewAlignedToView:), constraints, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        isPinnedToTarget = NO;
     }
-    // Right away too, so the badge can be laid out before the next layout pass. 同时立即设置 frame，角标无需等到下一次布局。
-    anchorView.frame = [target convertRect:target.bounds toView:container];
+    // [EN] The padding before the visible part, for the target's current size. Only real changes: this runs during the
+    //      plus button's layout, and any change lays it out again.
+    // [CN] 可见部分之前的边距，按目标当前尺寸计算。只在确有变化时修改：本方法在 PlusButton 布局期间执行，任何修改都会让它再次布局。
+    CGFloat leading = CGRectGetMinX(unitRect) * targetSize.width;
+    CGFloat top = CGRectGetMinY(unitRect) * targetSize.height;
+    if (fabs(constraints[0].constant - leading) >= 0.5) {
+        constraints[0].constant = leading;
+    }
+    if (fabs(constraints[1].constant - top) >= 0.5) {
+        constraints[1].constant = top;
+    }
+    if (!isPinnedToTarget) {
+        // [EN] Once, right after pinning, so the badge can be laid out before the next layout pass; setting it on every
+        //      call fought Auto Layout's pixel rounding and laid the plus button out forever.
+        // [CN] 只在刚建立约束时设置一次 frame，角标无需等到下一次布局；每次调用都设置会与 Auto Layout 的像素取整冲突，导致 PlusButton 无限布局。
+        CGRect visibleRect = CGRectMake(leading, top, CGRectGetWidth(unitRect) * targetSize.width,
+                                        CGRectGetHeight(unitRect) * targetSize.height);
+        anchorView.frame = [target convertRect:visibleRect toView:container];
+    }
     return anchorView;
 }
 

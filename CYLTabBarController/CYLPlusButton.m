@@ -117,6 +117,9 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 /// [CN] Issue #152：上次手指按下时选中的控制器，以及是否有按下。
 @property (nonatomic, weak, nullable) UIViewController *cyl_selectedViewControllerAtTouchDown;
 @property (nonatomic, assign) BOOL cyl_hasTouchDownForTabBarItemGesture;
+/// [EN] Set while this class lays out its image and title (see `-cyl_layOutContentOnce:`).
+/// [CN] 本类布置图片与标题期间为 YES（见 `-cyl_layOutContentOnce:`）。
+@property (nonatomic, assign) BOOL cyl_isLayingOutContent;
 - (void)cyl_tabBarItemGestureTouchDown;
 - (void)cyl_tabBarItemGestureTouchUpInside;
 
@@ -194,20 +197,114 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
 #pragma mark - Image rendering
 
 /*!
- * Issue #636
- * [EN] With the title in the tab item (`-cyl_showsTitleInTabBarItem`), the plus button's icon is drawn as is
- *      (`UIImageRenderingModeAlwaysOriginal`): an image with the default rendering mode can be tinted, e.g. by the tab
- *      bar's tint or by Liquid Glass in the selected layer, so the stand-in seen through the lens and the plus button
- *      showed the same icon in different colors. Other plus buttons keep their images as set.
- * [CN] 标题由 TabBarItem 显示时（`-cyl_showsTitleInTabBarItem`），PlusButton 的图标按原图绘制（`UIImageRenderingModeAlwaysOriginal`）：
- *      默认渲染模式的图片可能被染色（如 TabBar 的 tint，或液态玻璃选中图层），导致放大镜中的替身与 PlusButton 的同一图标颜色不一致。
- *      其他 PlusButton 保持原样。
+ * [EN] Every image given to a plus button is drawn as is (`UIImageRenderingModeAlwaysOriginal`), in every style: never
+ *      tinted by the tab bar's tint, by Liquid Glass's selected layer or by a button configuration, and not darkened while
+ *      touched. This covers `-setImage:forState:`, `-setBackgroundImage:forState:`, `UIButtonConfiguration`
+ *      (`image`, `background.image`), the stand-in in the lens (`-selectedContentView`, also when it is a plain `UIButton`)
+ *      and `-cyl_updateTitle:image:selectedImage:`. Before, only the Liquid Glass layout with the title in the tab item
+ *      (#636) did this, so the same icon could show in two colors.
+ * [CN] 加载给 PlusButton 的所有图片在所有样式下都按原图绘制（`UIImageRenderingModeAlwaysOriginal`）：不会被 TabBar 的 tint、液态玻璃的选中图层或
+ *      按钮 configuration 染色，按下时也不会变暗。适用于 `-setImage:forState:`、`-setBackgroundImage:forState:`、`UIButtonConfiguration`
+ *      （`image`、`background.image`）、放大镜中的替身（`-selectedContentView`，包括普通 `UIButton`）以及 `-cyl_updateTitle:image:selectedImage:`。
+ *      以前只有液态玻璃下标题由 TabBarItem 显示的布局（#636）这样处理，同一图标可能显示为两种颜色。
  */
-- (void)setImage:(UIImage *)image forState:(UIControlState)state {
-    if ([self cyl_showsTitleInTabBarItem]) {
-        image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+static UIImage *CYLPlusButtonOriginalImage(UIImage *image) {
+    if (!image || image.renderingMode == UIImageRenderingModeAlwaysOriginal) {
+        return image;
     }
-    [super setImage:image forState:state];
+    return [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+}
+
+/// [EN] The control states whose images a plus button (or its stand-in) can set. [CN] PlusButton（或其替身）可设置图片的状态。
+static NSArray<NSNumber *> *CYLPlusButtonImageStates(void) {
+    return @[ @(UIControlStateNormal), @(UIControlStateHighlighted), @(UIControlStateSelected),
+              @(UIControlStateSelected | UIControlStateHighlighted), @(UIControlStateDisabled) ];
+}
+
+/// [EN] Draws the images a button already has as is: a stand-in returned by `+selectedContentView` may be any UIButton.
+/// [CN] 让按钮已有的图片按原图绘制：`+selectedContentView` 返回的替身可能是任意 UIButton。
+static void CYLPlusButtonDrawImagesAsIs(UIButton *button) {
+    for (NSNumber *state in CYLPlusButtonImageStates()) {
+        UIControlState controlState = state.unsignedIntegerValue;
+        UIImage *image = [button imageForState:controlState];
+        if (image && image.renderingMode != UIImageRenderingModeAlwaysOriginal) {
+            [button setImage:CYLPlusButtonOriginalImage(image) forState:controlState];
+        }
+        UIImage *backgroundImage = [button backgroundImageForState:controlState];
+        if (backgroundImage && backgroundImage.renderingMode != UIImageRenderingModeAlwaysOriginal) {
+            [button setBackgroundImage:CYLPlusButtonOriginalImage(backgroundImage) forState:controlState];
+        }
+    }
+}
+
+/*!
+ * [EN] The states UIKit draws from another state's image when they have none, darkened (highlighted) or faded
+ *      (disabled), mapped to the state whose image they show instead: highlighted and disabled show the normal image,
+ *      selected and highlighted shows the selected one.
+ * [CN] 没有图片时，系统会用其他状态的图片并加暗（高亮）或变淡（禁用）绘制的状态，以及改为显示其图片的状态：高亮与禁用显示普通图片，
+ *      选中且高亮显示选中图片。
+ */
+static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(void) {
+    return @{
+        @(UIControlStateHighlighted): @(UIControlStateNormal),
+        @(UIControlStateDisabled): @(UIControlStateNormal),
+        @(UIControlStateSelected | UIControlStateHighlighted): @(UIControlStateSelected),
+    };
+}
+
+/*!
+ * [EN] Sets `image` for `state` (through `setter`, the superclass's), then gives every derived state that was never set
+ *      on purpose the plain image of its source state, so UIKit never darkens or fades a plus button's image.
+ *      `explicitStates` remembers the states set on purpose, one set for images and one for background images.
+ * [CN] 为 `state` 设置 `image`（通过 `setter`，即父类方法），然后为每个未被主动设置过的派生状态设置其来源状态的原图，系统因此不会把 PlusButton
+ *      的图片画暗或变淡。`explicitStates` 记录主动设置过的状态，图片与背景图片各一份。
+ */
+- (void)cyl_setImage:(UIImage *)image
+            forState:(UIControlState)state
+      explicitStates:(const void *)explicitStatesKey
+              getter:(UIImage * (NS_NOESCAPE ^)(UIControlState state))getter
+              setter:(void (NS_NOESCAPE ^)(UIImage *image, UIControlState state))setter {
+    NSMutableSet<NSNumber *> *explicitStates = objc_getAssociatedObject(self, explicitStatesKey);
+    if (!explicitStates) {
+        explicitStates = [NSMutableSet set];
+        objc_setAssociatedObject(self, explicitStatesKey, explicitStates, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    [explicitStates addObject:@(state)];
+    setter(CYLPlusButtonOriginalImage(image), state);
+    [CYLPlusButtonDerivedImageStates() enumerateKeysAndObjectsUsingBlock:^(NSNumber *derived, NSNumber *source, BOOL *stop) {
+        if ([explicitStates containsObject:derived]) {
+            return;
+        }
+        // [EN] `getter` falls back like UIKit (e.g. no selected image: the normal one). [CN] `getter` 与系统一样回退（如没有选中图片时取普通图片）。
+        setter(getter(source.unsignedIntegerValue), derived.unsignedIntegerValue);
+    }];
+}
+
+- (void)setImage:(UIImage *)image forState:(UIControlState)state {
+    static const void *CYLPlusButtonExplicitImageStatesKey = &CYLPlusButtonExplicitImageStatesKey;
+    [self cyl_setImage:image forState:state explicitStates:CYLPlusButtonExplicitImageStatesKey
+                getter:^UIImage *(UIControlState aState) { return [super imageForState:aState]; }
+                setter:^(UIImage *anImage, UIControlState aState) { [super setImage:anImage forState:aState]; }];
+}
+
+- (void)setBackgroundImage:(UIImage *)image forState:(UIControlState)state {
+    static const void *CYLPlusButtonExplicitBackgroundImageStatesKey = &CYLPlusButtonExplicitBackgroundImageStatesKey;
+    [self cyl_setImage:image forState:state explicitStates:CYLPlusButtonExplicitBackgroundImageStatesKey
+                getter:^UIImage *(UIControlState aState) { return [super backgroundImageForState:aState]; }
+                setter:^(UIImage *anImage, UIControlState aState) { [super setBackgroundImage:anImage forState:aState]; }];
+}
+
+- (void)setConfiguration:(UIButtonConfiguration *)configuration API_AVAILABLE(ios(15.0)) {
+    if (configuration && ((configuration.image && configuration.image.renderingMode != UIImageRenderingModeAlwaysOriginal) ||
+                          (configuration.background.image &&
+                           configuration.background.image.renderingMode != UIImageRenderingModeAlwaysOriginal))) {
+        configuration = [configuration copy];
+        configuration.image = CYLPlusButtonOriginalImage(configuration.image);
+        UIBackgroundConfiguration *background = [configuration.background copy];
+        background.image = CYLPlusButtonOriginalImage(background.image);
+        configuration.background = background;
+    }
+    [super setConfiguration:configuration];
 }
 
 #pragma mark - Title alignment
@@ -217,8 +314,26 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
 - (void)layoutSublayersOfLayer:(CALayer *)layer {
     [super layoutSublayersOfLayer:layer];
     if (layer == self.layer) {
-        [self cyl_alignTitleWithTabBarItemTitlesIfNeeded];
+        [self cyl_layOutContentOnce:^{
+            [self cyl_alignTitleWithTabBarItemTitlesIfNeeded];
+        }];
     }
+}
+
+/*!
+ * [EN] Runs `layout` unless this class is already laying out the image and title. The first read of `imageView` (or
+ *      `titleLabel`) creates it and lays the button out again, which ran this class's layout again, endlessly: a stack
+ *      overflow at launch (Example-Rive, a plus button made with `+cyl_plusButtonWithImage:…` and aligned titles).
+ * [CN] 本类正在布置图片与标题时不再执行 `layout`。第一次读取 `imageView`（或 `titleLabel`）时系统会创建它并再次布局按钮，从而再次执行本类的布局，
+ *      无限递归：启动时栈溢出（Example-Rive，使用 `+cyl_plusButtonWithImage:…` 并对齐标题的 PlusButton）。
+ */
+- (void)cyl_layOutContentOnce:(void (NS_NOESCAPE ^)(void))layout {
+    if (self.cyl_isLayingOutContent) {
+        return;
+    }
+    self.cyl_isLayingOutContent = YES;
+    layout();
+    self.cyl_isLayingOutContent = NO;
 }
 
 - (BOOL)cyl_alignsTitleWithTabBarItemTitles {
@@ -397,11 +512,6 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
                                   @(UIControlStateSelected | UIControlStateHighlighted)]) {
             UIControlState controlState = state.unsignedIntegerValue;
             [self setTitle:nil forState:controlState];
-            // The images set before this mode applied are drawn as is too (see `-setImage:forState:`).
-            UIImage *image = [self imageForState:controlState];
-            if (image && image.renderingMode != UIImageRenderingModeAlwaysOriginal) {
-                [self setImage:image forState:controlState];
-            }
         }
         if (@available(iOS 15.0, *)) {
             UIButtonConfiguration *configuration = self.configuration;
@@ -817,6 +927,12 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     if (![objc_getAssociatedObject(self, @selector(cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:)) boolValue]) {
         return;
     }
+    [self cyl_layOutContentOnce:^{
+        [self cyl_layOutImageAndTitle];
+    }];
+}
+
+- (void)cyl_layOutImageAndTitle {
     CGFloat imageWidth = CGRectGetWidth(self.bounds) * 0.7;
     CGFloat imageHeight = imageWidth * 0.9;
     CGFloat centerX = CGRectGetWidth(self.bounds) * 0.5;
@@ -1278,12 +1394,10 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
 
 + (UIButton *)selectedContentView {
     Class<CYLPlusButtonSubclassing> class = self;
-    CYLPlusButton *registeredPlusButton = [CYLPlusButton plusButtonForTabBarContext:[self matchedTabBarContext]];
-    if (registeredPlusButton) {
-        // [CN] 不使用selected 以避免选中背景
-        // [EN] Do not use selected, to avoid the selected background
-        registeredPlusButton.highlighted = YES;
-    }
+    // [EN] Only the stand-in is shown highlighted. The registered plus button was highlighted here too and stayed so: UIKit
+    //      then drew its image darkened (e.g. Example-PAG's circle above the glass while its page was selected).
+    // [CN] 只有替身以高亮状态显示。原先这里也把已注册的 PlusButton 设为高亮且一直保持，系统因此把它的图片画暗（如 Example-PAG 选中
+    //      其页面时，玻璃上方的圆形变暗）。
     UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
     if (NO == plusButton.cyl_userInteractionDisabled) {
         // [CN] 不使用selected 以避免选中背景
@@ -1302,14 +1416,16 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     if ([[self class] respondsToSelector:@selector(selectedContentView)]) {
         UIButton *button = [[self class] performSelector:@selector(selectedContentView)];
         if (button) {
+            CYLPlusButtonDrawImagesAsIs(button);
             _selectedContentView = button;
             return _selectedContentView;
         }
     }
     UIButton *selectedContentView = [UIButton buttonWithType:UIButtonTypeCustom];
-    
-    [selectedContentView setImage:([[self class] contentImage] ?: self.contentImage ?: UIImage.new) forState:UIControlStateNormal];
-    [selectedContentView setImage:([[self class] selectedContentImage] ?: self.selectedContentImage ?: UIImage.new)
+
+    [selectedContentView setImage:CYLPlusButtonOriginalImage([[self class] contentImage] ?: self.contentImage ?: UIImage.new)
+                         forState:UIControlStateNormal];
+    [selectedContentView setImage:CYLPlusButtonOriginalImage([[self class] selectedContentImage] ?: self.selectedContentImage ?: UIImage.new)
                          forState:UIControlStateHighlighted];
     CGRect bounds = self.bounds;
     selectedContentView.frame = ({
@@ -1339,6 +1455,9 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
 }
 
 - (void)cyl_updateTitle:(NSString *)title image:(UIImage *)image selectedImage:(UIImage *)selectedImage {
+    // [EN] Also for the stand-in, which may be a plain UIButton. [CN] 替身可能是普通 UIButton，同样按原图绘制。
+    image = CYLPlusButtonOriginalImage(image);
+    selectedImage = CYLPlusButtonOriginalImage(selectedImage);
     if (title) {
         if (objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey)) {
             // [EN] Shown by the tab item under the plus button (#636): its title changes, the layout follows (#729).

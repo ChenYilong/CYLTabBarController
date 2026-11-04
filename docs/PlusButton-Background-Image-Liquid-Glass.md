@@ -27,6 +27,8 @@
 | [修复](#cn修复) | [Fix](#enfix) |
 | [用法](#cn用法) | [Usage](#enusage) |
 | [Swift 中获取 PlusButton](#cnswift-中获取-plusbutton) | [Getting the PlusButton in Swift](#engetting-the-plusbutton-in-swift) |
+| [PlusButton 的图片一律按原图绘制](#cnplusbutton-的图片一律按原图绘制) | [Every PlusButton image is drawn as is](#enevery-plusbutton-image-is-drawn-as-is) |
+| [同时修复](#cn同时修复) | [Also fixed](#enalso-fixed) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
 <!-- navigation:end -->
@@ -85,6 +87,25 @@ if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton(forOwner: ta
 }
 ```
 
+## [CN]PlusButton 的图片一律按原图绘制
+## [EN]Every PlusButton image is drawn as is
+
+| 中文 | English |
+|:---|:---|
+| 加载给 PlusButton 的所有图片，在所有样式下都由 `CYLPlusButton` 自动按原图绘制（`UIImageRenderingModeAlwaysOriginal`），无需任何代码：不会被 TabBar 的 tint、液态玻璃的选中图层或按钮 configuration 染色，也不会被系统画暗或变淡：未主动设置的高亮、禁用状态使用普通图片的原图，选中且高亮状态使用选中图片的原图。 | Every image given to a plus button is drawn as is (`UIImageRenderingModeAlwaysOriginal`) by `CYLPlusButton` itself, in every style, with no code needed: never tinted by the tab bar's tint, Liquid Glass's selected layer or a button configuration, and never darkened or faded by UIKit: the highlighted and disabled states not set on purpose show the plain normal image, and selected and highlighted shows the plain selected one. |
+| 适用于：`setImage(_:for:)`、`setBackgroundImage(_:for:)`、`UIButtonConfiguration` 的 `image` 与 `background.image`、放大镜中的替身（`selectedContentView`，包括 `+selectedContentView` 返回的普通 `UIButton`）以及 `cyl_updateTitle(_:image:selectedImage:)`。以前只有液态玻璃下标题由 TabBarItem 显示的布局（#636）这样处理。 | It covers `setImage(_:for:)`, `setBackgroundImage(_:for:)`, a `UIButtonConfiguration`'s `image` and `background.image`, the stand-in in the lens (`selectedContentView`, including a plain `UIButton` returned by `+selectedContentView`) and `cyl_updateTitle(_:image:selectedImage:)`. Before, only the Liquid Glass layout with the title in the tab item (#636) did this. |
+| 想要单色图标随 TabBar 变色时，请自己绘制对应颜色的图片。 | For a one-color icon that follows the tab bar's color, draw the image in that color yourself. |
+
+## [CN]同时修复
+## [EN]Also fixed
+
+| 中文 | English |
+|:---|:---|
+| **启动时栈溢出**：PlusButton 在布局中第一次读取 `imageView` 时，系统创建它并再次布局按钮，又进入本类的布局（`+cyl_plusButtonWithImage:…` 的图片与标题布局、标题对齐），无限递归。见于 Example-Rive 新增的 PlusButton（使用 `+cyl_plusButtonWithImage:…` 并对齐标题）。现在本类的布局不会重入（`-cyl_layOutContentOnce:`）。 | **A stack overflow at launch**: the plus button's first read of `imageView` during layout made UIKit create it and lay the button out again, which ran this class's layout again (the image and title layout of `+cyl_plusButtonWithImage:…`, the title alignment), endlessly. Seen with Example-Rive's new plus button (made with `+cyl_plusButtonWithImage:…`, with aligned titles). This class's layout no longer re-enters (`-cyl_layOutContentOnce:`). |
+| **选中后 PlusButton 变暗**：`+selectedContentView` 创建放大镜中的替身时，也把已注册的 PlusButton 设为高亮，并一直保持；没有「选中且高亮」图片时，系统把它的图片画暗（Example-PAG 选中「菜单」后，玻璃上方的半个圆形变成深蓝色）。现在只有替身是高亮的。 | **The plus button turned dark once selected**: `+selectedContentView`, which makes the stand-in in the lens, also set the registered plus button highlighted, for good; without a selected-and-highlighted image UIKit drew its image darkened (Example-PAG: after "Menu" was selected, the half of the circle above the glass turned navy). Only the stand-in is highlighted now. |
+| **角标离开可见内容**：非 Tab 按钮控件的角标位于图标（或整个控件）的右上角。图片带透明边距时（Example-PAG 的 PlusButton：90 pt 图片中是 66 pt 的圆形），角标落在边距的角上，离圆形较远。现在角标对齐到图片中不透明的部分（每张图片只测量一次，结果缓存在图片上）。 | **A badge away from what is seen**: the badge of a control that is not a tab button sits at the top-right of its icon (or of the whole control). With transparent padding in the picture (Example-PAG's plus button: a 66 pt circle in a 90 pt image) it landed at the padding's corner, away from the circle. It is now aligned to the part of the picture that is not transparent (measured once per image and cached on it). |
+| **#618 误报**：液态玻璃与扁平样式下有 PlusButton 时，本库会在 `tabBarItemsAttributes` 中为 PlusButton 位置插入一个占位项，DEBUG 检查把它算作 Tab，打印「6 entries for 5 tab view controllers」。现在两种数量都视为正确。 | **A false #618 warning**: with a plus button on Liquid Glass and FlatDesign, the library inserts a placeholder entry for the plus slot into `tabBarItemsAttributes`, and the DEBUG check counted it as a tab, logging "6 entries for 5 tab view controllers". Both counts are now accepted. |
+
 ## [CN]测试与截图
 ## [EN]Testing and screenshots
 
@@ -96,7 +117,7 @@ if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton(forOwner: ta
 
 | 中文 | English |
 |:---|:---|
-| 选中「菜单」：放大镜中的副本与按钮对齐。圆形超出玻璃的上半部分由系统绘制得较暗，与修改前相同。 | "Menu" selected: the copy in the lens lines up with the button. The part of the circle above the glass is drawn darker by the system, as before this change. |
+| 选中「菜单」：放大镜中的副本与按钮对齐，圆形保持原色（以前玻璃上方的部分会变暗，见「同时修复」）；角标位于圆形右上方，而不是 90 pt 图片的透明边角上。 | "Menu" selected: the copy in the lens lines up with the button and the circle keeps its colors (the part above the glass used to turn dark, see "Also fixed"); the badge sits at the circle's top-right, not at the corner of the 90 pt image's transparent padding. |
 
 ![Plus button selected, the lens copy lines up](assets/plusbutton-background-image-liquid-glass-selected.png)
 
