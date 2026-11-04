@@ -62,8 +62,20 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         self.delegate = self;
         self.navigationController.navigationBar.hidden = YES;
         [self setUpLoginRequiredTabs];
+        [self setUpTabReselectAndAnimations];
     }
     return self;
+}
+
+/*!
+ * [EN] Tapping the selected tab again pops to the root page, then scrolls to the top (docs/Tab-Reselect.md), and flips its
+ *      icon (docs/Tab-Item-Animations.md). `-tabBarController:didReselectViewController:` below logs each reselect.
+ * [CN] 再次点击已选中的 Tab：先返回根页面，再滚动到顶部（docs/Tab-Reselect.md），并翻转图标（docs/Tab-Item-Animations.md）。
+ *      下方的 `-tabBarController:didReselectViewController:` 会输出每次重复点击。
+ */
+- (void)setUpTabReselectAndAnimations {
+    self.cyl_reselectBehavior = CYLTabBarReselectBehaviorPopToRootThenScrollToTop;
+    self.cyl_tabBarItemReselectAnimationType = CYLTabBarItemAnimationTypeRotate;
 }
 
 /*!
@@ -725,6 +737,12 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                                 );
     }
     return should && shouldSelectViewControllerFromSuper;
+}
+
+- (void)tabBarController:(CYLTabBarController *)tabBarController didReselectViewController:(UIViewController *)viewController {
+#if defined(DEBUG) || defined(BETA)
+    NSLog(@"[Demo] reselected tab: %@", viewController.cyl_tabBarItemIdentifier);
+#endif
 }
 
 - (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
