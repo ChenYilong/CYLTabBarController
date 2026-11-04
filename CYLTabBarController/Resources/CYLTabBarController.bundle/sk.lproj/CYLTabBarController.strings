@@ -289,3 +289,18 @@
 "轻触感反馈" = "Ľahká haptická odozva";
 "重触感反馈" = "Silná haptická odozva";
 "长按（#152）" = "Dlhé stlačenie (#152)";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Vianoce";
+"万圣节" = "Halloween";
+"情人节" = "Valentín";
+"中秋节" = "Sviatok stredu jesene";
+"复活节" = "Veľká noc";
+"新年" = "Nový rok";
+"夏日" = "Leto";
+"生日" = "Narodeniny";
+"太空" = "Vesmír";
+"海洋" = "Oceán";
+"换肤：节日与配色主题（%@ 种）" = "Vzhľady: sviatky a farby (%@)";
+"节日图标与配色" = "Sviatočné ikony a farby";
+"仅配色" = "Iba farby";

@@ -289,3 +289,18 @@
 "轻触感反馈" = "Lagana haptika";
 "重触感反馈" = "Jaka haptika";
 "长按（#152）" = "Dugi pritisak (#152)";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Božić";
+"万圣节" = "Noć vještica";
+"情人节" = "Valentinovo";
+"中秋节" = "Festival sredine jeseni";
+"复活节" = "Uskrs";
+"新年" = "Nova godina";
+"夏日" = "Ljeto";
+"生日" = "Rođendan";
+"太空" = "Svemir";
+"海洋" = "Ocean";
+"换肤：节日与配色主题（%@ 种）" = "Izgledi: blagdani i boje (%@)";
+"节日图标与配色" = "Blagdanske ikone i boje";
+"仅配色" = "Samo boje";

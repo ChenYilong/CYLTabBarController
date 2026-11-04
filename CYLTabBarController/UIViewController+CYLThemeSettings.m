@@ -22,22 +22,35 @@ static NSString *const CYLDemoThemeIdentifierGrass = @"Grass";
 static NSString *const CYLDemoThemeIdentifierPinkRose = @"Pink Rose";
 static NSString *const CYLDemoThemeIdentifierDark = @"Dark";
 static NSString *const CYLDemoThemeIdentifierSpringFestival = @"Spring Festival";
+static NSString *const CYLDemoThemeIdentifierChristmas = @"Christmas";
+static NSString *const CYLDemoThemeIdentifierHalloween = @"Halloween";
+static NSString *const CYLDemoThemeIdentifierValentine = @"Valentine's Day";
+static NSString *const CYLDemoThemeIdentifierMidAutumn = @"Mid-Autumn";
+static NSString *const CYLDemoThemeIdentifierEaster = @"Easter";
+static NSString *const CYLDemoThemeIdentifierNewYear = @"New Year";
+static NSString *const CYLDemoThemeIdentifierSummer = @"Summer";
+static NSString *const CYLDemoThemeIdentifierBirthday = @"Birthday";
+static NSString *const CYLDemoThemeIdentifierSpace = @"Space";
+static NSString *const CYLDemoThemeIdentifierOcean = @"Ocean";
 
 static UIColor *CYLDemoRGB(CGFloat red, CGFloat green, CGFloat blue) {
     return [UIColor colorWithRed:red / 255.0 green:green / 255.0 blue:blue / 255.0 alpha:1];
 }
 
 /*!
- * [EN] A demo theme: its colors and, for the Spring Festival skin, holiday icons. "Default" changes nothing, so the tab
- *      bar shows the app's own look again.
- * [CN] 演示主题：主题颜色；春节皮肤还带有节日图标。“默认”不做任何修改，TabBar 恢复 App 自己的外观。
+ * [EN] A demo theme: its colors and, for a holiday skin, its icons. The icons are Fluent Emoji (MIT License, Microsoft;
+ *      see `cyl_theme_icons_LICENSE.txt` in the resource bundle), named `cyl_theme_<name>` in the library's resource
+ *      bundle. "Default" changes nothing, so the tab bar shows the app's own look again.
+ * [CN] 演示主题：主题颜色；节日皮肤还带有自己的图标。图标为 Fluent Emoji（MIT 许可证，Microsoft；见资源包中的
+ *      `cyl_theme_icons_LICENSE.txt`），在本库资源包中命名为 `cyl_theme_<名字>`。“默认”不做任何修改，TabBar 恢复 App 自己的外观。
  */
 @interface CYLDemoTheme : NSObject <CYLTabBarTheme>
 @property (nonatomic, copy) NSString *identifier;
 @property (nonatomic, strong, nullable) UIColor *tintColor;
 @property (nonatomic, strong, nullable) UIColor *barColor;
 @property (nonatomic, strong, nullable) UIColor *normalColor;
-@property (nonatomic, assign) BOOL usesHolidayIcons;
+/// [EN] The icon names of a holiday skin, used in turn for the tabs; nil for a color theme. [CN] 节日皮肤的图标名，依次用于各 Tab；配色主题为 nil。
+@property (nonatomic, copy, nullable) NSArray<NSString *> *iconNames;
 @end
 
 @implementation CYLDemoTheme
@@ -68,43 +81,87 @@ static UIColor *CYLDemoRGB(CGFloat red, CGFloat green, CGFloat blue) {
     if ([self.identifier isEqualToString:CYLDemoThemeIdentifierSpringFestival]) {
         return CYLLocalizedString(@"春节");
     }
+    if ([self.identifier isEqualToString:CYLDemoThemeIdentifierChristmas]) {
+        return CYLLocalizedString(@"圣诞节");
+    }
+    if ([self.identifier isEqualToString:CYLDemoThemeIdentifierHalloween]) {
+        return CYLLocalizedString(@"万圣节");
+    }
+    if ([self.identifier isEqualToString:CYLDemoThemeIdentifierValentine]) {
+        return CYLLocalizedString(@"情人节");
+    }
+    if ([self.identifier isEqualToString:CYLDemoThemeIdentifierMidAutumn]) {
+        return CYLLocalizedString(@"中秋节");
+    }
+    if ([self.identifier isEqualToString:CYLDemoThemeIdentifierEaster]) {
+        return CYLLocalizedString(@"复活节");
+    }
+    if ([self.identifier isEqualToString:CYLDemoThemeIdentifierNewYear]) {
+        return CYLLocalizedString(@"新年");
+    }
+    if ([self.identifier isEqualToString:CYLDemoThemeIdentifierSummer]) {
+        return CYLLocalizedString(@"夏日");
+    }
+    if ([self.identifier isEqualToString:CYLDemoThemeIdentifierBirthday]) {
+        return CYLLocalizedString(@"生日");
+    }
+    if ([self.identifier isEqualToString:CYLDemoThemeIdentifierSpace]) {
+        return CYLLocalizedString(@"太空");
+    }
+    if ([self.identifier isEqualToString:CYLDemoThemeIdentifierOcean]) {
+        return CYLLocalizedString(@"海洋");
+    }
     return CYLLocalizedString(@"默认");
 }
 
 #pragma mark - CYLTabBarTheme
 
+/// [EN] A theme icon from the library's resource bundle, in its own colors. [CN] 本库资源包中的主题图标，保持原色。
+- (nullable UIImage *)iconNamed:(NSString *)iconName {
+    UIImage *image = [UIImage imageNamed:[@"cyl_theme_" stringByAppendingString:iconName] inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil];
+    return [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+}
+
+/// [EN] The first icon, for the theme list. [CN] 第一个图标，用于主题列表。
+- (nullable UIImage *)previewIcon {
+    return self.iconNames.count > 0 ? [self iconNamed:self.iconNames[0]] : nil;
+}
+
 /*!
- * [EN] The Spring Festival skin: one holiday symbol per tab (SF Symbols, iOS 13+), as `UIImage`s, so no image file is
- *      needed. Other themes return nil: the app's own icons.
- * [CN] 春节皮肤：每个 Tab 一个节日符号（SF Symbols，iOS 13+），以 `UIImage` 传入，无需图片文件。其他主题返回 nil：使用 App 自己的图标。
+ * [EN] `image` drawn at 45% opacity: the unselected look of a full color icon, which the item colors cannot tint.
+ * [CN] 以 45% 不透明度绘制的 `image`：全彩图标的未选中样式（item 颜色无法为其着色）。
+ */
+static UIImage *CYLDemoFadedImage(UIImage *image) {
+    UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat defaultFormat];
+    format.scale = image.scale;
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:image.size format:format];
+    UIImage *faded = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [image drawAtPoint:CGPointZero blendMode:kCGBlendModeNormal alpha:0.45];
+    }];
+    return [faded imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+}
+
+#pragma mark - CYLTabBarTheme
+
+/*!
+ * [EN] A holiday skin: its icons, in turn, on every tab (selected: full color; unselected: faded). A color theme, or
+ *      icons that cannot be loaded, return nil: the app's own icons.
+ * [CN] 节日皮肤：依次为每个 Tab 设置其图标（选中：全彩；未选中：半透明）。配色主题或图标无法加载时返回 nil：使用 App 自己的图标。
  */
 - (nullable NSArray<NSDictionary<NSString *, id> *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController {
-    if (!self.usesHolidayIcons) {
+    if (self.iconNames.count == 0) {
         return nil;
     }
-    if (@available(iOS 13.0, *)) {
-        NSArray<NSArray<NSString *> *> *symbols = @[
-            @[ @"gift", @"gift.fill" ],
-            @[ @"star", @"star.fill" ],
-            @[ @"moon.stars", @"moon.stars.fill" ],
-            @[ @"heart", @"heart.fill" ],
-            @[ @"bell", @"bell.fill" ],
-            @[ @"flame", @"flame.fill" ],
-        ];
-        NSMutableArray<NSDictionary<NSString *, id> *> *itemsAttributes = [NSMutableArray array];
-        NSUInteger count = tabBarController.tabBarItemsAttributes.count;
-        for (NSUInteger index = 0; index < count; index++) {
-            NSArray<NSString *> *pair = symbols[index % symbols.count];
-            UIImage *image = [UIImage systemImageNamed:pair[0]];
-            UIImage *selectedImage = [UIImage systemImageNamed:pair[1]];
-            if (!image || !selectedImage) {
-                return nil;
-            }
-            [itemsAttributes addObject:@{ CYLTabBarItemImage : image, CYLTabBarItemSelectedImage : selectedImage }];
+    NSMutableArray<NSDictionary<NSString *, id> *> *itemsAttributes = [NSMutableArray array];
+    NSUInteger count = tabBarController.tabBarItemsAttributes.count;
+    for (NSUInteger index = 0; index < count; index++) {
+        UIImage *selectedImage = [self iconNamed:self.iconNames[index % self.iconNames.count]];
+        if (!selectedImage) {
+            return nil;
         }
-        return itemsAttributes;
+        [itemsAttributes addObject:@{ CYLTabBarItemImage : CYLDemoFadedImage(selectedImage), CYLTabBarItemSelectedImage : selectedImage }];
     }
-    return nil;
+    return itemsAttributes;
 }
 
 - (nullable UITabBarAppearance *)cyl_tabBarAppearanceForTabBarController:(CYLTabBarController *)tabBarController API_AVAILABLE(ios(13.0)) {
@@ -153,23 +210,46 @@ static UIColor *CYLDemoRGB(CGFloat red, CGFloat green, CGFloat blue) {
 
 #pragma mark - Settings
 
-/// [EN] The demo themes, in the picker's order. [CN] 演示主题，按选择器中的顺序。
+/// [EN] A holiday skin. [CN] 节日皮肤。
+static CYLDemoTheme *CYLDemoHolidayTheme(NSString *identifier, UIColor *tintColor, UIColor *barColor, UIColor *normalColor, NSArray<NSString *> *iconNames) {
+    CYLDemoTheme *theme = [CYLDemoTheme themeWithIdentifier:identifier tintColor:tintColor barColor:barColor normalColor:normalColor];
+    theme.iconNames = iconNames;
+    return theme;
+}
+
+/// [EN] The demo themes, in the picker's order: five color themes, then eleven holiday skins. [CN] 演示主题，按选择器中的顺序：五个配色主题，然后是十一个节日皮肤。
 static NSArray<CYLDemoTheme *> *CYLDemoThemes(void) {
     static NSArray<CYLDemoTheme *> *themes;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        CYLDemoTheme *springFestival = [CYLDemoTheme themeWithIdentifier:CYLDemoThemeIdentifierSpringFestival
-                                                               tintColor:CYLDemoRGB(255, 213, 79)
-                                                                barColor:CYLDemoRGB(196, 30, 58)
-                                                             normalColor:CYLDemoRGB(255, 205, 210)];
-        springFestival.usesHolidayIcons = YES;
         themes = @[
             [CYLDemoTheme themeWithIdentifier:CYLDemoThemeIdentifierDefault tintColor:nil barColor:nil normalColor:nil],
             [CYLDemoTheme themeWithIdentifier:CYLDemoThemeIdentifierGrapefruit tintColor:CYLDemoRGB(239, 83, 98) barColor:nil normalColor:nil],
             [CYLDemoTheme themeWithIdentifier:CYLDemoThemeIdentifierGrass tintColor:CYLDemoRGB(110, 180, 60) barColor:nil normalColor:nil],
             [CYLDemoTheme themeWithIdentifier:CYLDemoThemeIdentifierPinkRose tintColor:CYLDemoRGB(238, 133, 193) barColor:nil normalColor:nil],
             [CYLDemoTheme themeWithIdentifier:CYLDemoThemeIdentifierDark tintColor:CYLDemoRGB(39, 192, 243) barColor:CYLDemoRGB(18, 18, 20) normalColor:CYLDemoRGB(142, 142, 147)],
-            springFestival,
+            CYLDemoHolidayTheme(CYLDemoThemeIdentifierSpringFestival, CYLDemoRGB(255, 213, 79), CYLDemoRGB(196, 30, 58), CYLDemoRGB(255, 205, 210),
+                                @[ @"red_envelope", @"firecracker", @"red_paper_lantern", @"dragon", @"fireworks" ]),
+            CYLDemoHolidayTheme(CYLDemoThemeIdentifierChristmas, CYLDemoRGB(255, 214, 102), CYLDemoRGB(22, 101, 52), CYLDemoRGB(200, 230, 201),
+                                @[ @"christmas_tree", @"wrapped_gift", @"snowman", @"bell", @"star" ]),
+            CYLDemoHolidayTheme(CYLDemoThemeIdentifierHalloween, CYLDemoRGB(255, 145, 0), CYLDemoRGB(38, 20, 58), CYLDemoRGB(179, 157, 219),
+                                @[ @"jack_o_lantern", @"ghost", @"bat", @"spider", @"candy" ]),
+            CYLDemoHolidayTheme(CYLDemoThemeIdentifierValentine, CYLDemoRGB(233, 30, 99), CYLDemoRGB(255, 235, 240), CYLDemoRGB(173, 120, 140),
+                                @[ @"heart_with_ribbon", @"rose", @"love_letter", @"chocolate_bar", @"ring" ]),
+            CYLDemoHolidayTheme(CYLDemoThemeIdentifierMidAutumn, CYLDemoRGB(255, 193, 7), CYLDemoRGB(26, 35, 76), CYLDemoRGB(159, 168, 218),
+                                @[ @"moon_cake", @"full_moon", @"rabbit", @"teacup_without_handle", @"crescent_moon" ]),
+            CYLDemoHolidayTheme(CYLDemoThemeIdentifierEaster, CYLDemoRGB(124, 179, 66), CYLDemoRGB(255, 250, 225), CYLDemoRGB(161, 136, 127),
+                                @[ @"hatching_chick", @"egg", @"rabbit_face", @"tulip", @"basket" ]),
+            CYLDemoHolidayTheme(CYLDemoThemeIdentifierNewYear, CYLDemoRGB(255, 215, 64), CYLDemoRGB(20, 20, 40), CYLDemoRGB(144, 164, 174),
+                                @[ @"party_popper", @"confetti_ball", @"clinking_glasses", @"sparkler", @"alarm_clock" ]),
+            CYLDemoHolidayTheme(CYLDemoThemeIdentifierSummer, CYLDemoRGB(0, 151, 167), CYLDemoRGB(255, 248, 225), CYLDemoRGB(141, 110, 99),
+                                @[ @"beach_with_umbrella", @"watermelon", @"palm_tree", @"tropical_drink", @"sun" ]),
+            CYLDemoHolidayTheme(CYLDemoThemeIdentifierBirthday, CYLDemoRGB(236, 64, 122), CYLDemoRGB(255, 243, 224), CYLDemoRGB(149, 117, 205),
+                                @[ @"birthday_cake", @"balloon", @"candle", @"teddy_bear", @"wrapped_gift" ]),
+            CYLDemoHolidayTheme(CYLDemoThemeIdentifierSpace, CYLDemoRGB(128, 222, 234), CYLDemoRGB(13, 17, 38), CYLDemoRGB(121, 134, 203),
+                                @[ @"rocket", @"ringed_planet", @"flying_saucer", @"glowing_star", @"comet" ]),
+            CYLDemoHolidayTheme(CYLDemoThemeIdentifierOcean, CYLDemoRGB(255, 255, 255), CYLDemoRGB(1, 87, 155), CYLDemoRGB(129, 212, 250),
+                                @[ @"spouting_whale", @"tropical_fish", @"spiral_shell", @"crab", @"water_wave" ]),
         ];
     });
     return themes;
@@ -223,7 +303,67 @@ static CYLDemoTheme *CYLDemoCurrentTheme(void) {
     return [theme isKindOfClass:[CYLDemoTheme class]] ? theme : CYLDemoThemes().firstObject;
 }
 
+static NSString *const CYLThemeListCellIdentifier = @"CYLThemeListCell";
+
+/// [EN] A round swatch of a color theme's tint, for the theme list. [CN] 配色主题 tint 的圆形色块，用于主题列表。
+static UIImage *CYLDemoColorSwatch(UIColor *color) {
+    CGSize size = CGSizeMake(25, 25);
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:size];
+    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [color setFill];
+        [[UIBezierPath bezierPathWithOvalInRect:CGRectInset(CGRectMake(0, 0, size.width, size.height), 2, 2)] fill];
+    }];
+    return [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+}
+
+/// [EN] Applies `theme`; a theme picked by hand stops following the system. [CN] 应用 `theme`；手动选择主题后不再跟随系统。
+static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
+    if (CYLDemoFollowsSystem()) {
+        CYLDemoSetFollowsSystem(NO);
+    }
+    CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = theme.identifier;
+}
+
 @implementation UIViewController (CYLThemeSettings)
+
+#pragma mark - Theme list section
+
+- (NSString *)cyl_themeListSectionTitle {
+    return [NSString stringWithFormat:CYLLocalizedString(@"换肤：节日与配色主题（%@ 种）"), @(CYLDemoThemes().count)];
+}
+
+- (NSInteger)cyl_themeListRowCount {
+    return (NSInteger)CYLDemoThemes().count;
+}
+
+- (UITableViewCell *)cyl_themeListCellForTableView:(UITableView *)tableView row:(NSInteger)row {
+    [UIViewController cyl_setUpThemeSettings];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLThemeListCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLThemeListCellIdentifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+    }
+    NSArray<CYLDemoTheme *> *themes = CYLDemoThemes();
+    if (row < 0 || row >= (NSInteger)themes.count) {
+        return cell;
+    }
+    CYLDemoTheme *theme = themes[(NSUInteger)row];
+    cell.textLabel.text = [theme localizedName];
+    cell.detailTextLabel.text = theme.iconNames.count > 0 ? CYLLocalizedString(@"节日图标与配色") : CYLLocalizedString(@"仅配色");
+    cell.imageView.image = [theme previewIcon] ?: CYLDemoColorSwatch(theme.tintColor ?: [UIColor lightGrayColor]);
+    cell.accessoryType = [theme.identifier isEqualToString:CYLDemoCurrentTheme().identifier] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    return cell;
+}
+
+- (void)cyl_didSelectThemeListRow:(NSInteger)row {
+    [UIViewController cyl_setUpThemeSettings];
+    NSArray<CYLDemoTheme *> *themes = CYLDemoThemes();
+    if (row < 0 || row >= (NSInteger)themes.count) {
+        return;
+    }
+    CYLDemoApplyTheme(themes[(NSUInteger)row]);
+}
 
 + (void)cyl_setUpThemeSettings {
     static CYLDemoThemeObserver *observer;
@@ -280,11 +420,7 @@ static CYLDemoTheme *CYLDemoCurrentTheme(void) {
         BOOL isCurrent = [theme.identifier isEqualToString:currentIdentifier];
         NSString *title = isCurrent ? [NSString stringWithFormat:@"✓ %@", [theme localizedName]] : [theme localizedName];
         [picker addAction:[UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-            // [EN] A theme picked by hand stops following the system. [CN] 手动选择主题后不再跟随系统。
-            if (CYLDemoFollowsSystem()) {
-                CYLDemoSetFollowsSystem(NO);
-            }
-            CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = theme.identifier;
+            CYLDemoApplyTheme(theme);
             if (completion) {
                 completion();
             }

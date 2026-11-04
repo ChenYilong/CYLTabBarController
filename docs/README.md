@@ -85,6 +85,7 @@ docs/
     ├── readme-english-before-reading.png
     ├── readme-english-bilingual-contents.png
     ├── readme-english-header-badges.png
+    ├── theme-switching-holiday-icons.png
     ├── update-tab-bar-items-all-local-icons.png
     ├── update-tab-bar-items-all-network-icons-badges.png
     ├── update-tab-bar-items-all-network-icons-restored.png

@@ -32,6 +32,7 @@
 | [视图与颜色](#cn视图与颜色) | [Views and colors](#enviews-and-colors) |
 | [代码组织](#cn代码组织) | [Code layout](#encode-layout) |
 | [演示](#cn演示) | [Demo](#endemo) |
+| [图标来源与许可](#cn图标来源与许可) | [Icon source and license](#enicon-source-and-license) |
 | [限制](#cn限制) | [Limits](#enlimits) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
@@ -256,8 +257,36 @@ CYLTabBarController/CYLUtils/
 
 | 中文 | English |
 |:---|:---|
-| 所有示例的设置分组新增“换肤（主题，issue #216）”一行（`UIViewController+CYLThemeSettings`）：点击打开主题选择器，包括默认、西柚、青草、玫瑰粉、深色，以及换成节日图标（SF Symbols）的春节皮肤；iOS 13+ 还可以选择“跟随系统深色模式”。所选主题保存在本地，下次启动时恢复。ObjC 示例首页导航栏还有一个“换肤”按钮。 | The settings section of every example gets a "Skin (theme, issue #216)" row (`UIViewController+CYLThemeSettings`): a tap opens the theme picker with Default, Grapefruit, Grass, Pink Rose, Dark and a Spring Festival skin with holiday icons (SF Symbols); on iOS 13+ also "Follow the system Dark Mode". The choice is saved and restored at the next launch. The ObjC example's home page also has a "Skin" button in its navigation bar. |
+| 演示共十六套主题，全部遵守 `CYLTabBarTheme`：五个配色主题（默认、西柚、青草、玫瑰粉、深色），以及十一个带自己图标与配色的节日皮肤：春节、圣诞节、万圣节、情人节、中秋节、复活节、新年、夏日、生日、太空、海洋。节日皮肤为每个 Tab 依次设置一个节日图标（选中时全彩，未选中时半透明），并设置 TabBar 背景与文字颜色。 | The demo has sixteen themes, all adopting `CYLTabBarTheme`: five color themes (Default, Grapefruit, Grass, Pink Rose, Dark) and eleven holiday skins with their own icons and colors: Spring Festival, Christmas, Halloween, Valentine's Day, Mid-Autumn, Easter, New Year, Summer, Birthday, Space, Ocean. A holiday skin gives each tab one of its icons in turn (full color when selected, faded when not) and sets the tab bar's background and title colors. |
+| ObjC 示例的列表单独有一个“换肤：节日与配色主题”section，每行一个主题，显示其第一个图标（配色主题显示色块），当前主题带勾号，点击即切换（`-cyl_themeListCellForTableView:row:` 等四个方法，见 `UIViewController+CYLThemeSettings.h`）。所有示例的设置分组还有“换肤（主题，issue #216）”一行，点击打开主题选择器（iOS 13+ 还可以选择“跟随系统深色模式”）；ObjC 示例首页导航栏有“换肤”按钮。所选主题保存在本地，下次启动时恢复。 | The ObjC example's lists have a "Skins: holidays and colors" section of their own, one row per theme, showing its first icon (a color swatch for a color theme), a checkmark on the current one; a tap switches to it (`-cyl_themeListCellForTableView:row:` and three more methods, see `UIViewController+CYLThemeSettings.h`). The settings section of every example also has a "Skin (theme, issue #216)" row that opens the theme picker (on iOS 13+ also "Follow the system Dark Mode"), and the ObjC example's home page has a "Skin" button. The choice is saved and restored at the next launch. |
 | ObjC 示例在 `SceneDelegate` 中调用 `+[UIViewController cyl_setUpThemeSettings]`，在 TabBar 显示之前注册主题并恢复上次的选择。 | The ObjC example calls `+[UIViewController cyl_setUpThemeSettings]` in its `SceneDelegate`, which registers the themes and restores the last choice before the tab bar shows. |
+
+| 中文 | English |
+|:---|:---|
+| 下图是节日皮肤使用的图标（每行一个皮肤，顺序与下表相同），不是 App 截图。 | The icons of the holiday skins (one skin per row, in the order of the table below), not a screenshot of the app. |
+
+![Holiday skin icons](assets/theme-switching-holiday-icons.png)
+
+| 皮肤 / Skin | 图标 / Icons |
+|:---|:---|
+| 圣诞节 / Christmas | 🎄 🎁 ⛄ 🔔 ⭐ |
+| 万圣节 / Halloween | 🎃 👻 🦇 🕷️ 🍬 |
+| 春节 / Spring Festival | 🧧 🧨 🏮 🐉 🎆 |
+| 情人节 / Valentine's Day | 💝 🌹 💌 🍫 💍 |
+| 中秋节 / Mid-Autumn | 🥮 🌕 🐇 🍵 🌙 |
+| 复活节 / Easter | 🐣 🥚 🐰 🌷 🧺 |
+| 新年 / New Year | 🎉 🎊 🥂 🎇 ⏰ |
+| 夏日 / Summer | 🏖️ 🍉 🌴 🍹 ☀️ |
+| 生日 / Birthday | 🎂 🎈 🕯️ 🧸 🎁 |
+| 太空 / Space | 🚀 🪐 🛸 🌟 ☄️ |
+| 海洋 / Ocean | 🐳 🐠 🐚 🦀 🌊 |
+
+## [CN]图标来源与许可
+## [EN]Icon source and license
+
+| 中文 | English |
+|:---|:---|
+| 节日图标来自 Microsoft 的 [Fluent Emoji](https://github.com/microsoft/fluentui-emoji)（3D 风格），采用 MIT 许可证，缩放为 75 × 75 像素（25 pt @3x）并压缩，共 54 个、约 134 KB，以 `cyl_theme_<名字>@3x.png` 存放在本库资源包 `CYLTabBarController.bundle` 中；许可证全文见同一目录下的 `cyl_theme_icons_LICENSE.txt`。在自己的 App 中使用这些图标时请保留该许可声明，或替换为自己的图标。 | The holiday icons are Microsoft's [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (3D style) under the MIT License, resized to 75 × 75 px (25 pt @3x) and compressed: 54 files, about 134 KB, stored as `cyl_theme_<name>@3x.png` in the library's resource bundle `CYLTabBarController.bundle`; the full license is `cyl_theme_icons_LICENSE.txt` in the same folder. Keep that notice when you use these icons in your own app, or replace them with your own. |
 
 ## [CN]限制
 ## [EN]Limits
