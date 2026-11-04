@@ -59,7 +59,8 @@ flowchart LR
 
 | 中文 | English |
 |:---|:---|
-| 背景色（`CYLTabBarItemBackgroundColor` / `SelectedBackgroundColor`）只用于经典 TabBar 与扁平样式；液态玻璃自带选中效果，这些场景在 iOS 26+ 上显示玻璃 TabBar。 | Backgrounds (`CYLTabBarItemBackgroundColor` / `SelectedBackgroundColor`) apply to the classic tab bar and FlatDesign; Liquid Glass draws its own selection, so on iOS 26+ these scenes show the glass tab bar. |
+| 背景色（`CYLTabBarItemBackgroundColor` / `SelectedBackgroundColor`）只用于经典 TabBar 与扁平样式，因此背景色相关场景在 iOS 26+ 上使用扁平样式（全宽 TabBar）；液态玻璃自带选中效果。「Edge insets and gaps」场景使用经典 TabBar，需要 iOS 25 及以前或 iOS 26 的 UI 兼容模式。 | Backgrounds (`CYLTabBarItemBackgroundColor` / `SelectedBackgroundColor`) apply to the classic tab bar and FlatDesign, so the background scenes use FlatDesign (the full-width tab bar) on iOS 26+; Liquid Glass draws its own selection. The "Edge insets and gaps" scene uses the classic tab bar, which needs iOS 25 or earlier, or iOS 26 in UI compatibility mode. |
+| 图库中的 CYLTabBarController 都把自己设为代理（`delegate = self`），使劫持检查在 UIKit 选中 Tab 之前执行；代理是其他对象时，请在其 `-tabBarController:shouldSelectViewController:` 中调用 `-cyl_interceptHijackIfNeededForViewController:`（见 [Tab-Hijack.md](Tab-Hijack.md)）。 | Every CYLTabBarController in the gallery is its own delegate (`delegate = self`), so the hijack check runs before UIKit selects a tab; with a delegate that is another object, call `-cyl_interceptHijackIfNeededForViewController:` from its `-tabBarController:shouldSelectViewController:` (see [Tab-Hijack.md](Tab-Hijack.md)). |
 | "Photo" 被拦截时弹出对话框，被点击的 Tab 不会被临时显示为选中。 | When "Photo" is intercepted, a dialog appears; the tapped tab is not shown as selected in the meantime. |
 | Lottie 场景中的动画在选中时播放（本库的 Lottie 行为），未选中时不循环播放。 | In the Lottie scene the animation plays on selection (the library's Lottie behavior); it does not loop while unselected. |
 

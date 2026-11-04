@@ -489,10 +489,17 @@ static NSArray<NSDictionary *> *CYLGalleryAttributes(NSUInteger count, BOOL show
 
 static CYLTabBarController *CYLGalleryTabBarController(NSArray<UIViewController *> *pages, NSArray<NSDictionary *> *attributes,
                                                        CYLTabBarStyleType styleType, NSString *context) {
-    return [[CYLTabBarController alloc] initWithViewControllers:pages
-                                          tabBarItemsAttributes:attributes
-                                                      styleType:styleType
-                                                        context:context];
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:pages
+                                                                           tabBarItemsAttributes:attributes
+                                                                                       styleType:styleType
+                                                                                         context:context];
+    // [EN] The controller is its own delegate, so its `-tabBarController:shouldSelectViewController:` runs the hijack
+    //      (and login) checks before UIKit selects a tab, in every style. Cast to `id`: the delegate property also names
+    //      the FlatDesign delegate protocol, whose methods are all optional.
+    // [CN] 控制器作为自己的代理，其 `-tabBarController:shouldSelectViewController:` 会在 UIKit 选中 Tab 之前执行劫持（及登录）检查，
+    //      适用于所有样式。转为 `id`：代理属性还要求扁平样式的代理协议，其方法都是可选的。
+    tabBarController.delegate = (id)tabBarController;
+    return tabBarController;
 }
 
 /// [EN] The system UITabBarController, for comparison. [CN] 系统 UITabBarController，用于对照。
@@ -649,7 +656,9 @@ static CYLTabBarController *CYLGalleryBackgroundTabBarController(void) {
         }
         return item;
     });
-    CYLTabBarController *tabBarController = CYLGalleryTabBarController(CYLGalleryPages(5, NO), attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext);
+    // [EN] Full width (FlatDesign on iOS 26+): Liquid Glass draws its own selection and ignores tab backgrounds.
+    // [CN] 全宽样式（iOS 26+ 为扁平样式）：液态玻璃自带选中效果，会忽略 Tab 的背景色。
+    CYLTabBarController *tabBarController = CYLGalleryTabBarController(CYLGalleryPages(5, NO), attributes, CYLGalleryFullWidthStyle(), CYLGalleryContext);
     CYLGallerySetTabBarBackgroundColor(tabBarController, CYLGalleryRGB(37, 39, 42));
     return tabBarController;
 }
@@ -750,7 +759,7 @@ static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
             UITabBarController *tabBarController = CYLGallerySystemTabBarController(8);
             tabBarController.delegate = [CYLGallerySystemPhotoInterceptor sharedInterceptor];
             return tabBarController;
-        } didPresent:selectThirdTab],
+        }],
         [CYLGalleryScene sceneWithTitle:@"CYLTabBarController with 'More'" subtitle:@"Eight tabs, full width" builder:^UIViewController *{
             return [self fullWidthTabBarControllerWithCount:8];
         }],
@@ -1072,8 +1081,11 @@ static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
             tabBarController.tabBar.itemSpacing = 12;
             return navigationController;
         }],
-        [CYLGalleryScene sceneWithTitle:@"Edge insets and gaps between tabs" subtitle:@"cyl_itemEdgeInsets 16 pt + itemSpacing 2 pt, dark backgrounds" builder:^UIViewController *{
-            CYLTabBarController *tabBarController = CYLGalleryBackgroundTabBarController();
+        [CYLGalleryScene sceneWithTitle:@"Edge insets and gaps between tabs" subtitle:@"cyl_itemEdgeInsets 16 pt + itemSpacing 2 pt; classic tab bar (iOS 25 and earlier, or iOS 26 compatibility mode)" builder:^UIViewController *{
+            NSArray<NSDictionary *> *attributes = CYLGalleryAttributes(5, NO, 22, ^NSDictionary *(NSUInteger index) {
+                return CYLGalleryDarkTabAttributes(index == 2);
+            });
+            CYLTabBarController *tabBarController = CYLGalleryTabBarController(CYLGalleryPages(5, NO), attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext);
             if ([tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
                 CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
                 tabBar.cyl_itemEdgeInsets = UIEdgeInsetsMake(0, 16, 0, 16);

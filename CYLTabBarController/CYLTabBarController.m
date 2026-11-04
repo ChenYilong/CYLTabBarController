@@ -862,12 +862,16 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
         // [EN] FIX: Before iOS26 tap events are no longer used either; this is handled in
         //      `-setSelectedViewController` and `-setSelectedIndex` instead
         [control addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-        // [EN] The pressed animation (`CYLTabButtonAnimation` highlight / dehighlight); removed first, as above.
-        // [CN] 按下动画（`CYLTabButtonAnimation` 的 highlight / dehighlight）；与上面一样先移除。
+        // [EN] The pressed animation (`CYLTabButtonAnimation` highlight / dehighlight), on tab buttons only (the plus button
+        //      adds its own, CYLPlusButton.m); removed first, as above.
+        // [CN] 按下动画（`CYLTabButtonAnimation` 的 highlight / dehighlight），仅用于 Tab 按钮（PlusButton 自己添加，见
+        //      CYLPlusButton.m）；与上面一样先移除。
         [control removeTarget:self action:@selector(cyl_tabButtonTouchDown:) forControlEvents:UIControlEventTouchDown];
         [control removeTarget:self action:@selector(cyl_tabButtonTouchUp:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
-        [control addTarget:self action:@selector(cyl_tabButtonTouchDown:) forControlEvents:UIControlEventTouchDown];
-        [control addTarget:self action:@selector(cyl_tabButtonTouchUp:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
+        if (isTabButton) {
+            [control addTarget:self action:@selector(cyl_tabButtonTouchDown:) forControlEvents:UIControlEventTouchDown];
+            [control addTarget:self action:@selector(cyl_tabButtonTouchUp:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
+        }
         
         // `selectedIndex` is NSNotFound while the "More" tab is selected; leave the buttons to UIKit then.
         if (isTabButton && self.selectedIndex != NSNotFound) {
@@ -3841,12 +3845,6 @@ static void CYLApplyExplicitAccessibility(NSObject<UIAccessibilityIdentification
 /// [CN] 标记本库填充过选中背景色的 Tab 按钮（以及控制器）。
 static char CYLColoredTabButtonsKey;
 
-/*!
- * [EN] Classic tab bar: fills the selected tab button with its `CYLTabBarItemSelectedBackgroundColor` and clears it when
- *      not selected. Tabs without the key are left alone. Liquid Glass draws its own selection, so it is not touched.
- * [CN] 经典 TabBar：用 `CYLTabBarItemSelectedBackgroundColor` 填充选中的 Tab 按钮，取消选中时清除。未设置该键的 Tab 保持不变。
- *      液态玻璃自带选中效果，不做处理。
- */
 /// [EN] Moves the selected background color once the current run loop turn ends, after UIKit changed the selection.
 /// [CN] 在当前 runloop 结束后（UIKit 修改选中状态之后）移动选中背景色。
 - (void)cyl_setNeedsUpdateSelectedBackgroundColors {
@@ -3856,6 +3854,13 @@ static char CYLColoredTabButtonsKey;
     });
 }
 
+/*!
+ * [EN] Classic tab bar: fills each tab button with its `CYLTabBarItemBackgroundColor`, and the selected one with its
+ *      `CYLTabBarItemSelectedBackgroundColor` (the unselected color when it has none). Tabs without either key are left
+ *      alone. Liquid Glass draws its own selection, so it is not touched.
+ * [CN] 经典 TabBar：用 `CYLTabBarItemBackgroundColor` 填充每个 Tab 按钮，选中的按钮使用 `CYLTabBarItemSelectedBackgroundColor`
+ *      （未设置时使用未选中背景色）。两个键都没有的 Tab 保持不变。液态玻璃自带选中效果，不做处理。
+ */
 - (void)cyl_updateSelectedBackgroundColorsOfTabButtons {
     if (!self.isViewLoaded || CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType || [CYLConstants isLiquidGlassActive] ||
         ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
@@ -5182,7 +5187,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             // （`selectedIndex = …`、`cyl_popSelect…`）时 TabBarItem 变了，屏幕上仍是旧 Tab。这里与点击一样通过 super 显示（重写的方法会再次回调）。
             [super setSelectedViewController:self.viewControllers[selectedIndex]];
             _selectedViewController = self.viewControllers[selectedIndex];
-                    if (_needsReloadItems) {
+            if (_needsReloadItems) {
                 [self _captureItems];
                 [self.cyl_tabBar setItems:self.items];
                 _needsReloadItems = NO;

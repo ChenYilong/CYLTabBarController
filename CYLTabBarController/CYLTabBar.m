@@ -338,6 +338,14 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
             resolvedSpacing = appearance.stackedItemSpacing;
         }
     }
+    // [EN] UIKit centers Automatic tabs in a regular horizontal size class (e.g. iPad): read it the same way, so a spacing
+    //      alone keeps UIKit's centered layout there instead of filling with gaps.
+    // [CN] UIKit 在 regular 水平尺寸类别（如 iPad）下把 Automatic 的 Tab 居中：这里按同样方式读取，因此只设置间距时，
+    //      在那里仍保持 UIKit 的居中布局，而不是铺满加间隙。
+    if (resolvedPositioning == UITabBarItemPositioningAutomatic &&
+        self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClassRegular) {
+        resolvedPositioning = UITabBarItemPositioningCentered;
+    }
     *positioning = resolvedPositioning;
     *itemWidth = resolvedWidth;
     *itemSpacing = resolvedSpacing;

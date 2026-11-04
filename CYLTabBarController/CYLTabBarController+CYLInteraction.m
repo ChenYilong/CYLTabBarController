@@ -338,15 +338,22 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
             }
         }
     }
-    [self cyl_setWeakAssociatedObject:control forKey:CYLPreviousAnimatedControlKey];
+    // [EN] A plus button without a child view controller selects nothing: it is not recorded as the selected button.
+    // [CN] 没有子控制器的 PlusButton 不会选中任何页面：不记录为已选中的按钮。
+    BOOL isPlusButtonWithoutPage = [control isKindOfClass:[CYLPlusButton class]] && index == NSNotFound;
+    if (!isPlusButtonWithoutPage) {
+        [self cyl_setWeakAssociatedObject:control forKey:CYLPreviousAnimatedControlKey];
+    }
 
     id<CYLTabButtonAnimation> animation = [self cyl_animationForTabControl:control];
     if (!animation) {
         return;
     }
-    // [EN] A tap on the button animated last (a reselect) plays the reselect animation when the animation has one.
-    // [CN] 点击上一次播放动画的按钮（重复点击）时，若动画实现了重复点击动画，则播放它。
-    if (previousControl == control && [animation respondsToSelector:@selector(cyl_playReselectAnimationWithTabButton:iconView:titleLabel:)]) {
+    // [EN] A tap on the button animated last whose tab is still selected (a reselect) plays the reselect animation when
+    //      the animation has one.
+    // [CN] 点击上一次播放动画、且其 Tab 仍处于选中状态的按钮（重复点击）时，若动画实现了重复点击动画，则播放它。
+    BOOL isReselect = previousControl == control && index != NSNotFound && index == self.selectedIndex;
+    if (isReselect && [animation respondsToSelector:@selector(cyl_playReselectAnimationWithTabButton:iconView:titleLabel:)]) {
         for (UIControl *layer in CYLTabButtonLayers(control)) {
             [animation cyl_playReselectAnimationWithTabButton:layer
                                                      iconView:CYLTabButtonIconView(layer)
