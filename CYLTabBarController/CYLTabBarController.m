@@ -75,6 +75,11 @@ NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
 NSString *const CYLTabBarItemIdentifier = @"CYLTabBarItemIdentifier";
+NSString *const CYLTabBarItemSelectAnimation = @"CYLTabBarItemSelectAnimation";
+NSString *const CYLTabBarItemReselectAnimation = @"CYLTabBarItemReselectAnimation";
+NSString *const CYLTabBarItemDeselectAnimation = @"CYLTabBarItemDeselectAnimation";
+NSString *const CYLTabBarItemHighlightAnimation = @"CYLTabBarItemHighlightAnimation";
+NSString *const CYLTabBarItemAnimationHandler = @"CYLTabBarItemAnimationHandler";
 NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
@@ -213,6 +218,9 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 /// [EN] The view controller reported as reselected in the current run loop turn (one report per tap).
 /// [CN] 当前 runloop 中已上报为重复点击的控制器（每次点击只上报一次）。
 @property (nonatomic, weak) UIViewController *cyl_viewControllerReselectedInCurrentRunLoop;
+/// [EN] The view controller whose selection was animated in the current run loop turn (one animation per change).
+/// [CN] 当前 runloop 中已播放选中动画的控制器（每次切换只播放一次）。
+@property (nonatomic, weak) UIViewController *cyl_viewControllerAnimatedInCurrentRunLoop;
 @property (nonatomic, strong) NSMutableArray<NSURL *> *lottieURLs;
 @property (nonatomic, strong) NSMutableArray *lottieSizes;
 @property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
@@ -245,6 +253,18 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (UIViewController *)cyl_viewControllerForTabControl:(UIControl *)control;
 /// [EN] A user tap on the tab that was already selected. [CN] 用户点击了已选中的 Tab。
 - (void)cyl_didReselectViewController:(UIViewController *)viewController control:(UIControl *)control;
+@end
+
+/// [EN] Implemented below (CYLTabBarItemAnimation). [CN] 实现见下方 CYLTabBarItemAnimation。
+@interface CYLTabBarController (CYLTabBarItemAnimationPrivate)
+/// [EN] Plays the select / deselect animations when the selection differs from the previous run loop turn's.
+/// [CN] 选中状态与上一个 runloop 不同时，播放选中 / 取消选中动画。
+- (void)cyl_animateSelectionChangeIfNeeded;
+/// [EN] Plays the animation of `event` for the tab of `viewController` (`control` found when nil).
+/// [CN] 为 `viewController` 对应的 Tab 播放 `event` 的动画（`control` 为 nil 时自动查找）。
+- (void)cyl_playTabBarItemAnimationEvent:(CYLTabBarItemAnimationEvent)event viewController:(UIViewController *)viewController control:(UIControl *)control;
+/// [EN] Touch down on a tab button (classic tab bar). [CN] 手指按下 Tab 按钮（经典 TabBar）。
+- (void)cyl_tabControlTouchDown:(UIControl *)control;
 @end
 
 /// Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
@@ -429,6 +449,7 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
     }
     UIViewController *vc = nil;
     [self tabChangedToSelectedViewController:vc control:control];
+    [self cyl_animateSelectionChangeIfNeeded];
     // [EN] Reselect: the tapped tab is selected now and was already selected before this tap (the selection as of the
     //      previous run loop turn). The classic tab bar runs this action after UIKit changed the selection; Liquid Glass
     //      runs it from the gesture delegate, only for a selected tab, before anything changes.
@@ -732,6 +753,10 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
         // [EN] FIX: Before iOS26 tap events are no longer used either; this is handled in
         //      `-setSelectedViewController` and `-setSelectedIndex` instead
         [control addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+        // [EN] Highlight animation (`CYLTabBarItemAnimationEventHighlight`); removed first, as above.
+        // [CN] 按下动画（`CYLTabBarItemAnimationEventHighlight`）；与上面一样先移除。
+        [control removeTarget:self action:@selector(cyl_tabControlTouchDown:) forControlEvents:UIControlEventTouchDown];
+        [control addTarget:self action:@selector(cyl_tabControlTouchDown:) forControlEvents:UIControlEventTouchDown];
         
         // `selectedIndex` is NSNotFound while the "More" tab is selected; leave the buttons to UIKit then.
         if (isTabButton && self.selectedIndex != NSNotFound) {
@@ -4472,6 +4497,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     if (NSNotFound == indexOfSelectedViewController) { return; }
     [super setSelectedViewController:selectedViewController];
     _selectedViewController = selectedViewController;
+    [self cyl_animateSelectionChangeIfNeeded];
 
     if (selectedViewController.cyl_isPlaceholder) { return; }
 
@@ -4685,6 +4711,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             // （`selectedIndex = …`、`cyl_popSelect…`）时 TabBarItem 变了，屏幕上仍是旧 Tab。这里与点击一样通过 super 显示（重写的方法会再次回调）。
             [super setSelectedViewController:self.viewControllers[selectedIndex]];
             _selectedViewController = self.viewControllers[selectedIndex];
+            [self cyl_animateSelectionChangeIfNeeded];
             if (_needsReloadItems) {
                 [self _captureItems];
                 [self.cyl_tabBar setItems:self.items];
@@ -6819,6 +6846,20 @@ static char CYLReselectBehaviorKey;
     if (!control || [control cyl_isPlusControl]) {
         return nil;
     }
+#if CYL_FLATDESIGN_AVAILABLE
+    // [EN] FlatDesign: the item's button, matched by position (items and view controllers are aligned).
+    // [CN] 扁平样式：按位置匹配 item 的按钮（items 与 viewControllers 一一对应）。
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+        NSArray<CYLFlatDesignTabBarItem *> *items = [self.items copy];
+        for (NSUInteger index = 0; index < items.count && index < self.viewControllers.count; index++) {
+            if ((UIControl *)items[index].tabBarButton == control) {
+                UIViewController *viewController = self.viewControllers[index];
+                return viewController.cyl_isPlaceholder ? nil : viewController;
+            }
+        }
+        return nil;
+    }
+#endif
     // [EN] Liquid Glass shows two buttons per tab; the selected layer's button stands for the normal one.
     // [CN] 液态玻璃中每个 Tab 有两个按钮；选中层的按钮对应普通层的按钮。
     NSMutableArray<UIControl *> *candidates = [NSMutableArray arrayWithObject:control];
@@ -6867,6 +6908,7 @@ static char CYLReselectBehaviorKey;
         weakSelf.cyl_viewControllerReselectedInCurrentRunLoop = nil;
     });
 
+    [self cyl_playTabBarItemAnimationEvent:CYLTabBarItemAnimationEventReselect viewController:viewController control:control];
     [self cyl_performReselectBehaviorForViewController:viewController];
 
     id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)self.delegate;
@@ -6894,6 +6936,258 @@ static char CYLReselectBehaviorKey;
             CGPoint topOffset = CGPointMake(scrollView.contentOffset.x, -scrollView.adjustedContentInset.top);
             [scrollView setContentOffset:topOffset animated:YES];
         }
+    }
+}
+
+@end
+
+#pragma mark - CYLTabBarItemAnimation (built-in tab icon animations)
+
+static char CYLTabBarItemSelectAnimationTypeKey;
+static char CYLTabBarItemReselectAnimationTypeKey;
+static char CYLTabBarItemDeselectAnimationTypeKey;
+static char CYLTabBarItemHighlightAnimationTypeKey;
+static char CYLTabBarItemAnimationHandlerKey;
+static NSString *const CYLTabBarItemAnimationLayerKey = @"cyl.tabBarItem.animation";
+
+/// [EN] What a tab button shows as its icon: its Lottie view, the view put in place of the icon, otherwise its image view.
+/// [CN] Tab 按钮当前显示的图标：Lottie 视图、替换图标的视图，否则为图片视图。
+static UIView *CYLTabBarItemAnimationIconViewOfControl(UIControl *control) {
+    if (!control) {
+        return nil;
+    }
+    UIView *lottieView = [control cyl_lottieAnimationView];
+    if (lottieView) {
+        return lottieView;
+    }
+    for (UIView *subview in control.cyl_allSubviews) {
+        if (subview.cyl_isTabBarItemIconView) {
+            return subview;
+        }
+    }
+    // [EN] A FlatDesign tab button (and any button) has its own image view. [CN] 扁平样式的 Tab 按钮（以及 UIButton）有自己的图片视图。
+    if ([control isKindOfClass:[UIButton class]]) {
+        return ((UIButton *)control).imageView;
+    }
+#if CYL_FLATDESIGN_AVAILABLE
+    if ([control isKindOfClass:[CYLFlatDesignTabBarButton class]]) {
+        return ((CYLFlatDesignTabBarButton *)control).imageView;
+    }
+#endif
+    return control.cyl_tabImageView;
+}
+
+static NSNumber *CYLTabBarItemAnimationTypeValue(id value) {
+    return [value isKindOfClass:[NSNumber class]] ? (NSNumber *)value : nil;
+}
+
+@implementation CYLTabBarController (CYLTabBarItemAnimation)
+
+- (CYLTabBarItemAnimationType)cyl_tabBarItemSelectAnimationType {
+    return (CYLTabBarItemAnimationType)[objc_getAssociatedObject(self, &CYLTabBarItemSelectAnimationTypeKey) integerValue];
+}
+
+- (void)setCyl_tabBarItemSelectAnimationType:(CYLTabBarItemAnimationType)animationType {
+    objc_setAssociatedObject(self, &CYLTabBarItemSelectAnimationTypeKey, @(animationType), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (CYLTabBarItemAnimationType)cyl_tabBarItemReselectAnimationType {
+    return (CYLTabBarItemAnimationType)[objc_getAssociatedObject(self, &CYLTabBarItemReselectAnimationTypeKey) integerValue];
+}
+
+- (void)setCyl_tabBarItemReselectAnimationType:(CYLTabBarItemAnimationType)animationType {
+    objc_setAssociatedObject(self, &CYLTabBarItemReselectAnimationTypeKey, @(animationType), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (CYLTabBarItemAnimationType)cyl_tabBarItemDeselectAnimationType {
+    return (CYLTabBarItemAnimationType)[objc_getAssociatedObject(self, &CYLTabBarItemDeselectAnimationTypeKey) integerValue];
+}
+
+- (void)setCyl_tabBarItemDeselectAnimationType:(CYLTabBarItemAnimationType)animationType {
+    objc_setAssociatedObject(self, &CYLTabBarItemDeselectAnimationTypeKey, @(animationType), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (CYLTabBarItemAnimationType)cyl_tabBarItemHighlightAnimationType {
+    return (CYLTabBarItemAnimationType)[objc_getAssociatedObject(self, &CYLTabBarItemHighlightAnimationTypeKey) integerValue];
+}
+
+- (void)setCyl_tabBarItemHighlightAnimationType:(CYLTabBarItemAnimationType)animationType {
+    objc_setAssociatedObject(self, &CYLTabBarItemHighlightAnimationTypeKey, @(animationType), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (CYLTabBarItemAnimationBlock)cyl_tabBarItemAnimationHandler {
+    return objc_getAssociatedObject(self, &CYLTabBarItemAnimationHandlerKey);
+}
+
+- (void)setCyl_tabBarItemAnimationHandler:(CYLTabBarItemAnimationBlock)animationHandler {
+    objc_setAssociatedObject(self, &CYLTabBarItemAnimationHandlerKey, animationHandler, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
++ (void)cyl_addTabBarItemAnimation:(CYLTabBarItemAnimationType)animationType toView:(UIView *)view {
+    if (!view || animationType == CYLTabBarItemAnimationTypeNone) {
+        return;
+    }
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animation];
+    switch (animationType) {
+        case CYLTabBarItemAnimationTypeBounce:
+            animation.keyPath = @"transform.scale";
+            animation.values = @[ @1.0, @1.3, @0.9, @1.15, @0.95, @1.02, @1.0 ];
+            animation.duration = 0.6;
+            animation.calculationMode = kCAAnimationCubic;
+            break;
+        case CYLTabBarItemAnimationTypeScale:
+            animation.keyPath = @"transform.scale";
+            animation.values = @[ @1.0, @1.2, @1.0 ];
+            animation.duration = 0.25;
+            break;
+        case CYLTabBarItemAnimationTypeRotate:
+            animation.keyPath = @"transform.rotation.y";
+            animation.values = @[ @0.0, @(M_PI), @(2.0 * M_PI) ];
+            animation.duration = 0.5;
+            break;
+        case CYLTabBarItemAnimationTypeShake:
+            animation.keyPath = @"transform.rotation.z";
+            animation.values = @[ @0.0, @(-0.25), @0.25, @(-0.15), @0.15, @0.0 ];
+            animation.duration = 0.4;
+            break;
+        case CYLTabBarItemAnimationTypeJump:
+            animation.keyPath = @"transform.translation.y";
+            animation.values = @[ @0.0, @(-8.0), @0.0, @(-3.0), @0.0 ];
+            animation.duration = 0.45;
+            break;
+        case CYLTabBarItemAnimationTypeNone:
+        default:
+            return;
+    }
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+    // [EN] A new animation replaces the running one, so fast taps do not stack. [CN] 新动画替换正在播放的动画，快速点击不会叠加。
+    [view.layer addAnimation:animation forKey:CYLTabBarItemAnimationLayerKey];
+}
+
+@end
+
+@implementation CYLTabBarController (CYLTabBarItemAnimationPrivate)
+
+/// [EN] The tab button of `viewController` in the current style, nil for the plus button and "More".
+/// [CN] 当前样式下 `viewController` 对应的 Tab 按钮，PlusButton 与“更多”返回 nil。
+- (UIControl *)cyl_tabControlForViewController:(UIViewController *)viewController {
+    if (!viewController || viewController.cyl_isPlaceholder) {
+        return nil;
+    }
+#if CYL_FLATDESIGN_AVAILABLE
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+        NSUInteger index = [self.viewControllers indexOfObject:viewController];
+        NSArray<CYLFlatDesignTabBarItem *> *items = [self.items copy];
+        return (index != NSNotFound && index < items.count) ? (UIControl *)items[index].tabBarButton : nil;
+    }
+#endif
+    UIControl *control = viewController.tabBarItem.cyl_tabButton ?: viewController.cyl_tabButton;
+    if (!control) {
+        control = [viewController cyl_getViewControllerInsteadOfNavigationController].cyl_tabButton;
+    }
+    return control;
+}
+
+- (void)cyl_animateSelectionChangeIfNeeded {
+    UIViewController *previousViewController = self.cyl_settledSelectedViewController;
+    UIViewController *currentViewController = self.selectedViewController;
+    // [EN] Nothing before the first appearance (no previous selection), and only once per change.
+    // [CN] 首次显示之前（没有之前的选中状态）不播放，且每次切换只播放一次。
+    if (!previousViewController || !currentViewController || previousViewController == currentViewController ||
+        self.cyl_viewControllerAnimatedInCurrentRunLoop == currentViewController) {
+        return;
+    }
+    self.cyl_viewControllerAnimatedInCurrentRunLoop = currentViewController;
+    __weak __typeof(self) weakSelf = self;
+    // [EN] Next run loop turn: the tab buttons show their new state (UIKit swaps the image view on selection).
+    // [CN] 下一个 runloop 执行：此时 Tab 按钮已显示新状态（UIKit 选中时会替换图片视图）。
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        strongSelf.cyl_viewControllerAnimatedInCurrentRunLoop = nil;
+        if (strongSelf.selectedViewController != currentViewController) {
+            return;
+        }
+        [strongSelf cyl_playTabBarItemAnimationEvent:CYLTabBarItemAnimationEventDeselect viewController:previousViewController control:nil];
+        [strongSelf cyl_playTabBarItemAnimationEvent:CYLTabBarItemAnimationEventSelect viewController:currentViewController control:nil];
+    });
+}
+
+- (CYLTabBarItemAnimationType)cyl_tabBarItemAnimationTypeForEvent:(CYLTabBarItemAnimationEvent)event attributes:(NSDictionary *)attributes {
+    NSNumber *value = nil;
+    switch (event) {
+        case CYLTabBarItemAnimationEventSelect:
+            value = CYLTabBarItemAnimationTypeValue(attributes[CYLTabBarItemSelectAnimation]);
+            return value ? (CYLTabBarItemAnimationType)value.integerValue : self.cyl_tabBarItemSelectAnimationType;
+        case CYLTabBarItemAnimationEventReselect:
+            value = CYLTabBarItemAnimationTypeValue(attributes[CYLTabBarItemReselectAnimation]);
+            return value ? (CYLTabBarItemAnimationType)value.integerValue : self.cyl_tabBarItemReselectAnimationType;
+        case CYLTabBarItemAnimationEventDeselect:
+            value = CYLTabBarItemAnimationTypeValue(attributes[CYLTabBarItemDeselectAnimation]);
+            return value ? (CYLTabBarItemAnimationType)value.integerValue : self.cyl_tabBarItemDeselectAnimationType;
+        case CYLTabBarItemAnimationEventHighlight:
+            value = CYLTabBarItemAnimationTypeValue(attributes[CYLTabBarItemHighlightAnimation]);
+            return value ? (CYLTabBarItemAnimationType)value.integerValue : self.cyl_tabBarItemHighlightAnimationType;
+    }
+    return CYLTabBarItemAnimationTypeNone;
+}
+
+- (void)cyl_playTabBarItemAnimationEvent:(CYLTabBarItemAnimationEvent)event
+                          viewController:(UIViewController *)viewController
+                                 control:(UIControl *)control {
+    if (!viewController || viewController.cyl_isPlaceholder) {
+        return;
+    }
+    if (!control) {
+        control = [self cyl_tabControlForViewController:viewController];
+    }
+    if (!control || [control cyl_isPlusControl]) {
+        return;
+    }
+    NSUInteger index = [self.viewControllers indexOfObject:viewController];
+    NSDictionary *attributes = (index != NSNotFound) ? [self tabBarItemAttributesAtIndex:index] : nil;
+    id tabHandler = attributes[CYLTabBarItemAnimationHandler];
+    CYLTabBarItemAnimationBlock handler = tabHandler ? (CYLTabBarItemAnimationBlock)tabHandler : self.cyl_tabBarItemAnimationHandler;
+    CYLTabBarItemAnimationType animationType = [self cyl_tabBarItemAnimationTypeForEvent:event attributes:attributes];
+    if (!handler && animationType == CYLTabBarItemAnimationTypeNone) {
+        return;
+    }
+    // [EN] Liquid Glass shows each tab twice: the normal layer and the selected layer under the lens.
+    // [CN] 液态玻璃中每个 Tab 显示两份：普通层，以及放大镜下的选中层。
+    NSMutableArray<UIControl *> *controls = [NSMutableArray arrayWithObject:control];
+    if ([CYLConstants isLiquidGlassActive] && CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) {
+        UIControl *normalControl = [control cyl_isPlatterSelectedControl] ? [control cyl_platterNormalControl] : control;
+        UIControl *selectedControl = [normalControl cyl_platterSelectedControl];
+        [controls removeAllObjects];
+        if (normalControl) {
+            [controls addObject:normalControl];
+        }
+        if (selectedControl && selectedControl != normalControl) {
+            [controls addObject:selectedControl];
+        }
+    }
+    for (UIControl *animatedControl in controls) {
+        UIView *iconView = CYLTabBarItemAnimationIconViewOfControl(animatedControl);
+        if (!iconView) {
+            continue;
+        }
+        if (handler) {
+            handler(iconView, animatedControl, event);
+        } else {
+            [CYLTabBarController cyl_addTabBarItemAnimation:animationType toView:iconView];
+        }
+    }
+}
+
+- (void)cyl_tabControlTouchDown:(UIControl *)control {
+    if (!control || [control cyl_isPlusControl]) {
+        return;
+    }
+    UIViewController *viewController = [self cyl_viewControllerForTabControl:control];
+    if (viewController) {
+        [self cyl_playTabBarItemAnimationEvent:CYLTabBarItemAnimationEventHighlight viewController:viewController control:control];
     }
 }
 
