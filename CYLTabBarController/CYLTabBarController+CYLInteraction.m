@@ -111,6 +111,15 @@ static const CGFloat CYLLiquidGlassPressAllowableMovement = 10.0;
 
 /// [EN] The view to animate as the icon: the Lottie view, else the image view. [CN] 作为图标播放动画的视图：Lottie 视图，否则为图片视图。
 static UIView *CYLTabButtonIconView(UIControl *control) {
+    // [EN] FIX: issue #601 — a view shown in place of the icon (`-setTabBarItemIconViewProvider:atIndex:`): the icon, or the
+    //      Lottie view, is hidden then, so the tap animation plays on that view.
+    // [CN] FIX: issue #601 — 替换图标显示的视图（`-setTabBarItemIconViewProvider:atIndex:`）：此时图标或 Lottie 视图已隐藏，
+    //      点击动画在该视图上播放。
+    for (UIView *subview in control.subviews) {
+        if (subview.cyl_isTabBarItemIconView && !subview.hidden) {
+            return subview;
+        }
+    }
 #if CYL_LOTTIE_AVAILABLE
     // [EN] Only when the Lottie library is integrated: a tab with a Lottie icon animates the Lottie view.
     // [CN] 仅在引入 Lottie 库时：有 Lottie 图标的 Tab 对 Lottie 视图播放动画。
