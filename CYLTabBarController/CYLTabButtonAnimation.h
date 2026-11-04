@@ -67,6 +67,33 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign, getter=cyl_isToRight, setter=cyl_setToRight:) BOOL cyl_toRight;
 
+/*!
+ * [EN] Plays the animation of a button that is tapped again while selected (a reselect). When implemented, it is played
+ *      instead of the select animation for that tap; otherwise the select animation plays again, as before.
+ * [CN] 再次点击已选中按钮（重复点击）时的动画。实现后，这次点击播放它而不是选中动画；未实现时与以前一样再次播放选中动画。
+ */
+- (void)cyl_playReselectAnimationWithTabButton:(UIControl *)button
+                                      iconView:(UIView *)iconView
+                                    titleLabel:(nullable UILabel *)titleLabel;
+
+/*!
+ * [EN] Plays the animation of a button a finger went down on (pressed), in every style: the classic tab bar, FlatDesign
+ *      and the plus button on touch down, Liquid Glass when its system gesture begins on the tab.
+ * [CN] 手指按下按钮（按压）时的动画，适用于所有样式：经典 TabBar、扁平样式与 PlusButton 在按下时，液态玻璃在系统手势于该 Tab 上开始时。
+ */
+- (void)cyl_playHighlightAnimationWithTabButton:(UIControl *)button
+                                       iconView:(UIView *)iconView
+                                     titleLabel:(nullable UILabel *)titleLabel;
+
+/*!
+ * [EN] Plays the animation of a pressed button the finger lifted from, or whose touch was cancelled. Pairs with
+ *      `-cyl_playHighlightAnimationWithTabButton:iconView:titleLabel:`.
+ * [CN] 按压的手指抬起或触摸被取消时的动画。与 `-cyl_playHighlightAnimationWithTabButton:iconView:titleLabel:` 成对使用。
+ */
+- (void)cyl_playDehighlightAnimationWithTabButton:(UIControl *)button
+                                         iconView:(UIView *)iconView
+                                       titleLabel:(nullable UILabel *)titleLabel;
+
 @end
 
 /*!
@@ -111,6 +138,17 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 图标下移，标题上浮并淡出；取消选中时恢复（TLFumeAnimation）。Tab 选中期间标题保持隐藏。
  */
 @interface CYLTabButtonFumeAnimation : NSObject <CYLTabButtonAnimation>
+@end
+
+/*!
+ * [EN] The icon shrinks while the button is pressed and springs back when the finger lifts (highlight / dehighlight);
+ *      no select animation. Set it as `cyl_defaultTabButtonAnimation` or a tab's `cyl_tabButtonAnimation`.
+ * [CN] 按压时图标缩小，手指抬起时弹回（highlight / dehighlight）；没有选中动画。可设置为 `cyl_defaultTabButtonAnimation`
+ *      或某个 Tab 的 `cyl_tabButtonAnimation`。
+ */
+@interface CYLTabButtonPressAnimation : NSObject <CYLTabButtonAnimation>
+/// [EN] The icon's scale while pressed. Default 0.85. [CN] 按压时图标的缩放比例，默认 0.85。
+@property (nonatomic, assign) CGFloat pressedScale;
 @end
 
 /*!

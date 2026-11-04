@@ -339,3 +339,34 @@ static UIViewAnimationOptions CYLTabButtonFlipOption(NSUInteger direction) {
 }
 
 @end
+
+#pragma mark - CYLTabButtonPressAnimation
+
+@implementation CYLTabButtonPressAnimation
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _pressedScale = 0.85;
+    }
+    return self;
+}
+
+- (void)cyl_playSelectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    // [EN] Pressing is the whole animation; nothing more on selection. [CN] 按压即是全部动画，选中时不再播放。
+}
+
+- (void)cyl_playHighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CGFloat scale = self.pressedScale;
+    [UIView animateWithDuration:0.12 delay:0 options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction animations:^{
+        iconView.transform = CGAffineTransformMakeScale(scale, scale);
+    } completion:nil];
+}
+
+- (void)cyl_playDehighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    [UIView animateWithDuration:0.35 delay:0 usingSpringWithDamping:0.5 initialSpringVelocity:0
+                        options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction animations:^{
+        iconView.transform = CGAffineTransformIdentity;
+    } completion:nil];
+}
+
+@end

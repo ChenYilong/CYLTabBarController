@@ -344,6 +344,16 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
     if (!animation) {
         return;
     }
+    // [EN] A tap on the button animated last (a reselect) plays the reselect animation when the animation has one.
+    // [CN] 点击上一次播放动画的按钮（重复点击）时，若动画实现了重复点击动画，则播放它。
+    if (previousControl == control && [animation respondsToSelector:@selector(cyl_playReselectAnimationWithTabButton:iconView:titleLabel:)]) {
+        for (UIControl *layer in CYLTabButtonLayers(control)) {
+            [animation cyl_playReselectAnimationWithTabButton:layer
+                                                     iconView:CYLTabButtonIconView(layer)
+                                                   titleLabel:CYLTabButtonTitleLabel(layer)];
+        }
+        return;
+    }
     if (hasIndexes && [animation respondsToSelector:@selector(cyl_setFromLeft:)]) {
         animation.cyl_fromLeft = previousIndex < index;
     }
@@ -351,6 +361,78 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
         [animation cyl_playSelectAnimationWithTabButton:layer
                                                iconView:CYLTabButtonIconView(layer)
                                              titleLabel:CYLTabButtonTitleLabel(layer)];
+    }
+}
+
+#pragma mark - Highlight (pressed) animation
+
+static const void *CYLHighlightedTabControlKey = &CYLHighlightedTabControlKey;
+
+/*!
+ * [EN] Plays the highlight (finger down) or dehighlight (finger up or cancelled) animation of `control`, when its
+ *      animation implements it. Only one button is highlighted at a time; a new press dehighlights the previous one.
+ * [CN] 播放 `control` 的按下（highlight）或抬起 / 取消（dehighlight）动画（其动画实现了对应方法时）。同一时间只有一个按钮处于按下状态；
+ *      新的按压会先让之前的按钮恢复。
+ */
+- (void)cyl_setTabButtonHighlighted:(BOOL)highlighted forControl:(nullable UIControl *)control {
+    UIControl *highlightedControl = [self cyl_weakAssociatedObjectForKey:CYLHighlightedTabControlKey];
+    if (highlighted) {
+        if (!control || control == highlightedControl) {
+            return;
+        }
+        if (highlightedControl) {
+            [self cyl_setTabButtonHighlighted:NO forControl:highlightedControl];
+        }
+    } else {
+        control = control ?: highlightedControl;
+        if (!control || control != highlightedControl) {
+            return;
+        }
+    }
+    [self cyl_setWeakAssociatedObject:(highlighted ? control : nil) forKey:CYLHighlightedTabControlKey];
+    id<CYLTabButtonAnimation> animation = [self cyl_animationForTabControl:control];
+    SEL selector = highlighted ? @selector(cyl_playHighlightAnimationWithTabButton:iconView:titleLabel:)
+                               : @selector(cyl_playDehighlightAnimationWithTabButton:iconView:titleLabel:);
+    if (![animation respondsToSelector:selector]) {
+        return;
+    }
+    for (UIControl *layer in CYLTabButtonLayers(control)) {
+        if (highlighted) {
+            [animation cyl_playHighlightAnimationWithTabButton:layer iconView:CYLTabButtonIconView(layer) titleLabel:CYLTabButtonTitleLabel(layer)];
+        } else {
+            [animation cyl_playDehighlightAnimationWithTabButton:layer iconView:CYLTabButtonIconView(layer) titleLabel:CYLTabButtonTitleLabel(layer)];
+        }
+    }
+}
+
+/// [EN] Touch targets of the classic and FlatDesign tab buttons and of the plus button. [CN] 经典、扁平样式 Tab 按钮与 PlusButton 的触摸事件。
+- (void)cyl_tabButtonTouchDown:(UIControl *)control {
+    [self cyl_setTabButtonHighlighted:YES forControl:control];
+}
+
+- (void)cyl_tabButtonTouchUp:(UIControl *)control {
+    [self cyl_setTabButtonHighlighted:NO forControl:control];
+}
+
+/*!
+ * [EN] Liquid Glass: UIKit's gestures receive the touches, so the press follows them: highlighted when one begins on a
+ *      tab, dehighlighted when it ends, is cancelled or fails.
+ * [CN] 液态玻璃：触摸由系统手势接收，因此按压状态跟随它们：手势在某个 Tab 上开始时按下，结束、取消或失败时恢复。
+ */
+- (void)cyl_updateTabButtonHighlightForLiquidGlassGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+    switch (gestureRecognizer.state) {
+        case UIGestureRecognizerStateBegan: {
+            UIControl *control = [self cyl_liquidGlassTabControlAtWindowPoint:[gestureRecognizer locationInView:self.view.window]];
+            [self cyl_setTabButtonHighlighted:YES forControl:control];
+            break;
+        }
+        case UIGestureRecognizerStateEnded:
+        case UIGestureRecognizerStateCancelled:
+        case UIGestureRecognizerStateFailed:
+            [self cyl_setTabButtonHighlighted:NO forControl:nil];
+            break;
+        default:
+            break;
     }
 }
 
@@ -614,6 +696,11 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
  * [CN] `CYLTabBar` 对系统液态玻璃手势的每次更新调用。见 `CYLTabBarLiquidGlassPress`。PlusButton 仍走自己的路径（抬起事件与库的长按手势）。
  */
 - (void)cyl_liquidGlassTabBarGestureRecognizerDidUpdate:(UIGestureRecognizer *)gestureRecognizer {
+    // [EN] The pressed animation follows every Liquid Glass press, whatever else is handled below.
+    // [CN] 按压动画跟随每一次液态玻璃按压，与下方是否处理其他手势无关。
+    if ([CYLConstants isLiquidGlassActive]) {
+        [self cyl_updateTabButtonHighlightForLiquidGlassGestureRecognizer:gestureRecognizer];
+    }
     BOOL handlesLongPress = [self cyl_handlesTabButtonLongPress];
     BOOL handlesTaps = [self cyl_hasTabBarItemGestureReceiver];
     if ((!handlesLongPress && !handlesTaps) || ![self cyl_liquidGlassReceivesTabTouches]) {

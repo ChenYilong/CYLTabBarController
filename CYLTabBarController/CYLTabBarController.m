@@ -323,6 +323,13 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)cyl_updateTabBarMinimizeTracking;
 @end
 
+// [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
+// [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
+@interface CYLTabBarController (CYLTabButtonHighlight)
+- (void)cyl_tabButtonTouchDown:(UIControl *)control;
+- (void)cyl_tabButtonTouchUp:(UIControl *)control;
+@end
+
 /// [EN] Implemented below (CYLReselect). [CN] 实现见下方 CYLReselect。
 @interface CYLTabBarController (CYLReselectPrivate)
 /// [EN] The view controller of a tab button (classic or Liquid Glass), nil for the plus button. [CN] Tab 按钮对应的控制器，PlusButton 返回 nil。
@@ -854,6 +861,12 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
         // [EN] FIX: Before iOS26 tap events are no longer used either; this is handled in
         //      `-setSelectedViewController` and `-setSelectedIndex` instead
         [control addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+        // [EN] The pressed animation (`CYLTabButtonAnimation` highlight / dehighlight); removed first, as above.
+        // [CN] 按下动画（`CYLTabButtonAnimation` 的 highlight / dehighlight）；与上面一样先移除。
+        [control removeTarget:self action:@selector(cyl_tabButtonTouchDown:) forControlEvents:UIControlEventTouchDown];
+        [control removeTarget:self action:@selector(cyl_tabButtonTouchUp:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
+        [control addTarget:self action:@selector(cyl_tabButtonTouchDown:) forControlEvents:UIControlEventTouchDown];
+        [control addTarget:self action:@selector(cyl_tabButtonTouchUp:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
         
         // `selectedIndex` is NSNotFound while the "More" tab is selected; leave the buttons to UIKit then.
         if (isTabButton && self.selectedIndex != NSNotFound) {

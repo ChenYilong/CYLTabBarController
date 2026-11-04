@@ -27,6 +27,7 @@
 |:---|:---|
 | [建议与对应功能](#cn建议与对应功能) | [Suggestions and what they became](#ensuggestions-and-what-they-became) |
 | [点击动画](#cn点击动画) | [Tap animations](#entap-animations) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [重复点击与按下动画](#cn重复点击与按下动画) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Reselect and pressed animations](#enreselect-and-pressed-animations) |
 | [长按](#cn长按) | [Long press](#enlong-press) |
 | [左右滑动切换 Tab](#cn左右滑动切换-tab) | [Swipe to switch tabs](#enswipe-to-switch-tabs) |
 | [超出父视图的子视图响应点击](#cn超出父视图的子视图响应点击) | [Subviews that respond outside their superview](#ensubviews-that-respond-outside-their-superview) |
@@ -102,6 +103,30 @@ messageNavigationController.cyl_tabButtonAnimation = [[CYLTabButtonRotationAnima
 
 ```swift
 tabBarController.cyl_tabButtonTapAnimationType = .bounce
+```
+
+### [CN]重复点击与按下动画
+### [EN]Reselect and pressed animations
+
+| 中文 | English |
+|:---|:---|
+| `CYLTabButtonAnimation` 协议新增三个可选方法：`-cyl_playReselectAnimationWithTabButton:iconView:titleLabel:`（再次点击已选中的按钮时代替选中动画播放；未实现时与以前一样再次播放选中动画）、`-cyl_playHighlightAnimationWithTabButton:iconView:titleLabel:`（手指按下）与 `-cyl_playDehighlightAnimationWithTabButton:iconView:titleLabel:`（手指抬起或触摸取消）。按下动画适用于所有样式：经典 TabBar、扁平样式与 PlusButton 跟随按钮的触摸事件，液态玻璃跟随系统手势的开始与结束。同一时间只有一个按钮处于按下状态。 | The `CYLTabButtonAnimation` protocol has three new optional methods: `-cyl_playReselectAnimationWithTabButton:iconView:titleLabel:` (played instead of the select animation when the selected button is tapped again; without it the select animation plays again, as before), `-cyl_playHighlightAnimationWithTabButton:iconView:titleLabel:` (finger down) and `-cyl_playDehighlightAnimationWithTabButton:iconView:titleLabel:` (finger up or touch cancelled). The pressed animation works in every style: the classic tab bar, FlatDesign and the plus button follow the button's touches, Liquid Glass follows its system gesture beginning and ending. One button is pressed at a time. |
+| 内置的 `CYLTabButtonPressAnimation`：按下时图标缩小（`pressedScale`，默认 0.85），抬起时弹回，不播放选中动画。 | The built-in `CYLTabButtonPressAnimation`: the icon shrinks while pressed (`pressedScale`, default 0.85) and springs back when the finger lifts, with no select animation. |
+
+```objc
+tabBarController.cyl_defaultTabButtonAnimation = [CYLTabButtonPressAnimation new];
+
+// 或者自己实现 / or your own:
+@interface MyTabAnimation : NSObject <CYLTabButtonAnimation>
+@end
+@implementation MyTabAnimation
+- (void)cyl_playSelectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    [[CYLTabButtonBounceAnimation new] cyl_playSelectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+}
+- (void)cyl_playReselectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    [[CYLTabButtonRotationAnimation new] cyl_playSelectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+}
+@end
 ```
 
 ## [CN]长按

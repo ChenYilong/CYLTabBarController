@@ -139,6 +139,13 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 static const void *CYLPlusButtonMovedTitleKey = &CYLPlusButtonMovedTitleKey;
 static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
 
+// [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
+// [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
+@interface CYLTabBarController (CYLTabButtonHighlight)
+- (void)cyl_tabButtonTouchDown:(UIControl *)control;
+- (void)cyl_tabButtonTouchUp:(UIControl *)control;
+@end
+
 @implementation CYLPlusButton
 //@synthesize selected = _selected;
 // [EN] Custom getter and setter: no automatic ivar.
@@ -1270,6 +1277,24 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     }
     [self addTarget:self action:@selector(cyl_tabBarItemGestureTouchDown) forControlEvents:UIControlEventTouchDown];
     [self addTarget:self action:@selector(cyl_tabBarItemGestureTouchUpInside) forControlEvents:UIControlEventTouchUpInside];
+    // [EN] The pressed animation (`CYLTabButtonAnimation` highlight / dehighlight), played by the tab bar controller.
+    // [CN] 按下动画（`CYLTabButtonAnimation` 的 highlight / dehighlight），由 TabBarController 播放。
+    [self addTarget:self action:@selector(cyl_tabButtonHighlightTouchDown) forControlEvents:UIControlEventTouchDown];
+    [self addTarget:self action:@selector(cyl_tabButtonHighlightTouchUp) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
+}
+
+- (void)cyl_tabButtonHighlightTouchDown {
+    CYLTabBarController *tabBarController = [self cyl_owningTabBarController];
+    if ([tabBarController respondsToSelector:@selector(cyl_tabButtonTouchDown:)]) {
+        [tabBarController cyl_tabButtonTouchDown:self];
+    }
+}
+
+- (void)cyl_tabButtonHighlightTouchUp {
+    CYLTabBarController *tabBarController = [self cyl_owningTabBarController];
+    if ([tabBarController respondsToSelector:@selector(cyl_tabButtonTouchUp:)]) {
+        [tabBarController cyl_tabButtonTouchUp:self];
+    }
 }
 
 - (void)cyl_tabBarItemGestureTouchDown {
