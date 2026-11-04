@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
  *              [[CYLTabBarItemViewAnimator alloc] initWithIdentifier:@"Rive"
  *                                                     fileExtensions:@[ @"riv" ]
  *                                                      attributeKeys:@{ CYLTabBarAnimationURL : CYLTabBarRiveURL }
- *                                              viewProviderClassName:@"CYLRiveTabBarItemAnimationView"]];
+ *                                                       viewProvider:[CYLRiveTabBarItemAnimationView class]]];
  *
  * [CN] 为视图自己会播放（`CYLTabBarItemAnimationPlayableView`）的动画库准备的现成 `CYLTabBarItemAnimator`。它完成这类动画库都相同的工作，
  *      动画库只需描述自己并提供视图：
@@ -46,22 +46,23 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CYLTabBarItemViewAnimator : NSObject <CYLTabBarItemAnimator>
 
 /*!
- * [EN] `viewProviderClassName`: the class that makes the views, looked up once when first needed and used only when it
- *      adopts `CYLTabBarItemAnimationViewProviding` (a Swift class cannot register itself in `+load`, so it is named here).
- * [CN] `viewProviderClassName`：创建视图的类，首次需要时查找一次，且仅在其遵守 `CYLTabBarItemAnimationViewProviding` 时使用（Swift 类无法在
- *      `+load` 中自行注册，因此在这里指定）。
+ * [EN] `viewProvider`: the class that makes the views (constructor injection, checked by the compiler); used only when it
+ *      adopts `CYLTabBarItemAnimationViewProviding`. A Swift class is passed from Objective-C through the module's
+ *      generated `…-Swift.h` header.
+ * [CN] `viewProvider`：创建视图的类（构造器注入，由编译器检查）；仅在其遵守 `CYLTabBarItemAnimationViewProviding` 时使用。Swift 类通过模块
+ *      生成的 `…-Swift.h` 头文件从 Objective-C 传入。
  */
 - (instancetype)initWithIdentifier:(NSString *)identifier
                     fileExtensions:(NSArray<NSString *> *)fileExtensions
                      attributeKeys:(nullable NSDictionary<NSString *, NSString *> *)attributeKeys
-             viewProviderClassName:(NSString *)viewProviderClassName NS_DESIGNATED_INITIALIZER;
+                      viewProvider:(nullable Class<CYLTabBarItemAnimationViewProviding>)viewProvider NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
 /*!
- * [EN] Where the views come from (dependency injection): by default the class named at initialization. Set any class
+ * [EN] Where the views come from (dependency injection): by default the class given at initialization. Set any class
  *      adopting `CYLTabBarItemAnimationViewProviding` (e.g. a test double); nil goes back to the default.
- * [CN] 视图的来源（依赖注入）：默认为初始化时指定的类。可以设置为任意遵守 `CYLTabBarItemAnimationViewProviding` 的类（例如测试替身）；设为 nil
+ * [CN] 视图的来源（依赖注入）：默认为初始化时传入的类。可以设置为任意遵守 `CYLTabBarItemAnimationViewProviding` 的类（例如测试替身）；设为 nil
  *      恢复默认。
  */
 @property (nonatomic, null_resettable) Class<CYLTabBarItemAnimationViewProviding> viewProvider;

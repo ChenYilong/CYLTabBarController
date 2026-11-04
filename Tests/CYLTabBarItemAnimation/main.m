@@ -194,7 +194,7 @@ int main(void) {
                                                                                  attributeKeys:@{ CYLTabBarAnimationURL : CYLTabBarRiveURL,
                                                                                                   CYLTabBarAnimationSize : CYLTabBarRiveSize,
                                                                                                   CYLTabBarAnimationDarkURL : CYLTabBarRiveDarkURL }
-                                                                         viewProviderClassName:@"CYLTestRiveView"];
+                                                                                  viewProvider:[CYLTestRiveView class]];
         CYLRegisterAll(rive);
         CHECK([[[CYLTabBarItemAnimatorRegistry animators] valueForKey:@"identifier"] isEqual:(@[ @"Rive", @"PAG", @"Lottie" ])],
               "lookup order: priority, then registration order; Lottie (the fallback) last");
@@ -265,6 +265,11 @@ int main(void) {
         CHECK([CYLLastRiveView.fileURL isEqual:riv], "the provider gets the file without its options");
         CHECK([CYLLastRiveView.options isEqual:options], "the options round-trip, including '/', '&', '=', '#' and spaces");
         CHECK(view.frame.size.width == 32 && view.frame.size.height == 32, "the view animator sets the view's size");
+        CYLTabBarItemViewAnimator *noProvider = [[CYLTabBarItemViewAnimator alloc] initWithIdentifier:@"None"
+                                                                                       fileExtensions:@[ @"none" ]
+                                                                                        attributeKeys:nil
+                                                                                         viewProvider:(Class<CYLTabBarItemAnimationViewProviding>)[CYLTestNotAProvider class]];
+        CHECK(noProvider.viewProvider == nil, "a class given at initialization that does not adopt the protocol is refused");
         id<CYLTabBarItemAnimationPlayer> player = [rive playerForAnimationView:view];
         [player play];
         [player stop];

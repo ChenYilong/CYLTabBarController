@@ -97,7 +97,7 @@ struct CYLRiveTabBarItemAnimationConfiguration {
  *      只显示、不播放。它不接收触摸，由 Tab 按钮接收。
  */
 @objc(CYLRiveTabBarItemAnimationView)
-final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding {
+public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding {
 
     /// [EN] The view model color property set by `lightColor`. [CN] `lightColor` 所设置的 view model 颜色属性。
     private static let colorPropertyPath = "color"
@@ -121,22 +121,23 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayab
 
     // MARK: - [EN] CYLTabBarItemAnimationViewProviding [CN] 视图工厂接口
 
-    /// [EN] The renderer for `legacy` options (another strategy of the same interface); injectable. The default is
-    ///      resolved by name only: it is deprecated with the legacy API it uses, and naming it here would warn.
-    /// [CN] `legacy` 选项使用的渲染器（同一接口的另一个策略），可注入。默认值只按名称解析：它与其使用的旧版 API 一起标记为废弃，
-    ///      在这里直接引用会产生警告。
-    static var legacyProvider: CYLTabBarItemAnimationViewProviding.Type? =
-        NSClassFromString("CYLRiveLegacyTabBarItemAnimationView") as? CYLTabBarItemAnimationViewProviding.Type
+    /// [EN] The renderer for `legacy` options (another strategy of the same interface), a class adopting
+    ///      `CYLTabBarItemAnimationViewProviding`. Injected by the composition root, `CYLRiveTabBarItemAnimator`, which
+    ///      passes `CYLRiveLegacyTabBarItemAnimationView`; nil: `legacy` options show nothing.
+    /// [CN] `legacy` 选项使用的渲染器（同一接口的另一个策略），为遵守 `CYLTabBarItemAnimationViewProviding` 的类。由组合根
+    ///      `CYLRiveTabBarItemAnimator` 注入（传入 `CYLRiveLegacyTabBarItemAnimationView`）；nil 表示 `legacy` 选项不显示内容。
+    @objc public static var legacyViewProvider: AnyClass?
 
     /// [EN] Where the views made by `makeAnimationView` load their files; injectable (e.g. a bundle or a download).
     /// [CN] `makeAnimationView` 创建的视图从哪里加载文件；可注入（例如 bundle 或下载）。
     static var fileProvider: CYLRiveTabBarItemAnimationFileProviding = CYLRiveTabBarItemAnimationFileCache.shared
 
-    static func makeAnimationView(fileURL: URL, options: [String: String], contentMode: UIView.ContentMode) -> (UIView & CYLTabBarItemAnimationPlayableView)? {
+    public static func makeAnimationView(fileURL: URL, options: [String: String], contentMode: UIView.ContentMode) -> (UIView & CYLTabBarItemAnimationPlayableView)? {
         let configuration = CYLRiveTabBarItemAnimationConfiguration(fileURL: fileURL, options: options)
         if configuration.usesLegacyRuntime {
             // [EN] Another implementation of the same interface (strategy), chosen by the options.
             // [CN] 同一接口的另一个实现（策略），根据选项选择。
+            let legacyProvider = legacyViewProvider as? CYLTabBarItemAnimationViewProviding.Type
             return legacyProvider?.makeAnimationView(fileURL: fileURL, options: options, contentMode: contentMode)
         }
         let view = CYLRiveTabBarItemAnimationView(configuration: configuration, fileProvider: fileProvider)
@@ -158,12 +159,12 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayab
     }
 
     /// [EN] Not used from Interface Builder. [CN] 不支持从 Interface Builder 创建。
-    required init?(coder _: NSCoder) {
+    public required init?(coder _: NSCoder) {
         return nil
     }
 
-    /// [EN] `lottieAnimationViewContentMode` -> Rive's fit. [CN] `lottieAnimationViewContentMode` 对应 Rive 的 fit。
-    override var contentMode: UIView.ContentMode {
+    /// [EN] `tabBarItemAnimationViewContentMode` -> Rive's fit. [CN] `tabBarItemAnimationViewContentMode` 对应 Rive 的 fit。
+    override public var contentMode: UIView.ContentMode {
         didSet {
             rive?.fit = Self.fit(for: contentMode)
         }
@@ -173,7 +174,7 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayab
 
     /// [EN] Plays once: sets the boolean to true, then false after `activeDuration`; or fires the trigger.
     /// [CN] 播放一次：把布尔属性设为 true，`activeDuration` 后设为 false；或触发 trigger。
-    func playAnimation() {
+    public func playAnimation() {
         guard isLoaded else {
             playsWhenLoaded = true
             return
@@ -204,12 +205,12 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayab
 
     /// [EN] A state machine has no last frame: the icon stays in its resting state (the tab selected at launch, #389).
     /// [CN] 状态机没有最后一帧：图标保持静止状态（启动时选中的 Tab，#389）。
-    func showAnimationLastFrame() {
+    public func showAnimationLastFrame() {
         stopAnimation()
     }
 
     /// [EN] Stops: the boolean goes back to false. [CN] 停止：布尔属性恢复为 false。
-    func stopAnimation() {
+    public func stopAnimation() {
         playsWhenLoaded = false
         deactivateTask?.cancel()
         deactivateTask = nil
@@ -220,7 +221,7 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayab
     }
 
     /// [EN] Color property path -> color (Dark Mode); nil restores the light colors. [CN] 颜色属性路径 -> 颜色（深色模式）；nil 恢复浅色颜色。
-    func applyAnimationColors(_ colors: [String: UIColor]?) {
+    public func applyAnimationColors(_ colors: [String: UIColor]?) {
         requestedColors = colors
         if isLoaded {
             enqueueRequestedColors()

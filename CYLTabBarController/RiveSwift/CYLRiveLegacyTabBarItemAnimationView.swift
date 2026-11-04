@@ -21,7 +21,7 @@ import RiveRuntime
 
 @available(*, deprecated, message: "Wraps Rive's legacy API for .riv files without a view model; created only through CYLTabBarItemAnimationViewProviding.")
 @objc(CYLRiveLegacyTabBarItemAnimationView)
-final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding {
+public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding {
 
     private let configuration: CYLRiveTabBarItemAnimationConfiguration
     private let viewModel: RiveViewModel
@@ -29,7 +29,7 @@ final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAnimation
 
     // MARK: - [EN] CYLTabBarItemAnimationViewProviding [CN] 视图工厂接口
 
-    static func makeAnimationView(fileURL: URL, options: [String: String], contentMode: UIView.ContentMode) -> (UIView & CYLTabBarItemAnimationPlayableView)? {
+    public static func makeAnimationView(fileURL: URL, options: [String: String], contentMode: UIView.ContentMode) -> (UIView & CYLTabBarItemAnimationPlayableView)? {
         let configuration = CYLRiveTabBarItemAnimationConfiguration(fileURL: fileURL, options: options)
         guard fileURL.isFileURL,
               let data = try? Data(contentsOf: fileURL),
@@ -85,12 +85,12 @@ final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAnimation
     }
 
     /// [EN] Not used from Interface Builder. [CN] 不支持从 Interface Builder 创建。
-    required init?(coder _: NSCoder) {
+    public required init?(coder _: NSCoder) {
         return nil
     }
 
-    /// [EN] `lottieAnimationViewContentMode` -> Rive's fit. [CN] `lottieAnimationViewContentMode` 对应 Rive 的 fit。
-    override var contentMode: UIView.ContentMode {
+    /// [EN] `tabBarItemAnimationViewContentMode` -> Rive's fit. [CN] `tabBarItemAnimationViewContentMode` 对应 Rive 的 fit。
+    override public var contentMode: UIView.ContentMode {
         didSet {
             switch contentMode {
             case .scaleToFill: viewModel.fit = .fill
@@ -104,7 +104,7 @@ final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAnimation
 
     /// [EN] Fires the trigger, sets the input to YES (back to NO after the duration, unless it is 0), or plays the animation.
     /// [CN] 触发 trigger、把输入设为 YES（经过指定时长后恢复为 NO，时长为 0 时保持），或播放动画。
-    func playAnimation() {
+    public func playAnimation() {
         if let animationName = configuration.animationName {
             viewModel.play(animationName: animationName)
             return
@@ -132,12 +132,12 @@ final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAnimation
     }
 
     /// [EN] The resting state, without playing (#389). [CN] 静止状态，不播放（#389）。
-    func showAnimationLastFrame() {
+    public func showAnimationLastFrame() {
         stopAnimation()
     }
 
     /// [EN] The input goes back to NO; an animation stops. [CN] 输入恢复为 NO；动画停止。
-    func stopAnimation() {
+    public func stopAnimation() {
         deactivateTask?.cancel()
         deactivateTask = nil
         if configuration.animationName != nil {

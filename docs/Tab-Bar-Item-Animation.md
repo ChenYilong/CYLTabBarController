@@ -236,12 +236,13 @@ factory.player(for: view)?.play()
 
 ```objc
 // CYLTabBarItemAnimation/Rive/CYLRiveTabBarItemAnimator.m — the registration is all the Objective-C there is.
-// 注册就是全部的 Objective-C 代码。
+// The Swift view classes come from the generated CYLTabBarController-Swift.h, so the compiler checks them (no string lookup).
+// 注册就是全部的 Objective-C 代码。Swift 视图类来自生成的 CYLTabBarController-Swift.h，由编译器检查（不按字符串查找）。
 + (CYLTabBarItemViewAnimator *)animator {
     … [[CYLTabBarItemViewAnimator alloc] initWithIdentifier:@"Rive"
                                              fileExtensions:@[ @"riv" ]
                                               attributeKeys:@{ CYLTabBarAnimationURL : CYLTabBarRiveURL, … }
-                                      viewProviderClassName:@"CYLRiveTabBarItemAnimationView"] …
+                                               viewProvider:[CYLRiveTabBarItemAnimationView class]] …
 }
 #if __has_include(<RiveRuntime/RiveRuntime.h>)
 + (void)load { [CYLTabBarItemAnimatorRegistry registerAnimator:self.animator]; }

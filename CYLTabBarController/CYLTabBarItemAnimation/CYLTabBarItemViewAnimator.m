@@ -99,7 +99,8 @@ static NSURL *CYLTabBarItemAnimationFileURLFromURL(NSURL *URL) {
     NSString *_identifier;
     NSArray<NSString *> *_fileExtensions;
     NSDictionary<NSString *, NSString *> *_attributeKeys;
-    NSString *_viewProviderClassName;
+    /// [EN] The class given at initialization. [CN] 初始化时传入的类。
+    Class<CYLTabBarItemAnimationViewProviding> _defaultViewProvider;
     /// [EN] The injected provider; nil: the default. [CN] 注入的 provider；nil 表示默认值。
     Class<CYLTabBarItemAnimationViewProviding> _injectedViewProvider;
 }
@@ -107,7 +108,7 @@ static NSURL *CYLTabBarItemAnimationFileURLFromURL(NSURL *URL) {
 - (instancetype)initWithIdentifier:(NSString *)identifier
                     fileExtensions:(NSArray<NSString *> *)fileExtensions
                      attributeKeys:(NSDictionary<NSString *, NSString *> *)attributeKeys
-             viewProviderClassName:(NSString *)viewProviderClassName {
+                      viewProvider:(Class<CYLTabBarItemAnimationViewProviding>)viewProvider {
     if (self = [super init]) {
         _identifier = [identifier copy];
         NSMutableArray<NSString *> *extensions = [NSMutableArray arrayWithCapacity:fileExtensions.count];
@@ -116,7 +117,7 @@ static NSURL *CYLTabBarItemAnimationFileURLFromURL(NSURL *URL) {
         }
         _fileExtensions = [extensions copy];
         _attributeKeys = [attributeKeys copy] ?: @{};
-        _viewProviderClassName = [viewProviderClassName copy];
+        _defaultViewProvider = [viewProvider conformsToProtocol:@protocol(CYLTabBarItemAnimationViewProviding)] ? viewProvider : nil;
     }
     return self;
 }
@@ -125,9 +126,7 @@ static NSURL *CYLTabBarItemAnimationFileURLFromURL(NSURL *URL) {
     if (_injectedViewProvider) {
         return _injectedViewProvider;
     }
-    // [EN] The default: the named class, only when it adopts the protocol. [CN] 默认值：指定的类，且仅在其遵守协议时使用。
-    Class candidate = NSClassFromString(_viewProviderClassName);
-    return [candidate conformsToProtocol:@protocol(CYLTabBarItemAnimationViewProviding)] ? candidate : nil;
+    return _defaultViewProvider;
 }
 
 - (void)setViewProvider:(Class<CYLTabBarItemAnimationViewProviding>)viewProvider {
