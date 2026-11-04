@@ -10,6 +10,8 @@
 // [CN] 与此类绑定的文档：
 //   - One configuration file, one TabBarController / 一个配置文件生成 TabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Configuration-File.md
+//   - Configuration scripts: export, edge cases and tests / 配置文件相关脚本：导出、边界情况与测试
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Configuration-Scripts.md
 // docs-binding:end
 
 #import <Foundation/Foundation.h>

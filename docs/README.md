@@ -17,6 +17,7 @@
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
 | [一个配置文件生成 TabBarController](Configuration-File.md) | [One configuration file, one TabBarController](Configuration-File.md) |
+| [配置文件相关脚本：导出、边界情况与测试](Configuration-Scripts.md) | [Configuration scripts: export, edge cases and tests](Configuration-Scripts.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
@@ -51,6 +52,7 @@ docs/
 ├── Carthage-Example.md
 ├── Carthage.md
 ├── Configuration-File.md
+├── Configuration-Scripts.md
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
 ├── Image-Only-Tabs.md

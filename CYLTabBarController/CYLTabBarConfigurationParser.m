@@ -1156,7 +1156,19 @@ static NSUInteger CYLYAMLKeyColonLocation(NSString *text) {
         }
         self.index++;
     }
-    NSArray<NSString *> *parts = CYLSplitDottedKey([self.text substringWithRange:NSMakeRange(start, self.index - start)]);
+    NSString *raw = [self.text substringWithRange:NSMakeRange(start, self.index - start)];
+    NSArray<NSString *> *parts = CYLSplitDottedKey(raw);
+    if (parts && [raw rangeOfString:@"\""].location == NSNotFound && [raw rangeOfString:@"'"].location == NSNotFound) {
+        // Bare keys only (A17): `[1, 2]` is not a table. 仅裸键（A17）：`[1, 2]` 不是表。
+        NSCharacterSet *bare = [[NSCharacterSet characterSetWithCharactersInString:
+                                 @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"] invertedSet];
+        for (NSString *part in parts) {
+            if ([part rangeOfCharacterFromSet:bare].location != NSNotFound) {
+                parts = nil;
+                break;
+            }
+        }
+    }
     if (!parts) {
         [self fail:@"invalid key"];
     }
@@ -2325,7 +2337,12 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
     // The extension or Content-Type was wrong (e.g. YAML in a .json file): detect the format and try again (A7).
     // 扩展名或 Content-Type 有误（例如 .json 文件中是 YAML）：根据内容识别格式并重试（A7）。
     CYLTabBarConfigurationFormat detected = [self formatBySniffingData:data];
-    if (detected != CYLTabBarConfigurationFormatUnknown && detected != format) {
+    // Never retry as .properties, INI or Protobuf text: they accept almost any `key value` text, so a syntax error of
+    // the declared format would come back as a meaningless dictionary instead of its error (A17).
+    // 不以 .properties、INI 或 Protobuf 文本重试：它们几乎接受任何 `key value` 文本，原格式的语法错误会变成毫无意义的字典，而不是错误（A17）。
+    BOOL distinctive = detected != CYLTabBarConfigurationFormatProperties && detected != CYLTabBarConfigurationFormatINI &&
+                       detected != CYLTabBarConfigurationFormatProtobufText;
+    if (detected != CYLTabBarConfigurationFormatUnknown && detected != format && distinctive) {
         dictionary = [self cyl_dictionaryWithData:data format:detected error:NULL];
         if (dictionary) {
 #if defined(DEBUG) || defined(BETA)
