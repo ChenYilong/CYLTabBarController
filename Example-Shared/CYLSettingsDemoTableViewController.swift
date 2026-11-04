@@ -60,11 +60,17 @@ class CYLSettingsDemoTableViewController: UITableViewController {
         tableView.reloadData()
     }
 
-    /// [EN] A table header keeps the frame it is given: size it to fit the table's width. [CN] 表头保持设置的 frame：按列表宽度计算其大小。
+    /// [EN] A table header keeps the frame it is given: size it to fit the table's width. Called from
+    ///      `viewDidLayoutSubviews`, so it changes the header only when something changed: setting it lays the table out
+    ///      again, which would call this again, forever.
+    /// [CN] 表头保持设置的 frame：按列表宽度计算其大小。由 `viewDidLayoutSubviews` 调用，因此只在有变化时才修改表头：设置表头会让列表
+    ///      重新布局并再次调用这里，导致无限循环。
     private func layoutHeaderView() {
         guard isViewLoaded else { return }
         guard let headerView = headerView else {
-            tableView.tableHeaderView = nil
+            if tableView.tableHeaderView != nil {
+                tableView.tableHeaderView = nil
+            }
             return
         }
         let width = tableView.bounds.width
