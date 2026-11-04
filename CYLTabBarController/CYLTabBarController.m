@@ -6456,6 +6456,7 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
 - (void)expandTabBar;
 - (void)restoreTabBar;
 - (void)restoreTabBarForReason:(NSString *)reason;
+- (void)observeTapsInView:(UIView *)view;
 - (UIScrollView *)scrollViewForSelectedViewController:(UIViewController *)selectedViewController;
 - (void)validateHideSession;
 - (void)appDidRequestTabBarHidden:(BOOL)hidden;
@@ -6496,6 +6497,9 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     /// [EN] Observes a long press on the followed scroll view; never cancels or delays its touches.
     /// [CN] 观察所跟随滚动视图上的长按；从不取消或延迟其触摸。
     UILongPressGestureRecognizer *_longPressObserver;
+    /// [EN] Observes taps anywhere in the controller's view; never cancels or delays touches.
+    /// [CN] 观察控制器视图中任意位置的点击；从不取消或延迟触摸。
+    UITapGestureRecognizer *_tapObserver;
     CYLTabBarMinimizeBehavior _sessionBehavior;
     CYLTabBarMinimizeMode _sessionMode;
     /// [EN] YES while scroll hiding itself calls `-setTabBarHidden:animated:`. [CN] 滚动隐藏自己调用 `-setTabBarHidden:animated:` 期间为 YES。
@@ -6523,6 +6527,7 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
 
 - (void)dealloc {
     [_checkTimer invalidate];
+    [_tapObserver.view removeGestureRecognizer:_tapObserver];
     for (id<NSObject> observer in _notificationObservers) {
         [[NSNotificationCenter defaultCenter] removeObserver:observer];
     }
@@ -6871,6 +6876,44 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
     return YES;
+}
+
+#pragma mark Taps outside the content
+
+/// [EN] Attaches the tap observer to the controller's view (once). [CN] 将点击观察者加到控制器的视图上（只加一次）。
+- (void)observeTapsInView:(UIView *)view {
+    if (!view || _tapObserver.view == view) {
+        return;
+    }
+    if (!_tapObserver) {
+        _tapObserver = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(controllerViewTapped:)];
+        _tapObserver.cancelsTouchesInView = NO;
+        _tapObserver.delaysTouchesBegan = NO;
+        _tapObserver.delaysTouchesEnded = NO;
+        _tapObserver.delegate = self;
+    }
+    [_tapObserver.view removeGestureRecognizer:_tapObserver];
+    [view addGestureRecognizer:_tapObserver];
+}
+
+/*!
+ * [EN] While the bar is hidden or minimized, a tap outside the followed scroll view (a navigation bar button, a button
+ *      with a UIMenu, a segmented control in a header, the search field) is not reading: it ends the session and shows
+ *      the bar. Taps inside the content (e.g. a like button in a post) keep it hidden, as in the Facebook app. The
+ *      observer runs alongside every other recognizer and never cancels or delays touches.
+ * [CN] TabBar 被隐藏或缩小期间，在所跟随滚动视图之外的点击（导航栏按钮、带 UIMenu 的按钮、头部的分段控件、搜索框）不是浏览：
+ *      结束会话并显示 TabBar。内容中的点击（例如帖子里的点赞按钮）保持隐藏，与 Facebook App 一致。该观察者与其他手势同时识别，
+ *      从不取消或延迟触摸。
+ */
+- (void)controllerViewTapped:(UITapGestureRecognizer *)recognizer {
+    if (UIGestureRecognizerStateEnded != recognizer.state || ![self isTabBarHiddenOrMinimizedByScroll]) {
+        return;
+    }
+    UIScrollView *scrollView = self.scrollView;
+    if (scrollView && [scrollView pointInside:[recognizer locationInView:scrollView] withEvent:nil]) {
+        return;
+    }
+    [self restoreTabBarForReason:@"tap outside the content (navigation bar, menu button, header)"];
 }
 
 #pragma mark Scroll view lookup
@@ -7434,6 +7477,7 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
         objc_setAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey, tracker, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     [tracker updateMode:mode];
+    [tracker observeTapsInView:self.viewIfLoaded];
     UIScrollView *scrollView = [tracker scrollViewForSelectedViewController:self.selectedViewController];
     if (scrollView != tracker.scrollView) {
         // [EN] Another tab or page is on screen: show the tab bar again, as the system does.

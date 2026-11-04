@@ -70,6 +70,14 @@
     
     [self.navigationItem.leftBarButtonItem setTintColor:UIColor.redColor];
     [self.navigationItem.rightBarButtonItem setTintColor:UIColor.redColor];
+    // [EN] Issue #13: a navigation bar button with a UIMenu, for the "Manual: tap a navigation bar button" simulation
+    //      (a tap outside the content ends the scroll hiding session). Appended, so `rightBarButtonItem` is unchanged.
+    // [CN] issue #13：带 UIMenu 的导航栏按钮，用于“手动：点击导航栏按钮”模拟（在内容之外的点击会结束滚动隐藏会话）。追加在末尾，
+    //      `rightBarButtonItem` 不变。
+    UIAction *menuAction = [UIAction actionWithTitle:@"#13" image:nil identifier:nil handler:^(__kindof UIAction *action) {}];
+    UIBarButtonItem *menuItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"ellipsis.circle"]
+                                                                  menu:[UIMenu menuWithTitle:@"" children:@[ menuAction ]]];
+    self.navigationItem.rightBarButtonItems = [self.navigationItem.rightBarButtonItems arrayByAddingObject:menuItem];
     
     // ✅ iOS 26修复方案
     
