@@ -1942,6 +1942,10 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
  */
 + (nullable NSURLSessionDataTask *)loadTabBarControllerWithConfigurationURL:(NSURL *)URL
                                                                  completion:(CYLTabBarControllerConfigurationCompletion)completion;
+
+@end
+
+/*!
  * [EN] Built-in actions for tapping the selected tab again (a "reselect"). See docs/Tab-Reselect.md.
  *
  *          tabBarController.cyl_reselectBehavior = CYLTabBarReselectBehaviorPopToRootThenScrollToTop;

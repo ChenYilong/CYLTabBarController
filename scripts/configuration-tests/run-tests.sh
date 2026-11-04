@@ -19,6 +19,11 @@ SAMPLES="$SOURCES/Resources/CYLTabBarController.bundle/Configurations"
 WORK=$(mktemp -d "${TMPDIR:-/tmp}/cyl-configuration-tests.XXXXXX")
 trap 'rm -rf "$WORK"' EXIT
 
+echo "== Comment blocks 注释块"
+# A merge that loses a "/*!" leaves comment lines as code: a compile error that is easy to miss.
+# 合并时丢失 "/*!" 会让注释行变成代码：一个容易被忽略的编译错误。
+python3 "$ROOT/scripts/check-comment-blocks.py"
+
 echo "== Fixtures 测试文件"
 python3 "$HERE/make-fixtures.py" "$WORK/fixtures"
 

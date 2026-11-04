@@ -20,6 +20,7 @@
 | `scripts/export-tabbar-configurations.py` | 在 Objective-C / Swift 源码中找到 TabBar 配置，导出为 12 种格式的配置文件 | Finds the tab bar configuration in Objective-C / Swift sources and exports it as configuration files, in 12 formats |
 | `scripts/configuration-edge-cases.py` | 边界情况清单、每轮评分，并生成 Configuration-File.md 中的表格 | The edge-case checklist, the score of each round, and the table of Configuration-File.md |
 | `scripts/configuration-tests/run-tests.sh` | 解析器测试：示例文件、边界情况文件、所有 Example 导出的文件 | The parser's tests: the sample files, the edge-case files, the files exported from every Example |
+| `scripts/check-comment-blocks.py` | 查找丢失了 `/*!` 开头的注释块（合并冲突的常见后果），`run-tests.sh` 会先运行它 | Finds comment blocks that lost their `/*!` opener (a common result of a merge), run first by `run-tests.sh` |
 
 ## [CN]目录
 ## [EN]Contents
@@ -37,6 +38,7 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [推荐用法](#cn推荐用法) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Recommended setup](#enrecommended-setup) |
 | [边界情况清单与评分：configuration-edge-cases.py](#cn边界情况清单与评分configuration-edge-casespy) | [Edge-case checklist and score: configuration-edge-cases.py](#enedge-case-checklist-and-score-configuration-edge-casespy) |
 | [解析器测试：configuration-tests/run-tests.sh](#cn解析器测试configuration-testsrun-testssh) | [Parser tests: configuration-tests/run-tests.sh](#enparser-tests-configuration-testsrun-testssh) |
+| [注释块检查：check-comment-blocks.py](#cn注释块检查check-comment-blockspy) | [Comment block check: check-comment-blocks.py](#encomment-block-check-check-comment-blockspy) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
 <!-- navigation:end -->
@@ -193,6 +195,18 @@ scripts/configuration-tests/run-tests.sh
 |:---|:---|
 | 新增测试文件：在 `make-fixtures.py` 中调用 `add(文件名, 内容, 预期, 编号, equals=..., values={...})`，预期为 `'dictionary'` 或错误码（如 `TOO_DEEP`）。 | To add a test file: call `add(name, content, expected, ID, equals=..., values={...})` in `make-fixtures.py`; expected is `'dictionary'` or an error code (e.g. `TOO_DEEP`). |
 | 固化测试后第一次运行就发现了第 4 轮的回归（A17：扩展名重试掩盖语法错误），已修复：这正是保留测试套件的意义。 | The first run of the kept test suite found a regression of round 4 (A17: the extension retry hid syntax errors), now fixed: that is why the suite is kept. |
+
+## [CN]注释块检查：check-comment-blocks.py
+## [EN]Comment block check: check-comment-blocks.py
+
+```sh
+python3 scripts/check-comment-blocks.py                  # CYLTabBarController/ and every Example*/
+python3 scripts/check-comment-blocks.py path/to/File.h   # given files or folders 指定的文件或目录
+```
+
+| 中文 | English |
+|:---|:---|
+| 合并冲突时，如果两侧共用 `/*!` 这一行，而解决冲突时把两侧拼接起来，其中一个文档注释会丢失开头，剩下的 ` * [EN] ...` 行就成了头文件中的普通文本：编译错误，但在审查中很难看出。本脚本列出所有注释之外、以 `*` 开头的行，存在时返回 1。本 PR 合并 master 时就发生过一次（`daa4c89`，28 行），已修复，并由此加入这个检查；`run-tests.sh` 会先运行它。 | When both sides of a merge conflict share a `/*!` line and the conflict is resolved by joining the two sides, one documentation comment loses its opener, and its remaining ` * [EN] ...` lines become plain text in the header: a compile error that is hard to see in review. This script lists every line outside a comment that starts with `*`, and exits 1 when there is one. It happened once in this PR when merging master (`daa4c89`, 28 lines); it was fixed, and the check was added for it; `run-tests.sh` runs it first. |
 
 ## [CN]测试与截图
 ## [EN]Testing and screenshots
