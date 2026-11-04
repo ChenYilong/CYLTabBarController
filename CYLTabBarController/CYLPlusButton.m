@@ -112,6 +112,12 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 /// [EN] Issue #91: the overlay of `showsTouchableArea`, in the superview, under the plus button.
 /// [CN] 可点击区域的调试覆盖层。
 @property (nonatomic, strong, nullable) UIView *cyl_touchableAreaView;
+/// [EN] Issue #152: the view controller selected on the last touch down, and whether there was one.
+/// [CN] Issue #152：上次手指按下时选中的控制器，以及是否有按下。
+@property (nonatomic, weak, nullable) UIViewController *cyl_selectedViewControllerAtTouchDown;
+@property (nonatomic, assign) BOOL cyl_hasTouchDownForTabBarItemGesture;
+- (void)cyl_tabBarItemGestureTouchDown;
+- (void)cyl_tabBarItemGestureTouchUpInside;
 
 @end
 
@@ -119,6 +125,8 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 // `-setSelectedIndex:` (see `-plusChildViewControllerButtonClicked:`).
 @interface CYLTabBarController (CYLPlusButtonSelection)
 - (UIControl *)cyl_plusButtonControlIfSelectingPlusChildViewController:(UIViewController *)viewController;
+// FIX: issue #152 — implemented in CYLTabBarController.m (`CYLTabBarController (CYLTabBarItemGesture)`).
+- (void)cyl_recognizePlusButtonTap:(UIControl *)plusButton selectedViewControllerAtTouchDown:(nullable UIViewController *)selectedViewController;
 #if CYL_FLATDESIGN_AVAILABLE
 // FIX: issue #610 — implemented in CYLTabBarController.m.
 - (void)cyl_flatDesignReportDidSelectControl:(UIControl *)control;
@@ -928,7 +936,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         target = plusButton;
         selectorNamesArray = [plusButton actionsForTarget:target forControlEvent:UIControlEventTouchUpInside];
     }
+    // [EN] FIX: issue #152 — keep the tab bar item gesture action (`-cyl_tabBarItemGestureTouchUpInside`).
+    // [CN] 保留 TabBarItem 手势的事件（`-cyl_tabBarItemGestureTouchUpInside`）。
+    NSString *gestureAction = NSStringFromSelector(@selector(cyl_tabBarItemGestureTouchUpInside));
     [selectorNamesArray enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isEqualToString:gestureAction]) {
+            return;
+        }
         SEL selector =  NSSelectorFromString(obj);
         [plusButton removeTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
     }];
@@ -1159,6 +1173,38 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
 - (void)didMoveToSuperview {
     [super didMoveToSuperview];
     [self cyl_updateTouchableAreaView];
+    [self cyl_addTabBarItemGestureTargetsIfNeeded];
+}
+
+#pragma mark - Tab bar item gestures (issue #152)
+
+/*!
+ * [EN] Issue #152: the plus button reports its taps for the tab bar item gestures itself, the same way in every style.
+ *      The actions only record and forward; they change nothing else, and are added once.
+ * [CN] Issue #152：PlusButton 自己为 TabBarItem 手势上报点击，所有样式方式一致。这些事件只记录与转发，不改变其他行为，只添加一次。
+ */
+- (void)cyl_addTabBarItemGestureTargetsIfNeeded {
+    NSString *touchUpInside = NSStringFromSelector(@selector(cyl_tabBarItemGestureTouchUpInside));
+    if ([[self actionsForTarget:self forControlEvent:UIControlEventTouchUpInside] containsObject:touchUpInside]) {
+        return;
+    }
+    [self addTarget:self action:@selector(cyl_tabBarItemGestureTouchDown) forControlEvents:UIControlEventTouchDown];
+    [self addTarget:self action:@selector(cyl_tabBarItemGestureTouchUpInside) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)cyl_tabBarItemGestureTouchDown {
+    self.cyl_selectedViewControllerAtTouchDown = [self cyl_owningTabBarController].selectedViewController;
+    self.cyl_hasTouchDownForTabBarItemGesture = YES;
+}
+
+- (void)cyl_tabBarItemGestureTouchUpInside {
+    UIViewController *selectedViewController = self.cyl_hasTouchDownForTabBarItemGesture ? self.cyl_selectedViewControllerAtTouchDown : nil;
+    self.cyl_hasTouchDownForTabBarItemGesture = NO;
+    self.cyl_selectedViewControllerAtTouchDown = nil;
+    CYLTabBarController *tabBarController = [self cyl_owningTabBarController];
+    if ([tabBarController respondsToSelector:@selector(cyl_recognizePlusButtonTap:selectedViewControllerAtTouchDown:)]) {
+        [tabBarController cyl_recognizePlusButtonTap:self selectedViewControllerAtTouchDown:selectedViewController];
+    }
 }
 
 - (void)removeFromSuperview {

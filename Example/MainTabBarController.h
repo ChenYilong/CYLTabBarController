@@ -62,3 +62,15 @@
 - (void)cyl_demo_presentLoginForViewController:(UIViewController *)viewController completion:(CYLTabBarLoginCompletion)completion;
 
 @end
+
+/*!
+ * [EN] #152 demo: what the tab bar item gestures do in the demos. Reselect scrolls the page to the top, DoubleTap calls
+ *      its `-refresh` (as Weibo does), LongPress shows an action sheet. MainTabBarController calls it from
+ *      `cyl_tabBarItemGestureHandler` (block API), CYLFlatDesignMainTabBarController from the delegate method.
+ * [CN] #152 演示：Demo 中 TabBarItem 手势的处理。Reselect 将页面滚动到顶部，DoubleTap 调用页面的 `-refresh`（像微博一样），
+ *      LongPress 弹出操作菜单。MainTabBarController 在 `cyl_tabBarItemGestureHandler`（block 方式）中调用，
+ *      CYLFlatDesignMainTabBarController 在代理方法中调用。
+ */
+@interface CYLTabBarController (CYLTabBarItemGestureDemo)
+- (void)cyl_demo_handleTabBarItemGesture:(CYLTabBarItemGesture)gesture control:(UIControl *)control viewController:(UIViewController *)viewController;
+@end

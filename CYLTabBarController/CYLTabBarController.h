@@ -23,6 +23,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
+//   - Tab bar item gestures: reselect, double tap and long press / TabBarItem 手势：再次点击、双击与长按
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBarItem-Gestures.md
 // docs-binding:end
 
 // [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
@@ -221,6 +223,41 @@ typedef void (^CYLTabBarLoginCompletion)(BOOL loggedIn);
  */
 FOUNDATION_EXTERN NSNotificationName const CYLTabBarLoginStateDidChangeNotification;
 
+/*!
+ * FIX: issue #152
+ * [EN] Gestures on a tab button or the plus button, reported by `cyl_tabBarItemGestureHandler` and
+ *      `-tabBarController:didRecognizeTabBarItemGesture:control:viewController:`, in every style (classic, Liquid Glass,
+ *      FlatDesign). See `CYLTabBarController (CYLTabBarItemGesture)` and docs/TabBarItem-Gestures.md.
+ *      - Reselect: a tap on the tab that is already selected (e.g. scroll to the top).
+ *      - DoubleTap: two taps on the same tab within `cyl_tabBarItemDoubleTapInterval` (e.g. refresh, as Weibo does). The
+ *        second tap is also a Reselect, reported first.
+ *      - LongPress: a long press began on the tab (e.g. a menu). The tab is still selected when the finger lifts.
+ * [CN] Tab 按钮或 PlusButton 上的手势，通过 `cyl_tabBarItemGestureHandler` 和
+ *      `-tabBarController:didRecognizeTabBarItemGesture:control:viewController:` 回调，适用于所有样式（经典、液态玻璃、扁平）。
+ *      见 `CYLTabBarController (CYLTabBarItemGesture)` 与 docs/TabBarItem-Gestures.md。
+ *      - Reselect：点击已选中的 Tab（例如滚动到顶部）。
+ *      - DoubleTap：在 `cyl_tabBarItemDoubleTapInterval` 内连续两次点击同一个 Tab（例如像微博一样双击刷新）。第二次点击同时也是
+ *        Reselect，Reselect 先回调。
+ *      - LongPress：在 Tab 上开始长按（例如弹出菜单）。手指抬起时该 Tab 仍会被选中。
+ */
+typedef NS_ENUM(NSInteger, CYLTabBarItemGesture) {
+    CYLTabBarItemGestureReselect = 0,
+    CYLTabBarItemGestureDoubleTap,
+    CYLTabBarItemGestureLongPress,
+};
+
+/*!
+ * FIX: issue #152
+ * [EN] The block of `cyl_tabBarItemGestureHandler`. `control` is the tab button or the plus button; `viewController` is
+ *      its tab's view controller (the plus child view controller for the plus button), nil for a plus button without one.
+ * [CN] `cyl_tabBarItemGestureHandler` 的 block。`control` 为 Tab 按钮或 PlusButton；`viewController` 为对应 Tab 的控制器
+ *      （PlusButton 为其子控制器），没有子控制器的 PlusButton 为 nil。
+ */
+typedef void (^CYLTabBarItemGestureHandler)(CYLTabBarController *tabBarController,
+                                            CYLTabBarItemGesture gesture,
+                                            UIControl *control,
+                                            UIViewController *_Nullable viewController);
+
 @protocol CYLTabBarControllerDelegate <NSObject, UITabBarControllerDelegate>
 @optional
 
@@ -259,7 +296,19 @@ presentLoginForViewController:(UIViewController *)viewController
  * [CN] 选中控件变化后回调，无论是用户点击还是代码切换。与 -tabBar:didSelectItem: 不同，control 可能是 PlusButton。
  */
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
-//- (void)tabBarController:(CYLTabBarController *)tabBarController didLongPressControl:(UIControl *)control;
+
+/*!
+ * FIX: issue #152
+ * [EN] A gesture on a tab button or the plus button: Reselect, DoubleTap or LongPress (see `CYLTabBarItemGesture`).
+ *      Called after `cyl_tabBarItemGestureHandler`, when both are set. Implementing it is enough to receive long presses.
+ * [CN] Tab 按钮或 PlusButton 上的手势：Reselect、DoubleTap 或 LongPress（见 `CYLTabBarItemGesture`）。两者都设置时，在
+ *      `cyl_tabBarItemGestureHandler` 之后调用。实现该方法即可接收长按。
+ */
+- (void)tabBarController:(CYLTabBarController *)tabBarController
+didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
+                 control:(UIControl *)control
+          viewController:(nullable UIViewController *)viewController
+    NS_SWIFT_NAME(tabBarController(_:didRecognize:control:viewController:));
 
 /*!
  * [EN] Asks whether the Liquid Glass lens (selection bubble) should be shown for `control`. Default: NO without Liquid Glass; NO when the plus child view controller is selected and the plus button is not centered; otherwise YES.
@@ -969,6 +1018,52 @@ presentLoginForViewController:(UIViewController *)viewController
  *      自身时，在其 `-tabBarController:shouldSelectViewController:` 开头调用（见上）。
  */
 - (BOOL)cyl_interceptLoginIfNeededForViewController:(UIViewController *)viewController NS_SWIFT_NAME(cyl_interceptLoginIfNeeded(for:));
+
+@end
+
+/*!
+ * FIX: issue #152
+ * [EN] Gestures on the tab buttons and the plus button, as a block and as a delegate method (both can be used):
+ *
+ *          tabBarController.cyl_tabBarItemGestureHandler = ^(CYLTabBarController *tabBarController, CYLTabBarItemGesture gesture,
+ *                                                            UIControl *control, UIViewController *viewController) {
+ *              if (gesture == CYLTabBarItemGestureDoubleTap) { [viewController.cyl_getViewControllerInsteadOfNavigationController refresh]; }
+ *          };
+ *
+ *      Reselect and DoubleTap: a tap on a tab button is counted once, before the selection changes, in
+ *      `-tabBarController:shouldSelectViewController:` (classic and Liquid Glass: UIKit asks it for every user tap, on a
+ *      new or the selected tab, never for selection in code) or `-_cyltabBarItemClicked:` (FlatDesign). The plus button
+ *      (a CYLPlusButton) takes the same entry on `UIControlEventTouchUpInside`, with or without a child view controller,
+ *      so a double tap on it is reported too. This needs the tab bar controller as its own `delegate`, or a subclass
+ *      override that calls super; otherwise the taps reported to `-tabBarController:didSelectControl:` are used for the
+ *      tab buttons. LongPress comes from a long press
+ *      recognizer that is added only when a handler or the delegate method is there, and that never cancels other touches.
+ * [CN] Tab 按钮与 PlusButton 上的手势，提供 block 与代理方法两种方式（可同时使用），示例见上。
+ *      Reselect 与 DoubleTap：Tab 按钮的点击在选中变化之前计数一次，位于 `-tabBarController:shouldSelectViewController:`（经典与液态玻璃：
+ *      UIKit 对每次用户点击都会询问，无论新 Tab 还是已选中的 Tab，代码切换不会询问）或 `-_cyltabBarItemClicked:`（扁平样式）。PlusButton
+ *      （CYLPlusButton）在 `UIControlEventTouchUpInside` 时进入同一入口，有无子控制器均可，因此双击 PlusButton 同样会回调。这要求
+ *      TabBarController 的 `delegate` 为其自身，或子类重写时调用 super；否则 Tab 按钮使用上报给
+ *      `-tabBarController:didSelectControl:` 的点击。LongPress 来自长按手势，仅在设置了 block 或实现了代理方法时添加，且不会取消其他触摸。
+ */
+@interface CYLTabBarController (CYLTabBarItemGesture)
+
+/*!
+ * [EN] Called for every gesture, before the delegate method. nil (default): only the delegate method.
+ * [CN] 每个手势都会回调，先于代理方法。默认 nil：只回调代理方法。
+ */
+@property (nonatomic, copy, nullable, setter=cyl_setTabBarItemGestureHandler:) CYLTabBarItemGestureHandler cyl_tabBarItemGestureHandler;
+
+/*!
+ * [EN] The longest time between the two taps of a DoubleTap, in seconds. Default 0.35.
+ * [CN] DoubleTap 两次点击之间的最长间隔（秒）。默认 0.35。
+ */
+@property (nonatomic, assign, setter=cyl_setTabBarItemDoubleTapInterval:) NSTimeInterval cyl_tabBarItemDoubleTapInterval;
+
+/*!
+ * [EN] How long a press lasts before it is a LongPress, in seconds. Default 0.5.
+ * [CN] 按住多久算作 LongPress（秒）。默认 0.5。
+ */
+@property (nonatomic, assign, setter=cyl_setTabBarItemLongPressDuration:) NSTimeInterval cyl_tabBarItemLongPressDuration;
 
 @end
 
