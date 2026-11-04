@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowStandardAppearance,
     CYLSettingsRowLoginState,
     CYLSettingsRowPlusButtonTouchableArea,
+    CYLSettingsRowSelectedIndexIgnoringPlusButton, // FIX: issue #515
     CYLSettingsRowTabBarItemUpdate,     // then one row per tab item update, see UIViewController+CYLTabBarItemUpdate.h
 };
 
@@ -440,6 +441,49 @@ static UITableViewCell *CYLTouchableAreaCellForTableView(UITableView *tableView,
     return cell;
 }
 
+#pragma mark - selectedIndex and the plus button (issue #515)
+
+static NSString *const CYLSelectedIndexCellIdentifier = @"CYLSelectedIndexCell";
+
+/*!
+ * [EN] Issue #515 demo row: a tap selects the next tab with `cyl_selectedIndexIgnoringPlusButton`; the text shows that
+ *      index next to `selectedIndex`, which also counts the plus button's child view controller or placeholder.
+ * [CN] Issue #515 演示行：点击通过 `cyl_selectedIndexIgnoringPlusButton` 选中下一个 Tab；文字同时显示该下标与 `selectedIndex`
+ *      （后者还会计入 PlusButton 的子控制器或占位控制器）。
+ */
+static UITableViewCell *CYLSelectedIndexCell(UITableView *tableView, CYLTabBarController *_Nullable tabBarController) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLSelectedIndexCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLSelectedIndexCellIdentifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+        cell.detailTextLabel.numberOfLines = 0;
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"arrow.right.square"];
+        }
+    }
+    NSUInteger indexIgnoringPlusButton = tabBarController ? tabBarController.cyl_selectedIndexIgnoringPlusButton : NSNotFound;
+    NSUInteger selectedIndex = tabBarController ? tabBarController.selectedIndex : NSNotFound;
+    UIViewController *selectedViewController = [tabBarController.selectedViewController cyl_getViewControllerInsteadOfNavigationController];
+    NSString *title = selectedViewController.tabBarItem.title ?: tabBarController.selectedViewController.tabBarItem.title ?: @"-";
+    NSString *indexText = (indexIgnoringPlusButton == NSNotFound) ? @"-" : [NSString stringWithFormat:@"%@", @(indexIgnoringPlusButton)];
+    NSString *selectedIndexText = (selectedIndex == NSNotFound) ? @"-" : [NSString stringWithFormat:@"%@", @(selectedIndex)];
+    cell.textLabel.text = CYLLocalizedString(@"selectedIndex 与 PlusButton（issue #515）");
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@"), indexText, selectedIndexText, title];
+    return cell;
+}
+
+/// [EN] Selects the next tab, by its index without the plus button. [CN] 按不含 PlusButton 的下标选中下一个 Tab。
+static void CYLSelectNextTabIgnoringPlusButton(CYLTabBarController *_Nullable tabBarController) {
+    NSUInteger count = tabBarController.cyl_viewControllersIgnoringPlusButton.count;
+    if (!tabBarController || count == 0) {
+        return;
+    }
+    NSUInteger current = tabBarController.cyl_selectedIndexIgnoringPlusButton;
+    NSUInteger next = (current == NSNotFound) ? 0 : (current + 1) % count;
+    tabBarController.cyl_selectedIndexIgnoringPlusButton = next;
+}
+
 @implementation UIViewController (CYLSettingsSection)
 
 - (NSInteger)cyl_settingsRowCount {
@@ -470,6 +514,9 @@ static UITableViewCell *CYLTouchableAreaCellForTableView(UITableView *tableView,
     if (indexPath.row == CYLSettingsRowPlusButtonTouchableArea) {
         return CYLTouchableAreaCellForTableView(tableView, CYLSettingsTabBarController(self));
     }
+    if (indexPath.row == CYLSettingsRowSelectedIndexIgnoringPlusButton) {
+        return CYLSelectedIndexCell(tableView, CYLSettingsTabBarController(self));
+    }
     if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdate];
     }
@@ -493,6 +540,13 @@ static UITableViewCell *CYLTouchableAreaCellForTableView(UITableView *tableView,
     } else if (indexPath.row == CYLSettingsRowPlusButtonTouchableArea) {
         // [EN] The switch and the slider act on their own; a tap on the row does nothing.
         // [CN] 开关与滑块各自生效，点击该行不做处理。
+    } else if (indexPath.row == CYLSettingsRowSelectedIndexIgnoringPlusButton) {
+        // [EN] The tab changes, so this list may disappear; reload the row only while it is still shown.
+        // [CN] Tab 切换后本列表可能已不可见；仅在仍显示时刷新该行。
+        CYLSelectNextTabIgnoringPlusButton(CYLSettingsTabBarController(self));
+        if (tableView.window) {
+            [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+        }
     } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdate];
         // [EN] The rows show which changes are on (a checkmark).

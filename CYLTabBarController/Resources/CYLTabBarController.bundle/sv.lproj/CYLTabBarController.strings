@@ -201,3 +201,7 @@
 "子控件" = "Undervy";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Visa en TabBarController med ny kontext (PlusButton med en tryckbar X-undervy, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Tryck på X uppe till höger på PlusButton: X får en slumpmässig färg och PlusButton reagerar inte";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex och PlusButton (issue #515)";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Tryck för att välja nästa flik. Index utan PlusButton: %1$@, selectedIndex: %2$@, nu: %3$@";

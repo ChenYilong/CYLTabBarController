@@ -201,3 +201,7 @@
 "子控件" = "सबव्यू";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "नए संदर्भ वाला TabBarController पुश करें (टैप करने योग्य X सबव्यू वाला PlusButton, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "PlusButton के ऊपर दाईं ओर X पर टैप करें: X का रंग बेतरतीब बदलता है, PlusButton प्रतिक्रिया नहीं देता";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex और PlusButton (issue #515)";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "अगला टैब चुनने के लिए टैप करें। PlusButton के बिना इंडेक्स: %1$@, selectedIndex: %2$@, अभी: %3$@";

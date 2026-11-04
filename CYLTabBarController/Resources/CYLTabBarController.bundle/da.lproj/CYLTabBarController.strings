@@ -201,3 +201,7 @@
 "子控件" = "Delvisning";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Vis en TabBarController med en ny kontekst (PlusButton med en X-delvisning, der kan trykkes på, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Tryk på X øverst til højre på PlusButton: X skifter til en tilfældig farve, og PlusButton reagerer ikke";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex og PlusButton (issue #515)";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Tryk for at vælge næste fane. Indeks uden PlusButton: %1$@, selectedIndex: %2$@, nu: %3$@";

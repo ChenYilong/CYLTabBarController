@@ -201,3 +201,7 @@
 "子控件" = "Alnézet";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "TabBarController megjelenítése új környezettel (PlusButton koppintható X alnézettel, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Koppints a PlusButton jobb felső sarkában lévő X-re: az X véletlenszerű színt kap, a PlusButton nem reagál";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex és a PlusButton (issue #515)";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Koppintson a következő lap kiválasztásához. Index PlusButton nélkül: %1$@, selectedIndex: %2$@, most: %3$@";
