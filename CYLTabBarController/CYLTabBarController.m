@@ -7240,8 +7240,13 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     _settingTabBarHidden = YES;
     _lastOwnRequestHidden = hidden;
     _lastOwnRequestTime = CACurrentMediaTime();
-    // [EN] Reduce Motion: no slide. [CN] 开启“减弱动态效果”时不执行滑动动画。
-    [self.tabBarController setTabBarHidden:hidden animated:!UIAccessibilityIsReduceMotionEnabled()];
+    // [EN] No slide with Reduce Motion, nor when this window or its scene is not active (resign active, background,
+    //      another key window): the app switcher snapshot taken then shows the bar fully back, not halfway.
+    // [CN] 开启“减弱动态效果”时不执行滑动动画；本窗口或其 Scene 不活跃时（失去活跃、进入后台、其他窗口成为 key window）也不执行，
+    //      使此时拍摄的 App 切换器快照显示完整恢复的 TabBar，而不是动画中途的状态。
+    CYLTabBarController *tabBarController = self.tabBarController;
+    BOOL animated = !UIAccessibilityIsReduceMotionEnabled() && CYLTabBarMinimizeWindowIsKeyAndActive(tabBarController.viewIfLoaded.window);
+    [tabBarController setTabBarHidden:hidden animated:animated];
     _settingTabBarHidden = NO;
 }
 
