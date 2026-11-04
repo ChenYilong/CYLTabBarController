@@ -356,6 +356,7 @@ flowchart TD
 | 8 | 92 | 没有真机验证 −5；液态玻璃：写入 Never 能否让系统恢复 TabBar 尚未验证 −2（恢复后被惯性再次缩小的风险已在本轮消除）；系统事件以通知模拟 −1 | 第 7 轮的点击观察者经复查无问题（不拦截触摸、内容中的点击保持隐藏）；进入本轮时为 91 分 | 液态玻璃：Never 保持到新的拖动开始（原为 0.35 秒），与其他样式的新拖动规则一致；App 设置新取值或离开液态玻璃时结束保持；演示新增“手动：恢复后不松手继续甩动”（共 31 行） |
 | 9 | 92 | 没有真机验证 −5；液态玻璃：写入 Never 能否恢复 TabBar 未验证 −2；真实来电与低电量弹框无法用代码触发 −1 | 复查第 6–8 轮：识别器的生命周期（控制器或视图释放时不会向已释放的目标发送消息）、恢复时的重入、嵌套 TabBarController 的点击观察者均无问题 | 演示新增 2 个真实触发（不是发送通知）：打开设置让 App 真正进入后台再回来；iPhone 上 tel:// 拨号提示这一真实系统弹框（共 33 行） |
 | 10 | 92（真机前的上限） | 没有真机验证 −5；液态玻璃：写入 Never 能否恢复 TabBar 未验证 −2；真实来电与低电量弹框无法用代码触发 −1。三项都只能在真机上解决，取得方式见本节开头 | 第 6–10 轮共处理 9 类新场景（长按、抽屉、安全区、Mac、内容外点击、液态玻璃惯性、真实触发、快照）；33 行演示；47 个边界情况；所有代码在五种编译配置下无警告 | 失去活跃、进入后台或其他窗口成为 key window 时，恢复不执行动画，App 切换器快照中 TabBar 已完整恢复；复查液态玻璃保持 / 释放路径与两个观察者，无问题。不在没有验证的情况下给出 100 分 |
+| 11 | 89 | 新的审查（iPad 多任务、辅助功能模式）发现：本 App 另一个 Scene 中的键盘会让本窗口无法隐藏 −1；其他 App 的键盘（侧拉 / 分屏）同样如此 −1；引导式访问开启或关闭不会恢复 −1；以及没有真机验证 −5、液态玻璃恢复未验证 −2、系统事件以通知模拟 −1 | 白名单会话使新问题只需局部修改 | 只有本地键盘（UIKeyboardIsLocalUserInfoKey）且本窗口是活跃 Scene 的 key window 时才记录键盘；引导式访问状态变化时恢复；演示新增“其他 App 的键盘（不应改变）”与引导式访问（共 35 行） |
 
 | Round | Score | Deductions | Positives | Changes in this round |
 |:---|:---|:---|:---|:---|
@@ -369,6 +370,7 @@ flowchart TD
 | 8 | 92 | no device testing −5; Liquid Glass: whether writing Never expands the bar is unverified −2 (the risk of momentum minimizing it again after a restore is removed in this round); system events simulated with notifications −1 | round 7's tap observer reviewed with no issue (never blocks touches, taps inside the content keep it hidden); 91 on entering this round | Liquid Glass: Never is held until a new drag starts (was 0.35 s), the same new-drag rule as the other styles; a new value from the app or leaving Liquid Glass ends the hold; a "Manual: after a restore, fling on without lifting" row (31 rows) |
 | 9 | 92 | no device testing −5; Liquid Glass: whether writing Never expands the bar is unverified −2; a real call and the low battery alert cannot be triggered from code −1 | rounds 6–8 reviewed: recognizer lifetime (no message to a released target when the controller or view goes), re-entrancy on restore, the tap observer of nested tab bar controllers; no issue | 2 real triggers in the demo (not posted notifications): opening Settings really sends the app to the background and back; the tel:// call prompt on iPhone is a real system alert (33 rows) |
 | 10 | 92（真机前的上限） | no device testing −5; Liquid Glass: whether writing Never expands the bar is unverified −2; a real call and the low battery alert cannot be triggered from code −1. All three can only be closed on a device; see the start of this section | rounds 6–10 handled 9 kinds of new scenarios (long press, drawers, safe area, Mac, taps outside the content, Liquid Glass momentum, real triggers, snapshots); 33 demo rows; 47 edge cases; no warnings in five build configurations | restores without animation when the app resigns active, goes to the background or another window becomes key, so the app switcher snapshot shows the bar fully back; the Liquid Glass hold / release path and both observers reviewed with no issue. No 100 is given without verification |
+| 11 | 89 | a new review (iPad multitasking, accessibility modes) found: a keyboard in another scene of this app keeps this window from hiding −1; so does another app's keyboard (Slide Over / Split View) −1; Guided Access on / off does not restore −1; plus no device testing −5, Liquid Glass restore unverified −2, system events simulated with notifications −1 | the whitelist session keeps new fixes local | the keyboard counts only when it is local (UIKeyboardIsLocalUserInfoKey) and this window is the key window of an active scene; Guided Access changes restore; demo rows for another app's keyboard (must not change) and Guided Access (35 rows) |
 
 ### [CN]边界情况清单
 ### [EN]Edge case list
@@ -407,25 +409,28 @@ flowchart TD
 | 26 | 滚动视图被替换或释放 | 会话上下文（滚动视图）+ weak | ✅ |
 | 27 | VoiceOver、切换控制开启或正在使用 | 不隐藏；状态变化时恢复 | ✅🧪 |
 | 28 | 键盘已显示时滚动（如搜索结果） | 键盘显示期间不隐藏 | ✅🧪 |
-| 29 | 带着键盘进入后台 | 进入后台时清除键盘记录，回到前台由 WillShow 重新记录 | ✅ |
-| 30 | iPad 多窗口：另一个 Scene 获得焦点 | 按本 Scene 的 keyWindow 与 activationState 判断 | ✅📱 |
-| 31 | 开启“减弱动态效果” | 滚动隐藏不执行滑动动画；状态变化时恢复 | ✅🧪 |
-| 32 | 低电量模式开启或关闭 | NSProcessInfoPowerStateDidChange | ✅🧪 |
-| 33 | 长按内容：上下文菜单、拖放、选择文字 | 滚动视图上不拦截触摸的长按观察者 | ✅🧪 |
-| 34 | 侧滑菜单 / 抽屉把 TabBarController 移开、容器转场 | 会话上下文包含控制器在窗口中的 frame | ✅🧪 |
-| 35 | 通话 / 热点 / 录屏状态栏改变顶部安全区（iOS 12 时代） | 会话上下文包含控制器的顶部安全区 | ✅🧪 |
-| 36 | 点击内容之外：导航栏按钮、带 UIMenu 的按钮、头部分段控件、搜索框 | 控制器视图上不拦截触摸的点击观察者；内容中的点击保持隐藏（如 Facebook） | ✅🧪 |
-| 37 | App 切换器快照（失去活跃、进入后台时） | 窗口或 Scene 不活跃时恢复不执行动画，快照中 TabBar 已完整恢复 | ✅🧪 |
-| 38 | 液态玻璃：恢复后旧拖动的惯性 | 系统保持 Never，直到新的拖动开始 | ✅🧪 |
-| 39 | iPad 指针、触控板、鼠标滚轮滚动 | 滚动手势的 isDragging；需真机确认 | 📱 |
-| 40 | Mac 上运行（Mac Catalyst、Apple 芯片 Mac 上的 iOS App） | 不隐藏 | ✅ |
-| 41 | 子控制器以 OverCurrentContext 方式 present | 当前页面的 presentedViewController | ✅🧪 |
-| 42 | iPad 弹出框（popover） | presentedViewController | ✅🧪 |
-| 43 | Scene 失去活跃（本 Scene） | UISceneWillDeactivate，按 Scene 过滤 | ✅🧪 |
-| 44 | 真机上定位“为何恢复 / 为何没恢复” | Xcode scheme 中设置环境变量 CYLTabBarMinimizeLog=1：打印会话开始、每次恢复及原因、App 接管、液态玻璃恢复自检 | ✅ |
-| 45 | 经典样式显示期间的页面检查开销 | 当前页面不变时复用滚动视图 2 秒，不重复遍历视图层级 | ✅ |
-| 46 | Swift Demo 中的模拟 | 设置分组第 8 行用操作表列出全部模拟 | 🧪 |
-| 47 | 经典样式：返回到 hidesBottomBarWhenPushed 页面之前的页面 | 会话只结束一次，不重复恢复；返回时随页面变化显示 | ✅🧪 |
+| 29 | iPad 多窗口：另一个 Scene 中的键盘 | 只有本窗口是活跃 Scene 的 key window 时才记录键盘 | ✅ |
+| 30 | 其他 App 的键盘（侧拉、分屏） | UIKeyboardIsLocalUserInfoKey 为 NO 时忽略 | ✅🧪 |
+| 31 | 引导式访问开启或关闭 | UIAccessibilityGuidedAccessStatusDidChange | ✅🧪 |
+| 32 | 带着键盘进入后台 | 进入后台时清除键盘记录，回到前台由 WillShow 重新记录 | ✅ |
+| 33 | iPad 多窗口：另一个 Scene 获得焦点 | 按本 Scene 的 keyWindow 与 activationState 判断 | ✅📱 |
+| 34 | 开启“减弱动态效果” | 滚动隐藏不执行滑动动画；状态变化时恢复 | ✅🧪 |
+| 35 | 低电量模式开启或关闭 | NSProcessInfoPowerStateDidChange | ✅🧪 |
+| 36 | 长按内容：上下文菜单、拖放、选择文字 | 滚动视图上不拦截触摸的长按观察者 | ✅🧪 |
+| 37 | 侧滑菜单 / 抽屉把 TabBarController 移开、容器转场 | 会话上下文包含控制器在窗口中的 frame | ✅🧪 |
+| 38 | 通话 / 热点 / 录屏状态栏改变顶部安全区（iOS 12 时代） | 会话上下文包含控制器的顶部安全区 | ✅🧪 |
+| 39 | 点击内容之外：导航栏按钮、带 UIMenu 的按钮、头部分段控件、搜索框 | 控制器视图上不拦截触摸的点击观察者；内容中的点击保持隐藏（如 Facebook） | ✅🧪 |
+| 40 | App 切换器快照（失去活跃、进入后台时） | 窗口或 Scene 不活跃时恢复不执行动画，快照中 TabBar 已完整恢复 | ✅🧪 |
+| 41 | 液态玻璃：恢复后旧拖动的惯性 | 系统保持 Never，直到新的拖动开始 | ✅🧪 |
+| 42 | iPad 指针、触控板、鼠标滚轮滚动 | 滚动手势的 isDragging；需真机确认 | 📱 |
+| 43 | Mac 上运行（Mac Catalyst、Apple 芯片 Mac 上的 iOS App） | 不隐藏 | ✅ |
+| 44 | 子控制器以 OverCurrentContext 方式 present | 当前页面的 presentedViewController | ✅🧪 |
+| 45 | iPad 弹出框（popover） | presentedViewController | ✅🧪 |
+| 46 | Scene 失去活跃（本 Scene） | UISceneWillDeactivate，按 Scene 过滤 | ✅🧪 |
+| 47 | 真机上定位“为何恢复 / 为何没恢复” | Xcode scheme 中设置环境变量 CYLTabBarMinimizeLog=1：打印会话开始、每次恢复及原因、App 接管、液态玻璃恢复自检 | ✅ |
+| 48 | 经典样式显示期间的页面检查开销 | 当前页面不变时复用滚动视图 2 秒，不重复遍历视图层级 | ✅ |
+| 49 | Swift Demo 中的模拟 | 设置分组第 8 行用操作表列出全部模拟 | 🧪 |
+| 50 | 经典样式：返回到 hidesBottomBarWhenPushed 页面之前的页面 | 会话只结束一次，不重复恢复；返回时随页面变化显示 | ✅🧪 |
 
 | # | Scenario | How it is handled | Status |
 |:---|:---|:---|:---|
@@ -457,25 +462,28 @@ flowchart TD
 | 26 | The scroll view is replaced or released | Session context (scroll view) + weak | ✅ |
 | 27 | VoiceOver or Switch Control turned on or running | Never hides; shown when the status changes | ✅🧪 |
 | 28 | Scrolling while the keyboard is up (e.g. search results) | Never hides while the keyboard is up | ✅🧪 |
-| 29 | Going to the background with the keyboard up | The keyboard state is cleared on entering the background; WillShow records it again on return | ✅ |
-| 30 | iPad multiple windows: another scene takes focus | Uses this scene's keyWindow and activationState | ✅📱 |
-| 31 | Reduce Motion turned on | Scroll hiding does not slide; shown when the setting changes | ✅🧪 |
-| 32 | Low Power Mode turned on or off | NSProcessInfoPowerStateDidChange | ✅🧪 |
-| 33 | A long press on the content: context menu, drag and drop, text selection | A long-press observer on the scroll view that never blocks touches | ✅🧪 |
-| 34 | A side menu / drawer moving the tab bar controller away, a container transition | The session context includes the controller's frame in its window | ✅🧪 |
-| 35 | An in-call / hotspot / recording status bar changing the top safe area (iOS 12 era) | The session context includes the controller's top safe area | ✅🧪 |
-| 36 | A tap outside the content: navigation bar button, button with a UIMenu, header segmented control, search field | A tap observer on the controller's view that never blocks touches; taps inside the content keep it hidden (as in Facebook) | ✅🧪 |
-| 37 | The app switcher snapshot (on resign active, background) | Restores without animation while the window or scene is not active, so the snapshot shows the bar fully back | ✅🧪 |
-| 38 | Liquid Glass: the old drag's momentum after a restore | The system is held at Never until a new drag starts | ✅🧪 |
-| 39 | Pointer, trackpad and mouse wheel scrolling on iPad | The scroll gesture's isDragging; needs a device to confirm | 📱 |
-| 40 | Running on a Mac (Mac Catalyst, an iOS app on Apple silicon) | Never hides | ✅ |
-| 41 | A child presenting with OverCurrentContext | The page's presentedViewController | ✅🧪 |
-| 42 | An iPad popover | presentedViewController | ✅🧪 |
-| 43 | The scene deactivates (this scene) | UISceneWillDeactivate, filtered by scene | ✅🧪 |
-| 44 | On a device: why the bar came back, or did not | Set the environment variable CYLTabBarMinimizeLog=1 in the Xcode scheme: logs session starts, every restore with its reason, app takeovers, the Liquid Glass restore self-check | ✅ |
-| 45 | Cost of the classic page check while the bar is shown | The scroll view is reused for 2 s while the page stays the same, without searching the view hierarchy again | ✅ |
-| 46 | Simulations in the Swift demos | Settings row 8 lists every simulation in an action sheet | 🧪 |
-| 47 | Classic: coming back from a hidesBottomBarWhenPushed page | The session ends once, no repeated restores; shown on the page change back | ✅🧪 |
+| 29 | iPad multiple windows: a keyboard in another scene | The keyboard counts only while this window is the key window of an active scene | ✅ |
+| 30 | Another app's keyboard (Slide Over, Split View) | Ignored when UIKeyboardIsLocalUserInfoKey is NO | ✅🧪 |
+| 31 | Guided Access turned on or off | UIAccessibilityGuidedAccessStatusDidChange | ✅🧪 |
+| 32 | Going to the background with the keyboard up | The keyboard state is cleared on entering the background; WillShow records it again on return | ✅ |
+| 33 | iPad multiple windows: another scene takes focus | Uses this scene's keyWindow and activationState | ✅📱 |
+| 34 | Reduce Motion turned on | Scroll hiding does not slide; shown when the setting changes | ✅🧪 |
+| 35 | Low Power Mode turned on or off | NSProcessInfoPowerStateDidChange | ✅🧪 |
+| 36 | A long press on the content: context menu, drag and drop, text selection | A long-press observer on the scroll view that never blocks touches | ✅🧪 |
+| 37 | A side menu / drawer moving the tab bar controller away, a container transition | The session context includes the controller's frame in its window | ✅🧪 |
+| 38 | An in-call / hotspot / recording status bar changing the top safe area (iOS 12 era) | The session context includes the controller's top safe area | ✅🧪 |
+| 39 | A tap outside the content: navigation bar button, button with a UIMenu, header segmented control, search field | A tap observer on the controller's view that never blocks touches; taps inside the content keep it hidden (as in Facebook) | ✅🧪 |
+| 40 | The app switcher snapshot (on resign active, background) | Restores without animation while the window or scene is not active, so the snapshot shows the bar fully back | ✅🧪 |
+| 41 | Liquid Glass: the old drag's momentum after a restore | The system is held at Never until a new drag starts | ✅🧪 |
+| 42 | Pointer, trackpad and mouse wheel scrolling on iPad | The scroll gesture's isDragging; needs a device to confirm | 📱 |
+| 43 | Running on a Mac (Mac Catalyst, an iOS app on Apple silicon) | Never hides | ✅ |
+| 44 | A child presenting with OverCurrentContext | The page's presentedViewController | ✅🧪 |
+| 45 | An iPad popover | presentedViewController | ✅🧪 |
+| 46 | The scene deactivates (this scene) | UISceneWillDeactivate, filtered by scene | ✅🧪 |
+| 47 | On a device: why the bar came back, or did not | Set the environment variable CYLTabBarMinimizeLog=1 in the Xcode scheme: logs session starts, every restore with its reason, app takeovers, the Liquid Glass restore self-check | ✅ |
+| 48 | Cost of the classic page check while the bar is shown | The scroll view is reused for 2 s while the page stays the same, without searching the view hierarchy again | ✅ |
+| 49 | Simulations in the Swift demos | Settings row 8 lists every simulation in an action sheet | 🧪 |
+| 50 | Classic: coming back from a hidesBottomBarWhenPushed page | The session ends once, no repeated restores; shown on the page change back | ✅🧪 |
 
 <!-- edge-cases:end -->
 

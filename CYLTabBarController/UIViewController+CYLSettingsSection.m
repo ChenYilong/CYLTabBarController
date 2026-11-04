@@ -713,6 +713,8 @@ typedef NS_ENUM(NSInteger, CYLScrollHideSimulationRow) {
     CYLScrollHideSimulationRowManualKeepDragging,
     CYLScrollHideSimulationRowRealBackground,
     CYLScrollHideSimulationRowRealSystemAlert,
+    CYLScrollHideSimulationRowOtherAppKeyboard,
+    CYLScrollHideSimulationRowGuidedAccess,
     CYLScrollHideSimulationRowCount,
 };
 
@@ -791,6 +793,10 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
             return @"Manual: after a restore, fling on without lifting; only a new drag hides it";
         case CYLScrollHideSimulationRowRealBackground: return @"Real: open Settings (the app really goes to the background; come back)";
         case CYLScrollHideSimulationRowRealSystemAlert: return @"Real system alert: tel:// call prompt (iPhone; tap Cancel)";
+        case CYLScrollHideSimulationRowOtherAppKeyboard:
+            *kind = CYLScrollHideSimulationKindKeep;
+            return @"UIKeyboardWillShow of another app (UIKeyboardIsLocalUserInfoKey = NO)";
+        case CYLScrollHideSimulationRowGuidedAccess: return @"UIAccessibilityGuidedAccessStatusDidChangeNotification";
         case CYLScrollHideSimulationRowCount: break;
     }
     return @"-";
@@ -1093,6 +1099,17 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
             // [EN] Not a simulation: iPhone shows a real system prompt and the app resigns active (no prompt in the
             //      simulator). [CN] 不是模拟：iPhone 显示真实的系统提示，App 失去活跃（模拟器中不显示）。
             [UIApplication.sharedApplication openURL:[NSURL URLWithString:@"tel://10086"] options:@{} completionHandler:nil];
+            break;
+        }
+        case CYLScrollHideSimulationRowOtherAppKeyboard: {
+            [center postNotificationName:UIKeyboardWillShowNotification object:nil userInfo:@{ UIKeyboardIsLocalUserInfoKey : @NO }];
+            CYLScrollHideSimulationAfter(CYLScrollHideSimulationHold, ^{
+                [center postNotificationName:UIKeyboardWillHideNotification object:nil userInfo:@{ UIKeyboardIsLocalUserInfoKey : @NO }];
+            });
+            break;
+        }
+        case CYLScrollHideSimulationRowGuidedAccess: {
+            [center postNotificationName:UIAccessibilityGuidedAccessStatusDidChangeNotification object:nil];
             break;
         }
         case CYLScrollHideSimulationRowManualLongPress:

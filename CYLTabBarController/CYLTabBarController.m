@@ -6573,6 +6573,7 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
         UIAccessibilityVoiceOverStatusDidChangeNotification,
         UIAccessibilitySwitchControlStatusDidChangeNotification,
         UIAccessibilityReduceMotionStatusDidChangeNotification,
+        UIAccessibilityGuidedAccessStatusDidChangeNotification,
         NSProcessInfoPowerStateDidChangeNotification,
     ]];
     if (@available(iOS 13.0, *)) {
@@ -6596,6 +6597,7 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
 }
 
 - (void)restoreTabBarForNotification:(NSNotification *)notification {
+    UIWindow *window = self.tabBarController.viewIfLoaded.window;
     // [EN] Keyboard: remember whether it is on screen; it going away is not an interruption.
     // [CN] 键盘：记录是否显示；键盘收起不算打断。
     if ([notification.name isEqualToString:UIKeyboardWillHideNotification]) {
@@ -6603,6 +6605,14 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
         return;
     }
     if ([notification.name isEqualToString:UIKeyboardWillShowNotification]) {
+        // [EN] Only this window's keyboard counts: not another app's (Slide Over / Split View, not local), nor one in
+        //      another scene of this app (this window is then not the key window of an active scene).
+        // [CN] 只处理本窗口的键盘：不处理其他 App 的键盘（侧拉 / 分屏，非本地），也不处理本 App 其他 Scene 中的键盘（此时本窗口不是
+        //      活跃 Scene 的 key window）。
+        NSNumber *isLocal = notification.userInfo[UIKeyboardIsLocalUserInfoKey];
+        if ((isLocal && !isLocal.boolValue) || !CYLTabBarMinimizeWindowIsKeyAndActive(window)) {
+            return;
+        }
         _keyboardVisible = YES;
     }
     // [EN] A keyboard left up when the app went to the background may never post WillHide; it posts WillShow again
@@ -6612,7 +6622,6 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     if ([notification.name isEqualToString:UIApplicationDidEnterBackgroundNotification]) {
         _keyboardVisible = NO;
     }
-    UIWindow *window = self.tabBarController.viewIfLoaded.window;
     // Guard: this tab bar's own window becoming key is not an interruption. 本 TabBar 自己的窗口成为 key window 不算打断。
     if ([notification.name isEqualToString:UIWindowDidBecomeKeyNotification] && notification.object == window) {
         return;
