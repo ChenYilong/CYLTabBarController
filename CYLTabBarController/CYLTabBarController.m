@@ -206,6 +206,13 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 /// [EN] The control last reported through `tabBarController:didSelectControl:` in the current run loop turn (one report per tap).
 /// [CN] 当前 runloop 中已通过 `tabBarController:didSelectControl:` 上报的控件（每次点击只上报一次）。
 @property (nonatomic, weak) UIControl *cyl_controlReportedInCurrentRunLoop;
+/// [EN] The selected view controller as of the previous run loop turn, so a tap can tell whether its tab was already
+///      selected before UIKit changed the selection (see `-cyl_settleSelectionSnapshot`).
+/// [CN] 上一个 runloop 结束时选中的控制器，用于在 UIKit 修改选中状态之后判断被点击的 Tab 之前是否已选中（见 `-cyl_settleSelectionSnapshot`）。
+@property (nonatomic, weak) UIViewController *cyl_settledSelectedViewController;
+/// [EN] The view controller reported as reselected in the current run loop turn (one report per tap).
+/// [CN] 当前 runloop 中已上报为重复点击的控制器（每次点击只上报一次）。
+@property (nonatomic, weak) UIViewController *cyl_viewControllerReselectedInCurrentRunLoop;
 @property (nonatomic, strong) NSMutableArray<NSURL *> *lottieURLs;
 @property (nonatomic, strong) NSMutableArray *lottieSizes;
 @property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
@@ -228,6 +235,16 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @interface CYLTabBarController (CYLTabBarMinimizePrivate)
 /// [EN] FlatDesign: observe the scroll view of the page on screen. [CN] 扁平样式：观察当前显示页面的滚动视图。
 - (void)cyl_updateTabBarMinimizeTracking;
+@end
+
+/// [EN] Implemented below (CYLReselect). [CN] 实现见下方 CYLReselect。
+@interface CYLTabBarController (CYLReselectPrivate)
+/// [EN] Records the selection once the current run loop turn ends. [CN] 在当前 runloop 结束后记录选中状态。
+- (void)cyl_settleSelectionSnapshot;
+/// [EN] The view controller of a tab button (classic or Liquid Glass), nil for the plus button. [CN] Tab 按钮对应的控制器，PlusButton 返回 nil。
+- (UIViewController *)cyl_viewControllerForTabControl:(UIControl *)control;
+/// [EN] A user tap on the tab that was already selected. [CN] 用户点击了已选中的 Tab。
+- (void)cyl_didReselectViewController:(UIViewController *)viewController control:(UIControl *)control;
 @end
 
 /// Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
@@ -374,6 +391,7 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [CYLTabBarController cyl_markTabBarControllerActive:self];
+    [self cyl_settleSelectionSnapshot];
 }
 
 
@@ -411,6 +429,19 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
     }
     UIViewController *vc = nil;
     [self tabChangedToSelectedViewController:vc control:control];
+    // [EN] Reselect: the tapped tab is selected now and was already selected before this tap (the selection as of the
+    //      previous run loop turn). The classic tab bar runs this action after UIKit changed the selection; Liquid Glass
+    //      runs it from the gesture delegate, only for a selected tab, before anything changes.
+    // [CN] 重复点击：被点击的 Tab 当前已选中，且在这次点击之前（上一个 runloop 结束时）就已选中。经典 TabBar 在 UIKit 修改选中状态之后
+    //      执行本事件；液态玻璃在手势代理中、仅对已选中的 Tab、在任何变化之前执行。
+    if (![control cyl_isPlusControl]) {
+        UIViewController *tappedViewController = [self cyl_viewControllerForTabControl:control];
+        if (tappedViewController && tappedViewController == self.selectedViewController &&
+            tappedViewController == self.cyl_settledSelectedViewController) {
+            [self cyl_didReselectViewController:tappedViewController control:control];
+        }
+    }
+    [self cyl_settleSelectionSnapshot];
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
 
@@ -4436,6 +4467,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 
 - (void)setSelectedViewController:(__kindof UIViewController *)selectedViewController {
     [self cyl_setNeedsUpdateTabBarItemIconViews];
+    [self cyl_settleSelectionSnapshot];
     NSUInteger indexOfSelectedViewController = [self.childViewControllers indexOfObject:selectedViewController];
     if (NSNotFound == indexOfSelectedViewController) { return; }
     [super setSelectedViewController:selectedViewController];
@@ -4602,6 +4634,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 
 - (void)setSelectedIndex:(NSUInteger)selectedIndex {
     [self cyl_setNeedsUpdateTabBarItemIconViews];
+    [self cyl_settleSelectionSnapshot];
     //    if (self.selectedIndex == selectedIndex) { return; }
     // FIX: issue #441
     // [EN] The index of the placeholder that stands for a plus button without a child view controller (Liquid Glass,
@@ -6748,6 +6781,119 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
         // [CN] 切换到其他 Tab 或页面：与系统一致，重新显示 TabBar。
         [tracker expandTabBar];
         [tracker observeScrollView:scrollView];
+    }
+}
+
+@end
+
+#pragma mark - CYLReselect (tapping the selected tab again)
+
+static char CYLReselectBehaviorKey;
+
+@implementation CYLTabBarController (CYLReselect)
+
+- (CYLTabBarReselectBehavior)cyl_reselectBehavior {
+    return (CYLTabBarReselectBehavior)[objc_getAssociatedObject(self, &CYLReselectBehaviorKey) unsignedIntegerValue];
+}
+
+- (void)setCyl_reselectBehavior:(CYLTabBarReselectBehavior)reselectBehavior {
+    objc_setAssociatedObject(self, &CYLReselectBehaviorKey, @(reselectBehavior), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+/*!
+ * [EN] The classic tab bar runs the tab button's action after UIKit changed the selection, so the selection at that moment
+ *      cannot tell a reselect from a selection. This keeps the selection as of the end of the run loop turn: a tap reads
+ *      the value from before UIKit's change, because the update below runs only after the current event is handled.
+ * [CN] 经典 TabBar 在 UIKit 修改选中状态之后才执行 Tab 按钮的事件，此时的选中状态无法区分重复点击与切换。这里保存 runloop 结束时的
+ *      选中状态：下面的更新在当前事件处理完之后才执行，因此点击时读到的是 UIKit 修改之前的值。
+ */
+- (void)cyl_settleSelectionSnapshot {
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) strongSelf = weakSelf;
+        strongSelf.cyl_settledSelectedViewController = strongSelf.selectedViewController;
+    });
+}
+
+- (UIViewController *)cyl_viewControllerForTabControl:(UIControl *)control {
+    if (!control || [control cyl_isPlusControl]) {
+        return nil;
+    }
+    // [EN] Liquid Glass shows two buttons per tab; the selected layer's button stands for the normal one.
+    // [CN] 液态玻璃中每个 Tab 有两个按钮；选中层的按钮对应普通层的按钮。
+    NSMutableArray<UIControl *> *candidates = [NSMutableArray arrayWithObject:control];
+    if ([control cyl_isPlatterSelectedControl]) {
+        UIControl *normalControl = [control cyl_platterNormalControl];
+        if (normalControl && normalControl != control) {
+            [candidates addObject:normalControl];
+        }
+    }
+    for (UIViewController *viewController in self.viewControllers) {
+        if (viewController.cyl_isPlaceholder) {
+            continue;
+        }
+        UIViewController *contentViewController = [viewController cyl_getViewControllerInsteadOfNavigationController];
+        for (UIControl *candidate in candidates) {
+            if (viewController.tabBarItem.cyl_tabButton == candidate || viewController.cyl_tabButton == candidate ||
+                contentViewController.cyl_tabButton == candidate) {
+                return viewController;
+            }
+        }
+    }
+    // [EN] The classic tab bar numbers its buttons in `-cyl_bindTabControlActions` (system tab buttons only).
+    // [CN] 经典 TabBar 在 `-cyl_bindTabControlActions` 中为按钮编号（只计系统 Tab 按钮）。
+    if (![CYLConstants isLiquidGlassActive]) {
+        NSInteger index = control.cyl_tabBarChildViewControllerIndex;
+        if (index >= 0 && index < (NSInteger)self.viewControllers.count) {
+            UIViewController *viewController = self.viewControllers[(NSUInteger)index];
+            return viewController.cyl_isPlaceholder ? nil : viewController;
+        }
+    }
+    return nil;
+}
+
+- (void)cyl_didReselectViewController:(UIViewController *)viewController control:(UIControl *)control {
+    if (!viewController || viewController.cyl_isPlaceholder) {
+        return;
+    }
+    // [EN] One report per tap: Liquid Glass can ask its two gesture recognizers for the same touch.
+    // [CN] 每次点击只上报一次：液态玻璃可能为同一次触摸询问两个手势。
+    if (self.cyl_viewControllerReselectedInCurrentRunLoop == viewController) {
+        return;
+    }
+    self.cyl_viewControllerReselectedInCurrentRunLoop = viewController;
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        weakSelf.cyl_viewControllerReselectedInCurrentRunLoop = nil;
+    });
+
+    [self cyl_performReselectBehaviorForViewController:viewController];
+
+    id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)self.delegate;
+    if ([delegate respondsToSelector:@selector(tabBarController:didReselectViewController:)]) {
+        [delegate tabBarController:self didReselectViewController:viewController];
+    }
+}
+
+- (void)cyl_performReselectBehaviorForViewController:(UIViewController *)viewController {
+    CYLTabBarReselectBehavior behavior = self.cyl_reselectBehavior;
+    if (behavior == CYLTabBarReselectBehaviorNone) {
+        return;
+    }
+    if ((behavior & CYLTabBarReselectBehaviorPopToRoot) && [viewController isKindOfClass:[UINavigationController class]]) {
+        UINavigationController *navigationController = (UINavigationController *)viewController;
+        if (navigationController.viewControllers.count > 1) {
+            [navigationController popToRootViewControllerAnimated:YES];
+            // [EN] Popped: the next tap, at the root page, scrolls to the top. [CN] 已返回根页面：下次点击（在根页面）再滚动到顶部。
+            return;
+        }
+    }
+    if (behavior & CYLTabBarReselectBehaviorScrollToTop) {
+        UIScrollView *scrollView = CYLTabBarMinimizeScrollViewForViewController(viewController);
+        if (scrollView) {
+            CGPoint topOffset = CGPointMake(scrollView.contentOffset.x, -scrollView.adjustedContentInset.top);
+            [scrollView setContentOffset:topOffset animated:YES];
+        }
     }
 }
 

@@ -29,6 +29,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
+//   - Tapping the Selected Tab Again / 重复点击已选中的 Tab
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Reselect.md
 //   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Minimize-On-Scroll.md
 //   - Update Tabs in Place: Titles, Icons, Network Icons and Pages / 原地更新 Tab：标题、图标、网络图标与替换页面
@@ -258,6 +260,25 @@ typedef void (^CYLTabBarLoginCompletion)(BOOL loggedIn);
  */
 FOUNDATION_EXTERN NSNotificationName const CYLTabBarLoginStateDidChangeNotification;
 
+/*!
+ * [EN] What the library does when the user taps the tab that is already selected (a "reselect"). See
+ *      `-[CYLTabBarController cyl_reselectBehavior]` and docs/Tab-Reselect.md.
+ *      - PopToRoot: a navigation controller with pushed pages pops back to its root page.
+ *      - ScrollToTop: the page's scroll view scrolls back to the top.
+ *      - PopToRootThenScrollToTop: both, as the system apps do: the first tap pops, the next one (already at the root)
+ *        scrolls to the top.
+ * [CN] 用户点击已选中的 Tab（"重复点击"）时本库执行的操作。见 `-[CYLTabBarController cyl_reselectBehavior]` 与 docs/Tab-Reselect.md。
+ *      - PopToRoot：push 了页面的导航控制器返回根页面。
+ *      - ScrollToTop：页面的滚动视图滚动到顶部。
+ *      - PopToRootThenScrollToTop：二者兼有，与系统 App 一致：第一次点击返回根页面，再点击一次（已在根页面）滚动到顶部。
+ */
+typedef NS_OPTIONS(NSUInteger, CYLTabBarReselectBehavior) {
+    CYLTabBarReselectBehaviorNone        = 0,
+    CYLTabBarReselectBehaviorPopToRoot   = 1 << 0,
+    CYLTabBarReselectBehaviorScrollToTop = 1 << 1,
+    CYLTabBarReselectBehaviorPopToRootThenScrollToTop = CYLTabBarReselectBehaviorPopToRoot | CYLTabBarReselectBehaviorScrollToTop,
+};
+
 @protocol CYLTabBarControllerDelegate <NSObject, UITabBarControllerDelegate>
 @optional
 
@@ -301,6 +322,19 @@ presentLoginForViewController:(UIViewController *)viewController
  */
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
 //- (void)tabBarController:(CYLTabBarController *)tabBarController didLongPressControl:(UIControl *)control;
+
+/*!
+ * [EN] The user tapped the tab of `viewController` while it was already selected (a "reselect"), in every style
+ *      (classic, Liquid Glass, FlatDesign). Called once per tap, after `cyl_reselectBehavior` ran, and never for a change
+ *      made in code or for the plus button. `tabBarController:didSelectControl:` is still called as before; this method
+ *      tells a reselect apart from a selection. Typical use: refresh the page, or scroll to the top yourself.
+ *      Liquid Glass reports it when the touch begins on the selected tab, the other styles when the tap ends.
+ * [CN] 用户点击了已选中的 `viewController` 对应的 Tab（"重复点击"），适用于所有样式（经典、液态玻璃、扁平样式）。每次点击调用一次，
+ *      在 `cyl_reselectBehavior` 执行之后；代码切换与 PlusButton 不会调用。`tabBarController:didSelectControl:` 仍与以前一样回调；
+ *      本方法用于区分重复点击与切换。常见用法：刷新页面，或自行滚动到顶部。
+ *      液态玻璃在手指按下已选中的 Tab 时回调，其他样式在点击结束时回调。
+ */
+- (void)tabBarController:(CYLTabBarController *)tabBarController didReselectViewController:(UIViewController *)viewController;
 
 /*!
  * [EN] Asks whether the Liquid Glass lens (selection bubble) should be shown for `control`. Default: NO without Liquid Glass; NO when the plus child view controller is selected and the plus button is not centered; otherwise YES.
@@ -1482,6 +1516,36 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      滚动隐藏开启时（OnScrollDown 或 OnScrollUp）getter 返回 YES。需要 OnScrollUp 或 Automatic 时使用 `cyl_tabBarMinimizeBehavior`。
  */
 @property (nonatomic, assign) BOOL cyl_hidesTabBarOnScroll;
+
+@end
+
+/*!
+ * [EN] Tapping the selected tab again (a "reselect"). See docs/Tab-Reselect.md.
+ *
+ *          tabBarController.cyl_reselectBehavior = CYLTabBarReselectBehaviorPopToRootThenScrollToTop;
+ *          // and/or, in the delegate:
+ *          - (void)tabBarController:(CYLTabBarController *)tabBarController didReselectViewController:(UIViewController *)viewController {
+ *              [self refreshPage];
+ *          }
+ *
+ * [CN] 再次点击已选中的 Tab（"重复点击"）。见 docs/Tab-Reselect.md，示例见上。
+ */
+@interface CYLTabBarController (CYLReselect)
+
+/*!
+ * [EN] What happens when the user taps the selected tab. Default `CYLTabBarReselectBehaviorNone`: nothing, as in earlier
+ *      versions (the library refuses a reselect in `-tabBarController:shouldSelectViewController:`, so UIKit's own
+ *      pop-to-root never ran). PopToRoot pops the tab's navigation controller to its root page (animated); ScrollToTop
+ *      scrolls the visible page's scroll view to the top (its bottom content scroll view, otherwise the first scroll view
+ *      in its view hierarchy), above its content inset. Runs before
+ *      `-tabBarController:didReselectViewController:`, in every style. Can be set at any time.
+ * [CN] 用户点击已选中 Tab 时的操作。默认 `CYLTabBarReselectBehaviorNone`：与以前的版本一样什么都不做（本库在
+ *      `-tabBarController:shouldSelectViewController:` 中拒绝了重复点击，所以 UIKit 自带的返回根页面从未执行）。PopToRoot 让该 Tab 的
+ *      导航控制器返回根页面（带动画）；ScrollToTop 让当前页面的滚动视图（页面底部的 content scroll view，没有时取视图层级中的
+ *      第一个滚动视图）滚动到顶部（考虑 contentInset）。在 `-tabBarController:didReselectViewController:` 之前执行，适用于所有样式。
+ *      任何时候都可以设置。
+ */
+@property (nonatomic, assign) CYLTabBarReselectBehavior cyl_reselectBehavior;
 
 @end
 
