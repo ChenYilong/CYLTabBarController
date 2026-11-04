@@ -149,6 +149,33 @@ static void * const CYLFlatDesignTabBarContext = (void*)&CYLFlatDesignTabBarCont
 static void * const CYLStandardAppearanceContext = (void*)&CYLStandardAppearanceContext;
 //static void * const CYLTabBarControllerVisiableItemsCountContext = (void*)&CYLTabBarControllerVisiableItemsCountContext;
 
+/*!
+ * [EN] Classic tab bar before iOS 18 (not FlatDesign, not Liquid Glass): duration of the animated
+ *      `-setTabBarHidden:animated:`, the same as FlatDesign (`CYLFlatDesignUITabBarControllerHideShowBarDuration`), so
+ *      both styles hide and show alike. Outside the FlatDesign guard: the classic style needs it without that subspec.
+ * [CN] iOS 18 以前的经典 TabBar（非扁平样式、非液态玻璃）：带动画的 `-setTabBarHidden:animated:` 的时长，与扁平样式
+ *      （`CYLFlatDesignUITabBarControllerHideShowBarDuration`）相同，使两种样式的隐藏、显示效果一致。放在扁平样式的 guard 之外：
+ *      不含该子库时经典样式同样需要它。
+ */
+static const NSTimeInterval CYLClassicTabBarHideShowDuration = 0.2;
+
+/*!
+ * [EN] Classic tab bar before iOS 18: how far the tab bar moves down to leave the screen, as FlatDesign moves its bar by
+ *      its height: the tab bar's height (without a transform), plus the part of the plus button (or any subview) that
+ *      sticks up above it, so a raised plus button leaves the screen too.
+ * [CN] iOS 18 以前的经典 TabBar：TabBar 移出屏幕需要下移的距离。与扁平样式按 TabBar 高度下移相同：TabBar 的高度（不计 transform），
+ *      再加上 PlusButton（或任何子视图）高出 TabBar 的部分，使凸起的 PlusButton 也完全移出屏幕。
+ */
+static CGFloat CYLClassicTabBarHideDistance(UITabBar *tabBar) {
+    CGFloat overflowAbove = 0;
+    for (UIView *subview in tabBar.subviews) {
+        if (!subview.hidden) {
+            overflowAbove = MAX(overflowAbove, -CGRectGetMinY(subview.frame));
+        }
+    }
+    return CGRectGetHeight(tabBar.bounds) + overflowAbove;
+}
+
 #if CYL_FLATDESIGN_AVAILABLE
 CGFloat const CYLFlatDesignUITabBarControllerHideShowBarDuration = 0.2;
 
@@ -238,6 +265,11 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
     _CYLFlatDesignTabBarParallaxOverlayView *_parallaxOverlayView;
 #else
 #endif
+    // [EN] Classic tab bar before iOS 18: the animated `-setTabBarHidden:animated:` (see `-cyl_setClassicTabBarHidden:animated:`).
+    // [CN] iOS 18 以前的经典 TabBar：带动画的 `-setTabBarHidden:animated:`（见 `-cyl_setClassicTabBarHidden:animated:`）。
+    BOOL _cylClassicTabBarIsAnimating;
+    BOOL _cylClassicTabBarHiddenRequest;
+    NSUInteger _cylClassicTabBarAnimationGeneration;
 }
 
 @synthesize viewControllers = _viewControllers;
@@ -988,6 +1020,13 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
         if (@available(iOS 18.0, *)) {
             return [super isTabBarHidden];
         }
+        // [EN] Classic before iOS 18: while the hide / show animation runs, the request, not the bar's `hidden` (which
+        //      changes when the animation ends), so a caller asking again mid-animation does not restart it.
+        // [CN] iOS 18 以前的经典样式：动画进行中返回请求的状态，而不是 TabBar 的 `hidden`（动画结束时才改变），避免动画中途再次请求
+        //      时重新开始动画。
+        if (_cylClassicTabBarIsAnimating) {
+            return _cylClassicTabBarHiddenRequest;
+        }
         return self.tabBar.hidden;
     }
 #if CYL_FLATDESIGN_AVAILABLE
@@ -1162,9 +1201,69 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
         if (@available(iOS 18.0, *)) {
             [super setTabBarHidden:hidden animated:animated];
         } else {
-            self.tabBar.hidden = hidden;
+            [self cyl_setClassicTabBarHidden:hidden animated:animated];
         }
     }
+}
+
+/*!
+ * [EN] Classic tab bar before iOS 18 (UIKit's `-setTabBarHidden:animated:` arrives in iOS 18): hides or shows the system
+ *      tab bar, with its plus button, animated as FlatDesign does: the same duration
+ *      (`CYLClassicTabBarHideShowDuration`), the bar moves down out of the screen and back, and `hidden` is set when the
+ *      animation ends. The newest request wins: an older animation's completion does nothing. Not animated when
+ *      `animated` is NO or the bar is not on screen. Guards: never FlatDesign (its own path above) and never Liquid Glass
+ *      (iOS 26+, so UIKit's path), both checked again here.
+ * [CN] iOS 18 以前的经典 TabBar（UIKit 的 `-setTabBarHidden:animated:` 从 iOS 18 起才有）：隐藏或显示系统 TabBar 及其中的 PlusButton，
+ *      动画与扁平样式一致：相同时长（`CYLClassicTabBarHideShowDuration`），TabBar 向下移出屏幕再移回，动画结束时设置 `hidden`。以最新
+ *      请求为准：旧动画的完成回调不做处理。`animated` 为 NO 或 TabBar 不在屏幕上时不执行动画。Guard：不处理扁平样式（上方有自己的
+ *      路径）与液态玻璃（iOS 26+，走 UIKit 的路径），在这里再次检查。
+ */
+- (void)cyl_setClassicTabBarHidden:(BOOL)hidden animated:(BOOL)animated {
+    UITabBar *tabBar = self.tabBar;
+    // Guard: only the classic tab bar. 只处理经典 TabBar。
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType || [CYLConstants isLiquidGlassActive] || !tabBar) {
+        return;
+    }
+    // Guard: the same request is already animating. 同一请求的动画正在进行。
+    if (_cylClassicTabBarIsAnimating && _cylClassicTabBarHiddenRequest == hidden) {
+        return;
+    }
+    NSUInteger generation = ++_cylClassicTabBarAnimationGeneration;
+    if (!animated || !tabBar.window || CGRectIsEmpty(tabBar.bounds)) {
+        _cylClassicTabBarIsAnimating = NO;
+        tabBar.transform = CGAffineTransformIdentity;
+        tabBar.hidden = hidden;
+        return;
+    }
+    // Guard: already there, nothing animating. 已是目标状态且没有动画。
+    if (!_cylClassicTabBarIsAnimating && tabBar.hidden == hidden) {
+        return;
+    }
+    _cylClassicTabBarIsAnimating = YES;
+    _cylClassicTabBarHiddenRequest = hidden;
+    CGFloat distance = CYLClassicTabBarHideDistance(tabBar);
+    if (!hidden && tabBar.hidden) {
+        // [EN] Showing: start below the screen, as FlatDesign does. [CN] 显示：与扁平样式一样，从屏幕下方开始。
+        tabBar.transform = CGAffineTransformMakeTranslation(0, distance);
+        tabBar.hidden = NO;
+    }
+    CGAffineTransform endTransform = hidden ? CGAffineTransformMakeTranslation(0, distance) : CGAffineTransformIdentity;
+    [UIView animateWithDuration:CYLClassicTabBarHideShowDuration
+                          delay:0
+                        options:UIViewAnimationOptionBeginFromCurrentState
+                     animations:^{
+        tabBar.transform = endTransform;
+    } completion:^(BOOL __unused finished) {
+        // [EN] A newer request owns the tab bar now. [CN] 已有更新的请求接管 TabBar。
+        if (generation != self->_cylClassicTabBarAnimationGeneration) {
+            return;
+        }
+        self->_cylClassicTabBarIsAnimating = NO;
+        // [EN] Reset the transform, so later layouts by UIKit (e.g. rotation) never meet a moved tab bar.
+        // [CN] 还原 transform，使 UIKit 之后的布局（如旋转）不会遇到移动过的 TabBar。
+        tabBar.transform = CGAffineTransformIdentity;
+        tabBar.hidden = hidden;
+    }];
 }
 
 - (BOOL)_checkHidesBottomBarWhenPushed {

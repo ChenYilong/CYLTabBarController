@@ -927,11 +927,12 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 @property (nonatomic, strong, readonly) NSMutableArray *lottieSizes;
 
 /**
- [CN] 显示或隐藏 TabBar，所有样式都生效：扁平样式为 CYLFlatDesignTabBar，液态玻璃与经典样式为系统 TabBar（iOS 18 起由 UIKit 执行动画）。
+ [CN] 显示或隐藏 TabBar，所有样式都生效：扁平样式为 CYLFlatDesignTabBar，液态玻璃与经典样式为系统 TabBar（iOS 18 起由 UIKit 执行动画；iOS 18 以前的经典样式使用与扁平样式相同的下移动画）。
  如果设置了 hidesBottomBarWhenPushed，则 hidesBottomBarWhenPushed 优先级更高。滚动隐藏（`cyl_tabBarMinimizeBehavior`，issue #13）
  在扁平样式与经典样式下也通过它隐藏、显示 TabBar。声明位于 CYL_FLATDESIGN_AVAILABLE 之外，不含扁平样式子库时同样可用。
  [EN] Show or hide the tab bar, in every style: CYLFlatDesignTabBar for FlatDesign, the system tab bar for Liquid Glass and
-      the classic style (animated by UIKit on iOS 18 and later).
+      the classic style (animated by UIKit on iOS 18 and later; before iOS 18 the classic style moves down and back as
+      FlatDesign does).
       If hidesBottomBarWhenPushed is set, hidesBottomBarWhenPushed takes priority. Scroll hiding
       (`cyl_tabBarMinimizeBehavior`, issue #13) hides and shows the tab bar through it in FlatDesign and the classic style.
       Declared outside CYL_FLATDESIGN_AVAILABLE, so it is there without the FlatDesign subspec too.
@@ -1373,7 +1374,7 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      - Classic tab bar (every style except FlatDesign on iOS 25 and earlier, and on iOS 26 in UI compatibility mode):
  *        the system tab bar, with its plus button, is hidden with `-setTabBarHidden:animated:` when the selected page
  *        scrolls, and shown on the opposite scroll, at the top (OnScrollDown) and when another tab or page appears
- *        (animated by UIKit on iOS 18 and later). Pages pushed with `hidesBottomBarWhenPushed` are left to UIKit, and a
+ *        (animated by UIKit on iOS 18 and later, as FlatDesign before iOS 18). Pages pushed with `hidesBottomBarWhenPushed` are left to UIKit, and a
  *        tab bar at the top (not at the bottom) is never hidden.
  *      FlatDesign and the classic tab bar hide through the same public `-setTabBarHidden:animated:` you can call yourself;
  *      a tab bar you hid with it stays hidden.
@@ -1389,7 +1390,7 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *        `-contentScrollViewForEdge:NSDirectionalRectEdgeBottom`，没有时取其视图层级中的第一个滚动视图。
  *      - 经典 TabBar（iOS 25 及以前，以及 iOS 26 UI 兼容模式下，扁平样式以外的所有样式）：选中页面滚动时，系统 TabBar 连同
  *        PlusButton 用 `-setTabBarHidden:animated:` 隐藏；反向滚动、回到顶部（OnScrollDown）、切换到其他 Tab 或页面时显示
- *        （iOS 18 起由 UIKit 执行动画）。使用 `hidesBottomBarWhenPushed` push 的页面交给 UIKit 处理，位于顶部（而非底部）的
+ *        （iOS 18 起由 UIKit 执行动画，iOS 18 以前与扁平样式相同）。使用 `hidesBottomBarWhenPushed` push 的页面交给 UIKit 处理，位于顶部（而非底部）的
  *        TabBar 不会被隐藏。
  *      扁平样式与经典 TabBar 都通过同一个公开接口 `-setTabBarHidden:animated:` 隐藏，你也可以直接调用它；你用它隐藏的 TabBar
  *      保持隐藏。
