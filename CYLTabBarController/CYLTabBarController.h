@@ -393,6 +393,7 @@ typedef NS_OPTIONS(NSUInteger, CYLTabBarReselectBehavior) {
     CYLTabBarReselectBehaviorPopToRootThenScrollToTop = CYLTabBarReselectBehaviorPopToRoot | CYLTabBarReselectBehaviorScrollToTop,
 };
 
+/*!
  * FIX: issue #152
  * [EN] Gestures on a tab button or the plus button, reported by `cyl_tabBarItemGestureHandler` and
  *      `-tabBarController:didRecognizeTabBarItemGesture:control:viewController:`, in every style (classic, Liquid Glass,
