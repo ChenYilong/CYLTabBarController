@@ -2077,6 +2077,18 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
     }
+    // FIX: issue #257, #522
+    // [EN] An image-only tab that gets a title is no longer image-only: undo the automatic adjustment, or the title stays
+    //      off screen (`UIOffsetMake(0, MAXFLOAT)`). A tab whose title becomes empty gets it again.
+    // [CN] 纯图标 Tab 设置标题后就不再是纯图标 Tab：撤销自动调整，否则标题会一直在屏幕外（`UIOffsetMake(0, MAXFLOAT)`）。
+    //      标题被清空的 Tab 重新获得自动调整。
+    if (title) {
+        if (title.length > 0) {
+            [self cyl_restoreImageOnlyTabItems:tabBarItems];
+        } else if ([_cyl_tabBar isKindOfClass:[CYLTabBar class]] && ((CYLTabBar *)_cyl_tabBar).tabImageViewDefaultOffset != 0.f) {
+            [self offsetTabBarTabImageViewToFit:((CYLTabBar *)_cyl_tabBar).tabImageViewDefaultOffset];
+        }
+    }
     // [EN] Liquid Glass may keep the tab buttons' previous layout (a longer title overlapping the plus button and the next
     //      tab) until a tab is tapped: reload them as a tap does.
     // [CN] 液态玻璃可能保持 Tab 按钮原来的布局（较长的标题与 PlusButton 及

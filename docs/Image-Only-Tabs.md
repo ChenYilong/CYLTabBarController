@@ -54,6 +54,7 @@
 | 只修改没有标题（`title.length == 0`）的 item；有标题的 Tab 保持不变。 | Only items without a title (`title.length == 0`) are changed; tabs with a title are left alone. |
 | 只写入 App 保持为零的值：item 已有非零的 `imageInsets`，或已有 `titlePositionAdjustment`（直接设置、`CYLTabBarItemTitlePositionAdjustment` 或控制器级别的偏移）时，该值不会被替换。控制器级别非零的 `imageInsets` 仍然完全关闭该功能，与以前一致。 | Only values the app left at zero are written: an item that already has non-zero `imageInsets`, or a `titlePositionAdjustment` (set directly, through `CYLTabBarItemTitlePositionAdjustment`, or the controller-level offset), keeps it. A non-zero controller-level `imageInsets` still turns the whole feature off, as before. |
 | 已写入的值不会重复写入，因此不会再引起额外的布局。 | A value already written is not written again, so it no longer causes extra layout passes. |
+| 通过 `-updateTabBarItemAtIndex:attributes:` / `-updateTabBarItemsWithAttributes:`（[#601](https://github.com/ChenYilong/CYLTabBarController/issues/601)）给纯图标 Tab 设置标题后，该 Tab 的自动调整会被撤销，标题正常显示；标题再次清空时重新应用。 | When an image-only tab gets a title through `-updateTabBarItemAtIndex:attributes:` / `-updateTabBarItemsWithAttributes:` ([#601](https://github.com/ChenYilong/CYLTabBarController/issues/601)), its automatic adjustment is undone and the title shows; when the title is cleared again, the adjustment comes back. |
 | 扁平样式（FlatDesign）不使用该功能，行为不变。 | FlatDesign does not use this feature; nothing changes there. |
 
 ## [CN]新 API
