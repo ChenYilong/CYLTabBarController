@@ -30,9 +30,10 @@ jobs:
           # FlatDesign: code can hide it on every system, so this runs the whole self-test.
           - style: FlatDesign
             runtime: ""
-          # Classic style: the default demo before iOS 26 (needs an iOS 18 simulator runtime on the runner).
+          # Default demo on the newest runtime: Liquid Glass, a smoke test (rows are SKIP, code cannot hide it). The runner has iOS 27
+          # simulators only; for the classic style before iOS 26, run RUNTIME=iOS-18 scripts/scroll-hide-self-test.sh locally.
           - style: Default
-            runtime: iOS-18
+            runtime: ""
     steps:
       - uses: actions/checkout@v4
       - name: Select the newest Xcode

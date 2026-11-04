@@ -76,7 +76,9 @@ APP="$TARGET_BUILD_DIR/$WRAPPER_NAME"
 if [ -z "$WRAPPER_NAME" ] || [ ! -d "$APP" ]; then
   APP=$(find "$DERIVED/Build/Products" -maxdepth 4 -name '*.app' -not -path '*/PlugIns/*' | head -n 1)
 fi
-[ -n "$APP" ] && [ -d "$APP" ] || { echo "No .app was built"; find "$DERIVED/Build/Products" -maxdepth 3 | head -n 40; exit 1; }
+if [ -z "$APP" ] || [ ! -d "$APP" ]; then
+  echo "No .app was built"; find "$DERIVED/Build/Products" -maxdepth 3 | head -n 40; exit 1
+fi
 echo "App bundle: $APP"
 BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
 
