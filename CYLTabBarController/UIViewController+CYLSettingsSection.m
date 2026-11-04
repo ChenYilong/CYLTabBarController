@@ -754,7 +754,7 @@ static UITableViewCell *CYLInteractionSwitchCell(UITableView *tableView, CYLTabB
 }
 
 /// [EN] A tap on the row flips its switch. [CN] 点击该行同样会拨动开关。
-static void CYLToggleInteractionSwitch(UITableView *tableView, NSIndexPath *indexPath, CYLTabBarController *_Nullable tabBarController, CYLInteractionDemoSwitchKind kind) {
+static void CYLToggleInteractionSwitch(UITableView *_Nullable tableView, NSIndexPath *indexPath, CYLTabBarController *_Nullable tabBarController, CYLInteractionDemoSwitchKind kind) {
     BOOL on = !CYLInteractionDemoSwitchIsOn(tabBarController, kind);
     CYLInteractionDemoSwitchApply(tabBarController, kind, on);
     UISwitch *demoSwitch = (UISwitch *)[tableView cellForRowAtIndexPath:indexPath].accessoryView;
@@ -1494,13 +1494,11 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
         case CYLSettingsGroupTabBarAppearance:
             return @[ @(CYLSettingsRowTitlePositionAdjustment), @(CYLSettingsRowStandardAppearance),
                       @(CYLSettingsRowTabBarMinimizeBehavior) ];
-        case CYLSettingsGroupTabBarItemUpdate: {
-            NSMutableArray<NSNumber *> *rows = [NSMutableArray array];
-            for (NSInteger row = 0; row < CYLTabBarItemUpdateRowReplaceNeighbors; row++) {
-                [rows addObject:@(update + row)];
-            }
-            return rows;
-        }
+        case CYLSettingsGroupTabBarItemUpdate:
+            return @[ @(update + CYLTabBarItemUpdateRowTitle), @(update + CYLTabBarItemUpdateRowIconView),
+                      @(update + CYLTabBarItemUpdateRowNetworkIcon), @(update + CYLTabBarItemUpdateRowAllNetworkIcons),
+                      @(update + CYLTabBarItemUpdateRowAllLocalIcons), @(update + CYLTabBarItemUpdateRowGIFIcon),
+                      @(update + CYLTabBarItemUpdateRowAllTitles) ];
         case CYLSettingsGroupPagesSelectionLogin:
             return @[ @(update + CYLTabBarItemUpdateRowReplaceNeighbors), @(CYLSettingsRowSelectedIndexIgnoringPlusButton),
                       @(CYLSettingsRowLoginState) ];
@@ -1571,11 +1569,15 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     // [EN] The rows reload their own index paths in the settings section, which a grouped list does not have: run the row
     //      without a table view; the caller reloads.
     // [CN] 各行会刷新其在设置分组中的 indexPath，而分组列表中没有该分组：不传列表执行该行，由调用方刷新。
-    [self cyl_didSelectSettingsRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:CYLSettingsSection]
-                                  inTableView:(UITableView *_Nonnull)nil];
+    [self cyl_runSettingsRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:CYLSettingsSection] inTableView:nil];
 }
 
 - (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
+    [self cyl_runSettingsRowAtIndexPath:indexPath inTableView:tableView];
+}
+
+/// [EN] Runs a row; with a table view, also deselects and reloads it. [CN] 执行某行；传入列表时同时取消选中并刷新该行。
+- (void)cyl_runSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(nullable UITableView *)tableView {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (indexPath.row == CYLSettingsRowMemoryWarning) {
         [self cyl_simulateMemoryWarningAndShowResult];

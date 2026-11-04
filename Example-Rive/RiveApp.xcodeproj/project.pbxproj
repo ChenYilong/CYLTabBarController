@@ -31,7 +31,7 @@
 		C4F7F8B25F828E7C7B86E306 /* HCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 036951B5B2B073F789932FF8 /* HCard.swift */; };
 		C8BB81F83DEDCBBF770BD1CA /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA98EA66563772A83BDA88 /* Extensions.swift */; };
 		D3CA8AD94703A4D0B9AB2D52 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16027FA884CF141ACF8691AD /* OnboardingView.swift */; };
-		D6F45F96F2196AB7B5E9E432 /* RiveUIKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29242C162EDC3294BE1BC4B0 /* RiveUIKitViewController.swift */; };
+		D6F45F96F2196AB7B5E9E432 /* RiveMenuButtonDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29242C162EDC3294BE1BC4B0 /* RiveMenuButtonDemoView.swift */; };
 		D8CE80177B49D4DDFAE39C91 /* CourseSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6605666A33C2A6CE223AD2B5 /* CourseSection.swift */; };
 		F15740D40D1D61709C97AD48 /* VCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE74468C4779D2C9657DDB0A /* VCard.swift */; };
 		F2EA4C27D59FFEFFD097501A /* confetti.riv in Resources */ = {isa = PBXBuildFile; fileRef = C78A77277F5BF044CE896CCF /* confetti.riv */; };
@@ -44,7 +44,7 @@
 		16027FA884CF141ACF8691AD /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		1E61D8530FAB92D859BBCDFC /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		26FF32281E56757A718BBBB4 /* SideMenu.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SideMenu.swift; sourceTree = "<group>"; };
-		29242C162EDC3294BE1BC4B0 /* RiveUIKitViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RiveUIKitViewController.swift; sourceTree = "<group>"; };
+		29242C162EDC3294BE1BC4B0 /* RiveMenuButtonDemoView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RiveMenuButtonDemoView.swift; sourceTree = "<group>"; };
 		302B7A22BBFEB0B6D2D1F250 /* TabItems.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TabItems.swift; sourceTree = "<group>"; };
 		45BFB2F14A25627FEFFEF13E /* Poppins-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Poppins-Bold.ttf"; sourceTree = "<group>"; };
 		484F60C30CA9614BAA11FB7E /* house.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = house.riv; sourceTree = "<group>"; };
@@ -182,7 +182,7 @@
 			children = (
 				5FF527C082D0F487D0E94689 /* AppDelegate.swift */,
 				C0A94E53C3C2459E59C39BB0 /* TabViewControllers.swift */,
-				29242C162EDC3294BE1BC4B0 /* RiveUIKitViewController.swift */,
+				29242C162EDC3294BE1BC4B0 /* RiveMenuButtonDemoView.swift */,
 				9A25FDF1B50065AB34F5233C /* Info.plist */,
 			);
 			name = RiveApp;
@@ -314,7 +314,7 @@
 			files = (
 				B0D4999FF5EE129B8EE2C3CD /* AppDelegate.swift in Sources */,
 				8C7CC7F169DF6D09CFED6CBE /* TabViewControllers.swift in Sources */,
-				D6F45F96F2196AB7B5E9E432 /* RiveUIKitViewController.swift in Sources */,
+				D6F45F96F2196AB7B5E9E432 /* RiveMenuButtonDemoView.swift in Sources */,
 				C4F7F8B25F828E7C7B86E306 /* HCard.swift in Sources */,
 				F15740D40D1D61709C97AD48 /* VCard.swift in Sources */,
 				9049620E8B510276C7D44D09 /* RiveAnimation.swift in Sources */,

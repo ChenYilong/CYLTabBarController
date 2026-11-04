@@ -382,13 +382,19 @@ static const NSInteger CYLDemoRowTabBar = 1000;
         if (settingsGroup == CYLSettingsGroupTabBarAppearance) {
             // [EN] Show / hide, height, item layout and background color of the tab bar.
             // [CN] 显示 / 隐藏、高度、TabBarItem 布局与背景色。
-            [rows addObjectsFromArray:@[ @(CYLDemoRowTabBar + 0), @(CYLDemoRowTabBar + 4), @(CYLDemoRowTabBar + 1),
-                                         @(CYLDemoRowTabBar + 2), @(CYLDemoRowTabBar + 3) ]];
+            [rows addObjectsFromArray:@[ @(CYLDemoRowTabBar + CYLTabBarDemoRowShowHideTabBar),
+                                         @(CYLDemoRowTabBar + CYLTabBarDemoRowTabBarHeight),
+                                         @(CYLDemoRowTabBar + CYLTabBarDemoRowItemNotCentered),
+                                         @(CYLDemoRowTabBar + CYLTabBarDemoRowItemCentered),
+                                         @(CYLDemoRowTabBar + CYLTabBarDemoRowItemBackgroundColor) ]];
         }
         [sections addObject:@{ @"title" : [self cyl_titleForSettingsGroup:settingsGroup], @"rows" : rows }];
     }
     [sections addObject:@{ @"title" : CYLLocalizedString(@"跳转与对比"),
-                           @"rows" : @[ @(CYLDemoRowTabBar + 5), @(CYLDemoRowTabBar + 6), @(CYLDemoRowTabBar + 7), @(CYLDemoRowTabBar + 8) ] }];
+                           @"rows" : @[ @(CYLDemoRowTabBar + CYLTabBarDemoRowCompareSystemTabBar),
+                                        @(CYLDemoRowTabBar + CYLTabBarDemoRowPushSystemStyle),
+                                        @(CYLDemoRowTabBar + CYLTabBarDemoRowPushFlatDesign),
+                                        @(CYLDemoRowTabBar + CYLTabBarDemoRowPopPushDemo) ] }];
     return sections;
 }
 

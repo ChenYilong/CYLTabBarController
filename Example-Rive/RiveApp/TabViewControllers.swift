@@ -9,8 +9,8 @@ import SwiftUI
 import UIKit
 
 extension Tab {
-    /// [EN] The page of each tab: the course's SwiftUI screens in a UIHostingController, and one plain UIKit page.
-    /// [CN] 每个 Tab 的页面：放在 UIHostingController 中的课程 SwiftUI 页面，以及一个纯 UIKit 页面。
+    /// [EN] The page of each tab: the course's SwiftUI screens in a UIHostingController, and the UIKit test list.
+    /// [CN] 每个 Tab 的页面：放在 UIHostingController 中的课程 SwiftUI 页面，以及 UIKit 测试列表。
     var viewController: UIViewController {
         let rootViewController: UIViewController
         switch self {
@@ -25,7 +25,11 @@ extension Tab {
         case .timer:
             rootViewController = UIHostingController(rootView: OnboardingView(show: .constant(true)))
         case .bell:
-            rootViewController = RiveUIKitViewController()
+            // [EN] The test list of every demo, with a Rive animation in plain UIKit above it.
+            // [CN] 所有 Demo 共用的测试列表，上方是纯 UIKit 中的 Rive 动画。
+            let settingsViewController = CYLSettingsDemoTableViewController()
+            settingsViewController.headerView = RiveMenuButtonDemoView()
+            rootViewController = settingsViewController
         case .user:
             rootViewController = UIHostingController(rootView: SignInView(show: .constant(true)))
         }
