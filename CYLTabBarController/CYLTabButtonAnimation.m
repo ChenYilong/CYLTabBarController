@@ -39,6 +39,9 @@ static NSArray *CYLTabButtonCGImages(NSArray<UIImage *> *images, BOOL reversed) 
     return frames;
 }
 
+/// [EN] The held frames of `CYLTabButtonFrameAnimation`. [CN] `CYLTabButtonFrameAnimation` 保持的帧。
+static NSString *const CYLTabButtonFrameAnimationKey = @"cyl.tabButton.frames";
+
 static void CYLTabButtonPlayFrameAnimation(UIView *iconView, NSArray<UIImage *> *images, BOOL reversed) {
     NSArray *frames = CYLTabButtonCGImages(images, reversed);
     if (frames.count == 0) {
@@ -47,9 +50,11 @@ static void CYLTabButtonPlayFrameAnimation(UIView *iconView, NSArray<UIImage *> 
     CAKeyframeAnimation *animation = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathContents, frames, CYLTabButtonAnimationDuration);
     animation.calculationMode = kCAAnimationDiscrete;
     animation.repeatCount = 1;
-    animation.removedOnCompletion = NO;
-    animation.fillMode = kCAFillModeForwards;
-    [iconView.layer addAnimation:animation forKey:nil];
+    // [EN] Selected: the last frame stays. Deselected (reversed): back to the icon itself at the end, not to the first frame.
+    // [CN] 选中：保持最后一帧。取消选中（倒序）：结束后恢复为图标本身，而不是停在第一帧。
+    animation.removedOnCompletion = reversed;
+    animation.fillMode = reversed ? kCAFillModeRemoved : kCAFillModeForwards;
+    [iconView.layer addAnimation:animation forKey:CYLTabButtonFrameAnimationKey];
 }
 
 /// [EN] A small dot drawn in `color`, the default firework particle. [CN] 用 `color` 绘制的小圆点，默认的烟花粒子。
@@ -264,6 +269,14 @@ static void CYLTabButtonFumeMoveIcon(UIView *iconView, NSArray *values) {
     titleLabel.alpha = 1;
 }
 
+- (void)cyl_resetTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    [iconView.layer removeAnimationForKey:@"cyl.tabButton.fume.icon"];
+    for (NSString *key in @[ @"cyl.tabButton.fume.move", @"cyl.tabButton.fume.scale", @"cyl.tabButton.fume.opacity" ]) {
+        [titleLabel.layer removeAnimationForKey:key];
+    }
+    titleLabel.alpha = 1;
+}
+
 @end
 
 #pragma mark - CYLTabButtonFlipAnimation
@@ -336,6 +349,10 @@ static UIViewAnimationOptions CYLTabButtonFlipOption(NSUInteger direction) {
         return;
     }
     CYLTabButtonPlayFrameAnimation(iconView, self.images, YES);
+}
+
+- (void)cyl_resetTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    [iconView.layer removeAnimationForKey:CYLTabButtonFrameAnimationKey];
 }
 
 @end

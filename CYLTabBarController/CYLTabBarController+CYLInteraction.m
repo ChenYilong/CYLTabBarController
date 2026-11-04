@@ -213,6 +213,26 @@ static NSArray<UIControl *> *CYLTabButtonLayers(UIControl *control) {
 
 #pragma mark - Animations
 
+static const void *CYLLastSelectAnimationKey = &CYLLastSelectAnimationKey;
+
+/*!
+ * [EN] When `control`'s last select animation is not `animation`, lets it undo what it left on the button (all layers in
+ *      Liquid Glass), then forgets it.
+ * [CN] 若 `control` 上一次的选中动画不是 `animation`，让它撤销留在按钮上的状态（液态玻璃下包括所有图层），然后不再记录。
+ */
+static void CYLTabButtonResetAnimationIfReplaced(UIControl *control, id<CYLTabButtonAnimation> _Nullable animation) {
+    id<CYLTabButtonAnimation> lastAnimation = objc_getAssociatedObject(control, CYLLastSelectAnimationKey);
+    if (!lastAnimation || lastAnimation == animation) {
+        return;
+    }
+    if ([lastAnimation respondsToSelector:@selector(cyl_resetTabButton:iconView:titleLabel:)]) {
+        for (UIControl *layer in CYLTabButtonLayers(control)) {
+            [lastAnimation cyl_resetTabButton:layer iconView:CYLTabButtonIconView(layer) titleLabel:CYLTabButtonTitleLabel(layer)];
+        }
+    }
+    objc_setAssociatedObject(control, CYLLastSelectAnimationKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabButtonTapAnimationType type) {
     switch (type) {
         case CYLTabButtonTapAnimationTypeScale:
@@ -317,6 +337,12 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
     }
     // [EN] Held weakly (CYLUtils): a tab button can be replaced by UIKit. [CN] 弱引用（CYLUtils）：Tab 按钮可能被 UIKit 替换。
     UIControl *previousControl = [self cyl_weakAssociatedObjectForKey:CYLPreviousAnimatedControlKey];
+    // [EN] A button keeps the state its last select animation left (a held frame, a hidden title); when another animation
+    //      takes over, that one resets it first.
+    // [CN] 按钮保留其上一次选中动画留下的状态（保持的帧、隐藏的标题）；当其他动画接管时，先由上一次的动画撤销该状态。
+    if (previousControl && previousControl != control) {
+        CYLTabButtonResetAnimationIfReplaced(previousControl, [self cyl_animationForTabControl:previousControl]);
+    }
     NSUInteger index = [self cyl_viewControllerIndexForTabControl:control];
     NSUInteger previousIndex = [self cyl_viewControllerIndexForTabControl:previousControl];
     BOOL hasIndexes = (index != NSNotFound && previousIndex != NSNotFound);
@@ -339,9 +365,11 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
     [self cyl_setWeakAssociatedObject:control forKey:CYLPreviousAnimatedControlKey];
 
     id<CYLTabButtonAnimation> animation = [self cyl_animationForTabControl:control];
+    CYLTabButtonResetAnimationIfReplaced(control, animation);
     if (!animation) {
         return;
     }
+    objc_setAssociatedObject(control, CYLLastSelectAnimationKey, animation, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     if (hasIndexes && [animation respondsToSelector:@selector(cyl_setFromLeft:)]) {
         animation.cyl_fromLeft = previousIndex < index;
     }

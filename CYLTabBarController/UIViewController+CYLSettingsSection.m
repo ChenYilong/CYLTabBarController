@@ -694,7 +694,9 @@ static void CYLInteractionDemoSwitchApply(CYLTabBarController *_Nullable tabBarC
         return;
     }
     tabBarController.cyl_didLongPressControlBlock = ^(CYLTabBarController *pressedTabBarController, UIControl *control) {
-        NSString *name = control.cyl_tabBarItemIdentifier ?: NSStringFromClass([control class]);
+        // [EN] The title the user sees first (an identifier can be a generated class name, e.g. a SwiftUI hosting controller's).
+        // [CN] 优先使用用户看到的标题（标识可能是自动生成的类名，例如 SwiftUI hosting controller 的类名）。
+        NSString *name = control.accessibilityLabel.length > 0 ? control.accessibilityLabel : (control.cyl_tabBarItemIdentifier ?: NSStringFromClass([control class]));
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:CYLLocalizedString(@"长按了「%@」"), name]
                                                                        message:nil
                                                                 preferredStyle:UIAlertControllerStyleAlert];
@@ -923,7 +925,12 @@ static NSString *const CYLNavigationSettingCellIdentifier = @"CYLNavigationSetti
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor whiteColor];
+    // [EN] Follows Dark Mode, like the label's text color. [CN] 与文字颜色一样跟随暗黑模式。
+    if (@available(iOS 13.0, *)) {
+        self.view.backgroundColor = [UIColor systemBackgroundColor];
+    } else {
+        self.view.backgroundColor = [UIColor whiteColor];
+    }
     self.cyl_navigationBarHidden = YES;
     self.cyl_hidesAncestorNavigationBars = YES;
     UILabel *label = [[UILabel alloc] init];
