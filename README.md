@@ -1757,6 +1757,7 @@ use_frameworks!
 | 中文 | English |
 |:---|:---|
 | 请使用 `self.navigationItem.title = @"同城";`： | Use `self.navigationItem.title = @"同城";`: |
+| 切换 Tab 时底部文字闪动、或变成导航栏标题（[#258](https://github.com/ChenYilong/CYLTabBarController/issues/258)），也是 `self.title` 导致的：页面第一次被选中时才执行 `viewDidLoad`，UIKit 把其中的 `self.title` 同步写入 `tabBarItem.title`。详见 [FAQ](docs/FAQ.md#cn页面里设置-selftitle-后tab-的文字也变了)。 | A tab title that flickers when switching tabs, or turns into the navigation bar title ([#258](https://github.com/ChenYilong/CYLTabBarController/issues/258)), is also caused by `self.title`: the page runs `viewDidLoad` only when first selected, and UIKit copies its `self.title` into `tabBarItem.title`. See the [FAQ](docs/FAQ.md#ensetting-selftitle-in-a-page-also-changes-the-tab-title). |
 
 | 中文 | English |
 |:---|:---|
