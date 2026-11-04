@@ -1,7 +1,10 @@
 # [EN] iOS CI on GitHub-hosted macOS runners (free for this public repository). See docs/Mac-CI-CD.md.
-#      `xcode-27`: Apple Silicon runner with Xcode 27 (public preview); the project needs Xcode 27 (scripts/pod-lint.xcconfig).
+#      Runner: `macos-26` (Apple Silicon, stable image, default Xcode 26.x). To use another runner without editing this
+#      file, set the repository variable MACOS_RUNNER (Settings → Secrets and variables → Actions → Variables), e.g.
+#      `xcode-27` for the Xcode 27 public preview.
 # [CN] 在 GitHub 托管的 macOS runner 上运行 iOS CI（本公开仓库免费），见 docs/Mac-CI-CD.md。
-#      `xcode-27`：带 Xcode 27 的 Apple Silicon runner（公开预览）；本项目需要 Xcode 27（scripts/pod-lint.xcconfig）。
+#      Runner：`macos-26`（Apple Silicon，稳定镜像，默认 Xcode 26.x）。想换 runner 而不改本文件时，设置仓库变量 MACOS_RUNNER
+#      （Settings → Secrets and variables → Actions → Variables），例如 `xcode-27`（Xcode 27 公开预览）。
 name: iOS
 
 on:
@@ -61,7 +64,7 @@ jobs:
   lint:
     name: pod lib lint
     needs: changes
-    runs-on: xcode-27
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -79,6 +82,7 @@ jobs:
         run: |
           sw_vers
           xcodebuild -version
+          xcodebuild -showsdks | grep -i iphone
           pod --version || sudo gem install cocoapods
       - name: pod lib lint
         if: needs.changes.outputs.code == 'true'
@@ -89,7 +93,7 @@ jobs:
   framework:
     name: Framework build and analyze
     needs: changes
-    runs-on: xcode-27
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -156,7 +160,7 @@ jobs:
   carthage:
     name: Carthage
     needs: changes
-    runs-on: xcode-27
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -172,7 +176,7 @@ jobs:
   examples:
     name: Demo ${{ matrix.demo }}
     needs: changes
-    runs-on: xcode-27
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
     timeout-minutes: 60
     strategy:
       fail-fast: false

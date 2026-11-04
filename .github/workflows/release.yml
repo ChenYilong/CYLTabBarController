@@ -1,11 +1,13 @@
-# [EN] Release on a version tag (e.g. 1.99.73), on a GitHub-hosted xcode-27 macOS runner. See docs/Mac-CI-CD.md.
+# [EN] Release on a version tag (e.g. 1.99.73), on a GitHub-hosted macOS runner: `macos-26`, or the
+#      repository variable MACOS_RUNNER when set. See docs/Mac-CI-CD.md.
 #      1. The tag must equal `s.version` in CYLTabBarController.podspec.
 #      2. `scripts/pod-lint.sh push`: `pod trunk push` with the COCOAPODS_TRUNK_TOKEN secret, then the Carthage and SPM
 #         versions in the demo and the docs move to the new version.
 #      3. A GitHub Release with generated notes.
 #      4. A pull request with the files step 2 changed. Normally there are none: `scripts/pod-lint.sh bump <version>`
 #         already updated them in the release pull request, which ran CI.
-# [CN] 推送版本 tag（如 1.99.73）时发布，运行在 GitHub 托管的 xcode-27 macOS runner 上。见 docs/Mac-CI-CD.md。
+# [CN] 推送版本 tag（如 1.99.73）时发布，运行在 GitHub 托管的 macOS runner 上：`macos-26`，设置了仓库变量
+#      MACOS_RUNNER 时使用该变量。见 docs/Mac-CI-CD.md。
 #      1. tag 必须等于 CYLTabBarController.podspec 中的 `s.version`。
 #      2. `scripts/pod-lint.sh push`：使用 Secret COCOAPODS_TRUNK_TOKEN 执行 `pod trunk push`，然后把 Demo 与文档中 Carthage、SPM 的版本号
 #         更新为新版本。
@@ -28,7 +30,7 @@ concurrency:
 jobs:
   publish:
     name: Publish ${{ github.ref_name }}
-    runs-on: xcode-27
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
     timeout-minutes: 60
     env:
       TAG: ${{ github.ref_name }}

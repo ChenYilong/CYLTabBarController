@@ -29,6 +29,7 @@
 | [推荐流水线设计](#cn推荐流水线设计) | [Recommended pipeline](#enrecommended-pipeline) |
 | [已添加的 CI workflow](#cn已添加的-ci-workflow) | [The CI workflow](#enthe-ci-workflow) |
 | [发布流程](#cn发布流程) | [Releasing](#enreleasing) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [运行环境：macos-26](#cn运行环境macos-26) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Runner: macos-26](#enrunner-macos-26) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [CI 提速与脚本检查](#cnci-提速与脚本检查) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Faster CI and script checks](#enfaster-ci-and-script-checks) |
 | [首次运行结果](#cn首次运行结果) | [First run results](#enfirst-run-results) |
 | [风险与注意事项](#cn风险与注意事项) | [Risks and notes](#enrisks-and-notes) |
@@ -226,6 +227,16 @@ jobs:
 | **设置**：（仅在发布时仍有版本文件改动时才会开 PR）自动开 PR 需要在 Settings → Actions → General 中开启「Allow GitHub Actions to create and approve pull requests」；未开启时分支仍会推送，运行日志中给出手动创建 PR 的链接。 | **Setting**: (a pull request is opened only when publishing still changed version files) opening it needs "Allow GitHub Actions to create and approve pull requests" in Settings → Actions → General; without it the branch is still pushed and the run log links to open the pull request by hand. |
 | **必需检查**：用 `GITHUB_TOKEN` 创建的 PR 不会触发其他 workflow，因此若 master 设置了必需检查，这个 PR 不会自动运行 CI。它只修改 Cartfile 与文档中的版本号；可以由管理员绕过合并（ruleset 的 Bypass list），或在本地向该分支推送一次提交以触发 CI。 | **Required checks**: pull requests created with `GITHUB_TOKEN` do not trigger other workflows, so if master requires checks, CI does not run on this pull request by itself. It only changes version numbers in the Cartfile and the docs; an admin can merge it through the ruleset's bypass list, or push one commit to its branch locally to trigger CI. |
 | **Token 过期**：trunk session 会过期（`pod trunk me` 可查看到期日）。过期后发布步骤会失败，需要重新 `pod trunk register` 并更新 Secret。 | **Token expiry**: trunk sessions expire (`pod trunk me` shows the date). Publishing then fails; run `pod trunk register` again and update the secret. |
+
+### [CN]运行环境：macos-26
+### [EN]Runner: macos-26
+
+| 中文 | English |
+|:---|:---|
+| **CI 与发布都运行在 `macos-26`**（2026-11-04 起，此前为 `xcode-27`）：Apple Silicon 稳定镜像，默认 Xcode 26.6（iOS 26.5 SDK），镜像中还有 Xcode 26.0.1–26.5，没有 Xcode 27。 | **CI and releases run on `macos-26`** (since 2026-11-04; `xcode-27` before): the stable Apple Silicon image, default Xcode 26.6 (iOS 26.5 SDK), with Xcode 26.0.1–26.5 also installed and no Xcode 27. |
+| **为什么能用 Xcode 26 编译**：本库使用 iOS 27 / 27.1 API 的地方（竖向栏、`UIHingeInteraction` 等）都有 `#if defined(__IPHONE_27_1) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_27_1` 保护，用 iOS 26 SDK 编译时这些代码不参与编译；其余只用 `@available` 运行时判断。`scripts/pod-lint.xcconfig` 的 iOS 15.0 最低版本对 Xcode 26 同样适用。 | **Why Xcode 26 can build it**: every use of iOS 27 / 27.1 API in the library (the vertical bar, `UIHingeInteraction` and so on) is guarded by `#if defined(__IPHONE_27_1) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_27_1`, so it is left out when building with the iOS 26 SDK; the rest only uses `@available` runtime checks. The iOS 15.0 deployment target of `scripts/pod-lint.xcconfig` works with Xcode 26 too. |
+| **注意**：用 iOS 26 SDK 编译时，iOS 27.1 的竖向栏相关代码不会被编译，所以 CI 不再覆盖这部分；发布的源码由使用者用自己的 Xcode 编译，不受影响。 | **Note**: with the iOS 26 SDK, the iOS 27.1 vertical-bar code is not compiled, so CI no longer covers it; the published sources are compiled by each app with its own Xcode, so releases are not affected. |
+| **切换 runner 不用改 workflow**：在 Settings → Secrets and variables → Actions → Variables 中新建仓库变量 `MACOS_RUNNER`，值为 runner 标签（例如 `xcode-27`），`ios.yml` 与 `release.yml` 的 macOS job 都会改用它；删除变量即回到 `macos-26`。 | **Switching runners needs no workflow change**: in Settings → Secrets and variables → Actions → Variables, add the repository variable `MACOS_RUNNER` with a runner label (e.g. `xcode-27`); the macOS jobs of `ios.yml` and `release.yml` then use it. Delete the variable to go back to `macos-26`. |
 
 ### [CN]CI 提速与脚本检查
 ### [EN]Faster CI and script checks
