@@ -75,6 +75,36 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
     CYLTabBarStyleTypeLiquidGlass
 };
 
+/*!
+ * [EN] How the tab bar reacts to scrolling (issue #13). One value for every style, set with
+ *      `-[CYLTabBarController cyl_tabBarMinimizeBehavior]`:
+ *      - Liquid Glass (iOS 26+): passed to the native `UITabBarController.tabBarMinimizeBehavior`; the system minimizes
+ *        (shrinks) the tab bar, and the plus button is centered on its tab meanwhile.
+ *      - FlatDesign: the tab bar is hidden and shown with `-setTabBarHidden:animated:` while the current page scrolls.
+ *      - Classic tab bar (iOS 25 and earlier, and iOS 26 in UI compatibility mode): the system tab bar, with its plus
+ *        button, is hidden and shown with `-setTabBarHidden:animated:` while the current page scrolls.
+ *      The values match `UITabBarMinimizeBehavior` one to one.
+ * [CN] TabBar 随滚动的变化方式（issue #13）。所有样式共用一个值，通过 `-[CYLTabBarController cyl_tabBarMinimizeBehavior]` 设置：
+ *      - 液态玻璃（iOS 26+）：传给系统原生的 `UITabBarController.tabBarMinimizeBehavior`，由系统缩小 TabBar，期间 PlusButton 居中于它的 Tab。
+ *      - 扁平样式：当前页面滚动时，通过 `-setTabBarHidden:animated:` 隐藏、显示 TabBar。
+ *      - 经典 TabBar（iOS 25 及以前，以及 iOS 26 的 UI 兼容模式）：当前页面滚动时，用 `-setTabBarHidden:animated:` 隐藏、显示系统 TabBar（连同 PlusButton）。
+ *      各个取值与 `UITabBarMinimizeBehavior` 一一对应。
+ */
+typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
+    /// [EN] Liquid Glass: the system default. FlatDesign and classic: same as Never.
+    /// [CN] 液态玻璃：系统默认行为。扁平样式与经典样式：等同于 Never。
+    CYLTabBarMinimizeBehaviorAutomatic = 0,
+    /// [EN] The tab bar never minimizes or hides on scroll. [CN] 滚动时 TabBar 不缩小、不隐藏。
+    CYLTabBarMinimizeBehaviorNever,
+    /// [EN] Minimizes (FlatDesign and classic: hides) when scrolling down, expands when scrolling back up.
+    /// [CN] 向下滚动时缩小（扁平样式与经典样式：隐藏），向上滚动时恢复。
+    CYLTabBarMinimizeBehaviorOnScrollDown,
+    /// [EN] Minimizes (FlatDesign and classic: hides) when scrolling up, expands when scrolling back down; for content
+    ///      aligned to the bottom, such as a chat.
+    /// [CN] 向上滚动时缩小（扁平样式与经典样式：隐藏），向下滚动时恢复；适合底部对齐的内容，如聊天页面。
+    CYLTabBarMinimizeBehaviorOnScrollUp,
+};
+
 @interface CYLConstants : NSObject
 
 /*!

@@ -242,6 +242,9 @@
 "滑动转场（CYLTabBarSlideTransitionAnimator）" = "Csúszó átmenet (CYLTabBarSlideTransitionAnimator)";
 "点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Koppintson egy rendszer UITabBarController megnyitásához: koppintson egy lapra, vagy húzza az oldalt balra vagy jobbra, és az oldal követi az ujját.";
 
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "TabBar kicsinyítése / elrejtése görgetéskor (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "Koppintson a görgetési viselkedés módosításához. Most: %@. Liquid Glass (iOS 26+): a rendszer kicsinyíti a TabBart; FlatDesign és a klasszikus stílus (iOS 25 és korábbi, az iOS 26 UI-kompatibilitási módja): a TabBar elrejtődik.";
 "当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Ez a lapsávstílus nem támogatja: csak FlatDesign (CYLFlatDesignTabBar)";
 "当前 TabBar 样式不支持" = "Ez a lapsávstílus nem támogatja";
 "该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "FlatDesign lapelemek (CYLFlatDesignTabBarItem) szükségesek. Liquid Glass és a klasszikus stílus esetén a rendszer rajzolja az elemeket, így az elrendezés és a háttérszín nem módosítható.";

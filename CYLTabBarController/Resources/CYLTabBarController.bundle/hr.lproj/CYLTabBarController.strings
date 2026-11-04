@@ -242,6 +242,9 @@
 "滑动转场（CYLTabBarSlideTransitionAnimator）" = "Klizni prijelaz (CYLTabBarSlideTransitionAnimator)";
 "点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Dodirnite za otvaranje sustavnog UITabBarControllera: dodirnite karticu ili povucite stranicu lijevo ili desno i stranica klizi s prstom.";
 
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "Smanji / sakrij TabBar pri pomicanju (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "Dodirnite za promjenu ponašanja pri pomicanju. Sada: %@. Liquid Glass (iOS 26+): sustav smanjuje TabBar; FlatDesign i klasični stil (iOS 25 i stariji, način kompatibilnosti sučelja u iOS-u 26): TabBar se skriva.";
 "当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Ovaj stil trake ne podržava: samo FlatDesign (CYLFlatDesignTabBar)";
 "当前 TabBar 样式不支持" = "Ovaj stil trake ne podržava";
 "该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Potrebne su FlatDesign stavke (CYLFlatDesignTabBarItem). U Liquid Glassu i klasičnom stilu sustav crta stavke pa se raspored i boja pozadine ne mogu mijenjati.";

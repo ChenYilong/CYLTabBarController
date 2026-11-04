@@ -242,6 +242,9 @@
 "滑动转场（CYLTabBarSlideTransitionAnimator）" = "Schuifovergang (CYLTabBarSlideTransitionAnimator)";
 "点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Tik om een systeem-UITabBarController te openen: tik op een tabblad of sleep de pagina naar links of rechts, en de pagina schuift mee met je vinger.";
 
+/* Issue #13: minimize / hide the tab bar on scroll demo row. */
+"滚动时缩小 / 隐藏 TabBar（issue #13）" = "TabBar verkleinen / verbergen bij scrollen (issue #13)";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "Tik om het scrollgedrag te wijzigen. Nu: %@. Liquid Glass (iOS 26+): het systeem verkleint de TabBar; FlatDesign en de klassieke stijl (iOS 25 en eerder, UI-compatibiliteitsmodus van iOS 26): de TabBar wordt verborgen.";
 "当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Niet ondersteund door deze tabbalkstijl: alleen FlatDesign (CYLFlatDesignTabBar)";
 "当前 TabBar 样式不支持" = "Niet ondersteund door deze tabbalkstijl";
 "该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Vereist FlatDesign-tabitems (CYLFlatDesignTabBarItem). Bij Liquid Glass en de klassieke stijl tekent het systeem de items, dus indeling en achtergrondkleur kunnen niet worden gewijzigd.";
