@@ -1627,6 +1627,8 @@ static NSDictionary *_Nullable CYLDictionaryFromXML(NSData *data, NSError **erro
     NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
     CYLXMLTreeBuilder *builder = [[CYLXMLTreeBuilder alloc] init];
     parser.delegate = builder;
+    // Never fetch or expand external entities (XXE, A14). 绝不获取或展开外部实体（XXE，A14）。
+    parser.shouldResolveExternalEntities = NO;
     BOOL parsed = [parser parse];
     if (builder.tooDeep) {
         if (error) { *error = CYLConfigurationTooDeepError(@"XML"); }
@@ -2126,6 +2128,13 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
     return data.length >= length && memcmp(data.bytes, prefix, length) == 0;
 }
 
+@interface CYLTabBarConfigurationParser ()
+/// [EN] One parse in one format, without the retry of A7. [CN] 按一种格式解析一次，不含 A7 的重试。
++ (nullable NSDictionary<NSString *, id> *)cyl_dictionaryWithData:(NSData *)data
+                                                           format:(CYLTabBarConfigurationFormat)format
+                                                            error:(NSError *_Nullable *_Nullable)error;
+@end
+
 @implementation CYLTabBarConfigurationParser
 
 + (NSDictionary<NSString *, NSNumber *> *)formatsByPathExtension {
@@ -2260,7 +2269,7 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
             continue; // Plain text is a valid YAML scalar, not a configuration. 纯文本是合法的 YAML 标量，但不是配置。
         }
         NSError *error = nil;
-        NSDictionary *dictionary = [self dictionaryWithData:data format:format error:&error];
+        NSDictionary *dictionary = [self cyl_dictionaryWithData:data format:format error:&error];
         if (dictionary.count > 0 || error.code == CYLTabBarConfigurationErrorTooDeep) {
             // Too deep: this is the format, and the caller gets the TooDeep error. 嵌套过深：就是该格式，调用方会得到 TooDeep 错误。
             return format;
@@ -2272,6 +2281,37 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
 + (NSDictionary<NSString *, id> *)dictionaryWithData:(NSData *)data
                                               format:(CYLTabBarConfigurationFormat)format
                                                error:(NSError **)error {
+    NSError *firstError = nil;
+    NSDictionary<NSString *, id> *dictionary = [self cyl_dictionaryWithData:data format:format error:&firstError];
+    if (dictionary || format == CYLTabBarConfigurationFormatUnknown ||
+        (firstError.code != CYLTabBarConfigurationErrorInvalidSyntax && firstError.code != CYLTabBarConfigurationErrorNotADictionary)) {
+        if (error) {
+            *error = firstError;
+        }
+        return dictionary;
+    }
+    // The extension or Content-Type was wrong (e.g. YAML in a .json file): detect the format and try again (A7).
+    // 扩展名或 Content-Type 有误（例如 .json 文件中是 YAML）：根据内容识别格式并重试（A7）。
+    CYLTabBarConfigurationFormat detected = [self formatBySniffingData:data];
+    if (detected != CYLTabBarConfigurationFormatUnknown && detected != format) {
+        dictionary = [self cyl_dictionaryWithData:data format:detected error:NULL];
+        if (dictionary) {
+#if defined(DEBUG) || defined(BETA)
+            NSLog(@"🟡 CYLTabBarConfigurationParser: the content is %@, not %@; read as %@.",
+                  [self nameOfFormat:detected], [self nameOfFormat:format], [self nameOfFormat:detected]);
+#endif
+            return dictionary;
+        }
+    }
+    if (error) {
+        *error = firstError;
+    }
+    return nil;
+}
+
++ (nullable NSDictionary<NSString *, id> *)cyl_dictionaryWithData:(NSData *)data
+                                                           format:(CYLTabBarConfigurationFormat)format
+                                                            error:(NSError **)error {
     if (data.length > CYLTabBarConfigurationMaximumLength) {
         if (error) {
             *error = CYLConfigurationError(CYLTabBarConfigurationErrorTooLarge,

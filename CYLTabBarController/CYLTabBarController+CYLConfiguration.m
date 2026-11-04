@@ -147,6 +147,15 @@ static NSNumber *_Nullable CYLStyleTypeValue(id value) {
             CYLLogInvalidConfigurationValue(CYLTabBarControllerStyleType, value);
             return nil;
         }
+#if !CYL_FLATDESIGN_AVAILABLE
+        if (style == CYLTabBarStyleTypeFlatDesign) {
+            // FlatDesign needs its subspec (B10). 扁平样式需要其子库（B10）。
+#if defined(DEBUG) || defined(BETA)
+            NSLog(@"🔴 CYLTabBarController configuration: flatDesign needs the CYLTabBarController/CYLFlatDesignTabBar subspec; the default style is used.");
+#endif
+            return nil;
+        }
+#endif
         return @(style);
     }
     if (![value isKindOfClass:[NSString class]]) {
@@ -210,17 +219,64 @@ static NSString *CYLMainBundlePath(NSString *path) {
     return found ?: path;
 }
 
-/// [EN] An NSURL from a URL string, a path or a file name in the main bundle. [CN] 将 URL 字符串、路径或 main bundle 中的文件名转换为 NSURL。
-static id CYLURLValue(id value) {
-    if (![value isKindOfClass:[NSString class]]) {
-        return value;
+static BOOL CYLIsRemoteURL(NSURL *URL) {
+    NSString *scheme = URL.scheme.lowercaseString;
+    return ([scheme isEqualToString:@"https"] || [scheme isEqualToString:@"http"]) && URL.host.length > 0;
+}
+
+static BOOL CYLFileExists(NSString *path) {
+    BOOL isDirectory = NO;
+    return path.length > 0 && [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] && !isDirectory;
+}
+
+/*!
+ * [EN] An NSURL from a URL, a URL string, a path or a file name in the main bundle: only http(s) URLs and local files
+ *      that exist; anything else is nil (B13).
+ * [CN] 将 URL、URL 字符串、路径或 main bundle 中的文件名转换为 NSURL：只接受 http(s) URL 与存在的本地文件，其他情况返回 nil（B13）。
+ */
+static NSURL *_Nullable CYLURLValue(id value) {
+    NSURL *URL = [value isKindOfClass:[NSURL class]] ? value : nil;
+    if ([value isKindOfClass:[NSString class]]) {
+        NSURL *parsed = [NSURL URLWithString:value];
+        URL = parsed.scheme.length > 1 ? parsed : [NSURL fileURLWithPath:CYLMainBundlePath(value)];
     }
-    NSString *string = value;
-    NSURL *URL = [NSURL URLWithString:string];
-    if (URL.scheme.length > 1) {
+    if (CYLIsRemoteURL(URL) || (URL.isFileURL && CYLFileExists(URL.path))) {
         return URL;
     }
-    return [NSURL fileURLWithPath:CYLMainBundlePath(string)];
+    return nil;
+}
+
+/*!
+ * [EN] An icon for `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL`, which take the sources of
+ *      `-setTabBarItemIcon:selectedIcon:size:atIndex:` (B13): a UIImage (kept); an NSURL or URL string, kept when it is
+ *      http(s) or a local file that exists; an absolute path, kept when the file exists; any other string is a file
+ *      name in the main bundle (its path) or an image name (kept: a missing image only leaves the tab's own icon, B14).
+ *      Other URL schemes and other types are nil.
+ * [CN] `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL` 的图标，接受 `-setTabBarItemIcon:selectedIcon:size:atIndex:` 的来源（B13）：
+ *      UIImage（保留）；NSURL 或 URL 字符串，为 http(s) 或存在的本地文件时保留；绝对路径，文件存在时保留；其他字符串为 main bundle 中的
+ *      文件名（转换为路径）或图片名（保留：图片不存在只会让 Tab 保持自身图标，B14）。其他 URL scheme 与其他类型返回 nil。
+ */
+static id _Nullable CYLImageURLValue(id value) {
+    if ([value isKindOfClass:[UIImage class]]) {
+        return value;
+    }
+    if ([value isKindOfClass:[NSURL class]]) {
+        return CYLURLValue(value);
+    }
+    if (![value isKindOfClass:[NSString class]] || [(NSString *)value length] == 0) {
+        return nil;
+    }
+    NSString *string = value;
+    NSURL *parsed = [NSURL URLWithString:string];
+    if (parsed.scheme.length > 1) {
+        NSURL *URL = CYLURLValue(parsed);
+        return URL ? (URL.isFileURL ? URL.path : string) : nil;
+    }
+    if ([string isAbsolutePath]) {
+        return CYLFileExists(string) ? string : nil;
+    }
+    NSString *bundled = CYLMainBundlePath(string);
+    return CYLFileExists(bundled) ? bundled : string;
 }
 
 /// [EN] "#RGB", "#RRGGBB" or "#RRGGBBAA" (the "#" is optional). [CN] "#RGB"、"#RRGGBB" 或 "#RRGGBBAA"（"#" 可省略）。
@@ -288,6 +344,101 @@ static id CYLDarkColorsValue(id value) {
     return colors;
 }
 
+/// [EN] Every key the library reads. [CN] 本库读取的所有键。
+static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
+    return @[ CYLTabBarControllerViewControllers, CYLTabBarControllerTabBarItemsAttributes, CYLTabBarControllerImageInsets,
+              CYLTabBarControllerTitlePositionAdjustment, CYLTabBarControllerStyleType, CYLTabBarControllerContext,
+              CYLTabBarControllerNavigationControllerClass ];
+}
+
+static NSArray<NSString *> *CYLKnownItemKeys(void) {
+    return @[ CYLTabBarItemTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage,
+              CYLTabBarItemSelectedDarkImage, CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize,
+              CYLTabBarItemImageInsets, CYLTabBarItemTitlePositionAdjustment, CYLTabBarItemImagePositionAdjustment,
+              CYLTabBarLottieFilePath, CYLTabBarLottieURL, CYLTabBarLottieSize, CYLTabBarItemIdentifier, CYLTabBarLottieDarkURL,
+              CYLTabBarLottieDarkFilePath, CYLTabBarLottieDarkColors, CYLTabBarItemViewControllerClass,
+              CYLTabBarItemNavigationControllerClass ];
+}
+
+#if defined(DEBUG) || defined(BETA)
+/// [EN] Edit distance, case-insensitive (keys are at most ~50 characters); DEBUG hints only. [CN] 不区分大小写的编辑距离（键最多约 50 个字符），仅用于 DEBUG 提示。
+static NSUInteger CYLEditDistance(NSString *a, NSString *b) {
+    a = a.lowercaseString;
+    b = b.lowercaseString;
+    NSUInteger m = MIN(a.length, (NSUInteger)64), n = MIN(b.length, (NSUInteger)64);
+    NSUInteger row[65];
+    for (NSUInteger j = 0; j <= n; j++) {
+        row[j] = j;
+    }
+    for (NSUInteger i = 1; i <= m; i++) {
+        NSUInteger diagonal = row[0];
+        row[0] = i;
+        for (NSUInteger j = 1; j <= n; j++) {
+            NSUInteger above = row[j];
+            NSUInteger cost = ([a characterAtIndex:i - 1] == [b characterAtIndex:j - 1]) ? 0 : 1;
+            row[j] = MIN(MIN(row[j] + 1, row[j - 1] + 1), diagonal + cost);
+            diagonal = above;
+        }
+    }
+    return row[n];
+}
+#endif
+
+/*!
+ * [EN] DEBUG: names the closest known key of a "CYL..." key the library does not read, e.g. a typo such as
+ *      `CYLTabBarItemTitel` (B11). The key itself is kept: the app may read keys of its own.
+ * [CN] DEBUG：对本库不读取的 "CYL..." 键，提示最接近的已知键，例如 `CYLTabBarItemTitel` 这样的拼写错误（B11）。该键本身会保留：App 可能
+ *      读取自己的键。
+ */
+static void CYLWarnUnknownKeys(NSDictionary *dictionary, NSArray<NSString *> *knownKeys) {
+#if defined(DEBUG) || defined(BETA)
+    for (id key in dictionary) {
+        if (![key isKindOfClass:[NSString class]] || ![(NSString *)key hasPrefix:@"CYL"] || [knownKeys containsObject:key]) {
+            continue;
+        }
+        NSString *closest = nil;
+        NSUInteger best = NSUIntegerMax;
+        for (NSString *known in knownKeys) {
+            NSUInteger distance = CYLEditDistance(key, known);
+            if (distance < best) {
+                best = distance;
+                closest = known;
+            }
+        }
+        NSLog(@"🟡 CYLTabBarController configuration: unknown key %@%@.", key,
+              best <= 3 ? [NSString stringWithFormat:@"; did you mean %@?", closest] : @"");
+    }
+#endif
+}
+
+/*!
+ * [EN] `CYLTabBarItemIdentifier` must be unique: lookups by identifier would find only the first tab. Later duplicates
+ *      become "identifier_2", "identifier_3"... (B12).
+ * [CN] `CYLTabBarItemIdentifier` 必须唯一：按标识查找只能找到第一个 Tab。后出现的重复标识改为「标识_2」「标识_3」……（B12）。
+ */
+static void CYLMakeIdentifiersUnique(NSMutableArray<NSDictionary *> *items) {
+    NSMutableSet<NSString *> *used = [NSMutableSet set];
+    for (NSUInteger i = 0; i < items.count; i++) {
+        NSString *identifier = items[i][CYLTabBarItemIdentifier];
+        if (!identifier) {
+            continue;
+        }
+        NSString *unique = identifier;
+        for (NSUInteger suffix = 2; [used containsObject:unique]; suffix++) {
+            unique = [NSString stringWithFormat:@"%@_%lu", identifier, (unsigned long)suffix];
+        }
+        if (![unique isEqualToString:identifier]) {
+#if defined(DEBUG) || defined(BETA)
+            NSLog(@"🟡 CYLTabBarController configuration: duplicate identifier %@ renamed %@.", identifier, unique);
+#endif
+            NSMutableDictionary *item = [items[i] mutableCopy];
+            item[CYLTabBarItemIdentifier] = unique;
+            items[i] = item;
+        }
+        [used addObject:unique];
+    }
+}
+
 /// [EN] A string, or a number as a string; nil for anything else (B5). [CN] 字符串，或转换为字符串的数字；其他类型返回 nil（B5）。
 static NSString *_Nullable CYLStringValue(id value) {
     if ([value isKindOfClass:[NSString class]]) {
@@ -344,24 +495,26 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
     }
     for (NSString *key in @[ CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarLottieURL, CYLTabBarLottieDarkURL ]) {
         id value = item[key];
-        if (value && ![value isKindOfClass:[NSString class]] && ![value isKindOfClass:[NSURL class]]) {
+        if (!value) {
+            continue;
+        }
+        BOOL isImage = [key isEqualToString:CYLTabBarItemImageURL] || [key isEqualToString:CYLTabBarItemSelectedImageURL];
+        id checked = isImage ? CYLImageURLValue(value) : CYLURLValue(value);
+        if (!checked) {
             CYLLogInvalidConfigurationValue(key, value);
-            item[key] = nil;
         }
-    }
-    for (NSString *key in @[ CYLTabBarLottieURL, CYLTabBarLottieDarkURL ]) {
-        if (item[key]) {
-            item[key] = CYLURLValue(item[key]);
-        }
+        item[key] = checked;
     }
     for (NSString *key in @[ CYLTabBarLottieFilePath, CYLTabBarLottieDarkFilePath ]) {
         id value = item[key];
-        if (value && ![value isKindOfClass:[NSString class]]) {
+        NSString *path = [value isKindOfClass:[NSString class]] ? CYLMainBundlePath(value) : nil;
+        if (value && !CYLFileExists(path)) {
             CYLLogInvalidConfigurationValue(key, value);
-            value = nil;
+            path = nil;
         }
-        item[key] = value ? CYLMainBundlePath(value) : nil;
+        item[key] = path;
     }
+    CYLWarnUnknownKeys(item, CYLKnownItemKeys());
     if (item[CYLTabBarLottieDarkColors]) {
         id colors = CYLDarkColorsValue(item[CYLTabBarLottieDarkColors]);
         if (![colors isKindOfClass:[NSDictionary class]]) {
@@ -442,14 +595,19 @@ static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id>
                 if ([item isKindOfClass:[NSDictionary class]]) {
                     [normalizedItems addObject:CYLNormalizedItemAttributes(item)];
                 } else {
+                    // A placeholder keeps the indexes of view controllers passed in code (B4).
+                    // 用占位保持与代码传入的子控制器的下标对应（B4）。
                     CYLLogInvalidConfigurationValue(CYLTabBarControllerTabBarItemsAttributes, item);
+                    [normalizedItems addObject:@{}];
                 }
             }
         } else {
             CYLLogInvalidConfigurationValue(CYLTabBarControllerTabBarItemsAttributes, items);
         }
+        CYLMakeIdentifiersUnique(normalizedItems);
         normalized[CYLTabBarControllerTabBarItemsAttributes] = normalizedItems;
     }
+    CYLWarnUnknownKeys(normalized, CYLKnownConfigurationKeys());
 #if defined(DEBUG) || defined(BETA)
     if ([normalized[CYLTabBarControllerTabBarItemsAttributes] count] == 0 && [normalized[CYLTabBarControllerViewControllers] count] == 0) {
         NSLog(@"🔴 CYLTabBarController configuration: no tab; the tab bar controller will be empty.");

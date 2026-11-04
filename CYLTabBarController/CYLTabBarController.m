@@ -1653,12 +1653,66 @@ static Class _Nullable CYLConfigurationClassNamed(id _Nullable name, Class requi
  * [CN] 根据 `CYLTabBarItemViewControllerClass`（默认 UIViewController）创建各 item 的子控制器，设置了
  *      `CYLTabBarItemNavigationControllerClass` / `CYLTabBarControllerNavigationControllerClass` 时嵌入导航控制器。
  */
+/*!
+ * [EN] Containers cannot be the content of a tab: a tab bar controller, a navigation controller without a root, a split
+ *      view controller, an alert or a search controller (C3).
+ * [CN] 容器不能作为 Tab 的内容：TabBarController、没有根控制器的导航控制器、分栏控制器、弹窗或搜索控制器（C3）。
+ */
+static BOOL CYLIsContainerViewControllerClass(Class aClass) {
+    for (NSString *name in @[ @"UITabBarController", @"UINavigationController", @"UISplitViewController", @"UIAlertController", @"UISearchController" ]) {
+        Class container = NSClassFromString(name);
+        if (container && [aClass isSubclassOfClass:container]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/*!
+ * [EN] `-init` of a class named in a file is not under the app's control here: an Objective-C exception it raises (e.g.
+ *      a view controller that needs a storyboard) is caught, and a UIViewController takes its place (C4).
+ * [CN] 文件中指定的类的 `-init` 不在此处的控制之内：它抛出的 Objective-C 异常（例如需要 storyboard 的控制器）会被捕获，改用 UIViewController（C4）。
+ */
+static UIViewController *CYLMakeViewController(Class aClass) {
+    @try {
+        UIViewController *viewController = [[aClass alloc] init];
+        if ([viewController isKindOfClass:[UIViewController class]]) {
+            return viewController;
+        }
+    } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🔴 CYLTabBarController configuration: -[%@ init] raised %@ (%@); a UIViewController is used.", NSStringFromClass(aClass), exception.name, exception.reason);
+#endif
+    }
+    return [[UIViewController alloc] init];
+}
+
+static UIViewController *CYLEmbedInNavigationController(UIViewController *viewController, Class navigationClass) {
+    @try {
+        UINavigationController *navigationController = [(UINavigationController *)[navigationClass alloc] initWithRootViewController:viewController];
+        if (navigationController) {
+            return navigationController;
+        }
+    } @catch (NSException *exception) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🔴 CYLTabBarController configuration: -[%@ initWithRootViewController:] raised %@; not embedded.", NSStringFromClass(navigationClass), exception.name);
+#endif
+    }
+    return viewController;
+}
+
 static NSArray<UIViewController *> *CYLViewControllersFromConfiguration(NSDictionary<NSString *, id> *configuration) {
     NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
     NSString *defaultNavigationClassName = configuration[CYLTabBarControllerNavigationControllerClass];
     for (NSDictionary *attributes in configuration[CYLTabBarControllerTabBarItemsAttributes]) {
-        Class viewControllerClass = CYLConfigurationClassNamed(attributes[CYLTabBarItemViewControllerClass], [UIViewController class]) ?: [UIViewController class];
-        UIViewController *viewController = [[viewControllerClass alloc] init];
+        Class viewControllerClass = CYLConfigurationClassNamed(attributes[CYLTabBarItemViewControllerClass], [UIViewController class]);
+        if (viewControllerClass && CYLIsContainerViewControllerClass(viewControllerClass)) {
+#if defined(DEBUG) || defined(BETA)
+            NSLog(@"🔴 CYLTabBarController configuration: %@ is a container and cannot be a tab's content; a UIViewController is used.", NSStringFromClass(viewControllerClass));
+#endif
+            viewControllerClass = nil;
+        }
+        UIViewController *viewController = CYLMakeViewController(viewControllerClass ?: [UIViewController class]);
         NSString *title = attributes[CYLTabBarItemTitle];
         if ([title isKindOfClass:[NSString class]] && !viewController.navigationItem.title) {
             viewController.navigationItem.title = title;
@@ -1666,7 +1720,7 @@ static NSArray<UIViewController *> *CYLViewControllersFromConfiguration(NSDictio
         id navigationClassName = attributes[CYLTabBarItemNavigationControllerClass] ?: defaultNavigationClassName;
         Class navigationClass = CYLConfigurationClassNamed(navigationClassName, [UINavigationController class]);
         if (navigationClass) {
-            viewController = [(UINavigationController *)[navigationClass alloc] initWithRootViewController:viewController];
+            viewController = CYLEmbedInNavigationController(viewController, navigationClass);
         }
         [viewControllers addObject:viewController];
     }
@@ -1676,7 +1730,20 @@ static NSArray<UIViewController *> *CYLViewControllersFromConfiguration(NSDictio
 - (instancetype)initWithConfiguration:(NSDictionary<NSString *, id> *)configuration {
     NSDictionary<NSString *, id> *normalized = [CYLTabBarController cyl_normalizedConfiguration:configuration ?: @{}];
     NSArray<NSDictionary *> *tabBarItemsAttributes = normalized[CYLTabBarControllerTabBarItemsAttributes] ?: @[];
-    NSArray<UIViewController *> *viewControllers = normalized[CYLTabBarControllerViewControllers] ?: CYLViewControllersFromConfiguration(normalized);
+    NSArray<UIViewController *> *viewControllers = normalized[CYLTabBarControllerViewControllers];
+    if (!viewControllers) {
+        // Created from the tabs: the placeholders of invalid entries are left out (B4). 根据 Tab 创建：跳过无效条目的占位（B4）。
+        NSMutableArray<NSDictionary *> *validItems = [NSMutableArray array];
+        for (NSDictionary *item in tabBarItemsAttributes) {
+            if (item.count > 0) {
+                [validItems addObject:item];
+            }
+        }
+        tabBarItemsAttributes = validItems;
+        NSMutableDictionary<NSString *, id> *withValidItems = [normalized mutableCopy];
+        withValidItems[CYLTabBarControllerTabBarItemsAttributes] = validItems;
+        viewControllers = CYLViewControllersFromConfiguration(withValidItems);
+    }
     NSValue *imageInsetsValue = normalized[CYLTabBarControllerImageInsets];
     NSValue *titlePositionAdjustmentValue = normalized[CYLTabBarControllerTitlePositionAdjustment];
     UIEdgeInsets imageInsets = imageInsetsValue ? imageInsetsValue.UIEdgeInsetsValue : UIEdgeInsetsZero;
