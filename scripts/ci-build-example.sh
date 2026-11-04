@@ -25,15 +25,20 @@ if [[ -f Podfile ]]; then
     pod install --repo-update
 fi
 
-CONTAINER_FLAG=""
-CONTAINER=""
-WORKSPACE=$(ls -d ./*.xcworkspace 2>/dev/null | head -n 1 || true)
-if [[ -n "$WORKSPACE" ]]; then
+# [EN] Globs that match nothing expand to nothing. [CN] 没有匹配的通配符展开为空。
+shopt -s nullglob
+WORKSPACES=(./*.xcworkspace)
+PROJECTS=(./*.xcodeproj)
+shopt -u nullglob
+if [[ ${#WORKSPACES[@]} -gt 0 ]]; then
     CONTAINER_FLAG="-workspace"
-    CONTAINER="$WORKSPACE"
-else
+    CONTAINER="${WORKSPACES[0]}"
+elif [[ ${#PROJECTS[@]} -gt 0 ]]; then
     CONTAINER_FLAG="-project"
-    CONTAINER=$(ls -d ./*.xcodeproj | head -n 1)
+    CONTAINER="${PROJECTS[0]}"
+else
+    echo "error: no .xcworkspace or .xcodeproj in $DEMO_DIR" >&2
+    exit 1
 fi
 
 # [EN] All schemes, then the first app scheme. [CN] 列出所有 scheme，取第一个 App scheme。

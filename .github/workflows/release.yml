@@ -3,13 +3,14 @@
 #      2. `scripts/pod-lint.sh push`: `pod trunk push` with the COCOAPODS_TRUNK_TOKEN secret, then the Carthage and SPM
 #         versions in the demo and the docs move to the new version.
 #      3. A GitHub Release with generated notes.
-#      4. A pull request with the files step 2 changed.
+#      4. A pull request with the files step 2 changed. Normally there are none: `scripts/pod-lint.sh bump <version>`
+#         already updated them in the release pull request, which ran CI.
 # [CN] 推送版本 tag（如 1.99.73）时发布，运行在 GitHub 托管的 xcode-27 macOS runner 上。见 docs/Mac-CI-CD.md。
 #      1. tag 必须等于 CYLTabBarController.podspec 中的 `s.version`。
 #      2. `scripts/pod-lint.sh push`：使用 Secret COCOAPODS_TRUNK_TOKEN 执行 `pod trunk push`，然后把 Demo 与文档中 Carthage、SPM 的版本号
 #         更新为新版本。
 #      3. 创建 GitHub Release（自动生成说明）。
-#      4. 为第 2 步修改的文件开一个 PR。
+#      4. 为第 2 步修改的文件开一个 PR。通常没有修改：发布 PR 中的 `scripts/pod-lint.sh bump <版本号>` 已更新这些文件，并跑过 CI。
 name: Release
 
 on:
@@ -37,13 +38,7 @@ jobs:
           fetch-depth: 0
 
       - name: Tag matches the podspec version
-        run: |
-          VERSION=$(sed -n 's/^[[:space:]]*s\.version[[:space:]]*=[[:space:]]*["'\'']\([^"'\'']*\)["'\''].*/\1/p' CYLTabBarController.podspec | head -n 1)
-          echo "podspec: $VERSION, tag: $TAG"
-          if [[ "$VERSION" != "$TAG" ]]; then
-            echo "::error::The tag $TAG does not match s.version $VERSION in CYLTabBarController.podspec. Bump s.version on master first, then tag that commit."
-            exit 1
-          fi
+        run: scripts/pod-lint.sh check-tag "$TAG" || { echo "::error::The tag $TAG does not match s.version in CYLTabBarController.podspec. Run scripts/pod-lint.sh bump $TAG in a pull request first."; exit 1; }
 
       - name: Versions
         run: |
