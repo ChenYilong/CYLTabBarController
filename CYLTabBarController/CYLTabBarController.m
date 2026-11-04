@@ -231,6 +231,9 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 /// [EN] Liquid Glass: expand a tab bar the system minimized (issue #13 lifecycle restore).
 /// [CN] 液态玻璃：恢复被系统缩小的 TabBar（issue #13 生命周期恢复）。
 - (void)cyl_expandSystemMinimizedTabBar;
+/// [EN] Liquid Glass: a new drag started, give the system its minimize behavior back.
+/// [CN] 液态玻璃：新的拖动开始，把缩小行为交还给系统。
+- (void)cyl_releaseSystemMinimizeHoldIfNeeded;
 /// [EN] A view lifecycle event of this controller (appear, disappear, size change): ends any hide session.
 /// [CN] 本控制器的视图生命周期事件（出现、消失、尺寸变化）：结束隐藏会话。
 - (void)cyl_tabBarMinimizeLifecycleEvent;
@@ -6271,9 +6274,9 @@ static const CGFloat CYLTabBarMinimizeHideStartDistance = 50.0;
 /// [CN] 当前页面不变时复用已找到的滚动视图的时长，之后才重新遍历视图层级（遍历发生在布局与经典样式的页面检查时）。
 static const CFTimeInterval CYLTabBarMinimizeResolveCacheDuration = 2.0;
 #if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
-/// [EN] Liquid Glass: how long the system tab bar stays at `Never` when it is forced to expand.
-/// [CN] 液态玻璃：强制恢复时，系统 TabBar 保持 `Never` 的时长。
-static const NSTimeInterval CYLTabBarMinimizeLiquidGlassExpandHold = 0.35;
+/// [EN] Liquid Glass: when the forced expand is checked (the system's animation has ended by then).
+/// [CN] 液态玻璃：检查强制恢复结果的时间（此时系统动画已结束）。
+static const NSTimeInterval CYLTabBarMinimizeLiquidGlassExpandCheckDelay = 0.35;
 static const void *CYLTabBarMinimizeHoldsSystemNeverKey = &CYLTabBarMinimizeHoldsSystemNeverKey;
 #endif
 
@@ -7037,6 +7040,14 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     }
     // Guard: Liquid Glass only follows the system; it never hides the bar itself. 液态玻璃只跟随系统，从不自行隐藏 TabBar。
     if (CYLTabBarMinimizeModeLiquidGlass == _mode) {
+        // [EN] A new drag hands the minimize behavior back to the system after a restore.
+        // [CN] 恢复之后，新的拖动把缩小行为交还给系统。
+        BOOL tracking = scrollView.isTracking;
+        if (tracking && !_lastSeenTracking) {
+            _needsNewDrag = NO;
+            [self.tabBarController cyl_releaseSystemMinimizeHoldIfNeeded];
+        }
+        _lastSeenTracking = tracking;
         [self layOutTabBarIfMinimizedStateChanged];
         [self validateHideSession];
         return;
@@ -7325,15 +7336,20 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
 
 - (void)setCyl_tabBarMinimizeBehavior:(CYLTabBarMinimizeBehavior)behavior {
     objc_setAssociatedObject(self, CYLTabBarMinimizeBehaviorKey, @(behavior), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    // [EN] A new value from the app ends a Liquid Glass hold. [CN] App 设置新取值时结束液态玻璃的保持状态。
+    objc_setAssociatedObject(self, CYLTabBarMinimizeHoldsSystemNeverKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+#endif
     [self cyl_updateTabBarMinimizeTracking];
 }
 
 /*!
  * [EN] Liquid Glass: UIKit has no API to expand a minimized tab bar. Writing `Never` (through `super`) makes the system
- *      expand it; the app's value is written back after CYLTabBarMinimizeLiquidGlassExpandHold, so minimizing on scroll
- *      keeps working. Does nothing on other systems or when the system value is already `Never`.
- * [CN] 液态玻璃：UIKit 没有恢复已缩小 TabBar 的接口。通过 `super` 写入 `Never` 让系统恢复 TabBar；
- *      CYLTabBarMinimizeLiquidGlassExpandHold 之后再写回 App 的取值，滚动缩小继续生效。其他系统或系统取值已是 `Never` 时不做处理。
+ *      expand it; `Never` is held until the user starts a new drag (`-cyl_releaseSystemMinimizeHoldIfNeeded`), then the
+ *      app's value is written back, so minimizing on scroll keeps working. Does nothing on other systems or when the
+ *      system value is already `Never`.
+ * [CN] 液态玻璃：UIKit 没有恢复已缩小 TabBar 的接口。通过 `super` 写入 `Never` 让系统恢复 TabBar；`Never` 保持到用户开始新的拖动
+ *      （`-cyl_releaseSystemMinimizeHoldIfNeeded`），之后写回 App 的取值，滚动缩小继续生效。其他系统或系统取值已是 `Never` 时不做处理。
  */
 - (void)cyl_expandSystemMinimizedTabBar {
 #if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
@@ -7341,23 +7357,32 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
         if (UITabBarMinimizeBehaviorNever == [super tabBarMinimizeBehavior]) {
             return;
         }
+        // [EN] Held until the user starts a new drag (`-cyl_releaseSystemMinimizeHoldIfNeeded`), as the new-drag rule of
+        //      FlatDesign and classic: the old drag's momentum, or an alert still on screen, cannot minimize it again.
+        // [CN] 保持到用户开始新的拖动（`-cyl_releaseSystemMinimizeHoldIfNeeded`），与扁平样式、经典样式的新拖动规则一致：
+        //      旧拖动的惯性或仍在屏幕上的弹框都不能再次缩小 TabBar。
         objc_setAssociatedObject(self, CYLTabBarMinimizeHoldsSystemNeverKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [super setTabBarMinimizeBehavior:UITabBarMinimizeBehaviorNever];
         __weak typeof(self) weakSelf = self;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(CYLTabBarMinimizeLiquidGlassExpandHold * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            if (!strongSelf) {
-                return;
-            }
-            objc_setAssociatedObject(strongSelf, CYLTabBarMinimizeHoldsSystemNeverKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(CYLTabBarMinimizeLiquidGlassExpandCheckDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             // [EN] Self-check for device testing: the bar must be expanded by now. [CN] 真机测试自检：此时 TabBar 应已恢复。
-            UIView *tabBar = strongSelf.cyl_tabBar;
+            UIView *tabBar = weakSelf.cyl_tabBar;
             if ([tabBar isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)tabBar cyl_showsMinimizedBar]) {
                 CYLTabBarMinimizeLog(@"Liquid Glass: writing Never did not expand the minimized tab bar", nil);
             }
-            [strongSelf cyl_updateTabBarMinimizeTracking];
         });
     }
+#endif
+}
+
+- (void)cyl_releaseSystemMinimizeHoldIfNeeded {
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    if (![objc_getAssociatedObject(self, CYLTabBarMinimizeHoldsSystemNeverKey) boolValue]) {
+        return;
+    }
+    objc_setAssociatedObject(self, CYLTabBarMinimizeHoldsSystemNeverKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    // [EN] Writes the app's value back to UIKit. [CN] 把 App 的取值写回 UIKit。
+    [self cyl_updateTabBarMinimizeTracking];
 #endif
 }
 
@@ -7457,6 +7482,13 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
 #endif
     _CYLTabBarMinimizeScrollTracker *tracker = objc_getAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey);
     CYLTabBarMinimizeMode mode = CYLTabBarMinimizeModeForTabBarController(self);
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    // [EN] Not Liquid Glass any more (style change, turned off): drop a hold, nothing will release it.
+    // [CN] 不再是液态玻璃（样式改变、已关闭）：清除保持状态，之后不会再有释放它的拖动。
+    if (CYLTabBarMinimizeModeLiquidGlass != mode) {
+        objc_setAssociatedObject(self, CYLTabBarMinimizeHoldsSystemNeverKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+#endif
     if (CYLTabBarMinimizeModeNone == mode) {
         if (tracker) {
             CYLTabBarMinimizeMode previousMode = tracker.mode;

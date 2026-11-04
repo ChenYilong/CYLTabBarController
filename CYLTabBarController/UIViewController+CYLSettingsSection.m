@@ -710,6 +710,7 @@ typedef NS_ENUM(NSInteger, CYLScrollHideSimulationRow) {
     CYLScrollHideSimulationRowSceneDeactivate,
     CYLScrollHideSimulationRowManualLongPress,
     CYLScrollHideSimulationRowManualTapOutside,
+    CYLScrollHideSimulationRowManualKeepDragging,
     CYLScrollHideSimulationRowCount,
 };
 
@@ -783,6 +784,9 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
         case CYLScrollHideSimulationRowManualTapOutside:
             *kind = CYLScrollHideSimulationKindManual;
             return @"Manual: tap a navigation bar button (UIMenu, action)";
+        case CYLScrollHideSimulationRowManualKeepDragging:
+            *kind = CYLScrollHideSimulationKindManual;
+            return @"Manual: after a restore, fling on without lifting; only a new drag hides it";
         case CYLScrollHideSimulationRowCount: break;
     }
     return @"-";
@@ -1076,6 +1080,7 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
         }
         case CYLScrollHideSimulationRowManualLongPress:
         case CYLScrollHideSimulationRowManualTapOutside:
+        case CYLScrollHideSimulationRowManualKeepDragging:
         case CYLScrollHideSimulationRowCount:
             break;
     }

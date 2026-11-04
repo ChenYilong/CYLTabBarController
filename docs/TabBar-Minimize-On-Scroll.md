@@ -319,7 +319,7 @@ flowchart TD
 
 | 中文 | English |
 |:---|:---|
-| 液态玻璃：UIKit 没有恢复已缩小 TabBar 的接口。恢复时，CYLTabBarController 通过 `super` 把系统的 `tabBarMinimizeBehavior` 暂时设为 `Never`（让系统恢复 TabBar），0.35 秒后写回 App 的取值，之后滚动缩小继续生效。该做法尚未在真机上验证。 | Liquid Glass: UIKit has no API to expand a minimized tab bar. To restore it, CYLTabBarController briefly sets the system's `tabBarMinimizeBehavior` to `Never` through `super` (so the system expands the bar) and writes the app's value back 0.35 s later, after which minimizing on scroll works again. Not verified on a device yet. |
+| 液态玻璃：UIKit 没有恢复已缩小 TabBar 的接口。恢复时，CYLTabBarController 通过 `super` 把系统的 `tabBarMinimizeBehavior` 设为 `Never`（让系统恢复 TabBar），并保持到用户开始新的拖动，再写回 App 的取值（与扁平样式、经典样式的新拖动规则一致：旧拖动的惯性或仍在屏幕上的弹框都不能再次缩小 TabBar）。App 设置新取值或样式不再是液态玻璃时也会结束保持。写入 `Never` 能否让系统恢复 TabBar 尚未在真机上验证；0.35 秒后的自检会在诊断日志中报告失败。 | Liquid Glass: UIKit has no API to expand a minimized tab bar. To restore it, CYLTabBarController sets the system's `tabBarMinimizeBehavior` to `Never` through `super` (so the system expands the bar) and holds it until the user starts a new drag, then writes the app's value back (the same new-drag rule as FlatDesign and classic: the old drag's momentum or an alert still on screen cannot minimize it again). A new value from the app, or a style that is no longer Liquid Glass, also ends the hold. Whether writing `Never` expands the bar is not verified on a device yet; a self-check 0.35 s later reports a failure in the diagnostic log. |
 | 来电：iOS 14 起，未接听的来电以横幅显示，App 保持活跃，横幅不遮挡 TabBar，因此不需要处理；接听或全屏来电时 App 失去活跃，TabBar 恢复显示。 | Calls: since iOS 14 an unanswered call shows as a banner, the app stays active and the banner does not cover the tab bar, so nothing is needed; when the call is answered or shown full screen the app resigns active and the tab bar comes back. |
 | 定时检查只在需要时运行：TabBar 被隐藏或缩小期间每 0.25 秒；经典样式在 TabBar 显示时每 0.5 秒确认一次当前页面（Core 中没有 push / pop 回调）；其他情况不运行。通知观察者与定时器只在开启滚动隐藏时存在。 | The check timer runs only when needed: every 0.25 s while the bar is hidden or minimized; for the classic style every 0.5 s while it is shown, to follow the page (core has no push / pop callback); otherwise not at all. The notification observers and the timer exist only while scroll hiding is on. |
 
@@ -352,6 +352,7 @@ flowchart TD
 | 5 | 90 ✅ | 没有真机验证 −5（需要 Xcode 与真机 / 模拟器）；液态玻璃恢复方式未验证 −3（需要 iOS 26 真机，诊断日志会报告失败）；长按上下文菜单预览没有公开回调 −1；真实来电与低电量弹框无法用代码触发，只能以通知模拟 −1 | 绑定上下文的白名单隐藏会话；25 项通知、生命周期与定时检查，每次恢复都有具体原因；所有 Demo 中的 23 个模拟；37 个边界情况；各样式用 guard 隔离；五种编译配置下无警告 | 全面复查：修复带着键盘进入后台后可能一直无法隐藏的问题；其余检查项（向上滚动恢复不受新拖动规则影响、自身调用不被当作 App 接管、滞回一致、动画期间各样式返回请求状态）无问题。分数达到 90，结束 |
 | 6 | 85 | 扩大审查范围（约 45 个场景）后发现：长按内容（上下文菜单、拖放、选择文字）不算打断 −1；侧滑菜单 / 抽屉移动控制器、容器转场没有回调 −2；Mac 上仍会隐藏 −1；顶部安全区变化（通话状态栏）−1；演示未覆盖子控制器 present、popover、抽屉、Scene 失活 −1；以及没有真机验证 −5、液态玻璃恢复方式未验证 −3、系统事件以通知模拟 −1 | 白名单会话的上下文可以继续扩展，新场景大多只需加入上下文比较 | 滚动视图上加入不拦截触摸的长按观察者；会话上下文加入控制器在窗口中的 frame 与顶部安全区；Mac Catalyst 与 Mac 上的 iOS App 不隐藏；演示新增 6 行（OverCurrentContext、popover、抽屉、顶部安全区、Scene 失活、手动长按），ObjC Demo 的角标行加入上下文菜单（共 29 行） |
 | 7 | 90 | 内容之外的点击（导航栏按钮、UIMenu 按钮、头部控件）不算打断，UIMenu 没有公开回调 −1；没有真机验证 −5（iPad 指针 / 触控板 / 鼠标滚轮滚动也需真机确认，计入此项）；液态玻璃恢复方式未验证 −3；系统事件以通知模拟 −1 | 长按、抽屉、安全区、Mac 已处理；29 行演示；43 个边界情况 | 控制器视图上加入不拦截触摸的点击观察者：TabBar 隐藏或缩小期间，所跟随滚动视图之外的点击结束会话；内容中的点击保持隐藏（与 Facebook 一致）；ObjC Demo 导航栏新增带 UIMenu 的按钮，演示新增“手动：点击导航栏按钮”（共 30 行） |
+| 8 | 92 | 没有真机验证 −5；液态玻璃：写入 Never 能否让系统恢复 TabBar 尚未验证 −2（恢复后被惯性再次缩小的风险已在本轮消除）；系统事件以通知模拟 −1 | 第 7 轮的点击观察者经复查无问题（不拦截触摸、内容中的点击保持隐藏）；进入本轮时为 91 分 | 液态玻璃：Never 保持到新的拖动开始（原为 0.35 秒），与其他样式的新拖动规则一致；App 设置新取值或离开液态玻璃时结束保持；演示新增“手动：恢复后不松手继续甩动”（共 31 行） |
 
 | Round | Score | Deductions | Positives | Changes in this round |
 |:---|:---|:---|:---|:---|
@@ -362,6 +363,7 @@ flowchart TD
 | 5 | 90 ✅ | no device testing −5 (needs Xcode and a device / simulator); Liquid Glass restore unverified −3 (needs an iOS 26 device; the diagnostic log reports a failure); context menu previews have no public callback −1; a real call and the low battery alert cannot be triggered from code, only simulated with notifications −1 | a whitelist hide session bound to its context; 25 notification, lifecycle and timer checks, every restore with its exact reason; 23 simulations in every demo; 37 edge cases; every style isolated by guards; no warnings in five build configurations | full review: fixed hiding staying blocked after going to the background with the keyboard up; the other checks (scroll-up restores regardless of the new-drag rule, our own calls never taken for the app's, consistent hysteresis, every style reports the request while animating) found no issue. Score 90 reached |
 | 6 | 85 | a wider review (about 45 scenarios) found: a long press on the content (context menu, drag, text selection) did not count as an interruption −1; a side menu / drawer moving the controller, container transitions have no callback −2; still hides on a Mac −1; top safe area changes (in-call status bar) −1; the demo did not cover child presentations, popovers, drawers, scene deactivation −1; plus no device testing −5, Liquid Glass restore unverified −3, system events simulated with notifications −1 | the whitelist session's context can be extended; most new scenarios only need one more context comparison | a long-press observer on the scroll view that never blocks touches; the session context now includes the controller's frame in its window and its top safe area; never hides with Mac Catalyst or an iOS app on a Mac; 6 more demo rows (OverCurrentContext, popover, drawer, top safe area, scene deactivation, manual long press) and a context menu on the ObjC demo's badge rows (29 rows) |
 | 7 | 90 | taps outside the content (navigation bar buttons, UIMenu buttons, header controls) did not count as interruptions, and UIMenu has no public callback −1; no device testing −5 (pointer / trackpad / mouse wheel scrolling on iPad also needs a device and is counted here); Liquid Glass restore unverified −3; system events simulated with notifications −1 | long press, drawers, safe area and Mac handled; 29 demo rows; 43 edge cases | a tap observer on the controller's view that never blocks touches: while the bar is hidden or minimized, a tap outside the followed scroll view ends the session; taps inside the content keep it hidden (as in Facebook); the ObjC demo's navigation bar gets a button with a UIMenu, and a "Manual: tap a navigation bar button" row (30 rows) |
+| 8 | 92 | no device testing −5; Liquid Glass: whether writing Never expands the bar is unverified −2 (the risk of momentum minimizing it again after a restore is removed in this round); system events simulated with notifications −1 | round 7's tap observer reviewed with no issue (never blocks touches, taps inside the content keep it hidden); 91 on entering this round | Liquid Glass: Never is held until a new drag starts (was 0.35 s), the same new-drag rule as the other styles; a new value from the app or leaving Liquid Glass ends the hold; a "Manual: after a restore, fling on without lifting" row (31 rows) |
 
 ### [CN]边界情况清单
 ### [EN]Edge case list
@@ -408,15 +410,16 @@ flowchart TD
 | 34 | 侧滑菜单 / 抽屉把 TabBarController 移开、容器转场 | 会话上下文包含控制器在窗口中的 frame | ✅🧪 |
 | 35 | 通话 / 热点 / 录屏状态栏改变顶部安全区（iOS 12 时代） | 会话上下文包含控制器的顶部安全区 | ✅🧪 |
 | 36 | 点击内容之外：导航栏按钮、带 UIMenu 的按钮、头部分段控件、搜索框 | 控制器视图上不拦截触摸的点击观察者；内容中的点击保持隐藏（如 Facebook） | ✅🧪 |
-| 37 | iPad 指针、触控板、鼠标滚轮滚动 | 滚动手势的 isDragging；需真机确认 | 📱 |
-| 38 | Mac 上运行（Mac Catalyst、Apple 芯片 Mac 上的 iOS App） | 不隐藏 | ✅ |
-| 39 | 子控制器以 OverCurrentContext 方式 present | 当前页面的 presentedViewController | ✅🧪 |
-| 40 | iPad 弹出框（popover） | presentedViewController | ✅🧪 |
-| 41 | Scene 失去活跃（本 Scene） | UISceneWillDeactivate，按 Scene 过滤 | ✅🧪 |
-| 42 | 真机上定位“为何恢复 / 为何没恢复” | Xcode scheme 中设置环境变量 CYLTabBarMinimizeLog=1：打印会话开始、每次恢复及原因、App 接管、液态玻璃恢复自检 | ✅ |
-| 43 | 经典样式显示期间的页面检查开销 | 当前页面不变时复用滚动视图 2 秒，不重复遍历视图层级 | ✅ |
-| 44 | Swift Demo 中的模拟 | 设置分组第 8 行用操作表列出全部模拟 | 🧪 |
-| 45 | 经典样式：返回到 hidesBottomBarWhenPushed 页面之前的页面 | 会话只结束一次，不重复恢复；返回时随页面变化显示 | ✅🧪 |
+| 37 | 液态玻璃：恢复后旧拖动的惯性 | 系统保持 Never，直到新的拖动开始 | ✅🧪 |
+| 38 | iPad 指针、触控板、鼠标滚轮滚动 | 滚动手势的 isDragging；需真机确认 | 📱 |
+| 39 | Mac 上运行（Mac Catalyst、Apple 芯片 Mac 上的 iOS App） | 不隐藏 | ✅ |
+| 40 | 子控制器以 OverCurrentContext 方式 present | 当前页面的 presentedViewController | ✅🧪 |
+| 41 | iPad 弹出框（popover） | presentedViewController | ✅🧪 |
+| 42 | Scene 失去活跃（本 Scene） | UISceneWillDeactivate，按 Scene 过滤 | ✅🧪 |
+| 43 | 真机上定位“为何恢复 / 为何没恢复” | Xcode scheme 中设置环境变量 CYLTabBarMinimizeLog=1：打印会话开始、每次恢复及原因、App 接管、液态玻璃恢复自检 | ✅ |
+| 44 | 经典样式显示期间的页面检查开销 | 当前页面不变时复用滚动视图 2 秒，不重复遍历视图层级 | ✅ |
+| 45 | Swift Demo 中的模拟 | 设置分组第 8 行用操作表列出全部模拟 | 🧪 |
+| 46 | 经典样式：返回到 hidesBottomBarWhenPushed 页面之前的页面 | 会话只结束一次，不重复恢复；返回时随页面变化显示 | ✅🧪 |
 
 | # | Scenario | How it is handled | Status |
 |:---|:---|:---|:---|
@@ -456,15 +459,16 @@ flowchart TD
 | 34 | A side menu / drawer moving the tab bar controller away, a container transition | The session context includes the controller's frame in its window | ✅🧪 |
 | 35 | An in-call / hotspot / recording status bar changing the top safe area (iOS 12 era) | The session context includes the controller's top safe area | ✅🧪 |
 | 36 | A tap outside the content: navigation bar button, button with a UIMenu, header segmented control, search field | A tap observer on the controller's view that never blocks touches; taps inside the content keep it hidden (as in Facebook) | ✅🧪 |
-| 37 | Pointer, trackpad and mouse wheel scrolling on iPad | The scroll gesture's isDragging; needs a device to confirm | 📱 |
-| 38 | Running on a Mac (Mac Catalyst, an iOS app on Apple silicon) | Never hides | ✅ |
-| 39 | A child presenting with OverCurrentContext | The page's presentedViewController | ✅🧪 |
-| 40 | An iPad popover | presentedViewController | ✅🧪 |
-| 41 | The scene deactivates (this scene) | UISceneWillDeactivate, filtered by scene | ✅🧪 |
-| 42 | On a device: why the bar came back, or did not | Set the environment variable CYLTabBarMinimizeLog=1 in the Xcode scheme: logs session starts, every restore with its reason, app takeovers, the Liquid Glass restore self-check | ✅ |
-| 43 | Cost of the classic page check while the bar is shown | The scroll view is reused for 2 s while the page stays the same, without searching the view hierarchy again | ✅ |
-| 44 | Simulations in the Swift demos | Settings row 8 lists every simulation in an action sheet | 🧪 |
-| 45 | Classic: coming back from a hidesBottomBarWhenPushed page | The session ends once, no repeated restores; shown on the page change back | ✅🧪 |
+| 37 | Liquid Glass: the old drag's momentum after a restore | The system is held at Never until a new drag starts | ✅🧪 |
+| 38 | Pointer, trackpad and mouse wheel scrolling on iPad | The scroll gesture's isDragging; needs a device to confirm | 📱 |
+| 39 | Running on a Mac (Mac Catalyst, an iOS app on Apple silicon) | Never hides | ✅ |
+| 40 | A child presenting with OverCurrentContext | The page's presentedViewController | ✅🧪 |
+| 41 | An iPad popover | presentedViewController | ✅🧪 |
+| 42 | The scene deactivates (this scene) | UISceneWillDeactivate, filtered by scene | ✅🧪 |
+| 43 | On a device: why the bar came back, or did not | Set the environment variable CYLTabBarMinimizeLog=1 in the Xcode scheme: logs session starts, every restore with its reason, app takeovers, the Liquid Glass restore self-check | ✅ |
+| 44 | Cost of the classic page check while the bar is shown | The scroll view is reused for 2 s while the page stays the same, without searching the view hierarchy again | ✅ |
+| 45 | Simulations in the Swift demos | Settings row 8 lists every simulation in an action sheet | 🧪 |
+| 46 | Classic: coming back from a hidesBottomBarWhenPushed page | The session ends once, no repeated restores; shown on the page change back | ✅🧪 |
 
 <!-- edge-cases:end -->
 
