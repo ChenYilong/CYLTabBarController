@@ -278,4 +278,6 @@
 "重触感反馈" = "Silna haptyka";
 "长按（#152）" = "Długie naciśnięcie (#152)";
 "播放 / 停止" = "Odtwórz / Zatrzymaj";
-"点击" = "Stuknij";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Stuknij";

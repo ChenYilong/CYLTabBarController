@@ -278,4 +278,6 @@
 "重触感反馈" = "Retour haptique fort";
 "长按（#152）" = "Appui long (#152)";
 "播放 / 停止" = "Lire / Arrêter";
-"点击" = "Toucher";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Touchez-moi";

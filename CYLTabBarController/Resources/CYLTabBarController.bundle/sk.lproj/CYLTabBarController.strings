@@ -278,4 +278,6 @@
 "重触感反馈" = "Silná haptická odozva";
 "长按（#152）" = "Dlhé stlačenie (#152)";
 "播放 / 停止" = "Prehrať / Zastaviť";
-"点击" = "Ťuknúť";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Ťukni";

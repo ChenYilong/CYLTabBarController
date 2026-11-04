@@ -278,4 +278,6 @@
 "重触感反馈" = "Heavy haptic";
 "长按（#152）" = "Long press (#152)";
 "播放 / 停止" = "Play / Stop";
-"点击" = "Tap";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Tap me";

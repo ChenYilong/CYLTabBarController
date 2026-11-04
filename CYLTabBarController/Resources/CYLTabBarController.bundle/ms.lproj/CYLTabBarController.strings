@@ -278,4 +278,6 @@
 "重触感反馈" = "Haptik kuat";
 "长按（#152）" = "Tekan lama (#152)";
 "播放 / 停止" = "Main / Henti";
-"点击" = "Ketik";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Ketik";

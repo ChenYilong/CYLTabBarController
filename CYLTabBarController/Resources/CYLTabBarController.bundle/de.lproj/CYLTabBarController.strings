@@ -278,4 +278,6 @@
 "重触感反馈" = "Starkes haptisches Feedback";
 "长按（#152）" = "Langes Drücken (#152)";
 "播放 / 停止" = "Abspielen / Stoppen";
-"点击" = "Tippen";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Tippen";

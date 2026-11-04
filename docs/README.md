@@ -22,6 +22,7 @@
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
+| [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](Mac-CI-CD.md) |
 | [PAG 动画 Tab 图标（与 Lottie 用法相同）](PAG-Animation.md) | [PAG animated tab icons (used like Lottie)](PAG-Animation.md) |
 | [只有部分 Tab 有动画（Lottie 或 PAG）](Per-Tab-Animation.md) | [Only some tabs animated (Lottie or PAG)](Per-Tab-Animation.md) |
 | [液态玻璃：标题画在背景图上的 PlusButton](PlusButton-Background-Image-Liquid-Glass.md) | [Liquid Glass: a PlusButton with its title on a background image](PlusButton-Background-Image-Liquid-Glass.md) |
@@ -65,6 +66,7 @@ docs/
 ├── FlatDesign-StandardAppearance.md
 ├── Image-Only-Tabs.md
 ├── Login-Required-Tabs.md
+├── Mac-CI-CD.md
 ├── PAG-Animation.md
 ├── Per-Tab-Animation.md
 ├── PlusButton-Background-Image-Liquid-Glass.md

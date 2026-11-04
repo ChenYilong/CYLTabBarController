@@ -278,4 +278,6 @@
 "重触感反馈" = "Kraftig haptik";
 "长按（#152）" = "Långt tryck (#152)";
 "播放 / 停止" = "Spela / Stoppa";
-"点击" = "Tryck";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Tryck här";

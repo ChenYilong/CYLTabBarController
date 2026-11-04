@@ -278,4 +278,6 @@
 "重触感反馈" = "Güçlü dokunsal geri bildirim";
 "长按（#152）" = "Uzun basma (#152)";
 "播放 / 停止" = "Oynat / Durdur";
-"点击" = "Dokun";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Dokun";

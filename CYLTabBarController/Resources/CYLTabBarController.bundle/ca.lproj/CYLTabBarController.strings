@@ -278,4 +278,6 @@
 "重触感反馈" = "Resposta hàptica forta";
 "长按（#152）" = "Pulsació llarga (#152)";
 "播放 / 停止" = "Reprodueix / Atura";
-"点击" = "Toca";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Toca'm";
