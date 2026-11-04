@@ -142,32 +142,56 @@ static UIInterfaceOrientationMask CYLMaskFromOrientation(UIInterfaceOrientation 
     }
 }
 
-+ (UIViewController * __nullable)cyl_topmostViewController {
-    UIViewController *topViewController = [CYLGetRootWindow() rootViewController];
-    
-    if (topViewController == nil) {
-        return nil;
-    }
-    
-    while (true) {
-        if (topViewController.presentedViewController != nil) {
-            topViewController = topViewController.presentedViewController;
-        } else if ([topViewController isKindOfClass:[UINavigationController class]]) {
-            UINavigationController *navi = (UINavigationController *)topViewController;
-            topViewController = navi.topViewController;
+/*!
+ * [EN] The walk shared by `+cyl_topmostViewController` and `+cyl_currentNavigationController`: from `viewController`,
+ *      follow presented controllers, the top of each navigation controller and the selected tab of each tab bar
+ *      controller.
+ *      FIX: issue #283 — with `forNavigation` YES (`+cyl_currentNavigationController`), an alert (`UIAlertController`)
+ *      or a controller that is being dismissed does not count as presented: it has no navigation controller, so a push
+ *      "from anywhere" (a notification, a network callback) found none while an alert was on screen. An empty
+ *      navigation or tab bar controller is returned itself instead of nil. With NO, the walk is the one
+ *      `+cyl_topmostViewController` always did.
+ * [CN] `+cyl_topmostViewController` 与 `+cyl_currentNavigationController` 共用的查找：从 `viewController` 开始，沿 present 出来的
+ *      控制器、导航控制器的栈顶、TabBarController 选中的 Tab 一路查找。
+ *      FIX: issue #283 — `forNavigation` 为 YES 时（`+cyl_currentNavigationController`），弹窗（`UIAlertController`）或正在 dismiss
+ *      的控制器不算作 present 出来的页面：它们没有导航控制器，屏幕上有弹窗时，“随时 push”（收到通知、网络回调）会找不到导航控制器。
+ *      空的导航控制器或 TabBarController 返回其自身而不是 nil。为 NO 时与 `+cyl_topmostViewController` 原有的查找完全相同。
+ */
+static UIViewController *CYLTopmostViewController(UIViewController *viewController, BOOL forNavigation) {
+    UIViewController *topViewController = viewController;
+    while (topViewController) {
+        UIViewController *presentedViewController = topViewController.presentedViewController;
+        if (presentedViewController && !(forNavigation && ([presentedViewController isKindOfClass:[UIAlertController class]] ||
+                                                           presentedViewController.isBeingDismissed))) {
+            topViewController = presentedViewController;
+            continue;
+        }
+        UIViewController *childViewController = nil;
+        if ([topViewController isKindOfClass:[UINavigationController class]]) {
+            childViewController = ((UINavigationController *)topViewController).topViewController;
         } else if ([topViewController isKindOfClass:[UITabBarController class]]) {
-            UITabBarController *tab = (UITabBarController *)topViewController;
-            topViewController = tab.selectedViewController;
+            childViewController = ((UITabBarController *)topViewController).selectedViewController;
         } else {
             break;
         }
+        if (!childViewController && forNavigation) {
+            break;
+        }
+        topViewController = childViewController;
     }
-    
     return topViewController;
 }
 
++ (UIViewController * __nullable)cyl_topmostViewController {
+    return CYLTopmostViewController([CYLGetRootWindow() rootViewController], NO);
+}
+
 + (UINavigationController * __nullable)cyl_currentNavigationController {
-    return [[UIViewController cyl_topmostViewController] navigationController];
+    UIViewController *topViewController = CYLTopmostViewController([CYLGetRootWindow() rootViewController], YES);
+    if ([topViewController isKindOfClass:[UINavigationController class]]) {
+        return (UINavigationController *)topViewController;
+    }
+    return topViewController.navigationController;
 }
 
 + (void)cyl_dismissAll:(void (^ __nullable)(void))completion {

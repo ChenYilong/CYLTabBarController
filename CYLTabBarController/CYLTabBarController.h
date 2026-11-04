@@ -21,6 +21,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Badge.md
 //   - Lottie tab icons and their files when there is a PlusButton / 有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Lottie-TabIcon.md
+//   - Get the navigation controller and push from anywhere / 在任意位置获取导航控制器并 Push
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Push-From-Anywhere.md
 //   - Using CYLTabBarController in Swift / 在 Swift 项目中使用 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
@@ -258,7 +260,11 @@ presentLoginForViewController:(UIViewController *)viewController
   *  代码切换index 时，底层通过 `-setSelectedIndex` 方法来实现。
  * @attention 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发涉及plusButton的回调
  * [EN] Called after the selected control changes, whether by a tap or by code. Unlike `-tabBar:didSelectItem:`, `control` may be the plus button.
+ *      FIX: issue #232 — in the classic system tab bar, a tap that `-tabBarController:shouldSelectViewController:` refuses
+ *      (returns NO) changes nothing and is not reported here.
  * [CN] 选中控件变化后回调，无论是用户点击还是代码切换。与 -tabBar:didSelectItem: 不同，control 可能是 PlusButton。
+ *      FIX: issue #232 — 经典系统 TabBar 中，被 `-tabBarController:shouldSelectViewController:` 拒绝（返回 NO）的点击不会改变任何状态，
+ *      也不会在这里回调。
  */
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
 //- (void)tabBarController:(CYLTabBarController *)tabBarController didLongPressControl:(UIControl *)control;
