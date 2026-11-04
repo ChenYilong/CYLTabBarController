@@ -14,8 +14,6 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Gallery.md
 //   - Tab interactions: tap animations, long press, swipe, and more / Tab 交互：点击动画、长按、滑动切换及其他
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Interactions.md
-//   - Tab interactions: tap animations, long press, swipe, and more / Tab 交互：点击动画、长按、滑动切换及其他
-//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Interactions.md
 // docs-binding:end
 
 #import <UIKit/UIKit.h>
@@ -46,11 +44,13 @@ NS_ASSUME_NONNULL_BEGIN
  *      underscore, imported into Swift as `cylPlay…(withTabButton:…)`, so Swift code needs no underscored method name).
  *      Implement either one; when both are implemented, the `cylPlay…` one is called. `-cyl_playSelectAnimationWithTabButton:…`
  *      used to be required; it is optional now so that a class can implement `-cylPlaySelectAnimationWithTabButton:…`
- *      instead, and existing classes are unaffected.
+ *      instead. Classes that implement it are unaffected; Swift code that calls it on a value typed
+ *      `CYLTabButtonAnimation` now needs optional chaining (`animation.cyl_playSelectAnimation?(withTabButton:…)`).
  * [CN] 每个方法都有两种写法，执行相同的逻辑：`cyl_play…` 与 `cylPlay…`（去掉下划线的同名方法，在 Swift 中导入为
  *      `cylPlay…(withTabButton:…)`，Swift 代码因此无需带下划线的方法名）。实现其中之一即可；两者都实现时调用 `cylPlay…`。
  *      `-cyl_playSelectAnimationWithTabButton:…` 以前是必需的，现在改为可选，以便改为实现 `-cylPlaySelectAnimationWithTabButton:…`；
- *      已有的类不受影响。
+ *      实现了该方法的类不受影响；Swift 中对 `CYLTabButtonAnimation` 类型的值调用它时，现在需要使用可选链
+ *      （`animation.cyl_playSelectAnimation?(withTabButton:…)`）。
  */
 
 @optional

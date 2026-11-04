@@ -351,6 +351,14 @@ static void CYLPlayTabButtonAnimationStep(id<CYLTabButtonAnimation> animation, C
                                           UIControl *button, UIView *iconView, UILabel *_Nullable titleLabel) {
     BOOL camelCase = [animation respondsToSelector:CYLCamelCaseSelectorForStep(step)];
     if (!camelCase && ![animation respondsToSelector:CYLUnderscoreSelectorForStep(step)]) {
+#if defined(DEBUG) || defined(BETA)
+        // [EN] The select method is optional now, so a missing or misspelled one is no longer a compiler warning; log it
+        //      (an animation may leave select out on purpose, e.g. a press-only one, so this only logs).
+        // [CN] 选中方法现在是可选的，缺失或拼错不再有编译警告，因此在此打印日志（动画可以有意不实现选中，例如只有按压效果的动画，所以只打印）。
+        if (step == CYLTabButtonAnimationStepSelect && animation) {
+            NSLog(@"[CYLTabBarController] %@ implements neither -cylPlaySelectAnimationWithTabButton:iconView:titleLabel: nor -cyl_playSelectAnimationWithTabButton:iconView:titleLabel:; no select animation plays.", NSStringFromClass([(NSObject *)animation class]));
+        }
+#endif
         return;
     }
     switch (step) {
