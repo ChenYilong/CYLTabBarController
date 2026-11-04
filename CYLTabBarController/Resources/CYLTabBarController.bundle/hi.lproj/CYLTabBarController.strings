@@ -202,9 +202,45 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "नए संदर्भ वाला TabBarController पुश करें (टैप करने योग्य X सबव्यू वाला PlusButton, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "PlusButton के ऊपर दाईं ओर X पर टैप करें: X का रंग बेतरतीब बदलता है, PlusButton प्रतिक्रिया नहीं देता";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "रीफ़्रेश";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex और PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "अगला टैब चुनने के लिए टैप करें। PlusButton के बिना इंडेक्स: %1$@, selectedIndex: %2$@, अभी: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "बड़ा करें और छोटा करें";
+"从小放大" = "ज़ूम इन";
+"弹性" = "उछाल";
+"弹性 + 烟花" = "उछाल + आतिशबाज़ी";
+"旋转" = "घुमाएँ";
+"翻转" = "पलटें";
+"飘散" = "धुआँ";
+"无" = "कोई नहीं";
+"Tab 点击动画（issue #535）" = "टैब टैप एनिमेशन (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "टैब और PlusButton का टैप एनिमेशन बदलने के लिए टैप करें। अभी: %@";
+"长按了「%@」" = "\"%@\" को देर तक दबाया";
+"左右滑动切换 Tab（issue #535）" = "स्वाइप से टैब बदलें (issue #535)";
+"长按 Tab（issue #535）" = "टैब को देर तक दबाएँ (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "स्विच चालू करें, फिर अगले या पिछले टैब पर जाने के लिए पेज पर बाएँ या दाएँ स्वाइप करें।";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "स्विच चालू करें, फिर किसी टैब या PlusButton को देर तक दबाकर उसका पहचानकर्ता देखें।";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "घुमाएँ (केवल यह टैब: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "फ़्रेम + आतिशबाज़ी (सभी टैब: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "पैरेंट व्यू के बाहर प्रतिक्रिया (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "स्विच चालू होने पर स्लेटी बॉक्स के बाहर का बटन वाला हिस्सा भी प्रतिक्रिया देता है; हर टैप पर स्केल एनिमेशन चलता है। टैप: %@";
+"已找到" = "मिला";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "नहीं मिला (use_frameworks के साथ रिसोर्स बंडल framework के अंदर होता है)";
+"从 bundle 加载图片（issue #535）" = "bundle से इमेज लोड करें (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "बाईं ओर की इमेज CYLImageInBundle से रिसोर्स बंडल से पढ़ी गई है (कैश के बिना)। मुख्य bundle में CYLBundleImage: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "यह एक साधारण UIViewController है जो CYLBaseViewController से इनहेरिट नहीं करता। नेविगेशन बार छिपा है।";
+"不继承基类隐藏导航栏（issue #535）" = "बेस क्लास के बिना नेविगेशन बार छिपाएँ (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "स्विच cyl_automaticNavigationSettingEnabled सेट करता है; पंक्ति पर टैप करके एक साधारण UIViewController खोलें जो cyl_navigationBarHidden और cyl_hidesAncestorNavigationBars सेट करता है।";
+"页面 %@" = "पेज %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "स्लाइड ट्रांज़िशन (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "सिस्टम UITabBarController खोलने के लिए टैप करें: किसी टैब पर टैप करें या पेज को बाएँ-दाएँ खींचें, पेज उंगली के साथ खिसकता है।";
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "स्क्रॉल पर TabBar छोटा / छिपाएँ (issue #13)";
@@ -219,3 +255,25 @@
 "跳转与对比" = "नेविगेशन और तुलना";
 "角标" = "बैज";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass में समर्थित नहीं: टैब बार की ऊँचाई सिस्टम तय करता है (FlatDesign और क्लासिक शैली समर्थित)";
+"默认点击声" = "डिफ़ॉल्ट क्लिक";
+"中等触感反馈" = "मध्यम हैप्टिक";
+"无需继承基类与工具方法" = "बेस क्लास के बिना, और सहायक";
+"切换到上一个 / 下一个 Tab（issue #535）" = "पिछला / अगला टैब (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "कमज़ोर संदर्भ: जीवित रहते मिला %@, रिलीज़ के बाद nil %@। %@ से चुने गए टैब बटन तक: %@";
+"点击声 + 触感反馈" = "क्लिक + हैप्टिक";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "बाउंस + तारों की आतिशबाज़ी (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "cyl_switchToAdjacentTabWithStep:-1 / 1 कॉल करने के लिए दाईं ओर के तीरों पर टैप करें। स्वाइप की तरह, यह PlusButton को छोड़ता है और लॉगिन जाँचता है। पिछला परिणाम: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "बदलने के लिए टैप करें, फिर सुनने के लिए कोई भी टैब या PlusButton टैप करें। हैप्टिक केवल असली डिवाइस पर कंपन करता है। अभी: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "चलाने के लिए टैप करें: ऑब्जेक्ट रिलीज़ होने पर cyl_setWeakAssociatedObject:forKey: nil लौटाता है; cyl_nearestControlBelowView: चुने गए टैब के आइकन से उसका बटन ढूँढता है।";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "बदलने के लिए टैप करें। cyl_tabBarItemLongPressDuration: %@ से., cyl_tabButtonLongPressMinimumDuration: %@ से., cyl_tabBarItemDoubleTapInterval: %@ से.";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "अपनी ध्वनि फ़ाइल (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "ऊपर की ओर मोड़ें, अचयन एनीमेशन नहीं (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "धीरे बड़ा और छोटा करें (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "धीरे ज़ूम इन (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils कमज़ोर संबद्ध ऑब्जेक्ट और बटन ढूँढना (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "लंबे दबाव की अवधि और डबल टैप अंतराल (issue #535 / #152)";
+"Tab 交互" = "टैब इंटरैक्शन";
+"Tab 点击声音与触感反馈（issue #535）" = "टैब टैप ध्वनि और हैप्टिक (issue #535)";
+"轻触感反馈" = "हल्का हैप्टिक";
+"重触感反馈" = "तेज़ हैप्टिक";
+"长按（#152）" = "लंबा दबाव (#152)";
