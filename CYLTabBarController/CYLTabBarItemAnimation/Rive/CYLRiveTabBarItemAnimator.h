@@ -15,43 +15,80 @@
 // docs-binding:end
 
 #import <Foundation/Foundation.h>
-#if __has_include("../CYLTabBarItemAnimator.h")
-#import "../CYLTabBarItemAnimator.h"
+#if __has_include("../CYLTabBarItemViewAnimator.h")
+#import "../CYLTabBarItemViewAnimator.h"
 #else
-#import "CYLTabBarItemAnimator.h"
+#import "CYLTabBarItemViewAnimator.h"
 #endif
-#import "CYLRiveTabBarItemAnimationViewing.h"
+// [EN] `CYLTabBarAnimationOption`. [CN] `CYLTabBarAnimationOption` 类型。
+#if __has_include("../../CYLTabBarController.h")
+#import "../../CYLTabBarController.h"
+#else
+#import "CYLTabBarController.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
- * [EN] Rive tab icon animations, in the `Rive` subspec next to the `CYLTabBarItemAnimation` subspec: ".riv" files get a
- *      view that hosts Rive's `RiveUIView` (`CYLRiveTabBarItemAnimationView`, the Swift bridge in `RiveSwift/`). This
- *      class is compiled only with the Rive runtime (`CYLTabBarController/Rive`, `<RiveRuntime/RiveRuntime.h>`), registers
- *      itself with `CYLTabBarItemAnimatorRegistry` when it loads, and the tab bar uses it only through
- *      `CYLTabBarItemAnimator`, so Rive works with or without Lottie and PAG.
- *      A tab's artboard, state machine and view model properties come from its URL
- *      (`CYLRiveTabBarItemAnimationConfiguration`), so one .riv file can hold the icons of several tabs. It talks to the
- *      view only through `CYLRiveTabBarItemAnimationViewProviding` and `CYLRiveTabBarItemAnimationViewing`.
- * [CN] Rive Tab 图标动画，位于 `CYLTabBarItemAnimation` 子库旁的 `Rive` 子库中：".riv" 文件创建一个承载 Rive `RiveUIView` 的视图
- *      （`CYLRiveTabBarItemAnimationView`，即 `RiveSwift/` 中的 Swift 桥接）。本类仅在引入 Rive 运行时（`CYLTabBarController/Rive`，
- *      `<RiveRuntime/RiveRuntime.h>`）时编译；它在加载时向 `CYLTabBarItemAnimatorRegistry` 注册自己，TabBar 只通过 `CYLTabBarItemAnimator` 使用它，
- *      因此无论是否引入 Lottie、PAG，Rive 都能使用。
- *      Tab 的画板、状态机与 view model 属性来自其 URL（`CYLRiveTabBarItemAnimationConfiguration`），因此一个 .riv 文件可以包含多个 Tab 的图标。
- *      它只通过 `CYLRiveTabBarItemAnimationViewProviding` 与 `CYLRiveTabBarItemAnimationViewing` 与视图交互。
+ * [EN] Rive tab icon animations (`RiveRuntime`), the same way as Lottie and PAG, through the short path of the
+ *      `CYLTabBarItemAnimation` subspec: a `CYLTabBarItemViewAnimator` for ".riv" files, whose views are made by the
+ *      Swift bridge `CYLRiveTabBarItemAnimationView` (RiveSwift/). This class only registers it and declares Rive's keys
+ *      and options; there is no Rive player: the view plays itself.
+ * [CN] Rive Tab 图标动画（`RiveRuntime`），用法与 Lottie、PAG 相同，通过 `CYLTabBarItemAnimation` 子库的简便方式接入：为 ".riv" 文件注册一个
+ *      `CYLTabBarItemViewAnimator`，视图由 Swift 桥接 `CYLRiveTabBarItemAnimationView`（RiveSwift/）创建。本类只负责注册它并声明 Rive 的 key 与
+ *      选项；没有 Rive 播放器：视图自己播放。
  */
-@interface CYLRiveTabBarItemAnimator : NSObject <CYLTabBarItemAnimator>
+@interface CYLRiveTabBarItemAnimator : NSObject
 
-/*!
- * [EN] Where the Rive views come from (dependency injection). Defaults to the Swift bridge
- *      `CYLRiveTabBarItemAnimationView`, resolved once and only used when it adopts
- *      `CYLRiveTabBarItemAnimationViewProviding`. Set another class adopting that protocol to render Rive differently
- *      (e.g. a test double); nil goes back to the default.
- * [CN] Rive 视图的来源（依赖注入）。默认为 Swift 桥接 `CYLRiveTabBarItemAnimationView`，只解析一次，且仅在其遵守
- *      `CYLRiveTabBarItemAnimationViewProviding` 时使用。设置为其他遵守该协议的类，即可用其他方式渲染 Rive（例如测试替身）；设为 nil 恢复默认。
- */
-@property (class, nonatomic, null_resettable) Class<CYLRiveTabBarItemAnimationViewProviding> viewProvider;
+/// [EN] The registered animator, e.g. to inject another view provider. [CN] 已注册的 animator，例如用于注入其他视图 provider。
+@property (class, nonatomic, readonly) CYLTabBarItemViewAnimator *animator;
 
 @end
+
+/*!
+ * [EN] Keys for a tab's Rive animation, aliases of the generic `CYLTabBarAnimation…` keys (either works), like the Lottie
+ *      and PAG keys. A Rive state machine has no playback speed, so `lottieAnimationSpeed` does not apply.
+ *      - `CYLTabBarRiveURL`: an NSURL of a .riv file, usually with options (`CYLTabBarAnimationURLWithOptions()`);
+ *        `CYLTabBarRiveFilePath`: its path (NSString, the default artboard). The URL wins.
+ *      - `CYLTabBarRiveSize`: the view size, an NSValue of CGSize.
+ *      - `CYLTabBarRiveDarkURL` / `CYLTabBarRiveDarkFilePath`: the Dark Mode version.
+ *      - `CYLTabBarRiveDarkColors`: view model color property path -> UIColor for Dark Mode, e.g. @{ @"color" : UIColor.whiteColor }.
+ * [CN] Tab 的 Rive 动画 key，是通用 key `CYLTabBarAnimation…` 的别名（两者都可以用），与 Lottie、PAG 的 key 相同。Rive 状态机没有播放速度，
+ *      `lottieAnimationSpeed` 对其无效。
+ *      - `CYLTabBarRiveURL`：.riv 文件的 NSURL，通常带有选项（`CYLTabBarAnimationURLWithOptions()`）；`CYLTabBarRiveFilePath`：其路径（NSString，
+ *        使用默认画板）。URL 优先。
+ *      - `CYLTabBarRiveSize`：视图尺寸，CGSize 的 NSValue。
+ *      - `CYLTabBarRiveDarkURL` / `CYLTabBarRiveDarkFilePath`：深色模式版本。
+ *      - `CYLTabBarRiveDarkColors`：深色模式下 view model 颜色属性路径 -> UIColor，例如 @{ @"color" : UIColor.whiteColor }。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveSize;
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkColors;
+
+/*!
+ * [EN] Rive's options for `CYLTabBarAnimationURLWithOptions()` (Swift: `.riveArtboard`, …). Every value is a string.
+ *      - `CYLTabBarAnimationOptionRiveArtboard`: the artboard (default: the file's default); one .riv file can hold many icons.
+ *      - `CYLTabBarAnimationOptionRiveStateMachine`: the state machine (default: the artboard's default).
+ *      - `CYLTabBarAnimationOptionRiveActiveProperty`: the view model boolean set to YES when the tab is selected, then back
+ *        to NO after `CYLTabBarAnimationOptionRiveActiveDuration` seconds (defaults @"active" and @"1").
+ *      - `CYLTabBarAnimationOptionRiveTriggerProperty`: a view model trigger fired instead.
+ *      - `CYLTabBarAnimationOptionRiveColor`: "#RRGGBB" or "#RRGGBBAA", set on the view model color @"color" (light mode).
+ * [CN] Rive 用于 `CYLTabBarAnimationURLWithOptions()` 的选项（Swift：`.riveArtboard` 等），所有值都是字符串。
+ *      - `CYLTabBarAnimationOptionRiveArtboard`：画板（默认为文件的默认画板）；一个 .riv 文件可以包含多个图标。
+ *      - `CYLTabBarAnimationOptionRiveStateMachine`：状态机（默认为画板的默认状态机）。
+ *      - `CYLTabBarAnimationOptionRiveActiveProperty`：选中 Tab 时设为 YES 的 view model 布尔属性，`CYLTabBarAnimationOptionRiveActiveDuration` 秒后
+ *        恢复为 NO（默认 @"active" 与 @"1"）。
+ *      - `CYLTabBarAnimationOptionRiveTriggerProperty`：改为触发的 view model trigger。
+ *      - `CYLTabBarAnimationOptionRiveColor`："#RRGGBB" 或 "#RRGGBBAA"，设置到 view model 颜色 @"color"（浅色模式）。
+ */
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveArtboard;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveStateMachine;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveActiveProperty;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveActiveDuration;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerProperty;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveColor;
 
 NS_ASSUME_NONNULL_END

@@ -6,6 +6,33 @@
 //
 
 #import "CYLPAGTabBarItemAnimator.h"
+// [EN] Core's generic keys and helpers. [CN] Core 的通用 key 与工具函数。
+#if __has_include("../../CYLTabBarController.h")
+#import "../../CYLTabBarController.h"
+#else
+#import "CYLTabBarController.h"
+#endif
+
+// [EN] The PAG keys, declared by the PAG subspec (aliases of the generic keys, see `attributeKeys`).
+// [CN] PAG 的 key，由 PAG 子库声明（通用 key 的别名，见 `attributeKeys`）。
+NSString *const CYLTabBarPAGURL = @"CYLTabBarPAGURL";
+NSString *const CYLTabBarPAGFilePath = @"CYLTabBarPAGFilePath";
+NSString *const CYLTabBarPAGSize = @"CYLTabBarPAGSize";
+NSString *const CYLTabBarPAGDarkURL = @"CYLTabBarPAGDarkURL";
+NSString *const CYLTabBarPAGDarkFilePath = @"CYLTabBarPAGDarkFilePath";
+
+NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFiles(NSArray<NSDictionary *> *attributes,
+                                                                 NSArray<NSString *> *pagFileNames,
+                                                                 NSBundle *bundle) {
+    // [EN] The generic helper with "<name>.pag": the same files, under the generic keys the PAG keys stand for.
+    // [CN] 使用「名称.pag」调用通用工具函数：文件相同，使用 PAG key 所对应的通用 key。
+    NSMutableArray *fileNames = [NSMutableArray arrayWithCapacity:pagFileNames.count];
+    for (id name in pagFileNames) {
+        BOOL hasName = [name isKindOfClass:[NSString class]] && [(NSString *)name length] > 0;
+        [fileNames addObject:hasName ? [(NSString *)name stringByAppendingPathExtension:@"pag"] : @""];
+    }
+    return CYLTabBarItemsAttributesAddingAnimationFiles(attributes, fileNames, bundle);
+}
 
 // FIX: issue #604 — only with the PAG subspec; without it this file is empty and the class is never used.
 // 仅在引入 PAG 子库时编译；未引入时本文件为空，也不会使用该类。
@@ -17,12 +44,6 @@
 #import "../CYLTabBarItemAnimatorRegistry.h"
 #else
 #import "CYLTabBarItemAnimatorRegistry.h"
-#endif
-// Core's keys (`CYLTabBarPAG…`, `CYLTabBarAnimation…`). Core 的 key。
-#if __has_include("../../CYLTabBarController.h")
-#import "../../CYLTabBarController.h"
-#else
-#import "CYLTabBarController.h"
 #endif
 
 /// [EN] Plays a `PAGView`. [CN] 播放 `PAGView`。

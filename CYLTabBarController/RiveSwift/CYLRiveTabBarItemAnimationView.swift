@@ -6,14 +6,14 @@
 //
 
 // [EN] The Swift bridge of the `Rive` subspec: Rive's runtime (`RiveRuntime`, 6.29+) is a Swift API, so this view hosts a
-//      `RiveUIView`. It adopts the Objective-C interfaces `CYLRiveTabBarItemAnimationViewing` (what the player calls) and
-//      `CYLRiveTabBarItemAnimationViewProviding` (how the animator gets a view), and gets its files through
-//      `CYLRiveTabBarItemAnimationFileProviding`, so each side depends only on an interface. It uses only Rive's current
+//      `RiveUIView`. It adopts the shared interfaces `CYLTabBarItemAnimationPlayableView` (it plays itself) and
+//      `CYLTabBarItemAnimationViewProviding` (it makes its views), so the shared `CYLTabBarItemViewAnimator` does everything
+//      else; it gets its files through `CYLRiveTabBarItemAnimationFileProviding`. It uses only Rive's current
 //      API (`Worker`, `File`, `Rive`, `RiveUIView`, view model instances), not the deprecated `RiveViewModel`. Compiled
 //      only with the Rive runtime.
-// [CN] `Rive` 子库的 Swift 桥接：Rive 运行时（`RiveRuntime` 6.29+）是 Swift API，因此本视图承载一个 `RiveUIView`。它遵守 Objective-C 接口
-//      `CYLRiveTabBarItemAnimationViewing`（播放器调用的方法）与 `CYLRiveTabBarItemAnimationViewProviding`（animator 获取视图的方式），并通过
-//      `CYLRiveTabBarItemAnimationFileProviding` 获取文件，因此每一方都只依赖接口。只使用 Rive 当前的 API（`Worker`、`File`、`Rive`、
+// [CN] `Rive` 子库的 Swift 桥接：Rive 运行时（`RiveRuntime` 6.29+）是 Swift API，因此本视图承载一个 `RiveUIView`。它遵守共用接口
+//      `CYLTabBarItemAnimationPlayableView`（自己播放）与 `CYLTabBarItemAnimationViewProviding`（创建视图），其余工作都由共用的
+//      `CYLTabBarItemViewAnimator` 完成；它通过 `CYLRiveTabBarItemAnimationFileProviding` 获取文件。只使用 Rive 当前的 API（`Worker`、`File`、`Rive`、
 //      `RiveUIView`、view model 实例），不使用已废弃的 `RiveViewModel`。仅在引入 Rive 运行时时编译。
 #if canImport(RiveRuntime)
 import UIKit
@@ -29,6 +29,44 @@ protocol CYLRiveTabBarItemAnimationFileProviding: AnyObject {
     func file(at url: URL) async throws -> RiveRuntime.File
 }
 
+/// [EN] What one tab plays, read from its URL's options (`CYLTabBarAnimationOptionRive…`). [CN] 一个 Tab 播放的内容，从其 URL 的选项中读取。
+struct CYLRiveTabBarItemAnimationConfiguration {
+    let fileURL: URL
+    let artboardName: String?
+    let stateMachineName: String?
+    let activePropertyPath: String
+    let activeDuration: TimeInterval
+    let triggerPropertyPath: String?
+    let lightColor: UIColor?
+
+    init(fileURL: URL, options: [String: String]) {
+        self.fileURL = fileURL
+        artboardName = options[CYLTabBarAnimationOption.riveArtboard.rawValue]
+        stateMachineName = options[CYLTabBarAnimationOption.riveStateMachine.rawValue]
+        activePropertyPath = options[CYLTabBarAnimationOption.riveActiveProperty.rawValue] ?? "active"
+        // [EN] 1 second by default, at most a minute. [CN] 默认 1 秒，最长一分钟。
+        let duration = Double(options[CYLTabBarAnimationOption.riveActiveDuration.rawValue] ?? "") ?? 1
+        activeDuration = duration > 0 ? min(duration, 60) : 1
+        triggerPropertyPath = options[CYLTabBarAnimationOption.riveTriggerProperty.rawValue]
+        lightColor = options[CYLTabBarAnimationOption.riveColor.rawValue].flatMap(Self.color(hex:))
+    }
+
+    /// [EN] "#RRGGBB" or "#RRGGBBAA" ("#" optional). [CN] "#RRGGBB" 或 "#RRGGBBAA"（"#" 可省略）。
+    private static func color(hex: String) -> UIColor? {
+        let digits = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
+        guard digits.count == 6 || digits.count == 8, var value = UInt64(digits, radix: 16) else {
+            return nil
+        }
+        if digits.count == 6 {
+            value = (value << 8) | 0xFF
+        }
+        func component(_ shift: UInt64) -> CGFloat {
+            return CGFloat((value >> shift) & 0xFF) / 255
+        }
+        return UIColor(red: component(24), green: component(16), blue: component(8), alpha: component(0))
+    }
+}
+
 /*!
  * [EN] A tab icon that plays a Rive artboard. It loads asynchronously; calls made before it has loaded are applied once
  *      it has. A tab "plays" through the artboard's view model: the boolean `activePropertyPath` is set to true, then back
@@ -39,7 +77,7 @@ protocol CYLRiveTabBarItemAnimationFileProviding: AnyObject {
  *      只显示、不播放。它不接收触摸，由 Tab 按钮接收。
  */
 @objc(CYLRiveTabBarItemAnimationView)
-final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationViewing, CYLRiveTabBarItemAnimationViewProviding {
+final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding {
 
     /// [EN] The view model color property set by `lightColor`. [CN] `lightColor` 所设置的 view model 颜色属性。
     private static let colorPropertyPath = "color"
@@ -61,11 +99,13 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
     private var originalColors: [String: RiveRuntime.Color] = [:]
     private var overriddenColorPaths: Set<String> = []
 
-    // MARK: - [EN] CYLRiveTabBarItemAnimationViewProviding [CN] 视图工厂接口
+    // MARK: - [EN] CYLTabBarItemAnimationViewProviding [CN] 视图工厂接口
 
-    static func makeAnimationView(configuration: CYLRiveTabBarItemAnimationConfiguration) -> (UIView & CYLRiveTabBarItemAnimationViewing)? {
-        return CYLRiveTabBarItemAnimationView(configuration: configuration,
-                                              fileProvider: CYLRiveTabBarItemAnimationFileCache.shared)
+    static func makeAnimationView(fileURL: URL, options: [String: String], contentMode: UIView.ContentMode) -> (UIView & CYLTabBarItemAnimationPlayableView)? {
+        let view = CYLRiveTabBarItemAnimationView(configuration: CYLRiveTabBarItemAnimationConfiguration(fileURL: fileURL, options: options),
+                                                  fileProvider: CYLRiveTabBarItemAnimationFileCache.shared)
+        view.contentMode = contentMode
+        return view
     }
 
     /// [EN] `fileProvider` is injected, so the view does not depend on where files come from.
@@ -74,7 +114,6 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
         self.configuration = configuration
         self.fileProvider = fileProvider
         super.init(frame: .zero)
-        contentMode = configuration.contentMode
         isUserInteractionEnabled = false
         backgroundColor = .clear
         // [EN] The tab button describes itself to VoiceOver. [CN] 由 Tab 按钮向 VoiceOver 描述自己。
@@ -94,7 +133,7 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
         }
     }
 
-    // MARK: - [EN] CYLRiveTabBarItemAnimationViewing [CN] 视图接口
+    // MARK: - [EN] CYLTabBarItemAnimationPlayableView [CN] 可播放视图接口
 
     /// [EN] Plays once: sets the boolean to true, then false after `activeDuration`; or fires the trigger.
     /// [CN] 播放一次：把布尔属性设为 true，`activeDuration` 后设为 false；或触发 trigger。
@@ -113,8 +152,7 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
         }
         let activePropertyPath = configuration.activePropertyPath
         instance.setValue(of: BoolProperty(path: activePropertyPath), to: true)
-        // [EN] At most a minute, so any value converts safely. [CN] 最长一分钟，保证任何值都能安全转换。
-        let nanoseconds = UInt64(min(max(configuration.activeDuration, 0), 60) * 1_000_000_000)
+        let nanoseconds = UInt64(configuration.activeDuration * 1_000_000_000)
         deactivateTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: nanoseconds)
             guard !Task.isCancelled, let self, let instance = self.viewModelInstance else {
@@ -126,7 +164,7 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
 
     /// [EN] A state machine has no last frame: the icon stays in its resting state (the tab selected at launch, #389).
     /// [CN] 状态机没有最后一帧：图标保持静止状态（启动时选中的 Tab，#389）。
-    func showAnimationRestingState() {
+    func showAnimationLastFrame() {
         stopAnimation()
     }
 

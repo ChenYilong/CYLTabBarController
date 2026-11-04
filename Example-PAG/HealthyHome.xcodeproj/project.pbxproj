@@ -37,6 +37,7 @@
 		C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000004 /* SceneDelegate.swift */; };
 		184C1CEB23F65B0B00B23C7F /* OCSwift.m in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CEA23F65B0B00B23C7F /* OCSwift.m */; };
 		184C1CF123F686AE00B23C7F /* TabBarCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CF023F686AE00B23C7F /* TabBarCommon.swift */; };
+		59239448FEAA4BF51FBEC4C0 /* TabBarAnimationDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C0AE2CDE2AF7FF13A5D371D /* TabBarAnimationDemo.swift */; };
 		184C1CF323F6898300B23C7F /* CYLPlusButtonSubclass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CF223F6898300B23C7F /* CYLPlusButtonSubclass.swift */; };
 		184F198223F7C707002DBAE4 /* ChilderVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F198123F7C707002DBAE4 /* ChilderVC.swift */; };
 		184F198623F7C811002DBAE4 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F198323F7C811002DBAE4 /* UIView+Extension.swift */; };
@@ -118,6 +119,7 @@
 		184C1CE923F65B0B00B23C7F /* OCSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCSwift.h; sourceTree = "<group>"; };
 		184C1CEA23F65B0B00B23C7F /* OCSwift.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCSwift.m; sourceTree = "<group>"; };
 		184C1CF023F686AE00B23C7F /* TabBarCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCommon.swift; sourceTree = "<group>"; };
+		1C0AE2CDE2AF7FF13A5D371D /* TabBarAnimationDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarAnimationDemo.swift; sourceTree = "<group>"; };
 		184C1CF223F6898300B23C7F /* CYLPlusButtonSubclass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLPlusButtonSubclass.swift; sourceTree = "<group>"; };
 		184F198123F7C707002DBAE4 /* ChilderVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChilderVC.swift; sourceTree = "<group>"; };
 		184F198323F7C811002DBAE4 /* UIView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
@@ -323,6 +325,7 @@
 			children = (
 				184C1CD823F65A8C00B23C7F /* Common.swift */,
 				184C1CF023F686AE00B23C7F /* TabBarCommon.swift */,
+				1C0AE2CDE2AF7FF13A5D371D /* TabBarAnimationDemo.swift */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
@@ -630,6 +633,7 @@
 				184C1CD423F65A7400B23C7F /* ImageVIewExtension.swift in Sources */,
 				184F198823F7C811002DBAE4 /* UIIamge+Extension.swift in Sources */,
 				184C1CF123F686AE00B23C7F /* TabBarCommon.swift in Sources */,
+				59239448FEAA4BF51FBEC4C0 /* TabBarAnimationDemo.swift in Sources */,
 				184F198C23F7E651002DBAE4 /* GuideViewController.swift in Sources */,
 				184C1CCA23F65A6700B23C7F /* WisdomVC.swift in Sources */,
 				184F199023F7EE40002DBAE4 /* APPDelegate+Categories.swift in Sources */,

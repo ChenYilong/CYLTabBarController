@@ -1,5 +1,5 @@
 {
-  "comment": "Fetched by scripts/fetch-rive-resources.py (run by `pod install` in Example-Rive); the files themselves are not in this repository.",
+  "comment": "Fetched by scripts/fetch-animation-resources.py (run by `pod install` in Example-Rive); the files themselves are not in this repository.",
   "packages": [
     {
       "package": "rive_animated_icon",

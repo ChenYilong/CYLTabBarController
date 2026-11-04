@@ -58,7 +58,7 @@ pod 'CYLTabBarController/PAGEnterprise'    # libpag-enterprise: audio, 3D, movie
 
 | 中文 | English |
 |:---|:---|
-| 库内部用 `CYL_PAG_AVAILABLE`（`__has_include(<libpag/PAGView.h>)`）识别是否引入了 PAG，与 `CYL_LOTTIE_AVAILABLE` 相同；`CYL_TAB_ANIMATION_AVAILABLE` 表示引入了 Lottie 或 PAG。未引入 PAG 子库时，PAG key 会被忽略，Tab 显示普通图片。Swift Package Manager 与 Carthage 暂不提供 PAG。 | Inside the library, `CYL_PAG_AVAILABLE` (`__has_include(<libpag/PAGView.h>)`) tells whether PAG is linked, like `CYL_LOTTIE_AVAILABLE`; `CYL_TAB_ANIMATION_AVAILABLE` means Lottie or PAG. Without the PAG subspec the PAG keys are ignored and the tabs show their images. Swift Package Manager and Carthage do not offer PAG yet. |
+| PAG 的 key（`CYLTabBarPAGURL`…）与 `CYLTabBarItemsAttributesAddingPAGFiles()` 声明在 PAG 子库自己的公开头文件 `CYLPAGTabBarItemAnimator.h` 中，Core 不包含任何动画库的 key；引入 PAG 子库后即可使用（`#import <CYLTabBarController/CYLTabBarController.h>` 已包含）。是否有动画在运行时由注册表决定，没有编译期开关。Swift Package Manager 与 Carthage 暂不提供 PAG。 | The PAG keys (`CYLTabBarPAGURL`…) and `CYLTabBarItemsAttributesAddingPAGFiles()` are declared in the PAG subspec's own public header, `CYLPAGTabBarItemAnimator.h`; Core declares no library's keys. They are available with the PAG subspec (`#import <CYLTabBarController/CYLTabBarController.h>` includes them). Whether tabs animate is decided at runtime by the registry; there is no compile-time switch. Swift Package Manager and Carthage do not offer PAG yet. |
 
 ## [CN]Key 对照
 ## [EN]Keys, side by side with Lottie
@@ -84,7 +84,7 @@ pod 'CYLTabBarController/PAGEnterprise'    # libpag-enterprise: audio, 3D, movie
 flowchart TB
     subgraph Keys["tabBarItemsAttributes"]
         lk["CYLTabBarLottieURL / FilePath / Size<br/>DarkURL / DarkFilePath / DarkColors"]
-        pk["CYLTabBarPAGURL / FilePath / Size<br/>DarkURL / DarkFilePath"]
+        pk["CYLTabBarPAGURL / FilePath / Size<br/>DarkURL / DarkFilePath<br/>(declared by the PAG subspec)"]
         helper["CYLTabBarItemsAttributesAddingLottieFiles()<br/>CYLTabBarItemsAttributesAddingPAGFiles()"]
     end
 
@@ -95,7 +95,6 @@ flowchart TB
         core["CYLTabBarController/Core"]
     end
 
-    macros["CYL_LOTTIE_AVAILABLE · CYL_PAG_AVAILABLE<br/>CYL_TAB_ANIMATION_AVAILABLE"]
     pipeline["One animation pipeline<br/>(Lottie keys first, then PAG keys)<br/>lottieURLs · tabBarItem.cyl_lottieURL · dark registry"]
     choose{"CYLTabBarItemAnimatorRegistry animatorForURL:<br/>(by priority)"}
     lottieView["Lottie view, made by CYLLottieTabBarItemAnimator<br/>LOTAnimationView / CYLCompatibleLOTAnimationView"]
@@ -107,12 +106,8 @@ flowchart TB
     lottiePod --> core
     pagPod --> core
     pagEntPod --> core
-    pagEntPod --> macros
-    lottiePod --> macros
-    pagPod --> macros
     lk --> pipeline
     pk --> pipeline
-    macros --> pipeline
     pipeline --> choose
     choose -- "CYLLottieTabBarItemAnimator (other files)" --> lottieView
     choose -- "CYLPAGTabBarItemAnimator (.pag)" --> pagView
@@ -199,7 +194,7 @@ return pagAttributes.map { item in
 
 | 中文 | English |
 |:---|:---|
-| **按 pod 的方式获取，不直接复制进仓库**：动效文件与 libpag 一样在安装时下载。[`Example-Shared/PAGResources/pag-resources.json`](../Example-Shared/PAGResources/pag-resources.json) 列出 libpag 6 个官方仓库（pag-ios、pag-enterprise-ios、pag-android、pag-flutter、pag-enterprise-android、pag-web）中的 44 个不重复 `.pag` 文件（约 20 MB）与各仓库的 LICENSE，每个都固定到某个 commit 并记录 SHA-256。在 `Example-PAG` 中执行 `pod install` 时，Podfile 的 `pre_install` 会运行 [`scripts/fetch-pag-resources.py`](../scripts/fetch-pag-resources.py) 下载并校验；也可以直接运行该脚本（`--check` 只校验）。下载的文件已加入 `.gitignore`。 | **Fetched like a pod, not copied into the repository**: the animation files are downloaded on install, like libpag itself. [`Example-Shared/PAGResources/pag-resources.json`](../Example-Shared/PAGResources/pag-resources.json) lists the 44 unique `.pag` files (about 20 MB) of libpag's 6 official repositories (pag-ios, pag-enterprise-ios, pag-android, pag-flutter, pag-enterprise-android, pag-web) and their licenses, each pinned to a commit with its SHA-256. `pod install` in `Example-PAG` runs [`scripts/fetch-pag-resources.py`](../scripts/fetch-pag-resources.py) from the Podfile's `pre_install` to download and verify them; you can also run the script yourself (`--check` only verifies). The downloaded files are in `.gitignore`. |
+| **按 pod 的方式获取，不直接复制进仓库**：动效文件与 libpag 一样在安装时下载。[`Example-Shared/PAGResources/pag-resources.json`](../Example-Shared/PAGResources/pag-resources.json) 列出 libpag 6 个官方仓库（pag-ios、pag-enterprise-ios、pag-android、pag-flutter、pag-enterprise-android、pag-web）中的 44 个不重复 `.pag` 文件（约 20 MB）与各仓库的 LICENSE，每个都固定到某个 commit 并记录 SHA-256。在 `Example-PAG` 中执行 `pod install` 时，Podfile 的 `pre_install` 会运行 [`scripts/fetch-animation-resources.py`](../scripts/fetch-animation-resources.py) 下载并校验；也可以直接运行该脚本（`--check` 只校验）。下载的文件已加入 `.gitignore`。 | **Fetched like a pod, not copied into the repository**: the animation files are downloaded on install, like libpag itself. [`Example-Shared/PAGResources/pag-resources.json`](../Example-Shared/PAGResources/pag-resources.json) lists the 44 unique `.pag` files (about 20 MB) of libpag's 6 official repositories (pag-ios, pag-enterprise-ios, pag-android, pag-flutter, pag-enterprise-android, pag-web) and their licenses, each pinned to a commit with its SHA-256. `pod install` in `Example-PAG` runs [`scripts/fetch-animation-resources.py`](../scripts/fetch-animation-resources.py) from the Podfile's `pre_install` to download and verify them; you can also run the script yourself (`--check` only verifies). The downloaded files are in `.gitignore`. |
 | **许可**：pag-ios、pag-enterprise-ios、pag-flutter 为 Apache License 2.0，pag-android 为 MIT；pag-enterprise-android 需要商业授权，pag-web 没有许可文件。这些文件只从原仓库下载到你的电脑上，本仓库不分发它们；在 App 中发布任何文件之前，请自行确认其使用条款。详见 [PAGResources/README.md](../Example-Shared/PAGResources/README.md)。 | **Licenses**: Apache License 2.0 for pag-ios, pag-enterprise-ios and pag-flutter, MIT for pag-android; pag-enterprise-android requires a commercial license and pag-web has no license file. The files are only downloaded to your machine from their original repositories; this repository does not distribute them. Check the terms before you ship any of them in an app. See [PAGResources/README.md](../Example-Shared/PAGResources/README.md). |
 
 ## [CN]其他平台的参考

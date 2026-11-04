@@ -76,30 +76,10 @@ NSString *const CYLTabBarAnimationSize = @"CYLTabBarAnimationSize";
 NSString *const CYLTabBarAnimationDarkURL = @"CYLTabBarAnimationDarkURL";
 NSString *const CYLTabBarAnimationDarkFilePath = @"CYLTabBarAnimationDarkFilePath";
 NSString *const CYLTabBarAnimationDarkColors = @"CYLTabBarAnimationDarkColors";
-NSString *const CYLTabBarPAGURL = @"CYLTabBarPAGURL";
-NSString *const CYLTabBarPAGFilePath = @"CYLTabBarPAGFilePath";
-NSString *const CYLTabBarPAGSize = @"CYLTabBarPAGSize";
-NSString *const CYLTabBarPAGDarkURL = @"CYLTabBarPAGDarkURL";
-NSString *const CYLTabBarPAGDarkFilePath = @"CYLTabBarPAGDarkFilePath";
-NSString *const CYLTabBarRiveURL = @"CYLTabBarRiveURL";
-NSString *const CYLTabBarRiveFilePath = @"CYLTabBarRiveFilePath";
-NSString *const CYLTabBarRiveSize = @"CYLTabBarRiveSize";
-NSString *const CYLTabBarRiveDarkURL = @"CYLTabBarRiveDarkURL";
-NSString *const CYLTabBarRiveDarkFilePath = @"CYLTabBarRiveDarkFilePath";
-NSString *const CYLTabBarRiveDarkColors = @"CYLTabBarRiveDarkColors";
-// [EN] The names of the items in the fragment of a Rive tab animation URL, read by `CYLRiveTabBarItemAnimator`.
-// [CN] Rive Tab 动画 URL 的 fragment 中各项的名称，由 `CYLRiveTabBarItemAnimator` 读取。
-CYLTabBarRiveOption const CYLTabBarRiveOptionArtboard = @"artboard";
-CYLTabBarRiveOption const CYLTabBarRiveOptionStateMachine = @"stateMachine";
-CYLTabBarRiveOption const CYLTabBarRiveOptionActiveProperty = @"active";
-CYLTabBarRiveOption const CYLTabBarRiveOptionActiveDuration = @"duration";
-CYLTabBarRiveOption const CYLTabBarRiveOptionTriggerProperty = @"trigger";
-CYLTabBarRiveOption const CYLTabBarRiveOptionColor = @"color";
 
-/// [EN] Shared by `CYLTabBarItemsAttributesAddingLottieFiles` ("json"), `CYLTabBarItemsAttributesAddingPAGFiles` ("pag", #604)
-///      and `CYLTabBarItemAttributesAddingAnimationFile` (any library, #477).
-/// [CN] 由 `CYLTabBarItemsAttributesAddingLottieFiles`（"json"）、`CYLTabBarItemsAttributesAddingPAGFiles`（"pag"，#604）与
-///      `CYLTabBarItemAttributesAddingAnimationFile`（任意动画库，#477）共用。
+/// [EN] Shared by `CYLTabBarItemsAttributesAddingLottieFiles` ("json") and `CYLTabBarItemAttributesAddingAnimationFile`
+///      (any library, #477).
+/// [CN] 由 `CYLTabBarItemsAttributesAddingLottieFiles`（"json"）与 `CYLTabBarItemAttributesAddingAnimationFile`（任意动画库，#477）共用。
 static NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingFilesOfType(NSArray<NSDictionary *> *attributes,
                                                                              NSArray<NSString *> *lottieFileNames,
                                                                              NSBundle *bundle,
@@ -141,21 +121,9 @@ NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingLottieFiles(NSArray<NSDic
                                                         CYLTabBarLottieFilePath, CYLTabBarLottieDarkFilePath);
 }
 
-NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFiles(NSArray<NSDictionary *> *attributes,
-                                                                 NSArray<NSString *> *pagFileNames,
-                                                                 NSBundle *bundle) {
-    return CYLTabBarItemsAttributesAddingFilesOfType(attributes, pagFileNames, bundle, @"pag",
-                                                        CYLTabBarPAGFilePath, CYLTabBarPAGDarkFilePath);
-}
-
-NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingRiveFiles(NSArray<NSDictionary *> *attributes,
-                                                                  NSArray<NSString *> *riveFileNames,
-                                                                  NSBundle *bundle) {
-    return CYLTabBarItemsAttributesAddingFilesOfType(attributes, riveFileNames, bundle, @"riv",
-                                                        CYLTabBarRiveFilePath, CYLTabBarRiveDarkFilePath);
-}
-
-NSURL *CYLTabBarRiveAnimationURL(NSURL *fileURL, NSDictionary<CYLTabBarRiveOption, NSString *> *options) {
+/// [EN] The format is read back by `CYLTabBarItemViewAnimator` (the `CYLTabBarItemAnimation` subspec).
+/// [CN] 该格式由 `CYLTabBarItemViewAnimator`（`CYLTabBarItemAnimation` 子库）读取。
+NSURL *CYLTabBarAnimationURLWithOptions(NSURL *fileURL, NSDictionary<CYLTabBarAnimationOption, NSString *> *options) {
     if (![fileURL isKindOfClass:[NSURL class]]) {
         return nil;
     }

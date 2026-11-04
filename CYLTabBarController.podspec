@@ -89,7 +89,11 @@ Pod::Spec.new do |s|
                                     'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayer.h',
                                     'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h',
                                     'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h',
-                                    'CYLTabBarController/CYLTabBarItemAnimation/UIControl+CYLTabBarItemAnimationPlayer.h'
+                                    'CYLTabBarController/CYLTabBarItemAnimation/UIControl+CYLTabBarItemAnimationPlayer.h',
+                                    # The short path for libraries whose view plays itself (Rive): the protocols and the
+                                    # ready-made animator. 视图自己会播放的动画库（Rive）的简便方式：协议与现成的 animator。
+                                    'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h',
+                                    'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h'
     animation.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.h'
     animation.frameworks = 'UIKit'
   end
@@ -133,7 +137,9 @@ Pod::Spec.new do |s|
     pag.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
     # The PAG animator (#604), registered with CYLTabBarItemAnimatorRegistry. PAG 的 animator（#604），向注册表注册。
     pag.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
-    pag.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
+    # Public: the PAG keys and `CYLTabBarItemsAttributesAddingPAGFiles()` live here, not in Core.
+    # 公开：PAG 的 key 与 `CYLTabBarItemsAttributesAddingPAGFiles()` 位于这里，而不是 Core 中。
+    pag.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
     pag.dependency 'libpag', '>= 4.0'
   end
 
@@ -146,35 +152,26 @@ Pod::Spec.new do |s|
     pagenterprise.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
     # The PAG animator (#604), registered with CYLTabBarItemAnimatorRegistry. PAG 的 animator（#604），向注册表注册。
     pagenterprise.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
-    pagenterprise.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
+    pagenterprise.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
     pagenterprise.dependency 'libpag-enterprise', '>= 4.0'
   end
   
   # Rive animations (`RiveRuntime`), the same way as Lottie and PAG: `pod 'CYLTabBarController/Rive'`.
-  # Tabs then take `CYLTabBarRiveURL` / `CYLTabBarRiveFilePath` (".riv" files) like the Lottie and PAG keys;
-  # `CYLTabBarRiveAnimationURL()` picks an artboard and a state machine, so one .riv file can hold every tab's icon.
-  # RiveRuntime is a binary pod (RiveRuntime.xcframework) with a Swift API: `CYLRiveTabBarItemAnimator`
-  # (CYLTabBarItemAnimation/Rive/) registers itself and gets its views only through the protocols
-  # `CYLRiveTabBarItemAnimationViewProviding` / `CYLRiveTabBarItemAnimationViewing`, which the Swift bridge
-  # `CYLRiveTabBarItemAnimationView` (RiveSwift/) adopts, with or without Lottie and PAG. 6.29 is the first version whose current API
-  # (`Worker`, `File`, `Rive`, `RiveUIView`) has replaced the deprecated `RiveViewModel`.
-  # Rive 动画（`RiveRuntime`），用法与 Lottie、PAG 相同：`pod 'CYLTabBarController/Rive'`。Tab 使用 `CYLTabBarRiveURL` /
-  # `CYLTabBarRiveFilePath`（".riv" 文件），与 Lottie、PAG key 一致；`CYLTabBarRiveAnimationURL()` 可以指定画板与状态机，因此一个 .riv 文件
-  # 即可包含所有 Tab 的图标。RiveRuntime 为二进制 pod（RiveRuntime.xcframework），提供 Swift API：`CYLRiveTabBarItemAnimator`
-  # （CYLTabBarItemAnimation/Rive/）自行注册，只通过协议 `CYLRiveTabBarItemAnimationViewProviding` / `CYLRiveTabBarItemAnimationViewing` 获取视图，
-  # 由 Swift 桥接 `CYLRiveTabBarItemAnimationView`（RiveSwift/）遵守这些协议，无论是否引入 Lottie、PAG。
-  # 6.29 起，Rive 当前的 API（`Worker`、`File`、`Rive`、`RiveUIView`）取代了已废弃的 `RiveViewModel`。
+  # Rive takes the short path of CYLTabBarItemAnimation: its Swift view (RiveSwift/) adopts
+  # `CYLTabBarItemAnimationPlayableView` / `CYLTabBarItemAnimationViewProviding`, and `CYLRiveTabBarItemAnimator` only
+  # registers a ready-made `CYLTabBarItemViewAnimator` for ".riv" files and declares Rive's keys and options; there is no
+  # Rive animator or player logic, and nothing in Core. RiveRuntime is a binary pod with a Swift API; 6.29 is the first
+  # version whose current API (`Worker`, `File`, `Rive`, `RiveUIView`) replaces the deprecated `RiveViewModel`.
+  # Rive 动画（`RiveRuntime`），用法与 Lottie、PAG 相同：`pod 'CYLTabBarController/Rive'`。Rive 使用 CYLTabBarItemAnimation 的简便方式：
+  # 其 Swift 视图（RiveSwift/）遵守 `CYLTabBarItemAnimationPlayableView` / `CYLTabBarItemAnimationViewProviding`，`CYLRiveTabBarItemAnimator`
+  # 只为 ".riv" 文件注册一个现成的 `CYLTabBarItemViewAnimator`，并声明 Rive 的 key 与选项；没有 Rive 专用的 animator 或播放器逻辑，Core 中也
+  # 没有任何 Rive 代码。RiveRuntime 为二进制 pod，提供 Swift API；6.29 起，其当前 API（`Worker`、`File`、`Rive`、`RiveUIView`）取代了已废弃的
+  # `RiveViewModel`。
   s.subspec 'Rive' do |rive|
     rive.dependency 'CYLTabBarController/Core'
     rive.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
-    # The Rive animator, registered with CYLTabBarItemAnimatorRegistry, and its Swift bridge.
-    # Rive 的 animator（向注册表注册）及其 Swift 桥接。
+    # The registration and keys, and the Swift view. 注册与 key，以及 Swift 视图。
     rive.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.{h,m}', 'CYLTabBarController/RiveSwift/*.swift'
-    # Public: the interfaces between the animator and the view (`CYLRiveTabBarItemAnimationViewing`,
-    # `CYLRiveTabBarItemAnimationViewProviding`), the configuration, and the animator's `viewProvider`. The Swift bridge
-    # adopts these protocols, so they must be in the module's umbrella header.
-    # 公开：animator 与视图之间的接口（`CYLRiveTabBarItemAnimationViewing`、`CYLRiveTabBarItemAnimationViewProviding`）、配置对象，以及
-    # animator 的 `viewProvider`。Swift 桥接遵守这些协议，因此它们必须在模块的 umbrella 头文件中。
     rive.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.h'
     rive.dependency 'RiveRuntime', '~> 6.29'
     # RiveRuntime requires iOS 14. RiveRuntime 要求 iOS 14。

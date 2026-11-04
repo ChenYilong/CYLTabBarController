@@ -33,8 +33,8 @@ end
 # [CN] #604：.pag 文件不在仓库中，与 pod 本身一样在安装时下载（固定版本，校验 SHA-256）。
 pre_install do |installer|
   # Pods/ is Example-PAG/Pods, so the script is two levels up. Pods/ 即 Example-PAG/Pods，脚本在其上两级。
-  script = File.expand_path('../../scripts/fetch-pag-resources.py', installer.sandbox.root.to_s)
-  system('python3', script) || abort('[!] Could not download the PAG files: python3 ' + script)
+  script = File.expand_path('../../scripts/fetch-animation-resources.py', installer.sandbox.root.to_s)
+  system('python3', script, 'PAGResources') || abort('[!] Could not download the PAG files: python3 ' + script)
 end
 
 post_install do |installer|

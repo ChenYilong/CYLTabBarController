@@ -1,5 +1,5 @@
 {
-  "comment": "Fetched by scripts/fetch-pag-resources.py (run by `pod install` in Example-PAG); the files themselves are not in this repository.",
+  "comment": "Fetched by scripts/fetch-animation-resources.py (run by `pod install` in Example-PAG); the files themselves are not in this repository.",
   "repositories": [
     {
       "repository": "libpag/pag-ios",

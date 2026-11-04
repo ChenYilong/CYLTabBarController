@@ -94,10 +94,10 @@ fastlane/screenshots
 # macOS artifact
 .DS_Store
 
-# PAG animation files (issue #604): downloaded by scripts/fetch-pag-resources.py (`pod install` in Example-PAG),
+# PAG animation files (issue #604): downloaded by scripts/fetch-animation-resources.py (`pod install` in Example-PAG),
 # not kept in the repository. PAG 动效文件：由脚本下载（Example-PAG 中执行 `pod install`），不保存在仓库中。
 Example-Shared/PAGResources/*/
 
-# Rive animation files: downloaded by scripts/fetch-rive-resources.py (`pod install` in Example-Rive),
+# Rive animation files: downloaded by scripts/fetch-animation-resources.py (`pod install` in Example-Rive),
 # not kept in the repository. Rive 动效文件：由脚本下载（Example-Rive 中执行 `pod install`），不保存在仓库中。
 Example-Shared/RiveResources/*/

@@ -7,12 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */; };
-		61DAEAC8826B3FA13591202F /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */; };
-		E4527749730DAF427484396C /* icon-set.riv in Resources */ = {isa = PBXBuildFile; fileRef = 15B09426CFDE645588779718 /* icon-set.riv */; };
-		7E36C3D378B559F4FFC753C7 /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */; };
-		A520A43B0231F8A9A36D72A4 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */; };
-		727E633E0971BFF96CD5500C /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = 6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */; };
 		184C1C9223F65A2800B23C7F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1C9123F65A2800B23C7F /* ViewController.swift */; };
 		184C1C9523F65A2800B23C7F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 184C1C9323F65A2800B23C7F /* Main.storyboard */; };
 		184C1C9723F65A2A00B23C7F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 184C1C9623F65A2A00B23C7F /* Assets.xcassets */; };
@@ -31,7 +25,6 @@
 		184C1CE423F65A9A00B23C7F /* RootNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CDE23F65A9A00B23C7F /* RootNavigationController.swift */; };
 		184C1CE623F65A9A00B23C7F /* RootTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CE023F65A9A00B23C7F /* RootTabBarController.swift */; };
 		184C1CE723F65A9A00B23C7F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CE323F65A9A00B23C7F /* AppDelegate.swift */; };
-		C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000004 /* SceneDelegate.swift */; };
 		184C1CEB23F65B0B00B23C7F /* OCSwift.m in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CEA23F65B0B00B23C7F /* OCSwift.m */; };
 		184C1CF123F686AE00B23C7F /* TabBarCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CF023F686AE00B23C7F /* TabBarCommon.swift */; };
 		184C1CF323F6898300B23C7F /* CYLPlusButtonSubclass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CF223F6898300B23C7F /* CYLPlusButtonSubclass.swift */; };
@@ -45,7 +38,15 @@
 		184F199023F7EE40002DBAE4 /* APPDelegate+Categories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F198F23F7EE40002DBAE4 /* APPDelegate+Categories.swift */; };
 		4672768B00F7389B9E4E50F8 /* Pods_HealthyHome.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49A270299539A5C33415EAAA /* Pods_HealthyHome.framework */; };
 		4D1BE67EE402613EB5A9BB00 /* Pods_HealthyHomeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95B70182D157AED1FB5147B7 /* Pods_HealthyHomeTests.framework */; };
+		59239448FEAA4BF51FBEC4C0 /* TabBarAnimationDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C0AE2CDE2AF7FF13A5D371D /* TabBarAnimationDemo.swift */; };
+		61DAEAC8826B3FA13591202F /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */; };
+		727E633E0971BFF96CD5500C /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = 6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */; };
+		7E36C3D378B559F4FFC753C7 /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */; };
+		A520A43B0231F8A9A36D72A4 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */; };
+		C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000004 /* SceneDelegate.swift */; };
+		C25B6D5C8A1F693141CFB9EA /* icon-set.riv in Resources */ = {isa = PBXBuildFile; fileRef = F2CC9489AD06718D7A075649 /* icon-set.riv */; };
 		E462EF3903016B48B7150636 /* Pods_HealthyHome_HealthyHomeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791B5EAC446039618D1575F4 /* Pods_HealthyHome_HealthyHomeUITests.framework */; };
+		F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,19 +67,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
-		4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home.json; path = "../Example/Classes/Other/LottieResources/green_lottie_tab_home.json"; sourceTree = SOURCE_ROOT; };
-		15B09426CFDE645588779718 /* icon-set.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = "icon-set.riv"; path = "../Example-Shared/RiveResources/rive_animated_icon/icon-set.riv"; sourceTree = SOURCE_ROOT; };
-		A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover.json; path = "../Example/Classes/Other/LottieResources/green_lottie_tab_discover.json"; sourceTree = SOURCE_ROOT; };
-		346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_news.json; path = "../Example/Classes/Other/LottieResources/green_lottie_tab_news.json"; sourceTree = SOURCE_ROOT; };
-		6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine.json; path = "../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json"; sourceTree = SOURCE_ROOT; };
-		A2A9C3F58E83E7420A5303DB /* LottieResources */ = {isa = PBXGroup; children = (
-				4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */,
-				15B09426CFDE645588779718 /* icon-set.riv */,
-				A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */,
-				346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */,
-				6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */,
-			); name = LottieResources; sourceTree = "<group>"; };
 		184C1C8A23F65A2800B23C7F /* HealthyHome.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthyHome.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		184C1C9123F65A2800B23C7F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		184C1C9423F65A2800B23C7F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -104,7 +92,6 @@
 		184C1CDE23F65A9A00B23C7F /* RootNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootNavigationController.swift; sourceTree = "<group>"; };
 		184C1CE023F65A9A00B23C7F /* RootTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootTabBarController.swift; sourceTree = "<group>"; };
 		184C1CE323F65A9A00B23C7F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		C1A5CE0E2E00000000000004 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		184C1CE823F65B0B00B23C7F /* HealthyHome-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HealthyHome-Bridging-Header.h"; sourceTree = "<group>"; };
 		184C1CE923F65B0B00B23C7F /* OCSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCSwift.h; sourceTree = "<group>"; };
 		184C1CEA23F65B0B00B23C7F /* OCSwift.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCSwift.m; sourceTree = "<group>"; };
@@ -119,14 +106,22 @@
 		184F198D23F7E8A3002DBAE4 /* NextVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextVC.swift; sourceTree = "<group>"; };
 		184F198F23F7EE40002DBAE4 /* APPDelegate+Categories.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "APPDelegate+Categories.swift"; sourceTree = "<group>"; };
 		1B5D87387AC5D7147E41C28C /* Pods-HealthyHomeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHomeTests.debug.xcconfig"; path = "Target Support Files/Pods-HealthyHomeTests/Pods-HealthyHomeTests.debug.xcconfig"; sourceTree = "<group>"; };
+		1C0AE2CDE2AF7FF13A5D371D /* TabBarAnimationDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthyHome/Tool/TabBarAnimationDemo.swift; sourceTree = SOURCE_ROOT; };
+		346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_news.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_news.json; sourceTree = SOURCE_ROOT; };
+		4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_home.json; sourceTree = SOURCE_ROOT; };
 		49A270299539A5C33415EAAA /* Pods_HealthyHome.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HealthyHome.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A14B4CADF8B73766EB93756 /* Pods-HealthyHome.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHome.debug.xcconfig"; path = "Target Support Files/Pods-HealthyHome/Pods-HealthyHome.debug.xcconfig"; sourceTree = "<group>"; };
+		6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json; sourceTree = SOURCE_ROOT; };
+		78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
 		791B5EAC446039618D1575F4 /* Pods_HealthyHome_HealthyHomeUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HealthyHome_HealthyHomeUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8DD79CA3F2DFB6CFCB202B2C /* Pods-HealthyHome-HealthyHomeUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHome-HealthyHomeUITests.debug.xcconfig"; path = "Target Support Files/Pods-HealthyHome-HealthyHomeUITests/Pods-HealthyHome-HealthyHomeUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		95B70182D157AED1FB5147B7 /* Pods_HealthyHomeTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HealthyHomeTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_discover.json; sourceTree = SOURCE_ROOT; };
 		B1BF0CD0D82597168C29F214 /* Pods-HealthyHome-HealthyHomeUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHome-HealthyHomeUITests.release.xcconfig"; path = "Target Support Files/Pods-HealthyHome-HealthyHomeUITests/Pods-HealthyHome-HealthyHomeUITests.release.xcconfig"; sourceTree = "<group>"; };
 		BB7EFE8FB9B45E33A24FDB92 /* Pods-HealthyHome.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHome.release.xcconfig"; path = "Target Support Files/Pods-HealthyHome/Pods-HealthyHome.release.xcconfig"; sourceTree = "<group>"; };
+		C1A5CE0E2E00000000000004 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		D496295660CB726F51EEFE39 /* Pods-HealthyHomeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHomeTests.release.xcconfig"; path = "Target Support Files/Pods-HealthyHomeTests/Pods-HealthyHomeTests.release.xcconfig"; sourceTree = "<group>"; };
+		F2CC9489AD06718D7A075649 /* icon-set.riv */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "icon-set.riv"; path = "../Example-Shared/RiveResources/rive_animated_icon/icon-set.riv"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -206,7 +201,7 @@
 				184C1CEA23F65B0B00B23C7F /* OCSwift.m */,
 				184C1CE823F65B0B00B23C7F /* HealthyHome-Bridging-Header.h */,
 			);
-			path = HealthyHome;
+			path = "../Example-PAG/HealthyHome";
 			sourceTree = "<group>";
 		};
 		184C1CA323F65A2A00B23C7F /* HealthyHomeTests */ = {
@@ -215,7 +210,7 @@
 				184C1CA423F65A2A00B23C7F /* HealthyHomeTests.swift */,
 				184C1CA623F65A2A00B23C7F /* Info.plist */,
 			);
-			path = HealthyHomeTests;
+			path = "../Example-PAG/HealthyHomeTests";
 			sourceTree = "<group>";
 		};
 		184C1CAE23F65A2A00B23C7F /* HealthyHomeUITests */ = {
@@ -224,7 +219,7 @@
 				184C1CAF23F65A2A00B23C7F /* HealthyHomeUITests.swift */,
 				184C1CB123F65A2A00B23C7F /* Info.plist */,
 			);
-			path = HealthyHomeUITests;
+			path = "../Example-PAG/HealthyHomeUITests";
 			sourceTree = "<group>";
 		};
 		184C1CBD23F65A6700B23C7F /* UI */ = {
@@ -314,6 +309,7 @@
 			children = (
 				184C1CD823F65A8C00B23C7F /* Common.swift */,
 				184C1CF023F686AE00B23C7F /* TabBarCommon.swift */,
+				1C0AE2CDE2AF7FF13A5D371D /* TabBarAnimationDemo.swift */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
@@ -374,6 +370,18 @@
 				184F198B23F7E651002DBAE4 /* GuideViewController.swift */,
 			);
 			path = Guide;
+			sourceTree = "<group>";
+		};
+		A2A9C3F58E83E7420A5303DB /* LottieResources */ = {
+			isa = PBXGroup;
+			children = (
+				4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */,
+				A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */,
+				346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */,
+				6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */,
+				F2CC9489AD06718D7A075649 /* icon-set.riv */,
+			);
+			name = LottieResources;
 			sourceTree = "<group>";
 		};
 		F45CB2C42A8D05A6BD28059F /* Pods */ = {
@@ -498,13 +506,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				61DAEAC8826B3FA13591202F /* green_lottie_tab_home.json in Resources */,
-				E4527749730DAF427484396C /* icon-set.riv in Resources */,
 				7E36C3D378B559F4FFC753C7 /* green_lottie_tab_discover.json in Resources */,
 				A520A43B0231F8A9A36D72A4 /* green_lottie_tab_news.json in Resources */,
 				727E633E0971BFF96CD5500C /* green_lottie_tab_mine.json in Resources */,
 				184C1C9A23F65A2A00B23C7F /* LaunchScreen.storyboard in Resources */,
 				184C1C9723F65A2A00B23C7F /* Assets.xcassets in Resources */,
 				184C1C9523F65A2800B23C7F /* Main.storyboard in Resources */,
+				C25B6D5C8A1F693141CFB9EA /* icon-set.riv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -618,6 +626,7 @@
 				184C1CD423F65A7400B23C7F /* ImageVIewExtension.swift in Sources */,
 				184F198823F7C811002DBAE4 /* UIIamge+Extension.swift in Sources */,
 				184C1CF123F686AE00B23C7F /* TabBarCommon.swift in Sources */,
+				59239448FEAA4BF51FBEC4C0 /* TabBarAnimationDemo.swift in Sources */,
 				184F198C23F7E651002DBAE4 /* GuideViewController.swift in Sources */,
 				184C1CCA23F65A6700B23C7F /* WisdomVC.swift in Sources */,
 				184F199023F7EE40002DBAE4 /* APPDelegate+Categories.swift in Sources */,
@@ -800,14 +809,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 35GDVZ2Q5K;
-				INFOPLIST_FILE = HealthyHome/Info.plist;
+				INFOPLIST_FILE = "../Example-PAG/HealthyHome/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.HealthyHomeRive;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "HealthyHome/HealthyHome-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "../Example-PAG/HealthyHome/HealthyHome-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -822,14 +831,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 35GDVZ2Q5K;
-				INFOPLIST_FILE = HealthyHome/Info.plist;
+				INFOPLIST_FILE = "../Example-PAG/HealthyHome/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.HealthyHomeRive;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "HealthyHome/HealthyHome-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "../Example-PAG/HealthyHome/HealthyHome-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -842,7 +851,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = HealthyHomeTests/Info.plist;
+				INFOPLIST_FILE = "../Example-PAG/HealthyHomeTests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -864,7 +873,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = HealthyHomeTests/Info.plist;
+				INFOPLIST_FILE = "../Example-PAG/HealthyHomeTests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -885,7 +894,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = HealthyHomeUITests/Info.plist;
+				INFOPLIST_FILE = "../Example-PAG/HealthyHomeUITests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -905,7 +914,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = HealthyHomeUITests/Info.plist;
+				INFOPLIST_FILE = "../Example-PAG/HealthyHomeUITests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
