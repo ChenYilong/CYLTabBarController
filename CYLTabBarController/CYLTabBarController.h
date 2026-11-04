@@ -1527,6 +1527,30 @@ FOUNDATION_EXTERN const NSTimeInterval CYLTabBarItemDoubleTapInterval;
 
 @end
 
+#pragma mark - Opaque tab bar safe area
+
+/*!
+ * [EN] UIKit bug: a page that extends under an opaque tab bar (`tabBar.translucent = NO` with
+ *      `extendedLayoutIncludesOpaqueBars = YES`; before iOS 13.4 also a translucent bar) gets a bottom safe area without
+ *      the tab bar, so the end of its scroll view stays under the bar. The library fixes it for the page shown in the
+ *      selected tab, see `cyl_fixesOpaqueTabBarSafeAreaInsets`.
+ * [CN] UIKit bug：延伸到不透明 TabBar 下方的页面（`tabBar.translucent = NO` 且 `extendedLayoutIncludesOpaqueBars = YES`；iOS 13.4 以前
+ *      半透明 TabBar 也有此问题）的底部安全区域不包含 TabBar，滚动视图末尾因此被遮挡。本库会为选中 Tab 当前显示的页面修正，见
+ *      `cyl_fixesOpaqueTabBarSafeAreaInsets`。
+ */
+@interface CYLTabBarController (CYLOpaqueTabBarSafeArea)
+
+/*!
+ * [EN] Default YES. The page now shown in the selected tab gets the missing part in `additionalSafeAreaInsets.bottom`,
+ *      on top of the app's own value (kept); 0 when UIKit is right, taken back when the page is no longer affected. Only
+ *      the page itself, never its child view controllers; the system tab bar only (FlatDesign sets the safe area itself).
+ * [CN] 默认 YES。选中 Tab 当前显示的页面在 `additionalSafeAreaInsets.bottom` 中补上缺少的部分，App 自己的值保留；UIKit 计算正确时为 0，
+ *      页面不再受影响时撤回。只作用于页面本身，不作用于其子控制器；仅系统 TabBar（扁平样式自行设置安全区域）。
+ */
+@property (nonatomic, assign) BOOL cyl_fixesOpaqueTabBarSafeAreaInsets;
+
+@end
+
 #pragma mark - Deprecated API
 
 @interface CYLTabBarController (CYLTabBarControllerDeprecated)

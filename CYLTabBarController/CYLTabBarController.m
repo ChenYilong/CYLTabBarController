@@ -240,6 +240,8 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (nullable UIViewController *)cyl_contextPlusChildViewController;
 /// [EN] Implemented below (CYLTabBarItemStyle). [CN] 实现见下方（CYLTabBarItemStyle）。
 - (void)cyl_applyTabBarItemStyles;
+/// [EN] Implemented below (CYLOpaqueTabBarSafeArea). [CN] 实现见下方（CYLOpaqueTabBarSafeArea）。
+- (void)cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded;
 @end
 
 /// Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
@@ -730,6 +732,7 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
     [self cyl_updateTabBarMinimizeTracking];
     // Issue #601: tab buttons created again (e.g. after a rotation) get their icon views again.
     [self cyl_setNeedsUpdateTabBarItemIconViews];
+    [self cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         // FIX: issue #585, #543 (follow-up to #93, #392)
         // [EN] The forced `-layoutSubviews` below is an iOS 10 workaround: #93 (iOS 10.0–10.2) and #392 (iOS 10.3.x, items
@@ -6839,6 +6842,87 @@ static NSDictionary<NSAttributedStringKey, id> *CYLAttributesSettingValue(NSDict
         CGFloat lineHeight = 1.0 / UIScreen.mainScreen.scale;
         tabBar.shadowImage = [UIImage cyl_imageWithColor:shadowColor size:CGSizeMake(1, lineHeight)];
     }
+}
+
+@end
+
+#pragma mark - Opaque tab bar safe area
+
+/// [EN] The bottom this library added to a page's `additionalSafeAreaInsets`. [CN] 本库为页面 `additionalSafeAreaInsets` 增加的底部值。
+static char CYLOpaqueTabBarAddedBottomKey;
+static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
+
+@implementation CYLTabBarController (CYLOpaqueTabBarSafeArea)
+
+- (BOOL)cyl_fixesOpaqueTabBarSafeAreaInsets {
+    NSNumber *value = objc_getAssociatedObject(self, &CYLFixesOpaqueTabBarSafeAreaInsetsKey);
+    return value ? value.boolValue : YES;
+}
+
+- (void)setCyl_fixesOpaqueTabBarSafeAreaInsets:(BOOL)fixes {
+    objc_setAssociatedObject(self, &CYLFixesOpaqueTabBarSafeAreaInsetsKey, @(fixes), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded];
+}
+
+/*!
+ * [EN] UIKit bug: a page that extends under an opaque tab bar (`tabBar.translucent = NO` with
+ *      `extendedLayoutIncludesOpaqueBars = YES`; before iOS 13.4 also a translucent bar) gets a bottom safe area that
+ *      leaves the tab bar out, so the end of its scroll view stays under the bar. The page now shown in the selected tab
+ *      gets the missing part in its `additionalSafeAreaInsets.bottom`, on top of the app's own value, which is kept. Self
+ *      correcting: when UIKit gets it right the missing part is 0 and nothing changes, and a part added before is taken
+ *      back when the page is no longer affected. Only the page itself, never its child view controllers. Not FlatDesign,
+ *      which sets the safe area itself.
+ * [CN] UIKit bug：延伸到不透明 TabBar 下方的页面（`tabBar.translucent = NO` 且 `extendedLayoutIncludesOpaqueBars = YES`；iOS 13.4 以前
+ *      半透明 TabBar 也有此问题）得到的底部安全区域没有包含 TabBar，滚动视图的末尾因此被 TabBar 遮挡。选中 Tab 当前显示的页面会在其
+ *      `additionalSafeAreaInsets.bottom` 中补上缺少的部分，App 自己设置的值保留不变。可自我修正：UIKit 计算正确时缺少的部分为 0，不做任何修改；
+ *      页面不再受影响时撤回之前补上的部分。只作用于页面本身，不作用于其子控制器。扁平样式自行设置安全区域，不做处理。
+ */
+- (void)cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded {
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType || !self.isViewLoaded || !self.view.window) {
+        return;
+    }
+    UIViewController *selectedViewController = self.selectedViewController;
+    UINavigationController *navigationController = [selectedViewController isKindOfClass:[UINavigationController class]] ? (UINavigationController *)selectedViewController : nil;
+    UIViewController *page = navigationController ? navigationController.topViewController : selectedViewController;
+    if (!page || !page.isViewLoaded || !page.view.window) {
+        return;
+    }
+    UITabBar *tabBar = self.tabBar;
+    BOOL barIsAffected = !tabBar.translucent;
+    if (@available(iOS 13.4, *)) {
+    } else {
+        barIsAffected = YES;
+    }
+    BOOL pageHidesTabBar = NO;
+    for (UIViewController *viewController in navigationController.viewControllers) {
+        if (viewController.hidesBottomBarWhenPushed && viewController != navigationController.viewControllers.firstObject) {
+            pageHidesTabBar = YES;
+        }
+        if (viewController == page) {
+            break;
+        }
+    }
+    BOOL affected = self.cyl_fixesOpaqueTabBarSafeAreaInsets && barIsAffected && page.extendedLayoutIncludesOpaqueBars &&
+                    (page.edgesForExtendedLayout & UIRectEdgeBottom) && !pageHidesTabBar &&
+                    !tabBar.hidden && tabBar.alpha > 0.01 && tabBar.window;
+    CGFloat addedBottom = [objc_getAssociatedObject(page, &CYLOpaqueTabBarAddedBottomKey) doubleValue];
+    UIEdgeInsets additionalInsets = page.additionalSafeAreaInsets;
+    CGFloat appBottom = additionalInsets.bottom - addedBottom;
+    CGFloat neededBottom = 0;
+    if (affected) {
+        CGRect pageRect = [page.view convertRect:page.view.bounds toView:self.view];
+        CGRect barRect = [tabBar convertRect:tabBar.bounds toView:self.view];
+        CGFloat coveredBottom = MAX(CGRectGetMaxY(pageRect) - CGRectGetMinY(barRect), 0);
+        // [EN] What UIKit gives without any additional inset. [CN] 不含任何 additional inset 时 UIKit 给出的值。
+        CGFloat systemBottom = page.view.safeAreaInsets.bottom - additionalInsets.bottom;
+        neededBottom = MAX(coveredBottom - systemBottom - appBottom, 0);
+    }
+    if (fabs(neededBottom - addedBottom) < 0.5) {
+        return;
+    }
+    additionalInsets.bottom = appBottom + neededBottom;
+    page.additionalSafeAreaInsets = additionalInsets;
+    objc_setAssociatedObject(page, &CYLOpaqueTabBarAddedBottomKey, neededBottom > 0 ? @(neededBottom) : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

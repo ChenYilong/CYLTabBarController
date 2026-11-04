@@ -33,6 +33,7 @@
 | [iOS 13、14 上粗体或大字号标题被截断](#cnios-1314-上粗体或大字号标题被截断) | [Bold or large titles cut off on iOS 13 and 14](#enbold-or-large-titles-cut-off-on-ios-13-and-14) |
 | [Tab 按钮布局后的回调](#cntab-按钮布局后的回调) | [A callback after the tab button is laid out](#ena-callback-after-the-tab-button-is-laid-out) |
 | [在一处设置常用样式](#cn在一处设置常用样式) | [Common styles in one place](#encommon-styles-in-one-place) |
+| [不透明 TabBar 遮挡滚动视图底部](#cn不透明-tabbar-遮挡滚动视图底部) | [An opaque tab bar covering the end of a scroll view](#enan-opaque-tab-bar-covering-the-end-of-a-scroll-view) |
 | [测试](#cn测试) | [Testing](#entesting) |
 
 <!-- navigation:end -->
@@ -169,6 +170,14 @@ tabBarController.cyl_tabBarItemSelectedImageColor = UIColor.systemOrangeColor;
 tabBarController.cyl_tabBarBackgroundColor = UIColor.systemBackgroundColor;
 tabBarController.cyl_tabBarShadowColor = UIColor.clearColor; // no separator line
 ```
+
+## [CN]不透明 TabBar 遮挡滚动视图底部
+## [EN]An opaque tab bar covering the end of a scroll view
+
+| 中文 | English |
+|:---|:---|
+| UIKit bug：页面延伸到不透明 TabBar 下方时（`tabBar.translucent = NO` 且 `extendedLayoutIncludesOpaqueBars = YES`；iOS 13.4 以前半透明 TabBar 也有此问题），底部安全区域没有包含 TabBar，滚动到底部时最后一部分内容被 TabBar 挡住。`CYLTabBarController` 现在为选中 Tab 当前显示的页面在 `additionalSafeAreaInsets.bottom` 中补上缺少的部分（App 自己设置的值保留不变）。 | UIKit bug: when a page extends under an opaque tab bar (`tabBar.translucent = NO` with `extendedLayoutIncludesOpaqueBars = YES`; before iOS 13.4 also a translucent bar), its bottom safe area leaves the tab bar out, so the end of a scroll view stays hidden under the bar. `CYLTabBarController` now adds the missing part to `additionalSafeAreaInsets.bottom` of the page shown in the selected tab (the app's own value is kept). |
+| 可自我修正：根据 TabBar 实际遮挡的高度计算缺少的部分，UIKit 计算正确时为 0、不做修改；页面不再受影响时（例如 TabBar 被隐藏）撤回之前补上的部分。只作用于页面本身，不作用于其中的子控制器（例如分页容器中的列表），因此不会让嵌套列表的 inset 错乱。在 TabBarController 布局与 TabBar 布局（pop 返回后）时检查。扁平样式自行设置安全区域，不做处理。`cyl_fixesOpaqueTabBarSafeAreaInsets = NO` 可关闭。 | Self correcting: the missing part is computed from how much the tab bar really covers, so it is 0 and nothing changes when UIKit gets it right, and it is taken back once the page is no longer affected (e.g. the tab bar is hidden). Only the page itself, never the child view controllers in it (e.g. the lists of a paging container), so nested lists do not get wrong insets. Checked on the tab bar controller's layout and the tab bar's (after a pop). FlatDesign sets the safe area itself and is left alone. `cyl_fixesOpaqueTabBarSafeAreaInsets = NO` turns it off. |
 
 ## [CN]测试
 ## [EN]Testing

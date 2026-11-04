@@ -55,6 +55,11 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
 - (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center;
 @end
 
+/// [EN] Implemented in CYLTabBarController.m. [CN] 实现于 CYLTabBarController.m。
+@interface CYLTabBarController (CYLOpaqueTabBarSafeAreaFix)
+- (void)cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded;
+@end
+
 @implementation CYLTabBar
 @synthesize plusButton = _plusButton;
 
@@ -437,6 +442,9 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];
     [self cyl_fixTruncatedTabTitlesIfNeeded];
     [self cyl_runItemLayoutBlocks];
+    // [EN] The bar is laid out again when it comes back after a pop: check the page's safe area under an opaque bar.
+    // [CN] pop 返回后 TabBar 会重新布局：检查不透明 TabBar 下页面的安全区域。
+    [self.tabBarController cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded];
 }
 
 /*!
