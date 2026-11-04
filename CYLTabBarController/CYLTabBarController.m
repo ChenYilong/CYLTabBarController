@@ -427,6 +427,15 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
         [self cyl_interceptLoginIfNeededForViewController:self.viewControllers[(NSUInteger)tappedIndex]]) {
         return;
     }
+    // [EN] A hijacked tab (CYLHijack): runs the action instead (once per tap), like a tab that needs login. The view
+    //      controller is looked up from the button itself: on Liquid Glass without a plus button the button's stored
+    //      index can be 0 for every tab.
+    // [CN] 被劫持的 Tab（CYLHijack）：改为执行对应操作（每次点击一次），与需要登录的 Tab 相同。控制器按按钮本身查找：
+    //      液态玻璃且没有 PlusButton 时，按钮记录的下标可能都是 0。
+    UIViewController *hijackCandidate = [self cyl_viewControllerForTabControl:control];
+    if (hijackCandidate && [self cyl_interceptHijackIfNeededForViewController:hijackCandidate]) {
+        return;
+    }
     // FIX: issue #232
     // [EN] `-tabBarController:shouldSelectViewController:` returned NO for the tapped tab (e.g. a tab that pushes a page
     //      instead of being selected): the selected tab did not change. The code below works on the selected tab, so it
@@ -3862,6 +3871,11 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     if ([self cyl_interceptLoginIfNeededForViewController:viewController]) {
         return NO;
     }
+    // [EN] A hijacked tab (CYLHijack): refuse the selection and run the action instead.
+    // [CN] 被劫持的 Tab（CYLHijack）：拒绝选中，改为执行对应操作。
+    if ([self cyl_interceptHijackIfNeededForViewController:viewController]) {
+        return NO;
+    }
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     if (YES == viewController.cyl_isPlaceholder) {
         return NO;
@@ -7189,6 +7203,87 @@ static NSNumber *CYLTabBarItemAnimationTypeValue(id value) {
     if (viewController) {
         [self cyl_playTabBarItemAnimationEvent:CYLTabBarItemAnimationEventHighlight viewController:viewController control:control];
     }
+}
+
+@end
+
+#pragma mark - CYLHijack (a tab that runs an action instead of being selected)
+
+static char CYLHijackedTabBarItemIdentifiersKey;
+static char CYLShouldHijackHandlerKey;
+static char CYLDidHijackHandlerKey;
+static char CYLHijackInterceptedViewControllerKey;
+
+@implementation CYLTabBarController (CYLHijack)
+
+- (NSArray<NSString *> *)cyl_hijackedTabBarItemIdentifiers {
+    return objc_getAssociatedObject(self, &CYLHijackedTabBarItemIdentifiersKey);
+}
+
+- (void)setCyl_hijackedTabBarItemIdentifiers:(NSArray<NSString *> *)hijackedTabBarItemIdentifiers {
+    objc_setAssociatedObject(self, &CYLHijackedTabBarItemIdentifiersKey, hijackedTabBarItemIdentifiers, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (BOOL (^)(CYLTabBarController *, UIViewController *))cyl_shouldHijackHandler {
+    return objc_getAssociatedObject(self, &CYLShouldHijackHandlerKey);
+}
+
+- (void)setCyl_shouldHijackHandler:(BOOL (^)(CYLTabBarController *, UIViewController *))shouldHijackHandler {
+    objc_setAssociatedObject(self, &CYLShouldHijackHandlerKey, shouldHijackHandler, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (void (^)(CYLTabBarController *, UIViewController *))cyl_didHijackHandler {
+    return objc_getAssociatedObject(self, &CYLDidHijackHandlerKey);
+}
+
+- (void)setCyl_didHijackHandler:(void (^)(CYLTabBarController *, UIViewController *))didHijackHandler {
+    objc_setAssociatedObject(self, &CYLDidHijackHandlerKey, didHijackHandler, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (BOOL)cyl_isHijackedViewController:(UIViewController *)viewController {
+    if (!viewController || viewController.cyl_isPlaceholder) {
+        return NO;
+    }
+    BOOL (^shouldHijackHandler)(CYLTabBarController *, UIViewController *) = self.cyl_shouldHijackHandler;
+    if (shouldHijackHandler) {
+        return shouldHijackHandler(self, viewController);
+    }
+    id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)self.delegate;
+    if ([delegate respondsToSelector:@selector(tabBarController:shouldHijackViewController:)]) {
+        return [delegate tabBarController:self shouldHijackViewController:viewController];
+    }
+    NSString *identifier = viewController.cyl_tabBarItemIdentifier;
+    return identifier.length > 0 && [self.cyl_hijackedTabBarItemIdentifiers containsObject:identifier];
+}
+
+- (BOOL)cyl_interceptHijackIfNeededForViewController:(UIViewController *)viewController {
+    if (![self cyl_isHijackedViewController:viewController]) {
+        return NO;
+    }
+    // [EN] One tap reaches here up to twice (`-tabBarController:shouldSelectViewController:`, then the tab button's action):
+    //      run the action only once per run loop turn.
+    // [CN] 一次点击最多到达这里两次（`-tabBarController:shouldSelectViewController:`，然后是 Tab 按钮的事件）：每个 runloop 只执行一次。
+    if (objc_getAssociatedObject(self, &CYLHijackInterceptedViewControllerKey) == viewController) {
+        return YES;
+    }
+    objc_setAssociatedObject(self, &CYLHijackInterceptedViewControllerKey, viewController, OBJC_ASSOCIATION_ASSIGN);
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf) {
+            objc_setAssociatedObject(strongSelf, &CYLHijackInterceptedViewControllerKey, nil, OBJC_ASSOCIATION_ASSIGN);
+        }
+    });
+    void (^didHijackHandler)(CYLTabBarController *, UIViewController *) = self.cyl_didHijackHandler;
+    if (didHijackHandler) {
+        didHijackHandler(self, viewController);
+        return YES;
+    }
+    id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)self.delegate;
+    if ([delegate respondsToSelector:@selector(tabBarController:didHijackViewController:)]) {
+        [delegate tabBarController:self didHijackViewController:viewController];
+    }
+    return YES;
 }
 
 @end
