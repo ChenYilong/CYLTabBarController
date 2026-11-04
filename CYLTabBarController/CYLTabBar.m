@@ -499,6 +499,7 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
  * 增加了类型为UITabBarController.MinimizeBehavior的tabBarMinimizeBehavior属性，用于设置 Tabbar 最小化时的行为。
 增加了类型为UITabAccessory的bottomAccessory属性，用于在 Tabbar 的上方再添加一个 UITabAccessory（辅助内容）。
 UISearchTab 会从 TabBar 分离出来单独显示。
+ issue #13：tabBarMinimizeBehavior 现在通过 `-[CYLTabBarController cyl_tabBarMinimizeBehavior]` 设置；缩小时隐藏、显示 PlusButton 仍待适配。
  [EN] TODO:   Adapt to the following iOS26 APIs. The idea is to observe size changes when a specific window
       minimizes, and hide or show the PlusButton accordingly.
       Added the tabBarMinimizeBehavior property of type UITabBarController.MinimizeBehavior, which sets the
@@ -506,6 +507,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
       Added the bottomAccessory property of type UITabAccessory, which adds a UITabAccessory (accessory content)
       above the Tabbar.
       UISearchTab is separated from the TabBar and shown on its own.
+      Issue #13: tabBarMinimizeBehavior is now set through `-[CYLTabBarController cyl_tabBarMinimizeBehavior]`; hiding
+      and showing the PlusButton while minimized is still to do.
  */
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if (context == CYLTabBarAlpha) {
@@ -704,11 +707,17 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         //      plus button stays here. Centre it on its placeholder tab button instead of the horizontal position.
         // [CN] 系统把 Tab 按钮移出本 TabBar，放进右侧竖向栏，而加号按钮仍在本 TabBar 上，需对齐到它的占位 Tab 按钮中心。
         UIView *verticalBarSlot = [self cyl_verticalBarTabButtonAtIndex:plusButtonIndex];
-        if (verticalBarSlot) {
+        // Issue #13: the minimized Liquid Glass tab bar (`cyl_tabBarMinimizeBehavior`, iOS 26+) is laid out as the
+        // vertical bar is: the platter shrinks, so the height-based Y offset no longer fits; center on the slot instead.
+        // [CN] issue #13：缩小后的液态玻璃 TabBar（`cyl_tabBarMinimizeBehavior`，iOS 26+）与竖向栏一样处理：platter 缩小后，
+        //      按 TabBar 高度计算的 Y 轴偏移不再适用，改为居中于该 Tab。
+        UIView *centeredSlot = verticalBarSlot ?: [self cyl_minimizedBarTabButtonAtIndex:plusButtonIndex];
+        if (centeredSlot) {
             // Issue #636: centered on the slot, with or without a title, like a plus button without a title. The height
-            // methods and the title alignment (`-cyl_alignedCenterForCenter:`) don't apply to the vertical bar.
-            // 竖向栏中，无论有没有标题，都与没有标题时一样居中于该 Tab；高度相关的代理方法和标题对齐都不适用于竖向栏。
-            CGPoint slotCenter = [verticalBarSlot.superview convertPoint:verticalBarSlot.center toView:self];
+            // methods and the title alignment (`-cyl_alignedCenterForCenter:`) don't apply to the vertical bar, nor to
+            // the minimized bar (issue #13).
+            // 竖向栏与缩小后的 TabBar 中（issue #13），无论有没有标题，都与没有标题时一样居中于该 Tab；高度相关的代理方法和标题对齐都不适用。
+            CGPoint slotCenter = [centeredSlot.superview convertPoint:centeredSlot.center toView:self];
             if (!CGPointEqualToPoint(self.plusButton.center, slotCenter)) {
                 [CATransaction begin];
                 [CATransaction setDisableActions:YES];
@@ -889,6 +898,50 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 - (BOOL)cyl_showsVerticalBar {
     UIView *platterView = self.cyl_platterView;
     return platterView.window && platterView.window == self.window && ![platterView isDescendantOfView:self];
+}
+
+/*!
+ * Issue #13
+ * [EN] Whether the system shows this Liquid Glass tab bar minimized (`-[CYLTabBarController cyl_tabBarMinimizeBehavior]`
+ *      is OnScrollDown or OnScrollUp, iOS 26+). UIKit has no public minimized state, so it is read from the geometry: on
+ *      iPhone the platter (the glass capsule with the tab buttons) shrinks from almost the full width of the bar to a
+ *      small capsule. Less than half the bar's width counts as minimized. NO in the vertical bar (issue #653).
+ * [CN] 系统是否正以缩小状态显示本液态玻璃 TabBar（`-[CYLTabBarController cyl_tabBarMinimizeBehavior]` 为 OnScrollDown 或
+ *      OnScrollUp，iOS 26+）。UIKit 没有公开的缩小状态，因此根据几何尺寸判断：iPhone 上 platter（承载 Tab 按钮的玻璃胶囊）
+ *      会从接近 TabBar 全宽缩小为一个小胶囊，宽度不到 TabBar 一半即视为缩小。竖向栏中（issue #653）返回 NO。
+ */
+- (BOOL)cyl_showsMinimizedBar {
+    if (![CYLConstants isLiquidGlassActive] || UIUserInterfaceIdiomPhone != self.traitCollection.userInterfaceIdiom) {
+        return NO;
+    }
+    CYLTabBarMinimizeBehavior behavior = [self tabBarController].cyl_tabBarMinimizeBehavior;
+    if (CYLTabBarMinimizeBehaviorOnScrollDown != behavior && CYLTabBarMinimizeBehaviorOnScrollUp != behavior) {
+        return NO;
+    }
+    UIView *platterView = self.cyl_platterView;
+    if (!platterView.window || ![platterView isDescendantOfView:self]) {
+        return NO;
+    }
+    // [EN] In this bar's coordinates, so a scale transform counts too. [CN] 转换到本 TabBar 坐标系，缩放 transform 也会计入。
+    CGFloat platterWidth = CGRectGetWidth([platterView convertRect:platterView.bounds toView:self]);
+    CGFloat tabBarWidth = CGRectGetWidth(self.bounds);
+    return platterWidth > 0 && tabBarWidth > 0 && platterWidth < tabBarWidth * 0.5;
+}
+
+/*!
+ * Issue #13
+ * [EN] The tab button at `index` while this tab bar is minimized (`-cyl_showsMinimizedBar`); nil otherwise.
+ * [CN] 本 TabBar 处于缩小状态（`-cyl_showsMinimizedBar`）时第 `index` 个 Tab 按钮；其他情况返回 nil。
+ */
+- (UIView *)cyl_minimizedBarTabButtonAtIndex:(NSUInteger)index {
+    if (![self cyl_showsMinimizedBar]) {
+        return nil;
+    }
+    NSArray<UIControl *> *tabButtons = [self cyl_tabBarSubviews];
+    if (index == NSNotFound || index >= tabButtons.count) {
+        return nil;
+    }
+    return tabButtons[index];
 }
 
 /*!
