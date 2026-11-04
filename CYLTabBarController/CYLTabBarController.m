@@ -334,6 +334,26 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
         [self cyl_interceptLoginIfNeededForViewController:self.viewControllers[(NSUInteger)tappedIndex]]) {
         return;
     }
+    // FIX: issue #232
+    // [EN] `-tabBarController:shouldSelectViewController:` returned NO for the tapped tab (e.g. a tab that pushes a page
+    //      instead of being selected): the selected tab did not change. The code below works on the selected tab, so it
+    //      played the selected tab's Lottie on the tapped button, marked the tapped button selected, reported it through
+    //      `tabBarController:didSelectControl:`, and deselected the plus button while its page was still shown. Leave the
+    //      tab bar as it is, as for a tab that needs login (#19).
+    // [CN] `-tabBarController:shouldSelectViewController:` 对被点击的 Tab 返回了 NO（例如点击后 push 页面而不切换的 Tab），选中的
+    //      Tab 没有变化。下面的代码按当前选中的 Tab 处理，于是会在被点击的按钮上播放选中 Tab 的 Lottie、把被点击的按钮设为选中、
+    //      通过 `tabBarController:didSelectControl:` 上报，并在 PlusButton 的页面仍在显示时取消 PlusButton 的选中状态。
+    //      与需要登录的 Tab（#19）一样，保持 TabBar 不变。
+    if (![control cyl_isPlusControl] && tappedIndex >= 0 && tappedIndex < (NSInteger)self.viewControllers.count) {
+        UIViewController *tappedViewController = self.viewControllers[(NSUInteger)tappedIndex];
+        UIViewController *selectedViewController = self.selectedViewController;
+        // [EN] The "More" tab selects `moreNavigationController`, which is not in `viewControllers`: not a refusal.
+        // [CN] “更多”Tab 选中的是不在 `viewControllers` 中的 `moreNavigationController`，不算被拒绝。
+        if (selectedViewController && selectedViewController != self.moreNavigationController &&
+            tappedViewController != selectedViewController) {
+            return;
+        }
+    }
     UIViewController *vc = nil;
     [self tabChangedToSelectedViewController:vc control:control];
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
