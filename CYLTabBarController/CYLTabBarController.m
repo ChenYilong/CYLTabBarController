@@ -85,6 +85,8 @@ NSString *const CYLTabBarItemSelectedTitleColor = @"CYLTabBarItemSelectedTitleCo
 NSString *const CYLTabBarItemIconColor = @"CYLTabBarItemIconColor";
 NSString *const CYLTabBarItemSelectedIconColor = @"CYLTabBarItemSelectedIconColor";
 NSString *const CYLTabBarItemSelectedBackgroundColor = @"CYLTabBarItemSelectedBackgroundColor";
+NSString *const CYLTabBarItemTitleFont = @"CYLTabBarItemTitleFont";
+NSString *const CYLTabBarItemSelectedTitleFont = @"CYLTabBarItemSelectedTitleFont";
 NSString *const CYLTabBarItemAccessibilityIdentifier = @"CYLTabBarItemAccessibilityIdentifier";
 NSString *const CYLTabBarItemAccessibilityLabel = @"CYLTabBarItemAccessibilityLabel";
 NSString *const CYLTabBarItemAccessibilityHint = @"CYLTabBarItemAccessibilityHint";
@@ -2251,7 +2253,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     // [CN] 单个 Tab 的颜色在下一次布局时生效（`-cyl_syncTabBarAppearances`、`-cyl_bindTabControlActions`）。
     if (self.isViewLoaded && (attributes[CYLTabBarItemTitleColor] || attributes[CYLTabBarItemSelectedTitleColor] ||
                               attributes[CYLTabBarItemIconColor] || attributes[CYLTabBarItemSelectedIconColor] ||
-                              attributes[CYLTabBarItemSelectedBackgroundColor])) {
+                              attributes[CYLTabBarItemSelectedBackgroundColor] ||
+                              attributes[CYLTabBarItemTitleFont] || attributes[CYLTabBarItemSelectedTitleFont])) {
         [self.view setNeedsLayout];
         [self cyl_updateSelectedBackgroundColorsOfTabButtons];
     }
@@ -3319,12 +3322,13 @@ static UITabBarAppearance *CYLTabBarAppearanceWithTitlePositionAdjustment(UITabB
     return appearance;
 }
 
-/// [EN] The per-tab colors (`CYLTabBarItemTitleColor`...) a tab asked for, kept on its UITabBarItem; nil when none.
-/// [CN] Tab 设置的颜色（`CYLTabBarItemTitleColor` 等），保存在其 UITabBarItem 上；没有时为 nil。
+/// [EN] The per-tab colors and title fonts (`CYLTabBarItemTitleColor`, `CYLTabBarItemTitleFont`...) a tab asked for, kept on
+///      its UITabBarItem; nil when none.
+/// [CN] Tab 设置的颜色与标题字体（`CYLTabBarItemTitleColor`、`CYLTabBarItemTitleFont` 等），保存在其 UITabBarItem 上；没有时为 nil。
 static char CYLTabBarItemColorsKey;
 
-static NSDictionary<NSString *, UIColor *> *CYLTabBarItemColorsFromAttributes(NSDictionary *attributes) {
-    NSMutableDictionary<NSString *, UIColor *> *colors = nil;
+static NSDictionary<NSString *, id> *CYLTabBarItemColorsFromAttributes(NSDictionary *attributes) {
+    NSMutableDictionary<NSString *, id> *colors = nil;
     for (NSString *key in @[ CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor, CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor ]) {
         id color = attributes[key];
         if ([color isKindOfClass:[UIColor class]]) {
@@ -3334,23 +3338,38 @@ static NSDictionary<NSString *, UIColor *> *CYLTabBarItemColorsFromAttributes(NS
             colors[key] = color;
         }
     }
+    for (NSString *key in @[ CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont ]) {
+        id font = attributes[key];
+        if ([font isKindOfClass:[UIFont class]]) {
+            if (!colors) {
+                colors = [NSMutableDictionary dictionary];
+            }
+            colors[key] = font;
+        }
+    }
     return [colors copy];
 }
 
+/// [EN] Sets one title text attribute (color or font) of a state, keeping the others. [CN] 设置某个状态的一个标题属性（颜色或字体），保留其他属性。
 API_AVAILABLE(ios(13.0))
-static void CYLSetTitleColorOfStateAppearance(UITabBarItemStateAppearance *state, UIColor *color) {
-    if (!color) {
+static void CYLSetTitleAttributeOfStateAppearance(UITabBarItemStateAppearance *state, NSAttributedStringKey attributeName, id value) {
+    if (!value) {
         return;
     }
     NSMutableDictionary<NSAttributedStringKey, id> *attributes = [state.titleTextAttributes mutableCopy] ?: [NSMutableDictionary dictionary];
-    attributes[NSForegroundColorAttributeName] = color;
+    attributes[attributeName] = value;
     state.titleTextAttributes = attributes;
 }
 
 API_AVAILABLE(ios(13.0))
-static void CYLSetColorsOfItemAppearance(UITabBarItemAppearance *itemAppearance, NSDictionary<NSString *, UIColor *> *colors) {
-    CYLSetTitleColorOfStateAppearance(itemAppearance.normal, colors[CYLTabBarItemTitleColor]);
-    CYLSetTitleColorOfStateAppearance(itemAppearance.selected, colors[CYLTabBarItemSelectedTitleColor]);
+static void CYLSetColorsOfItemAppearance(UITabBarItemAppearance *itemAppearance, NSDictionary<NSString *, id> *colors) {
+    CYLSetTitleAttributeOfStateAppearance(itemAppearance.normal, NSForegroundColorAttributeName, colors[CYLTabBarItemTitleColor]);
+    CYLSetTitleAttributeOfStateAppearance(itemAppearance.selected, NSForegroundColorAttributeName, colors[CYLTabBarItemSelectedTitleColor]);
+    // [EN] Fonts: the selected state uses the unselected font unless it has its own. [CN] 字体：选中状态没有单独设置时使用未选中的字体。
+    UIFont *titleFont = colors[CYLTabBarItemTitleFont];
+    UIFont *selectedTitleFont = colors[CYLTabBarItemSelectedTitleFont] ?: titleFont;
+    CYLSetTitleAttributeOfStateAppearance(itemAppearance.normal, NSFontAttributeName, titleFont);
+    CYLSetTitleAttributeOfStateAppearance(itemAppearance.selected, NSFontAttributeName, selectedTitleFont);
     if (colors[CYLTabBarItemIconColor]) {
         itemAppearance.normal.iconColor = colors[CYLTabBarItemIconColor];
     }
@@ -3365,7 +3384,7 @@ static void CYLSetColorsOfItemAppearance(UITabBarItemAppearance *itemAppearance,
  * [CN] 单个 Tab 的 appearance：`base` 的副本，写入其标题偏移（`offsetValue` 不为 nil 时）与颜色（`colors` 不为 nil 时），作用于所有布局。
  */
 API_AVAILABLE(ios(13.0))
-static UITabBarAppearance *CYLTabBarAppearanceForItem(UITabBarAppearance *base, NSValue *_Nullable offsetValue, NSDictionary<NSString *, UIColor *> *_Nullable colors) {
+static UITabBarAppearance *CYLTabBarAppearanceForItem(UITabBarAppearance *base, NSValue *_Nullable offsetValue, NSDictionary<NSString *, id> *_Nullable colors) {
     UITabBarAppearance *appearance = offsetValue ? CYLTabBarAppearanceWithTitlePositionAdjustment(base, offsetValue.UIOffsetValue) : [base copy];
     if (colors.count > 0) {
         CYLSetColorsOfItemAppearance(appearance.stackedLayoutAppearance, colors);
@@ -3386,7 +3405,7 @@ static UITabBarAppearance *CYLTabBarAppearanceForItem(UITabBarAppearance *base, 
  *      保存的是 bar appearance 本身（不是副本），TabBar 未改变时按对象身份即可识别，布局时不会重复安装。
  */
 API_AVAILABLE(ios(13.0))
-static void CYLSyncTitlePositionAdjustmentAppearance(UITabBarItem *tabBarItem, const void *stateKey, UITabBarAppearance *_Nullable current, UITabBarAppearance *_Nullable barAppearance, BOOL transparent, NSValue *_Nullable offsetValue, NSDictionary<NSString *, UIColor *> *_Nullable colors, void (^setter)(UITabBarAppearance *_Nullable appearance), UITabBarAppearance *_Nullable (^getter)(void)) {
+static void CYLSyncTitlePositionAdjustmentAppearance(UITabBarItem *tabBarItem, const void *stateKey, UITabBarAppearance *_Nullable current, UITabBarAppearance *_Nullable barAppearance, BOOL transparent, NSValue *_Nullable offsetValue, NSDictionary<NSString *, id> *_Nullable colors, void (^setter)(UITabBarAppearance *_Nullable appearance), UITabBarAppearance *_Nullable (^getter)(void)) {
     // [EN] State: @[installed, source, appBase or NSNull, offset or NSNull, colors or NSNull] (the last two since the
     //      per-tab colors were added; an older 3-element state reads them as missing).
     // [CN] 状态：@[installed, source, appBase 或 NSNull, offset 或 NSNull, colors 或 NSNull]（后两项为加入单个 Tab 颜色后新增；
@@ -3437,7 +3456,7 @@ static void CYLSyncTitlePositionAdjustmentAppearance(UITabBarItem *tabBarItem, c
 
 - (void)cyl_syncTitlePositionAdjustmentAppearanceOfTabBarItem:(UITabBarItem *)tabBarItem API_AVAILABLE(ios(13.0)) {
     NSValue *offsetValue = objc_getAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey);
-    NSDictionary<NSString *, UIColor *> *colors = objc_getAssociatedObject(tabBarItem, &CYLTabBarItemColorsKey);
+    NSDictionary<NSString *, id> *colors = objc_getAssociatedObject(tabBarItem, &CYLTabBarItemColorsKey);
     UITabBar *tabBar = self.tabBar;
     UITabBarAppearance *standardAppearance = tabBar.standardAppearance;
     CYLSyncTitlePositionAdjustmentAppearance(tabBarItem, &CYLTitlePositionAdjustmentStandardAppearanceKey, tabBarItem.standardAppearance, standardAppearance, NO, offsetValue, colors, ^(UITabBarAppearance *appearance) {
@@ -3471,7 +3490,7 @@ static void CYLSyncTitlePositionAdjustmentAppearance(UITabBarItem *tabBarItem, c
         NSArray<UIViewController *> *viewControllers = self.viewControllers;
         for (NSUInteger index = 0; index < viewControllers.count; index++) {
             UITabBarItem *item = viewControllers[index].tabBarItem;
-            NSDictionary<NSString *, UIColor *> *colors = CYLTabBarItemColorsFromAttributes([self tabBarItemAttributesAtIndex:index]);
+            NSDictionary<NSString *, id> *colors = CYLTabBarItemColorsFromAttributes([self tabBarItemAttributesAtIndex:index]);
             NSDictionary *storedColors = objc_getAssociatedObject(item, &CYLTabBarItemColorsKey);
             if (item && !(colors == storedColors || [colors isEqual:storedColors])) {
                 objc_setAssociatedObject(item, &CYLTabBarItemColorsKey, colors, OBJC_ASSOCIATION_COPY_NONATOMIC);
@@ -3632,6 +3651,25 @@ static char CYLObservedStandardAppearanceTabBarKey;
             }
             NSMutableDictionary<NSAttributedStringKey, id> *textAttributes = [current mutableCopy] ?: [NSMutableDictionary dictionary];
             textAttributes[NSForegroundColorAttributeName] = color;
+            [flatItem setTitleTextAttributes:textAttributes forState:state];
+        }];
+        // [EN] Title fonts: the selected state uses the unselected font unless it has its own.
+        // [CN] 标题字体：选中状态没有单独设置时使用未选中的字体。
+        id titleFont = attributes[CYLTabBarItemTitleFont];
+        id selectedTitleFont = attributes[CYLTabBarItemSelectedTitleFont] ?: titleFont;
+        NSDictionary<NSNumber *, id> *fontsByState = @{ @(UIControlStateNormal) : titleFont ?: [NSNull null],
+                                                        @(UIControlStateSelected) : selectedTitleFont ?: [NSNull null] };
+        [fontsByState enumerateKeysAndObjectsUsingBlock:^(NSNumber *stateValue, id font, BOOL *stop) {
+            if (![font isKindOfClass:[UIFont class]]) {
+                return;
+            }
+            UIControlState state = (UIControlState)stateValue.unsignedIntegerValue;
+            NSDictionary<NSAttributedStringKey, id> *current = [flatItem titleTextAttributesForState:state];
+            if ([current[NSFontAttributeName] isEqual:font]) {
+                return;
+            }
+            NSMutableDictionary<NSAttributedStringKey, id> *textAttributes = [current mutableCopy] ?: [NSMutableDictionary dictionary];
+            textAttributes[NSFontAttributeName] = font;
             [flatItem setTitleTextAttributes:textAttributes forState:state];
         }];
         id selectedBackgroundColor = attributes[CYLTabBarItemSelectedBackgroundColor];

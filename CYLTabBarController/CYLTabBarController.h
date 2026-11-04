@@ -327,6 +327,15 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedTitleColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemIconColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedIconColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedBackgroundColor;
+/*!
+ * [EN] Optional per-tab title fonts (UIFont), unselected / selected; the selected state uses the unselected font unless
+ *      it has its own. Applied like the colors above (iOS 13+), also in FlatDesign. A larger font for one tab, or a bold
+ *      title only while selected. See docs/Tab-Item-Colors.md.
+ * [CN] 可选的单个 Tab 标题字体（UIFont），未选中 / 选中；选中状态没有单独设置时使用未选中的字体。与上面的颜色一样生效（iOS 13+），
+ *      扁平样式同样支持。例如为某个 Tab 使用更大的字体，或只在选中时加粗。见 docs/Tab-Item-Colors.md。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemTitleFont;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedTitleFont;
 
 /*!
  * [EN] Accessibility of a tab, for VoiceOver and UI tests (`app.tabBars.buttons["home"]`). See docs/Tab-Accessibility.md.

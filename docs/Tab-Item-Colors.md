@@ -22,6 +22,7 @@
 | 中文 | English |
 |:---|:---|
 | [用法](#用法--usage) | [Usage](#用法--usage) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [单个 Tab 的字体](#单个-tab-的字体--per-tab-fonts) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Per-tab fonts](#单个-tab-的字体--per-tab-fonts) |
 | [API](#api) | [API](#api) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
@@ -53,6 +54,20 @@ let live: [String: Any] = [
 ]
 ```
 
+### 单个 Tab 的字体 / Per-tab fonts
+
+```objc
+NSDictionary *live = @{
+    CYLTabBarItemTitle : @"Live",
+    CYLTabBarItemTitleFont : [UIFont systemFontOfSize:10],                          // 未选中 / unselected
+    CYLTabBarItemSelectedTitleFont : [UIFont systemFontOfSize:11 weight:UIFontWeightBold], // 选中时加粗 / bold while selected
+};
+```
+
+| 中文 | English |
+|:---|:---|
+| 以前只能用 `standardAppearance` 为所有 Tab 设置同一种字体（见 FAQ）。现在可以只改某个 Tab，与颜色、标题偏移写入同一个 item appearance 副本，可同时使用。 | Fonts could only be set for all tabs at once through `standardAppearance` (see the FAQ). One tab can now have its own, written into the same per-item appearance copy as the colors and the title offset, so they work together. |
+
 ## API
 
 | Key | 中文 | English |
@@ -62,6 +77,8 @@ let live: [String: Any] = [
 | `CYLTabBarItemIconColor` | 未选中图标着色（仅模板图）。 | Unselected icon tint (template images only). |
 | `CYLTabBarItemSelectedIconColor` | 选中图标着色（仅模板图）。 | Selected icon tint (template images only). |
 | `CYLTabBarItemSelectedBackgroundColor` | 选中 Tab 的背景色（经典 TabBar 与扁平样式）。 | Background of the selected tab (classic tab bar and FlatDesign). |
+| `CYLTabBarItemTitleFont` | 未选中标题字体（UIFont）。 | Unselected title font (UIFont). |
+| `CYLTabBarItemSelectedTitleFont` | 选中标题字体；未设置时使用 `CYLTabBarItemTitleFont`。适用于所有样式（iOS 13+）。 | Selected title font; `CYLTabBarItemTitleFont` when not set. In every style (iOS 13+). |
 
 | 样式 / Style | 中文 | English |
 |:---|:---|:---|

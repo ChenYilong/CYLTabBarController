@@ -256,7 +256,7 @@ tabBarController.selectedIndex = [YourPlusButtonSubclass indexOfPlusButtonInTabB
 | 中文 | English |
 |:---|:---|
 | 来源：[#592](https://github.com/ChenYilong/CYLTabBarController/issues/592) | Source: [#592](https://github.com/ChenYilong/CYLTabBarController/issues/592) |
-| 这是系统 `UITabBar` 在 iPad 上的默认布局。可设置： | This is the default layout of the system `UITabBar` on iPad. Set: |
+| 这是系统 `UITabBar` 在 iPad 上的默认布局。可设置（反过来，需要居中、指定宽度与间距或两端留白时，有 PlusButton 的经典 TabBar 同样支持，见 [Tab-Item-Positioning.md](Tab-Item-Positioning.md)）： | This is the default layout of the system `UITabBar` on iPad. Set (and the other way round: centered tabs, an item width and spacing, or space at both ends also work on the classic tab bar with a plus button, see [Tab-Item-Positioning.md](Tab-Item-Positioning.md)): |
 
 ```Objective-C
 tabBarController.tabBar.itemPositioning = UITabBarItemPositioningFill;
