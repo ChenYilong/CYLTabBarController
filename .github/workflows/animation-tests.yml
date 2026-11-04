@@ -28,6 +28,6 @@ jobs:
   tests:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Run the animation tests
         run: Tests/CYLTabBarItemAnimation/run.sh
