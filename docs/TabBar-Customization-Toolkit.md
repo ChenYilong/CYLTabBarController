@@ -26,6 +26,8 @@
 |:---|:---|
 | [双击选中的 Tab](#cn双击选中的-tab) | [Double tap on the selected tab](#endouble-tap-on-the-selected-tab) |
 | [一次设置所有布局的 item 样式](#cn一次设置所有布局的-item-样式) | [Item styles for every layout in one go](#enitem-styles-for-every-layout-in-one-go) |
+| [经典样式接口与 UITabBarAppearance 同时生效](#cn经典样式接口与-uitabbarappearance-同时生效) | [Classic styles and UITabBarAppearance together](#enclassic-styles-and-uitabbarappearance-together) |
+| [背景视图、阴影线与模糊效果](#cn背景视图阴影线与模糊效果) | [Background views, the shadow line and the blur](#enbackground-views-the-shadow-line-and-the-blur) |
 | [测试](#cn测试) | [Testing](#entesting) |
 
 <!-- navigation:end -->
@@ -68,6 +70,32 @@ UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
     itemAppearance.selected.titleTextAttributes = @{ NSForegroundColorAttributeName : UIColor.systemRedColor };
 }];
 tabBarController.tabBar.standardAppearance = appearance;
+```
+
+## [CN]经典样式接口与 UITabBarAppearance 同时生效
+## [EN]Classic styles and UITabBarAppearance together
+
+| 中文 | English |
+|:---|:---|
+| iOS 13 起，TabBar 一旦使用 `UITabBarAppearance`（任何 `standardAppearance = ...`），UIKit 就会忽略 `tintColor`、`barTintColor`、`unselectedItemTintColor`、`backgroundImage`、`shadowImage`、`barStyle`，常见表现是“设置了选中颜色 / 分割线 / 背景色却没有效果”。`CYLTabBar` 的这些 setter 现在会同时把值写入 `standardAppearance`（存在 `scrollEdgeAppearance` 时也写入），两种设置方式可以同时使用。只写入发生变化的值；液态玻璃（由系统绘制 TabBar）时不同步；`syncsClassicStylesToAppearance = NO` 可关闭。只作用于本库的 `CYLTabBar`（子类重写），不 hook 全局的 `UITabBar`，因此不会影响 App 中的其他 TabBar。 | Since iOS 13, once a tab bar uses `UITabBarAppearance` (any `standardAppearance = ...`), UIKit ignores `tintColor`, `barTintColor`, `unselectedItemTintColor`, `backgroundImage`, `shadowImage` and `barStyle`: "the selected color / the separator / the background color has no effect". `CYLTabBar`'s setters now also write their value into `standardAppearance` (and `scrollEdgeAppearance` when there is one), so both ways of styling work together. Only a value that changed is written; not with Liquid Glass (the system draws the bar); `syncsClassicStylesToAppearance = NO` turns it off. It only concerns the library's `CYLTabBar` (overrides in the subclass), no global `UITabBar` method is hooked, so the app's other tab bars are untouched. |
+
+```Objective-C
+tabBarController.tabBar.standardAppearance = appearance;   // the app uses UITabBarAppearance...
+tabBarController.tabBar.tintColor = UIColor.systemRedColor; // ...and this still works now
+tabBarController.tabBar.shadowImage = [UIImage new];        // the separator line goes away
+```
+
+## [CN]背景视图、阴影线与模糊效果
+## [EN]Background views, the shadow line and the blur
+
+| 中文 | English |
+|:---|:---|
+| 任意 `UITabBar` 新增 `cyl_backgroundView`（承载背景、模糊与阴影线的视图）、`cyl_shadowImageView`（顶部阴影线）、`cyl_effectViews` / `cyl_effectView`（模糊视图），以及可读写的 `cyl_backgroundEffect`（模糊样式）与 `cyl_effectForegroundColor`（叠在模糊上的颜色）。iOS 13+ 二者写入 `UITabBarAppearance`（公开接口），因此重新布局后不会被系统覆盖，扁平样式也随之更新；iOS 13 以前直接设置在模糊视图上。 | Every `UITabBar` gets `cyl_backgroundView` (the view that holds the background, the blur and the shadow line), `cyl_shadowImageView` (the line on top), `cyl_effectViews` / `cyl_effectView` (the blur views), and the read-write `cyl_backgroundEffect` (the blur) and `cyl_effectForegroundColor` (a color over the blur). On iOS 13+ both are written into `UITabBarAppearance` (public API), so the system does not overwrite them on the next layout and FlatDesign follows; before iOS 13 they are set on the blur views. |
+
+```Objective-C
+tabBarController.tabBar.cyl_backgroundEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterialDark];
+tabBarController.tabBar.cyl_effectForegroundColor = [UIColor.systemPinkColor colorWithAlphaComponent:0.15];
+tabBarController.tabBar.cyl_shadowImageView.hidden = YES;
 ```
 
 ## [CN]测试
