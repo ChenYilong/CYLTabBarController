@@ -225,3 +225,4 @@
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "A koppintás után 1,5 mp-cel indul. Előbb görgessen le, hogy a TabBar elrejtődjön. Várt: a TabBar azonnal visszatér, és a lendület nem rejti el újra.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "A koppintás után 1,5 mp-cel indul. Várt: a TabBar ettől nem változik (nem rejtődik el, és az app által elrejtett TabBar nem jelenik meg).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Válasszon megszakítást; 1,5 mp múlva indul. Előbb görgessen le, hogy a TabBar elrejtődjön.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Kézi: koppintson az elrejtés görgetéskor bekapcsolásához, görgessen le a TabBar elrejtéséhez, majd tegye, amit a cím mond. Várt: a TabBar azonnal visszatér.";

@@ -225,3 +225,4 @@
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Fires 1.5 s after the tap. Scroll down first to hide the TabBar. Expected: the TabBar comes back at once, and momentum does not hide it again.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Fires 1.5 s after the tap. Expected: the TabBar does not change because of it (not hidden, and a TabBar hidden by the app is not shown).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Choose an interruption; it fires after 1.5 s. Scroll down first to hide the TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: tap to turn scroll hiding on, scroll down to hide the TabBar, then do what the title says. Expected: the TabBar comes back at once.";

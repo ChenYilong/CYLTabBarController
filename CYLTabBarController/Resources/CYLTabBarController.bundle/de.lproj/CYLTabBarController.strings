@@ -225,3 +225,4 @@
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Wird 1,5 s nach dem Tippen ausgelöst. Zuerst nach unten scrollen, um die TabBar auszublenden. Erwartet: Die TabBar erscheint sofort wieder, und das Nachscrollen blendet sie nicht erneut aus.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Wird 1,5 s nach dem Tippen ausgelöst. Erwartet: Die TabBar ändert sich dadurch nicht (wird nicht ausgeblendet, und eine von der App ausgeblendete TabBar wird nicht angezeigt).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Wählen Sie eine Unterbrechung; sie wird nach 1,5 s ausgelöst. Zuerst nach unten scrollen, um die TabBar auszublenden.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manuell: Tippen, um das Ausblenden beim Scrollen einzuschalten, nach unten scrollen, um die TabBar auszublenden, dann tun, was der Titel sagt. Erwartet: Die TabBar erscheint sofort wieder.";

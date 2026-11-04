@@ -225,3 +225,4 @@
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Se declanșează la 1,5 s după atingere. Derulați mai întâi în jos pentru a ascunde TabBar. Așteptat: TabBar revine imediat, iar inerția nu îl ascunde din nou.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Se declanșează la 1,5 s după atingere. Așteptat: TabBar nu se schimbă din această cauză (nu se ascunde, iar un TabBar ascuns de aplicație nu se afișează).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Alegeți o întrerupere; se declanșează după 1,5 s. Derulați mai întâi în jos pentru a ascunde TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: atingeți pentru a activa ascunderea la derulare, derulați în jos pentru a ascunde TabBar, apoi faceți ce spune titlul. Așteptat: TabBar revine imediat.";

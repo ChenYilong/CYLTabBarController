@@ -225,3 +225,4 @@
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Chạy 1,5 giây sau khi chạm. Hãy cuộn xuống trước để ẩn TabBar. Mong đợi: TabBar hiện lại ngay, và quán tính không ẩn nó lần nữa.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Chạy 1,5 giây sau khi chạm. Mong đợi: TabBar không thay đổi vì điều này (không bị ẩn, và TabBar do App ẩn sẽ không hiện).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Chọn một gián đoạn; nó chạy sau 1,5 giây. Hãy cuộn xuống trước để ẩn TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Thủ công: chạm để bật ẩn khi cuộn, cuộn xuống để ẩn TabBar, rồi làm theo tiêu đề. Mong đợi: TabBar hiện lại ngay.";

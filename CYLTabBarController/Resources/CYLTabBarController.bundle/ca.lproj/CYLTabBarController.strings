@@ -225,3 +225,4 @@
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "S'executa 1,5 s després del toc. Primer desplaça't cap avall per amagar la TabBar. Esperat: la TabBar torna de seguida i la inèrcia no l'amaga de nou.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "S'executa 1,5 s després del toc. Esperat: la TabBar no canvia per això (no s'amaga, i una TabBar amagada per l'app no es mostra).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Tria una interrupció; s'executa al cap d'1,5 s. Primer desplaça't cap avall per amagar la TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: toca per activar l'amagat en desplaçar, desplaça't cap avall per amagar la TabBar i fes el que diu el títol. Esperat: la TabBar torna de seguida.";

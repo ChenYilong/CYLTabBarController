@@ -6446,7 +6446,7 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
 
 /// [EN] Observes the scroll view of the page on screen and runs the path's action. See the section comment above.
 /// [CN] 观察当前显示页面的滚动视图，并执行对应路径的处理。见上方说明。
-@interface _CYLTabBarMinimizeScrollTracker : NSObject
+@interface _CYLTabBarMinimizeScrollTracker : NSObject <UIGestureRecognizerDelegate>
 @property (nonatomic, weak, readonly) CYLTabBarController *tabBarController;
 @property (nonatomic, weak, readonly) UIScrollView *scrollView;
 @property (nonatomic, assign, readonly) CYLTabBarMinimizeMode mode;
@@ -6488,6 +6488,14 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     __weak UIViewController *_sessionSelectedViewController;
     __weak UIViewController *_sessionPage;
     __weak UIWindow *_sessionWindow;
+    /// [EN] The controller's frame in its window and its top safe area when the session began (a side menu moving it,
+    ///      a container transition, an in-call / hotspot / recording status bar change them).
+    /// [CN] 会话开始时控制器在窗口中的 frame 及顶部安全区（侧滑菜单移动控制器、容器转场、通话 / 热点 / 录屏状态栏会改变它们）。
+    CGRect _sessionFrameInWindow;
+    CGFloat _sessionSafeAreaTop;
+    /// [EN] Observes a long press on the followed scroll view; never cancels or delays its touches.
+    /// [CN] 观察所跟随滚动视图上的长按；从不取消或延迟其触摸。
+    UILongPressGestureRecognizer *_longPressObserver;
     CYLTabBarMinimizeBehavior _sessionBehavior;
     CYLTabBarMinimizeMode _sessionMode;
     /// [EN] YES while scroll hiding itself calls `-setTabBarHidden:animated:`. [CN] 滚动隐藏自己调用 `-setTabBarHidden:animated:` 期间为 YES。
@@ -6672,6 +6680,18 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     if (!CYLTabBarMinimizeWindowIsKeyAndActive(window)) {
         return @"window not key, or its scene / the app not active";
     }
+    // [EN] On a Mac (Mac Catalyst, or an iPhone / iPad app on Apple silicon) a pointer and a resizable window make hiding
+    //      the tab bar pointless. [CN] 在 Mac 上（Mac Catalyst，或运行在 Apple 芯片 Mac 上的 iPhone / iPad App），鼠标与可调整
+    //      大小的窗口使隐藏 TabBar 没有意义。
+#if TARGET_OS_MACCATALYST
+    return @"Mac Catalyst";
+#else
+    if (@available(iOS 14.0, *)) {
+        if ([NSProcessInfo processInfo].isiOSAppOnMac) {
+            return @"iOS app running on a Mac";
+        }
+    }
+#endif
     // [EN] VoiceOver and Switch Control users move through the tabs: never take them away.
     // [CN] VoiceOver 与切换控制的用户依靠 Tab 导航：不隐藏 TabBar。
     if (UIAccessibilityIsVoiceOverRunning() || UIAccessibilityIsSwitchControlRunning()) {
@@ -6725,6 +6745,9 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     _sessionWindow = tabBarController.viewIfLoaded.window;
     _sessionBehavior = tabBarController.cyl_tabBarMinimizeBehavior;
     _sessionMode = _mode;
+    UIView *controllerView = tabBarController.viewIfLoaded;
+    _sessionFrameInWindow = controllerView ? [controllerView convertRect:controllerView.bounds toView:nil] : CGRectZero;
+    _sessionSafeAreaTop = controllerView.safeAreaInsets.top;
 }
 
 - (void)endHideSession {
@@ -6773,6 +6796,17 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     if (tabBarController.cyl_tabBarMinimizeBehavior != _sessionBehavior || _mode != _sessionMode) {
         return @"value or style changed";
     }
+    UIView *controllerView = tabBarController.viewIfLoaded;
+    CGRect frameInWindow = controllerView ? [controllerView convertRect:controllerView.bounds toView:nil] : CGRectZero;
+    if (fabs(CGRectGetMinX(frameInWindow) - CGRectGetMinX(_sessionFrameInWindow)) > 1.0 ||
+        fabs(CGRectGetMinY(frameInWindow) - CGRectGetMinY(_sessionFrameInWindow)) > 1.0 ||
+        fabs(CGRectGetWidth(frameInWindow) - CGRectGetWidth(_sessionFrameInWindow)) > 1.0 ||
+        fabs(CGRectGetHeight(frameInWindow) - CGRectGetHeight(_sessionFrameInWindow)) > 1.0) {
+        return @"controller moved or resized in its window (side menu, container transition)";
+    }
+    if (fabs(controllerView.safeAreaInsets.top - _sessionSafeAreaTop) > 0.5) {
+        return @"top safe area changed (in-call / hotspot / recording status bar)";
+    }
     return nil;
 }
 
@@ -6818,6 +6852,25 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     if (invalidReason) {
         [self restoreTabBarForReason:invalidReason];
     }
+}
+
+#pragma mark Long press on content
+
+/*!
+ * [EN] A long press on the content (a context menu, drag and drop, text selection) is not reading: it ends the session
+ *      and shows the bar. The observer runs alongside every other recognizer and never cancels or delays touches, so the
+ *      app's own gestures and context menus work as before; a press that moves (a scroll) fails it.
+ * [CN] 在内容上长按（上下文菜单、拖放、选择文字）不是浏览：结束会话并显示 TabBar。该观察者与其他手势同时识别，从不取消或延迟触摸，
+ *      App 自己的手势与上下文菜单不受影响；移动的按压（即滚动）不会被识别为长按。
+ */
+- (void)contentLongPressed:(UILongPressGestureRecognizer *)recognizer {
+    if (UIGestureRecognizerStateBegan == recognizer.state) {
+        [self restoreTabBarForReason:@"long press on content (context menu, drag, text selection)"];
+    }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
 }
 
 #pragma mark Scroll view lookup
@@ -6911,8 +6964,19 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     // [EN] A scroll view that is already gone was nilled out by `weak`; KVO drops its observers itself (iOS 11+).
     // [CN] 已释放的滚动视图会被 `weak` 置为 nil；KVO 会自行移除它的观察者（iOS 11+）。
     [observedScrollView removeObserver:self forKeyPath:@"contentOffset" context:CYLTabBarMinimizeContentOffsetContext];
+    [observedScrollView removeGestureRecognizer:_longPressObserver];
     _scrollView = scrollView;
     _scrolledDistance = 0;
+    if (scrollView) {
+        if (!_longPressObserver) {
+            _longPressObserver = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(contentLongPressed:)];
+            _longPressObserver.cancelsTouchesInView = NO;
+            _longPressObserver.delaysTouchesBegan = NO;
+            _longPressObserver.delaysTouchesEnded = NO;
+            _longPressObserver.delegate = self;
+        }
+        [scrollView addGestureRecognizer:_longPressObserver];
+    }
     [scrollView addObserver:self
                  forKeyPath:@"contentOffset"
                     options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew

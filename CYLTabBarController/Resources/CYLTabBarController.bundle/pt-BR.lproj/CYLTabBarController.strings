@@ -225,3 +225,4 @@
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Dispara 1,5 s após o toque. Role para baixo primeiro para ocultar a TabBar. Esperado: a TabBar volta na hora, e a inércia não a oculta de novo.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Dispara 1,5 s após o toque. Esperado: a TabBar não muda por isso (não é ocultada, e uma TabBar ocultada pelo app não é mostrada).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Escolha uma interrupção; ela dispara após 1,5 s. Role para baixo primeiro para ocultar a TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: toque para ativar o ocultar ao rolar, role para baixo para ocultar a TabBar e faça o que o título diz. Esperado: a TabBar volta na hora.";

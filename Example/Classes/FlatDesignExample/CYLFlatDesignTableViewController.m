@@ -127,6 +127,23 @@
     return 50;
 }
 
+/*!
+ * [EN] Issue #13: a context menu on the badge rows, for the "Manual: long press a row" simulation (a long press on the
+ *      content ends the scroll hiding session).
+ * [CN] issue #13：角标行的上下文菜单，用于“手动：长按某一行”模拟（在内容上长按会结束滚动隐藏会话）。
+ */
+- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point {
+    if (indexPath.section < [self cyl_demoSectionCount]) {
+        return nil;
+    }
+    return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu *(NSArray<UIMenuElement *> *suggestedActions) {
+        UIAction *copy = [UIAction actionWithTitle:@"Copy" image:[UIImage systemImageNamed:@"doc.on.doc"] identifier:nil handler:^(__kindof UIAction *action) {
+            UIPasteboard.generalPasteboard.string = [tableView cellForRowAtIndexPath:indexPath].textLabel.text;
+        }];
+        return [UIMenu menuWithTitle:@"" children:@[ copy ]];
+    }];
+}
+
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLLocalizedString(@"角标");
 }

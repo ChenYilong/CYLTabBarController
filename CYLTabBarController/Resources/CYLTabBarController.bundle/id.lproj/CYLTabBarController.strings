@@ -225,3 +225,4 @@
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Berjalan 1,5 dtk setelah ketukan. Gulir ke bawah dulu untuk menyembunyikan TabBar. Diharapkan: TabBar langsung kembali, dan momentum tidak menyembunyikannya lagi.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Berjalan 1,5 dtk setelah ketukan. Diharapkan: TabBar tidak berubah karenanya (tidak disembunyikan, dan TabBar yang disembunyikan app tidak ditampilkan).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Pilih gangguan; berjalan setelah 1,5 dtk. Gulir ke bawah dulu untuk menyembunyikan TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: ketuk untuk menyalakan sembunyikan saat menggulir, gulir ke bawah untuk menyembunyikan TabBar, lalu lakukan sesuai judul. Diharapkan: TabBar langsung kembali.";

@@ -225,3 +225,4 @@
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Utløses 1,5 s etter trykket. Rull først ned for å skjule TabBar. Forventet: TabBar kommer straks tilbake, og tregheten skjuler den ikke igjen.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Utløses 1,5 s etter trykket. Forventet: TabBar endres ikke av dette (skjules ikke, og en TabBar skjult av appen vises ikke).";
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Velg et avbrudd; det utløses etter 1,5 s. Rull først ned for å skjule TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manuelt: trykk for å slå på skjul ved rulling, rull ned for å skjule TabBar, og gjør så det tittelen sier. Forventet: TabBar kommer straks tilbake.";
