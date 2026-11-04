@@ -17,6 +17,11 @@ on:
 permissions:
   contents: read
 
+# A new push cancels the older run of the same branch, so the few macOS runners only test the newest commit.
+concurrency:
+  group: scroll-hide-self-test-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   self-test:
     name: self-test (${{ matrix.style }}${{ matrix.runtime && format(', {0}', matrix.runtime) || '' }})
