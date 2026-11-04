@@ -5269,21 +5269,35 @@ static char CYLLoginInterceptedViewControllerKey;
 
 #pragma mark - CYLTabBarMinimize (issue #13)
 
-// [EN] Minimize or hide the tab bar on scroll (issue #13). Liquid Glass: the native
-//      `UITabBarController.tabBarMinimizeBehavior` (iOS 26+). FlatDesign: the selected page's scroll view is observed and
-//      the flat tab bar is hidden and shown with `-setTabBarHidden:animated:`. See docs/TabBar-Minimize-On-Scroll.md.
-// [CN] 滚动时缩小或隐藏 TabBar（issue #13）。液态玻璃：使用系统原生的 `UITabBarController.tabBarMinimizeBehavior`（iOS 26+）。
-//      扁平样式：观察选中页面的滚动视图，用 `-setTabBarHidden:animated:` 隐藏、显示扁平 TabBar。见 docs/TabBar-Minimize-On-Scroll.md。
+// [EN] Minimize or hide the tab bar on scroll (issue #13). One API, three isolated paths, chosen by
+//      `CYLTabBarMinimizeModeForTabBarController()`; each path is behind its own guard:
+//      - FlatDesign (`#if CYL_FLATDESIGN_AVAILABLE`, FlatDesign style only): the selected page's scroll view is observed
+//        and the flat tab bar is hidden and shown with `-setTabBarHidden:animated:`.
+//      - Liquid Glass (iOS 26+ SDK and system, `+[CYLConstants isLiquidGlassActive]`): the native
+//        `UITabBarController.tabBarMinimizeBehavior`; the scroll view is observed only to keep the plus button centered
+//        while the system minimizes the bar (`-[CYLTabBar plusButtonIndex]`, as PR #728 does for the vertical bar).
+//      - Classic (not FlatDesign, Liquid Glass not active: iOS 25 and earlier, and iOS 26 in UI compatibility mode): the
+//        system tab bar (with its plus button) slides out and back while the page scrolls.
+//      See docs/TabBar-Minimize-On-Scroll.md.
+// [CN] 滚动时缩小或隐藏 TabBar（issue #13）。一个接口，三条相互隔离的路径，由 `CYLTabBarMinimizeModeForTabBarController()` 选择，
+//      每条路径都在各自的 guard 之后：
+//      - 扁平样式（`#if CYL_FLATDESIGN_AVAILABLE`，仅扁平样式）：观察选中页面的滚动视图，用 `-setTabBarHidden:animated:` 隐藏、显示
+//        扁平 TabBar。
+//      - 液态玻璃（iOS 26+ SDK 与系统，`+[CYLConstants isLiquidGlassActive]`）：使用系统原生的
+//        `UITabBarController.tabBarMinimizeBehavior`；观察滚动视图只为在系统缩小 TabBar 时让 PlusButton 保持居中
+//        （`-[CYLTabBar plusButtonIndex]`，与 PR #728 对竖向栏的处理相同）。
+//      - 经典样式（非扁平样式且液态玻璃未启用：iOS 25 及以前，以及 iOS 26 的 UI 兼容模式）：页面滚动时，系统 TabBar（连同 PlusButton）
+//        滑出、滑回。
+//      见 docs/TabBar-Minimize-On-Scroll.md。
 
 static const void *CYLTabBarMinimizeBehaviorKey = &CYLTabBarMinimizeBehaviorKey;
+static const void *CYLTabBarMinimizeScrollTrackerKey = &CYLTabBarMinimizeScrollTrackerKey;
+static void *CYLTabBarMinimizeContentOffsetContext = &CYLTabBarMinimizeContentOffsetContext;
 
 /// [EN] Implemented in CYLTabBar.m (issue #13). [CN] 实现见 CYLTabBar.m（issue #13）。
 @interface CYLTabBar (CYLTabBarMinimizeLayout)
 - (BOOL)cyl_showsMinimizedBar;
 @end
-
-static const void *CYLTabBarMinimizeScrollTrackerKey = &CYLTabBarMinimizeScrollTrackerKey;
-static void *CYLTabBarMinimizeContentOffsetContext = &CYLTabBarMinimizeContentOffsetContext;
 
 /// [EN] Distance (pt) to scroll in one direction before the tab bar hides or shows, so small movements do not flicker it.
 /// [CN] 同一方向滚动超过该距离（pt）才隐藏或显示 TabBar，避免小幅滚动时闪动。
@@ -5291,6 +5305,50 @@ static const CGFloat CYLTabBarMinimizeScrollDistance = 12.0;
 /// [EN] Content that scrolls less than this (pt) never hides the tab bar: hiding it would change the content's size.
 /// [CN] 可滚动距离小于该值（pt）的内容不隐藏 TabBar：隐藏 TabBar 本身就会改变内容的可滚动范围。
 static const CGFloat CYLTabBarMinimizeMinimumScrollableDistance = 100.0;
+/// [EN] Classic style: duration of the slide out / back. [CN] 经典样式：滑出、滑回的动画时长。
+static const NSTimeInterval CYLTabBarMinimizeClassicAnimationDuration = 0.25;
+/// [EN] Classic style: how often the page on screen is checked again (core has no push/pop hook outside FlatDesign).
+/// [CN] 经典样式：重新确认当前页面的间隔（FlatDesign 以外，Core 中没有 push/pop 回调）。
+static const NSTimeInterval CYLTabBarMinimizeClassicPageCheckInterval = 0.5;
+
+/// [EN] Which path handles `cyl_tabBarMinimizeBehavior`. [CN] 由哪条路径处理 `cyl_tabBarMinimizeBehavior`。
+typedef NS_ENUM(NSInteger, CYLTabBarMinimizeMode) {
+    /// [EN] Nothing to track (Automatic, Never, or the view is not loaded). [CN] 无需跟踪（Automatic、Never，或视图尚未加载）。
+    CYLTabBarMinimizeModeNone = 0,
+    CYLTabBarMinimizeModeFlatDesign,
+    CYLTabBarMinimizeModeLiquidGlass,
+    CYLTabBarMinimizeModeClassic,
+};
+
+/// [EN] The path for a tab bar controller, decided by guards in order. Never loads the view.
+/// [CN] 依次通过各个 guard 决定 TabBarController 使用的路径。不会触发视图加载。
+static CYLTabBarMinimizeMode CYLTabBarMinimizeModeForTabBarController(CYLTabBarController *tabBarController) {
+    CYLTabBarMinimizeBehavior behavior = tabBarController.cyl_tabBarMinimizeBehavior;
+    // Guard: only the scroll behaviors are tracked. 只跟踪滚动相关的取值。
+    if (CYLTabBarMinimizeBehaviorOnScrollDown != behavior && CYLTabBarMinimizeBehaviorOnScrollUp != behavior) {
+        return CYLTabBarMinimizeModeNone;
+    }
+    // Guard: the `cyl_tabBar` getter sets the tab bar up, so wait for the view. `cyl_tabBar` 的 getter 会创建 TabBar，需等视图加载。
+    if (!tabBarController.isViewLoaded) {
+        return CYLTabBarMinimizeModeNone;
+    }
+    // Guard: FlatDesign. 扁平样式。
+    if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
+#if CYL_FLATDESIGN_AVAILABLE
+        if ([tabBarController.cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
+            return CYLTabBarMinimizeModeFlatDesign;
+        }
+#endif
+        return CYLTabBarMinimizeModeNone;
+    }
+    // Guard: Liquid Glass. 液态玻璃。
+    if ([CYLConstants isLiquidGlassActive]) {
+        return [tabBarController.cyl_tabBar isKindOfClass:[CYLTabBar class]] ? CYLTabBarMinimizeModeLiquidGlass : CYLTabBarMinimizeModeNone;
+    }
+    // [EN] Everything else is the classic system tab bar: iOS 25 and earlier, and iOS 26 in UI compatibility mode.
+    // [CN] 其余都是经典系统 TabBar：iOS 25 及以前，以及 iOS 26 的 UI 兼容模式。
+    return CYLTabBarMinimizeModeClassic;
+}
 
 /// [EN] The page the user sees in a tab: the top page of a navigation controller.
 /// [CN] 用户在 Tab 中看到的页面：导航控制器的栈顶页面。
@@ -5330,15 +5388,58 @@ static UIScrollView *CYLTabBarMinimizeScrollViewForViewController(UIViewControll
     return nil;
 }
 
-/// [EN] Observes the scroll view of the page on screen. FlatDesign: hides or shows the flat tab bar. Liquid Glass with
-///      CYLTabBar: lays the tab bar out again when the system minimizes or expands it, so the plus button is centered on
-///      its tab (`-[CYLTabBar plusButtonIndex]`), as in the iOS 27.1 vertical bar (PR #728).
-/// [CN] 观察当前显示页面的滚动视图。扁平样式：隐藏、显示扁平 TabBar。液态玻璃（CYLTabBar）：系统缩小或恢复 TabBar 时重新布局，
-///      让 PlusButton 居中于它的 Tab（见 `-[CYLTabBar plusButtonIndex]`），与 iOS 27.1 竖向栏的处理相同（PR #728）。
+/// [EN] Classic style: how far the tab bar slides down to leave the screen: from its top (without a transform) to the
+///      bottom of its superview, plus the part of the plus button (or any subview) that sticks up above it.
+/// [CN] 经典样式：TabBar 移出屏幕需要下移的距离：从它的顶部（不计 transform）到父视图底部，再加上 PlusButton（或任何子视图）
+///      高出 TabBar 的部分。
+static CGFloat CYLTabBarMinimizeClassicSlideDistance(UITabBar *tabBar) {
+    UIView *container = tabBar.superview;
+    CGFloat top = tabBar.center.y - CGRectGetHeight(tabBar.bounds) * 0.5;
+    CGFloat overflowAbove = 0;
+    for (UIView *subview in tabBar.subviews) {
+        if (!subview.hidden) {
+            overflowAbove = MAX(overflowAbove, -CGRectGetMinY(subview.frame));
+        }
+    }
+    return MAX(0, CGRectGetHeight(container.bounds) - top) + overflowAbove;
+}
+
+/// [EN] Classic style: whether the tab bar sits at the bottom of its superview (not, e.g., a tab bar shown at the top).
+/// [CN] 经典样式：TabBar 是否位于父视图底部（例如排除显示在顶部的 TabBar）。
+static BOOL CYLTabBarMinimizeClassicTabBarIsAtBottom(UITabBar *tabBar) {
+    UIView *container = tabBar.superview;
+    if (!container) {
+        return NO;
+    }
+    CGFloat bottom = tabBar.center.y + CGRectGetHeight(tabBar.bounds) * 0.5;
+    return bottom >= CGRectGetHeight(container.bounds) - 1.0;
+}
+
+/// [EN] Classic style: whether UIKit hides the tab bar for the page on screen (`hidesBottomBarWhenPushed` on a page pushed
+///      above the root of the selected navigation controller), so the bar is UIKit's to move, not ours.
+/// [CN] 经典样式：UIKit 是否因当前页面隐藏 TabBar（选中的导航控制器中，根页面之上被 push 的页面设置了 `hidesBottomBarWhenPushed`），
+///      此时 TabBar 由 UIKit 移动，而不是由这里处理。
+static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedViewController) {
+    if (![selectedViewController isKindOfClass:[UINavigationController class]]) {
+        return NO;
+    }
+    NSArray<UIViewController *> *viewControllers = ((UINavigationController *)selectedViewController).viewControllers;
+    for (NSUInteger index = 1; index < viewControllers.count; index++) {
+        if (viewControllers[index].hidesBottomBarWhenPushed) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// [EN] Observes the scroll view of the page on screen and runs the path's action. See the section comment above.
+/// [CN] 观察当前显示页面的滚动视图，并执行对应路径的处理。见上方说明。
 @interface _CYLTabBarMinimizeScrollTracker : NSObject
 @property (nonatomic, weak, readonly) CYLTabBarController *tabBarController;
 @property (nonatomic, weak, readonly) UIScrollView *scrollView;
+@property (nonatomic, assign, readonly) CYLTabBarMinimizeMode mode;
 - (instancetype)initWithTabBarController:(CYLTabBarController *)tabBarController;
+- (void)updateMode:(CYLTabBarMinimizeMode)mode;
 - (void)observeScrollView:(UIScrollView *)scrollView;
 - (void)expandTabBar;
 @end
@@ -5350,6 +5451,10 @@ static UIScrollView *CYLTabBarMinimizeScrollViewForViewController(UIViewControll
     BOOL _hiddenByScroll;
     /// [EN] Liquid Glass: the minimized state the tab bar was last laid out for. [CN] 液态玻璃：上次布局时 TabBar 的缩小状态。
     BOOL _laidOutMinimized;
+    /// [EN] Classic: identifies the latest slide; an older slide's completion does nothing. [CN] 经典样式：最新一次滑动的编号，旧的动画完成回调不做处理。
+    NSUInteger _classicSlideGeneration;
+    /// [EN] Classic: checks the page on screen again (see CYLTabBarMinimizeClassicPageCheckInterval). [CN] 经典样式：定时重新确认当前页面。
+    NSTimer *_classicPageCheckTimer;
 }
 
 - (instancetype)initWithTabBarController:(CYLTabBarController *)tabBarController {
@@ -5361,7 +5466,36 @@ static UIScrollView *CYLTabBarMinimizeScrollViewForViewController(UIViewControll
 }
 
 - (void)dealloc {
+    [_classicPageCheckTimer invalidate];
     [self observeScrollView:nil];
+}
+
+- (void)updateMode:(CYLTabBarMinimizeMode)mode {
+    if (_mode == mode) {
+        return;
+    }
+    // [EN] Leaving a path: give back a tab bar it hid. [CN] 离开某条路径：恢复它隐藏的 TabBar。
+    [self expandTabBar];
+    _mode = mode;
+    _scrolledDistance = 0;
+    _laidOutMinimized = NO;
+    // Guard: the page check timer runs for the classic path only. 定时检查只用于经典样式。
+    [_classicPageCheckTimer invalidate];
+    _classicPageCheckTimer = nil;
+    if (CYLTabBarMinimizeModeClassic == mode) {
+        __weak typeof(self) weakSelf = self;
+        _classicPageCheckTimer = [NSTimer scheduledTimerWithTimeInterval:CYLTabBarMinimizeClassicPageCheckInterval repeats:YES block:^(NSTimer *timer) {
+            CYLTabBarController *tabBarController = weakSelf.tabBarController;
+            if (!tabBarController) {
+                [timer invalidate];
+                return;
+            }
+            if (tabBarController.viewIfLoaded.window) {
+                [tabBarController cyl_updateTabBarMinimizeTracking];
+            }
+        }];
+        _classicPageCheckTimer.tolerance = CYLTabBarMinimizeClassicPageCheckInterval * 0.5;
+    }
 }
 
 - (void)observeScrollView:(UIScrollView *)scrollView {
@@ -5389,44 +5523,26 @@ static UIScrollView *CYLTabBarMinimizeScrollViewForViewController(UIViewControll
     if (!scrollView || object != scrollView) {
         return;
     }
+    // Guard: Liquid Glass only follows the system; it never hides the bar itself. 液态玻璃只跟随系统，从不自行隐藏 TabBar。
+    if (CYLTabBarMinimizeModeLiquidGlass == _mode) {
+        [self layOutTabBarIfMinimizedStateChanged];
+        return;
+    }
     NSValue *oldValue = change[NSKeyValueChangeOldKey];
     NSValue *newValue = change[NSKeyValueChangeNewKey];
     if (![oldValue isKindOfClass:[NSValue class]] || ![newValue isKindOfClass:[NSValue class]]) {
         return;
     }
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarController.tabBarStyleType) {
-        [self scrollView:scrollView didScrollFromOffsetY:oldValue.CGPointValue.y toOffsetY:newValue.CGPointValue.y];
-    } else {
-        [self layOutTabBarIfMinimizedStateChanged];
-    }
+    [self scrollView:scrollView didScrollFromOffsetY:oldValue.CGPointValue.y toOffsetY:newValue.CGPointValue.y];
 }
 
-/*!
- * [EN] Liquid Glass: the system minimizes or expands the tab bar while the page scrolls, without a public callback. When
- *      the platter's geometry (`-[CYLTabBar cyl_showsMinimizedBar]`) flips, lay the tab bar out so the plus button
- *      follows: centered on its tab while minimized, the usual height-based position when expanded. Laid out once more
- *      after the system's animation.
- * [CN] 液态玻璃：页面滚动时系统会缩小或恢复 TabBar，没有公开的回调。当 platter 的几何尺寸（`-[CYLTabBar cyl_showsMinimizedBar]`）
- *      发生变化时重新布局 TabBar，让 PlusButton 跟随：缩小时居中于它的 Tab，恢复后回到按 TabBar 高度计算的位置。系统动画结束后再布局一次。
- */
-- (void)layOutTabBarIfMinimizedStateChanged {
-    UIView *tabBar = self.tabBarController.cyl_tabBar;
-    if (![tabBar isKindOfClass:[CYLTabBar class]]) {
-        return;
-    }
-    BOOL minimized = [(CYLTabBar *)tabBar cyl_showsMinimizedBar];
-    if (minimized == _laidOutMinimized) {
-        return;
-    }
-    _laidOutMinimized = minimized;
-    [tabBar setNeedsLayout];
-    __weak UIView *weakTabBar = tabBar;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [weakTabBar setNeedsLayout];
-    });
-}
-
+/// [EN] FlatDesign and classic: decide from the user's scrolling whether to hide or show the tab bar.
+/// [CN] 扁平样式与经典样式：根据用户的滚动决定隐藏或显示 TabBar。
 - (void)scrollView:(UIScrollView *)scrollView didScrollFromOffsetY:(CGFloat)oldOffsetY toOffsetY:(CGFloat)newOffsetY {
+    // Guard: the paths that hide the bar themselves. 只处理自行隐藏 TabBar 的路径。
+    if (CYLTabBarMinimizeModeFlatDesign != _mode && CYLTabBarMinimizeModeClassic != _mode) {
+        return;
+    }
     CYLTabBarMinimizeBehavior behavior = self.tabBarController.cyl_tabBarMinimizeBehavior;
     BOOL minimizesOnScrollDown = (CYLTabBarMinimizeBehaviorOnScrollDown == behavior);
     BOOL minimizesOnScrollUp = (CYLTabBarMinimizeBehaviorOnScrollUp == behavior);
@@ -5479,7 +5595,78 @@ static UIScrollView *CYLTabBarMinimizeScrollViewForViewController(UIViewControll
     }
 }
 
+#pragma mark Liquid Glass
+
+/*!
+ * [EN] Liquid Glass: the system minimizes or expands the tab bar while the page scrolls, without a public callback. When
+ *      the platter's geometry (`-[CYLTabBar cyl_showsMinimizedBar]`) flips, lay the tab bar out so the plus button
+ *      follows: centered on its tab while minimized, the usual height-based position when expanded. Laid out once more
+ *      after the system's animation.
+ * [CN] 液态玻璃：页面滚动时系统会缩小或恢复 TabBar，没有公开的回调。当 platter 的几何尺寸（`-[CYLTabBar cyl_showsMinimizedBar]`）
+ *      发生变化时重新布局 TabBar，让 PlusButton 跟随：缩小时居中于它的 Tab，恢复后回到按 TabBar 高度计算的位置。系统动画结束后再布局一次。
+ */
+- (void)layOutTabBarIfMinimizedStateChanged {
+    UIView *tabBar = self.tabBarController.cyl_tabBar;
+    if (![tabBar isKindOfClass:[CYLTabBar class]]) {
+        return;
+    }
+    BOOL minimized = [(CYLTabBar *)tabBar cyl_showsMinimizedBar];
+    if (minimized == _laidOutMinimized) {
+        return;
+    }
+    _laidOutMinimized = minimized;
+    [tabBar setNeedsLayout];
+    __weak UIView *weakTabBar = tabBar;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [weakTabBar setNeedsLayout];
+    });
+}
+
+#pragma mark Hide / show
+
 - (void)minimizeTabBar {
+    switch (_mode) {
+        case CYLTabBarMinimizeModeFlatDesign:
+            [self flatDesignMinimizeTabBar];
+            break;
+        case CYLTabBarMinimizeModeClassic:
+            [self classicMinimizeTabBar];
+            break;
+        case CYLTabBarMinimizeModeLiquidGlass:
+        case CYLTabBarMinimizeModeNone:
+            break;
+    }
+}
+
+- (void)expandTabBar {
+    // Guard: only a tab bar hidden by scrolling is shown again. 只恢复被滚动隐藏的 TabBar。
+    if (!_hiddenByScroll) {
+        return;
+    }
+    // [EN] Guard (classic): a pushed page hides the bar through `hidesBottomBarWhenPushed`; keep it hidden by scrolling
+    //      until a page that shows the bar is back, then show it.
+    // [CN] Guard（经典样式）：被 push 的页面通过 `hidesBottomBarWhenPushed` 隐藏了 TabBar；保持“滚动隐藏”状态，等显示 TabBar
+    //      的页面回来后再显示。
+    if (CYLTabBarMinimizeModeClassic == _mode && CYLTabBarMinimizeClassicPageHidesTabBar(self.tabBarController.selectedViewController)) {
+        return;
+    }
+    _hiddenByScroll = NO;
+    switch (_mode) {
+        case CYLTabBarMinimizeModeFlatDesign:
+            [self flatDesignExpandTabBar];
+            break;
+        case CYLTabBarMinimizeModeClassic:
+            [self classicExpandTabBar];
+            break;
+        case CYLTabBarMinimizeModeLiquidGlass:
+        case CYLTabBarMinimizeModeNone:
+            break;
+    }
+}
+
+#pragma mark FlatDesign
+
+- (void)flatDesignMinimizeTabBar {
 #if CYL_FLATDESIGN_AVAILABLE
     CYLTabBarController *tabBarController = self.tabBarController;
     // [EN] Only a tab bar on screen: not one hidden by the app, nor by `hidesBottomBarWhenPushed`.
@@ -5493,17 +5680,70 @@ static UIScrollView *CYLTabBarMinimizeScrollViewForViewController(UIViewControll
 #endif
 }
 
-- (void)expandTabBar {
+- (void)flatDesignExpandTabBar {
 #if CYL_FLATDESIGN_AVAILABLE
-    if (!_hiddenByScroll) {
-        return;
-    }
-    _hiddenByScroll = NO;
     CYLTabBarController *tabBarController = self.tabBarController;
     if (tabBarController.isTabBarHidden) {
         [tabBarController setTabBarHidden:NO animated:YES];
     }
 #endif
+}
+
+#pragma mark Classic
+
+/*!
+ * [EN] Classic: slides the system tab bar (with the plus button, which is its subview) below the screen, then hides it
+ *      and resets the transform, so later layouts by UIKit never meet a transformed tab bar. Only a tab bar on screen at
+ *      the bottom is hidden: not one hidden by the app, nor by `hidesBottomBarWhenPushed`.
+ * [CN] 经典样式：把系统 TabBar（连同作为其子视图的 PlusButton）滑到屏幕下方，然后隐藏并还原 transform，使 UIKit 之后的布局不会遇到
+ *      带 transform 的 TabBar。只隐藏显示在底部的 TabBar：App 自己隐藏的、`hidesBottomBarWhenPushed` 隐藏的都不处理。
+ */
+- (void)classicMinimizeTabBar {
+    CYLTabBarController *tabBarController = self.tabBarController;
+    UITabBar *tabBar = tabBarController.tabBar;
+    if (!tabBar || tabBar.hidden || tabBar.alpha < 0.01 || !tabBar.window || !CYLTabBarMinimizeClassicTabBarIsAtBottom(tabBar)) {
+        return;
+    }
+    if (CYLTabBarMinimizeClassicPageHidesTabBar(tabBarController.selectedViewController)) {
+        return;
+    }
+    _hiddenByScroll = YES;
+    NSUInteger generation = ++_classicSlideGeneration;
+    CGFloat distance = CYLTabBarMinimizeClassicSlideDistance(tabBar);
+    __weak typeof(self) weakSelf = self;
+    [UIView animateWithDuration:CYLTabBarMinimizeClassicAnimationDuration
+                          delay:0
+                        options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+        tabBar.transform = CGAffineTransformMakeTranslation(0, distance);
+    } completion:^(BOOL __unused finished) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        // [EN] A newer slide (e.g. the user scrolled back) owns the tab bar now. [CN] 已有更新的滑动（例如用户又滚了回来）接管 TabBar。
+        if (!strongSelf || generation != strongSelf->_classicSlideGeneration) {
+            return;
+        }
+        tabBar.hidden = YES;
+        tabBar.transform = CGAffineTransformIdentity;
+    }];
+}
+
+/// [EN] Classic: slides the tab bar back from below the screen. [CN] 经典样式：把 TabBar 从屏幕下方滑回。
+- (void)classicExpandTabBar {
+    UITabBar *tabBar = self.tabBarController.tabBar;
+    if (!tabBar) {
+        return;
+    }
+    ++_classicSlideGeneration;
+    if (tabBar.hidden) {
+        tabBar.transform = CGAffineTransformMakeTranslation(0, CYLTabBarMinimizeClassicSlideDistance(tabBar));
+        tabBar.hidden = NO;
+    }
+    [UIView animateWithDuration:CYLTabBarMinimizeClassicAnimationDuration
+                          delay:0
+                        options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+        tabBar.transform = CGAffineTransformIdentity;
+    } completion:nil];
 }
 
 @end
@@ -5545,41 +5785,30 @@ static UITabBarMinimizeBehavior CYLSystemTabBarMinimizeBehavior(CYLTabBarMinimiz
     }
 #if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
     if (@available(iOS 26.0, *)) {
-        // [EN] Liquid Glass: the system minimizes the tab bar. FlatDesign hides the system tab bar and does its own work
-        //      below, so the system one is told never to minimize. Checked again on every layout, because the style can
-        //      change after the value is set; only a different value is written.
-        // [CN] 液态玻璃：由系统缩小 TabBar。扁平样式隐藏了系统 TabBar 并在下面自行处理，因此让系统 TabBar 不缩小。由于设置取值后
+        // [EN] Only Liquid Glass lets the system minimize the tab bar. FlatDesign and the classic tab bar (UI compatibility
+        //      mode) hide it themselves, so the system is told never to minimize. Checked again on every layout, because
+        //      the style can change after the value is set; only a different value is written.
+        // [CN] 只有液态玻璃交给系统缩小 TabBar。扁平样式与经典 TabBar（UI 兼容模式）自行隐藏 TabBar，因此让系统不缩小。由于设置取值后
         //      样式仍可能改变，每次布局都会重新检查；只有取值不同时才写入。
-        BOOL isFlatDesign = (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType);
-        UITabBarMinimizeBehavior systemBehavior = isFlatDesign ? UITabBarMinimizeBehaviorNever : CYLSystemTabBarMinimizeBehavior(self.cyl_tabBarMinimizeBehavior);
+        BOOL systemMinimizes = (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) && [CYLConstants isLiquidGlassActive];
+        UITabBarMinimizeBehavior systemBehavior = systemMinimizes ? CYLSystemTabBarMinimizeBehavior(self.cyl_tabBarMinimizeBehavior) : UITabBarMinimizeBehaviorNever;
         if (self.tabBarMinimizeBehavior != systemBehavior) {
             self.tabBarMinimizeBehavior = systemBehavior;
         }
     }
 #endif
     _CYLTabBarMinimizeScrollTracker *tracker = objc_getAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey);
-    CYLTabBarMinimizeBehavior behavior = self.cyl_tabBarMinimizeBehavior;
-    BOOL minimizesOnScroll = (CYLTabBarMinimizeBehaviorOnScrollDown == behavior || CYLTabBarMinimizeBehaviorOnScrollUp == behavior);
-    BOOL tracksScrolling = NO;
-    if (minimizesOnScroll && CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        tracksScrolling = [self.cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]];
-#endif
-    } else if (minimizesOnScroll && self.isViewLoaded && [CYLConstants isLiquidGlassActive]) {
-        // [EN] Liquid Glass: only to keep the plus button centered while the system minimizes the bar (issue #13).
-        //      `isViewLoaded` first: the `cyl_tabBar` getter sets the tab bar up.
-        // [CN] 液态玻璃：仅用于在系统缩小 TabBar 时让 PlusButton 保持居中（issue #13）。先判断 `isViewLoaded`：`cyl_tabBar` 的 getter
-        //      会创建 TabBar。
-        tracksScrolling = [self.cyl_tabBar isKindOfClass:[CYLTabBar class]];
-    }
-    if (!tracksScrolling) {
+    CYLTabBarMinimizeMode mode = CYLTabBarMinimizeModeForTabBarController(self);
+    if (CYLTabBarMinimizeModeNone == mode) {
         if (tracker) {
-            // [EN] Turned off: give back a tab bar that scrolling hid. [CN] 已关闭：恢复被滚动隐藏的 TabBar。
+            CYLTabBarMinimizeMode previousMode = tracker.mode;
+            // [EN] Turned off: stop observing and give back a tab bar that scrolling hid.
+            // [CN] 已关闭：停止观察，并恢复被滚动隐藏的 TabBar。
             [tracker observeScrollView:nil];
-            [tracker expandTabBar];
+            [tracker updateMode:CYLTabBarMinimizeModeNone];
             objc_setAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             // [EN] Liquid Glass: put the plus button back at its usual position. [CN] 液态玻璃：让 PlusButton 回到常规位置。
-            if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && self.isViewLoaded) {
+            if (CYLTabBarMinimizeModeLiquidGlass == previousMode && self.isViewLoaded) {
                 [self.cyl_tabBar setNeedsLayout];
             }
         }
@@ -5589,6 +5818,7 @@ static UITabBarMinimizeBehavior CYLSystemTabBarMinimizeBehavior(CYLTabBarMinimiz
         tracker = [[_CYLTabBarMinimizeScrollTracker alloc] initWithTabBarController:self];
         objc_setAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey, tracker, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
+    [tracker updateMode:mode];
     UIScrollView *scrollView = CYLTabBarMinimizeScrollViewForViewController(self.selectedViewController);
     if (scrollView != tracker.scrollView) {
         // [EN] Another tab or page is on screen: show the tab bar again, as the system does.

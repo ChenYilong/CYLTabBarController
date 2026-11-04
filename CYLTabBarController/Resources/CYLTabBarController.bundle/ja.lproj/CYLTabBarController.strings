@@ -186,4 +186,4 @@
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "スクロール時に TabBar を縮小 / 非表示（issue #13）";
-"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar，扁平样式隐藏 TabBar。" = "タップでスクロール時の動作を切り替えます。現在：%@。Liquid Glass（iOS 26+）ではシステムが TabBar を縮小し、FlatDesign では TabBar を非表示にします。";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "タップでスクロール時の動作を切り替えます。現在：%@。Liquid Glass（iOS 26+）ではシステムが TabBar を縮小し、FlatDesign とクラシックスタイル（iOS 25 以前、iOS 26 の UI 互換モード）では TabBar を非表示にします。";

@@ -520,7 +520,7 @@ static UITableViewCell *CYLTabBarMinimizeCell(UITableView *tableView, CYLTabBarC
     }
     NSString *behaviorName = tabBarController ? CYLTabBarMinimizeBehaviorName(tabBarController.cyl_tabBarMinimizeBehavior) : @"-";
     cell.textLabel.text = CYLLocalizedString(@"滚动时缩小 / 隐藏 TabBar（issue #13）");
-    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar，扁平样式隐藏 TabBar。"), behaviorName];
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。"), behaviorName];
     return cell;
 }
 

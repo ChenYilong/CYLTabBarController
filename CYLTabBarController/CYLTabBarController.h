@@ -1146,7 +1146,10 @@ presentLoginForViewController:(UIViewController *)viewController
  *        top (OnScrollDown), and when another tab or page appears. A tab bar hidden by your own `-setTabBarHidden:` is
  *        left hidden. The scroll view is the page's `-contentScrollViewForEdge:NSDirectionalRectEdgeBottom`, otherwise
  *        the first scroll view in its view hierarchy.
- *      - iOS 25 and earlier with another style: no effect yet.
+ *      - Classic tab bar (every style except FlatDesign on iOS 25 and earlier, and on iOS 26 in UI compatibility mode):
+ *        the system tab bar, with its plus button, slides below the screen when the selected page scrolls and slides back
+ *        on the opposite scroll, at the top (OnScrollDown) and when another tab or page appears. Pages pushed with
+ *        `hidesBottomBarWhenPushed` are left to UIKit, and a tab bar at the top (not at the bottom) is never moved.
  *      Can be set at any time, before or after the view loads.
  * [CN] 当前页面滚动时 TabBar 的变化方式，默认 `CYLTabBarMinimizeBehaviorAutomatic`。
  *      - iOS 26+ 液态玻璃（扁平样式以外的所有样式）：设置系统原生的 `UITabBarController.tabBarMinimizeBehavior`，由系统缩小
@@ -1154,7 +1157,9 @@ presentLoginForViewController:(UIViewController *)viewController
  *      - 扁平样式：选中页面（导航控制器的栈顶页面）滚动时用 `-setTabBarHidden:animated:` 隐藏 TabBar；反向滚动、滚回顶部
  *        （OnScrollDown）、切换到其他 Tab 或页面时再显示。你自己用 `-setTabBarHidden:` 隐藏的 TabBar 保持隐藏。滚动视图为页面的
  *        `-contentScrollViewForEdge:NSDirectionalRectEdgeBottom`，没有时取其视图层级中的第一个滚动视图。
- *      - iOS 25 及以前的其他样式：暂不生效。
+ *      - 经典 TabBar（iOS 25 及以前，以及 iOS 26 UI 兼容模式下，扁平样式以外的所有样式）：选中页面滚动时，系统 TabBar 连同
+ *        PlusButton 滑到屏幕下方；反向滚动、回到顶部（OnScrollDown）、切换到其他 Tab 或页面时滑回。使用 `hidesBottomBarWhenPushed`
+ *        push 的页面交给 UIKit 处理，位于顶部（而非底部）的 TabBar 不会移动。
  *      任何时候都可以设置，视图加载前后均可。
  */
 @property (nonatomic, assign) CYLTabBarMinimizeBehavior cyl_tabBarMinimizeBehavior;

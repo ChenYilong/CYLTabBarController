@@ -186,4 +186,4 @@
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "Thu nhỏ / ẩn TabBar khi cuộn (issue #13)";
-"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar，扁平样式隐藏 TabBar。" = "Chạm để đổi cách hoạt động khi cuộn. Hiện tại: %@. Liquid Glass (iOS 26+): hệ thống thu nhỏ TabBar; FlatDesign: TabBar bị ẩn.";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "Chạm để đổi cách hoạt động khi cuộn. Hiện tại: %@. Liquid Glass (iOS 26+): hệ thống thu nhỏ TabBar; FlatDesign và kiểu cổ điển (iOS 25 trở về trước, chế độ tương thích giao diện của iOS 26): TabBar bị ẩn.";

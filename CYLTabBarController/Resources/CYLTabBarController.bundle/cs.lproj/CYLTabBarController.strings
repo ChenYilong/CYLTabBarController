@@ -186,4 +186,4 @@
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "Zmenšit / skrýt TabBar při posouvání (issue #13)";
-"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar，扁平样式隐藏 TabBar。" = "Klepnutím změníte chování při posouvání. Nyní: %@. Liquid Glass (iOS 26+): systém TabBar zmenší; FlatDesign: TabBar se skryje.";
+"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。" = "Klepnutím změníte chování při posouvání. Nyní: %@. Liquid Glass (iOS 26+): systém TabBar zmenší; FlatDesign a klasický styl (iOS 25 a starší, režim kompatibility UI v iOS 26): TabBar se skryje.";
