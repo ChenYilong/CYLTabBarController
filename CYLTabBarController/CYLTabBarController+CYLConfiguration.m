@@ -395,6 +395,29 @@ static NSArray<UIViewController *> *CYLValidViewControllers(id value) {
     return viewControllers;
 }
 
+/*!
+ * [EN] A configuration read from a file or a URL must describe at least one tab (B1, B2, D7): a captive Wi-Fi portal
+ *      or an error page answers with HTML, which parses as XML without any tab, and used to give an empty tab bar.
+ * [CN] 从文件或 URL 读取的配置必须至少描述一个 Tab（B1、B2、D7）：公共 Wi-Fi 登录页或错误页返回的是 HTML，会被解析为没有 Tab 的 XML，
+ *      以前会生成空的 TabBar。
+ */
+static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id> *configuration) {
+    id items = configuration[CYLTabBarControllerTabBarItemsAttributes];
+    if ([items isKindOfClass:[NSDictionary class]]) {
+        return nil;
+    }
+    if ([items isKindOfClass:[NSArray class]]) {
+        for (id item in (NSArray *)items) {
+            if ([item isKindOfClass:[NSDictionary class]]) {
+                return nil;
+            }
+        }
+    }
+    return [NSError errorWithDomain:CYLTabBarConfigurationErrorDomain code:CYLTabBarConfigurationErrorNoTabs userInfo:@{
+        NSLocalizedDescriptionKey : @"The configuration has no tab: CYLTabBarControllerTabBarItemsAttributes is missing or empty (was an HTML page downloaded instead?).",
+    }];
+}
+
 @implementation CYLTabBarController (CYLConfiguration)
 
 + (NSDictionary<NSString *, id> *)cyl_normalizedConfiguration:(NSDictionary<NSString *, id> *)configuration {
@@ -427,6 +450,11 @@ static NSArray<UIViewController *> *CYLValidViewControllers(id value) {
         }
         normalized[CYLTabBarControllerTabBarItemsAttributes] = normalizedItems;
     }
+#if defined(DEBUG) || defined(BETA)
+    if ([normalized[CYLTabBarControllerTabBarItemsAttributes] count] == 0 && [normalized[CYLTabBarControllerViewControllers] count] == 0) {
+        NSLog(@"🔴 CYLTabBarController configuration: no tab; the tab bar controller will be empty.");
+    }
+#endif
     if (normalized[CYLTabBarControllerImageInsets]) {
         normalized[CYLTabBarControllerImageInsets] = CYLEdgeInsetsValue(normalized[CYLTabBarControllerImageInsets], CYLTabBarControllerImageInsets);
     }
@@ -459,7 +487,16 @@ static NSArray<UIViewController *> *CYLValidViewControllers(id value) {
 }
 
 + (NSDictionary<NSString *, id> *)configurationWithContentsOfFile:(NSString *)filePath error:(NSError **)error {
-    return [CYLTabBarConfigurationParser dictionaryWithContentsOfFile:[self cyl_pathOfConfigurationFile:filePath ?: @""] error:error];
+    NSString *path = [filePath isKindOfClass:[NSString class]] ? [self cyl_pathOfConfigurationFile:filePath] : @"";
+    NSDictionary<NSString *, id> *configuration = [CYLTabBarConfigurationParser dictionaryWithContentsOfFile:path error:error];
+    NSError *tabsError = configuration ? CYLConfigurationTabsError(configuration) : nil;
+    if (tabsError) {
+        if (error) {
+            *error = tabsError;
+        }
+        return nil;
+    }
+    return configuration;
 }
 
 - (instancetype)initWithConfigurationFile:(NSString *)filePath error:(NSError **)error {
@@ -505,6 +542,11 @@ static NSArray<UIViewController *> *CYLValidViewControllers(id value) {
                 format = [CYLTabBarConfigurationParser formatForMIMEType:response.MIMEType];
             }
             configuration = [CYLTabBarConfigurationParser dictionaryWithData:data format:format error:&error];
+            NSError *tabsError = configuration ? CYLConfigurationTabsError(configuration) : nil;
+            if (tabsError) {
+                configuration = nil;
+                error = tabsError;
+            }
         }
         dispatch_async(dispatch_get_main_queue(), ^{
             completion(configuration, error);

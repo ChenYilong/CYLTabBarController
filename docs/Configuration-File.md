@@ -248,21 +248,21 @@ flowchart TD
 |:---|:---|:---|:---|:---|:---|
 | A1 | 文件路径为 nil 或空字符串 | The file path is nil or empty | 返回 nil 与 FileNotFound 错误 | nil and a FileNotFound error | ✅ 第 1 轮 / round 1 |
 | A2 | 文件不存在、是目录或无读取权限 | The file is missing, a directory or unreadable | 返回 nil 与 FileNotFound 错误 | nil and a FileNotFound error | ✅ 第 1 轮 / round 1 |
-| A3 | 文件为 0 字节 | The file has 0 bytes | Empty 错误（以前 YAML 等格式会生成没有 Tab 的控制器） | An Empty error (YAML and others used to give a controller with no tabs) | 🟡 部分 / partial |
-| A4 | 文件只有空白或注释 | The file has only whitespace or comments | Empty 错误 | An Empty error | ❌ 未处理 / not yet |
+| A3 | 文件为 0 字节 | The file has 0 bytes | Empty 错误（以前 YAML 等格式会生成没有 Tab 的控制器） | An Empty error (YAML and others used to give a controller with no tabs) | ✅ 第 3 轮 / round 3 |
+| A4 | 文件只有空白或注释 | The file has only whitespace or comments | Empty 错误 | An Empty error | ✅ 第 3 轮 / round 3 |
 | A5 | 不是合法的 UTF-8 文本 | Not valid UTF-8 text | InvalidSyntax 错误 | An InvalidSyntax error | ✅ 第 1 轮 / round 1 |
 | A6 | 以 UTF-8 BOM 开头 | Starts with a UTF-8 BOM | 自动去掉 BOM | The BOM is skipped | ✅ 第 1 轮 / round 1 |
 | A7 | 扩展名与内容不符（如 .json 中是 YAML） | The extension does not match the content (YAML in a .json file) | 按扩展名解析失败后根据内容识别并重试 | When the extension's format fails, the content is detected and parsed again | ❌ 未处理 / not yet |
 | A8 | 扩展名未知或缺失 | An unknown or missing extension | 根据内容识别格式 | The format is detected from the content | ✅ 第 1 轮 / round 1 |
-| A9 | 文件过大（例如 1 GB） | A huge file (e.g. 1 GB) | 超过 5 MB 时返回 TooLarge 错误，不读入内存解析 | Over 5 MB: a TooLarge error, nothing is parsed | ❌ 未处理 / not yet |
+| A9 | 文件过大（例如 1 GB） | A huge file (e.g. 1 GB) | 超过 5 MB 时返回 TooLarge 错误，不读入内存解析 | Over 5 MB: a TooLarge error, nothing is parsed | ✅ 第 3 轮 / round 3 |
 | A10 | 嵌套过深（如 10 万层 `[[[[`）导致栈溢出 | Deep nesting (e.g. 100,000 levels of `[[[[`) overflows the stack | 超过 64 层时返回 TooDeep 错误，所有递归解析器都有层数限制 | Over 64 levels: a TooDeep error; every recursive parser has a depth limit | ✅ 第 2 轮 / round 2 |
 | A11 | 顶层不是字典（数组、字符串、数字） | The top level is not a dictionary (a list, a string, a number) | NotADictionary 错误 | A NotADictionary error | ✅ 第 1 轮 / round 1 |
 | A12 | 截断或无效的二进制 plist / protobuf | A truncated or invalid binary plist / protobuf | InvalidSyntax 错误，越界读取被拒绝 | An InvalidSyntax error; out-of-bounds reads are refused | ✅ 第 1 轮 / round 1 |
 | A13 | 语法错误 | A syntax error | 错误描述包含格式与行号 | The error names the format and the line | ✅ 第 1 轮 / round 1 |
 | A14 | XML 外部实体（XXE） | XML external entities (XXE) | 显式关闭外部实体解析 | External entities are explicitly not resolved | 🟡 部分 / partial |
 | A15 | 重复的键 | Duplicate keys | 后出现的值生效，不崩溃 | The last value wins, no crash | ✅ 第 1 轮 / round 1 |
-| B1 | 没有 Tab（缺少或为空的 `CYLTabBarControllerTabBarItemsAttributes`） | No tabs (missing or empty `CYLTabBarControllerTabBarItemsAttributes`) | 读取文件或 URL 时返回 NoTabs 错误；代码中初始化时保持原行为并输出警告 | Files and URLs: a NoTabs error; in code: unchanged behavior and a warning | ❌ 未处理 / not yet |
-| B2 | Tab 列表不是数组（字符串、数字） | The tab list is not a list (a string, a number) | 视为没有 Tab，见 B1 | Treated as no tabs, see B1 | 🟡 部分 / partial |
+| B1 | 没有 Tab（缺少或为空的 `CYLTabBarControllerTabBarItemsAttributes`） | No tabs (missing or empty `CYLTabBarControllerTabBarItemsAttributes`) | 读取文件或 URL 时返回 NoTabs 错误；代码中初始化时保持原行为并输出警告 | Files and URLs: a NoTabs error; in code: unchanged behavior and a warning | ✅ 第 3 轮 / round 3 |
+| B2 | Tab 列表不是数组（字符串、数字） | The tab list is not a list (a string, a number) | 视为没有 Tab，见 B1 | Treated as no tabs, see B1 | ✅ 第 3 轮 / round 3 |
 | B3 | 只有一个 Tab 且写成字典（Protobuf 文本、XML） | A single tab written as a dictionary (Protobuf text, XML) | 自动包装为列表 | Wrapped into a list | ✅ 第 1 轮 / round 1 |
 | B4 | Tab 列表中的元素不是字典 | A tab entry is not a dictionary | 代码传入子控制器时用空字典占位，保持下标对应；根据配置创建子控制器时跳过 | With view controllers from code: an empty placeholder keeps the indexes; when they are created: skipped | 🟡 部分 / partial |
 | B5 | 字符串键的值类型错误（标题为数组、字典） | A string key has the wrong type (a title that is a list or a dictionary) | 数字转换为字符串，其他类型移除；以前会因 unrecognized selector 崩溃 | Numbers become strings, other types are removed; this used to crash (unrecognized selector) | ✅ 第 2 轮 / round 2 |
@@ -290,9 +290,9 @@ flowchart TD
 | D3 | HTTP 4xx / 5xx | HTTP 4xx / 5xx | Network 错误，包含状态码 | A Network error with the status code | ✅ 第 1 轮 / round 1 |
 | D4 | 无网络、DNS 失败 | No network, a DNS failure | Network 错误（NSUnderlyingErrorKey 为原始错误） | A Network error (NSUnderlyingErrorKey holds the original) | ✅ 第 1 轮 / round 1 |
 | D5 | 服务器不响应 | The server does not answer | 默认 15 秒超时（以前为系统默认的 60 秒）；可传入自定义 NSURLRequest | A 15 s timeout by default (it was the system's 60 s); a custom NSURLRequest can be passed | ❌ 未处理 / not yet |
-| D6 | 响应体为空 | An empty response body | Empty 错误 | An Empty error | 🟡 部分 / partial |
-| D7 | 返回 HTML 页面（如公共 Wi-Fi 的登录页） | An HTML page instead (e.g. a captive Wi-Fi portal) | 识别为没有 Tab 的配置，返回 NoTabs 错误；以前会生成空的 TabBar | Detected as a configuration with no tabs: a NoTabs error; it used to give an empty tab bar | ❌ 未处理 / not yet |
-| D8 | 响应过大 | A huge response | 超过 5 MB 时返回 TooLarge 错误 | Over 5 MB: a TooLarge error | ❌ 未处理 / not yet |
+| D6 | 响应体为空 | An empty response body | Empty 错误 | An Empty error | ✅ 第 3 轮 / round 3 |
+| D7 | 返回 HTML 页面（如公共 Wi-Fi 的登录页） | An HTML page instead (e.g. a captive Wi-Fi portal) | 识别为没有 Tab 的配置，返回 NoTabs 错误；以前会生成空的 TabBar | Detected as a configuration with no tabs: a NoTabs error; it used to give an empty tab bar | ✅ 第 3 轮 / round 3 |
+| D8 | 响应过大 | A huge response | 超过 5 MB 时返回 TooLarge 错误 | Over 5 MB: a TooLarge error | ✅ 第 3 轮 / round 3 |
 | D9 | Content-Type 错误（如 text/plain） | A wrong Content-Type (e.g. text/plain) | 根据扩展名或内容识别 | Detected from the extension or the content | ✅ 第 1 轮 / round 1 |
 | D10 | 请求被取消 | The request is cancelled | 回调仍会执行一次，返回 Network 错误 | The completion still runs once, with a Network error | ✅ 第 1 轮 / round 1 |
 | D11 | 回调线程与次数 | Completion thread and count | 总在主队列执行且只执行一次 | Always on the main queue, exactly once | ✅ 第 1 轮 / round 1 |
@@ -304,6 +304,7 @@ flowchart TD
 |:---|:---|:---|:---|:---|:---|
 | 1 | 55 | 53 | 基线：解析器已能拒绝大部分无效文件，但值的类型、NaN、嵌套深度、空文件与 HTML 页面等会导致崩溃或生成空 TabBar。 | Baseline: the parser already refuses most invalid files, but wrong value types, NaN, deep nesting, empty files and HTML pages crash or give an empty tab bar. | A3, A4, A7, A9, A10, A14, B1, B2, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, C3, C4, C6, C7, D5, D6, D7, D8, E1 |
 | 2 | 69 | 53 | 修复会崩溃的情况：值的类型检查、null、NaN / Infinity、尺寸范围、样式编号范围、非控制器对象、重复的控制器、嵌套深度限制。 | Crash fixes: value type checks, null, NaN / Infinity, size ranges, style number range, objects that are not view controllers, duplicate view controllers, nesting depth limit. | A3, A4, A7, A9, A14, B1, B2, B4, B10, B11, B12, B13, C3, C4, D5, D6, D7, D8, E1 |
+| 3 | 81 | 53 | 语义校验：空文件、没有 Tab、HTML 页面、文件 / 响应大小限制，新增错误码 Empty、TooLarge、TooDeep、NoTabs。 | Semantic checks: empty files, no tabs, HTML pages, file / response size limits; new error codes Empty, TooLarge, TooDeep, NoTabs. | A7, A14, B4, B10, B11, B12, B13, C3, C4, D5, E1 |
 <!-- edge-cases:end -->
 
 ## [CN]限制

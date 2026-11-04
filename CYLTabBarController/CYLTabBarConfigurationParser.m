@@ -2272,6 +2272,19 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
 + (NSDictionary<NSString *, id> *)dictionaryWithData:(NSData *)data
                                               format:(CYLTabBarConfigurationFormat)format
                                                error:(NSError **)error {
+    if (data.length > CYLTabBarConfigurationMaximumLength) {
+        if (error) {
+            *error = CYLConfigurationError(CYLTabBarConfigurationErrorTooLarge,
+                                           [NSString stringWithFormat:@"The configuration is %lu bytes, more than the %lu allowed.",
+                                            (unsigned long)data.length, (unsigned long)CYLTabBarConfigurationMaximumLength]);
+        }
+        return nil;
+    }
+    NSString *text = CYLStringFromData(data);
+    if (data.length == 0 || (text && CYLTrimmed(text).length == 0)) {
+        if (error) { *error = CYLConfigurationError(CYLTabBarConfigurationErrorEmpty, @"The configuration is empty."); }
+        return nil;
+    }
     if (format == CYLTabBarConfigurationFormatUnknown) {
         format = [self formatBySniffingData:data];
         if (format == CYLTabBarConfigurationFormatUnknown) {
@@ -2298,9 +2311,9 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
                 return nil;
             }
         } else {
-            NSString *text = CYLStringFromData(data) ?: @"";
-            BOOL isXML = [text rangeOfString:@"<plist"].location != NSNotFound || [CYLTrimmed(text) hasPrefix:@"<"];
-            tooDeep = (isXML ? CYLXMLPropertyListDepth(text) : CYLBracketDepth(text)) > CYLTabBarConfigurationMaximumDepth;
+            NSString *plistText = text ?: @"";
+            BOOL isXML = [plistText rangeOfString:@"<plist"].location != NSNotFound || [CYLTrimmed(plistText) hasPrefix:@"<"];
+            tooDeep = (isXML ? CYLXMLPropertyListDepth(plistText) : CYLBracketDepth(plistText)) > CYLTabBarConfigurationMaximumDepth;
         }
         if (tooDeep) {
             if (error) { *error = CYLConfigurationTooDeepError(formatName); }
@@ -2309,7 +2322,6 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
         result = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:&parseError];
         if (!result && !CYLDataHasPrefix(data, "bplist")) {
             // A .strings file: `"key" = value;` pairs without the outer braces. .strings 文件：没有外层大括号的 `"key" = value;`。
-            NSString *text = CYLStringFromData(data);
             NSData *wrapped = text ? [[NSString stringWithFormat:@"{\n%@\n}", text] dataUsingEncoding:NSUTF8StringEncoding] : nil;
             id strings = wrapped ? [NSPropertyListSerialization propertyListWithData:wrapped options:NSPropertyListImmutable format:NULL error:NULL] : nil;
             if (strings) {
@@ -2325,7 +2337,6 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
     } else if (format == CYLTabBarConfigurationFormatProtobuf) {
         result = CYLDictionaryFromProtobuf(data, &parseError);
     } else {
-        NSString *text = CYLStringFromData(data);
         if (!text) {
             parseError = CYLConfigurationSyntaxError(formatName, 0, @"the file is not UTF-8 text");
         } else if (format == CYLTabBarConfigurationFormatJSON || format == CYLTabBarConfigurationFormatJSON5) {
@@ -2365,6 +2376,13 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
         }
         return nil;
     }
+    if ([result isKindOfClass:[NSDictionary class]] && [(NSDictionary *)result count] == 0) {
+        if (error) {
+            *error = CYLConfigurationError(CYLTabBarConfigurationErrorEmpty,
+                                           [NSString stringWithFormat:@"%@ configuration: no key (only whitespace or comments).", formatName]);
+        }
+        return nil;
+    }
     if (![result isKindOfClass:[NSDictionary class]]) {
         if (error) {
             *error = CYLConfigurationError(CYLTabBarConfigurationErrorNotADictionary,
@@ -2376,7 +2394,19 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
 }
 
 + (NSDictionary<NSString *, id> *)dictionaryWithContentsOfFile:(NSString *)path error:(NSError **)error {
-    NSData *data = path.length > 0 ? [NSData dataWithContentsOfFile:path] : nil;
+    BOOL isDirectory = NO;
+    BOOL exists = path.length > 0 && [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] && !isDirectory;
+    unsigned long long size = exists ? [[[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL] fileSize] : 0;
+    if (size > CYLTabBarConfigurationMaximumLength) {
+        // Not read at all: a huge file never reaches memory. 完全不读取：超大文件不会进入内存。
+        if (error) {
+            *error = CYLConfigurationError(CYLTabBarConfigurationErrorTooLarge,
+                                           [NSString stringWithFormat:@"\"%@\" is %llu bytes, more than the %lu allowed.",
+                                            path.lastPathComponent, size, (unsigned long)CYLTabBarConfigurationMaximumLength]);
+        }
+        return nil;
+    }
+    NSData *data = exists ? [NSData dataWithContentsOfFile:path] : nil;
     if (!data) {
         if (error) {
             *error = CYLConfigurationError(CYLTabBarConfigurationErrorFileNotFound,
