@@ -1,0 +1,36 @@
+# Runs the scroll hiding self-test (issue #13) on an iOS simulator: by hand (Actions > Run workflow), and on pull requests
+# that change this workflow or its script (a macOS build takes several minutes). Locally: scripts/scroll-hide-self-test.sh
+name: Scroll hiding self-test
+
+on:
+  workflow_dispatch:
+    inputs:
+      device:
+        description: "Simulator name (empty: the first available iPhone)"
+        required: false
+        default: ""
+  pull_request:
+    paths:
+      - ".github/workflows/scroll-hide-self-test.yml"
+      - "scripts/scroll-hide-self-test.sh"
+
+permissions:
+  contents: read
+
+jobs:
+  self-test:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the self-test
+        env:
+          DEVICE: ${{ inputs.device }}
+        run: scripts/scroll-hide-self-test.sh "$DEVICE"
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scroll-hide-self-test-log
+          path: build/scroll-hide-self-test/self-test.log
+          if-no-files-found: ignore
