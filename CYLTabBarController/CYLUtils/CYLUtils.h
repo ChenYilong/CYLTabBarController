@@ -26,6 +26,14 @@
 #import "UIView+CYLUtils.h"
 #import "UIViewController+CYLUtils.h"
 #import "UIBarItem+CYLUtils.h"
+// [EN] FIX: issue #216 — theme switching (skins), in `CYLComponents/CYLTheme/`; the frameworks built by CocoaPods and
+//      Carthage keep no folders, hence the second form.
+// [CN] FIX: issue #216 — 换肤（主题切换），位于 `CYLComponents/CYLTheme/`；CocoaPods 与 Carthage 构建的 framework 不保留文件夹，因此有第二种写法。
+#if __has_include("CYLComponents/CYLTheme/CYLTheme.h")
+#import "CYLComponents/CYLTheme/CYLTheme.h"
+#else
+#import "CYLTheme.h"
+#endif
 // [EN] FIX: issue #535 — generic helpers shared by Core, CYLBadgeView and apps.
 // [CN] FIX: issue #535 — Core、CYLBadgeView 与 App 都可以使用的通用工具。
 #import "UIView+CYLHitTestOutsideBounds.h"

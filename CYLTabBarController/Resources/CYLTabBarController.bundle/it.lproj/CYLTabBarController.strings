@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigazione e confronti";
 "角标" = "Badge";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Non supportato da Liquid Glass: è il sistema a stabilire l'altezza della barra (FlatDesign e lo stile classico lo supportano)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Skin";
+"换肤（主题，issue #216）" = "Skin (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Tocca per scegliere un tema: sfondo, icone e colori del testo della TabBar cambiano sul posto, in ogni stile di TabBar. Attuale: %@";
+"选择主题" = "Scegli un tema";
+"默认" = "Predefinito";
+"西柚" = "Pompelmo";
+"青草" = "Erba";
+"玫瑰粉" = "Rosa";
+"春节" = "Festa di Primavera";
+"跟随系统深色模式" = "Segui la modalità scura del sistema";
 "默认点击声" = "Clic predefinito";
 "中等触感反馈" = "Feedback aptico medio";
 "无需继承基类与工具方法" = "Senza classe base e utilità";
@@ -278,5 +290,19 @@
 "重触感反馈" = "Feedback aptico forte";
 "长按（#152）" = "Pressione prolungata (#152)";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Natale";
+"万圣节" = "Halloween";
+"情人节" = "San Valentino";
+"中秋节" = "Festa di metà autunno";
+"复活节" = "Pasqua";
+"新年" = "Capodanno";
+"夏日" = "Estate";
+"生日" = "Compleanno";
+"太空" = "Spazio";
+"海洋" = "Oceano";
+"换肤：节日与配色主题（%@ 种）" = "Skin: festività e colori (%@)";
+"节日图标与配色" = "Icone delle festività e colori";
+"仅配色" = "Solo colori";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Toccami";

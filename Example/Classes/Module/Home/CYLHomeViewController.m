@@ -51,6 +51,10 @@
 
 
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"LiquidGlass") style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
+    // [EN] Issue #216: the skin button opens the theme picker; the tab bar restyles in place in every style.
+    // [CN] Issue #216：换肤按钮打开主题选择器，TabBar 在所有样式中原地更换外观。
+    UIBarButtonItem *themeBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"换肤") style:UIBarButtonItemStylePlain target:self action:@selector(showThemePicker:)];
+    self.navigationItem.rightBarButtonItems = @[ self.navigationItem.rightBarButtonItem, themeBarButtonItem ];
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"CYLTabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
 
 //    [self.navigationItem.leftBarButtonItem setTintColor:UIColor.blackColor];
@@ -104,6 +108,14 @@
     dispatch_after(when, dispatch_get_main_queue(), ^{
         [self.tableView.mj_header endRefreshing];
     });
+}
+
+/// [EN] Issue #216: the skin (theme) picker. [CN] Issue #216：换肤（主题）选择器。
+- (void)showThemePicker:(id)sender {
+    __weak __typeof(self) weakSelf = self;
+    [self cyl_presentThemePickerFromView:nil completion:^{
+        [weakSelf.tableView reloadData];
+    }];
 }
 
 - (void)refreshTabBar:(id)sender {

@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigasjon og sammenligninger";
 "角标" = "Merker";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Støttes ikke av Liquid Glass: systemet bestemmer høyden (FlatDesign og klassisk stil støtter det)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Utseende";
+"换肤（主题，issue #216）" = "Utseende (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Trykk for å velge et tema: bakgrunnen, symbolene og tekstfargene i TabBar endres på stedet, i alle TabBar-stiler. Nå: %@";
+"选择主题" = "Velg et tema";
+"默认" = "Standard";
+"西柚" = "Grapefrukt";
+"青草" = "Gress";
+"玫瑰粉" = "Rosa rose";
+"春节" = "Vårfestivalen";
+"跟随系统深色模式" = "Følg systemets mørke modus";
 "默认点击声" = "Standardklikk";
 "中等触感反馈" = "Middels haptisk tilbakemelding";
 "无需继承基类与工具方法" = "Uten basisklasse, og verktøy";
@@ -278,5 +290,19 @@
 "重触感反馈" = "Kraftig haptikk";
 "长按（#152）" = "Langt trykk (#152)";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Jul";
+"万圣节" = "Halloween";
+"情人节" = "Valentinsdagen";
+"中秋节" = "Midthøstfestivalen";
+"复活节" = "Påske";
+"新年" = "Nyttår";
+"夏日" = "Sommer";
+"生日" = "Bursdag";
+"太空" = "Verdensrommet";
+"海洋" = "Havet";
+"换肤：节日与配色主题（%@ 种）" = "Utseender: høytider og farger (%@)";
+"节日图标与配色" = "Høytidssymboler og farger";
+"仅配色" = "Bare farger";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Trykk her";
