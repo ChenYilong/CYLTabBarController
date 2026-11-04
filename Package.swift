@@ -50,6 +50,10 @@ let package = Package(
                 .headerSearchPath("CYLBadgeView"),
                 // FIX: issue #535 — the CYLUtils sources (CocoaPods `CYLUtils` subspec), shared by Core and CYLBadgeView.
                 .headerSearchPath("CYLUtils"),
+                // FIX: issue #604 — the CYLTabBarItemAnimation sources (CocoaPods `CYLTabBarItemAnimation` subspec, with Lottie):
+                // the shared engine, the animator protocol and registry, and one folder per library (`Lottie/`, and `PAG/`,
+                // which is empty without libpag; SPM does not offer libpag).
+                .headerSearchPath("CYLTabBarItemAnimation"),
                 .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar"),
                 .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBarPrivate"),
             ]

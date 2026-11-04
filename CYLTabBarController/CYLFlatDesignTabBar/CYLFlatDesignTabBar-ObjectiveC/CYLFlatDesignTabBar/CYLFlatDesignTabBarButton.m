@@ -14,6 +14,13 @@
 #else
 #import "CYLTabBarController.h"
 #endif
+// Private header of the pod: the library-neutral tab icon animation (#604). 本 pod 的私有头文件：与动画库无关的 Tab 图标动画（#604）。
+#import "UIControl+CYLTabBarItemAnimation.h"
+
+/// [EN] Implemented in CYLFlatDesignTabBar.m (#477). [CN] 在 CYLFlatDesignTabBar.m 中实现（#477）。
+@interface CYLFlatDesignTabBar (CYLTabBarItemAnimationPrivate)
+- (void)stopAllTabBarItemAnimations;
+@end
 
 @interface CYLFlatDesignTabBarButton ()
 
@@ -330,7 +337,7 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
     }
     [self _updateSelectionIndicator];
     [self _updateBadgeAppearance];
-    [self updateLottie];
+    [self updateTabBarItemAnimation];
     [self setNeedsLayout];
 //    [self layoutIfNeeded];
 }
@@ -344,8 +351,8 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
     // A Lottie-only item has no image, but the Lottie view is centered on `_imageView`,
     // so still lay the image slot out, sized to the Lottie size; otherwise it collapses to
     // CGRectZero and the animation is drawn around the button's top-left corner.
-    CGSize lottieSize = [[self _lottieSizeValue] CGSizeValue];
-    BOOL isLottieOnlyItem = (_imageView.image == nil) && (lottieSize.width > 0 && lottieSize.height > 0) && ([self _lottieURL] != nil);
+    CGSize lottieSize = [[self _animationSizeValue] CGSizeValue];
+    BOOL isLottieOnlyItem = (_imageView.image == nil) && (lottieSize.width > 0 && lottieSize.height > 0) && ([self _animationURL] != nil);
     BOOL isShowImageView = (_imageView.image != nil) || isLottieOnlyItem;
     BOOL isShowTitleLabel = _titleLabel.text.length > 0;
     BOOL isCYLFlatDesignTabBarItem = [_tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]];
@@ -408,7 +415,7 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
     } else {
         _imageView.frame = CGRectZero;
     }
-    [self initLottie];
+    [self initTabBarItemAnimation];
 }
 
 - (NSDictionary *)_titleTextAttributesForState {
@@ -476,9 +483,9 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
     return state;
 }
 
-#pragma mark - initLottie
+#pragma mark - initTabBarItemAnimation
 
-- (NSValue *)_lottieSizeValue {
+- (NSValue *)_animationSizeValue {
     NSValue *lottieSizeValue;
     if ([_tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
         lottieSizeValue = _tabBarItem.lottieSizeValue;
@@ -486,7 +493,7 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
     return lottieSizeValue;
 }
 
-- (NSString *)_lottieFilePath {
+- (NSString *)_animationFilePath {
     NSString *lottieFilePath;
     
     if ([_tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
@@ -495,13 +502,13 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
     return lottieFilePath;
 }
 
-- (NSURL *)_lottieURL {
+- (NSURL *)_animationURL {
     NSURL *lottieURL;
     if ([_tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
         // Keep the URL-first behavior used by the default tab bar, then fall back to the local path.
         lottieURL = _tabBarItem.lottieURL;
         if (!lottieURL) {
-            lottieURL = [CYLConstants cyl_getURLFromString:[self _lottieFilePath]];
+            lottieURL = [CYLConstants cyl_getURLFromString:[self _animationFilePath]];
         }
     }
     return lottieURL;
@@ -529,8 +536,8 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
  *   the Lottie view exists, so a wrong mode picked here would stick for the button's lifetime. That is why
  *   an unresolved controller falls back to the documented default instead of 0.
  */
-- (UIViewContentMode)_lottieContentMode {
-    CYLTabBarController *tabBarController = [self _lottieTabBarController];
+- (UIViewContentMode)_animationContentMode {
+    CYLTabBarController *tabBarController = [self _animationTabBarController];
     // Never let a missing controller become 0 (UIViewContentModeScaleToFill);
     // fall back to the documented default instead.
     if (!tabBarController) {
@@ -539,17 +546,17 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
     return [tabBarController lottieAnimationViewContentMode];
 }
 
-/// FIX: issue #428 — `-[CYLTabBarController lottieAnimationSpeed]` in flat design, resolved like `-_lottieContentMode`.
-- (CGFloat)_lottieAnimationSpeed {
-    CYLTabBarController *tabBarController = [self _lottieTabBarController];
+/// FIX: issue #428 — `-[CYLTabBarController lottieAnimationSpeed]` in flat design, resolved like `-_animationContentMode`.
+- (CGFloat)_animationSpeed {
+    CYLTabBarController *tabBarController = [self _animationTabBarController];
     if (!tabBarController) {
         return 1.0;
     }
     return [tabBarController lottieAnimationSpeed];
 }
 
-/// The tab bar controller that owns this button, in any style; see `-_lottieContentMode`.
-- (CYLTabBarController *)_lottieTabBarController {
+/// The tab bar controller that owns this button, in any style; see `-_animationContentMode`.
+- (CYLTabBarController *)_animationTabBarController {
     // Non-flat styles: the regular lookup finds the controller (nil for flat design, by design).
     CYLTabBarController *tabBarController = [self cyl_tabBarController];
     if (!tabBarController) {
@@ -568,41 +575,51 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
     return tabBarController;
 }
 
-- (void)initLottie {
-    NSURL *lottieURL = [self _lottieURL];
-    if (!lottieURL) {
-        return;
+/// [EN] The flat design tab bar this button is in, nil before it is added. [CN] 本按钮所在的扁平样式 TabBar；添加前为 nil。
+- (CYLFlatDesignTabBar *)_flatDesignTabBar {
+    UIView *view = self.superview;
+    while (view && ![view isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        view = view.superview;
     }
-
-    if (lottieURL) {
-#if __has_include(<Lottie/Lottie.h>)
-        CGSize lottieSize = [[self _lottieSizeValue] CGSizeValue];
-        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode] animationSpeed:[self _lottieAnimationSpeed]];
-#endif
-     
-#if __has_include(<Lottie/Lottie-Swift.h>)
-        CGSize lottieSize = [[self _lottieSizeValue] CGSizeValue];
-        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode] animationSpeed:[self _lottieAnimationSpeed]];
-#endif
-    }
+    return (CYLFlatDesignTabBar *)view;
 }
 
-- (void)updateLottie {
+- (void)initTabBarItemAnimation {
+    // FIX: issue #604 — only with the `CYLTabBarItemAnimation` subspec. 仅在包含 `CYLTabBarItemAnimation` 子库时。
+    if (!CYLTabBarItemAnimationIsAvailable()) {
+        return;
+    }
+    NSURL *animationURL = [self _animationURL];
+    if (!animationURL) {
+        return;
+    }
+    // FIX: issue #604 — any animation library (Lottie or PAG, each a `CYLTabBarItemAnimator`).
+    // 任意动画库（Lottie 或 PAG，均为 `CYLTabBarItemAnimator`）。
+    CGSize animationSize = [[self _animationSizeValue] CGSizeValue];
+    [self cyl_addTabBarItemAnimationWithURL:animationURL size:animationSize contentMode:[self _animationContentMode] animationSpeed:[self _animationSpeed]];
+}
+
+- (void)updateTabBarItemAnimation {
+    // FIX: issue #604 — only with the `CYLTabBarItemAnimation` subspec. 仅在包含 `CYLTabBarItemAnimation` 子库时。
+    if (!CYLTabBarItemAnimationIsAvailable()) {
+        return;
+    }
     if (![self.tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
         return;
     }
     if (self.isSelected) {
-        CGSize lottieSize = [[self _lottieSizeValue] CGSizeValue];
-        NSURL *lottieURL = [self _lottieURL];
-        if (!lottieURL) {
+        CGSize animationSize = [[self _animationSizeValue] CGSizeValue];
+        NSURL *animationURL = [self _animationURL];
+        if (!animationURL) {
+            // FIX: issue #477 — a selected tab without an animation: the animated tabs stop and go back to their first
+            // frame, as when another animated tab is selected. 选中没有动画的 Tab：有动画的 Tab 停止并回到第一帧，与选中其他动画 Tab 时一致。
+            [[self _flatDesignTabBar] stopAllTabBarItemAnimations];
             return;
         }
-        // The selected button can get here before `-initLottie`; add the view with the speed first (issue #428).
-        [self cyl_addLottieImageWithLottieURL:lottieURL size:lottieSize contentMode:[self _lottieContentMode] animationSpeed:[self _lottieAnimationSpeed]];
-        [self cyl_animationLottieImageWithLottieURL:lottieURL size:lottieSize defaultSelected:NO contentMode:[self _lottieContentMode]];
-    }
-    else {
-//        [self cyl_stopAnimationOfLottieView];
+        // The selected button can get here before `-initTabBarItemAnimation`; add the view with the speed first (issue #428).
+        // 选中的按钮可能先于 `-initTabBarItemAnimation` 执行到这里；先按速度添加视图（issue #428）。
+        [self cyl_addTabBarItemAnimationWithURL:animationURL size:animationSize contentMode:[self _animationContentMode] animationSpeed:[self _animationSpeed]];
+        [self cyl_playTabBarItemAnimationWithURL:animationURL size:animationSize defaultSelected:NO contentMode:[self _animationContentMode]];
     }
 }
 

@@ -52,6 +52,28 @@
 #define CYL_LOTTIE_AVAILABLE 0
 #endif
 
+/*!
+ * FIX: issue #604
+ * [EN] 1 when Tencent's PAG library is in the project (`CYLTabBarController/PAG`, which depends on the `libpag` pod;
+ *      `<libpag/PAGView.h>`), else 0. PAG animations use the same pipeline as Lottie (keys `CYLTabBarPAG…`), through
+ *      `CYLPAGTabBarItemAnimator`. Use it, like `CYL_LOTTIE_AVAILABLE`, only after importing this header.
+ * [CN] 工程中引入了腾讯 PAG 库时为 1，否则为 0（`CYLTabBarController/PAG`，依赖 `libpag` pod；`<libpag/PAGView.h>`）。PAG 动画与 Lottie
+ *      使用同一套流程（key 为 `CYLTabBarPAG…`），由 `CYLPAGTabBarItemAnimator` 实现。与 `CYL_LOTTIE_AVAILABLE` 一样，只能在引入本头文件之后使用。
+ */
+#if __has_include(<libpag/PAGView.h>)
+#define CYL_PAG_AVAILABLE 1
+#else
+#define CYL_PAG_AVAILABLE 0
+#endif
+
+/*!
+ * [EN] 1 when a tab icon animation library is in the project: Lottie or PAG. Each is a `CYLTabBarItemAnimator` of the
+ *      `CYLTabBarItemAnimation` subspec, so the tab bar code is the same for both and works with either one alone.
+ * [CN] 工程中引入了 Tab 图标动画库（Lottie 或 PAG）时为 1。二者都是 `CYLTabBarItemAnimation` 子库中的 `CYLTabBarItemAnimator`，因此 TabBar 代码
+ *      对二者完全相同，单独引入任意一个即可工作。
+ */
+#define CYL_TAB_ANIMATION_AVAILABLE (CYL_LOTTIE_AVAILABLE || CYL_PAG_AVAILABLE)
+
 #define CYL_DEPRECATED(explain) __attribute__((deprecated(explain)))
 
 

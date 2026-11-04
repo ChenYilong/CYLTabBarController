@@ -15,6 +15,10 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/FlatDesign-StandardAppearance.md
 //   - Tabs That Need Login / 需要登录的 Tab
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Login-Required-Tabs.md
+//   - PAG animated tab icons (used like Lottie) / PAG 动画 Tab 图标（与 Lottie 用法相同）
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PAG-Animation.md
+//   - Only some tabs animated (Lottie or PAG) / 只有部分 Tab 有动画（Lottie 或 PAG）
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Per-Tab-Animation.md
 //   - PlusButton badge: changes on every tap / PlusButton 角标：每次点击都会变化
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Badge.md
 //   - Lottie tab icons and their files when there is a PlusButton / 有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应
@@ -200,6 +204,105 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkColors;
  */
 FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingLottieFiles(NSArray<NSDictionary *> *attributes,
                                                                                     NSArray<NSString *> *lottieFileNames,
+                                                                                    NSBundle * _Nullable bundle);
+
+/*!
+ * FIX: issue #604 — generic animation keys, for every animation library.
+ * [EN] Keys for a tab's animation that do not name a library: the file decides which library plays it (".json" Lottie,
+ *      ".pag" PAG, or the file type of any library added later, see `CYLTabBarItemAnimatorRegistry`). They work like the
+ *      Lottie keys, and each library's own keys (`CYLTabBarLottie…`, `CYLTabBarPAG…`) keep working too.
+ *      - `CYLTabBarAnimationURL` (NSURL) / `CYLTabBarAnimationFilePath` (NSString): the file; the URL wins.
+ *      - `CYLTabBarAnimationSize`: the view size, an NSValue of CGSize (default: the icon placeholder size).
+ *      - `CYLTabBarAnimationDarkURL` / `CYLTabBarAnimationDarkFilePath`: the Dark Mode version (#442).
+ *      - `CYLTabBarAnimationDarkColors`: keypath -> UIColor for Dark Mode, for libraries that support it (Lottie 4.x).
+ * [CN] 不指定动画库的 Tab 动画 key：由文件决定使用哪个动画库播放（".json" 为 Lottie，".pag" 为 PAG，或以后新增的动画库对应的文件类型，
+ *      见 `CYLTabBarItemAnimatorRegistry`）。用法与 Lottie key 相同，各动画库自己的 key（`CYLTabBarLottie…`、`CYLTabBarPAG…`）也仍然有效。
+ *      - `CYLTabBarAnimationURL`（NSURL）/ `CYLTabBarAnimationFilePath`（NSString）：动画文件，URL 优先。
+ *      - `CYLTabBarAnimationSize`：视图尺寸，CGSize 的 NSValue（默认使用图标占位尺寸）。
+ *      - `CYLTabBarAnimationDarkURL` / `CYLTabBarAnimationDarkFilePath`：深色模式版本（#442）。
+ *      - `CYLTabBarAnimationDarkColors`：深色模式下 keypath -> UIColor，用于支持该功能的动画库（Lottie 4.x）。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationSize;
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationDarkURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationDarkFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationDarkColors;
+
+/*!
+ * FIX: issue #604 — PAG animations (Tencent libpag), the same way as Lottie.
+ * [EN] Keys for a tab's PAG animation, used exactly like their Lottie twins and through the same pipeline: the view is
+ *      added in place of the tab's icon, plays when the tab is selected, stops when another one is, follows
+ *      `lottieAnimationViewContentMode`, is returned by `-[UIControl cyl_lottieAnimationView]` and posts
+ *      `CYLTabBarItemLottieAnimationViewDidAddNotification`. Needs the `CYLTabBarController/PAG` subspec (the `libpag`
+ *      pod); without it the keys are ignored and the images show. Use either the Lottie keys or the PAG keys for a tab;
+ *      PAG has no playback speed, so `lottieAnimationSpeed` does not apply to it.
+ *      - `CYLTabBarPAGURL`: an NSURL of a .pag file; `CYLTabBarPAGFilePath`: its path (NSString). The URL wins.
+ *      - `CYLTabBarPAGSize`: the view size, an NSValue of CGSize (default: the icon placeholder size).
+ *      - `CYLTabBarPAGDarkURL` / `CYLTabBarPAGDarkFilePath`: the Dark Mode version, like `CYLTabBarLottieDarkURL`.
+ * [CN] Tab 的 PAG 动画 key，用法与对应的 Lottie key 完全相同，并走同一套流程：替换 Tab 图标显示，选中时播放，选中其他 Tab 时停止，
+ *      遵循 `lottieAnimationViewContentMode`，由 `-[UIControl cyl_lottieAnimationView]` 返回，并发送
+ *      `CYLTabBarItemLottieAnimationViewDidAddNotification`。需要引入 `CYLTabBarController/PAG` 子库（依赖 `libpag` pod）；未引入时忽略这些 key，
+ *      显示图片。同一个 Tab 请使用 Lottie key 或 PAG key 之一；PAG 没有播放速度，`lottieAnimationSpeed` 对其无效。
+ *      - `CYLTabBarPAGURL`：.pag 文件的 NSURL；`CYLTabBarPAGFilePath`：其路径（NSString）。URL 优先。
+ *      - `CYLTabBarPAGSize`：视图尺寸，CGSize 的 NSValue（默认使用图标占位尺寸）。
+ *      - `CYLTabBarPAGDarkURL` / `CYLTabBarPAGDarkFilePath`：深色模式版本，与 `CYLTabBarLottieDarkURL` 相同。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarPAGURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarPAGFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarPAGSize;
+FOUNDATION_EXTERN NSString *const CYLTabBarPAGDarkURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarPAGDarkFilePath;
+
+/*!
+ * FIX: issue #604
+ * [EN] Returns `attributes` with a PAG animation added to each item, like `CYLTabBarItemsAttributesAddingLottieFiles`:
+ *      `CYLTabBarPAGFilePath` for "<name>.pag" in `bundle` (nil: the main bundle), and `CYLTabBarPAGDarkFilePath` for
+ *      "<name>_dark.pag" when that file exists. Names are matched by position; an item without a name, or whose file is
+ *      missing, is left as it is.
+ *
+ *          CYLTabBarItemsAttributesAddingPAGFiles(attributes, @[@"tab_home", @"tab_discover"], nil);
+ * [CN] 返回为每个 item 添加了 PAG 动画的 `attributes`，与 `CYLTabBarItemsAttributesAddingLottieFiles` 相同：`CYLTabBarPAGFilePath` 为
+ *      `bundle`（nil 表示 main bundle）中的「<名称>.pag」；存在「<名称>_dark.pag」时再加上 `CYLTabBarPAGDarkFilePath`。名称按位置对应；
+ *      没有名称或文件不存在的 item 保持不变。示例见上。
+ */
+FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFiles(NSArray<NSDictionary *> *attributes,
+                                                                                 NSArray<NSString *> *pagFileNames,
+                                                                                 NSBundle * _Nullable bundle);
+
+/*!
+ * FIX: issue #477 — only some tabs animated, with any animation library.
+ * [EN] Returns one tab's `attributes` with an animation added (`CYLTabBarAnimationFilePath`, and
+ *      `CYLTabBarAnimationDarkFilePath` when "<name>_dark.<ext>" exists), so that only that tab is animated and the others
+ *      keep their images. `fileName` is "<name>.<ext>" for that file, or "<name>" for the first file found with the
+ *      extensions of the libraries in the build, in their lookup order (PAG ".pag", Lottie ".json" / ".lottie", or any
+ *      library added later). `bundle` nil means the main bundle. A missing file, or no animation library, leaves
+ *      `attributes` as they are. Animated and static tabs, and tabs of different libraries, can be mixed in one tab bar,
+ *      in every style.
+ *
+ *          NSArray *attributes = @[
+ *              homeAttributes,                                                                     // images only
+ *              CYLTabBarItemAttributesAddingAnimationFile(messageAttributes, @"tab_message.json", nil), // Lottie
+ *              CYLTabBarItemAttributesAddingAnimationFile(mineAttributes, @"tab_mine.pag", nil),        // PAG
+ *          ];
+ * [CN] 返回添加了动画的单个 Tab 的 `attributes`（`CYLTabBarAnimationFilePath`；存在「名称_dark.扩展名」时再加上
+ *      `CYLTabBarAnimationDarkFilePath`），使只有该 Tab 有动画，其他 Tab 保持图片。`fileName` 为「名称.扩展名」时使用该文件；为「名称」时，
+ *      按查找顺序使用构建中各动画库的扩展名（PAG ".pag"、Lottie ".json" / ".lottie"，或以后新增的动画库），取第一个存在的文件。`bundle` 为 nil
+ *      表示 main bundle。文件不存在或没有动画库时 `attributes` 保持不变。同一个 TabBar 中可以混用有动画与无动画的 Tab，以及不同动画库的 Tab，
+ *      所有样式均支持。示例见上。
+ */
+FOUNDATION_EXTERN NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(NSDictionary *attributes,
+                                                                          NSString *fileName,
+                                                                          NSBundle * _Nullable bundle);
+
+/*!
+ * [EN] The same for every tab, by position: an empty name or `NSNull` leaves that tab static (#477).
+ *
+ *          CYLTabBarItemsAttributesAddingAnimationFiles(attributes, @[@"tab_home.json", @"", @"tab_mine.pag"], nil);
+ * [CN] 按位置为每个 Tab 执行上面的操作：名称为空字符串或 `NSNull` 的 Tab 保持静态（#477）。示例见上。
+ */
+FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingAnimationFiles(NSArray<NSDictionary *> *attributes,
+                                                                                    NSArray *fileNames,
                                                                                     NSBundle * _Nullable bundle);
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImageInsets;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitlePositionAdjustment;

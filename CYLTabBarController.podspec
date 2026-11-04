@@ -47,17 +47,52 @@ Pod::Spec.new do |s|
     'CYLTabBarController/include/**/*', # SPM-only module map and header shims
     'CYLTabBarController/CYLUtils/**/*', # the CYLUtils subspec above
     'CYLTabBarController/CYLBadgeView/**/*', # the CYLBadgeView subspec above
+    'CYLTabBarController/CYLTabBarItemAnimation/**/*', # the CYLTabBarItemAnimation subspec below
     'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}',
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{swift}',
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{h,m}',
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/**/*.{h,m,swift}'
     ]
     core.public_header_files = 'CYLTabBarController/**/*.h'
+    # FIX: issue #604 — the interface to the CYLTabBarItemAnimation subspec, internal, not public API. Core does not depend
+    # on that subspec: it checks at runtime that it is there.
+    # 与 CYLTabBarItemAnimation 子库之间的接口，仅供内部使用，不属于公开 API。Core 不依赖该子库，而是在运行时检查它是否存在。
+    core.private_header_files = 'CYLTabBarController/UIControl+CYLTabBarItemAnimation.h', 'CYLTabBarController/CYLTabBarItemAnimationService.h'
     # The resource bundle is part of CYLUtils (see above), which Core depends on. 资源包属于 Core 依赖的 CYLUtils。
 
     
   end
   
+  # FIX: issue #604 — the tab icon animation shared by every animation library, its own pod (subspec) pulled in only by
+  # an animation library's subspec (Lottie, PAG…): Core does not depend on it. Dependency inversion on two levels:
+  # - Core owns `CYLTabBarItemAnimationService` and calls only that; `CYLTabBarItemAnimationEngine` here implements it and
+  #   hands itself to Core when it loads.
+  # - The engine owns the public protocols, split by role: `CYLTabBarItemAnimationFileMatching` and
+  #   `CYLTabBarItemAnimationViewFactory` (combined in `CYLTabBarItemAnimator`) and `CYLTabBarItemAnimationPlayer`; it
+  #   creates views only through `CYLTabBarItemAnimationFactory` and finds libraries only through
+  #   `CYLTabBarItemAnimatorRegistry`. Each library's animator and players live in that library's subspec
+  #   (`CYLTabBarItemAnimation/<Library>/`), and the animator registers itself.
+  # A new library is one more folder, one more animator class and one more subspec; nothing else changes.
+  # 所有动画库共用的 Tab 图标动画，是独立的 pod（子库），只由某个动画库的子库（Lottie、PAG…）引入，Core 不依赖它。两层依赖反转：
+  # - Core 定义 `CYLTabBarItemAnimationService` 并只调用它；这里的 `CYLTabBarItemAnimationEngine` 实现它，并在加载时交给 Core。
+  # - 引擎按职责定义公开协议：`CYLTabBarItemAnimationFileMatching` 与 `CYLTabBarItemAnimationViewFactory`（组合为 `CYLTabBarItemAnimator`），以及
+  #   `CYLTabBarItemAnimationPlayer`；只通过 `CYLTabBarItemAnimationFactory` 创建视图，只通过 `CYLTabBarItemAnimatorRegistry` 查找动画库。每个动画库的
+  #   animator 与播放器放在该库的子库中（`CYLTabBarItemAnimation/<库名>/`），animator 自行注册。
+  # 新增动画库只需新增一个目录、一个 animator 类和一个子库，其他代码都无需修改。
+  s.subspec 'CYLTabBarItemAnimation' do |animation|
+    animation.dependency 'CYLTabBarController/Core'
+    animation.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/*.{h,m}'
+    # Public: the protocols (matching, view factory, player), the registry, the factory and the player of a tab button.
+    # 公开：协议（匹配、视图工厂、播放器）、注册表、工厂，以及 Tab 按钮的播放器。
+    animation.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimator.h',
+                                    'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayer.h',
+                                    'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h',
+                                    'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h',
+                                    'CYLTabBarController/CYLTabBarItemAnimation/UIControl+CYLTabBarItemAnimationPlayer.h'
+    animation.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.h'
+    animation.frameworks = 'UIKit'
+  end
+
   s.subspec 'Lottie' do |lottie|
     #指定2.5.3，使用 oc 版本 lottie
     lottie.dependency "CYLTabBarController/LottieObjectiveC"
@@ -65,17 +100,53 @@ Pod::Spec.new do |s|
   
   s.subspec 'LottieObjectiveC' do |lottieobjc|
     lottieobjc.dependency 'CYLTabBarController/Core'
+    lottieobjc.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
+    # The Lottie animator (#604), registered with CYLTabBarItemAnimatorRegistry. Lottie 的 animator（#604），向注册表注册。
+    lottieobjc.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.{h,m}'
+    lottieobjc.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.h'
     #指定2.5.3，使用 oc 版本 lottie
     lottieobjc.dependency "lottie-ios", '~> 2.5.3'
   end
   
   s.subspec "LottieSwift" do |lottieswift|
-    lottieswift.source_files = 'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}'
+    # The Swift bridge, and the Lottie animator (#604). Swift 桥接，以及 Lottie 的 animator（#604）。
+    lottieswift.source_files = 'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}', 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.{h,m}'
+    lottieswift.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.h'
     #使用 swift 版本 lottie；4.5.1 起提供 `removeValueProvider(for:)`（#442 的 Dark Mode 颜色恢复会用到）
     lottieswift.dependency 'lottie-ios', '>= 4.5.1'
     # lottie-ios 4.5.1 起要求 iOS 13
     lottieswift.ios.deployment_target = '13.0'
     lottieswift.dependency 'CYLTabBarController/Core'
+    lottieswift.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
+  end
+
+  # FIX: issue #604 — PAG animations (Tencent libpag), the same way as Lottie: `pod 'CYLTabBarController/PAG'`.
+  # Tabs then take `CYLTabBarPAGURL` / `CYLTabBarPAGFilePath` (".pag" files) like the Lottie keys. libpag is a binary
+  # pod (libpag.xcframework), so no source is copied here; `CYLPAGTabBarItemAnimator` (CYLTabBarItemAnimation) finds it
+  # with `__has_include(<libpag/PAGView.h>)`, with or without Lottie.
+  # PAG 动画（腾讯 libpag），用法与 Lottie 相同：`pod 'CYLTabBarController/PAG'`。Tab 使用 `CYLTabBarPAGURL` /
+  # `CYLTabBarPAGFilePath`（".pag" 文件），与 Lottie key 一致。libpag 为二进制 pod（libpag.xcframework），无需复制源码；
+  # `CYLPAGTabBarItemAnimator`（CYLTabBarItemAnimation）通过 `__has_include(<libpag/PAGView.h>)` 识别，无论是否引入 Lottie。
+  s.subspec 'PAG' do |pag|
+    pag.dependency 'CYLTabBarController/Core'
+    pag.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
+    # The PAG animator (#604), registered with CYLTabBarItemAnimatorRegistry. PAG 的 animator（#604），向注册表注册。
+    pag.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
+    pag.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
+    pag.dependency 'libpag', '>= 4.0'
+  end
+
+  # FIX: issue #604 — the same with PAG Enterprise (`libpag-enterprise`: audio, 3D, movie layers…), like the two Lottie
+  # flavors. It ships the same `libpag.xcframework`, so use either `PAG` or `PAGEnterprise`, not both.
+  # 使用 PAG 企业版（`libpag-enterprise`：音频、3D、视频图层等），与 Lottie 的两个版本类似。它包含同样的 `libpag.xcframework`，
+  # 因此 `PAG` 与 `PAGEnterprise` 二选一，不要同时引入。
+  s.subspec 'PAGEnterprise' do |pagenterprise|
+    pagenterprise.dependency 'CYLTabBarController/Core'
+    pagenterprise.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
+    # The PAG animator (#604), registered with CYLTabBarItemAnimatorRegistry. PAG 的 animator（#604），向注册表注册。
+    pagenterprise.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
+    pagenterprise.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
+    pagenterprise.dependency 'libpag-enterprise', '>= 4.0'
   end
   
   s.subspec 'CYLFlatDesignTabBar' do |flatdesign|

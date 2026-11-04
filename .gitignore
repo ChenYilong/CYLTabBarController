@@ -93,3 +93,7 @@ fastlane/screenshots
 
 # macOS artifact
 .DS_Store
+
+# PAG animation files (issue #604): downloaded by scripts/fetch-pag-resources.py (`pod install` in Example-PAG),
+# not kept in the repository. PAG 动效文件：由脚本下载（Example-PAG 中执行 `pod install`），不保存在仓库中。
+Example-Shared/PAGResources/*/
