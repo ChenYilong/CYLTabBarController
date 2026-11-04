@@ -315,19 +315,14 @@ static BOOL CYLTabBarItemAttributesHaveAnimationFile(NSDictionary *attributes) {
     BOOL isLottieEnabled = URLCount > 0 ;
     BOOL isLottieEnabledFromAttributes = NO;
     if (tabBarItemsAttributes && tabBarItemsAttributes.count > 0) {
-        @try {
-            // FIX: issue #477 — any tab, not only the first: only some tabs may have an animation.
-            // 任意一个 Tab，而不只是第一个：可能只有部分 Tab 有动画。
-            for (NSDictionary *item in tabBarItemsAttributes) {
-                if ([item isKindOfClass:[NSDictionary class]] && CYLTabBarItemAttributesHaveAnimationFile(item)) {
-                    isLottieEnabledFromAttributes = YES;
-                    break;
-                }
+        // [EN] Checked instead of `@try`: only dictionaries are read. FIX: issue #477 — any tab, not only the first: only
+        //      some tabs may have an animation, of any library (Lottie, PAG, Rive).
+        // [CN] 用检查代替 `@try`：只读取字典。任意一个 Tab，而不只是第一个：可能只有部分 Tab 有动画，且可以是任一动画库（Lottie、PAG、Rive）。
+        for (NSDictionary *item in tabBarItemsAttributes) {
+            if ([item isKindOfClass:[NSDictionary class]] && CYLTabBarItemAttributesHaveAnimationFile(item)) {
+                isLottieEnabledFromAttributes = YES;
+                break;
             }
-        } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
         }
     }
     return isLottieEnabled || isLottieEnabledFromAttributes;

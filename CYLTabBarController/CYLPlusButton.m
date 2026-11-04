@@ -167,6 +167,13 @@ static const void *CYLPlusButtonMovedTitleKey = &CYLPlusButtonMovedTitleKey;
 ///      以底边而不是中心计算，之后设置或替换的图片保持同一距离。
 static const void *CYLPlusButtonImageBottomToTitleKey = &CYLPlusButtonImageBottomToTitleKey;
 
+// [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
+// [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
+@interface CYLTabBarController (CYLTabButtonHighlight)
+- (void)cyl_tabButtonTouchDown:(UIControl *)control;
+- (void)cyl_tabButtonTouchUp:(UIControl *)control;
+@end
+
 @implementation CYLPlusButton
 //@synthesize selected = _selected;
 // [EN] Custom getter and setter: no automatic ivar.
@@ -190,6 +197,73 @@ static const void *CYLPlusButtonImageBottomToTitleKey = &CYLPlusButtonImageBotto
 
 - (void)setAccessibilityLabel:(NSString *)accessibilityLabel {
     objc_setAssociatedObject(self, @selector(accessibilityLabel), accessibilityLabel, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+/*!
+ * [EN] VoiceOver: the plus button is announced as selected while its page is shown, like a tab.
+ * [CN] VoiceOver：PlusButton 对应的页面显示时，与 Tab 一样朗读为"已选中"。
+ */
+- (UIAccessibilityTraits)accessibilityTraits {
+    UIAccessibilityTraits traits = [super accessibilityTraits] | UIAccessibilityTraitButton;
+    return self.isSelected ? (traits | UIAccessibilityTraitSelected) : traits;
+}
+
+/*!
+ * [EN] Defaults that system tab buttons already have: the iPad pointer hover effect (iOS 13.4+) and the Large Content
+ *      Viewer (iOS 13+: with the largest text sizes, a long press shows the title and image in the middle of the screen).
+ *      Set at creation, so the app can turn them off afterwards (`pointerInteractionEnabled = NO`,
+ *      `showsLargeContentViewer = NO`).
+ * [CN] 系统 Tab 按钮本来就有的默认行为：iPad 指针悬停效果（iOS 13.4+）与大内容查看器（iOS 13+：使用最大字号时，长按会在屏幕中央
+ *      显示标题与图片）。在创建时设置，App 之后可以关闭（`pointerInteractionEnabled = NO`、`showsLargeContentViewer = NO`）。
+ */
+- (instancetype)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        [self cyl_setUpTabLikeInteractions];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    if (self = [super initWithCoder:coder]) {
+        [self cyl_setUpTabLikeInteractions];
+    }
+    return self;
+}
+
+- (void)cyl_setUpTabLikeInteractions {
+    if (@available(iOS 13.4, *)) {
+        self.pointerInteractionEnabled = YES;
+    }
+    if (@available(iOS 13.0, *)) {
+        self.showsLargeContentViewer = YES;
+        self.scalesLargeContentImage = YES;
+    }
+}
+
+- (NSString *)largeContentTitle API_AVAILABLE(ios(13.0)) {
+    NSString *title = [super largeContentTitle];
+    return title.length > 0 ? title : self.accessibilityLabel;
+}
+
+- (UIImage *)largeContentImage API_AVAILABLE(ios(13.0)) {
+    return [super largeContentImage] ?: self.currentImage;
+}
+
+/// [EN] The Large Content Viewer needs an interaction on an ancestor; add one to the bar when it has none.
+/// [CN] 大内容查看器需要祖先视图上有对应的 interaction；所在的 TabBar 没有时为其添加一个。
+- (void)cyl_installLargeContentViewerInteractionIfNeeded {
+    if (@available(iOS 13.0, *)) {
+        UIView *bar = self.superview;
+        if (!bar || !self.showsLargeContentViewer) {
+            return;
+        }
+        for (id<UIInteraction> interaction in bar.interactions) {
+            if ([interaction isKindOfClass:[UILargeContentViewerInteraction class]]) {
+                return;
+            }
+        }
+        [bar addInteraction:[[UILargeContentViewerInteraction alloc] init]];
+    }
 }
 #pragma mark -
 #pragma mark - public Methods
@@ -1455,6 +1529,7 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
 - (void)didMoveToSuperview {
     [super didMoveToSuperview];
     [self cyl_updateTouchableAreaView];
+    [self cyl_installLargeContentViewerInteractionIfNeeded];
     [self cyl_addTabBarItemGestureTargetsIfNeeded];
 }
 
@@ -1472,6 +1547,24 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     }
     [self addTarget:self action:@selector(cyl_tabBarItemGestureTouchDown) forControlEvents:UIControlEventTouchDown];
     [self addTarget:self action:@selector(cyl_tabBarItemGestureTouchUpInside) forControlEvents:UIControlEventTouchUpInside];
+    // [EN] The pressed animation (`CYLTabButtonAnimation` highlight / dehighlight), played by the tab bar controller.
+    // [CN] 按下动画（`CYLTabButtonAnimation` 的 highlight / dehighlight），由 TabBarController 播放。
+    [self addTarget:self action:@selector(cyl_tabButtonHighlightTouchDown) forControlEvents:UIControlEventTouchDown];
+    [self addTarget:self action:@selector(cyl_tabButtonHighlightTouchUp) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
+}
+
+- (void)cyl_tabButtonHighlightTouchDown {
+    CYLTabBarController *tabBarController = [self cyl_owningTabBarController];
+    if ([tabBarController respondsToSelector:@selector(cyl_tabButtonTouchDown:)]) {
+        [tabBarController cyl_tabButtonTouchDown:self];
+    }
+}
+
+- (void)cyl_tabButtonHighlightTouchUp {
+    CYLTabBarController *tabBarController = [self cyl_owningTabBarController];
+    if ([tabBarController respondsToSelector:@selector(cyl_tabButtonTouchUp:)]) {
+        [tabBarController cyl_tabButtonTouchUp:self];
+    }
 }
 
 - (void)cyl_tabBarItemGestureTouchDown {

@@ -319,6 +319,122 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
     return NSNotFound;
 }
 
+#pragma mark - Animation dispatch
+
+/// [EN] The steps of a `CYLTabButtonAnimation`. [CN] `CYLTabButtonAnimation` 的各个动画步骤。
+typedef NS_ENUM(NSInteger, CYLTabButtonAnimationStep) {
+    CYLTabButtonAnimationStepSelect,
+    CYLTabButtonAnimationStepDeselect,
+    CYLTabButtonAnimationStepReselect,
+    CYLTabButtonAnimationStepHighlight,
+    CYLTabButtonAnimationStepDehighlight,
+};
+
+/// [EN] The `cylPlay…` (no underscore) selector of `step`. [CN] `step` 对应的 `cylPlay…`（无下划线）方法。
+static SEL CYLCamelCaseSelectorForStep(CYLTabButtonAnimationStep step) {
+    switch (step) {
+        case CYLTabButtonAnimationStepSelect: return @selector(cylPlaySelectAnimationWithTabButton:iconView:titleLabel:);
+        case CYLTabButtonAnimationStepDeselect: return @selector(cylPlayDeselectAnimationWithTabButton:iconView:titleLabel:);
+        case CYLTabButtonAnimationStepReselect: return @selector(cylPlayReselectAnimationWithTabButton:iconView:titleLabel:);
+        case CYLTabButtonAnimationStepHighlight: return @selector(cylPlayHighlightAnimationWithTabButton:iconView:titleLabel:);
+        case CYLTabButtonAnimationStepDehighlight: return @selector(cylPlayDehighlightAnimationWithTabButton:iconView:titleLabel:);
+    }
+    return NULL;
+}
+
+/// [EN] The `cyl_play…` selector of `step`. [CN] `step` 对应的 `cyl_play…` 方法。
+static SEL CYLUnderscoreSelectorForStep(CYLTabButtonAnimationStep step) {
+    switch (step) {
+        case CYLTabButtonAnimationStepSelect: return @selector(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:);
+        case CYLTabButtonAnimationStepDeselect: return @selector(cyl_playDeselectAnimationWithTabButton:iconView:titleLabel:);
+        case CYLTabButtonAnimationStepReselect: return @selector(cyl_playReselectAnimationWithTabButton:iconView:titleLabel:);
+        case CYLTabButtonAnimationStepHighlight: return @selector(cyl_playHighlightAnimationWithTabButton:iconView:titleLabel:);
+        case CYLTabButtonAnimationStepDehighlight: return @selector(cyl_playDehighlightAnimationWithTabButton:iconView:titleLabel:);
+    }
+    return NULL;
+}
+
+/// [EN] Whether `animation` implements `step` in either spelling. [CN] `animation` 是否以任一写法实现了 `step`。
+static BOOL CYLTabButtonAnimationImplementsStep(id<CYLTabButtonAnimation> animation, CYLTabButtonAnimationStep step) {
+    return [animation respondsToSelector:CYLCamelCaseSelectorForStep(step)] ||
+           [animation respondsToSelector:CYLUnderscoreSelectorForStep(step)];
+}
+
+/*!
+ * [EN] Plays `step` of `animation` on `button`: the `cylPlay…` method when implemented, otherwise the `cyl_play…` one; both
+ *      spellings run through here, so they behave the same.
+ * [CN] 在 `button` 上播放 `animation` 的 `step`：实现了 `cylPlay…` 时调用它，否则调用 `cyl_play…`；两种写法都经过这里，行为相同。
+ */
+static void CYLPlayTabButtonAnimationStep(id<CYLTabButtonAnimation> animation, CYLTabButtonAnimationStep step,
+                                          UIControl *button, UIView *iconView, UILabel *_Nullable titleLabel) {
+    BOOL camelCase = [animation respondsToSelector:CYLCamelCaseSelectorForStep(step)];
+    if (!camelCase && ![animation respondsToSelector:CYLUnderscoreSelectorForStep(step)]) {
+#if defined(DEBUG) || defined(BETA)
+        // [EN] The select method is optional now, so a missing or misspelled one is no longer a compiler warning; log it
+        //      (an animation may leave select out on purpose, e.g. a press-only one, so this only logs).
+        // [CN] 选中方法现在是可选的，缺失或拼错不再有编译警告，因此在此打印日志（动画可以有意不实现选中，例如只有按压效果的动画，所以只打印）。
+        if (step == CYLTabButtonAnimationStepSelect && animation) {
+            NSLog(@"[CYLTabBarController] %@ implements neither -cylPlaySelectAnimationWithTabButton:iconView:titleLabel: nor -cyl_playSelectAnimationWithTabButton:iconView:titleLabel:; no select animation plays.", NSStringFromClass([(NSObject *)animation class]));
+        }
+#endif
+        return;
+    }
+    switch (step) {
+        case CYLTabButtonAnimationStepSelect:
+            if (camelCase) {
+                [animation cylPlaySelectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+            } else {
+                [animation cyl_playSelectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+            }
+            break;
+        case CYLTabButtonAnimationStepDeselect:
+            if (camelCase) {
+                [animation cylPlayDeselectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+            } else {
+                [animation cyl_playDeselectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+            }
+            break;
+        case CYLTabButtonAnimationStepReselect:
+            if (camelCase) {
+                [animation cylPlayReselectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+            } else {
+                [animation cyl_playReselectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+            }
+            break;
+        case CYLTabButtonAnimationStepHighlight:
+            if (camelCase) {
+                [animation cylPlayHighlightAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+            } else {
+                [animation cyl_playHighlightAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+            }
+            break;
+        case CYLTabButtonAnimationStepDehighlight:
+            if (camelCase) {
+                [animation cylPlayDehighlightAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+            } else {
+                [animation cyl_playDehighlightAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+            }
+            break;
+    }
+}
+
+/// [EN] Whether `animation` implements the badge-changed animation in either spelling. [CN] `animation` 是否以任一写法实现了角标变化动画。
+static BOOL CYLTabButtonAnimationImplementsBadgeChanged(id<CYLTabButtonAnimation> animation) {
+    return [animation respondsToSelector:@selector(cylPlayBadgeChangedAnimationWithTabButton:iconView:badgeView:)] ||
+           [animation respondsToSelector:@selector(cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:)];
+}
+
+/// [EN] Plays the badge-changed animation: `cylPlay…` first, then `cyl_play…`. [CN] 播放角标变化动画：优先 `cylPlay…`，其次 `cyl_play…`。
+static void CYLPlayTabButtonBadgeChangedAnimation(id<CYLTabButtonAnimation> animation, UIControl *button, UIView *iconView,
+                                                  UIView *_Nullable badgeView) {
+    if ([animation respondsToSelector:@selector(cylPlayBadgeChangedAnimationWithTabButton:iconView:badgeView:)]) {
+        [animation cylPlayBadgeChangedAnimationWithTabButton:button iconView:iconView badgeView:badgeView];
+    } else if ([animation respondsToSelector:@selector(cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:)]) {
+        [animation cyl_playBadgeChangedAnimationWithTabButton:button iconView:iconView badgeView:badgeView];
+    }
+}
+
+
 - (nullable id<CYLTabButtonAnimation>)cyl_animationForTabControl:(UIControl *)control {
     NSUInteger index = [self cyl_viewControllerIndexForTabControl:control];
     if (index != NSNotFound) {
@@ -351,18 +467,22 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
     // [CN] 之前选中的按钮播放取消选中动画（其动画实现了该方法时）。
     if (previousControl && previousControl != control) {
         id<CYLTabButtonAnimation> previousAnimation = [self cyl_animationForTabControl:previousControl];
-        if ([previousAnimation respondsToSelector:@selector(cyl_playDeselectAnimationWithTabButton:iconView:titleLabel:)]) {
+        if (CYLTabButtonAnimationImplementsStep(previousAnimation, CYLTabButtonAnimationStepDeselect)) {
             if (hasIndexes && [previousAnimation respondsToSelector:@selector(cyl_setToRight:)]) {
                 previousAnimation.cyl_toRight = previousIndex < index;
             }
             for (UIControl *layer in CYLTabButtonLayers(previousControl)) {
-                [previousAnimation cyl_playDeselectAnimationWithTabButton:layer
-                                                                 iconView:CYLTabButtonIconView(layer)
-                                                               titleLabel:CYLTabButtonTitleLabel(layer)];
+                CYLPlayTabButtonAnimationStep(previousAnimation, CYLTabButtonAnimationStepDeselect, layer,
+                                              CYLTabButtonIconView(layer), CYLTabButtonTitleLabel(layer));
             }
         }
     }
-    [self cyl_setWeakAssociatedObject:control forKey:CYLPreviousAnimatedControlKey];
+    // [EN] A plus button without a child view controller selects nothing: it is not recorded as the selected button.
+    // [CN] 没有子控制器的 PlusButton 不会选中任何页面：不记录为已选中的按钮。
+    BOOL isPlusButtonWithoutPage = [control isKindOfClass:[CYLPlusButton class]] && index == NSNotFound;
+    if (!isPlusButtonWithoutPage) {
+        [self cyl_setWeakAssociatedObject:control forKey:CYLPreviousAnimatedControlKey];
+    }
 
     id<CYLTabButtonAnimation> animation = [self cyl_animationForTabControl:control];
     CYLTabButtonResetAnimationIfReplaced(control, animation);
@@ -370,14 +490,115 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
         return;
     }
     objc_setAssociatedObject(control, CYLLastSelectAnimationKey, animation, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    // [EN] A tap on the button animated last whose tab is still selected (a reselect) plays the reselect animation when
+    //      the animation has one.
+    // [CN] 点击上一次播放动画、且其 Tab 仍处于选中状态的按钮（重复点击）时，若动画实现了重复点击动画，则播放它。
+    BOOL isReselect = previousControl == control && index != NSNotFound && index == self.selectedIndex;
+    if (isReselect && CYLTabButtonAnimationImplementsStep(animation, CYLTabButtonAnimationStepReselect)) {
+        for (UIControl *layer in CYLTabButtonLayers(control)) {
+            CYLPlayTabButtonAnimationStep(animation, CYLTabButtonAnimationStepReselect, layer,
+                                          CYLTabButtonIconView(layer), CYLTabButtonTitleLabel(layer));
+        }
+        return;
+    }
     if (hasIndexes && [animation respondsToSelector:@selector(cyl_setFromLeft:)]) {
         animation.cyl_fromLeft = previousIndex < index;
     }
     for (UIControl *layer in CYLTabButtonLayers(control)) {
-        [animation cyl_playSelectAnimationWithTabButton:layer
-                                               iconView:CYLTabButtonIconView(layer)
-                                             titleLabel:CYLTabButtonTitleLabel(layer)];
+        CYLPlayTabButtonAnimationStep(animation, CYLTabButtonAnimationStepSelect, layer,
+                                      CYLTabButtonIconView(layer), CYLTabButtonTitleLabel(layer));
     }
+}
+
+#pragma mark - Highlight (pressed) animation
+
+static const void *CYLHighlightedTabControlKey = &CYLHighlightedTabControlKey;
+
+/*!
+ * [EN] Plays the highlight (finger down) or dehighlight (finger up or cancelled) animation of `control`, when its
+ *      animation implements it. Only one button is highlighted at a time; a new press dehighlights the previous one.
+ * [CN] 播放 `control` 的按下（highlight）或抬起 / 取消（dehighlight）动画（其动画实现了对应方法时）。同一时间只有一个按钮处于按下状态；
+ *      新的按压会先让之前的按钮恢复。
+ */
+- (void)cyl_setTabButtonHighlighted:(BOOL)highlighted forControl:(nullable UIControl *)control {
+    UIControl *highlightedControl = [self cyl_weakAssociatedObjectForKey:CYLHighlightedTabControlKey];
+    if (highlighted) {
+        if (!control || control == highlightedControl) {
+            return;
+        }
+        if (highlightedControl) {
+            [self cyl_setTabButtonHighlighted:NO forControl:highlightedControl];
+        }
+    } else {
+        control = control ?: highlightedControl;
+        if (!control || control != highlightedControl) {
+            return;
+        }
+    }
+    [self cyl_setWeakAssociatedObject:(highlighted ? control : nil) forKey:CYLHighlightedTabControlKey];
+    id<CYLTabButtonAnimation> animation = [self cyl_animationForTabControl:control];
+    CYLTabButtonAnimationStep step = highlighted ? CYLTabButtonAnimationStepHighlight : CYLTabButtonAnimationStepDehighlight;
+    if (!CYLTabButtonAnimationImplementsStep(animation, step)) {
+        return;
+    }
+    for (UIControl *layer in CYLTabButtonLayers(control)) {
+        CYLPlayTabButtonAnimationStep(animation, step, layer, CYLTabButtonIconView(layer), CYLTabButtonTitleLabel(layer));
+    }
+}
+
+/// [EN] Touch targets of the classic and FlatDesign tab buttons and of the plus button. [CN] 经典、扁平样式 Tab 按钮与 PlusButton 的触摸事件。
+- (void)cyl_tabButtonTouchDown:(UIControl *)control {
+    [self cyl_setTabButtonHighlighted:YES forControl:control];
+}
+
+- (void)cyl_tabButtonTouchUp:(UIControl *)control {
+    [self cyl_setTabButtonHighlighted:NO forControl:control];
+}
+
+/*!
+ * [EN] Liquid Glass: UIKit's gestures receive the touches, so the press follows them: highlighted when one begins on a
+ *      tab, dehighlighted when it ends, is cancelled or fails.
+ * [CN] 液态玻璃：触摸由系统手势接收，因此按压状态跟随它们：手势在某个 Tab 上开始时按下，结束、取消或失败时恢复。
+ */
+- (void)cyl_updateTabButtonHighlightForLiquidGlassGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+    switch (gestureRecognizer.state) {
+        case UIGestureRecognizerStateBegan: {
+            UIControl *control = [self cyl_liquidGlassTabControlAtWindowPoint:[gestureRecognizer locationInView:self.view.window]];
+            [self cyl_setTabButtonHighlighted:YES forControl:control];
+            break;
+        }
+        case UIGestureRecognizerStateEnded:
+        case UIGestureRecognizerStateCancelled:
+        case UIGestureRecognizerStateFailed:
+            [self cyl_setTabButtonHighlighted:NO forControl:nil];
+            break;
+        default:
+            break;
+    }
+}
+
+#pragma mark - Badge-changed animation
+
+/*!
+ * [EN] Called by `CYLTabBar` when an item's `badgeValue` gets a new value: plays the badge-changed animation of that tab
+ *      (when its animation implements it) on the next run loop turn, on both Liquid Glass layers.
+ * [CN] 当 item 的 `badgeValue` 被设为新值时由 `CYLTabBar` 调用：在下一个 runloop 播放该 Tab 的角标变化动画（其动画实现了该方法时），
+ *      液态玻璃的两个图层都会播放。
+ */
+- (void)cyl_tabBarItemBadgeValueDidChange:(UITabBarItem *)item {
+    UIControl *control = item.cyl_tabButton;
+    if (!control) {
+        return;
+    }
+    id<CYLTabButtonAnimation> animation = [self cyl_animationForTabControl:control];
+    if (!CYLTabButtonAnimationImplementsBadgeChanged(animation)) {
+        return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (UIControl *layer in CYLTabButtonLayers(control)) {
+            CYLPlayTabButtonBadgeChangedAnimation(animation, layer, CYLTabButtonIconView(layer), [layer cyl_tabBadgeView]);
+        }
+    });
 }
 
 #pragma mark - Tap sound and haptic feedback
@@ -640,6 +861,11 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
  * [CN] `CYLTabBar` 对系统液态玻璃手势的每次更新调用。见 `CYLTabBarLiquidGlassPress`。PlusButton 仍走自己的路径（抬起事件与库的长按手势）。
  */
 - (void)cyl_liquidGlassTabBarGestureRecognizerDidUpdate:(UIGestureRecognizer *)gestureRecognizer {
+    // [EN] The pressed animation follows every Liquid Glass press, whatever else is handled below.
+    // [CN] 按压动画跟随每一次液态玻璃按压，与下方是否处理其他手势无关。
+    if ([CYLConstants isLiquidGlassActive]) {
+        [self cyl_updateTabButtonHighlightForLiquidGlassGestureRecognizer:gestureRecognizer];
+    }
     BOOL handlesLongPress = [self cyl_handlesTabButtonLongPress];
     BOOL handlesTaps = [self cyl_hasTabBarItemGestureReceiver];
     if ((!handlesLongPress && !handlesTaps) || ![self cyl_liquidGlassReceivesTabTouches]) {

@@ -14,6 +14,17 @@
 #import <objc/runtime.h>
 #import "CYLTabBar.h"
 
+/*!
+ * [EN] The object at `index`, or nil when `array` is nil or `index` is out of range (negative, `NSNotFound` or too
+ *      large). Used instead of `@try` / `@catch` around subscripts: under ARC an exception can leak, and a `@try` around
+ *      several reads skips every read after the first that throws.
+ * [CN] 返回 `index` 处的对象；`array` 为 nil 或 `index` 越界（负数、`NSNotFound` 或过大）时返回 nil。用来代替下标外的
+ *      `@try` / `@catch`：ARC 下抛出异常可能泄漏内存，而包住多次读取的 `@try` 会在第一次抛出后跳过其余全部读取。
+ */
+static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUInteger index) {
+    return index < array.count ? array[index] : nil;
+}
+
 @implementation CYLTabBar (CYLTabBarControllerExtention)
 
 /*!
@@ -171,26 +182,13 @@
         return selectedControl;
     }
     
-    @try {
-        selectedControl = [self cyl_subTabBarButtonsWithoutPlusButton][tabIndex];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    selectedControl = CYLObjectAtIndex([self cyl_subTabBarButtonsWithoutPlusButton], tabIndex);
     return selectedControl;
 }
 
 - (UIControl *)cyl_visibleControlWithIndex:(NSUInteger)index {
     UIControl *selectedControl;
-    @try {
-        NSArray *subControls = self.cyl_visibleControls;
-        selectedControl = subControls[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    selectedControl = CYLObjectAtIndex(self.cyl_visibleControls, index);
     return selectedControl;
 }
 
@@ -256,14 +254,8 @@
     if (NSNotFound == index) {
         return nil;
     }
-    @try {
-        //FIXME:  to delete cyl_subTabBarButtonsWithoutPlusButton
-        contentControl = [self.cyl_subTabBarButtons objectAtIndex:index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    //FIXME:  to delete cyl_subTabBarButtonsWithoutPlusButton
+    contentControl = CYLObjectAtIndex(self.cyl_subTabBarButtons, index);
     if (!contentControl) {
         return nil;
     }
@@ -292,31 +284,20 @@
     return fabs(WidthOffsetWithIndex);
 }
 
-- (UIControl *)cyl_selectedControl {
+- (UIControl * _Null_unspecified)cyl_selectedControl {
     UIControl *selectedControl = objc_getAssociatedObject(self, @selector(cyl_selectedControl));
     if (!selectedControl) {
-        @try {
-            do {
-                selectedControl = self.cyl_platterSelectedContentViews[0];
-                
-                if (selectedControl) {
-                    break;
-                }
-                selectedControl = self.cyl_platterContentViews[0];
-                
-                if (selectedControl) {
-                    break;
-                }
-                selectedControl = self.cyl_visibleControls[0];
-                
-                if (selectedControl) {
-                    break;
-                }
-            } while (false); // same as : 0, NO
-        } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
+        // [EN] Each candidate is read with a bounds check: the old `@try` around `[0]` jumped to `@catch` on the first empty
+        //      array, so the fallbacks after it never ran and this returned nil. Only controls count: the first subview of a
+        //      tab bar that is not Liquid Glass can be a background view.
+        // [CN] 每个候选都先检查下标再读取：原来 `[0]` 外的 `@try` 在第一个空数组处就跳到 `@catch`，后面的备选从未执行，结果返回 nil。
+        //      只接受控件：非液态玻璃 TabBar 的第一个子视图可能是背景视图。
+        for (NSArray *candidates in @[ self.cyl_platterSelectedContentViews ?: @[], self.cyl_platterContentViews ?: @[], self.cyl_visibleControls ?: @[] ]) {
+            id candidate = CYLObjectAtIndex(candidates, 0);
+            if ([candidate isKindOfClass:[UIControl class]]) {
+                selectedControl = candidate;
+                break;
+            }
         }
     }
     return selectedControl;
@@ -621,13 +602,7 @@
 - (UIView *)cyl_platterViewWithIndex:(NSInteger)index {
     //    - (BOOL)cyl_isPlatterView; {
     UIView *view = nil;
-    @try {
-        view = self.cyl_platterViews[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    view = CYLObjectAtIndex(self.cyl_platterViews, index);
     return view;
 }
 - (NSArray *)cyl_platterContentViews {
@@ -636,13 +611,7 @@
 
 - (UIView *)cyl_platterContentViewWithIndex:(NSInteger)index {
     UIView *view = nil;
-    @try {
-        view = self.cyl_platterContentViews[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    view = CYLObjectAtIndex(self.cyl_platterContentViews, index);
     return  view;
 }
 
@@ -792,26 +761,14 @@
 - (UIControl *)cyl_platterSelectedContentViewWithoutPlusButttonWithIndex:(NSInteger)index {
     //    - (BOOL)cyl_isPlatterView; {
     UIControl *view = nil;
-    @try {
-        view = self.cyl_platterSelectedContentViewsWithoutPlusButton[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    view = CYLObjectAtIndex(self.cyl_platterSelectedContentViewsWithoutPlusButton, index);
     return view;
 }
 
 - (UIControl *)cyl_platterSelectedContentViewWithIndex:(NSInteger)index {
     //    - (BOOL)cyl_isPlatterView; {
     UIControl *view = nil;
-    @try {
-        view = self.cyl_platterSelectedContentViews[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    view = CYLObjectAtIndex(self.cyl_platterSelectedContentViews, index);
     return view;
 }
 
@@ -822,13 +779,7 @@
 - (UIView *)cyl_platterPortalViewWithIndex:(NSInteger)index {
     //    - (BOOL)cyl_isPlatterView; {
     UIView *view = nil;
-    @try {
-        view = self.cyl_platterPortalViews[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    view = CYLObjectAtIndex(self.cyl_platterPortalViews, index);
     return view;
 }
 
