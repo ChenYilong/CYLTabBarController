@@ -33,6 +33,7 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Protocol Buffers](#cnprotocol-buffers) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Protocol Buffers](#enprotocol-buffers) |
 | [流程](#cn流程) | [Flow](#enflow) |
 | [演示](#cn演示) | [Demo](#endemo) |
+| [边界情况与评分](#cn边界情况与评分) | [Edge cases and score](#enedge-cases-and-score) |
 | [限制](#cn限制) | [Limits](#enlimits) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
@@ -232,6 +233,77 @@ flowchart TD
 |:---|:---|
 | Example 的设置列表中“跳转与对比”分组的第一行“从配置文件创建 TabBarController”：选择 17 个示例文件之一（JSON、JSON5、JSONC、XML / 二进制 / OpenStep plist、.strings、YAML、YML、TOML、INI、CFG、.properties、.env、XML、Protobuf 文本与二进制），或“从网络 URL 加载”（GitHub 上的 YAML 示例）。生成的 TabBarController 全屏展示，每个页面显示其来源文件的内容，左上角“关闭”返回。 | In the Example's settings list, the first row of the "Navigation and comparisons" section, "Create a TabBarController from a configuration file": choose one of the 17 sample files (JSON, JSON5, JSONC, XML / binary / OpenStep plist, .strings, YAML, YML, TOML, INI, CFG, .properties, .env, XML, Protobuf text and binary), or "Load from a URL" (the YAML sample on GitHub). The tab bar controller it creates is presented full screen; every page shows the file it came from, and Close (top left) goes back. |
 | 演示代码：`UIViewController+CYLConfigurationDemo.h/.m`；示例 URL 在合并到 master 后可用。 | Demo code: `UIViewController+CYLConfigurationDemo.h/.m`; the sample URL works once this is merged into master. |
+
+## [CN]边界情况与评分
+## [EN]Edge cases and score
+
+| 中文 | English |
+|:---|:---|
+| 配置文件可能来自网络，内容不可信。下表列出所有已考虑的边界情况及其处理方式。评分 = 已处理的情况 / 全部情况（部分处理计一半），每一轮修复后重新评分；复查中新发现的情况会加入表格，因此分数可能下降。Demo 中“配置文件：模拟意外情况”分组可以逐一触发这些情况。 | A configuration may come from the network: its content cannot be trusted. The table lists every edge case considered and how it is handled. Score = handled cases / all cases (partly handled counts half), scored again after each round of fixes; cases found during a review are added to the table, so the score can drop. The demo's "Configuration: simulated failures" section triggers them one by one. |
+
+<!-- edge-cases:start -->
+<!-- Generated from the edge-case checklist; the status column is the round that handled each case. -->
+
+| 编号 ID | 情况 | Case | 处理 | Handling | 状态 Status |
+|:---|:---|:---|:---|:---|:---|
+| A1 | 文件路径为 nil 或空字符串 | The file path is nil or empty | 返回 nil 与 FileNotFound 错误 | nil and a FileNotFound error | ✅ 第 1 轮 / round 1 |
+| A2 | 文件不存在、是目录或无读取权限 | The file is missing, a directory or unreadable | 返回 nil 与 FileNotFound 错误 | nil and a FileNotFound error | ✅ 第 1 轮 / round 1 |
+| A3 | 文件为 0 字节 | The file has 0 bytes | Empty 错误（以前 YAML 等格式会生成没有 Tab 的控制器） | An Empty error (YAML and others used to give a controller with no tabs) | 🟡 部分 / partial |
+| A4 | 文件只有空白或注释 | The file has only whitespace or comments | Empty 错误 | An Empty error | ❌ 未处理 / not yet |
+| A5 | 不是合法的 UTF-8 文本 | Not valid UTF-8 text | InvalidSyntax 错误 | An InvalidSyntax error | ✅ 第 1 轮 / round 1 |
+| A6 | 以 UTF-8 BOM 开头 | Starts with a UTF-8 BOM | 自动去掉 BOM | The BOM is skipped | ✅ 第 1 轮 / round 1 |
+| A7 | 扩展名与内容不符（如 .json 中是 YAML） | The extension does not match the content (YAML in a .json file) | 按扩展名解析失败后根据内容识别并重试 | When the extension's format fails, the content is detected and parsed again | ❌ 未处理 / not yet |
+| A8 | 扩展名未知或缺失 | An unknown or missing extension | 根据内容识别格式 | The format is detected from the content | ✅ 第 1 轮 / round 1 |
+| A9 | 文件过大（例如 1 GB） | A huge file (e.g. 1 GB) | 超过 5 MB 时返回 TooLarge 错误，不读入内存解析 | Over 5 MB: a TooLarge error, nothing is parsed | ❌ 未处理 / not yet |
+| A10 | 嵌套过深（如 10 万层 `[[[[`）导致栈溢出 | Deep nesting (e.g. 100,000 levels of `[[[[`) overflows the stack | 超过 64 层时返回 TooDeep 错误，所有递归解析器都有层数限制 | Over 64 levels: a TooDeep error; every recursive parser has a depth limit | ❌ 未处理 / not yet |
+| A11 | 顶层不是字典（数组、字符串、数字） | The top level is not a dictionary (a list, a string, a number) | NotADictionary 错误 | A NotADictionary error | ✅ 第 1 轮 / round 1 |
+| A12 | 截断或无效的二进制 plist / protobuf | A truncated or invalid binary plist / protobuf | InvalidSyntax 错误，越界读取被拒绝 | An InvalidSyntax error; out-of-bounds reads are refused | ✅ 第 1 轮 / round 1 |
+| A13 | 语法错误 | A syntax error | 错误描述包含格式与行号 | The error names the format and the line | ✅ 第 1 轮 / round 1 |
+| A14 | XML 外部实体（XXE） | XML external entities (XXE) | 显式关闭外部实体解析 | External entities are explicitly not resolved | 🟡 部分 / partial |
+| A15 | 重复的键 | Duplicate keys | 后出现的值生效，不崩溃 | The last value wins, no crash | ✅ 第 1 轮 / round 1 |
+| B1 | 没有 Tab（缺少或为空的 `CYLTabBarControllerTabBarItemsAttributes`） | No tabs (missing or empty `CYLTabBarControllerTabBarItemsAttributes`) | 读取文件或 URL 时返回 NoTabs 错误；代码中初始化时保持原行为并输出警告 | Files and URLs: a NoTabs error; in code: unchanged behavior and a warning | ❌ 未处理 / not yet |
+| B2 | Tab 列表不是数组（字符串、数字） | The tab list is not a list (a string, a number) | 视为没有 Tab，见 B1 | Treated as no tabs, see B1 | 🟡 部分 / partial |
+| B3 | 只有一个 Tab 且写成字典（Protobuf 文本、XML） | A single tab written as a dictionary (Protobuf text, XML) | 自动包装为列表 | Wrapped into a list | ✅ 第 1 轮 / round 1 |
+| B4 | Tab 列表中的元素不是字典 | A tab entry is not a dictionary | 代码传入子控制器时用空字典占位，保持下标对应；根据配置创建子控制器时跳过 | With view controllers from code: an empty placeholder keeps the indexes; when they are created: skipped | 🟡 部分 / partial |
+| B5 | 字符串键的值类型错误（标题为数组、字典） | A string key has the wrong type (a title that is a list or a dictionary) | 数字转换为字符串，其他类型移除；以前会因 unrecognized selector 崩溃 | Numbers become strings, other types are removed; this used to crash (unrecognized selector) | ❌ 未处理 / not yet |
+| B6 | 值为 null（JSON null、YAML ~） | A value is null (JSON null, YAML ~) | 移除该键；以前在 item 中会崩溃 | The key is removed; inside an item this used to crash | ❌ 未处理 / not yet |
+| B7 | 内边距 / 偏移为 NaN、Infinity 或极大值 | Insets / offsets are NaN, Infinity or huge | 非有限值或绝对值超过 1000 时移除；以前会触发 CALayer NaN 异常 | Non-finite values or values over 1000 are removed; this used to raise a CALayer NaN exception | ❌ 未处理 / not yet |
+| B8 | 尺寸为负数、0 或极大值 | A size is negative, zero or huge | 要求 0 < 值 ≤ 1000，否则移除 | Requires 0 < value ≤ 1000, removed otherwise | ❌ 未处理 / not yet |
+| B9 | 未知的样式名称或超出范围的样式编号（如 99） | An unknown style name or an out-of-range style number (e.g. 99) | 使用默认样式并输出警告 | The default style and a warning | 🟡 部分 / partial |
+| B10 | 请求扁平样式但未集成 FlatDesign 子库 | FlatDesign requested without the FlatDesign subspec | 使用默认样式并输出警告 | The default style and a warning | ❌ 未处理 / not yet |
+| B11 | 拼写错误的键（如 `CYLTabBarItemTitel`） | A misspelled key (e.g. `CYLTabBarItemTitel`) | 保留（App 可能有自定义键），DEBUG 下提示最接近的已知键 | Kept (the app may use its own keys); DEBUG names the closest known key | ❌ 未处理 / not yet |
+| B12 | 重复的 `CYLTabBarItemIdentifier` | A duplicate `CYLTabBarItemIdentifier` | 后出现的改为「标识_2」等并输出警告 | Later ones become "identifier_2"..., with a warning | ❌ 未处理 / not yet |
+| B13 | 无效的图片 / Lottie URL，或不存在的本地 Lottie 文件 | An invalid image / Lottie URL, or a missing local Lottie file | 只接受 http(s) 与存在的本地文件，否则移除 | Only http(s) URLs and existing local files are kept | ❌ 未处理 / not yet |
+| B14 | 图片名称或 SF Symbol 不存在 | An image name or SF Symbol that does not exist | 该 Tab 没有图标，不崩溃 | The tab has no icon, no crash | ✅ 第 1 轮 / round 1 |
+| B15 | Tab 很多（超过 5 个） | Many tabs (more than 5) | 由 UIKit 处理（“更多”） | Handled by UIKit ("More") | ✅ 第 1 轮 / round 1 |
+| B16 | 超长标题 | A very long title | 不崩溃，由 UIKit 截断显示 | No crash; UIKit truncates it | ✅ 第 1 轮 / round 1 |
+| C1 | 子控制器类不存在 | The view controller class does not exist | 使用 UIViewController 并输出警告 | UIViewController and a warning | ✅ 第 1 轮 / round 1 |
+| C2 | 类不是 UIViewController（如 NSString） | The class is not a UIViewController (e.g. NSString) | 使用 UIViewController 并输出警告 | UIViewController and a warning | ✅ 第 1 轮 / round 1 |
+| C3 | 子控制器类是 UITabBarController / UINavigationController / UIAlertController 等容器 | The class is a container: UITabBarController, UINavigationController, UIAlertController... | 拒绝并使用 UIViewController | Refused; UIViewController is used | ❌ 未处理 / not yet |
+| C4 | 子控制器的 -init 抛出异常 | The view controller's -init raises an exception | 捕获异常并使用 UIViewController | The exception is caught; UIViewController is used | ❌ 未处理 / not yet |
+| C5 | 导航控制器类无效 | An invalid navigation controller class | 不嵌入导航控制器 | Not embedded | ✅ 第 1 轮 / round 1 |
+| C6 | `CYLTabBarControllerViewControllers` 中有非控制器对象 | `CYLTabBarControllerViewControllers` holds objects that are not view controllers | 移除这些对象；以前会崩溃 | They are removed; this used to crash | ❌ 未处理 / not yet |
+| C7 | 同一个子控制器出现两次 | The same view controller twice | 移除重复项；以前 UIKit 会抛异常 | The duplicate is removed; UIKit used to raise | ❌ 未处理 / not yet |
+| C8 | 子控制器数量与 Tab 数量不一致 | More or fewer view controllers than tabs | 本库按下标保护，不越界 | The library checks indexes, no out-of-bounds access | ✅ 第 1 轮 / round 1 |
+| D1 | URL 为 nil | A nil URL | 回调返回 FileNotFound 错误 | The completion gets a FileNotFound error | ✅ 第 1 轮 / round 1 |
+| D2 | 不支持的 scheme 或无效 URL | An unsupported scheme or an invalid URL | 回调返回 Network 错误 | The completion gets a Network error | ✅ 第 1 轮 / round 1 |
+| D3 | HTTP 4xx / 5xx | HTTP 4xx / 5xx | Network 错误，包含状态码 | A Network error with the status code | ✅ 第 1 轮 / round 1 |
+| D4 | 无网络、DNS 失败 | No network, a DNS failure | Network 错误（NSUnderlyingErrorKey 为原始错误） | A Network error (NSUnderlyingErrorKey holds the original) | ✅ 第 1 轮 / round 1 |
+| D5 | 服务器不响应 | The server does not answer | 默认 15 秒超时（以前为系统默认的 60 秒）；可传入自定义 NSURLRequest | A 15 s timeout by default (it was the system's 60 s); a custom NSURLRequest can be passed | ❌ 未处理 / not yet |
+| D6 | 响应体为空 | An empty response body | Empty 错误 | An Empty error | 🟡 部分 / partial |
+| D7 | 返回 HTML 页面（如公共 Wi-Fi 的登录页） | An HTML page instead (e.g. a captive Wi-Fi portal) | 识别为没有 Tab 的配置，返回 NoTabs 错误；以前会生成空的 TabBar | Detected as a configuration with no tabs: a NoTabs error; it used to give an empty tab bar | ❌ 未处理 / not yet |
+| D8 | 响应过大 | A huge response | 超过 5 MB 时返回 TooLarge 错误 | Over 5 MB: a TooLarge error | ❌ 未处理 / not yet |
+| D9 | Content-Type 错误（如 text/plain） | A wrong Content-Type (e.g. text/plain) | 根据扩展名或内容识别 | Detected from the extension or the content | ✅ 第 1 轮 / round 1 |
+| D10 | 请求被取消 | The request is cancelled | 回调仍会执行一次，返回 Network 错误 | The completion still runs once, with a Network error | ✅ 第 1 轮 / round 1 |
+| D11 | 回调线程与次数 | Completion thread and count | 总在主队列执行且只执行一次 | Always on the main queue, exactly once | ✅ 第 1 轮 / round 1 |
+| D12 | completion 为 nil | A nil completion | 不发起请求，返回 nil | No request is made; returns nil | ✅ 第 1 轮 / round 1 |
+| E1 | 在后台线程读取文件并创建控制器 | Reading a file and creating the controller on a background thread | 文件接口返回 MainThreadRequired 错误；代码初始化输出警告（与原行为一致） | The file APIs return a MainThreadRequired error; the code initializer warns (as before) | ❌ 未处理 / not yet |
+| E2 | 在后台线程只解析配置字典 | Only parsing the dictionary on a background thread | 解析器只依赖 Foundation，线程安全 | The parser is Foundation only and thread-safe | ✅ 第 1 轮 / round 1 |
+
+| 轮次 Round | 分数 Score | 情况数 Cases | 说明 | Notes | 减分项 Deductions |
+|:---|:---|:---|:---|:---|:---|
+| 1 | 55 | 53 | 基线：解析器已能拒绝大部分无效文件，但值的类型、NaN、嵌套深度、空文件与 HTML 页面等会导致崩溃或生成空 TabBar。 | Baseline: the parser already refuses most invalid files, but wrong value types, NaN, deep nesting, empty files and HTML pages crash or give an empty tab bar. | A3, A4, A7, A9, A10, A14, B1, B2, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, C3, C4, C6, C7, D5, D6, D7, D8, E1 |
+<!-- edge-cases:end -->
 
 ## [CN]限制
 ## [EN]Limits
