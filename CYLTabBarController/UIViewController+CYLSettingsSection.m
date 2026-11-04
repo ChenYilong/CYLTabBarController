@@ -12,6 +12,8 @@
 #import "UITableViewCell+CYLBadgeExtention.h"
 #import "CYLTabBarController.h"
 #import "CYLPlusButton.h"
+#import "UIView+CYLUtils.h"
+#import "NSObject+CYLUtils.h"
 #import <objc/runtime.h>
 
 const NSInteger CYLSettingsSection = 0;
@@ -33,6 +35,10 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowBundleImage,               // FIX: issue #535
     CYLSettingsRowNavigationWithoutBaseClass, // FIX: issue #535
     CYLSettingsRowSlideTransition,           // FIX: issue #535
+    CYLSettingsRowTapFeedback,               // FIX: issue #535
+    CYLSettingsRowGestureTiming,             // FIX: issue #535 / #152
+    CYLSettingsRowSwitchAdjacentTab,         // FIX: issue #535
+    CYLSettingsRowUtilsHelpers,              // FIX: issue #535
     CYLSettingsRowTabBarItemUpdate,     // then one row per tab item update, see UIViewController+CYLTabBarItemUpdate.h
 };
 
@@ -527,6 +533,11 @@ static NSString *CYLTabButtonTapAnimationTypeName(CYLTabButtonTapAnimationType t
 typedef NS_ENUM(NSInteger, CYLDemoTapAnimationStep) {
     CYLDemoTapAnimationStepOneTabRotation = CYLTabButtonTapAnimationTypeFume + 1,
     CYLDemoTapAnimationStepDefaultFrameAnimation,
+    // [EN] The classes with their properties set. [CN] 设置了属性的动画类。
+    CYLDemoTapAnimationStepSlowScale,
+    CYLDemoTapAnimationStepSlowZoomIn,
+    CYLDemoTapAnimationStepStarFireworks,
+    CYLDemoTapAnimationStepCurlUp,
     CYLDemoTapAnimationStepCount,
 };
 
@@ -549,12 +560,57 @@ static NSArray<UIImage *> *CYLDemoFrameImages(void) {
     return images;
 }
 
+/// [EN] The animation classes with their properties set. [CN] 设置了属性的动画类。
+static id<CYLTabButtonAnimation> _Nullable CYLDemoConfiguredTapAnimation(NSInteger step) {
+    switch (step) {
+        case CYLDemoTapAnimationStepSlowScale: {
+            CYLTabButtonScaleAnimation *animation = [[CYLTabButtonScaleAnimation alloc] init];
+            animation.duration = 1.2;
+            return animation;
+        }
+        case CYLDemoTapAnimationStepSlowZoomIn: {
+            CYLTabButtonZoomInAnimation *animation = [[CYLTabButtonZoomInAnimation alloc] init];
+            animation.duration = 1.2;
+            return animation;
+        }
+        case CYLDemoTapAnimationStepStarFireworks: {
+            CYLTabButtonBounceAnimation *animation = [[CYLTabButtonBounceAnimation alloc] init];
+            animation.playsFireworks = YES;
+            if (@available(iOS 13.0, *)) {
+                UIImageSymbolConfiguration *configuration = [UIImageSymbolConfiguration configurationWithPointSize:8];
+                animation.fireworksImage = [[UIImage systemImageNamed:@"star.fill" withConfiguration:configuration] imageWithTintColor:[UIColor systemYellowColor] renderingMode:UIImageRenderingModeAlwaysOriginal];
+            }
+            return animation;
+        }
+        case CYLDemoTapAnimationStepCurlUp: {
+            CYLTabButtonFlipAnimation *animation = [[CYLTabButtonFlipAnimation alloc] init];
+            animation.direction = 5;
+            animation.disablesDeselectAnimation = YES;
+            return animation;
+        }
+        default:
+            return nil;
+    }
+}
+
 static NSString *CYLDemoTapAnimationStepName(NSInteger step) {
     if (step == CYLDemoTapAnimationStepOneTabRotation) {
         return CYLLocalizedString(@"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）");
     }
     if (step == CYLDemoTapAnimationStepDefaultFrameAnimation) {
         return CYLLocalizedString(@"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）");
+    }
+    if (step == CYLDemoTapAnimationStepSlowScale) {
+        return CYLLocalizedString(@"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）");
+    }
+    if (step == CYLDemoTapAnimationStepSlowZoomIn) {
+        return CYLLocalizedString(@"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）");
+    }
+    if (step == CYLDemoTapAnimationStepStarFireworks) {
+        return CYLLocalizedString(@"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）");
+    }
+    if (step == CYLDemoTapAnimationStepCurlUp) {
+        return CYLLocalizedString(@"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）");
     }
     return CYLTabButtonTapAnimationTypeName((CYLTabButtonTapAnimationType)step);
 }
@@ -600,6 +656,9 @@ static void CYLSwitchTabButtonTapAnimation(CYLTabBarController *_Nullable tabBar
         frameAnimation.images = CYLDemoFrameImages();
         frameAnimation.playsFireworks = YES;
         tabBarController.cyl_defaultTabButtonAnimation = frameAnimation;
+    } else if (next >= CYLDemoTapAnimationStepSlowScale) {
+        tabBarController.cyl_tabButtonTapAnimationType = CYLTabButtonTapAnimationTypeNone;
+        tabBarController.cyl_defaultTabButtonAnimation = CYLDemoConfiguredTapAnimation(next);
     } else {
         tabBarController.cyl_tabButtonTapAnimationType = (CYLTabButtonTapAnimationType)next;
     }
@@ -822,8 +881,27 @@ static UITableViewCell *CYLBundleImageCell(UITableView *tableView) {
     cell.imageView.image = CYLImageInBundle(CYLResourceBundle(), nil, fileName);
     UIImage *mainBundleImage = CYLBundleImage(nil, @"CYLTabBarController", nil, fileName);
     NSString *mainBundleResult = mainBundleImage ? CYLLocalizedString(@"已找到") : CYLLocalizedString(@"未找到（use_frameworks 时资源包位于 framework 中）");
+    // [EN] Every other loader once, each with its result. [CN] 其他每个加载函数各调用一次，并显示结果。
+    NSString *(^found)(id) = ^NSString *(id value) {
+        return value ? @"✓" : @"✗";
+    };
+    NSString *pathInBundle = CYLImagePathInBundle(CYLResourceBundle(), nil, @"cyl_badge_sample_icon@3x");
+    NSString *mainBundlePath = CYLBundleImagePath(nil, @"CYLTabBarController", nil, fileName);
+    NSData *mainBundleData = CYLBundleImageData(nil, @"CYLTabBarController", nil, fileName);
+    UIImage *imageFromData = CYLBundleImageFromData(nil, @"CYLTabBarController", nil, fileName);
+    // [EN] `imageNamed:` also takes a path inside a bundle of the main bundle (cached by the system).
+    // [CN] `imageNamed:` 也接受主 bundle 中某个 bundle 内的路径（由系统缓存）。
+    UIImage *namedImage = CYLImageNamed(@"CYLTabBarController.bundle/cyl_badge_sample_icon");
+    NSString *loaders = [NSString stringWithFormat:@"CYLImagePathInBundle %@ (%@) · CYLBundleImagePath %@ · CYLBundleImageData %@ · CYLBundleImageFromData %@ (@%@x) · CYLImageNamed %@",
+                         found([[NSFileManager defaultManager] fileExistsAtPath:pathInBundle ?: @""] ? pathInBundle : nil),
+                         pathInBundle.lastPathComponent ?: @"-",
+                         found(mainBundlePath && [[NSFileManager defaultManager] fileExistsAtPath:mainBundlePath] ? mainBundlePath : nil),
+                         mainBundleData ? [NSByteCountFormatter stringFromByteCount:(long long)mainBundleData.length countStyle:NSByteCountFormatterCountStyleFile] : found(nil),
+                         found(imageFromData), imageFromData ? @(imageFromData.scale) : @"-",
+                         found(namedImage)];
     cell.textLabel.text = CYLLocalizedString(@"从 bundle 加载图片（issue #535）");
     cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@"), mainBundleResult];
+    cell.detailTextLabel.text = [cell.detailTextLabel.text stringByAppendingFormat:@"\n%@", loaders];
     return cell;
 }
 
@@ -1007,6 +1085,259 @@ static UITableViewCell *CYLSlideTransitionCell(UITableView *tableView) {
     return cell;
 }
 
+#pragma mark - Tap sound and haptic feedback (issue #535)
+
+static NSString *const CYLTapFeedbackCellIdentifier = @"CYLTapFeedbackCell";
+
+/*!
+ * [EN] The steps the tap feedback row cycles through: off, the default click, a custom sound file, haptics of three
+ *      strengths, then sound and haptic together.
+ * [CN] 点击反馈行依次切换的步骤：关闭、默认点击声、自定义音频文件、三种强度的触感反馈、声音与触感同时开启。
+ */
+typedef NS_ENUM(NSInteger, CYLDemoTapFeedbackStep) {
+    CYLDemoTapFeedbackStepOff,
+    CYLDemoTapFeedbackStepDefaultSound,
+    CYLDemoTapFeedbackStepCustomSound,
+    CYLDemoTapFeedbackStepLightHaptic,
+    CYLDemoTapFeedbackStepMediumHaptic,
+    CYLDemoTapFeedbackStepHeavyHaptic,
+    CYLDemoTapFeedbackStepSoundAndHaptic,
+    CYLDemoTapFeedbackStepCount,
+};
+
+static char CYLDemoTapFeedbackStepKey;
+
+/// [EN] A system sound file for the custom sound step, nil when the system does not have it. [CN] 自定义声音步骤使用的系统音频文件，系统中没有时为 nil。
+static NSURL *_Nullable CYLDemoCustomTapSoundURL(void) {
+    NSString *path = @"/System/Library/Audio/UISounds/Tock.caf";
+    return [[NSFileManager defaultManager] fileExistsAtPath:path] ? [NSURL fileURLWithPath:path] : nil;
+}
+
+static NSString *CYLDemoTapFeedbackStepName(NSInteger step) {
+    switch (step) {
+        case CYLDemoTapFeedbackStepDefaultSound: return CYLLocalizedString(@"默认点击声");
+        case CYLDemoTapFeedbackStepCustomSound: return CYLLocalizedString(@"自定义音频文件（cyl_tabButtonTapSoundURL）");
+        case CYLDemoTapFeedbackStepLightHaptic: return CYLLocalizedString(@"轻触感反馈");
+        case CYLDemoTapFeedbackStepMediumHaptic: return CYLLocalizedString(@"中等触感反馈");
+        case CYLDemoTapFeedbackStepHeavyHaptic: return CYLLocalizedString(@"重触感反馈");
+        case CYLDemoTapFeedbackStepSoundAndHaptic: return CYLLocalizedString(@"点击声 + 触感反馈");
+        case CYLDemoTapFeedbackStepOff:
+        default: return CYLLocalizedString(@"无");
+    }
+}
+
+static UITableViewCell *CYLTapFeedbackCell(UITableView *tableView, CYLTabBarController *_Nullable tabBarController) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLTapFeedbackCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLTapFeedbackCellIdentifier];
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"speaker.wave.2"];
+        }
+    }
+    NSInteger step = [objc_getAssociatedObject(tabBarController, &CYLDemoTapFeedbackStepKey) integerValue];
+    cell.textLabel.text = CYLLocalizedString(@"Tab 点击声音与触感反馈（issue #535）");
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@"), CYLDemoTapFeedbackStepName(step)];
+    return cell;
+}
+
+/// [EN] Moves to the next step and plays it once at once. [CN] 切换到下一步，并立即播放一次。
+static void CYLSwitchTapFeedback(CYLTabBarController *_Nullable tabBarController) {
+    if (!tabBarController) {
+        return;
+    }
+    NSInteger step = ([objc_getAssociatedObject(tabBarController, &CYLDemoTapFeedbackStepKey) integerValue] + 1) % CYLDemoTapFeedbackStepCount;
+    objc_setAssociatedObject(tabBarController, &CYLDemoTapFeedbackStepKey, @(step), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    tabBarController.cyl_tabButtonTapSoundEnabled = (step == CYLDemoTapFeedbackStepDefaultSound ||
+                                                     step == CYLDemoTapFeedbackStepCustomSound ||
+                                                     step == CYLDemoTapFeedbackStepSoundAndHaptic);
+    tabBarController.cyl_tabButtonTapSoundURL = (step == CYLDemoTapFeedbackStepCustomSound) ? CYLDemoCustomTapSoundURL() : nil;
+    UIImpactFeedbackStyle style = UIImpactFeedbackStyleMedium;
+    if (step == CYLDemoTapFeedbackStepLightHaptic) {
+        style = UIImpactFeedbackStyleLight;
+    } else if (step == CYLDemoTapFeedbackStepHeavyHaptic) {
+        style = UIImpactFeedbackStyleHeavy;
+    }
+    tabBarController.cyl_tabButtonHapticFeedbackStyle = style;
+    tabBarController.cyl_tabButtonHapticFeedbackEnabled = (step >= CYLDemoTapFeedbackStepLightHaptic);
+    [tabBarController cyl_playTabButtonTapFeedback];
+}
+
+#pragma mark - Long press and double tap timing (issue #535 / #152)
+
+static NSString *const CYLGestureTimingCellIdentifier = @"CYLGestureTimingCell";
+
+/// [EN] The long press durations and double tap intervals the row cycles through, the default first.
+/// [CN] 该行依次切换的长按时长与双击间隔，第一个为默认值。
+static const NSTimeInterval CYLDemoLongPressDurations[] = { 0.5, 1.0, 0.25 };
+static const NSTimeInterval CYLDemoDoubleTapIntervals[] = { 0.35, 0.6, 0.25 };
+static const NSUInteger CYLDemoGestureTimingCount = sizeof(CYLDemoLongPressDurations) / sizeof(CYLDemoLongPressDurations[0]);
+
+static UITableViewCell *CYLGestureTimingCell(UITableView *tableView, CYLTabBarController *_Nullable tabBarController) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLGestureTimingCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLGestureTimingCellIdentifier];
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"timer"];
+        }
+    }
+    cell.textLabel.text = CYLLocalizedString(@"长按时长与双击间隔（issue #535 / #152）");
+    // [EN] Both long press properties are read, to show they are one value. [CN] 读取两个长按属性，说明它们是同一个值。
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒"),
+                                 @(tabBarController.cyl_tabBarItemLongPressDuration),
+                                 @(tabBarController.cyl_tabButtonLongPressMinimumDuration),
+                                 @(tabBarController.cyl_tabBarItemDoubleTapInterval)];
+    return cell;
+}
+
+/// [EN] The next pair of values. The two long press setters take turns, since they set one value.
+/// [CN] 切换到下一组值。两个长按 setter 轮流使用，因为它们设置的是同一个值。
+static void CYLSwitchGestureTiming(CYLTabBarController *_Nullable tabBarController) {
+    if (!tabBarController) {
+        return;
+    }
+    NSUInteger current = 0;
+    for (NSUInteger idx = 0; idx < CYLDemoGestureTimingCount; idx++) {
+        if (fabs(CYLDemoLongPressDurations[idx] - tabBarController.cyl_tabBarItemLongPressDuration) < 0.001) {
+            current = idx;
+            break;
+        }
+    }
+    NSUInteger next = (current + 1) % CYLDemoGestureTimingCount;
+    if (next % 2 == 0) {
+        tabBarController.cyl_tabBarItemLongPressDuration = CYLDemoLongPressDurations[next];
+    } else {
+        tabBarController.cyl_tabButtonLongPressMinimumDuration = CYLDemoLongPressDurations[next];
+    }
+    tabBarController.cyl_tabBarItemDoubleTapInterval = CYLDemoDoubleTapIntervals[next];
+}
+
+#pragma mark - Switch to the adjacent tab (issue #535)
+
+static NSString *const CYLSwitchAdjacentTabCellIdentifier = @"CYLSwitchAdjacentTabCell";
+
+/*!
+ * [EN] Two buttons that call `-cyl_switchToAdjacentTabWithStep:animated:` with -1 and 1; the list stays, so the result
+ *      (YES or NO, e.g. at the last tab) is shown after the switch.
+ * [CN] 两个按钮分别以 -1 与 1 调用 `-cyl_switchToAdjacentTabWithStep:animated:`；切换后在返回时显示结果（YES 或 NO，例如已是最后一个 Tab）。
+ */
+@interface CYLSwitchAdjacentTabCell : UITableViewCell
+@property (nonatomic, weak, nullable) CYLTabBarController *tabBarController;
+@end
+
+static char CYLDemoSwitchAdjacentResultKey;
+
+@implementation CYLSwitchAdjacentTabCell
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    if (self = [super initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:reuseIdentifier]) {
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+        if (@available(iOS 13.0, *)) {
+            self.imageView.image = [UIImage systemImageNamed:@"arrow.left.arrow.right"];
+        }
+        UIButton *previousButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        [previousButton setTitle:@"◀︎" forState:UIControlStateNormal];
+        previousButton.accessibilityLabel = @"cyl_switchToAdjacentTab -1";
+        previousButton.tag = -1;
+        UIButton *nextButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        [nextButton setTitle:@"▶︎" forState:UIControlStateNormal];
+        nextButton.accessibilityLabel = @"cyl_switchToAdjacentTab 1";
+        nextButton.tag = 1;
+        for (UIButton *button in @[ previousButton, nextButton ]) {
+            button.titleLabel.font = [UIFont systemFontOfSize:22];
+            [button addTarget:self action:@selector(cyl_switch:) forControlEvents:UIControlEventTouchUpInside];
+        }
+        UIStackView *stackView = [[UIStackView alloc] initWithArrangedSubviews:@[ previousButton, nextButton ]];
+        stackView.spacing = 4;
+        stackView.distribution = UIStackViewDistributionFillEqually;
+        stackView.frame = CGRectMake(0, 0, 88, 44);
+        self.accessoryView = stackView;
+    }
+    return self;
+}
+
+- (void)cyl_switch:(UIButton *)sender {
+    CYLTabBarController *tabBarController = self.tabBarController;
+    if (!tabBarController) {
+        return;
+    }
+    BOOL switched = [tabBarController cyl_switchToAdjacentTabWithStep:sender.tag animated:YES];
+    objc_setAssociatedObject(tabBarController, &CYLDemoSwitchAdjacentResultKey, @(switched), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_reload];
+}
+
+- (void)cyl_reload {
+    NSNumber *result = self.tabBarController ? objc_getAssociatedObject(self.tabBarController, &CYLDemoSwitchAdjacentResultKey) : nil;
+    self.textLabel.text = CYLLocalizedString(@"切换到上一个 / 下一个 Tab（issue #535）");
+    NSString *resultText = result ? (result.boolValue ? @"YES" : @"NO") : @"-";
+    self.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@"), resultText];
+}
+
+@end
+
+static UITableViewCell *CYLSwitchAdjacentTabCellForTableView(UITableView *tableView, CYLTabBarController *_Nullable tabBarController) {
+    CYLSwitchAdjacentTabCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLSwitchAdjacentTabCellIdentifier];
+    if (![cell isKindOfClass:[CYLSwitchAdjacentTabCell class]]) {
+        cell = [[CYLSwitchAdjacentTabCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLSwitchAdjacentTabCellIdentifier];
+    }
+    cell.tabBarController = tabBarController;
+    [cell cyl_reload];
+    return cell;
+}
+
+#pragma mark - CYLUtils helpers (issue #535)
+
+static NSString *const CYLUtilsHelpersCellIdentifier = @"CYLUtilsHelpersCell";
+static char CYLDemoUtilsHelpersResultKey;
+static char CYLDemoWeakObjectKey;
+
+static UITableViewCell *CYLUtilsHelpersCell(UITableView *tableView, CYLTabBarController *_Nullable tabBarController) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLUtilsHelpersCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLUtilsHelpersCellIdentifier];
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"wrench.and.screwdriver"];
+        }
+    }
+    NSString *result = tabBarController ? objc_getAssociatedObject(tabBarController, &CYLDemoUtilsHelpersResultKey) : nil;
+    cell.textLabel.text = CYLLocalizedString(@"CYLUtils 弱引用关联对象与查找按钮（issue #535）");
+    cell.detailTextLabel.text = result ?: CYLLocalizedString(@"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。");
+    return cell;
+}
+
+/*!
+ * [EN] Runs the two CYLUtils helpers and keeps their results for the row:
+ *      1. a weak associated object is there while its object lives, and nil after it is released;
+ *      2. from the image view inside the selected tab button, `-cyl_nearestControlBelowView:` finds that button.
+ * [CN] 运行两个 CYLUtils 工具方法，并保存结果供该行显示：
+ *      1. 弱引用关联对象在对象存活时存在，释放后为 nil；
+ *      2. 从选中 Tab 按钮内的图片视图出发，`-cyl_nearestControlBelowView:` 找到该按钮。
+ */
+static void CYLRunUtilsHelpers(CYLTabBarController *_Nullable tabBarController) {
+    if (!tabBarController) {
+        return;
+    }
+    BOOL whileAlive = NO;
+    @autoreleasepool {
+        NSObject *object = [[NSObject alloc] init];
+        [tabBarController cyl_setWeakAssociatedObject:object forKey:&CYLDemoWeakObjectKey];
+        whileAlive = ([tabBarController cyl_weakAssociatedObjectForKey:&CYLDemoWeakObjectKey] == object);
+    }
+    BOOL afterRelease = ([tabBarController cyl_weakAssociatedObjectForKey:&CYLDemoWeakObjectKey] == nil);
+
+    UIControl *tabButton = tabBarController.selectedViewController.cyl_tabButton;
+    UIView *innerView = tabButton;
+    // [EN] The deepest first subview, e.g. the icon's image view. [CN] 最深的第一个子视图，例如图标的图片视图。
+    while (innerView.subviews.firstObject) {
+        innerView = innerView.subviews.firstObject;
+    }
+    UIControl *foundControl = [innerView cyl_nearestControlBelowView:tabBarController.tabBar];
+    NSString *found = !tabButton ? @"-" : ((foundControl == tabButton) ? @"YES" : (foundControl ? NSStringFromClass([foundControl class]) : @"nil"));
+    NSString *result = [NSString stringWithFormat:CYLLocalizedString(@"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@"),
+                        whileAlive ? @"YES" : @"NO", afterRelease ? @"YES" : @"NO",
+                        innerView ? NSStringFromClass([innerView class]) : @"-", found];
+    objc_setAssociatedObject(tabBarController, &CYLDemoUtilsHelpersResultKey, result, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
 @implementation UIViewController (CYLSettingsSection)
 
 - (NSInteger)cyl_settingsRowCount {
@@ -1061,6 +1392,18 @@ static UITableViewCell *CYLSlideTransitionCell(UITableView *tableView) {
     if (indexPath.row == CYLSettingsRowSlideTransition) {
         return CYLSlideTransitionCell(tableView);
     }
+    if (indexPath.row == CYLSettingsRowTapFeedback) {
+        return CYLTapFeedbackCell(tableView, CYLSettingsTabBarController(self));
+    }
+    if (indexPath.row == CYLSettingsRowGestureTiming) {
+        return CYLGestureTimingCell(tableView, CYLSettingsTabBarController(self));
+    }
+    if (indexPath.row == CYLSettingsRowSwitchAdjacentTab) {
+        return CYLSwitchAdjacentTabCellForTableView(tableView, CYLSettingsTabBarController(self));
+    }
+    if (indexPath.row == CYLSettingsRowUtilsHelpers) {
+        return CYLUtilsHelpersCell(tableView, CYLSettingsTabBarController(self));
+    }
     if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdate];
     }
@@ -1114,6 +1457,17 @@ static UITableViewCell *CYLSlideTransitionCell(UITableView *tableView) {
         CYLSlideTransitionDemoTabBarController *demo = [[CYLSlideTransitionDemoTabBarController alloc] init];
         demo.modalPresentationStyle = UIModalPresentationFullScreen;
         [self presentViewController:demo animated:YES completion:nil];
+    } else if (indexPath.row == CYLSettingsRowTapFeedback) {
+        CYLSwitchTapFeedback(CYLSettingsTabBarController(self));
+        [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    } else if (indexPath.row == CYLSettingsRowGestureTiming) {
+        CYLSwitchGestureTiming(CYLSettingsTabBarController(self));
+        [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    } else if (indexPath.row == CYLSettingsRowSwitchAdjacentTab) {
+        // [EN] The two arrows act on their own; a tap on the row does nothing. [CN] 两个箭头各自生效，点击该行不做处理。
+    } else if (indexPath.row == CYLSettingsRowUtilsHelpers) {
+        CYLRunUtilsHelpers(CYLSettingsTabBarController(self));
+        [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
     } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdate];
         // [EN] The rows show which changes are on (a checkmark).

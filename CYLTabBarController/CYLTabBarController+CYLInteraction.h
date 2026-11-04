@@ -87,6 +87,54 @@ typedef void (^CYLTabBarControllerDidLongPressControlBlock)(CYLTabBarController 
  */
 - (void)cyl_playTabButtonAnimationForControl:(UIControl *)control;
 
+#pragma mark - Tap sound and haptic feedback
+
+/*!
+ * FIX: issue #535
+ * [EN] Plays a sound on every reported tap of a tab button or the plus button: right before
+ *      `-tabBarController:didSelectControl:` is called, together with the tap animation, so in the same cases (a tap, a
+ *      repeated tap on the selected tab, a swipe, a change of `selectedIndex` in code; not a tap refused by the login
+ *      check). Default NO. The sound is `cyl_tabButtonTapSoundURL`, or the system keyboard click when it is nil. Like any
+ *      system sound, it follows the ring/silent switch and the system volume. Ported from the `PlaySound` /
+ *      `NSObject (Sound)` code suggested in the issue (JobsKits/JobsTabbarItemLottie); here the sound is created once and
+ *      released when it changes.
+ * [CN] 每次上报 Tab 按钮或 PlusButton 的点击时播放声音：在调用 `-tabBarController:didSelectControl:` 之前，与点击动画同时，因此场景相同
+ *      （点击、再次点击已选中的 Tab、滑动切换、代码修改 `selectedIndex`；被登录检查拒绝的点击不会播放）。默认 NO。声音为 `cyl_tabButtonTapSoundURL`，为 nil 时使用
+ *      系统键盘点击声。与所有系统音效一样，受静音开关与系统音量控制。移植自 issue 中建议的 `PlaySound` / `NSObject (Sound)` 代码
+ *      （JobsKits/JobsTabbarItemLottie）；这里音效只创建一次，更换时释放。
+ */
+@property (nonatomic, assign, setter=cyl_setTabButtonTapSoundEnabled:) BOOL cyl_tabButtonTapSoundEnabled;
+
+/*!
+ * [EN] A local sound file (a file URL; .caf, .wav or .aif, at most 30 seconds) for `cyl_tabButtonTapSoundEnabled`.
+ *      nil (default): the system keyboard click.
+ * [CN] `cyl_tabButtonTapSoundEnabled` 使用的本地音频文件（文件 URL；.caf、.wav 或 .aif，最长 30 秒）。nil（默认）：系统键盘点击声。
+ */
+@property (nonatomic, copy, nullable, setter=cyl_setTabButtonTapSoundURL:) NSURL *cyl_tabButtonTapSoundURL;
+
+/*!
+ * FIX: issue #535
+ * [EN] Plays an impact haptic on every reported tap of a tab button or the plus button, with the tap sound (see
+ *      `cyl_tabButtonTapSoundEnabled` for when). Default NO. Ported from the
+ *      issue's `+feedbackGenerator` (`UIImpactFeedbackGenerator`). Only devices with a Taptic Engine vibrate; the
+ *      simulator does not.
+ * [CN] 每次上报 Tab 按钮或 PlusButton 的点击时播放触感反馈，与点击声音时机相同（见 `cyl_tabButtonTapSoundEnabled`）。默认 NO。移植自 issue 中的 `+feedbackGenerator`
+ *      （`UIImpactFeedbackGenerator`）。只有带 Taptic Engine 的设备会振动，模拟器不会。
+ */
+@property (nonatomic, assign, setter=cyl_setTabButtonHapticFeedbackEnabled:) BOOL cyl_tabButtonHapticFeedbackEnabled;
+
+/*!
+ * [EN] The strength of `cyl_tabButtonHapticFeedbackEnabled`. Default `UIImpactFeedbackStyleMedium`, as in the issue.
+ * [CN] `cyl_tabButtonHapticFeedbackEnabled` 的强度。默认 `UIImpactFeedbackStyleMedium`，与 issue 一致。
+ */
+@property (nonatomic, assign, setter=cyl_setTabButtonHapticFeedbackStyle:) UIImpactFeedbackStyle cyl_tabButtonHapticFeedbackStyle;
+
+/*!
+ * [EN] Plays the tap sound and the haptic now, the ones that are turned on, e.g. from your own button.
+ * [CN] 立即播放已开启的点击声音与触感反馈，例如在自己的按钮中调用。
+ */
+- (void)cyl_playTabButtonTapFeedback;
+
 #pragma mark - Long press
 
 /*!

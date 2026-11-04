@@ -8,6 +8,7 @@
 #import "CYLTabBarController+CYLInteraction.h"
 #import "CYLTabBarController.h"
 #import <objc/runtime.h>
+#import <AudioToolbox/AudioToolbox.h>
 
 /// [EN] Implemented in CYLTabBarController.m. [CN] 实现位于 CYLTabBarController.m。
 @interface CYLTabBarController (CYLInteractionPrivate)
@@ -106,6 +107,41 @@ static const void *CYLLiquidGlassPressKey = &CYLLiquidGlassPressKey;
 static const void *CYLLiquidGlassSeenKey = &CYLLiquidGlassSeenKey;
 /// [EN] How far the finger may move and still be a tap or a long press, in points. [CN] 仍算点击或长按时手指可移动的距离（pt）。
 static const CGFloat CYLLiquidGlassPressAllowableMovement = 10.0;
+
+#pragma mark - CYLTabBarTapSound
+
+/// [EN] The system keyboard click. [CN] 系统键盘点击声。
+static const SystemSoundID CYLTabBarDefaultTapSoundID = 1104;
+
+/*!
+ * [EN] One system sound for `cyl_tabButtonTapSoundURL`, created once and disposed of with this object. The code in the
+ *      issue created a new sound on every tap and never disposed of it.
+ * [CN] `cyl_tabButtonTapSoundURL` 对应的系统音效，只创建一次，随本对象释放。issue 中的代码每次点击都新建音效且从不释放。
+ */
+@interface CYLTabBarTapSound : NSObject
+@property (nonatomic, copy, readonly) NSURL *URL;
+@property (nonatomic, assign, readonly) SystemSoundID soundID;
+@end
+
+@implementation CYLTabBarTapSound
+
+- (nullable instancetype)initWithURL:(NSURL *)URL {
+    SystemSoundID soundID = 0;
+    if (!URL.isFileURL || AudioServicesCreateSystemSoundID((__bridge CFURLRef)URL, &soundID) != kAudioServicesNoError) {
+        return nil;
+    }
+    if (self = [super init]) {
+        _URL = [URL copy];
+        _soundID = soundID;
+    }
+    return self;
+}
+
+- (void)dealloc {
+    AudioServicesDisposeSystemSoundID(_soundID);
+}
+
+@end
 
 #pragma mark - Views of a tab button
 
@@ -314,6 +350,78 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
         [animation cyl_playSelectAnimationWithTabButton:layer
                                                iconView:CYLTabButtonIconView(layer)
                                              titleLabel:CYLTabButtonTitleLabel(layer)];
+    }
+}
+
+#pragma mark - Tap sound and haptic feedback
+
+- (BOOL)cyl_tabButtonTapSoundEnabled {
+    return [objc_getAssociatedObject(self, @selector(cyl_tabButtonTapSoundEnabled)) boolValue];
+}
+
+- (void)cyl_setTabButtonTapSoundEnabled:(BOOL)tabButtonTapSoundEnabled {
+    objc_setAssociatedObject(self, @selector(cyl_tabButtonTapSoundEnabled), @(tabButtonTapSoundEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (nullable NSURL *)cyl_tabButtonTapSoundURL {
+    return [(CYLTabBarTapSound *)objc_getAssociatedObject(self, @selector(cyl_tabButtonTapSoundURL)) URL];
+}
+
+- (void)cyl_setTabButtonTapSoundURL:(NSURL *)tabButtonTapSoundURL {
+    // [EN] The old sound is disposed of when its object is released. nil, or a file that cannot be played: the click.
+    // [CN] 旧音效随其对象释放。nil 或无法播放的文件：使用点击声。
+    CYLTabBarTapSound *sound = tabButtonTapSoundURL ? [[CYLTabBarTapSound alloc] initWithURL:tabButtonTapSoundURL] : nil;
+#if defined(DEBUG) || defined(BETA)
+    if (tabButtonTapSoundURL && !sound) {
+        NSLog(@"🔴 %@ %@", @(__PRETTY_FUNCTION__), tabButtonTapSoundURL);
+    }
+#endif
+    objc_setAssociatedObject(self, @selector(cyl_tabButtonTapSoundURL), sound, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (BOOL)cyl_tabButtonHapticFeedbackEnabled {
+    return [objc_getAssociatedObject(self, @selector(cyl_tabButtonHapticFeedbackEnabled)) boolValue];
+}
+
+- (void)cyl_setTabButtonHapticFeedbackEnabled:(BOOL)tabButtonHapticFeedbackEnabled {
+    objc_setAssociatedObject(self, @selector(cyl_tabButtonHapticFeedbackEnabled), @(tabButtonHapticFeedbackEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    // [EN] A new generator for the current style, prepared so the first tap has no delay.
+    // [CN] 为当前强度新建反馈器并预先准备，第一次点击没有延迟。
+    objc_setAssociatedObject(self, @selector(cyl_tabButtonHapticFeedbackGenerator), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (tabButtonHapticFeedbackEnabled) {
+        [[self cyl_tabButtonHapticFeedbackGenerator] prepare];
+    }
+}
+
+- (UIImpactFeedbackStyle)cyl_tabButtonHapticFeedbackStyle {
+    NSNumber *style = objc_getAssociatedObject(self, @selector(cyl_tabButtonHapticFeedbackStyle));
+    return style ? (UIImpactFeedbackStyle)style.integerValue : UIImpactFeedbackStyleMedium;
+}
+
+- (void)cyl_setTabButtonHapticFeedbackStyle:(UIImpactFeedbackStyle)tabButtonHapticFeedbackStyle {
+    objc_setAssociatedObject(self, @selector(cyl_tabButtonHapticFeedbackStyle), @(tabButtonHapticFeedbackStyle), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, @selector(cyl_tabButtonHapticFeedbackGenerator), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (UIImpactFeedbackGenerator *)cyl_tabButtonHapticFeedbackGenerator {
+    UIImpactFeedbackGenerator *generator = objc_getAssociatedObject(self, @selector(cyl_tabButtonHapticFeedbackGenerator));
+    if (!generator) {
+        generator = [[UIImpactFeedbackGenerator alloc] initWithStyle:self.cyl_tabButtonHapticFeedbackStyle];
+        objc_setAssociatedObject(self, @selector(cyl_tabButtonHapticFeedbackGenerator), generator, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return generator;
+}
+
+- (void)cyl_playTabButtonTapFeedback {
+    if (self.cyl_tabButtonTapSoundEnabled) {
+        CYLTabBarTapSound *sound = objc_getAssociatedObject(self, @selector(cyl_tabButtonTapSoundURL));
+        AudioServicesPlaySystemSound(sound ? sound.soundID : CYLTabBarDefaultTapSoundID);
+    }
+    if (self.cyl_tabButtonHapticFeedbackEnabled) {
+        UIImpactFeedbackGenerator *generator = [self cyl_tabButtonHapticFeedbackGenerator];
+        [generator impactOccurred];
+        // [EN] Ready for the next tap. [CN] 为下一次点击做准备。
+        [generator prepare];
     }
 }
 
