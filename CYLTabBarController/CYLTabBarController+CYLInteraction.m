@@ -807,18 +807,32 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
         return NO;
     }
     UIView *fromView = self.selectedViewController.view;
-    UIView *containerView = fromView.superview;
-    UIView *snapshotView = (animated && containerView) ? [fromView snapshotViewAfterScreenUpdates:NO] : nil;
+    UIView *snapshotView = (animated && fromView.window) ? [fromView snapshotViewAfterScreenUpdates:NO] : nil;
+    CGRect fromFrame = fromView.window ? [fromView convertRect:fromView.bounds toView:self.view] : CGRectZero;
     self.selectedIndex = (NSUInteger)index;
     UIView *toView = self.selectedViewController.view;
-    if (!snapshotView || toView.superview != containerView) {
+    if (!snapshotView || !toView) {
         return YES;
     }
-    // [EN] Slide like `CYLTabBarSlideTransitionAnimator`: the old page (a snapshot) leaves, the new one comes in.
-    // [CN] 与 `CYLTabBarSlideTransitionAnimator` 相同的滑动：旧页面（快照）滑出，新页面滑入。
-    CGFloat width = CGRectGetWidth(containerView.bounds);
-    snapshotView.frame = fromView.frame;
-    [containerView addSubview:snapshotView];
+    [self.view layoutIfNeeded];
+    // [EN] Slide like `CYLTabBarSlideTransitionAnimator`: the old page (a snapshot) leaves, the new one comes in. The
+    //      snapshot goes on this controller's view, below the tab bar: from iOS 18 (Liquid Glass and the classic style)
+    //      each page has its own container, so the two pages do not share a superview.
+    // [CN] 与 `CYLTabBarSlideTransitionAnimator` 相同的滑动：旧页面（快照）滑出，新页面滑入。快照放在本控制器的 view 上、TabBar
+    //      下方：从 iOS 18 起（液态玻璃与经典样式）每个页面有各自的容器，两个页面没有共同的父视图。
+    CGFloat width = CGRectGetWidth(self.view.bounds);
+    snapshotView.frame = fromFrame;
+    // [EN] Below the tab bar, or below the subview of this view that holds it (Liquid Glass wraps the tab bar).
+    // [CN] 放在 TabBar 下方，或放在包含 TabBar 的本 view 子视图下方（液态玻璃会包裹 TabBar）。
+    UIView *tabBarHost = self.cyl_tabBar ?: self.tabBar;
+    while (tabBarHost && tabBarHost.superview != self.view) {
+        tabBarHost = tabBarHost.superview;
+    }
+    if (tabBarHost) {
+        [self.view insertSubview:snapshotView belowSubview:tabBarHost];
+    } else {
+        [self.view addSubview:snapshotView];
+    }
     toView.transform = CGAffineTransformMakeTranslation(width * direction, 0);
     objc_setAssociatedObject(self, @selector(cyl_switchToAdjacentTabWithStep:animated:), @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     __weak __typeof(self) weakSelf = self;
