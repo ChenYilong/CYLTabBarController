@@ -228,6 +228,12 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @interface CYLTabBarController (CYLTabBarMinimizePrivate)
 /// [EN] FlatDesign: observe the scroll view of the page on screen. [CN] 扁平样式：观察当前显示页面的滚动视图。
 - (void)cyl_updateTabBarMinimizeTracking;
+/// [EN] Liquid Glass: expand a tab bar the system minimized (issue #13 lifecycle restore).
+/// [CN] 液态玻璃：恢复被系统缩小的 TabBar（issue #13 生命周期恢复）。
+- (void)cyl_expandSystemMinimizedTabBar;
+/// [EN] A view lifecycle event of this controller (appear, disappear, size change): ends any hide session.
+/// [CN] 本控制器的视图生命周期事件（出现、消失、尺寸变化）：结束隐藏会话。
+- (void)cyl_tabBarMinimizeLifecycleEvent;
 @end
 
 /// Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
@@ -359,11 +365,35 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
         _cylRefreshingSystemTabBarVisibility = NO;
     }
 }
+#endif
+
+/*!
+ * [EN] Every style. FlatDesign: refresh the system tab bar's visibility. Scroll hiding (issue #13): appearing ends any
+ *      hide session, so the tab bar is shown.
+ * [CN] 所有样式。扁平样式：刷新系统 TabBar 的可见性。滚动隐藏（issue #13）：出现时结束隐藏会话，TabBar 恢复显示。
+ */
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+#if CYL_FLATDESIGN_AVAILABLE
     [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
-}
 #endif
+    [self cyl_tabBarMinimizeLifecycleEvent];
+}
+
+/*!
+ * [EN] Scroll hiding (issue #13): disappearing (a full-screen modal, a push over this controller, a tab of an outer
+ *      controller) ends any hide session, so the tab bar is shown when this controller comes back.
+ * [CN] 滚动隐藏（issue #13）：消失时（全屏模态页面、在本控制器之上 push、外层控制器切换 Tab）结束隐藏会话，回来时 TabBar 正常显示。
+ */
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self cyl_tabBarMinimizeLifecycleEvent];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    [self cyl_tabBarMinimizeLifecycleEvent];
+}
 
 /*!
  * [EN] Every style: this controller becomes the most recently active one (`+cyl_activeTabBarController`), which
@@ -374,6 +404,8 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [CYLTabBarController cyl_markTabBarControllerActive:self];
+    // [EN] Scroll hiding (issue #13): appearing ends any hide session. [CN] 滚动隐藏（issue #13）：出现时结束隐藏会话。
+    [self cyl_tabBarMinimizeLifecycleEvent];
 }
 
 
@@ -4923,6 +4955,9 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 
 #pragma mark - UIContentContainer
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    // [EN] Scroll hiding (issue #13): a rotation or a Split View / Stage Manager resize ends any hide session.
+    // [CN] 滚动隐藏（issue #13）：旋转或分屏 / 台前调度尺寸变化时结束隐藏会话。
+    [self cyl_tabBarMinimizeLifecycleEvent];
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
 #if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
@@ -6211,6 +6246,20 @@ static const CGFloat CYLTabBarMinimizeMinimumScrollableDistance = 100.0;
 /// [EN] Classic style: how often the page on screen is checked again (core has no push/pop hook outside FlatDesign).
 /// [CN] 经典样式：重新确认当前页面的间隔（FlatDesign 以外，Core 中没有 push/pop 回调）。
 static const NSTimeInterval CYLTabBarMinimizeClassicPageCheckInterval = 0.5;
+/// [EN] While the tab bar is hidden or minimized by scrolling: how often the safety net checks whether it must come back
+///      (a page change, an alert, the app or window losing focus), for anything no notification reports.
+/// [CN] TabBar 被滚动隐藏或缩小期间：安全网检查是否需要恢复的间隔（页面变化、弹框、App 或窗口失去焦点），用于没有通知可监听的情况。
+static const NSTimeInterval CYLTabBarMinimizeRestoreCheckInterval = 0.25;
+/// [EN] As in the Facebook app, the tab bar hides only once the user has scrolled this far (pt) into the content, never
+///      right at its start.
+/// [CN] 与 Facebook App 一致，用户滚入内容超过该距离（pt）后才隐藏 TabBar，内容起始处不隐藏。
+static const CGFloat CYLTabBarMinimizeHideStartDistance = 50.0;
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+/// [EN] Liquid Glass: how long the system tab bar stays at `Never` when it is forced to expand.
+/// [CN] 液态玻璃：强制恢复时，系统 TabBar 保持 `Never` 的时长。
+static const NSTimeInterval CYLTabBarMinimizeLiquidGlassExpandHold = 0.35;
+static const void *CYLTabBarMinimizeHoldsSystemNeverKey = &CYLTabBarMinimizeHoldsSystemNeverKey;
+#endif
 
 /// [EN] Which path handles `cyl_tabBarMinimizeBehavior`. [CN] 由哪条路径处理 `cyl_tabBarMinimizeBehavior`。
 typedef NS_ENUM(NSInteger, CYLTabBarMinimizeMode) {
@@ -6327,6 +6376,8 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
 - (void)updateMode:(CYLTabBarMinimizeMode)mode;
 - (void)observeScrollView:(UIScrollView *)scrollView;
 - (void)expandTabBar;
+- (void)restoreTabBar;
+- (void)validateHideSession;
 @end
 
 @implementation _CYLTabBarMinimizeScrollTracker {
@@ -6336,21 +6387,312 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     BOOL _hiddenByScroll;
     /// [EN] Liquid Glass: the minimized state the tab bar was last laid out for. [CN] 液态玻璃：上次布局时 TabBar 的缩小状态。
     BOOL _laidOutMinimized;
-    /// [EN] Classic: checks the page on screen again (see CYLTabBarMinimizeClassicPageCheckInterval). [CN] 经典样式：定时重新确认当前页面。
-    NSTimer *_classicPageCheckTimer;
+    /// [EN] Checks again on a timer: the page on screen (classic) and, while the bar is hidden or minimized, whether it
+    ///      must come back (see `-checkTimerFired`). [CN] 定时检查：当前页面（经典样式），以及 TabBar 被隐藏或缩小期间是否需要恢复。
+    NSTimer *_checkTimer;
+    NSTimeInterval _checkTimerInterval;
+    /// [EN] After a restore, the tab bar hides again only on a new drag, not on the momentum of the old one.
+    /// [CN] 恢复之后，只有新的拖动才会再次隐藏 TabBar，旧拖动的惯性不会。
+    BOOL _needsNewDrag;
+    /// [EN] `isTracking` at the last offset change, to see a new drag start. [CN] 上次偏移变化时的 `isTracking`，用于识别新拖动的开始。
+    BOOL _lastSeenTracking;
+    /// [EN] Notification observers (app, scene, window, memory, keyboard). [CN] 通知观察者（App、Scene、窗口、内存、键盘）。
+    NSMutableArray<id<NSObject>> *_notificationObservers;
+    /// [EN] The one flag (whitelist): YES only while a hide session runs, i.e. the bar is hidden or minimized because the
+    ///      user scrolled down through content, in the context recorded below. See `-beginHideSession`.
+    /// [CN] 唯一的标记（白名单）：只有隐藏会话进行中才为 YES，即用户在下面记录的上下文中向下滚动浏览内容，TabBar 因此被隐藏或缩小。
+    ///      见 `-beginHideSession`。
+    BOOL _hideSessionActive;
+    __weak UIScrollView *_sessionScrollView;
+    __weak UIViewController *_sessionSelectedViewController;
+    __weak UIViewController *_sessionPage;
+    __weak UIWindow *_sessionWindow;
+    CYLTabBarMinimizeBehavior _sessionBehavior;
+    CYLTabBarMinimizeMode _sessionMode;
 }
 
 - (instancetype)initWithTabBarController:(CYLTabBarController *)tabBarController {
     self = [super init];
     if (self) {
         _tabBarController = tabBarController;
+        [self observeLifecycleNotifications];
     }
     return self;
 }
 
 - (void)dealloc {
-    [_classicPageCheckTimer invalidate];
+    [_checkTimer invalidate];
+    for (id<NSObject> observer in _notificationObservers) {
+        [[NSNotificationCenter defaultCenter] removeObserver:observer];
+    }
     [self observeScrollView:nil];
+}
+
+#pragma mark Lifecycle
+
+/*!
+ * [EN] Where bugs hide: when the tab bar must come back. Every event below restores a tab bar hidden (FlatDesign,
+ *      classic) or minimized (Liquid Glass) by scrolling, and then waits for a new drag before hiding it again:
+ *      - will resign active: an incoming call, the low battery alert or any system alert, Control Center, Notification
+ *        Center, the app switcher;
+ *      - did enter background / will enter foreground / did become active: background and foreground switches, opening
+ *        the app from a push notification (whose page push is then caught as a page change), returning from a call;
+ *      - memory warning;
+ *      - the same scene events (iOS 13+), only for the scene of this tab bar's window;
+ *      - another window becoming key: alerts, HUDs or overlays shown in a window of their own.
+ *      In-app alerts and modals, pushes and pops have no notification; the check timer catches them (`-checkTimerFired`).
+ * [CN] 最容易出 bug 的地方：何时恢复显示。下列每个事件都会恢复被滚动隐藏（扁平样式、经典样式）或缩小（液态玻璃）的 TabBar，
+ *      之后等待新的拖动才会再次隐藏：
+ *      - 即将失去活跃：来电、低电量弹框或任何系统弹框、控制中心、通知中心、App 切换器；
+ *      - 进入后台 / 即将进入前台 / 变为活跃：前后台切换、点击推送打开 App（随后 push 的页面按页面变化处理）、通话结束返回；
+ *      - 内存警告；
+ *      - 对应的 Scene 事件（iOS 13+），只处理本 TabBar 所在窗口的 Scene；
+ *      - 其他窗口成为 key window：显示在独立窗口中的弹框、HUD 或浮层。
+ *      App 内的弹框与模态页面、push 与 pop 没有通知，由定时检查处理（`-checkTimerFired`）。
+ */
+- (void)observeLifecycleNotifications {
+    _notificationObservers = [NSMutableArray array];
+    NSMutableArray<NSNotificationName> *names = [NSMutableArray arrayWithArray:@[
+        UIApplicationWillResignActiveNotification,
+        UIApplicationDidEnterBackgroundNotification,
+        UIApplicationWillEnterForegroundNotification,
+        UIApplicationDidBecomeActiveNotification,
+        UIApplicationDidReceiveMemoryWarningNotification,
+        UIWindowDidBecomeKeyNotification,
+        UIKeyboardWillShowNotification,
+    ]];
+    if (@available(iOS 13.0, *)) {
+        [names addObjectsFromArray:@[
+            UISceneWillDeactivateNotification,
+            UISceneDidEnterBackgroundNotification,
+            UISceneWillEnterForegroundNotification,
+            UISceneDidActivateNotification,
+        ]];
+    }
+    __weak typeof(self) weakSelf = self;
+    for (NSNotificationName name in names) {
+        id<NSObject> observer = [[NSNotificationCenter defaultCenter] addObserverForName:name
+                                                                                   object:nil
+                                                                                    queue:[NSOperationQueue mainQueue]
+                                                                               usingBlock:^(NSNotification *notification) {
+            [weakSelf restoreTabBarForNotification:notification];
+        }];
+        [_notificationObservers addObject:observer];
+    }
+}
+
+- (void)restoreTabBarForNotification:(NSNotification *)notification {
+    UIWindow *window = self.tabBarController.viewIfLoaded.window;
+    // Guard: this tab bar's own window becoming key is not an interruption. 本 TabBar 自己的窗口成为 key window 不算打断。
+    if ([notification.name isEqualToString:UIWindowDidBecomeKeyNotification] && notification.object == window) {
+        return;
+    }
+    // Guard: scene events of other scenes (iPad multiple windows). 其他 Scene 的事件（iPad 多窗口）。
+    if (@available(iOS 13.0, *)) {
+        UIWindowScene *windowScene = window.windowScene;
+        if ([notification.object isKindOfClass:[UIScene class]] && windowScene && notification.object != windowScene) {
+            return;
+        }
+    }
+    [self restoreTabBar];
+}
+
+/*!
+ * [EN] Shows a tab bar hidden or minimized by scrolling again, at once, and blocks hiding until the user starts a new
+ *      drag. Does nothing to a tab bar the app hid itself.
+ * [CN] 立即重新显示被滚动隐藏或缩小的 TabBar，并在用户开始新的拖动之前不再隐藏。App 自己隐藏的 TabBar 不处理。
+ */
+- (void)restoreTabBar {
+    [self endHideSession];
+    _needsNewDrag = YES;
+    _lastSeenTracking = self.scrollView.isTracking;
+    _scrolledDistance = 0;
+    [self expandTabBar];
+    // Guard: Liquid Glass, only a bar the system shows minimized. 液态玻璃：只处理系统正以缩小状态显示的 TabBar。
+    CYLTabBarController *tabBarController = self.tabBarController;
+    if (CYLTabBarMinimizeModeLiquidGlass == _mode && tabBarController) {
+        UIView *tabBar = tabBarController.cyl_tabBar;
+        if ([tabBar isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)tabBar cyl_showsMinimizedBar]) {
+            [tabBarController cyl_expandSystemMinimizedTabBar];
+        }
+    }
+    [self updateCheckTimer];
+}
+
+/// [EN] YES while scrolling hid (FlatDesign, classic) or the system minimized (Liquid Glass) the tab bar.
+/// [CN] TabBar 被滚动隐藏（扁平样式、经典样式）或被系统缩小（液态玻璃）期间为 YES。
+- (BOOL)isTabBarHiddenOrMinimizedByScroll {
+    if (_hiddenByScroll) {
+        return YES;
+    }
+    if (CYLTabBarMinimizeModeLiquidGlass != _mode) {
+        return NO;
+    }
+    UIView *tabBar = self.tabBarController.cyl_tabBar;
+    return [tabBar isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)tabBar cyl_showsMinimizedBar];
+}
+
+/*!
+ * [EN] Whether the tab bar may hide now. Hiding only makes sense while the user reads content in an active app; it is
+ *      refused while: the app is not active, this window is not the key window, anything is presented (an alert, an
+ *      action sheet, a modal page, from any child), a push or pop is running, or the scroll view is off screen.
+ * [CN] 现在是否可以隐藏 TabBar。只有在活跃的 App 中浏览内容时才隐藏；以下情况拒绝隐藏：App 不活跃、本窗口不是 key window、有任何
+ *      页面被 present（弹框、操作表、模态页面，来自任何子控制器）、push 或 pop 进行中、滚动视图不在屏幕上。
+ */
+- (BOOL)environmentAllowsHiding {
+    CYLTabBarController *tabBarController = self.tabBarController;
+    UIWindow *window = tabBarController.viewIfLoaded.window;
+    if (!window || !window.isKeyWindow) {
+        return NO;
+    }
+    if (UIApplicationStateActive != [UIApplication sharedApplication].applicationState) {
+        return NO;
+    }
+    if (tabBarController.presentedViewController) {
+        return NO;
+    }
+    if (tabBarController.selectedViewController.transitionCoordinator) {
+        return NO;
+    }
+    return self.scrollView.window != nil;
+}
+
+#pragma mark Hide session (whitelist)
+
+/*!
+ * [EN] The robust core, a whitelist instead of a list of events: hiding the bar is valid only inside a "hide session".
+ *      The one way to start a session is the user scrolling down through content (`-minimizeTabBar`; for Liquid Glass,
+ *      the system minimizing the bar while the app allows hiding). The session records its context: the scroll view, the
+ *      selected tab, the page on screen, the window, the behavior and the path. Anything that does not match that
+ *      context, or that `-environmentAllowsHiding` refuses, ends the session and brings the bar back at once, also for
+ *      situations nobody listed (e.g. a page shown from a notification banner, a share sheet, a split screen resize).
+ *      It is checked on every scroll event, every layout of the tab bar controller, its view lifecycle callbacks, every
+ *      observed notification, and by the check timer while the bar is hidden.
+ * [CN] 健壮性的核心是白名单而不是事件列表：只有在“隐藏会话”内，TabBar 才可以保持隐藏。开始会话的唯一方式是用户向下滚动浏览内容
+ *      （`-minimizeTabBar`；液态玻璃为 App 允许隐藏时系统缩小了 TabBar）。会话记录当时的上下文：滚动视图、选中的 Tab、当前显示的页面、
+ *      窗口、取值与路径。任何与该上下文不一致、或 `-environmentAllowsHiding` 不允许的情况，都会结束会话并立即恢复显示，包括没有被
+ *      列举到的情况（例如从通知横幅打开的页面、分享面板、分屏尺寸变化）。检查时机：每次滚动、TabBarController 每次布局、
+ *      它的视图生命周期回调、每个被监听的通知，以及 TabBar 隐藏期间的定时检查。
+ */
+- (void)beginHideSession {
+    CYLTabBarController *tabBarController = self.tabBarController;
+    UIViewController *selectedViewController = tabBarController.selectedViewController;
+    _hideSessionActive = YES;
+    _sessionScrollView = self.scrollView;
+    _sessionSelectedViewController = selectedViewController;
+    _sessionPage = CYLTabBarMinimizeVisibleViewController(selectedViewController);
+    _sessionWindow = tabBarController.viewIfLoaded.window;
+    _sessionBehavior = tabBarController.cyl_tabBarMinimizeBehavior;
+    _sessionMode = _mode;
+}
+
+- (void)endHideSession {
+    _hideSessionActive = NO;
+    _sessionScrollView = nil;
+    _sessionSelectedViewController = nil;
+    _sessionPage = nil;
+    _sessionWindow = nil;
+}
+
+/// [EN] Whether the running session still matches its context and the app still allows hiding.
+/// [CN] 正在进行的会话是否仍与其上下文一致，且 App 仍允许隐藏。
+- (BOOL)hideSessionIsValid {
+    if (!_hideSessionActive || ![self environmentAllowsHiding]) {
+        return NO;
+    }
+    CYLTabBarController *tabBarController = self.tabBarController;
+    UIViewController *selectedViewController = tabBarController.selectedViewController;
+    UIScrollView *scrollView = self.scrollView;
+    UIScrollView *sessionScrollView = _sessionScrollView;
+    UIViewController *sessionSelectedViewController = _sessionSelectedViewController;
+    UIViewController *sessionPage = _sessionPage;
+    UIWindow *sessionWindow = _sessionWindow;
+    return scrollView && scrollView == sessionScrollView
+        && selectedViewController && selectedViewController == sessionSelectedViewController
+        && sessionPage && CYLTabBarMinimizeVisibleViewController(selectedViewController) == sessionPage
+        && sessionWindow && tabBarController.viewIfLoaded.window == sessionWindow
+        && tabBarController.cyl_tabBarMinimizeBehavior == _sessionBehavior
+        && _mode == _sessionMode;
+}
+
+/*!
+ * [EN] Brings the bar back unless a valid session explains why it is hidden or minimized. Liquid Glass: a bar the system
+ *      minimized while hiding is allowed adopts a session (the system decides when to minimize), any other is restored.
+ * [CN] 除非有一个有效的会话说明 TabBar 为何被隐藏或缩小，否则恢复显示。液态玻璃：在允许隐藏时被系统缩小的 TabBar 会开始一个会话
+ *      （何时缩小由系统决定），其他情况恢复显示。
+ */
+- (void)validateHideSession {
+    // [EN] Shown again by the app or UIKit (FlatDesign, classic): not hidden by scrolling any more.
+    // [CN] 已被 App 或 UIKit 重新显示（扁平样式、经典样式）：不再是滚动隐藏状态。
+    if (_hiddenByScroll && !self.tabBarController.isTabBarHidden) {
+        _hiddenByScroll = NO;
+    }
+    if (![self isTabBarHiddenOrMinimizedByScroll]) {
+        // [EN] Shown again (by scrolling up, the system, or the app): the session is over. [CN] 已重新显示：会话结束。
+        if (_hideSessionActive) {
+            [self endHideSession];
+        }
+        return;
+    }
+    // [EN] Liquid Glass: the system decides when to minimize, so a minimize while hiding is allowed is adopted even before a
+    //      new drag; refusing it would fight the system while the old drag's momentum runs.
+    // [CN] 液态玻璃：何时缩小由系统决定，因此允许隐藏时的缩小即使发生在新的拖动之前也会被接受；拒绝它会在旧拖动的惯性期间与系统反复拉扯。
+    if (CYLTabBarMinimizeModeLiquidGlass == _mode && !_hideSessionActive && [self environmentAllowsHiding]) {
+        [self beginHideSession];
+        return;
+    }
+    if (![self hideSessionIsValid]) {
+        [self restoreTabBar];
+    }
+}
+
+#pragma mark Check timer
+
+/// [EN] Runs the check timer while it is needed: always for the classic path (page changes), and for every path while
+///      the bar is hidden or minimized by scrolling (faster then). Stops otherwise.
+/// [CN] 仅在需要时运行定时检查：经典样式始终运行（页面变化）；任何路径在 TabBar 被滚动隐藏或缩小期间运行（此时间隔更短）。其他情况停止。
+- (void)updateCheckTimer {
+    NSTimeInterval interval = 0;
+    if ([self isTabBarHiddenOrMinimizedByScroll]) {
+        interval = CYLTabBarMinimizeRestoreCheckInterval;
+    } else if (CYLTabBarMinimizeModeClassic == _mode) {
+        interval = CYLTabBarMinimizeClassicPageCheckInterval;
+    }
+    if (_checkTimer && interval == _checkTimerInterval) {
+        return;
+    }
+    [_checkTimer invalidate];
+    _checkTimer = nil;
+    _checkTimerInterval = interval;
+    if (interval <= 0) {
+        return;
+    }
+    __weak typeof(self) weakSelf = self;
+    _checkTimer = [NSTimer scheduledTimerWithTimeInterval:interval repeats:YES block:^(NSTimer *timer) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf || !strongSelf.tabBarController) {
+            [timer invalidate];
+            return;
+        }
+        [strongSelf checkTimerFired];
+    }];
+    _checkTimer.tolerance = interval * 0.5;
+}
+
+/*!
+ * [EN] The safety net for what no notification reports: a page change (push, pop, a push after a notification tap, a
+ *      tab switch) is found by re-resolving the scroll view, which shows the bar again; an alert, a modal or a lost key
+ *      window restores the bar.
+ * [CN] 没有通知可监听情况的安全网：重新确认滚动视图即可发现页面变化（push、pop、点击推送后的 push、切换 Tab），并重新显示 TabBar；
+ *      弹框、模态页面或失去 key window 时恢复 TabBar。
+ */
+- (void)checkTimerFired {
+    CYLTabBarController *tabBarController = self.tabBarController;
+    if (tabBarController.viewIfLoaded.window) {
+        [tabBarController cyl_updateTabBarMinimizeTracking];
+    }
+    [self validateHideSession];
+    [self updateCheckTimer];
 }
 
 - (void)updateMode:(CYLTabBarMinimizeMode)mode {
@@ -6362,23 +6704,7 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     _mode = mode;
     _scrolledDistance = 0;
     _laidOutMinimized = NO;
-    // Guard: the page check timer runs for the classic path only. 定时检查只用于经典样式。
-    [_classicPageCheckTimer invalidate];
-    _classicPageCheckTimer = nil;
-    if (CYLTabBarMinimizeModeClassic == mode) {
-        __weak typeof(self) weakSelf = self;
-        _classicPageCheckTimer = [NSTimer scheduledTimerWithTimeInterval:CYLTabBarMinimizeClassicPageCheckInterval repeats:YES block:^(NSTimer *timer) {
-            CYLTabBarController *tabBarController = weakSelf.tabBarController;
-            if (!tabBarController) {
-                [timer invalidate];
-                return;
-            }
-            if (tabBarController.viewIfLoaded.window) {
-                [tabBarController cyl_updateTabBarMinimizeTracking];
-            }
-        }];
-        _classicPageCheckTimer.tolerance = CYLTabBarMinimizeClassicPageCheckInterval * 0.5;
-    }
+    [self updateCheckTimer];
 }
 
 - (void)observeScrollView:(UIScrollView *)scrollView {
@@ -6409,8 +6735,11 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     // Guard: Liquid Glass only follows the system; it never hides the bar itself. 液态玻璃只跟随系统，从不自行隐藏 TabBar。
     if (CYLTabBarMinimizeModeLiquidGlass == _mode) {
         [self layOutTabBarIfMinimizedStateChanged];
+        [self validateHideSession];
         return;
     }
+    // [EN] Every scroll event checks the session first. [CN] 每次滚动都先检查会话。
+    [self validateHideSession];
     NSValue *oldValue = change[NSKeyValueChangeOldKey];
     NSValue *newValue = change[NSKeyValueChangeNewKey];
     if (![oldValue isKindOfClass:[NSValue class]] || ![newValue isKindOfClass:[NSValue class]]) {
@@ -6432,23 +6761,35 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     if (!minimizesOnScrollDown && !minimizesOnScrollUp) {
         return;
     }
-    // [EN] Only scrolling by the user counts. Offsets set in code, e.g. when the safe area changes because the tab bar
-    //      hides, are ignored.
-    // [CN] 只响应用户的滚动。代码设置的偏移（例如 TabBar 隐藏导致安全区变化）不处理。
-    if (!scrollView.isTracking && !scrollView.isDragging && !scrollView.isDecelerating) {
-        return;
-    }
     UIEdgeInsets insets = scrollView.adjustedContentInset;
     CGFloat minOffsetY = -insets.top;
     CGFloat maxOffsetY = MAX(minOffsetY, scrollView.contentSize.height + insets.bottom - CGRectGetHeight(scrollView.bounds));
+    // [EN] Checked before the user-scroll guard below, so these also work for offsets set in code: content that no
+    //      longer scrolls (e.g. reloaded shorter) never keeps the bar hidden, and back at the edge the content starts
+    //      from (also after a tap on the status bar) the bar comes back, as the system does.
+    // [CN] 放在下方“仅用户滚动”的 guard 之前，因此代码设置的偏移同样生效：不再能滚动的内容（例如重新加载后变短）不会让 TabBar
+    //      保持隐藏；回到内容的起始边缘（包括点击状态栏回到顶部）时，与系统一致，重新显示 TabBar。
     if (maxOffsetY - minOffsetY < CYLTabBarMinimizeMinimumScrollableDistance) {
+        _scrolledDistance = 0;
+        [self expandTabBar];
         return;
     }
-    // [EN] Back at the edge the content starts from: show the tab bar, as the system does.
-    // [CN] 回到内容的起始边缘：与系统一致，显示 TabBar。
     if ((minimizesOnScrollDown && newOffsetY <= minOffsetY) || (minimizesOnScrollUp && newOffsetY >= maxOffsetY)) {
         _scrolledDistance = 0;
         [self expandTabBar];
+        return;
+    }
+    // [EN] A new drag starts when `isTracking` turns on; it lifts the block set by a restore.
+    // [CN] `isTracking` 由 NO 变为 YES 即开始新的拖动，解除恢复时设置的限制。
+    BOOL tracking = scrollView.isTracking;
+    if (tracking && !_lastSeenTracking) {
+        _needsNewDrag = NO;
+    }
+    _lastSeenTracking = tracking;
+    // [EN] Only scrolling by the user counts. Offsets set in code, e.g. when the safe area changes because the tab bar
+    //      hides, are ignored.
+    // [CN] 只响应用户的滚动。代码设置的偏移（例如 TabBar 隐藏导致安全区变化）不处理。
+    if (!tracking && !scrollView.isDragging && !scrollView.isDecelerating) {
         return;
     }
     // [EN] Ignore the rubber band beyond either edge: it bounces back in the opposite direction.
@@ -6471,11 +6812,23 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     // [CN] 正值：内容上移，即用户向下滚动继续浏览。
     BOOL scrollsDown = (_scrolledDistance > 0);
     _scrolledDistance = 0;
-    if (scrollsDown == minimizesOnScrollDown) {
-        [self minimizeTabBar];
-    } else {
+    if (scrollsDown != minimizesOnScrollDown) {
         [self expandTabBar];
+        return;
     }
+    // [EN] Hide only while the user reads on, as in the Facebook app: not before a new drag after a restore, not in the
+    //      first CYLTabBarMinimizeHideStartDistance of the content, and only when the app allows it.
+    // [CN] 与 Facebook App 一致，只在用户继续浏览内容时隐藏：恢复后需新的拖动，内容开头 CYLTabBarMinimizeHideStartDistance 内不隐藏，
+    //      并且需要 App 环境允许。
+    if (_needsNewDrag) {
+        return;
+    }
+    BOOL farEnoughIntoContent = minimizesOnScrollDown ? (newOffsetY > minOffsetY + CYLTabBarMinimizeHideStartDistance)
+                                                      : (newOffsetY < maxOffsetY - CYLTabBarMinimizeHideStartDistance);
+    if (!farEnoughIntoContent || ![self environmentAllowsHiding]) {
+        return;
+    }
+    [self minimizeTabBar];
 }
 
 #pragma mark Liquid Glass
@@ -6498,6 +6851,8 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
         return;
     }
     _laidOutMinimized = minimized;
+    // [EN] Minimized: the safety net watches for anything that must bring the bar back. [CN] 缩小后：由安全网检查何时需要恢复。
+    [self updateCheckTimer];
     [tabBar setNeedsLayout];
     __weak UIView *weakTabBar = tabBar;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -6535,7 +6890,10 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
             return;
     }
     _hiddenByScroll = YES;
+    // [EN] The one place a session starts for FlatDesign and classic. [CN] 扁平样式与经典样式开始会话的唯一位置。
+    [self beginHideSession];
     [tabBarController setTabBarHidden:YES animated:YES];
+    [self updateCheckTimer];
 }
 
 - (void)expandTabBar {
@@ -6558,6 +6916,7 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     if (tabBarController.isTabBarHidden) {
         [tabBarController setTabBarHidden:NO animated:YES];
     }
+    [self updateCheckTimer];
 }
 
 /// [EN] FlatDesign guard: the flat tab bar is on screen in the controller's view (not in a transition overlay).
@@ -6627,6 +6986,34 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
 - (void)setCyl_tabBarMinimizeBehavior:(CYLTabBarMinimizeBehavior)behavior {
     objc_setAssociatedObject(self, CYLTabBarMinimizeBehaviorKey, @(behavior), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     [self cyl_updateTabBarMinimizeTracking];
+}
+
+/*!
+ * [EN] Liquid Glass: UIKit has no API to expand a minimized tab bar. Writing `Never` (through `super`) makes the system
+ *      expand it; the app's value is written back after CYLTabBarMinimizeLiquidGlassExpandHold, so minimizing on scroll
+ *      keeps working. Does nothing on other systems or when the system value is already `Never`.
+ * [CN] 液态玻璃：UIKit 没有恢复已缩小 TabBar 的接口。通过 `super` 写入 `Never` 让系统恢复 TabBar；
+ *      CYLTabBarMinimizeLiquidGlassExpandHold 之后再写回 App 的取值，滚动缩小继续生效。其他系统或系统取值已是 `Never` 时不做处理。
+ */
+- (void)cyl_expandSystemMinimizedTabBar {
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    if (@available(iOS 26.0, *)) {
+        if (UITabBarMinimizeBehaviorNever == [super tabBarMinimizeBehavior]) {
+            return;
+        }
+        objc_setAssociatedObject(self, CYLTabBarMinimizeHoldsSystemNeverKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [super setTabBarMinimizeBehavior:UITabBarMinimizeBehaviorNever];
+        __weak typeof(self) weakSelf = self;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(CYLTabBarMinimizeLiquidGlassExpandHold * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf) {
+                return;
+            }
+            objc_setAssociatedObject(strongSelf, CYLTabBarMinimizeHoldsSystemNeverKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            [strongSelf cyl_updateTabBarMinimizeTracking];
+        });
+    }
+#endif
 }
 
 #pragma mark cyl_hidesTabBarOnScroll
@@ -6711,7 +7098,10 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
         //      the style can change after the value is set; only a different value is written.
         // [CN] 只有液态玻璃交给系统缩小 TabBar。扁平样式与经典 TabBar（UI 兼容模式）自行隐藏 TabBar，因此让系统不缩小。由于设置取值后
         //      样式仍可能改变，每次布局都会重新检查；只有取值不同时才写入。
-        BOOL systemMinimizes = (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) && [CYLConstants isLiquidGlassActive];
+        // [EN] Guard: while `-cyl_expandSystemMinimizedTabBar` holds `Never` to expand the bar, leave it.
+        // [CN] Guard：`-cyl_expandSystemMinimizedTabBar` 为恢复 TabBar 暂时保持 `Never` 期间，不改动。
+        BOOL holdsNever = [objc_getAssociatedObject(self, CYLTabBarMinimizeHoldsSystemNeverKey) boolValue];
+        BOOL systemMinimizes = !holdsNever && (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) && [CYLConstants isLiquidGlassActive];
         UITabBarMinimizeBehavior systemBehavior = systemMinimizes ? CYLSystemTabBarMinimizeBehavior(self.cyl_tabBarMinimizeBehavior) : UITabBarMinimizeBehaviorNever;
         // [EN] Through `super`: `-setTabBarMinimizeBehavior:` above is the app's switch, not UIKit's value.
         // [CN] 通过 `super`：上面的 `-setTabBarMinimizeBehavior:` 是 App 的开关，而不是交给 UIKit 的取值。
@@ -6746,9 +7136,20 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
     if (scrollView != tracker.scrollView) {
         // [EN] Another tab or page is on screen: show the tab bar again, as the system does.
         // [CN] 切换到其他 Tab 或页面：与系统一致，重新显示 TabBar。
-        [tracker expandTabBar];
+        [tracker restoreTabBar];
         [tracker observeScrollView:scrollView];
     }
+    // [EN] Every layout of this controller checks the hide session. [CN] 本控制器每次布局都检查隐藏会话。
+    [tracker validateHideSession];
+}
+
+- (void)cyl_tabBarMinimizeLifecycleEvent {
+    _CYLTabBarMinimizeScrollTracker *tracker = objc_getAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey);
+    // Guard: only while scroll hiding is on. 仅在开启滚动隐藏时处理。
+    if (!tracker) {
+        return;
+    }
+    [tracker restoreTabBar];
 }
 
 @end

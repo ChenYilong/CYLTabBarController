@@ -1430,6 +1430,13 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      FlatDesign and the classic tab bar hide through the same public `-setTabBarHidden:animated:` you can call yourself;
  *      a tab bar you hid with it stays hidden.
  *      Can be set at any time, before or after the view loads.
+ *      When it comes back (issue #13, as in the Facebook app): the bar hides only while the user drags down through
+ *      content; it comes back at once, in every style, on background / foreground switches, a call, any system or in-app
+ *      alert, a modal page, another key window, a push notification, a push or pop, and a memory warning, and hides again
+ *      only on a new drag. Robust by design: a whitelist, not a list of events. The bar stays hidden only inside a hide
+ *      session, started by the user scrolling down and bound to its context (page, tab, scroll view, window); anything
+ *      else, also this controller's appear / disappear / size change and the keyboard, ends it and shows the bar.
+ *      See docs/TabBar-Minimize-On-Scroll.md, "When the tab bar hides, and when it comes back".
  *      Same switch, Apple's API: on iOS 26+, `tabBarController.tabBarMinimizeBehavior = UITabBarMinimizeBehaviorOnScrollDown`
  *      does exactly the same in every style (CYLTabBarController overrides it; both read and write one value). Use this
  *      property where iOS 25 and earlier must be supported, since Apple's property does not exist there.
@@ -1446,6 +1453,11 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      扁平样式与经典 TabBar 都通过同一个公开接口 `-setTabBarHidden:animated:` 隐藏，你也可以直接调用它；你用它隐藏的 TabBar
  *      保持隐藏。
  *      任何时候都可以设置，视图加载前后均可。
+ *      何时恢复显示（issue #13，参考 Facebook App）：只在用户向下拖动浏览内容时隐藏；前后台切换、来电、任何系统或 App 内弹框、
+ *      模态页面、其他窗口成为 key window、推送、push 或 pop、内存警告时，所有样式都立即恢复显示，之后只有新的拖动才会再次隐藏。
+ *      设计上采用白名单而不是事件列表：TabBar 只在“隐藏会话”内保持隐藏，会话由用户向下滚动开始，并绑定当时的上下文（页面、Tab、
+ *      滚动视图、窗口）；其他任何情况，包括本控制器的出现 / 消失 / 尺寸变化与键盘弹出，都会结束会话并恢复显示。
+ *      见 docs/TabBar-Minimize-On-Scroll.md「何时隐藏、何时恢复显示」。
  *      同一个开关，Apple 的接口：iOS 26+ 上 `tabBarController.tabBarMinimizeBehavior = UITabBarMinimizeBehaviorOnScrollDown`
  *      在所有样式下效果完全相同（CYLTabBarController 重写了它，二者读写同一个取值）。需要支持 iOS 25 及以前时使用本属性，
  *      因为这些系统上没有 Apple 的这个属性。
