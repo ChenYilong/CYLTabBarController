@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		08E79CD10245A663F1BD4123 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 45BFB2F14A25627FEFFEF13E /* Poppins-Bold.ttf */; };
 		167CF5CA65FDB746AE1E47F6 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CBB7661983D3BF1EC5DDFF /* SignInView.swift */; };
+		1992DB5C81A6B5A0E8695861 /* CYLSettingsDemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F30006E5BC2C896C43D35808 /* CYLSettingsDemoTableViewController.swift */; };
 		19E3EF073616D95A0907ECF0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8E9F1732B1A1048CFEFB23 /* HomeView.swift */; };
 		24C9C0A04F6CFE6ADF0916D6 /* TabItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302B7A22BBFEB0B6D2D1F250 /* TabItems.swift */; };
 		3A951187ACF1CACD03009E33 /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = C654F0A882961E70103CCF0B /* icons.riv */; };
@@ -69,6 +70,7 @@
 		CE74468C4779D2C9657DDB0A /* VCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VCard.swift; sourceTree = "<group>"; };
 		E2E65C33F57E037E0E98F612 /* button.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = button.riv; sourceTree = "<group>"; };
 		E8DF93C34F3E7B872BF47F0F /* check.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = check.riv; sourceTree = "<group>"; };
+		F30006E5BC2C896C43D35808 /* CYLSettingsDemoTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLSettingsDemoTableViewController.swift; path = "../Example-Shared/CYLSettingsDemoTableViewController.swift"; sourceTree = SOURCE_ROOT; };
 		FF928D71D024B7F90696E769 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -114,6 +116,14 @@
 			path = Fonts;
 			sourceTree = "<group>";
 		};
+		202FF2BA2D94A674B07FD8B8 /* Example-Shared */ = {
+			isa = PBXGroup;
+			children = (
+				F30006E5BC2C896C43D35808 /* CYLSettingsDemoTableViewController.swift */,
+			);
+			name = "Example-Shared";
+			sourceTree = "<group>";
+		};
 		2586F642F2547DDB3086C82D /* iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -129,6 +139,7 @@
 				04DA43D1003ED7CCDAE645A9 /* Frameworks */,
 				9899378068CB3C52A3906106 /* RiveApp */,
 				44BEF7973B94924E60D5369A /* Shared (Example-SwiftUI-Rive) */,
+				202FF2BA2D94A674B07FD8B8 /* Example-Shared */,
 			);
 			sourceTree = "<group>";
 		};
@@ -318,6 +329,7 @@
 				167CF5CA65FDB746AE1E47F6 /* SignInView.swift in Sources */,
 				A905CDB1E98C37058FE447D1 /* SideMenu.swift in Sources */,
 				24C9C0A04F6CFE6ADF0916D6 /* TabItems.swift in Sources */,
+				1992DB5C81A6B5A0E8695861 /* CYLSettingsDemoTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

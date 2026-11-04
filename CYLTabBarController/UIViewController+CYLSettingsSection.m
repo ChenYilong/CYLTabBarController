@@ -1480,6 +1480,101 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     return [self cyl_languageCellForTableView:tableView];
 }
 
+#pragma mark - Groups
+
+/*!
+ * [EN] The rows of each group, in display order. The tab item update rows follow `CYLSettingsRowTabBarItemUpdate`.
+ * [CN] 每个分组中的行，按显示顺序排列。更新 Tab 的行位于 `CYLSettingsRowTabBarItemUpdate` 之后。
+ */
+- (NSArray<NSNumber *> *)cyl_placedSettingsRowsInGroup:(CYLSettingsGroup)group {
+    NSInteger update = CYLSettingsRowTabBarItemUpdate;
+    switch (group) {
+        case CYLSettingsGroupGeneral:
+            return @[ @(CYLSettingsRowLanguage), @(CYLSettingsRowMemoryWarning) ];
+        case CYLSettingsGroupTabBarAppearance:
+            return @[ @(CYLSettingsRowTitlePositionAdjustment), @(CYLSettingsRowStandardAppearance),
+                      @(CYLSettingsRowTabBarMinimizeBehavior) ];
+        case CYLSettingsGroupTabBarItemUpdate: {
+            NSMutableArray<NSNumber *> *rows = [NSMutableArray array];
+            for (NSInteger row = 0; row < CYLTabBarItemUpdateRowReplaceNeighbors; row++) {
+                [rows addObject:@(update + row)];
+            }
+            return rows;
+        }
+        case CYLSettingsGroupPagesSelectionLogin:
+            return @[ @(update + CYLTabBarItemUpdateRowReplaceNeighbors), @(CYLSettingsRowSelectedIndexIgnoringPlusButton),
+                      @(CYLSettingsRowLoginState) ];
+        case CYLSettingsGroupPlusButton:
+            return @[ @(CYLSettingsRowPlusButtonTouchableArea) ];
+        case CYLSettingsGroupTabInteractions:
+            return @[ @(CYLSettingsRowTabButtonTapAnimation), @(CYLSettingsRowTapFeedback), @(CYLSettingsRowTabButtonLongPress),
+                      @(CYLSettingsRowGestureTiming), @(CYLSettingsRowSwipeToSwitchTab), @(CYLSettingsRowSwitchAdjacentTab),
+                      @(CYLSettingsRowSlideTransition) ];
+        case CYLSettingsGroupHelpers:
+            return @[ @(CYLSettingsRowNavigationWithoutBaseClass), @(CYLSettingsRowOutsideSuperviewBounds),
+                      @(CYLSettingsRowBundleImage), @(CYLSettingsRowUtilsHelpers) ];
+    }
+    return @[];
+}
+
+- (NSArray<NSNumber *> *)cyl_settingsGroups {
+    NSMutableArray<NSNumber *> *groups = [NSMutableArray array];
+    for (NSInteger group = CYLSettingsGroupGeneral; group <= CYLSettingsGroupHelpers; group++) {
+        if ([self cyl_settingsRowsInGroup:(CYLSettingsGroup)group].count > 0) {
+            [groups addObject:@(group)];
+        }
+    }
+    return groups;
+}
+
+- (NSString *)cyl_titleForSettingsGroup:(CYLSettingsGroup)group {
+    switch (group) {
+        case CYLSettingsGroupGeneral: return CYLLocalizedString(@"通用");
+        case CYLSettingsGroupTabBarAppearance: return CYLLocalizedString(@"TabBar 外观");
+        case CYLSettingsGroupTabBarItemUpdate: return CYLLocalizedString(@"原地更新 Tab");
+        case CYLSettingsGroupPagesSelectionLogin: return CYLLocalizedString(@"Tab 页面、选中与登录");
+        case CYLSettingsGroupPlusButton: return @"PlusButton";
+        case CYLSettingsGroupTabInteractions: return CYLLocalizedString(@"Tab 交互");
+        case CYLSettingsGroupHelpers: return CYLLocalizedString(@"无需继承基类与工具方法");
+    }
+    return @"";
+}
+
+- (NSArray<NSNumber *> *)cyl_settingsRowsInGroup:(CYLSettingsGroup)group {
+    NSInteger rowCount = [self cyl_settingsRowCount];
+    NSMutableArray<NSNumber *> *rows = [NSMutableArray array];
+    for (NSNumber *row in [self cyl_placedSettingsRowsInGroup:group]) {
+        if (row.integerValue < rowCount) {
+            [rows addObject:row];
+        }
+    }
+    if (group == CYLSettingsGroupGeneral) {
+        // [EN] Rows no group places (a newer row) stay visible here. [CN] 未被任何分组归类的行（新增的行）放在这里，保证可见。
+        NSMutableSet<NSNumber *> *placed = [NSMutableSet set];
+        for (NSInteger each = CYLSettingsGroupGeneral; each <= CYLSettingsGroupHelpers; each++) {
+            [placed addObjectsFromArray:[self cyl_placedSettingsRowsInGroup:(CYLSettingsGroup)each]];
+        }
+        for (NSInteger row = 0; row < rowCount; row++) {
+            if (![placed containsObject:@(row)]) {
+                [rows addObject:@(row)];
+            }
+        }
+    }
+    return rows;
+}
+
+- (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView row:(NSInteger)row {
+    return [self cyl_settingsCellForTableView:tableView atIndexPath:[NSIndexPath indexPathForRow:row inSection:CYLSettingsSection]];
+}
+
+- (void)cyl_didSelectSettingsRow:(NSInteger)row {
+    // [EN] The rows reload their own index paths in the settings section, which a grouped list does not have: run the row
+    //      without a table view; the caller reloads.
+    // [CN] 各行会刷新其在设置分组中的 indexPath，而分组列表中没有该分组：不传列表执行该行，由调用方刷新。
+    [self cyl_didSelectSettingsRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:CYLSettingsSection]
+                                  inTableView:(UITableView *_Nonnull)nil];
+}
+
 - (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (indexPath.row == CYLSettingsRowMemoryWarning) {

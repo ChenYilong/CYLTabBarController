@@ -41,6 +41,22 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 
 /*!
+ * [EN] The settings rows by function, for a list that shows them in groups (one table section per group, like Settings):
+ *      the ObjC demo and the Swift demo (`Example-Shared/CYLSettingsDemoTableViewController.swift`) use the same groups.
+ * [CN] 按功能划分的设置行，供分组显示的列表使用（每组一个 section，类似系统设置）：ObjC Demo 与 Swift Demo
+ *      （`Example-Shared/CYLSettingsDemoTableViewController.swift`）使用相同的分组。
+ */
+typedef NS_ENUM(NSInteger, CYLSettingsGroup) {
+    CYLSettingsGroupGeneral,              ///< [EN] Language, memory warning, and rows a newer version adds. [CN] 语言、内存警告，以及新版本新增的行。
+    CYLSettingsGroupTabBarAppearance,     ///< [EN] Title offset, standardAppearance, scroll minimize. [CN] 标题偏移、standardAppearance、滚动缩小。
+    CYLSettingsGroupTabBarItemUpdate,     ///< [EN] In-place tab item updates (#601). [CN] 原地更新 Tab（#601）。
+    CYLSettingsGroupPagesSelectionLogin,  ///< [EN] Replace pages (#481), selectedIndex (#515), login (#19). [CN] 替换页面、selectedIndex、登录。
+    CYLSettingsGroupPlusButton,           ///< [EN] The plus button's touchable area (#91). [CN] PlusButton 可点击区域（#91）。
+    CYLSettingsGroupTabInteractions,      ///< [EN] Tap animation, sound, long press, swipe (#535, #118). [CN] 点击动画、声音、长按、滑动。
+    CYLSettingsGroupHelpers,              ///< [EN] No base class, CYLUtils helpers (#535). [CN] 无需继承基类、CYLUtils 工具方法。
+};
+
+/*!
  * [EN] The settings section in three calls, so a list adds it with one line in each data source and delegate method:
  *
  *          numberOfSections                  → your sections + 1
@@ -69,6 +85,40 @@ FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
  * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题、登录状态或更新 Tab。
  */
 - (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
+
+#pragma mark - Groups
+
+/*!
+ * [EN] The groups that have rows, in display order (`CYLSettingsGroup` values).
+ * [CN] 有行的分组，按显示顺序排列（`CYLSettingsGroup` 的值）。
+ */
+- (NSArray<NSNumber *> *)cyl_settingsGroups NS_SWIFT_NAME(cyl_settingsGroups());
+
+/*!
+ * [EN] The localized title of `group`.
+ * [CN] `group` 的本地化标题。
+ */
+- (NSString *)cyl_titleForSettingsGroup:(CYLSettingsGroup)group NS_SWIFT_NAME(cyl_title(for:));
+
+/*!
+ * [EN] The settings rows of `group`, in display order. Every settings row is in exactly one group; a row this version does
+ *      not place goes to `CYLSettingsGroupGeneral`.
+ * [CN] `group` 中的设置行，按显示顺序排列。每个设置行只属于一个分组；本版本未归类的行放入 `CYLSettingsGroupGeneral`。
+ */
+- (NSArray<NSNumber *> *)cyl_settingsRowsInGroup:(CYLSettingsGroup)group NS_SWIFT_NAME(cyl_settingsRows(in:));
+
+/*!
+ * [EN] The cell of settings row `row`, for any section of any table view (a grouped list).
+ * [CN] 设置行 `row` 的 cell，可用于任意列表的任意 section（分组列表）。
+ */
+- (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView row:(NSInteger)row NS_SWIFT_NAME(cyl_settingsCell(for:row:));
+
+/*!
+ * [EN] Runs settings row `row`, without touching a table view: a grouped list deselects and reloads its own rows after it
+ *      (e.g. a checkmark or the current value changed).
+ * [CN] 执行设置行 `row`，不操作列表：分组列表在其后自行取消选中并刷新（例如勾号或当前值已变化）。
+ */
+- (void)cyl_didSelectSettingsRow:(NSInteger)row NS_SWIFT_NAME(cyl_didSelectSettingsRow(_:));
 
 @end
 

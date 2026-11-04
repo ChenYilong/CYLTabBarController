@@ -86,10 +86,13 @@ struct OnboardingView: View {
                         .offset(y: 10)
                 )
                 .overlay(
+                    // [EN] The button is white in both appearances, so its label stays dark (`.primary` turned white in
+                    //      Dark Mode, and the label disappeared).
+                    // [CN] 按钮在两种外观下都是白色，因此文字保持深色（`.primary` 在暗黑模式下变为白色，文字会看不见）。
                     Label("Start the course", systemImage: "arrow.forward")
                         .offset(x: 4, y: 4)
                         .customFont(.headline)
-                        .accentColor(.primary)
+                        .foregroundColor(.black)
                 )
                 .onTapGesture {
                     button.play()

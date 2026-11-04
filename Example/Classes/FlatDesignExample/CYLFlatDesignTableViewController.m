@@ -368,48 +368,27 @@ static const NSInteger CYLDemoRowTabBar = 1000;
 @implementation UIViewController (CYLDemoSections)
 
 /*!
- * [EN] The sections, by function: each row is a settings row index, or `CYLDemoRowTabBar` + a tab bar demo row. The
- *      settings rows follow `UIViewController+CYLSettingsSection.m`: 0 language, 1 memory warning, 2 title offset,
- *      3 standardAppearance, 4 login state, 5 plus button touchable area, 6 selectedIndex (#515), 7 minimize / hide the
- *      tab bar on scroll (#13, next to the show / hide row), 8–18 issue #535 (8 tap animation, 9 long press, 10 swipe,
- *      11 outside the superview, 12 bundle images, 13 navigation bar without a base class, 14 slide transition, 15 tap
- *      sound and haptic, 16 long press / double tap timing, 17 adjacent tab, 18 CYLUtils helpers), then the tab item
- *      updates (title, icon, network icon, all network icons, all local icons, GIF, all titles, replace neighbors).
- *      Settings rows not listed here (a newer library) go to the first section.
- * [CN] 按功能分组的 section：每行为设置行的序号，或 `CYLDemoRowTabBar` + TabBar 演示行序号。设置行顺序见
- *      `UIViewController+CYLSettingsSection.m`（见上方英文）。此处未列出的设置行（更新的库）放在第一个 section。
+ * [EN] The sections: the library's settings groups (`-cyl_settingsGroups`), with this demo's tab bar rows
+ *      (`CYLDemoRowTabBar` + a tab bar demo row) added to the appearance group, and a last section for the navigation and
+ *      comparison rows. Each row is a settings row index, or `CYLDemoRowTabBar` + a tab bar demo row.
+ * [CN] 各 section：使用库提供的设置分组（`-cyl_settingsGroups`），本 Demo 的 TabBar 演示行（`CYLDemoRowTabBar` + 行号）加入外观分组，
+ *      最后一个 section 放跳转与对比的行。每行为设置行的序号，或 `CYLDemoRowTabBar` + TabBar 演示行序号。
  */
 - (NSArray<NSDictionary *> *)cyl_demoSections {
-    NSInteger update = [self cyl_settingsRowCount] - [self cyl_tabBarItemUpdateRowCount];
-    NSMutableArray<NSDictionary *> *sections = [@[
-        @{ @"title" : CYLLocalizedString(@"通用"), @"rows" : @[ @0, @1 ] },
-        @{ @"title" : CYLLocalizedString(@"TabBar 外观"),
-           @"rows" : @[ @2, @3, @(CYLDemoRowTabBar + 0), @7, @(CYLDemoRowTabBar + 4), @(CYLDemoRowTabBar + 1),
-                        @(CYLDemoRowTabBar + 2), @(CYLDemoRowTabBar + 3) ] },
-        @{ @"title" : CYLLocalizedString(@"原地更新 Tab"),
-           @"rows" : @[ @(update + 0), @(update + 1), @(update + 2), @(update + 3), @(update + 4), @(update + 5), @(update + 6) ] },
-        @{ @"title" : CYLLocalizedString(@"Tab 页面、选中与登录"), @"rows" : @[ @(update + 7), @6, @4 ] },
-        @{ @"title" : @"PlusButton", @"rows" : @[ @5 ] },
-        // FIX: issue #535 — tap animation, tap sound and haptic, long press, long press / double tap timing, swipe,
-        // switch to the adjacent tab, slide transition. 点击动画、点击声音与触感、长按、长按与双击时长、滑动、切换相邻 Tab、滑动转场。
-        @{ @"title" : CYLLocalizedString(@"Tab 交互"), @"rows" : @[ @8, @15, @9, @16, @10, @17, @14 ] },
-        // FIX: issue #535 — navigation bar without a base class, outside the superview, bundle images, CYLUtils helpers.
-        // 不继承基类隐藏导航栏、超出父视图响应、bundle 图片、CYLUtils 工具方法。
-        @{ @"title" : CYLLocalizedString(@"无需继承基类与工具方法"), @"rows" : @[ @13, @11, @12, @18 ] },
-        @{ @"title" : CYLLocalizedString(@"跳转与对比"),
-           @"rows" : @[ @(CYLDemoRowTabBar + 5), @(CYLDemoRowTabBar + 6), @(CYLDemoRowTabBar + 7), @(CYLDemoRowTabBar + 8) ] },
-    ] mutableCopy];
-    NSMutableSet<NSNumber *> *listed = [NSMutableSet set];
-    for (NSDictionary *section in sections) {
-        [listed addObjectsFromArray:section[@"rows"]];
-    }
-    NSMutableArray<NSNumber *> *general = [sections[0][@"rows"] mutableCopy];
-    for (NSInteger row = 0; row < [self cyl_settingsRowCount]; row++) {
-        if (![listed containsObject:@(row)]) {
-            [general addObject:@(row)];
+    NSMutableArray<NSDictionary *> *sections = [NSMutableArray array];
+    for (NSNumber *group in [self cyl_settingsGroups]) {
+        CYLSettingsGroup settingsGroup = (CYLSettingsGroup)group.integerValue;
+        NSMutableArray<NSNumber *> *rows = [[self cyl_settingsRowsInGroup:settingsGroup] mutableCopy];
+        if (settingsGroup == CYLSettingsGroupTabBarAppearance) {
+            // [EN] Show / hide, height, item layout and background color of the tab bar.
+            // [CN] 显示 / 隐藏、高度、TabBarItem 布局与背景色。
+            [rows addObjectsFromArray:@[ @(CYLDemoRowTabBar + 0), @(CYLDemoRowTabBar + 4), @(CYLDemoRowTabBar + 1),
+                                         @(CYLDemoRowTabBar + 2), @(CYLDemoRowTabBar + 3) ]];
         }
+        [sections addObject:@{ @"title" : [self cyl_titleForSettingsGroup:settingsGroup], @"rows" : rows }];
     }
-    sections[0] = @{ @"title" : sections[0][@"title"], @"rows" : general };
+    [sections addObject:@{ @"title" : CYLLocalizedString(@"跳转与对比"),
+                           @"rows" : @[ @(CYLDemoRowTabBar + 5), @(CYLDemoRowTabBar + 6), @(CYLDemoRowTabBar + 7), @(CYLDemoRowTabBar + 8) ] }];
     return sections;
 }
 
@@ -434,7 +413,7 @@ static const NSInteger CYLDemoRowTabBar = 1000;
     if (row >= CYLDemoRowTabBar) {
         return [self cyl_tabBarDemoCellForTableView:tableView row:row - CYLDemoRowTabBar];
     }
-    return [self cyl_settingsCellForTableView:tableView atIndexPath:[NSIndexPath indexPathForRow:row inSection:CYLSettingsSection]];
+    return [self cyl_settingsCellForTableView:tableView row:row];
 }
 
 - (void)cyl_demoDidSelectRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
@@ -444,10 +423,8 @@ static const NSInteger CYLDemoRowTabBar = 1000;
         [self cyl_didSelectTabBarDemoRow:row - CYLDemoRowTabBar inTableView:nil];
         return;
     }
-    // [EN] The settings rows reload their own index paths in the settings section, which this grouped table does not
-    //      have: run the row without the table view, then reload the demo sections (e.g. the checkmarks).
-    // [CN] 设置行会刷新其在设置分组中的 indexPath，而分组后的列表中没有该分组：不传列表执行该行，然后刷新演示 section（如勾号）。
-    [self cyl_didSelectSettingsRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:CYLSettingsSection] inTableView:(UITableView *_Nonnull)nil];
+    // [EN] Run the row, then reload the demo sections (e.g. the checkmarks). [CN] 执行该行，然后刷新演示 section（如勾号）。
+    [self cyl_didSelectSettingsRow:row];
     if (tableView.window) {
         [tableView reloadSections:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, (NSUInteger)[self cyl_demoSectionCount])]
                  withRowAnimation:UITableViewRowAnimationNone];
