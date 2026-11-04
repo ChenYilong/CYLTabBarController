@@ -1,0 +1,513 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		08E79CD10245A663F1BD4123 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 45BFB2F14A25627FEFFEF13E /* Poppins-Bold.ttf */; };
+		167CF5CA65FDB746AE1E47F6 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CBB7661983D3BF1EC5DDFF /* SignInView.swift */; };
+		19E3EF073616D95A0907ECF0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8E9F1732B1A1048CFEFB23 /* HomeView.swift */; };
+		24C9C0A04F6CFE6ADF0916D6 /* TabItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302B7A22BBFEB0B6D2D1F250 /* TabItems.swift */; };
+		3A951187ACF1CACD03009E33 /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = C654F0A882961E70103CCF0B /* icons.riv */; };
+		3C711DA2856AABA0EEB6251B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB104DA902FE6C1FA00D432 /* Foundation.framework */; };
+		45608F73DF993EBDF7A91512 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD544589DFE95E305AADD727 /* CustomTextField.swift */; };
+		64BFFC1EF7D8969B5798C270 /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4832D075A2C5551C835B3AB /* CustomButton.swift */; };
+		64C91DB47B28EFAEC7C9792A /* CustomFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB5B4CC52C44691B7FCA304 /* CustomFont.swift */; };
+		6501E84D2037A29884A2FDA7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF928D71D024B7F90696E769 /* Assets.xcassets */; };
+		68E4EE124A24CAC0643AFEF7 /* menu_button.riv in Resources */ = {isa = PBXBuildFile; fileRef = 4B1F9532677D6BA1B23891DE /* menu_button.riv */; };
+		8C7CC7F169DF6D09CFED6CBE /* TabViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A94E53C3C2459E59C39BB0 /* TabViewControllers.swift */; };
+		9049620E8B510276C7D44D09 /* RiveAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A17F7195D8D07CB67028570 /* RiveAnimation.swift */; };
+		97F5EDDE4D5B47AFC38A08BD /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1E61D8530FAB92D859BBCDFC /* Inter-SemiBold.ttf */; };
+		A905CDB1E98C37058FE447D1 /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FF32281E56757A718BBBB4 /* SideMenu.swift */; };
+		AC7015914DF03E3B9C6AFEAF /* check.riv in Resources */ = {isa = PBXBuildFile; fileRef = E8DF93C34F3E7B872BF47F0F /* check.riv */; };
+		B0D4999FF5EE129B8EE2C3CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF527C082D0F487D0E94689 /* AppDelegate.swift */; };
+		B7E3FB4B942E2BEC8550BB04 /* house.riv in Resources */ = {isa = PBXBuildFile; fileRef = 484F60C30CA9614BAA11FB7E /* house.riv */; };
+		B85C6504BDC177B92A73077A /* button.riv in Resources */ = {isa = PBXBuildFile; fileRef = E2E65C33F57E037E0E98F612 /* button.riv */; };
+		C3D4D7128115A1AC496AE727 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 79CFC0FDE0FE7142C50EE84E /* Inter-Regular.ttf */; };
+		C4F7F8B25F828E7C7B86E306 /* HCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 036951B5B2B073F789932FF8 /* HCard.swift */; };
+		C8BB81F83DEDCBBF770BD1CA /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA98EA66563772A83BDA88 /* Extensions.swift */; };
+		D3CA8AD94703A4D0B9AB2D52 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16027FA884CF141ACF8691AD /* OnboardingView.swift */; };
+		D6F45F96F2196AB7B5E9E432 /* RiveUIKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29242C162EDC3294BE1BC4B0 /* RiveUIKitViewController.swift */; };
+		D8CE80177B49D4DDFAE39C91 /* CourseSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6605666A33C2A6CE223AD2B5 /* CourseSection.swift */; };
+		F15740D40D1D61709C97AD48 /* VCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE74468C4779D2C9657DDB0A /* VCard.swift */; };
+		F2EA4C27D59FFEFFD097501A /* confetti.riv in Resources */ = {isa = PBXBuildFile; fileRef = C78A77277F5BF044CE896CCF /* confetti.riv */; };
+		F432E9BCEE4F345D5C02A425 /* shapes.riv in Resources */ = {isa = PBXBuildFile; fileRef = 8EEB743298095836BF9377D6 /* shapes.riv */; };
+		F6B77B5916BCCA956213941A /* Course.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699EFCFF1B05220558FC4D31 /* Course.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		036951B5B2B073F789932FF8 /* HCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HCard.swift; sourceTree = "<group>"; };
+		16027FA884CF141ACF8691AD /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		1E61D8530FAB92D859BBCDFC /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		26FF32281E56757A718BBBB4 /* SideMenu.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SideMenu.swift; sourceTree = "<group>"; };
+		29242C162EDC3294BE1BC4B0 /* RiveUIKitViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RiveUIKitViewController.swift; sourceTree = "<group>"; };
+		302B7A22BBFEB0B6D2D1F250 /* TabItems.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TabItems.swift; sourceTree = "<group>"; };
+		45BFB2F14A25627FEFFEF13E /* Poppins-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Poppins-Bold.ttf"; sourceTree = "<group>"; };
+		484F60C30CA9614BAA11FB7E /* house.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = house.riv; sourceTree = "<group>"; };
+		4B1F9532677D6BA1B23891DE /* menu_button.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = menu_button.riv; sourceTree = "<group>"; };
+		4D8E9F1732B1A1048CFEFB23 /* HomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		5FF527C082D0F487D0E94689 /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		64CBB7661983D3BF1EC5DDFF /* SignInView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		6605666A33C2A6CE223AD2B5 /* CourseSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CourseSection.swift; sourceTree = "<group>"; };
+		699EFCFF1B05220558FC4D31 /* Course.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Course.swift; sourceTree = "<group>"; };
+		6A17F7195D8D07CB67028570 /* RiveAnimation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RiveAnimation.swift; sourceTree = "<group>"; };
+		6DAA98EA66563772A83BDA88 /* Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		6FC32815DFB9AB0C307D59E7 /* RiveApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RiveApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		79CFC0FDE0FE7142C50EE84E /* Inter-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
+		7CB5B4CC52C44691B7FCA304 /* CustomFont.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomFont.swift; sourceTree = "<group>"; };
+		8EEB743298095836BF9377D6 /* shapes.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = shapes.riv; sourceTree = "<group>"; };
+		9A25FDF1B50065AB34F5233C /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AD544589DFE95E305AADD727 /* CustomTextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
+		ADB104DA902FE6C1FA00D432 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		C0A94E53C3C2459E59C39BB0 /* TabViewControllers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TabViewControllers.swift; sourceTree = "<group>"; };
+		C4832D075A2C5551C835B3AB /* CustomButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
+		C654F0A882961E70103CCF0B /* icons.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = icons.riv; sourceTree = "<group>"; };
+		C78A77277F5BF044CE896CCF /* confetti.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = confetti.riv; sourceTree = "<group>"; };
+		CE74468C4779D2C9657DDB0A /* VCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VCard.swift; sourceTree = "<group>"; };
+		E2E65C33F57E037E0E98F612 /* button.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = button.riv; sourceTree = "<group>"; };
+		E8DF93C34F3E7B872BF47F0F /* check.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = check.riv; sourceTree = "<group>"; };
+		FF928D71D024B7F90696E769 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0A236F0394923B00C424FA7E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3C711DA2856AABA0EEB6251B /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		04DA43D1003ED7CCDAE645A9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2586F642F2547DDB3086C82D /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		0682FBCB181EADD3F8B65FB1 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4D8E9F1732B1A1048CFEFB23 /* HomeView.swift */,
+				16027FA884CF141ACF8691AD /* OnboardingView.swift */,
+				64CBB7661983D3BF1EC5DDFF /* SignInView.swift */,
+			);
+			name = Views;
+			path = Views;
+			sourceTree = "<group>";
+		};
+		168BABC23F369A551A5520EB /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				79CFC0FDE0FE7142C50EE84E /* Inter-Regular.ttf */,
+				1E61D8530FAB92D859BBCDFC /* Inter-SemiBold.ttf */,
+				45BFB2F14A25627FEFFEF13E /* Poppins-Bold.ttf */,
+			);
+			name = Fonts;
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		2586F642F2547DDB3086C82D /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				ADB104DA902FE6C1FA00D432 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		3C37C14836363AF1FB3E5EDA = {
+			isa = PBXGroup;
+			children = (
+				5B3932BF2F16CDB21549FA0D /* Products */,
+				04DA43D1003ED7CCDAE645A9 /* Frameworks */,
+				9899378068CB3C52A3906106 /* RiveApp */,
+				44BEF7973B94924E60D5369A /* Shared (Example-SwiftUI-Rive) */,
+			);
+			sourceTree = "<group>";
+		};
+		44BEF7973B94924E60D5369A /* Shared (Example-SwiftUI-Rive) */ = {
+			isa = PBXGroup;
+			children = (
+				E2E0164FCF8926D02EE4BD47 /* Components */,
+				99B41E86DCDB1AD4BC7580EE /* Model */,
+				AB66ABE5F8610EB90EB66028 /* Styles */,
+				0682FBCB181EADD3F8B65FB1 /* Views */,
+				51A5FBC86B8FF493F665445F /* Navigation */,
+				FF928D71D024B7F90696E769 /* Assets.xcassets */,
+				168BABC23F369A551A5520EB /* Fonts */,
+				B7E1FBDCB94469A0266AA1ED /* RiveAssets */,
+			);
+			name = "Shared (Example-SwiftUI-Rive)";
+			path = "../Example-SwiftUI-Rive/AnimatedApp";
+			sourceTree = "<group>";
+		};
+		51A5FBC86B8FF493F665445F /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				26FF32281E56757A718BBBB4 /* SideMenu.swift */,
+				302B7A22BBFEB0B6D2D1F250 /* TabItems.swift */,
+			);
+			name = Navigation;
+			path = Navigation;
+			sourceTree = "<group>";
+		};
+		5B3932BF2F16CDB21549FA0D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6FC32815DFB9AB0C307D59E7 /* RiveApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9899378068CB3C52A3906106 /* RiveApp */ = {
+			isa = PBXGroup;
+			children = (
+				5FF527C082D0F487D0E94689 /* AppDelegate.swift */,
+				C0A94E53C3C2459E59C39BB0 /* TabViewControllers.swift */,
+				29242C162EDC3294BE1BC4B0 /* RiveUIKitViewController.swift */,
+				9A25FDF1B50065AB34F5233C /* Info.plist */,
+			);
+			name = RiveApp;
+			path = RiveApp;
+			sourceTree = "<group>";
+		};
+		99B41E86DCDB1AD4BC7580EE /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				699EFCFF1B05220558FC4D31 /* Course.swift */,
+				6605666A33C2A6CE223AD2B5 /* CourseSection.swift */,
+			);
+			name = Model;
+			path = Model;
+			sourceTree = "<group>";
+		};
+		AB66ABE5F8610EB90EB66028 /* Styles */ = {
+			isa = PBXGroup;
+			children = (
+				C4832D075A2C5551C835B3AB /* CustomButton.swift */,
+				7CB5B4CC52C44691B7FCA304 /* CustomFont.swift */,
+				AD544589DFE95E305AADD727 /* CustomTextField.swift */,
+				6DAA98EA66563772A83BDA88 /* Extensions.swift */,
+			);
+			name = Styles;
+			path = Styles;
+			sourceTree = "<group>";
+		};
+		B7E1FBDCB94469A0266AA1ED /* RiveAssets */ = {
+			isa = PBXGroup;
+			children = (
+				E2E65C33F57E037E0E98F612 /* button.riv */,
+				E8DF93C34F3E7B872BF47F0F /* check.riv */,
+				C78A77277F5BF044CE896CCF /* confetti.riv */,
+				484F60C30CA9614BAA11FB7E /* house.riv */,
+				C654F0A882961E70103CCF0B /* icons.riv */,
+				4B1F9532677D6BA1B23891DE /* menu_button.riv */,
+				8EEB743298095836BF9377D6 /* shapes.riv */,
+			);
+			name = RiveAssets;
+			path = RiveAssets;
+			sourceTree = "<group>";
+		};
+		E2E0164FCF8926D02EE4BD47 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				036951B5B2B073F789932FF8 /* HCard.swift */,
+				CE74468C4779D2C9657DDB0A /* VCard.swift */,
+				6A17F7195D8D07CB67028570 /* RiveAnimation.swift */,
+			);
+			name = Components;
+			path = Components;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FB598D406039205E01C8DD17 /* RiveApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D8DDD13184D17292C0225E79 /* Build configuration list for PBXNativeTarget "RiveApp" */;
+			buildPhases = (
+				C1EE2EE83CDE205C7DE122BE /* Sources */,
+				0A236F0394923B00C424FA7E /* Frameworks */,
+				742F9D42955BBDA5801BF955 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RiveApp;
+			productName = RiveApp;
+			productReference = 6FC32815DFB9AB0C307D59E7 /* RiveApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AAC34FAB4D331F89AC930F09 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = C5D545DD0D7DEF4A27EA7D2A /* Build configuration list for PBXProject "RiveApp" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 3C37C14836363AF1FB3E5EDA;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 100;
+			productRefGroup = 5B3932BF2F16CDB21549FA0D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FB598D406039205E01C8DD17 /* RiveApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		742F9D42955BBDA5801BF955 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6501E84D2037A29884A2FDA7 /* Assets.xcassets in Resources */,
+				C3D4D7128115A1AC496AE727 /* Inter-Regular.ttf in Resources */,
+				97F5EDDE4D5B47AFC38A08BD /* Inter-SemiBold.ttf in Resources */,
+				08E79CD10245A663F1BD4123 /* Poppins-Bold.ttf in Resources */,
+				B85C6504BDC177B92A73077A /* button.riv in Resources */,
+				AC7015914DF03E3B9C6AFEAF /* check.riv in Resources */,
+				F2EA4C27D59FFEFFD097501A /* confetti.riv in Resources */,
+				B7E3FB4B942E2BEC8550BB04 /* house.riv in Resources */,
+				3A951187ACF1CACD03009E33 /* icons.riv in Resources */,
+				68E4EE124A24CAC0643AFEF7 /* menu_button.riv in Resources */,
+				F432E9BCEE4F345D5C02A425 /* shapes.riv in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C1EE2EE83CDE205C7DE122BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B0D4999FF5EE129B8EE2C3CD /* AppDelegate.swift in Sources */,
+				8C7CC7F169DF6D09CFED6CBE /* TabViewControllers.swift in Sources */,
+				D6F45F96F2196AB7B5E9E432 /* RiveUIKitViewController.swift in Sources */,
+				C4F7F8B25F828E7C7B86E306 /* HCard.swift in Sources */,
+				F15740D40D1D61709C97AD48 /* VCard.swift in Sources */,
+				9049620E8B510276C7D44D09 /* RiveAnimation.swift in Sources */,
+				F6B77B5916BCCA956213941A /* Course.swift in Sources */,
+				D8CE80177B49D4DDFAE39C91 /* CourseSection.swift in Sources */,
+				64BFFC1EF7D8969B5798C270 /* CustomButton.swift in Sources */,
+				64C91DB47B28EFAEC7C9792A /* CustomFont.swift in Sources */,
+				45608F73DF993EBDF7A91512 /* CustomTextField.swift in Sources */,
+				C8BB81F83DEDCBBF770BD1CA /* Extensions.swift in Sources */,
+				19E3EF073616D95A0907ECF0 /* HomeView.swift in Sources */,
+				D3CA8AD94703A4D0B9AB2D52 /* OnboardingView.swift in Sources */,
+				167CF5CA65FDB746AE1E47F6 /* SignInView.swift in Sources */,
+				A905CDB1E98C37058FE447D1 /* SideMenu.swift in Sources */,
+				24C9C0A04F6CFE6ADF0916D6 /* TabItems.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1E9767E90FFCC9983E1A3AAA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RiveApp/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cyltabbarcontroller.RiveApp;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		685E7C5F6F2080B018C0A1D8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6DF17B8D3B68E9ABDCBA788F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RiveApp/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cyltabbarcontroller.RiveApp;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9403728DCAD555DE18AAAD69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C5D545DD0D7DEF4A27EA7D2A /* Build configuration list for PBXProject "RiveApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				685E7C5F6F2080B018C0A1D8 /* Debug */,
+				9403728DCAD555DE18AAAD69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D8DDD13184D17292C0225E79 /* Build configuration list for PBXNativeTarget "RiveApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E9767E90FFCC9983E1A3AAA /* Release */,
+				6DF17B8D3B68E9ABDCBA788F /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AAC34FAB4D331F89AC930F09 /* Project object */;
+}

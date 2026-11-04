@@ -27,16 +27,7 @@ struct TabBar: UIViewControllerRepresentable {
         }
         let tabBarController = CYLTabBarController(viewControllers: viewControllers,
                                                    tabBarItemsAttributes: Tab.allCases.map(\.attributes))
-        // [EN] Before its view loads. The course's icons are white, drawn for its dark navy bar.
-        // [CN] 在其视图加载之前设置。课程的图标是白色的，为深蓝色 TabBar 设计。
-        tabBarController.tabBarStyleType = .liquidGlass
-        let appearance = UITabBarAppearance()
-        appearance.configureWithDefaultBackground()
-        appearance.backgroundColor = UIColor(named: "Background 2")?.withAlphaComponent(0.8)
-        tabBarController.tabBar.standardAppearance = appearance
-        tabBarController.tabBar.scrollEdgeAppearance = appearance
-        tabBarController.tabBar.overrideUserInterfaceStyle = .dark
-        tabBarController.tabBar.tintColor = .white
+        tabBarController.applyCourseTabBarAppearance()
         return tabBarController
     }
 
@@ -46,56 +37,7 @@ struct TabBar: UIViewControllerRepresentable {
     }
 }
 
-enum Tab: String, CaseIterable {
-    case chat
-    case search
-    case timer
-    case bell
-    case user
-
-    /// [EN] The tab's artboard and state machine in the course's icons.riv. [CN] 该 Tab 在课程 icons.riv 中的画板与状态机。
-    private var rive: (artboard: String, stateMachine: String) {
-        switch self {
-        case .chat: return ("CHAT", "CHAT_Interactivity")
-        case .search: return ("SEARCH", "SEARCH_Interactivity")
-        case .timer: return ("TIMER", "TIMER_Interactivity")
-        case .bell: return ("BELL", "BELL_Interactivity")
-        case .user: return ("USER", "USER_Interactivity")
-        }
-    }
-
-    /// [EN] Shown without the Rive subspec. [CN] 未引入 Rive 子库时显示。
-    private var symbolName: String {
-        switch self {
-        case .chat: return "message"
-        case .search: return "magnifyingglass"
-        case .timer: return "timer"
-        case .bell: return "bell"
-        case .user: return "person"
-        }
-    }
-
-    var attributes: [AnyHashable: Any] {
-        let image = UIImage(systemName: symbolName) ?? UIImage()
-        var attributes: [AnyHashable: Any] = [
-            CYLTabBarItemTitle: rawValue.capitalized,
-            CYLTabBarItemImage: image,
-            CYLTabBarItemSelectedImage: image,
-        ]
-        // [EN] The course's icons.riv has no view model: `.riveInput` plays its state machine input "active" instead.
-        // [CN] 课程的 icons.riv 没有 view model：使用 `.riveInput` 播放其状态机输入 "active"。
-        let iconsURL = Bundle.main.url(forResource: "icons", withExtension: "riv")
-        if let url = CYLTabBarAnimationURLWithOptions(iconsURL, [
-            .riveArtboard: rive.artboard,
-            .riveStateMachine: rive.stateMachine,
-            .riveInput: "active",
-        ]) {
-            attributes[CYLTabBarRiveURL] = url
-            attributes[CYLTabBarRiveSize] = NSValue(cgSize: CGSize(width: 32, height: 32))
-        }
-        return attributes
-    }
-
+extension Tab {
     @ViewBuilder
     var content: some View {
         if self == .chat {
