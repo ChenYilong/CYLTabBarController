@@ -304,3 +304,5 @@
 "换肤：节日与配色主题（%@ 种）" = "Skins: feestdagen en kleuren (%@)";
 "节日图标与配色" = "Feestdagsymbolen en kleuren";
 "仅配色" = "Alleen kleuren";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Tik hier";

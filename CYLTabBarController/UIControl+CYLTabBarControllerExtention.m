@@ -70,6 +70,7 @@ typedef CGPoint (^_CYLTabButtonCenterProvider)(UIControl *tabButton);
     tracker.userInteractionEnabled = NO;
     tracker.backgroundColor = UIColor.clearColor;
     [tabButton insertSubview:tracker atIndex:0];
+    [tracker cyl_markAsInsertedForTabControl:tabButton];
     return tracker;
 }
 
@@ -481,6 +482,9 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     BOOL shouldRemoveNewView = newView.superview;
     if (shouldShowNewView) {
         [tabBarButton addSubview:newView];
+        // [EN] Marked: found again in one pass, and recognized when it is still in an old button after UIKit rebuilt them.
+        // [CN] 标记：可一次性找到；UIKit 重建按钮后仍在旧按钮中时也能被识别。
+        [newView cyl_markAsInsertedForTabControl:tabBarButton];
         CGSize newViewSize = newView.frame.size;
         CYLTrackViewInTabButton(tabBarButton, newView, newViewSize, swappableImageView, replacedView, offset);
         !completion?:completion(YES, self, newView);
@@ -727,6 +731,7 @@ static void CYLApplyLottieDarkColors(UIView *lottieView, UITraitCollection *trai
     newLottieView.alpha = lottieView.alpha;
     CYLCopyLottieAnimationState(lottieView, newLottieView);
     [superview insertSubview:newLottieView aboveSubview:lottieView];
+    [newLottieView cyl_markAsInsertedForTabControl:lottieView.cyl_insertedForTabControl ?: self];
     for (UIView *subview in superview.subviews) {
         if ([subview isKindOfClass:[_CYLTabButtonLayoutTracker class]]) {
             [(_CYLTabButtonLayoutTracker *)subview cyl_replaceTrackedView:lottieView withView:newLottieView];

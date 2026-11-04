@@ -304,3 +304,5 @@
 "换肤：节日与配色主题（%@ 种）" = "Skin: hari raya dan warna (%@)";
 "节日图标与配色" = "Ikon hari raya dan warna";
 "仅配色" = "Warna saja";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Ketuk";

@@ -494,16 +494,18 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (void)checkTabBarChildControllerValidityAtIndex:(NSUInteger)index {
     CYLTabBarController *tabBarController = [[self cyl_getViewControllerInsteadOfNavigationController] cyl_popSelectTabBarController];
-    @try {
-        UIViewController *viewController;
-        viewController = tabBarController.viewControllers[index];
+    // [EN] Bounds-checked instead of `@try`: an index that is not a tab only logs (DEBUG / BETA), as before.
+    // [CN] 用下标检查代替 `@try`：不是 Tab 的下标只打印日志（DEBUG / BETA），与以前一致。
+    NSArray<UIViewController *> *viewControllers = tabBarController.viewControllers;
+    if (index < viewControllers.count) {
+        UIViewController *viewController = viewControllers[index];
         UIButton *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
         UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:tabBarController];
         BOOL shouldConfigureSelectionStatus = (plusChildViewController) && ((index != [tabBarController.cyl_tabBar cyl_plusButtonIndex]) && (viewController != plusChildViewController));
         if (shouldConfigureSelectionStatus) {
             plusButton.selected = NO;
         }
-    } @catch (NSException *exception) {
+    } else {
 #if defined(DEBUG) || defined(BETA)
         NSString *formatString = @"\n\n\
         ------ BEGIN NSException Log ---------------------------------------------------------------------\n \

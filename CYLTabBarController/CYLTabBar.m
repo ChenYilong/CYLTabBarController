@@ -18,13 +18,25 @@
 static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext;
+/// [EN] KVO context of the items' `badgeValue` (badge-changed animations). [CN] item 的 `badgeValue` 的 KVO context（角标变化动画）。
+static void *const CYLTabBarItemBadgeValueContext = (void*)&CYLTabBarItemBadgeValueContext;
 
 
 // Implemented in CYLTabBarController.m, issue #610 (and #22 for the pending blocks).
 @interface CYLTabBarController (CYLTabControlActions)
 - (void)cyl_bindTabControlActions;
 - (void)cyl_runPendingReloadBadgesBlocksIfReady;
+// [EN] Implemented in CYLTabBarController+CYLInteraction.m: a tab item's `badgeValue` changed.
+// [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：某个 Tab item 的 `badgeValue` 发生了变化。
+- (void)cyl_tabBarItemBadgeValueDidChange:(UITabBarItem *)item;
+// [EN] Implemented in CYLTabBarController.m: the plus button in the Liquid Glass layers, idempotent.
+// [CN] 在 CYLTabBarController.m 中实现：液态玻璃图层中的 PlusButton，可重复调用。
+- (void)cyl_layOutPlusButtonInLiquidGlassLayers;
 @end
+
+/// [EN] Key of the `hidden` value a view inserted by the library had before More editing hid it.
+/// [CN] 「More」编辑隐藏本库插入的视图之前，该视图原来的 `hidden` 值的 key。
+static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomizingKey;
 
 // [EN] FIX: issue #152 / #535 — implemented in CYLTabBarController+CYLInteraction.m.
 // [CN] FIX: issue #152 / #535 — 实现位于 CYLTabBarController+CYLInteraction.m。
@@ -33,6 +45,12 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
 @end
 
 @interface CYLTabBar () <UIGestureRecognizerDelegate>
+
+/// [EN] YES between `-beginCustomizingItems:` and `-endCustomizingAnimated:` (More editing). Unlike `isCustomizing`, it is
+///      already NO while UIKit animates the end of editing, so the layout requested then installs the views again.
+/// [CN] 在 `-beginCustomizingItems:` 与 `-endCustomizingAnimated:` 之间为 YES（「More」编辑）。与 `isCustomizing` 不同，UIKit 播放结束
+///      编辑的动画时它已是 NO，因此此时请求的布局会重新安装这些视图。
+@property (nonatomic, assign) BOOL cyl_isCustomizingItems;
 
 @property (nonatomic, strong) NSMutableSet<UIView *> *observedViews;
 /// Whether the last layout found the tab buttons in the iOS 27.1 vertical bar, see `-cyl_refreshTabButtonsAfterVerticalBar`.
@@ -47,6 +65,10 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
 @property (nonatomic, assign) BOOL cyl_isSettingItemTitles;
 /// Receives the `UIScrollEdgeElementContainerInteraction`s added to the tab bar, see `-addInteraction:`.
 @property (nonatomic, strong, nullable) UIView *cyl_scrollEdgeElementContainerView;
+/// [EN] The x of the first slot and the gap between slots of the last layout with a plus button (0 unless centered).
+/// [CN] 上次带 PlusButton 布局时第一个位置的 x 与位置间距（未居中时均为 0）。
+@property (nonatomic, assign) CGFloat cyl_itemLayoutLeading;
+@property (nonatomic, assign) CGFloat cyl_itemLayoutSpacing;
 /// FIX: issue #488. The token of the block-based Lottie observer: `-removeObserver:self` cannot remove it.
 @property (nonatomic, strong, nullable) id<NSObject> cyl_lottieAnimationPlayingObserver;
 /// [EN] While the library sets a classic style for itself: not synced to the appearances. [CN] 本库自己设置经典样式期间：不同步到 appearance。
@@ -451,6 +473,16 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     // [EN] The bar is laid out again when it comes back after a pop: check the page's safe area under an opaque bar.
     // [CN] pop 返回后 TabBar 会重新布局：检查不透明 TabBar 下页面的安全区域。
     [self.tabBarController cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded];
+    // [EN] The Liquid Glass selected layer can appear in a tab bar layout pass only: put the plus button's stand-in in it
+    //      now rather than after a fixed delay. Idempotent; does nothing without Liquid Glass or a plus button.
+    // [CN] 液态玻璃的选中层可能只在 TabBar 的布局中出现：此时就放入 PlusButton 的替身，而不是固定延迟之后。可重复调用；没有液态玻璃
+    //      或 PlusButton 时不做任何事。
+    // [EN] Only for the controller that owns this tab bar: `-tabBarController` can fall back to another controller.
+    // [CN] 只针对拥有本 TabBar 的控制器：`-tabBarController` 可能回退到其他控制器。
+    CYLTabBarController *owningTabBarController = self.tabBarController;
+    if (owningTabBarController.cyl_tabBar == self) {
+        [owningTabBarController cyl_layOutPlusButtonInLiquidGlassLayers];
+    }
 }
 
 /*!
@@ -499,6 +531,192 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     }
 }
 
+#pragma mark - More editing
+
+/*!
+ * [EN] More editing ("Edit" on the More page) lets the user drag items onto the tab bar, and UIKit moves and rebuilds the
+ *      tab buttons. The views the library inserted into them (`-cyl_markAsInsertedForTabControl:`) and the plus button
+ *      are hidden meanwhile, so none is left at a stale position, and they come back when editing ends; the next layout
+ *      puts the plus button's stand-in in the new buttons. The library does not support More editing as such: this only
+ *      keeps it from leaving views behind.
+ * [CN] 「More」编辑（More 页面中的 "Edit"）允许用户把 item 拖到 TabBar 上，UIKit 会移动并重建 Tab 按钮。编辑期间隐藏本库插入其中的视图
+ *      （`-cyl_markAsInsertedForTabControl:`）与 PlusButton，避免留在过时的位置；编辑结束后恢复，下一次布局会把 PlusButton 的替身放进
+ *      新按钮。本库并不支持「More」编辑本身，这里只是避免它留下残留视图。
+ */
+- (void)beginCustomizingItems:(NSArray<UITabBarItem *> *)items {
+    self.cyl_isCustomizingItems = YES;
+    [self cyl_setInsertedViewsHiddenForCustomizing:YES];
+    [super beginCustomizingItems:items];
+}
+
+- (BOOL)endCustomizingAnimated:(BOOL)animated {
+    BOOL changed = [super endCustomizingAnimated:animated];
+    self.cyl_isCustomizingItems = NO;
+    [self cyl_setInsertedViewsHiddenForCustomizing:NO];
+    [self setNeedsLayout];
+    // [EN] Again after UIKit's end-of-editing pass, which can rebuild the buttons. [CN] UIKit 结束编辑的处理可能重建按钮，之后再布局一次。
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf setNeedsLayout];
+    });
+    return changed;
+}
+
+/// [EN] Hides (YES) or restores (NO) the plus button and every inserted view inside this tab bar, in one pass.
+/// [CN] 一次性隐藏（YES）或恢复（NO）PlusButton 与本 TabBar 中所有被插入的视图。
+- (void)cyl_setInsertedViewsHiddenForCustomizing:(BOOL)hidden {
+    NSMutableArray<UIView *> *views = [NSMutableArray array];
+    for (UIView *view in [UIView cyl_insertedTabControlViews]) {
+        if ([view isDescendantOfView:self]) {
+            [views addObject:view];
+        }
+    }
+    UIView *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    if ([plusButton isDescendantOfView:self]) {
+        [views addObject:plusButton];
+    }
+    for (UIView *view in views) {
+        if (hidden) {
+            if (!objc_getAssociatedObject(view, CYLHiddenBeforeCustomizingKey)) {
+                objc_setAssociatedObject(view, CYLHiddenBeforeCustomizingKey, @(view.hidden), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
+            view.hidden = YES;
+        } else {
+            NSNumber *hiddenBefore = objc_getAssociatedObject(view, CYLHiddenBeforeCustomizingKey);
+            if (hiddenBefore) {
+                view.hidden = hiddenBefore.boolValue;
+                objc_setAssociatedObject(view, CYLHiddenBeforeCustomizingKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
+        }
+    }
+}
+
+#pragma mark - Item positioning (centered, item width, item spacing)
+
+/*!
+ * [EN] The classic tab bar lays its tab buttons out itself when there is a plus button, which used to fill the whole width
+ *      and ignore `itemPositioning`, `itemWidth` and `itemSpacing`. They are read as UIKit reads them: the
+ *      `standardAppearance` values (iOS 13+) when set, otherwise the tab bar's own properties.
+ * [CN] 有 PlusButton 时，经典 TabBar 自行布局 Tab 按钮，以前总是铺满整个宽度，忽略了 `itemPositioning`、`itemWidth`、`itemSpacing`。
+ *      这里按 UIKit 的方式读取：设置了 `standardAppearance` 中的值（iOS 13+）时使用它们，否则使用 TabBar 自身的属性。
+ */
+- (void)cyl_getItemPositioning:(UITabBarItemPositioning *)positioning itemWidth:(CGFloat *)itemWidth itemSpacing:(CGFloat *)itemSpacing {
+    UITabBarItemPositioning resolvedPositioning = self.itemPositioning;
+    CGFloat resolvedWidth = self.itemWidth;
+    CGFloat resolvedSpacing = self.itemSpacing;
+    if (@available(iOS 13.0, *)) {
+        UITabBarAppearance *appearance = self.standardAppearance;
+        if (appearance.stackedItemPositioning != UITabBarItemPositioningAutomatic) {
+            resolvedPositioning = appearance.stackedItemPositioning;
+        }
+        if (appearance.stackedItemWidth > 0) {
+            resolvedWidth = appearance.stackedItemWidth;
+        }
+        if (appearance.stackedItemSpacing > 0) {
+            resolvedSpacing = appearance.stackedItemSpacing;
+        }
+    }
+    // [EN] UIKit centers Automatic tabs in a regular horizontal size class (e.g. iPad): read it the same way, so a spacing
+    //      alone keeps UIKit's centered layout there instead of filling with gaps.
+    // [CN] UIKit 在 regular 水平尺寸类别（如 iPad）下把 Automatic 的 Tab 居中：这里按同样方式读取，因此只设置间距时，
+    //      在那里仍保持 UIKit 的居中布局，而不是铺满加间隙。
+    if (resolvedPositioning == UITabBarItemPositioningAutomatic &&
+        self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClassRegular) {
+        resolvedPositioning = UITabBarItemPositioningCentered;
+    }
+    *positioning = resolvedPositioning;
+    *itemWidth = resolvedWidth;
+    *itemSpacing = resolvedSpacing;
+}
+
+/*!
+ * [EN] The horizontal layout of `count` tab buttons plus, when `plusWidth` > 0, one plus button slot: the x of the first
+ *      slot (`leading`), the width of a tab slot and the gap between slots. Without centered positioning, an item width or
+ *      an item spacing it is the previous layout: leading 0, no gap, the tabs sharing the width left by the plus button.
+ *      Centered: the slots keep `itemWidth` (the shared width when 0) and `itemSpacing`, centered as a group; when they do
+ *      not fit, the previous layout is used.
+ * [CN] `count` 个 Tab 按钮（`plusWidth` > 0 时再加一个 PlusButton 位置）的横向布局：第一个位置的 x（`leading`）、Tab 位置的宽度、
+ *      位置之间的间距。未设置居中、item 宽度或间距时与以前的布局相同：leading 为 0、无间距，各 Tab 平分 PlusButton 之外的宽度。
+ *      居中时：各位置使用 `itemWidth`（为 0 时使用平分宽度）与 `itemSpacing`，整体居中；放不下时使用以前的布局。
+ */
+- (void)cyl_getItemLayoutForTabCount:(NSUInteger)count
+                           plusWidth:(CGFloat)plusWidth
+                             leading:(CGFloat *)leading
+                           itemWidth:(CGFloat *)itemWidth
+                             spacing:(CGFloat *)spacing {
+    UIEdgeInsets edgeInsets = self.cyl_itemEdgeInsets;
+    CGFloat availableWidth = MAX(0, self.cyl_boundsSize.width - edgeInsets.left - edgeInsets.right);
+    CGFloat fillWidth = count > 0 ? (availableWidth - plusWidth) / count : 0;
+    *leading = edgeInsets.left;
+    *itemWidth = fillWidth;
+    *spacing = 0;
+    UITabBarItemPositioning positioning = UITabBarItemPositioningAutomatic;
+    CGFloat customWidth = 0;
+    CGFloat customSpacing = 0;
+    [self cyl_getItemPositioning:&positioning itemWidth:&customWidth itemSpacing:&customSpacing];
+    if (count == 0) {
+        return;
+    }
+    NSUInteger slotCount = count + (plusWidth > 0 ? 1 : 0);
+    BOOL centered = (positioning == UITabBarItemPositioningCentered) || customWidth > 0;
+    if (!centered) {
+        // [EN] A spacing alone fills the width with gaps between the slots; the tab bar shows through them, e.g. as
+        //      separators between tabs that have a background color.
+        // [CN] 只设置间距时，各位置铺满宽度且之间留有间隙；TabBar 的背景透过间隙显示，例如作为有背景色的 Tab 之间的分隔线。
+        CGFloat gappedWidth = (availableWidth - plusWidth - customSpacing * (CGFloat)(slotCount - 1)) / count;
+        if (customSpacing > 0 && gappedWidth > 0) {
+            *itemWidth = gappedWidth;
+            *spacing = customSpacing;
+        }
+        return;
+    }
+    CGFloat width = customWidth > 0 ? customWidth : fillWidth;
+    CGFloat totalWidth = width * count + plusWidth + customSpacing * (CGFloat)(slotCount - 1);
+    if (totalWidth > availableWidth + 0.5) {
+        return;
+    }
+    *leading = edgeInsets.left + (availableWidth - totalWidth) * 0.5;
+    *itemWidth = width;
+    *spacing = customSpacing;
+}
+
+- (void)setCyl_itemEdgeInsets:(UIEdgeInsets)itemEdgeInsets {
+    if (UIEdgeInsetsEqualToEdgeInsets(_cyl_itemEdgeInsets, itemEdgeInsets)) {
+        return;
+    }
+    _cyl_itemEdgeInsets = itemEdgeInsets;
+    [self setNeedsLayout];
+}
+
+/*!
+ * [EN] Without a plus button UIKit lays the tab buttons out (and honors centered positioning itself). With
+ *      `cyl_itemEdgeInsets` they are laid out here instead, between the insets, the same way as with a plus button.
+ * [CN] 没有 PlusButton 时由 UIKit 布局 Tab 按钮（居中排列也由 UIKit 处理）。设置了 `cyl_itemEdgeInsets` 时改为在这里布局，
+ *      排列在两端空白之间，与有 PlusButton 时的方式相同。
+ */
+- (void)cyl_layoutTabButtonsWithItemEdgeInsetsIfNeeded {
+    UIEdgeInsets edgeInsets = self.cyl_itemEdgeInsets;
+    UITabBarItemPositioning positioning = UITabBarItemPositioningAutomatic;
+    CGFloat customWidth = 0;
+    CGFloat customSpacing = 0;
+    [self cyl_getItemPositioning:&positioning itemWidth:&customWidth itemSpacing:&customSpacing];
+    // [EN] UIKit does not leave gaps between filled tabs, so a fill with spacing is laid out here too.
+    // [CN] UIKit 铺满时不会在 Tab 之间留间隙，因此铺满加间距时同样在这里布局。
+    BOOL fillsWithSpacing = customSpacing > 0 && customWidth == 0 && positioning != UITabBarItemPositioningCentered;
+    if (((edgeInsets.left == 0 && edgeInsets.right == 0) && !fillsWithSpacing) || [CYLConstants isLiquidGlassActive]) {
+        return;
+    }
+    NSArray<UIControl *> *tabButtons = self.tabBarButtonArray;
+    CGFloat leading = 0, itemWidth = 0, spacing = 0;
+    [self cyl_getItemLayoutForTabCount:tabButtons.count plusWidth:0 leading:&leading itemWidth:&itemWidth spacing:&spacing];
+    [tabButtons enumerateObjectsUsingBlock:^(UIControl * _Nonnull tabButton, NSUInteger index, BOOL * _Nonnull stop) {
+        [self changeXForChildView:tabButton
+                       childViewX:leading + index * (itemWidth + spacing)
+                  tabBarItemWidth:itemWidth
+                            index:index];
+    }];
+}
+
 - (void)cyl_layoutTabBarSubviews {
     self.tabBarButtonArray = [self cyl_originalTabBarButtons];
     
@@ -534,9 +752,8 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
             }
         }
     }
-    CGFloat tabBarWidth = self.cyl_boundsSize.width;
-    
     if (!self.plusButtonActive) {
+        [self cyl_layoutTabButtonsWithItemEdgeInsetsIfNeeded];
         if (self.didLayoutSubViewsBlock) {
             self.didLayoutSubViewsBlock(self);
         }
@@ -545,11 +762,13 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     
     BOOL addedToTabBar = [_plusButton.superview isEqual:self];
     if (!addedToTabBar && self.hasPlusButton) {
-        [self cyl_setTabBarItemWidth:(tabBarWidth) / self.cyl_tabbarItemsCount];
+        CGFloat leading = 0, itemWidth = 0, spacing = 0;
+        [self cyl_getItemLayoutForTabCount:self.cyl_tabbarItemsCount plusWidth:0 leading:&leading itemWidth:&itemWidth spacing:&spacing];
+        [self cyl_setTabBarItemWidth:itemWidth];
         [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIControl * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
             // [CN] 仅修改childView的x和宽度,yh值不变
             // [EN] Only change childView's x and width; the y and height values stay the same
-            CGFloat childViewX = buttonIndex * self.cyl_tabBarItemWidth;
+            CGFloat childViewX = leading + buttonIndex * (self.cyl_tabBarItemWidth + spacing);
             [self changeXForChildView:childView
                            childViewX:childViewX
                       tabBarItemWidth:self.cyl_tabBarItemWidth
@@ -561,7 +780,12 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
         }
         return;
     }
-    [self cyl_setTabBarItemWidth:(tabBarWidth - self.cyl_plusButtonWidth) / self.cyl_tabbarItemsCount];
+    CGFloat itemLeading = 0, layoutItemWidth = 0, itemSpacing = 0;
+    [self cyl_getItemLayoutForTabCount:self.cyl_tabbarItemsCount plusWidth:self.cyl_plusButtonWidth
+                               leading:&itemLeading itemWidth:&layoutItemWidth spacing:&itemSpacing];
+    self.cyl_itemLayoutLeading = itemLeading;
+    self.cyl_itemLayoutSpacing = itemSpacing;
+    [self cyl_setTabBarItemWidth:layoutItemWidth];
    // [CN] plusButtonIndex内部调整 PlusButton 的中心坐标，不能直接修改 center，否则会造成点击动画时的闪动bug，需要借助坐标系转换。
    // [EN] plusButtonIndex adjusts the PlusButton's center internally. Do not modify center directly, otherwise the
    //      button flickers during the tap animation; use a coordinate-space conversion instead.
@@ -591,6 +815,10 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
             }
         }
         
+        // [EN] Centered positioning, item spacing (see `-cyl_getItemLayoutForTabCount:…`): 0 by default.
+        // [CN] 居中与间距（见 `-cyl_getItemLayoutForTabCount:…`）：默认均为 0。
+        NSUInteger slotIndex = [self cyl_hasPlusChildViewController] ? buttonIndex : (NSUInteger)visiableTabIndex;
+        childViewX += self.cyl_itemLayoutLeading + slotIndex * self.cyl_itemLayoutSpacing;
         [childView cyl_setTabBarChildViewControllerIndex:buttonIndex];
         UIControl *selectedContentControl = [self cyl_selectedContentControlFromContentControl:childView];
         
@@ -713,6 +941,19 @@ UISearchTab 会从 TabBar 分离出来单独显示。
             if ([change[NSKeyValueChangeNewKey] floatValue] == 0) {
                 view.alpha = 1;
             }
+        }
+        return;
+    }
+    if (context == CYLTabBarItemBadgeValueContext) {
+        // [EN] A badge appeared or changed (not removed): the tab's animation may play its badge-changed animation.
+        // [CN] 角标出现或变化（不是被移除）：该 Tab 的动画可以播放角标变化动画。
+        id oldValue = change[NSKeyValueChangeOldKey];
+        id newValue = change[NSKeyValueChangeNewKey];
+        BOOL hasNewValue = [newValue isKindOfClass:[NSString class]];
+        CYLTabBarController *tabBarController = [self tabBarController];
+        if (hasNewValue && ![oldValue isEqual:newValue] && [object isKindOfClass:[UITabBarItem class]] &&
+            [tabBarController respondsToSelector:@selector(cyl_tabBarItemBadgeValueDidChange:)]) {
+            [tabBarController cyl_tabBarItemBadgeValueDidChange:(UITabBarItem *)object];
         }
         return;
     }
@@ -876,7 +1117,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         CGFloat constantOfPlusButtonCenterYOffset = [self constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
         _plusButton.center = CGPointMake(tabBarWidth * 0.5, tabBarHeight * multiplierOfTabBarHeight + constantOfPlusButtonCenterYOffset);
         
-        CGFloat childViewX = plusButtonIndex * self.cyl_tabBarItemWidth;
+        CGFloat childViewX = self.cyl_itemLayoutLeading + plusButtonIndex * (self.cyl_tabBarItemWidth + self.cyl_itemLayoutSpacing);
         CGFloat tabBarItemWidth = CGRectGetWidth(self.plusButton.frame);
         [self changeXForChildView:self.plusButton
                        childViewX:childViewX
@@ -1074,6 +1315,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     for (UITabBarItem *item in items) {
         [item addObserver:self forKeyPath:@"title" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew)
                   context:CYLTabBarItemTitleContext];
+        [item addObserver:self forKeyPath:@"badgeValue" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew)
+                  context:CYLTabBarItemBadgeValueContext];
     }
     self.cyl_titleObservedItems = items;
 }
@@ -1081,6 +1324,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 - (void)cyl_stopObservingItemTitles {
     for (UITabBarItem *item in _cyl_titleObservedItems) {
         [item removeObserver:self forKeyPath:@"title" context:CYLTabBarItemTitleContext];
+        [item removeObserver:self forKeyPath:@"badgeValue" context:CYLTabBarItemBadgeValueContext];
     }
     _cyl_titleObservedItems = nil;
 }
