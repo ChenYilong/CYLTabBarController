@@ -6935,6 +6935,9 @@ static char CYLThemeLaunchThemeAppliedKey;
         return;
     }
     objc_setAssociatedObject(self, &CYLThemeLaunchThemeAppliedKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    // [EN] Styles set before the tab bar was replaced by the library's own (CYLTabBar) are written into the bar shown now.
+    // [CN] 在 TabBar 被替换为本库的 CYLTabBar 之前设置的样式，写入当前显示的 TabBar。
+    [self cyl_applyTabBarItemStyles];
     id theme = CYLThemeManagerCenter.defaultThemeManager.currentTheme;
     // [EN] Nothing to restore yet: only a tab bar theme changes anything here.
     // [CN] 此时尚无需恢复：只有 TabBar 主题才需要处理。

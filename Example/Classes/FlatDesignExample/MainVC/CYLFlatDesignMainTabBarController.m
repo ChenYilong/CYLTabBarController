@@ -455,6 +455,10 @@ presentLoginForViewController:(UIViewController *)viewController
 #pragma mark - CYLFlatDesignTabBarDelegate
 #if CYL_FLATDESIGN_AVAILABLE
 - (void)tabBar:(CYLFlatDesignTabBar *)tabBar didSelectItem:(nonnull CYLFlatDesignTabBarItem *)item {
+    // [EN] Super keeps the library's tap handling (e.g. a double tap on the selected tab). The selector is shared with
+    //      UITabBarDelegate, hence the casts.
+    // [CN] 调用 super 以保留本库的点击处理（例如双击选中的 Tab）。该方法名与 UITabBarDelegate 相同，因此需要类型转换。
+    [super tabBar:(UITabBar *)(id)tabBar didSelectItem:(UITabBarItem *)(id)item];
     NSInteger index = [tabBar.items indexOfObject:item];
     if (index == 2) {
         CYLFlatDesignModalViewController *vc = [[CYLFlatDesignModalViewController alloc] init];

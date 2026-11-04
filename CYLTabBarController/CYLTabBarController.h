@@ -1488,11 +1488,15 @@ FOUNDATION_EXTERN const NSTimeInterval CYLTabBarItemDoubleTapInterval;
  *      `scrollEdgeAppearance` when there is one) for the stacked, inline and compact inline layouts, so they hold in
  *      landscape and on iPad, and FlatDesign follows; before iOS 13: the classic `UITabBarItem` / `UITabBar` styles.
  *      Applied at once and again after a theme change (see `CYLTabBarTheme`), so they win over a theme's appearance.
- *      nil leaves the current value as it is. Set them after `tabBar.standardAppearance` if you also assign one.
+ *      nil leaves the current value as it is. Set them after `tabBar.standardAppearance` if you also assign one. They
+ *      are written again when the tab bar controller first appears, so they can be set right after init. For the same
+ *      styles in every tab bar controller of the app, set them in a subclass's `-cyl_didInitialize`.
  * [CN] 在一处设置常用的 TabBar 样式，作用于本 TabBarController，适用于所有样式：标题字体与颜色、图标颜色、背景与分割线。
  *      iOS 13+：写入 `tabBar.standardAppearance`（存在 `scrollEdgeAppearance` 时也写入）的纵向、横向、紧凑横向三种布局，因此横屏与 iPad
  *      上同样生效，扁平样式随之更新；iOS 13 以前：使用经典的 `UITabBarItem` / `UITabBar` 样式。立即生效，主题切换后（见
  *      `CYLTabBarTheme`）再次应用，因此优先于主题的外观。nil 表示保持当前值。如果还要直接设置 `tabBar.standardAppearance`，请先设置它。
+ *      TabBarController 首次显示时会再写入一次，因此可以在初始化后立即设置。需要 App 中所有 TabBarController 使用相同样式时，
+ *      在子类的 `-cyl_didInitialize` 中设置即可。
  */
 @interface CYLTabBarController (CYLTabBarItemStyle)
 
