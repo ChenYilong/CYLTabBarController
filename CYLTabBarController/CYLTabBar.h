@@ -89,10 +89,16 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 @property (nonatomic, strong) UIGestureRecognizer *liquidGlassContinuousGestureRecognizer;
 
 /*!
- *TODO:
  * [CN] 之前 tabbar 上有长按手势，iOS 26 液态玻璃，长按手势都不起作用了，需要重新增加自定义手势。
  * [EN] The tabbar used to have a long-press gesture; with iOS 26 Liquid Glass, long-press gestures no longer work,
  *      so a custom gesture needs to be added again.
+ * FIX: issue #152 / #535
+ * [CN] 已处理：液态玻璃下不再另加手势，而是跟踪本手势与 `liquidGlassContinuousGestureRecognizer` 的状态（`CYLTabBar` 转发给
+ *      `-[CYLTabBarController cyl_liquidGlassTabBarGestureRecognizerDidUpdate:]`），按位置识别 Tab 的长按、Reselect 与 DoubleTap。
+ * [EN] Done: in Liquid Glass no gesture is added; the states of this gesture and of
+ *      `liquidGlassContinuousGestureRecognizer` are followed instead (`CYLTabBar` forwards them to
+ *      `-[CYLTabBarController cyl_liquidGlassTabBarGestureRecognizerDidUpdate:]`), and the long press, Reselect and
+ *      DoubleTap of a tab are recognized by position.
   */
 @property (nonatomic, strong) UIGestureRecognizer *liquidGlassLongGestureRecognizer;
 

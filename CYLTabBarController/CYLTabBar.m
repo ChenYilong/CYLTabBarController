@@ -26,6 +26,12 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
 - (void)cyl_runPendingReloadBadgesBlocksIfReady;
 @end
 
+// [EN] FIX: issue #152 / #535 — implemented in CYLTabBarController+CYLInteraction.m.
+// [CN] FIX: issue #152 / #535 — 实现位于 CYLTabBarController+CYLInteraction.m。
+@interface CYLTabBarController (CYLLiquidGlassTabGestures)
+- (void)cyl_liquidGlassTabBarGestureRecognizerDidUpdate:(UIGestureRecognizer *)gestureRecognizer;
+@end
+
 @interface CYLTabBar () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) NSMutableSet<UIView *> *observedViews;
@@ -1472,6 +1478,15 @@ UISearchTab 会从 TabBar 分离出来单独显示。
  *      这里把这类 portal 视图移到该分支下方。
  */
 - (void)cyl_liquidGlassGestureRecognizerDidUpdate:(UIGestureRecognizer *)gestureRecognizer {
+    // [EN] FIX: issue #152 / #535 — in Liquid Glass these UIKit gestures receive every touch on the tab buttons, and a
+    //      gesture added by the library does not: the long press, Reselect and DoubleTap are recognized from them.
+    //      Every state is forwarded, before the checks below.
+    // [CN] FIX: issue #152 / #535 — 液态玻璃下，Tab 按钮上的每次触摸都由这些系统手势接收，库自己添加的手势收不到：长按、Reselect
+    //      与 DoubleTap 由它们识别。所有状态都转发，且在下方的判断之前。
+    CYLTabBarController *owningTabBarController = [self tabBarController];
+    if ([owningTabBarController respondsToSelector:@selector(cyl_liquidGlassTabBarGestureRecognizerDidUpdate:)]) {
+        [owningTabBarController cyl_liquidGlassTabBarGestureRecognizerDidUpdate:gestureRecognizer];
+    }
     if (gestureRecognizer.state != UIGestureRecognizerStateBegan && gestureRecognizer.state != UIGestureRecognizerStateChanged) {
         return;
     }

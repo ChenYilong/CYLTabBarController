@@ -35,6 +35,9 @@ extension CYLTabBarController {
     /// Shows the badge (1) once the tab bar is laid out, delayed like the ObjC demo's tab badges.
     /// TabBar 布局完成后显示角标（1），与 ObjC Demo 的 Tab 角标一样延迟显示。
     func demoShowPlusButtonBadgeAfterLayout() {
+        // [EN] #535: every Swift demo already calls this from `viewDidAppear(_:)`; turn the interaction demo on here too.
+        // [CN] #535：所有 Swift Demo 都已在 `viewDidAppear(_:)` 中调用本方法，因此也在这里开启交互演示。
+        demoSetUpInteractions()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
             self?.demoUpdatePlusButtonBadge(addingOne: false)
         }
@@ -86,5 +89,30 @@ final class DemoPlusButton: CYLPlusButton, CYLPlusButtonSubclassing {
     // #408: the plus button's identifier. PlusButton 的标识。
     static func tabBarItemIdentifier() -> String {
         return "plus"
+    }
+}
+
+/*!
+ * #535 demo, shared by every Swift demo: the interaction features of `CYLTabBarController (CYLInteraction)`.
+ * [EN] Turns on a tap animation for the tabs and the plus button (bounce), a long press that shows the pressed button's
+ *      identifier, and swiping the page left or right to switch tabs. `demoShowPlusButtonBadgeAfterLayout()`, which every
+ *      Swift demo calls from `viewDidAppear(_:)`, calls it (it can run more than once). The ObjC demo turns them on from
+ *      its table rows instead.
+ * [CN] 开启 `CYLTabBarController (CYLInteraction)` 的交互功能：Tab 与 PlusButton 的点击动画（弹性）、长按弹出被长按按钮的标识，
+ *      以及左右滑动页面切换 Tab。由所有 Swift Demo 在 `viewDidAppear(_:)` 中调用的 `demoShowPlusButtonBadgeAfterLayout()` 调用它
+ *      （可以重复调用）。ObjC Demo 改为在列表行中开启。
+ */
+extension CYLTabBarController {
+
+    func demoSetUpInteractions() {
+        cyl_tabButtonTapAnimationType = .bounce
+        cyl_swipeToSwitchTabEnabled = true
+        cyl_didLongPressControlBlock = { tabBarController, control in
+            let name = control.cyl_tabBarItemIdentifier ?: NSStringFromClass(type(of: control))
+            let alert = UIAlertController(title: String(format: CYLLocalizedString("长按了「%@」"), name),
+                                          message: nil, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+            tabBarController.present(alert, animated: true)
+        }
     }
 }

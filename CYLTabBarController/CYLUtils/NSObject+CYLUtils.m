@@ -36,6 +36,25 @@
     }
 }
 
+- (void)cyl_setWeakAssociatedObject:(id)object forKey:(const void *)key {
+    if (!object) {
+        objc_setAssociatedObject(self, key, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        return;
+    }
+    // [EN] A block that captures the object weakly: the associated object retains the block, not the object.
+    // [CN] 弱捕获对象的 block：关联对象持有的是 block，而不是对象本身。
+    __weak id weakObject = object;
+    id (^box)(void) = ^id {
+        return weakObject;
+    };
+    objc_setAssociatedObject(self, key, box, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (id)cyl_weakAssociatedObjectForKey:(const void *)key {
+    id (^box)(void) = objc_getAssociatedObject(self, key);
+    return box ? box() : nil;
+}
+
 - (BOOL)cyl_isPlaceholder {
     NSNumber *isPlaceholderObject = objc_getAssociatedObject(self, @selector(cyl_isPlaceholder));
     UIViewController *viewController = nil;

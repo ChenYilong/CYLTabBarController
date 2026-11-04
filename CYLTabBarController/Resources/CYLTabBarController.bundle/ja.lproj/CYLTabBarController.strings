@@ -202,9 +202,45 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "新しいコンテキストの TabBarController をプッシュ（タップできる X サブビュー付きプラスボタン、issue #202）";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "プラスボタン右上の X をタップ：X がランダムな色に変わり、プラスボタンは反応しません";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "更新";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex とプラスボタン（issue #515）";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "タップで次のタブを選択します。プラスボタンを除いたインデックス：%1$@、selectedIndex：%2$@、現在：%3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "拡大して縮小";
+"从小放大" = "ズームイン";
+"弹性" = "バウンス";
+"弹性 + 烟花" = "バウンス + 花火";
+"旋转" = "回転";
+"翻转" = "フリップ";
+"飘散" = "フェード";
+"无" = "なし";
+"Tab 点击动画（issue #535）" = "タブのタップアニメーション（issue #535）";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "タップしてタブとプラスボタンのタップアニメーションを切り替えます。現在：%@";
+"长按了「%@」" = "「%@」を長押ししました";
+"左右滑动切换 Tab（issue #535）" = "スワイプでタブを切り替え（issue #535）";
+"长按 Tab（issue #535）" = "タブの長押し（issue #535）";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "スイッチをオンにして画面を左右にスワイプすると、次または前のタブに切り替わります。";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "スイッチをオンにしてタブまたはプラスボタンを長押しすると、その識別子が表示されます。";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "回転（このタブのみ：viewController.cyl_tabButtonAnimation）";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "コマ送り + 花火（すべてのタブ：cyl_defaultTabButtonAnimation）";
+"超出父视图响应点击（issue #535）" = "スーパービュー外でのタップに反応（issue #535）";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "スイッチをオンにすると、灰色の枠の外にあるボタン部分も反応します。タップすると拡大縮小アニメーションが再生されます。タップ回数：%@";
+"已找到" = "見つかりました";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "見つかりません（use_frameworks の場合、リソースバンドルは framework 内にあります）";
+"从 bundle 加载图片（issue #535）" = "bundle から画像を読み込む（issue #535）";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "左の画像は CYLImageInBundle でリソースバンドルから読み込んでいます（キャッシュなし）。メイン bundle での CYLBundleImage：%@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "これは CYLBaseViewController を継承していない通常の UIViewController です。ナビゲーションバーは非表示です。";
+"不继承基类隐藏导航栏（issue #535）" = "基底クラスなしでナビゲーションバーを隠す（issue #535）";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "スイッチで cyl_automaticNavigationSettingEnabled を設定します。行をタップすると、cyl_navigationBarHidden と cyl_hidesAncestorNavigationBars を設定した通常の UIViewController をプッシュします。";
+"页面 %@" = "ページ %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "スライド遷移（CYLTabBarSlideTransitionAnimator）";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "タップするとシステムの UITabBarController を開きます。タブをタップするか画面を左右にドラッグすると、ページが指に合わせてスライドします。";
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "スクロール時に TabBar を縮小 / 非表示（issue #13）";
@@ -231,3 +267,25 @@
 "玫瑰粉" = "ピンクローズ";
 "春节" = "春節";
 "跟随系统深色模式" = "システムのダークモードに従う";
+"默认点击声" = "標準のクリック音";
+"中等触感反馈" = "中程度の触覚フィードバック";
+"无需继承基类与工具方法" = "基底クラス不要とユーティリティ";
+"切换到上一个 / 下一个 Tab（issue #535）" = "前 / 次のタブへ（issue #535）";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "弱参照：生存中に取得 %@、解放後に nil %@。%@ から選択中のタブボタンを検出：%@";
+"点击声 + 触感反馈" = "クリック音 + 触覚フィードバック";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "バウンス + 星の花火（CYLTabButtonBounceAnimation.fireworksImage）";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "右の矢印をタップして cyl_switchToAdjacentTabWithStep:-1 / 1 を呼び出します。スワイプと同様に PlusButton をスキップし、ログインを確認します。前回の結果：%@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "タップで切り替え、任意のタブまたは PlusButton をタップして確認します。触覚フィードバックは実機でのみ振動します。現在：%@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "タップして実行：cyl_setWeakAssociatedObject:forKey: はオブジェクト解放後に nil を返します。cyl_nearestControlBelowView: は選択中のタブのアイコンからそのボタンを見つけます。";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "タップで切り替え。cyl_tabBarItemLongPressDuration：%@ 秒、cyl_tabButtonLongPressMinimumDuration：%@ 秒、cyl_tabBarItemDoubleTapInterval：%@ 秒";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "カスタムサウンドファイル（cyl_tabButtonTapSoundURL）";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "上にめくる、選択解除アニメーションなし（CYLTabButtonFlipAnimation.direction = 5）";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "ゆっくり拡大・縮小（CYLTabButtonScaleAnimation.duration = 1.2）";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "ゆっくりズームイン（CYLTabButtonZoomInAnimation.duration = 1.2）";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils の弱参照関連オブジェクトとボタン検索（issue #535）";
+"长按时长与双击间隔（issue #535 / #152）" = "長押し時間とダブルタップ間隔（issue #535 / #152）";
+"Tab 交互" = "タブの操作";
+"Tab 点击声音与触感反馈（issue #535）" = "タブのタップ音と触覚フィードバック（issue #535）";
+"轻触感反馈" = "軽い触覚フィードバック";
+"重触感反馈" = "強い触覚フィードバック";
+"长按（#152）" = "長押し（#152）";
