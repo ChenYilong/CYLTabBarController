@@ -102,6 +102,14 @@ classes link back to it:
 - **No warnings**: fix every build and static-analyzer warning you meet, including old ones in code you did not change.
 - **Public API**: never remove or change an existing public API; add new API instead. Prefer implementing an existing
   protocol method over adding a new category method; file-private C functions and private headers are fine.
+- **Swift-friendly names for underscored protocol methods**: Swift method names must not contain underscores, but a
+  Swift class that implements an Objective-C protocol method must use its imported name (e.g. `cyl_play…`); renaming it
+  no longer satisfies the protocol. Adding `NS_SWIFT_NAME` to the existing method would change a Swift API already
+  released on `master`, which the Public API rule forbids. Instead, add a new method with the same name minus the
+  underscore, keeping the `cyl` prefix (e.g. `-cyl_playSelectAnimationWithTabButton:…` →
+  `-cylPlaySelectAnimationWithTabButton:…`), and define its Swift name with `NS_SWIFT_NAME` on the new method only.
+  Both spellings run the same logic: the library calls the underscore-free one when it is implemented, otherwise the
+  underscored one. If the old method was `@required`, make it `@optional` so a class can implement only the new one.
 - **Optional components are isolated with guards**:
   - FlatDesign code in Core: `#if CYL_FLATDESIGN_AVAILABLE` (defined once in `CYLUtils/CYLUtilsMacros.h`), and run only
     for `CYLTabBarStyleTypeFlatDesign`, so Liquid Glass and the classic style are never affected.

@@ -285,3 +285,6 @@
 "轻触感反馈" = "Feedback aptico leggero";
 "重触感反馈" = "Feedback aptico forte";
 "长按（#152）" = "Pressione prolungata (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Toccami";

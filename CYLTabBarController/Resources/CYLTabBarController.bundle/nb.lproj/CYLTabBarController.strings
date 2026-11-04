@@ -285,3 +285,6 @@
 "轻触感反馈" = "Lett haptikk";
 "重触感反馈" = "Kraftig haptikk";
 "长按（#152）" = "Langt trykk (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Trykk her";

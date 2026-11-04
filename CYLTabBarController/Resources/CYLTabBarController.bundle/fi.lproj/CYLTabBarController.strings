@@ -285,3 +285,6 @@
 "轻触感反馈" = "Kevyt haptinen palaute";
 "重触感反馈" = "Voimakas haptinen palaute";
 "长按（#152）" = "Pitkä painallus (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Napauta";
