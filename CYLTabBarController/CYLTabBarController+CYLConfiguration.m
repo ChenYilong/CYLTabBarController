@@ -6,6 +6,7 @@
 //
 
 #import "CYLTabBarController.h"
+#include <math.h>
 
 #pragma mark - Value conversion
 
@@ -59,47 +60,94 @@ static void CYLLogInvalidConfigurationValue(NSString *key, id value) {
 #endif
 }
 
-static NSValue *_Nullable CYLEdgeInsetsValue(id value, NSString *key) {
-    if (CYLIsValueOfType(value, @encode(UIEdgeInsets))) {
-        return value;
+/*!
+ * [EN] Insets, offsets and sizes must be finite and at most 1000 in magnitude (sizes also above 0): NaN or Infinity in a
+ *      layout raises a CALayer exception, and a huge value pushes the icon off screen (B7, B8). Values passed in code
+ *      as NSValue are checked too.
+ * [CN] 内边距、偏移与尺寸必须是有限值且绝对值不超过 1000（尺寸还必须大于 0）：布局中的 NaN 或 Infinity 会触发 CALayer 异常，极大的值会让
+ *      图标移出屏幕（B7、B8）。代码中以 NSValue 传入的值同样会检查。
+ */
+static const double CYLConfigurationMaximumMagnitude = 1000;
+
+static BOOL CYLNumbersAreReasonable(const double *values, NSUInteger count, BOOL positive) {
+    for (NSUInteger i = 0; i < count; i++) {
+        if (!isfinite(values[i]) || fabs(values[i]) > CYLConfigurationMaximumMagnitude || (positive && values[i] <= 0)) {
+            return NO;
+        }
     }
-    NSArray<NSNumber *> *n = CYLConfigurationNumbers(value, 4, @[ @"top", @"left", @"bottom", @"right" ]);
-    if (!n) {
+    return YES;
+}
+
+static NSValue *_Nullable CYLEdgeInsetsValue(id value, NSString *key) {
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    if (CYLIsValueOfType(value, @encode(UIEdgeInsets))) {
+        insets = [(NSValue *)value UIEdgeInsetsValue];
+    } else {
+        NSArray<NSNumber *> *n = CYLConfigurationNumbers(value, 4, @[ @"top", @"left", @"bottom", @"right" ]);
+        if (!n) {
+            CYLLogInvalidConfigurationValue(key, value);
+            return nil;
+        }
+        insets = UIEdgeInsetsMake(n[0].doubleValue, n[1].doubleValue, n[2].doubleValue, n[3].doubleValue);
+    }
+    double values[4] = { insets.top, insets.left, insets.bottom, insets.right };
+    if (!CYLNumbersAreReasonable(values, 4, NO)) {
         CYLLogInvalidConfigurationValue(key, value);
         return nil;
     }
-    return [NSValue valueWithUIEdgeInsets:UIEdgeInsetsMake(n[0].doubleValue, n[1].doubleValue, n[2].doubleValue, n[3].doubleValue)];
+    return [NSValue valueWithUIEdgeInsets:insets];
 }
 
 static NSValue *_Nullable CYLOffsetValue(id value, NSString *key) {
+    UIOffset offset = UIOffsetZero;
     if (CYLIsValueOfType(value, @encode(UIOffset))) {
-        return value;
+        offset = [(NSValue *)value UIOffsetValue];
+    } else {
+        NSArray<NSNumber *> *n = CYLConfigurationNumbers(value, 2, @[ @"horizontal|x", @"vertical|y" ]);
+        if (!n) {
+            CYLLogInvalidConfigurationValue(key, value);
+            return nil;
+        }
+        offset = UIOffsetMake(n[0].doubleValue, n[1].doubleValue);
     }
-    NSArray<NSNumber *> *n = CYLConfigurationNumbers(value, 2, @[ @"horizontal|x", @"vertical|y" ]);
-    if (!n) {
+    double values[2] = { offset.horizontal, offset.vertical };
+    if (!CYLNumbersAreReasonable(values, 2, NO)) {
         CYLLogInvalidConfigurationValue(key, value);
         return nil;
     }
-    return [NSValue valueWithUIOffset:UIOffsetMake(n[0].doubleValue, n[1].doubleValue)];
+    return [NSValue valueWithUIOffset:offset];
 }
 
 static NSValue *_Nullable CYLSizeValue(id value, NSString *key) {
+    CGSize size = CGSizeZero;
     if (CYLIsValueOfType(value, @encode(CGSize))) {
-        return value;
+        size = [(NSValue *)value CGSizeValue];
+    } else {
+        NSArray<NSNumber *> *n = CYLConfigurationNumbers(value, 2, @[ @"width|w", @"height|h" ]);
+        if (!n) {
+            CYLLogInvalidConfigurationValue(key, value);
+            return nil;
+        }
+        size = CGSizeMake(n[0].doubleValue, n[1].doubleValue);
     }
-    NSArray<NSNumber *> *n = CYLConfigurationNumbers(value, 2, @[ @"width|w", @"height|h" ]);
-    if (!n) {
+    double values[2] = { size.width, size.height };
+    if (!CYLNumbersAreReasonable(values, 2, YES)) {
         CYLLogInvalidConfigurationValue(key, value);
         return nil;
     }
-    return [NSValue valueWithCGSize:CGSizeMake(n[0].doubleValue, n[1].doubleValue)];
+    return [NSValue valueWithCGSize:size];
 }
 
 /// [EN] "default", "system", "flatDesign", "liquidGlass" (any case, with or without the `CYLTabBarStyleType` prefix) or a number.
 /// [CN] "default"、"system"、"flatDesign"、"liquidGlass"（不区分大小写，可带 `CYLTabBarStyleType` 前缀）或数字。
 static NSNumber *_Nullable CYLStyleTypeValue(id value) {
     if ([value isKindOfClass:[NSNumber class]]) {
-        return value;
+        NSInteger style = [value integerValue];
+        if ((double)style != [value doubleValue] || style < CYLTabBarStyleTypeDefault || style > CYLTabBarStyleTypeLiquidGlass) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerStyleType, value);
+            return nil;
+        }
+        return @(style);
     }
     if (![value isKindOfClass:[NSString class]]) {
         CYLLogInvalidConfigurationValue(CYLTabBarControllerStyleType, value);
@@ -126,8 +174,9 @@ static NSNumber *_Nullable CYLStyleTypeValue(id value) {
     }
     if (!style) {
         CYLLogInvalidConfigurationValue(CYLTabBarControllerStyleType, value);
+        return nil;
     }
-    return style;
+    return CYLStyleTypeValue(style);
 }
 
 /// [EN] "system:<name>" is an SF Symbol (iOS 13+); anything else is kept (an image name, a UIImage...).
@@ -239,12 +288,46 @@ static id CYLDarkColorsValue(id value) {
     return colors;
 }
 
+/// [EN] A string, or a number as a string; nil for anything else (B5). [CN] 字符串，或转换为字符串的数字；其他类型返回 nil（B5）。
+static NSString *_Nullable CYLStringValue(id value) {
+    if ([value isKindOfClass:[NSString class]]) {
+        return value;
+    }
+    if ([value isKindOfClass:[NSNumber class]]) {
+        return [value stringValue];
+    }
+    return nil;
+}
+
+/*!
+ * [EN] The attributes of one tab, each known key checked for its type: a title that is a list or a dictionary, or a
+ *      null, used to reach UIKit and crash with an unrecognized selector (B5, B6). Wrong values are removed, so the tab
+ *      takes the default for that key. Keys the library does not know are kept for the app.
+ * [CN] 一个 Tab 的属性，每个已知键都检查类型：以前标题为数组或字典、或值为 null 时，会传给 UIKit 并因 unrecognized selector 崩溃（B5、B6）。
+ *      错误的值会被移除，该键使用默认值。本库不认识的键保留给 App 使用。
+ */
 static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
-    NSMutableDictionary *item = [attributes mutableCopy];
-    for (NSString *key in @[ CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage, CYLTabBarItemSelectedDarkImage ]) {
-        if (item[key]) {
-            item[key] = CYLImageValue(item[key]);
+    NSMutableDictionary *item = [NSMutableDictionary dictionary];
+    for (id key in attributes) {
+        id value = attributes[key];
+        if (![key isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNull class]]) {
+            continue;
         }
+        item[key] = value;
+    }
+    for (NSString *key in @[ CYLTabBarItemTitle, CYLTabBarItemIdentifier, CYLTabBarItemViewControllerClass, CYLTabBarItemNavigationControllerClass ]) {
+        if (item[key] && !CYLStringValue(item[key])) {
+            CYLLogInvalidConfigurationValue(key, item[key]);
+        }
+        item[key] = CYLStringValue(item[key]);
+    }
+    for (NSString *key in @[ CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage, CYLTabBarItemSelectedDarkImage ]) {
+        id value = item[key];
+        if (value && ![value isKindOfClass:[NSString class]] && ![value isKindOfClass:[UIImage class]]) {
+            CYLLogInvalidConfigurationValue(key, value);
+            value = nil;
+        }
+        item[key] = value ? CYLImageValue(value) : nil;
     }
     if (item[CYLTabBarItemImageInsets]) {
         item[CYLTabBarItemImageInsets] = CYLEdgeInsetsValue(item[CYLTabBarItemImageInsets], CYLTabBarItemImageInsets);
@@ -259,25 +342,57 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
             item[key] = CYLSizeValue(item[key], key);
         }
     }
+    for (NSString *key in @[ CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarLottieURL, CYLTabBarLottieDarkURL ]) {
+        id value = item[key];
+        if (value && ![value isKindOfClass:[NSString class]] && ![value isKindOfClass:[NSURL class]]) {
+            CYLLogInvalidConfigurationValue(key, value);
+            item[key] = nil;
+        }
+    }
     for (NSString *key in @[ CYLTabBarLottieURL, CYLTabBarLottieDarkURL ]) {
         if (item[key]) {
             item[key] = CYLURLValue(item[key]);
         }
     }
     for (NSString *key in @[ CYLTabBarLottieFilePath, CYLTabBarLottieDarkFilePath ]) {
-        if ([item[key] isKindOfClass:[NSString class]]) {
-            item[key] = CYLMainBundlePath(item[key]);
+        id value = item[key];
+        if (value && ![value isKindOfClass:[NSString class]]) {
+            CYLLogInvalidConfigurationValue(key, value);
+            value = nil;
         }
+        item[key] = value ? CYLMainBundlePath(value) : nil;
     }
     if (item[CYLTabBarLottieDarkColors]) {
-        item[CYLTabBarLottieDarkColors] = CYLDarkColorsValue(item[CYLTabBarLottieDarkColors]);
-    }
-    for (NSString *key in @[ CYLTabBarItemTitle, CYLTabBarItemIdentifier ]) {
-        if ([item[key] isKindOfClass:[NSNumber class]]) {
-            item[key] = [item[key] stringValue];
+        id colors = CYLDarkColorsValue(item[CYLTabBarLottieDarkColors]);
+        if (![colors isKindOfClass:[NSDictionary class]]) {
+            CYLLogInvalidConfigurationValue(CYLTabBarLottieDarkColors, colors);
+            colors = nil;
         }
+        item[CYLTabBarLottieDarkColors] = colors;
     }
     return item;
+}
+
+/*!
+ * [EN] View controllers from code: only UIViewController instances, each once. Anything else used to crash in
+ *      -setViewControllers:, and UIKit raises when a view controller is added twice (C6, C7).
+ * [CN] 代码传入的子控制器：只保留 UIViewController 实例，且每个只保留一次。以前其他对象会在 -setViewControllers: 中崩溃，同一个控制器添加两次
+ *      UIKit 会抛出异常（C6、C7）。
+ */
+static NSArray<UIViewController *> *CYLValidViewControllers(id value) {
+    if (![value isKindOfClass:[NSArray class]]) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerViewControllers, value);
+        return nil;
+    }
+    NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
+    for (id viewController in (NSArray *)value) {
+        if (![viewController isKindOfClass:[UIViewController class]] || [viewControllers indexOfObjectIdenticalTo:viewController] != NSNotFound) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerViewControllers, viewController);
+            continue;
+        }
+        [viewControllers addObject:viewController];
+    }
+    return viewControllers;
 }
 
 @implementation CYLTabBarController (CYLConfiguration)
@@ -289,10 +404,8 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
             [normalized removeObjectForKey:key];
         }
     }
-    id viewControllers = normalized[CYLTabBarControllerViewControllers];
-    if (viewControllers && ![viewControllers isKindOfClass:[NSArray class]]) {
-        CYLLogInvalidConfigurationValue(CYLTabBarControllerViewControllers, viewControllers);
-        [normalized removeObjectForKey:CYLTabBarControllerViewControllers];
+    if (normalized[CYLTabBarControllerViewControllers]) {
+        normalized[CYLTabBarControllerViewControllers] = CYLValidViewControllers(normalized[CYLTabBarControllerViewControllers]);
     }
     id items = normalized[CYLTabBarControllerTabBarItemsAttributes];
     if ([items isKindOfClass:[NSDictionary class]]) {

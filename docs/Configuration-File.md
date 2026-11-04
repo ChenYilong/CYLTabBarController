@@ -255,7 +255,7 @@ flowchart TD
 | A7 | 扩展名与内容不符（如 .json 中是 YAML） | The extension does not match the content (YAML in a .json file) | 按扩展名解析失败后根据内容识别并重试 | When the extension's format fails, the content is detected and parsed again | ❌ 未处理 / not yet |
 | A8 | 扩展名未知或缺失 | An unknown or missing extension | 根据内容识别格式 | The format is detected from the content | ✅ 第 1 轮 / round 1 |
 | A9 | 文件过大（例如 1 GB） | A huge file (e.g. 1 GB) | 超过 5 MB 时返回 TooLarge 错误，不读入内存解析 | Over 5 MB: a TooLarge error, nothing is parsed | ❌ 未处理 / not yet |
-| A10 | 嵌套过深（如 10 万层 `[[[[`）导致栈溢出 | Deep nesting (e.g. 100,000 levels of `[[[[`) overflows the stack | 超过 64 层时返回 TooDeep 错误，所有递归解析器都有层数限制 | Over 64 levels: a TooDeep error; every recursive parser has a depth limit | ❌ 未处理 / not yet |
+| A10 | 嵌套过深（如 10 万层 `[[[[`）导致栈溢出 | Deep nesting (e.g. 100,000 levels of `[[[[`) overflows the stack | 超过 64 层时返回 TooDeep 错误，所有递归解析器都有层数限制 | Over 64 levels: a TooDeep error; every recursive parser has a depth limit | ✅ 第 2 轮 / round 2 |
 | A11 | 顶层不是字典（数组、字符串、数字） | The top level is not a dictionary (a list, a string, a number) | NotADictionary 错误 | A NotADictionary error | ✅ 第 1 轮 / round 1 |
 | A12 | 截断或无效的二进制 plist / protobuf | A truncated or invalid binary plist / protobuf | InvalidSyntax 错误，越界读取被拒绝 | An InvalidSyntax error; out-of-bounds reads are refused | ✅ 第 1 轮 / round 1 |
 | A13 | 语法错误 | A syntax error | 错误描述包含格式与行号 | The error names the format and the line | ✅ 第 1 轮 / round 1 |
@@ -265,11 +265,11 @@ flowchart TD
 | B2 | Tab 列表不是数组（字符串、数字） | The tab list is not a list (a string, a number) | 视为没有 Tab，见 B1 | Treated as no tabs, see B1 | 🟡 部分 / partial |
 | B3 | 只有一个 Tab 且写成字典（Protobuf 文本、XML） | A single tab written as a dictionary (Protobuf text, XML) | 自动包装为列表 | Wrapped into a list | ✅ 第 1 轮 / round 1 |
 | B4 | Tab 列表中的元素不是字典 | A tab entry is not a dictionary | 代码传入子控制器时用空字典占位，保持下标对应；根据配置创建子控制器时跳过 | With view controllers from code: an empty placeholder keeps the indexes; when they are created: skipped | 🟡 部分 / partial |
-| B5 | 字符串键的值类型错误（标题为数组、字典） | A string key has the wrong type (a title that is a list or a dictionary) | 数字转换为字符串，其他类型移除；以前会因 unrecognized selector 崩溃 | Numbers become strings, other types are removed; this used to crash (unrecognized selector) | ❌ 未处理 / not yet |
-| B6 | 值为 null（JSON null、YAML ~） | A value is null (JSON null, YAML ~) | 移除该键；以前在 item 中会崩溃 | The key is removed; inside an item this used to crash | ❌ 未处理 / not yet |
-| B7 | 内边距 / 偏移为 NaN、Infinity 或极大值 | Insets / offsets are NaN, Infinity or huge | 非有限值或绝对值超过 1000 时移除；以前会触发 CALayer NaN 异常 | Non-finite values or values over 1000 are removed; this used to raise a CALayer NaN exception | ❌ 未处理 / not yet |
-| B8 | 尺寸为负数、0 或极大值 | A size is negative, zero or huge | 要求 0 < 值 ≤ 1000，否则移除 | Requires 0 < value ≤ 1000, removed otherwise | ❌ 未处理 / not yet |
-| B9 | 未知的样式名称或超出范围的样式编号（如 99） | An unknown style name or an out-of-range style number (e.g. 99) | 使用默认样式并输出警告 | The default style and a warning | 🟡 部分 / partial |
+| B5 | 字符串键的值类型错误（标题为数组、字典） | A string key has the wrong type (a title that is a list or a dictionary) | 数字转换为字符串，其他类型移除；以前会因 unrecognized selector 崩溃 | Numbers become strings, other types are removed; this used to crash (unrecognized selector) | ✅ 第 2 轮 / round 2 |
+| B6 | 值为 null（JSON null、YAML ~） | A value is null (JSON null, YAML ~) | 移除该键；以前在 item 中会崩溃 | The key is removed; inside an item this used to crash | ✅ 第 2 轮 / round 2 |
+| B7 | 内边距 / 偏移为 NaN、Infinity 或极大值 | Insets / offsets are NaN, Infinity or huge | 非有限值或绝对值超过 1000 时移除；以前会触发 CALayer NaN 异常 | Non-finite values or values over 1000 are removed; this used to raise a CALayer NaN exception | ✅ 第 2 轮 / round 2 |
+| B8 | 尺寸为负数、0 或极大值 | A size is negative, zero or huge | 要求 0 < 值 ≤ 1000，否则移除 | Requires 0 < value ≤ 1000, removed otherwise | ✅ 第 2 轮 / round 2 |
+| B9 | 未知的样式名称或超出范围的样式编号（如 99） | An unknown style name or an out-of-range style number (e.g. 99) | 使用默认样式并输出警告 | The default style and a warning | ✅ 第 2 轮 / round 2 |
 | B10 | 请求扁平样式但未集成 FlatDesign 子库 | FlatDesign requested without the FlatDesign subspec | 使用默认样式并输出警告 | The default style and a warning | ❌ 未处理 / not yet |
 | B11 | 拼写错误的键（如 `CYLTabBarItemTitel`） | A misspelled key (e.g. `CYLTabBarItemTitel`) | 保留（App 可能有自定义键），DEBUG 下提示最接近的已知键 | Kept (the app may use its own keys); DEBUG names the closest known key | ❌ 未处理 / not yet |
 | B12 | 重复的 `CYLTabBarItemIdentifier` | A duplicate `CYLTabBarItemIdentifier` | 后出现的改为「标识_2」等并输出警告 | Later ones become "identifier_2"..., with a warning | ❌ 未处理 / not yet |
@@ -282,8 +282,8 @@ flowchart TD
 | C3 | 子控制器类是 UITabBarController / UINavigationController / UIAlertController 等容器 | The class is a container: UITabBarController, UINavigationController, UIAlertController... | 拒绝并使用 UIViewController | Refused; UIViewController is used | ❌ 未处理 / not yet |
 | C4 | 子控制器的 -init 抛出异常 | The view controller's -init raises an exception | 捕获异常并使用 UIViewController | The exception is caught; UIViewController is used | ❌ 未处理 / not yet |
 | C5 | 导航控制器类无效 | An invalid navigation controller class | 不嵌入导航控制器 | Not embedded | ✅ 第 1 轮 / round 1 |
-| C6 | `CYLTabBarControllerViewControllers` 中有非控制器对象 | `CYLTabBarControllerViewControllers` holds objects that are not view controllers | 移除这些对象；以前会崩溃 | They are removed; this used to crash | ❌ 未处理 / not yet |
-| C7 | 同一个子控制器出现两次 | The same view controller twice | 移除重复项；以前 UIKit 会抛异常 | The duplicate is removed; UIKit used to raise | ❌ 未处理 / not yet |
+| C6 | `CYLTabBarControllerViewControllers` 中有非控制器对象 | `CYLTabBarControllerViewControllers` holds objects that are not view controllers | 移除这些对象；以前会崩溃 | They are removed; this used to crash | ✅ 第 2 轮 / round 2 |
+| C7 | 同一个子控制器出现两次 | The same view controller twice | 移除重复项；以前 UIKit 会抛异常 | The duplicate is removed; UIKit used to raise | ✅ 第 2 轮 / round 2 |
 | C8 | 子控制器数量与 Tab 数量不一致 | More or fewer view controllers than tabs | 本库按下标保护，不越界 | The library checks indexes, no out-of-bounds access | ✅ 第 1 轮 / round 1 |
 | D1 | URL 为 nil | A nil URL | 回调返回 FileNotFound 错误 | The completion gets a FileNotFound error | ✅ 第 1 轮 / round 1 |
 | D2 | 不支持的 scheme 或无效 URL | An unsupported scheme or an invalid URL | 回调返回 Network 错误 | The completion gets a Network error | ✅ 第 1 轮 / round 1 |
@@ -303,6 +303,7 @@ flowchart TD
 | 轮次 Round | 分数 Score | 情况数 Cases | 说明 | Notes | 减分项 Deductions |
 |:---|:---|:---|:---|:---|:---|
 | 1 | 55 | 53 | 基线：解析器已能拒绝大部分无效文件，但值的类型、NaN、嵌套深度、空文件与 HTML 页面等会导致崩溃或生成空 TabBar。 | Baseline: the parser already refuses most invalid files, but wrong value types, NaN, deep nesting, empty files and HTML pages crash or give an empty tab bar. | A3, A4, A7, A9, A10, A14, B1, B2, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, C3, C4, C6, C7, D5, D6, D7, D8, E1 |
+| 2 | 69 | 53 | 修复会崩溃的情况：值的类型检查、null、NaN / Infinity、尺寸范围、样式编号范围、非控制器对象、重复的控制器、嵌套深度限制。 | Crash fixes: value type checks, null, NaN / Infinity, size ranges, style number range, objects that are not view controllers, duplicate view controllers, nesting depth limit. | A3, A4, A7, A9, A14, B1, B2, B4, B10, B11, B12, B13, C3, C4, D5, D6, D7, D8, E1 |
 <!-- edge-cases:end -->
 
 ## [CN]限制

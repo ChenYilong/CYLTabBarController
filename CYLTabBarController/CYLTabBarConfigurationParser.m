@@ -8,6 +8,8 @@
 #import "CYLTabBarConfigurationParser.h"
 
 NSString *const CYLTabBarConfigurationErrorDomain = @"CYLTabBarConfigurationErrorDomain";
+const NSUInteger CYLTabBarConfigurationMaximumLength = 5 * 1024 * 1024;
+const NSUInteger CYLTabBarConfigurationMaximumDepth = 64;
 
 // [EN] Pure Foundation, and no blocks, so that the parsers can also be built and tested outside Apple platforms.
 // [CN] 仅使用 Foundation 且不使用 block，以便在非 Apple 平台上也能编译与测试这些解析器。
@@ -25,6 +27,149 @@ static NSError *CYLConfigurationSyntaxError(NSString *formatName, NSUInteger lin
         ? [NSString stringWithFormat:@"%@ configuration, line %lu: %@", formatName, (unsigned long)line, reason]
         : [NSString stringWithFormat:@"%@ configuration: %@", formatName, reason];
     return CYLConfigurationError(CYLTabBarConfigurationErrorInvalidSyntax, description);
+}
+
+static NSError *CYLConfigurationTooDeepError(NSString *formatName) {
+    return CYLConfigurationError(CYLTabBarConfigurationErrorTooDeep,
+                                 [NSString stringWithFormat:@"%@ configuration: nested deeper than %lu levels.", formatName, (unsigned long)CYLTabBarConfigurationMaximumDepth]);
+}
+
+/*!
+ * [EN] The deepest nesting of { [ ( outside quoted strings: checked before Apple's recursive parsers (JSON, property
+ *      lists) run, so a hostile file cannot overflow the stack.
+ * [CN] 引号字符串之外 { [ ( 的最大嵌套层数：在 Apple 的递归解析器（JSON、属性列表）运行前检查，避免恶意文件导致栈溢出。
+ */
+static NSUInteger CYLBracketDepth(NSString *text) {
+    NSUInteger depth = 0, deepest = 0;
+    unichar quote = 0;
+    NSUInteger length = text.length;
+    for (NSUInteger i = 0; i < length; i++) {
+        unichar c = [text characterAtIndex:i];
+        if (quote) {
+            if (c == '\\') {
+                i++;
+            } else if (c == quote) {
+                quote = 0;
+            }
+        } else if (c == '"' || c == '\'') {
+            quote = c;
+        } else if (c == '{' || c == '[' || c == '(') {
+            deepest = MAX(deepest, ++depth);
+        } else if ((c == '}' || c == ']' || c == ')') && depth > 0) {
+            depth--;
+        }
+    }
+    return deepest;
+}
+
+/// [EN] The deepest nesting of <dict> / <array> in an XML property list. [CN] XML 属性列表中 <dict> / <array> 的最大嵌套层数。
+static NSUInteger CYLXMLPropertyListDepth(NSString *text) {
+    NSUInteger depth = 0, deepest = 0;
+    NSUInteger length = text.length;
+    NSRange search = NSMakeRange(0, length);
+    while (search.length > 0) {
+        NSRange open = [text rangeOfString:@"<" options:0 range:search];
+        if (open.location == NSNotFound) {
+            break;
+        }
+        NSRange close = [text rangeOfString:@">" options:0 range:NSMakeRange(open.location, length - open.location)];
+        if (close.location == NSNotFound) {
+            break;
+        }
+        NSString *tag = [text substringWithRange:NSMakeRange(open.location + 1, close.location - open.location - 1)];
+        BOOL selfClosing = [tag hasSuffix:@"/"];
+        if (!selfClosing && ([tag hasPrefix:@"dict"] || [tag hasPrefix:@"array"])) {
+            deepest = MAX(deepest, ++depth);
+        } else if (([tag hasPrefix:@"/dict"] || [tag hasPrefix:@"/array"]) && depth > 0) {
+            depth--;
+        }
+        search = NSMakeRange(NSMaxRange(close), length - NSMaxRange(close));
+    }
+    return deepest;
+}
+
+/// [EN] A big-endian unsigned integer of `size` bytes. [CN] `size` 字节的大端无符号整数。
+static uint64_t CYLReadBigEndian(const uint8_t *bytes, NSUInteger size) {
+    uint64_t value = 0;
+    for (NSUInteger i = 0; i < size; i++) {
+        value = (value << 8) | bytes[i];
+    }
+    return value;
+}
+
+/*!
+ * [EN] Checks the structure of a binary property list without recursion: every offset and reference in bounds, no
+ *      container nested deeper than the limit, and a bounded number of visits (which also stops reference cycles).
+ *      Returns NO with `*tooDeep` set when it is nested too deeply.
+ * [CN] 以非递归方式检查二进制属性列表的结构：所有偏移与引用都在范围内、容器嵌套不超过上限、访问次数有限（也可阻止循环引用）。嵌套过深时返回 NO 并设置 `*tooDeep`。
+ */
+static BOOL CYLBinaryPropertyListIsSafe(NSData *data, BOOL *tooDeep) {
+    const uint8_t *bytes = data.bytes;
+    NSUInteger length = data.length;
+    *tooDeep = NO;
+    if (length < 8 + 32) {
+        return NO;
+    }
+    const uint8_t *trailer = bytes + length - 32;
+    NSUInteger offsetSize = trailer[6];
+    NSUInteger referenceSize = trailer[7];
+    uint64_t objectCount = CYLReadBigEndian(trailer + 8, 8);
+    uint64_t topObject = CYLReadBigEndian(trailer + 16, 8);
+    uint64_t tableOffset = CYLReadBigEndian(trailer + 24, 8);
+    if (offsetSize < 1 || offsetSize > 8 || referenceSize < 1 || referenceSize > 8 || objectCount == 0 ||
+        topObject >= objectCount || tableOffset >= length || objectCount > (length - tableOffset) / offsetSize) {
+        return NO;
+    }
+    NSMutableArray<NSNumber *> *stack = [NSMutableArray arrayWithObject:@(topObject)];
+    NSMutableArray<NSNumber *> *depths = [NSMutableArray arrayWithObject:@1];
+    NSUInteger visits = 0;
+    while (stack.count > 0) {
+        uint64_t object = stack.lastObject.unsignedLongLongValue;
+        NSUInteger depth = depths.lastObject.unsignedIntegerValue;
+        [stack removeLastObject];
+        [depths removeLastObject];
+        if (++visits > 100000 || object >= objectCount) {
+            return NO;
+        }
+        uint64_t offset = CYLReadBigEndian(bytes + tableOffset + object * offsetSize, offsetSize);
+        if (offset >= tableOffset) {
+            return NO;
+        }
+        uint8_t marker = bytes[offset];
+        uint8_t type = marker >> 4;
+        if (type != 0xA && type != 0xC && type != 0xD) {
+            continue; // Not a container. 不是容器。
+        }
+        if (depth > CYLTabBarConfigurationMaximumDepth) {
+            *tooDeep = YES;
+            return NO;
+        }
+        uint64_t count = marker & 0x0F;
+        uint64_t position = offset + 1;
+        if (count == 0x0F) {
+            // The count follows as an int object: 0x1N, 2^N bytes. 数量以整数对象形式紧随其后：0x1N，2^N 字节。
+            if (position >= tableOffset || (bytes[position] >> 4) != 0x1 || (bytes[position] & 0x0F) > 3) {
+                return NO;
+            }
+            NSUInteger size = (NSUInteger)1 << (bytes[position] & 0x0F);
+            if (position + 1 + size > tableOffset) {
+                return NO;
+            }
+            count = CYLReadBigEndian(bytes + position + 1, size);
+            position += 1 + size;
+        }
+        uint64_t references = (type == 0xD) ? count * 2 : count;
+        // References must fit, and the pending work stays bounded (a container listed again and again).
+        // 引用必须在范围内，且待处理的工作量有上限（同一容器被反复引用时）。
+        if (count > objectCount || references > (tableOffset - position) / referenceSize || stack.count + references > 200000) {
+            return NO;
+        }
+        for (uint64_t i = 0; i < references; i++) {
+            [stack addObject:@(CYLReadBigEndian(bytes + position + i * referenceSize, referenceSize))];
+            [depths addObject:@(depth + 1)];
+        }
+    }
+    return YES;
 }
 
 static BOOL CYLIsInlineSpace(unichar c) {
@@ -309,6 +454,9 @@ static NSArray<NSString *> *_Nullable CYLSplitDottedKey(NSString *key) {
             return nil;
         }
         [parts addObject:part];
+        if (parts.count > CYLTabBarConfigurationMaximumDepth) {
+            return nil; // A path this long would build a too deeply nested tree. 路径过长会生成嵌套过深的树。
+        }
         while (i < length && CYLIsInlineSpace([key characterAtIndex:i])) {
             i++;
         }
@@ -473,6 +621,7 @@ static NSString *_Nullable CYLJSONFromJSON5(NSString *text) {
 @property (nonatomic, strong) NSArray<NSString *> *rawLines;
 @property (nonatomic, strong) NSMutableArray<CYLYAMLLine *> *lines;
 @property (nonatomic, assign) NSUInteger position;
+@property (nonatomic, assign) NSUInteger depth;
 @property (nonatomic, strong, nullable) NSError *error;
 @end
 
@@ -568,7 +717,22 @@ static NSUInteger CYLYAMLKeyColonLocation(NSString *text) {
     return NSNotFound;
 }
 
+/// [EN] Every nested block and flow collection counts one level (A10). [CN] 每个嵌套的块与流式集合计一层（A10）。
+- (BOOL)enterLevel {
+    if (++self.depth > CYLTabBarConfigurationMaximumDepth) {
+        self.error = self.error ?: CYLConfigurationTooDeepError(@"YAML");
+        return NO;
+    }
+    return YES;
+}
+
 - (nullable id)parseBlockAtIndent:(NSUInteger)indent {
+    id value = [self enterLevel] ? [self parseBlockBodyAtIndent:indent] : nil;
+    self.depth--;
+    return value;
+}
+
+- (nullable id)parseBlockBodyAtIndent:(NSUInteger)indent {
     CYLYAMLLine *line = [self currentLine];
     if (!line || line.indent < indent) {
         return [NSNull null];
@@ -759,6 +923,12 @@ static NSUInteger CYLYAMLKeyColonLocation(NSString *text) {
 }
 
 - (nullable id)parseFlowValueInText:(NSString *)text index:(NSUInteger *)index line:(NSUInteger)line {
+    id value = [self enterLevel] ? [self parseFlowValueBodyInText:text index:index line:line] : nil;
+    self.depth--;
+    return value;
+}
+
+- (nullable id)parseFlowValueBodyInText:(NSString *)text index:(NSUInteger *)index line:(NSUInteger)line {
     NSUInteger length = text.length;
     while (*index < length && CYLIsSpaceOrNewline([text characterAtIndex:*index])) {
         (*index)++;
@@ -866,6 +1036,7 @@ static NSUInteger CYLYAMLKeyColonLocation(NSString *text) {
 @interface CYLTOMLParser : NSObject
 @property (nonatomic, copy) NSString *text;
 @property (nonatomic, assign) NSUInteger index;
+@property (nonatomic, assign) NSUInteger depth;
 @property (nonatomic, strong, nullable) NSError *error;
 @end
 
@@ -963,6 +1134,17 @@ static NSUInteger CYLYAMLKeyColonLocation(NSString *text) {
 }
 
 - (nullable id)parseValue {
+    if (++self.depth > CYLTabBarConfigurationMaximumDepth) {
+        self.error = self.error ?: CYLConfigurationTooDeepError(@"TOML");
+        self.depth--;
+        return nil;
+    }
+    id value = [self parseValueBody];
+    self.depth--;
+    return value;
+}
+
+- (nullable id)parseValueBody {
     [self skipInlineSpace];
     unichar c = [self peek];
     if ([self hasPrefixAtIndex:@"\"\"\""] || [self hasPrefixAtIndex:@"'''"]) {
@@ -1301,7 +1483,7 @@ static NSDictionary *_Nullable CYLDictionaryFromProperties(NSString *text, NSErr
         NSArray<NSString *> *path = [dotted rangeOfString:@"\""].location != NSNotFound
             ? CYLSplitDottedKey(dotted)
             : [dotted componentsSeparatedByString:@"."];
-        if (path.count == 0) {
+        if (path.count == 0 || path.count > CYLTabBarConfigurationMaximumDepth) {
             if (error) { *error = CYLConfigurationSyntaxError(@"Properties", number, @"invalid key"); }
             return nil;
         }
@@ -1334,6 +1516,7 @@ static NSDictionary *_Nullable CYLDictionaryFromProperties(NSString *text, NSErr
 @interface CYLXMLTreeBuilder : NSObject <NSXMLParserDelegate>
 @property (nonatomic, strong, nullable) CYLXMLNode *root;
 @property (nonatomic, strong) NSMutableArray<CYLXMLNode *> *stack;
+@property (nonatomic, assign) BOOL tooDeep;
 @end
 
 @implementation CYLXMLTreeBuilder
@@ -1346,6 +1529,13 @@ static NSDictionary *_Nullable CYLDictionaryFromProperties(NSString *text, NSErr
 }
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary<NSString *, NSString *> *)attributeDict {
+    if (self.tooDeep || self.stack.count >= CYLTabBarConfigurationMaximumDepth) {
+        // Some parsers keep calling back after -abortParsing: ignore everything from here.
+        // 部分解析器在 -abortParsing 之后仍会回调：此后的回调全部忽略。
+        self.tooDeep = YES;
+        [parser abortParsing];
+        return;
+    }
     CYLXMLNode *node = [[CYLXMLNode alloc] init];
     node.name = elementName;
     node.attributes = attributeDict ?: @{};
@@ -1359,6 +1549,9 @@ static NSDictionary *_Nullable CYLDictionaryFromProperties(NSString *text, NSErr
 }
 
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string {
+    if (self.tooDeep) {
+        return;
+    }
     [self.stack.lastObject.text appendString:string];
 }
 
@@ -1370,6 +1563,9 @@ static NSDictionary *_Nullable CYLDictionaryFromProperties(NSString *text, NSErr
 }
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName {
+    if (self.tooDeep) {
+        return;
+    }
     [self.stack removeLastObject];
 }
 
@@ -1431,7 +1627,12 @@ static NSDictionary *_Nullable CYLDictionaryFromXML(NSData *data, NSError **erro
     NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
     CYLXMLTreeBuilder *builder = [[CYLXMLTreeBuilder alloc] init];
     parser.delegate = builder;
-    if (![parser parse] || !builder.root) {
+    BOOL parsed = [parser parse];
+    if (builder.tooDeep) {
+        if (error) { *error = CYLConfigurationTooDeepError(@"XML"); }
+        return nil;
+    }
+    if (!parsed || !builder.root) {
         NSString *reason = parser.parserError.localizedDescription ?: @"invalid XML";
         if (error) { *error = CYLConfigurationSyntaxError(@"XML", (NSUInteger)parser.lineNumber, reason); }
         return nil;
@@ -1459,6 +1660,7 @@ static NSDictionary *_Nullable CYLDictionaryFromXML(NSData *data, NSError **erro
 @interface CYLTextProtoParser : NSObject
 @property (nonatomic, copy) NSString *text;
 @property (nonatomic, assign) NSUInteger index;
+@property (nonatomic, assign) NSUInteger depth;
 @property (nonatomic, strong, nullable) NSError *error;
 @end
 
@@ -1656,6 +1858,17 @@ static BOOL CYLIsTextProtoNameCharacter(unichar c) {
 }
 
 - (nullable id)parseValue {
+    if (++self.depth > CYLTabBarConfigurationMaximumDepth) {
+        self.error = self.error ?: CYLConfigurationTooDeepError(@"Protobuf text");
+        self.depth--;
+        return nil;
+    }
+    id value = [self parseValueBody];
+    self.depth--;
+    return value;
+}
+
+- (nullable id)parseValueBody {
     [self skipSpaceAndComments];
     unichar c = [self peek];
     if (c == '{' || c == '<') {
@@ -2048,7 +2261,8 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
         }
         NSError *error = nil;
         NSDictionary *dictionary = [self dictionaryWithData:data format:format error:&error];
-        if (dictionary.count > 0) {
+        if (dictionary.count > 0 || error.code == CYLTabBarConfigurationErrorTooDeep) {
+            // Too deep: this is the format, and the caller gets the TooDeep error. 嵌套过深：就是该格式，调用方会得到 TooDeep 错误。
             return format;
         }
     }
@@ -2073,6 +2287,25 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
     id result = nil;
     NSError *parseError = nil;
     if (format == CYLTabBarConfigurationFormatPropertyList) {
+        // Apple's parser is recursive: check the nesting first (A10). Apple 的解析器是递归的：先检查嵌套层数（A10）。
+        BOOL tooDeep = NO;
+        if (CYLDataHasPrefix(data, "bplist")) {
+            if (!CYLBinaryPropertyListIsSafe(data, &tooDeep)) {
+                if (error) {
+                    *error = tooDeep ? CYLConfigurationTooDeepError(formatName)
+                                     : CYLConfigurationSyntaxError(formatName, 0, @"invalid binary property list structure");
+                }
+                return nil;
+            }
+        } else {
+            NSString *text = CYLStringFromData(data) ?: @"";
+            BOOL isXML = [text rangeOfString:@"<plist"].location != NSNotFound || [CYLTrimmed(text) hasPrefix:@"<"];
+            tooDeep = (isXML ? CYLXMLPropertyListDepth(text) : CYLBracketDepth(text)) > CYLTabBarConfigurationMaximumDepth;
+        }
+        if (tooDeep) {
+            if (error) { *error = CYLConfigurationTooDeepError(formatName); }
+            return nil;
+        }
         result = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:&parseError];
         if (!result && !CYLDataHasPrefix(data, "bplist")) {
             // A .strings file: `"key" = value;` pairs without the outer braces. .strings 文件：没有外层大括号的 `"key" = value;`。
@@ -2097,6 +2330,10 @@ static BOOL CYLDataHasPrefix(NSData *data, const char *prefix) {
             parseError = CYLConfigurationSyntaxError(formatName, 0, @"the file is not UTF-8 text");
         } else if (format == CYLTabBarConfigurationFormatJSON || format == CYLTabBarConfigurationFormatJSON5) {
             NSString *JSON = (format == CYLTabBarConfigurationFormatJSON5) ? CYLJSONFromJSON5(text) : text;
+            if (CYLBracketDepth(JSON ?: @"") > CYLTabBarConfigurationMaximumDepth) {
+                if (error) { *error = CYLConfigurationTooDeepError(formatName); }
+                return nil;
+            }
             NSData *JSONData = [JSON dataUsingEncoding:NSUTF8StringEncoding];
             result = JSONData ? [NSJSONSerialization JSONObjectWithData:JSONData options:0 error:&parseError] : nil;
             if (!result) {

@@ -66,7 +66,23 @@ typedef NS_ENUM(NSInteger, CYLTabBarConfigurationErrorCode) {
     CYLTabBarConfigurationErrorNotADictionary = 4,
     /// [EN] The download failed (`NSUnderlyingErrorKey` holds the network error). [CN] 下载失败（`NSUnderlyingErrorKey` 为网络错误）。
     CYLTabBarConfigurationErrorNetwork = 5,
+    /// [EN] The file or response is empty, or holds only whitespace and comments. [CN] 文件或响应为空，或只有空白与注释。
+    CYLTabBarConfigurationErrorEmpty = 6,
+    /// [EN] Larger than `CYLTabBarConfigurationMaximumLength`. [CN] 超过 `CYLTabBarConfigurationMaximumLength`。
+    CYLTabBarConfigurationErrorTooLarge = 7,
+    /// [EN] Nested deeper than `CYLTabBarConfigurationMaximumDepth`. [CN] 嵌套层数超过 `CYLTabBarConfigurationMaximumDepth`。
+    CYLTabBarConfigurationErrorTooDeep = 8,
+    /// [EN] The configuration has no tab (e.g. an HTML page was downloaded). [CN] 配置中没有 Tab（例如下载到的是 HTML 页面）。
+    CYLTabBarConfigurationErrorNoTabs = 9,
+    /// [EN] A controller can only be created on the main thread. [CN] 只能在主线程创建控制器。
+    CYLTabBarConfigurationErrorMainThreadRequired = 10,
 };
+
+/// [EN] The largest file or response read: 5 MB. [CN] 读取的文件或响应的最大长度：5 MB。
+FOUNDATION_EXTERN const NSUInteger CYLTabBarConfigurationMaximumLength;
+/// [EN] The deepest nesting accepted: 64 levels, far more than a configuration needs, far less than overflows the stack.
+/// [CN] 接受的最大嵌套层数：64 层，远多于配置所需，远少于导致栈溢出的层数。
+FOUNDATION_EXTERN const NSUInteger CYLTabBarConfigurationMaximumDepth;
 
 /*!
  * [EN] Reads key-value configuration files into dictionaries, in every `CYLTabBarConfigurationFormat`. Foundation only,
