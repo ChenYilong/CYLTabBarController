@@ -52,6 +52,12 @@
 - (void)cyl_flatDesignPlusButtonTouchUpInside:(UIControl *)plusButton;
 @end
 
+// [EN] Implemented in CYLTabBarController.m (CYLReselect): a user tap on the tab that was already selected.
+// [CN] 在 CYLTabBarController.m（CYLReselect）中实现：用户点击了已选中的 Tab。
+@interface CYLTabBarController (CYLFlatDesignReselect)
+- (void)cyl_didReselectViewController:(UIViewController *)viewController control:(UIControl *)control;
+@end
+
 @implementation CYLFlatDesignTabBar {
     NSInteger _selectedItemIndex;
     NSMutableArray *_buttons;
@@ -493,6 +499,18 @@
         }
         if (control) {
             [(CYLTabBarController *)owningTabBarController cyl_flatDesignReportDidSelectControl:control];
+        }
+        // [EN] Reselect: every tab button tap arrives here before the selection changes, so the selected view controller is
+        //      still the one shown before the tap. Not for the plus button's placeholder button.
+        // [CN] 重复点击：每次点击 Tab 按钮都会在选中状态变化之前到达这里，此时选中的控制器仍是点击前的那个。PlusButton 的占位按钮除外。
+        CYLTabBarController *reselectTabBarController = (CYLTabBarController *)owningTabBarController;
+        if (!tabBarButton.cyl_isPlaceholder && selectedIndex >= 0 &&
+            selectedIndex < (NSInteger)reselectTabBarController.viewControllers.count &&
+            [reselectTabBarController respondsToSelector:@selector(cyl_didReselectViewController:control:)]) {
+            UIViewController *tappedViewController = reselectTabBarController.viewControllers[(NSUInteger)selectedIndex];
+            if (!tappedViewController.cyl_isPlaceholder && tappedViewController == reselectTabBarController.selectedViewController) {
+                [reselectTabBarController cyl_didReselectViewController:tappedViewController control:tabBarButton];
+            }
         }
     }
     
