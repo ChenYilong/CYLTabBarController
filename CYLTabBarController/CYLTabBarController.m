@@ -974,6 +974,13 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
 #pragma mark - Overrides
 
 - (BOOL)isTabBarHidden {
+    if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) {
+        // FIX: [EN] Liquid Glass and the classic style: the system tab bar's state. [CN] 液态玻璃与经典样式：系统 TabBar 的状态。
+        if (@available(iOS 18.0, *)) {
+            return [super isTabBarHidden];
+        }
+        return self.tabBar.hidden;
+    }
 #if CYL_FLATDESIGN_AVAILABLE
     return self.cyl_tabBarHidden;
 #else
@@ -1139,7 +1146,16 @@ static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset o
             
 #else
 #endif
-    } else { }
+    } else {
+        // FIX: [EN] Liquid Glass and the classic style hid nothing: hide or show the system tab bar, with its plus button
+        //      (a subview of the tab bar), animated by UIKit on iOS 18 and later.
+        // [CN] 液态玻璃与经典样式此前不做任何处理：隐藏或显示系统 TabBar 及其中的 PlusButton，iOS 18 及以上由 UIKit 执行动画。
+        if (@available(iOS 18.0, *)) {
+            [super setTabBarHidden:hidden animated:animated];
+        } else {
+            self.tabBar.hidden = hidden;
+        }
+    }
 }
 
 - (BOOL)_checkHidesBottomBarWhenPushed {

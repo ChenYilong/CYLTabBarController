@@ -205,3 +205,13 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex и PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Нажмите, чтобы выбрать следующую вкладку. Индекс без PlusButton: %1$@, selectedIndex: %2$@, сейчас: %3$@";
+"当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Не поддерживается этим стилем панели: только FlatDesign (CYLFlatDesignTabBar)";
+"当前 TabBar 样式不支持" = "Не поддерживается этим стилем панели";
+"该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Нужны вкладки FlatDesign (CYLFlatDesignTabBarItem). В Liquid Glass и классическом стиле вкладки рисует система, поэтому их расположение и цвет фона изменить нельзя.";
+"通用" = "Общие";
+"TabBar 外观" = "Вид панели вкладок";
+"原地更新 Tab" = "Обновление вкладок на месте";
+"Tab 页面、选中与登录" = "Страницы, выбор и вход";
+"跳转与对比" = "Навигация и сравнение";
+"角标" = "Бейджи";
+"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Не поддерживается в Liquid Glass: высоту панели задаёт система (FlatDesign и классический стиль поддерживают)";

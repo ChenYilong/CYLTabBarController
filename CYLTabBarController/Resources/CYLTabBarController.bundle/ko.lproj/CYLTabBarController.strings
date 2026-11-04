@@ -205,3 +205,13 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex와 플러스 버튼 (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "탭하면 다음 탭을 선택합니다. 플러스 버튼을 제외한 인덱스: %1$@, selectedIndex: %2$@, 현재: %3$@";
+"当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "이 탭 바 스타일에서는 지원되지 않음: FlatDesign(CYLFlatDesignTabBar) 전용";
+"当前 TabBar 样式不支持" = "이 탭 바 스타일에서는 지원되지 않음";
+"该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "FlatDesign 탭 항목(CYLFlatDesignTabBarItem)이 필요합니다. Liquid Glass와 클래식 스타일에서는 시스템이 탭 항목을 그리므로 레이아웃과 배경색을 바꿀 수 없습니다.";
+"通用" = "일반";
+"TabBar 外观" = "탭 바 모양";
+"原地更新 Tab" = "탭 즉시 업데이트";
+"Tab 页面、选中与登录" = "탭 페이지, 선택 및 로그인";
+"跳转与对比" = "이동 및 비교";
+"角标" = "배지";
+"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass에서는 지원되지 않음: 탭 바 높이는 시스템이 정합니다(FlatDesign과 클래식 스타일은 지원)";

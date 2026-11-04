@@ -205,3 +205,13 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex και PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Πατήστε για επιλογή της επόμενης καρτέλας. Δείκτης χωρίς PlusButton: %1$@, selectedIndex: %2$@, τώρα: %3$@";
+"当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Δεν υποστηρίζεται σε αυτό το στυλ: μόνο FlatDesign (CYLFlatDesignTabBar)";
+"当前 TabBar 样式不支持" = "Δεν υποστηρίζεται σε αυτό το στυλ";
+"该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Απαιτεί στοιχεία καρτέλας FlatDesign (CYLFlatDesignTabBarItem). Στο Liquid Glass και στο κλασικό στυλ τα σχεδιάζει το σύστημα, οπότε η διάταξη και το χρώμα φόντου δεν αλλάζουν.";
+"通用" = "Γενικά";
+"TabBar 外观" = "Εμφάνιση γραμμής καρτελών";
+"原地更新 Tab" = "Ενημέρωση καρτελών επί τόπου";
+"Tab 页面、选中与登录" = "Σελίδες, επιλογή και σύνδεση";
+"跳转与对比" = "Πλοήγηση και συγκρίσεις";
+"角标" = "Σήματα";
+"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Δεν υποστηρίζεται στο Liquid Glass: το σύστημα ορίζει το ύψος (το υποστηρίζουν το FlatDesign και το κλασικό στυλ)";

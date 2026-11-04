@@ -205,3 +205,13 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex en de PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Tik om het volgende tabblad te kiezen. Index zonder PlusButton: %1$@, selectedIndex: %2$@, nu: %3$@";
+"当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Niet ondersteund door deze tabbalkstijl: alleen FlatDesign (CYLFlatDesignTabBar)";
+"当前 TabBar 样式不支持" = "Niet ondersteund door deze tabbalkstijl";
+"该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Vereist FlatDesign-tabitems (CYLFlatDesignTabBarItem). Bij Liquid Glass en de klassieke stijl tekent het systeem de items, dus indeling en achtergrondkleur kunnen niet worden gewijzigd.";
+"通用" = "Algemeen";
+"TabBar 外观" = "Uiterlijk van de tabbalk";
+"原地更新 Tab" = "Tabbladen ter plekke bijwerken";
+"Tab 页面、选中与登录" = "Tabpagina’s, selectie en inloggen";
+"跳转与对比" = "Navigatie en vergelijkingen";
+"角标" = "Badges";
+"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Niet ondersteund door Liquid Glass: het systeem bepaalt de hoogte van de tabbalk (FlatDesign en de klassieke stijl wel)";

@@ -205,3 +205,13 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex 與加號按鈕（issue #515）";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "點擊切換到下一個 Tab。不含加號按鈕的索引：%1$@，selectedIndex：%2$@，目前：%3$@";
+"当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "目前 TabBar 樣式不支援：僅扁平樣式（CYLFlatDesignTabBar）支援";
+"当前 TabBar 样式不支持" = "目前 TabBar 樣式不支援";
+"该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "此功能需要扁平樣式的 TabBarItem（CYLFlatDesignTabBarItem）。液態玻璃與經典樣式的 TabBarItem 由系統繪製，不支援修改佈局與背景色。";
+"通用" = "一般";
+"TabBar 外观" = "TabBar 外觀";
+"原地更新 Tab" = "原地更新 Tab";
+"Tab 页面、选中与登录" = "Tab 頁面、選取與登入";
+"跳转与对比" = "跳轉與對比";
+"角标" = "徽章";
+"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "液態玻璃不支援：TabBar 高度由系統決定（扁平樣式與經典樣式支援）";

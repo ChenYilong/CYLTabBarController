@@ -205,3 +205,13 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex și PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Atingeți pentru a selecta fila următoare. Index fără PlusButton: %1$@, selectedIndex: %2$@, acum: %3$@";
+"当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Nu este acceptat de acest stil de bară: doar FlatDesign (CYLFlatDesignTabBar)";
+"当前 TabBar 样式不支持" = "Nu este acceptat de acest stil de bară";
+"该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Necesită elemente de filă FlatDesign (CYLFlatDesignTabBarItem). În Liquid Glass și stilul clasic sistemul desenează elementele, deci aspectul și culoarea fundalului nu pot fi schimbate.";
+"通用" = "General";
+"TabBar 外观" = "Aspectul barei de file";
+"原地更新 Tab" = "Actualizează filele pe loc";
+"Tab 页面、选中与登录" = "Pagini, selecție și autentificare";
+"跳转与对比" = "Navigare și comparații";
+"角标" = "Insigne";
+"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Nu este acceptat de Liquid Glass: sistemul stabilește înălțimea barei (FlatDesign și stilul clasic acceptă)";

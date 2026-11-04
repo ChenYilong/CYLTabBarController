@@ -7,12 +7,20 @@
 //
 
 #import "CYLMineViewController.h"
+#import "CYLFlatDesignTableViewController.h"
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
 #import <CYLTabBarController/UIViewController+CYLSettingsSection.h>
 #import "CYLDetailsViewController.h"
 #import <MJRefresh/MJRefresh.h>
 
 @implementation CYLMineViewController
+
+
+- (instancetype)init {
+    // [EN] Inset grouped sections with rounded corners, as in the Settings app.
+    // [CN] 与系统“设置”App 相同的圆角分组（Inset Grouped）样式。
+    return [super initWithStyle:UITableViewStyleInsetGrouped];
+}
 
 #pragma mark - View lifecycle
 
@@ -21,7 +29,7 @@
     [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
     NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
 
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
 
 //    self.navigationItem.title = @"我的";
 //    self.tabBarItem.title = @"我的";
@@ -90,8 +98,8 @@
 #pragma mark - Table view
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == CYLSettingsSection) {
-        return [self cyl_settingsCellForTableView:tableView atIndexPath:indexPath];
+    if (indexPath.section < [self cyl_demoSectionCount]) {
+        return [self cyl_demoCellForTableView:tableView indexPath:indexPath];
     }
     static NSString * CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -104,19 +112,25 @@
 
 // Section 0: settings (language, memory warning). 第 0 组：设置（语言、内存警告）。
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 2;
+    // [EN] The grouped demo sections (shared with the FlatDesign page), then this page's rows.
+    // [CN] 分组的演示 section（与扁平样式页面共用），然后是本页面的行。
+    return [self cyl_demoSectionCount] + 1;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLLocalizedString(@"角标");
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (section == CYLSettingsSection) {
-        return [self cyl_settingsRowCount];
+    if (section < [self cyl_demoSectionCount]) {
+        return [self cyl_demoRowCountInSection:section];
     }
     return MAX(30, [UITableViewCell cyl_badgeStyleCount]); // every badge style has a row
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == CYLSettingsSection) {
-        [self cyl_didSelectSettingsRowAtIndexPath:indexPath inTableView:tableView];
+    if (indexPath.section < [self cyl_demoSectionCount]) {
+        [self cyl_demoDidSelectRowAtIndexPath:indexPath inTableView:tableView];
         return;
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];

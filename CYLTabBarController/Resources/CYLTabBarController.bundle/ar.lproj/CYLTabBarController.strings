@@ -205,3 +205,13 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex وPlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "انقر لتحديد علامة التبويب التالية. الفهرس دون PlusButton: %1$@، selectedIndex: %2$@، الحالية: %3$@";
+"当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "غير مدعوم في نمط شريط التبويب هذا: FlatDesign فقط (CYLFlatDesignTabBar)";
+"当前 TabBar 样式不支持" = "غير مدعوم في نمط شريط التبويب هذا";
+"该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "يتطلب هذا عناصر تبويب FlatDesign (CYLFlatDesignTabBarItem). في Liquid Glass والنمط الكلاسيكي يرسم النظام عناصر التبويب، فلا يمكن تغيير تخطيطها ولون خلفيتها.";
+"通用" = "عام";
+"TabBar 外观" = "مظهر شريط التبويب";
+"原地更新 Tab" = "تحديث علامات التبويب في مكانها";
+"Tab 页面、选中与登录" = "صفحات التبويب والتحديد وتسجيل الدخول";
+"跳转与对比" = "التنقل والمقارنات";
+"角标" = "الشارات";
+"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "غير مدعوم في Liquid Glass: النظام يحدد ارتفاع شريط التبويب (يدعمه FlatDesign والنمط الكلاسيكي)";

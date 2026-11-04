@@ -205,3 +205,13 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex i PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Dodirnite za odabir sljedeće kartice. Indeks bez PlusButtona: %1$@, selectedIndex: %2$@, sada: %3$@";
+"当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Ovaj stil trake ne podržava: samo FlatDesign (CYLFlatDesignTabBar)";
+"当前 TabBar 样式不支持" = "Ovaj stil trake ne podržava";
+"该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "Potrebne su FlatDesign stavke (CYLFlatDesignTabBarItem). U Liquid Glassu i klasičnom stilu sustav crta stavke pa se raspored i boja pozadine ne mogu mijenjati.";
+"通用" = "Općenito";
+"TabBar 外观" = "Izgled trake kartica";
+"原地更新 Tab" = "Ažuriranje kartica na mjestu";
+"Tab 页面、选中与登录" = "Stranice, odabir i prijava";
+"跳转与对比" = "Navigacija i usporedbe";
+"角标" = "Značke";
+"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass ne podržava: visinu trake određuje sustav (FlatDesign i klasični stil podržavaju)";

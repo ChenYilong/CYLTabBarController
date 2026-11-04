@@ -205,3 +205,13 @@
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex ve PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Sonraki sekmeyi seçmek için dokunun. PlusButton hariç dizin: %1$@, selectedIndex: %2$@, şu an: %3$@";
+"当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持" = "Bu sekme çubuğu stili desteklemiyor: yalnızca FlatDesign (CYLFlatDesignTabBar)";
+"当前 TabBar 样式不支持" = "Bu sekme çubuğu stili desteklemiyor";
+"该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。" = "FlatDesign sekme öğeleri (CYLFlatDesignTabBarItem) gerekir. Liquid Glass ve klasik stilde öğeleri sistem çizer; düzen ve arka plan rengi değiştirilemez.";
+"通用" = "Genel";
+"TabBar 外观" = "Sekme çubuğu görünümü";
+"原地更新 Tab" = "Sekmeleri yerinde güncelle";
+"Tab 页面、选中与登录" = "Sekme sayfaları, seçim ve giriş";
+"跳转与对比" = "Gezinme ve karşılaştırmalar";
+"角标" = "Rozetler";
+"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass desteklemiyor: sekme çubuğu yüksekliğini sistem belirler (FlatDesign ve klasik stil destekler)";
