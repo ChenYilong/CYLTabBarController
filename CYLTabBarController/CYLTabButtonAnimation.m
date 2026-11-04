@@ -62,6 +62,32 @@ static UIImage *CYLTabButtonDotImage(UIColor *color) {
     }];
 }
 
+/*!
+ * [EN] `image` drawn into a bitmap, for an emitter cell. The cell takes the CGImage, which has no tint: an SF Symbol or a
+ *      template image would show black. A template image is drawn in `tintColor`, any other image as it looks.
+ * [CN] 将 `image` 绘制为位图，供粒子使用。粒子使用 CGImage，其中不包含着色：SF Symbol 或模板图片会显示为黑色。
+ *      模板图片按 `tintColor` 绘制，其他图片按原样绘制。
+ */
+static UIImage *CYLTabButtonParticleImage(UIImage *image, UIColor *tintColor) {
+    if (image.size.width <= 0 || image.size.height <= 0) {
+        return image;
+    }
+    UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat preferredFormat];
+    format.opaque = NO;
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:image.size format:format];
+    return [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull context) {
+        CGRect rect = CGRectMake(0, 0, image.size.width, image.size.height);
+        if (image.renderingMode == UIImageRenderingModeAlwaysTemplate) {
+            [tintColor setFill];
+            [image drawInRect:rect];
+            CGContextSetBlendMode(context.CGContext, kCGBlendModeSourceIn);
+            CGContextFillRect(context.CGContext, rect);
+        } else {
+            [image drawInRect:rect];
+        }
+    }];
+}
+
 static CAEmitterLayer *CYLTabButtonEmitterLayer(NSString *cellName, CGFloat lifetime, CGFloat lifetimeRange, CGFloat velocity,
                                                 CGFloat velocityRange, UIImage *image, CGPoint center) {
     CAEmitterCell *cell = [CAEmitterCell emitterCell];
@@ -94,7 +120,8 @@ static CAEmitterLayer *CYLTabButtonEmitterLayer(NSString *cellName, CGFloat life
  * [CN] `view` 周围的烟花：粒子先聚拢再炸开（TLAnimationTabBar），结束后移除粒子图层。
  */
 static void CYLTabButtonPlayFireworks(UIView *view, UIImage *_Nullable image) {
-    UIImage *particle = image ?: CYLTabButtonDotImage(view.tintColor ?: [UIColor systemBlueColor]);
+    UIColor *tintColor = view.tintColor ?: [UIColor systemBlueColor];
+    UIImage *particle = image ? CYLTabButtonParticleImage(image, tintColor) : CYLTabButtonDotImage(tintColor);
     if (!particle.CGImage) {
         return;
     }

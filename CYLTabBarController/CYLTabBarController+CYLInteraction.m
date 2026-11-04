@@ -13,6 +13,7 @@
 /// [EN] Implemented in CYLTabBarController.m. [CN] 实现位于 CYLTabBarController.m。
 @interface CYLTabBarController (CYLInteractionPrivate)
 - (nullable CYLPlusButton<CYLPlusButtonSubclassing> *)cyl_contextPlusButton;
+- (nullable UIViewController *)cyl_contextPlusChildViewController;
 - (nullable UIControl *)cyl_reportedControlForControl:(nullable UIControl *)control;
 @end
 
@@ -736,16 +737,27 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
 }
 
 /*!
- * [EN] Asks the delegate and the login check (issue #19), as a tap does. The tab bar controller's own
+ * FIX: issue #19 / #118
+ * [EN] YES when `viewController` needs login while logged out; the login is started (as a tap does).
+ * [CN] `viewController` 需要登录且当前未登录时为 YES，并发起登录（与点击相同）。
+ */
+- (BOOL)cyl_swipeNeedsLoginForViewController:(UIViewController *)viewController {
+    return [self cyl_interceptLoginIfNeededForViewController:viewController];
+}
+
+/*!
+ * [EN] Asks the delegate, as a tap does (the login check is `-cyl_swipeNeedsLoginForViewController:`). The tab bar controller's own
  *      `-tabBarController:shouldSelectViewController:` runs the login check itself.
- * [CN] 与点击一样询问代理与登录检查（issue #19）。TabBarController 自身的 `-tabBarController:shouldSelectViewController:` 会自己做登录检查。
+ * [CN] 与点击一样询问代理（登录检查见 `-cyl_swipeNeedsLoginForViewController:`）。TabBarController 自身的
+ *      `-tabBarController:shouldSelectViewController:` 会自己做登录检查。
  */
 - (BOOL)cyl_shouldSwipeSelectViewController:(UIViewController *)viewController {
     id<UITabBarControllerDelegate> delegate = self.delegate;
-    if (delegate != (id<UITabBarControllerDelegate>)self && [self cyl_interceptLoginIfNeededForViewController:viewController]) {
-        return NO;
-    }
     if ([delegate respondsToSelector:@selector(tabBarController:shouldSelectViewController:)]) {
+        // [EN] A swipe is a tap on the tab it selects: the delegate, `-tabBarController:didSelectControl:`, the tap
+        //      animation, sound and haptic, and Reselect / DoubleTap (issue #152) all see it as one.
+        // [CN] 滑动等同于点击它所选中的 Tab：代理、`-tabBarController:didSelectControl:`、点击动画、声音与触感反馈，
+        //      以及 Reselect / DoubleTap（issue #152）都把它当作一次点击。
         return [delegate tabBarController:self shouldSelectViewController:viewController];
     }
     return YES;
@@ -757,16 +769,41 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
     if (step == 0 || selectedIndex == NSNotFound || selectedIndex >= viewControllers.count) {
         return NO;
     }
-    NSInteger direction = step > 0 ? 1 : -1;
-    NSInteger index = (NSInteger)selectedIndex + direction;
-    while (index >= 0 && index < (NSInteger)viewControllers.count && ![self cyl_canSwipeToViewController:viewControllers[index]]) {
-        index += direction;
-    }
-    if (index < 0 || index >= (NSInteger)viewControllers.count) {
+    // FIX: issue #118
+    // [EN] One switch at a time: a swipe during the slide (or during a UIKit transition) is ignored, as
+    //      LxTabBarController learned (its issue #2: a tap during the transition crashed).
+    // [CN] 同一时间只切换一次：滑动动画（或系统转场）进行中的滑动会被忽略，借鉴 LxTabBarController（其 issue #2：转场中点击导致崩溃）。
+    if ([objc_getAssociatedObject(self, @selector(cyl_switchToAdjacentTabWithStep:animated:)) boolValue] || self.transitionCoordinator) {
         return NO;
     }
-    UIViewController *toViewController = viewControllers[index];
-    if (![self cyl_shouldSwipeSelectViewController:toViewController]) {
+    NSInteger direction = step > 0 ? 1 : -1;
+    NSInteger index = (NSInteger)selectedIndex + direction;
+    UIViewController *toViewController = nil;
+    // [EN] The next tab that can be selected. A tab the delegate refuses (e.g. a plus button's tab that only the plus
+    //      button opens) is skipped; a tab that needs login stops the swipe there and starts the login, as a tap does.
+    // [CN] 下一个可以选中的 Tab。代理拒绝的 Tab（例如只能由 PlusButton 打开的 Tab）会被跳过；需要登录的 Tab 与点击一样，
+    //      停在该处并发起登录。
+    for (; index >= 0 && index < (NSInteger)viewControllers.count; index += direction) {
+        UIViewController *candidate = viewControllers[index];
+        if (![self cyl_canSwipeToViewController:candidate]) {
+            continue;
+        }
+        if ([self cyl_swipeNeedsLoginForViewController:candidate]) {
+            return NO;
+        }
+        // [EN] A plus button with a child view controller is a tab too: a swipe selects its page, as a tap on the plus
+        //      button does (that tap does not ask the delegate either). Without a child view controller the plus button
+        //      has no page, and its placeholder tab was skipped above.
+        // [CN] 带子控制器的 PlusButton 也是一个 Tab：滑动选中其页面，与点击 PlusButton 相同（点击 PlusButton 同样不询问代理）。
+        //      没有子控制器时 PlusButton 没有页面，其占位 Tab 已在上面跳过。
+        BOOL isPlusChildViewController = [self hasPlusChildViewController] &&
+            [candidate cyl_isEqualToViewController:[self cyl_contextPlusChildViewController]];
+        if (isPlusChildViewController || [self cyl_shouldSwipeSelectViewController:candidate]) {
+            toViewController = candidate;
+            break;
+        }
+    }
+    if (!toViewController) {
         return NO;
     }
     UIView *fromView = self.selectedViewController.view;
@@ -783,12 +820,17 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
     snapshotView.frame = fromView.frame;
     [containerView addSubview:snapshotView];
     toView.transform = CGAffineTransformMakeTranslation(width * direction, 0);
+    objc_setAssociatedObject(self, @selector(cyl_switchToAdjacentTabWithStep:animated:), @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    __weak __typeof(self) weakSelf = self;
     [UIView animateWithDuration:0.35 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
         toView.transform = CGAffineTransformIdentity;
         snapshotView.transform = CGAffineTransformMakeTranslation(-width * direction, 0);
     } completion:^(BOOL finished) {
         toView.transform = CGAffineTransformIdentity;
         [snapshotView removeFromSuperview];
+        if (weakSelf) {
+            objc_setAssociatedObject(weakSelf, @selector(cyl_switchToAdjacentTabWithStep:animated:), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
     }];
     return YES;
 }
@@ -838,6 +880,23 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
 
 #pragma mark - CYLTabBarInteractionHandler
 
+/// [EN] YES when the table view of `cell` offers swipe actions on its rows. [CN] `cell` 所在 tableView 的行支持侧滑操作时为 YES。
+static BOOL CYLTableViewCellHasSwipeActions(UITableViewCell *cell) {
+    UIView *superview = cell.superview;
+    while (superview && ![superview isKindOfClass:[UITableView class]]) {
+        superview = superview.superview;
+    }
+    UITableView *tableView = (UITableView *)superview;
+    if (!tableView) {
+        return NO;
+    }
+    id<UITableViewDelegate> delegate = tableView.delegate;
+    id<UITableViewDataSource> dataSource = tableView.dataSource;
+    return [delegate respondsToSelector:@selector(tableView:trailingSwipeActionsConfigurationForRowAtIndexPath:)] ||
+           [delegate respondsToSelector:@selector(tableView:leadingSwipeActionsConfigurationForRowAtIndexPath:)] ||
+           [dataSource respondsToSelector:@selector(tableView:commitEditingStyle:forRowAtIndexPath:)];
+}
+
 /// [EN] YES when `view` or one of its superviews scrolls horizontally. [CN] `view` 或其父视图可以横向滚动时为 YES。
 static BOOL CYLViewIsInHorizontalScrollView(UIView *view, UIView *stopView) {
     for (UIView *current = view; current && current != stopView; current = current.superview) {
@@ -849,6 +908,14 @@ static BOOL CYLViewIsInHorizontalScrollView(UIView *view, UIView *stopView) {
             }
         }
         if ([current isKindOfClass:[UISlider class]] || [current isKindOfClass:[UISwitch class]]) {
+            return YES;
+        }
+        // FIX: issue #118
+        // [EN] A table view cell that can be swiped to show actions (e.g. Delete) keeps the horizontal swipe: this was
+        //      a known conflict of the scroll-view based WXTabBarController (its issues #5 and #15).
+        // [CN] 可以侧滑显示操作（例如删除）的 tableView cell 保留水平滑动：这是基于 scrollView 的 WXTabBarController 的已知冲突
+        //      （其 issue #5 与 #15）。
+        if ([current isKindOfClass:[UITableViewCell class]] && CYLTableViewCellHasSwipeActions((UITableViewCell *)current)) {
             return YES;
         }
     }
