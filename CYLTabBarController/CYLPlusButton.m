@@ -15,6 +15,7 @@
 /// [EN] See `-[CYLTabBar plusButtonIndex]`.
 @interface CYLTabBar (CYLPlusButtonLayout)
 - (BOOL)cyl_showsVerticalBar;
+- (BOOL)cyl_showsMinimizedBar;
 @end
 
 CGFloat CYLPlusButtonWidth = 0.0f;
@@ -407,6 +408,16 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     return [tabBar isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)tabBar cyl_showsVerticalBar];
 }
 
+/// Issue #13: whether the tab bar is shown minimized (`cyl_tabBarMinimizeBehavior`, iOS 26+).
+/// 系统是否正以缩小状态显示 TabBar（`cyl_tabBarMinimizeBehavior`，iOS 26+）。
+- (BOOL)cyl_isInMinimizedBar {
+    UIView *tabBar = self.superview;
+    while (tabBar && ![tabBar isKindOfClass:[CYLTabBar class]]) {
+        tabBar = tabBar.superview;
+    }
+    return [tabBar isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)tabBar cyl_showsMinimizedBar];
+}
+
 /// Issue #636: the moved title in the tab item under the plus button (a new placeholder doesn't have it yet).
 /// 在 PlusButton 下方的 TabBarItem 中显示移过去的标题（新的占位控制器还没有标题）。
 - (void)cyl_updateTitleInTabBarItem {
@@ -440,6 +451,11 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     // The iOS 27.1 vertical bar: centered on its tab item, as without a title (`-[CYLTabBar plusButtonIndex]`).
     // iOS 27.1 竖向栏：与没有标题时一样，居中于它的 TabBarItem（见 `-[CYLTabBar plusButtonIndex]`）。
     if ([self cyl_isInVerticalBar]) {
+        return center;
+    }
+    // Issue #13: the minimized Liquid Glass bar, laid out as the vertical bar (`-[CYLTabBar plusButtonIndex]`).
+    // issue #13：缩小后的液态玻璃 TabBar，与竖向栏相同处理（见 `-[CYLTabBar plusButtonIndex]`）。
+    if ([self cyl_isInMinimizedBar]) {
         return center;
     }
     // The image's offset from the plus button's center. 图片中心相对 PlusButton 中心的偏移。

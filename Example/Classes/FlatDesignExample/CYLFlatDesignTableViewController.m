@@ -370,10 +370,11 @@ static const NSInteger CYLDemoRowTabBar = 1000;
 /*!
  * [EN] The sections, by function: each row is a settings row index, or `CYLDemoRowTabBar` + a tab bar demo row. The
  *      settings rows follow `UIViewController+CYLSettingsSection.m`: 0 language, 1 memory warning, 2 title offset,
- *      3 standardAppearance, 4 login state, 5 plus button touchable area, 6 selectedIndex (#515), 7–17 issue #535
- *      (7 tap animation, 8 long press, 9 swipe, 10 outside the superview, 11 bundle images, 12 navigation bar without a
- *      base class, 13 slide transition, 14 tap sound and haptic, 15 long press / double tap timing, 16 adjacent tab,
- *      17 CYLUtils helpers), then the tab item updates (title, icon, network icon, all network icons, all local icons, GIF, all titles, replace neighbors).
+ *      3 standardAppearance, 4 login state, 5 plus button touchable area, 6 selectedIndex (#515), 7 minimize / hide the
+ *      tab bar on scroll (#13, next to the show / hide row), 8–18 issue #535 (8 tap animation, 9 long press, 10 swipe,
+ *      11 outside the superview, 12 bundle images, 13 navigation bar without a base class, 14 slide transition, 15 tap
+ *      sound and haptic, 16 long press / double tap timing, 17 adjacent tab, 18 CYLUtils helpers), then the tab item
+ *      updates (title, icon, network icon, all network icons, all local icons, GIF, all titles, replace neighbors).
  *      Settings rows not listed here (a newer library) go to the first section.
  * [CN] 按功能分组的 section：每行为设置行的序号，或 `CYLDemoRowTabBar` + TabBar 演示行序号。设置行顺序见
  *      `UIViewController+CYLSettingsSection.m`（见上方英文）。此处未列出的设置行（更新的库）放在第一个 section。
@@ -383,7 +384,7 @@ static const NSInteger CYLDemoRowTabBar = 1000;
     NSMutableArray<NSDictionary *> *sections = [@[
         @{ @"title" : CYLLocalizedString(@"通用"), @"rows" : @[ @0, @1 ] },
         @{ @"title" : CYLLocalizedString(@"TabBar 外观"),
-           @"rows" : @[ @2, @3, @(CYLDemoRowTabBar + 0), @(CYLDemoRowTabBar + 4), @(CYLDemoRowTabBar + 1),
+           @"rows" : @[ @2, @3, @(CYLDemoRowTabBar + 0), @7, @(CYLDemoRowTabBar + 4), @(CYLDemoRowTabBar + 1),
                         @(CYLDemoRowTabBar + 2), @(CYLDemoRowTabBar + 3) ] },
         @{ @"title" : CYLLocalizedString(@"原地更新 Tab"),
            @"rows" : @[ @(update + 0), @(update + 1), @(update + 2), @(update + 3), @(update + 4), @(update + 5), @(update + 6) ] },
@@ -391,10 +392,10 @@ static const NSInteger CYLDemoRowTabBar = 1000;
         @{ @"title" : @"PlusButton", @"rows" : @[ @5 ] },
         // FIX: issue #535 — tap animation, tap sound and haptic, long press, long press / double tap timing, swipe,
         // switch to the adjacent tab, slide transition. 点击动画、点击声音与触感、长按、长按与双击时长、滑动、切换相邻 Tab、滑动转场。
-        @{ @"title" : CYLLocalizedString(@"Tab 交互"), @"rows" : @[ @7, @14, @8, @15, @9, @16, @13 ] },
+        @{ @"title" : CYLLocalizedString(@"Tab 交互"), @"rows" : @[ @8, @15, @9, @16, @10, @17, @14 ] },
         // FIX: issue #535 — navigation bar without a base class, outside the superview, bundle images, CYLUtils helpers.
         // 不继承基类隐藏导航栏、超出父视图响应、bundle 图片、CYLUtils 工具方法。
-        @{ @"title" : CYLLocalizedString(@"无需继承基类与工具方法"), @"rows" : @[ @12, @10, @11, @17 ] },
+        @{ @"title" : CYLLocalizedString(@"无需继承基类与工具方法"), @"rows" : @[ @13, @11, @12, @18 ] },
         @{ @"title" : CYLLocalizedString(@"跳转与对比"),
            @"rows" : @[ @(CYLDemoRowTabBar + 5), @(CYLDemoRowTabBar + 6), @(CYLDemoRowTabBar + 7), @(CYLDemoRowTabBar + 8) ] },
     ] mutableCopy];

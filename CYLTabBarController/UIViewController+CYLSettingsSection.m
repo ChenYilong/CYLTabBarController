@@ -28,6 +28,7 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowLoginState,
     CYLSettingsRowPlusButtonTouchableArea,
     CYLSettingsRowSelectedIndexIgnoringPlusButton, // FIX: issue #515
+    CYLSettingsRowTabBarMinimizeBehavior, // issue #13
     CYLSettingsRowTabButtonTapAnimation,     // FIX: issue #535
     CYLSettingsRowTabButtonLongPress,        // FIX: issue #535
     CYLSettingsRowSwipeToSwitchTab,          // FIX: issue #535
@@ -1338,6 +1339,72 @@ static void CYLRunUtilsHelpers(CYLTabBarController *_Nullable tabBarController) 
     objc_setAssociatedObject(tabBarController, &CYLDemoUtilsHelpersResultKey, result, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
+#pragma mark - Minimize / hide the tab bar on scroll (issue #13)
+
+static NSString *const CYLTabBarMinimizeCellIdentifier = @"CYLTabBarMinimizeCell";
+
+/// [EN] The name of a CYLTabBarMinimizeBehavior, as in code. [CN] CYLTabBarMinimizeBehavior 的名称，与代码中一致。
+static NSString *CYLTabBarMinimizeBehaviorName(CYLTabBarMinimizeBehavior behavior) {
+    switch (behavior) {
+        case CYLTabBarMinimizeBehaviorNever:
+            return @"Never";
+        case CYLTabBarMinimizeBehaviorOnScrollDown:
+            return @"OnScrollDown";
+        case CYLTabBarMinimizeBehaviorOnScrollUp:
+            return @"OnScrollUp";
+        case CYLTabBarMinimizeBehaviorAutomatic:
+            break;
+    }
+    return @"Automatic";
+}
+
+/*!
+ * [EN] Issue #13 demo row: a tap sets the next `cyl_tabBarMinimizeBehavior` (Automatic → OnScrollDown → OnScrollUp →
+ *      Never) on the tab bar controller that shows this list; then scroll the list.
+ * [CN] Issue #13 演示行：点击为显示本列表的 TabBarController 设置下一个 `cyl_tabBarMinimizeBehavior`（Automatic → OnScrollDown →
+ *      OnScrollUp → Never），然后滚动列表即可看到效果。
+ */
+static UITableViewCell *CYLTabBarMinimizeCell(UITableView *tableView, CYLTabBarController *_Nullable tabBarController) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLTabBarMinimizeCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLTabBarMinimizeCellIdentifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+        cell.detailTextLabel.numberOfLines = 0;
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"arrow.up.and.down"];
+        }
+    }
+    NSString *behaviorName = tabBarController ? CYLTabBarMinimizeBehaviorName(tabBarController.cyl_tabBarMinimizeBehavior) : @"-";
+    cell.textLabel.text = CYLLocalizedString(@"滚动时缩小 / 隐藏 TabBar（issue #13）");
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。"), behaviorName];
+    return cell;
+}
+
+/// [EN] Sets the next behavior: Automatic → OnScrollDown → OnScrollUp → Never → Automatic.
+/// [CN] 切换到下一个行为：Automatic → OnScrollDown → OnScrollUp → Never → Automatic。
+static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBarController) {
+    if (!tabBarController) {
+        return;
+    }
+    CYLTabBarMinimizeBehavior next = CYLTabBarMinimizeBehaviorAutomatic;
+    switch (tabBarController.cyl_tabBarMinimizeBehavior) {
+        case CYLTabBarMinimizeBehaviorAutomatic:
+            next = CYLTabBarMinimizeBehaviorOnScrollDown;
+            break;
+        case CYLTabBarMinimizeBehaviorOnScrollDown:
+            next = CYLTabBarMinimizeBehaviorOnScrollUp;
+            break;
+        case CYLTabBarMinimizeBehaviorOnScrollUp:
+            next = CYLTabBarMinimizeBehaviorNever;
+            break;
+        case CYLTabBarMinimizeBehaviorNever:
+            next = CYLTabBarMinimizeBehaviorAutomatic;
+            break;
+    }
+    tabBarController.cyl_tabBarMinimizeBehavior = next;
+}
+
 @implementation UIViewController (CYLSettingsSection)
 
 - (NSInteger)cyl_settingsRowCount {
@@ -1404,6 +1471,9 @@ static void CYLRunUtilsHelpers(CYLTabBarController *_Nullable tabBarController) 
     if (indexPath.row == CYLSettingsRowUtilsHelpers) {
         return CYLUtilsHelpersCell(tableView, CYLSettingsTabBarController(self));
     }
+    if (indexPath.row == CYLSettingsRowTabBarMinimizeBehavior) {
+        return CYLTabBarMinimizeCell(tableView, CYLSettingsTabBarController(self));
+    }
     if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdate];
     }
@@ -1434,6 +1504,9 @@ static void CYLRunUtilsHelpers(CYLTabBarController *_Nullable tabBarController) 
         if (tableView.window) {
             [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
         }
+    } else if (indexPath.row == CYLSettingsRowTabBarMinimizeBehavior) {
+        CYLSwitchTabBarMinimizeBehavior(CYLSettingsTabBarController(self));
+        [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
     } else if (indexPath.row == CYLSettingsRowTabButtonTapAnimation) {
         CYLSwitchTabButtonTapAnimation(CYLSettingsTabBarController(self));
         [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
