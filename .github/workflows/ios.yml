@@ -1,0 +1,144 @@
+# [EN] iOS CI on GitHub-hosted macOS runners (free for this public repository). See docs/Mac-CI-CD.md.
+#      `xcode-27`: Apple Silicon runner with Xcode 27 (public preview); the project needs Xcode 27 (scripts/pod-lint.xcconfig).
+# [CN] 在 GitHub 托管的 macOS runner 上运行 iOS CI（本公开仓库免费），见 docs/Mac-CI-CD.md。
+#      `xcode-27`：带 Xcode 27 的 Apple Silicon runner（公开预览）；本项目需要 Xcode 27（scripts/pod-lint.xcconfig）。
+name: iOS
+
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # [EN] Full `pod lib lint`, the verification CLAUDE.md asks for. [CN] 完整的 `pod lib lint`，即 CLAUDE.md 要求的验证。
+  lint:
+    name: pod lib lint
+    runs-on: xcode-27
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Versions
+        run: |
+          sw_vers
+          xcodebuild -version
+          pod --version || sudo gem install cocoapods
+      - name: pod lib lint
+        run: scripts/pod-lint.sh lib --verbose
+
+  # [EN] The framework target Carthage builds, then the static analyzer; a warning in the library's sources fails the job.
+  # [CN] Carthage 使用的 framework target，以及静态分析；本库源码中出现警告时该 job 失败。
+  framework:
+    name: Framework build and analyze
+    runs-on: xcode-27
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build CYLTabBarController-Framework
+        run: |
+          set -o pipefail
+          mkdir -p build
+          xcodebuild build \
+            -project CYLTabBarController.xcodeproj \
+            -scheme CYLTabBarController-Framework \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/DerivedData/framework \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/framework.log
+      - name: Analyze CYLTabBarController-Framework
+        run: |
+          set -o pipefail
+          xcodebuild analyze \
+            -project CYLTabBarController.xcodeproj \
+            -scheme CYLTabBarController-Framework \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/DerivedData/framework \
+            CODE_SIGNING_ALLOWED=NO \
+            CLANG_ANALYZER_OUTPUT=plist-html \
+            CLANG_ANALYZER_OUTPUT_DIR="$PWD/build/analyzer" 2>&1 | tee build/analyze.log
+      - name: Warnings summary
+        if: always()
+        run: |
+          {
+            echo "### Framework warnings"
+            echo
+            echo "| Step | Warnings |"
+            echo "|:---|---:|"
+            echo "| build | $(grep -c ': warning: ' build/framework.log || true) |"
+            echo "| analyze | $(grep -c ': warning: ' build/analyze.log || true) |"
+            echo
+            echo '```'
+            grep -h ': warning: ' build/framework.log build/analyze.log 2>/dev/null | sed "s|$PWD/||" | sort -u | head -200 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      # [EN] CLAUDE.md: no build or analyzer warnings in the library's own sources. The count was 0 on the first green run.
+      # [CN] CLAUDE.md：本库源码不允许有构建或静态分析警告。首次全绿运行时数量为 0。
+      - name: Fail on warnings
+        run: |
+          COUNT=$(grep -h '\.[mh]:[0-9]*:[0-9]*: warning: ' build/framework.log build/analyze.log | sort -u | wc -l | tr -d ' ')
+          echo "Source warnings: $COUNT"
+          if [[ "$COUNT" -gt 0 ]]; then
+            grep -h '\.[mh]:[0-9]*:[0-9]*: warning: ' build/framework.log build/analyze.log | sort -u
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: framework-logs
+          path: |
+            build/*.log
+            build/analyzer
+          if-no-files-found: ignore
+
+  # [EN] Carthage, as an app would use it: build this checkout as an XCFramework.
+  # [CN] 与 App 的用法一致的 Carthage：把当前代码编译为 XCFramework。
+  carthage:
+    name: Carthage
+    runs-on: xcode-27
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Carthage
+        run: carthage version || brew install carthage
+      - name: carthage build
+        run: carthage build --no-skip-current --use-xcframeworks --platform iOS
+
+  # [EN] Every demo, one job each; one failing demo does not stop the others.
+  # [CN] 每个 Demo 一个 job；一个 Demo 失败不会中止其他 Demo。
+  examples:
+    name: Demo ${{ matrix.demo }}
+    runs-on: xcode-27
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        demo:
+          - .
+          - Example-Swift
+          - Example-Swift-02
+          - Example-Swift-03
+          - Example-Swift-04
+          - Example-SwiftUI
+          - Example-Swift-SwiftManager
+          - Example-Swift-SwiftManager-FlatDesign
+          - Example-network-download
+    steps:
+      - uses: actions/checkout@v4
+      - name: CocoaPods
+        run: pod --version || sudo gem install cocoapods
+      - name: Build
+        run: scripts/ci-build-example.sh "${{ matrix.demo }}"
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "| Demo | Scheme | Build | Warnings |"
+            echo "|:---|:---|:---:|---:|"
+            cat build/summary.md 2>/dev/null || echo "| ${{ matrix.demo }} | - | ❌ | - |"
+          } >> "$GITHUB_STEP_SUMMARY"

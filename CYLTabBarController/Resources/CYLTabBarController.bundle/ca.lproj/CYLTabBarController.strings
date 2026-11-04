@@ -277,3 +277,6 @@
 "轻触感反馈" = "Resposta hàptica lleugera";
 "重触感反馈" = "Resposta hàptica forta";
 "长按（#152）" = "Pulsació llarga (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Toca'm";

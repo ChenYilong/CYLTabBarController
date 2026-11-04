@@ -277,3 +277,6 @@
 "轻触感反馈" = "Feedback haptic ușor";
 "重触感反馈" = "Feedback haptic puternic";
 "长按（#152）" = "Apăsare lungă (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Atinge";
