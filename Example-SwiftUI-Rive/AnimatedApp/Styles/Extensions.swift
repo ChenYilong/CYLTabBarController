@@ -10,9 +10,13 @@ import SwiftUI
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
+        // [EN] `UInt64(_:radix:)` instead of `Scanner.scanHexInt64`, deprecated since iOS 13.
+        // [CN] 使用 `UInt64(_:radix:)` 代替自 iOS 13 起废弃的 `Scanner.scanHexInt64`。
+        let int = UInt64(hex, radix: 16) ?? 0
+        let a: UInt64
+        let r: UInt64
+        let g: UInt64
+        let b: UInt64
         switch hex.count {
         case 3: // RGB (12-bit)
             (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)

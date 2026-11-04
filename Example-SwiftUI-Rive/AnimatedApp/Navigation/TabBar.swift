@@ -98,13 +98,12 @@ enum Tab: String, CaseIterable {
 
     @ViewBuilder
     var content: some View {
-        switch self {
-        case .chat:
+        if self == .chat {
             HomeView()
                 .safeAreaInset(edge: .top) {
                     Color.clear.frame(height: 104)
                 }
-        default:
+        } else {
             TabPlaceholderView(title: rawValue.capitalized)
         }
     }

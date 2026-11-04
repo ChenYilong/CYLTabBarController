@@ -63,5 +63,8 @@ private struct RiveAnimationView: UIViewRepresentable {
         return container
     }
 
-    func updateUIView(_: UIView, context _: Context) {}
+    func updateUIView(_: UIView, context _: Context) {
+        // [EN] Intentionally empty: the view is made once and controlled through `RiveAnimation.play()` / `stop()`.
+        // [CN] 有意留空：视图只创建一次，通过 `RiveAnimation.play()` / `stop()` 控制。
+    }
 }

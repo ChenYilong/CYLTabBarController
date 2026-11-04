@@ -30,7 +30,8 @@ struct HouseView: View {
     }
     
     func changeValue() {
-            
+        // [EN] Intentionally empty in the course: the house demo does not drive the animation with `rooms` yet.
+        // [CN] 课程中有意留空：这个 house 示例尚未用 `rooms` 驱动动画。
     }
 }
 
