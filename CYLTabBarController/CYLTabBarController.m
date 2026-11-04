@@ -807,14 +807,20 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
             [self cyl_bindTabControlActions];
             // VoiceOver: the tab under the plus button has no title, so it was read as an empty tab.
             // 加号按钮下方的占位 Tab 没有标题，VoiceOver 会读成空 Tab。
+            // [EN] Also the plus button's own view controller: its tab item has no title when the plus button keeps its
+            //      title (e.g. drawn on its background image).
+            // [CN] PlusButton 自己的子控制器也一样：PlusButton 保留自己的标题时（如画在背景图上），其 TabBarItem 没有标题。
+            UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:self];
             for (UIViewController *viewController in self.viewControllers) {
                 if (viewController.cyl_isPlaceholder) {
                     // Classic tab bar: the button is the element. Liquid Glass: the element comes from the item, which
                     // then reads as the plus button it is covered by (a tap on it is forwarded to the plus button).
                     viewController.cyl_tabButton.accessibilityElementsHidden = YES;
                     viewController.cyl_tabButton.isAccessibilityElement = NO;
-                    viewController.tabBarItem.accessibilityLabel = [self cyl_contextPlusButton].accessibilityLabel;
+                } else if (viewController != plusChildViewController || viewController.tabBarItem.title.length > 0) {
+                    continue;
                 }
+                viewController.tabBarItem.accessibilityLabel = [self cyl_contextPlusButton].accessibilityLabel;
             }
         
             do {

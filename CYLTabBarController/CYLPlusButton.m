@@ -292,10 +292,18 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     if (!plusButton || plusButton == self || !plusButton.superview || ![CYLPlusButton plusChildViewControllerForOwner:self]) {
         return center;
     }
-    if (![plusButton cyl_showsTitleInTabBarItem] && ![plusButton cyl_hasNoTitleInLiquidGlass]) {
+    if (![plusButton cyl_standInFollowsPlusButton]) {
         return center;
     }
     return [self.superview convertPoint:plusButton.center fromView:plusButton.superview];
+}
+
+/// [EN] The layouts whose stand-in stays on the plus button's position: the title in the tab item, no title, or a title
+///      drawn over the background image (`-cyl_drawsTitleOverBackgroundImage`).
+/// [CN] 替身保持在 PlusButton 位置的布局：标题由 TabBarItem 显示、没有标题，或标题画在背景图上（`-cyl_drawsTitleOverBackgroundImage`）。
+- (BOOL)cyl_standInFollowsPlusButton {
+    return [self cyl_showsTitleInTabBarItem] || [self cyl_hasNoTitleInLiquidGlass] ||
+           ([CYLConstants isLiquidGlassActive] && [self cyl_drawsTitleOverBackgroundImage]);
 }
 
 #pragma mark - Liquid Glass: the title in the tab item (issue #636)
@@ -317,7 +325,7 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
  *      `-cyl_viewControllerOfTabBarItem` 的 `tabBarItem.title`），系统在两个图层中以 Tab 的字体、位置和颜色绘制；PlusButton 只保留图片，替换 Tab 的图标。
  */
 - (BOOL)cyl_showsTitleInTabBarItem {
-    if (![CYLConstants isLiquidGlassActive] || ![self cyl_viewControllerOfTabBarItem]) {
+    if (![CYLConstants isLiquidGlassActive] || ![self cyl_viewControllerOfTabBarItem] || [self cyl_drawsTitleOverBackgroundImage]) {
         return NO;
     }
     NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
@@ -329,6 +337,29 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
         systemTabBar = systemTabBar.superview;
     }
     return systemTabBar != nil;
+}
+
+/*!
+ * [EN] A plus button drawn with a background image and no image (e.g. a circle with the title on it): its title is part
+ *      of that picture, not a label beside an icon. Moved into the tab item, the button was placed by its empty image
+ *      view, which sits at the title's leading edge: the circle moved right by half the title's width and down onto the
+ *      tab titles' line, below the bar. Such a button keeps its title and is placed as in the other styles
+ *      (`+multiplierOfTabBarHeight:`, `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`), centered on its tab.
+ * [CN] 使用背景图片且没有图片的 PlusButton（例如标题画在圆形背景上）：标题是这张图的一部分，而不是图标旁的标签。标题移到 TabBarItem
+ *      后，按钮按其空的 imageView 定位，而它位于标题的左边缘：圆形向右偏移标题宽度的一半，并向下落到 Tab 标题所在的线上、超出 TabBar。
+ *      这种按钮保留自己的标题，与其他样式一样定位（`+multiplierOfTabBarHeight:`、`+constantOfPlusButtonCenterYOffsetForTabBarHeight:`），
+ *      并居中于它的 Tab。
+ */
+- (BOOL)cyl_drawsTitleOverBackgroundImage {
+    if ([self backgroundImageForState:UIControlStateNormal] == nil || [self imageForState:UIControlStateNormal] != nil) {
+        return NO;
+    }
+    if (@available(iOS 15.0, *)) {
+        if (self.configuration.image) {
+            return NO;
+        }
+    }
+    return YES;
 }
 
 /// The view controller of the tab item under the plus button: the plus button's own, else the placeholder.
@@ -514,8 +545,7 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     if (!selectedContentView.superview || !self.superview || selectedContentView == self) {
         return;
     }
-    // Only for the layouts of this change: the title in the tab item, or no title.
-    if (![self cyl_showsTitleInTabBarItem] && ![self cyl_hasNoTitleInLiquidGlass]) {
+    if (![self cyl_standInFollowsPlusButton]) {
         return;
     }
     CGPoint center = [selectedContentView.superview convertPoint:self.center fromView:self.superview];

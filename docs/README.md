@@ -24,6 +24,7 @@
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
 | [PAG 动画 Tab 图标（与 Lottie 用法相同）](PAG-Animation.md) | [PAG animated tab icons (used like Lottie)](PAG-Animation.md) |
 | [只有部分 Tab 有动画（Lottie 或 PAG）](Per-Tab-Animation.md) | [Only some tabs animated (Lottie or PAG)](Per-Tab-Animation.md) |
+| [液态玻璃：标题画在背景图上的 PlusButton](PlusButton-Background-Image-Liquid-Glass.md) | [Liquid Glass: a PlusButton with its title on a background image](PlusButton-Background-Image-Liquid-Glass.md) |
 | [PlusButton 角标：每次点击都会变化](PlusButton-Badge.md) | [PlusButton badge: changes on every tap](PlusButton-Badge.md) |
 | [有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应](PlusButton-Lottie-TabIcon.md) | [Lottie tab icons and their files when there is a PlusButton](PlusButton-Lottie-TabIcon.md) |
 | [PlusButton 子控件响应各自的点击事件](PlusButton-Subview-Touches.md) | [Subviews of the PlusButton receive their own touches](PlusButton-Subview-Touches.md) |
@@ -66,6 +67,7 @@ docs/
 ├── Login-Required-Tabs.md
 ├── PAG-Animation.md
 ├── Per-Tab-Animation.md
+├── PlusButton-Background-Image-Liquid-Glass.md
 ├── PlusButton-Badge.md
 ├── PlusButton-Lottie-TabIcon.md
 ├── PlusButton-Subview-Touches.md
@@ -90,6 +92,9 @@ docs/
     ├── login-required-tabs-flow.svg
     ├── pag-animation-tab-icons.png
     ├── pag-animation-test-list.png
+    ├── plusbutton-background-image-liquid-glass-selected.png
+    ├── plusbutton-background-image-liquid-glass-swiftui.png
+    ├── plusbutton-background-image-liquid-glass.png
     ├── plusbutton-subview-touches-issue-202.png
     ├── readme-english-before-reading.png
     ├── readme-english-bilingual-contents.png
