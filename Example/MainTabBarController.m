@@ -144,7 +144,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  * [EN] Issue #428: plays the Lottie icons 1.5 times as fast. No need to wait for the Lottie views to be added.
  * [CN] Issue #428：Lottie 图标以 1.5 倍速播放，无需等待 Lottie 视图添加完成。
  */
-- (CGFloat)lottieAnimationSpeed {
+- (CGFloat)tabBarItemAnimationSpeed {
     return 1.5;
 }
 

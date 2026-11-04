@@ -238,7 +238,9 @@ static void CYLRegisterDarkAnimationFromAttributes(NSURL *animationURL, NSDictio
         return;
     }
     // [EN] The dark version is played by the same library as the light one. [CN] 深色版本与浅色版本由同一个动画库播放。
-    [CYLTabBarItemAnimationGetService() bindAnimationURL:darkURL toAttributes:attributes];
+    if (darkURL) {
+        [CYLTabBarItemAnimationGetService() bindAnimationURL:darkURL toAttributes:attributes];
+    }
     CYLTabBarItemAnimationRegisterDarkStyle(animationURL, darkURL, darkColors);
 }
 

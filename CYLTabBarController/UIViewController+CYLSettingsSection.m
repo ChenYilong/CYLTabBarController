@@ -546,7 +546,7 @@ static char CYLDemoTapAnimationStepKey;
 
 static NSInteger CYLCurrentDemoTapAnimationStep(CYLTabBarController *_Nullable tabBarController) {
     NSNumber *step = tabBarController ? objc_getAssociatedObject(tabBarController, &CYLDemoTapAnimationStepKey) : nil;
-    return step ? step.integerValue : tabBarController.cyl_tabButtonTapAnimationType;
+    return step != nil ? step.integerValue : tabBarController.cyl_tabButtonTapAnimationType;
 }
 
 /// [EN] Frames for `CYLTabButtonFrameAnimation`: dots that grow. [CN] `CYLTabButtonFrameAnimation` 的帧：逐渐变大的圆点。
@@ -802,7 +802,7 @@ static NSString *const CYLOutsideBoundsCellIdentifier = @"CYLOutsideBoundsCell";
         _outsideButton.backgroundColor = [UIColor systemBlueColor];
         _outsideButton.layer.cornerRadius = 6;
         [_outsideButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_outsideButton setTitle:@"Tap" forState:UIControlStateNormal];
+        [_outsideButton setTitle:CYLLocalizedString(@"点击") forState:UIControlStateNormal];
         // [EN] Inside the box (left half) and outside it (right half). [CN] 左半部分在方框内，右半部分在方框外。
         _outsideButton.frame = CGRectMake(40, 8, 80, 28);
         [_outsideButton addTarget:self action:@selector(cyl_outsideButtonTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -1274,7 +1274,7 @@ static char CYLDemoSwitchAdjacentResultKey;
 - (void)cyl_reload {
     NSNumber *result = self.tabBarController ? objc_getAssociatedObject(self.tabBarController, &CYLDemoSwitchAdjacentResultKey) : nil;
     self.textLabel.text = CYLLocalizedString(@"切换到上一个 / 下一个 Tab（issue #535）");
-    NSString *resultText = result ? (result.boolValue ? @"YES" : @"NO") : @"-";
+    NSString *resultText = result != nil ? (result.boolValue ? @"YES" : @"NO") : @"-";
     self.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@"), resultText];
 }
 

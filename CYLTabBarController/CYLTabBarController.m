@@ -3410,11 +3410,15 @@ static void CYLRememberItemImageInsets(id _Nullable item, UIEdgeInsets insets) {
     objc_setAssociatedObject(object, &CYLImageInsetsItemKey, isZero ? nil : [NSValue valueWithUIEdgeInsets:insets], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+#if CYL_FLATDESIGN_AVAILABLE
+// [EN] Only the FlatDesign branch below reads it; without FlatDesign it would be an unused function.
+// [CN] 只有下方的扁平样式分支使用；不包含扁平样式时会成为未使用的函数。
 static UIEdgeInsets CYLImageInsetsForItem(id _Nullable item, UIEdgeInsets controllerInsets) {
     id object = item;
     NSValue *itemInsets = object ? objc_getAssociatedObject(object, &CYLImageInsetsItemKey) : nil;
-    return itemInsets ? itemInsets.UIEdgeInsetsValue : controllerInsets;
+    return itemInsets != nil ? itemInsets.UIEdgeInsetsValue : controllerInsets;
 }
+#endif
 
 /*!
  * FIX: issue #95
@@ -6352,7 +6356,7 @@ static char CYLTabBarItemGestureStateKey;
 
 - (NSTimeInterval)cyl_tabBarItemDoubleTapInterval {
     NSNumber *value = objc_getAssociatedObject(self, &CYLTabBarItemDoubleTapIntervalKey);
-    return value ? value.doubleValue : 0.35;
+    return value != nil ? value.doubleValue : 0.35;
 }
 
 - (void)cyl_setTabBarItemDoubleTapInterval:(NSTimeInterval)tabBarItemDoubleTapInterval {

@@ -422,7 +422,7 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
 
 - (UIImpactFeedbackStyle)cyl_tabButtonHapticFeedbackStyle {
     NSNumber *style = objc_getAssociatedObject(self, @selector(cyl_tabButtonHapticFeedbackStyle));
-    return style ? (UIImpactFeedbackStyle)style.integerValue : UIImpactFeedbackStyleMedium;
+    return style != nil ? (UIImpactFeedbackStyle)style.integerValue : UIImpactFeedbackStyleMedium;
 }
 
 - (void)cyl_setTabButtonHapticFeedbackStyle:(UIImpactFeedbackStyle)tabButtonHapticFeedbackStyle {
@@ -465,7 +465,7 @@ static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabBu
 
 - (NSTimeInterval)cyl_tabButtonLongPressMinimumDuration {
     NSNumber *duration = objc_getAssociatedObject(self, @selector(cyl_tabButtonLongPressMinimumDuration));
-    return duration ? duration.doubleValue : 0.5;
+    return duration != nil ? duration.doubleValue : 0.5;
 }
 
 /*!
