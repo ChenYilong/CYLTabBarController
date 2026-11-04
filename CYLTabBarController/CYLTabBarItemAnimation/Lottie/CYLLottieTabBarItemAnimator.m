@@ -52,9 +52,9 @@
 @implementation CYLLottieObjectiveCTabBarItemAnimationPlayer
 
 + (BOOL)isLottieView:(UIView *)view {
-    // Resolved at runtime, as before. 与原来一样在运行时解析。
-    Class lottieViewClass = NSClassFromString(@"LOTAnimationView");
-    return lottieViewClass && [view isKindOfClass:lottieViewClass];
+    // [EN] Inside the `__has_include` guard Lottie is linked (this file already uses the class), so no string lookup.
+    // [CN] 在 `__has_include` 守卫内 Lottie 已链接（本文件已直接使用该类），因此无需按字符串查找。
+    return [view isKindOfClass:[LOTAnimationView class]];
 }
 
 + (UIView *)viewWithURL:(NSURL *)URL {

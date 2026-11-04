@@ -121,20 +121,25 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayab
 
     // MARK: - [EN] CYLTabBarItemAnimationViewProviding [CN] 视图工厂接口
 
-    /// [EN] The legacy renderer, resolved by name only: it is deprecated with the legacy API it uses, and naming it here
-    ///      would warn. [CN] 旧版渲染器，只按名称解析：它与其使用的旧版 API 一起标记为废弃，在这里直接引用会产生警告。
-    private static let legacyProviderClassName = "CYLRiveLegacyTabBarItemAnimationView"
+    /// [EN] The renderer for `legacy` options (another strategy of the same interface); injectable. The default is
+    ///      resolved by name only: it is deprecated with the legacy API it uses, and naming it here would warn.
+    /// [CN] `legacy` 选项使用的渲染器（同一接口的另一个策略），可注入。默认值只按名称解析：它与其使用的旧版 API 一起标记为废弃，
+    ///      在这里直接引用会产生警告。
+    static var legacyProvider: CYLTabBarItemAnimationViewProviding.Type? =
+        NSClassFromString("CYLRiveLegacyTabBarItemAnimationView") as? CYLTabBarItemAnimationViewProviding.Type
+
+    /// [EN] Where the views made by `makeAnimationView` load their files; injectable (e.g. a bundle or a download).
+    /// [CN] `makeAnimationView` 创建的视图从哪里加载文件；可注入（例如 bundle 或下载）。
+    static var fileProvider: CYLRiveTabBarItemAnimationFileProviding = CYLRiveTabBarItemAnimationFileCache.shared
 
     static func makeAnimationView(fileURL: URL, options: [String: String], contentMode: UIView.ContentMode) -> (UIView & CYLTabBarItemAnimationPlayableView)? {
         let configuration = CYLRiveTabBarItemAnimationConfiguration(fileURL: fileURL, options: options)
         if configuration.usesLegacyRuntime {
             // [EN] Another implementation of the same interface (strategy), chosen by the options.
             // [CN] 同一接口的另一个实现（策略），根据选项选择。
-            let legacyProvider = NSClassFromString(legacyProviderClassName) as? CYLTabBarItemAnimationViewProviding.Type
             return legacyProvider?.makeAnimationView(fileURL: fileURL, options: options, contentMode: contentMode)
         }
-        let view = CYLRiveTabBarItemAnimationView(configuration: configuration,
-                                                  fileProvider: CYLRiveTabBarItemAnimationFileCache.shared)
+        let view = CYLRiveTabBarItemAnimationView(configuration: configuration, fileProvider: fileProvider)
         view.contentMode = contentMode
         return view
     }
