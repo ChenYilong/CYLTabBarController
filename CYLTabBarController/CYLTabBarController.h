@@ -29,6 +29,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
+//   - Tab Accessibility and UI Tests / Tab 的无障碍与 UI 测试
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Accessibility.md
 //   - Hijacked Tabs / 劫持 Tab 点击
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Hijack.md
 //   - Built-in Tab Icon Animations / Tab 图标的内置动画
@@ -325,6 +327,27 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedTitleColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemIconColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedIconColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedBackgroundColor;
+
+/*!
+ * [EN] Accessibility of a tab, for VoiceOver and UI tests (`app.tabBars.buttons["home"]`). See docs/Tab-Accessibility.md.
+ *      - By default every tab gets an `accessibilityIdentifier`: its `CYLTabBarItemIdentifier` (or the default one, its
+ *        content view controller's class name); the plus button gets its own identifier the same way. An identifier the
+ *        app set itself is never replaced.
+ *      - `CYLTabBarItemAccessibilityIdentifier`, `CYLTabBarItemAccessibilityLabel`, `CYLTabBarItemAccessibilityHint`
+ *        (NSString) in `tabBarItemsAttributes` set them explicitly; without a label VoiceOver reads the title as before.
+ *      Classic and Liquid Glass: written on the tab's UITabBarItem, which UIKit's tab button reads. FlatDesign: written on
+ *      the flat tab button. Applied on layout, so a reload or an in-place update is picked up.
+ * [CN] Tab 的无障碍信息，用于 VoiceOver 与 UI 测试（`app.tabBars.buttons["home"]`）。见 docs/Tab-Accessibility.md。
+ *      - 默认每个 Tab 都会得到 `accessibilityIdentifier`：其 `CYLTabBarItemIdentifier`（未设置时为默认值，即内容控制器的类名）；
+ *        PlusButton 同样得到自己的标识。App 自己设置的 identifier 不会被替换。
+ *      - `tabBarItemsAttributes` 中的 `CYLTabBarItemAccessibilityIdentifier`、`CYLTabBarItemAccessibilityLabel`、
+ *        `CYLTabBarItemAccessibilityHint`（NSString）显式指定；未设置 label 时 VoiceOver 与以前一样朗读标题。
+ *      经典与液态玻璃：写入该 Tab 的 UITabBarItem，UIKit 的 Tab 按钮会读取它。扁平样式：写入扁平 Tab 按钮。布局时生效，因此
+ *      重新加载或原地更新后都会更新。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemAccessibilityIdentifier;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemAccessibilityLabel;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemAccessibilityHint;
 /*!
  * [EN] These globals hold what was written LAST, by whichever tab bar controller or plus button wrote last. The library
  *      no longer lays out with them: with several tab bar controllers they overwrote each other (a tab bar with 5 items

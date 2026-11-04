@@ -85,6 +85,9 @@ NSString *const CYLTabBarItemSelectedTitleColor = @"CYLTabBarItemSelectedTitleCo
 NSString *const CYLTabBarItemIconColor = @"CYLTabBarItemIconColor";
 NSString *const CYLTabBarItemSelectedIconColor = @"CYLTabBarItemSelectedIconColor";
 NSString *const CYLTabBarItemSelectedBackgroundColor = @"CYLTabBarItemSelectedBackgroundColor";
+NSString *const CYLTabBarItemAccessibilityIdentifier = @"CYLTabBarItemAccessibilityIdentifier";
+NSString *const CYLTabBarItemAccessibilityLabel = @"CYLTabBarItemAccessibilityLabel";
+NSString *const CYLTabBarItemAccessibilityHint = @"CYLTabBarItemAccessibilityHint";
 NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
@@ -281,6 +284,7 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 /// [EN] Per-tab colors, implemented in the main implementation. [CN] 单个 Tab 的颜色，在主实现中实现。
 @interface CYLTabBarController (CYLTabBarItemColorsPrivate)
 - (void)cyl_updateSelectedBackgroundColorsOfTabButtons;
+- (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
 - (void)cyl_syncFlatDesignTabBarItemColors;
 #endif
@@ -3638,6 +3642,84 @@ static char CYLObservedStandardAppearanceTabBarKey;
 }
 #endif
 
+#pragma mark - Tab accessibility (identifiers, labels, hints)
+
+/// [EN] The identifier the library wrote on an object, so a later change of the tab's identifier updates it while an
+///      identifier the app set itself is kept.
+/// [CN] 本库写入对象的 identifier，使 Tab 标识变化时可以更新它，同时保留 App 自己设置的 identifier。
+static char CYLAccessibilityIdentifierSetByCYLKey;
+
+/// [EN] Writes `identifier` on `element` unless the app set a different one itself. [CN] 写入 `identifier`，除非 App 自己设置了其他值。
+static void CYLApplyDefaultAccessibilityIdentifier(NSObject<UIAccessibilityIdentification> *element, NSString *identifier) {
+    if (!element || identifier.length == 0) {
+        return;
+    }
+    NSString *current = element.accessibilityIdentifier;
+    NSString *setByCYL = objc_getAssociatedObject(element, &CYLAccessibilityIdentifierSetByCYLKey);
+    BOOL ownedByApp = current.length > 0 && ![current isEqualToString:setByCYL ?: @""];
+    if (ownedByApp || [current isEqualToString:identifier]) {
+        return;
+    }
+    element.accessibilityIdentifier = identifier;
+    objc_setAssociatedObject(element, &CYLAccessibilityIdentifierSetByCYLKey, identifier, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+/// [EN] Writes the explicit identifier, label and hint of `attributes` on `element` (only values that changed).
+/// [CN] 将 `attributes` 中显式指定的 identifier、label、hint 写入 `element`（只写入有变化的值）。
+static void CYLApplyExplicitAccessibility(NSObject<UIAccessibilityIdentification> *element, NSDictionary *attributes) {
+    id identifier = attributes[CYLTabBarItemAccessibilityIdentifier];
+    if ([identifier isKindOfClass:[NSString class]] && ![element.accessibilityIdentifier isEqualToString:identifier]) {
+        element.accessibilityIdentifier = identifier;
+        objc_setAssociatedObject(element, &CYLAccessibilityIdentifierSetByCYLKey, identifier, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    }
+    id label = attributes[CYLTabBarItemAccessibilityLabel];
+    if ([label isKindOfClass:[NSString class]] && ![element.accessibilityLabel isEqualToString:label]) {
+        element.accessibilityLabel = label;
+    }
+    id hint = attributes[CYLTabBarItemAccessibilityHint];
+    if ([hint isKindOfClass:[NSString class]] && ![element.accessibilityHint isEqualToString:hint]) {
+        element.accessibilityHint = hint;
+    }
+}
+
+/*!
+ * [EN] Gives every tab (and the plus button) an `accessibilityIdentifier` and the explicit accessibility values of its
+ *      attributes. Runs on layout (`-cyl_syncTabBarAppearances`); only changed values are written.
+ * [CN] 为每个 Tab（以及 PlusButton）设置 `accessibilityIdentifier` 及其 attributes 中显式指定的无障碍信息。在布局时执行
+ *      （`-cyl_syncTabBarAppearances`）；只写入有变化的值。
+ */
+- (void)cyl_syncTabBarItemAccessibility {
+    NSArray<UIViewController *> *viewControllers = self.viewControllers;
+    for (NSUInteger index = 0; index < viewControllers.count; index++) {
+        UIViewController *viewController = viewControllers[index];
+        // [EN] The plus child view controller's tab sits under the plus button, which gets the identifier instead.
+        // [CN] PlusButton 子控制器的 Tab 位于 PlusButton 下方，由 PlusButton 使用该标识。
+        if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
+            continue;
+        }
+        NSDictionary *attributes = [self tabBarItemAttributesAtIndex:index];
+        NSString *identifier = viewController.cyl_tabBarItemIdentifier;
+        NSObject<UIAccessibilityIdentification> *element = viewController.tabBarItem;
+#if CYL_FLATDESIGN_AVAILABLE
+        if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+            NSArray<CYLFlatDesignTabBarItem *> *items = [self.items copy];
+            element = (index < items.count) ? items[index].tabBarButton : nil;
+        }
+#endif
+        if (!element) {
+            continue;
+        }
+        CYLApplyDefaultAccessibilityIdentifier(element, identifier);
+        if (attributes) {
+            CYLApplyExplicitAccessibility(element, attributes);
+        }
+    }
+    UIButton *plusButton = [self cyl_contextPlusButton];
+    if (plusButton && [self hasPlusButton]) {
+        CYLApplyDefaultAccessibilityIdentifier(plusButton, plusButton.cyl_tabBarItemIdentifier);
+    }
+}
+
 /// [EN] Marks the tab buttons (and the controller) the library filled with a selected background color.
 /// [CN] 标记本库填充过选中背景色的 Tab 按钮（以及控制器）。
 static char CYLColoredTabButtonsKey;
@@ -3697,6 +3779,7 @@ static char CYLColoredTabButtonsKey;
  *      `tabBar.standardAppearance` / `scrollEdgeAppearance` 被赋值时（KVO）执行，新的 appearance 立即生效。
  */
 - (void)cyl_syncTabBarAppearances {
+    [self cyl_syncTabBarItemAccessibility];
     if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) {
         // FIX: issue #475
         [self cyl_syncTitlePositionAdjustmentAppearances];

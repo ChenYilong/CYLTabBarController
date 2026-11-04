@@ -28,6 +28,7 @@
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
+| [Tab 的无障碍与 UI 测试](Tab-Accessibility.md) | [Tab Accessibility and UI Tests](Tab-Accessibility.md) |
 | [劫持 Tab 点击](Tab-Hijack.md) | [Hijacked Tabs](Tab-Hijack.md) |
 | [Tab 图标的内置动画](Tab-Item-Animations.md) | [Built-in Tab Icon Animations](Tab-Item-Animations.md) |
 | [单个 Tab 的颜色](Tab-Item-Colors.md) | [Per-tab Colors](Tab-Item-Colors.md) |
@@ -66,6 +67,7 @@ docs/
 ├── SelectedIndex-PlusButton.md
 ├── Swift-Guide.md
 ├── SwiftUI-Integration.md
+├── Tab-Accessibility.md
 ├── Tab-Hijack.md
 ├── Tab-Item-Animations.md
 ├── Tab-Item-Colors.md
