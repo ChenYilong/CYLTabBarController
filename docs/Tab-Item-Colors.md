@@ -77,6 +77,7 @@ NSDictionary *live = @{
 | `CYLTabBarItemIconColor` | 未选中图标着色（仅模板图）。 | Unselected icon tint (template images only). |
 | `CYLTabBarItemSelectedIconColor` | 选中图标着色（仅模板图）。 | Selected icon tint (template images only). |
 | `CYLTabBarItemSelectedBackgroundColor` | 选中 Tab 的背景色（经典 TabBar 与扁平样式）。 | Background of the selected tab (classic tab bar and FlatDesign). |
+| `CYLTabBarItemBackgroundColor` | 未选中 Tab 的背景色；未设置选中背景色时，选中后也使用它。 | Background of the tab while not selected; also used when selected if there is no selected background. |
 | `CYLTabBarItemTitleFont` | 未选中标题字体（UIFont）。 | Unselected title font (UIFont). |
 | `CYLTabBarItemSelectedTitleFont` | 选中标题字体；未设置时使用 `CYLTabBarItemTitleFont`。适用于所有样式（iOS 13+）。 | Selected title font; `CYLTabBarItemTitleFont` when not set. In every style (iOS 13+). |
 

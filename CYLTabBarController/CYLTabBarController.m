@@ -80,6 +80,7 @@ NSString *const CYLTabBarItemSelectedTitleColor = @"CYLTabBarItemSelectedTitleCo
 NSString *const CYLTabBarItemIconColor = @"CYLTabBarItemIconColor";
 NSString *const CYLTabBarItemSelectedIconColor = @"CYLTabBarItemSelectedIconColor";
 NSString *const CYLTabBarItemSelectedBackgroundColor = @"CYLTabBarItemSelectedBackgroundColor";
+NSString *const CYLTabBarItemBackgroundColor = @"CYLTabBarItemBackgroundColor";
 NSString *const CYLTabBarItemTitleFont = @"CYLTabBarItemTitleFont";
 NSString *const CYLTabBarItemSelectedTitleFont = @"CYLTabBarItemSelectedTitleFont";
 NSString *const CYLTabBarItemAccessibilityIdentifier = @"CYLTabBarItemAccessibilityIdentifier";
@@ -2323,7 +2324,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     // [CN] 单个 Tab 的颜色在下一次布局时生效（`-cyl_syncTabBarAppearances`、`-cyl_bindTabControlActions`）。
     if (self.isViewLoaded && (attributes[CYLTabBarItemTitleColor] || attributes[CYLTabBarItemSelectedTitleColor] ||
                               attributes[CYLTabBarItemIconColor] || attributes[CYLTabBarItemSelectedIconColor] ||
-                              attributes[CYLTabBarItemSelectedBackgroundColor] ||
+                              attributes[CYLTabBarItemSelectedBackgroundColor] || attributes[CYLTabBarItemBackgroundColor] ||
                               attributes[CYLTabBarItemTitleFont] || attributes[CYLTabBarItemSelectedTitleFont])) {
         [self.view setNeedsLayout];
         [self cyl_updateSelectedBackgroundColorsOfTabButtons];
@@ -3746,6 +3747,10 @@ static char CYLObservedStandardAppearanceTabBarKey;
             textAttributes[NSFontAttributeName] = font;
             [flatItem setTitleTextAttributes:textAttributes forState:state];
         }];
+        id normalBackgroundColor = attributes[CYLTabBarItemBackgroundColor];
+        if ([normalBackgroundColor isKindOfClass:[UIColor class]] && ![flatItem.backgroundColor isEqual:normalBackgroundColor]) {
+            flatItem.backgroundColor = normalBackgroundColor;
+        }
         id selectedBackgroundColor = attributes[CYLTabBarItemSelectedBackgroundColor];
         if ([selectedBackgroundColor isKindOfClass:[UIColor class]] && ![flatItem.selectedBackgroundColor isEqual:selectedBackgroundColor]) {
             flatItem.selectedBackgroundColor = selectedBackgroundColor;
@@ -3859,7 +3864,8 @@ static char CYLColoredTabButtonsKey;
     // [EN] Fast path: no tab uses the key and no button was colored before. [CN] 快速返回：没有 Tab 使用该键，且之前没有填充过按钮。
     BOOL usesSelectedBackgroundColor = NO;
     for (NSDictionary *attributes in self.tabBarItemsAttributes) {
-        if ([attributes isKindOfClass:[NSDictionary class]] && attributes[CYLTabBarItemSelectedBackgroundColor]) {
+        if ([attributes isKindOfClass:[NSDictionary class]] &&
+            (attributes[CYLTabBarItemSelectedBackgroundColor] || attributes[CYLTabBarItemBackgroundColor])) {
             usesSelectedBackgroundColor = YES;
             break;
         }
@@ -3876,9 +3882,13 @@ static char CYLColoredTabButtonsKey;
             continue;
         }
         NSUInteger controlTabIndex = tabIndex++;
-        id color = [self tabBarItemAttributesAtIndex:controlTabIndex][CYLTabBarItemSelectedBackgroundColor];
+        NSDictionary *attributes = [self tabBarItemAttributesAtIndex:controlTabIndex];
+        id selectedColor = attributes[CYLTabBarItemSelectedBackgroundColor];
+        id normalColor = attributes[CYLTabBarItemBackgroundColor];
+        selectedColor = [selectedColor isKindOfClass:[UIColor class]] ? selectedColor : nil;
+        normalColor = [normalColor isKindOfClass:[UIColor class]] ? normalColor : nil;
         BOOL coloredByCYL = [objc_getAssociatedObject(control, &CYLColoredTabButtonsKey) boolValue];
-        if (![color isKindOfClass:[UIColor class]]) {
+        if (!selectedColor && !normalColor) {
             // [EN] The key was removed (e.g. by a reload): clear the color the library set. [CN] 该键已被移除（如重新加载）：清除本库设置的颜色。
             if (coloredByCYL) {
                 control.backgroundColor = nil;
@@ -3886,7 +3896,8 @@ static char CYLColoredTabButtonsKey;
             }
             continue;
         }
-        control.backgroundColor = (controlTabIndex == self.selectedIndex) ? (UIColor *)color : nil;
+        // [EN] Selected: its own color, else the unselected one. [CN] 选中：使用选中背景色，未设置时使用未选中背景色。
+        control.backgroundColor = (controlTabIndex == self.selectedIndex) ? (selectedColor ?: normalColor) : normalColor;
         objc_setAssociatedObject(control, &CYLColoredTabButtonsKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     objc_setAssociatedObject(self, &CYLColoredTabButtonsKey, usesSelectedBackgroundColor ? @YES : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);

@@ -71,7 +71,8 @@ tabBarController.tabBar.itemSpacing = 24;
 | 中文 | English |
 |:---|:---|
 | 与 UIKit 相同：设置了 `standardAppearance` 中的值（iOS 13+）时使用它们，否则使用 TabBar 自身的 `itemPositioning` / `itemWidth` / `itemSpacing`。 | As UIKit: the `standardAppearance` values (iOS 13+) when set, otherwise the tab bar's own `itemPositioning` / `itemWidth` / `itemSpacing`. |
-| 居中、`itemWidth > 0` 或 `itemSpacing > 0` 任一成立即按居中排列；`itemWidth` 为 0 时使用平分宽度。PlusButton 占一个位置，宽度为其自身宽度。 | Any of centered, `itemWidth > 0` or `itemSpacing > 0` centers the group; `itemWidth` 0 uses the shared width. The plus button takes one slot of its own width. |
+| 居中或 `itemWidth > 0` 时按居中排列（`itemWidth` 为 0 时使用平分宽度），并使用 `itemSpacing`。PlusButton 占一个位置，宽度为其自身宽度。 | Centered or `itemWidth > 0` centers the group (`itemWidth` 0 uses the shared width), with `itemSpacing`. The plus button takes one slot of its own width. |
+| 只设置 `itemSpacing`（未居中、`itemWidth` 为 0）时，各位置铺满宽度，之间留出 `itemSpacing` 的间隙，TabBar 的背景透过间隙显示，例如作为有背景色（`CYLTabBarItemBackgroundColor`）的 Tab 之间的分隔线。没有 PlusButton 时同样由本库布局，因为 UIKit 铺满时不留间隙。 | `itemSpacing` alone (not centered, `itemWidth` 0) fills the width with gaps of `itemSpacing` between the slots; the tab bar shows through them, e.g. as separators between tabs with a background color (`CYLTabBarItemBackgroundColor`). The library lays this out without a plus button too, since UIKit leaves no gaps when it fills. |
 | 总宽度超过 TabBar 时回退为平铺。默认值（Automatic、0、0）时与以前完全相同。 | When the group is wider than the tab bar, it falls back to fill. With the defaults (Automatic, 0, 0) the layout is exactly as before. |
 | 支持 RTL（从右到左）布局。 | Right-to-left layouts are mirrored. |
 

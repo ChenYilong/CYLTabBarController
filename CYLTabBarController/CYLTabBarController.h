@@ -31,6 +31,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
 //   - Tab Accessibility and UI Tests / Tab 的无障碍与 UI 测试
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Accessibility.md
+//   - Tab Bar Gallery / TabBar 图库
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Gallery.md
 //   - Hijacked Tabs / 劫持 Tab 点击
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Hijack.md
 //   - Tab interactions: tap animations, long press, swipe, and more / Tab 交互：点击动画、长按、滑动切换及其他
@@ -281,6 +283,16 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedTitleColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemIconColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedIconColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedBackgroundColor;
+/*!
+ * [EN] Optional background of the tab while NOT selected (UIColor), the counterpart of
+ *      `CYLTabBarItemSelectedBackgroundColor`, which falls back to it when not set. Classic tab bar and FlatDesign, as the
+ *      selected one. With `itemSpacing` (and no item width), the tab bar shows through the gaps as separators. See
+ *      docs/Tab-Item-Colors.md.
+ * [CN] 可选的 Tab 未选中时的背景色（UIColor），与 `CYLTabBarItemSelectedBackgroundColor` 对应；后者未设置时使用本值。与选中背景色
+ *      一样适用于经典 TabBar 与扁平样式。配合 `itemSpacing`（且未设置 item 宽度）时，TabBar 的背景透过间隙显示为分隔线。见
+ *      docs/Tab-Item-Colors.md。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemBackgroundColor;
 /*!
  * [EN] Optional per-tab title fonts (UIFont), unselected / selected; the selected state uses the unselected font unless
  *      it has its own. Applied like the colors above (iOS 13+), also in FlatDesign. A larger font for one tab, or a bold

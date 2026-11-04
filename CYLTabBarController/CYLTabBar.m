@@ -368,13 +368,24 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
     CGFloat customWidth = 0;
     CGFloat customSpacing = 0;
     [self cyl_getItemPositioning:&positioning itemWidth:&customWidth itemSpacing:&customSpacing];
-    BOOL centered = (positioning == UITabBarItemPositioningCentered) || customWidth > 0 || customSpacing > 0;
-    if (!centered || count == 0) {
+    if (count == 0) {
+        return;
+    }
+    NSUInteger slotCount = count + (plusWidth > 0 ? 1 : 0);
+    BOOL centered = (positioning == UITabBarItemPositioningCentered) || customWidth > 0;
+    if (!centered) {
+        // [EN] A spacing alone fills the width with gaps between the slots; the tab bar shows through them, e.g. as
+        //      separators between tabs that have a background color.
+        // [CN] 只设置间距时，各位置铺满宽度且之间留有间隙；TabBar 的背景透过间隙显示，例如作为有背景色的 Tab 之间的分隔线。
+        CGFloat gappedWidth = (availableWidth - plusWidth - customSpacing * (CGFloat)(slotCount - 1)) / count;
+        if (customSpacing > 0 && gappedWidth > 0) {
+            *itemWidth = gappedWidth;
+            *spacing = customSpacing;
+        }
         return;
     }
     CGFloat width = customWidth > 0 ? customWidth : fillWidth;
-    NSUInteger slots = count + (plusWidth > 0 ? 1 : 0);
-    CGFloat totalWidth = width * count + plusWidth + customSpacing * (CGFloat)(slots - 1);
+    CGFloat totalWidth = width * count + plusWidth + customSpacing * (CGFloat)(slotCount - 1);
     if (totalWidth > availableWidth + 0.5) {
         return;
     }
@@ -399,7 +410,14 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
  */
 - (void)cyl_layoutTabButtonsWithItemEdgeInsetsIfNeeded {
     UIEdgeInsets edgeInsets = self.cyl_itemEdgeInsets;
-    if ((edgeInsets.left == 0 && edgeInsets.right == 0) || [CYLConstants isLiquidGlassActive]) {
+    UITabBarItemPositioning positioning = UITabBarItemPositioningAutomatic;
+    CGFloat customWidth = 0;
+    CGFloat customSpacing = 0;
+    [self cyl_getItemPositioning:&positioning itemWidth:&customWidth itemSpacing:&customSpacing];
+    // [EN] UIKit does not leave gaps between filled tabs, so a fill with spacing is laid out here too.
+    // [CN] UIKit 铺满时不会在 Tab 之间留间隙，因此铺满加间距时同样在这里布局。
+    BOOL fillsWithSpacing = customSpacing > 0 && customWidth == 0 && positioning != UITabBarItemPositioningCentered;
+    if (((edgeInsets.left == 0 && edgeInsets.right == 0) && !fillsWithSpacing) || [CYLConstants isLiquidGlassActive]) {
         return;
     }
     NSArray<UIControl *> *tabButtons = self.tabBarButtonArray;
