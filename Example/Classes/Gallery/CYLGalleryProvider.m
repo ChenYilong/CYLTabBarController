@@ -296,23 +296,25 @@ static void CYLGalleryPlayKeyframes(UIView *view, NSString *keyPath, NSArray *va
 
 static const CGFloat CYLGalleryLargeIconScale = 1.15;
 
-/// [EN] Icons drawn 15% larger; a press shrinks the icon to 80% and the release brings it back. [CN] 图标放大 15% 显示；按下缩小到 80%，抬起后恢复。
+/// [EN] Icons drawn 15% larger; a press shrinks the icon to 80% and the release brings it back. Written with the
+///      underscore-free spelling of the protocol methods (`-cylPlay…`).
+/// [CN] 图标放大 15% 显示；按下缩小到 80%，抬起后恢复。使用协议方法的无下划线写法（`-cylPlay…`）。
 @interface CYLGalleryHighlightAnimation : NSObject <CYLTabButtonAnimation>
 @end
 
 @implementation CYLGalleryHighlightAnimation
 
-- (void)cyl_playSelectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+- (void)cylPlaySelectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
     iconView.transform = CGAffineTransformMakeScale(CYLGalleryLargeIconScale, CYLGalleryLargeIconScale);
 }
 
-- (void)cyl_playHighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+- (void)cylPlayHighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
     [UIView animateWithDuration:0.2 animations:^{
         iconView.transform = CGAffineTransformMakeScale(CYLGalleryLargeIconScale * 0.8, CYLGalleryLargeIconScale * 0.8);
     }];
 }
 
-- (void)cyl_playDehighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+- (void)cylPlayDehighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
     [UIView animateWithDuration:0.2 animations:^{
         iconView.transform = CGAffineTransformMakeScale(CYLGalleryLargeIconScale, CYLGalleryLargeIconScale);
     }];

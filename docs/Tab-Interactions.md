@@ -37,6 +37,7 @@
 | [放进 CYLUtils 的通用工具](#cn放进-cylutils-的通用工具) | [Generic helpers in CYLUtils](#engeneric-helpers-in-cylutils) |
 | [演示](#cn演示) | [Demo](#endemo) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [角标变化动画](#cn角标变化动画) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Badge-changed animation](#enbadge-changed-animation) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [无下划线的方法名](#cn无下划线的方法名) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Underscore-free method names](#enunderscore-free-method-names) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [用 block 组成动画](#cn用-block-组成动画) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Animations made of blocks](#enanimations-made-of-blocks) |
 | [API 一览](#cnapi-一览) | [API reference](#enapi-reference) |
 | [兼容性与隔离](#cn兼容性与隔离) | [Compatibility and guards](#encompatibility-and-guards) |
@@ -250,6 +251,23 @@ viewController.cyl_tabButtonAnimation = badgeJump
 viewController.tabBarItem.badgeValue = "1"   // 播放动画 / plays the animation
 ```
 
+### [CN]无下划线的方法名
+### [EN]Underscore-free method names
+
+| 中文 | English |
+|:---|:---|
+| `CYLTabButtonAnimation` 的每个方法都新增了去掉下划线、保留 `cyl` 前缀的同名方法：`-cylPlaySelectAnimationWithTabButton:…`、`-cylPlayDeselectAnimationWithTabButton:…`、`-cylPlayReselectAnimationWithTabButton:…`、`-cylPlayHighlightAnimationWithTabButton:…`、`-cylPlayDehighlightAnimationWithTabButton:…`、`-cylPlayBadgeChangedAnimationWithTabButton:…`。它们通过 `NS_SWIFT_NAME` 在 Swift 中导入为 `cylPlaySelectAnimation(withTabButton:iconView:titleLabel:)` 等，因此 Swift 实现协议时方法名不带下划线（符合常见的命名规则与静态分析）。两种写法执行同一段逻辑：本库先调用 `cylPlay…`，没有实现时再调用 `cyl_play…`。原来必需的 `-cyl_playSelectAnimationWithTabButton:…` 改为可选，以便只实现 `cylPlay…` 写法；已有的实现不受影响。 | Every `CYLTabButtonAnimation` method has a new twin with the same name minus the underscore, keeping the `cyl` prefix: `-cylPlaySelectAnimationWithTabButton:…`, `-cylPlayDeselectAnimationWithTabButton:…`, `-cylPlayReselectAnimationWithTabButton:…`, `-cylPlayHighlightAnimationWithTabButton:…`, `-cylPlayDehighlightAnimationWithTabButton:…` and `-cylPlayBadgeChangedAnimationWithTabButton:…`. With `NS_SWIFT_NAME` they import into Swift as `cylPlaySelectAnimation(withTabButton:iconView:titleLabel:)` and so on, so a Swift implementation has no underscore in its method names (as usual naming rules and static analysis expect). Both spellings run the same logic: the library calls `cylPlay…` first and `cyl_play…` when it is not implemented. `-cyl_playSelectAnimationWithTabButton:…`, which was required, is optional now, so a class can implement only the `cylPlay…` spelling; existing implementations are unaffected. |
+
+```swift
+final class Bounce: NSObject, CYLTabButtonAnimation {
+    func cylPlaySelectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
+        iconView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+        UIView.animate(withDuration: 0.3) { iconView.transform = .identity }
+    }
+}
+tabBarController.cyl_defaultTabButtonAnimation = Bounce()
+```
+
 ### [CN]用 block 组成动画
 ### [EN]Animations made of blocks
 
@@ -294,6 +312,7 @@ tabBarController.cyl_defaultTabButtonAnimation = animation
 | `cyl_tabButtonLongPressMinimumDuration` | 长按时长，默认 0.5 秒 | `CYLTabBarController+CYLInteraction.h` |
 | `cyl_swipeToSwitchTabEnabled` / `-cyl_switchToAdjacentTabWithStep:animated:` | 左右滑动切换 Tab / 代码切换到相邻 Tab | `CYLTabBarController+CYLInteraction.h` |
 | `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:` | 角标出现或变化时的动画（可选协议方法） | `CYLTabButtonAnimation.h` |
+| `-cylPlay…AnimationWithTabButton:…` | 协议方法的无下划线写法（Swift：`cylPlay…Animation(withTabButton:…)`），优先于 `cyl_play…` 调用 | `CYLTabButtonAnimation.h` |
 | `CYLTabButtonBlockAnimation` | 用 block（Swift 闭包）组成的动画，每个 block 对应一个协议方法 | `CYLTabButtonAnimation.h` |
 | `<CYLTabButtonAnimation>` 与 `CYLTabButtonScaleAnimation`、`ZoomIn`、`Bounce`、`Rotation`、`Fume`、`Flip`、`Frame` | 动画协议与内置动画类 | `CYLTabButtonAnimation.h` |
 | `CYLTabBarSlideTransitionAnimator` / `CYLTabBarInteractiveTransition` | 滑动转场与跟手交互转场 | `CYLTabBarTransition.h` |
@@ -310,6 +329,7 @@ tabBarController.cyl_defaultTabButtonAnimation = animation
 | `cyl_tabButtonLongPressMinimumDuration` | How long a long press is, default 0.5 s | `CYLTabBarController+CYLInteraction.h` |
 | `cyl_swipeToSwitchTabEnabled` / `-cyl_switchToAdjacentTabWithStep:animated:` | Swipe to switch tabs / switch to the adjacent tab in code | `CYLTabBarController+CYLInteraction.h` |
 | `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:` | The animation when a badge appears or changes (optional protocol method) | `CYLTabButtonAnimation.h` |
+| `-cylPlay…AnimationWithTabButton:…` | The underscore-free spelling of the protocol methods (Swift: `cylPlay…Animation(withTabButton:…)`), called before `cyl_play…` | `CYLTabButtonAnimation.h` |
 | `CYLTabButtonBlockAnimation` | An animation made of blocks (Swift closures), one per protocol method | `CYLTabButtonAnimation.h` |
 | `<CYLTabButtonAnimation>` and `CYLTabButtonScaleAnimation`, `ZoomIn`, `Bounce`, `Rotation`, `Fume`, `Flip`, `Frame` | The animation protocol and built-in classes | `CYLTabButtonAnimation.h` |
 | `CYLTabBarSlideTransitionAnimator` / `CYLTabBarInteractiveTransition` | The slide transition and its interactive driver | `CYLTabBarTransition.h` |

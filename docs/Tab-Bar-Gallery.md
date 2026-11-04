@@ -71,7 +71,7 @@ flowchart LR
 | `GalleryViewController.swift` | 列表与点击分发；系统 UITabBarController / UITab 场景的代理（"Photo" 打开对话框并显示为选中） | The list and row dispatch; the delegate of the system UITabBarController / UITab scenes ("Photo" opens a dialog and looks selected) |
 | `GalleryProvider.swift` | 每个场景一个构建函数 | One builder per scene |
 | `GallerySupport.swift` | 颜色、SF Symbols、页面、气泡、对话框等共用工具 | Shared helpers: colors, SF Symbols, pages, bubbles, the dialog |
-| `GalleryAnimations.swift` | 用 `CYLTabButtonBlockAnimation` 的闭包实现：弹跳、按下、重复点击旋转、角标变化 | Closures on `CYLTabButtonBlockAnimation`: bounce, pressed, reselect turn, badge-changed |
+| `GalleryAnimations.swift` | 弹跳、按下、角标变化用协议的无下划线方法（`cylPlay…`）实现；按下 + 重复点击旋转用 `CYLTabButtonBlockAnimation` 的闭包实现 | Bounce, pressed and badge-changed implement the underscore-free protocol methods (`cylPlay…`); press + reselect turn uses closures on `CYLTabButtonBlockAnimation` |
 | `GalleryIrregularPlusButton.swift` | 凸起的圆形 `CYLPlusButton`，只在圆内响应 | The raised round `CYLPlusButton` that only responds inside its circle |
 | `GalleryPageViewController.swift` | 示例页面、长列表与导航控制器 | Sample pages, a long list and the navigation controller |
 
@@ -80,7 +80,7 @@ flowchart LR
 | 中文 | English |
 |:---|:---|
 | 逐个场景对照后，只有一个效果无法用已有公开 API 忠实实现：**角标出现时自动播放动画**（"Remind with animation" 两个场景）。以前只能在每处设置 `badgeValue` 的代码后手动对 `cyl_tabImageView` 播放动画，而系统或其他代码设置角标时不会触发。为此本库新增了可选协议方法 `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:`：`CYLTabBar` 监听每个 Item 的 `badgeValue`，新值出现时在下一个 runloop 调用该方法（见 [Tab-Interactions.md](Tab-Interactions.md)）。ObjC 与 Swift 图库的这两个场景都改为使用它。 | Going through every scene, only one effect could not be built faithfully with the existing public API: **an animation that plays automatically when a badge appears** (the two "Remind with animation" scenes). Before, you had to animate `cyl_tabImageView` by hand after every place that set `badgeValue`, and badges set by the system or other code were missed. So the library gained the optional protocol method `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:`: `CYLTabBar` observes every item's `badgeValue` and calls it on the next run loop turn when a new value appears (see [Tab-Interactions.md](Tab-Interactions.md)). Both galleries now use it for these two scenes. |
-| 其余效果都可以用公开 API 实现：颜色与字体（`CYLTabBarItemTitleColor` 等）、背景色、选中 / 重复点击 / 按下动画、不规则 PlusButton、自定义点击操作、提醒气泡、Lottie 循环、液态玻璃与 More。Swift 图库的动画用 `CYLTabButtonBlockAnimation` 的闭包编写，不声明任何 `cyl_play…` 协议方法。 | Every other effect is built with the public API: colors and fonts (`CYLTabBarItemTitleColor`...), backgrounds, select / reselect / pressed animations, the irregular plus button, custom click actions, reminder bubbles, a looping Lottie, Liquid Glass and "More". The Swift gallery writes its animations as closures on `CYLTabButtonBlockAnimation` and declares no `cyl_play…` protocol method. |
+| 其余效果都可以用公开 API 实现：颜色与字体（`CYLTabBarItemTitleColor` 等）、背景色、选中 / 重复点击 / 按下动画、不规则 PlusButton、自定义点击操作、提醒气泡、Lottie 循环、液态玻璃与 More。Swift 图库的动画实现协议的无下划线方法（`cylPlay…`）或使用 `CYLTabButtonBlockAnimation` 的闭包，不声明任何带下划线的方法。 | Every other effect is built with the public API: colors and fonts (`CYLTabBarItemTitleColor`...), backgrounds, select / reselect / pressed animations, the irregular plus button, custom click actions, reminder bubbles, a looping Lottie, Liquid Glass and "More". The Swift gallery's animations implement the underscore-free protocol methods (`cylPlay…`) or use closures on `CYLTabButtonBlockAnimation`, and declare no underscored method. |
 
 ## 限制 / Limits
 

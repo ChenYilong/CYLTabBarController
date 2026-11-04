@@ -41,7 +41,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol CYLTabButtonAnimation <NSObject>
 
-@required
+/*!
+ * [EN] Every method comes in two spellings that run the same logic: `cyl_play…` and `cylPlay…` (the same name without the
+ *      underscore, imported into Swift as `cylPlay…(withTabButton:…)`, so Swift code needs no underscored method name).
+ *      Implement either one; when both are implemented, the `cylPlay…` one is called. `-cyl_playSelectAnimationWithTabButton:…`
+ *      used to be required; it is optional now so that a class can implement `-cylPlaySelectAnimationWithTabButton:…`
+ *      instead, and existing classes are unaffected.
+ * [CN] 每个方法都有两种写法，执行相同的逻辑：`cyl_play…` 与 `cylPlay…`（去掉下划线的同名方法，在 Swift 中导入为
+ *      `cylPlay…(withTabButton:…)`，Swift 代码因此无需带下划线的方法名）。实现其中之一即可；两者都实现时调用 `cylPlay…`。
+ *      `-cyl_playSelectAnimationWithTabButton:…` 以前是必需的，现在改为可选，以便改为实现 `-cylPlaySelectAnimationWithTabButton:…`；
+ *      已有的类不受影响。
+ */
+
+@optional
 
 /*!
  * [EN] Plays the animation of a button that is being selected.
@@ -51,7 +63,41 @@ NS_ASSUME_NONNULL_BEGIN
                                     iconView:(UIView *)iconView
                                   titleLabel:(nullable UILabel *)titleLabel;
 
-@optional
+/// [EN] `-cyl_playSelectAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playSelectAnimationWithTabButton:…`。
+- (void)cylPlaySelectAnimationWithTabButton:(UIControl *)button
+                                   iconView:(UIView *)iconView
+                                 titleLabel:(nullable UILabel *)titleLabel
+    NS_SWIFT_NAME(cylPlaySelectAnimation(withTabButton:iconView:titleLabel:));
+
+/// [EN] `-cyl_playDeselectAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playDeselectAnimationWithTabButton:…`。
+- (void)cylPlayDeselectAnimationWithTabButton:(UIControl *)button
+                                     iconView:(UIView *)iconView
+                                   titleLabel:(nullable UILabel *)titleLabel
+    NS_SWIFT_NAME(cylPlayDeselectAnimation(withTabButton:iconView:titleLabel:));
+
+/// [EN] `-cyl_playReselectAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playReselectAnimationWithTabButton:…`。
+- (void)cylPlayReselectAnimationWithTabButton:(UIControl *)button
+                                     iconView:(UIView *)iconView
+                                   titleLabel:(nullable UILabel *)titleLabel
+    NS_SWIFT_NAME(cylPlayReselectAnimation(withTabButton:iconView:titleLabel:));
+
+/// [EN] `-cyl_playHighlightAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playHighlightAnimationWithTabButton:…`。
+- (void)cylPlayHighlightAnimationWithTabButton:(UIControl *)button
+                                      iconView:(UIView *)iconView
+                                    titleLabel:(nullable UILabel *)titleLabel
+    NS_SWIFT_NAME(cylPlayHighlightAnimation(withTabButton:iconView:titleLabel:));
+
+/// [EN] `-cyl_playDehighlightAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playDehighlightAnimationWithTabButton:…`。
+- (void)cylPlayDehighlightAnimationWithTabButton:(UIControl *)button
+                                        iconView:(UIView *)iconView
+                                      titleLabel:(nullable UILabel *)titleLabel
+    NS_SWIFT_NAME(cylPlayDehighlightAnimation(withTabButton:iconView:titleLabel:));
+
+/// [EN] `-cyl_playBadgeChangedAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playBadgeChangedAnimationWithTabButton:…`。
+- (void)cylPlayBadgeChangedAnimationWithTabButton:(UIControl *)button
+                                         iconView:(UIView *)iconView
+                                        badgeView:(nullable UIView *)badgeView
+    NS_SWIFT_NAME(cylPlayBadgeChangedAnimation(withTabButton:iconView:badgeView:));
 
 /*!
  * [EN] Plays the animation of the button that was selected before (when another button gets selected).
