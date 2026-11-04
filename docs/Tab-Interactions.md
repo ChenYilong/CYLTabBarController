@@ -38,6 +38,7 @@
 | [兼容性与隔离](#cn兼容性与隔离) | [Compatibility and guards](#encompatibility-and-guards) |
 | [各项关系图](#cn各项关系图) | [How the pieces relate](#enhow-the-pieces-relate) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
+| [待办](#cn待办) | [To do](#ento-do) |
 
 <!-- navigation:end -->
 
@@ -283,4 +284,15 @@ flowchart TD
 
 | 中文 | English |
 |:---|:---|
-| 本次修改在没有 Xcode 与 iOS 模拟器的环境（Linux）中完成，无法编译运行，因此暂无测试截图。已通过 `pod lib lint --quick`、对新增 Objective-C 文件的 clang 语法检查（使用模拟的 UIKit 头文件）以及代码检查。在设备或模拟器上验证后，可将截图放入 `docs/assets/` 并在此引用。 | This change was made in an environment without Xcode or an iOS simulator (Linux), so it could not be built or run, and there are no test screenshots. It was checked with `pod lib lint --quick`, a clang syntax check of the new Objective-C files (against stand-in UIKit headers) and code review. After checking it on a device or simulator, put screenshots in `docs/assets/` and reference them here. |
+| 已在模拟器上验证（PR #744）：iOS 26.5 与 iOS 17.5 编译无警告，`pod lib lint --quick` 与文档导航检查通过。 | Checked on the simulator (PR #744): builds on iOS 26.5 and iOS 17.5 with no warnings; `pod lib lint --quick` and the docs navigation check pass. |
+| 扁平样式：13 种点击动画、长按、长按时长与双击间隔生效、滑动切换（含 PlusButton 页面）、上一个 / 下一个 Tab、CYLUtils 与 bundle 图片行、滑动转场演示，全部通过。 | FlatDesign: the 13 tap animation steps, long press, the long press duration and double tap interval taking effect, swipe (including the plus button's page), previous / next tab, the CYLUtils and bundle image rows, and the slide transition demo all pass. |
+| 液态玻璃（iOS 26.5）：滑动切换（带滑动动画）与长按通过。经典样式（iOS 17.5）：滑动切换（带滑动动画，在需要登录的 Tab 处停下并发起登录）通过。 | Liquid Glass (iOS 26.5): swipe (with the slide) and long press pass. Classic style (iOS 17.5): swipe (with the slide, stopping at a tab that needs login and starting the login) passes. |
+
+## [CN]待办
+## [EN]To do
+
+| 中文 | English |
+|:---|:---|
+| 1. 在液态玻璃与经典样式（iOS 17）中复测以下演示行（扁平样式已全部通过；滑动切换与长按已在三种样式中通过）：点击动画、长按时长与双击间隔、上一个 / 下一个 Tab、不继承基类隐藏导航栏、超出父视图响应点击。不能完全支持的样式在演示行副标题或弹框中提示。 | 1. Re-check these demo rows in Liquid Glass and the classic style (iOS 17); they all pass in FlatDesign, and swipe and long press already pass in all three styles: the tap animations, the long press duration and double tap interval, previous / next tab, the navigation bar without a base class, and touches outside the superview. Where a style cannot fully support a row, say so in the row's subtitle or an alert. |
+| 2. 文档截图：本轮新增功能（点击声音与触感反馈、长按、滑动切换、点击动画、CYLUtils 工具方法）的无异常截图尚未放入 `docs/assets/` 并在本文档中引用；按仓库规则补齐，最终截图同时放入 `README.md`。 | 2. Screenshots: bug-free screenshots of this round's features (tap sound and haptics, long press, swipe to switch tabs, the tap animations, the CYLUtils helpers) are not yet in `docs/assets/` or referenced here. Add them as the repository rules require, with the final ones in `README.md` too. |
+| 3. 在真机上验证点击声音与触感反馈（模拟器不会振动）。 | 3. Check the tap sound and haptics on a device (the simulator does not vibrate). |
