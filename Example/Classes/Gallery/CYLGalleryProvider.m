@@ -11,9 +11,6 @@
 
 /// [EN] The context of the gallery's tab bars: no plus button is registered for it. [CN] 图库 TabBar 的 context：没有为它注册 PlusButton。
 static NSString *const CYLGalleryContext = @"CYLGallery";
-
-// [EN] Defined below; used by tab bars defined before it. [CN] 定义在下方；前面的 TabBar 会用到。
-static CYLTabBarStyleType CYLGalleryFullWidthStyle(void);
 /// [EN] The context of the irregular scenes, with their own plus button. [CN] 不规则场景的 context，带有自己的 PlusButton。
 static NSString *const CYLGalleryIrregularContext = @"CYLGalleryIrregular";
 /// [EN] Context of the plus button that has its own page (Liquid Glass stand-in scenes).
