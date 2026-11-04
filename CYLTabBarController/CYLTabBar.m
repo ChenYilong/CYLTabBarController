@@ -17,6 +17,7 @@
 
 static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
+static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext;
 
 
 // Implemented in CYLTabBarController.m, issue #610.
@@ -29,6 +30,14 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 @property (nonatomic, strong) NSMutableSet<UIView *> *observedViews;
 /// Whether the last layout found the tab buttons in the iOS 27.1 vertical bar, see `-cyl_refreshTabButtonsAfterVerticalBar`.
 @property (nonatomic, assign) BOOL cyl_wasShowingVerticalBar;
+/// The items whose `title` is observed, see `-cyl_observeItemTitles`.
+@property (nonatomic, copy, nullable) NSArray<UITabBarItem *> *cyl_titleObservedItems;
+/// Whether `-cyl_reloadTabButtons` has a reload scheduled.
+@property (nonatomic, assign) BOOL cyl_isTabButtonsReloadPending;
+/// Whether the scheduled reload also sets the items' titles again (after the vertical bar).
+@property (nonatomic, assign) BOOL cyl_reloadSetsItemTitles;
+/// While the reload sets the items' titles again: their `title` changes are not reloads to schedule.
+@property (nonatomic, assign) BOOL cyl_isSettingItemTitles;
 /// Receives the `UIScrollEdgeElementContainerInteraction`s added to the tab bar, see `-addInteraction:`.
 @property (nonatomic, strong, nullable) UIView *cyl_scrollEdgeElementContainerView;
 /// FIX: issue #488. The token of the block-based Lottie observer: `-removeObserver:self` cannot remove it.
@@ -275,6 +284,7 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
         [self cyl_refreshTabButtonsAfterVerticalBar];
     }
     self.cyl_wasShowingVerticalBar = showsVerticalBar;
+    [self cyl_observeItemTitles];
     // FIX: issue #610 — UIKit replaces the tab buttons when an item's image changes and lays out only the tab bar,
     // so bind the tap action here as well, not only in the controller's -viewDidLayoutSubviews. Done after the layout
     // above, which sets each new button's visible index (used to recognise the plus child view controller's button).
@@ -500,6 +510,14 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         }
         return;
     }
+    if (context == CYLTabBarItemTitleContext) {
+        id oldTitle = change[NSKeyValueChangeOldKey];
+        id newTitle = change[NSKeyValueChangeNewKey];
+        if (!self.cyl_isSettingItemTitles && ![oldTitle isEqual:newTitle] && [CYLConstants isLiquidGlassActive]) {
+            [self cyl_reloadTabButtons];
+        }
+        return;
+    }
     if (context == CYLTabBarContext) {
         [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemWidthDidChangeNotification object:self];
         if (@available(iOS 11.0, *)) {
@@ -520,6 +538,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     // [EN] Unregister KVO observers
     [self cyl_removeObserver:self forKeyPath:@"tabBarItemWidth" context:CYLTabBarContext];
     [self removeAlphaObserver];
+    [self cyl_stopObservingItemTitles];
 }
 
 /// It was never created: `-containsObject:` on nil is NO, so every layout pass added another `alpha` observer, and none
@@ -739,28 +758,89 @@ UISearchTab 会从 TabBar 分离出来单独显示。
  *      并重新布局 Tab 按钮。在下一个 run loop 执行，旋转动画结束后再执行一次。
  */
 - (void)cyl_refreshTabButtonsAfterVerticalBar {
+    [self cyl_reloadTabButtonsSettingItemTitles:YES];
+}
+
+- (void)cyl_reloadTabButtons {
+    [self cyl_reloadTabButtonsSettingItemTitles:NO];
+}
+
+/*!
+ * FIX: issue #601, #653
+ * [EN] Lays the tab buttons out again, as a tap does, on the next run loop and once more 0.5 s later (after a rotation
+ *      or an animated title change); calls made in the meantime are merged. `setsItemTitles` also sets every item's
+ *      title again first, which the tabs coming back from the vertical bar need to show their titles. Does nothing
+ *      while the tab buttons are in the iOS 27.1 vertical bar.
+ * [CN] 像点击一样重新布局 Tab 按钮：下一个 run loop 执行一次，0.5 秒后（旋转或标题改变的动画之后）再执行一次；期间的多次调用会合并。
+ *      `setsItemTitles` 为 YES 时先重新设置每个 item 的标题，从竖向栏返回的 Tab 需要这样才会显示标题。Tab 按钮位于 iOS 27.1
+ *      竖向栏时不执行。
+ */
+- (void)cyl_reloadTabButtonsSettingItemTitles:(BOOL)setsItemTitles {
+    self.cyl_reloadSetsItemTitles = self.cyl_reloadSetsItemTitles || setsItemTitles;
+    if (self.cyl_isTabButtonsReloadPending) {
+        return;
+    }
+    self.cyl_isTabButtonsReloadPending = YES;
     __weak typeof(self) weakSelf = self;
-    void (^refresh)(void) = ^{
+    void (^reload)(BOOL) = ^(BOOL isLast) {
         __strong typeof(weakSelf) self = weakSelf;
-        if (!self || [self cyl_verticalBarTabButtonAtIndex:0]) {
+        if (!self) {
             return;
         }
-        for (UITabBarItem *item in self.items) {
-            NSString *title = item.title;
-            item.title = nil;
-            item.title = title;
+        if (![self cyl_verticalBarTabButtonAtIndex:0]) {
+            if (self.cyl_reloadSetsItemTitles) {
+                self.cyl_isSettingItemTitles = YES;
+                for (UITabBarItem *item in self.items) {
+                    NSString *title = item.title;
+                    item.title = nil;
+                    item.title = title;
+                }
+                self.cyl_isSettingItemTitles = NO;
+            }
+            NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:self];
+            while (views.count > 0) {
+                UIView *view = views.lastObject;
+                [views removeLastObject];
+                [view setNeedsLayout];
+                [views addObjectsFromArray:view.subviews];
+            }
+            [self layoutIfNeeded];
         }
-        NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:self];
-        while (views.count > 0) {
-            UIView *view = views.lastObject;
-            [views removeLastObject];
-            [view setNeedsLayout];
-            [views addObjectsFromArray:view.subviews];
+        if (isLast) {
+            self.cyl_isTabButtonsReloadPending = NO;
+            self.cyl_reloadSetsItemTitles = NO;
         }
-        [self layoutIfNeeded];
     };
-    dispatch_async(dispatch_get_main_queue(), refresh);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), refresh);
+    dispatch_async(dispatch_get_main_queue(), ^{ reload(NO); });
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ reload(YES); });
+}
+
+/*!
+ * FIX: issue #601
+ * [EN] Observes the `title` of every item, so a title changed in place (e.g. `viewController.tabBarItem.title = ...`)
+ *      reloads the tab buttons (`-cyl_reloadTabButtons`). Liquid Glass otherwise kept their previous layout: the plus
+ *      button stayed where its tab was before, off its own title, until a tab was tapped.
+ * [CN] 观察每个 item 的 `title`，原地修改标题（如 `viewController.tabBarItem.title = ...`）后重新加载 Tab 按钮
+ *      （`-cyl_reloadTabButtons`）。否则液态玻璃保持原来的布局：PlusButton 停在它的 Tab 原来的位置，偏离自己的标题，直到点击某个 Tab。
+ */
+- (void)cyl_observeItemTitles {
+    NSArray<UITabBarItem *> *items = self.items ?: @[];
+    if ([items isEqualToArray:self.cyl_titleObservedItems ?: @[]]) {
+        return;
+    }
+    [self cyl_stopObservingItemTitles];
+    for (UITabBarItem *item in items) {
+        [item addObserver:self forKeyPath:@"title" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew)
+                  context:CYLTabBarItemTitleContext];
+    }
+    self.cyl_titleObservedItems = items;
+}
+
+- (void)cyl_stopObservingItemTitles {
+    for (UITabBarItem *item in _cyl_titleObservedItems) {
+        [item removeObserver:self forKeyPath:@"title" context:CYLTabBarItemTitleContext];
+    }
+    _cyl_titleObservedItems = nil;
 }
 
 /*!
