@@ -174,3 +174,8 @@
 "PlusButton 点击范围（issue #91）" = "PlusButton dokunma alanı (issue #91)";
 "打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Dokunma alanını yarı saydam kırmızıyla göstermek için anahtarı açın, normal görünüme dönmek için kapatın; alanı katlamak için kaydırıcıyı sürükleyin. Şu an: %@x";
 "当前 TabBar 没有 PlusButton" = "Bu sekme çubuğunda PlusButton yok";
+
+/* Issue #202: plus button with a tappable X subview demo. */
+"子控件" = "Alt görünüm";
+"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Yeni bağlamlı bir TabBarController göster (dokunulabilir X alt görünümlü PlusButton, issue #202)";
+"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "PlusButton'ın sağ üstündeki X'e dokunun: X rastgele bir renge döner, PlusButton tepki vermez";

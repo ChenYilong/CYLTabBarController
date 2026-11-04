@@ -972,6 +972,15 @@
     // [EN] Guard: only with a plus button.
     // [CN] 仅在有 PlusButton 时处理。
     if (plusButton) {
+        // [EN] FIX: issue #202 — a subview of the plus button that takes touches (a control, or a view with a gesture
+        // recognizer) gets the touch first; it used to be swallowed by the plus button.
+        // [CN] PlusButton 中自己接收触摸的子视图（控件，或带手势的视图）优先获得触摸；以前会被 PlusButton 拦截。
+        if ([plusButton isKindOfClass:[CYLPlusButton class]]) {
+            UIView *plusButtonSubview = [(CYLPlusButton *)plusButton hitTestInteractiveSubview:[plusButton convertPoint:point fromView:self] withEvent:event];
+            if (plusButtonSubview) {
+                return plusButtonSubview;
+            }
+        }
         // [EN] FIX: issue #91 — `-touchableRect` is in the plus button's SUPERVIEW coordinates (by default its frame, grown by
         // `touchableAreaOutsets` / `touchableAreaScale`). It used to be converted from the plus button's own coordinates,
         // which added the frame's origin twice and moved the area away from the button.

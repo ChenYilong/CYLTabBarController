@@ -547,3 +547,81 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 
 @end
 
+
+#pragma mark - CYLCloseSubviewPlusButtonSubclass
+
+/// [EN] Side of the X button, in points. [CN] X 按钮的边长（pt）。
+static CGFloat const CYLCloseSubviewButtonSide = 22;
+/// [EN] The X button's current color, shared with the copy shown in the Liquid Glass selected layer.
+/// [CN] X 按钮当前的颜色，与液态玻璃选中图层中显示的副本共用。
+static UIColor *CYLCloseSubviewCurrentColor = nil;
+
+@interface CYLCloseSubviewPlusButtonSubclass ()
+
+- (void)closeButtonTapped:(UIButton *)sender;
+
+@end
+
+@implementation CYLCloseSubviewPlusButtonSubclass
+
+/*!
+ * [EN] The context this plus button is bound to, different from the other two demo plus buttons.
+ * [CN] 这个 PlusButton 绑定的 context，与 Demo 中另外两个 PlusButton 不同。
+ */
++ (NSString *)tabBarContext {
+    return @"CYLCloseSubviewPlusButtonContext";
+}
+
++ (NSString *)tabBarItemIdentifier {
+    return @"closeSubview";
+}
+
++ (NSString *)plusButtonTitle {
+    return CYLLocalizedString(@"子控件");
+}
+
++ (UIColor *)currentCloseColor {
+    return CYLCloseSubviewCurrentColor ?: [UIColor systemRedColor];
+}
+
++ (UIImage *)closeImage {
+    UIImageSymbolConfiguration *configuration = [UIImageSymbolConfiguration configurationWithPointSize:CYLCloseSubviewButtonSide weight:UIImageSymbolWeightBold];
+    return [UIImage systemImageNamed:@"xmark.circle.fill" withConfiguration:configuration];
+}
+
++ (id)plusButton {
+    CYLCloseSubviewPlusButtonSubclass *button = [super plusButton];
+    UIButton *closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [closeButton setImage:[[self closeImage] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    closeButton.tintColor = [self currentCloseColor];
+    closeButton.accessibilityLabel = @"X";
+    // [EN] A UIControl subview: the tab bar hands it its own touches (issue #202).
+    // [CN] UIControl 子视图：TabBar 把它自己的触摸交给它（issue #202）。
+    [closeButton addTarget:button action:@selector(closeButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [button addSubview:closeButton];
+    button->_closeButton = closeButton;
+    return button;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    // [EN] Top right, inside the bounds, above the image and the title.
+    // [CN] 右上角，在按钮范围内，位于图片与标题之上。
+    CGFloat side = CYLCloseSubviewButtonSide;
+    self.closeButton.frame = CGRectMake(CGRectGetWidth(self.bounds) - side, 0, side, side);
+    [self bringSubviewToFront:self.closeButton];
+}
+
+- (void)closeButtonTapped:(UIButton *)sender {
+    UIColor *color = [UIColor colorWithHue:(CGFloat)arc4random_uniform(360) / 360.0 saturation:0.85 brightness:0.9 alpha:1.0];
+    CYLCloseSubviewCurrentColor = color;
+    sender.tintColor = color;
+    // [EN] The Liquid Glass selected layer shows another instance (`selectedContentView`): keep it in step.
+    // [CN] 液态玻璃的选中图层显示的是另一个实例（`selectedContentView`）：同步它的颜色。
+    UIButton *selectedContentView = self.selectedContentView;
+    if ([selectedContentView isKindOfClass:[CYLCloseSubviewPlusButtonSubclass class]]) {
+        ((CYLCloseSubviewPlusButtonSubclass *)selectedContentView).closeButton.tintColor = color;
+    }
+}
+
+@end

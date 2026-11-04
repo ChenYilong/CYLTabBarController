@@ -11,6 +11,8 @@
 // [CN] 与此类绑定的文档：
 //   - FlatDesign × UITabBarAppearance
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/FlatDesign-StandardAppearance.md
+//   - Subviews of the PlusButton receive their own touches / PlusButton 子控件响应各自的点击事件
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Subview-Touches.md
 //   - PlusButton touchable area: grow it, scale it, and see it / PlusButton 点击范围：扩大、按倍数放大与调试显示
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Touchable-Area.md
 // docs-binding:end

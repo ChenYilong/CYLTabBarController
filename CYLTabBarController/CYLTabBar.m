@@ -912,6 +912,13 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     // [CN] 仅在有 PlusButton 时处理。
     CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = self.plusButton;
     if (plusButton) {
+        // [EN] FIX: issue #202 — a subview of the plus button that takes touches (a control, or a view with a gesture
+        // recognizer) gets the touch first; it used to be swallowed by the plus button.
+        // [CN] PlusButton 中自己接收触摸的子视图（控件，或带手势的视图）优先获得触摸；以前会被 PlusButton 拦截。
+        UIView *plusButtonSubview = [plusButton hitTestInteractiveSubview:[plusButton convertPoint:point fromView:self] withEvent:event];
+        if (plusButtonSubview) {
+            return plusButtonSubview;
+        }
         // [EN] FIX: issue #91 — the touchable area (`touchableAreaOutsets`, `touchableAreaScale`, or an overridden
         // `-touchableRect`) is in the plus button's superview coordinates. In Liquid Glass that superview is the platter,
         // not this tab bar, so convert it first (as for the tab buttons, #653). A point outside this tab bar still

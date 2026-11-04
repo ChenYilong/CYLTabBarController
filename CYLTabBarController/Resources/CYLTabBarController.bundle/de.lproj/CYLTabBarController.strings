@@ -174,3 +174,8 @@
 "PlusButton 点击范围（issue #91）" = "Tippbereich des PlusButton (issue #91)";
 "打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Schalter ein: Tippbereich halbtransparent rot anzeigen, aus: normale Darstellung; mit dem Regler den Bereich vervielfachen. Aktuell: %@x";
 "当前 TabBar 没有 PlusButton" = "Diese Tab-Leiste hat keinen PlusButton";
+
+/* Issue #202: plus button with a tappable X subview demo. */
+"子控件" = "Unteransicht";
+"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "TabBarController mit neuem Kontext pushen (PlusButton mit antippbarer X-Unteransicht, issue #202)";
+"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Tippe auf das X oben rechts am PlusButton: Das X erhält eine zufällige Farbe, der PlusButton reagiert nicht";

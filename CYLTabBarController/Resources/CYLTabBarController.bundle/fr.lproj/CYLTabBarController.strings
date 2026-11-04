@@ -174,3 +174,8 @@
 "PlusButton 点击范围（issue #91）" = "Zone tactile du PlusButton (issue #91)";
 "打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Activez l’interrupteur pour afficher la zone tactile en rouge translucide, désactivez-le pour revenir à l’aspect normal ; faites glisser le curseur pour multiplier la zone. Actuel : %@x";
 "当前 TabBar 没有 PlusButton" = "Cette barre d’onglets n’a pas de PlusButton";
+
+/* Issue #202: plus button with a tappable X subview demo. */
+"子控件" = "Sous-vue";
+"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Afficher un TabBarController avec un nouveau contexte (PlusButton avec une sous-vue X touchable, issue #202)";
+"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Touchez le X en haut à droite du PlusButton : le X prend une couleur aléatoire et le PlusButton ne réagit pas";
