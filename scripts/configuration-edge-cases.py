@@ -133,7 +133,14 @@ def section(current):
         s = status(c, current)
         if s is None:
             continue
-        mark = '✅ 第 %d 轮 / round %d' % (c[5]['fixed'], c[5]['fixed']) if s == 1 else ('🟡 部分 / partial' if s == 0.5 else '❌ 未处理 / not yet')
+        # [EN] Ordered comparisons: the status is 1.0, 0.5 or 0.0 (no float equality).
+        # [CN] 使用大小比较：状态为 1.0、0.5 或 0.0（不对浮点数做相等比较）。
+        if s >= 1:
+            mark = '✅ 第 %d 轮 / round %d' % (c[5]['fixed'], c[5]['fixed'])
+        elif s > 0:
+            mark = '🟡 部分 / partial'
+        else:
+            mark = '❌ 未处理 / not yet'
         out.append('| %s | %s | %s | %s | %s | %s |' % (c[0], c[1], c[2], c[3], c[4], mark))
     out += ['', '| 轮次 Round | 分数 Score | 情况数 Cases | 说明 | Notes | 减分项 Deductions |', '|:---|:---|:---|:---|:---|:---|']
     for r in range(1, current + 1):

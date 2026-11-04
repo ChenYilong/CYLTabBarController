@@ -30,8 +30,22 @@ import os
 import plistlib
 import re
 import sys
+import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# [EN] Arguments may only name paths in the repository or the temporary folder. [CN] 参数只能指向仓库或临时目录内的路径。
+ALLOWED_ROOTS = (ROOT, tempfile.gettempdir())
+
+
+def confined_path(path, roots):
+    """[EN] The real path of `path` when it lies inside one of `roots`, else exit: no path traversal from arguments.
+    [CN] `path` 位于 `roots` 之一内时返回其真实路径，否则退出：防止通过参数进行路径穿越。"""
+    real = os.path.realpath(path)
+    for root in roots:
+        root = os.path.realpath(root)
+        if real == root or real.startswith(root + os.sep):
+            return real
+    sys.exit('%s: outside %s' % (path, ' / '.join(roots)))
 
 ITEM_KEYS = [
     'CYLTabBarItemTitle', 'CYLTabBarItemImage', 'CYLTabBarItemSelectedImage', 'CYLTabBarItemDarkImage',
@@ -412,7 +426,9 @@ def add_dark_colors(code, items, report):
     """Swift `["A", "B"].map { layer in ["\\(layer)_Suffix": UIColor(...)] }` used for `CYLTabBarLottieDarkColors`."""
     if 'CYLTabBarLottieDarkColors' not in code:
         return
-    m = re.search(r'\[((?:\s*"[^"]*"\s*,?)+)\]\s*\.map\s*\{\s*(\w+)\s*(?:->[^{]*?)?\s*in\s*', code)
+    # [EN] Linear regex: each part can match only one way (no nested optional quantifiers).
+    # [CN] 线性正则：每一部分只有一种匹配方式（无嵌套的可选量词）。
+    m = re.search(r'\[\s*("[^"]*"(?:\s*,\s*"[^"]*")*)\s*(?:,\s*)?\]\s*\.map\s*\{\s*(\w+)\s*(?:->[^{]*?)?\bin\s', code)
     if not m:
         report.append('CYLTabBarLottieDarkColors: built at runtime; skipped')
         return
@@ -739,6 +755,9 @@ def main():
     unknown = [f for f in formats if f not in FORMATS]
     if unknown:
         parser.error('unknown format: %s' % ', '.join(unknown))
+    if args.output:
+        args.output = confined_path(args.output, ALLOWED_ROOTS)
+    args.paths = [confined_path(p, ALLOWED_ROOTS) for p in args.paths]
     paths = args.paths or sorted(os.path.join(ROOT, d) for d in os.listdir(ROOT) if d.startswith('Example') and d != 'Example-Shared')
     stale, written = [], 0
     for path in sources(paths):
@@ -757,7 +776,7 @@ def main():
             if args.stdout:
                 sys.stdout.write(data.decode('utf-8', errors='replace') if fmt not in ('binpb', 'binary.plist') else '<%d bytes of %s>\n' % (len(data), fmt))
                 continue
-            target = os.path.join(out_dir, '%s.%s' % (stem, fmt))
+            target = confined_path(os.path.join(out_dir, '%s.%s' % (stem, fmt)), ALLOWED_ROOTS)
             old = open(target, 'rb').read() if os.path.exists(target) else None
             if old == data:
                 continue

@@ -86,6 +86,10 @@ python3 scripts/export-tabbar-configurations.py
 | `--stdout` | 输出到终端而不写文件（二进制格式只显示大小） | Print instead of writing files (binary formats show their size only) |
 | `--check` | 不写文件；有文件过期时返回 1，可用于 CI | Write nothing; exit 1 when a file is out of date, for CI |
 
+| 中文 | English |
+|:---|:---|
+| 为防止路径穿越，`paths` 与 `--output`（以及测试脚本 `lower.py`、`make-fixtures.py` 的参数）必须位于仓库（`scripts/` 的上一级目录）或系统临时目录内，否则脚本报错退出。把脚本复制到自己的项目时，请放在项目根目录的 `scripts/` 下。 | Against path traversal, `paths` and `--output` (and the arguments of the test scripts `lower.py` and `make-fixtures.py`) must lie inside the repository (the folder above `scripts/`) or the system temporary folder; otherwise the script exits with an error. When you copy the script into your project, put it in `scripts/` at the project's root. |
+
 | `--format` | 文件 File | 中文 | English |
 |:---|:---|:---|:---|
 | `json` | `.json` | JSON | JSON |
