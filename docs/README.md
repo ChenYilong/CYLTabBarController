@@ -18,6 +18,7 @@
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
+| [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
 | [PAG 动画 Tab 图标（与 Lottie 用法相同）](PAG-Animation.md) | [PAG animated tab icons (used like Lottie)](PAG-Animation.md) |
 | [只有部分 Tab 有动画（Lottie 或 PAG）](Per-Tab-Animation.md) | [Only some tabs animated (Lottie or PAG)](Per-Tab-Animation.md) |
@@ -54,6 +55,7 @@ docs/
 ├── Carthage.md
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
+├── Image-Only-Tabs.md
 ├── Login-Required-Tabs.md
 ├── PAG-Animation.md
 ├── Per-Tab-Animation.md
