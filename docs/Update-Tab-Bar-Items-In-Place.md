@@ -202,6 +202,7 @@ cache.downloadTimeout = 15;
 | 角标在 SF Symbol（模板）图标上保持自身颜色与文字 / Badges keep their colors and text on SF Symbol (template) icons | ![Badges on symbol icons](assets/update-tab-bar-items-badges-on-symbol-icons.png) |
 | 直接设置在 `tabBarItem` 上的角标，选中图层中同样显示 / A badge set on `tabBarItem` directly shows in the selected layer too | ![Badge in the selected layer](assets/update-tab-bar-items-tab-item-badge-selected-layer.png) |
 | 替换相邻 Tab 的页面（#481）与恢复 / Replace neighboring tabs (#481) and restored | ![Replaced](assets/update-tab-bar-items-replace-neighbors.png) ![Restored](assets/update-tab-bar-items-replace-neighbors-restored.png) |
+| [#434](https://github.com/ChenYilong/CYLTabBarController/issues/434)：修改标题后反复切换 Tab，只有选中的 Tab 处于选中状态（液态玻璃、扁平样式；经典样式在 iOS 17.5 用代码验证）/ [#434](https://github.com/ChenYilong/CYLTabBarController/issues/434): after a title change, switching tabs leaves only the selected tab selected (Liquid Glass, FlatDesign; the classic style checked by code on iOS 17.5) | ![#434 Liquid Glass](assets/update-tab-bar-items-issue-434-liquid-glass.png) ![#434 FlatDesign](assets/update-tab-bar-items-issue-434-flatdesign.png) |
 | 列表行换行显示（液态玻璃、扁平样式）/ Wrapped rows (Liquid Glass, FlatDesign) | ![Wrapped cells](assets/update-tab-bar-items-wrapped-cells.png) ![Wrapped cells FlatDesign](assets/update-tab-bar-items-wrapped-cells-flatdesign.png) |
 
 ## 角标 / Badges

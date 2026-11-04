@@ -74,6 +74,8 @@ docs/
     ├── update-tab-bar-items-flatdesign-restored.png
     ├── update-tab-bar-items-gif-icon.png
     ├── update-tab-bar-items-image-url-keys.png
+    ├── update-tab-bar-items-issue-434-flatdesign.png
+    ├── update-tab-bar-items-issue-434-liquid-glass.png
     ├── update-tab-bar-items-plus-button-local-icon.png
     ├── update-tab-bar-items-plus-button-network-icon.png
     ├── update-tab-bar-items-plus-button-restored.png
