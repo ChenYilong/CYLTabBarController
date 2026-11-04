@@ -140,7 +140,10 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 /// Issue #636: the title moved into the tab item, and the image-to-title distance measured before (see
 /// `-cyl_showsTitleInTabBarItem`).
 static const void *CYLPlusButtonMovedTitleKey = &CYLPlusButtonMovedTitleKey;
-static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
+/// [EN] From the image's bottom edge to the title's center line, measured before the title moved (#636). From the edge, not
+///      the center, so an image set or replaced later keeps the distance. [CN] 从图片底边到标题中心线的距离，在标题移走前测得（#636）。
+///      以底边而不是中心计算，之后设置或替换的图片保持同一距离。
+static const void *CYLPlusButtonImageBottomToTitleKey = &CYLPlusButtonImageBottomToTitleKey;
 
 @implementation CYLPlusButton
 //@synthesize selected = _selected;
@@ -285,6 +288,9 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     [self cyl_setImage:image forState:state explicitStates:CYLPlusButtonExplicitImageStatesKey
                 getter:^UIImage *(UIControlState aState) { return [super imageForState:aState]; }
                 setter:^(UIImage *anImage, UIControlState aState) { [super setImage:anImage forState:aState]; }];
+    if (state == UIControlStateNormal) {
+        [self cyl_growToFitContentIfNeeded];
+    }
 }
 
 - (void)setBackgroundImage:(UIImage *)image forState:(UIControlState)state {
@@ -292,6 +298,34 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     [self cyl_setImage:image forState:state explicitStates:CYLPlusButtonExplicitBackgroundImageStatesKey
                 getter:^UIImage *(UIControlState aState) { return [super backgroundImageForState:aState]; }
                 setter:^(UIImage *anImage, UIControlState aState) { [super setBackgroundImage:anImage forState:aState]; }];
+    if (state == UIControlStateNormal) {
+        [self cyl_growToFitContentIfNeeded];
+    }
+}
+
+/*!
+ * [EN] Content that changed after the plus button was sized and placed: an image set, replaced or removed (e.g. loaded
+ *      later from the network), or the title's font (the tab titles' one, `+alignsTitleWithTabBarItemTitles`). The
+ *      button grows around its center when the content no longer fits (it never shrinks below a size the app set), and
+ *      the tab bar places it again, so the layout follows the image (title in the tab item or not, `-cyl_hasImage`).
+ *      Before it is first sized (still empty bounds), nothing to do.
+ * [CN] PlusButton 确定尺寸与位置之后内容发生变化：设置、替换或移除图片（例如之后才从网络加载），或标题字体变化（使用 Tab 标题的字体，
+ *      `+alignsTitleWithTabBarItemTitles`）。内容放不下时，按钮以中心为基准变大（不会小于 App 设置的尺寸），TabBar 重新放置它，布局随图片变化
+ *      （标题是否由 TabBarItem 显示，见 `-cyl_hasImage`）。首次确定尺寸之前（bounds 仍为空）无需处理。
+ */
+- (void)cyl_growToFitContentIfNeeded {
+    CGSize size = self.bounds.size;
+    if (size.width <= 0 || size.height <= 0) {
+        return;
+    }
+    CGSize fittingSize = [self sizeThatFits:CGSizeZero];
+    if (fittingSize.width > size.width + 0.5 || fittingSize.height > size.height + 0.5) {
+        CGPoint center = self.center;
+        self.bounds = (CGRect){CGPointZero, CGSizeMake(MAX(size.width, fittingSize.width), MAX(size.height, fittingSize.height))};
+        self.center = center;
+    }
+    [self setNeedsLayout];
+    [self.superview setNeedsLayout];
 }
 
 - (void)setConfiguration:(UIButtonConfiguration *)configuration API_AVAILABLE(ios(15.0)) {
@@ -305,6 +339,7 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
         configuration.background = background;
     }
     [super setConfiguration:configuration];
+    [self cyl_growToFitContentIfNeeded];
 }
 
 #pragma mark - Title alignment
@@ -440,7 +475,8 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  *      `-cyl_viewControllerOfTabBarItem` 的 `tabBarItem.title`），系统在两个图层中以 Tab 的字体、位置和颜色绘制；PlusButton 只保留图片，替换 Tab 的图标。
  */
 - (BOOL)cyl_showsTitleInTabBarItem {
-    if (![CYLConstants isLiquidGlassActive] || ![self cyl_viewControllerOfTabBarItem] || [self cyl_drawsTitleOverBackgroundImage]) {
+    if (![CYLConstants isLiquidGlassActive] || ![self cyl_viewControllerOfTabBarItem] || [self cyl_drawsTitleOverBackgroundImage] ||
+        ![self cyl_hasImage]) {
         return NO;
     }
     NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
@@ -466,15 +502,22 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  *      并居中于它的 Tab。
  */
 - (BOOL)cyl_drawsTitleOverBackgroundImage {
-    if ([self backgroundImageForState:UIControlStateNormal] == nil || [self imageForState:UIControlStateNormal] != nil) {
-        return NO;
-    }
+    return [self backgroundImageForState:UIControlStateNormal] != nil && ![self cyl_hasImage];
+}
+
+/*!
+ * [EN] Whether the plus button has an image to show (not empty). Without one (e.g. loaded later from the network) it keeps
+ *      its own title: placing it by an empty `imageView` put it off its tab, and the distance to the title measured then
+ *      stayed wrong once the image came.
+ * [CN] PlusButton 是否有可显示的图片（非空）。没有时（例如之后才从网络加载）保留自己的标题：按空的 `imageView` 定位会偏离它的 Tab，
+ *      且此时测得的到标题的距离在图片加载后仍然是错的。
+ */
+- (BOOL)cyl_hasImage {
+    UIImage *image = [self imageForState:UIControlStateNormal];
     if (@available(iOS 15.0, *)) {
-        if (self.configuration.image) {
-            return NO;
-        }
+        image = image ?: self.configuration.image;
     }
-    return YES;
+    return image.size.width > 0 && image.size.height > 0;
 }
 
 /// The view controller of the tab item under the plus button: the plus button's own, else the placeholder.
@@ -501,11 +544,11 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
         // Measured while the title is still laid out, so the image keeps the distance from the title it has in the Flat
         // style, where the whole plus button is centered on its tab item.
         UILabel *titleLabel = self.titleLabel;
-        CGFloat imageToTitle = [titleLabel.superview convertPoint:titleLabel.center toView:self].y -
-                               [imageView.superview convertPoint:imageView.center toView:self].y;
+        CGFloat imageBottomToTitle = [titleLabel.superview convertPoint:titleLabel.center toView:self].y -
+                                     CGRectGetMaxY([imageView.superview convertRect:imageView.frame toView:self]);
         NSString *title = self.currentTitle;
         objc_setAssociatedObject(self, CYLPlusButtonMovedTitleKey, title, OBJC_ASSOCIATION_COPY_NONATOMIC);
-        objc_setAssociatedObject(self, CYLPlusButtonImageToTitleKey, @(imageToTitle), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(self, CYLPlusButtonImageBottomToTitleKey, @(imageBottomToTitle), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         // The stand-in in the selected layer is a second plus button: it drops its title too, the tab item has it.
         [self cyl_updateTitleInTabBarItem];
         for (NSNumber *state in @[@(UIControlStateNormal), @(UIControlStateHighlighted), @(UIControlStateSelected),
@@ -542,6 +585,27 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     }
 }
 
+/*!
+ * [EN] The title moved into the tab item (#636) comes back to the plus button when that layout no longer applies, e.g.
+ *      its image was removed (`-cyl_hasImage`): the button would otherwise stay without a title.
+ * [CN] 移到 TabBarItem 中的标题（#636）在该布局不再适用时回到 PlusButton，例如图片被移除（`-cyl_hasImage`）：否则按钮会一直没有标题。
+ */
+- (void)cyl_restoreTitleFromTabBarItemIfNeeded {
+    NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
+    if (movedTitle.length == 0 || [self cyl_isInPlatterSelectedLayer] || [self cyl_showsTitleInTabBarItem]) {
+        return;
+    }
+    objc_setAssociatedObject(self, CYLPlusButtonMovedTitleKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    objc_setAssociatedObject(self, CYLPlusButtonImageBottomToTitleKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    UITabBarItem *tabBarItem = [self cyl_viewControllerOfTabBarItem].tabBarItem;
+    if ([tabBarItem.title isEqualToString:movedTitle]) {
+        tabBarItem.title = nil;
+    }
+    [self setTitle:movedTitle forState:UIControlStateNormal];
+    [self setNeedsLayout];
+    [self.superview setNeedsLayout];
+}
+
 /// Whether the tab bar shows its tab buttons in the iOS 27.1 vertical bar (unfolded iPhone Duo in landscape,
 /// `allowsVerticalBar = YES`). 系统是否把 Tab 按钮放在 iOS 27.1 竖向栏中（iPhone Duo 展开横屏）。
 - (BOOL)cyl_isInVerticalBar {
@@ -575,17 +639,17 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
 
 /*!
  * FIX: issue #636
- * [EN] With the title in the tab item, the center (in the plus button's superview) that puts the image `imageToTitle`
- *      (measured before the title moved) above the tab titles' center line, and on the vertical center line of its own
+ * [EN] With the title in the tab item, the center (in the plus button's superview) that puts the image's bottom edge
+ *      `CYLPlusButtonImageBottomToTitleKey` (measured before the title moved) above the tab titles' center line, and on the vertical center line of its own
  *      title, which the system lays out. Returns `center` in any other case, or while the titles are not laid out.
- * [CN] 标题由 TabBarItem 显示时，PlusButton 在其父视图中的中心：图片位于 Tab 标题中心线上方 `imageToTitle`（标题移走前测得）处，
+ * [CN] 标题由 TabBarItem 显示时，PlusButton 在其父视图中的中心：图片底边位于 Tab 标题中心线上方 `CYLPlusButtonImageBottomToTitleKey`（标题移走前测得）处，
  *      并与它自己的标题（由系统布局）竖向中心线对齐。其他情况，或标题尚未布局时，原样返回 `center`。
  */
 - (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center {
     UIView *container = self.superview;
     UIImageView *imageView = self.imageView;
-    NSNumber *imageToTitle = objc_getAssociatedObject(self, CYLPlusButtonImageToTitleKey);
-    if (!container || !imageView.superview || imageToTitle == nil || [self cyl_isInPlatterSelectedLayer] ||
+    NSNumber *imageBottomToTitle = objc_getAssociatedObject(self, CYLPlusButtonImageBottomToTitleKey);
+    if (!container || !imageView.superview || imageBottomToTitle == nil || [self cyl_isInPlatterSelectedLayer] ||
         ![self cyl_showsTitleInTabBarItem]) {
         return center;
     }
@@ -610,7 +674,10 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     if (itemTitleLabel) {
         [itemTitleLabel.superview layoutIfNeeded];
         CGFloat itemTitleCenterY = [itemTitleLabel.superview convertPoint:itemTitleLabel.center toView:container].y;
-        center.y = itemTitleCenterY - imageToTitle.doubleValue - imageOffsetY;
+        // [EN] With the image's current height, so a later or replaced image keeps its bottom edge where it was.
+        // [CN] 使用图片当前的高度，之后设置或替换的图片底边位置不变。
+        CGFloat imageToTitle = imageBottomToTitle.doubleValue + CGRectGetHeight(imageView.bounds) * 0.5;
+        center.y = itemTitleCenterY - imageToTitle - imageOffsetY;
     }
     if (ownTitleLabel) {
         center.x = [ownTitleLabel.superview convertPoint:ownTitleLabel.center toView:container].x - imageOffsetX;
@@ -669,6 +736,7 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     if (![self cyl_alignsTitleWithTabBarItemTitles]) {
         return;
     }
+    [self cyl_restoreTitleFromTabBarItemIfNeeded];
     if ([self cyl_showsTitleInTabBarItem]) {
         [self cyl_layOutForTitleInTabBarItem];
         return;
@@ -686,7 +754,9 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     UIColor *selectedColor = nil;
     [self cyl_getTitleColorsOfTabBarItemTitleLabels:itemTitleLabels normalColor:&normalColor selectedColor:&selectedColor];
     if ([self cyl_applyTitleFont:itemTitleLabel.font normalColor:normalColor selectedColor:selectedColor]) {
-        // The title's size changes with the font: align it after the next layout.
+        // The title's size changes with the font: room for it, then align it after the next layout.
+        // 标题尺寸随字体变化：先留出空间，下次布局后再对齐。
+        [self cyl_growToFitContentIfNeeded];
         return;
     }
     UILabel *titleLabel = self.titleLabel;
@@ -900,7 +970,15 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
 
 /// A tab item's title: has text, sits in a tab button that is not a placeholder, and is not a badge.
 - (BOOL)cyl_isTabBarItemTitleLabel:(UILabel *)label tabBar:(UIView *)tabBar {
-    if (label.text.length == 0 || label == (UILabel *)label.superview.cyl_badge) {
+    if (label.text.length == 0) {
+        return NO;
+    }
+    // [EN] A badge never sits right inside a control (it is on the badge's anchor or in the icon view), so a control's
+    //      own label is not asked: a control's `cyl_badge` creates and pins that anchor, and doing so here, during the
+    //      plus button's layout, laid it out again forever (e.g. a plus button whose image loads later).
+    // [CN] 角标不会直接位于控件之中（它在角标锚点或图标视图上），因此不询问控件自身的标签：控件的 `cyl_badge` 会创建并约束该锚点，
+    //      在 PlusButton 布局期间这样做会使其无限布局（例如图片之后才加载的 PlusButton）。
+    if (![label.superview isKindOfClass:[UIControl class]] && label == (UILabel *)label.superview.cyl_badge) {
         return NO;
     }
     UIControl *tabButton = [label.superview cyl_nearestControlBelowView:tabBar];

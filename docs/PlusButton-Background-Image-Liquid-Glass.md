@@ -28,6 +28,7 @@
 | [用法](#cn用法) | [Usage](#enusage) |
 | [Swift 中获取 PlusButton](#cnswift-中获取-plusbutton) | [Getting the PlusButton in Swift](#engetting-the-plusbutton-in-swift) |
 | [PlusButton 的图片一律按原图绘制](#cnplusbutton-的图片一律按原图绘制) | [Every PlusButton image is drawn as is](#enevery-plusbutton-image-is-drawn-as-is) |
+| [之后才加载的图片](#cn之后才加载的图片) | [Images loaded later](#enimages-loaded-later) |
 | [同时修复](#cn同时修复) | [Also fixed](#enalso-fixed) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
@@ -96,6 +97,21 @@ if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton(forOwner: ta
 | 适用于：`setImage(_:for:)`、`setBackgroundImage(_:for:)`、`UIButtonConfiguration` 的 `image` 与 `background.image`、放大镜中的替身（`selectedContentView`，包括 `+selectedContentView` 返回的普通 `UIButton`）以及 `cyl_updateTitle(_:image:selectedImage:)`。以前只有液态玻璃下标题由 TabBarItem 显示的布局（#636）这样处理。 | It covers `setImage(_:for:)`, `setBackgroundImage(_:for:)`, a `UIButtonConfiguration`'s `image` and `background.image`, the stand-in in the lens (`selectedContentView`, including a plain `UIButton` returned by `+selectedContentView`) and `cyl_updateTitle(_:image:selectedImage:)`. Before, only the Liquid Glass layout with the title in the tab item (#636) did this. |
 | 想要单色图标随 TabBar 变色时，请自己绘制对应颜色的图片。 | For a one-color icon that follows the tab bar's color, draw the image in that color yourself. |
 
+## [CN]之后才加载的图片
+## [EN]Images loaded later
+
+| 中文 | English |
+|:---|:---|
+| PlusButton 创建时图片可能为空，之后才设置（例如从网络加载）。以前这会让它偏离位置：液态玻璃下，它在没有图片时就把标题移到 TabBarItem 中，并用空的 `imageView` 测量图片到标题的距离且一直使用；按钮的尺寸也按空图片计算，之后的图片被压扁。现在由 `CYLPlusButton` 自动处理，无需任何代码： | A plus button can be created without an image and get one later (e.g. from the network). That used to put it off its place: on Liquid Glass it moved its title into the tab item before it had an image, measured the image-to-title distance on the empty `imageView` and kept it, and its size was computed for the empty image, so the later image was squashed. `CYLPlusButton` now handles it, with no code needed: |
+| ① 只有在有可见图片时，标题才移到 TabBarItem 中；在此之前按钮保留自己的标题。 | ① The title moves into the tab item only once there is a visible image; until then the button keeps its own title. |
+| ② 距离从图片底边测量，而不是中心，因此之后设置或替换为不同尺寸的图片时位置仍然正确。 | ② The distance is measured from the image's bottom edge, not its center, so a later image, or one of another size, stays in place. |
+| ③ 普通状态的图片或背景图片、按钮 configuration 或标题字体变化后，内容放不下时按钮以中心为基准变大（不会小于 App 设置的尺寸），TabBar 重新放置它。 | ③ After the normal image or background image, the button configuration or the title's font changes, the button grows around its center when the content no longer fits (never below a size the app set), and the tab bar places it again. |
+| ④ 图片被移除后，标题回到按钮上。 | ④ When the image is removed, the title comes back to the button. |
+| ⑤ 角标：没有图片的图片视图不再作为角标的参照，角标对齐整个控件（例如由背景图绘制的按钮）。 | ⑤ Badges: an image view without an image is no longer the badge's reference; the badge follows the whole control (e.g. a button drawn by its background image). |
+| 下图（Example-Rive，临时修改为 2 秒后加载图片）：从上到下依次为加载前、加载 44 pt 图片后、替换为 60 pt 图片后、之后才设置背景图片（标题画在背景上）。 | Below (Example-Rive, changed for this test to load the image after 2 seconds), top to bottom: before the image, after a 44 pt image, after it is replaced by a 60 pt one, and with a background image set later (title on the background). |
+
+![Plus button image loaded later](assets/plusbutton-image-loaded-later.png)
+
 ## [CN]同时修复
 ## [EN]Also fixed
 
@@ -104,6 +120,7 @@ if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton(forOwner: ta
 | **启动时栈溢出**：PlusButton 在布局中第一次读取 `imageView` 时，系统创建它并再次布局按钮，又进入本类的布局（`+cyl_plusButtonWithImage:…` 的图片与标题布局、标题对齐），无限递归。见于 Example-Rive 新增的 PlusButton（使用 `+cyl_plusButtonWithImage:…` 并对齐标题）。现在本类的布局不会重入（`-cyl_layOutContentOnce:`）。 | **A stack overflow at launch**: the plus button's first read of `imageView` during layout made UIKit create it and lay the button out again, which ran this class's layout again (the image and title layout of `+cyl_plusButtonWithImage:…`, the title alignment), endlessly. Seen with Example-Rive's new plus button (made with `+cyl_plusButtonWithImage:…`, with aligned titles). This class's layout no longer re-enters (`-cyl_layOutContentOnce:`). |
 | **选中后 PlusButton 变暗**：`+selectedContentView` 创建放大镜中的替身时，也把已注册的 PlusButton 设为高亮，并一直保持；没有「选中且高亮」图片时，系统把它的图片画暗（Example-PAG 选中「菜单」后，玻璃上方的半个圆形变成深蓝色）。现在只有替身是高亮的。 | **The plus button turned dark once selected**: `+selectedContentView`, which makes the stand-in in the lens, also set the registered plus button highlighted, for good; without a selected-and-highlighted image UIKit drew its image darkened (Example-PAG: after "Menu" was selected, the half of the circle above the glass turned navy). Only the stand-in is highlighted now. |
 | **角标离开可见内容**：非 Tab 按钮控件的角标位于图标（或整个控件）的右上角。图片带透明边距时（Example-PAG 的 PlusButton：90 pt 图片中是 66 pt 的圆形），角标落在边距的角上，离圆形较远。现在角标对齐到图片中不透明的部分（每张图片只测量一次，结果缓存在图片上）。 | **A badge away from what is seen**: the badge of a control that is not a tab button sits at the top-right of its icon (or of the whole control). With transparent padding in the picture (Example-PAG's plus button: a 66 pt circle in a 90 pt image) it landed at the padding's corner, away from the circle. It is now aligned to the part of the picture that is not transparent (measured once per image and cached on it). |
+| **布局中读取角标导致无限布局**：对齐标题时查找 Tab 标题的代码会读取控件的 `cyl_badge`，而该读取会创建并约束角标锚点；在 PlusButton 布局期间这样做，配合图片视图位置每次布局都会变化，使按钮无限布局（App 卡死，CPU 100%）。现在不再询问控件自身的标签。 | **Reading the badge during layout laid the button out forever**: finding the tab titles to align with read controls' `cyl_badge`, which creates and pins the badge's anchor; doing so during the plus button's layout, with an image view moved on every pass, laid the button out forever (a frozen app at 100% CPU). A control's own labels are no longer asked. |
 | **#618 误报**：液态玻璃与扁平样式下有 PlusButton 时，本库会在 `tabBarItemsAttributes` 中为 PlusButton 位置插入一个占位项，DEBUG 检查把它算作 Tab，打印「6 entries for 5 tab view controllers」。现在两种数量都视为正确。 | **A false #618 warning**: with a plus button on Liquid Glass and FlatDesign, the library inserts a placeholder entry for the plus slot into `tabBarItemsAttributes`, and the DEBUG check counted it as a tab, logging "6 entries for 5 tab view controllers". Both counts are now accepted. |
 
 ## [CN]测试与截图

@@ -309,6 +309,15 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
         anchorView.alpha = self.alpha;
     }
     UIView *target = (referenceView && referenceView != anchorView) ? referenceView : self;
+    // [EN] An image view without an image shows nothing (e.g. a plus button drawn by its background image, or whose image
+    //      is not loaded yet): the badge goes on the whole control, whose background is what is seen.
+    // [CN] 没有图片的图片视图不显示任何内容（例如由背景图绘制的 PlusButton，或图片尚未加载）：角标对齐整个控件，其背景才是可见内容。
+    if ([target isKindOfClass:[UIImageView class]]) {
+        CGSize imageSize = ((UIImageView *)target).image.size;
+        if (imageSize.width <= 0 || imageSize.height <= 0) {
+            target = self;
+        }
+    }
     CGRect unitRect = CYLBadgeOpaqueUnitRectOfImage(CYLBadgeImageFillingView(target));
     CGSize targetSize = target.bounds.size;
     NSArray<NSLayoutConstraint *> *constraints = objc_getAssociatedObject(anchorView, @selector(cyl_badgeAnchorViewAlignedToView:));
