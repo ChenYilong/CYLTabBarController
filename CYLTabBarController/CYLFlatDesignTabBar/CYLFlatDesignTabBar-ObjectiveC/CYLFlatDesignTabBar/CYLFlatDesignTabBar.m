@@ -56,6 +56,9 @@
 // [CN] 在 CYLTabBarController.m（CYLReselect）中实现：用户点击了已选中的 Tab。
 @interface CYLTabBarController (CYLFlatDesignReselect)
 - (void)cyl_didReselectViewController:(UIViewController *)viewController control:(UIControl *)control;
+// [EN] Touch down on a tab button: the highlight animation (CYLTabBarItemAnimation).
+// [CN] 手指按下 Tab 按钮：按下动画（CYLTabBarItemAnimation）。
+- (void)cyl_tabControlTouchDown:(UIControl *)control;
 @end
 
 @implementation CYLFlatDesignTabBar {
@@ -460,6 +463,19 @@
 
 #pragma mark - Private
 
+/// [EN] Touch down on a tab button: forwards it to the tab bar controller for the highlight animation.
+/// [CN] 手指按下 Tab 按钮：转给 TabBarController 播放按下动画。
+- (void)_tabBarDidTouchDownButton:(CYLFlatDesignTabBarButton *)tabBarButton {
+    if (tabBarButton.cyl_isPlaceholder) {
+        return;
+    }
+    UITabBarController *owningTabBarController = self.tabBarController;
+    if ([owningTabBarController isKindOfClass:[CYLTabBarController class]] &&
+        [owningTabBarController respondsToSelector:@selector(cyl_tabControlTouchDown:)]) {
+        [(CYLTabBarController *)owningTabBarController cyl_tabControlTouchDown:tabBarButton];
+    }
+}
+
 - (void)_tabBarDidSelectButton:(CYLFlatDesignTabBarButton *)tabBarButton {
     NSInteger selectedIndex = [_buttons indexOfObject:tabBarButton];
     CYLFlatDesignTabBarItem *item = self.items[selectedIndex];
@@ -585,6 +601,7 @@
         button.tintColor = self.tintColor;
         button.selected = (item == self.selectedItem);
         [button addTarget:self action:@selector(_tabBarDidSelectButton:) forControlEvents:UIControlEventTouchUpInside];
+        [button addTarget:self action:@selector(_tabBarDidTouchDownButton:) forControlEvents:UIControlEventTouchDown];
         // [CN] TODO:  对齐方案， 最简单。 移除PlusButton对应的item， 重新从 self.contentView 插入对齐。
         // [EN] TODO:  Alignment approach, the simplest one: remove the item corresponding to the PlusButton and re-insert
         //      it into self.contentView for alignment.

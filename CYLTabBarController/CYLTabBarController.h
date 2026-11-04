@@ -29,6 +29,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
+//   - Built-in Tab Icon Animations / Tab 图标的内置动画
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Item-Animations.md
 //   - Tapping the Selected Tab Again / 重复点击已选中的 Tab
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Reselect.md
 //   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar
@@ -226,6 +228,69 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemImagePositionAdjustment;
  *      `+cyl_defaultTabBarItemIdentifierForClass:`）。与下标或标题不同，类名不会因增减 Tab 或切换语言而改变。
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifier;
+
+/*!
+ * [EN] Built-in animations of a tab's icon, played by the library in every style (classic, Liquid Glass, FlatDesign), with
+ *      no private subview to look up. See `CYLTabBarController (CYLTabBarItemAnimation)` and docs/Tab-Item-Animations.md.
+ * [CN] Tab 图标的内置动画，由本库在所有样式（经典、液态玻璃、扁平样式）下播放，无需查找私有子视图。见
+ *      `CYLTabBarController (CYLTabBarItemAnimation)` 与 docs/Tab-Item-Animations.md。
+ */
+typedef NS_ENUM(NSInteger, CYLTabBarItemAnimationType) {
+    CYLTabBarItemAnimationTypeNone = 0,  ///< [EN] No animation. [CN] 无动画。
+    CYLTabBarItemAnimationTypeBounce,    ///< [EN] Springy scale (1 → 1.3 → 0.9 → … → 1). [CN] 弹性缩放。
+    CYLTabBarItemAnimationTypeScale,     ///< [EN] Quick pop (1 → 1.2 → 1). [CN] 快速放大再还原。
+    CYLTabBarItemAnimationTypeRotate,    ///< [EN] A full flip around the vertical axis. [CN] 绕竖直轴翻转一周。
+    CYLTabBarItemAnimationTypeShake,     ///< [EN] A short left-right wiggle. [CN] 左右轻微摇摆。
+    CYLTabBarItemAnimationTypeJump,      ///< [EN] Jumps up and lands with a small bounce. [CN] 向上跳起再回弹落下。
+};
+
+/*!
+ * [EN] When an animation plays. Select: the tab became selected. Reselect: the selected tab was tapped again.
+ *      Deselect: the tab stopped being selected. Highlight: a finger went down on the tab (classic tab bar and FlatDesign;
+ *      Liquid Glass draws its own press effect, so it is not reported there).
+ * [CN] 动画的播放时机。Select：Tab 被选中。Reselect：再次点击已选中的 Tab。Deselect：Tab 取消选中。Highlight：手指按下 Tab
+ *      （经典 TabBar 与扁平样式；液态玻璃自带按压效果，不回调）。
+ */
+typedef NS_ENUM(NSInteger, CYLTabBarItemAnimationEvent) {
+    CYLTabBarItemAnimationEventSelect = 0,
+    CYLTabBarItemAnimationEventReselect,
+    CYLTabBarItemAnimationEventDeselect,
+    CYLTabBarItemAnimationEventHighlight,
+};
+
+/*!
+ * [EN] Your own animation. `iconView` is what the tab shows as its icon: its Lottie view, the view you put in place of the
+ *      icon (`-setTabBarItemIconViewProvider:atIndex:`), otherwise its image view. `control` is the tab button. Liquid Glass
+ *      shows each tab twice (normal and selected layer), so the block is called once for each.
+ * [CN] 自定义动画。`iconView` 是 Tab 当前显示的图标：Lottie 视图、替换图标的视图（`-setTabBarItemIconViewProvider:atIndex:`），
+ *      否则为图片视图。`control` 为 Tab 按钮。液态玻璃中每个 Tab 显示两份（普通层与选中层），因此各调用一次。
+ */
+typedef void (^CYLTabBarItemAnimationBlock)(UIView *iconView, UIControl *control, CYLTabBarItemAnimationEvent event);
+
+/*!
+ * [EN] Optional per-tab animations, in `tabBarItemsAttributes` (or `-updateTabBarItemAtIndex:attributes:`). They take
+ *      precedence over the controller-wide values of `CYLTabBarController (CYLTabBarItemAnimation)`.
+ *      - `CYLTabBarItemSelectAnimation`, `CYLTabBarItemReselectAnimation`, `CYLTabBarItemDeselectAnimation`,
+ *        `CYLTabBarItemHighlightAnimation`: an NSNumber of `CYLTabBarItemAnimationType`.
+ *      - `CYLTabBarItemAnimationHandler`: a `CYLTabBarItemAnimationBlock`; when set, the tab plays only what the block does.
+ *
+ *          @{ CYLTabBarItemTitle : @"Home",
+ *             CYLTabBarItemImage : @"home_normal",
+ *             CYLTabBarItemSelectedImage : @"home_selected",
+ *             CYLTabBarItemSelectAnimation : @(CYLTabBarItemAnimationTypeBounce),
+ *             CYLTabBarItemReselectAnimation : @(CYLTabBarItemAnimationTypeRotate) }
+ *
+ * [CN] 可选的单个 Tab 动画，写在 `tabBarItemsAttributes`（或 `-updateTabBarItemAtIndex:attributes:`）中，优先于
+ *      `CYLTabBarController (CYLTabBarItemAnimation)` 中的全局设置。
+ *      - `CYLTabBarItemSelectAnimation`、`CYLTabBarItemReselectAnimation`、`CYLTabBarItemDeselectAnimation`、
+ *        `CYLTabBarItemHighlightAnimation`：`CYLTabBarItemAnimationType` 的 NSNumber。
+ *      - `CYLTabBarItemAnimationHandler`：`CYLTabBarItemAnimationBlock`；设置后该 Tab 只执行 block 中的动画。示例见上。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectAnimation;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemReselectAnimation;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemDeselectAnimation;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemHighlightAnimation;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemAnimationHandler;
 /*!
  * [EN] These globals hold what was written LAST, by whichever tab bar controller or plus button wrote last. The library
  *      no longer lays out with them: with several tab bar controllers they overwrote each other (a tab bar with 5 items
@@ -1546,6 +1611,65 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      任何时候都可以设置。
  */
 @property (nonatomic, assign) CYLTabBarReselectBehavior cyl_reselectBehavior;
+
+@end
+
+/*!
+ * [EN] Built-in tab icon animations for selecting, reselecting, deselecting and pressing a tab. See
+ *      docs/Tab-Item-Animations.md.
+ *
+ *          tabBarController.cyl_tabBarItemSelectAnimationType = CYLTabBarItemAnimationTypeBounce;
+ *          tabBarController.cyl_tabBarItemReselectAnimationType = CYLTabBarItemAnimationTypeRotate;
+ *
+ *      Per tab: the `CYLTabBarItem…Animation` keys of `tabBarItemsAttributes`, which take precedence. The plus button is
+ *      not animated by these (it is your own button; see `CYLPlusButton`). Changes made in code animate too, except the
+ *      first selection when the tab bar appears.
+ * [CN] Tab 图标的内置动画：选中、重复点击、取消选中、按下。见 docs/Tab-Item-Animations.md，示例见上。
+ *      单个 Tab：`tabBarItemsAttributes` 中的 `CYLTabBarItem…Animation` 键，优先于这里的设置。PlusButton 不受这些设置影响（它是你自己的
+ *      按钮，见 `CYLPlusButton`）。代码切换 Tab 同样会播放动画，TabBar 首次显示时的初始选中除外。
+ */
+@interface CYLTabBarController (CYLTabBarItemAnimation)
+
+/*!
+ * [EN] The animation of a tab when it becomes selected. Default `CYLTabBarItemAnimationTypeNone`.
+ * [CN] Tab 被选中时的动画，默认 `CYLTabBarItemAnimationTypeNone`。
+ */
+@property (nonatomic, assign) CYLTabBarItemAnimationType cyl_tabBarItemSelectAnimationType;
+
+/*!
+ * [EN] The animation of the selected tab when it is tapped again (see `-tabBarController:didReselectViewController:`).
+ *      Default `CYLTabBarItemAnimationTypeNone`.
+ * [CN] 再次点击已选中 Tab 时的动画（见 `-tabBarController:didReselectViewController:`），默认 `CYLTabBarItemAnimationTypeNone`。
+ */
+@property (nonatomic, assign) CYLTabBarItemAnimationType cyl_tabBarItemReselectAnimationType;
+
+/*!
+ * [EN] The animation of the tab that stops being selected. Default `CYLTabBarItemAnimationTypeNone`.
+ * [CN] 取消选中的 Tab 的动画，默认 `CYLTabBarItemAnimationTypeNone`。
+ */
+@property (nonatomic, assign) CYLTabBarItemAnimationType cyl_tabBarItemDeselectAnimationType;
+
+/*!
+ * [EN] The animation when a finger goes down on a tab (classic tab bar and FlatDesign). Default
+ *      `CYLTabBarItemAnimationTypeNone`.
+ * [CN] 手指按下 Tab 时的动画（经典 TabBar 与扁平样式），默认 `CYLTabBarItemAnimationTypeNone`。
+ */
+@property (nonatomic, assign) CYLTabBarItemAnimationType cyl_tabBarItemHighlightAnimationType;
+
+/*!
+ * [EN] Optional: your own animation for every tab and event. When set, the preset types above are not played (call
+ *      `+cyl_addTabBarItemAnimation:toView:` from the block to combine). A tab's `CYLTabBarItemAnimationHandler` takes
+ *      precedence over it.
+ * [CN] 可选：所有 Tab 与时机共用的自定义动画。设置后不再播放上面的预设动画（可在 block 中调用 `+cyl_addTabBarItemAnimation:toView:`
+ *      组合使用）。单个 Tab 的 `CYLTabBarItemAnimationHandler` 优先于它。
+ */
+@property (nonatomic, copy, nullable) CYLTabBarItemAnimationBlock cyl_tabBarItemAnimationHandler;
+
+/*!
+ * [EN] Plays a preset animation on any view (Core Animation, on the view's layer; does nothing for None or a nil view).
+ * [CN] 在任意视图上播放预设动画（Core Animation，作用于视图的 layer；None 或 nil 视图时不做任何事）。
+ */
++ (void)cyl_addTabBarItemAnimation:(CYLTabBarItemAnimationType)animationType toView:(nullable UIView *)view;
 
 @end
 

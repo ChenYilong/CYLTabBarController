@@ -28,6 +28,7 @@
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
+| [Tab 图标的内置动画](Tab-Item-Animations.md) | [Built-in Tab Icon Animations](Tab-Item-Animations.md) |
 | [重复点击已选中的 Tab](Tab-Reselect.md) | [Tapping the Selected Tab Again](Tab-Reselect.md) |
 | [TabBar 的 hitTest 不再返回 nil，交给 super 处理](TabBar-HitTest-Super-Fallback.md) | [The tab bar's hitTest falls back to super instead of returning nil](TabBar-HitTest-Super-Fallback.md) |
 | [滚动时缩小或隐藏 TabBar](TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](TabBar-Minimize-On-Scroll.md) |
@@ -63,6 +64,7 @@ docs/
 ├── SelectedIndex-PlusButton.md
 ├── Swift-Guide.md
 ├── SwiftUI-Integration.md
+├── Tab-Item-Animations.md
 ├── Tab-Reselect.md
 ├── TabBar-HitTest-Super-Fallback.md
 ├── TabBar-Minimize-On-Scroll.md
