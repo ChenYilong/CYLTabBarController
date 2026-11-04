@@ -32,6 +32,7 @@
 | [屏幕方向、Home Indicator 与边缘手势](#cn屏幕方向home-indicator-与边缘手势) | [Orientation, the home indicator and edge gestures](#enorientation-the-home-indicator-and-edge-gestures) |
 | [iOS 13、14 上粗体或大字号标题被截断](#cnios-1314-上粗体或大字号标题被截断) | [Bold or large titles cut off on iOS 13 and 14](#enbold-or-large-titles-cut-off-on-ios-13-and-14) |
 | [Tab 按钮布局后的回调](#cntab-按钮布局后的回调) | [A callback after the tab button is laid out](#ena-callback-after-the-tab-button-is-laid-out) |
+| [在一处设置常用样式](#cn在一处设置常用样式) | [Common styles in one place](#encommon-styles-in-one-place) |
 | [测试](#cn测试) | [Testing](#entesting) |
 
 <!-- navigation:end -->
@@ -149,6 +150,23 @@ viewController.tabBarItem.cyl_viewDidLayoutSubviewsBlock = ^(UITabBarItem *tabBa
     });
     ribbon.center = CGPointMake(CGRectGetMidX(view.bounds), CGRectGetMaxY(view.bounds) - 3);
 };
+```
+
+## [CN]在一处设置常用样式
+## [EN]Common styles in one place
+
+| 中文 | English |
+|:---|:---|
+| `CYLTabBarController` 新增 8 个属性，一行一个，覆盖最常见的 TabBar 定制：标题字体（普通 / 选中）、标题颜色（普通 / 选中）、图标颜色（普通 / 选中）、背景色、顶部分割线颜色。iOS 13+ 写入 `standardAppearance`（存在 `scrollEdgeAppearance` 时也写入）的三种布局，横屏、iPad 与扁平样式同样生效；iOS 13 以前使用经典的 `UITabBarItem` / `UITabBar` 样式。主题切换后会再次应用（优先于主题外观）；nil 表示保持当前值。另有供子类重写的 `-cyl_didInitialize`，每个初始化方法都会调用一次。 | `CYLTabBarController` gets 8 properties, one line each, for the most common tab bar styles: title fonts (normal / selected), title colors (normal / selected), icon colors (normal / selected), the background color and the separator line color. On iOS 13+ they are written into the three layouts of `standardAppearance` (and `scrollEdgeAppearance` when there is one), so landscape, iPad and FlatDesign follow; before iOS 13 the classic `UITabBarItem` / `UITabBar` styles are used. They are applied again after a theme change (they win over the theme's appearance); nil leaves the current value. `-cyl_didInitialize`, for subclasses, is called once from every initializer. |
+
+```Objective-C
+tabBarController.cyl_tabBarItemTitleFont = [UIFont systemFontOfSize:11];
+tabBarController.cyl_tabBarItemSelectedTitleFont = [UIFont boldSystemFontOfSize:11];
+tabBarController.cyl_tabBarItemTitleColor = UIColor.secondaryLabelColor;
+tabBarController.cyl_tabBarItemSelectedTitleColor = UIColor.systemOrangeColor;
+tabBarController.cyl_tabBarItemSelectedImageColor = UIColor.systemOrangeColor;
+tabBarController.cyl_tabBarBackgroundColor = UIColor.systemBackgroundColor;
+tabBarController.cyl_tabBarShadowColor = UIColor.clearColor; // no separator line
 ```
 
 ## [CN]测试

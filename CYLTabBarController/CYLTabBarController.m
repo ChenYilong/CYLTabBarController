@@ -238,6 +238,8 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)cyl_syncTabBarAppearances;
 /// [EN] Implemented in the main implementation: the plus button's child view controller. [CN] 实现于主 implementation：PlusButton 的子控制器。
 - (nullable UIViewController *)cyl_contextPlusChildViewController;
+/// [EN] Implemented below (CYLTabBarItemStyle). [CN] 实现见下方（CYLTabBarItemStyle）。
+- (void)cyl_applyTabBarItemStyles;
 @end
 
 /// Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
@@ -6692,6 +6694,155 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
 }
 #endif
 
+#pragma mark - Item styles in one place
+
+/// [EN] The styles set through `CYLTabBarController (CYLTabBarItemStyle)`, by key. [CN] 通过 `CYLTabBarController (CYLTabBarItemStyle)` 设置的样式。
+static char CYLTabBarItemStylesKey;
+static NSString *const CYLStyleTitleFont = @"titleFont";
+static NSString *const CYLStyleSelectedTitleFont = @"selectedTitleFont";
+static NSString *const CYLStyleTitleColor = @"titleColor";
+static NSString *const CYLStyleSelectedTitleColor = @"selectedTitleColor";
+static NSString *const CYLStyleImageColor = @"imageColor";
+static NSString *const CYLStyleSelectedImageColor = @"selectedImageColor";
+static NSString *const CYLStyleBackgroundColor = @"backgroundColor";
+static NSString *const CYLStyleShadowColor = @"shadowColor";
+
+/// [EN] `attributes` with `value` for `key`, when there is a value. [CN] 有值时，将 `attributes` 中 `key` 设为 `value`。
+static NSDictionary<NSAttributedStringKey, id> *CYLAttributesSettingValue(NSDictionary<NSAttributedStringKey, id> *_Nullable attributes, NSAttributedStringKey key, id _Nullable value) {
+    NSMutableDictionary<NSAttributedStringKey, id> *result = [attributes mutableCopy] ?: [NSMutableDictionary dictionary];
+    if (value) {
+        result[key] = value;
+    }
+    return [result copy];
+}
+
+@implementation CYLTabBarController (CYLTabBarItemStyle)
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        [self cyl_didInitialize];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    if (self = [super initWithCoder:coder]) {
+        [self cyl_didInitialize];
+    }
+    return self;
+}
+
+- (void)cyl_didInitialize {
+    // [EN] For subclasses. [CN] 供子类重写。
+}
+
+- (NSMutableDictionary<NSString *, id> *)cyl_tabBarItemStyles {
+    NSMutableDictionary<NSString *, id> *styles = objc_getAssociatedObject(self, &CYLTabBarItemStylesKey);
+    if (!styles) {
+        styles = [NSMutableDictionary dictionary];
+        objc_setAssociatedObject(self, &CYLTabBarItemStylesKey, styles, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return styles;
+}
+
+- (void)cyl_setTabBarItemStyle:(nullable id)value forKey:(NSString *)key {
+    [self cyl_tabBarItemStyles][key] = value;
+    [self cyl_applyTabBarItemStyles];
+}
+
+- (nullable UIFont *)cyl_tabBarItemTitleFont { return [self cyl_tabBarItemStyles][CYLStyleTitleFont]; }
+- (void)setCyl_tabBarItemTitleFont:(nullable UIFont *)font { [self cyl_setTabBarItemStyle:font forKey:CYLStyleTitleFont]; }
+- (nullable UIFont *)cyl_tabBarItemSelectedTitleFont { return [self cyl_tabBarItemStyles][CYLStyleSelectedTitleFont]; }
+- (void)setCyl_tabBarItemSelectedTitleFont:(nullable UIFont *)font { [self cyl_setTabBarItemStyle:font forKey:CYLStyleSelectedTitleFont]; }
+- (nullable UIColor *)cyl_tabBarItemTitleColor { return [self cyl_tabBarItemStyles][CYLStyleTitleColor]; }
+- (void)setCyl_tabBarItemTitleColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleTitleColor]; }
+- (nullable UIColor *)cyl_tabBarItemSelectedTitleColor { return [self cyl_tabBarItemStyles][CYLStyleSelectedTitleColor]; }
+- (void)setCyl_tabBarItemSelectedTitleColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleSelectedTitleColor]; }
+- (nullable UIColor *)cyl_tabBarItemImageColor { return [self cyl_tabBarItemStyles][CYLStyleImageColor]; }
+- (void)setCyl_tabBarItemImageColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleImageColor]; }
+- (nullable UIColor *)cyl_tabBarItemSelectedImageColor { return [self cyl_tabBarItemStyles][CYLStyleSelectedImageColor]; }
+- (void)setCyl_tabBarItemSelectedImageColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleSelectedImageColor]; }
+- (nullable UIColor *)cyl_tabBarBackgroundColor { return [self cyl_tabBarItemStyles][CYLStyleBackgroundColor]; }
+- (void)setCyl_tabBarBackgroundColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleBackgroundColor]; }
+- (nullable UIColor *)cyl_tabBarShadowColor { return [self cyl_tabBarItemStyles][CYLStyleShadowColor]; }
+- (void)setCyl_tabBarShadowColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleShadowColor]; }
+
+/*!
+ * [EN] Writes the stored styles into the tab bar: the appearances on iOS 13+, the classic styles before.
+ * [CN] 把保存的样式写入 TabBar：iOS 13+ 写入 appearance，之前使用经典样式。
+ */
+- (void)cyl_applyTabBarItemStyles {
+    NSDictionary<NSString *, id> *styles = [[self cyl_tabBarItemStyles] copy];
+    if (styles.count == 0) {
+        return;
+    }
+    UIFont *titleFont = styles[CYLStyleTitleFont];
+    UIFont *selectedTitleFont = styles[CYLStyleSelectedTitleFont] ?: titleFont;
+    UIColor *titleColor = styles[CYLStyleTitleColor];
+    UIColor *selectedTitleColor = styles[CYLStyleSelectedTitleColor];
+    UIColor *imageColor = styles[CYLStyleImageColor];
+    UIColor *selectedImageColor = styles[CYLStyleSelectedImageColor];
+    UIColor *backgroundColor = styles[CYLStyleBackgroundColor];
+    UIColor *shadowColor = styles[CYLStyleShadowColor];
+    UITabBar *tabBar = self.tabBar;
+    if (@available(iOS 13.0, *)) {
+        void (^apply)(UITabBarAppearance *) = ^(UITabBarAppearance *appearance) {
+            if (backgroundColor) {
+                appearance.backgroundColor = backgroundColor;
+            }
+            if (shadowColor) {
+                appearance.shadowColor = shadowColor;
+            }
+            [appearance cyl_applyItemAppearanceWithBlock:^(UITabBarItemAppearance *itemAppearance) {
+                NSDictionary *normalAttributes = CYLAttributesSettingValue(itemAppearance.normal.titleTextAttributes, NSFontAttributeName, titleFont);
+                itemAppearance.normal.titleTextAttributes = CYLAttributesSettingValue(normalAttributes, NSForegroundColorAttributeName, titleColor);
+                NSDictionary *selectedAttributes = CYLAttributesSettingValue(itemAppearance.selected.titleTextAttributes, NSFontAttributeName, selectedTitleFont);
+                itemAppearance.selected.titleTextAttributes = CYLAttributesSettingValue(selectedAttributes, NSForegroundColorAttributeName, selectedTitleColor);
+                if (imageColor) {
+                    itemAppearance.normal.iconColor = imageColor;
+                }
+                if (selectedImageColor) {
+                    itemAppearance.selected.iconColor = selectedImageColor;
+                }
+            }];
+        };
+        UITabBarAppearance *standardAppearance = [tabBar.standardAppearance copy];
+        apply(standardAppearance);
+        tabBar.standardAppearance = standardAppearance;
+        if (@available(iOS 15.0, *)) {
+            if (tabBar.scrollEdgeAppearance) {
+                UITabBarAppearance *scrollEdgeAppearance = [tabBar.scrollEdgeAppearance copy];
+                apply(scrollEdgeAppearance);
+                tabBar.scrollEdgeAppearance = scrollEdgeAppearance;
+            }
+        }
+        [self cyl_syncTabBarAppearances];
+        return;
+    }
+    for (UIViewController *viewController in self.viewControllers) {
+        UITabBarItem *item = viewController.tabBarItem;
+        NSDictionary *normalAttributes = CYLAttributesSettingValue([item titleTextAttributesForState:UIControlStateNormal], NSFontAttributeName, titleFont);
+        [item setTitleTextAttributes:CYLAttributesSettingValue(normalAttributes, NSForegroundColorAttributeName, titleColor) forState:UIControlStateNormal];
+        NSDictionary *selectedAttributes = CYLAttributesSettingValue([item titleTextAttributesForState:UIControlStateSelected], NSFontAttributeName, selectedTitleFont);
+        [item setTitleTextAttributes:CYLAttributesSettingValue(selectedAttributes, NSForegroundColorAttributeName, selectedTitleColor) forState:UIControlStateSelected];
+    }
+    if (imageColor) {
+        tabBar.unselectedItemTintColor = imageColor;
+    }
+    if (selectedImageColor) {
+        tabBar.tintColor = selectedImageColor;
+    }
+    if (backgroundColor) {
+        tabBar.barTintColor = backgroundColor;
+    }
+    if (shadowColor) {
+        CGFloat lineHeight = 1.0 / UIScreen.mainScreen.scale;
+        tabBar.shadowImage = [UIImage cyl_imageWithColor:shadowColor size:CGSizeMake(1, lineHeight)];
+    }
+}
+
+@end
+
 #pragma mark - Double tap on the selected tab
 
 const NSTimeInterval CYLTabBarItemDoubleTapInterval = 0.3;
@@ -6849,6 +7000,8 @@ static char CYLThemeLaunchThemeAppliedKey;
     if ([tabBarTheme respondsToSelector:@selector(cyl_customizeTabBarController:)]) {
         [tabBarTheme cyl_customizeTabBarController:self];
     }
+    // [EN] Styles set in one place win over the theme's appearance. [CN] 在一处设置的样式优先于主题的外观。
+    [self cyl_applyTabBarItemStyles];
 }
 
 @end
