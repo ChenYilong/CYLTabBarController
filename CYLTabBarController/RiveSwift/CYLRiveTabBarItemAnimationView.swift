@@ -63,7 +63,7 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
 
     // MARK: - [EN] CYLRiveTabBarItemAnimationViewProviding [CN] 视图工厂接口
 
-    static func cyl_animationView(configuration: CYLRiveTabBarItemAnimationConfiguration) -> (UIView & CYLRiveTabBarItemAnimationViewing)? {
+    static func makeAnimationView(configuration: CYLRiveTabBarItemAnimationConfiguration) -> (UIView & CYLRiveTabBarItemAnimationViewing)? {
         return CYLRiveTabBarItemAnimationView(configuration: configuration,
                                               fileProvider: CYLRiveTabBarItemAnimationFileCache.shared)
     }
@@ -83,7 +83,7 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
     }
 
     /// [EN] Not used from Interface Builder. [CN] 不支持从 Interface Builder 创建。
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         return nil
     }
 
@@ -98,7 +98,7 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
 
     /// [EN] Plays once: sets the boolean to true, then false after `activeDuration`; or fires the trigger.
     /// [CN] 播放一次：把布尔属性设为 true，`activeDuration` 后设为 false；或触发 trigger。
-    func cyl_play() {
+    func playAnimation() {
         guard isLoaded else {
             playsWhenLoaded = true
             return
@@ -126,12 +126,12 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
 
     /// [EN] A state machine has no last frame: the icon stays in its resting state (the tab selected at launch, #389).
     /// [CN] 状态机没有最后一帧：图标保持静止状态（启动时选中的 Tab，#389）。
-    func cyl_showLastFrame() {
-        cyl_stop()
+    func showAnimationRestingState() {
+        stopAnimation()
     }
 
     /// [EN] Stops: the boolean goes back to false. [CN] 停止：布尔属性恢复为 false。
-    func cyl_stop() {
+    func stopAnimation() {
         playsWhenLoaded = false
         deactivateTask?.cancel()
         deactivateTask = nil
@@ -142,7 +142,7 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
     }
 
     /// [EN] Color property path -> color (Dark Mode); nil restores the light colors. [CN] 颜色属性路径 -> 颜色（深色模式）；nil 恢复浅色颜色。
-    func cyl_applyColors(_ colors: [String: UIColor]?) {
+    func applyAnimationColors(_ colors: [String: UIColor]?) {
         requestedColors = colors
         if isLoaded {
             enqueueRequestedColors()
@@ -201,7 +201,7 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
         }
         if playsWhenLoaded {
             playsWhenLoaded = false
-            cyl_play()
+            playAnimation()
         }
     }
 
@@ -241,7 +241,10 @@ final class CYLRiveTabBarItemAnimationView: UIView, CYLRiveTabBarItemAnimationVi
     }
 
     private static func riveColor(_ color: UIColor) -> RiveRuntime.Color {
-        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
         if !color.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
             var white: CGFloat = 0
             if color.getWhite(&white, alpha: &alpha) {

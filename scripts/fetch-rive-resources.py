@@ -35,7 +35,7 @@ MANIFEST = os.path.join(RESOURCES_DIR, "rive-resources.json")
 # [CN] 清单是数据：从中读取的每个值在用作文件路径或 URL 之前都会校验，修改清单也无法写到 RESOURCES_DIR 之外，或从 pub.dev 包归档以外的地址下载。
 ARCHIVE_PREFIX = "https://pub.dev/api/archives/"
 PACKAGE_PATTERN = re.compile(r"[a-z][a-z0-9_]{0,63}")
-VERSION_PATTERN = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?")
+VERSION_PATTERN = re.compile(r"\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?")
 SHA256_PATTERN = re.compile(r"[0-9a-f]{64}")
 # "<package>/<name>": one folder level, plain file names only (no "..", no absolute path).
 # 「<包名>/<文件名>」：只有一级目录，只允许普通文件名（不含 ".."，不是绝对路径）。
@@ -135,7 +135,7 @@ def extract(archive, entries):
             handle, temporary = tempfile.mkstemp(dir=os.path.dirname(destination))
             with os.fdopen(handle, "wb") as output:
                 output.write(data)
-            os.chmod(temporary, 0o644)  # mkstemp creates 0600. mkstemp 创建的文件权限为 0600。
+            # [EN] Kept as mkstemp creates it: readable by the owner only. [CN] 保持 mkstemp 创建时的权限：仅所有者可读写。
             os.replace(temporary, destination)
 
 
