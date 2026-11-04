@@ -63,15 +63,15 @@ sys.exit(1)' "$wanted_runtime") || return 1
   xcrun simctl create "iPhone (scroll hiding self-test)" "$device_type" "$runtime_id"
 }
 
-# [EN] The version to download for a RUNTIME such as iOS-18 or iOS-17-5: a major version alone means its last release.
-# [CN] RUNTIME（如 iOS-18 或 iOS-17-5）对应的下载版本：只写主版本时取该版本的最后一个发布版。
-runtime_download_version() {
+# [EN] The versions to try for a RUNTIME such as iOS-18 or iOS-17-5, newest first: a major version alone means its releases.
+# [CN] RUNTIME（如 iOS-18 或 iOS-17-5）要尝试的版本，从新到旧：只写主版本时为该版本的各个发布版。
+runtime_download_versions() {
   runtime_name="$1"
   VERSION=$(printf '%s' "$runtime_name" | sed -e 's/^iOS-//' -e 's/-/./g')
   case "$VERSION" in
-    18) echo 18.6 ;;
-    17) echo 17.5 ;;
-    16) echo 16.4 ;;
+    18) echo 18.6 18.5 18.4 18.3 18.2 18.1 18.0 ;;
+    17) echo 17.5 17.4 17.2 17.0 ;;
+    16) echo 16.4 16.2 16.0 ;;
     *) echo "$VERSION" ;;
   esac
 }
@@ -85,10 +85,16 @@ if [ -z "$DEVICE_NAME" ]; then
     #      runtime is installed, otherwise download it first (several GB, a few minutes).
     # [CN] runner（或本机）没有该运行时，例如 xcode-27 runner 只有 iOS 27：已安装运行时则创建 iPhone，否则先下载（数 GB，需几分钟）。
     if ! DEVICE_ID=$(create_iphone "$RUNTIME"); then
-      DOWNLOAD=$(runtime_download_version "$RUNTIME")
-      echo "Downloading the iOS $DOWNLOAD simulator runtime for RUNTIME=$RUNTIME"
-      xcodebuild -downloadPlatform iOS -buildVersion "$DOWNLOAD" || {
-        echo "Could not download the iOS $DOWNLOAD simulator runtime"; xcrun simctl list runtimes; exit 1; }
+      # [EN] Try the newest release of that major version first; this Xcode may only offer some of them.
+      # [CN] 先尝试该主版本的最新发布版；当前 Xcode 可能只提供其中一部分。
+      DOWNLOADED=""
+      for DOWNLOAD in $(runtime_download_versions "$RUNTIME"); do
+        echo "Downloading the iOS $DOWNLOAD simulator runtime for RUNTIME=$RUNTIME"
+        if xcodebuild -downloadPlatform iOS -buildVersion "$DOWNLOAD"; then DOWNLOADED=$DOWNLOAD; break; fi
+      done
+      if [ -z "$DOWNLOADED" ]; then
+        echo "This Xcode offers no simulator runtime for RUNTIME=$RUNTIME"; xcodebuild -version; xcrun simctl list runtimes; exit 1
+      fi
       DEVICE_ID=$(create_iphone "$RUNTIME") || {
         echo "No iPhone simulator for runtime '$RUNTIME' after the download"; xcrun simctl list runtimes; exit 1; }
     fi
@@ -125,10 +131,15 @@ echo "Simulator: $DEVICE_ID"
 # [CN] Xcode 生成 App 的位置（TARGET_BUILD_DIR / WRAPPER_NAME），没有时在产物目录中查找任意 .app。
 SETTINGS=$(xcodebuild -workspace CYLTabBarController.xcworkspace -scheme CYLTabBarController -configuration Debug \
   -sdk iphonesimulator -destination "id=$DEVICE_ID" -derivedDataPath "$DERIVED" -showBuildSettings 2>/dev/null || true)
-TARGET_BUILD_DIR=$(echo "$SETTINGS" | awk -F' = ' '/^ *TARGET_BUILD_DIR = /{print $2; exit}')
-WRAPPER_NAME=$(echo "$SETTINGS" | awk -F' = ' '/^ *WRAPPER_NAME = /{print $2; exit}')
-APP="$TARGET_BUILD_DIR/$WRAPPER_NAME"
-if [ -z "$WRAPPER_NAME" ] || [ ! -d "$APP" ]; then
+# [EN] The scheme also builds the pods (frameworks), whose settings come first: take the target whose WRAPPER_NAME ends in .app.
+# [CN] 该 scheme 也会构建 pods（framework），其设置排在前面：取 WRAPPER_NAME 以 .app 结尾的 target。
+APP=$(echo "$SETTINGS" | awk -F' = ' '
+  /^Build settings for action/ { dir = ""; name = "" }
+  /^ *TARGET_BUILD_DIR = / { dir = $2 }
+  /^ *WRAPPER_NAME = / { name = $2 }
+  dir != "" && name ~ /\.app$/ { print dir "/" name; exit }')
+case "$APP" in *.app) ;; *) APP="" ;; esac
+if [ -z "$APP" ] || [ ! -d "$APP" ]; then
   APP=$(find "$DERIVED/Build/Products" -maxdepth 4 -name '*.app' -not -path '*/PlugIns/*' | head -n 1)
 fi
 if [ -z "$APP" ] || [ ! -d "$APP" ]; then

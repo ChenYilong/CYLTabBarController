@@ -29,6 +29,9 @@ jobs:
     runs-on: xcode-27
     # Room for the iOS 18 runtime download (several GB).
     timeout-minutes: 60
+    # The iOS 18 job depends on Apple offering that runtime to this Xcode; when it does not, the job fails without
+    # failing the run.
+    continue-on-error: ${{ matrix.optional == true }}
     strategy:
       fail-fast: false
       matrix:
@@ -40,6 +43,7 @@ jobs:
           # downloads the iOS 18 runtime (xcodebuild -downloadPlatform) and creates an iPhone for it.
           - style: Default
             runtime: iOS-18
+            optional: true
           # Default demo on the newest runtime: Liquid Glass, a smoke test (rows are SKIP, code cannot hide it).
           - style: Default
             runtime: ""
