@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Durata apăsării lungi și intervalul atingerii duble (issue #535 / #152)";
 "Tab 交互" = "Interacțiuni cu filele";
 "Tab 点击声音与触感反馈（issue #535）" = "Sunet și haptic la atingerea filelor (issue #535)";
+"轻触感反馈" = "Feedback haptic ușor";
+"重触感反馈" = "Feedback haptic puternic";
+"长按（#152）" = "Apăsare lungă (#152)";

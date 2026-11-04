@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Trajanje dugog pritiska i razmak dvostrukog dodira (issue #535 / #152)";
 "Tab 交互" = "Interakcije kartica";
 "Tab 点击声音与触感反馈（issue #535）" = "Zvuk i haptika dodira kartice (issue #535)";
+"轻触感反馈" = "Lagana haptika";
+"重触感反馈" = "Jaka haptika";
+"长按（#152）" = "Dugi pritisak (#152)";

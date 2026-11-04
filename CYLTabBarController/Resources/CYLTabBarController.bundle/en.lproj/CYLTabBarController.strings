@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Long press duration and double tap interval (issue #535 / #152)";
 "Tab 交互" = "Tab interactions";
 "Tab 点击声音与触感反馈（issue #535）" = "Tab tap sound and haptics (issue #535)";
+"轻触感反馈" = "Light haptic";
+"重触感反馈" = "Heavy haptic";
+"长按（#152）" = "Long press (#152)";

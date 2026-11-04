@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Varighet for langt trykk og intervall for dobbelttrykk (issue #535 / #152)";
 "Tab 交互" = "Faneinteraksjoner";
 "Tab 点击声音与触感反馈（issue #535）" = "Fanetrykklyd og haptikk (issue #535)";
+"轻触感反馈" = "Lett haptikk";
+"重触感反馈" = "Kraftig haptikk";
+"长按（#152）" = "Langt trykk (#152)";

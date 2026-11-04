@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Duur van lang drukken en interval van dubbeltikken (issue #535 / #152)";
 "Tab 交互" = "Tabinteracties";
 "Tab 点击声音与触感反馈（issue #535）" = "Tikgeluid en haptiek van tabs (issue #535)";
+"轻触感反馈" = "Lichte haptische feedback";
+"重触感反馈" = "Sterke haptische feedback";
+"长按（#152）" = "Lang drukken (#152)";

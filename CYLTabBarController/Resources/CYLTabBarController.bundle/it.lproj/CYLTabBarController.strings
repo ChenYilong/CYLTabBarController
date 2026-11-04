@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Durata della pressione prolungata e intervallo del doppio tocco (issue #535 / #152)";
 "Tab 交互" = "Interazioni delle schede";
 "Tab 点击声音与触感反馈（issue #535）" = "Suono e aptica al tocco delle schede (issue #535)";
+"轻触感反馈" = "Feedback aptico leggero";
+"重触感反馈" = "Feedback aptico forte";
+"长按（#152）" = "Pressione prolungata (#152)";

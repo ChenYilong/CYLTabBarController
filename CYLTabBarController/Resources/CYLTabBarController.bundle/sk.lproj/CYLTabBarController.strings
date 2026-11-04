@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Dĺžka dlhého stlačenia a interval dvojitého klepnutia (issue #535 / #152)";
 "Tab 交互" = "Interakcie kariet";
 "Tab 点击声音与触感反馈（issue #535）" = "Zvuk a haptika klepnutia na kartu (issue #535)";
+"轻触感反馈" = "Ľahká haptická odozva";
+"重触感反馈" = "Silná haptická odozva";
+"长按（#152）" = "Dlhé stlačenie (#152)";

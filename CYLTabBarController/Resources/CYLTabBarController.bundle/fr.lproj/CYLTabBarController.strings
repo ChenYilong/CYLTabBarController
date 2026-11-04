@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Durée de l’appui long et intervalle du double toucher (issue #535 / #152)";
 "Tab 交互" = "Interactions des onglets";
 "Tab 点击声音与触感反馈（issue #535）" = "Son et haptique au toucher des onglets (issue #535)";
+"轻触感反馈" = "Retour haptique léger";
+"重触感反馈" = "Retour haptique fort";
+"长按（#152）" = "Appui long (#152)";

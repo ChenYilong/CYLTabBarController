@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Thời gian nhấn giữ và khoảng chạm hai lần (issue #535 / #152)";
 "Tab 交互" = "Tương tác tab";
 "Tab 点击声音与触感反馈（issue #535）" = "Âm thanh và xúc giác khi chạm tab (issue #535)";
+"轻触感反馈" = "Phản hồi xúc giác nhẹ";
+"重触感反馈" = "Phản hồi xúc giác mạnh";
+"长按（#152）" = "Nhấn giữ (#152)";

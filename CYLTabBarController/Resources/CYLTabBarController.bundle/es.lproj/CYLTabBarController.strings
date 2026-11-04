@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Duración de la pulsación larga e intervalo del doble toque (issue #535 / #152)";
 "Tab 交互" = "Interacciones de las pestañas";
 "Tab 点击声音与触感反馈（issue #535）" = "Sonido y háptica al tocar pestañas (issue #535)";
+"轻触感反馈" = "Respuesta háptica ligera";
+"重触感反馈" = "Respuesta háptica fuerte";
+"长按（#152）" = "Pulsación larga (#152)";

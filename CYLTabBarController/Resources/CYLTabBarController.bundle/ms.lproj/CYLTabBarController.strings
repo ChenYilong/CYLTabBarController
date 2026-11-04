@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Tempoh tekan lama dan selang ketik dua kali (issue #535 / #152)";
 "Tab 交互" = "Interaksi tab";
 "Tab 点击声音与触感反馈（issue #535）" = "Bunyi dan haptik ketik tab (issue #535)";
+"轻触感反馈" = "Haptik ringan";
+"重触感反馈" = "Haptik kuat";
+"长按（#152）" = "Tekan lama (#152)";

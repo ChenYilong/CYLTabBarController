@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Czas długiego naciśnięcia i odstęp podwójnego stuknięcia (issue #535 / #152)";
 "Tab 交互" = "Interakcje kart";
 "Tab 点击声音与触感反馈（issue #535）" = "Dźwięk i haptyka stuknięcia karty (issue #535)";
+"轻触感反馈" = "Lekka haptyka";
+"重触感反馈" = "Silna haptyka";
+"长按（#152）" = "Długie naciśnięcie (#152)";

@@ -274,3 +274,6 @@
 "长按时长与双击间隔（issue #535 / #152）" = "Pitkän painalluksen kesto ja kaksoisnapautuksen väli (issue #535 / #152)";
 "Tab 交互" = "Välilehtien vuorovaikutus";
 "Tab 点击声音与触感反馈（issue #535）" = "Välilehden napautusääni ja haptiikka (issue #535)";
+"轻触感反馈" = "Kevyt haptinen palaute";
+"重触感反馈" = "Voimakas haptinen palaute";
+"长按（#152）" = "Pitkä painallus (#152)";
