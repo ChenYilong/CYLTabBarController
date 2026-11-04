@@ -449,11 +449,12 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
 
 /*!
  * [EN] UIKit bug on iOS 13 and 14: a tab title styled through `UITabBarAppearance` with a font larger than the default
- *      (iOS 13), or bold (iOS 13 and 14), keeps the width of the default font and is cut off ("Mi…"). After UIKit's
+ *      (iOS 13), bold (iOS 13 and 14), or with a changed inline title color (iOS 14) keeps a too small width and is cut
+ *      off ("Mi…"). After UIKit's
  *      layout, a title narrower than its text is widened to fit (at most the button's width) around the same center.
  *      Fixed by Apple in iOS 15; nothing is done there.
- * [CN] iOS 13、14 的 UIKit bug：通过 `UITabBarAppearance` 设置的 Tab 标题字号大于默认值（iOS 13）或为粗体（iOS 13、14）时，仍按默认
- *      字体的宽度布局，被截断（“我…”）。在 UIKit 布局之后，宽度不足以显示文字的标题会以原中心加宽到合适宽度（不超过按钮宽度）。
+ * [CN] iOS 13、14 的 UIKit bug：通过 `UITabBarAppearance` 设置的 Tab 标题字号大于默认值（iOS 13）、为粗体（iOS 13、14），或修改了
+ *      横向布局的标题颜色（iOS 14）时，宽度不足，被截断（“我…”）。在 UIKit 布局之后，宽度不足以显示文字的标题会以原中心加宽到合适宽度（不超过按钮宽度）。
  *      iOS 15 起系统已修复，不做处理。
  */
 - (void)cyl_fixTruncatedTabTitlesIfNeeded {
@@ -461,16 +462,11 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
         return;
     }
     if (@available(iOS 13.0, *)) {
-        BOOL onlyBold = NO;
-        if (@available(iOS 14.0, *)) {
-            onlyBold = YES;
-        }
+        // [EN] Any title narrower than its text: on iOS 14 a changed inline title color cuts titles off too, not only bold.
+        // [CN] 任何宽度不足以显示文字的标题：iOS 14 上修改横向布局的标题颜色同样会截断标题，不只是粗体。
         for (UIControl *tabButton in self.tabBarButtonArray) {
             UILabel *label = [tabButton cyl_tabLabel];
             if (!label || label.text.length == 0) {
-                continue;
-            }
-            if (onlyBold && !(label.font.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold)) {
                 continue;
             }
             CGSize fittingSize = [label sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];

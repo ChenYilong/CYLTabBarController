@@ -238,6 +238,8 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)cyl_syncTabBarAppearances;
 /// [EN] Implemented in the main implementation: the plus button's child view controller. [CN] 实现于主 implementation：PlusButton 的子控制器。
 - (nullable UIViewController *)cyl_contextPlusChildViewController;
+/// [EN] Implemented below (CYLDoubleTap). [CN] 实现见下方（CYLDoubleTap）。
+- (void)cyl_rememberSelectedIndexForDoubleTap;
 /// [EN] Implemented below (CYLTabBarItemStyle). [CN] 实现见下方（CYLTabBarItemStyle）。
 - (void)cyl_applyTabBarItemStyles;
 /// [EN] Implemented below (CYLOpaqueTabBarSafeArea). [CN] 实现见下方（CYLOpaqueTabBarSafeArea）。
@@ -4834,11 +4836,6 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     return childViewController;
 }
 
-/// [EN] The selected tab decides whether the home indicator hides. [CN] 由选中的 Tab 决定是否隐藏 Home Indicator。
-- (nullable UIViewController *)childViewControllerForHomeIndicatorAutoHidden {
-    return self.selectedViewController;
-}
-
 /// [EN] The selected tab decides which edges defer the system gestures. [CN] 由选中的 Tab 决定哪些边缘延迟系统手势。
 - (nullable UIViewController *)childViewControllerForScreenEdgesDeferringSystemGestures {
     return self.selectedViewController;
@@ -6850,6 +6847,8 @@ static NSDictionary<NSAttributedStringKey, id> *CYLAttributesSettingValue(NSDict
 
 /// [EN] The bottom this library added to a page's `additionalSafeAreaInsets`. [CN] 本库为页面 `additionalSafeAreaInsets` 增加的底部值。
 static char CYLOpaqueTabBarAddedBottomKey;
+/// [EN] The page's safe area bottom when the library last wrote its inset. [CN] 本库上次写入时页面安全区域的底部值。
+static char CYLOpaqueTabBarSafeBottomAtWriteKey;
 static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
 
 @implementation CYLTabBarController (CYLOpaqueTabBarSafeArea)
@@ -6907,6 +6906,12 @@ static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
                     !tabBar.hidden && tabBar.alpha > 0.01 && tabBar.window;
     CGFloat addedBottom = [objc_getAssociatedObject(page, &CYLOpaqueTabBarAddedBottomKey) doubleValue];
     UIEdgeInsets additionalInsets = page.additionalSafeAreaInsets;
+    // [EN] Written, but the page has not been laid out with it yet: its safe area is stale, which would add the part again.
+    // [CN] 已写入，但页面尚未据此重新布局：此时的安全区域是旧值，会把缺少的部分再加一次。
+    NSNumber *safeBottomAtWrite = objc_getAssociatedObject(page, &CYLOpaqueTabBarSafeBottomAtWriteKey);
+    if (safeBottomAtWrite && fabs(page.view.safeAreaInsets.bottom - safeBottomAtWrite.doubleValue) < 0.5 && addedBottom > 0) {
+        return;
+    }
     CGFloat appBottom = additionalInsets.bottom - addedBottom;
     CGFloat neededBottom = 0;
     if (affected) {
@@ -6920,9 +6925,11 @@ static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
     if (fabs(neededBottom - addedBottom) < 0.5) {
         return;
     }
+    CGFloat safeBottomBeforeWrite = page.view.safeAreaInsets.bottom;
     additionalInsets.bottom = appBottom + neededBottom;
     page.additionalSafeAreaInsets = additionalInsets;
     objc_setAssociatedObject(page, &CYLOpaqueTabBarAddedBottomKey, neededBottom > 0 ? @(neededBottom) : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(page, &CYLOpaqueTabBarSafeBottomAtWriteKey, neededBottom > 0 ? @(safeBottomBeforeWrite) : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end
@@ -6934,6 +6941,8 @@ const NSTimeInterval CYLTabBarItemDoubleTapInterval = 0.3;
 /// [EN] The first tap of a possible double tap: the tab's index and when. [CN] 可能的双击中第一次点击：Tab 下标与时间。
 static char CYLDoubleTapLastIndexKey;
 static char CYLDoubleTapLastTimeKey;
+/// [EN] The selected index seen after the previous tap. [CN] 上一次点击之后看到的选中下标。
+static char CYLDoubleTapKnownSelectedIndexKey;
 
 @implementation CYLTabBarController (CYLDoubleTap)
 
@@ -6946,11 +6955,26 @@ static char CYLDoubleTapLastTimeKey;
  */
 - (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item {
     NSUInteger index = [tabBar.items indexOfObject:item];
-    BOOL wasSelected = (index != NSNotFound && index == self.selectedIndex);
+    // [EN] Whether UIKit has already changed `selectedIndex` when this is called is not documented: the tab also has to
+    //      be the one seen selected after the previous tap, so the tap that selects a tab never counts.
+    // [CN] UIKit 调用本方法时是否已修改 `selectedIndex` 没有文档说明：该 Tab 还必须是上一次点击之后看到的选中 Tab，
+    //      因此选中 Tab 的那一次点击永远不会计入。
+    NSNumber *knownSelectedIndex = objc_getAssociatedObject(self, &CYLDoubleTapKnownSelectedIndexKey);
+    BOOL wasSelected = (index != NSNotFound && index == self.selectedIndex &&
+                        (!knownSelectedIndex || knownSelectedIndex.unsignedIntegerValue == index));
     if ([tabBar isKindOfClass:[UITabBar class]] && [UITabBarController instancesRespondToSelector:@selector(tabBar:didSelectItem:)]) {
         [super tabBar:tabBar didSelectItem:item];
     }
     [self cyl_handleTapOnTabAtIndex:index wasSelected:wasSelected];
+    // [EN] Next run loop: the selection this tap led to. [CN] 下一个 runloop：本次点击之后的选中状态。
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf cyl_rememberSelectedIndexForDoubleTap];
+    });
+}
+
+- (void)cyl_rememberSelectedIndexForDoubleTap {
+    objc_setAssociatedObject(self, &CYLDoubleTapKnownSelectedIndexKey, @(self.selectedIndex), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 /*!
@@ -7022,6 +7046,8 @@ static char CYLThemeLaunchThemeAppliedKey;
     // [EN] Styles set before the tab bar was replaced by the library's own (CYLTabBar) are written into the bar shown now.
     // [CN] 在 TabBar 被替换为本库的 CYLTabBar 之前设置的样式，写入当前显示的 TabBar。
     [self cyl_applyTabBarItemStyles];
+    // [EN] The tab shown first counts as selected for a double tap. [CN] 首次显示的 Tab 视为双击判断中已选中的 Tab。
+    [self cyl_rememberSelectedIndexForDoubleTap];
     id theme = CYLThemeManagerCenter.defaultThemeManager.currentTheme;
     // [EN] Nothing to restore yet: only a tab bar theme changes anything here.
     // [CN] 此时尚无需恢复：只有 TabBar 主题才需要处理。
