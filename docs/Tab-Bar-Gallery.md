@@ -19,7 +19,7 @@
 
 ```mermaid
 flowchart LR
-    H["首页 / Home<br/>Tab Bar Gallery"] --> G["CYLGalleryViewController<br/>8 sections, 36 rows"]
+    H["首页 / Home<br/>Tab Bar Gallery"] --> G["CYLGalleryViewController<br/>9 sections, 42 rows"]
     G --> P["CYLGalleryProvider<br/>scene builders"]
     P --> T["CYLTabBarController / UITabBarController<br/>presented"]
 ```
@@ -51,6 +51,7 @@ flowchart LR
 | Remind | 系统角标；仿系统角标；带动画的提醒（图标跳动 / 角标缩放）；自定义提醒 · System badges; the same on this library; animated reminders (the icon jumps / the badge scales); a custom reminder | `badgeValue`, `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:`, `cyl_showBadgeValue:animationType:` |
 | Lottie | 中间 Tab 播放 Lottie 动画 · A Lottie animation on the middle tab | `CYLTabBarLottieURL`, `CYLTabBarLottieSize` |
 | New APIs | 重复点击：返回根页面再滚动到顶部；按下与重复点击动画；劫持普通 Tab；单个 Tab 的颜色、字体与背景；无障碍标识；PlusButton 两侧居中排列；两端留白与 Tab 间隙 · Reselect: pop to root then scroll to top; press and reselect animations; hijacking a regular tab; per-tab colors, fonts and backgrounds; accessibility identifiers; centered tabs around a plus button; edge insets and gaps | `cyl_reselectBehavior`, `CYLTabButtonPressAnimation`, `-cyl_playReselectAnimationWithTabButton:…`, `cyl_hijackedTabBarItemIdentifiers`, `CYLTabBarItemTitleFont`, `CYLTabBarItemAccessibilityIdentifier`, `itemPositioning` / `itemWidth` / `itemSpacing`, `cyl_itemEdgeInsets` |
+| Liquid Glass robustness | 带下标检查的选中按钮；越界读取返回 nil；Tab 按钮中被标记的视图（一键隐藏 / 显示）；修改 item 图片后的 PlusButton 替身；首次显示与旋转时的替身；8 个 Tab 的「More」编辑（push 进入）· The selected control with bounds checks; out-of-range reads return nil; marked views in tab buttons (hide / show in one pass); the plus button's stand-in after an item image changes; the stand-in on first display and rotation; More editing with 8 tabs (pushed) | `cyl_selectedControl` / `cyl_selectedIndex`, `cyl_platterContentViewWithIndex:`, `cyl_markAsInsertedForTabControl:` / `+cyl_insertedTabControlViews`, `+plusChildViewController` + `+selectedContentImage`, `-beginCustomizingItems:` / `-endCustomizingAnimated:`（见 [Liquid-Glass-Robustness.md](Liquid-Glass-Robustness.md)） |
 
 | 中文 | English |
 |:---|:---|
@@ -61,7 +62,7 @@ flowchart LR
 
 | 中文 | English |
 |:---|:---|
-| `Example-Swift-Gallery/` 是同一个图库的 Swift 版本：场景、分组、行标题与 ObjC 版一致，代码结构与常见的 Swift TabBar 图库 Demo 相同（`GalleryViewController` 列表 + `GalleryProvider` 场景构建函数）。它通过 **Swift Package Manager** 集成本库：Xcode 工程以本地包（`relativePath = ..`）引用仓库根目录的 `Package.swift`，产品为 `CYLTabBarController`（Core + FlatDesign + Lottie），因此不需要 `pod install`。代码只 `import CYLTabBarController`。 | `Example-Swift-Gallery/` is the Swift version of the same gallery: the scenes, sections and row titles match the ObjC one, and the code is laid out like a typical Swift tab bar gallery demo (a `GalleryViewController` list plus `GalleryProvider` scene builders). It integrates the library with **Swift Package Manager**: the Xcode project references the repository's root `Package.swift` as a local package (`relativePath = ..`), product `CYLTabBarController` (Core + FlatDesign + Lottie), so no `pod install` is needed. The code only does `import CYLTabBarController`. |
+| `Example-Swift-Gallery/` 是同一个图库的 Swift 版本：场景、分组、行标题与 ObjC 版前 8 组一致（「Liquid Glass robustness」一组演示库内部改进，只在 ObjC 版中），代码结构与常见的 Swift TabBar 图库 Demo 相同（`GalleryViewController` 列表 + `GalleryProvider` 场景构建函数）。它通过 **Swift Package Manager** 集成本库：Xcode 工程以本地包（`relativePath = ..`）引用仓库根目录的 `Package.swift`，产品为 `CYLTabBarController`（Core + FlatDesign + Lottie），因此不需要 `pod install`。代码只 `import CYLTabBarController`。 | `Example-Swift-Gallery/` is the Swift version of the same gallery: the scenes, sections and row titles match the first 8 sections of the ObjC one (the "Liquid Glass robustness" section demonstrates library internals and is ObjC only), and the code is laid out like a typical Swift tab bar gallery demo (a `GalleryViewController` list plus `GalleryProvider` scene builders). It integrates the library with **Swift Package Manager**: the Xcode project references the repository's root `Package.swift` as a local package (`relativePath = ..`), product `CYLTabBarController` (Core + FlatDesign + Lottie), so no `pod install` is needed. The code only does `import CYLTabBarController`. |
 | 打开方式：用 Xcode 26 打开 `Example-Swift-Gallery/CYLTabBarGallery.xcodeproj`，等待包解析完成后运行 `CYLTabBarGallery` 目标（iOS 15+）。工程使用 Xcode 的文件夹同步（`PBXFileSystemSynchronizedRootGroup`），`CYLTabBarGallery/` 中的源文件与 `tab_search_animate.json` 会自动加入目标。 | To run it: open `Example-Swift-Gallery/CYLTabBarGallery.xcodeproj` in Xcode 26, let the package resolve, and run the `CYLTabBarGallery` target (iOS 15+). The project uses Xcode's folder sync (`PBXFileSystemSynchronizedRootGroup`), so the sources in `CYLTabBarGallery/` and `tab_search_animate.json` join the target automatically. |
 
 | 文件 / File | 中文 | English |

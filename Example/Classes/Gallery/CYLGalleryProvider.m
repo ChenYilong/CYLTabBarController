@@ -13,6 +13,9 @@
 static NSString *const CYLGalleryContext = @"CYLGallery";
 /// [EN] The context of the irregular scenes, with their own plus button. [CN] 不规则场景的 context，带有自己的 PlusButton。
 static NSString *const CYLGalleryIrregularContext = @"CYLGalleryIrregular";
+/// [EN] Context of the plus button that has its own page (Liquid Glass stand-in scenes).
+/// [CN] 拥有自己页面的 PlusButton 所属的 context（液态玻璃替身场景）。
+static NSString *const CYLGalleryPlusPageContext = @"CYLGalleryPlusPage";
 
 #pragma mark - Colors
 
@@ -31,6 +34,7 @@ static UIColor *CYLGalleryGray(CGFloat white) {
 @property (nonatomic, copy, readwrite) NSString *subtitle;
 @property (nonatomic, copy, readwrite) CYLGallerySceneBuilder builder;
 @property (nonatomic, copy, readwrite, nullable) CYLGallerySceneDidPresent didPresent;
+@property (nonatomic, assign, readwrite) BOOL pushes;
 @end
 
 @implementation CYLGalleryScene
@@ -49,6 +53,13 @@ static UIColor *CYLGalleryGray(CGFloat white) {
 
 + (instancetype)sceneWithTitle:(NSString *)title subtitle:(NSString *)subtitle builder:(CYLGallerySceneBuilder)builder {
     return [self sceneWithTitle:title subtitle:subtitle builder:builder didPresent:nil];
+}
+
+/// [EN] A scene pushed onto the gallery's navigation controller. [CN] push 到图库导航控制器中的场景。
++ (instancetype)sceneWithTitle:(NSString *)title subtitle:(NSString *)subtitle pushingBuilder:(CYLGallerySceneBuilder)builder {
+    CYLGalleryScene *scene = [self sceneWithTitle:title subtitle:subtitle builder:builder didPresent:nil];
+    scene.pushes = YES;
+    return scene;
 }
 
 @end
@@ -846,11 +857,91 @@ static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
 
 #pragma mark - Provider
 
+#pragma mark - Plus button with a page (Liquid Glass robustness)
+
+/*!
+ * [EN] A plus button that selects its own page (`+plusChildViewController`), so on Liquid Glass the library puts its
+ *      stand-in (built from `+selectedContentImage`) in the selected layer: the view that
+ *      `-cyl_layOutPlusButtonInLiquidGlassLayers` installs on every layout pass.
+ * [CN] 选中自己页面（`+plusChildViewController`）的 PlusButton，因此在液态玻璃下本库会把它的替身（由 `+selectedContentImage` 生成）放进
+ *      选中层：即 `-cyl_layOutPlusButtonInLiquidGlassLayers` 在每次布局时安装的视图。
+ */
+@interface CYLGalleryPagePlusButton : CYLPlusButton <CYLPlusButtonSubclassing>
+@end
+
+@implementation CYLGalleryPagePlusButton
+
++ (id)plusButton {
+    CYLGalleryPagePlusButton *button = [self buttonWithType:UIButtonTypeCustom];
+    [button setImage:[self contentImage] forState:UIControlStateNormal];
+    [button setImage:[self selectedContentImage] forState:UIControlStateSelected];
+    button.tintColor = UIColor.systemIndigoColor;
+    button.frame = CGRectMake(0, 0, 64, 49);
+    button.accessibilityLabel = @"Compose";
+    return button;
+}
+
++ (UIImage *)contentImage {
+    return CYLGallerySymbol(@"plus.circle", NO, 30);
+}
+
++ (UIImage *)selectedContentImage {
+    return CYLGallerySymbol(@"plus.circle", YES, 30);
+}
+
++ (UIViewController *)plusChildViewController {
+    CYLGalleryPageViewController *page = [[CYLGalleryPageViewController alloc] init];
+    page.title = @"Compose";
+    return page;
+}
+
++ (NSUInteger)indexOfPlusButtonInTabBar {
+    return 2;
+}
+
++ (NSString *)tabBarContext {
+    return CYLGalleryPlusPageContext;
+}
+
++ (NSString *)tabBarItemIdentifier {
+    return @"compose";
+}
+
+@end
+
+/// [EN] The views the library marked (`-cyl_markAsInsertedForTabControl:`) inside `tabBar`.
+/// [CN] `tabBar` 中被本库标记（`-cyl_markAsInsertedForTabControl:`）的视图。
+static NSArray<UIView *> *CYLGalleryMarkedViews(UIView *tabBar) {
+    NSMutableArray<UIView *> *views = [NSMutableArray array];
+    for (UIView *view in [UIView cyl_insertedTabControlViews]) {
+        if (tabBar && [view isDescendantOfView:tabBar]) {
+            [views addObject:view];
+        }
+    }
+    return views;
+}
+
+/// [EN] A bar button item that runs `handler`. [CN] 点击后执行 `handler` 的导航栏按钮。
+static UIBarButtonItem *CYLGalleryBarButtonItem(NSString *title, void (^handler)(void)) {
+    UIAction *action = [UIAction actionWithTitle:title image:nil identifier:nil handler:^(__kindof UIAction *_Nonnull theAction) {
+        handler();
+    }];
+    return [[UIBarButtonItem alloc] initWithPrimaryAction:action];
+}
+
+/// [EN] A star drawn in place of a tab's icon, which the library marks as inserted. [CN] 替换 Tab 图标的星形视图，本库会将其标记为插入视图。
+static UIView *CYLGalleryStarView(void) {
+    UIImageView *starView = [[UIImageView alloc] initWithImage:CYLGallerySymbol(@"star", YES, 22)];
+    starView.tintColor = UIColor.systemOrangeColor;
+    return starView;
+}
+
 @implementation CYLGalleryProvider
 
 + (NSArray<CYLGallerySection *> *)sections {
     return @[ [self basicSection], [self embedSection], [self animationSection], [self irregularSection],
-              [self customClickSection], [self remindSection], [self lottieSection], [self newAPISection] ];
+              [self customClickSection], [self remindSection], [self lottieSection], [self newAPISection],
+              [self liquidGlassRobustnessSection] ];
 }
 
 #pragma mark Basic
@@ -1240,6 +1331,128 @@ static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
         }],
     ];
     return [CYLGallerySection sectionWithTitle:@"New APIs" scenes:scenes];
+}
+
+
+#pragma mark Liquid Glass robustness
+
+/// [EN] Four tabs around the plus button that has its own page. [CN] 拥有自己页面的 PlusButton 两侧的四个 Tab。
++ (CYLTabBarController *)plusPageTabBarController {
+    [CYLGalleryPagePlusButton registerPlusButton];
+    NSMutableArray<NSDictionary *> *attributes = [CYLGalleryAttributes(5, YES, 20, nil) mutableCopy];
+    [attributes removeObjectAtIndex:2];
+    NSMutableArray<UIViewController *> *pages = [CYLGalleryPages(5, NO) mutableCopy];
+    [pages removeObjectAtIndex:2];
+    return CYLGalleryTabBarController(pages, attributes, CYLTabBarStyleTypeDefault, CYLGalleryPlusPageContext);
+}
+
+/// [EN] Shows how many marked views the tab bar holds, in the navigation bar. [CN] 在导航栏中显示 TabBar 中被标记视图的数量。
++ (void)showMarkedViewCountOfTabBarController:(CYLTabBarController *)tabBarController {
+    NSArray<UIView *> *views = CYLGalleryMarkedViews(tabBarController.tabBar);
+    NSUInteger hiddenCount = 0;
+    for (UIView *view in views) {
+        hiddenCount += view.hidden ? 1 : 0;
+    }
+    tabBarController.navigationItem.title = [NSString stringWithFormat:@"%lu marked, %lu hidden", (unsigned long)views.count, (unsigned long)hiddenCount];
+}
+
++ (CYLGallerySection *)liquidGlassRobustnessSection {
+    NSArray<CYLGalleryScene *> *scenes = @[
+        [CYLGalleryScene sceneWithTitle:@"Selected control with bounds checks" subtitle:@"cyl_selectedControl falls back in order; \"Read\" shows its index and class" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
+            __weak CYLTabBarController *weakTabBarController = tabBarController;
+            void (^read)(void) = ^{
+                CYLTabBarController *controller = weakTabBarController;
+                if (![controller.tabBar isKindOfClass:[CYLTabBar class]]) {
+                    return;
+                }
+                UIControl *selectedControl = [(CYLTabBar *)controller.tabBar cyl_selectedControl];
+                controller.navigationItem.title = [NSString stringWithFormat:@"index %ld, %@", (long)[(CYLTabBar *)controller.tabBar cyl_selectedIndex],
+                                                   selectedControl ? NSStringFromClass([selectedControl class]) : @"nil"];
+            };
+            tabBarController.navigationItem.rightBarButtonItem = CYLGalleryBarButtonItem(@"Read", read);
+            [tabBarController performWhenTabBarItemsReady:^(CYLTabBarController *controller) {
+                read();
+            }];
+            return CYLGalleryEmbed(tabBarController);
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Out-of-range reads return nil" subtitle:@"Index 99 on the platter / tab button readers: nil, no exception" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
+            __weak CYLTabBarController *weakTabBarController = tabBarController;
+            tabBarController.navigationItem.rightBarButtonItem = CYLGalleryBarButtonItem(@"Read 99", ^{
+                CYLTabBarController *controller = weakTabBarController;
+                if (![controller.tabBar isKindOfClass:[CYLTabBar class]]) {
+                    return;
+                }
+                CYLTabBar *tabBar = (CYLTabBar *)controller.tabBar;
+                NSArray<NSString *> *lines = @[
+                    [NSString stringWithFormat:@"cyl_platterContentViewWithIndex: %@", (id)[tabBar cyl_platterContentViewWithIndex:99] ?: @"nil"],
+                    [NSString stringWithFormat:@"cyl_platterSelectedContentViewWithIndex: %@", (id)[tabBar cyl_platterSelectedContentViewWithIndex:99] ?: @"nil"],
+                    [NSString stringWithFormat:@"cyl_tabBarButtonWithTabIndex: %@", (id)[tabBar cyl_tabBarButtonWithTabIndex:99] ?: @"nil"],
+                ];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Index 99" message:[lines componentsJoinedByString:@"\n"] preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
+                [controller presentViewController:alert animated:YES completion:nil];
+            });
+            return CYLGalleryEmbed(tabBarController);
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Marked views in tab buttons" subtitle:@"A star replaces Home's icon; \"Hide\" / \"Show\" toggles every marked view in one pass" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
+            __weak CYLTabBarController *weakTabBarController = tabBarController;
+            [tabBarController performWhenTabBarItemsReady:^(CYLTabBarController *controller) {
+                UIControl *homeButton = controller.viewControllers.firstObject.cyl_tabButton;
+                [homeButton cyl_replaceTabImageViewWithNewView:CYLGalleryStarView() show:YES];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self showMarkedViewCountOfTabBarController:controller];
+                });
+            }];
+            tabBarController.navigationItem.rightBarButtonItem = CYLGalleryBarButtonItem(@"Hide / Show", ^{
+                CYLTabBarController *controller = weakTabBarController;
+                NSArray<UIView *> *views = CYLGalleryMarkedViews(controller.tabBar);
+                BOOL hides = NO;
+                for (UIView *view in views) {
+                    hides = hides || !view.hidden;
+                }
+                for (UIView *view in views) {
+                    view.hidden = hides;
+                }
+                [self showMarkedViewCountOfTabBarController:controller];
+            });
+            return CYLGalleryEmbed(tabBarController);
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Plus stand-in after an item image changes" subtitle:@"Select the plus tab, then \"Change image\": UIKit rebuilds the buttons and the stand-in moves to the new one (Liquid Glass)" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self plusPageTabBarController];
+            __weak CYLTabBarController *weakTabBarController = tabBarController;
+            __block BOOL usesAlternateImage = NO;
+            tabBarController.navigationItem.rightBarButtonItem = CYLGalleryBarButtonItem(@"Change image", ^{
+                usesAlternateImage = !usesAlternateImage;
+                NSString *name = usesAlternateImage ? @"sun.max" : @"house";
+                UITabBarItem *item = weakTabBarController.viewControllers.firstObject.tabBarItem;
+                item.image = CYLGallerySymbol(name, NO, 20);
+                item.selectedImage = CYLGallerySymbol(name, YES, 20);
+            });
+            return CYLGalleryEmbed(tabBarController);
+        } didPresent:^(UIViewController *presentedViewController) {
+            UINavigationController *navigationController = (UINavigationController *)presentedViewController;
+            UITabBarController *tabBarController = (UITabBarController *)navigationController.viewControllers.firstObject;
+            tabBarController.selectedIndex = 2;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Plus stand-in on first display and rotation" subtitle:@"The plus tab is selected at once; rotate the device: the stand-in follows layout, no fixed delay (Liquid Glass)" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self plusPageTabBarController];
+            tabBarController.selectedIndex = 2;
+            return CYLGalleryEmbed(tabBarController);
+        }],
+        [CYLGalleryScene sceneWithTitle:@"More editing with 8 tabs" subtitle:@"Pushed. More → Edit → drag → Done: the star (a marked view) hides while editing and comes back after" pushingBuilder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:8];
+            tabBarController.title = @"More editing";
+            [tabBarController performWhenTabBarItemsReady:^(CYLTabBarController *controller) {
+                UIControl *homeButton = controller.viewControllers.firstObject.cyl_tabButton;
+                [homeButton cyl_replaceTabImageViewWithNewView:CYLGalleryStarView() show:YES];
+            }];
+            return tabBarController;
+        }],
+    ];
+    return [CYLGallerySection sectionWithTitle:@"Liquid Glass robustness" scenes:scenes];
 }
 
 @end

@@ -35,6 +35,7 @@ flowchart LR
 | [插入视图的统一标记](#插入视图的统一标记--one-mark-for-inserted-views) | [One mark for inserted views](#插入视图的统一标记--one-mark-for-inserted-views) |
 | [PlusButton 替身随布局安装](#plusbutton-替身随布局安装--the-plus-buttons-stand-in-follows-layout) | [The plus button's stand-in follows layout](#plusbutton-替身随布局安装--the-plus-buttons-stand-in-follows-layout) |
 | [「More」编辑](#more编辑--more-editing) | [More editing](#more编辑--more-editing) |
+| [演示](#演示--demo) | [Demo](#演示--demo) |
 | [限制与验证](#限制与验证--limits-and-verification) | [Limits and verification](#限制与验证--limits-and-verification) |
 
 <!-- navigation:end -->
@@ -69,6 +70,21 @@ flowchart LR
 | 中文 | English |
 |:---|:---|
 | 本库不支持「More」编辑本身（More 页面中的 "Edit"，可以把 item 拖到 TabBar 上）。编辑时 UIKit 会移动并重建 Tab 按钮，插入的视图可能留在过时的位置。现在 `CYLTabBar` 在 `-beginCustomizingItems:` 时一次性隐藏被标记的视图与 PlusButton，在 `-endCustomizingAnimated:` 后恢复它们原来的 `hidden` 值并重新布局；编辑期间（`-beginCustomizingItems:` 到 `-endCustomizingAnimated:` 之间）不安装 PlusButton 替身；结束后立即与下一个 runloop 各请求一次布局，因为 UIKit 结束编辑时可能重建按钮。 | The library does not support More editing as such ("Edit" on the More page, which lets items be dragged onto the tab bar). While editing, UIKit moves and rebuilds the tab buttons, and inserted views could be left at stale positions. Now `CYLTabBar` hides the marked views and the plus button in one pass in `-beginCustomizingItems:`, restores their previous `hidden` values after `-endCustomizingAnimated:` and lays out again; the plus button's stand-in is not installed while editing (between `-beginCustomizingItems:` and `-endCustomizingAnimated:`); a layout is requested right after and again on the next run loop turn, since UIKit can rebuild the buttons as editing ends. |
+
+## 演示 / Demo
+
+| 中文 | English |
+|:---|:---|
+| ObjC Demo：首页 → 「Open the tab bar gallery」→ 最后一组「Liquid Glass robustness」，每一项改进对应一行，点击即可演示。前五行 present 一个 TabBarController，最后一行把 8 个 Tab 的 TabBarController push 进图库的导航控制器。代码见 `Example/Classes/Gallery/CYLGalleryProvider.m` 的 `+liquidGlassRobustnessSection`。 | ObjC demo: Home → "Open the tab bar gallery" → the last section, "Liquid Glass robustness", has one row per improvement; tap a row to see it. The first five rows present a tab bar controller; the last one pushes an 8-tab tab bar controller onto the gallery's navigation controller. The code is `+liquidGlassRobustnessSection` in `Example/Classes/Gallery/CYLGalleryProvider.m`. |
+
+| 行 / Row | 中文 | English |
+|:---|:---|:---|
+| Selected control with bounds checks | 导航栏显示 `cyl_selectedIndex` 与 `cyl_selectedControl` 的类名；点 "Read" 重新读取 | The navigation bar shows `cyl_selectedIndex` and the class of `cyl_selectedControl`; "Read" reads them again |
+| Out-of-range reads return nil | 点 "Read 99"：按下标 99 读取的三个接口都返回 nil，不抛异常 | "Read 99": the three index readers return nil for index 99, no exception |
+| Marked views in tab buttons | Home 的图标被星形视图替换（被标记）；导航栏显示被标记 / 隐藏的数量，"Hide / Show" 一次性切换 | A star replaces Home's icon (marked); the navigation bar shows how many views are marked / hidden, and "Hide / Show" toggles them in one pass |
+| Plus stand-in after an item image changes | 选中拥有自己页面的 PlusButton，点 "Change image"：UIKit 重建按钮，替身移到新按钮中（液态玻璃） | With the plus button's own page selected, "Change image" makes UIKit rebuild the buttons, and the stand-in moves to the new one (Liquid Glass) |
+| Plus stand-in on first display and rotation | 一打开就选中 PlusButton 的页面；旋转设备，替身随布局出现，没有固定延迟（液态玻璃） | The plus page is selected at once; rotate the device and the stand-in follows layout, with no fixed delay (Liquid Glass) |
+| More editing with 8 tabs | push 进入；More → Edit → 拖动 → Done：编辑期间星形视图隐藏，结束后恢复 | Pushed; More → Edit → drag → Done: the star hides while editing and comes back after |
 
 ## 限制与验证 / Limits and verification
 

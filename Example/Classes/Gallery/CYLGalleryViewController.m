@@ -61,6 +61,14 @@ static NSString *const CYLGalleryCellIdentifier = @"CYLGalleryCell";
     CYLGalleryScene *scene = self.sections[(NSUInteger)indexPath.section].scenes[(NSUInteger)indexPath.row];
     UIViewController *viewController = scene.builder();
     CYLGallerySceneDidPresent didPresent = scene.didPresent;
+    if (scene.pushes && self.navigationController) {
+        viewController.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:viewController animated:YES];
+        if (didPresent) {
+            didPresent(viewController);
+        }
+        return;
+    }
     [self presentViewController:viewController animated:YES completion:^{
         if (didPresent) {
             didPresent(viewController);
