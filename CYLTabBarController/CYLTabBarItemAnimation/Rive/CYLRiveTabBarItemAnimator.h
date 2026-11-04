@@ -20,6 +20,7 @@
 #else
 #import "CYLTabBarItemAnimator.h"
 #endif
+#import "CYLRiveTabBarItemAnimationViewing.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,15 +30,28 @@ NS_ASSUME_NONNULL_BEGIN
  *      class is compiled only with the Rive runtime (`CYLTabBarController/Rive`, `<RiveRuntime/RiveRuntime.h>`), registers
  *      itself with `CYLTabBarItemAnimatorRegistry` when it loads, and the tab bar uses it only through
  *      `CYLTabBarItemAnimator`, so Rive works with or without Lottie and PAG.
- *      A tab's artboard, state machine and view model properties are read from its URL's fragment
- *      (`CYLTabBarRiveAnimationURL()`), so one .riv file can hold the icons of several tabs.
+ *      A tab's artboard, state machine and view model properties come from its URL
+ *      (`CYLRiveTabBarItemAnimationConfiguration`), so one .riv file can hold the icons of several tabs. It talks to the
+ *      view only through `CYLRiveTabBarItemAnimationViewProviding` and `CYLRiveTabBarItemAnimationViewing`.
  * [CN] Rive Tab 图标动画，位于 `CYLTabBarItemAnimation` 子库旁的 `Rive` 子库中：".riv" 文件创建一个承载 Rive `RiveUIView` 的视图
  *      （`CYLRiveTabBarItemAnimationView`，即 `RiveSwift/` 中的 Swift 桥接）。本类仅在引入 Rive 运行时（`CYLTabBarController/Rive`，
  *      `<RiveRuntime/RiveRuntime.h>`）时编译；它在加载时向 `CYLTabBarItemAnimatorRegistry` 注册自己，TabBar 只通过 `CYLTabBarItemAnimator` 使用它，
  *      因此无论是否引入 Lottie、PAG，Rive 都能使用。
- *      Tab 的画板、状态机与 view model 属性从其 URL 的 fragment 中读取（`CYLTabBarRiveAnimationURL()`），因此一个 .riv 文件可以包含多个 Tab 的图标。
+ *      Tab 的画板、状态机与 view model 属性来自其 URL（`CYLRiveTabBarItemAnimationConfiguration`），因此一个 .riv 文件可以包含多个 Tab 的图标。
+ *      它只通过 `CYLRiveTabBarItemAnimationViewProviding` 与 `CYLRiveTabBarItemAnimationViewing` 与视图交互。
  */
 @interface CYLRiveTabBarItemAnimator : NSObject <CYLTabBarItemAnimator>
+
+/*!
+ * [EN] Where the Rive views come from (dependency injection). Defaults to the Swift bridge
+ *      `CYLRiveTabBarItemAnimationView`, resolved once and only used when it adopts
+ *      `CYLRiveTabBarItemAnimationViewProviding`. Set another class adopting that protocol to render Rive differently
+ *      (e.g. a test double); nil goes back to the default.
+ * [CN] Rive 视图的来源（依赖注入）。默认为 Swift 桥接 `CYLRiveTabBarItemAnimationView`，只解析一次，且仅在其遵守
+ *      `CYLRiveTabBarItemAnimationViewProviding` 时使用。设置为其他遵守该协议的类，即可用其他方式渲染 Rive（例如测试替身）；设为 nil 恢复默认。
+ */
+@property (class, nonatomic, null_resettable) Class<CYLRiveTabBarItemAnimationViewProviding> viewProvider;
+
 @end
 
 NS_ASSUME_NONNULL_END

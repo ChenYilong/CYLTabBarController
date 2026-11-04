@@ -17,95 +17,38 @@
 #else
 #import "CYLTabBarItemAnimatorRegistry.h"
 #endif
-// [EN] Core's keys and options (`CYLTabBarRive…`, `CYLTabBarAnimation…`).
-// [CN] Core 的 key 与选项。
+// [EN] Core's keys (`CYLTabBarRive…`, `CYLTabBarAnimation…`). [CN] Core 的 key。
 #if __has_include("../../CYLTabBarController.h")
 #import "../../CYLTabBarController.h"
 #else
 #import "CYLTabBarController.h"
 #endif
 
-/// [EN] The runtime name of the Swift bridge (`RiveSwift/CYLRiveTabBarItemAnimationView.swift`).
-/// [CN] Swift 桥接类的运行时名称（`RiveSwift/CYLRiveTabBarItemAnimationView.swift`）。
-static NSString *const CYLRiveTabBarItemAnimationViewClassName = @"CYLRiveTabBarItemAnimationView";
-
 /*!
- * [EN] What this file calls on the Swift bridge. It is resolved at runtime (`NSClassFromString`, `respondsToSelector:`), so
- *      this file needs no generated Swift header and builds the same with CocoaPods, SPM and Carthage.
- * [CN] 本文件调用 Swift 桥接的方法。运行时解析（`NSClassFromString`、`respondsToSelector:`），因此本文件不需要生成的 Swift 头文件，
- *      在 CocoaPods、SPM、Carthage 下编译方式相同。
+ * [EN] The composition root: the one place that names the default view provider, the Swift bridge in RiveSwift/
+ *      (Swift has no `+load`, so it cannot register itself). It is used only when it adopts
+ *      `CYLRiveTabBarItemAnimationViewProviding`; everything else talks to the protocols.
+ * [CN] 装配点：唯一指定默认视图 provider 的地方，即 RiveSwift/ 中的 Swift 桥接（Swift 没有 `+load`，无法自行注册）。仅在它遵守
+ *      `CYLRiveTabBarItemAnimationViewProviding` 时使用；其他代码都只与协议交互。
  */
-@protocol CYLRiveTabBarItemAnimationViewControlling <NSObject>
-- (instancetype)initWithFileURL:(NSURL *)fileURL
-                   artboardName:(nullable NSString *)artboardName
-               stateMachineName:(nullable NSString *)stateMachineName
-             activePropertyPath:(NSString *)activePropertyPath
-                 activeDuration:(NSTimeInterval)activeDuration
-            triggerPropertyPath:(nullable NSString *)triggerPropertyPath
-                     lightColor:(nullable UIColor *)lightColor
-                    contentMode:(UIViewContentMode)contentMode;
-- (void)cyl_play;
-- (void)cyl_showLastFrame;
-- (void)cyl_stop;
-/// [EN] Color property path -> color; nil restores the colors the view had before. [CN] 颜色属性路径 -> 颜色；nil 恢复原来的颜色。
-- (void)cyl_applyColors:(nullable NSDictionary<NSString *, UIColor *> *)colors;
-@end
+static NSString *const CYLRiveDefaultViewProviderClassName = @"CYLRiveTabBarItemAnimationView";
 
-/// [EN] The default path of the view model boolean that plays an icon (rive_animated_icon's icons use it).
-/// [CN] 播放图标的 view model 布尔属性的默认路径（rive_animated_icon 的图标使用它）。
-static NSString *const CYLRiveDefaultActivePropertyPath = @"active";
-/// [EN] Seconds the boolean stays YES (as rive_animated_icon does on a tap). [CN] 布尔属性保持 YES 的秒数（与 rive_animated_icon 点击时相同）。
-static const NSTimeInterval CYLRiveDefaultActiveDuration = 1;
-
-/// [EN] The options in `URL`'s fragment ("name=value&…", percent-encoded). [CN] `URL` 的 fragment 中的选项（「名称=值&…」，百分号编码）。
-static NSDictionary<NSString *, NSString *> *CYLRiveOptionsFromURL(NSURL *URL) {
-    NSString *fragment = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:YES].percentEncodedFragment;
-    if (fragment.length == 0) {
-        return @{};
-    }
-    NSMutableDictionary<NSString *, NSString *> *options = [NSMutableDictionary dictionary];
-    for (NSString *item in [fragment componentsSeparatedByString:@"&"]) {
-        NSRange separator = [item rangeOfString:@"="];
-        if (separator.location == NSNotFound || separator.location == 0) {
-            continue;
+static Class<CYLRiveTabBarItemAnimationViewProviding> CYLRiveDefaultViewProvider(void) {
+    static Class<CYLRiveTabBarItemAnimationViewProviding> provider;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        Class candidate = NSClassFromString(CYLRiveDefaultViewProviderClassName);
+        if ([candidate conformsToProtocol:@protocol(CYLRiveTabBarItemAnimationViewProviding)]) {
+            provider = candidate;
         }
-        NSString *name = [[item substringToIndex:separator.location] stringByRemovingPercentEncoding];
-        NSString *value = [[item substringFromIndex:NSMaxRange(separator)] stringByRemovingPercentEncoding];
-        if (name.length > 0 && value.length > 0) {
-            options[name] = value;
-        }
-    }
-    return [options copy];
+    });
+    return provider;
 }
 
-/// [EN] `URL` without its fragment: the .riv file itself. [CN] 去掉 fragment 的 `URL`，即 .riv 文件本身。
-static NSURL *CYLRiveFileURLFromURL(NSURL *URL) {
-    NSURLComponents *components = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:YES];
-    components.fragment = nil;
-    return components.URL ?: URL;
-}
+/// [EN] The injected provider; nil means the default. [CN] 注入的 provider；nil 表示使用默认值。
+static Class<CYLRiveTabBarItemAnimationViewProviding> CYLRiveInjectedViewProvider;
 
-/// [EN] "#RRGGBB" or "#RRGGBBAA" (the "#" is optional), else nil. [CN] "#RRGGBB" 或 "#RRGGBBAA"（"#" 可省略），否则返回 nil。
-static UIColor *CYLRiveColorFromHexString(NSString *string) {
-    NSString *hex = [string hasPrefix:@"#"] ? [string substringFromIndex:1] : string;
-    if (hex.length != 6 && hex.length != 8) {
-        return nil;
-    }
-    NSCharacterSet *notHex = [[NSCharacterSet characterSetWithCharactersInString:@"0123456789abcdefABCDEF"] invertedSet];
-    if ([hex rangeOfCharacterFromSet:notHex].location != NSNotFound) {
-        return nil;
-    }
-    unsigned long long value = strtoull(hex.UTF8String, NULL, 16);
-    if (hex.length == 6) {
-        value = (value << 8) | 0xFF;
-    }
-    return [UIColor colorWithRed:((value >> 24) & 0xFF) / 255.0
-                           green:((value >> 16) & 0xFF) / 255.0
-                            blue:((value >> 8) & 0xFF) / 255.0
-                           alpha:(value & 0xFF) / 255.0];
-}
-
-/// [EN] Plays a `CYLRiveTabBarItemAnimationView`. [CN] 播放 `CYLRiveTabBarItemAnimationView`。
+/// [EN] Plays any view adopting `CYLRiveTabBarItemAnimationViewing`. [CN] 播放任意遵守 `CYLRiveTabBarItemAnimationViewing` 的视图。
 @interface CYLRiveTabBarItemAnimationPlayer : CYLTabBarItemAnimationBasePlayer <CYLTabBarItemAnimationPlayer>
 @end
 
@@ -114,34 +57,25 @@ static UIColor *CYLRiveColorFromHexString(NSString *string) {
     BOOL _darkColorsApplied;
 }
 
-+ (BOOL)isRiveView:(UIView *)view {
-    Class viewClass = NSClassFromString(CYLRiveTabBarItemAnimationViewClassName);
-    return viewClass && [view isKindOfClass:viewClass];
++ (BOOL)canPlayView:(UIView *)view {
+    return [view conformsToProtocol:@protocol(CYLRiveTabBarItemAnimationViewing)];
 }
 
-- (id<CYLRiveTabBarItemAnimationViewControlling>)riveView {
-    return (id<CYLRiveTabBarItemAnimationViewControlling>)self.animationView;
+- (id<CYLRiveTabBarItemAnimationViewing>)riveView {
+    UIView *view = self.animationView;
+    return [[self class] canPlayView:view] ? (id<CYLRiveTabBarItemAnimationViewing>)view : nil;
 }
 
 - (void)play {
-    id<CYLRiveTabBarItemAnimationViewControlling> riveView = self.riveView;
-    if ([riveView respondsToSelector:@selector(cyl_play)]) {
-        [riveView cyl_play];
-    }
+    [self.riveView cyl_play];
 }
 
 - (void)showLastFrame {
-    id<CYLRiveTabBarItemAnimationViewControlling> riveView = self.riveView;
-    if ([riveView respondsToSelector:@selector(cyl_showLastFrame)]) {
-        [riveView cyl_showLastFrame];
-    }
+    [self.riveView cyl_showLastFrame];
 }
 
 - (void)stop {
-    id<CYLRiveTabBarItemAnimationViewControlling> riveView = self.riveView;
-    if ([riveView respondsToSelector:@selector(cyl_stop)]) {
-        [riveView cyl_stop];
-    }
+    [self.riveView cyl_stop];
 }
 
 /*!
@@ -151,8 +85,8 @@ static UIColor *CYLRiveColorFromHexString(NSString *string) {
  *      状态未变化时不做处理。
  */
 - (void)applyDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors traitCollection:(UITraitCollection *)traitCollection {
-    id<CYLRiveTabBarItemAnimationViewControlling> riveView = self.riveView;
-    if (!riveView || darkColors.count == 0 || ![riveView respondsToSelector:@selector(cyl_applyColors:)]) {
+    id<CYLRiveTabBarItemAnimationViewing> riveView = self.riveView;
+    if (!riveView || darkColors.count == 0) {
         return;
     }
     BOOL dark = NO;
@@ -191,6 +125,14 @@ static UIColor *CYLRiveColorFromHexString(NSString *string) {
     [CYLTabBarItemAnimatorRegistry registerAnimator:[[self alloc] init]];
 }
 
++ (Class<CYLRiveTabBarItemAnimationViewProviding>)viewProvider {
+    return CYLRiveInjectedViewProvider ?: CYLRiveDefaultViewProvider();
+}
+
++ (void)setViewProvider:(Class<CYLRiveTabBarItemAnimationViewProviding>)viewProvider {
+    CYLRiveInjectedViewProvider = [viewProvider conformsToProtocol:@protocol(CYLRiveTabBarItemAnimationViewProviding)] ? viewProvider : nil;
+}
+
 - (NSString *)identifier {
     return @"Rive";
 }
@@ -212,43 +154,24 @@ static UIColor *CYLRiveColorFromHexString(NSString *string) {
 }
 
 - (BOOL)canAnimateFileAtURL:(NSURL *)URL {
-    // [EN] `pathExtension` leaves out the fragment (the artboard and state machine options).
-    // [CN] `pathExtension` 不包含 fragment（画板与状态机选项）。
+    // [EN] `pathExtension` leaves out the fragment (the options). [CN] `pathExtension` 不包含 fragment（选项）。
     return [URL.pathExtension.lowercaseString isEqualToString:@"riv"];
 }
 
 - (UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
-    Class viewClass = NSClassFromString(CYLRiveTabBarItemAnimationViewClassName);
-    SEL initializer = @selector(initWithFileURL:artboardName:stateMachineName:activePropertyPath:activeDuration:triggerPropertyPath:lightColor:contentMode:);
-    if (!URL || ![viewClass isSubclassOfClass:[UIView class]] || ![viewClass instancesRespondToSelector:initializer]) {
+    CYLRiveTabBarItemAnimationConfiguration *configuration =
+        [CYLRiveTabBarItemAnimationConfiguration configurationWithAnimationURL:URL contentMode:contentMode];
+    Class<CYLRiveTabBarItemAnimationViewProviding> provider = [[self class] viewProvider];
+    if (!configuration || !provider) {
         return nil;
     }
-    NSDictionary<NSString *, NSString *> *options = CYLRiveOptionsFromURL(URL);
-    NSString *activePropertyPath = options[CYLTabBarRiveOptionActiveProperty] ?: CYLRiveDefaultActivePropertyPath;
-    NSString *durationString = options[CYLTabBarRiveOptionActiveDuration];
-    NSTimeInterval activeDuration = durationString.length > 0 ? durationString.doubleValue : CYLRiveDefaultActiveDuration;
-    // [EN] Zero, negative or not a number: the default. [CN] 为 0、负数或不是数字时使用默认值。
-    if (!(activeDuration > 0)) {
-        activeDuration = CYLRiveDefaultActiveDuration;
-    }
-    NSString *colorString = options[CYLTabBarRiveOptionColor];
-    UIColor *lightColor = colorString.length > 0 ? CYLRiveColorFromHexString(colorString) : nil;
-    id<CYLRiveTabBarItemAnimationViewControlling> riveView = [(id<CYLRiveTabBarItemAnimationViewControlling>)[viewClass alloc]
-                                                               initWithFileURL:CYLRiveFileURLFromURL(URL)
-                                                                  artboardName:options[CYLTabBarRiveOptionArtboard]
-                                                              stateMachineName:options[CYLTabBarRiveOptionStateMachine]
-                                                            activePropertyPath:activePropertyPath
-                                                                activeDuration:activeDuration
-                                                           triggerPropertyPath:options[CYLTabBarRiveOptionTriggerProperty]
-                                                                    lightColor:lightColor
-                                                                   contentMode:contentMode];
-    UIView *view = [riveView isKindOfClass:[UIView class]] ? (UIView *)riveView : nil;
+    UIView<CYLRiveTabBarItemAnimationViewing> *view = [provider cyl_animationViewWithConfiguration:configuration];
     view.frame = CGRectMake(0, 0, size.width, size.height);
     return view;
 }
 
 - (id<CYLTabBarItemAnimationPlayer>)playerForAnimationView:(UIView *)view {
-    return [CYLRiveTabBarItemAnimationPlayer isRiveView:view] ? [[CYLRiveTabBarItemAnimationPlayer alloc] initWithAnimationView:view] : nil;
+    return [CYLRiveTabBarItemAnimationPlayer canPlayView:view] ? [[CYLRiveTabBarItemAnimationPlayer alloc] initWithAnimationView:view] : nil;
 }
 
 @end

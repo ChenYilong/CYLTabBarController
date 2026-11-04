@@ -154,13 +154,15 @@ Pod::Spec.new do |s|
   # Tabs then take `CYLTabBarRiveURL` / `CYLTabBarRiveFilePath` (".riv" files) like the Lottie and PAG keys;
   # `CYLTabBarRiveAnimationURL()` picks an artboard and a state machine, so one .riv file can hold every tab's icon.
   # RiveRuntime is a binary pod (RiveRuntime.xcframework) with a Swift API: `CYLRiveTabBarItemAnimator`
-  # (CYLTabBarItemAnimation/Rive/) registers itself and talks to the Swift bridge `CYLRiveTabBarItemAnimationView`
-  # (RiveSwift/) at runtime, with or without Lottie and PAG. 6.29 is the first version whose current API
+  # (CYLTabBarItemAnimation/Rive/) registers itself and gets its views only through the protocols
+  # `CYLRiveTabBarItemAnimationViewProviding` / `CYLRiveTabBarItemAnimationViewing`, which the Swift bridge
+  # `CYLRiveTabBarItemAnimationView` (RiveSwift/) adopts, with or without Lottie and PAG. 6.29 is the first version whose current API
   # (`Worker`, `File`, `Rive`, `RiveUIView`) has replaced the deprecated `RiveViewModel`.
   # Rive 动画（`RiveRuntime`），用法与 Lottie、PAG 相同：`pod 'CYLTabBarController/Rive'`。Tab 使用 `CYLTabBarRiveURL` /
   # `CYLTabBarRiveFilePath`（".riv" 文件），与 Lottie、PAG key 一致；`CYLTabBarRiveAnimationURL()` 可以指定画板与状态机，因此一个 .riv 文件
   # 即可包含所有 Tab 的图标。RiveRuntime 为二进制 pod（RiveRuntime.xcframework），提供 Swift API：`CYLRiveTabBarItemAnimator`
-  # （CYLTabBarItemAnimation/Rive/）自行注册，并在运行时调用 Swift 桥接 `CYLRiveTabBarItemAnimationView`（RiveSwift/），无论是否引入 Lottie、PAG。
+  # （CYLTabBarItemAnimation/Rive/）自行注册，只通过协议 `CYLRiveTabBarItemAnimationViewProviding` / `CYLRiveTabBarItemAnimationViewing` 获取视图，
+  # 由 Swift 桥接 `CYLRiveTabBarItemAnimationView`（RiveSwift/）遵守这些协议，无论是否引入 Lottie、PAG。
   # 6.29 起，Rive 当前的 API（`Worker`、`File`、`Rive`、`RiveUIView`）取代了已废弃的 `RiveViewModel`。
   s.subspec 'Rive' do |rive|
     rive.dependency 'CYLTabBarController/Core'
@@ -168,7 +170,12 @@ Pod::Spec.new do |s|
     # The Rive animator, registered with CYLTabBarItemAnimatorRegistry, and its Swift bridge.
     # Rive 的 animator（向注册表注册）及其 Swift 桥接。
     rive.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.{h,m}', 'CYLTabBarController/RiveSwift/*.swift'
-    rive.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.h'
+    # Public: the interfaces between the animator and the view (`CYLRiveTabBarItemAnimationViewing`,
+    # `CYLRiveTabBarItemAnimationViewProviding`), the configuration, and the animator's `viewProvider`. The Swift bridge
+    # adopts these protocols, so they must be in the module's umbrella header.
+    # 公开：animator 与视图之间的接口（`CYLRiveTabBarItemAnimationViewing`、`CYLRiveTabBarItemAnimationViewProviding`）、配置对象，以及
+    # animator 的 `viewProvider`。Swift 桥接遵守这些协议，因此它们必须在模块的 umbrella 头文件中。
+    rive.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.h'
     rive.dependency 'RiveRuntime', '~> 6.29'
     # RiveRuntime requires iOS 14. RiveRuntime 要求 iOS 14。
     rive.ios.deployment_target = '14.0'
