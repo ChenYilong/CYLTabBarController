@@ -244,6 +244,9 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     if (moved) {
         [self cyl_setNeedsTitleAlignment];
         [self cyl_moveSelectedContentViewWithPlusButton];
+    }    // Issue #91: the touchable area overlay follows the plus button. 可点击区域的调试视图跟随 PlusButton。
+    if (_showsTouchableArea) {
+        [self cyl_updateTouchableAreaView];
     }
 }
 
@@ -257,6 +260,8 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
         if (!CGPointEqualToPoint(center, self.center)) {
             [super setCenter:center];
         }
+    }    if (_showsTouchableArea) {
+        [self cyl_updateTouchableAreaView];
     }
 }
 
@@ -1166,20 +1171,6 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     [super removeFromSuperview];
 }
 
-- (void)setFrame:(CGRect)frame {
-    [super setFrame:frame];
-    if (_showsTouchableArea) {
-        [self cyl_updateTouchableAreaView];
-    }
-}
-
-- (void)setCenter:(CGPoint)center {
-    [super setCenter:center];
-    if (_showsTouchableArea) {
-        [self cyl_updateTouchableAreaView];
-    }
-}
-
 - (void)setHidden:(BOOL)hidden {
     [super setHidden:hidden];
     if (_showsTouchableArea) {
@@ -1257,6 +1248,68 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     }
     _selectedContentView = selectedContentView;
     return _selectedContentView;
+}
+
+- (NSString *)cyl_title {
+    NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
+    return movedTitle.length > 0 ? movedTitle : (self.currentTitle.length > 0 ? self.currentTitle : nil);
+}
+
+- (void)cyl_updateTitle:(NSString *)title image:(UIImage *)image selectedImage:(UIImage *)selectedImage {
+    if (title) {
+        if (objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey)) {
+            // [EN] Shown by the tab item under the plus button (#636): its title changes, the layout follows (#729).
+            // [CN] 由 PlusButton 下方的 TabBarItem 显示（#636）：修改其标题，布局随之更新（#729）。
+            objc_setAssociatedObject(self, CYLPlusButtonMovedTitleKey, title, OBJC_ASSOCIATION_COPY_NONATOMIC);
+            [self cyl_updateTitleInTabBarItem];
+        } else {
+            BOOL hasSelectedTitle = [self titleForState:UIControlStateSelected] != nil;
+            [self setTitle:title forState:UIControlStateNormal];
+            if (hasSelectedTitle) {
+                [self setTitle:title forState:UIControlStateSelected];
+            }
+            if (@available(iOS 15.0, *)) {
+                UIButtonConfiguration *configuration = self.configuration;
+                if (configuration) {
+                    configuration.title = title;
+                    self.configuration = configuration;
+                }
+            }
+            // [EN] A longer title widens the plus button, around the same center. [CN] 标题变长时加宽 PlusButton，中心不变。
+            CGSize fittingSize = [self sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.bounds))];
+            if (fittingSize.width > CGRectGetWidth(self.bounds)) {
+                CGPoint center = self.center;
+                self.bounds = (CGRect){CGPointZero, CGSizeMake(fittingSize.width, CGRectGetHeight(self.bounds))};
+                self.center = center;
+            }
+        }
+    }
+    UIButton *selectedContentView = (_selectedContentView != self) ? _selectedContentView : nil;
+    for (UIButton *button in @[ self, selectedContentView ?: (id)[NSNull null] ]) {
+        if (![button isKindOfClass:[UIButton class]]) {
+            continue;
+        }
+        if (image) {
+            [button setImage:image forState:UIControlStateNormal];
+            // [EN] The stand-in is shown highlighted, with the selected look. [CN] 替身以高亮状态显示选中样式。
+            [button setImage:(button == self ? image : (selectedImage ?: image)) forState:UIControlStateHighlighted];
+        }
+        if (selectedImage) {
+            [button setImage:selectedImage forState:UIControlStateSelected];
+            if (button != self) {
+                [button setImage:selectedImage forState:UIControlStateHighlighted];
+            }
+        }
+    }
+    if (image) {
+        self.contentImage = image;
+    }
+    if (selectedImage) {
+        self.selectedContentImage = selectedImage;
+    }
+    [self cyl_setNeedsTitleAlignment];
+    [self setNeedsLayout];
+    [self.superview setNeedsLayout];
 }
 
 - (void)setTabLabelHidden:(BOOL)hidden {

@@ -139,6 +139,18 @@ FOUNDATION_EXTERN NSString * _Nullable CYLBadgeAccessibilityDescription(NSString
 - (void)cyl_refreshBadge;
 
 /*!
+ * FIX: issue #601
+ * [EN] YES while this view, the icon of a tab, is hidden because a view is shown in its place
+ *      (`-[CYLTabBarController setTabBarItemIconViewProvider:atIndex:]`). Its badge then stays visible on a transparent
+ *      overlay above it (`CYLBadgeHostOverlayView`), and this view still takes new badges. Set by CYLTabBarController;
+ *      call `-cyl_refreshBadge` after changing it.
+ * [CN] 当前视图（Tab 的图标）因被其他视图替换显示而隐藏时为 YES（`-[CYLTabBarController setTabBarItemIconViewProvider:atIndex:]`）。
+ *      其角标此时显示在它上方的透明浮层上（`CYLBadgeHostOverlayView`），它仍承载新的角标。由 CYLTabBarController 设置；修改后请调用
+ *      `-cyl_refreshBadge`。
+ */
+@property (nonatomic, assign, getter=cyl_isBadgeHostReplacedByIconView, setter=cyl_setBadgeHostReplacedByIconView:) BOOL cyl_badgeHostReplacedByIconView;
+
+/*!
  * FIX: issue #425
  * [EN] Removes the badge font, colors, center offset, radius, margin, corner radius, maximum number and border set on
  *      this view, so they follow `[CYLBadgeAppearance globalAppearance]` again, and applies the colors, font and border

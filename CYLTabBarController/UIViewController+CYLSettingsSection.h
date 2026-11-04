@@ -16,13 +16,16 @@ NS_ASSUME_NONNULL_BEGIN
  *      row 3 switches `tabBar.standardAppearance` themes, shared by Liquid Glass and FlatDesign,
  *      row 4 toggles the cached login state (`cyl_loggedIn`) and names the tabs that need login (issue #19),
  *      row 5 shows the plus button's touchable area and scales it with a slider (issue #91),
- *      row 6 selects the next tab by its index without the plus button (`cyl_selectedIndexIgnoringPlusButton`, issue #515).
+ *      row 6 selects the next tab by its index without the plus button (`cyl_selectedIndexIgnoringPlusButton`, issue #515),
+ *      then the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon,
+ *      all network icons, all local icons, GIF icon, all titles, replace neighboring tabs.
  * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
  *      （`-cyl_memoryWarningCellForTableView:`），第 2 行切换所有 Tab 的标题偏移（`CYLTabBarController.titlePositionAdjustment`，
  *      issue #475），第 3 行切换 `tabBar.standardAppearance` 主题（液态玻璃与扁平样式共用），
  *      第 4 行切换缓存的登录状态（`cyl_loggedIn`），并列出需要登录的 Tab（issue #19），
  *      第 5 行显示 PlusButton 的可点击区域，并用滑块按倍数扩大（issue #91），
- *      第 6 行按不含 PlusButton 的下标选中下一个 Tab（`cyl_selectedIndexIgnoringPlusButton`，issue #515）。
+ *      第 6 行按不含 PlusButton 的下标选中下一个 Tab（`cyl_selectedIndexIgnoringPlusButton`，issue #515），之后是原地更新 Tab 的若干行
+ *      （`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、所有网络图标、所有本地图标、GIF 图标、所有标题、替换相邻 Tab 的页面。
  */
 FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 
@@ -50,8 +53,9 @@ FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 - (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath;
 
 /*!
- * [EN] Deselects the row and runs it: the language picker, the memory warning check, the next title offset, the next appearance theme or the login state.
- * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题或登录状态。
+ * [EN] Deselects the row and runs it: the language picker, the memory warning check, the next title offset, the next
+ *      appearance theme, the login state or the tab item update.
+ * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题、登录状态或更新 Tab。
  */
 - (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
 
