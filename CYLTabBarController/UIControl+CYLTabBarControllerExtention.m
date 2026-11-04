@@ -227,17 +227,15 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     return viewControllers[index].cyl_tabBarItemIdentifier;
 }
 
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (BOOL)cyl_isLottieReady {
-    // FIX: issue #604 — any animation library, through the `CYLTabBarItemAnimation` subspec when it is in the build.
-    // 任意动画库：构建中包含 `CYLTabBarItemAnimation` 子库时由它处理。
-    if (CYLTabBarItemAnimationIsAvailable()) {
-        return [self cyl_isTabBarItemAnimationReady];
-    }
-    if (self.cyl_tabBarController.lottieURLs.count > 0) {
-        return self.cyl_tabBarController.lottieViewAdded;
-    }
-    return NO;
+    return [self cyl_isTabBarItemAnimationReady];
 }
+
+#pragma clang diagnostic pop
 
 - (BOOL)cyl_isSelected {
     NSUInteger tabBarSelectedIndex = self.cyl_tabBarController.selectedIndex;
@@ -254,14 +252,15 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     return [CYLPlusButton isPlusButtonView:self] || [self cyl_isChildViewControllerPlusButton];
 }
 
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (nullable UIView *)cyl_lottieAnimationView {
-    // FIX: issue #604 — the animation view of any library; nil without the `CYLTabBarItemAnimation` subspec.
-    // 任意动画库的动画视图；构建中没有 `CYLTabBarItemAnimation` 子库时为 nil。
-    if (!CYLTabBarItemAnimationIsAvailable()) {
-        return nil;
-    }
     return [self cyl_tabBarItemAnimationView];
 }
+
+#pragma clang diagnostic pop
 
 #define cyl_replaceTabImageViewWithNewViewcyl_isReadydelaySeconds 0
 - (void)cyl_replaceTabImageViewWithNewView:(UIView *)newView
@@ -479,6 +478,10 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
 // [CN] 动画代码位于 `CYLTabBarItemAnimation` 子库中，只有引入 Lottie 或 PAG 子库时才会包含它。这些公开方法在构建中包含该子库时交给它处理，
 //      否则不做处理，与原来未引入 Lottie 时的 Lottie 方法一致。
 
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)cyl_addLottieImageWithLottieURL:(nullable NSURL *)lottieURL
                                    size:(CGSize)size
                             contentMode:(UIViewContentMode)contentMode {
@@ -530,6 +533,8 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
         [self cyl_stopTabBarItemAnimation];
     }
 }
+
+#pragma clang diagnostic pop
 
 #pragma mark - private method
 

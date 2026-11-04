@@ -94,7 +94,7 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
     // animation view to stop (#488). 仅在引入动画库时监听（#604，运行时判断，以支持任意动画库）：没有时没有需要停止的动画（#488）。
     if (CYLTabBarItemAnimationIsAvailable()) {
         __weak __typeof(self) weakSelf = self;
-        void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
+        void (^CYLTabBarItemAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
             __strong typeof(self) self = weakSelf;
             if (!self) {
                  return;
@@ -111,7 +111,7 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
         self.cyl_lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemAnimationPlayingNotification
                                                                                                     object:nil
                                                                                                      queue:[NSOperationQueue mainQueue]
-                                                                                                usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
+                                                                                                usingBlock:CYLTabBarItemAnimationPlayingNotificationBlock];
     }
     [self cyl_keepStackedItemLayoutOnHingedDevice];
     return self;

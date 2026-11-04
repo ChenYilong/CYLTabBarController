@@ -112,7 +112,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  */
 - (void)observeLottieAnimationViewDidAdd {
     __weak __typeof(self) weakSelf = self;
-    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationViewDidAddNotification
+    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemAnimationViewDidAddNotification
                                                       object:nil
                                                        queue:[NSOperationQueue mainQueue]
                                                   usingBlock:^(NSNotification * _Nonnull note) {
@@ -121,7 +121,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
             return;
         }
         NSLog(@"🟢 Lottie view added: tab %@, animationSpeed %@", @(tabButton.cyl_tabBarChildViewControllerIndex),
-              [(id)tabButton.cyl_lottieAnimationView valueForKey:@"animationSpeed"]);
+              [(id)tabButton.cyl_tabBarItemAnimationView valueForKey:@"animationSpeed"]);
     }];
 }
 
@@ -943,7 +943,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     return ![rootViewController isKindOfClass:[CYLHomeViewController class]];
 }
 
-- (UIViewContentMode)lottieAnimationViewContentMode {
+- (UIViewContentMode)tabBarItemAnimationViewContentMode {
     return UIViewContentModeScaleAspectFit;
 }
 

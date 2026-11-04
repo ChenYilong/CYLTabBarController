@@ -45,8 +45,8 @@ id<CYLTabBarItemAnimationService> CYLTabBarItemAnimationGetService(void) {
 
 - (BOOL)isAnimationView:(UIView *)animationView readyInControl:(UIControl *)control {
     CYLTabBarController *tabBarController = control.cyl_tabBarController;
-    if (tabBarController.lottieURLs.count > 0) {
-        return tabBarController.lottieViewAdded;
+    if (tabBarController.tabBarItemAnimationURLs.count > 0) {
+        return tabBarController.isTabBarItemAnimationViewAdded;
     }
     return animationView ? animationView.frame.size.width > 10 : NO;
 }
@@ -284,7 +284,14 @@ id CYLTabBarItemAttributesAnimationValue(NSDictionary *attributes, NSString *gen
 }
 
 - (BOOL)cyl_isTabBarItemAnimationReady {
-    return [CYLTabBarItemAnimationGetService() isAnimationReadyInControl:self];
+    id<CYLTabBarItemAnimationService> service = CYLTabBarItemAnimationGetService();
+    if (service) {
+        return [service isAnimationReadyInControl:self];
+    }
+    // [EN] Without an animation subspec: whether the tab bar has added its animation views, as before.
+    // [CN] 没有动画子库时：与原来一样，取决于 TabBar 是否已添加动画视图。
+    CYLTabBarController *tabBarController = self.cyl_tabBarController;
+    return tabBarController.tabBarItemAnimationURLs.count > 0 && tabBarController.isTabBarItemAnimationViewAdded;
 }
 
 - (void)cyl_addTabBarItemAnimationWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {

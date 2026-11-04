@@ -153,7 +153,7 @@
     //只有在TabBar选中状态下才能取到SwappableImageView
     UIControl *tabButton = self;
     UIImageView *tabImageView = [tabButton cyl_tabImageView];
-    UIView *lottieAnimationView = (UIView *)tabButton.cyl_lottieAnimationView;
+    UIView *lottieAnimationView = tabButton.cyl_tabBarItemAnimationView;
     
     UIView *actualBadgeSuperView = nil;
     
@@ -324,8 +324,8 @@
     }
     BOOL isTabImageViewReady = self.cyl_tabImageView.frame.size.width > 10 || self.cyl_tabLabel.frame.size.width > 10;
     BOOL isLottieReady = YES;
-    if (self.cyl_tabBarController.lottieURLs.count > 0) {
-        isLottieReady = self.cyl_isLottieReady;
+    if (self.cyl_tabBarController.tabBarItemAnimationURLs.count > 0) {
+        isLottieReady = self.cyl_isTabBarItemAnimationReady;
     }
     return isTabImageViewReady && isLottieReady;
 }

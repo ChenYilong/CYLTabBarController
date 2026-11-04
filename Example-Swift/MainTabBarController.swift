@@ -86,7 +86,7 @@ class MainTabBarController: CYLTabBarController {
     }
     
     override func viewDidLoad() {
-        lottieAnimationSpeed = 1.5 // Issue #428: Lottie tab icons at 1.5x (no effect without Lottie) Lottie 图标 1.5 倍速
+        tabBarItemAnimationSpeed = 1.5 // Issue #428: tab icon animations at 1.5x (no effect without an animation subspec) Tab 图标动画 1.5 倍速
         // [CN] * @attention 请在父类的 ViewDidLoad 调用之前设置CYLTabBarStyleType。也就是在 `-[super viewDidLoad];` 之前调用。因为 需要在 tabBar 的KVC操作之前确定自定义样式，否则， 就会执行默认逻辑， 可能会导致你的自定义样式失效。
         // [EN] * @attention Set CYLTabBarStyleType before the superclass's ViewDidLoad is called, i.e. before
         //      `-[super viewDidLoad];`. The custom style must be determined before the tabBar's KVC operations; otherwise
@@ -113,7 +113,7 @@ class MainTabBarController: CYLTabBarController {
         _ = NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] note in
             guard let tabButton = note.object as? UIControl, tabButton.cyl_tabBarController === self else { return }
             if tabButton.cyl_tabBarChildViewControllerIndex == 0 {
-                tabButton.cyl_setLottieAnimationSpeed(2.0)
+                tabButton.cyl_setTabBarItemAnimationSpeed(2.0)
             }
         }
     }

@@ -79,7 +79,7 @@
         // [EN] Observe only with an animation library (#604, checked at runtime so that any library works).
         if (CYLTabBarItemAnimationIsAvailable()) {
             __weak __typeof(self) weakSelf = self;
-            void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
+            void (^CYLTabBarItemAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
                 __strong typeof(self) self = weakSelf;
                 if (!self) {
                      return;
@@ -91,7 +91,7 @@
             _lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemAnimationPlayingNotification
                                                                                                 object:nil
                                                                                                  queue:[NSOperationQueue mainQueue]
-                                                                                            usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
+                                                                                            usingBlock:CYLTabBarItemAnimationPlayingNotificationBlock];
         }
     }
     return self;

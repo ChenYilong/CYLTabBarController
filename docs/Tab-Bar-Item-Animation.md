@@ -34,6 +34,7 @@
 | [注册与选择动画库](#cn注册与选择动画库) | [Registering and choosing a library](#enregistering-and-choosing-a-library) |
 | [两层依赖反转](#cn两层依赖反转) | [Dependency inversion on two levels](#endependency-inversion-on-two-levels) |
 | [协议与类](#cn协议与类) | [Protocols and classes](#enprotocols-and-classes) |
+| [已废弃的 Lottie 名称](#cn已废弃的-lottie-名称) | [Deprecated Lottie names](#endeprecated-lottie-names) |
 | [依赖注入](#cn依赖注入) | [Dependency injection](#endependency-injection) |
 | [新增一个动画库](#cn新增一个动画库) | [Adding an animation library](#enadding-an-animation-library) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [方式 A：可播放视图（Rive 的完整实现）](#cn方式-a可播放视图rive-的完整实现) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Way A: a playable view (Rive's complete integration)](#enway-a-a-playable-view-rives-complete-integration) |
@@ -157,6 +158,35 @@ if ([player respondsToSelector:@selector(setAnimationSpeed:)]) {
     player.animationSpeed = 1.5;
 }
 ```
+
+## [CN]已废弃的 Lottie 名称
+## [EN]Deprecated Lottie names
+
+| 中文 | English |
+|:---|:---|
+| 这些名称原本只为 Lottie 设计，现在适用于任意动画库，因此新增了通用名称，旧名称标记为废弃（`DEPRECATED_MSG_ATTRIBUTE`）。旧名称没有删除，仍然可用，并转发给新名称；重写旧方法的子类也仍然有效。库内部与所有示例都已改用新名称，因此不会产生废弃警告；你的工程使用旧名称时会看到废弃警告，按下表替换即可。 | These names were made for Lottie only and now work for any library, so neutral names were added and the old ones are deprecated (`DEPRECATED_MSG_ATTRIBUTE`). Nothing was removed: the old names keep working and forward to the new ones, and a subclass that overrides an old method still works. The library and every example use the new names, so they build without deprecation warnings; a project that uses the old names sees a deprecation warning and can switch with the table below. |
+
+| 已废弃 / Deprecated | 替换为 / Use instead |
+|:---|:---|
+| `-[UIControl cyl_lottieAnimationView]` | `-[UIControl cyl_tabBarItemAnimationView]` |
+| `-[UIControl cyl_isLottieReady]` | `-[UIControl cyl_isTabBarItemAnimationReady]` |
+| `-[UIControl cyl_addLottieImageWithLottieURL:size:contentMode:]`（及 `animationSpeed:`、`…FilePath:` 版本 / and the `animationSpeed:` and `…FilePath:` variants） | `-[UIControl cyl_addTabBarItemAnimationWithURL:size:contentMode:]`（及 `animationSpeed:` 版本 / and the `animationSpeed:` variant） |
+| `-[UIControl cyl_setLottieAnimationSpeed:]` | `-[UIControl cyl_setTabBarItemAnimationSpeed:]` |
+| `-[UIControl cyl_reloadLottieAnimationViewForCurrentStyle]` | `-[UIControl cyl_reloadTabBarItemAnimationViewForCurrentStyle]` |
+| `-[UIControl cyl_animationLottieImageWithLottieURL:size:defaultSelected:contentMode:]` | `-[UIControl cyl_playTabBarItemAnimationWithURL:size:defaultSelected:contentMode:]` |
+| `-[UIControl cyl_stopAnimationOfLottieView]` | `-[UIControl cyl_stopTabBarItemAnimation]` |
+| `CYLTabBarController.lottieAnimationSpeed` | `CYLTabBarController.tabBarItemAnimationSpeed` |
+| `-[CYLTabBarController lottieAnimationViewContentMode]`（可重写 / overridable） | `-[CYLTabBarController tabBarItemAnimationViewContentMode]` |
+| `CYLTabBarController.lottieURLs` / `lottieSizes` / `lottieViewAdded` | `tabBarItemAnimationURLs` / `tabBarItemAnimationSizes` / `tabBarItemAnimationViewAdded` |
+| `UITabBarItem.cyl_lottieURL` / `cyl_lottieSizeValue` | `cyl_tabBarItemAnimationURL` / `cyl_tabBarItemAnimationSizeValue` |
+| `CYLTabBarItemLottieAnimationPlayingNotification` / `…ViewDidAddNotification` | `CYLTabBarItemAnimationPlayingNotification` / `CYLTabBarItemAnimationViewDidAddNotification`（取值相同 / same values） |
+| `+[CYLConstants cyl_getTureLottieSizeValue:fromNormalImage:]` | `+[CYLConstants cyl_tabBarItemAnimationSizeValue:fromNormalImage:]` |
+| `+[CYLConstants isLottieEnabledFromlottieURLs:tabBarItemsAttributes:]` | `+[CYLConstants isTabBarItemAnimationEnabledWithURLs:tabBarItemsAttributes:]` |
+| `+[CYLConstants cyl_registerDarkLottieURL:…]` 等深色模式方法 / and the other Dark Mode methods | Tab item 的 `CYLTabBarAnimationDarkURL`、`CYLTabBarAnimationDarkFilePath`、`CYLTabBarAnimationDarkColors` key / the tab item keys `CYLTabBarAnimationDarkURL`, `CYLTabBarAnimationDarkFilePath`, `CYLTabBarAnimationDarkColors` |
+
+| 中文 | English |
+|:---|:---|
+| 各动画库自己的 key（`CYLTabBarLottieURL`、`CYLTabBarPAGURL`、`CYLTabBarRiveURL`…）与 `CYLTabBarItemsAttributesAddingLottieFiles()` 属于各自的动画库，没有废弃。 | Each library's own keys (`CYLTabBarLottieURL`, `CYLTabBarPAGURL`, `CYLTabBarRiveURL`…) and `CYLTabBarItemsAttributesAddingLottieFiles()` belong to their library and are not deprecated. |
 
 ## [CN]依赖注入
 ## [EN]Dependency injection

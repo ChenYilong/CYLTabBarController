@@ -533,7 +533,16 @@ presentLoginForViewController:(UIViewController *)viewController
  * [EN] Content mode of the Lottie animation views. Default is UIViewContentModeScaleAspectFit; override in a subclass to change it.
  * [CN] Lottie 动画视图的 contentMode，默认 UIViewContentModeScaleAspectFit，可在子类中重写修改。
  */
-- (UIViewContentMode)lottieAnimationViewContentMode;
+- (UIViewContentMode)lottieAnimationViewContentMode DEPRECATED_MSG_ATTRIBUTE("Use -tabBarItemAnimationViewContentMode");
+
+/*!
+ * FIX: issue #604
+ * [EN] Content mode of the tab icon animation views, for any library. Default: `-lottieAnimationViewContentMode`
+ *      (UIViewContentModeScaleAspectFit), so an old override keeps working; override this one in a subclass instead.
+ * [CN] Tab 图标动画视图的 contentMode，适用于任意动画库。默认值为 `-lottieAnimationViewContentMode`（UIViewContentModeScaleAspectFit），
+ *      因此旧的重写仍然有效；请改为在子类中重写本方法。
+ */
+- (UIViewContentMode)tabBarItemAnimationViewContentMode;
 
 /*!
  * [EN] Issue #426: when YES, a memory warning unloads the views of the tabs that are not selected, and UIKit loads them
@@ -580,7 +589,15 @@ presentLoginForViewController:(UIViewController *)viewController
  *      无需等待动画视图添加完成（issue #428）。只修改某一个 Tab 时，可监听 `CYLTabBarItemLottieAnimationViewDidAddNotification`，
  *      或调用 `-[UIControl cyl_setLottieAnimationSpeed:]`。0、负数或非有限值表示默认值。只有集成了 Lottie 才会生效。
  */
-@property (nonatomic, assign) CGFloat lottieAnimationSpeed;
+@property (nonatomic, assign) CGFloat lottieAnimationSpeed DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationSpeed");
+
+/*!
+ * FIX: issue #604
+ * [EN] Playback speed of the tab icon animation views, for any library (the same value as the deprecated
+ *      `lottieAnimationSpeed`; see it for the details). Default is 1.0.
+ * [CN] Tab 图标动画视图的播放速度，适用于任意动画库（与已废弃的 `lottieAnimationSpeed` 为同一个值，详见其说明）。默认 1.0。
+ */
+@property (nonatomic, assign) CGFloat tabBarItemAnimationSpeed;
 
 /*!
  * To set both Item label text attributes in the tabBar,
@@ -1060,10 +1077,17 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  */
 @property (nonatomic, assign) BOOL allowsVerticalBar;
 
-@property (nonatomic, assign, getter=isLottieViewAdded, readonly) BOOL lottieViewAdded;
+@property (nonatomic, assign, getter=isLottieViewAdded, readonly) BOOL lottieViewAdded DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationViewAdded");
 
-@property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs;
-@property (nonatomic, strong, readonly) NSMutableArray *lottieSizes;
+@property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationURLs");
+@property (nonatomic, strong, readonly) NSMutableArray *lottieSizes DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationSizes");
+
+/// [EN] YES once the tab icon animation views were added (any library). [CN] Tab 图标动画视图已添加时为 YES（任意动画库）。
+@property (nonatomic, assign, getter=isTabBarItemAnimationViewAdded, readonly) BOOL tabBarItemAnimationViewAdded;
+/// [EN] The animation file of each animated tab, in order. [CN] 各个带动画的 Tab 的动画文件，按顺序。
+@property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *tabBarItemAnimationURLs;
+/// [EN] The animation size (NSValue of CGSize) of each animated tab, in order. [CN] 各个带动画的 Tab 的动画尺寸（CGSize 的 NSValue），按顺序。
+@property (nonatomic, strong, readonly) NSMutableArray *tabBarItemAnimationSizes;
 
 /**
  [CN] 显示或隐藏 TabBar，所有样式都生效：扁平样式为 CYLFlatDesignTabBar，液态玻璃与经典样式为系统 TabBar（iOS 18 起由 UIKit 执行动画；iOS 18 以前的经典样式使用与扁平样式相同的下移动画）。
@@ -1573,7 +1597,7 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 
 @end
 
-FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotification;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotification DEPRECATED_MSG_ATTRIBUTE("Use CYLTabBarItemAnimationPlayingNotification");
 
 /*!
  * [EN] Posted after a Lottie animation view is added to a tab button (issue #428). The notification's `object` is the tab
@@ -1584,7 +1608,7 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotificatio
  *      `-[UIControl cyl_lottieAnimationView]` 取得动画视图。在主队列发送，此时已设置 `-[CYLTabBarController lottieAnimationSpeed]`，
  *      在回调中设置的值不会被覆盖。液态玻璃样式中每个 Tab 有普通与选中两个按钮，因此各发送一次。
  */
-FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification DEPRECATED_MSG_ATTRIBUTE("Use CYLTabBarItemAnimationViewDidAddNotification");
 
 /*!
  * FIX: issue #604

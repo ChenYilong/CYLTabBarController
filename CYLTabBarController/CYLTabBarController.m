@@ -155,9 +155,9 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 /// [EN] The control last reported through `tabBarController:didSelectControl:` in the current run loop turn (one report per tap).
 /// [CN] 当前 runloop 中已通过 `tabBarController:didSelectControl:` 上报的控件（每次点击只上报一次）。
 @property (nonatomic, weak) UIControl *cyl_controlReportedInCurrentRunLoop;
-@property (nonatomic, strong) NSMutableArray<NSURL *> *lottieURLs;
-@property (nonatomic, strong) NSMutableArray *lottieSizes;
-@property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
+@property (nonatomic, strong) NSMutableArray<NSURL *> *tabBarItemAnimationURLs;
+@property (nonatomic, strong) NSMutableArray *tabBarItemAnimationSizes;
+@property (nonatomic, assign, getter=isTabBarItemAnimationViewAdded) BOOL tabBarItemAnimationViewAdded;
 @property (nonatomic, strong) UIImage *tabItemPlaceholderImage;
 @property (nonatomic, copy) NSString *context;
 @property (nonatomic, strong) CYLTabBar *tabBar;
@@ -421,7 +421,7 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
         // [EN] Shared logic for non-Liquid Glass and Liquid Glass; all Lottie playback logic lives in
         //      tabChangedToSelectedIndex.
         if (NO == self.selectedViewController.cyl_isPlaceholder) {
-            [self addLottieImageWithControl:control lottieURL:item.cyl_lottieURL lottieSizeValue:item.cyl_lottieSizeValue animation:YES];
+            [self addLottieImageWithControl:control lottieURL:item.cyl_tabBarItemAnimationURL lottieSizeValue:item.cyl_tabBarItemAnimationSizeValue animation:YES];
         }
     }
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
@@ -434,8 +434,8 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
         if ([CYLConstants isLiquidGlassActive]) {
             [self.viewControllers enumerateObjectsUsingBlock:^(UIViewController * _Nonnull viewController, NSUInteger idx, BOOL * _Nonnull stop) {
                 UIControl *control = viewController.cyl_tabButton;
-                NSURL *url = viewController.tabBarItem.cyl_lottieURL;
-                NSValue *lottieSizeValue = viewController.tabBarItem.cyl_lottieSizeValue;
+                NSURL *url = viewController.tabBarItem.cyl_tabBarItemAnimationURL;
+                NSValue *lottieSizeValue = viewController.tabBarItem.cyl_tabBarItemAnimationSizeValue;
                 if (!control) {
                     return;
                 }
@@ -459,7 +459,7 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
                                 lottieSizeValue:lottieSizeValue
                                       animation:defaultSelected
                                 defaultSelected:defaultSelected];
-                self.lottieViewAdded = YES;
+                self.tabBarItemAnimationViewAdded = YES;
             }];
         } else {
             NSArray *subTabBarButtonsWithoutPlusButton = tabBar.cyl_subTabBarButtonsWithoutPlusButton;
@@ -476,7 +476,7 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
                                                   : (idx == self.selectedIndex);
                 //TODO:  selected content, double add
                 [self addLottieImageWithControl:tabButton animation:defaultSelected defaultSelected:defaultSelected];
-                self.lottieViewAdded = YES;
+                self.tabBarItemAnimationViewAdded = YES;
             }];
         }
     });
@@ -705,7 +705,7 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
             }
         
             do {
-                if (self.isLottieViewAdded) {
+                if (self.isTabBarItemAnimationViewAdded) {
                     break;
                 }
                 BOOL isLottieEnabled = [self isLottieEnabled];
@@ -715,7 +715,7 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
                 // file per tab button and turned every animation off otherwise. 只有部分 Tab 有动画（Lottie 或 PAG）时，
                 // 每个 Tab 使用自己的文件，其余 Tab 保持图片。经典 TabBar 以前要求每个 Tab 按钮都有文件，否则关闭全部动画。
                 if (!isLottieEnabled) {
-                    self.lottieViewAdded = YES;
+                    self.tabBarItemAnimationViewAdded = YES;
                     break;
                 }
                 [self initLottieTabBar:tabBar];
@@ -1419,9 +1419,9 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
         }
                 
         if (lottieURL) {
-            [self.lottieURLs addObject:lottieURL];
-            NSValue *tureLottieSizeValue = [CYLConstants cyl_getTureLottieSizeValue:lottieSizeValue fromNormalImage:normalImage];
-            [self.lottieSizes addObject:tureLottieSizeValue];
+            [self.tabBarItemAnimationURLs addObject:lottieURL];
+            NSValue *tureLottieSizeValue = [CYLConstants cyl_tabBarItemAnimationSizeValue:lottieSizeValue fromNormalImage:normalImage];
+            [self.tabBarItemAnimationSizes addObject:tureLottieSizeValue];
         }        // [CN] cyl_setTabBarItem 方法内部需要获取到tabbarvc但是， cyl_setTabBarItem是在初始化完成前的配置， 所以需要手动指定tabbarvc，否则cyl_setTabBarItem会初始化失败。
         // [EN] cyl_setTabBarItem needs the tabbarvc internally, but cyl_setTabBarItem is configured before
         //      initialization is complete,
@@ -1553,6 +1553,10 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
     return self;
 }
 
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (UIViewContentMode)lottieAnimationViewContentMode {
     return UIViewContentModeScaleAspectFit;
 }
@@ -1567,6 +1571,25 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 - (void)setLottieAnimationSpeed:(CGFloat)lottieAnimationSpeed {
     _lottieAnimationSpeed = lottieAnimationSpeed;
 }
+
+#pragma clang diagnostic pop
+
+// [EN] The neutral names go through the deprecated ones, so a subclass that still overrides them keeps working.
+// [CN] 通用名称经由已废弃的名称实现，因此仍重写旧方法的子类依然有效。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+- (UIViewContentMode)tabBarItemAnimationViewContentMode {
+    return [self lottieAnimationViewContentMode];
+}
+
+- (CGFloat)tabBarItemAnimationSpeed {
+    return [self lottieAnimationSpeed];
+}
+
+- (void)setTabBarItemAnimationSpeed:(CGFloat)tabBarItemAnimationSpeed {
+    self.lottieAnimationSpeed = tabBarItemAnimationSpeed;
+}
+#pragma clang diagnostic pop
 
 + (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
                               tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
@@ -2276,9 +2299,9 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     // [CN] 与 `-reloadTabBarItemsWithAttributes:` 相同：重新添加 Lottie 视图，并为新的 Tab 按钮再执行一次只执行一次的布局 block
     //      （`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`，如封面与角标）。
     self.invokeOnceViewDidLayoutSubViewsBlock = YES;
-    self.lottieViewAdded = NO;
-    [_lottieURLs removeAllObjects];
-    [_lottieSizes removeAllObjects];
+    self.tabBarItemAnimationViewAdded = NO;
+    [_tabBarItemAnimationURLs removeAllObjects];
+    [_tabBarItemAnimationSizes removeAllObjects];
     // [EN] As a new set of tabs (#608): the tab items, icons and Lottie views are set up again from the attributes.
     // [CN] 与重新设置一组 Tab 相同（#608）：TabBarItem、图标与 Lottie 视图按属性重新设置。
     self.viewControllers = viewControllers;
@@ -2421,7 +2444,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     [tabButtons enumerateObjectsUsingBlock:^(UIControl *tabButton, NSUInteger idx, BOOL *stop) {
         NSMutableDictionary<NSNumber *, UIView *> *iconViews = objc_getAssociatedObject(tabButton, &CYLTabBarItemIconViewsKey);
         id installedProvider = objc_getAssociatedObject(tabButton, &CYLTabBarItemIconViewsProviderKey);
-        UIView *lottieView = tabButton.cyl_lottieAnimationView;
+        UIView *lottieView = tabButton.cyl_tabBarItemAnimationView;
         // [EN] A cover over the tab button (e.g. a logo over the first tab) hides its other views, the tab's own icon too:
         //      the views shown in place of the icon stay hidden under it.
         // [CN] 覆盖 Tab 按钮的封面（如第一个 Tab 上的 Logo）会隐藏按钮
@@ -2556,9 +2579,9 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     _tabBarItemsAttributes = tabBarItemsAttributes;
     self.invokeOnceViewDidLayoutSubViewsBlock = YES;
-    self.lottieViewAdded = NO;
-    [_lottieURLs removeAllObjects];
-    [_lottieSizes removeAllObjects];
+    self.tabBarItemAnimationViewAdded = NO;
+    [_tabBarItemAnimationURLs removeAllObjects];
+    [_tabBarItemAnimationSizes removeAllObjects];
     NSInteger index = [self selectedIndex];
     // FIX: issue #618 — `selectedIndex` is not always a valid index into `_viewControllers` (e.g. NSNotFound, or an
     // extra tab UIKit created for a child that is not in `viewControllers`). Do not index out of range.
@@ -3039,14 +3062,14 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     
     
     if (lottieURL) {
-        [self.lottieURLs addObject:lottieURL];
-        [viewController.tabBarItem cyl_setLottieURL:lottieURL];
-        [[viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem cyl_setLottieURL:lottieURL];
+        [self.tabBarItemAnimationURLs addObject:lottieURL];
+        [viewController.tabBarItem cyl_setTabBarItemAnimationURL:lottieURL];
+        [[viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem cyl_setTabBarItemAnimationURL:lottieURL];
         
-        NSValue *tureLottieSizeValue = [CYLConstants cyl_getTureLottieSizeValue:lottieSizeValue fromNormalImage:normalImage];
-        [self.lottieSizes addObject:tureLottieSizeValue];
-        [viewController.tabBarItem cyl_setLottieSizeValue:tureLottieSizeValue];
-        [[viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem cyl_setLottieSizeValue:tureLottieSizeValue];
+        NSValue *tureLottieSizeValue = [CYLConstants cyl_tabBarItemAnimationSizeValue:lottieSizeValue fromNormalImage:normalImage];
+        [self.tabBarItemAnimationSizes addObject:tureLottieSizeValue];
+        [viewController.tabBarItem cyl_setTabBarItemAnimationSizeValue:tureLottieSizeValue];
+        [[viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem cyl_setTabBarItemAnimationSizeValue:tureLottieSizeValue];
     }
     [self addChildViewController:viewController];
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
@@ -3814,7 +3837,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 }
 
 - (BOOL)isLottieEnabled {
-    return [CYLConstants isLottieEnabledFromlottieURLs:self.lottieURLs tabBarItemsAttributes:self.tabBarItemsAttributes];
+    return [CYLConstants isTabBarItemAnimationEnabledWithURLs:self.tabBarItemAnimationURLs tabBarItemsAttributes:self.tabBarItemsAttributes];
 }
 
 /*!
@@ -3961,13 +3984,13 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
  * Issue #423 (hardening)
  * [EN] The tab bar item a tab button belongs to, found through the view controllers instead of the button's position.
  *      Each item keeps its own Lottie file (`cyl_lottieURL` / `cyl_lottieSizeValue`, from `CYLTabBarLottieURL`, or
- *      `CYLTabBarLottieFilePath` turned into a file URL), the same value `lottieURLs` holds, so this never shifts.
+ *      `CYLTabBarLottieFilePath` turned into a file URL), the same value `tabBarItemAnimationURLs` holds, so this never shifts.
  *      Selecting a tab already uses the item (`-tabChangedToSelectedIndex:…`). The position-based lookups below only run
  *      at launch, where the counts are checked first, so they were aligned; this makes them independent of the plus
  *      button and of tabs without Lottie.
  * [CN] 通过子控制器（而不是按钮的位置）找到 Tab 按钮所属的 tabBarItem。每个 item 保存着自己的 Lottie 文件
  *      （`cyl_lottieURL` / `cyl_lottieSizeValue`，来自 `CYLTabBarLottieURL`，或由 `CYLTabBarLottieFilePath` 转成的文件 URL），
- *      与 `lottieURLs` 中的值相同，不会错位。选中 Tab 时本来就按 item 取（`-tabChangedToSelectedIndex:…`）；下面按位置取的代码只在
+ *      与 `tabBarItemAnimationURLs` 中的值相同，不会错位。选中 Tab 时本来就按 item 取（`-tabChangedToSelectedIndex:…`）；下面按位置取的代码只在
  *      启动时执行，且事先校验了数量，因此是对齐的。这里让它们不再依赖 PlusButton 和未设置 Lottie 的 Tab。
  */
 - (nullable UITabBarItem *)cyl_tabBarItemForTabButton:(nullable UIControl *)control {
@@ -3989,8 +4012,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 /*!
  * FIX: issue #477
  * [EN] YES when every tab (the plus button's placeholder aside) has an animation file, the only case where a tab's file
- *      can be taken by its position in `lottieURLs`. With only some animated tabs, each one takes its own file.
- * [CN] 每个 Tab（PlusButton 的占位 Tab 除外）都有动画文件时返回 YES；只有这种情况才能按 `lottieURLs` 中的位置取文件。
+ *      can be taken by its position in `tabBarItemAnimationURLs`. With only some animated tabs, each one takes its own file.
+ * [CN] 每个 Tab（PlusButton 的占位 Tab 除外）都有动画文件时返回 YES；只有这种情况才能按 `tabBarItemAnimationURLs` 中的位置取文件。
  *      只有部分 Tab 有动画时，每个 Tab 使用自己的文件。
  */
 - (BOOL)cyl_everyTabHasAnimationFile {
@@ -4000,7 +4023,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             tabCount += 1;
         }
     }
-    return tabCount > 0 && self.lottieURLs.count >= tabCount && self.lottieSizes.count >= tabCount;
+    return tabCount > 0 && self.tabBarItemAnimationURLs.count >= tabCount && self.tabBarItemAnimationSizes.count >= tabCount;
 }
 
 - (void)addLottieImageWithControl:(UIControl *)control
@@ -4027,24 +4050,24 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         // [EN] Issue #423 (hardening) — the file of this button's own tab item first; the position is only a fallback.
         // [CN] 优先使用该按钮所属 tabBarItem 的 Lottie 文件，按位置取仅作为兜底。
         UITabBarItem *tabBarItem = [self cyl_tabBarItemForTabButton:control];
-        NSURL *lottieURL = tabBarItem.cyl_lottieURL;
-        NSValue *lottieSizeValue = tabBarItem.cyl_lottieSizeValue;
+        NSURL *lottieURL = tabBarItem.cyl_tabBarItemAnimationURL;
+        NSValue *lottieSizeValue = tabBarItem.cyl_tabBarItemAnimationSizeValue;
         if (!lottieURL) {
             // FIX: issue #477 — by position only when every tab has a file; otherwise a tab without one (a static tab)
             // would take another tab's file. 仅在每个 Tab 都有文件时按位置取；否则没有文件的 Tab（静态 Tab）会取到其他 Tab 的文件。
             // FIX: issue #618 — a tab button without a matching Lottie entry (more tab buttons than
             // `tabBarItemsAttributes`) used to raise NSRangeException here.
-            if (![self cyl_everyTabHasAnimationFile] || index >= self.lottieURLs.count || index >= self.lottieSizes.count) {
+            if (![self cyl_everyTabHasAnimationFile] || index >= self.tabBarItemAnimationURLs.count || index >= self.tabBarItemAnimationSizes.count) {
                 return;
             }
-            lottieURL = self.lottieURLs[index];
-            lottieSizeValue = self.lottieSizes[index];
+            lottieURL = self.tabBarItemAnimationURLs[index];
+            lottieSizeValue = self.tabBarItemAnimationSizes[index];
         }
         CGSize lottieSize = [lottieSizeValue CGSizeValue];
-        [control cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode animationSpeed:self.lottieAnimationSpeed];
+        [control cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.tabBarItemAnimationViewContentMode animationSpeed:self.tabBarItemAnimationSpeed];
         if (animation) {
             // Library-neutral (#604): any animation library (Lottie, PAG). 与动画库无关：任意动画库（Lottie、PAG）。
-            [self.cyl_tabBar cyl_playTabBarItemAnimationWithSelectedControl:control URL:lottieURL size:lottieSize defaultSelected:defaultSelected contentMode:self.lottieAnimationViewContentMode];
+            [self.cyl_tabBar cyl_playTabBarItemAnimationWithSelectedControl:control URL:lottieURL size:lottieSize defaultSelected:defaultSelected contentMode:self.tabBarItemAnimationViewContentMode];
         }
     }
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
@@ -4076,8 +4099,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     // [CN] 未传入文件时，使用该按钮所属 tabBarItem 的 Lottie 文件，而不是按位置取。
     if (!lottieURL || !lottieSizeValue) {
         UITabBarItem *tabBarItem = [self cyl_tabBarItemForTabButton:contentControl];
-        lottieURL = lottieURL ?: tabBarItem.cyl_lottieURL;
-        lottieSizeValue = lottieSizeValue ?: tabBarItem.cyl_lottieSizeValue;
+        lottieURL = lottieURL ?: tabBarItem.cyl_tabBarItemAnimationURL;
+        lottieSizeValue = lottieSizeValue ?: tabBarItem.cyl_tabBarItemAnimationSizeValue;
     }
     // FIX: issue #477 — by position only when every tab has a file (see `-cyl_everyTabHasAnimationFile`).
     // 仅在每个 Tab 都有文件时按位置取。
@@ -4090,11 +4113,11 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
                 if (!lottieURL) {
                     // [EN] Fallback only: the position can be off by the plus button; `-cyl_tabBarItemForTabButton:` above is used first.
                     // [CN] 仅作兜底：按位置可能因 PlusButton 错位，上面优先使用 `-cyl_tabBarItemForTabButton:`。
-                    lottieURL = self.lottieURLs[index];
+                    lottieURL = self.tabBarItemAnimationURLs[index];
                 }
                 
                 if (!lottieSizeValue) {
-                    lottieSizeValue = self.lottieSizes[index];
+                    lottieSizeValue = self.tabBarItemAnimationSizes[index];
                 }
             }
         } @catch (NSException *exception) {
@@ -4116,7 +4139,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         return;
     }
     CGSize lottieSize = [lottieSizeValue CGSizeValue];
-    [control cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode animationSpeed:self.lottieAnimationSpeed];
+    [control cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.tabBarItemAnimationViewContentMode animationSpeed:self.tabBarItemAnimationSpeed];
     
     if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
@@ -4124,7 +4147,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     selectedContentControl = [self.cyl_tabBar cyl_selectedContentControlFromContentControl:contentControl];
     
     if (selectedContentControl) {
-        [selectedContentControl cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.lottieAnimationViewContentMode animationSpeed:self.lottieAnimationSpeed];
+        [selectedContentControl cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.tabBarItemAnimationViewContentMode animationSpeed:self.tabBarItemAnimationSpeed];
     }
     
     if (animation) {
@@ -4133,13 +4156,13 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
                                                                     URL:lottieURL
                                                                    size:lottieSize
                                                         defaultSelected:defaultSelected
-                                                            contentMode:self.lottieAnimationViewContentMode];
+                                                            contentMode:self.tabBarItemAnimationViewContentMode];
         if (selectedContentControl) {
             [self.cyl_tabBar cyl_playTabBarItemAnimationWithSelectedControl:selectedContentControl
                                                                         URL:lottieURL
                                                                        size:lottieSize
                                                             defaultSelected:defaultSelected
-                                                                contentMode:self.lottieAnimationViewContentMode];
+                                                                contentMode:self.tabBarItemAnimationViewContentMode];
         }
     }
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
@@ -4299,31 +4322,41 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     } else {}
 }
 
-/**
- *  lazy load lottieURLs
- *
- *  @return NSMutableArray
- */
-- (NSMutableArray *)lottieURLs {
-    if (_lottieURLs == nil) {
-        NSMutableArray *lottieURLs = [[NSMutableArray alloc] init];
-        _lottieURLs = lottieURLs;
+/// [EN] Lazily created. [CN] 懒加载。
+- (NSMutableArray<NSURL *> *)tabBarItemAnimationURLs {
+    if (_tabBarItemAnimationURLs == nil) {
+        _tabBarItemAnimationURLs = [[NSMutableArray alloc] init];
     }
-    return _lottieURLs;
+    return _tabBarItemAnimationURLs;
 }
 
-/**
- *  lazy load lottieSizes
- *
- *  @return NSMutableArray
- */
-- (NSMutableArray *)lottieSizes {
-    if (_lottieSizes == nil) {
-        NSMutableArray *lottieSizes = [[NSMutableArray alloc] init];
-        _lottieSizes = lottieSizes;
+/// [EN] Lazily created. [CN] 懒加载。
+- (NSMutableArray *)tabBarItemAnimationSizes {
+    if (_tabBarItemAnimationSizes == nil) {
+        _tabBarItemAnimationSizes = [[NSMutableArray alloc] init];
     }
-    return _lottieSizes;
+    return _tabBarItemAnimationSizes;
 }
+
+#pragma mark - Deprecated Lottie names (compatibility) 已废弃的 Lottie 名称（兼容）
+
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+- (NSMutableArray<NSURL *> *)lottieURLs {
+    return self.tabBarItemAnimationURLs;
+}
+
+- (NSMutableArray *)lottieSizes {
+    return self.tabBarItemAnimationSizes;
+}
+
+- (BOOL)isLottieViewAdded {
+    return self.isTabBarItemAnimationViewAdded;
+}
+
+#pragma clang diagnostic pop
 
 - (nonnull UIWindow *)rootWindow {
     return CYLGetRootWindow();
@@ -5736,7 +5769,7 @@ static CYLTabBarController *CYLTabBarControllerOwningTabBar(UIResponder *respond
 /// selected one per tab, flat design has its own buttons).
 static void CYLCollectLottieTabButtons(UIView *view, NSMutableArray<UIControl *> *tabButtons) {
     for (UIView *subview in view.subviews) {
-        if ([subview isKindOfClass:[UIControl class]] && ((UIControl *)subview).cyl_lottieAnimationView) {
+        if ([subview isKindOfClass:[UIControl class]] && ((UIControl *)subview).cyl_tabBarItemAnimationView) {
             [tabButtons addObject:(UIControl *)subview];
             continue;
         }
@@ -5756,7 +5789,7 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
     NSMutableArray<UIControl *> *tabButtons = [NSMutableArray array];
     CYLCollectLottieTabButtons(tabBarController.cyl_tabBar ?: tabBarController.tabBar, tabButtons);
     for (UIControl *tabButton in tabButtons) {
-        UIView *lottieView = tabButton.cyl_lottieAnimationView;
+        UIView *lottieView = tabButton.cyl_tabBarItemAnimationView;
         id speed = [lottieView respondsToSelector:NSSelectorFromString(@"animationSpeed")] ? [lottieView valueForKey:@"animationSpeed"] : @"?";
         [description appendFormat:@"\n  Lottie view in %@ at x = %.0f: animationSpeed %@", NSStringFromClass([tabButton class]), CGRectGetMinX([tabButton convertRect:tabButton.bounds toView:nil]), speed];
     }

@@ -152,7 +152,17 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
     return [CYLUtils isLiquidGlassActive];
 }
 
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 + (NSValue *)cyl_getTureLottieSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage {
+    return [self cyl_tabBarItemAnimationSizeValue:lottieSizeValue fromNormalImage:normalImage];
+}
+
+#pragma clang diagnostic pop
+
++ (NSValue *)cyl_tabBarItemAnimationSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage {
     NSValue *tureLottieSizeValue = nil;
     do {
         if (!CGSizeEqualToSize(CGSizeZero, [lottieSizeValue CGSizeValue])) {
@@ -228,6 +238,10 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
 */
 #pragma mark - Dark Mode Lottie (#442)
 
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 + (void)cyl_registerDarkLottieURL:(NSURL *)darkLottieURL forLottieURL:(NSURL *)lottieURL {
     [CYLTabBarItemAnimationSharedStyleRegistry() registerDarkURL:darkLottieURL forURL:lottieURL];
 }
@@ -251,6 +265,8 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
 + (BOOL)cyl_hasDarkLottieURLs {
     return [CYLTabBarItemAnimationSharedStyleRegistry() hasStyleVariants];
 }
+
+#pragma clang diagnostic pop
 
 + (NSURL *)cyl_getURLFromString:(NSString *)string {
     if (!string) {
@@ -278,15 +294,25 @@ static BOOL CYLTabBarItemAttributesHaveAnimationFile(NSDictionary *attributes) {
            CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationFilePath) != nil;
 }
 
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 + (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
+    return [self isTabBarItemAnimationEnabledWithURLs:lottieURLs tabBarItemsAttributes:tabBarItemsAttributes];
+}
+
+#pragma clang diagnostic pop
+
++ (BOOL)isTabBarItemAnimationEnabledWithURLs:(NSArray<NSURL *> *)URLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
     // FIX: issue #604 — only with an animation library, i.e. the `CYLTabBarItemAnimation` service, checked at runtime
     // so that any library works (Lottie, PAG or one added later); without one, never enabled.
     // 仅在引入动画库（即 `CYLTabBarItemAnimation` 服务）时启用，在运行时判断，以支持任意动画库（Lottie、PAG 或以后新增的库）；没有时恒为 NO。
     if (!CYLTabBarItemAnimationIsAvailable()) {
         return NO;
     }
-    NSInteger lottieURLCount = lottieURLs.count;
-    BOOL isLottieEnabled = lottieURLCount > 0 ;
+    NSInteger URLCount = URLs.count;
+    BOOL isLottieEnabled = URLCount > 0 ;
     BOOL isLottieEnabledFromAttributes = NO;
     if (tabBarItemsAttributes && tabBarItemsAttributes.count > 0) {
         @try {
