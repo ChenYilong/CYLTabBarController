@@ -40,6 +40,9 @@ ITEM_KEYS = [
     'CYLTabBarItemImagePositionAdjustment', 'CYLTabBarLottieFilePath', 'CYLTabBarLottieURL', 'CYLTabBarLottieSize',
     'CYLTabBarItemIdentifier', 'CYLTabBarLottieDarkURL', 'CYLTabBarLottieDarkFilePath', 'CYLTabBarLottieDarkColors',
     'CYLTabBarItemViewControllerClass', 'CYLTabBarItemNavigationControllerClass', 'CYLTabBarItemSelectedTitle',
+    'CYLTabBarItemTitleColor', 'CYLTabBarItemSelectedTitleColor', 'CYLTabBarItemIconColor', 'CYLTabBarItemSelectedIconColor',
+    'CYLTabBarItemSelectedBackgroundColor', 'CYLTabBarItemBackgroundColor', 'CYLTabBarItemTitleFont', 'CYLTabBarItemSelectedTitleFont',
+    'CYLTabBarItemAccessibilityIdentifier', 'CYLTabBarItemAccessibilityLabel', 'CYLTabBarItemAccessibilityHint',
 ]
 ITEMS_KEY = 'CYLTabBarControllerTabBarItemsAttributes'
 TOP_KEYS = ['CYLTabBarControllerContext', 'CYLTabBarControllerStyleType', 'CYLTabBarControllerImageInsets',
@@ -53,6 +56,7 @@ PROTO_TOP = {ITEMS_KEY: 1, 'CYLTabBarControllerImageInsets': 2, 'CYLTabBarContro
 PROTO_ITEM = {key: number for number, key in enumerate(ITEM_KEYS[:17], 1)}
 PROTO_ITEM.update({'CYLTabBarLottieDarkColors': 18, 'CYLTabBarItemViewControllerClass': 19,
                    'CYLTabBarItemNavigationControllerClass': 20, 'CYLTabBarItemSelectedTitle': 21})
+PROTO_ITEM.update({key: number for number, key in enumerate(ITEM_KEYS[ITEM_KEYS.index('CYLTabBarItemTitleColor'):], 22)})
 FORMATS = ['json', 'json5', 'plist', 'binary.plist', 'yaml', 'toml', 'ini', 'properties', 'env', 'xml', 'textproto',
            'binpb']
 
@@ -178,6 +182,13 @@ def hex_color(r, g, b, a):
     return '#' + ''.join('%02X' % max(0, min(255, round(v * 255))) for v in (r, g, b, a))
 
 
+# UIKit's fixed colors (the dynamic system colors follow Dark Mode and stay in code). UIKit 的固定颜色（动态系统颜色随深色模式变化，保留在代码中）。
+NAMED_COLORS = {'black': '#000000FF', 'white': '#FFFFFFFF', 'clear': '#00000000', 'red': '#FF0000FF', 'green': '#00FF00FF',
+                'blue': '#0000FFFF', 'gray': '#808080FF', 'darkGray': '#555555FF', 'lightGray': '#AAAAAAFF',
+                'yellow': '#FFFF00FF', 'orange': '#FF8000FF', 'purple': '#800080FF', 'brown': '#996633FF',
+                'cyan': '#00FFFFFF', 'magenta': '#FF00FFFF'}
+
+
 class Unresolved(Exception):
     pass
 
@@ -249,6 +260,22 @@ def evaluate(expr):
         values = [number(g) for g in groups]
         if None not in values:
             return hex_color(*values)
+    m = re.fullmatch(r'\[UIColor\s+(\w+)Color\]|UIColor\.(\w+?)(?:Color)?', e)
+    if m and (m.group(1) or m.group(2)) in NAMED_COLORS:
+        return NAMED_COLORS[m.group(1) or m.group(2)]
+    m = re.fullmatch(r'\[UIFont\s+(bold)?[sS]ystemFontOfSize:\s*(.+?)(?:\s+weight:\s*UIFontWeight(\w+))?\s*\]'
+                     r'|UIFont\.(bold)?[sS]ystemFont\(ofSize:\s*(.+?)(?:\s*,\s*weight:\s*(?:UIFont\.Weight)?\.(\w+))?\s*\)', e)
+    if m:
+        bold, size, weight = (m.group(1), m.group(2), m.group(3)) if m.group(2) is not None else (m.group(4), m.group(5), m.group(6))
+        size = number(size)
+        if size is not None:
+            weight = 'bold' if bold else (weight or '').lower()
+            return '%s:%s' % (weight, size) if weight and weight != 'regular' else size
+    m = re.fullmatch(r'\[UIFont\s+fontWithName:\s*' + STRING + r'\s+size:\s*(.+?)\s*\]|UIFont\(name:\s*' + STRING + r'\s*,\s*size:\s*(.+?)\s*\)', e)
+    if m:
+        name, size = (m.group(1), m.group(2)) if m.group(1) is not None else (m.group(3), m.group(4))
+        if number(size) is not None:
+            return '%s:%s' % (unescape(name), number(size))
     if e.startswith('@{') or (e.startswith('[') and ':' in e and not e.startswith('[[')):
         body = e[2:-1] if e.startswith('@{') else e[1:-1]
         result = {}

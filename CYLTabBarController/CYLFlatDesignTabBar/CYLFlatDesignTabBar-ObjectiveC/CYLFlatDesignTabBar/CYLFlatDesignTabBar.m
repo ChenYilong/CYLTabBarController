@@ -52,6 +52,14 @@
 - (void)cyl_flatDesignPlusButtonTouchUpInside:(UIControl *)plusButton;
 @end
 
+// [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
+// [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
+@interface CYLTabBarController (CYLTabButtonHighlight)
+- (void)cyl_tabButtonTouchDown:(UIControl *)control;
+- (void)cyl_tabButtonTouchUp:(UIControl *)control;
+@end
+
+
 @implementation CYLFlatDesignTabBar {
     NSInteger _selectedItemIndex;
     NSMutableArray *_buttons;
@@ -454,6 +462,24 @@
 
 #pragma mark - Private
 
+/// [EN] Touch down / up on a tab button: the pressed animation of the tab bar controller.
+/// [CN] 手指按下 / 抬起 Tab 按钮：TabBarController 的按下动画。
+- (void)_tabBarDidTouchDownButton:(CYLFlatDesignTabBarButton *)tabBarButton {
+    UITabBarController *owningTabBarController = self.tabBarController;
+    if (!tabBarButton.cyl_isPlaceholder && [owningTabBarController isKindOfClass:[CYLTabBarController class]] &&
+        [owningTabBarController respondsToSelector:@selector(cyl_tabButtonTouchDown:)]) {
+        [(CYLTabBarController *)owningTabBarController cyl_tabButtonTouchDown:tabBarButton];
+    }
+}
+
+- (void)_tabBarDidTouchUpButton:(CYLFlatDesignTabBarButton *)tabBarButton {
+    UITabBarController *owningTabBarController = self.tabBarController;
+    if (!tabBarButton.cyl_isPlaceholder && [owningTabBarController isKindOfClass:[CYLTabBarController class]] &&
+        [owningTabBarController respondsToSelector:@selector(cyl_tabButtonTouchUp:)]) {
+        [(CYLTabBarController *)owningTabBarController cyl_tabButtonTouchUp:tabBarButton];
+    }
+}
+
 - (void)_tabBarDidSelectButton:(CYLFlatDesignTabBarButton *)tabBarButton {
     NSInteger selectedIndex = [_buttons indexOfObject:tabBarButton];
     CYLFlatDesignTabBarItem *item = self.items[selectedIndex];
@@ -468,6 +494,13 @@
     if (loginTabBarController && !tabBarButton.cyl_isPlaceholder &&
         selectedIndex < (NSInteger)loginTabBarController.viewControllers.count &&
         [loginTabBarController cyl_interceptLoginIfNeededForViewController:loginTabBarController.viewControllers[(NSUInteger)selectedIndex]]) {
+        return;
+    }
+    // [EN] A custom action tab (CYLCustomTabAction): not selected, not reported as a selection; its action runs instead.
+    // [CN] 使用自定义点击操作的 Tab（CYLCustomTabAction）：不选中、不作为选中上报，改为执行对应操作。
+    if (loginTabBarController && !tabBarButton.cyl_isPlaceholder &&
+        selectedIndex < (NSInteger)loginTabBarController.viewControllers.count &&
+        [loginTabBarController cyl_performCustomTabActionIfNeededForViewController:loginTabBarController.viewControllers[(NSUInteger)selectedIndex]]) {
         return;
     }
     
@@ -567,6 +600,10 @@
         button.tintColor = self.tintColor;
         button.selected = (item == self.selectedItem);
         [button addTarget:self action:@selector(_tabBarDidSelectButton:) forControlEvents:UIControlEventTouchUpInside];
+        // [EN] The pressed animation, forwarded to the tab bar controller at touch time (it may not be set yet here).
+        // [CN] 按下动画，在触摸时转给 TabBarController（此时可能尚未设置）。
+        [button addTarget:self action:@selector(_tabBarDidTouchDownButton:) forControlEvents:UIControlEventTouchDown];
+        [button addTarget:self action:@selector(_tabBarDidTouchUpButton:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
         // [CN] TODO:  对齐方案， 最简单。 移除PlusButton对应的item， 重新从 self.contentView 插入对齐。
         // [EN] TODO:  Alignment approach, the simplest one: remove the item corresponding to the PlusButton and re-insert
         //      it into self.contentView for alignment.

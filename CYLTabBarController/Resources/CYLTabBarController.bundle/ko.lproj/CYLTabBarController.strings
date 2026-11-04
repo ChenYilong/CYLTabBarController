@@ -286,3 +286,6 @@
 "轻触感反馈" = "약한 햅틱";
 "重触感反馈" = "강한 햅틱";
 "长按（#152）" = "길게 누르기 (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "탭하기";

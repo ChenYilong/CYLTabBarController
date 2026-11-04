@@ -810,7 +810,7 @@ static NSString *const CYLOutsideBoundsCellIdentifier = @"CYLOutsideBoundsCell";
         _outsideButton.backgroundColor = [UIColor systemBlueColor];
         _outsideButton.layer.cornerRadius = 6;
         [_outsideButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_outsideButton setTitle:@"Tap" forState:UIControlStateNormal];
+        [_outsideButton setTitle:CYLLocalizedString(@"点我") forState:UIControlStateNormal];
         // [EN] Inside the box (left half) and outside it (right half). [CN] 左半部分在方框内，右半部分在方框外。
         _outsideButton.frame = CGRectMake(40, 8, 80, 28);
         [_outsideButton addTarget:self action:@selector(cyl_outsideButtonTapped) forControlEvents:UIControlEventTouchUpInside];

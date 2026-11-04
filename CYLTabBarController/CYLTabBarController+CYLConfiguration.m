@@ -374,12 +374,15 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
-    return @[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage,
+    return @[ CYLTabBarItemTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage,
               CYLTabBarItemSelectedDarkImage, CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize,
               CYLTabBarItemImageInsets, CYLTabBarItemTitlePositionAdjustment, CYLTabBarItemImagePositionAdjustment,
               CYLTabBarLottieFilePath, CYLTabBarLottieURL, CYLTabBarLottieSize, CYLTabBarItemIdentifier, CYLTabBarLottieDarkURL,
               CYLTabBarLottieDarkFilePath, CYLTabBarLottieDarkColors, CYLTabBarItemViewControllerClass,
-              CYLTabBarItemNavigationControllerClass ];
+              CYLTabBarItemNavigationControllerClass, CYLTabBarItemSelectedTitle, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
+              CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemBackgroundColor,
+              CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont, CYLTabBarItemAccessibilityIdentifier, CYLTabBarItemAccessibilityLabel,
+              CYLTabBarItemAccessibilityHint ];
 }
 
 #if defined(DEBUG) || defined(BETA)
@@ -461,6 +464,73 @@ static void CYLMakeIdentifiersUnique(NSMutableArray<NSDictionary *> *items) {
     }
 }
 
+/// [EN] A UIColor, or "#RGB" / "#RRGGBB" / "#RRGGBBAA"; nil otherwise (B19). [CN] UIColor，或 "#RGB" / "#RRGGBB" / "#RRGGBBAA"；否则返回 nil（B19）。
+static UIColor *_Nullable CYLColorValue(id value) {
+    if ([value isKindOfClass:[UIColor class]]) {
+        return value;
+    }
+    return [value isKindOfClass:[NSString class]] ? CYLColorFromHexString(value) : nil;
+}
+
+static UIFontWeight CYLFontWeightNamed(NSString *name, BOOL *found) {
+    NSDictionary<NSString *, NSNumber *> *weights = @{
+        @"ultralight" : @(UIFontWeightUltraLight), @"thin" : @(UIFontWeightThin), @"light" : @(UIFontWeightLight),
+        @"regular" : @(UIFontWeightRegular), @"medium" : @(UIFontWeightMedium), @"semibold" : @(UIFontWeightSemibold),
+        @"bold" : @(UIFontWeightBold), @"heavy" : @(UIFontWeightHeavy), @"black" : @(UIFontWeightBlack),
+    };
+    NSNumber *weight = weights[name.lowercaseString];
+    *found = (weight != nil);
+    return weight ? (UIFontWeight)weight.doubleValue : UIFontWeightRegular;
+}
+
+/*!
+ * [EN] A font for `CYLTabBarItemTitleFont` / `CYLTabBarItemSelectedTitleFont` (B20): a UIFont; a number (a system font
+ *      of that size); "bold:15" (a system font with a weight: ultralight, thin, light, regular, medium, semibold, bold,
+ *      heavy, black); "Menlo-Regular:12" (a font by name); or {name, size, weight}. The size must be finite and between
+ *      1 and 200; an unknown font name gives nil.
+ * [CN] `CYLTabBarItemTitleFont` / `CYLTabBarItemSelectedTitleFont` 的字体（B20）：UIFont；数字（该字号的系统字体）；"bold:15"（指定字重的
+ *      系统字体：ultralight、thin、light、regular、medium、semibold、bold、heavy、black）；"Menlo-Regular:12"（按名称的字体）；或
+ *      {name, size, weight}。字号必须是 1 到 200 之间的有限值；字体名称不存在时返回 nil。
+ */
+static UIFont *_Nullable CYLFontValue(id value) {
+    if ([value isKindOfClass:[UIFont class]]) {
+        return value;
+    }
+    NSString *name = nil;
+    NSString *weightName = nil;
+    double size = 0;
+    if ([value isKindOfClass:[NSNumber class]]) {
+        size = [value doubleValue];
+    } else if ([value isKindOfClass:[NSString class]]) {
+        NSString *string = [(NSString *)value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSRange colon = [string rangeOfString:@":" options:NSBackwardsSearch];
+        NSString *sizeText = colon.location == NSNotFound ? string : [string substringFromIndex:NSMaxRange(colon)];
+        NSScanner *scanner = [NSScanner scannerWithString:sizeText];
+        if (![scanner scanDouble:&size] || !scanner.isAtEnd) {
+            return nil;
+        }
+        if (colon.location != NSNotFound) {
+            name = [string substringToIndex:colon.location];
+        }
+    } else if ([value isKindOfClass:[NSDictionary class]]) {
+        id sizeValue = value[@"size"];
+        size = [sizeValue respondsToSelector:@selector(doubleValue)] ? [sizeValue doubleValue] : 0;
+        name = [value[@"name"] isKindOfClass:[NSString class]] ? value[@"name"] : nil;
+        weightName = [value[@"weight"] isKindOfClass:[NSString class]] ? value[@"weight"] : nil;
+    } else {
+        return nil;
+    }
+    if (!isfinite(size) || size < 1 || size > 200) {
+        return nil;
+    }
+    BOOL isWeight = NO;
+    UIFontWeight weight = CYLFontWeightNamed(weightName ?: name ?: @"regular", &isWeight);
+    if (name.length > 0 && !isWeight) {
+        return [UIFont fontWithName:name size:size];
+    }
+    return [UIFont systemFontOfSize:size weight:weight];
+}
+
 /// [EN] A string, or a number as a string; nil for anything else (B5). [CN] 字符串，或转换为字符串的数字；其他类型返回 nil（B5）。
 static NSString *_Nullable CYLStringValue(id value) {
     if ([value isKindOfClass:[NSString class]]) {
@@ -488,7 +558,8 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
         }
         item[key] = value;
     }
-    for (NSString *key in @[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemIdentifier, CYLTabBarItemViewControllerClass, CYLTabBarItemNavigationControllerClass ]) {
+    for (NSString *key in @[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemIdentifier, CYLTabBarItemViewControllerClass, CYLTabBarItemNavigationControllerClass,
+                              CYLTabBarItemAccessibilityIdentifier, CYLTabBarItemAccessibilityLabel, CYLTabBarItemAccessibilityHint ]) {
         if (item[key] && !CYLStringValue(item[key])) {
             CYLLogInvalidConfigurationValue(key, item[key]);
         }
@@ -538,6 +609,17 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
             path = nil;
         }
         item[key] = path;
+    }
+    for (NSString *key in @[ CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor, CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor,
+                              CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemBackgroundColor ]) {
+        if (item[key] && !(item[key] = CYLColorValue(item[key]))) {
+            CYLLogInvalidConfigurationValue(key, attributes[key]);
+        }
+    }
+    for (NSString *key in @[ CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont ]) {
+        if (item[key] && !(item[key] = CYLFontValue(item[key]))) {
+            CYLLogInvalidConfigurationValue(key, attributes[key]);
+        }
     }
     CYLWarnUnknownKeys(item, CYLKnownItemKeys());
     if (item[CYLTabBarLottieDarkColors]) {

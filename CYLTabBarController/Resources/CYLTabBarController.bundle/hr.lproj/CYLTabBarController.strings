@@ -286,3 +286,6 @@
 "轻触感反馈" = "Lagana haptika";
 "重触感反馈" = "Jaka haptika";
 "长按（#152）" = "Dugi pritisak (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Dodirni";

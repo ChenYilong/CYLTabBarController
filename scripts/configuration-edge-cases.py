@@ -59,6 +59,8 @@ CASES = [
  ('B16', '超长标题', 'A very long title', '不崩溃，由 UIKit 截断显示', 'No crash; UIKit truncates it', dict(fixed=1)),
  ('B17', 'Lottie 文件不是合法的 JSON 动画', 'A Lottie file that is not a valid JSON animation', '解析检查失败时移除，避免 Lottie 内部异常', 'Removed when it does not parse as a JSON object, so Lottie never sees it', dict(fixed=6, found=5)),
  ('B18', '代码中传入的配置不是字典（如类型不明的 JSON 数组）', 'The configuration passed in code is not a dictionary (e.g. an untyped JSON list)', '视为空配置并输出警告；以前会因 unrecognized selector 崩溃', 'Treated as empty, with a warning; this used to crash (unrecognized selector)', dict(fixed=6, found=6)),
+ ('B19', '无效的颜色（`CYLTabBarItemTitleColor` 等为错误的十六进制串或数字）', 'An invalid color (`CYLTabBarItemTitleColor`... a wrong hex string or a number)', '接受 UIColor 与 "#RGB" / "#RRGGBB" / "#RRGGBBAA"，其他移除并输出警告', 'UIColor and "#RGB" / "#RRGGBB" / "#RRGGBBAA" are accepted; anything else is removed, with a warning', dict(fixed=8, found=8)),
+ ('B20', '无效的字体（字号为 0、NaN、超过 200，或字体名称不存在）', 'An invalid font (size 0, NaN, over 200, or a font name that does not exist)', '字号必须在 1 到 200 之间，字体必须存在，否则移除并输出警告', 'The size must be between 1 and 200 and the font must exist; removed otherwise, with a warning', dict(fixed=8, found=8)),
  # C. View controllers 子控制器
  ('C1', '子控制器类不存在', 'The view controller class does not exist', '使用 UIViewController 并输出警告', 'UIViewController and a warning', dict(fixed=1)),
  ('C2', '类不是 UIViewController（如 NSString）', 'The class is not a UIViewController (e.g. NSString)', '使用 UIViewController 并输出警告', 'UIViewController and a warning', dict(fixed=1)),
@@ -100,6 +102,8 @@ ROUNDS = {
      'Network timeout and threads: a 15 s default timeout, a custom NSURLRequest, background-thread protection. The review found new cases (A16, B17, C9), so the score dropped.'),
  6: ('修复新发现的问题：UTF-16 / UTF-32、无效的 Lottie 文件、空的子控制器数组；复查又发现并修复了 B18（配置不是字典）。全部情况均已处理。',
      'Fixes for the new cases: UTF-16 / UTF-32, invalid Lottie files, an empty view controller list; the review also found and fixed B18 (a configuration that is not a dictionary). Every case is handled.'),
+ 8: ('合并 master 后，新增的 11 个 Tab 键（颜色、字体、无障碍）加入配置：文件中颜色写作 "#RRGGBB"，字体写作字号、"bold:15" 或 "Menlo-Regular:12"，无障碍键做字符串检查；导出脚本与 Protobuf 结构定义（字段 22–32）同步更新。新增并处理 B19、B20。',
+     'After merging master, its 11 new tab keys (colors, fonts, accessibility) join the configuration: colors as "#RRGGBB" in files, fonts as a size, "bold:15" or "Menlo-Regular:12", the accessibility keys checked as strings; the export script and the Protobuf schema (fields 22-32) follow. B19 and B20 added and handled.'),
  7: ('测试固化为 scripts/configuration-tests/run-tests.sh 后，测试套件发现第 4 轮的回归（A17）：A7 的重试会把 .json 中的数组、无效的 TOML、缩进错误的 YAML 当作 .properties、TOML 表或 Protobuf 文本读取，掩盖其错误。已修复，所有测试通过。',
      'With the tests kept as scripts/configuration-tests/run-tests.sh, the suite found a regression of round 4 (A17): the retry of A7 read a list in a .json file, invalid TOML and badly indented YAML as .properties, a TOML table or Protobuf text, hiding their errors. Fixed; every test passes.'),
 }

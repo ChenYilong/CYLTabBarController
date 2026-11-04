@@ -110,6 +110,8 @@ python3 scripts/export-tabbar-configurations.py
 | `[[NSBundle mainBundle] pathForResource:@"a" ofType:@"json"]`、`[NSURL fileURLWithPath:...]`、`Bundle.main.url(forResource:withExtension:)` | `a.json` |
 | `[NSURL URLWithString:@"https://..."]`、`URL(string: "https://...")!` | `https://...` |
 | `UIColor(white: 0.78, alpha: 1)`、`[UIColor colorWithRed:...]` | `#C7C7C7FF` |
+| `UIColor.whiteColor`、`[UIColor clearColor]`、`UIColor.red`（固定颜色；`systemBlue` 等动态颜色保留在代码中 / fixed colors; dynamic ones such as `systemBlue` stay in code） | `#FFFFFFFF`、`#00000000`、`#FF0000FF` |
+| `[UIFont systemFontOfSize:15]`、`[UIFont boldSystemFontOfSize:12]`、`UIFont.systemFont(ofSize: 13, weight: .medium)`、`UIFont(name: "Menlo-Regular", size: 12)` | `15`、`bold:12`、`medium:13`、`Menlo-Regular:12` |
 | `CYLLocalizedTabBarItemsAttributes(titles, images, selectedImages, darkImages)` | 每个 Tab 的标题与图片 / each tab's title and images |
 | `CYLTabBarItemsAttributesAddingLottieFiles(items, names, nil)` | `CYLTabBarLottieFilePath`，存在 `_dark.json` 时加 `CYLTabBarLottieDarkFilePath` / plus the dark file when `_dark.json` exists |
 | `["A", "B"].map { layer in ["\(layer)_Normal.**.Color": UIColor(...)] }` | 每个 Tab 的 `CYLTabBarLottieDarkColors` |

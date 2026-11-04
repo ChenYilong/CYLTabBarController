@@ -286,3 +286,6 @@
 "轻触感反馈" = "Phản hồi xúc giác nhẹ";
 "重触感反馈" = "Phản hồi xúc giác mạnh";
 "长按（#152）" = "Nhấn giữ (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Chạm";

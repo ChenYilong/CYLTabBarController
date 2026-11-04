@@ -19,10 +19,13 @@
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
 | [一个配置文件生成 TabBarController](Configuration-File.md) | [One configuration file, one TabBarController](Configuration-File.md) |
 | [配置文件相关脚本：导出、边界情况与测试](Configuration-Scripts.md) | [Configuration scripts: export, edge cases and tests](Configuration-Scripts.md) |
+| [自定义 TabBar 功能清单](Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](Custom-Tab-Bar-Features.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
+| [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
+| [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](Mac-CI-CD.md) |
 | [PlusButton 角标：每次点击都会变化](PlusButton-Badge.md) | [PlusButton badge: changes on every tap](PlusButton-Badge.md) |
 | [有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应](PlusButton-Lottie-TabIcon.md) | [Lottie tab icons and their files when there is a PlusButton](PlusButton-Lottie-TabIcon.md) |
 | [PlusButton 子控件响应各自的点击事件](PlusButton-Subview-Touches.md) | [Subviews of the PlusButton receive their own touches](PlusButton-Subview-Touches.md) |
@@ -31,7 +34,13 @@
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
+| [Tab 的无障碍与 UI 测试](Tab-Accessibility.md) | [Tab Accessibility and UI Tests](Tab-Accessibility.md) |
+| [TabBar 图库](Tab-Bar-Gallery.md) | [Tab Bar Gallery](Tab-Bar-Gallery.md) |
+| [自定义 Tab 点击操作](Tab-Custom-Action.md) | [Custom Tab Actions](Tab-Custom-Action.md) |
 | [Tab 交互：点击动画、长按、滑动切换及其他](Tab-Interactions.md) | [Tab interactions: tap animations, long press, swipe, and more](Tab-Interactions.md) |
+| [单个 Tab 的颜色](Tab-Item-Colors.md) | [Per-tab Colors](Tab-Item-Colors.md) |
+| [Tab 的排列方式](Tab-Item-Positioning.md) | [Tab Item Positioning](Tab-Item-Positioning.md) |
+| [重复点击已选中 Tab 的内置操作](Tab-Reselect.md) | [Built-in Actions for Tapping the Selected Tab](Tab-Reselect.md) |
 | [TabBar 的 hitTest 不再返回 nil，交给 super 处理](TabBar-HitTest-Super-Fallback.md) | [The tab bar's hitTest falls back to super instead of returning nil](TabBar-HitTest-Super-Fallback.md) |
 | [滚动时缩小或隐藏 TabBar](TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](TabBar-Minimize-On-Scroll.md) |
 | [TabBarItem 手势：再次点击、双击与长按](TabBarItem-Gestures.md) | [Tab bar item gestures: reselect, double tap and long press](TabBarItem-Gestures.md) |
@@ -58,10 +67,13 @@ docs/
 ├── Carthage.md
 ├── Configuration-File.md
 ├── Configuration-Scripts.md
+├── Custom-Tab-Bar-Features.md
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
 ├── Image-Only-Tabs.md
+├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
+├── Mac-CI-CD.md
 ├── PlusButton-Badge.md
 ├── PlusButton-Lottie-TabIcon.md
 ├── PlusButton-Subview-Touches.md
@@ -71,7 +83,13 @@ docs/
 ├── SelectedIndex-PlusButton.md
 ├── Swift-Guide.md
 ├── SwiftUI-Integration.md
+├── Tab-Accessibility.md
+├── Tab-Bar-Gallery.md
+├── Tab-Custom-Action.md
 ├── Tab-Interactions.md
+├── Tab-Item-Colors.md
+├── Tab-Item-Positioning.md
+├── Tab-Reselect.md
 ├── TabBar-HitTest-Super-Fallback.md
 ├── TabBar-Minimize-On-Scroll.md
 ├── TabBarItem-Gestures.md

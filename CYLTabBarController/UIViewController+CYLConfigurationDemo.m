@@ -200,7 +200,8 @@ static NSArray<NSArray<NSString *> *> *CYLConfigurationEdgeCases(void) {
         @[ @"A9", @"A 6 MB file" ], @[ @"B1", @"No tabs" ], @[ @"D7", @"An HTML page (file)" ], @[ @"B5", @"Wrong types and null" ],
         @[ @"B7", @"NaN and Infinity insets" ], @[ @"B9", @"Unknown style" ], @[ @"C1", @"Missing view controller class" ],
         @[ @"C2", @"Class is not a view controller" ], @[ @"C3", @"A container as a tab" ], @[ @"B13", @"Invalid URLs and Lottie files" ],
-        @[ @"B12", @"Duplicate identifiers" ], @[ @"B11", @"Misspelled keys" ], @[ @"A12", @"Truncated protobuf" ],
+        @[ @"B12", @"Duplicate identifiers" ], @[ @"B11", @"Misspelled keys" ], @[ @"B19", @"Invalid colors and fonts" ],
+        @[ @"A12", @"Truncated protobuf" ],
         @[ @"A12", @"Corrupted binary plist" ], @[ @"A14", @"XML external entity" ], @[ @"A2", @"Missing file" ],
         @[ @"E1", @"Created on a background thread" ], @[ @"C6", @"Non-controllers and duplicates (code)" ],
         @[ @"B18", @"Configuration is not a dictionary (code)" ], @[ @"C9", @"Empty view controller list (code)" ],
@@ -340,6 +341,8 @@ static NSData *CYLEdgeCaseData(NSString *text) {
         fromFile(@"ids.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"A\", \"CYLTabBarItemIdentifier\": \"tab\"}, {\"CYLTabBarItemTitle\": \"B\", \"CYLTabBarItemIdentifier\": \"tab\"}, {\"CYLTabBarItemTitle\": \"C\", \"CYLTabBarItemIdentifier\": \"tab\"}]}"));
     } else if ([title isEqualToString:@"Misspelled keys"]) {
         fromFile(@"typos.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerContxt\": \"typo\", \"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitel\": \"Typo\", \"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\"}]}"));
+    } else if ([title isEqualToString:@"Invalid colors and fonts"]) {
+        fromFile(@"colors.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemTitleColor\": \"not a color\", \"CYLTabBarItemIconColor\": \"#12345\", \"CYLTabBarItemSelectedTitleColor\": \"#FF3B30\", \"CYLTabBarItemBackgroundColor\": 123, \"CYLTabBarItemTitleFont\": 0, \"CYLTabBarItemSelectedTitleFont\": \"NoSuchFont:12\", \"CYLTabBarItemAccessibilityLabel\": [1, 2]}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemImage\": \"system:person\", \"CYLTabBarItemTitleFont\": \"bold:12\", \"CYLTabBarItemSelectedIconColor\": \"#34C759\"}]}"));
     } else if ([title isEqualToString:@"Truncated protobuf"]) {
         const uint8_t bytes[] = { 0x0A, 0x40, 0x0A, 0x04, 'H', 'o', 'm', 'e' };
         fromFile(@"truncated.binpb", [NSData dataWithBytes:bytes length:sizeof(bytes)]);

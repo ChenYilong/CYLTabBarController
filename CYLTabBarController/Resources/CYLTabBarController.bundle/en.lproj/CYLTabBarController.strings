@@ -286,3 +286,6 @@
 "轻触感反馈" = "Light haptic";
 "重触感反馈" = "Heavy haptic";
 "长按（#152）" = "Long press (#152)";
+
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Tap me";

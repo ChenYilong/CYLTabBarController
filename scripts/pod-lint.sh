@@ -5,6 +5,14 @@
 #   scripts/pod-lint.sh carthage                    # only update the Carthage version
 #   scripts/pod-lint.sh spm                         # only update the Swift Package Manager version
 #   scripts/pod-lint.sh versions                    # update both, without pushing
+#   scripts/pod-lint.sh version                     # print s.version
+#   scripts/pod-lint.sh check-tag <tag>             # exit 1 unless <tag> equals s.version (used by the Release workflow)
+#   scripts/pod-lint.sh bump <x.y.z>                # set s.version, then `versions`: prepares a release pull request
+#
+# [EN] Release (docs/Mac-CI-CD.md): `bump` on a branch from master → pull request, CI → merge → tag the merge commit
+#      with the same version → the Release workflow runs `check-tag` and `push`.
+# [CN] 发布流程（docs/Mac-CI-CD.md）：从 master 新建分支执行 `bump` → PR 跑 CI → 合并 → 在合并提交上打同名 tag → Release workflow
+#      执行 `check-tag` 与 `push`。
 #
 # [EN] Carthage and Swift Package Manager have no registry: a release is the git tag that `pod trunk push` also
 #      requires. After a push, the places that pin this library's version follow the podspec's s.version:
@@ -89,8 +97,41 @@ update_navigation() {
   fi
 }
 
+# The tag of a release must be the podspec's version (s.source uses it). 发布的 tag 必须等于 podspec 的版本（s.source 使用它）。
+check_tag() {
+  release_version
+  if [ "$1" != "$version" ]; then
+    echo "error: the tag '$1' does not match s.version $version in $PODSPEC. Bump it first (scripts/pod-lint.sh bump $1), merge, then tag that commit." >&2
+    exit 1
+  fi
+  echo "Tag $1 matches s.version in $PODSPEC"
+}
+
+# Set s.version (only the first s.version line). 设置 s.version（只改第一行 s.version）。
+bump_version() {
+  case "$1" in
+    [0-9]*.[0-9]*.[0-9]*) ;;
+    *) echo "usage: $0 bump <x.y.z>   (e.g. $0 bump 1.99.73)" >&2; exit 1 ;;
+  esac
+  if printf '%s' "$1" | grep -q '[^0-9.]'; then
+    echo "error: '$1' is not a version like 1.99.73" >&2
+    exit 1
+  fi
+  release_version
+  sed "1,/^[[:space:]]*s\.version[[:space:]]*=/s|^\([[:space:]]*s\.version[[:space:]]*=[[:space:]]*[\"']\)[^\"']*\([\"']\)|\1$1\2|" "$PODSPEC" > "$PODSPEC.tmp"
+  mv "$PODSPEC.tmp" "$PODSPEC"
+  if [ "$(pod_version)" != "$1" ]; then
+    echo "error: could not set s.version in $PODSPEC" >&2
+    exit 1
+  fi
+  echo "Podspec: s.version $version → $1 (commit this change, then tag the merged commit $1)"
+}
+
 case "$1" in
-  push)     shift; pod trunk push "$PODSPEC" --allow-warnings "$@"; update_carthage; update_spm; update_navigation ;;
+  push)      shift; pod trunk push "$PODSPEC" --allow-warnings "$@"; update_carthage; update_spm; update_navigation ;;
+  version)   release_version; echo "$version" ;;
+  check-tag) check_tag "${2:?usage: $0 check-tag <tag>}" ;;
+  bump)      bump_version "${2:-}"; update_carthage; update_spm; update_navigation ;;
   carthage) update_carthage ;;
   spm)      update_spm; update_navigation ;;
   versions) update_carthage; update_spm; update_navigation ;;

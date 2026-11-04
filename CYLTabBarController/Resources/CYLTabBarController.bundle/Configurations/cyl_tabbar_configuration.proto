@@ -48,4 +48,15 @@ message CYLTabBarItem {
   string CYLTabBarItemViewControllerClass = 19;
   string CYLTabBarItemNavigationControllerClass = 20;
   string CYLTabBarItemSelectedTitle = 21;
+  string CYLTabBarItemTitleColor = 22;
+  string CYLTabBarItemSelectedTitleColor = 23;
+  string CYLTabBarItemIconColor = 24;
+  string CYLTabBarItemSelectedIconColor = 25;
+  string CYLTabBarItemSelectedBackgroundColor = 26;
+  string CYLTabBarItemBackgroundColor = 27;
+  string CYLTabBarItemTitleFont = 28;
+  string CYLTabBarItemSelectedTitleFont = 29;
+  string CYLTabBarItemAccessibilityIdentifier = 30;
+  string CYLTabBarItemAccessibilityLabel = 31;
+  string CYLTabBarItemAccessibilityHint = 32;
 }
