@@ -26,22 +26,6 @@ BUILD_LOG="$DERIVED/build.log"
 TIMEOUT=600
 mkdir -p "$DERIVED"
 
-xcodebuild -version
-pod install
-if ! xcodebuild -workspace CYLTabBarController.xcworkspace -scheme CYLTabBarController -configuration Debug \
-  -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath "$DERIVED" \
-  CODE_SIGNING_ALLOWED=NO build > "$BUILD_LOG" 2>&1; then
-  echo "Build failed. Errors:"
-  grep -nE "(error|fatal error):" "$BUILD_LOG" | sort -u | head -n 60 || true
-  tail -n 30 "$BUILD_LOG"
-  exit 1
-fi
-echo "Build succeeded."
-
-APP=$(find "$DERIVED/Build/Products/Debug-iphonesimulator" -maxdepth 1 -name '*.app' | head -n 1)
-[ -n "$APP" ] || { echo "No .app was built"; exit 1; }
-BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
-
 if [ -z "$DEVICE_NAME" ]; then
   DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
 import json, sys
@@ -64,7 +48,24 @@ for runtime, devices in json.load(sys.stdin)["devices"].items():
             print(device["udid"]); sys.exit(0)
 sys.exit(1)' "$DEVICE_NAME")
 fi
-echo "Simulator: $DEVICE_ID, app: $BUNDLE_ID"
+xcodebuild -version
+pod install
+if ! xcodebuild -workspace CYLTabBarController.xcworkspace -scheme CYLTabBarController -configuration Debug \
+  -sdk iphonesimulator -destination "id=$DEVICE_ID" -derivedDataPath "$DERIVED" \
+  CODE_SIGNING_ALLOWED=NO build > "$BUILD_LOG" 2>&1; then
+  echo "Build failed. Errors:"
+  grep -nE "(error|fatal error):|^ld: |Undefined symbols|symbol\(s\) not found" "$BUILD_LOG" | sort -u | head -n 60 || true
+  tail -n 30 "$BUILD_LOG"
+  exit 1
+fi
+echo "Build succeeded."
+
+echo "Simulator: $DEVICE_ID"
+APP=$(find "$DERIVED/Build/Products/Debug-iphonesimulator" -maxdepth 1 -name '*.app' | head -n 1)
+[ -n "$APP" ] || { echo "No .app was built"; exit 1; }
+BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
+
+echo "App: $BUNDLE_ID"
 xcrun simctl boot "$DEVICE_ID" 2>/dev/null || true
 xcrun simctl bootstatus "$DEVICE_ID" -b
 xcrun simctl install "$DEVICE_ID" "$APP"
