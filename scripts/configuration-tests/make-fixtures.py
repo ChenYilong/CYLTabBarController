@@ -46,6 +46,10 @@ def field(number, payload):
     return varint(number << 3 | 2) + varint(len(payload)) + payload
 
 
+# [EN] The fixture other files are compared with. [CN] 其他测试文件与之比较的基准文件。
+REFERENCE = 'reference.json'
+
+
 def main(folder):
     folder = confined_path(folder, ALLOWED_ROOTS)
     os.makedirs(folder, exist_ok=True)
@@ -67,7 +71,7 @@ def main(folder):
             'CYLTabBarLottieDarkColors': {'Icon.**.Color': '#C8C8C8', 'Main.**.Color': '#266428'},
         }],
     }
-    add('reference.json', json.dumps(reference, ensure_ascii=False), 'dictionary', 'reference')
+    add(REFERENCE, json.dumps(reference, ensure_ascii=False), 'dictionary', 'reference')
 
     # A10: nesting. 嵌套。
     add('deep.json', '{"a": ' + '[' * N + ']' * N + '}', TOO_DEEP, 'A10')
@@ -93,7 +97,7 @@ def main(folder):
     item = field(1, '消息'.encode()) + field(2, b'system:message')
     item += field(18, field(1, b'Icon.**.Color') + field(2, b'#C8C8C8')) + field(18, field(1, b'Main.**.Color') + field(2, b'#266428'))
     message = field(1, item) + field(4, b'liquidGlass') + field(5, '首页 ✓'.encode())
-    add('reference.binpb', message, 'dictionary', 'A12', equals='reference.json')
+    add('reference.binpb', message, 'dictionary', 'A12', equals=REFERENCE)
     add('truncated.binpb', message[:-5], INVALID_SYNTAX, 'A12')
     add('garbage.binpb', bytes([0x0F, 0xFF, 0x01, 0x02, 0x03, 0x00, 0x99]), INVALID_SYNTAX, 'A12')
 
@@ -102,9 +106,9 @@ def main(folder):
             '  CYLTabBarLottieDarkColors { key: "Icon.**.Color" value: "#C8C8C8" }\n'
             '  CYLTabBarLottieDarkColors { key: "Main.**.Color" value: "#266428" }\n}\n'
             'CYLTabBarControllerStyleType: "liquidGlass"\nCYLTabBarControllerContext: "首页 ✓"\n')
-    add('reference.textproto', text, 'dictionary', 'B3', equals='reference.json')
+    add('reference.textproto', text, 'dictionary', 'B3', equals=REFERENCE)
     octal = ''.join(c if ord(c) < 128 else ''.join('\\%03o' % b for b in c.encode()) for c in text)
-    add('reference_octal.textproto', octal, 'dictionary', 'B3', equals='reference.json')
+    add('reference_octal.textproto', octal, 'dictionary', 'B3', equals=REFERENCE)
 
     # A3, A4: empty. 空。
     add('empty.json', '', EMPTY, 'A3')
@@ -131,7 +135,7 @@ def main(folder):
     # A16: UTF-16 / UTF-32.
     yaml_text = 'CYLTabBarControllerContext: utf16\nCYLTabBarControllerTabBarItemsAttributes:\n  - CYLTabBarItemTitle: 首页\n'
     add('utf16le.yaml', b'\xff\xfe' + yaml_text.encode('utf-16-le'), 'dictionary', 'A16')
-    add('utf16be.json', b'\xfe\xff' + json.dumps(reference, ensure_ascii=False).encode('utf-16-be'), 'dictionary', 'A16', equals='reference.json')
+    add('utf16be.json', b'\xfe\xff' + json.dumps(reference, ensure_ascii=False).encode('utf-16-be'), 'dictionary', 'A16', equals=REFERENCE)
     add('utf32le.toml', b'\xff\xfe\x00\x00' + 'CYLTabBarControllerContext = "utf32"\n[[CYLTabBarControllerTabBarItemsAttributes]]\nCYLTabBarItemTitle = "首页"\n'.encode('utf-32-le'), 'dictionary', 'A16')
     # D7: an HTML page parses (as XML); the library then refuses it with NoTabs. HTML 页面可以解析（XML）；随后由库以 NoTabs 拒绝。
     add('captive_portal.xml', '<html><head><title>Wi-Fi login</title></head><body><form>Accept</form></body></html>', 'dictionary', 'D7')

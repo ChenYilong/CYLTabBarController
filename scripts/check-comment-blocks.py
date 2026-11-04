@@ -21,29 +21,43 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STRAY = re.compile(r'^\s*\*(\s|/|$)')
 
 
+def string_end(line, i):
+    """[EN] Index after the string literal that starts at `i`. [CN] 从 `i` 开始的字符串字面量之后的位置。"""
+    j = i + 1
+    while j < len(line) and line[j] != '"':
+        j += 2 if line[j] == '\\' else 1
+    return j + 1
+
+
+def next_position(line, i, in_comment):
+    """[EN] (next index, still in a comment) after reading `line[i]`; index None at a // comment.
+    [CN] 读取 `line[i]` 后的（下一位置，是否仍在注释中）；遇到 // 注释时位置为 None。"""
+    if in_comment:
+        return (i + 2, False) if line.startswith('*/', i) else (i + 1, True)
+    if line.startswith('//', i):
+        return None, False
+    if line[i] == '"':
+        return string_end(line, i), False
+    if line.startswith('/*', i):
+        return i + 2, True
+    return i + 1, False
+
+
+def ends_in_comment(line, in_comment):
+    """[EN] Whether a block comment is still open at the end of `line`. [CN] `line` 结尾处块注释是否仍未闭合。"""
+    i = 0
+    while i is not None and i < len(line):
+        i, in_comment = next_position(line, i, in_comment)
+    return in_comment
+
+
 def stray_lines(text):
     """(line number, line) of every line outside a comment that starts with `*`. 注释之外以 `*` 开头的每一行。"""
     found, in_comment = [], False
     for number, line in enumerate(text.split('\n'), 1):
         if not in_comment and STRAY.match(line):
             found.append((number, line))
-        i = 0
-        while i < len(line):
-            if not in_comment and line.startswith('//', i):
-                break
-            if not in_comment and line[i] == '"':
-                j = i + 1
-                while j < len(line) and line[j] != '"':
-                    j += 2 if line[j] == '\\' else 1
-                i = j + 1
-                continue
-            if not in_comment and line.startswith('/*', i):
-                in_comment, i = True, i + 2
-                continue
-            if in_comment and line.startswith('*/', i):
-                in_comment, i = False, i + 2
-                continue
-            i += 1
+        in_comment = ends_in_comment(line, in_comment)
     return found
 
 

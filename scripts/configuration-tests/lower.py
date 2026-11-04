@@ -31,98 +31,189 @@ def confined_path(path, roots):
     sys.exit('%s: outside %s' % (path, ' / '.join(roots)))
 
 
-src = open(confined_path(sys.argv[1], ALLOWED_ROOTS)).read()
-
-# 1. Properties -> explicit ivars + @synthesize.
-props = {}
-def collect(m):
-    name, body = m.group(1), m.group(2)
-    for p in re.finditer(r'@property\s*\([^)]*\)\s*(.*?)(\w+);', body):
-        props.setdefault(name, []).append((p.group(1).replace('_Nullable', '').strip(), p.group(2)))
-    return m.group(0)
-re.sub(r'@interface (\w+)[^\n]*\n(.*?)@end', collect, src, flags=re.S)
-for name, ps in props.items():
-    ivars = '{\n' + ''.join(f'  {t} _{n};\n' for t, n in ps) + '}\n'
-    src = re.sub(r'(@interface ' + name + r'\b[^\n{]*\n)', lambda m: m.group(1) + ivars, src, count=1)
-    syn = ''.join(f'@synthesize {n} = _{n};\n' for t, n in ps)
-    src = re.sub(r'(@implementation ' + name + r'\b[^\n]*\n)', lambda m: m.group(1) + syn, src, count=1)
-
-# 2. Subscripts -> CYLSubGet / CYLSubSet (skip strings, chars, comments; C arrays listed below stay).
 C_ARRAYS = {'pair', 'argv', 'cases', 'bytes', 'trailer'}
-out = []; i = 0; n = len(src)
-def skip_literal(j):
-    q = src[j]; j += 1
-    while j < n and src[j] != q:
-        j += 2 if src[j] == '\\' else 1
-    return j + 1
-def match_bracket(j):  # src[j] == '['
+# [EN] "(int)[self peek]": a message send after a cast, not a subscript. [CN] 类型转换后的消息发送，不是下标。
+CAST_SEND = re.compile(r'^\s*[\w.]+\s+[A-Za-z_]\w*\s*(:|$)')
+ASSIGNMENT = re.compile(r'\s*=(?!=)')
+
+
+def is_identifier_character(c):
+    return c.isalnum() or c == '_'
+
+
+# 1. Properties -> explicit ivars + @synthesize. 属性 -> 显式实例变量 + @synthesize。
+
+def interface_bodies(src):
+    """[EN] (class name, body) of every @interface ... @end, found without backtracking regexes.
+    [CN] 每个 @interface ... @end 的（类名，内容），不使用会回溯的正则。"""
+    position = src.find('@interface ')
+    while position >= 0:
+        name = re.match(r'\w+', src[position + len('@interface '):])
+        line_end = src.find('\n', position)
+        end = src.find('@end', line_end) if line_end >= 0 else -1
+        if not name or end < 0:
+            return
+        yield name.group(0), src[line_end + 1:end]
+        position = src.find('@interface ', end + len('@end'))
+
+
+def properties(body):
+    """[EN] (type, name) of every @property of a class body. [CN] 类内容中每个 @property 的（类型，名称）。"""
+    found = []
+    for match in re.finditer(r'@property\s*\([^)]*\)([^;\n]*);', body):
+        declaration = match.group(1).lstrip()
+        k = len(declaration)
+        while k > 0 and is_identifier_character(declaration[k - 1]):
+            k -= 1
+        if k < len(declaration):
+            found.append((declaration[:k].replace('_Nullable', '').strip(), declaration[k:]))
+    return found
+
+
+def synthesize_properties(src):
+    for name, body in list(interface_bodies(src)):
+        declared = properties(body)
+        if not declared:
+            continue
+        ivars = '{\n' + ''.join(f'  {t} _{n};\n' for t, n in declared) + '}\n'
+        src = re.sub(r'(@interface ' + name + r'\b[^\n{]*\n)', lambda m, text=ivars: m.group(1) + text, src, count=1)
+        synthesized = ''.join(f'@synthesize {n} = _{n};\n' for _, n in declared)
+        src = re.sub(r'(@implementation ' + name + r'\b[^\n]*\n)', lambda m, text=synthesized: m.group(1) + text, src, count=1)
+    return src
+
+
+# 2. Subscripts -> CYLSubGet / CYLSubSet (strings, chars and comments are skipped; the C arrays above stay).
+#    下标 -> CYLSubGet / CYLSubSet（跳过字符串、字符与注释；上面列出的 C 数组保持不变）。
+
+def opener_index(emitted, b, closer):
+    """[EN] Index of the bracket that opens the one ending at `b`. [CN] 与 `b` 处结束的括号配对的左括号位置。"""
+    opener = '(' if closer == ')' else '['
     depth = 0
-    while j < n:
-        c = src[j]
-        if c in '"\'': j = skip_literal(j); continue
-        if c == '[': depth += 1
-        elif c == ']':
+    while b > 0:
+        b -= 1
+        if emitted[b] == closer:
+            depth += 1
+        elif emitted[b] == opener:
             depth -= 1
-            if depth == 0: return j
+            if depth == 0:
+                break
+    return b
+
+
+def base_start(emitted):
+    """[EN] Where the expression being subscripted starts in the text already emitted. [CN] 被下标访问的表达式在已输出文本中的起点。"""
+    b = len(emitted)
+    while b > 0:
+        ch = emitted[b - 1]
+        if ch in ')]':
+            b = opener_index(emitted, b, ch)
+        elif is_identifier_character(ch) or ch == '.':
+            b -= 1
+        else:
+            break
+    return b
+
+
+class Lowerer:
+    def __init__(self, text):
+        self.src = text
+        self.n = len(text)
+
+    def skip_literal(self, j):
+        quote = self.src[j]
         j += 1
-    raise SystemExit('unbalanced')
+        while j < self.n and self.src[j] != quote:
+            j += 2 if self.src[j] == '\\' else 1
+        return j + 1
+
+    def match_bracket(self, j):
+        """[EN] Index of the "]" closing the "[" at `j`. [CN] 与 `j` 处 "[" 配对的 "]" 的位置。"""
+        depth = 0
+        while j < self.n:
+            c = self.src[j]
+            if c in '"\'':
+                j = self.skip_literal(j)
+                continue
+            if c == '[':
+                depth += 1
+            elif c == ']':
+                depth -= 1
+                if depth == 0:
+                    return j
+            j += 1
+        raise SystemExit('unbalanced')
+
+    def verbatim_end(self, j):
+        """[EN] End of the comment or literal starting at `j`, else None. [CN] 从 `j` 开始的注释或字面量的结尾，否则为 None。"""
+        if self.src.startswith('//', j):
+            k = self.src.find('\n', j)
+            return self.n if k < 0 else k
+        if self.src.startswith('/*', j):
+            return self.src.find('*/', j) + 2
+        if self.src[j] in '"\'':
+            return self.skip_literal(j)
+        return None
+
+    def is_subscript(self, j):
+        return self.src[j] == '[' and j > 0 and (is_identifier_character(self.src[j - 1]) or self.src[j - 1] in ')]')
+
+    def statement_end(self, v):
+        """[EN] The ";" ending the assigned value, at depth 0. [CN] 赋值语句结尾处深度为 0 的 ";"。"""
+        depth = 0
+        while v < self.n:
+            ch = self.src[v]
+            if ch in '"\'':
+                v = self.skip_literal(v)
+                continue
+            if ch in '([{':
+                depth += 1
+            elif ch in ')]}':
+                depth -= 1
+            elif ch == ';' and depth == 0:
+                break
+            v += 1
+        return v
+
+    def subscript(self, j, res):
+        """[EN] Rewrites the subscript at `j`; returns the new output and position. [CN] 改写 `j` 处的下标，返回新的输出与位置。"""
+        k = self.match_bracket(j)
+        if CAST_SEND.match(self.src[j + 1:k]):
+            res.append('[')
+            return res, j + 1
+        emitted = ''.join(res)
+        base = emitted[base_start(emitted):]
+        if base in C_ARRAYS:
+            res.append(self.src[j:k + 1])
+            return res, k + 1
+        key = lower(self.src[j + 1:k])
+        emitted = emitted[:len(emitted) - len(base)]
+        assignment = ASSIGNMENT.match(self.src, k + 1)
+        if assignment:
+            v = self.statement_end(assignment.end())
+            value = lower(self.src[assignment.end():v])
+            return [emitted, f'CYLSubSet({base}, ({key}), ({value}))'], v
+        return [emitted, f'CYLSubGet({base}, ({key}))'], k + 1
+
+    def run(self):
+        res = []
+        j = 0
+        while j < self.n:
+            end = self.verbatim_end(j)
+            if end is not None:
+                res.append(self.src[j:end])
+                j = end
+            elif self.is_subscript(j):
+                res, j = self.subscript(j, res)
+            else:
+                res.append(self.src[j])
+                j += 1
+        return ''.join(res)
+
+
 def lower(text):
-    return LOWER(text)
-def LOWER(s):
-    global src, n
-    saved = (src, n); src, n = s, len(s)
-    res = []; j = 0
-    while j < n:
-        c = src[j]
-        if src.startswith('//', j):
-            k = src.find('\n', j); k = n if k < 0 else k; res.append(src[j:k]); j = k; continue
-        if src.startswith('/*', j):
-            k = src.find('*/', j) + 2; res.append(src[j:k]); j = k; continue
-        if c in '"\'':
-            k = skip_literal(j); res.append(src[j:k]); j = k; continue
-        if c == '[' and j > 0 and (src[j-1].isalnum() or src[j-1] in '_)]'):
-            # postfix subscript: find the base expression already emitted
-            k = match_bracket(j)
-            if re.match(r'^\s*[\w.]+\s+[A-Za-z_]\w*\s*(:|$)', src[j+1:k]):
-                # a message send after a cast, e.g. (int)[self peek]: not a subscript
-                res.append('['); j += 1; continue
-            emitted = ''.join(res)
-            b = len(emitted)
-            while b > 0:
-                ch = emitted[b-1]
-                if ch in ')]':
-                    opener = '(' if ch == ')' else '['; depth = 0
-                    while b > 0:
-                        b -= 1
-                        if emitted[b] == ch: depth += 1
-                        elif emitted[b] == opener:
-                            depth -= 1
-                            if depth == 0: break
-                elif ch.isalnum() or ch in '_.':
-                    b -= 1
-                else:
-                    break
-            base = emitted[b:]
-            if base in C_ARRAYS:
-                res.append(src[j:k+1]); j = k + 1; continue
-            key = LOWER(src[j+1:k])
-            rest = src[k+1:]
-            am = re.match(r'\s*=(?!=)', rest)
-            emitted = emitted[:len(emitted) - len(base)]
-            if am:
-                # value runs to the ';' at depth 0
-                v0 = k + 1 + am.end(); depth = 0; v = v0
-                while v < n:
-                    ch = src[v]
-                    if ch in '"\'': v = skip_literal(v); continue
-                    if ch in '([{': depth += 1
-                    elif ch in ')]}': depth -= 1
-                    elif ch == ';' and depth == 0: break
-                    v += 1
-                value = LOWER(src[v0:v])
-                res = [emitted, f'CYLSubSet({base}, ({key}), ({value}))']; j = v; continue
-            res = [emitted, f'CYLSubGet({base}, ({key}))']; j = k + 1; continue
-        res.append(c); j += 1
-    src, n = saved
-    return ''.join(res)
-print('#include "cyl_sub.h"\n' + LOWER(src))
+    return Lowerer(text).run()
+
+
+if __name__ == '__main__':
+    source = open(confined_path(sys.argv[1], ALLOWED_ROOTS)).read()
+    print('#include "cyl_sub.h"\n' + lower(synthesize_properties(source)))
