@@ -314,6 +314,18 @@ static UIImage *CYLPlusButtonOriginalImage(UIImage *image) {
     return [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
 
+/// [EN] Whether two images draw the same picture: the same object, the same bitmap at the same size, or equal (e.g. the
+///      same symbol). [CN] 两张图片是否绘制相同的内容：同一对象、相同尺寸的同一位图，或相等（例如同一 SF Symbol）。
+static BOOL CYLPlusButtonImagesDrawTheSame(UIImage *image, UIImage *otherImage) {
+    if (image == otherImage) {
+        return YES;
+    }
+    if (!image || !otherImage || !CGSizeEqualToSize(image.size, otherImage.size)) {
+        return NO;
+    }
+    return (image.CGImage && image.CGImage == otherImage.CGImage) || [image isEqual:otherImage];
+}
+
 /// [EN] The control states whose images a plus button (or its stand-in) can set. [CN] PlusButton（或其替身）可设置图片的状态。
 static NSArray<NSNumber *> *CYLPlusButtonImageStates(void) {
     return @[ @(UIControlStateNormal), @(UIControlStateHighlighted), @(UIControlStateSelected),
@@ -435,8 +447,17 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
         background.image = CYLPlusButtonOriginalImage(background.image);
         configuration.background = background;
     }
+    UIButtonConfiguration *oldConfiguration = self.configuration;
     [super setConfiguration:configuration];
-    [self cyl_contentImageDidChange];
+    // [EN] Only a new picture: the plus button sets its configuration too (e.g. without the title when it moves into the
+    //      tab item, #636), and treating that as a new picture gave the title back, which moved it again, forever.
+    //      A configuration hands back its images as new objects, so they are compared by what they draw.
+    // [CN] 仅在图片变化时处理：PlusButton 自己也会设置 configuration（例如标题移到 TabBarItem 时去掉标题，#636），把它当作新图片会把标题还回去，
+    //      标题随即再次移走，无限循环。configuration 返回的图片是新对象，因此按其绘制内容比较。
+    if (!CYLPlusButtonImagesDrawTheSame(configuration.image, oldConfiguration.image) ||
+        !CYLPlusButtonImagesDrawTheSame(configuration.background.image, oldConfiguration.background.image)) {
+        [self cyl_contentImageDidChange];
+    }
 }
 
 /*!
