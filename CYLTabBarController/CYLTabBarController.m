@@ -5763,6 +5763,21 @@ static UITabBarMinimizeBehavior CYLSystemTabBarMinimizeBehavior(CYLTabBarMinimiz
     }
     return UITabBarMinimizeBehaviorAutomatic;
 }
+
+/// [EN] The CYLTabBarMinimizeBehavior for a native value. [CN] 系统取值对应的 CYLTabBarMinimizeBehavior。
+static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMinimizeBehavior behavior) API_AVAILABLE(ios(26.0)) {
+    switch (behavior) {
+        case UITabBarMinimizeBehaviorNever:
+            return CYLTabBarMinimizeBehaviorNever;
+        case UITabBarMinimizeBehaviorOnScrollDown:
+            return CYLTabBarMinimizeBehaviorOnScrollDown;
+        case UITabBarMinimizeBehaviorOnScrollUp:
+            return CYLTabBarMinimizeBehaviorOnScrollUp;
+        case UITabBarMinimizeBehaviorAutomatic:
+            break;
+    }
+    return CYLTabBarMinimizeBehaviorAutomatic;
+}
 #endif
 
 @implementation CYLTabBarController (CYLTabBarMinimize)
@@ -5776,6 +5791,36 @@ static UITabBarMinimizeBehavior CYLSystemTabBarMinimizeBehavior(CYLTabBarMinimiz
     objc_setAssociatedObject(self, CYLTabBarMinimizeBehaviorKey, @(behavior), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     [self cyl_updateTabBarMinimizeTracking];
 }
+
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+/*!
+ * [EN] The same switch through Apple's own API (iOS 26+): `tabBarController.tabBarMinimizeBehavior = ...` turns scroll
+ *      hiding on and off in every style, exactly as `cyl_tabBarMinimizeBehavior`. Both read and write one stored value;
+ *      the value really given to UIKit (`Never` for FlatDesign and the classic tab bar) is written through `super`.
+ *      Use `cyl_tabBarMinimizeBehavior` where iOS 25 and earlier must be supported, since Apple's property does not
+ *      exist there.
+ * [CN] 通过 Apple 自己的接口（iOS 26+）使用同一个开关：`tabBarController.tabBarMinimizeBehavior = ...` 在所有样式下开启、关闭
+ *      滚动隐藏，与 `cyl_tabBarMinimizeBehavior` 完全相同。二者读写同一个保存的取值；真正交给 UIKit 的取值（扁平样式与经典
+ *      TabBar 为 `Never`）通过 `super` 写入。需要支持 iOS 25 及以前时请使用 `cyl_tabBarMinimizeBehavior`，因为这些系统上没有
+ *      Apple 的这个属性。
+ */
+- (void)setTabBarMinimizeBehavior:(UITabBarMinimizeBehavior)tabBarMinimizeBehavior {
+    if (@available(iOS 26.0, *)) {
+        self.cyl_tabBarMinimizeBehavior = CYLTabBarMinimizeBehaviorFromSystem(tabBarMinimizeBehavior);
+    }
+}
+
+- (UITabBarMinimizeBehavior)tabBarMinimizeBehavior {
+    if (@available(iOS 26.0, *)) {
+        // [EN] Not set by the app yet: UIKit's own value. [CN] App 尚未设置：返回 UIKit 自己的取值。
+        if (!objc_getAssociatedObject(self, CYLTabBarMinimizeBehaviorKey)) {
+            return [super tabBarMinimizeBehavior];
+        }
+        return CYLSystemTabBarMinimizeBehavior(self.cyl_tabBarMinimizeBehavior);
+    }
+    return 0;
+}
+#endif
 
 - (void)cyl_updateTabBarMinimizeTracking {
     // [EN] Nothing to do until the app sets a value: UIKit's own default is left untouched.
@@ -5792,8 +5837,10 @@ static UITabBarMinimizeBehavior CYLSystemTabBarMinimizeBehavior(CYLTabBarMinimiz
         //      样式仍可能改变，每次布局都会重新检查；只有取值不同时才写入。
         BOOL systemMinimizes = (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) && [CYLConstants isLiquidGlassActive];
         UITabBarMinimizeBehavior systemBehavior = systemMinimizes ? CYLSystemTabBarMinimizeBehavior(self.cyl_tabBarMinimizeBehavior) : UITabBarMinimizeBehaviorNever;
-        if (self.tabBarMinimizeBehavior != systemBehavior) {
-            self.tabBarMinimizeBehavior = systemBehavior;
+        // [EN] Through `super`: `-setTabBarMinimizeBehavior:` above is the app's switch, not UIKit's value.
+        // [CN] 通过 `super`：上面的 `-setTabBarMinimizeBehavior:` 是 App 的开关，而不是交给 UIKit 的取值。
+        if ([super tabBarMinimizeBehavior] != systemBehavior) {
+            [super setTabBarMinimizeBehavior:systemBehavior];
         }
     }
 #endif

@@ -26,6 +26,7 @@
 | 中文 | English |
 |:---|:---|
 | [API](#cnapi) | [API](#enapi) |
+| [同一个开关的两种写法](#cn同一个开关的两种写法) | [One switch, two ways to set it](#enone-switch-two-ways-to-set-it) |
 | [用法](#cn用法) | [Usage](#enusage) |
 | [各样式的实现](#cn各样式的实现) | [How each style works](#enhow-each-style-works) |
 | [缩小时的 PlusButton](#cn缩小时的-plusbutton) | [The PlusButton in the minimized bar](#enthe-plusbutton-in-the-minimized-bar) |
@@ -73,6 +74,25 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
 | 取值与系统的 [`UITabBarController.MinimizeBehavior`](https://developer.apple.com/documentation/uikit/uitabbarcontroller/minimizebehavior)（Objective-C：`UITabBarMinimizeBehavior`）一一对应，系统属性见 [`tabBarMinimizeBehavior`](https://developer.apple.com/documentation/uikit/uitabbarcontroller/tabbarminimizebehavior)（iOS 26.0+）。 | The values match the system's [`UITabBarController.MinimizeBehavior`](https://developer.apple.com/documentation/uikit/uitabbarcontroller/minimizebehavior) (Objective-C: `UITabBarMinimizeBehavior`) one to one; the system property is [`tabBarMinimizeBehavior`](https://developer.apple.com/documentation/uikit/uitabbarcontroller/tabbarminimizebehavior) (iOS 26.0+). |
 | 任何时候都可以设置，视图加载前后均可，也可以在运行时切换。没有设置时，CYLTabBarController 不会改动系统的默认值。 | Set it at any time, before or after the view loads, and change it at runtime. Until you set it, CYLTabBarController leaves the system default untouched. |
 
+## [CN]同一个开关的两种写法
+## [EN]One switch, two ways to set it
+
+| 中文 | English |
+|:---|:---|
+| 开启、关闭滚动隐藏只有一个开关，可以用两种写法设置，效果完全相同：Apple 的 `tabBarMinimizeBehavior`（iOS 26+）与 `cyl_tabBarMinimizeBehavior`（所有系统）。CYLTabBarController 重写了 Apple 的 `tabBarMinimizeBehavior` 的 setter 与 getter，二者读写同一个保存的取值，因此用 Apple 的接口设置后，扁平样式与经典 TabBar（iOS 26 UI 兼容模式）同样生效，`cyl_tabBarMinimizeBehavior` 也会读到相同的取值，反之亦然。 | Scroll hiding has one switch, set in either of two ways with exactly the same effect: Apple's `tabBarMinimizeBehavior` (iOS 26+) and `cyl_tabBarMinimizeBehavior` (every system). CYLTabBarController overrides the setter and getter of Apple's `tabBarMinimizeBehavior`, and both read and write one stored value: set through Apple's API, FlatDesign and the classic tab bar (iOS 26 UI compatibility mode) follow it too, and `cyl_tabBarMinimizeBehavior` reads the same value, and the other way round. |
+| 交给 UIKit 的真实取值（扁平样式与经典 TabBar 为 `Never`，避免系统重复处理）通过 `super` 写入，不会出现在 getter 中：getter 始终返回 App 设置的取值。App 设置之前，getter 返回 UIKit 自己的取值。 | The value really given to UIKit (`Never` for FlatDesign and the classic tab bar, so the system never acts as well) is written through `super` and never shows in the getter: the getter always returns the value the app set. Until the app sets one, the getter returns UIKit's own value. |
+| 只支持 iOS 26+ 的 App 可以直接使用 Apple 的接口；需要支持 iOS 25 及以前的 App 请使用 `cyl_tabBarMinimizeBehavior`，因为旧系统上没有 Apple 的这个属性。 | Apps that support only iOS 26+ can use Apple's API directly; apps that also support iOS 25 and earlier use `cyl_tabBarMinimizeBehavior`, since Apple's property does not exist on older systems. |
+
+| 写法 | 系统 | 液态玻璃 | 扁平样式 | 经典 TabBar |
+|:---|:---|:---|:---|:---|
+| `cyl_tabBarMinimizeBehavior` | 所有系统 | ✅ | ✅ | ✅ |
+| `tabBarMinimizeBehavior`（Apple） | iOS 26+ | ✅ | ✅ | ✅（UI 兼容模式） |
+
+| Way | Systems | Liquid Glass | FlatDesign | Classic tab bar |
+|:---|:---|:---|:---|:---|
+| `cyl_tabBarMinimizeBehavior` | Every system | ✅ | ✅ | ✅ |
+| `tabBarMinimizeBehavior` (Apple) | iOS 26+ | ✅ | ✅ | ✅ (UI compatibility mode) |
+
 ## [CN]用法
 ## [EN]Usage
 
@@ -87,6 +107,20 @@ tabBarController.cyl_tabBarMinimizeBehavior = CYLTabBarMinimizeBehaviorOnScrollD
 let tabBarController = CYLTabBarController(viewControllers: viewControllers,
                                            tabBarItemsAttributes: tabBarItemsAttributes)
 tabBarController.cyl_tabBarMinimizeBehavior = .onScrollDown
+```
+
+```Objective-C
+// [EN] iOS 26+ only: Apple's API, the same switch. [CN] 仅 iOS 26+：Apple 的接口，同一个开关。
+if (@available(iOS 26.0, *)) {
+    tabBarController.tabBarMinimizeBehavior = UITabBarMinimizeBehaviorOnScrollDown;
+}
+```
+
+```Swift
+// [EN] iOS 26+ only: Apple's API, the same switch. [CN] 仅 iOS 26+：Apple 的接口，同一个开关。
+if #available(iOS 26.0, *) {
+    tabBarController.tabBarMinimizeBehavior = .onScrollDown
+}
 ```
 
 | 中文 | English |

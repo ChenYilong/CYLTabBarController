@@ -1151,6 +1151,9 @@ presentLoginForViewController:(UIViewController *)viewController
  *        on the opposite scroll, at the top (OnScrollDown) and when another tab or page appears. Pages pushed with
  *        `hidesBottomBarWhenPushed` are left to UIKit, and a tab bar at the top (not at the bottom) is never moved.
  *      Can be set at any time, before or after the view loads.
+ *      Same switch, Apple's API: on iOS 26+, `tabBarController.tabBarMinimizeBehavior = UITabBarMinimizeBehaviorOnScrollDown`
+ *      does exactly the same in every style (CYLTabBarController overrides it; both read and write one value). Use this
+ *      property where iOS 25 and earlier must be supported, since Apple's property does not exist there.
  * [CN] 当前页面滚动时 TabBar 的变化方式，默认 `CYLTabBarMinimizeBehaviorAutomatic`。
  *      - iOS 26+ 液态玻璃（扁平样式以外的所有样式）：设置系统原生的 `UITabBarController.tabBarMinimizeBehavior`，由系统缩小
  *        TabBar 并选择滚动视图；页面中有多个滚动视图时，用 `-[UIViewController setContentScrollView:forEdge:]` 指定。
@@ -1161,6 +1164,9 @@ presentLoginForViewController:(UIViewController *)viewController
  *        PlusButton 滑到屏幕下方；反向滚动、回到顶部（OnScrollDown）、切换到其他 Tab 或页面时滑回。使用 `hidesBottomBarWhenPushed`
  *        push 的页面交给 UIKit 处理，位于顶部（而非底部）的 TabBar 不会移动。
  *      任何时候都可以设置，视图加载前后均可。
+ *      同一个开关，Apple 的接口：iOS 26+ 上 `tabBarController.tabBarMinimizeBehavior = UITabBarMinimizeBehaviorOnScrollDown`
+ *      在所有样式下效果完全相同（CYLTabBarController 重写了它，二者读写同一个取值）。需要支持 iOS 25 及以前时使用本属性，
+ *      因为这些系统上没有 Apple 的这个属性。
  */
 @property (nonatomic, assign) CYLTabBarMinimizeBehavior cyl_tabBarMinimizeBehavior;
 
