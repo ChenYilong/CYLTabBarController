@@ -1,0 +1,1089 @@
+//
+//  CYLGalleryProvider.m
+//  CYLTabBarController
+//
+//  v1.99.x Created by 微博@iOS程序犭袁 ( http://weibo.com/luohanchenyilong/ ) on 10/20/15.
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
+//
+
+#import "CYLGalleryProvider.h"
+#import <CYLTabBarController/CYLTabBarController.h>
+
+/// [EN] The context of the gallery's tab bars: no plus button is registered for it. [CN] 图库 TabBar 的 context：没有为它注册 PlusButton。
+static NSString *const CYLGalleryContext = @"CYLGallery";
+/// [EN] The context of the irregular scenes, with their own plus button. [CN] 不规则场景的 context，带有自己的 PlusButton。
+static NSString *const CYLGalleryIrregularContext = @"CYLGalleryIrregular";
+
+#pragma mark - Colors
+
+static UIColor *CYLGalleryRGB(CGFloat red, CGFloat green, CGFloat blue) {
+    return [UIColor colorWithRed:red / 255.0 green:green / 255.0 blue:blue / 255.0 alpha:1.0];
+}
+
+static UIColor *CYLGalleryGray(CGFloat white) {
+    return [UIColor colorWithWhite:white / 255.0 alpha:1.0];
+}
+
+#pragma mark - Scene model
+
+@interface CYLGalleryScene ()
+@property (nonatomic, copy, readwrite) NSString *title;
+@property (nonatomic, copy, readwrite) NSString *subtitle;
+@property (nonatomic, copy, readwrite) CYLGallerySceneBuilder builder;
+@property (nonatomic, copy, readwrite, nullable) CYLGallerySceneDidPresent didPresent;
+@end
+
+@implementation CYLGalleryScene
+
++ (instancetype)sceneWithTitle:(NSString *)title
+                      subtitle:(NSString *)subtitle
+                       builder:(CYLGallerySceneBuilder)builder
+                    didPresent:(nullable CYLGallerySceneDidPresent)didPresent {
+    CYLGalleryScene *scene = [[self alloc] init];
+    scene.title = title;
+    scene.subtitle = subtitle;
+    scene.builder = builder;
+    scene.didPresent = didPresent;
+    return scene;
+}
+
++ (instancetype)sceneWithTitle:(NSString *)title subtitle:(NSString *)subtitle builder:(CYLGallerySceneBuilder)builder {
+    return [self sceneWithTitle:title subtitle:subtitle builder:builder didPresent:nil];
+}
+
+@end
+
+@interface CYLGallerySection ()
+@property (nonatomic, copy, readwrite) NSString *title;
+@property (nonatomic, copy, readwrite) NSArray<CYLGalleryScene *> *scenes;
+@end
+
+@implementation CYLGallerySection
+
++ (instancetype)sectionWithTitle:(NSString *)title scenes:(NSArray<CYLGalleryScene *> *)scenes {
+    CYLGallerySection *section = [[self alloc] init];
+    section.title = title;
+    section.scenes = scenes;
+    return section;
+}
+
+@end
+
+#pragma mark - Page
+
+/*!
+ * [EN] The page shown in every tab: a line of text that changes every two seconds, and a button that pops or dismisses.
+ *      Tapping anywhere else pushes a detail page (or presents it without a navigation controller).
+ * [CN] 每个 Tab 中显示的页面：每两秒更换一次的文字，以及返回或关闭的按钮。点击其他位置会 push 一个详情页（没有导航控制器时 present）。
+ */
+@interface CYLGalleryPageViewController : UIViewController
+@property (nonatomic, strong) UILabel *textLabel;
+@property (nonatomic, strong) UIButton *backgroundButton;
+@property (nonatomic, strong) UIButton *closeButton;
+@property (nonatomic, strong, nullable) NSTimer *textTimer;
+@end
+
+@implementation CYLGalleryPageViewController
+
++ (NSArray<NSString *> *)lines {
+    static NSArray<NSString *> *lines;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        lines = @[ @"Tap a tab to switch pages.",
+                   @"Tap the selected tab again to see its reselect behavior.",
+                   @"Press and hold a tab to see its pressed animation.",
+                   @"Tap anywhere on this page to push a detail page.",
+                   @"Every tab bar here is built with the public API.",
+                   @"Badges, colors and fonts can differ from tab to tab.",
+                   @"The same code runs with and without Liquid Glass.",
+                   @"Use the button below to go back to the gallery." ];
+    });
+    return lines;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor *(UITraitCollection *traitCollection) {
+        return traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? UIColor.systemBackgroundColor : CYLGalleryRGB(244, 245, 245);
+    }];
+
+    self.backgroundButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.backgroundButton addTarget:self action:@selector(pushDetailPage) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.backgroundButton];
+
+    self.textLabel = [[UILabel alloc] init];
+    self.textLabel.font = [UIFont systemFontOfSize:24 weight:UIFontWeightMedium];
+    self.textLabel.textColor = UIColor.secondaryLabelColor;
+    self.textLabel.numberOfLines = 0;
+    self.textLabel.textAlignment = NSTextAlignmentCenter;
+    self.textLabel.text = [self randomLineExcluding:nil];
+    [self.view addSubview:self.textLabel];
+
+    UIColor *buttonColor = CYLGalleryGray(100);
+    self.closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.closeButton setTitle:@"  Click to pop or dismiss  " forState:UIControlStateNormal];
+    [self.closeButton setTitleColor:buttonColor forState:UIControlStateNormal];
+    self.closeButton.layer.borderWidth = 2;
+    self.closeButton.layer.borderColor = buttonColor.CGColor;
+    self.closeButton.layer.cornerRadius = 16;
+    [self.closeButton addTarget:self action:@selector(popOrDismiss) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.closeButton];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self.textTimer invalidate];
+    __weak __typeof(self) weakSelf = self;
+    self.textTimer = [NSTimer scheduledTimerWithTimeInterval:2 repeats:YES block:^(NSTimer *timer) {
+        __strong __typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            [timer invalidate];
+            return;
+        }
+        strongSelf.textLabel.text = [strongSelf randomLineExcluding:strongSelf.textLabel.text];
+        [strongSelf.view setNeedsLayout];
+    }];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    [self.textTimer invalidate];
+    self.textTimer = nil;
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    CGRect bounds = self.view.bounds;
+    self.backgroundButton.frame = bounds;
+    CGFloat padding = 24;
+    CGFloat labelWidth = CGRectGetWidth(bounds) - padding * 2;
+    CGSize labelSize = [self.textLabel sizeThatFits:CGSizeMake(labelWidth, CGFLOAT_MAX)];
+    self.textLabel.frame = CGRectMake(padding, (CGRectGetHeight(bounds) - labelSize.height) / 2.0 - 24, labelWidth, labelSize.height);
+    CGSize buttonSize = [self.closeButton sizeThatFits:bounds.size];
+    self.closeButton.frame = CGRectMake((CGRectGetWidth(bounds) - buttonSize.width) / 2.0, CGRectGetHeight(bounds) - 120, buttonSize.width, 42);
+}
+
+- (NSString *)randomLineExcluding:(nullable NSString *)current {
+    NSArray<NSString *> *lines = [CYLGalleryPageViewController lines];
+    NSString *line = current;
+    while (!line || [line isEqualToString:current ?: @""]) {
+        line = lines[arc4random_uniform((uint32_t)lines.count)];
+    }
+    return line;
+}
+
+- (void)pushDetailPage {
+    CYLGalleryPageViewController *detail = [[CYLGalleryPageViewController alloc] init];
+    detail.title = @"Detail";
+    detail.hidesBottomBarWhenPushed = YES;
+    if (self.navigationController) {
+        [self.navigationController pushViewController:detail animated:YES];
+        return;
+    }
+    [self presentViewController:detail animated:YES completion:nil];
+}
+
+- (void)popOrDismiss {
+    if (self.navigationController.viewControllers.count > 1) {
+        [self.navigationController popViewControllerAnimated:YES];
+        return;
+    }
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+@end
+
+#pragma mark - List page (reselect behavior)
+
+/// [EN] A long list, to see `cyl_reselectBehavior` scroll it back to the top. [CN] 一个长列表，用于观察 `cyl_reselectBehavior` 滚动回顶部。
+@interface CYLGalleryListViewController : UITableViewController
+@end
+
+@implementation CYLGalleryListViewController
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 60;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"row"] ?: [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"row"];
+    cell.textLabel.text = [NSString stringWithFormat:@"Row %@: tap to push, tap the tab again to go back", @(indexPath.row + 1)];
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    CYLGalleryPageViewController *page = [[CYLGalleryPageViewController alloc] init];
+    page.title = [NSString stringWithFormat:@"Row %@", @(indexPath.row + 1)];
+    [self.navigationController pushViewController:page animated:YES];
+}
+
+@end
+
+#pragma mark - Navigation controller
+
+/// [EN] Light navigation bar; pages pushed after the root hide the tab bar. [CN] 浅色导航栏；根页面之后 push 的页面隐藏 TabBar。
+@interface CYLGalleryNavigationController : UINavigationController
+@end
+
+@implementation CYLGalleryNavigationController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    UIColor *titleColor = CYLGalleryRGB(38, 38, 38);
+    self.navigationBar.translucent = YES;
+    self.navigationBar.tintColor = titleColor;
+    self.navigationBar.titleTextAttributes = @{ NSForegroundColorAttributeName : titleColor,
+                                                NSFontAttributeName : [UIFont systemFontOfSize:16] };
+}
+
+- (void)presentViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion {
+    if (![viewControllerToPresent isKindOfClass:[UIAlertController class]]) {
+        viewControllerToPresent.modalPresentationStyle = UIModalPresentationFullScreen;
+    }
+    [super presentViewController:viewControllerToPresent animated:flag completion:completion];
+}
+
+- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
+    if (self.viewControllers.count > 0) {
+        viewController.hidesBottomBarWhenPushed = YES;
+    }
+    [super pushViewController:viewController animated:animated];
+}
+
+@end
+
+#pragma mark - Tab button animations
+
+static void CYLGalleryPlayKeyframes(UIView *view, NSString *keyPath, NSArray *values, NSTimeInterval duration) {
+    if (!view) {
+        return;
+    }
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:keyPath];
+    animation.values = values;
+    animation.duration = duration;
+    animation.calculationMode = kCAAnimationCubic;
+    [view.layer addAnimation:animation forKey:nil];
+}
+
+/// [EN] A springy scale on select and on reselect. [CN] 选中与重复点击时的弹性缩放。
+@interface CYLGalleryBounceAnimation : NSObject <CYLTabButtonAnimation>
+@end
+
+@implementation CYLGalleryBounceAnimation
+
+- (void)cyl_playSelectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLGalleryPlayKeyframes(iconView, @"transform.scale", @[ @1.0, @1.4, @0.9, @1.15, @0.95, @1.02, @1.0 ], 0.6);
+}
+
+- (void)cyl_playReselectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    [self cyl_playSelectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+}
+
+@end
+
+static const CGFloat CYLGalleryLargeIconScale = 1.15;
+
+/// [EN] Icons drawn 15% larger; a press shrinks the icon to 80% and the release brings it back. [CN] 图标放大 15% 显示；按下缩小到 80%，抬起后恢复。
+@interface CYLGalleryHighlightAnimation : NSObject <CYLTabButtonAnimation>
+@end
+
+@implementation CYLGalleryHighlightAnimation
+
+- (void)cyl_playSelectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    iconView.transform = CGAffineTransformMakeScale(CYLGalleryLargeIconScale, CYLGalleryLargeIconScale);
+}
+
+- (void)cyl_playHighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    [UIView animateWithDuration:0.2 animations:^{
+        iconView.transform = CGAffineTransformMakeScale(CYLGalleryLargeIconScale * 0.8, CYLGalleryLargeIconScale * 0.8);
+    }];
+}
+
+- (void)cyl_playDehighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    [UIView animateWithDuration:0.2 animations:^{
+        iconView.transform = CGAffineTransformMakeScale(CYLGalleryLargeIconScale, CYLGalleryLargeIconScale);
+    }];
+}
+
+@end
+
+/// [EN] Press animation plus a full turn on reselect (the newer protocol hooks). [CN] 按下动画，加上重复点击时旋转一周（新增的协议方法）。
+@interface CYLGalleryPressAndReselectAnimation : CYLTabButtonPressAnimation
+@end
+
+@implementation CYLGalleryPressAndReselectAnimation
+
+- (void)cyl_playReselectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLGalleryPlayKeyframes(iconView, @"transform.rotation.z", @[ @0, @(M_PI), @(2 * M_PI) ], 0.5);
+}
+
+@end
+
+#pragma mark - Irregular plus button
+
+/*!
+ * [EN] The large round center button of the irregular scenes: a teal circle with a light border, raised above the tab
+ *      bar, that only responds inside its circle. A tap plays a ripple and shows an action sheet instead of selecting a
+ *      page.
+ * [CN] 不规则场景中的大号圆形中间按钮：带浅色描边的青色圆形，凸出于 TabBar 之上，只在圆形内响应点击。点击时播放波纹并弹出操作表，
+ *      而不是选中某个页面。
+ */
+@interface CYLGalleryIrregularPlusButton : CYLPlusButton <CYLPlusButtonSubclassing>
+@property (nonatomic, strong) UIView *circleView;
+@property (nonatomic, strong) UIImageView *iconView;
+@end
+
+@implementation CYLGalleryIrregularPlusButton
+
++ (id)plusButton {
+    CGFloat diameter = 70;
+    CYLGalleryIrregularPlusButton *button = [[self alloc] initWithFrame:CGRectMake(0, 0, diameter, diameter)];
+    UIView *circleView = [[UIView alloc] initWithFrame:button.bounds];
+    circleView.userInteractionEnabled = NO;
+    circleView.backgroundColor = CYLGalleryRGB(23, 149, 158);
+    circleView.layer.cornerRadius = diameter / 2.0;
+    circleView.layer.borderWidth = 3;
+    circleView.layer.borderColor = CYLGalleryGray(235).CGColor;
+    UIImageSymbolConfiguration *configuration = [UIImageSymbolConfiguration configurationWithPointSize:28 weight:UIImageSymbolWeightSemibold];
+    UIImageView *iconView = [[UIImageView alloc] initWithImage:[UIImage systemImageNamed:@"camera.fill" withConfiguration:configuration]];
+    iconView.tintColor = UIColor.whiteColor;
+    iconView.center = CGPointMake(diameter / 2.0, diameter / 2.0);
+    [circleView addSubview:iconView];
+    [button addSubview:circleView];
+    button.circleView = circleView;
+    button.iconView = iconView;
+    button.accessibilityLabel = @"Camera";
+    [button addTarget:button action:@selector(galleryDidTap) forControlEvents:UIControlEventTouchUpInside];
+    return button;
+}
+
++ (NSString *)tabBarContext {
+    return CYLGalleryIrregularContext;
+}
+
++ (NSUInteger)indexOfPlusButtonInTabBar {
+    return 2;
+}
+
++ (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight {
+    return 0.25;
+}
+
++ (NSString *)tabBarItemIdentifier {
+    return @"camera";
+}
+
+/// [EN] Only the circle responds. [CN] 只有圆形区域响应。
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
+    CGFloat radius = CGRectGetWidth(self.bounds) / 2.0;
+    CGFloat dx = point.x - CGRectGetMidX(self.bounds);
+    CGFloat dy = point.y - CGRectGetMidY(self.bounds);
+    return sqrt(dx * dx + dy * dy) <= radius;
+}
+
+- (void)setHighlighted:(BOOL)highlighted {
+    [super setHighlighted:highlighted];
+    [UIView animateWithDuration:0.2 animations:^{
+        self.circleView.transform = highlighted ? CGAffineTransformMakeScale(0.8, 0.8) : CGAffineTransformIdentity;
+    }];
+}
+
+- (void)galleryDidTap {
+    [self playRipple];
+    UIViewController *presenter = [self cyl_owningTabBarController];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        UIAlertController *sheet = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        [sheet addAction:[UIAlertAction actionWithTitle:@"Take a photo" style:UIAlertActionStyleDefault handler:nil]];
+        [sheet addAction:[UIAlertAction actionWithTitle:@"Select from album" style:UIAlertActionStyleDefault handler:nil]];
+        [sheet addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        sheet.popoverPresentationController.sourceView = self;
+        sheet.popoverPresentationController.sourceRect = self.bounds;
+        [presenter presentViewController:sheet animated:YES completion:nil];
+    });
+}
+
+/// [EN] A dot that grows over the circle and fades out. [CN] 一个小圆点放大覆盖圆形后淡出。
+- (void)playRipple {
+    UIView *dot = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 2, 2)];
+    dot.layer.cornerRadius = 1;
+    dot.backgroundColor = CYLGalleryRGB(10, 66, 91);
+    dot.alpha = 0.5;
+    dot.center = CGPointMake(CGRectGetMidX(self.circleView.bounds), CGRectGetMidY(self.circleView.bounds));
+    [self.circleView insertSubview:dot belowSubview:self.iconView];
+    CGFloat scale = CGRectGetWidth(self.circleView.bounds) / 2.0;
+    [UIView animateWithDuration:0.4 animations:^{
+        dot.transform = CGAffineTransformMakeScale(scale, scale);
+        dot.alpha = 0;
+    } completion:^(BOOL finished) {
+        [dot removeFromSuperview];
+    }];
+}
+
+@end
+
+#pragma mark - Helpers
+
+/// [EN] Eight tabs: title, SF Symbol and identifier. [CN] 八个 Tab：标题、SF Symbol 与标识。
+static NSArray<NSArray<NSString *> *> *CYLGalleryTabSpecs(void) {
+    return @[ @[ @"Home", @"house", @"home" ],
+              @[ @"Find", @"safari", @"find" ],
+              @[ @"Photo", @"camera", @"photo" ],
+              @[ @"Favor", @"heart", @"favor" ],
+              @[ @"Me", @"person", @"me" ],
+              @[ @"Message", @"message", @"message" ],
+              @[ @"Shop", @"cart", @"shop" ],
+              @[ @"Cardboard", @"shippingbox", @"cardboard" ] ];
+}
+
+/// [EN] A template SF Symbol, so per-tab icon colors apply. [CN] 模板 SF Symbol，单个 Tab 的图标颜色可以生效。
+static UIImage *CYLGallerySymbol(NSString *name, BOOL filled, CGFloat pointSize) {
+    UIImageSymbolConfiguration *configuration = [UIImageSymbolConfiguration configurationWithPointSize:pointSize];
+    NSString *symbolName = filled ? [name stringByAppendingString:@".fill"] : name;
+    UIImage *image = [UIImage systemImageNamed:symbolName withConfiguration:configuration] ?: [UIImage systemImageNamed:name withConfiguration:configuration];
+    return [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+}
+
+/// [EN] The pages of a scene, optionally each in a navigation controller. [CN] 场景中的页面，可选地分别放进导航控制器。
+static NSArray<UIViewController *> *CYLGalleryPages(NSUInteger count, BOOL embedsInNavigation) {
+    NSMutableArray<UIViewController *> *pages = [NSMutableArray array];
+    NSArray<NSArray<NSString *> *> *specs = CYLGalleryTabSpecs();
+    for (NSUInteger index = 0; index < count; index++) {
+        CYLGalleryPageViewController *page = [[CYLGalleryPageViewController alloc] init];
+        if (embedsInNavigation) {
+            page.title = (index == 3) ? @"List" : specs[index][0];
+            [pages addObject:[[CYLGalleryNavigationController alloc] initWithRootViewController:page]];
+        } else {
+            [pages addObject:page];
+        }
+    }
+    return pages;
+}
+
+/*!
+ * [EN] The attributes of `count` tabs. `showsTitles` NO gives image-only tabs; `extra` adds keys per tab (colors,
+ *      fonts...) and can return nil.
+ * [CN] `count` 个 Tab 的属性。`showsTitles` 为 NO 时为纯图标 Tab；`extra` 为每个 Tab 添加键（颜色、字体……），可以返回 nil。
+ */
+static NSArray<NSDictionary *> *CYLGalleryAttributes(NSUInteger count, BOOL showsTitles, CGFloat pointSize,
+                                                     NSDictionary *_Nullable (^_Nullable extra)(NSUInteger index)) {
+    NSMutableArray<NSDictionary *> *attributes = [NSMutableArray array];
+    NSArray<NSArray<NSString *> *> *specs = CYLGalleryTabSpecs();
+    for (NSUInteger index = 0; index < count; index++) {
+        NSArray<NSString *> *spec = specs[index];
+        NSMutableDictionary *item = [@{ CYLTabBarItemImage : CYLGallerySymbol(spec[1], NO, pointSize),
+                                        CYLTabBarItemSelectedImage : CYLGallerySymbol(spec[1], YES, pointSize),
+                                        CYLTabBarItemIdentifier : spec[2] } mutableCopy];
+        if (showsTitles) {
+            item[CYLTabBarItemTitle] = spec[0];
+        }
+        NSDictionary *more = extra ? extra(index) : nil;
+        if (more) {
+            [item addEntriesFromDictionary:more];
+        }
+        [attributes addObject:item];
+    }
+    return attributes;
+}
+
+static CYLTabBarController *CYLGalleryTabBarController(NSArray<UIViewController *> *pages, NSArray<NSDictionary *> *attributes,
+                                                       CYLTabBarStyleType styleType, NSString *context) {
+    return [[CYLTabBarController alloc] initWithViewControllers:pages
+                                          tabBarItemsAttributes:attributes
+                                                      styleType:styleType
+                                                        context:context];
+}
+
+/// [EN] The system UITabBarController, for comparison. [CN] 系统 UITabBarController，用于对照。
+static UITabBarController *CYLGallerySystemTabBarController(NSUInteger count) {
+    UITabBarController *tabBarController = [[UITabBarController alloc] init];
+    NSArray<UIViewController *> *pages = CYLGalleryPages(count, NO);
+    NSArray<NSArray<NSString *> *> *specs = CYLGalleryTabSpecs();
+    for (NSUInteger index = 0; index < count; index++) {
+        NSArray<NSString *> *spec = specs[index];
+        pages[index].tabBarItem = [[UITabBarItem alloc] initWithTitle:spec[0] image:CYLGallerySymbol(spec[1], NO, 20) selectedImage:CYLGallerySymbol(spec[1], YES, 20)];
+    }
+    tabBarController.viewControllers = pages;
+    return tabBarController;
+}
+
+/// [EN] The dialog of an intercepted tab. [CN] 被拦截的 Tab 弹出的对话框。
+static void CYLGalleryPresentMoreFeatures(UIViewController *presenter) {
+    if (!presenter || presenter.presentedViewController) {
+        return;
+    }
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"More features" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Settings" style:UIAlertActionStyleDefault handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"About us" style:UIAlertActionStyleDefault handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [presenter presentViewController:alert animated:YES completion:nil];
+}
+
+/*!
+ * [EN] The "Photo" tab opens a dialog instead of a page: with the library through `cyl_hijackedTabBarItemIdentifiers`
+ *      and `cyl_didHijackHandler`.
+ * [CN] "Photo" Tab 打开对话框而不是页面：通过本库的 `cyl_hijackedTabBarItemIdentifiers` 与 `cyl_didHijackHandler` 实现。
+ */
+static void CYLGalleryHijackPhotoTab(CYLTabBarController *tabBarController) {
+    tabBarController.cyl_hijackedTabBarItemIdentifiers = @[ @"photo" ];
+    tabBarController.cyl_didHijackHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {
+        CYLGalleryPresentMoreFeatures(controller);
+    };
+}
+
+/// [EN] The same interception for the system UITabBarController, through its delegate. [CN] 系统 UITabBarController 通过代理实现同样的拦截。
+@interface CYLGallerySystemPhotoInterceptor : NSObject <UITabBarControllerDelegate>
++ (instancetype)sharedInterceptor;
+@end
+
+@implementation CYLGallerySystemPhotoInterceptor
+
++ (instancetype)sharedInterceptor {
+    static CYLGallerySystemPhotoInterceptor *interceptor;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        interceptor = [[self alloc] init];
+    });
+    return interceptor;
+}
+
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    if ([viewController.tabBarItem.title isEqualToString:@"Photo"] && viewController != tabBarController.selectedViewController) {
+        CYLGalleryPresentMoreFeatures(tabBarController);
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectTab:(UITab *)tab API_AVAILABLE(ios(18.0)) {
+    if ([tab.title isEqualToString:@"Photo"] && tab != tabBarController.selectedTab) {
+        CYLGalleryPresentMoreFeatures(tabBarController);
+        return NO;
+    }
+    return YES;
+}
+
+@end
+
+/// [EN] Runs `block` with each tab button once the tab bar has them. [CN] TabBar 的按钮就绪后，对每个 Tab 按钮执行 `block`。
+static void CYLGalleryForEachTabButton(CYLTabBarController *tabBarController, void (^block)(UIControl *button, NSUInteger index)) {
+    [tabBarController performWhenTabBarItemsReady:^(CYLTabBarController *controller) {
+        [controller.viewControllers enumerateObjectsUsingBlock:^(UIViewController *viewController, NSUInteger index, BOOL *stop) {
+            UIControl *button = viewController.tabBarItem.cyl_tabButton ?: viewController.cyl_tabButton;
+            if (button) {
+                block(button, index);
+            }
+        }];
+    }];
+}
+
+/// [EN] A speech bubble with its tail at the bottom right. [CN] 尾巴在右下角的气泡。
+static UIImage *CYLGalleryBubbleImage(UIColor *color) {
+    CGSize size = CGSizeMake(40, 34);
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:size];
+    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [color setFill];
+        [[UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, size.width, 28) cornerRadius:8] fill];
+        UIBezierPath *tail = [UIBezierPath bezierPath];
+        [tail moveToPoint:CGPointMake(size.width - 22, 27)];
+        [tail addLineToPoint:CGPointMake(size.width - 10, 27)];
+        [tail addLineToPoint:CGPointMake(size.width - 16, size.height)];
+        [tail closePath];
+        [tail fill];
+    }];
+    return [image resizableImageWithCapInsets:UIEdgeInsetsMake(10, 10, 12, 25) resizingMode:UIImageResizingModeStretch];
+}
+
+/// [EN] A bubble with `text`, added above the right edge of `button`. [CN] 在 `button` 右上方添加一个带 `text` 的气泡。
+static UIView *CYLGalleryAddBubble(UIControl *button, NSString *text, UIColor *color, CGRect frame, UIFont *font) {
+    UIImageView *bubble = [[UIImageView alloc] initWithImage:CYLGalleryBubbleImage(color)];
+    bubble.frame = frame;
+    UILabel *label = [[UILabel alloc] init];
+    label.text = text;
+    label.font = font;
+    label.textColor = UIColor.whiteColor;
+    [label sizeToFit];
+    label.center = CGPointMake(CGRectGetWidth(frame) / 2.0, (CGRectGetHeight(frame) - 6) / 2.0);
+    [bubble addSubview:label];
+    button.clipsToBounds = NO;
+    [button addSubview:bubble];
+    return bubble;
+}
+
+/// [EN] The dark look of the background scenes: dark tabs, the selected one darker, white icons when selected. [CN] 背景色场景的深色外观。
+static NSDictionary *CYLGalleryDarkTabAttributes(BOOL special) {
+    if (special) {
+        return @{ CYLTabBarItemIconColor : UIColor.whiteColor,
+                  CYLTabBarItemSelectedIconColor : UIColor.whiteColor,
+                  CYLTabBarItemBackgroundColor : CYLGalleryRGB(17, 86, 136),
+                  CYLTabBarItemSelectedBackgroundColor : CYLGalleryRGB(22, 24, 25) };
+    }
+    return @{ CYLTabBarItemIconColor : CYLGalleryGray(165),
+              CYLTabBarItemSelectedIconColor : UIColor.whiteColor,
+              CYLTabBarItemBackgroundColor : CYLGalleryRGB(37, 39, 42),
+              CYLTabBarItemSelectedBackgroundColor : CYLGalleryRGB(22, 24, 25) };
+}
+
+static void CYLGallerySetTabBarBackgroundColor(UITabBarController *tabBarController, UIColor *color) {
+    UITabBarAppearance *appearance = [tabBarController.tabBar.standardAppearance copy] ?: [[UITabBarAppearance alloc] init];
+    [appearance configureWithOpaqueBackground];
+    appearance.backgroundColor = color;
+    appearance.shadowColor = UIColor.clearColor;
+    tabBarController.tabBar.standardAppearance = appearance;
+    tabBarController.tabBar.scrollEdgeAppearance = appearance;
+}
+
+static UIViewController *CYLGalleryEmbed(CYLTabBarController *tabBarController) {
+    tabBarController.title = @"Example";
+    return [[CYLGalleryNavigationController alloc] initWithRootViewController:tabBarController];
+}
+
+/// [EN] The look of the background scenes, image-only, the middle tab highlighted and larger. [CN] 背景色场景的外观：纯图标，中间 Tab 突出且更大。
+static CYLTabBarController *CYLGalleryBackgroundTabBarController(void) {
+    NSArray<NSDictionary *> *attributes = CYLGalleryAttributes(5, NO, 22, ^NSDictionary *(NSUInteger index) {
+        NSMutableDictionary *item = [CYLGalleryDarkTabAttributes(index == 2) mutableCopy];
+        if (index == 2) {
+            item[CYLTabBarItemImage] = CYLGallerySymbol(@"camera", NO, 28);
+            item[CYLTabBarItemSelectedImage] = CYLGallerySymbol(@"camera", YES, 28);
+        }
+        return item;
+    });
+    CYLTabBarController *tabBarController = CYLGalleryTabBarController(CYLGalleryPages(5, NO), attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext);
+    CYLGallerySetTabBarBackgroundColor(tabBarController, CYLGalleryRGB(37, 39, 42));
+    return tabBarController;
+}
+
+/// [EN] Runs `block` every `interval` seconds while `tabBarController` is alive. [CN] 在 `tabBarController` 存活期间每 `interval` 秒执行一次 `block`。
+static void CYLGalleryRepeat(CYLTabBarController *tabBarController, NSTimeInterval interval, void (^block)(CYLTabBarController *controller)) {
+    __weak CYLTabBarController *weakTabBarController = tabBarController;
+    NSTimer *timer = [NSTimer timerWithTimeInterval:interval repeats:YES block:^(NSTimer *aTimer) {
+        CYLTabBarController *strongTabBarController = weakTabBarController;
+        if (!strongTabBarController) {
+            [aTimer invalidate];
+            return;
+        }
+        block(strongTabBarController);
+    }];
+    [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+}
+
+/// [EN] The icon view of the tab at `index`. [CN] 第 `index` 个 Tab 的图标视图。
+static UIView *CYLGalleryIconView(CYLTabBarController *tabBarController, NSUInteger index) {
+    if (index >= tabBarController.viewControllers.count) {
+        return nil;
+    }
+    UIViewController *viewController = tabBarController.viewControllers[index];
+    UIControl *button = viewController.tabBarItem.cyl_tabButton ?: viewController.cyl_tabButton;
+    return button.cyl_tabImageView;
+}
+
+/// [EN] The look of the tips and irregular scenes: white titles, teal when selected, on a dark teal bar. [CN] 提示与不规则场景的外观。
+static NSDictionary *CYLGalleryTealTabAttributes(void) {
+    UIColor *teal = CYLGalleryRGB(23, 149, 158);
+    return @{ CYLTabBarItemTitleColor : UIColor.whiteColor,
+              CYLTabBarItemSelectedTitleColor : teal,
+              CYLTabBarItemIconColor : UIColor.whiteColor,
+              CYLTabBarItemSelectedIconColor : teal };
+}
+
+static NSDictionary *CYLGalleryRedTabAttributes(void) {
+    UIColor *gray = CYLGalleryGray(175);
+    UIColor *red = CYLGalleryRGB(254, 73, 42);
+    return @{ CYLTabBarItemTitleColor : gray,
+              CYLTabBarItemSelectedTitleColor : red,
+              CYLTabBarItemIconColor : gray,
+              CYLTabBarItemSelectedIconColor : red };
+}
+
+/// [EN] iOS 26+ draws Liquid Glass by default; FlatDesign shows the full-width tab bar of the earlier systems. [CN] iOS 26+ 默认液态玻璃；扁平样式显示以前系统的全宽 TabBar。
+static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
+    if (@available(iOS 26.0, *)) {
+        return CYLTabBarStyleTypeFlatDesign;
+    }
+    return CYLTabBarStyleTypeDefault;
+}
+
+#pragma mark - Provider
+
+@implementation CYLGalleryProvider
+
++ (NSArray<CYLGallerySection *> *)sections {
+    return @[ [self basicSection], [self embedSection], [self animationSection], [self irregularSection],
+              [self customClickSection], [self remindSection], [self lottieSection], [self newAPISection] ];
+}
+
+#pragma mark Basic
+
++ (CYLTabBarController *)fullWidthTabBarControllerWithCount:(NSUInteger)count {
+    return CYLGalleryTabBarController(CYLGalleryPages(count, NO), CYLGalleryAttributes(count, YES, 20, nil), CYLGalleryFullWidthStyle(), CYLGalleryContext);
+}
+
++ (CYLTabBarController *)defaultTabBarControllerWithCount:(NSUInteger)count {
+    return CYLGalleryTabBarController(CYLGalleryPages(count, NO), CYLGalleryAttributes(count, YES, 20, nil), CYLTabBarStyleTypeDefault, CYLGalleryContext);
+}
+
++ (CYLGallerySection *)basicSection {
+    CYLGallerySceneDidPresent selectThirdTab = ^(UIViewController *presented) {
+        ((UITabBarController *)presented).selectedIndex = 2;
+    };
+    NSArray<CYLGalleryScene *> *scenes = @[
+        [CYLGalleryScene sceneWithTitle:@"UITabBarController style" subtitle:@"The system tab bar, for comparison" builder:^UIViewController *{
+            return CYLGallerySystemTabBarController(5);
+        }],
+        [CYLGalleryScene sceneWithTitle:@"CYLTabBarController like system style" subtitle:@"Three tabs; full width on iOS 26 (FlatDesign)" builder:^UIViewController *{
+            return [self fullWidthTabBarControllerWithCount:3];
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Mix styled and system items" subtitle:@"Tabs 1, 3 and 5 bounce; tabs 2 and 4 are plain" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
+            for (NSUInteger index = 0; index < 5; index += 2) {
+                tabBarController.viewControllers[index].cyl_tabButtonAnimation = [CYLGalleryBounceAnimation new];
+            }
+            return tabBarController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"CYLTabBarController with Liquid Glass" subtitle:@"\"Photo\" opens a dialog (cyl_hijackedTabBarItemIdentifiers)" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
+            CYLGalleryHijackPhotoTab(tabBarController);
+            return tabBarController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"UITabBarController with 'More'" subtitle:@"Eight tabs; \"Photo\" opens a dialog (delegate)" builder:^UIViewController *{
+            UITabBarController *tabBarController = CYLGallerySystemTabBarController(8);
+            tabBarController.delegate = [CYLGallerySystemPhotoInterceptor sharedInterceptor];
+            return tabBarController;
+        } didPresent:selectThirdTab],
+        [CYLGalleryScene sceneWithTitle:@"CYLTabBarController with 'More'" subtitle:@"Eight tabs, full width" builder:^UIViewController *{
+            return [self fullWidthTabBarControllerWithCount:8];
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Mix styled and system items with 'More'" subtitle:@"Eight tabs; every other one bounces" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self fullWidthTabBarControllerWithCount:8];
+            for (NSUInteger index = 0; index < 8; index += 2) {
+                tabBarController.viewControllers[index].cyl_tabButtonAnimation = [CYLGalleryBounceAnimation new];
+            }
+            return tabBarController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Liquid Glass with 'More'" subtitle:@"Eight tabs with Liquid Glass" builder:^UIViewController *{
+            return [self defaultTabBarControllerWithCount:8];
+        }],
+        [CYLGalleryScene sceneWithTitle:@"UITabBarController with non-zero default index" subtitle:@"selectedIndex = 2 after presenting" builder:^UIViewController *{
+            return CYLGallerySystemTabBarController(5);
+        } didPresent:selectThirdTab],
+        [CYLGalleryScene sceneWithTitle:@"CYLTabBarController with non-zero default index" subtitle:@"selectedIndex = 2 after presenting" builder:^UIViewController *{
+            return [self fullWidthTabBarControllerWithCount:3];
+        } didPresent:selectThirdTab],
+        [CYLGalleryScene sceneWithTitle:@"Classic design on every system" subtitle:@"CYLTabBarStyleTypeFlatDesign, white bar; \"Photo\" opens a dialog" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = CYLGalleryTabBarController(CYLGalleryPages(5, NO), CYLGalleryAttributes(5, YES, 20, nil), CYLTabBarStyleTypeFlatDesign, CYLGalleryContext);
+            CYLGallerySetTabBarBackgroundColor(tabBarController, UIColor.whiteColor);
+            CYLGalleryHijackPhotoTab(tabBarController);
+            return tabBarController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Liquid Glass with badges" subtitle:@"New, 99+, a blue 1, a dot, none" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
+            [self addSystemBadgesToTabBarController:tabBarController];
+            return tabBarController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"UITabBarController tab style" subtitle:@"UITab (iOS 18+), eight tabs, \"Favor\" selected" builder:^UIViewController *{
+            return [self systemTabStyleTabBarController];
+        }],
+    ];
+    return [CYLGallerySection sectionWithTitle:@"Basic" scenes:scenes];
+}
+
++ (void)addSystemBadgesToTabBarController:(UITabBarController *)tabBarController {
+    NSArray<UIViewController *> *viewControllers = tabBarController.viewControllers;
+    viewControllers[0].tabBarItem.badgeValue = @"New";
+    viewControllers[1].tabBarItem.badgeValue = @"99+";
+    viewControllers[2].tabBarItem.badgeValue = @"1";
+    viewControllers[2].tabBarItem.badgeColor = UIColor.blueColor;
+    viewControllers[3].tabBarItem.badgeValue = @"";
+    viewControllers[4].tabBarItem.badgeValue = nil;
+}
+
++ (UITabBarController *)systemTabStyleTabBarController {
+    if (@available(iOS 18.0, *)) {
+        UITabBarController *tabBarController = [[UITabBarController alloc] init];
+        NSMutableArray<UITab *> *tabs = [NSMutableArray array];
+        for (NSArray<NSString *> *spec in CYLGalleryTabSpecs()) {
+            UITab *tab = [[UITab alloc] initWithTitle:spec[0] image:CYLGallerySymbol(spec[1], NO, 20) identifier:spec[2] viewControllerProvider:^UIViewController *(UITab *aTab) {
+                return [[CYLGalleryPageViewController alloc] init];
+            }];
+            [tabs addObject:tab];
+        }
+        tabBarController.tabs = tabs;
+        tabBarController.selectedTab = tabs[3];
+        tabBarController.delegate = [CYLGallerySystemPhotoInterceptor sharedInterceptor];
+        return tabBarController;
+    }
+    return CYLGallerySystemTabBarController(8);
+}
+
+#pragma mark Embed
+
++ (CYLGallerySection *)embedSection {
+    NSArray<CYLGalleryScene *> *scenes = @[
+        [CYLGalleryScene sceneWithTitle:@"UINavigationController embeds CYLTabBarController" subtitle:@"One navigation bar above the tab bar controller" builder:^UIViewController *{
+            return CYLGalleryEmbed([self fullWidthTabBarControllerWithCount:3]);
+        }],
+        [CYLGalleryScene sceneWithTitle:@"CYLTabBarController embeds UINavigationController" subtitle:@"A navigation controller in every tab" builder:^UIViewController *{
+            return CYLGalleryTabBarController(CYLGalleryPages(5, YES), CYLGalleryAttributes(5, YES, 20, nil), CYLTabBarStyleTypeDefault, CYLGalleryContext);
+        }],
+    ];
+    return [CYLGallerySection sectionWithTitle:@"Embed" scenes:scenes];
+}
+
+#pragma mark Animation
+
++ (CYLGallerySection *)animationSection {
+    NSArray<CYLGalleryScene *> *scenes = @[
+        [CYLGalleryScene sceneWithTitle:@"Customize the selected color" subtitle:@"CYLTabBarItemTitleColor / IconColor per tab" builder:^UIViewController *{
+            NSArray<NSDictionary *> *attributes = CYLGalleryAttributes(5, YES, 20, ^NSDictionary *(NSUInteger index) {
+                return CYLGalleryRedTabAttributes();
+            });
+            return CYLGalleryEmbed(CYLGalleryTabBarController(CYLGalleryPages(5, NO), attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext));
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Spring animation" subtitle:@"A CYLTabButtonAnimation that bounces on select and reselect" builder:^UIViewController *{
+            NSArray<NSDictionary *> *attributes = CYLGalleryAttributes(5, YES, 20, ^NSDictionary *(NSUInteger index) {
+                return CYLGalleryRedTabAttributes();
+            });
+            CYLTabBarController *tabBarController = CYLGalleryTabBarController(CYLGalleryPages(5, NO), attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext);
+            tabBarController.cyl_defaultTabButtonAnimation = [CYLGalleryBounceAnimation new];
+            return CYLGalleryEmbed(tabBarController);
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Background color change" subtitle:@"CYLTabBarItemBackgroundColor / SelectedBackgroundColor" builder:^UIViewController *{
+            return CYLGalleryEmbed(CYLGalleryBackgroundTabBarController());
+        }],
+        [CYLGalleryScene sceneWithTitle:@"With a pressed effect" subtitle:@"Larger icons that shrink while pressed (highlight hooks)" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = CYLGalleryBackgroundTabBarController();
+            tabBarController.cyl_defaultTabButtonAnimation = [CYLGalleryHighlightAnimation new];
+            CYLGalleryForEachTabButton(tabBarController, ^(UIControl *button, NSUInteger index) {
+                button.cyl_tabImageView.transform = CGAffineTransformMakeScale(CYLGalleryLargeIconScale, CYLGalleryLargeIconScale);
+            });
+            return CYLGalleryEmbed(tabBarController);
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Suggest a click" subtitle:@"The middle tab pulses every 3 s until it is selected" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = CYLGalleryBackgroundTabBarController();
+            CYLGalleryRepeat(tabBarController, 3, ^(CYLTabBarController *controller) {
+                if (controller.selectedIndex == 2) {
+                    return;
+                }
+                CYLGalleryPlayKeyframes(CYLGalleryIconView(controller, 2), @"transform.scale", @[ @1.15, @0.8, @1.15 ], 0.3);
+            });
+            return CYLGalleryEmbed(tabBarController);
+        }],
+    ];
+    return [CYLGallerySection sectionWithTitle:@"Animation" scenes:scenes];
+}
+
+#pragma mark Irregular
+
+/// [EN] Four teal tabs and the large round center button. [CN] 四个青色 Tab 与大号圆形中间按钮。
++ (UIViewController *)irregularScene {
+    [CYLGalleryIrregularPlusButton registerPlusButton];
+    NSArray<NSDictionary *> *attributes = CYLGalleryAttributes(4, YES, 20, ^NSDictionary *(NSUInteger index) {
+        return CYLGalleryTealTabAttributes();
+    });
+    // [EN] Home, Find, Favor, Me around the button. [CN] 按钮两侧为 Home、Find、Favor、Me。
+    NSMutableArray<NSDictionary *> *items = [attributes mutableCopy];
+    NSArray<NSArray<NSString *> *> *specs = CYLGalleryTabSpecs();
+    for (NSUInteger index = 2; index < 4; index++) {
+        NSMutableDictionary *item = [items[index] mutableCopy];
+        NSArray<NSString *> *spec = specs[index + 1];
+        item[CYLTabBarItemTitle] = spec[0];
+        item[CYLTabBarItemImage] = CYLGallerySymbol(spec[1], NO, 20);
+        item[CYLTabBarItemSelectedImage] = CYLGallerySymbol(spec[1], YES, 20);
+        item[CYLTabBarItemIdentifier] = spec[2];
+        items[index] = item;
+    }
+    NSArray<UIViewController *> *pages = CYLGalleryPages(4, NO);
+    CYLTabBarController *tabBarController = CYLGalleryTabBarController(pages, items, CYLTabBarStyleTypeDefault, CYLGalleryIrregularContext);
+    for (UIViewController *page in pages) {
+        page.cyl_tabButtonAnimation = [CYLGalleryBounceAnimation new];
+    }
+    CYLGallerySetTabBarBackgroundColor(tabBarController, CYLGalleryRGB(10, 66, 91));
+    return CYLGalleryEmbed(tabBarController);
+}
+
++ (CYLGallerySection *)irregularSection {
+    NSArray<CYLGalleryScene *> *scenes = @[
+        [CYLGalleryScene sceneWithTitle:@"A larger button in the middle" subtitle:@"A raised round CYLPlusButton that responds inside its circle" builder:^UIViewController *{
+            return [self irregularScene];
+        }],
+    ];
+    return [CYLGallerySection sectionWithTitle:@"Irregular" scenes:scenes];
+}
+
+#pragma mark Customize click
+
++ (CYLGallerySection *)customClickSection {
+    NSArray<CYLGalleryScene *> *scenes = @[
+        [CYLGalleryScene sceneWithTitle:@"Hijack the button click" subtitle:@"The center button shows an action sheet instead of a page" builder:^UIViewController *{
+            return [self irregularScene];
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Add a special reminder bubble" subtitle:@"A bubble above \"Me\"; \"Photo\" opens a dialog" builder:^UIViewController *{
+            NSArray<NSDictionary *> *attributes = CYLGalleryAttributes(5, YES, 20, ^NSDictionary *(NSUInteger index) {
+                return CYLGalleryTealTabAttributes();
+            });
+            CYLTabBarController *tabBarController = CYLGalleryTabBarController(CYLGalleryPages(5, NO), attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext);
+            tabBarController.cyl_defaultTabButtonAnimation = [CYLGalleryBounceAnimation new];
+            CYLGallerySetTabBarBackgroundColor(tabBarController, CYLGalleryRGB(10, 66, 91));
+            CYLGalleryHijackPhotoTab(tabBarController);
+            CYLGalleryForEachTabButton(tabBarController, ^(UIControl *button, NSUInteger index) {
+                if (index != 4) {
+                    return;
+                }
+                CGFloat width = 120;
+                CYLGalleryAddBubble(button, @"New version", [UIColor colorWithWhite:0 alpha:0.75],
+                                    CGRectMake(CGRectGetWidth(button.bounds) - width, -40, width, 36), [UIFont systemFontOfSize:14]);
+            });
+            return CYLGalleryEmbed(tabBarController);
+        }],
+    ];
+    return [CYLGallerySection sectionWithTitle:@"Customize click" scenes:scenes];
+}
+
+#pragma mark Remind
+
+/// [EN] The background look, with a badge on "Find" two seconds after it appears. [CN] 背景色外观，出现两秒后 "Find" 显示角标。
++ (UIViewController *)remindSceneWithBadge:(void (^)(CYLTabBarController *tabBarController))showBadge {
+    CYLTabBarController *tabBarController = CYLGalleryBackgroundTabBarController();
+    __weak CYLTabBarController *weakTabBarController = tabBarController;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        CYLTabBarController *strongTabBarController = weakTabBarController;
+        if (strongTabBarController) {
+            showBadge(strongTabBarController);
+        }
+    });
+    return CYLGalleryEmbed(tabBarController);
+}
+
++ (CYLGallerySection *)remindSection {
+    NSArray<CYLGalleryScene *> *scenes = @[
+        [CYLGalleryScene sceneWithTitle:@"System remind style" subtitle:@"UITabBarItem badges on the system tab bar" builder:^UIViewController *{
+            UITabBarController *tabBarController = CYLGallerySystemTabBarController(5);
+            [self addSystemBadgesToTabBarController:tabBarController];
+            return tabBarController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Imitate system remind style" subtitle:@"The same badges on CYLTabBarController" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
+            [self addSystemBadgesToTabBarController:tabBarController];
+            return tabBarController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Remind with animation" subtitle:@"The icon jumps when the badge appears" builder:^UIViewController *{
+            return [self remindSceneWithBadge:^(CYLTabBarController *tabBarController) {
+                tabBarController.viewControllers[1].tabBarItem.badgeValue = @"1";
+                CYLGalleryPlayKeyframes(CYLGalleryIconView(tabBarController, 1), @"transform.translation.y", @[ @0, @(-8), @4, @(-4), @3, @(-2), @0 ], 0.6);
+            }];
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Remind with animation (2)" subtitle:@"The badge scales in (CYLBadgeAnimationTypeScaleOnce)" builder:^UIViewController *{
+            return [self remindSceneWithBadge:^(CYLTabBarController *tabBarController) {
+                [tabBarController.viewControllers[1] cyl_showBadgeValue:@"1" animationType:CYLBadgeAnimationTypeScaleOnce];
+            }];
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Customize remind style" subtitle:@"A gray bubble instead of the red badge" builder:^UIViewController *{
+            return [self remindSceneWithBadge:^(CYLTabBarController *tabBarController) {
+                UIViewController *viewController = tabBarController.viewControllers[1];
+                UIControl *button = viewController.tabBarItem.cyl_tabButton ?: viewController.cyl_tabButton;
+                if (!button) {
+                    return;
+                }
+                CGFloat midX = CGRectGetMidX(button.bounds);
+                UIView *bubble = CYLGalleryAddBubble(button, @"1", UIColor.lightGrayColor, CGRectMake(midX + 2, -4, 30, 26), [UIFont systemFontOfSize:13]);
+                CYLGalleryPlayKeyframes(bubble, @"transform.scale", @[ @1.0, @1.4, @0.9, @1.15, @0.95, @1.02, @1.0 ], 0.6);
+            }];
+        }],
+    ];
+    return [CYLGallerySection sectionWithTitle:@"Remind" scenes:scenes];
+}
+
+#pragma mark Lottie
+
++ (CYLGallerySection *)lottieSection {
+    NSArray<CYLGalleryScene *> *scenes = @[
+        [CYLGalleryScene sceneWithTitle:@"Lottie" subtitle:@"The middle tab plays a Lottie animation (CYLTabBarLottieURL)" builder:^UIViewController *{
+            UIColor *normal = CYLGalleryRGB(61, 206, 193);
+            UIColor *selected = CYLGalleryRGB(252, 13, 27);
+            NSURL *lottieURL = [[NSBundle mainBundle] URLForResource:@"tab_search_animate" withExtension:@"json"];
+            NSArray<NSDictionary *> *attributes = CYLGalleryAttributes(5, NO, 22, ^NSDictionary *(NSUInteger index) {
+                NSMutableDictionary *item = [@{ CYLTabBarItemIconColor : normal, CYLTabBarItemSelectedIconColor : selected } mutableCopy];
+                if (index == 2 && lottieURL) {
+                    item[CYLTabBarLottieURL] = lottieURL;
+                    item[CYLTabBarLottieSize] = [NSValue valueWithCGSize:CGSizeMake(33, 33)];
+                }
+                return item;
+            });
+            return CYLGalleryTabBarController(CYLGalleryPages(5, NO), attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext);
+        }],
+    ];
+    return [CYLGallerySection sectionWithTitle:@"Lottie" scenes:scenes];
+}
+
+#pragma mark New APIs
+
++ (CYLGallerySection *)newAPISection {
+    NSArray<CYLGalleryScene *> *scenes = @[
+        [CYLGalleryScene sceneWithTitle:@"Reselect: pop to root, then scroll to top" subtitle:@"cyl_reselectBehavior = PopToRootThenScrollToTop" builder:^UIViewController *{
+            NSMutableArray<UIViewController *> *pages = [NSMutableArray array];
+            for (NSUInteger index = 0; index < 3; index++) {
+                CYLGalleryListViewController *list = [[CYLGalleryListViewController alloc] initWithStyle:UITableViewStylePlain];
+                list.title = CYLGalleryTabSpecs()[index][0];
+                [pages addObject:[[CYLGalleryNavigationController alloc] initWithRootViewController:list]];
+            }
+            CYLTabBarController *tabBarController = CYLGalleryTabBarController(pages, CYLGalleryAttributes(3, YES, 20, nil), CYLTabBarStyleTypeDefault, CYLGalleryContext);
+            tabBarController.cyl_reselectBehavior = CYLTabBarReselectBehaviorPopToRootThenScrollToTop;
+            return tabBarController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Press and reselect animations" subtitle:@"CYLTabButtonPressAnimation + a reselect turn" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
+            tabBarController.cyl_defaultTabButtonAnimation = [CYLGalleryPressAndReselectAnimation new];
+            return tabBarController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Hijack a regular tab" subtitle:@"cyl_hijackedTabBarItemIdentifiers + cyl_didHijackHandler" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
+            CYLGalleryHijackPhotoTab(tabBarController);
+            return tabBarController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Per-tab colors, fonts and backgrounds" subtitle:@"Every tab has its own title color, font and background" builder:^UIViewController *{
+            NSArray<UIColor *> *colors = @[ UIColor.systemRedColor, UIColor.systemOrangeColor, UIColor.systemGreenColor, UIColor.systemBlueColor, UIColor.systemPurpleColor ];
+            NSArray<NSDictionary *> *attributes = CYLGalleryAttributes(5, YES, 20, ^NSDictionary *(NSUInteger index) {
+                UIColor *color = colors[index];
+                return @{ CYLTabBarItemSelectedTitleColor : color,
+                          CYLTabBarItemSelectedIconColor : color,
+                          CYLTabBarItemTitleFont : [UIFont systemFontOfSize:10],
+                          CYLTabBarItemSelectedTitleFont : [UIFont systemFontOfSize:11 weight:UIFontWeightBold],
+                          CYLTabBarItemSelectedBackgroundColor : [color colorWithAlphaComponent:0.12] };
+            });
+            return CYLGalleryTabBarController(CYLGalleryPages(5, NO), attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext);
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Accessibility identifiers" subtitle:@"Each tab is app.tabBars.buttons[\"home\"] etc. in UI tests" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
+            [tabBarController performWhenTabBarItemsReady:^(CYLTabBarController *controller) {
+                NSMutableArray<NSString *> *identifiers = [NSMutableArray array];
+                for (UIViewController *viewController in controller.viewControllers) {
+                    [identifiers addObject:viewController.tabBarItem.accessibilityIdentifier ?: viewController.cyl_tabBarItemIdentifier ?: @"-"];
+                }
+                controller.viewControllers.firstObject.title = [identifiers componentsJoinedByString:@", "];
+            }];
+            return CYLGalleryEmbed(tabBarController);
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Centered tabs around a plus button" subtitle:@"itemPositioning = Centered, itemWidth 64, itemSpacing 12" builder:^UIViewController *{
+            UINavigationController *navigationController = (UINavigationController *)[self irregularScene];
+            UITabBarController *tabBarController = (UITabBarController *)navigationController.viewControllers.firstObject;
+            tabBarController.tabBar.itemPositioning = UITabBarItemPositioningCentered;
+            tabBarController.tabBar.itemWidth = 64;
+            tabBarController.tabBar.itemSpacing = 12;
+            return navigationController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Edge insets and gaps between tabs" subtitle:@"cyl_itemEdgeInsets 16 pt + itemSpacing 2 pt, dark backgrounds" builder:^UIViewController *{
+            CYLTabBarController *tabBarController = CYLGalleryBackgroundTabBarController();
+            if ([tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+                CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
+                tabBar.cyl_itemEdgeInsets = UIEdgeInsetsMake(0, 16, 0, 16);
+                tabBar.itemSpacing = 2;
+            }
+            CYLGallerySetTabBarBackgroundColor(tabBarController, UIColor.blackColor);
+            return CYLGalleryEmbed(tabBarController);
+        }],
+    ];
+    return [CYLGallerySection sectionWithTitle:@"New APIs" scenes:scenes];
+}
+
+@end

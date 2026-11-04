@@ -23,6 +23,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
 //   - Tab Accessibility and UI Tests / Tab 的无障碍与 UI 测试
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Accessibility.md
+//   - Tab Bar Gallery / TabBar 图库
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Gallery.md
 //   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Minimize-On-Scroll.md
 //   - Update Tabs in Place: Titles, Icons, Network Icons and Pages / 原地更新 Tab：标题、图标、网络图标与替换页面
