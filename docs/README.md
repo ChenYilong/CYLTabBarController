@@ -32,10 +32,9 @@
 | [Tab 的无障碍与 UI 测试](Tab-Accessibility.md) | [Tab Accessibility and UI Tests](Tab-Accessibility.md) |
 | [劫持 Tab 点击](Tab-Hijack.md) | [Hijacked Tabs](Tab-Hijack.md) |
 | [Tab 交互：点击动画、长按、滑动切换及其他](Tab-Interactions.md) | [Tab interactions: tap animations, long press, swipe, and more](Tab-Interactions.md) |
-| [Tab 图标的内置动画](Tab-Item-Animations.md) | [Built-in Tab Icon Animations](Tab-Item-Animations.md) |
 | [单个 Tab 的颜色](Tab-Item-Colors.md) | [Per-tab Colors](Tab-Item-Colors.md) |
 | [Tab 的排列方式](Tab-Item-Positioning.md) | [Tab Item Positioning](Tab-Item-Positioning.md) |
-| [重复点击已选中的 Tab](Tab-Reselect.md) | [Tapping the Selected Tab Again](Tab-Reselect.md) |
+| [重复点击已选中 Tab 的内置操作](Tab-Reselect.md) | [Built-in Actions for Tapping the Selected Tab](Tab-Reselect.md) |
 | [TabBar 的 hitTest 不再返回 nil，交给 super 处理](TabBar-HitTest-Super-Fallback.md) | [The tab bar's hitTest falls back to super instead of returning nil](TabBar-HitTest-Super-Fallback.md) |
 | [滚动时缩小或隐藏 TabBar](TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](TabBar-Minimize-On-Scroll.md) |
 | [TabBarItem 手势：再次点击、双击与长按](TabBarItem-Gestures.md) | [Tab bar item gestures: reselect, double tap and long press](TabBarItem-Gestures.md) |
@@ -76,7 +75,6 @@ docs/
 ├── Tab-Accessibility.md
 ├── Tab-Hijack.md
 ├── Tab-Interactions.md
-├── Tab-Item-Animations.md
 ├── Tab-Item-Colors.md
 ├── Tab-Item-Positioning.md
 ├── Tab-Reselect.md

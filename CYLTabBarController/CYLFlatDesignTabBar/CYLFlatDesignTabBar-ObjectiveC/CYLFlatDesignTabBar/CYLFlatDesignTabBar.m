@@ -52,14 +52,6 @@
 - (void)cyl_flatDesignPlusButtonTouchUpInside:(UIControl *)plusButton;
 @end
 
-// [EN] Implemented in CYLTabBarController.m (CYLReselect): a user tap on the tab that was already selected.
-// [CN] 在 CYLTabBarController.m（CYLReselect）中实现：用户点击了已选中的 Tab。
-@interface CYLTabBarController (CYLFlatDesignReselect)
-- (void)cyl_didReselectViewController:(UIViewController *)viewController control:(UIControl *)control;
-// [EN] Touch down on a tab button: the highlight animation (CYLTabBarItemAnimation).
-// [CN] 手指按下 Tab 按钮：按下动画（CYLTabBarItemAnimation）。
-- (void)cyl_tabControlTouchDown:(UIControl *)control;
-@end
 
 @implementation CYLFlatDesignTabBar {
     NSInteger _selectedItemIndex;
@@ -463,19 +455,6 @@
 
 #pragma mark - Private
 
-/// [EN] Touch down on a tab button: forwards it to the tab bar controller for the highlight animation.
-/// [CN] 手指按下 Tab 按钮：转给 TabBarController 播放按下动画。
-- (void)_tabBarDidTouchDownButton:(CYLFlatDesignTabBarButton *)tabBarButton {
-    if (tabBarButton.cyl_isPlaceholder) {
-        return;
-    }
-    UITabBarController *owningTabBarController = self.tabBarController;
-    if ([owningTabBarController isKindOfClass:[CYLTabBarController class]] &&
-        [owningTabBarController respondsToSelector:@selector(cyl_tabControlTouchDown:)]) {
-        [(CYLTabBarController *)owningTabBarController cyl_tabControlTouchDown:tabBarButton];
-    }
-}
-
 - (void)_tabBarDidSelectButton:(CYLFlatDesignTabBarButton *)tabBarButton {
     NSInteger selectedIndex = [_buttons indexOfObject:tabBarButton];
     CYLFlatDesignTabBarItem *item = self.items[selectedIndex];
@@ -522,18 +501,6 @@
         }
         if (control) {
             [(CYLTabBarController *)owningTabBarController cyl_flatDesignReportDidSelectControl:control];
-        }
-        // [EN] Reselect: every tab button tap arrives here before the selection changes, so the selected view controller is
-        //      still the one shown before the tap. Not for the plus button's placeholder button.
-        // [CN] 重复点击：每次点击 Tab 按钮都会在选中状态变化之前到达这里，此时选中的控制器仍是点击前的那个。PlusButton 的占位按钮除外。
-        CYLTabBarController *reselectTabBarController = (CYLTabBarController *)owningTabBarController;
-        if (!tabBarButton.cyl_isPlaceholder && selectedIndex >= 0 &&
-            selectedIndex < (NSInteger)reselectTabBarController.viewControllers.count &&
-            [reselectTabBarController respondsToSelector:@selector(cyl_didReselectViewController:control:)]) {
-            UIViewController *tappedViewController = reselectTabBarController.viewControllers[(NSUInteger)selectedIndex];
-            if (!tappedViewController.cyl_isPlaceholder && tappedViewController == reselectTabBarController.selectedViewController) {
-                [reselectTabBarController cyl_didReselectViewController:tappedViewController control:tabBarButton];
-            }
         }
     }
     
@@ -608,7 +575,6 @@
         button.tintColor = self.tintColor;
         button.selected = (item == self.selectedItem);
         [button addTarget:self action:@selector(_tabBarDidSelectButton:) forControlEvents:UIControlEventTouchUpInside];
-        [button addTarget:self action:@selector(_tabBarDidTouchDownButton:) forControlEvents:UIControlEventTouchDown];
         // [CN] TODO:  对齐方案， 最简单。 移除PlusButton对应的item， 重新从 self.contentView 插入对齐。
         // [EN] TODO:  Alignment approach, the simplest one: remove the item corresponding to the PlusButton and re-insert
         //      it into self.contentView for alignment.

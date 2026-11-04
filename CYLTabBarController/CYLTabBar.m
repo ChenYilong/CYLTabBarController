@@ -24,9 +24,6 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
 @interface CYLTabBarController (CYLTabControlActions)
 - (void)cyl_bindTabControlActions;
 - (void)cyl_runPendingReloadBadgesBlocksIfReady;
-// [EN] Liquid Glass: a gesture on the tab bar ended (YES) or was cancelled / failed (NO); reports a pending reselect (CYLReselect).
-// [CN] 液态玻璃：TabBar 上的手势结束（YES）或被取消 / 失败（NO）；上报等待中的重复点击（CYLReselect）。
-- (void)cyl_liquidGlassTabGestureDidFinish:(BOOL)ended;
 @end
 
 // [EN] FIX: issue #152 / #535 — implemented in CYLTabBarController+CYLInteraction.m.
@@ -1413,14 +1410,6 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     CYLTabBarController *owningTabBarController = [self tabBarController];
     if ([owningTabBarController respondsToSelector:@selector(cyl_liquidGlassTabBarGestureRecognizerDidUpdate:)]) {
         [owningTabBarController cyl_liquidGlassTabBarGestureRecognizerDidUpdate:gestureRecognizer];
-    }
-    UIGestureRecognizerState state = gestureRecognizer.state;
-    if (state == UIGestureRecognizerStateEnded || state == UIGestureRecognizerStateCancelled || state == UIGestureRecognizerStateFailed) {
-        CYLTabBarController *tabBarController = [self tabBarController];
-        if ([tabBarController respondsToSelector:@selector(cyl_liquidGlassTabGestureDidFinish:)]) {
-            [tabBarController cyl_liquidGlassTabGestureDidFinish:(state == UIGestureRecognizerStateEnded)];
-        }
-        return;
     }
     if (gestureRecognizer.state != UIGestureRecognizerStateBegan && gestureRecognizer.state != UIGestureRecognizerStateChanged) {
         return;

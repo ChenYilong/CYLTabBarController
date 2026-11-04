@@ -740,12 +740,6 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     return should && shouldSelectViewControllerFromSuper;
 }
 
-- (void)tabBarController:(CYLTabBarController *)tabBarController didReselectViewController:(UIViewController *)viewController {
-#if defined(DEBUG) || defined(BETA)
-    NSLog(@"[Demo] reselected tab: %@", viewController.cyl_tabBarItemIdentifier);
-#endif
-}
-
 - (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
     [super tabBarController:tabBarController shouldShowPlatterLiquidLensViewForControl:control];
     return YES;
