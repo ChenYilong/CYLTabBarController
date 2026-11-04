@@ -20,7 +20,8 @@ permissions:
 jobs:
   self-test:
     name: self-test (${{ matrix.style }}${{ matrix.runtime && format(', {0}', matrix.runtime) || '' }})
-    runs-on: macos-15
+    # Same runner label as the iOS workflow (ios.yml): the project needs Xcode 27, and macos-15 jobs were never given a runner.
+    runs-on: xcode-27
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -36,8 +37,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Select the newest Xcode
         run: |
-          XCODE=$(ls -d /Applications/Xcode_*.app | sort -V | tail -n 1)
-          sudo xcode-select -s "$XCODE"
+          # The runner image may already select its only Xcode; switch only when versioned copies exist.
+          XCODE=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -n 1 || true)
+          if [[ -n "$XCODE" ]]; then sudo xcode-select -s "$XCODE"; fi
           xcodebuild -version
           xcrun simctl list runtimes
       - name: Run the self-test
