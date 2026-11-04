@@ -27,26 +27,17 @@ jobs:
     name: self-test (${{ matrix.style }}${{ matrix.runtime && format(', {0}', matrix.runtime) || '' }})
     # Same runner label as the iOS workflow (ios.yml): the project needs Xcode 27, and macos-15 jobs were never given a runner.
     runs-on: xcode-27
-    # Room for the iOS 18 runtime download (several GB).
-    timeout-minutes: 60
-    # The iOS 18 job depends on Apple offering that runtime to this Xcode; when it does not, the job fails without
-    # failing the run.
-    continue-on-error: ${{ matrix.optional == true }}
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         include:
           # FlatDesign: code can hide it on every system, so this runs the whole self-test.
           - style: FlatDesign
-            runtime: ""
-          # Classic style: the default demo before iOS 26. The xcode-27 runner only has iOS 27 simulators, so the script
-          # downloads the iOS 18 runtime (xcodebuild -downloadPlatform) and creates an iPhone for it.
+            runtime: iOS-27
+          # Default demo: Liquid Glass, a smoke test (rows are SKIP, code cannot hide it).
           - style: Default
-            runtime: iOS-18
-            optional: true
-          # Default demo on the newest runtime: Liquid Glass, a smoke test (rows are SKIP, code cannot hide it).
-          - style: Default
-            runtime: ""
+            runtime: iOS-27
     steps:
       - uses: actions/checkout@v4
       - name: Select the newest Xcode
