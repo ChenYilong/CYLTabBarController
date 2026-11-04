@@ -174,3 +174,8 @@
 "PlusButton 点击范围（issue #91）" = "Područje dodira PlusButtona (issue #91)";
 "打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Uključite prekidač za prikaz područja dodira prozirnom crvenom, isključite za normalan izgled; povucite klizač za umnožavanje područja. Sada: %@x";
 "当前 TabBar 没有 PlusButton" = "Ova traka kartica nema PlusButton";
+
+/* Issue #202: plus button with a tappable X subview demo. */
+"子控件" = "Podprikaz";
+"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Prikaži TabBarController s novim kontekstom (PlusButton s X podprikazom koji se može dodirnuti, issue #202)";
+"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Dodirnite X gore desno na PlusButtonu: X mijenja boju u nasumičnu, a PlusButton ne reagira";

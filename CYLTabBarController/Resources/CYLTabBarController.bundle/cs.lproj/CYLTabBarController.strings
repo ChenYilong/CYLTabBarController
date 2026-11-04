@@ -174,3 +174,8 @@
 "PlusButton 点击范围（issue #91）" = "Dotyková oblast PlusButton (issue #91)";
 "打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍" = "Zapnutím přepínače zobrazíte dotykovou oblast poloprůhlednou červenou, vypnutím obnovíte normální vzhled; posuvníkem oblast znásobíte. Nyní: %@x";
 "当前 TabBar 没有 PlusButton" = "Tento panel záložek nemá PlusButton";
+
+/* Issue #202: plus button with a tappable X subview demo. */
+"子控件" = "Podzobrazení";
+"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Zobrazit TabBarController s novým kontextem (PlusButton s klepnutelným podzobrazením X, issue #202)";
+"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Klepněte na X vpravo nahoře u PlusButton: X změní barvu na náhodnou a PlusButton nereaguje";
