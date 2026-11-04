@@ -203,7 +203,8 @@ def doc_title(path):
 
 
 def doc_files():
-    return sorted(f for f in os.listdir(DOCS) if f.endswith(".md") and f != README_NAME)
+    # Hidden files are skipped, e.g. the "._name.md" AppleDouble files macOS writes on non-APFS volumes.
+    return sorted(f for f in os.listdir(DOCS) if f.endswith(".md") and f != README_NAME and not f.startswith("."))
 
 
 def docs_index_table(prefix):
@@ -352,7 +353,7 @@ def source_headers():
     """(path relative to the repository, text) of every header under CYLTabBarController/, SPM shims excluded."""
     for directory, folders, files in os.walk(SOURCES):
         folders[:] = sorted(f for f in folders if f != "include" and not f.startswith("."))
-        for name in sorted(f for f in files if f.endswith(".h")):
+        for name in sorted(f for f in files if f.endswith(".h") and not f.startswith(".")):
             path = os.path.join(directory, name)
             with open(path, encoding=ENCODING, errors="replace") as handle:
                 yield os.path.relpath(path, ROOT), handle.read()
