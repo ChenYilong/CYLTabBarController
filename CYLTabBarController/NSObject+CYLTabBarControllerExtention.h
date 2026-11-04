@@ -42,8 +42,14 @@ NS_ASSUME_NONNULL_BEGIN
 + (UIViewController * __nullable)cyl_topmostViewController;
 
 /*!
- * [EN] Returns the navigation controller of the topmost view controller.
- * [CN] 返回最顶层控制器所在的导航控制器。
+ * [EN] Returns the navigation controller of the topmost view controller, so you can push from anywhere (issue #283):
+ *      `[[UIViewController cyl_currentNavigationController] pushViewController:vc animated:YES];`
+ *      An alert (`UIAlertController`) or a controller being dismissed is skipped. Returns nil when the topmost
+ *      view controller is not in a navigation controller (e.g. a tab or a modal that is not wrapped in one).
+ * [CN] 返回最顶层控制器所在的导航控制器，可在任意位置 push（issue #283）：
+ *      `[[UIViewController cyl_currentNavigationController] pushViewController:vc animated:YES];`
+ *      会跳过弹窗（`UIAlertController`）和正在 dismiss 的控制器。最顶层控制器不在导航控制器中时
+ *      （例如没有用导航控制器包裹的 Tab 或 modal 页面）返回 nil。
  */
 + (UINavigationController * __nullable)cyl_currentNavigationController;
 
