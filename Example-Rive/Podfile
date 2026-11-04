@@ -1,0 +1,44 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '15.0'
+#source 'https://github.com/CocoaPods/Specs.git'
+
+target 'HealthyHome' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for HealthyHome
+
+#  pod 'CYLTabBarController/Rive'
+  # Rive tab icons (RiveRuntime), the same way as `CYLTabBarController/LottieSwift` and `CYLTabBarController/PAG`.
+  # Rive Tab 图标（RiveRuntime），用法与 `CYLTabBarController/LottieSwift`、`CYLTabBarController/PAG` 相同。
+  pod 'CYLTabBarController/Rive', :path => '../'
+
+
+
+
+
+  target 'HealthyHomeTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'HealthyHomeUITests' do
+    # Pods for testing
+  end
+
+end
+# [EN] The .riv file is not in the repository; download it (pinned, SHA-256 checked) like the pods themselves.
+# [CN] .riv 文件不在仓库中，与 pod 本身一样在安装时下载（固定版本，校验 SHA-256）。
+pre_install do |installer|
+  # Pods/ is Example-Rive/Pods, so the script is two levels up. Pods/ 即 Example-Rive/Pods，脚本在其上两级。
+  script = File.expand_path('../../scripts/fetch-rive-resources.py', installer.sandbox.root.to_s)
+  system('python3', script) || abort('[!] Could not download the Rive files: python3 ' + script)
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
+    end
+  end
+end

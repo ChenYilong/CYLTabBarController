@@ -1,0 +1,27 @@
+{
+  "comment": "Fetched by scripts/fetch-rive-resources.py (run by `pod install` in Example-Rive); the files themselves are not in this repository.",
+  "packages": [
+    {
+      "package": "rive_animated_icon",
+      "version": "2.1.1",
+      "homepage": "https://pub.dev/packages/rive_animated_icon",
+      "repository": "https://github.com/nikkieke/rive_animated_icons",
+      "license": "MIT",
+      "archive_sha256": "ca703cf1dc77c8dc8466182d303d1654e484e45979f8d992155a8381241be498",
+      "files": [
+        {
+          "member": "assets/icon-set.riv",
+          "file": "rive_animated_icon/icon-set.riv",
+          "size": 94959,
+          "sha256": "78600e54ae0785fb0becb377d3b25167869df58a300c189513c44d7745ab2894"
+        },
+        {
+          "member": "LICENSE",
+          "file": "rive_animated_icon/LICENSE",
+          "size": 1066,
+          "sha256": "c404e8ac5560e03043b9e92f5d9e1a1743a6deddafed5a2027c2f0c69fd2f121"
+        }
+      ]
+    }
+  ]
+}

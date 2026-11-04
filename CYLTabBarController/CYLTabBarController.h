@@ -25,6 +25,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Lottie-TabIcon.md
 //   - Get the navigation controller and push from anywhere / 在任意位置获取导航控制器并 Push
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Push-From-Anywhere.md
+//   - Rive animated tab icons (used like Lottie and PAG) / Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Rive-Animation.md
 //   - selectedIndex and the PlusButton: the selected title and image match / selectedIndex 与 PlusButton：选中的文字与图片一致
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SelectedIndex-PlusButton.md
 //   - Using CYLTabBarController in Swift / 在 Swift 项目中使用 CYLTabBarController
@@ -267,6 +269,97 @@ FOUNDATION_EXTERN NSString *const CYLTabBarPAGDarkFilePath;
 FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFiles(NSArray<NSDictionary *> *attributes,
                                                                                  NSArray<NSString *> *pagFileNames,
                                                                                  NSBundle * _Nullable bundle);
+
+/*!
+ * [EN] Rive animations (`RiveRuntime`), the same way as Lottie and PAG.
+ *      Keys for a tab's Rive animation, used exactly like their Lottie and PAG twins and through the same pipeline: the
+ *      view is added in place of the tab's icon, plays when the tab is selected, stops when another one is, follows
+ *      `lottieAnimationViewContentMode`, is returned by `-[UIControl cyl_lottieAnimationView]` and posts
+ *      `CYLTabBarItemLottieAnimationViewDidAddNotification`. Needs the `CYLTabBarController/Rive` subspec (the
+ *      `RiveRuntime` pod, iOS 14+); without it the keys are ignored and the images show. Rive state machines have no
+ *      playback position or speed, so `lottieAnimationSpeed` does not apply to them.
+ *      - `CYLTabBarRiveURL`: an NSURL of a .riv file, optionally with an artboard and a state machine
+ *        (`CYLTabBarRiveAnimationURL()`); `CYLTabBarRiveFilePath`: its path (NSString, the default artboard). The URL wins.
+ *      - `CYLTabBarRiveSize`: the view size, an NSValue of CGSize (default: the icon placeholder size).
+ *      - `CYLTabBarRiveDarkURL` / `CYLTabBarRiveDarkFilePath`: the Dark Mode version, like `CYLTabBarLottieDarkURL`.
+ *      - `CYLTabBarRiveDarkColors`: view model color property path -> UIColor for Dark Mode, e.g. @{ @"color" : UIColor.whiteColor },
+ *        so one file follows Dark Mode (like `CYLTabBarLottieDarkColors`).
+ * [CN] Rive 动画（`RiveRuntime`），用法与 Lottie、PAG 相同。
+ *      Tab 的 Rive 动画 key，用法与对应的 Lottie、PAG key 完全相同，并走同一套流程：替换 Tab 图标显示，选中时播放，选中其他 Tab 时停止，
+ *      遵循 `lottieAnimationViewContentMode`，由 `-[UIControl cyl_lottieAnimationView]` 返回，并发送
+ *      `CYLTabBarItemLottieAnimationViewDidAddNotification`。需要引入 `CYLTabBarController/Rive` 子库（依赖 `RiveRuntime` pod，iOS 14+）；未引入时忽略
+ *      这些 key，显示图片。Rive 状态机没有播放进度与播放速度，`lottieAnimationSpeed` 对其无效。
+ *      - `CYLTabBarRiveURL`：.riv 文件的 NSURL，可以指定画板与状态机（`CYLTabBarRiveAnimationURL()`）；`CYLTabBarRiveFilePath`：其路径（NSString，
+ *        使用默认画板）。URL 优先。
+ *      - `CYLTabBarRiveSize`：视图尺寸，CGSize 的 NSValue（默认使用图标占位尺寸）。
+ *      - `CYLTabBarRiveDarkURL` / `CYLTabBarRiveDarkFilePath`：深色模式版本，与 `CYLTabBarLottieDarkURL` 相同。
+ *      - `CYLTabBarRiveDarkColors`：深色模式下 view model 颜色属性路径 -> UIColor，例如 @{ @"color" : UIColor.whiteColor }，使一份文件即可适配
+ *        深色模式（与 `CYLTabBarLottieDarkColors` 相同）。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveSize;
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkColors;
+
+/*!
+ * [EN] Options of a Rive tab animation, for `CYLTabBarRiveAnimationURL()`. Every value is a string:
+ *      - `CYLTabBarRiveOptionArtboard`: the artboard name (default: the file's default artboard). One .riv file can hold
+ *        many icons, one per artboard.
+ *      - `CYLTabBarRiveOptionStateMachine`: the state machine name (default: the artboard's default state machine).
+ *      - `CYLTabBarRiveOptionActiveProperty`: the path of the view model boolean that plays the icon (default @"active"):
+ *        selecting the tab sets it to YES, then back to NO after `CYLTabBarRiveOptionActiveDuration` seconds (default
+ *        @"1"); selecting another tab sets it to NO.
+ *      - `CYLTabBarRiveOptionTriggerProperty`: the path of a view model trigger to fire instead of the boolean.
+ *      - `CYLTabBarRiveOptionColor`: "#RRGGBB" or "#RRGGBBAA", set on the view model color property @"color" when the
+ *        icon loads (its light color).
+ * [CN] Rive Tab 动画的选项，用于 `CYLTabBarRiveAnimationURL()`。所有值都是字符串：
+ *      - `CYLTabBarRiveOptionArtboard`：画板名称（默认使用文件的默认画板）。一个 .riv 文件可以包含多个图标，每个图标一个画板。
+ *      - `CYLTabBarRiveOptionStateMachine`：状态机名称（默认使用画板的默认状态机）。
+ *      - `CYLTabBarRiveOptionActiveProperty`：播放图标的 view model 布尔属性路径（默认 @"active"）：选中 Tab 时设为 YES，
+ *        `CYLTabBarRiveOptionActiveDuration` 秒后（默认 @"1"）恢复为 NO；选中其他 Tab 时设为 NO。
+ *      - `CYLTabBarRiveOptionTriggerProperty`：改为触发的 view model trigger 属性路径。
+ *      - `CYLTabBarRiveOptionColor`："#RRGGBB" 或 "#RRGGBBAA"，图标加载时设置到 view model 颜色属性 @"color"（浅色模式的颜色）。
+ */
+typedef NSString *CYLTabBarRiveOption NS_TYPED_ENUM;
+FOUNDATION_EXTERN CYLTabBarRiveOption const CYLTabBarRiveOptionArtboard;
+FOUNDATION_EXTERN CYLTabBarRiveOption const CYLTabBarRiveOptionStateMachine;
+FOUNDATION_EXTERN CYLTabBarRiveOption const CYLTabBarRiveOptionActiveProperty;
+FOUNDATION_EXTERN CYLTabBarRiveOption const CYLTabBarRiveOptionActiveDuration;
+FOUNDATION_EXTERN CYLTabBarRiveOption const CYLTabBarRiveOptionTriggerProperty;
+FOUNDATION_EXTERN CYLTabBarRiveOption const CYLTabBarRiveOptionColor;
+
+/*!
+ * [EN] The URL of a Rive tab animation: `fileURL` (a .riv file) with `options` in its fragment, for `CYLTabBarRiveURL`,
+ *      `CYLTabBarRiveDarkURL` or `CYLTabBarAnimationURL`. Several tabs can use one file with different artboards; each URL
+ *      stays a different tab animation. Returns nil when `fileURL` is nil.
+ *
+ *          NSURL *iconSet = [[NSBundle mainBundle] URLForResource:@"icon-set" withExtension:@"riv"];
+ *          homeAttributes[CYLTabBarRiveURL] = CYLTabBarRiveAnimationURL(iconSet, @{
+ *              CYLTabBarRiveOptionArtboard : @"HOME",
+ *              CYLTabBarRiveOptionStateMachine : @"HOME_interactivity",
+ *          });
+ *          // Swift: CYLTabBarRiveAnimationURL(iconSet, [.artboard: "HOME", .stateMachine: "HOME_interactivity"])
+ * [CN] Rive Tab 动画的 URL：`fileURL`（.riv 文件）加上写在 fragment 中的 `options`，用于 `CYLTabBarRiveURL`、`CYLTabBarRiveDarkURL` 或
+ *      `CYLTabBarAnimationURL`。多个 Tab 可以使用同一个文件的不同画板，每个 URL 仍是不同的 Tab 动画。`fileURL` 为 nil 时返回 nil。示例见上。
+ */
+FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarRiveAnimationURL(NSURL * _Nullable fileURL,
+                                                              NSDictionary<CYLTabBarRiveOption, NSString *> * _Nullable options);
+
+/*!
+ * [EN] Returns `attributes` with a Rive animation added to each item, like `CYLTabBarItemsAttributesAddingPAGFiles`:
+ *      `CYLTabBarRiveFilePath` for "<name>.riv" in `bundle` (nil: the main bundle), and `CYLTabBarRiveDarkFilePath` for
+ *      "<name>_dark.riv" when that file exists. Each file plays its default artboard and state machine; use
+ *      `CYLTabBarRiveAnimationURL()` to pick others. Names are matched by position; an item without a name, or whose file
+ *      is missing, is left as it is.
+ * [CN] 返回为每个 item 添加了 Rive 动画的 `attributes`，与 `CYLTabBarItemsAttributesAddingPAGFiles` 相同：`CYLTabBarRiveFilePath` 为
+ *      `bundle`（nil 表示 main bundle）中的「<名称>.riv」；存在「<名称>_dark.riv」时再加上 `CYLTabBarRiveDarkFilePath`。每个文件播放其默认画板与
+ *      状态机；需要其他画板时使用 `CYLTabBarRiveAnimationURL()`。名称按位置对应；没有名称或文件不存在的 item 保持不变。
+ */
+FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingRiveFiles(NSArray<NSDictionary *> *attributes,
+                                                                                  NSArray<NSString *> *riveFileNames,
+                                                                                  NSBundle * _Nullable bundle);
 
 /*!
  * FIX: issue #477 — only some tabs animated, with any animation library.

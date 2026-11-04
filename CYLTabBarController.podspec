@@ -49,6 +49,7 @@ Pod::Spec.new do |s|
     'CYLTabBarController/CYLBadgeView/**/*', # the CYLBadgeView subspec above
     'CYLTabBarController/CYLTabBarItemAnimation/**/*', # the CYLTabBarItemAnimation subspec below
     'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}',
+    'CYLTabBarController/RiveSwift/**/*', # the Rive subspec below (Swift bridge)
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{swift}',
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{h,m}',
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/**/*.{h,m,swift}'
@@ -149,6 +150,30 @@ Pod::Spec.new do |s|
     pagenterprise.dependency 'libpag-enterprise', '>= 4.0'
   end
   
+  # Rive animations (`RiveRuntime`), the same way as Lottie and PAG: `pod 'CYLTabBarController/Rive'`.
+  # Tabs then take `CYLTabBarRiveURL` / `CYLTabBarRiveFilePath` (".riv" files) like the Lottie and PAG keys;
+  # `CYLTabBarRiveAnimationURL()` picks an artboard and a state machine, so one .riv file can hold every tab's icon.
+  # RiveRuntime is a binary pod (RiveRuntime.xcframework) with a Swift API: `CYLRiveTabBarItemAnimator`
+  # (CYLTabBarItemAnimation/Rive/) registers itself and talks to the Swift bridge `CYLRiveTabBarItemAnimationView`
+  # (RiveSwift/) at runtime, with or without Lottie and PAG. 6.29 is the first version whose current API
+  # (`Worker`, `File`, `Rive`, `RiveUIView`) has replaced the deprecated `RiveViewModel`.
+  # Rive 动画（`RiveRuntime`），用法与 Lottie、PAG 相同：`pod 'CYLTabBarController/Rive'`。Tab 使用 `CYLTabBarRiveURL` /
+  # `CYLTabBarRiveFilePath`（".riv" 文件），与 Lottie、PAG key 一致；`CYLTabBarRiveAnimationURL()` 可以指定画板与状态机，因此一个 .riv 文件
+  # 即可包含所有 Tab 的图标。RiveRuntime 为二进制 pod（RiveRuntime.xcframework），提供 Swift API：`CYLRiveTabBarItemAnimator`
+  # （CYLTabBarItemAnimation/Rive/）自行注册，并在运行时调用 Swift 桥接 `CYLRiveTabBarItemAnimationView`（RiveSwift/），无论是否引入 Lottie、PAG。
+  # 6.29 起，Rive 当前的 API（`Worker`、`File`、`Rive`、`RiveUIView`）取代了已废弃的 `RiveViewModel`。
+  s.subspec 'Rive' do |rive|
+    rive.dependency 'CYLTabBarController/Core'
+    rive.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
+    # The Rive animator, registered with CYLTabBarItemAnimatorRegistry, and its Swift bridge.
+    # Rive 的 animator（向注册表注册）及其 Swift 桥接。
+    rive.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.{h,m}', 'CYLTabBarController/RiveSwift/*.swift'
+    rive.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.h'
+    rive.dependency 'RiveRuntime', '~> 6.29'
+    # RiveRuntime requires iOS 14. RiveRuntime 要求 iOS 14。
+    rive.ios.deployment_target = '14.0'
+  end
+
   s.subspec 'CYLFlatDesignTabBar' do |flatdesign|
     flatdesign.dependency "CYLTabBarController/CYLFlatDesignTabBar-ObjectiveC"
     flatdesign.ios.deployment_target = '13.0' # depends on LottieSwift

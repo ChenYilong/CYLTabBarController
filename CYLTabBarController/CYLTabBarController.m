@@ -81,6 +81,20 @@ NSString *const CYLTabBarPAGFilePath = @"CYLTabBarPAGFilePath";
 NSString *const CYLTabBarPAGSize = @"CYLTabBarPAGSize";
 NSString *const CYLTabBarPAGDarkURL = @"CYLTabBarPAGDarkURL";
 NSString *const CYLTabBarPAGDarkFilePath = @"CYLTabBarPAGDarkFilePath";
+NSString *const CYLTabBarRiveURL = @"CYLTabBarRiveURL";
+NSString *const CYLTabBarRiveFilePath = @"CYLTabBarRiveFilePath";
+NSString *const CYLTabBarRiveSize = @"CYLTabBarRiveSize";
+NSString *const CYLTabBarRiveDarkURL = @"CYLTabBarRiveDarkURL";
+NSString *const CYLTabBarRiveDarkFilePath = @"CYLTabBarRiveDarkFilePath";
+NSString *const CYLTabBarRiveDarkColors = @"CYLTabBarRiveDarkColors";
+// [EN] The names of the items in the fragment of a Rive tab animation URL, read by `CYLRiveTabBarItemAnimator`.
+// [CN] Rive Tab 动画 URL 的 fragment 中各项的名称，由 `CYLRiveTabBarItemAnimator` 读取。
+CYLTabBarRiveOption const CYLTabBarRiveOptionArtboard = @"artboard";
+CYLTabBarRiveOption const CYLTabBarRiveOptionStateMachine = @"stateMachine";
+CYLTabBarRiveOption const CYLTabBarRiveOptionActiveProperty = @"active";
+CYLTabBarRiveOption const CYLTabBarRiveOptionActiveDuration = @"duration";
+CYLTabBarRiveOption const CYLTabBarRiveOptionTriggerProperty = @"trigger";
+CYLTabBarRiveOption const CYLTabBarRiveOptionColor = @"color";
 
 /// [EN] Shared by `CYLTabBarItemsAttributesAddingLottieFiles` ("json"), `CYLTabBarItemsAttributesAddingPAGFiles` ("pag", #604)
 ///      and `CYLTabBarItemAttributesAddingAnimationFile` (any library, #477).
@@ -132,6 +146,51 @@ NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFiles(NSArray<NSDictio
                                                                  NSBundle *bundle) {
     return CYLTabBarItemsAttributesAddingFilesOfType(attributes, pagFileNames, bundle, @"pag",
                                                         CYLTabBarPAGFilePath, CYLTabBarPAGDarkFilePath);
+}
+
+NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingRiveFiles(NSArray<NSDictionary *> *attributes,
+                                                                  NSArray<NSString *> *riveFileNames,
+                                                                  NSBundle *bundle) {
+    return CYLTabBarItemsAttributesAddingFilesOfType(attributes, riveFileNames, bundle, @"riv",
+                                                        CYLTabBarRiveFilePath, CYLTabBarRiveDarkFilePath);
+}
+
+NSURL *CYLTabBarRiveAnimationURL(NSURL *fileURL, NSDictionary<CYLTabBarRiveOption, NSString *> *options) {
+    if (![fileURL isKindOfClass:[NSURL class]]) {
+        return nil;
+    }
+    NSURLComponents *components = [NSURLComponents componentsWithURL:fileURL resolvingAgainstBaseURL:YES];
+    if (!components) {
+        return nil;
+    }
+    // [EN] "name=value&…", percent-encoded so that a name or a value may hold any character ("&", "=", "#", spaces…).
+    //      Sorted by name, so the same options always give the same URL (it is also the key of its Dark Mode version).
+    // [CN] 「名称=值&…」，经过百分号编码，名称和值可以包含任意字符（"&"、"="、"#"、空格等）。按名称排序，相同的选项总是得到相同的 URL
+    //      （URL 也是其深色模式版本的 key）。
+    NSMutableCharacterSet *allowed = [[NSCharacterSet URLQueryAllowedCharacterSet] mutableCopy];
+    [allowed removeCharactersInString:@"&=+#?"];
+    NSMutableArray<NSString *> *items = [NSMutableArray array];
+    // [EN] Only string names and values; anything else is ignored. [CN] 只接受字符串名称和值，其他类型忽略。
+    NSMutableArray<NSString *> *names = [NSMutableArray array];
+    if ([options isKindOfClass:[NSDictionary class]]) {
+        for (id name in options) {
+            id value = options[name];
+            if ([name isKindOfClass:[NSString class]] && [(NSString *)name length] > 0 &&
+                [value isKindOfClass:[NSString class]] && [(NSString *)value length] > 0) {
+                [names addObject:name];
+            }
+        }
+    }
+    [names sortUsingSelector:@selector(compare:)];
+    for (NSString *name in names) {
+        NSString *encodedName = [name stringByAddingPercentEncodingWithAllowedCharacters:allowed];
+        NSString *encodedValue = [options[name] stringByAddingPercentEncodingWithAllowedCharacters:allowed];
+        if (encodedName.length > 0 && encodedValue.length > 0) {
+            [items addObject:[NSString stringWithFormat:@"%@=%@", encodedName, encodedValue]];
+        }
+    }
+    components.percentEncodedFragment = items.count > 0 ? [items componentsJoinedByString:@"&"] : nil;
+    return components.URL;
 }
 
 NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(NSDictionary *attributes, NSString *fileName, NSBundle *bundle) {

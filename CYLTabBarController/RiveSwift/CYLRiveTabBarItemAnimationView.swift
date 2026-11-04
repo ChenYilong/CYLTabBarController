@@ -1,0 +1,321 @@
+//
+//  CYLRiveTabBarItemAnimationView.swift
+//  CYLTabBarController
+//
+//  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
+//
+
+// [EN] The Swift bridge of the `Rive` subspec: Rive's runtime (`RiveRuntime`, 6.29+) is a Swift API, so this view hosts a
+//      `RiveUIView` and offers the few Objective-C methods that `CYLRiveTabBarItemAnimator` calls at runtime. It uses only
+//      Rive's current API (`Worker`, `File`, `Rive`, `RiveUIView`, view model instances), not the deprecated
+//      `RiveViewModel`. Compiled only with the Rive runtime.
+// [CN] `Rive` 子库的 Swift 桥接：Rive 运行时（`RiveRuntime` 6.29+）是 Swift API，因此本视图承载一个 `RiveUIView`，并提供
+//      `CYLRiveTabBarItemAnimator` 在运行时调用的少量 Objective-C 方法。只使用 Rive 当前的 API（`Worker`、`File`、`Rive`、`RiveUIView`、
+//      view model 实例），不使用已废弃的 `RiveViewModel`。仅在引入 Rive 运行时时编译。
+#if canImport(RiveRuntime)
+import UIKit
+import RiveRuntime
+
+/*!
+ * [EN] A tab icon that plays a Rive artboard. It loads asynchronously (one shared `Worker`, each .riv file loaded once and
+ *      shared by every tab that uses it); calls made before it has loaded are applied once it has. A tab "plays" through
+ *      the artboard's view model: the boolean `activePropertyPath` is set to true, then back to false after
+ *      `activeDuration` seconds, or the trigger `triggerPropertyPath` is fired. An artboard without a view model is shown
+ *      but does not play. It takes no touches: the tab button does.
+ * [CN] 播放 Rive 画板的 Tab 图标。异步加载（共用一个 `Worker`，每个 .riv 文件只加载一次，由使用它的所有 Tab 共用）；加载完成前的调用会在
+ *      加载后执行。Tab 通过画板的 view model「播放」：把布尔属性 `activePropertyPath` 设为 true，`activeDuration` 秒后恢复为 false；或触发
+ *      trigger 属性 `triggerPropertyPath`。没有 view model 的画板只显示、不播放。它不接收触摸，由 Tab 按钮接收。
+ */
+@objc(CYLRiveTabBarItemAnimationView)
+final class CYLRiveTabBarItemAnimationView: UIView {
+
+    /// [EN] The view model color property set by `lightColor`. [CN] `lightColor` 所设置的 view model 颜色属性。
+    private static let colorPropertyPath = "color"
+
+    private let fileURL: URL
+    private let artboardName: String?
+    private let stateMachineName: String?
+    private let activePropertyPath: String
+    private let activeDuration: TimeInterval
+    private let triggerPropertyPath: String?
+    private let lightColor: UIColor?
+
+    private var rive: Rive?
+    private var riveView: RiveUIView?
+    private var viewModelInstance: ViewModelInstance?
+    private var isLoaded = false
+    private var playsWhenLoaded = false
+    private var deactivateTask: Task<Void, Never>?
+
+    /// [EN] The colors asked for last (nil: the light colors), applied in order. [CN] 最近一次请求的颜色（nil 表示浅色颜色），按顺序应用。
+    private var requestedColors: [String: UIColor]?
+    private var colorTask: Task<Void, Never>?
+    /// [EN] Each overridden property's color before it was overridden. [CN] 每个被覆盖的属性在覆盖前的颜色。
+    private var originalColors: [String: RiveRuntime.Color] = [:]
+    private var overriddenColorPaths: Set<String> = []
+
+    @objc(initWithFileURL:artboardName:stateMachineName:activePropertyPath:activeDuration:triggerPropertyPath:lightColor:contentMode:)
+    init(fileURL: URL,
+         artboardName: String?,
+         stateMachineName: String?,
+         activePropertyPath: String,
+         activeDuration: TimeInterval,
+         triggerPropertyPath: String?,
+         lightColor: UIColor?,
+         contentMode: UIView.ContentMode) {
+        self.fileURL = fileURL
+        self.artboardName = artboardName
+        self.stateMachineName = stateMachineName
+        self.activePropertyPath = activePropertyPath
+        self.activeDuration = activeDuration
+        self.triggerPropertyPath = triggerPropertyPath
+        self.lightColor = lightColor
+        super.init(frame: .zero)
+        self.contentMode = contentMode
+        isUserInteractionEnabled = false
+        backgroundColor = .clear
+        // [EN] The tab button describes itself to VoiceOver. [CN] 由 Tab 按钮向 VoiceOver 描述自己。
+        accessibilityElementsHidden = true
+        load()
+    }
+
+    /// [EN] Not used from Interface Builder. [CN] 不支持从 Interface Builder 创建。
+    required init?(coder: NSCoder) {
+        return nil
+    }
+
+    /// [EN] `lottieAnimationViewContentMode` -> Rive's fit. [CN] `lottieAnimationViewContentMode` 对应 Rive 的 fit。
+    override var contentMode: UIView.ContentMode {
+        didSet {
+            rive?.fit = Self.fit(for: contentMode)
+        }
+    }
+
+    // MARK: - [EN] Called by CYLRiveTabBarItemAnimator (Objective-C) [CN] 由 CYLRiveTabBarItemAnimator（Objective-C）调用
+
+    /// [EN] Plays once: sets the boolean to true, then false after `activeDuration`; or fires the trigger.
+    /// [CN] 播放一次：把布尔属性设为 true，`activeDuration` 后设为 false；或触发 trigger。
+    @objc(cyl_play)
+    func play() {
+        guard isLoaded else {
+            playsWhenLoaded = true
+            return
+        }
+        guard let instance = viewModelInstance else {
+            return
+        }
+        deactivateTask?.cancel()
+        if let triggerPropertyPath {
+            instance.fire(trigger: TriggerProperty(path: triggerPropertyPath))
+            return
+        }
+        instance.setValue(of: BoolProperty(path: activePropertyPath), to: true)
+        // [EN] At most a minute, so any value converts safely. [CN] 最长一分钟，保证任何值都能安全转换。
+        let nanoseconds = UInt64(min(max(activeDuration, 0), 60) * 1_000_000_000)
+        deactivateTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: nanoseconds)
+            guard !Task.isCancelled, let self, let instance = self.viewModelInstance else {
+                return
+            }
+            instance.setValue(of: BoolProperty(path: self.activePropertyPath), to: false)
+        }
+    }
+
+    /// [EN] A state machine has no last frame: the icon stays in its resting state (the tab selected at launch, #389).
+    /// [CN] 状态机没有最后一帧：图标保持静止状态（启动时选中的 Tab，#389）。
+    @objc(cyl_showLastFrame)
+    func showLastFrame() {
+        stop()
+    }
+
+    /// [EN] Stops: the boolean goes back to false. [CN] 停止：布尔属性恢复为 false。
+    @objc(cyl_stop)
+    func stop() {
+        playsWhenLoaded = false
+        deactivateTask?.cancel()
+        deactivateTask = nil
+        guard triggerPropertyPath == nil, let instance = viewModelInstance else {
+            return
+        }
+        instance.setValue(of: BoolProperty(path: activePropertyPath), to: false)
+    }
+
+    /// [EN] Color property path -> color (Dark Mode); nil restores the light colors. [CN] 颜色属性路径 -> 颜色（深色模式）；nil 恢复浅色颜色。
+    @objc(cyl_applyColors:)
+    func applyColors(_ colors: [String: UIColor]?) {
+        requestedColors = colors
+        if isLoaded {
+            enqueueRequestedColors()
+        }
+    }
+
+    // MARK: - [EN] Loading [CN] 加载
+
+    private func load() {
+        let fileURL = self.fileURL
+        Task { @MainActor [weak self] in
+            do {
+                let file = try await CYLRiveTabBarItemAnimationFiles.file(at: fileURL)
+                guard let self else {
+                    return
+                }
+                let artboard = try await file.createArtboard(self.artboardName)
+                // [EN] The artboard's default view model instance, kept to play the icon; an artboard may have none.
+                // [CN] 画板默认的 view model 实例，保存下来用于播放图标；画板也可能没有。
+                let instance = try? await file.createViewModelInstance(.viewModelDefault(from: .artboardDefault(artboard)))
+                let stateMachine = try await artboard.createStateMachine(self.stateMachineName, binding: instance)
+                let rive = try await Rive(file: file,
+                                          artboard: artboard,
+                                          stateMachine: stateMachine,
+                                          fit: Self.fit(for: self.contentMode))
+                self.didLoad(rive: rive, viewModelInstance: instance)
+            } catch {
+                #if DEBUG
+                print("[CYLTabBarController] Could not load the Rive tab animation \(fileURL.lastPathComponent): \(error)")
+                #endif
+            }
+        }
+    }
+
+    private func didLoad(rive: Rive, viewModelInstance: ViewModelInstance?) {
+        self.rive = rive
+        self.viewModelInstance = viewModelInstance
+        let riveView = RiveUIView(rive: rive)
+        riveView.frame = bounds
+        riveView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        riveView.isUserInteractionEnabled = false
+        riveView.backgroundColor = .clear
+        addSubview(riveView)
+        self.riveView = riveView
+        isLoaded = true
+        if let lightColor, let instance = viewModelInstance {
+            let path = Self.colorPropertyPath
+            let color = Self.riveColor(lightColor)
+            // [EN] The light color is the one restored after Dark Mode. [CN] 浅色颜色即退出深色模式后恢复的颜色。
+            originalColors[path] = color
+            instance.setValue(of: ColorProperty(path: path), to: color)
+        }
+        if requestedColors != nil {
+            enqueueRequestedColors()
+        }
+        if playsWhenLoaded {
+            playsWhenLoaded = false
+            play()
+        }
+    }
+
+    // MARK: - [EN] Colors [CN] 颜色
+
+    /// [EN] Applies `requestedColors` after the updates already queued, so they keep their order.
+    /// [CN] 在已排队的更新之后应用 `requestedColors`，保持顺序。
+    private func enqueueRequestedColors() {
+        guard let instance = viewModelInstance else {
+            return
+        }
+        let colors = requestedColors
+        let previous = colorTask
+        colorTask = Task { @MainActor [weak self] in
+            await previous?.value
+            guard let self else {
+                return
+            }
+            if let colors {
+                for (path, color) in colors {
+                    let property = ColorProperty(path: path)
+                    if self.originalColors[path] == nil, let original = try? await instance.value(of: property) {
+                        self.originalColors[path] = original
+                    }
+                    instance.setValue(of: property, to: Self.riveColor(color))
+                    self.overriddenColorPaths.insert(path)
+                }
+            } else {
+                for path in self.overriddenColorPaths {
+                    if let original = self.originalColors[path] {
+                        instance.setValue(of: ColorProperty(path: path), to: original)
+                    }
+                }
+                self.overriddenColorPaths.removeAll()
+            }
+        }
+    }
+
+    private static func riveColor(_ color: UIColor) -> RiveRuntime.Color {
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        if !color.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
+            var white: CGFloat = 0
+            if color.getWhite(&white, alpha: &alpha) {
+                red = white
+                green = white
+                blue = white
+            }
+        }
+        func byte(_ value: CGFloat) -> UInt8 {
+            return UInt8(max(0, min(255, (value * 255).rounded())))
+        }
+        return RiveRuntime.Color(red: byte(red), green: byte(green), blue: byte(blue), alpha: byte(alpha))
+    }
+
+    private static func fit(for contentMode: UIView.ContentMode) -> RiveRuntime.Fit {
+        switch contentMode {
+        case .scaleToFill:
+            return .fill(alignment: .center)
+        case .scaleAspectFill:
+            return .cover(alignment: .center)
+        default:
+            return .contain(alignment: .center)
+        }
+    }
+}
+
+/*!
+ * [EN] One `Worker` for every Rive tab icon, and each .riv file loaded once: tabs that use the same file (e.g. one
+ *      artboard each) share it.
+ * [CN] 所有 Rive Tab 图标共用一个 `Worker`，每个 .riv 文件只加载一次：使用同一文件的 Tab（例如各用一个画板）共用它。
+ */
+@MainActor
+private enum CYLRiveTabBarItemAnimationFiles {
+
+    private static var workerTask: Task<RiveRuntime.Worker, Error>?
+    private static var fileTasks: [URL: Task<RiveRuntime.File, Error>] = [:]
+
+    static func file(at url: URL) async throws -> RiveRuntime.File {
+        if let task = fileTasks[url] {
+            return try await task.value
+        }
+        let task = Task { @MainActor () async throws -> RiveRuntime.File in
+            let worker = try await sharedWorker()
+            let source: RiveRuntime.Source
+            if url.isFileURL {
+                source = .data(try Data(contentsOf: url))
+            } else {
+                source = .url(url)
+            }
+            return try await RiveRuntime.File(source: source, worker: worker)
+        }
+        fileTasks[url] = task
+        do {
+            return try await task.value
+        } catch {
+            // [EN] Tried again next time. [CN] 下次重新尝试。
+            fileTasks[url] = nil
+            throw error
+        }
+    }
+
+    private static func sharedWorker() async throws -> RiveRuntime.Worker {
+        if let task = workerTask {
+            return try await task.value
+        }
+        let task = Task { @MainActor () async throws -> RiveRuntime.Worker in
+            return try await RiveRuntime.Worker()
+        }
+        workerTask = task
+        do {
+            return try await task.value
+        } catch {
+            workerTask = nil
+            throw error
+        }
+    }
+}
+#endif

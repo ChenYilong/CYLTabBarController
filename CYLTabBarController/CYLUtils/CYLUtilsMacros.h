@@ -67,12 +67,27 @@
 #endif
 
 /*!
- * [EN] 1 when a tab icon animation library is in the project: Lottie or PAG. Each is a `CYLTabBarItemAnimator` of the
- *      `CYLTabBarItemAnimation` subspec, so the tab bar code is the same for both and works with either one alone.
- * [CN] 工程中引入了 Tab 图标动画库（Lottie 或 PAG）时为 1。二者都是 `CYLTabBarItemAnimation` 子库中的 `CYLTabBarItemAnimator`，因此 TabBar 代码
- *      对二者完全相同，单独引入任意一个即可工作。
+ * [EN] 1 when Rive's runtime is in the project (`CYLTabBarController/Rive`, which depends on the `RiveRuntime` pod;
+ *      `<RiveRuntime/RiveRuntime.h>`), else 0. Rive animations use the same pipeline as Lottie and PAG (keys
+ *      `CYLTabBarRive…`), through `CYLRiveTabBarItemAnimator`. Use it, like `CYL_LOTTIE_AVAILABLE`, only after importing
+ *      this header.
+ * [CN] 工程中引入了 Rive 运行时时为 1，否则为 0（`CYLTabBarController/Rive`，依赖 `RiveRuntime` pod；`<RiveRuntime/RiveRuntime.h>`）。Rive 动画与
+ *      Lottie、PAG 使用同一套流程（key 为 `CYLTabBarRive…`），由 `CYLRiveTabBarItemAnimator` 实现。与 `CYL_LOTTIE_AVAILABLE` 一样，只能在引入本头文件
+ *      之后使用。
  */
-#define CYL_TAB_ANIMATION_AVAILABLE (CYL_LOTTIE_AVAILABLE || CYL_PAG_AVAILABLE)
+#if __has_include(<RiveRuntime/RiveRuntime.h>)
+#define CYL_RIVE_AVAILABLE 1
+#else
+#define CYL_RIVE_AVAILABLE 0
+#endif
+
+/*!
+ * [EN] 1 when a tab icon animation library is in the project: Lottie, PAG or Rive. Each is a `CYLTabBarItemAnimator` of
+ *      the `CYLTabBarItemAnimation` subspec, so the tab bar code is the same for all of them and works with any one alone.
+ * [CN] 工程中引入了 Tab 图标动画库（Lottie、PAG 或 Rive）时为 1。它们都是 `CYLTabBarItemAnimation` 子库中的 `CYLTabBarItemAnimator`，因此
+ *      TabBar 代码对它们完全相同，单独引入任意一个即可工作。
+ */
+#define CYL_TAB_ANIMATION_AVAILABLE (CYL_LOTTIE_AVAILABLE || CYL_PAG_AVAILABLE || CYL_RIVE_AVAILABLE)
 
 #define CYL_DEPRECATED(explain) __attribute__((deprecated(explain)))
 
