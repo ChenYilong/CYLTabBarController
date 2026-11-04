@@ -263,6 +263,17 @@
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Tria una interrupció; s'executa al cap d'1,5 s. Primer desplaça't cap avall per amagar la TabBar.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: toca per activar l'amagat en desplaçar, desplaça't cap avall per amagar la TabBar i fes el que diu el títol. Esperat: la TabBar torna de seguida.";
 "自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Executa per ordre totes les simulacions automàtiques i informa d'èxits / errors (uns 2 minuts), també a la consola. També es pot executar amb l'argument d'inici -CYLScrollHideSelfTest YES.";
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Aspecte";
+"换肤（主题，issue #216）" = "Aspecte (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Toqueu per triar un tema: el fons, les icones i els colors del text de la TabBar canvien al moment, en tots els estils de TabBar. Actual: %@";
+"选择主题" = "Trieu un tema";
+"默认" = "Per defecte";
+"西柚" = "Aranja";
+"青草" = "Herba";
+"玫瑰粉" = "Rosa";
+"春节" = "Festa de la Primavera";
+"跟随系统深色模式" = "Seguir el mode fosc del sistema";
 "默认点击声" = "Clic per defecte";
 "中等触感反馈" = "Resposta hàptica mitjana";
 "无需继承基类与工具方法" = "Sense classe base, i utilitats";
@@ -286,5 +297,19 @@
 "重触感反馈" = "Resposta hàptica forta";
 "长按（#152）" = "Pulsació llarga (#152)";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Nadal";
+"万圣节" = "Halloween";
+"情人节" = "Sant Valentí";
+"中秋节" = "Festa de mitja tardor";
+"复活节" = "Pasqua";
+"新年" = "Any Nou";
+"夏日" = "Estiu";
+"生日" = "Aniversari";
+"太空" = "Espai";
+"海洋" = "Oceà";
+"换肤：节日与配色主题（%@ 种）" = "Aspectes: festes i colors (%@)";
+"节日图标与配色" = "Icones festives i colors";
+"仅配色" = "Només colors";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Toca'm";

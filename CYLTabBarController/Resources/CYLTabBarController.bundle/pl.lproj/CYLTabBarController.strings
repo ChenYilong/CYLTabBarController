@@ -263,6 +263,17 @@
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Wybierz przerwanie; uruchomi się po 1,5 s. Najpierw przewiń w dół, aby ukryć TabBar.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Ręcznie: stuknij, aby włączyć ukrywanie przy przewijaniu, przewiń w dół, aby ukryć TabBar, a potem zrób to, co mówi tytuł. Oczekiwane: TabBar od razu wraca.";
 "自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Uruchamia po kolei wszystkie automatyczne symulacje i raportuje zaliczone / niezaliczone (około 2 minut), także w konsoli. Można też uruchomić argumentem -CYLScrollHideSelfTest YES.";
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Skórka";
+"换肤（主题，issue #216）" = "Skórka (motyw, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Stuknij, aby wybrać motyw: tło, ikony i kolory tekstu TabBar zmieniają się na miejscu, w każdym stylu TabBar. Teraz: %@";
+"选择主题" = "Wybierz motyw";
+"默认" = "Domyślny";
+"西柚" = "Grejpfrut";
+"青草" = "Trawa";
+"玫瑰粉" = "Różowa róża";
+"春节" = "Święto Wiosny";
+"跟随系统深色模式" = "Zgodnie z trybem ciemnym systemu";
 "默认点击声" = "Domyślne kliknięcie";
 "中等触感反馈" = "Średnia haptyka";
 "无需继承基类与工具方法" = "Bez klasy bazowej i narzędzia";
@@ -286,5 +297,19 @@
 "重触感反馈" = "Silna haptyka";
 "长按（#152）" = "Długie naciśnięcie (#152)";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Boże Narodzenie";
+"万圣节" = "Halloween";
+"情人节" = "Walentynki";
+"中秋节" = "Święto Środka Jesieni";
+"复活节" = "Wielkanoc";
+"新年" = "Nowy Rok";
+"夏日" = "Lato";
+"生日" = "Urodziny";
+"太空" = "Kosmos";
+"海洋" = "Ocean";
+"换肤：节日与配色主题（%@ 种）" = "Skórki: święta i kolory (%@)";
+"节日图标与配色" = "Ikony świąteczne i kolory";
+"仅配色" = "Tylko kolory";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Stuknij";

@@ -263,6 +263,17 @@
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Wählen Sie eine Unterbrechung; sie wird nach 1,5 s ausgelöst. Zuerst nach unten scrollen, um die TabBar auszublenden.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manuell: Tippen, um das Ausblenden beim Scrollen einzuschalten, nach unten scrollen, um die TabBar auszublenden, dann tun, was der Titel sagt. Erwartet: Die TabBar erscheint sofort wieder.";
 "自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Führt alle automatischen Simulationen nacheinander aus und meldet bestanden / fehlgeschlagen (etwa 2 Minuten), auch in der Konsole. Auch mit dem Startargument -CYLScrollHideSelfTest YES ausführbar.";
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Skin";
+"换肤（主题，issue #216）" = "Skin (Design, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Tippen, um ein Design zu wählen: Hintergrund, Symbole und Textfarben der TabBar ändern sich direkt, in jedem TabBar-Stil. Aktuell: %@";
+"选择主题" = "Design wählen";
+"默认" = "Standard";
+"西柚" = "Grapefruit";
+"青草" = "Gras";
+"玫瑰粉" = "Pinkrose";
+"春节" = "Frühlingsfest";
+"跟随系统深色模式" = "Dunkelmodus des Systems folgen";
 "默认点击声" = "Standard-Klick";
 "中等触感反馈" = "Mittleres haptisches Feedback";
 "无需继承基类与工具方法" = "Ohne Basisklasse und Hilfsfunktionen";
@@ -286,5 +297,19 @@
 "重触感反馈" = "Starkes haptisches Feedback";
 "长按（#152）" = "Langes Drücken (#152)";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Weihnachten";
+"万圣节" = "Halloween";
+"情人节" = "Valentinstag";
+"中秋节" = "Mondfest";
+"复活节" = "Ostern";
+"新年" = "Neujahr";
+"夏日" = "Sommer";
+"生日" = "Geburtstag";
+"太空" = "Weltraum";
+"海洋" = "Ozean";
+"换肤：节日与配色主题（%@ 种）" = "Skins: Feiertage und Farben (%@)";
+"节日图标与配色" = "Feiertagssymbole und Farben";
+"仅配色" = "Nur Farben";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Tippen";

@@ -263,6 +263,17 @@
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Pilih gangguan; berjalan setelah 1,5 dtk. Gulir ke bawah dulu untuk menyembunyikan TabBar.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: ketuk untuk menyalakan sembunyikan saat menggulir, gulir ke bawah untuk menyembunyikan TabBar, lalu lakukan sesuai judul. Diharapkan: TabBar langsung kembali.";
 "自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Menjalankan semua simulasi otomatis secara berurutan dan melaporkan lulus / gagal (sekitar 2 menit), juga di konsol. Bisa juga dijalankan dengan argumen peluncuran -CYLScrollHideSelfTest YES.";
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Skin";
+"换肤（主题，issue #216）" = "Skin (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Ketuk untuk memilih tema: latar, ikon, dan warna teks TabBar berubah di tempat, di semua gaya TabBar. Saat ini: %@";
+"选择主题" = "Pilih tema";
+"默认" = "Bawaan";
+"西柚" = "Jeruk Bali";
+"青草" = "Rumput";
+"玫瑰粉" = "Mawar Merah Muda";
+"春节" = "Imlek";
+"跟随系统深色模式" = "Ikuti Mode Gelap sistem";
 "默认点击声" = "Klik bawaan";
 "中等触感反馈" = "Haptik sedang";
 "无需继承基类与工具方法" = "Tanpa kelas dasar, dan utilitas";
@@ -286,5 +297,19 @@
 "重触感反馈" = "Haptik kuat";
 "长按（#152）" = "Tekan lama (#152)";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Natal";
+"万圣节" = "Halloween";
+"情人节" = "Hari Valentine";
+"中秋节" = "Festival Pertengahan Musim Gugur";
+"复活节" = "Paskah";
+"新年" = "Tahun Baru";
+"夏日" = "Musim Panas";
+"生日" = "Ulang Tahun";
+"太空" = "Luar Angkasa";
+"海洋" = "Samudra";
+"换肤：节日与配色主题（%@ 种）" = "Skin: hari raya dan warna (%@)";
+"节日图标与配色" = "Ikon hari raya dan warna";
+"仅配色" = "Warna saja";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Ketuk";

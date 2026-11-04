@@ -263,6 +263,17 @@
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Alegeți o întrerupere; se declanșează după 1,5 s. Derulați mai întâi în jos pentru a ascunde TabBar.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: atingeți pentru a activa ascunderea la derulare, derulați în jos pentru a ascunde TabBar, apoi faceți ce spune titlul. Așteptat: TabBar revine imediat.";
 "自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Rulează pe rând toate simulările automate și raportează reușit / eșuat (circa 2 minute), și în consolă. Se poate rula și cu argumentul de lansare -CYLScrollHideSelfTest YES.";
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Aspect";
+"换肤（主题，issue #216）" = "Aspect (temă, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Atingeți pentru a alege o temă: fundalul, pictogramele și culorile textului din TabBar se schimbă pe loc, în toate stilurile TabBar. Acum: %@";
+"选择主题" = "Alegeți o temă";
+"默认" = "Implicit";
+"西柚" = "Grepfrut";
+"青草" = "Iarbă";
+"玫瑰粉" = "Trandafir roz";
+"春节" = "Festivalul Primăverii";
+"跟随系统深色模式" = "Urmează modul întunecat al sistemului";
 "默认点击声" = "Clic implicit";
 "中等触感反馈" = "Feedback haptic mediu";
 "无需继承基类与工具方法" = "Fără clasă de bază, și utilitare";
@@ -286,5 +297,19 @@
 "重触感反馈" = "Feedback haptic puternic";
 "长按（#152）" = "Apăsare lungă (#152)";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Crăciun";
+"万圣节" = "Halloween";
+"情人节" = "Ziua Îndrăgostiților";
+"中秋节" = "Festivalul de mijloc al toamnei";
+"复活节" = "Paște";
+"新年" = "Anul Nou";
+"夏日" = "Vară";
+"生日" = "Zi de naștere";
+"太空" = "Spațiu";
+"海洋" = "Ocean";
+"换肤：节日与配色主题（%@ 种）" = "Aspecte: sărbători și culori (%@)";
+"节日图标与配色" = "Pictograme de sărbătoare și culori";
+"仅配色" = "Doar culori";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Atinge";

@@ -25,7 +25,7 @@ concurrency:
 jobs:
   self-test:
     name: self-test (${{ matrix.style }}${{ matrix.runtime && format(', {0}', matrix.runtime) || '' }})
-    # Same runner label as the iOS workflow (ios.yml): the project needs Xcode 27, and macos-15 jobs were never given a runner.
+    # Xcode 27 runner: the self-test runs on iOS 27 simulators only. (ios.yml builds on macos-26 / Xcode 26 by default.)
     runs-on: xcode-27
     timeout-minutes: 45
     strategy:

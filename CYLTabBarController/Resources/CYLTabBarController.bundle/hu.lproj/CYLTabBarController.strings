@@ -263,6 +263,17 @@
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Válasszon megszakítást; 1,5 mp múlva indul. Előbb görgessen le, hogy a TabBar elrejtődjön.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Kézi: koppintson az elrejtés görgetéskor bekapcsolásához, görgessen le a TabBar elrejtéséhez, majd tegye, amit a cím mond. Várt: a TabBar azonnal visszatér.";
 "自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Sorban lefuttatja az összes automatikus szimulációt, és jelenti a sikert / hibát (kb. 2 perc), a konzolon is. A -CYLScrollHideSelfTest YES indítási argumentummal is futtatható.";
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Megjelenés";
+"换肤（主题，issue #216）" = "Megjelenés (téma, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Koppintson egy téma kiválasztásához: a TabBar háttere, ikonjai és szövegszínei a helyükön változnak, minden TabBar-stílusban. Most: %@";
+"选择主题" = "Válasszon témát";
+"默认" = "Alapértelmezett";
+"西柚" = "Grépfrút";
+"青草" = "Fű";
+"玫瑰粉" = "Rózsaszín rózsa";
+"春节" = "Tavaszünnep";
+"跟随系统深色模式" = "A rendszer sötét módjának követése";
 "默认点击声" = "Alapértelmezett kattanás";
 "中等触感反馈" = "Közepes haptikus visszajelzés";
 "无需继承基类与工具方法" = "Alaposztály nélkül, és segédeszközök";
@@ -286,5 +297,19 @@
 "重触感反馈" = "Erős haptikus visszajelzés";
 "长按（#152）" = "Hosszú nyomás (#152)";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Karácsony";
+"万圣节" = "Halloween";
+"情人节" = "Valentin-nap";
+"中秋节" = "Holdünnep";
+"复活节" = "Húsvét";
+"新年" = "Újév";
+"夏日" = "Nyár";
+"生日" = "Születésnap";
+"太空" = "Világűr";
+"海洋" = "Óceán";
+"换肤：节日与配色主题（%@ 种）" = "Megjelenések: ünnepek és színek (%@)";
+"节日图标与配色" = "Ünnepi ikonok és színek";
+"仅配色" = "Csak színek";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Koppints";

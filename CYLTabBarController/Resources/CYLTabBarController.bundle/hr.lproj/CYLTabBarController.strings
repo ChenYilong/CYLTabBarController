@@ -263,6 +263,17 @@
 "选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Odaberite prekid; pokreće se nakon 1,5 s. Najprije se pomaknite prema dolje da se TabBar sakrije.";
 "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Ručno: dodirnite za uključivanje skrivanja pri pomicanju, pomaknite se prema dolje da se TabBar sakrije, zatim učinite što kaže naslov. Očekivano: TabBar se odmah vraća.";
 "自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Redom pokreće sve automatske simulacije i javlja prolaz / pad (oko 2 minute), i u konzoli. Može se pokrenuti i argumentom -CYLScrollHideSelfTest YES.";
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Izgled";
+"换肤（主题，issue #216）" = "Izgled (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Dodirnite za odabir teme: pozadina, ikone i boje teksta TabBara mijenjaju se na mjestu, u svim stilovima TabBara. Trenutačno: %@";
+"选择主题" = "Odaberite temu";
+"默认" = "Zadano";
+"西柚" = "Grejp";
+"青草" = "Trava";
+"玫瑰粉" = "Ružičasta ruža";
+"春节" = "Proljetni festival";
+"跟随系统深色模式" = "Prati tamni način sustava";
 "默认点击声" = "Zadani klik";
 "中等触感反馈" = "Srednja haptička povratna informacija";
 "无需继承基类与工具方法" = "Bez osnovne klase, i pomagala";
@@ -286,5 +297,19 @@
 "重触感反馈" = "Jaka haptika";
 "长按（#152）" = "Dugi pritisak (#152)";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Božić";
+"万圣节" = "Noć vještica";
+"情人节" = "Valentinovo";
+"中秋节" = "Festival sredine jeseni";
+"复活节" = "Uskrs";
+"新年" = "Nova godina";
+"夏日" = "Ljeto";
+"生日" = "Rođendan";
+"太空" = "Svemir";
+"海洋" = "Ocean";
+"换肤：节日与配色主题（%@ 种）" = "Izgledi: blagdani i boje (%@)";
+"节日图标与配色" = "Blagdanske ikone i boje";
+"仅配色" = "Samo boje";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Dodirni";

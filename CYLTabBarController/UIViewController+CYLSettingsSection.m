@@ -9,6 +9,7 @@
 #import "CYLLocalization.h"
 #import "UIViewController+CYLMemoryWarning.h"
 #import "UIViewController+CYLTabBarItemUpdate.h"
+#import "UIViewController+CYLThemeSettings.h"
 #import "UITableViewCell+CYLBadgeExtention.h"
 #import "CYLTabBarController.h"
 #import "CYLPlusButton.h"
@@ -40,6 +41,7 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowGestureTiming,             // FIX: issue #535 / #152
     CYLSettingsRowSwitchAdjacentTab,         // FIX: issue #535
     CYLSettingsRowUtilsHelpers,              // FIX: issue #535
+    CYLSettingsRowTheme,                // issue #216, see UIViewController+CYLThemeSettings.h
     CYLSettingsRowScrollHideSimulation,   // issue #13: simulated interruptions, in an action sheet
     CYLSettingsRowTabBarItemUpdate,     // then one row per tab item update, see UIViewController+CYLTabBarItemUpdate.h
 };
@@ -1494,6 +1496,9 @@ static UITableViewCell *CYLScrollHideSimulationMenuCell(UITableView *tableView) 
     if (indexPath.row == CYLSettingsRowTabBarMinimizeBehavior) {
         return CYLTabBarMinimizeCell(tableView, CYLSettingsTabBarController(self));
     }
+    if (indexPath.row == CYLSettingsRowTheme) {
+        return [self cyl_themeSettingsCellForTableView:tableView];
+    }
     if (indexPath.row == CYLSettingsRowScrollHideSimulation) {
         return CYLScrollHideSimulationMenuCell(tableView);
     }
@@ -1564,6 +1569,15 @@ static UITableViewCell *CYLScrollHideSimulationMenuCell(UITableView *tableView) 
     } else if (indexPath.row == CYLSettingsRowUtilsHelpers) {
         CYLRunUtilsHelpers(CYLSettingsTabBarController(self));
         [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    } else if (indexPath.row == CYLSettingsRowTheme) {
+        // [EN] The row shows the theme picked. [CN] 该行显示所选主题。
+        __weak UITableView *weakTableView = tableView;
+        [self cyl_presentThemePickerFromView:[tableView cellForRowAtIndexPath:indexPath] completion:^{
+            UITableView *strongTableView = weakTableView;
+            if (strongTableView.window && indexPath.row < [strongTableView numberOfRowsInSection:indexPath.section]) {
+                [strongTableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+            }
+        }];
     } else if (indexPath.row == CYLSettingsRowScrollHideSimulation) {
         [self cyl_presentScrollHideSimulationMenu];
     } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {

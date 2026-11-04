@@ -390,7 +390,10 @@ static char CYLTabBarDemoItemTitleKey;
 /// [CN] 演示 section 中的一行：设置行（`CYLDemoRowSettings`）或 TabBar 演示行（`CYLDemoRowTabBar`）。
 static const NSInteger CYLDemoRowTabBar = 1000;
 /// [EN] Rows of the scroll hiding simulation section (issue #13). [CN] 滚动隐藏模拟意外情况 section 的行（issue #13）。
-static const NSInteger CYLDemoRowScrollHideSimulation = 2000;
+static const NSInteger CYLDemoRowScrollHideSimulation = 3000;
+/// [EN] A row of the theme list section: `CYLDemoRowTheme` + the theme's index (issue #216).
+/// [CN] 主题列表 section 中的一行：`CYLDemoRowTheme` + 主题序号（issue #216）。
+static const NSInteger CYLDemoRowTheme = 2000;
 
 @implementation UIViewController (CYLDemoSections)
 
@@ -400,7 +403,7 @@ static const NSInteger CYLDemoRowScrollHideSimulation = 2000;
  *      3 standardAppearance, 4 login state, 5 plus button touchable area, 6 selectedIndex (#515), 7 minimize / hide the
  *      tab bar on scroll (#13, next to the show / hide row), 8–18 issue #535 (8 tap animation, 9 long press, 10 swipe,
  *      11 outside the superview, 12 bundle images, 13 navigation bar without a base class, 14 slide transition, 15 tap
- *      sound and haptic, 16 long press / double tap timing, 17 adjacent tab, 18 CYLUtils helpers), 19 the scroll hiding simulations (#13, in their own section), then the tab item
+ *      sound and haptic, 16 long press / double tap timing, 17 adjacent tab, 18 CYLUtils helpers), 19 skin (theme, #216), 20 the scroll hiding simulations (#13, in their own section), then the tab item
  *      updates (title, icon, network icon, all network icons, all local icons, GIF, all titles, replace neighbors).
  *      Settings rows not listed here (a newer library) go to the first section.
  * [CN] 按功能分组的 section：每行为设置行的序号，或 `CYLDemoRowTabBar` + TabBar 演示行序号。设置行顺序见
@@ -411,12 +414,21 @@ static const NSInteger CYLDemoRowScrollHideSimulation = 2000;
     NSMutableArray<NSDictionary *> *sections = [@[
         @{ @"title" : CYLLocalizedString(@"通用"), @"rows" : @[ @0, @1 ] },
         @{ @"title" : CYLLocalizedString(@"TabBar 外观"),
-           @"rows" : @[ @2, @3, @(CYLDemoRowTabBar + 0), @7, @(CYLDemoRowTabBar + 4), @(CYLDemoRowTabBar + 1),
+           @"rows" : @[ @2, @3, @19, @(CYLDemoRowTabBar + 0), @7, @(CYLDemoRowTabBar + 4), @(CYLDemoRowTabBar + 1),
                         @(CYLDemoRowTabBar + 2), @(CYLDemoRowTabBar + 3) ] },
         @{ @"title" : CYLLocalizedString(@"原地更新 Tab"),
            @"rows" : @[ @(update + 0), @(update + 1), @(update + 2), @(update + 3), @(update + 4), @(update + 5), @(update + 6) ] },
         @{ @"title" : CYLLocalizedString(@"Tab 页面、选中与登录"), @"rows" : @[ @(update + 7), @6, @4 ] },
         @{ @"title" : @"PlusButton", @"rows" : @[ @5 ] },
+        // [EN] Issue #216: every skin, one row each (color themes and holiday skins).
+        // [CN] Issue #216：所有皮肤，每行一个（配色主题与节日皮肤）。
+        @{ @"title" : [self cyl_themeListSectionTitle], @"rows" : ({
+            NSMutableArray<NSNumber *> *themeRows = [NSMutableArray array];
+            for (NSInteger themeRow = 0; themeRow < [self cyl_themeListRowCount]; themeRow++) {
+                [themeRows addObject:@(CYLDemoRowTheme + themeRow)];
+            }
+            themeRows;
+        }) },
         // FIX: issue #535 — tap animation, tap sound and haptic, long press, long press / double tap timing, swipe,
         // switch to the adjacent tab, slide transition. 点击动画、点击声音与触感、长按、长按与双击时长、滑动、切换相邻 Tab、滑动转场。
         @{ @"title" : CYLLocalizedString(@"Tab 交互"), @"rows" : @[ @8, @15, @9, @16, @10, @17, @14 ] },
@@ -427,9 +439,9 @@ static const NSInteger CYLDemoRowScrollHideSimulation = 2000;
            @"rows" : @[ @(CYLDemoRowTabBar + 5), @(CYLDemoRowTabBar + 6), @(CYLDemoRowTabBar + 7), @(CYLDemoRowTabBar + 8) ] },
     ] mutableCopy];
     // [EN] Scroll hiding (issue #13): one section of simulated interruptions. [CN] 滚动隐藏（issue #13）：模拟意外情况的 section。
-    // [EN] Settings row 19 (the same simulations in an action sheet) first, then one row per simulation.
-    // [CN] 先放设置第 19 行（操作表中的同样模拟），再每个模拟一行。
-    NSMutableArray<NSNumber *> *simulationRows = [NSMutableArray arrayWithObject:@19];
+    // [EN] Settings row 20 (the same simulations in an action sheet) first, then one row per simulation.
+    // [CN] 先放设置第 20 行（操作表中的同样模拟），再每个模拟一行。
+    NSMutableArray<NSNumber *> *simulationRows = [NSMutableArray arrayWithObject:@20];
     for (NSInteger row = 0; row < [self cyl_scrollHideSimulationRowCount]; row++) {
         [simulationRows addObject:@(CYLDemoRowScrollHideSimulation + row)];
     }
@@ -469,6 +481,9 @@ static const NSInteger CYLDemoRowScrollHideSimulation = 2000;
     if (row >= CYLDemoRowScrollHideSimulation) {
         return [self cyl_scrollHideSimulationCellForTableView:tableView row:row - CYLDemoRowScrollHideSimulation];
     }
+    if (row >= CYLDemoRowTheme) {
+        return [self cyl_themeListCellForTableView:tableView row:row - CYLDemoRowTheme];
+    }
     if (row >= CYLDemoRowTabBar) {
         return [self cyl_tabBarDemoCellForTableView:tableView row:row - CYLDemoRowTabBar];
     }
@@ -480,6 +495,14 @@ static const NSInteger CYLDemoRowScrollHideSimulation = 2000;
     NSInteger row = [self cyl_demoRowAtIndexPath:indexPath];
     if (row >= CYLDemoRowScrollHideSimulation) {
         [self cyl_didSelectScrollHideSimulationRow:row - CYLDemoRowScrollHideSimulation];
+        return;
+    }
+    if (row >= CYLDemoRowTheme) {
+        [self cyl_didSelectThemeListRow:row - CYLDemoRowTheme];
+        // [EN] The checkmarks of the list and the skin row follow the new theme. [CN] 列表勾号与换肤行随新主题更新。
+        if (tableView.window) {
+            [tableView reloadData];
+        }
         return;
     }
     if (row >= CYLDemoRowTabBar) {

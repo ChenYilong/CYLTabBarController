@@ -23,7 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
  *      row 13 hides the navigation bar without a base class, row 14 opens the slide transition demo, row 15 switches
  *      the tap sound and haptic, row 16 switches the long press duration and double tap interval, row 17 switches to
  *      the previous or next tab, row 18 runs the CYLUtils weak associated object and nearest control helpers (issue #535),
- *      row 19 lists the scroll hiding simulations in an action sheet (`-cyl_presentScrollHideSimulationMenu`, issue #13),
+ *      row 19 picks a skin (theme) of the tab bar (`CYLThemeManager`, `CYLTabBarTheme`, issue #216),
+ *      row 20 lists the scroll hiding simulations in an action sheet (`-cyl_presentScrollHideSimulationMenu`, issue #13),
  *      then the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon,
  *      all network icons, all local icons, GIF icon, all titles, replace neighboring tabs.
  * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
@@ -36,7 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
  *      第 8 行切换 Tab 的点击动画，第 9 行开启 Tab 长按，第 10 行开启左右滑动切换 Tab，第 11 行演示超出父视图的子视图响应点击，
  *      第 12 行从 bundle 加载图片，第 13 行不继承基类隐藏导航栏，第 14 行打开滑动转场演示，第 15 行切换点击声音与触感反馈，
  *      第 16 行切换长按时长与双击间隔，第 17 行切换到上一个或下一个 Tab，第 18 行运行 CYLUtils 弱引用关联对象与查找按钮的工具方法（issue #535），
- *      第 19 行用操作表列出滚动隐藏的模拟（`-cyl_presentScrollHideSimulationMenu`，issue #13），
+ *      第 19 行选择 TabBar 的皮肤（主题，`CYLThemeManager`、`CYLTabBarTheme`，issue #216），
+ *      第 20 行用操作表列出滚动隐藏的模拟（`-cyl_presentScrollHideSimulationMenu`，issue #13），
  *      之后是原地更新 Tab 的若干行
  *      （`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、所有网络图标、所有本地图标、GIF 图标、所有标题、替换相邻 Tab 的页面。
  */
@@ -67,8 +69,8 @@ FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 
 /*!
  * [EN] Deselects the row and runs it: the language picker, the memory warning check, the next title offset, the next
- *      appearance theme, the login state or the tab item update.
- * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题、登录状态或更新 Tab。
+ *      appearance theme, the login state, the skin picker or the tab item update.
+ * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题、登录状态、换肤选择器或更新 Tab。
  */
 - (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
 
