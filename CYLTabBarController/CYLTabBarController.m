@@ -167,6 +167,9 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @interface CYLTabBarController () <UITabBarControllerDelegate>
 
 @property (nonatomic, assign, getter=isObservingTabImageViewDefaultOffset) BOOL observingTabImageViewDefaultOffset;
+/// [EN] Backing flag of `automaticallyAdjustsImageOnlyTabs`, negated so that the default (NO) means YES (issue #257, #522).
+/// [CN] `automaticallyAdjustsImageOnlyTabs` 的存储标记，取反存储，使默认值 NO 表示 YES（issue #257、#522）。
+@property (nonatomic, assign) BOOL cyl_imageOnlyTabsAdjustmentDisabled;
 @property (nonatomic, assign, getter=shouldInvokeOnceViewDidLayoutSubViewsBlock) BOOL invokeOnceViewDidLayoutSubViewsBlock;
 /// Blocks passed to `-reloadBadgesWithBlock:` that wait for the tab buttons (#404).
 @property (nonatomic, strong) NSMutableArray<CYLViewDidLayoutSubViewsBlock> *pendingReloadBadgesBlocks;
@@ -2778,23 +2781,142 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 }
 
 
+#pragma mark - Image-only tabs (issue #257, #522)
+
+/*!
+ * FIX: issue #257, issue #522
+ * [EN] What the automatic adjustment of image-only tabs wrote into one tab bar item, so it is written only where the app
+ *      set nothing, never twice, and can be undone (`automaticallyAdjustsImageOnlyTabs = NO`). Keys:
+ *      `insets` / `appliedInsets`: the item's `imageInsets` before / after; `title` / `appliedTitle`: the same for
+ *      `titlePositionAdjustment`. A pair is missing when that value was left to the app.
+ * [CN] 纯图标 Tab 自动调整写入某个 TabBarItem 的内容：只在 App 未设置的地方写入、不会重复写入、并且可以撤销
+ *      （`automaticallyAdjustsImageOnlyTabs = NO`）。键：`insets` / `appliedInsets`：item 原来 / 写入后的 `imageInsets`；
+ *      `title` / `appliedTitle`：`titlePositionAdjustment` 的对应值。某一对缺失表示该值留给 App。
+ */
+static char CYLImageOnlyTabAdjustmentKey;
+static NSString *const CYLImageOnlyTabOriginalInsetsKey = @"insets";
+static NSString *const CYLImageOnlyTabAppliedInsetsKey = @"appliedInsets";
+static NSString *const CYLImageOnlyTabOriginalTitleKey = @"title";
+static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
+
+- (BOOL)automaticallyAdjustsImageOnlyTabs {
+    return !self.cyl_imageOnlyTabsAdjustmentDisabled;
+}
+
+- (void)setAutomaticallyAdjustsImageOnlyTabs:(BOOL)automaticallyAdjustsImageOnlyTabs {
+    if (self.automaticallyAdjustsImageOnlyTabs == automaticallyAdjustsImageOnlyTabs) {
+        return;
+    }
+    self.cyl_imageOnlyTabsAdjustmentDisabled = !automaticallyAdjustsImageOnlyTabs;
+    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
+        // Read the stored tab bar: the getter would create one.
+        // 读取已保存的 TabBar：getter 会创建新的 TabBar。
+        if (![_cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+            return;
+        }
+        CYLTabBar *tabBar = (CYLTabBar *)_cyl_tabBar;
+        if (automaticallyAdjustsImageOnlyTabs) {
+            if (tabBar.tabImageViewDefaultOffset != 0.f) {
+                [self offsetTabBarTabImageViewToFit:tabBar.tabImageViewDefaultOffset];
+            } else {
+                // Not measured yet: the next layout measures it. 尚未测量：下次布局时测量。
+                [tabBar setNeedsLayout];
+            }
+        } else {
+            [self cyl_restoreImageOnlyTabItems:tabBar.items];
+        }
+    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
+}
+
+/// [EN] Undoes what `-offsetTabBarTabImageViewToFit:` wrote, where the app has not changed the value since.
+/// [CN] 撤销 `-offsetTabBarTabImageViewToFit:` 写入的值（App 之后未修改过的值）。
+- (void)cyl_restoreImageOnlyTabItems:(NSArray<UITabBarItem *> *)tabBarItems {
+    for (UITabBarItem *item in tabBarItems) {
+        NSDictionary<NSString *, NSValue *> *record = objc_getAssociatedObject(item, &CYLImageOnlyTabAdjustmentKey);
+        if (!record) {
+            continue;
+        }
+        NSValue *appliedInsets = record[CYLImageOnlyTabAppliedInsetsKey];
+        if (appliedInsets && UIEdgeInsetsEqualToEdgeInsets(item.imageInsets, appliedInsets.UIEdgeInsetsValue)) {
+            item.imageInsets = record[CYLImageOnlyTabOriginalInsetsKey].UIEdgeInsetsValue;
+        }
+        NSValue *appliedTitle = record[CYLImageOnlyTabAppliedTitleKey];
+        if (appliedTitle && UIOffsetEqualToOffset(item.titlePositionAdjustment, appliedTitle.UIOffsetValue)) {
+            item.titlePositionAdjustment = record[CYLImageOnlyTabOriginalTitleKey].UIOffsetValue;
+        }
+        objc_setAssociatedObject(item, &CYLImageOnlyTabAdjustmentKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+}
+
+/*!
+ * FIX: issue #257, issue #522
+ * [EN] Moves the images of the image-only tabs by `tabImageViewDefaultOffset` (measured once by `CYLTabBar`).
+ *      Before, every item was written, on every notification: the image and title offsets the app had set on an item
+ *      (directly or with `CYLTabBarItemImageInsets` / `CYLTabBarItemTitlePositionAdjustment`) were replaced, a tab with a
+ *      title had its title moved off screen (`UIOffsetMake(0, MAXFLOAT)`) as soon as the first tab had none (#522), and
+ *      writing the items laid the tab bar out again, which measured and wrote again (#257).
+ *      Now only items without a title are written, only values the app left at zero, and a value already written is not
+ *      written again. `automaticallyAdjustsImageOnlyTabs = NO` turns it off.
+ * [CN] 按 `tabImageViewDefaultOffset`（由 `CYLTabBar` 测量一次）移动纯图标 Tab 的图片。
+ *      以前每次通知都会写入所有 item：App 在 item 上设置的图片与标题偏移（直接设置，或通过 `CYLTabBarItemImageInsets` /
+ *      `CYLTabBarItemTitlePositionAdjustment`）被替换；只要第一个 Tab 没有标题，有标题的 Tab 的标题也会被移出屏幕
+ *      （`UIOffsetMake(0, MAXFLOAT)`，#522）；而写入 item 又会让 TabBar 重新布局，再次测量并写入（#257）。
+ *      现在只写入没有标题的 item，只写入 App 保持为零的值，已写入的值不会重复写入。`automaticallyAdjustsImageOnlyTabs = NO`
+ *      可关闭该功能。
+ */
 - (void)offsetTabBarTabImageViewToFit:(CGFloat)tabImageViewDefaultOffset {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
+    if (!self.automaticallyAdjustsImageOnlyTabs) {
+        return;
+    }
     BOOL shouldCustomizeTitlePositionAdjustment= !(UIOffsetEqualToOffset(UIOffsetZero, _titlePositionAdjustment));
     BOOL shouldCustomizeImageInsets = !(UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, _imageInsets));
     if (shouldCustomizeImageInsets) {
         return;
     }
     CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
+    UIEdgeInsets imageInset = UIEdgeInsetsMake(tabImageViewDefaultOffset, 0, -tabImageViewDefaultOffset, 0);
+    UIOffset hiddenTitleOffset = UIOffsetMake(0, MAXFLOAT);
 
-    NSArray<UITabBarItem *> *tabBarItems = cyl_tabBar.items;
-    [tabBarItems enumerateObjectsUsingBlock:^(UITabBarItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        UIEdgeInsets imageInset = UIEdgeInsetsMake(tabImageViewDefaultOffset, 0, -tabImageViewDefaultOffset, 0);
-        obj.imageInsets = imageInset;
-        if (!shouldCustomizeTitlePositionAdjustment) {
-            obj.titlePositionAdjustment = UIOffsetMake(0, MAXFLOAT);
+    for (UITabBarItem *item in cyl_tabBar.items) {
+        if (item.title.length > 0) {
+            // A tab with a title is not image-only. 有标题的 Tab 不是纯图标 Tab。
+            continue;
         }
-    }];
+        NSDictionary<NSString *, NSValue *> *record = objc_getAssociatedObject(item, &CYLImageOnlyTabAdjustmentKey);
+        NSMutableDictionary<NSString *, NSValue *> *newRecord = record ? [record mutableCopy] : [NSMutableDictionary dictionary];
+
+        NSValue *appliedInsets = record[CYLImageOnlyTabAppliedInsetsKey];
+        BOOL insetsAreOurs = appliedInsets && UIEdgeInsetsEqualToEdgeInsets(item.imageInsets, appliedInsets.UIEdgeInsetsValue);
+        BOOL insetsAreFree = !record && UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, item.imageInsets);
+        if (insetsAreOurs || insetsAreFree) {
+            if (!UIEdgeInsetsEqualToEdgeInsets(item.imageInsets, imageInset)) {
+                item.imageInsets = imageInset;
+            }
+            if (insetsAreFree) {
+                newRecord[CYLImageOnlyTabOriginalInsetsKey] = [NSValue valueWithUIEdgeInsets:UIEdgeInsetsZero];
+            }
+            newRecord[CYLImageOnlyTabAppliedInsetsKey] = [NSValue valueWithUIEdgeInsets:imageInset];
+        }
+
+        // The item's own offset, kept by CYL (`CYLTabBarItemTitlePositionAdjustment` or the controller-level offset).
+        // CYL 记录的 item 自身偏移（`CYLTabBarItemTitlePositionAdjustment` 或控制器级别的偏移）。
+        BOOL titleOffsetSetByCYL = (objc_getAssociatedObject(item, &CYLTitlePositionAdjustmentItemOffsetKey) != nil) ||
+                                   (objc_getAssociatedObject(item, &CYLTitlePositionAdjustmentSetByCYLKey) != nil);
+        NSValue *appliedTitle = record[CYLImageOnlyTabAppliedTitleKey];
+        BOOL titleIsOurs = appliedTitle && UIOffsetEqualToOffset(item.titlePositionAdjustment, appliedTitle.UIOffsetValue);
+        BOOL titleIsFree = !record && !titleOffsetSetByCYL && UIOffsetEqualToOffset(UIOffsetZero, item.titlePositionAdjustment);
+        if (!shouldCustomizeTitlePositionAdjustment && (titleIsOurs || titleIsFree)) {
+            if (!UIOffsetEqualToOffset(item.titlePositionAdjustment, hiddenTitleOffset)) {
+                item.titlePositionAdjustment = hiddenTitleOffset;
+            }
+            if (titleIsFree) {
+                newRecord[CYLImageOnlyTabOriginalTitleKey] = [NSValue valueWithUIOffset:UIOffsetZero];
+            }
+            newRecord[CYLImageOnlyTabAppliedTitleKey] = [NSValue valueWithUIOffset:hiddenTitleOffset];
+        }
+        objc_setAssociatedObject(item, &CYLImageOnlyTabAdjustmentKey, newRecord.count > 0 ? [newRecord copy] : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
 
