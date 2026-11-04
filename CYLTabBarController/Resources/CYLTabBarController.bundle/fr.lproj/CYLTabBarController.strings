@@ -179,3 +179,7 @@
 "子控件" = "Sous-vue";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Afficher un TabBarController avec un nouveau contexte (PlusButton avec une sous-vue X touchable, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Touchez le X en haut à droite du PlusButton : le X prend une couleur aléatoire et le PlusButton ne réagit pas";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex et le PlusButton (issue #515)";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Touchez pour sélectionner l'onglet suivant. Index sans le PlusButton : %1$@, selectedIndex : %2$@, actuel : %3$@";
