@@ -6589,6 +6589,13 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     if ([notification.name isEqualToString:UIKeyboardWillShowNotification]) {
         _keyboardVisible = YES;
     }
+    // [EN] A keyboard left up when the app went to the background may never post WillHide; it posts WillShow again
+    //      when it comes back, so forget it here instead of blocking hiding until then.
+    // [CN] 进入后台时仍显示的键盘可能不会发送 WillHide；回到前台重新显示时会再次发送 WillShow，因此在这里清除记录，
+    //      避免在此之前一直无法隐藏。
+    if ([notification.name isEqualToString:UIApplicationDidEnterBackgroundNotification]) {
+        _keyboardVisible = NO;
+    }
     UIWindow *window = self.tabBarController.viewIfLoaded.window;
     // Guard: this tab bar's own window becoming key is not an interruption. 本 TabBar 自己的窗口成为 key window 不算打断。
     if ([notification.name isEqualToString:UIWindowDidBecomeKeyNotification] && notification.object == window) {
