@@ -219,3 +219,9 @@
 "跳转与对比" = "Navigasi dan perbandingan";
 "角标" = "Lencana";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Tidak disokong Liquid Glass: sistem menentukan ketinggian bar tab (FlatDesign dan gaya klasik menyokong)";
+"从配置文件创建 TabBarController" = "Cipta TabBarController daripada fail konfigurasi";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Satu fail membina keseluruhan bar tab: pilih JSON, YAML, TOML, plist, XML, INI dan lain-lain, atau muatkan daripada URL.";
+"选择配置文件" = "Pilih fail konfigurasi";
+"从网络 URL 加载" = "Muatkan daripada URL";
+"无法创建 TabBarController" = "Tidak dapat mencipta TabBarController";
+"本页由配置文件 %@ 创建：" = "Halaman ini dicipta daripada konfigurasi %@:";

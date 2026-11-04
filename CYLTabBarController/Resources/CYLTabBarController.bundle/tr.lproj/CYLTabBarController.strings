@@ -219,3 +219,9 @@
 "跳转与对比" = "Gezinme ve karşılaştırmalar";
 "角标" = "Rozetler";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass desteklemiyor: sekme çubuğu yüksekliğini sistem belirler (FlatDesign ve klasik stil destekler)";
+"从配置文件创建 TabBarController" = "Yapılandırma dosyasından TabBarController oluştur";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Tek bir dosya tüm sekme çubuğunu oluşturur: JSON, YAML, TOML, plist, XML, INI ve diğerlerini seçin ya da bir URL’den yükleyin.";
+"选择配置文件" = "Yapılandırma dosyası seçin";
+"从网络 URL 加载" = "URL’den yükle";
+"无法创建 TabBarController" = "TabBarController oluşturulamadı";
+"本页由配置文件 %@ 创建：" = "Bu sayfa %@ yapılandırmasından oluşturuldu:";

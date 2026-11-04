@@ -219,3 +219,9 @@
 "跳转与对比" = "跳轉與對比";
 "角标" = "徽章";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "液態玻璃不支援：TabBar 高度由系統決定（扁平樣式與經典樣式支援）";
+"从配置文件创建 TabBarController" = "從設定檔建立 TabBarController";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "一個檔案產生整個 TabBar：可選 JSON、YAML、TOML、plist、XML、INI 等格式，或從網路 URL 載入。";
+"选择配置文件" = "選擇設定檔";
+"从网络 URL 加载" = "從網路 URL 載入";
+"无法创建 TabBarController" = "無法建立 TabBarController";
+"本页由配置文件 %@ 创建：" = "本頁由設定檔 %@ 建立：";

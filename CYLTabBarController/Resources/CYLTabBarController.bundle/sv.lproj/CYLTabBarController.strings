@@ -219,3 +219,9 @@
 "跳转与对比" = "Navigering och jämförelser";
 "角标" = "Märken";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Stöds inte av Liquid Glass: systemet bestämmer flikfältets höjd (FlatDesign och klassisk stil stöder det)";
+"从配置文件创建 TabBarController" = "Skapa en TabBarController från en konfigurationsfil";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "En fil skapar hela flikfältet: välj JSON, YAML, TOML, plist, XML, INI med flera, eller läs in från en URL.";
+"选择配置文件" = "Välj en konfigurationsfil";
+"从网络 URL 加载" = "Läs in från en URL";
+"无法创建 TabBarController" = "Det gick inte att skapa TabBarController";
+"本页由配置文件 %@ 创建：" = "Den här sidan skapades från konfigurationen %@:";

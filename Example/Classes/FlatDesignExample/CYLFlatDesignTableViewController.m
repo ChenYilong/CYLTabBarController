@@ -371,7 +371,7 @@ static const NSInteger CYLDemoRowTabBar = 1000;
  * [EN] The sections, by function: each row is a settings row index, or `CYLDemoRowTabBar` + a tab bar demo row. The
  *      settings rows follow `UIViewController+CYLSettingsSection.m`: 0 language, 1 memory warning, 2 title offset,
  *      3 standardAppearance, 4 login state, 5 plus button touchable area, 6 selectedIndex (#515), 7 minimize / hide the
- *      tab bar on scroll (#13, next to the show / hide row), then the tab item
+ *      tab bar on scroll (#13, next to the show / hide row), 8 a tab bar controller from a configuration file, then the tab item
  *      updates (title, icon, network icon, all network icons, all local icons, GIF, all titles, replace neighbors).
  *      Settings rows not listed here (a newer library) go to the first section.
  * [CN] 按功能分组的 section：每行为设置行的序号，或 `CYLDemoRowTabBar` + TabBar 演示行序号。设置行顺序见
@@ -389,7 +389,7 @@ static const NSInteger CYLDemoRowTabBar = 1000;
         @{ @"title" : CYLLocalizedString(@"Tab 页面、选中与登录"), @"rows" : @[ @(update + 7), @6, @4 ] },
         @{ @"title" : @"PlusButton", @"rows" : @[ @5 ] },
         @{ @"title" : CYLLocalizedString(@"跳转与对比"),
-           @"rows" : @[ @(CYLDemoRowTabBar + 5), @(CYLDemoRowTabBar + 6), @(CYLDemoRowTabBar + 7), @(CYLDemoRowTabBar + 8) ] },
+           @"rows" : @[ @8, @(CYLDemoRowTabBar + 5), @(CYLDemoRowTabBar + 6), @(CYLDemoRowTabBar + 7), @(CYLDemoRowTabBar + 8) ] },
     ] mutableCopy];
     NSMutableSet<NSNumber *> *listed = [NSMutableSet set];
     for (NSDictionary *section in sections) {

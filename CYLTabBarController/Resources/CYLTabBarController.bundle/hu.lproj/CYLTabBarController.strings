@@ -219,3 +219,9 @@
 "跳转与对比" = "Navigáció és összehasonlítás";
 "角标" = "Jelvények";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nem támogatja: a lapsáv magasságát a rendszer adja meg (FlatDesign és a klasszikus stílus támogatja)";
+"从配置文件创建 TabBarController" = "TabBarController létrehozása konfigurációs fájlból";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Egyetlen fájl létrehozza a teljes lapsávot: válasszon JSON, YAML, TOML, plist, XML, INI vagy más formátumot, vagy töltse be URL-ről.";
+"选择配置文件" = "Válasszon konfigurációs fájlt";
+"从网络 URL 加载" = "Betöltés URL-ről";
+"无法创建 TabBarController" = "Nem sikerült létrehozni a TabBarControllert";
+"本页由配置文件 %@ 创建：" = "Ez az oldal a(z) %@ konfigurációból készült:";

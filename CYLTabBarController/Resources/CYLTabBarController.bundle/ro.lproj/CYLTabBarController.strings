@@ -219,3 +219,9 @@
 "跳转与对比" = "Navigare și comparații";
 "角标" = "Insigne";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Nu este acceptat de Liquid Glass: sistemul stabilește înălțimea barei (FlatDesign și stilul clasic acceptă)";
+"从配置文件创建 TabBarController" = "Creează un TabBarController dintr-un fișier de configurare";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Un singur fișier creează întreaga bară de file: alege JSON, YAML, TOML, plist, XML, INI și altele sau încarcă-l de la un URL.";
+"选择配置文件" = "Alege un fișier de configurare";
+"从网络 URL 加载" = "Încarcă de la un URL";
+"无法创建 TabBarController" = "Nu s-a putut crea TabBarController";
+"本页由配置文件 %@ 创建：" = "Această pagină a fost creată din configurația %@:";

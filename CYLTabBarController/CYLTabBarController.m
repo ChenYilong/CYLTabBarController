@@ -75,6 +75,15 @@ NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
 NSString *const CYLTabBarItemIdentifier = @"CYLTabBarItemIdentifier";
+NSString *const CYLTabBarItemViewControllerClass = @"CYLTabBarItemViewControllerClass";
+NSString *const CYLTabBarItemNavigationControllerClass = @"CYLTabBarItemNavigationControllerClass";
+NSString *const CYLTabBarControllerViewControllers = @"CYLTabBarControllerViewControllers";
+NSString *const CYLTabBarControllerTabBarItemsAttributes = @"CYLTabBarControllerTabBarItemsAttributes";
+NSString *const CYLTabBarControllerImageInsets = @"CYLTabBarControllerImageInsets";
+NSString *const CYLTabBarControllerTitlePositionAdjustment = @"CYLTabBarControllerTitlePositionAdjustment";
+NSString *const CYLTabBarControllerStyleType = @"CYLTabBarControllerStyleType";
+NSString *const CYLTabBarControllerContext = @"CYLTabBarControllerContext";
+NSString *const CYLTabBarControllerNavigationControllerClass = @"CYLTabBarControllerNavigationControllerClass";
 NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
@@ -1591,6 +1600,89 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
                 titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                               styleType:(CYLTabBarStyleType)styleType
                                 context:(nullable NSString *)context {
+    // [EN] Every initializer ends here, with its parameters as one configuration.
+    // [CN] 所有初始化方法都汇集到这里，参数组成一个配置字典。
+    NSMutableDictionary<NSString *, id> *configuration = [NSMutableDictionary dictionary];
+    configuration[CYLTabBarControllerViewControllers] = viewControllers ?: @[];
+    configuration[CYLTabBarControllerTabBarItemsAttributes] = tabBarItemsAttributes ?: @[];
+    configuration[CYLTabBarControllerImageInsets] = [NSValue valueWithUIEdgeInsets:imageInsets];
+    configuration[CYLTabBarControllerTitlePositionAdjustment] = [NSValue valueWithUIOffset:titlePositionAdjustment];
+    configuration[CYLTabBarControllerStyleType] = @(styleType);
+    configuration[CYLTabBarControllerContext] = context;
+    return [self initWithConfiguration:configuration];
+}
+
++ (instancetype)tabBarControllerWithConfiguration:(NSDictionary<NSString *, id> *)configuration {
+    return [[self alloc] initWithConfiguration:configuration];
+}
+
+/*!
+ * [EN] The class named `name`, a subclass of `requiredSuperclass`, or nil (no name, "none", unknown or wrong class). A
+ *      Swift class is also looked up as "<main executable>.<name>".
+ * [CN] 名为 `name` 且为 `requiredSuperclass` 子类的类，否则返回 nil（没有名称、"none"、找不到或类型不符）。Swift 类还会按
+ *      "<主程序名>.<name>" 查找。
+ */
+static Class _Nullable CYLConfigurationClassNamed(id _Nullable name, Class requiredSuperclass) {
+    if (![name isKindOfClass:[NSString class]]) {
+        return nil;
+    }
+    NSString *className = [(NSString *)name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (className.length == 0 || [className.lowercaseString isEqualToString:@"none"]) {
+        return nil;
+    }
+    Class aClass = NSClassFromString(className);
+    if (!aClass) {
+        NSString *module = [NSBundle mainBundle].infoDictionary[@"CFBundleExecutable"];
+        module = [[module stringByReplacingOccurrencesOfString:@"-" withString:@"_"] stringByReplacingOccurrencesOfString:@" " withString:@"_"];
+        aClass = module.length > 0 ? NSClassFromString([NSString stringWithFormat:@"%@.%@", module, className]) : nil;
+    }
+    if (aClass && ![aClass isSubclassOfClass:requiredSuperclass]) {
+        aClass = nil;
+    }
+#if defined(DEBUG) || defined(BETA)
+    if (!aClass) {
+        NSLog(@"🔴 CYLTabBarController configuration: \"%@\" is not a %@ class; the default is used.", className, NSStringFromClass(requiredSuperclass));
+    }
+#endif
+    return aClass;
+}
+
+/*!
+ * [EN] The view controllers of the items, created from `CYLTabBarItemViewControllerClass` (default UIViewController) and
+ *      embedded in `CYLTabBarItemNavigationControllerClass` / `CYLTabBarControllerNavigationControllerClass` when set.
+ * [CN] 根据 `CYLTabBarItemViewControllerClass`（默认 UIViewController）创建各 item 的子控制器，设置了
+ *      `CYLTabBarItemNavigationControllerClass` / `CYLTabBarControllerNavigationControllerClass` 时嵌入导航控制器。
+ */
+static NSArray<UIViewController *> *CYLViewControllersFromConfiguration(NSDictionary<NSString *, id> *configuration) {
+    NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
+    NSString *defaultNavigationClassName = configuration[CYLTabBarControllerNavigationControllerClass];
+    for (NSDictionary *attributes in configuration[CYLTabBarControllerTabBarItemsAttributes]) {
+        Class viewControllerClass = CYLConfigurationClassNamed(attributes[CYLTabBarItemViewControllerClass], [UIViewController class]) ?: [UIViewController class];
+        UIViewController *viewController = [[viewControllerClass alloc] init];
+        NSString *title = attributes[CYLTabBarItemTitle];
+        if ([title isKindOfClass:[NSString class]] && !viewController.navigationItem.title) {
+            viewController.navigationItem.title = title;
+        }
+        id navigationClassName = attributes[CYLTabBarItemNavigationControllerClass] ?: defaultNavigationClassName;
+        Class navigationClass = CYLConfigurationClassNamed(navigationClassName, [UINavigationController class]);
+        if (navigationClass) {
+            viewController = [(UINavigationController *)[navigationClass alloc] initWithRootViewController:viewController];
+        }
+        [viewControllers addObject:viewController];
+    }
+    return viewControllers;
+}
+
+- (instancetype)initWithConfiguration:(NSDictionary<NSString *, id> *)configuration {
+    NSDictionary<NSString *, id> *normalized = [CYLTabBarController cyl_normalizedConfiguration:configuration ?: @{}];
+    NSArray<NSDictionary *> *tabBarItemsAttributes = normalized[CYLTabBarControllerTabBarItemsAttributes] ?: @[];
+    NSArray<UIViewController *> *viewControllers = normalized[CYLTabBarControllerViewControllers] ?: CYLViewControllersFromConfiguration(normalized);
+    NSValue *imageInsetsValue = normalized[CYLTabBarControllerImageInsets];
+    NSValue *titlePositionAdjustmentValue = normalized[CYLTabBarControllerTitlePositionAdjustment];
+    UIEdgeInsets imageInsets = imageInsetsValue ? imageInsetsValue.UIEdgeInsetsValue : UIEdgeInsetsZero;
+    UIOffset titlePositionAdjustment = titlePositionAdjustmentValue ? titlePositionAdjustmentValue.UIOffsetValue : UIOffsetZero;
+    CYLTabBarStyleType styleType = (CYLTabBarStyleType)[normalized[CYLTabBarControllerStyleType] integerValue];
+    NSString *context = normalized[CYLTabBarControllerContext];
     if (self = [super init]) {
         _imageInsets = imageInsets;
         _titlePositionAdjustment = titlePositionAdjustment;

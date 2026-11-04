@@ -219,3 +219,9 @@
 "跳转与对比" = "Navigasjon og sammenligninger";
 "角标" = "Merker";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Støttes ikke av Liquid Glass: systemet bestemmer høyden (FlatDesign og klassisk stil støtter det)";
+"从配置文件创建 TabBarController" = "Opprett en TabBarController fra en konfigurasjonsfil";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Én fil lager hele fanelinjen: velg JSON, YAML, TOML, plist, XML, INI med flere, eller last inn fra en URL.";
+"选择配置文件" = "Velg en konfigurasjonsfil";
+"从网络 URL 加载" = "Last inn fra en URL";
+"无法创建 TabBarController" = "Kunne ikke opprette TabBarController";
+"本页由配置文件 %@ 创建：" = "Denne siden ble opprettet fra konfigurasjonen %@:";

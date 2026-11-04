@@ -219,3 +219,9 @@
 "跳转与对比" = "Điều hướng và so sánh";
 "角标" = "Huy hiệu";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass không hỗ trợ: hệ thống quyết định chiều cao thanh tab (FlatDesign và kiểu cổ điển hỗ trợ)";
+"从配置文件创建 TabBarController" = "Tạo TabBarController từ tệp cấu hình";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Một tệp tạo toàn bộ thanh tab: chọn JSON, YAML, TOML, plist, XML, INI và các định dạng khác, hoặc tải từ URL.";
+"选择配置文件" = "Chọn tệp cấu hình";
+"从网络 URL 加载" = "Tải từ URL";
+"无法创建 TabBarController" = "Không thể tạo TabBarController";
+"本页由配置文件 %@ 创建：" = "Trang này được tạo từ cấu hình %@:";

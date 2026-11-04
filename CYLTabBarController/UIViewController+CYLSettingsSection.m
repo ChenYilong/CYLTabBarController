@@ -9,6 +9,7 @@
 #import "CYLLocalization.h"
 #import "UIViewController+CYLMemoryWarning.h"
 #import "UIViewController+CYLTabBarItemUpdate.h"
+#import "UIViewController+CYLConfigurationDemo.h"
 #import "UITableViewCell+CYLBadgeExtention.h"
 #import "CYLTabBarController.h"
 #import "CYLPlusButton.h"
@@ -27,6 +28,7 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowPlusButtonTouchableArea,
     CYLSettingsRowSelectedIndexIgnoringPlusButton, // FIX: issue #515
     CYLSettingsRowTabBarMinimizeBehavior, // issue #13
+    CYLSettingsRowConfigurationFile,      // one configuration file creates a tab bar controller 一个配置文件生成 TabBarController
     CYLSettingsRowTabBarItemUpdate,     // then one row per tab item update, see UIViewController+CYLTabBarItemUpdate.h
 };
 
@@ -594,6 +596,9 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     if (indexPath.row == CYLSettingsRowTabBarMinimizeBehavior) {
         return CYLTabBarMinimizeCell(tableView, CYLSettingsTabBarController(self));
     }
+    if (indexPath.row == CYLSettingsRowConfigurationFile) {
+        return [self cyl_configurationDemoCellForTableView:tableView];
+    }
     if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdate];
     }
@@ -627,6 +632,8 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     } else if (indexPath.row == CYLSettingsRowTabBarMinimizeBehavior) {
         CYLSwitchTabBarMinimizeBehavior(CYLSettingsTabBarController(self));
         [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    } else if (indexPath.row == CYLSettingsRowConfigurationFile) {
+        [self cyl_presentConfigurationDemo];
     } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdate];
         // [EN] The rows show which changes are on (a checkmark).

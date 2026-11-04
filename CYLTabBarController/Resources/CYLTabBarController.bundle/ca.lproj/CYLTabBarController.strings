@@ -219,3 +219,9 @@
 "跳转与对比" = "Navegació i comparacions";
 "角标" = "Insígnies";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "No compatible amb Liquid Glass: el sistema fixa l'alçada de la barra (FlatDesign i l'estil clàssic sí)";
+"从配置文件创建 TabBarController" = "Crea un TabBarController a partir d’un fitxer de configuració";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Un sol fitxer crea tota la barra de pestanyes: tria JSON, YAML, TOML, plist, XML, INI i més, o carrega’l des d’un URL.";
+"选择配置文件" = "Tria un fitxer de configuració";
+"从网络 URL 加载" = "Carrega des d’un URL";
+"无法创建 TabBarController" = "No s’ha pogut crear el TabBarController";
+"本页由配置文件 %@ 创建：" = "Aquesta pàgina s’ha creat a partir de la configuració %@:";

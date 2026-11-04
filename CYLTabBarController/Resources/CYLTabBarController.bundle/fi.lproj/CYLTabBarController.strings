@@ -219,3 +219,9 @@
 "跳转与对比" = "Navigointi ja vertailut";
 "角标" = "Merkit";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass ei tue: järjestelmä määrää palkin korkeuden (FlatDesign ja klassinen tyyli tukevat)";
+"从配置文件创建 TabBarController" = "Luo TabBarController määritystiedostosta";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Yksi tiedosto luo koko välilehtipalkin: valitse JSON, YAML, TOML, plist, XML, INI ym. tai lataa URL-osoitteesta.";
+"选择配置文件" = "Valitse määritystiedosto";
+"从网络 URL 加载" = "Lataa URL-osoitteesta";
+"无法创建 TabBarController" = "TabBarControlleria ei voitu luoda";
+"本页由配置文件 %@ 创建：" = "Tämä sivu luotiin määrityksestä %@:";

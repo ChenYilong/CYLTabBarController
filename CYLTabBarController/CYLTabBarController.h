@@ -62,6 +62,7 @@
 #import "UITableViewCell+CYLBadgeExtention.h"
 #import "UIViewController+CYLMemoryWarning.h"
 #import "UIViewController+CYLTabBarItemUpdate.h"
+#import "CYLTabBarConfigurationParser.h"
 #import "UIViewController+CYLSettingsSection.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
@@ -224,6 +225,70 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemImagePositionAdjustment;
  *      `+cyl_defaultTabBarItemIdentifierForClass:`）。与下标或标题不同，类名不会因增减 Tab 或切换语言而改变。
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifier;
+
+/*!
+ * [EN] Keys of a tab bar configuration: one dictionary that holds everything an initializer takes, for
+ *      `-initWithConfiguration:`, and the same keys in a configuration file (JSON, YAML, plist...) or a downloaded one,
+ *      see `CYLTabBarController (CYLConfiguration)`. In code the values have their usual types; in a file, strings work
+ *      for every key (see each key). Missing keys take the defaults of the other initializers.
+ *      - `CYLTabBarControllerViewControllers`: NSArray<UIViewController *> (code only). Without it, the view controllers
+ *        are created from the items, see `CYLTabBarItemViewControllerClass`.
+ *      - `CYLTabBarControllerTabBarItemsAttributes`: NSArray<NSDictionary *>, the item attributes (`CYLTabBarItemTitle`...).
+ *      - `CYLTabBarControllerImageInsets`: NSValue of UIEdgeInsets, or "{top, left, bottom, right}", [t, l, b, r] or
+ *        {top: , left: , bottom: , right: }. Default UIEdgeInsetsZero.
+ *      - `CYLTabBarControllerTitlePositionAdjustment`: NSValue of UIOffset, or "{horizontal, vertical}", [h, v] or
+ *        {horizontal: , vertical: }. Default UIOffsetZero.
+ *      - `CYLTabBarControllerStyleType`: NSNumber of CYLTabBarStyleType, or "default", "system", "flatDesign",
+ *        "liquidGlass". Default CYLTabBarStyleTypeDefault.
+ *      - `CYLTabBarControllerContext`: NSString, see `context`. Default nil.
+ *      - `CYLTabBarControllerNavigationControllerClass`: NSString, the class (e.g. "UINavigationController") each created
+ *        view controller is embedded in. Default: not embedded.
+ * [CN] TabBar 配置的键：一个字典包含初始化方法的全部参数，用于 `-initWithConfiguration:`；配置文件（JSON、YAML、plist 等）或网络下载的
+ *      配置使用同样的键，见 `CYLTabBarController (CYLConfiguration)`。代码中的值使用原本的类型；文件中每个键都可以用字符串（见各键说明）。
+ *      缺少的键使用其他初始化方法的默认值。
+ *      - `CYLTabBarControllerViewControllers`：NSArray<UIViewController *>（仅代码）。没有时根据 item 创建子控制器，见
+ *        `CYLTabBarItemViewControllerClass`。
+ *      - `CYLTabBarControllerTabBarItemsAttributes`：NSArray<NSDictionary *>，即各 item 的属性（`CYLTabBarItemTitle` 等）。
+ *      - `CYLTabBarControllerImageInsets`：UIEdgeInsets 的 NSValue，或 "{top, left, bottom, right}"、[t, l, b, r]、
+ *        {top: , left: , bottom: , right: }。默认 UIEdgeInsetsZero。
+ *      - `CYLTabBarControllerTitlePositionAdjustment`：UIOffset 的 NSValue，或 "{horizontal, vertical}"、[h, v]、
+ *        {horizontal: , vertical: }。默认 UIOffsetZero。
+ *      - `CYLTabBarControllerStyleType`：CYLTabBarStyleType 的 NSNumber，或 "default"、"system"、"flatDesign"、"liquidGlass"。
+ *        默认 CYLTabBarStyleTypeDefault。
+ *      - `CYLTabBarControllerContext`：NSString，见 `context`。默认 nil。
+ *      - `CYLTabBarControllerNavigationControllerClass`：NSString，创建的子控制器嵌入的导航控制器类（如 "UINavigationController"）。
+ *        默认不嵌入。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerViewControllers;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerTabBarItemsAttributes;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerImageInsets;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerTitlePositionAdjustment;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerStyleType;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerContext;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerNavigationControllerClass;
+
+/*!
+ * [EN] Item keys used when the view controllers are created from the configuration (no `CYLTabBarControllerViewControllers`):
+ *      - `CYLTabBarItemViewControllerClass`: NSString, the view controller class of the tab, created with `-init`.
+ *        Default "UIViewController". A Swift class is found by its name ("HomeViewController") or "Module.Name"; give
+ *        it `@objc(HomeViewController)` to be sure.
+ *      - `CYLTabBarItemNavigationControllerClass`: NSString, overrides `CYLTabBarControllerNavigationControllerClass` for
+ *        this tab; "" or "none": not embedded.
+ *      In a file, image keys (`CYLTabBarItemImage`, `CYLTabBarItemSelectedImage` and the dark ones) also take
+ *      "system:<SF Symbol name>" (iOS 13+), e.g. "system:house.fill"; Lottie URL keys take an http(s) URL, a path or a
+ *      file name in the main bundle; `CYLTabBarItemImageURLSize` / `CYLTabBarLottieSize` take "{width, height}";
+ *      `CYLTabBarLottieDarkColors` takes "#RRGGBB" or "#RRGGBBAA" colors.
+ * [CN] 根据配置创建子控制器时（没有 `CYLTabBarControllerViewControllers`）使用的 item 键：
+ *      - `CYLTabBarItemViewControllerClass`：NSString，Tab 的子控制器类，用 `-init` 创建。默认 "UIViewController"。Swift 类可用类名
+ *        （"HomeViewController"）或 "模块名.类名"；为确保能找到，可添加 `@objc(HomeViewController)`。
+ *      - `CYLTabBarItemNavigationControllerClass`：NSString，覆盖该 Tab 的 `CYLTabBarControllerNavigationControllerClass`；
+ *        "" 或 "none" 表示不嵌入。
+ *      文件中，图片键（`CYLTabBarItemImage`、`CYLTabBarItemSelectedImage` 及深色键）也支持 "system:<SF Symbol 名称>"（iOS 13+），
+ *      例如 "system:house.fill"；Lottie URL 键支持 http(s) URL、路径或 main bundle 中的文件名；`CYLTabBarItemImageURLSize` /
+ *      `CYLTabBarLottieSize` 支持 "{width, height}"；`CYLTabBarLottieDarkColors` 支持 "#RRGGBB" 或 "#RRGGBBAA" 颜色。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemViewControllerClass;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemNavigationControllerClass;
 /*!
  * [EN] These globals hold what was written LAST, by whichever tab bar controller or plus button wrote last. The library
  *      no longer lays out with them: with several tab bar controllers they overwrote each other (a tab bar with 5 items
@@ -574,6 +639,38 @@ presentLoginForViewController:(UIViewController *)viewController
  *      见 `+[CYLPlusButton plusButtonForTabBarContext:]`。
  */
 @property (nonatomic, readonly, copy, nullable) NSString *context;
+
+/*!
+ * [EN] Creates a tab bar controller from one dictionary that holds every initializer parameter (see
+ *      `CYLTabBarControllerViewControllers` and the other configuration keys). Every other initializer calls this one.
+ *      Without `CYLTabBarControllerViewControllers`, the view controllers are created from the items
+ *      (`CYLTabBarItemViewControllerClass`). To read the configuration from a file or a URL, see
+ *      `CYLTabBarController (CYLConfiguration)`.
+ *
+ *          // Objective-C
+ *          CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithConfiguration:@{
+ *              CYLTabBarControllerViewControllers : viewControllers,
+ *              CYLTabBarControllerTabBarItemsAttributes : tabBarItemsAttributes,
+ *              CYLTabBarControllerTitlePositionAdjustment : [NSValue valueWithUIOffset:UIOffsetMake(0, -3)],
+ *              CYLTabBarControllerStyleType : @(CYLTabBarStyleTypeLiquidGlass),
+ *              CYLTabBarControllerContext : @"Home",
+ *          }];
+ *          // Swift
+ *          let tabBarController = CYLTabBarController(configuration: [
+ *              CYLTabBarControllerViewControllers: viewControllers,
+ *              CYLTabBarControllerTabBarItemsAttributes: tabBarItemsAttributes,
+ *          ])
+ *
+ * [CN] 用一个字典初始化，字典包含初始化方法的全部参数（见 `CYLTabBarControllerViewControllers` 等配置键）。其他所有初始化方法都调用本方法。
+ *      没有 `CYLTabBarControllerViewControllers` 时根据 item 创建子控制器（`CYLTabBarItemViewControllerClass`）。从文件或 URL 读取配置见
+ *      `CYLTabBarController (CYLConfiguration)`。示例见上。
+ */
+- (instancetype)initWithConfiguration:(NSDictionary<NSString *, id> *)configuration;
+
+/*!
+ * [EN] Convenience constructor for `-initWithConfiguration:`. [CN] `-initWithConfiguration:` 的便利构造方法。
+ */
++ (instancetype)tabBarControllerWithConfiguration:(NSDictionary<NSString *, id> *)configuration;
 
 /*!
  * [EN] Creates a tab bar controller with view controllers and matching item attributes.
@@ -1482,6 +1579,93 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      滚动隐藏开启时（OnScrollDown 或 OnScrollUp）getter 返回 YES。需要 OnScrollUp 或 Automatic 时使用 `cyl_tabBarMinimizeBehavior`。
  */
 @property (nonatomic, assign) BOOL cyl_hidesTabBarOnScroll;
+
+@end
+
+/*!
+ * [EN] Completion of `+loadTabBarControllerWithConfigurationURL:completion:`, on the main queue: a tab bar controller, or
+ *      nil and the error (`CYLTabBarConfigurationErrorDomain`).
+ * [CN] `+loadTabBarControllerWithConfigurationURL:completion:` 的回调，在主队列执行：TabBarController，或 nil 与错误
+ *      （`CYLTabBarConfigurationErrorDomain`）。
+ */
+typedef void (^CYLTabBarControllerConfigurationCompletion)(CYLTabBarController *_Nullable tabBarController, NSError *_Nullable error);
+
+/*!
+ * [EN] Completion of `+loadConfigurationWithURL:completion:`, on the main queue. [CN] `+loadConfigurationWithURL:completion:` 的回调，在主队列执行。
+ */
+typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_Nullable configuration, NSError *_Nullable error);
+
+/*!
+ * [EN] One configuration file, one tab bar controller. The file holds the keys of `-initWithConfiguration:` in any
+ *      key-value format: JSON, JSON5 / JSONC, property lists (XML, binary, OpenStep, .strings), YAML, TOML, INI (.ini,
+ *      .cfg, .conf), .properties, .env or XML (see `CYLTabBarConfigurationFormat`). The format comes from the file name
+ *      extension (or the HTTP Content-Type), else from the content. Every format becomes the same dictionary, whose values
+ *      are then converted (insets, offsets, SF Symbols, URLs...), see `CYLTabBarControllerImageInsets` and
+ *      `CYLTabBarItemViewControllerClass`.
+ *
+ *          // A file in the app (a path, or a file name in the main bundle). 应用内文件（路径或 main bundle 中的文件名）。
+ *          NSError *error = nil;
+ *          CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfigurationFile:@"tabbar.yaml" error:&error];
+ *
+ *          // A file on a server. 服务器上的文件。
+ *          [CYLTabBarController loadTabBarControllerWithConfigurationURL:[NSURL URLWithString:@"https://example.com/tabbar.json"]
+ *                                                             completion:^(CYLTabBarController *tabBarController, NSError *error) {
+ *              self.window.rootViewController = tabBarController ?: [CYLTabBarController tabBarControllerWithConfigurationFile:@"tabbar.json" error:NULL];
+ *          }];
+ *
+ *      Swift:
+ *
+ *          let tabBarController = try CYLTabBarController(configurationFile: "tabbar.yaml")
+ *
+ * [CN] 一个配置文件生成一个 TabBarController。文件包含 `-initWithConfiguration:` 的键，可以使用任意 key-value 格式：JSON、JSON5 / JSONC、
+ *      属性列表（XML、二进制、OpenStep、.strings）、YAML、TOML、INI（.ini、.cfg、.conf）、.properties、.env 或 XML（见
+ *      `CYLTabBarConfigurationFormat`）。格式由文件扩展名（或 HTTP Content-Type）决定，否则根据内容识别。所有格式都解析为同样的字典，再转换其中的值
+ *      （内边距、偏移、SF Symbols、URL 等），见 `CYLTabBarControllerImageInsets` 与 `CYLTabBarItemViewControllerClass`。示例见上。
+ */
+@interface CYLTabBarController (CYLConfiguration)
+
+/*!
+ * [EN] `configuration` with its file values converted to the types the library uses: strings to NSValue (insets,
+ *      offsets, sizes), style names to NSNumber, "system:" image names to SF Symbols, Lottie names and paths to URLs,
+ *      hex strings to UIColor. Values that already have their type are kept. `-initWithConfiguration:` calls it.
+ * [CN] 将 `configuration` 中来自文件的值转换为本库使用的类型：字符串转为 NSValue（内边距、偏移、尺寸）、样式名称转为 NSNumber、"system:"
+ *      图片名称转为 SF Symbols、Lottie 名称与路径转为 URL、十六进制字符串转为 UIColor。已经是对应类型的值保持不变。
+ *      `-initWithConfiguration:` 会调用本方法。
+ */
++ (NSDictionary<NSString *, id> *)cyl_normalizedConfiguration:(NSDictionary<NSString *, id> *)configuration;
+
+/*!
+ * [EN] Reads a configuration file: `filePath` is a path, a file URL string, or a file name in the main bundle
+ *      (e.g. @"tabbar.yaml"). Returns nil and sets `error` when the file is missing or invalid.
+ * [CN] 读取配置文件：`filePath` 为路径、文件 URL 字符串或 main bundle 中的文件名（如 @"tabbar.yaml"）。文件不存在或无效时返回 nil 并设置 `error`。
+ */
++ (nullable NSDictionary<NSString *, id> *)configurationWithContentsOfFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
+
+/*!
+ * [EN] A tab bar controller from a configuration file (see `+configurationWithContentsOfFile:error:`), or nil and `error`.
+ * [CN] 根据配置文件创建 TabBarController（见 `+configurationWithContentsOfFile:error:`），失败时返回 nil 并设置 `error`。
+ */
+- (nullable instancetype)initWithConfigurationFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
+
+/// [EN] Convenience constructor for `-initWithConfigurationFile:error:`. [CN] `-initWithConfigurationFile:error:` 的便利构造方法。
++ (nullable instancetype)tabBarControllerWithConfigurationFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
+
+/*!
+ * [EN] Downloads a configuration (http, https, or a file URL) and parses it; `completion` runs on the main queue. The
+ *      format comes from the URL's extension, then the response's Content-Type, then the content. Returns the task (nil
+ *      for a file URL), which can be cancelled. The request follows the URL loading system's cache policy.
+ * [CN] 下载配置（http、https 或文件 URL）并解析；`completion` 在主队列执行。格式依次由 URL 扩展名、响应的 Content-Type、内容决定。
+ *      返回可取消的任务（文件 URL 时为 nil）。请求遵循 URL 加载系统的缓存策略。
+ */
++ (nullable NSURLSessionDataTask *)loadConfigurationWithURL:(NSURL *)URL completion:(CYLTabBarConfigurationCompletion)completion;
+
+/*!
+ * [EN] Downloads a configuration (see `+loadConfigurationWithURL:completion:`) and creates the tab bar controller on the
+ *      main queue.
+ * [CN] 下载配置（见 `+loadConfigurationWithURL:completion:`），并在主队列创建 TabBarController。
+ */
++ (nullable NSURLSessionDataTask *)loadTabBarControllerWithConfigurationURL:(NSURL *)URL
+                                                                 completion:(CYLTabBarControllerConfigurationCompletion)completion;
 
 @end
 

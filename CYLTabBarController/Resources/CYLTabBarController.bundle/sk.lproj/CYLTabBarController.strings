@@ -219,3 +219,9 @@
 "跳转与对比" = "Navigácia a porovnania";
 "角标" = "Odznaky";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nepodporuje: výšku panela určuje systém (FlatDesign a klasický štýl áno)";
+"从配置文件创建 TabBarController" = "Vytvoriť TabBarController z konfiguračného súboru";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Jeden súbor vytvorí celý panel kariet: zvoľte JSON, YAML, TOML, plist, XML, INI a ďalšie, alebo ho načítajte z URL.";
+"选择配置文件" = "Vyberte konfiguračný súbor";
+"从网络 URL 加载" = "Načítať z URL";
+"无法创建 TabBarController" = "TabBarController nie je možné vytvoriť";
+"本页由配置文件 %@ 创建：" = "Táto stránka bola vytvorená z konfigurácie %@:";

@@ -219,3 +219,9 @@
 "跳转与对比" = "画面遷移と比較";
 "角标" = "バッジ";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass では使用できません：タブバーの高さはシステムが決めます（FlatDesign とクラシックスタイルは対応）";
+"从配置文件创建 TabBarController" = "設定ファイルから TabBarController を作成";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "1 つのファイルでタブバー全体を作成：JSON、YAML、TOML、plist、XML、INI などから選ぶか、URL から読み込みます。";
+"选择配置文件" = "設定ファイルを選択";
+"从网络 URL 加载" = "URL から読み込む";
+"无法创建 TabBarController" = "TabBarController を作成できません";
+"本页由配置文件 %@ 创建：" = "このページは設定 %@ から作成されました：";

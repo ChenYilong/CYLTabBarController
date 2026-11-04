@@ -219,3 +219,9 @@
 "跳转与对比" = "Navigacija i usporedbe";
 "角标" = "Značke";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass ne podržava: visinu trake određuje sustav (FlatDesign i klasični stil podržavaju)";
+"从配置文件创建 TabBarController" = "Stvori TabBarController iz konfiguracijske datoteke";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Jedna datoteka stvara cijelu traku kartica: odaberite JSON, YAML, TOML, plist, XML, INI i druge ili je učitajte s URL-a.";
+"选择配置文件" = "Odaberite konfiguracijsku datoteku";
+"从网络 URL 加载" = "Učitaj s URL-a";
+"无法创建 TabBarController" = "Nije moguće stvoriti TabBarController";
+"本页由配置文件 %@ 创建：" = "Ova je stranica stvorena iz konfiguracije %@:";

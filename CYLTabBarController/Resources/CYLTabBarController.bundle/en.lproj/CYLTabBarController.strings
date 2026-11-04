@@ -219,3 +219,9 @@
 "跳转与对比" = "Navigation and comparisons";
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Not supported by Liquid Glass: the system sets the tab bar height (FlatDesign and the classic style support it)";
+"从配置文件创建 TabBarController" = "Create a TabBarController from a configuration file";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "One file builds the whole tab bar: choose JSON, YAML, TOML, plist, XML, INI and more, or load it from a URL.";
+"选择配置文件" = "Choose a configuration file";
+"从网络 URL 加载" = "Load from a URL";
+"无法创建 TabBarController" = "Could not create the TabBarController";
+"本页由配置文件 %@ 创建：" = "This page was created from the configuration %@:";
