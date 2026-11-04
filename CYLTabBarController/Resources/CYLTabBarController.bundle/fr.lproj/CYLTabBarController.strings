@@ -156,6 +156,9 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Affiche un GIF animé comme icône de l’onglet ; touchez à nouveau pour rétablir";
 "批量更换标题" = "Modifier tous les titres";
 "一次更新所有 Tab 的标题，再点恢复" = "Met à jour les titres de tous les onglets ; touchez à nouveau pour rétablir";
+"替换相邻 Tab 的页面" = "Remplacer les onglets voisins";
+"把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复" = "Affiche d’autres pages dans les onglets de part et d’autre (issue #481) ; touchez à nouveau pour restaurer";
+"替换页 %@" = "Page de remplacement %@";
 "标题偏移（titlePositionAdjustment）" = "Décalage du titre (titlePositionAdjustment)";
 "点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Touchez pour changer le décalage vertical des titres de tous les onglets, actuel : %@";
 "standardAppearance 主题（液态玻璃与扁平样式共用）" = "Thème standardAppearance (partagé par Liquid Glass et FlatDesign)";

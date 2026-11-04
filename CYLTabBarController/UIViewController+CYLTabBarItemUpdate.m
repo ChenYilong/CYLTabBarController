@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, CYLTabBarItemUpdateRow) {
     CYLTabBarItemUpdateRowAllLocalIcons,   // `-setTabBarItemIcon:selectedIcon:size:atIndex:`, local images, for every tab
     CYLTabBarItemUpdateRowGIFIcon,      // the same, with a GIF
     CYLTabBarItemUpdateRowAllTitles,    // `-updateTabBarItemsWithAttributes:`
+    CYLTabBarItemUpdateRowReplaceNeighbors, // `-replaceViewControllerAtIndex:withViewController:attributes:`, issue #481
     CYLTabBarItemUpdateRowCount,
 };
 
@@ -30,6 +31,7 @@ static char CYLTabBarItemAllTitlesUpdatedKey;
 static char CYLTabBarItemAllNetworkIconsKey;
 static char CYLTabBarItemAllLocalIconsKey;
 static char CYLPlusButtonInitialAttributesKey;
+static char CYLReplacedNeighborsKey;
 
 @implementation UIViewController (CYLTabBarItemUpdate)
 
@@ -80,6 +82,11 @@ static char CYLPlusButtonInitialAttributesKey;
             subtitle = CYLLocalizedString(@"当前页 Tab 显示 GIF 动图，再点恢复");
             symbolName = @"sparkles";
             break;
+        case CYLTabBarItemUpdateRowReplaceNeighbors:
+            title = CYLLocalizedString(@"替换相邻 Tab 的页面");
+            subtitle = CYLLocalizedString(@"把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复");
+            symbolName = @"arrow.left.arrow.right";
+            break;
         default:
             title = CYLLocalizedString(@"批量更换标题");
             subtitle = CYLLocalizedString(@"一次更新所有 Tab 的标题，再点恢复");
@@ -118,6 +125,9 @@ static char CYLPlusButtonInitialAttributesKey;
         case CYLTabBarItemUpdateRowAllNetworkIcons:
         case CYLTabBarItemUpdateRowAllLocalIcons:
             [self cyl_toggleAllIconsRow:row inTabBarController:tabBarController];
+            break;
+        case CYLTabBarItemUpdateRowReplaceNeighbors:
+            [self cyl_toggleReplacedNeighborsOfTabAtIndex:index inTabBarController:tabBarController];
             break;
         default:
             [self cyl_toggleAllTitlesInTabBarController:tabBarController];
@@ -313,6 +323,91 @@ static char CYLPlusButtonInitialAttributesKey;
     objc_setAssociatedObject(tabBarController, otherKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+/*!
+ * FIX: issue #481
+ * [EN] The tabs next to the tab at `index` show other pages (`-replaceViewControllerAtIndex:withViewController:attributes:`),
+ *      with their own title and icon; tapped again, the original pages and tab items come back. The plus button's tab is
+ *      skipped: the nearest real tab on each side is replaced.
+ * [CN] 第 `index` 个 Tab 两侧的 Tab 显示其他页面（`-replaceViewControllerAtIndex:withViewController:attributes:`），使用各自的标题和图标；
+ *      再次点击，恢复原来的页面和 TabBarItem。跳过 PlusButton 的 Tab：替换每侧最近的真实 Tab。
+ */
+- (void)cyl_toggleReplacedNeighborsOfTabAtIndex:(NSUInteger)index inTabBarController:(CYLTabBarController *)tabBarController {
+    NSArray<NSDictionary *> *replaced = objc_getAssociatedObject(tabBarController, &CYLReplacedNeighborsKey);
+    if (replaced) {
+        // [EN] Each original page back, with its tab item. [CN] 放回每个原来的页面及其 TabBarItem。
+        for (NSDictionary *entry in replaced) {
+            NSUInteger replacedIndex = [tabBarController.viewControllers indexOfObject:entry[@"replacement"]];
+            if (replacedIndex != NSNotFound) {
+                [tabBarController replaceViewControllerAtIndex:replacedIndex withViewController:entry[@"original"] attributes:entry[@"attributes"]];
+            }
+        }
+        objc_setAssociatedObject(tabBarController, &CYLReplacedNeighborsKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [self cyl_redecorateTabBarController:tabBarController];
+        return;
+    }
+    NSMutableArray<NSDictionary *> *entries = [NSMutableArray array];
+    NSArray<NSString *> *names = @[ @"A", @"B" ];
+    NSArray<NSString *> *symbols = @[ @"a.circle", @"b.circle" ];
+    NSArray<NSNumber *> *steps = @[ @(-1), @(1) ];
+    for (NSUInteger side = 0; side < steps.count; side++) {
+        NSUInteger neighborIndex = [self cyl_realTabIndexNextToIndex:index step:steps[side].integerValue inTabBarController:tabBarController];
+        if (neighborIndex == NSNotFound) {
+            continue;
+        }
+        UIViewController *original = tabBarController.viewControllers[neighborIndex];
+        NSDictionary *originalAttributes = [tabBarController tabBarItemAttributesAtIndex:neighborIndex] ?: @{};
+        NSString *title = [NSString stringWithFormat:CYLLocalizedString(@"替换页 %@"), names[side]];
+        UIViewController *page = [[UIViewController alloc] init];
+        page.title = title;
+        page.view.backgroundColor = (side == 0) ? UIColor.systemTealColor : UIColor.systemPinkColor;
+        UINavigationController *replacement = [[UINavigationController alloc] initWithRootViewController:page];
+        NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:title forKey:CYLTabBarItemTitle];
+        if (@available(iOS 13.0, *)) {
+            attributes[CYLTabBarItemImage] = [UIImage systemImageNamed:symbols[side]];
+            attributes[CYLTabBarItemSelectedImage] = [UIImage systemImageNamed:[symbols[side] stringByAppendingString:@".fill"]];
+        }
+        if ([tabBarController replaceViewControllerAtIndex:neighborIndex withViewController:replacement attributes:attributes]) {
+            [entries addObject:@{ @"original" : original, @"attributes" : originalAttributes, @"replacement" : replacement }];
+        }
+    }
+    if (entries.count > 0) {
+        objc_setAssociatedObject(tabBarController, &CYLReplacedNeighborsKey, [entries copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    [self cyl_redecorateTabBarController:tabBarController];
+}
+
+/*!
+ * [EN] The tab buttons are new after a replacement: once they exist (`-performWhenTabBarItemsReady:`, issue #22), the app's
+ *      decorations (badges, a cover) are added again, when the tab bar controller has them (`-cyl_demo_decorateTabBarController:`
+ *      in the ObjC example).
+ * [CN] 替换后 Tab 按钮是新的：在其创建后（`-performWhenTabBarItemsReady:`，issue #22）重新添加 App 的装饰（角标、封面），前提是
+ *      TabBarController 提供了该方法（ObjC 示例中的 `-cyl_demo_decorateTabBarController:`）。
+ */
+- (void)cyl_redecorateTabBarController:(CYLTabBarController *)tabBarController {
+    SEL decorate = NSSelectorFromString(@"cyl_demo_decorateTabBarController:");
+    if (![tabBarController respondsToSelector:decorate]) {
+        return;
+    }
+    [tabBarController performWhenTabBarItemsReady:^(CYLTabBarController *readyTabBarController) {
+        void (*send)(id, SEL, id) = (void (*)(id, SEL, id))[readyTabBarController methodForSelector:decorate];
+        send(readyTabBarController, decorate, readyTabBarController);
+    }];
+}
+
+/// [EN] The nearest real tab (not the plus button's) from `index` in direction `step`; NSNotFound when none.
+/// [CN] 从 `index` 沿 `step` 方向最近的真实 Tab（不是 PlusButton 的）；没有时为 NSNotFound。
+- (NSUInteger)cyl_realTabIndexNextToIndex:(NSUInteger)index step:(NSInteger)step inTabBarController:(CYLTabBarController *)tabBarController {
+    UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:tabBarController];
+    NSArray<UIViewController *> *viewControllers = tabBarController.viewControllers;
+    for (NSInteger candidate = (NSInteger)index + step; candidate >= 0 && candidate < (NSInteger)viewControllers.count; candidate += step) {
+        UIViewController *viewController = viewControllers[candidate];
+        if (!viewController.cyl_isPlaceholder && viewController != plusChildViewController) {
+            return (NSUInteger)candidate;
+        }
+    }
+    return NSNotFound;
+}
+
 #pragma mark - Helpers
 
 /// The `tabBarItemsAttributes` given at initialization, one entry per tab (its view controller), copied before the
@@ -411,6 +506,8 @@ static char CYLPlusButtonInitialAttributesKey;
             return [objc_getAssociatedObject([self cyl_tabBarItemUpdateTabBarController], &CYLTabBarItemAllNetworkIconsKey) boolValue];
         case CYLTabBarItemUpdateRowAllLocalIcons:
             return [objc_getAssociatedObject([self cyl_tabBarItemUpdateTabBarController], &CYLTabBarItemAllLocalIconsKey) boolValue];
+        case CYLTabBarItemUpdateRowReplaceNeighbors:
+            return objc_getAssociatedObject([self cyl_tabBarItemUpdateTabBarController], &CYLReplacedNeighborsKey) != nil;
         default:
             return [objc_getAssociatedObject([self cyl_tabBarItemUpdateTabBarController], &CYLTabBarItemAllTitlesUpdatedKey) boolValue];
     }

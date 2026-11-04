@@ -156,6 +156,9 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Mostra un GIF animat com a icona de la pestanya; toca de nou per restaurar";
 "批量更换标题" = "Canvia tots els títols";
 "一次更新所有 Tab 的标题，再点恢复" = "Actualitza els títols de totes les pestanyes alhora; toca de nou per restaurar";
+"替换相邻 Tab 的页面" = "Substitueix les pestanyes veïnes";
+"把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复" = "Mostra altres pàgines a les pestanyes de tots dos costats (issue #481); toca de nou per restaurar";
+"替换页 %@" = "Pàgina substituta %@";
 "标题偏移（titlePositionAdjustment）" = "Desplaçament del títol (titlePositionAdjustment)";
 "点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Toca per canviar el desplaçament vertical dels títols de totes les pestanyes, actual: %@";
 "standardAppearance 主题（液态玻璃与扁平样式共用）" = "Tema de standardAppearance (compartit per Liquid Glass i FlatDesign)";

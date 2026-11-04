@@ -156,6 +156,9 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Mostra una GIF animata come icona della scheda; tocca di nuovo per ripristinare";
 "批量更换标题" = "Cambia tutti i titoli";
 "一次更新所有 Tab 的标题，再点恢复" = "Aggiorna i titoli di tutte le schede insieme; tocca di nuovo per ripristinare";
+"替换相邻 Tab 的页面" = "Sostituisci le schede vicine";
+"把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复" = "Mostra altre pagine nelle schede ai due lati (issue #481); tocca di nuovo per ripristinare";
+"替换页 %@" = "Pagina sostitutiva %@";
 "标题偏移（titlePositionAdjustment）" = "Spostamento del titolo (titlePositionAdjustment)";
 "点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Tocca per cambiare lo spostamento verticale dei titoli di tutte le schede, attuale: %@";
 "standardAppearance 主题（液态玻璃与扁平样式共用）" = "Tema standardAppearance (condiviso da Liquid Glass e FlatDesign)";

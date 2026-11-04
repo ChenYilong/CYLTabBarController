@@ -1688,7 +1688,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
             _viewControllers = [viewControllers copy];
             return;
         }
-        [self doubleCheckTabControlAlignWithViewControllers:_viewControllers ?: viewControllers];
+        // FIX: issue #481
+        // [EN] Before the alignment, the view controllers being set: re-assigning `viewControllers` (one tab replaced)
+        //      compared the new attributes with the previous tabs, the plus button's included, and failed the assertion.
+        // [CN] 对齐之前检查正在设置的视图控制器：重新赋值 `viewControllers`（替换一个 Tab）时，原先用新的属性与之前的 Tab
+        //      （包括 PlusButton 的 Tab）比较，导致断言失败。
+        [self doubleCheckTabControlAlignWithViewControllers:viewControllers ?: _viewControllers];
         BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
         BOOL addedFlag = [[self cyl_contextPlusChildViewController] cyl_plusViewControllerEverAdded];
         BOOL hasPlusChildViewController = [self hasPlusChildViewController] && !isAdded && !addedFlag;
@@ -2103,6 +2108,73 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         scaledImage = scale(image);
     }
     return [scaledImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+}
+
+- (BOOL)replaceViewControllerAtIndex:(NSUInteger)index
+                  withViewController:(UIViewController *)viewController
+                          attributes:(NSDictionary<NSString *, id> *)attributes {
+    if (index >= _viewControllers.count || !viewController || [_viewControllers containsObject:viewController]) {
+        return NO;
+    }
+    UIViewController *oldViewController = _viewControllers[index];
+    if (oldViewController.cyl_isPlaceholder || oldViewController == [self cyl_contextPlusChildViewController]) {
+        return NO;
+    }
+    UIViewController *selectedViewController = self.selectedViewController;
+    UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
+    // [EN] The shape the tab bar controller was created with: no entry for the plus button's tab, which
+    //      `-setViewControllers:` inserts again (it would be inserted twice otherwise).
+    // [CN] 与创建 TabBarController 时相同的结构：不含 PlusButton 的 Tab，`-setViewControllers:` 会重新插入它（否则会插入两次）。
+    NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
+    NSMutableArray<NSDictionary *> *tabBarItemsAttributes = [NSMutableArray array];
+    for (NSUInteger tabIndex = 0; tabIndex < _viewControllers.count; tabIndex++) {
+        UIViewController *tabViewController = _viewControllers[tabIndex];
+        if (tabViewController.cyl_isPlaceholder || tabViewController == plusChildViewController) {
+            continue;
+        }
+        NSDictionary *tabAttributes = [self tabBarItemAttributesAtIndex:tabIndex] ?: @{};
+        if (tabIndex == index) {
+            // [EN] The new tab's own entry (a Lottie animation of the old tab must not stay); nil keeps the old one.
+            // [CN] 使用新 Tab 自己的属性（旧 Tab 的 Lottie 动画等不能保留）；为 nil 时保留旧的属性。
+            tabViewController = viewController;
+            tabAttributes = attributes ?: tabAttributes;
+        }
+        [viewControllers addObject:tabViewController];
+        [tabBarItemsAttributes addObject:tabAttributes];
+    }
+    [plusChildViewController cyl_setPlusViewControllerEverAdded:NO];
+    _tabBarItemsAttributes = [tabBarItemsAttributes copy];
+    // [EN] As `-reloadTabBarItemsWithAttributes:`: the Lottie views are added again, and the one-time layout block
+    //      (`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`, e.g. covers and badges) runs again for the new tab buttons.
+    // [CN] 与 `-reloadTabBarItemsWithAttributes:` 相同：重新添加 Lottie 视图，并为新的 Tab 按钮再执行一次只执行一次的布局 block
+    //      （`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`，如封面与角标）。
+    self.invokeOnceViewDidLayoutSubViewsBlock = YES;
+    self.lottieViewAdded = NO;
+    [_lottieURLs removeAllObjects];
+    [_lottieSizes removeAllObjects];
+    // [EN] As a new set of tabs (#608): the tab items, icons and Lottie views are set up again from the attributes.
+    // [CN] 与重新设置一组 Tab 相同（#608）：TabBarItem、图标与 Lottie 视图按属性重新设置。
+    self.viewControllers = viewControllers;
+    // [EN] The tabs were installed as child view controllers after UIKit's list was cleared (#608): hand UIKit's own
+    //      setter the same tabs, so it builds their tab items again (Liquid Glass and the classic style).
+    // [CN] UIKit 的 Tab 列表被清空后（#608），Tab 以子控制器方式重新添加：把同样的 Tab 交给 UIKit 自身的 setter，使其重新生成
+    //      TabBarItem（液态玻璃与经典样式）。
+    if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && self.tabBar.items.count != [super viewControllers].count) {
+        [super setViewControllers:[super viewControllers] animated:NO];
+    }
+    UIViewController *viewControllerToSelect = (selectedViewController == oldViewController) ? viewController : selectedViewController;
+    NSUInteger selectedIndex = [self.viewControllers indexOfObject:viewControllerToSelect];
+    if (selectedIndex != NSNotFound) {
+        // [EN] Setting the tabs removed the selected page's view; selecting its index again would do nothing, so the
+        //      selection goes through another tab first and the page is shown again.
+        // [CN] 重新设置 Tab 时移除了选中页面的视图；再次选中同一索引不会有任何变化，所以先选中另一个 Tab，再选回来以重新显示该页面。
+        if (self.selectedIndex == selectedIndex && self.viewControllers.count > 1) {
+            [super setSelectedIndex:(selectedIndex == 0 ? 1 : 0)];
+        }
+        self.selectedIndex = selectedIndex;
+    }
+    [self.view setNeedsLayout];
+    return YES;
 }
 
 - (BOOL)updatePlusButtonWithAttributes:(NSDictionary<NSString *, id> *)attributes {

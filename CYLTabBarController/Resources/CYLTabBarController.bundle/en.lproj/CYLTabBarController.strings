@@ -156,6 +156,9 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Shows an animated GIF as this page's tab icon; tap again to restore";
 "批量更换标题" = "Change all titles";
 "一次更新所有 Tab 的标题，再点恢复" = "Updates the titles of all tabs at once; tap again to restore";
+"替换相邻 Tab 的页面" = "Replace neighboring tabs";
+"把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复" = "Shows other pages in the tabs on both sides of this tab (issue #481); tap again to restore";
+"替换页 %@" = "Replaced page %@";
 "标题偏移（titlePositionAdjustment）" = "Title offset (titlePositionAdjustment)";
 "点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Tap to switch the vertical offset of all tab titles, current: %@";
 "standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance theme (shared by Liquid Glass and FlatDesign)";

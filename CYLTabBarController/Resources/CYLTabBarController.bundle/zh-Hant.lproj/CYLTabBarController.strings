@@ -156,6 +156,9 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "目前頁面 Tab 顯示 GIF 動圖，再點一次還原";
 "批量更换标题" = "批次更換標題";
 "一次更新所有 Tab 的标题，再点恢复" = "一次更新所有 Tab 的標題，再點一次還原";
+"替换相邻 Tab 的页面" = "替換相鄰 Tab 的頁面";
+"把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复" = "把目前 Tab 兩側的 Tab 換成其他頁面（issue #481），再點恢復";
+"替换页 %@" = "替換頁 %@";
 "标题偏移（titlePositionAdjustment）" = "標題偏移（titlePositionAdjustment）";
 "点击切换所有 Tab 标题的垂直偏移，当前：%@" = "點按切換所有 Tab 標題的垂直偏移，目前：%@";
 "standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance 主題（液態玻璃與扁平樣式共用）";

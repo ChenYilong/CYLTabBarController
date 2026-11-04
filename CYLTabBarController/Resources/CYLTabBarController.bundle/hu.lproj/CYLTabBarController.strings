@@ -156,6 +156,9 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Animált GIF-et mutat lapikonként; koppintson újra a visszaállításhoz";
 "批量更换标题" = "Minden cím módosítása";
 "一次更新所有 Tab 的标题，再点恢复" = "Egyszerre frissíti az összes lap címét; koppintson újra a visszaállításhoz";
+"替换相邻 Tab 的页面" = "Szomszédos lapok cseréje";
+"把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复" = "Más oldalakat mutat a lap két oldalán lévő lapokon (issue #481); koppintson újra a visszaállításhoz";
+"替换页 %@" = "Csereoldal %@";
 "标题偏移（titlePositionAdjustment）" = "Címeltolás (titlePositionAdjustment)";
 "点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Koppintson az összes lap címének függőleges eltolásának váltásához, jelenlegi: %@";
 "standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance téma (közös a Liquid Glass és a FlatDesign számára)";

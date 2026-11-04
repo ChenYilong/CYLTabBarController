@@ -156,6 +156,9 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Sekme simgesi olarak hareketli GIF gösterir; geri almak için yeniden dokunun";
 "批量更换标题" = "Tüm başlıkları değiştir";
 "一次更新所有 Tab 的标题，再点恢复" = "Tüm sekmelerin başlıklarını birlikte günceller; geri almak için yeniden dokunun";
+"替换相邻 Tab 的页面" = "Komşu sekmeleri değiştir";
+"把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复" = "Bu sekmenin iki yanındaki sekmelerde başka sayfalar gösterir (issue #481); geri yüklemek için tekrar dokunun";
+"替换页 %@" = "Yedek sayfa %@";
 "标题偏移（titlePositionAdjustment）" = "Başlık kaydırması (titlePositionAdjustment)";
 "点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Tüm sekme başlıklarının dikey kaydırmasını değiştirmek için dokunun, geçerli: %@";
 "standardAppearance 主题（液态玻璃与扁平样式共用）" = "standardAppearance teması (Liquid Glass ve FlatDesign için ortak)";

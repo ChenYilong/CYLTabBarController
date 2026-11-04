@@ -600,79 +600,84 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //      Add a hint animation to guide the user to tap.
     __weak __typeof(self) weakSelf = self;
     [self setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *tabBarController) {
-        __strong typeof(self) self = weakSelf;
-        if (!self) {
+        [weakSelf cyl_demo_decorateTabBarController:tabBarController];
+    }];
+}
+
+/*!
+ * [EN] The badges, the cover of the first tab and the selection indicator, once the tab buttons exist. Called again after
+ *      the tab buttons are set up again, e.g. "Replace neighboring tabs" (issue #481).
+ * [CN] Tab 按钮创建后添加角标、第一个 Tab 的封面与选中指示图。Tab 按钮重新创建后（如“替换相邻 Tab 的页面”，issue #481）会再次调用。
+ */
+- (void)cyl_demo_decorateTabBarController:(CYLTabBarController *)tabBarController {
+    
+    if (!CYL_IS_IOS_26) {
+        [self customizeTabBarSelectionIndicatorImage];
+        //           [self updateSelectionIndicatorColor:[UIColor greenColor]];
+    }
+    
+    
+    // [CN] 延迟是为了演示demo的时候， 方便看清楚badge动画。 非必须。可删除延迟。
+    //@try是为了demo演示的时候， 随时调整减少 tabbar items 个数，而不导致崩溃， 非必须， 可删除。
+    // [EN] The delay is only so the badge animation is easy to see in the demo. Not required; the delay can be removed.
+    //      @try is only so the number of tabbar items can be reduced at any time in the demo without crashing. Not
+    //      required; it can be removed.
+    NSTimeInterval delaySeconds = 1.5;
+    dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
+    dispatch_after(when, dispatch_get_main_queue(), ^{
+        @try {
+            // #425: the shared badge style (offset, colors, font) is set once in SceneDelegate.m
+            // -setUpBadgeAppearance; each tab below sets only what differs from it.
+            // #425：共用的角标样式（偏移、颜色、字体）在 SceneDelegate.m -setUpBadgeAppearance 中统一设置一次，
+            // 下面每个 Tab 只设置与之不同的部分。
+            UIViewController *viewController0 = tabBarController.viewControllers[0];
+            // UIControl *tab0 = viewController0.cyl_tabButton;
+            // [tab0 cyl_showBadge];
+            [viewController0 cyl_setBadgeBackgroundColor:UIColor.cyl_randomColor];
+            [viewController0 cyl_setBadgeRadius:11/2];
+            [viewController0 cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeBreathe];
+            [self setSelectedCoverShow:YES];
+            // [CN] 以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
+            // [EN] The Badge settings above must be applied before cyl_showBadgeValue is called.
+            //                [viewController0 cyl_showBadge];
+            
+            //                                [tabBarController.viewControllers[1] cyl_setBadgeMargin:1.0];
+            //                                [tabBarController.viewControllers[2] cyl_setBadgeMargin:1.0];
+            //                                [tabBarController.viewControllers[3] cyl_setBadgeMargin:1.0];
+            //                                [tabBarController.viewControllers[4] cyl_setBadgeMargin:1.0];
+            [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:UIColor.cyl_randomColor];
+            [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScale];
+            [tabBarController.viewControllers[2] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake];
+            
+            NSString *testBadgeString = @"100";
+            //                [tabBarController.viewControllers[3] cyl_setBadgeMargin:-5];
+            //                CGSize size = [testBadgeString sizeWithAttributes:
+            //                               @{NSFontAttributeName:
+            //                                     tabBarController.viewControllers[3].cyl_badgeFont}];
+            //                float labelHeight = ceilf(size.height);
+            //                [tabBarController.viewControllers[3] cyl_setBadgeCornerRadius:(labelHeight+ tabBarController.viewControllers[3].cyl_badgeMargin)/2];
+            [tabBarController.viewControllers[3] cyl_showBadgeValue:testBadgeString animationType:CYLBadgeAnimationTypeBounce];
+            if (tabBarController.viewControllers.count > 4) {
+                // Differs from the global offset (SceneDelegate.m -setUpBadgeAppearance), so it is set here.
+                // 与全局偏移（SceneDelegate.m -setUpBadgeAppearance）不同，因此单独设置。
+                [tabBarController.viewControllers[4] cyl_setBadgeCenterOffset:CGPointMake(-1, 3)];
+                [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
+            }
+            // #535: the plus button gets a badge too, like the tabs; each tap adds 1 (see -didSelectControl:).
+            // #535：PlusButton 也显示角标，与 Tab 一致；每次点击数字加 1（见 -didSelectControl:）。
+            [tabBarController cyl_demo_showPlusButtonBadge];
+        } @catch (NSException *exception) {
+            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        }
+        
+        // [CN] 添加仿淘宝tabbar，第一个tab选中后有图标覆盖
+        // [EN] Add a Taobao-style tabbar: after the first tab is selected, an icon covers it.
+        if (self.selectedIndex != 0) {
             return;
         }
+        // tabBarController.selectedIndex = 1;
         
-        if (!CYL_IS_IOS_26) {
-            [self customizeTabBarSelectionIndicatorImage];
-            //           [self updateSelectionIndicatorColor:[UIColor greenColor]];
-        }
-        
-        
-        // [CN] 延迟是为了演示demo的时候， 方便看清楚badge动画。 非必须。可删除延迟。
-        //@try是为了demo演示的时候， 随时调整减少 tabbar items 个数，而不导致崩溃， 非必须， 可删除。
-        // [EN] The delay is only so the badge animation is easy to see in the demo. Not required; the delay can be removed.
-        //      @try is only so the number of tabbar items can be reduced at any time in the demo without crashing. Not
-        //      required; it can be removed.
-        NSTimeInterval delaySeconds = 1.5;
-        dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
-        dispatch_after(when, dispatch_get_main_queue(), ^{
-            @try {
-                // #425: the shared badge style (offset, colors, font) is set once in SceneDelegate.m
-                // -setUpBadgeAppearance; each tab below sets only what differs from it.
-                // #425：共用的角标样式（偏移、颜色、字体）在 SceneDelegate.m -setUpBadgeAppearance 中统一设置一次，
-                // 下面每个 Tab 只设置与之不同的部分。
-                UIViewController *viewController0 = tabBarController.viewControllers[0];
-                // UIControl *tab0 = viewController0.cyl_tabButton;
-                // [tab0 cyl_showBadge];
-                [viewController0 cyl_setBadgeBackgroundColor:UIColor.cyl_randomColor];
-                [viewController0 cyl_setBadgeRadius:11/2];
-                [viewController0 cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeBreathe];
-                [self setSelectedCoverShow:YES];
-                // [CN] 以上对Badge的参数设置，需要在 cyl_showBadgeValue 调用之前执行。
-                // [EN] The Badge settings above must be applied before cyl_showBadgeValue is called.
-                //                [viewController0 cyl_showBadge];
-                
-                //                                [tabBarController.viewControllers[1] cyl_setBadgeMargin:1.0];
-                //                                [tabBarController.viewControllers[2] cyl_setBadgeMargin:1.0];
-                //                                [tabBarController.viewControllers[3] cyl_setBadgeMargin:1.0];
-                //                                [tabBarController.viewControllers[4] cyl_setBadgeMargin:1.0];
-                [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:UIColor.cyl_randomColor];
-                [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScale];
-                [tabBarController.viewControllers[2] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake];
-                
-                NSString *testBadgeString = @"100";
-                //                [tabBarController.viewControllers[3] cyl_setBadgeMargin:-5];
-                //                CGSize size = [testBadgeString sizeWithAttributes:
-                //                               @{NSFontAttributeName:
-                //                                     tabBarController.viewControllers[3].cyl_badgeFont}];
-                //                float labelHeight = ceilf(size.height);
-                //                [tabBarController.viewControllers[3] cyl_setBadgeCornerRadius:(labelHeight+ tabBarController.viewControllers[3].cyl_badgeMargin)/2];
-                [tabBarController.viewControllers[3] cyl_showBadgeValue:testBadgeString animationType:CYLBadgeAnimationTypeBounce];
-                if (tabBarController.viewControllers.count > 4) {
-                    // Differs from the global offset (SceneDelegate.m -setUpBadgeAppearance), so it is set here.
-                    // 与全局偏移（SceneDelegate.m -setUpBadgeAppearance）不同，因此单独设置。
-                    [tabBarController.viewControllers[4] cyl_setBadgeCenterOffset:CGPointMake(-1, 3)];
-                    [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
-                }
-                // #535: the plus button gets a badge too, like the tabs; each tap adds 1 (see -didSelectControl:).
-                // #535：PlusButton 也显示角标，与 Tab 一致；每次点击数字加 1（见 -didSelectControl:）。
-                [tabBarController cyl_demo_showPlusButtonBadge];
-            } @catch (NSException *exception) {
-                NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-            }
-            
-            // [CN] 添加仿淘宝tabbar，第一个tab选中后有图标覆盖
-            // [EN] Add a Taobao-style tabbar: after the first tab is selected, an icon covers it.
-            if (self.selectedIndex != 0) {
-                return;
-            }
-            // tabBarController.selectedIndex = 1;
-            
-        });
-    }];
+    });
 }
 
 

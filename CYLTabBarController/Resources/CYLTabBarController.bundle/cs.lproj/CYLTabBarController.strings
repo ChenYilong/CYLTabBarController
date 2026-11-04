@@ -156,6 +156,9 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Zobrazí animovaný GIF jako ikonu panelu; klepnutím znovu obnovíte";
 "批量更换标题" = "Změnit všechny názvy";
 "一次更新所有 Tab 的标题，再点恢复" = "Aktualizuje názvy všech panelů najednou; klepnutím znovu obnovíte";
+"替换相邻 Tab 的页面" = "Nahradit sousední karty";
+"把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复" = "Zobrazí jiné stránky v kartách po obou stranách této karty (issue #481); dalším klepnutím obnovíte";
+"替换页 %@" = "Náhradní stránka %@";
 "标题偏移（titlePositionAdjustment）" = "Posun titulku (titlePositionAdjustment)";
 "点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Klepnutím přepnete svislý posun titulků všech karet, aktuální: %@";
 "standardAppearance 主题（液态玻璃与扁平样式共用）" = "Motiv standardAppearance (sdílený pro Liquid Glass a FlatDesign)";

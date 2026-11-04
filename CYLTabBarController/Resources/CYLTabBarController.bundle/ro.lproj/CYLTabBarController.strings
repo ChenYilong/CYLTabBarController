@@ -156,6 +156,9 @@
 "当前页 Tab 显示 GIF 动图，再点恢复" = "Afișează un GIF animat ca pictogramă a filei; atinge din nou pentru a restabili";
 "批量更换标题" = "Schimbă toate titlurile";
 "一次更新所有 Tab 的标题，再点恢复" = "Actualizează titlurile tuturor filelor deodată; atinge din nou pentru a restabili";
+"替换相邻 Tab 的页面" = "Înlocuiește filele vecine";
+"把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复" = "Afișează alte pagini în filele de pe ambele părți (issue #481); atinge din nou pentru a restaura";
+"替换页 %@" = "Pagină înlocuitoare %@";
 "标题偏移（titlePositionAdjustment）" = "Decalajul titlului (titlePositionAdjustment)";
 "点击切换所有 Tab 标题的垂直偏移，当前：%@" = "Atingeți pentru a comuta decalajul vertical al titlurilor tuturor filelor, curent: %@";
 "standardAppearance 主题（液态玻璃与扁平样式共用）" = "Temă standardAppearance (comună pentru Liquid Glass și FlatDesign)";
