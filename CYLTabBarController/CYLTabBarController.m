@@ -6391,6 +6391,33 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     return NO;
 }
 
+/*!
+ * [EN] Whether `window` is the key window of its scene, and the scene is in the foreground and active. With several
+ *      scenes (iPad multiple windows) the app-wide `isKeyWindow` and `applicationState` say nothing about this scene, so
+ *      the scene's own `keyWindow` (iOS 15+) and `activationState` (iOS 13+) are used when available.
+ * [CN] `window` 是否是其 Scene 的 key window，且该 Scene 在前台并处于活跃状态。存在多个 Scene（iPad 多窗口）时，App 级别的
+ *      `isKeyWindow` 与 `applicationState` 不能说明本 Scene 的状态，因此在可用时使用 Scene 自己的 `keyWindow`（iOS 15+）与
+ *      `activationState`（iOS 13+）。
+ */
+static BOOL CYLTabBarMinimizeWindowIsKeyAndActive(UIWindow *window) {
+    if (!window) {
+        return NO;
+    }
+    if (@available(iOS 13.0, *)) {
+        UIWindowScene *windowScene = window.windowScene;
+        if (windowScene) {
+            if (UISceneActivationStateForegroundActive != windowScene.activationState) {
+                return NO;
+            }
+            if (@available(iOS 15.0, *)) {
+                return windowScene.keyWindow == window;
+            }
+            return window.isKeyWindow;
+        }
+    }
+    return window.isKeyWindow && UIApplicationStateActive == [UIApplication sharedApplication].applicationState;
+}
+
 /// [EN] Observes the scroll view of the page on screen and runs the path's action. See the section comment above.
 /// [CN] 观察当前显示页面的滚动视图，并执行对应路径的处理。见上方说明。
 @interface _CYLTabBarMinimizeScrollTracker : NSObject
@@ -6437,6 +6464,9 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     CYLTabBarMinimizeMode _sessionMode;
     /// [EN] YES while scroll hiding itself calls `-setTabBarHidden:animated:`. [CN] 滚动隐藏自己调用 `-setTabBarHidden:animated:` 期间为 YES。
     BOOL _settingTabBarHidden;
+    /// [EN] YES while the keyboard is on screen: typing is not reading, the bar never hides then.
+    /// [CN] 键盘显示期间为 YES：输入不是浏览，此时不隐藏 TabBar。
+    BOOL _keyboardVisible;
     /// [EN] Scroll hiding's own last request and when it was made: a FlatDesign animation may replay it shortly after.
     /// [CN] 滚动隐藏自己最近一次请求及时间：扁平样式的动画可能稍后重放它。
     BOOL _lastOwnRequestHidden;
@@ -6492,6 +6522,9 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
         UIApplicationDidReceiveMemoryWarningNotification,
         UIWindowDidBecomeKeyNotification,
         UIKeyboardWillShowNotification,
+        UIKeyboardWillHideNotification,
+        UIAccessibilityVoiceOverStatusDidChangeNotification,
+        UIAccessibilitySwitchControlStatusDidChangeNotification,
     ]];
     if (@available(iOS 13.0, *)) {
         [names addObjectsFromArray:@[
@@ -6514,6 +6547,15 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
 }
 
 - (void)restoreTabBarForNotification:(NSNotification *)notification {
+    // [EN] Keyboard: remember whether it is on screen; it going away is not an interruption.
+    // [CN] 键盘：记录是否显示；键盘收起不算打断。
+    if ([notification.name isEqualToString:UIKeyboardWillHideNotification]) {
+        _keyboardVisible = NO;
+        return;
+    }
+    if ([notification.name isEqualToString:UIKeyboardWillShowNotification]) {
+        _keyboardVisible = YES;
+    }
     UIWindow *window = self.tabBarController.viewIfLoaded.window;
     // Guard: this tab bar's own window becoming key is not an interruption. 本 TabBar 自己的窗口成为 key window 不算打断。
     if ([notification.name isEqualToString:UIWindowDidBecomeKeyNotification] && notification.object == window) {
@@ -6574,10 +6616,15 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
 - (BOOL)environmentAllowsHiding {
     CYLTabBarController *tabBarController = self.tabBarController;
     UIWindow *window = tabBarController.viewIfLoaded.window;
-    if (!window || !window.isKeyWindow) {
+    if (!CYLTabBarMinimizeWindowIsKeyAndActive(window)) {
         return NO;
     }
-    if (UIApplicationStateActive != [UIApplication sharedApplication].applicationState) {
+    // [EN] VoiceOver and Switch Control users move through the tabs: never take them away.
+    // [CN] VoiceOver 与切换控制的用户依靠 Tab 导航：不隐藏 TabBar。
+    if (UIAccessibilityIsVoiceOverRunning() || UIAccessibilityIsSwitchControlRunning()) {
+        return NO;
+    }
+    if (_keyboardVisible) {
         return NO;
     }
     // [EN] Presented by this controller or an ancestor, by the selected tab, or by the page on screen (a child that
@@ -6659,10 +6706,22 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
  *      （何时缩小由系统决定），其他情况恢复显示。
  */
 - (void)validateHideSession {
+    CYLTabBarController *tabBarController = self.tabBarController;
     // [EN] Shown again by the app or UIKit (FlatDesign, classic): not hidden by scrolling any more.
     // [CN] 已被 App 或 UIKit 重新显示（扁平样式、经典样式）：不再是滚动隐藏状态。
-    if (_hiddenByScroll && !self.tabBarController.isTabBarHidden) {
+    if (_hiddenByScroll && !tabBarController.isTabBarHidden) {
         _hiddenByScroll = NO;
+    }
+    // [EN] Classic: a pushed page with `hidesBottomBarWhenPushed` holds the bar; UIKit owns it there. End the session once
+    //      and wait (no restore on every check); the bar comes back with the page change on the way back.
+    // [CN] 经典样式：设置了 `hidesBottomBarWhenPushed` 的页面占用 TabBar，此时由 UIKit 控制。只结束一次会话并等待（不在每次检查时
+    //      重复恢复）；返回时随页面变化恢复显示。
+    if (CYLTabBarMinimizeModeClassic == _mode && _hiddenByScroll &&
+        CYLTabBarMinimizeClassicPageHidesTabBar(tabBarController.selectedViewController)) {
+        if (_hideSessionActive) {
+            [self endHideSession];
+        }
+        return;
     }
     if (![self isTabBarHiddenOrMinimizedByScroll]) {
         // [EN] Shown again (by scrolling up, the system, or the app): the session is over. [CN] 已重新显示：会话结束。

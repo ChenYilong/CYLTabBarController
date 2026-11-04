@@ -493,6 +493,8 @@ typedef NS_ENUM(NSInteger, CYLScrollHideSimulationRow) {
     CYLScrollHideSimulationRowScrollDownInCode,
     CYLScrollHideSimulationRowAppHidesTabBar,
     CYLScrollHideSimulationRowTurnOffAndOn,
+    CYLScrollHideSimulationRowVoiceOverStatus,
+    CYLScrollHideSimulationRowKeyboardWhileScrolling,
     CYLScrollHideSimulationRowCount,
 };
 
@@ -538,6 +540,10 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
             *expectsRestore = NO;
             return @"App: setTabBarHidden:YES for 4 s";
         case CYLScrollHideSimulationRowTurnOffAndOn: return @"cyl_hidesTabBarOnScroll = NO, then YES";
+        case CYLScrollHideSimulationRowVoiceOverStatus: return @"UIAccessibilityVoiceOverStatusDidChangeNotification";
+        case CYLScrollHideSimulationRowKeyboardWhileScrolling:
+            *expectsRestore = NO;
+            return @"Keyboard up for 4 s: scroll, the bar must not hide";
         case CYLScrollHideSimulationRowCount: break;
     }
     return @"-";
@@ -705,6 +711,20 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
             tabBarController.cyl_hidesTabBarOnScroll = NO;
             CYLScrollHideSimulationAfter(CYLScrollHideSimulationHold, ^{
                 tabBarController.cyl_hidesTabBarOnScroll = YES;
+            });
+            break;
+        }
+        case CYLScrollHideSimulationRowVoiceOverStatus: {
+            [center postNotificationName:UIAccessibilityVoiceOverStatusDidChangeNotification object:nil];
+            break;
+        }
+        case CYLScrollHideSimulationRowKeyboardWhileScrolling: {
+            UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(0, -100, 10, 10)];
+            [self.view addSubview:textField];
+            [textField becomeFirstResponder];
+            CYLScrollHideSimulationAfter(4, ^{
+                [textField resignFirstResponder];
+                [textField removeFromSuperview];
             });
             break;
         }
