@@ -36,6 +36,7 @@
 | [API](#api) | [API](#api) |
 | [Demo](#demo) | [Demo](#demo) |
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
+| [角标](#角标--badges) | [Badges](#角标--badges) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
 
 <!-- navigation:end -->
@@ -198,8 +199,17 @@ cache.downloadTimeout = 15;
 | 扁平样式：修改与恢复 / FlatDesign: changed and restored | ![FlatDesign changed](assets/update-tab-bar-items-flatdesign-changed.png) ![FlatDesign restored](assets/update-tab-bar-items-flatdesign-restored.png) |
 | PlusButton：标题、网络图片、本地图片、恢复 / Plus button: title, network image, local image, restored | ![Plus title](assets/update-tab-bar-items-plus-button-title.png) ![Plus network](assets/update-tab-bar-items-plus-button-network-icon.png) ![Plus local](assets/update-tab-bar-items-plus-button-local-icon.png) ![Plus restored](assets/update-tab-bar-items-plus-button-restored.png) |
 | `CYLTabBarItemImageURL`（Example-network-download）/ `CYLTabBarItemImageURL` (Example-network-download) | ![Image URL keys](assets/update-tab-bar-items-image-url-keys.png) |
+| 角标在 SF Symbol（模板）图标上保持自身颜色与文字 / Badges keep their colors and text on SF Symbol (template) icons | ![Badges on symbol icons](assets/update-tab-bar-items-badges-on-symbol-icons.png) |
+| 直接设置在 `tabBarItem` 上的角标，选中图层中同样显示 / A badge set on `tabBarItem` directly shows in the selected layer too | ![Badge in the selected layer](assets/update-tab-bar-items-tab-item-badge-selected-layer.png) |
 | 替换相邻 Tab 的页面（#481）与恢复 / Replace neighboring tabs (#481) and restored | ![Replaced](assets/update-tab-bar-items-replace-neighbors.png) ![Restored](assets/update-tab-bar-items-replace-neighbors-restored.png) |
 | 列表行换行显示（液态玻璃、扁平样式）/ Wrapped rows (Liquid Glass, FlatDesign) | ![Wrapped cells](assets/update-tab-bar-items-wrapped-cells.png) ![Wrapped cells FlatDesign](assets/update-tab-bar-items-wrapped-cells-flatdesign.png) |
+
+## 角标 / Badges
+
+| 中文 | English |
+|:---|:---|
+| 液态玻璃把模板图标（如 SF Symbol）连同其子视图一起用 Tab 着色绘制，放在图标中的角标会变成没有文字的黑色形状。现在这类图标的角标放在图标上方的透明浮层中，保持自身颜色与文字。 | Liquid Glass draws a template icon (e.g. an SF Symbol) with the tab's tint, subviews included, so a badge inside the icon became a black shape without its text. The badge of such an icon now sits on a transparent overlay above it, with its own colors and text. |
+| 直接在 `UITabBarItem` 上设置角标（`[viewController.tabBarItem cyl_showBadgeValue:…]`、`cyl_setBadgeBackgroundColor:` 等）与在 `UIViewController` 上设置相同：液态玻璃下同时作用于普通图层与选中图层的 Tab 按钮。以前样式 setter 只作用于普通图层。 | Badges set on the `UITabBarItem` directly (`[viewController.tabBarItem cyl_showBadgeValue:…]`, `cyl_setBadgeBackgroundColor:`, ...) now behave as those set on the `UIViewController`: with Liquid Glass they apply to the tab button of the normal layer and of the selected layer. The style setters used to reach the normal layer only. |
 
 ## 限制 / Limits
 

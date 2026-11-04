@@ -190,12 +190,42 @@ static char CYLBadgeHostOverlayTokenKey;
 
 @end
 
-/// The view the badge of `host` is added to: `host` itself, or an overlay above it when `host` clips or is hidden for
-/// the view shown in its place (#601). 承载 `host` 角标的视图：`host` 本身，或在 `host` 会裁剪、或被替换显示而隐藏时（#601）位于其上方的浮层。
+/*!
+ * FIX: issue #481
+ * [EN] Whether `host` draws its image as a template: an image view whose image is `AlwaysTemplate`, or `Automatic` in a
+ *      tab button, where it is drawn as a template (e.g. an SF Symbol). Liquid Glass draws such an icon, subviews
+ *      included, as a mask filled with the tab's tint, so a badge inside it showed as a black shape without its text.
+ * [CN] `host` 是否把图片当作模板绘制：图片为 `AlwaysTemplate` 的图片视图，或位于 Tab 按钮中、图片为 `Automatic`（如 SF Symbol，按模板
+ *      绘制）的图片视图。液态玻璃把这类图标（包括其子视图）绘制为用 Tab 着色填充的蒙版，所以放在其中的角标显示为没有文字的黑色形状。
+ */
+static BOOL CYLBadgeHostDrawsAsTemplate(UIView *host) {
+    if (![host isKindOfClass:[UIImageView class]]) {
+        return NO;
+    }
+    UIImage *image = ((UIImageView *)host).image;
+    if (!image || image.renderingMode == UIImageRenderingModeAlwaysOriginal) {
+        return NO;
+    }
+    if (image.renderingMode == UIImageRenderingModeAlwaysTemplate) {
+        return YES;
+    }
+    for (UIView *view = host.superview; view && ![view isKindOfClass:[UIWindow class]]; view = view.superview) {
+        NSString *className = NSStringFromClass(view.class);
+        if ([className containsString:@"TabButton"] || [className containsString:@"TabBarButton"]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// [EN] The view the badge of `host` is added to: `host` itself, or an overlay above it when `host` clips, draws its
+///      image as a template (#481), or is hidden for the view shown in its place (#601).
+/// [CN] 承载 `host` 角标的视图：`host` 本身，或在 `host` 会裁剪、按模板绘制图片（#481）、或被替换显示而隐藏时（#601）位于其上方的浮层。
 static UIView *CYLBadgeContainerForHost(UIView *host) {
     CYLBadgeHostOverlayToken *token = objc_getAssociatedObject(host, &CYLBadgeHostOverlayTokenKey);
     BOOL hostClips = host.clipsToBounds || host.layer.masksToBounds || host.layer.mask != nil;
-    if ((!hostClips && !host.cyl_isBadgeHostReplacedByIconView) || !host.superview) {
+    BOOL needsOverlay = hostClips || host.cyl_isBadgeHostReplacedByIconView || CYLBadgeHostDrawsAsTemplate(host);
+    if (!needsOverlay || !host.superview) {
         if (token.overlay) {
             [token.overlay cyl_detach];
             [token.overlay removeFromSuperview];

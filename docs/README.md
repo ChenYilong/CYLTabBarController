@@ -66,6 +66,7 @@ docs/
     ├── update-tab-bar-items-all-local-icons.png
     ├── update-tab-bar-items-all-network-icons-badges.png
     ├── update-tab-bar-items-all-network-icons-restored.png
+    ├── update-tab-bar-items-badges-on-symbol-icons.png
     ├── update-tab-bar-items-change-all-titles.png
     ├── update-tab-bar-items-change-tab-title.png
     ├── update-tab-bar-items-download-network-icon.png
@@ -80,6 +81,7 @@ docs/
     ├── update-tab-bar-items-replace-neighbors-restored.png
     ├── update-tab-bar-items-replace-neighbors.png
     ├── update-tab-bar-items-switch-tab-icon.png
+    ├── update-tab-bar-items-tab-item-badge-selected-layer.png
     ├── update-tab-bar-items-wrapped-cells-flatdesign.png
     └── update-tab-bar-items-wrapped-cells.png
 ```

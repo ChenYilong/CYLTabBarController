@@ -645,8 +645,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
             //                                [tabBarController.viewControllers[2] cyl_setBadgeMargin:1.0];
             //                                [tabBarController.viewControllers[3] cyl_setBadgeMargin:1.0];
             //                                [tabBarController.viewControllers[4] cyl_setBadgeMargin:1.0];
-            [tabBarController.viewControllers[1] cyl_setBadgeBackgroundColor:UIColor.cyl_randomColor];
-            [tabBarController.viewControllers[1] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeScale];
+            // [EN] Issue #481: directly on the tab item; with Liquid Glass both layers get the badge and its color.
+            // [CN] Issue #481：直接设置在 TabBarItem 上；液态玻璃下两个图层都会显示该角标及其颜色。
+            [tabBarController.viewControllers[1].tabBarItem cyl_setBadgeBackgroundColor:UIColor.systemPurpleColor];
+            [tabBarController.viewControllers[1].tabBarItem cyl_showBadgeValue:@"8" animationType:CYLBadgeAnimationTypeScale];
             [tabBarController.viewControllers[2] cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake];
             
             NSString *testBadgeString = @"100";
