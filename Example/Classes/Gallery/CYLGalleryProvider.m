@@ -787,6 +787,14 @@ static UIViewController *CYLGalleryEmbed(CYLTabBarController *tabBarController) 
     return [[CYLGalleryNavigationController alloc] initWithRootViewController:tabBarController];
 }
 
+/// [EN] iOS 26+ draws Liquid Glass by default; FlatDesign shows the full-width tab bar of the earlier systems. [CN] iOS 26+ 默认液态玻璃；扁平样式显示以前系统的全宽 TabBar。
+static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
+    if (@available(iOS 26.0, *)) {
+        return CYLTabBarStyleTypeFlatDesign;
+    }
+    return CYLTabBarStyleTypeDefault;
+}
+
 /// [EN] The look of the background scenes, image-only, the middle tab highlighted and larger. [CN] 背景色场景的外观：纯图标，中间 Tab 突出且更大。
 static CYLTabBarController *CYLGalleryBackgroundTabBarController(void) {
     NSArray<NSDictionary *> *attributes = CYLGalleryAttributes(5, NO, 22, ^NSDictionary *(NSUInteger index) {
@@ -844,14 +852,6 @@ static NSDictionary *CYLGalleryRedTabAttributes(void) {
               CYLTabBarItemSelectedTitleColor : red,
               CYLTabBarItemIconColor : gray,
               CYLTabBarItemSelectedIconColor : red };
-}
-
-/// [EN] iOS 26+ draws Liquid Glass by default; FlatDesign shows the full-width tab bar of the earlier systems. [CN] iOS 26+ 默认液态玻璃；扁平样式显示以前系统的全宽 TabBar。
-static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
-    if (@available(iOS 26.0, *)) {
-        return CYLTabBarStyleTypeFlatDesign;
-    }
-    return CYLTabBarStyleTypeDefault;
 }
 
 #pragma mark - Provider
