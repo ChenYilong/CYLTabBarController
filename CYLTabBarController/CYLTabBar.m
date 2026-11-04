@@ -20,9 +20,10 @@ static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext;
 
 
-// Implemented in CYLTabBarController.m, issue #610.
+// Implemented in CYLTabBarController.m, issue #610 (and #22 for the pending blocks).
 @interface CYLTabBarController (CYLTabControlActions)
 - (void)cyl_bindTabControlActions;
+- (void)cyl_runPendingReloadBadgesBlocksIfReady;
 @end
 
 // [EN] FIX: issue #152 / #535 — implemented in CYLTabBarController+CYLInteraction.m.
@@ -297,6 +298,12 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
     // 修改 item 图片后 UIKit 会重建 Tab 按钮且只重新布局 TabBar，所以这里也要为新按钮添加点击事件。放在上面的布局之后，
     // 因为布局时才会设置新按钮的 visible index（用于识别加号子控制器对应的按钮）。
     [self.tabBarController cyl_bindTabControlActions];
+    // FIX: issue #22
+    // [EN] UIKit fills `items` during this layout, after the controller's `-viewDidLayoutSubviews`: run the blocks of
+    //      `-performWhenTabBarItemsReady:` / `-reloadBadgesWithBlock:` now that they exist.
+    // [CN] UIKit 在本次布局中（晚于控制器的 `-viewDidLayoutSubviews`）生成 `items`：此时执行
+    //      `-performWhenTabBarItemsReady:` / `-reloadBadgesWithBlock:` 的 block。
+    [self.tabBarController cyl_runPendingReloadBadgesBlocksIfReady];
     // The tab titles may have moved: lay the plus button out again so its title follows them
     // (`+alignsTitleWithTabBarItemTitles`).
     [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];

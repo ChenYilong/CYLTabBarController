@@ -39,7 +39,9 @@
         
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        // [EN] CYLUtils does not depend on CYLLocalization (Core): a literal format.
+        // [CN] CYLUtils 不依赖 Core 中的 CYLLocalization：使用字面量格式。
+        NSLog(@"🔴 %@ (line %@): %@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
     

@@ -19,7 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
  *      row 6 selects the next tab by its index without the plus button (`cyl_selectedIndexIgnoringPlusButton`, issue #515),
  *      row 7 switches the tap animation of the tabs, row 8 turns on the long press of the tabs, row 9 turns on swiping
  *      to switch tabs, row 10 shows a subview that responds outside its superview, row 11 loads an image from a bundle,
- *      row 12 hides the navigation bar without a base class, row 13 opens the slide transition demo (issue #535).
+ *      row 12 hides the navigation bar without a base class, row 13 opens the slide transition demo (issue #535),
+ *      then the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon,
+ *      all network icons, all local icons, GIF icon, all titles, replace neighboring tabs.
  * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
  *      （`-cyl_memoryWarningCellForTableView:`），第 2 行切换所有 Tab 的标题偏移（`CYLTabBarController.titlePositionAdjustment`，
  *      issue #475），第 3 行切换 `tabBar.standardAppearance` 主题（液态玻璃与扁平样式共用），
@@ -27,7 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
  *      第 5 行显示 PlusButton 的可点击区域，并用滑块按倍数扩大（issue #91），
  *      第 6 行按不含 PlusButton 的下标选中下一个 Tab（`cyl_selectedIndexIgnoringPlusButton`，issue #515），
  *      第 7 行切换 Tab 的点击动画，第 8 行开启 Tab 长按，第 9 行开启左右滑动切换 Tab，第 10 行演示超出父视图的子视图响应点击，
- *      第 11 行从 bundle 加载图片，第 12 行不继承基类隐藏导航栏，第 13 行打开滑动转场演示（issue #535）。
+ *      第 11 行从 bundle 加载图片，第 12 行不继承基类隐藏导航栏，第 13 行打开滑动转场演示（issue #535），
+ *      之后是原地更新 Tab 的若干行
+ *      （`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、所有网络图标、所有本地图标、GIF 图标、所有标题、替换相邻 Tab 的页面。
  */
 FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 
@@ -55,8 +59,9 @@ FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 - (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath;
 
 /*!
- * [EN] Deselects the row and runs it: the language picker, the memory warning check, the next title offset, the next appearance theme or the login state.
- * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题或登录状态。
+ * [EN] Deselects the row and runs it: the language picker, the memory warning check, the next title offset, the next
+ *      appearance theme, the login state or the tab item update.
+ * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题、登录状态或更新 Tab。
  */
 - (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
 

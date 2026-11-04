@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
     UIWindowScene *windowScene = (UIWindowScene *)scene;
     self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
     self.window.frame = windowScene.coordinateSpace.bounds;
-    self.window.backgroundColor = [UIColor whiteColor];
+    self.window.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
     [self setUpBadgeAppearance];
     
     // Rebuilt after a language change (the language row in every list), so every text shows in the new language.

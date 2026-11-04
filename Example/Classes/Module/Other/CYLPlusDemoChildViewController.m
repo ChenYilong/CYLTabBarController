@@ -7,6 +7,7 @@
 //
 
 #import "CYLPlusDemoChildViewController.h"
+#import "CYLTabBarController.h"
 
 @interface CYLPlusDemoChildViewController ()
 

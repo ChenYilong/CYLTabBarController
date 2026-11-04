@@ -192,6 +192,59 @@ static UIColor *CYLBadgeHelperDynamicBorderColor(void) {
     return items[(NSUInteger)MAX(row, 0) % items.count];
 }
 
+/// [EN] Whether `color` is one of the fixed default text colors (black or gray), which do not adapt to Dark Mode.
+/// [CN] `color` 是否为固定的默认文字颜色（黑色或灰色），这些颜色不会适配深色模式。
+static BOOL CYLIsFixedDefaultTextColor(UIColor *color) {
+    if (!color) {
+        return YES;
+    }
+    for (UIColor *fixed in @[ UIColor.blackColor, UIColor.grayColor, UIColor.darkGrayColor, UIColor.lightGrayColor, UIColor.darkTextColor ]) {
+        if ([color isEqual:fixed]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// [EN] Subtitles: `secondaryLabelColor` in light mode; a brighter gray in Dark Mode, where `secondaryLabelColor` (60 %
+///      white) is hard to read on black. [CN] 副标题：浅色模式为 `secondaryLabelColor`；深色模式为更亮的灰色，`secondaryLabelColor`
+///      （60% 白色）在黑色背景上不易辨认。
+static UIColor *CYLDemoSubtitleColor(void) API_AVAILABLE(ios(13.0)) {
+    return [UIColor colorWithDynamicProvider:^UIColor *(UITraitCollection *traitCollection) {
+        return traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor colorWithWhite:0.80 alpha:1] : UIColor.secondaryLabelColor;
+    }];
+}
+
+- (void)cyl_wrapsTextLabels {
+    for (UILabel *label in @[ self.textLabel ?: [UILabel new], self.detailTextLabel ?: [UILabel new] ]) {
+        label.numberOfLines = 0;
+        label.lineBreakMode = NSLineBreakByWordWrapping;
+    }
+    // [EN] Dark Mode and contrast: fixed black or gray text becomes the semantic label colors (a custom color is kept),
+    //      the title a semibold 16 pt and the subtitle 14 pt, both following Dynamic Type.
+    // [CN] 深色模式与对比度：固定的黑色或灰色文字改为语义化的标签颜色（自定义颜色保留），标题为 16 pt 半粗体、副标题为 14 pt，
+    //      均跟随动态字体。
+    if (@available(iOS 13.0, *)) {
+        if (CYLIsFixedDefaultTextColor(self.textLabel.textColor)) {
+            self.textLabel.textColor = UIColor.labelColor;
+        }
+        if (CYLIsFixedDefaultTextColor(self.detailTextLabel.textColor) || [self.detailTextLabel.textColor isEqual:UIColor.secondaryLabelColor]) {
+            self.detailTextLabel.textColor = CYLDemoSubtitleColor();
+        }
+    }
+    UIFontMetrics *titleMetrics = [UIFontMetrics metricsForTextStyle:UIFontTextStyleSubheadline];
+    UIFontMetrics *detailMetrics = [UIFontMetrics metricsForTextStyle:UIFontTextStyleFootnote];
+    self.textLabel.font = [titleMetrics scaledFontForFont:[UIFont systemFontOfSize:16 weight:UIFontWeightSemibold]];
+    self.detailTextLabel.font = [detailMetrics scaledFontForFont:[UIFont systemFontOfSize:14]];
+    self.textLabel.adjustsFontForContentSizeCategory = YES;
+    self.detailTextLabel.adjustsFontForContentSizeCategory = YES;
+}
+
++ (void)cyl_setUpAutomaticRowHeightForTableView:(UITableView *)tableView {
+    tableView.rowHeight = UITableViewAutomaticDimension;
+    tableView.estimatedRowHeight = CYLBadgeRowHeight;
+}
+
 + (NSString *)cyl_badgeTitleForRow:(NSInteger)row {
     NSDictionary *item = [self cyl_badgeItemForRow:row];
     NSString *title = item[CYLBadgeItemTitle];
@@ -293,7 +346,7 @@ static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationItem.title = CYLLocalizedString(@"Badge");
-    self.tableView.rowHeight = CYLBadgeRowHeight;
+    [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CYLBadgeHelperCellIdentifier];
 }
 
@@ -311,7 +364,7 @@ static NSString *const CYLBadgeHelperCellIdentifier = @"CYLBadgeHelperCell";
     }
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLBadgeHelperCellIdentifier forIndexPath:indexPath];
     cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
-    cell.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
+    [cell cyl_wrapsTextLabels];
     [cell cyl_showBadgeForRow:indexPath.row];
     return cell;
 }
