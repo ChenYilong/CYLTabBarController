@@ -202,9 +202,45 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Vis en TabBarController med ny kontekst (PlusButton med en X-delvisning som kan trykkes på, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Trykk på X øverst til høyre på PlusButton: X får en tilfeldig farge, og PlusButton reagerer ikke";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Oppdater";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex og PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Trykk for å velge neste fane. Indeks uten PlusButton: %1$@, selectedIndex: %2$@, nå: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Forstørr og forminsk";
+"从小放大" = "Zoom inn";
+"弹性" = "Sprett";
+"弹性 + 烟花" = "Sprett + fyrverkeri";
+"旋转" = "Roter";
+"翻转" = "Snu";
+"飘散" = "Forsvinn";
+"无" = "Ingen";
+"Tab 点击动画（issue #535）" = "Trykkanimasjon for faner (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Trykk for å bytte trykkanimasjon for fanene og PlusButton. Nå: %@";
+"长按了「%@」" = "Holdt inne «%@»";
+"左右滑动切换 Tab（issue #535）" = "Sveip for å bytte fane (issue #535)";
+"长按 Tab（issue #535）" = "Hold inne faner (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Slå på bryteren, og sveip til venstre eller høyre på siden for å gå til neste eller forrige fane.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Slå på bryteren, og hold inne en fane eller PlusButton for å se identifikatoren.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Roter (bare denne fanen: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Bilder + fyrverkeri (alle faner: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Reager utenfor overvisningen (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Med bryteren på reagerer også delen av knappen utenfor den grå boksen; hvert trykk spiller av skaleringsanimasjonen. Trykk: %@";
+"已找到" = "Funnet";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Ikke funnet (med use_frameworks ligger ressurspakken i frameworket)";
+"从 bundle 加载图片（issue #535）" = "Last inn bilder fra en bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Bildet til venstre leses fra ressurspakken med CYLImageInBundle (uten hurtigbuffer). CYLBundleImage i hovedbundelen: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Dette er en vanlig UIViewController som ikke arver fra CYLBaseViewController. Navigasjonslinjen er skjult.";
+"不继承基类隐藏导航栏（issue #535）" = "Skjul navigasjonslinjen uten basisklasse (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Bryteren setter cyl_automaticNavigationSettingEnabled; trykk på raden for å åpne en vanlig UIViewController som setter cyl_navigationBarHidden og cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Side %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Glidende overgang (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Trykk for å åpne en UITabBarController fra systemet: trykk på en fane eller dra siden til venstre eller høyre, så glir siden med fingeren.";
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "Minimer / skjul TabBar ved rulling (issue #13)";
@@ -228,3 +264,25 @@
 "配置文件：模拟意外情况" = "Konfigurasjon: simulerte feil";
 "已安全创建 TabBarController：%@ 个 Tab" = "TabBarController opprettet trygt: %@ faner";
 "查看" = "Vis";
+"默认点击声" = "Standardklikk";
+"中等触感反馈" = "Middels haptisk tilbakemelding";
+"无需继承基类与工具方法" = "Uten basisklasse, og verktøy";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Forrige / neste fane (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Svak referanse: funnet i live %@, nil etter frigjøring %@. Fra %@ til den valgte fanens knapp: %@";
+"点击声 + 触感反馈" = "Klikk + haptikk";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Sprett + stjernefyrverkeri (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Trykk på pilene til høyre for å kalle cyl_switchToAdjacentTabWithStep:-1 / 1. Som en sveip hopper den over PlusButton og sjekker innlogging. Siste resultat: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Trykk for å bytte, og trykk deretter på en fane eller PlusButton for å høre det. Haptikk vibrerer bare på en ekte enhet. Nå: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Trykk for å kjøre: cyl_setWeakAssociatedObject:forKey: returnerer nil når objektet er frigjort; cyl_nearestControlBelowView: finner den valgte fanens knapp fra symbolet.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Trykk for å bytte. cyl_tabBarItemLongPressDuration: %@ s, cyl_tabButtonLongPressMinimumDuration: %@ s, cyl_tabBarItemDoubleTapInterval: %@ s";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Egen lydfil (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Rull opp, ingen fravalgsanimasjon (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Sakte forstørr og forminsk (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Sakte zoom inn (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: svake tilknyttede objekter og å finne en knapp (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Varighet for langt trykk og intervall for dobbelttrykk (issue #535 / #152)";
+"Tab 交互" = "Faneinteraksjoner";
+"Tab 点击声音与触感反馈（issue #535）" = "Fanetrykklyd og haptikk (issue #535)";
+"轻触感反馈" = "Lett haptikk";
+"重触感反馈" = "Kraftig haptikk";
+"长按（#152）" = "Langt trykk (#152)";

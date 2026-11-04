@@ -47,4 +47,5 @@ message CYLTabBarItem {
   map<string, string> CYLTabBarLottieDarkColors = 18;
   string CYLTabBarItemViewControllerClass = 19;
   string CYLTabBarItemNavigationControllerClass = 20;
+  string CYLTabBarItemSelectedTitle = 21;
 }

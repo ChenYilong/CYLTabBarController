@@ -2044,6 +2044,7 @@ static NSDictionary<NSString *, NSDictionary<NSNumber *, NSArray<NSString *> *> 
                 @18 : @[ @"CYLTabBarLottieDarkColors", @"map" ],
                 @19 : @[ @"CYLTabBarItemViewControllerClass", @"string" ],
                 @20 : @[ @"CYLTabBarItemNavigationControllerClass", @"string" ],
+                @21 : @[ @"CYLTabBarItemSelectedTitle", @"string" ],
             },
             @"CYLMapEntry" : @{
                 @1 : @[ @"key", @"string" ],

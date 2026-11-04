@@ -5,6 +5,7 @@
   "CYLTabBarControllerTabBarItemsAttributes": [
     {
       "CYLTabBarItemTitle": "首页",
+      "CYLTabBarItemSelectedTitle": "刷新",
       "CYLTabBarItemIdentifier": "home",
       "CYLTabBarItemImage": "home_normal",
       "CYLTabBarItemSelectedImage": "home_highlight",

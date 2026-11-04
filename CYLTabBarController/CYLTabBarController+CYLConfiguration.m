@@ -374,7 +374,7 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
-    return @[ CYLTabBarItemTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage,
+    return @[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage,
               CYLTabBarItemSelectedDarkImage, CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize,
               CYLTabBarItemImageInsets, CYLTabBarItemTitlePositionAdjustment, CYLTabBarItemImagePositionAdjustment,
               CYLTabBarLottieFilePath, CYLTabBarLottieURL, CYLTabBarLottieSize, CYLTabBarItemIdentifier, CYLTabBarLottieDarkURL,
@@ -488,7 +488,7 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
         }
         item[key] = value;
     }
-    for (NSString *key in @[ CYLTabBarItemTitle, CYLTabBarItemIdentifier, CYLTabBarItemViewControllerClass, CYLTabBarItemNavigationControllerClass ]) {
+    for (NSString *key in @[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemIdentifier, CYLTabBarItemViewControllerClass, CYLTabBarItemNavigationControllerClass ]) {
         if (item[key] && !CYLStringValue(item[key])) {
             CYLLogInvalidConfigurationValue(key, item[key]);
         }

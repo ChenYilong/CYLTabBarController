@@ -39,7 +39,7 @@ ITEM_KEYS = [
     'CYLTabBarItemImageURLSize', 'CYLTabBarItemImageInsets', 'CYLTabBarItemTitlePositionAdjustment',
     'CYLTabBarItemImagePositionAdjustment', 'CYLTabBarLottieFilePath', 'CYLTabBarLottieURL', 'CYLTabBarLottieSize',
     'CYLTabBarItemIdentifier', 'CYLTabBarLottieDarkURL', 'CYLTabBarLottieDarkFilePath', 'CYLTabBarLottieDarkColors',
-    'CYLTabBarItemViewControllerClass', 'CYLTabBarItemNavigationControllerClass',
+    'CYLTabBarItemViewControllerClass', 'CYLTabBarItemNavigationControllerClass', 'CYLTabBarItemSelectedTitle',
 ]
 ITEMS_KEY = 'CYLTabBarControllerTabBarItemsAttributes'
 TOP_KEYS = ['CYLTabBarControllerContext', 'CYLTabBarControllerStyleType', 'CYLTabBarControllerImageInsets',
@@ -52,7 +52,7 @@ PROTO_TOP = {ITEMS_KEY: 1, 'CYLTabBarControllerImageInsets': 2, 'CYLTabBarContro
              'CYLTabBarControllerNavigationControllerClass': 6}
 PROTO_ITEM = {key: number for number, key in enumerate(ITEM_KEYS[:17], 1)}
 PROTO_ITEM.update({'CYLTabBarLottieDarkColors': 18, 'CYLTabBarItemViewControllerClass': 19,
-                   'CYLTabBarItemNavigationControllerClass': 20})
+                   'CYLTabBarItemNavigationControllerClass': 20, 'CYLTabBarItemSelectedTitle': 21})
 FORMATS = ['json', 'json5', 'plist', 'binary.plist', 'yaml', 'toml', 'ini', 'properties', 'env', 'xml', 'textproto',
            'binpb']
 
