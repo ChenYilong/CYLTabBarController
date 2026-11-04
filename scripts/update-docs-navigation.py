@@ -452,7 +452,10 @@ def bind(doc_texts):
         new_docs[name] = "\n".join(apply_binding_block(lines, binding_rows(classes, headers, name)))
         chinese, english = doc_title(os.path.join(DOCS, name))
         for class_name in classes:
-            by_header.setdefault(headers[class_name], []).append((name, chinese, english))
+            entries = by_header.setdefault(headers[class_name], [])
+            # A document binding several classes of the same header is listed once.
+            if (name, chinese, english) not in entries:
+                entries.append((name, chinese, english))
     # Every header that has, or should have, a binding block.
     targets = set(by_header) | {path for path, text in sources if HEADER_START in text}
     header_results = {}

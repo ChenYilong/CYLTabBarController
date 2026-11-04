@@ -14,6 +14,7 @@
 #import "CYLPlusButtonSubclass.h"
 #import "MainTabBarController.h"
 #import "CYLMainRootViewController.h"
+#import "CYLGalleryViewController.h"
 #import <MJRefresh/MJRefresh.h>
 
 @interface CYLHomeViewController ()
@@ -138,6 +139,15 @@
     if (indexPath.section < [self cyl_demoSectionCount]) {
         return [self cyl_demoCellForTableView:tableView indexPath:indexPath];
     }
+    if ([self isGallerySection:indexPath.section]) {
+        UITableViewCell *galleryCell = [tableView dequeueReusableCellWithIdentifier:@"GalleryCell"] ?:
+            [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"GalleryCell"];
+        galleryCell.textLabel.text = @"Open the tab bar gallery";
+        galleryCell.detailTextLabel.text = @"Every scene is a tab bar built with the public API: styles, animations, reminders, Lottie and the newer tab APIs";
+        [galleryCell cyl_wrapsTextLabels];
+        galleryCell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        return galleryCell;
+    }
     static NSString * CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
@@ -164,16 +174,28 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     // [EN] The grouped demo sections (shared with the FlatDesign page), then this page's rows.
     // [CN] 分组的演示 section（与扁平样式页面共用），然后是本页面的行。
-    return [self cyl_demoSectionCount] + 1;
+    return [self cyl_demoSectionCount] + 2;
+}
+
+/// [EN] The section right after the shared demo sections opens the tab bar gallery (docs/Tab-Bar-Gallery.md).
+/// [CN] 共用演示 section 之后的一组用于打开 TabBar 图库（docs/Tab-Bar-Gallery.md）。
+- (BOOL)isGallerySection:(NSInteger)section {
+    return section == [self cyl_demoSectionCount];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if ([self isGallerySection:section]) {
+        return @"Tab Bar Gallery";
+    }
     return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLLocalizedString(@"角标");
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (section < [self cyl_demoSectionCount]) {
         return [self cyl_demoRowCountInSection:section];
+    }
+    if ([self isGallerySection:section]) {
+        return 1;
     }
     return MAX(30, [UITableViewCell cyl_badgeStyleCount]); // every badge style has a row
 }
@@ -184,6 +206,10 @@
         return;
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    if ([self isGallerySection:indexPath.section]) {
+        [self.navigationController pushViewController:[[CYLGalleryViewController alloc] init] animated:YES];
+        return;
+    }
     NSNumber *badgeNumber = @(indexPath.row);
     self.navigationItem.title = [NSString stringWithFormat:CYLLocalizedString(@"首页(%@)"), badgeNumber]; //sets navigation bar title.
     
