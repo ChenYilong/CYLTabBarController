@@ -2994,7 +2994,9 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 
         NSValue *appliedInsets = record[CYLImageOnlyTabAppliedInsetsKey];
         BOOL insetsAreOurs = appliedInsets && UIEdgeInsetsEqualToEdgeInsets(item.imageInsets, appliedInsets.UIEdgeInsetsValue);
-        BOOL insetsAreFree = !record && UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, item.imageInsets);
+        // Each value is judged by its own entry: `-updateImageInsets:` forgets the insets entry but keeps the title one.
+        // 每个值按各自的记录判断：`-updateImageInsets:` 会清除内边距记录，但保留标题记录。
+        BOOL insetsAreFree = !appliedInsets && UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, item.imageInsets);
         if (insetsAreOurs || insetsAreFree) {
             if (!UIEdgeInsetsEqualToEdgeInsets(item.imageInsets, imageInset)) {
                 item.imageInsets = imageInset;
@@ -3011,7 +3013,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
                                    (objc_getAssociatedObject(item, &CYLTitlePositionAdjustmentSetByCYLKey) != nil);
         NSValue *appliedTitle = record[CYLImageOnlyTabAppliedTitleKey];
         BOOL titleIsOurs = appliedTitle && UIOffsetEqualToOffset(item.titlePositionAdjustment, appliedTitle.UIOffsetValue);
-        BOOL titleIsFree = !record && !titleOffsetSetByCYL && UIOffsetEqualToOffset(UIOffsetZero, item.titlePositionAdjustment);
+        BOOL titleIsFree = !appliedTitle && !titleOffsetSetByCYL && UIOffsetEqualToOffset(UIOffsetZero, item.titlePositionAdjustment);
         if (!shouldCustomizeTitlePositionAdjustment && (titleIsOurs || titleIsFree)) {
             if (!UIOffsetEqualToOffset(item.titlePositionAdjustment, hiddenTitleOffset)) {
                 item.titlePositionAdjustment = hiddenTitleOffset;
