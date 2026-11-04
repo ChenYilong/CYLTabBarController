@@ -179,3 +179,7 @@
 "子控件" = "มุมมองย่อย";
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "พุช TabBarController ที่มีบริบทใหม่ (PlusButton ที่มีมุมมองย่อย X ซึ่งแตะได้, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "แตะ X ที่มุมขวาบนของ PlusButton: X เปลี่ยนเป็นสีสุ่ม และ PlusButton ไม่ตอบสนอง";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex และ PlusButton (issue #515)";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "แตะเพื่อเลือกแท็บถัดไป ดัชนีที่ไม่นับ PlusButton: %1$@, selectedIndex: %2$@, ขณะนี้: %3$@";

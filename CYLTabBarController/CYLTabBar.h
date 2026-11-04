@@ -15,6 +15,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Subview-Touches.md
 //   - PlusButton touchable area: grow it, scale it, and see it / PlusButton 点击范围：扩大、按倍数放大与调试显示
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Touchable-Area.md
+//   - selectedIndex and the PlusButton: the selected title and image match / selectedIndex 与 PlusButton：选中的文字与图片一致
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SelectedIndex-PlusButton.md
 //   - The tab bar's hitTest falls back to super instead of returning nil / TabBar 的 hitTest 不再返回 nil，交给 super 处理
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-HitTest-Super-Fallback.md
 // docs-binding:end
@@ -82,6 +84,17 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
  * [CN] 返回 PlusButton 在 TabBar 中的索引。注意：调用时会顺带重新设置 PlusButton 的位置。
  */
 - (NSUInteger)plusButtonIndex;
+
+/*!
+ * [EN] Lays the tab buttons out again, as a tap on a tab does, on the next run loop and once more 0.5 s later; calls
+ *      made in the meantime are merged. Liquid Glass may keep the previous layout of the tab buttons, with the plus
+ *      button off its title, after a tab item's title changes or after the iOS 27.1 vertical bar. Both cases call it;
+ *      call it yourself after other changes to the tab items that the tab bar doesn't see.
+ * [CN] 像点击 Tab 一样重新布局 Tab 按钮：下一个 run loop 执行一次，0.5 秒后再执行一次；期间的多次调用会合并。TabBarItem 标题改变后，
+ *      或离开 iOS 27.1 竖向栏后，液态玻璃可能保持 Tab 按钮原来的布局，PlusButton 偏离自己的标题。这两种情况会自动调用；TabBar
+ *      无法感知的其他 TabBarItem 改动后，可手动调用。
+ */
+- (void)cyl_reloadTabButtons;
 
 /*!
  * [EN] Returns YES if the registered plus button's context matches this tab bar's context.

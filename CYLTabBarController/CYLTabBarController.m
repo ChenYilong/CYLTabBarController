@@ -1633,8 +1633,25 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         }
     
         NSInteger plusButtonIndex = (index != NSNotFound) ? [self.cyl_tabBar cyl_plusButtonIndex] : arrayWithoutPlusButton.count / 2;
+        // FIX: issue #515
+        // [EN] Classic style: the plus button is drawn at `+indexOfPlusButtonInTabBar`, and the tab button at that position
+        //      is the one laid out under it (`-[CYLTabBar layoutSubviews]`). Inserting the plus child view controller in
+        //      the middle instead shifted every tab between the two positions by one: after `-setSelectedIndex:` the
+        //      title of the right tab was selected but the image of its neighbour. Use the plus button's own position.
+        //      Liquid Glass keeps the middle: there the plus button covers the middle tab item.
+        // [CN] 经典样式：PlusButton 绘制在 `+indexOfPlusButtonInTabBar` 的位置，该位置的 Tab 按钮位于它下方（`-[CYLTabBar layoutSubviews]`）。
+        //      以前固定把 PlusButton 子控制器插在中间，两个位置之间的 Tab 都错位一个：调用 `-setSelectedIndex:` 后，选中的是正确 Tab
+        //      的文字，图片却是相邻 Tab 的。这里使用 PlusButton 自己的位置。液态玻璃仍使用中间位置：PlusButton 覆盖中间的 TabBarItem。
+        if (![CYLConstants isLiquidGlassActive]) {
+            CYLPlusButton<CYLPlusButtonSubclassing> *contextPlusButton = [self cyl_contextPlusButton];
+            NSUInteger customIndex = contextPlusButton ? [[contextPlusButton class] indexForTabbarItemsCount:arrayWithoutPlusButton.count] : NSNotFound;
+            if (customIndex != NSNotFound && customIndex <= arrayWithoutPlusButton.count) {
+                plusButtonIndex = (NSInteger)customIndex;
+            }
+        }
     
-        if (arrayWithPlusButton.count > plusButtonIndex) {
+        // [EN] `>=`: a plus button after the last tab is inserted at the end. [CN] `>=`：位于最后一个 Tab 之后的 PlusButton 插在末尾。
+        if (plusButtonIndex >= 0 && (NSInteger)arrayWithPlusButton.count >= plusButtonIndex) {
             [arrayWithPlusButton insertObject:plusButtonViewControllerPlaceholder atIndex:plusButtonIndex];
             // [CN] FIXME:  to delete 液态玻璃暂时不支持自定义PlusButton位置。
             // [EN] FIXME:  to delete Liquid Glass does not support custom PlusButton positions for now.
@@ -1942,7 +1959,14 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     UIView *superView = selected.view.superview;
     NSMutableArray<UIViewController *> *viewControllers = [_viewControllers mutableCopy];
     if ([self hasPlusChildViewController]) {
-        [viewControllers removeObjectAtIndex:[self.cyl_tabBar cyl_plusButtonIndex]];
+        // [EN] FIX: issue #515 — remove the plus child view controller itself: with a custom plus button position its index
+        //      is not always `cyl_plusButtonIndex` (Liquid Glass keeps it in the middle), and another tab was removed.
+        // [CN] 直接移除 PlusButton 子控制器本身：自定义 PlusButton 位置时，其下标不一定等于 `cyl_plusButtonIndex`（液态玻璃中位于中间），以前会移除其他 Tab。
+        UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
+        NSUInteger plusChildIndex = plusChildViewController ? [viewControllers indexOfObject:plusChildViewController] : NSNotFound;
+        if (plusChildIndex != NSNotFound) {
+            [viewControllers removeObjectAtIndex:plusChildIndex];
+        }
     }
     [self setViewControllers:viewControllers];
     [self.view setNeedsLayout];
@@ -3879,6 +3903,20 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 
 - (void)setSelectedIndex:(NSUInteger)selectedIndex {
     //    if (self.selectedIndex == selectedIndex) { return; }
+    // FIX: issue #441
+    // [EN] The index of the placeholder that stands for a plus button without a child view controller (Liquid Glass,
+    //      FlatDesign) selects nothing: it used to select that empty placeholder page (or return halfway), so
+    //      `setSelectedIndex:` looked like it did nothing. `selectedIndex` counts that placeholder; to use the index in
+    //      your own view controllers, set `cyl_selectedIndexIgnoringPlusButton` instead (issue #515).
+    // [CN] 没有子控制器的 PlusButton 对应的占位控制器（液态玻璃、扁平样式）的下标不会选中任何内容：以前会选中这个空白占位页（或中途返回），
+    //      看起来 `setSelectedIndex:` 没有生效。`selectedIndex` 会计入该占位控制器；如需使用你自己的控制器数组中的下标，请改为设置
+    //      `cyl_selectedIndexIgnoringPlusButton`（issue #515）。
+    if (selectedIndex < self.viewControllers.count && self.viewControllers[selectedIndex].cyl_isPlaceholder) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"[CYLTabBarController] setSelectedIndex:%@ is the plus button's placeholder and is ignored; use cyl_selectedIndexIgnoringPlusButton for the index without the plus button (issue #441).", @(selectedIndex));
+#endif
+        return;
+    }
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         [super setSelectedIndex:selectedIndex];
     
@@ -4905,6 +4943,58 @@ static CYLTabBarController *CYLTabBarControllerOwningTabBar(UIResponder *respond
         return plusButton;
     }
     return [self cyl_viewControllerWithTabBarItemIdentifier:identifier].cyl_tabButton;
+}
+
+@end
+
+#pragma mark - Selected index without the plus button (issue #515)
+
+@implementation CYLTabBarController (CYLSelectedIndexIgnoringPlusButton)
+
+/// [EN] YES for the plus button's child view controller or placeholder. [CN] PlusButton 的子控制器或占位控制器时为 YES。
+- (BOOL)cyl_isPlusButtonViewController:(UIViewController *)viewController {
+    if (viewController.cyl_isPlaceholder || [viewController cyl_getViewControllerInsteadOfNavigationController].cyl_isPlaceholder) {
+        return YES;
+    }
+    if (![self hasPlusButton] || ![self hasPlusChildViewController]) {
+        return NO;
+    }
+    UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
+    return plusChildViewController && viewController == plusChildViewController;
+}
+
+- (NSArray<UIViewController *> *)cyl_viewControllersIgnoringPlusButton {
+    NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
+    for (UIViewController *viewController in self.viewControllers) {
+        if (![self cyl_isPlusButtonViewController:viewController]) {
+            [viewControllers addObject:viewController];
+        }
+    }
+    return [viewControllers copy];
+}
+
+- (NSUInteger)cyl_selectedIndexForIndexIgnoringPlusButton:(NSUInteger)index {
+    NSArray<UIViewController *> *viewControllers = self.cyl_viewControllersIgnoringPlusButton;
+    if (index >= viewControllers.count) {
+        return NSNotFound;
+    }
+    return [self.viewControllers indexOfObject:viewControllers[index]];
+}
+
+- (NSUInteger)cyl_selectedIndexIgnoringPlusButton {
+    UIViewController *selectedViewController = self.selectedViewController;
+    if (!selectedViewController) {
+        return NSNotFound;
+    }
+    return [self.cyl_viewControllersIgnoringPlusButton indexOfObject:selectedViewController];
+}
+
+- (void)cyl_setSelectedIndexIgnoringPlusButton:(NSUInteger)selectedIndexIgnoringPlusButton {
+    NSUInteger selectedIndex = [self cyl_selectedIndexForIndexIgnoringPlusButton:selectedIndexIgnoringPlusButton];
+    if (selectedIndex == NSNotFound) {
+        return;
+    }
+    self.selectedIndex = selectedIndex;
 }
 
 @end
