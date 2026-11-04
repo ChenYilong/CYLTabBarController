@@ -222,12 +222,11 @@ static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *C
     BOOL isLottieEnabled = lottieURLCount > 0 ;
     BOOL isLottieEnabledFromAttributes = NO;
     if (tabBarItemsAttributes && tabBarItemsAttributes.count > 0) {
-        @try {
-            isLottieEnabledFromAttributes = tabBarItemsAttributes[0][CYLTabBarLottieURL] || tabBarItemsAttributes[0][CYLTabBarLottieFilePath];
-        } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
+        // [EN] Checked instead of `@try`: the first attributes entry must be a dictionary to be read.
+        // [CN] 用检查代替 `@try`：第一个属性项必须是字典才读取。
+        NSDictionary *firstAttributes = tabBarItemsAttributes.firstObject;
+        if ([firstAttributes isKindOfClass:[NSDictionary class]]) {
+            isLottieEnabledFromAttributes = firstAttributes[CYLTabBarLottieURL] || firstAttributes[CYLTabBarLottieFilePath];
         }
     }
     return isLottieEnabled || isLottieEnabledFromAttributes;

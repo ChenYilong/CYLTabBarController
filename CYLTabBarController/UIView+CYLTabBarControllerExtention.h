@@ -248,6 +248,31 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable UIImage *)cyl_takeSnapshotWithoutViews:(NSArray<UIView __kindof *> *)hideViews;
 
+#pragma mark - Views inserted into tab buttons
+
+/*!
+ * [EN] Marks the receiver as a view the library inserted into a tab button for `control` (a view shown in place of
+ *      the icon, a Lottie view, the plus button's stand-in in the Liquid Glass selected layer, a layout tracker).
+ *      `control` is held weakly. Marked views can be found, hidden and restored in one pass, and a marked view still
+ *      inside an old tab button (after UIKit rebuilt the buttons) is recognized and moved.
+ * [CN] 将接收者标记为本库为 `control` 插入到 Tab 按钮中的视图（替换图标的视图、Lottie 视图、液态玻璃选中层中 PlusButton
+ *      的替身、布局跟踪视图）。`control` 为弱引用。被标记的视图可以一次性找到、隐藏与恢复；UIKit 重建按钮后仍留在旧按钮中的
+ *      视图也能被识别并移走。
+ */
+- (void)cyl_markAsInsertedForTabControl:(nullable UIControl *)control;
+
+/*!
+ * [EN] The control passed to `-cyl_markAsInsertedForTabControl:`; nil for unmarked views and once it is deallocated.
+ * [CN] 传给 `-cyl_markAsInsertedForTabControl:` 的控件；未标记的视图或该控件已释放时为 nil。
+ */
+@property (nonatomic, weak, readonly, nullable) UIControl *cyl_insertedForTabControl;
+
+/*!
+ * [EN] Every marked view still alive, in no particular order. Main thread only.
+ * [CN] 所有仍存活的被标记视图，顺序不定。仅限主线程调用。
+ */
++ (NSArray<UIView *> *)cyl_insertedTabControlViews;
+
 @end
 
 @interface UIView (CYLTabBarControllerExtentionDeprecated)

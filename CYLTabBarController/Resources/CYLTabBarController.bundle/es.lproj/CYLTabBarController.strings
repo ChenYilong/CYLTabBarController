@@ -304,3 +304,5 @@
 "换肤：节日与配色主题（%@ 种）" = "Aspectos: festividades y colores (%@)";
 "节日图标与配色" = "Iconos festivos y colores";
 "仅配色" = "Solo colores";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Tócame";
