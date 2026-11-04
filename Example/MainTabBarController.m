@@ -540,7 +540,8 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
             [self.viewControllers[0] cyl_clearBadge];
             //            [tabBarButton insertSubview:tabBarButton.cyl_lottieAnimationView belowSubview:selectedTabButton];
             //            [tabBarButton bringSubviewToFront:newView];
-            // The cover is kept on top by -cyl_coverVisiableTabImageViewOrTabButton:. 封面由该方法保持在最上层。
+            // [EN] The cover is kept on top by -cyl_coverVisiableTabImageViewOrTabButton:.
+            // [CN] 封面由该方法保持在最上层。
             if (![CYLConstants isLiquidGlassActive]) {
                 // [CN] LiquidGlass 已经自带缩放动画， 无需缩放
                 // [EN] LiquidGlass already has its own scale animation, so no scaling is needed.
@@ -626,10 +627,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
         @try {
-            // #425: the shared badge style (offset, colors, font) is set once in SceneDelegate.m
-            // -setUpBadgeAppearance; each tab below sets only what differs from it.
-            // #425：共用的角标样式（偏移、颜色、字体）在 SceneDelegate.m -setUpBadgeAppearance 中统一设置一次，
-            // 下面每个 Tab 只设置与之不同的部分。
+            // [EN] #425: the shared badge style (offset, colors, font) is set once in SceneDelegate.m
+            //      -setUpBadgeAppearance; each tab below sets only what differs from it.
+            // [CN] #425：共用的角标样式（偏移、颜色、字体）在 SceneDelegate.m -setUpBadgeAppearance 中统一设置一次，
+            //      下面每个 Tab 只设置与之不同的部分。
             UIViewController *viewController0 = tabBarController.viewControllers[0];
             // UIControl *tab0 = viewController0.cyl_tabButton;
             // [tab0 cyl_showBadge];
@@ -660,13 +661,13 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
             //                [tabBarController.viewControllers[3] cyl_setBadgeCornerRadius:(labelHeight+ tabBarController.viewControllers[3].cyl_badgeMargin)/2];
             [tabBarController.viewControllers[3] cyl_showBadgeValue:testBadgeString animationType:CYLBadgeAnimationTypeBounce];
             if (tabBarController.viewControllers.count > 4) {
-                // Differs from the global offset (SceneDelegate.m -setUpBadgeAppearance), so it is set here.
-                // 与全局偏移（SceneDelegate.m -setUpBadgeAppearance）不同，因此单独设置。
+                // [EN] Differs from the global offset (SceneDelegate.m -setUpBadgeAppearance), so it is set here.
+                // [CN] 与全局偏移（SceneDelegate.m -setUpBadgeAppearance）不同，因此单独设置。
                 [tabBarController.viewControllers[4] cyl_setBadgeCenterOffset:CGPointMake(-1, 3)];
                 [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
             }
-            // #535: the plus button gets a badge too, like the tabs; each tap adds 1 (see -didSelectControl:).
-            // #535：PlusButton 也显示角标，与 Tab 一致；每次点击数字加 1（见 -didSelectControl:）。
+            // [EN] #535: the plus button gets a badge too, like the tabs; each tap adds 1 (see -didSelectControl:).
+            // [CN] #535：PlusButton 也显示角标，与 Tab 一致；每次点击数字加 1（见 -didSelectControl:）。
             [tabBarController cyl_demo_showPlusButtonBadge];
         } @catch (NSException *exception) {
             NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);

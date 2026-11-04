@@ -216,7 +216,8 @@
     if (!isKindOfImageView) {
         return NO;
     }
-    // Issue #601: a view shown in place of the icon, or inside one, is not the tab's icon. 替换图标的视图（或其子视图）不是 Tab 的图标。
+    // [EN] Issue #601: a view shown in place of the icon, or inside one, is not the tab's icon.
+    // [CN] 替换图标的视图（或其子视图）不是 Tab 的图标。
     for (UIView *view = (UIView *)self; view && ![view isKindOfClass:[UIControl class]]; view = view.superview) {
         if (view.cyl_isTabBarItemIconView) {
             return NO;

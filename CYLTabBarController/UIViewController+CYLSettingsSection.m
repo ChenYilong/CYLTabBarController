@@ -16,8 +16,8 @@
 
 const NSInteger CYLSettingsSection = 0;
 
-/// Rows of the settings section; the tab item update rows follow (`UIViewController+CYLTabBarItemUpdate.h`).
-/// 设置分组的行；其后是更新 Tab 的若干行（`UIViewController+CYLTabBarItemUpdate.h`）。
+/// [EN] Rows of the settings section; the tab item update rows follow (`UIViewController+CYLTabBarItemUpdate.h`).
+/// [CN] 设置分组的行；其后是更新 Tab 的若干行（`UIViewController+CYLTabBarItemUpdate.h`）。
 typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowLanguage,
     CYLSettingsRowMemoryWarning,
@@ -448,7 +448,8 @@ static UITableViewCell *CYLTouchableAreaCellForTableView(UITableView *tableView,
 
 - (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [self cyl_settingsRowCellForTableView:tableView atIndexPath:indexPath];
-    // Every row shows its whole text, wrapped, never an ellipsis. 每行完整显示文字（换行），不出现省略号。
+    // [EN] Every row shows its whole text, wrapped, never an ellipsis.
+    // [CN] 每行完整显示文字（换行），不出现省略号。
     [cell cyl_wrapsTextLabels];
     return cell;
 }

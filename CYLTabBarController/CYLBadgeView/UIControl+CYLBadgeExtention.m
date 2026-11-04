@@ -158,7 +158,8 @@
     UIView *actualBadgeSuperView = nil;
     
     do {
-        // Issue #601: an icon hidden for the view shown in its place still takes the badge. 被替换显示而隐藏的图标仍承载角标。
+        // [EN] Issue #601: an icon hidden for the view shown in its place still takes the badge.
+        // [CN] 被替换显示而隐藏的图标仍承载角标。
         if (lottieAnimationView && (!lottieAnimationView.cyl_isInvisiable || lottieAnimationView.cyl_isBadgeHostReplacedByIconView)) {
             actualBadgeSuperView = lottieAnimationView;
 

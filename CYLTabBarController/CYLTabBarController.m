@@ -1941,7 +1941,8 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     NSUInteger attributesIndex = 0;
     for (NSUInteger index = 0; index < _viewControllers.count && attributesIndex < tabBarItemsAttributes.count; index++) {
         UIViewController *viewController = _viewControllers[index];
-        // The plus button's tab has no entry. PlusButton 的 Tab 不占项。
+        // [EN] The plus button's tab has no entry.
+        // [CN] PlusButton 的 Tab 不占项。
         if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
             continue;
         }
@@ -2008,13 +2009,15 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
     }
-    // Liquid Glass may keep the tab buttons' previous layout (a longer title overlapping the plus button and the next
-    // tab) until a tab is tapped: reload them as a tap does. 液态玻璃可能保持 Tab 按钮原来的布局（较长的标题与 PlusButton 及
-    // 后一个 Tab 重叠），直到点击某个 Tab：像点击一样重新加载它们。
+    // [EN] Liquid Glass may keep the tab buttons' previous layout (a longer title overlapping the plus button and the next
+    //      tab) until a tab is tapped: reload them as a tap does.
+    // [CN] 液态玻璃可能保持 Tab 按钮原来的布局（较长的标题与 PlusButton 及
+    //      后一个 Tab 重叠），直到点击某个 Tab：像点击一样重新加载它们。
     if ([self.tabBar isKindOfClass:[CYLTabBar class]]) {
         [(CYLTabBar *)self.tabBar cyl_reloadTabButtons];
     }
-    // Icons from the network replace the images once downloaded (`CYLTabBarItemImageURL`). 网络图标下载完成后覆盖图片。
+    // [EN] Icons from the network replace the images once downloaded (`CYLTabBarItemImageURL`).
+    // [CN] 网络图标下载完成后覆盖图片。
     if (attributes[CYLTabBarItemImageURL] || attributes[CYLTabBarItemSelectedImageURL] || attributes[CYLTabBarItemImageURLSize]) {
         [self cyl_loadImageURLsOfAttributes:newAttributes atIndex:index];
     }
@@ -2027,7 +2030,8 @@ static char CYLTabBarItemIconViewProvidersKey;
 static char CYLTabBarItemIconViewsKey;
 static char CYLTabBarItemIconViewsProviderKey;
 
-/// The icon view providers by view controller (weak). 按子控制器（弱引用）保存的图标视图 provider。
+/// [EN] The icon view providers by view controller (weak).
+/// [CN] 按子控制器（弱引用）保存的图标视图 provider。
 - (NSMapTable<UIViewController *, CYLTabBarItemIconViewProvider> *)cyl_tabBarItemIconViewProviders {
     NSMapTable *providers = objc_getAssociatedObject(self, &CYLTabBarItemIconViewProvidersKey);
     if (!providers) {
@@ -2052,7 +2056,8 @@ static char CYLTabBarItemIconViewsProviderKey;
         [providers removeObjectForKey:viewController];
     }
     [self cyl_updateTabBarItemIconViewsOfViewController:viewController];
-    // The tab bar lays its buttons out again, as when a tab is selected. TabBar 重新布局其按钮，与选中 Tab 时相同。
+    // [EN] The tab bar lays its buttons out again, as when a tab is selected.
+    // [CN] TabBar 重新布局其按钮，与选中 Tab 时相同。
     [self.tabBar setNeedsLayout];
     [self cyl_setNeedsUpdateTabBarItemIconViews];
     return YES;
@@ -2267,8 +2272,8 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     return @[tabButton];
 }
 
-/// After layout and selection changes, on the next run loop: UIKit has updated the tab buttons by then.
-/// 布局与选中变化后，在下一个 run loop 执行：此时 UIKit 已更新 Tab 按钮。
+/// [EN] After layout and selection changes, on the next run loop: UIKit has updated the tab buttons by then.
+/// [CN] 布局与选中变化后，在下一个 run loop 执行：此时 UIKit 已更新 Tab 按钮。
 - (void)cyl_setNeedsUpdateTabBarItemIconViews {
     if ([self cyl_tabBarItemIconViewProviders].count == 0) {
         return;
@@ -2279,7 +2284,8 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     });
 }
 
-/// Installs, removes or shows the icon views of every tab with a provider. 安装、移除或显示所有设置了 provider 的 Tab 的图标视图。
+/// [EN] Installs, removes or shows the icon views of every tab with a provider.
+/// [CN] 安装、移除或显示所有设置了 provider 的 Tab 的图标视图。
 - (void)cyl_updateTabBarItemIconViews {
     for (UIViewController *viewController in [self cyl_tabBarItemIconViewProviders].keyEnumerator.allObjects) {
         [self cyl_updateTabBarItemIconViewsOfViewController:viewController];
@@ -2294,9 +2300,10 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         NSMutableDictionary<NSNumber *, UIView *> *iconViews = objc_getAssociatedObject(tabButton, &CYLTabBarItemIconViewsKey);
         id installedProvider = objc_getAssociatedObject(tabButton, &CYLTabBarItemIconViewsProviderKey);
         UIView *lottieView = tabButton.cyl_lottieAnimationView;
-        // A cover over the tab button (e.g. a logo over the first tab) hides its other views, the tab's own icon too:
-        // the views shown in place of the icon stay hidden under it. 覆盖 Tab 按钮的封面（如第一个 Tab 上的 Logo）会隐藏按钮
-        // 中的其他视图，包括 Tab 自身的图标：替换图标的视图在其下方保持隐藏。
+        // [EN] A cover over the tab button (e.g. a logo over the first tab) hides its other views, the tab's own icon too:
+        //      the views shown in place of the icon stay hidden under it.
+        // [CN] 覆盖 Tab 按钮的封面（如第一个 Tab 上的 Logo）会隐藏按钮
+        //      中的其他视图，包括 Tab 自身的图标：替换图标的视图在其下方保持隐藏。
         BOOL isCovered = NO;
         for (UIView *subview in tabButton.subviews) {
             if (subview.cyl_isTabButtonCoverView && !subview.cyl_isInvisiable) {
@@ -2305,7 +2312,8 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
             }
         }
         if (installedProvider != provider) {
-            // Another provider, or none: remove the views of the previous one. 换了 provider 或已移除：移除之前的视图。
+            // [EN] Another provider, or none: remove the views of the previous one.
+            // [CN] 换了 provider 或已移除：移除之前的视图。
             for (UIView *iconView in iconViews.allValues) {
                 [iconView removeFromSuperview];
             }
@@ -2313,7 +2321,8 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
             objc_setAssociatedObject(tabButton, &CYLTabBarItemIconViewsKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             objc_setAssociatedObject(tabButton, &CYLTabBarItemIconViewsProviderKey, provider, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             if (!provider) {
-                // The tab's own icon and its badge come back, unless the cover hides them. Tab 自身的图标及其角标恢复，除非被封面隐藏。
+                // [EN] The tab's own icon and its badge come back, unless the cover hides them.
+                // [CN] Tab 自身的图标及其角标恢复，除非被封面隐藏。
                 [self cyl_setTabImageView:tabButton.cyl_tabImageView lottieView:lottieView replacedByIconView:NO];
                 if (!isCovered) {
                     tabButton.cyl_tabImageView.hidden = (lottieView != nil);
@@ -2327,8 +2336,8 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         }
         if (!iconViews) {
             iconViews = [NSMutableDictionary dictionary];
-            // Liquid Glass: one look per layer (the second button is the selected layer); other styles: both looks here.
-            // 液态玻璃：每个图层一种样式（第二个按钮是选中图层）；其他样式：两种样式都在这个按钮上。
+            // [EN] Liquid Glass: one look per layer (the second button is the selected layer); other styles: both looks here.
+            // [CN] 液态玻璃：每个图层一种样式（第二个按钮是选中图层）；其他样式：两种样式都在这个按钮上。
             NSArray<NSNumber *> *looks = (tabButtons.count > 1) ? @[@(idx == 1)] : @[@NO, @YES];
             for (NSNumber *look in looks) {
                 UIView *iconView = provider(look.boolValue);
@@ -2347,14 +2356,17 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         if (iconViews.count == 0) {
             return;
         }
-        // The tab's own icon stays hidden (the system may show it again when the tab changes); its badge stays visible
-        // above it. Tab 自身图标保持隐藏（切换 Tab 时系统可能重新显示它）；其角标仍显示在它上方。
+        // [EN] The tab's own icon stays hidden (the system may show it again when the tab changes); its badge stays visible
+        //      above it.
+        // [CN] Tab 自身图标保持隐藏（切换 Tab 时系统可能重新显示它）；其角标仍显示在它上方。
         tabButton.cyl_tabImageView.hidden = YES;
         lottieView.hidden = YES;
-        // Under a cover the badge stays as the cover left it (cleared). 有封面时角标保持封面设置的状态（已清除）。
+        // [EN] Under a cover the badge stays as the cover left it (cleared).
+        // [CN] 有封面时角标保持封面设置的状态（已清除）。
         [self cyl_setTabImageView:tabButton.cyl_tabImageView lottieView:lottieView replacedByIconView:!isCovered];
-        // Below the tab's own icon, or the subview of the tab button holding it (Liquid Glass), so the badge shown above
-        // that icon stays above this view too. 位于 Tab 自身图标（或液态玻璃中包含它的 Tab 按钮子视图）之下，使该图标上方的角标也位于此视图之上。
+        // [EN] Below the tab's own icon, or the subview of the tab button holding it (Liquid Glass), so the badge shown above
+        //      that icon stays above this view too.
+        // [CN] 位于 Tab 自身图标（或液态玻璃中包含它的 Tab 按钮子视图）之下，使该图标上方的角标也位于此视图之上。
         UIView *iconHolder = lottieView ?: tabButton.cyl_tabImageView;
         while (iconHolder && iconHolder.superview != tabButton) {
             iconHolder = iconHolder.superview;
@@ -2377,8 +2389,9 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     }];
 }
 
-/// Marks the tab's own icon as hidden for the view shown in its place, or not, and moves its badge accordingly: onto
-/// an overlay above it, or back into it. 标记 Tab 自身的图标是否因替换显示而隐藏，并相应移动其角标：移到其上方的浮层，或移回图标中。
+/// [EN] Marks the tab's own icon as hidden for the view shown in its place, or not, and moves its badge accordingly: onto
+///      an overlay above it, or back into it.
+/// [CN] 标记 Tab 自身的图标是否因替换显示而隐藏，并相应移动其角标：移到其上方的浮层，或移回图标中。
 - (void)cyl_setTabImageView:(UIView *)tabImageView lottieView:(UIView *)lottieView replacedByIconView:(BOOL)replaced {
     for (UIView *host in @[ tabImageView ?: (id)[NSNull null], lottieView ?: (id)[NSNull null] ]) {
         if (![host isKindOfClass:[UIView class]] || host.cyl_isBadgeHostReplacedByIconView == replaced) {

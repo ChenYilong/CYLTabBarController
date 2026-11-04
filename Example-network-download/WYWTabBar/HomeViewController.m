@@ -17,7 +17,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor systemBackgroundColor];
-    // The network icons and the title update in both styles. 网络图标与标题更新在两种样式下都可用。
+    // [EN] The network icons and the title update in both styles.
+    // [CN] 网络图标与标题更新在两种样式下都可用。
     UISegmentedControl *styleControl = [[UISegmentedControl alloc] initWithItems:@[CYLLocalizedString(@"LiquidGlass"),
                                                                                    CYLLocalizedString(@"FlatDesign")]];
     styleControl.selectedSegmentIndex = (CYLTabBarStyleTypeFlatDesign == self.cyl_owningTabBarController.tabBarStyleType) ? 1 : 0;

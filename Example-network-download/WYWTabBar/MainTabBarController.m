@@ -15,8 +15,8 @@
 @implementation MainTabBarController
 
 - (void)viewDidLoad {
-    // The style is given when the controller is created (`-[AppDelegate showTabBarControllerWithStyle:]`).
-    // 样式在创建控制器时指定（`-[AppDelegate showTabBarControllerWithStyle:]`）。
+    // [EN] The style is given when the controller is created (`-[AppDelegate showTabBarControllerWithStyle:]`).
+    // [CN] 样式在创建控制器时指定（`-[AppDelegate showTabBarControllerWithStyle:]`）。
     [super viewDidLoad];
 }
 

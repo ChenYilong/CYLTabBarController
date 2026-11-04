@@ -11,7 +11,8 @@
 #import <ImageIO/ImageIO.h>
 #import <CommonCrypto/CommonDigest.h>
 
-/// The cache key of a URL: its SHA-256. URL 的缓存 key：其 SHA-256。
+/// [EN] The cache key of a URL: its SHA-256.
+/// [CN] URL 的缓存 key：其 SHA-256。
 static NSString *CYLRemoteImageCacheKey(NSURL *URL) {
     NSData *data = [URL.absoluteString dataUsingEncoding:NSUTF8StringEncoding];
     unsigned char digest[CC_SHA256_DIGEST_LENGTH];
@@ -23,7 +24,8 @@ static NSString *CYLRemoteImageCacheKey(NSURL *URL) {
     return key;
 }
 
-/// An image from downloaded data: animated for a GIF, at the screen scale otherwise. 由数据生成图片：GIF 为动图，其他按屏幕倍数。
+/// [EN] An image from downloaded data: animated for a GIF, at the screen scale otherwise.
+/// [CN] 由数据生成图片：GIF 为动图，其他按屏幕倍数。
 static UIImage *CYLRemoteImageWithData(NSData *data) {
     const char *bytes = data.bytes;
     if (data.length > 4 && memcmp(bytes, "GIF8", 4) == 0) {
@@ -34,7 +36,8 @@ static UIImage *CYLRemoteImageWithData(NSData *data) {
 
 #pragma mark - CYLImageCache
 
-/// Bytes an image takes in memory: its pixels, 4 bytes each. 图片在内存中占用的字节数：像素数 × 4。
+/// [EN] Bytes an image takes in memory: its pixels, 4 bytes each.
+/// [CN] 图片在内存中占用的字节数：像素数 × 4。
 static NSUInteger CYLRemoteImageCost(UIImage *image) {
     NSUInteger frames = MAX(image.images.count, 1);
     return (NSUInteger)(image.size.width * image.scale * image.size.height * image.scale * 4) * frames;
@@ -104,7 +107,8 @@ static NSUInteger CYLRemoteImageCost(UIImage *image) {
     }
 }
 
-/// Whether the file at `path` expired, by `diskCacheExpireType`. 按 `diskCacheExpireType` 判断文件是否过期。
+/// [EN] Whether the file at `path` expired, by `diskCacheExpireType`.
+/// [CN] 按 `diskCacheExpireType` 判断文件是否过期。
 - (BOOL)cyl_isExpiredFileAtURL:(NSURL *)fileURL {
     if (self.maxDiskAge <= 0) {
         return NO;
@@ -116,7 +120,8 @@ static NSUInteger CYLRemoteImageCost(UIImage *image) {
     return !date || -[date timeIntervalSinceNow] > self.maxDiskAge;
 }
 
-/// Disk data of `key` when not expired; a hit renews its access date. Called on `ioQueue`. 未过期的磁盘数据；命中时更新访问时间。
+/// [EN] Disk data of `key` when not expired; a hit renews its access date. Called on `ioQueue`.
+/// [CN] 未过期的磁盘数据；命中时更新访问时间。
 - (nullable NSData *)cyl_diskDataForKey:(NSString *)key {
     NSURL *fileURL = [NSURL fileURLWithPath:[self cyl_filePathForKey:key]];
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path] || [self cyl_isExpiredFileAtURL:fileURL]) {
@@ -193,7 +198,8 @@ static NSUInteger CYLRemoteImageCost(UIImage *image) {
     });
 }
 
-/// Called on `ioQueue`, as SDWebImage's `-deleteOldFilesWithCompletionBlock:`. 在 `ioQueue` 上执行。
+/// [EN] Called on `ioQueue`, as SDWebImage's `-deleteOldFilesWithCompletionBlock:`.
+/// [CN] 在 `ioQueue` 上执行。
 - (void)cyl_deleteOldFiles {
     NSURL *directoryURL = [NSURL fileURLWithPath:self.diskCachePath isDirectory:YES];
     NSArray<NSURLResourceKey> *keys = @[ NSURLIsDirectoryKey, NSURLContentAccessDateKey, NSURLContentModificationDateKey,
@@ -221,7 +227,8 @@ static NSUInteger CYLRemoteImageCost(UIImage *image) {
     if (self.maxDiskSize == 0 || totalSize <= self.maxDiskSize) {
         return;
     }
-    // Least recently used first, down to half of the limit. 先删除最久未用的文件，直到降到上限的一半。
+    // [EN] Least recently used first, down to half of the limit.
+    // [CN] 先删除最久未用的文件，直到降到上限的一半。
     NSUInteger targetSize = self.maxDiskSize / 2;
     NSArray<NSURL *> *sortedFiles = [remainingFiles keysSortedByValueWithOptions:NSSortConcurrent
                                                                  usingComparator:^NSComparisonResult(NSDictionary *a, NSDictionary *b) {
@@ -265,7 +272,8 @@ static NSUInteger CYLRemoteImageCost(UIImage *image) {
     [self deleteOldFilesWithCompletion:nil];
 }
 
-/// Loads `URL` with `options`; `finish` runs once, on any queue. 按 `options` 加载 `URL`；`finish` 只调用一次，可在任意队列。
+/// [EN] Loads `URL` with `options`; `finish` runs once, on any queue.
+/// [CN] 按 `options` 加载 `URL`；`finish` 只调用一次，可在任意队列。
 - (void)cyl_loadImageWithURL:(NSURL *)URL options:(CYLImageLoadOptions)options finish:(void (^)(UIImage *))finish {
     NSString *key = CYLRemoteImageCacheKey(URL);
     BOOL refreshes = (options & CYLImageLoadOptionsRefreshCached) != 0;
@@ -347,8 +355,8 @@ static NSUInteger CYLRemoteImageCost(UIImage *image) {
         }
         [frames addObject:[UIImage imageWithCGImage:imageRef scale:scale orientation:UIImageOrientationUp]];
         CGImageRelease(imageRef);
-        // The frame's delay, unclamped first; browsers treat very short delays as 0.1 s.
-        // 帧时长，优先使用未修正值；与浏览器一致，过短的时长按 0.1 秒处理。
+        // [EN] The frame's delay, unclamped first; browsers treat very short delays as 0.1 s.
+        // [CN] 帧时长，优先使用未修正值；与浏览器一致，过短的时长按 0.1 秒处理。
         NSDictionary *properties = (__bridge_transfer NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, index, NULL);
         NSDictionary *gifProperties = properties[(__bridge NSString *)kCGImagePropertyGIFDictionary];
         NSNumber *delay = gifProperties[(__bridge NSString *)kCGImagePropertyGIFUnclampedDelayTime];

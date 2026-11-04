@@ -425,7 +425,8 @@ presentLoginForViewController:(UIViewController *)viewController
             [self.viewControllers[0] cyl_clearBadge];
             //            [tabBarButton insertSubview:tabBarButton.cyl_lottieAnimationView belowSubview:selectedTabButton];
             //            [tabBarButton bringSubviewToFront:newView];
-            // The cover is kept on top by -cyl_coverVisiableTabImageViewOrTabButton:. 封面由该方法保持在最上层。
+            // [EN] The cover is kept on top by -cyl_coverVisiableTabImageViewOrTabButton:.
+            // [CN] 封面由该方法保持在最上层。
             
             if (![CYLConstants isLiquidGlassActive]) {
                 // [CN] LiquidGlass 已经自带缩放动画， 无需缩放

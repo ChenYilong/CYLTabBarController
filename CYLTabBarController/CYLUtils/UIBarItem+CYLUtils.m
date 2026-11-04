@@ -39,7 +39,8 @@
         
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        // CYLUtils does not depend on CYLLocalization (Core): a literal format. CYLUtils 不依赖 Core 中的 CYLLocalization：使用字面量格式。
+        // [EN] CYLUtils does not depend on CYLLocalization (Core): a literal format.
+        // [CN] CYLUtils 不依赖 Core 中的 CYLLocalization：使用字面量格式。
         NSLog(@"🔴 %@ (line %@): %@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }

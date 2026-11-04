@@ -155,8 +155,9 @@
         title = CYLLocalizedString(@"cyl_pop / cyl_push 系列方法演示");
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
-    // The action is the title; the other rows show the badge sample as the title and the page as the subtitle, as in
-    // the other demos. 操作行以操作为主标题；其余行与其他演示一致，以角标样例为主标题、页面为副标题。
+    // [EN] The action is the title; the other rows show the badge sample as the title and the page as the subtitle, as in
+    //      the other demos.
+    // [CN] 操作行以操作为主标题；其余行与其他演示一致，以角标样例为主标题、页面为副标题。
     BOOL isActionRow = indexPath.row <= 8;
     cell.textLabel.text = isActionRow ? title : [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
     cell.detailTextLabel.text = isActionRow ? [UITableViewCell cyl_badgeTitleForRow:indexPath.row] : title;

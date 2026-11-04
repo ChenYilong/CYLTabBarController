@@ -11,7 +11,8 @@
 
 static NSString *const CYLTabBarItemUpdateCellIdentifier = @"CYLTabBarItemUpdateCell";
 
-/// Rows, each one switching one thing on the tab, or back. 每行切换 Tab 的一项，或恢复。
+/// [EN] Rows, each one switching one thing on the tab, or back.
+/// [CN] 每行切换 Tab 的一项，或恢复。
 typedef NS_ENUM(NSInteger, CYLTabBarItemUpdateRow) {
     CYLTabBarItemUpdateRowTitle,        // `-updateTabBarItemForViewController:attributes:`
     CYLTabBarItemUpdateRowIconView,     // `-setTabBarItemIconViewProvider:atIndex:`
@@ -135,8 +136,8 @@ static char CYLReplacedNeighborsKey;
     }
 }
 
-/// The title: "Purchased courses"; tapped again, the title of the `tabBarItemsAttributes` given at initialization.
-/// 标题：“已购课程”；再次点击，恢复为初始化时传入的 `tabBarItemsAttributes` 中的标题。
+/// [EN] The title: "Purchased courses"; tapped again, the title of the `tabBarItemsAttributes` given at initialization.
+/// [CN] 标题：“已购课程”；再次点击，恢复为初始化时传入的 `tabBarItemsAttributes` 中的标题。
 - (void)cyl_toggleTitleOfTabViewController:(UIViewController *)tabViewController
                         inTabBarController:(CYLTabBarController *)tabBarController {
     BOOL isUpdated = [objc_getAssociatedObject(tabViewController, &CYLTabBarItemTitleUpdatedKey) boolValue];
@@ -148,9 +149,10 @@ static char CYLReplacedNeighborsKey;
     }
 }
 
-/// The icon: the one of this row; the same row again, the icon of the `tabBarItemsAttributes` given at initialization
-/// (`nil` restores the tab's own icon). 图标：该行的图标；再次点击同一行，恢复为初始化时传入的 `tabBarItemsAttributes` 中的图标
-/// （传 `nil` 即恢复 Tab 自身的图标）。
+/// [EN] The icon: the one of this row; the same row again, the icon of the `tabBarItemsAttributes` given at initialization
+///      (`nil` restores the tab's own icon).
+/// [CN] 图标：该行的图标；再次点击同一行，恢复为初始化时传入的 `tabBarItemsAttributes` 中的图标
+///      （传 `nil` 即恢复 Tab 自身的图标）。
 - (void)cyl_toggleIconRow:(NSInteger)row
       ofTabViewController:(UIViewController *)tabViewController
                   atIndex:(NSUInteger)index
@@ -164,7 +166,8 @@ static char CYLReplacedNeighborsKey;
     BOOL isSet = NO;
     if (row == CYLTabBarItemUpdateRowIconView) {
         if (@available(iOS 13.0, *)) {
-            // Any view works here, e.g. a `UIImageView` loaded by SDWebImage or Kingfisher. 这里可以是任意视图。
+            // [EN] Any view works here, e.g. a `UIImageView` loaded by SDWebImage or Kingfisher.
+            // [CN] 这里可以是任意视图。
             isSet = [tabBarController setTabBarItemIconViewProvider:^UIView *(BOOL selected) {
                 UIImageView *iconView = [[UIImageView alloc] initWithImage:[UIImage systemImageNamed:(selected ? @"star.fill" : @"star")]];
                 iconView.tintColor = selected ? [UIColor systemOrangeColor] : [UIColor systemGrayColor];
@@ -174,14 +177,15 @@ static char CYLReplacedNeighborsKey;
             } atIndex:index];
         }
     } else if (row == CYLTabBarItemUpdateRowNetworkIcon) {
-        // Downloaded once, then from the cache; the tab keeps its icon until the images are ready.
-        // 只下载一次，之后读取缓存；图片就绪前 Tab 保持自身图标。
+        // [EN] Downloaded once, then from the cache; the tab keeps its icon until the images are ready.
+        // [CN] 只下载一次，之后读取缓存；图片就绪前 Tab 保持自身图标。
         isSet = [tabBarController setTabBarItemIconWithURL:[NSURL URLWithString:@"https://cdn-icons-png.flaticon.com/512/3132/3132732.png"]
                                                selectedURL:[NSURL URLWithString:@"https://cdn-icons-png.flaticon.com/512/3132/3132779.png"]
                                                       size:CGSizeMake(24, 24)
                                                    atIndex:index];
     } else {
-        // Any URL, a file one here. 任何 URL 都可以，这里使用本地文件 URL。
+        // [EN] Any URL, a file one here.
+        // [CN] 任何 URL 都可以，这里使用本地文件 URL。
         NSURL *GIFURL = [CYLResourceBundle() URLForResource:@"cyl_tab_sample_animated" withExtension:@"gif"];
         isSet = GIFURL && [tabBarController setTabBarItemIconWithURL:GIFURL selectedURL:nil size:CGSizeMake(24, 24) atIndex:index];
     }
@@ -190,12 +194,12 @@ static char CYLReplacedNeighborsKey;
     }
 }
 
-/// Every tab's title with a star; tapped again, the titles of the `tabBarItemsAttributes` given at initialization.
-/// 所有 Tab 的标题加上星号；再次点击，恢复为初始化时传入的 `tabBarItemsAttributes` 中的标题。
+/// [EN] Every tab's title with a star; tapped again, the titles of the `tabBarItemsAttributes` given at initialization.
+/// [CN] 所有 Tab 的标题加上星号；再次点击，恢复为初始化时传入的 `tabBarItemsAttributes` 中的标题。
 - (void)cyl_toggleAllTitlesInTabBarController:(CYLTabBarController *)tabBarController {
     BOOL isUpdated = [objc_getAssociatedObject(tabBarController, &CYLTabBarItemAllTitlesUpdatedKey) boolValue];
-    // One entry per tab, in order, none for the plus button: the shape `-updateTabBarItemsWithAttributes:` takes.
-    // 每个 Tab 一项、按顺序、PlusButton 不占项：即 `-updateTabBarItemsWithAttributes:` 接受的结构。
+    // [EN] One entry per tab, in order, none for the plus button: the shape `-updateTabBarItemsWithAttributes:` takes.
+    // [CN] 每个 Tab 一项、按顺序、PlusButton 不占项：即 `-updateTabBarItemsWithAttributes:` 接受的结构。
     UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:tabBarController];
     NSMutableArray<NSDictionary *> *attributes = [NSMutableArray array];
     for (UIViewController *viewController in tabBarController.viewControllers) {
@@ -205,7 +209,8 @@ static char CYLReplacedNeighborsKey;
         NSString *title = nil;
         if (isUpdated) {
             title = [self cyl_initialTitleOfTabViewController:viewController inTabBarController:tabBarController];
-            // Every title is the initial one again, also the one of "Change tab title". 所有标题都已恢复，包括“更换 Tab 标题”的。
+            // [EN] Every title is the initial one again, also the one of "Change tab title".
+            // [CN] 所有标题都已恢复，包括“更换 Tab 标题”的。
             objc_setAssociatedObject(viewController, &CYLTabBarItemTitleUpdatedKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         } else {
             title = [NSString stringWithFormat:@"★ %@", [self cyl_titleOfTabViewController:viewController inTabBarController:tabBarController] ?: @""];
@@ -410,10 +415,10 @@ static char CYLReplacedNeighborsKey;
 
 #pragma mark - Helpers
 
-/// The `tabBarItemsAttributes` given at initialization, one entry per tab (its view controller), copied before the
-/// first change of these rows: the tab bar controller merges each update into its `tabBarItemsAttributes`.
-/// 初始化时传入的 `tabBarItemsAttributes`，每个 Tab（其视图控制器）一项，在这些行第一次修改前复制：TabBarController 会把每次更新合并进
-/// `tabBarItemsAttributes`。
+/// [EN] The `tabBarItemsAttributes` given at initialization, one entry per tab (its view controller), copied before the
+///      first change of these rows: the tab bar controller merges each update into its `tabBarItemsAttributes`.
+/// [CN] 初始化时传入的 `tabBarItemsAttributes`，每个 Tab（其视图控制器）一项，在这些行第一次修改前复制：TabBarController 会把每次更新合并进
+///      `tabBarItemsAttributes`。
 - (NSMapTable<UIViewController *, NSDictionary *> *)cyl_initialTabBarItemsAttributesOfTabBarController:(CYLTabBarController *)tabBarController {
     NSMapTable *attributes = objc_getAssociatedObject(tabBarController, &CYLTabBarItemInitialAttributesKey);
     if (!attributes) {
@@ -445,16 +450,17 @@ static char CYLReplacedNeighborsKey;
     return attributes ?: @{};
 }
 
-/// The title of the `tabBarItemsAttributes` given at initialization. 初始化时传入的 `tabBarItemsAttributes` 中的标题。
+/// [EN] The title of the `tabBarItemsAttributes` given at initialization.
+/// [CN] 初始化时传入的 `tabBarItemsAttributes` 中的标题。
 - (NSString *)cyl_initialTitleOfTabViewController:(UIViewController *)tabViewController
                                inTabBarController:(CYLTabBarController *)tabBarController {
     NSDictionary *attributes = [[self cyl_initialTabBarItemsAttributesOfTabBarController:tabBarController] objectForKey:tabViewController];
     return attributes[CYLTabBarItemTitle] ?: [self cyl_titleOfTabViewController:tabViewController inTabBarController:tabBarController];
 }
 
-/// The icon of the `tabBarItemsAttributes` given at initialization, back on the tab at `index`: its icons from the
-/// network when it has `CYLTabBarItemImageURL`, else its own icon (`nil` provider).
-/// 将 Tab 恢复为初始化时传入的 `tabBarItemsAttributes` 中的图标：有 `CYLTabBarItemImageURL` 时为网络图标，否则为 Tab 自身的图标（provider 传 nil）。
+/// [EN] The icon of the `tabBarItemsAttributes` given at initialization, back on the tab at `index`: its icons from the
+///      network when it has `CYLTabBarItemImageURL`, else its own icon (`nil` provider).
+/// [CN] 将 Tab 恢复为初始化时传入的 `tabBarItemsAttributes` 中的图标：有 `CYLTabBarItemImageURL` 时为网络图标，否则为 Tab 自身的图标（provider 传 nil）。
 - (void)cyl_restoreInitialIconOfTabViewController:(UIViewController *)tabViewController
                                           atIndex:(NSUInteger)index
                                inTabBarController:(CYLTabBarController *)tabBarController {
@@ -474,13 +480,14 @@ static char CYLReplacedNeighborsKey;
     return [self cyl_owningTabBarController] ?: [self cyl_tabBarController];
 }
 
-/// The tab of this page: its navigation controller, or itself. 当前页面所在的 Tab：其导航控制器或自身。
+/// [EN] The tab of this page: its navigation controller, or itself.
+/// [CN] 当前页面所在的 Tab：其导航控制器或自身。
 - (UIViewController *)cyl_tabBarItemUpdateTabViewController {
     return self.navigationController ?: self;
 }
 
-/// The title a tab shows: FlatDesign shows `cyl_tabBarItem`, the other styles `tabBarItem`.
-/// Tab 显示的标题：扁平样式显示 `cyl_tabBarItem`，其他样式显示 `tabBarItem`。
+/// [EN] The title a tab shows: FlatDesign shows `cyl_tabBarItem`, the other styles `tabBarItem`.
+/// [CN] Tab 显示的标题：扁平样式显示 `cyl_tabBarItem`，其他样式显示 `tabBarItem`。
 - (NSString *)cyl_titleOfTabViewController:(UIViewController *)tabViewController
                         inTabBarController:(CYLTabBarController *)tabBarController {
 #if CYL_FLATDESIGN_AVAILABLE

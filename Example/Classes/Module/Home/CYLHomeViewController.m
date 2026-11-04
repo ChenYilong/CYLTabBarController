@@ -117,7 +117,8 @@
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath {
     [cell cyl_showBadgeForRow:indexPath.row];
     
-    // The badge sample is the title, the page the subtitle; both wrap. 角标样例为主标题，页面为副标题；均可换行。
+    // [EN] The badge sample is the title, the page the subtitle; both wrap.
+    // [CN] 角标样例为主标题，页面为副标题；均可换行。
     cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
     cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
     [cell cyl_wrapsTextLabels];
