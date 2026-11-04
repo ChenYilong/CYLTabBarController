@@ -183,31 +183,47 @@ def archive_member(archive, member):
         return tar.extractfile(info).read()
 
 
-def process(folder_name, check_only):
+def resource_folder(folder_name):
+    """[EN] Example-Shared/<folder_name>, validated. [CN] 校验后的 Example-Shared/<folder_name>。"""
     require(FOLDER_PATTERN.fullmatch(folder_name), "invalid folder: {!r}".format(folder_name))
     folder = os.path.realpath(os.path.join(SHARED_DIR, folder_name))
     require(os.path.commonpath([SHARED_DIR, folder]) == SHARED_DIR, "folder outside Example-Shared: {!r}".format(folder_name))
+    return folder
+
+
+def folder_downloads(folder):
+    """[EN] The downloads of every manifest in `folder`. [CN] `folder` 中所有清单的下载项。"""
     manifests = sorted(name for name in os.listdir(folder) if name.endswith("-resources.json"))
     require(manifests, "no *-resources.json in {}".format(folder))
-    missing_count = 0
-    total = 0
+    downloads = []
     for manifest_name in manifests:
         with open(os.path.join(folder, manifest_name), encoding="utf-8") as handle:
-            downloads = plan(folder, json.load(handle))
-        for url, sha256, targets in downloads:
-            missing = [target for target in targets if not is_current(target[2], target[1])]
-            total += len(targets)
-            missing_count += len(missing)
-            if check_only:
-                for _, _, destination in missing:
-                    print("missing or changed: {}".format(os.path.relpath(destination, ROOT)))
-                continue
-            if not missing:
-                continue
-            print("{} <- {}".format(", ".join(os.path.relpath(t[2], folder) for t in missing), url))
-            data = fetch(url, sha256)
-            for member, member_sha256, destination in missing:
-                write(destination, data if member is None else archive_member(data, member), member_sha256)
+            downloads.extend(plan(folder, json.load(handle)))
+    return downloads
+
+
+def download_missing(folder, url, sha256, missing):
+    """[EN] Downloads `url` once and writes the missing targets. [CN] 下载 `url` 一次，并写入缺少的目标文件。"""
+    print("{} <- {}".format(", ".join(os.path.relpath(target[2], folder) for target in missing), url))
+    data = fetch(url, sha256)
+    for member, member_sha256, destination in missing:
+        write(destination, data if member is None else archive_member(data, member), member_sha256)
+
+
+def process(folder_name, check_only):
+    """[EN] Checks, or fetches, one folder; returns the number of missing files. [CN] 校验或下载一个目录，返回缺少的文件数。"""
+    folder = resource_folder(folder_name)
+    missing_count = 0
+    total = 0
+    for url, sha256, targets in folder_downloads(folder):
+        missing = [target for target in targets if not is_current(target[2], target[1])]
+        total += len(targets)
+        missing_count += len(missing)
+        if check_only:
+            for target in missing:
+                print("missing or changed: {}".format(os.path.relpath(target[2], ROOT)))
+        elif missing:
+            download_missing(folder, url, sha256, missing)
     if not check_only:
         print("{}: {} files ready".format(folder_name, total))
     return missing_count
