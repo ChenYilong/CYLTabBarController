@@ -30,6 +30,7 @@ mkdir -p "$DERIVED"
 # [EN] Prints the UDID of the first available iPhone whose runtime identifier contains $1 (any runtime when empty).
 # [CN] 输出运行时标识包含 $1（为空时为任意运行时）的第一个可用 iPhone 的 UDID。
 find_iphone() {
+  wanted_runtime="$1"
   xcrun simctl list devices available -j | python3 -c '
 import json, sys
 wanted = sys.argv[1]
@@ -40,12 +41,13 @@ for runtime in sorted(devices, reverse=True):
     for device in devices[runtime]:
         if device["name"].startswith("iPhone"):
             print(device["udid"]); sys.exit(0)
-sys.exit(1)' "$1"
+sys.exit(1)' "$wanted_runtime"
 }
 
 # [EN] Creates an iPhone on the newest installed runtime whose identifier contains $1 and prints its UDID.
 # [CN] 在标识包含 $1 的最新已安装运行时上创建一台 iPhone，并输出其 UDID。
 create_iphone() {
+  wanted_runtime="$1"
   PAIR=$(xcrun simctl list runtimes -j | python3 -c '
 import json, sys
 wanted = sys.argv[1]
@@ -55,16 +57,17 @@ for runtime in sorted(runtimes, key=lambda r: [int(x) for x in r["version"].spli
     phones = [t for t in runtime.get("supportedDeviceTypes", []) if t.get("productFamily") == "iPhone"]
     if phones:
         print(runtime["identifier"], phones[-1]["identifier"]); sys.exit(0)
-sys.exit(1)' "$1") || return 1
-  # shellcheck disable=SC2086 # [EN] Two words on purpose. [CN] 有意拆成两个参数。
-  set -- $PAIR
-  xcrun simctl create "iPhone (scroll hiding self-test)" "$2" "$1"
+sys.exit(1)' "$wanted_runtime") || return 1
+  runtime_id=${PAIR% *}
+  device_type=${PAIR#* }
+  xcrun simctl create "iPhone (scroll hiding self-test)" "$device_type" "$runtime_id"
 }
 
 # [EN] The version to download for a RUNTIME such as iOS-18 or iOS-17-5: a major version alone means its last release.
 # [CN] RUNTIME（如 iOS-18 或 iOS-17-5）对应的下载版本：只写主版本时取该版本的最后一个发布版。
 runtime_download_version() {
-  VERSION=$(printf '%s' "$1" | sed -e 's/^iOS-//' -e 's/-/./g')
+  runtime_name="$1"
+  VERSION=$(printf '%s' "$runtime_name" | sed -e 's/^iOS-//' -e 's/-/./g')
   case "$VERSION" in
     18) echo 18.6 ;;
     17) echo 17.5 ;;
