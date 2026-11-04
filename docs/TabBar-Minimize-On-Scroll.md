@@ -26,6 +26,7 @@
 | 中文 | English |
 |:---|:---|
 | [API](#cnapi) | [API](#enapi) |
+| [最直接的写法：cyl_hidesTabBarOnScroll](#cn最直接的写法cyl_hidestabbaronscroll) | [The most direct way: cyl_hidesTabBarOnScroll](#enthe-most-direct-way-cyl_hidestabbaronscroll) |
 | [同一个开关的两种写法](#cn同一个开关的两种写法) | [One switch, two ways to set it](#enone-switch-two-ways-to-set-it) |
 | [用法](#cn用法) | [Usage](#enusage) |
 | [各样式的实现](#cn各样式的实现) | [How each style works](#enhow-each-style-works) |
@@ -74,6 +75,49 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
 | 取值与系统的 [`UITabBarController.MinimizeBehavior`](https://developer.apple.com/documentation/uikit/uitabbarcontroller/minimizebehavior)（Objective-C：`UITabBarMinimizeBehavior`）一一对应，系统属性见 [`tabBarMinimizeBehavior`](https://developer.apple.com/documentation/uikit/uitabbarcontroller/tabbarminimizebehavior)（iOS 26.0+）。 | The values match the system's [`UITabBarController.MinimizeBehavior`](https://developer.apple.com/documentation/uikit/uitabbarcontroller/minimizebehavior) (Objective-C: `UITabBarMinimizeBehavior`) one to one; the system property is [`tabBarMinimizeBehavior`](https://developer.apple.com/documentation/uikit/uitabbarcontroller/tabbarminimizebehavior) (iOS 26.0+). |
 | 任何时候都可以设置，视图加载前后均可，也可以在运行时切换。没有设置时，CYLTabBarController 不会改动系统的默认值。 | Set it at any time, before or after the view loads, and change it at runtime. Until you set it, CYLTabBarController leaves the system default untouched. |
 
+## [CN]最直接的写法：cyl_hidesTabBarOnScroll
+## [EN]The most direct way: cyl_hidesTabBarOnScroll
+
+| 中文 | English |
+|:---|:---|
+| 只需要“向下滚动时隐藏 TabBar”时，用 BOOL 属性 `cyl_hidesTabBarOnScroll` 最直观，命名方式与 UIKit 的 `hidesBarsOnSwipe`、`hidesBottomBarWhenPushed` 一致。它与 `cyl_tabBarMinimizeBehavior` 共存、读写同一个取值：`YES` 等同于 `OnScrollDown`，`NO` 等同于 `Never`；滚动隐藏开启时（`OnScrollDown` 或 `OnScrollUp`）getter 返回 `YES`。需要 `OnScrollUp` 或 `Automatic` 时再使用 `cyl_tabBarMinimizeBehavior`。 | When all you need is "hide the tab bar while scrolling down", the BOOL property `cyl_hidesTabBarOnScroll` is the most direct, named like UIKit's `hidesBarsOnSwipe` and `hidesBottomBarWhenPushed`. It coexists with `cyl_tabBarMinimizeBehavior` and reads and writes the same value: `YES` is `OnScrollDown`, `NO` is `Never`; the getter is `YES` while scroll hiding is on (`OnScrollDown` or `OnScrollUp`). Use `cyl_tabBarMinimizeBehavior` for `OnScrollUp` or `Automatic`. |
+
+```Objective-C
+tabBarController.cyl_hidesTabBarOnScroll = YES; // [EN] Every style, every system. [CN] 所有样式、所有系统。
+```
+
+```Swift
+tabBarController.cyl_hidesTabBarOnScroll = true
+```
+
+| 中文 | English |
+|:---|:---|
+| setter 按样式分成三个分支，读代码即可知道效果；三个分支保存的都是同一个取值，因此样式之后改变也保持一致。 | The setter has one branch per style, so the code reads as what happens; every branch stores the same value, so it stays right if the style changes later. |
+
+| 样式 | `cyl_hidesTabBarOnScroll = YES` 时实际执行 | 效果 |
+|:---|:---|:---|
+| 液态玻璃（iOS 26+） | Apple 的 `tabBarMinimizeBehavior = UITabBarMinimizeBehaviorOnScrollDown` | 系统缩小 TabBar，PlusButton 居中于它的 Tab |
+| 扁平样式 | `cyl_tabBarMinimizeBehavior = OnScrollDown`，滚动时调用 `-setTabBarHidden:animated:` | 扁平 TabBar 下移隐藏、移回显示（0.2 秒） |
+| 经典 TabBar（iOS 25 及以前如 iOS 17、iOS 26 UI 兼容模式） | `cyl_tabBarMinimizeBehavior = OnScrollDown`，滚动时调用 `-setTabBarHidden:animated:` | iOS 18 起由 UIKit 执行动画；更早的系统与扁平样式动画相同 |
+
+| Style | What `cyl_hidesTabBarOnScroll = YES` runs | Result |
+|:---|:---|:---|
+| Liquid Glass (iOS 26+) | Apple's `tabBarMinimizeBehavior = UITabBarMinimizeBehaviorOnScrollDown` | The system minimizes the tab bar; the PlusButton is centered on its tab |
+| FlatDesign | `cyl_tabBarMinimizeBehavior = OnScrollDown`; `-setTabBarHidden:animated:` while scrolling | The flat tab bar moves down to hide and back to show (0.2 s) |
+| Classic tab bar (iOS 25 and earlier such as iOS 17, iOS 26 UI compatibility mode) | `cyl_tabBarMinimizeBehavior = OnScrollDown`; `-setTabBarHidden:animated:` while scrolling | Animated by UIKit on iOS 18+; on earlier systems the same animation as FlatDesign |
+
+| 写法 | 适合 |
+|:---|:---|
+| `cyl_hidesTabBarOnScroll` | 开 / 关，最直观（推荐） |
+| `cyl_tabBarMinimizeBehavior` | 需要 OnScrollUp、Automatic 等全部取值 |
+| `tabBarMinimizeBehavior`（Apple，iOS 26+） | 只支持 iOS 26+、习惯使用系统接口 |
+
+| Way | Best for |
+|:---|:---|
+| `cyl_hidesTabBarOnScroll` | On / off, the most direct (recommended) |
+| `cyl_tabBarMinimizeBehavior` | Every value, including OnScrollUp and Automatic |
+| `tabBarMinimizeBehavior` (Apple, iOS 26+) | iOS 26+ only apps that prefer the system API |
+
 ## [CN]同一个开关的两种写法
 ## [EN]One switch, two ways to set it
 
@@ -100,12 +144,16 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
 CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithViewControllers:viewControllers
                                                                            tabBarItemsAttributes:tabBarItemsAttributes];
 // [EN] The same line for every style and system. [CN] 所有样式与系统使用同一行代码。
+tabBarController.cyl_hidesTabBarOnScroll = YES;
+// [EN] Or, with every value: [CN] 或者使用全部取值：
 tabBarController.cyl_tabBarMinimizeBehavior = CYLTabBarMinimizeBehaviorOnScrollDown;
 ```
 
 ```Swift
 let tabBarController = CYLTabBarController(viewControllers: viewControllers,
                                            tabBarItemsAttributes: tabBarItemsAttributes)
+tabBarController.cyl_hidesTabBarOnScroll = true
+// [EN] Or, with every value: [CN] 或者使用全部取值：
 tabBarController.cyl_tabBarMinimizeBehavior = .onScrollDown
 ```
 

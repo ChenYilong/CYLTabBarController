@@ -1401,6 +1401,37 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  */
 @property (nonatomic, assign) CYLTabBarMinimizeBehavior cyl_tabBarMinimizeBehavior;
 
+/*!
+ * [EN] The most direct switch: hide the tab bar while the page scrolls down, show it again when it scrolls back up.
+ *      Named like UIKit's `hidesBarsOnSwipe` and `hidesBottomBarWhenPushed`, and the same feature as
+ *      `cyl_tabBarMinimizeBehavior`, which it reads and writes:
+ *
+ *          tabBarController.cyl_hidesTabBarOnScroll = YES;   // == cyl_tabBarMinimizeBehavior = OnScrollDown
+ *          tabBarController.cyl_hidesTabBarOnScroll = NO;    // == cyl_tabBarMinimizeBehavior = Never
+ *
+ *      What YES does in each style:
+ *      - Liquid Glass (iOS 26+): calls Apple's own `UITabBarController.tabBarMinimizeBehavior = OnScrollDown`; the system
+ *        minimizes the tab bar.
+ *      - FlatDesign: the flat tab bar is hidden and shown with `-setTabBarHidden:animated:` while the page scrolls.
+ *      - Classic tab bar (iOS 25 and earlier, e.g. iOS 17, and iOS 26 in UI compatibility mode): the system tab bar is
+ *        hidden and shown with `-setTabBarHidden:animated:`, with FlatDesign's animation before iOS 18.
+ *      The getter is YES while scroll hiding is on in either direction (OnScrollDown or OnScrollUp). Use
+ *      `cyl_tabBarMinimizeBehavior` for OnScrollUp or Automatic.
+ * [CN] 最直接的开关：页面向下滚动时隐藏 TabBar，向上滚动时重新显示。命名方式与 UIKit 的 `hidesBarsOnSwipe`、
+ *      `hidesBottomBarWhenPushed` 一致，与 `cyl_tabBarMinimizeBehavior` 是同一个功能，读写的也是它：
+ *
+ *          tabBarController.cyl_hidesTabBarOnScroll = YES;   // 等同于 cyl_tabBarMinimizeBehavior = OnScrollDown
+ *          tabBarController.cyl_hidesTabBarOnScroll = NO;    // 等同于 cyl_tabBarMinimizeBehavior = Never
+ *
+ *      YES 在各样式下的效果：
+ *      - 液态玻璃（iOS 26+）：直接调用 Apple 自己的 `UITabBarController.tabBarMinimizeBehavior = OnScrollDown`，由系统缩小 TabBar。
+ *      - 扁平样式：页面滚动时，用 `-setTabBarHidden:animated:` 隐藏、显示扁平 TabBar。
+ *      - 经典 TabBar（iOS 25 及以前，例如 iOS 17，以及 iOS 26 的 UI 兼容模式）：用 `-setTabBarHidden:animated:` 隐藏、显示系统
+ *        TabBar，iOS 18 以前使用与扁平样式相同的动画。
+ *      滚动隐藏开启时（OnScrollDown 或 OnScrollUp）getter 返回 YES。需要 OnScrollUp 或 Automatic 时使用 `cyl_tabBarMinimizeBehavior`。
+ */
+@property (nonatomic, assign) BOOL cyl_hidesTabBarOnScroll;
+
 @end
 
 FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotification;

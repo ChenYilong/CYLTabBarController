@@ -6407,6 +6407,45 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
     [self cyl_updateTabBarMinimizeTracking];
 }
 
+#pragma mark cyl_hidesTabBarOnScroll
+
+- (BOOL)cyl_hidesTabBarOnScroll {
+    CYLTabBarMinimizeBehavior behavior = self.cyl_tabBarMinimizeBehavior;
+    return (CYLTabBarMinimizeBehaviorOnScrollDown == behavior || CYLTabBarMinimizeBehaviorOnScrollUp == behavior);
+}
+
+/*!
+ * [EN] The direct switch, one branch per style so it reads as what happens. All branches store the same value as
+ *      `cyl_tabBarMinimizeBehavior` (OnScrollDown or Never), so the two APIs always agree, also after a style change.
+ * [CN] 直接的开关，每种样式一个分支，读代码即可知道效果。所有分支保存的都是与 `cyl_tabBarMinimizeBehavior` 相同的取值
+ *      （OnScrollDown 或 Never），因此两个接口始终一致，样式改变后也一样。
+ */
+- (void)setCyl_hidesTabBarOnScroll:(BOOL)hidesTabBarOnScroll {
+    // 1. Liquid Glass (iOS 26+): Apple's own API; the system minimizes the tab bar.
+    //    液态玻璃（iOS 26+）：直接调用 Apple 自己的接口，由系统缩小 TabBar。
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    if (@available(iOS 26.0, *)) {
+        if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]) {
+            self.tabBarMinimizeBehavior = hidesTabBarOnScroll ? UITabBarMinimizeBehaviorOnScrollDown : UITabBarMinimizeBehaviorNever;
+            return;
+        }
+    }
+#endif
+    CYLTabBarMinimizeBehavior behavior = hidesTabBarOnScroll ? CYLTabBarMinimizeBehaviorOnScrollDown : CYLTabBarMinimizeBehaviorNever;
+    // 2. FlatDesign: CYLTabBarController follows the page's scroll view and hides the flat tab bar with
+    //    `-setTabBarHidden:animated:`.
+    //    扁平样式：CYLTabBarController 跟随页面的滚动视图，用 `-setTabBarHidden:animated:` 隐藏扁平 TabBar。
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+        self.cyl_tabBarMinimizeBehavior = behavior;
+        return;
+    }
+    // 3. Classic tab bar (iOS 25 and earlier such as iOS 17, and iOS 26 in UI compatibility mode): the same tracking; the
+    //    system tab bar is hidden with `-setTabBarHidden:animated:` (UIKit on iOS 18+, FlatDesign's animation before).
+    //    经典 TabBar（iOS 25 及以前如 iOS 17，以及 iOS 26 的 UI 兼容模式）：同样的跟随方式；用 `-setTabBarHidden:animated:` 隐藏系统
+    //    TabBar（iOS 18+ 由 UIKit 执行，更早的系统使用扁平样式的动画）。
+    self.cyl_tabBarMinimizeBehavior = behavior;
+}
+
 #if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
 /*!
  * [EN] The same switch through Apple's own API (iOS 26+): `tabBarController.tabBarMinimizeBehavior = ...` turns scroll
