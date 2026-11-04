@@ -355,6 +355,26 @@ presentLoginForViewController:(UIViewController *)viewController
  */
 @property (nonatomic, readonly, assign) UIEdgeInsets imageInsets;
 
+/*!
+ * FIX: issue #95
+ * [EN] Sets `imageInsets` after the controller is created, e.g. when it was made with
+ *      `-initWithViewControllers:tabBarItemsAttributes:` and the insets are decided later. The insets are re-applied to
+ *      the tabs already added; a tab's own `CYLTabBarItemImageInsets` takes precedence. Non-zero insets turn off the
+ *      automatic centering of image-only tabs (`automaticallyAdjustsImageOnlyTabs`); `UIEdgeInsetsZero` gives it back.
+ *      Works for all tab bar styles: the classic system tab bar, Liquid Glass (iOS 26+) and FlatDesign.
+ *      `titlePositionAdjustment` is settable at any time too (issue #475).
+ * [CN] 在控制器创建之后设置 `imageInsets`，例如控制器通过 `-initWithViewControllers:tabBarItemsAttributes:` 创建、内边距稍后
+ *      才确定时。会对已添加的 Tab 重新应用；Tab 自身的 `CYLTabBarItemImageInsets` 优先。非零内边距会关闭纯图标 Tab 的自动居中
+ *      （`automaticallyAdjustsImageOnlyTabs`），`UIEdgeInsetsZero` 恢复自动居中。
+ *      适用于所有 TabBar 样式：经典系统 TabBar、液态玻璃（iOS 26+）与扁平样式。`titlePositionAdjustment` 同样可随时设置（issue #475）。
+ *
+ *          // Objective-C
+ *          [tabBarController updateImageInsets:UIEdgeInsetsMake(4, 0, -4, 0)];
+ *          // Swift
+ *          tabBarController.updateImageInsets(UIEdgeInsets(top: 4, left: 0, bottom: -4, right: 0))
+ */
+- (void)updateImageInsets:(UIEdgeInsets)imageInsets;
+
 @property (nonatomic, strong, readonly) CYLTabBar *tabBar;
 @property (nonatomic, strong, nullable, setter=cyl_setTabBar:) UIView __kindof *cyl_tabBar;
 

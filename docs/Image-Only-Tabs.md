@@ -15,6 +15,7 @@
 | 中文 | English |
 |:---|:---|
 | 解决 [#257](https://github.com/ChenYilong/CYLTabBarController/issues/257) 与 [#522](https://github.com/ChenYilong/CYLTabBarController/issues/522)。两个 issue 相关：它们来自同一段代码，即经典 TabBar 对“纯图标 Tab”（没有标题的 Tab）的自动居中。#257 看到的是它在每次布局时被反复触发（在页面上给 label 赋值就会触发 KVO 回调）；#522 看到的是它覆盖了 App 设置的 `titlePositionAdjustment`。 | Solves [#257](https://github.com/ChenYilong/CYLTabBarController/issues/257) and [#522](https://github.com/ChenYilong/CYLTabBarController/issues/522). The two issues are related: both come from the same code, the classic tab bar's automatic centering of "image-only tabs" (tabs without a title). #257 saw it fire again on layout passes (setting a label's text on a page triggered the KVO callback); #522 saw it override the `titlePositionAdjustment` set by the app. |
+| 同时解决 [#95](https://github.com/ChenYilong/CYLTabBarController/issues/95)：`titlePositionAdjustment` 与 `imageInsets` 以前只能在 `setViewControllers` 之前（即通过 init 方法）设置。现在两者都可以在控制器创建之后设置，见[创建之后设置偏移与内边距](#cn创建之后设置偏移与内边距)。 | Also solves [#95](https://github.com/ChenYilong/CYLTabBarController/issues/95): `titlePositionAdjustment` and `imageInsets` could only be set before `setViewControllers` (i.e. through an init method). Both can now be set after the controller is created, see [Setting offsets and insets after creation](#ensetting-offsets-and-insets-after-creation). |
 
 ## [CN]目录
 ## [EN]Contents
@@ -27,6 +28,7 @@
 | [原理与问题](#cn原理与问题) | [How it works, and what went wrong](#enhow-it-works-and-what-went-wrong) |
 | [现在的规则](#cn现在的规则) | [Rules now](#enrules-now) |
 | [新 API](#cn新-api) | [New API](#ennew-api) |
+| [创建之后设置偏移与内边距](#cn创建之后设置偏移与内边距) | [Setting offsets and insets after creation](#ensetting-offsets-and-insets-after-creation) |
 | [代码演示](#cn代码演示) | [Code](#encode) |
 | [流程图](#cn流程图) | [Flow](#enflow) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
@@ -61,6 +63,30 @@
 |:---|:---|
 | `CYLTabBarController` 新增 `@property (nonatomic, assign) BOOL automaticallyAdjustsImageOnlyTabs;`，默认 YES（保持原有的自动居中）。设为 NO 时 TabBar 不再测量偏移，回调不再修改 item；已经写入且之后未被 App 修改的值会被还原。这就是 #522 建议的“添加一个 BOOL 值来判断是否使用自定义的 titlePositionAdjustment”。现有 API 不变。 | `CYLTabBarController` gains `@property (nonatomic, assign) BOOL automaticallyAdjustsImageOnlyTabs;`, default YES (the automatic centering as before). Set to NO, the tab bar stops measuring and the callback no longer changes the items; values it already wrote, and the app has not changed since, are restored. This is the "BOOL to decide whether to use the custom titlePositionAdjustment" #522 asked for. No existing API changes. |
 | 建议在 TabBar 布局之前（`-init…` 或 `-viewDidLoad`）设置，否则图标可能先移动一次再复原。 | Set it before the tab bar is laid out (in `-init…` or `-viewDidLoad`); otherwise the icons may move once and then move back. |
+
+## [CN]创建之后设置偏移与内边距
+## [EN]Setting offsets and insets after creation
+
+| 中文 | English |
+|:---|:---|
+| **#95 的问题**：`CYLTabBarControllerConfig` 这类配置类通过 `-initWithViewControllers:tabBarItemsAttributes:` 创建控制器，`setViewControllers` 在 init 内部执行，之后再设置 `titlePositionAdjustment` 已经太晚；`imageInsets` 是只读属性，同样无效（issue 评论）。 | **The problem in #95**: a config class such as `CYLTabBarControllerConfig` creates the controller with `-initWithViewControllers:tabBarItemsAttributes:`; `setViewControllers` runs inside init, so setting `titlePositionAdjustment` afterwards was too late, and `imageInsets` is read-only, so it had no effect either (issue comment). |
+| **现有代码已解决一半**：`titlePositionAdjustment` 自 [#475](https://github.com/ChenYilong/CYLTabBarController/issues/475) 起可随时设置，会重新应用到已添加的 Tab，并在 iOS 13+ 使用 `UITabBarAppearance` 时同样生效。 | **The current code already solved half of it**: since [#475](https://github.com/ChenYilong/CYLTabBarController/issues/475), `titlePositionAdjustment` can be set at any time; it is re-applied to the tabs already added and also works on iOS 13+ with `UITabBarAppearance`. |
+| **本次新增** `- (void)updateImageInsets:(UIEdgeInsets)imageInsets;`：在创建之后设置所有 Tab 的图片内边距。`imageInsets` 属性保持只读（不修改现有 API），读取的仍是当前值。Tab 自身的 `CYLTabBarItemImageInsets` 优先；非零值会关闭纯图标 Tab 的自动居中，设回 `UIEdgeInsetsZero` 后自动居中恢复。适用于经典样式、液态玻璃与扁平样式。 | **New in this change**: `- (void)updateImageInsets:(UIEdgeInsets)imageInsets;` sets the image insets of every tab after creation. The `imageInsets` property stays read-only (no existing API changes) and still reads the current value. A tab's own `CYLTabBarItemImageInsets` takes precedence; non-zero insets turn off the automatic centering of image-only tabs, and `UIEdgeInsetsZero` brings it back. Works in the classic style, Liquid Glass and FlatDesign. |
+| 仍可在创建时一次性传入：`-initWithViewControllers:tabBarItemsAttributes:imageInsets:titlePositionAdjustment:`，或为单个 Tab 使用 `CYLTabBarItemImageInsets` / `CYLTabBarItemTitlePositionAdjustment`。 | You can still pass them at creation: `-initWithViewControllers:tabBarItemsAttributes:imageInsets:titlePositionAdjustment:`, or per tab with `CYLTabBarItemImageInsets` / `CYLTabBarItemTitlePositionAdjustment`. |
+
+```objc
+// Objective-C, e.g. in CYLTabBarControllerConfig 例如在 CYLTabBarControllerConfig 中
+CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithViewControllers:viewControllers
+                                                                           tabBarItemsAttributes:tabBarItemsAttributes];
+tabBarController.titlePositionAdjustment = UIOffsetMake(0, -3);          // #475
+[tabBarController updateImageInsets:UIEdgeInsetsMake(4, 0, -4, 0)];      // #95
+```
+
+```swift
+// Swift
+tabBarController.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3)
+tabBarController.updateImageInsets(UIEdgeInsets(top: 4, left: 0, bottom: -4, right: 0))
+```
 
 ## [CN]代码演示
 ## [EN]Code
@@ -106,4 +132,4 @@ flowchart TD
 
 | 中文 | English |
 |:---|:---|
-| 本次修改在 Linux 环境中完成，没有 Xcode、iOS SDK 与模拟器，未能编译和运行，因此没有截图。请在合并前用 Example 工程验证：纯图标 Tab 仍然居中；给 item 设置的 `titlePositionAdjustment` / `imageInsets` 生效；设置 `automaticallyAdjustsImageOnlyTabs = NO` 后图标保持系统默认位置。 | This change was made on Linux without Xcode, the iOS SDK or a simulator: it could not be built or run, so there are no screenshots. Please check it with the Example project before merging: image-only tabs are still centered; `titlePositionAdjustment` / `imageInsets` set on an item take effect; with `automaticallyAdjustsImageOnlyTabs = NO` the icons stay where UIKit puts them. |
+| 本次修改在 Linux 环境中完成，没有 Xcode、iOS SDK 与模拟器，未能编译和运行，因此没有截图。请在合并前用 Example 工程验证：纯图标 Tab 仍然居中；给 item 设置的 `titlePositionAdjustment` / `imageInsets` 生效；设置 `automaticallyAdjustsImageOnlyTabs = NO` 后图标保持系统默认位置；用 `-initWithViewControllers:tabBarItemsAttributes:` 创建后调用 `updateImageInsets:` 与设置 `titlePositionAdjustment` 均生效（#95）。 | This change was made on Linux without Xcode, the iOS SDK or a simulator: it could not be built or run, so there are no screenshots. Please check it with the Example project before merging: image-only tabs are still centered; `titlePositionAdjustment` / `imageInsets` set on an item take effect; with `automaticallyAdjustsImageOnlyTabs = NO` the icons stay where UIKit puts them; after creating the controller with `-initWithViewControllers:tabBarItemsAttributes:`, both `updateImageInsets:` and setting `titlePositionAdjustment` take effect (#95). |
