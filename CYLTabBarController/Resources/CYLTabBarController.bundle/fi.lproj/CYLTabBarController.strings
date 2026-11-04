@@ -281,3 +281,15 @@
 
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Napauta";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Lataa kuva";
+"替换为更大的图片" = "Korvaa suuremmalla kuvalla";
+"移除图片" = "Poista kuva";
+"加载背景图片" = "Lataa taustakuva";
+"2 秒后：%@" = "2 sekunnin kuluttua: %@";
+"PlusButton 图片之后才加载" = "PlusButton-kuva ladataan myöhemmin";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Napauta valitaksesi tapauksen ja avataksesi välilehtipalkkiohjaimen: PlusButtonilla ei aluksi ole kuvaa; 2 sekunnin kuluttua kuva ladataan, korvataan tai poistetaan, tai ladataan taustakuva. Tuloksen pitäisi vastata käynnistyksessä asetettua kuvaa.";
+"对照：启动时即有图片" = "Vertaa: kuva käynnistyksessä";
+"对照：启动时即有更大的图片" = "Vertaa: suurempi kuva käynnistyksessä";
+"对照：启动时即有背景图片" = "Vertaa: taustakuva käynnistyksessä";

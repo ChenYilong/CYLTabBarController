@@ -102,6 +102,28 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
     CYLPlusButtonWidth = registration.plusButtonWidth;
 }
 
+/*!
+ * [EN] The width registered for `plusButton`'s context, after the button changed size (e.g. its image loaded later): the
+ *      classic and Flat tab bars lay the tabs out with it, so a stale width put the plus button and its neighbours off
+ *      their places.
+ * [CN] PlusButton 尺寸变化后（例如图片之后才加载）更新其 context 登记的宽度：经典与扁平样式的 TabBar 用它布局各 Tab，过期的宽度会让
+ *      PlusButton 及相邻的 Tab 偏离位置。
+ */
+static void CYLPlusButtonUpdateRegisteredWidth(CYLPlusButton *plusButton) {
+    NSMutableDictionary<NSString *, CYLPlusButtonRegistration *> *registry = CYLPlusButtonRegistry();
+    @synchronized (registry) {
+        for (CYLPlusButtonRegistration *registration in registry.allValues) {
+            if (registration.plusButton != plusButton && ![registration.boundCopies containsObject:plusButton]) {
+                continue;
+            }
+            registration.plusButtonWidth = CGRectGetWidth(plusButton.bounds);
+            if ([registration.context isEqualToString:CYLPlusButtonLatestContext]) {
+                CYLPlusButtonWidth = registration.plusButtonWidth;
+            }
+        }
+    }
+}
+
 @interface CYLPlusButton () 
 
 @property (nonatomic, strong) UIImage *snapshot;
@@ -289,7 +311,7 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
                 getter:^UIImage *(UIControlState aState) { return [super imageForState:aState]; }
                 setter:^(UIImage *anImage, UIControlState aState) { [super setImage:anImage forState:aState]; }];
     if (state == UIControlStateNormal) {
-        [self cyl_growToFitContentIfNeeded];
+        [self cyl_contentImageDidChange];
     }
 }
 
@@ -299,7 +321,7 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
                 getter:^UIImage *(UIControlState aState) { return [super backgroundImageForState:aState]; }
                 setter:^(UIImage *anImage, UIControlState aState) { [super setBackgroundImage:anImage forState:aState]; }];
     if (state == UIControlStateNormal) {
-        [self cyl_growToFitContentIfNeeded];
+        [self cyl_contentImageDidChange];
     }
 }
 
@@ -319,10 +341,20 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
         return;
     }
     CGSize fittingSize = [self sizeThatFits:CGSizeZero];
+    // [EN] With the title in the tab item (#636), as if it were still in the button: the size a button made with this
+    //      image gets, so a later image ends up as large as the same image set at launch.
+    // [CN] 标题已移到 TabBarItem 中时（#636），按标题仍在按钮中计算：与启动时就设置该图片的按钮尺寸相同，之后设置的图片显示得一样大。
+    NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
+    if (movedTitle.length > 0 && self.titleLabel.font) {
+        CGSize titleSize = [movedTitle sizeWithAttributes:@{ NSFontAttributeName : self.titleLabel.font }];
+        fittingSize.width += ceil(titleSize.width);
+        fittingSize.height = MAX(fittingSize.height, ceil(titleSize.height));
+    }
     if (fittingSize.width > size.width + 0.5 || fittingSize.height > size.height + 0.5) {
         CGPoint center = self.center;
         self.bounds = (CGRect){CGPointZero, CGSizeMake(MAX(size.width, fittingSize.width), MAX(size.height, fittingSize.height))};
         self.center = center;
+        CYLPlusButtonUpdateRegisteredWidth(self);
     }
     [self setNeedsLayout];
     [self.superview setNeedsLayout];
@@ -339,7 +371,21 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
         configuration.background = background;
     }
     [super setConfiguration:configuration];
+    [self cyl_contentImageDidChange];
+}
+
+/*!
+ * [EN] The picture changed: room for it (`-cyl_growToFitContentIfNeeded`), and a badge already shown moves onto it (the
+ *      badge's anchor follows the visible picture: the image, or the whole button for a background image). Only when a
+ *      badge exists; never during layout.
+ * [CN] 图片发生变化：留出空间（`-cyl_growToFitContentIfNeeded`），已显示的角标移到图片上（角标锚点跟随可见图片：图片本身，或背景图时为整个按钮）。
+ *      仅在已有角标时处理；不会在布局期间执行。
+ */
+- (void)cyl_contentImageDidChange {
     [self cyl_growToFitContentIfNeeded];
+    if (objc_getAssociatedObject(self, NSSelectorFromString(@"cyl_badgeAnchorViewAlignedToView:"))) {
+        [self cyl_refreshBadge];
+    }
 }
 
 #pragma mark - Title alignment

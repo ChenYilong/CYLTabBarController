@@ -281,3 +281,15 @@
 
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Tócame";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Cargar la imagen";
+"替换为更大的图片" = "Reemplazar por una imagen más grande";
+"移除图片" = "Quitar la imagen";
+"加载背景图片" = "Cargar una imagen de fondo";
+"2 秒后：%@" = "En 2 segundos: %@";
+"PlusButton 图片之后才加载" = "Imagen del PlusButton cargada después";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Toca para elegir un caso y hacer push de un controlador de barra de pestañas: el PlusButton no tiene imagen al principio; 2 segundos después se carga, reemplaza o quita la imagen, o se carga una imagen de fondo. El resultado debe coincidir con una imagen definida al iniciar.";
+"对照：启动时即有图片" = "Comparar: imagen al iniciar";
+"对照：启动时即有更大的图片" = "Comparar: imagen más grande al iniciar";
+"对照：启动时即有背景图片" = "Comparar: imagen de fondo al iniciar";

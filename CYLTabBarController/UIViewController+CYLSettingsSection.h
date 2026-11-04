@@ -23,7 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
  *      row 13 hides the navigation bar without a base class, row 14 opens the slide transition demo, row 15 switches
  *      the tap sound and haptic, row 16 switches the long press duration and double tap interval, row 17 switches to
  *      the previous or next tab, row 18 runs the CYLUtils weak associated object and nearest control helpers (issue #535),
- *      then the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon,
+ *      row 19 pushes a tab bar controller whose plus button gets its image later (loaded, replaced, removed, or a
+ *      background image), then the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon,
  *      all network icons, all local icons, GIF icon, all titles, replace neighboring tabs.
  * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
  *      （`-cyl_memoryWarningCellForTableView:`），第 2 行切换所有 Tab 的标题偏移（`CYLTabBarController.titlePositionAdjustment`，
@@ -35,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
  *      第 8 行切换 Tab 的点击动画，第 9 行开启 Tab 长按，第 10 行开启左右滑动切换 Tab，第 11 行演示超出父视图的子视图响应点击，
  *      第 12 行从 bundle 加载图片，第 13 行不继承基类隐藏导航栏，第 14 行打开滑动转场演示，第 15 行切换点击声音与触感反馈，
  *      第 16 行切换长按时长与双击间隔，第 17 行切换到上一个或下一个 Tab，第 18 行运行 CYLUtils 弱引用关联对象与查找按钮的工具方法（issue #535），
+ *      第 19 行 push 一个 PlusButton 之后才加载图片的 TabBarController（加载、替换、移除图片或加载背景图片），
  *      之后是原地更新 Tab 的若干行
  *      （`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、所有网络图标、所有本地图标、GIF 图标、所有标题、替换相邻 Tab 的页面。
  */
@@ -51,7 +53,7 @@ typedef NS_ENUM(NSInteger, CYLSettingsGroup) {
     CYLSettingsGroupTabBarAppearance,     ///< [EN] Title offset, standardAppearance, scroll minimize. [CN] 标题偏移、standardAppearance、滚动缩小。
     CYLSettingsGroupTabBarItemUpdate,     ///< [EN] In-place tab item updates (#601). [CN] 原地更新 Tab（#601）。
     CYLSettingsGroupPagesSelectionLogin,  ///< [EN] Replace pages (#481), selectedIndex (#515), login (#19). [CN] 替换页面、selectedIndex、登录。
-    CYLSettingsGroupPlusButton,           ///< [EN] The plus button's touchable area (#91). [CN] PlusButton 可点击区域（#91）。
+    CYLSettingsGroupPlusButton,           ///< [EN] The plus button's touchable area (#91), an image set later. [CN] PlusButton 可点击区域（#91）、之后才加载的图片。
     CYLSettingsGroupTabInteractions,      ///< [EN] Tap animation, sound, long press, swipe (#535, #118). [CN] 点击动画、声音、长按、滑动。
     CYLSettingsGroupHelpers,              ///< [EN] No base class, CYLUtils helpers (#535). [CN] 无需继承基类、CYLUtils 工具方法。
 };

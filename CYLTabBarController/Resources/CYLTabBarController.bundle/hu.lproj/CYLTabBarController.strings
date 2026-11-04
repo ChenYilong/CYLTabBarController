@@ -281,3 +281,15 @@
 
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Koppints";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Kép betöltése";
+"替换为更大的图片" = "Csere nagyobb képre";
+"移除图片" = "Kép eltávolítása";
+"加载背景图片" = "Háttérkép betöltése";
+"2 秒后：%@" = "2 másodperc múlva: %@";
+"PlusButton 图片之后才加载" = "Később betöltött PlusButton-kép";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Koppintson egy eset kiválasztásához és egy lapsáv-vezérlő megnyitásához: a PlusButtonnak eleinte nincs képe; 2 másodperc múlva a kép betöltődik, lecserélődik vagy eltűnik, vagy háttérkép töltődik be. Az eredménynek meg kell egyeznie az induláskor beállított képpel.";
+"对照：启动时即有图片" = "Összevetés: kép induláskor";
+"对照：启动时即有更大的图片" = "Összevetés: nagyobb kép induláskor";
+"对照：启动时即有背景图片" = "Összevetés: háttérkép induláskor";

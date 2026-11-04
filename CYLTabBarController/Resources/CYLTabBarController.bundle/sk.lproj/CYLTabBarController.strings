@@ -281,3 +281,15 @@
 
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Ťukni";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Načítať obrázok";
+"替换为更大的图片" = "Nahradiť väčším obrázkom";
+"移除图片" = "Odstrániť obrázok";
+"加载背景图片" = "Načítať obrázok pozadia";
+"2 秒后：%@" = "O 2 sekundy: %@";
+"PlusButton 图片之后才加载" = "Obrázok PlusButton načítaný neskôr";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Ťuknutím vyberte prípad a otvorte ovládač panela kariet: PlusButton spočiatku nemá obrázok; po 2 sekundách sa obrázok načíta, nahradí alebo odstráni, alebo sa načíta obrázok pozadia. Výsledok by mal zodpovedať obrázku nastavenému pri spustení.";
+"对照：启动时即有图片" = "Porovnanie: obrázok pri spustení";
+"对照：启动时即有更大的图片" = "Porovnanie: väčší obrázok pri spustení";
+"对照：启动时即有背景图片" = "Porovnanie: obrázok pozadia pri spustení";

@@ -281,3 +281,15 @@
 
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Trykk her";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Last inn bildet";
+"替换为更大的图片" = "Erstatt med et større bilde";
+"移除图片" = "Fjern bildet";
+"加载背景图片" = "Last inn et bakgrunnsbilde";
+"2 秒后：%@" = "Om 2 sekunder: %@";
+"PlusButton 图片之后才加载" = "PlusButton-bilde lastet inn senere";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Trykk for å velge et tilfelle og pushe en fanelinjekontroller: PlusButton har først ikke noe bilde; 2 sekunder senere lastes bildet inn, erstattes eller fjernes, eller et bakgrunnsbilde lastes inn. Resultatet skal samsvare med et bilde angitt ved oppstart.";
+"对照：启动时即有图片" = "Sammenlign: bilde ved oppstart";
+"对照：启动时即有更大的图片" = "Sammenlign: større bilde ved oppstart";
+"对照：启动时即有背景图片" = "Sammenlign: bakgrunnsbilde ved oppstart";

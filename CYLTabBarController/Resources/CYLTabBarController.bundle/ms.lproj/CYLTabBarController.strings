@@ -281,3 +281,15 @@
 
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Ketik";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Muatkan imej";
+"替换为更大的图片" = "Gantikan dengan imej yang lebih besar";
+"移除图片" = "Alih keluar imej";
+"加载背景图片" = "Muatkan imej latar";
+"2 秒后：%@" = "Dalam 2 saat: %@";
+"PlusButton 图片之后才加载" = "Imej PlusButton dimuatkan kemudian";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Ketik untuk memilih kes dan push tab bar controller: pada mulanya PlusButton tiada imej; 2 saat kemudian imej dimuatkan, digantikan atau dialih keluar, atau imej latar dimuatkan. Hasilnya patut sama seperti imej yang ditetapkan semasa pelancaran.";
+"对照：启动时即有图片" = "Bandingkan: imej semasa pelancaran";
+"对照：启动时即有更大的图片" = "Bandingkan: imej lebih besar semasa pelancaran";
+"对照：启动时即有背景图片" = "Bandingkan: imej latar semasa pelancaran";
