@@ -217,14 +217,19 @@ enum GalleryProvider {
         controller.cyl_defaultTabButtonAnimation = GalleryBounceAnimation()
         Gallery.setBackgroundColor(of: controller, to: Gallery.darkTeal)
         Gallery.hijackPhotoTab(of: controller)
+        // [EN] The bubble lives on the tab bar, not on the button, so it survives the page swaps of the "Photo" dialog.
+        // [CN] 气泡加在 TabBar 上而不是按钮上，因此 "Photo" 对话框交换页面时不会丢失。
         Gallery.forEachTabButton(of: controller) { button, index in
-            guard index == 4 else {
+            guard index == 4, let tabBar = button.superview else {
                 return
             }
             let width: CGFloat = 120
-            Gallery.addBubble(to: button, text: "New version", color: UIColor(white: 0, alpha: 0.75),
-                              frame: CGRect(x: button.bounds.width - width, y: -40, width: width, height: 36),
-                              font: .systemFont(ofSize: 14))
+            let buttonFrame = button.convert(button.bounds, to: tabBar)
+            let bubble = Gallery.addBubble(to: tabBar, text: "New version", color: UIColor(white: 0, alpha: 0.75),
+                                           frame: CGRect(x: buttonFrame.maxX - width, y: buttonFrame.minY - 40,
+                                                         width: width, height: 36),
+                                           font: .systemFont(ofSize: 14))
+            bubble.autoresizingMask = [.flexibleLeftMargin]
         }
         return Gallery.embed(controller)
     }
@@ -345,7 +350,7 @@ enum GalleryProvider {
             let identifiers = (tabBarController.viewControllers ?? []).map {
                 $0.tabBarItem.accessibilityIdentifier ?? $0.cyl_tabBarItemIdentifier ?? "-"
             }
-            tabBarController.viewControllers?.first?.title = identifiers.joined(separator: ", ")
+            tabBarController.navigationItem.title = identifiers.joined(separator: ", ")
         }
         return Gallery.embed(controller)
     }

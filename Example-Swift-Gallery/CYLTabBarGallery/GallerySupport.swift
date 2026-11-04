@@ -147,12 +147,10 @@ enum Gallery {
 
     // MARK: Tab buttons
 
-    /// [EN] The tab button of `viewController`. `UIBarItem.cyl_tabButton` is imported as non-optional but is nil before
-    ///      the button exists, so it is read into an optional first.
-    /// [CN] `viewController` 的 Tab 按钮。`UIBarItem.cyl_tabButton` 被导入为非可选类型，但按钮创建前为 nil，因此先读入可选值。
+    /// [EN] The tab button of `viewController` (nullable; it falls back to `tabBarItem.cyl_tabButton` internally).
+    /// [CN] `viewController` 的 Tab 按钮（可为 nil；内部会回退到 `tabBarItem.cyl_tabButton`）。
     static func tabButton(of viewController: UIViewController) -> UIControl? {
-        let itemButton: UIControl? = viewController.tabBarItem.cyl_tabButton
-        return itemButton ?? viewController.cyl_tabButton
+        return viewController.cyl_tabButton
     }
 
     /// [EN] Runs `body` with each tab button once the tab bar has them. [CN] TabBar 的按钮就绪后，对每个 Tab 按钮执行 `body`。
@@ -206,7 +204,8 @@ enum Gallery {
 
     /// [EN] A bubble with `text`, added to `button` at `frame`. [CN] 在 `button` 的 `frame` 处添加一个带 `text` 的气泡。
     @discardableResult
-    static func addBubble(to button: UIControl, text: String, color: UIColor, frame: CGRect, font: UIFont) -> UIView {
+    @discardableResult
+    static func addBubble(to button: UIView, text: String, color: UIColor, frame: CGRect, font: UIFont) -> UIView {
         let bubble = UIImageView(image: bubbleImage(color: color))
         bubble.frame = frame
         let label = UILabel()

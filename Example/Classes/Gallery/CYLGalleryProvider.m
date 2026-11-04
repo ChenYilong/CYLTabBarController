@@ -734,7 +734,7 @@ static UIImage *CYLGalleryBubbleImage(UIColor *color) {
 }
 
 /// [EN] A bubble with `text`, added above the right edge of `button`. [CN] 在 `button` 右上方添加一个带 `text` 的气泡。
-static UIView *CYLGalleryAddBubble(UIControl *button, NSString *text, UIColor *color, CGRect frame, UIFont *font) {
+static UIView *CYLGalleryAddBubble(UIView *button, NSString *text, UIColor *color, CGRect frame, UIFont *font) {
     UIImageView *bubble = [[UIImageView alloc] initWithImage:CYLGalleryBubbleImage(color)];
     bubble.frame = frame;
     UILabel *label = [[UILabel alloc] init];
@@ -1069,12 +1069,18 @@ static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
             CYLGallerySetTabBarBackgroundColor(tabBarController, CYLGalleryRGB(10, 66, 91));
             CYLGalleryHijackPhotoTab(tabBarController);
             CYLGalleryForEachTabButton(tabBarController, ^(UIControl *button, NSUInteger index) {
-                if (index != 4) {
+                UIView *tabBar = button.superview;
+                if (index != 4 || !tabBar) {
                     return;
                 }
+                // [EN] The bubble lives on the tab bar, not on the button, so it survives the page swaps of the "Photo" dialog.
+                // [CN] 气泡加在 TabBar 上而不是按钮上，因此 "Photo" 对话框交换页面时不会丢失。
                 CGFloat width = 120;
-                CYLGalleryAddBubble(button, @"New version", [UIColor colorWithWhite:0 alpha:0.75],
-                                    CGRectMake(CGRectGetWidth(button.bounds) - width, -40, width, 36), [UIFont systemFontOfSize:14]);
+                CGRect buttonFrame = [button convertRect:button.bounds toView:tabBar];
+                UIView *bubble = CYLGalleryAddBubble(tabBar, @"New version", [UIColor colorWithWhite:0 alpha:0.75],
+                                                     CGRectMake(CGRectGetMaxX(buttonFrame) - width, CGRectGetMinY(buttonFrame) - 40, width, 36),
+                                                     [UIFont systemFontOfSize:14]);
+                bubble.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
             });
             return CYLGalleryEmbed(tabBarController);
         }],
@@ -1207,7 +1213,7 @@ static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
                 for (UIViewController *viewController in controller.viewControllers) {
                     [identifiers addObject:viewController.tabBarItem.accessibilityIdentifier ?: viewController.cyl_tabBarItemIdentifier ?: @"-"];
                 }
-                controller.viewControllers.firstObject.title = [identifiers componentsJoinedByString:@", "];
+                controller.navigationItem.title = [identifiers componentsJoinedByString:@", "];
             }];
             return CYLGalleryEmbed(tabBarController);
         }],

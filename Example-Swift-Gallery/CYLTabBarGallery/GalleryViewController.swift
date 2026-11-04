@@ -224,10 +224,11 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         guard viewController.tabBarItem.title == "Photo",
               let photoIndex = tabBarController.viewControllers?.firstIndex(of: viewController),
+              tabBarController.selectedIndex != NSNotFound,
               photoIndex != tabBarController.selectedIndex else {
             return true
         }
-        interceptPhoto(at: photoIndex, selectedIndex: tabBarController.selectedIndex, in: tabBarController)
+        interceptPhoto(at: photoIndex, selectedIndex: tabBarController.selectedIndex, usesTabs: false, in: tabBarController)
         return false
     }
 
@@ -240,31 +241,32 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
               photoIndex != currentIndex else {
             return true
         }
-        interceptPhoto(at: photoIndex, selectedIndex: currentIndex, in: tabBarController)
+        interceptPhoto(at: photoIndex, selectedIndex: currentIndex, usesTabs: true, in: tabBarController)
         return false
     }
 
     /// [EN] Swaps the two tabs' pages (each keeps its title and icon), selects "Photo", and restores after the dialog.
     /// [CN] 交换两个 Tab 的页面（各自保持标题与图标），选中 "Photo"，对话框关闭后恢复。
-    private func interceptPhoto(at photoIndex: Int, selectedIndex currentIndex: Int, in tabBarController: UITabBarController) {
+    private func interceptPhoto(at photoIndex: Int, selectedIndex currentIndex: Int, usesTabs: Bool,
+                                in tabBarController: UITabBarController) {
         DispatchQueue.main.async { [weak self, weak tabBarController] in
             guard let self = self, let tabBarController = tabBarController else {
                 return
             }
-            self.swapTab(at: currentIndex, with: photoIndex, in: tabBarController)
+            self.swapTab(at: currentIndex, with: photoIndex, usesTabs: usesTabs, in: tabBarController)
             tabBarController.selectedIndex = photoIndex
             Gallery.presentMoreFeatures(from: tabBarController) { [weak self, weak tabBarController] in
                 guard let self = self, let tabBarController = tabBarController else {
                     return
                 }
-                self.swapTab(at: currentIndex, with: photoIndex, in: tabBarController)
+                self.swapTab(at: currentIndex, with: photoIndex, usesTabs: usesTabs, in: tabBarController)
                 tabBarController.selectedIndex = currentIndex
             }
         }
     }
 
-    private func swapTab(at first: Int, with second: Int, in tabBarController: UITabBarController) {
-        if #available(iOS 18.0, *), !tabBarController.tabs.isEmpty {
+    private func swapTab(at first: Int, with second: Int, usesTabs: Bool, in tabBarController: UITabBarController) {
+        if #available(iOS 18.0, *), usesTabs {
             var tabs = tabBarController.tabs
             guard tabs.indices.contains(first), tabs.indices.contains(second) else {
                 return
@@ -281,9 +283,15 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
               viewControllers.indices.contains(first), viewControllers.indices.contains(second) else {
             return
         }
+        // [EN] New items (copies) first, so no two pages share one item while the bar is rebuilt.
+        // [CN] 先换上新的 item（拷贝），避免重建 TabBar 时两个页面共用同一个 item。
+        let firstItem = viewControllers[first].tabBarItem
+        let secondItem = viewControllers[second].tabBarItem
+        viewControllers[first].tabBarItem = UITabBarItem(title: secondItem?.title, image: secondItem?.image,
+                                                         selectedImage: secondItem?.selectedImage)
+        viewControllers[second].tabBarItem = UITabBarItem(title: firstItem?.title, image: firstItem?.image,
+                                                          selectedImage: firstItem?.selectedImage)
         viewControllers.swapAt(first, second)
         tabBarController.setViewControllers(viewControllers, animated: false)
-        (viewControllers[first].tabBarItem, viewControllers[second].tabBarItem) =
-            (viewControllers[second].tabBarItem, viewControllers[first].tabBarItem)
     }
 }
