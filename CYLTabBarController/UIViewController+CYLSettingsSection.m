@@ -715,6 +715,9 @@ typedef NS_ENUM(NSInteger, CYLScrollHideSimulationRow) {
     CYLScrollHideSimulationRowRealSystemAlert,
     CYLScrollHideSimulationRowOtherAppKeyboard,
     CYLScrollHideSimulationRowGuidedAccess,
+    CYLScrollHideSimulationRowSameTabAgain,
+    CYLScrollHideSimulationRowTurnOnAgain,
+    CYLScrollHideSimulationRowAppShowsTabBar,
     CYLScrollHideSimulationRowSelfTest,
     CYLScrollHideSimulationRowCount,
 };
@@ -800,6 +803,13 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
             *kind = CYLScrollHideSimulationKindKeep;
             return @"UIKeyboardWillShow of another app (UIKeyboardIsLocalUserInfoKey = NO)";
         case CYLScrollHideSimulationRowGuidedAccess: return @"UIAccessibilityGuidedAccessStatusDidChangeNotification";
+        case CYLScrollHideSimulationRowSameTabAgain:
+            *kind = CYLScrollHideSimulationKindKeep;
+            return @"selectedIndex = the same tab (no change)";
+        case CYLScrollHideSimulationRowTurnOnAgain:
+            *kind = CYLScrollHideSimulationKindKeep;
+            return @"cyl_hidesTabBarOnScroll = YES again (no change)";
+        case CYLScrollHideSimulationRowAppShowsTabBar: return @"App: setTabBarHidden:NO";
         case CYLScrollHideSimulationRowSelfTest:
             *kind = CYLScrollHideSimulationKindSelfTest;
             return @"Self-test: run every automatic simulation, report PASS / FAIL";
@@ -1125,6 +1135,18 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
             [center postNotificationName:UIAccessibilityGuidedAccessStatusDidChangeNotification object:nil];
             break;
         }
+        case CYLScrollHideSimulationRowSameTabAgain: {
+            tabBarController.selectedIndex = tabBarController.selectedIndex;
+            break;
+        }
+        case CYLScrollHideSimulationRowTurnOnAgain: {
+            tabBarController.cyl_hidesTabBarOnScroll = YES;
+            break;
+        }
+        case CYLScrollHideSimulationRowAppShowsTabBar: {
+            [tabBarController setTabBarHidden:NO animated:YES];
+            break;
+        }
         case CYLScrollHideSimulationRowSelfTest:
         case CYLScrollHideSimulationRowManualLongPress:
         case CYLScrollHideSimulationRowManualTapOutside:
@@ -1152,7 +1174,11 @@ static CYLScrollHideSelfTestExpectation CYLScrollHideSelfTestExpectationForRow(N
     switch ((CYLScrollHideSimulationRow)row) {
         case CYLScrollHideSimulationRowScrollDownInCode:
         case CYLScrollHideSimulationRowOtherAppKeyboard:
+        case CYLScrollHideSimulationRowSameTabAgain:
+        case CYLScrollHideSimulationRowTurnOnAgain:
             return CYLScrollHideSelfTestExpectationStillHidden;
+        case CYLScrollHideSimulationRowAppShowsTabBar:
+            return CYLScrollHideSelfTestExpectationRestored;
         case CYLScrollHideSimulationRowAppHidesTabBar:
             return CYLScrollHideSelfTestExpectationAppHidden;
         case CYLScrollHideSimulationRowKeyboardWhileScrolling:

@@ -7406,13 +7406,39 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
         //      旧拖动的惯性或仍在屏幕上的弹框都不能再次缩小 TabBar。
         objc_setAssociatedObject(self, CYLTabBarMinimizeHoldsSystemNeverKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [super setTabBarMinimizeBehavior:UITabBarMinimizeBehaviorNever];
-        __weak typeof(self) weakSelf = self;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(CYLTabBarMinimizeLiquidGlassExpandCheckDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            // [EN] Self-check for device testing: the bar must be expanded by now. [CN] 真机测试自检：此时 TabBar 应已恢复。
-            UIView *tabBar = weakSelf.cyl_tabBar;
-            if ([tabBar isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)tabBar cyl_showsMinimizedBar]) {
-                CYLTabBarMinimizeLog(@"Liquid Glass: writing Never did not expand the minimized tab bar", nil);
-            }
+            [self cyl_expandSystemMinimizedTabBarFallbackIfNeeded];
+        });
+    }
+#endif
+}
+
+/*!
+ * [EN] Liquid Glass, second mechanism: if writing `Never` did not expand the bar (self-check after
+ *      CYLTabBarMinimizeLiquidGlassExpandCheckDelay), hide and show it once with UIKit's own `-setTabBarHidden:animated:`
+ *      (iOS 18+, not animated, through `super` so it is not taken for the app's request), which lays it out expanded.
+ *      Each step reports its result in the diagnostic log. Skipped for a bar the app hid itself.
+ * [CN] 液态玻璃的第二种方式：如果写入 `Never` 没有恢复 TabBar（CYLTabBarMinimizeLiquidGlassExpandCheckDelay 之后自检），用 UIKit 自己的
+ *      `-setTabBarHidden:animated:`（iOS 18+，无动画，通过 `super` 调用，不会被当作 App 的请求）隐藏再显示一次，使其按展开状态重新布局。
+ *      每一步的结果都写入诊断日志。App 自己隐藏的 TabBar 不处理。
+ */
+- (void)cyl_expandSystemMinimizedTabBarFallbackIfNeeded {
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    if (@available(iOS 26.0, *)) {
+        UIView *tabBar = self.cyl_tabBar;
+        if (![tabBar isKindOfClass:[CYLTabBar class]] || ![(CYLTabBar *)tabBar cyl_showsMinimizedBar]) {
+            return;
+        }
+        if ([super isTabBarHidden]) {
+            return;
+        }
+        CYLTabBarMinimizeLog(@"Liquid Glass: writing Never did not expand the minimized tab bar; trying hide / show", nil);
+        [super setTabBarHidden:YES animated:NO];
+        [super setTabBarHidden:NO animated:NO];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(CYLTabBarMinimizeLiquidGlassExpandCheckDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            UIView *checkedTabBar = self.cyl_tabBar;
+            BOOL stillMinimized = [checkedTabBar isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)checkedTabBar cyl_showsMinimizedBar];
+            CYLTabBarMinimizeLog(stillMinimized ? @"Liquid Glass: hide / show did not expand it either" : @"Liquid Glass: hide / show expanded it", nil);
         });
     }
 #endif
