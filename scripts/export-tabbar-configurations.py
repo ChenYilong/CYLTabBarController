@@ -783,7 +783,8 @@ def main():
             if args.check:
                 stale.append(os.path.relpath(target, ROOT))
                 continue
-            os.makedirs(out_dir, exist_ok=True)
+            # [EN] The folder of the checked target, not the raw argument. [CN] 使用已检查的目标路径所在目录，而非原始参数。
+            os.makedirs(os.path.dirname(target), exist_ok=True)
             open(target, 'wb').write(data)
             written += 1
     if args.check:
