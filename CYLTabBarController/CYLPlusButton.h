@@ -23,6 +23,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
 //   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Minimize-On-Scroll.md
+//   - Update Tabs in Place: Titles, Icons, Network Icons and Pages / 原地更新 Tab：标题、图标、网络图标与替换页面
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Update-Tab-Bar-Items-In-Place.md
 // docs-binding:end
 
 #import "CYLConstants.h"
@@ -492,6 +494,26 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
  * [CN] 仅液态玻璃下生效。隐藏或显示 PlusButton 的标题 Label，并反向切换选中态内容的 Label。
  */
 - (void)setTabLabelHidden:(BOOL)hidden;
+
+/*!
+ * FIX: issue #601
+ * [EN] The title the plus button shows: its own, or, when it is shown by the tab item under it (Liquid Glass,
+ *      `-cyl_showsTitleInTabBarItem`), that one. nil without a title.
+ * [CN] PlusButton 显示的标题：它自己的，或由其下方 TabBarItem 显示时（液态玻璃，`-cyl_showsTitleInTabBarItem`）的那个。没有标题时为 nil。
+ */
+- (nullable NSString *)cyl_title;
+
+/*!
+ * FIX: issue #601
+ * [EN] Changes the plus button in place, in every style: `title` (nil keeps it), shown by the plus button or by the tab
+ *      item under it (Liquid Glass, `-cyl_showsTitleInTabBarItem`); `image` (normal and highlighted) and `selectedImage`
+ *      (nil keeps them), drawn as given, also on its stand-in in the Liquid Glass selected layer. See
+ *      `-[CYLTabBarController updatePlusButtonWithAttributes:]` for images from names, paths or URLs.
+ * [CN] 原地修改 PlusButton，适用于所有样式：`title`（nil 保持不变），由 PlusButton 或其下方的 TabBarItem 显示（液态玻璃，
+ *      `-cyl_showsTitleInTabBarItem`）；`image`（普通与高亮状态）和 `selectedImage`（nil 保持不变）按原样绘制，液态玻璃选中图层中的替身
+ *      也会更新。图片来自图片名、路径或 URL 时，见 `-[CYLTabBarController updatePlusButtonWithAttributes:]`。
+ */
+- (void)cyl_updateTitle:(nullable NSString *)title image:(nullable UIImage *)image selectedImage:(nullable UIImage *)selectedImage;
 
 @end
 

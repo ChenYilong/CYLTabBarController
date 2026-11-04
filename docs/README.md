@@ -29,6 +29,7 @@
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
 | [TabBar 的 hitTest 不再返回 nil，交给 super 处理](TabBar-HitTest-Super-Fallback.md) | [The tab bar's hitTest falls back to super instead of returning nil](TabBar-HitTest-Super-Fallback.md) |
 | [滚动时缩小或隐藏 TabBar](TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](TabBar-Minimize-On-Scroll.md) |
+| [原地更新 Tab：标题、图标、网络图标与替换页面](Update-Tab-Bar-Items-In-Place.md) | [Update Tabs in Place: Titles, Icons, Network Icons and Pages](Update-Tab-Bar-Items-In-Place.md) |
 
 <!-- navigation:end -->
 
@@ -61,6 +62,7 @@ docs/
 ├── SwiftUI-Integration.md
 ├── TabBar-HitTest-Super-Fallback.md
 ├── TabBar-Minimize-On-Scroll.md
+├── Update-Tab-Bar-Items-In-Place.md
 └── assets/
     ├── docs-navigation-index.png
     ├── flatdesign-standard-appearance-mapping.svg
@@ -68,7 +70,30 @@ docs/
     ├── plusbutton-subview-touches-issue-202.png
     ├── readme-english-before-reading.png
     ├── readme-english-bilingual-contents.png
-    └── readme-english-header-badges.png
+    ├── readme-english-header-badges.png
+    ├── update-tab-bar-items-all-local-icons.png
+    ├── update-tab-bar-items-all-network-icons-badges.png
+    ├── update-tab-bar-items-all-network-icons-restored.png
+    ├── update-tab-bar-items-badges-on-symbol-icons.png
+    ├── update-tab-bar-items-change-all-titles.png
+    ├── update-tab-bar-items-change-tab-title.png
+    ├── update-tab-bar-items-download-network-icon.png
+    ├── update-tab-bar-items-flatdesign-changed.png
+    ├── update-tab-bar-items-flatdesign-restored.png
+    ├── update-tab-bar-items-gif-icon.png
+    ├── update-tab-bar-items-image-url-keys.png
+    ├── update-tab-bar-items-issue-434-flatdesign.png
+    ├── update-tab-bar-items-issue-434-liquid-glass.png
+    ├── update-tab-bar-items-plus-button-local-icon.png
+    ├── update-tab-bar-items-plus-button-network-icon.png
+    ├── update-tab-bar-items-plus-button-restored.png
+    ├── update-tab-bar-items-plus-button-title.png
+    ├── update-tab-bar-items-replace-neighbors-restored.png
+    ├── update-tab-bar-items-replace-neighbors.png
+    ├── update-tab-bar-items-switch-tab-icon.png
+    ├── update-tab-bar-items-tab-item-badge-selected-layer.png
+    ├── update-tab-bar-items-wrapped-cells-flatdesign.png
+    └── update-tab-bar-items-wrapped-cells.png
 ```
 
 <!-- navigation:end -->

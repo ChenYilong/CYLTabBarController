@@ -8,13 +8,16 @@
 #import "UIViewController+CYLSettingsSection.h"
 #import "CYLLocalization.h"
 #import "UIViewController+CYLMemoryWarning.h"
+#import "UIViewController+CYLTabBarItemUpdate.h"
+#import "UITableViewCell+CYLBadgeExtention.h"
 #import "CYLTabBarController.h"
 #import "CYLPlusButton.h"
 #import <objc/runtime.h>
 
 const NSInteger CYLSettingsSection = 0;
 
-/// Rows of the settings section.
+/// [EN] Rows of the settings section; the tab item update rows follow (`UIViewController+CYLTabBarItemUpdate.h`).
+/// [CN] 设置分组的行；其后是更新 Tab 的若干行（`UIViewController+CYLTabBarItemUpdate.h`）。
 typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowLanguage,
     CYLSettingsRowMemoryWarning,
@@ -24,7 +27,7 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowPlusButtonTouchableArea,
     CYLSettingsRowSelectedIndexIgnoringPlusButton, // FIX: issue #515
     CYLSettingsRowTabBarMinimizeBehavior, // issue #13
-    CYLSettingsRowCount,
+    CYLSettingsRowTabBarItemUpdate,     // then one row per tab item update, see UIViewController+CYLTabBarItemUpdate.h
 };
 
 static NSString *const CYLTitlePositionAdjustmentCellIdentifier = @"CYLTitlePositionAdjustmentCell";
@@ -357,11 +360,18 @@ static NSString *const CYLTouchableAreaCellIdentifier = @"CYLTouchableAreaCell";
     if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         _titleLabel = [[UILabel alloc] init];
-        _titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        _titleLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightSemibold];
         _titleLabel.numberOfLines = 0;
         _summaryLabel = [[UILabel alloc] init];
-        _summaryLabel.font = [UIFont systemFontOfSize:12];
-        _summaryLabel.textColor = [UIColor grayColor];
+        _summaryLabel.font = [UIFont systemFontOfSize:14];
+        if (@available(iOS 13.0, *)) {
+            // [EN] As the other rows' subtitles: a brighter gray in Dark Mode. [CN] 与其他行的副标题一致：深色模式下为更亮的灰色。
+            _summaryLabel.textColor = [UIColor colorWithDynamicProvider:^UIColor *(UITraitCollection *traitCollection) {
+                return traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? [UIColor colorWithWhite:0.80 alpha:1] : UIColor.secondaryLabelColor;
+            }];
+        } else {
+            _summaryLabel.textColor = [UIColor grayColor];
+        }
         _summaryLabel.numberOfLines = 0;
         _scaleSlider = [[UISlider alloc] init];
         _scaleSlider.minimumValue = 1.0;
@@ -551,10 +561,18 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
 @implementation UIViewController (CYLSettingsSection)
 
 - (NSInteger)cyl_settingsRowCount {
-    return CYLSettingsRowCount;
+    return CYLSettingsRowTabBarItemUpdate + [self cyl_tabBarItemUpdateRowCount];
 }
 
 - (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [self cyl_settingsRowCellForTableView:tableView atIndexPath:indexPath];
+    // [EN] Every row shows its whole text, wrapped, never an ellipsis.
+    // [CN] 每行完整显示文字（换行），不出现省略号。
+    [cell cyl_wrapsTextLabels];
+    return cell;
+}
+
+- (UITableViewCell *)cyl_settingsRowCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row == CYLSettingsRowMemoryWarning) {
         return [self cyl_memoryWarningCellForTableView:tableView];
     }
@@ -575,6 +593,9 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     }
     if (indexPath.row == CYLSettingsRowTabBarMinimizeBehavior) {
         return CYLTabBarMinimizeCell(tableView, CYLSettingsTabBarController(self));
+    }
+    if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
+        return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdate];
     }
     return [self cyl_languageCellForTableView:tableView];
 }
@@ -606,6 +627,15 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     } else if (indexPath.row == CYLSettingsRowTabBarMinimizeBehavior) {
         CYLSwitchTabBarMinimizeBehavior(CYLSettingsTabBarController(self));
         [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
+        [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdate];
+        // [EN] The rows show which changes are on (a checkmark).
+        // [CN] 各行用勾号显示已应用的更改。
+        NSMutableArray<NSIndexPath *> *indexPaths = [NSMutableArray array];
+        for (NSInteger row = CYLSettingsRowTabBarItemUpdate; row < [self cyl_settingsRowCount]; row++) {
+            [indexPaths addObject:[NSIndexPath indexPathForRow:row inSection:indexPath.section]];
+        }
+        [tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
     } else {
         [self cyl_presentLanguagePicker];
     }

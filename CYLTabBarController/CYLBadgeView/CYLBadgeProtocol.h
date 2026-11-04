@@ -125,11 +125,12 @@ NS_ASSUME_NONNULL_BEGIN
 /** badge entity, which is adviced not to set manually */
 //@property (nonatomic, strong, getter=cyl_badge, setter=cyl_setBadge:) UIView __kindof *cyl_badge;
 /** `CYLBadgeAppearance.font` if not set, [UIFont boldSystemFontOfSize:9] by default */
-@property (nonatomic, strong, getter=cyl_badgeFont, setter=cyl_setBadgeFont:) UIFont *cyl_badgeFont;
+// [EN] nil goes back to `[CYLBadgeAppearance globalAppearance]` (null_resettable). [CN] 设为 nil 时恢复为 `[CYLBadgeAppearance globalAppearance]` 的值（null_resettable）。
+@property (nonatomic, strong, null_resettable, getter=cyl_badgeFont, setter=cyl_setBadgeFont:) UIFont *cyl_badgeFont;
 /** `CYLBadgeAppearance.backgroundColor` if not set, red by default */
-@property (nonatomic, strong, getter=cyl_badgeBackgroundColor, setter=cyl_setBadgeBackgroundColor:) UIColor *cyl_badgeBackgroundColor;
+@property (nonatomic, strong, null_resettable, getter=cyl_badgeBackgroundColor, setter=cyl_setBadgeBackgroundColor:) UIColor *cyl_badgeBackgroundColor;
 /** `CYLBadgeAppearance.textColor` if not set, white by default */
-@property (nonatomic, strong, getter=cyl_badgeTextColor, setter=cyl_setBadgeTextColor:) UIColor *cyl_badgeTextColor;
+@property (nonatomic, strong, null_resettable, getter=cyl_badgeTextColor, setter=cyl_setBadgeTextColor:) UIColor *cyl_badgeTextColor;
 /** we have optimized the badge frame and center. This property is adviced not to set manually */
 @property (nonatomic, assign, getter=cyl_badgeFrame, setter=cyl_setBadgeFrame:) CGRect cyl_badgeFrame;
 

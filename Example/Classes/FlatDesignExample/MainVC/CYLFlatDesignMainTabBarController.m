@@ -97,7 +97,7 @@
     
     // Used only while no `standardAppearance` is set: the appearance assigned in `-init…` takes precedence.
     // 仅在没有设置 `standardAppearance` 时使用：`-init…` 中赋值的 appearance 优先。
-    cyl_tabBar.barTintColor = [UIColor whiteColor];
+    cyl_tabBar.barTintColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
     cyl_tabBar.shadowImage = [UIImage cyl_imageWithColor:[UIColor.lightGrayColor colorWithAlphaComponent:0.5] size:CGSizeMake(1, 1)];
     
     //    NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
@@ -425,7 +425,8 @@ presentLoginForViewController:(UIViewController *)viewController
             [self.viewControllers[0] cyl_clearBadge];
             //            [tabBarButton insertSubview:tabBarButton.cyl_lottieAnimationView belowSubview:selectedTabButton];
             //            [tabBarButton bringSubviewToFront:newView];
-            [tabBarButton cyl_bringSubviewToTop:newView];
+            // [EN] The cover is kept on top by -cyl_coverVisiableTabImageViewOrTabButton:.
+            // [CN] 封面由该方法保持在最上层。
             
             if (![CYLConstants isLiquidGlassActive]) {
                 // [CN] LiquidGlass 已经自带缩放动画， 无需缩放
