@@ -219,3 +219,8 @@
 "跳转与对比" = "Navigation and comparisons";
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Not supported by Liquid Glass: the system sets the tab bar height (FlatDesign and the classic style support it)";
+
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Scroll hiding: simulate interruptions (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Fires 1.5 s after the tap. Scroll down first to hide the TabBar. Expected: the TabBar comes back at once, and momentum does not hide it again.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Fires 1.5 s after the tap. Expected: the TabBar does not change because of it (not hidden, and a TabBar hidden by the app is not shown).";

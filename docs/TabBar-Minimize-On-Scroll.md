@@ -37,6 +37,9 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [隐藏的条件](#cn隐藏的条件) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [When it hides](#enwhen-it-hides) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [恢复显示的场景](#cn恢复显示的场景) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [When it comes back](#enwhen-it-comes-back) |
 | [演示](#cn演示) | [Demo](#endemo) |
+| [边界情况与自评](#cn边界情况与自评) | [Edge cases and self-assessment](#enedge-cases-and-self-assessment) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [自评记录](#cn自评记录) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Self-assessment rounds](#enself-assessment-rounds) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [边界情况清单](#cn边界情况清单) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Edge case list](#enedge-case-list) |
 | [限制](#cn限制) | [Limits](#enlimits) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
@@ -326,6 +329,94 @@ flowchart TD
 | 中文 | English |
 |:---|:---|
 | 每个 Demo 列表顶部的设置分组新增「滚动时缩小 / 隐藏 TabBar（issue #13）」一行（`UIViewController+CYLSettingsSection`，Objective-C 与 Swift Demo 共用）。点击后依次为显示该列表的 TabBarController 设置 Automatic → OnScrollDown → OnScrollUp → Never，然后滚动列表即可：在液态玻璃 TabBar 中看到系统缩小 TabBar，在扁平样式 TabBar（Demo 中导航栏左侧的 FlatDesign 按钮）中看到 TabBar 隐藏与显示，在 iOS 25 及以前或开启 UI 兼容模式的 iOS 26 上看到经典 TabBar 隐藏与显示。 | The settings section at the top of every demo list has a new row, "Minimize / hide the TabBar on scroll (issue #13)" (`UIViewController+CYLSettingsSection`, shared by the Objective-C and Swift demos). Each tap sets the next value on the tab bar controller that shows the list (Automatic → OnScrollDown → OnScrollUp → Never); then scroll the list: in a Liquid Glass tab bar the system minimizes it, in a FlatDesign tab bar (the FlatDesign button on the left of the demo's navigation bar) it hides and shows, and on iOS 25 and earlier or on iOS 26 in UI compatibility mode the classic tab bar hides and shows. |
+
+<!-- edge-cases:start -->
+
+## [CN]边界情况与自评
+## [EN]Edge cases and self-assessment
+
+| 中文 | English |
+|:---|:---|
+| 滚动隐藏最难的是“何时恢复显示”。每一轮按满分 100 分给边界情况的兼容程度打分，列出减分项与加分项，修改代码与文档后再打分，直到不低于 90 分（至少五轮）。分数衡量的是设计对边界情况的覆盖程度；没有真机验证始终作为减分项保留，不会被当作已解决。 | The hard part of scroll hiding is when the bar comes back. Each round scores how well edge cases are handled (out of 100), lists deductions and positives, changes the code and the docs, and scores again, until the score is at least 90 (at least five rounds). The score measures how well the design covers edge cases; the lack of device testing stays a deduction and is never counted as solved. |
+| 演示：Objective-C Demo 的分组列表（液态玻璃与扁平样式页面）末尾新增「滚动隐藏：模拟意外情况（issue #13）」section。每行先开启滚动隐藏，点击 1.5 秒后触发对应的意外情况，留出时间先向下滚动隐藏 TabBar；行标题即触发的 API 或事件名称，副标题说明预期结果。无法用代码触发的系统事件（真实来电、低电量弹框）通过发送系统会发送的通知来模拟，真机上仍需手动验证。 | Demo: the grouped list of the Objective-C demo (Liquid Glass and FlatDesign pages) ends with a new section, "Scroll hiding: simulate interruptions (issue #13)". Each row turns scroll hiding on and fires its interruption 1.5 s after the tap, so there is time to scroll down and hide the bar first; the row title names the API or event, the subtitle the expected result. System events code cannot trigger (a real call, the low battery alert) are simulated by posting the notifications the system posts; they still need checking by hand on a device. |
+
+### [CN]自评记录
+### [EN]Self-assessment rounds
+
+| 轮次 | 分数 | 减分项 | 加分项 | 本轮修改 |
+|:---|:---|:---|:---|:---|
+| 1 | 70 | 没有模拟意外情况的演示 −8；子控制器 presentation −4；App 自己隐藏后会被显示 −4；刚好够长的内容闪动 −3；横向分页选错滚动视图 −2；VoiceOver −3；hidesBottomBarWhenPushed 页面每 0.25 秒重复恢复 −1；iPad 多 Scene 的 key window −2；液态玻璃恢复方式未验证 −3 | 白名单隐藏会话；通知 + 生命周期 + 定时检查；新拖动规则；三种样式用 guard 隔离 | 新增演示 section（18 行）；App 的 setTabBarHidden: 接管 TabBar；检查子控制器的 presentedViewController；优先选择竖向滚动视图；隐藏需要 ≥ 200pt 可滚动距离（滞回） |
+
+| Round | Score | Deductions | Positives | Changes in this round |
+|:---|:---|:---|:---|:---|
+| 1 | 70 | no demo of interruptions −8; child presentation −4; a bar the app hid gets shown −4; flicker on content just long enough −3; wrong scroll view in pagers −2; VoiceOver −3; repeated restores every 0.25 s on hidesBottomBarWhenPushed pages −1; key window with several iPad scenes −2; Liquid Glass restore unverified −3 | whitelist hide session; notifications + lifecycle + timer; new-drag rule; three styles isolated by guards | demo section (18 rows); the app's setTabBarHidden: takes the bar over; children's presentedViewController checked; vertical scroll views preferred; hiding needs 200pt of scrollable distance (hysteresis) |
+
+### [CN]边界情况清单
+### [EN]Edge case list
+
+| 中文 | English |
+|:---|:---|
+| 状态：✅ 由代码处理；🧪 另有演示行（「滚动隐藏：模拟意外情况」section）；📱 只能在真机上手动验证。 | Status: ✅ handled in code; 🧪 also has a demo row (the "Scroll hiding: simulate interruptions" section); 📱 can only be checked by hand on a device. |
+
+| # | 场景 | 处理方式 | 状态 |
+|:---|:---|:---|:---|
+| 1 | 向上滚动 | 滚动方向反转超过 12pt | ✅ |
+| 2 | 回到顶部、点击状态栏回到顶部 | contentOffset 到达起始边缘（代码设置的偏移也算） | ✅🧪 |
+| 3 | 代码向下滚动（非用户拖动） | 只响应拖动或拖动后的惯性 | ✅🧪 |
+| 4 | 内容变短不再能滚动 | 可滚动距离 < 100pt 时恢复；隐藏需要 ≥ 200pt（滞回，防止闪动） | ✅ |
+| 5 | 内容开头 | 滚入超过 50pt 才隐藏 | ✅ |
+| 6 | 恢复后的惯性滚动 | 恢复后需要新的拖动 | ✅ |
+| 7 | 前后台切换 | App 与 Scene 通知 | ✅🧪 |
+| 8 | 来电（接听） | WillResignActive | ✅🧪📱 |
+| 9 | 低电量弹框、系统弹框、权限请求 | WillResignActive | ✅🧪📱 |
+| 10 | 控制中心、通知中心、App 切换器 | WillResignActive / DidEnterBackground | ✅📱 |
+| 11 | 点击推送打开 App 后 push | 前台通知 + 页面变化 | ✅🧪 |
+| 12 | push、pop、手势返回 | 会话上下文（页面）+ 转场中不隐藏 | ✅🧪 |
+| 13 | push 设置了 hidesBottomBarWhenPushed 的页面 | 交给 UIKit；返回后恢复 | ✅🧪 |
+| 14 | 切换 Tab（点击或代码） | 会话上下文（Tab） | ✅🧪 |
+| 15 | App 内 alert、actionSheet | presentedViewController（本控制器、选中 Tab、当前页面） | ✅🧪 |
+| 16 | 全屏模态页面、页面卡片 | presentedViewController + viewWillDisappear / viewWillAppear | ✅🧪 |
+| 17 | 子控制器自定义 presentation context | 检查选中 Tab 与当前页面的 presentedViewController | ✅ |
+| 18 | 分享面板 | presentedViewController | ✅🧪 |
+| 19 | 独立窗口中的 HUD、浮层 | UIWindowDidBecomeKey + key window 检查 | ✅🧪 |
+| 20 | 键盘弹出 | UIKeyboardWillShow | ✅🧪 |
+| 21 | 内存警告 | UIApplicationDidReceiveMemoryWarning | ✅🧪 |
+| 22 | 旋转、分屏 / 台前调度尺寸变化 | viewWillTransitionToSize | ✅📱 |
+| 23 | App 自己隐藏 TabBar | App 的 setTabBarHidden: 接管 TabBar，滚动隐藏不再显示它 | ✅🧪 |
+| 24 | 关闭滚动隐藏、改变样式 | 设置取值、每次布局 | ✅🧪 |
+| 25 | 横向分页中的竖向列表 | 优先选择可以竖向滚动的滚动视图 | ✅ |
+| 26 | 滚动视图被替换或释放 | 会话上下文（滚动视图）+ weak | ✅ |
+
+| # | Scenario | How it is handled | Status |
+|:---|:---|:---|:---|
+| 1 | Scrolling up | The direction reverses for 12pt | ✅ |
+| 2 | Back at the top, a status bar tap | contentOffset reaches the start edge (offsets set in code count too) | ✅🧪 |
+| 3 | Scrolling down in code (not a user drag) | Only drags and their momentum count | ✅🧪 |
+| 4 | Content that no longer scrolls | Shown below 100pt of scrollable distance; hiding needs 200pt (hysteresis, no flicker) | ✅ |
+| 5 | The start of the content | Hides only after 50pt into the content | ✅ |
+| 6 | Momentum after a restore | A new drag is needed after a restore | ✅ |
+| 7 | Background / foreground | App and scene notifications | ✅🧪 |
+| 8 | A call (answered) | WillResignActive | ✅🧪📱 |
+| 9 | Low battery alert, system alerts, permission requests | WillResignActive | ✅🧪📱 |
+| 10 | Control Center, Notification Center, the app switcher | WillResignActive / DidEnterBackground | ✅📱 |
+| 11 | A push notification tap that opens the app and pushes a page | Foreground notifications + page change | ✅🧪 |
+| 12 | Push, pop, swipe back | Session context (page) + no hiding during a transition | ✅🧪 |
+| 13 | Push of a page with hidesBottomBarWhenPushed | Left to UIKit; shown on the way back | ✅🧪 |
+| 14 | Tab switch (tap or code) | Session context (tab) | ✅🧪 |
+| 15 | In-app alert, action sheet | presentedViewController (this controller, the selected tab, the page) | ✅🧪 |
+| 16 | Full-screen modal, page sheet | presentedViewController + viewWillDisappear / viewWillAppear | ✅🧪 |
+| 17 | A child that defines its own presentation context | Checks the selected tab's and the page's presentedViewController | ✅ |
+| 18 | Share sheet | presentedViewController | ✅🧪 |
+| 19 | HUD or overlay in a window of its own | UIWindowDidBecomeKey + key window check | ✅🧪 |
+| 20 | The keyboard appears | UIKeyboardWillShow | ✅🧪 |
+| 21 | Memory warning | UIApplicationDidReceiveMemoryWarning | ✅🧪 |
+| 22 | Rotation, Split View / Stage Manager resize | viewWillTransitionToSize | ✅📱 |
+| 23 | The app hides the tab bar itself | The app's setTabBarHidden: takes the bar over; scroll hiding never shows it | ✅🧪 |
+| 24 | Scroll hiding turned off, a style change | Setting the value, every layout | ✅🧪 |
+| 25 | A vertical list inside a horizontal pager | A vertically scrolling scroll view is preferred | ✅ |
+| 26 | The scroll view is replaced or released | Session context (scroll view) + weak | ✅ |
+
+<!-- edge-cases:end -->
 
 ## [CN]限制
 ## [EN]Limits

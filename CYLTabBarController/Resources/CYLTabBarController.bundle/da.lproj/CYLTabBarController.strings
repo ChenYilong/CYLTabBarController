@@ -219,3 +219,8 @@
 "跳转与对比" = "Navigation og sammenligninger";
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Understøttes ikke af Liquid Glass: systemet bestemmer fanelinjens højde (FlatDesign og klassisk stil understøtter det)";
+
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Skjul ved rulning: simuler afbrydelser (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Udløses 1,5 s efter trykket. Rul først ned for at skjule TabBar. Forventet: TabBar kommer straks tilbage, og inertien skjuler den ikke igen.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Udløses 1,5 s efter trykket. Forventet: TabBar ændres ikke af det (skjules ikke, og en TabBar skjult af appen vises ikke).";

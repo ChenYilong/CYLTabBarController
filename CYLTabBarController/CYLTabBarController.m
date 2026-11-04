@@ -234,6 +234,9 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 /// [EN] A view lifecycle event of this controller (appear, disappear, size change): ends any hide session.
 /// [CN] 本控制器的视图生命周期事件（出现、消失、尺寸变化）：结束隐藏会话。
 - (void)cyl_tabBarMinimizeLifecycleEvent;
+/// [EN] Every `-setTabBarHidden:animated:` call: one not made by scroll hiding is the app taking the tab bar over.
+/// [CN] 每次 `-setTabBarHidden:animated:` 调用：不是滚动隐藏发出的调用，即 App 接管 TabBar。
+- (void)cyl_tabBarMinimizeDidReceiveTabBarHiddenRequest:(BOOL)hidden;
 @end
 
 /// Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
@@ -1087,6 +1090,9 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 }
 
 - (void)setTabBarHidden:(BOOL)hidden animated:(BOOL)animated {
+    // [EN] Scroll hiding (issue #13): a request by the app takes the tab bar over from scroll hiding.
+    // [CN] 滚动隐藏（issue #13）：App 自己的请求从滚动隐藏手中接管 TabBar。
+    [self cyl_tabBarMinimizeDidReceiveTabBarHiddenRequest:hidden];
     //CYLTabBarStyleTypeFlatDesign
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
 #if CYL_FLATDESIGN_AVAILABLE
@@ -6243,6 +6249,12 @@ static const CGFloat CYLTabBarMinimizeScrollDistance = 12.0;
 /// [EN] Content that scrolls less than this (pt) never hides the tab bar: hiding it would change the content's size.
 /// [CN] 可滚动距离小于该值（pt）的内容不隐藏 TabBar：隐藏 TabBar 本身就会改变内容的可滚动范围。
 static const CGFloat CYLTabBarMinimizeMinimumScrollableDistance = 100.0;
+/// [EN] Hysteresis: hiding needs this much scrollable distance (pt), more than the 100pt that keeps the bar hidden, because
+///      hiding the bar itself makes the visible area taller (by about the bar's height) and the content shorter to scroll.
+///      Without it, content just long enough would hide, become "too short", show, and hide again.
+/// [CN] 滞回：隐藏需要的可滚动距离（pt）大于保持隐藏所需的 100pt，因为隐藏 TabBar 本身会让可见区域变高（约一个 TabBar 的高度），
+///      内容可滚动的距离随之变短。否则刚好够长的内容会隐藏、变得“太短”、显示、再隐藏，反复闪动。
+static const CGFloat CYLTabBarMinimizeHideMinimumScrollableDistance = 200.0;
 /// [EN] Classic style: how often the page on screen is checked again (core has no push/pop hook outside FlatDesign).
 /// [CN] 经典样式：重新确认当前页面的间隔（FlatDesign 以外，Core 中没有 push/pop 回调）。
 static const NSTimeInterval CYLTabBarMinimizeClassicPageCheckInterval = 0.5;
@@ -6324,6 +6336,11 @@ static UIScrollView *CYLTabBarMinimizeScrollViewForViewController(UIViewControll
             return contentScrollView;
         }
     }
+    // [EN] Breadth first, the first scroll view that scrolls vertically wins, so a list inside a horizontal pager (a
+    //      paging scroll view, a page view controller) is chosen, not the pager; otherwise the first scroll view.
+    // [CN] 广度优先，第一个可以竖向滚动的滚动视图优先，因此横向分页容器（分页滚动视图、page view controller）中的列表会被选中，
+    //      而不是分页容器本身；没有时取第一个滚动视图。
+    UIScrollView *firstScrollView = nil;
     NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:visibleViewController.view];
     for (NSUInteger index = 0; index < views.count; index++) {
         UIView *view = views[index];
@@ -6331,11 +6348,19 @@ static UIScrollView *CYLTabBarMinimizeScrollViewForViewController(UIViewControll
             continue;
         }
         if ([view isKindOfClass:[UIScrollView class]] && ![view isKindOfClass:[UITextView class]]) {
-            return (UIScrollView *)view;
+            UIScrollView *scrollView = (UIScrollView *)view;
+            BOOL scrollsVertically = scrollView.contentSize.height > CGRectGetHeight(scrollView.bounds) + 1.0;
+            BOOL isHorizontalPager = scrollView.pagingEnabled && scrollView.contentSize.width > CGRectGetWidth(scrollView.bounds) + 1.0;
+            if (scrollsVertically && !isHorizontalPager) {
+                return scrollView;
+            }
+            if (!firstScrollView) {
+                firstScrollView = scrollView;
+            }
         }
         [views addObjectsFromArray:view.subviews];
     }
-    return nil;
+    return firstScrollView;
 }
 
 /// [EN] Classic style: whether the tab bar sits at the bottom of its superview (not, e.g., a tab bar shown at the top).
@@ -6378,6 +6403,7 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
 - (void)expandTabBar;
 - (void)restoreTabBar;
 - (void)validateHideSession;
+- (void)appDidRequestTabBarHidden:(BOOL)hidden;
 @end
 
 @implementation _CYLTabBarMinimizeScrollTracker {
@@ -6409,6 +6435,12 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     __weak UIWindow *_sessionWindow;
     CYLTabBarMinimizeBehavior _sessionBehavior;
     CYLTabBarMinimizeMode _sessionMode;
+    /// [EN] YES while scroll hiding itself calls `-setTabBarHidden:animated:`. [CN] 滚动隐藏自己调用 `-setTabBarHidden:animated:` 期间为 YES。
+    BOOL _settingTabBarHidden;
+    /// [EN] Scroll hiding's own last request and when it was made: a FlatDesign animation may replay it shortly after.
+    /// [CN] 滚动隐藏自己最近一次请求及时间：扁平样式的动画可能稍后重放它。
+    BOOL _lastOwnRequestHidden;
+    CFTimeInterval _lastOwnRequestTime;
 }
 
 - (instancetype)initWithTabBarController:(CYLTabBarController *)tabBarController {
@@ -6548,10 +6580,15 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     if (UIApplicationStateActive != [UIApplication sharedApplication].applicationState) {
         return NO;
     }
-    if (tabBarController.presentedViewController) {
+    // [EN] Presented by this controller or an ancestor, by the selected tab, or by the page on screen (a child that
+    //      defines its own presentation context is not seen from above).
+    // [CN] 由本控制器或其祖先、选中的 Tab、或当前页面 present（自行定义 presentation context 的子控制器从上层看不到）。
+    UIViewController *selectedViewController = tabBarController.selectedViewController;
+    if (tabBarController.presentedViewController || selectedViewController.presentedViewController ||
+        CYLTabBarMinimizeVisibleViewController(selectedViewController).presentedViewController) {
         return NO;
     }
-    if (tabBarController.selectedViewController.transitionCoordinator) {
+    if (selectedViewController.transitionCoordinator) {
         return NO;
     }
     return self.scrollView.window != nil;
@@ -6825,7 +6862,8 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     }
     BOOL farEnoughIntoContent = minimizesOnScrollDown ? (newOffsetY > minOffsetY + CYLTabBarMinimizeHideStartDistance)
                                                       : (newOffsetY < maxOffsetY - CYLTabBarMinimizeHideStartDistance);
-    if (!farEnoughIntoContent || ![self environmentAllowsHiding]) {
+    if (!farEnoughIntoContent || maxOffsetY - minOffsetY < CYLTabBarMinimizeHideMinimumScrollableDistance ||
+        ![self environmentAllowsHiding]) {
         return;
     }
     [self minimizeTabBar];
@@ -6892,7 +6930,7 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     _hiddenByScroll = YES;
     // [EN] The one place a session starts for FlatDesign and classic. [CN] 扁平样式与经典样式开始会话的唯一位置。
     [self beginHideSession];
-    [tabBarController setTabBarHidden:YES animated:YES];
+    [self setTabBarHiddenFromScroll:YES];
     [self updateCheckTimer];
 }
 
@@ -6905,17 +6943,51 @@ static BOOL CYLTabBarMinimizeClassicPageHidesTabBar(UIViewController *selectedVi
     //      until a page that shows the bar is back, then show it.
     // [CN] Guard（经典样式）：被 push 的页面通过 `hidesBottomBarWhenPushed` 隐藏了 TabBar；保持“滚动隐藏”状态，等显示 TabBar
     //      的页面回来后再显示。
-    if (CYLTabBarMinimizeModeClassic == _mode && CYLTabBarMinimizeClassicPageHidesTabBar(self.tabBarController.selectedViewController)) {
+    CYLTabBarController *tabBarController = self.tabBarController;
+    if (CYLTabBarMinimizeModeClassic == _mode && CYLTabBarMinimizeClassicPageHidesTabBar(tabBarController.selectedViewController)) {
         return;
     }
     _hiddenByScroll = NO;
     if (CYLTabBarMinimizeModeFlatDesign != _mode && CYLTabBarMinimizeModeClassic != _mode) {
         return;
     }
-    CYLTabBarController *tabBarController = self.tabBarController;
     if (tabBarController.isTabBarHidden) {
-        [tabBarController setTabBarHidden:NO animated:YES];
+        [self setTabBarHiddenFromScroll:NO];
     }
+    [self updateCheckTimer];
+}
+
+/// [EN] Scroll hiding's own call of the public `-setTabBarHidden:animated:`, marked so it is not taken for the app's.
+/// [CN] 滚动隐藏自己调用公开的 `-setTabBarHidden:animated:`，做上标记，避免被当作 App 的调用。
+- (void)setTabBarHiddenFromScroll:(BOOL)hidden {
+    _settingTabBarHidden = YES;
+    _lastOwnRequestHidden = hidden;
+    _lastOwnRequestTime = CACurrentMediaTime();
+    [self.tabBarController setTabBarHidden:hidden animated:YES];
+    _settingTabBarHidden = NO;
+}
+
+/*!
+ * [EN] The app called `-setTabBarHidden:animated:` itself: it owns the tab bar from now on. A bar hidden by scrolling is
+ *      no longer ours to show (it stays as the app wants), and the session ends. Ignored: scroll hiding's own calls, and
+ *      a FlatDesign replay of our own last request within 0.5 s.
+ * [CN] App 自己调用了 `-setTabBarHidden:animated:`：之后由 App 控制 TabBar。被滚动隐藏的 TabBar 不再由这里显示（保持 App 想要的状态），
+ *      会话结束。忽略：滚动隐藏自己的调用，以及 0.5 秒内扁平样式动画对我们最近一次请求的重放。
+ */
+- (void)appDidRequestTabBarHidden:(BOOL)hidden {
+    if (_settingTabBarHidden) {
+        return;
+    }
+    if (hidden == _lastOwnRequestHidden && CACurrentMediaTime() - _lastOwnRequestTime < 0.5) {
+        return;
+    }
+    if (!_hiddenByScroll && !_hideSessionActive) {
+        return;
+    }
+    _hiddenByScroll = NO;
+    [self endHideSession];
+    _needsNewDrag = YES;
+    _lastSeenTracking = self.scrollView.isTracking;
     [self updateCheckTimer];
 }
 
@@ -7141,6 +7213,11 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
     }
     // [EN] Every layout of this controller checks the hide session. [CN] 本控制器每次布局都检查隐藏会话。
     [tracker validateHideSession];
+}
+
+- (void)cyl_tabBarMinimizeDidReceiveTabBarHiddenRequest:(BOOL)hidden {
+    _CYLTabBarMinimizeScrollTracker *tracker = objc_getAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey);
+    [tracker appDidRequestTabBarHidden:hidden];
 }
 
 - (void)cyl_tabBarMinimizeLifecycleEvent {
