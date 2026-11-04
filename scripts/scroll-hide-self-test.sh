@@ -48,11 +48,16 @@ for runtime, devices in json.load(sys.stdin)["devices"].items():
             print(device["udid"]); sys.exit(0)
 sys.exit(1)' "$DEVICE_NAME")
 fi
+# [EN] IPHONEOS_DEPLOYMENT_TARGET=16.0 for every target of this test build only: the demo's Podfile sets the pods to
+#      iOS 15.0, where Swift code auto-links swiftCompatibility56, which Xcode 26.3 no longer ships (link error). The
+#      project files are not changed.
+# [CN] 仅本次测试构建的所有 target 使用 IPHONEOS_DEPLOYMENT_TARGET=16.0：演示工程的 Podfile 把 pods 设为 iOS 15.0，此时 Swift 代码会自动
+#      链接 Xcode 26.3 已不再提供的 swiftCompatibility56（链接错误）。不修改工程文件。
 xcodebuild -version
 pod install
 if ! xcodebuild -workspace CYLTabBarController.xcworkspace -scheme CYLTabBarController -configuration Debug \
   -sdk iphonesimulator -destination "id=$DEVICE_ID" -derivedDataPath "$DERIVED" \
-  CODE_SIGNING_ALLOWED=NO build > "$BUILD_LOG" 2>&1; then
+  CODE_SIGNING_ALLOWED=NO IPHONEOS_DEPLOYMENT_TARGET=16.0 build > "$BUILD_LOG" 2>&1; then
   echo "Build failed. Errors:"
   grep -nE "(error|fatal error):|^ld: |Undefined symbols|symbol\(s\) not found" "$BUILD_LOG" | sort -u | head -n 60 || true
   tail -n 30 "$BUILD_LOG"
