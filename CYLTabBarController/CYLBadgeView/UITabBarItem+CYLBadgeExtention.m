@@ -116,14 +116,14 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 - (void)cyl_showBadge {
     // [kActualView cyl_showBadge];
     SEL selector = @selector(cyl_showBadge);
-    [kActualView cyl_performSelector:selector];
+    [self cyl_performSelector:selector];
 }
 
 - (void)cyl_showBadgeValue:(NSString *)value
              animationTypeValue:(NSNumber *)animationTypeValue {
 //    [kActualView cyl_showBadgeValue:value animationType:animationType];
     SEL selector = @selector(cyl_showBadgeValue:animationTypeValue:);
-    [kActualView cyl_performSelector:selector withObject:value withObject:animationTypeValue];
+    [self cyl_performSelector:selector withObject:value withObject:animationTypeValue];
 }
 
 - (void)cyl_showBadgeValue:(NSString *)value
@@ -134,13 +134,13 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 - (void)cyl_clearBadge {
 //    [kActualView cyl_clearBadge];
     SEL selector = @selector(cyl_clearBadge);
-    [kActualView cyl_performSelector:selector];
+    [self cyl_performSelector:selector];
 }
 
 - (void)cyl_resumeBadge {
 //    [kActualView cyl_resumeBadge];
     SEL selector = @selector(cyl_resumeBadge);
-    [kActualView cyl_performSelector:selector];
+    [self cyl_performSelector:selector];
 }
 
 - (BOOL)cyl_isShowBadge {
@@ -269,6 +269,15 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 }
 
 #pragma mark -- setter/getter
+
+// FIX: issue #481
+// [EN] The setters go through `-cyl_performSelector:withObject:` (as `UIViewController`'s, which call this item): with
+//      Liquid Glass it applies them to the badge host of the normal layer and of its counterpart in the selected layer,
+//      so a badge styled on the tab item directly is styled in both layers. They used to reach only the normal layer,
+//      and the selected layer showed the default style. Values that are not objects use the `…Value:` setters.
+// [CN] setter 通过 `-cyl_performSelector:withObject:` 设置（与调用本 item 的 `UIViewController` 相同）：液态玻璃下同时作用于普通图层
+//      及其在选中图层中的对应按钮上的角标宿主，因此直接在 TabBarItem 上设置的角标样式在两个图层中都生效。原先只作用于普通图层，选中图层
+//      显示默认样式。非对象的值使用 `…Value:` setter。
 - (UIView<CYLBadgeTextDisplaying> *)cyl_badge {
     return CYL_ACTUAL_BARBUTTON.cyl_badge;
 }
@@ -282,7 +291,7 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 }
 
 - (void)cyl_setBadgeFont:(UIFont *)badgeFont {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeFont:badgeFont];
+    [self cyl_performSelector:@selector(cyl_setBadgeFont:) withObject:badgeFont];
 }
 
 - (UIColor *)cyl_badgeBackgroundColor {
@@ -290,7 +299,7 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 }
 
 - (void)cyl_setBadgeBackgroundColor:(UIColor *)badgeBackgroundColor {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeBackgroundColor:badgeBackgroundColor];
+    [self cyl_performSelector:@selector(cyl_setBadgeBackgroundColor:) withObject:badgeBackgroundColor];
 }
 
 - (UIColor *)cyl_badgeTextColor {
@@ -298,7 +307,7 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 }
 
 - (void)cyl_setBadgeTextColor:(UIColor *)badgeTextColor {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeTextColor:badgeTextColor];
+    [self cyl_performSelector:@selector(cyl_setBadgeTextColor:) withObject:badgeTextColor];
 }
 
 - (CYLBadgeAnimationType)cyl_badgeAnimationType {
@@ -306,7 +315,7 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 }
 
 - (void)cyl_setBadgeAnimationType:(CYLBadgeAnimationType)animationType {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeAnimationType:animationType];
+    [self cyl_performSelector:@selector(cyl_setBadgeAnimationTypeValue:) withObject:@(animationType)];
 }
 
 - (CGRect)cyl_badgeFrame {
@@ -314,7 +323,7 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 }
 
 - (void)cyl_setBadgeFrame:(CGRect)badgeFrame {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeFrame:badgeFrame];
+    [self cyl_performSelector:@selector(cyl_setBadgeFrameValue:) withObject:[NSValue valueWithCGRect:badgeFrame]];
 }
 
 - (void)cyl_setBadgeFrameValue:(NSValue *)cyl_badgeFrameValue {
@@ -327,7 +336,7 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 }
 
 - (void)cyl_setBadgeCenterOffset:(CGPoint)badgeCenterOffset {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeCenterOffset:badgeCenterOffset];
+    [self cyl_performSelector:@selector(cyl_setBadgeCenterOffsetValue:) withObject:[NSValue valueWithCGPoint:badgeCenterOffset]];
 }
 
 - (void)cyl_setBadgeCenterOffsetValue:(NSValue *)badgeCenterOffsetValue {
@@ -339,7 +348,7 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 }
 
 - (void)cyl_setBadgeMaximumBadgeNumber:(NSInteger)badgeMaximumBadgeNumber {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeMaximumBadgeNumber:badgeMaximumBadgeNumber];
+    [self cyl_performSelector:@selector(cyl_setBadgeMaximumBadgeNumberValue:) withObject:@(badgeMaximumBadgeNumber)];
 }
 
 - (void)cyl_setBadgeMaximumBadgeNumberValue:(NSNumber *)cyl_badgeMaximumBadgeNumberValue {
@@ -352,7 +361,7 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 }
 
 - (void)cyl_setBadgeMargin:(CGFloat)badgeMargin {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeMargin:badgeMargin];
+    [self cyl_performSelector:@selector(cyl_setBadgeMarginValue:) withObject:@(badgeMargin)];
 }
 
 - (void)cyl_setBadgeMarginValue:(NSNumber *)cyl_badgeMarginValue {
@@ -365,7 +374,7 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 }
 
 - (void)cyl_setBadgeRadius:(CGFloat)badgeRadius {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeRadius:badgeRadius];
+    [self cyl_performSelector:@selector(cyl_setBadgeRadiusValue:) withObject:@(badgeRadius)];
 }
 
 - (void)cyl_setBadgeRadiusValue:(NSNumber *)cyl_badgeRadiusValue {
@@ -378,7 +387,7 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
 }
 
 - (void)cyl_setBadgeCornerRadius:(CGFloat)cyl_badgeCornerRadius {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
+    [self cyl_performSelector:@selector(cyl_setBadgeCornerRadiusValue:) withObject:@(cyl_badgeCornerRadius)];
 }
 
 - (void)cyl_setBadgeCornerRadiusValue:(NSNumber *)cyl_badgeCornerRadiusValue {

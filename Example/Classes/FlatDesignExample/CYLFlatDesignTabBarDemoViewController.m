@@ -59,7 +59,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
     [self initSubviews];
 }
 
@@ -98,7 +98,7 @@
     _tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     _tableView.delegate = self;
     _tableView.dataSource = self;
-    _tableView.rowHeight = CYLBadgeRowHeight;
+    [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:_tableView];
     _tableView.backgroundColor = [UIColor clearColor];
     _tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     [self.view insertSubview:_tableView atIndex:0];
@@ -134,6 +134,7 @@
     
     
     cell.textLabel.text = self.datas[indexPath.row];
+    [cell cyl_wrapsTextLabels];
     [cell cyl_showBadgeForRow:indexPath.row];
     return cell;
 }

@@ -111,6 +111,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)cyl_isTabImageView;
 
 /*!
+ * [EN] Issue #601: YES for a view shown in place of a tab's icon (`-[CYLTabBarController setTabBarItemIconViewProvider:atIndex:]`).
+ *      Neither it nor its subviews are taken for the tab's own icon (`-cyl_isTabImageView`).
+ * [CN] Issue #601：替换 Tab 图标显示的视图（`-[CYLTabBarController setTabBarItemIconViewProvider:atIndex:]`）为 YES。它及其子视图
+ *      不会被当作 Tab 自身的图标（`-cyl_isTabImageView`）。
+ */
+@property (nonatomic, assign, getter=cyl_isTabBarItemIconView, setter=cyl_setTabBarItemIconView:) BOOL cyl_tabBarItemIconView;
+
+/*!
+ * [EN] Issue #601: YES for a view covering a tab button (`-[UIControl cyl_coverVisiableTabImageViewOrTabButton:...]`),
+ *      e.g. a logo over the first tab. The view shown in place of the tab's icon stays hidden under it.
+ * [CN] Issue #601：覆盖 Tab 按钮的视图（`-[UIControl cyl_coverVisiableTabImageViewOrTabButton:...]`，如第一个 Tab 上的 Logo）为 YES。
+ *      替换 Tab 图标显示的视图在其下方保持隐藏。
+ */
+@property (nonatomic, assign, getter=cyl_isTabButtonCoverView, setter=cyl_setTabButtonCoverView:) BOOL cyl_tabButtonCoverView;
+
+/*!
  * [EN] Returns YES if the receiver is the title label inside a tab bar button.
  * [CN] 判断当前视图是否为 TabBar 按钮内部的标题 Label。
  */

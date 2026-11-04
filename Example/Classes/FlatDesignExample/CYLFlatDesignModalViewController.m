@@ -18,7 +18,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
     
     _button = [[UIButton alloc] init];
     [_button setTitle:CYLLocalizedString(@"关闭") forState:UIControlStateNormal];
