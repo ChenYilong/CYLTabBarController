@@ -492,6 +492,13 @@
         [loginTabBarController cyl_interceptLoginIfNeededForViewController:loginTabBarController.viewControllers[(NSUInteger)selectedIndex]]) {
         return;
     }
+    // [EN] A hijacked tab (CYLHijack): not selected, not reported as a selection; its action runs instead.
+    // [CN] 被劫持的 Tab（CYLHijack）：不选中、不作为选中上报，改为执行对应操作。
+    if (loginTabBarController && !tabBarButton.cyl_isPlaceholder &&
+        selectedIndex < (NSInteger)loginTabBarController.viewControllers.count &&
+        [loginTabBarController cyl_interceptHijackIfNeededForViewController:loginTabBarController.viewControllers[(NSUInteger)selectedIndex]]) {
+        return;
+    }
     
     // FIX: issue #610
     // [EN] Report the tap through `tabBarController:didSelectControl:`, as the other styles do, here where every tab

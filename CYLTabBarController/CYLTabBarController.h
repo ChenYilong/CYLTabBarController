@@ -29,6 +29,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SwiftUI-Integration.md
+//   - Hijacked Tabs / 劫持 Tab 点击
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Hijack.md
 //   - Built-in Tab Icon Animations / Tab 图标的内置动画
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Item-Animations.md
 //   - Tapping the Selected Tab Again / 重复点击已选中的 Tab
@@ -400,6 +402,22 @@ presentLoginForViewController:(UIViewController *)viewController
  *      液态玻璃在手指按下已选中的 Tab 时回调，其他样式在点击结束时回调。
  */
 - (void)tabBarController:(CYLTabBarController *)tabBarController didReselectViewController:(UIViewController *)viewController;
+
+/*!
+ * [EN] Whether a tap on the tab of `viewController` runs your own action instead of selecting it (a "hijacked" tab, e.g. a
+ *      tab that presents a page modally). Asked only when `-cyl_shouldHijackHandler` is nil; without either, the tabs in
+ *      `-cyl_hijackedTabBarItemIdentifiers` are hijacked. See `CYLTabBarController (CYLHijack)`.
+ * [CN] 点击 `viewController` 对应的 Tab 时，是否执行你自己的操作而不选中它（"劫持"的 Tab，例如模态弹出页面的 Tab）。仅在
+ *      `-cyl_shouldHijackHandler` 为 nil 时询问；二者都没有时，`-cyl_hijackedTabBarItemIdentifiers` 中的 Tab 被劫持。见
+ *      `CYLTabBarController (CYLHijack)`。
+ */
+- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldHijackViewController:(UIViewController *)viewController;
+
+/*!
+ * [EN] A hijacked tab was tapped: run your action (the tab is not selected). Called only when `-cyl_didHijackHandler` is nil.
+ * [CN] 被劫持的 Tab 被点击：执行你的操作（该 Tab 不会被选中）。仅在 `-cyl_didHijackHandler` 为 nil 时调用。
+ */
+- (void)tabBarController:(CYLTabBarController *)tabBarController didHijackViewController:(UIViewController *)viewController;
 
 /*!
  * [EN] Asks whether the Liquid Glass lens (selection bubble) should be shown for `control`. Default: NO without Liquid Glass; NO when the plus child view controller is selected and the plus button is not centered; otherwise YES.
@@ -1670,6 +1688,69 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  * [CN] 在任意视图上播放预设动画（Core Animation，作用于视图的 layer；None 或 nil 视图时不做任何事）。
  */
 + (void)cyl_addTabBarItemAnimation:(CYLTabBarItemAnimationType)animationType toView:(nullable UIView *)view;
+
+@end
+
+/*!
+ * [EN] "Hijacked" tabs: tapping one runs your action (present a page, open a menu, start a camera...) and does not select
+ *      it, for any tab, not only the plus button. Works for the classic style, Liquid Glass and FlatDesign. See
+ *      docs/Tab-Hijack.md.
+ *
+ *          tabBarController.cyl_hijackedTabBarItemIdentifiers = @[ @"publish" ];   // or cyl_shouldHijackHandler
+ *          tabBarController.cyl_didHijackHandler = ^(CYLTabBarController *tabBarController, UIViewController *viewController) {
+ *              [tabBarController presentViewController:[PublishViewController new] animated:YES completion:nil];
+ *          };
+ *
+ *      Blocks take precedence over the delegate methods. The checks run where the login checks run (a tab that needs login
+ *      is checked first): the controller's own `-tabBarController:shouldSelectViewController:` (a subclass that overrides
+ *      it must call super) and the tab buttons' taps. With a delegate that is another object, call
+ *      `-cyl_interceptHijackIfNeededForViewController:` at the start of its `-tabBarController:shouldSelectViewController:`.
+ *      Selecting the tab in code (`selectedIndex = …`) is not hijacked.
+ * [CN] "劫持"的 Tab：点击后执行你的操作（弹出页面、打开菜单、启动相机……），不会选中该 Tab；适用于任意 Tab，而不仅是 PlusButton。
+ *      适用于经典样式、液态玻璃与扁平样式。见 docs/Tab-Hijack.md，示例见上。
+ *      block 优先于代理方法。检查位置与登录检查相同（需要登录的 Tab 先检查登录）：控制器自身的
+ *      `-tabBarController:shouldSelectViewController:`（子类重写时须调用 super）以及 Tab 按钮的点击。代理是其他对象时，请在其
+ *      `-tabBarController:shouldSelectViewController:` 开头调用 `-cyl_interceptHijackIfNeededForViewController:`。
+ *      代码选中该 Tab（`selectedIndex = …`）不会被劫持。
+ */
+@interface CYLTabBarController (CYLHijack)
+
+/*!
+ * [EN] The identifiers (`CYLTabBarItemIdentifier`, or the default, see `-cyl_tabBarItemIdentifier`) of the hijacked tabs.
+ *      Used when neither `cyl_shouldHijackHandler` nor the delegate method decides.
+ * [CN] 被劫持的 Tab 的标识（`CYLTabBarItemIdentifier`，未设置时为默认值，见 `-cyl_tabBarItemIdentifier`）。
+ *      `cyl_shouldHijackHandler` 与代理方法都没有提供时使用。
+ */
+@property (nonatomic, copy, nullable) NSArray<NSString *> *cyl_hijackedTabBarItemIdentifiers;
+
+/*!
+ * [EN] Optional: whether a tap on `viewController`'s tab is hijacked. Takes precedence over the delegate method and the
+ *      identifiers.
+ * [CN] 可选：点击 `viewController` 对应的 Tab 是否被劫持。优先于代理方法与标识列表。
+ */
+@property (nonatomic, copy, nullable) BOOL (^cyl_shouldHijackHandler)(CYLTabBarController *tabBarController, UIViewController *viewController);
+
+/*!
+ * [EN] Runs your action when a hijacked tab is tapped (once per tap). Takes precedence over
+ *      `-tabBarController:didHijackViewController:`.
+ * [CN] 被劫持的 Tab 被点击时执行你的操作（每次点击一次）。优先于 `-tabBarController:didHijackViewController:`。
+ */
+@property (nonatomic, copy, nullable) void (^cyl_didHijackHandler)(CYLTabBarController *tabBarController, UIViewController *viewController);
+
+/*!
+ * [EN] Whether a tap on `viewController`'s tab is hijacked (block, delegate, then identifiers).
+ * [CN] 点击 `viewController` 对应的 Tab 是否被劫持（依次判断 block、代理、标识列表）。
+ */
+- (BOOL)cyl_isHijackedViewController:(UIViewController *)viewController NS_SWIFT_NAME(cyl_isHijacked(_:));
+
+/*!
+ * [EN] If `viewController`'s tab is hijacked, runs your action (once per tap) and returns YES: the selection must be
+ *      refused. Otherwise returns NO. For a delegate that is not the tab bar controller itself:
+ *          if ([tabBarController cyl_interceptHijackIfNeededForViewController:viewController]) { return NO; }
+ * [CN] `viewController` 对应的 Tab 被劫持时，执行你的操作（每次点击一次）并返回 YES：应拒绝这次选中；否则返回 NO。代理不是
+ *      TabBarController 自身时，在其 `-tabBarController:shouldSelectViewController:` 开头调用（见上）。
+ */
+- (BOOL)cyl_interceptHijackIfNeededForViewController:(UIViewController *)viewController NS_SWIFT_NAME(cyl_interceptHijackIfNeeded(for:));
 
 @end
 
