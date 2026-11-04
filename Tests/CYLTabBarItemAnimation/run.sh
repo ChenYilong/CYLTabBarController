@@ -22,7 +22,7 @@ def extract(path, start, end):
     i = text.index(start)
     return text[i:text.index(end, i)]
 code = extract("UIControl+CYLTabBarItemAnimation.m", "id CYLTabBarItemAttributesAnimationValue(", "#pragma mark - Categories")
-code += extract("CYLTabBarController.m", "NSURL *CYLTabBarAnimationURLWithOptions(", "NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(")
+code += extract("UIControl+CYLTabBarItemAnimation.m", "NSURL *CYLTabBarAnimationURLWithOptions(", "NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(")
 style = extract("CYLConstants.m", "@interface CYLTabBarItemAnimationStyleRegistry", "/// [EN] Core's style source: the one style registry.")
 open(out.replace("core.m", "style.m"), "w", encoding="utf-8").write(
     "#import <UIKit/UIKit.h>\n"

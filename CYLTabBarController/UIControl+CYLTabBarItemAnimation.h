@@ -80,6 +80,15 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /*!
+ * [EN] Implemented by Core, for CYLTabBarController.m: the animation file of a tab item (`…URL`, else `…FilePath`, with
+ *      `filePath` set to the latter), bound to the library its keys choose, with its Dark Mode version registered (#442).
+ * [CN] 由 Core 实现，供 CYLTabBarController.m 使用：Tab item 的动画文件（`…URL`，否则为 `…FilePath`，并把后者写入 `filePath`），
+ *      绑定到其 key 选择的动画库，并注册其深色模式版本（#442）。
+ */
+FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarItemAnimationURLFromAttributes(NSDictionary * _Nullable attributes,
+                                                                            NSString * _Nullable __autoreleasing * _Nullable filePath);
+
+/*!
  * [EN] Implemented by Core, for the subspec: moves the layout tracking of `view` (#653) to `newView`, e.g. a Lottie view
  *      swapped for its Dark Mode version (#442).
  * [CN] 由 Core 实现，供子库使用：把 `view` 的布局跟踪（#653）改为跟随 `newView`，例如 Lottie 视图替换为深色版本时（#442）。
