@@ -226,6 +226,10 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 /// [EN] The view controller whose selection was animated in the current run loop turn (one animation per change).
 /// [CN] 当前 runloop 中已播放选中动画的控制器（每次切换只播放一次）。
 @property (nonatomic, weak) UIViewController *cyl_viewControllerAnimatedInCurrentRunLoop;
+/// [EN] Liquid Glass: the selected tab a touch began on, reported as a reselect if the gesture ends on it.
+/// [CN] 液态玻璃：手指按下的已选中 Tab，手势结束且仍选中它时上报为重复点击。
+@property (nonatomic, weak) UIViewController *cyl_pendingLiquidGlassReselectViewController;
+@property (nonatomic, weak) UIControl *cyl_pendingLiquidGlassReselectControl;
 @property (nonatomic, strong) NSMutableArray<NSURL *> *lottieURLs;
 @property (nonatomic, strong) NSMutableArray *lottieSizes;
 @property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
@@ -258,6 +262,8 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (UIViewController *)cyl_viewControllerForTabControl:(UIControl *)control;
 /// [EN] A user tap on the tab that was already selected. [CN] 用户点击了已选中的 Tab。
 - (void)cyl_didReselectViewController:(UIViewController *)viewController control:(UIControl *)control;
+/// [EN] Liquid Glass: a tab bar gesture ended (YES) or was cancelled (NO). [CN] 液态玻璃：TabBar 手势结束（YES）或被取消（NO）。
+- (void)cyl_liquidGlassTabGestureDidFinish:(BOOL)ended;
 @end
 
 /// [EN] Implemented below (CYLTabBarItemAnimation). [CN] 实现见下方 CYLTabBarItemAnimation。
@@ -445,7 +451,11 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
     //      index can be 0 for every tab.
     // [CN] 被劫持的 Tab（CYLHijack）：改为执行对应操作（每次点击一次），与需要登录的 Tab 相同。控制器按按钮本身查找：
     //      液态玻璃且没有 PlusButton 时，按钮记录的下标可能都是 0。
-    UIViewController *hijackCandidate = [self cyl_viewControllerForTabControl:control];
+    // [EN] Liquid Glass calls this from the gesture delegate when a touch begins; the tap itself reaches
+    //      `-tabBarController:shouldSelectViewController:`, which checks it, so it is not checked here (it would run twice).
+    // [CN] 液态玻璃在手指按下时从手势代理调用本方法；点击本身会到达 `-tabBarController:shouldSelectViewController:` 并在那里检查，
+    //      因此这里不再检查（否则会执行两次）。
+    UIViewController *hijackCandidate = [CYLConstants isLiquidGlassActive] ? nil : [self cyl_viewControllerForTabControl:control];
     if (hijackCandidate && [self cyl_interceptHijackIfNeededForViewController:hijackCandidate]) {
         return;
     }
@@ -481,7 +491,16 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
         UIViewController *tappedViewController = [self cyl_viewControllerForTabControl:control];
         if (tappedViewController && tappedViewController == self.selectedViewController &&
             tappedViewController == self.cyl_settledSelectedViewController) {
-            [self cyl_didReselectViewController:tappedViewController control:control];
+            if ([CYLConstants isLiquidGlassActive]) {
+                // [EN] Liquid Glass: this runs when the touch begins. Wait for the gesture to end: a press that drags the
+                //      lens to another tab, or is cancelled, is not a reselect (`-cyl_liquidGlassTabGestureDidFinish:`).
+                // [CN] 液态玻璃：这里在手指按下时执行。等待手势结束：拖动放大镜到其他 Tab 或被取消的按压不算重复点击
+                //      （`-cyl_liquidGlassTabGestureDidFinish:`）。
+                self.cyl_pendingLiquidGlassReselectViewController = tappedViewController;
+                self.cyl_pendingLiquidGlassReselectControl = control;
+            } else {
+                [self cyl_didReselectViewController:tappedViewController control:control];
+            }
         }
     }
     [self cyl_settleSelectionSnapshot];
@@ -3355,10 +3374,11 @@ static UITabBarAppearance *CYLTabBarAppearanceForItem(UITabBarAppearance *base, 
 /*!
  * [EN] Keeps one appearance of `tabBarItem` (`standardAppearance` or `scrollEdgeAppearance`) in step with its offset.
  *      `barAppearance` is the tab bar's appearance it is built from; `transparent` builds it with a transparent
- *      background. The associated state is `@[installed, barAppearance, appBase or NSNull]`: the bar appearance itself is
- *      kept (not a copy), so an unchanged tab bar is recognized by identity and nothing is installed again on layout.
+ *      background. The associated state is `@[installed, barAppearance, appBase or NSNull, offset or NSNull, colors or
+ *      NSNull]`: the bar appearance itself is kept (not a copy), so an unchanged tab bar is recognized by identity and
+ *      nothing is installed again on layout; the offset and the per-tab colors it was built with tell when to rebuild.
  * [CN] 使 `tabBarItem` 的某个 appearance（`standardAppearance` 或 `scrollEdgeAppearance`）与偏移保持一致。`barAppearance`
- *      为其所基于的 TabBar appearance，`transparent` 表示以透明背景构建。关联状态为 `@[installed, barAppearance, appBase 或 NSNull]`：
+ *      为其所基于的 TabBar appearance，`transparent` 表示以透明背景构建。关联状态为 `@[installed, barAppearance, appBase 或 NSNull, offset 或 NSNull, colors 或 NSNull]`（offset 与单个 Tab 的颜色用于判断是否需要重建）：
  *      保存的是 bar appearance 本身（不是副本），TabBar 未改变时按对象身份即可识别，布局时不会重复安装。
  */
 API_AVAILABLE(ios(13.0))
@@ -3573,13 +3593,6 @@ static UIEdgeInsets CYLImageInsetsForItem(id _Nullable item, UIEdgeInsets contro
 /// Observed tab bar, see `-cyl_startObservingStandardAppearance`. 被观察的 TabBar，见 `-cyl_startObservingStandardAppearance`。
 static char CYLObservedStandardAppearanceTabBarKey;
 
-/*!
- * [EN] Brings everything built from the system tab bar's appearances up to date: the title offset copies of the tabs
- *      (issue #475) or, for FlatDesign (only when CYLFlatDesignTabBar is integrated), the flat design tab bar. Runs on layout and when `tabBar.standardAppearance` /
- *      `scrollEdgeAppearance` is assigned (KVO), so a new appearance applies at once.
- * [CN] 更新所有基于系统 TabBar appearance 构建的内容：Tab 的标题偏移副本（issue #475），扁平样式时（仅在集成了 CYLFlatDesignTabBar 时）为扁平样式 TabBar。在布局时以及
- *      `tabBar.standardAppearance` / `scrollEdgeAppearance` 被赋值时（KVO）执行，新的 appearance 立即生效。
- */
 #if CYL_FLATDESIGN_AVAILABLE
 /*!
  * [EN] FlatDesign: the per-tab colors (`CYLTabBarItemTitleColor`, `CYLTabBarItemSelectedTitleColor`,
@@ -3625,6 +3638,10 @@ static char CYLObservedStandardAppearanceTabBarKey;
 }
 #endif
 
+/// [EN] Marks the tab buttons (and the controller) the library filled with a selected background color.
+/// [CN] 标记本库填充过选中背景色的 Tab 按钮（以及控制器）。
+static char CYLColoredTabButtonsKey;
+
 /*!
  * [EN] Classic tab bar: fills the selected tab button with its `CYLTabBarItemSelectedBackgroundColor` and clears it when
  *      not selected. Tabs without the key are left alone. Liquid Glass draws its own selection, so it is not touched.
@@ -3636,6 +3653,18 @@ static char CYLObservedStandardAppearanceTabBarKey;
         ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
     }
+    // [EN] Fast path: no tab uses the key and no button was colored before. [CN] 快速返回：没有 Tab 使用该键，且之前没有填充过按钮。
+    BOOL usesSelectedBackgroundColor = NO;
+    for (NSDictionary *attributes in self.tabBarItemsAttributes) {
+        if ([attributes isKindOfClass:[NSDictionary class]] && attributes[CYLTabBarItemSelectedBackgroundColor]) {
+            usesSelectedBackgroundColor = YES;
+            break;
+        }
+    }
+    BOOL coloredBefore = [objc_getAssociatedObject(self, &CYLColoredTabButtonsKey) boolValue];
+    if (!usesSelectedBackgroundColor && !coloredBefore) {
+        return;
+    }
     CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
     NSUInteger tabIndex = 0;
     for (UIControl *control in tabBar.cyl_visibleControls) {
@@ -3645,13 +3674,28 @@ static char CYLObservedStandardAppearanceTabBarKey;
         }
         NSUInteger controlTabIndex = tabIndex++;
         id color = [self tabBarItemAttributesAtIndex:controlTabIndex][CYLTabBarItemSelectedBackgroundColor];
+        BOOL coloredByCYL = [objc_getAssociatedObject(control, &CYLColoredTabButtonsKey) boolValue];
         if (![color isKindOfClass:[UIColor class]]) {
+            // [EN] The key was removed (e.g. by a reload): clear the color the library set. [CN] 该键已被移除（如重新加载）：清除本库设置的颜色。
+            if (coloredByCYL) {
+                control.backgroundColor = nil;
+                objc_setAssociatedObject(control, &CYLColoredTabButtonsKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
             continue;
         }
         control.backgroundColor = (controlTabIndex == self.selectedIndex) ? (UIColor *)color : nil;
+        objc_setAssociatedObject(control, &CYLColoredTabButtonsKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
+    objc_setAssociatedObject(self, &CYLColoredTabButtonsKey, usesSelectedBackgroundColor ? @YES : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+/*!
+ * [EN] Brings everything built from the system tab bar's appearances up to date: the title offset copies of the tabs
+ *      (issue #475) or, for FlatDesign (only when CYLFlatDesignTabBar is integrated), the flat design tab bar. Runs on layout and when `tabBar.standardAppearance` /
+ *      `scrollEdgeAppearance` is assigned (KVO), so a new appearance applies at once.
+ * [CN] 更新所有基于系统 TabBar appearance 构建的内容：Tab 的标题偏移副本（issue #475），扁平样式时（仅在集成了 CYLFlatDesignTabBar 时）为扁平样式 TabBar。在布局时以及
+ *      `tabBar.standardAppearance` / `scrollEdgeAppearance` 被赋值时（KVO）执行，新的 appearance 立即生效。
+ */
 - (void)cyl_syncTabBarAppearances {
     if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) {
         // FIX: issue #475
@@ -7083,6 +7127,17 @@ static char CYLReselectBehaviorKey;
     return nil;
 }
 
+- (void)cyl_liquidGlassTabGestureDidFinish:(BOOL)ended {
+    UIViewController *viewController = self.cyl_pendingLiquidGlassReselectViewController;
+    UIControl *control = self.cyl_pendingLiquidGlassReselectControl;
+    self.cyl_pendingLiquidGlassReselectViewController = nil;
+    self.cyl_pendingLiquidGlassReselectControl = nil;
+    // [EN] Only a gesture that ended with the same tab still selected. [CN] 仅当手势正常结束且仍选中同一个 Tab 时。
+    if (ended && viewController && viewController == self.selectedViewController) {
+        [self cyl_didReselectViewController:viewController control:control];
+    }
+}
+
 - (void)cyl_didReselectViewController:(UIViewController *)viewController control:(UIControl *)control {
     if (!viewController || viewController.cyl_isPlaceholder) {
         return;
@@ -7339,6 +7394,10 @@ static NSNumber *CYLTabBarItemAnimationTypeValue(id value) {
     NSUInteger index = [self.viewControllers indexOfObject:viewController];
     NSDictionary *attributes = (index != NSNotFound) ? [self tabBarItemAttributesAtIndex:index] : nil;
     id tabHandler = attributes[CYLTabBarItemAnimationHandler];
+    // [EN] Only a block is called; any other value is ignored. [CN] 只调用 block，其他类型的值忽略。
+    if (tabHandler && ![tabHandler isKindOfClass:NSClassFromString(@"NSBlock")]) {
+        tabHandler = nil;
+    }
     CYLTabBarItemAnimationBlock handler = tabHandler ? (CYLTabBarItemAnimationBlock)tabHandler : self.cyl_tabBarItemAnimationHandler;
     CYLTabBarItemAnimationType animationType = [self cyl_tabBarItemAnimationTypeForEvent:event attributes:attributes];
     if (!handler && animationType == CYLTabBarItemAnimationTypeNone) {
