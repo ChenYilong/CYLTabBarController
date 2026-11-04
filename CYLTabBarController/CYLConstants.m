@@ -14,6 +14,108 @@
 #import "CYLTabBarController.h"
 #endif
 
+/*!
+ * FIX: issue #442
+ * [EN] The dark versions and dark colors registered for light animation URLs (`absoluteString`), kept in one instance
+ *      instead of global dictionaries. It is Core's `CYLTabBarItemAnimationStyleSource`; the `CYLConstants` class methods
+ *      below forward to it. Main thread only, like the tab bar that uses it.
+ * [CN] 为浅色动画 URL（`absoluteString`）注册的深色版本与深色颜色，保存在一个实例中，而不是全局字典。它就是 Core 的
+ *      `CYLTabBarItemAnimationStyleSource`；下面 `CYLConstants` 的类方法都转发给它。与使用它的 Tab 栏一样只在主线程使用。
+ */
+@interface CYLTabBarItemAnimationStyleRegistry : NSObject <CYLTabBarItemAnimationStyleSource>
+- (void)registerDarkURL:(NSURL *)darkURL forURL:(NSURL *)URL;
+- (void)registerDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forURL:(NSURL *)URL;
+@end
+
+@implementation CYLTabBarItemAnimationStyleRegistry {
+    NSMutableDictionary<NSString *, NSURL *> *_darkURLs;
+    NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *_darkColors;
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _darkURLs = [NSMutableDictionary dictionary];
+        _darkColors = [NSMutableDictionary dictionary];
+    }
+    return self;
+}
+
+static NSString *CYLTabBarItemAnimationStyleKey(NSURL *URL) {
+    return [URL isKindOfClass:[NSURL class]] ? URL.absoluteString : nil;
+}
+
+- (void)registerDarkURL:(NSURL *)darkURL forURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    if (key.length == 0) {
+        return;
+    }
+    // Only a real URL counts; anything else clears it. 只接受 NSURL，其他值视为清除。
+    _darkURLs[key] = [darkURL isKindOfClass:[NSURL class]] ? darkURL : nil;
+}
+
+- (void)registerDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    if (key.length == 0) {
+        return;
+    }
+    // Only keypath (non-empty NSString) -> UIColor pairs count. 只保留「非空 NSString keypath -> UIColor」。
+    NSMutableDictionary<NSString *, UIColor *> *validColors = [NSMutableDictionary dictionary];
+    if ([darkColors isKindOfClass:[NSDictionary class]]) {
+        [darkColors enumerateKeysAndObjectsUsingBlock:^(id keypath, id color, BOOL *stop) {
+            (void)stop;
+            if ([keypath isKindOfClass:[NSString class]] && [(NSString *)keypath length] > 0 && [color isKindOfClass:[UIColor class]]) {
+                validColors[keypath] = color;
+            }
+        }];
+    }
+    _darkColors[key] = validColors.count > 0 ? [validColors copy] : nil;
+}
+
+#pragma mark - CYLTabBarItemAnimationStyleSource
+
+- (BOOL)hasStyleVariants {
+    return _darkURLs.count > 0 || _darkColors.count > 0;
+}
+
+- (BOOL)hasStyleVariantForURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    return key.length > 0 && (_darkURLs[key] != nil || _darkColors[key].count > 0);
+}
+
+- (NSURL *)URL:(NSURL *)URL forTraitCollection:(UITraitCollection *)traitCollection {
+    if (!URL) {
+        return nil;
+    }
+    if (@available(iOS 13.0, *)) {
+        NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+        if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark && key.length > 0) {
+            return _darkURLs[key] ?: URL;
+        }
+    }
+    return URL;
+}
+
+- (NSDictionary<NSString *, UIColor *> *)darkColorsForURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    return key.length > 0 ? _darkColors[key] : nil;
+}
+
+@end
+
+/// [EN] Core's style source: the one style registry. [CN] Core 的风格来源：唯一的风格注册表。
+static CYLTabBarItemAnimationStyleRegistry *CYLTabBarItemAnimationSharedStyleRegistry(void) {
+    static CYLTabBarItemAnimationStyleRegistry *registry;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        registry = [[CYLTabBarItemAnimationStyleRegistry alloc] init];
+    });
+    return registry;
+}
+
+id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(void) {
+    return CYLTabBarItemAnimationSharedStyleRegistry();
+}
+
 @implementation CYLConstants
 
 static CGFloat _basisWidthScale = 1.0;
@@ -120,80 +222,28 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
 */
 #pragma mark - Dark Mode Lottie (#442)
 
-/// Light Lottie URL (`absoluteString`) -> its dark version. Main thread only, like the tab bar that uses it.
-static NSMutableDictionary<NSString *, NSURL *> *CYLDarkLottieURLs(void) {
-    static NSMutableDictionary<NSString *, NSURL *> *darkLottieURLs;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        darkLottieURLs = [NSMutableDictionary dictionary];
-    });
-    return darkLottieURLs;
-}
-
 + (void)cyl_registerDarkLottieURL:(NSURL *)darkLottieURL forLottieURL:(NSURL *)lottieURL {
-    NSString *key = [lottieURL isKindOfClass:[NSURL class]] ? lottieURL.absoluteString : nil;
-    if (key.length == 0) {
-        return;
-    }
-    // Only a real URL counts; anything else clears it. 只接受 NSURL，其他值视为清除。
-    CYLDarkLottieURLs()[key] = [darkLottieURL isKindOfClass:[NSURL class]] ? darkLottieURL : nil;
+    [CYLTabBarItemAnimationSharedStyleRegistry() registerDarkURL:darkLottieURL forURL:lottieURL];
 }
 
 + (NSURL *)cyl_lottieURL:(NSURL *)lottieURL forTraitCollection:(UITraitCollection *)traitCollection {
-    if (!lottieURL) {
-        return nil;
-    }
-    if (@available(iOS 13.0, *)) {
-        if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-            return CYLDarkLottieURLs()[lottieURL.absoluteString] ?: lottieURL;
-        }
-    }
-    return lottieURL;
-}
-
-/// Light Lottie URL (`absoluteString`) -> keypath -> dark color (Lottie 4.x). Main thread only.
-static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *CYLLottieDarkColors(void) {
-    static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *lottieDarkColors;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        lottieDarkColors = [NSMutableDictionary dictionary];
-    });
-    return lottieDarkColors;
+    return [CYLTabBarItemAnimationSharedStyleRegistry() URL:lottieURL forTraitCollection:traitCollection];
 }
 
 + (void)cyl_registerLottieDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forLottieURL:(NSURL *)lottieURL {
-    NSString *key = [lottieURL isKindOfClass:[NSURL class]] ? lottieURL.absoluteString : nil;
-    if (key.length == 0) {
-        return;
-    }
-    // Only keypath (non-empty NSString) -> UIColor pairs count. 只保留「非空 NSString keypath -> UIColor」。
-    NSMutableDictionary<NSString *, UIColor *> *validColors = [NSMutableDictionary dictionary];
-    if ([darkColors isKindOfClass:[NSDictionary class]]) {
-        [darkColors enumerateKeysAndObjectsUsingBlock:^(id keypath, id color, BOOL *stop) {
-            (void)stop;
-            if ([keypath isKindOfClass:[NSString class]] && [(NSString *)keypath length] > 0 && [color isKindOfClass:[UIColor class]]) {
-                validColors[keypath] = color;
-            }
-        }];
-    }
-    CYLLottieDarkColors()[key] = validColors.count > 0 ? [validColors copy] : nil;
+    [CYLTabBarItemAnimationSharedStyleRegistry() registerDarkColors:darkColors forURL:lottieURL];
 }
 
 + (BOOL)cyl_hasDarkLottieForLottieURL:(NSURL *)lottieURL {
-    NSString *key = [lottieURL isKindOfClass:[NSURL class]] ? lottieURL.absoluteString : nil;
-    if (key.length == 0) {
-        return NO;
-    }
-    return CYLDarkLottieURLs()[key] != nil || CYLLottieDarkColors()[key].count > 0;
+    return [CYLTabBarItemAnimationSharedStyleRegistry() hasStyleVariantForURL:lottieURL];
 }
 
 + (NSDictionary<NSString *, UIColor *> *)cyl_lottieDarkColorsForLottieURL:(NSURL *)lottieURL {
-    NSString *key = lottieURL.absoluteString;
-    return key.length > 0 ? CYLLottieDarkColors()[key] : nil;
+    return [CYLTabBarItemAnimationSharedStyleRegistry() darkColorsForURL:lottieURL];
 }
 
 + (BOOL)cyl_hasDarkLottieURLs {
-    return CYLDarkLottieURLs().count > 0 || CYLLottieDarkColors().count > 0;
+    return [CYLTabBarItemAnimationSharedStyleRegistry() hasStyleVariants];
 }
 
 + (NSURL *)cyl_getURLFromString:(NSString *)string {

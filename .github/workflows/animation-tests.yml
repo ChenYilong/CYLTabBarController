@@ -10,6 +10,7 @@ on:
       - "CYLTabBarController/CYLTabBarItemAnimationService.h"
       - "CYLTabBarController/UIControl+CYLTabBarItemAnimation.m"
       - "CYLTabBarController/CYLTabBarController.m"
+      - "CYLTabBarController/CYLConstants.m"
       - "Tests/CYLTabBarItemAnimation/**"
       - ".github/workflows/animation-tests.yml"
   push:
@@ -19,6 +20,7 @@ on:
       - "CYLTabBarController/CYLTabBarItemAnimationService.h"
       - "CYLTabBarController/UIControl+CYLTabBarItemAnimation.m"
       - "CYLTabBarController/CYLTabBarController.m"
+      - "CYLTabBarController/CYLConstants.m"
       - "Tests/CYLTabBarItemAnimation/**"
 
 permissions:

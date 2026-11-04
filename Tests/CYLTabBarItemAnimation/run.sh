@@ -23,6 +23,10 @@ def extract(path, start, end):
     return text[i:text.index(end, i)]
 code = extract("UIControl+CYLTabBarItemAnimation.m", "id CYLTabBarItemAttributesAnimationValue(", "#pragma mark - Categories")
 code += extract("CYLTabBarController.m", "NSURL *CYLTabBarAnimationURLWithOptions(", "NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(")
+style = extract("CYLConstants.m", "@interface CYLTabBarItemAnimationStyleRegistry", "/// [EN] Core's style source: the one style registry.")
+open(out.replace("core.m", "style.m"), "w", encoding="utf-8").write(
+    "#import <UIKit/UIKit.h>\n"
+    f'#import "{root}/CYLTabBarController/CYLTabBarItemAnimationService.h"\n' + style)
 open(out, "w", encoding="utf-8").write(
     "#import <Foundation/Foundation.h>\n"
     "typedef NSString *CYLTabBarAnimationOption;\n"
@@ -34,7 +38,7 @@ PY
 
 xcrun clang -fobjc-arc -fmodules -Wall -Wextra -Wno-unused-parameter -DDEBUG=1 \
     -I"$here/stub" -I"$animation" \
-    "$here/main.m" "$here/stub/UIKit.m" "$build/core.m" \
+    "$here/main.m" "$here/stub/UIKit.m" "$build/core.m" "$build/style.m" \
     "$animation/CYLTabBarItemAnimatorRegistry.m" \
     "$animation/CYLTabBarItemAnimationFactory.m" \
     "$animation/CYLTabBarItemAnimationEngine.m" \

@@ -161,6 +161,12 @@ id<CYLTabBarItemAnimationHost> CYLTabBarItemAnimationDefaultHost(void) {
     return [[CYLTestHost alloc] init];
 }
 
+/// [EN] Core's style registry (CYLConstants.m), extracted by run.sh. [CN] Core 的风格注册表（CYLConstants.m），由 run.sh 提取。
+@interface CYLTabBarItemAnimationStyleRegistry : NSObject <CYLTabBarItemAnimationStyleSource>
+- (void)registerDarkURL:(NSURL *)darkURL forURL:(NSURL *)URL;
+- (void)registerDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forURL:(NSURL *)URL;
+@end
+
 /// [EN] An existing local file, as the engine requires. [CN] 引擎要求的本地已存在文件。
 static NSURL *CYLTestFile(NSString *name) {
     NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:name];
@@ -351,6 +357,27 @@ int main(void) {
         CHECK(darkTab.subviews.count == 1 && darkView.superview == nil, "the old view is removed");
         CHECK(host.trackedReplacements == 1, "the host moves its layout tracking to the new view");
         CHECK(lightView.frame.size.width == 30, "the new view keeps the size");
+
+        printf("\n# Core's style registry: instance state, no global dictionaries\n");
+        CYLTabBarItemAnimationStyleRegistry *styles = [[CYLTabBarItemAnimationStyleRegistry alloc] init];
+        CYLTabBarItemAnimationStyleRegistry *otherStyles = [[CYLTabBarItemAnimationStyleRegistry alloc] init];
+        CHECK(![styles hasStyleVariants], "a new style registry has no variants");
+        [styles registerDarkURL:darkFile forURL:lightFile];
+        CHECK([styles hasStyleVariants] && [styles hasStyleVariantForURL:lightFile], "a dark version makes a variant");
+        CHECK(![otherStyles hasStyleVariants], "registrations stay in their own instance");
+        UITraitCollection *darkTraits = [[UITraitCollection alloc] init];
+        darkTraits.userInterfaceStyle = UIUserInterfaceStyleDark;
+        UITraitCollection *lightTraits = [[UITraitCollection alloc] init];
+        lightTraits.userInterfaceStyle = UIUserInterfaceStyleLight;
+        CHECK([[styles URL:lightFile forTraitCollection:darkTraits] isEqual:darkFile], "dark traits: the dark version");
+        CHECK([[styles URL:lightFile forTraitCollection:lightTraits] isEqual:lightFile], "light traits: the light animation");
+        CHECK([[styles URL:darkFile forTraitCollection:darkTraits] isEqual:darkFile], "an URL without a dark version is kept");
+        UIColor *color = [[UIColor alloc] init];
+        NSDictionary *mixedColors = @{ @"Fill 1" : color, @"" : color, @"Fill 2" : (id)@"not a color" };
+        [styles registerDarkColors:mixedColors forURL:riv];
+        CHECK([[styles darkColorsForURL:riv] isEqual:(@{ @"Fill 1" : color })], "only non-empty keypath -> color pairs are kept");
+        [styles registerDarkURL:nil forURL:lightFile];
+        CHECK(![styles hasStyleVariantForURL:lightFile], "nil clears a dark version");
     }
     printf("\n%d checks, %d failures\n", CYLChecks, CYLFailures);
     return CYLFailures == 0 ? 0 : 1;
