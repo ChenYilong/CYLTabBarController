@@ -21,19 +21,19 @@ ROOT="$PWD"
 mkdir -p "$ROOT/build"
 cd "$DEMO_DIR"
 
-if [ -f Podfile ]; then
+if [[ -f Podfile ]]; then
     pod install --repo-update
 fi
 
 CONTAINER_FLAG=""
 CONTAINER=""
-WORKSPACE=$(ls -d *.xcworkspace 2>/dev/null | head -n 1 || true)
-if [ -n "$WORKSPACE" ]; then
+WORKSPACE=$(ls -d ./*.xcworkspace 2>/dev/null | head -n 1 || true)
+if [[ -n "$WORKSPACE" ]]; then
     CONTAINER_FLAG="-workspace"
     CONTAINER="$WORKSPACE"
 else
     CONTAINER_FLAG="-project"
-    CONTAINER=$(ls -d *.xcodeproj | head -n 1)
+    CONTAINER=$(ls -d ./*.xcodeproj | head -n 1)
 fi
 
 # [EN] All schemes, then the first app scheme. [CN] 列出所有 scheme，取第一个 App scheme。
@@ -47,7 +47,7 @@ skip = ("Pods", "Test", "Tests", "UITests", "Framework", "Lottie", "MJRefresh", 
 apps = [s for s in schemes if not any(word in s for word in skip)]
 print((apps or schemes or [""])[0])
 ')
-if [ -z "$SCHEME" ]; then
+if [[ -z "$SCHEME" ]]; then
     echo "error: no scheme found in $DEMO_DIR/$CONTAINER" >&2
     printf '%s\n' "$LIST_JSON" >&2
     exit 1
@@ -66,5 +66,5 @@ STATUS=${PIPESTATUS[0]}
 set -e
 
 WARNINGS=$(grep -c ': warning: ' "$ROOT/build/$DEMO_DIR.log" || true)
-echo "| $DEMO_DIR | \`$SCHEME\` | $([ "$STATUS" -eq 0 ] && echo ✅ || echo ❌) | $WARNINGS |" >> "$ROOT/build/summary.md"
+echo "| $DEMO_DIR | \`$SCHEME\` | $([[ "$STATUS" -eq 0 ]] && echo ✅ || echo ❌) | $WARNINGS |" >> "$ROOT/build/summary.md"
 exit "$STATUS"
