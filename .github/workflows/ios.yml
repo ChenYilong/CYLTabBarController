@@ -33,8 +33,8 @@ jobs:
       - name: pod lib lint
         run: scripts/pod-lint.sh lib --verbose
 
-  # [EN] The framework target Carthage builds, then the static analyzer (report only for now).
-  # [CN] Carthage 使用的 framework target，以及静态分析（目前只报告，不失败）。
+  # [EN] The framework target Carthage builds, then the static analyzer; a warning in the library's sources fails the job.
+  # [CN] Carthage 使用的 framework target，以及静态分析；本库源码中出现警告时该 job 失败。
   framework:
     name: Framework build and analyze
     runs-on: xcode-27
@@ -77,6 +77,16 @@ jobs:
             grep -h ': warning: ' build/framework.log build/analyze.log 2>/dev/null | sed "s|$PWD/||" | sort -u | head -200 || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+      # [EN] CLAUDE.md: no build or analyzer warnings in the library's own sources. The count was 0 on the first green run.
+      # [CN] CLAUDE.md：本库源码不允许有构建或静态分析警告。首次全绿运行时数量为 0。
+      - name: Fail on warnings
+        run: |
+          COUNT=$(grep -h '\.[mh]:[0-9]*:[0-9]*: warning: ' build/framework.log build/analyze.log | sort -u | wc -l | tr -d ' ')
+          echo "Source warnings: $COUNT"
+          if [[ "$COUNT" -gt 0 ]]; then
+            grep -h '\.[mh]:[0-9]*:[0-9]*: warning: ' build/framework.log build/analyze.log | sort -u
+            exit 1
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

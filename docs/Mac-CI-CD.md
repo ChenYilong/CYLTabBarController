@@ -28,6 +28,7 @@
 | [可选方案对比](#cn可选方案对比) | [Options compared](#enoptions-compared) |
 | [推荐流水线设计](#cn推荐流水线设计) | [Recommended pipeline](#enrecommended-pipeline) |
 | [已添加的 CI workflow 与发布草稿](#cn已添加的-ci-workflow-与发布草稿) | [The CI workflow and the release draft](#enthe-ci-workflow-and-the-release-draft) |
+| [首次运行结果](#cn首次运行结果) | [First run results](#enfirst-run-results) |
 | [风险与注意事项](#cn风险与注意事项) | [Risks and notes](#enrisks-and-notes) |
 | [TODO：维护者需要完成的步骤](#cntodo维护者需要完成的步骤) | [TODO: steps for the maintainer](#entodo-steps-for-the-maintainer) |
 | [来源](#cn来源) | [Sources](#ensources) |
@@ -125,7 +126,7 @@ flowchart LR
 
 | 中文 | English |
 |:---|:---|
-| `.github/workflows/ios.yml` 已添加，在每个 PR、push 到 master 以及手动触发（`workflow_dispatch`）时运行，包含四类 job：`pod lib lint`（完整）；`Framework build and analyze`（构建 Carthage 的 framework target 并静态分析，警告汇总写入 job summary，分析报告作为 artifact，目前只报告不失败）；`Carthage`（`carthage build --no-skip-current --use-xcframeworks`）；`Demo …` 矩阵（每个 Demo 一个 job，互不影响）。 | `.github/workflows/ios.yml` is added. It runs on every pull request, on pushes to master and on demand (`workflow_dispatch`), with four kinds of jobs: `pod lib lint` (full); `Framework build and analyze` (builds the Carthage framework target and runs the static analyzer; warnings are listed in the job summary and the analyzer report is an artifact; for now it reports and does not fail); `Carthage` (`carthage build --no-skip-current --use-xcframeworks`); and the `Demo …` matrix (one job per demo, independent of each other). |
+| `.github/workflows/ios.yml` 已添加，在每个 PR、push 到 master 以及手动触发（`workflow_dispatch`）时运行，包含四类 job：`pod lib lint`（完整）；`Framework build and analyze`（构建 Carthage 的 framework target 并静态分析，警告汇总写入 job summary，分析报告作为 artifact；本库源码出现构建或静态分析警告时该 job 失败）；`Carthage`（`carthage build --no-skip-current --use-xcframeworks`）；`Demo …` 矩阵（每个 Demo 一个 job，互不影响）。 | `.github/workflows/ios.yml` is added. It runs on every pull request, on pushes to master and on demand (`workflow_dispatch`), with four kinds of jobs: `pod lib lint` (full); `Framework build and analyze` (builds the Carthage framework target and runs the static analyzer; warnings are listed in the job summary and the analyzer report is an artifact; a build or analyzer warning in the library's sources fails the job); `Carthage` (`carthage build --no-skip-current --use-xcframeworks`); and the `Demo …` matrix (one job per demo, independent of each other). |
 | 大部分 Demo 没有共享 scheme，名称只有在 Mac 上才能得到，因此 `scripts/ci-build-example.sh` 在 runner 上运行 `xcodebuild -list -json` 选出 App 的 scheme，有 Podfile 时先 `pod install`（不修改 Podfile），并为 job summary 输出一行结果（scheme、是否成功、警告数）。 | Most demos have no shared scheme, so their names are only known on the Mac. `scripts/ci-build-example.sh` therefore runs `xcodebuild -list -json` on the runner to pick the app scheme, runs `pod install` first when there is a Podfile (without changing it), and writes a result line (scheme, success, warning count) for the job summary. |
 | 下面第一段为最初的草稿（仓库中的文件以 `.github/workflows/ios.yml` 为准），第二段为发布 workflow 草稿，尚未添加。 | The first block below is the original draft (the repository's `.github/workflows/ios.yml` is the source of truth); the second is the release workflow draft, not added yet. |
 
@@ -212,6 +213,16 @@ jobs:
         run: gh release create "$GITHUB_REF_NAME" --generate-notes
 ```
 
+## [CN]首次运行结果
+## [EN]First run results
+
+| 中文 | English |
+|:---|:---|
+| 2026-11-04 在 PR #763 中于 `xcode-27` runner（Xcode 27.1，iOS Simulator 27.1 SDK）上运行，这是本项目第一次在 CI 中编译。最终全部通过：`pod lib lint`（完整）、Framework 构建与静态分析、Carthage XCFramework，以及全部 9 个 Demo（根目录 ObjC Demo、Example-Swift、-02、-03、-04、SwiftUI、SwiftManager、SwiftManager-FlatDesign、network-download）。 | Run on 2026-11-04 in PR #763 on the `xcode-27` runner (Xcode 27.1, iOS Simulator 27.1 SDK), the first time this project was compiled in CI. It passed in full: `pod lib lint` (full), the framework build and analysis, the Carthage XCFramework, and all 9 demos (the root ObjC demo, Example-Swift, -02, -03, -04, SwiftUI, SwiftManager, SwiftManager-FlatDesign, network-download). |
+| 修复的问题 1：根目录 ObjC Demo 链接失败，找不到 `swiftCompatibility56`。本库是含 Swift 代码的静态 framework，CocoaPods 为 App 添加 `${TOOLCHAIN_DIR}/usr/lib/swift/...` 搜索路径，而该 runner 上 `TOOLCHAIN_DIR` 指向一个未挂载的 Metal 工具链。`scripts/ci-build-example.sh` 改为传入 Xcode 默认工具链。Swift Demo 不受影响。若在本机遇到同样的链接错误，原因相同。 | Fixed 1: the root ObjC demo failed to link, missing `swiftCompatibility56`. The library is a static framework with Swift code, so CocoaPods adds `${TOOLCHAIN_DIR}/usr/lib/swift/...` to the app's search paths, and on this runner `TOOLCHAIN_DIR` pointed at an unmounted Metal toolchain. `scripts/ci-build-example.sh` now passes Xcode's default toolchain. Swift demos were not affected. The same link error on a local Mac has the same cause. |
+| 修复的问题 2：整个库的构建与静态分析只有 1 个警告（`UIViewController+CYLSettingsSection.m` 中未本地化的按钮标题），已改为 `CYLLocalizedString`。之后警告数为 0，因此 Framework job 改为出现警告即失败。 | Fixed 2: the whole library's build and analysis had a single warning (a non-localized button title in `UIViewController+CYLSettingsSection.m`), now `CYLLocalizedString`. The count is 0 since, so the framework job now fails on any warning. |
+| SonarCloud 对 `scripts/ci-build-example.sh` 报的 6 个 shell 写法问题也已修复。 | The 6 shell style findings SonarCloud reported on `scripts/ci-build-example.sh` are fixed as well. |
+
 ## [CN]风险与注意事项
 ## [EN]Risks and notes
 
@@ -232,7 +243,7 @@ jobs:
 | ~~**TODO 1**~~ 已完成：采用方案 A（GitHub 托管 runner），主 runner 为 `xcode-27`。 | ~~**TODO 1**~~ Done: option A (GitHub-hosted runners), with `xcode-27` as the main runner. |
 | **TODO 2** 仓库 Settings → Actions → General：允许 GitHub Actions；对外部贡献者的 fork PR 设置「需要批准」。 | **TODO 2** Repository Settings → Actions → General: allow GitHub Actions; require approval for workflows from fork pull requests by outside contributors. |
 | **TODO 3** 在本机运行 `pod trunk me` 取得 trunk token（`~/.netrc` 中 `trunk.cocoapods.org` 的 password），添加为仓库 Secret `COCOAPODS_TRUNK_TOKEN`（仅在需要 CD 时）。 | **TODO 3** On your Mac, get the trunk token after `pod trunk me` (the password for `trunk.cocoapods.org` in `~/.netrc`) and add it as the repository secret `COCOAPODS_TRUNK_TOKEN` (only for CD). |
-| **TODO 4**（进行中）CI workflow 已添加到本分支并在 PR #763 中运行；根据运行结果修正 Demo 的构建问题与遗留的构建、静态分析警告。 | **TODO 4** (in progress) The CI workflow is added on this branch and runs in PR #763; the demos' build problems and the existing build and analyzer warnings are fixed from its results. |
+| ~~**TODO 4**~~ 已完成：CI 已在 PR #763 中运行，首次全部通过，结果见「首次运行结果」。 | ~~**TODO 4**~~ Done: CI runs in PR #763 and passed in full; see "First run results". |
 | **TODO 5** CI 稳定后，在仓库 Settings → Branches 中把这些检查设为 master 的必需检查。 | **TODO 5** Once CI is stable, make these checks required for master in Settings → Branches. |
 
 ## [CN]来源
