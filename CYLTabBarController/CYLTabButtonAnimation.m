@@ -370,3 +370,72 @@ static UIViewAnimationOptions CYLTabButtonFlipOption(NSUInteger direction) {
 }
 
 @end
+
+@implementation CYLTabButtonBlockAnimation
+
+/*!
+ * [EN] An optional method counts as implemented only while its block is set, so the library's default applies otherwise.
+ * [CN] 只有设置了对应 block 时，可选方法才算已实现；否则库的默认行为生效。
+ */
+- (BOOL)respondsToSelector:(SEL)aSelector {
+    if (aSelector == @selector(cyl_playDeselectAnimationWithTabButton:iconView:titleLabel:)) {
+        return self.deselectAnimation != nil;
+    }
+    if (aSelector == @selector(cyl_playReselectAnimationWithTabButton:iconView:titleLabel:)) {
+        return self.reselectAnimation != nil;
+    }
+    if (aSelector == @selector(cyl_playHighlightAnimationWithTabButton:iconView:titleLabel:)) {
+        return self.highlightAnimation != nil;
+    }
+    if (aSelector == @selector(cyl_playDehighlightAnimationWithTabButton:iconView:titleLabel:)) {
+        return self.dehighlightAnimation != nil;
+    }
+    if (aSelector == @selector(cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:)) {
+        return self.badgeChangedAnimation != nil;
+    }
+    return [super respondsToSelector:aSelector];
+}
+
+- (void)cyl_playSelectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLTabButtonAnimationBlock block = self.selectAnimation;
+    if (block) {
+        block(button, iconView, titleLabel);
+    }
+}
+
+- (void)cyl_playDeselectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLTabButtonAnimationBlock block = self.deselectAnimation;
+    if (block) {
+        block(button, iconView, titleLabel);
+    }
+}
+
+- (void)cyl_playReselectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLTabButtonAnimationBlock block = self.reselectAnimation;
+    if (block) {
+        block(button, iconView, titleLabel);
+    }
+}
+
+- (void)cyl_playHighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLTabButtonAnimationBlock block = self.highlightAnimation;
+    if (block) {
+        block(button, iconView, titleLabel);
+    }
+}
+
+- (void)cyl_playDehighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLTabButtonAnimationBlock block = self.dehighlightAnimation;
+    if (block) {
+        block(button, iconView, titleLabel);
+    }
+}
+
+- (void)cyl_playBadgeChangedAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView badgeView:(UIView *)badgeView {
+    CYLTabButtonBadgeAnimationBlock block = self.badgeChangedAnimation;
+    if (block) {
+        block(button, iconView, badgeView);
+    }
+}
+
+@end

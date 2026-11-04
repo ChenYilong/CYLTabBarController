@@ -14,6 +14,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Gallery.md
 //   - Tab interactions: tap animations, long press, swipe, and more / Tab 交互：点击动画、长按、滑动切换及其他
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Interactions.md
+//   - Tab interactions: tap animations, long press, swipe, and more / Tab 交互：点击动画、长按、滑动切换及其他
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Interactions.md
 // docs-binding:end
 
 #import <UIKit/UIKit.h>
@@ -164,6 +166,53 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CYLTabButtonPressAnimation : NSObject <CYLTabButtonAnimation>
 /// [EN] The icon's scale while pressed. Default 0.85. [CN] 按压时图标的缩放比例，默认 0.85。
 @property (nonatomic, assign) CGFloat pressedScale;
+@end
+
+/*!
+ * [EN] The signature of the animation blocks of `CYLTabButtonBlockAnimation`: the same arguments as the protocol methods.
+ * [CN] `CYLTabButtonBlockAnimation` 中动画 block 的签名：参数与协议方法相同。
+ */
+typedef void (^CYLTabButtonAnimationBlock)(UIControl *button, UIView *iconView, UILabel *_Nullable titleLabel);
+
+/*!
+ * [EN] The signature of `CYLTabButtonBlockAnimation.badgeChangedAnimation`.
+ * [CN] `CYLTabButtonBlockAnimation.badgeChangedAnimation` 的签名。
+ */
+typedef void (^CYLTabButtonBadgeAnimationBlock)(UIControl *button, UIView *iconView, UIView *_Nullable badgeView);
+
+/*!
+ * [EN] A `CYLTabButtonAnimation` made of blocks (Swift closures), so no protocol method has to be written: each block plays
+ *      the matching protocol method. A block left nil behaves as if the method were not implemented, so the library's
+ *      default applies (e.g. without `reselectAnimation` a reselect plays `selectAnimation` again; without
+ *      `highlightAnimation` a press plays nothing).
+ *
+ *          CYLTabButtonBlockAnimation *animation = [CYLTabButtonBlockAnimation new];
+ *          animation.selectAnimation = ^(UIControl *button, UIView *iconView, UILabel *titleLabel) {
+ *              [[CYLTabButtonBounceAnimation new] cyl_playSelectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
+ *          };
+ *          tabBarController.cyl_defaultTabButtonAnimation = animation;
+ *
+ *          // Swift
+ *          let animation = CYLTabButtonBlockAnimation()
+ *          animation.highlightAnimation = { _, iconView, _ in iconView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8) }
+ *
+ * [CN] 由 block（Swift 闭包）组成的 `CYLTabButtonAnimation`，无需编写协议方法：每个 block 对应播放同名协议方法。为 nil 的 block 等同于
+ *      未实现该方法，库的默认行为生效（例如没有 `reselectAnimation` 时重复点击会再次播放 `selectAnimation`；没有 `highlightAnimation`
+ *      时按下不播放动画）。
+ */
+@interface CYLTabButtonBlockAnimation : NSObject <CYLTabButtonAnimation>
+/// [EN] `-cyl_playSelectAnimationWithTabButton:…`; nil plays nothing. [CN] `-cyl_playSelectAnimationWithTabButton:…`；nil 时不播放。
+@property (nonatomic, copy, nullable) CYLTabButtonAnimationBlock selectAnimation;
+/// [EN] `-cyl_playDeselectAnimationWithTabButton:…`. [CN] `-cyl_playDeselectAnimationWithTabButton:…`。
+@property (nonatomic, copy, nullable) CYLTabButtonAnimationBlock deselectAnimation;
+/// [EN] `-cyl_playReselectAnimationWithTabButton:…`. [CN] `-cyl_playReselectAnimationWithTabButton:…`。
+@property (nonatomic, copy, nullable) CYLTabButtonAnimationBlock reselectAnimation;
+/// [EN] `-cyl_playHighlightAnimationWithTabButton:…` (finger down). [CN] `-cyl_playHighlightAnimationWithTabButton:…`（手指按下）。
+@property (nonatomic, copy, nullable) CYLTabButtonAnimationBlock highlightAnimation;
+/// [EN] `-cyl_playDehighlightAnimationWithTabButton:…` (finger up). [CN] `-cyl_playDehighlightAnimationWithTabButton:…`（手指抬起）。
+@property (nonatomic, copy, nullable) CYLTabButtonAnimationBlock dehighlightAnimation;
+/// [EN] `-cyl_playBadgeChangedAnimationWithTabButton:…`. [CN] `-cyl_playBadgeChangedAnimationWithTabButton:…`。
+@property (nonatomic, copy, nullable) CYLTabButtonBadgeAnimationBlock badgeChangedAnimation;
 @end
 
 /*!

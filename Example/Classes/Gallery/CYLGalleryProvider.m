@@ -332,35 +332,28 @@ static const CGFloat CYLGalleryLargeIconScale = 1.15;
 
 @end
 
-/// [EN] When a badge appears, the icon jumps (badge-changed hook). [CN] 角标出现时图标跳动（角标变化回调）。
-@interface CYLGalleryBadgeJumpAnimation : NSObject <CYLTabButtonAnimation>
-@end
-
-@implementation CYLGalleryBadgeJumpAnimation
-
-- (void)cyl_playSelectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+/*!
+ * [EN] When a badge appears, the icon jumps (badge-changed hook), built with `CYLTabButtonBlockAnimation`: only the block
+ *      that is set plays, so selecting the tab plays nothing.
+ * [CN] 角标出现时图标跳动（角标变化回调），用 `CYLTabButtonBlockAnimation` 实现：只有设置了的 block 会播放，选中 Tab 时不播放动画。
+ */
+static CYLTabButtonBlockAnimation *CYLGalleryBadgeJumpAnimation(void) {
+    CYLTabButtonBlockAnimation *animation = [[CYLTabButtonBlockAnimation alloc] init];
+    animation.badgeChangedAnimation = ^(UIControl *button, UIView *iconView, UIView *badgeView) {
+        CYLGalleryPlayKeyframes(iconView, @"transform.translation.y", @[ @0, @(-8), @4, @(-4), @3, @(-2), @0 ], 0.6);
+    };
+    return animation;
 }
 
-- (void)cyl_playBadgeChangedAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView badgeView:(UIView *)badgeView {
-    CYLGalleryPlayKeyframes(iconView, @"transform.translation.y", @[ @0, @(-8), @4, @(-4), @3, @(-2), @0 ], 0.6);
+/// [EN] When a badge appears, the badge itself scales in (badge-changed hook, `CYLTabButtonBlockAnimation`).
+/// [CN] 角标出现时角标自身缩放弹出（角标变化回调，`CYLTabButtonBlockAnimation`）。
+static CYLTabButtonBlockAnimation *CYLGalleryBadgeScaleAnimation(void) {
+    CYLTabButtonBlockAnimation *animation = [[CYLTabButtonBlockAnimation alloc] init];
+    animation.badgeChangedAnimation = ^(UIControl *button, UIView *iconView, UIView *badgeView) {
+        CYLGalleryPlayKeyframes(badgeView ?: iconView, @"transform.scale", @[ @1.0, @1.4, @0.9, @1.15, @0.95, @1.02, @1.0 ], 0.6);
+    };
+    return animation;
 }
-
-@end
-
-/// [EN] When a badge appears, the badge itself scales in (badge-changed hook). [CN] 角标出现时角标自身缩放弹出（角标变化回调）。
-@interface CYLGalleryBadgeScaleAnimation : NSObject <CYLTabButtonAnimation>
-@end
-
-@implementation CYLGalleryBadgeScaleAnimation
-
-- (void)cyl_playSelectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
-}
-
-- (void)cyl_playBadgeChangedAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView badgeView:(UIView *)badgeView {
-    CYLGalleryPlayKeyframes(badgeView ?: iconView, @"transform.scale", @[ @1.0, @1.4, @0.9, @1.15, @0.95, @1.02, @1.0 ], 0.6);
-}
-
-@end
 
 #pragma mark - Irregular plus button
 
@@ -1206,18 +1199,18 @@ static UIView *CYLGalleryStarView(void) {
             [self addSystemBadgesToTabBarController:tabBarController];
             return tabBarController;
         }],
-        [CYLGalleryScene sceneWithTitle:@"Remind with animation" subtitle:@"The icon jumps when the badge appears (badge-changed hook)" builder:^UIViewController *{
+        [CYLGalleryScene sceneWithTitle:@"Remind with animation" subtitle:@"The icon jumps when the badge appears (CYLTabButtonBlockAnimation.badgeChangedAnimation)" builder:^UIViewController *{
             UINavigationController *navigationController = (UINavigationController *)[self remindSceneWithBadge:^(CYLTabBarController *tabBarController) {
                 tabBarController.viewControllers[1].tabBarItem.badgeValue = @"1";
             }];
-            ((CYLTabBarController *)navigationController.viewControllers.firstObject).cyl_defaultTabButtonAnimation = [CYLGalleryBadgeJumpAnimation new];
+            ((CYLTabBarController *)navigationController.viewControllers.firstObject).cyl_defaultTabButtonAnimation = CYLGalleryBadgeJumpAnimation();
             return navigationController;
         }],
-        [CYLGalleryScene sceneWithTitle:@"Remind with animation (2)" subtitle:@"The badge scales in when it appears (badge-changed hook)" builder:^UIViewController *{
+        [CYLGalleryScene sceneWithTitle:@"Remind with animation (2)" subtitle:@"The badge scales in when it appears (CYLTabButtonBlockAnimation.badgeChangedAnimation)" builder:^UIViewController *{
             UINavigationController *navigationController = (UINavigationController *)[self remindSceneWithBadge:^(CYLTabBarController *tabBarController) {
                 tabBarController.viewControllers[1].tabBarItem.badgeValue = @"1";
             }];
-            ((CYLTabBarController *)navigationController.viewControllers.firstObject).cyl_defaultTabButtonAnimation = [CYLGalleryBadgeScaleAnimation new];
+            ((CYLTabBarController *)navigationController.viewControllers.firstObject).cyl_defaultTabButtonAnimation = CYLGalleryBadgeScaleAnimation();
             return navigationController;
         }],
         [CYLGalleryScene sceneWithTitle:@"Customize remind style" subtitle:@"A gray bubble instead of the red badge" builder:^UIViewController *{
