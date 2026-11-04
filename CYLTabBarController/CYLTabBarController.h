@@ -21,6 +21,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Lottie-TabIcon.md
 //   - Get the navigation controller and push from anywhere / 在任意位置获取导航控制器并 Push
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Push-From-Anywhere.md
+//   - selectedIndex and the PlusButton: the selected title and image match / selectedIndex 与 PlusButton：选中的文字与图片一致
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SelectedIndex-PlusButton.md
 //   - Using CYLTabBarController in Swift / 在 Swift 项目中使用 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
@@ -1084,6 +1086,43 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  * [CN] 按住多久算作 LongPress（秒）。默认 0.5。
  */
 @property (nonatomic, assign, setter=cyl_setTabBarItemLongPressDuration:) NSTimeInterval cyl_tabBarItemLongPressDuration;
+
+@end
+
+/*!
+ * FIX: issue #515
+ * [EN] `selectedIndex` counts `viewControllers`, which can hold an extra entry for the plus button: its child view
+ *      controller, or, in Liquid Glass and FlatDesign, a placeholder for a plus button without one. The same app index can
+ *      then name different tabs in different styles. These methods use the index in the view controllers you passed in
+ *      (without the plus button), so they select the same tab in every style.
+ *          tabBarController.cyl_selectedIndexIgnoringPlusButton = 2; // your third view controller, in every style
+ * [CN] `selectedIndex` 按 `viewControllers` 计数，而其中可能多出一个 PlusButton 对应的控制器：PlusButton 的子控制器，或者在液态玻璃
+ *      与扁平样式中，没有子控制器的 PlusButton 的占位控制器。同一个下标在不同样式下可能对应不同的 Tab。下面的方法使用你传入的控制器
+ *      数组中的下标（不含 PlusButton），在所有样式下选中同一个 Tab。
+ */
+@interface CYLTabBarController (CYLSelectedIndexIgnoringPlusButton)
+
+/*!
+ * [EN] The view controllers without the plus button's child view controller or placeholder, in tab order.
+ * [CN] 不含 PlusButton 子控制器与占位控制器的控制器数组，按 Tab 顺序排列。
+ */
+@property (nonatomic, copy, readonly) NSArray<UIViewController *> *cyl_viewControllersIgnoringPlusButton;
+
+/*!
+ * [EN] The selected index in `cyl_viewControllersIgnoringPlusButton`. Reading it gives NSNotFound while the plus button's
+ *      child view controller is selected. Setting an index out of range does nothing; setting one selects that tab
+ *      exactly as `selectedIndex` does.
+ * [CN] 在 `cyl_viewControllersIgnoringPlusButton` 中的选中下标。选中 PlusButton 子控制器时读取为 NSNotFound。设置越界的下标不做任何事；
+ *      否则与设置 `selectedIndex` 完全一样地选中该 Tab。
+ */
+@property (nonatomic, assign, setter=cyl_setSelectedIndexIgnoringPlusButton:) NSUInteger cyl_selectedIndexIgnoringPlusButton;
+
+/*!
+ * [EN] The `selectedIndex` (index in `viewControllers`) of the tab at `index` in `cyl_viewControllersIgnoringPlusButton`,
+ *      or NSNotFound.
+ * [CN] `cyl_viewControllersIgnoringPlusButton` 中第 `index` 个 Tab 对应的 `selectedIndex`（`viewControllers` 中的下标），没有时为 NSNotFound。
+ */
+- (NSUInteger)cyl_selectedIndexForIndexIgnoringPlusButton:(NSUInteger)index;
 
 @end
 

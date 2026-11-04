@@ -182,3 +182,7 @@
 
 /* FIX: issue #433 — the selected title of the demo Home tab. */
 "刷新" = "रीफ़्रेश";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex और PlusButton (issue #515)";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "अगला टैब चुनने के लिए टैप करें। PlusButton के बिना इंडेक्स: %1$@, selectedIndex: %2$@, अभी: %3$@";

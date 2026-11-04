@@ -182,3 +182,7 @@
 
 /* FIX: issue #433 — the selected title of the demo Home tab. */
 "刷新" = "更新";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex とプラスボタン（issue #515）";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "タップで次のタブを選択します。プラスボタンを除いたインデックス：%1$@、selectedIndex：%2$@、現在：%3$@";

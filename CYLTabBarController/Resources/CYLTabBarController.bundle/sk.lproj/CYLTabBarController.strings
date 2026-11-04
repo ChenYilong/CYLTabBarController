@@ -182,3 +182,7 @@
 
 /* FIX: issue #433 — the selected title of the demo Home tab. */
 "刷新" = "Obnoviť";
+
+/* Issue #515: selectedIndex and the plus button demo row. */
+"selectedIndex 与 PlusButton（issue #515）" = "selectedIndex a PlusButton (issue #515)";
+"点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Ťuknutím vyberiete ďalšiu kartu. Index bez PlusButton: %1$@, selectedIndex: %2$@, teraz: %3$@";
