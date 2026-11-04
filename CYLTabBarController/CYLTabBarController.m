@@ -81,6 +81,7 @@ NSString *const CYLTabBarItemIconColor = @"CYLTabBarItemIconColor";
 NSString *const CYLTabBarItemSelectedIconColor = @"CYLTabBarItemSelectedIconColor";
 NSString *const CYLTabBarItemSelectedBackgroundColor = @"CYLTabBarItemSelectedBackgroundColor";
 NSString *const CYLTabBarItemBackgroundColor = @"CYLTabBarItemBackgroundColor";
+NSString *const CYLTabBarLottieLoopsWhenUnselected = @"CYLTabBarLottieLoopsWhenUnselected";
 NSString *const CYLTabBarItemTitleFont = @"CYLTabBarItemTitleFont";
 NSString *const CYLTabBarItemSelectedTitleFont = @"CYLTabBarItemSelectedTitleFont";
 NSString *const CYLTabBarItemAccessibilityIdentifier = @"CYLTabBarItemAccessibilityIdentifier";
@@ -343,6 +344,8 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @interface CYLTabBarController (CYLTabBarItemColorsPrivate)
 - (void)cyl_updateSelectedBackgroundColorsOfTabButtons;
 - (void)cyl_setNeedsUpdateSelectedBackgroundColors;
+- (void)cyl_updateLoopingLottieViews;
+- (void)cyl_updateBadgesOfSelectedTab;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
 - (void)cyl_syncFlatDesignTabBarItemColors;
@@ -883,6 +886,9 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
+    // [EN] Lottie views are added during layout: start the looping ones (`CYLTabBarLottieLoopsWhenUnselected`).
+    // [CN] Lottie 视图在布局时添加：启动需要循环播放的视图（`CYLTabBarLottieLoopsWhenUnselected`）。
+    [self cyl_updateLoopingLottieViews];
     // [EN] FIX: issue #535 — long press and swipe to switch tabs, once the view exists (every style).
     // [CN] FIX: issue #535 — view 已存在时安装长按与滑动切换手势（所有样式）。
     [self cyl_installInteractionGestureRecognizersIfNeeded];
@@ -3851,7 +3857,124 @@ static char CYLColoredTabButtonsKey;
     __weak __typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         [weakSelf cyl_updateSelectedBackgroundColorsOfTabButtons];
+        // [EN] Also selection dependent: looping Lottie icons and the selected tab's badge.
+        // [CN] 同样取决于选中状态：循环播放的 Lottie 图标与选中 Tab 的角标。
+        [weakSelf cyl_updateLoopingLottieViews];
+        [weakSelf cyl_updateBadgesOfSelectedTab];
     });
+}
+
+#if CYL_LOTTIE_AVAILABLE
+/// [EN] Calls a no-argument method only when `object` implements it (Lottie 2.x and 4.x views differ).
+/// [CN] 仅当 `object` 实现了该无参方法时才调用（Lottie 2.x 与 4.x 的视图不同）。
+static void CYLCallIfImplemented(id object, SEL selector) {
+    if (![object respondsToSelector:selector]) {
+        return;
+    }
+    IMP implementation = [object methodForSelector:selector];
+    ((void (*)(id, SEL))implementation)(object, selector);
+}
+#endif
+
+/*!
+ * [EN] `CYLTabBarLottieLoopsWhenUnselected`: the Lottie views of those tabs loop while unselected and pause while selected.
+ *      Idempotent (a playing view is left playing), so it also runs on layout, once the views exist.
+ * [CN] `CYLTabBarLottieLoopsWhenUnselected`：这些 Tab 的 Lottie 视图未选中时循环播放，选中时暂停。可重复调用（正在播放的视图不受影响），
+ *      因此在布局时、视图创建之后也会执行。
+ */
+- (void)cyl_updateLoopingLottieViews {
+#if CYL_LOTTIE_AVAILABLE
+    NSArray<UIViewController *> *viewControllers = self.viewControllers;
+    for (NSUInteger index = 0; index < viewControllers.count; index++) {
+        NSDictionary *attributes = [self tabBarItemAttributesAtIndex:index];
+        if (![attributes[CYLTabBarLottieLoopsWhenUnselected] respondsToSelector:@selector(boolValue)] ||
+            ![attributes[CYLTabBarLottieLoopsWhenUnselected] boolValue]) {
+            continue;
+        }
+        UIViewController *viewController = viewControllers[index];
+        UIControl *control = viewController.tabBarItem.cyl_tabButton ?: viewController.cyl_tabButton;
+        if (!control) {
+            continue;
+        }
+        NSMutableArray<UIControl *> *controls = [NSMutableArray arrayWithObject:control];
+        // [EN] Liquid Glass shows the tab twice (normal and selected layer). [CN] 液态玻璃中每个 Tab 显示两份（普通层与选中层）。
+        UIControl *selectedLayerControl = [CYLConstants isLiquidGlassActive] ? [control cyl_platterSelectedControl] : nil;
+        if (selectedLayerControl && selectedLayerControl != control) {
+            [controls addObject:selectedLayerControl];
+        }
+        BOOL selected = (viewController == self.selectedViewController);
+        for (UIControl *eachControl in controls) {
+            UIView *lottieView = [eachControl cyl_lottieAnimationView];
+            if (!lottieView) {
+                continue;
+            }
+            if (selected) {
+                CYLCallIfImplemented(lottieView, NSSelectorFromString(@"pause"));
+                continue;
+            }
+            // [EN] Lottie 4.x bridge: loopAnimationCount -1 loops; Lottie 2.x: loopAnimation.
+            // [CN] Lottie 4.x 桥接：loopAnimationCount 为 -1 时循环；Lottie 2.x：loopAnimation。
+            if ([lottieView respondsToSelector:NSSelectorFromString(@"setLoopAnimationCount:")]) {
+                [lottieView setValue:@(-1) forKey:@"loopAnimationCount"];
+            } else if ([lottieView respondsToSelector:NSSelectorFromString(@"setLoopAnimation:")]) {
+                [lottieView setValue:@YES forKey:@"loopAnimation"];
+            }
+            BOOL playing = [lottieView respondsToSelector:NSSelectorFromString(@"isAnimationPlaying")] &&
+                [[lottieView valueForKey:@"isAnimationPlaying"] boolValue];
+            if (!playing) {
+                CYLCallIfImplemented(lottieView, NSSelectorFromString(@"play"));
+            }
+        }
+    }
+#endif
+}
+
+static char CYLHidesBadgeOfSelectedTabKey;
+/// [EN] The badge value hidden on a tab item ([NSNull null] for a nil one never stored). [CN] Tab item 上被隐藏的角标值。
+static char CYLHiddenBadgeValueKey;
+/// [EN] Marks a view controller whose CYLBadge was cleared by the library. [CN] 标记本库清除过 CYLBadge 的控制器。
+static char CYLHiddenCYLBadgeKey;
+
+/*!
+ * [EN] `cyl_hidesBadgeOfSelectedTab`: hides the selected tab's badge, restores the others'; with the property off, restores
+ *      everything it hid.
+ * [CN] `cyl_hidesBadgeOfSelectedTab`：隐藏选中 Tab 的角标，恢复其他 Tab 的角标；属性关闭时恢复所有被隐藏的角标。
+ */
+- (void)cyl_updateBadgesOfSelectedTab {
+    BOOL hides = [objc_getAssociatedObject(self, &CYLHidesBadgeOfSelectedTabKey) boolValue];
+    UIViewController *selectedViewController = self.selectedViewController;
+    for (UIViewController *viewController in self.viewControllers) {
+        if (viewController.cyl_isPlaceholder) {
+            continue;
+        }
+        BOOL hideThis = hides && viewController == selectedViewController;
+        UITabBarItem *item = viewController.tabBarItem;
+        NSString *hiddenValue = objc_getAssociatedObject(item, &CYLHiddenBadgeValueKey);
+        if (hideThis && item.badgeValue) {
+            objc_setAssociatedObject(item, &CYLHiddenBadgeValueKey, item.badgeValue, OBJC_ASSOCIATION_COPY_NONATOMIC);
+            item.badgeValue = nil;
+        } else if (!hideThis && hiddenValue) {
+            item.badgeValue = hiddenValue;
+            objc_setAssociatedObject(item, &CYLHiddenBadgeValueKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+        }
+        BOOL clearedByLibrary = [objc_getAssociatedObject(viewController, &CYLHiddenCYLBadgeKey) boolValue];
+        if (hideThis && !clearedByLibrary && [viewController cyl_isShowBadge]) {
+            [viewController cyl_clearBadge];
+            objc_setAssociatedObject(viewController, &CYLHiddenCYLBadgeKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        } else if (!hideThis && clearedByLibrary) {
+            [viewController cyl_resumeBadge];
+            objc_setAssociatedObject(viewController, &CYLHiddenCYLBadgeKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+    }
+}
+
+- (BOOL)cyl_hidesBadgeOfSelectedTab {
+    return [objc_getAssociatedObject(self, &CYLHidesBadgeOfSelectedTabKey) boolValue];
+}
+
+- (void)setCyl_hidesBadgeOfSelectedTab:(BOOL)hidesBadgeOfSelectedTab {
+    objc_setAssociatedObject(self, &CYLHidesBadgeOfSelectedTabKey, @(hidesBadgeOfSelectedTab), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_updateBadgesOfSelectedTab];
 }
 
 /*!

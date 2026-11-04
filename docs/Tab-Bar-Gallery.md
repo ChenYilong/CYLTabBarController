@@ -53,7 +53,7 @@ flowchart LR
 | 中文 | English |
 |:---|:---|
 | 图标使用 SF Symbols 模板图片，因此单个 Tab 的图标颜色可以生效；气泡、圆形按钮与深色背景在代码中绘制，Demo 不依赖额外的图片资源。界面文字为英文，按仓库规则不在代码中写中文字符串。 | Icons are SF Symbols template images, so per-tab icon colors apply; the bubbles, the round button and the dark backgrounds are drawn in code, so the demo needs no extra image assets. The UI text is English, as the repository rules keep Chinese strings out of code. |
-| 为实现这些效果，本库新增了 `CYLTabBarItemBackgroundColor`（未选中 Tab 的背景色），并让只设置 `itemSpacing` 时在 Tab 之间留出间隙（见 [Tab-Item-Colors.md](Tab-Item-Colors.md)、[Tab-Item-Positioning.md](Tab-Item-Positioning.md)）。 | To build these effects the library gained `CYLTabBarItemBackgroundColor` (the background of a tab while not selected), and `itemSpacing` alone now leaves gaps between the tabs (see [Tab-Item-Colors.md](Tab-Item-Colors.md), [Tab-Item-Positioning.md](Tab-Item-Positioning.md)). |
+| 为实现这些效果，本库新增了 `CYLTabBarItemBackgroundColor`（未选中 Tab 的背景色）、`CYLTabBarLottieLoopsWhenUnselected`（未选中时循环播放 Lottie）、`cyl_hidesBadgeOfSelectedTab`（选中的 Tab 隐藏角标），并让只设置 `itemSpacing` 时在 Tab 之间留出间隙。被拦截的 "Photo" 在对话框显示期间显示为选中（交换页面，关闭后恢复）。逐项对照见 [Custom-Tab-Bar-Features.md](Custom-Tab-Bar-Features.md)。 | To build these effects the library gained `CYLTabBarItemBackgroundColor` (the background of a tab while not selected), `CYLTabBarLottieLoopsWhenUnselected` (a Lottie that loops while unselected) and `cyl_hidesBadgeOfSelectedTab` (the selected tab hides its badge), and `itemSpacing` alone now leaves gaps between the tabs. The intercepted "Photo" tab looks selected while its dialog is up (the pages are swapped, then restored). The item-by-item checklist is in [Custom-Tab-Bar-Features.md](Custom-Tab-Bar-Features.md). |
 
 ## 限制 / Limits
 
@@ -61,8 +61,6 @@ flowchart LR
 |:---|:---|
 | 背景色（`CYLTabBarItemBackgroundColor` / `SelectedBackgroundColor`）只用于经典 TabBar 与扁平样式，因此背景色相关场景在 iOS 26+ 上使用扁平样式（全宽 TabBar）；液态玻璃自带选中效果。「Edge insets and gaps」场景使用经典 TabBar，需要 iOS 25 及以前或 iOS 26 的 UI 兼容模式。 | Backgrounds (`CYLTabBarItemBackgroundColor` / `SelectedBackgroundColor`) apply to the classic tab bar and FlatDesign, so the background scenes use FlatDesign (the full-width tab bar) on iOS 26+; Liquid Glass draws its own selection. The "Edge insets and gaps" scene uses the classic tab bar, which needs iOS 25 or earlier, or iOS 26 in UI compatibility mode. |
 | 图库中的 CYLTabBarController 都把自己设为代理（`delegate = self`），使劫持检查在 UIKit 选中 Tab 之前执行；代理是其他对象时，请在其 `-tabBarController:shouldSelectViewController:` 中调用 `-cyl_interceptHijackIfNeededForViewController:`（见 [Tab-Hijack.md](Tab-Hijack.md)）。 | Every CYLTabBarController in the gallery is its own delegate (`delegate = self`), so the hijack check runs before UIKit selects a tab; with a delegate that is another object, call `-cyl_interceptHijackIfNeededForViewController:` from its `-tabBarController:shouldSelectViewController:` (see [Tab-Hijack.md](Tab-Hijack.md)). |
-| "Photo" 被拦截时弹出对话框，被点击的 Tab 不会被临时显示为选中。 | When "Photo" is intercepted, a dialog appears; the tapped tab is not shown as selected in the meantime. |
-| Lottie 场景中的动画在选中时播放（本库的 Lottie 行为），未选中时不循环播放。 | In the Lottie scene the animation plays on selection (the library's Lottie behavior); it does not loop while unselected. |
 
 ## 截图 / Screenshots
 

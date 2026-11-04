@@ -515,16 +515,39 @@ static UITabBarController *CYLGallerySystemTabBarController(NSUInteger count) {
     return tabBarController;
 }
 
-/// [EN] The dialog of an intercepted tab. [CN] 被拦截的 Tab 弹出的对话框。
-static void CYLGalleryPresentMoreFeatures(UIViewController *presenter) {
+/// [EN] The dialog of an intercepted tab; `dismissed` runs when any button closes it. [CN] 被拦截的 Tab 弹出的对话框；任一按钮关闭它时执行 `dismissed`。
+static void CYLGalleryPresentMoreFeatures(UIViewController *presenter, void (^dismissed)(void)) {
     if (!presenter || presenter.presentedViewController) {
+        dismissed();
         return;
     }
+    void (^handler)(UIAlertAction *) = ^(UIAlertAction *action) {
+        dismissed();
+    };
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"More features" message:nil preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Settings" style:UIAlertActionStyleDefault handler:nil]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"About us" style:UIAlertActionStyleDefault handler:nil]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Settings" style:UIAlertActionStyleDefault handler:handler]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"About us" style:UIAlertActionStyleDefault handler:handler]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:handler]];
     [presenter presentViewController:alert animated:YES completion:nil];
+}
+
+/*!
+ * [EN] Swaps the pages of the tabs at `first` and `second` while each tab keeps its title and icon, with
+ *      `-replaceViewControllerAtIndex:withViewController:attributes:` (a spare page frees one slot first).
+ * [CN] 交换 `first` 与 `second` 两个 Tab 的页面，各 Tab 保持自己的标题与图标，使用
+ *      `-replaceViewControllerAtIndex:withViewController:attributes:`（先用一个临时页面腾出一个位置）。
+ */
+static BOOL CYLGallerySwapPages(CYLTabBarController *tabBarController, NSUInteger first, NSUInteger second) {
+    NSArray<UIViewController *> *viewControllers = tabBarController.viewControllers;
+    if (first >= viewControllers.count || second >= viewControllers.count || first == second) {
+        return NO;
+    }
+    UIViewController *firstPage = viewControllers[first];
+    UIViewController *secondPage = viewControllers[second];
+    UIViewController *sparePage = [[UIViewController alloc] init];
+    return [tabBarController replaceViewControllerAtIndex:first withViewController:sparePage attributes:nil] &&
+           [tabBarController replaceViewControllerAtIndex:second withViewController:firstPage attributes:nil] &&
+           [tabBarController replaceViewControllerAtIndex:first withViewController:secondPage attributes:nil];
 }
 
 /*!
@@ -535,7 +558,30 @@ static void CYLGalleryPresentMoreFeatures(UIViewController *presenter) {
 static void CYLGalleryHijackPhotoTab(CYLTabBarController *tabBarController) {
     tabBarController.cyl_hijackedTabBarItemIdentifiers = @[ @"photo" ];
     tabBarController.cyl_didHijackHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {
-        CYLGalleryPresentMoreFeatures(controller);
+        // [EN] Next run loop turn (outside the tap): "Photo" looks selected over the current page while the dialog is up,
+        //      then everything is restored.
+        // [CN] 在下一个 runloop（点击处理之外）执行：对话框显示期间，"Photo" 显示为选中而页面保持不变，关闭后全部恢复。
+        __weak CYLTabBarController *weakController = controller;
+        __weak UIViewController *weakPhotoPage = viewController;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            CYLTabBarController *strongController = weakController;
+            UIViewController *photoPage = weakPhotoPage;
+            if (!strongController || !photoPage) {
+                return;
+            }
+            NSUInteger photoIndex = [strongController.viewControllers indexOfObject:photoPage];
+            NSUInteger currentIndex = strongController.selectedIndex;
+            BOOL swapped = CYLGallerySwapPages(strongController, currentIndex, photoIndex);
+            if (swapped) {
+                strongController.selectedIndex = photoIndex;
+            }
+            CYLGalleryPresentMoreFeatures(strongController, ^{
+                CYLTabBarController *restoringController = weakController;
+                if (swapped && restoringController && CYLGallerySwapPages(restoringController, currentIndex, photoIndex)) {
+                    restoringController.selectedIndex = currentIndex;
+                }
+            });
+        });
     };
 }
 
@@ -555,17 +601,72 @@ static void CYLGalleryHijackPhotoTab(CYLTabBarController *tabBarController) {
     return interceptor;
 }
 
+/// [EN] Swaps two tabs' pages while each keeps its title and icon (UITab entries on iOS 18+ when the controller uses them).
+/// [CN] 交换两个 Tab 的页面，各 Tab 保持自己的标题与图标（iOS 18+ 且控制器使用 UITab 时交换 UITab）。
+- (void)swapTabAtIndex:(NSUInteger)first withTabAtIndex:(NSUInteger)second inTabBarController:(UITabBarController *)tabBarController {
+    if (@available(iOS 18.0, *)) {
+        if (tabBarController.tabs.count > MAX(first, second)) {
+            NSMutableArray<UITab *> *tabs = [tabBarController.tabs mutableCopy];
+            [tabs exchangeObjectAtIndex:first withObjectAtIndex:second];
+            tabBarController.tabs = tabs;
+            UITab *firstTab = tabs[first];
+            UITab *secondTab = tabs[second];
+            NSString *title = firstTab.title;
+            UIImage *image = firstTab.image;
+            firstTab.title = secondTab.title;
+            firstTab.image = secondTab.image;
+            secondTab.title = title;
+            secondTab.image = image;
+            return;
+        }
+    }
+    NSMutableArray<UIViewController *> *viewControllers = [tabBarController.viewControllers mutableCopy];
+    if (MAX(first, second) >= viewControllers.count) {
+        return;
+    }
+    [viewControllers exchangeObjectAtIndex:first withObjectAtIndex:second];
+    [tabBarController setViewControllers:viewControllers animated:NO];
+    UITabBarItem *firstItem = viewControllers[first].tabBarItem;
+    viewControllers[first].tabBarItem = viewControllers[second].tabBarItem;
+    viewControllers[second].tabBarItem = firstItem;
+}
+
+/// [EN] "Photo" looks selected over the current page while the dialog is up, then it is restored. [CN] 对话框显示期间 "Photo" 显示为选中且页面不变，关闭后恢复。
+- (void)interceptPhotoAtIndex:(NSUInteger)photoIndex selectedIndex:(NSUInteger)currentIndex inTabBarController:(UITabBarController *)tabBarController {
+    __weak UITabBarController *weakTabBarController = tabBarController;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UITabBarController *strongTabBarController = weakTabBarController;
+        if (!strongTabBarController) {
+            return;
+        }
+        [self swapTabAtIndex:currentIndex withTabAtIndex:photoIndex inTabBarController:strongTabBarController];
+        strongTabBarController.selectedIndex = photoIndex;
+        CYLGalleryPresentMoreFeatures(strongTabBarController, ^{
+            UITabBarController *restoringTabBarController = weakTabBarController;
+            if (restoringTabBarController) {
+                [self swapTabAtIndex:currentIndex withTabAtIndex:photoIndex inTabBarController:restoringTabBarController];
+                restoringTabBarController.selectedIndex = currentIndex;
+            }
+        });
+    });
+}
+
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
-    if ([viewController.tabBarItem.title isEqualToString:@"Photo"] && viewController != tabBarController.selectedViewController) {
-        CYLGalleryPresentMoreFeatures(tabBarController);
+    NSUInteger photoIndex = [tabBarController.viewControllers indexOfObject:viewController];
+    NSUInteger currentIndex = tabBarController.selectedIndex;
+    if ([viewController.tabBarItem.title isEqualToString:@"Photo"] && photoIndex != NSNotFound &&
+        currentIndex != NSNotFound && photoIndex != currentIndex) {
+        [self interceptPhotoAtIndex:photoIndex selectedIndex:currentIndex inTabBarController:tabBarController];
         return NO;
     }
     return YES;
 }
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectTab:(UITab *)tab API_AVAILABLE(ios(18.0)) {
-    if ([tab.title isEqualToString:@"Photo"] && tab != tabBarController.selectedTab) {
-        CYLGalleryPresentMoreFeatures(tabBarController);
+    NSUInteger photoIndex = [tabBarController.tabs indexOfObject:tab];
+    NSUInteger currentIndex = tabBarController.selectedTab ? [tabBarController.tabs indexOfObject:tabBarController.selectedTab] : NSNotFound;
+    if ([tab.title isEqualToString:@"Photo"] && photoIndex != NSNotFound && currentIndex != NSNotFound && photoIndex != currentIndex) {
+        [self interceptPhotoAtIndex:photoIndex selectedIndex:currentIndex inTabBarController:tabBarController];
         return NO;
     }
     return YES;
@@ -785,9 +886,11 @@ static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
             CYLGalleryHijackPhotoTab(tabBarController);
             return tabBarController;
         }],
-        [CYLGalleryScene sceneWithTitle:@"Liquid Glass with badges" subtitle:@"New, 99+, a blue 1, a dot, none" builder:^UIViewController *{
+        [CYLGalleryScene sceneWithTitle:@"Liquid Glass with badges" subtitle:@"New, 99+, a blue 1, a dot, none; the selected tab hides its badge" builder:^UIViewController *{
             CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];
             [self addSystemBadgesToTabBarController:tabBarController];
+            // [EN] The selected tab hides its badge; the others keep theirs. [CN] 选中的 Tab 隐藏角标，其他 Tab 保留。
+            tabBarController.cyl_hidesBadgeOfSelectedTab = YES;
             return tabBarController;
         }],
         [CYLGalleryScene sceneWithTitle:@"UITabBarController tab style" subtitle:@"UITab (iOS 18+), eight tabs, \"Favor\" selected" builder:^UIViewController *{
@@ -1007,7 +1110,7 @@ static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
 
 + (CYLGallerySection *)lottieSection {
     NSArray<CYLGalleryScene *> *scenes = @[
-        [CYLGalleryScene sceneWithTitle:@"Lottie" subtitle:@"The middle tab plays a Lottie animation (CYLTabBarLottieURL)" builder:^UIViewController *{
+        [CYLGalleryScene sceneWithTitle:@"Lottie" subtitle:@"The middle tab loops its Lottie animation until it is selected (CYLTabBarLottieLoopsWhenUnselected)" builder:^UIViewController *{
             UIColor *normal = CYLGalleryRGB(61, 206, 193);
             UIColor *selected = CYLGalleryRGB(252, 13, 27);
             NSURL *lottieURL = [[NSBundle mainBundle] URLForResource:@"tab_search_animate" withExtension:@"json"];
@@ -1016,6 +1119,8 @@ static CYLTabBarStyleType CYLGalleryFullWidthStyle(void) {
                 if (index == 2 && lottieURL) {
                     item[CYLTabBarLottieURL] = lottieURL;
                     item[CYLTabBarLottieSize] = [NSValue valueWithCGSize:CGSizeMake(33, 33)];
+                    // [EN] Loops while unselected, pauses while selected. [CN] 未选中时循环播放，选中时暂停。
+                    item[CYLTabBarLottieLoopsWhenUnselected] = @YES;
                 }
                 return item;
             });
