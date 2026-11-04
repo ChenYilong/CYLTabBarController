@@ -6525,6 +6525,8 @@ static BOOL CYLTabBarMinimizeWindowIsKeyAndActive(UIWindow *window) {
         UIKeyboardWillHideNotification,
         UIAccessibilityVoiceOverStatusDidChangeNotification,
         UIAccessibilitySwitchControlStatusDidChangeNotification,
+        UIAccessibilityReduceMotionStatusDidChangeNotification,
+        NSProcessInfoPowerStateDidChangeNotification,
     ]];
     if (@available(iOS 13.0, *)) {
         [names addObjectsFromArray:@[
@@ -7022,7 +7024,8 @@ static BOOL CYLTabBarMinimizeWindowIsKeyAndActive(UIWindow *window) {
     _settingTabBarHidden = YES;
     _lastOwnRequestHidden = hidden;
     _lastOwnRequestTime = CACurrentMediaTime();
-    [self.tabBarController setTabBarHidden:hidden animated:YES];
+    // [EN] Reduce Motion: no slide. [CN] 开启“减弱动态效果”时不执行滑动动画。
+    [self.tabBarController setTabBarHidden:hidden animated:!UIAccessibilityIsReduceMotionEnabled()];
     _settingTabBarHidden = NO;
 }
 

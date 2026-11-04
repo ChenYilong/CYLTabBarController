@@ -42,18 +42,6 @@ NS_ASSUME_NONNULL_BEGIN
  *      登录、PlusButton、跳转与对比。包括共用的设置行（`UIViewController+CYLSettingsSection.h`）和上面的 TabBar 演示行。页面先显示这
  *      `-cyl_demoSectionCount` 个 section，然后是自己的行（如角标样例）。
  */
-/*!
- * [EN] Scroll hiding (issue #13): a section of rows that simulate interruptions (alerts, modals, push / pop, tab switch,
- *      app lifecycle, memory warning, overlay window, keyboard, share sheet, scrolling in code, the app hiding the bar).
- * [CN] 滚动隐藏（issue #13）：模拟意外情况的演示行（弹框、模态页面、push / pop、切换 Tab、App 生命周期、内存警告、浮层窗口、键盘、
- *      分享面板、代码滚动、App 自己隐藏 TabBar）。
- */
-@interface UIViewController (CYLScrollHideSimulationSection)
-- (NSInteger)cyl_scrollHideSimulationRowCount;
-- (UITableViewCell *)cyl_scrollHideSimulationCellForTableView:(UITableView *)tableView row:(NSInteger)row;
-- (void)cyl_didSelectScrollHideSimulationRow:(NSInteger)row;
-@end
-
 @interface UIViewController (CYLDemoSections)
 
 - (NSInteger)cyl_demoSectionCount;

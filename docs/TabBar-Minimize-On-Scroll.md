@@ -347,11 +347,13 @@ flowchart TD
 |:---|:---|:---|:---|:---|
 | 1 | 70 | 没有模拟意外情况的演示 −8；子控制器 presentation −4；App 自己隐藏后会被显示 −4；刚好够长的内容闪动 −3；横向分页选错滚动视图 −2；VoiceOver −3；hidesBottomBarWhenPushed 页面每 0.25 秒重复恢复 −1；iPad 多 Scene 的 key window −2；液态玻璃恢复方式未验证 −3 | 白名单隐藏会话；通知 + 生命周期 + 定时检查；新拖动规则；三种样式用 guard 隔离 | 新增演示 section（18 行）；App 的 setTabBarHidden: 接管 TabBar；检查子控制器的 presentedViewController；优先选择竖向滚动视图；隐藏需要 ≥ 200pt 可滚动距离（滞回） |
 | 2 | 80 | 没有真机验证 −5；VoiceOver / 切换控制 −3；液态玻璃恢复方式未验证 −3；iPad 多 Scene 的 key window 与活跃状态 −2；键盘显示时仍会隐藏 −2；Swift Demo 没有模拟 section −2；hidesBottomBarWhenPushed 页面重复恢复 −1；经典样式显示期间每 0.5 秒遍历视图 −1；系统事件以发送通知模拟 −1 | App 接管、子控制器 presentation、分页列表、滞回已处理；18 行模拟演示；用精简 UIKit 声明编译演示代码时发现并修复了 switch 中 block 导致的编译错误 | VoiceOver / 切换控制开启时不隐藏，状态变化时恢复；按 Scene 判断 key window 与活跃状态（iOS 13 / 15+）；键盘显示期间不隐藏；hidesBottomBarWhenPushed 页面只结束一次会话；新增 2 个演示行 |
+| 3 | 84 | 没有真机验证 −5；液态玻璃恢复方式未验证 −3；Swift Demo 没有模拟 −2；“减弱动态效果”下仍有滑动动画 −1；旋转没有演示 −1；没有调试日志，真机问题难以定位 −1；经典样式显示期间每 0.5 秒遍历视图 −1；长按上下文菜单预览是否算 present 未知 −1；系统事件以发送通知模拟 −1 | VoiceOver / 切换控制、按 Scene 判断焦点、键盘、hidesBottomBarWhenPushed 已处理；20 行模拟演示；30 个边界情况 | 模拟移入库中的演示辅助（UIViewController+CYLSettingsSection），设置分组第 8 行用操作表列出全部模拟，Swift Demo 同样可用；ObjC Demo 的 section 调用同一份代码；“减弱动态效果”下不执行滑动动画；监听减弱动态效果与低电量模式变化；新增旋转、减弱动态效果、低电量模式 3 个演示行（共 23 行） |
 
 | Round | Score | Deductions | Positives | Changes in this round |
 |:---|:---|:---|:---|:---|
 | 1 | 70 | no demo of interruptions −8; child presentation −4; a bar the app hid gets shown −4; flicker on content just long enough −3; wrong scroll view in pagers −2; VoiceOver −3; repeated restores every 0.25 s on hidesBottomBarWhenPushed pages −1; key window with several iPad scenes −2; Liquid Glass restore unverified −3 | whitelist hide session; notifications + lifecycle + timer; new-drag rule; three styles isolated by guards | demo section (18 rows); the app's setTabBarHidden: takes the bar over; children's presentedViewController checked; vertical scroll views preferred; hiding needs 200pt of scrollable distance (hysteresis) |
 | 2 | 80 | no device testing −5; VoiceOver / Switch Control −3; Liquid Glass restore unverified −3; key window and active state with several iPad scenes −2; still hides with the keyboard up −2; no simulation section in the Swift demos −2; repeated restores on hidesBottomBarWhenPushed pages −1; the classic style walks views every 0.5 s while shown −1; system events simulated by posting notifications −1 | app takeover, child presentations, pager lists and hysteresis handled; an 18-row simulation demo; compiling the demo against minimal UIKit declarations found and fixed a build error (blocks in switch cases) | never hides with VoiceOver / Switch Control running, shown when their status changes; key window and active state per scene (iOS 13 / 15+); never hides with the keyboard up; one session end on hidesBottomBarWhenPushed pages; 2 more demo rows |
+| 3 | 84 | no device testing −5; Liquid Glass restore unverified −3; no simulations in the Swift demos −2; still slides with Reduce Motion −1; no rotation demo −1; no debug log, device issues are hard to trace −1; the classic style walks views every 0.5 s while shown −1; unknown whether a context menu preview counts as presented −1; system events simulated by posting notifications −1 | VoiceOver / Switch Control, focus per scene, keyboard, hidesBottomBarWhenPushed handled; a 20-row simulation demo; 30 edge cases | the simulations move into the library's demo helpers (UIViewController+CYLSettingsSection); settings row 8 lists them in an action sheet, so the Swift demos have them too; the ObjC demo section calls the same code; no slide with Reduce Motion; Reduce Motion and Low Power Mode changes observed; 3 more demo rows: rotation, Reduce Motion, Low Power Mode (23 rows) |
 
 ### [CN]边界情况清单
 ### [EN]Edge case list
@@ -383,7 +385,7 @@ flowchart TD
 | 19 | 独立窗口中的 HUD、浮层 | UIWindowDidBecomeKey + key window 检查 | ✅🧪 |
 | 20 | 键盘弹出 | UIKeyboardWillShow | ✅🧪 |
 | 21 | 内存警告 | UIApplicationDidReceiveMemoryWarning | ✅🧪 |
-| 22 | 旋转、分屏 / 台前调度尺寸变化 | viewWillTransitionToSize | ✅📱 |
+| 22 | 旋转、分屏 / 台前调度尺寸变化 | viewWillTransitionToSize | ✅🧪📱 |
 | 23 | App 自己隐藏 TabBar | App 的 setTabBarHidden: 接管 TabBar，滚动隐藏不再显示它 | ✅🧪 |
 | 24 | 关闭滚动隐藏、改变样式 | 设置取值、每次布局 | ✅🧪 |
 | 25 | 横向分页中的竖向列表 | 优先选择可以竖向滚动的滚动视图 | ✅ |
@@ -391,7 +393,10 @@ flowchart TD
 | 27 | VoiceOver、切换控制开启或正在使用 | 不隐藏；状态变化时恢复 | ✅🧪 |
 | 28 | 键盘已显示时滚动（如搜索结果） | 键盘显示期间不隐藏 | ✅🧪 |
 | 29 | iPad 多窗口：另一个 Scene 获得焦点 | 按本 Scene 的 keyWindow 与 activationState 判断 | ✅📱 |
-| 30 | 经典样式：返回到 hidesBottomBarWhenPushed 页面之前的页面 | 会话只结束一次，不重复恢复；返回时随页面变化显示 | ✅🧪 |
+| 30 | 开启“减弱动态效果” | 滚动隐藏不执行滑动动画；状态变化时恢复 | ✅🧪 |
+| 31 | 低电量模式开启或关闭 | NSProcessInfoPowerStateDidChange | ✅🧪 |
+| 32 | Swift Demo 中的模拟 | 设置分组第 8 行用操作表列出全部模拟 | 🧪 |
+| 33 | 经典样式：返回到 hidesBottomBarWhenPushed 页面之前的页面 | 会话只结束一次，不重复恢复；返回时随页面变化显示 | ✅🧪 |
 
 | # | Scenario | How it is handled | Status |
 |:---|:---|:---|:---|
@@ -416,7 +421,7 @@ flowchart TD
 | 19 | HUD or overlay in a window of its own | UIWindowDidBecomeKey + key window check | ✅🧪 |
 | 20 | The keyboard appears | UIKeyboardWillShow | ✅🧪 |
 | 21 | Memory warning | UIApplicationDidReceiveMemoryWarning | ✅🧪 |
-| 22 | Rotation, Split View / Stage Manager resize | viewWillTransitionToSize | ✅📱 |
+| 22 | Rotation, Split View / Stage Manager resize | viewWillTransitionToSize | ✅🧪📱 |
 | 23 | The app hides the tab bar itself | The app's setTabBarHidden: takes the bar over; scroll hiding never shows it | ✅🧪 |
 | 24 | Scroll hiding turned off, a style change | Setting the value, every layout | ✅🧪 |
 | 25 | A vertical list inside a horizontal pager | A vertically scrolling scroll view is preferred | ✅ |
@@ -424,7 +429,10 @@ flowchart TD
 | 27 | VoiceOver or Switch Control turned on or running | Never hides; shown when the status changes | ✅🧪 |
 | 28 | Scrolling while the keyboard is up (e.g. search results) | Never hides while the keyboard is up | ✅🧪 |
 | 29 | iPad multiple windows: another scene takes focus | Uses this scene's keyWindow and activationState | ✅📱 |
-| 30 | Classic: coming back from a hidesBottomBarWhenPushed page | The session ends once, no repeated restores; shown on the page change back | ✅🧪 |
+| 30 | Reduce Motion turned on | Scroll hiding does not slide; shown when the setting changes | ✅🧪 |
+| 31 | Low Power Mode turned on or off | NSProcessInfoPowerStateDidChange | ✅🧪 |
+| 32 | Simulations in the Swift demos | Settings row 8 lists every simulation in an action sheet | 🧪 |
+| 33 | Classic: coming back from a hidesBottomBarWhenPushed page | The session ends once, no repeated restores; shown on the page change back | ✅🧪 |
 
 <!-- edge-cases:end -->
 

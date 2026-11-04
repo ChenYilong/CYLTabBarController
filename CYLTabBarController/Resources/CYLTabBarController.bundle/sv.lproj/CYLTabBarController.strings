@@ -224,3 +224,4 @@
 "滚动隐藏：模拟意外情况（issue #13）" = "Dölj vid rullning: simulera avbrott (issue #13)";
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Utlöses 1,5 s efter tryckningen. Rulla först nedåt för att dölja TabBar. Förväntat: TabBar kommer tillbaka direkt, och trögheten döljer den inte igen.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Utlöses 1,5 s efter tryckningen. Förväntat: TabBar ändras inte av detta (döljs inte, och en TabBar som appen dolt visas inte).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Välj ett avbrott; det utlöses efter 1,5 s. Rulla först nedåt för att dölja TabBar.";

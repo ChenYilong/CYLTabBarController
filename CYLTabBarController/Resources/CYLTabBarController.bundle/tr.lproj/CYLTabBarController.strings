@@ -224,3 +224,4 @@
 "滚动隐藏：模拟意外情况（issue #13）" = "Kaydırırken gizle: kesintileri simüle et (issue #13)";
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Dokunduktan 1,5 sn sonra çalışır. Önce TabBar'ı gizlemek için aşağı kaydırın. Beklenen: TabBar hemen geri gelir ve atalet onu yeniden gizlemez.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Dokunduktan 1,5 sn sonra çalışır. Beklenen: TabBar bundan dolayı değişmez (gizlenmez ve uygulamanın gizlediği TabBar gösterilmez).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Bir kesinti seçin; 1,5 sn sonra çalışır. Önce TabBar'ı gizlemek için aşağı kaydırın.";

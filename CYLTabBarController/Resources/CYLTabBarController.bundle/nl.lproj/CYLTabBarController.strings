@@ -224,3 +224,4 @@
 "滚动隐藏：模拟意外情况（issue #13）" = "Verbergen bij scrollen: onderbrekingen simuleren (issue #13)";
 "点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Wordt 1,5 s na het tikken uitgevoerd. Scrol eerst omlaag om de TabBar te verbergen. Verwacht: de TabBar komt meteen terug en het naglijden verbergt hem niet opnieuw.";
 "点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Wordt 1,5 s na het tikken uitgevoerd. Verwacht: de TabBar verandert hierdoor niet (wordt niet verborgen, en een door de app verborgen TabBar wordt niet getoond).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Kies een onderbreking; die wordt na 1,5 s uitgevoerd. Scrol eerst omlaag om de TabBar te verbergen.";

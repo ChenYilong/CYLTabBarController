@@ -27,6 +27,7 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowPlusButtonTouchableArea,
     CYLSettingsRowSelectedIndexIgnoringPlusButton, // FIX: issue #515
     CYLSettingsRowTabBarMinimizeBehavior, // issue #13
+    CYLSettingsRowScrollHideSimulation,   // issue #13: simulated interruptions, in an action sheet
     CYLSettingsRowTabBarItemUpdate,     // then one row per tab item update, see UIViewController+CYLTabBarItemUpdate.h
 };
 
@@ -558,6 +559,25 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     tabBarController.cyl_tabBarMinimizeBehavior = next;
 }
 
+/// [EN] Issue #13: the settings row that lists the scroll hiding simulations. [CN] issue #13：列出滚动隐藏模拟的设置行。
+static UITableViewCell *CYLScrollHideSimulationMenuCell(UITableView *tableView) {
+    static NSString *const identifier = @"CYLScrollHideSimulationMenuCell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+        cell.detailTextLabel.numberOfLines = 0;
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
+        }
+    }
+    cell.textLabel.text = CYLLocalizedString(@"滚动隐藏：模拟意外情况（issue #13）");
+    cell.detailTextLabel.text = CYLLocalizedString(@"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。");
+    return cell;
+}
+
 @implementation UIViewController (CYLSettingsSection)
 
 - (NSInteger)cyl_settingsRowCount {
@@ -594,6 +614,9 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     if (indexPath.row == CYLSettingsRowTabBarMinimizeBehavior) {
         return CYLTabBarMinimizeCell(tableView, CYLSettingsTabBarController(self));
     }
+    if (indexPath.row == CYLSettingsRowScrollHideSimulation) {
+        return CYLScrollHideSimulationMenuCell(tableView);
+    }
     if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdate];
     }
@@ -627,6 +650,8 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     } else if (indexPath.row == CYLSettingsRowTabBarMinimizeBehavior) {
         CYLSwitchTabBarMinimizeBehavior(CYLSettingsTabBarController(self));
         [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    } else if (indexPath.row == CYLSettingsRowScrollHideSimulation) {
+        [self cyl_presentScrollHideSimulationMenu];
     } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdate];
         // [EN] The rows show which changes are on (a checkmark).
@@ -639,6 +664,340 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     } else {
         [self cyl_presentLanguagePicker];
     }
+}
+
+@end
+
+#pragma mark - CYLScrollHideSimulationSection (issue #13)
+
+/*!
+ * [EN] Scroll hiding (issue #13): rows that simulate the interruptions the tab bar must come back from. Each row turns
+ *      scroll hiding on and fires its interruption after CYLScrollHideSimulationDelay, so there is time to scroll down
+ *      and hide the bar first. Row titles name the API or event they trigger. System events that cannot be triggered
+ *      from code (a real call, the low battery alert) are simulated by posting the notifications the system posts.
+ * [CN] 滚动隐藏（issue #13）：模拟各种意外情况的演示行，TabBar 都必须从中恢复显示。每行先开启滚动隐藏，并在
+ *      CYLScrollHideSimulationDelay 之后触发，留出时间先向下滚动隐藏 TabBar。行标题即触发的 API 或事件名称。无法用代码触发的系统事件
+ *      （真实来电、低电量弹框）通过发送系统会发送的通知来模拟。
+ */
+typedef NS_ENUM(NSInteger, CYLScrollHideSimulationRow) {
+    CYLScrollHideSimulationRowAlert,
+    CYLScrollHideSimulationRowActionSheet,
+    CYLScrollHideSimulationRowFullScreenModal,
+    CYLScrollHideSimulationRowPageSheet,
+    CYLScrollHideSimulationRowPushThenPop,
+    CYLScrollHideSimulationRowPushHidesBottomBar,
+    CYLScrollHideSimulationRowSwitchTab,
+    CYLScrollHideSimulationRowResignActive,
+    CYLScrollHideSimulationRowBackgroundForeground,
+    CYLScrollHideSimulationRowNotificationTapPush,
+    CYLScrollHideSimulationRowMemoryWarning,
+    CYLScrollHideSimulationRowOverlayWindow,
+    CYLScrollHideSimulationRowKeyboard,
+    CYLScrollHideSimulationRowShareSheet,
+    CYLScrollHideSimulationRowScrollToTopInCode,
+    CYLScrollHideSimulationRowScrollDownInCode,
+    CYLScrollHideSimulationRowAppHidesTabBar,
+    CYLScrollHideSimulationRowTurnOffAndOn,
+    CYLScrollHideSimulationRowVoiceOverStatus,
+    CYLScrollHideSimulationRowKeyboardWhileScrolling,
+    CYLScrollHideSimulationRowReduceMotionStatus,
+    CYLScrollHideSimulationRowLowPowerMode,
+    CYLScrollHideSimulationRowRotation,
+    CYLScrollHideSimulationRowCount,
+};
+
+/// [EN] Seconds between the tap and the interruption. [CN] 点击到触发之间的秒数。
+static const NSTimeInterval CYLScrollHideSimulationDelay = 1.5;
+/// [EN] Seconds a temporary page, window or keyboard stays. [CN] 临时页面、窗口或键盘停留的秒数。
+static const NSTimeInterval CYLScrollHideSimulationHold = 1.5;
+
+static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_t block) {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(seconds * NSEC_PER_SEC)), dispatch_get_main_queue(), block);
+}
+
+@implementation UIViewController (CYLScrollHideSimulation)
+
+- (NSInteger)cyl_scrollHideSimulationRowCount {
+    return CYLScrollHideSimulationRowCount;
+}
+
+/// [EN] The row's title (the API or event it triggers) and whether the bar is expected to come back.
+/// [CN] 行标题（触发的 API 或事件）以及 TabBar 是否应当恢复显示。
+- (NSString *)cyl_scrollHideSimulationTitleForRow:(NSInteger)row expectsRestore:(BOOL *)expectsRestore {
+    *expectsRestore = YES;
+    switch ((CYLScrollHideSimulationRow)row) {
+        case CYLScrollHideSimulationRowAlert: return @"UIAlertController (alert)";
+        case CYLScrollHideSimulationRowActionSheet: return @"UIAlertController (actionSheet)";
+        case CYLScrollHideSimulationRowFullScreenModal: return @"present (UIModalPresentationFullScreen)";
+        case CYLScrollHideSimulationRowPageSheet: return @"present (UIModalPresentationPageSheet)";
+        case CYLScrollHideSimulationRowPushThenPop: return @"push, then pop";
+        case CYLScrollHideSimulationRowPushHidesBottomBar: return @"push (hidesBottomBarWhenPushed), then pop";
+        case CYLScrollHideSimulationRowSwitchTab: return @"selectedIndex + 1, then back";
+        case CYLScrollHideSimulationRowResignActive: return @"WillResignActive / DidBecomeActive (call, low battery, system alert)";
+        case CYLScrollHideSimulationRowBackgroundForeground: return @"DidEnterBackground / WillEnterForeground";
+        case CYLScrollHideSimulationRowNotificationTapPush: return @"Push notification tap: foreground, then push";
+        case CYLScrollHideSimulationRowMemoryWarning: return @"UIApplicationDidReceiveMemoryWarningNotification";
+        case CYLScrollHideSimulationRowOverlayWindow: return @"UIWindow (alert level) makeKeyAndVisible";
+        case CYLScrollHideSimulationRowKeyboard: return @"UITextField becomeFirstResponder (keyboard)";
+        case CYLScrollHideSimulationRowShareSheet: return @"UIActivityViewController";
+        case CYLScrollHideSimulationRowScrollToTopInCode: return @"setContentOffset: top (status bar tap)";
+        case CYLScrollHideSimulationRowScrollDownInCode:
+            *expectsRestore = NO;
+            return @"setContentOffset: down, in code";
+        case CYLScrollHideSimulationRowAppHidesTabBar:
+            *expectsRestore = NO;
+            return @"App: setTabBarHidden:YES for 4 s";
+        case CYLScrollHideSimulationRowTurnOffAndOn: return @"cyl_hidesTabBarOnScroll = NO, then YES";
+        case CYLScrollHideSimulationRowVoiceOverStatus: return @"UIAccessibilityVoiceOverStatusDidChangeNotification";
+        case CYLScrollHideSimulationRowKeyboardWhileScrolling:
+            *expectsRestore = NO;
+            return @"Keyboard up for 4 s: scroll, the bar must not hide";
+        case CYLScrollHideSimulationRowReduceMotionStatus: return @"UIAccessibilityReduceMotionStatusDidChangeNotification";
+        case CYLScrollHideSimulationRowLowPowerMode: return @"NSProcessInfoPowerStateDidChangeNotification (Low Power Mode)";
+        case CYLScrollHideSimulationRowRotation: return @"requestGeometryUpdate: landscape, then portrait (iOS 16+)";
+        case CYLScrollHideSimulationRowCount: break;
+    }
+    return @"-";
+}
+
+- (UITableViewCell *)cyl_scrollHideSimulationCellForTableView:(UITableView *)tableView row:(NSInteger)row {
+    static NSString *const identifier = @"CYLScrollHideSimulationCell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
+        cell.detailTextLabel.numberOfLines = 0;
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
+        }
+    }
+    BOOL expectsRestore = YES;
+    cell.textLabel.text = [self cyl_scrollHideSimulationTitleForRow:row expectsRestore:&expectsRestore];
+    cell.detailTextLabel.text = expectsRestore
+        ? CYLLocalizedString(@"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。")
+        : CYLLocalizedString(@"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。");
+    return cell;
+}
+
+/// [EN] The scroll view of this page. [CN] 当前页面的滚动视图。
+- (UIScrollView *)cyl_scrollHideSimulationScrollView {
+    if ([self isKindOfClass:[UITableViewController class]]) {
+        return ((UITableViewController *)self).tableView;
+    }
+    return [self.view isKindOfClass:[UIScrollView class]] ? (UIScrollView *)self.view : nil;
+}
+
+/// [EN] A plain page that leaves by itself. [CN] 一个会自行离开的普通页面。
+- (UIViewController *)cyl_scrollHideSimulationPage {
+    UIViewController *page = [[UIViewController alloc] init];
+    page.view.backgroundColor = [UIColor colorWithRed:0.35 green:0.78 blue:0.98 alpha:1.0];
+    return page;
+}
+
+- (void)cyl_didSelectScrollHideSimulationRow:(NSInteger)row {
+    CYLTabBarController *tabBarController = [self cyl_owningTabBarController] ?: [self cyl_tabBarController];
+    tabBarController.cyl_hidesTabBarOnScroll = YES;
+    __weak typeof(self) weakSelf = self;
+    CYLScrollHideSimulationAfter(CYLScrollHideSimulationDelay, ^{
+        [weakSelf cyl_runScrollHideSimulationRow:row tabBarController:tabBarController];
+    });
+}
+
+- (void)cyl_runScrollHideSimulationRow:(NSInteger)row tabBarController:(CYLTabBarController *)tabBarController {
+    __weak typeof(self) weakSelf = self;
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    switch ((CYLScrollHideSimulationRow)row) {
+        case CYLScrollHideSimulationRowAlert:
+        case CYLScrollHideSimulationRowActionSheet: {
+            UIAlertControllerStyle style = (row == CYLScrollHideSimulationRowAlert) ? UIAlertControllerStyleAlert : UIAlertControllerStyleActionSheet;
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"CYLTabBarController" message:@"#13" preferredStyle:style];
+            [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
+            alert.popoverPresentationController.sourceView = self.view;
+            alert.popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds), 1, 1);
+            [self presentViewController:alert animated:YES completion:nil];
+            break;
+        }
+        case CYLScrollHideSimulationRowFullScreenModal:
+        case CYLScrollHideSimulationRowPageSheet: {
+            UIViewController *page = [self cyl_scrollHideSimulationPage];
+            page.modalPresentationStyle = (row == CYLScrollHideSimulationRowFullScreenModal) ? UIModalPresentationFullScreen : UIModalPresentationPageSheet;
+            [self presentViewController:page animated:YES completion:^{
+                CYLScrollHideSimulationAfter(CYLScrollHideSimulationHold, ^{
+                    [page dismissViewControllerAnimated:YES completion:nil];
+                });
+            }];
+            break;
+        }
+        case CYLScrollHideSimulationRowPushThenPop:
+        case CYLScrollHideSimulationRowPushHidesBottomBar:
+        case CYLScrollHideSimulationRowNotificationTapPush: {
+            if (row == CYLScrollHideSimulationRowNotificationTapPush) {
+                [center postNotificationName:UIApplicationWillEnterForegroundNotification object:UIApplication.sharedApplication];
+                [center postNotificationName:UIApplicationDidBecomeActiveNotification object:UIApplication.sharedApplication];
+            }
+            UIViewController *page = [self cyl_scrollHideSimulationPage];
+            page.hidesBottomBarWhenPushed = (row == CYLScrollHideSimulationRowPushHidesBottomBar);
+            [self.navigationController pushViewController:page animated:YES];
+            CYLScrollHideSimulationAfter(CYLScrollHideSimulationHold, ^{
+                [weakSelf.navigationController popViewControllerAnimated:YES];
+            });
+            break;
+        }
+        case CYLScrollHideSimulationRowSwitchTab: {
+            NSUInteger original = tabBarController.selectedIndex;
+            NSUInteger count = tabBarController.viewControllers.count;
+            if (count > 1) {
+                tabBarController.selectedIndex = (original + 1) % count;
+                CYLScrollHideSimulationAfter(CYLScrollHideSimulationHold, ^{
+                    tabBarController.selectedIndex = original;
+                });
+            }
+            break;
+        }
+        case CYLScrollHideSimulationRowResignActive: {
+            [center postNotificationName:UIApplicationWillResignActiveNotification object:UIApplication.sharedApplication];
+            CYLScrollHideSimulationAfter(CYLScrollHideSimulationHold, ^{
+                [center postNotificationName:UIApplicationDidBecomeActiveNotification object:UIApplication.sharedApplication];
+            });
+            break;
+        }
+        case CYLScrollHideSimulationRowBackgroundForeground: {
+            [center postNotificationName:UIApplicationDidEnterBackgroundNotification object:UIApplication.sharedApplication];
+            CYLScrollHideSimulationAfter(CYLScrollHideSimulationHold, ^{
+                [center postNotificationName:UIApplicationWillEnterForegroundNotification object:UIApplication.sharedApplication];
+                [center postNotificationName:UIApplicationDidBecomeActiveNotification object:UIApplication.sharedApplication];
+            });
+            break;
+        }
+        case CYLScrollHideSimulationRowMemoryWarning: {
+            [center postNotificationName:UIApplicationDidReceiveMemoryWarningNotification object:UIApplication.sharedApplication];
+            break;
+        }
+        case CYLScrollHideSimulationRowOverlayWindow: {
+            UIWindow *mainWindow = self.view.window;
+            UIWindow *overlay = nil;
+            if (@available(iOS 13.0, *)) {
+                overlay = mainWindow.windowScene ? [[UIWindow alloc] initWithWindowScene:mainWindow.windowScene] : nil;
+            }
+            if (!overlay) {
+                overlay = [[UIWindow alloc] initWithFrame:mainWindow.bounds];
+            }
+            overlay.windowLevel = UIWindowLevelAlert;
+            overlay.rootViewController = [self cyl_scrollHideSimulationPage];
+            overlay.rootViewController.view.alpha = 0.6;
+            [overlay makeKeyAndVisible];
+            CYLScrollHideSimulationAfter(CYLScrollHideSimulationHold, ^{
+                overlay.hidden = YES;
+                [mainWindow makeKeyWindow];
+            });
+            break;
+        }
+        case CYLScrollHideSimulationRowKeyboard: {
+            UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(0, -100, 10, 10)];
+            [self.view addSubview:textField];
+            [textField becomeFirstResponder];
+            CYLScrollHideSimulationAfter(CYLScrollHideSimulationHold, ^{
+                [textField resignFirstResponder];
+                [textField removeFromSuperview];
+            });
+            break;
+        }
+        case CYLScrollHideSimulationRowShareSheet: {
+            UIActivityViewController *share = [[UIActivityViewController alloc] initWithActivityItems:@[ @"https://github.com/ChenYilong/CYLTabBarController/issues/13" ] applicationActivities:nil];
+            share.popoverPresentationController.sourceView = self.view;
+            share.popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds), 1, 1);
+            [self presentViewController:share animated:YES completion:nil];
+            break;
+        }
+        case CYLScrollHideSimulationRowScrollToTopInCode: {
+            UIScrollView *scrollView = [self cyl_scrollHideSimulationScrollView];
+            [scrollView setContentOffset:CGPointMake(scrollView.contentOffset.x, -scrollView.adjustedContentInset.top) animated:YES];
+            break;
+        }
+        case CYLScrollHideSimulationRowScrollDownInCode: {
+            UIScrollView *scrollView = [self cyl_scrollHideSimulationScrollView];
+            CGFloat maxOffsetY = MAX(-scrollView.adjustedContentInset.top, scrollView.contentSize.height + scrollView.adjustedContentInset.bottom - CGRectGetHeight(scrollView.bounds));
+            [scrollView setContentOffset:CGPointMake(scrollView.contentOffset.x, MIN(maxOffsetY, scrollView.contentOffset.y + 600)) animated:YES];
+            break;
+        }
+        case CYLScrollHideSimulationRowAppHidesTabBar: {
+            [tabBarController setTabBarHidden:YES animated:YES];
+            CYLScrollHideSimulationAfter(4, ^{
+                [tabBarController setTabBarHidden:NO animated:YES];
+            });
+            break;
+        }
+        case CYLScrollHideSimulationRowTurnOffAndOn: {
+            tabBarController.cyl_hidesTabBarOnScroll = NO;
+            CYLScrollHideSimulationAfter(CYLScrollHideSimulationHold, ^{
+                tabBarController.cyl_hidesTabBarOnScroll = YES;
+            });
+            break;
+        }
+        case CYLScrollHideSimulationRowVoiceOverStatus: {
+            [center postNotificationName:UIAccessibilityVoiceOverStatusDidChangeNotification object:nil];
+            break;
+        }
+        case CYLScrollHideSimulationRowKeyboardWhileScrolling: {
+            UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(0, -100, 10, 10)];
+            [self.view addSubview:textField];
+            [textField becomeFirstResponder];
+            CYLScrollHideSimulationAfter(4, ^{
+                [textField resignFirstResponder];
+                [textField removeFromSuperview];
+            });
+            break;
+        }
+        case CYLScrollHideSimulationRowReduceMotionStatus: {
+            [center postNotificationName:UIAccessibilityReduceMotionStatusDidChangeNotification object:nil];
+            break;
+        }
+        case CYLScrollHideSimulationRowLowPowerMode: {
+            [center postNotificationName:NSProcessInfoPowerStateDidChangeNotification object:[NSProcessInfo processInfo]];
+            break;
+        }
+        case CYLScrollHideSimulationRowRotation: {
+#if defined(__IPHONE_16_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_16_0
+            if (@available(iOS 16.0, *)) {
+                UIWindowScene *windowScene = self.view.window.windowScene;
+                UIWindowSceneGeometryPreferencesIOS *landscape = [[UIWindowSceneGeometryPreferencesIOS alloc] initWithInterfaceOrientations:UIInterfaceOrientationMaskLandscapeRight];
+                [windowScene requestGeometryUpdateWithPreferences:landscape errorHandler:nil];
+                CYLScrollHideSimulationAfter(CYLScrollHideSimulationHold, ^{
+                    UIWindowSceneGeometryPreferencesIOS *portrait = [[UIWindowSceneGeometryPreferencesIOS alloc] initWithInterfaceOrientations:UIInterfaceOrientationMaskPortrait];
+                    [windowScene requestGeometryUpdateWithPreferences:portrait errorHandler:nil];
+                });
+            }
+#endif
+            break;
+        }
+        case CYLScrollHideSimulationRowCount:
+            break;
+    }
+}
+
+#pragma mark Settings row: all simulations in an action sheet
+
+/*!
+ * [EN] The settings section's row for the same simulations (shown in every demo, Swift ones included): an action sheet
+ *      lists them; the chosen one fires after CYLScrollHideSimulationDelay.
+ * [CN] 设置分组中用于同样模拟的行（所有 Demo 都显示，包括 Swift Demo）：用操作表列出全部模拟，所选模拟在 CYLScrollHideSimulationDelay
+ *      之后触发。
+ */
+- (void)cyl_presentScrollHideSimulationMenu {
+    UIAlertController *menu = [UIAlertController alertControllerWithTitle:CYLLocalizedString(@"滚动隐藏：模拟意外情况（issue #13）")
+                                                                  message:CYLLocalizedString(@"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。")
+                                                           preferredStyle:UIAlertControllerStyleActionSheet];
+    __weak typeof(self) weakSelf = self;
+    for (NSInteger row = 0; row < CYLScrollHideSimulationRowCount; row++) {
+        BOOL expectsRestore = YES;
+        NSString *title = [self cyl_scrollHideSimulationTitleForRow:row expectsRestore:&expectsRestore];
+        [menu addAction:[UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault handler:^(UIAlertAction * __unused action) {
+            [weakSelf cyl_didSelectScrollHideSimulationRow:row];
+        }]];
+    }
+    [menu addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil]];
+    menu.popoverPresentationController.sourceView = self.view;
+    menu.popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds), 1, 1);
+    [self presentViewController:menu animated:YES completion:nil];
 }
 
 @end
