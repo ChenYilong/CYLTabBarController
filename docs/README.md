@@ -17,6 +17,7 @@
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
+| [Demo 测试列表：设置分组与纯 Swift 版本](Demo-Test-List.md) | [The demo test list: settings groups and a pure Swift version](Demo-Test-List.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
@@ -58,6 +59,7 @@ docs/
 ├── CYLUtils-Helpers.md
 ├── Carthage-Example.md
 ├── Carthage.md
+├── Demo-Test-List.md
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
 ├── Image-Only-Tabs.md
@@ -82,13 +84,32 @@ docs/
 ├── TabBarItem-Selected-Title.md
 ├── Update-Tab-Bar-Items-In-Place.md
 └── assets/
+    ├── demo-test-list-objc-classic.png
     ├── docs-navigation-index.png
     ├── flatdesign-standard-appearance-mapping.svg
     ├── login-required-tabs-flow.svg
+    ├── pag-animation-tab-icons.png
+    ├── pag-animation-test-list.png
     ├── plusbutton-subview-touches-issue-202.png
     ├── readme-english-before-reading.png
     ├── readme-english-bilingual-contents.png
     ├── readme-english-header-badges.png
+    ├── rive-animation-onboarding-button.png
+    ├── rive-animation-search-tab-frames.png
+    ├── rive-animation-swiftui-test-list.png
+    ├── rive-animation-tab-icons.png
+    ├── rive-animation-test-list.png
+    ├── tab-interactions-long-press-classic.png
+    ├── tab-interactions-long-press-flatdesign.png
+    ├── tab-interactions-long-press-liquid-glass.png
+    ├── tab-interactions-navigation-bar-hidden-classic.png
+    ├── tab-interactions-outside-superview-classic.png
+    ├── tab-interactions-outside-superview-liquid-glass.png
+    ├── tab-interactions-slide-transition.png
+    ├── tab-interactions-star-fireworks-flatdesign.png
+    ├── tab-interactions-swipe-classic.png
+    ├── tab-interactions-swipe-liquid-glass.png
+    ├── tab-interactions-swipe-login-classic.png
     ├── update-tab-bar-items-all-local-icons.png
     ├── update-tab-bar-items-all-network-icons-badges.png
     ├── update-tab-bar-items-all-network-icons-restored.png
