@@ -23,14 +23,7 @@ struct TabBar: UIViewControllerRepresentable {
 
     func makeUIViewController(context _: Context) -> CYLTabBarController {
         let viewControllers = Tab.allCases.map { tab -> UIViewController in
-            if tab == .bell {
-                // [EN] The test list shared by every Swift demo: every settings row of the library, grouped.
-                // [CN] 所有 Swift Demo 共用的测试列表：库中所有设置行，分组显示。
-                let settingsViewController = CYLSettingsDemoTableViewController()
-                settingsViewController.title = tab.rawValue.capitalized
-                return UINavigationController(rootViewController: settingsViewController)
-            }
-            return UIHostingController(rootView: tab.content)
+            tab == .bell ? tab.settingsViewController() : UIHostingController(rootView: tab.content)
         }
         let tabBarController = CYLTabBarController(viewControllers: viewControllers,
                                                    tabBarItemsAttributes: Tab.allCases.map(\.attributes))

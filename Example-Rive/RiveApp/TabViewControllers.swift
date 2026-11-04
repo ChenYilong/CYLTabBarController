@@ -25,11 +25,8 @@ extension Tab {
         case .timer:
             rootViewController = UIHostingController(rootView: OnboardingView(show: .constant(true)))
         case .bell:
-            // [EN] The test list of every demo, with a Rive animation in plain UIKit above it.
-            // [CN] 所有 Demo 共用的测试列表，上方是纯 UIKit 中的 Rive 动画。
-            let settingsViewController = CYLSettingsDemoTableViewController()
-            settingsViewController.headerView = RiveMenuButtonDemoView()
-            rootViewController = settingsViewController
+            // [EN] The shared test list, with a Rive animation in plain UIKit above it. [CN] 共用的测试列表，上方是纯 UIKit 中的 Rive 动画。
+            return settingsViewController(headerView: RiveMenuButtonDemoView())
         case .user:
             rootViewController = UIHostingController(rootView: SignInView(show: .constant(true)))
         }
