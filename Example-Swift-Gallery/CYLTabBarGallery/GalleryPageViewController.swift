@@ -117,7 +117,7 @@ final class GalleryPageViewController: UIViewController {
 // [CN] 一个长列表，用于观察 `cyl_reselectBehavior` 滚动回顶部。
 final class GalleryListViewController: UITableViewController {
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
         return 60
     }
 

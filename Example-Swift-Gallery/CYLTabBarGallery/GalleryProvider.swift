@@ -115,7 +115,7 @@ enum GalleryProvider {
 
     // MARK: - Animation
 
-    static func redAttributes(_ index: Int) -> [String: Any] {
+    static func redAttributes(_: Int) -> [String: Any] {
         let gray = Gallery.gray(175)
         return [CYLTabBarItemTitleColor: gray, CYLTabBarItemSelectedTitleColor: Gallery.red,
                 CYLTabBarItemIconColor: gray, CYLTabBarItemSelectedIconColor: Gallery.red]
@@ -183,7 +183,7 @@ enum GalleryProvider {
 
     // MARK: - Irregular and customized clicks
 
-    static func tealAttributes(_ index: Int) -> [String: Any] {
+    static func tealAttributes(_: Int) -> [String: Any] {
         return [CYLTabBarItemTitleColor: UIColor.white, CYLTabBarItemSelectedTitleColor: Gallery.teal,
                 CYLTabBarItemIconColor: UIColor.white, CYLTabBarItemSelectedIconColor: Gallery.teal]
     }
@@ -326,10 +326,10 @@ enum GalleryProvider {
         return controller
     }
 
+    /// [EN] The same tab bar as `customGlassStyle()`: "Photo" is a hijacked regular tab. [CN] 与 `customGlassStyle()` 相同：
+    /// "Photo" 是被劫持的普通 Tab。
     static func hijackStyle() -> CYLTabBarController {
-        let controller = Gallery.tabBarController(pages: Gallery.pages(5), attributes: Gallery.attributes(5))
-        Gallery.hijackPhotoTab(of: controller)
-        return controller
+        return customGlassStyle()
     }
 
     static func perTabStyle() -> CYLTabBarController {

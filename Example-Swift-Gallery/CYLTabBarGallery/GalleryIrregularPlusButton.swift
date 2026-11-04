@@ -60,7 +60,7 @@ final class GalleryIrregularPlusButton: CYLPlusButton, CYLPlusButtonSubclassing 
     }
 
     /// [EN] Only the circle responds. [CN] 只有圆形区域响应。
-    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+    override func point(inside point: CGPoint, with _: UIEvent?) -> Bool {
         let radius = bounds.width / 2
         let dx = point.x - bounds.midX
         let dy = point.y - bounds.midY

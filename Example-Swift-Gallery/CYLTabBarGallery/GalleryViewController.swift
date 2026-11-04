@@ -141,15 +141,15 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
 
     // MARK: - UITableViewDataSource
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
+    override func numberOfSections(in _: UITableView) -> Int {
         return sectionTitleArray.count
     }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    override func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
         return sectionTitleArray[section]
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
         return titleArray[section].count
     }
 
@@ -169,52 +169,82 @@ final class GalleryViewController: UITableViewController, UITabBarControllerDele
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        switch (indexPath.section, indexPath.row) {
-        case (0, 0): present(GalleryProvider.systemStyle(), animated: true)
-        case (0, 1): present(GalleryProvider.customStyle(), animated: true)
-        case (0, 2): present(GalleryProvider.mixtureStyle(), animated: true)
-        case (0, 3): present(GalleryProvider.customGlassStyle(), animated: true)
-        case (0, 4):
+        // [EN] One function per section, so no switch grows past a handful of cases.
+        // [CN] 每个分组一个函数，避免单个 switch 分支过多。
+        let row = indexPath.row
+        switch indexPath.section {
+        case 0: presentBasicScene(at: row)
+        case 1: present(row == 0 ? GalleryProvider.tabbarWithNavigationStyle() : GalleryProvider.navigationWithTabbarStyle(), animated: true)
+        case 2: presentAnimationScene(at: row)
+        case 3: present(GalleryProvider.customIrregularityStyle(), animated: true)
+        case 4: present(row == 0 ? GalleryProvider.customIrregularityStyle() : GalleryProvider.customTipsStyle(), animated: true)
+        case 5: presentRemindScene(at: row)
+        case 6: present(GalleryProvider.lottieStyle(), animated: true)
+        case 7: presentNewAPIScene(at: row)
+        default: break
+        }
+    }
+
+    private func presentBasicScene(at row: Int) {
+        switch row {
+        case 0: present(GalleryProvider.systemStyle(), animated: true)
+        case 1: present(GalleryProvider.customStyle(), animated: true)
+        case 2: present(GalleryProvider.mixtureStyle(), animated: true)
+        case 3: present(GalleryProvider.customGlassStyle(), animated: true)
+        case 4:
             let tabBarController = GalleryProvider.systemMoreStyle()
             tabBarController.delegate = self
             present(tabBarController, animated: true)
-        case (0, 5): present(GalleryProvider.customMoreStyle(), animated: true)
-        case (0, 6): present(GalleryProvider.mixtureMoreStyle(), animated: true)
-        case (0, 7): present(GalleryProvider.customGlassMoreStyle(), animated: true)
-        case (0, 8):
+        case 5: present(GalleryProvider.customMoreStyle(), animated: true)
+        case 6: present(GalleryProvider.mixtureMoreStyle(), animated: true)
+        case 7: present(GalleryProvider.customGlassMoreStyle(), animated: true)
+        case 8:
             let tabBarController = GalleryProvider.systemStyle()
             present(tabBarController, animated: true) { tabBarController.selectedIndex = 2 }
-        case (0, 9):
+        case 9:
             let tabBarController = GalleryProvider.customStyle()
             present(tabBarController, animated: true) { tabBarController.selectedIndex = 2 }
-        case (0, 10): present(GalleryProvider.mandatoryOldDesignStyle(), animated: true)
-        case (0, 11): present(GalleryProvider.customGlassWithBadgeStyle(), animated: true)
-        case (0, 12):
+        case 10: present(GalleryProvider.mandatoryOldDesignStyle(), animated: true)
+        case 11: present(GalleryProvider.customGlassWithBadgeStyle(), animated: true)
+        case 12:
             let tabBarController = GalleryProvider.systemTabStyle()
             tabBarController.delegate = self
             present(tabBarController, animated: true)
-        case (1, 0): present(GalleryProvider.tabbarWithNavigationStyle(), animated: true)
-        case (1, 1): present(GalleryProvider.navigationWithTabbarStyle(), animated: true)
-        case (2, 0): present(GalleryProvider.customColorStyle(), animated: true)
-        case (2, 1): present(GalleryProvider.customBouncesStyle(), animated: true)
-        case (2, 2): present(GalleryProvider.customBackgroundColorStyle(implies: false), animated: true)
-        case (2, 3): present(GalleryProvider.customHighlightableStyle(), animated: true)
-        case (2, 4): present(GalleryProvider.customBackgroundColorStyle(implies: true), animated: true)
-        case (3, 0), (4, 0): present(GalleryProvider.customIrregularityStyle(), animated: true)
-        case (4, 1): present(GalleryProvider.customTipsStyle(), animated: true)
-        case (5, 0): present(GalleryProvider.systemRemindStyle(), animated: true)
-        case (5, 1): present(GalleryProvider.customRemindStyle(), animated: true)
-        case (5, 2): present(GalleryProvider.customAnimateRemindStyle(), animated: true)
-        case (5, 3): present(GalleryProvider.customAnimateRemindStyle2(), animated: true)
-        case (5, 4): present(GalleryProvider.customAnimateRemindStyle3(), animated: true)
-        case (6, 0): present(GalleryProvider.lottieStyle(), animated: true)
-        case (7, 0): present(GalleryProvider.reselectStyle(), animated: true)
-        case (7, 1): present(GalleryProvider.pressAndReselectStyle(), animated: true)
-        case (7, 2): present(GalleryProvider.hijackStyle(), animated: true)
-        case (7, 3): present(GalleryProvider.perTabStyle(), animated: true)
-        case (7, 4): present(GalleryProvider.accessibilityStyle(), animated: true)
-        case (7, 5): present(GalleryProvider.centeredStyle(), animated: true)
-        case (7, 6): present(GalleryProvider.edgeInsetsStyle(), animated: true)
+        default: break
+        }
+    }
+
+    private func presentAnimationScene(at row: Int) {
+        switch row {
+        case 0: present(GalleryProvider.customColorStyle(), animated: true)
+        case 1: present(GalleryProvider.customBouncesStyle(), animated: true)
+        case 2: present(GalleryProvider.customBackgroundColorStyle(implies: false), animated: true)
+        case 3: present(GalleryProvider.customHighlightableStyle(), animated: true)
+        case 4: present(GalleryProvider.customBackgroundColorStyle(implies: true), animated: true)
+        default: break
+        }
+    }
+
+    private func presentRemindScene(at row: Int) {
+        switch row {
+        case 0: present(GalleryProvider.systemRemindStyle(), animated: true)
+        case 1: present(GalleryProvider.customRemindStyle(), animated: true)
+        case 2: present(GalleryProvider.customAnimateRemindStyle(), animated: true)
+        case 3: present(GalleryProvider.customAnimateRemindStyle2(), animated: true)
+        case 4: present(GalleryProvider.customAnimateRemindStyle3(), animated: true)
+        default: break
+        }
+    }
+
+    private func presentNewAPIScene(at row: Int) {
+        switch row {
+        case 0: present(GalleryProvider.reselectStyle(), animated: true)
+        case 1: present(GalleryProvider.pressAndReselectStyle(), animated: true)
+        case 2: present(GalleryProvider.hijackStyle(), animated: true)
+        case 3: present(GalleryProvider.perTabStyle(), animated: true)
+        case 4: present(GalleryProvider.accessibilityStyle(), animated: true)
+        case 5: present(GalleryProvider.centeredStyle(), animated: true)
+        case 6: present(GalleryProvider.edgeInsetsStyle(), animated: true)
         default: break
         }
     }

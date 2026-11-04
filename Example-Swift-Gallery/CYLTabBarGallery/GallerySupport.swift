@@ -260,22 +260,30 @@ enum Gallery {
         tabBarController.cyl_hijackedTabBarItemIdentifiers = ["photo"]
         tabBarController.cyl_didHijackHandler = { controller, photoPage in
             DispatchQueue.main.async { [weak controller, weak photoPage] in
-                guard let controller = controller, let photoPage = photoPage,
-                      let photoIndex = controller.viewControllers?.firstIndex(of: photoPage) else {
+                guard let controller = controller, let photoPage = photoPage else {
                     return
                 }
-                let currentIndex = controller.selectedIndex
-                let swapped = swapPages(of: controller, currentIndex, photoIndex)
-                if swapped {
-                    controller.selectedIndex = photoIndex
-                }
-                presentMoreFeatures(from: controller) { [weak controller] in
-                    guard swapped, let controller = controller, swapPages(of: controller, currentIndex, photoIndex) else {
-                        return
-                    }
-                    controller.selectedIndex = currentIndex
-                }
+                showPhotoDialog(in: controller, photoPage: photoPage)
             }
+        }
+    }
+
+    /// [EN] Shows "Photo" as selected over the current page while its dialog is up, then restores everything.
+    /// [CN] 对话框显示期间让 "Photo" 显示为选中而页面不变，关闭后全部恢复。
+    private static func showPhotoDialog(in controller: CYLTabBarController, photoPage: UIViewController) {
+        guard let photoIndex = controller.viewControllers?.firstIndex(of: photoPage) else {
+            return
+        }
+        let currentIndex = controller.selectedIndex
+        let swapped = swapPages(of: controller, currentIndex, photoIndex)
+        if swapped {
+            controller.selectedIndex = photoIndex
+        }
+        presentMoreFeatures(from: controller) { [weak controller] in
+            guard swapped, let controller = controller, swapPages(of: controller, currentIndex, photoIndex) else {
+                return
+            }
+            controller.selectedIndex = currentIndex
         }
     }
 }

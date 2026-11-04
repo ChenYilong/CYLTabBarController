@@ -17,12 +17,12 @@ import CYLTabBarController
 final class GalleryBounceAnimation: NSObject, CYLTabButtonAnimation {
 
     @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
-    func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    func cyl_playSelectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {  // NOSONAR swift:S100: Swift import name of the Objective-C protocol method, kept so it matches the requirement.
         Gallery.playKeyframes(on: iconView, keyPath: "transform.scale", values: Gallery.bounceValues, duration: 0.6)
     }
 
     @objc(cyl_playReselectAnimationWithTabButton:iconView:titleLabel:)
-    func cyl_playReselectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    func cyl_playReselectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {  // NOSONAR swift:S100: Swift import name of the Objective-C protocol method, kept so it matches the requirement.
         cyl_playSelectAnimation(withTabButton: button, iconView: iconView, titleLabel: titleLabel)
     }
 }
@@ -34,19 +34,19 @@ final class GalleryHighlightableAnimation: NSObject, CYLTabButtonAnimation {
     static let largeScale: CGFloat = 1.15
 
     @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
-    func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    func cyl_playSelectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {  // NOSONAR swift:S100: Swift import name of the Objective-C protocol method, kept so it matches the requirement.
         iconView.transform = CGAffineTransform(scaleX: Self.largeScale, y: Self.largeScale)
     }
 
     @objc(cyl_playHighlightAnimationWithTabButton:iconView:titleLabel:)
-    func cyl_playHighlightAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    func cyl_playHighlightAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {  // NOSONAR swift:S100: Swift import name of the Objective-C protocol method, kept so it matches the requirement.
         UIView.animate(withDuration: 0.2) {
             iconView.transform = CGAffineTransform(scaleX: Self.largeScale * 0.8, y: Self.largeScale * 0.8)
         }
     }
 
     @objc(cyl_playDehighlightAnimationWithTabButton:iconView:titleLabel:)
-    func cyl_playDehighlightAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    func cyl_playDehighlightAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {  // NOSONAR swift:S100: Swift import name of the Objective-C protocol method, kept so it matches the requirement.
         UIView.animate(withDuration: 0.2) {
             iconView.transform = CGAffineTransform(scaleX: Self.largeScale, y: Self.largeScale)
         }
@@ -57,7 +57,7 @@ final class GalleryHighlightableAnimation: NSObject, CYLTabButtonAnimation {
 final class GalleryPressAndReselectAnimation: CYLTabButtonPressAnimation {
 
     @objc(cyl_playReselectAnimationWithTabButton:iconView:titleLabel:)
-    func cyl_playReselectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    func cyl_playReselectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {  // NOSONAR swift:S100: Swift import name of the Objective-C protocol method, kept so it matches the requirement.
         Gallery.playKeyframes(on: iconView, keyPath: "transform.rotation.z", values: [0, Double.pi, 2 * Double.pi], duration: 0.5)
     }
 }
@@ -81,11 +81,13 @@ final class GalleryBadgeAnimation: NSObject, CYLTabButtonAnimation {
     }
 
     @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
-    func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    func cyl_playSelectAnimation(withTabButton _: UIControl, iconView _: UIView, titleLabel _: UILabel?) {  // NOSONAR swift:S100: Swift import name of the Objective-C protocol method, kept so it matches the requirement.
+        // [EN] Intentionally empty: this animation only reacts to badge changes; selecting the tab plays nothing.
+        // [CN] 有意留空：此动画只响应角标变化，选中 Tab 时不播放任何动画。
     }
 
     @objc(cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:)
-    func cyl_playBadgeChangedAnimation(withTabButton button: UIControl, iconView: UIView, badgeView: UIView?) {
+    func cyl_playBadgeChangedAnimation(withTabButton _: UIControl, iconView: UIView, badgeView: UIView?) {  // NOSONAR swift:S100: Swift import name of the Objective-C protocol method, kept so it matches the requirement.
         switch style {
         case .jumpingIcon:
             Gallery.playKeyframes(on: iconView, keyPath: "transform.translation.y", values: [0, -8, 4, -4, 3, -2, 0], duration: 0.6)
