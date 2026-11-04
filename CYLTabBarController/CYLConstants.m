@@ -7,6 +7,7 @@
 //
 
 #import "CYLConstants.h"
+#import "UIControl+CYLTabBarItemAnimation.h"
 #if __has_include(<CYLTabBarController/CYLTabBarController.h>)
 #import <CYLTabBarController/CYLTabBarController.h>
 #else
@@ -214,16 +215,33 @@ static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *C
     return URL;
 }
 
+/// FIX: issue #604 — YES when `attributes` give an animation file of any library in the build (generic keys, or each
+/// library's own keys). `attributes` 中设置了构建中任意动画库的文件时返回 YES（通用 key，或各动画库自己的 key）。
+static BOOL CYLTabBarItemAttributesHaveAnimationFile(NSDictionary *attributes) {
+    return CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationURL) != nil ||
+           CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationFilePath) != nil;
+}
+
 + (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
-    // Lottie ObjC (`<Lottie/Lottie.h>`) or Lottie Swift (`<Lottie/Lottie-Swift.h>`); without either, never enabled.
-    // 引入 Lottie ObjC 或 Lottie Swift 之一时才可能启用；两者都没有时恒为 NO。
-#if CYL_LOTTIE_AVAILABLE
+    // FIX: issue #604 — only with an animation library, i.e. the `CYLTabBarItemAnimation` service, checked at runtime
+    // so that any library works (Lottie, PAG or one added later); without one, never enabled.
+    // 仅在引入动画库（即 `CYLTabBarItemAnimation` 服务）时启用，在运行时判断，以支持任意动画库（Lottie、PAG 或以后新增的库）；没有时恒为 NO。
+    if (!CYLTabBarItemAnimationIsAvailable()) {
+        return NO;
+    }
     NSInteger lottieURLCount = lottieURLs.count;
     BOOL isLottieEnabled = lottieURLCount > 0 ;
     BOOL isLottieEnabledFromAttributes = NO;
     if (tabBarItemsAttributes && tabBarItemsAttributes.count > 0) {
         @try {
-            isLottieEnabledFromAttributes = tabBarItemsAttributes[0][CYLTabBarLottieURL] || tabBarItemsAttributes[0][CYLTabBarLottieFilePath];
+            // FIX: issue #477 — any tab, not only the first: only some tabs may have an animation.
+            // 任意一个 Tab，而不只是第一个：可能只有部分 Tab 有动画。
+            for (NSDictionary *item in tabBarItemsAttributes) {
+                if ([item isKindOfClass:[NSDictionary class]] && CYLTabBarItemAttributesHaveAnimationFile(item)) {
+                    isLottieEnabledFromAttributes = YES;
+                    break;
+                }
+            }
         } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
         NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
@@ -231,11 +249,6 @@ static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *C
         }
     }
     return isLottieEnabled || isLottieEnabledFromAttributes;
-#else
-    (void)lottieURLs;
-    (void)tabBarItemsAttributes;
-    return NO;
-#endif
 }
 
 @end

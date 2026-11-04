@@ -18,6 +18,8 @@
 #import "UIControl+CYLTabBarControllerExtention.h"
 
 #endif
+// Private header of the pod: the library-neutral tab icon animation (#604). 本 pod 的私有头文件：与动画库无关的 Tab 图标动画（#604）。
+#import "UIControl+CYLTabBarItemAnimation.h"
 #import "UINavigationController+CYLFlatDesignTabBarPrivate.h"
 #import "_CYLFlatDesignTabBarParallaxOverlayView.h"
 
@@ -73,23 +75,24 @@
         [UINavigationController cyl_navigationBarActionHook];
         [self commonInit];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_tabBarItemDidChange:) name:CYLFlatDesignTabBarItemDidChange object:nil];
-        // [CN] Only with a Lottie library. 仅在引入 Lottie 库时监听。
-        // [EN] Only with a Lottie library. Observe only when the Lottie library is imported.
-#if CYL_LOTTIE_AVAILABLE
-        __weak __typeof(self) weakSelf = self;
-        void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
-            __strong typeof(self) self = weakSelf;
-            if (!self) {
-                 return;
-            }
-            [self stopAnimationOfAllLottieView];
-        };
-        // FIX: issue #488 keep the token, see `-dealloc`. 保存 token，见 `-dealloc`。
-        _lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationPlayingNotification
-                                                                                            object:nil
-                                                                                             queue:[NSOperationQueue mainQueue]
-                                                                                        usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
-#endif
+        // [CN] 仅在引入动画库时监听（#604，运行时判断，以支持任意动画库）。
+        // [EN] Observe only with an animation library (#604, checked at runtime so that any library works).
+        if (CYLTabBarItemAnimationIsAvailable()) {
+            __weak __typeof(self) weakSelf = self;
+            void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
+                __strong typeof(self) self = weakSelf;
+                if (!self) {
+                     return;
+                }
+                // Library-neutral (#604): every animation library (Lottie, PAG). 与动画库无关：所有动画库（Lottie、PAG）。
+                [self stopAllTabBarItemAnimations];
+            };
+            // FIX: issue #488 keep the token, see `-dealloc`. 保存 token，见 `-dealloc`。
+            _lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationPlayingNotification
+                                                                                                object:nil
+                                                                                                 queue:[NSOperationQueue mainQueue]
+                                                                                            usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
+        }
     }
     return self;
 }
@@ -854,32 +857,24 @@
 //    return selectedCover;
 //}
 
+/*!
+ * FIX: issue #604
+ * [EN] Stops the animations of every tab, whatever their library (Lottie or PAG, each a `CYLTabBarItemAnimator`).
+ * [CN] 停止所有 Tab 的动画，与动画库无关（Lottie 或 PAG，均为 `CYLTabBarItemAnimator`）。
+ */
+- (void)stopAllTabBarItemAnimations {
+    // FIX: issue #604 — only with the `CYLTabBarItemAnimation` subspec. 仅在包含 `CYLTabBarItemAnimation` 子库时。
+    if (!CYLTabBarItemAnimationIsAvailable()) {
+        return;
+    }
+    [self.tabBarItems enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [obj cyl_stopTabBarItemAnimation];
+    }];
+}
+
+/// [EN] Kept for compatibility; any animation library (#604). [CN] 为兼容而保留；适用于任意动画库（#604）。
 - (void)stopAnimationOfAllLottieView {
-#if __has_include(<Lottie/Lottie.h>)
-    if ([self isKindOfClass:[CYLFlatDesignTabBar class]]) {
-        CYLFlatDesignTabBar *flatDesignTabBar = (CYLFlatDesignTabBar *)self;
-        [flatDesignTabBar.tabBarItems enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [obj cyl_stopAnimationOfLottieView];
-        }];
-        
-    }
-#endif
-
-#if __has_include(<Lottie/Lottie-Swift.h>)
-    if ([self isKindOfClass:[CYLFlatDesignTabBar class]]) {
-        CYLFlatDesignTabBar *flatDesignTabBar = (CYLFlatDesignTabBar *)self;
-        [flatDesignTabBar.tabBarItems enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-
-#if __has_include(<CYLTabBarController/CYLTabBarController.h>)
-            [obj cyl_stopAnimationOfLottieView];
-#else
-            [obj cyl_stopAnimationOfLottieView];
-#endif
-        }];
-        
-    }
-#endif
-
+    [self stopAllTabBarItemAnimations];
 }
 
 #pragma mark - plusFrame and tabBarItemFrameWithIndex
