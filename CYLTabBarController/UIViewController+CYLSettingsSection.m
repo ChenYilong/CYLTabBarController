@@ -2195,9 +2195,30 @@ static const NSTimeInterval CYLScrollHideSelfTestNextDelay = 1.5;
 }
 
 - (void)cyl_runScrollHideSelfTestRow:(NSInteger)row tabBarController:(CYLTabBarController *)tabBarController results:(NSMutableArray<NSString *> *)results {
+    [self cyl_runScrollHideSelfTestRow:row tabBarController:tabBarController results:results leftoverAttempt:0];
+}
+
+/*!
+ * [EN] Before each row, dismiss whatever a previous simulation left presented: a share sheet can appear seconds late on
+ *      a simulator, after that row's cleanup, and scroll hiding (rightly) refuses to hide while a page is presented, so
+ *      every later row would be SKIP. Tries every 0.5 s, for at most 10 s.
+ * [CN] 每一行开始前，关闭上一个模拟遗留的页面：模拟器上分享面板可能在几秒后才出现（晚于该行的清理），而有页面 present 时滚动隐藏（正确地）
+ *      拒绝隐藏，后面的每一行都会变成 SKIP。每 0.5 秒尝试一次，最多 10 秒。
+ */
+- (void)cyl_runScrollHideSelfTestRow:(NSInteger)row tabBarController:(CYLTabBarController *)tabBarController results:(NSMutableArray<NSString *> *)results leftoverAttempt:(NSInteger)attempt {
     __weak typeof(self) weakSelf = self;
     if (row >= CYLScrollHideSimulationRowCount) {
         [self cyl_finishScrollHideSelfTestWithResults:results];
+        return;
+    }
+    UIViewController *root = self.view.window.rootViewController ?: tabBarController;
+    if (root.presentedViewController && attempt < 20) {
+        if (!root.presentedViewController.isBeingDismissed) {
+            [root dismissViewControllerAnimated:NO completion:nil];
+        }
+        CYLScrollHideSimulationAfter(0.5, ^{
+            [weakSelf cyl_runScrollHideSelfTestRow:row tabBarController:tabBarController results:results leftoverAttempt:attempt + 1];
+        });
         return;
     }
     CYLScrollHideSimulationKind kind = CYLScrollHideSimulationKindRestore;
@@ -2221,6 +2242,35 @@ static const NSTimeInterval CYLScrollHideSelfTestNextDelay = 1.5;
     }
     [self cyl_runScrollHideSimulationRow:row tabBarController:tabBarController];
     CYLScrollHideSimulationAfter(CYLScrollHideSelfTestCheckDelay, ^{
+        [weakSelf cyl_checkScrollHideSelfTestRow:row title:title expectation:expectation tabBarController:tabBarController results:results next:next waited:0];
+    });
+}
+
+/// [EN] Restore rows may wait up to this much longer for a slow presentation (e.g. a share sheet on a simulator).
+/// [CN] “应恢复”的行最多再等待这么久，以等待较慢的 present（例如模拟器上的分享面板）。
+static const NSTimeInterval CYLScrollHideSelfTestRestoreExtraWait = 8.0;
+
+/*!
+ * [EN] Checks one row. A row that expects the bar back is polled every 0.5 s for up to
+ *      CYLScrollHideSelfTestRestoreExtraWait more seconds before it fails; the other expectations are checked once.
+ * [CN] 检查一行。期望 TabBar 恢复的行在判为失败前，每 0.5 秒再检查一次，最多再等 CYLScrollHideSelfTestRestoreExtraWait 秒；其他期望只检查一次。
+ */
+- (void)cyl_checkScrollHideSelfTestRow:(NSInteger)row
+                                 title:(NSString *)title
+                           expectation:(CYLScrollHideSelfTestExpectation)expectation
+                      tabBarController:(CYLTabBarController *)tabBarController
+                               results:(NSMutableArray<NSString *> *)results
+                                  next:(dispatch_block_t)next
+                                waited:(NSTimeInterval)waited {
+    __weak typeof(self) weakSelf = self;
+    if (CYLScrollHideSelfTestExpectationRestored == expectation && tabBarController.cyl_isTabBarHiddenByScroll
+        && waited < CYLScrollHideSelfTestRestoreExtraWait) {
+        CYLScrollHideSimulationAfter(0.5, ^{
+            [weakSelf cyl_checkScrollHideSelfTestRow:row title:title expectation:expectation tabBarController:tabBarController results:results next:next waited:waited + 0.5];
+        });
+        return;
+    }
+    {
         BOOL hiddenByScroll = tabBarController.cyl_isTabBarHiddenByScroll;
         BOOL passed = NO;
         switch (expectation) {
@@ -2241,9 +2291,9 @@ static const NSTimeInterval CYLScrollHideSelfTestNextDelay = 1.5;
         NSLog(@"[CYLTabBarController] scroll hiding self-test: %@", line);
         // [EN] Clean up: dismiss what is still presented (alerts, share sheet), show a bar left hidden.
         // [CN] 清理：关闭仍在显示的页面（弹框、分享面板），显示仍被隐藏的 TabBar。
-        UIViewController *presented = weakSelf.presentedViewController;
-        if (presented && !presented.isBeingDismissed) {
-            [presented dismissViewControllerAnimated:NO completion:nil];
+        UIViewController *root = self.view.window.rootViewController ?: tabBarController;
+        if (root.presentedViewController && !root.presentedViewController.isBeingDismissed) {
+            [root dismissViewControllerAnimated:NO completion:nil];
         }
         NSTimeInterval wait = CYLScrollHideSelfTestNextDelay;
         if (CYLScrollHideSelfTestExpectationAppHidden == expectation) {
@@ -2252,7 +2302,7 @@ static const NSTimeInterval CYLScrollHideSelfTestNextDelay = 1.5;
             [tabBarController setTabBarHidden:NO animated:NO];
         }
         CYLScrollHideSimulationAfter(wait, next);
-    });
+    }
 }
 
 - (void)cyl_finishScrollHideSelfTestWithResults:(NSArray<NSString *> *)results {
