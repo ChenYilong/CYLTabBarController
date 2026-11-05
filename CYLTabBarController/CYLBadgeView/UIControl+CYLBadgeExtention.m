@@ -26,6 +26,30 @@
 #define kActualView ((UIView *)[self cyl_getActualBadgeSuperView])
 #define CYL_ACTUAL_BARBUTTON kActualView
 
+@interface UIView (CYLBadgeAnchorLayout)
+- (void)cyl_layoutBadgeAtTopRightCorner;
+@end
+
+/*!
+ * [EN] The transparent view that holds a control's badge (`-cyl_badgeAnchorViewAlignedToView:`). It places its badge again
+ *      on every layout pass, from its final bounds: placed once, the badge kept the fraction of a point it got from the
+ *      bounds at that moment (a plus button's badge shown before its image loaded sat 0.17–0.33 pt off the same badge shown
+ *      with the image ready).
+ * [CN] 承载控件角标的透明视图（`-cyl_badgeAnchorViewAlignedToView:`）。每次布局都按最终的 bounds 重新放置角标：只放置一次时，角标会保留当时
+ *      bounds 带来的不到一个点的偏差（图片加载前就显示的 PlusButton 角标，与图片已就绪时显示的同一角标相差 0.17–0.33 pt）。
+ */
+@interface CYLBadgeAnchorView : UIView
+@end
+
+@implementation CYLBadgeAnchorView
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    [self cyl_layoutBadgeAtTopRightCorner];
+}
+
+@end
+
 @implementation UIControl (CYLBadgeExtention) 
 
 - (void)cyl_setBadgeValue:(NSString *)badgeValue {
@@ -282,7 +306,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 - (UIView *)cyl_badgeAnchorViewAlignedToView:(UIView *)referenceView {
     UIView *anchorView = objc_getAssociatedObject(self, @selector(cyl_badgeAnchorViewAlignedToView:));
     if (!anchorView) {
-        anchorView = [[UIView alloc] initWithFrame:self.bounds];
+        anchorView = [[CYLBadgeAnchorView alloc] initWithFrame:self.bounds];
         anchorView.backgroundColor = UIColor.clearColor;
         anchorView.userInteractionEnabled = NO;
         anchorView.clipsToBounds = NO;
@@ -353,13 +377,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
         // [CN] 只在刚建立约束时设置一次 frame，角标无需等到下一次布局；每次调用都设置会与 Auto Layout 的像素取整冲突，导致 PlusButton 无限布局。
         CGRect visibleRect = CGRectMake(leading, top, CGRectGetWidth(unitRect) * targetSize.width,
                                         CGRectGetHeight(unitRect) * targetSize.height);
-        // [EN] On whole pixels, as Auto Layout will place it: the badge laid out on the unrounded frame stayed up to a
-        //      fraction of a point off where the same badge lands after a later layout (0.17 pt on a 3x screen).
-        // [CN] 对齐到整像素，与 Auto Layout 之后的位置一致：角标按未取整的 frame 布局时，会与之后再次布局的同一角标相差不到一个点（3x 屏上 0.17 pt）。
-        CGRect frame = [target convertRect:visibleRect toView:container];
-        CGFloat scale = container.traitCollection.displayScale > 0 ? container.traitCollection.displayScale : 1;
-        anchorView.frame = CGRectMake(round(CGRectGetMinX(frame) * scale) / scale, round(CGRectGetMinY(frame) * scale) / scale,
-                                      round(CGRectGetWidth(frame) * scale) / scale, round(CGRectGetHeight(frame) * scale) / scale);
+        anchorView.frame = [target convertRect:visibleRect toView:container];
     }
     return anchorView;
 }
