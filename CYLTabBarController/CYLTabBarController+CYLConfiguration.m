@@ -259,8 +259,15 @@ static BOOL CYLIsReadableLottieFile(NSString *path) {
 static NSURL *_Nullable CYLURLValue(id value) {
     NSURL *URL = [value isKindOfClass:[NSURL class]] ? value : nil;
     if ([value isKindOfClass:[NSString class]]) {
+        // [EN] FIX: B21: an empty string is no URL; +fileURLWithPath: requires a non-empty path.
+        // [CN] 修复 B21：空字符串不是 URL；+fileURLWithPath: 要求非空路径。
+        NSString *path = [(NSString *)value length] > 0 ? CYLMainBundlePath(value) : nil;
         NSURL *parsed = [NSURL URLWithString:value];
-        URL = parsed.scheme.length > 1 ? parsed : [NSURL fileURLWithPath:CYLMainBundlePath(value)];
+        if (parsed.scheme.length > 1) {
+            URL = parsed;
+        } else {
+            URL = path.length > 0 ? [NSURL fileURLWithPath:path] : nil;
+        }
     }
     if (CYLIsRemoteURL(URL) || (URL.isFileURL && CYLFileExists(URL.path))) {
         return URL;
@@ -801,7 +808,8 @@ static void CYLLoadLocalConfiguration(NSURL *_Nullable URL, CYLTabBarConfigurati
     NSError *error = nil;
     NSDictionary *configuration = nil;
     if (URL) {
-        configuration = [CYLTabBarController configurationWithContentsOfFile:URL.path error:&error];
+        // [EN] A file URL's path can be nil (C10). [CN] file URL 的 path 可能为 nil（C10）。
+        configuration = [CYLTabBarController configurationWithContentsOfFile:URL.path ?: @"" error:&error];
     } else {
         error = [NSError errorWithDomain:CYLTabBarConfigurationErrorDomain code:CYLTabBarConfigurationErrorFileNotFound
                                 userInfo:@{ NSLocalizedDescriptionKey : @"No configuration URL." }];

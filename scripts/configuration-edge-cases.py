@@ -61,6 +61,7 @@ CASES = [
  ('B18', '代码中传入的配置不是字典（如类型不明的 JSON 数组）', 'The configuration passed in code is not a dictionary (e.g. an untyped JSON list)', '视为空配置并输出警告；以前会因 unrecognized selector 崩溃', 'Treated as empty, with a warning; this used to crash (unrecognized selector)', {'fixed': 6, 'found': 6}),
  ('B19', '无效的颜色（`CYLTabBarItemTitleColor` 等为错误的十六进制串或数字）', 'An invalid color (`CYLTabBarItemTitleColor`... a wrong hex string or a number)', '接受 UIColor 与 "#RGB" / "#RRGGBB" / "#RRGGBBAA"，其他移除并输出警告', 'UIColor and "#RGB" / "#RRGGBB" / "#RRGGBBAA" are accepted; anything else is removed, with a warning', {'fixed': 8, 'found': 8}),
  ('B20', '无效的字体（字号为 0、NaN、超过 200，或字体名称不存在）', 'An invalid font (size 0, NaN, over 200, or a font name that does not exist)', '字号必须在 1 到 200 之间，字体必须存在，否则移除并输出警告', 'The size must be between 1 and 200 and the font must exist; removed otherwise, with a warning', {'fixed': 8, 'found': 8}),
+ ('B21', '空字符串作为 URL、Lottie 文件、图片 URL、类名、颜色或字体（`""`）', 'An empty string (`""`) as a URL, Lottie file, image URL, class, color or font', '视为未提供并输出警告；以前空的 Lottie URL 会传给 +fileURLWithPath:（要求非空路径）', 'Treated as missing, with a warning; an empty Lottie URL used to reach +fileURLWithPath:, which requires a non-empty path', {'fixed': 10, 'found': 9}),
  # C. View controllers 子控制器
  ('C1', '子控制器类不存在', 'The view controller class does not exist', '使用 UIViewController 并输出警告', 'UIViewController and a warning', {'fixed': 1}),
  ('C2', '类不是 UIViewController（如 NSString）', 'The class is not a UIViewController (e.g. NSString)', '使用 UIViewController 并输出警告', 'UIViewController and a warning', {'fixed': 1}),
@@ -71,6 +72,7 @@ CASES = [
  ('C7', '同一个子控制器出现两次', 'The same view controller twice', '移除重复项；以前 UIKit 会抛异常', 'The duplicate is removed; UIKit used to raise', {'fixed': 2}),
  ('C8', '子控制器数量与 Tab 数量不一致', 'More or fewer view controllers than tabs', '本库按下标保护，不越界', 'The library checks indexes, no out-of-bounds access', {'fixed': 1}),
  ('C9', '`CYLTabBarControllerViewControllers` 为空数组', '`CYLTabBarControllerViewControllers` is an empty list', '视为未提供，根据 Tab 创建子控制器', 'Treated as missing: the view controllers are created from the tabs', {'fixed': 6, 'found': 5}),
+ ('C10', '没有 URL 的 NSURLRequest，或代码中传入 nil 请求 / URL（声明为 nonnull）', 'An NSURLRequest without a URL, or a nil request / URL from code (declared nonnull)', '返回 FileNotFound 错误；本地与缺失 URL 由同一个文件内私有函数处理，不再把 nil 传给 nonnull 参数（CI 静态分析 nullability.NullPassedToNonnull）', 'A FileNotFound error; local and missing URLs go through one file-private function, so nil never reaches a nonnull parameter (CI static analyzer, nullability.NullPassedToNonnull)', {'fixed': 10, 'found': 9}),
  # D. Network 网络
  ('D1', 'URL 为 nil', 'A nil URL', '回调返回 FileNotFound 错误', 'The completion gets a FileNotFound error', {'fixed': 1}),
  ('D2', '不支持的 scheme 或无效 URL', 'An unsupported scheme or an invalid URL', '回调返回 Network 错误', 'The completion gets a Network error', {'fixed': 1}),
@@ -106,6 +108,10 @@ ROUNDS = {
      'After merging master, its 11 new tab keys (colors, fonts, accessibility) join the configuration: colors as "#RRGGBB" in files, fonts as a size, "bold:15" or "Menlo-Regular:12", the accessibility keys checked as strings; the export script and the Protobuf schema (fields 22-32) follow. B19 and B20 added and handled.'),
  7: ('测试固化为 scripts/configuration-tests/run-tests.sh 后，测试套件发现第 4 轮的回归（A17）：A7 的重试会把 .json 中的数组、无效的 TOML、缩进错误的 YAML 当作 .properties、TOML 表或 Protobuf 文本读取，掩盖其错误。已修复，所有测试通过。',
      'With the tests kept as scripts/configuration-tests/run-tests.sh, the suite found a regression of round 4 (A17): the retry of A7 read a list in a .json file, invalid TOML and badly indented YAML as .properties, a TOML table or Protobuf text, hiding their errors. Fixed; every test passes.'),
+ 9: ('首次在 iOS CI 上运行静态分析：发现 `-loadConfigurationWithURLRequest:` 会把 nil URL 传给声明为 nonnull 的参数（C10）。据此复查所有 nil 与 nonnull 的边界，另发现空字符串作为 Lottie URL 会传给 +fileURLWithPath:（B21）。总分下降。',
+     'The static analyzer ran on iOS CI for the first time: `-loadConfigurationWithURLRequest:` passed a nil URL to a nonnull parameter (C10). A review of every nil / nonnull boundary then found that an empty string as a Lottie URL reached +fileURLWithPath: (B21). The score dropped.'),
+ 10: ('修复 C10 与 B21：本地 / 缺失 URL 由 CYLLoadLocalConfiguration() 统一处理，空字符串不再生成 file URL，演示中的请求不会带 nil URL；演示新增“B21 · Empty strings”与“C10 · Request without a URL”两行。全部情况均已处理。',
+     'C10 and B21 fixed: local / missing URLs go through CYLLoadLocalConfiguration(), an empty string no longer becomes a file URL, the demo never builds a request with a nil URL; two demo rows added, "B21 · Empty strings" and "C10 · Request without a URL". Every case is handled.'),
 }
 
 

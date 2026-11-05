@@ -91,6 +91,9 @@ static NSString *CYLConfigurationSourceText(NSString *_Nullable path, NSDictiona
     }
     [sheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"从网络 URL 加载") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         NSURL *URL = [NSURL URLWithString:CYLSampleConfigurationURLString];
+        if (!URL) {
+            return;
+        }
         [CYLTabBarController loadConfigurationWithURL:URL completion:^(NSDictionary<NSString *, id> *configuration, NSError *error) {
             CYLTabBarController *tabBarController = configuration ? [CYLTabBarController tabBarControllerWithConfiguration:configuration] : nil;
             [weakSelf cyl_presentConfigurationDemoTabBarController:tabBarController
@@ -195,12 +198,13 @@ static NSArray<NSArray<NSString *> *> *CYLConfigurationEdgeCases(void) {
         @[ @"A9", @"A 6 MB file" ], @[ @"B1", @"No tabs" ], @[ @"D7", @"An HTML page (file)" ], @[ @"B5", @"Wrong types and null" ],
         @[ @"B7", @"NaN and Infinity insets" ], @[ @"B9", @"Unknown style" ], @[ @"C1", @"Missing view controller class" ],
         @[ @"C2", @"Class is not a view controller" ], @[ @"C3", @"A container as a tab" ], @[ @"B13", @"Invalid URLs and Lottie files" ],
-        @[ @"B12", @"Duplicate identifiers" ], @[ @"B11", @"Misspelled keys" ], @[ @"B19", @"Invalid colors and fonts" ],
+        @[ @"B12", @"Duplicate identifiers" ], @[ @"B11", @"Misspelled keys" ], @[ @"B19", @"Invalid colors and fonts" ], @[ @"B21", @"Empty strings" ],
         @[ @"A12", @"Truncated protobuf" ],
         @[ @"A12", @"Corrupted binary plist" ], @[ @"A14", @"XML external entity" ], @[ @"A2", @"Missing file" ],
         @[ @"E1", @"Created on a background thread" ], @[ @"C6", @"Non-controllers and duplicates (code)" ],
         @[ @"B18", @"Configuration is not a dictionary (code)" ], @[ @"C9", @"Empty view controller list (code)" ],
         @[ @"D3", @"HTTP 404" ], @[ @"D4", @"Unknown host" ], @[ @"D5", @"Server timeout (3 s)" ], @[ @"D10", @"Request cancelled" ],
+        @[ @"C10", @"Request without a URL" ],
         @[ @"D7", @"An HTML page (network)" ],
     ];
 }
@@ -215,6 +219,17 @@ static NSString *CYLEdgeCaseFile(NSString *name, NSData *data) {
     NSString *path = [directory stringByAppendingPathComponent:name];
     [data writeToFile:path atomically:YES];
     return path;
+}
+
+/// [EN] A request for a URL string, or a request without a URL when the string is not a URL (C10): never a nil URL.
+/// [CN] URL 字符串对应的请求；字符串不是 URL 时为没有 URL 的请求（C10）：不会传入 nil URL。
+static NSURLRequest *CYLEdgeCaseRequest(NSString *string, NSTimeInterval timeout) {
+    NSURL *URL = [NSURL URLWithString:string];
+    if (!URL) {
+        return [[NSURLRequest alloc] init];
+    }
+    return timeout > 0 ? [NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:timeout]
+                       : [NSURLRequest requestWithURL:URL];
 }
 
 static NSData *CYLEdgeCaseData(NSString *text) {
@@ -379,16 +394,24 @@ static NSData *CYLEdgeCaseData(NSString *text) {
             CYLTabBarControllerTabBarItemsAttributes : attributes ?: @[],
         }], nil, @"CYLTabBarControllerViewControllers : @[]");
     } else if ([title isEqualToString:@"HTTP 404"]) {
-        fromURL([NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/no_such_configuration.json"]], NO);
+        fromURL(CYLEdgeCaseRequest(@"https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/no_such_configuration.json", 0), NO);
     } else if ([title isEqualToString:@"Unknown host"]) {
-        fromURL([NSURLRequest requestWithURL:[NSURL URLWithString:@"https://configuration.cyltabbarcontroller.invalid/tabbar.json"]], NO);
+        fromURL(CYLEdgeCaseRequest(@"https://configuration.cyltabbarcontroller.invalid/tabbar.json", 0), NO);
     } else if ([title isEqualToString:@"Server timeout (3 s)"]) {
         // 10.255.255.1 is not routed: the request can only time out. 10.255.255.1 不可路由：请求只会超时。
-        fromURL([NSURLRequest requestWithURL:[NSURL URLWithString:@"https://10.255.255.1/tabbar.json"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:3], NO);
+        fromURL(CYLEdgeCaseRequest(@"https://10.255.255.1/tabbar.json", 3), NO);
     } else if ([title isEqualToString:@"Request cancelled"]) {
-        fromURL([NSURLRequest requestWithURL:[NSURL URLWithString:CYLSampleConfigurationURLString]], YES);
+        fromURL(CYLEdgeCaseRequest(CYLSampleConfigurationURLString, 0), YES);
     } else if ([title isEqualToString:@"An HTML page (network)"]) {
-        fromURL([NSURLRequest requestWithURL:[NSURL URLWithString:@"https://example.com/"]], NO);
+        fromURL(CYLEdgeCaseRequest(@"https://example.com/", 0), NO);
+    } else if ([title isEqualToString:@"Request without a URL"]) {
+        // [EN] C10: a request without a URL (and, in code, a nil request or URL) gives a FileNotFound error.
+        // [CN] C10：没有 URL 的请求（以及代码中传入 nil 请求或 URL）返回 FileNotFound 错误。
+        fromURL([[NSURLRequest alloc] init], NO);
+    } else if ([title isEqualToString:@"Empty strings"]) {
+        // [EN] B21: empty URLs, Lottie files, image URLs, classes, colors and fonts are left out; the tabs stay.
+        // [CN] B21：空的 URL、Lottie 文件、图片 URL、类名、颜色与字体会被忽略；Tab 保留。
+        fromFile(@"empty_strings.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarLottieURL\": \"\", \"CYLTabBarLottieFilePath\": \"\", \"CYLTabBarItemImageURL\": \"\", \"CYLTabBarItemViewControllerClass\": \"\", \"CYLTabBarItemTitleColor\": \"\", \"CYLTabBarItemTitleFont\": \"\"}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemImage\": \"system:\", \"CYLTabBarItemNavigationControllerClass\": \"\"}]}"));
     }
 }
 
