@@ -12,14 +12,14 @@
 #else
 #import "CYLTabBarItemAnimatorRegistry.h"
 #endif
+// [EN] Only with RiveRuntime (`CYL_RIVE_AVAILABLE`, the Rive subspec); without it this file is empty: no keys, no class.
+//      A Swift package (Package.swift: no RiveRuntime, no RiveSwift/) compiles it that way.
+// [CN] 仅在引入 RiveRuntime 时编译（`CYL_RIVE_AVAILABLE`，Rive 子库）；未引入时本文件为空：没有 key，也没有类。
+//      Swift Package（Package.swift：没有 RiveRuntime 与 RiveSwift/）即按此编译。
+#if CYL_RIVE_AVAILABLE
 // [EN] The Swift views of this subspec (RiveSwift/), through the module's generated header (framework or static library).
-//      Only with RiveRuntime: they are built with it. A Swift package (Package.swift, no RiveRuntime, no RiveSwift/) has
-//      a generated header of the same name without them, and this file did not compile there.
-// [CN] 本子库的 Swift 视图（RiveSwift/），通过模块生成的头文件引入（framework 或静态库）。仅在有 RiveRuntime 时引入：这些视图依赖它构建。
-//      Swift Package（Package.swift，没有 RiveRuntime 与 RiveSwift/）中有同名的生成头文件但不含这些视图，本文件因此无法编译。
-#if !__has_include(<RiveRuntime/RiveRuntime.h>)
-// [EN] No Swift views: Rive tabs show their images. [CN] 没有 Swift 视图：Rive Tab 显示图片。
-#elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
+// [CN] 本子库的 Swift 视图（RiveSwift/），通过模块生成的头文件引入（framework 或静态库）。
+#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 #import <CYLTabBarController/CYLTabBarController-Swift.h>
 #define CYL_RIVE_SWIFT_VIEWS_AVAILABLE 1
 #elif __has_include("CYLTabBarController-Swift.h")
@@ -86,11 +86,11 @@ static Class<CYLTabBarItemAnimationViewProviding> CYLRiveTabBarItemAnimationView
     return animator;
 }
 
-#if __has_include(<RiveRuntime/RiveRuntime.h>)
-/// [EN] Registers Rive's animator when linked with RiveRuntime. [CN] 链接了 RiveRuntime 时注册 Rive 的 animator。
+/// [EN] Registers Rive's animator (this file only compiles with RiveRuntime). [CN] 注册 Rive 的 animator（本文件只在有 RiveRuntime 时编译）。
 + (void)load {
     [CYLTabBarItemAnimatorRegistry registerAnimator:self.animator];
 }
-#endif
 
 @end
+
+#endif

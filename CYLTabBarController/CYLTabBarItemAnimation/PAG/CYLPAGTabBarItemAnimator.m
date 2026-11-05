@@ -13,6 +13,12 @@
 #import "CYLTabBarController.h"
 #endif
 
+// FIX: issue #604 — only with libpag (`CYL_PAG_AVAILABLE`, the PAG subspec); without it this file is empty: no keys,
+// no class.
+// [CN] 仅在引入 libpag 时编译（`CYL_PAG_AVAILABLE`，PAG 子库）；未引入时本文件为空：没有 key，也没有类。
+#if CYL_PAG_AVAILABLE
+#import <libpag/PAGView.h>
+
 // [EN] The PAG keys, declared by the PAG subspec (aliases of the generic keys, see `attributeKeys`).
 // [CN] PAG 的 key，由 PAG 子库声明（通用 key 的别名，见 `attributeKeys`）。
 NSString *const CYLTabBarPAGURL = @"CYLTabBarPAGURL";
@@ -34,10 +40,6 @@ NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFiles(NSArray<NSDictio
     return CYLTabBarItemsAttributesAddingAnimationFiles(attributes, fileNames, bundle);
 }
 
-// FIX: issue #604 — only with the PAG subspec; without it this file is empty and the class is never used.
-// 仅在引入 PAG 子库时编译；未引入时本文件为空，也不会使用该类。
-#if __has_include(<libpag/PAGView.h>)
-#import <libpag/PAGView.h>
 // The protocol and the registry of the `CYLTabBarItemAnimation` subspec (the source tree, or flattened by CocoaPods).
 // `CYLTabBarItemAnimation` 子库的协议与注册表（源码目录，或 CocoaPods 展平后）。
 #if __has_include("../CYLTabBarItemAnimatorRegistry.h")

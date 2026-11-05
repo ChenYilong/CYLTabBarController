@@ -53,11 +53,13 @@
 #endif
 
 /*!
- * [EN] There is no compile-time switch per animation library (PAG, Rive, …): whether a tab animates is decided at runtime
- *      by the animators registered with `CYLTabBarItemAnimatorRegistry` (the `CYLTabBarItemAnimation` subspec), so adding
- *      a library changes nothing here.
- * [CN] 各动画库（PAG、Rive……）没有编译期开关：Tab 是否有动画在运行时由注册到 `CYLTabBarItemAnimatorRegistry` 的 animator 决定
- *      （`CYLTabBarItemAnimation` 子库），因此新增动画库时这里无需修改。
+ * [EN] Core and CYLUtils have no compile-time switch per animation library (PAG, Rive, …): whether a tab animates is
+ *      decided at runtime by the animators registered with `CYLTabBarItemAnimatorRegistry` (the `CYLTabBarItemAnimation`
+ *      subspec), so adding a library changes nothing here. Each library's own header defines its switch
+ *      (`CYL_PAG_AVAILABLE`, `CYL_RIVE_AVAILABLE`), and its keys exist only when the library does.
+ * [CN] Core 与 CYLUtils 中没有各动画库（PAG、Rive……）的编译期开关：Tab 是否有动画在运行时由注册到 `CYLTabBarItemAnimatorRegistry`
+ *      的 animator 决定（`CYLTabBarItemAnimation` 子库），因此新增动画库时这里无需修改。各动画库在自己的头文件中定义开关
+ *      （`CYL_PAG_AVAILABLE`、`CYL_RIVE_AVAILABLE`），其 key 只在引入该动画库时存在。
  */
 
 #define CYL_DEPRECATED(explain) __attribute__((deprecated(explain)))

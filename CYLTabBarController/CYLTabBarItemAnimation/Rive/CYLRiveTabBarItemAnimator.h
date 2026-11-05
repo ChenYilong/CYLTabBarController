@@ -27,6 +27,21 @@
 #import "CYLTabBarController.h"
 #endif
 
+/*!
+ * [EN] 1 when RiveRuntime is part of the build, 0 otherwise. Everything below, the Rive keys and options included,
+ *      exists only then: without RiveRuntime, using `CYLTabBarRiveURL` fails to build instead of being silently ignored.
+ *      Use `#if CYL_RIVE_AVAILABLE` for Rive-only code of your own. CocoaPods: `pod 'CYLTabBarController/Rive'`.
+ * [CN] 工程中引入了 RiveRuntime 时为 1，否则为 0。以下所有内容（包括 Rive 的 key 与选项）只在此时存在：没有 RiveRuntime 时，
+ *      使用 `CYLTabBarRiveURL` 会编译失败，而不是被静默忽略。App 自己只用于 Rive 的代码可用 `#if CYL_RIVE_AVAILABLE` 包住。
+ *      CocoaPods：`pod 'CYLTabBarController/Rive'`。
+ */
+#if __has_include(<RiveRuntime/RiveRuntime.h>)
+#define CYL_RIVE_AVAILABLE 1
+#else
+#define CYL_RIVE_AVAILABLE 0
+#endif
+
+#if CYL_RIVE_AVAILABLE
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
@@ -110,3 +125,4 @@ FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveAni
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveLegacyRuntime;
 
 NS_ASSUME_NONNULL_END
+#endif

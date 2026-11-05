@@ -21,6 +21,22 @@
 #import "CYLTabBarItemAnimator.h"
 #endif
 
+/*!
+ * [EN] 1 when libpag (or libpag-enterprise) is part of the build, 0 otherwise. Everything below, the PAG keys included,
+ *      exists only then: without libpag, using `CYLTabBarPAGURL` fails to build instead of being silently ignored. Use
+ *      `#if CYL_PAG_AVAILABLE` for PAG-only code of your own. CocoaPods: `pod 'CYLTabBarController/PAG'` (or
+ *      `PAGEnterprise`).
+ * [CN] 工程中引入了 libpag（或 libpag-enterprise）时为 1，否则为 0。以下所有内容（包括 PAG 的 key）只在此时存在：没有 libpag 时，
+ *      使用 `CYLTabBarPAGURL` 会编译失败，而不是被静默忽略。App 自己只用于 PAG 的代码可用 `#if CYL_PAG_AVAILABLE` 包住。
+ *      CocoaPods：`pod 'CYLTabBarController/PAG'`（或 `PAGEnterprise`）。
+ */
+#if __has_include(<libpag/PAGView.h>)
+#define CYL_PAG_AVAILABLE 1
+#else
+#define CYL_PAG_AVAILABLE 0
+#endif
+
+#if CYL_PAG_AVAILABLE
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
@@ -81,3 +97,4 @@ FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFile
 @end
 
 NS_ASSUME_NONNULL_END
+#endif
