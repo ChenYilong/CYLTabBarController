@@ -7517,17 +7517,18 @@ static BOOL CYLTabBarMinimizeWindowIsKeyAndActive(UIWindow *window) {
 }
 
 /*!
- * [EN] Opt-in diagnostics for device testing: set the environment variable `CYLTabBarMinimizeLog` to `1` in the Xcode
- *      scheme to log every session start, every restore with its reason, and every takeover by the app. Off otherwise,
- *      also in debug builds.
- * [CN] 用于真机测试的可选诊断：在 Xcode scheme 中把环境变量 `CYLTabBarMinimizeLog` 设为 `1`，即可打印每次会话开始、每次恢复及其原因、
- *      以及每次 App 接管。其他情况下关闭，Debug 构建也不例外。
+ * [EN] Opt-in diagnostics for device testing: set the environment variable `CYLTabBarMinimizeLog` (or its ALL_CAPS
+ *      spelling `CYL_TAB_BAR_MINIMIZE_LOG`, for scripts) to `1` in the Xcode scheme to log every session start, every
+ *      restore with its reason, and every takeover by the app. Off otherwise, also in debug builds.
+ * [CN] 用于真机测试的可选诊断：在 Xcode scheme 中把环境变量 `CYLTabBarMinimizeLog`（或供脚本使用的全大写写法 `CYL_TAB_BAR_MINIMIZE_LOG`）
+ *      设为 `1`，即可打印每次会话开始、每次恢复及其原因、以及每次 App 接管。其他情况下关闭，Debug 构建也不例外。
  */
 static BOOL CYLTabBarMinimizeLogEnabled(void) {
     static BOOL enabled;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        enabled = [[NSProcessInfo processInfo].environment[@"CYLTabBarMinimizeLog"] boolValue];
+        NSDictionary<NSString *, NSString *> *environment = [NSProcessInfo processInfo].environment;
+        enabled = [environment[@"CYLTabBarMinimizeLog"] boolValue] || [environment[@"CYL_TAB_BAR_MINIMIZE_LOG"] boolValue];
     });
     return enabled;
 }

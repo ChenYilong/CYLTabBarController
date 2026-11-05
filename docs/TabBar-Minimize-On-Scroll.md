@@ -444,7 +444,7 @@ flowchart TD
 | 48 | 子控制器以 OverCurrentContext 方式 present | 当前页面的 presentedViewController | ✅🧪 |
 | 49 | iPad 弹出框（popover） | presentedViewController | ✅🧪 |
 | 50 | Scene 失去活跃（本 Scene） | UISceneWillDeactivate，按 Scene 过滤 | ✅🧪 |
-| 51 | 真机上定位“为何恢复 / 为何没恢复” | Xcode scheme 中设置环境变量 CYLTabBarMinimizeLog=1：打印会话开始、每次恢复及原因、App 接管、液态玻璃恢复自检 | ✅ |
+| 51 | 真机上定位“为何恢复 / 为何没恢复” | Xcode scheme 中设置环境变量 CYLTabBarMinimizeLog=1（脚本可用全大写写法 CYL_TAB_BAR_MINIMIZE_LOG=1）：打印会话开始、每次恢复及原因、App 接管、液态玻璃恢复自检 | ✅ |
 | 52 | 经典样式显示期间的页面检查开销 | 当前页面不变时复用滚动视图 2 秒，不重复遍历视图层级 | ✅ |
 | 53 | Swift Demo 中的模拟 | 设置分组第 8 行用操作表列出全部模拟 | 🧪 |
 | 54 | 经典样式：返回到 hidesBottomBarWhenPushed 页面之前的页面 | 会话只结束一次，不重复恢复；返回时随页面变化显示 | ✅🧪 |
@@ -501,7 +501,7 @@ flowchart TD
 | 48 | A child presenting with OverCurrentContext | The page's presentedViewController | ✅🧪 |
 | 49 | An iPad popover | presentedViewController | ✅🧪 |
 | 50 | The scene deactivates (this scene) | UISceneWillDeactivate, filtered by scene | ✅🧪 |
-| 51 | On a device: why the bar came back, or did not | Set the environment variable CYLTabBarMinimizeLog=1 in the Xcode scheme: logs session starts, every restore with its reason, app takeovers, the Liquid Glass restore self-check | ✅ |
+| 51 | On a device: why the bar came back, or did not | Set the environment variable CYLTabBarMinimizeLog=1 in the Xcode scheme (scripts can use the ALL_CAPS spelling CYL_TAB_BAR_MINIMIZE_LOG=1): logs session starts, every restore with its reason, app takeovers, the Liquid Glass restore self-check | ✅ |
 | 52 | Cost of the classic page check while the bar is shown | The scroll view is reused for 2 s while the page stays the same, without searching the view hierarchy again | ✅ |
 | 53 | Simulations in the Swift demos | Settings row 8 lists every simulation in an action sheet | 🧪 |
 | 54 | Classic: coming back from a hidesBottomBarWhenPushed page | The session ends once, no repeated restores; shown on the page change back | ✅🧪 |

@@ -166,10 +166,11 @@ STYLE_ARGUMENTS=""
 if [ "$STYLE" = "FlatDesign" ]; then
   STYLE_ARGUMENTS="-CYLScrollHideSelfTestFlatDesign YES"
 fi
-# [EN] SIMCTL_CHILD_* variables reach the app: CYLTabBarMinimizeLog=1 turns on the library's scroll hiding log, which
-#      explains every SKIP (why the bar could not be hidden).
-# [CN] SIMCTL_CHILD_* 变量会传给 App：CYLTabBarMinimizeLog=1 打开本库的滚动隐藏日志，用于解释每个 SKIP（TabBar 为何无法隐藏）。
-export SIMCTL_CHILD_CYLTabBarMinimizeLog=1
+# [EN] SIMCTL_CHILD_* variables reach the app without the prefix: CYL_TAB_BAR_MINIMIZE_LOG=1 (the ALL_CAPS spelling of
+#      CYLTabBarMinimizeLog) turns on the library's scroll hiding log, which explains every SKIP.
+# [CN] SIMCTL_CHILD_* 变量会去掉前缀后传给 App：CYL_TAB_BAR_MINIMIZE_LOG=1（CYLTabBarMinimizeLog 的全大写写法）打开本库的滚动隐藏日志，
+#      用于解释每个 SKIP。
+export SIMCTL_CHILD_CYL_TAB_BAR_MINIMIZE_LOG=1
 # shellcheck disable=SC2086
 xcrun simctl launch --console-pty --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLScrollHideSelfTest YES $STYLE_ARGUMENTS > "$LOG" 2>&1 &
 LAUNCH_PID=$!
