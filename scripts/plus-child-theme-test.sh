@@ -105,6 +105,15 @@ for SCENARIO in $SCENARIOS; do
       ELAPSED=$((ELAPSED + 1))
     done
     xcrun simctl io "$DEVICE_ID" screenshot "$FILE-$PHASE.png" >/dev/null && echo "Saved $FILE-$PHASE.png"
+    # [EN] Then the stand-in alone (the app hides the real plus button for 1.5 s); not after a SKIP.
+    # [CN] 然后只截替身（App 隐藏真实的 PlusButton 1.5 秒）；SKIP 之后不截。
+    if ! grep -q "plus child theme test: SKIP $PHASE" "$RUN_LOG"; then
+      while ! grep -q "plus child theme test: stand-in only $PHASE" "$RUN_LOG" && [ "$ELAPSED" -lt 60 ]; do
+        sleep 0.2
+        ELAPSED=$((ELAPSED + 1))
+      done
+      xcrun simctl io "$DEVICE_ID" screenshot "$FILE-$PHASE-stand-in-only.png" >/dev/null && echo "Saved $FILE-$PHASE-stand-in-only.png"
+    fi
   done
   while ! grep -q "plus child theme test: done" "$RUN_LOG" && [ "$ELAPSED" -lt 70 ]; do
     sleep 1

@@ -488,6 +488,36 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
     }
     NSLog(@"plus child theme test: %@ %@ theme=%@ selectedIndex=%@ standIn=%@ plusButton=%@", matches ? @"PASS" : @"FAIL", phase, theme,
           @(tabBarController.selectedIndex), NSStringFromCGSize(shown.size), NSStringFromCGSize(plusButton.currentImage.size));
+    // [EN] What is drawn: the image view's own image (a button with a `UIButtonConfiguration` may draw another image than
+    //      `currentImage`), frames in the window, visibility up the superview chain, image scale.
+    // [CN] 实际绘制的内容：图片视图自己的图片（使用 `UIButtonConfiguration` 的按钮绘制的图片可能与 `currentImage` 不同）、在 window 中的
+    //      frame、父视图链上的可见性、图片 scale。
+    BOOL standInVisible = YES;
+    for (UIView *view = standIn; view; view = view.superview) {
+        if (view.hidden || view.alpha < 0.01) {
+            standInVisible = NO;
+            break;
+        }
+    }
+    UIImageView *imageView = standIn.imageView;
+    NSLog(@"plus child theme test: info %@ standInFrame=%@ plusButtonFrame=%@ visible=%@ configuration=%@ highlighted=%@ "
+          @"imageViewImageIsCurrent=%@ imageViewFrame=%@ imageViewHidden=%@ imageViewAlpha=%.2f imageScale=%.1f plusImageScale=%.1f "
+          @"standInSuperview=%@",
+          phase, NSStringFromCGRect([standIn convertRect:standIn.bounds toView:nil]),
+          NSStringFromCGRect([plusButton convertRect:plusButton.bounds toView:nil]), @(standInVisible), @(standIn.configuration != nil),
+          @(standIn.highlighted), @(CYLDemoSameImage(imageView.image, shown)), NSStringFromCGRect(imageView.frame), @(imageView.hidden),
+          imageView.alpha, imageView.image.scale, plusButton.currentImage.scale, NSStringFromClass([standIn.superview class]));
+    // [EN] The stand-in alone, 1.5 s after the check (after the script's normal screenshot): the real plus button is hidden
+    //      for 1.5 s, and "stand-in only" lets the script take a screenshot.
+    // [CN] 只看替身：检查 1.5 秒后（脚本的普通截图之后）隐藏真实的 PlusButton 1.5 秒，"stand-in only" 让脚本截图。
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        CGFloat alpha = plusButton.alpha;
+        plusButton.alpha = 0;
+        NSLog(@"plus child theme test: stand-in only %@", phase);
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            plusButton.alpha = alpha;
+        });
+    });
 }
 
 static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
@@ -606,7 +636,10 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
                 if (checksPlusChild) {
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                         CYLDemoCheckPlusChildStandIn(@"after");
-                        NSLog(@"plus child theme test: done");
+                        // [EN] After the "stand-in only" screenshot. [CN] 在 "stand-in only" 截图之后。
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                            NSLog(@"plus child theme test: done");
+                        });
                     });
                 }
             });
