@@ -47,6 +47,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Item-Colors.md
 //   - Built-in Actions for Tapping the Selected Tab / 重复点击已选中 Tab 的内置操作
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Reselect.md
+//   - Research: how a tab in a configuration file finds its page object (cross-platform IDs, registries and order) / 调研：配置文件中的 Tab 如何对应到页面对象（跨端标识、注册表与顺序）
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-View-Controller-Resolution-Research.md
 //   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Minimize-On-Scroll.md
 //   - Tab bar item gestures: reselect, double tap and long press / TabBarItem 手势：再次点击、双击与长按

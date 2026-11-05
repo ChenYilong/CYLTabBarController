@@ -282,6 +282,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [单个 Tab 的颜色](docs/Tab-Item-Colors.md) | [Per-tab Colors](docs/Tab-Item-Colors.md) |
 | [Tab 的排列方式](docs/Tab-Item-Positioning.md) | [Tab Item Positioning](docs/Tab-Item-Positioning.md) |
 | [重复点击已选中 Tab 的内置操作](docs/Tab-Reselect.md) | [Built-in Actions for Tapping the Selected Tab](docs/Tab-Reselect.md) |
+| [调研：配置文件中的 Tab 如何对应到页面对象（跨端标识、注册表与顺序）](docs/Tab-View-Controller-Resolution-Research.md) | [Research: how a tab in a configuration file finds its page object (cross-platform IDs, registries and order)](docs/Tab-View-Controller-Resolution-Research.md) |
 | [TabBar 的 hitTest 不再返回 nil，交给 super 处理](docs/TabBar-HitTest-Super-Fallback.md) | [The tab bar's hitTest falls back to super instead of returning nil](docs/TabBar-HitTest-Super-Fallback.md) |
 | [滚动时缩小或隐藏 TabBar](docs/TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](docs/TabBar-Minimize-On-Scroll.md) |
 | [TabBarItem 手势：再次点击、双击与长按](docs/TabBarItem-Gestures.md) | [Tab bar item gestures: reselect, double tap and long press](docs/TabBarItem-Gestures.md) |

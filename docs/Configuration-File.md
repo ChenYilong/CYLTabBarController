@@ -75,6 +75,7 @@ let tabBarController = CYLTabBarController(configuration: [
 |:---|:---|
 | 现有的所有初始化方法都改为调用 `-initWithConfiguration:`，行为不变。子类若要统一定制所有初始化方式，请重写 `-initWithConfiguration:`。 | Every existing initializer now calls `-initWithConfiguration:`, with no change in behavior. A subclass that wants to customize every way of initializing overrides `-initWithConfiguration:`. |
 | 缺少的键使用其他初始化方法的默认值。没有 `CYLTabBarControllerViewControllers` 时，根据每个 item 的 `CYLTabBarItemViewControllerClass` 创建子控制器（配置文件中只能这样写）。 | Missing keys take the defaults of the other initializers. Without `CYLTabBarControllerViewControllers`, the view controllers are created from each item's `CYLTabBarItemViewControllerClass` (the only way in a file). |
+| ⚠️ 类名方案不跨端（Android 类名不同）、一个类无法对应多个对象、只能用 `-init` 创建。替代设计（跨端 ID + 页面注册表 + 由配置决定顺序）的调研见 [调研：配置文件中的 Tab 如何对应到页面对象](Tab-View-Controller-Resolution-Research.md)，确定方案前这两个类名键可能改变。 | ⚠️ Class names are not cross-platform (Android classes differ), cannot map one class to several objects, and only use `-init`. The research on a replacement (cross-platform IDs + a page registry + order from the configuration) is in [Research: how a tab in a configuration file finds its page object](Tab-View-Controller-Resolution-Research.md); the class-name keys may change until a design is chosen. |
 
 ### [CN]配置键
 ### [EN]Configuration keys
