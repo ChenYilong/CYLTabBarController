@@ -6694,7 +6694,7 @@ static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
 
 - (BOOL)cyl_fixesOpaqueTabBarSafeAreaInsets {
     NSNumber *value = objc_getAssociatedObject(self, &CYLFixesOpaqueTabBarSafeAreaInsetsKey);
-    return value ? value.boolValue : YES;
+    return value != nil ? value.boolValue : YES;
 }
 
 - (void)setCyl_fixesOpaqueTabBarSafeAreaInsets:(BOOL)fixes {

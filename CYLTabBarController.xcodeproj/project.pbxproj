@@ -49,7 +49,7 @@
 		0D3BEC8B4C4244569FC5D6C5 /* CYLUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD5946D8790419FB3713C6E /* CYLUtils.m */; };
 		0D40EDC47DAD4ED0B9AC2D1C /* NSObject+CYLUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 11512D0319D64052A6C7194A /* NSObject+CYLUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0E8D2BCAF1B6F38D21B07172 /* UITabBarItem+CYLBadgeExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = 73262A7C64D406B47FB45CD4 /* UITabBarItem+CYLBadgeExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		12ACB02DC23C3AC0CBABA5CB /* UINavigationController+CYLFlatDesignTabBarPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 7CBA275D264ECE11094A2DD4 /* UINavigationController+CYLFlatDesignTabBarPrivate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		12ACB02DC23C3AC0CBABA5CB /* UINavigationController+CYLFlatDesignTabBarPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 7CBA275D264ECE11094A2DD4 /* UINavigationController+CYLFlatDesignTabBarPrivate.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1677271DE1912F5BFFFD2226 /* CYLTabBarTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DF90D1C9C51B67F53BDDD8C /* CYLTabBarTransition.m */; };
 		18E8308B66C435016E450941 /* CYLTabBar.m in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1F03FEFE78078784730F /* CYLTabBar.m */; };
 		1AF6CC9CE0981A6E158057FC /* UIControl+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = 195AA0ABA05581B584BF4466 /* UIControl+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -79,7 +79,7 @@
 		612BF72EA3F27506A3FB901B /* CYLBadgeAppearance.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B42D556C6D31DBDCF523AD3 /* CYLBadgeAppearance.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		625E5A778D2B41D3BAA21F45 /* CYLUtilsMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 258BC86DDCC04322B8CE9E1A /* CYLUtilsMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		62991E68F39ACEA63E7BE7A6 /* CAAnimation+CYLBadgeExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E457C5B5EEB9B7A3B116C92 /* CAAnimation+CYLBadgeExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6CFDEBCABDCB79E6BF4156B5 /* _CYLFlatDesignTabBarParallaxOverlayView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DEE608538CB215E8DED6994 /* _CYLFlatDesignTabBarParallaxOverlayView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6CFDEBCABDCB79E6BF4156B5 /* _CYLFlatDesignTabBarParallaxOverlayView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DEE608538CB215E8DED6994 /* _CYLFlatDesignTabBarParallaxOverlayView.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		6DAB656065F09E6993670C52 /* _CYLFlatDesignTabBarControllerTransitionAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = 926D0651297FBAEC70151FDF /* _CYLFlatDesignTabBarControllerTransitionAnimator.m */; };
 		6DF0856810A3A8175EA3FD25 /* UIView+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = F45F360D448D6E78DD3A4B88 /* UIView+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6E4F61490E99EE7219351273 /* CYLFlatDesignTabBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 40EEE12ABB9B47D869B88580 /* CYLFlatDesignTabBar.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -135,9 +135,9 @@
 		9AE942E81BDC933E00354519 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942CD1BDC933E00354519 /* LaunchScreen.storyboard */; };
 		9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942E31BDC933E00354519 /* Images.xcassets */; };
 		9AE942F11BDC933E00354519 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E51BDC933E00354519 /* main.m */; };
-		9D9B22007B3D39D38DC6EA83 /* _CYLFlatDesignTabBarControllerTransitionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DBDB36FCFF032EEBBF40B92 /* _CYLFlatDesignTabBarControllerTransitionContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9D9B22007B3D39D38DC6EA83 /* _CYLFlatDesignTabBarControllerTransitionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DBDB36FCFF032EEBBF40B92 /* _CYLFlatDesignTabBarControllerTransitionContext.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		9F683CC12AF7F4A5CB5652B4 /* green_lottie_tab_home_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 7F01DDCC6E3492E356050263 /* green_lottie_tab_home_dark.json */; };
-		9FDC2CFDEB3ABC21DC2E0E12 /* CYLFlatDesignTabBarHideTabBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 397A1D329BC9D244349DC56B /* CYLFlatDesignTabBarHideTabBar.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9FDC2CFDEB3ABC21DC2E0E12 /* CYLFlatDesignTabBarHideTabBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 397A1D329BC9D244349DC56B /* CYLFlatDesignTabBarHideTabBar.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		A09DDCF501653FD99731443E /* UIImage+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = B09E171BC787DC361EBF0D16 /* UIImage+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A0FFF3EF8C04A3562AF3C9F1 /* CYLBadgeProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 8639E7E7C404DA5FC37B8984 /* CYLBadgeProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A124A58980C4D6A4DB746D47 /* CYLTabButtonAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BF5C8307145477A68BF1612 /* CYLTabButtonAnimation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -178,7 +178,7 @@
 		ECCFFF1A303B3EADDAFF8B44 /* CYLBaseViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = F2A1F78CB3AA47B647CD33EA /* CYLBaseViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EDA9F35C5E046B28A0A97A07 /* CYLBaseNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2344B48F79B992A212852B20 /* CYLBaseNavigationController.m */; };
 		F2584DE0CE5DF015B848AEB8 /* CYLLocalization.h in Headers */ = {isa = PBXBuildFile; fileRef = 122AD69C82D1C708D134796A /* CYLLocalization.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F554F7394B9A80A20759A71C /* _CYLFlatDesignTabBarControllerTransitionAnimator.h in Headers */ = {isa = PBXBuildFile; fileRef = 04C2AF4F5157DB1DB2A68D1B /* _CYLFlatDesignTabBarControllerTransitionAnimator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F554F7394B9A80A20759A71C /* _CYLFlatDesignTabBarControllerTransitionAnimator.h in Headers */ = {isa = PBXBuildFile; fileRef = 04C2AF4F5157DB1DB2A68D1B /* _CYLFlatDesignTabBarControllerTransitionAnimator.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		FB0B8528E2C479F633297CB8 /* UIControl+CYLBadgeExtention.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D6AE8A15AA260E26D8CD7D6 /* UIControl+CYLBadgeExtention.m */; };
 		FB7CE7413A924BD5A352F058 /* UIBarItem+CYLUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A012D43E4A5C46A2A98D54A5 /* UIBarItem+CYLUtils.m */; };
 		FD29E0C76D2E410F2694CE36 /* UIControl+CYLTabBarControllerExtention.m in Sources */ = {isa = PBXBuildFile; fileRef = 97F0C0695D1F49C4E912FD4A /* UIControl+CYLTabBarControllerExtention.m */; };
@@ -1588,7 +1588,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				INFOPLIST_FILE = CYLTabBarControllerTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLTabBarControllerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1604,7 +1604,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				INFOPLIST_FILE = CYLTabBarControllerTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLTabBarControllerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
