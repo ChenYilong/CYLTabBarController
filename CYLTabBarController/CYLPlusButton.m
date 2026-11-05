@@ -763,21 +763,24 @@ static NSString *const CYLPlusButtonLiquidGlassMaskName = @"CYLPlusButtonLiquidG
         (selectedViewController == plusChildViewController ||
          [selectedViewController cyl_getViewControllerInsteadOfNavigationController] == plusChildViewController);
     if (plusChildSelected) {
-        // [EN] The first view above the stand-in that clips it (bounds or a layer mask), up to the tab bar.
-        // [CN] 替身之上第一个裁剪它的视图（bounds 或 layer mask），最多找到 TabBar。
-        for (UIView *view = standIn.superview; view && view != tabBarController.tabBar.superview; view = view.superview) {
-            CALayer *viewMask = view.layer.mask;
-            if (!viewMask && !view.clipsToBounds && !view.layer.masksToBounds) {
-                continue;
+        // [EN] The glass over the plus tab: the tab button of the selected layer that holds the stand-in, a capsule,
+        //      within the first view above it that clips (the whole tab bar platter). Masking the whole platter left a
+        //      strip between its top and the glass where neither the plus button nor its stand-in was drawn.
+        // [CN] PlusButton Tab 上方的玻璃：选中图层中容纳替身的 Tab 按钮（胶囊形），限制在其上方第一个裁剪的视图（整个 TabBar platter）之内。
+        //      mask 掉整个 platter 时，platter 顶部与玻璃之间留下一条既没有 PlusButton、也没有替身的空隙。
+        UIView *glassView = standIn.superview;
+        CGRect glassRect = [glassView convertRect:glassView.bounds toView:self];
+        for (UIView *view = glassView.superview; view && view != tabBarController.tabBar.superview; view = view.superview) {
+            if (view.layer.mask || view.clipsToBounds || view.layer.masksToBounds) {
+                CGRect clipRect = view.layer.mask ? view.layer.mask.frame : view.bounds;
+                glassRect = CGRectIntersection(glassRect, [view convertRect:clipRect toView:self]);
+                break;
             }
-            CGRect clipRect = viewMask ? viewMask.frame : view.bounds;
-            CGFloat cornerRadius = viewMask ? MAX(viewMask.cornerRadius, view.layer.cornerRadius) : view.layer.cornerRadius;
-            clipRect = [view convertRect:clipRect toView:self];
-            if (CGRectIntersectsRect(clipRect, self.bounds)) {
-                cornerRadius = MIN(cornerRadius, MIN(CGRectGetWidth(clipRect), CGRectGetHeight(clipRect)) * 0.5);
-                glassPath = [UIBezierPath bezierPathWithRoundedRect:clipRect cornerRadius:cornerRadius];
-            }
-            break;
+        }
+        if (glassView && !CGRectIsNull(glassRect) && CGRectIntersectsRect(glassRect, self.bounds)) {
+            // [EN] A capsule; never NaN (a platter's layer reported a NaN corner radius). [CN] 胶囊形；不使用 NaN（platter 的 layer 曾返回 NaN 圆角）。
+            CGFloat cornerRadius = MIN(CGRectGetWidth(glassRect), CGRectGetHeight(glassRect)) * 0.5;
+            glassPath = [UIBezierPath bezierPathWithRoundedRect:glassRect cornerRadius:(isnan(cornerRadius) ? 0 : cornerRadius)];
         }
     }
     [CATransaction begin];

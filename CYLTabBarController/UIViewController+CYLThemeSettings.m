@@ -500,6 +500,26 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
             break;
         }
     }
+    // [EN] The glass geometry: the selected-layer tab button that holds the stand-in, and the views of the tab bar whose
+    //      class names say selection, lens, indicator or highlight. [CN] 玻璃的几何信息：容纳替身的选中图层 Tab 按钮，以及类名中
+    //      含 selection、lens、indicator 或 highlight 的 TabBar 视图。
+    NSLog(@"plus child theme test: info %@ selectedLayerTabButton=%@", phase, NSStringFromCGRect([standIn.superview convertRect:standIn.superview.bounds toView:nil]));
+    NSMutableArray<UIView *> *pending = [NSMutableArray arrayWithObject:tabBarController.tabBar];
+    NSUInteger logged = 0;
+    while (pending.count > 0 && logged < 12) {
+        UIView *view = pending.firstObject;
+        [pending removeObjectAtIndex:0];
+        [pending addObjectsFromArray:view.subviews];
+        NSString *className = NSStringFromClass([view class]).lowercaseString;
+        for (NSString *word in @[ @"selection", @"lens", @"indicator", @"highlight" ]) {
+            if ([className containsString:word]) {
+                NSLog(@"plus child theme test: info %@ view=%@ frame=%@ hidden=%@ alpha=%.2f", phase, NSStringFromClass([view class]),
+                      NSStringFromCGRect([view convertRect:view.bounds toView:nil]), @(view.hidden), view.alpha);
+                logged++;
+                break;
+            }
+        }
+    }
     // [EN] What is drawn: the image view's own image (a button with a `UIButtonConfiguration` may draw another image than
     //      `currentImage`), frames in the window, visibility up the superview chain, image scale.
     // [CN] 实际绘制的内容：图片视图自己的图片（使用 `UIButtonConfiguration` 的按钮绘制的图片可能与 `currentImage` 不同）、在 window 中的
