@@ -356,6 +356,8 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 /// [EN] Implemented in the main implementation: removes `keys` from the attributes of the tab at `index` (a key a theme
 ///      added that the app did not have). [CN] 实现于主 implementation：从第 `index` 个 Tab 的 attributes 中移除 `keys`（主题添加、App 原本没有的 key）。
 - (void)cyl_themeRemoveTabBarItemAttributeKeys:(NSArray<NSString *> *)keys atIndex:(NSUInteger)index;
+/// [EN] Main implementation: the one-time layout block runs once more. [CN] 主实现：只执行一次的布局 block 再执行一次。
+- (void)cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce;
 /// [EN] Implemented in the main implementation: the plus button's child view controller. [CN] 实现于主 implementation：PlusButton 的子控制器。
 - (nullable UIViewController *)cyl_contextPlusChildViewController;
 /// [EN] Implemented below (CYLTabBarItemStyle). [CN] 实现见下方（CYLTabBarItemStyle）。
@@ -834,7 +836,25 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
     //      设置的 block 永远不会执行（如在其中显示的角标不出现）。这里重新启用，使每次设置的 block 都执行一次。
     //      范围：所有样式（经典、iOS 26 UI 兼容模式、iOS 26+ 液态玻璃与 iPhone Duo、扁平样式）：once-block 在
     //      `-viewDidLayoutSubviews` 末尾对它们都会执行。`invokeOnce` 参数按文档说明仍被忽略。
+    [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
+}
+
+/*!
+ * [EN] Lets the one-time layout block (`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`) run once more, at the end of the
+ *      next `-viewDidLayoutSubviews`: it sets the "once" mode and clears the mark of the run before. Setting only the mode
+ *      (as the tab reloads did) kept the mark, so the block never ran again after it had run once. Used whenever the
+ *      tab buttons or their contents are set up again: a new block, `-reloadTabBarItemsWithAttributes:`, replacing a tab,
+ *      and a theme (`-cyl_applyTabBarTheme:`).
+ * [CN] 让只执行一次的布局 block（`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`）在下一次 `-viewDidLayoutSubviews` 末尾再执行一次：
+ *      设置“只执行一次”模式，并清除上一次执行的标记。之前重新加载 Tab 时只设置了模式、保留了标记，因此 block 执行过一次后再也不会执行。
+ *      在 Tab 按钮或其内容重新设置时调用：设置新的 block、`-reloadTabBarItemsWithAttributes:`、替换 Tab、应用主题（`-cyl_applyTabBarTheme:`）。
+ */
+- (void)cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce {
+    self.invokeOnceViewDidLayoutSubViewsBlock = YES;
     objc_setAssociatedObject(self, @selector(viewDidLayoutSubviews), nil, OBJC_ASSOCIATION_RETAIN);
+    if (self.isViewLoaded) {
+        [self.view setNeedsLayout];
+    }
 }
 
 - (void)setViewDidLayoutSubViewsBlock:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock {
@@ -2776,7 +2796,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     //      (`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`, e.g. covers and badges) runs again for the new tab buttons.
     // [CN] 与 `-reloadTabBarItemsWithAttributes:` 相同：重新添加 Lottie 视图，并为新的 Tab 按钮再执行一次只执行一次的布局 block
     //      （`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`，如封面与角标）。
-    self.invokeOnceViewDidLayoutSubViewsBlock = YES;
+    [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
     self.lottieViewAdded = NO;
     [_lottieURLs removeAllObjects];
     [_lottieSizes removeAllObjects];
@@ -3074,7 +3094,8 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
 - (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     _tabBarItemsAttributes = tabBarItemsAttributes;
-    self.invokeOnceViewDidLayoutSubViewsBlock = YES;
+    // [EN] The tab buttons are built again: their covers and badges too. [CN] Tab 按钮会重新创建：其封面与角标也需要重新添加。
+    [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
     self.lottieViewAdded = NO;
     [_lottieURLs removeAllObjects];
     [_lottieSizes removeAllObjects];
@@ -9093,6 +9114,17 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
     }
     // [EN] Styles set in one place win over the theme's appearance. [CN] 在一处设置的样式优先于主题的外观。
     [self cyl_applyTabBarItemStyles];
+    // [EN] What the app adds to the tab buttons in its one-time layout block (`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`,
+    //      e.g. a cover over a tab, badges) is added again after the next layout: before, a theme switch left that block
+    //      marked as run, and what UIKit dropped from the tab buttons never came back.
+    //      Scope: every style. The block itself decides what to add; the theme's own icons do not depend on it: they are
+    //      views in place of each icon (`-[UIControl cyl_replaceTabImageViewWithNewView:show:]`), in both layers on Liquid
+    //      Glass, and are installed again after every layout (#601).
+    // [CN] App 在只执行一次的布局 block（`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`，如 Tab 上的封面、角标）中添加到 Tab 按钮的内容，
+    //      在下一次布局后重新添加：之前换肤后该 block 仍被标记为已执行，UIKit 从 Tab 按钮中丢弃的内容不会再出现。
+    //      范围：所有样式。添加什么由 block 自己决定；主题自身的图标不依赖它：它们是替换每个图标的视图
+    //      （`-[UIControl cyl_replaceTabImageViewWithNewView:show:]`，液态玻璃下两个图层都有），每次布局后都会重新安装（#601）。
+    [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
 }
 
 /// [EN] YES while no other theme was applied after the one counted `generation`. [CN] 计数为 `generation` 的主题之后没有应用其他主题时为 YES。

@@ -339,6 +339,28 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
     XCTAssertEqualObjects([tabBarController tabBarItemAttributesAtIndex:1][CYLTabBarItemTitle], @"B", @"the untouched tab gets its own title back");
 }
 
+- (void)testOneTimeLayoutBlockRunsAgainAfterATheme {
+    CYLTabBarController *tabBarController = [self newTabBarControllerWithTitles];
+    __block NSInteger runs = 0;
+    [tabBarController setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *controller) {
+        runs++;
+    }];
+    [tabBarController viewDidLayoutSubviews];
+    [tabBarController viewDidLayoutSubviews];
+    XCTAssertEqual(runs, 1, @"once per setup");
+
+    CYLTestKeysTabBarTheme *theme = [CYLTestKeysTabBarTheme new];
+    theme.attributes = @[ @{ CYLTabBarItemTitle : @"T" }, @{} ];
+    [tabBarController cyl_applyTabBarTheme:theme];
+    [tabBarController viewDidLayoutSubviews];
+    [tabBarController viewDidLayoutSubviews];
+    XCTAssertEqual(runs, 2, @"a theme lets it run once more (covers and badges are added again)");
+
+    [tabBarController reloadTabBarItemsWithAttributes:@[ @{ CYLTabBarItemTitle : @"A" }, @{ CYLTabBarItemTitle : @"B" } ]];
+    [tabBarController viewDidLayoutSubviews];
+    XCTAssertEqual(runs, 3, @"reloading the tabs too");
+}
+
 - (void)testSymbolThemeImagesAreMarkedNewObjects {
     CYLThemeManager *manager = [self newManager];
     UIImage *symbol = [UIImage systemImageNamed:@"star.fill"];

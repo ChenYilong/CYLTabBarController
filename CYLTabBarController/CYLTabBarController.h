@@ -561,7 +561,11 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 
 /*!
  * [EN] Sets the block invoked in `-viewDidLayoutSubviews`, marked to run only once. Note: `invokeOnce` is currently ignored and always treated as YES.
+ *      It runs once more after the tab buttons or their contents are set up again: a theme switch (`CYLTabBarTheme`),
+ *      `-reloadTabBarItemsWithAttributes:`, replacing a tab. Write it so it can run again (e.g. cover with the same views).
  * [CN] 设置在 -viewDidLayoutSubviews 中回调的 block，并标记为只执行一次。注意：目前 invokeOnce 参数未被使用，始终按 YES 处理。
+ *      Tab 按钮或其内容重新设置后会再执行一次：换肤（`CYLTabBarTheme`）、`-reloadTabBarItemsWithAttributes:`、替换 Tab。
+ *      请保证它可以重复执行（例如用同样的视图覆盖）。
  */
 - (void)setViewDidLayoutSubViewsBlockInvokeOnce:(BOOL)invokeOnce block:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock;
 
