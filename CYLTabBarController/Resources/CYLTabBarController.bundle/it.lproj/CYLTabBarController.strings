@@ -256,6 +256,13 @@
 "角标" = "Badge";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Non supportato da Liquid Glass: è il sistema a stabilire l'altezza della barra (FlatDesign e lo stile classico lo supportano)";
 
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Nascondi allo scorrimento: simula interruzioni (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Si attiva 1,5 s dopo il tocco. Prima scorri verso il basso per nascondere la TabBar. Atteso: la TabBar torna subito e l'inerzia non la nasconde di nuovo.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Si attiva 1,5 s dopo il tocco. Atteso: la TabBar non cambia per questo (non viene nascosta, e una TabBar nascosta dall'app non viene mostrata).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Scegli un'interruzione; si attiva dopo 1,5 s. Prima scorri verso il basso per nascondere la TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manuale: tocca per attivare il nascondi allo scorrimento, scorri verso il basso per nascondere la TabBar, poi fai ciò che dice il titolo. Atteso: la TabBar torna subito.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Esegue in sequenza tutte le simulazioni automatiche e riporta superati / falliti (circa 2 minuti), anche nella console. Si può avviare anche con l'argomento -CYLScrollHideSelfTest YES.";
 /* Issue #216: theme switching (skins) demo. */
 "换肤" = "Skin";
 "换肤（主题，issue #216）" = "Skin (tema, issue #216)";
@@ -335,3 +342,6 @@
 "打开 TabBar 场景展示" = "Apri la galleria delle tab bar";
 "每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Ogni scena è una tab bar creata con l’API pubblica: stili, animazioni, avvisi, Lottie e le nuove API delle tab";
 "TabBar 场景展示" = "Galleria delle tab bar";
+
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Copia";

@@ -256,6 +256,13 @@
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Understøttes ikke af Liquid Glass: systemet bestemmer fanelinjens højde (FlatDesign og klassisk stil understøtter det)";
 
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Skjul ved rulning: simuler afbrydelser (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Udløses 1,5 s efter trykket. Rul først ned for at skjule TabBar. Forventet: TabBar kommer straks tilbage, og inertien skjuler den ikke igen.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Udløses 1,5 s efter trykket. Forventet: TabBar ændres ikke af det (skjules ikke, og en TabBar skjult af appen vises ikke).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Vælg en afbrydelse; den udløses efter 1,5 s. Rul først ned for at skjule TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manuelt: tryk for at slå skjul ved rulning til, rul ned for at skjule TabBar, og gør så det, titlen siger. Forventet: TabBar kommer straks tilbage.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Kører alle automatiske simuleringer efter tur og rapporterer bestået / fejlet (ca. 2 minutter), også i konsollen. Kan også køres med startargumentet -CYLScrollHideSelfTest YES.";
 /* Issue #216: theme switching (skins) demo. */
 "换肤" = "Udseende";
 "换肤（主题，issue #216）" = "Udseende (tema, issue #216)";
@@ -335,3 +342,6 @@
 "打开 TabBar 场景展示" = "Åbn fanelinjegalleriet";
 "每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Hver scene er en fanelinje bygget med det offentlige API: typografier, animationer, påmindelser, Lottie og de nyere fane-API'er";
 "TabBar 场景展示" = "Fanelinjegalleri";
+
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Kopiér";
