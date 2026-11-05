@@ -38,6 +38,24 @@ FOUNDATION_EXTERN UIColor *CYLThemeColorRefreshedColor(UIColor *color);
 FOUNDATION_EXTERN NSObject<NSCopying> *_Nullable CYLThemeColorManagerName(UIColor *color);
 
 /*!
+ * [EN] The image of the current theme for a theme image (a new object, itself a theme image); `image` for any other.
+ * [CN] 主题图片在当前主题下的图片（新对象，同样是主题图片）；其他图片返回 `image`。
+ */
+FOUNDATION_EXTERN UIImage *CYLThemeImageRefreshedImage(UIImage *image);
+
+/// [EN] The name of the manager a theme image follows; nil for any other image. [CN] 主题图片所跟随的管理器名字；其他图片为 nil。
+FOUNDATION_EXTERN NSObject<NSCopying> *_Nullable CYLThemeImageManagerName(UIImage *image);
+
+/*!
+ * [EN] The effect of the current theme for a theme effect (a new object, itself a theme effect); `effect` for any other.
+ * [CN] 主题效果在当前主题下的效果（新对象，同样是主题效果）；其他效果返回 `effect`。
+ */
+FOUNDATION_EXTERN UIVisualEffect *CYLThemeVisualEffectRefreshedEffect(UIVisualEffect *effect);
+
+/// [EN] The name of the manager a theme effect follows; nil for any other. [CN] 主题效果所跟随的管理器名字；其他效果为 nil。
+FOUNDATION_EXTERN NSObject<NSCopying> *_Nullable CYLThemeVisualEffectManagerName(UIVisualEffect *effect);
+
+/*!
  * [EN] Assigns the bar appearances (`standardAppearance`, `scrollEdgeAppearance`, `compactAppearance`...) of a
  *      `UITabBar`, `UINavigationBar` or `UIToolbar` again, so that the theme colors in them are drawn with the new theme:
  *      a bar does not update by itself for colors nested in an appearance object.

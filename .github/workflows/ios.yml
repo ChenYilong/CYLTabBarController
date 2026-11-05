@@ -155,6 +155,25 @@ jobs:
             build/analyzer
           if-no-files-found: ignore
 
+  # [EN] The unit tests of the CYLTabBarController-Framework scheme (CYLTabBarControllerTests) on an iOS simulator.
+  # [CN] 在 iOS 模拟器上运行 CYLTabBarController-Framework scheme 的单元测试（CYLTabBarControllerTests）。
+  unit-tests:
+    name: Unit tests
+    needs: changes
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: xcodebuild test
+        if: needs.changes.outputs.code == 'true'
+        run: scripts/unit-tests.sh
+      - uses: actions/upload-artifact@v4
+        if: always() && needs.changes.outputs.code == 'true'
+        with:
+          name: unit-tests-log
+          path: build/unit-tests.log
+          if-no-files-found: ignore
+
   # [EN] Carthage, as an app would use it: build this checkout as an XCFramework.
   # [CN] 与 App 的用法一致的 Carthage：把当前代码编译为 XCFramework。
   carthage:

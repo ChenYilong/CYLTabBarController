@@ -8,6 +8,7 @@
 
 #import "UIViewController+CYLTheme.h"
 #import "CYLThemeManager.h"
+#import "CYLThemePrivate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,6 +29,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     if (self.isViewLoaded) {
         [self setNeedsStatusBarAppearanceUpdate];
+        // [EN] A view that is not in a window (a tab not selected, a page under the top of a navigation stack) is not
+        //      reached by the walk of the windows: walk it here, so it shows the new theme when it comes back. Only a
+        //      detached view (no superview): a view inside another one is walked with that one.
+        // [CN] 不在 window 上的视图（未选中的 Tab、导航栈中非顶部的页面）不会被 window 的遍历访问：在这里遍历，使其重新显示时已是新主题。
+        //      只处理脱离层级的视图（没有父视图）：位于其他视图中的视图会随该视图一起遍历。
+        UIView *view = self.view;
+        if (!view.window && !view.superview) {
+            [view cyl_themeDidChangeByManager:manager identifier:identifier theme:theme enumeratesSubviews:YES];
+        }
     }
 }
 

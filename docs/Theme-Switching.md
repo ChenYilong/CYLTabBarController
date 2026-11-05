@@ -30,6 +30,7 @@
 | [TabBar 主题：CYLTabBarTheme](#cntabbar-主题cyltabbartheme) | [Tab bar themes: CYLTabBarTheme](#entab-bar-themes-cyltabbartheme) |
 | [跟随系统深色模式](#cn跟随系统深色模式) | [Following the system Dark Mode](#enfollowing-the-system-dark-mode) |
 | [视图与颜色](#cn视图与颜色) | [Views and colors](#enviews-and-colors) |
+| [图片、视觉效果与 layer 颜色](#cn图片视觉效果与-layer-颜色) | [Images, visual effects and layer colors](#enimages-visual-effects-and-layer-colors) |
 | [代码组织](#cn代码组织) | [Code layout](#encode-layout) |
 | [演示](#cn演示) | [Demo](#endemo) |
 | [图标来源与许可](#cn图标来源与许可) | [Icon source and license](#enicon-source-and-license) |
@@ -77,6 +78,24 @@ FOUNDATION_EXTERN NSNotificationName const CYLThemeDidChangeNotification;
 + (UIColor *)cyl_colorWithThemeManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeColorProvider)provider;
 + (UIColor *)cyl_colorWithName:(nullable NSString *)name themeManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeColorProvider)provider;
 
+// CYLUtils/CYLComponents/CYLTheme/UIImage+CYLTheme.h
++ (UIImage *)cyl_imageWithThemeProvider:(CYLThemeImageProvider)provider;
++ (UIImage *)cyl_imageWithThemeManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeImageProvider)provider;
+@property (nonatomic, assign, readonly) BOOL cyl_isThemeImage;
+- (UIImage *)cyl_imageForCurrentTheme;
+
+// CYLUtils/CYLComponents/CYLTheme/UIVisualEffect+CYLTheme.h
++ (UIVisualEffect *)cyl_effectWithThemeProvider:(CYLThemeVisualEffectProvider)provider;
++ (UIVisualEffect *)cyl_effectWithThemeManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeVisualEffectProvider)provider;
+@property (nonatomic, assign, readonly) BOOL cyl_isThemeEffect;
+- (UIVisualEffect *)cyl_effectForCurrentTheme;
+
+// CYLUtils/CYLComponents/CYLTheme/CALayer+CYLTheme.h
+- (void)cyl_setThemeColor:(nullable UIColor *)color forKeyPath:(NSString *)keyPath;
+- (nullable UIColor *)cyl_themeColorForKeyPath:(NSString *)keyPath;
+@property (nonatomic, strong, nullable) UIColor *cyl_themeBackgroundColor; // also cyl_themeBorderColor, cyl_themeShadowColor
+- (void)cyl_refreshThemeColors;
+
 // CYLUtils/CYLComponents/CYLTheme/UIView+CYLTheme.h and UIViewController+CYLTheme.h
 - (void)cyl_registerThemeColorProperties:(NSArray<NSString *> *)getters;      // UIView
 - (void)cyl_unregisterThemeColorProperties:(NSArray<NSString *> *)getters;    // UIView
@@ -87,6 +106,7 @@ FOUNDATION_EXTERN NSNotificationName const CYLThemeDidChangeNotification;
 @protocol CYLTabBarTheme <NSObject>
 @optional
 - (nullable NSArray<NSDictionary<NSString *, id> *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController;
+- (nullable NSDictionary<NSString *, id> *)cyl_plusButtonAttributesForTabBarController:(CYLTabBarController *)tabBarController;
 - (nullable UITabBarAppearance *)cyl_tabBarAppearanceForTabBarController:(CYLTabBarController *)tabBarController; // iOS 13+
 - (void)cyl_customizeTabBarController:(CYLTabBarController *)tabBarController;
 @end
@@ -221,7 +241,7 @@ manager.respondsSystemStyleAutomatically = YES;
 |:---|:---|
 | `+[UIColor cyl_colorWithThemeProvider:]` 创建跟随主题的颜色：iOS 13+ 为动态颜色，每次绘制时向 provider 取当前主题的值，provider 返回的系统颜色（例如 `labelColor`）仍跟随深色模式。 | `+[UIColor cyl_colorWithThemeProvider:]` makes a color that follows the theme: on iOS 13+ a dynamic color that asks the provider for the current theme's value each time it is drawn; system colors returned by the provider (e.g. `labelColor`) still follow Dark Mode. |
 | 用 `-cyl_registerThemeColorProperties:` 注册持有这些颜色的属性（例如 `@[@"backgroundColor", @"tintColor"]`），主题切换时会被设为该颜色的新副本，使 UIKit 重绘（UIKit 遇到同一个颜色对象会跳过赋值）。普通颜色与图片不会被重新设置，因此后来在代码中设置的样式不会被覆盖。 | Register the properties that hold such colors with `-cyl_registerThemeColorProperties:` (e.g. `@[@"backgroundColor", @"tintColor"]`): on a theme change they get a fresh copy of the color, so UIKit redraws (UIKit skips setting the very same color object). Plain colors and images are not set again, so a style set later in code is kept. |
-| 无需注册即自动处理：UILabel 与 UITextView 重绘；`UITabBar`、`UINavigationBar`、`UIToolbar` 重新设置 appearance。其他内容（枚举值、layer 的 `CGColor`）请重写 `-cyl_themeDidChangeByManager:identifier:theme:`（调用 super）或设置 `cyl_themeDidChangeBlock`。 | Handled without registering: labels and text views redraw; `UITabBar`, `UINavigationBar` and `UIToolbar` assign their appearances again. For anything else (an enum, a layer's `CGColor`), override `-cyl_themeDidChangeByManager:identifier:theme:` (calling super) or set `cyl_themeDidChangeBlock`. |
+| 无需注册即自动处理：UILabel 与 UITextView 重绘；`UITabBar`、`UINavigationBar`、`UIToolbar` 重新设置 appearance。图片、视觉效果与 layer 颜色见下一节。其他内容（例如枚举值）请重写 `-cyl_themeDidChangeByManager:identifier:theme:`（调用 super）或设置 `cyl_themeDidChangeBlock`。 | Handled without registering: labels and text views redraw; `UITabBar`, `UINavigationBar` and `UIToolbar` assign their appearances again. Images, visual effects and layer colors: see the next section. For anything else (e.g. an enum), override `-cyl_themeDidChangeByManager:identifier:theme:` (calling super) or set `cyl_themeDidChangeBlock`. |
 | 视图控制器的回调会传给所有子控制器，包括尚未显示的 Tab：其 view 可能尚未加载，回调中请先判断 `isViewLoaded`，不要假定它一定晚于 `-viewDidLoad`。 | The view controller callback reaches every child, including tabs not shown yet: their view may not be loaded, so check `isViewLoaded` first and do not count on it coming after `-viewDidLoad`. |
 
 ```Objective-C
@@ -231,8 +251,36 @@ self.view.backgroundColor = [UIColor cyl_colorWithThemeProvider:^UIColor *(CYLTh
 [self.view cyl_registerThemeColorProperties:@[ @"backgroundColor" ]];
 
 self.cardView.cyl_themeDidChangeBlock = ^{
-    weakSelf.cardView.layer.borderColor = [UIColor cyl_colorWithThemeProvider:provider].cyl_rawColor.CGColor;
+    [weakSelf.cardView reloadContent]; // anything else that depends on the theme
 };
+```
+
+## [CN]图片、视觉效果与 layer 颜色
+## [EN]Images, visual effects and layer colors
+
+| 中文 | English |
+|:---|:---|
+| `+[UIImage cyl_imageWithThemeProvider:]` 返回跟随主题的图片，`+[UIVisualEffect cyl_effectWithThemeProvider:]` 返回跟随主题的视觉效果（模糊、活力效果），用法与主题颜色相同。返回的是普通的 `UIImage` / `UIVisualEffect`（provider 在当前主题下的结果，作为独立对象，不会标记 provider 返回的共享对象），并记住 provider；资源目录图片的深色版本仍跟随深色模式。 | `+[UIImage cyl_imageWithThemeProvider:]` returns an image and `+[UIVisualEffect cyl_effectWithThemeProvider:]` a visual effect (blur, vibrancy) that follow the theme, used like theme colors. They are plain `UIImage` / `UIVisualEffect` objects (the provider's result for the current theme, as their own objects, so a shared object the provider returns is never marked) that remember the provider; the dark variant of an asset image still follows Dark Mode. |
+| 无需注册即自动更新：`UIImageView` 的 `image` / `highlightedImage`；`UIButton` 设置过图片的各状态的图片与背景图片，以及 iOS 15 的 `configuration.image` / `configuration.background.image`；`UIVisualEffectView` 的 `effect`。其他视图的图片或效果属性，用 `-cyl_registerThemeColorProperties:` 注册即可。 | Updated without registration: `UIImageView` `image` / `highlightedImage`; the images and background images of the `UIButton` states set with one, and the iOS 15 `configuration.image` / `configuration.background.image`; `UIVisualEffectView` `effect`. Register an image or effect property of any other view with `-cyl_registerThemeColorProperties:`. |
+| layer 颜色：`CGColor` 是固定值。用 `-[CALayer cyl_setThemeColor:forKeyPath:]`（或 `cyl_themeBackgroundColor`、`cyl_themeBorderColor`、`cyl_themeShadowColor`）设置 `UIColor`，layer 立即得到对应的 `CGColor`，并在每次主题切换时重新设置；包括子 layer（例如 `CAShapeLayer` 的 `fillColor`），颜色按所在视图的 trait collection 解析。 | Layer colors: a `CGColor` is a fixed value. Set a `UIColor` with `-[CALayer cyl_setThemeColor:forKeyPath:]` (or `cyl_themeBackgroundColor`, `cyl_themeBorderColor`, `cyl_themeShadowColor`): the layer gets its `CGColor` now and again on every theme change, sublayers included (e.g. the `fillColor` of a `CAShapeLayer`), resolved with the trait collection of the layer's view. |
+| 不在 window 上的视图：视图控制器收到主题回调时，如果其 view 已加载但不在 window 上（未选中的 Tab、导航栈中非顶部的页面），会遍历该 view，使其中的颜色、图片、效果与 layer 颜色在重新显示时已是新主题。 | Views not in a window: when a view controller gets the theme callback while its view is loaded but not in a window (a tab not selected, a page under the top of a navigation stack), that view is walked too, so its colors, images, effects and layer colors show the new theme when it comes back. |
+| 以上都不 hook 任何 UIKit 方法：更新发生在管理器的遍历中（window 中的视图，以及上述控制器的视图）。 | None of this hooks a UIKit method: the updates happen in the manager's walk (the views of the windows and of those view controllers). |
+
+```Objective-C
+UIImage *logo = [UIImage cyl_imageWithThemeProvider:^UIImage *(CYLThemeManager *manager, NSString *identifier, MyTheme *theme) {
+    return [UIImage imageNamed:[@"logo_" stringByAppendingString:identifier]]; // logo_Default, logo_Christmas...
+}];
+self.logoView.image = logo;                                    // UIImageView: no registration
+[self.likeButton setImage:logo forState:UIControlStateNormal]; // UIButton: no registration
+
+self.headerBlurView.effect = [UIVisualEffect cyl_effectWithThemeProvider:^UIVisualEffect *(CYLThemeManager *manager, NSString *identifier, MyTheme *theme) {
+    return [UIBlurEffect effectWithStyle:theme.isDark ? UIBlurEffectStyleDark : UIBlurEffectStyleLight];
+}];
+
+self.cardView.layer.cyl_themeBorderColor = [UIColor cyl_colorWithThemeProvider:^UIColor *(CYLThemeManager *manager, NSString *identifier, MyTheme *theme) {
+    return theme.tintColor;
+}];
+[self.ringLayer cyl_setThemeColor:themeColor forKeyPath:@"strokeColor"]; // a CAShapeLayer sublayer
 ```
 
 ## [CN]代码组织
@@ -252,6 +300,9 @@ CYLTabBarController/CYLUtils/
         ├── CYLThemeManagerCenter.h/.m
         ├── CYLThemePrivate.h/.m    private
         ├── UIColor+CYLTheme.h/.m
+        ├── UIImage+CYLTheme.h/.m
+        ├── UIVisualEffect+CYLTheme.h/.m
+        ├── CALayer+CYLTheme.h/.m
         ├── UIView+CYLTheme.h/.m
         └── UIViewController+CYLTheme.h/.m
 ```
@@ -298,10 +349,10 @@ CYLTabBarController/CYLUtils/
 
 | 中文 | English |
 |:---|:---|
-| 没有 hook 任何 UIKit 方法（避免与其他库冲突）：只有主题切换时位于 window 上的视图会收到回调；之后才加入 window 的视图在绘制时读取主题颜色，与其他动态颜色相同。 | No UIKit method is swizzled (so it cannot clash with other libraries): only the views in a window when the theme changes get the callback; a view added later reads its theme colors when it is drawn, as any dynamic color. |
+| 没有 hook 任何 UIKit 方法（避免与其他库冲突）：主题切换时，window 中的视图，以及视图控制器中已加载但不在 window 上的 view 会收到回调。两者都不属于的视图（例如 App 自己保存、尚未加入任何控制器的视图，或复用队列中的 cell）：主题颜色在绘制时读取当前主题，与其他动态颜色相同；图片、效果与 layer 颜色在下一次主题切换时更新，也可以自行调用 `-cyl_themeDidChangeByManager:identifier:theme:`。 | No UIKit method is swizzled (so it cannot clash with other libraries): when the theme changes, the views in a window and the loaded views of view controllers that are not in a window get the callback. A view in neither (e.g. one the app keeps before adding it to any view controller, or a cell waiting in a reuse queue) reads its theme colors when drawn, as any dynamic color; its images, effects and layer colors update at the next theme change, or call `-cyl_themeDidChangeByManager:identifier:theme:` on it yourself. |
 | iOS 13 以前没有动态颜色：主题颜色为创建时所在主题的值，已注册的属性在主题切换时更新；`UITabBarAppearance` 不存在，TabBar 颜色请在 `-cyl_customizeTabBarController:` 中设置。 | Before iOS 13 there are no dynamic colors: a theme color has the value of the theme current when it was made, and registered properties update on a theme change; there is no `UITabBarAppearance`, so set the tab bar colors in `-cyl_customizeTabBarController:`. |
-| 不提供“动态图片”：动态图片无法跟随主题切换。因此 TabBar 图标通过 `-cyl_tabBarItemsAttributesForTabBarController:` 在每次切换时重新设置。 | There are no "dynamic images": they cannot follow a theme switch. Tab bar icons are therefore set again on every switch through `-cyl_tabBarItemsAttributesForTabBarController:`. |
-| layer 的 `CGColor` 不会跟随主题，请在回调中重新设置。 | A layer's `CGColor` does not follow the theme: set it again in the callback. |
+| 主题图片与主题效果是当前主题的普通对象，而不是代理对象：之后才赋值时，请保存 provider（或使用 `cyl_imageForCurrentTheme` / `cyl_effectForCurrentTheme`），否则主题切换前创建的对象在下一次切换前显示旧主题。TabBarItem 保存的是图片副本，因此 TabBar 图标通过 `-cyl_tabBarItemsAttributesForTabBarController:` 在每次切换时重新设置。 | Theme images and theme effects are plain objects of the current theme, not proxies: when you assign one later, keep the provider (or use `cyl_imageForCurrentTheme` / `cyl_effectForCurrentTheme`), or an object made before a theme change shows the old theme until the next change. Tab bar items keep a copy of their images, so tab bar icons are set again on every switch through `-cyl_tabBarItemsAttributesForTabBarController:`. |
+| layer 颜色在主题切换时更新；只切换深色模式（管理器未开启 `respondsSystemStyleAutomatically`）时，`CGColor` 不会自动重新解析。 | Layer colors update on a theme change; a Dark Mode change alone (the manager not following the system with `respondsSystemStyleAutomatically`) does not resolve their `CGColor` again. |
 | 恢复：下一个主题没有为某个 Tab 提供图标（或没有主题）时，该 Tab 恢复主题替换前的图标（App 自己的图标，或 App 用 `-setTabBarItemIcon:...` 设置的图标）；如果 App 在主题生效期间替换了该图标，则保留 App 的图标。标题等其他 key 只会恢复主题修改过的 key，主题请提供与 App 自身 `tabBarItemsAttributes` 相同的 key。 | Restoring: when the next theme gives a tab no icon (or there is no theme), the tab gets back the icon it had before (the app's own, or one the app set with `-setTabBarItemIcon:...`); if the app replaced the theme's icon meanwhile, the app's icon stays. Titles and the other keys restore only the keys a theme changed, so give a theme the same keys as the app's own `tabBarItemsAttributes`. |
 
 ## [CN]测试与截图
@@ -311,3 +362,5 @@ CYLTabBarController/CYLUtils/
 |:---|:---|
 | 本次修改在没有 Xcode、模拟器与真机的 Linux 环境中完成，无法运行示例，因此本文没有截图，也没有在 iOS 上编译验证。已完成：新增与修改的 Objective-C 代码（`CYLTheme` 全部源文件、`UIViewController+CYLThemeSettings.m`、`CYLTabBarController (CYLTheme)`）基于 UIKit 接口最小桩头文件的语法检查与静态分析（`clang -fsyntax-only -fobjc-arc -Wall -Wextra`、`clang --analyze`，无警告）、`pod lib lint CYLTabBarController.podspec --quick`（通过）、用 xcodeproj 解析 Xcode 工程确认新文件已加入 framework target，以及文档导航检查（`--check` 通过）。`Package.swift` 只新增了一个头文件搜索路径，未能用 Swift 工具链验证。请在合并前用 Xcode 运行 ObjC 示例：点击首页导航栏的“换肤”，依次选择各主题并在液态玻璃、扁平样式之间切换。 | This change was made on Linux, without Xcode, a simulator or a device, so the examples could not be run: there are no screenshots here and nothing was compiled for iOS. Done: a syntax check and static analysis of the new and changed Objective-C code (every `CYLTheme` source, `UIViewController+CYLThemeSettings.m`, `CYLTabBarController (CYLTheme)`) against minimal stub headers of the UIKit API they use (`clang -fsyntax-only -fobjc-arc -Wall -Wextra`, `clang --analyze`, no warnings), `pod lib lint CYLTabBarController.podspec --quick` (passed), parsing the Xcode project with xcodeproj to confirm the new files are in the framework target, and the documentation navigation check (`--check` passed). `Package.swift` only gains one header search path and could not be checked with a Swift toolchain. Before merging, run the ObjC example in Xcode: tap "Skin" in the home page's navigation bar, pick each theme, and switch between Liquid Glass and FlatDesign. |
 | 主题图标改用 `-setTabBarItemIcon:...`（液态玻璃上节日图标不显示的修复）与扁平样式页面的“换肤”按钮同样没有在模拟器或真机上运行，只做了语法检查与静态分析，因此没有截图；合并前请在液态玻璃与扁平样式中切换几个节日皮肤与“默认”主题，确认图标出现、恢复正确。 | Theme icons through `-setTabBarItemIcon:...` (the fix for holiday icons not showing on Liquid Glass) and the FlatDesign page's "Skin" button were not run on a simulator or device either, only syntax-checked and analyzed, so there are no screenshots. Before merging, switch between a few holiday skins and "Default" in Liquid Glass and FlatDesign, and check that the icons appear and come back correctly. |
+| 单元测试：`CYLTabBarControllerTests/CYLThemeTests.m` 覆盖管理器、主题颜色、主题图片（不标记共享图片、`UIImageView` 与 `UIButton` 更新、未单独设置的状态仍回退到普通图片）、主题效果（`UIVisualEffectView`）、layer 颜色（包括子 layer）、不在 window 上的控制器视图，以及 TabBar 主题（外观、标题；图标不修改 `tabBarItem.image` 与 `tabBarItemsAttributes`）。CI 的 “Unit tests” job 在 iOS 模拟器上运行它们（`scripts/unit-tests.sh`，本地也可运行）。 | Unit tests: `CYLTabBarControllerTests/CYLThemeTests.m` covers the managers, theme colors, theme images (a shared image is never marked; `UIImageView` and `UIButton` update; a state without its own image still falls back to the normal one), theme effects (`UIVisualEffectView`), layer colors (sublayers included), the views of view controllers not in a window, and tab bar themes (appearance, titles; icons leave `tabBarItem.image` and `tabBarItemsAttributes` alone). The CI job "Unit tests" runs them on an iOS simulator (`scripts/unit-tests.sh`, which also runs locally). |
+| 截图：“Theme screenshots” workflow（`scripts/theme-screenshots.sh`）在 iOS 模拟器上为每个主题启动一次 ObjC Demo（`-CYLDemoThemeIdentifier <主题>`），分别使用液态玻璃与扁平样式，截图作为该运行的 artifact。 | Screenshots: the "Theme screenshots" workflow (`scripts/theme-screenshots.sh`) launches the ObjC demo once per theme on an iOS simulator (`-CYLDemoThemeIdentifier <theme>`), in Liquid Glass and in FlatDesign, and keeps the screenshots as an artifact of the run. |

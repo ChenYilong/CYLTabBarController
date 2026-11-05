@@ -34,12 +34,18 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  * [EN] Registers properties of the receiver to set again when the theme changes, by their getter names, e.g.
  *      `@[ @"backgroundColor", @"tintColor" ]`; the setter follows the usual naming (`setBackgroundColor:`). A property
- *      that holds a theme color (`+[UIColor cyl_colorWithThemeProvider:]`) gets a fresh copy of it, any other object
- *      that is not a color or an image (e.g. an `NSAttributedString`) is set again as is; plain colors and images are
- *      left alone, so a style set later in code is kept.
+ *      that holds a theme color (`+[UIColor cyl_colorWithThemeProvider:]`) gets a fresh copy of it, one that holds a theme
+ *      image (`+[UIImage cyl_imageWithThemeProvider:]`) or a theme effect (`+[UIVisualEffect cyl_effectWithThemeProvider:]`)
+ *      gets the one of the new theme, any other object that is not a color, an image or an effect (e.g. an
+ *      `NSAttributedString`) is set again as is; plain colors, images and effects are left alone, so a style set later
+ *      in code is kept. `UIImageView`, `UIButton` and `UIVisualEffectView` need no registration for their images and
+ *      effects, nor layers for colors set with `-[CALayer cyl_setThemeColor:forKeyPath:]`.
  * [CN] 按 getter 名注册主题切换时需要重新设置的属性，例如 `@[ @"backgroundColor", @"tintColor" ]`；setter 按常规命名
- *      （`setBackgroundColor:`）。持有主题颜色（`+[UIColor cyl_colorWithThemeProvider:]`）的属性会得到该颜色的新副本；
- *      非颜色、非图片的其他对象（例如 `NSAttributedString`）原样重新设置；普通颜色与图片保持不变，后来在代码中设置的样式不会被覆盖。
+ *      （`setBackgroundColor:`）。持有主题颜色（`+[UIColor cyl_colorWithThemeProvider:]`）的属性会得到该颜色的新副本；持有主题图片
+ *      （`+[UIImage cyl_imageWithThemeProvider:]`）或主题效果（`+[UIVisualEffect cyl_effectWithThemeProvider:]`）的属性会得到新主题的
+ *      图片或效果；非颜色、非图片、非效果的其他对象（例如 `NSAttributedString`）原样重新设置；普通颜色、图片与效果保持不变，后来在代码中
+ *      设置的样式不会被覆盖。`UIImageView`、`UIButton`、`UIVisualEffectView` 的图片与效果无需注册，通过
+ *      `-[CALayer cyl_setThemeColor:forKeyPath:]` 设置的 layer 颜色也无需注册。
  */
 - (void)cyl_registerThemeColorProperties:(NSArray<NSString *> *)getters;
 

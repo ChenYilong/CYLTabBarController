@@ -24,6 +24,10 @@
 
 @end
 
+/// [EN] A tab bar theme with a title and an icon for each tab (below). [CN] 每个 Tab 都有标题与图标的 TabBar 主题（见下方）。
+@interface CYLTestItemsTabBarTheme : NSObject <CYLTabBarTheme>
+@end
+
 @interface CYLThemeTests : XCTestCase
 @end
 
@@ -152,6 +156,149 @@
 
     [tabBarController cyl_applyTabBarTheme:nil];
     XCTAssertEqualObjects(tabBarController.tabBar.standardAppearance.backgroundColor, originalColor, @"nil gives back the app's own look");
+}
+
+#pragma mark - Theme images, effects, layer colors
+
+/// [EN] A square image of `side` points. [CN] 边长为 `side` 点的正方形图片。
+static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(side, side)];
+    return [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [color setFill];
+        UIRectFill(CGRectMake(0, 0, side, side));
+    }];
+}
+
+/// [EN] A manager with a small image theme "A" (10 pt) and a large one "B" (20 pt), on "A". [CN] 有小图主题“A”（10 pt）与大图主题“B”（20 pt）的管理器，当前为“A”。
+- (CYLThemeManager *)newImageManager {
+    CYLThemeManager *manager = [self newManager];
+    [manager addThemeIdentifier:@"A" theme:CYLTestImage(10, UIColor.redColor)];
+    [manager addThemeIdentifier:@"B" theme:CYLTestImage(20, UIColor.blueColor)];
+    manager.currentThemeIdentifier = @"A";
+    return manager;
+}
+
+- (UIImage *)themeImageOfManager:(CYLThemeManager *)manager {
+    return [UIImage cyl_imageWithThemeManagerName:manager.name provider:^UIImage *(CYLThemeManager *themeManager, id identifier, UIImage *theme) {
+        return theme;
+    }];
+}
+
+- (void)testThemeImageFollowsTheThemeAndNeverMarksTheProvidersImage {
+    CYLThemeManager *manager = [self newImageManager];
+    UIImage *image = [self themeImageOfManager:manager];
+    XCTAssertTrue(image.cyl_isThemeImage);
+    XCTAssertEqual(image.size.width, 10.0);
+    XCTAssertFalse(((UIImage *)manager.currentTheme).cyl_isThemeImage, @"the provider's image (maybe shared) is not marked");
+    XCTAssertNotEqual(image, manager.currentTheme);
+
+    manager.currentThemeIdentifier = @"B";
+    UIImage *current = [image cyl_imageForCurrentTheme];
+    XCTAssertTrue(current.cyl_isThemeImage);
+    XCTAssertEqual(current.size.width, 20.0);
+    UIImage *plain = CYLTestImage(5, UIColor.greenColor);
+    XCTAssertFalse(plain.cyl_isThemeImage);
+    XCTAssertEqual([plain cyl_imageForCurrentTheme], plain);
+}
+
+- (void)testImageViewAndButtonGetTheNewThemeImage {
+    CYLThemeManager *manager = [self newImageManager];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[self themeImageOfManager:manager]];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button setImage:[self themeImageOfManager:manager] forState:UIControlStateNormal];
+    [button setBackgroundImage:[self themeImageOfManager:manager] forState:UIControlStateSelected];
+
+    manager.currentThemeIdentifier = @"B";
+    [imageView cyl_themeDidChangeByManager:manager identifier:manager.currentThemeIdentifier theme:manager.currentTheme];
+    [button cyl_themeDidChangeByManager:manager identifier:manager.currentThemeIdentifier theme:manager.currentTheme];
+    XCTAssertEqual(imageView.image.size.width, 20.0);
+    XCTAssertEqual([button imageForState:UIControlStateNormal].size.width, 20.0);
+    XCTAssertEqual([button backgroundImageForState:UIControlStateSelected].size.width, 20.0);
+    XCTAssertEqual([button imageForState:UIControlStateHighlighted], [button imageForState:UIControlStateNormal],
+                   @"a state without an image of its own still falls back to the normal one");
+}
+
+- (void)testVisualEffectViewGetsTheNewThemeEffect {
+    CYLThemeManager *manager = [self newManager];
+    [manager addThemeIdentifier:@"Light" theme:@(UIBlurEffectStyleLight)];
+    [manager addThemeIdentifier:@"Dark" theme:@(UIBlurEffectStyleDark)];
+    manager.currentThemeIdentifier = @"Light";
+    UIVisualEffect *effect = [UIVisualEffect cyl_effectWithThemeManagerName:manager.name provider:^UIVisualEffect *(CYLThemeManager *themeManager, id identifier, NSNumber *theme) {
+        return [UIBlurEffect effectWithStyle:(UIBlurEffectStyle)theme.integerValue];
+    }];
+    XCTAssertTrue(effect.cyl_isThemeEffect);
+    XCTAssertTrue([effect isKindOfClass:[UIBlurEffect class]]);
+    UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
+    XCTAssertTrue(effectView.effect.cyl_isThemeEffect, @"the effect view keeps the theme effect");
+
+    UIVisualEffect *before = effectView.effect;
+    manager.currentThemeIdentifier = @"Dark";
+    [effectView cyl_themeDidChangeByManager:manager identifier:manager.currentThemeIdentifier theme:manager.currentTheme];
+    XCTAssertNotEqual(effectView.effect, before);
+    XCTAssertTrue(effectView.effect.cyl_isThemeEffect);
+}
+
+- (void)testLayerThemeColorFollowsTheThemeWithSublayers {
+    CYLThemeManager *manager = [self newManager];
+    [manager addThemeIdentifier:@"Red" theme:UIColor.redColor];
+    [manager addThemeIdentifier:@"Blue" theme:UIColor.blueColor];
+    manager.currentThemeIdentifier = @"Red";
+    UIColor *color = [UIColor cyl_colorWithThemeManagerName:manager.name provider:^UIColor *(CYLThemeManager *themeManager, id identifier, UIColor *theme) {
+        return theme;
+    }];
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
+    view.layer.cyl_themeBorderColor = color;
+    CAShapeLayer *sublayer = [CAShapeLayer layer];
+    [view.layer addSublayer:sublayer];
+    [sublayer cyl_setThemeColor:color forKeyPath:@"fillColor"];
+    XCTAssertTrue(CGColorEqualToColor(view.layer.borderColor, UIColor.redColor.CGColor));
+    XCTAssertTrue(CGColorEqualToColor(sublayer.fillColor, UIColor.redColor.CGColor));
+    XCTAssertEqualObjects([sublayer cyl_themeColorForKeyPath:@"fillColor"], color);
+
+    manager.currentThemeIdentifier = @"Blue";
+    [view cyl_themeDidChangeByManager:manager identifier:manager.currentThemeIdentifier theme:manager.currentTheme];
+    XCTAssertTrue(CGColorEqualToColor(view.layer.borderColor, UIColor.blueColor.CGColor));
+    XCTAssertTrue(CGColorEqualToColor(sublayer.fillColor, UIColor.blueColor.CGColor), @"sublayers follow too");
+
+    [sublayer cyl_setThemeColor:nil forKeyPath:@"fillColor"];
+    XCTAssertNil([sublayer cyl_themeColorForKeyPath:@"fillColor"]);
+}
+
+- (void)testViewOfAViewControllerNotInAWindowGetsTheNewTheme {
+    CYLThemeManager *manager = [self newImageManager];
+    UIViewController *viewController = [[UIViewController alloc] init];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[self themeImageOfManager:manager]];
+    [viewController.view addSubview:imageView];
+    XCTAssertNil(viewController.view.window);
+
+    manager.currentThemeIdentifier = @"B";
+    [viewController cyl_themeDidChangeByManager:manager identifier:manager.currentThemeIdentifier theme:manager.currentTheme];
+    XCTAssertEqual(imageView.image.size.width, 20.0, @"the walk reaches a view controller's view that is not in a window");
+}
+
+/// [EN] A tab bar theme with an icon and a title for each tab. [CN] 每个 Tab 都有图标与标题的 TabBar 主题。
+- (void)testTabBarThemeIconsDoNotTouchTabBarItemImagesAndTitlesStillChange {
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" }, @{ CYLTabBarItemTitle : @"B" } ]];
+    [tabBarController loadViewIfNeeded];
+    CYLTestItemsTabBarTheme *theme = [CYLTestItemsTabBarTheme new];
+    [tabBarController cyl_applyTabBarTheme:theme];
+    UIViewController *first = tabBarController.viewControllers.firstObject;
+    XCTAssertEqualObjects(first.tabBarItem.title, @"★ A");
+    XCTAssertNil(first.tabBarItem.image, @"theme icons are views in place of the icon; the item keeps the app's image");
+    XCTAssertNil(tabBarController.tabBarItemsAttributes.firstObject[CYLTabBarItemImage]);
+
+    [tabBarController cyl_applyTabBarTheme:nil];
+    XCTAssertEqualObjects(first.tabBarItem.title, @"A", @"nil gives back the app's own titles");
+}
+
+@end
+
+@implementation CYLTestItemsTabBarTheme
+
+- (NSArray<NSDictionary<NSString *, id> *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController {
+    return @[ @{ CYLTabBarItemTitle : @"★ A", CYLTabBarItemImage : CYLTestImage(24, UIColor.orangeColor) },
+              @{ CYLTabBarItemTitle : @"★ B", CYLTabBarItemImage : CYLTestImage(24, UIColor.purpleColor) } ];
 }
 
 @end
