@@ -70,14 +70,18 @@
     
     [self.navigationItem.leftBarButtonItem setTintColor:UIColor.redColor];
     [self.navigationItem.rightBarButtonItem setTintColor:UIColor.redColor];
-    // [EN] Issue #13: a navigation bar button with a UIMenu, for the "Manual: tap a navigation bar button" simulation
-    //      (a tap outside the content ends the scroll hiding session). Appended, so `rightBarButtonItem` is unchanged.
-    // [CN] issue #13：带 UIMenu 的导航栏按钮，用于“手动：点击导航栏按钮”模拟（在内容之外的点击会结束滚动隐藏会话）。追加在末尾，
-    //      `rightBarButtonItem` 不变。
-    UIAction *menuAction = [UIAction actionWithTitle:@"#13" image:nil identifier:nil handler:^(__kindof UIAction *action) {}];
-    UIBarButtonItem *menuItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"ellipsis.circle"]
-                                                                  menu:[UIMenu menuWithTitle:@"" children:@[ menuAction ]]];
-    self.navigationItem.rightBarButtonItems = [self.navigationItem.rightBarButtonItems arrayByAddingObject:menuItem];
+    // [EN] Issue #216: the skin button, as on the Liquid Glass home page; its themes open as a UIMenu, and picking one
+    //      restyles the tab bar in place. Issue #13: it is also the navigation bar button with a UIMenu of the "Manual: tap
+    //      a navigation bar button" simulation (a tap outside the content ends the scroll hiding session). Appended, so
+    //      `rightBarButtonItem` is unchanged.
+    // [CN] Issue #216：换肤按钮，与液态玻璃首页相同；主题以 UIMenu 打开，选择后 TabBar 原地更换外观。issue #13：它同时是“手动：点击
+    //      导航栏按钮”模拟中带 UIMenu 的导航栏按钮（在内容之外的点击会结束滚动隐藏会话）。追加在末尾，`rightBarButtonItem` 不变。
+    __weak __typeof(self) weakSelf = self;
+    UIMenu *themeMenu = [self cyl_themeMenuWithCompletion:^{
+        [weakSelf.tableView reloadData];
+    }];
+    UIBarButtonItem *themeBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"换肤") menu:themeMenu];
+    self.navigationItem.rightBarButtonItems = [self.navigationItem.rightBarButtonItems arrayByAddingObject:themeBarButtonItem];
     
     // ✅ iOS 26修复方案
     

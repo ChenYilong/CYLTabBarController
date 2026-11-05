@@ -1673,10 +1673,23 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 
 /*!
  * [EN] The titles and icons of the tabs in this theme, shaped like `tabBarItemsAttributes` (one entry per tab, none for
- *      the plus button), applied with `-updateTabBarItemsWithAttributes:`: e.g. holiday icons. A missing key keeps the
- *      current value, so give the keys the app's own attributes use.
- * [CN] 该主题下各 Tab 的标题与图标，结构与 `tabBarItemsAttributes` 相同（每个 Tab 一项，PlusButton 不占项），通过
- *      `-updateTabBarItemsWithAttributes:` 应用：例如节日图标。未提供的 key 保持当前值，因此请提供与 App 自身 attributes 相同的 key。
+ *      the plus button): e.g. holiday icons.
+ *      - Titles and the other keys are applied with `-updateTabBarItemsWithAttributes:`. A missing key keeps the current
+ *        value, so give the keys the app's own attributes use.
+ *      - Icons (`CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` with their dark images, or `CYLTabBarItemImageURL` /
+ *        `CYLTabBarItemSelectedImageURL` / `CYLTabBarItemImageURLSize`, which win) are shown like
+ *        `-setTabBarItemIcon:selectedIcon:size:atIndex:`: a view in place of the tab's icon, in every style, also over a
+ *        Lottie icon, in the image's own colors (give a faded image for the unselected look). Any source that method
+ *        takes: a UIImage, a name, a path, a URL. `tabBarItem.image` and `tabBarItemsAttributes` keep the app's icons.
+ *      - A tab with no icon in the next theme (or with no theme) gets back the icon it had before, unless the app
+ *        replaced the theme's icon meanwhile.
+ * [CN] 该主题下各 Tab 的标题与图标，结构与 `tabBarItemsAttributes` 相同（每个 Tab 一项，PlusButton 不占项）：例如节日图标。
+ *      - 标题与其他 key 通过 `-updateTabBarItemsWithAttributes:` 应用。未提供的 key 保持当前值，因此请提供与 App 自身 attributes 相同的 key。
+ *      - 图标（`CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` 及其深色图片，或优先使用的 `CYLTabBarItemImageURL` /
+ *        `CYLTabBarItemSelectedImageURL` / `CYLTabBarItemImageURLSize`）与 `-setTabBarItemIcon:selectedIcon:size:atIndex:` 的显示方式
+ *        相同：以视图替换 Tab 的图标，适用于所有样式，也能覆盖 Lottie 图标，按图片原色绘制（未选中样式请提供半透明图片）。支持该方法的
+ *        所有来源：UIImage、图片名、文件路径、URL。`tabBarItem.image` 与 `tabBarItemsAttributes` 保留 App 自己的图标。
+ *      - 下一个主题中没有图标（或没有主题）的 Tab 恢复原来的图标，除非 App 期间替换了主题图标。
  */
 - (nullable NSArray<NSDictionary<NSString *, id> *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController;
 

@@ -50,6 +50,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_presentThemePickerFromView:(nullable UIView *)sourceView completion:(nullable void (^)(void))completion;
 
 /*!
+ * [EN] The theme picker as a menu, e.g. for a navigation bar button (`-[UIBarButtonItem initWithTitle:menu:]`): one action
+ *      per theme with its icon or color, the current one checked, and "Follow the system Dark Mode". On iOS 15+ it is
+ *      built again each time it opens. Picking a theme switches it at once in every tab bar style.
+ * [CN] 菜单形式的主题选择器，例如用于导航栏按钮（`-[UIBarButtonItem initWithTitle:menu:]`）：每个主题一项（带图标或颜色），当前主题
+ *      显示勾号，还有“跟随系统深色模式”。iOS 15+ 每次打开时重新生成。选择后立即切换，适用于所有 TabBar 样式。
+ * @param completion [EN] Runs after a theme was picked, e.g. to reload a list. [CN] 选择主题后执行，例如刷新列表。
+ */
+- (UIMenu *)cyl_themeMenuWithCompletion:(nullable void (^)(void))completion API_AVAILABLE(ios(14.0));
+
+/*!
  * [EN] A section of its own that lists every demo theme, one row each: five color themes and eleven holiday skins
  *      (Spring Festival, Christmas, Halloween, Valentine's Day, Mid-Autumn, Easter, New Year, Summer, Birthday, Space,
  *      Ocean) with Fluent Emoji icons. A tap applies the theme; the current one has a checkmark. Use the four methods

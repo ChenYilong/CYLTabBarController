@@ -344,6 +344,11 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 - (void)cyl_applyLaunchTabBarThemeIfNeeded;
 /// [EN] Implemented in the main implementation (tabBar.standardAppearance). [CN] 实现于主 implementation（tabBar.standardAppearance）。
 - (void)cyl_syncTabBarAppearances;
+/// [EN] Implemented in the main implementation: the icon view providers by view controller (theme icons use them).
+/// [CN] 实现于主 implementation：按子控制器保存的图标视图 provider（主题图标会使用）。
+- (NSMapTable<UIViewController *, CYLTabBarItemIconViewProvider> *)cyl_tabBarItemIconViewProviders;
+/// [EN] The theme's icons, in place of each tab's icon. [CN] 主题图标，替换每个 Tab 的图标。
+- (void)cyl_applyThemeIconsOfItemsAttributes:(nullable NSArray<NSDictionary<NSString *, id> *> *)itemsAttributes;
 @end
 
 // [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
@@ -8534,6 +8539,26 @@ static char CYLThemeOriginalStandardAppearanceKey;
 static char CYLThemeOriginalScrollEdgeAppearanceKey;
 /// [EN] The launch theme was applied (or a theme change came first). [CN] 已应用启动时的主题（或已先收到主题切换）。
 static char CYLThemeLaunchThemeAppliedKey;
+/// [EN] Theme icons: the icon view provider each tab had before the theme replaced it (`NSNull` for none), the provider
+///      the theme installed, and a counter that drops icons still loading when another theme is applied.
+/// [CN] 主题图标：主题替换前每个 Tab 的图标视图 provider（没有时为 `NSNull`）、主题安装的 provider，以及一个计数器：应用其他主题时，
+///      丢弃仍在加载的图标。
+static char CYLThemeOriginalIconViewProvidersKey;
+static char CYLThemeInstalledIconViewProvidersKey;
+static char CYLThemeIconGenerationKey;
+
+/// [EN] The icon keys of `tabBarItemsAttributes`. [CN] `tabBarItemsAttributes` 中与图标有关的 key。
+static NSArray<NSString *> *CYLThemeIconAttributeKeys(void) {
+    return @[ CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage, CYLTabBarItemSelectedDarkImage,
+              CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize ];
+}
+
+/// [EN] `attributes` without its icon keys. [CN] 去掉图标 key 的 `attributes`。
+static NSDictionary<NSString *, id> *CYLThemeAttributesWithoutIcons(NSDictionary<NSString *, id> *attributes) {
+    NSMutableDictionary *withoutIcons = [attributes mutableCopy] ?: [NSMutableDictionary dictionary];
+    [withoutIcons removeObjectsForKeys:CYLThemeIconAttributeKeys()];
+    return [withoutIcons copy];
+}
 
 @implementation CYLTabBarController (CYLTheme)
 
@@ -8565,21 +8590,38 @@ static char CYLThemeLaunchThemeAppliedKey;
     objc_setAssociatedObject(self, &CYLThemeLaunchThemeAppliedKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     id<CYLTabBarTheme> tabBarTheme = [theme conformsToProtocol:@protocol(CYLTabBarTheme)] ? theme : nil;
 
-    // [EN] Titles and icons, in place (issue #601). [CN] 原地更新标题与图标（issue #601）。
     NSArray<NSDictionary<NSString *, id> *> *itemsAttributes = nil;
     if ([tabBarTheme respondsToSelector:@selector(cyl_tabBarItemsAttributesForTabBarController:)]) {
         itemsAttributes = [tabBarTheme cyl_tabBarItemsAttributesForTabBarController:self];
     }
+
+    // [EN] Titles and the other keys, in place (issue #601), without the icon keys: the icons follow below.
+    // [CN] 原地更新标题与其他 key（issue #601），不含图标 key：图标在下面处理。
+    NSMutableArray<NSDictionary<NSString *, id> *> *itemsAttributesWithoutIcons = [NSMutableArray array];
+    BOOL hasOtherKeys = NO;
+    for (NSDictionary<NSString *, id> *attributes in itemsAttributes) {
+        NSDictionary<NSString *, id> *withoutIcons = CYLThemeAttributesWithoutIcons(attributes);
+        hasOtherKeys = hasOtherKeys || withoutIcons.count > 0;
+        [itemsAttributesWithoutIcons addObject:withoutIcons];
+    }
     NSArray *originalItemsAttributes = objc_getAssociatedObject(self, &CYLThemeOriginalTabBarItemsAttributesKey);
-    if (itemsAttributes.count > 0) {
+    if (hasOtherKeys) {
         if (!originalItemsAttributes) {
-            objc_setAssociatedObject(self, &CYLThemeOriginalTabBarItemsAttributesKey, [self.tabBarItemsAttributes copy] ?: @[], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            NSMutableArray *original = [NSMutableArray array];
+            for (NSDictionary<NSString *, id> *attributes in self.tabBarItemsAttributes) {
+                [original addObject:CYLThemeAttributesWithoutIcons(attributes)];
+            }
+            objc_setAssociatedObject(self, &CYLThemeOriginalTabBarItemsAttributesKey, [original copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
-        [self updateTabBarItemsWithAttributes:itemsAttributes];
+        [self updateTabBarItemsWithAttributes:itemsAttributesWithoutIcons];
     } else if (originalItemsAttributes) {
         [self updateTabBarItemsWithAttributes:originalItemsAttributes];
         objc_setAssociatedObject(self, &CYLThemeOriginalTabBarItemsAttributesKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
+
+    // [EN] The icons, as views in place of each tab's icon (`-setTabBarItemIcon:selectedIcon:size:atIndex:`).
+    // [CN] 图标：以视图替换每个 Tab 的图标（`-setTabBarItemIcon:selectedIcon:size:atIndex:`）。
+    [self cyl_applyThemeIconsOfItemsAttributes:itemsAttributes];
 
     // [EN] The appearance: a new object for every theme, so every style (FlatDesign included) applies it.
     // [CN] 外观：每个主题都是新对象，因此所有样式（包括扁平样式）都会应用。
@@ -8617,6 +8659,136 @@ static char CYLThemeLaunchThemeAppliedKey;
 
     if ([tabBarTheme respondsToSelector:@selector(cyl_customizeTabBarController:)]) {
         [tabBarTheme cyl_customizeTabBarController:self];
+    }
+}
+
+/*!
+ * [EN] The theme's icons, with the mechanism of `-setTabBarItemIcon:selectedIcon:size:atIndex:` (the "change all local
+ *      icons" demo row): a view in place of each tab's icon, in every style (Liquid Glass, its selected layer included,
+ *      the system tab bar, FlatDesign), also over a Lottie icon, drawn with its own colors. Setting `tabBarItem.image`
+ *      did not show on Liquid Glass with Lottie icons, and made UIKit rebuild the tab buttons.
+ *      - The icon of an entry: `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL` (with `CYLTabBarItemImageURLSize`)
+ *        win; else `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`, combined with their dark images. Any source
+ *        `-setTabBarItemIcon:...` takes: a UIImage, a name, a path, a URL.
+ *      - Before the first theme icon, the tab's own provider (or none) is kept; a tab the new theme gives no icon gets it
+ *        back, unless the app replaced the theme's icon meanwhile.
+ *      - Icons are loaded first (network ones asynchronously) and shown only if no other theme came in between.
+ * [CN] 主题图标，使用 `-setTabBarItemIcon:selectedIcon:size:atIndex:` 的机制（演示中的“修改所有本地图标”行）：以视图替换每个 Tab 的图标，
+ *      适用于所有样式（液态玻璃，包括其选中图层；系统 TabBar；扁平样式），也能覆盖 Lottie 图标，按原图颜色绘制。原来设置
+ *      `tabBarItem.image` 的方式在使用 Lottie 图标的液态玻璃上不显示，并会让 UIKit 重建 Tab 按钮。
+ *      - 每项的图标：`CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL`（及 `CYLTabBarItemImageURLSize`）优先；否则为
+ *        `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`，并与其深色图片合成。支持 `-setTabBarItemIcon:...` 的所有来源：UIImage、
+ *        图片名、文件路径、URL。
+ *      - 第一次设置主题图标前，保存该 Tab 自己的 provider（或没有）；新主题未提供图标的 Tab 恢复它，除非 App 期间替换了主题图标。
+ *      - 先加载图标（网络图标为异步），只有期间没有切换到其他主题时才显示。
+ */
+- (void)cyl_applyThemeIconsOfItemsAttributes:(nullable NSArray<NSDictionary<NSString *, id> *> *)itemsAttributes {
+    NSUInteger generation = [objc_getAssociatedObject(self, &CYLThemeIconGenerationKey) unsignedIntegerValue] + 1;
+    objc_setAssociatedObject(self, &CYLThemeIconGenerationKey, @(generation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    NSMapTable<UIViewController *, id> *originalProviders = objc_getAssociatedObject(self, &CYLThemeOriginalIconViewProvidersKey);
+    NSMapTable<UIViewController *, id> *installedProviders = objc_getAssociatedObject(self, &CYLThemeInstalledIconViewProvidersKey);
+    if (!originalProviders) {
+        originalProviders = [NSMapTable weakToStrongObjectsMapTable];
+        installedProviders = [NSMapTable weakToStrongObjectsMapTable];
+        objc_setAssociatedObject(self, &CYLThemeOriginalIconViewProvidersKey, originalProviders, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(self, &CYLThemeInstalledIconViewProvidersKey, installedProviders, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    NSMapTable<UIViewController *, CYLTabBarItemIconViewProvider> *providers = [self cyl_tabBarItemIconViewProviders];
+
+    // [EN] The icon of each tab in this theme, by view controller (as `-updateTabBarItemsWithAttributes:`: one entry per
+    //      tab, none for the plus button).
+    // [CN] 该主题下每个 Tab 的图标，按子控制器保存（与 `-updateTabBarItemsWithAttributes:` 相同：每个 Tab 一项，PlusButton 不占项）。
+    NSMapTable<UIViewController *, NSDictionary *> *themeIcons = [NSMapTable weakToStrongObjectsMapTable];
+    NSUInteger attributesIndex = 0;
+    for (NSUInteger index = 0; index < _viewControllers.count && attributesIndex < itemsAttributes.count; index++) {
+        UIViewController *viewController = _viewControllers[index];
+        if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
+            continue;
+        }
+        NSDictionary<NSString *, id> *attributes = itemsAttributes[attributesIndex++];
+        id icon = attributes[CYLTabBarItemImageURL];
+        id selectedIcon = attributes[CYLTabBarItemSelectedImageURL];
+        NSValue *sizeValue = attributes[CYLTabBarItemImageURLSize];
+        if (!icon) {
+            id image = attributes[CYLTabBarItemImage];
+            id selectedImage = attributes[CYLTabBarItemSelectedImage];
+            // [EN] With a dark image, the combined image (names and UIImages); else the source as it is.
+            // [CN] 有深色图片时为合成后的图片（图片名与 UIImage）；否则原样使用该来源。
+            icon = attributes[CYLTabBarItemDarkImage] ? [UIImage cyl_imageWithImageInfo:image darkImageInfo:attributes[CYLTabBarItemDarkImage]] : image;
+            selectedIcon = attributes[CYLTabBarItemSelectedDarkImage] ?
+                [UIImage cyl_imageWithImageInfo:selectedImage darkImageInfo:attributes[CYLTabBarItemSelectedDarkImage]] : selectedImage;
+            if (!icon) {
+                icon = selectedIcon;
+            }
+        }
+        if (!icon) {
+            continue;
+        }
+        NSMutableDictionary *tabIcon = [NSMutableDictionary dictionaryWithObject:icon forKey:@"icon"];
+        tabIcon[@"selectedIcon"] = selectedIcon;
+        tabIcon[@"size"] = [sizeValue isKindOfClass:[NSValue class]] ? sizeValue : nil;
+        [themeIcons setObject:[tabIcon copy] forKey:viewController];
+    }
+
+    // [EN] Tabs with a theme icon before: an icon the app set meanwhile becomes the one to restore; a tab without an icon
+    //      in this theme gets its own provider back.
+    // [CN] 之前有主题图标的 Tab：App 期间设置的图标成为要恢复的图标；本主题中没有图标的 Tab 恢复自己的 provider。
+    for (UIViewController *viewController in originalProviders.keyEnumerator.allObjects) {
+        id installed = [installedProviders objectForKey:viewController];
+        id current = [providers objectForKey:viewController];
+        BOOL replacedByApp = installed && current != installed;
+        if (replacedByApp) {
+            [originalProviders setObject:(current ?: [NSNull null]) forKey:viewController];
+            [installedProviders removeObjectForKey:viewController];
+        }
+        if ([themeIcons objectForKey:viewController]) {
+            continue;
+        }
+        id original = [originalProviders objectForKey:viewController];
+        NSUInteger index = [_viewControllers indexOfObject:viewController];
+        if (!replacedByApp && index != NSNotFound) {
+            [self setTabBarItemIconViewProvider:([original isKindOfClass:[NSNull class]] ? nil : original) atIndex:index];
+        }
+        [originalProviders removeObjectForKey:viewController];
+        [installedProviders removeObjectForKey:viewController];
+    }
+
+    // [EN] The theme's icons. [CN] 主题图标。
+    __weak __typeof(self) weakSelf = self;
+    for (UIViewController *viewController in themeIcons.keyEnumerator.allObjects) {
+        if (![originalProviders objectForKey:viewController]) {
+            [originalProviders setObject:([providers objectForKey:viewController] ?: [NSNull null]) forKey:viewController];
+        }
+        NSDictionary *tabIcon = [themeIcons objectForKey:viewController];
+        __weak UIViewController *weakViewController = viewController;
+        CYLLoadTabBarItemIcon(tabIcon[@"icon"], ^(UIImage *image) {
+            void (^show)(UIImage *) = ^(UIImage *selectedImage) {
+                __strong __typeof(weakSelf) self = weakSelf;
+                UIViewController *strongViewController = weakViewController;
+                // [EN] Dropped when another theme came in between, or the tab is gone. [CN] 期间切换了其他主题或 Tab 已不存在时丢弃。
+                if (!self || !strongViewController || !image ||
+                    [objc_getAssociatedObject(self, &CYLThemeIconGenerationKey) unsignedIntegerValue] != generation) {
+                    return;
+                }
+                NSUInteger index = [self.viewControllers indexOfObject:strongViewController];
+                NSValue *sizeValue = tabIcon[@"size"];
+                CGSize size = sizeValue ? sizeValue.CGSizeValue : CGSizeZero;
+                if (index == NSNotFound || ![self setTabBarItemIcon:image selectedIcon:selectedImage size:size atIndex:index]) {
+                    return;
+                }
+                id installed = [[self cyl_tabBarItemIconViewProviders] objectForKey:strongViewController];
+                NSMapTable *installedMap = objc_getAssociatedObject(self, &CYLThemeInstalledIconViewProvidersKey);
+                if (installed) {
+                    [installedMap setObject:installed forKey:strongViewController];
+                }
+            };
+            id selectedIcon = tabIcon[@"selectedIcon"];
+            if (!selectedIcon || [selectedIcon isEqual:tabIcon[@"icon"]]) {
+                show(nil);
+            } else {
+                CYLLoadTabBarItemIcon(selectedIcon, show);
+            }
+        });
     }
 }
 

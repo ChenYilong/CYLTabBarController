@@ -450,6 +450,49 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
     [self presentViewController:picker animated:YES completion:nil];
 }
 
+/// [EN] The actions of the theme menu, built when it opens. [CN] 主题菜单的各项，在菜单打开时生成。
+static NSArray<UIMenuElement *> *CYLDemoThemeMenuElements(void (^_Nullable completion)(void)) API_AVAILABLE(ios(14.0));
+static NSArray<UIMenuElement *> *CYLDemoThemeMenuElements(void (^_Nullable completion)(void)) {
+    NSMutableArray<UIMenuElement *> *themeActions = [NSMutableArray array];
+    NSString *currentIdentifier = CYLDemoCurrentTheme().identifier;
+    for (CYLDemoTheme *theme in CYLDemoThemes()) {
+        UIImage *image = [theme previewIcon] ?: CYLDemoColorSwatch(theme.tintColor ?: [UIColor lightGrayColor]);
+        UIAction *action = [UIAction actionWithTitle:[theme localizedName] image:image identifier:nil handler:^(__kindof UIAction *menuAction) {
+            CYLDemoApplyTheme(theme);
+            if (completion) {
+                completion();
+            }
+        }];
+        action.state = [theme.identifier isEqualToString:currentIdentifier] ? UIMenuElementStateOn : UIMenuElementStateOff;
+        [themeActions addObject:action];
+    }
+    BOOL followsSystem = CYLDemoFollowsSystem();
+    UIAction *followAction = [UIAction actionWithTitle:CYLLocalizedString(@"跟随系统深色模式") image:[UIImage systemImageNamed:@"circle.lefthalf.filled"] identifier:nil handler:^(__kindof UIAction *menuAction) {
+        CYLDemoSetFollowsSystem(!followsSystem);
+        if (completion) {
+            completion();
+        }
+    }];
+    followAction.state = followsSystem ? UIMenuElementStateOn : UIMenuElementStateOff;
+    return @[ [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:themeActions],
+              [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[ followAction ]] ];
+}
+
+- (UIMenu *)cyl_themeMenuWithCompletion:(nullable void (^)(void))completion {
+    [UIViewController cyl_setUpThemeSettings];
+    NSArray<UIMenuElement *> *children = nil;
+    if (@available(iOS 15.0, *)) {
+        // [EN] Built again every time it opens, so the checkmark follows the current theme.
+        // [CN] 每次打开时重新生成，勾号随当前主题变化。
+        children = @[ [UIDeferredMenuElement elementWithUncachedProvider:^(void (^provide)(NSArray<UIMenuElement *> *)) {
+            provide(CYLDemoThemeMenuElements(completion));
+        }] ];
+    } else {
+        children = CYLDemoThemeMenuElements(completion);
+    }
+    return [UIMenu menuWithTitle:CYLLocalizedString(@"选择主题") children:children];
+}
+
 @end
 
 NS_ASSUME_NONNULL_END
