@@ -153,7 +153,11 @@ static UIImage *CYLDemoFadedImage(UIImage *image) {
         return nil;
     }
     NSMutableArray<NSDictionary<NSString *, id> *> *itemsAttributes = [NSMutableArray array];
-    NSUInteger count = tabBarController.tabBarItemsAttributes.count;
+    // [EN] One entry per tab, none for the plus button's slot (`tabBarItemsAttributes` has an entry for it on Liquid Glass
+    //      and FlatDesign), as `-updateTabBarItemsWithAttributes:` takes them.
+    // [CN] 每个 Tab 一项，PlusButton 的 slot 不占项（液态玻璃与扁平样式的 `tabBarItemsAttributes` 中有它的一项），与
+    //      `-updateTabBarItemsWithAttributes:` 接受的结构一致。
+    NSUInteger count = tabBarController.cyl_viewControllersIgnoringPlusButton.count;
     for (NSUInteger index = 0; index < count; index++) {
         UIImage *selectedImage = [self iconNamed:self.iconNames[index % self.iconNames.count]];
         if (!selectedImage) {
