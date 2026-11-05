@@ -6,7 +6,7 @@
 #      (https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Plus-Child-Theme-Switching-Test.md).
 #      On a Mac with Xcode and CocoaPods: builds the Objective-C demo and launches it once per scenario "A>B" with
 #      -CYLDemoThemeIdentifier A -CYLDemoSelectIndex $SELECT_INDEX (default 2, the plus child view controller, selected
-#      2 s after launch) -CYLDemoThemeSwitchTo B -CYLDemoThemeSwitchDelay 14. The demo checks the plus button's stand-in
+#      2 s after launch) -CYLDemoThemeSwitchTo B (the steps run as a chain, each timed from the previous one). The demo checks the plus button's stand-in
 #      in the Liquid Glass selected layer 3 s after the selection ("before") and 3 s after the switch ("after") and logs
 #      "plus child theme test: PASS|FAIL|SKIP ..."; the script also saves a screenshot right after each check (before,
 #      after) in build/plus-child-theme-test/. Exits 1 on any FAIL, on a run that never logged "done", and, with
@@ -17,7 +17,7 @@
 #      （https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Plus-Child-Theme-Switching-Test.md）。
 #      需要装有 Xcode 与 CocoaPods 的 Mac：编译 Objective-C Demo，每个场景 “A>B” 启动一次，参数为 -CYLDemoThemeIdentifier A
 #      -CYLDemoSelectIndex $SELECT_INDEX（默认 2，即 PlusButton 子控制器，启动 2 秒后选中）-CYLDemoThemeSwitchTo B
-#      -CYLDemoThemeSwitchDelay 14。Demo 在选中 3 秒后（“before”）与切换 3 秒后（“after”）检查液态玻璃选中图层中的 PlusButton 替身，
+#      （各步骤按链式执行，每一步从上一步开始计时）。Demo 在选中 3 秒后（“before”）与切换 3 秒后（“after”）检查液态玻璃选中图层中的 PlusButton 替身，
 #      输出 "plus child theme test: PASS|FAIL|SKIP ..."；脚本还会在每次检查之后立即截图（切换前、切换后），保存在
 #      build/plus-child-theme-test/。出现 FAIL、某次运行没有输出 "done"，或设置 REQUIRE_PASS=1（液态玻璃 job）而没有任何 PASS 时，
 #      退出码为 1。STYLE=FlatDesign 使用扁平样式 TabBar，没有替身（SKIP），截图仍会显示 PlusButton。
@@ -116,7 +116,7 @@ for SCENARIO in $SCENARIOS; do
   echo "== $STYLE: $FROM > $TO (tab $SELECT_INDEX)"
   # shellcheck disable=SC2086
   xcrun simctl launch --console-pty --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$FROM" \
-    -CYLDemoSelectIndex "$SELECT_INDEX" -CYLDemoThemeSwitchTo "$TO" -CYLDemoThemeSwitchDelay 14 $STYLE_ARGUMENTS > "$CONSOLE_LOG" 2>&1 &
+    -CYLDemoSelectIndex "$SELECT_INDEX" -CYLDemoThemeSwitchTo "$TO" $STYLE_ARGUMENTS > "$CONSOLE_LOG" 2>&1 &
   LAUNCH_PID=$!
   # [EN] Each screenshot right after the app logged that check: a launch can take seconds, so fixed delays from here
   #      caught the home screen, or the theme before the switch. [CN] 每张截图都在 App 输出对应检查之后立即截取：启动可能需要

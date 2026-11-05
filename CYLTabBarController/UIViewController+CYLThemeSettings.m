@@ -659,49 +659,56 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
         //      `-CYLDemoThemeSwitchDelay <seconds>` delays the switch (default 4).
         // [CN] `-CYLDemoSelectIndex <n>` 在启动 2 秒后选中第 n 个 Tab，与点击相同（例如 2：PlusButton 子控制器，用于检查换肤前后液态玻璃
         //      选中图层中的 PlusButton 是否保持清晰）。`-CYLDemoThemeSwitchDelay <秒>` 推迟切换（默认 4）。
+        NSString *switchIdentifier = [defaults stringForKey:@"CYLDemoThemeSwitchTo"];
+        double switchDelay = [defaults objectForKey:@"CYLDemoThemeSwitchDelay"] ? [defaults doubleForKey:@"CYLDemoThemeSwitchDelay"] : 4;
+        void (^switchTheme)(void) = ^{
+            for (CYLDemoTheme *theme in CYLDemoThemes()) {
+                if ([theme.identifier isEqualToString:switchIdentifier]) {
+                    CYLDemoApplyTheme(theme);
+                    break;
+                }
+            }
+        };
         if ([defaults objectForKey:@"CYLDemoSelectIndex"]) {
+            // [EN] The plus child theme test, as a chain: each step is scheduled from the moment the previous one ran, not
+            //      from launch. On a busy simulator the main thread can be blocked for seconds at launch; timers counted
+            //      from launch then fired together, so the "before" check and the switch ran back to back and the "before"
+            //      screenshot showed the new theme. Select tab n (2 s) → "before" check (3 s later; it hides the real plus
+            //      button 3 s after the check for 2 s) → switch (6 s after the check) → "after" check (3 s later) → "done"
+            //      (6 s after it). `-CYLDemoThemeSwitchDelay` is not used here.
+            // [CN] PlusButton 子控制器换肤测试，按链式执行：每一步都从上一步实际执行的时刻开始计时，而不是从启动开始。模拟器繁忙时主线程在启动阶段
+            //      可能被阻塞数秒；从启动开始计时的定时器会一起触发，导致 “before” 检查与切换紧挨着执行，“before” 截图已经是新主题。选中第 n 个
+            //      Tab（2 秒）→ “before” 检查（3 秒后；检查 3 秒后隐藏真实的 PlusButton 2 秒）→ 切换（检查 6 秒后）→ “after” 检查（3 秒后）→
+            //      “done”（其后 6 秒）。这里不使用 `-CYLDemoThemeSwitchDelay`。
             NSInteger selectIndex = [defaults integerForKey:@"CYLDemoSelectIndex"];
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            CYLDemoTestLog(@"plus child theme test: launch theme=%@", manager.currentThemeIdentifier);
+            void (^after)(dispatch_time_t, dispatch_block_t) = ^(dispatch_time_t delay, dispatch_block_t block) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)delay), dispatch_get_main_queue(), block);
+            };
+            after(2 * NSEC_PER_SEC, ^{
                 CYLTabBarController *tabBarController = [CYLTabBarController cyl_activeTabBarController];
                 if (selectIndex >= 0 && (NSUInteger)selectIndex < tabBarController.viewControllers.count) {
                     tabBarController.selectedIndex = (NSUInteger)selectIndex;
                 }
-            });
-        }
-        NSString *switchIdentifier = [defaults stringForKey:@"CYLDemoThemeSwitchTo"];
-        double switchDelay = [defaults objectForKey:@"CYLDemoThemeSwitchDelay"] ? [defaults doubleForKey:@"CYLDemoThemeSwitchDelay"] : 4;
-        // [EN] With a selected tab, check the plus button's stand-in 3 s after the selection ("before") and 3 s after the
-        //      switch ("after"), then log "done" (scripts/plus-child-theme-test.sh waits for it).
-        // [CN] 选中了 Tab 时，在选中 3 秒后（“before”）与切换 3 秒后（“after”）检查 PlusButton 替身，然后输出 "done"
-        //      （scripts/plus-child-theme-test.sh 等待该行）。
-        BOOL checksPlusChild = ([defaults objectForKey:@"CYLDemoSelectIndex"] != nil);
-        if (checksPlusChild) {
-            CYLDemoTestLog(@"plus child theme test: launch theme=%@", manager.currentThemeIdentifier);
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                CYLDemoCheckPlusChildStandIn(@"before");
-                if (switchIdentifier.length == 0) {
-                    CYLDemoTestLog(@"plus child theme test: done");
-                }
-            });
-        }
-        if (switchIdentifier.length > 0) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(switchDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                for (CYLDemoTheme *theme in CYLDemoThemes()) {
-                    if ([theme.identifier isEqualToString:switchIdentifier]) {
-                        CYLDemoApplyTheme(theme);
-                        break;
-                    }
-                }
-                if (checksPlusChild) {
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                        CYLDemoCheckPlusChildStandIn(@"after");
-                        // [EN] After the "stand-in only" screenshot. [CN] 在 "stand-in only" 截图之后。
-                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                after(3 * NSEC_PER_SEC, ^{
+                    CYLDemoCheckPlusChildStandIn(@"before");
+                    after(6 * NSEC_PER_SEC, ^{
+                        if (switchIdentifier.length == 0) {
                             CYLDemoTestLog(@"plus child theme test: done");
+                            return;
+                        }
+                        switchTheme();
+                        after(3 * NSEC_PER_SEC, ^{
+                            CYLDemoCheckPlusChildStandIn(@"after");
+                            after(6 * NSEC_PER_SEC, ^{
+                                CYLDemoTestLog(@"plus child theme test: done");
+                            });
                         });
                     });
-                }
+                });
             });
+        } else if (switchIdentifier.length > 0) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(switchDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), switchTheme);
         }
     });
 }
