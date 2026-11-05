@@ -30,6 +30,7 @@
 | [TabBar 主题：CYLTabBarTheme](#cntabbar-主题cyltabbartheme) | [Tab bar themes: CYLTabBarTheme](#entab-bar-themes-cyltabbartheme) |
 | [跟随系统深色模式](#cn跟随系统深色模式) | [Following the system Dark Mode](#enfollowing-the-system-dark-mode) |
 | [视图与颜色](#cn视图与颜色) | [Views and colors](#enviews-and-colors) |
+| [图片、模糊效果与 layer 颜色](#cn图片模糊效果与-layer-颜色) | [Images, blur effects and layer colors](#enimages-blur-effects-and-layer-colors) |
 | [代码组织](#cn代码组织) | [Code layout](#encode-layout) |
 | [演示](#cn演示) | [Demo](#endemo) |
 | [图标来源与许可](#cn图标来源与许可) | [Icon source and license](#enicon-source-and-license) |
@@ -76,6 +77,24 @@ FOUNDATION_EXTERN NSNotificationName const CYLThemeDidChangeNotification;
 + (UIColor *)cyl_colorWithName:(nullable NSString *)name themeProvider:(CYLThemeColorProvider)provider;
 + (UIColor *)cyl_colorWithThemeManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeColorProvider)provider;
 + (UIColor *)cyl_colorWithName:(nullable NSString *)name themeManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeColorProvider)provider;
+
+// CYLUtils/CYLComponents/CYLTheme/UIImage+CYLTheme.h — images that follow the theme (image views, buttons, bar appearances)
++ (UIImage *)cyl_imageWithThemeProvider:(CYLThemeImageProvider)provider;
++ (UIImage *)cyl_imageWithName:(nullable NSString *)name themeProvider:(CYLThemeImageProvider)provider;
++ (UIImage *)cyl_imageWithThemeManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeImageProvider)provider;
+@property (nonatomic, assign, readonly) BOOL cyl_isThemeImage;
+@property (nonatomic, strong, readonly) UIImage *cyl_rawImage;
+
+// CYLUtils/CYLComponents/CYLTheme/UIVisualEffect+CYLTheme.h — blur / vibrancy effects that follow the theme
++ (UIVisualEffect *)cyl_effectWithThemeProvider:(CYLThemeEffectProvider)provider;
++ (UIVisualEffect *)cyl_effectWithThemeManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeEffectProvider)provider;
+@property (nonatomic, assign, readonly) BOOL cyl_isThemeEffect;
+@property (nonatomic, strong, readonly) UIVisualEffect *cyl_rawEffect;
+
+// CYLUtils/CYLComponents/CYLTheme/CALayer+CYLTheme.h — layer CGColors that follow the theme
+- (void)cyl_setThemeColor:(nullable UIColor *)color forKey:(NSString *)key;   // backgroundColor, borderColor, shadowColor, fillColor...
+- (nullable UIColor *)cyl_themeColorForKey:(NSString *)key;
+- (void)cyl_updateThemeColors;
 
 // CYLUtils/CYLComponents/CYLTheme/UIView+CYLTheme.h and UIViewController+CYLTheme.h
 - (void)cyl_registerThemeColorProperties:(NSArray<NSString *> *)getters;      // UIView
@@ -231,6 +250,42 @@ self.cardView.cyl_themeDidChangeBlock = ^{
 };
 ```
 
+## [CN]图片、模糊效果与 layer 颜色
+## [EN]Images, blur effects and layer colors
+
+| 中文 | English |
+|:---|:---|
+| 除颜色外，图片、模糊效果与 layer 的 `CGColor` 同样可以跟随主题，依然不 hook 任何 UIKit 方法。三者的用法相同：用 provider 创建一个值，像普通值一样赋给视图；主题切换时，本库在回调中把它换成新主题的值。 | Besides colors, images, blur effects and a layer's `CGColor` follow the theme too, still without hooking any UIKit method. All three work the same way: make a value with a provider, assign it like any plain value; on a theme change the library swaps it for the new theme's value in the callback. |
+
+```objc
+// [EN] An image: UIImageView.image / highlightedImage, every state of a UIButton, and the background / shadow image of a
+//      UITabBarAppearance, UINavigationBarAppearance or UIToolbarAppearance follow. A real UIImage: the asset catalog's
+//      Dark Mode variant, the rendering mode and the symbol configuration are kept.
+// [CN] 图片：UIImageView.image / highlightedImage、UIButton 各状态、以及 UITabBarAppearance / UINavigationBarAppearance /
+//      UIToolbarAppearance 的背景与阴影图片都会跟随。它是真正的 UIImage：保留 Asset Catalog 的深色变体、渲染模式与 SF Symbol 配置。
+imageView.image = [UIImage cyl_imageWithThemeProvider:^UIImage *(CYLThemeManager *manager, id identifier, id theme) {
+    return [UIImage imageNamed:[identifier isEqual:@"Christmas"] ? @"logo_christmas" : @"logo"];
+}];
+
+// [EN] A blur effect: UIVisualEffectView.effect and the backgroundEffect of a bar appearance follow.
+// [CN] 模糊效果：UIVisualEffectView.effect 与 Bar appearance 的 backgroundEffect 会跟随。
+effectView.effect = [UIVisualEffect cyl_effectWithThemeProvider:^UIVisualEffect *(CYLThemeManager *manager, id identifier, id theme) {
+    return [UIBlurEffect effectWithStyle:[identifier isEqual:@"Dark"] ? UIBlurEffectStyleDark : UIBlurEffectStyleLight];
+}];
+
+// [EN] A layer color: instead of `layer.borderColor = color.CGColor` (a fixed value), give the layer the UIColor. It gets
+//      its CGColor now, on every theme change, and on iOS 17+ when Dark Mode changes.
+// [CN] layer 颜色：不要写 `layer.borderColor = color.CGColor`（固定值），而是把 UIColor 交给 layer。它会立即得到 CGColor，
+//      并在每次主题切换、以及 iOS 17+ 深色模式变化时重新得到。
+[view.layer cyl_setThemeColor:borderColor forKey:@"borderColor"];
+[shapeLayer cyl_setThemeColor:fillColor forKey:@"fillColor"];
+```
+
+| 中文 | English |
+|:---|:---|
+| 不在 window 中的视图也会更新：已加载但未显示的页面（未选中的 Tab、导航栈下层）由其控制器遍历；注册过属性、设置过 layer 颜色、或上次切换时持有主题图片 / 效果的视图会被（弱引用）记住，管理器在遍历 window 后再遍历它们；一次切换中多处到达的视图只更新一次。 | Views out of every window update too: a loaded page that is not shown (an unselected tab, a page below the top of a navigation stack) is walked by its view controller; a view that registered properties, set a layer color, or held a theme image / effect on a previous change is remembered (weakly) and walked by the manager after the windows; a view reached several times in one change is updated once. |
+| 自定义视图中非视图属性里的图片（`UIButtonConfiguration.image`、`NSTextAttachment.image`、`UITabBarItem.image`）仍需在 `cyl_themeDidChangeBlock` 中重设；TabBar 图标请用 `CYLTabBarTheme`。各项能力的评分与差距见 [docs/Theme-Switching-Evaluation.md](Theme-Switching-Evaluation.md)。 | Images that are not view properties (`UIButtonConfiguration.image`, `NSTextAttachment.image`, `UITabBarItem.image`) still need `cyl_themeDidChangeBlock`; for tab bar icons use `CYLTabBarTheme`. The scores and gaps of every capability are in [docs/Theme-Switching-Evaluation.md](Theme-Switching-Evaluation.md). |
+
 ## [CN]代码组织
 ## [EN]Code layout
 
@@ -293,10 +348,10 @@ CYLTabBarController/CYLUtils/
 
 | 中文 | English |
 |:---|:---|
-| 没有 hook 任何 UIKit 方法（避免与其他库冲突）：只有主题切换时位于 window 上的视图会收到回调；之后才加入 window 的视图在绘制时读取主题颜色，与其他动态颜色相同。 | No UIKit method is swizzled (so it cannot clash with other libraries): only the views in a window when the theme changes get the callback; a view added later reads its theme colors when it is drawn, as any dynamic color. |
+| 没有 hook 任何 UIKit 方法（避免与其他库冲突）：主题切换时，可见 window 上的视图、已加载控制器的视图、以及被记住的视图（见上文）会收到回调；从未进入视图树也未注册的视图在绘制时读取主题颜色（动态颜色），其中的主题图片要到它第一次收到回调时才更新。 | No UIKit method is swizzled (so it cannot clash with other libraries): on a theme change the views in a visible window, the views of loaded view controllers and the remembered views (see above) get the callback; a view never in a view tree and never registered reads its theme colors when drawn (dynamic colors), and a theme image in it updates when it first gets the callback. |
 | iOS 13 以前没有动态颜色：主题颜色为创建时所在主题的值，已注册的属性在主题切换时更新；`UITabBarAppearance` 不存在，TabBar 颜色请在 `-cyl_customizeTabBarController:` 中设置。 | Before iOS 13 there are no dynamic colors: a theme color has the value of the theme current when it was made, and registered properties update on a theme change; there is no `UITabBarAppearance`, so set the tab bar colors in `-cyl_customizeTabBarController:`. |
-| 不提供“动态图片”：`UITabBarItem.selectedImage` 只保存图片的静态副本，动态图片会在切换后失效，选中图标会显示错误的图片。因此 TabBar 图标通过 `-cyl_tabBarItemsAttributesForTabBarController:` 在每次切换时重新设置。 | There are no "dynamic images": `UITabBarItem.selectedImage` keeps only a static copy of an image, so a dynamic image stops following the theme and a selected icon can show the wrong image. Tab bar icons are therefore set again on every switch through `-cyl_tabBarItemsAttributesForTabBarController:`. |
-| layer 的 `CGColor` 不会跟随主题，请在回调中重新设置。 | A layer's `CGColor` does not follow the theme: set it again in the callback. |
+| 主题图片不是“动态图片”（`UIImage` 子类）：`UITabBarItem.selectedImage` 等只保存静态副本的位置不会跟随，TabBar 图标因此通过 `-cyl_tabBarItemsAttributesForTabBarController:` 在每次切换时重新设置；图片视图、按钮与 Bar appearance 中的主题图片由回调替换。 | A theme image is not a "dynamic image" (a `UIImage` subclass): places that keep only a static copy, such as `UITabBarItem.selectedImage`, do not follow, so tab bar icons are set again on every switch through `-cyl_tabBarItemsAttributesForTabBarController:`; theme images in image views, buttons and bar appearances are replaced by the callback. |
+| `layer.borderColor = color.CGColor` 这样直接写入的 `CGColor` 不会跟随主题：请改用 `-[CALayer cyl_setThemeColor:forKey:]`，或在回调中重新设置。 | A `CGColor` written directly, `layer.borderColor = color.CGColor`, does not follow the theme: use `-[CALayer cyl_setThemeColor:forKey:]` instead, or set it again in the callback. |
 | 恢复图标时只会恢复主题修改过的 key；主题请提供与 App 自身 `tabBarItemsAttributes` 相同的 key。 | Restoring icons restores the keys a theme changed; give a theme the same keys as the app's own `tabBarItemsAttributes`. |
 
 ## [CN]测试与截图

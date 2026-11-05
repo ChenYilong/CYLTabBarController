@@ -61,6 +61,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBarItem-Gestures.md
 //   - Selected title: a different title on the selected tab (like JD's "Refresh") / 选中标题：选中的 Tab 显示不同文字（如京东「刷新」）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBarItem-Selected-Title.md
+//   - Theme switching evaluation: integration with the animation components, gaps and improvements / 换肤实现评估：与动画组件的集成、差距与改进
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching-Evaluation.md
 //   - Theme switching (skins) / 换肤（主题切换）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching.md
 //   - Update Tabs in Place: Titles, Icons, Network Icons and Pages / 原地更新 Tab：标题、图标、网络图标与替换页面

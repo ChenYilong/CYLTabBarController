@@ -155,3 +155,143 @@
 }
 
 @end
+
+#pragma mark - Theme images, effects and layer colors (QMUI gap)
+
+/// [EN] Two 1 × 1 images that tell themselves apart by their tint. [CN] 两张以 tint 区分的 1 × 1 图片。
+static UIImage *CYLTestImage(UIColor *color) {
+    return [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(1, 1)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [color setFill];
+        UIRectFill(CGRectMake(0, 0, 1, 1));
+    }];
+}
+
+@interface CYLThemeValueTests : XCTestCase
+@property (nonatomic, strong) CYLThemeManager *manager;
+@property (nonatomic, strong) UIImage *dayImage;
+@property (nonatomic, strong) UIImage *nightImage;
+@end
+
+@implementation CYLThemeValueTests
+
+- (void)setUp {
+    [super setUp];
+    self.manager = [CYLThemeManagerCenter themeManagerWithName:@"CYLThemeValueTests"];
+    for (NSObject<NSCopying> *identifier in [self.manager.themeIdentifiers copy]) {
+        [self.manager removeThemeIdentifier:identifier];
+    }
+    [self.manager addThemeIdentifier:@"day" theme:@"day"];
+    [self.manager addThemeIdentifier:@"night" theme:@"night"];
+    self.manager.currentThemeIdentifier = @"day";
+    self.dayImage = CYLTestImage(UIColor.whiteColor);
+    self.nightImage = CYLTestImage(UIColor.blackColor);
+}
+
+- (UIImage *)themeImage {
+    __weak typeof(self) weakSelf = self;
+    return [UIImage cyl_imageWithThemeManagerName:@"CYLThemeValueTests" provider:^UIImage *(CYLThemeManager *manager, NSObject<NSCopying> *identifier, NSObject *theme) {
+        return [identifier isEqual:@"night"] ? weakSelf.nightImage : weakSelf.dayImage;
+    }];
+}
+
+- (UIVisualEffect *)themeEffect {
+    return [UIVisualEffect cyl_effectWithThemeManagerName:@"CYLThemeValueTests" provider:^UIVisualEffect *(CYLThemeManager *manager, NSObject<NSCopying> *identifier, NSObject *theme) {
+        return [UIBlurEffect effectWithStyle:[identifier isEqual:@"night"] ? UIBlurEffectStyleDark : UIBlurEffectStyleLight];
+    }];
+}
+
+- (UIColor *)themeColor {
+    return [UIColor cyl_colorWithThemeManagerName:@"CYLThemeValueTests" provider:^UIColor *(CYLThemeManager *manager, NSObject<NSCopying> *identifier, NSObject *theme) {
+        return [identifier isEqual:@"night"] ? UIColor.blackColor : UIColor.whiteColor;
+    }];
+}
+
+- (void)testThemeImageIsANewObjectThatKeepsTheProviderImageContent {
+    UIImage *image = [self themeImage];
+    XCTAssertTrue(image.cyl_isThemeImage);
+    XCTAssertNotEqual(image, self.dayImage, @"the provider's (shared) image must not carry the theme info");
+    XCTAssertFalse(self.dayImage.cyl_isThemeImage);
+    XCTAssertEqual(image.cyl_rawImage, self.dayImage);
+    XCTAssertTrue(CGSizeEqualToSize(image.size, self.dayImage.size));
+    self.manager.currentThemeIdentifier = @"night";
+    XCTAssertEqual(image.cyl_rawImage, self.nightImage, @"the raw image follows the current theme");
+}
+
+- (void)testImageViewAndButtonGetTheImageOfTheNewTheme {
+    UIImageView *imageView = [[UIImageView alloc] init];
+    imageView.image = [self themeImage];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button setImage:[self themeImage] forState:UIControlStateNormal];
+    [button setBackgroundImage:[self themeImage] forState:UIControlStateSelected];
+    UIImage *plainImage = CYLTestImage(UIColor.redColor);
+    [button setImage:plainImage forState:UIControlStateDisabled];
+    UIView *container = [[UIView alloc] init];
+    [container addSubview:imageView];
+    [container addSubview:button];
+    [container cyl_themeDidChangeByManager:self.manager identifier:@"day" theme:@"day"];
+    self.manager.currentThemeIdentifier = @"night";
+    // [EN] Not in a window: reached as a tracked view (found on the first change) or here by hand. [CN] 不在 window 中：作为记住的视图到达，或在此手动调用。
+    [container cyl_themeDidChangeByManager:self.manager identifier:@"night" theme:@"night"];
+    XCTAssertEqual(imageView.image.cyl_rawImage, self.nightImage);
+    XCTAssertTrue(imageView.image.cyl_isThemeImage, @"still a theme image after the change");
+    XCTAssertEqual([button imageForState:UIControlStateNormal].cyl_rawImage, self.nightImage);
+    XCTAssertEqual([button backgroundImageForState:UIControlStateSelected].cyl_rawImage, self.nightImage);
+    XCTAssertEqual([button imageForState:UIControlStateDisabled], plainImage, @"a plain image is left alone");
+    XCTAssertEqual([button imageForState:UIControlStateHighlighted].cyl_rawImage, self.nightImage, @"a state without its own image follows normal");
+}
+
+- (void)testThemeEffectFollowsTheThemeInAnEffectView {
+    UIVisualEffect *effect = [self themeEffect];
+    XCTAssertTrue(effect.cyl_isThemeEffect);
+    XCTAssertTrue([effect isKindOfClass:[UIBlurEffect class]], @"a real blur effect, usable anywhere a UIBlurEffect is");
+    UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
+    self.manager.currentThemeIdentifier = @"night";
+    [effectView cyl_themeDidChangeByManager:self.manager identifier:@"night" theme:@"night"];
+    XCTAssertNotEqual(effectView.effect, effect, @"a new effect object, so the view redraws");
+    XCTAssertTrue(effectView.effect.cyl_isThemeEffect);
+    UIBlurEffect *darkEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+    XCTAssertEqualObjects([NSKeyedArchiver archivedDataWithRootObject:effectView.effect requiringSecureCoding:YES error:nil],
+                          [NSKeyedArchiver archivedDataWithRootObject:darkEffect requiringSecureCoding:YES error:nil]);
+}
+
+- (void)testLayerColorFollowsTheThemeWithoutHooks {
+    UIView *view = [[UIView alloc] init];
+    [view.layer cyl_setThemeColor:[self themeColor] forKey:@"borderColor"];
+    CAShapeLayer *shape = [CAShapeLayer layer];
+    [view.layer addSublayer:shape];
+    [shape cyl_setThemeColor:[self themeColor] forKey:@"fillColor"];
+    XCTAssertTrue(CGColorEqualToColor(view.layer.borderColor, UIColor.whiteColor.CGColor));
+    self.manager.currentThemeIdentifier = @"night";
+    [view cyl_themeDidChangeByManager:self.manager identifier:@"night" theme:@"night"];
+    XCTAssertTrue(CGColorEqualToColor(view.layer.borderColor, UIColor.blackColor.CGColor), @"the layer's CGColor is set again");
+    XCTAssertTrue(CGColorEqualToColor(shape.fillColor, UIColor.blackColor.CGColor), @"and its own sublayers' too");
+    [view.layer cyl_setThemeColor:nil forKey:@"borderColor"];
+    XCTAssertNil([view.layer cyl_themeColorForKey:@"borderColor"]);
+    XCTAssertEqual(view.layer.borderColor, NULL);
+}
+
+- (void)testAViewOutOfEveryWindowIsStillReachedByAThemeChange {
+    UIImageView *imageView = [[UIImageView alloc] init];
+    imageView.image = [self themeImage];
+    [imageView cyl_registerThemeColorProperties:@[ @"tintColor" ]];
+    imageView.tintColor = [self themeColor];
+    // [EN] Registering tracked the view: the manager reaches it although it is in no window. [CN] 注册后视图被记住：虽不在 window 中，管理器仍能到达。
+    self.manager.currentThemeIdentifier = @"night";
+    XCTAssertEqual(imageView.image.cyl_rawImage, self.nightImage);
+    XCTAssertEqualObjects(imageView.tintColor.cyl_rawColor, UIColor.blackColor);
+}
+
+- (void)testBarAppearanceImagesAndEffectsFollowTheTheme {
+    UITabBar *tabBar = [[UITabBar alloc] init];
+    UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
+    appearance.backgroundImage = [self themeImage];
+    appearance.backgroundEffect = (UIBlurEffect *)[self themeEffect];
+    tabBar.standardAppearance = appearance;
+    self.manager.currentThemeIdentifier = @"night";
+    [tabBar cyl_themeDidChangeByManager:self.manager identifier:@"night" theme:@"night"];
+    XCTAssertEqual(tabBar.standardAppearance.backgroundImage.cyl_rawImage, self.nightImage);
+    XCTAssertTrue(tabBar.standardAppearance.backgroundEffect.cyl_isThemeEffect);
+    XCTAssertNotEqual(tabBar.standardAppearance.backgroundEffect, appearance.backgroundEffect);
+}
+
+@end

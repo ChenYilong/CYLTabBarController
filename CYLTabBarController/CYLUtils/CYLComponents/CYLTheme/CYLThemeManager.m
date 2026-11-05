@@ -217,6 +217,8 @@ static NSArray<UIWindow *> *CYLThemeApplicationWindows(void) {
     [[NSNotificationCenter defaultCenter] postNotificationName:CYLThemeDidChangeNotification object:self];
     NSObject<NSCopying> *identifier = self.currentThemeIdentifier;
     NSObject *theme = self.currentTheme;
+    // [EN] Numbered, so a view reached several times below is updated once. [CN] 编号，使下面多次到达的视图只更新一次。
+    CYLThemeBeginChange();
     for (UIWindow *window in CYLThemeApplicationWindows()) {
         if (window.hidden || window.alpha <= 0.01 || !window.rootViewController) {
             continue;
@@ -226,6 +228,13 @@ static NSArray<UIWindow *> *CYLThemeApplicationWindows(void) {
         // [CN] 某些 present 方式下一个 window 上有多个控制器的视图：遍历整个 window。
         [window cyl_themeDidChangeByManager:self identifier:identifier theme:theme enumeratesSubviews:YES];
     }
+    // [EN] Views holding theme values that are in no visible window and no view controller reached them (e.g. a view
+    //      removed to be added again later): those remembered on a previous change or when their values were set.
+    // [CN] 持有主题值、但不在可见 window 中、也没有被控制器到达的视图（例如暂时移除、之后再添加的视图）：在之前的切换中或设置其值时记住的视图。
+    for (UIView *view in CYLThemeTrackedViews()) {
+        [view cyl_themeDidChangeByManager:self identifier:identifier theme:theme enumeratesSubviews:YES];
+    }
+    CYLThemeEndChange();
 }
 
 @end

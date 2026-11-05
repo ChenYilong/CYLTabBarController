@@ -17,5 +17,8 @@
 #import "CYLThemeManager.h"
 #import "CYLThemeManagerCenter.h"
 #import "UIColor+CYLTheme.h"
+#import "UIImage+CYLTheme.h"
+#import "UIVisualEffect+CYLTheme.h"
+#import "CALayer+CYLTheme.h"
 #import "UIView+CYLTheme.h"
 #import "UIViewController+CYLTheme.h"

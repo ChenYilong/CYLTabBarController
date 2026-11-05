@@ -10,6 +10,8 @@
 // [CN] 与此类绑定的文档：
 //   - The shared tab icon animation subspec: CYLTabBarItemAnimation (protocol-oriented, open to any library) / Tab 图标动画共用子库：CYLTabBarItemAnimation（面向协议，可扩展任意动画库）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Item-Animation.md
+//   - Theme switching evaluation: integration with the animation components, gaps and improvements / 换肤实现评估：与动画组件的集成、差距与改进
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching-Evaluation.md
 // docs-binding:end
 
 #import <Foundation/Foundation.h>
