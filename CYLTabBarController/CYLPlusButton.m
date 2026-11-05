@@ -172,6 +172,11 @@ static const void *CYLPlusButtonTitleStyleKey = &CYLPlusButtonTitleStyleKey;
 /// [EN] The title font the app gave the plus button, before the tab titles' font was applied.
 /// [CN] 应用 Tab 标题字体之前，App 为 PlusButton 设置的标题字体。
 static const void *CYLPlusButtonOriginalTitleFontKey = &CYLPlusButtonOriginalTitleFontKey;
+/// [EN] The tab titles' center line, in the plus button, while its title stays in the button and is aligned with them.
+/// [CN] 标题留在按钮中并与 Tab 标题对齐时，Tab 标题的中心线（PlusButton 坐标系）。
+static const void *CYLPlusButtonAlignedTitleCenterYKey = &CYLPlusButtonAlignedTitleCenterYKey;
+/// [EN] Between the image and the title it sits above. [CN] 图片与其下方标题之间的间距。
+static const CGFloat CYLPlusButtonImageToTitleSpacing = 2;
 
 // [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
 // [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
@@ -956,6 +961,16 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     [itemTitleLabel.superview layoutIfNeeded];
     // Different hierarchies: convert the item title's center into the coordinate space the title label is laid out in.
     CGPoint itemTitleCenter = [itemTitleLabel.superview convertPoint:itemTitleLabel.center toView:titleLabel.superview];
+    // [EN] Recorded for the layout of `+cyl_plusButtonWithImage:…` (`-cyl_getImageFrame:titleFrame:`), which puts its
+    //      image above this line; a new line lays the button out again, once.
+    // [CN] 供 `+cyl_plusButtonWithImage:…` 的布局（`-cyl_getImageFrame:titleFrame:`）使用，图片放在这条线上方；线变化时重新布局一次。
+    if (titleLabel.superview == self) {
+        NSNumber *recorded = objc_getAssociatedObject(self, CYLPlusButtonAlignedTitleCenterYKey);
+        if (recorded == nil || fabs(recorded.doubleValue - itemTitleCenter.y) >= 0.5) {
+            objc_setAssociatedObject(self, CYLPlusButtonAlignedTitleCenterYKey, @(itemTitleCenter.y), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            [self setNeedsLayout];
+        }
+    }
     CGPoint titleCenter = titleLabel.center;
     if (fabs(titleCenter.y - itemTitleCenter.y) < 0.5) {
         return;
@@ -1232,9 +1247,19 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
         imageSize = CGSizeMake(imageWidth, imageHeight);
     }
     CGPoint imageCenter = CGPointMake(width * 0.5, verticalMargin + imageHeight * 0.5);
+    CGFloat titleCenterY = imageHeight + verticalMargin * 2 + lineHeight * 0.5 + 10;
+    // [EN] Title aligned with the tab titles and kept in the button (FlatDesign, the classic tab bar): the title on their
+    //      line and the image right above it, like a tab icon. Centered on the button instead, a 60 pt image covered
+    //      its own title.
+    // [CN] 标题与 Tab 标题对齐且留在按钮中时（扁平样式、经典 TabBar）：标题位于其中心线上，图片紧挨在标题上方，与 Tab 图标一致。若图片居中于按钮，
+    //      60 pt 的图片会盖住自己的标题。
+    NSNumber *alignedTitleCenterY = objc_getAssociatedObject(self, CYLPlusButtonAlignedTitleCenterYKey);
+    if (alignedTitleCenterY != nil && ![self cyl_showsTitleInTabBarItem]) {
+        titleCenterY = alignedTitleCenterY.doubleValue;
+        imageCenter.y = titleCenterY - lineHeight * 0.5 - CYLPlusButtonImageToTitleSpacing - imageSize.height * 0.5;
+    }
     *imageFrame = CGRectMake(imageCenter.x - imageSize.width * 0.5, imageCenter.y - imageSize.height * 0.5,
                              imageSize.width, imageSize.height);
-    CGFloat titleCenterY = imageHeight + verticalMargin * 2 + lineHeight * 0.5 + 10;
     *titleFrame = CGRectMake(0, titleCenterY - lineHeight * 0.5, width, lineHeight);
 }
 
