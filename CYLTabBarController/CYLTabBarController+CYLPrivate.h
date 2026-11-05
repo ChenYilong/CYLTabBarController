@@ -43,6 +43,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_syncTabBarAppearances;
 @end
 
+/// [EN] Implemented in CYLTabBarController.m (tab bar customization toolkit). [CN] 实现见 CYLTabBarController.m（TabBar 自定义工具集）。
+@interface CYLTabBarController (CYLTabBarToolkitPrivate)
+/// [EN] CYLTabBarItemStyle: writes the stored item styles into the tab bar. [CN] CYLTabBarItemStyle：把保存的 item 样式写入 TabBar。
+- (void)cyl_applyTabBarItemStyles;
+/// [EN] CYLOpaqueTabBarSafeArea: keeps the page's bottom clear of an opaque tab bar. [CN] CYLOpaqueTabBarSafeArea：避免不透明 TabBar 遮挡页面底部。
+- (void)cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded;
+@end
+
 // [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
 // [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
 @interface CYLTabBarController (CYLTabButtonHighlight)

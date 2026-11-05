@@ -1024,6 +1024,7 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
     [self cyl_updateTabBarMinimizeTracking];
     // Issue #601: tab buttons created again (e.g. after a rotation) get their icon views again.
     [self cyl_setNeedsUpdateTabBarItemIconViews];
+    [self cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         // FIX: issue #585, #543 (follow-up to #93, #392)
         // [EN] The forced `-layoutSubviews` below is an iOS 10 workaround: #93 (iOS 10.0–10.2) and #392 (iOS 10.3.x, items
@@ -1163,9 +1164,50 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
 
+/*!
+ * [EN] The view controller that decides the orientation now: one presented by this controller (not while it is being
+ *      dismissed, and never a `UIAlertController`, which asks its presenting view controller back and would loop), else
+ *      nil (the selected tab decides, below). The system's full screen video player (`AVFullScreenViewController`) is
+ *      presented too, so a video can turn to landscape in a portrait app.
+ * [CN] 当前决定方向的控制器：由本控制器 present 出的控制器（正在 dismiss 时除外，且不包括 `UIAlertController`：它会反过来询问
+ *      presenting 控制器，造成循环），否则为 nil（由选中的 Tab 决定，见下方）。系统的全屏视频播放器（`AVFullScreenViewController`）
+ *      同样是 present 出来的，因此竖屏 App 中的视频也能横屏。
+ */
+- (nullable UIViewController *)cyl_presentedViewControllerForOrientation {
+    UIViewController *presentedViewController = self.presentedViewController;
+    if (!presentedViewController || presentedViewController.isBeingDismissed ||
+        presentedViewController.presentingViewController != self ||
+        [presentedViewController isKindOfClass:[UIAlertController class]]) {
+        return nil;
+    }
+    return presentedViewController;
+}
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+/// [EN] Asks the presented view controller, else the selected tab (the top of its navigation stack).
+/// [CN] 询问 present 出的控制器，否则询问选中的 Tab（其导航栈的栈顶）。
+- (BOOL)shouldAutorotate {
+    UIViewController *presentedViewController = [self cyl_presentedViewControllerForOrientation];
+    if (presentedViewController) {
+        return presentedViewController.shouldAutorotate;
+    }
+    UIViewController *controller = self.selectedViewController;
+    if ([controller isKindOfClass:[UINavigationController class]]) {
+        controller = ((UINavigationController *)controller).topViewController;
+    }
+    return controller ? controller.shouldAutorotate : YES;
+}
+#pragma clang diagnostic pop
+
 /// [CN] 控制器支持方向
 /// [EN] Orientations supported by the view controller
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    UIViewController *presentedViewController = [self cyl_presentedViewControllerForOrientation];
+    if (presentedViewController) {
+        return presentedViewController.supportedInterfaceOrientations;
+    }
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         UIViewController *controller = self.selectedViewController;
         if ([controller isKindOfClass:[UINavigationController class]]) {
@@ -5535,6 +5577,11 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     return childViewController;
 }
 
+/// [EN] The selected tab decides which edges defer the system gestures. [CN] 由选中的 Tab 决定哪些边缘延迟系统手势。
+- (nullable UIViewController *)childViewControllerForScreenEdgesDeferringSystemGestures {
+    return self.selectedViewController;
+}
+
 - (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {
     UIViewController *childViewController = self.childViewControllerForStatusBarStyle;
 
@@ -6496,6 +6543,246 @@ static char CYLThemeLaunchThemeAppliedKey;
     if ([tabBarTheme respondsToSelector:@selector(cyl_customizeTabBarController:)]) {
         [tabBarTheme cyl_customizeTabBarController:self];
     }
+}
+
+@end
+
+#pragma mark - Item styles in one place
+
+/// [EN] The styles set through `CYLTabBarController (CYLTabBarItemStyle)`, by key. [CN] 通过 `CYLTabBarController (CYLTabBarItemStyle)` 设置的样式。
+static char CYLTabBarItemStylesKey;
+static NSString *const CYLStyleTitleFont = @"titleFont";
+static NSString *const CYLStyleSelectedTitleFont = @"selectedTitleFont";
+static NSString *const CYLStyleTitleColor = @"titleColor";
+static NSString *const CYLStyleSelectedTitleColor = @"selectedTitleColor";
+static NSString *const CYLStyleImageColor = @"imageColor";
+static NSString *const CYLStyleSelectedImageColor = @"selectedImageColor";
+static NSString *const CYLStyleBackgroundColor = @"backgroundColor";
+static NSString *const CYLStyleShadowColor = @"shadowColor";
+
+/// [EN] `attributes` with `value` for `key`, when there is a value. [CN] 有值时，将 `attributes` 中 `key` 设为 `value`。
+static NSDictionary<NSAttributedStringKey, id> *CYLAttributesSettingValue(NSDictionary<NSAttributedStringKey, id> *_Nullable attributes, NSAttributedStringKey key, id _Nullable value) {
+    NSMutableDictionary<NSAttributedStringKey, id> *result = [attributes mutableCopy] ?: [NSMutableDictionary dictionary];
+    if (value) {
+        result[key] = value;
+    }
+    return [result copy];
+}
+
+@implementation CYLTabBarController (CYLTabBarItemStyle)
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        [self cyl_didInitialize];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    if (self = [super initWithCoder:coder]) {
+        [self cyl_didInitialize];
+    }
+    return self;
+}
+
+- (void)cyl_didInitialize {
+    // [EN] For subclasses. [CN] 供子类重写。
+}
+
+- (NSMutableDictionary<NSString *, id> *)cyl_tabBarItemStyles {
+    NSMutableDictionary<NSString *, id> *styles = objc_getAssociatedObject(self, &CYLTabBarItemStylesKey);
+    if (!styles) {
+        styles = [NSMutableDictionary dictionary];
+        objc_setAssociatedObject(self, &CYLTabBarItemStylesKey, styles, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return styles;
+}
+
+- (void)cyl_setTabBarItemStyle:(nullable id)value forKey:(NSString *)key {
+    [self cyl_tabBarItemStyles][key] = value;
+    [self cyl_applyTabBarItemStyles];
+}
+
+- (nullable UIFont *)cyl_tabBarItemTitleFont { return [self cyl_tabBarItemStyles][CYLStyleTitleFont]; }
+- (void)setCyl_tabBarItemTitleFont:(nullable UIFont *)font { [self cyl_setTabBarItemStyle:font forKey:CYLStyleTitleFont]; }
+- (nullable UIFont *)cyl_tabBarItemSelectedTitleFont { return [self cyl_tabBarItemStyles][CYLStyleSelectedTitleFont]; }
+- (void)setCyl_tabBarItemSelectedTitleFont:(nullable UIFont *)font { [self cyl_setTabBarItemStyle:font forKey:CYLStyleSelectedTitleFont]; }
+- (nullable UIColor *)cyl_tabBarItemTitleColor { return [self cyl_tabBarItemStyles][CYLStyleTitleColor]; }
+- (void)setCyl_tabBarItemTitleColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleTitleColor]; }
+- (nullable UIColor *)cyl_tabBarItemSelectedTitleColor { return [self cyl_tabBarItemStyles][CYLStyleSelectedTitleColor]; }
+- (void)setCyl_tabBarItemSelectedTitleColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleSelectedTitleColor]; }
+- (nullable UIColor *)cyl_tabBarItemImageColor { return [self cyl_tabBarItemStyles][CYLStyleImageColor]; }
+- (void)setCyl_tabBarItemImageColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleImageColor]; }
+- (nullable UIColor *)cyl_tabBarItemSelectedImageColor { return [self cyl_tabBarItemStyles][CYLStyleSelectedImageColor]; }
+- (void)setCyl_tabBarItemSelectedImageColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleSelectedImageColor]; }
+- (nullable UIColor *)cyl_tabBarBackgroundColor { return [self cyl_tabBarItemStyles][CYLStyleBackgroundColor]; }
+- (void)setCyl_tabBarBackgroundColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleBackgroundColor]; }
+- (nullable UIColor *)cyl_tabBarShadowColor { return [self cyl_tabBarItemStyles][CYLStyleShadowColor]; }
+- (void)setCyl_tabBarShadowColor:(nullable UIColor *)color { [self cyl_setTabBarItemStyle:color forKey:CYLStyleShadowColor]; }
+
+/*!
+ * [EN] Writes the stored styles into the tab bar: the appearances on iOS 13+, the classic styles before.
+ * [CN] 把保存的样式写入 TabBar：iOS 13+ 写入 appearance，之前使用经典样式。
+ */
+- (void)cyl_applyTabBarItemStyles {
+    NSDictionary<NSString *, id> *styles = [[self cyl_tabBarItemStyles] copy];
+    if (styles.count == 0) {
+        return;
+    }
+    UIFont *titleFont = styles[CYLStyleTitleFont];
+    UIFont *selectedTitleFont = styles[CYLStyleSelectedTitleFont] ?: titleFont;
+    UIColor *titleColor = styles[CYLStyleTitleColor];
+    UIColor *selectedTitleColor = styles[CYLStyleSelectedTitleColor];
+    UIColor *imageColor = styles[CYLStyleImageColor];
+    UIColor *selectedImageColor = styles[CYLStyleSelectedImageColor];
+    UIColor *backgroundColor = styles[CYLStyleBackgroundColor];
+    UIColor *shadowColor = styles[CYLStyleShadowColor];
+    UITabBar *tabBar = self.tabBar;
+    if (@available(iOS 13.0, *)) {
+        void (^apply)(UITabBarAppearance *) = ^(UITabBarAppearance *appearance) {
+            if (backgroundColor) {
+                appearance.backgroundColor = backgroundColor;
+            }
+            if (shadowColor) {
+                appearance.shadowColor = shadowColor;
+            }
+            [appearance cyl_applyItemAppearanceWithBlock:^(UITabBarItemAppearance *itemAppearance) {
+                NSDictionary *normalAttributes = CYLAttributesSettingValue(itemAppearance.normal.titleTextAttributes, NSFontAttributeName, titleFont);
+                itemAppearance.normal.titleTextAttributes = CYLAttributesSettingValue(normalAttributes, NSForegroundColorAttributeName, titleColor);
+                NSDictionary *selectedAttributes = CYLAttributesSettingValue(itemAppearance.selected.titleTextAttributes, NSFontAttributeName, selectedTitleFont);
+                itemAppearance.selected.titleTextAttributes = CYLAttributesSettingValue(selectedAttributes, NSForegroundColorAttributeName, selectedTitleColor);
+                if (imageColor) {
+                    itemAppearance.normal.iconColor = imageColor;
+                }
+                if (selectedImageColor) {
+                    itemAppearance.selected.iconColor = selectedImageColor;
+                }
+            }];
+        };
+        UITabBarAppearance *standardAppearance = [tabBar.standardAppearance copy];
+        apply(standardAppearance);
+        tabBar.standardAppearance = standardAppearance;
+        if (@available(iOS 15.0, *)) {
+            if (tabBar.scrollEdgeAppearance) {
+                UITabBarAppearance *scrollEdgeAppearance = [tabBar.scrollEdgeAppearance copy];
+                apply(scrollEdgeAppearance);
+                tabBar.scrollEdgeAppearance = scrollEdgeAppearance;
+            }
+        }
+        [self cyl_syncTabBarAppearances];
+        return;
+    }
+    for (UIViewController *viewController in self.viewControllers) {
+        UITabBarItem *item = viewController.tabBarItem;
+        NSDictionary *normalAttributes = CYLAttributesSettingValue([item titleTextAttributesForState:UIControlStateNormal], NSFontAttributeName, titleFont);
+        [item setTitleTextAttributes:CYLAttributesSettingValue(normalAttributes, NSForegroundColorAttributeName, titleColor) forState:UIControlStateNormal];
+        NSDictionary *selectedAttributes = CYLAttributesSettingValue([item titleTextAttributesForState:UIControlStateSelected], NSFontAttributeName, selectedTitleFont);
+        [item setTitleTextAttributes:CYLAttributesSettingValue(selectedAttributes, NSForegroundColorAttributeName, selectedTitleColor) forState:UIControlStateSelected];
+    }
+    if (imageColor) {
+        tabBar.unselectedItemTintColor = imageColor;
+    }
+    if (selectedImageColor) {
+        tabBar.tintColor = selectedImageColor;
+    }
+    if (backgroundColor) {
+        tabBar.barTintColor = backgroundColor;
+    }
+    if (shadowColor) {
+        CGFloat lineHeight = 1.0 / UIScreen.mainScreen.scale;
+        tabBar.shadowImage = [UIImage cyl_imageWithColor:shadowColor size:CGSizeMake(1, lineHeight)];
+    }
+}
+
+@end
+
+#pragma mark - Opaque tab bar safe area
+
+/// [EN] The bottom this library added to a page's `additionalSafeAreaInsets`. [CN] 本库为页面 `additionalSafeAreaInsets` 增加的底部值。
+static char CYLOpaqueTabBarAddedBottomKey;
+/// [EN] The page's safe area bottom when the library last wrote its inset. [CN] 本库上次写入时页面安全区域的底部值。
+static char CYLOpaqueTabBarSafeBottomAtWriteKey;
+static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
+
+@implementation CYLTabBarController (CYLOpaqueTabBarSafeArea)
+
+- (BOOL)cyl_fixesOpaqueTabBarSafeAreaInsets {
+    NSNumber *value = objc_getAssociatedObject(self, &CYLFixesOpaqueTabBarSafeAreaInsetsKey);
+    return value ? value.boolValue : YES;
+}
+
+- (void)setCyl_fixesOpaqueTabBarSafeAreaInsets:(BOOL)fixes {
+    objc_setAssociatedObject(self, &CYLFixesOpaqueTabBarSafeAreaInsetsKey, @(fixes), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded];
+}
+
+/*!
+ * [EN] UIKit bug: a page that extends under an opaque tab bar (`tabBar.translucent = NO` with
+ *      `extendedLayoutIncludesOpaqueBars = YES`; before iOS 13.4 also a translucent bar) gets a bottom safe area that
+ *      leaves the tab bar out, so the end of its scroll view stays under the bar. The page now shown in the selected tab
+ *      gets the missing part in its `additionalSafeAreaInsets.bottom`, on top of the app's own value, which is kept. Self
+ *      correcting: when UIKit gets it right the missing part is 0 and nothing changes, and a part added before is taken
+ *      back when the page is no longer affected. Only the page itself, never its child view controllers. Not FlatDesign,
+ *      which sets the safe area itself.
+ * [CN] UIKit bug：延伸到不透明 TabBar 下方的页面（`tabBar.translucent = NO` 且 `extendedLayoutIncludesOpaqueBars = YES`；iOS 13.4 以前
+ *      半透明 TabBar 也有此问题）得到的底部安全区域没有包含 TabBar，滚动视图的末尾因此被 TabBar 遮挡。选中 Tab 当前显示的页面会在其
+ *      `additionalSafeAreaInsets.bottom` 中补上缺少的部分，App 自己设置的值保留不变。可自我修正：UIKit 计算正确时缺少的部分为 0，不做任何修改；
+ *      页面不再受影响时撤回之前补上的部分。只作用于页面本身，不作用于其子控制器。扁平样式自行设置安全区域，不做处理。
+ */
+- (void)cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded {
+    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType || !self.isViewLoaded || !self.view.window) {
+        return;
+    }
+    UIViewController *selectedViewController = self.selectedViewController;
+    UINavigationController *navigationController = [selectedViewController isKindOfClass:[UINavigationController class]] ? (UINavigationController *)selectedViewController : nil;
+    UIViewController *page = navigationController ? navigationController.topViewController : selectedViewController;
+    if (!page || !page.isViewLoaded || !page.view.window) {
+        return;
+    }
+    UITabBar *tabBar = self.tabBar;
+    BOOL barIsAffected = !tabBar.translucent;
+    if (@available(iOS 13.4, *)) {
+    } else {
+        barIsAffected = YES;
+    }
+    BOOL pageHidesTabBar = NO;
+    for (UIViewController *viewController in navigationController.viewControllers) {
+        if (viewController.hidesBottomBarWhenPushed && viewController != navigationController.viewControllers.firstObject) {
+            pageHidesTabBar = YES;
+        }
+        if (viewController == page) {
+            break;
+        }
+    }
+    BOOL affected = self.cyl_fixesOpaqueTabBarSafeAreaInsets && barIsAffected && page.extendedLayoutIncludesOpaqueBars &&
+                    (page.edgesForExtendedLayout & UIRectEdgeBottom) && !pageHidesTabBar &&
+                    !tabBar.hidden && tabBar.alpha > 0.01 && tabBar.window;
+    CGFloat addedBottom = [objc_getAssociatedObject(page, &CYLOpaqueTabBarAddedBottomKey) doubleValue];
+    UIEdgeInsets additionalInsets = page.additionalSafeAreaInsets;
+    // [EN] Written, but the page has not been laid out with it yet: its safe area is stale, which would add the part again.
+    // [CN] 已写入，但页面尚未据此重新布局：此时的安全区域是旧值，会把缺少的部分再加一次。
+    NSNumber *safeBottomAtWrite = objc_getAssociatedObject(page, &CYLOpaqueTabBarSafeBottomAtWriteKey);
+    if (safeBottomAtWrite && fabs(page.view.safeAreaInsets.bottom - safeBottomAtWrite.doubleValue) < 0.5 && addedBottom > 0) {
+        return;
+    }
+    CGFloat appBottom = additionalInsets.bottom - addedBottom;
+    CGFloat neededBottom = 0;
+    if (affected) {
+        CGRect pageRect = [page.view convertRect:page.view.bounds toView:self.view];
+        CGRect barRect = [tabBar convertRect:tabBar.bounds toView:self.view];
+        CGFloat coveredBottom = MAX(CGRectGetMaxY(pageRect) - CGRectGetMinY(barRect), 0);
+        // [EN] What UIKit gives without any additional inset. [CN] 不含任何 additional inset 时 UIKit 给出的值。
+        CGFloat systemBottom = page.view.safeAreaInsets.bottom - additionalInsets.bottom;
+        neededBottom = MAX(coveredBottom - systemBottom - appBottom, 0);
+    }
+    if (fabs(neededBottom - addedBottom) < 0.5) {
+        return;
+    }
+    CGFloat safeBottomBeforeWrite = page.view.safeAreaInsets.bottom;
+    additionalInsets.bottom = appBottom + neededBottom;
+    page.additionalSafeAreaInsets = additionalInsets;
+    objc_setAssociatedObject(page, &CYLOpaqueTabBarAddedBottomKey, neededBottom > 0 ? @(neededBottom) : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(page, &CYLOpaqueTabBarSafeBottomAtWriteKey, neededBottom > 0 ? @(safeBottomBeforeWrite) : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

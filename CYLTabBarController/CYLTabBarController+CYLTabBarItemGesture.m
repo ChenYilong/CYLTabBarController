@@ -136,6 +136,32 @@ static char CYLTabBarItemGestureStateKey;
 }
 
 /*!
+ * [EN] Taps are recognized for the gesture receivers above, and also for a tab item's `-[UITabBarItem cyl_doubleTapBlock]`.
+ *      The long press keeps `-cyl_hasTabBarItemGestureReceiver`, so its recognizer is added only when someone listens.
+ * [CN] 除上面的手势接收方外，Tab item 的 `-[UITabBarItem cyl_doubleTapBlock]` 也需要识别点击。长按仍使用
+ *      `-cyl_hasTabBarItemGestureReceiver`，因此只有存在接收方时才添加长按手势。
+ */
+- (BOOL)cyl_hasTabBarItemTapReceiver {
+    if ([self cyl_hasTabBarItemGestureReceiver]) {
+        return YES;
+    }
+    for (UIViewController *viewController in self.viewControllers) {
+        if ([self cyl_doubleTapBlockForViewController:viewController]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// [EN] The double tap block of a tab: its item's, else its root view controller's item's. [CN] Tab 的双击 block：其 item 的，否则为根控制器 item 的。
+- (nullable void (^)(UITabBarItem *, NSInteger))cyl_doubleTapBlockForViewController:(nullable UIViewController *)viewController {
+    if (!viewController) {
+        return nil;
+    }
+    return viewController.tabBarItem.cyl_doubleTapBlock ?: [viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem.cyl_doubleTapBlock;
+}
+
+/*!
  * [EN] YES when `control` is one of this controller's tab buttons, or its plus button; `viewController` is then the tab's
  *      view controller (the plus child view controller for the plus button, nil without one).
  * [CN] `control` 为本控制器的 Tab 按钮或 PlusButton 时返回 YES；此时 `viewController` 为对应 Tab 的控制器（PlusButton 为其子控制器，
@@ -181,10 +207,18 @@ static char CYLTabBarItemGestureStateKey;
     if ([delegate respondsToSelector:@selector(tabBarController:didRecognizeTabBarItemGesture:control:viewController:)]) {
         [delegate tabBarController:self didRecognizeTabBarItemGesture:gesture control:control viewController:viewController];
     }
+    // [EN] The tab's own double tap block, after the handler and the delegate. [CN] Tab 自己的双击 block，在 handler 与代理之后。
+    if (CYLTabBarItemGestureDoubleTap == gesture) {
+        void (^doubleTapBlock)(UITabBarItem *, NSInteger) = [self cyl_doubleTapBlockForViewController:viewController];
+        NSUInteger index = viewController ? [self.viewControllers indexOfObject:viewController] : NSNotFound;
+        if (doubleTapBlock && index != NSNotFound) {
+            doubleTapBlock(viewController.tabBarItem, (NSInteger)index);
+        }
+    }
 }
 
 - (void)cyl_recognizeTabBarItemGestureForReportedControl:(UIControl *)control {
-    if (![self cyl_hasTabBarItemGestureReceiver]) {
+    if (![self cyl_hasTabBarItemTapReceiver]) {
         return;
     }
     // [EN] A CYLPlusButton counts its own taps (`-cyl_recognizePlusButtonTap:…`), tab buttons count before the selection
@@ -234,7 +268,7 @@ static char CYLTabBarItemGestureStateKey;
  *      TabBarController（代理是其他对象，或子类重写时未调用 super）也仍使用上报。
  */
 - (void)cyl_recognizeTabBarItemTapWillSelectViewController:(UIViewController *)viewController {
-    if (![self cyl_hasTabBarItemGestureReceiver] || !viewController || viewController.cyl_isPlaceholder) {
+    if (![self cyl_hasTabBarItemTapReceiver] || !viewController || viewController.cyl_isPlaceholder) {
         return;
     }
     UIControl *control = nil;
@@ -294,7 +328,7 @@ static char CYLTabBarItemGestureStateKey;
  *      时，即使系统在按下时已选中它，也算 Reselect。此后与 shouldSelect 入口一样，Tab 按钮不再使用 `didSelectControl` 上报计数。
  */
 - (void)cyl_recognizeLiquidGlassTapOnControl:(UIControl *)control selectedViewControllerAtTouchDown:(UIViewController *)selectedViewController {
-    if (![self cyl_hasTabBarItemGestureReceiver]) {
+    if (![self cyl_hasTabBarItemTapReceiver]) {
         return;
     }
     UIViewController *viewController = nil;
@@ -308,7 +342,7 @@ static char CYLTabBarItemGestureStateKey;
 
 - (void)cyl_recognizePlusButtonTap:(UIControl *)plusButton selectedViewControllerAtTouchDown:(UIViewController *)selectedViewController {
     // Guard: only with a plus button. 仅在有 PlusButton 时处理。
-    if (![self cyl_hasTabBarItemGestureReceiver] || ![self hasPlusButton]) {
+    if (![self cyl_hasTabBarItemTapReceiver] || ![self hasPlusButton]) {
         return;
     }
     UIViewController *viewController = nil;

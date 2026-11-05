@@ -392,6 +392,7 @@ typedef NS_ENUM(NSInteger, CYLDemoRowKind) {
     CYLDemoRowKindTabBarDemo, ///< [EN] A tab bar demo row of this demo. [CN] 本 Demo 的 TabBar 演示行。
     CYLDemoRowKindTheme,      ///< [EN] A skin of the skin list (issue #216). [CN] 皮肤列表中的一个皮肤（issue #216）。
     CYLDemoRowKindScrollHideSimulation, ///< [EN] A scroll hiding simulation (issue #13). [CN] 一个滚动隐藏模拟（issue #13）。
+    CYLDemoRowKindScrollHideSimulationToggle, ///< [EN] The row that expands / collapses the simulations. [CN] 展开 / 收起模拟列表的行。
 };
 
 /*!
@@ -407,6 +408,7 @@ typedef NS_ENUM(NSInteger, CYLDemoRowKind) {
 + (instancetype)tabBarDemoRow:(CYLTabBarDemoRow)index;
 + (instancetype)themeRow:(NSInteger)index;
 + (instancetype)scrollHideSimulationRow:(NSInteger)index;
++ (instancetype)scrollHideSimulationToggleRow;
 @end
 
 @implementation CYLDemoRow
@@ -434,9 +436,74 @@ typedef NS_ENUM(NSInteger, CYLDemoRowKind) {
     return [self rowWithIndex:index kind:CYLDemoRowKindScrollHideSimulation];
 }
 
++ (instancetype)scrollHideSimulationToggleRow {
+    return [self rowWithIndex:0 kind:CYLDemoRowKindScrollHideSimulationToggle];
+}
+
 @end
 
+/// [EN] Key of the associated object that remembers whether the simulation list is expanded.
+/// [CN] 关联对象的 key，记录模拟列表是否展开。
+/// [EN] The settings row that lists the scroll hiding simulations in an action sheet (issue #13).
+/// [CN] 用操作表列出滚动隐藏模拟的设置行（issue #13）。
+static const NSInteger CYLScrollHideSimulationMenuSettingsRow = 21;
+static const void *const CYLScrollHideSimulationListExpandedKey = &CYLScrollHideSimulationListExpandedKey;
+
 @implementation UIViewController (CYLDemoSections)
+
+/// [EN] Whether the scroll hiding simulation list is expanded (collapsed by default). [CN] 滚动隐藏模拟列表是否展开（默认收起）。
+- (BOOL)cyl_isScrollHideSimulationListExpanded {
+    return [objc_getAssociatedObject(self, CYLScrollHideSimulationListExpandedKey) boolValue];
+}
+
+- (void)cyl_setScrollHideSimulationListExpanded:(BOOL)expanded {
+    objc_setAssociatedObject(self, CYLScrollHideSimulationListExpandedKey, @(expanded), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+/// [EN] The row that expands / collapses the simulation list. [CN] 展开 / 收起模拟列表的行。
+- (UITableViewCell *)cyl_scrollHideSimulationToggleCellForTableView:(UITableView *)tableView {
+    static NSString *const identifier = @"CYLScrollHideSimulationToggleCell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+        cell.textLabel.numberOfLines = 0;
+        cell.textLabel.textColor = tableView.tintColor ?: [UIColor systemBlueColor];
+    }
+    BOOL expanded = [self cyl_isScrollHideSimulationListExpanded];
+    cell.textLabel.text = expanded
+        ? CYLLocalizedString(@"收起模拟列表")
+        : [NSString stringWithFormat:CYLLocalizedString(@"展开全部 %@ 个模拟"), @([self cyl_scrollHideSimulationRowCount])];
+    if (@available(iOS 13.0, *)) {
+        cell.imageView.image = [UIImage systemImageNamed:expanded ? @"chevron.up" : @"chevron.down"];
+    }
+    return cell;
+}
+
+/// [EN] Expands or collapses the simulation list with a row animation. [CN] 以行动画展开或收起模拟列表。
+- (void)cyl_toggleScrollHideSimulationListAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
+    BOOL expand = ![self cyl_isScrollHideSimulationListExpanded];
+    [self cyl_setScrollHideSimulationListExpanded:expand];
+    if (!tableView.window) {
+        return;
+    }
+    // [EN] The simulation rows follow the toggle row. [CN] 模拟行紧跟在展开 / 收起行之后。
+    NSMutableArray<NSIndexPath *> *indexPaths = [NSMutableArray array];
+    for (NSInteger row = 0; row < [self cyl_scrollHideSimulationRowCount]; row++) {
+        [indexPaths addObject:[NSIndexPath indexPathForRow:indexPath.row + 1 + row inSection:indexPath.section]];
+    }
+    [tableView beginUpdates];
+    if (expand) {
+        [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+    } else {
+        [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+    }
+    [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    [tableView endUpdates];
+    if (!expand) {
+        // [EN] After collapsing, keep the toggle row on screen. [CN] 收起后让展开 / 收起行保持可见。
+        [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
+    }
+}
 
 /*!
  * [EN] The sections: the library's settings groups (`-cyl_settingsGroups`), with this demo's tab bar rows added to the
@@ -451,6 +518,10 @@ typedef NS_ENUM(NSInteger, CYLDemoRowKind) {
         CYLSettingsGroup settingsGroup = (CYLSettingsGroup)group.integerValue;
         NSMutableArray<CYLDemoRow *> *rows = [NSMutableArray array];
         for (NSNumber *row in [self cyl_settingsRowsInGroup:settingsGroup]) {
+            // [EN] Settings row 21 (the simulation menu) heads the simulation section below. [CN] 设置第 21 行（模拟菜单）放在下方模拟 section 的首行。
+            if (row.integerValue == CYLScrollHideSimulationMenuSettingsRow) {
+                continue;
+            }
             [rows addObject:[CYLDemoRow settingsRow:row.integerValue]];
         }
         if (settingsGroup == CYLSettingsGroupTabBarAppearance) {
@@ -465,9 +536,15 @@ typedef NS_ENUM(NSInteger, CYLDemoRowKind) {
         [sections addObject:@{ @"title" : [self cyl_titleForSettingsGroup:settingsGroup], @"rows" : rows }];
         if (settingsGroup == CYLSettingsGroupTabBarAppearance) {
             // [EN] Issue #13: one row per simulated interruption of scroll hiding. [CN] issue #13：每个滚动隐藏的模拟意外情况一行。
-            NSMutableArray<CYLDemoRow *> *simulationRows = [NSMutableArray array];
-            for (NSInteger simulationRow = 0; simulationRow < [self cyl_scrollHideSimulationRowCount]; simulationRow++) {
-                [simulationRows addObject:[CYLDemoRow scrollHideSimulationRow:simulationRow]];
+            // [EN] Settings row 21 (the same simulations in an action sheet) first, then a row that expands / collapses the
+            //      list. The list (almost 40 rows) is collapsed by default, so it does not flood the page.
+            // [CN] 先放设置第 21 行（操作表中的同样模拟），再放一行用于展开 / 收起列表。列表（近 40 行）默认收起，避免占满整个页面。
+            NSMutableArray<CYLDemoRow *> *simulationRows = [NSMutableArray arrayWithObjects:[CYLDemoRow settingsRow:CYLScrollHideSimulationMenuSettingsRow],
+                                                                                            [CYLDemoRow scrollHideSimulationToggleRow], nil];
+            if ([self cyl_isScrollHideSimulationListExpanded]) {
+                for (NSInteger simulationRow = 0; simulationRow < [self cyl_scrollHideSimulationRowCount]; simulationRow++) {
+                    [simulationRows addObject:[CYLDemoRow scrollHideSimulationRow:simulationRow]];
+                }
             }
             [sections addObject:@{ @"title" : CYLLocalizedString(@"滚动隐藏：模拟意外情况（issue #13）"), @"rows" : simulationRows }];
         }
@@ -508,6 +585,8 @@ typedef NS_ENUM(NSInteger, CYLDemoRowKind) {
 - (UITableViewCell *)cyl_demoCellForTableView:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath {
     CYLDemoRow *row = [self cyl_demoRowAtIndexPath:indexPath];
     switch (row.kind) {
+        case CYLDemoRowKindScrollHideSimulationToggle:
+            return [self cyl_scrollHideSimulationToggleCellForTableView:tableView];
         case CYLDemoRowKindTabBarDemo:
             return [self cyl_tabBarDemoCellForTableView:tableView row:row.index];
         case CYLDemoRowKindTheme:
@@ -522,6 +601,10 @@ typedef NS_ENUM(NSInteger, CYLDemoRowKind) {
 - (void)cyl_demoDidSelectRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     CYLDemoRow *row = [self cyl_demoRowAtIndexPath:indexPath];
+    if (row.kind == CYLDemoRowKindScrollHideSimulationToggle) {
+        [self cyl_toggleScrollHideSimulationListAtIndexPath:indexPath inTableView:tableView];
+        return;
+    }
     if (row.kind == CYLDemoRowKindTabBarDemo) {
         [self cyl_didSelectTabBarDemoRow:row.index inTableView:nil];
         return;

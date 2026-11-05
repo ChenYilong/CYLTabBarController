@@ -22,6 +22,7 @@
 /// [CN] FIX: issue #152 — 实现位于 CYLTabBarController.m（`CYLTabBarController (CYLTabBarItemGesture)`）。
 @interface CYLTabBarController (CYLInteractionTabBarItemGesture)
 - (BOOL)cyl_hasTabBarItemGestureReceiver;
+- (BOOL)cyl_hasTabBarItemTapReceiver;
 - (BOOL)cyl_isTabBarItemGestureControl:(UIControl *)control viewController:(UIViewController *__autoreleasing _Nullable *_Nullable)viewController;
 - (void)cyl_reportTabBarItemGesture:(CYLTabBarItemGesture)gesture control:(UIControl *)control viewController:(nullable UIViewController *)viewController;
 - (void)cyl_recognizeLiquidGlassTapOnControl:(UIControl *)control selectedViewControllerAtTouchDown:(nullable UIViewController *)selectedViewController;
@@ -867,7 +868,7 @@ static const void *CYLHighlightedTabControlKey = &CYLHighlightedTabControlKey;
         [self cyl_updateTabButtonHighlightForLiquidGlassGestureRecognizer:gestureRecognizer];
     }
     BOOL handlesLongPress = [self cyl_handlesTabButtonLongPress];
-    BOOL handlesTaps = [self cyl_hasTabBarItemGestureReceiver];
+    BOOL handlesTaps = [self cyl_hasTabBarItemTapReceiver];
     if ((!handlesLongPress && !handlesTaps) || ![self cyl_liquidGlassReceivesTabTouches]) {
         return;
     }
