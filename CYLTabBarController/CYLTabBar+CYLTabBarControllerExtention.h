@@ -156,13 +156,18 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CYLTabBar (CYLTabBarControllerExtention)
 
 
-@property (nonatomic, strong, getter=cyl_selectedControl, setter=cyl_setSelectedControl:) UIControl *cyl_selectedControl;
+/*!
+ * [EN] `null_unspecified`: nil when the tab bar has no tab button yet (it always could be); Swift still sees `UIControl!`,
+ *      so existing Swift code keeps compiling.
+ * [CN] `null_unspecified`：TabBar 还没有 Tab 按钮时为 nil（一直如此）；Swift 中仍为 `UIControl!`，已有的 Swift 代码可继续编译。
+ */
+@property (nonatomic, strong, null_unspecified, getter=cyl_selectedControl, setter=cyl_setSelectedControl:) UIControl *cyl_selectedControl;
 
 /*!
- * [EN] Returns the currently selected control.
- * [CN] 返回当前选中的控件。
+ * [EN] Returns the currently selected control, nil when the tab bar has no tab button yet.
+ * [CN] 返回当前选中的控件；TabBar 还没有 Tab 按钮时为 nil。
  */
-- (UIControl *)cyl_selectedControl;
+- (UIControl * _Null_unspecified)cyl_selectedControl;
 
 /*!
  * [EN] Returns the visible index of the selected control.

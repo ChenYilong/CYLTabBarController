@@ -9,6 +9,7 @@
 #import "CYLLocalization.h"
 #import "UIViewController+CYLMemoryWarning.h"
 #import "UIViewController+CYLTabBarItemUpdate.h"
+#import "UIViewController+CYLThemeSettings.h"
 #import "UITableViewCell+CYLBadgeExtention.h"
 #import "CYLTabBarController.h"
 #import "CYLPlusButton.h"
@@ -40,6 +41,8 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowGestureTiming,             // FIX: issue #535 / #152
     CYLSettingsRowSwitchAdjacentTab,         // FIX: issue #535
     CYLSettingsRowUtilsHelpers,              // FIX: issue #535
+    CYLSettingsRowPlusButtonLateImage,       // a plus button whose image is set later
+    CYLSettingsRowTheme,                // issue #216, see UIViewController+CYLThemeSettings.h
     CYLSettingsRowTabBarItemUpdate,     // then one row per tab item update, see UIViewController+CYLTabBarItemUpdate.h
 };
 
@@ -546,7 +549,7 @@ static char CYLDemoTapAnimationStepKey;
 
 static NSInteger CYLCurrentDemoTapAnimationStep(CYLTabBarController *_Nullable tabBarController) {
     NSNumber *step = tabBarController ? objc_getAssociatedObject(tabBarController, &CYLDemoTapAnimationStepKey) : nil;
-    return step ? step.integerValue : tabBarController.cyl_tabButtonTapAnimationType;
+    return step != nil ? step.integerValue : tabBarController.cyl_tabButtonTapAnimationType;
 }
 
 /// [EN] Frames for `CYLTabButtonFrameAnimation`: dots that grow. [CN] `CYLTabButtonFrameAnimation` 的帧：逐渐变大的圆点。
@@ -694,7 +697,7 @@ static void CYLInteractionDemoSwitchApply(CYLTabBarController *_Nullable tabBarC
         return;
     }
     tabBarController.cyl_didLongPressControlBlock = ^(CYLTabBarController *pressedTabBarController, UIControl *control) {
-        NSString *name = control.cyl_tabBarItemIdentifier ?: NSStringFromClass([control class]);
+        NSString *name = control.cyl_tabBarItemDisplayName;
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:CYLLocalizedString(@"长按了「%@」"), name]
                                                                        message:nil
                                                                 preferredStyle:UIAlertControllerStyleAlert];
@@ -754,7 +757,7 @@ static UITableViewCell *CYLInteractionSwitchCell(UITableView *tableView, CYLTabB
 }
 
 /// [EN] A tap on the row flips its switch. [CN] 点击该行同样会拨动开关。
-static void CYLToggleInteractionSwitch(UITableView *tableView, NSIndexPath *indexPath, CYLTabBarController *_Nullable tabBarController, CYLInteractionDemoSwitchKind kind) {
+static void CYLToggleInteractionSwitch(UITableView *_Nullable tableView, NSIndexPath *indexPath, CYLTabBarController *_Nullable tabBarController, CYLInteractionDemoSwitchKind kind) {
     BOOL on = !CYLInteractionDemoSwitchIsOn(tabBarController, kind);
     CYLInteractionDemoSwitchApply(tabBarController, kind, on);
     UISwitch *demoSwitch = (UISwitch *)[tableView cellForRowAtIndexPath:indexPath].accessoryView;
@@ -802,7 +805,7 @@ static NSString *const CYLOutsideBoundsCellIdentifier = @"CYLOutsideBoundsCell";
         _outsideButton.backgroundColor = [UIColor systemBlueColor];
         _outsideButton.layer.cornerRadius = 6;
         [_outsideButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_outsideButton setTitle:@"Tap" forState:UIControlStateNormal];
+        [_outsideButton setTitle:CYLLocalizedString(@"点我") forState:UIControlStateNormal];
         // [EN] Inside the box (left half) and outside it (right half). [CN] 左半部分在方框内，右半部分在方框外。
         _outsideButton.frame = CGRectMake(40, 8, 80, 28);
         [_outsideButton addTarget:self action:@selector(cyl_outsideButtonTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -923,7 +926,12 @@ static NSString *const CYLNavigationSettingCellIdentifier = @"CYLNavigationSetti
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor whiteColor];
+    // [EN] Follows Dark Mode, like the label's text color. [CN] 与文字颜色一样跟随暗黑模式。
+    if (@available(iOS 13.0, *)) {
+        self.view.backgroundColor = [UIColor systemBackgroundColor];
+    } else {
+        self.view.backgroundColor = [UIColor whiteColor];
+    }
     self.cyl_navigationBarHidden = YES;
     self.cyl_hidesAncestorNavigationBars = YES;
     UILabel *label = [[UILabel alloc] init];
@@ -1084,6 +1092,251 @@ static UITableViewCell *CYLSlideTransitionCell(UITableView *tableView) {
     cell.textLabel.text = CYLLocalizedString(@"滑动转场（CYLTabBarSlideTransitionAnimator）");
     cell.detailTextLabel.text = CYLLocalizedString(@"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。");
     return cell;
+}
+
+#pragma mark - PlusButton image set later
+
+static NSString *const CYLLateImageCellIdentifier = @"CYLLateImageCell";
+/// [EN] The demo's own context, so the app's plus button stays as it is. [CN] 演示专用的 context，App 自己的 PlusButton 保持不变。
+static NSString *const CYLLateImageDemoContext = @"CYLLateImagePlusButtonDemo";
+
+/// [EN] What happens to the plus button's picture 2 seconds after it is created. [CN] PlusButton 创建 2 秒后其图片的变化。
+typedef NS_ENUM(NSInteger, CYLLateImageCase) {
+    CYLLateImageCaseLoaded,            ///< [EN] Empty, then a 44 pt image. [CN] 先为空，再加载 44 pt 图片。
+    CYLLateImageCaseReplaced,          ///< [EN] A 44 pt image, then a 60 pt one. [CN] 先是 44 pt 图片，再替换为 60 pt。
+    CYLLateImageCaseRemoved,           ///< [EN] A 44 pt image, then none: the title comes back. [CN] 先有图片，再移除：标题回到按钮上。
+    CYLLateImageCaseBackgroundLoaded,  ///< [EN] Empty, then a 60 pt background image. [CN] 先为空，再加载 60 pt 背景图片。
+    // [EN] Ready at launch, to compare with: each late case must end like one of these.
+    // [CN] 启动时即已就绪，用于对照：每个之后才加载的场景最终都应与其中之一一致。
+    CYLLateImageCaseReadyImage,        ///< [EN] A 44 pt image at launch. [CN] 启动时即有 44 pt 图片。
+    CYLLateImageCaseReadyLargerImage,  ///< [EN] A 60 pt image at launch. [CN] 启动时即有 60 pt 图片。
+    CYLLateImageCaseReadyBackground,   ///< [EN] A 60 pt background image at launch. [CN] 启动时即有 60 pt 背景图片。
+};
+
+static NSArray<NSString *> *CYLLateImageCaseTitles(void) {
+    return @[ CYLLocalizedString(@"加载图片"), CYLLocalizedString(@"替换为更大的图片"), CYLLocalizedString(@"移除图片"),
+              CYLLocalizedString(@"加载背景图片"), CYLLocalizedString(@"对照：启动时即有图片"),
+              CYLLocalizedString(@"对照：启动时即有更大的图片"), CYLLocalizedString(@"对照：启动时即有背景图片") ];
+}
+
+/// [EN] The case the next demo runs; set right before its plus button is registered. [CN] 下一次演示的场景，注册 PlusButton 之前设置。
+static CYLLateImageCase CYLLateImageDemoCase = CYLLateImageCaseLoaded;
+
+/// [EN] A purple circle with a white plus. [CN] 紫色圆形加白色加号。
+static UIImage *CYLLateImageCircle(CGFloat diameter) {
+    CGSize size = CGSizeMake(diameter, diameter);
+    UIImage *plus = nil;
+    if (@available(iOS 13.0, *)) {
+        UIImageSymbolConfiguration *configuration = [UIImageSymbolConfiguration configurationWithPointSize:diameter * 0.45
+                                                                                                    weight:UIImageSymbolWeightBold];
+        plus = [[UIImage systemImageNamed:@"plus" withConfiguration:configuration] imageWithTintColor:[UIColor whiteColor]];
+    }
+    return [[[UIGraphicsImageRenderer alloc] initWithSize:size] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [[UIColor systemPurpleColor] setFill];
+        [[UIBezierPath bezierPathWithOvalInRect:(CGRect){CGPointZero, size}] fill];
+        [plus drawAtPoint:CGPointMake((size.width - plus.size.width) * 0.5, (size.height - plus.size.height) * 0.5)];
+    }];
+}
+
+/*!
+ * [EN] A plus button whose picture changes 2 seconds after it is created (`CYLLateImageDemoCase`), as when it is loaded
+ *      from the network. Every style must end with the layout a picture set at launch gets: no offset, no squashed
+ *      image, the title in the right place, the badge on the picture. Registered in its own context.
+ * [CN] 创建 2 秒后图片发生变化的 PlusButton（`CYLLateImageDemoCase`），模拟从网络加载。所有样式最终都应与启动时就设置图片的布局一致：不偏移、
+ *      图片不被压扁、标题位置正确、角标位于图片上。注册在自己的 context 中。
+ */
+@interface CYLLateImageDemoPlusButton : CYLPlusButton <CYLPlusButtonSubclassing>
+@end
+
+@implementation CYLLateImageDemoPlusButton
+
++ (id)plusButton {
+    CYLLateImageCase lateCase = CYLLateImageDemoCase;
+    UIImage *image = [[UIImage alloc] init];
+    if (lateCase == CYLLateImageCaseReplaced || lateCase == CYLLateImageCaseRemoved || lateCase == CYLLateImageCaseReadyImage) {
+        image = CYLLateImageCircle(44);
+    } else if (lateCase == CYLLateImageCaseReadyLargerImage) {
+        image = CYLLateImageCircle(60);
+    }
+    CYLLateImageDemoPlusButton *button = [self cyl_plusButtonWithImage:image
+                                                                 title:CYLLocalizedString(@"发布")
+                                                         selectedTitle:nil
+                                                    selectedTitleColor:nil];
+    if (lateCase == CYLLateImageCaseReadyBackground) {
+        [button setBackgroundImage:CYLLateImageCircle(60) forState:UIControlStateNormal];
+        [button sizeToFit];
+    }
+    __weak CYLLateImageDemoPlusButton *weakButton = button;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        CYLLateImageDemoPlusButton *plusButton = weakButton;
+        switch (lateCase) {
+            case CYLLateImageCaseLoaded:
+                [plusButton cyl_updateTitle:nil image:CYLLateImageCircle(44) selectedImage:nil];
+                break;
+            case CYLLateImageCaseReplaced:
+                [plusButton cyl_updateTitle:nil image:CYLLateImageCircle(60) selectedImage:nil];
+                break;
+            case CYLLateImageCaseRemoved:
+                [plusButton setImage:nil forState:UIControlStateNormal];
+                break;
+            case CYLLateImageCaseBackgroundLoaded:
+                [plusButton setBackgroundImage:CYLLateImageCircle(60) forState:UIControlStateNormal];
+                break;
+            case CYLLateImageCaseReadyImage:
+            case CYLLateImageCaseReadyLargerImage:
+            case CYLLateImageCaseReadyBackground:
+                break;
+        }
+    });
+    return button;
+}
+
++ (NSString *)tabBarContext {
+    return CYLLateImageDemoContext;
+}
+
++ (NSUInteger)indexOfPlusButtonInTabBar {
+    return 2;
+}
+
++ (BOOL)alignsTitleWithTabBarItemTitles {
+    return YES;
+}
+
++ (NSString *)tabBarItemIdentifier {
+    return @"plus";
+}
+
++ (UIViewController *)plusChildViewController {
+    UIViewController *page = [[UIViewController alloc] init];
+    page.view.backgroundColor = [UIColor systemPurpleColor];
+    page.title = CYLLocalizedString(@"发布");
+    return page;
+}
+
+@end
+
+/*!
+ * [EN] The tab bar controller the row pushes: four pages and `CYLLateImageDemoPlusButton`, in the style of the app's
+ *      tab bar controller. Its context's plus button is removed when it is popped.
+ * [CN] 点击该行后 push 的 TabBarController：四个页面与 `CYLLateImageDemoPlusButton`，样式与 App 的 TabBarController 相同。被 pop 时
+ *      移除其 context 的 PlusButton。
+ */
+@interface CYLLateImageDemoTabBarController : CYLTabBarController
+@end
+
+@implementation CYLLateImageDemoTabBarController
+
++ (instancetype)demoWithCase:(CYLLateImageCase)lateCase styleType:(CYLTabBarStyleType)styleType {
+    CYLLateImageDemoCase = lateCase;
+    [CYLLateImageDemoPlusButton registerPlusButton];
+    NSArray<UIColor *> *colors = @[ [UIColor systemRedColor], [UIColor systemGreenColor], [UIColor systemBlueColor],
+                                    [UIColor systemOrangeColor] ];
+    NSArray<NSString *> *symbols = @[ @"house", @"heart", @"bell", @"person" ];
+    NSString *caseTitle = CYLLateImageCaseTitles()[lateCase];
+    NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
+    NSMutableArray<NSDictionary *> *attributes = [NSMutableArray array];
+    for (NSUInteger idx = 0; idx < colors.count; idx++) {
+        UIViewController *page = [[UIViewController alloc] init];
+        page.view.backgroundColor = colors[idx];
+        UILabel *label = [[UILabel alloc] init];
+        label.text = lateCase >= CYLLateImageCaseReadyImage ? caseTitle
+                                                            : [NSString stringWithFormat:CYLLocalizedString(@"2 秒后：%@"), caseTitle];
+        label.textColor = [UIColor whiteColor];
+        label.font = [UIFont boldSystemFontOfSize:17];
+        label.translatesAutoresizingMaskIntoConstraints = NO;
+        [page.view addSubview:label];
+        [NSLayoutConstraint activateConstraints:@[
+            [label.centerXAnchor constraintEqualToAnchor:page.view.centerXAnchor],
+            [label.centerYAnchor constraintEqualToAnchor:page.view.centerYAnchor],
+        ]];
+        [viewControllers addObject:page];
+        UIImage *image = nil;
+        if (@available(iOS 13.0, *)) {
+            image = [UIImage systemImageNamed:symbols[idx]];
+        }
+        [attributes addObject:@{
+            CYLTabBarItemTitle : [NSString stringWithFormat:CYLLocalizedString(@"页面 %@"), @(idx + 1)],
+            CYLTabBarItemImage : image ?: [[UIImage alloc] init],
+            CYLTabBarItemSelectedImage : image ?: [[UIImage alloc] init],
+        }];
+    }
+    CYLLateImageDemoTabBarController *tabBarController = [[self alloc] initWithViewControllers:viewControllers
+                                                                       tabBarItemsAttributes:attributes
+                                                                                 imageInsets:UIEdgeInsetsZero
+                                                                     titlePositionAdjustment:UIOffsetZero
+                                                                                   styleType:styleType
+                                                                                     context:CYLLateImageDemoContext];
+    tabBarController.title = caseTitle;
+    tabBarController.hidesBottomBarWhenPushed = YES;
+    return tabBarController;
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    // [EN] A badge, shown before the picture changes: it must end on the picture as with a picture set at launch.
+    // [CN] 在图片变化之前显示角标：最终应与启动时就有图片一样位于图片上。
+    [[CYLPlusButton plusButtonForOwner:self] cyl_showBadgeValue:@"1" animationType:CYLBadgeAnimationTypeNone];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    if (self.isMovingFromParentViewController || self.isBeingDismissed) {
+        [CYLPlusButton removePlusButtonForTabBarContext:CYLLateImageDemoContext];
+    }
+}
+
+@end
+
+static UITableViewCell *CYLLateImageCell(UITableView *tableView) {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLLateImageCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLLateImageCellIdentifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+        cell.detailTextLabel.numberOfLines = 0;
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"photo.badge.arrow.down"];
+        }
+    }
+    cell.textLabel.text = CYLLocalizedString(@"PlusButton 图片之后才加载");
+    cell.detailTextLabel.text = CYLLocalizedString(@"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。");
+    return cell;
+}
+
+/// [EN] Asks for a case, then pushes the demo (or presents it without a navigation controller).
+/// [CN] 选择场景后 push 演示（没有导航控制器时 present）。
+static void CYLShowLateImageDemo(UIViewController *viewController, UITableView *tableView, NSIndexPath *indexPath) {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:CYLLocalizedString(@"PlusButton 图片之后才加载")
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    CYLTabBarStyleType styleType = CYLSettingsTabBarController(viewController).tabBarStyleType;
+    __weak UIViewController *weakViewController = viewController;
+    [CYLLateImageCaseTitles() enumerateObjectsUsingBlock:^(NSString *title, NSUInteger idx, BOOL *stop) {
+        [alert addAction:[UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            UIViewController *presenter = weakViewController;
+            CYLLateImageDemoTabBarController *demo = [CYLLateImageDemoTabBarController demoWithCase:(CYLLateImageCase)idx
+                                                                                          styleType:styleType];
+            if (presenter.navigationController) {
+                [presenter.navigationController pushViewController:demo animated:YES];
+            } else {
+                demo.modalPresentationStyle = UIModalPresentationFullScreen;
+                [presenter presentViewController:demo animated:YES completion:nil];
+            }
+        }]];
+    }];
+    [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil]];
+    // [EN] iPad only: anchored to the row, else the list, else the page (the Swift list runs rows without a table view).
+    //      On iPhone an anchor turns the sheet into a popover (iOS 26), which cut off the last cases.
+    // [CN] 仅 iPad：锚定到该行，没有时到列表，再没有时到页面（Swift 列表执行行操作时不传 tableView）。iPhone 上设置锚点会让操作表
+    //      变成弹出框（iOS 26），最后几个场景被截断。
+    if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        UIView *sourceView = [tableView cellForRowAtIndexPath:indexPath] ?: tableView ?: viewController.view;
+        alert.popoverPresentationController.sourceView = sourceView;
+        alert.popoverPresentationController.sourceRect = sourceView.bounds;
+    }
+    [viewController presentViewController:alert animated:YES completion:nil];
 }
 
 #pragma mark - Tap sound and haptic feedback (issue #535)
@@ -1269,7 +1522,7 @@ static char CYLDemoSwitchAdjacentResultKey;
 - (void)cyl_reload {
     NSNumber *result = self.tabBarController ? objc_getAssociatedObject(self.tabBarController, &CYLDemoSwitchAdjacentResultKey) : nil;
     self.textLabel.text = CYLLocalizedString(@"切换到上一个 / 下一个 Tab（issue #535）");
-    NSString *resultText = result ? (result.boolValue ? @"YES" : @"NO") : @"-";
+    NSString *resultText = result != nil ? (result.boolValue ? @"YES" : @"NO") : @"-";
     self.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@"), resultText];
 }
 
@@ -1474,13 +1727,116 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     if (indexPath.row == CYLSettingsRowTabBarMinimizeBehavior) {
         return CYLTabBarMinimizeCell(tableView, CYLSettingsTabBarController(self));
     }
+    if (indexPath.row == CYLSettingsRowPlusButtonLateImage) {
+        return CYLLateImageCell(tableView);
+    }
+    if (indexPath.row == CYLSettingsRowTheme) {
+        return [self cyl_themeSettingsCellForTableView:tableView];
+    }
     if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdate];
     }
     return [self cyl_languageCellForTableView:tableView];
 }
 
+#pragma mark - Groups
+
+/*!
+ * [EN] The rows of each group, in display order. The tab item update rows follow `CYLSettingsRowTabBarItemUpdate`.
+ * [CN] 每个分组中的行，按显示顺序排列。更新 Tab 的行位于 `CYLSettingsRowTabBarItemUpdate` 之后。
+ */
+- (NSArray<NSNumber *> *)cyl_placedSettingsRowsInGroup:(CYLSettingsGroup)group {
+    NSInteger update = CYLSettingsRowTabBarItemUpdate;
+    switch (group) {
+        case CYLSettingsGroupGeneral:
+            return @[ @(CYLSettingsRowLanguage), @(CYLSettingsRowMemoryWarning) ];
+        case CYLSettingsGroupTabBarAppearance:
+            return @[ @(CYLSettingsRowTitlePositionAdjustment), @(CYLSettingsRowStandardAppearance), @(CYLSettingsRowTheme),
+                      @(CYLSettingsRowTabBarMinimizeBehavior) ];
+        case CYLSettingsGroupTabBarItemUpdate:
+            return @[ @(update + CYLTabBarItemUpdateRowTitle), @(update + CYLTabBarItemUpdateRowIconView),
+                      @(update + CYLTabBarItemUpdateRowNetworkIcon), @(update + CYLTabBarItemUpdateRowAllNetworkIcons),
+                      @(update + CYLTabBarItemUpdateRowAllLocalIcons), @(update + CYLTabBarItemUpdateRowGIFIcon),
+                      @(update + CYLTabBarItemUpdateRowAllTitles) ];
+        case CYLSettingsGroupPagesSelectionLogin:
+            return @[ @(update + CYLTabBarItemUpdateRowReplaceNeighbors), @(CYLSettingsRowSelectedIndexIgnoringPlusButton),
+                      @(CYLSettingsRowLoginState) ];
+        case CYLSettingsGroupPlusButton:
+            return @[ @(CYLSettingsRowPlusButtonTouchableArea), @(CYLSettingsRowPlusButtonLateImage) ];
+        case CYLSettingsGroupTabInteractions:
+            return @[ @(CYLSettingsRowTabButtonTapAnimation), @(CYLSettingsRowTapFeedback), @(CYLSettingsRowTabButtonLongPress),
+                      @(CYLSettingsRowGestureTiming), @(CYLSettingsRowSwipeToSwitchTab), @(CYLSettingsRowSwitchAdjacentTab),
+                      @(CYLSettingsRowSlideTransition) ];
+        case CYLSettingsGroupHelpers:
+            return @[ @(CYLSettingsRowNavigationWithoutBaseClass), @(CYLSettingsRowOutsideSuperviewBounds),
+                      @(CYLSettingsRowBundleImage), @(CYLSettingsRowUtilsHelpers) ];
+    }
+    return @[];
+}
+
+- (NSArray<NSNumber *> *)cyl_settingsGroups {
+    NSMutableArray<NSNumber *> *groups = [NSMutableArray array];
+    for (NSInteger group = CYLSettingsGroupGeneral; group <= CYLSettingsGroupHelpers; group++) {
+        if ([self cyl_settingsRowsInGroup:(CYLSettingsGroup)group].count > 0) {
+            [groups addObject:@(group)];
+        }
+    }
+    return groups;
+}
+
+- (NSString *)cyl_titleForSettingsGroup:(CYLSettingsGroup)group {
+    switch (group) {
+        case CYLSettingsGroupGeneral: return CYLLocalizedString(@"通用");
+        case CYLSettingsGroupTabBarAppearance: return CYLLocalizedString(@"TabBar 外观");
+        case CYLSettingsGroupTabBarItemUpdate: return CYLLocalizedString(@"原地更新 Tab");
+        case CYLSettingsGroupPagesSelectionLogin: return CYLLocalizedString(@"Tab 页面、选中与登录");
+        case CYLSettingsGroupPlusButton: return @"PlusButton";
+        case CYLSettingsGroupTabInteractions: return CYLLocalizedString(@"Tab 交互");
+        case CYLSettingsGroupHelpers: return CYLLocalizedString(@"无需继承基类与工具方法");
+    }
+    return @"";
+}
+
+- (NSArray<NSNumber *> *)cyl_settingsRowsInGroup:(CYLSettingsGroup)group {
+    NSInteger rowCount = [self cyl_settingsRowCount];
+    NSMutableArray<NSNumber *> *rows = [NSMutableArray array];
+    for (NSNumber *row in [self cyl_placedSettingsRowsInGroup:group]) {
+        if (row.integerValue < rowCount) {
+            [rows addObject:row];
+        }
+    }
+    if (group == CYLSettingsGroupGeneral) {
+        // [EN] Rows no group places (a newer row) stay visible here. [CN] 未被任何分组归类的行（新增的行）放在这里，保证可见。
+        NSMutableSet<NSNumber *> *placed = [NSMutableSet set];
+        for (NSInteger each = CYLSettingsGroupGeneral; each <= CYLSettingsGroupHelpers; each++) {
+            [placed addObjectsFromArray:[self cyl_placedSettingsRowsInGroup:(CYLSettingsGroup)each]];
+        }
+        for (NSInteger row = 0; row < rowCount; row++) {
+            if (![placed containsObject:@(row)]) {
+                [rows addObject:@(row)];
+            }
+        }
+    }
+    return rows;
+}
+
+- (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView row:(NSInteger)row {
+    return [self cyl_settingsCellForTableView:tableView atIndexPath:[NSIndexPath indexPathForRow:row inSection:CYLSettingsSection]];
+}
+
+- (void)cyl_didSelectSettingsRow:(NSInteger)row {
+    // [EN] The rows reload their own index paths in the settings section, which a grouped list does not have: run the row
+    //      without a table view; the caller reloads.
+    // [CN] 各行会刷新其在设置分组中的 indexPath，而分组列表中没有该分组：不传列表执行该行，由调用方刷新。
+    [self cyl_runSettingsRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:CYLSettingsSection] inTableView:nil];
+}
+
 - (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
+    [self cyl_runSettingsRowAtIndexPath:indexPath inTableView:tableView];
+}
+
+/// [EN] Runs a row; with a table view, also deselects and reloads it. [CN] 执行某行；传入列表时同时取消选中并刷新该行。
+- (void)cyl_runSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(nullable UITableView *)tableView {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (indexPath.row == CYLSettingsRowMemoryWarning) {
         [self cyl_simulateMemoryWarningAndShowResult];
@@ -1526,6 +1882,8 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:page];
             [self presentViewController:navigationController animated:YES completion:nil];
         }
+    } else if (indexPath.row == CYLSettingsRowPlusButtonLateImage) {
+        CYLShowLateImageDemo(self, tableView, indexPath);
     } else if (indexPath.row == CYLSettingsRowSlideTransition) {
         CYLSlideTransitionDemoTabBarController *demo = [[CYLSlideTransitionDemoTabBarController alloc] init];
         demo.modalPresentationStyle = UIModalPresentationFullScreen;
@@ -1541,6 +1899,15 @@ static void CYLSwitchTabBarMinimizeBehavior(CYLTabBarController *_Nullable tabBa
     } else if (indexPath.row == CYLSettingsRowUtilsHelpers) {
         CYLRunUtilsHelpers(CYLSettingsTabBarController(self));
         [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    } else if (indexPath.row == CYLSettingsRowTheme) {
+        // [EN] The row shows the theme picked. [CN] 该行显示所选主题。
+        __weak UITableView *weakTableView = tableView;
+        [self cyl_presentThemePickerFromView:[tableView cellForRowAtIndexPath:indexPath] completion:^{
+            UITableView *strongTableView = weakTableView;
+            if (strongTableView.window && indexPath.row < [strongTableView numberOfRowsInSection:indexPath.section]) {
+                [strongTableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+            }
+        }];
     } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
         [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdate];
         // [EN] The rows show which changes are on (a checkmark).

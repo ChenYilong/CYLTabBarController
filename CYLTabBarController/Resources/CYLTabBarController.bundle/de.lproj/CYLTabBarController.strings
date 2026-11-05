@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigation und Vergleiche";
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Von Liquid Glass nicht unterstützt: Das System legt die Höhe der Tab-Bar fest (FlatDesign und der klassische Stil unterstützen es)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Skin";
+"换肤（主题，issue #216）" = "Skin (Design, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Tippen, um ein Design zu wählen: Hintergrund, Symbole und Textfarben der TabBar ändern sich direkt, in jedem TabBar-Stil. Aktuell: %@";
+"选择主题" = "Design wählen";
+"默认" = "Standard";
+"西柚" = "Grapefruit";
+"青草" = "Gras";
+"玫瑰粉" = "Pinkrose";
+"春节" = "Frühlingsfest";
+"跟随系统深色模式" = "Dunkelmodus des Systems folgen";
 "默认点击声" = "Standard-Klick";
 "中等触感反馈" = "Mittleres haptisches Feedback";
 "无需继承基类与工具方法" = "Ohne Basisklasse und Hilfsfunktionen";
@@ -277,3 +289,49 @@
 "轻触感反馈" = "Leichtes haptisches Feedback";
 "重触感反馈" = "Starkes haptisches Feedback";
 "长按（#152）" = "Langes Drücken (#152)";
+"播放 / 停止" = "Abspielen / Stoppen";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Weihnachten";
+"万圣节" = "Halloween";
+"情人节" = "Valentinstag";
+"中秋节" = "Mondfest";
+"复活节" = "Ostern";
+"新年" = "Neujahr";
+"夏日" = "Sommer";
+"生日" = "Geburtstag";
+"太空" = "Weltraum";
+"海洋" = "Ozean";
+"换肤：节日与配色主题（%@ 种）" = "Skins: Feiertage und Farben (%@)";
+"节日图标与配色" = "Feiertagssymbole und Farben";
+"仅配色" = "Nur Farben";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Tippen";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Bild laden";
+"替换为更大的图片" = "Durch größeres Bild ersetzen";
+"移除图片" = "Bild entfernen";
+"加载背景图片" = "Hintergrundbild laden";
+"2 秒后：%@" = "In 2 Sekunden: %@";
+"PlusButton 图片之后才加载" = "PlusButton-Bild später geladen";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Tippen, um einen Fall zu wählen und einen Tab-Bar-Controller zu pushen: Der PlusButton hat zuerst kein Bild; 2 Sekunden später wird das Bild geladen, ersetzt oder entfernt oder ein Hintergrundbild geladen. Das Ergebnis sollte einem beim Start gesetzten Bild entsprechen.";
+"对照：启动时即有图片" = "Vergleich: Bild beim Start";
+"对照：启动时即有更大的图片" = "Vergleich: größeres Bild beim Start";
+"对照：启动时即有背景图片" = "Vergleich: Hintergrundbild beim Start";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Tippen zum Zurückgehen oder Schließen";
+"详情" = "Details";
+"拍照" = "Foto aufnehmen";
+"从相册选择" = "Aus Album auswählen";
+"设置" = "Einstellungen";
+"关于我们" = "Über uns";
+"示例" = "Beispiel";
+"撰写" = "Verfassen";
+"好" = "OK";
+"编辑更多" = "Mehr bearbeiten";
+"新版本" = "Neue Version";
+"打开 TabBar 场景展示" = "Tab-Bar-Galerie öffnen";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Jede Szene ist eine Tab-Bar aus der öffentlichen API: Stile, Animationen, Hinweise, Lottie und die neueren Tab-APIs";
+"TabBar 场景展示" = "Tab-Bar-Galerie";

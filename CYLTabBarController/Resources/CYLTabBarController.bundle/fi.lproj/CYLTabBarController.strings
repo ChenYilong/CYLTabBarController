@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigointi ja vertailut";
 "角标" = "Merkit";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass ei tue: järjestelmä määrää palkin korkeuden (FlatDesign ja klassinen tyyli tukevat)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Ulkoasu";
+"换肤（主题，issue #216）" = "Ulkoasu (teema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Valitse teema napauttamalla: TabBarin tausta, kuvakkeet ja tekstien värit vaihtuvat paikallaan kaikissa TabBar-tyyleissä. Nyt: %@";
+"选择主题" = "Valitse teema";
+"默认" = "Oletus";
+"西柚" = "Greippi";
+"青草" = "Ruoho";
+"玫瑰粉" = "Vaaleanpunainen ruusu";
+"春节" = "Kevätjuhla";
+"跟随系统深色模式" = "Seuraa järjestelmän tummaa tilaa";
 "默认点击声" = "Oletusnapsautus";
 "中等触感反馈" = "Keskivahva haptinen palaute";
 "无需继承基类与工具方法" = "Ilman perusluokkaa, ja apuvälineet";
@@ -277,3 +289,49 @@
 "轻触感反馈" = "Kevyt haptinen palaute";
 "重触感反馈" = "Voimakas haptinen palaute";
 "长按（#152）" = "Pitkä painallus (#152)";
+"播放 / 停止" = "Toista / Pysäytä";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Joulu";
+"万圣节" = "Halloween";
+"情人节" = "Ystävänpäivä";
+"中秋节" = "Keskisyksyn juhla";
+"复活节" = "Pääsiäinen";
+"新年" = "Uusivuosi";
+"夏日" = "Kesä";
+"生日" = "Syntymäpäivä";
+"太空" = "Avaruus";
+"海洋" = "Valtameri";
+"换肤：节日与配色主题（%@ 种）" = "Ulkoasut: juhlapyhät ja värit (%@)";
+"节日图标与配色" = "Juhlakuvakkeet ja värit";
+"仅配色" = "Vain värit";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Napauta";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Lataa kuva";
+"替换为更大的图片" = "Korvaa suuremmalla kuvalla";
+"移除图片" = "Poista kuva";
+"加载背景图片" = "Lataa taustakuva";
+"2 秒后：%@" = "2 sekunnin kuluttua: %@";
+"PlusButton 图片之后才加载" = "PlusButton-kuva ladataan myöhemmin";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Napauta valitaksesi tapauksen ja avataksesi välilehtipalkkiohjaimen: PlusButtonilla ei aluksi ole kuvaa; 2 sekunnin kuluttua kuva ladataan, korvataan tai poistetaan, tai ladataan taustakuva. Tuloksen pitäisi vastata käynnistyksessä asetettua kuvaa.";
+"对照：启动时即有图片" = "Vertaa: kuva käynnistyksessä";
+"对照：启动时即有更大的图片" = "Vertaa: suurempi kuva käynnistyksessä";
+"对照：启动时即有背景图片" = "Vertaa: taustakuva käynnistyksessä";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Napauta palataksesi tai sulkeaksesi";
+"详情" = "Tiedot";
+"拍照" = "Ota kuva";
+"从相册选择" = "Valitse albumista";
+"设置" = "Asetukset";
+"关于我们" = "Tietoa meistä";
+"示例" = "Esimerkki";
+"撰写" = "Kirjoita";
+"好" = "OK";
+"编辑更多" = "Muokkaa Lisää";
+"新版本" = "Uusi versio";
+"打开 TabBar 场景展示" = "Avaa välilehtipalkkigalleria";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Jokainen näkymä on julkisella API:lla rakennettu välilehtipalkki: tyylit, animaatiot, muistutukset, Lottie ja uudemmat välilehti-API:t";
+"TabBar 场景展示" = "Välilehtipalkkigalleria";

@@ -97,7 +97,7 @@ static char CYLTabBarItemGestureStateKey;
 
 - (NSTimeInterval)cyl_tabBarItemDoubleTapInterval {
     NSNumber *value = objc_getAssociatedObject(self, &CYLTabBarItemDoubleTapIntervalKey);
-    return value ? value.doubleValue : 0.35;
+    return value != nil ? value.doubleValue : 0.35;
 }
 
 - (void)cyl_setTabBarItemDoubleTapInterval:(NSTimeInterval)tabBarItemDoubleTapInterval {
@@ -129,7 +129,9 @@ static char CYLTabBarItemGestureStateKey;
 }
 
 - (BOOL)cyl_hasTabBarItemGestureReceiver {
-    return self.cyl_tabBarItemGestureHandler != nil ||
+    // [EN] `cyl_reselectBehavior` (CYLReselect) is driven by the Reselect gesture too.
+    // [CN] `cyl_reselectBehavior`（CYLReselect）同样由 Reselect 手势驱动。
+    return self.cyl_tabBarItemGestureHandler != nil || self.cyl_reselectBehavior != CYLTabBarReselectBehaviorNone ||
         [self.delegate respondsToSelector:@selector(tabBarController:didRecognizeTabBarItemGesture:control:viewController:)];
 }
 
@@ -166,6 +168,11 @@ static char CYLTabBarItemGestureStateKey;
 }
 
 - (void)cyl_reportTabBarItemGesture:(CYLTabBarItemGesture)gesture control:(UIControl *)control viewController:(nullable UIViewController *)viewController {
+    // [EN] The built-in reselect behavior (CYLReselect) runs first, then the callbacks.
+    // [CN] 先执行内置的重复点击操作（CYLReselect），再回调。
+    if (gesture == CYLTabBarItemGestureReselect && viewController) {
+        [self cyl_performReselectBehaviorForViewController:viewController];
+    }
     CYLTabBarItemGestureHandler handler = self.cyl_tabBarItemGestureHandler;
     if (handler) {
         handler(self, gesture, control, viewController);

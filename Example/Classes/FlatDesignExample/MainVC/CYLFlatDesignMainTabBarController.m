@@ -581,7 +581,7 @@ static NSString *const CYLSpringAnimationKey = @"CYLSpringAnimationKey";
  * [EN] Issue #428: plays the Lottie icons 1.5 times as fast, the same as in the other styles.
  * [CN] Issue #428：Lottie 图标以 1.5 倍速播放，与其他样式一致。
  */
-- (CGFloat)lottieAnimationSpeed {
+- (CGFloat)tabBarItemAnimationSpeed {
     return 1.5;
 }
 

@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigazione e confronti";
 "角标" = "Badge";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Non supportato da Liquid Glass: è il sistema a stabilire l'altezza della barra (FlatDesign e lo stile classico lo supportano)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Skin";
+"换肤（主题，issue #216）" = "Skin (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Tocca per scegliere un tema: sfondo, icone e colori del testo della TabBar cambiano sul posto, in ogni stile di TabBar. Attuale: %@";
+"选择主题" = "Scegli un tema";
+"默认" = "Predefinito";
+"西柚" = "Pompelmo";
+"青草" = "Erba";
+"玫瑰粉" = "Rosa";
+"春节" = "Festa di Primavera";
+"跟随系统深色模式" = "Segui la modalità scura del sistema";
 "默认点击声" = "Clic predefinito";
 "中等触感反馈" = "Feedback aptico medio";
 "无需继承基类与工具方法" = "Senza classe base e utilità";
@@ -277,3 +289,49 @@
 "轻触感反馈" = "Feedback aptico leggero";
 "重触感反馈" = "Feedback aptico forte";
 "长按（#152）" = "Pressione prolungata (#152)";
+"播放 / 停止" = "Riproduci / Ferma";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Natale";
+"万圣节" = "Halloween";
+"情人节" = "San Valentino";
+"中秋节" = "Festa di metà autunno";
+"复活节" = "Pasqua";
+"新年" = "Capodanno";
+"夏日" = "Estate";
+"生日" = "Compleanno";
+"太空" = "Spazio";
+"海洋" = "Oceano";
+"换肤：节日与配色主题（%@ 种）" = "Skin: festività e colori (%@)";
+"节日图标与配色" = "Icone delle festività e colori";
+"仅配色" = "Solo colori";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Toccami";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Carica l’immagine";
+"替换为更大的图片" = "Sostituisci con un’immagine più grande";
+"移除图片" = "Rimuovi l’immagine";
+"加载背景图片" = "Carica un’immagine di sfondo";
+"2 秒后：%@" = "Tra 2 secondi: %@";
+"PlusButton 图片之后才加载" = "Immagine del PlusButton caricata dopo";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Tocca per scegliere un caso e fare push di un tab bar controller: il PlusButton all’inizio non ha immagine; 2 secondi dopo l’immagine viene caricata, sostituita o rimossa, oppure viene caricata un’immagine di sfondo. Il risultato deve corrispondere a un’immagine impostata all’avvio.";
+"对照：启动时即有图片" = "Confronto: immagine all’avvio";
+"对照：启动时即有更大的图片" = "Confronto: immagine più grande all’avvio";
+"对照：启动时即有背景图片" = "Confronto: immagine di sfondo all’avvio";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Tocca per tornare o chiudere";
+"详情" = "Dettaglio";
+"拍照" = "Scatta una foto";
+"从相册选择" = "Scegli dall’album";
+"设置" = "Impostazioni";
+"关于我们" = "Chi siamo";
+"示例" = "Esempio";
+"撰写" = "Componi";
+"好" = "OK";
+"编辑更多" = "Modifica Altro";
+"新版本" = "Nuova versione";
+"打开 TabBar 场景展示" = "Apri la galleria delle tab bar";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Ogni scena è una tab bar creata con l’API pubblica: stili, animazioni, avvisi, Lottie e le nuove API delle tab";
+"TabBar 场景展示" = "Galleria delle tab bar";

@@ -57,6 +57,7 @@ typedef CGPoint (^_CYLTabButtonCenterProvider)(UIControl *tabButton);
     tracker.userInteractionEnabled = NO;
     tracker.backgroundColor = UIColor.clearColor;
     [tabButton insertSubview:tracker atIndex:0];
+    [tracker cyl_markAsInsertedForTabControl:tabButton];
     return tracker;
 }
 
@@ -195,6 +196,13 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
 
 - (void)cyl_setTabBarItemIdentifier:(NSString *)tabBarItemIdentifier {
     objc_setAssociatedObject(self, @selector(cyl_tabBarItemIdentifier), [tabBarItemIdentifier copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSString *)cyl_tabBarItemDisplayName {
+    if (self.accessibilityLabel.length > 0) {
+        return self.accessibilityLabel;
+    }
+    return self.cyl_tabBarItemIdentifier ?: NSStringFromClass([self class]);
 }
 
 - (NSString *)cyl_tabBarItemIdentifier {
@@ -455,6 +463,9 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     BOOL shouldRemoveNewView = newView.superview;
     if (shouldShowNewView) {
         [tabBarButton addSubview:newView];
+        // [EN] Marked: found again in one pass, and recognized when it is still in an old button after UIKit rebuilt them.
+        // [CN] 标记：可一次性找到；UIKit 重建按钮后仍在旧按钮中时也能被识别。
+        [newView cyl_markAsInsertedForTabControl:tabBarButton];
         CGSize newViewSize = newView.frame.size;
         CYLTrackViewInTabButton(tabBarButton, newView, newViewSize, swappableImageView, replacedView, offset);
         !completion?:completion(YES, self, newView);
@@ -698,6 +709,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 @implementation UIView (CYLTabBarItemAnimationCoreSupport)
 
 - (void)cyl_replaceTrackedSubview:(UIView *)view withView:(UIView *)newView {
+    // [EN] The new view (e.g. the Dark Mode version of an animation) keeps the mark of the view it replaces.
+    // [CN] 新视图（例如动画的深色版本）沿用被替换视图的标记。
+    UIControl *tabControl = view.cyl_insertedForTabControl ?: ([self isKindOfClass:[UIControl class]] ? (UIControl *)self : nil);
+    if (tabControl) {
+        [newView cyl_markAsInsertedForTabControl:tabControl];
+    }
     for (UIView *subview in self.subviews) {
         if ([subview isKindOfClass:[_CYLTabButtonLayoutTracker class]]) {
             [(_CYLTabButtonLayoutTracker *)subview cyl_replaceTrackedView:view withView:newView];

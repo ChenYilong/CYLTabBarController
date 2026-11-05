@@ -66,6 +66,18 @@ enum Tab: String, CaseIterable {
     }
 }
 
+extension Tab {
+    /// [EN] The Bell tab's page in both apps: the test list shared by every Swift demo (every settings row of the library,
+    ///      grouped), in a navigation controller, with an optional view above the rows.
+    /// [CN] 两个 App 中 Bell Tab 的页面：所有 Swift Demo 共用的测试列表（库中所有设置行，分组显示），放在导航控制器中，各行上方可选显示一个视图。
+    func settingsViewController(headerView: UIView? = nil) -> UIViewController {
+        let settingsViewController = CYLSettingsDemoTableViewController()
+        settingsViewController.title = rawValue.capitalized
+        settingsViewController.headerView = headerView
+        return UINavigationController(rootViewController: settingsViewController)
+    }
+}
+
 extension CYLTabBarController {
     /// [EN] Call before the view loads. The course's icons are white, drawn for its dark navy bar.
     /// [CN] 在视图加载之前调用。课程的图标是白色的，为深蓝色 TabBar 设计。

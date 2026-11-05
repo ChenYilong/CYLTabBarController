@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigation and comparisons";
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Not supported by Liquid Glass: the system sets the tab bar height (FlatDesign and the classic style support it)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Skin";
+"换肤（主题，issue #216）" = "Skin (theme, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Tap to pick a theme: the TabBar background, icons and text colors change in place, in every TabBar style. Now: %@";
+"选择主题" = "Choose a theme";
+"默认" = "Default";
+"西柚" = "Grapefruit";
+"青草" = "Grass";
+"玫瑰粉" = "Pink Rose";
+"春节" = "Spring Festival";
+"跟随系统深色模式" = "Follow the system Dark Mode";
 "默认点击声" = "Default click";
 "中等触感反馈" = "Medium haptic";
 "无需继承基类与工具方法" = "No base class, and helpers";
@@ -277,3 +289,49 @@
 "轻触感反馈" = "Light haptic";
 "重触感反馈" = "Heavy haptic";
 "长按（#152）" = "Long press (#152)";
+"播放 / 停止" = "Play / Stop";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Christmas";
+"万圣节" = "Halloween";
+"情人节" = "Valentine's Day";
+"中秋节" = "Mid-Autumn";
+"复活节" = "Easter";
+"新年" = "New Year";
+"夏日" = "Summer";
+"生日" = "Birthday";
+"太空" = "Space";
+"海洋" = "Ocean";
+"换肤：节日与配色主题（%@ 种）" = "Skins: holidays and colors (%@)";
+"节日图标与配色" = "Holiday icons and colors";
+"仅配色" = "Colors only";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Tap me";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Load the image";
+"替换为更大的图片" = "Replace with a larger image";
+"移除图片" = "Remove the image";
+"加载背景图片" = "Load a background image";
+"2 秒后：%@" = "In 2 seconds: %@";
+"PlusButton 图片之后才加载" = "PlusButton image loaded later";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Tap to pick a case and push a tab bar controller: its PlusButton has no image at first; 2 seconds later the image is loaded, replaced or removed, or a background image is loaded. The result should match an image set at launch.";
+"对照：启动时即有图片" = "Compare: image at launch";
+"对照：启动时即有更大的图片" = "Compare: larger image at launch";
+"对照：启动时即有背景图片" = "Compare: background image at launch";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Tap to pop or dismiss";
+"详情" = "Detail";
+"拍照" = "Take a photo";
+"从相册选择" = "Select from album";
+"设置" = "Settings";
+"关于我们" = "About us";
+"示例" = "Example";
+"撰写" = "Compose";
+"好" = "OK";
+"编辑更多" = "More editing";
+"新版本" = "New version";
+"打开 TabBar 场景展示" = "Open the tab bar gallery";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Every scene is a tab bar built with the public API: styles, animations, reminders, Lottie and the newer tab APIs";
+"TabBar 场景展示" = "Tab Bar Gallery";

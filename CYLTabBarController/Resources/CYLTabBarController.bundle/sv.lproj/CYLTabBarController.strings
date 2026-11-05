@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigering och jämförelser";
 "角标" = "Märken";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Stöds inte av Liquid Glass: systemet bestämmer flikfältets höjd (FlatDesign och klassisk stil stöder det)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Utseende";
+"换肤（主题，issue #216）" = "Utseende (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Tryck för att välja ett tema: TabBar-bakgrunden, symbolerna och textfärgerna byts på plats, i alla TabBar-stilar. Nu: %@";
+"选择主题" = "Välj ett tema";
+"默认" = "Standard";
+"西柚" = "Grapefrukt";
+"青草" = "Gräs";
+"玫瑰粉" = "Rosa ros";
+"春节" = "Vårfesten";
+"跟随系统深色模式" = "Följ systemets mörka läge";
 "默认点击声" = "Standardklick";
 "中等触感反馈" = "Medelstark haptik";
 "无需继承基类与工具方法" = "Utan basklass, och verktyg";
@@ -277,3 +289,49 @@
 "轻触感反馈" = "Lätt haptik";
 "重触感反馈" = "Kraftig haptik";
 "长按（#152）" = "Långt tryck (#152)";
+"播放 / 停止" = "Spela / Stoppa";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Jul";
+"万圣节" = "Halloween";
+"情人节" = "Alla hjärtans dag";
+"中秋节" = "Midhöstfestivalen";
+"复活节" = "Påsk";
+"新年" = "Nyår";
+"夏日" = "Sommar";
+"生日" = "Födelsedag";
+"太空" = "Rymden";
+"海洋" = "Havet";
+"换肤：节日与配色主题（%@ 种）" = "Utseenden: högtider och färger (%@)";
+"节日图标与配色" = "Högtidssymboler och färger";
+"仅配色" = "Endast färger";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Tryck här";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Läs in bilden";
+"替换为更大的图片" = "Ersätt med en större bild";
+"移除图片" = "Ta bort bilden";
+"加载背景图片" = "Läs in en bakgrundsbild";
+"2 秒后：%@" = "Om 2 sekunder: %@";
+"PlusButton 图片之后才加载" = "PlusButton-bild som läses in senare";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Tryck för att välja ett fall och pusha en flikfältskontroller: PlusButton har först ingen bild; 2 sekunder senare läses bilden in, ersätts eller tas bort, eller så läses en bakgrundsbild in. Resultatet ska motsvara en bild som angavs vid start.";
+"对照：启动时即有图片" = "Jämför: bild vid start";
+"对照：启动时即有更大的图片" = "Jämför: större bild vid start";
+"对照：启动时即有背景图片" = "Jämför: bakgrundsbild vid start";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Tryck för att gå tillbaka eller stänga";
+"详情" = "Detaljer";
+"拍照" = "Ta en bild";
+"从相册选择" = "Välj från album";
+"设置" = "Inställningar";
+"关于我们" = "Om oss";
+"示例" = "Exempel";
+"撰写" = "Skriv";
+"好" = "OK";
+"编辑更多" = "Redigera Mer";
+"新版本" = "Ny version";
+"打开 TabBar 场景展示" = "Öppna flikfältsgalleriet";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Varje scen är ett flikfält byggt med det publika API:t: stilar, animationer, påminnelser, Lottie och de nyare flik-API:erna";
+"TabBar 场景展示" = "Flikfältsgalleri";

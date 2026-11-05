@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigáció és összehasonlítás";
 "角标" = "Jelvények";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nem támogatja: a lapsáv magasságát a rendszer adja meg (FlatDesign és a klasszikus stílus támogatja)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Megjelenés";
+"换肤（主题，issue #216）" = "Megjelenés (téma, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Koppintson egy téma kiválasztásához: a TabBar háttere, ikonjai és szövegszínei a helyükön változnak, minden TabBar-stílusban. Most: %@";
+"选择主题" = "Válasszon témát";
+"默认" = "Alapértelmezett";
+"西柚" = "Grépfrút";
+"青草" = "Fű";
+"玫瑰粉" = "Rózsaszín rózsa";
+"春节" = "Tavaszünnep";
+"跟随系统深色模式" = "A rendszer sötét módjának követése";
 "默认点击声" = "Alapértelmezett kattanás";
 "中等触感反馈" = "Közepes haptikus visszajelzés";
 "无需继承基类与工具方法" = "Alaposztály nélkül, és segédeszközök";
@@ -277,3 +289,49 @@
 "轻触感反馈" = "Enyhe haptikus visszajelzés";
 "重触感反馈" = "Erős haptikus visszajelzés";
 "长按（#152）" = "Hosszú nyomás (#152)";
+"播放 / 停止" = "Lejátszás / Leállítás";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Karácsony";
+"万圣节" = "Halloween";
+"情人节" = "Valentin-nap";
+"中秋节" = "Holdünnep";
+"复活节" = "Húsvét";
+"新年" = "Újév";
+"夏日" = "Nyár";
+"生日" = "Születésnap";
+"太空" = "Világűr";
+"海洋" = "Óceán";
+"换肤：节日与配色主题（%@ 种）" = "Megjelenések: ünnepek és színek (%@)";
+"节日图标与配色" = "Ünnepi ikonok és színek";
+"仅配色" = "Csak színek";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Koppints";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Kép betöltése";
+"替换为更大的图片" = "Csere nagyobb képre";
+"移除图片" = "Kép eltávolítása";
+"加载背景图片" = "Háttérkép betöltése";
+"2 秒后：%@" = "2 másodperc múlva: %@";
+"PlusButton 图片之后才加载" = "Később betöltött PlusButton-kép";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Koppintson egy eset kiválasztásához és egy lapsáv-vezérlő megnyitásához: a PlusButtonnak eleinte nincs képe; 2 másodperc múlva a kép betöltődik, lecserélődik vagy eltűnik, vagy háttérkép töltődik be. Az eredménynek meg kell egyeznie az induláskor beállított képpel.";
+"对照：启动时即有图片" = "Összevetés: kép induláskor";
+"对照：启动时即有更大的图片" = "Összevetés: nagyobb kép induláskor";
+"对照：启动时即有背景图片" = "Összevetés: háttérkép induláskor";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Koppintson a visszalépéshez vagy bezáráshoz";
+"详情" = "Részletek";
+"拍照" = "Fénykép készítése";
+"从相册选择" = "Kiválasztás albumból";
+"设置" = "Beállítások";
+"关于我们" = "Rólunk";
+"示例" = "Példa";
+"撰写" = "Írás";
+"好" = "OK";
+"编辑更多" = "Továbbiak szerkesztése";
+"新版本" = "Új verzió";
+"打开 TabBar 场景展示" = "A lapsáv-galéria megnyitása";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Minden jelenet a nyilvános API-val épített lapsáv: stílusok, animációk, emlékeztetők, Lottie és az újabb lap-API-k";
+"TabBar 场景展示" = "Lapsáv-galéria";

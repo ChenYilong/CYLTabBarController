@@ -23,7 +23,7 @@ struct TabBar: UIViewControllerRepresentable {
 
     func makeUIViewController(context _: Context) -> CYLTabBarController {
         let viewControllers = Tab.allCases.map { tab -> UIViewController in
-            UIHostingController(rootView: tab.content)
+            tab == .bell ? tab.settingsViewController() : UIHostingController(rootView: tab.content)
         }
         let tabBarController = CYLTabBarController(viewControllers: viewControllers,
                                                    tabBarItemsAttributes: Tab.allCases.map(\.attributes))

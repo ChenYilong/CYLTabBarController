@@ -79,7 +79,7 @@ class MainTabBarController: CYLTabBarController {
     override func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
         // [CN] 守卫：仅在有 PlusButton 时处理  [EN] Guard: plus button code only with a plus button
         guard hasPlusButton(), control.cyl_isPlusControl() else { return }
-        guard let plusButton = CYLPlusButton.plusButton(forOwner: self) else { return }
+        guard let plusButton = CYLPlusButton(forOwner: self) else { return }
 
         plusButton.tag += 1                                   // [CN] 每次点击加 1  [EN] +1 per tap
         let badgeValue = "\(plusButton.tag)"

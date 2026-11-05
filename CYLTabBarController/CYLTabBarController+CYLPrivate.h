@@ -17,6 +17,45 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CYLTabBarController (CYLTabBarMinimizePrivate)
 /// [EN] FlatDesign: observe the scroll view of the page on screen. [CN] 扁平样式：观察当前显示页面的滚动视图。
 - (void)cyl_updateTabBarMinimizeTracking;
+/// [EN] The scroll view that drives the tab bar for `viewController`, as UIKit picks it (also used by CYLReselect's
+///      scroll to top). nil when there is none or the view is not loaded.
+/// [CN] `viewController` 中控制 TabBar 的滚动视图，与 UIKit 的选择方式一致（CYLReselect 的滚动到顶部也使用）。没有或视图未加载时为 nil。
+- (nullable UIScrollView *)cyl_tabBarMinimizeScrollViewForViewController:(nullable UIViewController *)viewController;
+@end
+
+/// [EN] Implemented in CYLTabBarController.m (CYLTheme, issue #216). [CN] 实现见 CYLTabBarController.m 中的 CYLTheme（issue #216）。
+@interface CYLTabBarController (CYLThemePrivate)
+/// [EN] Once, when first shown: the theme chosen at launch. [CN] 首次显示时执行一次：应用启动时选择的主题。
+- (void)cyl_applyLaunchTabBarThemeIfNeeded;
+/// [EN] Implemented in the main implementation (tabBar.standardAppearance). [CN] 实现于主 implementation（tabBar.standardAppearance）。
+- (void)cyl_syncTabBarAppearances;
+@end
+
+// [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
+// [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
+@interface CYLTabBarController (CYLTabButtonHighlight)
+- (void)cyl_tabButtonTouchDown:(UIControl *)control;
+- (void)cyl_tabButtonTouchUp:(UIControl *)control;
+@end
+
+/// [EN] Implemented in CYLTabBarController.m (CYLReselect). [CN] 实现见 CYLTabBarController.m 中的 CYLReselect。
+@interface CYLTabBarController (CYLReselectPrivate)
+/// [EN] The view controller of a tab button (classic or Liquid Glass), nil for the plus button. [CN] Tab 按钮对应的控制器，PlusButton 返回 nil。
+- (nullable UIViewController *)cyl_viewControllerForTabControl:(UIControl *)control;
+/// [EN] Runs `cyl_reselectBehavior` for a reselected tab. [CN] 为重复点击的 Tab 执行 `cyl_reselectBehavior`。
+- (void)cyl_performReselectBehaviorForViewController:(UIViewController *)viewController;
+@end
+
+/// [EN] Per-tab colors, implemented in the main implementation. [CN] 单个 Tab 的颜色，在主实现中实现。
+@interface CYLTabBarController (CYLTabBarItemColorsPrivate)
+- (void)cyl_updateSelectedBackgroundColorsOfTabButtons;
+- (void)cyl_setNeedsUpdateSelectedBackgroundColors;
+- (void)cyl_updateLoopingLottieViews;
+- (void)cyl_updateBadgesOfSelectedTab;
+- (void)cyl_syncTabBarItemAccessibility;
+#if CYL_FLATDESIGN_AVAILABLE
+- (void)cyl_syncFlatDesignTabBarItemColors;
+#endif
 @end
 
 /// [EN] Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.

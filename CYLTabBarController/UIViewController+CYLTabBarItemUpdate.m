@@ -11,20 +11,6 @@
 
 static NSString *const CYLTabBarItemUpdateCellIdentifier = @"CYLTabBarItemUpdateCell";
 
-/// [EN] Rows, each one switching one thing on the tab, or back.
-/// [CN] 每行切换 Tab 的一项，或恢复。
-typedef NS_ENUM(NSInteger, CYLTabBarItemUpdateRow) {
-    CYLTabBarItemUpdateRowTitle,        // `-updateTabBarItemForViewController:attributes:`
-    CYLTabBarItemUpdateRowIconView,     // `-setTabBarItemIconViewProvider:atIndex:`
-    CYLTabBarItemUpdateRowNetworkIcon,  // `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`
-    CYLTabBarItemUpdateRowAllNetworkIcons, // the same, for every tab
-    CYLTabBarItemUpdateRowAllLocalIcons,   // `-setTabBarItemIcon:selectedIcon:size:atIndex:`, local images, for every tab
-    CYLTabBarItemUpdateRowGIFIcon,      // the same, with a GIF
-    CYLTabBarItemUpdateRowAllTitles,    // `-updateTabBarItemsWithAttributes:`
-    CYLTabBarItemUpdateRowReplaceNeighbors, // `-replaceViewControllerAtIndex:withViewController:attributes:`, issue #481
-    CYLTabBarItemUpdateRowCount,
-};
-
 static char CYLTabBarItemInitialAttributesKey;
 static char CYLTabBarItemTitleUpdatedKey;
 static char CYLTabBarItemActiveIconRowKey;

@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigácia a porovnania";
 "角标" = "Odznaky";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nepodporuje: výšku panela určuje systém (FlatDesign a klasický štýl áno)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Vzhľad";
+"换肤（主题，issue #216）" = "Vzhľad (motív, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Klepnutím vyberte motív: pozadie, ikony a farby textu TabBar sa zmenia na mieste, vo všetkých štýloch TabBar. Teraz: %@";
+"选择主题" = "Vyberte motív";
+"默认" = "Predvolený";
+"西柚" = "Grapefruit";
+"青草" = "Tráva";
+"玫瑰粉" = "Ružová ruža";
+"春节" = "Sviatky jari";
+"跟随系统深色模式" = "Riadiť sa tmavým režimom systému";
 "默认点击声" = "Predvolené cvaknutie";
 "中等触感反馈" = "Stredná haptická odozva";
 "无需继承基类与工具方法" = "Bez základnej triedy a pomôcky";
@@ -277,3 +289,49 @@
 "轻触感反馈" = "Ľahká haptická odozva";
 "重触感反馈" = "Silná haptická odozva";
 "长按（#152）" = "Dlhé stlačenie (#152)";
+"播放 / 停止" = "Prehrať / Zastaviť";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Vianoce";
+"万圣节" = "Halloween";
+"情人节" = "Valentín";
+"中秋节" = "Sviatok stredu jesene";
+"复活节" = "Veľká noc";
+"新年" = "Nový rok";
+"夏日" = "Leto";
+"生日" = "Narodeniny";
+"太空" = "Vesmír";
+"海洋" = "Oceán";
+"换肤：节日与配色主题（%@ 种）" = "Vzhľady: sviatky a farby (%@)";
+"节日图标与配色" = "Sviatočné ikony a farby";
+"仅配色" = "Iba farby";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Ťukni";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Načítať obrázok";
+"替换为更大的图片" = "Nahradiť väčším obrázkom";
+"移除图片" = "Odstrániť obrázok";
+"加载背景图片" = "Načítať obrázok pozadia";
+"2 秒后：%@" = "O 2 sekundy: %@";
+"PlusButton 图片之后才加载" = "Obrázok PlusButton načítaný neskôr";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Ťuknutím vyberte prípad a otvorte ovládač panela kariet: PlusButton spočiatku nemá obrázok; po 2 sekundách sa obrázok načíta, nahradí alebo odstráni, alebo sa načíta obrázok pozadia. Výsledok by mal zodpovedať obrázku nastavenému pri spustení.";
+"对照：启动时即有图片" = "Porovnanie: obrázok pri spustení";
+"对照：启动时即有更大的图片" = "Porovnanie: väčší obrázok pri spustení";
+"对照：启动时即有背景图片" = "Porovnanie: obrázok pozadia pri spustení";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Ťuknutím sa vrátite alebo zatvoríte";
+"详情" = "Podrobnosti";
+"拍照" = "Odfotiť";
+"从相册选择" = "Vybrať z albumu";
+"设置" = "Nastavenia";
+"关于我们" = "O nás";
+"示例" = "Príklad";
+"撰写" = "Napísať";
+"好" = "OK";
+"编辑更多" = "Upraviť Ďalšie";
+"新版本" = "Nová verzia";
+"打开 TabBar 场景展示" = "Otvoriť galériu panelov kariet";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Každá scéna je panel kariet vytvorený verejným API: štýly, animácie, upozornenia, Lottie a novšie API kariet";
+"TabBar 场景展示" = "Galéria panelov kariet";

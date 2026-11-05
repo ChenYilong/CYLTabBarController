@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigasjon og sammenligninger";
 "角标" = "Merker";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Støttes ikke av Liquid Glass: systemet bestemmer høyden (FlatDesign og klassisk stil støtter det)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Utseende";
+"换肤（主题，issue #216）" = "Utseende (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Trykk for å velge et tema: bakgrunnen, symbolene og tekstfargene i TabBar endres på stedet, i alle TabBar-stiler. Nå: %@";
+"选择主题" = "Velg et tema";
+"默认" = "Standard";
+"西柚" = "Grapefrukt";
+"青草" = "Gress";
+"玫瑰粉" = "Rosa rose";
+"春节" = "Vårfestivalen";
+"跟随系统深色模式" = "Følg systemets mørke modus";
 "默认点击声" = "Standardklikk";
 "中等触感反馈" = "Middels haptisk tilbakemelding";
 "无需继承基类与工具方法" = "Uten basisklasse, og verktøy";
@@ -277,3 +289,49 @@
 "轻触感反馈" = "Lett haptikk";
 "重触感反馈" = "Kraftig haptikk";
 "长按（#152）" = "Langt trykk (#152)";
+"播放 / 停止" = "Spill av / Stopp";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Jul";
+"万圣节" = "Halloween";
+"情人节" = "Valentinsdagen";
+"中秋节" = "Midthøstfestivalen";
+"复活节" = "Påske";
+"新年" = "Nyttår";
+"夏日" = "Sommer";
+"生日" = "Bursdag";
+"太空" = "Verdensrommet";
+"海洋" = "Havet";
+"换肤：节日与配色主题（%@ 种）" = "Utseender: høytider og farger (%@)";
+"节日图标与配色" = "Høytidssymboler og farger";
+"仅配色" = "Bare farger";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Trykk her";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Last inn bildet";
+"替换为更大的图片" = "Erstatt med et større bilde";
+"移除图片" = "Fjern bildet";
+"加载背景图片" = "Last inn et bakgrunnsbilde";
+"2 秒后：%@" = "Om 2 sekunder: %@";
+"PlusButton 图片之后才加载" = "PlusButton-bilde lastet inn senere";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Trykk for å velge et tilfelle og pushe en fanelinjekontroller: PlusButton har først ikke noe bilde; 2 sekunder senere lastes bildet inn, erstattes eller fjernes, eller et bakgrunnsbilde lastes inn. Resultatet skal samsvare med et bilde angitt ved oppstart.";
+"对照：启动时即有图片" = "Sammenlign: bilde ved oppstart";
+"对照：启动时即有更大的图片" = "Sammenlign: større bilde ved oppstart";
+"对照：启动时即有背景图片" = "Sammenlign: bakgrunnsbilde ved oppstart";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Trykk for å gå tilbake eller lukke";
+"详情" = "Detaljer";
+"拍照" = "Ta et bilde";
+"从相册选择" = "Velg fra album";
+"设置" = "Innstillinger";
+"关于我们" = "Om oss";
+"示例" = "Eksempel";
+"撰写" = "Skriv";
+"好" = "OK";
+"编辑更多" = "Rediger Mer";
+"新版本" = "Ny versjon";
+"打开 TabBar 场景展示" = "Åpne fanelinjegalleriet";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Hver scene er en fanelinje bygget med det offentlige API-et: stiler, animasjoner, påminnelser, Lottie og de nyere fane-API-ene";
+"TabBar 场景展示" = "Fanelinjegalleri";

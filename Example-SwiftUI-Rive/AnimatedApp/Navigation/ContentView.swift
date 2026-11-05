@@ -38,6 +38,14 @@ struct ContentView: View {
             button.view()
                 .frame(width: 44, height: 44)
                 .mask(Circle())
+                .onAppear {
+                    // [EN] In menu_button.riv, "isOpen" YES shows the menu icon and NO the close icon; the running state
+                    //      machine starts on the close icon, so show the menu icon while the menu is closed. (The course
+                    //      created the view with `autoPlay: false`, which rested on the menu icon.)
+                    // [CN] 在 menu_button.riv 中，"isOpen" 为 YES 显示菜单图标、为 NO 显示关闭图标；运行中的状态机从关闭图标开始，
+                    //      因此菜单关闭时显示菜单图标。（课程用 `autoPlay: false` 创建视图，停在菜单图标上。）
+                    button.play()
+                }
                 .shadow(color: Color("Shadow").opacity(0.2), radius: 5, x: 0, y: 5)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .padding()
@@ -54,7 +62,10 @@ struct ContentView: View {
                     }
                 }
             
+            // [EN] The circle is white in both appearances, so the symbol stays dark (it was white on white in Dark Mode).
+            // [CN] 圆形在两种外观下都是白色，因此图标保持深色（暗黑模式下以前是白底白字）。
             Image(systemName: "person")
+                .foregroundColor(.black)
                 .frame(width: 36, height: 36)
                 .background(.white)
                 .mask(Circle())

@@ -39,6 +39,9 @@ static NSArray *CYLTabButtonCGImages(NSArray<UIImage *> *images, BOOL reversed) 
     return frames;
 }
 
+/// [EN] The held frames of `CYLTabButtonFrameAnimation`. [CN] `CYLTabButtonFrameAnimation` 保持的帧。
+static NSString *const CYLTabButtonFrameAnimationKey = @"cyl.tabButton.frames";
+
 static void CYLTabButtonPlayFrameAnimation(UIView *iconView, NSArray<UIImage *> *images, BOOL reversed) {
     NSArray *frames = CYLTabButtonCGImages(images, reversed);
     if (frames.count == 0) {
@@ -47,9 +50,11 @@ static void CYLTabButtonPlayFrameAnimation(UIView *iconView, NSArray<UIImage *> 
     CAKeyframeAnimation *animation = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathContents, frames, CYLTabButtonAnimationDuration);
     animation.calculationMode = kCAAnimationDiscrete;
     animation.repeatCount = 1;
-    animation.removedOnCompletion = NO;
-    animation.fillMode = kCAFillModeForwards;
-    [iconView.layer addAnimation:animation forKey:nil];
+    // [EN] Selected: the last frame stays. Deselected (reversed): back to the icon itself at the end, not to the first frame.
+    // [CN] 选中：保持最后一帧。取消选中（倒序）：结束后恢复为图标本身，而不是停在第一帧。
+    animation.removedOnCompletion = reversed;
+    animation.fillMode = reversed ? kCAFillModeRemoved : kCAFillModeForwards;
+    [iconView.layer addAnimation:animation forKey:CYLTabButtonFrameAnimationKey];
 }
 
 /// [EN] A small dot drawn in `color`, the default firework particle. [CN] 用 `color` 绘制的小圆点，默认的烟花粒子。
@@ -225,11 +230,17 @@ static void CYLTabButtonPlayFireworks(UIView *view, UIImage *_Nullable image) {
 
 #pragma mark - CYLTabButtonFumeAnimation
 
+/// [EN] The animations Fume leaves on the button while it is selected. [CN] Tab 选中期间 Fume 留在按钮上的动画。
+static NSString *const CYLTabButtonFumeIconKey = @"cyl.tabButton.fume.icon";
+static NSString *const CYLTabButtonFumeMoveKey = @"cyl.tabButton.fume.move";
+static NSString *const CYLTabButtonFumeScaleKey = @"cyl.tabButton.fume.scale";
+static NSString *const CYLTabButtonFumeOpacityKey = @"cyl.tabButton.fume.opacity";
+
 static void CYLTabButtonFumeMoveIcon(UIView *iconView, NSArray *values) {
     CAKeyframeAnimation *animation = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathPositionY, values, CYLTabButtonAnimationDuration / 2.0);
     animation.fillMode = kCAFillModeForwards;
     animation.removedOnCompletion = NO;
-    [iconView.layer addAnimation:animation forKey:@"cyl.tabButton.fume.icon"];
+    [iconView.layer addAnimation:animation forKey:CYLTabButtonFumeIconKey];
 }
 
 @implementation CYLTabButtonFumeAnimation
@@ -241,26 +252,34 @@ static void CYLTabButtonFumeMoveIcon(UIView *iconView, NSArray *values) {
     }
     CGFloat y = titleLabel.layer.position.y;
     CAKeyframeAnimation *move = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathPositionY, @[ @(y), @(y - 60.0) ], CYLTabButtonAnimationDuration);
-    [titleLabel.layer addAnimation:move forKey:@"cyl.tabButton.fume.move"];
+    [titleLabel.layer addAnimation:move forKey:CYLTabButtonFumeMoveKey];
     CAKeyframeAnimation *scale = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathScale, @[ @1.0, @2.0 ], CYLTabButtonAnimationDuration);
-    [titleLabel.layer addAnimation:scale forKey:@"cyl.tabButton.fume.scale"];
+    [titleLabel.layer addAnimation:scale forKey:CYLTabButtonFumeScaleKey];
     CAKeyframeAnimation *opacity = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathOpacity, @[ @1.0, @0.0 ], CYLTabButtonAnimationDuration);
-    [titleLabel.layer addAnimation:opacity forKey:@"cyl.tabButton.fume.opacity"];
+    [titleLabel.layer addAnimation:opacity forKey:CYLTabButtonFumeOpacityKey];
     titleLabel.alpha = 0;
 }
 
 - (void)cyl_playDeselectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
     // [EN] Removing the forward-filled move puts the icon back where the layout placed it.
     // [CN] 移除保持在终点的位移动画，图标回到布局给出的位置。
-    [iconView.layer removeAnimationForKey:@"cyl.tabButton.fume.icon"];
+    [iconView.layer removeAnimationForKey:CYLTabButtonFumeIconKey];
     if (!titleLabel) {
         return;
     }
     CGFloat y = titleLabel.layer.position.y;
     CAKeyframeAnimation *move = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathPositionY, @[ @(y + 15.0), @(y) ], CYLTabButtonAnimationDuration);
-    [titleLabel.layer addAnimation:move forKey:@"cyl.tabButton.fume.move"];
+    [titleLabel.layer addAnimation:move forKey:CYLTabButtonFumeMoveKey];
     CAKeyframeAnimation *opacity = CYLTabButtonKeyframeAnimation(CYLTabButtonAnimationKeyPathOpacity, @[ @0.0, @1.0 ], CYLTabButtonAnimationDuration);
-    [titleLabel.layer addAnimation:opacity forKey:@"cyl.tabButton.fume.opacity"];
+    [titleLabel.layer addAnimation:opacity forKey:CYLTabButtonFumeOpacityKey];
+    titleLabel.alpha = 1;
+}
+
+- (void)cyl_resetTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    [iconView.layer removeAnimationForKey:CYLTabButtonFumeIconKey];
+    for (NSString *key in @[ CYLTabButtonFumeMoveKey, CYLTabButtonFumeScaleKey, CYLTabButtonFumeOpacityKey ]) {
+        [titleLabel.layer removeAnimationForKey:key];
+    }
     titleLabel.alpha = 1;
 }
 
@@ -336,6 +355,110 @@ static UIViewAnimationOptions CYLTabButtonFlipOption(NSUInteger direction) {
         return;
     }
     CYLTabButtonPlayFrameAnimation(iconView, self.images, YES);
+}
+
+- (void)cyl_resetTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    [iconView.layer removeAnimationForKey:CYLTabButtonFrameAnimationKey];
+}
+
+@end
+
+#pragma mark - CYLTabButtonPressAnimation
+
+@implementation CYLTabButtonPressAnimation
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _pressedScale = 0.85;
+    }
+    return self;
+}
+
+- (void)cyl_playSelectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    // [EN] Pressing is the whole animation; nothing more on selection. [CN] 按压即是全部动画，选中时不再播放。
+}
+
+- (void)cyl_playHighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CGFloat scale = self.pressedScale;
+    [UIView animateWithDuration:0.12 delay:0 options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction animations:^{
+        iconView.transform = CGAffineTransformMakeScale(scale, scale);
+    } completion:nil];
+}
+
+- (void)cyl_playDehighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    [UIView animateWithDuration:0.35 delay:0 usingSpringWithDamping:0.5 initialSpringVelocity:0
+                        options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction animations:^{
+        iconView.transform = CGAffineTransformIdentity;
+    } completion:nil];
+}
+
+@end
+
+@implementation CYLTabButtonBlockAnimation
+
+/*!
+ * [EN] An optional method counts as implemented only while its block is set, so the library's default applies otherwise.
+ * [CN] 只有设置了对应 block 时，可选方法才算已实现；否则库的默认行为生效。
+ */
+- (BOOL)respondsToSelector:(SEL)aSelector {
+    if (aSelector == @selector(cyl_playDeselectAnimationWithTabButton:iconView:titleLabel:)) {
+        return self.deselectAnimation != nil;
+    }
+    if (aSelector == @selector(cyl_playReselectAnimationWithTabButton:iconView:titleLabel:)) {
+        return self.reselectAnimation != nil;
+    }
+    if (aSelector == @selector(cyl_playHighlightAnimationWithTabButton:iconView:titleLabel:)) {
+        return self.highlightAnimation != nil;
+    }
+    if (aSelector == @selector(cyl_playDehighlightAnimationWithTabButton:iconView:titleLabel:)) {
+        return self.dehighlightAnimation != nil;
+    }
+    if (aSelector == @selector(cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:)) {
+        return self.badgeChangedAnimation != nil;
+    }
+    return [super respondsToSelector:aSelector];
+}
+
+- (void)cyl_playSelectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLTabButtonAnimationBlock block = self.selectAnimation;
+    if (block) {
+        block(button, iconView, titleLabel);
+    }
+}
+
+- (void)cyl_playDeselectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLTabButtonAnimationBlock block = self.deselectAnimation;
+    if (block) {
+        block(button, iconView, titleLabel);
+    }
+}
+
+- (void)cyl_playReselectAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLTabButtonAnimationBlock block = self.reselectAnimation;
+    if (block) {
+        block(button, iconView, titleLabel);
+    }
+}
+
+- (void)cyl_playHighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLTabButtonAnimationBlock block = self.highlightAnimation;
+    if (block) {
+        block(button, iconView, titleLabel);
+    }
+}
+
+- (void)cyl_playDehighlightAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView titleLabel:(UILabel *)titleLabel {
+    CYLTabButtonAnimationBlock block = self.dehighlightAnimation;
+    if (block) {
+        block(button, iconView, titleLabel);
+    }
+}
+
+- (void)cyl_playBadgeChangedAnimationWithTabButton:(UIControl *)button iconView:(UIView *)iconView badgeView:(UIView *)badgeView {
+    CYLTabButtonBadgeAnimationBlock block = self.badgeChangedAnimation;
+    if (block) {
+        block(button, iconView, badgeView);
+    }
 }
 
 @end

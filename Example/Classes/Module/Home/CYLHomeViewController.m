@@ -14,6 +14,7 @@
 #import "CYLPlusButtonSubclass.h"
 #import "MainTabBarController.h"
 #import "CYLMainRootViewController.h"
+#import "CYLGalleryViewController.h"
 #import <MJRefresh/MJRefresh.h>
 
 @interface CYLHomeViewController ()
@@ -50,6 +51,10 @@
 
 
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"LiquidGlass") style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
+    // [EN] Issue #216: the skin button opens the theme picker; the tab bar restyles in place in every style.
+    // [CN] Issue #216：换肤按钮打开主题选择器，TabBar 在所有样式中原地更换外观。
+    UIBarButtonItem *themeBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"换肤") style:UIBarButtonItemStylePlain target:self action:@selector(showThemePicker:)];
+    self.navigationItem.rightBarButtonItems = @[ self.navigationItem.rightBarButtonItem, themeBarButtonItem ];
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"CYLTabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
 
 //    [self.navigationItem.leftBarButtonItem setTintColor:UIColor.blackColor];
@@ -105,6 +110,14 @@
     });
 }
 
+/// [EN] Issue #216: the skin (theme) picker. [CN] Issue #216：换肤（主题）选择器。
+- (void)showThemePicker:(id)sender {
+    __weak __typeof(self) weakSelf = self;
+    [self cyl_presentThemePickerFromView:nil completion:^{
+        [weakSelf.tableView reloadData];
+    }];
+}
+
 - (void)refreshTabBar:(id)sender {
     [self createNewTabBardynamically];
 }
@@ -138,6 +151,15 @@
     if (indexPath.section < [self cyl_demoSectionCount]) {
         return [self cyl_demoCellForTableView:tableView indexPath:indexPath];
     }
+    if ([self isGallerySection:indexPath.section]) {
+        UITableViewCell *galleryCell = [tableView dequeueReusableCellWithIdentifier:@"GalleryCell"] ?:
+            [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"GalleryCell"];
+        galleryCell.textLabel.text = CYLLocalizedString(@"打开 TabBar 场景展示");
+        galleryCell.detailTextLabel.text = CYLLocalizedString(@"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API");
+        [galleryCell cyl_wrapsTextLabels];
+        galleryCell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        return galleryCell;
+    }
     static NSString * CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
@@ -164,16 +186,28 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     // [EN] The grouped demo sections (shared with the FlatDesign page), then this page's rows.
     // [CN] 分组的演示 section（与扁平样式页面共用），然后是本页面的行。
-    return [self cyl_demoSectionCount] + 1;
+    return [self cyl_demoSectionCount] + 2;
+}
+
+/// [EN] The section right after the shared demo sections opens the tab bar gallery (docs/Tab-Bar-Gallery.md).
+/// [CN] 共用演示 section 之后的一组用于打开 TabBar 图库（docs/Tab-Bar-Gallery.md）。
+- (BOOL)isGallerySection:(NSInteger)section {
+    return section == [self cyl_demoSectionCount];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if ([self isGallerySection:section]) {
+        return @"Tab Bar Gallery";
+    }
     return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLLocalizedString(@"角标");
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (section < [self cyl_demoSectionCount]) {
         return [self cyl_demoRowCountInSection:section];
+    }
+    if ([self isGallerySection:section]) {
+        return 1;
     }
     return MAX(30, [UITableViewCell cyl_badgeStyleCount]); // every badge style has a row
 }
@@ -184,6 +218,10 @@
         return;
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    if ([self isGallerySection:indexPath.section]) {
+        [self.navigationController pushViewController:[[CYLGalleryViewController alloc] init] animated:YES];
+        return;
+    }
     NSNumber *badgeNumber = @(indexPath.row);
     self.navigationItem.title = [NSString stringWithFormat:CYLLocalizedString(@"首页(%@)"), badgeNumber]; //sets navigation bar title.
     

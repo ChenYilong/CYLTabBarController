@@ -19,6 +19,9 @@ Pod::Spec.new do |s|
   s.subspec 'CYLUtils' do |utils|
     utils.source_files = 'CYLTabBarController/CYLUtils/**/*.{h,m}'
     utils.public_header_files = 'CYLTabBarController/CYLUtils/**/*.h'
+    # FIX: issue #216 — theme switching (skins) lives in `CYLUtils/CYLComponents/CYLTheme/`; its private header stays private.
+    # 换肤（主题切换）位于 `CYLUtils/CYLComponents/CYLTheme/`，其私有头文件不公开。
+    utils.private_header_files = 'CYLTabBarController/CYLUtils/CYLComponents/CYLTheme/CYLThemePrivate.h'
     # The library's resource bundle (localized strings now, images can go in it too), shipped as is, so its layout is
     # the same in every integration (see `CYLResourceBundle()`).
     utils.resources = ['CYLTabBarController/Resources/CYLTabBarController.bundle']

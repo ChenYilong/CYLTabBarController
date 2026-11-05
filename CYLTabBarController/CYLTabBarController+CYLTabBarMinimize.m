@@ -507,6 +507,10 @@ static CYLTabBarMinimizeBehavior CYLTabBarMinimizeBehaviorFromSystem(UITabBarMin
 
 @implementation CYLTabBarController (CYLTabBarMinimize)
 
+- (UIScrollView *)cyl_tabBarMinimizeScrollViewForViewController:(UIViewController *)viewController {
+    return CYLTabBarMinimizeScrollViewForViewController(viewController);
+}
+
 - (CYLTabBarMinimizeBehavior)cyl_tabBarMinimizeBehavior {
     NSNumber *behavior = objc_getAssociatedObject(self, CYLTabBarMinimizeBehaviorKey);
     return (CYLTabBarMinimizeBehavior)behavior.integerValue;

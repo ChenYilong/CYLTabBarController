@@ -23,7 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
  *      row 13 hides the navigation bar without a base class, row 14 opens the slide transition demo, row 15 switches
  *      the tap sound and haptic, row 16 switches the long press duration and double tap interval, row 17 switches to
  *      the previous or next tab, row 18 runs the CYLUtils weak associated object and nearest control helpers (issue #535),
- *      then the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon,
+ *      row 19 pushes a tab bar controller whose plus button gets its image later (loaded, replaced, removed, or a
+ *      background image),
+ *      row 20 picks a skin (theme) of the tab bar (`CYLThemeManager`, `CYLTabBarTheme`, issue #216), then the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon,
  *      all network icons, all local icons, GIF icon, all titles, replace neighboring tabs.
  * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
  *      （`-cyl_memoryWarningCellForTableView:`），第 2 行切换所有 Tab 的标题偏移（`CYLTabBarController.titlePositionAdjustment`，
@@ -35,10 +37,27 @@ NS_ASSUME_NONNULL_BEGIN
  *      第 8 行切换 Tab 的点击动画，第 9 行开启 Tab 长按，第 10 行开启左右滑动切换 Tab，第 11 行演示超出父视图的子视图响应点击，
  *      第 12 行从 bundle 加载图片，第 13 行不继承基类隐藏导航栏，第 14 行打开滑动转场演示，第 15 行切换点击声音与触感反馈，
  *      第 16 行切换长按时长与双击间隔，第 17 行切换到上一个或下一个 Tab，第 18 行运行 CYLUtils 弱引用关联对象与查找按钮的工具方法（issue #535），
- *      之后是原地更新 Tab 的若干行
+ *      第 19 行 push 一个 PlusButton 之后才加载图片的 TabBarController（加载、替换、移除图片或加载背景图片），
+ *      第 20 行选择 TabBar 的皮肤（主题，`CYLThemeManager`、`CYLTabBarTheme`，issue #216），之后是原地更新 Tab 的若干行
  *      （`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、所有网络图标、所有本地图标、GIF 图标、所有标题、替换相邻 Tab 的页面。
  */
 FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
+
+/*!
+ * [EN] The settings rows by function, for a list that shows them in groups (one table section per group, like Settings):
+ *      the ObjC demo and the Swift demo (`Example-Shared/CYLSettingsDemoTableViewController.swift`) use the same groups.
+ * [CN] 按功能划分的设置行，供分组显示的列表使用（每组一个 section，类似系统设置）：ObjC Demo 与 Swift Demo
+ *      （`Example-Shared/CYLSettingsDemoTableViewController.swift`）使用相同的分组。
+ */
+typedef NS_ENUM(NSInteger, CYLSettingsGroup) {
+    CYLSettingsGroupGeneral,              ///< [EN] Language, memory warning, and rows a newer version adds. [CN] 语言、内存警告，以及新版本新增的行。
+    CYLSettingsGroupTabBarAppearance,     ///< [EN] Title offset, standardAppearance, scroll minimize. [CN] 标题偏移、standardAppearance、滚动缩小。
+    CYLSettingsGroupTabBarItemUpdate,     ///< [EN] In-place tab item updates (#601). [CN] 原地更新 Tab（#601）。
+    CYLSettingsGroupPagesSelectionLogin,  ///< [EN] Replace pages (#481), selectedIndex (#515), login (#19). [CN] 替换页面、selectedIndex、登录。
+    CYLSettingsGroupPlusButton,           ///< [EN] The plus button's touchable area (#91), an image set later. [CN] PlusButton 可点击区域（#91）、之后才加载的图片。
+    CYLSettingsGroupTabInteractions,      ///< [EN] Tap animation, sound, long press, swipe (#535, #118). [CN] 点击动画、声音、长按、滑动。
+    CYLSettingsGroupHelpers,              ///< [EN] No base class, CYLUtils helpers (#535). [CN] 无需继承基类、CYLUtils 工具方法。
+};
 
 /*!
  * [EN] The settings section in three calls, so a list adds it with one line in each data source and delegate method:
@@ -65,10 +84,44 @@ FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
 
 /*!
  * [EN] Deselects the row and runs it: the language picker, the memory warning check, the next title offset, the next
- *      appearance theme, the login state or the tab item update.
- * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题、登录状态或更新 Tab。
+ *      appearance theme, the login state, the skin picker or the tab item update.
+ * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题、登录状态、换肤选择器或更新 Tab。
  */
 - (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
+
+#pragma mark - Groups
+
+/*!
+ * [EN] The groups that have rows, in display order (`CYLSettingsGroup` values).
+ * [CN] 有行的分组，按显示顺序排列（`CYLSettingsGroup` 的值）。
+ */
+- (NSArray<NSNumber *> *)cyl_settingsGroups NS_SWIFT_NAME(cyl_settingsGroups());
+
+/*!
+ * [EN] The localized title of `group`.
+ * [CN] `group` 的本地化标题。
+ */
+- (NSString *)cyl_titleForSettingsGroup:(CYLSettingsGroup)group NS_SWIFT_NAME(cyl_title(for:));
+
+/*!
+ * [EN] The settings rows of `group`, in display order. Every settings row is in exactly one group; a row this version does
+ *      not place goes to `CYLSettingsGroupGeneral`.
+ * [CN] `group` 中的设置行，按显示顺序排列。每个设置行只属于一个分组；本版本未归类的行放入 `CYLSettingsGroupGeneral`。
+ */
+- (NSArray<NSNumber *> *)cyl_settingsRowsInGroup:(CYLSettingsGroup)group NS_SWIFT_NAME(cyl_settingsRows(in:));
+
+/*!
+ * [EN] The cell of settings row `row`, for any section of any table view (a grouped list).
+ * [CN] 设置行 `row` 的 cell，可用于任意列表的任意 section（分组列表）。
+ */
+- (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView row:(NSInteger)row NS_SWIFT_NAME(cyl_settingsCell(for:row:));
+
+/*!
+ * [EN] Runs settings row `row`, without touching a table view: a grouped list deselects and reloads its own rows after it
+ *      (e.g. a checkmark or the current value changed).
+ * [CN] 执行设置行 `row`，不操作列表：分组列表在其后自行取消选中并刷新（例如勾号或当前值已变化）。
+ */
+- (void)cyl_didSelectSettingsRow:(NSInteger)row NS_SWIFT_NAME(cyl_didSelectSettingsRow(_:));
 
 @end
 

@@ -60,6 +60,8 @@ let package = Package(
                 // [CN] 共用引擎、animator 协议与注册表，以及每个动画库一个目录（`Lottie/`；`PAG/` 与 `Rive/` 在没有 libpag、RiveRuntime 时为空，
                 // SPM 不提供它们）。
                 .headerSearchPath("CYLTabBarItemAnimation"),
+                // FIX: issue #216 — theme switching (skins), in CYLUtils/CYLComponents/CYLTheme.
+                .headerSearchPath("CYLUtils/CYLComponents/CYLTheme"),
                 .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar"),
                 .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBarPrivate"),
             ],

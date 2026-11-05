@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigasi dan perbandingan";
 "角标" = "Lencana";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Tidak didukung Liquid Glass: sistem menentukan tinggi tab bar (FlatDesign dan gaya klasik mendukung)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Skin";
+"换肤（主题，issue #216）" = "Skin (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Ketuk untuk memilih tema: latar, ikon, dan warna teks TabBar berubah di tempat, di semua gaya TabBar. Saat ini: %@";
+"选择主题" = "Pilih tema";
+"默认" = "Bawaan";
+"西柚" = "Jeruk Bali";
+"青草" = "Rumput";
+"玫瑰粉" = "Mawar Merah Muda";
+"春节" = "Imlek";
+"跟随系统深色模式" = "Ikuti Mode Gelap sistem";
 "默认点击声" = "Klik bawaan";
 "中等触感反馈" = "Haptik sedang";
 "无需继承基类与工具方法" = "Tanpa kelas dasar, dan utilitas";
@@ -277,3 +289,49 @@
 "轻触感反馈" = "Haptik ringan";
 "重触感反馈" = "Haptik kuat";
 "长按（#152）" = "Tekan lama (#152)";
+"播放 / 停止" = "Putar / Hentikan";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Natal";
+"万圣节" = "Halloween";
+"情人节" = "Hari Valentine";
+"中秋节" = "Festival Pertengahan Musim Gugur";
+"复活节" = "Paskah";
+"新年" = "Tahun Baru";
+"夏日" = "Musim Panas";
+"生日" = "Ulang Tahun";
+"太空" = "Luar Angkasa";
+"海洋" = "Samudra";
+"换肤：节日与配色主题（%@ 种）" = "Skin: hari raya dan warna (%@)";
+"节日图标与配色" = "Ikon hari raya dan warna";
+"仅配色" = "Warna saja";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Ketuk";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Muat gambar";
+"替换为更大的图片" = "Ganti dengan gambar yang lebih besar";
+"移除图片" = "Hapus gambar";
+"加载背景图片" = "Muat gambar latar";
+"2 秒后：%@" = "Dalam 2 detik: %@";
+"PlusButton 图片之后才加载" = "Gambar PlusButton dimuat belakangan";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Ketuk untuk memilih kasus dan melakukan push tab bar controller: awalnya PlusButton tidak punya gambar; 2 detik kemudian gambar dimuat, diganti, atau dihapus, atau gambar latar dimuat. Hasilnya harus sama dengan gambar yang ditetapkan saat peluncuran.";
+"对照：启动时即有图片" = "Bandingkan: gambar saat peluncuran";
+"对照：启动时即有更大的图片" = "Bandingkan: gambar lebih besar saat peluncuran";
+"对照：启动时即有背景图片" = "Bandingkan: gambar latar saat peluncuran";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Ketuk untuk kembali atau menutup";
+"详情" = "Detail";
+"拍照" = "Ambil foto";
+"从相册选择" = "Pilih dari album";
+"设置" = "Pengaturan";
+"关于我们" = "Tentang kami";
+"示例" = "Contoh";
+"撰写" = "Tulis";
+"好" = "OK";
+"编辑更多" = "Edit Lainnya";
+"新版本" = "Versi baru";
+"打开 TabBar 场景展示" = "Buka galeri tab bar";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Setiap adegan adalah tab bar yang dibuat dengan API publik: gaya, animasi, pengingat, Lottie, dan API tab terbaru";
+"TabBar 场景展示" = "Galeri tab bar";
