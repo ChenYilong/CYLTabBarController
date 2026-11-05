@@ -26,6 +26,7 @@
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](Mac-CI-CD.md) |
 | [PlusButton 角标：每次点击都会变化](PlusButton-Badge.md) | [PlusButton badge: changes on every tap](PlusButton-Badge.md) |
 | [有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应](PlusButton-Lottie-TabIcon.md) | [Lottie tab icons and their files when there is a PlusButton](PlusButton-Lottie-TabIcon.md) |
+| [PlusButton 的 slot：占位与数量一致](PlusButton-Slot.md) | [The PlusButton Slot: Placeholders and Matching Counts](PlusButton-Slot.md) |
 | [PlusButton 子控件响应各自的点击事件](PlusButton-Subview-Touches.md) | [Subviews of the PlusButton receive their own touches](PlusButton-Subview-Touches.md) |
 | [PlusButton 点击范围：扩大、按倍数放大与调试显示](PlusButton-Touchable-Area.md) | [PlusButton touchable area: grow it, scale it, and see it](PlusButton-Touchable-Area.md) |
 | [在任意位置获取导航控制器并 Push](Push-From-Anywhere.md) | [Get the navigation controller and push from anywhere](Push-From-Anywhere.md) |
@@ -74,6 +75,7 @@ docs/
 ├── Mac-CI-CD.md
 ├── PlusButton-Badge.md
 ├── PlusButton-Lottie-TabIcon.md
+├── PlusButton-Slot.md
 ├── PlusButton-Subview-Touches.md
 ├── PlusButton-Touchable-Area.md
 ├── Push-From-Anywhere.md

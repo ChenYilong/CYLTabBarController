@@ -158,7 +158,12 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
     //      No, it is limited to cyl_isChildViewControllerPlusButton
     NSMutableArray *subControls = [NSMutableArray arrayWithCapacity:self.cyl_visibleControls.count];
     [self.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([control cyl_isPlusButton] && ![CYLPlusButton plusChildViewControllerForOwner:self].cyl_plusViewControllerEverAdded) {
+        // [EN] FIX: placeholder count mismatch — the plus button view itself is never a view controller's control:
+        //      `cyl_visibleControls` adds it next to the tab button of its slot, so with a plus child view controller this
+        //      list had one control more than `viewControllers`. The slot's own tab button stays.
+        // [CN] FIX：占位导致的数量不匹配——PlusButton 视图本身从不对应任何控制器：`cyl_visibleControls` 会把它加在其 slot 的 Tab
+        //      按钮旁边，因此有 PlusButton 子控制器时本数组比 `viewControllers` 多一个。slot 自己的 Tab 按钮保留。
+        if ([CYLPlusButton isPlusButtonView:control]) {
             return;
         }
         [subControls addObject:control];
@@ -182,17 +187,22 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
 }
 
 - (UIControl *)cyl_tabBarButtonWithTabIndex:(NSUInteger)tabIndex {
-    UIControl *selectedControl = [self cyl_visibleControlWithIndex:tabIndex];
-    
-    NSInteger plusViewControllerIndex = [self.tabBarController.viewControllers indexOfObject:[CYLPlusButton plusChildViewControllerForOwner:self]];
-    BOOL isPlusViewControllerAdded = [CYLPlusButton plusChildViewControllerForOwner:self].cyl_plusViewControllerEverAdded && (plusViewControllerIndex != NSNotFound);
-    
-    if (isPlusViewControllerAdded) {
-        return selectedControl;
+    // [EN] FIX: placeholder count mismatch — `tabIndex` is an index in `viewControllers`. First the tab button of that view
+    //      controller itself. Otherwise the tab buttons in order, without the plus button view: they match
+    //      `viewControllers` one to one in every style (the slot's tab button included). The index used to go into
+    //      `cyl_visibleControls` with a plus child view controller (the plus button view is in it: one off after the slot)
+    //      and into the list without plus controls otherwise (no slot button there on Liquid Glass with a placeholder).
+    // [CN] FIX：占位导致的数量不匹配——`tabIndex` 是 `viewControllers` 中的下标。先直接取该控制器的 Tab 按钮；否则按顺序取去掉
+    //      PlusButton 视图后的 Tab 按钮：在所有样式下都与 `viewControllers` 一一对应（包含 slot 的 Tab 按钮）。以前有 PlusButton 子控制器时
+    //      用这个下标取 `cyl_visibleControls`（其中包含 PlusButton 视图，slot 之后错一位），否则取去掉 Plus 控件的数组。
+    NSArray<UIViewController *> *viewControllers = self.tabBarController.viewControllers;
+    if (tabIndex < viewControllers.count) {
+        UIControl *tabButton = viewControllers[tabIndex].tabBarItem.cyl_tabButton;
+        if ([tabButton isKindOfClass:[UIControl class]] && tabButton.superview && ![CYLPlusButton isPlusButtonView:tabButton]) {
+            return tabButton;
+        }
     }
-    
-    selectedControl = CYLObjectAtIndex([self cyl_subTabBarButtonsWithoutPlusButton], tabIndex);
-    return selectedControl;
+    return CYLObjectAtIndex([self cyl_subTabBarButtons], tabIndex);
 }
 
 - (UIControl *)cyl_visibleControlWithIndex:(NSUInteger)index {
