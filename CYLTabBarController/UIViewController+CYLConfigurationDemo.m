@@ -46,6 +46,12 @@ static NSString *CYLConfigurationSourceText(NSString *_Nullable path, NSDictiona
 
 #pragma mark - Demo pages 演示页面
 
+/// [EN] The title of a tab, from its configuration, or its page ID. [CN] Tab 的标题（来自其配置），否则为页面 ID。
+static NSString *CYLConfigurationDemoTitle(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
+    NSString *title = tabAttributes[CYLTabBarItemTitle];
+    return [title isKindOfClass:[NSString class]] && title.length > 0 ? title : pageIdentifier;
+}
+
 /// [EN] A demo page: its title and a text, in a navigation controller. [CN] 演示页面：标题与一段文字，包裹在导航控制器中。
 static UIViewController *CYLConfigurationDemoPage(NSString *title, NSString *text) {
     UIViewController *page = [[UIViewController alloc] init];
@@ -81,13 +87,12 @@ static void CYLRegisterConfigurationDemoPages(void) {
     dispatch_once(&onceToken, ^{
         CYLTabBarPageRegistry *registry = CYLTabBarPageRegistry.sharedRegistry;
         [registry registerPageProvider:^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
-            NSString *title = [tabAttributes[CYLTabBarItemTitle] isKindOfClass:[NSString class]] ? tabAttributes[CYLTabBarItemTitle] : pageIdentifier;
-            return CYLConfigurationDemoPage(title, [NSString stringWithFormat:@"page ID: %@", pageIdentifier]);
+            return CYLConfigurationDemoPage(CYLConfigurationDemoTitle(pageIdentifier, tabAttributes), [NSString stringWithFormat:@"page ID: %@", pageIdentifier]);
         } forPageIdentifiers:@[ @"home", @"message", @"discover", @"me", @"tab" ]];
         [registry registerPageProvider:^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
             NSDictionary *parameters = tabAttributes[CYLTabBarItemPageParameters];
             NSString *URLString = [parameters[@"url"] isKindOfClass:[NSString class]] ? parameters[@"url"] : @"(no url)";
-            return CYLConfigurationDemoPage(@"Web", [NSString stringWithFormat:@"page ID: %@\nCYLTabBarItemPageParameters.url:\n%@", pageIdentifier, URLString]);
+            return CYLConfigurationDemoPage(CYLConfigurationDemoTitle(pageIdentifier, tabAttributes), [NSString stringWithFormat:@"page ID: %@\nCYLTabBarItemPageParameters.url:\n%@", pageIdentifier, URLString]);
         } forPageIdentifier:@"web"];
     });
 }
@@ -650,7 +655,7 @@ static NSData *CYLEdgeCaseData(NSString *text) {
 }
 
 + (UIViewController *)cylTabBarPageWithAttributes:(NSDictionary<NSString *, id> *)tabAttributes {
-    return CYLConfigurationDemoPage(@"Auto", @"CYLConfigurationDemoAutoPage\n+cylTabBarPageIdentifier = \"auto\"\n(CYLTabBarPage, no registration code)");
+    return CYLConfigurationDemoPage(CYLConfigurationDemoTitle([self cylTabBarPageIdentifier], tabAttributes), [NSString stringWithFormat:@"%@\n+cylTabBarPageIdentifier = \"%@\"\n(CYLTabBarPage, no registration code)", NSStringFromClass(self), [self cylTabBarPageIdentifier]]);
 }
 
 @end
@@ -666,7 +671,7 @@ static NSData *CYLEdgeCaseData(NSString *text) {
 }
 
 + (UIViewController *)cylTabBarPageWithAttributes:(NSDictionary<NSString *, id> *)tabAttributes {
-    return CYLConfigurationDemoPage(@"Conflict", @"CYLConfigurationDemoConflictPageA\n(used: first in class name order)");
+    return CYLConfigurationDemoPage(CYLConfigurationDemoTitle([self cylTabBarPageIdentifier], tabAttributes), [NSString stringWithFormat:@"%@\n(used: first in class name order)", NSStringFromClass(self)]);
 }
 
 @end
