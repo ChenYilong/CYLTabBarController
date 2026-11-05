@@ -313,3 +313,5 @@
 "仅配色" = "צבעים בלבד";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "הקישו כאן";
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "העתק";

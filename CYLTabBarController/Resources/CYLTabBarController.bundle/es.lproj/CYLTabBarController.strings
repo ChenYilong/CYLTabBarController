@@ -313,3 +313,5 @@
 "仅配色" = "Solo colores";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Tócame";
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Copiar";

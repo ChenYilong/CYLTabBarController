@@ -1667,9 +1667,28 @@ static const NSTimeInterval CYLScrollHideSimulationDelay = 1.5;
 /// [EN] Seconds a temporary page, window or keyboard stays. [CN] 临时页面、窗口或键盘停留的秒数。
 static const NSTimeInterval CYLScrollHideSimulationHold = 1.5;
 
+/*!
+ * [EN] Text shown as is in every language: product and API names, issue numbers, and the self-test report, which stays
+ *      in English because scripts/scroll-hide-self-test.sh reads its PASS / FAIL lines. The annotation tells the static
+ *      analyzer's localizability checker that this is intended.
+ * [CN] 在所有语言中原样显示的文字：产品名与 API 名、issue 编号，以及自测报告（保持英文，因为 scripts/scroll-hide-self-test.sh 会读取
+ *      其中的 PASS / FAIL 行）。该标注告知静态分析器的本地化检查这是有意为之。
+ */
+static NSString *CYLScrollHideSimulationUntranslatedText(NSString *text) CYL_RETURNS_LOCALIZED_STRING;
+static NSString *CYLScrollHideSimulationUntranslatedText(NSString *text) {
+    return text;
+}
+
 static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_t block) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(seconds * NSEC_PER_SEC)), dispatch_get_main_queue(), block);
 }
+
+@interface UIViewController (CYLScrollHideSimulationTitle)
+/// [EN] The simulation titles are API and event names (e.g. "UIAlertController (alert)"), the same in every language, so
+///      they are not translated; the annotation tells the static analyzer's localizability checker so.
+/// [CN] 模拟的标题是 API 与事件名（如 "UIAlertController (alert)"），在所有语言中都相同，因此不翻译；该标注告知静态分析器的本地化检查。
+- (NSString *)cyl_scrollHideSimulationTitleForRow:(NSInteger)row kind:(CYLScrollHideSimulationKind *)kind CYL_RETURNS_LOCALIZED_STRING;
+@end
 
 @implementation UIViewController (CYLScrollHideSimulation)
 
@@ -1816,8 +1835,10 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
         case CYLScrollHideSimulationRowAlert:
         case CYLScrollHideSimulationRowActionSheet: {
             UIAlertControllerStyle style = (row == CYLScrollHideSimulationRowAlert) ? UIAlertControllerStyleAlert : UIAlertControllerStyleActionSheet;
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"CYLTabBarController" message:@"#13" preferredStyle:style];
-            [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:CYLScrollHideSimulationUntranslatedText(@"CYLTabBarController")
+                                                                           message:CYLScrollHideSimulationUntranslatedText(@"#13")
+                                                                    preferredStyle:style];
+            [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"OK") style:UIAlertActionStyleCancel handler:nil]];
             alert.popoverPresentationController.sourceView = self.view;
             alert.popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds), 1, 1);
             [self presentViewController:alert animated:YES completion:nil];
@@ -1883,7 +1904,8 @@ static void CYLScrollHideSimulationAfter(NSTimeInterval seconds, dispatch_block_
             UIWindow *mainWindow = self.view.window;
             UIWindow *overlay = nil;
             if (@available(iOS 13.0, *)) {
-                overlay = mainWindow.windowScene ? [[UIWindow alloc] initWithWindowScene:mainWindow.windowScene] : nil;
+                UIWindowScene *windowScene = mainWindow.windowScene;
+                overlay = windowScene ? [[UIWindow alloc] initWithWindowScene:windowScene] : nil;
             }
             if (!overlay) {
                 overlay = [[UIWindow alloc] initWithFrame:mainWindow.bounds];
@@ -2248,10 +2270,10 @@ static const NSTimeInterval CYLScrollHideSelfTestNextDelay = 1.5;
     }
     NSString *summary = [NSString stringWithFormat:@"%@ passed, %@ failed, %@ skipped", @(passed), @(failed), @(skipped)];
     NSLog(@"[CYLTabBarController] scroll hiding self-test: done: %@", summary);
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Scroll hiding self-test (#13)"
-                                                                   message:[NSString stringWithFormat:@"%@\n\n%@", summary, [results componentsJoinedByString:@"\n"]]
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:CYLScrollHideSimulationUntranslatedText(@"Scroll hiding self-test (#13)")
+                                                                   message:CYLScrollHideSimulationUntranslatedText([NSString stringWithFormat:@"%@\n\n%@", summary, [results componentsJoinedByString:@"\n"]])
                                                             preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"OK") style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];
 }
 
