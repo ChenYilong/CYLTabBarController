@@ -137,6 +137,15 @@ classes link back to it:
 - **Verify** before pushing: `pod lib lint CYLTabBarController.podspec --quick`, plus a build or static check of the
   changed code. Say plainly what could not be verified.
 
+### Running the simulator
+
+- **Before every run of the iOS Simulator** (`xcrun simctl boot`, `xcodebuild test`, installing and launching an app,
+  opening Simulator.app, simulator screenshots), AI agents first run `scripts/free-ram.sh` to free up RAM.
+- It never asks for a password: `purge` runs through `sudo -n`, and is skipped with a hint when the maintainer has not
+  run the one-time `scripts/free-ram.sh --install` (a sudoers rule that allows only `/usr/sbin/purge`). Never type,
+  store or ask for a password to work around that; continue without the purge and mention the hint.
+- It quits no app or simulator, and does nothing outside macOS.
+
 ## 5. Xcode project files keep the ObjC example's format
 
 **Purpose: keep CI/CD from failing.** CI and releases run on the `macos-26` runner (Xcode 26.x, no Xcode 27; see
