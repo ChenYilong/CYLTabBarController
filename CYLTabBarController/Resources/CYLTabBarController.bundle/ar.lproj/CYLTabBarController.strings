@@ -315,6 +315,10 @@
 "点我" = "انقر هنا";
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "نسخ";
+/* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
+"展开全部 %@ 个模拟" = "عرض جميع عمليات المحاكاة (%@)";
+/* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
+"收起模拟列表" = "طي قائمة المحاكاة";
 
 /* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
 "网络图标" = "أيقونات من الشبكة";
