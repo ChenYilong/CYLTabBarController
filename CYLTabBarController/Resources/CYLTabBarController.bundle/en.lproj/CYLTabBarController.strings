@@ -330,3 +330,5 @@
 "展开全部 %@ 个模拟" = "Show all %@ simulations";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Collapse the simulation list";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "%1$@ tabs skipped: %2$@";

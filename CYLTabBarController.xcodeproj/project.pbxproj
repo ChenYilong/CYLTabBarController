@@ -54,6 +54,7 @@
 		3DFC724D5AA6D2B820CC163C /* UITabBarItem+CYLBadgeExtention.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D011D1D39B1E8C96E402189 /* UITabBarItem+CYLBadgeExtention.m */; };
 		3E5F7488174426E3E897E98D /* CYLFlatDesignTabBarButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 46818C00AA5DC8A0452B9DCA /* CYLFlatDesignTabBarButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		466E25FCA6E83C9A1ECD53B5 /* CYLTabBarToolkitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1462951104765AC860889E3A /* CYLTabBarToolkitTests.m */; };
+		AD70F28867C640F7B1AC49C1 /* CYLTabBarPageRegistryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D116232EB2440CC01A94254 /* CYLTabBarPageRegistryTests.m */; };
 		49F431C7B83D83B4DC51F6B7 /* CYLPlusButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 932C34E7F43574B5940DDCCA /* CYLPlusButton.m */; };
 		4DDA7544292C4ED7BCBA3201 /* UIViewController+CYLUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = B0730541CF894802806F1CAC /* UIViewController+CYLUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4E7CF3A770DDF273DD5C30C1 /* UIColor+CYLTabBarControllerExtention.m in Sources */ = {isa = PBXBuildFile; fileRef = 15959DC83062213DEB9FB34C /* UIColor+CYLTabBarControllerExtention.m */; };
@@ -273,6 +274,7 @@
 		1271DF34FCBFCDE1D45F35B3 /* UIControl+CYLBadgeExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIControl+CYLBadgeExtention.h"; sourceTree = "<group>"; };
 		137550D89BD30C4CC0BE2F23 /* CYLTabBarControllerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CYLTabBarControllerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1462951104765AC860889E3A /* CYLTabBarToolkitTests.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarToolkitTests.m; sourceTree = "<group>"; };
+		8D116232EB2440CC01A94254 /* CYLTabBarPageRegistryTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarPageRegistryTests.m; sourceTree = "<group>"; };
 		14D64365484FA027D689BD77 /* UITabBarItem+CYLTabBarControllerExtention.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UITabBarItem+CYLTabBarControllerExtention.m"; sourceTree = "<group>"; };
 		15959DC83062213DEB9FB34C /* UIColor+CYLTabBarControllerExtention.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIColor+CYLTabBarControllerExtention.m"; sourceTree = "<group>"; };
 		18D2209706B0791A2E14CA10 /* CYLTabBarController+CYLInteraction.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "CYLTabBarController+CYLInteraction.m"; sourceTree = "<group>"; };
@@ -781,6 +783,7 @@
 				9AE942911BDC91B900354519 /* Supporting Files */,
 				D40978248EE9C4959E82A341 /* CYLThemeTests.m */,
 				1462951104765AC860889E3A /* CYLTabBarToolkitTests.m */,
+				8D116232EB2440CC01A94254 /* CYLTabBarPageRegistryTests.m */,
 			);
 			path = CYLTabBarControllerTests;
 			sourceTree = "<group>";
@@ -1352,6 +1355,7 @@
 				59F72D27E1D4CB8E7CF82B1D /* CYLTabBarControllerTests.m in Sources */,
 				05D761411F50E1D1BF3C6B26 /* CYLThemeTests.m in Sources */,
 				466E25FCA6E83C9A1ECD53B5 /* CYLTabBarToolkitTests.m in Sources */,
+				AD70F28867C640F7B1AC49C1 /* CYLTabBarPageRegistryTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,6 +9,8 @@
 
 /// [EN] Private: marks a left-out tab; the same key as in CYLTabBarController.m. [CN] 私有：标记被排除的 Tab；与 CYLTabBarController.m 中的键相同。
 static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
+/// [EN] Private: the reason of a left-out tab (English); the same key as in CYLTabBarController.m. [CN] 私有：被排除的 Tab 的原因（英文）；与 CYLTabBarController.m 中的键相同。
+static NSString *const CYLTabBarItemExclusionReasonKey = @"_CYLTabBarItemExclusionReason";
 /*!
  * [EN] Private: marks the entry the tab bar controller inserts for the PlusButton slot; the same key as in
  *      CYLTabBarController.m (#774).
@@ -386,7 +388,8 @@ static id CYLDarkColorsValue(id value) {
 static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
     return @[ CYLTabBarControllerViewControllers, CYLTabBarControllerTabBarItemsAttributes, CYLTabBarControllerImageInsets,
               CYLTabBarControllerTitlePositionAdjustment, CYLTabBarControllerStyleType, CYLTabBarControllerContext,
-              CYLTabBarControllerPageRegistry, CYLTabBarControllerPageResolver ];
+              CYLTabBarControllerPageRegistry, CYLTabBarControllerPageResolver, CYLTabBarControllerPageLookupOrder,
+              CYLTabBarControllerAutomaticPageRegistration ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -628,6 +631,57 @@ static BOOL CYLVersionIsLower(NSArray<NSNumber *> *version, NSArray<NSNumber *> 
  * [CN] 该 Tab 在本设备上被排除的原因，没有则为 nil：不适用于 iOS（`CYLTabBarItemPlatforms`），或需要更新的 App 版本
  *      （`CYLTabBarItemMinimumAppVersion`）。无效的最低版本会被忽略并输出警告（B24）。
  */
+/*!
+ * [EN] A BOOL from a configuration value: NSNumber, or "true" / "false", "yes" / "no", "1" / "0" (any case). nil otherwise.
+ * [CN] 配置值中的 BOOL：NSNumber，或 "true" / "false"、"yes" / "no"、"1" / "0"（不区分大小写）。否则为 nil。
+ */
+static NSNumber *_Nullable CYLBoolValue(id value) {
+    if ([value isKindOfClass:[NSNumber class]]) {
+        return @([value boolValue]);
+    }
+    if ([value isKindOfClass:[NSString class]]) {
+        NSString *text = [[(NSString *)value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] lowercaseString];
+        if ([@[ @"true", @"yes", @"1" ] containsObject:text]) {
+            return @(YES);
+        }
+        if ([@[ @"false", @"no", @"0" ] containsObject:text]) {
+            return @(NO);
+        }
+    }
+    return nil;
+}
+
+/*!
+ * [EN] The lookup order from a configuration value: an array of strings, or a comma-separated string, of "instance",
+ *      "resolver", "shared", "automatic" (any case, each once). Unknown entries are dropped with a warning; nil when
+ *      nothing is left (C18), so the default order is used.
+ * [CN] 配置值中的查找顺序：由 "instance"、"resolver"、"shared"、"automatic"（不区分大小写，各一次）组成的数组或逗号分隔的字符串。
+ *      未知项会被丢弃并输出警告；没有剩余项时为 nil（C18），即使用默认顺序。
+ */
+static NSArray<CYLTabBarPageSource> *_Nullable CYLPageLookupOrderValue(id value) {
+    NSArray *entries = nil;
+    if ([value isKindOfClass:[NSString class]]) {
+        entries = [(NSString *)value componentsSeparatedByString:@","];
+    } else if ([value isKindOfClass:[NSArray class]]) {
+        entries = value;
+    }
+    NSMutableArray<CYLTabBarPageSource> *order = [NSMutableArray array];
+    for (id entry in entries) {
+        NSString *name = [entry isKindOfClass:[NSString class]]
+            ? [[(NSString *)entry stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] lowercaseString] : nil;
+        if ([CYLTabBarPageRegistry.defaultPageLookupOrder containsObject:name ?: @""] && ![order containsObject:name]) {
+            [order addObject:name];
+        } else if (name.length > 0 || ![entry isKindOfClass:[NSString class]]) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerPageLookupOrder, entry);
+        }
+    }
+    if (order.count == 0) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerPageLookupOrder, value);
+        return nil;
+    }
+    return [order copy];
+}
+
 static NSString *_Nullable CYLExclusionReason(NSDictionary *item) {
     NSArray<NSString *> *platforms = item[CYLTabBarItemPlatforms];
     if (platforms && ![platforms containsObject:@"ios"]) {
@@ -826,7 +880,9 @@ static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nulla
     if (normalized[CYLTabBarControllerViewControllers]) {
         normalized[CYLTabBarControllerViewControllers] = CYLValidViewControllers(normalized[CYLTabBarControllerViewControllers]);
     }
-    if (normalized[CYLTabBarControllerPageRegistry] && ![normalized[CYLTabBarControllerPageRegistry] isKindOfClass:[CYLTabBarPageRegistry class]]) {
+    if (normalized[CYLTabBarControllerPageRegistry] && ![normalized[CYLTabBarControllerPageRegistry] conformsToProtocol:@protocol(CYLTabBarPageProviding)]) {
+        // Any `CYLTabBarPageProviding` (a registry, a router, a mock); a string from a file cannot provide pages (C14).
+        // 任何 `CYLTabBarPageProviding`（注册表、路由器、Mock）；文件中的字符串不能提供页面（C14）。
         CYLLogInvalidConfigurationValue(CYLTabBarControllerPageRegistry, normalized[CYLTabBarControllerPageRegistry]);
         [normalized removeObjectForKey:CYLTabBarControllerPageRegistry];
     }
@@ -835,6 +891,16 @@ static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nulla
         // Only a block can be called; a string from a file cannot (C15). 只有 block 可以调用；文件中的字符串不行（C15）。
         CYLLogInvalidConfigurationValue(CYLTabBarControllerPageResolver, normalized[CYLTabBarControllerPageResolver]);
         [normalized removeObjectForKey:CYLTabBarControllerPageResolver];
+    }
+    if (normalized[CYLTabBarControllerPageLookupOrder]) {
+        normalized[CYLTabBarControllerPageLookupOrder] = CYLPageLookupOrderValue(normalized[CYLTabBarControllerPageLookupOrder]);
+    }
+    if (normalized[CYLTabBarControllerAutomaticPageRegistration]) {
+        NSNumber *automatic = CYLBoolValue(normalized[CYLTabBarControllerAutomaticPageRegistration]);
+        if (!automatic) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerAutomaticPageRegistration, normalized[CYLTabBarControllerAutomaticPageRegistration]);
+        }
+        normalized[CYLTabBarControllerAutomaticPageRegistration] = automatic;
     }
     id items = normalized[CYLTabBarControllerTabBarItemsAttributes];
     if ([items isKindOfClass:[NSDictionary class]]) {
@@ -860,7 +926,13 @@ static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nulla
 #if defined(DEBUG) || defined(BETA)
                         NSLog(@"🟡 CYLTabBarController configuration: the tab %@ is left out on this device: %@.", normalizedItem[CYLTabBarItemTitle] ?: @"", reason);
 #endif
-                        normalizedItem = @{ CYLTabBarItemExcludedKey : @(YES) };
+                        NSMutableDictionary *excluded = [NSMutableDictionary dictionaryWithObject:@(YES) forKey:CYLTabBarItemExcludedKey];
+                        excluded[CYLTabBarItemExclusionReasonKey] = reason;
+                        // [EN] Kept for `cyl_skippedTabs`; the entry is still left out. [CN] 保留给 `cyl_skippedTabs`；该项仍被排除。
+                        for (NSString *key in @[ CYLTabBarItemTitle, CYLTabBarItemIdentifier, CYLTabBarItemPageIdentifier ]) {
+                            excluded[key] = normalizedItem[key];
+                        }
+                        normalizedItem = excluded;
                     }
                     [normalizedItems addObject:normalizedItem];
                 } else {

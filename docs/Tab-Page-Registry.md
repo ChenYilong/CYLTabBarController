@@ -32,6 +32,10 @@
 | [解析回调](#cn解析回调) | [Resolver](#enresolver) |
 | [自动注册（CYLTabBarPage）](#cn自动注册cyltabbarpage) | [Automatic registration (CYLTabBarPage)](#enautomatic-registration-cyltabbarpage) |
 | [远程配置兼容字段](#cn远程配置兼容字段) | [Remote configuration keys](#enremote-configuration-keys) |
+| [页面工厂与请求](#cn页面工厂与请求) | [Page factories and requests](#enpage-factories-and-requests) |
+| [自定义页面来源（协议）](#cn自定义页面来源协议) | [Custom page sources (the protocol)](#encustom-page-sources-the-protocol) |
+| [重新加载（配置更新、登录后换 Tab）](#cn重新加载配置更新登录后换-tab) | [Reload (a configuration update, tabs after login)](#enreload-a-configuration-update-tabs-after-login) |
+| [被跳过的 Tab](#cn被跳过的-tab) | [Skipped tabs](#enskipped-tabs) |
 | [API](#cnapi) | [API](#enapi) |
 | [Android](#cnandroid) | [Android](#enandroid) |
 | [演示](#cn演示) | [Demo](#endemo) |
@@ -115,6 +119,8 @@ flowchart TD
 | Tab 的**顺序只由配置中的数组决定**；注册表是无序的映射。没有找到页面的 Tab 会被跳过（DEBUG 下输出警告），其余 Tab 保持原来的顺序。由文件或 URL 创建时，如果没有任何 Tab 找到页面，返回 `CYLTabBarConfigurationErrorNoPages`（11）错误，而不是空的 TabBar。 | The **order comes only from the array in the configuration**; registries are unordered maps. A tab whose page is not found is skipped (with a warning in DEBUG) and the other tabs keep their order. From a file or a URL, when no tab finds its page, the result is a `CYLTabBarConfigurationErrorNoPages` (11) error instead of an empty tab bar. |
 | 提供者返回的页面会被检查：nil、不是视图控制器、是 TabBarController（不允许嵌套）、已属于其他容器（例如单例页面已在另一个 TabBar 中）或已被本 TabBar 的其他 Tab 使用，都会被拒绝并跳过该 Tab；提供者抛出的 Objective-C 异常会被捕获（C12、C13）。提供者每次调用都应返回新页面。 | Every page a provider returns is checked: nil, not a view controller, a tab bar controller (no nested tab bars), a page that already belongs to another container (e.g. a singleton page already in another tab bar) or a page already used by another tab of this tab bar is refused and the tab skipped; an Objective-C exception a provider raises is caught (C12, C13). A provider should return a new page on each call. |
 | 传入 `CYLTabBarControllerViewControllers`（代码，按下标对应）时不使用页面 ID，行为与以前一致。 | With `CYLTabBarControllerViewControllers` (code, matched by index), page IDs are not used; the behavior is the same as before. |
+| 顺序可以配置：`CYLTabBarControllerPageLookupOrder`（数组或逗号分隔的字符串，取值 `instance`、`resolver`、`shared`、`automatic`，代码中为 `CYLTabBarPageSource` 常量）只保留列出的来源并按其顺序查找；`CYLTabBarControllerAutomaticPageRegistration` 为 NO 时不扫描 `CYLTabBarPage` 类。未知项会被丢弃并警告，都无效时使用默认顺序（C18）。控制器用 `cyl_pageLookupOrder` 给出实际顺序。 | The order is configurable: `CYLTabBarControllerPageLookupOrder` (an array or a comma-separated string of `instance`, `resolver`, `shared`, `automatic`; the `CYLTabBarPageSource` constants in code) keeps only the listed sources, in that order; `CYLTabBarControllerAutomaticPageRegistration` NO leaves the `CYLTabBarPage` classes out. Unknown entries are dropped with a warning, and the default order is used when nothing valid is left (C18). The controller reports the order in use in `cyl_pageLookupOrder`. |
+| 查找本身是 `+[CYLTabBarPageRegistry pagesOfTabs:registry:resolver:lookupOrder:keptTabs:skipped:]`，TabBarController 只是调用它；其他容器或测试可以直接调用。 | The lookup itself is `+[CYLTabBarPageRegistry pagesOfTabs:registry:resolver:lookupOrder:keptTabs:skipped:]`; the tab bar controller only calls it, and another container or a test can call it directly. |
 
 ## [CN]多个 TabBar
 ## [EN]Several tab bars
@@ -186,6 +192,54 @@ final class MessageViewController: UIViewController, CYLTabBarPage {
 |:---|:---|
 | 子控制器由代码传入（按下标对应）时，被排除的 Tab 连同对应的子控制器一起移除，其余 Tab 与子控制器仍然一一对应（B22）。Protobuf 字段：页面 ID 33、页面参数 34（map）、平台 35（逗号分隔的字符串）、最低版本 36；原来的类名字段 19、20 与顶层 6 为保留编号。 | With view controllers from code (matched by index), a left-out tab takes its view controller out with it, so the other tabs and view controllers still match (B22). Protobuf fields: page ID 33, page parameters 34 (map), platforms 35 (a comma-separated string), minimum version 36; the former class-name fields 19, 20 and the top-level 6 are reserved. |
 
+## [CN]页面工厂与请求
+## [EN]Page factories and requests
+
+| 中文 | English |
+|:---|:---|
+| `CYLTabBarPageProvider` 收到整个属性字典；新代码建议注册 `CYLTabBarPageFactory`：它收到只读的 `CYLTabBarPageRequest`（`pageIdentifier`、`tabIdentifier`、`title`、`parameters`、`attributes`，不含库的私有标记键），库新增键时契约不变。两种注册方式可以混用，查找时没有区别。 | A `CYLTabBarPageProvider` receives the whole attribute dictionary; new code should register a `CYLTabBarPageFactory`, which receives a read-only `CYLTabBarPageRequest` (`pageIdentifier`, `tabIdentifier`, `title`, `parameters`, `attributes`, without the library's private marker keys), so the contract does not change when the library adds keys. Both kinds can be mixed; the lookup does not tell them apart. |
+
+```objc
+[CYLTabBarPageRegistry.sharedRegistry registerPageFactory:^UIViewController *(CYLTabBarPageRequest *request) {
+    CYLWebViewController *web = [[CYLWebViewController alloc] initWithURLString:request.parameters[@"url"]];
+    web.title = request.title;
+    return [[UINavigationController alloc] initWithRootViewController:web];
+} forPageIdentifiers:@[ @"web", @"docs" ]];
+```
+
+```swift
+CYLTabBarPageRegistry.shared.register(factory: { request in
+    UINavigationController(rootViewController: WebViewController(url: request.parameters["url"] as? String))
+}, forPageIdentifier: "web")
+```
+
+## [CN]自定义页面来源（协议）
+## [EN]Custom page sources (the protocol)
+
+| 中文 | English |
+|:---|:---|
+| `CYLTabBarControllerPageRegistry` 接受任何遵守 `CYLTabBarPageProviding` 的对象（一个方法：`-pageProviderForPageIdentifier:`），而不只是 `CYLTabBarPageRegistry`：App 的路由器、DI 容器或测试替身都可以直接作为注册表传入，不必绕道解析回调。TabBarController 只依赖这个协议。 | `CYLTabBarControllerPageRegistry` accepts any object that adopts `CYLTabBarPageProviding` (one method, `-pageProviderForPageIdentifier:`), not only a `CYLTabBarPageRegistry`: an app's router, DI container or test double can be passed as the registry directly, without the detour through the resolver. The tab bar controller depends on this protocol only. |
+| 显式注册一个 `CYLTabBarPage` 类（关闭了自动注册，或类在之后加载的镜像中）：`-registerPageClass:`；镜像加载后重新扫描：`+rescanPageClasses`。 | To register a `CYLTabBarPage` class explicitly (automatic registration off, or a class in an image loaded later): `-registerPageClass:`; to scan again after an image was loaded: `+rescanPageClasses`. |
+
+## [CN]重新加载（配置更新、登录后换 Tab）
+## [EN]Reload (a configuration update, tabs after login)
+
+| 中文 | English |
+|:---|:---|
+| 由页面 ID 创建的 TabBarController 保留它的页面来源（`cyl_pageRegistry`、`cyl_pageResolver`、`cyl_pageLookupOrder`）。调用 `-reloadTabBarItemsWithAttributes:` 时，新的属性像配置一样规范化（平台、最低版本、占位），然后：页面 ID 已有页面的 Tab 继续使用该页面（同一对象，状态保留；同一 ID 的多个页面按 Tab 顺序复用），其余 Tab 通过同样的来源创建，找不到的跳过。被移除的 Tab 的页面随之释放。传入代码子控制器的控制器不受影响。 | A tab bar controller created from page IDs keeps its page sources (`cyl_pageRegistry`, `cyl_pageResolver`, `cyl_pageLookupOrder`). On `-reloadTabBarItemsWithAttributes:` the new attributes are normalized like a configuration (platforms, minimum version, placeholders), then a tab whose page ID already has a page keeps that page (the same object, state kept; several pages of one ID are reused in tab order), the other tabs are created through the same sources, and tabs without a page are skipped. The pages of removed tabs are released. A controller with view controllers from code is not affected. |
+
+```objc
+// [EN] A remote configuration arrived: same controller, new tabs. [CN] 收到远程配置：同一个控制器，新的 Tab。
+[tabBarController reloadTabBarItemsWithAttributes:remoteConfiguration[CYLTabBarControllerTabBarItemsAttributes]];
+```
+
+## [CN]被跳过的 Tab
+## [EN]Skipped tabs
+
+| 中文 | English |
+|:---|:---|
+| 没有页面的 Tab 不再只在 DEBUG 日志里出现：`cyl_skippedTabs`（`CYLTabBarSkippedTab` 数组，Release 下同样可用）按顺序列出最近一次初始化或重新加载中被跳过的 Tab，带 `reason`（`CYLTabBarPageSkipReason`：无效、没有 ID、未注册、被排除、提供者失败）、`pageIdentifier`、`title`、原始 `attributes` 与英文 `detail`（失败的来源、异常等）。演示中“配置文件：模拟意外情况”的结果会列出它们。 | A tab without a page no longer shows up in the DEBUG log only: `cyl_skippedTabs` (an array of `CYLTabBarSkippedTab`, available in Release too) lists, in order, the tabs skipped by the last initialization or reload, with a `reason` (`CYLTabBarPageSkipReason`: invalid, no ID, unregistered, excluded, provider failed), the `pageIdentifier`, the `title`, the original `attributes` and an English `detail` (the source that failed, the exception...). The results of the "simulated failures" demo list them. |
+
 ## [CN]API
 ## [EN]API
 
@@ -199,6 +253,14 @@ final class MessageViewController: UIViewController, CYLTabBarPage {
 | `+automaticallyRegisteredPageClasses` | `CYLTabBarPage` 类自动注册的 ID 与类 | The IDs and classes registered automatically by `CYLTabBarPage` |
 | `CYLTabBarPage`：`+cylTabBarPageIdentifier`、可选 `+cylTabBarPageWithAttributes:` | 自动注册协议 | The automatic registration protocol |
 | `CYLTabBarControllerPageResolver` | 解析回调（`CYLTabBarPageProvider` block，仅代码） | Resolver (a `CYLTabBarPageProvider` block, code only) |
+| `CYLTabBarPageProviding`（协议） | 任何页面来源都可作为 `CYLTabBarControllerPageRegistry` 传入 | Any page source can be passed as `CYLTabBarControllerPageRegistry` |
+| `-registerPageFactory:forPageIdentifier:` / `…forPageIdentifiers:`、`CYLTabBarPageRequest` | 类型化请求的工厂 | Factories with a typed request |
+| `-registerPageClass:`、`+rescanPageClasses` | 显式注册 `CYLTabBarPage` 类；重新扫描 | Explicit `CYLTabBarPage` registration; rescan |
+| `CYLTabBarControllerPageLookupOrder`、`CYLTabBarControllerAutomaticPageRegistration`、`+defaultPageLookupOrder` | 查找顺序与自动注册开关 | The lookup order and the automatic-registration switch |
+| `+pagesOfTabs:registry:resolver:lookupOrder:keptTabs:skipped:`、`+pageIdentifierOfTab:` | 查找本身（可直接调用） | The lookup itself (callable directly) |
+| `cyl_pagesFromPageIdentifiers`、`cyl_pageRegistry`、`cyl_pageResolver`、`cyl_pageLookupOrder` | 控制器保留的页面来源 | The page sources the controller keeps |
+| `cyl_skippedTabs`（`CYLTabBarSkippedTab`、`CYLTabBarPageSkipReason`） | 没有页面的 Tab 及原因 | The tabs without a page, and why |
+| `-reloadTabBarItemsWithAttributes:` | 由页面 ID 创建时按 ID 解析新 Tab、复用已有页面 | Resolves new tabs by ID and reuses existing pages when created from page IDs |
 | `CYLTabBarConfigurationErrorNoPages`（11） | 没有任何 Tab 找到页面（文件 / URL） | No tab found its page (file / URL) |
 
 ## [CN]Android
@@ -230,6 +292,7 @@ gradle :app:assembleDebug      # the demo app (needs the Android SDK) 演示 App
 | 中文 | English |
 |:---|:---|
 | iOS：设置列表中“从配置文件创建 TabBarController”使用的示例文件已改为页面 ID（演示在全局注册表中注册了 `home`、`message`、`discover`、`me`、`web`）。“配置文件：模拟意外情况”分组新增：C11 未注册的页面 ID、C12 提供者抛出异常、C13 不能作为 Tab 的页面、C14 自动注册（`CYLTabBarPage`，包括两个类声明同一个 ID）、C15 类型错误的注册表与解析回调、**C16 两个 TabBar 共用页面 ID**（同一屏幕上的两个 TabBarController，各自的注册表把 `home`、`me` 对应到蓝色与橙色页面）、B22 其他平台与更高版本的 Tab、B23 无效的平台 / 版本 / 页面参数。 | iOS: the sample files of "Create a TabBarController from a configuration file" now use page IDs (the demo registers `home`, `message`, `discover`, `me` and `web` in the shared registry). The "Configuration: simulated failures" section adds: C11 unregistered page IDs, C12 a provider that raises, C13 pages that cannot be tabs, C14 automatic registration (`CYLTabBarPage`, including two classes that claim one ID), C15 a registry and a resolver of the wrong type, **C16 two tab bars sharing page IDs** (two tab bar controllers on one screen, whose registries map `home` and `me` to blue and orange pages), B22 tabs for other platforms and newer versions, B23 invalid platforms / versions / page parameters. |
+| 新增：C18 查找顺序与自动注册开关、B27 重新加载（`-reloadTabBarItemsWithAttributes:` 创建 "message"、复用 "home"、跳过 "no_such_page"）；每个结果都列出被跳过的 Tab 及原因。Swift：`Example-Swift-SwiftManager-FlatDesign/TWDFGASDGDSFDFG/TabPages.swift` 用 Swift 注册工厂、实现 `CYLTabBarPage` 并读取 `cyl_skippedTabs`，由 CI 编译。 | New: C18 the lookup order and the automatic-registration switch, B27 reload (`-reloadTabBarItemsWithAttributes:` creates "message", reuses "home", skips "no_such_page"); every result lists the skipped tabs with their reason. Swift: `Example-Swift-SwiftManager-FlatDesign/TWDFGASDGDSFDFG/TabPages.swift` registers factories, adopts `CYLTabBarPage` and reads `cyl_skippedTabs` from Swift, compiled by CI. |
 | Android：启动后显示共用示例文件中的 4 个 Tab（“Discover” 使用页面 ID `web` 并显示其 URL）；“Home” 页的按钮打开两个 TabBar 的演示。 | Android: the app shows the 4 tabs of the shared sample file ("Discover" uses the page ID `web` and shows its URL); the button on "Home" opens the two-tab-bar demo. |
 
 ## [CN]验证与限制
@@ -239,4 +302,5 @@ gradle :app:assembleDebug      # the demo app (needs the Android SDK) 演示 App
 |:---|:---|
 | iOS 代码在 Linux 上用 UIKit 桩头文件做了语法检查与 clang 静态分析（nullability、core），解析器测试（312 项）全部通过；**未在 iOS 模拟器或真机上运行**，因此没有截图，iOS CI（`ios.yml`）负责真实编译。Android：`tabpages` 的 8 个单元测试在 JVM 上通过；演示 App 在 Linux 上用 Android SDK 35 编译了 debug 与 release（R8 混淆）APK，release 包中自动注册的 `AutoPageFactory` 被保留；**未在 Android 设备或模拟器上运行**。 | The iOS code was syntax-checked and run through the clang static analyzer (nullability, core) on Linux against UIKit stub headers, and the parser's tests (312) pass; **it was not run on an iOS simulator or device**, so there are no screenshots, and the iOS CI (`ios.yml`) does the real build. Android: the 8 `tabpages` unit tests pass on the JVM; the demo app was built on Linux with Android SDK 35 as debug and release (R8-obfuscated) APKs, and the automatically registered `AutoPageFactory` is kept in the release one; **it was not run on an Android device or emulator**. |
 | PlusButton 仍在代码中按 context 注册；按 ID 注册 PlusButton 的设计提案见 [调研：PlusButton 注册](PlusButton-Registration-Research.md)。 | The plus button is still registered in code by context; a design proposal for registering it by ID: [Research: PlusButton registration](PlusButton-Registration-Research.md). |
-| 页面在创建 TabBarController 时一次创建（与以前相同），不是选中时才创建。配置更新时请重新创建 TabBarController；按 ID 复用已有页面（调研中的“刷新时保留状态”）尚未实现。 | Pages are created when the tab bar controller is created (as before), not when a tab is first selected. After a configuration update, create the tab bar controller again; reusing existing pages by ID (the research's "keep state across refreshes") is not implemented yet. |
+| 页面在创建 TabBarController 时一次创建（不是选中时才创建）。配置更新时不必重新创建 TabBarController：`-reloadTabBarItemsWithAttributes:` 按 ID 解析新 Tab 并复用已有页面（见“重新加载”）。提供者必须同步返回页面；异步（先占位、模块就绪后替换）尚未支持。 | Pages are created when the tab bar controller is created (not on selection). A configuration update needs no new tab bar controller: `-reloadTabBarItemsWithAttributes:` resolves new tabs by ID and reuses existing pages (see "Reload"). A provider must return the page synchronously; asynchronous pages (a placeholder replaced once a module is ready) are not supported yet. |
+| 单元测试：`CYLTabBarControllerTests/CYLTabBarPageRegistryTests.m`（注册、工厂与请求、查找顺序、协议来源、跳过原因、控制器保留来源、重新加载复用页面）。CI 只编译框架，不运行测试目标；请在 Xcode 中运行。评审与改造记录见 [评审](Tab-Page-Registry-Review.md)。 | Unit tests: `CYLTabBarControllerTests/CYLTabBarPageRegistryTests.m` (registration, factories and requests, lookup order, protocol sources, skip reasons, the controller keeping its sources, reload reusing pages). CI builds the framework only and does not run the test target; run it in Xcode. The review and the refactoring are recorded in the [review](Tab-Page-Registry-Review.md). |

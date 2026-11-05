@@ -1,0 +1,27 @@
+{
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "Home",
+      "CYLTabBarItemImage": "system:house",
+      "CYLTabBarItemPageIdentifier": "swift-home"
+    },
+    {
+      "CYLTabBarItemTitle": "Auto",
+      "CYLTabBarItemImage": "system:star",
+      "CYLTabBarItemPageIdentifier": "swift-auto"
+    },
+    {
+      "CYLTabBarItemTitle": "Docs",
+      "CYLTabBarItemImage": "system:book",
+      "CYLTabBarItemPageIdentifier": "swift-docs",
+      "CYLTabBarItemPageParameters": {
+        "url": "https://github.com/ChenYilong/CYLTabBarController"
+      }
+    },
+    {
+      "CYLTabBarItemTitle": "Missing",
+      "CYLTabBarItemImage": "system:questionmark",
+      "CYLTabBarItemPageIdentifier": "no-such-page"
+    }
+  ]
+}

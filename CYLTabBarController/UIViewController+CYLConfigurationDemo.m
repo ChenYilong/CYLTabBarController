@@ -261,8 +261,9 @@ static NSArray<NSArray<NSString *> *> *CYLConfigurationEdgeCases(void) {
         @[ @"B7", @"NaN and Infinity insets" ], @[ @"B9", @"Unknown style" ], @[ @"C11", @"Unregistered page IDs" ],
         @[ @"C12", @"A page provider raises (code)" ], @[ @"C13", @"Pages that cannot be tabs (code)" ],
         @[ @"C14", @"Automatic registration (CYLTabBarPage)" ], @[ @"C15", @"Registry and resolver of wrong types" ],
-        @[ @"C16", @"Two tab bars, one page ID" ], @[ @"B22", @"Other platforms and newer versions" ],
-        @[ @"B23", @"Invalid platforms, versions and parameters" ], @[ @"B13", @"Invalid URLs and Lottie files" ],
+        @[ @"C16", @"Two tab bars, one page ID" ], @[ @"C18", @"Lookup order and automatic registration" ],
+        @[ @"B22", @"Other platforms and newer versions" ],
+        @[ @"B23", @"Invalid platforms, versions and parameters" ], @[ @"B27", @"Reload with new tabs (code)" ], @[ @"B13", @"Invalid URLs and Lottie files" ],
         @[ @"B12", @"Duplicate identifiers" ], @[ @"B11", @"Misspelled keys" ], @[ @"B19", @"Invalid colors and fonts" ], @[ @"B21", @"Empty strings" ],
         @[ @"A12", @"Truncated protobuf" ],
         @[ @"A12", @"Corrupted binary plist" ], @[ @"A14", @"XML external entity" ], @[ @"A2", @"Missing file" ],
@@ -272,6 +273,18 @@ static NSArray<NSArray<NSString *> *> *CYLConfigurationEdgeCases(void) {
         @[ @"C10", @"Request without a URL" ],
         @[ @"D7", @"An HTML page (network)" ],
     ];
+}
+
+/// [EN] The English name of a skip reason (an identifier, not translated). [CN] 跳过原因的英文名称（标识符，不翻译）。
+static NSString *CYLSkipReasonName(CYLTabBarPageSkipReason reason) {
+    switch (reason) {
+        case CYLTabBarPageSkipReasonInvalidTab: return @"invalid tab";
+        case CYLTabBarPageSkipReasonMissingIdentifier: return @"no page ID";
+        case CYLTabBarPageSkipReasonUnregistered: return @"unregistered";
+        case CYLTabBarPageSkipReasonExcluded: return @"excluded";
+        case CYLTabBarPageSkipReasonProviderFailed: return @"provider failed";
+    }
+    return @"unknown";
 }
 
 /// [EN] Two valid tabs, as JSON. [CN] 两个有效的 Tab（JSON）。
@@ -458,6 +471,28 @@ static NSData *CYLEdgeCaseData(NSString *text) {
     } else if ([title isEqualToString:@"Two tab bars, one page ID"]) {
         [self cyl_presentTwoTabBarsDemo];
         [self cyl_configurationEdgeCaseResults][@(row)] = CYLLocalizedString(@"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。");
+    } else if ([title isEqualToString:@"Lookup order and automatic registration"]) {
+        // [EN] C18: "shared, bogus" keeps "shared" (the unknown entry is dropped with a warning) and "no" turns automatic
+        //      registration off, so "home" (shared registry) stays, "auto" (a CYLTabBarPage class) and "maybe" are skipped
+        //      and listed in `cyl_skippedTabs`.
+        // [CN] C18："shared, bogus" 保留 "shared"（未知项丢弃并警告），"no" 关闭自动注册：因此 "home"（全局注册表）保留，"auto"
+        //      （CYLTabBarPage 类）与 "maybe" 被跳过并记录在 `cyl_skippedTabs` 中。
+        fromFile(@"lookup_order.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerPageLookupOrder\": \"shared, bogus\", \"CYLTabBarControllerAutomaticPageRegistration\": \"no\", \"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemIdentifier\": \"home\"}, {\"CYLTabBarItemTitle\": \"Auto\", \"CYLTabBarItemPageIdentifier\": \"auto\"}, {\"CYLTabBarItemTitle\": \"Maybe\", \"CYLTabBarItemPageIdentifier\": \"maybe\"}]}"));
+    } else if ([title isEqualToString:@"Reload with new tabs (code)"]) {
+        // [EN] B27: a controller created from page IDs keeps its sources: `-reloadTabBarItemsWithAttributes:` creates the
+        //      page of "message", reuses the page of "home" (same object, state kept) and skips "no_such_page".
+        // [CN] B27：由页面 ID 创建的控制器保留页面来源：`-reloadTabBarItemsWithAttributes:` 创建 "message" 的页面、复用 "home" 的页面
+        //      （同一对象，状态保留）、跳过 "no_such_page"。
+        CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+            CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"Home", CYLTabBarItemImage : @"system:house", CYLTabBarItemIdentifier : @"home" },
+                                                          @{ CYLTabBarItemTitle : @"Me", CYLTabBarItemImage : @"system:person", CYLTabBarItemIdentifier : @"me" } ],
+        }];
+        UIViewController *home = tabBarController.viewControllers.firstObject;
+        [tabBarController reloadTabBarItemsWithAttributes:@[ @{ CYLTabBarItemTitle : @"Message", CYLTabBarItemImage : @"system:message", CYLTabBarItemIdentifier : @"message" },
+                                                             @{ CYLTabBarItemTitle : @"Home", CYLTabBarItemImage : @"system:house", CYLTabBarItemIdentifier : @"home" },
+                                                             @{ CYLTabBarItemTitle : @"Unknown", CYLTabBarItemPageIdentifier : @"no_such_page" } ]];
+        BOOL reused = tabBarController.viewControllers.count > 1 && tabBarController.viewControllers[1] == home;
+        finish(tabBarController, nil, [NSString stringWithFormat:@"[tabBarController reloadTabBarItemsWithAttributes:@[message, home, no_such_page]]\n// home page reused: %@", reused ? @"YES" : @"NO"]);
     } else if ([title isEqualToString:@"Other platforms and newer versions"]) {
         // [EN] B22: "android only" and "version 999" are left out on iOS; the other two tabs stay.
         // [CN] B22："仅 Android" 与 "版本 999" 在 iOS 上不显示；其余两个 Tab 保留。
@@ -548,6 +583,14 @@ static NSData *CYLEdgeCaseData(NSString *text) {
         : [NSString stringWithFormat:@"❌ %@ (%ld)", error.localizedDescription ?: @"", (long)error.code];
     if (tabBarController) {
         result = [@"✅ " stringByAppendingString:result];
+    }
+    if (tabBarController.cyl_skippedTabs.count > 0) {
+        // [EN] The tabs that got no page, with the reason (docs/Tab-Page-Registry.md). [CN] 没有页面的 Tab 及原因（docs/Tab-Page-Registry.md）。
+        NSMutableArray<NSString *> *names = [NSMutableArray array];
+        for (CYLTabBarSkippedTab *skipped in tabBarController.cyl_skippedTabs) {
+            [names addObject:[NSString stringWithFormat:@"%@ (%@)", skipped.title ?: skipped.pageIdentifier ?: @"?", CYLSkipReasonName(skipped.reason)]];
+        }
+        result = [result stringByAppendingFormat:@"\n%@", [NSString stringWithFormat:CYLLocalizedString(@"跳过 %1$@ 个 Tab：%2$@"), @(names.count), [names componentsJoinedByString:@", "]]];
     }
     [self cyl_configurationEdgeCaseResults][@(row)] = result;
     UITableView *tableView = objc_getAssociatedObject(self, &CYLConfigurationEdgeCaseTableViewKey);

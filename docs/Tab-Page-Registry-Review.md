@@ -33,6 +33,7 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [解耦（16 / 20）](#cn解耦16--20) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Decoupling (16 / 20)](#endecoupling-16--20) |
 | [改进建议（按优先级）](#cn改进建议按优先级) | [Suggestions (by priority)](#ensuggestions-by-priority) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [P0 的 API 草图](#cnp0-的-api-草图) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [API sketch for P0](#enapi-sketch-for-p0) |
+| [改造结果](#cn改造结果) | [What the refactoring did](#enwhat-the-refactoring-did) |
 | [需要你决定的问题](#cn需要你决定的问题) | [Questions for you to decide](#enquestions-for-you-to-decide) |
 | [验证与限制](#cn验证与限制) | [Verification and limits](#enverification-and-limits) |
 
@@ -176,6 +177,36 @@ typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
 | 中文 | English |
 |:---|:---|
 | 全部为新增 API；`CYLTabBarControllerPageRegistry` 键继续接受 `CYLTabBarPageRegistry` 实例（它遵守新协议），不破坏已有调用。 | All of it is new API; the `CYLTabBarControllerPageRegistry` key keeps accepting a `CYLTabBarPageRegistry` instance (it adopts the new protocol), so existing calls do not break. |
+
+## [CN]改造结果
+## [EN]What the refactoring did
+
+| 中文 | English |
+|:---|:---|
+| 按上表实施（commit 见 PR #754）。P0 与 P1 全部完成，P2 完成了查找顺序与 Swift 示例；异步页面与 Android 的更多格式未做。改造后的用法见 [页面注册表](Tab-Page-Registry.md)；新增边界情况 B27、C18、C19（第 13 轮）。 | Implemented as in the table above (commits in PR #754). Every P0 and P1 item is done, and of P2 the lookup order and the Swift example; asynchronous pages and more Android formats are not. The usage after the refactoring is in [the page registry](Tab-Page-Registry.md); edge cases B27, C18 and C19 were added (round 13). |
+
+| 建议 Suggestion | 状态 Status | 实现 / Implementation |
+|:---|:---|:---|
+| P0 抽出解析器 / Extract the resolver | ✅ | `+[CYLTabBarPageRegistry pagesOfTabs:registry:resolver:lookupOrder:keptTabs:skipped:]`、`+pageIdentifierOfTab:`；`CYLTabBarController.m` 只保留排除 / 占位的处理与调用 / `CYLTabBarController.m` keeps only exclusion / placeholder handling and the call |
+| P0 控制器保留页面来源 / The controller keeps its page sources | ✅ | `cyl_pageRegistry`、`cyl_pageResolver`、`cyl_pageLookupOrder`、`cyl_pagesFromPageIdentifiers`；`-reloadTabBarItemsWithAttributes:` 按 ID 解析新 Tab、复用已有页面（B27） / resolves new tabs by ID and reuses existing pages (B27) |
+| P0 XCTest | ✅ | `CYLTabBarControllerTests/CYLTabBarPageRegistryTests.m`（10 个测试 / 10 tests）；CI 不运行测试目标 / CI does not run the test target |
+| P1 协议 / Protocol | ✅ | `CYLTabBarPageProviding`；`CYLTabBarControllerPageRegistry` 接受任何遵守者 / accepts any conformer |
+| P1 自动注册可控 / Automatic registration under control | ✅（部分 / partly） | `CYLTabBarControllerAutomaticPageRegistration`、`-registerPageClass:`、`+rescanPageClasses`；扫描仍在首次使用时于主线程进行（未做后台预热） / the scan still runs on the main thread on first use (no background warm-up) |
+| P1 报告被跳过的 Tab / Report skipped tabs | ✅ | `cyl_skippedTabs`（`CYLTabBarSkippedTab`、`CYLTabBarPageSkipReason`，Release 可用）；未加代理方法 / no delegate method (C19) |
+| P1 收窄提供者契约 / Narrow the provider contract | ✅ | `CYLTabBarPageFactory` + `CYLTabBarPageRequest`；`CYLTabBarPageProvider` 保留 / kept |
+| P2 异步页面 / Asynchronous pages | ❌ | 另开 issue / a separate issue |
+| P2 Swift 示例 / Swift example | ✅ | `Example-Swift-SwiftManager-FlatDesign/TWDFGASDGDSFDFG/TabPages.swift`，由 `Demo Example-Swift-SwiftManager-FlatDesign` 编译 / compiled by that CI job |
+| P2 Android 更多格式 / More Android formats | ❌ | 文档说明共享的是 JSON / the docs say JSON is the shared format |
+| P2 可配置的查找顺序 / Configurable lookup order | ✅ | `CYLTabBarControllerPageLookupOrder`（C18） |
+
+| 维度 Dimension | 改造前 Before | 改造后 After |
+|:---|:---|:---|
+| 兼容性 Compatibility | 18 | 19（Swift 示例由 CI 编译；API 只增不改 / the Swift example is compiled by CI; API only added） |
+| 健壮性 Robustness | 18 | 19（可重新扫描、Release 可观测；扫描成本未变 / rescan, observable in Release; scan cost unchanged） |
+| 扩展性 Extensibility | 15 | 18（重新加载、顺序可配置；仍无异步页面 / reload, configurable order; still no asynchronous pages） |
+| 依赖反转 Dependency inversion | 15 | 19（协议；dyld 扫描仍在核心库 / the protocol; the dyld scan stays in the core） |
+| 解耦 Decoupling | 16 | 19（解析器独立、契约收窄 / a separate resolver, a narrower contract） |
+| 合计 Total | 82 | 94 |
 
 ## [CN]需要你决定的问题
 ## [EN]Questions for you to decide

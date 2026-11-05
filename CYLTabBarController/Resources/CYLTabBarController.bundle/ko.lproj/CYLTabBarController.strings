@@ -330,3 +330,5 @@
 "展开全部 %@ 个模拟" = "시뮬레이션 %@개 모두 보기";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "시뮬레이션 목록 접기";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "탭 %1$@개 건너뜀: %2$@";

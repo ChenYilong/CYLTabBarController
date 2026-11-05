@@ -330,3 +330,5 @@
 "展开全部 %@ 个模拟" = "Pokaż wszystkie symulacje (%@)";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Zwiń listę symulacji";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "Pominięto %1$@ kart: %2$@";

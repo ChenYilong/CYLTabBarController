@@ -302,10 +302,14 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifier;
  *      - `CYLTabBarControllerStyleType`: NSNumber of CYLTabBarStyleType, or "default", "system", "flatDesign",
  *        "liquidGlass". Default CYLTabBarStyleTypeDefault.
  *      - `CYLTabBarControllerContext`: NSString, see `context`. Default nil.
- *      - `CYLTabBarControllerPageRegistry`: CYLTabBarPageRegistry (code only), the page providers of this tab bar
- *        controller only, looked up before the shared registry. Lets several tab bars map one page ID to different pages.
+ *      - `CYLTabBarControllerPageRegistry`: CYLTabBarPageRegistry or any `CYLTabBarPageProviding` (code only), the page
+ *        providers of this tab bar controller only, looked up before the shared registry. Lets several tab bars map one page ID to different pages.
  *      - `CYLTabBarControllerPageResolver`: CYLTabBarPageProvider block (code only), called for each tab whose page ID
  *        is not in `CYLTabBarControllerPageRegistry`, before the shared registry; return nil to go on looking.
+ *      - `CYLTabBarControllerPageLookupOrder`: NSArray<CYLTabBarPageSource> (or a comma-separated string) of "instance",
+ *        "resolver", "shared", "automatic": where pages are looked up, in order. Default all four, in that order.
+ *      - `CYLTabBarControllerAutomaticPageRegistration`: NSNumber (BOOL), or "true" / "false"; NO leaves the classes that
+ *        adopt `CYLTabBarPage` out of the lookup. Default YES.
  * [CN] TabBar 配置的键：一个字典包含初始化方法的全部参数，用于 `-initWithConfiguration:`；配置文件（JSON、YAML、plist 等）或网络下载的
  *      配置使用同样的键，见 `CYLTabBarController (CYLConfiguration)`。代码中的值使用原本的类型；文件中每个键都可以用字符串（见各键说明）。
  *      缺少的键使用其他初始化方法的默认值。
@@ -319,10 +323,14 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifier;
  *      - `CYLTabBarControllerStyleType`：CYLTabBarStyleType 的 NSNumber，或 "default"、"system"、"flatDesign"、"liquidGlass"。
  *        默认 CYLTabBarStyleTypeDefault。
  *      - `CYLTabBarControllerContext`：NSString，见 `context`。默认 nil。
- *      - `CYLTabBarControllerPageRegistry`：CYLTabBarPageRegistry（仅代码），只属于该 TabBarController 的页面提供者，先于全局注册表
- *        查找。多个 TabBar 可以把同一个页面 ID 对应到不同页面。
+ *      - `CYLTabBarControllerPageRegistry`：CYLTabBarPageRegistry 或任何 `CYLTabBarPageProviding`（仅代码），只属于该 TabBarController
+ *        的页面提供者，先于全局注册表查找。多个 TabBar 可以把同一个页面 ID 对应到不同页面。
  *      - `CYLTabBarControllerPageResolver`：CYLTabBarPageProvider block（仅代码），页面 ID 不在 `CYLTabBarControllerPageRegistry`
  *        中时对每个 Tab 调用，先于全局注册表；返回 nil 则继续查找。
+ *      - `CYLTabBarControllerPageLookupOrder`：由 "instance"、"resolver"、"shared"、"automatic" 组成的 NSArray<CYLTabBarPageSource>
+ *        （或逗号分隔的字符串）：按顺序查找页面的来源。默认为这四个，顺序同上。
+ *      - `CYLTabBarControllerAutomaticPageRegistration`：NSNumber（BOOL），或 "true" / "false"；为 NO 时不在遵守 `CYLTabBarPage` 的类中
+ *        查找。默认 YES。
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerViewControllers;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerTabBarItemsAttributes;
@@ -332,6 +340,8 @@ FOUNDATION_EXTERN NSString *const CYLTabBarControllerStyleType;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerContext;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerPageRegistry;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerPageResolver;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerPageLookupOrder;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerAutomaticPageRegistration;
 
 /*!
  * [EN] Item keys of the pages and of remote configurations (see docs/Tab-Page-Registry.md):
@@ -2081,6 +2091,34 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
  *      `CYLTabBarConfigurationFormat`）。格式由文件扩展名（或 HTTP Content-Type）决定，否则根据内容识别。所有格式都解析为同样的字典，再转换其中的值
  *      （内边距、偏移、SF Symbols、URL 等），见 `CYLTabBarControllerImageInsets` 与 `CYLTabBarItemPageIdentifier`。示例见上。
  */
+/*!
+ * [EN] The page sources of a tab bar controller created from page IDs (docs/Tab-Page-Registry.md): kept after
+ *      initialization, so `-reloadTabBarItemsWithAttributes:` resolves new tabs through them, and the tabs that got no
+ *      page, with their reason.
+ * [CN] 由页面 ID 创建的 TabBarController 的页面来源（docs/Tab-Page-Registry.md）：初始化后继续保留，`-reloadTabBarItemsWithAttributes:`
+ *      通过它们解析新的 Tab；以及没有页面的 Tab 及其原因。
+ */
+@interface CYLTabBarController (CYLPageRegistry)
+
+/// [EN] Whether the tabs came from page IDs (no `CYLTabBarControllerViewControllers`). [CN] Tab 是否来自页面 ID（没有 `CYLTabBarControllerViewControllers`）。
+@property (nonatomic, readonly) BOOL cyl_pagesFromPageIdentifiers;
+/// [EN] The `CYLTabBarControllerPageRegistry` of the configuration, or nil. [CN] 配置中的 `CYLTabBarControllerPageRegistry`，没有则为 nil。
+@property (nonatomic, readonly, nullable) id<CYLTabBarPageProviding> cyl_pageRegistry;
+/// [EN] The `CYLTabBarControllerPageResolver` of the configuration, or nil. [CN] 配置中的 `CYLTabBarControllerPageResolver`，没有则为 nil。
+@property (nonatomic, readonly, nullable) CYLTabBarPageProvider cyl_pageResolver;
+/// [EN] The lookup order in use (see `CYLTabBarControllerPageLookupOrder`). [CN] 使用中的查找顺序（见 `CYLTabBarControllerPageLookupOrder`）。
+@property (nonatomic, readonly, copy) NSArray<CYLTabBarPageSource> *cyl_pageLookupOrder;
+/*!
+ * [EN] The tabs of the last initialization or `-reloadTabBarItemsWithAttributes:` that got no page, in order, with the
+ *      reason: left out by platform / version, no page ID, unregistered, provider failed, or not a dictionary. Available
+ *      in Release too (the DEBUG log says the same).
+ * [CN] 最近一次初始化或 `-reloadTabBarItemsWithAttributes:` 中没有页面的 Tab（按顺序）及原因：因平台 / 版本被排除、没有页面 ID、未注册、
+ *      提供者失败、不是字典。Release 下同样可用（DEBUG 日志内容相同）。
+ */
+@property (nonatomic, readonly, copy) NSArray<CYLTabBarSkippedTab *> *cyl_skippedTabs;
+
+@end
+
 @interface CYLTabBarController (CYLConfiguration)
 
 /*!
