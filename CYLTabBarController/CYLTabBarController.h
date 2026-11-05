@@ -17,6 +17,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/FlatDesign-StandardAppearance.md
 //   - Automatic centering of image-only tabs / 纯图标 Tab 的自动居中
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Image-Only-Tabs.md
+//   - Long Press in Liquid Glass: Fixing the Tab Switching Freeze / 液态玻璃下的长按：修复切换 Tab 卡死
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Liquid-Glass-Long-Press.md
 //   - Liquid Glass Robustness / 液态玻璃的健壮性改进
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Liquid-Glass-Robustness.md
 //   - Tabs That Need Login / 需要登录的 Tab
@@ -408,6 +410,7 @@ typedef NS_OPTIONS(NSUInteger, CYLTabBarReselectBehavior) {
  *      - DoubleTap: two taps on the same tab within `cyl_tabBarItemDoubleTapInterval` (e.g. refresh, as Weibo does). The
  *        second tap is also a Reselect, reported first.
  *      - LongPress: a long press began on the tab (e.g. a menu). The tab is still selected when the finger lifts.
+ *        Liquid Glass: on the plus button only (see docs/Liquid-Glass-Long-Press.md).
  * [CN] Tab 按钮或 PlusButton 上的手势，通过 `cyl_tabBarItemGestureHandler` 和
  *      `-tabBarController:didRecognizeTabBarItemGesture:control:viewController:` 回调，适用于所有样式（经典、液态玻璃、扁平）。
  *      见 `CYLTabBarController (CYLTabBarItemGesture)` 与 docs/TabBarItem-Gestures.md。
@@ -415,6 +418,7 @@ typedef NS_OPTIONS(NSUInteger, CYLTabBarReselectBehavior) {
  *      - DoubleTap：在 `cyl_tabBarItemDoubleTapInterval` 内连续两次点击同一个 Tab（例如像微博一样双击刷新）。第二次点击同时也是
  *        Reselect，Reselect 先回调。
  *      - LongPress：在 Tab 上开始长按（例如弹出菜单）。手指抬起时该 Tab 仍会被选中。
+ *        液态玻璃：仅 PlusButton 支持（见 docs/Liquid-Glass-Long-Press.md）。
  */
 typedef NS_ENUM(NSInteger, CYLTabBarItemGesture) {
     CYLTabBarItemGestureReselect = 0,
@@ -495,9 +499,10 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  * [EN] A long press on a tab button or the plus button, in every style. `control` is the same control as in
  *      `-tabBarController:didSelectControl:`. Implementing it (or setting `cyl_didLongPressControlBlock`) turns the long
  *      press on; the tab is then not selected when the finger lifts after a long press. See
- *      `CYLTabBarController (CYLInteraction)`.
+ *      `CYLTabBarController (CYLInteraction)`. Liquid Glass: on the plus button only (see docs/Liquid-Glass-Long-Press.md).
  * [CN] 长按 Tab 按钮或 PlusButton，适用于所有样式。`control` 与 `-tabBarController:didSelectControl:` 中的控件相同。实现本方法
  *      （或设置 `cyl_didLongPressControlBlock`）即开启长按；长按后抬起手指不会再选中该 Tab。见 `CYLTabBarController (CYLInteraction)`。
+ *      液态玻璃：仅 PlusButton 支持（见 docs/Liquid-Glass-Long-Press.md）。
  */
 - (void)tabBarController:(CYLTabBarController *)tabBarController didLongPressControl:(UIControl *)control;
 
