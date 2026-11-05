@@ -566,6 +566,22 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
           NSStringFromCGRect([plusButton convertRect:plusButton.bounds toView:nil]), @(standInVisible), @(standIn.configuration != nil),
           @(standIn.highlighted), @(CYLDemoSameImage(imageView.image, shown)), NSStringFromCGRect(imageView.frame), @(imageView.hidden),
           imageView.alpha, imageView.image.scale, plusButton.currentImage.scale, NSStringFromClass([standIn.superview class]));
+    // [EN] The real plus button: whether anything hides it (itself or a superview), its mask, its image view.
+    // [CN] 真实的 PlusButton：是否被隐藏（自身或父视图）、其 mask、其图片视图。
+    NSString *hiddenBy = @"nothing";
+    for (UIView *view = plusButton; view; view = view.superview) {
+        if (view.hidden || view.alpha < 0.01) {
+            hiddenBy = [NSString stringWithFormat:@"%@(hidden=%@ alpha=%.2f)", NSStringFromClass([view class]), @(view.hidden), view.alpha];
+            break;
+        }
+    }
+    CAShapeLayer *plusMask = [plusButton.layer.mask isKindOfClass:[CAShapeLayer class]] ? (CAShapeLayer *)plusButton.layer.mask : nil;
+    CYLDemoTestLog(@"plus child theme test: info %@ plusButton hiddenBy=%@ window=%@ superview=%@ selected=%@ highlighted=%@ "
+          @"maskFrame=%@ maskPathBox=%@ imageViewHidden=%@ imageViewAlpha=%.2f imageViewFrame=%@ layerOpacity=%.2f",
+          phase, hiddenBy, @(plusButton.window != nil), NSStringFromClass([plusButton.superview class]), @(plusButton.selected),
+          @(plusButton.highlighted), plusMask ? NSStringFromCGRect(plusMask.frame) : @"none",
+          plusMask ? NSStringFromCGRect(CGPathGetPathBoundingBox(plusMask.path)) : @"none", @(plusButton.imageView.hidden),
+          plusButton.imageView.alpha, NSStringFromCGRect(plusButton.imageView.frame), plusButton.layer.opacity);
     // [EN] The stand-in alone, 3 s after the check (after the script's normal screenshot): the real plus button is hidden
     //      for 2 s, and "stand-in only" lets the script take a screenshot.
     // [CN] 只看替身：检查 3 秒后（脚本的普通截图之后）隐藏真实的 PlusButton 2 秒，"stand-in only" 让脚本截图。
