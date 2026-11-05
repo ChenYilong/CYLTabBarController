@@ -315,3 +315,7 @@
 "点我" = "Ketuk";
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Salin";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Ikon dari jaringan";
+"网络图标、标题与配色" = "Ikon dari jaringan, judul, dan warna";

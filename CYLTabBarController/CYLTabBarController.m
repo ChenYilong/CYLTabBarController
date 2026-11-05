@@ -8546,6 +8546,25 @@ static char CYLThemeLaunchThemeAppliedKey;
 static char CYLThemeOriginalIconViewProvidersKey;
 static char CYLThemeInstalledIconViewProvidersKey;
 static char CYLThemeIconGenerationKey;
+/// [EN] The plus button in a theme: its own title and images before the theme changed them (`NSNull` for none), what
+///      the theme set, and a counter that drops images still loading when another theme is applied.
+/// [CN] 主题中的 PlusButton：主题修改前它自己的标题与图片（没有时为 `NSNull`）、主题设置的内容，以及一个计数器：应用其他主题时，
+///      丢弃仍在加载的图片。
+static char CYLThemeOriginalPlusButtonPartsKey;
+static char CYLThemeInstalledPlusButtonPartsKey;
+static char CYLThemePlusButtonGenerationKey;
+/// [EN] The three parts of the plus button a theme can change. [CN] 主题可以修改的 PlusButton 三个部分。
+static NSString *const CYLThemePlusButtonPartTitle = @"title";
+static NSString *const CYLThemePlusButtonPartImage = @"image";
+static NSString *const CYLThemePlusButtonPartSelectedImage = @"selectedImage";
+
+/// [EN] What the plus button shows now for `part`. [CN] PlusButton 当前显示的 `part`。
+static id _Nullable CYLThemePlusButtonCurrentPart(CYLPlusButton *plusButton, NSString *part) {
+    if ([part isEqualToString:CYLThemePlusButtonPartTitle]) {
+        return plusButton.cyl_title;
+    }
+    return [plusButton imageForState:([part isEqualToString:CYLThemePlusButtonPartImage] ? UIControlStateNormal : UIControlStateSelected)];
+}
 
 /// [EN] The icon keys of `tabBarItemsAttributes`. [CN] `tabBarItemsAttributes` 中与图标有关的 key。
 static NSArray<NSString *> *CYLThemeIconAttributeKeys(void) {
@@ -8622,6 +8641,14 @@ static NSDictionary<NSString *, id> *CYLThemeAttributesWithoutIcons(NSDictionary
     // [EN] The icons, as views in place of each tab's icon (`-setTabBarItemIcon:selectedIcon:size:atIndex:`).
     // [CN] 图标：以视图替换每个 Tab 的图标（`-setTabBarItemIcon:selectedIcon:size:atIndex:`）。
     [self cyl_applyThemeIconsOfItemsAttributes:itemsAttributes];
+
+    // [EN] The plus button's title and images (`-updatePlusButtonWithAttributes:`).
+    // [CN] PlusButton 的标题与图片（`-updatePlusButtonWithAttributes:`）。
+    NSDictionary<NSString *, id> *plusButtonAttributes = nil;
+    if ([tabBarTheme respondsToSelector:@selector(cyl_plusButtonAttributesForTabBarController:)]) {
+        plusButtonAttributes = [tabBarTheme cyl_plusButtonAttributesForTabBarController:self];
+    }
+    [self cyl_applyThemePlusButtonAttributes:plusButtonAttributes];
 
     // [EN] The appearance: a new object for every theme, so every style (FlatDesign included) applies it.
     // [CN] 外观：每个主题都是新对象，因此所有样式（包括扁平样式）都会应用。
@@ -8757,7 +8784,8 @@ static NSDictionary<NSString *, id> *CYLThemeAttributesWithoutIcons(NSDictionary
     __weak __typeof(self) weakSelf = self;
     for (UIViewController *viewController in themeIcons.keyEnumerator.allObjects) {
         if (![originalProviders objectForKey:viewController]) {
-            [originalProviders setObject:([providers objectForKey:viewController] ?: [NSNull null]) forKey:viewController];
+            id provider = [providers objectForKey:viewController];
+            [originalProviders setObject:(provider ?: [NSNull null]) forKey:viewController];
         }
         NSDictionary *tabIcon = [themeIcons objectForKey:viewController];
         __weak UIViewController *weakViewController = viewController;
@@ -8789,6 +8817,116 @@ static NSDictionary<NSString *, id> *CYLThemeAttributesWithoutIcons(NSDictionary
                 CYLLoadTabBarItemIcon(selectedIcon, show);
             }
         });
+    }
+}
+
+/*!
+ * [EN] The theme's plus button, through `-updatePlusButtonWithAttributes:` (as the "change all titles" and "change all
+ *      network icons" demo rows), one part at a time: the title, the image, the selected image.
+ *      - Before the first change of a part, what the plus button shows is kept (`NSNull` for nothing).
+ *      - A part the app changed after the theme becomes the one to restore, and is not touched again by this theme.
+ *      - A part this theme does not give gets its own value back. An image the plus button never had is restored as
+ *        the normal image (a button without a selected image shows its normal one); a title it never had as "".
+ *      - Images are loaded first (network ones asynchronously) and shown only if no other theme came in between.
+ * [CN] 主题中的 PlusButton，通过 `-updatePlusButtonWithAttributes:`（与演示中“批量更换标题”“批量下载网络图标”行相同）逐个部分处理：
+ *      标题、图片、选中图片。
+ *      - 第一次修改某个部分前，保存 PlusButton 当时显示的内容（没有时为 `NSNull`）。
+ *      - 主题之后被 App 修改的部分成为要恢复的内容，本主题不再修改它。
+ *      - 本主题未提供的部分恢复为它自己的内容。PlusButton 原本没有的图片恢复为普通图片（按钮没有选中图片时显示普通图片）；原本没有的
+ *        标题恢复为 ""。
+ *      - 先加载图片（网络图片为异步），只有期间没有切换到其他主题时才显示。
+ */
+- (void)cyl_applyThemePlusButtonAttributes:(nullable NSDictionary<NSString *, id> *)attributes {
+    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    if (!plusButton) {
+        return;
+    }
+    NSUInteger generation = [objc_getAssociatedObject(self, &CYLThemePlusButtonGenerationKey) unsignedIntegerValue] + 1;
+    objc_setAssociatedObject(self, &CYLThemePlusButtonGenerationKey, @(generation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    NSMutableDictionary<NSString *, id> *originalParts = objc_getAssociatedObject(self, &CYLThemeOriginalPlusButtonPartsKey);
+    NSMutableDictionary<NSString *, id> *installedParts = objc_getAssociatedObject(self, &CYLThemeInstalledPlusButtonPartsKey);
+    if (!originalParts) {
+        originalParts = [NSMutableDictionary dictionary];
+        installedParts = [NSMutableDictionary dictionary];
+        objc_setAssociatedObject(self, &CYLThemeOriginalPlusButtonPartsKey, originalParts, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(self, &CYLThemeInstalledPlusButtonPartsKey, installedParts, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    // [EN] What this theme gives, by part. [CN] 本主题提供的内容，按部分保存。
+    NSMutableDictionary<NSString *, id> *themeParts = [NSMutableDictionary dictionary];
+    themeParts[CYLThemePlusButtonPartTitle] = attributes[CYLTabBarItemTitle];
+    themeParts[CYLThemePlusButtonPartImage] = attributes[CYLTabBarItemImageURL] ?: attributes[CYLTabBarItemImage];
+    themeParts[CYLThemePlusButtonPartSelectedImage] = attributes[CYLTabBarItemSelectedImageURL] ?: attributes[CYLTabBarItemSelectedImage];
+    NSValue *sizeValue = attributes[CYLTabBarItemImageURLSize];
+
+    for (NSString *part in @[ CYLThemePlusButtonPartTitle, CYLThemePlusButtonPartImage, CYLThemePlusButtonPartSelectedImage ]) {
+        id current = CYLThemePlusButtonCurrentPart(plusButton, part);
+        id installed = installedParts[part];
+        // [EN] Changed by the app after the theme: that is the plus button's own value now.
+        // [CN] 主题之后被 App 修改：这就是 PlusButton 现在自己的内容。
+        if (installed && ![current isEqual:installed]) {
+            originalParts[part] = current ?: [NSNull null];
+            [installedParts removeObjectForKey:part];
+        }
+        id themeValue = themeParts[part];
+        if (!themeValue) {
+            // [EN] Back to the plus button's own value, unless the app changed it (then nothing was installed).
+            // [CN] 恢复 PlusButton 自己的内容，除非 App 修改过（此时没有记录主题设置的内容）。
+            id original = originalParts[part];
+            if (original && installedParts[part]) {
+                [self cyl_restoreThemePlusButtonPart:part original:original plusButton:plusButton];
+            }
+            [originalParts removeObjectForKey:part];
+            [installedParts removeObjectForKey:part];
+            continue;
+        }
+        if (!originalParts[part]) {
+            originalParts[part] = current ?: [NSNull null];
+        }
+        if ([part isEqualToString:CYLThemePlusButtonPartTitle]) {
+            if ([self updatePlusButtonWithAttributes:@{ CYLTabBarItemTitle : themeValue }]) {
+                installedParts[part] = CYLThemePlusButtonCurrentPart(plusButton, part) ?: themeValue;
+            }
+            continue;
+        }
+        __weak __typeof(self) weakSelf = self;
+        __weak CYLPlusButton *weakPlusButton = plusButton;
+        CYLLoadTabBarItemIcon(themeValue, ^(UIImage *image) {
+            __strong __typeof(weakSelf) self = weakSelf;
+            CYLPlusButton *strongPlusButton = weakPlusButton;
+            // [EN] Dropped when another theme came in between. [CN] 期间切换了其他主题时丢弃。
+            if (!self || !strongPlusButton || !image ||
+                [objc_getAssociatedObject(self, &CYLThemePlusButtonGenerationKey) unsignedIntegerValue] != generation) {
+                return;
+            }
+            NSString *imageKey = [part isEqualToString:CYLThemePlusButtonPartImage] ? CYLTabBarItemImage : CYLTabBarItemSelectedImage;
+            NSMutableDictionary *imageAttributes = [NSMutableDictionary dictionaryWithObject:image forKey:imageKey];
+            imageAttributes[CYLTabBarItemImageURLSize] = [sizeValue isKindOfClass:[NSValue class]] ? sizeValue : nil;
+            if ([self updatePlusButtonWithAttributes:imageAttributes]) {
+                NSMutableDictionary *installedMap = objc_getAssociatedObject(self, &CYLThemeInstalledPlusButtonPartsKey);
+                installedMap[part] = CYLThemePlusButtonCurrentPart(strongPlusButton, part);
+            }
+        });
+    }
+}
+
+/// [EN] Puts the plus button's own `part` back. [CN] 恢复 PlusButton 自己的 `part`。
+- (void)cyl_restoreThemePlusButtonPart:(NSString *)part original:(id)original plusButton:(CYLPlusButton *)plusButton {
+    BOOL hadNothing = [original isKindOfClass:[NSNull class]];
+    if ([part isEqualToString:CYLThemePlusButtonPartTitle]) {
+        [plusButton cyl_updateTitle:(hadNothing ? @"" : original) image:nil selectedImage:nil];
+        return;
+    }
+    if ([part isEqualToString:CYLThemePlusButtonPartImage]) {
+        if (!hadNothing) {
+            [plusButton cyl_updateTitle:nil image:original selectedImage:nil];
+        }
+        return;
+    }
+    // [EN] No selected image of its own: the normal one, as a button without a selected image shows.
+    // [CN] 原本没有选中图片：使用普通图片，与没有选中图片的按钮显示一致。
+    UIImage *selectedImage = hadNothing ? [plusButton imageForState:UIControlStateNormal] : original;
+    if (selectedImage) {
+        [plusButton cyl_updateTitle:nil image:nil selectedImage:selectedImage];
     }
 }
 

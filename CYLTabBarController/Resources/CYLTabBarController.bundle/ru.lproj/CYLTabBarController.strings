@@ -315,3 +315,7 @@
 "点我" = "Нажми";
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Копировать";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Сетевые значки";
+"网络图标、标题与配色" = "Сетевые значки, заголовки и цвета";

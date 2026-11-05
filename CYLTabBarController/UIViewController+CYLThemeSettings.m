@@ -32,6 +32,7 @@ static NSString *const CYLDemoThemeIdentifierSummer = @"Summer";
 static NSString *const CYLDemoThemeIdentifierBirthday = @"Birthday";
 static NSString *const CYLDemoThemeIdentifierSpace = @"Space";
 static NSString *const CYLDemoThemeIdentifierOcean = @"Ocean";
+static NSString *const CYLDemoThemeIdentifierNetwork = @"Network";
 
 static UIColor *CYLDemoRGB(CGFloat red, CGFloat green, CGFloat blue) {
     return [UIColor colorWithRed:red / 255.0 green:green / 255.0 blue:blue / 255.0 alpha:1];
@@ -51,6 +52,13 @@ static UIColor *CYLDemoRGB(CGFloat red, CGFloat green, CGFloat blue) {
 @property (nonatomic, strong, nullable) UIColor *normalColor;
 /// [EN] The icon names of a holiday skin, used in turn for the tabs; nil for a color theme. [CN] 节日皮肤的图标名，依次用于各 Tab；配色主题为 nil。
 @property (nonatomic, copy, nullable) NSArray<NSString *> *iconNames;
+/// [EN] The network skin: the URLs of each tab's icons (unselected, selected), used in turn; nil for the other themes.
+/// [CN] 网络皮肤：每个 Tab 图标的 URL（未选中、选中），依次使用；其他主题为 nil。
+@property (nonatomic, copy, nullable) NSArray<NSArray<NSString *> *> *iconURLs;
+/// [EN] The network skin: the URLs of the plus button's images (normal, selected). [CN] 网络皮肤：PlusButton 图片的 URL（普通、选中）。
+@property (nonatomic, copy, nullable) NSArray<NSString *> *plusButtonIconURLs;
+/// [EN] The network skin: put before every tab title, e.g. "★". [CN] 网络皮肤：加在每个 Tab 标题前，例如“★”。
+@property (nonatomic, copy, nullable) NSString *titlePrefix;
 @end
 
 @implementation CYLDemoTheme
@@ -111,6 +119,9 @@ static UIColor *CYLDemoRGB(CGFloat red, CGFloat green, CGFloat blue) {
     if ([self.identifier isEqualToString:CYLDemoThemeIdentifierOcean]) {
         return CYLLocalizedString(@"海洋");
     }
+    if ([self.identifier isEqualToString:CYLDemoThemeIdentifierNetwork]) {
+        return CYLLocalizedString(@"网络图标");
+    }
     return CYLLocalizedString(@"默认");
 }
 
@@ -124,7 +135,22 @@ static UIColor *CYLDemoRGB(CGFloat red, CGFloat green, CGFloat blue) {
 
 /// [EN] The first icon, for the theme list. [CN] 第一个图标，用于主题列表。
 - (nullable UIImage *)previewIcon {
+    if (self.iconURLs.count > 0) {
+        if (@available(iOS 13.0, *)) {
+            return [[UIImage systemImageNamed:@"icloud.and.arrow.down"] imageWithTintColor:(self.tintColor ?: UIColor.systemBlueColor)
+                                                                               renderingMode:UIImageRenderingModeAlwaysOriginal];
+        }
+        return nil;
+    }
     return self.iconNames.count > 0 ? [self iconNamed:self.iconNames[0]] : nil;
+}
+
+/// [EN] What the theme changes, for the theme list. [CN] 主题修改的内容，用于主题列表。
+- (NSString *)localizedSummary {
+    if (self.iconURLs.count > 0) {
+        return CYLLocalizedString(@"网络图标、标题与配色");
+    }
+    return self.iconNames.count > 0 ? CYLLocalizedString(@"节日图标与配色") : CYLLocalizedString(@"仅配色");
 }
 
 /*!
@@ -149,6 +175,9 @@ static UIImage *CYLDemoFadedImage(UIImage *image) {
  * [CN] 节日皮肤：依次为每个 Tab 设置其图标（选中：全彩；未选中：半透明）。配色主题或图标无法加载时返回 nil：使用 App 自己的图标。
  */
 - (nullable NSArray<NSDictionary<NSString *, id> *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController {
+    if (self.iconURLs.count > 0) {
+        return [self networkItemsAttributesForTabBarController:tabBarController];
+    }
     if (self.iconNames.count == 0) {
         return nil;
     }
@@ -162,6 +191,56 @@ static UIImage *CYLDemoFadedImage(UIImage *image) {
         [itemsAttributes addObject:@{ CYLTabBarItemImage : CYLDemoFadedImage(selectedImage), CYLTabBarItemSelectedImage : selectedImage }];
     }
     return itemsAttributes;
+}
+
+/*!
+ * [EN] The network skin, as the "change tab title" and "change all network icons" demo rows: every tab's title with the
+ *      prefix (`CYLTabBarItemTitle`), and its icons downloaded from the network (`CYLTabBarItemImageURL`,
+ *      `CYLTabBarItemSelectedImageURL`, `CYLTabBarItemImageURLSize`), cached after the first time. Until the images are
+ *      ready, the tab keeps the icon it shows.
+ * [CN] 网络皮肤，与演示中“更换 Tab 标题”“批量下载网络图标”行相同：每个 Tab 的标题加上前缀（`CYLTabBarItemTitle`），图标从网络下载
+ *      （`CYLTabBarItemImageURL`、`CYLTabBarItemSelectedImageURL`、`CYLTabBarItemImageURLSize`），第一次之后读取缓存。图片就绪前，
+ *      Tab 保持当前显示的图标。
+ */
+- (NSArray<NSDictionary<NSString *, id> *> *)networkItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController {
+    NSMutableArray<NSDictionary<NSString *, id> *> *itemsAttributes = [NSMutableArray array];
+    NSArray<NSDictionary *> *currentAttributes = tabBarController.tabBarItemsAttributes;
+    NSString *prefix = [NSString stringWithFormat:@"%@ ", self.titlePrefix ?: @""];
+    for (NSUInteger index = 0; index < currentAttributes.count; index++) {
+        NSArray<NSString *> *URLs = self.iconURLs[index % self.iconURLs.count];
+        NSMutableDictionary<NSString *, id> *attributes = [NSMutableDictionary dictionary];
+        attributes[CYLTabBarItemImageURL] = URLs.firstObject;
+        attributes[CYLTabBarItemSelectedImageURL] = URLs.lastObject;
+        attributes[CYLTabBarItemImageURLSize] = [NSValue valueWithCGSize:CGSizeMake(24, 24)];
+        // [EN] The title without a prefix added before (the tab bar remembers the titles a theme set).
+        // [CN] 去掉之前加上的前缀（TabBar 会记录主题设置过的标题）。
+        NSString *title = currentAttributes[index][CYLTabBarItemTitle];
+        if ([title isKindOfClass:[NSString class]] && title.length > 0) {
+            while (self.titlePrefix.length > 0 && [title hasPrefix:prefix]) {
+                title = [title substringFromIndex:prefix.length];
+            }
+            attributes[CYLTabBarItemTitle] = [prefix stringByAppendingString:title];
+        }
+        [itemsAttributes addObject:[attributes copy]];
+    }
+    return itemsAttributes;
+}
+
+/*!
+ * [EN] The plus button in this theme (`-updatePlusButtonWithAttributes:`): a holiday skin puts its last icon on it, the
+ *      network skin downloads its images; a color theme leaves it alone.
+ * [CN] 该主题下的 PlusButton（`-updatePlusButtonWithAttributes:`）：节日皮肤使用其最后一个图标，网络皮肤从网络下载图片；配色主题不修改。
+ */
+- (nullable NSDictionary<NSString *, id> *)cyl_plusButtonAttributesForTabBarController:(CYLTabBarController *)tabBarController {
+    if (self.plusButtonIconURLs.count > 0) {
+        return @{ CYLTabBarItemImageURL : self.plusButtonIconURLs.firstObject,
+                  CYLTabBarItemSelectedImageURL : self.plusButtonIconURLs.lastObject };
+    }
+    UIImage *icon = self.iconNames.count > 0 ? [self iconNamed:self.iconNames.lastObject] : nil;
+    if (!icon) {
+        return nil;
+    }
+    return @{ CYLTabBarItemImage : icon, CYLTabBarItemSelectedImage : icon };
 }
 
 - (nullable UITabBarAppearance *)cyl_tabBarAppearanceForTabBarController:(CYLTabBarController *)tabBarController API_AVAILABLE(ios(13.0)) {
@@ -217,7 +296,27 @@ static CYLDemoTheme *CYLDemoHolidayTheme(NSString *identifier, UIColor *tintColo
     return theme;
 }
 
-/// [EN] The demo themes, in the picker's order: five color themes, then eleven holiday skins. [CN] 演示主题，按选择器中的顺序：五个配色主题，然后是十一个节日皮肤。
+/*!
+ * [EN] The network skin: everything a theme can change at once. Each tab's title gets a "★" prefix, its icons and the
+ *      plus button's come from the network (the URLs of the "download network icon" demo rows), and the colors change.
+ * [CN] 网络皮肤：一次展示主题可以修改的所有内容。每个 Tab 的标题加上“★”前缀，Tab 图标与 PlusButton 图片来自网络（与演示中“下载网络图标”
+ *      行相同的 URL），并修改配色。
+ */
+static CYLDemoTheme *CYLDemoNetworkTheme(void) {
+    CYLDemoTheme *theme = [CYLDemoTheme themeWithIdentifier:CYLDemoThemeIdentifierNetwork tintColor:CYLDemoRGB(0, 122, 255)
+                                                   barColor:CYLDemoRGB(242, 247, 255) normalColor:CYLDemoRGB(120, 134, 156)];
+    theme.titlePrefix = @"★";
+    theme.iconURLs = @[
+        @[ @"https://cdn-icons-png.flaticon.com/512/1946/1946488.png", @"https://cdn-icons-png.flaticon.com/512/1946/1946436.png" ],
+        @[ @"https://cdn-icons-png.flaticon.com/512/2099/2099085.png", @"https://cdn-icons-png.flaticon.com/512/2099/2099085.png" ],
+        @[ @"https://cdn-icons-png.flaticon.com/512/2099/2099100.png", @"https://cdn-icons-png.flaticon.com/512/2099/2099100.png" ],
+        @[ @"https://cdn-icons-png.flaticon.com/512/1077/1077063.png", @"https://cdn-icons-png.flaticon.com/512/1077/1077114.png" ],
+    ];
+    theme.plusButtonIconURLs = @[ @"https://cdn-icons-png.flaticon.com/512/992/992651.png", @"https://cdn-icons-png.flaticon.com/512/1828/1828817.png" ];
+    return theme;
+}
+
+/// [EN] The demo themes, in the picker's order: five color themes, eleven holiday skins, then the network skin. [CN] 演示主题，按选择器中的顺序：五个配色主题、十一个节日皮肤，然后是网络皮肤。
 static NSArray<CYLDemoTheme *> *CYLDemoThemes(void) {
     static NSArray<CYLDemoTheme *> *themes;
     static dispatch_once_t onceToken;
@@ -250,6 +349,7 @@ static NSArray<CYLDemoTheme *> *CYLDemoThemes(void) {
                                 @[ @"rocket", @"ringed_planet", @"flying_saucer", @"glowing_star", @"comet" ]),
             CYLDemoHolidayTheme(CYLDemoThemeIdentifierOcean, CYLDemoRGB(255, 255, 255), CYLDemoRGB(1, 87, 155), CYLDemoRGB(129, 212, 250),
                                 @[ @"spouting_whale", @"tropical_fish", @"spiral_shell", @"crab", @"water_wave" ]),
+            CYLDemoNetworkTheme(),
         ];
     });
     return themes;
@@ -350,7 +450,7 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
     }
     CYLDemoTheme *theme = themes[(NSUInteger)row];
     cell.textLabel.text = [theme localizedName];
-    cell.detailTextLabel.text = theme.iconNames.count > 0 ? CYLLocalizedString(@"节日图标与配色") : CYLLocalizedString(@"仅配色");
+    cell.detailTextLabel.text = [theme localizedSummary];
     cell.imageView.image = [theme previewIcon] ?: CYLDemoColorSwatch(theme.tintColor ?: [UIColor lightGrayColor]);
     cell.accessoryType = [theme.identifier isEqualToString:CYLDemoCurrentTheme().identifier] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     return cell;

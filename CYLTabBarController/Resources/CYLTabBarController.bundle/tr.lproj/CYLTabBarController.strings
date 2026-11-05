@@ -315,3 +315,7 @@
 "点我" = "Dokun";
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Kopyala";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Ağ simgeleri";
+"网络图标、标题与配色" = "Ağ simgeleri, başlıklar ve renkler";

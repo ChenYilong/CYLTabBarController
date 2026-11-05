@@ -315,3 +315,7 @@
 "点我" = "Ťukni";
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Kopírovať";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Ikony zo siete";
+"网络图标、标题与配色" = "Ikony zo siete, názvy a farby";

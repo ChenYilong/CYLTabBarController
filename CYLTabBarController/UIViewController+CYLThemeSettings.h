@@ -11,16 +11,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 /*!
  * FIX: issue #216
- * [EN] The skin (theme) demo of the examples: sixteen tab bar themes registered with
+ * [EN] The skin (theme) demo of the examples: seventeen tab bar themes registered with
  *      `CYLThemeManagerCenter.defaultThemeManager`, each adopting `CYLTabBarTheme`: five color themes (Default,
  *      Grapefruit, Grass, Pink Rose, Dark) and eleven holiday skins with their own icons (Spring Festival, Christmas,
- *      Halloween, Valentine's Day, Mid-Autumn, Easter, New Year, Summer, Birthday, Space, Ocean). The icons are Fluent
- *      Emoji (MIT License, Microsoft), in the library's resource bundle. A theme picker, a theme list section, and the
+ *      Halloween, Valentine's Day, Mid-Autumn, Easter, New Year, Summer, Birthday, Space, Ocean), and a network skin whose
+ *      tab titles, tab icons and plus button come from the theme, the icons downloaded from the network. The holiday icons
+ *      are Fluent Emoji (MIT License, Microsoft), in the library's resource bundle. A theme picker, a theme list section, and the
  *      choice saved across launches. Part of the settings section (`UIViewController+CYLSettingsSection.h`); the ObjC
  *      example also has a "Skin" button in the navigation bar of its home page.
- * [CN] 示例中的换肤（主题）演示：向 `CYLThemeManagerCenter.defaultThemeManager` 注册十六套 TabBar 主题，每套都遵守 `CYLTabBarTheme`：
+ * [CN] 示例中的换肤（主题）演示：向 `CYLThemeManagerCenter.defaultThemeManager` 注册十七套 TabBar 主题，每套都遵守 `CYLTabBarTheme`：
  *      五个配色主题（默认、西柚、青草、玫瑰粉、深色）与十一个带自己图标的节日皮肤（春节、圣诞节、万圣节、情人节、中秋节、复活节、新年、
- *      夏日、生日、太空、海洋）。图标为 Fluent Emoji（MIT 许可证，Microsoft），位于本库资源包中。提供主题选择器、主题列表 section，
+ *      夏日、生日、太空、海洋），以及一个网络皮肤：Tab 标题、Tab 图标与 PlusButton 均由主题修改，图标从网络下载。节日图标为 Fluent Emoji（MIT 许可证，Microsoft），位于本库资源包中。提供主题选择器、主题列表 section，
  *      所选主题在下次启动时保留。属于设置分组（`UIViewController+CYLSettingsSection.h`）；ObjC 示例首页的导航栏还有一个“换肤”按钮。
  */
 @interface UIViewController (CYLThemeSettings)
@@ -60,12 +61,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (UIMenu *)cyl_themeMenuWithCompletion:(nullable void (^)(void))completion API_AVAILABLE(ios(14.0));
 
 /*!
- * [EN] A section of its own that lists every demo theme, one row each: five color themes and eleven holiday skins
+ * [EN] A section of its own that lists every demo theme, one row each: five color themes, eleven holiday skins
  *      (Spring Festival, Christmas, Halloween, Valentine's Day, Mid-Autumn, Easter, New Year, Summer, Birthday, Space,
- *      Ocean) with Fluent Emoji icons. A tap applies the theme; the current one has a checkmark. Use the four methods
+ *      Ocean) with Fluent Emoji icons, and the network skin. A tap applies the theme; the current one has a checkmark. Use the four methods
  *      below in a table view's data source and delegate.
- * [CN] 单独的一个 section，每行一个演示主题：五个配色主题与十一个使用 Fluent Emoji 图标的节日皮肤（春节、圣诞节、万圣节、情人节、
- *      中秋节、复活节、新年、夏日、生日、太空、海洋）。点击应用该主题，当前主题显示勾号。在列表的数据源与代理中使用下面四个方法。
+ * [CN] 单独的一个 section，每行一个演示主题：五个配色主题、十一个使用 Fluent Emoji 图标的节日皮肤（春节、圣诞节、万圣节、情人节、
+ *      中秋节、复活节、新年、夏日、生日、太空、海洋）与网络皮肤。点击应用该主题，当前主题显示勾号。在列表的数据源与代理中使用下面四个方法。
  */
 - (NSString *)cyl_themeListSectionTitle;
 

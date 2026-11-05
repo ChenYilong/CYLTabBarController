@@ -1694,6 +1694,25 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 - (nullable NSArray<NSDictionary<NSString *, id> *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController;
 
 /*!
+ * [EN] The plus button in this theme, with the keys of `-updatePlusButtonWithAttributes:` (the "change all titles" and
+ *      "change all network icons" demo rows): `CYLTabBarItemTitle`; `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`,
+ *      or `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL` (which win) with `CYLTabBarItemImageURLSize`. Any
+ *      source that method takes: a UIImage, a name, a path, an `NSURL` or an `http(s)` string, downloaded and cached.
+ *      - Every style, also on the plus button's stand-in in the Liquid Glass selected layer.
+ *      - A key the next theme does not give (or no theme) gets back the plus button's own title or image, unless the
+ *        app changed it meanwhile. An image still downloading is dropped when another theme comes in between.
+ *      - Nothing happens without a plus button.
+ * [CN] 该主题下的 PlusButton，使用 `-updatePlusButtonWithAttributes:` 的 key（演示中“批量更换标题”“批量下载网络图标”行使用的实现）：
+ *      `CYLTabBarItemTitle`；`CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`，或优先使用的 `CYLTabBarItemImageURL` /
+ *      `CYLTabBarItemSelectedImageURL` 及 `CYLTabBarItemImageURLSize`。支持该方法的所有来源：UIImage、图片名、文件路径、`NSURL` 或
+ *      `http(s)` 字符串（会下载并缓存）。
+ *      - 适用于所有样式，液态玻璃选中图层中的 PlusButton 替身也会更新。
+ *      - 下一个主题未提供的 key（或没有主题）恢复 PlusButton 自己的标题或图片，除非 App 期间修改过。仍在下载的图片在期间切换其他主题时丢弃。
+ *      - 没有 PlusButton 时不做任何事。
+ */
+- (nullable NSDictionary<NSString *, id> *)cyl_plusButtonAttributesForTabBarController:(CYLTabBarController *)tabBarController;
+
+/*!
  * [EN] The appearance of the tab bar in this theme: background, item colors, selection indicator... Assigned to
  *      `tabBar.standardAppearance` and, on iOS 15+, `tabBar.scrollEdgeAppearance`; FlatDesign follows it. Return a new
  *      object with the theme's colors.
@@ -1703,8 +1722,9 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 - (nullable UITabBarAppearance *)cyl_tabBarAppearanceForTabBarController:(CYLTabBarController *)tabBarController API_AVAILABLE(ios(13.0));
 
 /*!
- * [EN] Anything else, after the items and the appearance: the plus button, `tabBar.tintColor` before iOS 13...
- * [CN] 其他内容，在更新 item 与外观之后调用：PlusButton、iOS 13 以前的 `tabBar.tintColor` 等。
+ * [EN] Anything else, after the items, the plus button and the appearance: `tabBar.tintColor` before iOS 13, the tint
+ *      of the pages...
+ * [CN] 其他内容，在更新 item、PlusButton 与外观之后调用：iOS 13 以前的 `tabBar.tintColor`、页面的 tint 等。
  */
 - (void)cyl_customizeTabBarController:(CYLTabBarController *)tabBarController;
 
