@@ -83,6 +83,14 @@ FOUNDATION_EXTERN NSArray<UIView *> *CYLThemeTrackedViews(void);
  */
 FOUNDATION_EXTERN void CYLThemeRefreshBarAppearances(UIView *view);
 
+/*!
+ * [EN] Resolves the layer colors (`-[CALayer cyl_setThemeColor:forKey:]`) of every window, and of the view
+ *      controllers' views that are not in a window, again: after a Dark Mode change that switched no theme.
+ * [CN] 重新解析所有 window，以及不在 window 上的控制器视图中的 layer 颜色（`-[CALayer cyl_setThemeColor:forKey:]`）：用于未切换主题的深色
+ *      模式变化之后。
+ */
+FOUNDATION_EXTERN void CYLThemeRefreshTraitDependentValues(void);
+
 @interface UIView (CYLThemePrivate)
 
 /*!

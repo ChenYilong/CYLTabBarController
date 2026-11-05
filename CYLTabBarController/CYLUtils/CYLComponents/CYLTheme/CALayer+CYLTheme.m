@@ -99,6 +99,30 @@ static UIView *_Nullable CYLThemeViewOfLayer(CALayer *layer) {
     }
 }
 
+- (nullable UIColor *)cyl_themeBackgroundColor {
+    return [self cyl_themeColorForKey:@"backgroundColor"];
+}
+
+- (void)cyl_setThemeBackgroundColor:(nullable UIColor *)color {
+    [self cyl_setThemeColor:color forKey:@"backgroundColor"];
+}
+
+- (nullable UIColor *)cyl_themeBorderColor {
+    return [self cyl_themeColorForKey:@"borderColor"];
+}
+
+- (void)cyl_setThemeBorderColor:(nullable UIColor *)color {
+    [self cyl_setThemeColor:color forKey:@"borderColor"];
+}
+
+- (nullable UIColor *)cyl_themeShadowColor {
+    return [self cyl_themeColorForKey:@"shadowColor"];
+}
+
+- (void)cyl_setThemeShadowColor:(nullable UIColor *)color {
+    [self cyl_setThemeColor:color forKey:@"shadowColor"];
+}
+
 @end
 
 NS_ASSUME_NONNULL_END

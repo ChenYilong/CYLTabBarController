@@ -27,6 +27,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PAG-Animation.md
 //   - Only some tabs animated (Lottie or PAG) / 只有部分 Tab 有动画（Lottie 或 PAG）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Per-Tab-Animation.md
+//   - Plus child theme switching test / PlusButton 子控制器换肤测试
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Plus-Child-Theme-Switching-Test.md
 //   - PlusButton badge: changes on every tap / PlusButton 角标：每次点击都会变化
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Badge.md
 //   - Lottie tab icons and their files when there is a PlusButton / 有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应
@@ -63,6 +65,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBarItem-Selected-Title.md
 //   - Theme switching evaluation: integration with the animation components, gaps and improvements / 换肤实现评估：与动画组件的集成、差距与改进
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching-Evaluation.md
+//   - Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve / 换肤实现评估：与 QMUI 的差距、架构符合度与改进建议
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching-QMUI-Evaluation.md
 //   - Theme switching (skins) / 换肤（主题切换）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching.md
 //   - Update Tabs in Place: Titles, Icons, Network Icons and Pages / 原地更新 Tab：标题、图标、网络图标与替换页面
@@ -661,7 +665,11 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 
 /*!
  * [EN] Sets the block invoked in `-viewDidLayoutSubviews`, marked to run only once. Note: `invokeOnce` is currently ignored and always treated as YES.
+ *      It runs once more after the tab buttons or their contents are set up again: a theme switch (`CYLTabBarTheme`),
+ *      `-reloadTabBarItemsWithAttributes:`, replacing a tab. Write it so it can run again (e.g. cover with the same views).
  * [CN] 设置在 -viewDidLayoutSubviews 中回调的 block，并标记为只执行一次。注意：目前 invokeOnce 参数未被使用，始终按 YES 处理。
+ *      Tab 按钮或其内容重新设置后会再执行一次：换肤（`CYLTabBarTheme`）、`-reloadTabBarItemsWithAttributes:`、替换 Tab。
+ *      请保证它可以重复执行（例如用同样的视图覆盖）。
  */
 - (void)setViewDidLayoutSubViewsBlockInvokeOnce:(BOOL)invokeOnce block:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock;
 
@@ -1804,12 +1812,44 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 
 /*!
  * [EN] The titles and icons of the tabs in this theme, shaped like `tabBarItemsAttributes` (one entry per tab, none for
- *      the plus button), applied with `-updateTabBarItemsWithAttributes:`: e.g. holiday icons. A missing key keeps the
- *      current value, so give the keys the app's own attributes use.
- * [CN] 该主题下各 Tab 的标题与图标，结构与 `tabBarItemsAttributes` 相同（每个 Tab 一项，PlusButton 不占项），通过
- *      `-updateTabBarItemsWithAttributes:` 应用：例如节日图标。未提供的 key 保持当前值，因此请提供与 App 自身 attributes 相同的 key。
+ *      the plus button): e.g. holiday icons.
+ *      - Titles and the other keys are applied with `-updateTabBarItemsWithAttributes:`. A missing key keeps the current
+ *        value, so give the keys the app's own attributes use.
+ *      - Icons (`CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` with their dark images, or `CYLTabBarItemImageURL` /
+ *        `CYLTabBarItemSelectedImageURL` / `CYLTabBarItemImageURLSize`, which win) are shown like
+ *        `-setTabBarItemIcon:selectedIcon:size:atIndex:`: a view in place of the tab's icon, in every style, also over a
+ *        Lottie icon, in the image's own colors (give a faded image for the unselected look). Any source that method
+ *        takes: a UIImage, a name, a path, a URL. `tabBarItem.image` and `tabBarItemsAttributes` keep the app's icons.
+ *      - A tab with no icon in the next theme (or with no theme) gets back the icon it had before, unless the app
+ *        replaced the theme's icon meanwhile.
+ * [CN] 该主题下各 Tab 的标题与图标，结构与 `tabBarItemsAttributes` 相同（每个 Tab 一项，PlusButton 不占项）：例如节日图标。
+ *      - 标题与其他 key 通过 `-updateTabBarItemsWithAttributes:` 应用。未提供的 key 保持当前值，因此请提供与 App 自身 attributes 相同的 key。
+ *      - 图标（`CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` 及其深色图片，或优先使用的 `CYLTabBarItemImageURL` /
+ *        `CYLTabBarItemSelectedImageURL` / `CYLTabBarItemImageURLSize`）与 `-setTabBarItemIcon:selectedIcon:size:atIndex:` 的显示方式
+ *        相同：以视图替换 Tab 的图标，适用于所有样式，也能覆盖 Lottie 图标，按图片原色绘制（未选中样式请提供半透明图片）。支持该方法的
+ *        所有来源：UIImage、图片名、文件路径、URL。`tabBarItem.image` 与 `tabBarItemsAttributes` 保留 App 自己的图标。
+ *      - 下一个主题中没有图标（或没有主题）的 Tab 恢复原来的图标，除非 App 期间替换了主题图标。
  */
 - (nullable NSArray<NSDictionary<NSString *, id> *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController;
+
+/*!
+ * [EN] The plus button in this theme, with the keys of `-updatePlusButtonWithAttributes:` (the "change all titles" and
+ *      "change all network icons" demo rows): `CYLTabBarItemTitle`; `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`,
+ *      or `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL` (which win) with `CYLTabBarItemImageURLSize`. Any
+ *      source that method takes: a UIImage, a name, a path, an `NSURL` or an `http(s)` string, downloaded and cached.
+ *      - Every style, also on the plus button's stand-in in the Liquid Glass selected layer.
+ *      - A key the next theme does not give (or no theme) gets back the plus button's own title or image, unless the
+ *        app changed it meanwhile. An image still downloading is dropped when another theme comes in between.
+ *      - Nothing happens without a plus button.
+ * [CN] 该主题下的 PlusButton，使用 `-updatePlusButtonWithAttributes:` 的 key（演示中“批量更换标题”“批量下载网络图标”行使用的实现）：
+ *      `CYLTabBarItemTitle`；`CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`，或优先使用的 `CYLTabBarItemImageURL` /
+ *      `CYLTabBarItemSelectedImageURL` 及 `CYLTabBarItemImageURLSize`。支持该方法的所有来源：UIImage、图片名、文件路径、`NSURL` 或
+ *      `http(s)` 字符串（会下载并缓存）。
+ *      - 适用于所有样式，液态玻璃选中图层中的 PlusButton 替身也会更新。
+ *      - 下一个主题未提供的 key（或没有主题）恢复 PlusButton 自己的标题或图片，除非 App 期间修改过。仍在下载的图片在期间切换其他主题时丢弃。
+ *      - 没有 PlusButton 时不做任何事。
+ */
+- (nullable NSDictionary<NSString *, id> *)cyl_plusButtonAttributesForTabBarController:(CYLTabBarController *)tabBarController;
 
 /*!
  * [EN] The appearance of the tab bar in this theme: background, item colors, selection indicator... Assigned to
@@ -1821,8 +1861,9 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 - (nullable UITabBarAppearance *)cyl_tabBarAppearanceForTabBarController:(CYLTabBarController *)tabBarController API_AVAILABLE(ios(13.0));
 
 /*!
- * [EN] Anything else, after the items and the appearance: the plus button, `tabBar.tintColor` before iOS 13...
- * [CN] 其他内容，在更新 item 与外观之后调用：PlusButton、iOS 13 以前的 `tabBar.tintColor` 等。
+ * [EN] Anything else, after the items, the plus button and the appearance: `tabBar.tintColor` before iOS 13, the tint
+ *      of the pages...
+ * [CN] 其他内容，在更新 item、PlusButton 与外观之后调用：iOS 13 以前的 `tabBar.tintColor`、页面的 tint 等。
  */
 - (void)cyl_customizeTabBarController:(CYLTabBarController *)tabBarController;
 

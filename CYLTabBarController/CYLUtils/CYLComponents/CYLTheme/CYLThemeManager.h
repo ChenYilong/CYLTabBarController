@@ -11,6 +11,8 @@
 // [CN] 与此类绑定的文档：
 //   - Theme switching evaluation: integration with the animation components, gaps and improvements / 换肤实现评估：与动画组件的集成、差距与改进
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching-Evaluation.md
+//   - Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve / 换肤实现评估：与 QMUI 的差距、架构符合度与改进建议
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching-QMUI-Evaluation.md
 //   - Theme switching (skins) / 换肤（主题切换）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching.md
 // docs-binding:end
@@ -119,9 +121,9 @@ FOUNDATION_EXTERN NSNotificationName const CYLThemeDidChangeNotification;
 /*!
  * [EN] The identifier of the current theme. Setting it also sets `currentTheme`. Setting an identifier that is not
  *      registered asks `themeGenerator` for its theme; without one, the change is ignored. The first value set is not
- *      a change (nothing is posted): set it at launch before the UI is shown.
+ *      a change (nothing is posted): set it at launch before the UI is shown. Main thread only (asserted in debug).
  * [CN] 当前主题的 identifier，设置时会同时设置 `currentTheme`。设置未注册的 identifier 时会通过 `themeGenerator` 生成主题；
- *      没有 `themeGenerator` 时忽略本次设置。第一次设置不视为切换（不发送通知）：请在启动时、界面显示之前设置。
+ *      没有 `themeGenerator` 时忽略本次设置。第一次设置不视为切换（不发送通知）：请在启动时、界面显示之前设置。仅限主线程（debug 下断言）。
  */
 @property (nonatomic, copy, nullable) __kindof NSObject<NSCopying> *currentThemeIdentifier;
 
@@ -132,6 +134,24 @@ FOUNDATION_EXTERN NSNotificationName const CYLThemeDidChangeNotification;
  *      没有时忽略本次设置。
  */
 @property (nonatomic, strong, nullable) __kindof NSObject *currentTheme;
+
+/*!
+ * [EN] Saves the identifier of the current theme in `NSUserDefaults` (key `CYLThemeManager.<name>.currentThemeIdentifier`)
+ *      on every change, and makes the saved one current again: when this is set to YES, and when its theme is
+ *      registered later, as long as no theme is current yet. Only an `NSString` or `NSNumber` identifier is saved.
+ *      Default NO. Set it at launch, before setting a theme.
+ * [CN] 每次切换时把当前主题的 identifier 保存到 `NSUserDefaults`（key 为 `CYLThemeManager.<name>.currentThemeIdentifier`），并重新使用保存的
+ *      主题：设为 YES 时，以及之后注册该主题时，前提是尚无当前主题。只保存 `NSString` 或 `NSNumber` 类型的 identifier。默认 NO。请在启动时、
+ *      设置主题之前设置。
+ */
+@property (nonatomic, assign) BOOL persistsCurrentThemeIdentifier;
+
+/*!
+ * [EN] When greater than 0, a theme change cross-fades over this many seconds: each visible window is covered by a
+ *      snapshot of itself, restyled underneath, and the snapshot fades out. Default 0 (no animation).
+ * [CN] 大于 0 时，主题切换以该秒数交叉淡入淡出：每个可见 window 先被自身截图覆盖，在其下更新样式，然后截图淡出。默认 0（无动画）。
+ */
+@property (nonatomic, assign) NSTimeInterval themeChangeAnimationDuration;
 
 /*!
  * [EN] Creates the theme of an identifier that is not registered yet, when it becomes current; the pair is registered.

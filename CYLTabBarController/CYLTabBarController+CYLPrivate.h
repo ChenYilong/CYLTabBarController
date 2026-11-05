@@ -35,12 +35,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable UIScrollView *)cyl_tabBarMinimizeScrollViewForViewController:(nullable UIViewController *)viewController;
 @end
 
+/// [EN] Loads a tab icon (a UIImage, a name, a path or a URL), asynchronously for a URL. [CN] 加载 Tab 图标（UIImage、图片名、路径或 URL），URL 为异步。
+FOUNDATION_EXTERN void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completion)(UIImage *_Nullable image));
+
 /// [EN] Implemented in CYLTabBarController.m (CYLTheme, issue #216). [CN] 实现见 CYLTabBarController.m 中的 CYLTheme（issue #216）。
 @interface CYLTabBarController (CYLThemePrivate)
 /// [EN] Once, when first shown: the theme chosen at launch. [CN] 首次显示时执行一次：应用启动时选择的主题。
 - (void)cyl_applyLaunchTabBarThemeIfNeeded;
 /// [EN] Implemented in the main implementation (tabBar.standardAppearance). [CN] 实现于主 implementation（tabBar.standardAppearance）。
 - (void)cyl_syncTabBarAppearances;
+/// [EN] The icon view providers by view controller (theme icons use them). [CN] 按子控制器保存的图标视图 provider（主题图标会使用）。
+- (NSMapTable<UIViewController *, CYLTabBarItemIconViewProvider> *)cyl_tabBarItemIconViewProviders;
+/// [EN] Removes `keys` from the attributes of the tab at `index` (a key a theme added that the app did not have).
+/// [CN] 从第 `index` 个 Tab 的 attributes 中移除 `keys`（主题添加、App 原本没有的 key）。
+- (void)cyl_themeRemoveTabBarItemAttributeKeys:(NSArray<NSString *> *)keys atIndex:(NSUInteger)index;
+/// [EN] The one-time layout block runs once more. [CN] 只执行一次的布局 block 再执行一次。
+- (void)cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce;
 @end
 
 /// [EN] Implemented in CYLTabBarController.m (tab bar customization toolkit). [CN] 实现见 CYLTabBarController.m（TabBar 自定义工具集）。

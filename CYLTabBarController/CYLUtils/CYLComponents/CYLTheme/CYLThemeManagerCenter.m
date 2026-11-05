@@ -49,8 +49,17 @@ static NSMutableArray<CYLThemeManager *> *CYLThemeAllManagers(void) {
 }
 
 + (void)updateThemesForTraitCollection:(UITraitCollection *)traitCollection {
+    BOOL themeChanged = NO;
     for (CYLThemeManager *manager in [self themeManagers]) {
+        NSObject<NSCopying> *identifier = manager.currentThemeIdentifier;
         [manager updateThemeForTraitCollection:traitCollection];
+        NSObject<NSCopying> *newIdentifier = manager.currentThemeIdentifier;
+        themeChanged = themeChanged || (identifier != newIdentifier && ![identifier isEqual:newIdentifier]);
+    }
+    // [EN] A theme change walked every view already; otherwise the layer colors still have the old appearance.
+    // [CN] 主题切换时已遍历所有视图；否则 layer 颜色仍是旧外观的值。
+    if (!themeChanged) {
+        CYLThemeRefreshTraitDependentValues();
     }
 }
 

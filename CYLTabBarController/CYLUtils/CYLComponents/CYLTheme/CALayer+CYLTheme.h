@@ -53,6 +53,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)cyl_updateThemeColors;
 
+/// [EN] `backgroundColor`, `borderColor` and `shadowColor` as theme colors (`-cyl_setThemeColor:forKey:`).
+/// [CN] 以主题颜色设置 `backgroundColor`、`borderColor` 与 `shadowColor`（`-cyl_setThemeColor:forKey:`）。
+@property (nonatomic, strong, nullable, setter=cyl_setThemeBackgroundColor:) UIColor *cyl_themeBackgroundColor;
+@property (nonatomic, strong, nullable, setter=cyl_setThemeBorderColor:) UIColor *cyl_themeBorderColor;
+@property (nonatomic, strong, nullable, setter=cyl_setThemeShadowColor:) UIColor *cyl_themeShadowColor;
+
 @end
 
 NS_ASSUME_NONNULL_END

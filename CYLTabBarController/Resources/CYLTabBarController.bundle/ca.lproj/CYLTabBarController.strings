@@ -349,3 +349,7 @@
 "展开全部 %@ 个模拟" = "Mostra les %@ simulacions";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Amaga la llista de simulacions";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Icones de la xarxa";
+"网络图标、标题与配色" = "Icones de la xarxa, títols i colors";

@@ -277,6 +277,52 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 #endif
 @end
 
+/// [EN] Implemented in `CYLPlusButton.m`. [CN] 在 `CYLPlusButton.m` 中实现。
+@interface CYLPlusButton (CYLLiquidGlassMaskPrivate)
+/// [EN] Liquid Glass: masks the real plus button out under the glass that shows its stand-in. [CN] 液态玻璃：在显示替身的玻璃下方 mask 掉真实的 PlusButton。
+- (void)cyl_updateLiquidGlassMask;
+@end
+
+
+/// [EN] Per-tab colors, implemented in the main implementation. [CN] 单个 Tab 的颜色，在主实现中实现。
+@interface CYLTabBarController (CYLTabBarItemColorsPrivate)
+- (void)cyl_updateSelectedBackgroundColorsOfTabButtons;
+- (void)cyl_setNeedsUpdateSelectedBackgroundColors;
+- (void)cyl_updateLoopingLottieViews;
+- (void)cyl_updateBadgesOfSelectedTab;
+- (void)cyl_syncTabBarItemAccessibility;
+#if CYL_FLATDESIGN_AVAILABLE
+- (void)cyl_syncFlatDesignTabBarItemColors;
+#endif
+@end
+
+/// Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
+typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController);
+
+/// Implemented below (CYLActiveTabBarController): the registry of live tab bar controllers.
+/// FIX: issue #152 — implemented in `CYLTabBarController (CYLTabBarItemGesture)` below. 实现见下方的分类。
+@interface CYLTabBarController (CYLTabBarItemGesturePrivate)
+- (void)cyl_recognizeTabBarItemGestureForReportedControl:(UIControl *)control;
+- (void)cyl_installTabBarItemLongPressIfNeeded;
+- (BOOL)cyl_isTabBarItemGestureControl:(UIControl *)control viewController:(UIViewController *__autoreleasing _Nullable *_Nullable)viewController;
+- (void)cyl_reportTabBarItemGesture:(CYLTabBarItemGesture)gesture control:(UIControl *)control viewController:(nullable UIViewController *)viewController;
+- (void)cyl_recognizeTapOnControl:(UIControl *)control viewController:(nullable UIViewController *)viewController isReselect:(BOOL)isReselect;
+- (void)cyl_recognizeTabBarItemTapWillSelectViewController:(UIViewController *)viewController;
+- (void)cyl_recognizeTabBarItemTapOnControl:(UIControl *)control viewController:(nullable UIViewController *)viewController isReselect:(BOOL)isReselect;
+@end
+
+@interface CYLTabBarController (CYLActiveTabBarControllerPrivate)
++ (void)cyl_registerTabBarController:(CYLTabBarController *)tabBarController;
++ (void)cyl_markTabBarControllerActive:(CYLTabBarController *)tabBarController;
++ (CYLTabBarController *)cyl_tabBarControllerForContext:(NSString *)context matching:(CYLTabBarControllerMatcher)matcher;
+@end
+
+/// [EN] FIX: issue #535 — implemented in CYLTabBarController+CYLInteraction.m. [CN] 实现位于 CYLTabBarController+CYLInteraction.m。
+@interface CYLTabBarController (CYLInteractionInstall)
+- (void)cyl_installInteractionGestureRecognizersIfNeeded;
+- (BOOL)cyl_liquidGlassTakesTabTaps;
+@end
+
 /// FIX: issue #475. The title offset a tab asked for itself; see `-setTitlePositionAdjustment:`.
 /// Tab 自身设置的标题偏移，见 `-setTitlePositionAdjustment:`。
 static void CYLRememberItemTitlePositionAdjustment(id _Nullable item, UIOffset offset);
@@ -693,6 +739,11 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
                 self.tabBarItemAnimationViewAdded = YES;
             }];
         }
+        // [EN] Icon views installed before the Lottie views (e.g. the icons of the theme chosen at launch) hide them now; until
+        //      the next layout pass the Lottie view stayed on top of the theme's icon (seen on Liquid Glass).
+        // [CN] 在 Lottie 视图之前安装的图标视图（例如启动时所选主题的图标）现在将其隐藏；否则在下一次布局前 Lottie 视图会盖在主题图标之上
+        //      （液态玻璃上可见）。
+        [self cyl_setNeedsUpdateTabBarItemIconViews];
     });
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }
@@ -711,7 +762,25 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
     //      设置的 block 永远不会执行（如在其中显示的角标不出现）。这里重新启用，使每次设置的 block 都执行一次。
     //      范围：所有样式（经典、iOS 26 UI 兼容模式、iOS 26+ 液态玻璃与 iPhone Duo、扁平样式）：once-block 在
     //      `-viewDidLayoutSubviews` 末尾对它们都会执行。`invokeOnce` 参数按文档说明仍被忽略。
+    [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
+}
+
+/*!
+ * [EN] Lets the one-time layout block (`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`) run once more, at the end of the
+ *      next `-viewDidLayoutSubviews`: it sets the "once" mode and clears the mark of the run before. Setting only the mode
+ *      (as the tab reloads did) kept the mark, so the block never ran again after it had run once. Used whenever the
+ *      tab buttons or their contents are set up again: a new block, `-reloadTabBarItemsWithAttributes:`, replacing a tab,
+ *      and a theme (`-cyl_applyTabBarTheme:`).
+ * [CN] 让只执行一次的布局 block（`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`）在下一次 `-viewDidLayoutSubviews` 末尾再执行一次：
+ *      设置“只执行一次”模式，并清除上一次执行的标记。之前重新加载 Tab 时只设置了模式、保留了标记，因此 block 执行过一次后再也不会执行。
+ *      在 Tab 按钮或其内容重新设置时调用：设置新的 block、`-reloadTabBarItemsWithAttributes:`、替换 Tab、应用主题（`-cyl_applyTabBarTheme:`）。
+ */
+- (void)cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce {
+    self.invokeOnceViewDidLayoutSubViewsBlock = YES;
     objc_setAssociatedObject(self, @selector(viewDidLayoutSubviews), nil, OBJC_ASSOCIATION_RETAIN);
+    if (self.isViewLoaded) {
+        [self.view setNeedsLayout];
+    }
 }
 
 - (void)setViewDidLayoutSubViewsBlock:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock {
@@ -966,6 +1035,9 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
             if (platterView && selectedContainerView) {
                 selectedCover.center = [selectedContainerView convertPoint:plusButton.center fromView:platterView];
             }
+            // [EN] The real plus button is not drawn under the glass that shows the stand-in (`CYLPlusButton.m`).
+            // [CN] 显示替身的玻璃下方不绘制真实的 PlusButton（`CYLPlusButton.m`）。
+            [plusButton cyl_updateLiquidGlassMask];
         };
         if ([contextPlusButton cyl_showsTitleInTabBarItem]) {
             // [EN] FIX: issue #636 — the tab item shows the plus button's title (`-cyl_showsTitleInTabBarItem`): as the
@@ -2365,18 +2437,20 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 }
 
 - (void)updateTabBarItemsWithAttributes:(NSArray<NSDictionary<NSString *, id> *> *)tabBarItemsAttributes {
-    // FIX: issue #216
-    // [EN] `tabBarItemsAttributes` read back from the controller (a theme restoring the app's look does) can hold the slot
-    //      entry of Liquid Glass and FlatDesign. It belongs to no tab: left in, every tab after it gets the previous tab's values.
-    // [CN] 从控制器读回的 `tabBarItemsAttributes`（主题恢复 App 外观时就是如此）可能含有液态玻璃与扁平样式的 slot 项。它不属于任何 Tab：
-    //      如果保留，其后的每个 Tab 都会得到前一个 Tab 的值。
+    // [EN] FIX: placeholder count mismatch — one entry per tab, none for the slot: an array read back from
+    //      `tabBarItemsAttributes` (Liquid Glass, FlatDesign) carries the slot's own entry, which used to be given to the
+    //      tab after the slot, and every later tab took the entry before its own. A theme restored this way (a skin, then
+    //      another one) left that tab without icon and title, and showed each later tab with its neighbor's.
+    // [CN] FIX：占位导致的数量不匹配——每个 Tab 一项，slot 不占项：从 `tabBarItemsAttributes` 读回的数组（液态玻璃、扁平样式）带有
+    //      slot 自己的一项，以前会被分给 slot 之后的 Tab，之后每个 Tab 都取到前一个 Tab 的属性。用它恢复主题（换一种皮肤后再换另一种）时，
+    //      该 Tab 没有图标和标题，之后的 Tab 显示相邻 Tab 的内容。
     tabBarItemsAttributes = [self cyl_tabBarItemsAttributesByRemovingPlusSlot:tabBarItemsAttributes];
     NSUInteger attributesIndex = 0;
     for (NSUInteger index = 0; index < _viewControllers.count && attributesIndex < tabBarItemsAttributes.count; index++) {
         UIViewController *viewController = _viewControllers[index];
         // [EN] The plus button's tab has no entry.
         // [CN] PlusButton 的 Tab 不占项。
-        if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
+        if ([self cyl_isPlusSlotViewController:viewController]) {
             continue;
         }
         [self updateTabBarItemAtIndex:index attributes:tabBarItemsAttributes[attributesIndex]];
@@ -2469,6 +2543,11 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
     NSDictionary *oldAttributes = (attributesIndex < _tabBarItemsAttributes.count) ? _tabBarItemsAttributes[attributesIndex] : @{};
     NSMutableDictionary *newAttributes = [oldAttributes mutableCopy];
     [newAttributes addEntriesFromDictionary:attributes];
+    // [EN] FIX: placeholder count mismatch — a tab's entry never takes the slot's marker (an entry copied from the slot's):
+    //      it would be taken for the slot's entry and removed on the next `-setViewControllers:`.
+    // [CN] FIX：占位导致的数量不匹配——Tab 的属性永远不带 slot 的标记（从 slot 那一项复制过来时）：否则会被当成 slot 的属性，
+    //      在下一次 `-setViewControllers:` 时被移除。
+    [newAttributes removeObjectForKey:CYLTabBarItemPlusSlotPlaceholderKey];
     if (attributesIndex < _tabBarItemsAttributes.count) {
         NSMutableArray *tabBarItemsAttributes = [_tabBarItemsAttributes mutableCopy];
         tabBarItemsAttributes[attributesIndex] = [newAttributes copy];
@@ -2573,6 +2652,40 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
     return YES;
 }
 
+/*!
+ * FIX: issue #216
+ * [EN] Removes `keys` from the attributes of the tab at `index`: a key a theme added that the app did not have. A title
+ *      becomes empty again (an image-only tab), a selected title stops overriding the title, and colors and fonts fall
+ *      back on the next layout pass.
+ * [CN] 从第 `index` 个 Tab 的 attributes 中移除 `keys`：主题添加、App 原本没有的 key。标题恢复为空（纯图标 Tab），选中标题不再覆盖标题，
+ *      颜色与字体在下一次布局时回退。
+ */
+- (void)cyl_themeRemoveTabBarItemAttributeKeys:(NSArray<NSString *> *)keys atIndex:(NSUInteger)index {
+    if (index >= _viewControllers.count || keys.count == 0) {
+        return;
+    }
+    NSUInteger attributesIndex = [self cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:index];
+    if (attributesIndex >= _tabBarItemsAttributes.count) {
+        return;
+    }
+    if ([keys containsObject:CYLTabBarItemTitle]) {
+        [self updateTabBarItemAtIndex:index attributes:@{ CYLTabBarItemTitle : @"" }];
+    }
+    NSMutableArray *tabBarItemsAttributes = [_tabBarItemsAttributes mutableCopy];
+    NSMutableDictionary *attributes = [tabBarItemsAttributes[attributesIndex] mutableCopy];
+    [attributes removeObjectsForKeys:keys];
+    tabBarItemsAttributes[attributesIndex] = [attributes copy];
+    _tabBarItemsAttributes = [tabBarItemsAttributes copy];
+    if ([keys containsObject:CYLTabBarItemSelectedTitle]) {
+        CYLRememberTabBarItemSelectedTitle(_viewControllers[index], attributes, attributes[CYLTabBarItemTitle]);
+        CYLApplyTabBarItemSelectedTitles(self);
+    }
+    if (self.isViewLoaded) {
+        [self.view setNeedsLayout];
+        [self cyl_updateSelectedBackgroundColorsOfTabButtons];
+    }
+}
+
 #pragma mark - A view of yours in place of a tab's icon (issue #601)
 
 static char CYLTabBarItemIconViewProvidersKey;
@@ -2622,7 +2735,7 @@ static char CYLTabBarItemIconViewsProviderKey;
  * [CN] 在主队列返回 `icon` 对应的图片：`UIImage` 原样返回；`NSURL` 或 `http(s)` 字符串通过 `CYLImageCache` 加载；其他字符串按图片名或
  *      绝对路径加载（`+[UIImage cyl_imageNamed:]`，#535）。没有图片时为 nil。
  */
-static void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completion)(UIImage *_Nullable image)) {
+void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completion)(UIImage *_Nullable image)) {
     if ([icon isKindOfClass:[UIImage class]]) {
         completion(icon);
         return;
@@ -2702,7 +2815,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     //      (`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`, e.g. covers and badges) runs again for the new tab buttons.
     // [CN] 与 `-reloadTabBarItemsWithAttributes:` 相同：重新添加 Lottie 视图，并为新的 Tab 按钮再执行一次只执行一次的布局 block
     //      （`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`，如封面与角标）。
-    self.invokeOnceViewDidLayoutSubViewsBlock = YES;
+    [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
     self.tabBarItemAnimationViewAdded = NO;
     [_tabBarItemAnimationURLs removeAllObjects];
     [_tabBarItemAnimationSizes removeAllObjects];
@@ -2829,7 +2942,12 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     if (![tabButton isKindOfClass:[UIControl class]]) {
         return @[];
     }
-    UIControl *selectedLayerTabButton = [CYLConstants isLiquidGlassActive] ? tabButton.cyl_platterSelectedControl : nil;
+    // [EN] Liquid Glass active AND not the FlatDesign style (on iOS 26 `+isLiquidGlassActive` is YES with the FlatDesign tab
+    //      bar too, which has no selected layer). Used by the icon views of themes (`-setTabBarItemIcon:...`).
+    // [CN] 液态玻璃处于活动状态且不是扁平样式（iOS 26 上使用扁平样式 TabBar 时 `+isLiquidGlassActive` 也为 YES，而它没有选中图层）。
+    //      主题的图标视图（`-setTabBarItemIcon:...`）使用这里的结果。
+    BOOL isLiquidGlassTabBar = (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]);
+    UIControl *selectedLayerTabButton = isLiquidGlassTabBar ? tabButton.cyl_platterSelectedControl : nil;
     if (selectedLayerTabButton && selectedLayerTabButton != tabButton) {
         return @[tabButton, selectedLayerTabButton];
     }
@@ -3000,7 +3118,8 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
 - (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     _tabBarItemsAttributes = tabBarItemsAttributes;
-    self.invokeOnceViewDidLayoutSubViewsBlock = YES;
+    // [EN] The tab buttons are built again: their covers and badges too. [CN] Tab 按钮会重新创建：其封面与角标也需要重新添加。
+    [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
     self.tabBarItemAnimationViewAdded = NO;
     [_tabBarItemAnimationURLs removeAllObjects];
     [_tabBarItemAnimationSizes removeAllObjects];
@@ -4671,7 +4790,10 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 }
 
 - (BOOL)isLottieEnabled {
-    return [CYLConstants isTabBarItemAnimationEnabledWithURLs:self.tabBarItemAnimationURLs tabBarItemsAttributes:self.tabBarItemsAttributes];
+    // [EN] FIX: placeholder count mismatch — without the slot's entry: it is the first one when the plus button is the first tab.
+    // [CN] FIX：占位导致的数量不匹配——去掉 slot 的属性项：PlusButton 为第一个 Tab 时它就是第一项。
+    return [CYLConstants isTabBarItemAnimationEnabledWithURLs:self.tabBarItemAnimationURLs
+                                 tabBarItemsAttributes:[self cyl_tabBarItemsAttributesByRemovingPlusSlot:_tabBarItemsAttributes]];
 }
 
 /*!

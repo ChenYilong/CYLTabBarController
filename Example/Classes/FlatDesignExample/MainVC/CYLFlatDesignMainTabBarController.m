@@ -25,6 +25,11 @@
 @interface CYLFlatDesignMainTabBarController ()
 
 #endif
+/// [EN] The covers of the first tab, kept: the decoration block runs again after a theme switch or a tab reload, and
+///      covering with the same views moves them instead of adding more.
+/// [CN] 第一个 Tab 的封面，保留下来：换肤或重新加载 Tab 后装饰 block 会再次执行，用同样的视图覆盖只会移动它们，不会再添加新的。
+@property (nonatomic, strong) UIButton *contentCover;
+@property (nonatomic, strong) UIButton *selectedContentCover;
 @end
 
 @implementation CYLFlatDesignMainTabBarController
@@ -403,13 +408,17 @@ presentLoginForViewController:(UIViewController *)viewController
     UIControl *selectedTabButton = [self.viewControllers[0] cyl_tabButton];
     //    selectedTabButton = self.viewControllers[0].cyl_tabBarItem.tabBarButton;
     __weak __typeof(self) weakSelf = self;
-    
+    if (!self.contentCover) {
+        self.contentCover = self.selectedCover;
+        self.selectedContentCover = self.selectedCover;
+    }
+
     // [CN] TODO:  如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
     // [EN] TODO:  For a Lottie animation icon, a delay is needed; otherwise it is replaced before the lottie animation
     //      finishes initializing, and ends up in the wrong position.
     [selectedTabButton cyl_coverVisiableTabImageViewOrTabButton:YES
-                                                 contentNewView:self.selectedCover
-                                          seclectContentNewView:self.selectedCover
+                                                 contentNewView:self.contentCover
+                                          seclectContentNewView:self.selectedContentCover
                                                          offset:UIOffsetZero
                                                            show:show
                                         delayIfNeededForSeconds:0.5

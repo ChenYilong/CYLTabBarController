@@ -349,3 +349,7 @@
 "展开全部 %@ 个模拟" = "%@ simülasyonun tümünü göster";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Simülasyon listesini daralt";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Ağ simgeleri";
+"网络图标、标题与配色" = "Ağ simgeleri, başlıklar ve renkler";

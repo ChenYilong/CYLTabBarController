@@ -159,6 +159,11 @@ static BOOL CYLThemeRefreshBuiltInValues(UIView *view, CYLThemeManager *_Nullabl
     }
 }
 
+- (void)cyl_applyCurrentTheme {
+    // [EN] A nil manager: the theme values of every manager. [CN] manager 为 nil：所有管理器的主题值。
+    [self cyl_themeDidChangeByManager:nil identifier:nil theme:nil enumeratesSubviews:YES];
+}
+
 - (nullable void (^)(void))cyl_themeDidChangeBlock {
     return objc_getAssociatedObject(self, @selector(cyl_themeDidChangeBlock));
 }

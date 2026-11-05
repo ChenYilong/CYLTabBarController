@@ -349,3 +349,7 @@
 "展开全部 %@ 个模拟" = "Afișează toate cele %@ simulări";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Restrânge lista de simulări";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Pictograme din rețea";
+"网络图标、标题与配色" = "Pictograme din rețea, titluri și culori";

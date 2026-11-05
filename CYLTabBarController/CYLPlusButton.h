@@ -11,6 +11,8 @@
 // [CN] 与此类绑定的文档：
 //   - Custom Tab Bar Feature Checklist / 自定义 TabBar 功能清单
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Custom-Tab-Bar-Features.md
+//   - Plus child theme switching test / PlusButton 子控制器换肤测试
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Plus-Child-Theme-Switching-Test.md
 //   - Liquid Glass: a PlusButton with its title on a background image / 液态玻璃：标题画在背景图上的 PlusButton
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Background-Image-Liquid-Glass.md
 //   - PlusButton badge: changes on every tap / PlusButton 角标：每次点击都会变化
