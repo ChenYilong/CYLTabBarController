@@ -53,6 +53,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBarItem-Gestures.md
 //   - Selected title: a different title on the selected tab (like JD's "Refresh") / 选中标题：选中的 Tab 显示不同文字（如京东「刷新」）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBarItem-Selected-Title.md
+//   - Theme switching (skins) / 换肤（主题切换）
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching.md
 //   - Update Tabs in Place: Titles, Icons, Network Icons and Pages / 原地更新 Tab：标题、图标、网络图标与替换页面
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Update-Tab-Bar-Items-In-Place.md
 // docs-binding:end
@@ -87,6 +89,7 @@
 #import "UIViewController+CYLConfigurationDemo.h"
 #import "CYLTabBarConfigurationParser.h"
 #import "UIViewController+CYLSettingsSection.h"
+#import "UIViewController+CYLThemeSettings.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
 #import "UIColor+CYLTabBarControllerExtention.h"
 #import "CYLConstants.h"
@@ -1746,6 +1749,70 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 @property (nullable, nonatomic, weak, getter=cylflatdesign_tabBarController, setter=cylflatdesign_setTabBarController:) UIViewController __kindof *cylflatdesign_tabBarController;
 
 #endif
+
+@end
+
+#pragma mark - Theme switching (issue #216)
+
+/*!
+ * FIX: issue #216, #136
+ * [EN] A theme (skin) of the tab bar: what a theme object registered with `CYLThemeManager` adopts so that switching
+ *      the theme restyles the tab bar in place, in every style (Liquid Glass, the system tab bar, FlatDesign), with no
+ *      new tab bar and no new view controllers. Every method is optional; a method that is missing or returns nil gives
+ *      the tab bar back what the app had set before the first theme changed it. See docs/Theme-Switching.md.
+ * [CN] TabBar 的主题（皮肤）：注册到 `CYLThemeManager` 的主题对象遵守该协议后，切换主题即可原地更新 TabBar，适用于所有样式
+ *      （液态玻璃、系统 TabBar、扁平样式），无需新建 TabBar、无需重新创建子控制器。所有方法均为可选；未实现或返回 nil 的方法，会让 TabBar
+ *      恢复为第一次被主题修改前 App 自己的设置。见 docs/Theme-Switching.md。
+ */
+@protocol CYLTabBarTheme <NSObject>
+
+@optional
+
+/*!
+ * [EN] The titles and icons of the tabs in this theme, shaped like `tabBarItemsAttributes` (one entry per tab, none for
+ *      the plus button), applied with `-updateTabBarItemsWithAttributes:`: e.g. holiday icons. A missing key keeps the
+ *      current value, so give the keys the app's own attributes use.
+ * [CN] 该主题下各 Tab 的标题与图标，结构与 `tabBarItemsAttributes` 相同（每个 Tab 一项，PlusButton 不占项），通过
+ *      `-updateTabBarItemsWithAttributes:` 应用：例如节日图标。未提供的 key 保持当前值，因此请提供与 App 自身 attributes 相同的 key。
+ */
+- (nullable NSArray<NSDictionary<NSString *, id> *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController;
+
+/*!
+ * [EN] The appearance of the tab bar in this theme: background, item colors, selection indicator... Assigned to
+ *      `tabBar.standardAppearance` and, on iOS 15+, `tabBar.scrollEdgeAppearance`; FlatDesign follows it. Return a new
+ *      object with the theme's colors.
+ * [CN] 该主题下 TabBar 的外观：背景、item 颜色、选中指示器等。赋给 `tabBar.standardAppearance`，iOS 15+ 同时赋给
+ *      `tabBar.scrollEdgeAppearance`；扁平样式随之更新。请返回带有该主题颜色的新对象。
+ */
+- (nullable UITabBarAppearance *)cyl_tabBarAppearanceForTabBarController:(CYLTabBarController *)tabBarController API_AVAILABLE(ios(13.0));
+
+/*!
+ * [EN] Anything else, after the items and the appearance: the plus button, `tabBar.tintColor` before iOS 13...
+ * [CN] 其他内容，在更新 item 与外观之后调用：PlusButton、iOS 13 以前的 `tabBar.tintColor` 等。
+ */
+- (void)cyl_customizeTabBarController:(CYLTabBarController *)tabBarController;
+
+@end
+
+/*!
+ * FIX: issue #216
+ * [EN] The tab bar follows the theme of `CYLThemeManagerCenter.defaultThemeManager`: when its theme changes, and once
+ *      when the tab bar controller first appears (for the theme chosen at launch). A theme that does not adopt
+ *      `CYLTabBarTheme` gives the tab bar back the app's own look. A theme of another manager is applied only when it
+ *      adopts `CYLTabBarTheme`. Liquid Glass, the system tab bar and FlatDesign alike.
+ * [CN] TabBar 跟随 `CYLThemeManagerCenter.defaultThemeManager` 的主题：主题切换时，以及 TabBarController 首次显示时（应用启动时选择的
+ *      主题）。不遵守 `CYLTabBarTheme` 的主题会让 TabBar 恢复 App 自己的外观。其他管理器的主题仅在遵守 `CYLTabBarTheme` 时应用。
+ *      液态玻璃、系统 TabBar、扁平样式均适用。
+ */
+@interface CYLTabBarController (CYLTheme)
+
+/*!
+ * [EN] Restyles the tab bar with `theme` now, see `CYLTabBarTheme`; nil or a theme that does not adopt it restores the
+ *      app's own titles, icons and appearance. Called for you when the theme changes.
+ * [CN] 立即用 `theme` 更新 TabBar，见 `CYLTabBarTheme`；传 nil 或不遵守该协议的主题时，恢复 App 自己的标题、图标与外观。
+ *      主题切换时会自动调用。
+ */
+- (void)cyl_applyTabBarTheme:(nullable id)theme;
 
 @end
 

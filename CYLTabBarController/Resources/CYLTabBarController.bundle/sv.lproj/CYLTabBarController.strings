@@ -264,6 +264,18 @@
 "配置文件：模拟意外情况" = "Konfiguration: simulerade fel";
 "已安全创建 TabBarController：%@ 个 Tab" = "TabBarController skapad säkert: %@ flikar";
 "查看" = "Visa";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Utseende";
+"换肤（主题，issue #216）" = "Utseende (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Tryck för att välja ett tema: TabBar-bakgrunden, symbolerna och textfärgerna byts på plats, i alla TabBar-stilar. Nu: %@";
+"选择主题" = "Välj ett tema";
+"默认" = "Standard";
+"西柚" = "Grapefrukt";
+"青草" = "Gräs";
+"玫瑰粉" = "Rosa ros";
+"春节" = "Vårfesten";
+"跟随系统深色模式" = "Följ systemets mörka läge";
 "默认点击声" = "Standardklick";
 "中等触感反馈" = "Medelstark haptik";
 "无需继承基类与工具方法" = "Utan basklass, och verktyg";
@@ -287,5 +299,19 @@
 "重触感反馈" = "Kraftig haptik";
 "长按（#152）" = "Långt tryck (#152)";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Jul";
+"万圣节" = "Halloween";
+"情人节" = "Alla hjärtans dag";
+"中秋节" = "Midhöstfestivalen";
+"复活节" = "Påsk";
+"新年" = "Nyår";
+"夏日" = "Sommar";
+"生日" = "Födelsedag";
+"太空" = "Rymden";
+"海洋" = "Havet";
+"换肤：节日与配色主题（%@ 种）" = "Utseenden: högtider och färger (%@)";
+"节日图标与配色" = "Högtidssymboler och färger";
+"仅配色" = "Endast färger";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Tryck här";

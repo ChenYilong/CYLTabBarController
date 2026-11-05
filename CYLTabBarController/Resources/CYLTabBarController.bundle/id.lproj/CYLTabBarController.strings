@@ -264,6 +264,18 @@
 "配置文件：模拟意外情况" = "Konfigurasi: simulasi kegagalan";
 "已安全创建 TabBarController：%@ 个 Tab" = "TabBarController dibuat dengan aman: %@ tab";
 "查看" = "Lihat";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Skin";
+"换肤（主题，issue #216）" = "Skin (tema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Ketuk untuk memilih tema: latar, ikon, dan warna teks TabBar berubah di tempat, di semua gaya TabBar. Saat ini: %@";
+"选择主题" = "Pilih tema";
+"默认" = "Bawaan";
+"西柚" = "Jeruk Bali";
+"青草" = "Rumput";
+"玫瑰粉" = "Mawar Merah Muda";
+"春节" = "Imlek";
+"跟随系统深色模式" = "Ikuti Mode Gelap sistem";
 "默认点击声" = "Klik bawaan";
 "中等触感反馈" = "Haptik sedang";
 "无需继承基类与工具方法" = "Tanpa kelas dasar, dan utilitas";
@@ -287,5 +299,19 @@
 "重触感反馈" = "Haptik kuat";
 "长按（#152）" = "Tekan lama (#152)";
 
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Natal";
+"万圣节" = "Halloween";
+"情人节" = "Hari Valentine";
+"中秋节" = "Festival Pertengahan Musim Gugur";
+"复活节" = "Paskah";
+"新年" = "Tahun Baru";
+"夏日" = "Musim Panas";
+"生日" = "Ulang Tahun";
+"太空" = "Luar Angkasa";
+"海洋" = "Samudra";
+"换肤：节日与配色主题（%@ 种）" = "Skin: hari raya dan warna (%@)";
+"节日图标与配色" = "Ikon hari raya dan warna";
+"仅配色" = "Warna saja";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Ketuk";

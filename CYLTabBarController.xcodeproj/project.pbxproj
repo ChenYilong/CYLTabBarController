@@ -7,6 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C55EB2BC5D6C89C66BF454DF /* UIViewController+CYLThemeSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B125B4B6B9CBD155357BAD3 /* UIViewController+CYLThemeSettings.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5906E5649F98CD8682126056 /* UIViewController+CYLThemeSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D5F426FC4C1BB8E2317AFEB /* UIViewController+CYLThemeSettings.m */; };
+		8A56AE527FB06723D2743E7D /* CYLTheme.h in Headers */ = {isa = PBXBuildFile; fileRef = 529E2243371297284C0BEC1C /* CYLTheme.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3491203CB996FE9713798B45 /* CYLThemeManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FEAE77FC4A017D57E648057E /* CYLThemeManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		287A316008DF20786645A511 /* CYLThemeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E359E10AD4AFF3E46A67BA28 /* CYLThemeManager.m */; };
+		A3CC4AC834D659AD8B76B95D /* CYLThemeManagerCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = BBEC547945F02BC7D75AC416 /* CYLThemeManagerCenter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		783DD8242C0063AD60CD48C8 /* CYLThemeManagerCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = DF19A6C7EB37532B125698D2 /* CYLThemeManagerCenter.m */; };
+		24A3CFF53D12FFE98BC2CEE9 /* CYLThemePrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = E9627A9FA13ACBDBECEA3D4B /* CYLThemePrivate.h */; };
+		C16BA3BD2BA11084ABA5D248 /* CYLThemePrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = 912DA005AE14DB2B47212CC4 /* CYLThemePrivate.m */; };
+		45231A54859B21D498735A1E /* UIColor+CYLTheme.h in Headers */ = {isa = PBXBuildFile; fileRef = 82BFEA11E08BD49F05E488A9 /* UIColor+CYLTheme.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		95E3B884DA44033B8BA1B2A6 /* UIColor+CYLTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = B568DE2B1E79DE67F9EB17A8 /* UIColor+CYLTheme.m */; };
+		2B910FB9CAFD606AC428BF1B /* UIView+CYLTheme.h in Headers */ = {isa = PBXBuildFile; fileRef = A1332ABF31C405152CAD5EAE /* UIView+CYLTheme.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		52AC7D5933E6513FFDED6477 /* UIView+CYLTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = EBBEADFBFBD49909C8BDA2C6 /* UIView+CYLTheme.m */; };
+		F86EAD1B424CC7C8FD0797F6 /* UIViewController+CYLTheme.h in Headers */ = {isa = PBXBuildFile; fileRef = B7867273EDC0A1A56B351CBE /* UIViewController+CYLTheme.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		273FB0BC9320322CD96E79E1 /* UIViewController+CYLTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 20C039F83546F91858D4A40C /* UIViewController+CYLTheme.m */; };
 		097BA5790ABC6FE0F936312C /* CYLGalleryProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 2235759C0549079BA7160DF4 /* CYLGalleryProvider.m */; };
 		3AA9A8C1CFFED294DB877EAF /* CYLGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A93305C6DEB3D45BD52B623 /* CYLGalleryViewController.m */; };
 		002ACFDEC3236108A0445E6F /* UIColor+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = A494E02A66D2AE6B5B42B9E8 /* UIColor+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -211,6 +226,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1B125B4B6B9CBD155357BAD3 /* UIViewController+CYLThemeSettings.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIViewController+CYLThemeSettings.h"; sourceTree = "<group>"; };
+		7D5F426FC4C1BB8E2317AFEB /* UIViewController+CYLThemeSettings.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+CYLThemeSettings.m"; sourceTree = "<group>"; };
+		529E2243371297284C0BEC1C /* CYLTheme.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLTheme.h; sourceTree = "<group>"; };
+		FEAE77FC4A017D57E648057E /* CYLThemeManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLThemeManager.h; sourceTree = "<group>"; };
+		E359E10AD4AFF3E46A67BA28 /* CYLThemeManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLThemeManager.m; sourceTree = "<group>"; };
+		BBEC547945F02BC7D75AC416 /* CYLThemeManagerCenter.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLThemeManagerCenter.h; sourceTree = "<group>"; };
+		DF19A6C7EB37532B125698D2 /* CYLThemeManagerCenter.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLThemeManagerCenter.m; sourceTree = "<group>"; };
+		E9627A9FA13ACBDBECEA3D4B /* CYLThemePrivate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLThemePrivate.h; sourceTree = "<group>"; };
+		912DA005AE14DB2B47212CC4 /* CYLThemePrivate.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLThemePrivate.m; sourceTree = "<group>"; };
+		82BFEA11E08BD49F05E488A9 /* UIColor+CYLTheme.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIColor+CYLTheme.h"; sourceTree = "<group>"; };
+		B568DE2B1E79DE67F9EB17A8 /* UIColor+CYLTheme.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIColor+CYLTheme.m"; sourceTree = "<group>"; };
+		A1332ABF31C405152CAD5EAE /* UIView+CYLTheme.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIView+CYLTheme.h"; sourceTree = "<group>"; };
+		EBBEADFBFBD49909C8BDA2C6 /* UIView+CYLTheme.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIView+CYLTheme.m"; sourceTree = "<group>"; };
+		B7867273EDC0A1A56B351CBE /* UIViewController+CYLTheme.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIViewController+CYLTheme.h"; sourceTree = "<group>"; };
+		20C039F83546F91858D4A40C /* UIViewController+CYLTheme.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+CYLTheme.m"; sourceTree = "<group>"; };
 		6DFB1797FF9392354939CEEB /* CYLGalleryProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLGalleryProvider.h; sourceTree = "<group>"; };
 		2235759C0549079BA7160DF4 /* CYLGalleryProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLGalleryProvider.m; sourceTree = "<group>"; };
 		D384C6A734E0625DEE351CEC /* CYLGalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLGalleryViewController.h; sourceTree = "<group>"; };
@@ -410,6 +440,34 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		706600A1ADD2C11A0FBEFD8C /* CYLComponents */ = {
+			isa = PBXGroup;
+			children = (
+				A3B7B2C4616EC3D1CC1B500B /* CYLTheme */,
+			);
+			path = CYLComponents;
+			sourceTree = "<group>";
+		};
+		A3B7B2C4616EC3D1CC1B500B /* CYLTheme */ = {
+			isa = PBXGroup;
+			children = (
+				529E2243371297284C0BEC1C /* CYLTheme.h */,
+				FEAE77FC4A017D57E648057E /* CYLThemeManager.h */,
+				E359E10AD4AFF3E46A67BA28 /* CYLThemeManager.m */,
+				BBEC547945F02BC7D75AC416 /* CYLThemeManagerCenter.h */,
+				DF19A6C7EB37532B125698D2 /* CYLThemeManagerCenter.m */,
+				E9627A9FA13ACBDBECEA3D4B /* CYLThemePrivate.h */,
+				912DA005AE14DB2B47212CC4 /* CYLThemePrivate.m */,
+				82BFEA11E08BD49F05E488A9 /* UIColor+CYLTheme.h */,
+				B568DE2B1E79DE67F9EB17A8 /* UIColor+CYLTheme.m */,
+				A1332ABF31C405152CAD5EAE /* UIView+CYLTheme.h */,
+				EBBEADFBFBD49909C8BDA2C6 /* UIView+CYLTheme.m */,
+				B7867273EDC0A1A56B351CBE /* UIViewController+CYLTheme.h */,
+				20C039F83546F91858D4A40C /* UIViewController+CYLTheme.m */,
+			);
+			path = CYLTheme;
+			sourceTree = "<group>";
+		};
 		EC3885766943B77938B305A1 /* Gallery */ = {
 			isa = PBXGroup;
 			children = (
@@ -446,6 +504,7 @@
 				C0159DCB51DD44C8B7593E4E /* UIViewController+CYLUtils.m */,
 				C516EBC3F17A4023BADF3152 /* UIBarItem+CYLUtils.h */,
 				A012D43E4A5C46A2A98D54A5 /* UIBarItem+CYLUtils.m */,
+				706600A1ADD2C11A0FBEFD8C /* CYLComponents */,
 				934598AD21CBB8B71C2AFEB8 /* UIView+CYLHitTestOutsideBounds.h */,
 				59B5CC540D1171260C4BC216 /* UIView+CYLHitTestOutsideBounds.m */,
 				28B4B3989F4BED8910D1864A /* UIImage+CYLUtils.h */,
@@ -782,6 +841,8 @@
 				254EC1ADE154A59D8FF60778 /* UIViewController+CYLConfigurationDemo.h */,
 				66841A8A554BFB4AB6932A9A /* UIViewController+CYLConfigurationDemo.m */,
 				8A1B2C3D4E5F60718293A4B5 /* UIViewController+CYLSettingsSection.h */,
+				1B125B4B6B9CBD155357BAD3 /* UIViewController+CYLThemeSettings.h */,
+				7D5F426FC4C1BB8E2317AFEB /* UIViewController+CYLThemeSettings.m */,
 				9B2C3D4E5F60718293A4B5C6 /* UIViewController+CYLSettingsSection.m */,
 				F45F360D448D6E78DD3A4B88 /* UIView+CYLTabBarControllerExtention.h */,
 				7E837923A3C4F015D5EF885D /* UIView+CYLTabBarControllerExtention.m */,
@@ -837,6 +898,13 @@
 				C23D489F6AA443C1B0121DD7 /* UIView+CYLUtils.h in Headers */,
 				4DDA7544292C4ED7BCBA3201 /* UIViewController+CYLUtils.h in Headers */,
 				591685A653E94A20A95E7C35 /* UIBarItem+CYLUtils.h in Headers */,
+				8A56AE527FB06723D2743E7D /* CYLTheme.h in Headers */,
+				3491203CB996FE9713798B45 /* CYLThemeManager.h in Headers */,
+				A3CC4AC834D659AD8B76B95D /* CYLThemeManagerCenter.h in Headers */,
+				24A3CFF53D12FFE98BC2CEE9 /* CYLThemePrivate.h in Headers */,
+				45231A54859B21D498735A1E /* UIColor+CYLTheme.h in Headers */,
+				2B910FB9CAFD606AC428BF1B /* UIView+CYLTheme.h in Headers */,
+				F86EAD1B424CC7C8FD0797F6 /* UIViewController+CYLTheme.h in Headers */,
 				CC15B48C54264A1782F1C80B /* CYLBadgeView.h in Headers */,
 				DB1A987ED14547D2A9E5D1FA /* CYLBadgeViewDefines.h in Headers */,
 				62991E68F39ACEA63E7BE7A6 /* CAAnimation+CYLBadgeExtention.h in Headers */,
@@ -875,6 +943,7 @@
 				1A9BCC31260729A0028A4B81 /* CYLTabBarConfigurationParser.h in Headers */,
 				122FC04BC841268AB72B3CFB /* UIViewController+CYLConfigurationDemo.h in Headers */,
 				AC3D4E5F60718293A4B5C6D7 /* UIViewController+CYLSettingsSection.h in Headers */,
+				C55EB2BC5D6C89C66BF454DF /* UIViewController+CYLThemeSettings.h in Headers */,
 				6DF0856810A3A8175EA3FD25 /* UIView+CYLTabBarControllerExtention.h in Headers */,
 				AC11DB045581B6D3C67A2473 /* UIViewController+CYLNavigationControllerExtention.h in Headers */,
 				C2BC718902482846D5C84EB9 /* UIViewController+CYLTabBarControllerExtention.h in Headers */,
@@ -1162,6 +1231,12 @@
 				1FDA6E8C69434EF29DF17730 /* UIView+CYLUtils.m in Sources */,
 				AE77F5059A7A425DB97C37A1 /* UIViewController+CYLUtils.m in Sources */,
 				FB7CE7413A924BD5A352F058 /* UIBarItem+CYLUtils.m in Sources */,
+				287A316008DF20786645A511 /* CYLThemeManager.m in Sources */,
+				783DD8242C0063AD60CD48C8 /* CYLThemeManagerCenter.m in Sources */,
+				C16BA3BD2BA11084ABA5D248 /* CYLThemePrivate.m in Sources */,
+				95E3B884DA44033B8BA1B2A6 /* UIColor+CYLTheme.m in Sources */,
+				52AC7D5933E6513FFDED6477 /* UIView+CYLTheme.m in Sources */,
+				273FB0BC9320322CD96E79E1 /* UIViewController+CYLTheme.m in Sources */,
 				E681EEE1526CEADD13246270 /* CAAnimation+CYLBadgeExtention.m in Sources */,
 				5F1751155F5B5E881987270D /* CYLTabBarBadgeView.m in Sources */,
 				EDA9F35C5E046B28A0A97A07 /* CYLBaseNavigationController.m in Sources */,
@@ -1198,6 +1273,7 @@
 				5631D0E4C06580EE520D1B41 /* CYLTabBarController+CYLConfiguration.m in Sources */,
 				EBBFC349BA8CD5FC9F051578 /* UIViewController+CYLConfigurationDemo.m in Sources */,
 				BD4E5F60718293A4B5C6D7E8 /* UIViewController+CYLSettingsSection.m in Sources */,
+				5906E5649F98CD8682126056 /* UIViewController+CYLThemeSettings.m in Sources */,
 				297CA4BAC3339C32B5B3AD8D /* UIView+CYLTabBarControllerExtention.m in Sources */,
 				89896F85AC7444ED382DCB77 /* UIViewController+CYLNavigationControllerExtention.m in Sources */,
 				EAEC29CCF7FF7A3DD4D64F6A /* UIViewController+CYLTabBarControllerExtention.m in Sources */,
