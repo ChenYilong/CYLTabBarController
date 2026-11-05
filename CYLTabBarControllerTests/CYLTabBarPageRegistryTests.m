@@ -213,6 +213,69 @@ static NSDictionary *CYLTestTab(NSString *title, NSString *pageIdentifier) {
     XCTAssertEqual(tabBarController.tabBarItemsAttributes.count, 2u);
 }
 
+#pragma mark - Asynchronous pages
+
+- (void)testAsynchronousPageIsSwappedInAndAFailedOneRemovesTheTab {
+    CYLTabBarPageRegistry *registry = [[CYLTabBarPageRegistry alloc] init];
+    [registry registerPageProvider:CYLTestPage(@"home") forPageIdentifier:@"home"];
+    [registry registerAsyncPageFactory:^UIViewController *(CYLTabBarPageRequest *request, CYLTabBarPageCompletion completion) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+            UIViewController *page = [request.pageIdentifier isEqualToString:@"later"] ? [[UIViewController alloc] init] : nil;
+            page.title = request.title;
+            completion(page);
+            completion(page); // [EN] A second call is ignored. [CN] 第二次调用被忽略。
+        });
+        return nil;
+    } forPageIdentifiers:@[ @"later", @"never" ]];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerPageRegistry : registry,
+        CYLTabBarControllerTabBarItemsAttributes : @[ CYLTestTab(@"Later", @"later"), CYLTestTab(@"Home", @"home"), CYLTestTab(@"Never", @"never") ],
+    }];
+    XCTAssertEqual(tabBarController.viewControllers.count, 3u);
+    XCTAssertEqual(tabBarController.cyl_pendingPages.count, 2u);
+    XCTAssertTrue([tabBarController.viewControllers[0] isKindOfClass:[CYLTabBarPagePlaceholder class]]);
+    XCTAssertTrue(tabBarController.viewControllers[0].cyl_isPendingPage);
+
+    XCTestExpectation *swapped = [self expectationWithDescription:@"pages delivered"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [swapped fulfill];
+    });
+    [self waitForExpectationsWithTimeout:2 handler:nil];
+
+    XCTAssertEqual(tabBarController.cyl_pendingPages.count, 0u);
+    XCTAssertEqualObjects([tabBarController.viewControllers valueForKey:@"title"], (@[ @"Later", @"home" ]), @"\"later\" swapped in, \"never\" removed");
+    XCTAssertFalse([tabBarController.viewControllers[0] isKindOfClass:[CYLTabBarPagePlaceholder class]]);
+    XCTAssertEqual(tabBarController.tabBarItemsAttributes.count, 2u);
+    XCTAssertEqual(tabBarController.cyl_skippedTabs.count, 1u);
+    XCTAssertEqualObjects(tabBarController.cyl_skippedTabs.firstObject.pageIdentifier, @"never");
+    XCTAssertEqual(tabBarController.cyl_skippedTabs.firstObject.reason, CYLTabBarPageSkipReasonProviderFailed);
+}
+
+- (void)testAsynchronousFactoryMayCompleteSynchronouslyAndUseItsOwnPlaceholder {
+    CYLTabBarPageRegistry *registry = [[CYLTabBarPageRegistry alloc] init];
+    UIViewController *placeholder = [[UIViewController alloc] init];
+    placeholder.title = @"placeholder";
+    [registry registerAsyncPageFactory:^UIViewController *(CYLTabBarPageRequest *request, CYLTabBarPageCompletion completion) {
+        UIViewController *page = [[UIViewController alloc] init];
+        page.title = @"now";
+        completion(page);
+        return placeholder;
+    } forPageIdentifier:@"now"];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerPageRegistry : registry,
+        CYLTabBarControllerTabBarItemsAttributes : @[ CYLTestTab(@"Now", @"now") ],
+    }];
+    XCTAssertEqual(tabBarController.viewControllers.firstObject, placeholder, @"swapped on the next run loop turn, not inside init");
+    XCTAssertNotNil(placeholder.cyl_loadedPage);
+    XCTestExpectation *swapped = [self expectationWithDescription:@"swapped"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [swapped fulfill];
+    });
+    [self waitForExpectationsWithTimeout:2 handler:nil];
+    XCTAssertEqualObjects(tabBarController.viewControllers.firstObject.title, @"now");
+    XCTAssertEqual(tabBarController.cyl_pendingPages.count, 0u);
+}
+
 - (void)testReloadWithViewControllersFromCodeIsUnchanged {
     UIViewController *first = [[UIViewController alloc] init];
     UIViewController *second = [[UIViewController alloc] init];

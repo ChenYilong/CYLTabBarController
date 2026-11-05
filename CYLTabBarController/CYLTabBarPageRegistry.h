@@ -41,6 +41,20 @@ typedef UIViewController *_Nullable (^CYLTabBarPageProvider)(NSString *pageIdent
  */
 typedef UIViewController *_Nullable (^CYLTabBarPageFactory)(CYLTabBarPageRequest *request);
 
+/// [EN] Delivers the page of an asynchronous factory; nil removes the tab. Any thread. [CN] 交付异步工厂的页面；nil 则移除该 Tab。任意线程。
+typedef void (^CYLTabBarPageCompletion)(UIViewController *_Nullable page);
+
+/*!
+ * [EN] Creates the page of a tab asynchronously (a module downloaded or initialized later): call `completion` once with
+ *      the page, or with nil to remove the tab. Return the view controller to show meanwhile, or nil for the built-in
+ *      `CYLTabBarPagePlaceholder`. The tab bar controller swaps the page in at the same index when it arrives (see
+ *      `-[CYLTabBarController cyl_pendingPages]` and `CYLTabBarControllerDelegate`).
+ * [CN] 异步创建 Tab 的页面（稍后下载或初始化的模块）：调用一次 `completion` 交付页面，或传 nil 移除该 Tab。返回期间显示的视图控制器，
+ *      或返回 nil 使用内置的 `CYLTabBarPagePlaceholder`。页面到达后 TabBarController 在同一下标换入（见
+ *      `-[CYLTabBarController cyl_pendingPages]` 与 `CYLTabBarControllerDelegate`）。
+ */
+typedef UIViewController *_Nullable (^CYLTabBarAsyncPageFactory)(CYLTabBarPageRequest *request, CYLTabBarPageCompletion completion);
+
 /*!
  * [EN] Where a tab's page is looked up; the values of `CYLTabBarControllerPageLookupOrder` (code: this type, files: the
  *      same strings). The default order is `+[CYLTabBarPageRegistry defaultPageLookupOrder]`.
@@ -174,6 +188,14 @@ typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
 - (void)registerPageProvider:(CYLTabBarPageProvider)provider
           forPageIdentifiers:(NSArray<NSString *> *)pageIdentifiers NS_SWIFT_NAME(register(_:forPageIdentifiers:));
 
+/// [EN] Registers (or replaces) an asynchronous page factory for a page ID. [CN] 为页面 ID 注册（或替换）异步页面工厂。
+- (void)registerAsyncPageFactory:(CYLTabBarAsyncPageFactory)factory
+               forPageIdentifier:(NSString *)pageIdentifier NS_SWIFT_NAME(register(asyncFactory:forPageIdentifier:));
+
+/// [EN] Registers one asynchronous page factory for several page IDs. [CN] 为多个页面 ID 注册同一个异步页面工厂。
+- (void)registerAsyncPageFactory:(CYLTabBarAsyncPageFactory)factory
+              forPageIdentifiers:(NSArray<NSString *> *)pageIdentifiers NS_SWIFT_NAME(register(asyncFactory:forPageIdentifiers:));
+
 /// [EN] Registers (or replaces) a page factory (typed request) for a page ID. [CN] 为页面 ID 注册（或替换）页面工厂（类型化请求）。
 - (void)registerPageFactory:(CYLTabBarPageFactory)factory
           forPageIdentifier:(NSString *)pageIdentifier NS_SWIFT_NAME(register(factory:forPageIdentifier:));
@@ -215,6 +237,13 @@ typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
  * [CN] 重新扫描已加载的镜像，例如在加载了动态框架或插件之后。主线程。
  */
 + (void)rescanPageClasses;
+
+/*!
+ * [EN] Runs the scan on a background queue now (e.g. at launch), so the first tab bar controller does not pay for it on
+ *      the main thread. Optional; the scan still runs on first use when this was not called.
+ * [CN] 立即在后台队列执行扫描（例如启动时），第一个 TabBarController 就不必在主线程承担扫描成本。可选；未调用时仍在首次使用时扫描。
+ */
++ (void)prepareAutomaticRegistrationInBackground;
 
 /// [EN] `[instance, resolver, shared, automatic]`. [CN] `[instance, resolver, shared, automatic]`。
 @property (class, nonatomic, readonly, copy) NSArray<CYLTabBarPageSource> *defaultPageLookupOrder;
@@ -259,6 +288,32 @@ typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
 @optional
 /// [EN] Creates the page for a tab (e.g. wrapped in a navigation controller); nil skips the tab. [CN] 为 Tab 创建页面（例如包裹在导航控制器中）；返回 nil 则跳过该 Tab。
 + (nullable UIViewController *)cylTabBarPageWithAttributes:(NSDictionary<NSString *, id> *)tabAttributes;
+
+@end
+
+/*!
+ * [EN] The view controller shown while an asynchronous factory loads its page: a centered activity indicator on the
+ *      system background. Subclass it, or return your own view controller from the factory, for a different look.
+ * [CN] 异步工厂加载页面期间显示的视图控制器：系统背景色上居中的活动指示器。需要不同外观时可以子类化，或从工厂返回自己的视图控制器。
+ */
+@interface CYLTabBarPagePlaceholder : UIViewController
+@end
+
+/*!
+ * [EN] The state of a view controller returned by an asynchronous factory (the placeholder), until the tab bar
+ *      controller swaps the page in. Other view controllers answer NO / nil.
+ * [CN] 异步工厂返回的视图控制器（占位）在 TabBarController 换入页面之前的状态。其他视图控制器返回 NO / nil。
+ */
+@interface UIViewController (CYLTabBarPageLoading)
+
+/// [EN] A placeholder whose page has not been delivered yet. [CN] 页面尚未交付的占位。
+@property (nonatomic, readonly) BOOL cyl_isPendingPage;
+/// [EN] The delivered page, until it is swapped in. [CN] 已交付、尚未换入的页面。
+@property (nonatomic, readonly, nullable) UIViewController *cyl_loadedPage;
+/// [EN] The factory delivered nil (the tab will be removed). [CN] 工厂交付了 nil（该 Tab 将被移除）。
+@property (nonatomic, readonly) BOOL cyl_pageLoadFailed;
+/// [EN] Called on the main thread when the page is delivered; set by the tab bar controller. [CN] 页面交付时在主线程调用；由 TabBarController 设置。
+@property (nonatomic, copy, nullable) void (^cyl_pageLoadHandler)(UIViewController *placeholder);
 
 @end
 

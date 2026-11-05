@@ -356,6 +356,12 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 #endif
 @end
 
+/// [EN] Asynchronous pages (docs/Tab-Page-Registry.md); implemented at the end of this file. [CN] 异步页面（docs/Tab-Page-Registry.md）；实现见本文件末尾。
+@interface CYLTabBarController (CYLPendingPages)
+- (void)cyl_adoptPendingPages;
+- (void)cyl_placeholderDidFinishLoading:(UIViewController *)placeholder;
+@end
+
 /// [EN] Implemented below (CYLTabBarMinimize, issue #13). [CN] 实现见下方 CYLTabBarMinimize（issue #13）。
 @interface CYLTabBarController (CYLTabBarMinimizePrivate)
 /// [EN] FlatDesign: observe the scroll view of the page on screen. [CN] 扁平样式：观察当前显示页面的滚动视图。
@@ -2211,6 +2217,7 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
         self.viewControllers = viewControllers;// [CN] 步骤3 must use setter,必须在 self.tabBarStyleType之后设置， 因为 self.viewControllers 直接涉及到扁平TabBar样式KVC逻辑。
         // [EN] Step 3: must use the setter and must be set after self.tabBarStyleType,
         //      because self.viewControllers directly involves the KVC logic of the flat TabBar style.
+        [self cyl_adoptPendingPages];
         
     }
     return self;
@@ -3237,6 +3244,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         }
     }
     [self setViewControllers:viewControllers];
+    [self cyl_adoptPendingPages];
     // FIX: issue #433
     // [EN] The reloaded tabs show the selected title on the selected tab.
     // [CN] 重新加载后，选中的 Tab 显示选中标题。
@@ -9637,6 +9645,101 @@ static char CYLCustomTabActionViewControllerKey;
 
 @end
 
+#pragma mark - Asynchronous pages
+
+@implementation CYLTabBarController (CYLPendingPages)
+
+/*!
+ * [EN] Takes charge of the placeholders of asynchronous factories among the tabs: a pending one calls back when its
+ *      page arrives, one that already finished (a factory that completed synchronously) is swapped on the next run loop
+ *      turn, so `-setViewControllers:` is never re-entered.
+ * [CN] 接管 Tab 中异步工厂的占位：尚未完成的在页面到达时回调；已完成的（工厂同步完成）在下一次 run loop 换入，避免重入
+ *      `-setViewControllers:`。
+ */
+- (void)cyl_adoptPendingPages {
+    __weak typeof(self) weakSelf = self;
+    for (UIViewController *viewController in [_viewControllers copy]) {
+        if (viewController.cyl_isPendingPage) {
+            viewController.cyl_pageLoadHandler = ^(UIViewController *placeholder) {
+                [weakSelf cyl_placeholderDidFinishLoading:placeholder];
+            };
+        } else if (viewController.cyl_loadedPage || viewController.cyl_pageLoadFailed) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf cyl_placeholderDidFinishLoading:viewController];
+            });
+        }
+    }
+}
+
+/*!
+ * [EN] The page of a placeholder arrived: it is swapped in at the placeholder's index (title, attributes and selection
+ *      kept), or, when the factory delivered nil or a page that cannot be a tab, the tab is removed and listed in
+ *      `cyl_skippedTabs`. The delegate is told either way.
+ * [CN] 占位的页面已到达：在占位的下标换入（标题、属性与选中状态保留）；工厂交付 nil 或不能作为 Tab 的页面时，移除该 Tab 并记录到
+ *      `cyl_skippedTabs`。两种情况都会通知代理。
+ */
+- (void)cyl_placeholderDidFinishLoading:(UIViewController *)placeholder {
+    NSUInteger index = [_viewControllers indexOfObjectIdenticalTo:placeholder];
+    if (index == NSNotFound || (!placeholder.cyl_loadedPage && !placeholder.cyl_pageLoadFailed)) {
+        return;
+    }
+    placeholder.cyl_pageLoadHandler = nil;
+    UIViewController *page = placeholder.cyl_loadedPage;
+    NSString *problem = nil;
+    if (!page) {
+        problem = @"the asynchronous page factory delivered nil";
+    } else if ([page isKindOfClass:[UITabBarController class]]) {
+        problem = @"the delivered page is a tab bar controller (tab bars cannot be nested)";
+    } else if (page.parentViewController || page.presentingViewController) {
+        problem = @"the delivered page already belongs to another container";
+    } else if ([_viewControllers indexOfObjectIdenticalTo:page] != NSNotFound) {
+        problem = @"the delivered page is already the page of another tab";
+    }
+    NSDictionary<NSString *, id> *attributes = [self tabBarItemAttributesAtIndex:index];
+    NSString *pageIdentifier = [CYLTabBarPageRegistry pageIdentifierOfTab:attributes ?: @{}];
+    NSMutableArray<UIViewController *> *pages = pageIdentifier ? self.pagesByPageIdentifier[pageIdentifier] : nil;
+    NSInteger selectedIndex = (NSInteger)self.selectedIndex;
+    BOOL wasSelected = (selectedIndex == (NSInteger)index);
+    NSMutableArray<UIViewController *> *viewControllers = [_viewControllers mutableCopy];
+    if (problem) {
+        [viewControllers removeObjectAtIndex:index];
+        NSUInteger attributesIndex = [self cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:index];
+        if (attributesIndex < _tabBarItemsAttributes.count) {
+            NSMutableArray<NSDictionary *> *tabBarItemsAttributes = [_tabBarItemsAttributes mutableCopy];
+            [tabBarItemsAttributes removeObjectAtIndex:attributesIndex];
+            _tabBarItemsAttributes = [tabBarItemsAttributes copy];
+        }
+        CYLTabBarSkippedTab *skipped = [CYLTabBarSkippedTab skippedTabWithReason:CYLTabBarPageSkipReasonProviderFailed pageIdentifier:pageIdentifier
+                                                                       attributes:attributes detail:problem];
+        self.skippedTabs = [(self.skippedTabs ?: @[]) arrayByAddingObject:skipped];
+        [pages removeObjectIdenticalTo:placeholder];
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🔴 CYLTabBarController: the tab is removed: %@.", skipped);
+#endif
+        page = nil;
+    } else {
+        viewControllers[index] = page;
+        NSString *title = attributes[CYLTabBarItemTitle];
+        UIViewController *content = [page isKindOfClass:[UINavigationController class]] ? [(UINavigationController *)page viewControllers].firstObject : page;
+        if ([title isKindOfClass:[NSString class]] && content && !content.navigationItem.title) {
+            content.navigationItem.title = title;
+        }
+        NSUInteger pageIndex = [pages indexOfObjectIdenticalTo:placeholder];
+        if (pageIndex != NSNotFound) {
+            pages[pageIndex] = page;
+        }
+    }
+    [self setViewControllers:viewControllers];
+    if (wasSelected && self.viewControllers.count > 0) {
+        self.selectedIndex = MIN(index, self.viewControllers.count - 1);
+    }
+    if ([self.delegate respondsToSelector:@selector(cyl_tabBarController:didLoadPage:forPlaceholder:atIndex:)]) {
+        [(id<CYLTabBarControllerDelegate>)self.delegate cyl_tabBarController:self didLoadPage:page forPlaceholder:placeholder atIndex:index];
+    }
+}
+
+@end
+
 #pragma mark - CYLTabBarController (CYLPageRegistry)
 
 @implementation CYLTabBarController (CYLPageRegistry)
@@ -9655,6 +9758,16 @@ static char CYLCustomTabActionViewControllerKey;
 
 - (NSArray<CYLTabBarSkippedTab *> *)cyl_skippedTabs {
     return self.skippedTabs ?: @[];
+}
+
+- (NSArray<UIViewController *> *)cyl_pendingPages {
+    NSMutableArray<UIViewController *> *pending = [NSMutableArray array];
+    for (UIViewController *viewController in _viewControllers) {
+        if (viewController.cyl_isPendingPage) {
+            [pending addObject:viewController];
+        }
+    }
+    return [pending copy];
 }
 
 - (BOOL)cyl_pagesFromPageIdentifiers {

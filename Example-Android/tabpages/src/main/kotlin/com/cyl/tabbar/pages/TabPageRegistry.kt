@@ -96,27 +96,42 @@ object TabPages {
         registry: TabPageRegistry<P>? = null,
         resolver: TabPageProvider<P>? = null,
         shared: TabPageRegistry<P>? = null,
+        lookupOrder: List<PageSource> = PageSource.entries,
+        skipped: MutableList<SkippedTab>? = null,
+        reuse: Map<String, List<P>>? = null,
     ): List<Pair<TabItem, P>> {
+        // [EN] `reuse`: existing pages by page ID (a reload); a tab takes the next unused one of its ID before the sources
+        //      are asked, so state is kept. [CN] `reuse`：按页面 ID 分组的已有页面（重新加载）；Tab 先取其 ID 下一个未用的页面再查找来源，状态得以保留。
+        val available = reuse?.mapValues { ArrayDeque(it.value) }.orEmpty()
         val pages = ArrayList<Pair<TabItem, P>>()
         for (tab in tabs) {
             val pageId = tab.pageId
             if (pageId == null) {
-                println("CYLTabBar: the tab \"${tab.title.orEmpty()}\" has no page ID; skipped.")
+                skip(skipped, SkippedTab(SkipReason.MISSING_IDENTIFIER, null, tab))
                 continue
             }
-            val candidates = listOfNotNull(
-                registry?.provider(pageId),
-                resolver,
-                shared?.provider(pageId),
-                automaticFactories[pageId]?.let { factory -> { _: String, item: TabItem -> pageClass.cast(factory.create(item)) } },
-            )
+            val reused = available[pageId]?.removeFirstOrNull()
+            if (reused != null) {
+                pages += tab to reused
+                continue
+            }
+            val candidates = lookupOrder.mapNotNull { source ->
+                when (source) {
+                    PageSource.INSTANCE -> registry?.provider(pageId)
+                    PageSource.RESOLVER -> resolver
+                    PageSource.SHARED -> shared?.provider(pageId)
+                    PageSource.AUTOMATIC -> automaticFactories[pageId]?.let { factory -> { _: String, item: TabItem -> pageClass.cast(factory.create(item)) } }
+                }?.let { source to it }
+            }
             var page: P? = null
-            for (provider in candidates) {
-                page = call(provider, pageId, tab, pageClass, pages)
+            val problems = ArrayList<String>()
+            for ((source, provider) in candidates) {
+                page = call(provider, pageId, tab, pageClass, pages, reuse?.values?.flatten().orEmpty(), source.key, problems)
                 if (page != null) break
             }
             if (page == null) {
-                println("CYLTabBar: no page for \"$pageId\"; the tab is skipped.")
+                val reason = if (candidates.isEmpty()) SkipReason.UNREGISTERED else SkipReason.PROVIDER_FAILED
+                skip(skipped, SkippedTab(reason, pageId, tab, problems.joinToString("; ").ifEmpty { null }))
                 continue
             }
             pages += tab to page
@@ -124,21 +139,29 @@ object TabPages {
         return pages
     }
 
+    private fun skip(skipped: MutableList<SkippedTab>?, tab: SkippedTab) {
+        skipped?.add(tab)
+        println("CYLTabBar: the tab \"${tab.tab?.title.orEmpty()}\" (page ID ${tab.pageId ?: "missing"}) is skipped: ${tab.reason}${tab.detail?.let { " — $it" }.orEmpty()}")
+    }
+
     private fun <P : Any> call(provider: TabPageProvider<P>, pageId: String, tab: TabItem, pageClass: Class<P>,
-                               used: List<Pair<TabItem, P>>): P? {
+                               used: List<Pair<TabItem, P>>, reused: List<P>, source: String, problems: MutableList<String>): P? {
         val page: Any? = try {
             provider(pageId, tab)
         } catch (error: Exception) {
-            println("CYLTabBar: the provider of \"$pageId\" threw $error; the tab is skipped.")
+            problems += "$source threw $error"
             return null
         }
-        if (page == null) return null
+        if (page == null) {
+            problems += "$source returned null"
+            return null
+        }
         if (!pageClass.isInstance(page)) {
-            println("CYLTabBar: the page of \"$pageId\" is not a ${pageClass.simpleName}; the tab is skipped.")
+            problems += "the page from $source is not a ${pageClass.simpleName}"
             return null
         }
-        if (used.any { it.second === page }) {
-            println("CYLTabBar: the page of \"$pageId\" is already the page of another tab; the tab is skipped.")
+        if (used.any { it.second === page } || reused.any { it === page }) {
+            problems += "the page from $source is already the page of another tab"
             return null
         }
         return pageClass.cast(page)

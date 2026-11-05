@@ -23,6 +23,52 @@ class TabPagesTest {
         assertEquals("https://github.com/ChenYilong/CYLTabBarController", tabs[2].pageParameters["url"])
     }
 
+    private fun sibling(extension: String): String =
+        File(System.getProperty("cyl.sharedConfiguration")).let { File(it.parentFile, it.nameWithoutExtension + "." + extension) }.readText()
+
+    @Test
+    fun plistAndPropertiesGiveTheSameTabsAsJson() {
+        // [EN] The iOS bundle ships the same configuration in every format. [CN] iOS 的 bundle 以每种格式提供同一份配置。
+        val fromPlist = TabConfiguration.configuration(sibling("plist"), platform = "android", appVersion = "1.0.0")
+        val fromProperties = TabConfiguration.configuration(sibling("properties"), platform = "android", appVersion = "1.0.0")
+        assertEquals(TabConfigurationFormat.PLIST, TabConfigurationFormats.detect(sibling("plist")))
+        assertEquals(TabConfigurationFormat.PROPERTIES, TabConfigurationFormats.formatOf("a.properties"))
+        assertEquals(listOf("home", "message", "web", "me"), fromPlist.tabs.map { it.pageId })
+        assertEquals(listOf("home", "message", "web", "me"), fromProperties.tabs.map { it.pageId })
+        assertEquals("https://github.com/ChenYilong/CYLTabBarController", fromProperties.tabs[2].pageParameters["url"])
+        assertEquals("CYLConfigurationDemo", fromPlist.attributes["CYLTabBarControllerContext"])
+    }
+
+    @Test
+    fun lookupOrderAndSkippedTabsFollowTheIosRules() {
+        val configuration = TabConfiguration.configuration(
+            """{"CYLTabBarControllerPageLookupOrder": "shared, bogus", "CYLTabBarControllerAutomaticPageRegistration": "no",
+                "CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemIdentifier": "home"},
+                {"CYLTabBarItemTitle": "Android", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemPlatforms": "ios"},
+                {"CYLTabBarItemTitle": "No ID"}, {"CYLTabBarItemTitle": "Missing", "CYLTabBarItemPageIdentifier": "missing"}]}""",
+            platform = "android", appVersion = "1.0")
+        assertEquals(listOf(PageSource.SHARED), configuration.lookupOrder)
+        assertEquals(listOf(SkipReason.EXCLUDED), configuration.skipped.map { it.reason })
+        val shared = TabPageRegistry<String>().apply { register("home") { _, _ -> "home page" } }
+        val skipped = ArrayList<SkippedTab>()
+        val pages = TabPages.resolve(configuration.tabs, String::class.java, shared = shared, lookupOrder = configuration.lookupOrder, skipped = skipped)
+        assertEquals(listOf("home page"), pages.map { it.second })
+        assertEquals(listOf(SkipReason.MISSING_IDENTIFIER, SkipReason.UNREGISTERED), skipped.map { it.reason })
+    }
+
+    @Test
+    fun reloadReusesExistingPagesByPageId() {
+        var created = 0
+        val shared = TabPageRegistry<String>().apply { register("home", "me") { id, _ -> created++; "$id#$created" } }
+        val first = TabPages.resolve(listOf(TabItem(mapOf("CYLTabBarItemIdentifier" to "home"))), String::class.java, shared = shared)
+        val reuse = first.groupBy({ it.first.pageId!! }, { it.second })
+        val second = TabPages.resolve(
+            listOf(TabItem(mapOf("CYLTabBarItemIdentifier" to "me")), TabItem(mapOf("CYLTabBarItemIdentifier" to "home"))),
+            String::class.java, shared = shared, reuse = reuse)
+        assertEquals(listOf("me#2", "home#1"), second.map { it.second })
+        assertEquals(2, created)
+    }
+
     @Test
     fun platformsAndMinimumVersionLeaveTabsOut() {
         // "Message" is for iOS and Android; "Me" needs 1.0.0. "Message" 适用于 iOS 与 Android；"Me" 需要 1.0.0。

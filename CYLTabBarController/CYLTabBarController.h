@@ -539,6 +539,17 @@ typedef void (^CYLTabBarItemGestureHandler)(CYLTabBarController *tabBarControlle
 @optional
 
 /*!
+ * [EN] An asynchronous page factory finished (docs/Tab-Page-Registry.md): `page` was swapped in for `placeholder` at
+ *      `index`, or, when `page` is nil, the tab at `index` was removed (see `cyl_skippedTabs`). Main thread.
+ * [CN] 异步页面工厂已完成（docs/Tab-Page-Registry.md）：`page` 在 `index` 处替换了 `placeholder`；`page` 为 nil 时，`index` 处的 Tab
+ *      已被移除（见 `cyl_skippedTabs`）。主线程。
+ */
+- (void)cyl_tabBarController:(CYLTabBarController *)tabBarController
+                 didLoadPage:(nullable UIViewController *)page
+              forPlaceholder:(UIViewController *)placeholder
+                     atIndex:(NSUInteger)index;
+
+/*!
  * FIX: issue #19
  * [EN] Whether selecting `viewController` needs the user to be logged in. Asked only when `-cyl_loginRequiredBlock` is
  *      nil; without either, the tabs in `-cyl_loginRequiredTabBarItemIdentifiers` need login. See `CYLTabBarController (CYLLogin)`.
@@ -2116,6 +2127,15 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
  *      提供者失败、不是字典。Release 下同样可用（DEBUG 日志内容相同）。
  */
 @property (nonatomic, readonly, copy) NSArray<CYLTabBarSkippedTab *> *cyl_skippedTabs;
+/*!
+ * [EN] The placeholders of asynchronous page factories whose page has not arrived yet (`CYLTabBarAsyncPageFactory`).
+ *      When a page arrives it is swapped in at the same index; when the factory delivers nil, the tab is removed and
+ *      added to `cyl_skippedTabs`. `CYLTabBarControllerDelegate` is told through
+ *      `-cyl_tabBarController:didLoadPage:forPlaceholder:atIndex:`.
+ * [CN] 页面尚未到达的异步页面工厂占位（`CYLTabBarAsyncPageFactory`）。页面到达后在同一下标换入；工厂交付 nil 时移除该 Tab 并加入
+ *      `cyl_skippedTabs`。通过 `-cyl_tabBarController:didLoadPage:forPlaceholder:atIndex:` 通知 `CYLTabBarControllerDelegate`。
+ */
+@property (nonatomic, readonly, copy) NSArray<UIViewController *> *cyl_pendingPages;
 
 @end
 

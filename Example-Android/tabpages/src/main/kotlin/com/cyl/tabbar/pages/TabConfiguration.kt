@@ -36,6 +36,23 @@ data class TabItem(val attributes: Map<String, Any?>) {
  * [CN] 按 iOS 库的规则读取 TabBar 配置文件（JSON）：按顺序返回各 Tab，去掉在本平台（`CYLTabBarItemPlatforms`）或本 App 版本
  *      （`CYLTabBarItemMinimumAppVersion`）不显示的 Tab。无效值会被忽略并输出警告，与 iOS 一致（边界情况 B23–B25）。
  */
+/** [EN] Where a page is looked up, in the iOS order. [CN] 查找页面的来源，顺序与 iOS 相同。 */
+enum class PageSource(val key: String) { INSTANCE("instance"), RESOLVER("resolver"), SHARED("shared"), AUTOMATIC("automatic") }
+
+/** [EN] Why a tab got no page (the iOS `CYLTabBarPageSkipReason`). [CN] Tab 没有页面的原因（对应 iOS 的 `CYLTabBarPageSkipReason`）。 */
+enum class SkipReason { INVALID_TAB, MISSING_IDENTIFIER, UNREGISTERED, EXCLUDED, PROVIDER_FAILED }
+
+/** [EN] A tab without a page, and why. [CN] 没有页面的 Tab 及其原因。 */
+data class SkippedTab(val reason: SkipReason, val pageId: String?, val tab: TabItem?, val detail: String? = null)
+
+/** [EN] A parsed configuration: see [TabConfiguration.configuration]. [CN] 解析后的配置：见 [TabConfiguration.configuration]。 */
+data class TabBarConfiguration(
+    val attributes: Map<String, Any?>,
+    val tabs: List<TabItem>,
+    val lookupOrder: List<PageSource>,
+    val skipped: List<SkippedTab>,
+)
+
 object TabConfiguration {
     const val ITEMS = "CYLTabBarControllerTabBarItemsAttributes"
     const val TITLE = "CYLTabBarItemTitle"
@@ -47,15 +64,72 @@ object TabConfiguration {
     const val PLATFORMS = "CYLTabBarItemPlatforms"
     const val MINIMUM_APP_VERSION = "CYLTabBarItemMinimumAppVersion"
 
-    /** [EN] The tabs of a JSON configuration for [platform] and [appVersion]. [CN] JSON 配置中适用于 [platform] 与 [appVersion] 的 Tab。 */
-    fun tabs(json: String, platform: String = "android", appVersion: String? = null): List<TabItem> {
-        val root = JSONObject(json)
-        val items = when (val value = root.opt(ITEMS)) {
-            is JSONArray -> (0 until value.length()).mapNotNull { value.opt(it) as? JSONObject }
-            is JSONObject -> listOf(value)
+    const val PAGE_LOOKUP_ORDER = "CYLTabBarControllerPageLookupOrder"
+    const val AUTOMATIC_PAGE_REGISTRATION = "CYLTabBarControllerAutomaticPageRegistration"
+
+    /**
+     * [EN] The tabs of a configuration text (JSON, XML plist or `.properties`, see [TabConfigurationFormats]) for
+     *      [platform] and [appVersion]. Left-out tabs are not returned; [configuration] also reports them.
+     * [CN] 配置文本（JSON、XML plist 或 `.properties`，见 [TabConfigurationFormats]）中适用于 [platform] 与 [appVersion] 的 Tab。
+     *      被排除的 Tab 不返回；[configuration] 会同时报告它们。
+     */
+    fun tabs(text: String, platform: String = "android", appVersion: String? = null): List<TabItem> =
+        configuration(text, platform, appVersion).tabs
+
+    /**
+     * [EN] The whole configuration: the top-level attributes, the tabs for this platform and app version, the lookup
+     *      order (`CYLTabBarControllerPageLookupOrder` / `CYLTabBarControllerAutomaticPageRegistration`, the iOS rules)
+     *      and the tabs left out, with their reason.
+     * [CN] 整份配置：顶层属性、适用于本平台与 App 版本的 Tab、查找顺序（`CYLTabBarControllerPageLookupOrder` /
+     *      `CYLTabBarControllerAutomaticPageRegistration`，规则与 iOS 相同）以及被排除的 Tab 及原因。
+     */
+    fun configuration(text: String, platform: String = "android", appVersion: String? = null,
+                      format: TabConfigurationFormat = TabConfigurationFormats.detect(text)): TabBarConfiguration {
+        val root = TabConfigurationFormats.parse(text, format)
+        val items: List<Map<String, Any?>> = when (val value = root[ITEMS]) {
+            is List<*> -> value.mapNotNull { item -> (item as? Map<*, *>)?.entries?.associate { it.key.toString() to it.value } }
+            is Map<*, *> -> listOf(value.entries.associate { it.key.toString() to it.value })
             else -> emptyList()
         }
-        return items.map { TabItem(toMap(it)) }.filter { exclusionReason(it, platform, appVersion) == null }
+        val tabs = ArrayList<TabItem>()
+        val skipped = ArrayList<SkippedTab>()
+        for (item in items) {
+            val tab = TabItem(item)
+            val reason = exclusionReason(tab, platform, appVersion)
+            if (reason == null) tabs += tab else skipped += SkippedTab(SkipReason.EXCLUDED, tab.pageId, tab, reason)
+        }
+        return TabBarConfiguration(root, tabs, lookupOrder(root[PAGE_LOOKUP_ORDER], root[AUTOMATIC_PAGE_REGISTRATION]), skipped)
+    }
+
+    /**
+     * [EN] The lookup order of a configuration value (a list or a comma-separated string of `instance`, `resolver`,
+     *      `shared`, `automatic`), without `automatic` when the flag is false; unknown entries are dropped with a warning,
+     *      the default order is used when nothing is left (iOS edge case C18).
+     * [CN] 配置值中的查找顺序（`instance`、`resolver`、`shared`、`automatic` 的列表或逗号分隔的字符串）；开关为 false 时去掉 `automatic`；
+     *      未知项丢弃并警告，没有剩余项时使用默认顺序（iOS 边界情况 C18）。
+     */
+    fun lookupOrder(value: Any?, automatic: Any?): List<PageSource> {
+        val names: List<Any?> = when (value) {
+            null -> emptyList()
+            is String -> value.split(",")
+            is List<*> -> value
+            else -> { println("CYLTabBar: invalid $PAGE_LOOKUP_ORDER $value; ignored."); emptyList() }
+        }
+        val order = ArrayList<PageSource>()
+        for (name in names) {
+            val source = (name as? String)?.trim()?.let { trimmed -> PageSource.entries.firstOrNull { it.key.equals(trimmed, ignoreCase = true) } }
+            if (source != null) { if (source !in order) order += source } else println("CYLTabBar: invalid $PAGE_LOOKUP_ORDER entry $name; ignored.")
+        }
+        val result = if (order.isEmpty()) PageSource.entries.toMutableList() else order
+        val automaticOn = when (automatic) {
+            null -> true
+            is Boolean -> automatic
+            is String -> automatic.trim().lowercase() !in listOf("false", "no", "0")
+            is Number -> automatic.toInt() != 0
+            else -> { println("CYLTabBar: invalid $AUTOMATIC_PAGE_REGISTRATION $automatic; ignored."); true }
+        }
+        if (!automaticOn) result.remove(PageSource.AUTOMATIC)
+        return result
     }
 
     /** [EN] Why a tab is left out, or null. [CN] Tab 被排除的原因，没有则为 null。 */
@@ -109,7 +183,7 @@ object TabConfiguration {
         return false
     }
 
-    private fun toMap(json: JSONObject): Map<String, Any?> =
+    internal fun toMap(json: JSONObject): Map<String, Any?> =
         json.keys().asSequence().associateWith { key -> toValue(json.opt(key)) }
 
     private fun toValue(value: Any?): Any? = when (value) {

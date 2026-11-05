@@ -42,6 +42,15 @@ enum TabPages {
             page.title = request.parameters["topic"] as? String ?? request.pageIdentifier
             return page
         }, forPageIdentifiers: ["swift-web", "swift-docs"])
+        // [CN] 异步工厂：先显示内置占位，页面稍后交付（nil 则移除该 Tab）。 [EN] An asynchronous factory: the built-in placeholder shows first, the page is delivered later (nil removes the tab).
+        registry.register(asyncFactory: { request, completion in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                let page = UIViewController()
+                page.title = request.title
+                completion(page)
+            }
+            return nil
+        }, forPageIdentifier: "swift-later")
     }
 
     /// [CN] 由配置创建 TabBarController，并列出没有页面的 Tab。

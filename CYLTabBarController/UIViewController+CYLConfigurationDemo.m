@@ -263,7 +263,8 @@ static NSArray<NSArray<NSString *> *> *CYLConfigurationEdgeCases(void) {
         @[ @"C14", @"Automatic registration (CYLTabBarPage)" ], @[ @"C15", @"Registry and resolver of wrong types" ],
         @[ @"C16", @"Two tab bars, one page ID" ], @[ @"C18", @"Lookup order and automatic registration" ],
         @[ @"B22", @"Other platforms and newer versions" ],
-        @[ @"B23", @"Invalid platforms, versions and parameters" ], @[ @"B27", @"Reload with new tabs (code)" ], @[ @"B13", @"Invalid URLs and Lottie files" ],
+        @[ @"B23", @"Invalid platforms, versions and parameters" ], @[ @"B27", @"Reload with new tabs (code)" ],
+        @[ @"C20", @"Asynchronous pages (code)" ], @[ @"B13", @"Invalid URLs and Lottie files" ],
         @[ @"B12", @"Duplicate identifiers" ], @[ @"B11", @"Misspelled keys" ], @[ @"B19", @"Invalid colors and fonts" ], @[ @"B21", @"Empty strings" ],
         @[ @"A12", @"Truncated protobuf" ],
         @[ @"A12", @"Corrupted binary plist" ], @[ @"A14", @"XML external entity" ], @[ @"A2", @"Missing file" ],
@@ -493,6 +494,31 @@ static NSData *CYLEdgeCaseData(NSString *text) {
                                                              @{ CYLTabBarItemTitle : @"Unknown", CYLTabBarItemPageIdentifier : @"no_such_page" } ]];
         BOOL reused = tabBarController.viewControllers.count > 1 && tabBarController.viewControllers[1] == home;
         finish(tabBarController, nil, [NSString stringWithFormat:@"[tabBarController reloadTabBarItemsWithAttributes:@[message, home, no_such_page]]\n// home page reused: %@", reused ? @"YES" : @"NO"]);
+    } else if ([title isEqualToString:@"Asynchronous pages (code)"]) {
+        // [EN] C20: "later" delivers its page after 2 s (the placeholder is swapped), "never" delivers nil after 2 s (the tab
+        //      is removed and listed in `cyl_skippedTabs`); the completion is called twice and off the main thread on purpose.
+        // [CN] C20："later" 在 2 秒后交付页面（占位被换入），"never" 在 2 秒后交付 nil（该 Tab 被移除并记录在 `cyl_skippedTabs`）；
+        //      故意在非主线程调用两次 completion。
+        CYLTabBarPageRegistry *registry = [[CYLTabBarPageRegistry alloc] init];
+        [registry registerAsyncPageFactory:^UIViewController *(CYLTabBarPageRequest *request, CYLTabBarPageCompletion completion) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+                UIViewController *page = nil;
+                if ([request.pageIdentifier isEqualToString:@"later"]) {
+                    page = [[UIViewController alloc] init];
+                    page.title = request.title;
+                    page.view.backgroundColor = [UIColor systemGreenColor];
+                }
+                completion(page);
+                completion(page);
+            });
+            return nil;
+        } forPageIdentifiers:@[ @"later", @"never" ]];
+        finish([CYLTabBarController tabBarControllerWithConfiguration:@{
+            CYLTabBarControllerPageRegistry : registry,
+            CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"Later", CYLTabBarItemImage : @"system:clock", CYLTabBarItemPageIdentifier : @"later" },
+                                                          @{ CYLTabBarItemTitle : @"Home", CYLTabBarItemImage : @"system:house", CYLTabBarItemIdentifier : @"home" },
+                                                          @{ CYLTabBarItemTitle : @"Never", CYLTabBarItemImage : @"system:xmark", CYLTabBarItemPageIdentifier : @"never" } ],
+        }], nil, @"registerAsyncPageFactory: \"later\" -> a page after 2 s, \"never\" -> nil after 2 s (the tab is removed)");
     } else if ([title isEqualToString:@"Other platforms and newer versions"]) {
         // [EN] B22: "android only" and "version 999" are left out on iOS; the other two tabs stay.
         // [CN] B22："仅 Android" 与 "版本 999" 在 iOS 上不显示；其余两个 Tab 保留。

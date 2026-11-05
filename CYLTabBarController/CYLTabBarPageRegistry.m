@@ -10,6 +10,102 @@
 #import <mach-o/dyld.h>
 #import <objc/runtime.h>
 
+#pragma mark - CYLTabBarPagePlaceholder
+
+@implementation CYLTabBarPagePlaceholder
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] init];
+    if (@available(iOS 13.0, *)) {
+        self.view.backgroundColor = [UIColor systemBackgroundColor];
+        indicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
+    } else {
+        self.view.backgroundColor = [UIColor whiteColor];
+    }
+    indicator.color = [UIColor grayColor];
+    indicator.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:indicator];
+    [NSLayoutConstraint activateConstraints:@[
+        [indicator.centerXAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.centerXAnchor],
+        [indicator.centerYAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.centerYAnchor],
+    ]];
+    [indicator startAnimating];
+}
+
+@end
+
+#pragma mark - Page loading state
+
+/// [EN] The pending load behind a placeholder; one per asynchronous factory call. [CN] 占位背后的待完成加载；每次调用异步工厂一个。
+@interface CYLTabBarPageLoad : NSObject
+@property (nonatomic, weak) UIViewController *placeholder;
+@property (nonatomic, strong, nullable) UIViewController *page;
+@property (nonatomic, assign) BOOL finished;
+@property (nonatomic, assign) BOOL failed;
+@property (nonatomic, copy, nullable) void (^handler)(UIViewController *placeholder);
+@end
+
+@implementation CYLTabBarPageLoad
+
+/// [EN] Takes the delivered page, once, on the main thread; later calls are ignored. [CN] 在主线程接收交付的页面，只接收一次；之后的调用忽略。
+- (void)finishWithPage:(UIViewController *)page {
+    if (![NSThread isMainThread]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self finishWithPage:page];
+        });
+        return;
+    }
+    if (self.finished) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🟡 CYLTabBarPageRegistry: the completion of an asynchronous page factory was called again; ignored.");
+#endif
+        return;
+    }
+    self.finished = YES;
+    self.failed = (page == nil);
+    self.page = page;
+    UIViewController *placeholder = self.placeholder;
+    if (self.handler && placeholder) {
+        self.handler(placeholder);
+    }
+}
+
+@end
+
+static const void *CYLTabBarPageLoadKey = &CYLTabBarPageLoadKey;
+
+@implementation UIViewController (CYLTabBarPageLoading)
+
+- (CYLTabBarPageLoad *)cyl_pageLoad {
+    return objc_getAssociatedObject(self, CYLTabBarPageLoadKey);
+}
+
+- (BOOL)cyl_isPendingPage {
+    CYLTabBarPageLoad *load = [self cyl_pageLoad];
+    return load != nil && !load.finished;
+}
+
+- (UIViewController *)cyl_loadedPage {
+    CYLTabBarPageLoad *load = [self cyl_pageLoad];
+    return load.finished ? load.page : nil;
+}
+
+- (BOOL)cyl_pageLoadFailed {
+    CYLTabBarPageLoad *load = [self cyl_pageLoad];
+    return load.finished && load.failed;
+}
+
+- (void (^)(UIViewController *))cyl_pageLoadHandler {
+    return [self cyl_pageLoad].handler;
+}
+
+- (void)setCyl_pageLoadHandler:(void (^)(UIViewController *))handler {
+    [self cyl_pageLoad].handler = handler;
+}
+
+@end
+
 CYLTabBarPageSource const CYLTabBarPageSourceInstanceRegistry = @"instance";
 CYLTabBarPageSource const CYLTabBarPageSourceResolver = @"resolver";
 CYLTabBarPageSource const CYLTabBarPageSourceSharedRegistry = @"shared";
@@ -142,6 +238,23 @@ static CYLTabBarPageProvider CYLProviderOfFactory(CYLTabBarPageFactory factory) 
     [self registerPageProvider:CYLProviderOfFactory(factory) forPageIdentifier:pageIdentifier];
 }
 
+- (void)registerAsyncPageFactory:(CYLTabBarAsyncPageFactory)factory forPageIdentifier:(NSString *)pageIdentifier {
+    if (!factory) {
+        return;
+    }
+    [self registerPageProvider:CYLProviderOfAsyncFactory(factory) forPageIdentifier:pageIdentifier];
+}
+
+- (void)registerAsyncPageFactory:(CYLTabBarAsyncPageFactory)factory forPageIdentifiers:(NSArray<NSString *> *)pageIdentifiers {
+    if (!factory || ![pageIdentifiers isKindOfClass:[NSArray class]]) {
+        return;
+    }
+    CYLTabBarPageProvider provider = CYLProviderOfAsyncFactory(factory);
+    for (NSString *pageIdentifier in pageIdentifiers) {
+        [self registerPageProvider:provider forPageIdentifier:pageIdentifier];
+    }
+}
+
 - (void)registerPageFactory:(CYLTabBarPageFactory)factory forPageIdentifiers:(NSArray<NSString *> *)pageIdentifiers {
     if (!factory || ![pageIdentifiers isKindOfClass:[NSArray class]]) {
         return;
@@ -150,6 +263,37 @@ static CYLTabBarPageProvider CYLProviderOfFactory(CYLTabBarPageFactory factory) 
     for (NSString *pageIdentifier in pageIdentifiers) {
         [self registerPageProvider:provider forPageIdentifier:pageIdentifier];
     }
+}
+
+/*!
+ * [EN] A provider that calls an asynchronous factory and returns its placeholder (the factory's, else a
+ *      `CYLTabBarPagePlaceholder`) with the pending load attached; the completion finishes the load, once, on the main
+ *      thread. A placeholder that is a tab bar controller or already has a parent is replaced by the built-in one.
+ * [CN] 调用异步工厂并返回其占位（工厂返回的，否则为 `CYLTabBarPagePlaceholder`）的提供者，占位上附有待完成的加载；completion 在主线程
+ *      完成该加载，且只完成一次。占位是 TabBarController 或已有父控制器时，改用内置占位。
+ */
+static CYLTabBarPageProvider CYLProviderOfAsyncFactory(CYLTabBarAsyncPageFactory factory) {
+    CYLTabBarAsyncPageFactory copiedFactory = [factory copy];
+    CYLTabBarPageProvider provider = ^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
+        CYLTabBarPageLoad *load = [[CYLTabBarPageLoad alloc] init];
+        CYLTabBarPageCompletion completion = ^(UIViewController *_Nullable page) {
+            [load finishWithPage:page];
+        };
+        UIViewController *placeholder = copiedFactory([CYLTabBarPageRequest requestWithPageIdentifier:pageIdentifier attributes:tabAttributes], completion);
+        if (![placeholder isKindOfClass:[UIViewController class]] || [placeholder isKindOfClass:[UITabBarController class]]
+            || placeholder.parentViewController || placeholder.presentingViewController) {
+#if defined(DEBUG) || defined(BETA)
+            if (placeholder) {
+                NSLog(@"🟡 CYLTabBarPageRegistry: the placeholder of \"%@\" cannot be a tab (%@); CYLTabBarPagePlaceholder is used.", pageIdentifier, placeholder);
+            }
+#endif
+            placeholder = [[CYLTabBarPagePlaceholder alloc] init];
+        }
+        load.placeholder = placeholder;
+        objc_setAssociatedObject(placeholder, CYLTabBarPageLoadKey, load, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        return placeholder;
+    };
+    return [provider copy];
 }
 
 /*!
@@ -298,6 +442,12 @@ static NSDictionary<NSString *, Class> *_Nullable CYLScannedPageClasses = nil;
     @synchronized (self) {
         CYLScannedPageClasses = nil;
     }
+}
+
++ (void)prepareAutomaticRegistrationInBackground {
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+        (void)self.automaticallyRegisteredPageClasses;
+    });
 }
 
 + (NSArray<CYLTabBarPageSource> *)defaultPageLookupOrder {
