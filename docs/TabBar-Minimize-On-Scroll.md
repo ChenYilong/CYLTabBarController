@@ -36,6 +36,10 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [白名单：隐藏会话](#cn白名单隐藏会话) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [The whitelist: a hide session](#enthe-whitelist-a-hide-session) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [隐藏的条件](#cn隐藏的条件) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [When it hides](#enwhen-it-hides) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [恢复显示的场景](#cn恢复显示的场景) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [When it comes back](#enwhen-it-comes-back) |
+| [诊断日志：CYL_TAB_BAR_MINIMIZE_LOG](#cn诊断日志cyl_tab_bar_minimize_log) | [Diagnostic log: CYL_TAB_BAR_MINIMIZE_LOG](#endiagnostic-log-cyl_tab_bar_minimize_log) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [打开日志](#cn打开日志) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Turning it on](#enturning-it-on) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [日志内容](#cn日志内容) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [What it logs](#enwhat-it-logs) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [示例输出](#cn示例输出) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Sample output](#ensample-output) |
 | [演示](#cn演示) | [Demo](#endemo) |
 | [边界情况与自评](#cn边界情况与自评) | [Edge cases and self-assessment](#enedge-cases-and-self-assessment) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [自评记录](#cn自评记录) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Self-assessment rounds](#enself-assessment-rounds) |
@@ -322,6 +326,65 @@ flowchart TD
 | 液态玻璃：UIKit 没有恢复已缩小 TabBar 的接口。恢复时，CYLTabBarController 通过 `super` 把系统的 `tabBarMinimizeBehavior` 设为 `Never`（让系统恢复 TabBar），并保持到用户开始新的拖动，再写回 App 的取值（与扁平样式、经典样式的新拖动规则一致：旧拖动的惯性或仍在屏幕上的弹框都不能再次缩小 TabBar）。App 设置新取值或样式不再是液态玻璃时也会结束保持。写入 `Never` 能否让系统恢复 TabBar 尚未在真机上验证；0.35 秒后的自检会在诊断日志中报告失败。 | Liquid Glass: UIKit has no API to expand a minimized tab bar. To restore it, CYLTabBarController sets the system's `tabBarMinimizeBehavior` to `Never` through `super` (so the system expands the bar) and holds it until the user starts a new drag, then writes the app's value back (the same new-drag rule as FlatDesign and classic: the old drag's momentum or an alert still on screen cannot minimize it again). A new value from the app, or a style that is no longer Liquid Glass, also ends the hold. Whether writing `Never` expands the bar is not verified on a device yet; a self-check 0.35 s later reports a failure in the diagnostic log. |
 | 来电：iOS 14 起，未接听的来电以横幅显示，App 保持活跃，横幅不遮挡 TabBar，因此不需要处理；接听或全屏来电时 App 失去活跃，TabBar 恢复显示。 | Calls: since iOS 14 an unanswered call shows as a banner, the app stays active and the banner does not cover the tab bar, so nothing is needed; when the call is answered or shown full screen the app resigns active and the tab bar comes back. |
 | 定时检查只在需要时运行：TabBar 被隐藏或缩小期间每 0.25 秒；经典样式在 TabBar 显示时每 0.5 秒确认一次当前页面（Core 中没有 push / pop 回调）；其他情况不运行。通知观察者与定时器只在开启滚动隐藏时存在。 | The check timer runs only when needed: every 0.25 s while the bar is hidden or minimized; for the classic style every 0.5 s while it is shown, to follow the page (core has no push / pop callback); otherwise not at all. The notification observers and the timer exist only while scroll hiding is on. |
+
+## [CN]诊断日志：CYL_TAB_BAR_MINIMIZE_LOG
+## [EN]Diagnostic log: CYL_TAB_BAR_MINIMIZE_LOG
+
+| 中文 | English |
+|:---|:---|
+| 想知道 TabBar 为何恢复显示、为何没有隐藏时，打开本库的诊断日志：把环境变量 `CYL_TAB_BAR_MINIMIZE_LOG` 设为 `1`。它与 `CYLTabBarMinimizeLog` 等价（两种写法都可以，任意一个为 `1` 即打开）；全大写写法便于在脚本与 CI 中使用。 | To find out why the tab bar came back, or why it did not hide, turn on the library's diagnostic log: set the environment variable `CYL_TAB_BAR_MINIMIZE_LOG` to `1`. It is the same as `CYLTabBarMinimizeLog` (either spelling works; the log is on when either one is `1`); the ALL_CAPS spelling suits scripts and CI. |
+| 默认关闭，Debug 构建也不例外，不影响性能。该变量在第一次需要日志时读取一次（`dispatch_once`），因此要在 App 启动前设置；运行中修改无效。 | Off by default, debug builds included, so it costs nothing. The variable is read once, the first time a log line could be written (`dispatch_once`), so set it before the app launches; changing it while the app runs has no effect. |
+| 日志只用 `NSLog` 打印到控制台（Xcode 控制台、Console.app 或 `simctl` 的输出），每行以 `[CYLTabBarController] scroll hiding:` 开头，不会上传或保存。 | The log only goes to the console through `NSLog` (the Xcode console, Console.app or the output of `simctl`); every line starts with `[CYLTabBarController] scroll hiding:`. Nothing is uploaded or stored. |
+
+### [CN]打开日志
+### [EN]Turning it on
+
+| 中文 | English |
+|:---|:---|
+| Xcode：Product → Scheme → Edit Scheme… → Run → Arguments → Environment Variables，添加 `CYL_TAB_BAR_MINIMIZE_LOG`，值为 `1`。在真机与模拟器上都可用。 | Xcode: Product → Scheme → Edit Scheme… → Run → Arguments → Environment Variables, add `CYL_TAB_BAR_MINIMIZE_LOG` with the value `1`. Works on devices and simulators. |
+| 命令行（模拟器）：`simctl` 会把以 `SIMCTL_CHILD_` 开头的变量去掉前缀后传给 App。`scripts/scroll-hide-self-test.sh` 就是这样打开日志的，CI 中的自测因此能解释每个 SKIP。 | Command line (simulator): `simctl` passes variables that start with `SIMCTL_CHILD_` to the app without the prefix. `scripts/scroll-hide-self-test.sh` turns the log on this way, so the CI self-test can explain every SKIP. |
+
+```sh
+# [EN] Launch the demo on a booted simulator with the log on.
+# [CN] 在已启动的模拟器上打开日志运行演示工程。
+SIMCTL_CHILD_CYL_TAB_BAR_MINIMIZE_LOG=1 xcrun simctl launch --console-pty booted CYL.CYLTabBarController
+```
+
+### [CN]日志内容
+### [EN]What it logs
+
+| 中文 | English |
+|:---|:---|
+| 每行的格式为 `scroll hiding: <事件> (<原因>)`。事件如下表；原因是英文短语，与代码中的判断一一对应，便于在源码中搜索。 | Each line reads `scroll hiding: <event> (<reason>)`. The events are listed below; the reasons are English phrases that match the checks in the code one to one, so they can be searched for in the source. |
+
+| 事件 / Event | 中文 | English |
+|:---|:---|:---|
+| `hide session begins` | 隐藏会话开始：扁平样式与经典样式为 `user scrolled down`（用户向下拖动），液态玻璃为 `system minimized`（系统缩小了 TabBar）。 | A hide session starts: `user scrolled down` for FlatDesign and classic, `system minimized` for Liquid Glass. |
+| `restore` | TabBar 恢复显示，括号中是原因，例如 `a view controller is presented`、`keyboard on screen`、`page or scroll view changed`、`scroll view off screen`、`tap outside the content (navigation bar, menu button, header)`，或触发恢复的通知名（如 `UIApplicationWillResignActiveNotification`）。 | The tab bar comes back; the reason is in parentheses, e.g. `a view controller is presented`, `keyboard on screen`, `page or scroll view changed`, `scroll view off screen`, `tap outside the content (navigation bar, menu button, header)`, or the name of the notification that caused it (e.g. `UIApplicationWillResignActiveNotification`). |
+| `the app takes the tab bar over` | App 自己调用了 `setTabBarHidden:YES` 或 `setTabBarHidden:NO`，滚动隐藏让出控制权。 | The app called `setTabBarHidden:YES` or `setTabBarHidden:NO` itself, and scroll hiding hands the tab bar over. |
+| `Liquid Glass: writing Never did not expand the minimized tab bar; trying hide / show` | 液态玻璃：写入 `Never` 没有恢复已缩小的 TabBar，改用第二种恢复方式。 | Liquid Glass: writing `Never` did not expand the minimized tab bar, so the second restore mechanism is used. |
+| `test hide refused` | 自测或 `-cyl_simulateHideOnScrollForTesting` 无法隐藏 TabBar，括号中是原因：`Liquid Glass: the system minimizes the bar`、`scroll hiding is off`、`no scroll tracker (…)`、环境拒绝的原因（如 `a view controller is presented`、`window not key, or its scene / the app not active`），或 `the bar did not hide (…)` 并附滚动视图的尺寸与偏移。 | The self-test or `-cyl_simulateHideOnScrollForTesting` could not hide the tab bar; the reason is in parentheses: `Liquid Glass: the system minimizes the bar`, `scroll hiding is off`, `no scroll tracker (…)`, the environment's refusal (e.g. `a view controller is presented`, `window not key, or its scene / the app not active`), or `the bar did not hide (…)` with the scroll view's sizes and offset. |
+
+### [CN]示例输出
+### [EN]Sample output
+
+| 中文 | English |
+|:---|:---|
+| 以下几行摘自 CI 模拟器上的一次自测（Xcode 27.2，iOS 27，扁平样式），省略了时间戳与进程信息。 | These lines come from one self-test run on the CI simulator (Xcode 27.2, iOS 27, FlatDesign), without the timestamps and process details. |
+
+```text
+[CYLTabBarController] scroll hiding: hide session begins (user scrolled down)
+[CYLTabBarController] scroll hiding: restore (a view controller is presented)
+[CYLTabBarController] scroll hiding: restore (page or scroll view changed)
+[CYLTabBarController] scroll hiding: restore (UIApplicationWillResignActiveNotification)
+[CYLTabBarController] scroll hiding: restore (UIKeyboardWillShowNotification)
+[CYLTabBarController] scroll hiding: the app takes the tab bar over (setTabBarHidden:NO)
+[CYLTabBarController] scroll hiding: test hide refused (a view controller is presented)
+```
+
+| 中文 | English |
+|:---|:---|
+| 在液态玻璃（默认演示，iOS 26+）上运行自测时，每个可自动化的模拟都会打印 `test hide refused (Liquid Glass: the system minimizes the bar)`：代码无法隐藏液态玻璃 TabBar，由系统负责缩小，因此这些模拟为 SKIP。 | Running the self-test on Liquid Glass (the default demo, iOS 26+) prints `test hide refused (Liquid Glass: the system minimizes the bar)` for every automatic simulation: code cannot hide a Liquid Glass tab bar (the system minimizes it), so those simulations are SKIP. |
 
 ## [CN]演示
 ## [EN]Demo
