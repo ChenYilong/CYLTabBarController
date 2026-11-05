@@ -89,6 +89,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// [EN] The plus button's slot (its placeholder or plus child view controller), see "Plus slot" in CYLTabBarController.m.
 /// [CN] PlusButton 的 slot（占位控制器或 PlusButton 子控制器），见 CYLTabBarController.m 中的 "Plus slot"。
 - (BOOL)cyl_isPlusSlotViewController:(UIViewController *)viewController;
+/// [EN] The tab buttons of `viewController` (two with Liquid Glass: the normal and the selected layer). [CN] `viewController` 的 Tab 按钮（液态玻璃为两个：普通层与选中层）。
+- (NSArray<UIControl *> *)cyl_tabButtonsOfViewController:(UIViewController *)viewController;
 @end
 
 /// [EN] Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.

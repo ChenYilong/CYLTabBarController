@@ -45,6 +45,7 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [两种方案对比](#cn两种方案对比) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [The two options compared](#enthe-two-options-compared) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [结论与建议](#cn结论与建议) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Conclusion and recommendation](#enconclusion-and-recommendation) |
 | [集成方式](#cn集成方式) | [Integrations](#enintegrations) |
+| [跟随主题（#216）](#cn跟随主题216) | [Following the theme (#216)](#enfollowing-the-theme-216) |
 | [测试](#cn测试) | [Testing](#entesting) |
 
 <!-- navigation:end -->
@@ -383,6 +384,28 @@ sequenceDiagram
 | **CocoaPods**：子库 `CYLTabBarItemAnimation`（依赖 Core），其中协议、注册表、工厂与 `UIControl+CYLTabBarItemAnimationPlayer.h` 为公开头文件，引擎为私有头文件；每个动画库的 animator 属于该库的子库。animator 与引擎在 `+load` 中注册，需要链接对应的目标文件（CocoaPods 默认添加 `-ObjC`）。 | **CocoaPods**: the `CYLTabBarItemAnimation` subspec (depends on Core), with the protocols, the registry, the factory and `UIControl+CYLTabBarItemAnimationPlayer.h` public and the engine private; each library's animator belongs to that library's subspec. Animators and the engine register in `+load`, so their object files must be linked (CocoaPods adds `-ObjC`). |
 | **Swift Package Manager**：同一个 target 编译全部源文件（含 Lottie）；`PAG/` 与 `Rive/` 在没有 libpag、RiveRuntime 时为空，Rive 的 Swift 桥接 `RiveSwift/` 不参与编译。 | **Swift Package Manager**: one target compiles every source (with Lottie); `PAG/` and `Rive/` are empty without libpag and RiveRuntime, and Rive's Swift bridge `RiveSwift/` is left out. |
 | **Carthage**：框架工程中按目录结构登记这些文件（与 #535 新增 CYLUtils 的方式相同）；没有 PAG 与 Rive。 | **Carthage**: the framework project references these files by folder (as #535 did for CYLUtils); no PAG and no Rive. |
+
+## [CN]跟随主题（#216）
+## [EN]Following the theme (#216)
+
+| 中文 | English |
+|:---|:---|
+| 换肤（[Theme-Switching.md](Theme-Switching.md)）与动画组件通过两条通路相连，都只经过协议，三个动画库无需改动：① `-updateTabBarItemsWithAttributes:`（`CYLTabBarTheme` 的图标就是这样应用的）遇到动画 key 时，经 `CYLTabBarItemAnimationService` 的可选方法 `-replaceAnimationWithURL:size:contentMode:inControl:` 原地替换动画视图，`CYLTabBarItemAnimationEngine` 复用 #442 深色变体的替换逻辑（复制播放状态、转移 #653 的布局跟踪）；② 新的通用 key `CYLTabBarAnimationColors`（keypath → `UIColor`，可以是主题颜色）由 Core 的风格注册表保存（`CYLTabBarItemAnimationStyleSource` 的可选方法 `-colorsForURL:`），主题切换时引擎经 `-refreshAnimationColorsInControl:` 重新解析并经播放器的可选方法 `-applyColors:traitCollection:` 应用；深色模式下再叠加 `CYLTabBarAnimationDarkColors`。实现了 `-applyColors:` 的播放器（Lottie、`CYLTabBarItemViewAnimator` 即 Rive）优先使用它，只实现 `-applyDarkColors:` 的播放器行为不变。 | Theming ([Theme-Switching.md](Theme-Switching.md)) and the animation components meet on two paths, both through protocols only, so none of the three libraries changes: ① when `-updateTabBarItemsWithAttributes:` (how a `CYLTabBarTheme` applies its icons) meets an animation key, the optional `-replaceAnimationWithURL:size:contentMode:inControl:` of `CYLTabBarItemAnimationService` replaces the animation view in place, and `CYLTabBarItemAnimationEngine` reuses the #442 dark-variant swap (playback state copied, the #653 layout tracking moved); ② the new generic key `CYLTabBarAnimationColors` (keypath → `UIColor`, theme colors allowed) is kept by Core's style registry (the optional `-colorsForURL:` of `CYLTabBarItemAnimationStyleSource`); on a theme change the engine resolves it again through `-refreshAnimationColorsInControl:` and applies it through the players' optional `-applyColors:traitCollection:`, with `CYLTabBarAnimationDarkColors` on top in Dark Mode. A player that implements `-applyColors:` (Lottie, and `CYLTabBarItemViewAnimator`, i.e. Rive) is preferred; one with `-applyDarkColors:` only behaves as before. |
+| 引擎解析主题颜色时不依赖 CYLUtils：只在颜色能响应 `cyl_rawColor` 时取值，因此 `CYLTabBarItemAnimation` 子库仍可单独编译。 | The engine resolves theme colors without depending on CYLUtils: it reads `cyl_rawColor` only when the color responds to it, so the `CYLTabBarItemAnimation` subspec still builds on its own. |
+
+```objc
+// [EN] One Lottie file, recolored by the skin. [CN] 一份 Lottie 文件，随皮肤换色。
+@{ CYLTabBarItemTitle : @"Home",
+   CYLTabBarAnimationFilePath : @"home.json",
+   CYLTabBarAnimationColors : @{ @"**.Fill 1.Color" : [UIColor cyl_colorWithThemeProvider:^UIColor *(CYLThemeManager *manager, id identifier, id theme) {
+       return [identifier isEqual:@"Christmas"] ? UIColor.systemRedColor : UIColor.systemBlueColor;
+   }] } }
+
+// [EN] A skin with its own file for the first tab (a CYLTabBarTheme). [CN] 第一个 Tab 使用皮肤自己文件的主题（CYLTabBarTheme）。
+- (NSArray<NSDictionary *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController {
+    return @[ @{ CYLTabBarAnimationFilePath : @"home_christmas.json" }, @{}, @{} ];
+}
+```
 
 ## [CN]测试
 ## [EN]Testing

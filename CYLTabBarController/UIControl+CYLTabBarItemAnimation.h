@@ -40,6 +40,14 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 由 Core 实现（CYLConstants.m）：在 Core 的风格注册表（`CYLTabBarItemAnimationDefaultStyleSource()`）中注册浅色动画 `URL`
  *      的深色版本与深色颜色；nil 表示清除。
  */
+/*!
+ * FIX: issue #216
+ * [EN] Implemented by Core (CYLConstants.m): registers the colors of every appearance of the animation `URL`
+ *      (`CYLTabBarAnimationColors`, theme colors allowed) in Core's style registry; nil clears them.
+ * [CN] 由 Core 实现（CYLConstants.m）：在 Core 的风格注册表中注册动画 `URL` 在所有外观下的颜色（`CYLTabBarAnimationColors`，可以是主题颜色）；nil 清除。
+ */
+FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictionary<NSString *, UIColor *> * _Nullable colors);
+
 FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterDarkStyle(NSURL *URL, NSURL * _Nullable darkURL,
                                                                 NSDictionary<NSString *, UIColor *> * _Nullable darkColors);
 

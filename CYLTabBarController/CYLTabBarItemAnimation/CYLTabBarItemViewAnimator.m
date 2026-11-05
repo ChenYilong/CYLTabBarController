@@ -93,6 +93,16 @@ static NSURL *CYLTabBarItemAnimationFileURLFromURL(NSURL *URL) {
     [view cyl_applyAnimationViewColors:colors];
 }
 
+/// FIX: issue #216 — already resolved: handed to the view as they are; nil removes them. 已解析：原样交给视图；nil 移除。
+- (void)applyColors:(nullable NSDictionary<NSString *, UIColor *> *)colors traitCollection:(UITraitCollection *)traitCollection {
+    id<CYLTabBarItemAnimationPlayableView> view = self.playableView;
+    if (![view respondsToSelector:@selector(cyl_applyAnimationViewColors:)]) {
+        return;
+    }
+    _darkColorsApplied = NO;
+    [view cyl_applyAnimationViewColors:colors.count > 0 ? colors : nil];
+}
+
 @end
 
 @implementation CYLTabBarItemViewAnimator {

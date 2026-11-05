@@ -295,3 +295,97 @@ static UIImage *CYLTestImage(UIColor *color) {
 }
 
 @end
+
+#pragma mark - Themes and the animation components (#216 + #604)
+
+// [EN] Declared here: `UIControl+CYLTabBarItemAnimation.h` and `CYLTabBarItemAnimationService.h` are project headers of the
+//      framework, not public ones; the C functions are exported and the methods are dispatched by selector.
+// [CN] 在此声明：`UIControl+CYLTabBarItemAnimation.h` 与 `CYLTabBarItemAnimationService.h` 是 framework 的工程头文件，不是公开头文件；
+//      C 函数已导出，方法按 selector 分发。
+FOUNDATION_EXTERN NSURL *_Nullable CYLTabBarItemAnimationURLFromAttributes(NSDictionary *_Nullable attributes, NSString *_Nullable __autoreleasing *_Nullable filePath);
+FOUNDATION_EXTERN id CYLTabBarItemAnimationDefaultStyleSource(void);
+FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictionary<NSString *, UIColor *> *_Nullable colors);
+
+@protocol CYLThemeTestStyleSource <NSObject>
+- (BOOL)hasStyleVariantForURL:(nullable NSURL *)URL;
+- (nullable NSDictionary<NSString *, UIColor *> *)colorsForURL:(nullable NSURL *)URL;
+@end
+
+@interface CYLThemeAnimationTests : XCTestCase
+@end
+
+@implementation CYLThemeAnimationTests
+
+/// [EN] A file URL that needs no file on disk: the registries key by the URL only. [CN] 无需磁盘上存在的文件 URL：注册表只按 URL 作为 key。
+- (NSURL *)animationURLNamed:(NSString *)name {
+    return [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:[name stringByAppendingPathExtension:@"json"]]];
+}
+
+- (void)testAnimationColorsOfTheAttributesAreRegisteredWithTheStyleSource {
+    NSURL *URL = [self animationURLNamed:@"home"];
+    UIColor *themeColor = [UIColor cyl_colorWithThemeProvider:^UIColor *(CYLThemeManager *manager, NSObject<NSCopying> *identifier, NSObject *theme) {
+        return UIColor.systemRedColor;
+    }];
+    NSString *filePath = nil;
+    NSURL *boundURL = CYLTabBarItemAnimationURLFromAttributes(@{ CYLTabBarAnimationURL : URL, CYLTabBarAnimationColors : @{ @"**.Fill 1.Color" : themeColor, @"" : UIColor.blackColor, @"bad" : @1 } }, &filePath);
+    XCTAssertEqualObjects(boundURL, URL);
+    id<CYLThemeTestStyleSource> styleSource = CYLTabBarItemAnimationDefaultStyleSource();
+    XCTAssertTrue([styleSource respondsToSelector:@selector(colorsForURL:)]);
+    NSDictionary<NSString *, UIColor *> *colors = [styleSource colorsForURL:URL];
+    XCTAssertEqualObjects(colors.allKeys, @[ @"**.Fill 1.Color" ], @"only keypath -> UIColor pairs are kept");
+    XCTAssertTrue(colors[@"**.Fill 1.Color"].cyl_isThemeColor, @"the theme color itself is kept, so a theme change can resolve it again");
+    XCTAssertTrue([styleSource hasStyleVariantForURL:URL], @"colors count as a style variant, so the view remembers its source URL");
+    CYLTabBarItemAnimationRegisterColors(URL, nil);
+    XCTAssertNil([styleSource colorsForURL:URL]);
+}
+
+- (void)testAnInPlaceUpdateWithAnAnimationKeyGivesTheTabTheNewFile {
+    XCTSkipIf(NSClassFromString(@"CYLLottieTabBarItemAnimator") == nil, @"needs an animation library (the Lottie subspec) in the test host");
+    NSURL *oldURL = [self animationURLNamed:@"old"];
+    NSURL *newURL = [self animationURLNamed:@"new"];
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A", CYLTabBarAnimationURL : oldURL, CYLTabBarAnimationSize : [NSValue valueWithCGSize:CGSizeMake(30, 30)] },
+                                                                                                    @{ CYLTabBarItemTitle : @"B" } ]];
+    [tabBarController loadViewIfNeeded];
+    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.cyl_tabBarItemAnimationURL, oldURL);
+    XCTAssertEqualObjects(tabBarController.tabBarItemAnimationURLs, @[ oldURL ]);
+
+    // [EN] What a `CYLTabBarTheme` returns for a holiday skin with its own animation. [CN] 节日皮肤带自己动画时 `CYLTabBarTheme` 返回的内容。
+    [tabBarController updateTabBarItemsWithAttributes:@[ @{ CYLTabBarAnimationURL : newURL }, @{} ]];
+    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.cyl_tabBarItemAnimationURL, newURL, @"the tab item plays the new file from now on");
+    XCTAssertEqualObjects(tabBarController.tabBarItemAnimationURLs, @[ newURL ], @"replaced in place, not appended");
+    XCTAssertEqualObjects(tabBarController.tabBarItemsAttributes[0][CYLTabBarAnimationURL], newURL);
+    XCTAssertNil(tabBarController.viewControllers[1].tabBarItem.cyl_tabBarItemAnimationURL, @"a tab without an animation key is left alone");
+}
+
+- (void)testTheTabBarFollowsAnInjectedThemeManager {
+    CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:@"CYLThemeAnimationTests.tabBar"];
+    for (NSObject<NSCopying> *identifier in [manager.themeIdentifiers copy]) {
+        [manager removeThemeIdentifier:identifier];
+    }
+    CYLTestTabBarTheme *pink = [CYLTestTabBarTheme new];
+    pink.barColor = UIColor.systemPinkColor;
+    [manager addThemeIdentifier:@"plain" theme:@"plain"];
+    [manager addThemeIdentifier:@"pink" theme:pink];
+    manager.currentThemeIdentifier = @"plain";
+
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" } ]];
+    XCTAssertEqual(tabBarController.cyl_themeManager, CYLThemeManagerCenter.defaultThemeManager, @"the default manager unless set");
+    tabBarController.cyl_themeManager = manager;
+    [tabBarController loadViewIfNeeded];
+    UIColor *originalColor = tabBarController.tabBar.standardAppearance.backgroundColor;
+
+    [tabBarController cyl_themeDidChangeByManager:manager identifier:@"pink" theme:pink];
+    XCTAssertEqualObjects(tabBarController.tabBar.standardAppearance.backgroundColor, UIColor.systemPinkColor);
+    // [EN] A plain theme of the tab bar's own manager gives the app's look back; the default manager is not the tab bar's any more.
+    // [CN] TabBar 自己管理器的普通主题恢复 App 外观；默认管理器不再是 TabBar 的管理器。
+    [tabBarController cyl_themeDidChangeByManager:manager identifier:@"plain" theme:@"plain"];
+    XCTAssertEqualObjects(tabBarController.tabBar.standardAppearance.backgroundColor, originalColor);
+    [tabBarController cyl_themeDidChangeByManager:CYLThemeManagerCenter.defaultThemeManager identifier:@"x" theme:@"x"];
+    XCTAssertEqualObjects(tabBarController.tabBar.standardAppearance.backgroundColor, originalColor, @"a plain theme of another manager changes nothing");
+    tabBarController.cyl_themeManager = nil;
+    XCTAssertEqual(tabBarController.cyl_themeManager, CYLThemeManagerCenter.defaultThemeManager, @"nil resets to the default");
+}
+
+@end

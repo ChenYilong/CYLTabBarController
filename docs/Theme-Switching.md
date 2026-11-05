@@ -112,6 +112,7 @@ FOUNDATION_EXTERN NSNotificationName const CYLThemeDidChangeNotification;
 
 @interface CYLTabBarController (CYLTheme)
 - (void)cyl_applyTabBarTheme:(nullable id)theme;
+@property (nonatomic, strong, null_resettable) CYLThemeManager *cyl_themeManager;   // default: CYLThemeManagerCenter.defaultThemeManager
 @end
 ```
 
@@ -212,6 +213,8 @@ CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = "Spring Festi
 | `-cyl_customizeTabBarController:`：其余内容，例如 PlusButton、所有页面的 `tintColor`、iOS 13 以前的 `tabBar.tintColor`。 | `-cyl_customizeTabBarController:`: anything else, e.g. the plus button, the `tintColor` of every page, `tabBar.tintColor` before iOS 13. |
 | 恢复：未实现或返回 nil 的方法，会把 TabBar 恢复为第一次被主题修改前 App 自己的标题、图标与外观。不遵守 `CYLTabBarTheme` 的默认管理器主题同样会恢复。其他管理器的主题只有遵守 `CYLTabBarTheme` 时才会作用于 TabBar，因此页面级主题不会影响 TabBar。 | Restoring: a method that is missing or returns nil gives the tab bar back the app's own titles, icons and appearance from before the first theme changed them. A theme of the default manager that does not adopt `CYLTabBarTheme` restores them too. A theme of another manager restyles the tab bar only when it adopts `CYLTabBarTheme`, so the themes of a single page leave the tab bar alone. |
 | 需要立即应用（例如自己管理主题对象）时，可直接调用 `-[CYLTabBarController cyl_applyTabBarTheme:]`。 | To apply a theme right away (e.g. one you manage yourself), call `-[CYLTabBarController cyl_applyTabBarTheme:]`. |
+| 动画图标（Lottie / PAG / Rive）：`-cyl_tabBarItemsAttributesForTabBarController:` 返回的项里带 `CYLTabBarAnimationURL` / `CYLTabBarAnimationFilePath`（或某个动画库的别名）时，该 Tab 的动画视图会被原地替换为新文件，并保留播放进度与速度；恢复时换回 App 自己的文件。`CYLTabBarAnimationColors`（keypath → `UIColor`，可以是主题颜色）让一份动画文件跟随皮肤换色：每次主题切换都会按当前主题重新解析并应用，深色模式下再叠加 `CYLTabBarAnimationDarkColors`（Lottie 4.x 与 Rive 支持颜色覆盖，PAG 不支持）。没有动画库的 App 收到这类 key 时打印 `🔴[CYL #216]` 日志并忽略。 | Animated icons (Lottie / PAG / Rive): when an entry returned by `-cyl_tabBarItemsAttributesForTabBarController:` carries `CYLTabBarAnimationURL` / `CYLTabBarAnimationFilePath` (or a library's alias), the tab's animation view is replaced in place by the new file, keeping its progress and speed; restoring brings the app's own file back. `CYLTabBarAnimationColors` (keypath → `UIColor`, theme colors allowed) recolors one animation file per skin: on every theme change it is resolved for the current theme and applied again, with `CYLTabBarAnimationDarkColors` on top in Dark Mode (Lottie 4.x and Rive support color overrides, PAG does not). An app without an animation library logs `🔴[CYL #216]` and ignores such keys. |
+| `cyl_themeManager`：TabBar 跟随的管理器，默认为 `CYLThemeManagerCenter.defaultThemeManager`；测试或 TabBar 使用单独管理器的 App 可以注入。 | `cyl_themeManager`: the manager the tab bar follows, `CYLThemeManagerCenter.defaultThemeManager` by default; tests, or an app whose tab bar has a manager of its own, can inject one. |
 
 ## [CN]跟随系统深色模式
 ## [EN]Following the system Dark Mode

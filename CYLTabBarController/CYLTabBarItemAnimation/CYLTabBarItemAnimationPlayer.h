@@ -55,6 +55,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)applyDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors traitCollection:(UITraitCollection *)traitCollection;
 
+/*!
+ * FIX: issue #216
+ * [EN] Applies `colors` (keypath -> color, already resolved for `traitCollection`: `CYLTabBarAnimationColors` plus the dark
+ *      colors in Dark Mode) and removes the overrides of keypaths no longer in it; nil or empty removes every override.
+ *      Preferred over `-applyDarkColors:traitCollection:` when both are implemented. Libraries without color overrides
+ *      leave it out.
+ * [CN] 应用 `colors`（keypath -> 颜色，已按 `traitCollection` 解析：`CYLTabBarAnimationColors`，深色模式下加上深色颜色），并移除不再包含的
+ *      keypath 的覆盖；nil 或空字典移除全部覆盖。两者都实现时优先于 `-applyDarkColors:traitCollection:`。不支持颜色覆盖的动画库不实现。
+ */
+- (void)applyColors:(nullable NSDictionary<NSString *, UIColor *> *)colors traitCollection:(UITraitCollection *)traitCollection;
+
 @end
 
 /*!

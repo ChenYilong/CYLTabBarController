@@ -26,6 +26,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSURL *)URL:(nullable NSURL *)URL forTraitCollection:(nullable UITraitCollection *)traitCollection;
 /// [EN] Keypath -> dark color for `URL`. [CN] `URL` 的「keypath -> 深色颜色」。
 - (nullable NSDictionary<NSString *, UIColor *> *)darkColorsForURL:(nullable NSURL *)URL;
+@optional
+/*!
+ * FIX: issue #216
+ * [EN] Keypath -> color for `URL` in every appearance (`CYLTabBarAnimationColors`); a theme color in it is resolved for
+ *      the current theme when applied. Dark colors are added on top in Dark Mode.
+ * [CN] `URL` 在所有外观下的「keypath -> 颜色」（`CYLTabBarAnimationColors`）；其中的主题颜色在应用时按当前主题解析。深色模式下再叠加深色颜色。
+ */
+- (nullable NSDictionary<NSString *, UIColor *> *)colorsForURL:(nullable NSURL *)URL;
 @end
 
 /*!
@@ -116,6 +124,24 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 记录 `URL`（Tab 的文件或其深色版本）由 `attributes` 通过 key 选择的动画库播放，与扩展名无关；只使用通用 key 时由文件决定。
  */
 - (void)bindAnimationURL:(NSURL *)URL toAttributes:(NSDictionary *)attributes;
+
+@optional
+
+/*!
+ * FIX: issue #216
+ * [EN] Replaces the animation shown in `control` by the one at `URL` (a theme that gives a tab another file), keeping
+ *      the playback state; adds it when the control has none; nothing when it already shows `URL`.
+ * [CN] 把 `control` 中显示的动画替换为 `URL` 的动画（主题为 Tab 指定了另一个文件），并保留播放状态；控件没有动画时添加；已显示 `URL` 时不做处理。
+ */
+- (void)replaceAnimationWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode inControl:(UIControl *)control;
+
+/*!
+ * FIX: issue #216
+ * [EN] Applies the colors registered for the animation in `control` again (`CYLTabBarAnimationColors`, and the dark
+ *      colors in Dark Mode), e.g. after a theme change resolved its theme colors to new values.
+ * [CN] 重新应用为 `control` 中动画注册的颜色（`CYLTabBarAnimationColors`，深色模式下还有深色颜色），例如主题切换后主题颜色解析为新值时。
+ */
+- (void)refreshAnimationColorsInControl:(UIControl *)control;
 
 /// [EN] The file extensions the libraries in the build play, in lookup order. [CN] 构建中各动画库能播放的文件扩展名，按查找顺序排列。
 - (NSArray<NSString *> *)animationFileExtensions;

@@ -330,6 +330,24 @@ NS_ASSUME_NONNULL_BEGIN
 /// [EN] Swaps the view for the version of its animation matching the current style (#442). [CN] 将视图替换为与当前界面风格相符的动画版本（#442）。
 - (void)cyl_reloadTabBarItemAnimationViewForCurrentStyle;
 
+/*!
+ * FIX: issue #216
+ * [EN] Replaces the animation of this tab button by the one at `URL`, keeping the playback state (a theme that gives the
+ *      tab another file); adds it when the button has none. `-updateTabBarItemsWithAttributes:` calls it for an
+ *      animation key, so a `CYLTabBarTheme` does not need to.
+ * [CN] 把本 Tab 按钮的动画替换为 `URL` 的动画并保留播放状态（主题为该 Tab 指定了另一个文件）；按钮没有动画时添加。
+ *      `-updateTabBarItemsWithAttributes:` 遇到动画 key 时会调用它，`CYLTabBarTheme` 无需自己调用。
+ */
+- (void)cyl_replaceTabBarItemAnimationWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode;
+
+/*!
+ * FIX: issue #216
+ * [EN] Applies the colors registered for this tab button's animation again (`CYLTabBarAnimationColors`, resolved for the
+ *      current theme, plus the dark colors in Dark Mode). Called for you on every theme change.
+ * [CN] 重新应用为本 Tab 按钮动画注册的颜色（按当前主题解析的 `CYLTabBarAnimationColors`，深色模式下加上深色颜色）。每次主题切换时会自动调用。
+ */
+- (void)cyl_refreshTabBarItemAnimationColors;
+
 /// [EN] Adds the animation if needed and plays it (`defaultSelected`: shows its last frame). [CN] 必要时添加动画并播放（`defaultSelected`：显示最后一帧）。
 - (void)cyl_playTabBarItemAnimationWithURL:(NSURL *)URL
                                       size:(CGSize)size

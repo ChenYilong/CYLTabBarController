@@ -25,17 +25,21 @@
 @interface CYLTabBarItemAnimationStyleRegistry : NSObject <CYLTabBarItemAnimationStyleSource>
 - (void)registerDarkURL:(NSURL *)darkURL forURL:(NSURL *)URL;
 - (void)registerDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forURL:(NSURL *)URL;
+/// [EN] FIX: issue #216 — the colors of every appearance (`CYLTabBarAnimationColors`). [CN] 所有外观下的颜色（`CYLTabBarAnimationColors`）。
+- (void)registerColors:(NSDictionary<NSString *, UIColor *> *)colors forURL:(NSURL *)URL;
 @end
 
 @implementation CYLTabBarItemAnimationStyleRegistry {
     NSMutableDictionary<NSString *, NSURL *> *_darkURLs;
     NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *_darkColors;
+    NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *_colors;
 }
 
 - (instancetype)init {
     if (self = [super init]) {
         _darkURLs = [NSMutableDictionary dictionary];
         _darkColors = [NSMutableDictionary dictionary];
+        _colors = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -53,33 +57,45 @@ static NSString *CYLTabBarItemAnimationStyleKey(NSURL *URL) {
     _darkURLs[key] = [darkURL isKindOfClass:[NSURL class]] ? darkURL : nil;
 }
 
-- (void)registerDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forURL:(NSURL *)URL {
-    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
-    if (key.length == 0) {
-        return;
-    }
-    // Only keypath (non-empty NSString) -> UIColor pairs count. 只保留「非空 NSString keypath -> UIColor」。
+/// [EN] Only keypath (non-empty NSString) -> UIColor pairs count; nil without any. [CN] 只保留「非空 NSString keypath -> UIColor」；没有时为 nil。
+static NSDictionary<NSString *, UIColor *> *_Nullable CYLTabBarItemAnimationValidColors(NSDictionary<NSString *, UIColor *> *colors) {
     NSMutableDictionary<NSString *, UIColor *> *validColors = [NSMutableDictionary dictionary];
-    if ([darkColors isKindOfClass:[NSDictionary class]]) {
-        [darkColors enumerateKeysAndObjectsUsingBlock:^(id keypath, id color, BOOL *stop) {
+    if ([colors isKindOfClass:[NSDictionary class]]) {
+        [colors enumerateKeysAndObjectsUsingBlock:^(id keypath, id color, BOOL *stop) {
             (void)stop;
             if ([keypath isKindOfClass:[NSString class]] && [(NSString *)keypath length] > 0 && [color isKindOfClass:[UIColor class]]) {
                 validColors[keypath] = color;
             }
         }];
     }
-    _darkColors[key] = validColors.count > 0 ? [validColors copy] : nil;
+    return validColors.count > 0 ? [validColors copy] : nil;
+}
+
+- (void)registerDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    if (key.length == 0) {
+        return;
+    }
+    _darkColors[key] = CYLTabBarItemAnimationValidColors(darkColors);
+}
+
+- (void)registerColors:(NSDictionary<NSString *, UIColor *> *)colors forURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    if (key.length == 0) {
+        return;
+    }
+    _colors[key] = CYLTabBarItemAnimationValidColors(colors);
 }
 
 #pragma mark - CYLTabBarItemAnimationStyleSource
 
 - (BOOL)hasStyleVariants {
-    return _darkURLs.count > 0 || _darkColors.count > 0;
+    return _darkURLs.count > 0 || _darkColors.count > 0 || _colors.count > 0;
 }
 
 - (BOOL)hasStyleVariantForURL:(NSURL *)URL {
     NSString *key = CYLTabBarItemAnimationStyleKey(URL);
-    return key.length > 0 && (_darkURLs[key] != nil || _darkColors[key].count > 0);
+    return key.length > 0 && (_darkURLs[key] != nil || _darkColors[key].count > 0 || _colors[key].count > 0);
 }
 
 - (NSURL *)URL:(NSURL *)URL forTraitCollection:(UITraitCollection *)traitCollection {
@@ -98,6 +114,11 @@ static NSString *CYLTabBarItemAnimationStyleKey(NSURL *URL) {
 - (NSDictionary<NSString *, UIColor *> *)darkColorsForURL:(NSURL *)URL {
     NSString *key = CYLTabBarItemAnimationStyleKey(URL);
     return key.length > 0 ? _darkColors[key] : nil;
+}
+
+- (NSDictionary<NSString *, UIColor *> *)colorsForURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    return key.length > 0 ? _colors[key] : nil;
 }
 
 @end
@@ -120,6 +141,10 @@ void CYLTabBarItemAnimationRegisterDarkStyle(NSURL *URL, NSURL *darkURL, NSDicti
     CYLTabBarItemAnimationStyleRegistry *registry = CYLTabBarItemAnimationSharedStyleRegistry();
     [registry registerDarkURL:darkURL forURL:URL];
     [registry registerDarkColors:darkColors forURL:URL];
+}
+
+void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictionary<NSString *, UIColor *> *colors) {
+    [CYLTabBarItemAnimationSharedStyleRegistry() registerColors:colors forURL:URL];
 }
 
 @implementation CYLConstants

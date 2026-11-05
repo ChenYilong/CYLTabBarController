@@ -239,9 +239,13 @@ static void CYLRegisterDarkAnimationFromAttributes(NSURL *animationURL, NSDictio
         darkURL = [CYLConstants cyl_getURLFromString:darkFilePathValue];
     }
     NSDictionary *darkColors = ([darkColorsValue isKindOfClass:[NSDictionary class]] && [(NSDictionary *)darkColorsValue count] > 0) ? darkColorsValue : nil;
-    if (!darkURL && !darkColors && ![CYLTabBarItemAnimationDefaultStyleSource() hasStyleVariantForURL:animationURL]) {
+    // FIX: issue #216 — the colors of every appearance, theme colors allowed. 所有外观下的颜色，可以是主题颜色。
+    id colorsValue = CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationColors);
+    NSDictionary *colors = ([colorsValue isKindOfClass:[NSDictionary class]] && [(NSDictionary *)colorsValue count] > 0) ? colorsValue : nil;
+    if (!darkURL && !darkColors && !colors && ![CYLTabBarItemAnimationDefaultStyleSource() hasStyleVariantForURL:animationURL]) {
         return;
     }
+    CYLTabBarItemAnimationRegisterColors(animationURL, colors);
     // [EN] The dark version is played by the same library as the light one. [CN] 深色版本与浅色版本由同一个动画库播放。
     if (darkURL) {
         [CYLTabBarItemAnimationGetService() bindAnimationURL:darkURL toAttributes:attributes];
@@ -318,6 +322,23 @@ id CYLTabBarItemAttributesAnimationValue(NSDictionary *attributes, NSString *gen
 
 - (void)cyl_reloadTabBarItemAnimationViewForCurrentStyle {
     [CYLTabBarItemAnimationGetService() reloadAnimationForCurrentStyleInControl:self];
+}
+
+- (void)cyl_replaceTabBarItemAnimationWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
+    id<CYLTabBarItemAnimationService> service = CYLTabBarItemAnimationGetService();
+    if ([service respondsToSelector:@selector(replaceAnimationWithURL:size:contentMode:inControl:)]) {
+        [service replaceAnimationWithURL:URL size:size contentMode:contentMode inControl:self];
+    } else {
+        // [EN] A service without replacement: at least a control without an animation gets one. [CN] 不支持替换的 service：至少为没有动画的控件添加动画。
+        [service addAnimationWithURL:URL size:size contentMode:contentMode animationSpeed:0 toControl:self];
+    }
+}
+
+- (void)cyl_refreshTabBarItemAnimationColors {
+    id<CYLTabBarItemAnimationService> service = CYLTabBarItemAnimationGetService();
+    if ([service respondsToSelector:@selector(refreshAnimationColorsInControl:)]) {
+        [service refreshAnimationColorsInControl:self];
+    }
 }
 
 - (void)cyl_playTabBarItemAnimationWithURL:(NSURL *)URL

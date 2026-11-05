@@ -55,8 +55,10 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
  */
 - (UIView *)makeAnimationViewWithSourceURL:(NSURL *)sourceURL shownURL:(NSURL *)shownURL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
     UIView *animationView = [self.factory animationViewWithURL:shownURL size:size contentMode:contentMode];
-    // Remembered only for animations that use a #442 key. 仅为使用了 #442 新增 key 的动画记录。
-    if (animationView && [self.styleSource hasStyleVariantForURL:sourceURL]) {
+    // [EN] Always remembered (#216: a theme may replace the file, so the view must know which one it shows); the #442
+    //      checks below still ask the style source.
+    // [CN] 总是记录（#216：主题可能替换文件，视图需要知道自己显示的是哪一个）；下面 #442 的判断仍然询问风格来源。
+    if (animationView) {
         objc_setAssociatedObject(animationView, CYLTabBarItemAnimationSourceURLKey, sourceURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(animationView, CYLTabBarItemAnimationShownURLKey, shownURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
@@ -88,11 +90,45 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
 - (void)applyDarkColorsToAnimationView:(UIView *)animationView traitCollection:(UITraitCollection *)traitCollection {
     NSURL *sourceURL = animationView ? objc_getAssociatedObject(animationView, CYLTabBarItemAnimationSourceURLKey) : nil;
     NSDictionary<NSString *, UIColor *> *darkColors = [self.styleSource darkColorsForURL:sourceURL];
-    if (darkColors.count == 0) {
+    // FIX: issue #216 — the colors of every appearance (`CYLTabBarAnimationColors`), theme colors resolved for the current
+    // theme, with the dark colors on top in Dark Mode. 所有外观下的颜色（`CYLTabBarAnimationColors`），主题颜色按当前主题解析，深色模式下再叠加深色颜色。
+    NSDictionary<NSString *, UIColor *> *colors = nil;
+    if ([self.styleSource respondsToSelector:@selector(colorsForURL:)]) {
+        colors = [self.styleSource colorsForURL:sourceURL];
+    }
+    if (darkColors.count == 0 && colors.count == 0) {
         return;
     }
     id<CYLTabBarItemAnimationPlayer> player = [self.factory playerForView:animationView];
-    if ([player respondsToSelector:@selector(applyDarkColors:traitCollection:)]) {
+    if ([player respondsToSelector:@selector(applyColors:traitCollection:)]) {
+        BOOL dark = NO;
+        if (@available(iOS 13.0, *)) {
+            dark = (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark);
+        }
+        NSMutableDictionary<NSString *, UIColor *> *merged = [NSMutableDictionary dictionary];
+        void (^add)(NSDictionary<NSString *, UIColor *> *) = ^(NSDictionary<NSString *, UIColor *> *source) {
+            [source enumerateKeysAndObjectsUsingBlock:^(NSString *keypath, UIColor *color, BOOL *stop) {
+                (void)stop;
+                if (![keypath isKindOfClass:[NSString class]] || ![color isKindOfClass:[UIColor class]]) {
+                    return;
+                }
+                // [EN] A theme color's value for the current theme, without depending on CYLUtils here. [CN] 主题颜色在当前主题下的值，这里不依赖 CYLUtils。
+                UIColor *resolvedColor = color;
+                if ([resolvedColor respondsToSelector:NSSelectorFromString(@"cyl_rawColor")]) {
+                    resolvedColor = [resolvedColor valueForKey:@"cyl_rawColor"] ?: color;
+                }
+                if (@available(iOS 13.0, *)) {
+                    resolvedColor = [resolvedColor resolvedColorWithTraitCollection:traitCollection] ?: resolvedColor;
+                }
+                merged[keypath] = resolvedColor;
+            }];
+        };
+        add(colors);
+        if (dark) {
+            add(darkColors);
+        }
+        [player applyColors:merged traitCollection:traitCollection];
+    } else if (darkColors.count > 0 && [player respondsToSelector:@selector(applyDarkColors:traitCollection:)]) {
         [player applyDarkColors:darkColors traitCollection:traitCollection];
     }
 }
@@ -237,8 +273,18 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
         }
         return;
     }
-    UIView *newAnimationView = [self makeAnimationViewWithSourceURL:sourceURL shownURL:URL size:animationView.bounds.size contentMode:animationView.contentMode];
-    if (!newAnimationView) {
+    [self swapAnimationView:animationView withNewView:[self makeAnimationViewWithSourceURL:sourceURL shownURL:URL size:animationView.bounds.size contentMode:animationView.contentMode]];
+}
+
+/*!
+ * [EN] Puts `newAnimationView` where `animationView` is (same place, transform, visibility and playback state), moves the
+ *      layout tracking of Core (#653) to it, and removes `animationView`. Nothing without a new view.
+ * [CN] 把 `newAnimationView` 放到 `animationView` 的位置（相同的位置、transform、可见性与播放状态），把 Core 的布局跟踪（#653）转移给它，
+ *      然后移除 `animationView`。没有新视图时不做处理。
+ */
+- (void)swapAnimationView:(UIView *)animationView withNewView:(nullable UIView *)newAnimationView {
+    UIView *superview = animationView.superview;
+    if (!newAnimationView || !superview) {
         return;
     }
     newAnimationView.center = animationView.center;
@@ -248,9 +294,43 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
     newAnimationView.alpha = animationView.alpha;
     [self copyAnimationStateFromView:animationView toView:newAnimationView];
     [superview insertSubview:newAnimationView aboveSubview:animationView];
-    // The layout tracking of Core (#653) moves to the new view. Core 的布局跟踪（#653）改为跟随新视图。
     [self.host replaceTrackedSubview:animationView withView:newAnimationView inSuperview:superview];
     [animationView removeFromSuperview];
+}
+
+#pragma mark - Themes (#216)
+
+- (void)replaceAnimationWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode inControl:(UIControl *)control {
+    UIView *animationView = [self animationViewInControl:control];
+    if (!animationView) {
+        [self addAnimationWithURL:URL size:size contentMode:contentMode toControl:control];
+        return;
+    }
+    BOOL isLocalFile = [URL isKindOfClass:[NSURL class]] && URL.isFileURL && URL.path.length > 0 && [[NSFileManager defaultManager] fileExistsAtPath:URL.path];
+    if (!isLocalFile) {
+        return;
+    }
+    NSURL *sourceURL = objc_getAssociatedObject(animationView, CYLTabBarItemAnimationSourceURLKey);
+    if ([sourceURL isEqual:URL]) {
+        // [EN] The same file: only its colors may have changed (theme colors). [CN] 同一个文件：只可能是颜色变了（主题颜色）。
+        [self applyDarkColorsToAnimationView:animationView traitCollection:control.traitCollection];
+        return;
+    }
+    CGSize viewSize = CGSizeEqualToSize(size, CGSizeZero) ? animationView.bounds.size : size;
+    NSURL *shownURL = [self.styleSource hasStyleVariantForURL:URL] ? [self.styleSource URL:URL forTraitCollection:control.traitCollection] : URL;
+    UIView *newAnimationView = [self makeAnimationViewWithSourceURL:URL shownURL:shownURL size:viewSize contentMode:contentMode];
+    [self swapAnimationView:animationView withNewView:newAnimationView];
+    if (newAnimationView.superview) {
+        [self applyDarkColorsToAnimationView:newAnimationView traitCollection:control.traitCollection];
+        [self postAnimationViewDidAddNotificationForControl:control];
+    }
+}
+
+- (void)refreshAnimationColorsInControl:(UIControl *)control {
+    UIView *animationView = [self animationViewInControl:control];
+    if (animationView) {
+        [self applyDarkColorsToAnimationView:animationView traitCollection:control.traitCollection];
+    }
 }
 
 - (void)reloadAnimationForCurrentStyleInControl:(UIControl *)control {

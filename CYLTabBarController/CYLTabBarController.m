@@ -173,6 +173,7 @@ NSString *const CYLTabBarAnimationSize = @"CYLTabBarAnimationSize";
 NSString *const CYLTabBarAnimationDarkURL = @"CYLTabBarAnimationDarkURL";
 NSString *const CYLTabBarAnimationDarkFilePath = @"CYLTabBarAnimationDarkFilePath";
 NSString *const CYLTabBarAnimationDarkColors = @"CYLTabBarAnimationDarkColors";
+NSString *const CYLTabBarAnimationColors = @"CYLTabBarAnimationColors";
 
 NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;
@@ -2377,6 +2378,73 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
     }
 }
 
+/*!
+ * FIX: issue #216
+ * [EN] The animation keys of an in-place update (`CYLTabBarAnimationURL` / `…FilePath`, a library's alias, `…Size`,
+ *      `…Colors`, the #442 dark keys): the new file is bound to its library and its colors are registered (as at setup),
+ *      the tab items and `tabBarItemAnimationURLs` learn the new file, and every tab button of the tab (two with Liquid
+ *      Glass) swaps its animation view, keeping the playback state. Without an animation library the keys are logged
+ *      and ignored, so a theme made for an app with Lottie does not fail silently in one without.
+ * [CN] 原地更新中的动画 key（`CYLTabBarAnimationURL` / `…FilePath`、动画库别名、`…Size`、`…Colors`、#442 的深色 key）：新文件绑定到
+ *      其动画库并注册颜色（与初始设置相同），Tab item 与 `tabBarItemAnimationURLs` 记录新文件，该 Tab 的每个按钮（液态玻璃为两个）
+ *      替换动画视图并保留播放状态。没有动画库时打印日志并忽略，避免为带 Lottie 的 App 编写的主题在没有 Lottie 的 App 中静默失效。
+ */
+- (void)cyl_updateAnimationOfViewController:(UIViewController *)viewController
+                                 attributes:(NSDictionary<NSString *, id> *)attributes
+                              newAttributes:(NSDictionary<NSString *, id> *)newAttributes {
+    // [EN] The generic keys and every library's aliases share these prefixes. [CN] 通用 key 与各动画库的别名都以这些前缀开头。
+    BOOL hasAnimationKey = NO;
+    for (NSString *key in attributes) {
+        if ([key hasPrefix:@"CYLTabBarAnimation"] || [key hasPrefix:@"CYLTabBarLottie"] || [key hasPrefix:@"CYLTabBarPAG"] || [key hasPrefix:@"CYLTabBarRive"]) {
+            hasAnimationKey = YES;
+            break;
+        }
+    }
+    if (!hasAnimationKey) {
+        return;
+    }
+    if (!CYLTabBarItemAnimationIsAvailable()) {
+        NSLog(@"🔴[CYL #216] tab bar item attributes carry an animation key (%@) but no animation library is linked: add pod 'CYLTabBarController/Lottie', 'CYLTabBarController/PAG' or 'CYLTabBarController/Rive'. The key is ignored and the tab keeps its image.", [attributes.allKeys componentsJoinedByString:@", "]);
+        return;
+    }
+    NSString *animationFilePath = nil;
+    NSURL *animationURL = CYLTabBarItemAnimationURLFromAttributes(newAttributes, &animationFilePath);
+    if (!animationURL) {
+        return;
+    }
+    NSValue *sizeValue = CYLTabBarItemAttributesAnimationValue(newAttributes, CYLTabBarAnimationSize);
+    UITabBarItem *tabBarItem = viewController.tabBarItem;
+    UITabBarItem *rootTabBarItem = [viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem;
+    NSURL *oldURL = tabBarItem.cyl_tabBarItemAnimationURL ?: rootTabBarItem.cyl_tabBarItemAnimationURL;
+    NSUInteger oldIndex = oldURL ? [self.tabBarItemAnimationURLs indexOfObject:oldURL] : NSNotFound;
+    if (oldIndex != NSNotFound) {
+        self.tabBarItemAnimationURLs[oldIndex] = animationURL;
+        if (sizeValue && oldIndex < self.tabBarItemAnimationSizes.count) {
+            self.tabBarItemAnimationSizes[oldIndex] = sizeValue;
+        }
+    } else {
+        [self.tabBarItemAnimationURLs addObject:animationURL];
+        if (sizeValue) {
+            [self.tabBarItemAnimationSizes addObject:sizeValue];
+        }
+    }
+    for (UITabBarItem *item in rootTabBarItem && rootTabBarItem != tabBarItem ? @[ tabBarItem, rootTabBarItem ] : @[ tabBarItem ]) {
+        item.cyl_tabBarItemAnimationURL = animationURL;
+        if (sizeValue) {
+            item.cyl_tabBarItemAnimationSizeValue = sizeValue;
+        }
+    }
+#if CYL_FLATDESIGN_AVAILABLE
+    if ([viewController.cyl_tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
+        viewController.cyl_tabBarItem.lottieURL = animationURL;
+    }
+#endif
+    CGSize size = sizeValue ? [sizeValue CGSizeValue] : (tabBarItem.cyl_tabBarItemAnimationSizeValue ? [tabBarItem.cyl_tabBarItemAnimationSizeValue CGSizeValue] : CGSizeZero);
+    for (UIControl *tabButton in [self cyl_tabButtonsOfViewController:viewController]) {
+        [tabButton cyl_replaceTabBarItemAnimationWithURL:animationURL size:size contentMode:self.tabBarItemAnimationViewContentMode];
+    }
+}
+
 - (BOOL)updateTabBarItemAtIndex:(NSUInteger)index attributes:(NSDictionary<NSString *, id> *)attributes {
     if (index >= _viewControllers.count || attributes.count == 0) {
         return NO;
@@ -2421,6 +2489,10 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
     UIImage *selectedImage = updatesSelectedImage ?
         [UIImage cyl_imageNamed:[UIImage cyl_imageWithImageInfo:newAttributes[CYLTabBarItemSelectedImage]
                                                   darkImageInfo:newAttributes[CYLTabBarItemSelectedDarkImage]]] : nil;
+
+    // FIX: issue #216 — an animation key (e.g. from a `CYLTabBarTheme`) replaces the tab's animation in place, in every style.
+    // 动画 key（例如来自 `CYLTabBarTheme`）在所有样式下原地替换该 Tab 的动画。
+    [self cyl_updateAnimationOfViewController:viewController attributes:attributes newAttributes:newAttributes];
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
 #if CYL_FLATDESIGN_AVAILABLE
@@ -6433,102 +6505,6 @@ static char CYLCustomTabActionViewControllerKey;
         [delegate tabBarController:self performCustomActionForViewController:viewController];
     }
     return YES;
-}
-
-@end
-
-#pragma mark - Theme switching (issue #216)
-
-/// [EN] What the app had set before the first theme changed it. [CN] 第一次被主题修改前 App 自己的设置。
-static char CYLThemeOriginalTabBarItemsAttributesKey;
-static char CYLThemeOriginalStandardAppearanceKey;
-static char CYLThemeOriginalScrollEdgeAppearanceKey;
-/// [EN] The launch theme was applied (or a theme change came first). [CN] 已应用启动时的主题（或已先收到主题切换）。
-static char CYLThemeLaunchThemeAppliedKey;
-
-@implementation CYLTabBarController (CYLTheme)
-
-- (void)cyl_themeDidChangeByManager:(CYLThemeManager *)manager identifier:(nullable __kindof NSObject<NSCopying> *)identifier theme:(nullable __kindof NSObject *)theme {
-    [super cyl_themeDidChangeByManager:manager identifier:identifier theme:theme];
-    // [EN] The default manager drives the tab bar; another manager (e.g. the themes of one page) only with a tab bar theme.
-    // [CN] 默认管理器决定 TabBar 外观；其他管理器（例如某个页面自己的主题）仅在其主题为 TabBar 主题时生效。
-    BOOL isDefaultManager = [manager.name isEqual:CYLThemeManagerNameDefault];
-    if (!isDefaultManager && ![theme conformsToProtocol:@protocol(CYLTabBarTheme)]) {
-        return;
-    }
-    [self cyl_applyTabBarTheme:theme];
-}
-
-- (void)cyl_applyLaunchTabBarThemeIfNeeded {
-    if (objc_getAssociatedObject(self, &CYLThemeLaunchThemeAppliedKey)) {
-        return;
-    }
-    objc_setAssociatedObject(self, &CYLThemeLaunchThemeAppliedKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    id theme = CYLThemeManagerCenter.defaultThemeManager.currentTheme;
-    // [EN] Nothing to restore yet: only a tab bar theme changes anything here.
-    // [CN] 此时尚无需恢复：只有 TabBar 主题才需要处理。
-    if ([theme conformsToProtocol:@protocol(CYLTabBarTheme)]) {
-        [self cyl_applyTabBarTheme:theme];
-    }
-}
-
-- (void)cyl_applyTabBarTheme:(id)theme {
-    objc_setAssociatedObject(self, &CYLThemeLaunchThemeAppliedKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    id<CYLTabBarTheme> tabBarTheme = [theme conformsToProtocol:@protocol(CYLTabBarTheme)] ? theme : nil;
-
-    // [EN] Titles and icons, in place (issue #601). [CN] 原地更新标题与图标（issue #601）。
-    NSArray<NSDictionary<NSString *, id> *> *itemsAttributes = nil;
-    if ([tabBarTheme respondsToSelector:@selector(cyl_tabBarItemsAttributesForTabBarController:)]) {
-        itemsAttributes = [tabBarTheme cyl_tabBarItemsAttributesForTabBarController:self];
-    }
-    NSArray *originalItemsAttributes = objc_getAssociatedObject(self, &CYLThemeOriginalTabBarItemsAttributesKey);
-    if (itemsAttributes.count > 0) {
-        if (!originalItemsAttributes) {
-            objc_setAssociatedObject(self, &CYLThemeOriginalTabBarItemsAttributesKey, [self.tabBarItemsAttributes copy] ?: @[], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-        [self updateTabBarItemsWithAttributes:itemsAttributes];
-    } else if (originalItemsAttributes) {
-        [self updateTabBarItemsWithAttributes:originalItemsAttributes];
-        objc_setAssociatedObject(self, &CYLThemeOriginalTabBarItemsAttributesKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-
-    // [EN] The appearance: a new object for every theme, so every style (FlatDesign included) applies it.
-    // [CN] 外观：每个主题都是新对象，因此所有样式（包括扁平样式）都会应用。
-    if (@available(iOS 13.0, *)) {
-        UITabBar *tabBar = self.tabBar;
-        UITabBarAppearance *appearance = nil;
-        if ([tabBarTheme respondsToSelector:@selector(cyl_tabBarAppearanceForTabBarController:)]) {
-            appearance = [tabBarTheme cyl_tabBarAppearanceForTabBarController:self];
-        }
-        id originalStandardAppearance = objc_getAssociatedObject(self, &CYLThemeOriginalStandardAppearanceKey);
-        if (appearance) {
-            if (!originalStandardAppearance) {
-                objc_setAssociatedObject(self, &CYLThemeOriginalStandardAppearanceKey, tabBar.standardAppearance, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-                if (@available(iOS 15.0, *)) {
-                    objc_setAssociatedObject(self, &CYLThemeOriginalScrollEdgeAppearanceKey, tabBar.scrollEdgeAppearance ?: [NSNull null], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-                }
-            }
-            tabBar.standardAppearance = appearance;
-            if (@available(iOS 15.0, *)) {
-                tabBar.scrollEdgeAppearance = [appearance copy];
-            }
-        } else if ([originalStandardAppearance isKindOfClass:[UITabBarAppearance class]]) {
-            tabBar.standardAppearance = originalStandardAppearance;
-            if (@available(iOS 15.0, *)) {
-                id originalScrollEdgeAppearance = objc_getAssociatedObject(self, &CYLThemeOriginalScrollEdgeAppearanceKey);
-                tabBar.scrollEdgeAppearance = [originalScrollEdgeAppearance isKindOfClass:[UITabBarAppearance class]] ? originalScrollEdgeAppearance : nil;
-            }
-            objc_setAssociatedObject(self, &CYLThemeOriginalStandardAppearanceKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            objc_setAssociatedObject(self, &CYLThemeOriginalScrollEdgeAppearanceKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-        // [EN] Bring the title offset copies (issue #475) and the flat design tab bar up to date now.
-        // [CN] 立即更新标题偏移副本（issue #475）与扁平样式 TabBar。
-        [self cyl_syncTabBarAppearances];
-    }
-
-    if ([tabBarTheme respondsToSelector:@selector(cyl_customizeTabBarController:)]) {
-        [tabBarTheme cyl_customizeTabBarController:self];
-    }
 }
 
 @end

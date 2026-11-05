@@ -127,6 +127,8 @@
 @implementation CYLLottieSwiftTabBarItemAnimationPlayer {
     /// [EN] Whether the dark colors are applied now (#442). [CN] 当前是否已应用深色颜色（#442）。
     BOOL _darkColorsApplied;
+    /// FIX: issue #216 — the keypaths `-applyColors:` set last. [CN] `-applyColors:` 上次设置的 keypath。
+    NSSet<NSString *> *_appliedColorKeypaths;
 }
 
 + (BOOL)isLottieView:(UIView *)view {
@@ -236,6 +238,41 @@
         }
     }];
     _darkColorsApplied = dark;
+    if ([view respondsToSelector:@selector(forceDrawingUpdate)]) {
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:@selector(forceDrawingUpdate)]);
+    }
+}
+
+/*!
+ * FIX: issue #216 — Lottie 4.x only.
+ * [EN] Sets `colors` (already resolved) with Lottie's value providers and removes the providers of the keypaths set by a
+ *      previous call that are no longer in it; nil removes them all.
+ * [CN] 用 Lottie 的 value provider 设置 `colors`（已解析），并移除上一次调用设置、这次不再包含的 keypath 的 provider；nil 移除全部。
+ */
+- (void)applyColors:(nullable NSDictionary<NSString *, UIColor *> *)colors traitCollection:(UITraitCollection *)traitCollection {
+    UIView *view = self.animationView;
+    SEL setColorSelector = @selector(setColorValue:forKeypathString:);
+    SEL removeColorSelector = @selector(removeValueProviderForKeypathString:);
+    if (!view || ![view respondsToSelector:setColorSelector] || ![view respondsToSelector:removeColorSelector]) {
+        return;
+    }
+    for (NSString *keypath in _appliedColorKeypaths) {
+        if (!colors[keypath]) {
+            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:removeColorSelector withObject:keypath]);
+        }
+    }
+    NSMutableSet<NSString *> *appliedKeypaths = [NSMutableSet set];
+    [colors enumerateKeysAndObjectsUsingBlock:^(NSString *keypath, UIColor *color, BOOL *stop) {
+        (void)stop;
+        if (![keypath isKindOfClass:[NSString class]] || ![color isKindOfClass:[UIColor class]]) {
+            return;
+        }
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:setColorSelector withObject:color withObject:keypath]);
+        [appliedKeypaths addObject:keypath];
+    }];
+    _appliedColorKeypaths = appliedKeypaths;
+    // [EN] `-applyColors:` carries the dark colors itself. [CN] `-applyColors:` 自己带有深色颜色。
+    _darkColorsApplied = NO;
     if ([view respondsToSelector:@selector(forceDrawingUpdate)]) {
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:@selector(forceDrawingUpdate)]);
     }

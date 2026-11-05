@@ -285,6 +285,16 @@ FOUNDATION_EXTERN NSString *const CYLTabBarAnimationSize;
 FOUNDATION_EXTERN NSString *const CYLTabBarAnimationDarkURL;
 FOUNDATION_EXTERN NSString *const CYLTabBarAnimationDarkFilePath;
 FOUNDATION_EXTERN NSString *const CYLTabBarAnimationDarkColors;
+/*!
+ * FIX: issue #216
+ * [EN] `CYLTabBarAnimationColors`: keypath -> UIColor applied in every appearance, for libraries that support color
+ *      overrides (Lottie 4.x, Rive). A theme color (`+[UIColor cyl_colorWithThemeProvider:]`) is resolved again on every
+ *      theme change, so the animation follows the skin; `CYLTabBarAnimationDarkColors` is added on top of it in Dark Mode.
+ * [CN] `CYLTabBarAnimationColors`：在所有外观下应用的 keypath -> UIColor，用于支持颜色覆盖的动画库（Lottie 4.x、Rive）。
+ *      主题颜色（`+[UIColor cyl_colorWithThemeProvider:]`）会在每次主题切换时重新解析，使动画跟随皮肤；深色模式下再叠加
+ *      `CYLTabBarAnimationDarkColors`。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationColors;
 
 /*!
  * [EN] Options of a tab animation, for `CYLTabBarAnimationURLWithOptions()`. Each library declares the options it reads
@@ -1828,6 +1838,8 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      主题）。不遵守 `CYLTabBarTheme` 的主题会让 TabBar 恢复 App 自己的外观。其他管理器的主题仅在遵守 `CYLTabBarTheme` 时应用。
  *      液态玻璃、系统 TabBar、扁平样式均适用。
  */
+@class CYLThemeManager;
+
 @interface CYLTabBarController (CYLTheme)
 
 /*!
@@ -1837,6 +1849,13 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      主题切换时会自动调用。
  */
 - (void)cyl_applyTabBarTheme:(nullable id)theme;
+
+/*!
+ * [EN] The manager whose theme the tab bar follows; `CYLThemeManagerCenter.defaultThemeManager` unless set. For tests, or
+ *      an app whose tab bar follows a manager of its own.
+ * [CN] TabBar 跟随的管理器；未设置时为 `CYLThemeManagerCenter.defaultThemeManager`。用于测试，或 TabBar 跟随单独管理器的 App。
+ */
+@property (nonatomic, strong, null_resettable) CYLThemeManager *cyl_themeManager;
 
 @end
 
