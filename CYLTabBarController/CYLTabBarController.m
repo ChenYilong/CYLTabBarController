@@ -2923,7 +2923,12 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     if (![tabButton isKindOfClass:[UIControl class]]) {
         return @[];
     }
-    UIControl *selectedLayerTabButton = [CYLConstants isLiquidGlassActive] ? tabButton.cyl_platterSelectedControl : nil;
+    // [EN] Liquid Glass active AND not the FlatDesign style (on iOS 26 `+isLiquidGlassActive` is YES with the FlatDesign tab
+    //      bar too, which has no selected layer). Used by the icon views of themes (`-setTabBarItemIcon:...`).
+    // [CN] 液态玻璃处于活动状态且不是扁平样式（iOS 26 上使用扁平样式 TabBar 时 `+isLiquidGlassActive` 也为 YES，而它没有选中图层）。
+    //      主题的图标视图（`-setTabBarItemIcon:...`）使用这里的结果。
+    BOOL isLiquidGlassTabBar = (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]);
+    UIControl *selectedLayerTabButton = isLiquidGlassTabBar ? tabButton.cyl_platterSelectedControl : nil;
     if (selectedLayerTabButton && selectedLayerTabButton != tabButton) {
         return @[tabButton, selectedLayerTabButton];
     }

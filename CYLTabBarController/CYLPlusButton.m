@@ -143,6 +143,24 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
 static const void *CYLPlusButtonUpdatedImageKey = &CYLPlusButtonUpdatedImageKey;
 static const void *CYLPlusButtonUpdatedSelectedImageKey = &CYLPlusButtonUpdatedSelectedImageKey;
 
+/*!
+ * [EN] YES when `plusButton` is in a Liquid Glass tab bar: Liquid Glass is active AND its tab bar controller is not the
+ *      FlatDesign style (on iOS 26 `+isLiquidGlassActive` is YES with the FlatDesign tab bar too), as master's checks
+ *      (`CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]`). The controller is
+ *      found as in `-plusChildViewControllerSelected:`; NO when there is none.
+ * [CN] `plusButton` 位于液态玻璃 TabBar 中时为 YES：液态玻璃处于活动状态，且其 TabBarController 不是扁平样式（iOS 26 上使用扁平样式
+ *      TabBar 时 `+isLiquidGlassActive` 也为 YES），与 master 中的判断相同（`CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType &&
+ *      [CYLConstants isLiquidGlassActive]`）。TabBarController 的查找方式与 `-plusChildViewControllerSelected:` 相同；找不到时为 NO。
+ */
+static BOOL CYLPlusButtonIsInLiquidGlassTabBar(CYLPlusButton *plusButton) {
+    if (![CYLConstants isLiquidGlassActive]) {
+        return NO;
+    }
+    CYLTabBarController *tabBarController = [plusButton cyl_owningTabBarController] ?:
+        [CYLTabBarController cyl_tabBarControllerForContext:[CYLPlusButton tabBarContextForOwner:plusButton]];
+    return tabBarController && CYLTabBarStyleTypeFlatDesign != tabBarController.tabBarStyleType;
+}
+
 // [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
 // [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
 @interface CYLTabBarController (CYLTabButtonHighlight)
@@ -1485,7 +1503,7 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
             // [CN] 仅液态玻璃（选中 PlusButton 子控制器时，选中图层显示替身）。类方法会新建一个 PlusButton，使用 App 原来的图片：在第一次选中
             //      PlusButton 子控制器之前应用的主题（例如启动时恢复的主题）使替身保持旧图片，盖在换肤后的 PlusButton 上，周围透过玻璃显示为模糊。
             //      这里为替身设置之后更新过的图片。
-            if ([CYLConstants isLiquidGlassActive] && button != self) {
+            if (button != self && CYLPlusButtonIsInLiquidGlassTabBar(self)) {
                 UIImage *image = objc_getAssociatedObject(self, CYLPlusButtonUpdatedImageKey);
                 UIImage *selectedImage = objc_getAssociatedObject(self, CYLPlusButtonUpdatedSelectedImageKey);
                 if (image) {
