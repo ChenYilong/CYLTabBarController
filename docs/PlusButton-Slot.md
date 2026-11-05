@@ -35,6 +35,7 @@ flowchart LR
 |:---|:---|
 | [问题](#问题--the-problems) | [The problems](#问题--the-problems) |
 | [方案](#方案--the-solution) | [The solution](#方案--the-solution) |
+| [静态排查：guard 与下标](#静态排查guard-与下标--static-audit-guards-and-indexes) | [Static audit: guards and indexes](#静态排查guard-与下标--static-audit-guards-and-indexes) |
 | [各样式](#各样式--by-style) | [By style](#各样式--by-style) |
 | [用法](#用法--usage) | [Usage](#用法--usage) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
@@ -64,6 +65,30 @@ flowchart LR
 | **独立的扁平 TabBar 没有 PlusButton**：`delegate` 不是 CYLTabBarController、却位于某个 TabBarController 中的 `CYLFlatDesignTabBar`，`hasPlusButton` / `hasPlusChildViewController` 返回 NO；布局时的下标也先检查范围。 | **A standalone flat tab bar has no PlusButton**: a `CYLFlatDesignTabBar` whose `delegate` is not a CYLTabBarController but that sits inside one answers NO to `hasPlusButton` / `hasPlusChildViewController`; the index is also range-checked during layout. |
 | **按 slot 找按钮，而不是按文字**：PlusButton 对齐自己的标题时，先取 slot 控制器的 `tabBarItem.cyl_tabButton`（该 Tab 在普通图层中的按钮），只在其中找标题标签；按文字在整个 TabBar 中查找（#775 的普通图层过滤）只作为该按钮尚不可知时的备选。 | **Find the slot's button, not its text**: to align with its own title, the PlusButton first takes the slot view controller's `tabBarItem.cyl_tabButton` (that tab's button in the normal layer) and looks for the title label only inside it; searching the whole tab bar by text (with #775's normal-layer filter) is only the fallback while that button is not known yet. |
 | **`cyl_isPlaceholder` 只表示 slot**：`-cyl_setHidden:` 只改变可见性，不再修改该标记。 | **`cyl_isPlaceholder` only means the slot**: `-cyl_setHidden:` only changes visibility and no longer touches the flag. |
+
+## 静态排查：guard 与下标 / Static audit: guards and indexes
+
+| 中文 | English |
+|:---|:---|
+| 全局搜索 `index`、`items`、`viewControllers`、`hasPlusButton`、`hasPlusChildViewController`、`placeholder`（忽略大小写）后逐个核对。原则：**`hasPlusButton` / `hasPlusChildViewController` 只用来决定行为（如是否选中 PlusButton 子控制器），不用来推断数量或下标**；数量与下标只经过下面的 slot guard。 | Every hit of `index`, `items`, `viewControllers`, `hasPlusButton`, `hasPlusChildViewController` and `placeholder` (any case) was checked. The rule: **`hasPlusButton` / `hasPlusChildViewController` decide behavior only (e.g. whether the plus child view controller is being selected), never a count or an index**; counts and indexes go through the slot guards below only. |
+
+| Guard | 含义 / Meaning |
+|:---|:---|
+| `-cyl_isPlusSlotViewController:` | 是否为 slot（占位控制器、PlusButton 子控制器，含导航控制器包裹的） / whether a view controller is the slot (placeholder, plus child view controller, also inside a navigation controller) |
+| `-cyl_plusSlotIndexInViewControllers` | slot 在 `viewControllers` 中的下标 / the slot's index in `viewControllers` |
+| `-cyl_tabBarItemsAttributesIncludePlusSlot` | `tabBarItemsAttributes` 是否有 slot 项（按带标记的数据判断，不按样式猜） / whether `tabBarItemsAttributes` has a slot entry (read from the marked entry, not guessed from the style) |
+| `-[UIView cyl_plusButtonIndex]`、`-[CYLTabBar cyl_plusButtonViewControllerIndexWithFallback:]` | TabBar 一侧读取 slot 的下标 / the slot's index, read on the tab bar side |
+
+| 中文 | English |
+|:---|:---|
+| 8. **`-[CYLTabBar cyl_selectedIndex]` 多 1**：CYLTabBar 布局循环用 `cyl_hasPlusChildViewController` 判断 slot 是否在 Tab 按钮中；液态玻璃下没有子控制器时同样有占位 slot，slot 之后每个按钮的 `cyl_tabBarItemVisibleIndex` 都多 1。现在从 `viewControllers` 读取 slot 是否存在。 | 8. **`-[CYLTabBar cyl_selectedIndex]` one too high**: the CYLTabBar layout loop used `cyl_hasPlusChildViewController` to tell whether the slot is among the tab buttons; on Liquid Glass a plus button without a child view controller has a placeholder slot too, so every button after it got `cyl_tabBarItemVisibleIndex` + 1. Whether the slot exists is now read from `viewControllers`. |
+| 9. **`tabBarItemsAttributes` 的映射按样式猜测**：`-cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:` 与设置 Tab 的两个循环用 `isLiquidGlassActive && hasPlusButton` 判断属性中是否有 slot 项；在 `viewControllers` 之后才赋值 `tabBarItemsAttributes`（没有 slot 项）时，slot 之后的 Tab 取到下一个 Tab 的标题与图片，占位控制器也会读取别人的属性。现在按数据判断，占位控制器没有自己的项时跳过（保留占位图）。 | 9. **The `tabBarItemsAttributes` mapping guessed from the style**: `-cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:` and the two tab setup loops used `isLiquidGlassActive && hasPlusButton` to tell whether the attributes have a slot entry; with `tabBarItemsAttributes` assigned after `viewControllers` (no slot entry), tabs after the slot took the next tab's title and image, and the placeholder read another tab's entry. It is now read from the data, and a placeholder without its own entry is skipped (keeping its placeholder image). |
+| 10. **扁平样式按下标访问系统列表**：系统 TabBar 中没有占位 slot 的 item，PlusButton 子控制器的 item 被追加在末尾。`-[CYLFlatDesignTabBar _tabBarDidSelectButton:]` 用 `tabBar.items[selectedIndex]`，`-setSelectedIndex:` 用 `[super setSelectedIndex:selectedIndex]`：slot 之后选错，最后一个越界。现在都按控制器对象换算。 | 10. **FlatDesign indexed the system list**: the system tab bar has no item for a placeholder slot, and a plus child view controller's item is appended at its end. `-[CYLFlatDesignTabBar _tabBarDidSelectButton:]` used `tabBar.items[selectedIndex]` and `-setSelectedIndex:` used `[super setSelectedIndex:selectedIndex]`: wrong after the slot, out of range for the last tab. Both now map through the view controller. |
+| 11. **对齐后的列表被覆盖**：经典分支在 TabBar 不是 CYLTabBar 时执行 `_viewControllers = viewControllers`，丢掉刚插入的 slot。 | 11. **The aligned list was overwritten**: the classic branch ran `_viewControllers = viewControllers` when the tab bar is not a CYLTabBar, dropping the slot just inserted. |
+| 12. **液态玻璃 Lottie 回退的下标**：按钮下标包含 slot，`lottieURLs` 只有 App 的 Tab；slot 之后取到下一个 Tab 的动画。（主路径按 TabBarItem 取，不受影响。） | 12. **The Liquid Glass Lottie fallback index**: button indexes include the slot, `lottieURLs` has the app's tabs only; tabs after the slot took the next tab's animation. (The main path reads it from the tab item and was not affected.) |
+| 13. **`cyl_isPlusButtonViewController:` 与 slot 判断不一致**：认不出导航控制器包裹的 PlusButton 子控制器，`cyl_selectedIndexIgnoringPlusButton` 会多算一个。现在使用同一个 guard。 | 13. **`cyl_isPlusButtonViewController:` disagreed with the slot test**: it missed a plus child view controller inside a navigation controller, so `cyl_selectedIndexIgnoringPlusButton` counted one too many. It now uses the same guard. |
+| 14. **调试日志误报**：#618 的属性数量检查把 slot 项算作 Tab 属性，液态玻璃与扁平样式下总是报不匹配。 | 14. **A false debug report**: the #618 attributes count check counted the slot entry as a tab's, and always reported a mismatch on Liquid Glass and FlatDesign. |
+| 核对后未改动：`hasPlusButton` / `hasPlusChildViewController` 的其余调用都是行为判断（选中、上报、手势、无障碍），不涉及下标；按 `viewControllers` 遍历并用 `tabBarItemAttributesAtIndex:` 取属性的循环随第 9 条一起正确；扁平样式的 `items` 与 `viewControllers` 一一对应（「More」除外）。仍需真机确认：`-[CYLTabBar cyl_tabBarButtonWithTabIndex:]` 在有子控制器时使用 `cyl_visibleControls`，其中是否包含 PlusButton 视图无法静态确定。 | Checked and left as is: the other `hasPlusButton` / `hasPlusChildViewController` calls decide behavior (selection, reporting, gestures, accessibility), not indexes; loops over `viewControllers` that read attributes through `tabBarItemAttributesAtIndex:` are right with item 9; FlatDesign's `items` match `viewControllers` one to one (except "More"). Still to confirm on a device: with a plus child view controller, `-[CYLTabBar cyl_tabBarButtonWithTabIndex:]` uses `cyl_visibleControls`, and whether that list holds the plus button view cannot be told statically. |
 
 ## 各样式 / By style
 

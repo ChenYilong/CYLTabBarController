@@ -540,9 +540,17 @@
         // [CN] 系统方法
         // [EN] System method
         SEL sel = NSSelectorFromString(clickSelectorFromString);
-        if ([self.tabBarController respondsToSelector:sel]) {
+        // [EN] FIX: placeholder count mismatch — the system item of this button's view controller, not
+        //      `tabBar.items[selectedIndex]`: the system tab bar has no item for a placeholder slot, and a plus child view
+        //      controller's item is appended at its end, so the indexes after the slot differ (the last one was out of range).
+        // [CN] FIX：占位导致的数量不匹配——取该按钮对应控制器的系统 item，而不是 `tabBar.items[selectedIndex]`：系统 TabBar 中没有
+        //      占位 slot 的 item，PlusButton 子控制器的 item 被追加在末尾，因此 slot 之后的下标不一致（最后一个会越界）。
+        UITabBarItem *systemItem = item.childViewController.tabBarItem;
+        if (![self.tabBarController.tabBar.items containsObject:systemItem]) {
+            systemItem = nil;
+        }
+        if (systemItem && [self.tabBarController respondsToSelector:sel]) {
             //FIXME:  to delete cylflatdesign_tabBarController
-            UITabBarItem *systemItem = self.tabBarController.tabBar.items[selectedIndex];
             CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
             (
              [self.tabBarController performSelector:sel withObject:systemItem];

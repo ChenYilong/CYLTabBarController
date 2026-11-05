@@ -600,6 +600,14 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
    // [EN] plusButtonIndex adjusts the PlusButton's center internally. Do not modify center directly, otherwise the
    //      button flickers during the tap animation; use a coordinate-space conversion instead.
     NSUInteger plusButtonIndex = [self plusButtonIndex];
+    // [EN] FIX: placeholder count mismatch — whether the plus button's slot is one of the tab buttons, read from
+    //      `viewControllers`, not from `cyl_hasPlusChildViewController`: on Liquid Glass a plus button without a child view
+    //      controller has a placeholder slot too, and every tab button after it got `cyl_tabBarItemVisibleIndex` + 1
+    //      (`-[CYLTabBar cyl_selectedIndex]` returned the next tab's index).
+    // [CN] FIX：占位导致的数量不匹配——PlusButton 的 slot 是否是 Tab 按钮之一，从 `viewControllers` 读取，而不是用
+    //      `cyl_hasPlusChildViewController`：液态玻璃下没有子控制器的 PlusButton 同样有占位 slot，以前它之后的每个 Tab 按钮的
+    //      `cyl_tabBarItemVisibleIndex` 都多 1（`-[CYLTabBar cyl_selectedIndex]` 返回下一个 Tab 的下标）。
+    BOOL isPlusSlotAmongTabButtons = ([self cyl_plusButtonViewControllerIndexWithFallback:NSNotFound] != NSNotFound);
     [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIControl * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
         // [CN] 调整UITabBarItem的位置
         // [EN] Adjust the position of the UITabBarItem
@@ -607,7 +615,7 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
         CGFloat visiableTabIndex = buttonIndex;
         CGFloat tabBarItemWidth = self.cyl_tabBarItemWidth;
         
-        if ([self cyl_hasPlusChildViewController]) {
+        if (isPlusSlotAmongTabButtons) {
             if (buttonIndex <= plusButtonIndex) {
                 childViewX = buttonIndex * self.cyl_tabBarItemWidth;
             } else {
@@ -627,7 +635,7 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
         
         // [EN] Centered positioning, item spacing (see `-cyl_getItemLayoutForTabCount:…`): 0 by default.
         // [CN] 居中与间距（见 `-cyl_getItemLayoutForTabCount:…`）：默认均为 0。
-        NSUInteger slotIndex = [self cyl_hasPlusChildViewController] ? buttonIndex : (NSUInteger)visiableTabIndex;
+        NSUInteger slotIndex = isPlusSlotAmongTabButtons ? buttonIndex : (NSUInteger)visiableTabIndex;
         childViewX += self.cyl_itemLayoutLeading + slotIndex * self.cyl_itemLayoutSpacing;
         [childView cyl_setTabBarChildViewControllerIndex:buttonIndex];
         UIControl *selectedContentControl = [self cyl_selectedContentControlFromContentControl:childView];
