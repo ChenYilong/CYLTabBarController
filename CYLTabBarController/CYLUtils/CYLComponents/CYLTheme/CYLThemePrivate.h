@@ -43,6 +43,9 @@ FOUNDATION_EXTERN NSObject<NSCopying> *_Nullable CYLThemeColorManagerName(UIColo
  */
 FOUNDATION_EXTERN UIImage *CYLThemeImageRefreshedImage(UIImage *image);
 
+/// [EN] YES for an image of `+[UIImage cyl_dynamicImageWithThemeProvider:]`. [CN] `+[UIImage cyl_dynamicImageWithThemeProvider:]` 创建的图片为 YES。
+FOUNDATION_EXTERN BOOL CYLThemeImageIsDynamic(UIImage *_Nullable image);
+
 /// [EN] The name of the manager a theme image follows; nil for any other image. [CN] 主题图片所跟随的管理器名字；其他图片为 nil。
 FOUNDATION_EXTERN NSObject<NSCopying> *_Nullable CYLThemeImageManagerName(UIImage *image);
 
@@ -63,6 +66,15 @@ FOUNDATION_EXTERN NSObject<NSCopying> *_Nullable CYLThemeVisualEffectManagerName
  *      `compactAppearance` 等），使其中的主题颜色以新主题重新绘制：appearance 对象内的颜色变化不会让 Bar 自动更新。
  */
 FOUNDATION_EXTERN void CYLThemeRefreshBarAppearances(UIView *view);
+
+/*!
+ * [EN] Resolves the layer colors (`-[CALayer cyl_setThemeColor:forKeyPath:]`) of every window, and of the view
+ *      controllers' views that are not in a window, again: after a Dark Mode change that switched no theme. A `CGColor`
+ *      does not follow the traits by itself; colors, images and effects do.
+ * [CN] 重新解析所有 window，以及不在 window 上的控制器视图中的 layer 颜色（`-[CALayer cyl_setThemeColor:forKeyPath:]`）：用于未切换主题的深色
+ *      模式变化之后。`CGColor` 不会自动跟随 trait；颜色、图片与效果会。
+ */
+FOUNDATION_EXTERN void CYLThemeRefreshTraitDependentValues(void);
 
 @interface UIView (CYLThemePrivate)
 

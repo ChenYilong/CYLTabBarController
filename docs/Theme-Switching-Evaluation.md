@@ -30,6 +30,7 @@
 | [与最初架构设计的对照](#cn与最初架构设计的对照) | [Against the original architecture](#enagainst-the-original-architecture) |
 | [质量维度评估](#cn质量维度评估) | [Quality dimensions](#enquality-dimensions) |
 | [新的建议](#cn新的建议) | [New proposals](#ennew-proposals) |
+| [按建议改造的结果](#cn按建议改造的结果) | [After the refactor](#enafter-the-refactor) |
 | [结论](#cn结论) | [Conclusion](#enconclusion) |
 
 <!-- navigation:end -->
@@ -120,9 +121,49 @@
 | P3 | SF Symbol 保留配置 / Keep SF Symbol configurations | 见差距表 / see the gap table | `imageByApplyingSymbolConfiguration:` |
 | P3 | 网络图标失败回退 / Network icon failure fallback | 见差距表 / see the gap table | 失败时恢复 `originalProviders` 中的图标 / restore the icon in `originalProviders` on failure |
 
+## [CN]按建议改造的结果
+## [EN]After the refactor
+
+| 中文 | English |
+|:---|:---|
+| 本节记录按上方建议进行的改造（#777 中“refactor”提交之后）。除标注外，新行为均有单元测试，由 CI 的 “Unit tests” job 在 iOS 26 模拟器上运行；撰写时该次运行尚未完成，结果见 #777。 | This section records the refactor that followed the proposals above (the "refactor" commit in #777 and after). Unless noted, the new behavior has unit tests, run by the CI job "Unit tests" on an iOS 26 simulator; that run had not finished when this was written, see #777 for its result. |
+
+| 建议 / Proposal | 状态 / Status | 做法 / What changed | 测试 / Test |
+|:---|:---:|:---|:---|
+| P1 统一恢复模型 / One restore model | ✅ | 私有类 `CYLThemeRestorableValue`（保存原值 → App 修改则改为恢复 App 的值 → 恢复）取代三套实现；Tab attributes 改为按 Tab、按 key 恢复，主题添加而 App 原本没有的 key 会被移除（此前会残留）；三者共用一个主题代计数 / a private `CYLThemeRestorableValue` (keep the original → adopt an app change → restore) replaces the three implementations; tab attributes are restored per tab and key, and a key the theme added that the app did not have is removed (it used to stay); one theme generation counter for all three | `testRestoreRemovesAKeyTheAppDidNotHave`、`testRestoreKeepsATitleTheAppChangedMeanwhile` |
+| P1 示例代码移出库 / Demo code out of the library | ⏸ 待决定 / needs a decision | 与 CLAUDE.md 冲突：示例 Podfile 不得修改（默认 subspec 为 `Core`，示例代码移出 `Core` 即需修改），公开 API 不得移除（显式依赖 `CYLTabBarController/Core` 的 App 会失去这些头文件）。可选方案见下 / conflicts with CLAUDE.md: the examples' Podfiles must not change (the default subspec is `Core`; moving the demo code out of it needs a Podfile change), and public API must not be removed (apps that depend on `CYLTabBarController/Core` explicitly would lose these headers). Options below | — |
+| P2 可选的动态图片 / Opt-in dynamic images | ✅ | `+[UIImage cyl_dynamicImageWithThemeProvider:]`：`UIImage` 子类，公开属性与绘制方法转发到当前主题的图片，派生图片仍为动态；遍历在主题切换时重新赋值（先赋 nil，UIKit 会跳过同一对象）/ `+[UIImage cyl_dynamicImageWithThemeProvider:]`: a `UIImage` subclass whose public properties and drawing methods forward to the current theme's image, derived images staying dynamic; the walk assigns it again on a change (nil first, since UIKit skips the same object) | `testDynamicImageIsAlwaysTheCurrentThemesAndRenders`（离屏渲染并检查像素颜色 / renders off screen and checks the pixel color） |
+| P2 深色模式下刷新 layer 颜色 / Layer colors on a Dark Mode change | ✅ | `+[CYLThemeManagerCenter updateThemesForTraitCollection:]`（`CYLTabBarController` 在外观变化时调用）在没有主题切换时重新解析所有 window 与不在 window 上的控制器视图中的 layer 颜色 / `+[CYLThemeManagerCenter updateThemesForTraitCollection:]` (called by `CYLTabBarController` on an appearance change) resolves the layer colors of every window and of off-window view controller views again when no theme switched | 无（需改变模拟器外观）/ none (needs the simulator's appearance to change) |
+| P2 `-[UIView cyl_applyCurrentTheme]` | ✅ | 对视图及其子视图执行所有管理器的刷新与回调 / the refresh and callbacks of every manager on the view and its subviews | `testApplyCurrentThemeRefreshesAViewNothingWalked` |
+| P3 主线程断言 / Main thread assertion | ✅ | `setCurrentThemeIdentifier:` 与 `setCurrentTheme:` 中的 `NSAssert` / an `NSAssert` in both setters | — |
+| P3 主题持久化 / Persisting the theme | ✅ | `persistsCurrentThemeIdentifier`：保存到 `NSUserDefaults`（key 含管理器名），设为 YES 时或之后注册该主题时恢复 / saved in `NSUserDefaults` (key includes the manager name), restored when set to YES or when the theme is registered later | `testPersistsCurrentThemeIdentifier` |
+| P3 切换过渡动画 / Transition animation | ✅ | `themeChangeAnimationDuration`：每个可见 window 覆盖截图，更新后淡出 / a snapshot over each visible window, faded out after the restyle | 无（视觉效果）/ none (visual) |
+| P3 SF Symbol 保留配置 / Keep SF Symbols | ✅ | `imageByApplyingSymbolConfiguration:` 返回新对象时保留为符号，否则回退为位图 / kept a symbol when `imageByApplyingSymbolConfiguration:` returns a new object, else a bitmap | `testSymbolThemeImagesAreMarkedNewObjects`（是否仍为符号记录在日志中 / whether it stays a symbol is logged） |
+| P3 网络图标失败回退 / Network icon failure fallback | ✅ | 图标或 PlusButton 图片加载失败时恢复主题前的内容 / a tab icon or plus button image that fails to load gets its pre-theme value back | 无（需网络失败）/ none (needs a failing download) |
+
+| 中文 | English |
+|:---|:---|
+| 示例代码移出库的两个可选方案：A. 新增 `CYLTabBarController/Demo` subspec 并加入 `default_subspecs = ['Core', 'Demo']`，示例 Podfile 无需修改，只依赖 `Core` 的 App 不再包含示例代码（这些 App 会失去 `UIViewController+CYLSettingsSection.h` 等头文件，属于公开 API 变化，需要发布说明）；B. 保持现状，只把 54 个节日图标移到单独的 `CYLTabBarControllerDemo.bundle`，库的资源包减小 134 KB，API 不变。建议 B 先行，A 在下一个大版本进行。 | Two options for moving the demo code out of the library: A. a new `CYLTabBarController/Demo` subspec in `default_subspecs = ['Core', 'Demo']`: the examples' Podfiles need no change, and apps that depend only on `Core` no longer carry the demo code (they lose headers such as `UIViewController+CYLSettingsSection.h`, a public API change that needs release notes); B. keep the code where it is and move only the 54 holiday icons into a separate `CYLTabBarControllerDemo.bundle`: the library's bundle shrinks by 134 KB and no API changes. Suggested: B now, A in the next major version. |
+
+| 项目 / Item | 权重 / Weight | 改造前 / Before | 改造后 / After | 说明 / Notes |
+|:---|:---:|:---:|:---:|:---|
+| 跟随主题的图片 / Theme images | 10 | 8 | 10 | 可选动态图片补齐代理能力（以 CI 渲染测试为准）/ opt-in dynamic images add the proxy behavior (subject to the CI render test) |
+| 自动刷新 / Automatic refresh | 10 | 7 | 8 | `cyl_applyCurrentTheme` 与深色模式下的 layer 刷新；之后加入的视图仍需调用一次 / `cyl_applyCurrentTheme` and layer refresh on Dark Mode; a view added later still needs one call |
+| TabBar 换肤 / Tab bar skins | 20 | 18 | 19 | 网络失败回退；仍只在模拟器验证（−1）/ the network failure fallback; still simulator-only (−1) |
+| 健壮性 / Robustness | 5 | 4 | 5 | 统一恢复模型、移除残留 key、主线程断言 / one restore model, no leftover keys, main thread assertion |
+| 其余各项 / Other items | 45 | 44 | 44 | 不变 / unchanged |
+| **合计 / Total**（QMUI 83） | **100** | **84** | **89** | 功能分 81 → 86（QMUI 74）/ functional 81 → 86 (QMUI 74) |
+
+| 维度 / Dimension | 改造前 / Before | 改造后 / After | 原因 / Why |
+|:---|:---:|:---:|:---|
+| 健壮性 / Robustness | 7 | 8 | 统一恢复模型、主线程断言、失败回退 / one restore model, main thread assertion, failure fallback |
+| 扩展性 / Extensibility | 7 | 8 | 新的主题内容只需一条 `CYLThemeRestorableValue` 记录 / a new kind of theme content is one more `CYLThemeRestorableValue` record |
+| 解耦 / Decoupling | 6 | 6 | 待上方 A / B 方案决定 / pending the decision on A / B above |
+| 其余维度 / Other dimensions | — | 不变 / unchanged | |
+
 ## [CN]结论
 ## [EN]Conclusion
 
 | 中文 | English |
 |:---|:---|
-| 本次实现达到了最初的设计：QMUI 风格的管理器、协议驱动的原地换肤、复用示例行的底层方法、无 hook、三种样式一致。功能上已超过 QMUI 的主题模块（81 对 74），总分持平（84 对 83），差距只剩成熟度。下一步按优先级：统一恢复模型、示例代码移出库，然后是可选的动态图片与 Dark Mode 下的 layer 刷新。 | The implementation meets the original design: a QMUI-style manager, protocol-driven in-place skins, the demo rows' mechanisms reused, no hooks, three styles alike. Functionally it is now ahead of QMUI's theme module (81 to 74) and level overall (84 to 83); what remains is maturity. Next, in order: one restore model, the demo code out of the library, then opt-in dynamic images and layer refresh on Dark Mode changes. |
+| 本次实现达到了最初的设计：QMUI 风格的管理器、协议驱动的原地换肤、复用示例行的底层方法、无 hook、三种样式一致。功能上已超过 QMUI 的主题模块（81 对 74），总分持平（84 对 83），差距只剩成熟度。按建议改造后（见上一节）总分为 89（功能分 86），剩余事项为示例代码移出库（需决定方案）与成熟度。 | The implementation meets the original design: a QMUI-style manager, protocol-driven in-place skins, the demo rows' mechanisms reused, no hooks, three styles alike. Functionally it is now ahead of QMUI's theme module (81 to 74) and level overall (84 to 83); what remains is maturity. After the refactor that followed the proposals (previous section) the total is 89 (86 functional); what remains is the demo code out of the library (a decision is needed) and maturity. |

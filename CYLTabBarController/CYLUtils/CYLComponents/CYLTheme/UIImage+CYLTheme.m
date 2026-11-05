@@ -40,6 +40,21 @@ static CYLThemeImageInfo *_Nullable CYLThemeImageInfoOfImage(UIImage *image) {
  *      拉伸区域与对齐边距；动图保留其帧。不会是 UIKit 可能共享的对象：`-imageWithRenderingMode:` 等方法会缓存结果，可能返回原图片本身。
  */
 static UIImage *CYLThemeImageBitmapCopy(UIImage *image) {
+    // [EN] An SF Symbol stays a symbol (its weight and scale keep following the configuration), when UIKit gives a new
+    //      object; otherwise it is copied as a bitmap below.
+    // [CN] SF Symbol 保持为符号（粗细与缩放继续跟随配置），前提是 UIKit 返回新对象；否则在下面按位图复制。
+    if (@available(iOS 13.0, *)) {
+        if (image.isSymbolImage) {
+            UIImageSymbolConfiguration *configuration = image.symbolConfiguration ?: [UIImageSymbolConfiguration unspecifiedConfiguration];
+            UIImage *symbol = [image imageByApplyingSymbolConfiguration:configuration];
+            if (symbol && symbol != image && symbol.isSymbolImage) {
+                UIImage *symbolCopy = [symbol imageWithRenderingMode:image.renderingMode];
+                if (symbolCopy != image) {
+                    return symbolCopy;
+                }
+            }
+        }
+    }
     UIImage *copy = nil;
     if (image.images.count > 1) {
         copy = [UIImage animatedImageWithImages:image.images duration:image.duration];
@@ -124,12 +139,138 @@ static UIImage *CYLThemeImageMake(NSObject<NSCopying> *managerName, CYLThemeImag
     return images.firstObject;
 }
 
+#pragma mark - Dynamic theme images
+
+/*!
+ * [EN] An image that is always the provider's image of the current theme (`+cyl_dynamicImageWithThemeProvider:`): every
+ *      public property and drawing method answers with that image, so an image made before a theme change and assigned
+ *      after it still shows the current theme. The theme walk assigns it again on a change (UIKit skips assigning the
+ *      very same image), since a view keeps what it drew.
+ * [CN] 始终为 provider 在当前主题下的图片（`+cyl_dynamicImageWithThemeProvider:`）：所有公开属性与绘制方法都以该图片作答，因此在主题切换
+ *      前创建、切换后才赋值的图片仍显示当前主题。由于视图会保留已绘制的内容，主题切换时由遍历重新赋值（UIKit 会跳过赋值同一个图片）。
+ */
+@interface CYLThemeDynamicImage : UIImage
+@property (nonatomic, copy) NSObject<NSCopying> *cyl_managerName;
+@property (nonatomic, copy) CYLThemeImageProvider cyl_provider;
+@end
+
+@implementation CYLThemeDynamicImage
+
+/// [EN] The image of the current theme (nested theme images resolved). [CN] 当前主题下的图片（嵌套的主题图片也会被解析）。
+- (UIImage *)cyl_resolvedImage {
+    CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:self.cyl_managerName];
+    UIImage *image = self.cyl_provider(manager, manager.currentThemeIdentifier, manager.currentTheme);
+    for (NSUInteger depth = 0; depth < 8 && image; depth++) {
+        if ([image isKindOfClass:[CYLThemeDynamicImage class]]) {
+            image = [(CYLThemeDynamicImage *)image cyl_resolvedImage];
+            continue;
+        }
+        CYLThemeImageInfo *nestedInfo = CYLThemeImageInfoOfImage(image);
+        if (!nestedInfo) {
+            break;
+        }
+        CYLThemeManager *nestedManager = [CYLThemeManagerCenter themeManagerWithName:nestedInfo.managerName];
+        image = nestedInfo.provider(nestedManager, nestedManager.currentThemeIdentifier, nestedManager.currentTheme);
+    }
+    static UIImage *transparent;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        transparent = CYLThemeImageTransparent();
+    });
+    return image ?: transparent;
+}
+
+/// [EN] A dynamic image whose image is `transform` applied to this one's. [CN] 图片为对本图片应用 `transform` 结果的动态图片。
+- (UIImage *)cyl_dynamicImageWithTransform:(UIImage *(^)(UIImage *image))transform {
+    CYLThemeImageProvider provider = self.cyl_provider;
+    NSObject<NSCopying> *managerName = self.cyl_managerName;
+    CYLThemeDynamicImage *base = self;
+    return [UIImage cyl_dynamicImageWithThemeManagerName:managerName provider:^UIImage *(CYLThemeManager *manager, id identifier, id theme) {
+        return transform([base cyl_resolvedImage]) ?: provider(manager, identifier, theme);
+    }];
+}
+
+- (CGSize)size { return [self cyl_resolvedImage].size; }
+- (CGFloat)scale { return [self cyl_resolvedImage].scale; }
+- (CGImageRef)CGImage { return [self cyl_resolvedImage].CGImage; }
+- (CIImage *)CIImage { return [self cyl_resolvedImage].CIImage; }
+- (UIImageOrientation)imageOrientation { return [self cyl_resolvedImage].imageOrientation; }
+- (NSArray<UIImage *> *)images { return [self cyl_resolvedImage].images; }
+- (NSTimeInterval)duration { return [self cyl_resolvedImage].duration; }
+- (UIEdgeInsets)capInsets { return [self cyl_resolvedImage].capInsets; }
+- (UIImageResizingMode)resizingMode { return [self cyl_resolvedImage].resizingMode; }
+- (UIEdgeInsets)alignmentRectInsets { return [self cyl_resolvedImage].alignmentRectInsets; }
+- (UIImageRenderingMode)renderingMode { return [self cyl_resolvedImage].renderingMode; }
+- (BOOL)flipsForRightToLeftLayoutDirection { return [self cyl_resolvedImage].flipsForRightToLeftLayoutDirection; }
+- (UITraitCollection *)traitCollection { return [self cyl_resolvedImage].traitCollection; }
+- (UIImageAsset *)imageAsset { return [self cyl_resolvedImage].imageAsset; }
+- (BOOL)isSymbolImage API_AVAILABLE(ios(13.0)) { return [self cyl_resolvedImage].isSymbolImage; }
+- (UIImageSymbolConfiguration *)symbolConfiguration API_AVAILABLE(ios(13.0)) { return [self cyl_resolvedImage].symbolConfiguration; }
+- (CGFloat)baselineOffsetFromBottom API_AVAILABLE(ios(13.0)) { return [self cyl_resolvedImage].baselineOffsetFromBottom; }
+- (BOOL)hasBaseline API_AVAILABLE(ios(13.0)) { return [self cyl_resolvedImage].hasBaseline; }
+
+- (void)drawAtPoint:(CGPoint)point { [[self cyl_resolvedImage] drawAtPoint:point]; }
+- (void)drawAtPoint:(CGPoint)point blendMode:(CGBlendMode)blendMode alpha:(CGFloat)alpha {
+    [[self cyl_resolvedImage] drawAtPoint:point blendMode:blendMode alpha:alpha];
+}
+- (void)drawInRect:(CGRect)rect { [[self cyl_resolvedImage] drawInRect:rect]; }
+- (void)drawInRect:(CGRect)rect blendMode:(CGBlendMode)blendMode alpha:(CGFloat)alpha {
+    [[self cyl_resolvedImage] drawInRect:rect blendMode:blendMode alpha:alpha];
+}
+- (void)drawAsPatternInRect:(CGRect)rect { [[self cyl_resolvedImage] drawAsPatternInRect:rect]; }
+
+// [EN] Derived images stay dynamic. [CN] 派生图片仍为动态图片。
+- (UIImage *)imageWithRenderingMode:(UIImageRenderingMode)renderingMode {
+    return [self cyl_dynamicImageWithTransform:^UIImage *(UIImage *image) { return [image imageWithRenderingMode:renderingMode]; }];
+}
+- (UIImage *)imageWithAlignmentRectInsets:(UIEdgeInsets)alignmentInsets {
+    return [self cyl_dynamicImageWithTransform:^UIImage *(UIImage *image) { return [image imageWithAlignmentRectInsets:alignmentInsets]; }];
+}
+- (UIImage *)resizableImageWithCapInsets:(UIEdgeInsets)capInsets {
+    return [self cyl_dynamicImageWithTransform:^UIImage *(UIImage *image) { return [image resizableImageWithCapInsets:capInsets]; }];
+}
+- (UIImage *)resizableImageWithCapInsets:(UIEdgeInsets)capInsets resizingMode:(UIImageResizingMode)resizingMode {
+    return [self cyl_dynamicImageWithTransform:^UIImage *(UIImage *image) { return [image resizableImageWithCapInsets:capInsets resizingMode:resizingMode]; }];
+}
+- (UIImage *)imageWithTintColor:(UIColor *)color API_AVAILABLE(ios(13.0)) {
+    return [self cyl_dynamicImageWithTransform:^UIImage *(UIImage *image) { return [image imageWithTintColor:color]; }];
+}
+- (UIImage *)imageWithTintColor:(UIColor *)color renderingMode:(UIImageRenderingMode)renderingMode API_AVAILABLE(ios(13.0)) {
+    return [self cyl_dynamicImageWithTransform:^UIImage *(UIImage *image) { return [image imageWithTintColor:color renderingMode:renderingMode]; }];
+}
+
+// [EN] Anything else (private UIKit methods included) goes to the image of the current theme.
+// [CN] 其他消息（包括 UIKit 的私有方法）转发给当前主题的图片。
+- (id)forwardingTargetForSelector:(SEL)aSelector {
+    return [self cyl_resolvedImage];
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<%@: %p, manager = %@, current = %@>", NSStringFromClass(self.class), self, self.cyl_managerName, [self cyl_resolvedImage]];
+}
+
+@end
+
+BOOL CYLThemeImageIsDynamic(UIImage *_Nullable image) {
+    return [image isKindOfClass:[CYLThemeDynamicImage class]];
+}
+
+#pragma mark - Refreshing
+
 UIImage *CYLThemeImageRefreshedImage(UIImage *image) {
+    // [EN] A dynamic image is the current theme's already: the same object, to be assigned again.
+    // [CN] 动态图片已经是当前主题的图片：返回同一对象，由调用方重新赋值。
+    if (CYLThemeImageIsDynamic(image)) {
+        return image;
+    }
     CYLThemeImageInfo *info = CYLThemeImageInfoOfImage(image);
     return info ? CYLThemeImageMake(info.managerName, info.provider) : image;
 }
 
 NSObject<NSCopying> *_Nullable CYLThemeImageManagerName(UIImage *image) {
+    if (CYLThemeImageIsDynamic(image)) {
+        return ((CYLThemeDynamicImage *)image).cyl_managerName;
+    }
     return CYLThemeImageInfoOfImage(image).managerName;
 }
 
@@ -143,11 +284,31 @@ NSObject<NSCopying> *_Nullable CYLThemeImageManagerName(UIImage *image) {
     return CYLThemeImageMake(managerName, provider);
 }
 
++ (UIImage *)cyl_dynamicImageWithThemeProvider:(CYLThemeImageProvider)provider {
+    return [self cyl_dynamicImageWithThemeManagerName:CYLThemeManagerNameDefault provider:provider];
+}
+
++ (UIImage *)cyl_dynamicImageWithThemeManagerName:(__kindof NSObject<NSCopying> *)managerName provider:(CYLThemeImageProvider)provider {
+    CYLThemeDynamicImage *image = [[CYLThemeDynamicImage alloc] init];
+    image.cyl_managerName = managerName;
+    image.cyl_provider = provider;
+    return image;
+}
+
 - (BOOL)cyl_isThemeImage {
-    return CYLThemeImageInfoOfImage(self) != nil;
+    return CYLThemeImageIsDynamic(self) || CYLThemeImageInfoOfImage(self) != nil;
+}
+
+- (BOOL)cyl_isDynamicThemeImage {
+    return CYLThemeImageIsDynamic(self);
 }
 
 - (UIImage *)cyl_imageForCurrentTheme {
+    // [EN] For a dynamic image, a plain (marked) copy of the current theme's image. [CN] 动态图片：返回当前主题图片的普通（已标记）副本。
+    if (CYLThemeImageIsDynamic(self)) {
+        CYLThemeDynamicImage *dynamicImage = (CYLThemeDynamicImage *)self;
+        return CYLThemeImageMake(dynamicImage.cyl_managerName, dynamicImage.cyl_provider);
+    }
     return CYLThemeImageRefreshedImage(self);
 }
 

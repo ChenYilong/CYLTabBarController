@@ -75,6 +75,18 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) void (^cyl_themeDidChangeBlock)(void);
 
+/*!
+ * [EN] Brings the receiver and its subviews to the current themes of every manager now: colors, images, effects and
+ *      layer colors, then the callbacks (`-cyl_themeDidChangeByManager:identifier:theme:` with a nil manager,
+ *      `cyl_themeDidChangeBlock`). For a view that neither the windows nor the view controllers reach when the theme
+ *      changes: call it from a custom view's `-didMoveToWindow`, a cell's `-prepareForReuse`, or after adding a view
+ *      the app kept aside. No UIKit method is hooked.
+ * [CN] 立即让自身及其子视图使用所有管理器的当前主题：颜色、图片、效果与 layer 颜色，然后调用回调（manager 为 nil 的
+ *      `-cyl_themeDidChangeByManager:identifier:theme:`、`cyl_themeDidChangeBlock`）。用于主题切换时 window 与视图控制器都访问不到的视图：
+ *      在自定义视图的 `-didMoveToWindow`、cell 的 `-prepareForReuse` 中，或加入 App 先前另外保存的视图后调用。不 hook 任何 UIKit 方法。
+ */
+- (void)cyl_applyCurrentTheme;
+
 @end
 
 NS_ASSUME_NONNULL_END
