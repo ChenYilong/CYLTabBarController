@@ -159,6 +159,12 @@ Pod::Spec.new do |s|
     pagenterprise.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
     pagenterprise.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
     pagenterprise.dependency 'libpag-enterprise', '>= 4.0'
+    # libpag-enterprise 4.4.x–4.5.98: the module's umbrella `libpag.h` imports `PAGView+Audio.h`, which the framework does
+    # not ship, so a modular import of libpag fails ("Could not build module 'libpag'"). The PAG animator imports only
+    # `PAGView.h` (complete), so its file is compiled without modules.
+    # libpag-enterprise 4.4.x–4.5.98：模块的 umbrella 头文件 `libpag.h` 引入了框架中不存在的 `PAGView+Audio.h`，以模块方式引入 libpag
+    # 会失败（"Could not build module 'libpag'"）。PAG animator 只引入完整的 `PAGView.h`，因此它的文件不使用模块编译。
+    pagenterprise.compiler_flags = '-fno-modules'
   end
   
   # Rive animations (`RiveRuntime`), the same way as Lottie and PAG: `pod 'CYLTabBarController/Rive'`.
