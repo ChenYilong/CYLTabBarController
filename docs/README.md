@@ -122,6 +122,7 @@ docs/
     ├── login-required-tabs-flow.svg
     ├── pag-animation-tab-icons.png
     ├── pag-animation-test-list.png
+    ├── plus-child-theme-switching.png
     ├── plusbutton-background-image-liquid-glass-selected.png
     ├── plusbutton-background-image-liquid-glass-swiftui.png
     ├── plusbutton-background-image-liquid-glass.png
