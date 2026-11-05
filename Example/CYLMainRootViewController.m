@@ -18,6 +18,11 @@
 
 @implementation CYLMainRootViewController
 
++ (instancetype)currentRootViewController {
+    UIViewController *rootViewController = CYLGetRootWindow().rootViewController;
+    return [rootViewController isKindOfClass:self] ? (CYLMainRootViewController *)rootViewController : nil;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationBarHidden = YES;

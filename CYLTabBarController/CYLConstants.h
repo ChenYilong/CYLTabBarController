@@ -241,6 +241,11 @@ CG_INLINE UIWindow *CYLGetRootWindow(void) {
     return window;
 }
 
+/*!
+ * [EN] The topmost presented view controller from the window's root (the root itself when nothing is presented), so it can
+ *      be a `UIAlertController`. Check its class before casting it.
+ * [CN] 从窗口根控制器开始，最顶层被 present 的控制器（没有 present 时为根控制器本身），因此可能是 `UIAlertController`。强转前请先判断类型。
+ */
 CG_INLINE UIViewController *CYLGetRootViewController(void) {
     UIViewController *rootViewController ;
     UIWindow *window = CYLGetRootWindow();
