@@ -402,7 +402,7 @@ python3 scripts/export-tabbar-configurations.py --check               # exit 1 w
 |:---|:---|
 | 配置文件无法包含对象：页面由 App 按页面 ID 注册的提供者创建（可以使用任意初始化方法与依赖注入）。每个 TabBar 自己的注册表或解析回调只能在代码中传入：先用 `+configurationWithContentsOfFile:error:` 读取字典，加入 `CYLTabBarControllerPageRegistry`，再调用 `-initWithConfiguration:`。 | A file cannot hold objects: pages are created by the providers the app registers per page ID (any initializer, any dependency injection). A tab bar's own registry or resolver can only be passed in code: read the dictionary with `+configurationWithContentsOfFile:error:`, add `CYLTabBarControllerPageRegistry`, then call `-initWithConfiguration:`. |
 | YAML 与 TOML 支持配置文件常用的子集：YAML 不支持锚点、别名与标签；TOML 不支持日期时间。 | YAML and TOML support the subset configurations use: no anchors, aliases or tags in YAML; no date-times in TOML. |
-| PlusButton 仍按 `context` 注册（`+[CYLPlusButton tabBarContext]`），不在配置文件中描述。 | The plus button is still registered by `context` (`+[CYLPlusButton tabBarContext]`), not described in the file. |
+| PlusButton 仍按 `context` 注册（`+[CYLPlusButton tabBarContext]`），不在配置文件中描述；配置可以通过 `CYLTabBarControllerContext` 选择代码中注册的 PlusButton。按 ID 注册 PlusButton 的设计提案见 [调研：PlusButton 注册](PlusButton-Registration-Research.md)。 | The plus button is still registered by `context` (`+[CYLPlusButton tabBarContext]`), not described in the file; a configuration can choose a plus button registered in code through `CYLTabBarControllerContext`. A design proposal for registering plus buttons by ID: [Research: PlusButton registration](PlusButton-Registration-Research.md). |
 
 ## [CN]测试与截图
 ## [EN]Testing and screenshots
