@@ -331,6 +331,12 @@ CYLTabBarController/CYLUtils/
 
 | 中文 | English |
 |:---|:---|
+| 下图验证运行时换肤（与点击导航栏“换肤”按钮相同的路径，由启动参数 `-CYLDemoThemeSwitchTo` 触发）：上排液态玻璃、下排扁平样式；左列以圣诞节主题启动，右列为 4 秒后切换到玫瑰粉主题的结果。所有 Tab（包括 PlusButton 后面的 Messages 与 Me）都保留自己的图标与标题，PlusButton 恢复为“+”。截图来自 CI 的 “Theme screenshots” workflow（iOS 26 模拟器），未经修改，只裁剪了下半部分。列表中“当前：圣诞节”未更新是因为启动参数路径不刷新列表；点击按钮时会刷新。 | The image below checks switching at runtime (the same path as the navigation bar's "Skin" button, triggered by the launch argument `-CYLDemoThemeSwitchTo`): Liquid Glass on top, FlatDesign below; the left column launched with the Christmas theme, the right column is the result of switching to Pink Rose 4 seconds later. Every tab, including Messages and Me after the plus button, keeps its own icon and title, and the plus button is back to "+". The screenshots come from the CI workflow "Theme screenshots" (iOS 26 simulator), unedited apart from cropping to the lower part. The list's "Now: Christmas" is not updated because the launch argument path does not reload the list; tapping the button does. |
+
+![Runtime switch from Christmas to Pink Rose](assets/theme-switching-runtime-christmas-to-pink-rose.png)
+
+| 中文 | English |
+|:---|:---|
 | 下图是节日皮肤使用的图标（每行一个皮肤，顺序与下表相同），不是 App 截图。 | The icons of the holiday skins (one skin per row, in the order of the table below), not a screenshot of the app. |
 
 ![Holiday skin icons](assets/theme-switching-holiday-icons.png)

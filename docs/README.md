@@ -110,6 +110,7 @@ docs/
     ├── theme-switching-flat-design.png
     ├── theme-switching-holiday-icons.png
     ├── theme-switching-liquid-glass.png
+    ├── theme-switching-runtime-christmas-to-pink-rose.png
     ├── update-tab-bar-items-all-local-icons.png
     ├── update-tab-bar-items-all-network-icons-badges.png
     ├── update-tab-bar-items-all-network-icons-restored.png
