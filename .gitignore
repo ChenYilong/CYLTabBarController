@@ -102,3 +102,6 @@ Example-Shared/PAGResources/*/
 # Example-SwiftUI-Rive/AnimatedApp. 下载的「SwiftUI Animations」课程的其余部分：只保留最终的 App。
 Example-SwiftUI-Rive/SwiftUI Animations/
 Example-SwiftUI-Rive/AnimatedApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+
+# Removed from the repository (#760); kept locally only. 已从仓库移除（#760），只保留在本地。
+Example-loadTabBarIconsFroNework/

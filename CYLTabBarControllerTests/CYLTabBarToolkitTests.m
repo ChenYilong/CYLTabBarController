@@ -100,7 +100,7 @@
     tabBarController.cyl_tabBarItemSelectedTitleColor = UIColor.systemGreenColor;
     tabBarController.cyl_tabBarItemImageColor = UIColor.systemGrayColor;
     tabBarController.cyl_tabBarBackgroundColor = UIColor.whiteColor;
-    tabBarController.cyl_tabBarShadowColor = UIColor.clearColor;
+    tabBarController.cyl_tabBarShadowColor = UIColor.systemRedColor;
 
     XCTAssertEqualObjects(tabBarController.cyl_tabBarItemSelectedTitleColor, UIColor.systemGreenColor, @"the getter returns the value set");
     UITabBarAppearance *appearance = tabBarController.tabBar.standardAppearance;
@@ -110,7 +110,13 @@
         XCTAssertEqualObjects(itemAppearance.normal.iconColor, UIColor.systemGrayColor);
     }
     XCTAssertEqualObjects(appearance.backgroundColor, UIColor.whiteColor);
-    XCTAssertEqualObjects(appearance.shadowColor, UIColor.clearColor);
+    XCTAssertEqualObjects(appearance.shadowColor, UIColor.systemRedColor);
+
+    // [EN] No shadow: the getter returns the color that was set, but UITabBarAppearance reads a clear shadow back as nil.
+    // [CN] 没有阴影：getter 返回设置的颜色，但 UITabBarAppearance 把透明阴影读回为 nil。
+    tabBarController.cyl_tabBarShadowColor = UIColor.clearColor;
+    XCTAssertEqualObjects(tabBarController.cyl_tabBarShadowColor, UIColor.clearColor);
+    XCTAssertNil(tabBarController.tabBar.standardAppearance.shadowColor);
 }
 
 #pragma mark - Layout helpers
