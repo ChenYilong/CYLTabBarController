@@ -40,6 +40,7 @@
 | [5. 改进建议（按收益排序）](#cn5-改进建议按收益排序) | [5. Improvements, by payoff](#en5-improvements-by-payoff) |
 | [6. 本次提交的验证](#cn6-本次提交的验证) | [6. What this commit verified](#en6-what-this-commit-verified) |
 | [7. 改进后的状态（本次第二个提交）](#cn7-改进后的状态本次第二个提交) | [7. After the improvements (the second commit of this change)](#en7-after-the-improvements-the-second-commit-of-this-change) |
+| [8. 第 3 项：Demo 换肤与截图（本次第三个提交）](#cn8-第-3-项demo-换肤与截图本次第三个提交) | [8. Item 3: theming in the demos, with screenshots (the third commit of this change)](#en8-item-3-theming-in-the-demos-with-screenshots-the-third-commit-of-this-change) |
 
 <!-- navigation:end -->
 
@@ -199,3 +200,38 @@
 | 中文 | English |
 |:---|:---|
 | 改动清单：`CYLTabBarAnimationColors` 通用 key；`CYLTabBarItemAnimationStyleSource` 可选 `-colorsForURL:`（Core 注册表实现，`CYLTabBarItemAnimationRegisterColors()`）；`CYLTabBarItemAnimationService` 可选 `-replaceAnimationWithURL:size:contentMode:inControl:` 与 `-refreshAnimationColorsInControl:`（引擎实现）；`CYLTabBarItemAnimationPlayer` 可选 `-applyColors:traitCollection:`（Lottie 播放器与 `CYLTabBarItemViewAnimator` 实现）；`UIControl` 新增 `-cyl_replaceTabBarItemAnimationWithURL:size:contentMode:` 与 `-cyl_refreshTabBarItemAnimationColors`；`-updateTabBarItemAtIndex:attributes:` 处理动画 key；`CYLTabBarController (CYLTheme)` 移到 `CYLTabBarController+CYLTheme.m` 并新增 `cyl_themeManager`。所有既有公开 API 保持不变。 | The change list: the generic key `CYLTabBarAnimationColors`; the optional `-colorsForURL:` of `CYLTabBarItemAnimationStyleSource` (implemented by Core's registry, `CYLTabBarItemAnimationRegisterColors()`); the optional `-replaceAnimationWithURL:size:contentMode:inControl:` and `-refreshAnimationColorsInControl:` of `CYLTabBarItemAnimationService` (implemented by the engine); the optional `-applyColors:traitCollection:` of `CYLTabBarItemAnimationPlayer` (implemented by the Lottie player and `CYLTabBarItemViewAnimator`); `-cyl_replaceTabBarItemAnimationWithURL:size:contentMode:` and `-cyl_refreshTabBarItemAnimationColors` on `UIControl`; animation keys handled by `-updateTabBarItemAtIndex:attributes:`; `CYLTabBarController (CYLTheme)` moved to `CYLTabBarController+CYLTheme.m` with the new `cyl_themeManager`. Every existing public API is unchanged. |
+
+## [CN]8. 第 3 项：Demo 换肤与截图（本次第三个提交）
+## [EN]8. Item 3: theming in the demos, with screenshots (the third commit of this change)
+
+| 中文 | English |
+|:---|:---|
+| 第 5 节的第 3 项已完成。在 iPhone 17 Pro（iOS 26.5）模拟器上，通过各 Demo 的「Skin」入口实际切换了皮肤。动手前，这些 Demo 的皮肤对动画 Tab 没有任何可见效果：它们没有使用第 1、2 项的能力，而 `testAnInPlaceUpdateWithAnAnimationKeyGivesTheTabTheNewFile` 在测试宿主中因为没有动画库而被跳过。因此第 7 节的 93 分当时没有真实动画视图的验证，这次实测发现了下面的问题。 | Item 3 of section 5 is done. Skins were switched for real through each demo's "Skin" entry, on the iPhone 17 Pro (iOS 26.5) simulator. Before this, a skin had no visible effect on an animated tab in these demos: they used neither ability of items 1 and 2, and `testAnInPlaceUpdateWithAnAnimationKeyGivesTheTabTheNewFile` is skipped in the test host, which has no animation library. So the 93 of section 7 had not been checked against a real animation view, and doing so found the problems below. |
+
+| 问题 / Problem | 影响 / Effect | 处理 / Fix |
+|:---|:---|:---|
+| `CYLTheme` 保存的「原始属性」含有液态玻璃与扁平样式的 slot 项 / the "original attributes" a theme saves hold the slot entry of Liquid Glass and FlatDesign | 有 PlusButton 时，从节日皮肤切回其他皮肤，PlusButton 之后的 Tab 标题与图标错位 / with a plus button, leaving a holiday skin shifts the titles and icons of the tabs after it | `-updateTabBarItemsWithAttributes:` 先去掉 slot 项，并新增回归测试 `testASlotEntryInTheAttributesDoesNotShiftTheTabs` / `-updateTabBarItemsWithAttributes:` drops the slot entry first, with the regression test `testASlotEntryInTheAttributesDoesNotShiftTheTabs` |
+| `CYLTabBarAnimationFilePath` 传文件名时静默失败，且本仓库文档的示例就是这样写的 / a file name in `CYLTabBarAnimationFilePath` failed silently, and this repository's doc example did just that | 换肤时动画不变，也没有任何提示 / the animation stays on a theme change, with no message | 打印 `🔴[CYL #216]` 日志，改正 [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md) 的示例 / a `🔴[CYL #216]` log, and a corrected example in [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md) |
+| Demo 列表的换肤行显示上一个皮肤 / the demo lists' skin row showed the previous skin | Swift 列表与 ObjC 列表的 `Now:` 落后一步 / `Now:` lagged one step in the Swift and ObjC lists | 两个列表在主题回调中刷新 / both lists reload in the theme callback |
+
+| Demo | 动画库 / Library | 皮肤对动画 Tab 做了什么 / What the skin does to an animated tab | 第几项 / Item |
+|:---|:---|:---|:---:|
+| Example-PAG | PAG | 圣诞皮肤互换 Moments 与 Me 的文件 / the Christmas skin swaps the files of Moments and Me | 1 |
+| Example-Rive、Example-SwiftUI-Rive | Rive | 圣诞皮肤互换 Chat 与 User 的画板 / the Christmas skin swaps the artboards of Chat and User | 1 |
+| ObjC Demo | Lottie 4.6.1 | 圣诞皮肤把 Nearby 未选中图标变成红色，文件不变 / the Christmas skin turns the unselected Nearby icon red, with the same file | 2 |
+
+| 中文 | English |
+|:---|:---|
+| 下面是圣诞皮肤的截图。每个 Demo 都验证了切回其他皮肤后动画、标题与 `Now:` 恢复正确。Rive 的两张图在深色模式下拍摄：课程的图标是白色的，在浅色 TabBar 上几乎看不见。 | The screenshots below show the Christmas skin. Each demo was also checked going back to another skin: the animations, titles and `Now:` come back right. The two Rive pictures were taken in Dark Mode: the course's icons are white and almost invisible on a light tab bar. |
+| 使用时要注意：皮肤对动画的修改请放在 `-cyl_themeDidChangeByManager:identifier:theme:` 中、调用 `super` 之后。`CYLThemeDidChangeNotification` 比它先发出，在通知中修改的动画会被 `CYLTheme` 记为 App 的原始外观，切回时恢复错误（Example-Rive 第一版就是这样）。动画 Tab 显示动画视图，所以节日皮肤的静态图标只出现在没有动画的 Tab 上（如 Example-PAG 的 Health）。 | One thing to watch: make a skin's animation changes in `-cyl_themeDidChangeByManager:identifier:theme:`, after calling `super`. `CYLThemeDidChangeNotification` is posted before it, and an animation changed in the notification is saved by `CYLTheme` as the app's original look, so going back restores the wrong one (the first version of the Example-Rive change did this). An animated tab shows its animation view, so a holiday skin's static icons only appear on tabs without an animation (e.g. Health in Example-PAG). |
+| 尚未验证：真机；经典样式（iOS 25 及以前）下动画 Tab 的换肤；Rive 的主题颜色（课程的 `icons.riv` 没有 view model，所以 `CYLTabBarAnimationColors` 没有目标）。`testAnInPlaceUpdateWithAnAnimationKeyGivesTheTabTheNewFile` 在测试宿主中仍被跳过。 | Not verified: a real device; theming of animated tabs in the classic style (iOS 25 and earlier); Rive theme colors (the course's `icons.riv` has no view model, so `CYLTabBarAnimationColors` has nothing to act on). `testAnInPlaceUpdateWithAnAnimationKeyGivesTheTabTheNewFile` is still skipped in the test host. |
+
+![Example-PAG, Christmas skin / Example-PAG 圣诞皮肤](assets/theme-switching-pag-christmas.png)
+
+![Example-Rive, Christmas skin / Example-Rive 圣诞皮肤](assets/theme-switching-rive-christmas.png)
+
+![Example-SwiftUI-Rive, Christmas skin / Example-SwiftUI-Rive 圣诞皮肤](assets/theme-switching-swiftui-rive-christmas.png)
+
+![ObjC demo, Liquid Glass, Christmas skin / ObjC Demo 液态玻璃 圣诞皮肤](assets/theme-switching-objc-liquid-glass-christmas.png)
+
+![ObjC demo, FlatDesign, Christmas skin / ObjC Demo 扁平样式 圣诞皮肤](assets/theme-switching-objc-flat-design-christmas.png)

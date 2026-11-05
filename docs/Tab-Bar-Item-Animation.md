@@ -396,16 +396,22 @@ sequenceDiagram
 ```objc
 // [EN] One Lottie file, recolored by the skin. [CN] 一份 Lottie 文件，随皮肤换色。
 @{ CYLTabBarItemTitle : @"Home",
-   CYLTabBarAnimationFilePath : @"home.json",
+   // [EN] A full path. [CN] 完整路径。
+   CYLTabBarAnimationFilePath : [[NSBundle mainBundle] pathForResource:@"home" ofType:@"json"],
    CYLTabBarAnimationColors : @{ @"**.Fill 1.Color" : [UIColor cyl_colorWithThemeProvider:^UIColor *(CYLThemeManager *manager, id identifier, id theme) {
        return [identifier isEqual:@"Christmas"] ? UIColor.systemRedColor : UIColor.systemBlueColor;
    }] } }
 
 // [EN] A skin with its own file for the first tab (a CYLTabBarTheme). [CN] 第一个 Tab 使用皮肤自己文件的主题（CYLTabBarTheme）。
 - (NSArray<NSDictionary *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController {
-    return @[ @{ CYLTabBarAnimationFilePath : @"home_christmas.json" }, @{}, @{} ];
+    // [EN] CYLTabBarItemAttributesAddingAnimationFile() finds a file name in the main bundle. [CN] CYLTabBarItemAttributesAddingAnimationFile() 在 main bundle 中查找文件名。
+    return @[ CYLTabBarItemAttributesAddingAnimationFile(@{}, @"home_christmas.json", nil), @{}, @{} ];
 }
 ```
+
+| 中文 | English |
+|:---|:---|
+| `CYLTabBarAnimationFilePath` 是完整路径：只写文件名时找不到文件，动画不变，并打印 `🔴[CYL #216]` 日志。在主题回调中修改动画时，请放在 `-cyl_themeDidChangeByManager:identifier:theme:` 的 `super` 之后；`CYLThemeDidChangeNotification` 比它先发出，在通知中修改的动画会被记为 App 的原始外观。实测结果与截图见 [Theme-Switching-Evaluation.md](Theme-Switching-Evaluation.md) 第 8 节。 | `CYLTabBarAnimationFilePath` is a full path: a bare file name finds nothing, the animation stays, and `🔴[CYL #216]` is logged. To change an animation when the theme changes, do it after `super` in `-cyl_themeDidChangeByManager:identifier:theme:`; `CYLThemeDidChangeNotification` is posted earlier, and an animation changed there is saved as the app's original look. For results and screenshots, see section 8 of [Theme-Switching-Evaluation.md](Theme-Switching-Evaluation.md). |
 
 ## [CN]测试
 ## [EN]Testing

@@ -148,6 +148,11 @@ docs/
     ├── tab-interactions-swipe-liquid-glass.png
     ├── tab-interactions-swipe-login-classic.png
     ├── theme-switching-holiday-icons.png
+    ├── theme-switching-objc-flat-design-christmas.png
+    ├── theme-switching-objc-liquid-glass-christmas.png
+    ├── theme-switching-pag-christmas.png
+    ├── theme-switching-rive-christmas.png
+    ├── theme-switching-swiftui-rive-christmas.png
     ├── update-tab-bar-items-all-local-icons.png
     ├── update-tab-bar-items-all-network-icons-badges.png
     ├── update-tab-bar-items-all-network-icons-restored.png

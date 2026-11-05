@@ -50,6 +50,15 @@ class CYLSettingsDemoTableViewController: UITableViewController {
         reloadGroups()
     }
 
+    // [EN] The skin row shows the current theme, and a theme is picked while this list stays on screen (#216).
+    // [CN] 换肤行显示当前主题，而选择主题时本列表一直在屏幕上（#216）。
+    override func cyl_themeDidChange(by manager: CYLThemeManager, identifier: (any NSCopying & NSObjectProtocol)?, theme: NSObject?) {
+        super.cyl_themeDidChange(by: manager, identifier: identifier, theme: theme)
+        if isViewLoaded {
+            reloadGroups()
+        }
+    }
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         layoutHeaderView()

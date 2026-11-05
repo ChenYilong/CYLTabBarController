@@ -358,6 +358,24 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     XCTAssertNil(tabBarController.viewControllers[1].tabBarItem.cyl_tabBarItemAnimationURL, @"a tab without an animation key is left alone");
 }
 
+/*!
+ * FIX: issue #216
+ * [EN] With a plus button, Liquid Glass and FlatDesign keep a slot entry in `tabBarItemsAttributes`, and a theme saves that
+ *      array to restore it later. The entry must not take a tab's place: "Moments" used to land on "Me".
+ * [CN] 有 PlusButton 时，液态玻璃与扁平样式在 `tabBarItemsAttributes` 中保留一个 slot 项，而主题会保存该数组以便之后恢复。该项不能占用
+ *      Tab 的位置：以前「Moments」会落到「Me」上。
+ */
+- (void)testASlotEntryInTheAttributesDoesNotShiftTheTabs {
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" }, @{ CYLTabBarItemTitle : @"B" } ]];
+    [tabBarController loadViewIfNeeded];
+    [tabBarController updateTabBarItemsWithAttributes:@[ @{ CYLTabBarItemTitle : @"Home" },
+                                                         @{ @"CYLTabBarItemPlusSlotPlaceholder" : @YES },
+                                                         @{ CYLTabBarItemTitle : @"Moments" } ]];
+    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.title, @"Home");
+    XCTAssertEqualObjects(tabBarController.viewControllers[1].tabBarItem.title, @"Moments", @"the slot entry takes no tab's place");
+}
+
 - (void)testTheTabBarFollowsAnInjectedThemeManager {
     CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:@"CYLThemeAnimationTests.tabBar"];
     for (NSObject<NSCopying> *identifier in [manager.themeIdentifiers copy]) {

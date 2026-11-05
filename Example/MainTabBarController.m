@@ -257,6 +257,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                  CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"],
         CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover_dark" ofType:@"json"],
+        // [EN] #216: the unselected icon's color follows the skin (the tab's file stays the same): gray, or red with the Christmas skin.
+        // [CN] #216：未选中图标的颜色跟随皮肤（Tab 的文件不变）：灰色，圣诞皮肤时为红色。
+        CYLTabBarAnimationColors : @{ @"Icon_Discovery_Normal.**.Color" : [UIColor cyl_colorWithThemeProvider:^UIColor *(CYLThemeManager *manager, NSObject<NSCopying> *identifier, NSObject *theme) {
+            return [identifier isEqual:@"Christmas"] ? UIColor.systemRedColor : [UIColor colorWithWhite:0.498 alpha:1];
+        }] },
         //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     

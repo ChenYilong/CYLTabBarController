@@ -25,8 +25,8 @@ struct TabBar: UIViewControllerRepresentable {
         let viewControllers = Tab.allCases.map { tab -> UIViewController in
             tab == .bell ? tab.settingsViewController() : UIHostingController(rootView: tab.content)
         }
-        let tabBarController = CYLTabBarController(viewControllers: viewControllers,
-                                                   tabBarItemsAttributes: Tab.allCases.map(\.attributes))
+        let tabBarController = CourseTabBarController(viewControllers: viewControllers,
+                                                      tabBarItemsAttributes: Tab.allCases.map(\.attributes))
         tabBarController.applyCourseTabBarAppearance()
         return tabBarController
     }

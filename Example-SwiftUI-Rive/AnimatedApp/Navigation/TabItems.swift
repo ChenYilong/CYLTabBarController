@@ -51,18 +51,23 @@ enum Tab: String, CaseIterable {
             CYLTabBarItemImage: image,
             CYLTabBarItemSelectedImage: image,
         ]
-        // [EN] The course's icons.riv has no view model: `.riveInput` plays its state machine input "active" instead.
-        // [CN] 课程的 icons.riv 没有 view model：使用 `.riveInput` 播放其状态机输入 "active"。
+        attributes.merge(animationAttributes) { _, new in new }
+        return attributes
+    }
+
+    /// [EN] The tab's Rive icon only. The course's icons.riv has no view model: `.riveInput` plays its state machine input
+    ///      "active" instead.
+    /// [CN] 仅该 Tab 的 Rive 图标。课程的 icons.riv 没有 view model：使用 `.riveInput` 播放其状态机输入 "active"。
+    fileprivate var animationAttributes: [AnyHashable: Any] {
         let iconsURL = Bundle.main.url(forResource: "icons", withExtension: "riv")
-        if let url = CYLTabBarAnimationURLWithOptions(iconsURL, [
+        guard let url = CYLTabBarAnimationURLWithOptions(iconsURL, [
             .riveArtboard: rive.artboard,
             .riveStateMachine: rive.stateMachine,
             .riveInput: "active",
-        ]) {
-            attributes[CYLTabBarRiveURL] = url
-            attributes[CYLTabBarRiveSize] = NSValue(cgSize: CGSize(width: 32, height: 32))
+        ]) else {
+            return [:]
         }
-        return attributes
+        return [CYLTabBarRiveURL: url, CYLTabBarRiveSize: NSValue(cgSize: CGSize(width: 32, height: 32))]
     }
 }
 
@@ -90,5 +95,32 @@ extension CYLTabBarController {
         tabBar.scrollEdgeAppearance = appearance
         tabBar.overrideUserInterfaceStyle = .dark
         tabBar.tintColor = .white
+    }
+}
+
+/*!
+ * [EN] #216: a skin can change a tab's animation in place. The Christmas skin swaps the icons of "Chat" and "User"; icons.riv
+ *      has no view model, so a skin cannot recolor it (`CYLTabBarAnimationColors` needs one). This runs after `super`, which
+ *      applies the theme and restores the app's own look; a `CYLThemeDidChangeNotification` observer would run before it.
+ * [CN] #216：皮肤可以原地更换 Tab 的动画。圣诞皮肤互换 Chat 与 User 的图标；icons.riv 没有 view model，因此皮肤无法为其换色
+ *      （`CYLTabBarAnimationColors` 需要 view model）。这段代码在 `super` 之后执行，`super` 负责应用主题并恢复 App 自己的外观；
+ *      `CYLThemeDidChangeNotification` 的监听者则会在它之前执行。
+ */
+class CourseTabBarController: CYLTabBarController {
+
+    override func cyl_themeDidChange(by manager: CYLThemeManager, identifier: (any NSCopying & NSObjectProtocol)?, theme: NSObject?) {
+        super.cyl_themeDidChange(by: manager, identifier: identifier, theme: theme)
+        guard let lastIndex = viewControllers?.indices.last else { return }
+        let isChristmas = (identifier as? String) == "Christmas"
+        // [EN] "Chat" is the first tab and "User" the last in both apps; what lies between differs (Example-Rive has a PlusButton).
+        // [CN] 两个 App 中 Chat 都是第一个 Tab，User 都是最后一个；中间不同（Example-Rive 有 PlusButton）。
+        setAnimation(of: isChristmas ? .user : .chat, at: 0)
+        setAnimation(of: isChristmas ? .chat : .user, at: lastIndex)
+    }
+
+    private func setAnimation(of tab: Tab, at index: Int) {
+        if let attributes = tab.animationAttributes as? [String: Any] {
+            updateTabBarItem(at: UInt(index), attributes: attributes)
+        }
     }
 }

@@ -14,7 +14,7 @@ import CYLTabBarController
  * [CN] Example-Rive 的 TabBarController：所有 Swift Demo 共用的 PlusButton 角标演示（Example-Shared/CYLPlusButtonBadgeDemo.swift）：
  *      启动后显示 1，每次点击 PlusButton 加 1。
  */
-final class RiveTabBarController: CYLTabBarController {
+final class RiveTabBarController: CourseTabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

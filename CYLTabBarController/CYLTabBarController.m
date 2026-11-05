@@ -2365,6 +2365,12 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 }
 
 - (void)updateTabBarItemsWithAttributes:(NSArray<NSDictionary<NSString *, id> *> *)tabBarItemsAttributes {
+    // FIX: issue #216
+    // [EN] `tabBarItemsAttributes` read back from the controller (a theme restoring the app's look does) can hold the slot
+    //      entry of Liquid Glass and FlatDesign. It belongs to no tab: left in, every tab after it gets the previous tab's values.
+    // [CN] 从控制器读回的 `tabBarItemsAttributes`（主题恢复 App 外观时就是如此）可能含有液态玻璃与扁平样式的 slot 项。它不属于任何 Tab：
+    //      如果保留，其后的每个 Tab 都会得到前一个 Tab 的值。
+    tabBarItemsAttributes = [self cyl_tabBarItemsAttributesByRemovingPlusSlot:tabBarItemsAttributes];
     NSUInteger attributesIndex = 0;
     for (NSUInteger index = 0; index < _viewControllers.count && attributesIndex < tabBarItemsAttributes.count; index++) {
         UIViewController *viewController = _viewControllers[index];
@@ -2410,6 +2416,11 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
     NSString *animationFilePath = nil;
     NSURL *animationURL = CYLTabBarItemAnimationURLFromAttributes(newAttributes, &animationFilePath);
     if (!animationURL) {
+        // [EN] `CYLTabBarAnimationFilePath` is a full path: a bare file name finds nothing and would fail silently.
+        //      `CYLTabBarItemAttributesAddingAnimationFile()` looks a name up in a bundle.
+        // [CN] `CYLTabBarAnimationFilePath` 是完整路径：只写文件名时找不到文件，且不会有任何提示。按名称在 bundle 中查找请用
+        //      `CYLTabBarItemAttributesAddingAnimationFile()`。
+        NSLog(@"🔴[CYL #216] no animation file found at \"%@\": CYLTabBarAnimationFilePath is a full path; use CYLTabBarItemAttributesAddingAnimationFile() for a file name in a bundle.", animationFilePath);
         return;
     }
     NSValue *sizeValue = CYLTabBarItemAttributesAnimationValue(newAttributes, CYLTabBarAnimationSize);
