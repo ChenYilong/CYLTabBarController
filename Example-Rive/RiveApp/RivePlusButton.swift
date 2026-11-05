@@ -13,11 +13,11 @@ import CYLTabBarController
  *      course's onboarding (Rive button and background, then sign-in). It takes the Timer tab's place, as an iPhone
  *      tab bar shows at most 5 items. On Liquid Glass its title moves into the tab item under it and the image sits above
  *      the tab titles (`+alignsTitleWithTabBarItemTitles`, issue #636); Example-PAG shows the other layout, a title drawn
- *      on a background image. Registered in `AppDelegate` before the tab bar controller is created.
+ *      on a background image. Registered in `SceneDelegate` before the tab bar controller is created.
  * [CN] Example-Rive 的 PlusButton：标题为 "Start" 的图片，位于 Search 与 Bell 之间，其页面是课程的引导页（Rive 按钮与背景，然后进入登录页）。
  *      iPhone 的 TabBar 最多显示 5 项，因此它占用 Timer Tab 的位置。液态玻璃下，标题移到
  *      其下方的 TabBarItem 中，图片位于 Tab 标题上方（`+alignsTitleWithTabBarItemTitles`，issue #636）；Example-PAG 演示另一种布局：标题画在
- *      背景图上。在 `AppDelegate` 中、创建 TabBarController 之前注册。
+ *      背景图上。在 `SceneDelegate` 中、创建 TabBarController 之前注册。
  */
 final class RivePlusButton: CYLPlusButton, CYLPlusButtonSubclassing {
 
