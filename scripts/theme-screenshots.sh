@@ -16,7 +16,7 @@ set -eu
 cd "$(dirname "$0")/.."
 DEVICE_NAME="${1:-}"
 STYLE="${STYLE:-Default}"
-THEMES="${THEMES:-Default,Christmas,Spring Festival,Halloween,Dark,Network,Christmas>Pink Rose,Spring Festival>Default}"
+THEMES="${THEMES:-Default,Christmas,Spring Festival,Halloween,Dark,Network,Christmas>Pink Rose,Spring Festival>Default,Default@2>Christmas,Christmas@2>Pink Rose}"
 DERIVED=build/theme-screenshots-build
 OUT=build/theme-screenshots
 mkdir -p "$DERIVED" "$OUT"
@@ -78,7 +78,27 @@ for THEME in $THEMES; do
   case "$THEME" in
     *">"*) SWITCH_TO=${THEME#*>}; THEME=${THEME%%>*} ;;
   esac
-  SLUG=$(printf '%s' "$THEME${SWITCH_TO:+ to $SWITCH_TO}" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '-' | sed -e 's/--*/-/g' -e 's/-$//')
+  # [EN] "A@2>B": also select tab 2 (the plus child view controller) 2 s after launch, take a screenshot before the
+  #      switch (…-before.png) and after it (…-after.png). [CN] “A@2>B”：启动 2 秒后再选中第 2 个 Tab（PlusButton 子控制器），
+  #      在切换前（…-before.png）与切换后（…-after.png）各截一张图。
+  SELECT_INDEX=""
+  case "$THEME" in
+    *"@"*) SELECT_INDEX=${THEME#*@}; THEME=${THEME%%@*} ;;
+  esac
+  SLUG=$(printf '%s' "$THEME${SELECT_INDEX:+ index $SELECT_INDEX}${SWITCH_TO:+ to $SWITCH_TO}" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '-' | sed -e 's/--*/-/g' -e 's/-$//')
+  if [ -n "$SELECT_INDEX" ] && [ -n "$SWITCH_TO" ]; then
+    FILE="$OUT/theme-switching-$STYLE_SLUG-$SLUG"
+    # shellcheck disable=SC2086
+    xcrun simctl launch --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$THEME" \
+      -CYLDemoSelectIndex "$SELECT_INDEX" -CYLDemoThemeSwitchTo "$SWITCH_TO" -CYLDemoThemeSwitchDelay 10 $STYLE_ARGUMENTS
+    sleep 8
+    xcrun simctl io "$DEVICE_ID" screenshot "$FILE-before.png" && echo "Saved $FILE-before.png"
+    sleep 8
+    xcrun simctl io "$DEVICE_ID" screenshot "$FILE-after.png" && echo "Saved $FILE-after.png"
+    xcrun simctl terminate "$DEVICE_ID" "$BUNDLE_ID" || true
+    IFS=','
+    continue
+  fi
   # [EN] Network icons are downloaded, a switch happens 4 s after launch: give them longer. [CN] 网络图标需要下载、切换在启动 4 秒后发生：多等一会。
   WAIT=8
   [ "$THEME" = "Network" ] && WAIT=20

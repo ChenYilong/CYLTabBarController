@@ -509,9 +509,25 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
         //      then a color skin, with a plus button and its child view controller).
         // [CN] `-CYLDemoThemeSwitchTo <identifier>`（scripts/theme-screenshots.sh）：启动几秒后切换到该主题，与点击换肤按钮相同，
         //      用于检查运行时切换主题（例如带 PlusButton 及其子控制器时，先节日皮肤、再配色主题）。
-        NSString *switchIdentifier = [[NSUserDefaults standardUserDefaults] stringForKey:@"CYLDemoThemeSwitchTo"];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        // [EN] `-CYLDemoSelectIndex <n>` selects tab n 2 s after launch, as a tap does (e.g. 2: the plus child view controller,
+        //      to check that the plus button stays sharp in the Liquid Glass selected layer before and after a theme switch).
+        //      `-CYLDemoThemeSwitchDelay <seconds>` delays the switch (default 4).
+        // [CN] `-CYLDemoSelectIndex <n>` 在启动 2 秒后选中第 n 个 Tab，与点击相同（例如 2：PlusButton 子控制器，用于检查换肤前后液态玻璃
+        //      选中图层中的 PlusButton 是否保持清晰）。`-CYLDemoThemeSwitchDelay <秒>` 推迟切换（默认 4）。
+        if ([defaults objectForKey:@"CYLDemoSelectIndex"]) {
+            NSInteger selectIndex = [defaults integerForKey:@"CYLDemoSelectIndex"];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                CYLTabBarController *tabBarController = [CYLTabBarController cyl_activeTabBarController];
+                if (selectIndex >= 0 && (NSUInteger)selectIndex < tabBarController.viewControllers.count) {
+                    tabBarController.selectedIndex = (NSUInteger)selectIndex;
+                }
+            });
+        }
+        NSString *switchIdentifier = [defaults stringForKey:@"CYLDemoThemeSwitchTo"];
+        double switchDelay = [defaults objectForKey:@"CYLDemoThemeSwitchDelay"] ? [defaults doubleForKey:@"CYLDemoThemeSwitchDelay"] : 4;
         if (switchIdentifier.length > 0) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(switchDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 for (CYLDemoTheme *theme in CYLDemoThemes()) {
                     if ([theme.identifier isEqualToString:switchIdentifier]) {
                         CYLDemoApplyTheme(theme);
