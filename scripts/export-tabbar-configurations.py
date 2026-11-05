@@ -356,7 +356,12 @@ def evaluate_geometry(e):
     for selector, function, label, initializer, count in GEOMETRY:
         objc = message_arguments(e, 'NSValue', [selector])
         swift = call_arguments(e, 'NSValue', [label])
-        inside = call_inside(objc[0], function) if objc else (call_inside(swift[0], initializer) if swift else None)
+        if objc:
+            inside = call_inside(objc[0], function)
+        elif swift:
+            inside = call_inside(swift[0], initializer)
+        else:
+            inside = None
         values = numbers(inside, count) if inside is not None else None
         if values:
             return fmt_numbers(values)
@@ -386,15 +391,26 @@ def font_weight_name(weight):
     return weight.strip().replace('UIFontWeight', '').split('.')[-1].lower()
 
 
+def system_font_value(bold, values):
+    """A size or "weight:size" from the arguments of a system font, else NOT_MATCHED. 系统字体参数对应的值。"""
+    size = number(values[0]) if values else None
+    if size is None:
+        return NOT_MATCHED
+    if bold:
+        weight = 'bold'
+    elif len(values) > 1:
+        weight = font_weight_name(values[1])
+    else:
+        weight = ''
+    return '%s:%s' % (weight, size) if weight and weight != 'regular' else size
+
+
 def evaluate_font(e):
     """System fonts -> a size or "weight:size"; named fonts -> "Name:size". 系统字体与命名字体。"""
     for bold, parts, callee, labels in SYSTEM_FONTS:
-        values = arguments_of(e, ('UIFont', parts), (callee, labels))
-        size = number(values[0]) if values else None
-        if size is None:
-            continue
-        weight = 'bold' if bold else (font_weight_name(values[1]) if len(values) > 1 else '')
-        return '%s:%s' % (weight, size) if weight and weight != 'regular' else size
+        value = system_font_value(bold, arguments_of(e, ('UIFont', parts), (callee, labels)))
+        if value is not NOT_MATCHED:
+            return value
     values = arguments_of(e, ('UIFont', ['fontWithName', 'size']), ('UIFont', ['name', 'size']))
     name, size = (string_value(values[0]), number(values[1])) if values else (None, None)
     if name is not None and size is not None:
@@ -458,9 +474,8 @@ def assigned_name(head):
     m = re.fullmatch(r'NSDictionary(?:\s*<[^>]*>)?\s*\*\s*(\w+)', left[index:]) if index >= 0 else None
     if m:
         return m.group(1)
-    declaration = None
-    for declaration in re.finditer(r'(?:let|var)\s+(\w+)', left):
-        pass
+    declarations = list(re.finditer(r'(?:let|var)\s+(\w+)', left))
+    declaration = declarations[-1] if declarations else None
     rest = left[declaration.end():].strip() if declaration else None
     if rest is not None and (not rest or (len(rest) > 1 and rest.startswith(':') and '=' not in rest)):
         return declaration.group(1)

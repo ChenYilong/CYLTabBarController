@@ -41,20 +41,23 @@ def is_identifier_character(c):
     return c.isalnum() or c == '_'
 
 
+INTERFACE = '@interface '
+
+
 # 1. Properties -> explicit ivars + @synthesize. 属性 -> 显式实例变量 + @synthesize。
 
 def interface_bodies(src):
     """[EN] (class name, body) of every @interface ... @end, found without backtracking regexes.
     [CN] 每个 @interface ... @end 的（类名，内容），不使用会回溯的正则。"""
-    position = src.find('@interface ')
+    position = src.find(INTERFACE)
     while position >= 0:
-        name = re.match(r'\w+', src[position + len('@interface '):])
+        name = re.match(r'\w+', src[position + len(INTERFACE):])
         line_end = src.find('\n', position)
         end = src.find('@end', line_end) if line_end >= 0 else -1
         if not name or end < 0:
             return
         yield name.group(0), src[line_end + 1:end]
-        position = src.find('@interface ', end + len('@end'))
+        position = src.find(INTERFACE, end + len('@end'))
 
 
 def properties(body):
@@ -71,7 +74,8 @@ def properties(body):
 
 
 def synthesize_properties(src):
-    for name, body in list(interface_bodies(src)):
+    # [EN] The generator reads the original text; `src` is rebound below. [CN] 生成器读取原始文本；下面重新绑定 `src`。
+    for name, body in interface_bodies(src):
         declared = properties(body)
         if not declared:
             continue
