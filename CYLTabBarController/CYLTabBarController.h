@@ -45,6 +45,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Item-Colors.md
 //   - Built-in Actions for Tapping the Selected Tab / 重复点击已选中 Tab 的内置操作
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Reselect.md
+//   - Tab bar customization toolkit / TabBar 自定义工具集
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Customization-Toolkit.md
 //   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Minimize-On-Scroll.md
 //   - Tab bar item gestures: reselect, double tap and long press / TabBarItem 手势：再次点击、双击与长按
@@ -496,6 +498,7 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  *      （或设置 `cyl_didLongPressControlBlock`）即开启长按；长按后抬起手指不会再选中该 Tab。见 `CYLTabBarController (CYLInteraction)`。
  */
 - (void)tabBarController:(CYLTabBarController *)tabBarController didLongPressControl:(UIControl *)control;
+
 
 /*!
  * [EN] Whether a tap on the tab of `viewController` runs your own action instead of selecting it (a custom action tab, e.g. a
@@ -1716,6 +1719,77 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      主题切换时会自动调用。
  */
 - (void)cyl_applyTabBarTheme:(nullable id)theme;
+
+@end
+
+#pragma mark - Item styles in one place
+
+/*!
+ * [EN] The common tab bar styles in one place, for this tab bar controller, in every style: title fonts and colors, icon
+ *      colors, the background and the separator line. iOS 13+: written into `tabBar.standardAppearance` (and
+ *      `scrollEdgeAppearance` when there is one) for the stacked, inline and compact inline layouts, so they hold in
+ *      landscape and on iPad, and FlatDesign follows; before iOS 13: the classic `UITabBarItem` / `UITabBar` styles.
+ *      Applied at once and again after a theme change (see `CYLTabBarTheme`), so they win over a theme's appearance.
+ *      nil leaves the current value as it is. Set them after `tabBar.standardAppearance` if you also assign one. They
+ *      are written again when the tab bar controller first appears, so they can be set right after init. For the same
+ *      styles in every tab bar controller of the app, set them in a subclass's `-cyl_didInitialize`.
+ * [CN] 在一处设置常用的 TabBar 样式，作用于本 TabBarController，适用于所有样式：标题字体与颜色、图标颜色、背景与分割线。
+ *      iOS 13+：写入 `tabBar.standardAppearance`（存在 `scrollEdgeAppearance` 时也写入）的纵向、横向、紧凑横向三种布局，因此横屏与 iPad
+ *      上同样生效，扁平样式随之更新；iOS 13 以前：使用经典的 `UITabBarItem` / `UITabBar` 样式。立即生效，主题切换后（见
+ *      `CYLTabBarTheme`）再次应用，因此优先于主题的外观。nil 表示保持当前值。如果还要直接设置 `tabBar.standardAppearance`，请先设置它。
+ *      TabBarController 首次显示时会再写入一次，因此可以在初始化后立即设置。需要 App 中所有 TabBarController 使用相同样式时，
+ *      在子类的 `-cyl_didInitialize` 中设置即可。
+ */
+@interface CYLTabBarController (CYLTabBarItemStyle)
+
+/// [EN] Title font of unselected tabs (and of selected ones without `cyl_tabBarItemSelectedTitleFont`). [CN] 未选中 Tab 的标题字体（未设置 `cyl_tabBarItemSelectedTitleFont` 时也用于选中的 Tab）。
+@property (nonatomic, strong, nullable) UIFont *cyl_tabBarItemTitleFont;
+/// [EN] Title font of the selected tab. [CN] 选中 Tab 的标题字体。
+@property (nonatomic, strong, nullable) UIFont *cyl_tabBarItemSelectedTitleFont;
+/// [EN] Title color of unselected tabs. [CN] 未选中 Tab 的标题颜色。
+@property (nonatomic, strong, nullable) UIColor *cyl_tabBarItemTitleColor;
+/// [EN] Title color of the selected tab. [CN] 选中 Tab 的标题颜色。
+@property (nonatomic, strong, nullable) UIColor *cyl_tabBarItemSelectedTitleColor;
+/// [EN] Icon color of unselected tabs (template images). [CN] 未选中 Tab 的图标颜色（模板图片）。
+@property (nonatomic, strong, nullable) UIColor *cyl_tabBarItemImageColor;
+/// [EN] Icon color of the selected tab (template images). [CN] 选中 Tab 的图标颜色（模板图片）。
+@property (nonatomic, strong, nullable) UIColor *cyl_tabBarItemSelectedImageColor;
+/// [EN] Background color of the tab bar. [CN] TabBar 背景色。
+@property (nonatomic, strong, nullable) UIColor *cyl_tabBarBackgroundColor;
+/// [EN] Color of the separator line on top of the tab bar; `UIColor.clearColor` hides it. [CN] TabBar 顶部分割线的颜色；`UIColor.clearColor` 隐藏分割线。
+@property (nonatomic, strong, nullable) UIColor *cyl_tabBarShadowColor;
+
+/*!
+ * [EN] For subclasses: called once from every initializer (`-initWithNibName:bundle:`, `-initWithCoder:`, and so the
+ *      `-initWithViewControllers:...` ones), before the view controllers are set. Call super.
+ * [CN] 供子类重写：每个初始化方法（`-initWithNibName:bundle:`、`-initWithCoder:`，以及由此调用的 `-initWithViewControllers:...`）都会调用
+ *      一次，早于设置 viewControllers。请调用 super。
+ */
+- (void)cyl_didInitialize NS_REQUIRES_SUPER;
+
+@end
+
+#pragma mark - Opaque tab bar safe area
+
+/*!
+ * [EN] UIKit bug: a page that extends under an opaque tab bar (`tabBar.translucent = NO` with
+ *      `extendedLayoutIncludesOpaqueBars = YES`; before iOS 13.4 also a translucent bar) gets a bottom safe area without
+ *      the tab bar, so the end of its scroll view stays under the bar. The library fixes it for the page shown in the
+ *      selected tab, see `cyl_fixesOpaqueTabBarSafeAreaInsets`.
+ * [CN] UIKit bug：延伸到不透明 TabBar 下方的页面（`tabBar.translucent = NO` 且 `extendedLayoutIncludesOpaqueBars = YES`；iOS 13.4 以前
+ *      半透明 TabBar 也有此问题）的底部安全区域不包含 TabBar，滚动视图末尾因此被遮挡。本库会为选中 Tab 当前显示的页面修正，见
+ *      `cyl_fixesOpaqueTabBarSafeAreaInsets`。
+ */
+@interface CYLTabBarController (CYLOpaqueTabBarSafeArea)
+
+/*!
+ * [EN] Default YES. The page now shown in the selected tab gets the missing part in `additionalSafeAreaInsets.bottom`,
+ *      on top of the app's own value (kept); 0 when UIKit is right, taken back when the page is no longer affected. Only
+ *      the page itself, never its child view controllers; the system tab bar only (FlatDesign sets the safe area itself).
+ * [CN] 默认 YES。选中 Tab 当前显示的页面在 `additionalSafeAreaInsets.bottom` 中补上缺少的部分，App 自己的值保留；UIKit 计算正确时为 0，
+ *      页面不再受影响时撤回。只作用于页面本身，不作用于其子控制器；仅系统 TabBar（扁平样式自行设置安全区域）。
+ */
+@property (nonatomic, assign) BOOL cyl_fixesOpaqueTabBarSafeAreaInsets;
 
 @end
 

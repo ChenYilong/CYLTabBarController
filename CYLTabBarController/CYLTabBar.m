@@ -71,6 +71,8 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
 @property (nonatomic, assign) CGFloat cyl_itemLayoutSpacing;
 /// FIX: issue #488. The token of the block-based Lottie observer: `-removeObserver:self` cannot remove it.
 @property (nonatomic, strong, nullable) id<NSObject> cyl_lottieAnimationPlayingObserver;
+/// [EN] While the library sets a classic style for itself: not synced to the appearances. [CN] 本库自己设置经典样式期间：不同步到 appearance。
+@property (nonatomic, assign) BOOL cyl_isSettingClassicStyleInternally;
 
 @end
 
@@ -79,6 +81,11 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
 @interface CYLPlusButton (CYLTabBarLayout)
 - (BOOL)cyl_isCenteredWithoutTitle;
 - (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center;
+@end
+
+/// [EN] Implemented in CYLTabBarController.m. [CN] 实现于 CYLTabBarController.m。
+@interface CYLTabBarController (CYLOpaqueTabBarSafeAreaFix)
+- (void)cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded;
 @end
 
 @implementation CYLTabBar
@@ -113,6 +120,7 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
 }
 
 - (instancetype)sharedInit {
+    _syncsClassicStylesToAppearance = YES;
     // [CN] KVO注册监听
     // [EN] Register KVO observers
     _tabBarItemWidth = self.cyl_tabBarItemWidth;
@@ -300,9 +308,140 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
                 }];
             }];
         }
+        // [EN] The color the items already show: not an app's style to sync. [CN] item 当前已显示的颜色：不是需要同步的 App 样式。
+        self.cyl_isSettingClassicStyleInternally = YES;
         self.unselectedItemTintColor = tabLabelTextColor;
+        self.cyl_isSettingClassicStyleInternally = NO;
     }
 #endif
+}
+
+#pragma mark - Classic styles and UITabBarAppearance
+
+/*!
+ * [EN] Since iOS 13, once a tab bar uses `UITabBarAppearance` (any `standardAppearance = ...`), UIKit ignores the classic
+ *      styles (`tintColor`, `barTintColor`, `unselectedItemTintColor`, `backgroundImage`, `shadowImage`, `barStyle`).
+ *      Each classic setter therefore also writes its value into `standardAppearance` (and `scrollEdgeAppearance` when
+ *      there is one), so both ways of styling keep working together. Only a value that changed is written. Not with
+ *      Liquid Glass, where the system draws the bar, nor while `syncsClassicStylesToAppearance` is NO.
+ * [CN] iOS 13 起，TabBar 一旦使用 `UITabBarAppearance`（任何 `standardAppearance = ...`），UIKit 就会忽略经典样式（`tintColor`、
+ *      `barTintColor`、`unselectedItemTintColor`、`backgroundImage`、`shadowImage`、`barStyle`）。因此每个经典 setter 同时把值写入
+ *      `standardAppearance`（存在 `scrollEdgeAppearance` 时也写入），两种设置方式可以同时使用。只写入发生变化的值。液态玻璃（由系统
+ *      绘制 TabBar）以及 `syncsClassicStylesToAppearance` 为 NO 时不同步。
+ */
+- (BOOL)cyl_shouldSyncClassicStyle {
+    if (@available(iOS 13.0, *)) {
+        return self.syncsClassicStylesToAppearance && !self.cyl_isSettingClassicStyleInternally && ![CYLUtils isLiquidGlassActive];
+    }
+    return NO;
+}
+
+- (void)cyl_syncClassicStyleWithBarBlock:(nullable void (^)(UITabBarAppearance *appearance))barBlock
+                               itemBlock:(nullable void (^)(UITabBarItemAppearance *itemAppearance))itemBlock API_AVAILABLE(ios(13.0)) {
+    void (^apply)(UITabBarAppearance *) = ^(UITabBarAppearance *appearance) {
+        if (barBlock) {
+            barBlock(appearance);
+        }
+        if (itemBlock) {
+            [appearance cyl_applyItemAppearanceWithBlock:itemBlock];
+        }
+    };
+    UITabBarAppearance *standardAppearance = [self.standardAppearance copy];
+    apply(standardAppearance);
+    self.standardAppearance = standardAppearance;
+    if (@available(iOS 15.0, *)) {
+        if (self.scrollEdgeAppearance) {
+            UITabBarAppearance *scrollEdgeAppearance = [self.scrollEdgeAppearance copy];
+            apply(scrollEdgeAppearance);
+            self.scrollEdgeAppearance = scrollEdgeAppearance;
+        }
+    }
+}
+
+/// [EN] `attributes` with the foreground color replaced (removed for nil). [CN] 替换（为 nil 时移除）前景色后的 `attributes`。
+static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDictionary<NSAttributedStringKey, id> *attributes, UIColor *_Nullable color) {
+    NSMutableDictionary<NSAttributedStringKey, id> *result = [attributes mutableCopy] ?: [NSMutableDictionary dictionary];
+    result[NSForegroundColorAttributeName] = color;
+    return [result copy];
+}
+
+- (void)setTintColor:(UIColor *)tintColor {
+    [super setTintColor:tintColor];
+    if (!tintColor || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:nil itemBlock:^(UITabBarItemAppearance *itemAppearance) {
+            itemAppearance.selected.iconColor = tintColor;
+            itemAppearance.selected.titleTextAttributes = CYLTitleAttributesWithColor(itemAppearance.selected.titleTextAttributes, tintColor);
+        }];
+    }
+}
+
+- (void)setUnselectedItemTintColor:(UIColor *)unselectedItemTintColor {
+    BOOL changed = !(unselectedItemTintColor == self.unselectedItemTintColor || [unselectedItemTintColor isEqual:self.unselectedItemTintColor]);
+    [super setUnselectedItemTintColor:unselectedItemTintColor];
+    if (!changed || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:nil itemBlock:^(UITabBarItemAppearance *itemAppearance) {
+            itemAppearance.normal.iconColor = unselectedItemTintColor;
+            itemAppearance.normal.titleTextAttributes = CYLTitleAttributesWithColor(itemAppearance.normal.titleTextAttributes, unselectedItemTintColor);
+        }];
+    }
+}
+
+- (void)setBarTintColor:(UIColor *)barTintColor {
+    BOOL changed = !(barTintColor == self.barTintColor || [barTintColor isEqual:self.barTintColor]);
+    [super setBarTintColor:barTintColor];
+    if (!changed || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:^(UITabBarAppearance *appearance) {
+            appearance.backgroundColor = barTintColor;
+        } itemBlock:nil];
+    }
+}
+
+- (void)setBackgroundImage:(UIImage *)backgroundImage {
+    BOOL changed = (backgroundImage != self.backgroundImage);
+    [super setBackgroundImage:backgroundImage];
+    if (!changed || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:^(UITabBarAppearance *appearance) {
+            appearance.backgroundImage = backgroundImage;
+        } itemBlock:nil];
+    }
+}
+
+- (void)setShadowImage:(UIImage *)shadowImage {
+    BOOL changed = (shadowImage != self.shadowImage);
+    [super setShadowImage:shadowImage];
+    if (!changed || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:^(UITabBarAppearance *appearance) {
+            appearance.shadowImage = shadowImage;
+        } itemBlock:nil];
+    }
+}
+
+- (void)setBarStyle:(UIBarStyle)barStyle {
+    BOOL changed = (barStyle != self.barStyle);
+    [super setBarStyle:barStyle];
+    if (!changed || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:^(UITabBarAppearance *appearance) {
+            appearance.backgroundEffect = [UIBlurEffect effectWithStyle:(barStyle == UIBarStyleDefault) ? UIBlurEffectStyleSystemChromeMaterialLight : UIBlurEffectStyleSystemChromeMaterialDark];
+        } itemBlock:nil];
+    }
 }
 
 - (void)layoutSubviews {
@@ -329,6 +468,11 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
     // The tab titles may have moved: lay the plus button out again so its title follows them
     // (`+alignsTitleWithTabBarItemTitles`).
     [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];
+    [self cyl_fixTruncatedTabTitlesIfNeeded];
+    [self cyl_runItemLayoutBlocks];
+    // [EN] The bar is laid out again when it comes back after a pop: check the page's safe area under an opaque bar.
+    // [CN] pop 返回后 TabBar 会重新布局：检查不透明 TabBar 下页面的安全区域。
+    [self.tabBarController cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded];
     // [EN] The Liquid Glass selected layer can appear in a tab bar layout pass only: put the plus button's stand-in in it
     //      now rather than after a fixed delay. Idempotent; does nothing without Liquid Glass or a plus button.
     // [CN] 液态玻璃的选中层可能只在 TabBar 的布局中出现：此时就放入 PlusButton 的替身，而不是固定延迟之后。可重复调用；没有液态玻璃
@@ -338,6 +482,52 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
     CYLTabBarController *owningTabBarController = self.tabBarController;
     if (owningTabBarController.cyl_tabBar == self) {
         [owningTabBarController cyl_layOutPlusButtonInLiquidGlassLayers];
+    }
+}
+
+/*!
+ * [EN] UIKit bug on iOS 13 and 14: a tab title styled through `UITabBarAppearance` with a font larger than the default
+ *      (iOS 13), bold (iOS 13 and 14), or with a changed inline title color (iOS 14) keeps a too small width and is cut
+ *      off ("Mi…"). After UIKit's
+ *      layout, a title narrower than its text is widened to fit (at most the button's width) around the same center.
+ *      Fixed by Apple in iOS 15; nothing is done there.
+ * [CN] iOS 13、14 的 UIKit bug：通过 `UITabBarAppearance` 设置的 Tab 标题字号大于默认值（iOS 13）、为粗体（iOS 13、14），或修改了
+ *      横向布局的标题颜色（iOS 14）时，宽度不足，被截断（“我…”）。在 UIKit 布局之后，宽度不足以显示文字的标题会以原中心加宽到合适宽度（不超过按钮宽度）。
+ *      iOS 15 起系统已修复，不做处理。
+ */
+- (void)cyl_fixTruncatedTabTitlesIfNeeded {
+    if (@available(iOS 15.0, *)) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        // [EN] Any title narrower than its text: on iOS 14 a changed inline title color cuts titles off too, not only bold.
+        // [CN] 任何宽度不足以显示文字的标题：iOS 14 上修改横向布局的标题颜色同样会截断标题，不只是粗体。
+        for (UIControl *tabButton in self.tabBarButtonArray) {
+            UILabel *label = [tabButton cyl_tabLabel];
+            if (!label || label.text.length == 0) {
+                continue;
+            }
+            CGSize fittingSize = [label sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
+            if (fittingSize.width <= CGRectGetWidth(label.bounds) + 0.5) {
+                continue;
+            }
+            CGPoint center = label.center;
+            CGRect bounds = label.bounds;
+            bounds.size.width = MIN(ceil(fittingSize.width), CGRectGetWidth(tabButton.bounds));
+            label.bounds = bounds;
+            label.center = center;
+        }
+    }
+}
+
+/// [EN] `-[UITabBarItem cyl_viewDidLayoutSubviewsBlock]` of every item, after the layout. [CN] 布局之后执行各 item 的 `cyl_viewDidLayoutSubviewsBlock`。
+- (void)cyl_runItemLayoutBlocks {
+    for (UITabBarItem *item in self.items) {
+        void (^block)(UITabBarItem *, UIView *) = item.cyl_viewDidLayoutSubviewsBlock;
+        UIView *view = block ? item.cyl_tabButton : nil;
+        if (view) {
+            block(item, view);
+        }
     }
 }
 
@@ -1687,3 +1877,88 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 
 @end
 
+#pragma mark - Background, shadow and blur
+
+@implementation UITabBar (CYLBarBackground)
+
+- (nullable UIView *)cyl_backgroundView {
+    return [self cyl_valueForKey:@"_backgroundView"];
+}
+
+- (nullable UIImageView *)cyl_shadowImageView {
+    return self.cyl_tabShadowImageView;
+}
+
+- (nullable NSArray<UIVisualEffectView *> *)cyl_effectViews {
+    NSMutableArray<UIVisualEffectView *> *effectViews = [NSMutableArray array];
+    for (UIView *subview in self.cyl_backgroundView.subviews) {
+        // [EN] Exactly UIVisualEffectView: the shadow is drawn by a subclass. [CN] 必须恰好是 UIVisualEffectView：阴影由其子类绘制。
+        if ([subview isMemberOfClass:[UIVisualEffectView class]]) {
+            [effectViews addObject:(UIVisualEffectView *)subview];
+        }
+    }
+    return effectViews.count > 0 ? [effectViews copy] : nil;
+}
+
+- (nullable UIVisualEffectView *)cyl_effectView {
+    UIVisualEffectView *visibleEffectView = nil;
+    for (UIVisualEffectView *effectView in self.cyl_effectViews) {
+        if (!effectView.hidden && effectView.alpha > 0.01) {
+            visibleEffectView = effectView;
+        }
+    }
+    return visibleEffectView;
+}
+
+/// [EN] Writes into `standardAppearance` and `scrollEdgeAppearance` (when there is one). [CN] 写入 `standardAppearance` 与 `scrollEdgeAppearance`（存在时）。
+- (void)cyl_updateAppearancesWithBlock:(void (^)(UITabBarAppearance *appearance))block API_AVAILABLE(ios(13.0)) {
+    UITabBarAppearance *standardAppearance = [self.standardAppearance copy];
+    block(standardAppearance);
+    self.standardAppearance = standardAppearance;
+    if (@available(iOS 15.0, *)) {
+        if (self.scrollEdgeAppearance) {
+            UITabBarAppearance *scrollEdgeAppearance = [self.scrollEdgeAppearance copy];
+            block(scrollEdgeAppearance);
+            self.scrollEdgeAppearance = scrollEdgeAppearance;
+        }
+    }
+}
+
+- (nullable UIBlurEffect *)cyl_backgroundEffect {
+    if (@available(iOS 13.0, *)) {
+        return self.standardAppearance.backgroundEffect;
+    }
+    UIVisualEffect *effect = self.cyl_effectView.effect;
+    return [effect isKindOfClass:[UIBlurEffect class]] ? (UIBlurEffect *)effect : nil;
+}
+
+- (void)cyl_setBackgroundEffect:(nullable UIBlurEffect *)backgroundEffect {
+    if (@available(iOS 13.0, *)) {
+        [self cyl_updateAppearancesWithBlock:^(UITabBarAppearance *appearance) {
+            appearance.backgroundEffect = backgroundEffect;
+        }];
+        return;
+    }
+    for (UIVisualEffectView *effectView in self.cyl_effectViews) {
+        effectView.effect = backgroundEffect;
+    }
+}
+
+- (nullable UIColor *)cyl_effectForegroundColor {
+    if (@available(iOS 13.0, *)) {
+        return self.standardAppearance.backgroundColor;
+    }
+    return self.barTintColor;
+}
+
+- (void)cyl_setEffectForegroundColor:(nullable UIColor *)effectForegroundColor {
+    if (@available(iOS 13.0, *)) {
+        [self cyl_updateAppearancesWithBlock:^(UITabBarAppearance *appearance) {
+            appearance.backgroundColor = effectForegroundColor;
+        }];
+        return;
+    }
+    self.barTintColor = effectForegroundColor;
+}
+
+@end
