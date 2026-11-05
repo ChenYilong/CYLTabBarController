@@ -9,6 +9,12 @@
 
 /// [EN] Private: marks a left-out tab; the same key as in CYLTabBarController.m. [CN] 私有：标记被排除的 Tab；与 CYLTabBarController.m 中的键相同。
 static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
+/*!
+ * [EN] Private: marks the entry the tab bar controller inserts for the PlusButton slot; the same key as in
+ *      CYLTabBarController.m (#774).
+ * [CN] 私有：标记 TabBarController 为 PlusButton 的 slot 插入的一项；与 CYLTabBarController.m 中的键相同（#774）。
+ */
+static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlusSlotPlaceholder";
 #include <math.h>
 
 #pragma mark - Value conversion
@@ -839,6 +845,12 @@ static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nulla
         NSMutableArray<NSDictionary *> *normalizedItems = [NSMutableArray array];
         if ([items isKindOfClass:[NSArray class]]) {
             for (id item in (NSArray *)items) {
+                if ([item isKindOfClass:[NSDictionary class]] && [((NSDictionary *)item)[CYLTabBarItemPlusSlotPlaceholderKey] boolValue]) {
+                    // The slot's entry from an existing tab bar controller (its `tabBarItemsAttributes` re-used): not an app tab;
+                    // the slot is inserted again, once (B26).
+                    // 已有 TabBarController 的 slot 项（复用其 `tabBarItemsAttributes`）：不是 App 的 Tab；slot 会重新插入且只插入一次（B26）。
+                    continue;
+                }
                 if ([item isKindOfClass:[NSDictionary class]]) {
                     NSDictionary *normalizedItem = CYLNormalizedItemAttributes(item);
                     NSString *reason = CYLExclusionReason(normalizedItem);
