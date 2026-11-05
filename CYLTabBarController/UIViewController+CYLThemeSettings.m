@@ -479,17 +479,19 @@ static BOOL CYLDemoSameImage(UIImage *image, UIImage *otherImage) {
  *      plus child view controller selected on Liquid Glass, the plus button's stand-in in the selected layer
  *      (`selectedContentView`) must show one of the plus button's own current images; an image the plus button no
  *      longer has is the stale stand-in that looked blurred. Logs "plus child theme test: PASS|FAIL|SKIP <phase> ...".
+ *      Returns the plus button when its stand-in is shown (for the "stand-in only" step), else nil.
  * [CN] PlusButton 子控制器换肤测试（docs/Plus-Child-Theme-Switching-Test.md、scripts/plus-child-theme-test.sh）：在液态玻璃上选中
  *      PlusButton 子控制器时，选中图层中的 PlusButton 替身（`selectedContentView`）必须显示 PlusButton 自己当前的某张图片；显示 PlusButton
  *      已经没有的图片，就是看起来模糊的过期替身。输出 "plus child theme test: PASS|FAIL|SKIP <阶段> ..."。
+ *      替身已显示时返回 PlusButton（用于“只看替身”步骤），否则返回 nil。
  */
-static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
+static UIButton *CYLDemoCheckPlusChildStandIn(NSString *phase) {
     CYLTabBarController *tabBarController = [CYLTabBarController cyl_activeTabBarController];
     CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
     NSString *theme = CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier;
     if (!plusButton) {
         CYLDemoTestLog(@"plus child theme test: SKIP %@ theme=%@: no plus button", phase, theme);
-        return;
+        return nil;
     }
     // [EN] Liquid Glass active AND not the FlatDesign style, as in master: the FlatDesign tab bar has no selected layer,
     //      even on iOS 26 where `+isLiquidGlassActive` is YES.
@@ -498,12 +500,12 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
     BOOL isLiquidGlassTabBar = (CYLTabBarStyleTypeFlatDesign != tabBarController.tabBarStyleType && [CYLConstants isLiquidGlassActive]);
     if (!isLiquidGlassTabBar) {
         CYLDemoTestLog(@"plus child theme test: SKIP %@ theme=%@: no stand-in outside the Liquid Glass tab bar", phase, theme);
-        return;
+        return nil;
     }
     UIButton *standIn = plusButton.selectedContentView;
     if (!standIn || standIn == plusButton || !standIn.window) {
         CYLDemoTestLog(@"plus child theme test: FAIL %@ theme=%@ selectedIndex=%@: the stand-in is not shown", phase, theme, @(tabBarController.selectedIndex));
-        return;
+        return nil;
     }
     UIImage *shown = standIn.currentImage;
     BOOL matches = NO;
@@ -582,17 +584,7 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
           @(plusButton.highlighted), plusMask ? NSStringFromCGRect(plusMask.frame) : @"none",
           plusMask ? NSStringFromCGRect(CGPathGetPathBoundingBox(plusMask.path)) : @"none", @(plusButton.imageView.hidden),
           plusButton.imageView.alpha, NSStringFromCGRect(plusButton.imageView.frame), plusButton.layer.opacity);
-    // [EN] The stand-in alone, 3 s after the check (after the script's normal screenshot): the real plus button is hidden
-    //      for 2 s, and "stand-in only" lets the script take a screenshot.
-    // [CN] 只看替身：检查 3 秒后（脚本的普通截图之后）隐藏真实的 PlusButton 2 秒，"stand-in only" 让脚本截图。
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        CGFloat alpha = plusButton.alpha;
-        plusButton.alpha = 0;
-        CYLDemoTestLog(@"plus child theme test: stand-in only %@", phase);
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            plusButton.alpha = alpha;
-        });
-    });
+    return plusButton;
 }
 
 static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
@@ -686,38 +678,75 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
             }
         };
         if ([defaults objectForKey:@"CYLDemoSelectIndex"]) {
-            // [EN] The plus child theme test, as a chain: each step is scheduled from the moment the previous one ran, not
-            //      from launch. On a busy simulator the main thread can be blocked for seconds at launch; timers counted
-            //      from launch then fired together, so the "before" check and the switch ran back to back and the "before"
-            //      screenshot showed the new theme. Select tab n (2 s) → "before" check (3 s later; it hides the real plus
-            //      button 3 s after the check for 2 s) → switch (6 s after the check) → "after" check (3 s later) → "done"
-            //      (6 s after it). `-CYLDemoThemeSwitchDelay` is not used here.
-            // [CN] PlusButton 子控制器换肤测试，按链式执行：每一步都从上一步实际执行的时刻开始计时，而不是从启动开始。模拟器繁忙时主线程在启动阶段
-            //      可能被阻塞数秒；从启动开始计时的定时器会一起触发，导致 “before” 检查与切换紧挨着执行，“before” 截图已经是新主题。选中第 n 个
-            //      Tab（2 秒）→ “before” 检查（3 秒后；检查 3 秒后隐藏真实的 PlusButton 2 秒）→ 切换（检查 6 秒后）→ “after” 检查（3 秒后）→
-            //      “done”（其后 6 秒）。这里不使用 `-CYLDemoThemeSwitchDelay`。
+            // [EN] The plus child theme test, as a chain with a handshake: after each state to photograph, the app waits
+            //      until scripts/plus-child-theme-test.sh has saved its screenshot and created `tmp/ack-<step>` in the
+            //      app's data container (at most 30 s), then goes on. On CI a screenshot took from 1 s to more than 10 s,
+            //      so fixed delays let the app move on during the capture: the "before" screenshot showed the new theme,
+            //      or the plus button hidden for the "stand-in only" step. Steps: select tab n (2 s after launch) →
+            //      "before" check → ack → "stand-in only" (real plus button hidden) → ack → switch → "after" check (3 s
+            //      later) → ack → "stand-in only" → ack → "done". `-CYLDemoThemeSwitchDelay` is not used here.
+            // [CN] PlusButton 子控制器换肤测试，按链式执行并与脚本握手：每个需要截图的状态之后，App 等待 scripts/plus-child-theme-test.sh
+            //      保存截图并在 App 数据容器中创建 `tmp/ack-<步骤>`（最多 30 秒），然后继续。CI 上一次截图需要 1 秒到 10 秒以上，固定延时会让
+            //      App 在截图过程中继续执行：“before” 截图已经是新主题，或者截到为“只看替身”而隐藏的 PlusButton。步骤：选中第 n 个 Tab
+            //      （启动 2 秒后）→ “before” 检查 → ack → “只看替身”（隐藏真实 PlusButton）→ ack → 切换 → “after” 检查（3 秒后）→ ack →
+            //      “只看替身” → ack → “done”。这里不使用 `-CYLDemoThemeSwitchDelay`。
             NSInteger selectIndex = [defaults integerForKey:@"CYLDemoSelectIndex"];
             CYLDemoTestLog(@"plus child theme test: launch theme=%@", manager.currentThemeIdentifier);
-            void (^after)(dispatch_time_t, dispatch_block_t) = ^(dispatch_time_t delay, dispatch_block_t block) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)delay), dispatch_get_main_queue(), block);
+            void (^after)(NSTimeInterval, dispatch_block_t) = ^(NSTimeInterval seconds, dispatch_block_t block) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(seconds * NSEC_PER_SEC)), dispatch_get_main_queue(), block);
             };
-            after(2 * NSEC_PER_SEC, ^{
+            // [EN] Runs `block` once tmp/ack-<step> exists, or after 30 s. [CN] tmp/ack-<步骤> 出现后（或 30 秒后）执行 `block`。
+            __block void (^waitForAck)(NSString *, NSUInteger, dispatch_block_t);
+            void (^waitForAckBlock)(NSString *, NSUInteger, dispatch_block_t) = ^(NSString *step, NSUInteger tries, dispatch_block_t block) {
+                NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:[@"ack-" stringByAppendingString:step]];
+                if ([[NSFileManager defaultManager] fileExistsAtPath:path] || tries >= 120) {
+                    if (tries >= 120) {
+                        CYLDemoTestLog(@"plus child theme test: no ack for %@ after 30 s", step);
+                    }
+                    block();
+                    return;
+                }
+                after(0.25, ^{
+                    waitForAck(step, tries + 1, block);
+                });
+            };
+            waitForAck = waitForAckBlock;
+            // [EN] A check, its screenshot, then the stand-in alone and its screenshot. [CN] 检查并截图，然后只看替身并截图。
+            void (^checkAndPhotograph)(NSString *, dispatch_block_t) = ^(NSString *phase, dispatch_block_t next) {
+                UIButton *plusButton = CYLDemoCheckPlusChildStandIn(phase);
+                waitForAck(phase, 0, ^{
+                    if (!plusButton) {
+                        next();
+                        return;
+                    }
+                    CGFloat alpha = plusButton.alpha;
+                    plusButton.alpha = 0;
+                    after(0.5, ^{
+                        CYLDemoTestLog(@"plus child theme test: stand-in only %@", phase);
+                        waitForAck([@"stand-in-only-" stringByAppendingString:phase], 0, ^{
+                            plusButton.alpha = alpha;
+                            after(1, next);
+                        });
+                    });
+                });
+            };
+            after(2, ^{
                 CYLTabBarController *tabBarController = [CYLTabBarController cyl_activeTabBarController];
                 if (selectIndex >= 0 && (NSUInteger)selectIndex < tabBarController.viewControllers.count) {
                     tabBarController.selectedIndex = (NSUInteger)selectIndex;
                 }
-                after(3 * NSEC_PER_SEC, ^{
-                    CYLDemoCheckPlusChildStandIn(@"before");
-                    after(6 * NSEC_PER_SEC, ^{
+                after(3, ^{
+                    checkAndPhotograph(@"before", ^{
                         if (switchIdentifier.length == 0) {
                             CYLDemoTestLog(@"plus child theme test: done");
+                            waitForAck = nil;
                             return;
                         }
                         switchTheme();
-                        after(3 * NSEC_PER_SEC, ^{
-                            CYLDemoCheckPlusChildStandIn(@"after");
-                            after(6 * NSEC_PER_SEC, ^{
+                        after(3, ^{
+                            checkAndPhotograph(@"after", ^{
                                 CYLDemoTestLog(@"plus child theme test: done");
+                                waitForAck = nil;
                             });
                         });
                     });

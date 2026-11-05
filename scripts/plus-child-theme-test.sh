@@ -110,8 +110,9 @@ for SCENARIO in $SCENARIOS; do
   # [CN] App 把测试输出立即追加到其数据容器中的 tmp/plus-child-theme-test.log：`simctl launch --console-pty` 的控制台输出
   #      直到 App 关闭才传到本脚本。
   RUN_LOG="$(xcrun simctl get_app_container "$DEVICE_ID" "$BUNDLE_ID" data)/tmp/plus-child-theme-test.log"
-  rm -f "$RUN_LOG"
-  mkdir -p "$(dirname "$RUN_LOG")"
+  ACK_DIR="$(dirname "$RUN_LOG")"
+  rm -f "$RUN_LOG" "$ACK_DIR"/ack-*
+  mkdir -p "$ACK_DIR"
   : > "$RUN_LOG"
   echo "== $STYLE: $FROM > $TO (tab $SELECT_INDEX)"
   # shellcheck disable=SC2086
@@ -122,16 +123,20 @@ for SCENARIO in $SCENARIOS; do
   #      caught the home screen, or the theme before the switch. [CN] 每张截图都在 App 输出对应检查之后立即截取：启动可能需要
   #      数秒，从这里开始计算的固定延时曾截到主屏幕，或切换前的主题。
   for PHASE in before after; do
-    wait_for_line "plus child theme test: (PASS|FAIL|SKIP) $PHASE" 60 || true
+    wait_for_line "plus child theme test: (PASS|FAIL|SKIP) $PHASE" 90 || true
     xcrun simctl io "$DEVICE_ID" screenshot "$FILE-$PHASE.png" >/dev/null && echo "Saved $FILE-$PHASE.png"
+    # [EN] Handshake: the app waits for this file before it changes what is on screen (a screenshot can take more than
+    #      10 s on CI). [CN] 握手：App 等到这个文件出现才改变屏幕内容（CI 上一次截图可能超过 10 秒）。
+    touch "$ACK_DIR/ack-$PHASE"
     # [EN] Then the stand-in alone (the app hides the real plus button for 2 s, 3 s after the check); not after a SKIP.
     # [CN] 然后只截替身（App 在检查 3 秒后隐藏真实的 PlusButton 2 秒）；SKIP 之后不截。
     if ! grep -q "plus child theme test: SKIP $PHASE" "$RUN_LOG"; then
-      wait_for_line "plus child theme test: stand-in only $PHASE" 15 || true
+      wait_for_line "plus child theme test: stand-in only $PHASE" 40 || true
       xcrun simctl io "$DEVICE_ID" screenshot "$FILE-$PHASE-stand-in-only.png" >/dev/null && echo "Saved $FILE-$PHASE-stand-in-only.png"
+      touch "$ACK_DIR/ack-stand-in-only-$PHASE"
     fi
   done
-  wait_for_line "plus child theme test: done" 20 || true
+  wait_for_line "plus child theme test: done" 40 || true
   kill "$LAUNCH_PID" 2>/dev/null || true
   xcrun simctl terminate "$DEVICE_ID" "$BUNDLE_ID" 2>/dev/null || true
   cp "$RUN_LOG" "$OUT/$STYLE_SLUG-$SLUG.log" 2>/dev/null || true
