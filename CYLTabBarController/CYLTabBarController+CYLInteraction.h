@@ -140,7 +140,11 @@ typedef void (^CYLTabBarControllerDidLongPressControlBlock)(CYLTabBarController 
 /*!
  * [EN] Called on a long press on a tab button or the plus button, before `-tabBarController:didLongPressControl:`.
  *      With either of them, a long press no longer selects the tab when the finger lifts.
+ *      Liquid Glass: only the plus button reports a long press; the tab buttons' long press is off there, because it
+ *      froze UIKit's own tab switching (see docs/Liquid-Glass-Long-Press.md).
  * [CN] 长按 Tab 按钮或 PlusButton 时回调，先于 `-tabBarController:didLongPressControl:`。设置了任意一个时，长按后抬起手指不会再选中该 Tab。
+ *      液态玻璃：只有 PlusButton 上报长按；Tab 按钮的长按在液态玻璃下关闭，因为它会让系统自己的 Tab 切换卡死
+ *      （见 docs/Liquid-Glass-Long-Press.md）。
  */
 @property (nonatomic, copy, nullable, setter=cyl_setDidLongPressControlBlock:) CYLTabBarControllerDidLongPressControlBlock cyl_didLongPressControlBlock;
 

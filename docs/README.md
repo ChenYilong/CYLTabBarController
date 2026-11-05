@@ -21,6 +21,7 @@
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
+| [液态玻璃下的长按：修复切换 Tab 卡死](Liquid-Glass-Long-Press.md) | [Long Press in Liquid Glass: Fixing the Tab Switching Freeze](Liquid-Glass-Long-Press.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](Mac-CI-CD.md) |
@@ -70,6 +71,7 @@ docs/
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
 ├── Image-Only-Tabs.md
+├── Liquid-Glass-Long-Press.md
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
 ├── Mac-CI-CD.md
