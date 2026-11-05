@@ -589,6 +589,17 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     if (movedTitle.length == 0 || !systemTabBar || !container) {
         return nil;
     }
+    // [EN] FIX: placeholder count mismatch — first the tab button of the plus button's slot itself (its placeholder or
+    //      plus child view controller, `-cyl_viewControllerOfTabBarItem`): `tabBarItem.cyl_tabButton` is that tab's
+    //      button in the normal layer, so neither another layer's copy nor another tab with the same title can be taken.
+    //      Searching the whole tab bar by text, below, is only the fallback while that button is not known yet.
+    // [CN] FIX：占位导致的数量不匹配——先直接取 PlusButton 的 slot（占位控制器或 PlusButton 子控制器，`-cyl_viewControllerOfTabBarItem`）
+    //      对应的 Tab 按钮：`tabBarItem.cyl_tabButton` 就是该 Tab 在普通图层中的按钮，既不会取到其他图层的副本，也不会取到同名的其他 Tab。
+    //      下面按文字在整个 TabBar 中查找，只是该按钮尚不可知时的备选。
+    UILabel *slotLabel = [self cyl_titleLabel:movedTitle inSlotTabButtonNearX:x inView:container];
+    if (slotLabel) {
+        return slotLabel;
+    }
     UILabel *nearestLabel = nil;
     CGFloat nearestDistance = CGFLOAT_MAX;
     NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:systemTabBar];
@@ -615,6 +626,41 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
         [views addObjectsFromArray:view.subviews];
     }
     return nearestLabel;
+}
+
+/*!
+ * [EN] The label showing `title` in the normal-layer tab button of the plus button's slot, within half that button's width
+ *      of `x` (in `container`); nil when the slot's tab button is not known, not in the normal layer, or has no such label.
+ *      A hidden label counts: it stays laid out while the plus child view controller is selected.
+ * [CN] PlusButton 的 slot 在普通图层中的 Tab 按钮里显示 `title` 的标签，且与 `x`（在 `container` 中）的距离不超过该按钮宽度的一半；
+ *      slot 的 Tab 按钮未知、不在普通图层或没有该标签时返回 nil。隐藏的标签也可以：选中 PlusButton 子控制器时它仍保持布局。
+ */
+- (UILabel *)cyl_titleLabel:(NSString *)title inSlotTabButtonNearX:(CGFloat)x inView:(UIView *)container {
+    UIControl *slotTabButton = [self cyl_viewControllerOfTabBarItem].tabBarItem.cyl_tabButton;
+    if (![slotTabButton isKindOfClass:[UIControl class]] || !slotTabButton.window || slotTabButton == (UIControl *)self) {
+        return nil;
+    }
+    if ([CYLConstants isLiquidGlassActive] && !slotTabButton.cyl_isPlatterNormalControl) {
+        return nil;
+    }
+    NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:slotTabButton];
+    while (views.count > 0) {
+        UIView *view = views.firstObject;
+        [views removeObjectAtIndex:0];
+        if (view == self || view.cyl_isPlatterSelectedContentView) {
+            continue;
+        }
+        if ([view isKindOfClass:[UILabel class]]) {
+            UILabel *label = (UILabel *)view;
+            if ([label.text isEqualToString:title]) {
+                CGFloat distance = fabs([label.superview convertPoint:label.center toView:container].x - x);
+                return (distance <= CGRectGetWidth(slotTabButton.bounds) * 0.5) ? label : nil;
+            }
+            continue;
+        }
+        [views addObjectsFromArray:view.subviews];
+    }
+    return nil;
 }
 
 /*!
