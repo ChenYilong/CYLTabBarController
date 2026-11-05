@@ -90,53 +90,94 @@ object TabPages {
      *      [automaticFactories] 中查找；没有页面的 Tab 会被跳过。提供者抛出异常、返回错误类型或已被其他 Tab 使用的页面时会被拒绝
      *      （对应 iOS 的 C12、C13）。
      */
+    /**
+     * [EN] Options of [resolve]: the lookup order, a list that receives the skipped tabs, and existing pages by page ID
+     *      to reuse (a reload: a tab takes the next unused page of its ID before the sources are asked, so state is kept).
+     * [CN] [resolve] 的选项：查找顺序、接收被跳过 Tab 的列表，以及按页面 ID 分组、可复用的已有页面（重新加载：Tab 先取其 ID 下一个
+     *      未用的页面再查找来源，状态得以保留）。
+     */
+    data class Options<P : Any>(
+        val lookupOrder: List<PageSource> = PageSource.entries,
+        val skipped: MutableList<SkippedTab>? = null,
+        val reuse: Map<String, List<P>>? = null,
+    )
+
     fun <P : Any> resolve(
         tabs: List<TabItem>,
         pageClass: Class<P>,
         registry: TabPageRegistry<P>? = null,
         resolver: TabPageProvider<P>? = null,
         shared: TabPageRegistry<P>? = null,
-        lookupOrder: List<PageSource> = PageSource.entries,
-        skipped: MutableList<SkippedTab>? = null,
-        reuse: Map<String, List<P>>? = null,
+        options: Options<P> = Options(),
     ): List<Pair<TabItem, P>> {
-        // [EN] `reuse`: existing pages by page ID (a reload); a tab takes the next unused one of its ID before the sources
-        //      are asked, so state is kept. [CN] `reuse`：按页面 ID 分组的已有页面（重新加载）；Tab 先取其 ID 下一个未用的页面再查找来源，状态得以保留。
-        val available = reuse?.mapValues { ArrayDeque(it.value) }.orEmpty()
+        val available = options.reuse?.mapValues { ArrayDeque(it.value) }.orEmpty()
+        val lookup = Lookup(pageClass, registry, resolver, shared, options.lookupOrder, options.reuse?.values?.flatten().orEmpty())
         val pages = ArrayList<Pair<TabItem, P>>()
         for (tab in tabs) {
             val pageId = tab.pageId
             if (pageId == null) {
-                skip(skipped, SkippedTab(SkipReason.MISSING_IDENTIFIER, null, tab))
+                skip(options.skipped, SkippedTab(SkipReason.MISSING_IDENTIFIER, null, tab))
                 continue
             }
-            val reused = available[pageId]?.removeFirstOrNull()
-            if (reused != null) {
-                pages += tab to reused
-                continue
-            }
-            val candidates = lookupOrder.mapNotNull { source ->
-                when (source) {
-                    PageSource.INSTANCE -> registry?.provider(pageId)
-                    PageSource.RESOLVER -> resolver
-                    PageSource.SHARED -> shared?.provider(pageId)
-                    PageSource.AUTOMATIC -> automaticFactories[pageId]?.let { factory -> { _: String, item: TabItem -> pageClass.cast(factory.create(item)) } }
-                }?.let { source to it }
-            }
-            var page: P? = null
-            val problems = ArrayList<String>()
-            for ((source, provider) in candidates) {
-                page = call(provider, pageId, tab, pageClass, pages, reuse?.values?.flatten().orEmpty(), source.key, problems)
-                if (page != null) break
-            }
-            if (page == null) {
-                val reason = if (candidates.isEmpty()) SkipReason.UNREGISTERED else SkipReason.PROVIDER_FAILED
-                skip(skipped, SkippedTab(reason, pageId, tab, problems.joinToString("; ").ifEmpty { null }))
-                continue
-            }
-            pages += tab to page
+            val page = available[pageId]?.removeFirstOrNull() ?: lookup.page(pageId, tab, pages, options.skipped)
+            if (page != null) pages += tab to page
         }
         return pages
+    }
+
+    /** [EN] The sources of one resolution. [CN] 一次解析的来源。 */
+    private class Lookup<P : Any>(
+        val pageClass: Class<P>,
+        val registry: TabPageRegistry<P>?,
+        val resolver: TabPageProvider<P>?,
+        val shared: TabPageRegistry<P>?,
+        val order: List<PageSource>,
+        val reused: List<P>,
+    ) {
+        private fun provider(source: PageSource, pageId: String): TabPageProvider<P>? = when (source) {
+            PageSource.INSTANCE -> registry?.provider(pageId)
+            PageSource.RESOLVER -> resolver
+            PageSource.SHARED -> shared?.provider(pageId)
+            PageSource.AUTOMATIC -> automaticFactories[pageId]?.let { factory -> { _: String, item: TabItem -> pageClass.cast(factory.create(item)) } }
+        }
+
+        /** [EN] The first page a source gives, or null with the tab recorded in [skipped]. [CN] 第一个来源给出的页面；没有时返回 null 并记录到 [skipped]。 */
+        fun page(pageId: String, tab: TabItem, used: List<Pair<TabItem, P>>, skipped: MutableList<SkippedTab>?): P? {
+            val candidates = order.mapNotNull { source -> provider(source, pageId)?.let { source to it } }
+            val problems = ArrayList<String>()
+            for ((source, provider) in candidates) {
+                call(provider, pageId, tab, used, source.key, problems)?.let { return it }
+            }
+            val reason = if (candidates.isEmpty()) SkipReason.UNREGISTERED else SkipReason.PROVIDER_FAILED
+            skip(skipped, SkippedTab(reason, pageId, tab, problems.joinToString("; ").ifEmpty { null }))
+            return null
+        }
+
+        /**
+         * [EN] Calls a provider: an exception, null, a page of the wrong type or a page already used by another tab is
+         *      refused and explained in [problems] (iOS edge cases C12, C13).
+         * [CN] 调用提供者：异常、null、类型错误或已被其他 Tab 使用的页面会被拒绝，并在 [problems] 中说明（iOS 边界情况 C12、C13）。
+         */
+        private fun call(provider: TabPageProvider<P>, pageId: String, tab: TabItem, used: List<Pair<TabItem, P>>,
+                         source: String, problems: MutableList<String>): P? {
+            val page: Any? = try {
+                provider(pageId, tab)
+            } catch (error: Exception) {
+                problems += "$source threw $error"
+                return null
+            }
+            val problem = when {
+                page == null -> "$source returned null"
+                !pageClass.isInstance(page) -> "the page from $source is not a ${pageClass.simpleName}"
+                used.any { it.second === page } || reused.any { it === page } -> "the page from $source is already the page of another tab"
+                else -> null
+            }
+            if (problem != null) {
+                problems += problem
+                return null
+            }
+            return pageClass.cast(page)
+        }
     }
 
     private fun skip(skipped: MutableList<SkippedTab>?, tab: SkippedTab) {
@@ -144,26 +185,4 @@ object TabPages {
         println("CYLTabBar: the tab \"${tab.tab?.title.orEmpty()}\" (page ID ${tab.pageId ?: "missing"}) is skipped: ${tab.reason}${tab.detail?.let { " — $it" }.orEmpty()}")
     }
 
-    private fun <P : Any> call(provider: TabPageProvider<P>, pageId: String, tab: TabItem, pageClass: Class<P>,
-                               used: List<Pair<TabItem, P>>, reused: List<P>, source: String, problems: MutableList<String>): P? {
-        val page: Any? = try {
-            provider(pageId, tab)
-        } catch (error: Exception) {
-            problems += "$source threw $error"
-            return null
-        }
-        if (page == null) {
-            problems += "$source returned null"
-            return null
-        }
-        if (!pageClass.isInstance(page)) {
-            problems += "the page from $source is not a ${pageClass.simpleName}"
-            return null
-        }
-        if (used.any { it.second === page } || reused.any { it === page }) {
-            problems += "the page from $source is already the page of another tab"
-            return null
-        }
-        return pageClass.cast(page)
-    }
 }

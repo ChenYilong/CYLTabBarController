@@ -51,7 +51,8 @@ class TabPagesTest {
         assertEquals(listOf(SkipReason.EXCLUDED), configuration.skipped.map { it.reason })
         val shared = TabPageRegistry<String>().apply { register("home") { _, _ -> "home page" } }
         val skipped = ArrayList<SkippedTab>()
-        val pages = TabPages.resolve(configuration.tabs, String::class.java, shared = shared, lookupOrder = configuration.lookupOrder, skipped = skipped)
+        val pages = TabPages.resolve(configuration.tabs, String::class.java, shared = shared,
+            options = TabPages.Options(lookupOrder = configuration.lookupOrder, skipped = skipped))
         assertEquals(listOf("home page"), pages.map { it.second })
         assertEquals(listOf(SkipReason.MISSING_IDENTIFIER, SkipReason.UNREGISTERED), skipped.map { it.reason })
     }
@@ -64,7 +65,7 @@ class TabPagesTest {
         val reuse = first.groupBy({ it.first.pageId!! }, { it.second })
         val second = TabPages.resolve(
             listOf(TabItem(mapOf("CYLTabBarItemIdentifier" to "me")), TabItem(mapOf("CYLTabBarItemIdentifier" to "home"))),
-            String::class.java, shared = shared, reuse = reuse)
+            String::class.java, shared = shared, options = TabPages.Options(reuse = reuse))
         assertEquals(listOf("me#2", "home#1"), second.map { it.second })
         assertEquals(2, created)
     }

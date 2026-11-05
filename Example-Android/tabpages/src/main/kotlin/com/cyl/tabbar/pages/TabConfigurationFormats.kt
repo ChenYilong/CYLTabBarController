@@ -52,12 +52,20 @@ object TabConfigurationFormats {
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = false
             isExpandEntityReferences = false
+            isXIncludeAware = false
             setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
-            setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-            setFeature("http://xml.org/sax/features/external-general-entities", false)
-            setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+            for (attribute in listOf(XMLConstants.ACCESS_EXTERNAL_DTD, XMLConstants.ACCESS_EXTERNAL_SCHEMA)) {
+                try {
+                    setAttribute(attribute, "")
+                } catch (ignored: IllegalArgumentException) {
+                    // [EN] An older parser without the attribute; secure processing still applies. [CN] 旧解析器没有该属性；安全处理仍然生效。
+                }
+            }
         }
-        val document = factory.newDocumentBuilder().parse(org.xml.sax.InputSource(StringReader(text)))
+        val builder = factory.newDocumentBuilder()
+        // [EN] The plist DOCTYPE names Apple's DTD: never fetched, an empty one is used. [CN] plist 的 DOCTYPE 指向 Apple 的 DTD：从不下载，用空的代替。
+        builder.setEntityResolver { _, _ -> org.xml.sax.InputSource(StringReader("")) }
+        val document = builder.parse(org.xml.sax.InputSource(StringReader(text)))
         val root = childElements(document.documentElement).firstOrNull() ?: return emptyMap()
         @Suppress("UNCHECKED_CAST")
         return plistValue(root) as? Map<String, Any?> ?: emptyMap()
@@ -94,29 +102,27 @@ object TabConfigurationFormats {
      */
     private fun parseProperties(text: String): Map<String, Any?> {
         val properties = Properties().apply { load(StringReader(text)) }
-        val root = LinkedHashMap<String, Any?>()
+        val root = PropertyNode()
         for (name in properties.stringPropertyNames().sorted()) {
             val path = name.split('.')
             var node = root
-            for (part in path.dropLast(1)) {
-                @Suppress("UNCHECKED_CAST")
-                node = node.getOrPut(part) { LinkedHashMap<String, Any?>() } as? LinkedHashMap<String, Any?> ?: return root
-            }
-            node[path.last()] = properties.getProperty(name)
+            for (part in path.dropLast(1)) node = node.children.getOrPut(part) { PropertyNode() }
+            node.children[path.last()] = PropertyNode(properties.getProperty(name))
         }
-        return listsFromNumberedKeys(root) as Map<String, Any?>
+        return root.toMap()
     }
 
-    private fun listsFromNumberedKeys(value: Any?): Any? = when (value) {
-        is Map<*, *> -> {
-            val converted = LinkedHashMap<String, Any?>()
-            for ((key, child) in value) converted[key.toString()] = listsFromNumberedKeys(child)
-            if (converted.isNotEmpty() && converted.keys.all { it.toIntOrNull() != null }) {
-                converted.entries.sortedBy { it.key.toInt() }.map { it.value }
-            } else {
-                converted
-            }
+    /** [EN] A key path tree of a properties file. [CN] properties 文件的键路径树。 */
+    private class PropertyNode(val value: String? = null) {
+        val children = LinkedHashMap<String, PropertyNode>()
+
+        fun toMap(): Map<String, Any?> = children.mapValues { it.value.toValue() }
+
+        /** [EN] A leaf is its string; a node whose keys are all numbers is a list in number order. [CN] 叶子为其字符串；键全为数字的节点为按数字排序的列表。 */
+        fun toValue(): Any? = when {
+            children.isEmpty() -> value
+            children.keys.all { it.toIntOrNull() != null } -> children.entries.sortedBy { it.key.toInt() }.map { it.value.toValue() }
+            else -> toMap()
         }
-        else -> value
     }
 }
