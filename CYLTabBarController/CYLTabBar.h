@@ -27,6 +27,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Gallery.md
 //   - Tab Item Positioning / Tab 的排列方式
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Item-Positioning.md
+//   - Tab bar customization toolkit / TabBar 自定义工具集
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Customization-Toolkit.md
 //   - The tab bar's hitTest falls back to super instead of returning nil / TabBar 的 hitTest 不再返回 nil，交给 super 处理
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-HitTest-Super-Fallback.md
 //   - Minimize or hide the TabBar on scroll / 滚动时缩小或隐藏 TabBar
@@ -59,6 +61,19 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
  * `viewController.tabBarItem.imageInsets = UIEdgeInsetsMake(tabImageViewDefaultOffset, 0, -tabImageViewDefaultOffset, 0);`
  */
 @property (nonatomic, assign, readonly) CGFloat tabImageViewDefaultOffset;
+
+/*!
+ * [EN] Since iOS 13 UIKit ignores the classic styles (`tintColor`, `barTintColor`, `unselectedItemTintColor`,
+ *      `backgroundImage`, `shadowImage`, `barStyle`) once the tab bar uses `UITabBarAppearance`. When YES (default), each
+ *      classic setter also writes its value into `standardAppearance` (and `scrollEdgeAppearance` when there is one), so
+ *      both ways of styling work together; only a value that changed is written. Not with Liquid Glass, where the
+ *      system draws the bar. Set NO to keep UIKit's own behavior.
+ * [CN] iOS 13 起，TabBar 使用 `UITabBarAppearance` 后，UIKit 会忽略经典样式（`tintColor`、`barTintColor`、`unselectedItemTintColor`、
+ *      `backgroundImage`、`shadowImage`、`barStyle`）。为 YES（默认）时，每个经典 setter 同时把值写入 `standardAppearance`（存在
+ *      `scrollEdgeAppearance` 时也写入），两种设置方式可以同时使用；只写入发生变化的值。液态玻璃（由系统绘制 TabBar）时不同步。
+ *      设为 NO 则保持 UIKit 原有行为。
+ */
+@property (nonatomic, assign) BOOL syncsClassicStylesToAppearance;
 
 /*!
  [EN] This can be left unset; the default is CYLTabBarController. If set, please implement the `+[CYLPlusButton tabBarContext]` method in CYLPlusButton and ensure consistency. If neither is implemented, the default is CYLTabBarController for both.
@@ -151,6 +166,56 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
  * [CN] 返回所属的 CYLTabBarController（优先取 delegate，否则取 cyl_tabBarController）。
  */
 - (CYLTabBarController *)tabBarController;
+
+@end
+
+/*!
+ * [EN] The views UIKit draws a tab bar's background with, and its blur, for any `UITabBar`.
+ * [CN] UIKit 绘制 TabBar 背景所用的视图及其模糊效果，适用于任意 `UITabBar`。
+ */
+@interface UITabBar (CYLBarBackground)
+
+/*!
+ * [EN] The view behind the items that holds the background, the blur and the shadow line (UIKit's private
+ *      `_UIBarBackground`); nil if UIKit changes it.
+ * [CN] item 后方承载背景、模糊与阴影线的视图（UIKit 私有的 `_UIBarBackground`）；UIKit 改变实现时为 nil。
+ */
+@property (nonatomic, readonly, nullable) UIView *cyl_backgroundView;
+
+/*!
+ * [EN] The image view of the shadow line on top of the bar (same as `-cyl_tabShadowImageView`).
+ * [CN] TabBar 顶部阴影线的图片视图（同 `-cyl_tabShadowImageView`）。
+ */
+@property (nonatomic, readonly, nullable) UIImageView *cyl_shadowImageView;
+
+/*!
+ * [EN] The blur views of the background (UIKit uses one for the standard and one for the scroll edge look).
+ * [CN] 背景中的模糊视图（UIKit 分别用于标准样式与滚动到边缘时的样式）。
+ */
+@property (nonatomic, readonly, nullable) NSArray<UIVisualEffectView *> *cyl_effectViews;
+
+/*!
+ * [EN] The blur view shown now, the last visible one of `cyl_effectViews`.
+ * [CN] 当前显示的模糊视图，即 `cyl_effectViews` 中最后一个可见的。
+ */
+@property (nonatomic, readonly, nullable) UIVisualEffectView *cyl_effectView;
+
+/*!
+ * [EN] The background blur, e.g. `[UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterial]`. iOS 13+: written
+ *      into `standardAppearance.backgroundEffect` (and `scrollEdgeAppearance`, when there is one), so it is kept across
+ *      layouts and follows FlatDesign; before iOS 13 set on the blur views. nil removes the blur.
+ * [CN] 背景模糊效果，例如 `[UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterial]`。iOS 13+ 写入
+ *      `standardAppearance.backgroundEffect`（存在 `scrollEdgeAppearance` 时也写入），因此重新布局后不会丢失，扁平样式也随之更新；
+ *      iOS 13 以前直接设置在模糊视图上。nil 去掉模糊。
+ */
+@property (nonatomic, strong, nullable, getter=cyl_backgroundEffect, setter=cyl_setBackgroundEffect:) UIBlurEffect *cyl_backgroundEffect;
+
+/*!
+ * [EN] A color drawn over the blur, e.g. a translucent tint: `standardAppearance.backgroundColor` (and the scroll edge
+ *      one) on iOS 13+, `barTintColor` before.
+ * [CN] 绘制在模糊之上的颜色，例如半透明的色调：iOS 13+ 为 `standardAppearance.backgroundColor`（以及滚动边缘的），之前为 `barTintColor`。
+ */
+@property (nonatomic, strong, nullable, getter=cyl_effectForegroundColor, setter=cyl_setEffectForegroundColor:) UIColor *cyl_effectForegroundColor;
 
 @end
 
