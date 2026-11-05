@@ -265,6 +265,13 @@
 "已安全创建 TabBarController：%@ 个 Tab" = "TabBarController opprettet trygt: %@ faner";
 "查看" = "Vis";
 
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Skjul ved rulling: simuler avbrudd (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Utløses 1,5 s etter trykket. Rull først ned for å skjule TabBar. Forventet: TabBar kommer straks tilbake, og tregheten skjuler den ikke igjen.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Utløses 1,5 s etter trykket. Forventet: TabBar endres ikke av dette (skjules ikke, og en TabBar skjult av appen vises ikke).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Velg et avbrudd; det utløses etter 1,5 s. Rull først ned for å skjule TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manuelt: trykk for å slå på skjul ved rulling, rull ned for å skjule TabBar, og gjør så det tittelen sier. Forventet: TabBar kommer straks tilbake.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Kjører alle automatiske simuleringer etter tur og rapporterer bestått / feilet (ca. 2 minutter), også i konsollen. Kan også kjøres med oppstartsargumentet -CYLScrollHideSelfTest YES.";
 /* Issue #216: theme switching (skins) demo. */
 "换肤" = "Utseende";
 "换肤（主题，issue #216）" = "Utseende (tema, issue #216)";
@@ -317,3 +324,5 @@
 "点我" = "Trykk her";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "To fanelinjer deler én konfigurasjon; registeret til hver av dem kobler de samme side-ID-ene til ulike sider.";
 "两个 TabBar，同一个页面 ID" = "To fanelinjer, én side-ID";
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Kopier";

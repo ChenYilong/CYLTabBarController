@@ -265,6 +265,13 @@
 "已安全创建 TabBarController：%@ 个 Tab" = "TabBarController created safely: %@ tabs";
 "查看" = "View";
 
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Scroll hiding: simulate interruptions (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Fires 1.5 s after the tap. Scroll down first to hide the TabBar. Expected: the TabBar comes back at once, and momentum does not hide it again.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Fires 1.5 s after the tap. Expected: the TabBar does not change because of it (not hidden, and a TabBar hidden by the app is not shown).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Choose an interruption; it fires after 1.5 s. Scroll down first to hide the TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: tap to turn scroll hiding on, scroll down to hide the TabBar, then do what the title says. Expected: the TabBar comes back at once.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Runs every automatic simulation in turn and reports pass / fail (about 2 minutes), also in the console. Can also run with the launch argument -CYLScrollHideSelfTest YES.";
 /* Issue #216: theme switching (skins) demo. */
 "换肤" = "Skin";
 "换肤（主题，issue #216）" = "Skin (theme, issue #216)";
@@ -317,3 +324,5 @@
 "点我" = "Tap me";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Two tab bars share one configuration; each one's registry maps the same page IDs to different pages.";
 "两个 TabBar，同一个页面 ID" = "Two tab bars, one page ID";
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Copy";

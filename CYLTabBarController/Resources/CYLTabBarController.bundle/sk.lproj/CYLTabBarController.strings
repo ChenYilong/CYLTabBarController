@@ -265,6 +265,13 @@
 "已安全创建 TabBarController：%@ 个 Tab" = "TabBarController bezpečne vytvorený: kariet: %@";
 "查看" = "Zobraziť";
 
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Skrytie pri posúvaní: simulácia prerušení (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Spustí sa 1,5 s po klepnutí. Najprv posuňte nadol, aby sa TabBar skryl. Očakávané: TabBar sa hneď vráti a zotrvačnosť ho znova neskryje.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Spustí sa 1,5 s po klepnutí. Očakávané: TabBar sa tým nezmení (neskryje sa a TabBar skrytý aplikáciou sa nezobrazí).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Vyberte prerušenie; spustí sa po 1,5 s. Najprv posuňte nadol, aby sa TabBar skryl.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Ručne: klepnutím zapnite skrývanie pri posúvaní, posuňte nadol, aby sa TabBar skryl, a urobte, čo hovorí názov. Očakávané: TabBar sa hneď vráti.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Postupne spustí všetky automatické simulácie a nahlási úspech / zlyhanie (asi 2 minúty), aj v konzole. Dá sa spustiť aj argumentom -CYLScrollHideSelfTest YES.";
 /* Issue #216: theme switching (skins) demo. */
 "换肤" = "Vzhľad";
 "换肤（主题，issue #216）" = "Vzhľad (motív, issue #216)";
@@ -317,3 +324,5 @@
 "点我" = "Ťukni";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Dva panely kariet zdieľajú jednu konfiguráciu; register každého z nich priraďuje rovnaké ID stránok rôznym stránkam.";
 "两个 TabBar，同一个页面 ID" = "Dva panely kariet, jedno ID stránky";
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Kopírovať";

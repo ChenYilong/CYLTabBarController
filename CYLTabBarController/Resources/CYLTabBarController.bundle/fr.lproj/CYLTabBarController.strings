@@ -265,6 +265,13 @@
 "已安全创建 TabBarController：%@ 个 Tab" = "TabBarController créé en toute sécurité : %@ onglets";
 "查看" = "Voir";
 
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Masquer au défilement : simuler des interruptions (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Se déclenche 1,5 s après le toucher. Faites d'abord défiler vers le bas pour masquer la TabBar. Attendu : la TabBar revient aussitôt, et l'inertie ne la masque pas de nouveau.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Se déclenche 1,5 s après le toucher. Attendu : la TabBar ne change pas pour autant (elle n'est pas masquée, et une TabBar masquée par l'app n'est pas affichée).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Choisissez une interruption ; elle se déclenche après 1,5 s. Faites d'abord défiler vers le bas pour masquer la TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manuel : touchez pour activer le masquage au défilement, faites défiler vers le bas pour masquer la TabBar, puis faites ce qu'indique le titre. Attendu : la TabBar revient aussitôt.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Exécute tour à tour toutes les simulations automatiques et indique réussite / échec (environ 2 minutes), aussi dans la console. Peut aussi être lancé avec l'argument -CYLScrollHideSelfTest YES.";
 /* Issue #216: theme switching (skins) demo. */
 "换肤" = "Habillage";
 "换肤（主题，issue #216）" = "Habillage (thème, issue #216)";
@@ -317,3 +324,5 @@
 "点我" = "Touchez-moi";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Deux barres d’onglets partagent une configuration ; le registre de chacune associe les mêmes ID de page à des pages différentes.";
 "两个 TabBar，同一个页面 ID" = "Deux barres d’onglets, un ID de page";
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Copier";

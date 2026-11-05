@@ -265,6 +265,13 @@
 "已安全创建 TabBarController：%@ 个 Tab" = "TabBarController veilig gemaakt: %@ tabbladen";
 "查看" = "Bekijken";
 
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Verbergen bij scrollen: onderbrekingen simuleren (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Wordt 1,5 s na het tikken uitgevoerd. Scrol eerst omlaag om de TabBar te verbergen. Verwacht: de TabBar komt meteen terug en het naglijden verbergt hem niet opnieuw.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Wordt 1,5 s na het tikken uitgevoerd. Verwacht: de TabBar verandert hierdoor niet (wordt niet verborgen, en een door de app verborgen TabBar wordt niet getoond).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Kies een onderbreking; die wordt na 1,5 s uitgevoerd. Scrol eerst omlaag om de TabBar te verbergen.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Handmatig: tik om verbergen bij scrollen aan te zetten, scrol omlaag om de TabBar te verbergen en doe dan wat de titel zegt. Verwacht: de TabBar komt meteen terug.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Voert alle automatische simulaties na elkaar uit en meldt geslaagd / mislukt (ongeveer 2 minuten), ook in de console. Ook uit te voeren met het startargument -CYLScrollHideSelfTest YES.";
 /* Issue #216: theme switching (skins) demo. */
 "换肤" = "Skin";
 "换肤（主题，issue #216）" = "Skin (thema, issue #216)";
@@ -317,3 +324,5 @@
 "点我" = "Tik hier";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Twee tabbalken delen één configuratie; het register van elke balk koppelt dezelfde pagina-ID’s aan andere pagina’s.";
 "两个 TabBar，同一个页面 ID" = "Twee tabbalken, één pagina-ID";
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Kopieer";

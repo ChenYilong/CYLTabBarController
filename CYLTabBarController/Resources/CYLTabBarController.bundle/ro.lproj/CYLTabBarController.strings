@@ -265,6 +265,13 @@
 "已安全创建 TabBarController：%@ 个 Tab" = "TabBarController creat în siguranță: %@ file";
 "查看" = "Vezi";
 
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Ascundere la derulare: simularea întreruperilor (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Se declanșează la 1,5 s după atingere. Derulați mai întâi în jos pentru a ascunde TabBar. Așteptat: TabBar revine imediat, iar inerția nu îl ascunde din nou.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Se declanșează la 1,5 s după atingere. Așteptat: TabBar nu se schimbă din această cauză (nu se ascunde, iar un TabBar ascuns de aplicație nu se afișează).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Alegeți o întrerupere; se declanșează după 1,5 s. Derulați mai întâi în jos pentru a ascunde TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: atingeți pentru a activa ascunderea la derulare, derulați în jos pentru a ascunde TabBar, apoi faceți ce spune titlul. Așteptat: TabBar revine imediat.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Rulează pe rând toate simulările automate și raportează reușit / eșuat (circa 2 minute), și în consolă. Se poate rula și cu argumentul de lansare -CYLScrollHideSelfTest YES.";
 /* Issue #216: theme switching (skins) demo. */
 "换肤" = "Aspect";
 "换肤（主题，issue #216）" = "Aspect (temă, issue #216)";
@@ -317,3 +324,5 @@
 "点我" = "Atinge";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Două bare de file folosesc aceeași configurație; registrul fiecăreia asociază aceleași ID-uri de pagină cu pagini diferite.";
 "两个 TabBar，同一个页面 ID" = "Două bare de file, un ID de pagină";
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Copiază";
