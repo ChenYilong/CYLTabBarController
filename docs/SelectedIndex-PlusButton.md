@@ -98,7 +98,7 @@ flowchart TD
     App["App: setSelectedIndex: / cyl_selectedIndexIgnoringPlusButton"] --> Map["cyl_selectedIndexForIndexIgnoringPlusButton:<br/>skips the plus entry 跳过 PlusButton 控制器"]
     Map --> SI["selectedIndex<br/>index in viewControllers"]
     App --> SI
-    VCs["Your view controllers 你的控制器"] --> Align["alignViewControllers:…<br/>inserts the plus entry 插入 PlusButton 控制器"]
+    VCs["Your view controllers 你的控制器"] --> Align["alignTabControlIfNeededWithViewControllers:<br/>removes any slot, inserts exactly one<br/>先移除 slot，再插入一个（见 PlusButton-Slot.md）"]
     Plus["CYLPlusButton<br/>+indexOfPlusButtonInTabBar"] --> Align
     Align --> All["viewControllers<br/>(with the plus entry 含 PlusButton 控制器)"]
     All --> SI
