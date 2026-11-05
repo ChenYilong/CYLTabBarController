@@ -2174,6 +2174,8 @@ static CYLScrollHideSelfTestExpectation CYLScrollHideSelfTestExpectationForRow(N
 /// [EN] When a simulation is checked, and when the next one starts. [CN] 检查模拟结果的时间，以及开始下一个模拟的时间。
 static const NSTimeInterval CYLScrollHideSelfTestCheckDelay = 2.7;
 static const NSTimeInterval CYLScrollHideSelfTestNextDelay = 1.5;
+/// [EN] Wait between the simulated hide and the simulation. [CN] 模拟隐藏与执行模拟之间的等待时间。
+static const NSTimeInterval CYLScrollHideSelfTestHideSettleDelay = 0.6;
 
 /*!
  * [EN] The automatic self-test: for every automatic simulation, scroll into the content, hide the bar as a downward
@@ -2240,9 +2242,14 @@ static const NSTimeInterval CYLScrollHideSelfTestNextDelay = 1.5;
         next();
         return;
     }
-    [self cyl_runScrollHideSimulationRow:row tabBarController:tabBarController];
-    CYLScrollHideSimulationAfter(CYLScrollHideSelfTestCheckDelay, ^{
-        [weakSelf cyl_checkScrollHideSelfTestRow:row title:title expectation:expectation tabBarController:tabBarController results:results next:next waited:0];
+    // [EN] Run the simulation a moment after the hide, as a real interruption comes after the user scrolled: an app
+    //      request repeating the last hide within 0.5 s is taken for a FlatDesign replay of it and ignored.
+    // [CN] 隐藏之后稍等片刻再执行模拟，与真实的打断在用户滚动之后发生一致：0.5 秒内重复最近一次隐藏的 App 请求会被当作扁平样式对它的重放而忽略。
+    CYLScrollHideSimulationAfter(CYLScrollHideSelfTestHideSettleDelay, ^{
+        [weakSelf cyl_runScrollHideSimulationRow:row tabBarController:tabBarController];
+        CYLScrollHideSimulationAfter(CYLScrollHideSelfTestCheckDelay, ^{
+            [weakSelf cyl_checkScrollHideSelfTestRow:row title:title expectation:expectation tabBarController:tabBarController results:results next:next waited:0];
+        });
     });
 }
 

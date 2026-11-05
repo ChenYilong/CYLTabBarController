@@ -25,8 +25,9 @@ concurrency:
 jobs:
   self-test:
     name: self-test (${{ matrix.style }}${{ matrix.runtime && format(', {0}', matrix.runtime) || '' }})
-    # Xcode 27 runner: the self-test runs on iOS 27 simulators only. (ios.yml builds on macos-26 / Xcode 26 by default.)
-    runs-on: xcode-27
+    # Same runner as ios.yml: macos-26 (Xcode 26), or the repository variable MACOS_RUNNER. The self-test uses the newest
+    # iPhone simulator on it.
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -34,12 +35,12 @@ jobs:
         include:
           # FlatDesign: code can hide it on every system, so this runs the whole self-test.
           - style: FlatDesign
-            runtime: iOS-27
+            runtime: ""
             # Must really test: fail when every row is SKIP.
             require_pass: "1"
           # Default demo: Liquid Glass, a smoke test (rows are SKIP, code cannot hide it).
           - style: Default
-            runtime: iOS-27
+            runtime: ""
     steps:
       - uses: actions/checkout@v4
       - name: Select the newest Xcode

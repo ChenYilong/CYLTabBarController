@@ -8215,11 +8215,22 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     //      保持隐藏；回到内容的起始边缘（包括点击状态栏回到顶部）时，与系统一致，重新显示 TabBar。
     if (maxOffsetY - minOffsetY < CYLTabBarMinimizeMinimumScrollableDistance) {
         _scrolledDistance = 0;
+        if (_hiddenByScroll) {
+            CYLTabBarMinimizeLog(@"restore", @"the content no longer scrolls");
+        }
         [self expandTabBar];
         return;
     }
-    if ((minimizesOnScrollDown && newOffsetY <= minOffsetY) || (minimizesOnScrollUp && newOffsetY >= maxOffsetY)) {
+    // [EN] Half a point of tolerance: an animated scroll to the edge (e.g. a tap on the status bar) can end a fraction of a
+    //      point away from it after pixel rounding, which an exact comparison would miss.
+    // [CN] 允许半个点的误差：动画滚动到边缘（例如点击状态栏）在像素取整后可能停在离边缘不到一个点的位置，精确比较会漏掉。
+    static const CGFloat CYLTabBarMinimizeEdgeTolerance = 0.5;
+    if ((minimizesOnScrollDown && newOffsetY <= minOffsetY + CYLTabBarMinimizeEdgeTolerance) ||
+        (minimizesOnScrollUp && newOffsetY >= maxOffsetY - CYLTabBarMinimizeEdgeTolerance)) {
         _scrolledDistance = 0;
+        if (_hiddenByScroll) {
+            CYLTabBarMinimizeLog(@"restore", @"back at the edge the content starts from");
+        }
         [self expandTabBar];
         return;
     }
