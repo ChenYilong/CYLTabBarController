@@ -1,0 +1,68 @@
+# Runs the scroll hiding self-test (issue #13) on an iOS simulator: by hand (Actions > Run workflow), and on pull requests
+# that change this workflow or its script (a macOS build takes several minutes). Locally: scripts/scroll-hide-self-test.sh
+name: Scroll hiding self-test
+
+on:
+  workflow_dispatch:
+    inputs:
+      device:
+        description: "Simulator name (empty: the first available iPhone)"
+        required: false
+        default: ""
+  pull_request:
+    paths:
+      - ".github/workflows/scroll-hide-self-test.yml"
+      - "scripts/scroll-hide-self-test.sh"
+
+permissions:
+  contents: read
+
+# A new push cancels the older run of the same branch, so the few macOS runners only test the newest commit.
+concurrency:
+  group: scroll-hide-self-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  self-test:
+    name: self-test (${{ matrix.style }}${{ matrix.runtime && format(', {0}', matrix.runtime) || '' }})
+    # Same runner as ios.yml: macos-26 (Xcode 26), or the repository variable MACOS_RUNNER. The self-test uses the newest
+    # iPhone simulator on it.
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # FlatDesign: code can hide it on every system, so this runs the whole self-test.
+          - style: FlatDesign
+            runtime: ""
+            # Must really test: fail when every row is SKIP.
+            require_pass: "1"
+          # Default demo: Liquid Glass, a smoke test (rows are SKIP, code cannot hide it).
+          - style: Default
+            runtime: ""
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select the newest Xcode
+        run: |
+          # The runner image may already select its only Xcode; switch only when versioned copies exist.
+          XCODE=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -n 1 || true)
+          if [[ -n "$XCODE" ]]; then sudo xcode-select -s "$XCODE"; fi
+          xcodebuild -version
+          xcrun simctl list runtimes
+      - name: Run the self-test
+        env:
+          DEVICE: ${{ inputs.device }}
+          STYLE: ${{ matrix.style }}
+          RUNTIME: ${{ matrix.runtime }}
+          REQUIRE_PASS: ${{ matrix.require_pass || '0' }}
+        run: scripts/scroll-hide-self-test.sh "$DEVICE"
+      - name: Keep the logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scroll-hide-self-test-${{ matrix.style }}${{ matrix.runtime && format('-{0}', matrix.runtime) || '' }}
+          path: |
+            build/scroll-hide-self-test/self-test.log
+            build/scroll-hide-self-test/build.log
+          if-no-files-found: ignore

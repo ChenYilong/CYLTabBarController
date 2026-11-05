@@ -256,6 +256,13 @@
 "角标" = "Huy hiệu";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass không hỗ trợ: hệ thống quyết định chiều cao thanh tab (FlatDesign và kiểu cổ điển hỗ trợ)";
 
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Ẩn khi cuộn: mô phỏng gián đoạn (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Chạy 1,5 giây sau khi chạm. Hãy cuộn xuống trước để ẩn TabBar. Mong đợi: TabBar hiện lại ngay, và quán tính không ẩn nó lần nữa.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Chạy 1,5 giây sau khi chạm. Mong đợi: TabBar không thay đổi vì điều này (không bị ẩn, và TabBar do App ẩn sẽ không hiện).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Chọn một gián đoạn; nó chạy sau 1,5 giây. Hãy cuộn xuống trước để ẩn TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Thủ công: chạm để bật ẩn khi cuộn, cuộn xuống để ẩn TabBar, rồi làm theo tiêu đề. Mong đợi: TabBar hiện lại ngay.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Chạy lần lượt mọi mô phỏng tự động và báo đạt / không đạt (khoảng 2 phút), cả trong console. Cũng có thể chạy bằng tham số khởi chạy -CYLScrollHideSelfTest YES.";
 /* Issue #216: theme switching (skins) demo. */
 "换肤" = "Giao diện";
 "换肤（主题，issue #216）" = "Giao diện (chủ đề, issue #216)";
@@ -306,3 +313,5 @@
 "仅配色" = "Chỉ màu sắc";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Chạm";
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Sao chép";
