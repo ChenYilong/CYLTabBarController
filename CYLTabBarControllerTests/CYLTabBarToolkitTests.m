@@ -26,6 +26,21 @@
     return tabBarController;
 }
 
+#pragma mark - Type safety
+
+/// [EN] A tab bar controller whose tab bar is a plain UITabBar: only CYLTabBar has the plus button label check.
+/// [CN] TabBar 是系统 UITabBar 的控制器：只有 CYLTabBar 才有 PlusButton 标题的判断方法。
+- (void)testSelectionUpdateAcceptsASystemTabBar {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UITabBarController *systemTabBarController = [[UITabBarController alloc] init];
+    UIViewController *first = [[UIViewController alloc] init];
+    UIViewController *second = [[UIViewController alloc] init];
+    systemTabBarController.viewControllers = @[ first, second ];
+    XCTAssertFalse([systemTabBarController.tabBar isKindOfClass:[CYLTabBar class]]);
+    XCTAssertNoThrow([tabBarController updateSelectionStatusIfNeededForTabBarController:systemTabBarController
+                                                             shouldSelectViewController:second]);
+}
+
 #pragma mark - Double tap
 
 /// [EN] The per-tab block; the taps themselves are recognized by the tab bar item gestures (docs/TabBarItem-Gestures.md).
