@@ -29,6 +29,27 @@
 | [建议与对应功能](#cn建议与对应功能) | [Suggestions and what they became](#ensuggestions-and-what-they-became) |
 | [点击动画](#cn点击动画) | [Tap animations](#entap-animations) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [重复点击与按下动画](#cn重复点击与按下动画) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Reselect and pressed animations](#enreselect-and-pressed-animations) |
+| [点击声音与触感反馈](#cn点击声音与触感反馈) | [Tap sound and haptics](#entap-sound-and-haptics) |
+| [长按](#cn长按) | [Long press](#enlong-press) |
+| [左右滑动切换 Tab](#cn左右滑动切换-tab) | [Swipe to switch tabs](#enswipe-to-switch-tabs) |
+| [超出父视图的子视图响应点击](#cn超出父视图的子视图响应点击) | [Subviews that respond outside their superview](#ensubviews-that-respond-outside-their-superview) |
+| [从任意位置加载图片](#cn从任意位置加载图片) | [Loading images from anywhere](#enloading-images-from-anywhere) |
+| [不继承基类使用导航栏设置](#cn不继承基类使用导航栏设置) | [Navigation bar settings without base classes](#ennavigation-bar-settings-without-base-classes) |
+| [放进 CYLUtils 的通用工具](#cn放进-cylutils-的通用工具) | [Generic helpers in CYLUtils](#engeneric-helpers-in-cylutils) |
+| [演示](#cn演示) | [Demo](#endemo) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [角标变化动画](#cn角标变化动画) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Badge-changed animation](#enbadge-changed-animation) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [无下划线的方法名](#cn无下划线的方法名) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Underscore-free method names](#enunderscore-free-method-names) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [用 block 组成动画](#cn用-block-组成动画) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Animations made of blocks](#enanimations-made-of-blocks) |
+| [API 一览](#cnapi-一览) | [API reference](#enapi-reference) |
+| [兼容性与隔离](#cn兼容性与隔离) | [Compatibility and guards](#encompatibility-and-guards) |
+| [各项关系图](#cn各项关系图) | [How the pieces relate](#enhow-the-pieces-relate) |
+| [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [点击动画](#cn点击动画-1) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Tap animations](#entap-animations-1) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [长按](#cn长按-1) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Long press](#enlong-press-1) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [左右滑动切换 Tab](#cn左右滑动切换-tab-1) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Swipe to switch tabs](#enswipe-to-switch-tabs-1) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [滑动转场](#cn滑动转场) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Slide transition](#enslide-transition) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [超出父视图响应点击与不继承基类隐藏导航栏](#cn超出父视图响应点击与不继承基类隐藏导航栏) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Touches outside the superview, and the navigation bar without a base class](#entouches-outside-the-superview-and-the-navigation-bar-without-a-base-class) |
+| [待办](#cn待办) | [To do](#ento-do) |
 
 <!-- navigation:end -->
 
@@ -121,6 +142,7 @@ tabBarController.cyl_defaultTabButtonAnimation = [CYLTabButtonPressAnimation new
     [[CYLTabButtonRotationAnimation new] cyl_playSelectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
 }
 @end
+```
 
 ## [CN]点击声音与触感反馈
 ## [EN]Tap sound and haptics
