@@ -2597,6 +2597,13 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         tabBarItemsAttributes[attributesIndex] = [newAttributes copy];
         _tabBarItemsAttributes = [tabBarItemsAttributes copy];
     }
+    // FIX: issue #433
+    // [EN] A new normal or selected title is remembered, so a later selection change shows the new ones.
+    // [CN] 记录新的普通标题或选中标题，之后切换选中时显示新的标题。
+    BOOL updatesSelectedTitle = (attributes[CYLTabBarItemTitle] || attributes[CYLTabBarItemSelectedTitle]);
+    if (updatesSelectedTitle) {
+        CYLRememberTabBarItemSelectedTitle(viewController, newAttributes, newAttributes[CYLTabBarItemTitle]);
+    }
     // [EN] Per-tab colors are applied on the next layout pass (`-cyl_syncTabBarAppearances`, `-cyl_bindTabControlActions`).
     // [CN] 单个 Tab 的颜色在下一次布局时生效（`-cyl_syncTabBarAppearances`、`-cyl_bindTabControlActions`）。
     if (self.isViewLoaded && (attributes[CYLTabBarItemTitleColor] || attributes[CYLTabBarItemSelectedTitleColor] ||
@@ -2627,6 +2634,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         if (title) { tabBarItem.title = title; }
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
+        // FIX: issue #433
+        // [EN] The selected tab shows its selected title, not the new normal title.
+        // [CN] 选中的 Tab 显示选中标题，而不是新的普通标题。
+        if (updatesSelectedTitle) {
+            CYLApplyTabBarItemSelectedTitles(self);
+        }
         if (attributes[CYLTabBarItemImageURL] || attributes[CYLTabBarItemSelectedImageURL] || attributes[CYLTabBarItemImageURLSize]) {
             [self cyl_loadImageURLsOfAttributes:newAttributes atIndex:index];
         }
@@ -2645,6 +2658,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
         if (title) { tabBarItem.title = title; }
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
+    }
+    // FIX: issue #433
+    // [EN] The selected tab shows its selected title, not the new normal title.
+    // [CN] 选中的 Tab 显示选中标题，而不是新的普通标题。
+    if (updatesSelectedTitle) {
+        CYLApplyTabBarItemSelectedTitles(self);
     }
     // FIX: issue #257, #522
     // [EN] An image-only tab that gets a title is no longer image-only: undo the automatic adjustment, or the title stays
@@ -2809,6 +2828,10 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     // [EN] As a new set of tabs (#608): the tab items, icons and Lottie views are set up again from the attributes.
     // [CN] 与重新设置一组 Tab 相同（#608）：TabBarItem、图标与 Lottie 视图按属性重新设置。
     self.viewControllers = viewControllers;
+    // FIX: issue #433
+    // [EN] The new tab may be the selected one: show its selected title.
+    // [CN] 新的 Tab 可能正是选中的 Tab：显示其选中标题。
+    CYLSetNeedsUpdateTabBarItemSelectedTitles(self);
     // [EN] The tabs were installed as child view controllers after UIKit's list was cleared (#608): hand UIKit's own
     //      setter the same tabs, so it builds their tab items again (Liquid Glass and the classic style).
     // [CN] UIKit 的 Tab 列表被清空后（#608），Tab 以子控制器方式重新添加：把同样的 Tab 交给 UIKit 自身的 setter，使其重新生成
@@ -3103,6 +3126,10 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         }
     }
     [self setViewControllers:viewControllers];
+    // FIX: issue #433
+    // [EN] The reloaded tabs show the selected title on the selected tab.
+    // [CN] 重新加载后，选中的 Tab 显示选中标题。
+    CYLSetNeedsUpdateTabBarItemSelectedTitles(self);
     [self.view setNeedsLayout];
     self.selectedIndex = index;
     [superView addSubview:selected.view];
