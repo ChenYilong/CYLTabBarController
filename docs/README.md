@@ -24,6 +24,7 @@
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](Mac-CI-CD.md) |
+| [PlusButton 子控制器换肤测试](Plus-Child-Theme-Switching-Test.md) | [Plus child theme switching test](Plus-Child-Theme-Switching-Test.md) |
 | [PlusButton 角标：每次点击都会变化](PlusButton-Badge.md) | [PlusButton badge: changes on every tap](PlusButton-Badge.md) |
 | [有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应](PlusButton-Lottie-TabIcon.md) | [Lottie tab icons and their files when there is a PlusButton](PlusButton-Lottie-TabIcon.md) |
 | [PlusButton 的 slot：占位与数量一致](PlusButton-Slot.md) | [The PlusButton Slot: Placeholders and Matching Counts](PlusButton-Slot.md) |
@@ -74,6 +75,7 @@ docs/
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
 ├── Mac-CI-CD.md
+├── Plus-Child-Theme-Switching-Test.md
 ├── PlusButton-Badge.md
 ├── PlusButton-Lottie-TabIcon.md
 ├── PlusButton-Slot.md

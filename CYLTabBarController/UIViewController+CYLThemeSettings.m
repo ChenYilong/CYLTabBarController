@@ -435,6 +435,56 @@ static UIImage *CYLDemoColorSwatch(UIColor *color) {
 }
 
 /// [EN] Applies `theme`; a theme picked by hand stops following the system. [CN] 应用 `theme`；手动选择主题后不再跟随系统。
+/// [EN] YES for the same image object or the same pixels. [CN] 同一个图片对象或像素相同时为 YES。
+static BOOL CYLDemoSameImage(UIImage *image, UIImage *otherImage) {
+    if (!image || !otherImage) {
+        return NO;
+    }
+    if (image == otherImage || [image isEqual:otherImage]) {
+        return YES;
+    }
+    NSData *data = UIImagePNGRepresentation(image);
+    return data && [data isEqualToData:UIImagePNGRepresentation(otherImage)];
+}
+
+/*!
+ * [EN] The plus child theme test (docs/Plus-Child-Theme-Switching-Test.md, scripts/plus-child-theme-test.sh): with the
+ *      plus child view controller selected on Liquid Glass, the plus button's stand-in in the selected layer
+ *      (`selectedContentView`) must show one of the plus button's own current images; an image the plus button no
+ *      longer has is the stale stand-in that looked blurred. Logs "plus child theme test: PASS|FAIL|SKIP <phase> ...".
+ * [CN] PlusButton 子控制器换肤测试（docs/Plus-Child-Theme-Switching-Test.md、scripts/plus-child-theme-test.sh）：在液态玻璃上选中
+ *      PlusButton 子控制器时，选中图层中的 PlusButton 替身（`selectedContentView`）必须显示 PlusButton 自己当前的某张图片；显示 PlusButton
+ *      已经没有的图片，就是看起来模糊的过期替身。输出 "plus child theme test: PASS|FAIL|SKIP <阶段> ..."。
+ */
+static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
+    CYLTabBarController *tabBarController = [CYLTabBarController cyl_activeTabBarController];
+    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
+    NSString *theme = CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier;
+    if (!plusButton) {
+        NSLog(@"plus child theme test: SKIP %@ theme=%@: no plus button", phase, theme);
+        return;
+    }
+    if (![CYLConstants isLiquidGlassActive]) {
+        NSLog(@"plus child theme test: SKIP %@ theme=%@: no stand-in outside Liquid Glass", phase, theme);
+        return;
+    }
+    UIButton *standIn = plusButton.selectedContentView;
+    if (!standIn || standIn == plusButton || !standIn.window) {
+        NSLog(@"plus child theme test: FAIL %@ theme=%@ selectedIndex=%@: the stand-in is not shown", phase, theme, @(tabBarController.selectedIndex));
+        return;
+    }
+    UIImage *shown = standIn.currentImage;
+    BOOL matches = NO;
+    for (NSNumber *state in @[ @(UIControlStateNormal), @(UIControlStateSelected), @(UIControlStateHighlighted) ]) {
+        if (CYLDemoSameImage(shown, [plusButton imageForState:state.unsignedIntegerValue])) {
+            matches = YES;
+            break;
+        }
+    }
+    NSLog(@"plus child theme test: %@ %@ theme=%@ selectedIndex=%@ standIn=%@ plusButton=%@", matches ? @"PASS" : @"FAIL", phase, theme,
+          @(tabBarController.selectedIndex), NSStringFromCGSize(shown.size), NSStringFromCGSize(plusButton.currentImage.size));
+}
+
 static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
     if (CYLDemoFollowsSystem()) {
         CYLDemoSetFollowsSystem(NO);
@@ -526,6 +576,20 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
         }
         NSString *switchIdentifier = [defaults stringForKey:@"CYLDemoThemeSwitchTo"];
         double switchDelay = [defaults objectForKey:@"CYLDemoThemeSwitchDelay"] ? [defaults doubleForKey:@"CYLDemoThemeSwitchDelay"] : 4;
+        // [EN] With a selected tab, check the plus button's stand-in 3 s after the selection ("before") and 3 s after the
+        //      switch ("after"), then log "done" (scripts/plus-child-theme-test.sh waits for it).
+        // [CN] 选中了 Tab 时，在选中 3 秒后（“before”）与切换 3 秒后（“after”）检查 PlusButton 替身，然后输出 "done"
+        //      （scripts/plus-child-theme-test.sh 等待该行）。
+        BOOL checksPlusChild = ([defaults objectForKey:@"CYLDemoSelectIndex"] != nil);
+        if (checksPlusChild) {
+            NSLog(@"plus child theme test: launch theme=%@", manager.currentThemeIdentifier);
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                CYLDemoCheckPlusChildStandIn(@"before");
+                if (switchIdentifier.length == 0) {
+                    NSLog(@"plus child theme test: done");
+                }
+            });
+        }
         if (switchIdentifier.length > 0) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(switchDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 for (CYLDemoTheme *theme in CYLDemoThemes()) {
@@ -533,6 +597,12 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
                         CYLDemoApplyTheme(theme);
                         break;
                     }
+                }
+                if (checksPlusChild) {
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                        CYLDemoCheckPlusChildStandIn(@"after");
+                        NSLog(@"plus child theme test: done");
+                    });
                 }
             });
         }

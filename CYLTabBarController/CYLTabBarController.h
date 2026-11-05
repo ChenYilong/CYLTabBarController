@@ -21,6 +21,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Liquid-Glass-Robustness.md
 //   - Tabs That Need Login / 需要登录的 Tab
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Login-Required-Tabs.md
+//   - Plus child theme switching test / PlusButton 子控制器换肤测试
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Plus-Child-Theme-Switching-Test.md
 //   - PlusButton badge: changes on every tap / PlusButton 角标：每次点击都会变化
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Badge.md
 //   - Lottie tab icons and their files when there is a PlusButton / 有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应
