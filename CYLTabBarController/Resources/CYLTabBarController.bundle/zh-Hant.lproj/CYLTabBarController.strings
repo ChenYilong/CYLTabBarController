@@ -315,3 +315,7 @@
 "点我" = "點我";
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "拷貝";
+/* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
+"展开全部 %@ 个模拟" = "展開全部 %@ 個模擬";
+/* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
+"收起模拟列表" = "收起模擬列表";
