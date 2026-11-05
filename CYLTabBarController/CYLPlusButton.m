@@ -1191,7 +1191,17 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     CGFloat imageHeight = imageWidth * 0.9;
     CGFloat lineHeight = self.titleLabel.font.lineHeight;
     CGFloat verticalMargin = (CGRectGetHeight(self.bounds) - lineHeight - imageHeight) * 0.5;
-    *imageFrame = CGRectMake((width - imageWidth) * 0.5, verticalMargin, imageWidth, imageHeight);
+    // [EN] The image keeps its natural size (UIButton's), centered where this layout puts the image box: resizing the
+    //      image view made it ask UIButton for a layout, which put it back, forever (Flat, an image set later).
+    // [CN] 图片保持其原始尺寸（与 UIButton 一致），居中于本布局的图片区域：修改图片视图的尺寸会让它请求 UIButton 重新布局，UIButton 又把它改回去，
+    //      无限循环（扁平样式，之后才设置的图片）。
+    CGSize imageSize = [self imageForState:UIControlStateNormal].size;
+    if (imageSize.width <= 0 || imageSize.height <= 0) {
+        imageSize = CGSizeMake(imageWidth, imageHeight);
+    }
+    CGPoint imageCenter = CGPointMake(width * 0.5, verticalMargin + imageHeight * 0.5);
+    *imageFrame = CGRectMake(imageCenter.x - imageSize.width * 0.5, imageCenter.y - imageSize.height * 0.5,
+                             imageSize.width, imageSize.height);
     CGFloat titleCenterY = imageHeight + verticalMargin * 2 + lineHeight * 0.5 + 10;
     *titleFrame = CGRectMake(0, titleCenterY - lineHeight * 0.5, width, lineHeight);
 }
