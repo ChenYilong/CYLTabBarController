@@ -149,6 +149,27 @@ xcodebuild: error: Unable to read project 'TWDFGASDGDSFDFG.xcodeproj' from folde
 `project.pbxproj`). Before committing, search the diff for it, e.g. `git diff --cached --name-only | grep '\.xcodeproj/'`,
 and check every project it lists.
 
+**Keywords**: besides `.xcodeproj`, search the commit's code (the diff) for these keywords. A hit means an Xcode
+project setting changed and this section applies. Each keyword is followed by a complete example of the line it
+appears in:
+
+| Keyword | Complete example |
+|:---|:---|
+| `.xcodeproj` | `CYLTabBarController.xcodeproj` |
+| `objectVersion` | `objectVersion = 46;` |
+| `compatibilityVersion` | `compatibilityVersion = "Xcode 3.2";` |
+| `IPHONEOS_DEPLOYMENT_TARGET` | `IPHONEOS_DEPLOYMENT_TARGET = 12.0;` |
+
+```sh
+git diff --cached --name-only | grep '\.xcodeproj'
+git diff --cached | grep -E 'objectVersion|compatibilityVersion|IPHONEOS_DEPLOYMENT_TARGET'
+```
+
+**Example fix**: [#772](https://github.com/ChenYilong/CYLTabBarController/pull/772) brought every example back to the
+ObjC example's format. Follow its diff when a project needs the same fix: format 110 / 77 / 60 / 50 / 48 set to 46,
+folder sync replaced by explicit file lists, the Xcode 27-only keys removed, and a project-level deployment target of 27.0
+lowered.
+
 **The rule**: every project matches the root ObjC example, `CYLTabBarController.xcodeproj`:
 
 - `objectVersion = 46;` in `project.pbxproj`, and `compatibilityVersion = "Xcode 3.2";` in the `PBXProject` object
