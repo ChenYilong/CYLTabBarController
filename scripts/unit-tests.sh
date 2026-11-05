@@ -24,6 +24,8 @@ for runtime in sorted(devices, reverse=True):
             print(device["udid"]); sys.exit(0)
 sys.exit(1)' "$DEVICE_NAME") || { echo "No iPhone simulator${DEVICE_NAME:+ named $DEVICE_NAME}"; xcrun simctl list devices available; exit 1; }
 echo "Simulator: $DEVICE_ID"
+# [EN] CLAUDE.md: free RAM before the simulator (does nothing outside macOS). [CN] CLAUDE.md：启动模拟器前释放内存（macOS 以外不做任何事）。
+scripts/free-ram.sh || true
 xcodebuild -version
 
 set +e

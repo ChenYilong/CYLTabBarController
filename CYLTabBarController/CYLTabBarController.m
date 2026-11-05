@@ -2474,12 +2474,20 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 }
 
 - (void)updateTabBarItemsWithAttributes:(NSArray<NSDictionary<NSString *, id> *> *)tabBarItemsAttributes {
+    // [EN] FIX: placeholder count mismatch — one entry per tab, none for the slot: an array read back from
+    //      `tabBarItemsAttributes` (Liquid Glass, FlatDesign) carries the slot's own entry, which used to be given to the
+    //      tab after the slot, and every later tab took the entry before its own. A theme restored this way (a skin, then
+    //      another one) left that tab without icon and title, and showed each later tab with its neighbor's.
+    // [CN] FIX：占位导致的数量不匹配——每个 Tab 一项，slot 不占项：从 `tabBarItemsAttributes` 读回的数组（液态玻璃、扁平样式）带有
+    //      slot 自己的一项，以前会被分给 slot 之后的 Tab，之后每个 Tab 都取到前一个 Tab 的属性。用它恢复主题（换一种皮肤后再换另一种）时，
+    //      该 Tab 没有图标和标题，之后的 Tab 显示相邻 Tab 的内容。
+    tabBarItemsAttributes = [self cyl_tabBarItemsAttributesByRemovingPlusSlot:tabBarItemsAttributes];
     NSUInteger attributesIndex = 0;
     for (NSUInteger index = 0; index < _viewControllers.count && attributesIndex < tabBarItemsAttributes.count; index++) {
         UIViewController *viewController = _viewControllers[index];
         // [EN] The plus button's tab has no entry.
         // [CN] PlusButton 的 Tab 不占项。
-        if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
+        if ([self cyl_isPlusSlotViewController:viewController]) {
             continue;
         }
         [self updateTabBarItemAtIndex:index attributes:tabBarItemsAttributes[attributesIndex]];
@@ -2500,6 +2508,11 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
     NSDictionary *oldAttributes = (attributesIndex < _tabBarItemsAttributes.count) ? _tabBarItemsAttributes[attributesIndex] : @{};
     NSMutableDictionary *newAttributes = [oldAttributes mutableCopy];
     [newAttributes addEntriesFromDictionary:attributes];
+    // [EN] FIX: placeholder count mismatch — a tab's entry never takes the slot's marker (an entry copied from the slot's):
+    //      it would be taken for the slot's entry and removed on the next `-setViewControllers:`.
+    // [CN] FIX：占位导致的数量不匹配——Tab 的属性永远不带 slot 的标记（从 slot 那一项复制过来时）：否则会被当成 slot 的属性，
+    //      在下一次 `-setViewControllers:` 时被移除。
+    [newAttributes removeObjectForKey:CYLTabBarItemPlusSlotPlaceholderKey];
     if (attributesIndex < _tabBarItemsAttributes.count) {
         NSMutableArray *tabBarItemsAttributes = [_tabBarItemsAttributes mutableCopy];
         tabBarItemsAttributes[attributesIndex] = [newAttributes copy];
@@ -4790,7 +4803,10 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 }
 
 - (BOOL)isLottieEnabled {
-    return [CYLConstants isLottieEnabledFromlottieURLs:self.lottieURLs tabBarItemsAttributes:self.tabBarItemsAttributes];
+    // [EN] FIX: placeholder count mismatch — without the slot's entry: it is the first one when the plus button is the first tab.
+    // [CN] FIX：占位导致的数量不匹配——去掉 slot 的属性项：PlusButton 为第一个 Tab 时它就是第一项。
+    return [CYLConstants isLottieEnabledFromlottieURLs:self.lottieURLs
+                                 tabBarItemsAttributes:[self cyl_tabBarItemsAttributesByRemovingPlusSlot:_tabBarItemsAttributes]];
 }
 
 /*!
@@ -9104,7 +9120,9 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
     NSUInteger attributesIndex = 0;
     for (NSUInteger index = 0; index < _viewControllers.count && attributesIndex < itemsAttributes.count; index++) {
         UIViewController *viewController = _viewControllers[index];
-        if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
+        // [EN] The same slot test as `-updateTabBarItemsWithAttributes:` (a plus child inside a navigation controller too).
+        // [CN] 与 `-updateTabBarItemsWithAttributes:` 相同的 slot 判断（也包括被导航控制器包裹的 PlusButton 子控制器）。
+        if ([self cyl_isPlusSlotViewController:viewController]) {
             continue;
         }
         [tabAttributes setObject:itemsAttributes[attributesIndex++] forKey:viewController];

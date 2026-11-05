@@ -134,14 +134,14 @@ static UIColor *CYLDemoRGB(CGFloat red, CGFloat green, CGFloat blue) {
  *      `tabBarItemsAttributes` 中为它提供一项）与占位控制器不占项。
  */
 static NSArray<NSDictionary *> *CYLDemoRealTabsAttributes(CYLTabBarController *tabBarController) {
-    UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:tabBarController];
+    // [EN] The tabs without the plus button's slot, as the library counts them (a plus child inside a navigation
+    //      controller, a placeholder). [CN] 去掉 PlusButton slot 的 Tab，与本库的判断一致（包括被导航控制器包裹的 PlusButton 子控制器、占位控制器）。
+    NSArray<UIViewController *> *viewControllers = tabBarController.viewControllers;
     NSMutableArray<NSDictionary *> *attributes = [NSMutableArray array];
-    [tabBarController.viewControllers enumerateObjectsUsingBlock:^(UIViewController *viewController, NSUInteger index, BOOL *stop) {
-        if (viewController.cyl_isPlaceholder || viewController == plusChildViewController) {
-            return;
-        }
-        [attributes addObject:[tabBarController tabBarItemAttributesAtIndex:index] ?: @{}];
-    }];
+    for (UIViewController *viewController in tabBarController.cyl_viewControllersIgnoringPlusButton) {
+        NSUInteger index = [viewControllers indexOfObject:viewController];
+        [attributes addObject:(index == NSNotFound ? nil : [tabBarController tabBarItemAttributesAtIndex:index]) ?: @{}];
+    }
     return attributes;
 }
 
@@ -503,6 +503,22 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
         [[NSNotificationCenter defaultCenter] addObserver:observer selector:@selector(themeDidChange:) name:CYLThemeDidChangeNotification object:nil];
         if ([[NSUserDefaults standardUserDefaults] boolForKey:CYLDemoThemeFollowsSystemDefaultsKey]) {
             CYLDemoSetFollowsSystem(YES);
+        }
+        // [EN] `-CYLDemoThemeSwitchTo <identifier>` (scripts/theme-screenshots.sh): switch to that theme a few seconds
+        //      after launch, as a tap on the skin button does, to check a theme change at runtime (e.g. a holiday skin,
+        //      then a color skin, with a plus button and its child view controller).
+        // [CN] `-CYLDemoThemeSwitchTo <identifier>`（scripts/theme-screenshots.sh）：启动几秒后切换到该主题，与点击换肤按钮相同，
+        //      用于检查运行时切换主题（例如带 PlusButton 及其子控制器时，先节日皮肤、再配色主题）。
+        NSString *switchIdentifier = [[NSUserDefaults standardUserDefaults] stringForKey:@"CYLDemoThemeSwitchTo"];
+        if (switchIdentifier.length > 0) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                for (CYLDemoTheme *theme in CYLDemoThemes()) {
+                    if ([theme.identifier isEqualToString:switchIdentifier]) {
+                        CYLDemoApplyTheme(theme);
+                        break;
+                    }
+                }
+            });
         }
     });
 }

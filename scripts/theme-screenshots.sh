@@ -5,16 +5,18 @@
 #      Objective-C demo, installs it, then launches it once per theme with -CYLDemoThemeIdentifier <theme> (read from
 #      NSUserDefaults by +[UIViewController cyl_setUpThemeSettings]) and saves a screenshot of each launch in
 #      build/theme-screenshots/. STYLE=FlatDesign starts the FlatDesign tab bar (-CYLScrollHideSelfTestFlatDesign YES);
-#      otherwise the default style (Liquid Glass on iOS 26). THEMES overrides the list (comma separated identifiers).
+#      otherwise the default style (Liquid Glass on iOS 26). THEMES overrides the list (comma separated identifiers);
+#      "A>B" launches with theme A and switches to B at runtime (-CYLDemoThemeSwitchTo B), as the skin button does.
 # [CN] 在 iOS 模拟器上为换肤（issue #216）截图，需要装有 Xcode 与 CocoaPods 的 Mac：编译 Objective-C Demo 并安装，然后每个主题启动一次
 #      （-CYLDemoThemeIdentifier <主题>，由 +[UIViewController cyl_setUpThemeSettings] 从 NSUserDefaults 读取），每次启动保存一张截图到
 #      build/theme-screenshots/。STYLE=FlatDesign 以扁平样式 TabBar 启动（-CYLScrollHideSelfTestFlatDesign YES）；否则为默认样式
-#      （iOS 26 上为液态玻璃）。THEMES 可替换主题列表（以逗号分隔的 identifier）。
+#      （iOS 26 上为液态玻璃）。THEMES 可替换主题列表（以逗号分隔的 identifier）；“A>B”表示以主题 A 启动、运行时切换到 B
+#      （-CYLDemoThemeSwitchTo B），与点击换肤按钮相同。
 set -eu
 cd "$(dirname "$0")/.."
 DEVICE_NAME="${1:-}"
 STYLE="${STYLE:-Default}"
-THEMES="${THEMES:-Default,Christmas,Spring Festival,Halloween,Dark,Network}"
+THEMES="${THEMES:-Default,Christmas,Spring Festival,Halloween,Dark,Network,Christmas>Pink Rose,Spring Festival>Default}"
 DERIVED=build/theme-screenshots-build
 OUT=build/theme-screenshots
 mkdir -p "$DERIVED" "$OUT"
@@ -52,6 +54,8 @@ fi
 BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
 echo "App: $BUNDLE_ID ($APP)"
 
+# [EN] CLAUDE.md: free RAM before the simulator (does nothing outside macOS). [CN] CLAUDE.md：启动模拟器前释放内存（macOS 以外不做任何事）。
+scripts/free-ram.sh || true
 xcrun simctl boot "$DEVICE_ID" 2>/dev/null || true
 xcrun simctl bootstatus "$DEVICE_ID" -b
 # [EN] A clean status bar, as in App Store screenshots. [CN] 干净的状态栏，与 App Store 截图一致。
@@ -69,14 +73,29 @@ OLD_IFS=$IFS
 IFS=','
 for THEME in $THEMES; do
   IFS=$OLD_IFS
-  SLUG=$(printf '%s' "$THEME" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '-' | sed -e 's/--*/-/g' -e 's/-$//')
-  # [EN] Network icons are downloaded: give them longer. [CN] 网络图标需要下载：多等一会。
+  # [EN] "A>B": launch with A, switch to B at runtime. [CN] “A>B”：以 A 启动，运行时切换到 B。
+  SWITCH_TO=""
+  case "$THEME" in
+    *">"*) SWITCH_TO=${THEME#*>}; THEME=${THEME%%>*} ;;
+  esac
+  SLUG=$(printf '%s' "$THEME${SWITCH_TO:+ to $SWITCH_TO}" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '-' | sed -e 's/--*/-/g' -e 's/-$//')
+  # [EN] Network icons are downloaded, a switch happens 4 s after launch: give them longer. [CN] 网络图标需要下载、切换在启动 4 秒后发生：多等一会。
   WAIT=8
   [ "$THEME" = "Network" ] && WAIT=20
+  SWITCH_ARGUMENTS=""
+  if [ -n "$SWITCH_TO" ]; then
+    WAIT=14
+    SWITCH_ARGUMENTS="-CYLDemoThemeSwitchTo"
+  fi
   FILE="$OUT/theme-switching-$STYLE_SLUG-$SLUG.png"
   for ATTEMPT in 1 2; do
-    # shellcheck disable=SC2086
-    xcrun simctl launch --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$THEME" $STYLE_ARGUMENTS
+    if [ -n "$SWITCH_TO" ]; then
+      # shellcheck disable=SC2086
+      xcrun simctl launch --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$THEME" "$SWITCH_ARGUMENTS" "$SWITCH_TO" $STYLE_ARGUMENTS
+    else
+      # shellcheck disable=SC2086
+      xcrun simctl launch --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$THEME" $STYLE_ARGUMENTS
+    fi
     sleep "$WAIT"
     # [EN] Still running? A crash leaves a black screen behind: report it and launch once more.
     # [CN] 仍在运行？崩溃后屏幕为黑色：报告并重新启动一次。
