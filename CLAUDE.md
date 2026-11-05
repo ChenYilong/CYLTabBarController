@@ -151,14 +151,14 @@ and check every project it lists.
 
 **Keywords**: besides `.xcodeproj`, search the commit's code (the diff) for these keywords. A hit means an Xcode
 project setting changed and this section applies. Each keyword is followed by a complete example of the line it
-appears in:
+appears in, taken from the fix in #772 (CI/CD passed with these values), and by what to do when it shows up:
 
-| Keyword | Complete example |
-|:---|:---|
-| `.xcodeproj` | `CYLTabBarController.xcodeproj` |
-| `objectVersion` | `objectVersion = 46;` |
-| `compatibilityVersion` | `compatibilityVersion = "Xcode 3.2";` |
-| `IPHONEOS_DEPLOYMENT_TARGET` | `IPHONEOS_DEPLOYMENT_TARGET = 12.0;` |
+| Keyword | Complete example (#772) | Guidance |
+|:---|:---|:---|
+| `.xcodeproj` | `Example-Swift-SwiftManager-FlatDesign/TWDFGASDGDSFDFG.xcodeproj/project.pbxproj` | Any file under a `.xcodeproj` changed: run the check below on that project. Compare it with `CYLTabBarController.xcodeproj`; if the diff is large because Xcode rewrote the project, keep only the changes you meant and restore the format values. |
+| `objectVersion` | `objectVersion = 46;` (was `110`) | Must stay `46`. If Xcode raised it, set it back. A value of 77 or more usually comes with folder sync: convert that to explicit file lists as #772 did; do not just change the number. |
+| `compatibilityVersion` | `compatibilityVersion = "Xcode 3.2";` (was `"Xcode 8.0"` / `"Xcode 9.3"` / missing) | Must be `"Xcode 3.2"`, in the `PBXProject` object right after `buildConfigurationList`. Add it when missing, and remove `preferredProjectObjectVersion` and the top-level `validationLevel` if present. |
+| `IPHONEOS_DEPLOYMENT_TARGET` | `IPHONEOS_DEPLOYMENT_TARGET = 15.0;` (`Example-Swift-04`, was `27.0`) | Never 27 or more, not even at the project level. Use 15.0, like the ObjC example; match the app's Podfile `platform :ios` so the app is not below its pods. Before lowering it, check the code for newer APIs without `#available`. A raised value is usually an accident of a newer Xcode saving the project (e.g. #669), not a code need. |
 
 ```sh
 git diff --cached --name-only | grep '\.xcodeproj'
@@ -167,8 +167,8 @@ git diff --cached | grep -E 'objectVersion|compatibilityVersion|IPHONEOS_DEPLOYM
 
 **Example fix**: [#772](https://github.com/ChenYilong/CYLTabBarController/pull/772) brought every example back to the
 ObjC example's format. Follow its diff when a project needs the same fix: format 110 / 77 / 60 / 50 / 48 set to 46,
-folder sync replaced by explicit file lists, the Xcode 27-only keys removed, and a project-level deployment target of 27.0
-lowered.
+folder sync replaced by explicit file lists, the Xcode 27-only keys removed, and every deployment target of 27.0 lowered
+to 15.0 (FlatDesign's project level, `Example-Swift-04`'s app target).
 
 **The rule**: every project matches the root ObjC example, `CYLTabBarController.xcodeproj`:
 
