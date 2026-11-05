@@ -166,6 +166,12 @@ static const void *CYLPlusButtonMovedTitleKey = &CYLPlusButtonMovedTitleKey;
 ///      the center, so an image set or replaced later keeps the distance. [CN] 从图片底边到标题中心线的距离，在标题移走前测得（#636）。
 ///      以底边而不是中心计算，之后设置或替换的图片保持同一距离。
 static const void *CYLPlusButtonImageBottomToTitleKey = &CYLPlusButtonImageBottomToTitleKey;
+/// [EN] The title style applied from the tab titles (`-cyl_applyTitleFont:normalColor:selectedColor:`).
+/// [CN] 按 Tab 标题应用的标题样式（`-cyl_applyTitleFont:normalColor:selectedColor:`）。
+static const void *CYLPlusButtonTitleStyleKey = &CYLPlusButtonTitleStyleKey;
+/// [EN] The title font the app gave the plus button, before the tab titles' font was applied.
+/// [CN] 应用 Tab 标题字体之前，App 为 PlusButton 设置的标题字体。
+static const void *CYLPlusButtonOriginalTitleFontKey = &CYLPlusButtonOriginalTitleFontKey;
 
 // [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
 // [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
@@ -467,6 +473,29 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  * [CN] 图片发生变化：留出空间（`-cyl_growToFitContentIfNeeded`），已显示的角标移到图片上（角标锚点跟随可见图片：图片本身，或背景图时为整个按钮）。
  *      仅在已有角标时处理；不会在布局期间执行。
  */
+/*!
+ * [EN] Liquid Glass, an image arriving while the plus button shows its own title: the title is about to move into the tab
+ *      item (#636), so it gets back the font the app gave it, as a plus button with the image set at launch has when its
+ *      title moves. Sized with the tab titles' font instead, the button came out 1 pt wider, and its image sat on half a
+ *      point, which the badge's anchor rounded: 0.17 pt off. Buttons with a configuration keep their transformer.
+ * [CN] 液态玻璃下，PlusButton 显示自己的标题时图片到来：标题即将移到 TabBarItem 中（#636），因此先恢复 App 设置的字体，与启动时就有图片的
+ *      PlusButton 移走标题时一致。若按 Tab 标题的字体计算尺寸，按钮会宽 1 pt，图片落在半个点上，角标锚点取整后偏差 0.17 pt。使用 configuration
+ *      的按钮保留其 transformer。
+ */
+- (void)cyl_restoreOriginalTitleFontBeforeTitleMoves {
+    UIFont *originalFont = objc_getAssociatedObject(self, CYLPlusButtonOriginalTitleFontKey);
+    if (!originalFont || ![CYLConstants isLiquidGlassActive] || ![self cyl_hasImage] || ![self cyl_alignsTitleWithTabBarItemTitles]) {
+        return;
+    }
+    if (@available(iOS 15.0, *)) {
+        if (self.configuration) {
+            return;
+        }
+    }
+    self.titleLabel.font = originalFont;
+    objc_setAssociatedObject(self, CYLPlusButtonTitleStyleKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
 - (void)cyl_contentImageDidChange {
     // [EN] With the title in the tab item (#636), the image-to-title distance was measured with the old picture: the title
     //      comes back to the button, so the next layout moves it again and measures with the new one, as for a picture
@@ -474,6 +503,7 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     // [CN] 标题已移到 TabBarItem 中时（#636），图片到标题的距离是用旧图片测量的：先把标题还给按钮，下一次布局重新移走并用新图片测量，
     //      与启动时就设置该图片一致（60 pt 图片替换 44 pt 图片后，比启动时就设置的同一图片低 3 pt）。
     [self cyl_returnTitleFromTabBarItem];
+    [self cyl_restoreOriginalTitleFontBeforeTitleMoves];
     [self cyl_growToFitContentIfNeeded];
     if (objc_getAssociatedObject(self, NSSelectorFromString(@"cyl_badgeAnchorViewAlignedToView:"))) {
         [self cyl_refreshBadge];
@@ -953,7 +983,6 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  *      以便下次布局时按新的尺寸对齐。
  */
 - (BOOL)cyl_applyTitleFont:(UIFont *)font normalColor:(UIColor *)normalColor selectedColor:(UIColor *)selectedColor {
-    static const void *CYLPlusButtonTitleStyleKey = &CYLPlusButtonTitleStyleKey;
     NSDictionary *applied = objc_getAssociatedObject(self, CYLPlusButtonTitleStyleKey);
     UIFont *titleFont = font ?: applied[@"font"];
     UIColor *selectedTitleColor = selectedColor ?: applied[@"selected"] ?: normalColor ?: applied[@"normal"];
@@ -981,6 +1010,9 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
             self.configuration = configuration;
             return YES;
         }
+    }
+    if (!objc_getAssociatedObject(self, CYLPlusButtonOriginalTitleFontKey) && self.titleLabel.font) {
+        objc_setAssociatedObject(self, CYLPlusButtonOriginalTitleFontKey, self.titleLabel.font, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     self.titleLabel.font = titleFont;
     [self setTitleColor:titleColor forState:UIControlStateNormal];

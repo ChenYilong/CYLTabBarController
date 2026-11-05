@@ -39,12 +39,30 @@
  *      bounds 带来的不到一个点的偏差（图片加载前就显示的 PlusButton 角标，与图片已就绪时显示的同一角标相差 0.17–0.33 pt）。
  */
 @interface CYLBadgeAnchorView : UIView
+/// [EN] The view it follows, the visible part of its picture (fractions) and the two constraints set from them.
+/// [CN] 跟随的视图、其图片可见部分（比例）以及据此设置的两个约束。
+@property (nonatomic, weak) UIView *cyl_target;
+@property (nonatomic, assign) CGRect cyl_unitRect;
+@property (nonatomic, weak) NSLayoutConstraint *cyl_leadingConstraint;
+@property (nonatomic, weak) NSLayoutConstraint *cyl_topConstraint;
 @end
 
 @implementation CYLBadgeAnchorView
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    // [EN] The padding before the visible part follows the target's current size: computed only when the badge was pinned,
+    //      it kept the size the target had then (a badge pinned before its image loaded sat 0.17 pt off).
+    // [CN] 可见部分之前的边距随目标当前尺寸变化：只在固定角标时计算的话，会保留目标当时的尺寸（图片加载前固定的角标偏移 0.17 pt）。
+    CGSize targetSize = self.cyl_target.bounds.size;
+    CGFloat leading = CGRectGetMinX(self.cyl_unitRect) * targetSize.width;
+    CGFloat top = CGRectGetMinY(self.cyl_unitRect) * targetSize.height;
+    if (self.cyl_leadingConstraint && fabs(self.cyl_leadingConstraint.constant - leading) > 0.01) {
+        self.cyl_leadingConstraint.constant = leading;
+    }
+    if (self.cyl_topConstraint && fabs(self.cyl_topConstraint.constant - top) > 0.01) {
+        self.cyl_topConstraint.constant = top;
+    }
     [self cyl_layoutBadgeAtTopRightCorner];
 }
 
@@ -365,6 +383,13 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
     // [CN] 可见部分之前的边距，按目标当前尺寸计算。只在确有变化时修改：本方法在 PlusButton 布局期间执行，任何修改都会让它再次布局。
     CGFloat leading = CGRectGetMinX(unitRect) * targetSize.width;
     CGFloat top = CGRectGetMinY(unitRect) * targetSize.height;
+    if ([anchorView isKindOfClass:[CYLBadgeAnchorView class]]) {
+        CYLBadgeAnchorView *badgeAnchorView = (CYLBadgeAnchorView *)anchorView;
+        badgeAnchorView.cyl_target = target;
+        badgeAnchorView.cyl_unitRect = unitRect;
+        badgeAnchorView.cyl_leadingConstraint = constraints[0];
+        badgeAnchorView.cyl_topConstraint = constraints[1];
+    }
     if (fabs(constraints[0].constant - leading) >= 0.5) {
         constraints[0].constant = leading;
     }
