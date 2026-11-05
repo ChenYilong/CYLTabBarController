@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C7A1000000000000000000B1 /* CYLTabBarController in Frameworks */ = {isa = PBXBuildFile; productRef = C7A1000000000000000000A2 /* CYLTabBarController */; };
+		C1A5CE4E0000000000000011 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE4E0000000000000012 /* SceneDelegate.swift */; };
 		8D66718AF9D0CA59FDFB2A8B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61081066C1DCBD98D54841FA /* AppDelegate.swift */; };
 		9B4646B8E027A05422674EBE /* GalleryAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C44C660B33A02CCB3BACC1 /* GalleryAnimations.swift */; };
 		6BF49D6C4A2613241925B554 /* GalleryIrregularPlusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B578CA6ADEA821166FCA96 /* GalleryIrregularPlusButton.swift */; };
@@ -20,6 +21,8 @@
 
 /* Begin PBXFileReference section */
 		C7A100000000000000000010 /* CYLTabBarGallery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CYLTabBarGallery.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1A5CE4E0000000000000012 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		C1A5CE4E0000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		61081066C1DCBD98D54841FA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		84C44C660B33A02CCB3BACC1 /* GalleryAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryAnimations.swift; sourceTree = "<group>"; };
 		D8B578CA6ADEA821166FCA96 /* GalleryIrregularPlusButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryIrregularPlusButton.swift; sourceTree = "<group>"; };
@@ -62,6 +65,8 @@
 			isa = PBXGroup;
 			children = (
 				61081066C1DCBD98D54841FA /* AppDelegate.swift */,
+				C1A5CE4E0000000000000012 /* SceneDelegate.swift */,
+				C1A5CE4E0000000000000013 /* Info.plist */,
 				84C44C660B33A02CCB3BACC1 /* GalleryAnimations.swift */,
 				D8B578CA6ADEA821166FCA96 /* GalleryIrregularPlusButton.swift */,
 				9F36F1C40FF98022F4960801 /* GalleryPageViewController.swift */,
@@ -150,6 +155,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D66718AF9D0CA59FDFB2A8B /* AppDelegate.swift in Sources */,
+				C1A5CE4E0000000000000011 /* SceneDelegate.swift in Sources */,
 				9B4646B8E027A05422674EBE /* GalleryAnimations.swift in Sources */,
 				6BF49D6C4A2613241925B554 /* GalleryIrregularPlusButton.swift in Sources */,
 				C5FAF482D290995567600217 /* GalleryPageViewController.swift in Sources */,
@@ -213,6 +219,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CYLTabBarGallery/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "CYL Gallery";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -236,6 +243,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CYLTabBarGallery/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "CYL Gallery";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

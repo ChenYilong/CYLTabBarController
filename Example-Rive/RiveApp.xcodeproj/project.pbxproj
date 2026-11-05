@@ -9,13 +9,12 @@
 /* Begin PBXBuildFile section */
 		08E79CD10245A663F1BD4123 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 45BFB2F14A25627FEFFEF13E /* Poppins-Bold.ttf */; };
 		167CF5CA65FDB746AE1E47F6 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CBB7661983D3BF1EC5DDFF /* SignInView.swift */; };
-		1992DB5C81A6B5A0E8695861 /* CYLSettingsDemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F30006E5BC2C896C43D35808 /* CYLSettingsDemoTableViewController.swift */; };
-		A1C0FFEE5A1D0F00D0000003 /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */; };
 		19E3EF073616D95A0907ECF0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8E9F1732B1A1048CFEFB23 /* HomeView.swift */; };
 		24C9C0A04F6CFE6ADF0916D6 /* TabItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302B7A22BBFEB0B6D2D1F250 /* TabItems.swift */; };
 		3A951187ACF1CACD03009E33 /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = C654F0A882961E70103CCF0B /* icons.riv */; };
 		3C711DA2856AABA0EEB6251B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB104DA902FE6C1FA00D432 /* Foundation.framework */; };
 		45608F73DF993EBDF7A91512 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD544589DFE95E305AADD727 /* CustomTextField.swift */; };
+		4F8618CF17404F47A6EA1BD2 /* Pods_RiveApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C113115355150D7EF79987B6 /* Pods_RiveApp.framework */; };
 		64BFFC1EF7D8969B5798C270 /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4832D075A2C5551C835B3AB /* CustomButton.swift */; };
 		64C91DB47B28EFAEC7C9792A /* CustomFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB5B4CC52C44691B7FCA304 /* CustomFont.swift */; };
 		6501E84D2037A29884A2FDA7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF928D71D024B7F90696E769 /* Assets.xcassets */; };
@@ -23,8 +22,11 @@
 		8C7CC7F169DF6D09CFED6CBE /* TabViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A94E53C3C2459E59C39BB0 /* TabViewControllers.swift */; };
 		9049620E8B510276C7D44D09 /* RiveAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A17F7195D8D07CB67028570 /* RiveAnimation.swift */; };
 		97F5EDDE4D5B47AFC38A08BD /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1E61D8530FAB92D859BBCDFC /* Inter-SemiBold.ttf */; };
+		A85B4D667BD72D9C31E30BBC /* CYLSettingsDemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D0C069C05195A044437DCC9 /* CYLSettingsDemoTableViewController.swift */; };
+		A1C0FFEE5A1D0F00D0000003 /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */; };
 		A905CDB1E98C37058FE447D1 /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FF32281E56757A718BBBB4 /* SideMenu.swift */; };
 		AC7015914DF03E3B9C6AFEAF /* check.riv in Resources */ = {isa = PBXBuildFile; fileRef = E8DF93C34F3E7B872BF47F0F /* check.riv */; };
+		C1A5CE4E0000000000000001 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE4E0000000000000002 /* SceneDelegate.swift */; };
 		B0D4999FF5EE129B8EE2C3CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF527C082D0F487D0E94689 /* AppDelegate.swift */; };
 		B7E3FB4B942E2BEC8550BB04 /* house.riv in Resources */ = {isa = PBXBuildFile; fileRef = 484F60C30CA9614BAA11FB7E /* house.riv */; };
 		B85C6504BDC177B92A73077A /* button.riv in Resources */ = {isa = PBXBuildFile; fileRef = E2E65C33F57E037E0E98F612 /* button.riv */; };
@@ -55,6 +57,9 @@
 		484F60C30CA9614BAA11FB7E /* house.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = house.riv; sourceTree = "<group>"; };
 		4B1F9532677D6BA1B23891DE /* menu_button.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = menu_button.riv; sourceTree = "<group>"; };
 		4D8E9F1732B1A1048CFEFB23 /* HomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		5D0C069C05195A044437DCC9 /* CYLSettingsDemoTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLSettingsDemoTableViewController.swift; path = "../Example-Shared/CYLSettingsDemoTableViewController.swift"; sourceTree = SOURCE_ROOT; };
+		A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
+		C1A5CE4E0000000000000002 /* SceneDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		5FF527C082D0F487D0E94689 /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		64CBB7661983D3BF1EC5DDFF /* SignInView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		6605666A33C2A6CE223AD2B5 /* CourseSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CourseSection.swift; sourceTree = "<group>"; };
@@ -68,15 +73,16 @@
 		9A25FDF1B50065AB34F5233C /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AD544589DFE95E305AADD727 /* CustomTextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 		ADB104DA902FE6C1FA00D432 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		B5B4050CF6591CE83F68121D /* Pods-RiveApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RiveApp.debug.xcconfig"; path = "Target Support Files/Pods-RiveApp/Pods-RiveApp.debug.xcconfig"; sourceTree = "<group>"; };
+		B7D020E8709D5AB99BF942DE /* Pods-RiveApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RiveApp.release.xcconfig"; path = "Target Support Files/Pods-RiveApp/Pods-RiveApp.release.xcconfig"; sourceTree = "<group>"; };
 		C0A94E53C3C2459E59C39BB0 /* TabViewControllers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TabViewControllers.swift; sourceTree = "<group>"; };
+		C113115355150D7EF79987B6 /* Pods_RiveApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RiveApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4832D075A2C5551C835B3AB /* CustomButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
 		C654F0A882961E70103CCF0B /* icons.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = icons.riv; sourceTree = "<group>"; };
 		C78A77277F5BF044CE896CCF /* confetti.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = confetti.riv; sourceTree = "<group>"; };
 		CE74468C4779D2C9657DDB0A /* VCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VCard.swift; sourceTree = "<group>"; };
 		E2E65C33F57E037E0E98F612 /* button.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = button.riv; sourceTree = "<group>"; };
 		E8DF93C34F3E7B872BF47F0F /* check.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = check.riv; sourceTree = "<group>"; };
-		F30006E5BC2C896C43D35808 /* CYLSettingsDemoTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLSettingsDemoTableViewController.swift; path = "../Example-Shared/CYLSettingsDemoTableViewController.swift"; sourceTree = SOURCE_ROOT; };
-		A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
 		FF928D71D024B7F90696E769 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,6 +92,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3C711DA2856AABA0EEB6251B /* Foundation.framework in Frameworks */,
+				4F8618CF17404F47A6EA1BD2 /* Pods_RiveApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				2586F642F2547DDB3086C82D /* iOS */,
+				C113115355150D7EF79987B6 /* Pods_RiveApp.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -122,21 +130,21 @@
 			path = Fonts;
 			sourceTree = "<group>";
 		};
-		202FF2BA2D94A674B07FD8B8 /* Example-Shared */ = {
-			isa = PBXGroup;
-			children = (
-				F30006E5BC2C896C43D35808 /* CYLSettingsDemoTableViewController.swift */,
-				A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */,
-			);
-			name = "Example-Shared";
-			sourceTree = "<group>";
-		};
 		2586F642F2547DDB3086C82D /* iOS */ = {
 			isa = PBXGroup;
 			children = (
 				ADB104DA902FE6C1FA00D432 /* Foundation.framework */,
 			);
 			name = iOS;
+			sourceTree = "<group>";
+		};
+		2CE3363CA18A1182962E0C20 /* Example-Shared */ = {
+			isa = PBXGroup;
+			children = (
+				5D0C069C05195A044437DCC9 /* CYLSettingsDemoTableViewController.swift */,
+				A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */,
+			);
+			name = "Example-Shared";
 			sourceTree = "<group>";
 		};
 		3C37C14836363AF1FB3E5EDA = {
@@ -146,8 +154,19 @@
 				04DA43D1003ED7CCDAE645A9 /* Frameworks */,
 				9899378068CB3C52A3906106 /* RiveApp */,
 				44BEF7973B94924E60D5369A /* Shared (Example-SwiftUI-Rive) */,
-				202FF2BA2D94A674B07FD8B8 /* Example-Shared */,
+				2CE3363CA18A1182962E0C20 /* Example-Shared */,
+				3FE99F7B37D197C3D84C7574 /* Pods */,
 			);
+			sourceTree = "<group>";
+		};
+		3FE99F7B37D197C3D84C7574 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				B7D020E8709D5AB99BF942DE /* Pods-RiveApp.release.xcconfig */,
+				B5B4050CF6591CE83F68121D /* Pods-RiveApp.debug.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		44BEF7973B94924E60D5369A /* Shared (Example-SwiftUI-Rive) */ = {
@@ -188,6 +207,7 @@
 			isa = PBXGroup;
 			children = (
 				5FF527C082D0F487D0E94689 /* AppDelegate.swift */,
+				C1A5CE4E0000000000000002 /* SceneDelegate.swift */,
 				C0A94E53C3C2459E59C39BB0 /* TabViewControllers.swift */,
 				29242C162EDC3294BE1BC4B0 /* RiveMenuButtonDemoView.swift */,
 				A1C0FFEE5A1D0F00D0000002 /* RivePlusButton.swift */,
@@ -253,9 +273,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D8DDD13184D17292C0225E79 /* Build configuration list for PBXNativeTarget "RiveApp" */;
 			buildPhases = (
+				9D9FB4023D06D585473D4759 /* [CP] Check Pods Manifest.lock */,
 				C1EE2EE83CDE205C7DE122BE /* Sources */,
 				0A236F0394923B00C424FA7E /* Frameworks */,
 				742F9D42955BBDA5801BF955 /* Resources */,
+				6683EE67B94BF93165D3E75D /* [CP] Embed Pods Frameworks */,
+				6D99EE627F457A5855926B04 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -315,12 +338,76 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		6683EE67B94BF93165D3E75D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RiveApp/Pods-RiveApp-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/RiveRuntime/RiveRuntime.framework/RiveRuntime",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RiveRuntime.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RiveApp/Pods-RiveApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6D99EE627F457A5855926B04 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RiveApp/Pods-RiveApp-resources.sh",
+				"${PODS_ROOT}/../../CYLTabBarController/Resources/CYLTabBarController.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RiveRuntime/runtime_ios_privacy.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/runtime_ios_privacy.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RiveApp/Pods-RiveApp-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9D9FB4023D06D585473D4759 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RiveApp-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		C1EE2EE83CDE205C7DE122BE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				B0D4999FF5EE129B8EE2C3CD /* AppDelegate.swift in Sources */,
+				C1A5CE4E0000000000000001 /* SceneDelegate.swift in Sources */,
 				8C7CC7F169DF6D09CFED6CBE /* TabViewControllers.swift in Sources */,
 				D6F45F96F2196AB7B5E9E432 /* RiveMenuButtonDemoView.swift in Sources */,
 				A1C0FFEE5A1D0F00D0000001 /* RivePlusButton.swift in Sources */,
@@ -339,7 +426,7 @@
 				167CF5CA65FDB746AE1E47F6 /* SignInView.swift in Sources */,
 				A905CDB1E98C37058FE447D1 /* SideMenu.swift in Sources */,
 				24C9C0A04F6CFE6ADF0916D6 /* TabItems.swift in Sources */,
-				1992DB5C81A6B5A0E8695861 /* CYLSettingsDemoTableViewController.swift in Sources */,
+				A85B4D667BD72D9C31E30BBC /* CYLSettingsDemoTableViewController.swift in Sources */,
 				A1C0FFEE5A1D0F00D0000003 /* CYLPlusButtonBadgeDemo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -349,6 +436,7 @@
 /* Begin XCBuildConfiguration section */
 		1E9767E90FFCC9983E1A3AAA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B7D020E8709D5AB99BF942DE /* Pods-RiveApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -434,6 +522,7 @@
 		};
 		6DF17B8D3B68E9ABDCBA788F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B5B4050CF6591CE83F68121D /* Pods-RiveApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

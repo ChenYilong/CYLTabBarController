@@ -25,8 +25,6 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    self.window.backgroundColor = [UIColor whiteColor];
     // [EN] FIX: issue #601 — how long and how much the icons from the network stay cached (memory and sandbox), as
     //      SDWebImage's SDImageCacheConfig.
     // [CN] 网络图标在内存与沙盒中的缓存时长与大小，参考 SDWebImage 的 SDImageCacheConfig。
@@ -34,8 +32,6 @@
     imageCache.maxDiskAge = 30 * 24 * 60 * 60;                 // 30 days
     imageCache.maxDiskSize = 20 * 1024 * 1024;                 // 20 MB
     imageCache.diskCacheExpireType = CYLImageCacheExpireTypeAccessDate;
-    [self showTabBarControllerWithStyle:CYLTabBarStyleTypeLiquidGlass];
-    [self.window makeKeyAndVisible];
     return YES;
 }
 

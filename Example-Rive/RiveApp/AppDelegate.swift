@@ -9,23 +9,13 @@ import UIKit
 import CYLTabBarController
 
 /*!
- * [EN] A UIKit app (no SwiftUI `App`): the window's root view controller is a CYLTabBarController whose tab icons are Rive
- *      artboards. It reuses the course's screens, Rive files and assets from Example-SwiftUI-Rive (see README.md).
- * [CN] 一个 UIKit App（不使用 SwiftUI `App`）：window 的根控制器是 CYLTabBarController，其 Tab 图标是 Rive 画板。它复用
+ * [EN] A UIKit app (no SwiftUI `App`): the root view controller of the scene's window (SceneDelegate.swift) is a
+ *      CYLTabBarController whose tab icons are Rive artboards. It reuses the course's screens, Rive files and assets from Example-SwiftUI-Rive (see README.md).
+ * [CN] 一个 UIKit App（不使用 SwiftUI `App`）：scene 的 window（SceneDelegate.swift）的根控制器是 CYLTabBarController，其 Tab 图标是 Rive 画板。它复用
  *      Example-SwiftUI-Rive 中课程的页面、Rive 文件与资源（见 README.md）。
  */
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    var window: UIWindow?
-
-    func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        let window = UIWindow(frame: UIScreen.main.bounds)
-        window.rootViewController = Self.makeTabBarController()
-        window.makeKeyAndVisible()
-        self.window = window
-        return true
-    }
 
     /// [EN] The tabs and Rive attributes of the SwiftUI app (TabItems.swift) and a plus button (RivePlusButton.swift),
     ///      registered before the tab bar controller is created. The plus button shows the Timer tab's page, so Timer is

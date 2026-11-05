@@ -10,6 +10,7 @@
 #import <CYLTabBarController/CYLTabBarController.h>
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
+/// The scene's window, set by SceneDelegate. SceneDelegate 设置的 scene window。
 @property (strong, nonatomic) UIWindow *window;
 
 /// Shows the tabs with `styleType` (Liquid Glass or FlatDesign), then loads their icons from the network: the in-place
