@@ -256,6 +256,13 @@
 "角标" = "Insígnies";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "No compatible amb Liquid Glass: el sistema fixa l'alçada de la barra (FlatDesign i l'estil clàssic sí)";
 
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Amagar en desplaçar: simular interrupcions (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "S'executa 1,5 s després del toc. Primer desplaça't cap avall per amagar la TabBar. Esperat: la TabBar torna de seguida i la inèrcia no l'amaga de nou.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "S'executa 1,5 s després del toc. Esperat: la TabBar no canvia per això (no s'amaga, i una TabBar amagada per l'app no es mostra).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Tria una interrupció; s'executa al cap d'1,5 s. Primer desplaça't cap avall per amagar la TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Manual: toca per activar l'amagat en desplaçar, desplaça't cap avall per amagar la TabBar i fes el que diu el títol. Esperat: la TabBar torna de seguida.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Executa per ordre totes les simulacions automàtiques i informa d'èxits / errors (uns 2 minuts), també a la consola. També es pot executar amb l'argument d'inici -CYLScrollHideSelfTest YES.";
 /* Issue #216: theme switching (skins) demo. */
 "换肤" = "Aspecte";
 "换肤（主题，issue #216）" = "Aspecte (tema, issue #216)";
@@ -306,3 +313,5 @@
 "仅配色" = "Només colors";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Toca'm";
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Copia";

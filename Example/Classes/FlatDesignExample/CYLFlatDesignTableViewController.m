@@ -70,6 +70,14 @@
     
     [self.navigationItem.leftBarButtonItem setTintColor:UIColor.redColor];
     [self.navigationItem.rightBarButtonItem setTintColor:UIColor.redColor];
+    // [EN] Issue #13: a navigation bar button with a UIMenu, for the "Manual: tap a navigation bar button" simulation
+    //      (a tap outside the content ends the scroll hiding session). Appended, so `rightBarButtonItem` is unchanged.
+    // [CN] issue #13：带 UIMenu 的导航栏按钮，用于“手动：点击导航栏按钮”模拟（在内容之外的点击会结束滚动隐藏会话）。追加在末尾，
+    //      `rightBarButtonItem` 不变。
+    UIAction *menuAction = [UIAction actionWithTitle:@"#13" image:nil identifier:nil handler:^(__kindof UIAction *action) {}];
+    UIBarButtonItem *menuItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"ellipsis.circle"]
+                                                                  menu:[UIMenu menuWithTitle:@"" children:@[ menuAction ]]];
+    self.navigationItem.rightBarButtonItems = [self.navigationItem.rightBarButtonItems arrayByAddingObject:menuItem];
     
     // ✅ iOS 26修复方案
     
@@ -125,6 +133,23 @@
         return [self cyl_demoRowCountInSection:section];
     }
     return 50;
+}
+
+/*!
+ * [EN] Issue #13: a context menu on the badge rows, for the "Manual: long press a row" simulation (a long press on the
+ *      content ends the scroll hiding session).
+ * [CN] issue #13：角标行的上下文菜单，用于“手动：长按某一行”模拟（在内容上长按会结束滚动隐藏会话）。
+ */
+- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point {
+    if (indexPath.section < [self cyl_demoSectionCount]) {
+        return nil;
+    }
+    return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu *(NSArray<UIMenuElement *> *suggestedActions) {
+        UIAction *copy = [UIAction actionWithTitle:CYLLocalizedString(@"复制") image:[UIImage systemImageNamed:@"doc.on.doc"] identifier:nil handler:^(__kindof UIAction *action) {
+            UIPasteboard.generalPasteboard.string = [tableView cellForRowAtIndexPath:indexPath].textLabel.text;
+        }];
+        return [UIMenu menuWithTitle:@"" children:@[ copy ]];
+    }];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
@@ -364,6 +389,8 @@ static char CYLTabBarDemoItemTitleKey;
 /// [EN] A row of a demo section: a settings row (`CYLDemoRowSettings`) or a tab bar demo row (`CYLDemoRowTabBar`).
 /// [CN] 演示 section 中的一行：设置行（`CYLDemoRowSettings`）或 TabBar 演示行（`CYLDemoRowTabBar`）。
 static const NSInteger CYLDemoRowTabBar = 1000;
+/// [EN] Rows of the scroll hiding simulation section (issue #13). [CN] 滚动隐藏模拟意外情况 section 的行（issue #13）。
+static const NSInteger CYLDemoRowScrollHideSimulation = 3000;
 /// [EN] A row of the theme list section: `CYLDemoRowTheme` + the theme's index (issue #216).
 /// [CN] 主题列表 section 中的一行：`CYLDemoRowTheme` + 主题序号（issue #216）。
 static const NSInteger CYLDemoRowTheme = 2000;
@@ -376,7 +403,7 @@ static const NSInteger CYLDemoRowTheme = 2000;
  *      3 standardAppearance, 4 login state, 5 plus button touchable area, 6 selectedIndex (#515), 7 minimize / hide the
  *      tab bar on scroll (#13, next to the show / hide row), 8–18 issue #535 (8 tap animation, 9 long press, 10 swipe,
  *      11 outside the superview, 12 bundle images, 13 navigation bar without a base class, 14 slide transition, 15 tap
- *      sound and haptic, 16 long press / double tap timing, 17 adjacent tab, 18 CYLUtils helpers), 19 skin (theme, #216), then the tab item
+ *      sound and haptic, 16 long press / double tap timing, 17 adjacent tab, 18 CYLUtils helpers), 19 skin (theme, #216), 20 the scroll hiding simulations (#13, in their own section), then the tab item
  *      updates (title, icon, network icon, all network icons, all local icons, GIF, all titles, replace neighbors).
  *      Settings rows not listed here (a newer library) go to the first section.
  * [CN] 按功能分组的 section：每行为设置行的序号，或 `CYLDemoRowTabBar` + TabBar 演示行序号。设置行顺序见
@@ -411,6 +438,14 @@ static const NSInteger CYLDemoRowTheme = 2000;
         @{ @"title" : CYLLocalizedString(@"跳转与对比"),
            @"rows" : @[ @(CYLDemoRowTabBar + 5), @(CYLDemoRowTabBar + 6), @(CYLDemoRowTabBar + 7), @(CYLDemoRowTabBar + 8) ] },
     ] mutableCopy];
+    // [EN] Scroll hiding (issue #13): one section of simulated interruptions. [CN] 滚动隐藏（issue #13）：模拟意外情况的 section。
+    // [EN] Settings row 20 (the same simulations in an action sheet) first, then one row per simulation.
+    // [CN] 先放设置第 20 行（操作表中的同样模拟），再每个模拟一行。
+    NSMutableArray<NSNumber *> *simulationRows = [NSMutableArray arrayWithObject:@20];
+    for (NSInteger row = 0; row < [self cyl_scrollHideSimulationRowCount]; row++) {
+        [simulationRows addObject:@(CYLDemoRowScrollHideSimulation + row)];
+    }
+    [sections addObject:@{ @"title" : CYLLocalizedString(@"滚动隐藏：模拟意外情况（issue #13）"), @"rows" : simulationRows }];
     NSMutableSet<NSNumber *> *listed = [NSMutableSet set];
     for (NSDictionary *section in sections) {
         [listed addObjectsFromArray:section[@"rows"]];
@@ -443,6 +478,9 @@ static const NSInteger CYLDemoRowTheme = 2000;
 
 - (UITableViewCell *)cyl_demoCellForTableView:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath {
     NSInteger row = [self cyl_demoRowAtIndexPath:indexPath];
+    if (row >= CYLDemoRowScrollHideSimulation) {
+        return [self cyl_scrollHideSimulationCellForTableView:tableView row:row - CYLDemoRowScrollHideSimulation];
+    }
     if (row >= CYLDemoRowTheme) {
         return [self cyl_themeListCellForTableView:tableView row:row - CYLDemoRowTheme];
     }
@@ -455,6 +493,10 @@ static const NSInteger CYLDemoRowTheme = 2000;
 - (void)cyl_demoDidSelectRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     NSInteger row = [self cyl_demoRowAtIndexPath:indexPath];
+    if (row >= CYLDemoRowScrollHideSimulation) {
+        [self cyl_didSelectScrollHideSimulationRow:row - CYLDemoRowScrollHideSimulation];
+        return;
+    }
     if (row >= CYLDemoRowTheme) {
         [self cyl_didSelectThemeListRow:row - CYLDemoRowTheme];
         // [EN] The checkmarks of the list and the skin row follow the new theme. [CN] 列表勾号与换肤行随新主题更新。

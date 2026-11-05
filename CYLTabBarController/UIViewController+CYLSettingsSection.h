@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
  *      the tap sound and haptic, row 16 switches the long press duration and double tap interval, row 17 switches to
  *      the previous or next tab, row 18 runs the CYLUtils weak associated object and nearest control helpers (issue #535),
  *      row 19 picks a skin (theme) of the tab bar (`CYLThemeManager`, `CYLTabBarTheme`, issue #216),
+ *      row 20 lists the scroll hiding simulations in an action sheet (`-cyl_presentScrollHideSimulationMenu`, issue #13),
  *      then the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon,
  *      all network icons, all local icons, GIF icon, all titles, replace neighboring tabs.
  * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
@@ -36,7 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
  *      第 8 行切换 Tab 的点击动画，第 9 行开启 Tab 长按，第 10 行开启左右滑动切换 Tab，第 11 行演示超出父视图的子视图响应点击，
  *      第 12 行从 bundle 加载图片，第 13 行不继承基类隐藏导航栏，第 14 行打开滑动转场演示，第 15 行切换点击声音与触感反馈，
  *      第 16 行切换长按时长与双击间隔，第 17 行切换到上一个或下一个 Tab，第 18 行运行 CYLUtils 弱引用关联对象与查找按钮的工具方法（issue #535），
- *      第 19 行选择 TabBar 的皮肤（主题，`CYLThemeManager`、`CYLTabBarTheme`，issue #216），之后是原地更新 Tab 的若干行
+ *      第 19 行选择 TabBar 的皮肤（主题，`CYLThemeManager`、`CYLTabBarTheme`，issue #216），
+ *      第 20 行用操作表列出滚动隐藏的模拟（`-cyl_presentScrollHideSimulationMenu`，issue #13），
+ *      之后是原地更新 Tab 的若干行
  *      （`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、所有网络图标、所有本地图标、GIF 图标、所有标题、替换相邻 Tab 的页面。
  */
 FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
@@ -71,6 +74,35 @@ FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
  */
 - (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
 
+@end
+
+/*!
+ * [EN] Scroll hiding (issue #13): simulations of the interruptions the tab bar must come back from (alerts, modals,
+ *      push / pop, tab switch, app lifecycle, memory warning, overlay window, keyboard, share sheet, scrolling in code,
+ *      the app hiding the bar, accessibility and power state changes, rotation). Demo helpers: each turns scroll hiding
+ *      on and fires after 1.5 s. A grouped list shows them as a section; the settings section has one row that lists
+ *      them all in an action sheet (`CYLSettingsSection`, every demo).
+ * [CN] 滚动隐藏（issue #13）：模拟 TabBar 必须从中恢复显示的各种意外情况（弹框、模态页面、push / pop、切换 Tab、App 生命周期、内存警告、
+ *      浮层窗口、键盘、分享面板、代码滚动、App 自己隐藏 TabBar、辅助功能与电源状态变化、旋转）。演示辅助方法：每项先开启滚动隐藏，
+ *      1.5 秒后触发。分组列表以一个 section 显示；设置分组中有一行，用操作表列出全部模拟（`CYLSettingsSection`，所有 Demo）。
+ */
+@interface UIViewController (CYLScrollHideSimulation)
+/// [EN] Number of simulations. [CN] 模拟的数量。
+- (NSInteger)cyl_scrollHideSimulationRowCount;
+/// [EN] The cell of simulation `row`. [CN] 第 `row` 个模拟的 cell。
+- (UITableViewCell *)cyl_scrollHideSimulationCellForTableView:(UITableView *)tableView row:(NSInteger)row;
+/// [EN] Runs simulation `row` after 1.5 s. [CN] 1.5 秒后执行第 `row` 个模拟。
+- (void)cyl_didSelectScrollHideSimulationRow:(NSInteger)row;
+/// [EN] Lists every simulation in an action sheet. [CN] 用操作表列出全部模拟。
+- (void)cyl_presentScrollHideSimulationMenu;
+/*!
+ * [EN] The automatic self-test: runs every automatic simulation on this page, checks the expected result and reports
+ *      PASS / FAIL / SKIP in the console and an alert (about 2 minutes). Launching the app with
+ *      `-CYLScrollHideSelfTest YES` runs it once on the first page.
+ * [CN] 自动自测：在本页面依次运行所有可自动化的模拟，检查预期结果，并在控制台和弹框中报告 PASS / FAIL / SKIP（约 2 分钟）。
+ *      以 `-CYLScrollHideSelfTest YES` 启动 App 时，会在第一个页面上自动运行一次。
+ */
+- (void)cyl_runScrollHideSelfTest;
 @end
 
 NS_ASSUME_NONNULL_END
