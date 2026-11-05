@@ -458,7 +458,7 @@ static BOOL CYLDemoSameImage(UIImage *image, UIImage *otherImage) {
  */
 static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
     CYLTabBarController *tabBarController = [CYLTabBarController cyl_activeTabBarController];
-    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
+    CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
     NSString *theme = CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier;
     if (!plusButton) {
         NSLog(@"plus child theme test: SKIP %@ theme=%@: no plus button", phase, theme);
