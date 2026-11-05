@@ -29,6 +29,7 @@
 | [Swift 中获取 PlusButton](#cnswift-中获取-plusbutton) | [Getting the PlusButton in Swift](#engetting-the-plusbutton-in-swift) |
 | [PlusButton 的图片一律按原图绘制](#cnplusbutton-的图片一律按原图绘制) | [Every PlusButton image is drawn as is](#enevery-plusbutton-image-is-drawn-as-is) |
 | [之后才加载的图片](#cn之后才加载的图片) | [Images loaded later](#enimages-loaded-later) |
+| [图标与标题重叠](#cn图标与标题重叠) | [When the icon and the title overlap](#enwhen-the-icon-and-the-title-overlap) |
 | [同时修复](#cn同时修复) | [Also fixed](#enalso-fixed) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
@@ -111,6 +112,37 @@ if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton(forOwner: ta
 | 下图（Example-Rive，临时修改为 2 秒后加载图片）：从上到下依次为加载前、加载 44 pt 图片后、替换为 60 pt 图片后、之后才设置背景图片（标题画在背景上）。 | Below (Example-Rive, changed for this test to load the image after 2 seconds), top to bottom: before the image, after a 44 pt image, after it is replaced by a 60 pt one, and with a background image set later (title on the background). |
 
 ![Plus button image loaded later](assets/plusbutton-image-loaded-later.png)
+
+## [CN]图标与标题重叠
+## [EN]When the icon and the title overlap
+
+| 中文 | English |
+|:---|:---|
+| PlusButton 的图标与标题是否重叠，取决于图片是怎么设置的，以及是否实现了 `+alignsTitleWithTabBarItemTitles`（标题与 Tab 标题对齐）。下表列出各种情况，以及是正常现象还是异常。 | Whether a plus button's icon and title overlap depends on how its picture is set and on `+alignsTitleWithTabBarItemTitles` (the title aligned with the tab titles). The table lists each case and whether it is expected or a bug. |
+
+| 设置方式 / How the plus button is set | 是否重叠 / Overlap | 说明 / Notes |
+|:---|:---|:---|
+| `+cyl_plusButtonWithImage:…`（图片 + 标题）<br>`+cyl_plusButtonWithImage:…` (image + title) | 不重叠，所有样式 / No, in every style | 标题位于 Tab 标题的中心线上，图片紧挨在标题上方（间距 2 pt），与 Tab 图标一致。液态玻璃下标题由 TabBarItem 显示（#636）；扁平样式与经典 TabBar 下标题留在按钮中。以前在扁平样式与经典 TabBar 下，标题移到 Tab 标题线上而图片仍居中于按钮，二者重叠（60 pt 图片几乎盖住标题），属于**异常**，已在库中修复。<br>The title is on the tab titles' center line and the image right above it (2 pt apart), like a tab icon. On Liquid Glass the tab item shows the title (#636); in FlatDesign and the classic tab bar the title stays in the button. Before, in FlatDesign and the classic tab bar, the title moved onto the tab titles' line while the image stayed centered on the button, so they overlapped (a 60 pt image nearly hid the title): a **bug**, fixed in the library. |
+| 只有背景图片（`setBackgroundImage`，没有 `setImage`），标题画在背景上，例如 Example-PAG 的圆形按钮<br>Background image only (`setBackgroundImage`, no `setImage`), the title drawn on it, e.g. Example-PAG's round button | 标题在圆形上 / The title is on the circle | **正常**：这种按钮的标题是图片的一部分，UIButton 总是把标题画在背景图之上。按钮按 `+multiplierOfTabBarHeight:` 与 `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` 定位。希望标题位于图片下方时，请改用 `setImage(_:for:)`。<br>**Expected**: the title is part of the picture, and UIButton always draws it on top of the background image. The button is placed by `+multiplierOfTabBarHeight:` and `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`. For the title below the picture, use `setImage(_:for:)` instead. |
+| 自定义按钮，未使用 `+cyl_plusButtonWithImage:…`，实现了 `+alignsTitleWithTabBarItemTitles`，扁平样式或经典 TabBar<br>A custom button not made with `+cyl_plusButtonWithImage:…`, with `+alignsTitleWithTabBarItemTitles`, in FlatDesign or the classic tab bar | 可能重叠 / Can overlap | 库只把标题移到 Tab 标题线上，图片保留 UIButton 自己的位置；图片较大时可能与标题重叠。使用 `UIButtonConfiguration` 且 `imagePlacement` 为 `.top` 的按钮不会重叠（例如 ObjC Demo 的 PlusButton）。要避免重叠，请使用 `+cyl_plusButtonWithImage:…`，或使用 `imagePlacement = .top` 的 configuration。<br>The library moves only the title onto the tab titles' line and leaves the image where UIButton put it; a large image can overlap the title. A button with a `UIButtonConfiguration` whose `imagePlacement` is `.top` does not (e.g. the ObjC demo's plus button). To avoid it, use `+cyl_plusButtonWithImage:…`, or a configuration with `imagePlacement = .top`. |
+| App 自己设置了 `imageEdgeInsets` / `titleEdgeInsets` 或自定义 `layoutSubviews`<br>The app sets `imageEdgeInsets` / `titleEdgeInsets` or its own `layoutSubviews` | 由 App 决定 / Up to the app | 库不会覆盖 App 自己的布局。<br>The library does not override the app's own layout. |
+| 图片之后才加载（创建时为空）<br>The image is set later (empty at first) | 与启动时就有图片相同 / Same as with the image at launch | 在加载之前按钮只显示标题；加载之后的位置、尺寸与角标与启动时就设置同一图片完全相同（见下图与「之后才加载的图片」）。<br>Until it loads the button shows its title only; afterwards its position, size and badge are exactly those of the same image set at launch (see below and "Images loaded later"). |
+
+| 中文 | English |
+|:---|:---|
+| 测试：Demo 测试列表 PlusButton 分组中的「PlusButton 图片之后才加载」行，每张图左侧为启动时即有图片（对照），右侧为之后才加载；从上到下依次为 44 pt 图片、60 pt 图片、60 pt 背景图片。iOS 17.5 经典 TabBar 与 iOS 26.5 扁平样式、液态玻璃，三种样式中图片位置、尺寸与角标坐标两两完全相同（lldb 读取 frame，截图像素一致）。 | Tested with the "PlusButton image loaded later" row of the demo test list (PlusButton group). In each picture the left column is the image set at launch (to compare), the right column the image set later; top to bottom: a 44 pt image, a 60 pt image, a 60 pt background image. In the classic tab bar (iOS 17.5), FlatDesign and Liquid Glass (iOS 26.5), the image position, size and badge coordinates are identical in every pair (frames read with lldb, screenshot pixels agree). |
+
+经典 TabBar / Classic tab bar (iOS 17.5):
+
+![PlusButton icon and title, classic tab bar](assets/plusbutton-overlap-classic.png)
+
+扁平样式 / FlatDesign (iOS 26.5):
+
+![PlusButton icon and title, FlatDesign](assets/plusbutton-overlap-flat.png)
+
+液态玻璃 / Liquid Glass (iOS 26.5):
+
+![PlusButton icon and title, Liquid Glass](assets/plusbutton-overlap-lg.png)
 
 ## [CN]同时修复
 ## [EN]Also fixed

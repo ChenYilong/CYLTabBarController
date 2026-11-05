@@ -116,6 +116,9 @@ docs/
     ├── plusbutton-background-image-liquid-glass-swiftui.png
     ├── plusbutton-background-image-liquid-glass.png
     ├── plusbutton-image-loaded-later.png
+    ├── plusbutton-overlap-classic.png
+    ├── plusbutton-overlap-flat.png
+    ├── plusbutton-overlap-lg.png
     ├── plusbutton-subview-touches-issue-202.png
     ├── readme-english-before-reading.png
     ├── readme-english-bilingual-contents.png
