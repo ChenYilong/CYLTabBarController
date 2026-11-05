@@ -104,9 +104,17 @@ let home: [AnyHashable: Any] = [
 |:---|:---|
 | 选中标题在以下时机更新：控制器显示时（`-viewWillAppear:`）、用户点击 Tab、代码设置 `selectedIndex` / `selectedViewController`。只处理设置了 `CYLTabBarItemSelectedTitle` 的 Tab，没有设置时行为不变。 | The selected title is updated when the controller appears (`-viewWillAppear:`), on a tap on a tab, and when `selectedIndex` / `selectedViewController` is set in code. Only tabs with a `CYLTabBarItemSelectedTitle` are touched; without it nothing changes. |
 | 经典样式与液态玻璃通过 `tabBarItem.title` 修改标题（同时修改导航控制器根控制器的 `tabBarItem`）；扁平样式修改 `CYLFlatDesignTabBarItem.title`。 | The classic style and Liquid Glass change `tabBarItem.title` (and the one of the navigation controller's root view controller); FlatDesign changes `CYLFlatDesignTabBarItem.title`. |
-| 普通标题取自 `CYLTabBarItemTitle`。如需修改标题，请修改 `tabBarItemsAttributes` 后重新设置 Tab，不要直接修改该 Tab 的 `tabBarItem.title`（切换选中时会被恢复为 `CYLTabBarItemTitle`）。 | The normal title is taken from `CYLTabBarItemTitle`. To change a title, change `tabBarItemsAttributes` and set the tabs again; do not set that tab's `tabBarItem.title` directly (it goes back to `CYLTabBarItemTitle` when the selection changes). |
+| 普通标题取自 `CYLTabBarItemTitle`。如需修改普通标题或选中标题，请使用 `-updateTabBarItemAtIndex:attributes:`（或 `-updateTabBarItemsWithAttributes:`）传入 `CYLTabBarItemTitle` / `CYLTabBarItemSelectedTitle`，选中的 Tab 会立即显示新的选中标题；`-replaceViewControllerAtIndex:withViewController:attributes:` 与 `-reloadTabBarItemsWithAttributes:` 同样支持。不要直接修改该 Tab 的 `tabBarItem.title`（切换选中时会被恢复为 `CYLTabBarItemTitle`）。 | The normal title is taken from `CYLTabBarItemTitle`. To change the normal or the selected title, pass `CYLTabBarItemTitle` / `CYLTabBarItemSelectedTitle` to `-updateTabBarItemAtIndex:attributes:` (or `-updateTabBarItemsWithAttributes:`); the selected tab shows its new selected title right away. `-replaceViewControllerAtIndex:withViewController:attributes:` and `-reloadTabBarItemsWithAttributes:` take them too. Do not set that tab's `tabBarItem.title` directly (it goes back to `CYLTabBarItemTitle` when the selection changes). |
 | 选中标题与普通标题长度差异较大时，TabBar 布局会随之变化；建议两者长度相近。 | When the two titles differ much in length, the tab bar layout changes with them; keep them about the same length. |
 | PlusButton 没有 `CYLTabBarItemTitle` 属性，选中标题请使用 `+[CYLPlusButton cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:]`。 | The plus button has no `CYLTabBarItemTitle` attributes; for its selected title use `+[CYLPlusButton cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:]`. |
+
+```objc
+// 例如切换语言后 / e.g. after the app's language changed
+[tabBarController updateTabBarItemAtIndex:0 attributes:@{
+    CYLTabBarItemTitle : CYLLocalizedString(@"首页"),
+    CYLTabBarItemSelectedTitle : CYLLocalizedString(@"刷新"),
+}];
+```
 
 ## [CN]测试与截图
 ## [EN]Testing and screenshots
