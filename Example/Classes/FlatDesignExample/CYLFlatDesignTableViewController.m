@@ -114,13 +114,13 @@
 }
 
 - (void)flatDesignTabBar:(id)sender {
-    CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
+    CYLMainRootViewController *rootController = [CYLMainRootViewController currentRootViewController];
     [rootController createFlatDesignTabBar];
 }
 
 - (void)createNewTabBardynamically {
     [CYLPlusButtonSubclass registerPlusButton];
-    CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
+    CYLMainRootViewController *rootController = [CYLMainRootViewController currentRootViewController];
     [rootController createNewTabBarWithContext:NSStringFromClass([CYLTabBarController class])];
 }
 
