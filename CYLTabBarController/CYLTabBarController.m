@@ -2683,6 +2683,17 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     id selectedIcon = attributes[CYLTabBarItemSelectedImageURL] ?: attributes[CYLTabBarItemSelectedImage];
     NSValue *sizeValue = attributes[CYLTabBarItemImageURLSize];
     CGSize size = [sizeValue isKindOfClass:[NSValue class]] ? sizeValue.CGSizeValue : [plusButton imageForState:UIControlStateNormal].size;
+    // FIX: issue #601
+    // [EN] Never left unscaled: a downloaded image keeps its own size (a 512 px icon is about 170 pt), which resizes the
+    //      plus button and moves it. Without a size, the image view's, else the tab icon's.
+    // [CN] 不保留原始尺寸：下载的图片会保持自身尺寸（512 px 的图标约 170 pt），导致 PlusButton 尺寸变化并移位。没有尺寸时
+    //      使用图片视图的尺寸，否则使用 Tab 图标的尺寸。
+    if (size.width <= 0 || size.height <= 0) {
+        size = plusButton.imageView.bounds.size;
+    }
+    if (size.width <= 0 || size.height <= 0) {
+        size = CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
+    }
     __weak CYLPlusButton *weakPlusButton = plusButton;
     if (icon) {
         CYLLoadTabBarItemIcon(icon, ^(UIImage *image) {

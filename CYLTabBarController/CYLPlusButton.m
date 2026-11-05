@@ -538,8 +538,21 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     CGFloat imageOffsetY = imageCenter.y - CGRectGetMidY(self.bounds);
     // Its own title first (the tab item's), else the other tab titles, which share its center line.
     // 优先用它自己的标题（TabBarItem 的），没有时用其他 Tab 标题（中心线相同）。
-    UILabel *ownTitleLabel = [self cyl_ownTitleLabelInTabBarItem];
-    UILabel *itemTitleLabel = ownTitleLabel ?: [self cyl_tabBarItemTitleLabels].firstObject;
+    // FIX: issue #601
+    // [EN] Both in the normal layer only: the titles and the plus button are not in the same layer, and a title of
+    //      another layer (the selected layer, seen through the lens) does not convert to the plus button's position.
+    // [CN] 两者都只取普通图层中的：标题与 PlusButton 不在同一个图层，其他图层（透过放大镜显示的选中图层）中的标题无法
+    //      换算为 PlusButton 的位置。
+    UILabel *ownTitleLabel = [self cyl_ownTitleLabelInTabBarItemNearX:center.x inView:container];
+    UILabel *itemTitleLabel = ownTitleLabel;
+    if (!itemTitleLabel) {
+        for (UILabel *label in [self cyl_tabBarItemTitleLabels]) {
+            if ([self cyl_isViewInNormalTabLayer:label]) {
+                itemTitleLabel = label;
+                break;
+            }
+        }
+    }
     if (itemTitleLabel) {
         [itemTitleLabel.superview layoutIfNeeded];
         CGFloat itemTitleCenterY = [itemTitleLabel.superview convertPoint:itemTitleLabel.center toView:container].y;
@@ -551,30 +564,77 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     return center;
 }
 
-/// The tab item's label that shows the plus button's title, in the normal layer. 普通图层中显示 PlusButton 标题的 TabBarItem 标签。
-- (UILabel *)cyl_ownTitleLabelInTabBarItem {
+/*!
+ * FIX: issue #601
+ * [EN] The tab item's label that shows the plus button's title, in the normal layer, near `x` (the plus tab's center in
+ *      `container`, the plus button's superview). The titles are not in the plus button's layer: Liquid Glass draws each
+ *      one in the normal layer and again in the selected layer (through the lens), and while the plus child view
+ *      controller is selected the normal one can be hidden. The first visible label with the title was then a copy of
+ *      another layer, whose position does not convert to the plus button's: after "Change all network icons" and a tap
+ *      on the plus button, the plus button moved to x = 0. Now only a label in the normal layer counts, hidden or not
+ *      (it stays laid out), the nearest to `x`, and none farther than half its tab button's width: the plus button then
+ *      keeps `x`.
+ * [CN] 普通图层中显示 PlusButton 标题、且靠近 `x`（PlusButton 的 Tab 在 `container`，即 PlusButton 父视图中的中心）的 TabBarItem
+ *      标签。标题与 PlusButton 不在同一个图层：液态玻璃在普通图层绘制每个标题，并在选中图层（透过放大镜）再绘制一次；选中
+ *      PlusButton 子控制器时，普通图层的标题可能被隐藏。此前找到的第一个带该标题的可见标签因此是其他图层中的副本，其位置无法换算为
+ *      PlusButton 的位置：点击「更换所有网络图标」后再点击 PlusButton，PlusButton 移到了 x = 0。现在只取普通图层中的标签（隐藏的
+ *      也可以，它仍保持布局），取离 `x` 最近的一个，且距离不超过其 Tab 按钮宽度的一半；否则 PlusButton 保持 `x`。
+ */
+- (UILabel *)cyl_ownTitleLabelInTabBarItemNearX:(CGFloat)x inView:(UIView *)container {
     NSString *movedTitle = objc_getAssociatedObject(self, CYLPlusButtonMovedTitleKey);
     UIView *systemTabBar = self.superview;
     while (systemTabBar && ![systemTabBar isKindOfClass:[UITabBar class]]) {
         systemTabBar = systemTabBar.superview;
     }
-    if (movedTitle.length == 0 || !systemTabBar) {
+    if (movedTitle.length == 0 || !systemTabBar || !container) {
         return nil;
     }
+    UILabel *nearestLabel = nil;
+    CGFloat nearestDistance = CGFLOAT_MAX;
     NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:systemTabBar];
     while (views.count > 0) {
         UIView *view = views.firstObject;
         [views removeObjectAtIndex:0];
+        // [EN] Not the plus button, nor anything in the selected layer. [CN] 跳过 PlusButton 及选中图层中的一切。
         if (view == self || view.cyl_isPlatterSelectedContentView) {
             continue;
         }
-        if ([view isKindOfClass:[UILabel class]] && [((UILabel *)view).text isEqualToString:movedTitle] && !view.hidden &&
-            view.window) {
-            return (UILabel *)view;
+        if ([view isKindOfClass:[UILabel class]]) {
+            UILabel *label = (UILabel *)view;
+            UIControl *tabButton = [self cyl_tabButtonOfTabBarItemTitleLabel:label];
+            if ([label.text isEqualToString:movedTitle] && label.window && tabButton &&
+                [self cyl_isViewInNormalTabLayer:label]) {
+                CGFloat distance = fabs([label.superview convertPoint:label.center toView:container].x - x);
+                if (distance <= CGRectGetWidth(tabButton.bounds) * 0.5 && distance < nearestDistance) {
+                    nearestLabel = label;
+                    nearestDistance = distance;
+                }
+            }
+            continue;
         }
         [views addObjectsFromArray:view.subviews];
     }
-    return nil;
+    return nearestLabel;
+}
+
+/*!
+ * FIX: issue #601
+ * [EN] Whether `view` is in the normal layer of the tab buttons: under no Liquid Glass selected layer, and, with Liquid
+ *      Glass, in a tab button of the normal layer (`-cyl_isPlatterNormalControl`). Always YES without Liquid Glass.
+ * [CN] `view` 是否位于 Tab 按钮的普通图层：不在液态玻璃的选中图层之下，且液态玻璃下位于普通图层的 Tab 按钮
+ *      （`-cyl_isPlatterNormalControl`）中。非液态玻璃时总是 YES。
+ */
+- (BOOL)cyl_isViewInNormalTabLayer:(UIView *)view {
+    if (![CYLConstants isLiquidGlassActive]) {
+        return YES;
+    }
+    for (UIView *ancestor = view.superview; ancestor; ancestor = ancestor.superview) {
+        if (ancestor.cyl_isPlatterSelectedContentView) {
+            return NO;
+        }
+    }
+    UIControl *tabButton = [self cyl_tabButtonOfTabBarItemTitleLabel:(UILabel *)view];
+    return tabButton.cyl_isPlatterNormalControl;
 }
 
 /*!
