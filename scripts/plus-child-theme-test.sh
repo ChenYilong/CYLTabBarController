@@ -80,6 +80,21 @@ if [ "$STYLE" = "FlatDesign" ]; then
   STYLE_SLUG="flat-design"
 fi
 
+# [EN] Waits until the app's test log has a line matching $1 (extended regex), at most $2 seconds.
+# [CN] 等待 App 的测试日志出现匹配 $1（扩展正则）的行，最多 $2 秒。
+wait_for_line() {
+  WAITED=0
+  while ! grep -qE "$1" "$RUN_LOG" 2>/dev/null; do
+    if [ "$WAITED" -ge "$(($2 * 5))" ]; then
+      echo "Timed out waiting for: $1"
+      return 1
+    fi
+    sleep 0.2
+    WAITED=$((WAITED + 1))
+  done
+  return 0
+}
+
 STATUS=0
 OLD_IFS=$IFS
 IFS=','
@@ -89,39 +104,38 @@ for SCENARIO in $SCENARIOS; do
   TO=${SCENARIO#*>}
   SLUG=$(printf '%s' "$FROM to $TO" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '-' | sed -e 's/--*/-/g' -e 's/-$//')
   FILE="$OUT/plus-child-theme-$STYLE_SLUG-$SLUG"
-  RUN_LOG="$OUT/$STYLE_SLUG-$SLUG.log"
+  CONSOLE_LOG="$OUT/$STYLE_SLUG-$SLUG-console.log"
+  # [EN] The app appends its test lines at once to tmp/plus-child-theme-test.log in its data container: the console
+  #      stream of `simctl launch --console-pty` reached this script only when the app was closed.
+  # [CN] App 把测试输出立即追加到其数据容器中的 tmp/plus-child-theme-test.log：`simctl launch --console-pty` 的控制台输出
+  #      直到 App 关闭才传到本脚本。
+  RUN_LOG="$(xcrun simctl get_app_container "$DEVICE_ID" "$BUNDLE_ID" data)/tmp/plus-child-theme-test.log"
+  rm -f "$RUN_LOG"
+  mkdir -p "$(dirname "$RUN_LOG")"
+  : > "$RUN_LOG"
   echo "== $STYLE: $FROM > $TO (tab $SELECT_INDEX)"
   # shellcheck disable=SC2086
   xcrun simctl launch --console-pty --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$FROM" \
-    -CYLDemoSelectIndex "$SELECT_INDEX" -CYLDemoThemeSwitchTo "$TO" -CYLDemoThemeSwitchDelay 14 $STYLE_ARGUMENTS > "$RUN_LOG" 2>&1 &
+    -CYLDemoSelectIndex "$SELECT_INDEX" -CYLDemoThemeSwitchTo "$TO" -CYLDemoThemeSwitchDelay 14 $STYLE_ARGUMENTS > "$CONSOLE_LOG" 2>&1 &
   LAUNCH_PID=$!
   # [EN] Each screenshot right after the app logged that check: a launch can take seconds, so fixed delays from here
   #      caught the home screen, or the theme before the switch. [CN] 每张截图都在 App 输出对应检查之后立即截取：启动可能需要
   #      数秒，从这里开始计算的固定延时曾截到主屏幕，或切换前的主题。
-  ELAPSED=0
   for PHASE in before after; do
-    while ! grep -qE "plus child theme test: (PASS|FAIL|SKIP) $PHASE" "$RUN_LOG" && [ "$ELAPSED" -lt 60 ]; do
-      sleep 1
-      ELAPSED=$((ELAPSED + 1))
-    done
+    wait_for_line "plus child theme test: (PASS|FAIL|SKIP) $PHASE" 60 || true
     xcrun simctl io "$DEVICE_ID" screenshot "$FILE-$PHASE.png" >/dev/null && echo "Saved $FILE-$PHASE.png"
     # [EN] Then the stand-in alone (the app hides the real plus button for 2 s, 3 s after the check); not after a SKIP.
     # [CN] 然后只截替身（App 在检查 3 秒后隐藏真实的 PlusButton 2 秒）；SKIP 之后不截。
     if ! grep -q "plus child theme test: SKIP $PHASE" "$RUN_LOG"; then
-      while ! grep -q "plus child theme test: stand-in only $PHASE" "$RUN_LOG" && [ "$ELAPSED" -lt 60 ]; do
-        sleep 0.2
-        ELAPSED=$((ELAPSED + 1))
-      done
+      wait_for_line "plus child theme test: stand-in only $PHASE" 15 || true
       xcrun simctl io "$DEVICE_ID" screenshot "$FILE-$PHASE-stand-in-only.png" >/dev/null && echo "Saved $FILE-$PHASE-stand-in-only.png"
     fi
   done
-  while ! grep -q "plus child theme test: done" "$RUN_LOG" && [ "$ELAPSED" -lt 70 ]; do
-    sleep 1
-    ELAPSED=$((ELAPSED + 1))
-  done
+  wait_for_line "plus child theme test: done" 20 || true
   kill "$LAUNCH_PID" 2>/dev/null || true
   xcrun simctl terminate "$DEVICE_ID" "$BUNDLE_ID" 2>/dev/null || true
-  grep "plus child theme test" "$RUN_LOG" | sed 's/^.*plus child theme test/plus child theme test/' | tee -a "$LOG" || true
+  cp "$RUN_LOG" "$OUT/$STYLE_SLUG-$SLUG.log" 2>/dev/null || true
+  grep "plus child theme test" "$RUN_LOG" | tee -a "$LOG" || true
   if ! grep -q "plus child theme test: done" "$RUN_LOG"; then
     echo "plus child theme test: FAIL $FROM > $TO: the app never logged 'done' (crashed?)" | tee -a "$LOG"
     STATUS=1

@@ -436,6 +436,33 @@ static UIImage *CYLDemoColorSwatch(UIColor *color) {
 
 /// [EN] Applies `theme`; a theme picked by hand stops following the system. [CN] 应用 `theme`；手动选择主题后不再跟随系统。
 /// [EN] YES for the same image object or the same pixels. [CN] 同一个图片对象或像素相同时为 YES。
+/*!
+ * [EN] A line of the plus child theme test: to the console, and appended at once to `tmp/plus-child-theme-test.log` in
+ *      the app's data container, which scripts/plus-child-theme-test.sh reads (`xcrun simctl get_app_container … data`).
+ *      The console stream of `simctl launch --console-pty` reached the script only when the app was closed, so it waited
+ *      in vain and took every screenshot at the end.
+ * [CN] PlusButton 子控制器换肤测试的一行输出：写到控制台，并立即追加到 App 数据容器中的 `tmp/plus-child-theme-test.log`，
+ *      由 scripts/plus-child-theme-test.sh 读取（`xcrun simctl get_app_container … data`）。`simctl launch --console-pty` 的控制台输出
+ *      直到 App 关闭才传到脚本，脚本因此一直等待，所有截图都在最后才截取。
+ */
+static void CYLDemoTestLog(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
+static void CYLDemoTestLog(NSString *format, ...) {
+    va_list arguments;
+    va_start(arguments, format);
+    NSString *line = [[NSString alloc] initWithFormat:format arguments:arguments];
+    va_end(arguments);
+    NSLog(@"%@", line);
+    NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:@"plus-child-theme-test.log"];
+    NSFileHandle *file = [NSFileHandle fileHandleForWritingAtPath:path];
+    if (!file) {
+        [[NSFileManager defaultManager] createFileAtPath:path contents:nil attributes:nil];
+        file = [NSFileHandle fileHandleForWritingAtPath:path];
+    }
+    [file seekToEndOfFile];
+    [file writeData:[[line stringByAppendingString:@"\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [file closeFile];
+}
+
 static BOOL CYLDemoSameImage(UIImage *image, UIImage *otherImage) {
     if (!image || !otherImage) {
         return NO;
@@ -461,7 +488,7 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
     CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
     NSString *theme = CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier;
     if (!plusButton) {
-        NSLog(@"plus child theme test: SKIP %@ theme=%@: no plus button", phase, theme);
+        CYLDemoTestLog(@"plus child theme test: SKIP %@ theme=%@: no plus button", phase, theme);
         return;
     }
     // [EN] Liquid Glass active AND not the FlatDesign style, as in master: the FlatDesign tab bar has no selected layer,
@@ -470,12 +497,12 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
     //      iOS 26 上也是如此。
     BOOL isLiquidGlassTabBar = (CYLTabBarStyleTypeFlatDesign != tabBarController.tabBarStyleType && [CYLConstants isLiquidGlassActive]);
     if (!isLiquidGlassTabBar) {
-        NSLog(@"plus child theme test: SKIP %@ theme=%@: no stand-in outside the Liquid Glass tab bar", phase, theme);
+        CYLDemoTestLog(@"plus child theme test: SKIP %@ theme=%@: no stand-in outside the Liquid Glass tab bar", phase, theme);
         return;
     }
     UIButton *standIn = plusButton.selectedContentView;
     if (!standIn || standIn == plusButton || !standIn.window) {
-        NSLog(@"plus child theme test: FAIL %@ theme=%@ selectedIndex=%@: the stand-in is not shown", phase, theme, @(tabBarController.selectedIndex));
+        CYLDemoTestLog(@"plus child theme test: FAIL %@ theme=%@ selectedIndex=%@: the stand-in is not shown", phase, theme, @(tabBarController.selectedIndex));
         return;
     }
     UIImage *shown = standIn.currentImage;
@@ -490,12 +517,12 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
     //      stand-in's image wherever that image is transparent (a theme's star), and the icon looked soft.
     // [CN] 真实的 PlusButton 不能在玻璃下方绘制：它在那里被模糊并放大，会从替身图片的透明区域（如主题的星星）周围露出来，图标因此发虚。
     BOOL masked = [plusButton.layer.mask.name isEqualToString:@"CYLPlusButtonLiquidGlassMask"];
-    NSLog(@"plus child theme test: %@ %@ theme=%@ selectedIndex=%@ standIn=%@ plusButton=%@ realButtonMaskedUnderGlass=%@",
+    CYLDemoTestLog(@"plus child theme test: %@ %@ theme=%@ selectedIndex=%@ standIn=%@ plusButton=%@ realButtonMaskedUnderGlass=%@",
           (matches && masked) ? @"PASS" : @"FAIL", phase, theme, @(tabBarController.selectedIndex), NSStringFromCGSize(shown.size),
           NSStringFromCGSize(plusButton.currentImage.size), @(masked));
     for (UIView *view = standIn.superview; view && view != tabBarController.tabBar.superview; view = view.superview) {
         if (view.layer.mask || view.clipsToBounds || view.layer.masksToBounds) {
-            NSLog(@"plus child theme test: info %@ clip=%@ frame=%@ cornerRadius=%.1f layerMask=%@", phase, NSStringFromClass([view class]),
+            CYLDemoTestLog(@"plus child theme test: info %@ clip=%@ frame=%@ cornerRadius=%.1f layerMask=%@", phase, NSStringFromClass([view class]),
                   NSStringFromCGRect([view convertRect:view.bounds toView:nil]), view.layer.cornerRadius, @(view.layer.mask != nil));
             break;
         }
@@ -503,7 +530,7 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
     // [EN] The glass geometry: the selected-layer tab button that holds the stand-in, and the views of the tab bar whose
     //      class names say selection, lens, indicator or highlight. [CN] 玻璃的几何信息：容纳替身的选中图层 Tab 按钮，以及类名中
     //      含 selection、lens、indicator 或 highlight 的 TabBar 视图。
-    NSLog(@"plus child theme test: info %@ selectedLayerTabButton=%@", phase, NSStringFromCGRect([standIn.superview convertRect:standIn.superview.bounds toView:nil]));
+    CYLDemoTestLog(@"plus child theme test: info %@ selectedLayerTabButton=%@", phase, NSStringFromCGRect([standIn.superview convertRect:standIn.superview.bounds toView:nil]));
     NSMutableArray<UIView *> *pending = [NSMutableArray arrayWithObject:tabBarController.tabBar];
     NSUInteger logged = 0;
     while (pending.count > 0 && logged < 12) {
@@ -513,7 +540,7 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
         NSString *className = NSStringFromClass([view class]).lowercaseString;
         for (NSString *word in @[ @"selection", @"lens", @"indicator", @"highlight" ]) {
             if ([className containsString:word]) {
-                NSLog(@"plus child theme test: info %@ view=%@ frame=%@ hidden=%@ alpha=%.2f", phase, NSStringFromClass([view class]),
+                CYLDemoTestLog(@"plus child theme test: info %@ view=%@ frame=%@ hidden=%@ alpha=%.2f", phase, NSStringFromClass([view class]),
                       NSStringFromCGRect([view convertRect:view.bounds toView:nil]), @(view.hidden), view.alpha);
                 logged++;
                 break;
@@ -532,7 +559,7 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
         }
     }
     UIImageView *imageView = standIn.imageView;
-    NSLog(@"plus child theme test: info %@ standInFrame=%@ plusButtonFrame=%@ visible=%@ configuration=%@ highlighted=%@ "
+    CYLDemoTestLog(@"plus child theme test: info %@ standInFrame=%@ plusButtonFrame=%@ visible=%@ configuration=%@ highlighted=%@ "
           @"imageViewImageIsCurrent=%@ imageViewFrame=%@ imageViewHidden=%@ imageViewAlpha=%.2f imageScale=%.1f plusImageScale=%.1f "
           @"standInSuperview=%@",
           phase, NSStringFromCGRect([standIn convertRect:standIn.bounds toView:nil]),
@@ -545,7 +572,7 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         CGFloat alpha = plusButton.alpha;
         plusButton.alpha = 0;
-        NSLog(@"plus child theme test: stand-in only %@", phase);
+        CYLDemoTestLog(@"plus child theme test: stand-in only %@", phase);
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             plusButton.alpha = alpha;
         });
@@ -649,11 +676,11 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
         //      （scripts/plus-child-theme-test.sh 等待该行）。
         BOOL checksPlusChild = ([defaults objectForKey:@"CYLDemoSelectIndex"] != nil);
         if (checksPlusChild) {
-            NSLog(@"plus child theme test: launch theme=%@", manager.currentThemeIdentifier);
+            CYLDemoTestLog(@"plus child theme test: launch theme=%@", manager.currentThemeIdentifier);
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 CYLDemoCheckPlusChildStandIn(@"before");
                 if (switchIdentifier.length == 0) {
-                    NSLog(@"plus child theme test: done");
+                    CYLDemoTestLog(@"plus child theme test: done");
                 }
             });
         }
@@ -670,7 +697,7 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
                         CYLDemoCheckPlusChildStandIn(@"after");
                         // [EN] After the "stand-in only" screenshot. [CN] 在 "stand-in only" 截图之后。
                         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                            NSLog(@"plus child theme test: done");
+                            CYLDemoTestLog(@"plus child theme test: done");
                         });
                     });
                 }
