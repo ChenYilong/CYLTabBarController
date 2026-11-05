@@ -117,11 +117,12 @@ fi
 #      链接 Xcode 26.3 已不再提供的 swiftCompatibility56（链接错误）。不修改工程文件。
 xcodebuild -version
 pod install
-# [EN] CocoaPods shares a scheme for the development pod with the same name as the demo's scheme (CYLTabBarController), and
-#      xcodebuild then builds the pod framework instead of the app. Remove that generated scheme (Pods/ is not in git).
-# [CN] CocoaPods 为开发中的 pod 共享了一个与演示工程 scheme 同名（CYLTabBarController）的 scheme，xcodebuild 会因此只构建 pod framework 而不是
-#      App。删除这个生成的 scheme（Pods/ 不在 git 中）。
-rm -f Pods/Pods.xcodeproj/xcshareddata/xcschemes/CYLTabBarController.xcscheme
+# [EN] CocoaPods generates schemes for the development pod with the same name as the demo's scheme (CYLTabBarController), a
+#      shared one and a user one, and xcodebuild may then build the pod framework instead of the app (it picks one of
+#      the same-named schemes). Remove every generated one (Pods/ is not in git).
+# [CN] CocoaPods 为开发中的 pod 生成与演示工程 scheme 同名（CYLTabBarController）的 scheme（共享的与用户的各一个），xcodebuild 可能因此只构建
+#      pod framework 而不是 App（会在同名 scheme 中任选一个）。删除所有生成的同名 scheme（Pods/ 不在 git 中）。
+find Pods -name 'CYLTabBarController.xcscheme' -print -delete
 if ! xcodebuild -workspace CYLTabBarController.xcworkspace -scheme CYLTabBarController -configuration Debug \
   -sdk iphonesimulator -destination "id=$DEVICE_ID" -derivedDataPath "$DERIVED" \
   CODE_SIGNING_ALLOWED=NO IPHONEOS_DEPLOYMENT_TARGET=16.0 build > "$BUILD_LOG" 2>&1; then
