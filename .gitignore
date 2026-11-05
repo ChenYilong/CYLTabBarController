@@ -93,3 +93,6 @@ fastlane/screenshots
 
 # macOS artifact
 .DS_Store
+
+# Removed from the repository (#760); kept locally only. 已从仓库移除（#760），只保留在本地。
+Example-loadTabBarIconsFroNework/
