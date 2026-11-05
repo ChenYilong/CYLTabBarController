@@ -1,4 +1,5 @@
 platform :ios, '15.4'
+project 'RiveApp.xcodeproj'
 
 target 'RiveApp' do
   use_frameworks!

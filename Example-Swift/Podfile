@@ -2,6 +2,7 @@
 # source 'git@github.com:CocoaPods/Specs.git'
 
 platform :ios, '15.0'
+project 'CYLTabBarController-Swift.xcodeproj'
 inhibit_all_warnings!
 
 target 'CYLTabBarController-Swift' do

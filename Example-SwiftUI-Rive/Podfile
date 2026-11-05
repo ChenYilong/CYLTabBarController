@@ -1,4 +1,5 @@
 platform :ios, '15.4'
+project 'AnimatedApp.xcodeproj'
 
 target 'AnimatedApp' do
   use_frameworks!
