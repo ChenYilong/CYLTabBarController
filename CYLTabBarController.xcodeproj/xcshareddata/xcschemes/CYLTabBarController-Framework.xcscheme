@@ -28,6 +28,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "CEDF36E7AD1A7D6D1D0985F0"
+               BuildableName = "CYLTabBarControllerTests.xctest"
+               BlueprintName = "CYLTabBarControllerTests"
+               ReferencedContainer = "container:CYLTabBarController.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
