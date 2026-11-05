@@ -43,9 +43,6 @@ FOUNDATION_EXTERN NSObject<NSCopying> *_Nullable CYLThemeColorManagerName(UIColo
  */
 FOUNDATION_EXTERN UIImage *CYLThemeImageRefreshedImage(UIImage *image);
 
-/// [EN] YES for an image of `+[UIImage cyl_dynamicImageWithThemeProvider:]`. [CN] `+[UIImage cyl_dynamicImageWithThemeProvider:]` 创建的图片为 YES。
-FOUNDATION_EXTERN BOOL CYLThemeImageIsDynamic(UIImage *_Nullable image);
-
 /// [EN] The name of the manager a theme image follows; nil for any other image. [CN] 主题图片所跟随的管理器名字；其他图片为 nil。
 FOUNDATION_EXTERN NSObject<NSCopying> *_Nullable CYLThemeImageManagerName(UIImage *image);
 

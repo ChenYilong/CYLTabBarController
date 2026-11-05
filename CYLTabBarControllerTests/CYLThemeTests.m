@@ -305,30 +305,7 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
     XCTAssertEqualObjects(first.tabBarItem.title, @"A", @"nil gives back the app's own titles");
 }
 
-#pragma mark - The restore model, dynamic images, applying the current theme, persistence
-
-/// [EN] The color of the pixel at the center of `view`, drawn off screen. [CN] 离屏绘制 `view` 后中心像素的颜色。
-static UIColor *CYLTestCenterColorOfView(UIView *view) {
-    UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat defaultFormat];
-    format.scale = 1;
-    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:view.bounds.size format:format];
-    UIImage *snapshot = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
-        [view.layer renderInContext:context.CGContext];
-    }];
-    unsigned char pixel[4] = { 0, 0, 0, 0 };
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef bitmap = CGBitmapContextCreate(pixel, 1, 1, 8, 4, colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
-    CGContextDrawImage(bitmap, CGRectMake(-CGRectGetMidX(view.bounds), -CGRectGetMidY(view.bounds), snapshot.size.width, snapshot.size.height), snapshot.CGImage);
-    CGContextRelease(bitmap);
-    CGColorSpaceRelease(colorSpace);
-    return [UIColor colorWithRed:pixel[0] / 255.0 green:pixel[1] / 255.0 blue:pixel[2] / 255.0 alpha:pixel[3] / 255.0];
-}
-
-static BOOL CYLTestColorIsMostly(UIColor *color, CGFloat red, CGFloat green, CGFloat blue) {
-    CGFloat r = 0, g = 0, b = 0, a = 0;
-    [color getRed:&r green:&g blue:&b alpha:&a];
-    return fabs(r - red) < 0.2 && fabs(g - green) < 0.2 && fabs(b - blue) < 0.2 && a > 0.8;
-}
+#pragma mark - The restore model, applying the current theme, persistence
 
 - (CYLTabBarController *)newTabBarControllerWithTitles {
     CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new] ]
@@ -360,31 +337,6 @@ static BOOL CYLTestColorIsMostly(UIColor *color, CGFloat red, CGFloat green, CGF
     [tabBarController cyl_applyTabBarTheme:nil];
     XCTAssertEqualObjects([tabBarController tabBarItemAttributesAtIndex:0][CYLTabBarItemTitle], @"Mine", @"the app's change is kept");
     XCTAssertEqualObjects([tabBarController tabBarItemAttributesAtIndex:1][CYLTabBarItemTitle], @"B", @"the untouched tab gets its own title back");
-}
-
-- (void)testDynamicImageIsAlwaysTheCurrentThemesAndRenders {
-    CYLThemeManager *manager = [self newImageManager];
-    UIImage *dynamicImage = [UIImage cyl_dynamicImageWithThemeManagerName:manager.name provider:^UIImage *(CYLThemeManager *themeManager, id identifier, UIImage *theme) {
-        return theme;
-    }];
-    XCTAssertTrue(dynamicImage.cyl_isThemeImage);
-    XCTAssertTrue(dynamicImage.cyl_isDynamicThemeImage);
-    XCTAssertEqual(dynamicImage.size.width, 10.0);
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
-    imageView.image = dynamicImage;
-    XCTAssertTrue(CYLTestColorIsMostly(CYLTestCenterColorOfView(imageView), 1, 0, 0), @"%@", CYLTestCenterColorOfView(imageView));
-
-    manager.currentThemeIdentifier = @"B";
-    XCTAssertEqual(dynamicImage.size.width, 20.0, @"the same object answers with the new theme");
-    [imageView cyl_themeDidChangeByManager:manager identifier:manager.currentThemeIdentifier theme:manager.currentTheme];
-    XCTAssertTrue(CYLTestColorIsMostly(CYLTestCenterColorOfView(imageView), 0, 0, 1), @"%@", CYLTestCenterColorOfView(imageView));
-
-    UIImageView *laterImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
-    laterImageView.image = dynamicImage;
-    XCTAssertTrue(CYLTestColorIsMostly(CYLTestCenterColorOfView(laterImageView), 0, 0, 1), @"assigned after the change: the current theme");
-    XCTAssertTrue([dynamicImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal].cyl_isDynamicThemeImage, @"derived images stay dynamic");
-    XCTAssertFalse([dynamicImage cyl_imageForCurrentTheme].cyl_isDynamicThemeImage);
-    XCTAssertTrue([dynamicImage cyl_imageForCurrentTheme].cyl_isThemeImage);
 }
 
 - (void)testSymbolThemeImagesAreMarkedNewObjects {

@@ -50,17 +50,10 @@ static void CYLThemeRefreshImagesAndEffects(UIView *view, CYLThemeManager *_Null
         UIImageView *imageView = (UIImageView *)view;
         UIImage *image = CYLThemeRefreshedImageIfNeeded(imageView.image, manager);
         if (image) {
-            // [EN] A dynamic image is the same object: UIKit would skip it. [CN] 动态图片是同一对象：UIKit 会跳过赋值。
-            if (CYLThemeImageIsDynamic(image)) {
-                imageView.image = nil;
-            }
             imageView.image = image;
         }
         UIImage *highlightedImage = CYLThemeRefreshedImageIfNeeded(imageView.highlightedImage, manager);
         if (highlightedImage) {
-            if (CYLThemeImageIsDynamic(highlightedImage)) {
-                imageView.highlightedImage = nil;
-            }
             imageView.highlightedImage = highlightedImage;
         }
         return;
@@ -84,14 +77,6 @@ static void CYLThemeRefreshImagesAndEffects(UIView *view, CYLThemeManager *_Null
                     changed = YES;
                 }
                 if (changed) {
-                    if (CYLThemeImageIsDynamic(configuration.image) || CYLThemeImageIsDynamic(configuration.background.image)) {
-                        UIButtonConfiguration *cleared = [configuration copy];
-                        cleared.image = nil;
-                        UIBackgroundConfiguration *clearedBackground = cleared.background;
-                        clearedBackground.image = nil;
-                        cleared.background = clearedBackground;
-                        button.configuration = cleared;
-                    }
                     button.configuration = configuration;
                 }
             }
@@ -118,9 +103,6 @@ static void CYLThemeRefreshImagesAndEffects(UIView *view, CYLThemeManager *_Null
             if (state == UIControlStateNormal || stateImage != normalImage) {
                 UIImage *image = CYLThemeRefreshedImageIfNeeded(stateImage, manager);
                 if (image) {
-                    if (CYLThemeImageIsDynamic(image)) {
-                        [button setImage:nil forState:state];
-                    }
                     [button setImage:image forState:state];
                 }
             }
@@ -128,9 +110,6 @@ static void CYLThemeRefreshImagesAndEffects(UIView *view, CYLThemeManager *_Null
             if (state == UIControlStateNormal || stateBackgroundImage != normalBackgroundImage) {
                 UIImage *backgroundImage = CYLThemeRefreshedImageIfNeeded(stateBackgroundImage, manager);
                 if (backgroundImage) {
-                    if (CYLThemeImageIsDynamic(backgroundImage)) {
-                        [button setBackgroundImage:nil forState:state];
-                    }
                     [button setBackgroundImage:backgroundImage forState:state];
                 }
             }
@@ -200,9 +179,6 @@ static NSString *CYLThemeSetterNameForGetterName(NSString *getterName) {
             // [EN] A theme image gets the image of the new theme; any other image is left alone.
             // [CN] 主题图片换成新主题的图片；其他图片不处理。
             if (CYLThemeFollowsManager(CYLThemeImageManagerName(value), manager)) {
-                if (CYLThemeImageIsDynamic(value)) {
-                    [self performSelector:setter withObject:nil];
-                }
                 [self performSelector:setter withObject:CYLThemeImageRefreshedImage(value)];
             }
         } else if ([value isKindOfClass:[UIVisualEffect class]]) {
