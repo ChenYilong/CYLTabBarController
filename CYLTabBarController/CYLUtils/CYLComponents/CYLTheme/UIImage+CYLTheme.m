@@ -192,10 +192,10 @@ static UIImage *CYLThemeImageMake(NSObject<NSCopying> *managerName, CYLThemeImag
 
 - (CGSize)size { return [self cyl_resolvedImage].size; }
 - (CGFloat)scale { return [self cyl_resolvedImage].scale; }
-- (CGImageRef)CGImage { return [self cyl_resolvedImage].CGImage; }
-- (CIImage *)CIImage { return [self cyl_resolvedImage].CIImage; }
+- (nullable CGImageRef)CGImage { return [self cyl_resolvedImage].CGImage; }
+- (nullable CIImage *)CIImage { return [self cyl_resolvedImage].CIImage; }
 - (UIImageOrientation)imageOrientation { return [self cyl_resolvedImage].imageOrientation; }
-- (NSArray<UIImage *> *)images { return [self cyl_resolvedImage].images; }
+- (nullable NSArray<UIImage *> *)images { return [self cyl_resolvedImage].images; }
 - (NSTimeInterval)duration { return [self cyl_resolvedImage].duration; }
 - (UIEdgeInsets)capInsets { return [self cyl_resolvedImage].capInsets; }
 - (UIImageResizingMode)resizingMode { return [self cyl_resolvedImage].resizingMode; }
@@ -203,9 +203,9 @@ static UIImage *CYLThemeImageMake(NSObject<NSCopying> *managerName, CYLThemeImag
 - (UIImageRenderingMode)renderingMode { return [self cyl_resolvedImage].renderingMode; }
 - (BOOL)flipsForRightToLeftLayoutDirection { return [self cyl_resolvedImage].flipsForRightToLeftLayoutDirection; }
 - (UITraitCollection *)traitCollection { return [self cyl_resolvedImage].traitCollection; }
-- (UIImageAsset *)imageAsset { return [self cyl_resolvedImage].imageAsset; }
+- (nullable UIImageAsset *)imageAsset { return [self cyl_resolvedImage].imageAsset; }
 - (BOOL)isSymbolImage API_AVAILABLE(ios(13.0)) { return [self cyl_resolvedImage].isSymbolImage; }
-- (UIImageSymbolConfiguration *)symbolConfiguration API_AVAILABLE(ios(13.0)) { return [self cyl_resolvedImage].symbolConfiguration; }
+- (nullable UIImageSymbolConfiguration *)symbolConfiguration API_AVAILABLE(ios(13.0)) { return [self cyl_resolvedImage].symbolConfiguration; }
 - (CGFloat)baselineOffsetFromBottom API_AVAILABLE(ios(13.0)) { return [self cyl_resolvedImage].baselineOffsetFromBottom; }
 - (BOOL)hasBaseline API_AVAILABLE(ios(13.0)) { return [self cyl_resolvedImage].hasBaseline; }
 
