@@ -35,6 +35,8 @@ jobs:
           # FlatDesign: code can hide it on every system, so this runs the whole self-test.
           - style: FlatDesign
             runtime: iOS-27
+            # Must really test: fail when every row is SKIP.
+            require_pass: "1"
           # Default demo: Liquid Glass, a smoke test (rows are SKIP, code cannot hide it).
           - style: Default
             runtime: iOS-27
@@ -52,6 +54,7 @@ jobs:
           DEVICE: ${{ inputs.device }}
           STYLE: ${{ matrix.style }}
           RUNTIME: ${{ matrix.runtime }}
+          REQUIRE_PASS: ${{ matrix.require_pass || '0' }}
         run: scripts/scroll-hide-self-test.sh "$DEVICE"
       - name: Keep the logs
         if: always()

@@ -552,12 +552,36 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
     static BOOL cylDidStartScrollHideSelfTest = NO;
     if (!cylDidStartScrollHideSelfTest && [[NSUserDefaults standardUserDefaults] boolForKey:@"CYLScrollHideSelfTest"]) {
         cylDidStartScrollHideSelfTest = YES;
-        UIViewController *page = self.selectedViewController;
+        [self cyl_startScrollHideSelfTestWhenActiveWithAttempt:0];
+    }
+}
+
+/*!
+ * [EN] Issue #13: the launch self-test starts once the app is active and the first page is laid out. At the first
+ *      viewDidAppear the app can still be inactive, and scroll hiding (rightly) refuses to hide an inactive window,
+ *      which made every simulation SKIP. Checks every 0.5 s, for at most 20 s.
+ * [CN] Issue #13：启动自测在 App 进入活跃状态、首个页面完成布局之后开始。第一次 viewDidAppear 时 App 可能仍未活跃，而滚动隐藏（正确地）
+ *      不会隐藏非活跃窗口中的 TabBar，导致所有模拟都为 SKIP。每 0.5 秒检查一次，最多 20 秒。
+ */
+- (void)cyl_startScrollHideSelfTestWhenActiveWithAttempt:(NSInteger)attempt {
+    __weak typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        CYLTabBarController *strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        BOOL active = (UIApplicationStateActive == [UIApplication sharedApplication].applicationState) && strongSelf.view.window != nil;
+        if (!active && attempt < 40) {
+            [strongSelf cyl_startScrollHideSelfTestWhenActiveWithAttempt:attempt + 1];
+            return;
+        }
+        UIViewController *page = strongSelf.selectedViewController;
         if ([page isKindOfClass:[UINavigationController class]]) {
             page = ((UINavigationController *)page).topViewController;
         }
+        [page.view layoutIfNeeded];
         [page cyl_runScrollHideSelfTest];
-    }
+    });
 }
 
 /*!
@@ -7963,14 +7987,26 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
 
 /// [EN] Hides as a user's downward scroll would (FlatDesign, classic), for self-tests. [CN] 像用户向下滚动一样隐藏（扁平样式、经典样式），用于自测。
 - (BOOL)simulateHideForTesting {
+    // [EN] Each refusal is logged (opt-in log, CYLTabBarMinimizeLog=1) so a self-test SKIP can be explained.
+    // [CN] 每种拒绝都会记录到可选日志（CYLTabBarMinimizeLog=1），以便解释自测中的 SKIP。
     if (CYLTabBarMinimizeModeFlatDesign != _mode && CYLTabBarMinimizeModeClassic != _mode) {
+        CYLTabBarMinimizeLog(@"test hide refused", CYLTabBarMinimizeModeLiquidGlass == _mode ? @"Liquid Glass: the system minimizes the bar" : @"scroll hiding is off");
         return NO;
     }
-    if (![self environmentAllowsHiding]) {
+    NSString *refusal = [self environmentRefusalReason];
+    if (refusal) {
+        CYLTabBarMinimizeLog(@"test hide refused", refusal);
         return NO;
     }
     _needsNewDrag = NO;
     [self minimizeTabBar];
+    if (!_hiddenByScroll) {
+        UIScrollView *scrollView = _scrollView;
+        CYLTabBarMinimizeLog(@"test hide refused", [NSString stringWithFormat:@"the bar did not hide (tab bar hidden already: %@, scroll view: %@, content height %.0f, bounds height %.0f, offset %.0f)",
+                                                    self.tabBarController.isTabBarHidden ? @"YES" : @"NO",
+                                                    scrollView ? NSStringFromClass([scrollView class]) : @"none",
+                                                    scrollView.contentSize.height, CGRectGetHeight(scrollView.bounds), scrollView.contentOffset.y]);
+    }
     return _hiddenByScroll;
 }
 
@@ -8616,6 +8652,10 @@ static char CYLThemeLaunchThemeAppliedKey;
 - (BOOL)cyl_simulateHideOnScrollForTesting {
     [self cyl_updateTabBarMinimizeTracking];
     _CYLTabBarMinimizeScrollTracker *tracker = objc_getAssociatedObject(self, CYLTabBarMinimizeScrollTrackerKey);
+    if (!tracker) {
+        CYLTabBarMinimizeLog(@"test hide refused", @"no scroll tracker (scroll hiding is off, or no scroll view on the selected page)");
+        return NO;
+    }
     return [tracker simulateHideForTesting];
 }
 

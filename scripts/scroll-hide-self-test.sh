@@ -4,6 +4,7 @@
 #   scripts/scroll-hide-self-test.sh                          # newest iPhone simulator, default demo style
 #   scripts/scroll-hide-self-test.sh "iPhone 16"              # a simulator by name
 #   STYLE=FlatDesign scripts/scroll-hide-self-test.sh         # start on the FlatDesign tab bar
+#   REQUIRE_PASS=1 scripts/scroll-hide-self-test.sh          # also fail when no simulation passed (all SKIP)
 #   RUNTIME=iOS-18 scripts/scroll-hide-self-test.sh           # an iPhone of a runtime (classic style before iOS 26);
 #                                                             # a missing runtime is downloaded and an iPhone created
 #
@@ -164,6 +165,10 @@ STYLE_ARGUMENTS=""
 if [ "$STYLE" = "FlatDesign" ]; then
   STYLE_ARGUMENTS="-CYLScrollHideSelfTestFlatDesign YES"
 fi
+# [EN] SIMCTL_CHILD_* variables reach the app: CYLTabBarMinimizeLog=1 turns on the library's scroll hiding log, which
+#      explains every SKIP (why the bar could not be hidden).
+# [CN] SIMCTL_CHILD_* 变量会传给 App：CYLTabBarMinimizeLog=1 打开本库的滚动隐藏日志，用于解释每个 SKIP（TabBar 为何无法隐藏）。
+export SIMCTL_CHILD_CYLTabBarMinimizeLog=1
 # shellcheck disable=SC2086
 xcrun simctl launch --console-pty --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLScrollHideSelfTest YES $STYLE_ARGUMENTS > "$LOG" 2>&1 &
 LAUNCH_PID=$!
@@ -181,6 +186,12 @@ grep "scroll hiding" "$LOG" || true
 
 grep -q "scroll hiding self-test: done" "$LOG" || exit 1
 if grep -q "scroll hiding self-test: FAIL" "$LOG"; then
+  exit 1
+fi
+# [EN] REQUIRE_PASS=1: a run that skipped everything tested nothing, so it fails (the FlatDesign job sets it).
+# [CN] REQUIRE_PASS=1：全部 SKIP 的运行什么也没有测试，因此判为失败（扁平样式的 job 会设置它）。
+if [ "${REQUIRE_PASS:-0}" = "1" ] && ! grep -q "scroll hiding self-test: PASS" "$LOG"; then
+  echo "No simulation passed: every row was SKIP (see the 'test hide refused' lines above)"
   exit 1
 fi
 exit 0
