@@ -204,7 +204,6 @@ enum Gallery {
 
     /// [EN] A bubble with `text`, added to `button` at `frame`. [CN] 在 `button` 的 `frame` 处添加一个带 `text` 的气泡。
     @discardableResult
-    @discardableResult
     static func addBubble(to button: UIView, text: String, color: UIColor, frame: CGRect, font: UIFont) -> UIView {
         let bubble = UIImageView(image: bubbleImage(color: color))
         bubble.frame = frame

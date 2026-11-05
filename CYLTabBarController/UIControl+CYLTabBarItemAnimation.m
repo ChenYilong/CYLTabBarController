@@ -128,8 +128,13 @@ static NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingFilesOfType(NSArra
 NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingLottieFiles(NSArray<NSDictionary *> *attributes,
                                                                     NSArray<NSString *> *lottieFileNames,
                                                                     NSBundle *bundle) {
+    // [EN] The Lottie keys warn in a build without Lottie (`CYL_LOTTIE_REQUIRED`); this released helper still fills them.
+    // [CN] 没有 Lottie 的构建中 Lottie key 会给出警告（`CYL_LOTTIE_REQUIRED`）；这个已发布的工具函数仍然填写它们。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     return CYLTabBarItemsAttributesAddingFilesOfType(attributes, lottieFileNames, bundle, @"json",
                                                         CYLTabBarLottieFilePath, CYLTabBarLottieDarkFilePath);
+#pragma clang diagnostic pop
 }
 
 /// [EN] The format is read back by `CYLTabBarItemViewAnimator` (the `CYLTabBarItemAnimation` subspec).

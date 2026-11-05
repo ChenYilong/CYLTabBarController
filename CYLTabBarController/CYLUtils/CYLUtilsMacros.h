@@ -53,6 +53,23 @@
 #endif
 
 /*!
+ * [EN] On the Lottie keys (`CYLTabBarLottieURL`…) and `CYLTabBarItemsAttributesAddingLottieFiles`: nothing with Lottie;
+ *      without it, a compile warning. Those keys are released API, so they stay defined (code that uses them keeps
+ *      building, and the tab shows its image), but using one in a build without Lottie is most likely a forgotten pod.
+ *      The PAG and Rive keys go further: they do not exist without their library (`CYL_PAG_AVAILABLE`,
+ *      `CYL_RIVE_AVAILABLE`).
+ * [CN] 用于 Lottie 的 key（`CYLTabBarLottieURL`……）与 `CYLTabBarItemsAttributesAddingLottieFiles`：引入 Lottie 时无影响；
+ *      未引入时给出编译警告。这些 key 是已发布的 API，因此保持定义（使用它们的代码仍能编译，Tab 显示图片），但在没有 Lottie 的
+ *      构建中使用它们，多半是忘了引入 pod。PAG 与 Rive 的 key 更进一步：未引入动画库时不存在（`CYL_PAG_AVAILABLE`、
+ *      `CYL_RIVE_AVAILABLE`）。
+ */
+#if CYL_LOTTIE_AVAILABLE
+#define CYL_LOTTIE_REQUIRED
+#else
+#define CYL_LOTTIE_REQUIRED __attribute__((deprecated("Lottie is not part of this build, so this is ignored and the tab shows its image. Add pod 'CYLTabBarController/Lottie' (or LottieSwift), or wrap the code in #if canImport(Lottie) / #if CYL_LOTTIE_AVAILABLE.")))
+#endif
+
+/*!
  * [EN] Core and CYLUtils have no compile-time switch per animation library (PAG, Rive, …): whether a tab animates is
  *      decided at runtime by the animators registered with `CYLTabBarItemAnimatorRegistry` (the `CYLTabBarItemAnimation`
  *      subspec), so adding a library changes nothing here. Each library's own header defines its switch

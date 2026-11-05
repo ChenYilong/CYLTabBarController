@@ -115,6 +115,10 @@ classes link back to it:
     for `CYLTabBarStyleTypeFlatDesign`, so Liquid Glass and the classic style are never affected.
   - Lottie: separate `__has_include` guards; check keys first; call through `respondsToSelector:` and
     `cyl_performSelector`.
+  - An animation library's own keys exist only with that library: its header defines `CYL_<LIBRARY>_AVAILABLE`
+    (`__has_include` of the library), and the header's content and the `.m` definitions sit inside it (`CYL_PAG_AVAILABLE`,
+    `CYL_RIVE_AVAILABLE`). Core and CYLUtils get no library switch. The released Lottie keys stay defined and are marked
+    `CYL_LOTTIE_REQUIRED` (a compile warning without Lottie). See docs/Tab-Bar-Item-Animation.md.
 - **Comments are bilingual**: write `[EN]` / `[CN]` blocks; mark fixes with `FIX: issue #N`. A comment written in
   Chinese is tagged `[CN]` and is followed directly by its English translation tagged `[EN]`, in the same comment style
   (`//`, `///`, or inside the same block comment; for a trailing comment, on the next line). Comments that only

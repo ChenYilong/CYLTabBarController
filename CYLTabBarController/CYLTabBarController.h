@@ -183,9 +183,9 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedDarkImage;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImageURL;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedImageURL;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImageURLSize;
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieFilePath;
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieURL;
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieFilePath CYL_LOTTIE_REQUIRED;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieURL CYL_LOTTIE_REQUIRED;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize CYL_LOTTIE_REQUIRED;
 /*!
  * FIX: issue #442
  * [EN] Optional Dark Mode versions of `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath` (an NSURL / a file path). A
@@ -200,8 +200,8 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize;
  *      所以设置了 `CYLTabBarLottieURL` 的 Tab 以前在深色模式下保持浅色样式，与图片无关。设置后，界面风格为深色时（系统设置或
  *      `overrideUserInterfaceStyle`）Tab 显示深色动画，并自动切换，选中状态保持不变。示例见上。
  */
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkURL;
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkURL CYL_LOTTIE_REQUIRED;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkFilePath CYL_LOTTIE_REQUIRED;
 /*!
  * FIX: issue #442 — Lottie 4.x (`CYLTabBarController/LottieSwift`, `CYLFlatDesignTabBar`, SPM)
  * [EN] One Lottie file for both styles: an NSDictionary of keypath -> UIColor, the colors used where the interface style
@@ -224,7 +224,7 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkFilePath;
  *      Lottie 2.x（`CYLTabBarController/LottieObjectiveC`）不支持，请使用 `CYLTabBarLottieDarkFilePath`。深色文件与深色颜色可同时设置，
  *      此时颜色作用于深色文件。
  */
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkColors;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkColors CYL_LOTTIE_REQUIRED;
 
 /*!
  * [EN] Optional, per tab (an NSNumber BOOL, default NO): the tab's Lottie animation (`CYLTabBarLottieURL` /
@@ -234,7 +234,7 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkColors;
  *      **未选中**时循环播放以吸引点击，选中时暂停，而不是在选中时播放一次。支持 Lottie 2.x 与 4.x，适用于所有样式。见
  *      docs/Custom-Tab-Bar-Features.md。
  */
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieLoopsWhenUnselected;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieLoopsWhenUnselected CYL_LOTTIE_REQUIRED;
 
 /*!
  * [EN] Returns `attributes` with a Lottie animation added to each item: `CYLTabBarLottieFilePath` for "<name>.json" in
@@ -255,7 +255,7 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieLoopsWhenUnselected;
  */
 FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingLottieFiles(NSArray<NSDictionary *> *attributes,
                                                                                     NSArray<NSString *> *lottieFileNames,
-                                                                                    NSBundle * _Nullable bundle);
+                                                                                    NSBundle * _Nullable bundle) CYL_LOTTIE_REQUIRED;
 
 /*!
  * FIX: issue #604 — generic animation keys, for every animation library.
