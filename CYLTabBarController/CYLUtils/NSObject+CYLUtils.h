@@ -31,10 +31,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_setValue:(id)value forKey:(NSString *)key;
 
 /*!
- * [EN] YES for a placeholder, e.g. the tab button under a plus button or a hidden view kept in place by
- *      `-cyl_setHidden:`. For a view controller, also YES when its navigation controller's root view controller is one.
- * [CN] 是否为占位对象，例如 PlusButton 下方的 Tab 按钮，或通过 `-cyl_setHidden:` 保留位置的视图。对视图控制器而言，
- *      其导航控制器的根控制器是占位对象时也为 YES。
+ * [EN] YES for the plus button's slot: the placeholder view controller of a plus button without a child view controller,
+ *      or the tab button under the plus button. For a view controller, also YES when its navigation controller's root
+ *      view controller is one. `-cyl_setHidden:` does not change it (it only changes visibility).
+ * [CN] 是否为 PlusButton 的 slot：没有子控制器的 PlusButton 对应的占位控制器，或 PlusButton 下方的 Tab 按钮。对视图控制器而言，
+ *      其导航控制器的根控制器是占位对象时也为 YES。`-cyl_setHidden:` 不会改变它（只改变可见性）。
  */
 @property (nonatomic, assign, getter=cyl_isPlaceholder, setter=cyl_setIsPlaceholder:) BOOL cyl_isPlaceholder;
 

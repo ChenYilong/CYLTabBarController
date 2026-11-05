@@ -543,9 +543,17 @@
         // [CN] 系统方法
         // [EN] System method
         SEL sel = NSSelectorFromString(clickSelectorFromString);
-        if ([self.tabBarController respondsToSelector:sel]) {
+        // [EN] FIX: placeholder count mismatch — the system item of this button's view controller, not
+        //      `tabBar.items[selectedIndex]`: the system tab bar has no item for a placeholder slot, and a plus child view
+        //      controller's item is appended at its end, so the indexes after the slot differ (the last one was out of range).
+        // [CN] FIX：占位导致的数量不匹配——取该按钮对应控制器的系统 item，而不是 `tabBar.items[selectedIndex]`：系统 TabBar 中没有
+        //      占位 slot 的 item，PlusButton 子控制器的 item 被追加在末尾，因此 slot 之后的下标不一致（最后一个会越界）。
+        UITabBarItem *systemItem = item.childViewController.tabBarItem;
+        if (![self.tabBarController.tabBar.items containsObject:systemItem]) {
+            systemItem = nil;
+        }
+        if (systemItem && [self.tabBarController respondsToSelector:sel]) {
             //FIXME:  to delete cylflatdesign_tabBarController
-            UITabBarItem *systemItem = self.tabBarController.tabBar.items[selectedIndex];
             CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
             (
              [self.tabBarController performSelector:sel withObject:systemItem];
@@ -758,7 +766,14 @@
         // [CN] FIXME:  to delete 自定义的index。
         // [EN] FIXME:  to delete the custom index.
 //        [self cyl_replace];(
-        CYLFlatDesignTabBarButton *plusButtonIndexPlaceholder = _buttons[self.cyl_plusButtonIndex];
+        // [EN] Never index past this tab bar's own buttons: the plus button index comes from the tab items count, which may
+        //      describe another tab bar or be stale while the items change.
+        // [CN] 不能越过本 TabBar 自己的按钮取下标：PlusButton 的 index 来自 Tab 数量，可能描述的是另一个 TabBar，或在 items 变化时已过期。
+        NSUInteger plusButtonIndex = self.cyl_plusButtonIndex;
+        if (plusButtonIndex >= _buttons.count) {
+            return;
+        }
+        CYLFlatDesignTabBarButton *plusButtonIndexPlaceholder = _buttons[plusButtonIndex];
         if (![plusButtonIndexPlaceholder.tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
             return;
         }
@@ -1110,13 +1125,39 @@
     return CGRectMake(x, y, w, h);
 }
 
+/*!
+ * [EN] A standalone tab bar: one the app added to a page by itself (e.g. the FlatDesign demo page), not the tab bar of a
+ *      CYLTabBarController (whose `delegate` is that controller). The owner lookup walks up from such a bar to the
+ *      CYLTabBarController the page is in, and used to give it that controller's plus button: its index belongs to the
+ *      other tab bar, so `_buttons[plusButtonIndex]` crashed with "index 2 beyond bounds [0 .. 1]" (popping back from a
+ *      four-tab page), and the shared plus button would be moved out of the controller's own tab bar.
+ * [CN] 独立 TabBar：App 自己添加到页面上的 TabBar（如扁平风格演示页），而不是某个 CYLTabBarController 的 TabBar（其 `delegate`
+ *      就是该控制器）。从这种 TabBar 向上查找会找到页面所在的 CYLTabBarController，以前会拿到那个控制器的 PlusButton：其 index
+ *      属于另一个 TabBar，所以 `_buttons[plusButtonIndex]` 数组越界崩溃（从四个 Tab 的页面返回时 "index 2 beyond bounds [0 .. 1]"），
+ *      而且共享的 PlusButton 会被移出控制器自己的 TabBar。
+ */
+- (BOOL)cyl_isStandaloneTabBar {
+    if ([self.delegate isKindOfClass:[CYLTabBarController class]]) {
+        return NO;
+    }
+    // [EN] Not inside any CYLTabBarController (not attached yet): keep the context lookup.
+    // [CN] 不在任何 CYLTabBarController 中（尚未挂上）：保留按 context 查找。
+    return [self cyl_owningTabBarController] != nil;
+}
+
 - (BOOL)hasPlusButton {
     // Bound to the CYLTabBarController that owns this tab bar, see `-[CYLTabBar hasPlusButton]`.
     // 绑定的是拥有本 TabBar 的 CYLTabBarController，见 `-[CYLTabBar hasPlusButton]`。
+    if ([self cyl_isStandaloneTabBar]) {
+        return NO;
+    }
     return [CYLPlusButton plusButtonForOwner:self] != nil;
 }
 
 - (BOOL)hasPlusChildViewController {
+    if ([self cyl_isStandaloneTabBar]) {
+        return NO;
+    }
     return [CYLPlusButton plusChildViewControllerForOwner:self] != nil;
 }
 

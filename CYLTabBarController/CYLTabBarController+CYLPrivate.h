@@ -86,6 +86,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CYLTabBarController (CYLContextPlusButtonPrivate)
 - (nullable CYLPlusButton<CYLPlusButtonSubclassing> *)cyl_contextPlusButton;
 - (nullable UIViewController *)cyl_contextPlusChildViewController;
+/// [EN] The plus button's slot (its placeholder or plus child view controller), see "Plus slot" in CYLTabBarController.m.
+/// [CN] PlusButton 的 slot（占位控制器或 PlusButton 子控制器），见 CYLTabBarController.m 中的 "Plus slot"。
+- (BOOL)cyl_isPlusSlotViewController:(UIViewController *)viewController;
 @end
 
 /// [EN] Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.

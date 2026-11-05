@@ -15,6 +15,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Background-Image-Liquid-Glass.md
 //   - PlusButton badge: changes on every tap / PlusButton 角标：每次点击都会变化
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Badge.md
+//   - The PlusButton Slot: Placeholders and Matching Counts / PlusButton 的 slot：占位与数量一致
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Slot.md
 //   - Subviews of the PlusButton receive their own touches / PlusButton 子控件响应各自的点击事件
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Subview-Touches.md
 //   - PlusButton touchable area: grow it, scale it, and see it / PlusButton 点击范围：扩大、按倍数放大与调试显示

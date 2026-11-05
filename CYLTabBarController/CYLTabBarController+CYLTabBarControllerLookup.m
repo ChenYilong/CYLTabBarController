@@ -256,14 +256,11 @@ static CYLTabBarController *CYLTabBarControllerOwningTabBar(UIResponder *respond
 
 /// [EN] YES for the plus button's child view controller or placeholder. [CN] PlusButton 的子控制器或占位控制器时为 YES。
 - (BOOL)cyl_isPlusButtonViewController:(UIViewController *)viewController {
-    if (viewController.cyl_isPlaceholder || [viewController cyl_getViewControllerInsteadOfNavigationController].cyl_isPlaceholder) {
-        return YES;
-    }
-    if (![self hasPlusButton] || ![self hasPlusChildViewController]) {
-        return NO;
-    }
-    UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
-    return plusChildViewController && viewController == plusChildViewController;
+    // [EN] FIX: placeholder count mismatch — the same test as the slot insertion, so `cyl_viewControllersIgnoringPlusButton`
+    //      also leaves out a plus child view controller inside a navigation controller.
+    // [CN] FIX：占位导致的数量不匹配——与插入 slot 时使用同一判断，`cyl_viewControllersIgnoringPlusButton` 也会去掉被导航控制器包裹的
+    //      PlusButton 子控制器。
+    return [self cyl_isPlusSlotViewController:viewController];
 }
 
 - (NSArray<UIViewController *> *)cyl_viewControllersIgnoringPlusButton {
