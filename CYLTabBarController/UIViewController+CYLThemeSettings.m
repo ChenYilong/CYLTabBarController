@@ -486,8 +486,20 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
             break;
         }
     }
-    NSLog(@"plus child theme test: %@ %@ theme=%@ selectedIndex=%@ standIn=%@ plusButton=%@", matches ? @"PASS" : @"FAIL", phase, theme,
-          @(tabBarController.selectedIndex), NSStringFromCGSize(shown.size), NSStringFromCGSize(plusButton.currentImage.size));
+    // [EN] The real plus button must not be drawn under the glass: blurred and magnified there, it showed around the
+    //      stand-in's image wherever that image is transparent (a theme's star), and the icon looked soft.
+    // [CN] 真实的 PlusButton 不能在玻璃下方绘制：它在那里被模糊并放大，会从替身图片的透明区域（如主题的星星）周围露出来，图标因此发虚。
+    BOOL masked = [plusButton.layer.mask.name isEqualToString:@"CYLPlusButtonLiquidGlassMask"];
+    NSLog(@"plus child theme test: %@ %@ theme=%@ selectedIndex=%@ standIn=%@ plusButton=%@ realButtonMaskedUnderGlass=%@",
+          (matches && masked) ? @"PASS" : @"FAIL", phase, theme, @(tabBarController.selectedIndex), NSStringFromCGSize(shown.size),
+          NSStringFromCGSize(plusButton.currentImage.size), @(masked));
+    for (UIView *view = standIn.superview; view && view != tabBarController.tabBar.superview; view = view.superview) {
+        if (view.layer.mask || view.clipsToBounds || view.layer.masksToBounds) {
+            NSLog(@"plus child theme test: info %@ clip=%@ frame=%@ cornerRadius=%.1f layerMask=%@", phase, NSStringFromClass([view class]),
+                  NSStringFromCGRect([view convertRect:view.bounds toView:nil]), view.layer.cornerRadius, @(view.layer.mask != nil));
+            break;
+        }
+    }
     // [EN] What is drawn: the image view's own image (a button with a `UIButtonConfiguration` may draw another image than
     //      `currentImage`), frames in the window, visibility up the superview chain, image scale.
     // [CN] 实际绘制的内容：图片视图自己的图片（使用 `UIButtonConfiguration` 的按钮绘制的图片可能与 `currentImage` 不同）、在 window 中的
@@ -507,14 +519,14 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
           NSStringFromCGRect([plusButton convertRect:plusButton.bounds toView:nil]), @(standInVisible), @(standIn.configuration != nil),
           @(standIn.highlighted), @(CYLDemoSameImage(imageView.image, shown)), NSStringFromCGRect(imageView.frame), @(imageView.hidden),
           imageView.alpha, imageView.image.scale, plusButton.currentImage.scale, NSStringFromClass([standIn.superview class]));
-    // [EN] The stand-in alone, 1.5 s after the check (after the script's normal screenshot): the real plus button is hidden
-    //      for 1.5 s, and "stand-in only" lets the script take a screenshot.
-    // [CN] 只看替身：检查 1.5 秒后（脚本的普通截图之后）隐藏真实的 PlusButton 1.5 秒，"stand-in only" 让脚本截图。
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    // [EN] The stand-in alone, 3 s after the check (after the script's normal screenshot): the real plus button is hidden
+    //      for 2 s, and "stand-in only" lets the script take a screenshot.
+    // [CN] 只看替身：检查 3 秒后（脚本的普通截图之后）隐藏真实的 PlusButton 2 秒，"stand-in only" 让脚本截图。
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         CGFloat alpha = plusButton.alpha;
         plusButton.alpha = 0;
         NSLog(@"plus child theme test: stand-in only %@", phase);
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             plusButton.alpha = alpha;
         });
     });
@@ -637,7 +649,7 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                         CYLDemoCheckPlusChildStandIn(@"after");
                         // [EN] After the "stand-in only" screenshot. [CN] 在 "stand-in only" 截图之后。
-                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                             NSLog(@"plus child theme test: done");
                         });
                     });

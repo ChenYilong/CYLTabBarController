@@ -724,6 +724,89 @@ static BOOL CYLPlusButtonIsInLiquidGlassTabBar(CYLPlusButton *plusButton) {
     if (!CGPointEqualToPoint(center, selectedContentView.center)) {
         selectedContentView.center = center;
     }
+    [self cyl_updateLiquidGlassMask];
+}
+
+/// [EN] The name of the mask `-cyl_updateLiquidGlassMask` puts on the plus button. [CN] `-cyl_updateLiquidGlassMask` 给 PlusButton 设置的 mask 的名字。
+static NSString *const CYLPlusButtonLiquidGlassMaskName = @"CYLPlusButtonLiquidGlassMask";
+
+/*!
+ * [EN] FIX: a theme image on the plus button looked blurred with the plus child view controller selected (Liquid Glass).
+ *      The glass over the selected tab shows the stand-in (`-selectedContentView`) sharp, and what lies under it — the
+ *      real plus button — blurred and magnified. The app's own image is an opaque disc that hides that blurred copy; an
+ *      image with transparent parts (e.g. a holiday star) let it show around its edges, so the icon looked soft. While
+ *      the stand-in is shown, the real plus button is masked out inside the area that clips the stand-in (the glass), and
+ *      still drawn outside it (the stand-in is clipped there). Only in a Liquid Glass tab bar (Liquid Glass active AND not
+ *      the FlatDesign style), only while the plus child view controller is selected; never replaces a mask of the app.
+ * [CN] FIX：选中 PlusButton 子控制器时，PlusButton 上的主题图片看起来是模糊的（液态玻璃）。选中 Tab 上方的玻璃清晰地显示替身
+ *      （`-selectedContentView`），而玻璃下方的内容——真实的 PlusButton——被模糊并放大。App 自己的图片是不透明的圆盘，会挡住这个模糊的副本；
+ *      带透明区域的图片（例如节日星星）会让它从边缘露出来，图标因此发虚。显示替身时，真实的 PlusButton 在裁剪替身的区域（玻璃）内被 mask 掉，
+ *      在区域外仍然绘制（替身在那里被裁剪）。仅在液态玻璃 TabBar 中（液态玻璃处于活动状态且不是扁平样式），仅在选中 PlusButton 子控制器时；
+ *      不会替换 App 自己设置的 mask。
+ */
+- (void)cyl_updateLiquidGlassMask {
+    CALayer *currentMask = self.layer.mask;
+    BOOL ownsMask = [currentMask.name isEqualToString:CYLPlusButtonLiquidGlassMaskName];
+    if (currentMask && !ownsMask) {
+        return;
+    }
+    UIBezierPath *glassPath = nil;
+    UIButton *standIn = (_selectedContentView != self) ? _selectedContentView : nil;
+    CYLTabBarController *tabBarController = nil;
+    if (standIn.window && self.window && CYLPlusButtonIsInLiquidGlassTabBar(self)) {
+        tabBarController = [self cyl_owningTabBarController] ?:
+            [CYLTabBarController cyl_tabBarControllerForContext:[CYLPlusButton tabBarContextForOwner:self]];
+    }
+    UIViewController *plusChildViewController = tabBarController ? [CYLPlusButton plusChildViewControllerForOwner:tabBarController] : nil;
+    UIViewController *selectedViewController = tabBarController.selectedViewController;
+    BOOL plusChildSelected = plusChildViewController &&
+        (selectedViewController == plusChildViewController ||
+         [selectedViewController cyl_getViewControllerInsteadOfNavigationController] == plusChildViewController);
+    if (plusChildSelected) {
+        // [EN] The first view above the stand-in that clips it (bounds or a layer mask), up to the tab bar.
+        // [CN] 替身之上第一个裁剪它的视图（bounds 或 layer mask），最多找到 TabBar。
+        for (UIView *view = standIn.superview; view && view != tabBarController.tabBar.superview; view = view.superview) {
+            CALayer *viewMask = view.layer.mask;
+            if (!viewMask && !view.clipsToBounds && !view.layer.masksToBounds) {
+                continue;
+            }
+            CGRect clipRect = viewMask ? viewMask.frame : view.bounds;
+            CGFloat cornerRadius = viewMask ? MAX(viewMask.cornerRadius, view.layer.cornerRadius) : view.layer.cornerRadius;
+            clipRect = [view convertRect:clipRect toView:self];
+            if (CGRectIntersectsRect(clipRect, self.bounds)) {
+                cornerRadius = MIN(cornerRadius, MIN(CGRectGetWidth(clipRect), CGRectGetHeight(clipRect)) * 0.5);
+                glassPath = [UIBezierPath bezierPathWithRoundedRect:clipRect cornerRadius:cornerRadius];
+            }
+            break;
+        }
+    }
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    if (glassPath) {
+        CAShapeLayer *mask = ownsMask ? (CAShapeLayer *)currentMask : [CAShapeLayer layer];
+        mask.name = CYLPlusButtonLiquidGlassMaskName;
+        mask.frame = self.bounds;
+        // [EN] Everything, minus the glass (even-odd). [CN] 全部区域减去玻璃区域（奇偶规则）。
+        UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectInset(self.bounds, -CGRectGetWidth(self.bounds), -CGRectGetHeight(self.bounds))];
+        [path appendPath:glassPath];
+        mask.fillRule = kCAFillRuleEvenOdd;
+        mask.path = path.CGPath;
+        self.layer.mask = mask;
+    } else if (ownsMask) {
+        self.layer.mask = nil;
+    }
+    [CATransaction commit];
+}
+
+- (void)setSelected:(BOOL)selected {
+    [super setSelected:selected];
+    // [EN] The glass moves to or away from the plus button: now and once its animation is over.
+    // [CN] 玻璃移到 PlusButton 上或离开：现在更新一次，动画结束后再更新一次。
+    [self cyl_updateLiquidGlassMask];
+    __weak __typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [weakSelf cyl_updateLiquidGlassMask];
+    });
 }
 
 /// See `+alignsTitleWithTabBarItemTitles`.
@@ -981,6 +1064,9 @@ static BOOL CYLPlusButtonIsInLiquidGlassTabBar(CYLPlusButton *plusButton) {
 /// The image-above-title layout of `+cyl_plusButtonWithImage:…`; other plus buttons keep UIButton's layout.
 - (void)layoutSubviews {
     [super layoutSubviews];
+    // [EN] Liquid Glass: the real plus button is not drawn under the glass that shows its stand-in.
+    // [CN] 液态玻璃：显示替身的玻璃下方不绘制真实的 PlusButton。
+    [self cyl_updateLiquidGlassMask];
     // [EN] Issue #91: keep the touchable area overlay on the button.
     // [CN] 保持可点击区域覆盖层与按钮一致。
     if (_showsTouchableArea) {

@@ -345,6 +345,12 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @end
 
 /// [EN] Implemented below (CYLTheme, issue #216). [CN] 实现见下方 CYLTheme（issue #216）。
+/// [EN] Implemented in `CYLPlusButton.m`. [CN] 在 `CYLPlusButton.m` 中实现。
+@interface CYLPlusButton (CYLLiquidGlassMaskPrivate)
+/// [EN] Liquid Glass: masks the real plus button out under the glass that shows its stand-in. [CN] 液态玻璃：在显示替身的玻璃下方 mask 掉真实的 PlusButton。
+- (void)cyl_updateLiquidGlassMask;
+@end
+
 @interface CYLTabBarController (CYLThemePrivate)
 /// [EN] Once, when first shown: the theme chosen at launch. [CN] 首次显示时执行一次：应用启动时选择的主题。
 - (void)cyl_applyLaunchTabBarThemeIfNeeded;
@@ -1109,6 +1115,9 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
             if (platterView && selectedContainerView) {
                 selectedCover.center = [selectedContainerView convertPoint:plusButton.center fromView:platterView];
             }
+            // [EN] The real plus button is not drawn under the glass that shows the stand-in (`CYLPlusButton.m`).
+            // [CN] 显示替身的玻璃下方不绘制真实的 PlusButton（`CYLPlusButton.m`）。
+            [plusButton cyl_updateLiquidGlassMask];
         };
         if ([contextPlusButton cyl_showsTitleInTabBarItem]) {
             // [EN] FIX: issue #636 — the tab item shows the plus button's title (`-cyl_showsTitleInTabBarItem`): as the
