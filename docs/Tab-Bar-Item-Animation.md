@@ -40,6 +40,10 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [方式 A：可播放视图（Rive 的完整实现）](#cn方式-a可播放视图rive-的完整实现) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Way A: a playable view (Rive's complete integration)](#enway-a-a-playable-view-rives-complete-integration) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [方式 B：animator ＋ 播放器（PAG 的方式）](#cn方式-banimator--播放器pag-的方式) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Way B: an animator and a player (PAG's way)](#enway-b-an-animator-and-a-player-pags-way) |
 | [选中 Tab 时](#cn选中-tab-时) | [When a tab is selected](#enwhen-a-tab-is-selected) |
+| [动画库 key 的预编译检查：方案评估](#cn动画库-key-的预编译检查方案评估) | [Compile-time guards for the animation keys: options evaluated](#encompile-time-guards-for-the-animation-keys-options-evaluated) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [现状](#cn现状) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Where the code stands](#enwhere-the-code-stands) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [两种方案对比](#cn两种方案对比) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [The two options compared](#enthe-two-options-compared) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [结论与建议](#cn结论与建议) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Conclusion and recommendation](#enconclusion-and-recommendation) |
 | [集成方式](#cn集成方式) | [Integrations](#enintegrations) |
 | [测试](#cn测试) | [Testing](#entesting) |
 
@@ -317,6 +321,56 @@ sequenceDiagram
     TBC->>Eng: stopAnimationInControl: for every other tab → each player stop
     Eng->>Ply: play (showLastFrame for the tab selected at launch)
 ```
+
+## [CN]动画库 key 的预编译检查：方案评估
+## [EN]Compile-time guards for the animation keys: options evaluated
+
+| 中文 | English |
+|:---|:---|
+| 问题：动画库自己的 key（例如 `CYLTabBarPAGURL`、`CYLTabBarRiveURL`、`CYLTabBarAnimationOptionRiveArtboard`）只有在引入对应动画库时才有作用。是否应在定义与使用处加预编译检查？有两种做法：(A) 未引入动画库时，key 取默认值「原值 + `Undefined`」（例如 `CYLTabBarPAGURLUndefined`），并通过判断 key 是否包含 `Undefined` 来判断动画库是否引入；(B) 未引入时完全不定义该 key，使用处直接编译失败，提醒先引入。以下按 PR #752 的代码评估。 | The question: a library's own keys (e.g. `CYLTabBarPAGURL`, `CYLTabBarRiveURL`, `CYLTabBarAnimationOptionRiveArtboard`) only do something when that animation library is added. Should their definitions and uses be guarded at compile time? Two ways: (A) without the library, the key takes a default value, "its value + `Undefined`" (e.g. `CYLTabBarPAGURLUndefined`), and checking whether a key contains `Undefined` tells whether the library is there; (B) without the library, the key is not defined at all, so using it fails to compile and reminds the developer to add the library first. Evaluated against the code of PR #752 below. |
+
+### [CN]现状
+### [EN]Where the code stands
+
+| key | 声明与定义位置 / Declared and defined in | 未引入动画库时 / Without the library | 已在 master 发布 / Released on master |
+|:---|:---|:---|:---|
+| 通用 key `CYLTabBarAnimationURL`、`…FilePath`、`…Size`、`…DarkURL`、`…DarkFilePath`、`…DarkColors`<br>The generic keys | Core（`CYLTabBarController.h`） | 不属于任何动画库，任何动画库都使用它们，必须始终定义。<br>They belong to no library; every library uses them, so they must always be defined. | 否（本 PR 新增）/ No (new in this PR) |
+| Lottie key `CYLTabBarLottieURL` 等<br>The Lottie keys | Core（`CYLTabBarController.h` / `.m`） | 已定义，值为原值；没有 Lottie 时被忽略，Tab 显示图片。<br>Defined, with their own values; without Lottie they are ignored and the tab shows its image. | **是**，属于公开 API / **Yes**, public API |
+| PAG key、Rive key 与 Rive 选项<br>The PAG and Rive keys, and the Rive options | 各自子库（`PAG/CYLPAGTabBarItemAnimator.h`、`Rive/CYLRiveTabBarItemAnimator.h`）<br>Their own subspecs | CocoaPods：不引入 `PAG` / `Rive` 子库时，这两个头文件根本不存在，使用 key 即编译失败（`use of undeclared identifier 'CYLTabBarPAGURL'`）；子库依赖 libpag / RiveRuntime，因此有 key 就一定有动画库。<br>CocoaPods: without the `PAG` / `Rive` subspec those headers do not exist, so using a key fails to compile (`use of undeclared identifier 'CYLTabBarPAGURL'`); the subspecs depend on libpag / RiveRuntime, so whenever the keys exist, the library does too. | 否（本 PR 新增）/ No (new in this PR) |
+
+| 中文 | English |
+|:---|:---|
+| **使用处不需要预编译检查。** Core 从不直接写动画库的 key：它通过 `CYLTabBarItemAnimatorRegistry` 读取已注册 animator 的 `attributeKeys`。animator 只在链接了动画库时于 `+load` 中注册（`__has_include(<libpag/PAGView.h>)`、`__has_include(<RiveRuntime/RiveRuntime.h>)`、`CYL_LOTTIE_AVAILABLE`）。没有注册的动画库，它的 key 不会被读取，Tab 显示图片，不会崩溃。 | **The uses need no compile-time guard.** Core never names a library's key: it reads the `attributeKeys` of the registered animators through `CYLTabBarItemAnimatorRegistry`. An animator registers in `+load` only when its library is linked (`__has_include(<libpag/PAGView.h>)`, `__has_include(<RiveRuntime/RiveRuntime.h>)`, `CYL_LOTTIE_AVAILABLE`). The keys of a library that is not registered are never read: the tab shows its image, nothing crashes. |
+| **唯一的缺口**：Swift Package（以及直接拷贝源码）会编译 `PAG/`、`Rive/` 的 `.m`，但没有 libpag / RiveRuntime。PAG 与 Rive key 的定义位于 `__has_include` 检查之外（`CYLPAGTabBarItemAnimator.m:18-22`、`CYLRiveTabBarItemAnimator.m:30-46`），因此这些符号存在但没有 animator。Swift Package 的公开头文件（`include/`）不包含这两个头文件，用户仍无法使用这些 key，所以只是无用的符号，不会造成错误行为。 | **The one gap**: a Swift package (and a plain copy of the sources) compiles the `.m` files in `PAG/` and `Rive/` without libpag / RiveRuntime. The PAG and Rive key definitions sit outside the `__has_include` checks (`CYLPAGTabBarItemAnimator.m:18-22`, `CYLRiveTabBarItemAnimator.m:30-46`), so those symbols exist with no animator. The Swift package's public headers (`include/`) do not include those two headers, so users still cannot name the keys: dead symbols, no wrong behavior. |
+
+### [CN]两种方案对比
+### [EN]The two options compared
+
+| 评估项 / Criterion | (A) 默认值「…Undefined」<br>(A) Default value "…Undefined" | (B) 不定义，编译失败<br>(B) Not defined, a build error |
+|:---|:---|:---|
+| 忘记引入动画库时<br>When the library was forgotten | 能编译，运行时 Tab 只显示图片，与现状相同：错误被推迟到运行时，仍是静默的。<br>Compiles; at run time the tab only shows its image, as today: the mistake moves to run time and stays silent. | 编译失败，停在写错的那一行，零运行时成本。<br>Fails to build, at the line of the mistake, at no run-time cost. |
+| 代码量<br>Amount of code | 每个 key 需要 `#if` / `#else` 两份定义；判断依赖字符串子串匹配（`containsString:@"Undefined"`），属于约定而非类型。<br>Two definitions per key (`#if` / `#else`); the check is a substring match (`containsString:@"Undefined"`), a convention rather than a type. | 不增加代码：PAG / Rive 在 CocoaPods 中已经如此（按子库）。<br>No new code: PAG / Rive already work this way in CocoaPods (per subspec). |
+| 值的一致性<br>Consistent values | 同一符号的值取决于构建配置：带与不带动画库编译的模块（App 扩展、其他 framework、SPM 与 CocoaPods）值不同；服务端 JSON、plist 或 Swift 中写的字符串字面量（`"CYLTabBarPAGURL"`）永远等于原值。两个事实来源。<br>The same symbol's value depends on the build: modules built with and without the library (app extensions, other frameworks, SPM vs CocoaPods) disagree, while literal strings in server JSON, plists or Swift (`"CYLTabBarPAGURL"`) always carry the original value. Two sources of truth. | 值永远只有一个。<br>One value, always. |
+| 公开 API 规则（CLAUDE.md §4）<br>Public API rule (CLAUDE.md §4) | 用于 Lottie key 会改变已发布常量的值，违反规则；以字面量 `"CYLTabBarLottieURL"` 配置的用户会失效。<br>Applied to the Lottie keys, it changes released constants' values, which the rule forbids; users who configure with the literal `"CYLTabBarLottieURL"` would break. | 不能用于 Lottie key（删除已发布的符号同样违反规则），也不能用于通用 key。只适用于 PAG / Rive。<br>Cannot apply to the Lottie keys (removing a released symbol breaks the rule too) nor to the generic keys. Applies to PAG / Rive only. |
+| 判断动画库是否可用<br>Telling whether a library is there | 通过命名约定判断，与真实状态可能不一致。<br>Through a naming convention, which can disagree with reality. | 编译期由符号是否存在决定；运行时已有精确的接口：`[CYLTabBarItemAnimatorRegistry animatorWithIdentifier:@"PAG"] != nil`，反映动画库是否真的注册。<br>At compile time, by whether the symbol exists; at run time there is already a precise API: `[CYLTabBarItemAnimatorRegistry animatorWithIdentifier:@"PAG"] != nil`, which reflects whether the library really registered. |
+| CocoaPods 中的可达性<br>Reachable in CocoaPods | `#else` 分支永远不会编译：PAG / Rive 子库依赖其动画库。需要维护的死代码。<br>The `#else` branch is never compiled: the PAG / Rive subspecs depend on their libraries. Dead code to maintain. | — |
+| 依赖方向<br>Dependency direction | 不影响。<br>Unaffected. | 不影响，前提是不把「不可用」的声明放进 Core（见下）。<br>Unaffected, as long as no "unavailable" declaration goes into Core (see below). |
+
+### [CN]结论与建议
+### [EN]Conclusion and recommendation
+
+| 中文 | English |
+|:---|:---|
+| **建议采用 (B)，而且 PR #752 在 CocoaPods 中已经这样做了**（以子库为单位）；不建议 (A)。(A) 不能让错误更早暴露，只是把「动画库是否存在」从编译期事实变成运行时的字符串约定，同时让同一个 key 在不同构建中有不同的值；用于 Lottie 还会违反公开 API 规则。 | **Recommended: (B), which PR #752 already does in CocoaPods** (per subspec); (A) is not recommended. (A) does not surface the mistake any earlier: it turns "is the library there" from a compile-time fact into a run-time string convention, and gives the same key different values in different builds; applied to Lottie, it also breaks the public API rule. |
+| 按 key 分类：通用 key 与 Lottie key 保持始终定义、值不变（Lottie key 已发布；没有 Lottie 时被忽略）。PAG / Rive key 保持「不引入子库就不存在」。 | Per kind of key: the generic keys and the Lottie keys stay always defined, values unchanged (the Lottie keys are released; without Lottie they are ignored). The PAG / Rive keys stay "absent without their subspec". |
+| 可选的补强（约 30 分钟，等待决定）：把 PAG / Rive key 的定义移到 `.m` 中与 `+load` 相同的 `__has_include` 检查内，使 Swift Package 与源码拷贝中也不存在这些无用符号，三种集成方式行为一致。头文件同时用相同条件包住声明，避免出现「有声明、无定义」的链接错误。 | An optional hardening (about 30 minutes, awaiting a decision): move the PAG / Rive key definitions inside the same `__has_include` check as `+load` in the `.m` files, so the Swift package and a copy of the sources do not carry those dead symbols either, and all three integrations behave alike. Wrap the declarations in the headers in the same condition, so there is never a "declared but not defined" link error. |
+| 不建议：为了让编译错误给出「请引入 `pod 'CYLTabBarController/PAG'`」这样的提示，在 Core 中用 `__attribute__((unavailable("…")))` 声明 PAG / Rive key。没有子库时只有 Core 的头文件存在，这意味着 Core 要写出动画库的 key，反转了依赖方向（Core 不包含任何动画库代码）。改为在下表中说明。 | Not recommended: declaring the PAG / Rive keys in Core with `__attribute__((unavailable("…")))` so the build error says "add `pod 'CYLTabBarController/PAG'`". Without the subspec only Core's headers exist, so Core would have to name a library's keys, reversing the dependency direction (Core holds no library code). The table below says it instead. |
+
+| 编译错误中的 key / The key in the build error | 需要引入 / Add |
+|:---|:---|
+| `CYLTabBarPAG…` | `pod 'CYLTabBarController/PAG'`（或 / or `PAGEnterprise`） |
+| `CYLTabBarRive…`、`CYLTabBarAnimationOptionRive…` | `pod 'CYLTabBarController/Rive'` |
+| `CYLTabBarLottie…` | 始终可用；动画需要 `pod 'CYLTabBarController/Lottie'`<br>Always available; the animation needs `pod 'CYLTabBarController/Lottie'` |
 
 ## [CN]集成方式
 ## [EN]Integrations
