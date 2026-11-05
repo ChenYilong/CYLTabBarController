@@ -464,8 +464,10 @@ static void CYLDemoCheckPlusChildStandIn(NSString *phase) {
         NSLog(@"plus child theme test: SKIP %@ theme=%@: no plus button", phase, theme);
         return;
     }
-    if (![CYLConstants isLiquidGlassActive]) {
-        NSLog(@"plus child theme test: SKIP %@ theme=%@: no stand-in outside Liquid Glass", phase, theme);
+    // [EN] The FlatDesign tab bar has no selected layer, even on iOS 26 where `+isLiquidGlassActive` is YES.
+    // [CN] 扁平样式 TabBar 没有选中图层，即使在 `+isLiquidGlassActive` 为 YES 的 iOS 26 上也是如此。
+    if (![CYLConstants isLiquidGlassActive] || tabBarController.tabBarStyleType == CYLTabBarStyleTypeFlatDesign) {
+        NSLog(@"plus child theme test: SKIP %@ theme=%@: no stand-in outside the Liquid Glass tab bar", phase, theme);
         return;
     }
     UIButton *standIn = plusButton.selectedContentView;
