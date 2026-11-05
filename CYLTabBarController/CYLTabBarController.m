@@ -804,6 +804,11 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
                 self.lottieViewAdded = YES;
             }];
         }
+        // [EN] Icon views installed before the Lottie views (e.g. the icons of the theme chosen at launch) hide them now; until
+        //      the next layout pass the Lottie view stayed on top of the theme's icon (seen on Liquid Glass).
+        // [CN] 在 Lottie 视图之前安装的图标视图（例如启动时所选主题的图标）现在将其隐藏；否则在下一次布局前 Lottie 视图会盖在主题图标之上
+        //      （液态玻璃上可见）。
+        [self cyl_setNeedsUpdateTabBarItemIconViews];
     });
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }

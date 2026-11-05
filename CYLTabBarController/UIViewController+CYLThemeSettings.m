@@ -127,6 +127,24 @@ static UIColor *CYLDemoRGB(CGFloat red, CGFloat green, CGFloat blue) {
 
 #pragma mark - CYLTabBarTheme
 
+/*!
+ * [EN] The attributes of each real tab, in order, as `CYLTabBarTheme` expects them: one entry per tab, none for the plus
+ *      button's page (some apps give it an entry in `tabBarItemsAttributes`) or a placeholder.
+ * [CN] 每个真实 Tab 的 attributes，按顺序，符合 `CYLTabBarTheme` 的要求：每个 Tab 一项，PlusButton 的页面（有些 App 会在
+ *      `tabBarItemsAttributes` 中为它提供一项）与占位控制器不占项。
+ */
+static NSArray<NSDictionary *> *CYLDemoRealTabsAttributes(CYLTabBarController *tabBarController) {
+    UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:tabBarController];
+    NSMutableArray<NSDictionary *> *attributes = [NSMutableArray array];
+    [tabBarController.viewControllers enumerateObjectsUsingBlock:^(UIViewController *viewController, NSUInteger index, BOOL *stop) {
+        if (viewController.cyl_isPlaceholder || viewController == plusChildViewController) {
+            return;
+        }
+        [attributes addObject:[tabBarController tabBarItemAttributesAtIndex:index] ?: @{}];
+    }];
+    return attributes;
+}
+
 /// [EN] A theme icon from the library's resource bundle, in its own colors. [CN] 本库资源包中的主题图标，保持原色。
 - (nullable UIImage *)iconNamed:(NSString *)iconName {
     UIImage *image = [UIImage imageNamed:[@"cyl_theme_" stringByAppendingString:iconName] inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil];
@@ -182,7 +200,7 @@ static UIImage *CYLDemoFadedImage(UIImage *image) {
         return nil;
     }
     NSMutableArray<NSDictionary<NSString *, id> *> *itemsAttributes = [NSMutableArray array];
-    NSUInteger count = tabBarController.tabBarItemsAttributes.count;
+    NSUInteger count = CYLDemoRealTabsAttributes(tabBarController).count;
     for (NSUInteger index = 0; index < count; index++) {
         UIImage *selectedImage = [self iconNamed:self.iconNames[index % self.iconNames.count]];
         if (!selectedImage) {
@@ -204,7 +222,7 @@ static UIImage *CYLDemoFadedImage(UIImage *image) {
  */
 - (NSArray<NSDictionary<NSString *, id> *> *)networkItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController {
     NSMutableArray<NSDictionary<NSString *, id> *> *itemsAttributes = [NSMutableArray array];
-    NSArray<NSDictionary *> *currentAttributes = tabBarController.tabBarItemsAttributes;
+    NSArray<NSDictionary *> *currentAttributes = CYLDemoRealTabsAttributes(tabBarController);
     NSString *prefix = [NSString stringWithFormat:@"%@ ", self.titlePrefix ?: @""];
     for (NSUInteger index = 0; index < currentAttributes.count; index++) {
         NSArray<NSString *> *URLs = self.iconURLs[index % self.iconURLs.count];

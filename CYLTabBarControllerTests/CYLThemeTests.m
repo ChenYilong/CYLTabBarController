@@ -191,6 +191,12 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
     XCTAssertEqual(image.size.width, 10.0);
     XCTAssertFalse(((UIImage *)manager.currentTheme).cyl_isThemeImage, @"the provider's image (maybe shared) is not marked");
     XCTAssertNotEqual(image, manager.currentTheme);
+    // [EN] Again from the same provider image: UIKit caches derived images, which once gave back the provider's image.
+    // [CN] 再次使用同一个 provider 图片：UIKit 会缓存派生图片，曾因此返回 provider 的图片本身。
+    UIImage *again = [self themeImageOfManager:manager];
+    XCTAssertTrue(again.cyl_isThemeImage);
+    XCTAssertNotEqual(again, image);
+    XCTAssertNotEqual(again, manager.currentTheme);
 
     manager.currentThemeIdentifier = @"B";
     UIImage *current = [image cyl_imageForCurrentTheme];
@@ -207,12 +213,6 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     [button setImage:[self themeImageOfManager:manager] forState:UIControlStateNormal];
     [button setBackgroundImage:[self themeImageOfManager:manager] forState:UIControlStateSelected];
-    UIImage *setImage = [self themeImageOfManager:manager];
-    UIButton *probe = [UIButton buttonWithType:UIButtonTypeCustom];
-    [probe setImage:setImage forState:UIControlStateNormal];
-    UIImage *storedImage = [probe imageForState:UIControlStateNormal];
-    NSLog(@"[CYLThemeTests] UIButton stores %@ (%p, theme image: %d) for %@ (%p, rendering mode %ld)",
-          storedImage, storedImage, storedImage.cyl_isThemeImage, setImage, setImage, (long)setImage.renderingMode);
     XCTAssertTrue([button imageForState:UIControlStateNormal].cyl_isThemeImage, @"UIButton keeps the theme image object");
 
     manager.currentThemeIdentifier = @"B";

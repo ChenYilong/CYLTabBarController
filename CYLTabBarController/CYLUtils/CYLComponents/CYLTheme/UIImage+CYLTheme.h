@@ -25,7 +25,8 @@ typedef UIImage *_Nullable (^CYLThemeImageProvider)(__kindof CYLThemeManager *ma
  * [EN] Images that follow the theme of a `CYLThemeManager`, like theme colors (`UIColor+CYLTheme.h`).
  *      - The image returned is a normal `UIImage`: the provider's image for the current theme, as its own object (the
  *        provider's image itself, e.g. a shared `+imageNamed:` one, is never marked), which remembers the provider.
- *        Light and dark variants of an asset image keep following Dark Mode.
+ *        Light and dark variants of an asset image keep following Dark Mode; an SF Symbol becomes a bitmap of its
+ *        current configuration (its rendering mode is kept, so a template symbol still takes the tint color).
  *      - When the theme changes, every view in a window, and the views of the app's view controllers that are not in a
  *        window (other tabs, pages under the top of a navigation stack), get the image of the new theme, with no UIKit
  *        method hooked:
@@ -38,7 +39,8 @@ typedef UIImage *_Nullable (^CYLThemeImageProvider)(__kindof CYLThemeManager *ma
  *      - Tab bar items keep a copy of their images: theme the tab bar with `CYLTabBarTheme` (`CYLTabBarController.h`).
  * [CN] 跟随 `CYLThemeManager` 主题的图片，用法与主题颜色（`UIColor+CYLTheme.h`）相同。
  *      - 返回的是普通的 `UIImage`：provider 在当前主题下返回的图片，作为独立对象（不会标记 provider 返回的图片本身，例如共享的
- *        `+imageNamed:` 图片），并记住该 provider。资源目录图片的浅色与深色版本仍跟随深色模式。
+ *        `+imageNamed:` 图片），并记住该 provider。资源目录图片的浅色与深色版本仍跟随深色模式；SF Symbol 会变为当前配置下的位图（保留渲染模式，因此模板符号仍使用
+ *        tintColor）。
  *      - 主题切换时，window 中的所有视图，以及 App 中不在 window 上的控制器视图（其他 Tab、导航栈中非顶部的页面）都会得到新主题的图片，
  *        不 hook 任何 UIKit 方法：
  *        - `UIImageView`：`image`、`highlightedImage`（也包括按钮与 cell 中的图片视图）；

@@ -73,12 +73,24 @@ for THEME in $THEMES; do
   # [EN] Network icons are downloaded: give them longer. [CN] 网络图标需要下载：多等一会。
   WAIT=8
   [ "$THEME" = "Network" ] && WAIT=20
-  # shellcheck disable=SC2086
-  xcrun simctl launch --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$THEME" $STYLE_ARGUMENTS
-  sleep "$WAIT"
   FILE="$OUT/theme-switching-$STYLE_SLUG-$SLUG.png"
-  xcrun simctl io "$DEVICE_ID" screenshot "$FILE"
-  echo "Saved $FILE"
+  for ATTEMPT in 1 2; do
+    # shellcheck disable=SC2086
+    xcrun simctl launch --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$THEME" $STYLE_ARGUMENTS
+    sleep "$WAIT"
+    # [EN] Still running? A crash leaves a black screen behind: report it and launch once more.
+    # [CN] 仍在运行？崩溃后屏幕为黑色：报告并重新启动一次。
+    if xcrun simctl spawn "$DEVICE_ID" launchctl list | grep -q "UIKitApplication:$BUNDLE_ID"; then
+      # [EN] A little longer for the first frame, then the screenshot. [CN] 再多等一会，确保首帧已绘制，然后截图。
+      sleep 2
+      xcrun simctl io "$DEVICE_ID" screenshot "$FILE"
+      echo "Saved $FILE"
+      break
+    fi
+    echo "The app is not running after launching it with theme $THEME (attempt $ATTEMPT): crashed?"
+    find "$HOME/Library/Logs/DiagnosticReports" -name 'CYLTabBarController*' -newer "$DERIVED/build.log" -print \
+      -exec head -n 60 {} \; 2>/dev/null || true
+  done
   xcrun simctl terminate "$DEVICE_ID" "$BUNDLE_ID" || true
   IFS=','
 done

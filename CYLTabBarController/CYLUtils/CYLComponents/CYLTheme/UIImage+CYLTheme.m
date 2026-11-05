@@ -32,16 +32,66 @@ static CYLThemeImageInfo *_Nullable CYLThemeImageInfoOfImage(UIImage *image) {
 }
 
 /*!
- * [EN] A new image object that draws like `image` (asset, Dark Mode variants, symbol configuration, cap insets and
- *      animation kept): changing the rendering mode twice always makes a new object. nil when UIKit returned `image`.
- * [CN] 绘制效果与 `image` 相同的新图片对象（保留资源目录、深色模式版本、符号配置、拉伸区域与动画）：修改两次渲染模式总会得到新对象。
- *      UIKit 返回 `image` 本身时为 nil。
+ * [EN] A new image object that draws like one image (no Dark Mode variants): the same bitmap (`CGImage`, or drawn when
+ *      there is none), scale, orientation, rendering mode, cap insets and alignment insets; an animated image keeps its
+ *      frames. Never an object UIKit may share: `-imageWithRenderingMode:` and similar methods cache their results, so
+ *      they can return the very image they were sent to.
+ * [CN] 与某一张图片绘制效果相同的新图片对象（不含深色模式版本）：相同的位图（`CGImage`，没有时重新绘制）、scale、方向、渲染模式、
+ *      拉伸区域与对齐边距；动图保留其帧。不会是 UIKit 可能共享的对象：`-imageWithRenderingMode:` 等方法会缓存结果，可能返回原图片本身。
  */
-static UIImage *_Nullable CYLThemeImageDistinctCopy(UIImage *image) {
-    UIImageRenderingMode mode = image.renderingMode;
-    UIImageRenderingMode otherMode = (mode == UIImageRenderingModeAlwaysOriginal) ? UIImageRenderingModeAlwaysTemplate : UIImageRenderingModeAlwaysOriginal;
-    UIImage *copy = [[image imageWithRenderingMode:otherMode] imageWithRenderingMode:mode];
-    return (copy && copy != image) ? copy : nil;
+static UIImage *CYLThemeImageBitmapCopy(UIImage *image) {
+    UIImage *copy = nil;
+    if (image.images.count > 1) {
+        copy = [UIImage animatedImageWithImages:image.images duration:image.duration];
+    } else if (image.CGImage) {
+        copy = [UIImage imageWithCGImage:image.CGImage scale:image.scale orientation:image.imageOrientation];
+    } else {
+        UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat defaultFormat];
+        format.scale = image.scale;
+        UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:image.size format:format];
+        copy = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            [image drawAtPoint:CGPointZero];
+        }];
+    }
+    copy = [copy imageWithRenderingMode:image.renderingMode];
+    if (!UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero)) {
+        copy = [copy resizableImageWithCapInsets:image.capInsets resizingMode:image.resizingMode];
+    }
+    if (!UIEdgeInsetsEqualToEdgeInsets(image.alignmentRectInsets, UIEdgeInsetsZero)) {
+        copy = [copy imageWithAlignmentRectInsets:image.alignmentRectInsets];
+    }
+    return copy;
+}
+
+/*!
+ * [EN] New image objects that draw like `image`, as `CYLThemeImageBitmapCopy()`; the first is the one to show. An image
+ *      with light and dark variants (an asset catalog image, iOS 13+) gets a new `UIImageAsset` with a copy of each, so
+ *      it still follows Dark Mode; every copy is returned, to be marked.
+ * [CN] 绘制效果与 `image` 相同的新图片对象，同 `CYLThemeImageBitmapCopy()`；第一个为要显示的图片。带有浅色与深色版本的图片（资源目录图片，
+ *      iOS 13+）会得到一个新的 `UIImageAsset`，其中是每个版本的副本，因此仍跟随深色模式；返回所有副本，以便全部标记。
+ */
+static NSArray<UIImage *> *CYLThemeImageDistinctCopies(UIImage *image) {
+    if (@available(iOS 13.0, *)) {
+        UIImageAsset *asset = image.imageAsset;
+        UIImage *light = [asset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight]];
+        UIImage *dark = [asset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark]];
+        if (light && dark && light != dark) {
+            UIImage *lightCopy = CYLThemeImageBitmapCopy(light);
+            UIImage *darkCopy = CYLThemeImageBitmapCopy(dark);
+            UIImageAsset *newAsset = [[UIImageAsset alloc] init];
+            [newAsset registerImage:lightCopy withTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight]];
+            [newAsset registerImage:darkCopy withTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark]];
+            UIImage *resolved = [newAsset imageWithTraitCollection:UITraitCollection.currentTraitCollection] ?: lightCopy;
+            NSMutableArray<UIImage *> *copies = [NSMutableArray arrayWithObject:resolved];
+            for (UIImage *copy in @[ lightCopy, darkCopy ]) {
+                if (copy != resolved) {
+                    [copies addObject:copy];
+                }
+            }
+            return copies;
+        }
+    }
+    return @[ CYLThemeImageBitmapCopy(image) ];
 }
 
 /// [EN] A transparent 1 × 1 pt image, a new object each time. [CN] 透明的 1 × 1 pt 图片，每次都是新对象。
@@ -62,18 +112,16 @@ static UIImage *CYLThemeImageMake(NSObject<NSCopying> *managerName, CYLThemeImag
         CYLThemeManager *nestedManager = [CYLThemeManagerCenter themeManagerWithName:nestedInfo.managerName];
         providedImage = nestedInfo.provider(nestedManager, nestedManager.currentThemeIdentifier, nestedManager.currentTheme);
     }
-    UIImage *image = providedImage ? CYLThemeImageDistinctCopy(providedImage) : CYLThemeImageTransparent();
-    if (!image) {
-        // [EN] Never mark an image UIKit may share (e.g. one of `+imageNamed:`): return it as a plain image.
-        // [CN] 不能标记 UIKit 可能共享的图片（例如 `+imageNamed:` 返回的图片）：作为普通图片返回。
-        NSLog(@"🔴 UIImage (CYLTheme): could not copy the image of the provider; it will not follow the theme.");
-        return providedImage ?: CYLThemeImageTransparent();
-    }
+    // [EN] Never the provider's image itself, which UIKit may share (e.g. one of `+imageNamed:`): new objects, all marked.
+    // [CN] 不使用 provider 返回的图片本身（UIKit 可能共享它，例如 `+imageNamed:` 的图片）：使用新对象，并全部标记。
+    NSArray<UIImage *> *images = providedImage ? CYLThemeImageDistinctCopies(providedImage) : @[ CYLThemeImageTransparent() ];
     CYLThemeImageInfo *info = [[CYLThemeImageInfo alloc] init];
     info.managerName = managerName;
     info.provider = provider;
-    objc_setAssociatedObject(image, &CYLThemeImageInfoKey, info, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    return image;
+    for (UIImage *image in images) {
+        objc_setAssociatedObject(image, &CYLThemeImageInfoKey, info, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return images.firstObject;
 }
 
 UIImage *CYLThemeImageRefreshedImage(UIImage *image) {
