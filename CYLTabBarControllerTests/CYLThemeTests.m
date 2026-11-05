@@ -207,6 +207,13 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     [button setImage:[self themeImageOfManager:manager] forState:UIControlStateNormal];
     [button setBackgroundImage:[self themeImageOfManager:manager] forState:UIControlStateSelected];
+    UIImage *setImage = [self themeImageOfManager:manager];
+    UIButton *probe = [UIButton buttonWithType:UIButtonTypeCustom];
+    [probe setImage:setImage forState:UIControlStateNormal];
+    UIImage *storedImage = [probe imageForState:UIControlStateNormal];
+    NSLog(@"[CYLThemeTests] UIButton stores %@ (%p, theme image: %d) for %@ (%p, rendering mode %ld)",
+          storedImage, storedImage, storedImage.cyl_isThemeImage, setImage, setImage, (long)setImage.renderingMode);
+    XCTAssertTrue([button imageForState:UIControlStateNormal].cyl_isThemeImage, @"UIButton keeps the theme image object");
 
     manager.currentThemeIdentifier = @"B";
     [imageView cyl_themeDidChangeByManager:manager identifier:manager.currentThemeIdentifier theme:manager.currentTheme];
@@ -281,11 +288,13 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
     CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new] ]
                                                                            tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" }, @{ CYLTabBarItemTitle : @"B" } ]];
     [tabBarController loadViewIfNeeded];
+    UIViewController *first = tabBarController.viewControllers.firstObject;
+    // [EN] A tab without an image of its own gets a placeholder image from the library. [CN] 没有图片的 Tab 会得到本库设置的占位图。
+    UIImage *imageBefore = first.tabBarItem.image;
     CYLTestItemsTabBarTheme *theme = [CYLTestItemsTabBarTheme new];
     [tabBarController cyl_applyTabBarTheme:theme];
-    UIViewController *first = tabBarController.viewControllers.firstObject;
     XCTAssertEqualObjects(first.tabBarItem.title, @"★ A");
-    XCTAssertNil(first.tabBarItem.image, @"theme icons are views in place of the icon; the item keeps the app's image");
+    XCTAssertEqual(first.tabBarItem.image, imageBefore, @"theme icons are views in place of the icon; the item keeps the app's image");
     XCTAssertNil(tabBarController.tabBarItemsAttributes.firstObject[CYLTabBarItemImage]);
 
     [tabBarController cyl_applyTabBarTheme:nil];

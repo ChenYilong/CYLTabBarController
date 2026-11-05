@@ -110,7 +110,9 @@
         XCTAssertEqualObjects(itemAppearance.normal.iconColor, UIColor.systemGrayColor);
     }
     XCTAssertEqualObjects(appearance.backgroundColor, UIColor.whiteColor);
-    XCTAssertEqualObjects(appearance.shadowColor, UIColor.clearColor);
+    // [EN] UIKit stores a clear shadow color as nil: both mean no shadow line.
+    // [CN] UIKit 会把透明的阴影色保存为 nil：两者都表示没有阴影线。
+    XCTAssertTrue(appearance.shadowColor == nil || [appearance.shadowColor isEqual:UIColor.clearColor], @"%@", appearance.shadowColor);
 }
 
 #pragma mark - Layout helpers
