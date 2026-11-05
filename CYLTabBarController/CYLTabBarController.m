@@ -7638,6 +7638,8 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     /// [CN] 滚动隐藏自己最近一次请求及时间：扁平样式的动画可能稍后重放它。
     BOOL _lastOwnRequestHidden;
     CFTimeInterval _lastOwnRequestTime;
+    /// [EN] The app took the tab bar over after scroll hiding's last request. [CN] 滚动隐藏最近一次请求之后，App 接管了 TabBar。
+    BOOL _appTookTabBarOver;
 }
 
 - (instancetype)initWithTabBarController:(CYLTabBarController *)tabBarController {
@@ -7958,7 +7960,14 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     CYLTabBarController *tabBarController = self.tabBarController;
     // [EN] Shown again by the app or UIKit (FlatDesign, classic): not hidden by scrolling any more.
     // [CN] 已被 App 或 UIKit 重新显示（扁平样式、经典样式）：不再是滚动隐藏状态。
-    if (_hiddenByScroll && !tabBarController.isTabBarHidden) {
+    // [EN] Not while our own hide is under way: during the call, and for 0.5 s after it, FlatDesign may still report the
+    //      bar as shown (seen on iOS 26.5), which would drop the flag while the bar ends up hidden, with nothing left to
+    //      bring it back.
+    // [CN] 我们自己的隐藏进行中时不判断：调用期间及之后 0.5 秒内，扁平样式可能仍报告 TabBar 为显示（在 iOS 26.5 上出现），会在 TabBar
+    //      最终隐藏的情况下丢掉标记，之后再没有恢复它的途径。
+    BOOL ownHideUnderWay = _settingTabBarHidden || (_lastOwnRequestHidden && CACurrentMediaTime() - _lastOwnRequestTime < 0.5);
+    if (_hiddenByScroll && !tabBarController.isTabBarHidden && !ownHideUnderWay) {
+        CYLTabBarMinimizeLog(@"no longer hidden by scrolling", @"the tab bar was shown again by the app or UIKit");
         _hiddenByScroll = NO;
     }
     // [EN] Classic: a pushed page with `hidesBottomBarWhenPushed` holds the bar; UIKit owns it there. End the session once
@@ -8354,7 +8363,20 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
  */
 - (void)minimizeTabBar {
     CYLTabBarController *tabBarController = self.tabBarController;
-    if (!tabBarController || tabBarController.isTabBarHidden) {
+    if (!tabBarController) {
+        return;
+    }
+    if (tabBarController.isTabBarHidden) {
+        // [EN] Safety net: the bar is hidden by our own last request and the app has not taken it over since, but the
+        //      flag was lost: take it back as hidden by scrolling, so a restore can show it again.
+        // [CN] 安全网：TabBar 是我们最近一次请求隐藏的，此后 App 也没有接管，但标记丢失了：重新作为滚动隐藏处理，使恢复时能再次显示。
+        if (!_hiddenByScroll && _lastOwnRequestHidden && !_appTookTabBarOver &&
+            (CYLTabBarMinimizeModeFlatDesign == _mode || CYLTabBarMinimizeModeClassic == _mode)) {
+            CYLTabBarMinimizeLog(@"hidden by scrolling again", @"our own hide was still in effect");
+            _hiddenByScroll = YES;
+            [self beginHideSession];
+            [self updateCheckTimer];
+        }
         return;
     }
     switch (_mode) {
@@ -8408,6 +8430,7 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     _settingTabBarHidden = YES;
     _lastOwnRequestHidden = hidden;
     _lastOwnRequestTime = CACurrentMediaTime();
+    _appTookTabBarOver = NO;
     // [EN] No slide with Reduce Motion, nor when this window or its scene is not active (resign active, background,
     //      another key window): the app switcher snapshot taken then shows the bar fully back, not halfway.
     // [CN] 开启“减弱动态效果”时不执行滑动动画；本窗口或其 Scene 不活跃时（失去活跃、进入后台、其他窗口成为 key window）也不执行，
@@ -8432,6 +8455,9 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     if (hidden == _lastOwnRequestHidden && CACurrentMediaTime() - _lastOwnRequestTime < 0.5) {
         return;
     }
+    // [EN] Any accepted app request: the safety net in -minimizeTabBar no longer takes the bar back.
+    // [CN] 任何被接受的 App 请求：-minimizeTabBar 中的安全网不再收回 TabBar。
+    _appTookTabBarOver = YES;
     if (!_hiddenByScroll && !_hideSessionActive) {
         return;
     }

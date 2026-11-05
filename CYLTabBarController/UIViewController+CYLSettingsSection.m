@@ -2213,6 +2213,15 @@ static const NSTimeInterval CYLScrollHideSelfTestHideSettleDelay = 0.6;
         [self cyl_finishScrollHideSelfTestWithResults:results];
         return;
     }
+    // [EN] Each row starts from a shown bar: one left hidden by an earlier row (and not by scrolling) is shown first.
+    // [CN] 每一行都从显示的 TabBar 开始：之前的行遗留的隐藏（且不是滚动隐藏）先恢复显示。
+    if (tabBarController.isTabBarHidden && !tabBarController.cyl_isTabBarHiddenByScroll && attempt < 20) {
+        [tabBarController setTabBarHidden:NO animated:NO];
+        CYLScrollHideSimulationAfter(0.5, ^{
+            [weakSelf cyl_runScrollHideSelfTestRow:row tabBarController:tabBarController results:results leftoverAttempt:attempt + 1];
+        });
+        return;
+    }
     UIViewController *root = self.view.window.rootViewController ?: tabBarController;
     if (root.presentedViewController && attempt < 20) {
         if (!root.presentedViewController.isBeingDismissed) {
