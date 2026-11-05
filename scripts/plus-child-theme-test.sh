@@ -8,8 +8,8 @@
 #      -CYLDemoThemeIdentifier A -CYLDemoSelectIndex $SELECT_INDEX (default 2, the plus child view controller, selected
 #      2 s after launch) -CYLDemoThemeSwitchTo B -CYLDemoThemeSwitchDelay 10. The demo checks the plus button's stand-in
 #      in the Liquid Glass selected layer 3 s after the selection ("before") and 3 s after the switch ("after") and logs
-#      "plus child theme test: PASS|FAIL|SKIP ..."; the script also saves a screenshot at 8 s (before) and 16 s (after)
-#      in build/plus-child-theme-test/. Exits 1 on any FAIL, on a run that never logged "done", and, with
+#      "plus child theme test: PASS|FAIL|SKIP ..."; the script also saves a screenshot right after each check (before,
+#      after) in build/plus-child-theme-test/. Exits 1 on any FAIL, on a run that never logged "done", and, with
 #      REQUIRE_PASS=1 (the Liquid Glass job), when nothing passed. STYLE=FlatDesign uses the FlatDesign tab bar, where
 #      there is no stand-in (SKIP); the screenshots still show the plus button.
 # [CN] PlusButton 子控制器换肤测试。测试方法、测试场景、预期效果、可能的错乱及推测原因见
@@ -18,7 +18,7 @@
 #      需要装有 Xcode 与 CocoaPods 的 Mac：编译 Objective-C Demo，每个场景 “A>B” 启动一次，参数为 -CYLDemoThemeIdentifier A
 #      -CYLDemoSelectIndex $SELECT_INDEX（默认 2，即 PlusButton 子控制器，启动 2 秒后选中）-CYLDemoThemeSwitchTo B
 #      -CYLDemoThemeSwitchDelay 10。Demo 在选中 3 秒后（“before”）与切换 3 秒后（“after”）检查液态玻璃选中图层中的 PlusButton 替身，
-#      输出 "plus child theme test: PASS|FAIL|SKIP ..."；脚本还会在第 8 秒（切换前）与第 16 秒（切换后）各截一张图，保存在
+#      输出 "plus child theme test: PASS|FAIL|SKIP ..."；脚本还会在每次检查之后立即截图（切换前、切换后），保存在
 #      build/plus-child-theme-test/。出现 FAIL、某次运行没有输出 "done"，或设置 REQUIRE_PASS=1（液态玻璃 job）而没有任何 PASS 时，
 #      退出码为 1。STYLE=FlatDesign 使用扁平样式 TabBar，没有替身（SKIP），截图仍会显示 PlusButton。
 set -eu
@@ -95,14 +95,20 @@ for SCENARIO in $SCENARIOS; do
   xcrun simctl launch --console-pty --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$FROM" \
     -CYLDemoSelectIndex "$SELECT_INDEX" -CYLDemoThemeSwitchTo "$TO" -CYLDemoThemeSwitchDelay 10 $STYLE_ARGUMENTS > "$RUN_LOG" 2>&1 &
   LAUNCH_PID=$!
-  sleep 8
-  xcrun simctl io "$DEVICE_ID" screenshot "$FILE-before.png" >/dev/null && echo "Saved $FILE-before.png"
-  sleep 8
-  xcrun simctl io "$DEVICE_ID" screenshot "$FILE-after.png" >/dev/null && echo "Saved $FILE-after.png"
-  ELAPSED=16
-  while ! grep -q "plus child theme test: done" "$RUN_LOG" && [ "$ELAPSED" -lt 40 ]; do
-    sleep 2
-    ELAPSED=$((ELAPSED + 2))
+  # [EN] Each screenshot right after the app logged that check: a launch can take seconds, so fixed delays from here
+  #      caught the home screen, or the theme before the switch. [CN] 每张截图都在 App 输出对应检查之后立即截取：启动可能需要
+  #      数秒，从这里开始计算的固定延时曾截到主屏幕，或切换前的主题。
+  ELAPSED=0
+  for PHASE in before after; do
+    while ! grep -qE "plus child theme test: (PASS|FAIL|SKIP) $PHASE" "$RUN_LOG" && [ "$ELAPSED" -lt 60 ]; do
+      sleep 1
+      ELAPSED=$((ELAPSED + 1))
+    done
+    xcrun simctl io "$DEVICE_ID" screenshot "$FILE-$PHASE.png" >/dev/null && echo "Saved $FILE-$PHASE.png"
+  done
+  while ! grep -q "plus child theme test: done" "$RUN_LOG" && [ "$ELAPSED" -lt 70 ]; do
+    sleep 1
+    ELAPSED=$((ELAPSED + 1))
   done
   kill "$LAUNCH_PID" 2>/dev/null || true
   xcrun simctl terminate "$DEVICE_ID" "$BUNDLE_ID" 2>/dev/null || true
