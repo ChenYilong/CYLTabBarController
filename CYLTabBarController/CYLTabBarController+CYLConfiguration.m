@@ -793,20 +793,30 @@ static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id>
 /// [EN] The timeout of `+loadConfigurationWithURL:completion:` (D5); the system default is 60 seconds. [CN] `+loadConfigurationWithURL:completion:` 的超时（D5）；系统默认 60 秒。
 static const NSTimeInterval CYLConfigurationRequestTimeout = 15;
 
+/// [EN] Loads a local (file URL) or missing configuration URL and calls `completion` on the main queue. Shared by both loaders,
+///      so a nil URL is never passed to a nonnull parameter (FIX: static analyzer, nullability.NullPassedToNonnull).
+/// [CN] 加载本地（file URL）或缺失的配置 URL，并在主队列回调 `completion`。两个加载方法共用，避免把 nil 传给 nonnull 参数
+///      （修复静态分析警告 nullability.NullPassedToNonnull）。
+static void CYLLoadLocalConfiguration(NSURL *_Nullable URL, CYLTabBarConfigurationCompletion completion) {
+    NSError *error = nil;
+    NSDictionary *configuration = nil;
+    if (URL) {
+        configuration = [CYLTabBarController configurationWithContentsOfFile:URL.path error:&error];
+    } else {
+        error = [NSError errorWithDomain:CYLTabBarConfigurationErrorDomain code:CYLTabBarConfigurationErrorFileNotFound
+                                userInfo:@{ NSLocalizedDescriptionKey : @"No configuration URL." }];
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        completion(configuration, error);
+    });
+}
+
 + (NSURLSessionDataTask *)loadConfigurationWithURL:(NSURL *)URL completion:(CYLTabBarConfigurationCompletion)completion {
     if (!completion) {
         return nil;
     }
     if (!URL || URL.isFileURL) {
-        NSError *error = nil;
-        NSDictionary *configuration = URL ? [self configurationWithContentsOfFile:URL.path error:&error] : nil;
-        if (!URL) {
-            error = [NSError errorWithDomain:CYLTabBarConfigurationErrorDomain code:CYLTabBarConfigurationErrorFileNotFound
-                                    userInfo:@{ NSLocalizedDescriptionKey : @"No configuration URL." }];
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completion(configuration, error);
-        });
+        CYLLoadLocalConfiguration(URL, completion);
         return nil;
     }
     NSURLRequest *request = [NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:CYLConfigurationRequestTimeout];
@@ -819,7 +829,8 @@ static const NSTimeInterval CYLConfigurationRequestTimeout = 15;
     }
     NSURL *URL = request.URL;
     if (![request isKindOfClass:[NSURLRequest class]] || !URL || URL.isFileURL) {
-        return [self loadConfigurationWithURL:URL completion:completion];
+        CYLLoadLocalConfiguration(URL, completion);
+        return nil;
     }
     NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *networkError) {
         NSDictionary *configuration = nil;
