@@ -485,7 +485,7 @@ static BOOL CYLDemoSameImage(UIImage *image, UIImage *otherImage) {
  *      已经没有的图片，就是看起来模糊的过期替身。输出 "plus child theme test: PASS|FAIL|SKIP <阶段> ..."。
  *      替身已显示时返回 PlusButton（用于“只看替身”步骤），否则返回 nil。
  */
-static UIButton *CYLDemoCheckPlusChildStandIn(NSString *phase) {
+static UIButton * _Nullable CYLDemoCheckPlusChildStandIn(NSString *phase) {
     CYLTabBarController *tabBarController = [CYLTabBarController cyl_activeTabBarController];
     CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
     NSString *theme = CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier;
@@ -713,7 +713,7 @@ static void CYLDemoApplyTheme(CYLDemoTheme *theme) {
             waitForAck = waitForAckBlock;
             // [EN] A check, its screenshot, then the stand-in alone and its screenshot. [CN] 检查并截图，然后只看替身并截图。
             void (^checkAndPhotograph)(NSString *, dispatch_block_t) = ^(NSString *phase, dispatch_block_t next) {
-                UIButton *plusButton = CYLDemoCheckPlusChildStandIn(phase);
+                UIButton * _Nullable plusButton = CYLDemoCheckPlusChildStandIn(phase);
                 waitForAck(phase, 0, ^{
                     if (!plusButton) {
                         next();

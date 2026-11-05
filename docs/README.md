@@ -105,6 +105,7 @@ docs/
     ├── docs-navigation-index.png
     ├── flatdesign-standard-appearance-mapping.svg
     ├── login-required-tabs-flow.svg
+    ├── plus-child-theme-switching.png
     ├── plusbutton-subview-touches-issue-202.png
     ├── readme-english-before-reading.png
     ├── readme-english-bilingual-contents.png

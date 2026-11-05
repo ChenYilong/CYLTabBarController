@@ -29,6 +29,7 @@
 | [测试场景](#cn测试场景) | [Test scenarios](#entest-scenarios) |
 | [预期效果](#cn预期效果) | [Expected results](#enexpected-results) |
 | [可能的错乱与推测原因](#cn可能的错乱与推测原因) | [Possible glitches and their likely causes](#enpossible-glitches-and-their-likely-causes) |
+| [截图](#cn截图) | [Screenshots](#enscreenshots) |
 | [限制](#cn限制) | [Limits](#enlimits) |
 
 <!-- navigation:end -->
@@ -96,6 +97,15 @@ SCENARIOS="Halloween>Dark,Dark>Default" SELECT_INDEX=2 scripts/plus-child-theme-
 | 换肤后第一个 Tab 的封面或角标消失 / The first tab's cover or badges are gone after a switch | 只执行一次的布局 block（`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`）被永久标记为已执行 / The one-time layout block (`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`) stayed marked as run | 已修复：换肤、重新加载 Tab 与替换 Tab 后再执行一次 / Fixed: it runs once more after a theme switch, a tab reload and a tab replacement |
 | 截图与主题不符：以 `Default` 启动的场景切换前的截图已经是切换后的主题，或切换后的截图仍是切换前的主题，或截到主屏幕 / A screenshot that does not match the theme: the "before" screenshot of a scenario launched with `Default` already showed the theme switched to, an "after" screenshot still showed the old theme, or the home screen | 截图时机问题，不是 App 的问题：日志中 `launch theme=Default` 与 before 行的 `theme=Default` 说明主题正确；截图原来按启动命令后的固定延时截取，而 App 启动可能需要数秒；之后改为等待控制台输出，但 `--console-pty` 的输出直到 App 关闭才到达，截图仍在最后才截取 / A screenshot timing problem, not the app: the log's `launch theme=Default` and the before line's `theme=Default` show the right theme; the screenshots were taken at fixed delays after the launch command, and the app can take seconds to start; waiting for the console output instead did not help, because `--console-pty` delivered it only when the app was closed, so the screenshots were still taken at the end | 已修复：App 把测试输出立即写入数据容器中的文件，每张截图在该文件出现对应检查行之后立即截取 / Fixed: the app writes its test lines at once to a file in its data container, and each screenshot is taken right after that check appears there |
 
+## [CN]截图
+## [EN]Screenshots
+
+| 中文 | English |
+|:---|:---|
+| 选中 PlusButton 子控制器后换肤：上方六张为液态玻璃、下方六张为扁平样式；每行一个场景（默认→圣诞节、圣诞节→玫瑰粉、春节→网络皮肤），左列切换前、右列切换后。PlusButton 的图标（“+”、星星、烟花、网络图标）完整且清晰，玻璃内没有模糊的光晕，玻璃上下没有缝隙，角标仍在。截图来自 CI 的 “Plus child theme test” workflow（iOS 26 模拟器），未经修改，只裁剪了 TabBar 部分并拼合；玻璃边缘的细亮线是系统玻璃自身的边框。 | Switching the theme with the plus child view controller selected: the top six images are Liquid Glass, the bottom six FlatDesign; one scenario per row (Default → Christmas, Christmas → Pink Rose, Spring Festival → Network), before the switch on the left and after it on the right. The plus button's icon ("+", the star, the fireworks, the network icon) is whole and sharp, with no blurred halo inside the glass and no seam at its edge, and the badge stays. The screenshots come from the CI workflow "Plus child theme test" (iOS 26 simulator), unedited apart from cropping to the tab bar and putting them together; the thin light line at the glass edge is the system glass's own border. |
+
+![Plus child theme switching](assets/plus-child-theme-switching.png)
+
 ## [CN]限制
 ## [EN]Limits
 
@@ -103,4 +113,4 @@ SCENARIOS="Halloween>Dark,Dark>Default" SELECT_INDEX=2 scripts/plus-child-theme-
 |:---|:---|
 | CI 无法点击屏幕：选中 Tab 用 `selectedIndex`，换肤用与“换肤”按钮相同的函数，但没有经过按钮的点击与菜单。 | CI cannot tap: the tab is selected with `selectedIndex` and the theme is switched with the same function as the "Skin" button, without the button's tap and menu. |
 | 自动检查只比较替身显示的图片是否属于 PlusButton；位置、尺寸与清晰度由截图人工判断。 | The automated check only compares the stand-in's image with the plus button's; position, size and sharpness are judged by eye in the screenshots. |
-| 本文写作时，测试在 CI 的 iOS 26 模拟器上运行；没有在真机上运行。 | At the time of writing, the test ran on CI's iOS 26 simulator, not on a device. |
+| 本文写作时，测试在 CI 的 iOS 26 模拟器上运行；没有在真机上运行。玻璃在 Tab 之间滑动的动画过程中，mask 只在选中变化时与动画结束后更新，不逐帧跟随，PlusButton 在这段时间内可能短暂被截断。 | At the time of writing, the test ran on CI's iOS 26 simulator, not on a device. While the glass slides between tabs, the mask is updated when the selection changes and after the animation, not frame by frame, so the plus button may look cut off for that moment. |
