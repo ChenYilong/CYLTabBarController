@@ -4516,6 +4516,10 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
     BOOL should = viewController != tabBarController.selectedViewController;
     [self updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController shouldSelect:should];
+    // Guard: only CYLTabBar has the plus button label check; `tabBarController` can have a system tab bar.
+    if (![tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+        return;
+    }
     CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
     if (should && [tabBar cyl_shouldUpdateHiddenStatueForPlusButtonLabel]) {
         if ([viewController isEqual:[self cyl_contextPlusChildViewController]]) {

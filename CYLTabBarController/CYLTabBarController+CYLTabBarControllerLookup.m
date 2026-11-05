@@ -482,7 +482,8 @@ static NSString *CYLTabBarStateDescription(CYLTabBarController *tabBarController
     if (tabBarController) {
         return tabBarController;
     }
-    UIViewController *rootViewController = [CYLGetRootViewController() cyl_getViewControllerInsteadOfNavigationController];
+    // The window's root, not `CYLGetRootViewController()`: that is the topmost presented one, e.g. an alert.
+    UIViewController *rootViewController = [CYLGetRootWindow().rootViewController cyl_getViewControllerInsteadOfNavigationController];
     return CYLTabBarControllerMatches(rootViewController, matcher) ? (CYLTabBarController *)rootViewController : nil;
 }
 

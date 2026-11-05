@@ -343,10 +343,9 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
         tabBarController = [self tabBarController];
     }
     
-    CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
-    if (!tabBar) {
-        tabBar = self;
-    }
+    // Its own tab bar when that is a CYLTabBar, otherwise this one (no tab bar controller, or a system tab bar).
+    UITabBar *controllerTabBar = tabBarController.tabBar;
+    CYLTabBar *tabBar = [controllerTabBar isKindOfClass:[CYLTabBar class]] ? (CYLTabBar *)controllerTabBar : self;
     // The plus button and its child view controller are bound to the controller (by its `context`), so ask it.
     // PlusButton 和它的子控制器绑定的是控制器（通过它的 `context`），所以向它询问。
     id plusOwner = tabBarController ?: self;
