@@ -29,6 +29,7 @@
 | [Swift 中获取 PlusButton](#cnswift-中获取-plusbutton) | [Getting the PlusButton in Swift](#engetting-the-plusbutton-in-swift) |
 | [PlusButton 的图片一律按原图绘制](#cnplusbutton-的图片一律按原图绘制) | [Every PlusButton image is drawn as is](#enevery-plusbutton-image-is-drawn-as-is) |
 | [之后才加载的图片](#cn之后才加载的图片) | [Images loaded later](#enimages-loaded-later) |
+| [背景图片按钮：Y 轴代理方法与标题对齐](#cn背景图片按钮y-轴代理方法与标题对齐) | [Background-image buttons: the Y-axis methods and title alignment](#enbackground-image-buttons-the-y-axis-methods-and-title-alignment) |
 | [图标与标题重叠](#cn图标与标题重叠) | [When the icon and the title overlap](#enwhen-the-icon-and-the-title-overlap) |
 | [同时修复](#cn同时修复) | [Also fixed](#enalso-fixed) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
@@ -113,6 +114,32 @@ if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton(forOwner: ta
 
 ![Plus button image loaded later](assets/plusbutton-image-loaded-later.png)
 
+## [CN]背景图片按钮：Y 轴代理方法与标题对齐
+## [EN]Background-image buttons: the Y-axis methods and title alignment
+
+| 中文 | English |
+|:---|:---|
+| **Y 轴代理方法：遵循，所有样式。** 只用 `setBackgroundImage` 绘制的 PlusButton 按 `+multiplierOfTabBarHeight:` 与 `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` 放置：`PlusButtonCenterY = multiplierOfTabBarHeight × tabBarHeight + constantOfPlusButtonCenterYOffset`。扁平样式与经典 TabBar 使用 TabBar 的高度；液态玻璃使用 TabBar 本身（玻璃区域）的高度，并且标题由 TabBarItem 显示的调整（#636）不适用于这种按钮。只有完全没有标题的 PlusButton 在液态玻璃下例外：它居中于玻璃，见 `cyl_appliesCenterYOffsetWithoutTitle`。 | **The Y-axis methods: followed, in every style.** A plus button drawn only with `setBackgroundImage` is placed by `+multiplierOfTabBarHeight:` and `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`: `PlusButtonCenterY = multiplierOfTabBarHeight × tabBarHeight + constantOfPlusButtonCenterYOffset`. FlatDesign and the classic tab bar use the tab bar's height; Liquid Glass uses the height of the tab bar itself (the glass), and the title-in-tab-item adjustment (#636) does not apply to this kind of button. The only exception is a plus button with no title at all on Liquid Glass: it is centered on the glass, see `cyl_appliesCenterYOffsetWithoutTitle`. |
+| 实测：Example-PAG（`multiplier = 0.3`，`constant = -10`），iOS 26.5 液态玻璃，TabBar 位于 y = 873，玻璃高 62 pt：按钮中心 y = 881.6 = 873 + 0.3 × 62 − 10。 | Measured: Example-PAG (`multiplier = 0.3`, `constant = -10`), Liquid Glass on iOS 26.5, the tab bar at y = 873, the glass 62 pt high: the button's center is at y = 881.6 = 873 + 0.3 × 62 − 10. |
+| **`+alignsTitleWithTabBarItemTitles`：建议不要实现。** 这种按钮的标题画在背景图上，是图片的一部分，由 UIButton 居中绘制在背景图上。实现并返回 YES 时，库会把标题移到 Tab 标题的中心线上，并使用 Tab 标题的字体和颜色：标题离开图片的中心，落在圆形的下边缘附近（见下文「图标与标题重叠」截图的最后一行），颜色也可能与背景对比不足。不实现（或返回 NO）时，标题保持在背景图的中心。 | **`+alignsTitleWithTabBarItemTitles`: better not implemented.** This kind of button draws its title on the background image, as part of the picture, centered on it by UIButton. Implemented and returning YES, the library moves the title onto the tab titles' center line and gives it their font and colors: the title leaves the middle of the picture for its lower edge (see the last row of the screenshots in "When the icon and the title overlap"), and its color may not contrast with the background. Not implemented (or NO), the title stays in the middle of the background image. |
+| 希望标题与 Tab 标题对齐、位于图片下方时，请用 `setImage(_:for:)`（或 `+cyl_plusButtonWithImage:…`）设置图片，而不是背景图，并实现 `+alignsTitleWithTabBarItemTitles`。说明：Example-PAG 为了演示标题对齐实现了该方法，因此它的「菜单」标题位于圆形下边缘。 | To have the title aligned with the tab titles, below the picture, set the picture with `setImage(_:for:)` (or `+cyl_plusButtonWithImage:…`) instead of a background image, and implement `+alignsTitleWithTabBarItemTitles`. Note: Example-PAG implements it to show title alignment, which is why its "Menu" title sits at the circle's lower edge. |
+
+```swift
+// 背景图按钮：标题画在图上，按 Y 轴代理方法放置，不实现 alignsTitleWithTabBarItemTitles。
+// A background-image button: the title drawn on the picture, placed by the Y-axis methods, no alignsTitleWithTabBarItemTitles.
+class BackgroundPlusButton: CYLPlusButton, CYLPlusButtonSubclassing {
+    static func plusButton() -> Any {
+        let button = BackgroundPlusButton()
+        button.setBackgroundImage(UIImage(named: "plus_circle"), for: .normal)
+        button.setTitle(CYLLocalizedString("菜单"), for: .normal)
+        button.sizeToFit()
+        return button
+    }
+    static func multiplier(ofTabBarHeight _: CGFloat) -> CGFloat { 0.3 }
+    static func constantOfPlusButtonCenterYOffset(forTabBarHeight _: CGFloat) -> CGFloat { -10 }
+}
+```
+
 ## [CN]图标与标题重叠
 ## [EN]When the icon and the title overlap
 
@@ -123,7 +150,7 @@ if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton(forOwner: ta
 | 设置方式 / How the plus button is set | 是否重叠 / Overlap | 说明 / Notes |
 |:---|:---|:---|
 | `+cyl_plusButtonWithImage:…`（图片 + 标题）<br>`+cyl_plusButtonWithImage:…` (image + title) | 不重叠，所有样式 / No, in every style | 标题位于 Tab 标题的中心线上，图片紧挨在标题上方（间距 2 pt），与 Tab 图标一致。液态玻璃下标题由 TabBarItem 显示（#636）；扁平样式与经典 TabBar 下标题留在按钮中。以前在扁平样式与经典 TabBar 下，标题移到 Tab 标题线上而图片仍居中于按钮，二者重叠（60 pt 图片几乎盖住标题），属于**异常**，已在库中修复。<br>The title is on the tab titles' center line and the image right above it (2 pt apart), like a tab icon. On Liquid Glass the tab item shows the title (#636); in FlatDesign and the classic tab bar the title stays in the button. Before, in FlatDesign and the classic tab bar, the title moved onto the tab titles' line while the image stayed centered on the button, so they overlapped (a 60 pt image nearly hid the title): a **bug**, fixed in the library. |
-| 只有背景图片（`setBackgroundImage`，没有 `setImage`），标题画在背景上，例如 Example-PAG 的圆形按钮<br>Background image only (`setBackgroundImage`, no `setImage`), the title drawn on it, e.g. Example-PAG's round button | 标题在圆形上 / The title is on the circle | **正常**：这种按钮的标题是图片的一部分，UIButton 总是把标题画在背景图之上。按钮按 `+multiplierOfTabBarHeight:` 与 `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` 定位。希望标题位于图片下方时，请改用 `setImage(_:for:)`。<br>**Expected**: the title is part of the picture, and UIButton always draws it on top of the background image. The button is placed by `+multiplierOfTabBarHeight:` and `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`. For the title below the picture, use `setImage(_:for:)` instead. |
+| 只有背景图片（`setBackgroundImage`，没有 `setImage`），标题画在背景上，例如 Example-PAG 的圆形按钮<br>Background image only (`setBackgroundImage`, no `setImage`), the title drawn on it, e.g. Example-PAG's round button | 标题在圆形上 / The title is on the circle | **正常**：这种按钮的标题是图片的一部分，UIButton 总是把标题画在背景图之上。按钮按 `+multiplierOfTabBarHeight:` 与 `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` 定位；建议不实现 `+alignsTitleWithTabBarItemTitles`（见「背景图片按钮：Y 轴代理方法与标题对齐」）。希望标题位于图片下方时，请改用 `setImage(_:for:)`。<br>**Expected**: the title is part of the picture, and UIButton always draws it on top of the background image. The button is placed by `+multiplierOfTabBarHeight:` and `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`; better not implement `+alignsTitleWithTabBarItemTitles` (see "Background-image buttons: the Y-axis methods and title alignment"). For the title below the picture, use `setImage(_:for:)` instead. |
 | 自定义按钮，未使用 `+cyl_plusButtonWithImage:…`，实现了 `+alignsTitleWithTabBarItemTitles`，扁平样式或经典 TabBar<br>A custom button not made with `+cyl_plusButtonWithImage:…`, with `+alignsTitleWithTabBarItemTitles`, in FlatDesign or the classic tab bar | 可能重叠 / Can overlap | 库只把标题移到 Tab 标题线上，图片保留 UIButton 自己的位置；图片较大时可能与标题重叠。使用 `UIButtonConfiguration` 且 `imagePlacement` 为 `.top` 的按钮不会重叠（例如 ObjC Demo 的 PlusButton）。要避免重叠，请使用 `+cyl_plusButtonWithImage:…`，或使用 `imagePlacement = .top` 的 configuration。<br>The library moves only the title onto the tab titles' line and leaves the image where UIButton put it; a large image can overlap the title. A button with a `UIButtonConfiguration` whose `imagePlacement` is `.top` does not (e.g. the ObjC demo's plus button). To avoid it, use `+cyl_plusButtonWithImage:…`, or a configuration with `imagePlacement = .top`. |
 | App 自己设置了 `imageEdgeInsets` / `titleEdgeInsets` 或自定义 `layoutSubviews`<br>The app sets `imageEdgeInsets` / `titleEdgeInsets` or its own `layoutSubviews` | 由 App 决定 / Up to the app | 库不会覆盖 App 自己的布局。<br>The library does not override the app's own layout. |
 | 图片之后才加载（创建时为空）<br>The image is set later (empty at first) | 与启动时就有图片相同 / Same as with the image at launch | 在加载之前按钮只显示标题；加载之后的位置、尺寸与角标与启动时就设置同一图片完全相同（见下图与「之后才加载的图片」）。<br>Until it loads the button shows its title only; afterwards its position, size and badge are exactly those of the same image set at launch (see below and "Images loaded later"). |
