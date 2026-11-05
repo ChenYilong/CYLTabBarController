@@ -1,7 +1,7 @@
 // Pure Kotlin (no Android): the page registry and the configuration rules, tested on the JVM.
 // 纯 Kotlin（不依赖 Android）：页面注册表与配置规则，在 JVM 上测试。
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+    alias(libs.plugins.kotlin.jvm)
 }
 
 java {
@@ -17,8 +17,8 @@ kotlin {
 
 dependencies {
     // Android ships org.json; the JVM tests need it. Android 自带 org.json；JVM 测试需要引入。
-    compileOnly("org.json:json:20240303")
-    testImplementation("org.json:json:20240303")
+    compileOnly(libs.json)
+    testImplementation(libs.json)
     testImplementation(kotlin("test"))
 }
 

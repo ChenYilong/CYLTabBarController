@@ -1,8 +1,8 @@
 // The demo app: a bottom navigation bar built from the iOS library's configuration file, pages from page IDs.
 // 演示 App：用 iOS 库的配置文件生成底部导航栏，页面由页面 ID 获得。
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -15,6 +15,14 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
+    }
+
+    buildTypes {
+        release {
+            // R8 shrinks and obfuscates the release build. R8 压缩并混淆 release 包。
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
     }
 
     compileOptions {
@@ -36,7 +44,7 @@ android {
 
 dependencies {
     implementation(project(":tabpages"))
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.fragment:fragment-ktx:1.8.5")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.material)
 }

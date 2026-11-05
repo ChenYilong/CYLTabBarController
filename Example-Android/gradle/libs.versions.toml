@@ -1,0 +1,19 @@
+# Versions of the Android demo, in one place. Android 演示的版本号，集中在此。
+[versions]
+agp = "8.7.3"
+kotlin = "2.0.21"
+appcompat = "1.7.0"
+fragment = "1.8.5"
+material = "1.12.0"
+json = "20240303"
+
+[libraries]
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+json = { module = "org.json:json", version.ref = "json" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
