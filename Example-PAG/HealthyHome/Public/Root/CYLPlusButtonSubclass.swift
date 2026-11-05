@@ -60,12 +60,12 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         return nav
     }
     
-    /// MARK: 插入位置
-    // The plus button's title stays on the same center line as the tab item titles, in every tab bar style.
-    static func alignsTitleWithTabBarItemTitles() -> Bool {
-        return true
-    }
+    // [CN] 不实现 `alignsTitleWithTabBarItemTitles`：本按钮只有背景图片，标题画在图上，保持在图片中心
+    //      （见 docs/PlusButton-Background-Image-Liquid-Glass.md）。
+    // [EN] No `alignsTitleWithTabBarItemTitles`: this button has a background image only, with its title drawn on it,
+    //      so the title stays in the middle of the picture (see docs/PlusButton-Background-Image-Liquid-Glass.md).
 
+    /// MARK: 插入位置
     static func indexOfPlusButtonInTabBar() -> UInt {
         return 2
     }
