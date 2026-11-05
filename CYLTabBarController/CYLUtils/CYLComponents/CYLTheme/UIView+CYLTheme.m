@@ -98,12 +98,23 @@ static void CYLThemeRefreshImagesAndEffects(UIView *view, CYLThemeManager *_Null
         }
         // [EN] A state without an image of its own returns the normal one: only the states set with their own image.
         // [CN] 没有单独设置图片的状态会返回普通状态的图片：只处理单独设置过图片的状态。
+        // [EN] Every state's images are read before any is replaced: once the normal image changes, a state without an
+        //      image of its own returns the new one and would look like a state set with its own.
+        // [CN] 先读取所有状态的图片再替换：普通状态的图片一旦改变，没有单独设置图片的状态会返回新图片，看起来就像单独设置过。
+        NSArray<NSNumber *> *states = @[ @(UIControlStateNormal), @(UIControlStateHighlighted), @(UIControlStateSelected),
+                                         @(UIControlStateDisabled), @(UIControlStateSelected | UIControlStateHighlighted) ];
         UIImage *normalImage = [button imageForState:UIControlStateNormal];
         UIImage *normalBackgroundImage = [button backgroundImageForState:UIControlStateNormal];
-        for (NSNumber *stateValue in @[ @(UIControlStateNormal), @(UIControlStateHighlighted), @(UIControlStateSelected),
-                                        @(UIControlStateDisabled), @(UIControlStateSelected | UIControlStateHighlighted) ]) {
+        NSMutableArray *stateImages = [NSMutableArray array];
+        NSMutableArray *stateBackgroundImages = [NSMutableArray array];
+        for (NSNumber *stateValue in states) {
             UIControlState state = stateValue.unsignedIntegerValue;
-            UIImage *stateImage = [button imageForState:state];
+            [stateImages addObject:[button imageForState:state] ?: [NSNull null]];
+            [stateBackgroundImages addObject:[button backgroundImageForState:state] ?: [NSNull null]];
+        }
+        [states enumerateObjectsUsingBlock:^(NSNumber *stateValue, NSUInteger idx, BOOL *stop) {
+            UIControlState state = stateValue.unsignedIntegerValue;
+            UIImage *stateImage = [stateImages[idx] isKindOfClass:[UIImage class]] ? stateImages[idx] : nil;
             if (state == UIControlStateNormal || stateImage != normalImage) {
                 UIImage *image = CYLThemeRefreshedImageIfNeeded(stateImage, manager);
                 if (image) {
@@ -113,7 +124,7 @@ static void CYLThemeRefreshImagesAndEffects(UIView *view, CYLThemeManager *_Null
                     [button setImage:image forState:state];
                 }
             }
-            UIImage *stateBackgroundImage = [button backgroundImageForState:state];
+            UIImage *stateBackgroundImage = [stateBackgroundImages[idx] isKindOfClass:[UIImage class]] ? stateBackgroundImages[idx] : nil;
             if (state == UIControlStateNormal || stateBackgroundImage != normalBackgroundImage) {
                 UIImage *backgroundImage = CYLThemeRefreshedImageIfNeeded(stateBackgroundImage, manager);
                 if (backgroundImage) {
@@ -123,7 +134,7 @@ static void CYLThemeRefreshImagesAndEffects(UIView *view, CYLThemeManager *_Null
                     [button setBackgroundImage:backgroundImage forState:state];
                 }
             }
-        }
+        }];
         return;
     }
     if ([view isKindOfClass:[UIVisualEffectView class]]) {

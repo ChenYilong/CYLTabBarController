@@ -39,7 +39,7 @@ static CYLThemeImageInfo *_Nullable CYLThemeImageInfoOfImage(UIImage *image) {
  * [CN] 与某一张图片绘制效果相同的新图片对象（不含深色模式版本）：相同的位图（`CGImage`，没有时重新绘制）、scale、方向、渲染模式、
  *      拉伸区域与对齐边距；动图保留其帧。不会是 UIKit 可能共享的对象：`-imageWithRenderingMode:` 等方法会缓存结果，可能返回原图片本身。
  */
-static UIImage *CYLThemeImageBitmapCopy(UIImage *image) {
+static UIImage *CYLThemeImageBitmapCopy(UIImage *image, CGFloat scale) {
     // [EN] An SF Symbol stays a symbol (its weight and scale keep following the configuration), when UIKit gives a new
     //      object; otherwise it is copied as a bitmap below.
     // [CN] SF Symbol 保持为符号（粗细与缩放继续跟随配置），前提是 UIKit 返回新对象；否则在下面按位图复制。
@@ -59,10 +59,10 @@ static UIImage *CYLThemeImageBitmapCopy(UIImage *image) {
     if (image.images.count > 1) {
         copy = [UIImage animatedImageWithImages:image.images duration:image.duration];
     } else if (image.CGImage) {
-        copy = [UIImage imageWithCGImage:image.CGImage scale:image.scale orientation:image.imageOrientation];
+        copy = [UIImage imageWithCGImage:image.CGImage scale:scale orientation:image.imageOrientation];
     } else {
         UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat defaultFormat];
-        format.scale = image.scale;
+        format.scale = scale;
         UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:image.size format:format];
         copy = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
             [image drawAtPoint:CGPointZero];
@@ -90,9 +90,12 @@ static NSArray<UIImage *> *CYLThemeImageDistinctCopies(UIImage *image) {
         UIImageAsset *asset = image.imageAsset;
         UIImage *light = [asset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight]];
         UIImage *dark = [asset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark]];
-        if (light && dark && light != dark) {
-            UIImage *lightCopy = CYLThemeImageBitmapCopy(light);
-            UIImage *darkCopy = CYLThemeImageBitmapCopy(dark);
+        // [EN] UIKit gives every image light and dark objects, the same bitmap for an image without a dark variant: only
+        //      different bitmaps make a new asset. The copies keep the scale of `image`.
+        // [CN] UIKit 会为任何图片提供浅色与深色对象，没有深色版本的图片两者位图相同：只有位图不同时才新建资源。副本保留 `image` 的 scale。
+        if (light && dark && light != dark && light.CGImage != dark.CGImage) {
+            UIImage *lightCopy = CYLThemeImageBitmapCopy(light, image.scale);
+            UIImage *darkCopy = CYLThemeImageBitmapCopy(dark, image.scale);
             UIImageAsset *newAsset = [[UIImageAsset alloc] init];
             [newAsset registerImage:lightCopy withTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight]];
             [newAsset registerImage:darkCopy withTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark]];
@@ -106,7 +109,7 @@ static NSArray<UIImage *> *CYLThemeImageDistinctCopies(UIImage *image) {
             return copies;
         }
     }
-    return @[ CYLThemeImageBitmapCopy(image) ];
+    return @[ CYLThemeImageBitmapCopy(image, image.scale) ];
 }
 
 /// [EN] A transparent 1 × 1 pt image, a new object each time. [CN] 透明的 1 × 1 pt 图片，每次都是新对象。
