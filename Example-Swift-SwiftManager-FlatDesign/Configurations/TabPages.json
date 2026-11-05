@@ -15,7 +15,7 @@
       "CYLTabBarItemImage": "system:book",
       "CYLTabBarItemPageIdentifier": "swift-docs",
       "CYLTabBarItemPageParameters": {
-        "url": "https://github.com/ChenYilong/CYLTabBarController"
+        "topic": "Documentation"
       }
     },
     {

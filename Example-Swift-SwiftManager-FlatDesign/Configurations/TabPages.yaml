@@ -9,7 +9,7 @@ CYLTabBarControllerTabBarItemsAttributes:
     CYLTabBarItemImage: "system:book"
     CYLTabBarItemPageIdentifier: "swift-docs"
     CYLTabBarItemPageParameters:
-      "url": "https://github.com/ChenYilong/CYLTabBarController"
+      "topic": "Documentation"
   - CYLTabBarItemTitle: "Missing"
     CYLTabBarItemImage: "system:questionmark"
     CYLTabBarItemPageIdentifier: "no-such-page"

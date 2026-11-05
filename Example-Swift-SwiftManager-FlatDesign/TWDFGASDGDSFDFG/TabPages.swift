@@ -39,7 +39,7 @@ enum TabPages {
         // [CN] 几个页面 ID 共用一个工厂，用 `parameters` 区分。 [EN] Several page IDs share one factory, told apart by `parameters`.
         registry.register(factory: { request in
             let page = UIViewController()
-            page.title = request.parameters["url"] as? String ?? request.pageIdentifier
+            page.title = request.parameters["topic"] as? String ?? request.pageIdentifier
             return page
         }, forPageIdentifiers: ["swift-web", "swift-docs"])
     }
@@ -53,7 +53,7 @@ enum TabPages {
                 [CYLTabBarItemTitle: "Home", CYLTabBarItemImage: "system:house", CYLTabBarItemPageIdentifier: "swift-home"],
                 [CYLTabBarItemTitle: "Auto", CYLTabBarItemImage: "system:star", CYLTabBarItemPageIdentifier: "swift-auto"],
                 [CYLTabBarItemTitle: "Docs", CYLTabBarItemImage: "system:book", CYLTabBarItemPageIdentifier: "swift-docs",
-                 CYLTabBarItemPageParameters: ["url": "https://github.com/ChenYilong/CYLTabBarController"]],
+                 CYLTabBarItemPageParameters: ["topic": "Documentation"]],
                 [CYLTabBarItemTitle: "Missing", CYLTabBarItemImage: "system:questionmark", CYLTabBarItemPageIdentifier: "no-such-page"],
             ],
         ])
