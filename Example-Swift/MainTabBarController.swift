@@ -109,7 +109,7 @@ class MainTabBarController: CYLTabBarController {
     // Issue #428: called once for each Lottie view, after `lottieAnimationSpeed` was applied; one tab can get its own
     // speed here. 每个 Lottie 视图添加后回调一次，可在这里为某一个 Tab 单独设置速度。
     private func observeLottieAnimationViewDidAdd() {
-        let name = NSNotification.Name.CYLTabBarItemLottieAnimationViewDidAdd
+        let name = NSNotification.Name.CYLTabBarItemAnimationViewDidAdd
         _ = NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] note in
             guard let tabButton = note.object as? UIControl, tabButton.cyl_tabBarController === self else { return }
             if tabButton.cyl_tabBarChildViewControllerIndex == 0 {
@@ -188,10 +188,12 @@ extension MainTabBarController {
 //      `cyl_tabBarItemGestureHandler`。
 extension MainTabBarController {
 
+    // [EN] `override`: CYLTabBarController adopts CYLTabBarControllerDelegate, which declares this method.
+    // [CN] `override`：CYLTabBarController 遵循声明该方法的 CYLTabBarControllerDelegate。
     @objc(tabBarController:didRecognizeTabBarItemGesture:control:viewController:)
-    func tabBarController(_ _: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture,
+    override func tabBarController(_ _: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture,
                                 control: UIControl, viewController: UIViewController?) {
-        let content = viewController?.cyl_getViewControllerInsteadOfNavigationController()
+        let content = viewController?.cyl_getViewControllerInsteadOfNavigation()
         switch gesture {
         case .reselect:
             // [EN] Tap the selected tab: scroll to the top.

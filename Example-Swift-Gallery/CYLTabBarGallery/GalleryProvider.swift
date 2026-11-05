@@ -346,12 +346,12 @@ enum GalleryProvider {
 
     static func accessibilityStyle() -> UIViewController {
         let controller = Gallery.tabBarController(pages: Gallery.pages(5), attributes: Gallery.attributes(5))
-        controller.performWhenTabBarItemsReady { tabBarController in
+        controller.perform(whenTabBarItemsReady: { tabBarController in
             let identifiers = (tabBarController.viewControllers ?? []).map {
                 $0.tabBarItem.accessibilityIdentifier ?? $0.cyl_tabBarItemIdentifier ?? "-"
             }
             tabBarController.navigationItem.title = identifiers.joined(separator: ", ")
-        }
+        })
         return Gallery.embed(controller)
     }
 
