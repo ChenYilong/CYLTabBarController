@@ -175,7 +175,8 @@ static CYLTabBarController *CYLTabBarControllerOwningTabBar(UIResponder *respond
     }
     UIViewController *tab = viewControllers[index];
     // The plus child view controller is the plus button's tab. PlusButton 子控制器即 PlusButton 对应的 Tab。
-    if ([tab cyl_isEqualToViewController:[self cyl_contextPlusChildViewController]] && [self cyl_identifiedPlusButton]) {
+    UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
+    if (plusChildViewController && [tab cyl_isEqualToViewController:plusChildViewController] && [self cyl_identifiedPlusButton]) {
         return [self cyl_identifiedPlusButton].cyl_tabBarItemIdentifier;
     }
     Class contentClass = [[tab cyl_getViewControllerInsteadOfNavigationController] class];

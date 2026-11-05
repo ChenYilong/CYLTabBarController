@@ -58,6 +58,16 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 @end
 
+/// [EN] Implemented in CYLTabBarController.m: the plus button of this controller's context, and its child view controller.
+///      Used by CYLTabBarController+CYLTabBarControllerLookup.m (identifiers #408, the selected index without the plus
+///      button #515).
+/// [CN] 实现见 CYLTabBarController.m：本控制器 context 的 PlusButton 及其子控制器。供
+///      CYLTabBarController+CYLTabBarControllerLookup.m 使用（标识 #408、不含 PlusButton 的选中下标 #515）。
+@interface CYLTabBarController (CYLContextPlusButtonPrivate)
+- (nullable CYLPlusButton<CYLPlusButtonSubclassing> *)cyl_contextPlusButton;
+- (nullable UIViewController *)cyl_contextPlusChildViewController;
+@end
+
 /// [EN] Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
 /// [CN] 查找时接受哪些 TabBarController；nil 表示接受任意 CYLTabBarController。
 typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController);
