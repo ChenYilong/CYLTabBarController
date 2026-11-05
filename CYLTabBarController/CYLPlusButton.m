@@ -138,6 +138,10 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 /// `-cyl_showsTitleInTabBarItem`).
 static const void *CYLPlusButtonMovedTitleKey = &CYLPlusButtonMovedTitleKey;
 static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
+/// [EN] The images last set by `-cyl_updateTitle:image:selectedImage:` (a theme, `-updatePlusButtonWithAttributes:`).
+/// [CN] 最近一次由 `-cyl_updateTitle:image:selectedImage:` 设置的图片（主题、`-updatePlusButtonWithAttributes:`）。
+static const void *CYLPlusButtonUpdatedImageKey = &CYLPlusButtonUpdatedImageKey;
+static const void *CYLPlusButtonUpdatedSelectedImageKey = &CYLPlusButtonUpdatedSelectedImageKey;
 
 // [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
 // [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
@@ -1472,6 +1476,27 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
         UIButton *button = [[self class] performSelector:@selector(selectedContentView)];
         if (button) {
             _selectedContentView = button;
+            // FIX: the plus button's stand-in kept the original image after a theme
+            // [EN] Liquid Glass only (the stand-in is shown in the selected layer while the plus child view controller is
+            //      selected). The class makes a new plus button, with the app's original images: a theme applied before
+            //      the plus child was first selected (e.g. the theme restored at launch) left the stand-in with the old
+            //      image over the themed plus button, which showed blurred through the glass around it. Give it the images
+            //      set since then.
+            // [CN] 仅液态玻璃（选中 PlusButton 子控制器时，选中图层显示替身）。类方法会新建一个 PlusButton，使用 App 原来的图片：在第一次选中
+            //      PlusButton 子控制器之前应用的主题（例如启动时恢复的主题）使替身保持旧图片，盖在换肤后的 PlusButton 上，周围透过玻璃显示为模糊。
+            //      这里为替身设置之后更新过的图片。
+            if ([CYLConstants isLiquidGlassActive] && button != self) {
+                UIImage *image = objc_getAssociatedObject(self, CYLPlusButtonUpdatedImageKey);
+                UIImage *selectedImage = objc_getAssociatedObject(self, CYLPlusButtonUpdatedSelectedImageKey);
+                if (image) {
+                    [button setImage:image forState:UIControlStateNormal];
+                    [button setImage:(selectedImage ?: image) forState:UIControlStateHighlighted];
+                }
+                if (selectedImage) {
+                    [button setImage:selectedImage forState:UIControlStateSelected];
+                    [button setImage:selectedImage forState:UIControlStateHighlighted];
+                }
+            }
             return _selectedContentView;
         }
     }
@@ -1555,9 +1580,11 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     }
     if (image) {
         self.contentImage = image;
+        objc_setAssociatedObject(self, CYLPlusButtonUpdatedImageKey, image, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     if (selectedImage) {
         self.selectedContentImage = selectedImage;
+        objc_setAssociatedObject(self, CYLPlusButtonUpdatedSelectedImageKey, selectedImage, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     [self cyl_setNeedsTitleAlignment];
     [self setNeedsLayout];
