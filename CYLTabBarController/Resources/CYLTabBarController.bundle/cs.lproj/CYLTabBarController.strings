@@ -255,6 +255,18 @@
 "跳转与对比" = "Navigace a srovnání";
 "角标" = "Odznaky";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nepodporuje: výšku panelu určuje systém (FlatDesign a klasický styl ano)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Vzhled";
+"换肤（主题，issue #216）" = "Vzhled (motiv, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Klepnutím vyberte motiv: pozadí, ikony a barvy textu TabBar se změní na místě, ve všech stylech TabBar. Nyní: %@";
+"选择主题" = "Vyberte motiv";
+"默认" = "Výchozí";
+"西柚" = "Grapefruit";
+"青草" = "Tráva";
+"玫瑰粉" = "Růžová růže";
+"春节" = "Svátky jara";
+"跟随系统深色模式" = "Řídit se tmavým režimem systému";
 "默认点击声" = "Výchozí cvaknutí";
 "中等触感反馈" = "Střední haptická odezva";
 "无需继承基类与工具方法" = "Bez základní třídy a pomůcky";
@@ -277,3 +289,20 @@
 "轻触感反馈" = "Lehká haptická odezva";
 "重触感反馈" = "Silná haptická odezva";
 "长按（#152）" = "Dlouhý stisk (#152)";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Vánoce";
+"万圣节" = "Halloween";
+"情人节" = "Valentýn";
+"中秋节" = "Svátek středu podzimu";
+"复活节" = "Velikonoce";
+"新年" = "Nový rok";
+"夏日" = "Léto";
+"生日" = "Narozeniny";
+"太空" = "Vesmír";
+"海洋" = "Oceán";
+"换肤：节日与配色主题（%@ 种）" = "Vzhledy: svátky a barvy (%@)";
+"节日图标与配色" = "Sváteční ikony a barvy";
+"仅配色" = "Pouze barvy";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Klepni";

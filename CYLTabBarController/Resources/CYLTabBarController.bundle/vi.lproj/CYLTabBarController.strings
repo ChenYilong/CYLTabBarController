@@ -255,6 +255,18 @@
 "跳转与对比" = "Điều hướng và so sánh";
 "角标" = "Huy hiệu";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass không hỗ trợ: hệ thống quyết định chiều cao thanh tab (FlatDesign và kiểu cổ điển hỗ trợ)";
+
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Giao diện";
+"换肤（主题，issue #216）" = "Giao diện (chủ đề, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Chạm để chọn chủ đề: nền, biểu tượng và màu chữ của TabBar đổi ngay tại chỗ, với mọi kiểu TabBar. Hiện tại: %@";
+"选择主题" = "Chọn chủ đề";
+"默认" = "Mặc định";
+"西柚" = "Bưởi";
+"青草" = "Cỏ";
+"玫瑰粉" = "Hồng phấn";
+"春节" = "Tết Nguyên Đán";
+"跟随系统深色模式" = "Theo chế độ tối của hệ thống";
 "默认点击声" = "Tiếng nhấp mặc định";
 "中等触感反馈" = "Phản hồi xúc giác vừa";
 "无需继承基类与工具方法" = "Không cần lớp cơ sở, và tiện ích";
@@ -277,3 +289,20 @@
 "轻触感反馈" = "Phản hồi xúc giác nhẹ";
 "重触感反馈" = "Phản hồi xúc giác mạnh";
 "长按（#152）" = "Nhấn giữ (#152)";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Giáng sinh";
+"万圣节" = "Halloween";
+"情人节" = "Lễ tình nhân";
+"中秋节" = "Tết Trung thu";
+"复活节" = "Lễ Phục sinh";
+"新年" = "Năm mới";
+"夏日" = "Mùa hè";
+"生日" = "Sinh nhật";
+"太空" = "Không gian";
+"海洋" = "Đại dương";
+"换肤：节日与配色主题（%@ 种）" = "Giao diện: ngày lễ và màu sắc (%@)";
+"节日图标与配色" = "Biểu tượng ngày lễ và màu sắc";
+"仅配色" = "Chỉ màu sắc";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Chạm";

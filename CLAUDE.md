@@ -102,6 +102,14 @@ classes link back to it:
 - **No warnings**: fix every build and static-analyzer warning you meet, including old ones in code you did not change.
 - **Public API**: never remove or change an existing public API; add new API instead. Prefer implementing an existing
   protocol method over adding a new category method; file-private C functions and private headers are fine.
+- **Swift-friendly names for underscored protocol methods**: Swift method names must not contain underscores, but a
+  Swift class that implements an Objective-C protocol method must use its imported name (e.g. `cyl_play…`); renaming it
+  no longer satisfies the protocol. Adding `NS_SWIFT_NAME` to the existing method would change a Swift API already
+  released on `master`, which the Public API rule forbids. Instead, add a new method with the same name minus the
+  underscore, keeping the `cyl` prefix (e.g. `-cyl_playSelectAnimationWithTabButton:…` →
+  `-cylPlaySelectAnimationWithTabButton:…`), and define its Swift name with `NS_SWIFT_NAME` on the new method only.
+  Both spellings run the same logic: the library calls the underscore-free one when it is implemented, otherwise the
+  underscored one. If the old method was `@required`, make it `@optional` so a class can implement only the new one.
 - **Optional components are isolated with guards**:
   - FlatDesign code in Core: `#if CYL_FLATDESIGN_AVAILABLE` (defined once in `CYLUtils/CYLUtilsMacros.h`), and run only
     for `CYLTabBarStyleTypeFlatDesign`, so Liquid Glass and the classic style are never affected.
@@ -125,7 +133,72 @@ classes link back to it:
 - **Verify** before pushing: `pod lib lint CYLTabBarController.podspec --quick`, plus a build or static check of the
   changed code. Say plainly what could not be verified.
 
-## 5. Git and pull requests
+## 5. Xcode project files keep the ObjC example's format
+
+**Purpose: keep CI/CD from failing.** CI and releases run on the `macos-26` runner (Xcode 26.x, no Xcode 27; see
+`docs/Mac-CI-CD.md`). A project saved in a newer format cannot be opened there, and its job fails. This happened to
+`scripts/ci-build-example.sh "Example-Swift-SwiftManager-FlatDesign"` after Xcode 27 saved that project
+(fixed in [#772](https://github.com/ChenYilong/CYLTabBarController/pull/772)):
+
+```
+xcodebuild: error: Unable to read project 'TWDFGASDGDSFDFG.xcodeproj' from folder '/Users/runner/work/CYLTabBarController/CYLTabBarController/Example-Swift-SwiftManager-FlatDesign/.'.
+	Reason: The project 'TWDFGASDGDSFDFG' cannot be opened because it is in a future Xcode project file format (110). Adjust the project format using a compatible version of Xcode to allow it to be opened by this version of Xcode.
+```
+
+**When this applies**: you create an Xcode project, or a commit touches any file inside a `*.xcodeproj` (above all
+`project.pbxproj`). Before committing, search the diff for it, e.g. `git diff --cached --name-only | grep '\.xcodeproj/'`,
+and check every project it lists.
+
+**Keywords**: besides `.xcodeproj`, search the commit's code (the diff) for these keywords. A hit means an Xcode
+project setting changed and this section applies. Each keyword is followed by a complete example of the line it
+appears in, taken from the fix in #772 (CI/CD passed with these values), and by what to do when it shows up:
+
+| Keyword | Complete example (#772) | Guidance |
+|:---|:---|:---|
+| `.xcodeproj` | `Example-Swift-SwiftManager-FlatDesign/TWDFGASDGDSFDFG.xcodeproj/project.pbxproj` | Any file under a `.xcodeproj` changed: run the check below on that project. Compare it with `CYLTabBarController.xcodeproj`; if the diff is large because Xcode rewrote the project, keep only the changes you meant and restore the format values. |
+| `objectVersion` | `objectVersion = 46;` (was `110`) | Must stay `46`. If Xcode raised it, set it back. A value of 77 or more usually comes with folder sync: convert that to explicit file lists as #772 did; do not just change the number. |
+| `compatibilityVersion` | `compatibilityVersion = "Xcode 3.2";` (was `"Xcode 8.0"` / `"Xcode 9.3"` / missing) | Must be `"Xcode 3.2"`, in the `PBXProject` object right after `buildConfigurationList`. Add it when missing, and remove `preferredProjectObjectVersion` and the top-level `validationLevel` if present. |
+| `IPHONEOS_DEPLOYMENT_TARGET` | `IPHONEOS_DEPLOYMENT_TARGET = 15.0;` (`Example-Swift-04`, was `27.0`) | Never 27 or more, not even at the project level. Use 15.0, like the ObjC example; match the app's Podfile `platform :ios` so the app is not below its pods. Before lowering it, check the code for newer APIs without `#available`. A raised value is usually an accident of a newer Xcode saving the project (e.g. #669), not a code need. |
+
+```sh
+git diff --cached --name-only | grep '\.xcodeproj'
+git diff --cached | grep -E 'objectVersion|compatibilityVersion|IPHONEOS_DEPLOYMENT_TARGET'
+```
+
+**Example fix**: [#772](https://github.com/ChenYilong/CYLTabBarController/pull/772) brought every example back to the
+ObjC example's format. Follow its diff when a project needs the same fix: format 110 / 77 / 60 / 50 / 48 set to 46,
+folder sync replaced by explicit file lists, the Xcode 27-only keys removed, and every deployment target of 27.0 lowered
+to 15.0 (FlatDesign's project level, `Example-Swift-04`'s app target).
+
+**The rule**: every project matches the root ObjC example, `CYLTabBarController.xcodeproj`:
+
+- `objectVersion = 46;` in `project.pbxproj`, and `compatibilityVersion = "Xcode 3.2";` in the `PBXProject` object
+  (right after `buildConfigurationList`).
+- No `preferredProjectObjectVersion` key, and no top-level `validationLevel` key (Xcode 27 only).
+- No folder sync: no `PBXFileSystemSynchronizedRootGroup` or `PBXFileSystemSynchronizedBuildFileExceptionSet`
+  (format 77+, Xcode 16). List the files explicitly: `PBXGroup`, `PBXFileReference`, `PBXBuildFile` in the Sources /
+  Resources phases, and `PBXVariantGroup` for `Base.lproj` storyboards. Keep the target membership the same (e.g.
+  `Info.plist` stays out of Resources). New files are added to the target by hand in Xcode.
+- No effective deployment target newer than the CI SDK: no `IPHONEOS_DEPLOYMENT_TARGET` of 27 or more, not even at the
+  project level when a target overrides it.
+- Scheme files (`*.xcscheme`) may keep `version="1.7"`; Xcode 15 and later read it.
+
+**Check it** (each line must print `46` and `"Xcode 3.2"` and nothing else):
+
+```sh
+for f in $(git ls-files '*.pbxproj'); do
+  echo "$f: $(grep -oE 'objectVersion = [0-9]+|compatibilityVersion = "[^"]+"|preferredProjectObjectVersion|validationLevel|PBXFileSystemSynchronized[A-Za-z]*|IPHONEOS_DEPLOYMENT_TARGET = (2[7-9]|[3-9][0-9])' "$f" | sort -u | tr '\n' ' ')"
+done
+```
+
+- When Xcode upgrades a project's format (it does when a newer Xcode saves it), set those values back before committing.
+- A project that uses folder sync has to be converted to explicit file lists, not just relabeled. Afterwards check it
+  with CocoaPods' parser (`ruby -rxcodeproj -e 'Xcodeproj::Project.open(ARGV[0])' <path>.xcodeproj`, run with
+  `LC_ALL=C.UTF-8`) and make sure every file in its build phases exists on disk.
+- Say in the PR that the project was not opened in Xcode when it could not be; the `Demo …` CI jobs on `macos-26` are
+  the real check.
+
+## 6. Git and pull requests
 
 - Branch from the latest `master` for each issue or feature.
 - Commit messages are in English, Conventional Commits as configured for commitizen in `package.json`
