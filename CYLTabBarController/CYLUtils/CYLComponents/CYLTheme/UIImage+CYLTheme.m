@@ -155,7 +155,7 @@ static UIImage *CYLThemeImageMake(NSObject<NSCopying> *managerName, CYLThemeImag
 @interface CYLThemeDynamicImage : UIImage
 @property (nonatomic, copy, readonly, nullable) NSObject<NSCopying> *cyl_managerName;
 @property (nonatomic, copy, readonly, nullable) CYLThemeImageProvider cyl_provider;
-- (instancetype)cyl_initWithManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeImageProvider)provider;
+- (instancetype)initWithThemeManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeImageProvider)provider;
 @end
 
 @implementation CYLThemeDynamicImage
@@ -199,7 +199,7 @@ static UIImage *CYLThemeDynamicImageResolve(NSObject<NSCopying> *_Nullable manag
  * [CN] 以当前主题的位图初始化，使绕过下面重写属性的 UIKit 代码仍能得到有效的图片。UIImage 自身的初始化方法可能在设置管理器与 provider 之前
  *      读取这些属性：此前它们以透明图片作答。
  */
-- (instancetype)cyl_initWithManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeImageProvider)provider {
+- (instancetype)initWithThemeManagerName:(NSObject<NSCopying> *)managerName provider:(CYLThemeImageProvider)provider {
     UIImage *current = CYLThemeDynamicImageResolve(managerName, provider);
     if (current.CGImage) {
         self = [super initWithCGImage:current.CGImage scale:current.scale orientation:current.imageOrientation];
@@ -327,7 +327,7 @@ NSObject<NSCopying> *_Nullable CYLThemeImageManagerName(UIImage *image) {
 }
 
 + (UIImage *)cyl_dynamicImageWithThemeManagerName:(__kindof NSObject<NSCopying> *)managerName provider:(CYLThemeImageProvider)provider {
-    return [[CYLThemeDynamicImage alloc] cyl_initWithManagerName:managerName provider:provider];
+    return [[CYLThemeDynamicImage alloc] initWithThemeManagerName:managerName provider:provider];
 }
 
 - (BOOL)cyl_isThemeImage {
