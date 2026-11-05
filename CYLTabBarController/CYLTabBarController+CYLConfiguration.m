@@ -668,8 +668,8 @@ static NSArray<CYLTabBarPageSource> *_Nullable CYLPageLookupOrderValue(id value)
     NSMutableArray<CYLTabBarPageSource> *order = [NSMutableArray array];
     for (id entry in entries) {
         NSString *name = [entry isKindOfClass:[NSString class]]
-            ? [[(NSString *)entry stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] lowercaseString] : nil;
-        if ([CYLTabBarPageRegistry.defaultPageLookupOrder containsObject:name ?: @""] && ![order containsObject:name]) {
+            ? [[(NSString *)entry stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] lowercaseString] : @"";
+        if (name.length > 0 && [CYLTabBarPageRegistry.defaultPageLookupOrder containsObject:name] && ![order containsObject:name]) {
             [order addObject:name];
         } else if (name.length > 0 || ![entry isKindOfClass:[NSString class]]) {
             CYLLogInvalidConfigurationValue(CYLTabBarControllerPageLookupOrder, entry);
