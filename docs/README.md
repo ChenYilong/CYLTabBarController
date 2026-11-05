@@ -44,6 +44,7 @@
 | [按页面 ID 获得 Tab 页面（页面注册表）](Tab-Page-Registry.md) | [Tab pages from page IDs (the page registry)](Tab-Page-Registry.md) |
 | [重复点击已选中 Tab 的内置操作](Tab-Reselect.md) | [Built-in Actions for Tapping the Selected Tab](Tab-Reselect.md) |
 | [调研：配置文件中的 Tab 如何对应到页面对象（跨端标识、注册表与顺序）](Tab-View-Controller-Resolution-Research.md) | [Research: how a tab in a configuration file finds its page object (cross-platform IDs, registries and order)](Tab-View-Controller-Resolution-Research.md) |
+| [TabBar 自定义工具集](TabBar-Customization-Toolkit.md) | [Tab bar customization toolkit](TabBar-Customization-Toolkit.md) |
 | [TabBar 的 hitTest 不再返回 nil，交给 super 处理](TabBar-HitTest-Super-Fallback.md) | [The tab bar's hitTest falls back to super instead of returning nil](TabBar-HitTest-Super-Fallback.md) |
 | [滚动时缩小或隐藏 TabBar](TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](TabBar-Minimize-On-Scroll.md) |
 | [TabBarItem 手势：再次点击、双击与长按](TabBarItem-Gestures.md) | [Tab bar item gestures: reselect, double tap and long press](TabBarItem-Gestures.md) |
@@ -97,6 +98,7 @@ docs/
 ├── Tab-Page-Registry.md
 ├── Tab-Reselect.md
 ├── Tab-View-Controller-Resolution-Research.md
+├── TabBar-Customization-Toolkit.md
 ├── TabBar-HitTest-Super-Fallback.md
 ├── TabBar-Minimize-On-Scroll.md
 ├── TabBarItem-Gestures.md

@@ -326,3 +326,7 @@
 "两个 TabBar，同一个页面 ID" = "Δύο γραμμές καρτελών, ένα ID σελίδας";
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Αντιγραφή";
+/* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
+"展开全部 %@ 个模拟" = "Εμφάνιση και των %@ προσομοιώσεων";
+/* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
+"收起模拟列表" = "Σύμπτυξη λίστας προσομοιώσεων";

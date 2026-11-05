@@ -391,11 +391,71 @@ static char CYLTabBarDemoItemTitleKey;
 static const NSInteger CYLDemoRowTabBar = 1000;
 /// [EN] Rows of the scroll hiding simulation section (issue #13). [CN] 滚动隐藏模拟意外情况 section 的行（issue #13）。
 static const NSInteger CYLDemoRowScrollHideSimulation = 3000;
+/// [EN] The row that expands / collapses the scroll hiding simulation list (issue #13); it sits above the simulation rows.
+/// [CN] 展开 / 收起滚动隐藏模拟列表的行（issue #13）；序号大于模拟行。
+static const NSInteger CYLDemoRowScrollHideSimulationToggle = 4000;
+/// [EN] Key of the associated object that remembers whether the simulation list is expanded.
+/// [CN] 关联对象的 key，记录模拟列表是否展开。
+static const void *const CYLScrollHideSimulationListExpandedKey = &CYLScrollHideSimulationListExpandedKey;
 /// [EN] A row of the theme list section: `CYLDemoRowTheme` + the theme's index (issue #216).
 /// [CN] 主题列表 section 中的一行：`CYLDemoRowTheme` + 主题序号（issue #216）。
 static const NSInteger CYLDemoRowTheme = 2000;
 
 @implementation UIViewController (CYLDemoSections)
+
+/// [EN] Whether the scroll hiding simulation list is expanded (collapsed by default). [CN] 滚动隐藏模拟列表是否展开（默认收起）。
+- (BOOL)cyl_isScrollHideSimulationListExpanded {
+    return [objc_getAssociatedObject(self, CYLScrollHideSimulationListExpandedKey) boolValue];
+}
+
+- (void)cyl_setScrollHideSimulationListExpanded:(BOOL)expanded {
+    objc_setAssociatedObject(self, CYLScrollHideSimulationListExpandedKey, @(expanded), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+/// [EN] The row that expands / collapses the simulation list. [CN] 展开 / 收起模拟列表的行。
+- (UITableViewCell *)cyl_scrollHideSimulationToggleCellForTableView:(UITableView *)tableView {
+    static NSString *const identifier = @"CYLScrollHideSimulationToggleCell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+        cell.textLabel.numberOfLines = 0;
+        cell.textLabel.textColor = tableView.tintColor ?: [UIColor systemBlueColor];
+    }
+    BOOL expanded = [self cyl_isScrollHideSimulationListExpanded];
+    cell.textLabel.text = expanded
+        ? CYLLocalizedString(@"收起模拟列表")
+        : [NSString stringWithFormat:CYLLocalizedString(@"展开全部 %@ 个模拟"), @([self cyl_scrollHideSimulationRowCount])];
+    if (@available(iOS 13.0, *)) {
+        cell.imageView.image = [UIImage systemImageNamed:expanded ? @"chevron.up" : @"chevron.down"];
+    }
+    return cell;
+}
+
+/// [EN] Expands or collapses the simulation list with a row animation. [CN] 以行动画展开或收起模拟列表。
+- (void)cyl_toggleScrollHideSimulationListAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
+    BOOL expand = ![self cyl_isScrollHideSimulationListExpanded];
+    [self cyl_setScrollHideSimulationListExpanded:expand];
+    if (!tableView.window) {
+        return;
+    }
+    // [EN] The simulation rows follow the toggle row. [CN] 模拟行紧跟在展开 / 收起行之后。
+    NSMutableArray<NSIndexPath *> *indexPaths = [NSMutableArray array];
+    for (NSInteger row = 0; row < [self cyl_scrollHideSimulationRowCount]; row++) {
+        [indexPaths addObject:[NSIndexPath indexPathForRow:indexPath.row + 1 + row inSection:indexPath.section]];
+    }
+    [tableView beginUpdates];
+    if (expand) {
+        [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+    } else {
+        [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+    }
+    [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    [tableView endUpdates];
+    if (!expand) {
+        // [EN] After collapsing, keep the toggle row on screen. [CN] 收起后让展开 / 收起行保持可见。
+        [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
+    }
+}
 
 /*!
  * [EN] The sections, by function: each row is a settings row index, or `CYLDemoRowTabBar` + a tab bar demo row. The
@@ -449,11 +509,15 @@ static const NSInteger CYLDemoRowTheme = 2000;
         @{ @"title" : [UIViewController cyl_configurationEdgeCaseSectionTitle], @"rows" : edgeCaseRows },
     ] mutableCopy];
     // [EN] Scroll hiding (issue #13): one section of simulated interruptions. [CN] 滚动隐藏（issue #13）：模拟意外情况的 section。
-    // [EN] Settings row 20 (the same simulations in an action sheet) first, then one row per simulation.
-    // [CN] 先放设置第 20 行（操作表中的同样模拟），再每个模拟一行。
-    NSMutableArray<NSNumber *> *simulationRows = [NSMutableArray arrayWithObject:@20];
-    for (NSInteger row = 0; row < [self cyl_scrollHideSimulationRowCount]; row++) {
-        [simulationRows addObject:@(CYLDemoRowScrollHideSimulation + row)];
+    // [EN] Settings row 20 (the same simulations in an action sheet) first, then a row that expands / collapses the list.
+    //      The list (one row per simulation, almost 40) is collapsed by default, so it does not flood the page.
+    // [CN] 先放设置第 20 行（操作表中的同样模拟），再放一行用于展开 / 收起列表。
+    //      列表（每个模拟一行，近 40 行）默认收起，避免占满整个页面。
+    NSMutableArray<NSNumber *> *simulationRows = [NSMutableArray arrayWithObjects:@20, @(CYLDemoRowScrollHideSimulationToggle), nil];
+    if ([self cyl_isScrollHideSimulationListExpanded]) {
+        for (NSInteger row = 0; row < [self cyl_scrollHideSimulationRowCount]; row++) {
+            [simulationRows addObject:@(CYLDemoRowScrollHideSimulation + row)];
+        }
     }
     [sections addObject:@{ @"title" : CYLLocalizedString(@"滚动隐藏：模拟意外情况（issue #13）"), @"rows" : simulationRows }];
     NSMutableSet<NSNumber *> *listed = [NSMutableSet set];
@@ -488,6 +552,9 @@ static const NSInteger CYLDemoRowTheme = 2000;
 
 - (UITableViewCell *)cyl_demoCellForTableView:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath {
     NSInteger row = [self cyl_demoRowAtIndexPath:indexPath];
+    if (row == CYLDemoRowScrollHideSimulationToggle) {
+        return [self cyl_scrollHideSimulationToggleCellForTableView:tableView];
+    }
     if (row >= CYLDemoRowScrollHideSimulation) {
         return [self cyl_scrollHideSimulationCellForTableView:tableView row:row - CYLDemoRowScrollHideSimulation];
     }
@@ -503,6 +570,10 @@ static const NSInteger CYLDemoRowTheme = 2000;
 - (void)cyl_demoDidSelectRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     NSInteger row = [self cyl_demoRowAtIndexPath:indexPath];
+    if (row == CYLDemoRowScrollHideSimulationToggle) {
+        [self cyl_toggleScrollHideSimulationListAtIndexPath:indexPath inTableView:tableView];
+        return;
+    }
     if (row >= CYLDemoRowScrollHideSimulation) {
         [self cyl_didSelectScrollHideSimulationRow:row - CYLDemoRowScrollHideSimulation];
         return;
