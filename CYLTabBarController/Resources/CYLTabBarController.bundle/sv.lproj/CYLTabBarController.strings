@@ -315,3 +315,5 @@
 "仅配色" = "Endast färger";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Tryck här";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Två flikfält delar en konfiguration; vart och ett av registren kopplar samma sid-ID till olika sidor.";
+"两个 TabBar，同一个页面 ID" = "Två flikfält, ett sid-ID";

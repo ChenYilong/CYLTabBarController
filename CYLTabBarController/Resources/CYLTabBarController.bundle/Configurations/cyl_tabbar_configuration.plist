@@ -6,8 +6,6 @@
 	<string>CYLConfigurationDemo</string>
 	<key>CYLTabBarControllerImageInsets</key>
 	<string>{0, 0, 0, 0}</string>
-	<key>CYLTabBarControllerNavigationControllerClass</key>
-	<string>UINavigationController</string>
 	<key>CYLTabBarControllerStyleType</key>
 	<string>default</string>
 	<key>CYLTabBarControllerTabBarItemsAttributes</key>
@@ -21,20 +19,18 @@
 			<string>system:house.fill</string>
 			<key>CYLTabBarItemTitle</key>
 			<string>Plist</string>
-			<key>CYLTabBarItemViewControllerClass</key>
-			<string>UIViewController</string>
 		</dict>
 		<dict>
 			<key>CYLTabBarItemIdentifier</key>
 			<string>message</string>
+			<key>CYLTabBarItemPlatforms</key>
+			<string>ios,android</string>
 			<key>CYLTabBarItemImage</key>
 			<string>system:message</string>
 			<key>CYLTabBarItemSelectedImage</key>
 			<string>system:message.fill</string>
 			<key>CYLTabBarItemTitle</key>
 			<string>Message</string>
-			<key>CYLTabBarItemViewControllerClass</key>
-			<string>UIViewController</string>
 		</dict>
 		<dict>
 			<key>CYLTabBarItemIdentifier</key>
@@ -43,16 +39,23 @@
 			<string>system:safari</string>
 			<key>CYLTabBarItemImageInsets</key>
 			<string>{1, 0, -1, 0}</string>
+			<key>CYLTabBarItemPageIdentifier</key>
+			<string>web</string>
+			<key>CYLTabBarItemPageParameters</key>
+			<dict>
+				<key>url</key>
+				<string>https://github.com/ChenYilong/CYLTabBarController</string>
+			</dict>
 			<key>CYLTabBarItemSelectedImage</key>
 			<string>system:safari.fill</string>
 			<key>CYLTabBarItemTitle</key>
 			<string>Discover</string>
-			<key>CYLTabBarItemViewControllerClass</key>
-			<string>UIViewController</string>
 		</dict>
 		<dict>
 			<key>CYLTabBarItemIdentifier</key>
 			<string>me</string>
+			<key>CYLTabBarItemMinimumAppVersion</key>
+			<string>1.0.0</string>
 			<key>CYLTabBarItemImage</key>
 			<string>system:person</string>
 			<key>CYLTabBarItemSelectedImage</key>
@@ -61,8 +64,6 @@
 			<string>Me</string>
 			<key>CYLTabBarItemTitlePositionAdjustment</key>
 			<string>{0, -1}</string>
-			<key>CYLTabBarItemViewControllerClass</key>
-			<string>UIViewController</string>
 		</dict>
 	</array>
 	<key>CYLTabBarControllerTitlePositionAdjustment</key>

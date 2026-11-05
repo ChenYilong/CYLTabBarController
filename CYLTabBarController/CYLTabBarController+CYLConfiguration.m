@@ -6,6 +6,9 @@
 //
 
 #import "CYLTabBarController.h"
+
+/// [EN] Private: marks a left-out tab; the same key as in CYLTabBarController.m. [CN] 私有：标记被排除的 Tab；与 CYLTabBarController.m 中的键相同。
+static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
 #include <math.h>
 
 #pragma mark - Value conversion
@@ -377,7 +380,7 @@ static id CYLDarkColorsValue(id value) {
 static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
     return @[ CYLTabBarControllerViewControllers, CYLTabBarControllerTabBarItemsAttributes, CYLTabBarControllerImageInsets,
               CYLTabBarControllerTitlePositionAdjustment, CYLTabBarControllerStyleType, CYLTabBarControllerContext,
-              CYLTabBarControllerNavigationControllerClass ];
+              CYLTabBarControllerPageRegistry, CYLTabBarControllerPageResolver ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -385,8 +388,8 @@ static NSArray<NSString *> *CYLKnownItemKeys(void) {
               CYLTabBarItemSelectedDarkImage, CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize,
               CYLTabBarItemImageInsets, CYLTabBarItemTitlePositionAdjustment, CYLTabBarItemImagePositionAdjustment,
               CYLTabBarLottieFilePath, CYLTabBarLottieURL, CYLTabBarLottieSize, CYLTabBarItemIdentifier, CYLTabBarLottieDarkURL,
-              CYLTabBarLottieDarkFilePath, CYLTabBarLottieDarkColors, CYLTabBarItemViewControllerClass,
-              CYLTabBarItemNavigationControllerClass, CYLTabBarItemSelectedTitle, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
+              CYLTabBarLottieDarkFilePath, CYLTabBarLottieDarkColors, CYLTabBarItemPageIdentifier,
+              CYLTabBarItemPageParameters, CYLTabBarItemPlatforms, CYLTabBarItemMinimumAppVersion, CYLTabBarItemSelectedTitle, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
               CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemBackgroundColor,
               CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont, CYLTabBarItemAccessibilityIdentifier, CYLTabBarItemAccessibilityLabel,
               CYLTabBarItemAccessibilityHint ];
@@ -465,6 +468,11 @@ static void CYLMakeIdentifiersUnique(NSMutableArray<NSDictionary *> *items) {
 #endif
             NSMutableDictionary *item = [items[i] mutableCopy];
             item[CYLTabBarItemIdentifier] = unique;
+            // The page ID falls back to the tab ID: keep the original one, so the page is still found (B12).
+            // 页面 ID 默认取 Tab 标识：保留原来的标识，以便仍能找到页面（B12）。
+            if ([item[CYLTabBarItemPageIdentifier] length] == 0) {
+                item[CYLTabBarItemPageIdentifier] = identifier;
+            }
             items[i] = item;
         }
         [used addObject:unique];
@@ -550,6 +558,90 @@ static NSString *_Nullable CYLStringValue(id value) {
 }
 
 /*!
+ * [EN] `CYLTabBarItemPlatforms` as lowercase names: a list of strings, or one comma-separated string ("ios, android").
+ *      Anything else is removed with a warning, so the tab shows on every platform (B23).
+ * [CN] 将 `CYLTabBarItemPlatforms` 转为小写名称列表：字符串数组，或逗号分隔的字符串（"ios, android"）。其他值会被移除并输出警告，该 Tab
+ *      在所有平台显示（B23）。
+ */
+static NSArray<NSString *> *_Nullable CYLPlatformsValue(id value) {
+    NSArray *names = [value isKindOfClass:[NSString class]] ? [(NSString *)value componentsSeparatedByString:@","] : value;
+    if (![names isKindOfClass:[NSArray class]]) {
+        CYLLogInvalidConfigurationValue(CYLTabBarItemPlatforms, value);
+        return nil;
+    }
+    NSMutableArray<NSString *> *platforms = [NSMutableArray array];
+    for (id name in names) {
+        NSString *platform = [name isKindOfClass:[NSString class]]
+            ? [(NSString *)name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].lowercaseString : nil;
+        if (platform.length == 0) {
+            CYLLogInvalidConfigurationValue(CYLTabBarItemPlatforms, value);
+            return nil;
+        }
+        [platforms addObject:platform];
+    }
+    return platforms.count > 0 ? platforms : nil;
+}
+
+/*!
+ * [EN] The numbers of a version string ("2.10.1" -> 2, 10, 1), or nil when it has none or a part is not a number:
+ *      "2.10" is newer than "2.9", which a string comparison gets wrong (B24).
+ * [CN] 版本字符串中的数字（"2.10.1" -> 2、10、1）；没有数字或某部分不是数字时返回 nil："2.10" 比 "2.9" 新，字符串比较会算错（B24）。
+ */
+static NSArray<NSNumber *> *_Nullable CYLVersionNumbers(NSString *version) {
+    NSString *trimmed = [version stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (trimmed.length == 0) {
+        return nil;
+    }
+    NSMutableArray<NSNumber *> *numbers = [NSMutableArray array];
+    for (NSString *part in [trimmed componentsSeparatedByString:@"."]) {
+        NSScanner *scanner = [NSScanner scannerWithString:part];
+        long long number = 0;
+        if (![scanner scanLongLong:&number] || !scanner.isAtEnd || number < 0) {
+            return nil;
+        }
+        [numbers addObject:@(number)];
+    }
+    return numbers;
+}
+
+/// [EN] Whether `version` is lower than `minimum` (missing parts count as 0). [CN] `version` 是否低于 `minimum`（缺少的部分视为 0）。
+static BOOL CYLVersionIsLower(NSArray<NSNumber *> *version, NSArray<NSNumber *> *minimum) {
+    for (NSUInteger i = 0; i < MAX(version.count, minimum.count); i++) {
+        long long a = i < version.count ? version[i].longLongValue : 0;
+        long long b = i < minimum.count ? minimum[i].longLongValue : 0;
+        if (a != b) {
+            return a < b;
+        }
+    }
+    return NO;
+}
+
+/*!
+ * [EN] Why a tab is left out on this device, or nil: not for iOS (`CYLTabBarItemPlatforms`), or a newer app needed
+ *      (`CYLTabBarItemMinimumAppVersion`). An invalid minimum version is ignored with a warning (B24).
+ * [CN] 该 Tab 在本设备上被排除的原因，没有则为 nil：不适用于 iOS（`CYLTabBarItemPlatforms`），或需要更新的 App 版本
+ *      （`CYLTabBarItemMinimumAppVersion`）。无效的最低版本会被忽略并输出警告（B24）。
+ */
+static NSString *_Nullable CYLExclusionReason(NSDictionary *item) {
+    NSArray<NSString *> *platforms = item[CYLTabBarItemPlatforms];
+    if (platforms && ![platforms containsObject:@"ios"]) {
+        return [NSString stringWithFormat:@"its platforms are %@", [platforms componentsJoinedByString:@", "]];
+    }
+    NSString *minimum = item[CYLTabBarItemMinimumAppVersion];
+    if (minimum) {
+        NSArray<NSNumber *> *minimumNumbers = CYLVersionNumbers(minimum);
+        NSString *appVersion = [NSBundle mainBundle].infoDictionary[@"CFBundleShortVersionString"];
+        NSArray<NSNumber *> *appNumbers = [appVersion isKindOfClass:[NSString class]] ? CYLVersionNumbers(appVersion) : nil;
+        if (!minimumNumbers) {
+            CYLLogInvalidConfigurationValue(CYLTabBarItemMinimumAppVersion, minimum);
+        } else if (appNumbers && CYLVersionIsLower(appNumbers, minimumNumbers)) {
+            return [NSString stringWithFormat:@"it needs version %@ (this app is %@)", minimum, appVersion];
+        }
+    }
+    return nil;
+}
+
+/*!
  * [EN] The attributes of one tab, each known key checked for its type: a title that is a list or a dictionary, or a
  *      null, used to reach UIKit and crash with an unrecognized selector (B5, B6). Wrong values are removed, so the tab
  *      takes the default for that key. Keys the library does not know are kept for the app.
@@ -565,8 +657,8 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
         }
         item[key] = value;
     }
-    for (NSString *key in @[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemIdentifier, CYLTabBarItemViewControllerClass, CYLTabBarItemNavigationControllerClass,
-                              CYLTabBarItemAccessibilityIdentifier, CYLTabBarItemAccessibilityLabel, CYLTabBarItemAccessibilityHint ]) {
+    for (NSString *key in @[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemIdentifier, CYLTabBarItemPageIdentifier,
+                              CYLTabBarItemMinimumAppVersion, CYLTabBarItemAccessibilityIdentifier, CYLTabBarItemAccessibilityLabel, CYLTabBarItemAccessibilityHint ]) {
         if (item[key] && !CYLStringValue(item[key])) {
             CYLLogInvalidConfigurationValue(key, item[key]);
         }
@@ -628,6 +720,18 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
             CYLLogInvalidConfigurationValue(key, attributes[key]);
         }
     }
+    if (item[CYLTabBarItemPageParameters]) {
+        // Protobuf maps arrive as key / value entries. Protobuf 的 map 以 key / value 条目的形式出现。
+        item[CYLTabBarItemPageParameters] = CYLDictionaryFromMapEntries(item[CYLTabBarItemPageParameters]);
+    }
+    if (item[CYLTabBarItemPageParameters] && ![item[CYLTabBarItemPageParameters] isKindOfClass:[NSDictionary class]]) {
+        // Page parameters must be a dictionary (B25). 页面参数必须是字典（B25）。
+        CYLLogInvalidConfigurationValue(CYLTabBarItemPageParameters, item[CYLTabBarItemPageParameters]);
+        item[CYLTabBarItemPageParameters] = nil;
+    }
+    if (item[CYLTabBarItemPlatforms]) {
+        item[CYLTabBarItemPlatforms] = CYLPlatformsValue(item[CYLTabBarItemPlatforms]);
+    }
     CYLWarnUnknownKeys(item, CYLKnownItemKeys());
     if (item[CYLTabBarLottieDarkColors]) {
         id colors = CYLDarkColorsValue(item[CYLTabBarLottieDarkColors]);
@@ -685,6 +789,20 @@ static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id>
     }];
 }
 
+/*!
+ * [EN] A tab bar controller created from a file or a URL must show at least one tab: when no tab found its page (no
+ *      page ID registered, C11), it is an error instead of an empty tab bar.
+ * [CN] 由文件或 URL 创建的 TabBarController 必须至少显示一个 Tab：没有任何 Tab 找到页面时（页面 ID 均未注册，C11）返回错误，而不是空的 TabBar。
+ */
+static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nullable tabBarController) {
+    if (tabBarController.viewControllers.count > 0) {
+        return nil;
+    }
+    return [NSError errorWithDomain:CYLTabBarConfigurationErrorDomain code:CYLTabBarConfigurationErrorNoPages userInfo:@{
+        NSLocalizedDescriptionKey : @"No tab found its page: register the page IDs (CYLTabBarItemPageIdentifier) with CYLTabBarPageRegistry, or adopt CYLTabBarPage.",
+    }];
+}
+
 @implementation CYLTabBarController (CYLConfiguration)
 
 + (NSDictionary<NSString *, id> *)cyl_normalizedConfiguration:(NSDictionary<NSString *, id> *)configuration {
@@ -702,6 +820,16 @@ static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id>
     if (normalized[CYLTabBarControllerViewControllers]) {
         normalized[CYLTabBarControllerViewControllers] = CYLValidViewControllers(normalized[CYLTabBarControllerViewControllers]);
     }
+    if (normalized[CYLTabBarControllerPageRegistry] && ![normalized[CYLTabBarControllerPageRegistry] isKindOfClass:[CYLTabBarPageRegistry class]]) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerPageRegistry, normalized[CYLTabBarControllerPageRegistry]);
+        [normalized removeObjectForKey:CYLTabBarControllerPageRegistry];
+    }
+    Class blockClass = NSClassFromString(@"NSBlock");
+    if (normalized[CYLTabBarControllerPageResolver] && !(blockClass && [normalized[CYLTabBarControllerPageResolver] isKindOfClass:blockClass])) {
+        // Only a block can be called; a string from a file cannot (C15). 只有 block 可以调用；文件中的字符串不行（C15）。
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerPageResolver, normalized[CYLTabBarControllerPageResolver]);
+        [normalized removeObjectForKey:CYLTabBarControllerPageResolver];
+    }
     id items = normalized[CYLTabBarControllerTabBarItemsAttributes];
     if ([items isKindOfClass:[NSDictionary class]]) {
         // One tab: formats without list syntax (Protobuf text, XML) give a dictionary. 只有一个 Tab：没有列表语法的格式（Protobuf 文本、XML）解析为字典。
@@ -712,7 +840,17 @@ static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id>
         if ([items isKindOfClass:[NSArray class]]) {
             for (id item in (NSArray *)items) {
                 if ([item isKindOfClass:[NSDictionary class]]) {
-                    [normalizedItems addObject:CYLNormalizedItemAttributes(item)];
+                    NSDictionary *normalizedItem = CYLNormalizedItemAttributes(item);
+                    NSString *reason = CYLExclusionReason(normalizedItem);
+                    if (reason) {
+                        // A marked placeholder: the tab (and a view controller from code) is left out (B22).
+                        // 带标记的占位：该 Tab（以及代码传入的对应子控制器）会被移除（B22）。
+#if defined(DEBUG) || defined(BETA)
+                        NSLog(@"🟡 CYLTabBarController configuration: the tab %@ is left out on this device: %@.", normalizedItem[CYLTabBarItemTitle] ?: @"", reason);
+#endif
+                        normalizedItem = @{ CYLTabBarItemExcludedKey : @(YES) };
+                    }
+                    [normalizedItems addObject:normalizedItem];
                 } else {
                     // A placeholder keeps the indexes of view controllers passed in code (B4).
                     // 用占位保持与代码传入的子控制器的下标对应（B4）。
@@ -790,7 +928,15 @@ static NSError *_Nullable CYLConfigurationTabsError(NSDictionary<NSString *, id>
     if (!configuration) {
         return nil;
     }
-    return [self initWithConfiguration:configuration];
+    self = [self initWithConfiguration:configuration];
+    NSError *pagesError = CYLConfigurationPagesError(self);
+    if (pagesError) {
+        if (error) {
+            *error = pagesError;
+        }
+        return nil;
+    }
+    return self;
 }
 
 + (instancetype)tabBarControllerWithConfigurationFile:(NSString *)filePath error:(NSError **)error {
@@ -877,7 +1023,8 @@ static void CYLLoadLocalConfiguration(NSURL *_Nullable URL, CYLTabBarConfigurati
     Class tabBarControllerClass = self;
     return [self loadConfigurationWithURLRequest:request completion:^(NSDictionary<NSString *, id> *configuration, NSError *error) {
         CYLTabBarController *tabBarController = configuration ? [[tabBarControllerClass alloc] initWithConfiguration:configuration] : nil;
-        completion(tabBarController, error);
+        NSError *pagesError = configuration ? CYLConfigurationPagesError(tabBarController) : nil;
+        completion(pagesError ? nil : tabBarController, pagesError ?: error);
     }];
 }
 
@@ -889,7 +1036,8 @@ static void CYLLoadLocalConfiguration(NSURL *_Nullable URL, CYLTabBarConfigurati
     Class tabBarControllerClass = self;
     return [self loadConfigurationWithURL:URL completion:^(NSDictionary<NSString *, id> *configuration, NSError *error) {
         CYLTabBarController *tabBarController = configuration ? [[tabBarControllerClass alloc] initWithConfiguration:configuration] : nil;
-        completion(tabBarController, error);
+        NSError *pagesError = configuration ? CYLConfigurationPagesError(tabBarController) : nil;
+        completion(pagesError ? nil : tabBarController, pagesError ?: error);
     }];
 }
 

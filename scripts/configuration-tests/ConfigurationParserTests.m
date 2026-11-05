@@ -48,6 +48,11 @@ static id CYLNormalized(id value) {
         }
         return out;
     }
+    if ([value isKindOfClass:[NSDictionary class]] && [value count] == 2 && [value objectForKey:@"key"] && [value objectForKey:@"value"]) {
+        // A map with one entry (Protobuf text): the library reads it as a one-key dictionary too.
+        // 只有一个条目的 map（Protobuf 文本）：库同样把它读作只有一个键的字典。
+        return [NSDictionary dictionaryWithObject:CYLNormalized([value objectForKey:@"value"]) forKey:[value objectForKey:@"key"]];
+    }
     if ([value isKindOfClass:[NSDictionary class]]) {
         NSMutableDictionary *out = [NSMutableDictionary dictionary];
         NSEnumerator *keys = [value keyEnumerator];

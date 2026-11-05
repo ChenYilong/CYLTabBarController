@@ -62,17 +62,28 @@ CASES = [
  ('B19', '无效的颜色（`CYLTabBarItemTitleColor` 等为错误的十六进制串或数字）', 'An invalid color (`CYLTabBarItemTitleColor`... a wrong hex string or a number)', '接受 UIColor 与 "#RGB" / "#RRGGBB" / "#RRGGBBAA"，其他移除并输出警告', 'UIColor and "#RGB" / "#RRGGBB" / "#RRGGBBAA" are accepted; anything else is removed, with a warning', {'fixed': 8, 'found': 8}),
  ('B20', '无效的字体（字号为 0、NaN、超过 200，或字体名称不存在）', 'An invalid font (size 0, NaN, over 200, or a font name that does not exist)', '字号必须在 1 到 200 之间，字体必须存在，否则移除并输出警告', 'The size must be between 1 and 200 and the font must exist; removed otherwise, with a warning', {'fixed': 8, 'found': 8}),
  ('B21', '空字符串作为 URL、Lottie 文件、图片 URL、类名、颜色或字体（`""`）', 'An empty string (`""`) as a URL, Lottie file, image URL, class, color or font', '视为未提供并输出警告；以前空的 Lottie URL 会传给 +fileURLWithPath:（要求非空路径）', 'Treated as missing, with a warning; an empty Lottie URL used to reach +fileURLWithPath:, which requires a non-empty path', {'fixed': 10, 'found': 9}),
+ ('B22', 'Tab 只适用于其他平台（`CYLTabBarItemPlatforms`），或需要更新的 App 版本（`CYLTabBarItemMinimumAppVersion`）', 'A tab only for other platforms (`CYLTabBarItemPlatforms`), or for a newer app version (`CYLTabBarItemMinimumAppVersion`)', '该 Tab 在 iOS 上不显示；子控制器由代码传入时，连同对应的子控制器一起移除，其余下标仍然对应', 'The tab is left out on iOS; with view controllers from code, its view controller goes too and the other indexes still match', {'fixed': 11, 'found': 11}),
+ ('B23', '`CYLTabBarItemPlatforms` 无效（数字、空字符串、非字符串元素）', 'An invalid `CYLTabBarItemPlatforms` (a number, an empty string, non-string elements)', '忽略并输出警告，该 Tab 在所有平台显示', 'Ignored, with a warning; the tab shows on every platform', {'fixed': 11, 'found': 11}),
+ ('B24', '`CYLTabBarItemMinimumAppVersion` 无效（"abc"、"2.x"），或按字符串比较会出错（"2.10" 与 "2.9"）', 'An invalid `CYLTabBarItemMinimumAppVersion` ("abc", "2.x"), or one a string comparison gets wrong ("2.10" vs "2.9")', '按数字逐段比较；无效版本被忽略并输出警告', 'Compared number by number; an invalid version is ignored, with a warning', {'fixed': 11, 'found': 11}),
+ ('B25', '`CYLTabBarItemPageParameters` 不是字典', '`CYLTabBarItemPageParameters` is not a dictionary', '移除并输出警告；Protobuf 的 key / value 条目转换为字典', 'Removed, with a warning; Protobuf key / value entries become a dictionary', {'fixed': 11, 'found': 11}),
  # C. View controllers 子控制器
- ('C1', '子控制器类不存在', 'The view controller class does not exist', '使用 UIViewController 并输出警告', 'UIViewController and a warning', {'fixed': 1}),
- ('C2', '类不是 UIViewController（如 NSString）', 'The class is not a UIViewController (e.g. NSString)', '使用 UIViewController 并输出警告', 'UIViewController and a warning', {'fixed': 1}),
- ('C3', '子控制器类是 UITabBarController / UINavigationController / UIAlertController 等容器', 'The class is a container: UITabBarController, UINavigationController, UIAlertController...', '拒绝并使用 UIViewController', 'Refused; UIViewController is used', {'fixed': 4}),
- ('C4', '子控制器的 -init 抛出异常', 'The view controller\'s -init raises an exception', '捕获异常并使用 UIViewController', 'The exception is caught; UIViewController is used', {'fixed': 4}),
- ('C5', '导航控制器类无效', 'An invalid navigation controller class', '不嵌入导航控制器', 'Not embedded', {'fixed': 1}),
+ ('C1', '子控制器类不存在', 'The view controller class does not exist', '使用 UIViewController 并输出警告', 'UIViewController and a warning', {'fixed': 1, 'removed': 11}),
+ ('C2', '类不是 UIViewController（如 NSString）', 'The class is not a UIViewController (e.g. NSString)', '使用 UIViewController 并输出警告', 'UIViewController and a warning', {'fixed': 1, 'removed': 11}),
+ ('C3', '子控制器类是 UITabBarController / UINavigationController / UIAlertController 等容器', 'The class is a container: UITabBarController, UINavigationController, UIAlertController...', '拒绝并使用 UIViewController', 'Refused; UIViewController is used', {'fixed': 4, 'removed': 11}),
+ ('C4', '子控制器的 -init 抛出异常', 'The view controller\'s -init raises an exception', '捕获异常并使用 UIViewController', 'The exception is caught; UIViewController is used', {'fixed': 4, 'removed': 11}),
+ ('C5', '导航控制器类无效', 'An invalid navigation controller class', '不嵌入导航控制器', 'Not embedded', {'fixed': 1, 'removed': 11}),
  ('C6', '`CYLTabBarControllerViewControllers` 中有非控制器对象', '`CYLTabBarControllerViewControllers` holds objects that are not view controllers', '移除这些对象；以前会崩溃', 'They are removed; this used to crash', {'fixed': 2}),
  ('C7', '同一个子控制器出现两次', 'The same view controller twice', '移除重复项；以前 UIKit 会抛异常', 'The duplicate is removed; UIKit used to raise', {'fixed': 2}),
  ('C8', '子控制器数量与 Tab 数量不一致', 'More or fewer view controllers than tabs', '本库按下标保护，不越界', 'The library checks indexes, no out-of-bounds access', {'fixed': 1}),
  ('C9', '`CYLTabBarControllerViewControllers` 为空数组', '`CYLTabBarControllerViewControllers` is an empty list', '视为未提供，根据 Tab 创建子控制器', 'Treated as missing: the view controllers are created from the tabs', {'fixed': 6, 'found': 5}),
  ('C10', '没有 URL 的 NSURLRequest，或代码中传入 nil 请求 / URL（声明为 nonnull）', 'An NSURLRequest without a URL, or a nil request / URL from code (declared nonnull)', '返回 FileNotFound 错误；本地与缺失 URL 由同一个文件内私有函数处理，不再把 nil 传给 nonnull 参数（CI 静态分析 nullability.NullPassedToNonnull）', 'A FileNotFound error; local and missing URLs go through one file-private function, so nil never reaches a nonnull parameter (CI static analyzer, nullability.NullPassedToNonnull)', {'fixed': 10, 'found': 9}),
+ ('C11', 'Tab 的页面 ID 没有注册，或 Tab 没有任何 ID', 'A tab\'s page ID is not registered, or the tab has no ID at all', '跳过该 Tab 并输出警告；由文件或 URL 创建且没有任何 Tab 找到页面时，返回 NoPages 错误（11）', 'The tab is skipped, with a warning; from a file or a URL, when no tab finds its page, a NoPages error (11)', {'fixed': 11, 'found': 11}),
+ ('C12', '页面提供者抛出 Objective-C 异常', 'A page provider raises an Objective-C exception', '捕获异常，跳过该 Tab', 'The exception is caught; the tab is skipped', {'fixed': 11, 'found': 11}),
+ ('C13', '页面提供者返回 nil、非控制器对象、TabBarController、已属于其他容器的页面，或两个 Tab 返回同一个页面', 'A page provider returns nil, an object that is not a view controller, a tab bar controller, a page that belongs to another container, or one page for two tabs', '拒绝并跳过该 Tab，UIKit 不会移动或嵌套页面', 'Refused and the tab skipped; UIKit never moves or nests the page', {'fixed': 11, 'found': 11}),
+ ('C14', '两个遵守 `CYLTabBarPage` 的类声明同一个页面 ID', 'Two classes that adopt `CYLTabBarPage` claim the same page ID', '按类名顺序使用第一个，DEBUG 下输出警告；扫描只读取类信息，不触发 +initialize', 'The first in class name order is used, with a warning in DEBUG; the scan only reads class data, no +initialize runs', {'fixed': 11, 'found': 11}),
+ ('C15', '`CYLTabBarControllerPageRegistry` / `CYLTabBarControllerPageResolver` 类型错误（例如文件中的字符串）', '`CYLTabBarControllerPageRegistry` / `CYLTabBarControllerPageResolver` of the wrong type (e.g. a string from a file)', '忽略并输出警告，继续使用全局注册表', 'Ignored, with a warning; the shared registry is still used', {'fixed': 11, 'found': 11}),
+ ('C16', '多个 TabBar 把同一个页面 ID 对应到不同页面', 'Several tab bars map one page ID to different pages', '每个 TabBar 传入自己的 `CYLTabBarControllerPageRegistry`，先于全局注册表查找', 'Each tab bar passes its own `CYLTabBarControllerPageRegistry`, looked up before the shared registry', {'fixed': 11, 'found': 11}),
+ ('C17', '重复的 Tab 标识被改名后，页面 ID 也随之改变', 'A duplicate tab identifier, once renamed, changes the page ID too', '改名前把原标识保存为 `CYLTabBarItemPageIdentifier`，页面仍能找到', 'The original identifier is kept as `CYLTabBarItemPageIdentifier` before renaming, so the page is still found', {'fixed': 11, 'found': 11}),
  # D. Network 网络
  ('D1', 'URL 为 nil', 'A nil URL', '回调返回 FileNotFound 错误', 'The completion gets a FileNotFound error', {'fixed': 1}),
  ('D2', '不支持的 scheme 或无效 URL', 'An unsupported scheme or an invalid URL', '回调返回 Network 错误', 'The completion gets a Network error', {'fixed': 1}),
@@ -110,6 +121,8 @@ ROUNDS = {
      'With the tests kept as scripts/configuration-tests/run-tests.sh, the suite found a regression of round 4 (A17): the retry of A7 read a list in a .json file, invalid TOML and badly indented YAML as .properties, a TOML table or Protobuf text, hiding their errors. Fixed; every test passes.'),
  9: ('首次在 iOS CI 上运行静态分析：发现 `-loadConfigurationWithURLRequest:` 会把 nil URL 传给声明为 nonnull 的参数（C10）。据此复查所有 nil 与 nonnull 的边界，另发现空字符串作为 Lottie URL 会传给 +fileURLWithPath:（B21）。总分下降。',
      'The static analyzer ran on iOS CI for the first time: `-loadConfigurationWithURLRequest:` passed a nil URL to a nonnull parameter (C10). A review of every nil / nonnull boundary then found that an empty string as a Lottie URL reached +fileURLWithPath: (B21). The score dropped.'),
+ 11: ('页面改为由跨端页面 ID 获得：删除类名键（`CYLTabBarItemViewControllerClass`、`…NavigationControllerClass`，未发布），C1–C5 随之不再适用；新增 `CYLTabBarPageRegistry`（全局与每个 TabBar 各一份）、`CYLTabBarControllerPageResolver`、自动注册的 `CYLTabBarPage`，以及远程配置字段 `CYLTabBarItemPlatforms`、`CYLTabBarItemMinimumAppVersion`、`CYLTabBarItemPageParameters`。设计时列出的新情况 B22–B25、C11–C17 在同一轮处理。',
+     'Pages now come from cross-platform page IDs: the class-name keys (`CYLTabBarItemViewControllerClass`, `…NavigationControllerClass`, unreleased) are removed, so C1–C5 no longer apply; new `CYLTabBarPageRegistry` (global and one per tab bar), `CYLTabBarControllerPageResolver`, automatically registered `CYLTabBarPage` classes, and the remote keys `CYLTabBarItemPlatforms`, `CYLTabBarItemMinimumAppVersion`, `CYLTabBarItemPageParameters`. The new cases listed during the design, B22–B25 and C11–C17, are handled in the same round.'),
  10: ('修复 C10 与 B21：本地 / 缺失 URL 由 CYLLoadLocalConfiguration() 统一处理，空字符串不再生成 file URL，演示中的请求不会带 nil URL；演示新增“B21 · Empty strings”与“C10 · Request without a URL”两行。全部情况均已处理。',
      'C10 and B21 fixed: local / missing URLs go through CYLLoadLocalConfiguration(), an empty string no longer becomes a file URL, the demo never builds a request with a nil URL; two demo rows added, "B21 · Empty strings" and "C10 · Request without a URL". Every case is handled.'),
 }
@@ -117,7 +130,8 @@ ROUNDS = {
 
 def status(case, round_):
     info = case[5]
-    if info.get('found', 1) > round_:
+    if info.get('found', 1) > round_ or info.get('removed', 99) <= round_:
+        # Not known yet, or no longer applies (e.g. the class-name keys, removed in round 11). 尚未发现，或已不再适用（例如第 11 轮删除的类名键）。
         return None
     if info['fixed'] <= round_:
         return 1.0

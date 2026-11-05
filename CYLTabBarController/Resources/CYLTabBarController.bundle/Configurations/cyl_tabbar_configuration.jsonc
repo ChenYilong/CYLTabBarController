@@ -5,17 +5,18 @@
   "CYLTabBarControllerStyleType": "default",
   "CYLTabBarControllerImageInsets": "{0, 0, 0, 0}",
   "CYLTabBarControllerTitlePositionAdjustment": "{0, -2}",
-  "CYLTabBarControllerNavigationControllerClass": "UINavigationController",
   "CYLTabBarControllerTabBarItemsAttributes": [
     { "CYLTabBarItemTitle": "JSONC", "CYLTabBarItemImage": "system:house", "CYLTabBarItemSelectedImage": "system:house.fill",
-      "CYLTabBarItemIdentifier": "home", "CYLTabBarItemViewControllerClass": "UIViewController" },
+      "CYLTabBarItemIdentifier": "home" },
     { "CYLTabBarItemTitle": "Message", "CYLTabBarItemImage": "system:message", "CYLTabBarItemSelectedImage": "system:message.fill",
-      "CYLTabBarItemIdentifier": "message", "CYLTabBarItemViewControllerClass": "UIViewController" },
+      "CYLTabBarItemIdentifier": "message", "CYLTabBarItemPlatforms": "ios,android" },
     { "CYLTabBarItemTitle": "Discover", "CYLTabBarItemImage": "system:safari", "CYLTabBarItemSelectedImage": "system:safari.fill",
-      "CYLTabBarItemIdentifier": "discover", "CYLTabBarItemViewControllerClass": "UIViewController",
+      "CYLTabBarItemIdentifier": "discover",
+      "CYLTabBarItemPageIdentifier": "web", "CYLTabBarItemPageParameters": { "url": "https://github.com/ChenYilong/CYLTabBarController" },
       "CYLTabBarItemImageInsets": "{1, 0, -1, 0}" },
     { "CYLTabBarItemTitle": "Me", "CYLTabBarItemImage": "system:person", "CYLTabBarItemSelectedImage": "system:person.fill",
-      "CYLTabBarItemIdentifier": "me", "CYLTabBarItemViewControllerClass": "UIViewController",
+      "CYLTabBarItemIdentifier": "me",
+      "CYLTabBarItemMinimumAppVersion": "1.0.0",
       "CYLTabBarItemTitlePositionAdjustment": "{0, -1}", }, /* trailing commas 尾逗号 */
   ],
 }

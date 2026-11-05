@@ -315,3 +315,5 @@
 "仅配色" = "仅配色";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "点我";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。";
+"两个 TabBar，同一个页面 ID" = "两个 TabBar，同一个页面 ID";

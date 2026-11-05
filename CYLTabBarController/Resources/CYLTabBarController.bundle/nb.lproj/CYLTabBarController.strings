@@ -315,3 +315,5 @@
 "仅配色" = "Bare farger";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Trykk her";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "To fanelinjer deler én konfigurasjon; registeret til hver av dem kobler de samme side-ID-ene til ulike sider.";
+"两个 TabBar，同一个页面 ID" = "To fanelinjer, én side-ID";

@@ -121,7 +121,7 @@ python3 scripts/export-tabbar-configurations.py
 | `CYLLocalizedTabBarItemsAttributes(titles, images, selectedImages, darkImages)` | 每个 Tab 的标题与图片 / each tab's title and images |
 | `CYLTabBarItemsAttributesAddingLottieFiles(items, names, nil)` | `CYLTabBarLottieFilePath`，存在 `_dark.json` 时加 `CYLTabBarLottieDarkFilePath` / plus the dark file when `_dark.json` exists |
 | `["A", "B"].map { layer in ["\(layer)_Normal.**.Color": UIColor(...)] }` | 每个 Tab 的 `CYLTabBarLottieDarkColors` |
-| `[[HomeViewController alloc] init]`、`HomeViewController()`、`UINavigationController(rootViewController:)` | `CYLTabBarItemViewControllerClass`（数量与 Tab 一致时）、`CYLTabBarControllerNavigationControllerClass` |
+| `[[CYLHomeViewController alloc] init]`、`HomeViewController()` | 没有 `CYLTabBarItemIdentifier` 的 Tab 写入由类名生成的 `CYLTabBarItemPageIdentifier`（`CYLHomeViewController` → `home`），报告列出每个页面 ID 需要注册的类（数量与 Tab 一致时）/ a tab without `CYLTabBarItemIdentifier` gets a `CYLTabBarItemPageIdentifier` made from the class name (`CYLHomeViewController` → `home`), and the report lists the class to register for each page ID (when there are as many classes as tabs) |
 | `context:@"Home"`、`styleType = CYLTabBarStyleTypeLiquidGlass`、`tabBarStyleType = .flatDesign`、`titlePositionAdjustment = UIOffsetMake(...)` | 对应的顶层键 / the matching top-level keys |
 
 ### [CN]报告与限制
@@ -131,7 +131,7 @@ python3 scripts/export-tabbar-configurations.py
 |:---|:---|
 | 每个源文件输出一行结果和一份报告。只在运行时才有的值（变量、枚举、方法调用、计算属性）无法从源码读取：不会写入，并在报告中说明，因此文件只会不完整，不会出错。例如 `- CYLTabBarItemTitle = module.title: only known at runtime; left out`。 | Each source file prints one line and a report. Values that only exist at runtime (variables, enums, method calls, computed properties) cannot be read from the source: they are left out and reported, so a file can be incomplete, never wrong. For example `- CYLTabBarItemTitle = module.title: only known at runtime; left out`. |
 | 所有 Tab 都在运行时生成时（如 `Example-Swift-SwiftManager-FlatDesign`），脚本报告 “the tabs are built at runtime” 且不生成文件。 | When every tab is built at runtime (e.g. `Example-Swift-SwiftManager-FlatDesign`), the script reports "the tabs are built at runtime" and writes no file. |
-| 子控制器类只在数量与 Tab 一致时写入；否则报告并使用 `UIViewController`，可以手动补上 `CYLTabBarItemViewControllerClass`。Swift 类在运行时也会按 `模块名.类名` 查找。 | View controller classes are written only when there are as many as tabs; otherwise the report says so and the tabs use `UIViewController`: add `CYLTabBarItemViewControllerClass` by hand. Swift classes are also looked up as `Module.Name` at runtime. |
+| 类名不会写入文件（不跨端）：页面由页面 ID 获得，报告中的 `page "home": register it to CYLHomeViewController` 说明了需要在 App 中注册什么（见 [页面注册表](Tab-Page-Registry.md)）。类与 Tab 数量不一致时，报告提示为每个 Tab 补上 `CYLTabBarItemPageIdentifier`。 | Class names are not written (they are not cross-platform): pages come from page IDs, and a report line such as `page "home": register it to CYLHomeViewController` says what to register in the app (see [the page registry](Tab-Page-Registry.md)). When the classes do not match the tabs, the report asks for a `CYLTabBarItemPageIdentifier` on each tab. |
 | 标题写入的是本地化 key（如 `首页`）：文件中的标题不会自动本地化，需要多语言时为每种语言准备一个文件，或在读取后替换标题。 | Titles are written as their localization keys (e.g. `首页`): titles in a file are not localized automatically; for several languages, ship one file per language or replace the titles after reading. |
 | PlusButton 不在配置中描述，仍按 `context` 注册。 | The plus button is not part of a configuration: it is still registered by `context`. |
 

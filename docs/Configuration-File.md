@@ -74,29 +74,31 @@ let tabBarController = CYLTabBarController(configuration: [
 | 中文 | English |
 |:---|:---|
 | 现有的所有初始化方法都改为调用 `-initWithConfiguration:`，行为不变。子类若要统一定制所有初始化方式，请重写 `-initWithConfiguration:`。 | Every existing initializer now calls `-initWithConfiguration:`, with no change in behavior. A subclass that wants to customize every way of initializing overrides `-initWithConfiguration:`. |
-| 缺少的键使用其他初始化方法的默认值。没有 `CYLTabBarControllerViewControllers` 时，根据每个 item 的 `CYLTabBarItemViewControllerClass` 创建子控制器（配置文件中只能这样写）。 | Missing keys take the defaults of the other initializers. Without `CYLTabBarControllerViewControllers`, the view controllers are created from each item's `CYLTabBarItemViewControllerClass` (the only way in a file). |
-| ⚠️ 类名方案不跨端（Android 类名不同）、一个类无法对应多个对象、只能用 `-init` 创建。替代设计（跨端 ID + 页面注册表 + 由配置决定顺序）的调研见 [调研：配置文件中的 Tab 如何对应到页面对象](Tab-View-Controller-Resolution-Research.md)，确定方案前这两个类名键可能改变。 | ⚠️ Class names are not cross-platform (Android classes differ), cannot map one class to several objects, and only use `-init`. The research on a replacement (cross-platform IDs + a page registry + order from the configuration) is in [Research: how a tab in a configuration file finds its page object](Tab-View-Controller-Resolution-Research.md); the class-name keys may change until a design is chosen. |
+| 缺少的键使用其他初始化方法的默认值。没有 `CYLTabBarControllerViewControllers` 时，每个 Tab 的页面根据其跨端页面 ID 获得（`CYLTabBarItemPageIdentifier`，未设置时为 `CYLTabBarItemIdentifier`）：App 用 `CYLTabBarPageRegistry` 注册每个 ID 创建什么页面，找不到页面的 Tab 会被跳过。完整说明见 [按页面 ID 获得 Tab 页面（页面注册表）](Tab-Page-Registry.md)。 | Missing keys take the defaults of the other initializers. Without `CYLTabBarControllerViewControllers`, each tab's page comes from its cross-platform page ID (`CYLTabBarItemPageIdentifier`, else `CYLTabBarItemIdentifier`): the app registers what each ID creates with `CYLTabBarPageRegistry`, and a tab whose page is not found is skipped. See [Tab pages from page IDs (the page registry)](Tab-Page-Registry.md). |
 
 ### [CN]配置键
 ### [EN]Configuration keys
 
 | 键 Key | 代码中的类型 Type in code | 文件中的写法 In a file | 默认值 Default |
 |:---|:---|:---|:---|
-| `CYLTabBarControllerViewControllers` | `NSArray<UIViewController *>` | 不支持（仅代码） / not supported (code only) | 根据 item 创建 / created from the items |
+| `CYLTabBarControllerViewControllers` | `NSArray<UIViewController *>`，按下标对应 / matched by index | 不支持（仅代码） / not supported (code only) | 按页面 ID 获得 / from the page IDs |
 | `CYLTabBarControllerTabBarItemsAttributes` | `NSArray<NSDictionary *>` | 字典数组 / a list of dictionaries | `@[]` |
 | `CYLTabBarControllerImageInsets` | `NSValue` (UIEdgeInsets) | `"{top, left, bottom, right}"`、`[t, l, b, r]`、`{top: …}` | `UIEdgeInsetsZero` |
 | `CYLTabBarControllerTitlePositionAdjustment` | `NSValue` (UIOffset) | `"{horizontal, vertical}"`、`[h, v]`、`{horizontal: …}` | `UIOffsetZero` |
 | `CYLTabBarControllerStyleType` | `NSNumber` (CYLTabBarStyleType) | `default`、`system`、`flatDesign`、`liquidGlass` 或数字 / or a number | `default` |
 | `CYLTabBarControllerContext` | `NSString` | 字符串 / a string | `nil` |
-| `CYLTabBarControllerNavigationControllerClass` | `NSString` | 例如 / e.g. `UINavigationController` | 不嵌入 / not embedded |
+| `CYLTabBarControllerPageRegistry` | `CYLTabBarPageRegistry` | 不支持（仅代码） / not supported (code only) | `nil`：只用全局注册表 / the shared registry only |
+| `CYLTabBarControllerPageResolver` | `CYLTabBarPageProvider` block | 不支持（仅代码） / not supported (code only) | `nil` |
 
 ### [CN]新增的 item 键与文件中的写法
 ### [EN]New item keys and file values
 
 | 键 Key | 说明 | Description |
 |:---|:---|:---|
-| `CYLTabBarItemViewControllerClass` | Tab 子控制器的类名，用 `-init` 创建，默认 `UIViewController`。Swift 类可写类名或 `模块名.类名`，建议加 `@objc(类名)`。 | The tab's view controller class, created with `-init`; default `UIViewController`. A Swift class: its name or `Module.Name`; adding `@objc(Name)` is safest. |
-| `CYLTabBarItemNavigationControllerClass` | 覆盖该 Tab 的导航控制器类；`""` 或 `none` 表示不嵌入。 | Overrides the navigation controller class for this tab; `""` or `none`: not embedded. |
+| `CYLTabBarItemPageIdentifier` | Tab 页面的跨端 ID，例如 `"web"`；未设置或为 `""` 时使用 `CYLTabBarItemIdentifier`。见 [页面注册表](Tab-Page-Registry.md)。 | The cross-platform ID of the tab's page, e.g. `"web"`; missing or `""`: `CYLTabBarItemIdentifier`. See [the page registry](Tab-Page-Registry.md). |
+| `CYLTabBarItemPageParameters` | 字典，随 Tab 的属性传给页面提供者，例如 `{url: "https://…"}`；不是字典时移除（B25）。 | A dictionary passed to the page provider with the tab's attributes, e.g. `{url: "https://…"}`; removed when it is not a dictionary (B25). |
+| `CYLTabBarItemPlatforms` | 字符串数组或逗号分隔的字符串，例如 `"ios,android"`；不含 `ios` 时 iOS 上不显示该 Tab（B22）。 | A list of strings or a comma-separated string, e.g. `"ios,android"`; without `ios`, the tab is left out on iOS (B22). |
+| `CYLTabBarItemMinimumAppVersion` | 例如 `"2.3.0"`；App 版本更低时不显示该 Tab，按数字逐段比较（B22、B24）。 | E.g. `"2.3.0"`; the tab is left out when the app is older, compared number by number (B22, B24). |
 | 图片键 / image keys | `CYLTabBarItemImage` 等支持 `"system:house.fill"`（SF Symbol，iOS 13+）或图片名称。 | `CYLTabBarItemImage` and the like take `"system:house.fill"` (an SF Symbol, iOS 13+) or an image name. |
 | `CYLTabBarItemImageInsets` 等 | 与上表相同的 `"{…}"`、数组或字典写法。 | The same `"{…}"`, list or dictionary forms as above. |
 | `CYLTabBarItemImageURLSize`、`CYLTabBarLottieSize` | `"{width, height}"`、`[w, h]` 或 `{width: …}`。 | `"{width, height}"`, `[w, h]` or `{width: …}`. |
@@ -167,16 +169,22 @@ A YAML file 一个 YAML 文件：
 CYLTabBarControllerContext: CYLConfigurationDemo
 CYLTabBarControllerStyleType: default
 CYLTabBarControllerTitlePositionAdjustment: "{0, -2}"
-CYLTabBarControllerNavigationControllerClass: UINavigationController
 CYLTabBarControllerTabBarItemsAttributes:
   - CYLTabBarItemTitle: Home
     CYLTabBarItemImage: system:house
     CYLTabBarItemSelectedImage: system:house.fill
-    CYLTabBarItemViewControllerClass: HomeViewController
+    CYLTabBarItemIdentifier: home            # page ID "home" 页面 ID "home"
+  - CYLTabBarItemTitle: Discover
+    CYLTabBarItemImage: system:safari
+    CYLTabBarItemIdentifier: discover
+    CYLTabBarItemPageIdentifier: web         # page ID "web" 页面 ID "web"
+    CYLTabBarItemPageParameters:
+      url: https://github.com/ChenYilong/CYLTabBarController
   - CYLTabBarItemTitle: Me
     CYLTabBarItemImage: system:person
     CYLTabBarItemSelectedImage: system:person.fill
-    CYLTabBarItemViewControllerClass: MeViewController
+    CYLTabBarItemIdentifier: me
+    CYLTabBarItemMinimumAppVersion: "1.0.0"
     CYLTabBarItemTitlePositionAdjustment: [0, -1]
 ```
 
@@ -189,7 +197,8 @@ CYLTabBarControllerTitlePositionAdjustment = "{0, -2}"
 [[CYLTabBarControllerTabBarItemsAttributes]]
 CYLTabBarItemTitle = "Home"
 CYLTabBarItemImage = "system:house"
-CYLTabBarItemViewControllerClass = "HomeViewController"
+CYLTabBarItemIdentifier = "home"
+CYLTabBarItemPlatforms = "ios,android"
 ```
 
 ### [CN]Protocol Buffers
@@ -198,7 +207,7 @@ CYLTabBarItemViewControllerClass = "HomeViewController"
 | 中文 | English |
 |:---|:---|
 | 二进制 protobuf 只保存字段编号，因此需要结构定义。本库内置了 `cyl_tabbar_configuration.proto`（位于示例文件目录），字段名即配置键，字段编号永不改变；解析器自带解码器，App 不需要引入 protobuf 运行库。服务器可以用任何语言的官方 protobuf 库生成 `.binpb`，`Content-Type` 为 `application/x-protobuf` 时也能识别。未知字段（例如更新的结构定义中新增的字段）会被跳过。 | Binary protobuf only stores field numbers, so it needs a schema. The library has `cyl_tabbar_configuration.proto` built in (in the sample folder): its field names are the configuration keys and its field numbers never change; the parser has its own decoder, so the app needs no protobuf runtime. A server can write `.binpb` with the official protobuf library of any language; a `Content-Type` of `application/x-protobuf` is recognized too. Unknown fields (e.g. added by a newer schema) are skipped. |
-| 文本格式不需要结构定义。protobuf 的 `map` 在文本格式中写作多个 `{ key: … value: … }` 条目，`CYLTabBarLottieDarkColors` 会自动转换为字典；只有一个 Tab 时（文本格式没有列表语法）也会自动当作列表。 | The text format needs no schema. A protobuf `map` is written as `{ key: … value: … }` entries in the text format: `CYLTabBarLottieDarkColors` turns them into a dictionary; with a single tab (the text format has no list syntax) the tab is taken as a list too. |
+| 文本格式不需要结构定义。protobuf 的 `map` 在文本格式中写作多个 `{ key: … value: … }` 条目，`CYLTabBarLottieDarkColors` 与 `CYLTabBarItemPageParameters` 会自动转换为字典；只有一个 Tab 时（文本格式没有列表语法）也会自动当作列表。 | The text format needs no schema. A protobuf `map` is written as `{ key: … value: … }` entries in the text format: `CYLTabBarLottieDarkColors` and `CYLTabBarItemPageParameters` turn them into a dictionary; with a single tab (the text format has no list syntax) the tab is taken as a list too. |
 | 用 protoc 由文本格式生成二进制：`protoc --encode=cyl.CYLTabBarConfiguration cyl_tabbar_configuration.proto < cyl_tabbar_configuration.textproto > cyl_tabbar_configuration.binpb` | Encode the text format with protoc: `protoc --encode=cyl.CYLTabBarConfiguration cyl_tabbar_configuration.proto < cyl_tabbar_configuration.textproto > cyl_tabbar_configuration.binpb` |
 
 ```textproto
@@ -207,7 +216,7 @@ CYLTabBarControllerContext: "CYLConfigurationDemo"
 CYLTabBarControllerTabBarItemsAttributes {
   CYLTabBarItemTitle: "Home"
   CYLTabBarItemImage: "system:house"
-  CYLTabBarItemViewControllerClass: "HomeViewController"
+  CYLTabBarItemIdentifier: "home"
 }
 CYLTabBarControllerTabBarItemsAttributes {
   CYLTabBarItemTitle: "Me"
@@ -228,7 +237,7 @@ flowchart TD
     C --> N["+cyl_normalizedConfiguration:<br/>strings → NSValue / UIImage / NSURL / UIColor"]
     N --> I["-initWithConfiguration:"]
     O["Existing initializers<br/>现有初始化方法"] --> I
-    I --> V["View controllers from<br/>CYLTabBarItemViewControllerClass<br/>（未传入子控制器时）"]
+    I --> V["Pages from page IDs 页面 ID → 页面<br/>CYLTabBarPageRegistry<br/>（未传入子控制器时 / without view controllers）"]
     I --> T["CYLTabBarController"]
 ```
 
@@ -239,7 +248,7 @@ flowchart TD
 |:---|:---|
 | Example 的设置列表中“跳转与对比”分组的第一行“从配置文件创建 TabBarController”：选择 17 个示例文件之一（JSON、JSON5、JSONC、XML / 二进制 / OpenStep plist、.strings、YAML、YML、TOML、INI、CFG、.properties、.env、XML、Protobuf 文本与二进制），或“从网络 URL 加载”（GitHub 上的 YAML 示例）。生成的 TabBarController 全屏展示，每个页面显示其来源文件的内容，左上角“关闭”返回。 | In the Example's settings list, the first row of the "Navigation and comparisons" section, "Create a TabBarController from a configuration file": choose one of the 17 sample files (JSON, JSON5, JSONC, XML / binary / OpenStep plist, .strings, YAML, YML, TOML, INI, CFG, .properties, .env, XML, Protobuf text and binary), or "Load from a URL" (the YAML sample on GitHub). The tab bar controller it creates is presented full screen; every page shows the file it came from, and Close (top left) goes back. |
 | 演示代码：`UIViewController+CYLConfigurationDemo.h/.m`；示例 URL 在合并到 master 后可用。 | Demo code: `UIViewController+CYLConfigurationDemo.h/.m`; the sample URL works once this is merged into master. |
-| “配置文件：模拟意外情况”分组：36 行，每行把一种损坏、恶意或特殊的输入交给真实 API（空文件、只有注释、语法错误、编码错误、UTF-16、嵌套 1 万层、6 MB 文件、没有 Tab、HTML 页面、错误的类型与 null、NaN、未知样式、不存在或错误的类、容器类、无效 URL 与 Lottie 文件、重复标识、拼写错误、无效的颜色与字体、空字符串、截断的 protobuf、损坏的二进制 plist、XXE、文件不存在、后台线程、代码中的非控制器对象与非字典配置、空的子控制器列表、HTTP 404、域名无法解析、3 秒超时、请求取消、没有 URL 的请求、网络返回 HTML）。行标题以下方“边界情况与评分”表格中的编号开头；结果显示在该行下方并弹窗说明，成功创建的控制器可点“查看”打开。 | The "Configuration: simulated failures" section: 36 rows, each feeding one broken, hostile or unusual input to the real API (an empty file, comments only, a syntax error, a bad encoding, UTF-16, 10,000 levels of nesting, a 6 MB file, no tabs, an HTML page, wrong types and null, NaN, an unknown style, missing or wrong classes, a container class, invalid URLs and Lottie files, duplicate identifiers, typos, invalid colors and fonts, empty strings, a truncated protobuf, a corrupted binary plist, XXE, a missing file, a background thread, objects that are not view controllers and a configuration that is not a dictionary in code, an empty view controller list, HTTP 404, an unknown host, a 3 s timeout, a cancelled request, a request without a URL, HTML from the network). Each row starts with the ID of its case in the "Edge cases and score" table below; the outcome shows under the row and in an alert, and a controller that was created can be opened with "View". |
+| “配置文件：模拟意外情况”分组：41 行，每行把一种损坏、恶意或特殊的输入交给真实 API（空文件、只有注释、语法错误、编码错误、UTF-16、嵌套 1 万层、6 MB 文件、没有 Tab、HTML 页面、错误的类型与 null、NaN、未知样式、未注册的页面 ID、抛出异常或返回无效页面的提供者、自动注册（`CYLTabBarPage`）、类型错误的注册表、两个 TabBar 共用页面 ID、其他平台与更高版本的 Tab、无效的平台 / 版本 / 页面参数、无效 URL 与 Lottie 文件、重复标识、拼写错误、无效的颜色与字体、空字符串、截断的 protobuf、损坏的二进制 plist、XXE、文件不存在、后台线程、代码中的非控制器对象与非字典配置、空的子控制器列表、HTTP 404、域名无法解析、3 秒超时、请求取消、没有 URL 的请求、网络返回 HTML）。行标题以下方“边界情况与评分”表格中的编号开头；结果显示在该行下方并弹窗说明，成功创建的控制器可点“查看”打开。 | The "Configuration: simulated failures" section: 41 rows, each feeding one broken, hostile or unusual input to the real API (an empty file, comments only, a syntax error, a bad encoding, UTF-16, 10,000 levels of nesting, a 6 MB file, no tabs, an HTML page, wrong types and null, NaN, an unknown style, unregistered page IDs, providers that raise or return invalid pages, automatic registration (`CYLTabBarPage`), a registry of the wrong type, two tab bars sharing page IDs, tabs for other platforms and newer versions, invalid platforms / versions / page parameters, invalid URLs and Lottie files, duplicate identifiers, typos, invalid colors and fonts, empty strings, a truncated protobuf, a corrupted binary plist, XXE, a missing file, a background thread, objects that are not view controllers and a configuration that is not a dictionary in code, an empty view controller list, HTTP 404, an unknown host, a 3 s timeout, a cancelled request, a request without a URL, HTML from the network). Each row starts with the ID of its case in the "Edge cases and score" table below; the outcome shows under the row and in an alert, and a controller that was created can be opened with "View". |
 
 ## [CN]把代码中的配置导出为配置文件
 ## [EN]Export the configuration written in code to files
@@ -340,16 +349,22 @@ python3 scripts/export-tabbar-configurations.py --check               # exit 1 w
 | B19 | 无效的颜色（`CYLTabBarItemTitleColor` 等为错误的十六进制串或数字） | An invalid color (`CYLTabBarItemTitleColor`... a wrong hex string or a number) | 接受 UIColor 与 "#RGB" / "#RRGGBB" / "#RRGGBBAA"，其他移除并输出警告 | UIColor and "#RGB" / "#RRGGBB" / "#RRGGBBAA" are accepted; anything else is removed, with a warning | ✅ 第 8 轮 / round 8 |
 | B20 | 无效的字体（字号为 0、NaN、超过 200，或字体名称不存在） | An invalid font (size 0, NaN, over 200, or a font name that does not exist) | 字号必须在 1 到 200 之间，字体必须存在，否则移除并输出警告 | The size must be between 1 and 200 and the font must exist; removed otherwise, with a warning | ✅ 第 8 轮 / round 8 |
 | B21 | 空字符串作为 URL、Lottie 文件、图片 URL、类名、颜色或字体（`""`） | An empty string (`""`) as a URL, Lottie file, image URL, class, color or font | 视为未提供并输出警告；以前空的 Lottie URL 会传给 +fileURLWithPath:（要求非空路径） | Treated as missing, with a warning; an empty Lottie URL used to reach +fileURLWithPath:, which requires a non-empty path | ✅ 第 10 轮 / round 10 |
-| C1 | 子控制器类不存在 | The view controller class does not exist | 使用 UIViewController 并输出警告 | UIViewController and a warning | ✅ 第 1 轮 / round 1 |
-| C2 | 类不是 UIViewController（如 NSString） | The class is not a UIViewController (e.g. NSString) | 使用 UIViewController 并输出警告 | UIViewController and a warning | ✅ 第 1 轮 / round 1 |
-| C3 | 子控制器类是 UITabBarController / UINavigationController / UIAlertController 等容器 | The class is a container: UITabBarController, UINavigationController, UIAlertController... | 拒绝并使用 UIViewController | Refused; UIViewController is used | ✅ 第 4 轮 / round 4 |
-| C4 | 子控制器的 -init 抛出异常 | The view controller's -init raises an exception | 捕获异常并使用 UIViewController | The exception is caught; UIViewController is used | ✅ 第 4 轮 / round 4 |
-| C5 | 导航控制器类无效 | An invalid navigation controller class | 不嵌入导航控制器 | Not embedded | ✅ 第 1 轮 / round 1 |
+| B22 | Tab 只适用于其他平台（`CYLTabBarItemPlatforms`），或需要更新的 App 版本（`CYLTabBarItemMinimumAppVersion`） | A tab only for other platforms (`CYLTabBarItemPlatforms`), or for a newer app version (`CYLTabBarItemMinimumAppVersion`) | 该 Tab 在 iOS 上不显示；子控制器由代码传入时，连同对应的子控制器一起移除，其余下标仍然对应 | The tab is left out on iOS; with view controllers from code, its view controller goes too and the other indexes still match | ✅ 第 11 轮 / round 11 |
+| B23 | `CYLTabBarItemPlatforms` 无效（数字、空字符串、非字符串元素） | An invalid `CYLTabBarItemPlatforms` (a number, an empty string, non-string elements) | 忽略并输出警告，该 Tab 在所有平台显示 | Ignored, with a warning; the tab shows on every platform | ✅ 第 11 轮 / round 11 |
+| B24 | `CYLTabBarItemMinimumAppVersion` 无效（"abc"、"2.x"），或按字符串比较会出错（"2.10" 与 "2.9"） | An invalid `CYLTabBarItemMinimumAppVersion` ("abc", "2.x"), or one a string comparison gets wrong ("2.10" vs "2.9") | 按数字逐段比较；无效版本被忽略并输出警告 | Compared number by number; an invalid version is ignored, with a warning | ✅ 第 11 轮 / round 11 |
+| B25 | `CYLTabBarItemPageParameters` 不是字典 | `CYLTabBarItemPageParameters` is not a dictionary | 移除并输出警告；Protobuf 的 key / value 条目转换为字典 | Removed, with a warning; Protobuf key / value entries become a dictionary | ✅ 第 11 轮 / round 11 |
 | C6 | `CYLTabBarControllerViewControllers` 中有非控制器对象 | `CYLTabBarControllerViewControllers` holds objects that are not view controllers | 移除这些对象；以前会崩溃 | They are removed; this used to crash | ✅ 第 2 轮 / round 2 |
 | C7 | 同一个子控制器出现两次 | The same view controller twice | 移除重复项；以前 UIKit 会抛异常 | The duplicate is removed; UIKit used to raise | ✅ 第 2 轮 / round 2 |
 | C8 | 子控制器数量与 Tab 数量不一致 | More or fewer view controllers than tabs | 本库按下标保护，不越界 | The library checks indexes, no out-of-bounds access | ✅ 第 1 轮 / round 1 |
 | C9 | `CYLTabBarControllerViewControllers` 为空数组 | `CYLTabBarControllerViewControllers` is an empty list | 视为未提供，根据 Tab 创建子控制器 | Treated as missing: the view controllers are created from the tabs | ✅ 第 6 轮 / round 6 |
 | C10 | 没有 URL 的 NSURLRequest，或代码中传入 nil 请求 / URL（声明为 nonnull） | An NSURLRequest without a URL, or a nil request / URL from code (declared nonnull) | 返回 FileNotFound 错误；本地与缺失 URL 由同一个文件内私有函数处理，不再把 nil 传给 nonnull 参数（CI 静态分析 nullability.NullPassedToNonnull） | A FileNotFound error; local and missing URLs go through one file-private function, so nil never reaches a nonnull parameter (CI static analyzer, nullability.NullPassedToNonnull) | ✅ 第 10 轮 / round 10 |
+| C11 | Tab 的页面 ID 没有注册，或 Tab 没有任何 ID | A tab's page ID is not registered, or the tab has no ID at all | 跳过该 Tab 并输出警告；由文件或 URL 创建且没有任何 Tab 找到页面时，返回 NoPages 错误（11） | The tab is skipped, with a warning; from a file or a URL, when no tab finds its page, a NoPages error (11) | ✅ 第 11 轮 / round 11 |
+| C12 | 页面提供者抛出 Objective-C 异常 | A page provider raises an Objective-C exception | 捕获异常，跳过该 Tab | The exception is caught; the tab is skipped | ✅ 第 11 轮 / round 11 |
+| C13 | 页面提供者返回 nil、非控制器对象、TabBarController、已属于其他容器的页面，或两个 Tab 返回同一个页面 | A page provider returns nil, an object that is not a view controller, a tab bar controller, a page that belongs to another container, or one page for two tabs | 拒绝并跳过该 Tab，UIKit 不会移动或嵌套页面 | Refused and the tab skipped; UIKit never moves or nests the page | ✅ 第 11 轮 / round 11 |
+| C14 | 两个遵守 `CYLTabBarPage` 的类声明同一个页面 ID | Two classes that adopt `CYLTabBarPage` claim the same page ID | 按类名顺序使用第一个，DEBUG 下输出警告；扫描只读取类信息，不触发 +initialize | The first in class name order is used, with a warning in DEBUG; the scan only reads class data, no +initialize runs | ✅ 第 11 轮 / round 11 |
+| C15 | `CYLTabBarControllerPageRegistry` / `CYLTabBarControllerPageResolver` 类型错误（例如文件中的字符串） | `CYLTabBarControllerPageRegistry` / `CYLTabBarControllerPageResolver` of the wrong type (e.g. a string from a file) | 忽略并输出警告，继续使用全局注册表 | Ignored, with a warning; the shared registry is still used | ✅ 第 11 轮 / round 11 |
+| C16 | 多个 TabBar 把同一个页面 ID 对应到不同页面 | Several tab bars map one page ID to different pages | 每个 TabBar 传入自己的 `CYLTabBarControllerPageRegistry`，先于全局注册表查找 | Each tab bar passes its own `CYLTabBarControllerPageRegistry`, looked up before the shared registry | ✅ 第 11 轮 / round 11 |
+| C17 | 重复的 Tab 标识被改名后，页面 ID 也随之改变 | A duplicate tab identifier, once renamed, changes the page ID too | 改名前把原标识保存为 `CYLTabBarItemPageIdentifier`，页面仍能找到 | The original identifier is kept as `CYLTabBarItemPageIdentifier` before renaming, so the page is still found | ✅ 第 11 轮 / round 11 |
 | D1 | URL 为 nil | A nil URL | 回调返回 FileNotFound 错误 | The completion gets a FileNotFound error | ✅ 第 1 轮 / round 1 |
 | D2 | 不支持的 scheme 或无效 URL | An unsupported scheme or an invalid URL | 回调返回 Network 错误 | The completion gets a Network error | ✅ 第 1 轮 / round 1 |
 | D3 | HTTP 4xx / 5xx | HTTP 4xx / 5xx | Network 错误，包含状态码 | A Network error with the status code | ✅ 第 1 轮 / round 1 |
@@ -377,6 +392,7 @@ python3 scripts/export-tabbar-configurations.py --check               # exit 1 w
 | 8 | 100 | 60 | 合并 master 后，新增的 11 个 Tab 键（颜色、字体、无障碍）加入配置：文件中颜色写作 "#RRGGBB"，字体写作字号、"bold:15" 或 "Menlo-Regular:12"，无障碍键做字符串检查；导出脚本与 Protobuf 结构定义（字段 22–32）同步更新。新增并处理 B19、B20。 | After merging master, its 11 new tab keys (colors, fonts, accessibility) join the configuration: colors as "#RRGGBB" in files, fonts as a size, "bold:15" or "Menlo-Regular:12", the accessibility keys checked as strings; the export script and the Protobuf schema (fields 22-32) follow. B19 and B20 added and handled. | — |
 | 9 | 97 | 62 | 首次在 iOS CI 上运行静态分析：发现 `-loadConfigurationWithURLRequest:` 会把 nil URL 传给声明为 nonnull 的参数（C10）。据此复查所有 nil 与 nonnull 的边界，另发现空字符串作为 Lottie URL 会传给 +fileURLWithPath:（B21）。总分下降。 | The static analyzer ran on iOS CI for the first time: `-loadConfigurationWithURLRequest:` passed a nil URL to a nonnull parameter (C10). A review of every nil / nonnull boundary then found that an empty string as a Lottie URL reached +fileURLWithPath: (B21). The score dropped. | B21, C10 |
 | 10 | 100 | 62 | 修复 C10 与 B21：本地 / 缺失 URL 由 CYLLoadLocalConfiguration() 统一处理，空字符串不再生成 file URL，演示中的请求不会带 nil URL；演示新增“B21 · Empty strings”与“C10 · Request without a URL”两行。全部情况均已处理。 | C10 and B21 fixed: local / missing URLs go through CYLLoadLocalConfiguration(), an empty string no longer becomes a file URL, the demo never builds a request with a nil URL; two demo rows added, "B21 · Empty strings" and "C10 · Request without a URL". Every case is handled. | — |
+| 11 | 100 | 68 | 页面改为由跨端页面 ID 获得：删除类名键（`CYLTabBarItemViewControllerClass`、`…NavigationControllerClass`，未发布），C1–C5 随之不再适用；新增 `CYLTabBarPageRegistry`（全局与每个 TabBar 各一份）、`CYLTabBarControllerPageResolver`、自动注册的 `CYLTabBarPage`，以及远程配置字段 `CYLTabBarItemPlatforms`、`CYLTabBarItemMinimumAppVersion`、`CYLTabBarItemPageParameters`。设计时列出的新情况 B22–B25、C11–C17 在同一轮处理。 | Pages now come from cross-platform page IDs: the class-name keys (`CYLTabBarItemViewControllerClass`, `…NavigationControllerClass`, unreleased) are removed, so C1–C5 no longer apply; new `CYLTabBarPageRegistry` (global and one per tab bar), `CYLTabBarControllerPageResolver`, automatically registered `CYLTabBarPage` classes, and the remote keys `CYLTabBarItemPlatforms`, `CYLTabBarItemMinimumAppVersion`, `CYLTabBarItemPageParameters`. The new cases listed during the design, B22–B25 and C11–C17, are handled in the same round. | — |
 <!-- edge-cases:end -->
 
 ## [CN]限制
@@ -384,7 +400,7 @@ python3 scripts/export-tabbar-configurations.py --check               # exit 1 w
 
 | 中文 | English |
 |:---|:---|
-| 配置文件无法包含对象，子控制器只能通过类名创建（`-init`）；需要自定义初始化或依赖注入时，先用 `+configurationWithContentsOfFile:error:` 读取字典，再加入 `CYLTabBarControllerViewControllers`。 | A file cannot hold objects: view controllers can only be created from class names (`-init`). For custom initializers or dependency injection, read the dictionary with `+configurationWithContentsOfFile:error:` and add `CYLTabBarControllerViewControllers`. |
+| 配置文件无法包含对象：页面由 App 按页面 ID 注册的提供者创建（可以使用任意初始化方法与依赖注入）。每个 TabBar 自己的注册表或解析回调只能在代码中传入：先用 `+configurationWithContentsOfFile:error:` 读取字典，加入 `CYLTabBarControllerPageRegistry`，再调用 `-initWithConfiguration:`。 | A file cannot hold objects: pages are created by the providers the app registers per page ID (any initializer, any dependency injection). A tab bar's own registry or resolver can only be passed in code: read the dictionary with `+configurationWithContentsOfFile:error:`, add `CYLTabBarControllerPageRegistry`, then call `-initWithConfiguration:`. |
 | YAML 与 TOML 支持配置文件常用的子集：YAML 不支持锚点、别名与标签；TOML 不支持日期时间。 | YAML and TOML support the subset configurations use: no anchors, aliases or tags in YAML; no date-times in TOML. |
 | PlusButton 仍按 `context` 注册（`+[CYLPlusButton tabBarContext]`），不在配置文件中描述。 | The plus button is still registered by `context` (`+[CYLPlusButton tabBarContext]`), not described in the file. |
 

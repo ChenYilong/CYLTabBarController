@@ -75,15 +75,21 @@ NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
 NSString *const CYLTabBarItemIdentifier = @"CYLTabBarItemIdentifier";
-NSString *const CYLTabBarItemViewControllerClass = @"CYLTabBarItemViewControllerClass";
-NSString *const CYLTabBarItemNavigationControllerClass = @"CYLTabBarItemNavigationControllerClass";
+NSString *const CYLTabBarItemPageIdentifier = @"CYLTabBarItemPageIdentifier";
+NSString *const CYLTabBarItemPageParameters = @"CYLTabBarItemPageParameters";
+NSString *const CYLTabBarItemPlatforms = @"CYLTabBarItemPlatforms";
+NSString *const CYLTabBarItemMinimumAppVersion = @"CYLTabBarItemMinimumAppVersion";
 NSString *const CYLTabBarControllerViewControllers = @"CYLTabBarControllerViewControllers";
 NSString *const CYLTabBarControllerTabBarItemsAttributes = @"CYLTabBarControllerTabBarItemsAttributes";
 NSString *const CYLTabBarControllerImageInsets = @"CYLTabBarControllerImageInsets";
 NSString *const CYLTabBarControllerTitlePositionAdjustment = @"CYLTabBarControllerTitlePositionAdjustment";
 NSString *const CYLTabBarControllerStyleType = @"CYLTabBarControllerStyleType";
 NSString *const CYLTabBarControllerContext = @"CYLTabBarControllerContext";
-NSString *const CYLTabBarControllerNavigationControllerClass = @"CYLTabBarControllerNavigationControllerClass";
+NSString *const CYLTabBarControllerPageRegistry = @"CYLTabBarControllerPageRegistry";
+NSString *const CYLTabBarControllerPageResolver = @"CYLTabBarControllerPageResolver";
+/// [EN] Private: marks a tab left out by `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` (set by the normalization).
+/// [CN] 私有：标记被 `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` 排除的 Tab（由规范化设置）。
+static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
 /// [EN] Private: set by the parameter initializers, which keep an empty view controller list (C9). [CN] 私有：由参数初始化方法设置，保持空的子控制器列表（C9）。
 static NSString *const CYLTabBarControllerKeepsEmptyViewControllersKey = @"_CYLTabBarControllerKeepsEmptyViewControllers";
 NSString *const CYLTabBarItemTitleColor = @"CYLTabBarItemTitleColor";
@@ -1901,114 +1907,121 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
 }
 
 /*!
- * [EN] The class named `name`, a subclass of `requiredSuperclass`, or nil (no name, "none", unknown or wrong class). A
- *      Swift class is also looked up as "<main executable>.<name>".
- * [CN] 名为 `name` 且为 `requiredSuperclass` 子类的类，否则返回 nil（没有名称、"none"、找不到或类型不符）。Swift 类还会按
- *      "<主程序名>.<name>" 查找。
+ * [EN] The page ID of a tab: `CYLTabBarItemPageIdentifier`, or `CYLTabBarItemIdentifier` when it is missing or empty.
+ * [CN] Tab 的页面 ID：`CYLTabBarItemPageIdentifier`；未设置或为空时使用 `CYLTabBarItemIdentifier`。
  */
-static Class _Nullable CYLConfigurationClassNamed(id _Nullable name, Class requiredSuperclass) {
-    if (![name isKindOfClass:[NSString class]]) {
-        return nil;
-    }
-    NSString *className = [(NSString *)name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    if (className.length == 0 || [className.lowercaseString isEqualToString:@"none"]) {
-        return nil;
-    }
-    Class aClass = NSClassFromString(className);
-    if (!aClass) {
-        NSString *module = [NSBundle mainBundle].infoDictionary[@"CFBundleExecutable"];
-        module = [[module stringByReplacingOccurrencesOfString:@"-" withString:@"_"] stringByReplacingOccurrencesOfString:@" " withString:@"_"];
-        aClass = module.length > 0 ? NSClassFromString([NSString stringWithFormat:@"%@.%@", module, className]) : nil;
-    }
-    if (aClass && ![aClass isSubclassOfClass:requiredSuperclass]) {
-        aClass = nil;
-    }
-#if defined(DEBUG) || defined(BETA)
-    if (!aClass) {
-        NSLog(@"🔴 CYLTabBarController configuration: \"%@\" is not a %@ class; the default is used.", className, NSStringFromClass(requiredSuperclass));
-    }
-#endif
-    return aClass;
-}
-
-/*!
- * [EN] The view controllers of the items, created from `CYLTabBarItemViewControllerClass` (default UIViewController) and
- *      embedded in `CYLTabBarItemNavigationControllerClass` / `CYLTabBarControllerNavigationControllerClass` when set.
- * [CN] 根据 `CYLTabBarItemViewControllerClass`（默认 UIViewController）创建各 item 的子控制器，设置了
- *      `CYLTabBarItemNavigationControllerClass` / `CYLTabBarControllerNavigationControllerClass` 时嵌入导航控制器。
- */
-/*!
- * [EN] Containers cannot be the content of a tab: a tab bar controller, a navigation controller without a root, a split
- *      view controller, an alert or a search controller (C3).
- * [CN] 容器不能作为 Tab 的内容：TabBarController、没有根控制器的导航控制器、分栏控制器、弹窗或搜索控制器（C3）。
- */
-static BOOL CYLIsContainerViewControllerClass(Class aClass) {
-    for (NSString *name in @[ @"UITabBarController", @"UINavigationController", @"UISplitViewController", @"UIAlertController", @"UISearchController" ]) {
-        Class container = NSClassFromString(name);
-        if (container && [aClass isSubclassOfClass:container]) {
-            return YES;
+static NSString *_Nullable CYLPageIdentifierOfTab(NSDictionary *attributes) {
+    for (NSString *key in @[ CYLTabBarItemPageIdentifier, CYLTabBarItemIdentifier ]) {
+        id value = attributes[key];
+        NSString *identifier = [value isKindOfClass:[NSString class]]
+            ? [(NSString *)value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] : nil;
+        if (identifier.length > 0) {
+            return identifier;
         }
     }
-    return NO;
+    return nil;
 }
 
 /*!
- * [EN] `-init` of a class named in a file is not under the app's control here: an Objective-C exception it raises (e.g.
- *      a view controller that needs a storyboard) is caught, and a UIViewController takes its place (C4).
- * [CN] 文件中指定的类的 `-init` 不在此处的控制之内：它抛出的 Objective-C 异常（例如需要 storyboard 的控制器）会被捕获，改用 UIViewController（C4）。
+ * [EN] Calls a page provider. A provider is app code: an Objective-C exception it raises is caught (C12), and a result
+ *      that is not a view controller, is a tab bar controller (no nested tab bars), already belongs to another container
+ *      or is already used by another tab of this tab bar controller is refused (C13), so UIKit never moves or nests it.
+ * [CN] 调用页面提供者。提供者是 App 代码：它抛出的 Objective-C 异常会被捕获（C12）；结果不是视图控制器、是 TabBarController（不允许嵌套
+ *      TabBar）、已属于其他容器或已被本 TabBarController 的其他 Tab 使用时会被拒绝（C13），因此 UIKit 不会移动或嵌套它。
  */
-static UIViewController *CYLMakeViewController(Class aClass) {
+static UIViewController *_Nullable CYLCallPageProvider(CYLTabBarPageProvider provider, NSString *pageIdentifier, NSDictionary *attributes,
+                                                       NSArray<UIViewController *> *usedPages, NSString *source) {
+    id page = nil;
     @try {
-        UIViewController *viewController = [[aClass alloc] init];
-        if ([viewController isKindOfClass:[UIViewController class]]) {
-            return viewController;
-        }
+        page = provider(pageIdentifier, attributes);
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴 CYLTabBarController configuration: -[%@ init] raised %@ (%@); a UIViewController is used.", NSStringFromClass(aClass), exception.name, exception.reason);
+        NSLog(@"🔴 CYLTabBarController: the page provider of \"%@\" (%@) raised %@ (%@); the tab is skipped.", pageIdentifier, source, exception.name, exception.reason);
 #endif
+        return nil;
     }
-    return [[UIViewController alloc] init];
+    if (!page) {
+        return nil;
+    }
+    NSString *problem = nil;
+    if (![page isKindOfClass:[UIViewController class]]) {
+        problem = @"is not a view controller";
+    } else if ([page isKindOfClass:[UITabBarController class]]) {
+        problem = @"is a tab bar controller (tab bars cannot be nested)";
+    } else if ([(UIViewController *)page parentViewController] || [(UIViewController *)page presentingViewController]) {
+        problem = @"already belongs to another container (return a new page each time)";
+    } else if ([usedPages indexOfObjectIdenticalTo:page] != NSNotFound) {
+        problem = @"is already the page of another tab";
+    }
+    if (problem) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🔴 CYLTabBarController: the page of \"%@\" (%@) %@: %@; the tab is skipped.", pageIdentifier, source, problem, page);
+#endif
+        return nil;
+    }
+    return page;
 }
 
-static UIViewController *CYLEmbedInNavigationController(UIViewController *viewController, Class navigationClass) {
-    @try {
-        UINavigationController *navigationController = [(UINavigationController *)[navigationClass alloc] initWithRootViewController:viewController];
-        if (navigationController) {
-            return navigationController;
+/*!
+ * [EN] The page of an automatically registered `CYLTabBarPage` class: `+cylTabBarPageWithAttributes:`, else `-init`.
+ * [CN] 自动注册的 `CYLTabBarPage` 类的页面：`+cylTabBarPageWithAttributes:`，否则 `-init`。
+ */
+static CYLTabBarPageProvider CYLPageProviderOfClass(Class pageClass) {
+    CYLTabBarPageProvider provider = ^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
+        if ([pageClass respondsToSelector:@selector(cylTabBarPageWithAttributes:)]) {
+            return [(Class<CYLTabBarPage>)pageClass cylTabBarPageWithAttributes:tabAttributes];
         }
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(@"🔴 CYLTabBarController configuration: -[%@ initWithRootViewController:] raised %@; not embedded.", NSStringFromClass(navigationClass), exception.name);
-#endif
-    }
-    return viewController;
+        return [[pageClass alloc] init];
+    };
+    return [provider copy];
 }
 
-static NSArray<UIViewController *> *CYLViewControllersFromConfiguration(NSDictionary<NSString *, id> *configuration) {
-    NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
-    NSString *defaultNavigationClassName = configuration[CYLTabBarControllerNavigationControllerClass];
-    for (NSDictionary *attributes in configuration[CYLTabBarControllerTabBarItemsAttributes]) {
-        Class viewControllerClass = CYLConfigurationClassNamed(attributes[CYLTabBarItemViewControllerClass], [UIViewController class]);
-        if (viewControllerClass && CYLIsContainerViewControllerClass(viewControllerClass)) {
-#if defined(DEBUG) || defined(BETA)
-            NSLog(@"🔴 CYLTabBarController configuration: %@ is a container and cannot be a tab's content; a UIViewController is used.", NSStringFromClass(viewControllerClass));
-#endif
-            viewControllerClass = nil;
+/*!
+ * [EN] The pages of the tabs, in the order of the tabs. Each page ID is looked up in the configuration's registry, then
+ *      its resolver, the shared registry and the `CYLTabBarPage` classes (see `CYLTabBarPageRegistry`). Tabs without a
+ *      page are skipped: `keptItems` receives the tabs that have one, in the same order.
+ * [CN] 按 Tab 的顺序返回各 Tab 的页面。每个页面 ID 依次在配置的注册表、解析回调、全局注册表与 `CYLTabBarPage` 类中查找（见
+ *      `CYLTabBarPageRegistry`）。没有页面的 Tab 会被跳过：`keptItems` 按同样的顺序收到有页面的 Tab。
+ */
+static NSArray<UIViewController *> *CYLPagesOfTabs(NSArray<NSDictionary *> *items, CYLTabBarPageRegistry *_Nullable registry,
+                                                    CYLTabBarPageProvider _Nullable resolver, NSMutableArray<NSDictionary *> *keptItems) {
+    NSMutableArray<UIViewController *> *pages = [NSMutableArray array];
+    for (NSDictionary *attributes in items) {
+        NSString *pageIdentifier = CYLPageIdentifierOfTab(attributes);
+        UIViewController *page = nil;
+        if (pageIdentifier) {
+            CYLTabBarPageProvider registered = [registry pageProviderForPageIdentifier:pageIdentifier];
+            if (registered) {
+                page = CYLCallPageProvider(registered, pageIdentifier, attributes, pages, @"CYLTabBarControllerPageRegistry");
+            }
+            if (!page && resolver) {
+                page = CYLCallPageProvider(resolver, pageIdentifier, attributes, pages, @"CYLTabBarControllerPageResolver");
+            }
+            CYLTabBarPageProvider shared = [CYLTabBarPageRegistry.sharedRegistry pageProviderForPageIdentifier:pageIdentifier];
+            if (!page && shared) {
+                page = CYLCallPageProvider(shared, pageIdentifier, attributes, pages, @"sharedRegistry");
+            }
+            Class pageClass = page ? Nil : CYLTabBarPageRegistry.automaticallyRegisteredPageClasses[pageIdentifier];
+            if (pageClass) {
+                page = CYLCallPageProvider(CYLPageProviderOfClass(pageClass), pageIdentifier, attributes, pages, NSStringFromClass(pageClass));
+            }
         }
-        UIViewController *viewController = CYLMakeViewController(viewControllerClass ?: [UIViewController class]);
+        if (!page) {
+#if defined(DEBUG) || defined(BETA)
+            NSLog(@"🔴 CYLTabBarController: no page for the tab %@ (page ID %@); the tab is skipped. Register the ID with CYLTabBarPageRegistry or adopt CYLTabBarPage.",
+                  attributes[CYLTabBarItemTitle] ?: @"", pageIdentifier ? [NSString stringWithFormat:@"\"%@\"", pageIdentifier] : @"missing");
+#endif
+            continue;
+        }
         NSString *title = attributes[CYLTabBarItemTitle];
-        if ([title isKindOfClass:[NSString class]] && !viewController.navigationItem.title) {
-            viewController.navigationItem.title = title;
+        UIViewController *content = [page isKindOfClass:[UINavigationController class]] ? [(UINavigationController *)page viewControllers].firstObject : page;
+        if ([title isKindOfClass:[NSString class]] && content && !content.navigationItem.title) {
+            content.navigationItem.title = title;
         }
-        id navigationClassName = attributes[CYLTabBarItemNavigationControllerClass] ?: defaultNavigationClassName;
-        Class navigationClass = CYLConfigurationClassNamed(navigationClassName, [UINavigationController class]);
-        if (navigationClass) {
-            viewController = CYLEmbedInNavigationController(viewController, navigationClass);
-        }
-        [viewControllers addObject:viewController];
+        [pages addObject:page];
+        [keptItems addObject:attributes];
     }
-    return viewControllers;
+    return pages;
 }
 
 - (instancetype)initWithConfiguration:(NSDictionary<NSString *, id> *)configuration {
@@ -2024,18 +2037,40 @@ static NSArray<UIViewController *> *CYLViewControllersFromConfiguration(NSDictio
         // An empty list (or one with no valid view controller) is treated as missing (C9). 空列表（或没有有效控制器的列表）视为未提供（C9）。
         viewControllers = nil;
     }
-    if (!viewControllers) {
-        // Created from the tabs: the placeholders of invalid entries are left out (B4). 根据 Tab 创建：跳过无效条目的占位（B4）。
+    if (viewControllers) {
+        // From code, matched by index: a tab left out by its platforms or minimum version takes its view controller out (B22).
+        // 代码传入，按下标对应：因平台或最低版本被排除的 Tab 连同其子控制器一起移除（B22）。
+        NSMutableArray<NSDictionary *> *keptItems = [NSMutableArray array];
+        NSMutableArray<UIViewController *> *keptViewControllers = [NSMutableArray array];
+        for (NSUInteger index = 0; index < MAX(tabBarItemsAttributes.count, viewControllers.count); index++) {
+            NSDictionary *item = index < tabBarItemsAttributes.count ? tabBarItemsAttributes[index] : nil;
+            if ([item[CYLTabBarItemExcludedKey] boolValue]) {
+                continue;
+            }
+            if (item) {
+                [keptItems addObject:item];
+            }
+            if (index < viewControllers.count) {
+                [keptViewControllers addObject:viewControllers[index]];
+            }
+        }
+        tabBarItemsAttributes = keptItems;
+        viewControllers = keptViewControllers;
+    } else {
+        // Created from the page IDs: placeholders (B4), left-out tabs (B22) and tabs without a page (C11) are skipped.
+        // 根据页面 ID 创建：跳过占位（B4）、被排除的 Tab（B22）与没有页面的 Tab（C11）。
         NSMutableArray<NSDictionary *> *validItems = [NSMutableArray array];
         for (NSDictionary *item in tabBarItemsAttributes) {
-            if (item.count > 0) {
+            if (item.count > 0 && ![item[CYLTabBarItemExcludedKey] boolValue]) {
                 [validItems addObject:item];
             }
         }
-        tabBarItemsAttributes = validItems;
-        NSMutableDictionary<NSString *, id> *withValidItems = [normalized mutableCopy];
-        withValidItems[CYLTabBarControllerTabBarItemsAttributes] = validItems;
-        viewControllers = CYLViewControllersFromConfiguration(withValidItems);
+        CYLTabBarPageRegistry *registry = [normalized[CYLTabBarControllerPageRegistry] isKindOfClass:[CYLTabBarPageRegistry class]]
+            ? normalized[CYLTabBarControllerPageRegistry] : nil;
+        CYLTabBarPageProvider resolver = normalized[CYLTabBarControllerPageResolver];
+        NSMutableArray<NSDictionary *> *keptItems = [NSMutableArray array];
+        viewControllers = CYLPagesOfTabs(validItems, registry, resolver, keptItems);
+        tabBarItemsAttributes = keptItems;
     }
     NSValue *imageInsetsValue = normalized[CYLTabBarControllerImageInsets];
     NSValue *titlePositionAdjustmentValue = normalized[CYLTabBarControllerTitlePositionAdjustment];

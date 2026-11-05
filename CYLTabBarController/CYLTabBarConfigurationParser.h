@@ -78,6 +78,8 @@ typedef NS_ENUM(NSInteger, CYLTabBarConfigurationErrorCode) {
     CYLTabBarConfigurationErrorNoTabs = 9,
     /// [EN] A controller can only be created on the main thread. [CN] 只能在主线程创建控制器。
     CYLTabBarConfigurationErrorMainThreadRequired = 10,
+    /// [EN] No tab found its page (see `CYLTabBarPageRegistry`). [CN] 没有任何 Tab 找到页面（见 `CYLTabBarPageRegistry`）。
+    CYLTabBarConfigurationErrorNoPages = 11,
 };
 
 /// [EN] The largest file or response read: 5 MB. [CN] 读取的文件或响应的最大长度：5 MB。

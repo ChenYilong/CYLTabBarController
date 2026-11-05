@@ -315,3 +315,5 @@
 "仅配色" = "Solo colori";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Toccami";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Due barre delle schede condividono una configurazione; il registro di ciascuna associa gli stessi ID di pagina a pagine diverse.";
+"两个 TabBar，同一个页面 ID" = "Due barre delle schede, un ID di pagina";

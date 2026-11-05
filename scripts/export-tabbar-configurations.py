@@ -53,23 +53,23 @@ ITEM_KEYS = [
     'CYLTabBarItemImageURLSize', 'CYLTabBarItemImageInsets', 'CYLTabBarItemTitlePositionAdjustment',
     'CYLTabBarItemImagePositionAdjustment', 'CYLTabBarLottieFilePath', 'CYLTabBarLottieURL', 'CYLTabBarLottieSize',
     'CYLTabBarItemIdentifier', 'CYLTabBarLottieDarkURL', 'CYLTabBarLottieDarkFilePath', 'CYLTabBarLottieDarkColors',
-    'CYLTabBarItemViewControllerClass', 'CYLTabBarItemNavigationControllerClass', 'CYLTabBarItemSelectedTitle',
+    'CYLTabBarItemSelectedTitle',
     'CYLTabBarItemTitleColor', 'CYLTabBarItemSelectedTitleColor', 'CYLTabBarItemIconColor', 'CYLTabBarItemSelectedIconColor',
     'CYLTabBarItemSelectedBackgroundColor', 'CYLTabBarItemBackgroundColor', 'CYLTabBarItemTitleFont', 'CYLTabBarItemSelectedTitleFont',
     'CYLTabBarItemAccessibilityIdentifier', 'CYLTabBarItemAccessibilityLabel', 'CYLTabBarItemAccessibilityHint',
+    'CYLTabBarItemPageIdentifier', 'CYLTabBarItemPageParameters', 'CYLTabBarItemPlatforms', 'CYLTabBarItemMinimumAppVersion',
 ]
 ITEMS_KEY = 'CYLTabBarControllerTabBarItemsAttributes'
 TOP_KEYS = ['CYLTabBarControllerContext', 'CYLTabBarControllerStyleType', 'CYLTabBarControllerImageInsets',
-            'CYLTabBarControllerTitlePositionAdjustment', 'CYLTabBarControllerNavigationControllerClass']
+            'CYLTabBarControllerTitlePositionAdjustment']
 STYLE_NAMES = {'Default': 'default', 'System': 'system', 'FlatDesign': 'flatDesign', 'LiquidGlass': 'liquidGlass',
                'default': 'default', 'system': 'system', 'flatDesign': 'flatDesign', 'liquidGlass': 'liquidGlass'}
 # Field numbers of cyl_tabbar_configuration.proto. cyl_tabbar_configuration.proto 的字段编号。
 PROTO_TOP = {ITEMS_KEY: 1, 'CYLTabBarControllerImageInsets': 2, 'CYLTabBarControllerTitlePositionAdjustment': 3,
-             'CYLTabBarControllerStyleType': 4, 'CYLTabBarControllerContext': 5,
-             'CYLTabBarControllerNavigationControllerClass': 6}
+             'CYLTabBarControllerStyleType': 4, 'CYLTabBarControllerContext': 5}
 PROTO_ITEM = {key: number for number, key in enumerate(ITEM_KEYS[:17], 1)}
-PROTO_ITEM.update({'CYLTabBarLottieDarkColors': 18, 'CYLTabBarItemViewControllerClass': 19,
-                   'CYLTabBarItemNavigationControllerClass': 20, 'CYLTabBarItemSelectedTitle': 21})
+# 19 and 20 (class names) and the top-level 6 are reserved: removed before release. 19、20（类名）与顶层的 6 为保留编号：发布前已移除。
+PROTO_ITEM.update({'CYLTabBarLottieDarkColors': 18, 'CYLTabBarItemSelectedTitle': 21})
 PROTO_ITEM.update({key: number for number, key in enumerate(ITEM_KEYS[ITEM_KEYS.index('CYLTabBarItemTitleColor'):], 22)})
 # [EN] Repeated literals. [CN] 重复使用的字面量。
 BINARY_PLIST = 'binary.plist'
@@ -755,17 +755,32 @@ def items_from_literals(code, literals, report):
     return items
 
 
-def add_view_controller_classes(code, items, configuration, report):
-    classes, navigation = view_controller_classes(code)
-    if classes and len(classes) == len(items):
-        for item, name in zip(items, classes):
-            item.setdefault('CYLTabBarItemViewControllerClass', name)
-        if navigation:
-            configuration['CYLTabBarControllerNavigationControllerClass'] = navigation
-    elif classes:
-        report.append('view controller classes not matched to the tabs (%d classes, %d tabs); left out' % (len(classes), len(items)))
-    else:
-        report.append('view controller classes are created elsewhere; tabs use UIViewController')
+def page_identifier_for_class(name):
+    """[EN] A cross-platform page ID from a class name: CYLHomeViewController -> home, MeController -> me.
+    [CN] 由类名生成跨端页面 ID：CYLHomeViewController -> home，MeController -> me。"""
+    base = re.sub(r'(ViewController|Controller)$', '', name) or name
+    base = re.sub(r'^[A-Z]{2,}(?=[A-Z][a-z])', '', base) or base
+    return base[0].lower() + base[1:]
+
+
+def add_page_identifiers(code, items, report):
+    """[EN] Pages come from page IDs (docs/Tab-Page-Registry.md): a tab without an ID gets one from its view controller
+    class, and the report lists what each ID must be registered to. Class names are not written (not cross-platform).
+    [CN] 页面由页面 ID 获得（docs/Tab-Page-Registry.md）：没有 ID 的 Tab 根据其视图控制器类生成一个，报告列出每个 ID 需要注册的页面。
+    不写出类名（不跨端）。"""
+    classes, _ = view_controller_classes(code)
+    if not classes or len(classes) != len(items):
+        if classes:
+            report.append('view controller classes not matched to the tabs (%d classes, %d tabs): give each tab a CYLTabBarItemPageIdentifier' % (len(classes), len(items)))
+        else:
+            report.append('view controller classes are created elsewhere: give each tab a CYLTabBarItemPageIdentifier')
+        return
+    for item, name in zip(items, classes):
+        identifier = item.get('CYLTabBarItemPageIdentifier') or item.get('CYLTabBarItemIdentifier')
+        if not identifier:
+            identifier = page_identifier_for_class(name)
+            item['CYLTabBarItemPageIdentifier'] = identifier
+        report.append('page "%s": register it to %s (CYLTabBarPageRegistry) or adopt CYLTabBarPage' % (identifier, name))
 
 
 def extract(path):
@@ -782,7 +797,7 @@ def extract(path):
     add_lottie_files(code, items, report)
     add_dark_colors(code, items, report)
     configuration = top_level(code)
-    add_view_controller_classes(code, items, configuration, report)
+    add_page_identifiers(code, items, report)
     configuration[ITEMS_KEY] = items
     return configuration, report
 

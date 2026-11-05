@@ -315,3 +315,5 @@
 "仅配色" = "Colors only";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Tap me";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Two tab bars share one configuration; each one's registry maps the same page IDs to different pages.";
+"两个 TabBar，同一个页面 ID" = "Two tab bars, one page ID";

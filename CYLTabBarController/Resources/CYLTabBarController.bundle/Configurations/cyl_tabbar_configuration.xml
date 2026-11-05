@@ -6,22 +6,24 @@
     <CYLTabBarControllerStyleType>default</CYLTabBarControllerStyleType>
     <CYLTabBarControllerImageInsets>{0, 0, 0, 0}</CYLTabBarControllerImageInsets>
     <CYLTabBarControllerTitlePositionAdjustment>{0, -2}</CYLTabBarControllerTitlePositionAdjustment>
-    <CYLTabBarControllerNavigationControllerClass>UINavigationController</CYLTabBarControllerNavigationControllerClass>
     <CYLTabBarControllerTabBarItemsAttributes>
         <item>
             <CYLTabBarItemTitle>XML</CYLTabBarItemTitle>
             <CYLTabBarItemImage>system:house</CYLTabBarItemImage>
             <CYLTabBarItemSelectedImage>system:house.fill</CYLTabBarItemSelectedImage>
             <CYLTabBarItemIdentifier>home</CYLTabBarItemIdentifier>
-            <CYLTabBarItemViewControllerClass>UIViewController</CYLTabBarItemViewControllerClass>
         </item>
         <item CYLTabBarItemTitle="Message" CYLTabBarItemImage="system:message" CYLTabBarItemSelectedImage="system:message.fill"
-              CYLTabBarItemIdentifier="message" CYLTabBarItemViewControllerClass="UIViewController"/>
+              CYLTabBarItemIdentifier="message" CYLTabBarItemPlatforms="ios,android"/>
         <item CYLTabBarItemTitle="Discover" CYLTabBarItemImage="system:safari" CYLTabBarItemSelectedImage="system:safari.fill"
-              CYLTabBarItemIdentifier="discover" CYLTabBarItemViewControllerClass="UIViewController"
-              CYLTabBarItemImageInsets="{1, 0, -1, 0}"/>
+              CYLTabBarItemIdentifier="discover" CYLTabBarItemPageIdentifier="web"
+              CYLTabBarItemImageInsets="{1, 0, -1, 0}">
+            <CYLTabBarItemPageParameters>
+                <url>https://github.com/ChenYilong/CYLTabBarController</url>
+            </CYLTabBarItemPageParameters>
+        </item>
         <item CYLTabBarItemTitle="Me" CYLTabBarItemImage="system:person" CYLTabBarItemSelectedImage="system:person.fill"
-              CYLTabBarItemIdentifier="me" CYLTabBarItemViewControllerClass="UIViewController"
+              CYLTabBarItemIdentifier="me" CYLTabBarItemMinimumAppVersion="1.0.0"
               CYLTabBarItemTitlePositionAdjustment="{0, -1}"/>
     </CYLTabBarControllerTabBarItemsAttributes>
 </CYLTabBarController>

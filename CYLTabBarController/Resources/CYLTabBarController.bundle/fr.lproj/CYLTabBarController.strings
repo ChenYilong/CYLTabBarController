@@ -315,3 +315,5 @@
 "仅配色" = "Couleurs seulement";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Touchez-moi";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Deux barres d’onglets partagent une configuration ; le registre de chacune associe les mêmes ID de page à des pages différentes.";
+"两个 TabBar，同一个页面 ID" = "Deux barres d’onglets, un ID de page";

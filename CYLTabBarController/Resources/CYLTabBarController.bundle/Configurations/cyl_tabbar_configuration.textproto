@@ -7,14 +7,13 @@ CYLTabBarControllerTabBarItemsAttributes {
   CYLTabBarItemImage: "system:house"
   CYLTabBarItemSelectedImage: "system:house.fill"
   CYLTabBarItemIdentifier: "home"
-  CYLTabBarItemViewControllerClass: "UIViewController"
 }
 CYLTabBarControllerTabBarItemsAttributes {
   CYLTabBarItemTitle: "Message"
   CYLTabBarItemImage: "system:message"
   CYLTabBarItemSelectedImage: "system:message.fill"
   CYLTabBarItemIdentifier: "message"
-  CYLTabBarItemViewControllerClass: "UIViewController"
+  CYLTabBarItemPlatforms: "ios,android"
 }
 CYLTabBarControllerTabBarItemsAttributes {
   CYLTabBarItemTitle: "Discover"
@@ -22,7 +21,8 @@ CYLTabBarControllerTabBarItemsAttributes {
   CYLTabBarItemSelectedImage: "system:safari.fill"
   CYLTabBarItemImageInsets: "{1, 0, -1, 0}"
   CYLTabBarItemIdentifier: "discover"
-  CYLTabBarItemViewControllerClass: "UIViewController"
+  CYLTabBarItemPageIdentifier: "web"
+  CYLTabBarItemPageParameters { key: "url" value: "https://github.com/ChenYilong/CYLTabBarController" }
 }
 CYLTabBarControllerTabBarItemsAttributes {
   CYLTabBarItemTitle: "Me"
@@ -30,10 +30,9 @@ CYLTabBarControllerTabBarItemsAttributes {
   CYLTabBarItemSelectedImage: "system:person.fill"
   CYLTabBarItemTitlePositionAdjustment: "{0, -1}"
   CYLTabBarItemIdentifier: "me"
-  CYLTabBarItemViewControllerClass: "UIViewController"
+  CYLTabBarItemMinimumAppVersion: "1.0.0"
 }
 CYLTabBarControllerImageInsets: "{0, 0, 0, 0}"
 CYLTabBarControllerTitlePositionAdjustment: "{0, -2}"
 CYLTabBarControllerStyleType: "default"
 CYLTabBarControllerContext: "CYLConfigurationDemo"
-CYLTabBarControllerNavigationControllerClass: "UINavigationController"

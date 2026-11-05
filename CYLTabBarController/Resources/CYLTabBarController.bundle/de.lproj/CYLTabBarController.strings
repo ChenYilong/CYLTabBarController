@@ -315,3 +315,5 @@
 "仅配色" = "Nur Farben";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Tippen";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Zwei Tab-Leisten nutzen eine Konfiguration; jede Registry ordnet dieselben Seiten-IDs anderen Seiten zu.";
+"两个 TabBar，同一个页面 ID" = "Zwei Tab-Leisten, eine Seiten-ID";

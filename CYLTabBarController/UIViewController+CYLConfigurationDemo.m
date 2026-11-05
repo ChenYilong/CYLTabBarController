@@ -18,7 +18,12 @@ static NSString *const CYLConfigurationDemoCellIdentifier = @"CYLConfigurationDe
 - (void)cyl_dismissConfigurationDemo;
 @end
 
+@interface UINavigationController (CYLConfigurationTwoTabBarsDemo)
+- (void)cyl_dismissTwoTabBarsDemo;
+@end
+
 @interface UIViewController (CYLConfigurationDemoPrivate)
+- (void)cyl_presentTwoTabBarsDemo;
 - (void)cyl_presentConfigurationDemoTabBarController:(nullable CYLTabBarController *)tabBarController
                                               source:(NSString *)source
                                           sourceText:(NSString *)sourceText
@@ -37,6 +42,54 @@ static NSString *CYLConfigurationSourceText(NSString *_Nullable path, NSDictiona
         return text;
     }
     return configuration ? configuration.description : @"";
+}
+
+#pragma mark - Demo pages 演示页面
+
+/// [EN] A demo page: its title and a text, in a navigation controller. [CN] 演示页面：标题与一段文字，包裹在导航控制器中。
+static UIViewController *CYLConfigurationDemoPage(NSString *title, NSString *text) {
+    UIViewController *page = [[UIViewController alloc] init];
+    page.navigationItem.title = title;
+    if (@available(iOS 13.0, *)) {
+        page.view.backgroundColor = [UIColor systemBackgroundColor];
+    } else {
+        page.view.backgroundColor = [UIColor whiteColor];
+    }
+    UILabel *label = [[UILabel alloc] init];
+    label.numberOfLines = 0;
+    label.textAlignment = NSTextAlignmentCenter;
+    label.text = text;
+    label.translatesAutoresizingMaskIntoConstraints = NO;
+    [page.view addSubview:label];
+    [NSLayoutConstraint activateConstraints:@[
+        [label.centerYAnchor constraintEqualToAnchor:page.view.centerYAnchor],
+        [label.leadingAnchor constraintEqualToAnchor:page.view.leadingAnchor constant:24],
+        [label.trailingAnchor constraintEqualToAnchor:page.view.trailingAnchor constant:-24],
+    ]];
+    return [[UINavigationController alloc] initWithRootViewController:page];
+}
+
+/*!
+ * [EN] The pages of the sample files and the simulated failures, in the shared registry: "home", "message",
+ *      "discover", "me", "tab" (one page per call), and "web", which shows the URL of its CYLTabBarItemPageParameters.
+ *      An app registers its own pages the same way, once at launch (see docs/Tab-Page-Registry.md).
+ * [CN] 示例文件与模拟意外情况使用的页面，注册到全局注册表："home"、"message"、"discover"、"me"、"tab"（每次调用创建一个页面），以及
+ *      显示其 CYLTabBarItemPageParameters 中 URL 的 "web"。App 以同样的方式在启动时注册一次自己的页面（见 docs/Tab-Page-Registry.md）。
+ */
+static void CYLRegisterConfigurationDemoPages(void) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        CYLTabBarPageRegistry *registry = CYLTabBarPageRegistry.sharedRegistry;
+        [registry registerPageProvider:^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
+            NSString *title = [tabAttributes[CYLTabBarItemTitle] isKindOfClass:[NSString class]] ? tabAttributes[CYLTabBarItemTitle] : pageIdentifier;
+            return CYLConfigurationDemoPage(title, [NSString stringWithFormat:@"page ID: %@", pageIdentifier]);
+        } forPageIdentifiers:@[ @"home", @"message", @"discover", @"me", @"tab" ]];
+        [registry registerPageProvider:^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
+            NSDictionary *parameters = tabAttributes[CYLTabBarItemPageParameters];
+            NSString *URLString = [parameters[@"url"] isKindOfClass:[NSString class]] ? parameters[@"url"] : @"(no url)";
+            return CYLConfigurationDemoPage(@"Web", [NSString stringWithFormat:@"page ID: %@\nCYLTabBarItemPageParameters.url:\n%@", pageIdentifier, URLString]);
+        } forPageIdentifier:@"web"];
+    });
 }
 
 @implementation UIViewController (CYLConfigurationDemo)
@@ -74,6 +127,7 @@ static NSString *CYLConfigurationSourceText(NSString *_Nullable path, NSDictiona
 }
 
 - (void)cyl_presentConfigurationDemo {
+    CYLRegisterConfigurationDemoPages();
     UIAlertController *sheet = [UIAlertController alertControllerWithTitle:CYLLocalizedString(@"选择配置文件")
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
@@ -96,6 +150,9 @@ static NSString *CYLConfigurationSourceText(NSString *_Nullable path, NSDictiona
         }
         [CYLTabBarController loadConfigurationWithURL:URL completion:^(NSDictionary<NSString *, id> *configuration, NSError *error) {
             CYLTabBarController *tabBarController = configuration ? [CYLTabBarController tabBarControllerWithConfiguration:configuration] : nil;
+            if (tabBarController.viewControllers.count == 0) {
+                tabBarController = nil;
+            }
             [weakSelf cyl_presentConfigurationDemoTabBarController:tabBarController
                                                             source:URL.absoluteString
                                                         sourceText:CYLConfigurationSourceText(nil, configuration)
@@ -196,8 +253,11 @@ static NSArray<NSArray<NSString *> *> *CYLConfigurationEdgeCases(void) {
         @[ @"A3", @"Empty file" ], @[ @"A4", @"Comments only" ], @[ @"A13", @"Malformed JSON" ], @[ @"A11", @"Top level is a list" ],
         @[ @"A7", @"YAML in a .json file" ], @[ @"A5", @"Not UTF-8" ], @[ @"A16", @"UTF-16 encoded" ], @[ @"A10", @"Nested 10,000 levels" ],
         @[ @"A9", @"A 6 MB file" ], @[ @"B1", @"No tabs" ], @[ @"D7", @"An HTML page (file)" ], @[ @"B5", @"Wrong types and null" ],
-        @[ @"B7", @"NaN and Infinity insets" ], @[ @"B9", @"Unknown style" ], @[ @"C1", @"Missing view controller class" ],
-        @[ @"C2", @"Class is not a view controller" ], @[ @"C3", @"A container as a tab" ], @[ @"B13", @"Invalid URLs and Lottie files" ],
+        @[ @"B7", @"NaN and Infinity insets" ], @[ @"B9", @"Unknown style" ], @[ @"C11", @"Unregistered page IDs" ],
+        @[ @"C12", @"A page provider raises (code)" ], @[ @"C13", @"Pages that cannot be tabs (code)" ],
+        @[ @"C14", @"Automatic registration (CYLTabBarPage)" ], @[ @"C15", @"Registry and resolver of wrong types" ],
+        @[ @"C16", @"Two tab bars, one page ID" ], @[ @"B22", @"Other platforms and newer versions" ],
+        @[ @"B23", @"Invalid platforms, versions and parameters" ], @[ @"B13", @"Invalid URLs and Lottie files" ],
         @[ @"B12", @"Duplicate identifiers" ], @[ @"B11", @"Misspelled keys" ], @[ @"B19", @"Invalid colors and fonts" ], @[ @"B21", @"Empty strings" ],
         @[ @"A12", @"Truncated protobuf" ],
         @[ @"A12", @"Corrupted binary plist" ], @[ @"A14", @"XML external entity" ], @[ @"A2", @"Missing file" ],
@@ -210,7 +270,7 @@ static NSArray<NSArray<NSString *> *> *CYLConfigurationEdgeCases(void) {
 }
 
 /// [EN] Two valid tabs, as JSON. [CN] 两个有效的 Tab（JSON）。
-static NSString *const CYLEdgeCaseTabsJSON = @"[{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\"}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemImage\": \"system:person\"}]";
+static NSString *const CYLEdgeCaseTabsJSON = @"[{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemIdentifier\": \"home\"}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemImage\": \"system:person\", \"CYLTabBarItemIdentifier\": \"me\"}]";
 
 /// [EN] Writes `data` to a temporary file and returns its path. [CN] 将 `data` 写入临时文件并返回路径。
 static NSString *CYLEdgeCaseFile(NSString *name, NSData *data) {
@@ -276,6 +336,7 @@ static NSData *CYLEdgeCaseData(NSString *text) {
 }
 
 - (void)cyl_runConfigurationEdgeCaseAtRow:(NSInteger)row {
+    CYLRegisterConfigurationDemoPages();
     NSArray<NSArray<NSString *> *> *cases = CYLConfigurationEdgeCases();
     if (row < 0 || row >= (NSInteger)cases.count) {
         return;
@@ -313,7 +374,7 @@ static NSData *CYLEdgeCaseData(NSString *text) {
     } else if ([title isEqualToString:@"Top level is a list"]) {
         fromFile(@"list.json", CYLEdgeCaseData(items));
     } else if ([title isEqualToString:@"YAML in a .json file"]) {
-        fromFile(@"yaml.json", CYLEdgeCaseData(@"CYLTabBarControllerTabBarItemsAttributes:\n  - CYLTabBarItemTitle: Home\n    CYLTabBarItemImage: system:house\n  - CYLTabBarItemTitle: Me\n    CYLTabBarItemImage: system:person\n"));
+        fromFile(@"yaml.json", CYLEdgeCaseData(@"CYLTabBarControllerTabBarItemsAttributes:\n  - CYLTabBarItemTitle: Home\n    CYLTabBarItemImage: system:house\n    CYLTabBarItemIdentifier: home\n  - CYLTabBarItemTitle: Me\n    CYLTabBarItemImage: system:person\n    CYLTabBarItemIdentifier: me\n"));
     } else if ([title isEqualToString:@"Not UTF-8"]) {
         const uint8_t bytes[] = { '{', '"', 0xC3, 0x28, '"', ':', '1', '}' };
         fromFile(@"latin.json", [NSData dataWithBytes:bytes length:sizeof(bytes)]);
@@ -334,25 +395,80 @@ static NSData *CYLEdgeCaseData(NSString *text) {
     } else if ([title isEqualToString:@"An HTML page (file)"]) {
         fromFile(@"portal.xml", CYLEdgeCaseData(@"<html><head><title>Wi-Fi</title></head><body><form>Accept</form></body></html>"));
     } else if ([title isEqualToString:@"Wrong types and null"]) {
-        fromFile(@"types.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerContext\": [1, 2], \"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": [\"a\", \"list\"], \"CYLTabBarItemImage\": null, \"CYLTabBarItemIdentifier\": 7}, \"not a tab\", {\"CYLTabBarItemTitle\": 42, \"CYLTabBarItemImage\": {\"a\": 1}}]}"));
+        fromFile(@"types.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerContext\": [1, 2], \"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": [\"a\", \"list\"], \"CYLTabBarItemImage\": null, \"CYLTabBarItemIdentifier\": 7, \"CYLTabBarItemPageIdentifier\": \"home\"}, \"not a tab\", {\"CYLTabBarItemTitle\": 42, \"CYLTabBarItemImage\": {\"a\": 1}, \"CYLTabBarItemIdentifier\": \"me\"}]}"));
     } else if ([title isEqualToString:@"NaN and Infinity insets"]) {
-        fromFile(@"nan.yaml", CYLEdgeCaseData(@"CYLTabBarControllerImageInsets: \"{nan, 0, 0, 0}\"\nCYLTabBarControllerTitlePositionAdjustment: [1e999, -3]\nCYLTabBarControllerTabBarItemsAttributes:\n  - CYLTabBarItemTitle: Home\n    CYLTabBarItemImage: system:house\n    CYLTabBarItemImageInsets: \"{inf, 0, -inf, 0}\"\n    CYLTabBarLottieSize: \"{-24, 0}\"\n"));
+        fromFile(@"nan.yaml", CYLEdgeCaseData(@"CYLTabBarControllerImageInsets: \"{nan, 0, 0, 0}\"\nCYLTabBarControllerTitlePositionAdjustment: [1e999, -3]\nCYLTabBarControllerTabBarItemsAttributes:\n  - CYLTabBarItemTitle: Home\n    CYLTabBarItemIdentifier: home\n    CYLTabBarItemImage: system:house\n    CYLTabBarItemImageInsets: \"{inf, 0, -inf, 0}\"\n    CYLTabBarLottieSize: \"{-24, 0}\"\n"));
     } else if ([title isEqualToString:@"Unknown style"]) {
-        fromFile(@"style.toml", CYLEdgeCaseData(@"CYLTabBarControllerStyleType = 99\n[[CYLTabBarControllerTabBarItemsAttributes]]\nCYLTabBarItemTitle = \"Home\"\nCYLTabBarItemImage = \"system:house\"\n"));
-    } else if ([title isEqualToString:@"Missing view controller class"]) {
-        fromFile(@"missing_class.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemViewControllerClass\": \"NoSuchViewController\", \"CYLTabBarItemNavigationControllerClass\": \"NoSuchNavigationController\"}]}"));
-    } else if ([title isEqualToString:@"Class is not a view controller"]) {
-        fromFile(@"not_a_controller.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerNavigationControllerClass\": \"UIViewController\", \"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemViewControllerClass\": \"NSString\"}]}"));
-    } else if ([title isEqualToString:@"A container as a tab"]) {
-        fromFile(@"container.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Tabs\", \"CYLTabBarItemViewControllerClass\": \"UITabBarController\"}, {\"CYLTabBarItemTitle\": \"Alert\", \"CYLTabBarItemViewControllerClass\": \"UIAlertController\"}]}"));
+        fromFile(@"style.toml", CYLEdgeCaseData(@"CYLTabBarControllerStyleType = 99\n[[CYLTabBarControllerTabBarItemsAttributes]]\nCYLTabBarItemTitle = \"Home\"\nCYLTabBarItemIdentifier = \"home\"\nCYLTabBarItemImage = \"system:house\"\n"));
+    } else if ([title isEqualToString:@"Unregistered page IDs"]) {
+        // [EN] C11: "home" is registered; "no_such_page" and a tab without any ID are skipped.
+        // [CN] C11："home" 已注册；"no_such_page" 与没有任何 ID 的 Tab 会被跳过。
+        fromFile(@"unregistered.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemIdentifier\": \"home\"}, {\"CYLTabBarItemTitle\": \"Unknown\", \"CYLTabBarItemPageIdentifier\": \"no_such_page\"}, {\"CYLTabBarItemTitle\": \"No ID\"}]}"));
+    } else if ([title isEqualToString:@"A page provider raises (code)"]) {
+        CYLTabBarPageRegistry *registry = [[CYLTabBarPageRegistry alloc] init];
+        [registry registerPageProvider:^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
+            [NSException raise:NSInternalInconsistencyException format:@"%@", @"a provider that raises"];
+            return nil;
+        } forPageIdentifier:@"raises"];
+        finish([CYLTabBarController tabBarControllerWithConfiguration:@{
+            CYLTabBarControllerPageRegistry : registry,
+            CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"Raises", CYLTabBarItemPageIdentifier : @"raises" },
+                                                          @{ CYLTabBarItemTitle : @"Home", CYLTabBarItemIdentifier : @"home" } ],
+        }], nil, @"provider of \"raises\": [NSException raise:...]");
+    } else if ([title isEqualToString:@"Pages that cannot be tabs (code)"]) {
+        // [EN] C13: nil, a string, a tab bar controller, a page inside another navigation controller and one page for two
+        //      tabs are refused; only "home" stays.
+        // [CN] C13：nil、字符串、TabBarController、已在其他导航控制器中的页面、两个 Tab 共用一个页面都会被拒绝；只保留 "home"。
+        UIViewController *shared = [[UIViewController alloc] init];
+        UIViewController *owned = [[UIViewController alloc] init];
+        UINavigationController *owner = [[UINavigationController alloc] initWithRootViewController:owned];
+        NSDictionary<NSString *, UIViewController *(^)(void)> *pages = @{
+            @"nil" : ^UIViewController *(void) { return nil; },
+            @"string" : ^UIViewController *(void) { return (UIViewController *)(id)@"not a page"; },
+            @"tabBar" : ^UIViewController *(void) { return [[UITabBarController alloc] init]; },
+            @"owned" : ^UIViewController *(void) { return owner.viewControllers.firstObject; },
+            @"sharedA" : ^UIViewController *(void) { return shared; },
+            @"sharedB" : ^UIViewController *(void) { return shared; },
+        };
+        CYLTabBarPageProvider resolver = ^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
+            UIViewController *(^page)(void) = pages[pageIdentifier];
+            return page ? page() : nil;
+        };
+        NSMutableArray<NSDictionary *> *attributes = [NSMutableArray array];
+        for (NSString *pageIdentifier in @[ @"nil", @"string", @"tabBar", @"owned", @"sharedA", @"sharedB", @"home" ]) {
+            [attributes addObject:@{ CYLTabBarItemTitle : pageIdentifier, CYLTabBarItemPageIdentifier : pageIdentifier }];
+        }
+        finish([CYLTabBarController tabBarControllerWithConfiguration:@{
+            CYLTabBarControllerPageResolver : resolver,
+            CYLTabBarControllerTabBarItemsAttributes : attributes,
+        }], nil, @"CYLTabBarControllerPageResolver: nil, a string, a UITabBarController, a page inside a UINavigationController, one page for two tabs");
+    } else if ([title isEqualToString:@"Automatic registration (CYLTabBarPage)"]) {
+        // [EN] C14: "auto" and "conflict" come from classes that adopt CYLTabBarPage; no registration code.
+        // [CN] C14："auto" 与 "conflict" 来自遵守 CYLTabBarPage 的类，无需注册代码。
+        fromFile(@"automatic.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Auto\", \"CYLTabBarItemImage\": \"system:wand.and.stars\", \"CYLTabBarItemPageIdentifier\": \"auto\"}, {\"CYLTabBarItemTitle\": \"Conflict\", \"CYLTabBarItemImage\": \"system:exclamationmark.2\", \"CYLTabBarItemPageIdentifier\": \"conflict\"}]}"));
+    } else if ([title isEqualToString:@"Registry and resolver of wrong types"]) {
+        // [EN] C15: from a file, the registry and the resolver are strings: ignored with a warning; the shared registry is used.
+        // [CN] C15：文件中的注册表与解析回调是字符串：忽略并输出警告；使用全局注册表。
+        fromFile(@"wrong_registry.json", CYLEdgeCaseData([NSString stringWithFormat:@"{\"CYLTabBarControllerPageRegistry\": \"MyRegistry\", \"CYLTabBarControllerPageResolver\": \"resolve:\", \"CYLTabBarControllerTabBarItemsAttributes\": %@}", items]));
+    } else if ([title isEqualToString:@"Two tab bars, one page ID"]) {
+        [self cyl_presentTwoTabBarsDemo];
+        [self cyl_configurationEdgeCaseResults][@(row)] = CYLLocalizedString(@"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。");
+    } else if ([title isEqualToString:@"Other platforms and newer versions"]) {
+        // [EN] B22: "android only" and "version 999" are left out on iOS; the other two tabs stay.
+        // [CN] B22："仅 Android" 与 "版本 999" 在 iOS 上不显示；其余两个 Tab 保留。
+        fromFile(@"platforms.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarItemPlatforms\": [\"ios\", \"android\"]}, {\"CYLTabBarItemTitle\": \"Android only\", \"CYLTabBarItemIdentifier\": \"message\", \"CYLTabBarItemPlatforms\": \"android\"}, {\"CYLTabBarItemTitle\": \"Version 999\", \"CYLTabBarItemIdentifier\": \"discover\", \"CYLTabBarItemMinimumAppVersion\": \"999.0\"}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemImage\": \"system:person\", \"CYLTabBarItemIdentifier\": \"me\", \"CYLTabBarItemMinimumAppVersion\": \"0.1\"}]}"));
+    } else if ([title isEqualToString:@"Invalid platforms, versions and parameters"]) {
+        // [EN] B23-B25: a number as platforms, "abc" as a version and a list as page parameters are ignored with warnings.
+        // [CN] B23–B25：数字作为平台、"abc" 作为版本、数组作为页面参数，都会被忽略并输出警告。
+        fromFile(@"invalid_remote.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarItemPlatforms\": 42, \"CYLTabBarItemMinimumAppVersion\": \"abc\"}, {\"CYLTabBarItemTitle\": \"Web\", \"CYLTabBarItemImage\": \"system:globe\", \"CYLTabBarItemPageIdentifier\": \"web\", \"CYLTabBarItemPageParameters\": [\"not\", \"a\", \"dictionary\"], \"CYLTabBarItemMinimumAppVersion\": \"2.x\"}]}"));
     } else if ([title isEqualToString:@"Invalid URLs and Lottie files"]) {
-        fromFile(@"urls.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemImageURL\": \"javascript:alert(1)\", \"CYLTabBarLottieURL\": \"ftp://example.com/a.json\", \"CYLTabBarLottieFilePath\": \"/no/such/animation.json\", \"CYLTabBarLottieDarkURL\": \"no_such_animation.json\"}]}"));
+        fromFile(@"urls.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemImageURL\": \"javascript:alert(1)\", \"CYLTabBarLottieURL\": \"ftp://example.com/a.json\", \"CYLTabBarLottieFilePath\": \"/no/such/animation.json\", \"CYLTabBarLottieDarkURL\": \"no_such_animation.json\"}]}"));
     } else if ([title isEqualToString:@"Duplicate identifiers"]) {
         fromFile(@"ids.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"A\", \"CYLTabBarItemIdentifier\": \"tab\"}, {\"CYLTabBarItemTitle\": \"B\", \"CYLTabBarItemIdentifier\": \"tab\"}, {\"CYLTabBarItemTitle\": \"C\", \"CYLTabBarItemIdentifier\": \"tab\"}]}"));
     } else if ([title isEqualToString:@"Misspelled keys"]) {
-        fromFile(@"typos.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerContxt\": \"typo\", \"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitel\": \"Typo\", \"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\"}]}"));
+        fromFile(@"typos.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerContxt\": \"typo\", \"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitel\": \"Typo\", \"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarItemImage\": \"system:house\"}]}"));
     } else if ([title isEqualToString:@"Invalid colors and fonts"]) {
-        fromFile(@"colors.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemTitleColor\": \"not a color\", \"CYLTabBarItemIconColor\": \"#12345\", \"CYLTabBarItemSelectedTitleColor\": \"#FF3B30\", \"CYLTabBarItemBackgroundColor\": 123, \"CYLTabBarItemTitleFont\": 0, \"CYLTabBarItemSelectedTitleFont\": \"NoSuchFont:12\", \"CYLTabBarItemAccessibilityLabel\": [1, 2]}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemImage\": \"system:person\", \"CYLTabBarItemTitleFont\": \"bold:12\", \"CYLTabBarItemSelectedIconColor\": \"#34C759\"}]}"));
+        fromFile(@"colors.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemTitleColor\": \"not a color\", \"CYLTabBarItemIconColor\": \"#12345\", \"CYLTabBarItemSelectedTitleColor\": \"#FF3B30\", \"CYLTabBarItemBackgroundColor\": 123, \"CYLTabBarItemTitleFont\": 0, \"CYLTabBarItemSelectedTitleFont\": \"NoSuchFont:12\", \"CYLTabBarItemAccessibilityLabel\": [1, 2]}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemIdentifier\": \"me\", \"CYLTabBarItemImage\": \"system:person\", \"CYLTabBarItemTitleFont\": \"bold:12\", \"CYLTabBarItemSelectedIconColor\": \"#34C759\"}]}"));
     } else if ([title isEqualToString:@"Truncated protobuf"]) {
         const uint8_t bytes[] = { 0x0A, 0x40, 0x0A, 0x04, 'H', 'o', 'm', 'e' };
         fromFile(@"truncated.binpb", [NSData dataWithBytes:bytes length:sizeof(bytes)]);
@@ -363,7 +479,7 @@ static NSData *CYLEdgeCaseData(NSString *text) {
         }
         fromFile(@"corrupted.plist", data ?: [NSData data]);
     } else if ([title isEqualToString:@"XML external entity"]) {
-        fromFile(@"xxe.xml", CYLEdgeCaseData(@"<?xml version=\"1.0\"?>\n<!DOCTYPE r [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>\n<r><CYLTabBarControllerContext>&xxe;</CYLTabBarControllerContext><CYLTabBarControllerTabBarItemsAttributes><item CYLTabBarItemTitle=\"Home\" CYLTabBarItemImage=\"system:house\"/></CYLTabBarControllerTabBarItemsAttributes></r>"));
+        fromFile(@"xxe.xml", CYLEdgeCaseData(@"<?xml version=\"1.0\"?>\n<!DOCTYPE r [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>\n<r><CYLTabBarControllerContext>&xxe;</CYLTabBarControllerContext><CYLTabBarControllerTabBarItemsAttributes><item CYLTabBarItemTitle=\"Home\" CYLTabBarItemIdentifier=\"home\" CYLTabBarItemImage=\"system:house\"/></CYLTabBarControllerTabBarItemsAttributes></r>"));
     } else if ([title isEqualToString:@"Missing file"]) {
         NSError *error = nil;
         CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfigurationFile:@"no_such_configuration.yaml" error:&error];
@@ -409,9 +525,10 @@ static NSData *CYLEdgeCaseData(NSString *text) {
         // [CN] C10：没有 URL 的请求（以及代码中传入 nil 请求或 URL）返回 FileNotFound 错误。
         fromURL([[NSURLRequest alloc] init], NO);
     } else if ([title isEqualToString:@"Empty strings"]) {
-        // [EN] B21: empty URLs, Lottie files, image URLs, classes, colors and fonts are left out; the tabs stay.
-        // [CN] B21：空的 URL、Lottie 文件、图片 URL、类名、颜色与字体会被忽略；Tab 保留。
-        fromFile(@"empty_strings.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarLottieURL\": \"\", \"CYLTabBarLottieFilePath\": \"\", \"CYLTabBarItemImageURL\": \"\", \"CYLTabBarItemViewControllerClass\": \"\", \"CYLTabBarItemTitleColor\": \"\", \"CYLTabBarItemTitleFont\": \"\"}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemImage\": \"system:\", \"CYLTabBarItemNavigationControllerClass\": \"\"}]}"));
+        // [EN] B21: empty URLs, Lottie files, image URLs, colors, fonts and platforms are left out; an empty page ID falls back to
+        //      CYLTabBarItemIdentifier; the tabs stay.
+        // [CN] B21：空的 URL、Lottie 文件、图片 URL、颜色、字体与平台会被忽略；空的页面 ID 改用 CYLTabBarItemIdentifier；Tab 保留。
+        fromFile(@"empty_strings.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarLottieURL\": \"\", \"CYLTabBarLottieFilePath\": \"\", \"CYLTabBarItemImageURL\": \"\", \"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarItemPageIdentifier\": \"\", \"CYLTabBarItemTitleColor\": \"\", \"CYLTabBarItemTitleFont\": \"\"}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemImage\": \"system:\", \"CYLTabBarItemIdentifier\": \"me\", \"CYLTabBarItemPlatforms\": \"\"}]}"));
     }
 }
 
@@ -444,6 +561,123 @@ static NSData *CYLEdgeCaseData(NSString *text) {
         }]];
     }
     [self presentViewController:alert animated:YES completion:nil];
+}
+
+/*!
+ * [EN] C16: two tab bar controllers on one screen, created from the same configuration: each passes its own
+ *      CYLTabBarPageRegistry, so the same page IDs ("home", "me") give different pages (blue and orange). Both are child
+ *      view controllers of one container.
+ * [CN] C16：同一屏幕上的两个 TabBarController，由同一份配置创建：各自传入自己的 CYLTabBarPageRegistry，因此相同的页面 ID（"home"、"me"）
+ *      得到不同的页面（蓝色与橙色）。两者都是同一个容器的子控制器。
+ */
+- (void)cyl_presentTwoTabBarsDemo {
+    NSArray *items = @[ @{ CYLTabBarItemTitle : @"Home", CYLTabBarItemImage : @"system:house", CYLTabBarItemIdentifier : @"home" },
+                        @{ CYLTabBarItemTitle : @"Me", CYLTabBarItemImage : @"system:person", CYLTabBarItemIdentifier : @"me" } ];
+    UIViewController *container = [[UIViewController alloc] init];
+    if (@available(iOS 13.0, *)) {
+        container.view.backgroundColor = [UIColor systemBackgroundColor];
+    } else {
+        container.view.backgroundColor = [UIColor whiteColor];
+    }
+    NSArray<UIColor *> *colors = @[ [UIColor systemBlueColor], [UIColor systemOrangeColor] ];
+    NSMutableArray<UIView *> *views = [NSMutableArray array];
+    for (NSUInteger index = 0; index < colors.count; index++) {
+        UIColor *color = colors[index];
+        NSString *name = index == 0 ? @"Tab bar A" : @"Tab bar B";
+        CYLTabBarPageRegistry *registry = [[CYLTabBarPageRegistry alloc] init];
+        [registry registerPageProvider:^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
+            UIViewController *page = [[UIViewController alloc] init];
+            page.view.backgroundColor = [color colorWithAlphaComponent:0.25];
+            UILabel *label = [[UILabel alloc] init];
+            label.text = [NSString stringWithFormat:@"%@ · page ID \"%@\"", name, pageIdentifier];
+            label.translatesAutoresizingMaskIntoConstraints = NO;
+            [page.view addSubview:label];
+            [NSLayoutConstraint activateConstraints:@[ [label.centerXAnchor constraintEqualToAnchor:page.view.centerXAnchor],
+                                                       [label.centerYAnchor constraintEqualToAnchor:page.view.centerYAnchor] ]];
+            return page;
+        } forPageIdentifiers:@[ @"home", @"me" ]];
+        CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+            CYLTabBarControllerTabBarItemsAttributes : items,
+            CYLTabBarControllerPageRegistry : registry,
+            CYLTabBarControllerContext : name,
+        }];
+        [container addChildViewController:tabBarController];
+        tabBarController.view.translatesAutoresizingMaskIntoConstraints = NO;
+        [container.view addSubview:tabBarController.view];
+        [tabBarController didMoveToParentViewController:container];
+        [views addObject:tabBarController.view];
+    }
+    UILayoutGuide *safeArea = container.view.safeAreaLayoutGuide;
+    [NSLayoutConstraint activateConstraints:@[
+        [views[0].topAnchor constraintEqualToAnchor:safeArea.topAnchor],
+        [views[0].leadingAnchor constraintEqualToAnchor:container.view.leadingAnchor],
+        [views[0].trailingAnchor constraintEqualToAnchor:container.view.trailingAnchor],
+        [views[1].topAnchor constraintEqualToAnchor:views[0].bottomAnchor constant:8],
+        [views[1].heightAnchor constraintEqualToAnchor:views[0].heightAnchor],
+        [views[1].leadingAnchor constraintEqualToAnchor:container.view.leadingAnchor],
+        [views[1].trailingAnchor constraintEqualToAnchor:container.view.trailingAnchor],
+        [views[1].bottomAnchor constraintEqualToAnchor:container.view.bottomAnchor],
+    ]];
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:container];
+    container.navigationItem.title = CYLLocalizedString(@"两个 TabBar，同一个页面 ID");
+    container.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"关闭")
+                                                                                  style:UIBarButtonItemStylePlain
+                                                                                 target:navigationController
+                                                                                 action:@selector(cyl_dismissTwoTabBarsDemo)];
+    navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController:navigationController animated:YES completion:nil];
+}
+
+@end
+
+@implementation UINavigationController (CYLConfigurationTwoTabBarsDemo)
+
+/// [EN] The Close button of the two-tab-bar demo. [CN] 两个 TabBar 演示页的关闭按钮。
+- (void)cyl_dismissTwoTabBarsDemo {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+@end
+
+/// [EN] C14: registered automatically under "auto" by adopting CYLTabBarPage. [CN] C14：遵守 CYLTabBarPage，自动注册为 "auto"。
+@interface CYLConfigurationDemoAutoPage : UIViewController <CYLTabBarPage>
+@end
+
+@implementation CYLConfigurationDemoAutoPage
+
++ (NSString *)cylTabBarPageIdentifier {
+    return @"auto";
+}
+
++ (UIViewController *)cylTabBarPageWithAttributes:(NSDictionary<NSString *, id> *)tabAttributes {
+    return CYLConfigurationDemoPage(@"Auto", @"CYLConfigurationDemoAutoPage\n+cylTabBarPageIdentifier = \"auto\"\n(CYLTabBarPage, no registration code)");
+}
+
+@end
+
+/// [EN] C14: two classes claim "conflict"; the first in class name order (A) is used, with a warning. [CN] C14：两个类都声明 "conflict"；按类名顺序使用第一个（A），并输出警告。
+@interface CYLConfigurationDemoConflictPageA : UIViewController <CYLTabBarPage>
+@end
+
+@implementation CYLConfigurationDemoConflictPageA
+
++ (NSString *)cylTabBarPageIdentifier {
+    return @"conflict";
+}
+
++ (UIViewController *)cylTabBarPageWithAttributes:(NSDictionary<NSString *, id> *)tabAttributes {
+    return CYLConfigurationDemoPage(@"Conflict", @"CYLConfigurationDemoConflictPageA\n(used: first in class name order)");
+}
+
+@end
+
+@interface CYLConfigurationDemoConflictPageB : UIViewController <CYLTabBarPage>
+@end
+
+@implementation CYLConfigurationDemoConflictPageB
+
++ (NSString *)cylTabBarPageIdentifier {
+    return @"conflict";
 }
 
 @end

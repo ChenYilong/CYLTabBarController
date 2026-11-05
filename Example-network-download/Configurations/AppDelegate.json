@@ -1,6 +1,5 @@
 {
   "CYLTabBarControllerStyleType": "liquidGlass",
-  "CYLTabBarControllerNavigationControllerClass": "UINavigationController",
   "CYLTabBarControllerTabBarItemsAttributes": [
     {
       "CYLTabBarItemTitle": "首页",
@@ -9,7 +8,7 @@
       "CYLTabBarItemImageURL": "https://cdn-icons-png.flaticon.com/512/3132/3132732.png",
       "CYLTabBarItemSelectedImageURL": "https://cdn-icons-png.flaticon.com/512/3132/3132779.png",
       "CYLTabBarItemImageURLSize": "{24, 24}",
-      "CYLTabBarItemViewControllerClass": "HomeViewController"
+      "CYLTabBarItemPageIdentifier": "home"
     },
     {
       "CYLTabBarItemTitle": "行情",
@@ -18,7 +17,7 @@
       "CYLTabBarItemImageURL": "https://cdn-icons-png.flaticon.com/512/1828/1828884.png",
       "CYLTabBarItemSelectedImageURL": "https://cdn-icons-png.flaticon.com/512/1828/1828925.png",
       "CYLTabBarItemImageURLSize": "{24, 24}",
-      "CYLTabBarItemViewControllerClass": "WealthViewController"
+      "CYLTabBarItemPageIdentifier": "wealth"
     },
     {
       "CYLTabBarItemTitle": "交易",
@@ -27,7 +26,7 @@
       "CYLTabBarItemImageURL": "https://cdn-icons-png.flaticon.com/512/3132/3132732.png",
       "CYLTabBarItemSelectedImageURL": "https://cdn-icons-png.flaticon.com/512/3132/3132779.png",
       "CYLTabBarItemImageURLSize": "{24, 24}",
-      "CYLTabBarItemViewControllerClass": "TradeViewController"
+      "CYLTabBarItemPageIdentifier": "trade"
     },
     {
       "CYLTabBarItemTitle": "资讯",
@@ -36,7 +35,7 @@
       "CYLTabBarItemImageURL": "https://cdn-icons-png.flaticon.com/512/1828/1828884.png",
       "CYLTabBarItemSelectedImageURL": "https://cdn-icons-png.flaticon.com/512/1828/1828925.png",
       "CYLTabBarItemImageURLSize": "{24, 24}",
-      "CYLTabBarItemViewControllerClass": "InfoViewController"
+      "CYLTabBarItemPageIdentifier": "info"
     },
     {
       "CYLTabBarItemTitle": "我的",
@@ -44,7 +43,7 @@
       "CYLTabBarItemSelectedImage": "system:person.fill",
       "CYLTabBarItemImageURL": "tab_animated.gif",
       "CYLTabBarItemImageURLSize": "{24, 24}",
-      "CYLTabBarItemViewControllerClass": "MineViewController"
+      "CYLTabBarItemPageIdentifier": "mine"
     }
   ]
 }

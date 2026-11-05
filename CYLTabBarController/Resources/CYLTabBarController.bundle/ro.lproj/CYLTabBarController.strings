@@ -315,3 +315,5 @@
 "仅配色" = "Doar culori";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Atinge";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Două bare de file folosesc aceeași configurație; registrul fiecăreia asociază aceleași ID-uri de pagină cu pagini diferite.";
+"两个 TabBar，同一个页面 ID" = "Două bare de file, un ID de pagină";

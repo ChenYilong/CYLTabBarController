@@ -1,7 +1,6 @@
 {
   "CYLTabBarControllerContext": "",
   "CYLTabBarControllerTitlePositionAdjustment": "{0, -3.5}",
-  "CYLTabBarControllerNavigationControllerClass": "UINavigationController",
   "CYLTabBarControllerTabBarItemsAttributes": [
     {
       "CYLTabBarItemTitle": "首页",
@@ -9,7 +8,7 @@
       "CYLTabBarItemSelectedImage": "home_highlight",
       "CYLTabBarLottieFilePath": "green_lottie_tab_home.json",
       "CYLTabBarLottieDarkFilePath": "green_lottie_tab_home_dark.json",
-      "CYLTabBarItemViewControllerClass": "CYLBadgeHelperTableViewController"
+      "CYLTabBarItemPageIdentifier": "badgeHelperTable"
     },
     {
       "CYLTabBarItemTitle": "同城",
@@ -17,7 +16,7 @@
       "CYLTabBarItemSelectedImage": "mycity_highlight",
       "CYLTabBarLottieFilePath": "green_lottie_tab_discover.json",
       "CYLTabBarLottieDarkFilePath": "green_lottie_tab_discover_dark.json",
-      "CYLTabBarItemViewControllerClass": "ConnectionViewController"
+      "CYLTabBarItemPageIdentifier": "connection"
     },
     {
       "CYLTabBarItemTitle": "消息",
@@ -26,7 +25,7 @@
       "CYLTabBarItemDarkImage": "message_normal_night",
       "CYLTabBarLottieFilePath": "green_lottie_tab_news.json",
       "CYLTabBarLottieDarkFilePath": "green_lottie_tab_news_dark.json",
-      "CYLTabBarItemViewControllerClass": "MessageViewController"
+      "CYLTabBarItemPageIdentifier": "message"
     },
     {
       "CYLTabBarItemTitle": "我的",
@@ -34,7 +33,7 @@
       "CYLTabBarItemSelectedImage": "account_highlight",
       "CYLTabBarLottieFilePath": "green_lottie_tab_mine.json",
       "CYLTabBarLottieDarkFilePath": "green_lottie_tab_mine_dark.json",
-      "CYLTabBarItemViewControllerClass": "PersonalViewController"
+      "CYLTabBarItemPageIdentifier": "personal"
     }
   ]
 }

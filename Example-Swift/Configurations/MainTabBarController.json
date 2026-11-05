@@ -1,7 +1,6 @@
 {
   "CYLTabBarControllerStyleType": "liquidGlass",
   "CYLTabBarControllerTitlePositionAdjustment": "{0, -3.5}",
-  "CYLTabBarControllerNavigationControllerClass": "UINavigationController",
   "CYLTabBarControllerTabBarItemsAttributes": [
     {
       "CYLTabBarItemTitle": "首页",
@@ -13,7 +12,7 @@
         "Icon_Shop_Normal.**.Color": "#C7C7C7FF",
         "Icon_Shop_Active_Main.**.Color": "#266329FF"
       },
-      "CYLTabBarItemViewControllerClass": "HomeViewController"
+      "CYLTabBarItemPageIdentifier": "home"
     },
     {
       "CYLTabBarItemTitle": "鱼塘",
@@ -25,7 +24,7 @@
         "Icon_Discovery_Normal.**.Color": "#C7C7C7FF",
         "Icon_Discovery_Active_Main.**.Color": "#266329FF"
       },
-      "CYLTabBarItemViewControllerClass": "ConnectionViewController"
+      "CYLTabBarItemPageIdentifier": "connection"
     },
     {
       "CYLTabBarItemTitle": "消息",
@@ -38,7 +37,7 @@
         "Icon_Knowledge_Normal.**.Color": "#C7C7C7FF",
         "Icon_Knowledge_Active_Main.**.Color": "#266329FF"
       },
-      "CYLTabBarItemViewControllerClass": "MessageViewController"
+      "CYLTabBarItemPageIdentifier": "message"
     },
     {
       "CYLTabBarItemTitle": "我的",
@@ -50,7 +49,7 @@
         "Icon_Mine_Normal.**.Color": "#C7C7C7FF",
         "Icon_Mine_Active_Main.**.Color": "#266329FF"
       },
-      "CYLTabBarItemViewControllerClass": "PersonalViewController"
+      "CYLTabBarItemPageIdentifier": "personal"
     }
   ]
 }

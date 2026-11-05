@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CYLTabBar Pages</string>
+    <string name="two_tab_bars">Two tab bars, one page ID</string>
+    <string name="open_two_tab_bars">Open: two tab bars, one page ID</string>
+    <string name="open_in_browser">Open in the browser</string>
+</resources>

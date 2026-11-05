@@ -2021,7 +2021,6 @@ static NSDictionary<NSString *, NSDictionary<NSNumber *, NSArray<NSString *> *> 
                 @3 : @[ @"CYLTabBarControllerTitlePositionAdjustment", @"string" ],
                 @4 : @[ @"CYLTabBarControllerStyleType", @"string" ],
                 @5 : @[ @"CYLTabBarControllerContext", @"string" ],
-                @6 : @[ @"CYLTabBarControllerNavigationControllerClass", @"string" ],
             },
             @"CYLTabBarItem" : @{
                 @1 : @[ @"CYLTabBarItemTitle", @"string" ],
@@ -2042,8 +2041,6 @@ static NSDictionary<NSString *, NSDictionary<NSNumber *, NSArray<NSString *> *> 
                 @16 : @[ @"CYLTabBarLottieDarkURL", @"string" ],
                 @17 : @[ @"CYLTabBarLottieDarkFilePath", @"string" ],
                 @18 : @[ @"CYLTabBarLottieDarkColors", @"map" ],
-                @19 : @[ @"CYLTabBarItemViewControllerClass", @"string" ],
-                @20 : @[ @"CYLTabBarItemNavigationControllerClass", @"string" ],
                 @21 : @[ @"CYLTabBarItemSelectedTitle", @"string" ],
                 @22 : @[ @"CYLTabBarItemTitleColor", @"string" ],
                 @23 : @[ @"CYLTabBarItemSelectedTitleColor", @"string" ],
@@ -2056,6 +2053,10 @@ static NSDictionary<NSString *, NSDictionary<NSNumber *, NSArray<NSString *> *> 
                 @30 : @[ @"CYLTabBarItemAccessibilityIdentifier", @"string" ],
                 @31 : @[ @"CYLTabBarItemAccessibilityLabel", @"string" ],
                 @32 : @[ @"CYLTabBarItemAccessibilityHint", @"string" ],
+                @33 : @[ @"CYLTabBarItemPageIdentifier", @"string" ],
+                @34 : @[ @"CYLTabBarItemPageParameters", @"map" ],
+                @35 : @[ @"CYLTabBarItemPlatforms", @"string" ],
+                @36 : @[ @"CYLTabBarItemMinimumAppVersion", @"string" ],
             },
             @"CYLMapEntry" : @{
                 @1 : @[ @"key", @"string" ],

@@ -45,6 +45,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Interactions.md
 //   - Per-tab Colors / 单个 Tab 的颜色
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Item-Colors.md
+//   - Tab pages from page IDs (the page registry) / 按页面 ID 获得 Tab 页面（页面注册表）
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Page-Registry.md
 //   - Built-in Actions for Tapping the Selected Tab / 重复点击已选中 Tab 的内置操作
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Reselect.md
 //   - Research: how a tab in a configuration file finds its page object (cross-platform IDs, registries and order) / 调研：配置文件中的 Tab 如何对应到页面对象（跨端标识、注册表与顺序）
@@ -90,6 +92,7 @@
 #import "UIViewController+CYLTabBarItemUpdate.h"
 #import "UIViewController+CYLConfigurationDemo.h"
 #import "CYLTabBarConfigurationParser.h"
+#import "CYLTabBarPageRegistry.h"
 #import "UIViewController+CYLSettingsSection.h"
 #import "UIViewController+CYLThemeSettings.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
@@ -283,8 +286,8 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifier;
  *      `-initWithConfiguration:`, and the same keys in a configuration file (JSON, YAML, plist...) or a downloaded one,
  *      see `CYLTabBarController (CYLConfiguration)`. In code the values have their usual types; in a file, strings work
  *      for every key (see each key). Missing keys take the defaults of the other initializers.
- *      - `CYLTabBarControllerViewControllers`: NSArray<UIViewController *> (code only). Without it, the view controllers
- *        are created from the items, see `CYLTabBarItemViewControllerClass`.
+ *      - `CYLTabBarControllerViewControllers`: NSArray<UIViewController *> (code only), matched to the items by index.
+ *        Without it, each tab's page comes from its page ID, see `CYLTabBarItemPageIdentifier`.
  *      - `CYLTabBarControllerTabBarItemsAttributes`: NSArray<NSDictionary *>, the item attributes (`CYLTabBarItemTitle`...).
  *      - `CYLTabBarControllerImageInsets`: NSValue of UIEdgeInsets, or "{top, left, bottom, right}", [t, l, b, r] or
  *        {top: , left: , bottom: , right: }. Default UIEdgeInsetsZero.
@@ -293,13 +296,15 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifier;
  *      - `CYLTabBarControllerStyleType`: NSNumber of CYLTabBarStyleType, or "default", "system", "flatDesign",
  *        "liquidGlass". Default CYLTabBarStyleTypeDefault.
  *      - `CYLTabBarControllerContext`: NSString, see `context`. Default nil.
- *      - `CYLTabBarControllerNavigationControllerClass`: NSString, the class (e.g. "UINavigationController") each created
- *        view controller is embedded in. Default: not embedded.
+ *      - `CYLTabBarControllerPageRegistry`: CYLTabBarPageRegistry (code only), the page providers of this tab bar
+ *        controller only, looked up before the shared registry. Lets several tab bars map one page ID to different pages.
+ *      - `CYLTabBarControllerPageResolver`: CYLTabBarPageProvider block (code only), called for each tab whose page ID
+ *        is not in `CYLTabBarControllerPageRegistry`, before the shared registry; return nil to go on looking.
  * [CN] TabBar 配置的键：一个字典包含初始化方法的全部参数，用于 `-initWithConfiguration:`；配置文件（JSON、YAML、plist 等）或网络下载的
  *      配置使用同样的键，见 `CYLTabBarController (CYLConfiguration)`。代码中的值使用原本的类型；文件中每个键都可以用字符串（见各键说明）。
  *      缺少的键使用其他初始化方法的默认值。
- *      - `CYLTabBarControllerViewControllers`：NSArray<UIViewController *>（仅代码）。没有时根据 item 创建子控制器，见
- *        `CYLTabBarItemViewControllerClass`。
+ *      - `CYLTabBarControllerViewControllers`：NSArray<UIViewController *>（仅代码），按下标与 item 对应。没有时每个 Tab 的页面
+ *        根据其页面 ID 获得，见 `CYLTabBarItemPageIdentifier`。
  *      - `CYLTabBarControllerTabBarItemsAttributes`：NSArray<NSDictionary *>，即各 item 的属性（`CYLTabBarItemTitle` 等）。
  *      - `CYLTabBarControllerImageInsets`：UIEdgeInsets 的 NSValue，或 "{top, left, bottom, right}"、[t, l, b, r]、
  *        {top: , left: , bottom: , right: }。默认 UIEdgeInsetsZero。
@@ -308,8 +313,10 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifier;
  *      - `CYLTabBarControllerStyleType`：CYLTabBarStyleType 的 NSNumber，或 "default"、"system"、"flatDesign"、"liquidGlass"。
  *        默认 CYLTabBarStyleTypeDefault。
  *      - `CYLTabBarControllerContext`：NSString，见 `context`。默认 nil。
- *      - `CYLTabBarControllerNavigationControllerClass`：NSString，创建的子控制器嵌入的导航控制器类（如 "UINavigationController"）。
- *        默认不嵌入。
+ *      - `CYLTabBarControllerPageRegistry`：CYLTabBarPageRegistry（仅代码），只属于该 TabBarController 的页面提供者，先于全局注册表
+ *        查找。多个 TabBar 可以把同一个页面 ID 对应到不同页面。
+ *      - `CYLTabBarControllerPageResolver`：CYLTabBarPageProvider block（仅代码），页面 ID 不在 `CYLTabBarControllerPageRegistry`
+ *        中时对每个 Tab 调用，先于全局注册表；返回 nil 则继续查找。
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerViewControllers;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerTabBarItemsAttributes;
@@ -317,30 +324,43 @@ FOUNDATION_EXTERN NSString *const CYLTabBarControllerImageInsets;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerTitlePositionAdjustment;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerStyleType;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerContext;
-FOUNDATION_EXTERN NSString *const CYLTabBarControllerNavigationControllerClass;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerPageRegistry;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerPageResolver;
 
 /*!
- * [EN] Item keys used when the view controllers are created from the configuration (no `CYLTabBarControllerViewControllers`):
- *      - `CYLTabBarItemViewControllerClass`: NSString, the view controller class of the tab, created with `-init`.
- *        Default "UIViewController". A Swift class is found by its name ("HomeViewController") or "Module.Name"; give
- *        it `@objc(HomeViewController)` to be sure.
- *      - `CYLTabBarItemNavigationControllerClass`: NSString, overrides `CYLTabBarControllerNavigationControllerClass` for
- *        this tab; "" or "none": not embedded.
+ * [EN] Item keys of the pages and of remote configurations (see docs/Tab-Page-Registry.md):
+ *      - `CYLTabBarItemPageIdentifier`: NSString, the cross-platform ID of the tab's page, e.g. "home"; iOS and Android
+ *        register what it creates (see `CYLTabBarPageRegistry`). Missing or "": `CYLTabBarItemIdentifier` is used. A
+ *        tab whose page is not found is skipped. Used only when `CYLTabBarControllerViewControllers` is not given.
+ *      - `CYLTabBarItemPageParameters`: NSDictionary, passed to the page provider in the tab's attributes, e.g.
+ *        {url: "https://..."} for two tabs that show the same web page class.
+ *      - `CYLTabBarItemPlatforms`: NSArray<NSString *> or a comma-separated NSString, e.g. ["ios", "android"]; the tab
+ *        is left out on iOS unless the list contains "ios". Missing: every platform.
+ *      - `CYLTabBarItemMinimumAppVersion`: NSString, e.g. "2.3.0"; the tab is left out when the app's
+ *        CFBundleShortVersionString is lower. With view controllers from code, a left-out tab takes its view
+ *        controller out with it.
  *      In a file, image keys (`CYLTabBarItemImage`, `CYLTabBarItemSelectedImage` and the dark ones) also take
  *      "system:<SF Symbol name>" (iOS 13+), e.g. "system:house.fill"; Lottie URL keys take an http(s) URL, a path or a
  *      file name in the main bundle; `CYLTabBarItemImageURLSize` / `CYLTabBarLottieSize` take "{width, height}";
  *      `CYLTabBarLottieDarkColors` takes "#RRGGBB" or "#RRGGBBAA" colors.
- * [CN] 根据配置创建子控制器时（没有 `CYLTabBarControllerViewControllers`）使用的 item 键：
- *      - `CYLTabBarItemViewControllerClass`：NSString，Tab 的子控制器类，用 `-init` 创建。默认 "UIViewController"。Swift 类可用类名
- *        （"HomeViewController"）或 "模块名.类名"；为确保能找到，可添加 `@objc(HomeViewController)`。
- *      - `CYLTabBarItemNavigationControllerClass`：NSString，覆盖该 Tab 的 `CYLTabBarControllerNavigationControllerClass`；
- *        "" 或 "none" 表示不嵌入。
+ * [CN] 页面与远程配置相关的 item 键（见 docs/Tab-Page-Registry.md）：
+ *      - `CYLTabBarItemPageIdentifier`：NSString，Tab 页面的跨端 ID，例如 "home"；iOS 与 Android 各自注册它创建什么页面（见
+ *        `CYLTabBarPageRegistry`）。未设置或为 ""：使用 `CYLTabBarItemIdentifier`。找不到页面的 Tab 会被跳过。只在没有传入
+ *        `CYLTabBarControllerViewControllers` 时使用。
+ *      - `CYLTabBarItemPageParameters`：NSDictionary，随 Tab 的属性传给页面提供者，例如两个 Tab 使用同一个网页类时的
+ *        {url: "https://..."}。
+ *      - `CYLTabBarItemPlatforms`：NSArray<NSString *> 或逗号分隔的 NSString，例如 ["ios", "android"]；列表中没有 "ios" 时，
+ *        iOS 上不显示该 Tab。未设置：所有平台。
+ *      - `CYLTabBarItemMinimumAppVersion`：NSString，例如 "2.3.0"；App 的 CFBundleShortVersionString 更低时不显示该 Tab。
+ *        子控制器由代码传入时，不显示的 Tab 连同其子控制器一起移除。
  *      文件中，图片键（`CYLTabBarItemImage`、`CYLTabBarItemSelectedImage` 及深色键）也支持 "system:<SF Symbol 名称>"（iOS 13+），
  *      例如 "system:house.fill"；Lottie URL 键支持 http(s) URL、路径或 main bundle 中的文件名；`CYLTabBarItemImageURLSize` /
  *      `CYLTabBarLottieSize` 支持 "{width, height}"；`CYLTabBarLottieDarkColors` 支持 "#RRGGBB" 或 "#RRGGBBAA" 颜色。
  */
-FOUNDATION_EXTERN NSString *const CYLTabBarItemViewControllerClass;
-FOUNDATION_EXTERN NSString *const CYLTabBarItemNavigationControllerClass;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemPageIdentifier;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemPageParameters;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemPlatforms;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemMinimumAppVersion;
 
 /*!
  * [EN] Optional per-tab colors (UIColor), in `tabBarItemsAttributes` (or `-updateTabBarItemAtIndex:attributes:`). See
@@ -858,8 +878,8 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 /*!
  * [EN] Creates a tab bar controller from one dictionary that holds every initializer parameter (see
  *      `CYLTabBarControllerViewControllers` and the other configuration keys). Every other initializer calls this one.
- *      Without `CYLTabBarControllerViewControllers`, the view controllers are created from the items
- *      (`CYLTabBarItemViewControllerClass`). To read the configuration from a file or a URL, see
+ *      Without `CYLTabBarControllerViewControllers`, each tab's page comes from its page ID
+ *      (`CYLTabBarItemPageIdentifier`, `CYLTabBarPageRegistry`). To read the configuration from a file or a URL, see
  *      `CYLTabBarController (CYLConfiguration)`.
  *
  *          // Objective-C
@@ -877,7 +897,7 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  *          ])
  *
  * [CN] 用一个字典初始化，字典包含初始化方法的全部参数（见 `CYLTabBarControllerViewControllers` 等配置键）。其他所有初始化方法都调用本方法。
- *      没有 `CYLTabBarControllerViewControllers` 时根据 item 创建子控制器（`CYLTabBarItemViewControllerClass`）。从文件或 URL 读取配置见
+ *      没有 `CYLTabBarControllerViewControllers` 时每个 Tab 的页面根据其页面 ID 获得（`CYLTabBarItemPageIdentifier`、`CYLTabBarPageRegistry`）。从文件或 URL 读取配置见
  *      `CYLTabBarController (CYLConfiguration)`。示例见上。
  */
 - (instancetype)initWithConfiguration:(NSDictionary<NSString *, id> *)configuration;
@@ -1932,7 +1952,7 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
  *      `CYLTabBarConfigurationFormat`). The format comes from the file name
  *      extension (or the HTTP Content-Type), else from the content. Every format becomes the same dictionary, whose values
  *      are then converted (insets, offsets, SF Symbols, URLs...), see `CYLTabBarControllerImageInsets` and
- *      `CYLTabBarItemViewControllerClass`.
+ *      `CYLTabBarItemPageIdentifier`.
  *
  *          // A file in the app (a path, or a file name in the main bundle). 应用内文件（路径或 main bundle 中的文件名）。
  *          NSError *error = nil;
@@ -1951,7 +1971,7 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
  * [CN] 一个配置文件生成一个 TabBarController。文件包含 `-initWithConfiguration:` 的键，可以使用任意 key-value 格式：JSON、JSON5 / JSONC、
  *      属性列表（XML、二进制、OpenStep、.strings）、YAML、TOML、INI（.ini、.cfg、.conf）、.properties、.env、XML 或 Protocol Buffers（文本格式，或使用内置结构定义的二进制）（见
  *      `CYLTabBarConfigurationFormat`）。格式由文件扩展名（或 HTTP Content-Type）决定，否则根据内容识别。所有格式都解析为同样的字典，再转换其中的值
- *      （内边距、偏移、SF Symbols、URL 等），见 `CYLTabBarControllerImageInsets` 与 `CYLTabBarItemViewControllerClass`。示例见上。
+ *      （内边距、偏移、SF Symbols、URL 等），见 `CYLTabBarControllerImageInsets` 与 `CYLTabBarItemPageIdentifier`。示例见上。
  */
 @interface CYLTabBarController (CYLConfiguration)
 

@@ -5,7 +5,6 @@
   CYLTabBarControllerStyleType: 'default',
   CYLTabBarControllerImageInsets: '{0, 0, 0, 0}',
   CYLTabBarControllerTitlePositionAdjustment: '{0, -2}',
-  CYLTabBarControllerNavigationControllerClass: 'UINavigationController',
   /* One dictionary per tab. 每个 Tab 一个字典。 */
   CYLTabBarControllerTabBarItemsAttributes: [
     {
@@ -13,21 +12,21 @@
       CYLTabBarItemImage: 'system:house',
       CYLTabBarItemSelectedImage: 'system:house.fill',
       CYLTabBarItemIdentifier: 'home',
-      CYLTabBarItemViewControllerClass: 'UIViewController',
     },
     {
       CYLTabBarItemTitle: 'Message',
       CYLTabBarItemImage: 'system:message',
       CYLTabBarItemSelectedImage: 'system:message.fill',
       CYLTabBarItemIdentifier: 'message',
-      CYLTabBarItemViewControllerClass: 'UIViewController',
+      CYLTabBarItemPlatforms: 'ios,android',
     },
     {
       CYLTabBarItemTitle: 'Discover',
       CYLTabBarItemImage: 'system:safari',
       CYLTabBarItemSelectedImage: 'system:safari.fill',
       CYLTabBarItemIdentifier: 'discover',
-      CYLTabBarItemViewControllerClass: 'UIViewController',
+      CYLTabBarItemPageIdentifier: 'web',
+      CYLTabBarItemPageParameters: { url: 'https://github.com/ChenYilong/CYLTabBarController' },
       CYLTabBarItemImageInsets: '{1, 0, -1, 0}',
     },
     {
@@ -35,7 +34,7 @@
       CYLTabBarItemImage: 'system:person',
       CYLTabBarItemSelectedImage: 'system:person.fill',
       CYLTabBarItemIdentifier: 'me',
-      CYLTabBarItemViewControllerClass: 'UIViewController',
+      CYLTabBarItemMinimumAppVersion: '1.0.0',
       CYLTabBarItemTitlePositionAdjustment: '{0, -1}',
     },
   ],

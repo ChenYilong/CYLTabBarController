@@ -315,3 +315,5 @@
 "仅配色" = "Warna saja";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Ketuk";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Dua bilah tab memakai satu konfigurasi; registri masing-masing memetakan ID halaman yang sama ke halaman berbeda.";
+"两个 TabBar，同一个页面 ID" = "Dua bilah tab, satu ID halaman";

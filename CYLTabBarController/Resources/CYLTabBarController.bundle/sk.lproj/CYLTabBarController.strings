@@ -315,3 +315,5 @@
 "仅配色" = "Iba farby";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Ťukni";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Dva panely kariet zdieľajú jednu konfiguráciu; register každého z nich priraďuje rovnaké ID stránok rôznym stránkam.";
+"两个 TabBar，同一个页面 ID" = "Dva panely kariet, jedno ID stránky";

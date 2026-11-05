@@ -315,3 +315,5 @@
 "仅配色" = "Somente cores";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Toque aqui";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Duas barras de abas usam a mesma configuração; o registro de cada uma associa os mesmos IDs de página a páginas diferentes.";
+"两个 TabBar，同一个页面 ID" = "Duas barras de abas, um ID de página";

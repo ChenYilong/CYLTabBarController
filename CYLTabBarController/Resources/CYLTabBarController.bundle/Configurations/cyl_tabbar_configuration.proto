@@ -23,7 +23,8 @@ message CYLTabBarConfiguration {
   string CYLTabBarControllerTitlePositionAdjustment = 3;
   string CYLTabBarControllerStyleType = 4;
   string CYLTabBarControllerContext = 5;
-  string CYLTabBarControllerNavigationControllerClass = 6;
+  // 6 was CYLTabBarControllerNavigationControllerClass (removed before release). 6 曾为导航控制器类（发布前已移除）。
+  reserved 6;
 }
 
 message CYLTabBarItem {
@@ -45,8 +46,8 @@ message CYLTabBarItem {
   string CYLTabBarLottieDarkURL = 16;
   string CYLTabBarLottieDarkFilePath = 17;
   map<string, string> CYLTabBarLottieDarkColors = 18;
-  string CYLTabBarItemViewControllerClass = 19;
-  string CYLTabBarItemNavigationControllerClass = 20;
+  // 19, 20 were class names (removed before release; pages come from page IDs). 19、20 曾为类名（发布前已移除；页面由页面 ID 获得）。
+  reserved 19, 20;
   string CYLTabBarItemSelectedTitle = 21;
   string CYLTabBarItemTitleColor = 22;
   string CYLTabBarItemSelectedTitleColor = 23;
@@ -59,4 +60,9 @@ message CYLTabBarItem {
   string CYLTabBarItemAccessibilityIdentifier = 30;
   string CYLTabBarItemAccessibilityLabel = 31;
   string CYLTabBarItemAccessibilityHint = 32;
+  string CYLTabBarItemPageIdentifier = 33;
+  map<string, string> CYLTabBarItemPageParameters = 34;
+  // Comma-separated, e.g. "ios,android". 逗号分隔，例如 "ios,android"。
+  string CYLTabBarItemPlatforms = 35;
+  string CYLTabBarItemMinimumAppVersion = 36;
 }
