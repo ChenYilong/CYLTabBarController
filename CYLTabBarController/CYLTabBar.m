@@ -923,6 +923,11 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     CGFloat tabBarHeight = self.cyl_boundsSize.height;
     
     if (![CYLConstants isLiquidGlassActive]) {
+        // [EN] FIX: placeholder count mismatch — with a plus child view controller, over its tab (the slot), which
+        //      `-[CYLTabBarController setViewControllers:]` places by the same rule; without one, between the tabs as before.
+        // [CN] FIX：占位导致的数量不匹配——有 PlusButton 子控制器时位于其 Tab（slot）上方，slot 由 `-[CYLTabBarController setViewControllers:]`
+        //      按同一规则放置；没有时与以前一样位于 Tab 之间。
+        plusButtonIndex = [self cyl_plusButtonViewControllerIndexWithFallback:plusButtonIndex];
         CGFloat multiplierOfTabBarHeight = [self multiplierOfTabBarHeight];
         CGFloat constantOfPlusButtonCenterYOffset = [self constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
         _plusButton.center = CGPointMake(tabBarWidth * 0.5, tabBarHeight * multiplierOfTabBarHeight + constantOfPlusButtonCenterYOffset);

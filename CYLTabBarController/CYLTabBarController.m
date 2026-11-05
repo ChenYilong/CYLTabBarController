@@ -2055,282 +2055,194 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 }
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
-#pragma mark -  *  iOS26+ , 有 plusButton
+#pragma mark - Plus slot (the plus button's tab)
 
-// [CN] MARK:  *  iOS26+ , 有 plusButton
-// [EN] MARK:  *  iOS26+, with plusButton
+// [EN] MARK: Plus slot. The plus button's tab in `viewControllers`: the plus child view controller, or a placeholder for a
+//      plus button without one (Liquid Glass, FlatDesign). It is DERIVED state: `-setViewControllers:` removes any slot
+//      the array already carries and inserts exactly one, at the index of `-cyl_plusSlotIndexForTabCount:`. Every other
+//      place reads the slot's index from `viewControllers` (`-[UIView cyl_plusButtonIndex]`), never computes its own.
+// [CN] MARK: 加号 slot。PlusButton 在 `viewControllers` 中对应的 Tab：PlusButton 子控制器，或没有子控制器时的占位控制器（液态玻璃、
+//      扁平样式）。它是派生状态：`-setViewControllers:` 先移除传入数组中已有的 slot，再在 `-cyl_plusSlotIndexForTabCount:` 的位置
+//      插入且只插入一个。其他地方都从 `viewControllers` 中读取 slot 的下标（`-[UIView cyl_plusButtonIndex]`），不再各自计算。
 
 /*!
- * [CN] iOS26+ , 有 plusButton
- * [EN] iOS26+, with plusButton
+ * [EN] Marks the tab item attributes inserted for the slot (Liquid Glass, FlatDesign), so a re-assignment can remove them.
+ * [CN] 标记为 slot 插入的 TabBarItem 属性（液态玻璃、扁平样式），重新赋值时据此移除。
  */
-- (void)alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:(NSArray *)viewControllers {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        // Asked of this controller, which the plus button is bound to, not of its tab bar.
-        if (![self hasPlusButton]) {
-            _viewControllers = viewControllers;
-            return;
-        }
-        UIViewController *viewController = nil;
-        NSInteger index = NSNotFound;
-        if ([self hasPlusChildViewController]) {
-            viewController = [self cyl_contextPlusChildViewController];
-            //        index = [self.cyl_tabBar cyl_plusButtonIndex];
-        } else {
-            UIViewController *placeholderViewController = [UIViewController new];
-            [placeholderViewController cyl_setIsPlaceholder:YES];
-            viewController = placeholderViewController;
-        }
-        _viewControllers = [[self alignViewControllers:viewControllers withPlusButtonViewControllerPlaceholder:viewController] copy];
-        [[self cyl_contextPlusButton] cyl_setTabBarChildViewControllerIndex:index];
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
+static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlusSlotPlaceholder";
 
-    //CYLTabBarStyleTypeFlatDesign
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        // Asked of this controller, which the plus button is bound to, not of its tab bar.
-        if (![self hasPlusButton]) {
-            _viewControllers = viewControllers;
-            return;
-        }
-        UIViewController *viewController = nil;
-        NSInteger index = NSNotFound;
-        if ([self hasPlusChildViewController]) {
-            viewController = [self cyl_contextPlusChildViewController];
-        } else {
-            UIViewController *placeholderViewController = [UIViewController new];
-            [placeholderViewController cyl_setIsPlaceholder:YES];
-            viewController = placeholderViewController;
-        }
-           
+/*!
+ * [EN] FIX: placeholder count mismatch. Why one rule: the slot used to be inserted by three methods with different
+ *      conditions and indexes, and was not removed first, so
+ *      - re-assigning `viewControllers` (login, `-reloadTabBarItemsWithAttributes:`, `vc.viewControllers = vc.viewControllers`)
+ *        dropped the plus child view controller (classic style: guarded by `cyl_plusViewControllerEverAdded`) or added a
+ *        second slot (Liquid Glass placeholder, FlatDesign), with `tabBarItemsAttributes` one entry off;
+ *      - FlatDesign did not insert a slot after the last tab (`>` instead of `>=`), nor with an odd tab count without
+ *        `+indexOfPlusButtonInTabBar`, while its tab bar indexed `_buttons` with that index: "index beyond bounds";
+ *      - `cyl_tabbarItemsCount` counted a slot carried by the array, so `+indexForTabbarItemsCount:` got the wrong count;
+ *      - Liquid Glass keeps the slot in the middle, while `-[UIView cyl_plusButtonIndex]` returned the custom index.
+ * [CN] FIX：占位导致的数量不匹配。为什么只用一条规则：以前 slot 由三个方法插入，条件和下标各不相同，且插入前不移除旧的，因此
+ *      - 重新赋值 `viewControllers`（登录、`-reloadTabBarItemsWithAttributes:`、`vc.viewControllers = vc.viewControllers`）时，
+ *        经典样式丢失 PlusButton 子控制器（被 `cyl_plusViewControllerEverAdded` 拦住），液态玻璃占位与扁平样式则多出第二个 slot，
+ *        `tabBarItemsAttributes` 也错位一个；
+ *      - 扁平样式在最后一个 Tab 之后（`>` 而不是 `>=`）、或 Tab 数为奇数且未实现 `+indexOfPlusButtonInTabBar` 时不插入 slot，
+ *        而 TabBar 仍用该下标访问 `_buttons`：数组越界；
+ *      - `cyl_tabbarItemsCount` 把数组自带的 slot 也计算在内，`+indexForTabbarItemsCount:` 得到错误的数量；
+ *      - 液态玻璃把 slot 放在中间，而 `-[UIView cyl_plusButtonIndex]` 返回的是自定义下标。
+ */
+- (BOOL)cyl_isPlusSlotViewController:(UIViewController *)viewController {
+    if (!viewController) {
+        return NO;
+    }
+    UIViewController *contentViewController = [viewController cyl_getViewControllerInsteadOfNavigationController];
+    if (viewController.cyl_isPlaceholder || contentViewController.cyl_isPlaceholder) {
+        return YES;
+    }
+    // [EN] Also the plus child view controller seen through a navigation controller. [CN] 也包括被导航控制器包裹的 PlusButton 子控制器。
+    UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
+    return plusChildViewController && (viewController == plusChildViewController || contentViewController == plusChildViewController);
+}
 
-        index = [self.cyl_tabBar cyl_plusButtonIndex];
-        _viewControllers = [[self alignViewControllers:viewControllers withPlusButtonViewControllerPlaceholder:viewController] copy];
-                
-        [[self cyl_contextPlusButton] cyl_setTabBarChildViewControllerIndex:index];
-        
-#else
-#endif
-    } else {}
+/// [EN] The app's own tabs: `viewControllers` without any slot. [CN] App 自己的 Tab：去掉所有 slot 的 `viewControllers`。
+- (NSArray<UIViewController *> *)cyl_viewControllersByRemovingPlusSlot:(NSArray<UIViewController *> *)viewControllers {
+    if (![viewControllers isKindOfClass:[NSArray class]]) {
+        return @[];
+    }
+    NSMutableArray<UIViewController *> *tabs = [NSMutableArray arrayWithCapacity:viewControllers.count];
+    for (UIViewController *viewController in viewControllers) {
+        if (![self cyl_isPlusSlotViewController:viewController]) {
+            [tabs addObject:viewController];
+        }
+    }
+    return [tabs copy];
+}
+
+/// [EN] The app's own tab item attributes: without the entries inserted for the slot. [CN] 去掉为 slot 插入的属性。
+- (NSArray<NSDictionary *> *)cyl_tabBarItemsAttributesByRemovingPlusSlot:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
+    if (![tabBarItemsAttributes isKindOfClass:[NSArray class]]) {
+        return tabBarItemsAttributes;
+    }
+    NSIndexSet *slotIndexes = [tabBarItemsAttributes indexesOfObjectsPassingTest:^BOOL(NSDictionary *attributes, NSUInteger idx, BOOL *stop) {
+        return [attributes isKindOfClass:[NSDictionary class]] && [attributes[CYLTabBarItemPlusSlotPlaceholderKey] boolValue];
+    }];
+    if (slotIndexes.count == 0) {
+        return tabBarItemsAttributes;
+    }
+    NSMutableArray<NSDictionary *> *attributes = [tabBarItemsAttributes mutableCopy];
+    [attributes removeObjectsAtIndexes:slotIndexes];
+    return [attributes copy];
+}
+
+/// [EN] Liquid Glass with a CYLTabBar. [CN] 液态玻璃且使用 CYLTabBar。
+- (BOOL)cyl_isLiquidGlassPlusSlotStyle {
+    return CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive] &&
+           [self.cyl_tabBar isKindOfClass:[CYLTabBar class]];
 }
 
 /*!
- * [CN] iOS26+ , 有 plusButton
- * [EN] iOS26+, with plusButton
+ * [EN] The view controller of the slot, or nil when this style shows the plus button without one: the classic style only
+ *      needs it for a plus child view controller; Liquid Glass (CYLTabBar) and FlatDesign always do, the plus button covers it.
+ * [CN] slot 对应的控制器；该样式不需要 slot 时返回 nil：经典样式只在有 PlusButton 子控制器时需要；液态玻璃（CYLTabBar）与扁平样式
+ *      始终需要，PlusButton 覆盖在它上面。
  */
-- (NSMutableArray *)alignViewControllers:(NSArray *)arrayWithoutPlusButton withPlusButtonViewControllerPlaceholder:(id)plusButtonViewControllerPlaceholder {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        if (!plusButtonViewControllerPlaceholder) {
-            return [arrayWithoutPlusButton mutableCopy];
-        }
-        // Asked of this controller, which the plus button is bound to, not of its tab bar.
-        if (![self hasPlusButton]) {
-            return [arrayWithoutPlusButton mutableCopy];
-        }
-        NSMutableArray *arrayWithPlusButton = nil;
-        if ([arrayWithoutPlusButton isKindOfClass:[NSArray class]]) {
-            arrayWithPlusButton = [NSMutableArray arrayWithArray:arrayWithoutPlusButton];
-        } else if ([arrayWithoutPlusButton isKindOfClass:[NSMutableArray class]]) {
-            arrayWithPlusButton = (NSMutableArray *)arrayWithoutPlusButton;
-        }
-        NSInteger index = NSNotFound;
-        if (plusButtonViewControllerPlaceholder && (plusButtonViewControllerPlaceholder == [self cyl_contextPlusChildViewController])) {
-            //        index = [self.cyl_tabBar cyl_plusButtonIndex];
-        }
-    
-        NSInteger plusButtonIndex = (index != NSNotFound) ? [self.cyl_tabBar cyl_plusButtonIndex] : arrayWithoutPlusButton.count / 2;
-        // FIX: issue #515
-        // [EN] Classic style: the plus button is drawn at `+indexOfPlusButtonInTabBar`, and the tab button at that position
-        //      is the one laid out under it (`-[CYLTabBar layoutSubviews]`). Inserting the plus child view controller in
-        //      the middle instead shifted every tab between the two positions by one: after `-setSelectedIndex:` the
-        //      title of the right tab was selected but the image of its neighbour. Use the plus button's own position.
-        //      Liquid Glass keeps the middle: there the plus button covers the middle tab item.
-        // [CN] 经典样式：PlusButton 绘制在 `+indexOfPlusButtonInTabBar` 的位置，该位置的 Tab 按钮位于它下方（`-[CYLTabBar layoutSubviews]`）。
-        //      以前固定把 PlusButton 子控制器插在中间，两个位置之间的 Tab 都错位一个：调用 `-setSelectedIndex:` 后，选中的是正确 Tab
-        //      的文字，图片却是相邻 Tab 的。这里使用 PlusButton 自己的位置。液态玻璃仍使用中间位置：PlusButton 覆盖中间的 TabBarItem。
-        if (![CYLConstants isLiquidGlassActive]) {
-            CYLPlusButton<CYLPlusButtonSubclassing> *contextPlusButton = [self cyl_contextPlusButton];
-            NSUInteger customIndex = contextPlusButton ? [[contextPlusButton class] indexForTabbarItemsCount:arrayWithoutPlusButton.count] : NSNotFound;
-            if (customIndex != NSNotFound && customIndex <= arrayWithoutPlusButton.count) {
-                plusButtonIndex = (NSInteger)customIndex;
-            }
-        }
-    
-        // [EN] `>=`: a plus button after the last tab is inserted at the end. [CN] `>=`：位于最后一个 Tab 之后的 PlusButton 插在末尾。
-        if (plusButtonIndex >= 0 && (NSInteger)arrayWithPlusButton.count >= plusButtonIndex) {
-            [arrayWithPlusButton insertObject:plusButtonViewControllerPlaceholder atIndex:plusButtonIndex];
-            // [CN] FIXME:  to delete 液态玻璃暂时不支持自定义PlusButton位置。
-            // [EN] FIXME:  to delete Liquid Glass does not support custom PlusButton positions for now.
-            [[self cyl_contextPlusButton] cyl_setTabBarItemVisibleIndex:plusButtonIndex];
-            [self cyl_addChildViewController:plusButtonViewControllerPlaceholder];
-        }
-        return arrayWithPlusButton;
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-
-    //CYLTabBarStyleTypeFlatDesign
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+- (UIViewController *)cyl_plusSlotViewController {
+    if (![self hasPlusButton]) {
+        return nil;
+    }
+    BOOL isFlatDesign = (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType);
 #if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return [arrayWithoutPlusButton mutableCopy]; }
-        if (!plusButtonViewControllerPlaceholder) {
-            return [arrayWithoutPlusButton mutableCopy];
-        }
-        // Asked of this controller, which the plus button is bound to, not of its tab bar.
-        if (![self hasPlusButton]) {
-            return [arrayWithoutPlusButton mutableCopy];
-        }
-        NSMutableArray *arrayWithPlusButton = nil;
-        if ([arrayWithoutPlusButton isKindOfClass:[NSArray class]]) {
-            arrayWithPlusButton = [NSMutableArray arrayWithArray:arrayWithoutPlusButton];
-        } else if ([arrayWithoutPlusButton isKindOfClass:[NSMutableArray class]]) {
-            arrayWithPlusButton = (NSMutableArray *)arrayWithoutPlusButton;
-        }
-        NSInteger index = NSNotFound;
-        //    if (plusButtonViewControllerPlaceholder && (plusButtonViewControllerPlaceholder == [self cyl_contextPlusChildViewController])) {
-        index = [self.cyl_tabBar cyl_plusButtonIndex];
-        //    }
-        NSInteger plusButtonIndex = (index != NSNotFound) ? [self.cyl_tabBar cyl_plusButtonIndex] : arrayWithoutPlusButton.count / 2;
-        if (arrayWithPlusButton.count > plusButtonIndex) {
-            [arrayWithPlusButton insertObject:plusButtonViewControllerPlaceholder atIndex:plusButtonIndex];
-            [[self cyl_contextPlusButton] cyl_setTabBarItemVisibleIndex:plusButtonIndex];
-            [self cyl_addChildViewController:plusButtonViewControllerPlaceholder];
-        }
-                
-        //TODO:  插入self.items
-        //    if (self.items.count > plusButtonIndex) {
-        //        [self.items insertObject:[CYLFlatDesignTabBarItem new] atIndex:plusButtonIndex];
-        //    }
-        return arrayWithPlusButton;
-            
+    isFlatDesign = isFlatDesign && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]];
 #else
+    isFlatDesign = NO;
 #endif
-        
-    } else {    }
-    return [arrayWithoutPlusButton mutableCopy];
+    UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
+    if (plusChildViewController) {
+        return plusChildViewController;
+    }
+    if (!isFlatDesign && ![self cyl_isLiquidGlassPlusSlotStyle]) {
+        return nil;
+    }
+    UIViewController *placeholderViewController = [UIViewController new];
+    [placeholderViewController cyl_setIsPlaceholder:YES];
+    return placeholderViewController;
 }
+
 /*!
- * [CN] iOS26+ , 有 plusButton
- * [EN] iOS26+, with plusButton
+ * [EN] The one rule for where the slot goes among `tabCount` tabs (0 ... tabCount). Liquid Glass: the middle, where the
+ *      plus button covers the tab item (custom positions are not supported there yet). Classic and FlatDesign: the plus
+ *      button's own position (`+indexForTabbarItemsCount:`, issue #515), else the middle.
+ * [CN] slot 在 `tabCount` 个 Tab 中位置的唯一规则（0 ... tabCount）。液态玻璃：中间，PlusButton 覆盖该 TabBarItem（暂不支持自定义位置）。
+ *      经典样式与扁平样式：PlusButton 自己的位置（`+indexForTabbarItemsCount:`，issue #515），否则为中间。
+ */
+- (NSUInteger)cyl_plusSlotIndexForTabCount:(NSUInteger)tabCount {
+    NSUInteger slotIndex = tabCount / 2;
+    if ([self cyl_isLiquidGlassPlusSlotStyle]) {
+        return slotIndex;
+    }
+    CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [self cyl_contextPlusButton];
+    BOOL implementsCustomIndex = [[plusButton class] respondsToSelector:@selector(indexOfPlusButtonInTabBar)];
+    // [EN] `+indexForTabbarItemsCount:` asserts for an odd count without a custom index: only ask when it can answer.
+    // [CN] Tab 数为奇数且没有自定义下标时 `+indexForTabbarItemsCount:` 会断言：只在它能给出结果时调用。
+    if (plusButton && (implementsCustomIndex || tabCount % 2 == 0)) {
+        NSUInteger customIndex = [[plusButton class] indexForTabbarItemsCount:tabCount];
+        if (customIndex != NSNotFound && customIndex <= tabCount) {
+            slotIndex = customIndex;
+        }
+    }
+    return slotIndex;
+}
+
+/// [EN] The attributes of the slot's tab item. [CN] slot 对应 TabBarItem 的属性。
+- (NSDictionary *)cyl_plusSlotTabBarItemAttributes {
+    return @{
+        CYLTabBarItemTitle : @"",
+        CYLTabBarItemImage : [UIImage cyl_tabItemPlaceholderImage],
+        CYLTabBarItemSelectedImage : [UIImage cyl_tabItemPlaceholderImage],
+        CYLTabBarItemPlusSlotPlaceholderKey : @YES,
+    };
+}
+
+/*!
+ * [EN] Sets `_viewControllers` to `viewControllers` (the app's tabs, slot already removed) with exactly one slot, and
+ *      keeps `_tabBarItemsAttributes` in step (Liquid Glass and FlatDesign give the slot its own entry; the classic style
+ *      skips it, `-cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:`).
+ * [CN] 把 `_viewControllers` 设为 `viewControllers`（App 的 Tab，已去掉 slot）加上唯一一个 slot，并同步 `_tabBarItemsAttributes`
+ *      （液态玻璃与扁平样式为 slot 提供单独的一项；经典样式跳过它，见 `-cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:`）。
  */
 - (void)alignTabControlIfNeededWithViewControllers:(NSArray *)viewControllers {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    
-        // Asked of this controller, which the plus button is bound to, not of its tab bar.
-        if (![self hasPlusButton]) {
-            _viewControllers = [viewControllers copy];
-            return;
-        }
-        // FIX: issue #481
-        // [EN] Before the alignment, the view controllers being set: re-assigning `viewControllers` (one tab replaced)
-        //      compared the new attributes with the previous tabs, the plus button's included, and failed the assertion.
-        // [CN] 对齐之前检查正在设置的视图控制器：重新赋值 `viewControllers`（替换一个 Tab）时，原先用新的属性与之前的 Tab
-        //      （包括 PlusButton 的 Tab）比较，导致断言失败。
-        [self doubleCheckTabControlAlignWithViewControllers:viewControllers ?: _viewControllers];
-        BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
-        BOOL addedFlag = [[self cyl_contextPlusChildViewController] cyl_plusViewControllerEverAdded];
-        BOOL hasPlusChildViewController = [self hasPlusChildViewController] && !isAdded && !addedFlag;
-        if (hasPlusChildViewController) {
-            [self alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:viewControllers];
-            [[self cyl_contextPlusChildViewController] cyl_setPlusViewControllerEverAdded:YES];
-        } else {
-            [[self cyl_contextPlusButton] cyl_setTabBarChildViewControllerIndex:NSNotFound];
-        }
-    
-        if (![CYLConstants isLiquidGlassActive]) {
-            if (!hasPlusChildViewController) {
-                _viewControllers = [viewControllers copy];
-            }
-            return;
-        }
-    
-        if (![self hasPlusButton]) {
-            if (!hasPlusChildViewController) {
-                _viewControllers = [viewControllers copy];
-            }
-            return;
-        }
-    
-        if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
-            if (!hasPlusChildViewController) {
-                _viewControllers = [viewControllers copy];
-            }
-            return;
-        }
-    
-        // [CN] iOS26+ , 有 plusButton
-        // [EN] iOS26+, with plusButton
-        if ([self hasPlusButton] && [CYLConstants isLiquidGlassActive]) {
-            [self alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:viewControllers];
-            NSDictionary *plusInfo =
-            @{
-                CYLTabBarItemTitle: @"",
-                CYLTabBarItemImage :  [UIImage cyl_tabItemPlaceholderImage],
-                CYLTabBarItemSelectedImage : [UIImage cyl_tabItemPlaceholderImage]
-            };
-            _tabBarItemsAttributes = [self alignViewControllers:_tabBarItemsAttributes withPlusButtonViewControllerPlaceholder:plusInfo];
-        }
-        [self doubleCheckTabControlAlignWithViewControllers:_viewControllers ?: viewControllers];
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-
-    //CYLTabBarStyleTypeFlatDesign
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        // Asked of this controller, which the plus button is bound to, not of its tab bar.
-        if (![self hasPlusButton]) {
-            _viewControllers = [viewControllers copy];
-            return;
-        }
-        [self doubleCheckTabControlAlignWithViewControllers:_viewControllers ?: viewControllers];
-        BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
-        BOOL addedFlag = [[self cyl_contextPlusChildViewController] cyl_plusViewControllerEverAdded];
-        BOOL hasPlusChildViewController = [self hasPlusChildViewController] && !isAdded && !addedFlag;
-        if (hasPlusChildViewController) {
-            [self alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:viewControllers];
-            [[self cyl_contextPlusChildViewController] cyl_setPlusViewControllerEverAdded:YES];
-        } else {
-            [[self cyl_contextPlusButton] cyl_setTabBarChildViewControllerIndex:NSNotFound];
-        }
-        
-        //        if (![CYLConstants isLiquidGlassActive]) {
-        //            if (!hasPlusChildViewController) {
-        //                _viewControllers = [viewControllers copy];
-        //            }
-        //            return;
-        //        }
-        
-        if (![self hasPlusButton]) {
-            if (!hasPlusChildViewController) {
-                _viewControllers = [viewControllers copy];
-            }
-            return;
-        }
-        
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-            if (!hasPlusChildViewController) {
-                _viewControllers = [viewControllers copy];
-            }
-            return;
-        }
-        
-        // [CN] iOS26+ , 有 plusButton
-        // [EN] iOS26+, with plusButton
-        //        if ([self hasPlusButton] && [CYLConstants isLiquidGlassActive]) {
-        if ([self hasPlusButton]) {
-
-            [self alignTabControlIfNeededWithPlusChildViewControllerFromViewControllers:viewControllers];
-            NSDictionary *plusInfo =
-            @{
-                CYLTabBarItemTitle: @"",
-                CYLTabBarItemImage :  [UIImage cyl_tabItemPlaceholderImage],
-                CYLTabBarItemSelectedImage : [UIImage cyl_tabItemPlaceholderImage]
-            };
-            _tabBarItemsAttributes = [self alignViewControllers:_tabBarItemsAttributes withPlusButtonViewControllerPlaceholder:plusInfo];
-        }
-        [self doubleCheckTabControlAlignWithViewControllers:_viewControllers ?: viewControllers];
-#else
-#endif
-    } else {}
+    NSArray<UIViewController *> *tabs = [self cyl_viewControllersByRemovingPlusSlot:viewControllers];
+    _tabBarItemsAttributes = [self cyl_tabBarItemsAttributesByRemovingPlusSlot:_tabBarItemsAttributes];
+    CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [self cyl_contextPlusButton];
+    if (plusButton) {
+        // FIX: issue #481 — checked before the alignment, with the app's own tabs.
+        // 在对齐之前用 App 自己的 Tab 检查。
+        [self doubleCheckTabControlAlignWithViewControllers:tabs];
+    }
+    UIViewController *slotViewController = [self cyl_plusSlotViewController];
+    if (!slotViewController) {
+        _viewControllers = tabs;
+        [plusButton cyl_setTabBarChildViewControllerIndex:NSNotFound];
+        return;
+    }
+    NSUInteger slotIndex = MIN([self cyl_plusSlotIndexForTabCount:tabs.count], tabs.count);
+    NSMutableArray<UIViewController *> *viewControllersWithSlot = [tabs mutableCopy];
+    [viewControllersWithSlot insertObject:slotViewController atIndex:slotIndex];
+    _viewControllers = [viewControllersWithSlot copy];
+    [self cyl_addChildViewController:slotViewController];
+    [plusButton cyl_setTabBarItemVisibleIndex:(NSInteger)slotIndex];
+    // [EN] As the tab bars set it on layout (`-[CYLTabBar plusButtonIndex]`): the slot's index, placeholder or not.
+    // [CN] 与 TabBar 布局时设置的一致（`-[CYLTabBar plusButtonIndex]`）：slot 的下标，无论是否为占位控制器。
+    [plusButton cyl_setTabBarChildViewControllerIndex:(NSInteger)slotIndex];
+    BOOL isPlusChildViewController = !slotViewController.cyl_isPlaceholder;
+    if (isPlusChildViewController) {
+        [slotViewController cyl_setPlusViewControllerEverAdded:YES];
+    }
+    BOOL isFlatDesign = (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType);
+    if ((isFlatDesign || [self cyl_isLiquidGlassPlusSlotStyle]) && _tabBarItemsAttributes.count > 0) {
+        NSMutableArray<NSDictionary *> *attributes = [_tabBarItemsAttributes mutableCopy];
+        [attributes insertObject:[self cyl_plusSlotTabBarItemAttributes] atIndex:MIN(slotIndex, attributes.count)];
+        _tabBarItemsAttributes = [attributes copy];
+    }
 }
 
 - (void)doubleCheckTabControlAlignWithViewControllers:(NSArray *)viewControllers {
@@ -3249,7 +3161,9 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         [self cyl_logTabBarItemsAttributesMismatchIfNeeded];
 #endif
     
-        [self.cyl_tabBar cyl_setTabbarItemsCount:[viewControllers count]];
+        // [EN] The app's own tabs: a slot carried by `viewControllers` (a re-assignment) is not a tab.
+        // [CN] App 自己的 Tab 数：`viewControllers` 自带的 slot（重新赋值时）不算 Tab。
+        [self.cyl_tabBar cyl_setTabbarItemsCount:[self cyl_viewControllersByRemovingPlusSlot:viewControllers].count];
         if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
             _viewControllers = viewControllers;
             return;
@@ -3382,6 +3296,11 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
 #if CYL_FLATDESIGN_AVAILABLE
         if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
         _needsReloadItems = YES;
+        // [EN] The app's own tabs and their attributes: a re-assignment may carry the slot (and its attributes), which
+        //      shifted `idx` below by one after the slot, and inserted a second slot.
+        // [CN] App 自己的 Tab 及其属性：重新赋值时可能带有 slot（及其属性），以前会使下面 slot 之后的 `idx` 错位一个，并插入第二个 slot。
+        viewControllers = [self cyl_viewControllersByRemovingPlusSlot:viewControllers];
+        _tabBarItemsAttributes = [self cyl_tabBarItemsAttributesByRemovingPlusSlot:_tabBarItemsAttributes];
         __weak __typeof(self) weakSelf = self;
         [viewControllers enumerateObjectsUsingBlock:^(__kindof UIViewController * _Nonnull childVC, NSUInteger idx, BOOL * _Nonnull stop) {
             __strong typeof(self) self = weakSelf;
@@ -3394,8 +3313,6 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
             //TODO: if (_tabBarItemsAttributes.count > idx)
         }];
         [self.cyl_tabBar cyl_setTabbarItemsCount:[viewControllers count]];
-        // Legacy global (what was written last); this tab bar's own index is `-[UIView cyl_plusButtonIndex]`.
-        CYLPlusButtonIndex = [self.cyl_tabBar cyl_plusButtonIndex];
         [super setViewControllers:viewControllers];
         if (@available(iOS 27.1, *)) {
             _cylDidRefreshSystemTabBarVisibility = NO;
@@ -3403,6 +3320,10 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         }
         //    _viewControllers = viewControllers;
         [self alignTabControlIfNeededWithViewControllers:viewControllers];
+        // Legacy global (what was written last); this tab bar's own index is `-[UIView cyl_plusButtonIndex]`. Read after
+        // the slot is inserted: it is the slot's index in `viewControllers`.
+        // 旧的全局变量（最后写入的值）；本 TabBar 自己的下标见 `-[UIView cyl_plusButtonIndex]`。在插入 slot 之后读取：即 slot 在 `viewControllers` 中的下标。
+        CYLPlusButtonIndex = [self.cyl_tabBar cyl_plusButtonIndex];
         if (_needsReloadItems) {
             [self _captureItems];
             [self.cyl_tabBar setItems:self.items];
