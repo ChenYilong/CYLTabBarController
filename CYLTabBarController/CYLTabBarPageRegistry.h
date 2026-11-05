@@ -10,6 +10,8 @@
 // [CN] 与此类绑定的文档：
 //   - Research: registering the PlusButton through configurations and the page registry / 调研：配置文件与页面注册表中的 PlusButton 注册
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Registration-Research.md
+//   - Review: does the page registry implementation match the original design / 评审：页面注册表的实现是否符合最初的架构设计
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Page-Registry-Review.md
 //   - Tab pages from page IDs (the page registry) / 按页面 ID 获得 Tab 页面（页面注册表）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Page-Registry.md
 // docs-binding:end

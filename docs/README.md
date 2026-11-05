@@ -42,6 +42,7 @@
 | [Tab 交互：点击动画、长按、滑动切换及其他](Tab-Interactions.md) | [Tab interactions: tap animations, long press, swipe, and more](Tab-Interactions.md) |
 | [单个 Tab 的颜色](Tab-Item-Colors.md) | [Per-tab Colors](Tab-Item-Colors.md) |
 | [Tab 的排列方式](Tab-Item-Positioning.md) | [Tab Item Positioning](Tab-Item-Positioning.md) |
+| [评审：页面注册表的实现是否符合最初的架构设计](Tab-Page-Registry-Review.md) | [Review: does the page registry implementation match the original design](Tab-Page-Registry-Review.md) |
 | [按页面 ID 获得 Tab 页面（页面注册表）](Tab-Page-Registry.md) | [Tab pages from page IDs (the page registry)](Tab-Page-Registry.md) |
 | [重复点击已选中 Tab 的内置操作](Tab-Reselect.md) | [Built-in Actions for Tapping the Selected Tab](Tab-Reselect.md) |
 | [调研：配置文件中的 Tab 如何对应到页面对象（跨端标识、注册表与顺序）](Tab-View-Controller-Resolution-Research.md) | [Research: how a tab in a configuration file finds its page object (cross-platform IDs, registries and order)](Tab-View-Controller-Resolution-Research.md) |
@@ -97,6 +98,7 @@ docs/
 ├── Tab-Interactions.md
 ├── Tab-Item-Colors.md
 ├── Tab-Item-Positioning.md
+├── Tab-Page-Registry-Review.md
 ├── Tab-Page-Registry.md
 ├── Tab-Reselect.md
 ├── Tab-View-Controller-Resolution-Research.md

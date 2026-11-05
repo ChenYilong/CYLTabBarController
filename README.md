@@ -286,6 +286,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [Tab 交互：点击动画、长按、滑动切换及其他](docs/Tab-Interactions.md) | [Tab interactions: tap animations, long press, swipe, and more](docs/Tab-Interactions.md) |
 | [单个 Tab 的颜色](docs/Tab-Item-Colors.md) | [Per-tab Colors](docs/Tab-Item-Colors.md) |
 | [Tab 的排列方式](docs/Tab-Item-Positioning.md) | [Tab Item Positioning](docs/Tab-Item-Positioning.md) |
+| [评审：页面注册表的实现是否符合最初的架构设计](docs/Tab-Page-Registry-Review.md) | [Review: does the page registry implementation match the original design](docs/Tab-Page-Registry-Review.md) |
 | [按页面 ID 获得 Tab 页面（页面注册表）](docs/Tab-Page-Registry.md) | [Tab pages from page IDs (the page registry)](docs/Tab-Page-Registry.md) |
 | [重复点击已选中 Tab 的内置操作](docs/Tab-Reselect.md) | [Built-in Actions for Tapping the Selected Tab](docs/Tab-Reselect.md) |
 | [调研：配置文件中的 Tab 如何对应到页面对象（跨端标识、注册表与顺序）](docs/Tab-View-Controller-Resolution-Research.md) | [Research: how a tab in a configuration file finds its page object (cross-platform IDs, registries and order)](docs/Tab-View-Controller-Resolution-Research.md) |

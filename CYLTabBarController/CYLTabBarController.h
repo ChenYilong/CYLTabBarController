@@ -47,6 +47,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Interactions.md
 //   - Per-tab Colors / 单个 Tab 的颜色
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Item-Colors.md
+//   - Review: does the page registry implementation match the original design / 评审：页面注册表的实现是否符合最初的架构设计
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Page-Registry-Review.md
 //   - Tab pages from page IDs (the page registry) / 按页面 ID 获得 Tab 页面（页面注册表）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Page-Registry.md
 //   - Built-in Actions for Tapping the Selected Tab / 重复点击已选中 Tab 的内置操作
