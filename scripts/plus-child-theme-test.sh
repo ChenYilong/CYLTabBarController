@@ -84,7 +84,7 @@ fi
 # [CN] 等待 App 的测试日志出现匹配 $1（扩展正则）的行，最多 $2 秒。
 wait_for_line() {
   WAITED=0
-  while ! grep -qE "$1" "$RUN_LOG" 2>/dev/null; do
+  while ! grep -qE -- "$1" "$RUN_LOG" 2>/dev/null; do
     if [ "$WAITED" -ge "$(($2 * 5))" ]; then
       echo "Timed out waiting for: $1"
       return 1
@@ -106,8 +106,8 @@ for SCENARIO in $SCENARIOS; do
   FILE="$OUT/plus-child-theme-$STYLE_SLUG-$SLUG"
   CONSOLE_LOG="$OUT/$STYLE_SLUG-$SLUG-console.log"
   # [EN] The app appends its test lines at once to tmp/plus-child-theme-test.log in its data container: the console
-  #      stream of `simctl launch --console-pty` reached this script only when the app was closed.
-  # [CN] App 把测试输出立即追加到其数据容器中的 tmp/plus-child-theme-test.log：`simctl launch --console-pty` 的控制台输出
+  #      stream of "simctl launch --console-pty" reached this script only when the app was closed.
+  # [CN] App 把测试输出立即追加到其数据容器中的 tmp/plus-child-theme-test.log："simctl launch --console-pty" 的控制台输出
   #      直到 App 关闭才传到本脚本。
   RUN_LOG="$(xcrun simctl get_app_container "$DEVICE_ID" "$BUNDLE_ID" data)/tmp/plus-child-theme-test.log"
   ACK_DIR="$(dirname "$RUN_LOG")"
