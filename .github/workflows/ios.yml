@@ -147,6 +147,9 @@ jobs:
             exit 1
           fi
       - uses: actions/upload-artifact@v4
+        # [EN] A log that cannot be uploaded (GitHub's artifact service timing out) must not fail the job.
+        # [CN] 日志上传失败（GitHub 的 artifact 服务超时）不应让 job 失败。
+        continue-on-error: true
         if: always() && needs.changes.outputs.code == 'true'
         with:
           name: framework-logs
@@ -168,6 +171,9 @@ jobs:
         if: needs.changes.outputs.code == 'true'
         run: scripts/unit-tests.sh
       - uses: actions/upload-artifact@v4
+        # [EN] A log that cannot be uploaded (GitHub's artifact service timing out) must not fail the job.
+        # [CN] 日志上传失败（GitHub 的 artifact 服务超时）不应让 job 失败。
+        continue-on-error: true
         if: always() && needs.changes.outputs.code == 'true'
         with:
           name: unit-tests-log

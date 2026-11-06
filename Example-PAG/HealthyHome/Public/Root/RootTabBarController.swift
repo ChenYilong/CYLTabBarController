@@ -24,13 +24,14 @@ class RootTabBarController: CYLTabBarController {
 
     
 
-    // [EN] #216: a skin can change a tab's PAG file in place. The Christmas skin swaps the files of "Moments" and "Me"; every
-    //      other skin uses the files of `TabBarCommon`. PAG has no color override, so the file is what a skin can change.
-    // [CN] #216：皮肤可以原地更换 Tab 的 PAG 文件。圣诞皮肤互换「朋友圈」与「我的」的文件；其他皮肤使用 `TabBarCommon` 中的文件。
-    //      PAG 没有颜色覆盖，因此皮肤能更换的就是文件。
-    override func cyl_themeDidChange(by manager: CYLThemeManager, identifier: (any NSCopying & NSObjectProtocol)?, theme: NSObject?) {
-        super.cyl_themeDidChange(by: manager, identifier: identifier, theme: theme)
-        let isChristmas = (identifier as? String) == "Christmas"
+    /// [EN] #216: a skin can change a tab's PAG file in place. The Grapefruit skin swaps the files of "Moments" and "Me"; every
+    ///      other skin uses the files of `TabBarCommon`. PAG has no color override, so the file is what a skin can change. A color skin, because the
+    ///      icons of a holiday skin are shown over the animations.
+    ///      `cyl_themeDidChangeBlock` runs after the theme was applied to this controller.
+    /// [CN] #216：皮肤可以原地更换 Tab 的 PAG 文件。西柚皮肤互换「朋友圈」与「我的」的文件；其他皮肤使用 `TabBarCommon` 中的文件。
+    ///      PAG 没有颜色覆盖，因此皮肤能更换的就是文件。使用配色皮肤，因为节日皮肤的图标会显示在动画之上。`cyl_themeDidChangeBlock` 在主题应用到本控制器之后执行。
+    private func applySkinAnimations() {
+        let swapsFiles = (cyl_themeManager.currentThemeIdentifier as? String) == "Grapefruit"
         // [EN] Indexes in `viewControllers`: the PlusButton's tab is index 2. [CN] `viewControllers` 中的索引：PlusButton 的 Tab 是索引 2。
         // [EN] `CYLTabBarItemAttributesAddingAnimationFile()` finds the file in the main bundle; `CYLTabBarAnimationFilePath` itself is a full path.
         // [CN] `CYLTabBarItemAttributesAddingAnimationFile()` 在 main bundle 中查找文件；`CYLTabBarAnimationFilePath` 本身是完整路径。
@@ -39,14 +40,18 @@ class RootTabBarController: CYLTabBarController {
                 self.updateTabBarItem(at: index, attributes: attributes)
             }
         }
-        setFile(3, isChristmas ? "test2.pag" : "22.pag")
-        setFile(4, isChristmas ? "22.pag" : "test2.pag")
+        setFile(3, swapsFiles ? "test2.pag" : "22.pag")
+        setFile(4, swapsFiles ? "22.pag" : "test2.pag")
     }
 
     override func viewDidLoad() {
         tabBarItemAnimationSpeed = 1.5 // Issue #428: tab icon animations at 1.5x (no effect without an animation subspec) Tab 图标动画 1.5 倍速
 
         super.viewDidLoad()
+
+        view.cyl_themeDidChangeBlock = { [weak self] in
+            self?.applySkinAnimations()
+        }
 
         self.delegate = self
 

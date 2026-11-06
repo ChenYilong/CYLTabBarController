@@ -262,10 +262,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                  CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"],
         CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover_dark" ofType:@"json"],
-        // [EN] #216: the unselected icon's color follows the skin (the tab's file stays the same): gray, or red with the Christmas skin.
-        // [CN] #216：未选中图标的颜色跟随皮肤（Tab 的文件不变）：灰色，圣诞皮肤时为红色。
+        // [EN] #216: the unselected icon's color follows the skin (the tab's file stays the same): gray, or red with the Grapefruit skin (a color skin: a holiday skin's icons are shown over the animations).
+        // [CN] #216：未选中图标的颜色跟随皮肤（Tab 的文件不变）：灰色，西柚皮肤时为红色（使用配色皮肤：节日皮肤的图标会显示在动画之上）。
         CYLTabBarAnimationColors : @{ @"Icon_Discovery_Normal.**.Color" : [UIColor cyl_colorWithThemeProvider:^UIColor *(CYLThemeManager *manager, NSObject<NSCopying> *identifier, NSObject *theme) {
-            return [identifier isEqual:@"Christmas"] ? UIColor.systemRedColor : [UIColor colorWithWhite:0.498 alpha:1];
+            return [identifier isEqual:@"Grapefruit"] ? UIColor.systemRedColor : [UIColor colorWithWhite:0.498 alpha:1];
         }] },
         //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };

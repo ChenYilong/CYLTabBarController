@@ -46,6 +46,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_moveSelectedContentViewWithPlusButton;
 /// [EN] Puts the stand-in in place, in every layout. [CN] 在所有布局中放置替身。
 - (void)cyl_placeSelectedContentView;
+/// [EN] A button whose picture is its background image, its title on it. [CN] 以背景图为图片、标题画在图上的按钮。
+- (BOOL)cyl_drawsTitleOverBackgroundImage;
+/// [EN] Removes the image from the plus button and its stand-in, in every state. [CN] 移除 PlusButton 及其替身所有状态的图片。
+- (void)cyl_removeImage;
 @end
 
 /// [EN] Implemented in CYLTabBarController.m (CYLTheme, issue #216). [CN] 实现见 CYLTabBarController.m 中的 CYLTheme（issue #216）。

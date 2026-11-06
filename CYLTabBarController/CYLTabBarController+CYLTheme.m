@@ -466,11 +466,13 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
  * [EN] The theme's plus button, through `-updatePlusButtonWithAttributes:` (as the "change all titles" and "change all
  *      network icons" demo rows), one restore record per part: the title, the image, the selected image. A part the new
  *      theme does not give, or an image that could not be loaded, gets its own value back, unless the app changed it.
- *      An image the plus button never had is restored as the normal image (a button without a selected image shows its
- *      normal one); a title it never had as "".
+ *      An image the plus button never had is removed, and a selected image it never had becomes its normal image (a button
+ *      without a selected image shows its normal one); a title it never had becomes "". A button whose picture is its
+ *      background image (`-cyl_drawsTitleOverBackgroundImage`) takes no image from a theme.
  * [CN] 主题中的 PlusButton，通过 `-updatePlusButtonWithAttributes:`（与演示中“批量更换标题”“批量下载网络图标”行相同），每个部分一条恢复
- *      记录：标题、图片、选中图片。新主题未提供的部分、未能加载的图片恢复为它自己的内容，除非 App 修改过。PlusButton 原本没有的图片恢复为
- *      普通图片（按钮没有选中图片时显示普通图片）；原本没有的标题恢复为 ""。
+ *      记录：标题、图片、选中图片。新主题未提供的部分、未能加载的图片恢复为它自己的内容，除非 App 修改过。PlusButton 原本没有的图片会被移除，
+ *      原本没有的选中图片恢复为普通图片（按钮没有选中图片时显示普通图片）；原本没有的标题恢复为 ""。以背景图为图片的按钮
+ *      （`-cyl_drawsTitleOverBackgroundImage`）不接受主题的图片。
  */
 - (void)cyl_applyThemePlusButtonAttributes:(nullable NSDictionary<NSString *, id> *)attributes generation:(NSUInteger)generation {
     CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
@@ -481,8 +483,11 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
         [self cyl_themeRestorablesForKey:&CYLThemePlusButtonRestorablesKey create:^id { return [NSMutableDictionary dictionary]; }];
     NSMutableDictionary<NSString *, id> *themeParts = [NSMutableDictionary dictionary];
     themeParts[CYLThemePlusButtonPartTitle] = attributes[CYLTabBarItemTitle];
-    themeParts[CYLThemePlusButtonPartImage] = attributes[CYLTabBarItemImageURL] ?: attributes[CYLTabBarItemImage];
-    themeParts[CYLThemePlusButtonPartSelectedImage] = attributes[CYLTabBarItemSelectedImageURL] ?: attributes[CYLTabBarItemSelectedImage];
+    // [EN] A button whose picture is its background keeps it: an icon of a theme would sit beside the title, over the picture.
+    // [CN] 以背景图为图片的按钮保持原样：主题图标会盖在图片上、挤在标题旁边。
+    BOOL takesThemeImages = ![plusButton cyl_drawsTitleOverBackgroundImage];
+    themeParts[CYLThemePlusButtonPartImage] = takesThemeImages ? (attributes[CYLTabBarItemImageURL] ?: attributes[CYLTabBarItemImage]) : nil;
+    themeParts[CYLThemePlusButtonPartSelectedImage] = takesThemeImages ? (attributes[CYLTabBarItemSelectedImageURL] ?: attributes[CYLTabBarItemSelectedImage]) : nil;
     NSValue *sizeValue = attributes[CYLTabBarItemImageURLSize];
 
     for (NSString *part in @[ CYLThemePlusButtonPartTitle, CYLThemePlusButtonPartImage, CYLThemePlusButtonPartSelectedImage ]) {
@@ -541,6 +546,9 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
     } else if ([part isEqualToString:CYLThemePlusButtonPartImage]) {
         if (original) {
             [plusButton cyl_updateTitle:nil image:original selectedImage:nil];
+        } else {
+            // [EN] It had no image of its own. [CN] 它原本没有图片。
+            [plusButton cyl_removeImage];
         }
     } else {
         // [EN] No selected image of its own: the normal one, as a button without a selected image shows.

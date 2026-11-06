@@ -157,12 +157,12 @@ docs/
     ├── theme-switching-flat-design.png
     ├── theme-switching-holiday-icons.png
     ├── theme-switching-liquid-glass.png
-    ├── theme-switching-objc-flat-design-christmas.png
-    ├── theme-switching-objc-liquid-glass-christmas.png
-    ├── theme-switching-pag-christmas.png
-    ├── theme-switching-rive-christmas.png
+    ├── theme-switching-objc-flat-design-grapefruit.png
+    ├── theme-switching-objc-liquid-glass-grapefruit.png
+    ├── theme-switching-pag-grapefruit.png
+    ├── theme-switching-rive-grapefruit.png
     ├── theme-switching-runtime-christmas-to-pink-rose.png
-    ├── theme-switching-swiftui-rive-christmas.png
+    ├── theme-switching-swiftui-rive-grapefruit.png
     ├── update-tab-bar-items-all-local-icons.png
     ├── update-tab-bar-items-all-network-icons-badges.png
     ├── update-tab-bar-items-all-network-icons-restored.png

@@ -55,6 +55,9 @@ jobs:
           if [ -n "$SCENARIOS_INPUT" ]; then export SCENARIOS="$SCENARIOS_INPUT"; fi
           scripts/plus-child-theme-test.sh
       - uses: actions/upload-artifact@v4
+        # [EN] A log that cannot be uploaded (GitHub's artifact service timing out) must not fail the job.
+        # [CN] 日志上传失败（GitHub 的 artifact 服务超时）不应让 job 失败。
+        continue-on-error: true
         if: always()
         with:
           name: plus-child-theme-test-${{ matrix.style }}

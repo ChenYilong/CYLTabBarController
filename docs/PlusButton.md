@@ -101,6 +101,10 @@
 | 液态玻璃的换肤机制与其他样式完全不同，相关代码必须用 guard 隔离。判断样式时同时检查液态玻璃与 TabBar 样式：iOS 26 上使用扁平样式 TabBar 时 `+[CYLConstants isLiquidGlassActive]` 也为 YES。`CYLPlusButton.m` 中使用 `CYLPlusButtonIsInLiquidGlassTabBar()`，并同时检查 `+plusChildViewControllerForOwner:`。 | Theming on Liquid Glass works quite differently from the other styles, and its code must be isolated with guards. Check both Liquid Glass and the tab bar style: `+[CYLConstants isLiquidGlassActive]` is YES on iOS 26 with the FlatDesign tab bar too. `CYLPlusButton.m` uses `CYLPlusButtonIsInLiquidGlassTabBar()`, together with `+plusChildViewControllerForOwner:`. |
 | 液态玻璃有两个图层，修改 `tabBarItem.image` 会让 UIKit 重建 Tab 按钮，并且无法显示在动画图标之上。因此主题图标使用 `-setTabBarItemIcon:selectedIcon:size:atIndex:`，以视图替换图标；替身的安装使用 `-cyl_replaceTabImageViewWithNewView:offset:show:completion:`（标题由 TabBarItem 显示时）或 `-cyl_coverTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:`。液态玻璃下需要替换图标时，优先考虑 `cyl_replace` 与 `cyl_cover` 系列方法，而不是更新图片。 | Liquid Glass has two layers, and changing `tabBarItem.image` makes UIKit rebuild the tab buttons and does not show over an animated icon. So theme icons use `-setTabBarItemIcon:selectedIcon:size:atIndex:`, a view in place of the icon, and the stand-in is installed with `-cyl_replaceTabImageViewWithNewView:offset:show:completion:` (when the tab item shows the title) or `-cyl_coverTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:`. To replace an icon on Liquid Glass, prefer the `cyl_replace` and `cyl_cover` methods to updating an image. |
 
+| 中文 | English |
+|:---|:---|
+| 以背景图为图片、标题画在图上的 PlusButton（`-cyl_drawsTitleOverBackgroundImage`）不接受主题的图片：主题图标会盖在图片上、挤在标题旁边。App 直接调用 `-updatePlusButtonWithAttributes:` 时不受影响。原本没有图片的 PlusButton 从主题恢复时，主题图片会被移除。 | A plus button whose picture is its background image, its title on it (`-cyl_drawsTitleOverBackgroundImage`), takes no image from a theme: a theme's icon would sit over the picture, beside the title. An app calling `-updatePlusButtonWithAttributes:` itself is not affected. A plus button with no image of its own loses the theme's image when the theme goes. |
+
 ## [CN]测试
 ## [EN]Testing
 

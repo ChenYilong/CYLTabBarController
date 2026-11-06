@@ -99,23 +99,29 @@ extension CYLTabBarController {
 }
 
 /*!
- * [EN] #216: a skin can change a tab's animation in place. The Christmas skin swaps the icons of "Chat" and "User"; icons.riv
- *      has no view model, so a skin cannot recolor it (`CYLTabBarAnimationColors` needs one). This runs after `super`, which
- *      applies the theme and restores the app's own look; a `CYLThemeDidChangeNotification` observer would run before it.
- * [CN] #216：皮肤可以原地更换 Tab 的动画。圣诞皮肤互换 Chat 与 User 的图标；icons.riv 没有 view model，因此皮肤无法为其换色
- *      （`CYLTabBarAnimationColors` 需要 view model）。这段代码在 `super` 之后执行，`super` 负责应用主题并恢复 App 自己的外观；
- *      `CYLThemeDidChangeNotification` 的监听者则会在它之前执行。
+ * [EN] #216: a skin can change a tab's animation in place. The Grapefruit skin swaps the icons of "Chat" and "User" (a color skin: a holiday skin's icons are shown over the animations); icons.riv
+ *      has no view model, so a skin cannot recolor it (`CYLTabBarAnimationColors` needs one). `cyl_themeDidChangeBlock` runs
+ *      after the theme was applied and the app's own look restored; a `CYLThemeDidChangeNotification` observer would run before that.
+ * [CN] #216：皮肤可以原地更换 Tab 的动画。西柚皮肤互换 Chat 与 User 的图标（使用配色皮肤：节日皮肤的图标会显示在动画之上）；icons.riv 没有 view model，因此皮肤无法为其换色
+ *      （`CYLTabBarAnimationColors` 需要 view model）。`cyl_themeDidChangeBlock` 在应用主题并恢复 App 自己的外观之后执行；
+ *      `CYLThemeDidChangeNotification` 的监听者则会在这之前执行。
  */
 class CourseTabBarController: CYLTabBarController {
 
-    override func cyl_themeDidChange(by manager: CYLThemeManager, identifier: (any NSCopying & NSObjectProtocol)?, theme: NSObject?) {
-        super.cyl_themeDidChange(by: manager, identifier: identifier, theme: theme)
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.cyl_themeDidChangeBlock = { [weak self] in
+            self?.applySkinAnimations()
+        }
+    }
+
+    private func applySkinAnimations() {
         guard let lastIndex = viewControllers?.indices.last else { return }
-        let isChristmas = (identifier as? String) == "Christmas"
+        let swapsIcons = (cyl_themeManager.currentThemeIdentifier as? String) == "Grapefruit"
         // [EN] "Chat" is the first tab and "User" the last in both apps; what lies between differs (Example-Rive has a PlusButton).
         // [CN] 两个 App 中 Chat 都是第一个 Tab，User 都是最后一个；中间不同（Example-Rive 有 PlusButton）。
-        setAnimation(of: isChristmas ? .user : .chat, at: 0)
-        setAnimation(of: isChristmas ? .chat : .user, at: lastIndex)
+        setAnimation(of: swapsIcons ? .user : .chat, at: 0)
+        setAnimation(of: swapsIcons ? .chat : .user, at: lastIndex)
     }
 
     private func setAnimation(of tab: Tab, at index: Int) {

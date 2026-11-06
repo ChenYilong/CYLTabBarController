@@ -14,6 +14,7 @@
 /// [CN] See `-[CYLTabBar plusButtonIndex]`. 见 `-[CYLTabBar plusButtonIndex]`。
 /// [EN] See `-[CYLTabBar plusButtonIndex]`.
 @interface CYLTabBar (CYLPlusButtonLayout)
+- (BOOL)cyl_isLiquidGlassGestureActive;
 - (BOOL)cyl_showsVerticalBar;
 - (BOOL)cyl_showsMinimizedBar;
 @end
@@ -468,6 +469,27 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
         [self cyl_updateSelectedContentViewImage];
         [self cyl_contentImageDidChange];
     }
+}
+
+- (void)cyl_removeImage {
+    UIButton *standIn = (_selectedContentView != self) ? _selectedContentView : nil;
+    for (NSNumber *imageState in CYLPlusButtonImageStates()) {
+        [self setImage:nil forState:imageState.unsignedIntegerValue];
+        [standIn setImage:nil forState:imageState.unsignedIntegerValue];
+    }
+    if (@available(iOS 15.0, *)) {
+        if (self.configuration.image) {
+            UIButtonConfiguration *configuration = self.configuration;
+            configuration.image = nil;
+            self.configuration = configuration;
+        }
+        if (standIn.configuration.image) {
+            UIButtonConfiguration *configuration = standIn.configuration;
+            configuration.image = nil;
+            standIn.configuration = configuration;
+        }
+    }
+    [self.superview setNeedsLayout];
 }
 
 /// [EN] Liquid Glass with a plus child view controller, see `-cyl_updateSelectedContentViewImage`. [CN] 液态玻璃且有 PlusButton 子控制器，见 `-cyl_updateSelectedContentViewImage`。
@@ -1138,7 +1160,7 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     if (!CGPointEqualToPoint(center, selectedContentView.center)) {
         selectedContentView.center = center;
     }
-    [self cyl_updateLiquidGlassMask];
+//    [self cyl_updateLiquidGlassMask];
 }
 
 /// [EN] The name of the mask `-cyl_updateLiquidGlassMask` puts on the plus button. [CN] `-cyl_updateLiquidGlassMask` 给 PlusButton 设置的 mask 的名字。
@@ -1176,7 +1198,11 @@ static NSString *const CYLPlusButtonLiquidGlassMaskName = @"CYLPlusButtonLiquidG
     BOOL plusChildSelected = plusChildViewController &&
         (selectedViewController == plusChildViewController ||
          [selectedViewController cyl_getViewControllerInsteadOfNavigationController] == plusChildViewController);
-    if (plusChildSelected) {
+    // [EN] While the glass is held or dragged it is no longer where the stand-in rests, so nothing is cut out of the plus button.
+    // [CN] 玻璃被按住或拖动时已不在替身的原位，因此不从 PlusButton 上挖掉任何区域。
+    UITabBar *tabBar = tabBarController.tabBar;
+    BOOL glassIsMoving = [tabBar isKindOfClass:[CYLTabBar class]] && [(CYLTabBar *)tabBar cyl_isLiquidGlassGestureActive];
+    if (plusChildSelected && !glassIsMoving) {
         // [EN] The glass over the plus tab: the tab button of the selected layer that holds the stand-in, a capsule,
         //      within the first view above it that clips (the whole tab bar platter). Masking the whole platter left a
         //      strip between its top and the glass where neither the plus button nor its stand-in was drawn.

@@ -42,21 +42,17 @@ class CYLSettingsDemoTableViewController: UITableViewController {
         UITableViewCell.cyl_setUpAutomaticRowHeight(for: tableView)
         reloadGroups()
         layoutHeaderView()
+        // [EN] The skin row shows the current theme, and a theme is picked while this list stays on screen (#216).
+        // [CN] 换肤行显示当前主题，而选择主题时本列表一直在屏幕上（#216）。
+        view.cyl_themeDidChangeBlock = { [weak self] in
+            self?.reloadGroups()
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // [EN] Rows show state that other tabs can change (login, titles, icons). [CN] 各行显示的状态可能被其他 Tab 修改（登录、标题、图标）。
         reloadGroups()
-    }
-
-    // [EN] The skin row shows the current theme, and a theme is picked while this list stays on screen (#216).
-    // [CN] 换肤行显示当前主题，而选择主题时本列表一直在屏幕上（#216）。
-    override func cyl_themeDidChange(by manager: CYLThemeManager, identifier: (any NSCopying & NSObjectProtocol)?, theme: NSObject?) {
-        super.cyl_themeDidChange(by: manager, identifier: identifier, theme: theme)
-        if isViewLoaded {
-            reloadGroups()
-        }
     }
 
     override func viewDidLayoutSubviews() {

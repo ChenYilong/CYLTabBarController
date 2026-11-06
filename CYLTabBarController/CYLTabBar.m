@@ -81,6 +81,7 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
 /// [EN] See `cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h.
 @interface CYLPlusButton (CYLTabBarLayout)
 - (BOOL)cyl_isCenteredWithoutTitle;
+- (void)cyl_updateLiquidGlassMask;
 - (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center;
 @end
 
@@ -1749,6 +1750,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     if ([owningTabBarController respondsToSelector:@selector(cyl_liquidGlassTabBarGestureRecognizerDidUpdate:)]) {
         [owningTabBarController cyl_liquidGlassTabBarGestureRecognizerDidUpdate:gestureRecognizer];
     }
+    [self cyl_updatePlusButtonMaskForGlassGestureState:gestureRecognizer.state];
     if (gestureRecognizer.state != UIGestureRecognizerStateBegan && gestureRecognizer.state != UIGestureRecognizerStateChanged) {
         return;
     }
@@ -1758,6 +1760,37 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     // The portal is added by the lift animation, slightly after the gesture begins, and a finger held still sends no
     // further updates: keep checking while the gesture is active. 抬起动画稍后才添加 portal，手指不动时没有后续回调，因此手势进行中持续检查。
     [self cyl_keepPlusButtonAbovePortalViewsWhileGestureIsActive:gestureRecognizer];
+}
+
+- (BOOL)cyl_isLiquidGlassGestureActive {
+    for (UIGestureRecognizer *gestureRecognizer in @[ self.liquidGlassContinuousGestureRecognizer ?: [NSNull null],
+                                                      self.liquidGlassLongGestureRecognizer ?: [NSNull null] ]) {
+        if ([gestureRecognizer isKindOfClass:[UIGestureRecognizer class]] &&
+            (gestureRecognizer.state == UIGestureRecognizerStateBegan || gestureRecognizer.state == UIGestureRecognizerStateChanged)) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/*!
+ * [EN] FIX: the plus button lost a piece while the glass was dragged away from it. Its mask follows the glass only when the
+ *      selection changes, and a drag moves the glass without changing it (`-[CYLPlusButton cyl_updateLiquidGlassMask]`).
+ *      Updated when a drag begins, and when it is over, after the glass has settled (the same delay as `-setSelected:`).
+ * [CN] FIX：拖动玻璃离开 PlusButton 时，PlusButton 缺了一块。它的 mask 只在选中状态变化时才跟随玻璃，而拖动会移动玻璃，
+ *      却不改变选中状态（`-[CYLPlusButton cyl_updateLiquidGlassMask]`）。拖动开始时更新一次；拖动结束、玻璃停稳后再更新一次
+ *      （延迟与 `-setSelected:` 相同）。
+ */
+- (void)cyl_updatePlusButtonMaskForGlassGestureState:(UIGestureRecognizerState)state {
+    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    if (state == UIGestureRecognizerStateBegan) {
+        [plusButton cyl_updateLiquidGlassMask];
+    } else if (state != UIGestureRecognizerStateChanged && state != UIGestureRecognizerStatePossible) {
+        __weak CYLPlusButton *weakPlusButton = plusButton;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [weakPlusButton cyl_updateLiquidGlassMask];
+        });
+    }
 }
 
 - (void)cyl_keepPlusButtonAbovePortalViewsWhileGestureIsActive:(UIGestureRecognizer *)gestureRecognizer {

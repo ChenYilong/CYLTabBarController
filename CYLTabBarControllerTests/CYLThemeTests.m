@@ -585,6 +585,26 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     XCTAssertEqual([plusButton imageForState:UIControlStateSelected].CGImage, selected.CGImage);
 }
 
+/*!
+ * FIX: issue #216
+ * [EN] A plus button with no image of its own loses a theme's image when the theme goes, on its stand-in too.
+ * [CN] 原本没有图片的 PlusButton 在主题结束时失去主题图片，替身也一样。
+ */
+- (void)testRemovingTheImageOfAPlusButtonClearsItAndItsStandIn {
+    CYLTestPlusButton *plusButton = [CYLTestPlusButton new];
+    UIButton *standIn = plusButton.selectedContentView;
+    UIImage *themed = CYLTestImage(10, UIColor.greenColor);
+    [plusButton cyl_updateTitle:nil image:themed selectedImage:themed];
+    XCTAssertEqual([plusButton imageForState:UIControlStateNormal].CGImage, themed.CGImage);
+    SEL removeImage = NSSelectorFromString(@"cyl_removeImage");
+    XCTAssertTrue([plusButton respondsToSelector:removeImage]);
+    ((void (*)(id, SEL))[plusButton methodForSelector:removeImage])(plusButton, removeImage);
+    for (NSNumber *state in @[ @(UIControlStateNormal), @(UIControlStateHighlighted), @(UIControlStateSelected) ]) {
+        XCTAssertNil([plusButton imageForState:state.unsignedIntegerValue], @"plus button, state %@", state);
+        XCTAssertNil([standIn imageForState:state.unsignedIntegerValue], @"stand-in, state %@", state);
+    }
+}
+
 - (void)testTheTabBarFollowsAnInjectedThemeManager {
     CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:@"CYLThemeAnimationTests.tabBar"];
     for (NSObject<NSCopying> *identifier in [manager.themeIdentifiers copy]) {

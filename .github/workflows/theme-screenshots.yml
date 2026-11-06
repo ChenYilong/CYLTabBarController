@@ -43,6 +43,9 @@ jobs:
           if [ -n "$THEMES_INPUT" ]; then export THEMES="$THEMES_INPUT"; fi
           scripts/theme-screenshots.sh
       - uses: actions/upload-artifact@v4
+        # [EN] A log that cannot be uploaded (GitHub's artifact service timing out) must not fail the job.
+        # [CN] 日志上传失败（GitHub 的 artifact 服务超时）不应让 job 失败。
+        continue-on-error: true
         if: always()
         with:
           name: theme-screenshots-${{ matrix.style }}

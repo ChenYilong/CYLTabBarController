@@ -14,4 +14,9 @@ import UIKit
  *      Example-SwiftUI-Rive 中课程的页面、Rive 文件与资源（见 README.md）。
  */
 @main
-final class AppDelegate: UIResponder, UIApplicationDelegate {}
+final class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        true
+    }
+}

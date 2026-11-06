@@ -216,22 +216,22 @@
 
 | Demo | 动画库 / Library | 皮肤对动画 Tab 做了什么 / What the skin does to an animated tab | 第几项 / Item |
 |:---|:---|:---|:---:|
-| Example-PAG | PAG | 圣诞皮肤互换 Moments 与 Me 的文件 / the Christmas skin swaps the files of Moments and Me | 1 |
-| Example-Rive、Example-SwiftUI-Rive | Rive | 圣诞皮肤互换 Chat 与 User 的画板 / the Christmas skin swaps the artboards of Chat and User | 1 |
-| ObjC Demo | Lottie 4.6.1 | 圣诞皮肤把 Nearby 未选中图标变成红色，文件不变 / the Christmas skin turns the unselected Nearby icon red, with the same file | 2 |
+| Example-PAG | PAG | 西柚皮肤互换 Moments 与 Me 的文件 / the Grapefruit skin swaps the files of Moments and Me | 1 |
+| Example-Rive、Example-SwiftUI-Rive | Rive | 西柚皮肤互换 Chat 与 User 的画板 / the Grapefruit skin swaps the artboards of Chat and User | 1 |
+| ObjC Demo | Lottie 4.6.1 | 西柚皮肤把 Nearby 未选中图标变成红色，文件不变 / the Grapefruit skin turns the unselected Nearby icon red, with the same file | 2 |
 
 | 中文 | English |
 |:---|:---|
-| 下面是圣诞皮肤的截图。每个 Demo 都验证了切回其他皮肤后动画、标题与 `Now:` 恢复正确。Rive 的两张图在深色模式下拍摄：课程的图标是白色的，在浅色 TabBar 上几乎看不见。 | The screenshots below show the Christmas skin. Each demo was also checked going back to another skin: the animations, titles and `Now:` come back right. The two Rive pictures were taken in Dark Mode: the course's icons are white and almost invisible on a light tab bar. |
-| 使用时要注意：皮肤对动画的修改请放在 `-cyl_themeDidChangeByManager:identifier:theme:` 中、调用 `super` 之后。`CYLThemeDidChangeNotification` 比它先发出，在通知中修改的动画会被 `CYLTheme` 记为 App 的原始外观，切回时恢复错误（Example-Rive 第一版就是这样）。动画 Tab 显示动画视图，所以节日皮肤的静态图标只出现在没有动画的 Tab 上（如 Example-PAG 的 Health）。 | One thing to watch: make a skin's animation changes in `-cyl_themeDidChangeByManager:identifier:theme:`, after calling `super`. `CYLThemeDidChangeNotification` is posted before it, and an animation changed in the notification is saved by `CYLTheme` as the app's original look, so going back restores the wrong one (the first version of the Example-Rive change did this). An animated tab shows its animation view, so a holiday skin's static icons only appear on tabs without an animation (e.g. Health in Example-PAG). |
+| 下面是西柚皮肤的截图。每个 Demo 都验证了切回其他皮肤后动画、标题与 `Now:` 恢复正确。Rive 的两张图在深色模式下拍摄：课程的图标是白色的，在浅色 TabBar 上几乎看不见。 | The screenshots below show the Grapefruit skin. Each demo was also checked going back to another skin: the animations, titles and `Now:` come back right. The two Rive pictures were taken in Dark Mode: the course's icons are white and almost invisible on a light tab bar. |
+| 使用时要注意：皮肤对动画的修改请放在 `-cyl_themeDidChangeByManager:identifier:theme:` 中、调用 `super` 之后，或控制器视图的 `cyl_themeDidChangeBlock` 中。`CYLThemeDidChangeNotification` 比它先发出，在通知中修改的动画会被 `CYLTheme` 记为 App 的原始外观，切回时恢复错误（Example-Rive 第一版就是这样）。节日皮肤的图标显示在动画之上（`-setTabBarItemIcon:selectedIcon:size:atIndex:`，来自 #777），会遮住动画，因此这里的演示使用配色皮肤。 | One thing to watch: make a skin's animation changes in `-cyl_themeDidChangeByManager:identifier:theme:`, after calling `super`, or in the `cyl_themeDidChangeBlock` of the controller's view. `CYLThemeDidChangeNotification` is posted before it, and an animation changed in the notification is saved by `CYLTheme` as the app's original look, so going back restores the wrong one (the first version of the Example-Rive change did this). A holiday skin's icons are shown over the animations (`-setTabBarItemIcon:selectedIcon:size:atIndex:`, from #777) and hide them, so these demos use a color skin. |
 | 尚未验证：真机；经典样式（iOS 25 及以前）下动画 Tab 的换肤；Rive 的主题颜色（课程的 `icons.riv` 没有 view model，所以 `CYLTabBarAnimationColors` 没有目标）。`testAnInPlaceUpdateWithAnAnimationKeyGivesTheTabTheNewFile` 在测试宿主中仍被跳过。 | Not verified: a real device; theming of animated tabs in the classic style (iOS 25 and earlier); Rive theme colors (the course's `icons.riv` has no view model, so `CYLTabBarAnimationColors` has nothing to act on). `testAnInPlaceUpdateWithAnAnimationKeyGivesTheTabTheNewFile` is still skipped in the test host. |
 
-![Example-PAG, Christmas skin / Example-PAG 圣诞皮肤](assets/theme-switching-pag-christmas.png)
+![Example-PAG, Grapefruit skin / Example-PAG 西柚皮肤](assets/theme-switching-pag-grapefruit.png)
 
-![Example-Rive, Christmas skin / Example-Rive 圣诞皮肤](assets/theme-switching-rive-christmas.png)
+![Example-Rive, Grapefruit skin / Example-Rive 西柚皮肤](assets/theme-switching-rive-grapefruit.png)
 
-![Example-SwiftUI-Rive, Christmas skin / Example-SwiftUI-Rive 圣诞皮肤](assets/theme-switching-swiftui-rive-christmas.png)
+![Example-SwiftUI-Rive, Grapefruit skin / Example-SwiftUI-Rive 西柚皮肤](assets/theme-switching-swiftui-rive-grapefruit.png)
 
-![ObjC demo, Liquid Glass, Christmas skin / ObjC Demo 液态玻璃 圣诞皮肤](assets/theme-switching-objc-liquid-glass-christmas.png)
+![ObjC demo, Liquid Glass, Grapefruit skin / ObjC Demo 液态玻璃 西柚皮肤](assets/theme-switching-objc-liquid-glass-grapefruit.png)
 
-![ObjC demo, FlatDesign, Christmas skin / ObjC Demo 扁平样式 圣诞皮肤](assets/theme-switching-objc-flat-design-christmas.png)
+![ObjC demo, FlatDesign, Grapefruit skin / ObjC Demo 扁平样式 西柚皮肤](assets/theme-switching-objc-flat-design-grapefruit.png)

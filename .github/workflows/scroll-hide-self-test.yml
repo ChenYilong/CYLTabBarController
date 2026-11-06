@@ -60,6 +60,9 @@ jobs:
       - name: Keep the logs
         if: always()
         uses: actions/upload-artifact@v4
+        # [EN] A log that cannot be uploaded (GitHub's artifact service timing out) must not fail the job.
+        # [CN] 日志上传失败（GitHub 的 artifact 服务超时）不应让 job 失败。
+        continue-on-error: true
         with:
           name: scroll-hide-self-test-${{ matrix.style }}${{ matrix.runtime && format('-{0}', matrix.runtime) || '' }}
           path: |

@@ -411,7 +411,7 @@ sequenceDiagram
 
 | 中文 | English |
 |:---|:---|
-| `CYLTabBarAnimationFilePath` 是完整路径：只写文件名时找不到文件，动画不变，并打印 `🔴[CYL #216]` 日志。在主题回调中修改动画时，请放在 `-cyl_themeDidChangeByManager:identifier:theme:` 的 `super` 之后；`CYLThemeDidChangeNotification` 比它先发出，在通知中修改的动画会被记为 App 的原始外观。实测结果与截图见 [Theme-Switching-Evaluation.md](Theme-Switching-Evaluation.md) 第 8 节。 | `CYLTabBarAnimationFilePath` is a full path: a bare file name finds nothing, the animation stays, and `🔴[CYL #216]` is logged. To change an animation when the theme changes, do it after `super` in `-cyl_themeDidChangeByManager:identifier:theme:`; `CYLThemeDidChangeNotification` is posted earlier, and an animation changed there is saved as the app's original look. For results and screenshots, see section 8 of [Theme-Switching-Evaluation.md](Theme-Switching-Evaluation.md). |
+| `CYLTabBarAnimationFilePath` 是完整路径：只写文件名时找不到文件，动画不变，并打印 `🔴[CYL #216]` 日志。在主题回调中修改动画时，请放在 `-cyl_themeDidChangeByManager:identifier:theme:` 的 `super` 之后，或控制器视图的 `cyl_themeDidChangeBlock` 中（Swift Demo 使用后者）；`CYLThemeDidChangeNotification` 比它们先发出，在通知中修改的动画会被记为 App 的原始外观。实测结果与截图见 [Theme-Switching-Evaluation.md](Theme-Switching-Evaluation.md) 第 8 节。 | `CYLTabBarAnimationFilePath` is a full path: a bare file name finds nothing, the animation stays, and `🔴[CYL #216]` is logged. To change an animation when the theme changes, do it after `super` in `-cyl_themeDidChangeByManager:identifier:theme:`, or in the `cyl_themeDidChangeBlock` of the controller's view (the Swift demos do); `CYLThemeDidChangeNotification` is posted earlier, and an animation changed there is saved as the app's original look. For results and screenshots, see section 8 of [Theme-Switching-Evaluation.md](Theme-Switching-Evaluation.md). |
 
 ## [CN]测试
 ## [EN]Testing
