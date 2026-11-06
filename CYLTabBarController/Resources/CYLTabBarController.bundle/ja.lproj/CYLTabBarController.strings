@@ -319,3 +319,7 @@
 "展开全部 %@ 个模拟" = "%@ 件のシミュレーションをすべて表示";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "シミュレーション一覧を折りたたむ";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "ネットワークアイコン";
+"网络图标、标题与配色" = "ネットワークアイコン、タイトルと配色";

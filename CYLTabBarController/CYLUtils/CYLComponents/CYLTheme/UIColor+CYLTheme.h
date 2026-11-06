@@ -26,13 +26,13 @@ typedef UIColor *_Nonnull (^CYLThemeColorProvider)(__kindof CYLThemeManager *man
  *      registered with `-[UIView cyl_registerThemeColorProperties:]` get a fresh copy of the color, so every view
  *      redraws. Before iOS 13 the color is the value of the theme current when it was created; a registered property
  *      gets the value of the new theme when the theme changes.
- *      `CGColor` (layers) does not follow: set it again in `-cyl_themeDidChangeByManager:identifier:theme:` or
- *      `cyl_themeDidChangeBlock`.
+ *      A `CGColor` (layers) is a fixed value: set the layer's colors with `-[CALayer cyl_setThemeColor:forKeyPath:]`
+ *      (`CALayer+CYLTheme.h`) to follow the theme.
  * [CN] 跟随 `CYLThemeManager` 主题的颜色。iOS 13+ 上是动态颜色（类似 `+[UIColor colorWithDynamicProvider:]`），每次绘制时都向
  *      provider 取值；provider 返回的系统颜色（例如 `labelColor`）仍然跟随深色模式。主题切换时，用
  *      `-[UIView cyl_registerThemeColorProperties:]` 注册的视图属性会得到该颜色的新副本，从而使视图重绘。iOS 13 以前，颜色为创建时
  *      所在主题的值；主题切换时，已注册的属性会得到新主题的值。
- *      `CGColor`（layer）不会跟随：请在 `-cyl_themeDidChangeByManager:identifier:theme:` 或 `cyl_themeDidChangeBlock` 中重新设置。
+ *      `CGColor`（layer）是固定值：请用 `-[CALayer cyl_setThemeColor:forKeyPath:]`（`CALayer+CYLTheme.h`）设置 layer 颜色以跟随主题。
  */
 @interface UIColor (CYLTheme)
 

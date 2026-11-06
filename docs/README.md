@@ -24,11 +24,13 @@
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](Mac-CI-CD.md) |
+| [PlusButton 子控制器换肤测试](Plus-Child-Theme-Switching-Test.md) | [Plus child theme switching test](Plus-Child-Theme-Switching-Test.md) |
 | [PlusButton 角标：每次点击都会变化](PlusButton-Badge.md) | [PlusButton badge: changes on every tap](PlusButton-Badge.md) |
 | [有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应](PlusButton-Lottie-TabIcon.md) | [Lottie tab icons and their files when there is a PlusButton](PlusButton-Lottie-TabIcon.md) |
 | [PlusButton 的 slot：占位与数量一致](PlusButton-Slot.md) | [The PlusButton Slot: Placeholders and Matching Counts](PlusButton-Slot.md) |
 | [PlusButton 子控件响应各自的点击事件](PlusButton-Subview-Touches.md) | [Subviews of the PlusButton receive their own touches](PlusButton-Subview-Touches.md) |
 | [PlusButton 点击范围：扩大、按倍数放大与调试显示](PlusButton-Touchable-Area.md) | [PlusButton touchable area: grow it, scale it, and see it](PlusButton-Touchable-Area.md) |
+| [PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片](PlusButton.md) | [How the PlusButton works: the real button, its Liquid Glass stand-in and selected images](PlusButton.md) |
 | [在任意位置获取导航控制器并 Push](Push-From-Anywhere.md) | [Get the navigation controller and push from anywhere](Push-From-Anywhere.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
@@ -45,6 +47,7 @@
 | [滚动时缩小或隐藏 TabBar](TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](TabBar-Minimize-On-Scroll.md) |
 | [TabBarItem 手势：再次点击、双击与长按](TabBarItem-Gestures.md) | [Tab bar item gestures: reselect, double tap and long press](TabBarItem-Gestures.md) |
 | [选中标题：选中的 Tab 显示不同文字（如京东「刷新」）](TabBarItem-Selected-Title.md) | [Selected title: a different title on the selected tab (like JD's "Refresh")](TabBarItem-Selected-Title.md) |
+| [换肤实现评估：与 QMUI 的差距、架构符合度与改进建议](Theme-Switching-Evaluation.md) | [Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve](Theme-Switching-Evaluation.md) |
 | [换肤（主题切换）](Theme-Switching.md) | [Theme switching (skins)](Theme-Switching.md) |
 | [原地更新 Tab：标题、图标、网络图标与替换页面](Update-Tab-Bar-Items-In-Place.md) | [Update Tabs in Place: Titles, Icons, Network Icons and Pages](Update-Tab-Bar-Items-In-Place.md) |
 
@@ -73,11 +76,13 @@ docs/
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
 ├── Mac-CI-CD.md
+├── Plus-Child-Theme-Switching-Test.md
 ├── PlusButton-Badge.md
 ├── PlusButton-Lottie-TabIcon.md
 ├── PlusButton-Slot.md
 ├── PlusButton-Subview-Touches.md
 ├── PlusButton-Touchable-Area.md
+├── PlusButton.md
 ├── Push-From-Anywhere.md
 ├── README.md
 ├── SelectedIndex-PlusButton.md
@@ -95,17 +100,22 @@ docs/
 ├── TabBar-Minimize-On-Scroll.md
 ├── TabBarItem-Gestures.md
 ├── TabBarItem-Selected-Title.md
+├── Theme-Switching-Evaluation.md
 ├── Theme-Switching.md
 ├── Update-Tab-Bar-Items-In-Place.md
 └── assets/
     ├── docs-navigation-index.png
     ├── flatdesign-standard-appearance-mapping.svg
     ├── login-required-tabs-flow.svg
+    ├── plus-child-theme-switching.png
     ├── plusbutton-subview-touches-issue-202.png
     ├── readme-english-before-reading.png
     ├── readme-english-bilingual-contents.png
     ├── readme-english-header-badges.png
+    ├── theme-switching-flat-design.png
     ├── theme-switching-holiday-icons.png
+    ├── theme-switching-liquid-glass.png
+    ├── theme-switching-runtime-christmas-to-pink-rose.png
     ├── update-tab-bar-items-all-local-icons.png
     ├── update-tab-bar-items-all-network-icons-badges.png
     ├── update-tab-bar-items-all-network-icons-restored.png

@@ -1,0 +1,64 @@
+# [EN] The plus child theme test (scripts/plus-child-theme-test.sh, docs/Plus-Child-Theme-Switching-Test.md): the ObjC demo
+#      selects the plus child view controller (tab 2) and switches the theme; the plus button must stay sharp in the
+#      Liquid Glass selected layer before and after the switch. Liquid Glass must pass (REQUIRE_PASS=1); FlatDesign has
+#      no stand-in and only adds screenshots. The screenshots and logs are an artifact of the run. Runs by hand, and on
+#      pull requests that change the plus button, the theme code, the demo themes, the script or this file.
+# [CN] PlusButton 子控制器换肤测试（scripts/plus-child-theme-test.sh、docs/Plus-Child-Theme-Switching-Test.md）：ObjC Demo 选中
+#      PlusButton 子控制器（第 2 个 Tab）并切换主题，换肤前后液态玻璃选中图层中的 PlusButton 都必须清晰。液态玻璃必须通过（REQUIRE_PASS=1）；
+#      扁平样式没有替身，只提供截图。截图与日志作为本次运行的 artifact。手动运行；修改 PlusButton、主题代码、Demo 主题、脚本或本文件的 PR 也会运行。
+name: Plus child theme test
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenarios:
+        description: "Scenarios \"A>B\", comma separated (empty: the default list)"
+        required: false
+        default: ""
+  pull_request:
+    paths:
+      - ".github/workflows/plus-child-theme-test.yml"
+      - "scripts/plus-child-theme-test.sh"
+      - "CYLTabBarController/CYLPlusButton.*"
+      - "CYLTabBarController/CYLTabBarController.m"
+      - "CYLTabBarController/UIViewController+CYLThemeSettings.*"
+      - "CYLTabBarController/CYLUtils/CYLComponents/CYLTheme/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plus-child-theme-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: plus child theme test (${{ matrix.style }})
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - style: Default
+            require_pass: "1"
+          - style: FlatDesign
+            require_pass: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test
+        env:
+          STYLE: ${{ matrix.style }}
+          REQUIRE_PASS: ${{ matrix.require_pass }}
+          SCENARIOS_INPUT: ${{ github.event.inputs.scenarios }}
+        run: |
+          if [ -n "$SCENARIOS_INPUT" ]; then export SCENARIOS="$SCENARIOS_INPUT"; fi
+          scripts/plus-child-theme-test.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: plus-child-theme-test-${{ matrix.style }}
+          path: |
+            build/plus-child-theme-test/*
+            build/plus-child-theme-test-build/build.log
+          if-no-files-found: warn

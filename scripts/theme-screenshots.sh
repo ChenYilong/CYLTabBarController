@@ -1,0 +1,137 @@
+#!/bin/sh
+# Usage: STYLE=FlatDesign scripts/theme-screenshots.sh [simulator name]
+#
+# [EN] Screenshots of the skins (issue #216) on an iOS simulator, on a Mac with Xcode and CocoaPods: builds the
+#      Objective-C demo, installs it, then launches it once per theme with -CYLDemoThemeIdentifier <theme> (read from
+#      NSUserDefaults by +[UIViewController cyl_setUpThemeSettings]) and saves a screenshot of each launch in
+#      build/theme-screenshots/. STYLE=FlatDesign starts the FlatDesign tab bar (-CYLScrollHideSelfTestFlatDesign YES);
+#      otherwise the default style (Liquid Glass on iOS 26). THEMES overrides the list (comma separated identifiers);
+#      "A>B" launches with theme A and switches to B at runtime (-CYLDemoThemeSwitchTo B), as the skin button does.
+# [CN] 在 iOS 模拟器上为换肤（issue #216）截图，需要装有 Xcode 与 CocoaPods 的 Mac：编译 Objective-C Demo 并安装，然后每个主题启动一次
+#      （-CYLDemoThemeIdentifier <主题>，由 +[UIViewController cyl_setUpThemeSettings] 从 NSUserDefaults 读取），每次启动保存一张截图到
+#      build/theme-screenshots/。STYLE=FlatDesign 以扁平样式 TabBar 启动（-CYLScrollHideSelfTestFlatDesign YES）；否则为默认样式
+#      （iOS 26 上为液态玻璃）。THEMES 可替换主题列表（以逗号分隔的 identifier）；“A>B”表示以主题 A 启动、运行时切换到 B
+#      （-CYLDemoThemeSwitchTo B），与点击换肤按钮相同。
+set -eu
+cd "$(dirname "$0")/.."
+DEVICE_NAME="${1:-}"
+STYLE="${STYLE:-Default}"
+THEMES="${THEMES:-Default,Christmas,Spring Festival,Halloween,Dark,Network,Christmas>Pink Rose,Spring Festival>Default,Default@2>Christmas,Christmas@2>Pink Rose}"
+DERIVED=build/theme-screenshots-build
+OUT=build/theme-screenshots
+mkdir -p "$DERIVED" "$OUT"
+
+DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
+import json, sys
+name = sys.argv[1]
+devices = json.load(sys.stdin)["devices"]
+for runtime in sorted(devices, reverse=True):
+    if "iOS" not in runtime:
+        continue
+    for device in devices[runtime]:
+        if (name and device["name"] == name) or (not name and device["name"].startswith("iPhone")):
+            print(device["udid"]); sys.exit(0)
+sys.exit(1)' "$DEVICE_NAME") || { echo "No iPhone simulator"; xcrun simctl list devices available; exit 1; }
+echo "Simulator: $DEVICE_ID"
+xcodebuild -version
+
+# [EN] As scripts/scroll-hide-self-test.sh: the demo's pods, then the app for the simulator.
+# [CN] 与 scripts/scroll-hide-self-test.sh 相同：先安装 Demo 的 pods，再为模拟器编译 App。
+pod install
+find Pods -name 'CYLTabBarController.xcscheme' -print -delete
+if ! xcodebuild -workspace CYLTabBarController.xcworkspace -scheme CYLTabBarController -configuration Debug \
+  -sdk iphonesimulator -destination "id=$DEVICE_ID" -derivedDataPath "$DERIVED" \
+  CODE_SIGNING_ALLOWED=NO IPHONEOS_DEPLOYMENT_TARGET=16.0 build > "$DERIVED/build.log" 2>&1; then
+  echo "Build failed. Errors:"
+  grep -nE "(error|fatal error):|^ld: |Undefined symbols" "$DERIVED/build.log" | sort -u | head -n 60 || true
+  tail -n 30 "$DERIVED/build.log"
+  exit 1
+fi
+APP=$(find "$DERIVED/Build/Products" -maxdepth 4 -name '*.app' -not -path '*/PlugIns/*' | head -n 1)
+if [ -z "$APP" ] || [ ! -d "$APP" ]; then
+  echo "No .app was built"; exit 1
+fi
+BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
+echo "App: $BUNDLE_ID ($APP)"
+
+# [EN] CLAUDE.md: free RAM before the simulator (does nothing outside macOS). [CN] CLAUDE.md：启动模拟器前释放内存（macOS 以外不做任何事）。
+scripts/free-ram.sh || true
+xcrun simctl boot "$DEVICE_ID" 2>/dev/null || true
+xcrun simctl bootstatus "$DEVICE_ID" -b
+# [EN] A clean status bar, as in App Store screenshots. [CN] 干净的状态栏，与 App Store 截图一致。
+xcrun simctl status_bar "$DEVICE_ID" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 || true
+xcrun simctl install "$DEVICE_ID" "$APP"
+
+STYLE_ARGUMENTS=""
+STYLE_SLUG="liquid-glass"
+if [ "$STYLE" = "FlatDesign" ]; then
+  STYLE_ARGUMENTS="-CYLScrollHideSelfTestFlatDesign YES"
+  STYLE_SLUG="flat-design"
+fi
+
+OLD_IFS=$IFS
+IFS=','
+for THEME in $THEMES; do
+  IFS=$OLD_IFS
+  # [EN] "A>B": launch with A, switch to B at runtime. [CN] “A>B”：以 A 启动，运行时切换到 B。
+  SWITCH_TO=""
+  case "$THEME" in
+    *">"*) SWITCH_TO=${THEME#*>}; THEME=${THEME%%>*} ;;
+  esac
+  # [EN] "A@2>B": also select tab 2 (the plus child view controller) 2 s after launch, take a screenshot before the
+  #      switch (…-before.png) and after it (…-after.png). [CN] “A@2>B”：启动 2 秒后再选中第 2 个 Tab（PlusButton 子控制器），
+  #      在切换前（…-before.png）与切换后（…-after.png）各截一张图。
+  SELECT_INDEX=""
+  case "$THEME" in
+    *"@"*) SELECT_INDEX=${THEME#*@}; THEME=${THEME%%@*} ;;
+  esac
+  SLUG=$(printf '%s' "$THEME${SELECT_INDEX:+ index $SELECT_INDEX}${SWITCH_TO:+ to $SWITCH_TO}" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '-' | sed -e 's/--*/-/g' -e 's/-$//')
+  if [ -n "$SELECT_INDEX" ] && [ -n "$SWITCH_TO" ]; then
+    FILE="$OUT/theme-switching-$STYLE_SLUG-$SLUG"
+    # shellcheck disable=SC2086
+    xcrun simctl launch --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$THEME" \
+      -CYLDemoSelectIndex "$SELECT_INDEX" -CYLDemoThemeSwitchTo "$SWITCH_TO" -CYLDemoThemeSwitchDelay 10 $STYLE_ARGUMENTS
+    sleep 8
+    xcrun simctl io "$DEVICE_ID" screenshot "$FILE-before.png" && echo "Saved $FILE-before.png"
+    sleep 8
+    xcrun simctl io "$DEVICE_ID" screenshot "$FILE-after.png" && echo "Saved $FILE-after.png"
+    xcrun simctl terminate "$DEVICE_ID" "$BUNDLE_ID" || true
+    IFS=','
+    continue
+  fi
+  # [EN] Network icons are downloaded, a switch happens 4 s after launch: give them longer. [CN] 网络图标需要下载、切换在启动 4 秒后发生：多等一会。
+  WAIT=8
+  [ "$THEME" = "Network" ] && WAIT=20
+  SWITCH_ARGUMENTS=""
+  if [ -n "$SWITCH_TO" ]; then
+    WAIT=14
+    SWITCH_ARGUMENTS="-CYLDemoThemeSwitchTo"
+  fi
+  FILE="$OUT/theme-switching-$STYLE_SLUG-$SLUG.png"
+  for ATTEMPT in 1 2; do
+    if [ -n "$SWITCH_TO" ]; then
+      # shellcheck disable=SC2086
+      xcrun simctl launch --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$THEME" "$SWITCH_ARGUMENTS" "$SWITCH_TO" $STYLE_ARGUMENTS
+    else
+      # shellcheck disable=SC2086
+      xcrun simctl launch --terminate-running-process "$DEVICE_ID" "$BUNDLE_ID" -CYLDemoThemeIdentifier "$THEME" $STYLE_ARGUMENTS
+    fi
+    sleep "$WAIT"
+    # [EN] Still running? A crash leaves a black screen behind: report it and launch once more.
+    # [CN] 仍在运行？崩溃后屏幕为黑色：报告并重新启动一次。
+    if xcrun simctl spawn "$DEVICE_ID" launchctl list | grep -q "UIKitApplication:$BUNDLE_ID"; then
+      # [EN] A little longer for the first frame, then the screenshot. [CN] 再多等一会，确保首帧已绘制，然后截图。
+      sleep 2
+      xcrun simctl io "$DEVICE_ID" screenshot "$FILE"
+      echo "Saved $FILE"
+      break
+    fi
+    echo "The app is not running after launching it with theme $THEME (attempt $ATTEMPT): crashed?"
+    find "$HOME/Library/Logs/DiagnosticReports" -name 'CYLTabBarController*' -newer "$DERIVED/build.log" -print \
+      -exec head -n 60 {} \; 2>/dev/null || true
+  done
+  xcrun simctl terminate "$DEVICE_ID" "$BUNDLE_ID" || true
+  IFS=','
+done
+IFS=$OLD_IFS
+ls -la "$OUT"

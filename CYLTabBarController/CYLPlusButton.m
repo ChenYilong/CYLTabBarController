@@ -138,6 +138,28 @@ static void CYLPlusButtonMirrorLegacyGlobals(CYLPlusButtonRegistration *registra
 /// `-cyl_showsTitleInTabBarItem`).
 static const void *CYLPlusButtonMovedTitleKey = &CYLPlusButtonMovedTitleKey;
 static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
+/// [EN] The images last set by `-cyl_updateTitle:image:selectedImage:` (a theme, `-updatePlusButtonWithAttributes:`).
+/// [CN] 最近一次由 `-cyl_updateTitle:image:selectedImage:` 设置的图片（主题、`-updatePlusButtonWithAttributes:`）。
+static const void *CYLPlusButtonUpdatedImageKey = &CYLPlusButtonUpdatedImageKey;
+static const void *CYLPlusButtonUpdatedSelectedImageKey = &CYLPlusButtonUpdatedSelectedImageKey;
+
+/*!
+ * [EN] YES when `plusButton` is in a Liquid Glass tab bar: Liquid Glass is active AND its tab bar controller is not the
+ *      FlatDesign style (on iOS 26 `+isLiquidGlassActive` is YES with the FlatDesign tab bar too), as master's checks
+ *      (`CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]`). The controller is
+ *      found as in `-plusChildViewControllerSelected:`; NO when there is none.
+ * [CN] `plusButton` 位于液态玻璃 TabBar 中时为 YES：液态玻璃处于活动状态，且其 TabBarController 不是扁平样式（iOS 26 上使用扁平样式
+ *      TabBar 时 `+isLiquidGlassActive` 也为 YES），与 master 中的判断相同（`CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType &&
+ *      [CYLConstants isLiquidGlassActive]`）。TabBarController 的查找方式与 `-plusChildViewControllerSelected:` 相同；找不到时为 NO。
+ */
+static BOOL CYLPlusButtonIsInLiquidGlassTabBar(CYLPlusButton *plusButton) {
+    if (![CYLConstants isLiquidGlassActive]) {
+        return NO;
+    }
+    CYLTabBarController *tabBarController = [plusButton cyl_owningTabBarController] ?:
+        [CYLTabBarController cyl_tabBarControllerForContext:[CYLPlusButton tabBarContextForOwner:plusButton]];
+    return tabBarController && CYLTabBarStyleTypeFlatDesign != tabBarController.tabBarStyleType;
+}
 
 // [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
 // [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
@@ -282,6 +304,10 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
         image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     }
     [super setImage:image forState:state];
+    if (state == UIControlStateNormal) {
+        // [EN] #216: the Liquid Glass stand-in shows this image too. [CN] #216：液态玻璃替身也显示这张图片。
+        [self cyl_updateSelectedContentViewImage];
+    }
 }
 
 #pragma mark - Title alignment
@@ -299,6 +325,128 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     Class plusButtonClass = [self class];
     return [plusButtonClass respondsToSelector:@selector(alignsTitleWithTabBarItemTitles)] &&
            [(Class<CYLPlusButtonSubclassing>)plusButtonClass alignsTitleWithTabBarItemTitles];
+}
+
+#pragma mark - Liquid Glass stand-in (#216)
+
+/*!
+ * FIX: issue #216
+ * [EN] The center of `button`'s icon in `view`; NO when the icon is not laid out yet. The only place that reads the
+ *      buttons' image views for the stand-in (docs/PlusButton.md).
+ * [CN] `button` 的图标在 `view` 中的中心；图标尚未布局时返回 NO。替身只在这里读取按钮的图片视图（docs/PlusButton.md）。
+ */
+static BOOL CYLPlusButtonGetIconCenter(UIButton *button, UIView *view, CGPoint *center) {
+    UIImageView *imageView = button.imageView;
+    if (!imageView.superview || CGRectIsEmpty(imageView.frame)) {
+        return NO;
+    }
+    *center = [imageView.superview convertPoint:imageView.center toView:view];
+    return YES;
+}
+
+/*!
+ * FIX: issue #216
+ * [EN] The center of the stand-in, in its superview. When the app asks for the title to be aligned with the tab titles
+ *      (`+alignsTitleWithTabBarItemTitles`), the stand-in and the plus button line up by icon only, and their other
+ *      subviews are not considered: the plus button then replaces only the tab's icon and is placed by its icon
+ *      (`-cyl_alignedCenterForCenter:`), so its center does not say where the icon is, and the two buttons can lay their
+ *      icons out differently (on feat/rive-animation the two parts were about 5.67 pt apart). In any other layout, or
+ *      without laid out icons, the plus button's center (docs/PlusButton.md).
+ * [CN] 替身在其父视图中的中心。App 要求标题与 Tab 标题对齐时（`+alignsTitleWithTabBarItemTitles`），替身与 PlusButton 只对齐图标，不考虑其他
+ *      子视图：此时 PlusButton 只替换 Tab 的图标，并按图标定位（`-cyl_alignedCenterForCenter:`），其中心不代表图标位置，两个按钮的图标布局
+ *      也可能不同（在 feat/rive-animation 上两部分曾相差约 5.67 pt）。其他布局，或图标尚未布局时，使用 PlusButton 的中心（docs/PlusButton.md）。
+ */
+static CGPoint CYLPlusButtonCenterOfStandIn(CYLPlusButton *plusButton, UIButton *standIn) {
+    UIView *container = standIn.superview;
+    CGPoint center = [container convertPoint:plusButton.center fromView:plusButton.superview];
+    CGPoint plusIcon = CGPointZero;
+    CGPoint standInIcon = CGPointZero;
+    if (![plusButton cyl_alignsTitleWithTabBarItemTitles] || !CYLPlusButtonGetIconCenter(plusButton, container, &plusIcon) ||
+        !CYLPlusButtonGetIconCenter(standIn, standIn, &standInIcon)) {
+        return center;
+    }
+    return CGPointMake(plusIcon.x - (standInIcon.x - CGRectGetMidX(standIn.bounds)),
+                       plusIcon.y - (standInIcon.y - CGRectGetMidY(standIn.bounds)));
+}
+
+/// [EN] YES for the same picture: the same object, or the same bitmap (`-imageWithRenderingMode:` returns a new object for
+///      it; setting an image that differs only so on every layout pass could lay out without end).
+/// [CN] 同一张图片时为 YES：同一个对象，或同一个位图（`-imageWithRenderingMode:` 会为它返回新对象；每次布局都设置这种只有对象不同的图片可能导致无限布局）。
+static BOOL CYLPlusButtonStandInImageIsSame(UIImage *_Nullable image, UIImage *_Nullable otherImage) {
+    if (image == otherImage) {
+        return YES;
+    }
+    return image && otherImage && image.CGImage && image.CGImage == otherImage.CGImage;
+}
+
+/*!
+ * FIX: issue #216
+ * [EN] The one rule for the stand-in's images (docs/PlusButton.md): with a plus child view controller in a Liquid Glass
+ *      tab bar (Liquid Glass active AND not FlatDesign), the stand-in shows only the real plus button's normal image and
+ *      ignores selected images. The glass splits the icon in two, the real button above it and the stand-in in it; with
+ *      two pictures (the network skin gives a selected image too) one icon was drawn half from each and looked cut.
+ *      Selected images stay on the plus button, for FlatDesign and the classic tab bar.
+ * [CN] 替身图片的唯一规则（docs/PlusButton.md）：有 PlusButton 子控制器且位于液态玻璃 TabBar 中（液态玻璃处于活动状态且不是扁平样式）时，替身只显示
+ *      真实 PlusButton 普通状态的图片，忽略选中图片。玻璃把图标分成两部分，真实按钮在玻璃上方，替身在玻璃内；两张图片不同时（网络皮肤还提供了选中
+ *      图片），一个图标由两张图各显示一部分，看起来被截断。选中图片仍保留在 PlusButton 上，供扁平样式与经典 TabBar 使用。
+ */
+- (BOOL)cyl_standInShowsNormalImageOnly {
+    return CYLPlusButtonIsInLiquidGlassTabBar(self) && [CYLPlusButton plusChildViewControllerForOwner:self] != nil;
+}
+
+/*!
+ * FIX: issue #216
+ * [EN] Puts the real plus button's normal image (`configuration.image`, else the normal state's) on the stand-in, in every
+ *      state, when `-cyl_standInShowsNormalImageOnly`. Idempotent: run when the normal image changes, when the stand-in
+ *      is made, by `-cyl_updateTitle:image:selectedImage:` and on every layout pass, so it heals itself.
+ * [CN] 在 `-cyl_standInShowsNormalImageOnly` 为 YES 时，把真实 PlusButton 普通状态的图片（`configuration.image`，没有时为普通状态的图片）设置到
+ *      替身的所有状态。可重复调用：普通图片变化、创建替身、`-cyl_updateTitle:image:selectedImage:` 以及每次布局时都会执行，因此可以自愈。
+ */
+- (void)cyl_updateSelectedContentViewImage {
+    UIButton *standIn = (_selectedContentView != self) ? _selectedContentView : nil;
+    if (!standIn || ![self cyl_standInShowsNormalImageOnly]) {
+        return;
+    }
+    UIImage *image = [super imageForState:UIControlStateNormal];
+    if (@available(iOS 15.0, *)) {
+        image = self.configuration.image ?: image;
+        UIButtonConfiguration *configuration = standIn.configuration;
+        if (configuration && image && !CYLPlusButtonStandInImageIsSame(configuration.image, image)) {
+            configuration.image = image;
+            standIn.configuration = configuration;
+        }
+    }
+    if (!image) {
+        return;
+    }
+    for (NSNumber *state in @[ @(UIControlStateNormal), @(UIControlStateHighlighted), @(UIControlStateSelected),
+                               @(UIControlStateSelected | UIControlStateHighlighted) ]) {
+        if (!CYLPlusButtonStandInImageIsSame([standIn imageForState:state.unsignedIntegerValue], image)) {
+            [standIn setImage:image forState:state.unsignedIntegerValue];
+        }
+    }
+}
+
+/*!
+ * FIX: issue #216
+ * [EN] The one way to put the stand-in in place: its image (`-cyl_updateSelectedContentViewImage`), then its center
+ *      (`CYLPlusButtonCenterOfStandIn()`), then the mask of the real button under the glass. Only for the layouts whose
+ *      stand-in follows the plus button: the title in the tab item, or no title.
+ * [CN] 放置替身的唯一方法：先设置图片（`-cyl_updateSelectedContentViewImage`），再设置中心（`CYLPlusButtonCenterOfStandIn()`），最后更新玻璃下真实按钮的
+ *      mask。仅用于替身跟随 PlusButton 的布局：标题由 TabBarItem 显示，或没有标题。
+ */
+- (void)cyl_placeSelectedContentView {
+    [self cyl_updateSelectedContentViewImage];
+    UIButton *selectedContentView = _selectedContentView;
+    if (selectedContentView.superview && self.superview && selectedContentView != self &&
+        ([self cyl_showsTitleInTabBarItem] || [self cyl_hasNoTitleInLiquidGlass])) {
+        [selectedContentView layoutIfNeeded];
+        CGPoint center = CYLPlusButtonCenterOfStandIn(self, selectedContentView);
+        if (!CGPointEqualToPoint(center, selectedContentView.center)) {
+            selectedContentView.center = center;
+        }
+    }
+    [self cyl_updateLiquidGlassMask];
 }
 
 - (void)cyl_setNeedsTitleAlignment {
@@ -369,7 +517,8 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
     if (![plusButton cyl_showsTitleInTabBarItem] && ![plusButton cyl_hasNoTitleInLiquidGlass]) {
         return center;
     }
-    return [self.superview convertPoint:plusButton.center fromView:plusButton.superview];
+    // [EN] By icon when the title is aligned (#216). [CN] 标题对齐时按图标对齐（#216）。
+    return CYLPlusButtonCenterOfStandIn(plusButton, self);
 }
 
 #pragma mark - Liquid Glass: the title in the tab item (issue #636)
@@ -690,18 +839,93 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
  *      保持在 PlusButton 的位置。
  */
 - (void)cyl_moveSelectedContentViewWithPlusButton {
-    UIButton *selectedContentView = _selectedContentView;
-    if (!selectedContentView.superview || !self.superview || selectedContentView == self) {
+    // [EN] One way to place the stand-in (#216). [CN] 放置替身的唯一方法（#216）。
+    [self cyl_placeSelectedContentView];
+}
+
+/// [EN] The name of the mask `-cyl_updateLiquidGlassMask` puts on the plus button. [CN] `-cyl_updateLiquidGlassMask` 给 PlusButton 设置的 mask 的名字。
+static NSString *const CYLPlusButtonLiquidGlassMaskName = @"CYLPlusButtonLiquidGlassMask";
+
+/*!
+ * [EN] FIX: a theme image on the plus button looked blurred with the plus child view controller selected (Liquid Glass).
+ *      The glass over the selected tab shows the stand-in (`-selectedContentView`) sharp, and what lies under it — the
+ *      real plus button — blurred and magnified. The app's own image is an opaque disc that hides that blurred copy; an
+ *      image with transparent parts (e.g. a holiday star) let it show around its edges, so the icon looked soft. While
+ *      the stand-in is shown, the real plus button is masked out inside the area that clips the stand-in (the glass), and
+ *      still drawn outside it (the stand-in is clipped there). Only in a Liquid Glass tab bar (Liquid Glass active AND not
+ *      the FlatDesign style), only while the plus child view controller is selected; never replaces a mask of the app.
+ * [CN] FIX：选中 PlusButton 子控制器时，PlusButton 上的主题图片看起来是模糊的（液态玻璃）。选中 Tab 上方的玻璃清晰地显示替身
+ *      （`-selectedContentView`），而玻璃下方的内容——真实的 PlusButton——被模糊并放大。App 自己的图片是不透明的圆盘，会挡住这个模糊的副本；
+ *      带透明区域的图片（例如节日星星）会让它从边缘露出来，图标因此发虚。显示替身时，真实的 PlusButton 在裁剪替身的区域（玻璃）内被 mask 掉，
+ *      在区域外仍然绘制（替身在那里被裁剪）。仅在液态玻璃 TabBar 中（液态玻璃处于活动状态且不是扁平样式），仅在选中 PlusButton 子控制器时；
+ *      不会替换 App 自己设置的 mask。
+ */
+- (void)cyl_updateLiquidGlassMask {
+    CALayer *currentMask = self.layer.mask;
+    BOOL ownsMask = [currentMask.name isEqualToString:CYLPlusButtonLiquidGlassMaskName];
+    if (currentMask && !ownsMask) {
         return;
     }
-    // Only for the layouts of this change: the title in the tab item, or no title.
-    if (![self cyl_showsTitleInTabBarItem] && ![self cyl_hasNoTitleInLiquidGlass]) {
-        return;
+    UIBezierPath *glassPath = nil;
+    UIButton *standIn = (_selectedContentView != self) ? _selectedContentView : nil;
+    CYLTabBarController *tabBarController = nil;
+    if (standIn.window && self.window && CYLPlusButtonIsInLiquidGlassTabBar(self)) {
+        tabBarController = [self cyl_owningTabBarController] ?:
+            [CYLTabBarController cyl_tabBarControllerForContext:[CYLPlusButton tabBarContextForOwner:self]];
     }
-    CGPoint center = [selectedContentView.superview convertPoint:self.center fromView:self.superview];
-    if (!CGPointEqualToPoint(center, selectedContentView.center)) {
-        selectedContentView.center = center;
+    UIViewController *plusChildViewController = tabBarController ? [CYLPlusButton plusChildViewControllerForOwner:tabBarController] : nil;
+    UIViewController *selectedViewController = tabBarController.selectedViewController;
+    BOOL plusChildSelected = plusChildViewController &&
+        (selectedViewController == plusChildViewController ||
+         [selectedViewController cyl_getViewControllerInsteadOfNavigationController] == plusChildViewController);
+    if (plusChildSelected) {
+        // [EN] The glass over the plus tab: the tab button of the selected layer that holds the stand-in, a capsule,
+        //      within the first view above it that clips (the whole tab bar platter). Masking the whole platter left a
+        //      strip between its top and the glass where neither the plus button nor its stand-in was drawn.
+        // [CN] PlusButton Tab 上方的玻璃：选中图层中容纳替身的 Tab 按钮（胶囊形），限制在其上方第一个裁剪的视图（整个 TabBar platter）之内。
+        //      mask 掉整个 platter 时，platter 顶部与玻璃之间留下一条既没有 PlusButton、也没有替身的空隙。
+        UIView *glassView = standIn.superview;
+        CGRect glassRect = [glassView convertRect:glassView.bounds toView:self];
+        for (UIView *view = glassView.superview; view && view != tabBarController.tabBar.superview; view = view.superview) {
+            if (view.layer.mask || view.clipsToBounds || view.layer.masksToBounds) {
+                CGRect clipRect = view.layer.mask ? view.layer.mask.frame : view.bounds;
+                glassRect = CGRectIntersection(glassRect, [view convertRect:clipRect toView:self]);
+                break;
+            }
+        }
+        if (glassView && !CGRectIsNull(glassRect) && CGRectIntersectsRect(glassRect, self.bounds)) {
+            // [EN] A capsule; never NaN (a platter's layer reported a NaN corner radius). [CN] 胶囊形；不使用 NaN（platter 的 layer 曾返回 NaN 圆角）。
+            CGFloat cornerRadius = MIN(CGRectGetWidth(glassRect), CGRectGetHeight(glassRect)) * 0.5;
+            glassPath = [UIBezierPath bezierPathWithRoundedRect:glassRect cornerRadius:(isnan(cornerRadius) ? 0 : cornerRadius)];
+        }
     }
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    if (glassPath) {
+        CAShapeLayer *mask = ownsMask ? (CAShapeLayer *)currentMask : [CAShapeLayer layer];
+        mask.name = CYLPlusButtonLiquidGlassMaskName;
+        mask.frame = self.bounds;
+        // [EN] Everything, minus the glass (even-odd). [CN] 全部区域减去玻璃区域（奇偶规则）。
+        UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectInset(self.bounds, -CGRectGetWidth(self.bounds), -CGRectGetHeight(self.bounds))];
+        [path appendPath:glassPath];
+        mask.fillRule = kCAFillRuleEvenOdd;
+        mask.path = path.CGPath;
+        self.layer.mask = mask;
+    } else if (ownsMask) {
+        self.layer.mask = nil;
+    }
+    [CATransaction commit];
+}
+
+- (void)setSelected:(BOOL)selected {
+    [super setSelected:selected];
+    // [EN] The glass moves to or away from the plus button: now and once its animation is over.
+    // [CN] 玻璃移到 PlusButton 上或离开：现在更新一次，动画结束后再更新一次。
+    [self cyl_updateLiquidGlassMask];
+    __weak __typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [weakSelf cyl_updateLiquidGlassMask];
+    });
 }
 
 /// See `+alignsTitleWithTabBarItemTitles`.
@@ -959,6 +1183,9 @@ static const void *CYLPlusButtonImageToTitleKey = &CYLPlusButtonImageToTitleKey;
 /// The image-above-title layout of `+cyl_plusButtonWithImage:…`; other plus buttons keep UIButton's layout.
 - (void)layoutSubviews {
     [super layoutSubviews];
+    // [EN] Liquid Glass: the real plus button is not drawn under the glass that shows its stand-in.
+    // [CN] 液态玻璃：显示替身的玻璃下方不绘制真实的 PlusButton。
+    [self cyl_updateLiquidGlassMask];
     // [EN] Issue #91: keep the touchable area overlay on the button.
     // [CN] 保持可点击区域覆盖层与按钮一致。
     if (_showsTouchableArea) {
@@ -1472,6 +1699,30 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
         UIButton *button = [[self class] performSelector:@selector(selectedContentView)];
         if (button) {
             _selectedContentView = button;
+            // FIX: the plus button's stand-in kept the original image after a theme
+            // [EN] Liquid Glass only (the stand-in is shown in the selected layer while the plus child view controller is
+            //      selected). The class makes a new plus button, with the app's original images: a theme applied before
+            //      the plus child was first selected (e.g. the theme restored at launch) left the stand-in with the old
+            //      image over the themed plus button, which showed blurred through the glass around it. Give it the images
+            //      set since then.
+            // [CN] 仅液态玻璃（选中 PlusButton 子控制器时，选中图层显示替身）。类方法会新建一个 PlusButton，使用 App 原来的图片：在第一次选中
+            //      PlusButton 子控制器之前应用的主题（例如启动时恢复的主题）使替身保持旧图片，盖在换肤后的 PlusButton 上，周围透过玻璃显示为模糊。
+            //      这里为替身设置之后更新过的图片。
+            if (button != self && [self cyl_standInShowsNormalImageOnly]) {
+                // [EN] #216: the real button's normal image only (docs/PlusButton.md). [CN] #216：只用真实按钮普通状态的图片（docs/PlusButton.md）。
+                [self cyl_updateSelectedContentViewImage];
+            } else if (button != self && CYLPlusButtonIsInLiquidGlassTabBar(self)) {
+                UIImage *image = objc_getAssociatedObject(self, CYLPlusButtonUpdatedImageKey);
+                UIImage *selectedImage = objc_getAssociatedObject(self, CYLPlusButtonUpdatedSelectedImageKey);
+                if (image) {
+                    [button setImage:image forState:UIControlStateNormal];
+                    [button setImage:(selectedImage ?: image) forState:UIControlStateHighlighted];
+                }
+                if (selectedImage) {
+                    [button setImage:selectedImage forState:UIControlStateSelected];
+                    [button setImage:selectedImage forState:UIControlStateHighlighted];
+                }
+            }
             return _selectedContentView;
         }
     }
@@ -1537,6 +1788,10 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
         }
     }
     UIButton *selectedContentView = (_selectedContentView != self) ? _selectedContentView : nil;
+    // [EN] #216: with a plus child on Liquid Glass the stand-in gets the normal image only, below. [CN] #216：液态玻璃且有 PlusButton 子控制器时，替身只使用普通图片，见下方。
+    if ([self cyl_standInShowsNormalImageOnly]) {
+        selectedContentView = nil;
+    }
     for (UIButton *button in @[ self, selectedContentView ?: (id)[NSNull null] ]) {
         if (![button isKindOfClass:[UIButton class]]) {
             continue;
@@ -1555,10 +1810,13 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     }
     if (image) {
         self.contentImage = image;
+        objc_setAssociatedObject(self, CYLPlusButtonUpdatedImageKey, image, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     if (selectedImage) {
         self.selectedContentImage = selectedImage;
+        objc_setAssociatedObject(self, CYLPlusButtonUpdatedSelectedImageKey, selectedImage, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
+    [self cyl_updateSelectedContentViewImage];
     [self cyl_setNeedsTitleAlignment];
     [self setNeedsLayout];
     [self.superview setNeedsLayout];

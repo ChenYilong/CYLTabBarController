@@ -319,3 +319,7 @@
 "展开全部 %@ 个模拟" = "Hiện tất cả %@ mô phỏng";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Thu gọn danh sách mô phỏng";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Biểu tượng từ mạng";
+"网络图标、标题与配色" = "Biểu tượng từ mạng, tiêu đề và màu sắc";
