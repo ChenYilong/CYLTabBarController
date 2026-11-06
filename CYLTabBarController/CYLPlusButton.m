@@ -183,6 +183,16 @@ static const CGFloat CYLPlusButtonImageToTitleSpacing = 2;
 static const void *CYLPlusButtonUpdatedImageKey = &CYLPlusButtonUpdatedImageKey;
 static const void *CYLPlusButtonUpdatedSelectedImageKey = &CYLPlusButtonUpdatedSelectedImageKey;
 
+/// [EN] The center of `button`'s icon in `view`; NO while the icon is not laid out. [CN] `button` 的图标中心在 `view` 中的坐标；图标尚未布局时返回 NO。
+static BOOL CYLPlusButtonGetIconCenter(UIButton *button, UIView *view, CGPoint *center) {
+    UIImageView *imageView = button.imageView;
+    if (!imageView.superview || CGRectIsEmpty(imageView.frame)) {
+        return NO;
+    }
+    *center = [imageView.superview convertPoint:imageView.center toView:view];
+    return YES;
+}
+
 /*!
  * FIX: issue #216
  * [EN] The center of the stand-in, in its superview. The agreement when the app asks for the title to be aligned with the
@@ -197,18 +207,14 @@ static const void *CYLPlusButtonUpdatedSelectedImageKey = &CYLPlusButtonUpdatedS
  */
 static CGPoint CYLPlusButtonCenterOfStandIn(CYLPlusButton *plusButton, UIButton *standIn) {
     UIView *container = standIn.superview;
-    UIView *plusContainer = plusButton.superview;
-    CGPoint center = [container convertPoint:plusButton.center fromView:plusContainer];
-    UIImageView *plusImageView = plusButton.imageView;
-    UIImageView *standInImageView = standIn.imageView;
-    if (![plusButton cyl_alignsTitleWithTabBarItemTitles] || !plusImageView.superview || !standInImageView.superview ||
-        CGRectIsEmpty(plusImageView.frame) || CGRectIsEmpty(standInImageView.frame)) {
-        return center;
+    CGPoint plusIcon = CGPointZero;
+    CGPoint standInIcon = CGPointZero;
+    if ([plusButton cyl_alignsTitleWithTabBarItemTitles] && CYLPlusButtonGetIconCenter(plusButton, container, &plusIcon) &&
+        CYLPlusButtonGetIconCenter(standIn, standIn, &standInIcon)) {
+        return CGPointMake(plusIcon.x - (standInIcon.x - CGRectGetMidX(standIn.bounds)),
+                           plusIcon.y - (standInIcon.y - CGRectGetMidY(standIn.bounds)));
     }
-    CGPoint plusIcon = [plusImageView.superview convertPoint:plusImageView.center toView:container];
-    CGPoint standInIcon = [standInImageView.superview convertPoint:standInImageView.center toView:standIn];
-    return CGPointMake(plusIcon.x - (standInIcon.x - CGRectGetMidX(standIn.bounds)),
-                       plusIcon.y - (standInIcon.y - CGRectGetMidY(standIn.bounds)));
+    return [container convertPoint:plusButton.center fromView:plusButton.superview];
 }
 
 /*!
@@ -464,6 +470,11 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     }
 }
 
+/// [EN] Liquid Glass with a plus child view controller, see `-cyl_updateSelectedContentViewImage`. [CN] 液态玻璃且有 PlusButton 子控制器，见 `-cyl_updateSelectedContentViewImage`。
+- (BOOL)cyl_standInShowsNormalImageOnly {
+    return CYLPlusButtonIsInLiquidGlassTabBar(self) && [CYLPlusButton plusChildViewControllerForOwner:self] != nil;
+}
+
 /*!
  * FIX: issue #216
  * [EN] Liquid Glass with a plus child view controller only: the stand-in in the selected layer is a copy of the one real
@@ -479,8 +490,7 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  */
 - (void)cyl_updateSelectedContentViewImage {
     UIButton *standIn = (_selectedContentView != self) ? _selectedContentView : nil;
-    if (!standIn || !CYLPlusButtonIsInLiquidGlassTabBar(self) ||
-        ![CYLPlusButton plusChildViewControllerForOwner:self]) {
+    if (!standIn || ![self cyl_standInShowsNormalImageOnly]) {
         return;
     }
     UIImage *image = [self imageForState:UIControlStateNormal];
@@ -1111,11 +1121,16 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  *      保持在 PlusButton 的位置。
  */
 - (void)cyl_moveSelectedContentViewWithPlusButton {
+    if ([self cyl_standInFollowsPlusButton]) {
+        [self cyl_placeSelectedContentView];
+    }
+}
+
+/// [EN] Puts the stand-in in place (`CYLPlusButtonCenterOfStandIn()`), and the real plus button's mask with it.
+/// [CN] 放置替身（`CYLPlusButtonCenterOfStandIn()`），并同时更新真实 PlusButton 的 mask。
+- (void)cyl_placeSelectedContentView {
     UIButton *selectedContentView = _selectedContentView;
     if (!selectedContentView.superview || !self.superview || selectedContentView == self) {
-        return;
-    }
-    if (![self cyl_standInFollowsPlusButton]) {
         return;
     }
     [selectedContentView layoutIfNeeded];
@@ -2055,7 +2070,9 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
             // [CN] 仅液态玻璃（选中 PlusButton 子控制器时，选中图层显示替身）。类方法会新建一个 PlusButton，使用 App 原来的图片：在第一次选中
             //      PlusButton 子控制器之前应用的主题（例如启动时恢复的主题）使替身保持旧图片，盖在换肤后的 PlusButton 上，周围透过玻璃显示为模糊。
             //      这里为替身设置之后更新过的图片。
-            if (button != self && CYLPlusButtonIsInLiquidGlassTabBar(self)) {
+            if ([self cyl_standInShowsNormalImageOnly]) {
+                [self cyl_updateSelectedContentViewImage];
+            } else if (button != self && CYLPlusButtonIsInLiquidGlassTabBar(self)) {
                 UIImage *image = objc_getAssociatedObject(self, CYLPlusButtonUpdatedImageKey);
                 UIImage *selectedImage = objc_getAssociatedObject(self, CYLPlusButtonUpdatedSelectedImageKey);
                 if (image) {
@@ -2067,7 +2084,6 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
                     [button setImage:selectedImage forState:UIControlStateHighlighted];
                 }
             }
-            [self cyl_updateSelectedContentViewImage];
             return _selectedContentView;
         }
     }
@@ -2137,11 +2153,9 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
             }
         }
     }
-    UIButton *selectedContentView = (_selectedContentView != self) ? _selectedContentView : nil;
-    for (UIButton *button in @[ self, selectedContentView ?: (id)[NSNull null] ]) {
-        if (![button isKindOfClass:[UIButton class]]) {
-            continue;
-        }
+    // [EN] A stand-in that shows the normal image only is updated below, not here. [CN] 只显示普通状态图片的替身在下面更新，不在这里。
+    UIButton *standIn = (_selectedContentView != self && ![self cyl_standInShowsNormalImageOnly]) ? _selectedContentView : nil;
+    for (UIButton *button in (standIn ? @[ self, standIn ] : @[ self ])) {
         if (image) {
             [button setImage:image forState:UIControlStateNormal];
             // [EN] The stand-in is shown highlighted, with the selected look. [CN] 替身以高亮状态显示选中样式。

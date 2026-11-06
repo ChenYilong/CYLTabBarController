@@ -81,7 +81,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 每次换肤后（液态玻璃 guard 内）都会调用 `-cyl_layOutPlusButtonInLiquidGlassLayers`，异步下载的图片到达后再调用一次。 | After every theme change (inside a Liquid Glass guard) `-cyl_layOutPlusButtonInLiquidGlassLayers` runs, and once more when a downloaded image arrives. |
+| 每次换肤后（液态玻璃 guard 内）都会请求一次布局，由 `-viewDidLayoutSubviews` 调用 `-cyl_layOutPlusButtonInLiquidGlassLayers`；异步下载的图片到达后再调用一次。 | After every theme change (inside a Liquid Glass guard) a layout pass is requested, and `-viewDidLayoutSubviews` runs `-cyl_layOutPlusButtonInLiquidGlassLayers`; it runs once more when a downloaded image arrives. |
 | 图片同步在以下时机执行：设置普通状态图片、更新 `configuration`、`-cyl_updateTitle:image:selectedImage:`、创建替身，以及每次布局。放在每次布局中是为了自愈：`-cyl_layOutPlusButtonInLiquidGlassLayers` 发现替身已在按钮中就会提前返回，图片同步位于这个返回之前。 | The image sync runs when the normal image is set, when `configuration` changes, in `-cyl_updateTitle:image:selectedImage:`, when the stand-in is made, and on every layout pass. Every layout pass, so it heals itself: `-cyl_layOutPlusButtonInLiquidGlassLayers` returns early when the stand-in is already in its button, and the sync comes before that return. |
 
 ## [CN]替身的创建时机与布局 block

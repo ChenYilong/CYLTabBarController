@@ -277,15 +277,6 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 #endif
 @end
 
-/// [EN] Implemented in `CYLPlusButton.m`. [CN] 在 `CYLPlusButton.m` 中实现。
-@interface CYLPlusButton (CYLLiquidGlassMaskPrivate)
-/// [EN] Liquid Glass: masks the real plus button out under the glass that shows its stand-in. [CN] 液态玻璃：在显示替身的玻璃下方 mask 掉真实的 PlusButton。
-- (void)cyl_updateLiquidGlassMask;
-/// [EN] Liquid Glass with a plus child: the stand-in shows the plus button's normal image. [CN] 液态玻璃且有 PlusButton 子控制器：替身显示 PlusButton 普通状态的图片。
-- (void)cyl_updateSelectedContentViewImage;
-/// [EN] Liquid Glass: the stand-in's image stays on the plus button's image. [CN] 液态玻璃：替身的图片与 PlusButton 的图片保持对齐。
-- (void)cyl_moveSelectedContentViewWithPlusButton;
-@end
 
 
 /// [EN] Per-tab colors, implemented in the main implementation. [CN] 单个 Tab 的颜色，在主实现中实现。
@@ -1009,16 +1000,9 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
          */
         __weak CYLPlusButton *weakPlusButton = contextPlusButton;
         void (^centerOnPlusButton)(BOOL, UIControl *, UIView *) = ^(BOOL isReplaced, UIControl *tabBarButton, UIView *selectedCover) {
-            CYLPlusButton *plusButton = weakPlusButton;
-            UIView *platterView = plusButton.superview;
-            UIView *selectedContainerView = selectedCover.superview;
-            if (platterView && selectedContainerView) {
-                selectedCover.center = [selectedContainerView convertPoint:plusButton.center fromView:platterView];
-            }
-            [plusButton cyl_moveSelectedContentViewWithPlusButton];
-            // [EN] The real plus button is not drawn under the glass that shows the stand-in (`CYLPlusButton.m`).
-            // [CN] 显示替身的玻璃下方不绘制真实的 PlusButton（`CYLPlusButton.m`）。
-            [plusButton cyl_updateLiquidGlassMask];
+            // [EN] The stand-in on the plus button, whose real button is not drawn under the glass that shows it (`CYLPlusButton.m`).
+            // [CN] 替身与 PlusButton 对齐，显示替身的玻璃下方不绘制真实的 PlusButton（`CYLPlusButton.m`）。
+            [weakPlusButton cyl_placeSelectedContentView];
         };
         if ([contextPlusButton cyl_showsTitleInTabBarItem]) {
             // [EN] FIX: issue #636 — the tab item shows the plus button's title (`-cyl_showsTitleInTabBarItem`): as the
@@ -2716,7 +2700,7 @@ static char CYLTabBarItemIconViewsProviderKey;
  * [CN] 在主队列返回 `icon` 对应的图片：`UIImage` 原样返回；`NSURL` 或 `http(s)` 字符串通过 `CYLImageCache` 加载；其他字符串按图片名或
  *      绝对路径加载（`+[UIImage cyl_imageNamed:]`，#535）。没有图片时为 nil。
  */
-void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completion)(UIImage *_Nullable image)) {
+static void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completion)(UIImage *_Nullable image)) {
     if ([icon isKindOfClass:[UIImage class]]) {
         completion(icon);
         return;
@@ -2827,6 +2811,10 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     }
     [self.view setNeedsLayout];
     return YES;
+}
+
++ (void)cyl_loadTabBarItemIcon:(id)icon completion:(void (^)(UIImage *_Nullable))completion {
+    CYLLoadTabBarItemIcon(icon, completion);
 }
 
 - (BOOL)updatePlusButtonWithAttributes:(NSDictionary<NSString *, id> *)attributes {

@@ -10,6 +10,7 @@
 // [CN] Core 的私有头文件，不属于公开 API：CYLTabBarController.m 与从中拆分出的文件（CYLTabBarController+CYL….m）共用的声明。
 
 #import "CYLTabBarController.h"
+#import "CYLPlusButton.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -35,8 +36,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable UIScrollView *)cyl_tabBarMinimizeScrollViewForViewController:(nullable UIViewController *)viewController;
 @end
 
-/// [EN] Loads a tab icon (a UIImage, a name, a path or a URL), asynchronously for a URL. [CN] 加载 Tab 图标（UIImage、图片名、路径或 URL），URL 为异步。
-FOUNDATION_EXTERN void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completion)(UIImage *_Nullable image));
+/// [EN] Implemented in `CYLPlusButton.m`. [CN] 在 `CYLPlusButton.m` 中实现。
+@interface CYLPlusButton (CYLLiquidGlassPrivate)
+/// [EN] Masks the real plus button out under the glass that shows its stand-in. [CN] 在显示替身的玻璃下方 mask 掉真实的 PlusButton。
+- (void)cyl_updateLiquidGlassMask;
+/// [EN] With a plus child: the stand-in shows the plus button's normal image. [CN] 有 PlusButton 子控制器时：替身显示 PlusButton 普通状态的图片。
+- (void)cyl_updateSelectedContentViewImage;
+/// [EN] In the layouts where the stand-in follows the plus button, puts it in place. [CN] 在替身跟随 PlusButton 的布局中放置替身。
+- (void)cyl_moveSelectedContentViewWithPlusButton;
+/// [EN] Puts the stand-in in place, in every layout. [CN] 在所有布局中放置替身。
+- (void)cyl_placeSelectedContentView;
+@end
 
 /// [EN] Implemented in CYLTabBarController.m (CYLTheme, issue #216). [CN] 实现见 CYLTabBarController.m 中的 CYLTheme（issue #216）。
 @interface CYLTabBarController (CYLThemePrivate)
@@ -51,9 +61,8 @@ FOUNDATION_EXTERN void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completio
 - (void)cyl_themeRemoveTabBarItemAttributeKeys:(NSArray<NSString *> *)keys atIndex:(NSUInteger)index;
 /// [EN] The one-time layout block runs once more. [CN] 只执行一次的布局 block 再执行一次。
 - (void)cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce;
-/// [EN] Liquid Glass: installs the plus button's stand-in and keeps it on the plus button (idempotent; returns at once on other styles).
-/// [CN] 液态玻璃：安装 PlusButton 的替身并使其与 PlusButton 对齐（可重复调用；其他样式立即返回）。
-- (void)cyl_layOutPlusButtonInLiquidGlassLayers;
+/// [EN] Loads a tab icon (a UIImage, a name, a path or a URL), asynchronously for a URL. [CN] 加载 Tab 图标（UIImage、图片名、路径或 URL），URL 为异步。
++ (void)cyl_loadTabBarItemIcon:(nullable id)icon completion:(void (^)(UIImage *_Nullable image))completion;
 @end
 
 /// [EN] Implemented in CYLTabBarController.m (tab bar customization toolkit). [CN] 实现见 CYLTabBarController.m（TabBar 自定义工具集）。

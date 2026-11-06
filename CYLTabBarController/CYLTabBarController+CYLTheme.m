@@ -21,6 +21,10 @@
 
 #pragma mark - Theme switching (issue #216)
 
+static void CYLThemeLoadIcon(id _Nullable icon, void (^completion)(UIImage *_Nullable image)) {
+    [CYLTabBarController cyl_loadTabBarItemIcon:icon completion:completion];
+}
+
 /// [EN] What the app had set before the first theme changed it. [CN] 第一次被主题修改前 App 自己的设置。
 static char CYLThemeOriginalStandardAppearanceKey;
 static char CYLThemeOriginalScrollEdgeAppearanceKey;
@@ -247,10 +251,10 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
     //      范围：所有样式。添加什么由 block 自己决定；主题自身的图标不依赖它：它们是替换每个图标的视图
     //      （`-[UIControl cyl_replaceTabImageViewWithNewView:show:]`，液态玻璃下两个图层都有），每次布局后都会重新安装（#601）。
     [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
-    // [EN] Liquid Glass only: the stand-in follows the plus button's new image and position after every theme change.
+    // [EN] Liquid Glass only: the next layout pass puts the stand-in on the plus button's new image and position (`-viewDidLayoutSubviews`).
     // [CN] 仅液态玻璃：每次换肤后，替身跟随 PlusButton 的新图片与新位置。
-    if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]) {
-        [self cyl_layOutPlusButtonInLiquidGlassLayers];
+    if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive] && self.isViewLoaded) {
+        [self.view setNeedsLayout];
     }
 }
 
@@ -414,7 +418,7 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
         [value prepareWithCurrentValue:[providers objectForKey:viewController]];
         NSDictionary *tabIcon = [themeIcons objectForKey:viewController];
         __weak UIViewController *weakViewController = viewController;
-        CYLLoadTabBarItemIcon(tabIcon[@"icon"], ^(UIImage *image) {
+        CYLThemeLoadIcon(tabIcon[@"icon"], ^(UIImage *image) {
             void (^show)(UIImage *) = ^(UIImage *selectedImage) {
                 __strong __typeof(weakSelf) self = weakSelf;
                 UIViewController *strongViewController = weakViewController;
@@ -436,7 +440,7 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
             if (!image || !selectedIcon || [selectedIcon isEqual:tabIcon[@"icon"]]) {
                 show(nil);
             } else {
-                CYLLoadTabBarItemIcon(selectedIcon, show);
+                CYLThemeLoadIcon(selectedIcon, show);
             }
         });
     }
@@ -498,7 +502,7 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
         }
         __weak __typeof(self) weakSelf = self;
         __weak CYLPlusButton *weakPlusButton = plusButton;
-        CYLLoadTabBarItemIcon(themeValue, ^(UIImage *image) {
+        CYLThemeLoadIcon(themeValue, ^(UIImage *image) {
             __strong __typeof(weakSelf) self = weakSelf;
             CYLPlusButton *strongPlusButton = weakPlusButton;
             // [EN] Dropped when another theme came in between. [CN] 期间切换了其他主题时丢弃。
