@@ -3,6 +3,19 @@
 Instructions for anyone (people and AI agents) changing this repository. The library is an iOS tab bar
 (Objective-C, usable from Swift) with Lottie, Liquid Glass and FlatDesign styles. See `README.md` for the API.
 
+## Reading the bilingual docs and comments
+
+The documents in `docs/` and the code comments are bilingual. AI agents read only the English part and skip the Chinese part:
+
+- **Keywords**: `[EN]` starts the English part, `[CN]` the Chinese part. Always read what starts with `[EN]`; skip what starts
+  with `[CN]`.
+- **`docs/`**: read the `## [EN]…` heading and skip its `## [CN]…` twin. In a table with `中文 | English` columns, read only the
+  right column. In a heading or a cell written as `中文 / English`, read only the part after the `/`.
+- **Code comments**: read the `[EN]` block and skip the `[CN]` block, which runs until the next `[EN]`, the next tag or the end of the
+  comment.
+- **Exception**: text with no English version (e.g. an older comment in Chinese only) is read as is, since it is the only source.
+- **Writing is not affected**: new text is still written in both languages, as section 1 and section 4 require.
+
 ## 1. Documentation is part of every new feature
 
 Every new feature (and every user-visible behavior change) ships with **bilingual Chinese–English documentation in
@@ -110,6 +123,12 @@ classes link back to it:
   `-cylPlaySelectAnimationWithTabButton:…`), and define its Swift name with `NS_SWIFT_NAME` on the new method only.
   Both spellings run the same logic: the library calls the underscore-free one when it is implemented, otherwise the
   underscored one. If the old method was `@required`, make it `@optional` so a class can implement only the new one.
+- **PlusButton images**: read [docs/PlusButton.md](docs/PlusButton.md) before changing the plus button's images, its stand-in or
+  its theming. With a plus child view controller on Liquid Glass (not FlatDesign), the stand-in ignores selected images and shows
+  only the real plus button's normal image. Selected images stay available to apps and themes for FlatDesign and the classic
+  tab bar, so keep this in the plus button's internals, behind a Liquid Glass guard.
+  When the app asks for the title to be aligned (`+alignsTitleWithTabBarItemTitles`), the stand-in and the real plus button line
+  up by icon only: take the icon's coordinates and ignore the other subviews.
 - **Optional components are isolated with guards**:
   - FlatDesign code in Core: `#if CYL_FLATDESIGN_AVAILABLE` (defined once in `CYLUtils/CYLUtilsMacros.h`), and run only
     for `CYLTabBarStyleTypeFlatDesign`, so Liquid Glass and the classic style are never affected.

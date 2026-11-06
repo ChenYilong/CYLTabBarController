@@ -349,6 +349,9 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @interface CYLPlusButton (CYLLiquidGlassMaskPrivate)
 /// [EN] Liquid Glass: masks the real plus button out under the glass that shows its stand-in. [CN] 液态玻璃：在显示替身的玻璃下方 mask 掉真实的 PlusButton。
 - (void)cyl_updateLiquidGlassMask;
+/// [EN] Liquid Glass with a plus child: the stand-in shows the real button's normal image only (#216, docs/PlusButton.md).
+/// [CN] 液态玻璃且有 PlusButton 子控制器：替身只显示真实按钮普通状态的图片（#216，docs/PlusButton.md）。
+- (void)cyl_updateSelectedContentViewImage;
 @end
 
 @interface CYLTabBarController (CYLThemePrivate)
@@ -1076,6 +1079,9 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
     CYLPlusButton<CYLPlusButtonSubclassing> *contextPlusButton = [self cyl_contextPlusButton];
     UIControl *plusControlOrigin = [self.cyl_tabBar cyl_platterContentViewWithIndex:contextPlusButton.cyl_tabBarItemVisibleIndex];
     UIButton *selectedCover = contextPlusButton.selectedContentView;
+    // [EN] #216: on every layout pass, before the early return below, so the stand-in's image heals itself.
+    // [CN] #216：每次布局都执行，且位于下方提前返回之前，使替身的图片可以自愈。
+    [contextPlusButton cyl_updateSelectedContentViewImage];
     UIControl *plusSelectedControl = plusControlOrigin.cyl_platterSelectedControl;
     [plusControlOrigin.cyl_tabImageView cyl_setHidden:YES];
     [plusControlOrigin.cyl_swappableImageViewViewInTabBarButton cyl_setHidden:YES];
@@ -9133,6 +9139,16 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
     }
     // [EN] Styles set in one place win over the theme's appearance. [CN] 在一处设置的样式优先于主题的外观。
     [self cyl_applyTabBarItemStyles];
+    // [EN] #216, Liquid Glass only (Liquid Glass active AND not FlatDesign): a layout pass, so the plus button's stand-in
+    //      follows the plus button's new image and position (`-cyl_layOutPlusButtonInLiquidGlassLayers`).
+    // [CN] #216，仅液态玻璃（液态玻璃处于活动状态且不是扁平样式）：请求一次布局，使 PlusButton 的替身跟随 PlusButton 的新图片与新位置
+    //      （`-cyl_layOutPlusButtonInLiquidGlassLayers`）。
+    if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]) {
+        [self.tabBar setNeedsLayout];
+        if (self.isViewLoaded) {
+            [self.view setNeedsLayout];
+        }
+    }
     // [EN] What the app adds to the tab buttons in its one-time layout block (`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`,
     //      e.g. a cover over a tab, badges) is added again after the next layout: before, a theme switch left that block
     //      marked as run, and what UIKit dropped from the tab buttons never came back.

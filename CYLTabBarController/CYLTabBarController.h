@@ -29,6 +29,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Lottie-TabIcon.md
 //   - The PlusButton Slot: Placeholders and Matching Counts / PlusButton 的 slot：占位与数量一致
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Slot.md
+//   - How the PlusButton works: the real button, its Liquid Glass stand-in and selected images / PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md
 //   - Get the navigation controller and push from anywhere / 在任意位置获取导航控制器并 Push
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Push-From-Anywhere.md
 //   - selectedIndex and the PlusButton: the selected title and image match / selectedIndex 与 PlusButton：选中的文字与图片一致

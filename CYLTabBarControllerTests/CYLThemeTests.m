@@ -28,6 +28,16 @@
 @interface CYLTestItemsTabBarTheme : NSObject <CYLTabBarTheme>
 @end
 
+/// [EN] A plus button made without a tab bar. [CN] 不依赖 TabBar 创建的 PlusButton。
+@interface CYLTestPlusButton : CYLPlusButton <CYLPlusButtonSubclassing>
+@end
+
+@implementation CYLTestPlusButton
++ (id)plusButton {
+    return [self new];
+}
+@end
+
 @interface CYLTestKeysTabBarTheme : NSObject <CYLTabBarTheme>
 @property (nonatomic, copy) NSArray<NSDictionary<NSString *, id> *> *attributes;
 @end
@@ -355,6 +365,27 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
                                                          @{ CYLTabBarItemTitle : @"Moments" } ]];
     XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.title, @"Home");
     XCTAssertEqualObjects(tabBarController.viewControllers[1].tabBarItem.title, @"Moments", @"the slot entry takes no tab's place");
+}
+
+/*!
+ * FIX: issue #216
+ * [EN] Outside Liquid Glass with a plus child, a plus button keeps its selected image: only there does the stand-in use
+ *      one picture (checked on a simulator by scripts/plus-child-theme-test.sh).
+ * [CN] 不是液态玻璃且有 PlusButton 子控制器的场景时，PlusButton 保留其选中图片：只有该场景的替身才只用一张图片（由
+ *      scripts/plus-child-theme-test.sh 在模拟器上检查）。
+ */
+- (void)testAPlusButtonOutsideAGlassPlusChildKeepsItsSelectedImage {
+    UIImage *normal = CYLTestImage(10, UIColor.redColor);
+    UIImage *selected = CYLTestImage(10, UIColor.blueColor);
+    CYLTestPlusButton *plusButton = [CYLTestPlusButton new];
+    [plusButton setImage:normal forState:UIControlStateNormal];
+    [plusButton setImage:selected forState:UIControlStateSelected];
+    XCTAssertEqual([plusButton imageForState:UIControlStateNormal].CGImage, normal.CGImage);
+    XCTAssertEqual([plusButton imageForState:UIControlStateSelected].CGImage, selected.CGImage);
+    UIImage *themed = CYLTestImage(10, UIColor.greenColor);
+    [plusButton cyl_updateTitle:nil image:themed selectedImage:selected];
+    XCTAssertEqual([plusButton imageForState:UIControlStateNormal].CGImage, themed.CGImage);
+    XCTAssertEqual([plusButton imageForState:UIControlStateSelected].CGImage, selected.CGImage);
 }
 
 - (void)testOneTimeLayoutBlockRunsAgainAfterATheme {
