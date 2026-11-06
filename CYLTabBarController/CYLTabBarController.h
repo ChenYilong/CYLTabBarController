@@ -35,6 +35,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Lottie-TabIcon.md
 //   - The PlusButton Slot: Placeholders and Matching Counts / PlusButton 的 slot：占位与数量一致
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Slot.md
+//   - How the PlusButton works: the real button, its Liquid Glass stand-in and selected images / PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md
 //   - Get the navigation controller and push from anywhere / 在任意位置获取导航控制器并 Push
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Push-From-Anywhere.md
 //   - selectedIndex and the PlusButton: the selected title and image match / selectedIndex 与 PlusButton：选中的文字与图片一致
@@ -1205,11 +1207,11 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` and `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL`
  *      (the URL keys win), each any source `-setTabBarItemIcon:selectedIcon:size:atIndex:` takes: a `UIImage`, an image
  *      name, a file path, an `NSURL` or an `http(s)` string, downloaded and cached when remote. The images are scaled to
- *      `CYLTabBarItemImageURLSize`, else to the plus button's current image size. See `-[CYLPlusButton cyl_updateTitle:image:selectedImage:]`.
+ *      `CYLTabBarItemImageURLSize`, else to the plus button's current image size. With a plus child view controller on Liquid Glass (not FlatDesign), the stand-in ignores the selected keys: https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md See `-[CYLPlusButton cyl_updateTitle:image:selectedImage:]`.
  * [CN] 适用于 PlusButton 的 `-updateTabBarItemAtIndex:attributes:`，原地更新，适用于所有样式：`CYLTabBarItemTitle`；
  *      `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` 与 `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL`（URL 键优先），
  *      均支持 `-setTabBarItemIcon:selectedIcon:size:atIndex:` 的所有来源：`UIImage`、图片名、文件路径、`NSURL` 或 `http(s)` 字符串，
- *      网络图片会下载并缓存。图片缩放到 `CYLTabBarItemImageURLSize`，未设置时缩放到 PlusButton 当前图片的尺寸。见
+ *      网络图片会下载并缓存。图片缩放到 `CYLTabBarItemImageURLSize`，未设置时缩放到 PlusButton 当前图片的尺寸。有 PlusButton 子控制器且为液态玻璃（非扁平样式）时，替身忽略选中图片的 key，见上面的链接。见
  *      `-[CYLPlusButton cyl_updateTitle:image:selectedImage:]`。
  * @return [EN] NO without a plus button. [CN] 没有 PlusButton 时返回 NO。
  */

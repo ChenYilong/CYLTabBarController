@@ -51,6 +51,9 @@ FOUNDATION_EXTERN void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completio
 - (void)cyl_themeRemoveTabBarItemAttributeKeys:(NSArray<NSString *> *)keys atIndex:(NSUInteger)index;
 /// [EN] The one-time layout block runs once more. [CN] 只执行一次的布局 block 再执行一次。
 - (void)cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce;
+/// [EN] Liquid Glass: installs the plus button's stand-in and keeps it on the plus button (idempotent; returns at once on other styles).
+/// [CN] 液态玻璃：安装 PlusButton 的替身并使其与 PlusButton 对齐（可重复调用；其他样式立即返回）。
+- (void)cyl_layOutPlusButtonInLiquidGlassLayers;
 @end
 
 /// [EN] Implemented in CYLTabBarController.m (tab bar customization toolkit). [CN] 实现见 CYLTabBarController.m（TabBar 自定义工具集）。

@@ -247,6 +247,11 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
     //      范围：所有样式。添加什么由 block 自己决定；主题自身的图标不依赖它：它们是替换每个图标的视图
     //      （`-[UIControl cyl_replaceTabImageViewWithNewView:show:]`，液态玻璃下两个图层都有），每次布局后都会重新安装（#601）。
     [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
+    // [EN] Liquid Glass only: the stand-in follows the plus button's new image and position after every theme change.
+    // [CN] 仅液态玻璃：每次换肤后，替身跟随 PlusButton 的新图片与新位置。
+    if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]) {
+        [self cyl_layOutPlusButtonInLiquidGlassLayers];
+    }
 }
 
 /// [EN] YES while no other theme was applied after the one counted `generation`. [CN] 计数为 `generation` 的主题之后没有应用其他主题时为 YES。

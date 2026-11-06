@@ -188,93 +188,6 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
     }];
 }
 
-- (void)testThemeImageFollowsTheThemeAndNeverMarksTheProvidersImage {
-    CYLThemeManager *manager = [self newImageManager];
-    UIImage *image = [self themeImageOfManager:manager];
-    XCTAssertTrue(image.cyl_isThemeImage);
-    XCTAssertEqual(image.size.width, 10.0);
-    XCTAssertFalse(((UIImage *)manager.currentTheme).cyl_isThemeImage, @"the provider's image (maybe shared) is not marked");
-    XCTAssertNotEqual(image, manager.currentTheme);
-    // [EN] Again from the same provider image: UIKit caches derived images, which once gave back the provider's image.
-    // [CN] 再次使用同一个 provider 图片：UIKit 会缓存派生图片，曾因此返回 provider 的图片本身。
-    UIImage *again = [self themeImageOfManager:manager];
-    XCTAssertTrue(again.cyl_isThemeImage);
-    XCTAssertNotEqual(again, image);
-    XCTAssertNotEqual(again, manager.currentTheme);
-
-    manager.currentThemeIdentifier = @"B";
-    UIImage *current = [image cyl_imageForCurrentTheme];
-    XCTAssertTrue(current.cyl_isThemeImage);
-    XCTAssertEqual(current.size.width, 20.0);
-    UIImage *plain = CYLTestImage(5, UIColor.greenColor);
-    XCTAssertFalse(plain.cyl_isThemeImage);
-    XCTAssertEqual([plain cyl_imageForCurrentTheme], plain);
-}
-
-- (void)testImageViewAndButtonGetTheNewThemeImage {
-    CYLThemeManager *manager = [self newImageManager];
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[self themeImageOfManager:manager]];
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    [button setImage:[self themeImageOfManager:manager] forState:UIControlStateNormal];
-    [button setBackgroundImage:[self themeImageOfManager:manager] forState:UIControlStateSelected];
-    XCTAssertTrue([button imageForState:UIControlStateNormal].cyl_isThemeImage, @"UIButton keeps the theme image object");
-
-    manager.currentThemeIdentifier = @"B";
-    [imageView cyl_themeDidChangeByManager:manager identifier:manager.currentThemeIdentifier theme:manager.currentTheme];
-    [button cyl_themeDidChangeByManager:manager identifier:manager.currentThemeIdentifier theme:manager.currentTheme];
-    XCTAssertEqual(imageView.image.size.width, 20.0);
-    XCTAssertEqual([button imageForState:UIControlStateNormal].size.width, 20.0);
-    XCTAssertEqual([button backgroundImageForState:UIControlStateSelected].size.width, 20.0);
-    XCTAssertEqual([button imageForState:UIControlStateHighlighted], [button imageForState:UIControlStateNormal],
-                   @"a state without an image of its own still falls back to the normal one");
-}
-
-- (void)testVisualEffectViewGetsTheNewThemeEffect {
-    CYLThemeManager *manager = [self newManager];
-    [manager addThemeIdentifier:@"Light" theme:@(UIBlurEffectStyleLight)];
-    [manager addThemeIdentifier:@"Dark" theme:@(UIBlurEffectStyleDark)];
-    manager.currentThemeIdentifier = @"Light";
-    UIVisualEffect *effect = [UIVisualEffect cyl_effectWithThemeManagerName:manager.name provider:^UIVisualEffect *(CYLThemeManager *themeManager, id identifier, NSNumber *theme) {
-        return [UIBlurEffect effectWithStyle:(UIBlurEffectStyle)theme.integerValue];
-    }];
-    XCTAssertTrue(effect.cyl_isThemeEffect);
-    XCTAssertTrue([effect isKindOfClass:[UIBlurEffect class]]);
-    UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:effect];
-    XCTAssertTrue(effectView.effect.cyl_isThemeEffect, @"the effect view keeps the theme effect");
-
-    UIVisualEffect *before = effectView.effect;
-    manager.currentThemeIdentifier = @"Dark";
-    [effectView cyl_themeDidChangeByManager:manager identifier:manager.currentThemeIdentifier theme:manager.currentTheme];
-    XCTAssertNotEqual(effectView.effect, before);
-    XCTAssertTrue(effectView.effect.cyl_isThemeEffect);
-}
-
-- (void)testLayerThemeColorFollowsTheThemeWithSublayers {
-    CYLThemeManager *manager = [self newManager];
-    [manager addThemeIdentifier:@"Red" theme:UIColor.redColor];
-    [manager addThemeIdentifier:@"Blue" theme:UIColor.blueColor];
-    manager.currentThemeIdentifier = @"Red";
-    UIColor *color = [UIColor cyl_colorWithThemeManagerName:manager.name provider:^UIColor *(CYLThemeManager *themeManager, id identifier, UIColor *theme) {
-        return theme;
-    }];
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
-    view.layer.cyl_themeBorderColor = color;
-    CAShapeLayer *sublayer = [CAShapeLayer layer];
-    [view.layer addSublayer:sublayer];
-    [sublayer cyl_setThemeColor:color forKeyPath:@"fillColor"];
-    XCTAssertTrue(CGColorEqualToColor(view.layer.borderColor, UIColor.redColor.CGColor));
-    XCTAssertTrue(CGColorEqualToColor(sublayer.fillColor, UIColor.redColor.CGColor));
-    XCTAssertEqualObjects([sublayer cyl_themeColorForKeyPath:@"fillColor"], color);
-
-    manager.currentThemeIdentifier = @"Blue";
-    [view cyl_themeDidChangeByManager:manager identifier:manager.currentThemeIdentifier theme:manager.currentTheme];
-    XCTAssertTrue(CGColorEqualToColor(view.layer.borderColor, UIColor.blueColor.CGColor));
-    XCTAssertTrue(CGColorEqualToColor(sublayer.fillColor, UIColor.blueColor.CGColor), @"sublayers follow too");
-
-    [sublayer cyl_setThemeColor:nil forKeyPath:@"fillColor"];
-    XCTAssertNil([sublayer cyl_themeColorForKeyPath:@"fillColor"]);
-}
-
 - (void)testViewOfAViewControllerNotInAWindowGetsTheNewTheme {
     CYLThemeManager *manager = [self newImageManager];
     UIViewController *viewController = [[UIViewController alloc] init];
@@ -424,7 +337,7 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
 #pragma mark - Theme images, effects and layer colors (QMUI gap)
 
 /// [EN] Two 1 × 1 images that tell themselves apart by their tint. [CN] 两张以 tint 区分的 1 × 1 图片。
-static UIImage *CYLTestImage(UIColor *color) {
+static UIImage *CYLTestSolidImage(UIColor *color) {
     return [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(1, 1)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
         [color setFill];
         UIRectFill(CGRectMake(0, 0, 1, 1));
@@ -448,8 +361,8 @@ static UIImage *CYLTestImage(UIColor *color) {
     [self.manager addThemeIdentifier:@"day" theme:@"day"];
     [self.manager addThemeIdentifier:@"night" theme:@"night"];
     self.manager.currentThemeIdentifier = @"day";
-    self.dayImage = CYLTestImage(UIColor.whiteColor);
-    self.nightImage = CYLTestImage(UIColor.blackColor);
+    self.dayImage = CYLTestSolidImage(UIColor.whiteColor);
+    self.nightImage = CYLTestSolidImage(UIColor.blackColor);
 }
 
 - (UIImage *)themeImage {
@@ -488,7 +401,7 @@ static UIImage *CYLTestImage(UIColor *color) {
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     [button setImage:[self themeImage] forState:UIControlStateNormal];
     [button setBackgroundImage:[self themeImage] forState:UIControlStateSelected];
-    UIImage *plainImage = CYLTestImage(UIColor.redColor);
+    UIImage *plainImage = CYLTestSolidImage(UIColor.redColor);
     [button setImage:plainImage forState:UIControlStateDisabled];
     UIView *container = [[UIView alloc] init];
     [container addSubview:imageView];
@@ -576,6 +489,16 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
 - (nullable NSDictionary<NSString *, UIColor *> *)colorsForURL:(nullable NSURL *)URL;
 @end
 
+/// [EN] A plus button as an app makes it: its stand-in comes from `+plusButton`. [CN] App 的 PlusButton：其替身来自 `+plusButton`。
+@interface CYLTestPlusButton : CYLPlusButton <CYLPlusButtonSubclassing>
+@end
+
+@implementation CYLTestPlusButton
++ (id)plusButton {
+    return [self new];
+}
+@end
+
 @interface CYLThemeAnimationTests : XCTestCase
 @end
 
@@ -639,6 +562,27 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
                                                          @{ CYLTabBarItemTitle : @"Moments" } ]];
     XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.title, @"Home");
     XCTAssertEqualObjects(tabBarController.viewControllers[1].tabBarItem.title, @"Moments", @"the slot entry takes no tab's place");
+}
+
+/*!
+ * FIX: issue #216
+ * [EN] Outside Liquid Glass with a plus child, a plus button keeps its selected image: only there does the stand-in use
+ *      one picture (checked on a simulator by scripts/plus-child-theme-test.sh).
+ * [CN] 不是液态玻璃且有 PlusButton 子控制器的场景时，PlusButton 保留其选中图片：只有该场景的替身才只用一张图片（由
+ *      scripts/plus-child-theme-test.sh 在模拟器上检查）。
+ */
+- (void)testAPlusButtonOutsideAGlassPlusChildKeepsItsSelectedImage {
+    UIImage *normal = CYLTestImage(10, UIColor.redColor);
+    UIImage *selected = CYLTestImage(10, UIColor.blueColor);
+    CYLTestPlusButton *plusButton = [CYLTestPlusButton new];
+    [plusButton setImage:normal forState:UIControlStateNormal];
+    [plusButton setImage:selected forState:UIControlStateSelected];
+    XCTAssertEqual([plusButton imageForState:UIControlStateNormal].CGImage, normal.CGImage);
+    XCTAssertEqual([plusButton imageForState:UIControlStateSelected].CGImage, selected.CGImage);
+    UIImage *themed = CYLTestImage(10, UIColor.greenColor);
+    [plusButton cyl_updateTitle:nil image:themed selectedImage:selected];
+    XCTAssertEqual([plusButton imageForState:UIControlStateNormal].CGImage, themed.CGImage);
+    XCTAssertEqual([plusButton imageForState:UIControlStateSelected].CGImage, selected.CGImage);
 }
 
 - (void)testTheTabBarFollowsAnInjectedThemeManager {

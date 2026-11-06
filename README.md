@@ -296,6 +296,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [PlusButton 的 slot：占位与数量一致](docs/PlusButton-Slot.md) | [The PlusButton Slot: Placeholders and Matching Counts](docs/PlusButton-Slot.md) |
 | [PlusButton 子控件响应各自的点击事件](docs/PlusButton-Subview-Touches.md) | [Subviews of the PlusButton receive their own touches](docs/PlusButton-Subview-Touches.md) |
 | [PlusButton 点击范围：扩大、按倍数放大与调试显示](docs/PlusButton-Touchable-Area.md) | [PlusButton touchable area: grow it, scale it, and see it](docs/PlusButton-Touchable-Area.md) |
+| [PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片](docs/PlusButton.md) | [How the PlusButton works: the real button, its Liquid Glass stand-in and selected images](docs/PlusButton.md) |
 | [在任意位置获取导航控制器并 Push](docs/Push-From-Anywhere.md) | [Get the navigation controller and push from anywhere](docs/Push-From-Anywhere.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](docs/Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](docs/Rive-Animation.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](docs/SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](docs/SelectedIndex-PlusButton.md) |

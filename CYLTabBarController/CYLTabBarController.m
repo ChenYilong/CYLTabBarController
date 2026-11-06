@@ -281,47 +281,23 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @interface CYLPlusButton (CYLLiquidGlassMaskPrivate)
 /// [EN] Liquid Glass: masks the real plus button out under the glass that shows its stand-in. [CN] 液态玻璃：在显示替身的玻璃下方 mask 掉真实的 PlusButton。
 - (void)cyl_updateLiquidGlassMask;
+/// [EN] Liquid Glass with a plus child: the stand-in shows the plus button's normal image. [CN] 液态玻璃且有 PlusButton 子控制器：替身显示 PlusButton 普通状态的图片。
+- (void)cyl_updateSelectedContentViewImage;
+/// [EN] Liquid Glass: the stand-in's image stays on the plus button's image. [CN] 液态玻璃：替身的图片与 PlusButton 的图片保持对齐。
+- (void)cyl_moveSelectedContentViewWithPlusButton;
 @end
 
 
 /// [EN] Per-tab colors, implemented in the main implementation. [CN] 单个 Tab 的颜色，在主实现中实现。
-@interface CYLTabBarController (CYLTabBarItemColorsPrivate)
-- (void)cyl_updateSelectedBackgroundColorsOfTabButtons;
-- (void)cyl_setNeedsUpdateSelectedBackgroundColors;
-- (void)cyl_updateLoopingLottieViews;
-- (void)cyl_updateBadgesOfSelectedTab;
-- (void)cyl_syncTabBarItemAccessibility;
-#if CYL_FLATDESIGN_AVAILABLE
-- (void)cyl_syncFlatDesignTabBarItemColors;
-#endif
-@end
 
 /// Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController.
 typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController);
 
 /// Implemented below (CYLActiveTabBarController): the registry of live tab bar controllers.
 /// FIX: issue #152 — implemented in `CYLTabBarController (CYLTabBarItemGesture)` below. 实现见下方的分类。
-@interface CYLTabBarController (CYLTabBarItemGesturePrivate)
-- (void)cyl_recognizeTabBarItemGestureForReportedControl:(UIControl *)control;
-- (void)cyl_installTabBarItemLongPressIfNeeded;
-- (BOOL)cyl_isTabBarItemGestureControl:(UIControl *)control viewController:(UIViewController *__autoreleasing _Nullable *_Nullable)viewController;
-- (void)cyl_reportTabBarItemGesture:(CYLTabBarItemGesture)gesture control:(UIControl *)control viewController:(nullable UIViewController *)viewController;
-- (void)cyl_recognizeTapOnControl:(UIControl *)control viewController:(nullable UIViewController *)viewController isReselect:(BOOL)isReselect;
-- (void)cyl_recognizeTabBarItemTapWillSelectViewController:(UIViewController *)viewController;
-- (void)cyl_recognizeTabBarItemTapOnControl:(UIControl *)control viewController:(nullable UIViewController *)viewController isReselect:(BOOL)isReselect;
-@end
 
-@interface CYLTabBarController (CYLActiveTabBarControllerPrivate)
-+ (void)cyl_registerTabBarController:(CYLTabBarController *)tabBarController;
-+ (void)cyl_markTabBarControllerActive:(CYLTabBarController *)tabBarController;
-+ (CYLTabBarController *)cyl_tabBarControllerForContext:(NSString *)context matching:(CYLTabBarControllerMatcher)matcher;
-@end
 
 /// [EN] FIX: issue #535 — implemented in CYLTabBarController+CYLInteraction.m. [CN] 实现位于 CYLTabBarController+CYLInteraction.m。
-@interface CYLTabBarController (CYLInteractionInstall)
-- (void)cyl_installInteractionGestureRecognizersIfNeeded;
-- (BOOL)cyl_liquidGlassTakesTabTaps;
-@end
 
 /// FIX: issue #475. The title offset a tab asked for itself; see `-setTitlePositionAdjustment:`.
 /// Tab 自身设置的标题偏移，见 `-setTitlePositionAdjustment:`。
@@ -996,6 +972,10 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
     CYLPlusButton<CYLPlusButtonSubclassing> *contextPlusButton = [self cyl_contextPlusButton];
     UIControl *plusControlOrigin = [self.cyl_tabBar cyl_platterContentViewWithIndex:contextPlusButton.cyl_tabBarItemVisibleIndex];
     UIButton *selectedCover = contextPlusButton.selectedContentView;
+    // [EN] FIX: issue #216 — on every layout pass, before the early return below: a theme changes the image of a stand-in
+    //      that is already in its tab button. [CN] FIX: issue #216 — 每次布局都执行，且在下面的提前返回之前：主题会修改已在 Tab 按钮中的替身的图片。
+    [contextPlusButton cyl_updateSelectedContentViewImage];
+    [contextPlusButton cyl_moveSelectedContentViewWithPlusButton];
     UIControl *plusSelectedControl = plusControlOrigin.cyl_platterSelectedControl;
     [plusControlOrigin.cyl_tabImageView cyl_setHidden:YES];
     [plusControlOrigin.cyl_swappableImageViewViewInTabBarButton cyl_setHidden:YES];
@@ -1035,6 +1015,7 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
             if (platterView && selectedContainerView) {
                 selectedCover.center = [selectedContainerView convertPoint:plusButton.center fromView:platterView];
             }
+            [plusButton cyl_moveSelectedContentViewWithPlusButton];
             // [EN] The real plus button is not drawn under the glass that shows the stand-in (`CYLPlusButton.m`).
             // [CN] 显示替身的玻璃下方不绘制真实的 PlusButton（`CYLPlusButton.m`）。
             [plusButton cyl_updateLiquidGlassMask];
@@ -2873,9 +2854,12 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         size = CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
     }
     __weak CYLPlusButton *weakPlusButton = plusButton;
+    __weak __typeof(self) weakSelf = self;
     if (icon) {
         CYLLoadTabBarItemIcon(icon, ^(UIImage *image) {
             [weakPlusButton cyl_updateTitle:nil image:CYLImageScaledToSize(image, size) selectedImage:nil];
+            // [EN] A downloaded image arrives after the layout of the theme change. [CN] 下载的图片在换肤的布局之后才到达。
+            [weakSelf cyl_layOutPlusButtonInLiquidGlassLayers];
         });
     }
     if (selectedIcon) {
