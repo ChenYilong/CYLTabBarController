@@ -40,6 +40,15 @@
 
 @implementation CYLFlatDesignTableViewController
 
+// [EN] #216: the skin row shows the current theme, and a theme is also picked from a sheet while this list stays on screen.
+// [CN] #216：换肤行显示当前主题，而主题也可以在弹出列表中选择，此时本列表一直在屏幕上。
+- (void)cyl_themeDidChangeByManager:(CYLThemeManager *)manager identifier:(__kindof NSObject<NSCopying> *)identifier theme:(__kindof NSObject *)theme {
+    [super cyl_themeDidChangeByManager:manager identifier:identifier theme:theme];
+    if (self.isViewLoaded) {
+        [self.tableView reloadData];
+    }
+}
+
 
 - (instancetype)init {
     // [EN] Inset grouped sections with rounded corners, as in the Settings app.
