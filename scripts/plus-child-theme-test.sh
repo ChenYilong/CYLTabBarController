@@ -84,13 +84,19 @@ fi
 # [CN] 等待 App 的测试日志出现匹配 $1（扩展正则）的行，最多 $2 秒。
 wait_for_line() {
   WAITED=0
+  TICKS=0
   while ! grep -qE -- "$1" "$RUN_LOG" 2>/dev/null; do
-    if [ "$WAITED" -ge "$(($2 * 5))" ]; then
+    if [ "$WAITED" -ge "$2" ]; then
       echo "Timed out waiting for: $1"
       return 1
     fi
+    # [EN] Checked every 0.2 s; five checks make a second. [CN] 每 0.2 秒检查一次；五次为一秒。
     sleep 0.2
-    WAITED=$((WAITED + 1))
+    TICKS=$((TICKS + 1))
+    if [ "$TICKS" -eq 5 ]; then
+      TICKS=0
+      WAITED=$((WAITED + 1))
+    fi
   done
   return 0
 }
@@ -111,7 +117,7 @@ for SCENARIO in $SCENARIOS; do
   #      直到 App 关闭才传到本脚本。
   RUN_LOG="$(xcrun simctl get_app_container "$DEVICE_ID" "$BUNDLE_ID" data)/tmp/plus-child-theme-test.log"
   ACK_DIR="$(dirname "$RUN_LOG")"
-  rm -f "$RUN_LOG" "$ACK_DIR"/ack-*
+  rm -f -- "$RUN_LOG" "$ACK_DIR"/ack-*
   mkdir -p "$ACK_DIR"
   : > "$RUN_LOG"
   echo "== $STYLE: $FROM > $TO (tab $SELECT_INDEX)"
