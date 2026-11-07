@@ -52,15 +52,17 @@
 
 | 样式 / Style | 有 `plusChildViewController` / With a plus child | 没有 `plusChildViewController` / Without a plus child |
 |:---|:---|:---|
-| 液态玻璃 / Liquid Glass | **替身忽略选中态图片**；真实按钮保留设置的选中图片 / **the stand-in ignores selected images**; the real button keeps the selected image it was given | 不适用此限制 / the rule does not apply |
+| 液态玻璃 / Liquid Glass | **替身与真实按钮都只绘制普通状态的图片**；设置的选中图片仍可通过 `-imageForState:` 读取 / **the stand-in and the real button both draw the normal image only**; a selected image it was given stays readable through `-imageForState:` | 不适用此限制 / the rule does not apply |
 | 扁平样式 / FlatDesign | 使用选中图片（没有替身）/ selected images are used (no stand-in) | 使用选中图片 / selected images are used |
 | 经典系统 TabBar（如 iOS 18、iOS 26 UI 兼容模式）/ Classic system tab bar (e.g. iOS 18, iOS 26 UI compatibility mode) | 使用选中图片（没有替身）/ selected images are used (no stand-in) | 使用选中图片 / selected images are used |
 
 | API | 液态玻璃且有 `plusChildViewController` 时 / On Liquid Glass with a plus child |
 |:---|:---|
-| `-setImage:forState:`（`UIControlStateSelected`）| 保存在真实按钮上，替身不使用 / kept on the real button, not used by the stand-in |
-| `-cyl_updateTitle:image:selectedImage:` 的 `selectedImage` | 保存在真实按钮上，替身不使用 / kept on the real button, not used by the stand-in |
+| `-setImage:forState:`（`UIControlStateSelected`）| 保存在真实按钮上，不绘制，替身也不使用 / kept on the real button, not drawn, not used by the stand-in |
+| `-cyl_updateTitle:image:selectedImage:` 的 `selectedImage` | 保存在真实按钮上，不绘制，替身也不使用 / kept on the real button, not drawn, not used by the stand-in |
 | `-updatePlusButtonWithAttributes:` 的选中图片 key / its selected image keys | 仍会加载并交给上一行的方法，替身不使用 / still loaded and passed to the method above, not used by the stand-in |
+| `-setBackgroundImage:forState:`（换肤之后才设置 / set after a theme）| 主题在按钮只是看起来为空时装上的图标会被撤销，标题回到按钮和替身上，徽标重新显示 / the icon a theme installed while the button only looked empty is taken back; the title returns to the button and the stand-in; the badge is shown again |
+| `-setImage:nil forState:UIControlStateNormal` | 真实按钮和替身的选中状态副本一并移除，标题回到两者上；此时没有图标可对齐，替身与真实按钮中心对齐；设置的选中图片仍可通过 `-imageForState:` 读取 / the copies in the selected states go on both, the title returns to both; with no icon to line up, the stand-in takes the plus button's center; a selected image set on the button stays readable through `-imageForState:` |
 | `CYLTabBarTheme` 的 `-cyl_plusButtonAttributesForTabBarController:` | 同上 / as above |
 | `+selectedContentImage`、`selectedContentImage` 属性 / property | 只作为替身创建时的初始值，随即被普通状态的图片覆盖 / only an initial value when the stand-in is made, replaced at once by the normal image |
 | `+selectedContentView` 返回的按钮 / the button it returns | 仍作为替身使用（位置、标题等），但其所有状态的图片都被替换为普通状态的图片 / still the stand-in (position, title...), but its image is replaced by the normal image in every state |
@@ -74,7 +76,7 @@
 
 | 角色 / Role | 位置 / Where | 说明 / Notes |
 |:---|:---|:---|
-| 真实 PlusButton / The real plus button | `CYLPlusButton`，位于 `CYLTabBar` 中 / in `CYLTabBar` | 液态玻璃选中 PlusButton 子控制器时被 mask，只绘制玻璃之外的部分（`-cyl_updateLiquidGlassMask`）/ masked while the plus child is selected on Liquid Glass, so it draws only outside the glass |
+| 真实 PlusButton / The real plus button | `CYLPlusButton`，位于 `CYLTabBar` 中 / in `CYLTabBar` | 不再被 mask，玻璃下方也会绘制；`-cyl_updateLiquidGlassMask` 目前是空实现，保留为选中态布局的钩子 / no longer masked, so it is drawn under the glass too; `-cyl_updateLiquidGlassMask` is empty for now, kept as a hook for the selected layout |
 | 替身 / The stand-in | `-[CYLPlusButton selectedContentView]`，位于选中图层的 Tab 按钮中 / in the tab button of the selected layer | 位置由 `CYLPlusButtonCenterOfStandIn()` 经坐标转换得到：标题对齐时对齐图标，其他布局对齐按钮中心 / placed by `CYLPlusButtonCenterOfStandIn()` through a coordinate conversion: by icon with an aligned title, by button center otherwise |
 | 规则判断 / The rule | `-[CYLPlusButton cyl_standInShowsNormalImageOnly]` | 唯一决定替身是否只用普通状态图片的地方：`CYLPlusButtonIsInLiquidGlassTabBar()` 且有 PlusButton 子控制器 / the one place that decides whether the stand-in uses the normal image only: `CYLPlusButtonIsInLiquidGlassTabBar()` and a plus child |
 | 图片同步 / Image sync | `-[CYLPlusButton cyl_updateSelectedContentViewImage]` | 本文限制的唯一实现处，可重复调用 / the one place that implements the rule; idempotent |

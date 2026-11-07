@@ -481,6 +481,10 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
     }
     NSMutableDictionary<NSString *, CYLThemeRestorableValue *> *restorables =
         [self cyl_themeRestorablesForKey:&CYLThemePlusButtonRestorablesKey create:^id { return [NSMutableDictionary dictionary]; }];
+    __weak __typeof(self) weakSelf = self;
+    [plusButton cyl_setBackgroundImageDidChangeHandler:^{
+        [weakSelf cyl_plusButtonBackgroundImageDidChange];
+    }];
     NSMutableDictionary<NSString *, id> *themeParts = [NSMutableDictionary dictionary];
     themeParts[CYLThemePlusButtonPartTitle] = attributes[CYLTabBarItemTitle];
     // [EN] A button whose picture is its background keeps it: an icon of a theme would sit beside the title, over the picture.
@@ -505,13 +509,17 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
             }
             continue;
         }
-        __weak __typeof(self) weakSelf = self;
         __weak CYLPlusButton *weakPlusButton = plusButton;
         CYLThemeLoadIcon(themeValue, ^(UIImage *image) {
             __strong __typeof(weakSelf) self = weakSelf;
             CYLPlusButton *strongPlusButton = weakPlusButton;
             // [EN] Dropped when another theme came in between. [CN] 期间切换了其他主题时丢弃。
             if (!self || !strongPlusButton || ![self cyl_isCurrentThemeGeneration:generation]) {
+                return;
+            }
+            // [EN] A background image arrived while the icon was loading: the button takes no theme image any more.
+            // [CN] 图标加载期间背景图片已到：按钮不再接受主题图片。
+            if ([strongPlusButton cyl_drawsTitleOverBackgroundImage]) {
                 return;
             }
             if (!image) {
@@ -525,6 +533,26 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
                 [value didInstallValue:CYLThemePlusButtonCurrentPart(strongPlusButton, part)];
             }
         });
+    }
+}
+
+/*!
+ * FIX: issue #216
+ * [EN] A background image that arrives after the theme: a button whose picture is its background image takes no image from
+ *      a theme, but while the background was loading the button only looked empty and took one, so the theme's icon was
+ *      drawn over the new picture. The theme's images go when the button has no image of its own, so it ends like a button
+ *      that had the background image at launch.
+ * [CN] 主题之后才到的背景图片：以背景图为图片的按钮不接受主题图片，但背景图片加载期间按钮看起来只是没有图片，于是接受了
+ *      主题图片，主题图标因此盖在新图片上。按钮没有自己的图片时移除主题图片，最终与启动时就有背景图片的按钮一致。
+ */
+- (void)cyl_plusButtonBackgroundImageDidChange {
+    NSMutableDictionary<NSString *, CYLThemeRestorableValue *> *restorables = objc_getAssociatedObject(self, &CYLThemePlusButtonRestorablesKey);
+    for (NSString *part in @[ CYLThemePlusButtonPartImage, CYLThemePlusButtonPartSelectedImage ]) {
+        id original = restorables[part].original;
+        BOOL hadOwnImage = [original isKindOfClass:[UIImage class]] && ((UIImage *)original).size.width > 0;
+        if (restorables[part] && !hadOwnImage) {
+            [self cyl_restoreThemePlusButtonPart:part];
+        }
     }
 }
 

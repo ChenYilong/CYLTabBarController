@@ -1000,8 +1000,7 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
          */
         __weak CYLPlusButton *weakPlusButton = contextPlusButton;
         void (^centerOnPlusButton)(BOOL, UIControl *, UIView *) = ^(BOOL isReplaced, UIControl *tabBarButton, UIView *selectedCover) {
-            // [EN] The stand-in on the plus button, whose real button is not drawn under the glass that shows it (`CYLPlusButton.m`).
-            // [CN] 替身与 PlusButton 对齐，显示替身的玻璃下方不绘制真实的 PlusButton（`CYLPlusButton.m`）。
+            // [EN] The stand-in on the plus button (`CYLPlusButton.m`). [CN] 替身与 PlusButton 对齐（`CYLPlusButton.m`）。
             [weakPlusButton cyl_placeSelectedContentView];
         };
         if ([contextPlusButton cyl_showsTitleInTabBarItem]) {

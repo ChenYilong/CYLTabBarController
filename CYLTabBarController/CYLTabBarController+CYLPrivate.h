@@ -38,8 +38,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// [EN] Implemented in `CYLPlusButton.m`. [CN] 在 `CYLPlusButton.m` 中实现。
 @interface CYLPlusButton (CYLLiquidGlassPrivate)
-/// [EN] Masks the real plus button out under the glass that shows its stand-in. [CN] 在显示替身的玻璃下方 mask 掉真实的 PlusButton。
-- (void)cyl_updateLiquidGlassMask;
 /// [EN] With a plus child: the stand-in shows the plus button's normal image. [CN] 有 PlusButton 子控制器时：替身显示 PlusButton 普通状态的图片。
 - (void)cyl_updateSelectedContentViewImage;
 /// [EN] In the layouts where the stand-in follows the plus button, puts it in place. [CN] 在替身跟随 PlusButton 的布局中放置替身。
@@ -48,6 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_placeSelectedContentView;
 /// [EN] A button whose picture is its background image, its title on it. [CN] 以背景图为图片、标题画在图上的按钮。
 - (BOOL)cyl_drawsTitleOverBackgroundImage;
+/// [EN] Runs `handler` whenever a background image is set for the normal state; nil stops it. [CN] 每次为普通状态设置背景图片时执行 `handler`；传 nil 则停止。
+- (void)cyl_setBackgroundImageDidChangeHandler:(nullable void (^)(void))handler;
 /// [EN] Removes the image from the plus button and its stand-in, in every state. [CN] 移除 PlusButton 及其替身所有状态的图片。
 - (void)cyl_removeImage;
 @end

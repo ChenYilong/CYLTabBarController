@@ -515,13 +515,9 @@ static UIButton * _Nullable CYLDemoCheckPlusChildStandIn(NSString *phase) {
     //      PlusButton 当前状态显示的也是它（docs/PlusButton.md）。
     UIImage *normalImage = [plusButton imageForState:UIControlStateNormal];
     BOOL matches = CYLDemoSameImage(shown, normalImage) && CYLDemoSameImage(plusButton.currentImage, normalImage);
-    // [EN] The real plus button must not be drawn under the glass: blurred and magnified there, it showed around the
-    //      stand-in's image wherever that image is transparent (a theme's star), and the icon looked soft.
-    // [CN] 真实的 PlusButton 不能在玻璃下方绘制：它在那里被模糊并放大，会从替身图片的透明区域（如主题的星星）周围露出来，图标因此发虚。
-    BOOL masked = [plusButton.layer.mask.name isEqualToString:@"CYLPlusButtonLiquidGlassMask"];
-    CYLDemoTestLog(@"plus child theme test: %@ %@ theme=%@ selectedIndex=%@ standIn=%@ plusButton=%@ realButtonMaskedUnderGlass=%@",
-          (matches && masked) ? @"PASS" : @"FAIL", phase, theme, @(tabBarController.selectedIndex), NSStringFromCGSize(shown.size),
-          NSStringFromCGSize(plusButton.currentImage.size), @(masked));
+    CYLDemoTestLog(@"plus child theme test: %@ %@ theme=%@ selectedIndex=%@ standIn=%@ plusButton=%@",
+          matches ? @"PASS" : @"FAIL", phase, theme, @(tabBarController.selectedIndex), NSStringFromCGSize(shown.size),
+          NSStringFromCGSize(plusButton.currentImage.size));
     for (UIView *view = standIn.superview; view && view != tabBarController.tabBar.superview; view = view.superview) {
         if (view.layer.mask || view.clipsToBounds || view.layer.masksToBounds) {
             CYLDemoTestLog(@"plus child theme test: info %@ clip=%@ frame=%@ cornerRadius=%.1f layerMask=%@", phase, NSStringFromClass([view class]),
@@ -577,13 +573,10 @@ static UIButton * _Nullable CYLDemoCheckPlusChildStandIn(NSString *phase) {
             break;
         }
     }
-    CAShapeLayer *plusMask = [plusButton.layer.mask isKindOfClass:[CAShapeLayer class]] ? (CAShapeLayer *)plusButton.layer.mask : nil;
     CYLDemoTestLog(@"plus child theme test: info %@ plusButton hiddenBy=%@ window=%@ superview=%@ selected=%@ highlighted=%@ "
-          @"maskFrame=%@ maskPathBox=%@ imageViewHidden=%@ imageViewAlpha=%.2f imageViewFrame=%@ layerOpacity=%.2f",
+          @"imageViewHidden=%@ imageViewAlpha=%.2f imageViewFrame=%@ layerOpacity=%.2f",
           phase, hiddenBy, @(plusButton.window != nil), NSStringFromClass([plusButton.superview class]), @(plusButton.selected),
-          @(plusButton.highlighted), plusMask ? NSStringFromCGRect(plusMask.frame) : @"none",
-          plusMask ? NSStringFromCGRect(CGPathGetPathBoundingBox(plusMask.path)) : @"none", @(plusButton.imageView.hidden),
-          plusButton.imageView.alpha, NSStringFromCGRect(plusButton.imageView.frame), plusButton.layer.opacity);
+          @(plusButton.highlighted), @(plusButton.imageView.hidden), plusButton.imageView.alpha, NSStringFromCGRect(plusButton.imageView.frame), plusButton.layer.opacity);
     return plusButton;
 }
 

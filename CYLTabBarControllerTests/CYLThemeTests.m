@@ -493,6 +493,11 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
 @interface CYLTestPlusButton : CYLPlusButton <CYLPlusButtonSubclassing>
 @end
 
+/// [EN] Implemented in `CYLPlusButton.m`. [CN] 在 `CYLPlusButton.m` 中实现。
+@interface CYLPlusButton (CYLThemeTestsPrivate)
+- (void)cyl_setBackgroundImageDidChangeHandler:(nullable void (^)(void))handler;
+@end
+
 @implementation CYLTestPlusButton
 + (id)plusButton {
     return [self new];
@@ -571,6 +576,20 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
  * [CN] 不是液态玻璃且有 PlusButton 子控制器的场景时，PlusButton 保留其选中图片：只有该场景的替身才只用一张图片（由
  *      scripts/plus-child-theme-test.sh 在模拟器上检查）。
  */
+- (void)testABackgroundImageRunsTheHandlerUntilItIsRemoved {
+    CYLTestPlusButton *plusButton = [CYLTestPlusButton new];
+    __block NSInteger runs = 0;
+    [plusButton cyl_setBackgroundImageDidChangeHandler:^{ runs += 1; }];
+    [plusButton setBackgroundImage:CYLTestImage(10, UIColor.redColor) forState:UIControlStateNormal];
+    XCTAssertEqual(runs, 1);
+    [plusButton setBackgroundImage:CYLTestImage(10, UIColor.blueColor) forState:UIControlStateSelected];
+    [plusButton setBackgroundImage:nil forState:UIControlStateNormal];
+    XCTAssertEqual(runs, 1, @"only a new background image of the normal state");
+    [plusButton cyl_setBackgroundImageDidChangeHandler:nil];
+    [plusButton setBackgroundImage:CYLTestImage(10, UIColor.redColor) forState:UIControlStateNormal];
+    XCTAssertEqual(runs, 1);
+}
+
 - (void)testAPlusButtonOutsideAGlassPlusChildKeepsItsSelectedImage {
     UIImage *normal = CYLTestImage(10, UIColor.redColor);
     UIImage *selected = CYLTestImage(10, UIColor.blueColor);
