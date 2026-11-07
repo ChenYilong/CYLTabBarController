@@ -25,6 +25,8 @@ message CYLTabBarConfiguration {
   string CYLTabBarControllerContext = 5;
   // 6 was CYLTabBarControllerNavigationControllerClass (removed before release). 6 曾为导航控制器类（发布前已移除）。
   reserved 6;
+  // A number, e.g. "1.5"; see CYLTabBarControllerTabBarItemAnimationSpeed. 数字，例如 "1.5"；见 CYLTabBarControllerTabBarItemAnimationSpeed。
+  string CYLTabBarControllerTabBarItemAnimationSpeed = 7;
 }
 
 message CYLTabBarItem {
@@ -65,4 +67,26 @@ message CYLTabBarItem {
   // Comma-separated, e.g. "ios,android". 逗号分隔，例如 "ios,android"。
   string CYLTabBarItemPlatforms = 35;
   string CYLTabBarItemMinimumAppVersion = 36;
+  // Tab animations (#604, #752): the generic keys of any library, the options, Lottie, PAG and Rive.
+  // Tab 动画（#604、#752）：任何动画库的通用键、选项、Lottie、PAG 与 Rive。
+  string CYLTabBarAnimationURL = 37;
+  string CYLTabBarAnimationFilePath = 38;
+  string CYLTabBarAnimationSize = 39;
+  string CYLTabBarAnimationDarkURL = 40;
+  string CYLTabBarAnimationDarkFilePath = 41;
+  map<string, string> CYLTabBarAnimationDarkColors = 42;
+  map<string, string> CYLTabBarAnimationColors = 43;
+  map<string, string> CYLTabBarAnimationOptions = 44;
+  string CYLTabBarLottieLoopsWhenUnselected = 45;
+  string CYLTabBarPAGURL = 46;
+  string CYLTabBarPAGFilePath = 47;
+  string CYLTabBarPAGSize = 48;
+  string CYLTabBarPAGDarkURL = 49;
+  string CYLTabBarPAGDarkFilePath = 50;
+  string CYLTabBarRiveURL = 51;
+  string CYLTabBarRiveFilePath = 52;
+  string CYLTabBarRiveSize = 53;
+  string CYLTabBarRiveDarkURL = 54;
+  string CYLTabBarRiveDarkFilePath = 55;
+  map<string, string> CYLTabBarRiveDarkColors = 56;
 }

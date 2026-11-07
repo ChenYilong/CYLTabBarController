@@ -450,6 +450,14 @@ FOUNDATION_EXTERN NSString *const CYLTabBarControllerPageRegistry;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerPageResolver;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerPageLookupOrder;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerAutomaticPageRegistration;
+/*!
+ * [EN] `CYLTabBarControllerTabBarItemAnimationSpeed`: NSNumber (or a number in a file), the playback speed of every tab
+ *      animation (`tabBarItemAnimationSpeed`); 1 is the file's own speed. Not set: the default. Invalid (0, negative,
+ *      NaN, not a number): ignored with a warning.
+ * [CN] `CYLTabBarControllerTabBarItemAnimationSpeed`：NSNumber（文件中为数字），所有 Tab 动画的播放速度（`tabBarItemAnimationSpeed`）；
+ *      1 为文件本身的速度。未设置时使用默认值。无效（0、负数、NaN、不是数字）时忽略并输出警告。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerTabBarItemAnimationSpeed;
 
 /*!
  * [EN] Item keys of the pages and of remote configurations (see docs/Tab-Page-Registry.md):
@@ -485,6 +493,23 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemPageIdentifier;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemPageParameters;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemPlatforms;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemMinimumAppVersion;
+
+/*!
+ * [EN] `CYLTabBarAnimationOptions`: the options of the tab's animation as a dictionary, option name -> string, for
+ *      configurations (files, URLs or dictionaries). `-initWithConfiguration:` writes them into the fragment of the tab's
+ *      animation URLs (`CYLTabBarAnimationURL`, a library's URL key, and their Dark Mode versions) with
+ *      `CYLTabBarAnimationURLWithOptions()`; a tab that only has a file path gets a file URL with the options, so the
+ *      same options can be written in a file as in code. The names are the option strings, e.g. "artboard",
+ *      "stateMachine", "input" for Rive (`CYLTabBarAnimationOptionRive…`). Not a dictionary: ignored with a warning.
+ *
+ *          {"CYLTabBarAnimationURL": "icons.riv", "CYLTabBarAnimationOptions": {"artboard": "HOME", "input": "active"}}
+ *
+ * [CN] `CYLTabBarAnimationOptions`：Tab 动画的选项，字典（选项名 -> 字符串），用于配置（文件、URL 或字典）。`-initWithConfiguration:`
+ *      用 `CYLTabBarAnimationURLWithOptions()` 把它们写入该 Tab 动画 URL（`CYLTabBarAnimationURL`、动画库的 URL 键及其深色模式版本）的
+ *      fragment；只有文件路径的 Tab 会得到带选项的 file URL，因此文件中可以写与代码相同的选项。名称为选项字符串，例如 Rive 的
+ *      "artboard"、"stateMachine"、"input"（`CYLTabBarAnimationOptionRive…`）。不是字典时忽略并输出警告。示例见上。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationOptions;
 
 /*!
  * [EN] Optional per-tab colors (UIColor), in `tabBarItemsAttributes` (or `-updateTabBarItemAtIndex:attributes:`). See

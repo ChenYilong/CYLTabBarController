@@ -11,6 +11,25 @@
 static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
 /// [EN] Private: the reason of a left-out tab (English); the same key as in CYLTabBarController.m. [CN] 私有：被排除的 Tab 的原因（英文）；与 CYLTabBarController.m 中的键相同。
 static NSString *const CYLTabBarItemExclusionReasonKey = @"_CYLTabBarItemExclusionReason";
+
+/*!
+ * [EN] The keys of the PAG and Rive subspecs (`CYLTabBarPAG…`, `CYLTabBarRive…`), by name: their constants exist only
+ *      when that subspec is part of the build, while a configuration may name them whether or not the library is
+ *      installed (a library that is not installed ignores its keys, B29). The values are converted like the Lottie keys.
+ * [CN] PAG 与 Rive 子库的键（`CYLTabBarPAG…`、`CYLTabBarRive…`），按名称引用：它们的常量只在该子库参与编译时存在，而配置无论动画库是否
+ *      安装都可以写这些键（未安装的动画库会忽略自己的键，B29）。值的转换与 Lottie 键相同。
+ */
+static NSString *const CYLConfigurationPAGURLKey = @"CYLTabBarPAGURL";
+static NSString *const CYLConfigurationPAGFilePathKey = @"CYLTabBarPAGFilePath";
+static NSString *const CYLConfigurationPAGSizeKey = @"CYLTabBarPAGSize";
+static NSString *const CYLConfigurationPAGDarkURLKey = @"CYLTabBarPAGDarkURL";
+static NSString *const CYLConfigurationPAGDarkFilePathKey = @"CYLTabBarPAGDarkFilePath";
+static NSString *const CYLConfigurationRiveURLKey = @"CYLTabBarRiveURL";
+static NSString *const CYLConfigurationRiveFilePathKey = @"CYLTabBarRiveFilePath";
+static NSString *const CYLConfigurationRiveSizeKey = @"CYLTabBarRiveSize";
+static NSString *const CYLConfigurationRiveDarkURLKey = @"CYLTabBarRiveDarkURL";
+static NSString *const CYLConfigurationRiveDarkFilePathKey = @"CYLTabBarRiveDarkFilePath";
+static NSString *const CYLConfigurationRiveDarkColorsKey = @"CYLTabBarRiveDarkColors";
 /*!
  * [EN] Private: marks the entry the tab bar controller inserts for the PlusButton slot; the same key as in
  *      CYLTabBarController.m (#774).
@@ -363,7 +382,7 @@ static id CYLDictionaryFromMapEntries(id value) {
     return map;
 }
 
-static id CYLDarkColorsValue(id value) {
+static id CYLDarkColorsValue(id value, NSString *key) {
     value = CYLDictionaryFromMapEntries(value);
     if (![value isKindOfClass:[NSDictionary class]]) {
         return value;
@@ -378,10 +397,85 @@ static id CYLDarkColorsValue(id value) {
         if ([color isKindOfClass:[UIColor class]]) {
             colors[keypath] = color;
         } else {
-            CYLLogInvalidConfigurationValue(CYLTabBarLottieDarkColors, dictionary[keypath]);
+            CYLLogInvalidConfigurationValue(key, dictionary[keypath]);
         }
     }
     return colors;
+}
+
+/*!
+ * [EN] `CYLTabBarAnimationOptions` from a configuration value: a dictionary (or Protobuf map entries) of option name ->
+ *      string; numbers become strings, other values are dropped with a warning. nil when it is not a dictionary (B28).
+ * [CN] 配置值中的 `CYLTabBarAnimationOptions`：选项名 -> 字符串的字典（或 Protobuf 的 map 条目）；数字转为字符串，其他值丢弃并警告。
+ *      不是字典时为 nil（B28）。
+ */
+static NSDictionary<NSString *, NSString *> *_Nullable CYLAnimationOptionsValue(id value) {
+    value = CYLDictionaryFromMapEntries(value);
+    if (![value isKindOfClass:[NSDictionary class]]) {
+        CYLLogInvalidConfigurationValue(CYLTabBarAnimationOptions, value);
+        return nil;
+    }
+    NSMutableDictionary<NSString *, NSString *> *options = [NSMutableDictionary dictionary];
+    [(NSDictionary *)value enumerateKeysAndObjectsUsingBlock:^(id name, id option, BOOL *stop) {
+        NSString *text = [option isKindOfClass:[NSString class]] ? option : ([option isKindOfClass:[NSNumber class]] ? [option stringValue] : nil);
+        if ([name isKindOfClass:[NSString class]] && [(NSString *)name length] > 0 && text.length > 0) {
+            options[name] = text;
+        } else {
+            CYLLogInvalidConfigurationValue(CYLTabBarAnimationOptions, option);
+        }
+    }];
+    return [options copy];
+}
+
+/*!
+ * [EN] Writes `options` into the tab's animation URLs with `CYLTabBarAnimationURLWithOptions()`: every URL key that has
+ *      a value, and, for a file path without a URL, a file URL of that path under the matching URL key (the URL wins
+ *      over the path in the library, so the path may stay).
+ * [CN] 用 `CYLTabBarAnimationURLWithOptions()` 把 `options` 写入 Tab 的动画 URL：每个有值的 URL 键；只有文件路径而没有 URL 时，在对应的
+ *      URL 键下写入该路径的 file URL（库中 URL 优先于路径，路径可以保留）。
+ */
+static void CYLApplyAnimationOptions(NSMutableDictionary *item, NSDictionary<NSString *, NSString *> *options) {
+    if (options.count == 0) {
+        return;
+    }
+    NSArray<NSArray<NSString *> *> *pairs = @[
+        @[ CYLTabBarAnimationURL, CYLTabBarAnimationFilePath ], @[ CYLTabBarAnimationDarkURL, CYLTabBarAnimationDarkFilePath ],
+        @[ CYLTabBarLottieURL, CYLTabBarLottieFilePath ], @[ CYLTabBarLottieDarkURL, CYLTabBarLottieDarkFilePath ],
+        @[ CYLConfigurationPAGURLKey, CYLConfigurationPAGFilePathKey ], @[ CYLConfigurationPAGDarkURLKey, CYLConfigurationPAGDarkFilePathKey ],
+        @[ CYLConfigurationRiveURLKey, CYLConfigurationRiveFilePathKey ], @[ CYLConfigurationRiveDarkURLKey, CYLConfigurationRiveDarkFilePathKey ],
+    ];
+    for (NSArray<NSString *> *pair in pairs) {
+        NSURL *URL = [item[pair[0]] isKindOfClass:[NSURL class]] ? item[pair[0]] : nil;
+        NSString *path = [item[pair[1]] isKindOfClass:[NSString class]] ? item[pair[1]] : nil;
+        if (!URL && path.length > 0) {
+            URL = [NSURL fileURLWithPath:path];
+        }
+        NSURL *withOptions = CYLTabBarAnimationURLWithOptions(URL, options);
+        if (withOptions) {
+            item[pair[0]] = withOptions;
+        }
+    }
+}
+
+/*!
+ * [EN] `CYLTabBarControllerTabBarItemAnimationSpeed` from a configuration value: a finite number above 0 (an NSNumber,
+ *      or a numeric string from a file); nil otherwise (B28).
+ * [CN] 配置值中的 `CYLTabBarControllerTabBarItemAnimationSpeed`：大于 0 的有限数字（NSNumber，或文件中的数字字符串）；否则为 nil（B28）。
+ */
+static NSNumber *_Nullable CYLAnimationSpeedValue(id value) {
+    NSNumber *number = nil;
+    if ([value isKindOfClass:[NSNumber class]]) {
+        number = value;
+    } else if ([value isKindOfClass:[NSString class]]) {
+        NSString *text = [(NSString *)value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSScanner *scanner = [NSScanner scannerWithString:text];
+        double parsed = 0;
+        if (text.length > 0 && [scanner scanDouble:&parsed] && scanner.isAtEnd) {
+            number = @(parsed);
+        }
+    }
+    double speed = number.doubleValue;
+    return (number && isfinite(speed) && speed > 0) ? number : nil;
 }
 
 /// [EN] Every key the library reads. [CN] 本库读取的所有键。
@@ -389,7 +483,7 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
     return @[ CYLTabBarControllerViewControllers, CYLTabBarControllerTabBarItemsAttributes, CYLTabBarControllerImageInsets,
               CYLTabBarControllerTitlePositionAdjustment, CYLTabBarControllerStyleType, CYLTabBarControllerContext,
               CYLTabBarControllerPageRegistry, CYLTabBarControllerPageResolver, CYLTabBarControllerPageLookupOrder,
-              CYLTabBarControllerAutomaticPageRegistration ];
+              CYLTabBarControllerAutomaticPageRegistration, CYLTabBarControllerTabBarItemAnimationSpeed ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -401,7 +495,15 @@ static NSArray<NSString *> *CYLKnownItemKeys(void) {
               CYLTabBarItemPageParameters, CYLTabBarItemPlatforms, CYLTabBarItemMinimumAppVersion, CYLTabBarItemSelectedTitle, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
               CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemBackgroundColor,
               CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont, CYLTabBarItemAccessibilityIdentifier, CYLTabBarItemAccessibilityLabel,
-              CYLTabBarItemAccessibilityHint ];
+              CYLTabBarItemAccessibilityHint,
+              // [EN] Tab animations (#604, #752): the generic keys, the options, Lottie's loop flag, PAG and Rive.
+              // [CN] Tab 动画（#604、#752）：通用键、选项、Lottie 的循环开关、PAG 与 Rive。
+              CYLTabBarAnimationURL, CYLTabBarAnimationFilePath, CYLTabBarAnimationSize, CYLTabBarAnimationDarkURL,
+              CYLTabBarAnimationDarkFilePath, CYLTabBarAnimationDarkColors, CYLTabBarAnimationColors, CYLTabBarAnimationOptions,
+              CYLTabBarLottieLoopsWhenUnselected,
+              CYLConfigurationPAGURLKey, CYLConfigurationPAGFilePathKey, CYLConfigurationPAGSizeKey, CYLConfigurationPAGDarkURLKey,
+              CYLConfigurationPAGDarkFilePathKey, CYLConfigurationRiveURLKey, CYLConfigurationRiveFilePathKey, CYLConfigurationRiveSizeKey,
+              CYLConfigurationRiveDarkURLKey, CYLConfigurationRiveDarkFilePathKey, CYLConfigurationRiveDarkColorsKey ];
 }
 
 #if defined(DEBUG) || defined(BETA)
@@ -740,12 +842,17 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
             item[key] = CYLOffsetValue(item[key], key);
         }
     }
-    for (NSString *key in @[ CYLTabBarItemImageURLSize, CYLTabBarLottieSize ]) {
+    for (NSString *key in @[ CYLTabBarItemImageURLSize, CYLTabBarLottieSize, CYLTabBarAnimationSize, CYLConfigurationPAGSizeKey,
+                              CYLConfigurationRiveSizeKey ]) {
         if (item[key]) {
             item[key] = CYLSizeValue(item[key], key);
         }
     }
-    for (NSString *key in @[ CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarLottieURL, CYLTabBarLottieDarkURL ]) {
+    // [EN] Animation URLs: Lottie's, the generic ones (any library) and PAG's / Rive's; a local file must exist, and a
+    //      Lottie file must be readable (B17). [CN] 动画 URL：Lottie、通用（任何动画库）与 PAG / Rive；本地文件必须存在，Lottie 文件必须可读（B17）。
+    for (NSString *key in @[ CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarLottieURL, CYLTabBarLottieDarkURL,
+                              CYLTabBarAnimationURL, CYLTabBarAnimationDarkURL, CYLConfigurationPAGURLKey, CYLConfigurationPAGDarkURLKey,
+                              CYLConfigurationRiveURLKey, CYLConfigurationRiveDarkURLKey ]) {
         id value = item[key];
         if (!value) {
             continue;
@@ -760,7 +867,9 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
         }
         item[key] = checked;
     }
-    for (NSString *key in @[ CYLTabBarLottieFilePath, CYLTabBarLottieDarkFilePath ]) {
+    for (NSString *key in @[ CYLTabBarLottieFilePath, CYLTabBarLottieDarkFilePath, CYLTabBarAnimationFilePath, CYLTabBarAnimationDarkFilePath,
+                              CYLConfigurationPAGFilePathKey, CYLConfigurationPAGDarkFilePathKey, CYLConfigurationRiveFilePathKey,
+                              CYLConfigurationRiveDarkFilePathKey ]) {
         id value = item[key];
         NSString *path = [value isKindOfClass:[NSString class]] ? CYLMainBundlePath(value) : nil;
         if (value && (!CYLFileExists(path) || !CYLIsReadableLottieFile(path))) {
@@ -793,13 +902,27 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
         item[CYLTabBarItemPlatforms] = CYLPlatformsValue(item[CYLTabBarItemPlatforms]);
     }
     CYLWarnUnknownKeys(item, CYLKnownItemKeys());
-    if (item[CYLTabBarLottieDarkColors]) {
-        id colors = CYLDarkColorsValue(item[CYLTabBarLottieDarkColors]);
-        if (![colors isKindOfClass:[NSDictionary class]]) {
-            CYLLogInvalidConfigurationValue(CYLTabBarLottieDarkColors, colors);
-            colors = nil;
+    for (NSString *key in @[ CYLTabBarLottieDarkColors, CYLTabBarAnimationDarkColors, CYLTabBarAnimationColors, CYLConfigurationRiveDarkColorsKey ]) {
+        if (item[key]) {
+            id colors = CYLDarkColorsValue(item[key], key);
+            if (![colors isKindOfClass:[NSDictionary class]]) {
+                CYLLogInvalidConfigurationValue(key, colors);
+                colors = nil;
+            }
+            item[key] = colors;
         }
-        item[CYLTabBarLottieDarkColors] = colors;
+    }
+    if (item[CYLTabBarLottieLoopsWhenUnselected]) {
+        NSNumber *loops = CYLBoolValue(item[CYLTabBarLottieLoopsWhenUnselected]);
+        if (!loops) {
+            CYLLogInvalidConfigurationValue(CYLTabBarLottieLoopsWhenUnselected, item[CYLTabBarLottieLoopsWhenUnselected]);
+        }
+        item[CYLTabBarLottieLoopsWhenUnselected] = loops;
+    }
+    if (item[CYLTabBarAnimationOptions]) {
+        NSDictionary<NSString *, NSString *> *options = CYLAnimationOptionsValue(item[CYLTabBarAnimationOptions]);
+        item[CYLTabBarAnimationOptions] = options;
+        CYLApplyAnimationOptions(item, options);
     }
     return item;
 }
@@ -894,6 +1017,13 @@ static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nulla
     }
     if (normalized[CYLTabBarControllerPageLookupOrder]) {
         normalized[CYLTabBarControllerPageLookupOrder] = CYLPageLookupOrderValue(normalized[CYLTabBarControllerPageLookupOrder]);
+    }
+    if (normalized[CYLTabBarControllerTabBarItemAnimationSpeed]) {
+        NSNumber *speed = CYLAnimationSpeedValue(normalized[CYLTabBarControllerTabBarItemAnimationSpeed]);
+        if (!speed) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerTabBarItemAnimationSpeed, normalized[CYLTabBarControllerTabBarItemAnimationSpeed]);
+        }
+        normalized[CYLTabBarControllerTabBarItemAnimationSpeed] = speed;
     }
     if (normalized[CYLTabBarControllerAutomaticPageRegistration]) {
         NSNumber *automatic = CYLBoolValue(normalized[CYLTabBarControllerAutomaticPageRegistration]);

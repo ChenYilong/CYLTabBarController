@@ -82,6 +82,8 @@ NSString *const CYLTabBarControllerPageRegistry = @"CYLTabBarControllerPageRegis
 NSString *const CYLTabBarControllerPageResolver = @"CYLTabBarControllerPageResolver";
 NSString *const CYLTabBarControllerPageLookupOrder = @"CYLTabBarControllerPageLookupOrder";
 NSString *const CYLTabBarControllerAutomaticPageRegistration = @"CYLTabBarControllerAutomaticPageRegistration";
+NSString *const CYLTabBarControllerTabBarItemAnimationSpeed = @"CYLTabBarControllerTabBarItemAnimationSpeed";
+NSString *const CYLTabBarAnimationOptions = @"CYLTabBarAnimationOptions";
 /// [EN] Private: marks a tab left out by `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` (set by the normalization).
 /// [CN] 私有：标记被 `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` 排除的 Tab（由规范化设置）。
 static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
@@ -2133,6 +2135,11 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
         // [EN] Step 3: must use the setter and must be set after self.tabBarStyleType,
         //      because self.viewControllers directly involves the KVC logic of the flat TabBar style.
         [self cyl_adoptPendingPages];
+        NSNumber *animationSpeed = normalized[CYLTabBarControllerTabBarItemAnimationSpeed];
+        if (animationSpeed) {
+            // [EN] Validated by the normalizer (B28). [CN] 已由规范化检查（B28）。
+            self.tabBarItemAnimationSpeed = animationSpeed.doubleValue;
+        }
         
     }
     return self;

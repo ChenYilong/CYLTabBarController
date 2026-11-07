@@ -264,7 +264,7 @@ static NSArray<NSArray<NSString *> *> *CYLConfigurationEdgeCases(void) {
         @[ @"C16", @"Two tab bars, one page ID" ], @[ @"C18", @"Lookup order and automatic registration" ],
         @[ @"B22", @"Other platforms and newer versions" ],
         @[ @"B23", @"Invalid platforms, versions and parameters" ], @[ @"B27", @"Reload with new tabs (code)" ],
-        @[ @"C20", @"Asynchronous pages (code)" ], @[ @"B13", @"Invalid URLs and Lottie files" ],
+        @[ @"C20", @"Asynchronous pages (code)" ], @[ @"B28", @"Animation keys, options and speed" ], @[ @"B13", @"Invalid URLs and Lottie files" ],
         @[ @"B12", @"Duplicate identifiers" ], @[ @"B11", @"Misspelled keys" ], @[ @"B19", @"Invalid colors and fonts" ], @[ @"B21", @"Empty strings" ],
         @[ @"A12", @"Truncated protobuf" ],
         @[ @"A12", @"Corrupted binary plist" ], @[ @"A14", @"XML external entity" ], @[ @"A2", @"Missing file" ],
@@ -519,6 +519,13 @@ static NSData *CYLEdgeCaseData(NSString *text) {
                                                           @{ CYLTabBarItemTitle : @"Home", CYLTabBarItemImage : @"system:house", CYLTabBarItemIdentifier : @"home" },
                                                           @{ CYLTabBarItemTitle : @"Never", CYLTabBarItemImage : @"system:xmark", CYLTabBarItemPageIdentifier : @"never" } ],
         }], nil, @"registerAsyncPageFactory: \"later\" -> a page after 2 s, \"never\" -> nil after 2 s (the tab is removed)");
+    } else if ([title isEqualToString:@"Animation keys, options and speed"]) {
+        // [EN] B28 / B29: a Rive URL with options (a library that may not be installed: the tab then shows its image), a
+        //      generic animation path of a missing file (dropped), options that are not a dictionary, an invalid speed and
+        //      an invalid loop flag (ignored with warnings). The tabs are created in every case.
+        // [CN] B28 / B29：带选项的 Rive URL（动画库可能未安装：Tab 显示图片）、指向不存在文件的通用动画路径（丢弃）、不是字典的选项、无效的
+        //      速度与无效的循环开关（忽略并警告）。所有情况下 Tab 都会创建。
+        fromFile(@"animation.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemAnimationSpeed\": \"fast\", \"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarRiveURL\": \"https://example.com/icons.riv\", \"CYLTabBarAnimationOptions\": {\"artboard\": \"HOME\", \"input\": \"active\", \"duration\": 2, \"bad\": [1, 2]}}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemImage\": \"system:person\", \"CYLTabBarItemIdentifier\": \"me\", \"CYLTabBarAnimationFilePath\": \"no_such_animation.pag\", \"CYLTabBarAnimationOptions\": \"not a dictionary\", \"CYLTabBarLottieLoopsWhenUnselected\": \"maybe\"}]}"));
     } else if ([title isEqualToString:@"Other platforms and newer versions"]) {
         // [EN] B22: "android only" and "version 999" are left out on iOS; the other two tabs stay.
         // [CN] B22："仅 Android" 与 "版本 999" 在 iOS 上不显示；其余两个 Tab 保留。

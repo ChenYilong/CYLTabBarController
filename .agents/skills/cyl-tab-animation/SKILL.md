@@ -21,6 +21,7 @@ Main document: [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md)
 - Demo files: name them by use (`tab_home.pag`). A tab shows the first frame until it is selected, so pick a small file whose first frame shows the icon; a full-screen poster or a file that starts empty looks like a blank or still tab. Check a new file's frames before using it.
 - PAG and Rive files draw their own colors, and Liquid Glass ignores a background color in `standardAppearance`. White icons (the course's `icons.riv`) need a dark interface: the Rive demos set `overrideUserInterfaceStyle = .dark` on the tab bar controller.
 - On a simulator libpag draws with software OpenGL: icons can appear many seconds late, and the main thread can wait on libpag. Judge PAG playback on a device.
+- A configuration file (`-initWithConfiguration:`, [Configuration-File](../../../docs/Configuration-File.md)) takes the same keys as strings: the generic `CYLTabBarAnimation…` keys, PAG's and Rive's keys (by name, whether or not the subspec is installed), `CYLTabBarAnimationOptions` (a dictionary written into the animation URL's fragment, e.g. `{"artboard": "HOME", "input": "active"}`), `CYLTabBarLottieLoopsWhenUnselected`, and the top-level `CYLTabBarControllerTabBarItemAnimationSpeed`.
 - `tabBarItemAnimationSpeed` sets the speed. PAG files are downloaded by `scripts/fetch-animation-resources.py` at `pod install`, not kept in the repository.
 
 ## Rules for the library

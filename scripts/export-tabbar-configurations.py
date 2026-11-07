@@ -58,15 +58,18 @@ ITEM_KEYS = [
     'CYLTabBarItemSelectedBackgroundColor', 'CYLTabBarItemBackgroundColor', 'CYLTabBarItemTitleFont', 'CYLTabBarItemSelectedTitleFont',
     'CYLTabBarItemAccessibilityIdentifier', 'CYLTabBarItemAccessibilityLabel', 'CYLTabBarItemAccessibilityHint',
     'CYLTabBarItemPageIdentifier', 'CYLTabBarItemPageParameters', 'CYLTabBarItemPlatforms', 'CYLTabBarItemMinimumAppVersion',
+    # [EN] Tab animations (#604, #752), Protobuf fields 37-56. [CN] Tab 动画（#604、#752），Protobuf 字段 37–56。
+    'CYLTabBarAnimationURL', 'CYLTabBarAnimationFilePath', 'CYLTabBarAnimationSize', 'CYLTabBarAnimationDarkURL', 'CYLTabBarAnimationDarkFilePath', 'CYLTabBarAnimationDarkColors', 'CYLTabBarAnimationColors', 'CYLTabBarAnimationOptions', 'CYLTabBarLottieLoopsWhenUnselected',
+    'CYLTabBarPAGURL', 'CYLTabBarPAGFilePath', 'CYLTabBarPAGSize', 'CYLTabBarPAGDarkURL', 'CYLTabBarPAGDarkFilePath', 'CYLTabBarRiveURL', 'CYLTabBarRiveFilePath', 'CYLTabBarRiveSize', 'CYLTabBarRiveDarkURL', 'CYLTabBarRiveDarkFilePath', 'CYLTabBarRiveDarkColors',
 ]
 ITEMS_KEY = 'CYLTabBarControllerTabBarItemsAttributes'
 TOP_KEYS = ['CYLTabBarControllerContext', 'CYLTabBarControllerStyleType', 'CYLTabBarControllerImageInsets',
-            'CYLTabBarControllerTitlePositionAdjustment']
+            'CYLTabBarControllerTitlePositionAdjustment', 'CYLTabBarControllerTabBarItemAnimationSpeed']
 STYLE_NAMES = {'Default': 'default', 'System': 'system', 'FlatDesign': 'flatDesign', 'LiquidGlass': 'liquidGlass',
                'default': 'default', 'system': 'system', 'flatDesign': 'flatDesign', 'liquidGlass': 'liquidGlass'}
 # Field numbers of cyl_tabbar_configuration.proto. cyl_tabbar_configuration.proto 的字段编号。
 PROTO_TOP = {ITEMS_KEY: 1, 'CYLTabBarControllerImageInsets': 2, 'CYLTabBarControllerTitlePositionAdjustment': 3,
-             'CYLTabBarControllerStyleType': 4, 'CYLTabBarControllerContext': 5}
+             'CYLTabBarControllerStyleType': 4, 'CYLTabBarControllerContext': 5, 'CYLTabBarControllerTabBarItemAnimationSpeed': 7}
 PROTO_ITEM = {key: number for number, key in enumerate(ITEM_KEYS[:17], 1)}
 # 19 and 20 (class names) and the top-level 6 are reserved: removed before release. 19、20（类名）与顶层的 6 为保留编号：发布前已移除。
 PROTO_ITEM.update({'CYLTabBarLottieDarkColors': 18, 'CYLTabBarItemSelectedTitle': 21})
