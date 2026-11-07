@@ -509,9 +509,10 @@ static UIButton * _Nullable CYLDemoCheckPlusChildStandIn(NSString *phase) {
     }
     UIImage *shown = standIn.currentImage;
     // [EN] One picture on Liquid Glass with a plus child, even when the theme gives a selected image too (the network skin):
-    //      the stand-in shows the plus button's normal image, and so does the plus button in its current state.
+    //      the stand-in shows the plus button's normal image, and so does the plus button in its current state
+    //      (docs/PlusButton.md).
     // [CN] 液态玻璃且有 PlusButton 子控制器时只有一张图片，即使主题同时提供了选中图片（网络皮肤）：替身显示 PlusButton 的普通状态图片，
-    //      PlusButton 当前状态显示的也是它。
+    //      PlusButton 当前状态显示的也是它（docs/PlusButton.md）。
     UIImage *normalImage = [plusButton imageForState:UIControlStateNormal];
     BOOL matches = CYLDemoSameImage(shown, normalImage) && CYLDemoSameImage(plusButton.currentImage, normalImage);
     // [EN] The real plus button must not be drawn under the glass: blurred and magnified there, it showed around the

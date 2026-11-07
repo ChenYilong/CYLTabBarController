@@ -76,7 +76,9 @@
 |:---|:---|:---|
 | 真实 PlusButton / The real plus button | `CYLPlusButton`，位于 `CYLTabBar` 中 / in `CYLTabBar` | 液态玻璃选中 PlusButton 子控制器时被 mask，只绘制玻璃之外的部分（`-cyl_updateLiquidGlassMask`）/ masked while the plus child is selected on Liquid Glass, so it draws only outside the glass |
 | 替身 / The stand-in | `-[CYLPlusButton selectedContentView]`，位于选中图层的 Tab 按钮中 / in the tab button of the selected layer | 位置由 `CYLPlusButtonCenterOfStandIn()` 经坐标转换得到：标题对齐时对齐图标，其他布局对齐按钮中心 / placed by `CYLPlusButtonCenterOfStandIn()` through a coordinate conversion: by icon with an aligned title, by button center otherwise |
+| 规则判断 / The rule | `-[CYLPlusButton cyl_standInShowsNormalImageOnly]` | 唯一决定替身是否只用普通状态图片的地方：`CYLPlusButtonIsInLiquidGlassTabBar()` 且有 PlusButton 子控制器 / the one place that decides whether the stand-in uses the normal image only: `CYLPlusButtonIsInLiquidGlassTabBar()` and a plus child |
 | 图片同步 / Image sync | `-[CYLPlusButton cyl_updateSelectedContentViewImage]` | 本文限制的唯一实现处，可重复调用 / the one place that implements the rule; idempotent |
+| 放置替身 / Placing it | `-[CYLPlusButton cyl_placeSelectedContentView]` | 放置替身的唯一方法：图片、中心（`CYLPlusButtonCenterOfStandIn()`，只有 `CYLPlusButtonGetIconCenter()` 读取按钮的图片视图） / the one way to place the stand-in: its image, its center (`CYLPlusButtonCenterOfStandIn()`; only `CYLPlusButtonGetIconCenter()` reads the buttons' image views) |
 | 安装替身 / Installing it | `-[CYLTabBarController cyl_layOutPlusButtonInLiquidGlassLayers]` | 液态玻璃专用 / Liquid Glass only |
 
 | 中文 | English |

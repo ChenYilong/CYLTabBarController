@@ -133,7 +133,7 @@
     // [CN] 与扁平样式页面的“Liquid Glass”按钮相同：注册 PlusButton，新 TabBar 使用其 context。以前使用本页面的类名作为 context，
     //      没有与之匹配的 PlusButton，因此新 TabBar 没有 PlusButton。
     [CYLPlusButtonSubclass registerPlusButton];
-    CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
+    CYLMainRootViewController *rootController = [CYLMainRootViewController currentRootViewController];
     [rootController createNewTabBarWithContext:NSStringFromClass([CYLTabBarController class])];
 }
 
