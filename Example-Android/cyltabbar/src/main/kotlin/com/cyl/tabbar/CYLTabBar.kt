@@ -83,7 +83,14 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         if (controller?.adjustTabBarItemImageViewSizeDependOnSuperView != false) iconSize = iconSize.coerceAtMost(height - titleHeight)
         val offset = item.cyl_imagePositionAdjustment
         val contentHeight = iconSize + titleHeight
-        val iconTop = ((height - contentHeight) / 2f + insets.top * density + offset.vertical * density + (tabBar?.tabImageViewDefaultOffset ?: 0f) * density).toInt()
+        // [EN] FlatDesign (iOS `CYLFlatDesignTabBarButton`): the title 2 dp above the bottom and the icon centered above it; `layoutCentered` centers a lone icon or title. [CN] 扁平样式（iOS `CYLFlatDesignTabBarButton`）：标题位于底部上方 2 dp，图标在其上方居中；`layoutCentered` 使单独的图标或标题居中。
+        val flat = tabBar?.styleRenderer is CYLFlatDesignTabBarStyle
+        val hasIcon = iconView.drawable != null || cyl_tabBarItemAnimationView != null || cyl_customIconView != null
+        val flatTitleHeight = titleLabel.measuredHeight
+        val flatTitleTop = if (!hasIcon && item.layoutCentered) (height - flatTitleHeight) / 2 else height - flatTitleHeight - (2 * density).toInt()
+        val iconTop = if (flat) {
+            ((if (!hasTitle && item.layoutCentered) (height - iconSize) / 2f else (flatTitleTop - iconSize) / 2f) + insets.top * density + offset.vertical * density).toInt()
+        } else ((height - contentHeight) / 2f + insets.top * density + offset.vertical * density + (tabBar?.tabImageViewDefaultOffset ?: 0f) * density).toInt()
         val iconLeft = ((width - iconSize) / 2f + insets.left * density + offset.horizontal * density).toInt()
         iconView.layout(iconLeft, iconTop, iconLeft + iconSize, iconTop + iconSize)
         cyl_customIconView?.let { custom ->
@@ -101,9 +108,9 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         }
         val titleOffset = item.cyl_titlePositionAdjustment
         val controllerOffset = tabBar?.tabBarController?.titlePositionAdjustment ?: CYLOffset.zero
-        val titleTop = (iconTop + iconSize + (titleOffset.vertical + controllerOffset.vertical) * density).toInt()
+        val titleTop = ((if (flat) flatTitleTop.toFloat() else (iconTop + iconSize).toFloat()) + (titleOffset.vertical + controllerOffset.vertical) * density).toInt()
         val titleLeft = ((titleOffset.horizontal + controllerOffset.horizontal) * density).toInt()
-        titleLabel.layout(titleLeft, titleTop, titleLeft + width, titleTop + titleHeight)
+        titleLabel.layout(titleLeft, titleTop, titleLeft + width, titleTop + if (flat) flatTitleHeight else titleHeight)
         for (child in 0 until childCount) {
             val badge = getChildAt(child) as? CYLBadgeView ?: continue
             badge.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
@@ -247,8 +254,101 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     val tabBarButtonArray: List<CYLTabBarItemButton> get() = buttons.toList()
     /** [EN] `tabBarItemWidth`: the width of one tab, in dp. [CN] 一个 Tab 的宽度（dp）。 */
     val tabBarItemWidth: Float get() = if (slotCount() == 0) 0f else width / slotCount().toFloat() / resources.displayMetrics.density
-    @ColorInt var selectedTintColor: Int = 0xFF007AFF.toInt()
-    @ColorInt var unselectedTintColor: Int = 0xFF8E8E93.toInt()
+    /** [EN] The selected tint; by default the style's (blue, or the Liquid Glass accent). [CN] 选中颜色；默认使用样式的颜色（蓝色，或液态玻璃的强调色）。 */
+    @get:ColorInt @setparam:ColorInt
+    var selectedTintColor: Int
+        get() = customSelectedTintColor ?: styleRenderer.defaultTintColors(this).first
+        set(value) { customSelectedTintColor = value; refreshSelection() }
+    /** [EN] The unselected tint; by default the style's (gray, or the Liquid Glass label color). [CN] 未选中颜色；默认使用样式的颜色（灰色，或液态玻璃的文字颜色）。 */
+    @get:ColorInt @setparam:ColorInt
+    var unselectedTintColor: Int
+        get() = customUnselectedTintColor ?: styleRenderer.defaultTintColors(this).second
+        set(value) { customUnselectedTintColor = value; refreshSelection() }
+    private var customSelectedTintColor: Int? = null
+    private var customUnselectedTintColor: Int? = null
+
+    // MARK: - Styles (classic, FlatDesign, Liquid Glass) 样式（经典、扁平、液态玻璃）
+
+    /** [EN] Draws and lays out the bar in the controller's `tabBarStyleType` (see `CYLTabBarStyle.kt`). [CN] 按控制器的 `tabBarStyleType` 绘制与布局 TabBar（见 `CYLTabBarStyle.kt`）。 */
+    internal var styleRenderer: CYLTabBarStyleRenderer = CYLClassicTabBarStyle
+        set(value) {
+            if (field === value) return
+            field.onDetach(this)
+            field = value
+            value.onAttach(this)
+            refreshSelection()
+            requestLayout()
+            invalidate()
+        }
+    /** [EN] The frame of the items inside the bar, from the style. [CN] Item 在 TabBar 中的区域，由样式给出。 */
+    internal val cyl_itemsFrame = Rect()
+    internal val cyl_touchSlop: Int get() = touchSlop
+
+    // MARK: - CYLFlatDesignTabBar (FlatDesign style) 扁平样式
+
+    /** [EN] `CYLFlatDesignTabBar.tintColor`: the selected tint (`selectedTintColor`). [CN] 选中颜色（`selectedTintColor`）。 */
+    @get:ColorInt @setparam:ColorInt
+    var tintColor: Int
+        get() = selectedTintColor
+        set(value) { selectedTintColor = value }
+    /** [EN] `barTintColor`: a color over the FlatDesign blur (default clear). [CN] 叠加在扁平样式模糊之上的颜色（默认透明）。 */
+    @get:ColorInt @setparam:ColorInt
+    var barTintColor: Int = Color.TRANSPARENT
+        set(value) { field = value; invalidate() }
+    /** [EN] `backgroundImage`: replaces the FlatDesign blur. [CN] 代替扁平样式的模糊。 */
+    var backgroundImage: android.graphics.drawable.Drawable? = null
+        set(value) { field = value; invalidate() }
+    /** [EN] `shadowImage`: the FlatDesign top line (none by default). [CN] 扁平样式顶部的线条（默认没有）。 */
+    var shadowImage: android.graphics.drawable.Drawable? = null
+        set(value) { field = value; invalidate() }
+    /** [EN] `standardAppearance`: the FlatDesign appearance; the selected item's own one wins. [CN] 扁平样式的外观；选中 item 自身的优先。 */
+    var standardAppearance: CYLTabBarAppearance? = null
+        set(value) { field = value; refreshSelection(); requestLayout(); invalidate() }
+    /**
+     * [EN] `useLayoutSafeAreaInsets` / `respectsVerticalStatusBarSafeArea`: kept for the iOS API. On Android the controller's
+     *      root view already keeps the items clear of the system bars and the display cutout.
+     * [CN] 为与 iOS API 一致而保留。在 Android 上，控制器的根视图已让各 Item 避开系统栏与屏幕挖孔。
+     */
+    var useLayoutSafeAreaInsets: Boolean = true
+    var respectsVerticalStatusBarSafeArea: Boolean = false
+
+    /** [EN] The appearance drawn now: the selected item's, else the bar's. [CN] 当前绘制所用的外观：选中 item 的，否则为 TabBar 的。 */
+    internal fun cyl_effectiveAppearance(): CYLTabBarAppearance? {
+        val selected = tabBarController?.selectedIndex ?: -1
+        return buttons.getOrNull(selected)?.item?.standardAppearance ?: standardAppearance
+    }
+
+    internal fun cyl_setShadowVisible(visible: Boolean) {
+        shadow.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    internal fun cyl_slotCount(): Int = slotCount()
+
+    /** [EN] The slot of the selected tab (the plus button's when it is active), or -1. [CN] 选中 Tab 的 slot（PlusButton 激活时为其 slot），没有则为 -1。 */
+    internal fun cyl_selectedSlot(): Int {
+        val plusIndex = plusButtonIndex()
+        if (plusButtonActive && plusIndex >= 0) return plusIndex
+        val index = tabBarController?.selectedIndex ?: return -1
+        if (index < 0 || index >= buttons.size) return -1
+        return if (plusIndex in 0..index) index + 1 else index
+    }
+
+    /** [EN] The tab slot nearest to `position`, skipping a plus button without a page. [CN] 离 `position` 最近的 Tab slot，跳过没有页面的 PlusButton。 */
+    internal fun cyl_nearestTabSlot(position: Float): Int {
+        val plusIndex = plusButtonIndex()
+        val selectable = (0 until slotCount()).filter { it != plusIndex || hasPlusChildViewController() }
+        return selectable.minByOrNull { abs(it - position) } ?: 0
+    }
+
+    /** [EN] Selects the tab at `slot`, as a tap on it does. [CN] 选中 `slot` 处的 Tab，与点击它相同。 */
+    internal fun cyl_selectSlot(slot: Int) {
+        val plusIndex = plusButtonIndex()
+        if (slot == plusIndex) { plusButton?.performClick(); return }
+        val index = if (plusIndex in 0 until slot) slot - 1 else slot
+        val button = buttons.getOrNull(index) ?: return
+        if (index == tabBarController?.selectedIndex && !plusButtonActive) { refreshSelection(); return }
+        tabBarController?.cyl_tabButtonTapped(button)
+    }
     @ColorInt var cyl_shadowColor: Int? = 0x33000000
     private val buttons = ArrayList<CYLTabBarItemButton>()
     private val shadow = View(context)
@@ -283,7 +383,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         }
 
     /** [EN] The height of the items' area: the bar without the bottom safe area. [CN] Item 区域的高度：不含底部安全区的 TabBar 高度。 */
-    private val itemsHeight: Int get() = height - cyl_safeAreaBottom
+    private val itemsHeight: Int get() = cyl_itemsFrame.height().takeIf { it > 0 } ?: (height - cyl_safeAreaBottom)
     private var contentWidth = 0
     private var indicatorIndex = -1
     private var indicatorAnimator: android.animation.ValueAnimator? = null
@@ -293,7 +393,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     private var dragStartX = 0f
     private var lastDragX = 0f
     private var dragging = false
-    private val maxScrollX: Int get() = maxOf(0, contentWidth - width)
+    private val maxScrollX: Int get() = maxOf(0, contentWidth - (cyl_itemsFrame.width().takeIf { it > 0 } ?: width))
     private var titleAlignedPlusLabel: TextView? = null
 
     // MARK: - UITabBar (CYLBarBackground) 背景
@@ -433,6 +533,8 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         shadow.setBackgroundColor(cyl_shadowColor ?: Color.TRANSPARENT)
         layoutIndicator(animated = true)
         scrollSelectedTabIntoView()
+        styleRenderer.onSelectionChanged(this, animated = true)
+        invalidate()
     }
 
     private fun indicatorTarget(): Int = if (plusButtonActive) -1 else tabBarController?.selectedIndex ?: -1
@@ -533,6 +635,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
+        if (styleRenderer.onInterceptTouchEvent(this, event)) return true
         if (maxScrollX <= 0) return false
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> { dragStartX = event.x; lastDragX = event.x; dragging = !scroller.isFinished; scroller.forceFinished(true) }
@@ -545,6 +648,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     @android.annotation.SuppressLint("ClickableViewAccessibility") // [EN] Dragging scrolls; taps go to the tab buttons. [CN] 拖动用于滚动；点击交给 Tab 按钮。
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (styleRenderer.onTouchEvent(this, event)) return true
         if (maxScrollX <= 0) return super.onTouchEvent(event)
         val tracker = velocityTracker ?: android.view.VelocityTracker.obtain().also { velocityTracker = it }
         tracker.addMovement(event)
@@ -568,9 +672,12 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
-        val height = ((tabBarController?.tabBarHeight ?: CYLConstants.CYLTabBarHeight) * resources.displayMetrics.density).toInt()
+        val tabBarHeight = ((tabBarController?.tabBarHeight ?: CYLConstants.CYLTabBarHeight) * resources.displayMetrics.density).toInt()
+        val barHeight = styleRenderer.barHeight(this, tabBarHeight, cyl_safeAreaBottom)
+        styleRenderer.itemsFrame(this, width, barHeight, tabBarHeight, cyl_safeAreaBottom, cyl_itemsFrame)
+        val height = cyl_itemsFrame.height()
         plusButton?.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
-        slotWidths = computeSlotWidths(width)
+        slotWidths = computeSlotWidths(cyl_itemsFrame.width())
         contentWidth = slotWidths.sum()
         val plusIndex = plusButtonIndex()
         var slot = 0
@@ -579,7 +686,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             button.measure(MeasureSpec.makeMeasureSpec(slotWidths.getOrElse(slot) { 0 }, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
             slot++
         }
-        setMeasuredDimension(width, height + cyl_safeAreaBottom)
+        setMeasuredDimension(width, barHeight)
     }
 
     /**
@@ -601,18 +708,20 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         return if (widths.sum() <= width) equal else widths
     }
 
-    private fun slotLeft(slot: Int): Int { var left = 0; for (index in 0 until slot) left += slotWidths.getOrElse(index) { 0 }; return left }
+    private fun slotLeft(slot: Int): Int { var left = cyl_itemsFrame.left; for (index in 0 until slot) left += slotWidths.getOrElse(index) { 0 }; return left }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val density = resources.displayMetrics.density
-        if (slotWidths.size != slotCount()) slotWidths = computeSlotWidths(width)
+        styleRenderer.itemsFrame(this, width, height, ((tabBarController?.tabBarHeight ?: CYLConstants.CYLTabBarHeight) * density).toInt(), cyl_safeAreaBottom, cyl_itemsFrame)
+        if (slotWidths.size != slotCount()) slotWidths = computeSlotWidths(cyl_itemsFrame.width())
         val plusIndex = plusButtonIndex()
         var slot = 0
         for ((index, button) in buttons.withIndex()) {
             if (index == plusIndex) slot++
             val slotStart = slotLeft(slot)
             val left = slotStart + (cyl_itemEdgeInsets.left * density).toInt()
-            button.layout(left, (cyl_itemEdgeInsets.top * density).toInt(), slotStart + slotWidths.getOrElse(slot) { 0 } - (cyl_itemEdgeInsets.right * density).toInt(), itemsHeight - (cyl_itemEdgeInsets.bottom * density).toInt())
+            val itemsTop = cyl_itemsFrame.top
+            button.layout(left, itemsTop + (cyl_itemEdgeInsets.top * density).toInt(), slotStart + slotWidths.getOrElse(slot) { 0 } - (cyl_itemEdgeInsets.right * density).toInt(), itemsTop + itemsHeight - (cyl_itemEdgeInsets.bottom * density).toInt())
             slot++
         }
         plusButton?.let { plus -> val plusWidth = slotWidths.getOrElse(plusIndex) { 0 }; layoutPlusButton(plus, slotLeft(plusIndex) + plusWidth / 2, plusWidth, density) }
@@ -643,7 +752,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         val tabBarHeight = itemsHeight / density
         val appliesOffset = plus.cyl_showsTitleInTabBarItem() || plus.cyl_appliesCenterYOffsetWithoutTitle || plus.provider != null
         val offset = if (appliesOffset) plus.constantOfPlusButtonCenterYOffsetForTabBarHeight(tabBarHeight) else 0f
-        val centerY = (itemsHeight * plus.multiplierOfTabBarHeight(tabBarHeight) + offset * density).toInt()
+        val centerY = cyl_itemsFrame.top + (itemsHeight * plus.multiplierOfTabBarHeight(tabBarHeight) + offset * density).toInt()
         val w = if (plus.measuredWidth > 0) plus.measuredWidth else slotWidth
         var h = if (plus.measuredHeight > 0) plus.measuredHeight else itemsHeight
         val top = centerY - h / 2
@@ -663,8 +772,10 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     private val touchableAreaPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     override fun dispatchDraw(canvas: Canvas) {
+        styleRenderer.drawBehindItems(this, canvas)
         super.dispatchDraw(canvas)
-        cyl_indicator?.draw(canvas, paddingTop, itemsHeight - paddingBottom, resources.displayMetrics.density)
+        styleRenderer.drawAboveItems(this, canvas)
+        cyl_indicator?.draw(canvas, cyl_itemsFrame.top + paddingTop, cyl_itemsFrame.top + itemsHeight - paddingBottom, resources.displayMetrics.density)
         val plus = plusButton ?: return
         if (plus.showsTouchableArea) {
             // [EN] `showsTouchableArea` (#91): the touchable rect, for debugging. [CN] `showsTouchableArea`（#91）：绘制可点击区域，用于调试。

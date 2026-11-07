@@ -63,6 +63,23 @@ class CYLTabBarItem(attributes: Map<String, Any?> = emptyMap()) {
         set(value) { cyl_tabBarItemAnimationSizeValue = value }
     /** [EN] `cyl_imagePositionAdjustment`: moves the icon. [CN] 图标偏移。 */
     var cyl_imagePositionAdjustment: CYLOffset = CYLOffset.zero
+    /** [EN] `CYLFlatDesignTabBarItem.imagePositionAdjustment`. [CN] 图标位置偏移。 */
+    var imagePositionAdjustment: CYLOffset
+        get() = cyl_imagePositionAdjustment
+        set(value) { cyl_imagePositionAdjustment = value }
+    /** [EN] `CYLFlatDesignTabBarItem.titlePositionAdjustment`. [CN] 标题位置偏移。 */
+    var titlePositionAdjustment: CYLOffset
+        get() = cyl_titlePositionAdjustment
+        set(value) { cyl_titlePositionAdjustment = value }
+    /** [EN] `CYLFlatDesignTabBarItem.standardAppearance`: while this item is selected, it styles the whole FlatDesign bar. [CN] 该 item 选中时，作用于整个扁平样式 TabBar 的外观。 */
+    var standardAppearance: CYLTabBarAppearance? = null
+        set(value) { field = value; cyl_visiableTabButton?.let { button -> (button.parent as? CYLTabBar)?.refreshSelection() } }
+    /** [EN] `CYLFlatDesignTabBarItem.layoutCentered`: an item with only an icon or only a title centers it (FlatDesign). [CN] 只有图标或只有标题的 item 居中显示（扁平样式）。 */
+    var layoutCentered: Boolean = false
+        set(value) { field = value; cyl_visiableTabButton?.requestLayout() }
+    /** [EN] `CYLFlatDesignTabBarItem.enabled`: a disabled item ignores taps. [CN] 禁用的 item 忽略点击。 */
+    var isEnabled: Boolean = true
+        set(value) { field = value; cyl_visiableTabButton?.isEnabled = value }
     var cyl_titlePositionAdjustment: CYLOffset = CYLOffset.zero
     var cyl_imageInsets: CYLEdgeInsets = CYLEdgeInsets.zero
     /** [EN] An icon size (dp) set by `setTabBarItemIcon:selectedIcon:size:atIndex:` / `CYLTabBarItemImageURLSize`; null: the placeholder size. [CN] 由图标接口或 `CYLTabBarItemImageURLSize` 设置的图标尺寸（dp）；null 为占位尺寸。 */

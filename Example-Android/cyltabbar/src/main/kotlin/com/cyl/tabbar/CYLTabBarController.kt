@@ -70,6 +70,22 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     private var pagesCommitPending = false
 
+    /**
+     * [EN] A bar that shows the pages through it (FlatDesign's blur, Liquid Glass) draws again with every frame of the pages.
+     *      Invalidating during the traversal draws it in the same frame, without asking for another one.
+     * [CN] 透出页面的 TabBar（扁平样式的模糊、液态玻璃）在页面每次重绘时一起重绘。在遍历过程中 invalidate 会在同一帧绘制，不会再请求一帧。
+     */
+    private val backdropListener = android.view.ViewTreeObserver.OnPreDrawListener {
+        if (tabBar.styleRenderer.drawsPagesUnderTabBar) tabBar.invalidate()
+        true
+    }
+
+    /** [EN] The height of a bar floating over the pages, in px. [CN] 浮在页面之上的 TabBar 的高度（像素）。 */
+    internal fun cyl_overlayTabBarHeight(): Int {
+        val itemsHeight = (tabBarHeight * activity.resources.displayMetrics.density).toInt()
+        return tabBar.styleRenderer.barHeight(tabBar, itemsHeight, tabBar.cyl_safeAreaBottom)
+    }
+
     init {
         view.addView(pagesContainer, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
         view.addView(tabBar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
@@ -83,7 +99,11 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             val bars = insets.getInsets(types)
             root.setPadding(bars.left, bars.top, bars.right, 0)
             tabBar.cyl_safeAreaBottom = bars.bottom
-            WindowInsetsCompat.Builder(insets).setInsets(types, Insets.NONE).build()
+            // [EN] A bar that floats over the pages (FlatDesign, Liquid Glass) gives them its height as their bottom inset, as iOS
+            //      does with the safe area, so a list can scroll its last rows above the bar.
+            // [CN] 浮在页面之上的 TabBar（扁平样式、液态玻璃）把自己的高度作为页面的底部 inset，与 iOS 的安全区相同，列表可把最后几行滚到 TabBar 上方。
+            val pagesBottom = if (tabBar.styleRenderer.drawsPagesUnderTabBar) cyl_overlayTabBarHeight() else 0
+            WindowInsetsCompat.Builder(insets).setInsets(types, Insets.of(0, 0, 0, pagesBottom)).build()
         }
         // [EN] Fragments need their container in the window: transactions wait until `view` is attached. [CN] Fragment 需要容器已在窗口中：事务等到 `view` 附加后再提交。
         pagesContainer.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
@@ -91,10 +111,12 @@ open class CYLTabBarController(val activity: FragmentActivity) {
                 if (pagesCommitPending) commitPages()
                 v.viewTreeObserver.addOnWindowFocusChangeListener(windowFocusListener)
                 v.viewTreeObserver.addOnGlobalLayoutListener(keyboardListener)
+                v.viewTreeObserver.addOnPreDrawListener(backdropListener)
             }
             override fun onViewDetachedFromWindow(v: View) {
                 v.viewTreeObserver.removeOnWindowFocusChangeListener(windowFocusListener)
                 v.viewTreeObserver.removeOnGlobalLayoutListener(keyboardListener)
+                v.viewTreeObserver.removeOnPreDrawListener(backdropListener)
             }
         })
         // [EN] The activity pausing (a call, another app, the recents screen) shows a bar hidden by scrolling (#13). [CN] Activity 暂停（来电、其他 App、最近任务）时恢复滚动隐藏的 TabBar（#13）。
@@ -123,7 +145,20 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     // MARK: - CYLTabBarController properties 属性
 
+    /**
+     * [EN] `tabBarStyleType`: the classic bar (`Default` / `System`), FlatDesign (translated from iOS `CYLFlatDesignTabBar`) or
+     *      Liquid Glass (a floating glass capsule, after Kyant's AndroidLiquidGlass). FlatDesign and Liquid Glass float over
+     *      the pages, which get the bar's height as their bottom inset. See `CYLTabBarStyle.kt`.
+     * [CN] `tabBarStyleType`：经典 TabBar（`Default` / `System`）、扁平样式（由 iOS 的 `CYLFlatDesignTabBar` 翻译）或液态玻璃（浮动的玻璃胶囊，
+     *      参考 Kyant 的 AndroidLiquidGlass）。扁平样式与液态玻璃浮在页面之上，页面以 TabBar 的高度作为底部 inset。见 `CYLTabBarStyle.kt`。
+     */
     var tabBarStyleType: CYLEnums.CYLTabBarStyleType = CYLEnums.CYLTabBarStyleType.Default
+        set(value) {
+            field = value
+            tabBar.styleRenderer = CYLTabBarStyleRenderer.forStyle(value)
+            ViewCompat.requestApplyInsets(view)
+            view.requestLayout()
+        }
     /** [EN] `context`: selects the plus button (`CYLPlusButtonSubclassing.tabBarContext`). [CN] 选择 PlusButton 的 context。 */
     var context: String? = null
         set(value) { field = value; tabBar.context_ = value }
@@ -465,6 +500,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     // MARK: - Tab taps 点击
 
     internal fun cyl_tabButtonTapped(button: CYLTabBarItemButton) {
+        if (!button.item.isEnabled) return
         val index = button.index
         val page = viewControllers.getOrNull(index) ?: return
         val delegate = delegate
@@ -840,7 +876,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     @ColorInt var cyl_tabBarItemSelectedImageColor: Int? = null
         set(value) { field = value; tabBar.refreshSelection() }
     @ColorInt var cyl_tabBarBackgroundColor: Int? = null
-        set(value) { field = value; tabBar.setBackgroundColor(value ?: 0xFFF9F9F9.toInt()) }
+        set(value) { field = value; tabBar.styleRenderer.applyBackgroundColor(tabBar, value) }
     @ColorInt var cyl_tabBarShadowColor: Int? = 0x33000000
         set(value) { field = value; tabBar.cyl_shadowColor = value; tabBar.refreshSelection() }
     var cyl_fixesOpaqueTabBarSafeAreaInsets: Boolean = true
@@ -1289,6 +1325,29 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 class CYLTabBarControllerView(context: Context) : LinearLayout(context) {
     internal var controller: CYLTabBarController? = null
     private var routedToPlus = false
+
+    private val overlaysPages: Boolean get() = controller?.tabBar?.styleRenderer?.drawsPagesUnderTabBar == true
+
+    /** [EN] FlatDesign and Liquid Glass: the pages fill the view and the bar floats over their bottom. [CN] 扁平样式与液态玻璃：页面铺满视图，TabBar 浮在页面底部之上。 */
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val controller = controller
+        if (!overlaysPages || controller == null) return super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val height = MeasureSpec.getSize(heightMeasureSpec)
+        val innerWidth = MeasureSpec.makeMeasureSpec(width - paddingLeft - paddingRight, MeasureSpec.EXACTLY)
+        controller.pagesContainer.measure(innerWidth, MeasureSpec.makeMeasureSpec(height - paddingTop, MeasureSpec.EXACTLY))
+        controller.tabBar.measure(innerWidth, MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST))
+        setMeasuredDimension(width, height)
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        val controller = controller
+        if (!overlaysPages || controller == null) return super.onLayout(changed, l, t, r, b)
+        val pages = controller.pagesContainer
+        pages.layout(paddingLeft, paddingTop, paddingLeft + pages.measuredWidth, paddingTop + pages.measuredHeight)
+        val bar = controller.tabBar
+        bar.layout(paddingLeft, height - bar.measuredHeight, paddingLeft + bar.measuredWidth, height)
+    }
 
     init {
         orientation = VERTICAL

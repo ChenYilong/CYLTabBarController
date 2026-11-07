@@ -26,7 +26,11 @@ interface CYLTabBarTheme {
     fun cyl_customizeTabBarController(tabBarController: CYLTabBarController) { /* [EN] Optional. [CN] 可选。 */ }
 }
 
-/** [EN] `UITabBarAppearance`, the part the library sets. [CN] TabBar 外观（库设置的部分）。 */
+/**
+ * [EN] `UITabBarAppearance`, the part the library sets. In the FlatDesign style, `backgroundColor` replaces the blur and
+ *      `shadowColor` draws the top line.
+ * [CN] TabBar 外观（库设置的部分）。扁平样式中，`backgroundColor` 代替模糊，`shadowColor` 绘制顶部线条。
+ */
 data class CYLTabBarAppearance(
     val backgroundColor: Int? = null,
     val shadowColor: Int? = null,
@@ -34,6 +38,10 @@ data class CYLTabBarAppearance(
     val selectedTitleColor: Int? = null,
     val iconColor: Int? = null,
     val selectedIconColor: Int? = null,
+    /** [EN] `stackedItemPositioning == .centered` (FlatDesign): items centered, `stackedItemWidth` wide (dp, 0: an equal share), `stackedItemSpacing` apart (dp). [CN] `stackedItemPositioning == .centered`（扁平样式）：item 居中，宽 `stackedItemWidth`（dp，0 表示平分），间距 `stackedItemSpacing`（dp）。 */
+    val stackedItemPositioningCentered: Boolean = false,
+    val stackedItemWidth: Float = 0f,
+    val stackedItemSpacing: Float = 0f,
 )
 
 /**
