@@ -107,7 +107,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 以背景图为图片、标题画在图上的 PlusButton（`-cyl_drawsTitleOverBackgroundImage`）不接受主题的图片：主题图标会盖在图片上、挤在标题旁边。App 直接调用 `-updatePlusButtonWithAttributes:` 时不受影响。原本没有图片的 PlusButton 从主题恢复时，主题图片会被移除。 | A plus button whose picture is its background image, its title on it (`-cyl_drawsTitleOverBackgroundImage`), takes no image from a theme: a theme's icon would sit over the picture, beside the title. An app calling `-updatePlusButtonWithAttributes:` itself is not affected. A plus button with no image of its own loses the theme's image when the theme goes. |
+| 以背景图为图片、标题画在图上的 PlusButton（`-cyl_drawsTitleOverBackgroundImage`）不接受主题的图片：主题图标会盖在图片上、挤在标题旁边。App 直接调用 `-updatePlusButtonWithAttributes:` 时不受影响。演示列表的“批量下载网络图标”“批量使用本地图标”同样不修改这种按钮。原本没有图片的 PlusButton 从主题恢复时，主题图片会被移除。 | A plus button whose picture is its background image, its title on it (`-cyl_drawsTitleOverBackgroundImage`), takes no image from a theme: a theme's icon would sit over the picture, beside the title. An app calling `-updatePlusButtonWithAttributes:` itself is not affected. The demo rows "Change all network icons" and "Change all local icons" leave such a button alone too. A plus button with no image of its own loses the theme's image when the theme goes. |
 
 ## [CN]测试
 ## [EN]Testing
