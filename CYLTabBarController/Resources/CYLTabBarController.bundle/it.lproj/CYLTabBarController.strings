@@ -255,6 +255,15 @@
 "跳转与对比" = "Navigazione e confronti";
 "角标" = "Badge";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Non supportato da Liquid Glass: è il sistema a stabilire l'altezza della barra (FlatDesign e lo stile classico lo supportano)";
+"从配置文件创建 TabBarController" = "Crea un TabBarController da un file di configurazione";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Un solo file crea l’intera barra delle schede: scegli JSON, YAML, TOML, plist, XML, INI e altri, oppure caricalo da un URL.";
+"选择配置文件" = "Scegli un file di configurazione";
+"从网络 URL 加载" = "Carica da un URL";
+"无法创建 TabBarController" = "Impossibile creare il TabBarController";
+"本页由配置文件 %@ 创建：" = "Questa pagina è stata creata dalla configurazione %@:";
+"配置文件：模拟意外情况" = "Configurazione: errori simulati";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController creato in sicurezza: %@ schede";
+"查看" = "Visualizza";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Nascondi allo scorrimento: simula interruzioni (issue #13)";
@@ -314,6 +323,8 @@
 "仅配色" = "Solo colori";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Toccami";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Due barre delle schede condividono una configurazione; il registro di ciascuna associa gli stessi ID di pagina a pagine diverse.";
+"两个 TabBar，同一个页面 ID" = "Due barre delle schede, un ID di pagina";
 
 /* A plus button whose image is set later (demo row). */
 "加载图片" = "Carica l’immagine";
@@ -349,7 +360,11 @@
 "展开全部 %@ 个模拟" = "Mostra tutte le %@ simulazioni";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Comprimi l'elenco delle simulazioni";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "%1$@ schede saltate: %2$@";
 
 /* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
 "网络图标" = "Icone di rete";
 "网络图标、标题与配色" = "Icone di rete, titoli e colori";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "File di configurazione";

@@ -1,0 +1,223 @@
+#!/usr/bin/env python3
+"""The edge-case checklist of configuration loading, its score per round, and the docs table generated from it.
+
+[EN] Every edge case of `-initWithConfiguration:`, the configuration files and the URL loading (A: files and data,
+     B: values, C: view controllers, D: network, E: threads), with the round of fixes that handled it. The score of a
+     round = handled cases / cases known in that round (partly handled counts half); cases found during a review are
+     added with `found`, so a score can drop. The table between `<!-- edge-cases:start -->` and `<!-- edge-cases:end -->`
+     in docs/Configuration-File.md is generated from this file: edit the list here, never the table.
+[CN] `-initWithConfiguration:`、配置文件与 URL 加载的所有边界情况（A：文件与数据，B：值，C：子控制器，D：网络，E：线程），以及处理它的修复轮次。
+     某一轮的分数 = 已处理的情况 / 该轮已知的情况（部分处理计一半）；复查中发现的情况用 `found` 加入，因此分数可能下降。
+     docs/Configuration-File.md 中 `<!-- edge-cases:start -->` 与 `<!-- edge-cases:end -->` 之间的表格由本文件生成：请修改这里的列表，不要直接修改表格。
+
+Usage 用法:
+    python3 scripts/configuration-edge-cases.py            # score of every round 每一轮的分数
+    python3 scripts/configuration-edge-cases.py --write    # regenerate the docs table 重新生成文档中的表格
+    python3 scripts/configuration-edge-cases.py --check    # exit 1 if the docs table is out of date 表格过期时返回 1
+
+Add a case 新增情况: append a tuple (ID, 中文情况, English case, 中文处理, English handling,
+{'fixed': <round>, 'partial': <round, optional>, 'found': <round, default 1>}) and, for a new round, an entry in ROUNDS.
+"""
+import os
+import sys
+
+CASES = [
+ # A. Files and data 文件与数据
+ ('A1', '文件路径为 nil 或空字符串', 'The file path is nil or empty', '返回 nil 与 FileNotFound 错误', 'nil and a FileNotFound error', {'fixed': 1}),
+ ('A2', '文件不存在、是目录或无读取权限', 'The file is missing, a directory or unreadable', '返回 nil 与 FileNotFound 错误', 'nil and a FileNotFound error', {'fixed': 1}),
+ ('A3', '文件为 0 字节', 'The file has 0 bytes', 'Empty 错误（以前 YAML 等格式会生成没有 Tab 的控制器）', 'An Empty error (YAML and others used to give a controller with no tabs)', {'fixed': 3, 'partial': 1}),
+ ('A4', '文件只有空白或注释', 'The file has only whitespace or comments', 'Empty 错误', 'An Empty error', {'fixed': 3}),
+ ('A5', '不是合法的 UTF-8 文本', 'Not valid UTF-8 text', 'InvalidSyntax 错误', 'An InvalidSyntax error', {'fixed': 1}),
+ ('A6', '以 UTF-8 BOM 开头', 'Starts with a UTF-8 BOM', '自动去掉 BOM', 'The BOM is skipped', {'fixed': 1}),
+ ('A7', '扩展名与内容不符（如 .json 中是 YAML）', 'The extension does not match the content (YAML in a .json file)', '按扩展名解析失败后根据内容识别并重试', 'When the extension\'s format fails, the content is detected and parsed again', {'fixed': 4}),
+ ('A8', '扩展名未知或缺失', 'An unknown or missing extension', '根据内容识别格式', 'The format is detected from the content', {'fixed': 1}),
+ ('A9', '文件过大（例如 1 GB）', 'A huge file (e.g. 1 GB)', '超过 5 MB 时返回 TooLarge 错误，不读入内存解析', 'Over 5 MB: a TooLarge error, nothing is parsed', {'fixed': 3}),
+ ('A10', '嵌套过深（如 10 万层 `[[[[`）导致栈溢出', 'Deep nesting (e.g. 100,000 levels of `[[[[`) overflows the stack', '超过 64 层时返回 TooDeep 错误，所有递归解析器都有层数限制', 'Over 64 levels: a TooDeep error; every recursive parser has a depth limit', {'fixed': 2}),
+ ('A11', '顶层不是字典（数组、字符串、数字）', 'The top level is not a dictionary (a list, a string, a number)', 'NotADictionary 错误', 'A NotADictionary error', {'fixed': 1}),
+ ('A12', '截断或无效的二进制 plist / protobuf', 'A truncated or invalid binary plist / protobuf', 'InvalidSyntax 错误，越界读取被拒绝', 'An InvalidSyntax error; out-of-bounds reads are refused', {'fixed': 1}),
+ ('A13', '语法错误', 'A syntax error', '错误描述包含格式与行号', 'The error names the format and the line', {'fixed': 1}),
+ ('A14', 'XML 外部实体（XXE）', 'XML external entities (XXE)', '显式关闭外部实体解析', 'External entities are explicitly not resolved', {'fixed': 4, 'partial': 1}),
+ ('A15', '重复的键', 'Duplicate keys', '后出现的值生效，不崩溃', 'The last value wins, no crash', {'fixed': 1}),
+ ('A16', 'UTF-16 / UTF-32 编码的文本文件（带 BOM）', 'A UTF-16 / UTF-32 text file (with a BOM)', '根据 BOM 识别编码', 'The encoding is detected from the BOM', {'fixed': 6, 'found': 5}),
+ ('A17', 'A7 的重试掩盖了语法错误（.properties、INI、Protobuf 文本几乎接受任何文本；TOML 曾接受 `[1, 2]` 这样的表名）', 'The retry of A7 hid syntax errors (.properties, INI and Protobuf text accept almost any text; TOML accepted a table named `[1, 2]`)', '重试只使用结构明确的格式（JSON、YAML、TOML、plist、XML、二进制 Protobuf），TOML 裸键只接受规范允许的字符；由测试套件发现', 'The retry only uses formats with a distinctive structure (JSON, YAML, TOML, plist, XML, binary Protobuf), and TOML bare keys only take the characters of the specification; found by the test suite', {'fixed': 7, 'found': 7}),
+ # B. Values 值
+ ('B1', '没有 Tab（缺少或为空的 `CYLTabBarControllerTabBarItemsAttributes`）', 'No tabs (missing or empty `CYLTabBarControllerTabBarItemsAttributes`)', '读取文件或 URL 时返回 NoTabs 错误；代码中初始化时保持原行为并输出警告', 'Files and URLs: a NoTabs error; in code: unchanged behavior and a warning', {'fixed': 3}),
+ ('B2', 'Tab 列表不是数组（字符串、数字）', 'The tab list is not a list (a string, a number)', '视为没有 Tab，见 B1', 'Treated as no tabs, see B1', {'fixed': 3, 'partial': 1}),
+ ('B3', '只有一个 Tab 且写成字典（Protobuf 文本、XML）', 'A single tab written as a dictionary (Protobuf text, XML)', '自动包装为列表', 'Wrapped into a list', {'fixed': 1}),
+ ('B4', 'Tab 列表中的元素不是字典', 'A tab entry is not a dictionary', '代码传入子控制器时用空字典占位，保持下标对应；根据配置创建子控制器时跳过', 'With view controllers from code: an empty placeholder keeps the indexes; when they are created: skipped', {'fixed': 4, 'partial': 1}),
+ ('B5', '字符串键的值类型错误（标题为数组、字典）', 'A string key has the wrong type (a title that is a list or a dictionary)', '数字转换为字符串，其他类型移除；以前会因 unrecognized selector 崩溃', 'Numbers become strings, other types are removed; this used to crash (unrecognized selector)', {'fixed': 2}),
+ ('B6', '值为 null（JSON null、YAML ~）', 'A value is null (JSON null, YAML ~)', '移除该键；以前在 item 中会崩溃', 'The key is removed; inside an item this used to crash', {'fixed': 2}),
+ ('B7', '内边距 / 偏移为 NaN、Infinity 或极大值', 'Insets / offsets are NaN, Infinity or huge', '非有限值或绝对值超过 1000 时移除；以前会触发 CALayer NaN 异常', 'Non-finite values or values over 1000 are removed; this used to raise a CALayer NaN exception', {'fixed': 2}),
+ ('B8', '尺寸为负数、0 或极大值', 'A size is negative, zero or huge', '要求 0 < 值 ≤ 1000，否则移除', 'Requires 0 < value ≤ 1000, removed otherwise', {'fixed': 2}),
+ ('B9', '未知的样式名称或超出范围的样式编号（如 99）', 'An unknown style name or an out-of-range style number (e.g. 99)', '使用默认样式并输出警告', 'The default style and a warning', {'fixed': 2, 'partial': 1}),
+ ('B10', '请求扁平样式但未集成 FlatDesign 子库', 'FlatDesign requested without the FlatDesign subspec', '使用默认样式并输出警告', 'The default style and a warning', {'fixed': 4}),
+ ('B11', '拼写错误的键（如 `CYLTabBarItemTitel`）', 'A misspelled key (e.g. `CYLTabBarItemTitel`)', '保留（App 可能有自定义键），DEBUG 下提示最接近的已知键', 'Kept (the app may use its own keys); DEBUG names the closest known key', {'fixed': 4}),
+ ('B12', '重复的 `CYLTabBarItemIdentifier`', 'A duplicate `CYLTabBarItemIdentifier`', '后出现的改为「标识_2」等并输出警告', 'Later ones become "identifier_2"..., with a warning', {'fixed': 4}),
+ ('B13', '无效的图片 / Lottie URL，或不存在的本地 Lottie 文件', 'An invalid image / Lottie URL, or a missing local Lottie file', '只接受 http(s) 与存在的本地文件，否则移除', 'Only http(s) URLs and existing local files are kept', {'fixed': 4}),
+ ('B14', '图片名称或 SF Symbol 不存在', 'An image name or SF Symbol that does not exist', '该 Tab 没有图标，不崩溃', 'The tab has no icon, no crash', {'fixed': 1}),
+ ('B15', 'Tab 很多（超过 5 个）', 'Many tabs (more than 5)', '由 UIKit 处理（“更多”）', 'Handled by UIKit ("More")', {'fixed': 1}),
+ ('B16', '超长标题', 'A very long title', '不崩溃，由 UIKit 截断显示', 'No crash; UIKit truncates it', {'fixed': 1}),
+ ('B17', 'Lottie 文件不是合法的 JSON 动画', 'A Lottie file that is not a valid JSON animation', '解析检查失败时移除，避免 Lottie 内部异常', 'Removed when it does not parse as a JSON object, so Lottie never sees it', {'fixed': 6, 'found': 5}),
+ ('B18', '代码中传入的配置不是字典（如类型不明的 JSON 数组）', 'The configuration passed in code is not a dictionary (e.g. an untyped JSON list)', '视为空配置并输出警告；以前会因 unrecognized selector 崩溃', 'Treated as empty, with a warning; this used to crash (unrecognized selector)', {'fixed': 6, 'found': 6}),
+ ('B19', '无效的颜色（`CYLTabBarItemTitleColor` 等为错误的十六进制串或数字）', 'An invalid color (`CYLTabBarItemTitleColor`... a wrong hex string or a number)', '接受 UIColor 与 "#RGB" / "#RRGGBB" / "#RRGGBBAA"，其他移除并输出警告', 'UIColor and "#RGB" / "#RRGGBB" / "#RRGGBBAA" are accepted; anything else is removed, with a warning', {'fixed': 8, 'found': 8}),
+ ('B20', '无效的字体（字号为 0、NaN、超过 200，或字体名称不存在）', 'An invalid font (size 0, NaN, over 200, or a font name that does not exist)', '字号必须在 1 到 200 之间，字体必须存在，否则移除并输出警告', 'The size must be between 1 and 200 and the font must exist; removed otherwise, with a warning', {'fixed': 8, 'found': 8}),
+ ('B21', '空字符串作为 URL、Lottie 文件、图片 URL、类名、颜色或字体（`""`）', 'An empty string (`""`) as a URL, Lottie file, image URL, class, color or font', '视为未提供并输出警告；以前空的 Lottie URL 会传给 +fileURLWithPath:（要求非空路径）', 'Treated as missing, with a warning; an empty Lottie URL used to reach +fileURLWithPath:, which requires a non-empty path', {'fixed': 10, 'found': 9}),
+ ('B22', 'Tab 只适用于其他平台（`CYLTabBarItemPlatforms`），或需要更新的 App 版本（`CYLTabBarItemMinimumAppVersion`）', 'A tab only for other platforms (`CYLTabBarItemPlatforms`), or for a newer app version (`CYLTabBarItemMinimumAppVersion`)', '该 Tab 在 iOS 上不显示；子控制器由代码传入时，连同对应的子控制器一起移除，其余下标仍然对应', 'The tab is left out on iOS; with view controllers from code, its view controller goes too and the other indexes still match', {'fixed': 11, 'found': 11}),
+ ('B23', '`CYLTabBarItemPlatforms` 无效（数字、空字符串、非字符串元素）', 'An invalid `CYLTabBarItemPlatforms` (a number, an empty string, non-string elements)', '忽略并输出警告，该 Tab 在所有平台显示', 'Ignored, with a warning; the tab shows on every platform', {'fixed': 11, 'found': 11}),
+ ('B24', '`CYLTabBarItemMinimumAppVersion` 无效（"abc"、"2.x"），或按字符串比较会出错（"2.10" 与 "2.9"）', 'An invalid `CYLTabBarItemMinimumAppVersion` ("abc", "2.x"), or one a string comparison gets wrong ("2.10" vs "2.9")', '按数字逐段比较；无效版本被忽略并输出警告', 'Compared number by number; an invalid version is ignored, with a warning', {'fixed': 11, 'found': 11}),
+ ('B25', '`CYLTabBarItemPageParameters` 不是字典', '`CYLTabBarItemPageParameters` is not a dictionary', '移除并输出警告；Protobuf 的 key / value 条目转换为字典', 'Removed, with a warning; Protobuf key / value entries become a dictionary', {'fixed': 11, 'found': 11}),
+ ('B26', '复用已有 TabBarController 的 `viewControllers` / `tabBarItemsAttributes`，其中带有 PlusButton 的 slot（占位控制器、PlusButton 子控制器、带标记的 slot 项，#774）', 'Re-using the `viewControllers` / `tabBarItemsAttributes` of an existing tab bar controller, which carry the PlusButton slot (placeholder, plus child view controller, the marked slot entry, #774)', '先去掉 slot 再按下标对应 Tab 与子控制器，slot 由 `-setViewControllers:` 重新插入且只插入一次；不再误报未知键', 'The slot is removed before tabs and view controllers are matched by index, and `-setViewControllers:` inserts it again, once; no false unknown-key warning', {'fixed': 12, 'found': 12}),
+ ('B27', '由页面 ID 创建的控制器调用 `-reloadTabBarItemsWithAttributes:`（远程配置更新、登录后换 Tab）', '`-reloadTabBarItemsWithAttributes:` on a controller created from page IDs (a remote update, tabs after login)', '控制器保留注册表、解析回调与查找顺序：新 Tab 的页面按 ID 解析，页面 ID 已有页面的 Tab 复用它，找不到的跳过并记录在 `cyl_skippedTabs`', 'The controller keeps its registry, resolver and lookup order: new tabs are resolved by ID, a tab whose page ID already has a page reuses it, the rest are skipped and listed in `cyl_skippedTabs`', {'fixed': 13, 'found': 12}),
+ ('B28', '动画键无效：`CYLTabBarAnimationOptions` 不是字典或含非字符串值，`CYLTabBarControllerTabBarItemAnimationSpeed` 为 0、负数或 "fast"，`CYLTabBarLottieLoopsWhenUnselected` 不是布尔值，动画 URL / 路径指向不存在的文件', 'Invalid animation keys: `CYLTabBarAnimationOptions` not a dictionary or with non-string values, `CYLTabBarControllerTabBarItemAnimationSpeed` 0, negative or "fast", `CYLTabBarLottieLoopsWhenUnselected` not a boolean, an animation URL / path of a missing file', '选项逐项检查（数字转为字符串，其余丢弃）；速度必须是大于 0 的有限数字，否则忽略并警告；布尔值同 `CYLTabBarControllerAutomaticPageRegistration`；本地文件必须存在（Lottie 文件还须可读）；有效选项写入动画 URL 的 fragment（`CYLTabBarAnimationURLWithOptions()`）', 'Options are checked one by one (numbers become strings, the rest is dropped); the speed must be a finite number above 0, else ignored with a warning; the boolean works like `CYLTabBarControllerAutomaticPageRegistration`; a local file must exist (a Lottie file must also be readable); valid options go into the fragment of the animation URLs (`CYLTabBarAnimationURLWithOptions()`)', {'fixed': 15, 'found': 15}),
+ ('B29', '配置使用了未安装的动画库的键（例如没有 `Rive` 子库时写 `CYLTabBarRiveURL`），或同一 Tab 写了多个动画库的键', 'A configuration names the keys of an animation library that is not installed (e.g. `CYLTabBarRiveURL` without the `Rive` subspec), or one tab names several libraries', 'PAG / Rive 的键按名称识别（不依赖子库的常量），值照常转换并传给库：未安装的库忽略自己的键，Tab 显示图片；多个库时由库按键选择（#752）', 'The PAG / Rive keys are known by name (no dependency on the subspec constants), converted as usual and handed to the library: a library that is not installed ignores its keys and the tab shows its image; with several libraries the library chooses by key (#752)', {'fixed': 15, 'found': 15}),
+ ('B30', 'GIF 键（#605）：没有 `GIF` 子库时写 `CYLTabBarGIFURL`，或 `.gif` 文件不是 GIF（扩展名对、内容不对）', 'GIF keys (#605): `CYLTabBarGIFURL` without the `GIF` subspec, or a `.gif` file that is not a GIF (the right extension, the wrong content)', 'GIF 的键按名称识别，值照常转换（Protobuf 字段 57–61）；`.gif` 文件必须以 GIF87a / GIF89a 开头，否则移除并输出警告，Tab 显示图片', 'The GIF keys are known by name and converted as usual (Protobuf fields 57–61); a `.gif` file must start with GIF87a / GIF89a, otherwise it is removed with a warning and the tab shows its image', {'fixed': 16, 'found': 16}),
+ # C. View controllers 子控制器
+ ('C1', '子控制器类不存在', 'The view controller class does not exist', '使用 UIViewController 并输出警告', 'UIViewController and a warning', {'fixed': 1, 'removed': 11}),
+ ('C2', '类不是 UIViewController（如 NSString）', 'The class is not a UIViewController (e.g. NSString)', '使用 UIViewController 并输出警告', 'UIViewController and a warning', {'fixed': 1, 'removed': 11}),
+ ('C3', '子控制器类是 UITabBarController / UINavigationController / UIAlertController 等容器', 'The class is a container: UITabBarController, UINavigationController, UIAlertController...', '拒绝并使用 UIViewController', 'Refused; UIViewController is used', {'fixed': 4, 'removed': 11}),
+ ('C4', '子控制器的 -init 抛出异常', 'The view controller\'s -init raises an exception', '捕获异常并使用 UIViewController', 'The exception is caught; UIViewController is used', {'fixed': 4, 'removed': 11}),
+ ('C5', '导航控制器类无效', 'An invalid navigation controller class', '不嵌入导航控制器', 'Not embedded', {'fixed': 1, 'removed': 11}),
+ ('C6', '`CYLTabBarControllerViewControllers` 中有非控制器对象', '`CYLTabBarControllerViewControllers` holds objects that are not view controllers', '移除这些对象；以前会崩溃', 'They are removed; this used to crash', {'fixed': 2}),
+ ('C7', '同一个子控制器出现两次', 'The same view controller twice', '移除重复项；以前 UIKit 会抛异常', 'The duplicate is removed; UIKit used to raise', {'fixed': 2}),
+ ('C8', '子控制器数量与 Tab 数量不一致', 'More or fewer view controllers than tabs', '本库按下标保护，不越界', 'The library checks indexes, no out-of-bounds access', {'fixed': 1}),
+ ('C9', '`CYLTabBarControllerViewControllers` 为空数组', '`CYLTabBarControllerViewControllers` is an empty list', '视为未提供，根据 Tab 创建子控制器', 'Treated as missing: the view controllers are created from the tabs', {'fixed': 6, 'found': 5}),
+ ('C10', '没有 URL 的 NSURLRequest，或代码中传入 nil 请求 / URL（声明为 nonnull）', 'An NSURLRequest without a URL, or a nil request / URL from code (declared nonnull)', '返回 FileNotFound 错误；本地与缺失 URL 由同一个文件内私有函数处理，不再把 nil 传给 nonnull 参数（CI 静态分析 nullability.NullPassedToNonnull）', 'A FileNotFound error; local and missing URLs go through one file-private function, so nil never reaches a nonnull parameter (CI static analyzer, nullability.NullPassedToNonnull)', {'fixed': 10, 'found': 9}),
+ ('C11', 'Tab 的页面 ID 没有注册，或 Tab 没有任何 ID', 'A tab\'s page ID is not registered, or the tab has no ID at all', '跳过该 Tab 并输出警告；由文件或 URL 创建且没有任何 Tab 找到页面时，返回 NoPages 错误（11）', 'The tab is skipped, with a warning; from a file or a URL, when no tab finds its page, a NoPages error (11)', {'fixed': 11, 'found': 11}),
+ ('C12', '页面提供者抛出 Objective-C 异常', 'A page provider raises an Objective-C exception', '捕获异常，跳过该 Tab', 'The exception is caught; the tab is skipped', {'fixed': 11, 'found': 11}),
+ ('C13', '页面提供者返回 nil、非控制器对象、TabBarController、已属于其他容器的页面，或两个 Tab 返回同一个页面', 'A page provider returns nil, an object that is not a view controller, a tab bar controller, a page that belongs to another container, or one page for two tabs', '拒绝并跳过该 Tab，UIKit 不会移动或嵌套页面', 'Refused and the tab skipped; UIKit never moves or nests the page', {'fixed': 11, 'found': 11}),
+ ('C14', '两个遵守 `CYLTabBarPage` 的类声明同一个页面 ID', 'Two classes that adopt `CYLTabBarPage` claim the same page ID', '按类名顺序使用第一个，DEBUG 下输出警告；扫描只读取类信息，不触发 +initialize', 'The first in class name order is used, with a warning in DEBUG; the scan only reads class data, no +initialize runs', {'fixed': 11, 'found': 11}),
+ ('C15', '`CYLTabBarControllerPageRegistry` / `CYLTabBarControllerPageResolver` 类型错误（例如文件中的字符串）', '`CYLTabBarControllerPageRegistry` / `CYLTabBarControllerPageResolver` of the wrong type (e.g. a string from a file)', '忽略并输出警告，继续使用全局注册表', 'Ignored, with a warning; the shared registry is still used', {'fixed': 11, 'found': 11}),
+ ('C16', '多个 TabBar 把同一个页面 ID 对应到不同页面', 'Several tab bars map one page ID to different pages', '每个 TabBar 传入自己的 `CYLTabBarControllerPageRegistry`，先于全局注册表查找', 'Each tab bar passes its own `CYLTabBarControllerPageRegistry`, looked up before the shared registry', {'fixed': 11, 'found': 11}),
+ ('C17', '重复的 Tab 标识被改名后，页面 ID 也随之改变', 'A duplicate tab identifier, once renamed, changes the page ID too', '改名前把原标识保存为 `CYLTabBarItemPageIdentifier`，页面仍能找到', 'The original identifier is kept as `CYLTabBarItemPageIdentifier` before renaming, so the page is still found', {'fixed': 11, 'found': 11}),
+ # D. Network 网络
+ ('D1', 'URL 为 nil', 'A nil URL', '回调返回 FileNotFound 错误', 'The completion gets a FileNotFound error', {'fixed': 1}),
+ ('D2', '不支持的 scheme 或无效 URL', 'An unsupported scheme or an invalid URL', '回调返回 Network 错误', 'The completion gets a Network error', {'fixed': 1}),
+ ('D3', 'HTTP 4xx / 5xx', 'HTTP 4xx / 5xx', 'Network 错误，包含状态码', 'A Network error with the status code', {'fixed': 1}),
+ ('D4', '无网络、DNS 失败', 'No network, a DNS failure', 'Network 错误（NSUnderlyingErrorKey 为原始错误）', 'A Network error (NSUnderlyingErrorKey holds the original)', {'fixed': 1}),
+ ('D5', '服务器不响应', 'The server does not answer', '默认 15 秒超时（以前为系统默认的 60 秒）；可传入自定义 NSURLRequest', 'A 15 s timeout by default (it was the system\'s 60 s); a custom NSURLRequest can be passed', {'fixed': 5}),
+ ('D6', '响应体为空', 'An empty response body', 'Empty 错误', 'An Empty error', {'fixed': 3, 'partial': 1}),
+ ('D7', '返回 HTML 页面（如公共 Wi-Fi 的登录页）', 'An HTML page instead (e.g. a captive Wi-Fi portal)', '识别为没有 Tab 的配置，返回 NoTabs 错误；以前会生成空的 TabBar', 'Detected as a configuration with no tabs: a NoTabs error; it used to give an empty tab bar', {'fixed': 3}),
+ ('D8', '响应过大', 'A huge response', '超过 5 MB 时返回 TooLarge 错误', 'Over 5 MB: a TooLarge error', {'fixed': 3}),
+ ('D9', 'Content-Type 错误（如 text/plain）', 'A wrong Content-Type (e.g. text/plain)', '根据扩展名或内容识别', 'Detected from the extension or the content', {'fixed': 1}),
+ ('D10', '请求被取消', 'The request is cancelled', '回调仍会执行一次，返回 Network 错误', 'The completion still runs once, with a Network error', {'fixed': 1}),
+ ('D11', '回调线程与次数', 'Completion thread and count', '总在主队列执行且只执行一次', 'Always on the main queue, exactly once', {'fixed': 1}),
+ ('D12', 'completion 为 nil', 'A nil completion', '不发起请求，返回 nil', 'No request is made; returns nil', {'fixed': 1}),
+ ('C18', '`CYLTabBarControllerPageLookupOrder` 含未知项或为空，`CYLTabBarControllerAutomaticPageRegistration` 不是布尔值', '`CYLTabBarControllerPageLookupOrder` with unknown entries or empty, `CYLTabBarControllerAutomaticPageRegistration` not a boolean', '未知项丢弃并警告，没有剩余项时用默认顺序；非布尔值忽略并警告', 'Unknown entries are dropped with a warning, the default order is used when nothing is left; a non-boolean is ignored with a warning', {'fixed': 13, 'found': 13}),
+ ('C19', '被跳过的 Tab 在 Release 中无法观测', 'Skipped tabs cannot be observed in Release', '`cyl_skippedTabs` 列出每个没有页面的 Tab 及原因（排除、无 ID、未注册、提供者失败、无效）', '`cyl_skippedTabs` lists every tab without a page and why (excluded, no ID, unregistered, provider failed, invalid)', {'fixed': 13, 'found': 12}),
+ ('C20', '异步页面工厂：completion 在非主线程调用、调用两次、交付 nil 或不能作为 Tab 的页面、在控制器释放后调用，或同步完成', 'An asynchronous page factory: the completion called off the main thread, twice, with nil or a page that cannot be a tab, after the controller is gone, or synchronously', '切回主线程、只接受第一次；nil / 无效页面移除该 Tab 并记录在 `cyl_skippedTabs`；控制器已释放时忽略；同步完成在下一次 run loop 换入', 'Delivered on the main thread, the first call only; nil / an invalid page removes the tab and lists it in `cyl_skippedTabs`; ignored when the controller is gone; a synchronous completion is swapped on the next run loop turn', {'fixed': 14, 'found': 14}),
+ # E. Threads 线程
+ ('E1', '在后台线程读取文件并创建控制器', 'Reading a file and creating the controller on a background thread', '文件接口返回 MainThreadRequired 错误；代码初始化输出警告（与原行为一致）', 'The file APIs return a MainThreadRequired error; the code initializer warns (as before)', {'fixed': 5}),
+ ('E2', '在后台线程只解析配置字典', 'Only parsing the dictionary on a background thread', '解析器只依赖 Foundation，线程安全', 'The parser is Foundation only and thread-safe', {'fixed': 1}),
+]
+
+ROUNDS = {
+ 1: ('基线：解析器已能拒绝大部分无效文件，但值的类型、NaN、嵌套深度、空文件与 HTML 页面等会导致崩溃或生成空 TabBar。',
+     'Baseline: the parser already refuses most invalid files, but wrong value types, NaN, deep nesting, empty files and HTML pages crash or give an empty tab bar.'),
+ 2: ('修复会崩溃的情况：值的类型检查、null、NaN / Infinity、尺寸范围、样式编号范围、非控制器对象、重复的控制器、嵌套深度限制。',
+     'Crash fixes: value type checks, null, NaN / Infinity, size ranges, style number range, objects that are not view controllers, duplicate view controllers, nesting depth limit.'),
+ 3: ('语义校验：空文件、没有 Tab、HTML 页面、文件 / 响应大小限制，新增错误码 Empty、TooLarge、TooDeep、NoTabs。',
+     'Semantic checks: empty files, no tabs, HTML pages, file / response size limits; new error codes Empty, TooLarge, TooDeep, NoTabs.'),
+ 4: ('容错：扩展名不符时重试、XXE、容器类与 -init 异常、无效 Tab 占位、FlatDesign 不可用、拼写错误提示、重复标识、URL 与本地文件检查。',
+     'Tolerance: retry when the extension is wrong, XXE, container classes and -init exceptions, placeholders for invalid tabs, FlatDesign missing, typo hints, duplicate identifiers, URL and local file checks.'),
+ 5: ('网络超时与线程：默认 15 秒超时、可传入 NSURLRequest、后台线程保护。复查时新发现 4 个问题（A16、B17、C9），总分下降。',
+     'Network timeout and threads: a 15 s default timeout, a custom NSURLRequest, background-thread protection. The review found new cases (A16, B17, C9), so the score dropped.'),
+ 6: ('修复新发现的问题：UTF-16 / UTF-32、无效的 Lottie 文件、空的子控制器数组；复查又发现并修复了 B18（配置不是字典）。全部情况均已处理。',
+     'Fixes for the new cases: UTF-16 / UTF-32, invalid Lottie files, an empty view controller list; the review also found and fixed B18 (a configuration that is not a dictionary). Every case is handled.'),
+ 8: ('合并 master 后，新增的 11 个 Tab 键（颜色、字体、无障碍）加入配置：文件中颜色写作 "#RRGGBB"，字体写作字号、"bold:15" 或 "Menlo-Regular:12"，无障碍键做字符串检查；导出脚本与 Protobuf 结构定义（字段 22–32）同步更新。新增并处理 B19、B20。',
+     'After merging master, its 11 new tab keys (colors, fonts, accessibility) join the configuration: colors as "#RRGGBB" in files, fonts as a size, "bold:15" or "Menlo-Regular:12", the accessibility keys checked as strings; the export script and the Protobuf schema (fields 22-32) follow. B19 and B20 added and handled.'),
+ 7: ('测试固化为 scripts/configuration-tests/run-tests.sh 后，测试套件发现第 4 轮的回归（A17）：A7 的重试会把 .json 中的数组、无效的 TOML、缩进错误的 YAML 当作 .properties、TOML 表或 Protobuf 文本读取，掩盖其错误。已修复，所有测试通过。',
+     'With the tests kept as scripts/configuration-tests/run-tests.sh, the suite found a regression of round 4 (A17): the retry of A7 read a list in a .json file, invalid TOML and badly indented YAML as .properties, a TOML table or Protobuf text, hiding their errors. Fixed; every test passes.'),
+ 9: ('首次在 iOS CI 上运行静态分析：发现 `-loadConfigurationWithURLRequest:` 会把 nil URL 传给声明为 nonnull 的参数（C10）。据此复查所有 nil 与 nonnull 的边界，另发现空字符串作为 Lottie URL 会传给 +fileURLWithPath:（B21）。总分下降。',
+     'The static analyzer ran on iOS CI for the first time: `-loadConfigurationWithURLRequest:` passed a nil URL to a nonnull parameter (C10). A review of every nil / nonnull boundary then found that an empty string as a Lottie URL reached +fileURLWithPath: (B21). The score dropped.'),
+ 11: ('页面改为由跨端页面 ID 获得：删除类名键（`CYLTabBarItemViewControllerClass`、`…NavigationControllerClass`，未发布），C1–C5 随之不再适用；新增 `CYLTabBarPageRegistry`（全局与每个 TabBar 各一份）、`CYLTabBarControllerPageResolver`、自动注册的 `CYLTabBarPage`，以及远程配置字段 `CYLTabBarItemPlatforms`、`CYLTabBarItemMinimumAppVersion`、`CYLTabBarItemPageParameters`。设计时列出的新情况 B22–B25、C11–C17 在同一轮处理。',
+     'Pages now come from cross-platform page IDs: the class-name keys (`CYLTabBarItemViewControllerClass`, `…NavigationControllerClass`, unreleased) are removed, so C1–C5 no longer apply; new `CYLTabBarPageRegistry` (global and one per tab bar), `CYLTabBarControllerPageResolver`, automatically registered `CYLTabBarPage` classes, and the remote keys `CYLTabBarItemPlatforms`, `CYLTabBarItemMinimumAppVersion`, `CYLTabBarItemPageParameters`. The new cases listed during the design, B22–B25 and C11–C17, are handled in the same round.'),
+ 12: ('合并 master 的 #774（PlusButton slot 只按一条规则插入）后复查：复用已有 TabBarController 的数组时，其中的 slot 会让按下标的对应错位，slot 项还会被报告为未知键（B26）。现在先去掉 slot，再由 `-setViewControllers:` 插入一次。',
+     'Review after merging #774 from master (the PlusButton slot is inserted by one rule): re-using the arrays of an existing tab bar controller, their slot shifted the index matching and its entry was reported as an unknown key (B26). The slot is now removed first, and `-setViewControllers:` inserts it once.'),
+ 13: ('按评审（docs/Tab-Page-Registry-Review.md）改造：页面查找移到 `+[CYLTabBarPageRegistry pagesOfTabs:…]`，控制器保留页面来源并在重新加载时解析新 Tab（B27），`cyl_skippedTabs` 报告被跳过的 Tab（C19），`CYLTabBarPageProviding` 协议、`CYLTabBarPageRequest`、可配置的查找顺序与自动注册开关（C18）。',
+     'Refactored after the review (docs/Tab-Page-Registry-Review.md): page lookup moved to `+[CYLTabBarPageRegistry pagesOfTabs:…]`, the controller keeps its page sources and resolves new tabs on reload (B27), `cyl_skippedTabs` reports skipped tabs (C19), the `CYLTabBarPageProviding` protocol, `CYLTabBarPageRequest`, a configurable lookup order and an automatic-registration switch (C18).'),
+ 14: ('评审剩余项：异步页面（`CYLTabBarAsyncPageFactory`、`CYLTabBarPagePlaceholder`、`cyl_pendingPages`，C20）、自动注册的后台预热、Android 增加 plist 与 properties 格式并与 iOS 的查找顺序 / 跳过报告 / 复用对齐。',
+     'The remaining review items: asynchronous pages (`CYLTabBarAsyncPageFactory`, `CYLTabBarPagePlaceholder`, `cyl_pendingPages`, C20), background warm-up of automatic registration, and Android gains plist and properties formats plus the lookup order / skipped tabs / reuse of iOS.'),
+ 15: ('合并 #752（Rive、PAG 与共享动画层）后：通用动画键（`CYLTabBarAnimation…`）、`CYLTabBarAnimationOptions`、`CYLTabBarLottieLoopsWhenUnselected`、PAG 与 Rive 的键、顶层 `CYLTabBarControllerTabBarItemAnimationSpeed` 加入配置（Protobuf 字段 37–56 与顶层 7）；B28、B29。',
+     'After merging #752 (Rive, PAG and the shared animation layer): the generic animation keys (`CYLTabBarAnimation…`), `CYLTabBarAnimationOptions`, `CYLTabBarLottieLoopsWhenUnselected`, the PAG and Rive keys and the top-level `CYLTabBarControllerTabBarItemAnimationSpeed` join the configuration (Protobuf fields 37–56 and top-level 7); B28, B29.'),
+ 10: ('修复 C10 与 B21：本地 / 缺失 URL 由 CYLLoadLocalConfiguration() 统一处理，空字符串不再生成 file URL，演示中的请求不会带 nil URL；演示新增“B21 · Empty strings”与“C10 · Request without a URL”两行。全部情况均已处理。',
+     'C10 and B21 fixed: local / missing URLs go through CYLLoadLocalConfiguration(), an empty string no longer becomes a file URL, the demo never builds a request with a nil URL; two demo rows added, "B21 · Empty strings" and "C10 · Request without a URL". Every case is handled.'),
+ 16: ('合并 #752 的 GIF Tab 图标（#605）后：GIF 的 5 个键加入配置（按名称识别，Protobuf 字段 57–61，导出脚本），并检查 `.gif` 文件的签名（B30）；Android 端新增 GIF animator 与 `CYLTabBarGIF…` 常量。',
+     'After merging the GIF tab icons of #752 (#605): the 5 GIF keys join the configuration (known by name, Protobuf fields 57–61, the export script), and a `.gif` file is checked by its signature (B30); Android gains the GIF animator and the `CYLTabBarGIF…` constants.'),
+}
+
+
+def status(case, round_):
+    info = case[5]
+    if info.get('found', 1) > round_ or info.get('removed', 99) <= round_:
+        # Not known yet, or no longer applies (e.g. the class-name keys, removed in round 11). 尚未发现，或已不再适用（例如第 11 轮删除的类名键）。
+        return None
+    if info['fixed'] <= round_:
+        return 1.0
+    if info.get('partial') and info['partial'] <= round_:
+        return 0.5
+    return 0.0
+
+
+def score(round_):
+    values = [status(c, round_) for c in CASES]
+    values = [v for v in values if v is not None]
+    return round(100 * sum(values) / len(values)), len(values)
+
+
+def section(current):
+    out = ['<!-- edge-cases:start -->', '<!-- Generated from the edge-case checklist; the status column is the round that handled each case. -->', '']
+    out += ['| 编号 ID | 情况 | Case | 处理 | Handling | 状态 Status |', '|:---|:---|:---|:---|:---|:---|']
+    for c in CASES:
+        s = status(c, current)
+        if s is None:
+            continue
+        # [EN] Ordered comparisons: the status is 1.0, 0.5 or 0.0 (no float equality).
+        # [CN] 使用大小比较：状态为 1.0、0.5 或 0.0（不对浮点数做相等比较）。
+        if s >= 1:
+            mark = '✅ 第 %d 轮 / round %d' % (c[5]['fixed'], c[5]['fixed'])
+        elif s > 0:
+            mark = '🟡 部分 / partial'
+        else:
+            mark = '❌ 未处理 / not yet'
+        out.append('| %s | %s | %s | %s | %s | %s |' % (c[0], c[1], c[2], c[3], c[4], mark))
+    out += ['', '| 轮次 Round | 分数 Score | 情况数 Cases | 说明 | Notes | 减分项 Deductions |', '|:---|:---|:---|:---|:---|:---|']
+    for r in range(1, current + 1):
+        sc, n = score(r)
+        open_cases = [c[0] for c in CASES if status(c, r) not in (None, 1.0)]
+        out.append('| %d | %d | %d | %s | %s | %s |' % (r, sc, n, ROUNDS[r][0], ROUNDS[r][1], ', '.join(open_cases) or '—'))
+    out.append('<!-- edge-cases:end -->')
+    return '\n'.join(out)
+
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DOC = os.path.join(ROOT, 'docs', 'Configuration-File.md')
+START, END = '<!-- edge-cases:start -->', '<!-- edge-cases:end -->'
+
+
+def last_round():
+    return max(ROUNDS)
+
+
+def main():
+    current = last_round()
+    for r in range(1, current + 1):
+        sc, n = score(r)
+        open_cases = ', '.join(c[0] for c in CASES if status(c, r) not in (None, 1.0)) or 'none'
+        print('round %d: %d / 100 (%d cases); open: %s' % (r, sc, n, open_cases))
+    if '--write' in sys.argv or '--check' in sys.argv:
+        text = open(DOC, encoding='utf-8').read()
+        start, end = text.index(START), text.index(END) + len(END)
+        updated = text[:start] + section(current) + text[end:]
+        if '--check' in sys.argv:
+            if updated != text:
+                print('docs/Configuration-File.md is out of date: run python3 scripts/configuration-edge-cases.py --write')
+                return 1
+            print('docs/Configuration-File.md is up to date.')
+        elif updated != text:
+            open(DOC, 'w', encoding='utf-8').write(updated)
+            print('updated docs/Configuration-File.md')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

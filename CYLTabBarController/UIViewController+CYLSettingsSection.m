@@ -9,6 +9,7 @@
 #import "CYLLocalization.h"
 #import "UIViewController+CYLMemoryWarning.h"
 #import "UIViewController+CYLTabBarItemUpdate.h"
+#import "UIViewController+CYLConfigurationDemo.h"
 #import "UIViewController+CYLThemeSettings.h"
 #import "UITableViewCell+CYLBadgeExtention.h"
 #import "CYLTabBarController.h"
@@ -44,8 +45,15 @@ typedef NS_ENUM(NSInteger, CYLSettingsRow) {
     CYLSettingsRowPlusButtonLateImage,       // a plus button whose image is set later
     CYLSettingsRowTheme,                // issue #216, see UIViewController+CYLThemeSettings.h
     CYLSettingsRowScrollHideSimulation,   // issue #13: simulated interruptions, in an action sheet
-    CYLSettingsRowTabBarItemUpdate,     // then one row per tab item update, see UIViewController+CYLTabBarItemUpdate.h
+    CYLSettingsRowConfigurationFile,      // one configuration file creates a tab bar controller 一个配置文件生成 TabBarController
+    CYLSettingsRowConfigurationEdgeCase,  // then one row per simulated failure, see UIViewController+CYLConfigurationDemo.h
+                                          // 然后每个模拟意外情况一行，之后每个原地更新一行（UIViewController+CYLTabBarItemUpdate.h）
 };
+
+/// [EN] The first in-place update row, after the simulated failures. [CN] 第一个原地更新行，位于模拟意外情况之后。
+static NSInteger CYLSettingsRowTabBarItemUpdateStart(UIViewController *viewController) {
+    return CYLSettingsRowConfigurationEdgeCase + [viewController cyl_configurationEdgeCaseRowCount];
+}
 
 static NSString *const CYLTitlePositionAdjustmentCellIdentifier = @"CYLTitlePositionAdjustmentCell";
 
@@ -1681,7 +1689,7 @@ static UITableViewCell *CYLScrollHideSimulationMenuCell(UITableView *tableView) 
 @implementation UIViewController (CYLSettingsSection)
 
 - (NSInteger)cyl_settingsRowCount {
-    return CYLSettingsRowTabBarItemUpdate + [self cyl_tabBarItemUpdateRowCount];
+    return CYLSettingsRowTabBarItemUpdateStart(self) + [self cyl_tabBarItemUpdateRowCount];
 }
 
 - (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath {
@@ -1756,8 +1764,14 @@ static UITableViewCell *CYLScrollHideSimulationMenuCell(UITableView *tableView) 
     if (indexPath.row == CYLSettingsRowScrollHideSimulation) {
         return CYLScrollHideSimulationMenuCell(tableView);
     }
-    if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
-        return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdate];
+    if (indexPath.row == CYLSettingsRowConfigurationFile) {
+        return [self cyl_configurationDemoCellForTableView:tableView];
+    }
+    if (indexPath.row >= CYLSettingsRowTabBarItemUpdateStart(self)) {
+        return [self cyl_tabBarItemUpdateCellForTableView:tableView row:indexPath.row - CYLSettingsRowTabBarItemUpdateStart(self)];
+    }
+    if (indexPath.row >= CYLSettingsRowConfigurationEdgeCase) {
+        return [self cyl_configurationEdgeCaseCellForTableView:tableView row:indexPath.row - CYLSettingsRowConfigurationEdgeCase];
     }
     return [self cyl_languageCellForTableView:tableView];
 }
@@ -1765,11 +1779,12 @@ static UITableViewCell *CYLScrollHideSimulationMenuCell(UITableView *tableView) 
 #pragma mark - Groups
 
 /*!
- * [EN] The rows of each group, in display order. The tab item update rows follow `CYLSettingsRowTabBarItemUpdate`.
- * [CN] 每个分组中的行，按显示顺序排列。更新 Tab 的行位于 `CYLSettingsRowTabBarItemUpdate` 之后。
+ * [EN] The rows of each group, in display order. The tab item update rows start at `CYLSettingsRowTabBarItemUpdateStart()`,
+ *      after the simulated failures of configurations.
+ * [CN] 每个分组中的行，按显示顺序排列。更新 Tab 的行从 `CYLSettingsRowTabBarItemUpdateStart()` 开始，位于配置文件模拟意外情况之后。
  */
 - (NSArray<NSNumber *> *)cyl_placedSettingsRowsInGroup:(CYLSettingsGroup)group {
-    NSInteger update = CYLSettingsRowTabBarItemUpdate;
+    NSInteger update = CYLSettingsRowTabBarItemUpdateStart(self);
     switch (group) {
         case CYLSettingsGroupGeneral:
             return @[ @(CYLSettingsRowLanguage), @(CYLSettingsRowMemoryWarning) ];
@@ -1793,13 +1808,22 @@ static UITableViewCell *CYLScrollHideSimulationMenuCell(UITableView *tableView) 
         case CYLSettingsGroupHelpers:
             return @[ @(CYLSettingsRowNavigationWithoutBaseClass), @(CYLSettingsRowOutsideSuperviewBounds),
                       @(CYLSettingsRowBundleImage), @(CYLSettingsRowUtilsHelpers) ];
+        case CYLSettingsGroupConfiguration: {
+            // [EN] The configuration file row, then one row per simulated failure (docs/Configuration-File.md).
+            // [CN] 配置文件行，然后每个模拟意外情况一行（docs/Configuration-File.md）。
+            NSMutableArray<NSNumber *> *rows = [NSMutableArray arrayWithObject:@(CYLSettingsRowConfigurationFile)];
+            for (NSInteger row = CYLSettingsRowConfigurationEdgeCase; row < update; row++) {
+                [rows addObject:@(row)];
+            }
+            return rows;
+        }
     }
     return @[];
 }
 
 - (NSArray<NSNumber *> *)cyl_settingsGroups {
     NSMutableArray<NSNumber *> *groups = [NSMutableArray array];
-    for (NSInteger group = CYLSettingsGroupGeneral; group <= CYLSettingsGroupHelpers; group++) {
+    for (NSInteger group = CYLSettingsGroupGeneral; group <= CYLSettingsGroupConfiguration; group++) {
         if ([self cyl_settingsRowsInGroup:(CYLSettingsGroup)group].count > 0) {
             [groups addObject:@(group)];
         }
@@ -1816,6 +1840,7 @@ static UITableViewCell *CYLScrollHideSimulationMenuCell(UITableView *tableView) 
         case CYLSettingsGroupPlusButton: return @"PlusButton";
         case CYLSettingsGroupTabInteractions: return CYLLocalizedString(@"Tab 交互");
         case CYLSettingsGroupHelpers: return CYLLocalizedString(@"无需继承基类与工具方法");
+        case CYLSettingsGroupConfiguration: return CYLLocalizedString(@"配置文件");
     }
     return @"";
 }
@@ -1831,7 +1856,7 @@ static UITableViewCell *CYLScrollHideSimulationMenuCell(UITableView *tableView) 
     if (group == CYLSettingsGroupGeneral) {
         // [EN] Rows no group places (a newer row) stay visible here. [CN] 未被任何分组归类的行（新增的行）放在这里，保证可见。
         NSMutableSet<NSNumber *> *placed = [NSMutableSet set];
-        for (NSInteger each = CYLSettingsGroupGeneral; each <= CYLSettingsGroupHelpers; each++) {
+        for (NSInteger each = CYLSettingsGroupGeneral; each <= CYLSettingsGroupConfiguration; each++) {
             [placed addObjectsFromArray:[self cyl_placedSettingsRowsInGroup:(CYLSettingsGroup)each]];
         }
         for (NSInteger row = 0; row < rowCount; row++) {
@@ -1933,12 +1958,16 @@ static UITableViewCell *CYLScrollHideSimulationMenuCell(UITableView *tableView) 
         }];
     } else if (indexPath.row == CYLSettingsRowScrollHideSimulation) {
         [self cyl_presentScrollHideSimulationMenu];
-    } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdate) {
-        [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdate];
+    } else if (indexPath.row == CYLSettingsRowConfigurationFile) {
+        [self cyl_presentConfigurationDemo];
+    } else if (indexPath.row >= CYLSettingsRowConfigurationEdgeCase && indexPath.row < CYLSettingsRowTabBarItemUpdateStart(self)) {
+        [self cyl_runConfigurationEdgeCaseAtRow:indexPath.row - CYLSettingsRowConfigurationEdgeCase];
+    } else if (indexPath.row >= CYLSettingsRowTabBarItemUpdateStart(self)) {
+        [self cyl_didSelectTabBarItemUpdateRow:indexPath.row - CYLSettingsRowTabBarItemUpdateStart(self)];
         // [EN] The rows show which changes are on (a checkmark).
         // [CN] 各行用勾号显示已应用的更改。
         NSMutableArray<NSIndexPath *> *indexPaths = [NSMutableArray array];
-        for (NSInteger row = CYLSettingsRowTabBarItemUpdate; row < [self cyl_settingsRowCount]; row++) {
+        for (NSInteger row = CYLSettingsRowTabBarItemUpdateStart(self); row < [self cyl_settingsRowCount]; row++) {
             [indexPaths addObject:[NSIndexPath indexPathForRow:row inSection:indexPath.section]];
         }
         [tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];

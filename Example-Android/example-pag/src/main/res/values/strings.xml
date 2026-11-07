@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CYLTabBar PAG</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_health">Health</string>
+    <string name="tab_moments">Moments</string>
+    <string name="tab_me">Me</string>
+    <string name="menu">Menu</string>
+    <string name="contacts">Contacts</string>
+    <string name="skip">Skip %1$d</string>
+    <string name="next">Next</string>
+    <string name="full_screen">Full screen</string>
+    <string name="child_hint">Tap the page to create the tab bar again</string>
+    <string name="next_hint">Tap the page to create the tab bar with "Me" selected</string>
+    <string name="missing_pag">PAG files missing: run python3 scripts/fetch-animation-resources.py PAGResources, then build again. The tabs show their images.</string>
+</resources>

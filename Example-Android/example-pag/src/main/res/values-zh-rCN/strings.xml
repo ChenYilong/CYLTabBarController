@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CYLTabBar PAG</string>
+    <string name="tab_home">首页</string>
+    <string name="tab_health">健康</string>
+    <string name="tab_moments">朋友圈</string>
+    <string name="tab_me">我的</string>
+    <string name="menu">菜单</string>
+    <string name="contacts">通讯录</string>
+    <string name="skip">跳过 %1$d</string>
+    <string name="next">下一页</string>
+    <string name="full_screen">全屏</string>
+    <string name="child_hint">点击页面重新创建 TabBar</string>
+    <string name="next_hint">点击页面重新创建 TabBar 并选中“我的”</string>
+    <string name="missing_pag">缺少 PAG 文件：请执行 python3 scripts/fetch-animation-resources.py PAGResources 后重新构建。Tab 显示其图片。</string>
+</resources>

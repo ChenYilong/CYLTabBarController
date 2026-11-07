@@ -255,6 +255,15 @@
 "跳转与对比" = "नेविगेशन और तुलना";
 "角标" = "बैज";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass में समर्थित नहीं: टैब बार की ऊँचाई सिस्टम तय करता है (FlatDesign और क्लासिक शैली समर्थित)";
+"从配置文件创建 TabBarController" = "कॉन्फ़िगरेशन फ़ाइल से TabBarController बनाएँ";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "एक फ़ाइल पूरा टैब बार बनाती है: JSON, YAML, TOML, plist, XML, INI आदि चुनें, या URL से लोड करें।";
+"选择配置文件" = "कॉन्फ़िगरेशन फ़ाइल चुनें";
+"从网络 URL 加载" = "URL से लोड करें";
+"无法创建 TabBarController" = "TabBarController नहीं बनाया जा सका";
+"本页由配置文件 %@ 创建：" = "यह पेज कॉन्फ़िगरेशन %@ से बनाया गया है:";
+"配置文件：模拟意外情况" = "कॉन्फ़िगरेशन: नकली विफलताएँ";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController सुरक्षित रूप से बनाया गया: %@ टैब";
+"查看" = "देखें";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "स्क्रॉल पर छिपाना: रुकावटों का सिमुलेशन (issue #13)";
@@ -314,6 +323,8 @@
 "仅配色" = "केवल रंग";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "टैप करें";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "दो टैब बार एक ही कॉन्फ़िगरेशन इस्तेमाल करते हैं; हर एक की रजिस्ट्री समान पेज ID को अलग पेजों से जोड़ती है।";
+"两个 TabBar，同一个页面 ID" = "दो टैब बार, एक पेज ID";
 
 /* A plus button whose image is set later (demo row). */
 "加载图片" = "छवि लोड करें";
@@ -349,7 +360,11 @@
 "展开全部 %@ 个模拟" = "सभी %@ सिमुलेशन दिखाएँ";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "सिमुलेशन सूची समेटें";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "%1$@ टैब छोड़े गए: %2$@";
 
 /* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
 "网络图标" = "नेटवर्क आइकन";
 "网络图标、标题与配色" = "नेटवर्क आइकन, शीर्षक और रंग";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "कॉन्फ़िगरेशन फ़ाइल";

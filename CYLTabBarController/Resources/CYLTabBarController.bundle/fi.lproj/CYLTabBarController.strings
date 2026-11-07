@@ -255,6 +255,15 @@
 "跳转与对比" = "Navigointi ja vertailut";
 "角标" = "Merkit";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass ei tue: järjestelmä määrää palkin korkeuden (FlatDesign ja klassinen tyyli tukevat)";
+"从配置文件创建 TabBarController" = "Luo TabBarController määritystiedostosta";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Yksi tiedosto luo koko välilehtipalkin: valitse JSON, YAML, TOML, plist, XML, INI ym. tai lataa URL-osoitteesta.";
+"选择配置文件" = "Valitse määritystiedosto";
+"从网络 URL 加载" = "Lataa URL-osoitteesta";
+"无法创建 TabBarController" = "TabBarControlleria ei voitu luoda";
+"本页由配置文件 %@ 创建：" = "Tämä sivu luotiin määrityksestä %@:";
+"配置文件：模拟意外情况" = "Määritys: simuloidut virheet";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController luotiin turvallisesti: %@ välilehteä";
+"查看" = "Näytä";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Piilota vieritettäessä: simuloi keskeytyksiä (issue #13)";
@@ -314,6 +323,8 @@
 "仅配色" = "Vain värit";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Napauta";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Kaksi välilehtipalkkia käyttää samaa määritystä; kummankin rekisteri yhdistää samat sivutunnukset eri sivuihin.";
+"两个 TabBar，同一个页面 ID" = "Kaksi välilehtipalkkia, yksi sivutunnus";
 
 /* A plus button whose image is set later (demo row). */
 "加载图片" = "Lataa kuva";
@@ -349,7 +360,11 @@
 "展开全部 %@ 个模拟" = "Näytä kaikki %@ simulaatiota";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Tiivistä simulaatioluettelo";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "%1$@ välilehteä ohitettu: %2$@";
 
 /* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
 "网络图标" = "Verkkokuvakkeet";
 "网络图标、标题与配色" = "Verkkokuvakkeet, otsikot ja värit";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Määritystiedosto";

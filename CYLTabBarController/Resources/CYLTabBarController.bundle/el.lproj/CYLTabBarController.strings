@@ -255,6 +255,15 @@
 "跳转与对比" = "Πλοήγηση και συγκρίσεις";
 "角标" = "Σήματα";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Δεν υποστηρίζεται στο Liquid Glass: το σύστημα ορίζει το ύψος (το υποστηρίζουν το FlatDesign και το κλασικό στυλ)";
+"从配置文件创建 TabBarController" = "Δημιουργία TabBarController από αρχείο ρυθμίσεων";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Ένα αρχείο δημιουργεί ολόκληρη τη γραμμή καρτελών: επιλέξτε JSON, YAML, TOML, plist, XML, INI κ.ά. ή φορτώστε το από URL.";
+"选择配置文件" = "Επιλέξτε αρχείο ρυθμίσεων";
+"从网络 URL 加载" = "Φόρτωση από URL";
+"无法创建 TabBarController" = "Δεν ήταν δυνατή η δημιουργία του TabBarController";
+"本页由配置文件 %@ 创建：" = "Αυτή η σελίδα δημιουργήθηκε από τις ρυθμίσεις %@:";
+"配置文件：模拟意外情况" = "Ρυθμίσεις: προσομοίωση σφαλμάτων";
+"已安全创建 TabBarController：%@ 个 Tab" = "Το TabBarController δημιουργήθηκε με ασφάλεια: %@ καρτέλες";
+"查看" = "Προβολή";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Απόκρυψη κατά την κύλιση: προσομοίωση διακοπών (issue #13)";
@@ -314,6 +323,8 @@
 "仅配色" = "Μόνο χρώματα";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Πάτα με";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Δύο γραμμές καρτελών μοιράζονται μία διαμόρφωση· το μητρώο της καθεμιάς αντιστοιχίζει τα ίδια ID σελίδων σε διαφορετικές σελίδες.";
+"两个 TabBar，同一个页面 ID" = "Δύο γραμμές καρτελών, ένα ID σελίδας";
 
 /* A plus button whose image is set later (demo row). */
 "加载图片" = "Φόρτωση εικόνας";
@@ -349,7 +360,11 @@
 "展开全部 %@ 个模拟" = "Εμφάνιση και των %@ προσομοιώσεων";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Σύμπτυξη λίστας προσομοιώσεων";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "Παραλείφθηκαν %1$@ καρτέλες: %2$@";
 
 /* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
 "网络图标" = "Εικονίδια από το δίκτυο";
 "网络图标、标题与配色" = "Εικονίδια από το δίκτυο, τίτλοι και χρώματα";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Αρχείο ρυθμίσεων";

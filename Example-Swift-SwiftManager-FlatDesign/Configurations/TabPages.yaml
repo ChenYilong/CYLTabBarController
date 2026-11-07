@@ -1,0 +1,16 @@
+CYLTabBarControllerTabBarItemAnimationSpeed: "1.5"
+CYLTabBarControllerTabBarItemsAttributes:
+  - CYLTabBarItemTitle: "Home"
+    CYLTabBarItemImage: "system:house"
+    CYLTabBarItemPageIdentifier: "swift-home"
+  - CYLTabBarItemTitle: "Auto"
+    CYLTabBarItemImage: "system:star"
+    CYLTabBarItemPageIdentifier: "swift-auto"
+  - CYLTabBarItemTitle: "Docs"
+    CYLTabBarItemImage: "system:book"
+    CYLTabBarItemPageIdentifier: "swift-docs"
+    CYLTabBarItemPageParameters:
+      "topic": "Documentation"
+  - CYLTabBarItemTitle: "Missing"
+    CYLTabBarItemImage: "system:questionmark"
+    CYLTabBarItemPageIdentifier: "no-such-page"

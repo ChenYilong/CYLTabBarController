@@ -1,0 +1,41 @@
+// JSON5: comments, unquoted keys, single quotes and trailing commas.
+// JSON5：注释、不加引号的键、单引号与尾逗号。
+{
+  CYLTabBarControllerContext: 'CYLConfigurationDemo',
+  CYLTabBarControllerStyleType: 'default',
+  CYLTabBarControllerImageInsets: '{0, 0, 0, 0}',
+  CYLTabBarControllerTitlePositionAdjustment: '{0, -2}',
+  /* One dictionary per tab. 每个 Tab 一个字典。 */
+  CYLTabBarControllerTabBarItemsAttributes: [
+    {
+      CYLTabBarItemTitle: 'JSON5',
+      CYLTabBarItemImage: 'system:house',
+      CYLTabBarItemSelectedImage: 'system:house.fill',
+      CYLTabBarItemIdentifier: 'home',
+    },
+    {
+      CYLTabBarItemTitle: 'Message',
+      CYLTabBarItemImage: 'system:message',
+      CYLTabBarItemSelectedImage: 'system:message.fill',
+      CYLTabBarItemIdentifier: 'message',
+      CYLTabBarItemPlatforms: 'ios,android',
+    },
+    {
+      CYLTabBarItemTitle: 'Discover',
+      CYLTabBarItemImage: 'system:safari',
+      CYLTabBarItemSelectedImage: 'system:safari.fill',
+      CYLTabBarItemIdentifier: 'discover',
+      CYLTabBarItemPageIdentifier: 'web',
+      CYLTabBarItemPageParameters: { url: 'https://github.com/ChenYilong/CYLTabBarController' },
+      CYLTabBarItemImageInsets: '{1, 0, -1, 0}',
+    },
+    {
+      CYLTabBarItemTitle: 'Me',
+      CYLTabBarItemImage: 'system:person',
+      CYLTabBarItemSelectedImage: 'system:person.fill',
+      CYLTabBarItemIdentifier: 'me',
+      CYLTabBarItemMinimumAppVersion: '1.0.0',
+      CYLTabBarItemTitlePositionAdjustment: '{0, -1}',
+    },
+  ],
+}

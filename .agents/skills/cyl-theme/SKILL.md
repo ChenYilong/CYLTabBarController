@@ -24,3 +24,11 @@ Main document: [Theme-Switching](../../../docs/Theme-Switching.md). In-place upd
 ## Check
 
 `scripts/plus-child-theme-test.sh` and `STYLE=FlatDesign scripts/theme-screenshots.sh`; see [Plus-Child-Theme-Switching-Test](../../../docs/Plus-Child-Theme-Switching-Test.md).
+
+## Android: theme values (Android only)
+
+The Android library follows the same `CYLThemeManager` model. On top of it, theme values (adapted from QMUI_Android) let any view follow a theme by name: `View.cyl_themeValue = "textColor:title|background:surface"` (or `CYLThemeValueBuilder`, or `app:cyl_themeTextColor="title"` with `CYLThemeValues.installLayoutInflaterFactory` before `super.onCreate`). Names resolve in the current theme: a `CYLThemeStyle(R.style.X)` (theme attributes), a `Map`, or a `CYLThemeValueProviding`. Views outside a tab bar controller's activity need `CYLThemeValues.register(target)`. Never add these to the iOS API; they have no iOS twin. Details: docs/Android-Library.md, "Android-only extensions".
+
+## Skins in a configuration file (iOS and Android)
+
+A configuration file can carry skins: `CYLTabBarControllerThemes` (identifier -> named values), `CYLTabBarControllerThemeIdentifier` (base and first skin), `CYLTabBarControllerDarkThemeIdentifier` (Dark Mode) and `CYLTabBarControllerThemeManagerName`. Tab values written `"@name"` take the current skin's value; reserved names (`CYLTabBarBackgroundColor`, `CYLTabBarShadowColor`, the bar-wide title / icon colors and fonts) style the whole bar. Each skin is a `CYLTabBarConfigurationTheme` registered with the manager, so switching is `manager.currentThemeIdentifier = "dark"` and goes through the usual `CYLTabBarTheme` path. Use this instead of writing a `CYLTabBarTheme` class when the skins are data. Details: docs/Configuration-File.md, "Skins".

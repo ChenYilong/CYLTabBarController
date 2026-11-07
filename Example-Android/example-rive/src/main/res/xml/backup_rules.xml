@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- [EN] Before Android 12: nothing in backups either. [CN] Android 12 之前：同样不备份任何数据。 -->
+<full-backup-content>
+    <exclude domain="root" path="." />
+</full-backup-content>

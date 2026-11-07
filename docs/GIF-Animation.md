@@ -146,6 +146,7 @@ flowchart LR
 | 中文 | English |
 |:---|:---|
 | `Example-GIF`：第 1 个 Tab 使用 `CYLTabBarGIFFilePath`，第 2 个 Tab 使用 `CYLTabBarItemAttributesAddingAnimationFile()`，都是选中时播放一次；第 3 个 Tab 使用 `CYLTabBarItemImageURL`，一直循环；第 4 个 Tab 是静态图片。素材来自 Google 的 Noto Emoji Animation（CC BY 4.0），见 [Example-GIF/README.md](../Example-GIF/README.md)。 | `Example-GIF`: tab 1 uses `CYLTabBarGIFFilePath` and tab 2 `CYLTabBarItemAttributesAddingAnimationFile()`, both playing once when selected; tab 3 uses `CYLTabBarItemImageURL` and keeps looping; tab 4 is a static image. The icons are Google's Noto Emoji Animation (CC BY 4.0), see [Example-GIF/README.md](../Example-GIF/README.md). |
+| Android 版 `example-gif`（[Android-Examples.md](Android-Examples.md)）使用同样的 GIF 文件与 key；Android 库的 `CYLGIFDrawable` 让作为图片传入的 GIF 同样循环播放。 | The Android `example-gif` ([Android-Examples.md](Android-Examples.md)) uses the same GIF files and keys; the Android library's `CYLGIFDrawable` makes a GIF given as an image loop too. |
 
 ## [CN]限制
 ## [EN]Limits

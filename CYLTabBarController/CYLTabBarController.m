@@ -68,6 +68,35 @@ NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
 NSString *const CYLTabBarItemIdentifier = @"CYLTabBarItemIdentifier";
+NSString *const CYLTabBarItemPageIdentifier = @"CYLTabBarItemPageIdentifier";
+NSString *const CYLTabBarItemPageParameters = @"CYLTabBarItemPageParameters";
+NSString *const CYLTabBarItemPlatforms = @"CYLTabBarItemPlatforms";
+NSString *const CYLTabBarItemMinimumAppVersion = @"CYLTabBarItemMinimumAppVersion";
+NSString *const CYLTabBarControllerViewControllers = @"CYLTabBarControllerViewControllers";
+NSString *const CYLTabBarControllerTabBarItemsAttributes = @"CYLTabBarControllerTabBarItemsAttributes";
+NSString *const CYLTabBarControllerImageInsets = @"CYLTabBarControllerImageInsets";
+NSString *const CYLTabBarControllerTitlePositionAdjustment = @"CYLTabBarControllerTitlePositionAdjustment";
+NSString *const CYLTabBarControllerStyleType = @"CYLTabBarControllerStyleType";
+NSString *const CYLTabBarControllerContext = @"CYLTabBarControllerContext";
+NSString *const CYLTabBarControllerPageRegistry = @"CYLTabBarControllerPageRegistry";
+NSString *const CYLTabBarControllerPageResolver = @"CYLTabBarControllerPageResolver";
+NSString *const CYLTabBarControllerPageLookupOrder = @"CYLTabBarControllerPageLookupOrder";
+NSString *const CYLTabBarControllerAutomaticPageRegistration = @"CYLTabBarControllerAutomaticPageRegistration";
+NSString *const CYLTabBarControllerTabBarItemAnimationSpeed = @"CYLTabBarControllerTabBarItemAnimationSpeed";
+NSString *const CYLTabBarControllerThemes = @"CYLTabBarControllerThemes";
+NSString *const CYLTabBarControllerThemeIdentifier = @"CYLTabBarControllerThemeIdentifier";
+NSString *const CYLTabBarControllerDarkThemeIdentifier = @"CYLTabBarControllerDarkThemeIdentifier";
+NSString *const CYLTabBarControllerThemeManagerName = @"CYLTabBarControllerThemeManagerName";
+NSString *const CYLTabBarThemeIdentifier = @"CYLTabBarThemeIdentifier";
+NSString *const CYLTabBarThemeValues = @"CYLTabBarThemeValues";
+NSString *const CYLTabBarBackgroundColor = @"CYLTabBarBackgroundColor";
+NSString *const CYLTabBarShadowColor = @"CYLTabBarShadowColor";
+NSString *const CYLTabBarAnimationOptions = @"CYLTabBarAnimationOptions";
+/// [EN] Private: marks a tab left out by `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` (set by the normalization).
+/// [CN] 私有：标记被 `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` 排除的 Tab（由规范化设置）。
+static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
+/// [EN] Private: set by the parameter initializers, which keep an empty view controller list (C9). [CN] 私有：由参数初始化方法设置，保持空的子控制器列表（C9）。
+static NSString *const CYLTabBarControllerKeepsEmptyViewControllersKey = @"_CYLTabBarControllerKeepsEmptyViewControllers";
 NSString *const CYLTabBarItemTitleColor = @"CYLTabBarItemTitleColor";
 NSString *const CYLTabBarItemSelectedTitleColor = @"CYLTabBarItemSelectedTitleColor";
 NSString *const CYLTabBarItemIconColor = @"CYLTabBarItemIconColor";
@@ -243,6 +272,17 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 
 @interface CYLTabBarController () <UITabBarControllerDelegate>
 
+/// [EN] Page registry state (docs/Tab-Page-Registry.md): whether the tabs came from page IDs, the sources, the pages by
+///      ID (for `-reloadTabBarItemsWithAttributes:`) and the skipped tabs.
+/// [CN] 页面注册表状态（docs/Tab-Page-Registry.md）：Tab 是否来自页面 ID、页面来源、按 ID 分组的页面（供
+///      `-reloadTabBarItemsWithAttributes:` 使用）与被跳过的 Tab。
+@property (nonatomic, assign) BOOL pagesFromPageIdentifiers;
+@property (nonatomic, strong, nullable) id<CYLTabBarPageProviding> pageRegistry;
+@property (nonatomic, copy, nullable) CYLTabBarPageProvider pageResolver;
+@property (nonatomic, copy, nullable) NSArray<CYLTabBarPageSource> *pageLookupOrder;
+@property (nonatomic, strong, nullable) NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *pagesByPageIdentifier;
+@property (nonatomic, copy) NSArray<CYLTabBarSkippedTab *> *skippedTabs;
+
 // [EN] The plus button's slot (see "Plus slot" below): the guards every count and index goes through.
 // [CN] PlusButton 的 slot（见下文 "Plus slot"）：所有数量与下标都经过这些判断。
 - (BOOL)cyl_isPlusSlotViewController:(UIViewController *)viewController;
@@ -275,6 +315,13 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 //@property (nonatomic, readwrite) CYLFlatDesignTabBar *cyl_tabBar;
 #else
 #endif
+@end
+
+
+/// [EN] Asynchronous pages (docs/Tab-Page-Registry.md); implemented at the end of this file. [CN] 异步页面（docs/Tab-Page-Registry.md）；实现见本文件末尾。
+@interface CYLTabBarController (CYLPendingPages)
+- (void)cyl_adoptPendingPages;
+- (void)cyl_placeholderDidFinishLoading:(UIViewController *)placeholder;
 @end
 
 
@@ -1979,11 +2026,135 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
                 titlePositionAdjustment:(UIOffset)titlePositionAdjustment
                               styleType:(CYLTabBarStyleType)styleType
                                 context:(nullable NSString *)context {
+    // [EN] Every initializer ends here, with its parameters as one configuration.
+    // [CN] 所有初始化方法都汇集到这里，参数组成一个配置字典。
+    NSMutableDictionary<NSString *, id> *configuration = [NSMutableDictionary dictionary];
+    configuration[CYLTabBarControllerViewControllers] = viewControllers ?: @[];
+    configuration[CYLTabBarControllerTabBarItemsAttributes] = tabBarItemsAttributes ?: @[];
+    configuration[CYLTabBarControllerImageInsets] = [NSValue valueWithUIEdgeInsets:imageInsets];
+    configuration[CYLTabBarControllerTitlePositionAdjustment] = [NSValue valueWithUIOffset:titlePositionAdjustment];
+    configuration[CYLTabBarControllerStyleType] = @(styleType);
+    configuration[CYLTabBarControllerContext] = context;
+    // These initializers keep an empty view controller list empty (C9 is for configurations).
+    // 这些初始化方法保持空的子控制器列表不变（C9 只针对配置）。
+    configuration[CYLTabBarControllerKeepsEmptyViewControllersKey] = @YES;
+    return [self initWithConfiguration:configuration];
+}
+
++ (instancetype)tabBarControllerWithConfiguration:(NSDictionary<NSString *, id> *)configuration {
+    return [[self alloc] initWithConfiguration:configuration];
+}
+
+/// [EN] Private: the reason of a left-out tab; the same key as in CYLTabBarController+CYLConfiguration.m. [CN] 私有：被排除的 Tab 的原因；与 CYLTabBarController+CYLConfiguration.m 中的键相同。
+static NSString *const CYLTabBarItemExclusionReasonKey = @"_CYLTabBarItemExclusionReason";
+
+/*!
+ * [EN] The tabs that may get a page: placeholders for invalid tabs (B4) and tabs left out by their platforms or minimum
+ *      version (B22) are reported in `skipped` instead. The lookup itself is `+[CYLTabBarPageRegistry pagesOfTabs:...]`.
+ * [CN] 可以获得页面的 Tab：无效 Tab 的占位（B4）与因平台或最低版本被排除的 Tab（B22）记录到 `skipped` 中。查找本身见
+ *      `+[CYLTabBarPageRegistry pagesOfTabs:...]`。
+ */
+static NSArray<NSDictionary *> *CYLResolvableTabs(NSArray<NSDictionary *> *items, NSMutableArray<CYLTabBarSkippedTab *> *skipped) {
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (id item in items) {
+        if (![item isKindOfClass:[NSDictionary class]] || [(NSDictionary *)item count] == 0) {
+            [skipped addObject:[CYLTabBarSkippedTab skippedTabWithReason:CYLTabBarPageSkipReasonInvalidTab pageIdentifier:nil attributes:nil
+                                                                  detail:@"a placeholder for a tab that is not a dictionary"]];
+            continue;
+        }
+        NSDictionary *attributes = item;
+        if ([attributes[CYLTabBarItemExcludedKey] boolValue]) {
+            [skipped addObject:[CYLTabBarSkippedTab skippedTabWithReason:CYLTabBarPageSkipReasonExcluded
+                                                          pageIdentifier:[CYLTabBarPageRegistry pageIdentifierOfTab:attributes]
+                                                              attributes:attributes detail:attributes[CYLTabBarItemExclusionReasonKey]]];
+            continue;
+        }
+        [tabs addObject:attributes];
+    }
+    return tabs;
+}
+
+/*!
+ * [EN] The lookup order of a normalized configuration: `CYLTabBarControllerPageLookupOrder` (else the default), without
+ *      "automatic" when `CYLTabBarControllerAutomaticPageRegistration` is NO.
+ * [CN] 规范化配置的查找顺序：`CYLTabBarControllerPageLookupOrder`（否则默认顺序）；`CYLTabBarControllerAutomaticPageRegistration` 为 NO 时
+ *      去掉 "automatic"。
+ */
+static NSArray<CYLTabBarPageSource> *CYLPageLookupOrderOfConfiguration(NSDictionary<NSString *, id> *normalized) {
+    NSArray<CYLTabBarPageSource> *order = [normalized[CYLTabBarControllerPageLookupOrder] isKindOfClass:[NSArray class]]
+        ? normalized[CYLTabBarControllerPageLookupOrder] : CYLTabBarPageRegistry.defaultPageLookupOrder;
+    id automatic = normalized[CYLTabBarControllerAutomaticPageRegistration];
+    if (automatic && ![automatic boolValue]) {
+        NSMutableArray<CYLTabBarPageSource> *withoutAutomatic = [order mutableCopy];
+        [withoutAutomatic removeObject:CYLTabBarPageSourceAutomaticRegistration];
+        order = withoutAutomatic;
+    }
+    return [order copy];
+}
+
+/// [EN] The pages by page ID, in tab order (one ID may have several pages). [CN] 按页面 ID 分组的页面（按 Tab 顺序；一个 ID 可以有多个页面）。
+static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CYLPagesByPageIdentifier(NSArray<UIViewController *> *pages,
+                                                                                                        NSArray<NSDictionary *> *tabs) {
+    NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *pagesByIdentifier = [NSMutableDictionary dictionary];
+    for (NSUInteger index = 0; index < MIN(pages.count, tabs.count); index++) {
+        NSString *pageIdentifier = [CYLTabBarPageRegistry pageIdentifierOfTab:tabs[index]];
+        if (!pageIdentifier) {
+            continue;
+        }
+        NSMutableArray<UIViewController *> *list = pagesByIdentifier[pageIdentifier] ?: [NSMutableArray array];
+        [list addObject:pages[index]];
+        pagesByIdentifier[pageIdentifier] = list;
+    }
+    return pagesByIdentifier;
+}
+
+- (instancetype)initWithConfiguration:(NSDictionary<NSString *, id> *)configuration {
+#if defined(DEBUG) || defined(BETA)
+    if (![NSThread isMainThread]) {
+        NSLog(@"🔴 CYLTabBarController: created off the main thread; UIKit objects must be created on the main thread.");
+    }
+#endif
+    NSDictionary<NSString *, id> *normalized = [CYLTabBarController cyl_normalizedConfiguration:configuration ?: @{}];
+    NSArray<NSDictionary *> *tabBarItemsAttributes = normalized[CYLTabBarControllerTabBarItemsAttributes] ?: @[];
+    NSArray<UIViewController *> *viewControllers = normalized[CYLTabBarControllerViewControllers];
+    if (viewControllers.count == 0 && ![normalized[CYLTabBarControllerKeepsEmptyViewControllersKey] boolValue]) {
+        // An empty list (or one with no valid view controller) is treated as missing (C9). 空列表（或没有有效控制器的列表）视为未提供（C9）。
+        viewControllers = nil;
+    }
+    BOOL viewControllersFromCode = (viewControllers != nil);
+    NSMutableArray<CYLTabBarSkippedTab *> *skippedTabs = [NSMutableArray array];
+    id<CYLTabBarPageProviding> pageRegistry = nil;
+    CYLTabBarPageProvider pageResolver = nil;
+    NSArray<CYLTabBarPageSource> *pageLookupOrder = nil;
+    if (!viewControllersFromCode) {
+        // Created from the page IDs: placeholders (B4), left-out tabs (B22) and tabs without a page (C11) are skipped and
+        // listed in `cyl_skippedTabs`. 根据页面 ID 创建：跳过占位（B4）、被排除的 Tab（B22）与没有页面的 Tab（C11），记录在 `cyl_skippedTabs` 中。
+        pageRegistry = [normalized[CYLTabBarControllerPageRegistry] conformsToProtocol:@protocol(CYLTabBarPageProviding)]
+            ? normalized[CYLTabBarControllerPageRegistry] : nil;
+        pageResolver = normalized[CYLTabBarControllerPageResolver];
+        pageLookupOrder = CYLPageLookupOrderOfConfiguration(normalized);
+        NSMutableArray<NSDictionary<NSString *, id> *> *keptItems = [NSMutableArray array];
+        viewControllers = [CYLTabBarPageRegistry pagesOfTabs:CYLResolvableTabs(tabBarItemsAttributes, skippedTabs)
+                                                    registry:pageRegistry resolver:pageResolver lookupOrder:pageLookupOrder
+                                                    keptTabs:keptItems skipped:skippedTabs];
+        tabBarItemsAttributes = keptItems;
+    }
+    NSValue *imageInsetsValue = normalized[CYLTabBarControllerImageInsets];
+    NSValue *titlePositionAdjustmentValue = normalized[CYLTabBarControllerTitlePositionAdjustment];
+    UIEdgeInsets imageInsets = imageInsetsValue ? imageInsetsValue.UIEdgeInsetsValue : UIEdgeInsetsZero;
+    UIOffset titlePositionAdjustment = titlePositionAdjustmentValue ? titlePositionAdjustmentValue.UIOffsetValue : UIOffsetZero;
+    CYLTabBarStyleType styleType = (CYLTabBarStyleType)[normalized[CYLTabBarControllerStyleType] integerValue];
+    NSString *context = normalized[CYLTabBarControllerContext];
     if (self = [super init]) {
         _imageInsets = imageInsets;
         _titlePositionAdjustment = titlePositionAdjustment;
         _tabBarItemsAttributes = tabBarItemsAttributes;
         _adjustTabBarItemImageViewSizeDependOnSuperView = YES;
+        _pagesFromPageIdentifiers = !viewControllersFromCode;
+        _pageRegistry = pageRegistry;
+        _pageResolver = [pageResolver copy];
+        _pageLookupOrder = pageLookupOrder;
+        _pagesByPageIdentifier = viewControllersFromCode ? nil : CYLPagesByPageIdentifier(viewControllers, tabBarItemsAttributes);
 #if CYL_FLATDESIGN_AVAILABLE
         // FlatDesign only. Before a subclass customizes the tab bar: tells an app's `standardAppearance` from the default one.
         // 仅用于扁平样式。在子类自定义 TabBar 之前：用于区分 App 设置的 `standardAppearance` 与默认值。
@@ -1999,9 +2170,48 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
         // [EN] Step 2: must use the setter and must be set before self.viewControllers, because
         //      self.viewControllers directly involves
         //      the style context and PlusButton detection logic. Otherwise the context always stays at its default value
+        if (viewControllersFromCode) {
+            // [EN] Without the PlusButton slot (#774): the slot of an existing tab bar controller (its `viewControllers`
+            //      re-used) is not an app tab, and would shift the index matching below (B26). Needs the context (step 2).
+            // [CN] 去掉 PlusButton 的 slot（#774）：已有 TabBarController 的 slot（复用其 `viewControllers`）不是 App 的 Tab，
+            //      会让下面按下标的对应错位（B26）。需要先设置 context（步骤 2）。
+            viewControllers = [self cyl_viewControllersByRemovingPlusSlot:viewControllers];
+            // From code, matched by index: a tab left out by its platforms or minimum version takes its view controller out (B22).
+            // 代码传入，按下标对应：因平台或最低版本被排除的 Tab 连同其子控制器一起移除（B22）。
+            NSMutableArray<NSDictionary *> *keptItems = [NSMutableArray array];
+            NSMutableArray<UIViewController *> *keptViewControllers = [NSMutableArray array];
+            for (NSUInteger index = 0; index < MAX(tabBarItemsAttributes.count, viewControllers.count); index++) {
+                NSDictionary *item = index < tabBarItemsAttributes.count ? tabBarItemsAttributes[index] : nil;
+                if ([item[CYLTabBarItemExcludedKey] boolValue]) {
+                    [skippedTabs addObject:[CYLTabBarSkippedTab skippedTabWithReason:CYLTabBarPageSkipReasonExcluded
+                                                                      pageIdentifier:[CYLTabBarPageRegistry pageIdentifierOfTab:item]
+                                                                          attributes:item detail:item[CYLTabBarItemExclusionReasonKey]]];
+                    continue;
+                }
+                if (item) {
+                    [keptItems addObject:item];
+                }
+                if (index < viewControllers.count) {
+                    [keptViewControllers addObject:viewControllers[index]];
+                }
+            }
+            tabBarItemsAttributes = keptItems;
+            viewControllers = keptViewControllers;
+            _tabBarItemsAttributes = tabBarItemsAttributes;
+        }
+        _skippedTabs = [skippedTabs copy];
         self.viewControllers = viewControllers;// [CN] 步骤3 must use setter,必须在 self.tabBarStyleType之后设置， 因为 self.viewControllers 直接涉及到扁平TabBar样式KVC逻辑。
         // [EN] Step 3: must use the setter and must be set after self.tabBarStyleType,
         //      because self.viewControllers directly involves the KVC logic of the flat TabBar style.
+        [self cyl_adoptPendingPages];
+        NSNumber *animationSpeed = normalized[CYLTabBarControllerTabBarItemAnimationSpeed];
+        if (animationSpeed) {
+            // [EN] Validated by the normalizer (B28). [CN] 已由规范化检查（B28）。
+            self.tabBarItemAnimationSpeed = animationSpeed.doubleValue;
+        }
+        // [EN] Skins of the configuration (`CYLTabBarControllerThemes`): registered with the theme manager, the first one applied.
+        // [CN] 配置中的皮肤（`CYLTabBarControllerThemes`）：注册到主题管理器，并应用首个皮肤。
+        [self cyl_applyConfigurationThemes:normalized];
         
     }
     return self;
@@ -3148,6 +3358,16 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
 
 - (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
+    NSArray<UIViewController *> *resolvedPages = nil;
+    if (self.pagesFromPageIdentifiers) {
+        // [EN] Created from page IDs: the new tabs get their pages from the same sources; a tab whose page ID already has a
+        //      page keeps it (its state too), the others are created, the rest are skipped (docs/Tab-Page-Registry.md).
+        // [CN] 由页面 ID 创建：新的 Tab 从同样的来源获得页面；页面 ID 已有页面的 Tab 继续使用它（状态保留），其余创建，找不到的跳过
+        //      （docs/Tab-Page-Registry.md）。
+        NSMutableArray<NSDictionary *> *keptItems = [NSMutableArray array];
+        resolvedPages = [self cyl_pagesOfReloadedTabs:tabBarItemsAttributes keptTabs:keptItems];
+        tabBarItemsAttributes = keptItems;
+    }
     _tabBarItemsAttributes = tabBarItemsAttributes;
     // [EN] The tab buttons are built again: their covers and badges too. [CN] Tab 按钮会重新创建：其封面与角标也需要重新添加。
     [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
@@ -3159,8 +3379,14 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     // extra tab UIKit created for a child that is not in `viewControllers`). Do not index out of range.
     UIViewController *selected = (index >= 0 && index < (NSInteger)_viewControllers.count) ? _viewControllers[index] : nil;
     UIView *superView = selected.view.superview;
-    NSMutableArray<UIViewController *> *viewControllers = [_viewControllers mutableCopy];
-    if ([self hasPlusChildViewController]) {
+    NSMutableArray<UIViewController *> *viewControllers = resolvedPages ? [resolvedPages mutableCopy] : [_viewControllers mutableCopy];
+    if (resolvedPages && selected && [viewControllers indexOfObjectIdenticalTo:selected] == NSNotFound) {
+        // [EN] The selected tab is gone: select the first one. [CN] 选中的 Tab 已不存在：选中第一个。
+        selected = nil;
+        superView = nil;
+        index = 0;
+    }
+    if (!resolvedPages && [self hasPlusChildViewController]) {
         // [EN] FIX: issue #515 — remove the plus child view controller itself: with a custom plus button position its index
         //      is not always `cyl_plusButtonIndex` (Liquid Glass keeps it in the middle), and another tab was removed.
         // [CN] 直接移除 PlusButton 子控制器本身：自定义 PlusButton 位置时，其下标不一定等于 `cyl_plusButtonIndex`（液态玻璃中位于中间），以前会移除其他 Tab。
@@ -3171,14 +3397,81 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         }
     }
     [self setViewControllers:viewControllers];
+    [self cyl_adoptPendingPages];
     // FIX: issue #433
     // [EN] The reloaded tabs show the selected title on the selected tab.
     // [CN] 重新加载后，选中的 Tab 显示选中标题。
     CYLSetNeedsUpdateTabBarItemSelectedTitles(self);
     [self.view setNeedsLayout];
-    self.selectedIndex = index;
-    [superView addSubview:selected.view];
+    if (!resolvedPages || (index >= 0 && index < (NSInteger)self.viewControllers.count)) {
+        self.selectedIndex = index;
+    }
+    if (superView && selected) {
+        [superView addSubview:selected.view];
+    }
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
+}
+
+/*!
+ * [EN] The pages of reloaded tabs (`-reloadTabBarItemsWithAttributes:` on a controller created from page IDs): the
+ *      attributes are normalized like a configuration (platforms, version, placeholders), a tab reuses an existing page of
+ *      its page ID when one is left (in tab order), the other tabs are resolved through the controller's sources, and
+ *      `cyl_skippedTabs` is replaced.
+ * [CN] 重新加载的 Tab 的页面（由页面 ID 创建的控制器调用 `-reloadTabBarItemsWithAttributes:`）：属性像配置一样规范化（平台、版本、占位），
+ *      页面 ID 还有剩余已有页面的 Tab 复用它（按 Tab 顺序），其余 Tab 通过控制器的页面来源解析，`cyl_skippedTabs` 被替换。
+ */
+- (NSArray<UIViewController *> *)cyl_pagesOfReloadedTabs:(NSArray<NSDictionary *> *)tabBarItemsAttributes
+                                                keptTabs:(NSMutableArray<NSDictionary *> *)keptTabs {
+    NSDictionary<NSString *, id> *normalized = [CYLTabBarController cyl_normalizedConfiguration:@{
+        CYLTabBarControllerTabBarItemsAttributes : [tabBarItemsAttributes isKindOfClass:[NSArray class]] ? tabBarItemsAttributes : @[],
+    }];
+    NSMutableArray<CYLTabBarSkippedTab *> *skipped = [NSMutableArray array];
+    NSArray<NSDictionary *> *tabs = CYLResolvableTabs(normalized[CYLTabBarControllerTabBarItemsAttributes] ?: @[], skipped);
+    NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *available = [NSMutableDictionary dictionary];
+    [self.pagesByPageIdentifier enumerateKeysAndObjectsUsingBlock:^(NSString *pageIdentifier, NSMutableArray<UIViewController *> *pages, BOOL *stop) {
+        available[pageIdentifier] = [pages mutableCopy];
+    }];
+    // [EN] One entry per tab: the reused page, or NSNull for a tab to resolve. [CN] 每个 Tab 一项：复用的页面，或待解析时为 NSNull。
+    NSMutableArray<id> *reusedPages = [NSMutableArray array];
+    NSMutableArray<NSDictionary<NSString *, id> *> *tabsToResolve = [NSMutableArray array];
+    for (NSDictionary *tab in tabs) {
+        NSString *pageIdentifier = [CYLTabBarPageRegistry pageIdentifierOfTab:tab];
+        UIViewController *page = pageIdentifier ? available[pageIdentifier].firstObject : nil;
+        if (page) {
+            [available[pageIdentifier] removeObjectAtIndex:0];
+            [reusedPages addObject:page];
+        } else {
+            [reusedPages addObject:[NSNull null]];
+            [tabsToResolve addObject:tab];
+        }
+    }
+    NSMutableArray<NSDictionary<NSString *, id> *> *keptNewTabs = [NSMutableArray array];
+    NSArray<UIViewController *> *newPages = [CYLTabBarPageRegistry pagesOfTabs:tabsToResolve registry:self.pageRegistry resolver:self.pageResolver
+                                                                   lookupOrder:self.pageLookupOrder keptTabs:keptNewTabs skipped:skipped];
+    NSMutableArray<UIViewController *> *pages = [NSMutableArray array];
+    NSUInteger newIndex = 0;
+    for (NSUInteger index = 0; index < tabs.count; index++) {
+        NSDictionary *tab = tabs[index];
+        if (reusedPages[index] != [NSNull null]) {
+            [pages addObject:reusedPages[index]];
+            [keptTabs addObject:tab];
+        } else if (newIndex < keptNewTabs.count && keptNewTabs[newIndex] == tab) {
+            UIViewController *page = newPages[newIndex];
+            newIndex++;
+            if ([reusedPages indexOfObjectIdenticalTo:page] != NSNotFound) {
+                // [EN] A provider returned a page another tab keeps. [CN] 提供者返回了其他 Tab 继续使用的页面。
+                [skipped addObject:[CYLTabBarSkippedTab skippedTabWithReason:CYLTabBarPageSkipReasonProviderFailed
+                                                              pageIdentifier:[CYLTabBarPageRegistry pageIdentifierOfTab:tab] attributes:tab
+                                                                      detail:@"the page is already the page of another tab"]];
+                continue;
+            }
+            [pages addObject:page];
+            [keptTabs addObject:tab];
+        }
+    }
+    self.pagesByPageIdentifier = CYLPagesByPageIdentifier(pages, keptTabs);
+    self.skippedTabs = [skipped copy];
+    return pages;
 }
 
 /**
@@ -6913,6 +7206,137 @@ static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
     page.additionalSafeAreaInsets = additionalInsets;
     objc_setAssociatedObject(page, &CYLOpaqueTabBarAddedBottomKey, neededBottom > 0 ? @(neededBottom) : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     objc_setAssociatedObject(page, &CYLOpaqueTabBarSafeBottomAtWriteKey, neededBottom > 0 ? @(safeBottomBeforeWrite) : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+@end
+
+#pragma mark - Asynchronous pages
+
+@implementation CYLTabBarController (CYLPendingPages)
+
+/*!
+ * [EN] Takes charge of the placeholders of asynchronous factories among the tabs: a pending one calls back when its
+ *      page arrives, one that already finished (a factory that completed synchronously) is swapped on the next run loop
+ *      turn, so `-setViewControllers:` is never re-entered.
+ * [CN] 接管 Tab 中异步工厂的占位：尚未完成的在页面到达时回调；已完成的（工厂同步完成）在下一次 run loop 换入，避免重入
+ *      `-setViewControllers:`。
+ */
+- (void)cyl_adoptPendingPages {
+    __weak typeof(self) weakSelf = self;
+    for (UIViewController *viewController in [_viewControllers copy]) {
+        if (viewController.cyl_isPendingPage) {
+            viewController.cyl_pageLoadHandler = ^(UIViewController *placeholder) {
+                [weakSelf cyl_placeholderDidFinishLoading:placeholder];
+            };
+        } else if (viewController.cyl_loadedPage || viewController.cyl_pageLoadFailed) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf cyl_placeholderDidFinishLoading:viewController];
+            });
+        }
+    }
+}
+
+/*!
+ * [EN] The page of a placeholder arrived: it is swapped in at the placeholder's index (title, attributes and selection
+ *      kept), or, when the factory delivered nil or a page that cannot be a tab, the tab is removed and listed in
+ *      `cyl_skippedTabs`. The delegate is told either way.
+ * [CN] 占位的页面已到达：在占位的下标换入（标题、属性与选中状态保留）；工厂交付 nil 或不能作为 Tab 的页面时，移除该 Tab 并记录到
+ *      `cyl_skippedTabs`。两种情况都会通知代理。
+ */
+- (void)cyl_placeholderDidFinishLoading:(UIViewController *)placeholder {
+    NSUInteger index = [_viewControllers indexOfObjectIdenticalTo:placeholder];
+    if (index == NSNotFound || (!placeholder.cyl_loadedPage && !placeholder.cyl_pageLoadFailed)) {
+        return;
+    }
+    placeholder.cyl_pageLoadHandler = nil;
+    UIViewController *page = placeholder.cyl_loadedPage;
+    NSString *problem = nil;
+    if (!page) {
+        problem = @"the asynchronous page factory delivered nil";
+    } else if ([page isKindOfClass:[UITabBarController class]]) {
+        problem = @"the delivered page is a tab bar controller (tab bars cannot be nested)";
+    } else if (page.parentViewController || page.presentingViewController) {
+        problem = @"the delivered page already belongs to another container";
+    } else if ([_viewControllers indexOfObjectIdenticalTo:page] != NSNotFound) {
+        problem = @"the delivered page is already the page of another tab";
+    }
+    NSDictionary<NSString *, id> *attributes = [self tabBarItemAttributesAtIndex:index];
+    NSString *pageIdentifier = [CYLTabBarPageRegistry pageIdentifierOfTab:attributes ?: @{}];
+    NSMutableArray<UIViewController *> *pages = pageIdentifier ? self.pagesByPageIdentifier[pageIdentifier] : nil;
+    NSInteger selectedIndex = (NSInteger)self.selectedIndex;
+    BOOL wasSelected = (selectedIndex == (NSInteger)index);
+    NSMutableArray<UIViewController *> *viewControllers = [_viewControllers mutableCopy];
+    if (problem) {
+        [viewControllers removeObjectAtIndex:index];
+        NSUInteger attributesIndex = [self cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:index];
+        if (attributesIndex < _tabBarItemsAttributes.count) {
+            NSMutableArray<NSDictionary *> *tabBarItemsAttributes = [_tabBarItemsAttributes mutableCopy];
+            [tabBarItemsAttributes removeObjectAtIndex:attributesIndex];
+            _tabBarItemsAttributes = [tabBarItemsAttributes copy];
+        }
+        CYLTabBarSkippedTab *skipped = [CYLTabBarSkippedTab skippedTabWithReason:CYLTabBarPageSkipReasonProviderFailed pageIdentifier:pageIdentifier
+                                                                       attributes:attributes detail:problem];
+        self.skippedTabs = [(self.skippedTabs ?: @[]) arrayByAddingObject:skipped];
+        [pages removeObjectIdenticalTo:placeholder];
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🔴 CYLTabBarController: the tab is removed: %@.", skipped);
+#endif
+        page = nil;
+    } else {
+        viewControllers[index] = page;
+        NSString *title = attributes[CYLTabBarItemTitle];
+        UIViewController *content = [page isKindOfClass:[UINavigationController class]] ? [(UINavigationController *)page viewControllers].firstObject : page;
+        if ([title isKindOfClass:[NSString class]] && content && !content.navigationItem.title) {
+            content.navigationItem.title = title;
+        }
+        NSUInteger pageIndex = [pages indexOfObjectIdenticalTo:placeholder];
+        if (pageIndex != NSNotFound) {
+            pages[pageIndex] = page;
+        }
+    }
+    [self setViewControllers:viewControllers];
+    if (wasSelected && self.viewControllers.count > 0) {
+        self.selectedIndex = MIN(index, self.viewControllers.count - 1);
+    }
+    if ([self.delegate respondsToSelector:@selector(cyl_tabBarController:didLoadPage:forPlaceholder:atIndex:)]) {
+        [(id<CYLTabBarControllerDelegate>)self.delegate cyl_tabBarController:self didLoadPage:page forPlaceholder:placeholder atIndex:index];
+    }
+}
+
+@end
+
+#pragma mark - CYLTabBarController (CYLPageRegistry)
+
+@implementation CYLTabBarController (CYLPageRegistry)
+
+- (nullable id<CYLTabBarPageProviding>)cyl_pageRegistry {
+    return self.pageRegistry;
+}
+
+- (nullable CYLTabBarPageProvider)cyl_pageResolver {
+    return self.pageResolver;
+}
+
+- (NSArray<CYLTabBarPageSource> *)cyl_pageLookupOrder {
+    return self.pageLookupOrder ?: CYLTabBarPageRegistry.defaultPageLookupOrder;
+}
+
+- (NSArray<CYLTabBarSkippedTab *> *)cyl_skippedTabs {
+    return self.skippedTabs ?: @[];
+}
+
+- (NSArray<UIViewController *> *)cyl_pendingPages {
+    NSMutableArray<UIViewController *> *pending = [NSMutableArray array];
+    for (UIViewController *viewController in _viewControllers) {
+        if (viewController.cyl_isPendingPage) {
+            [pending addObject:viewController];
+        }
+    }
+    return [pending copy];
+}
+
+- (BOOL)cyl_pagesFromPageIdentifiers {
+    return self.pagesFromPageIdentifiers;
 }
 
 @end

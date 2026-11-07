@@ -255,6 +255,15 @@
 "跳转与对比" = "Gezinme ve karşılaştırmalar";
 "角标" = "Rozetler";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass desteklemiyor: sekme çubuğu yüksekliğini sistem belirler (FlatDesign ve klasik stil destekler)";
+"从配置文件创建 TabBarController" = "Yapılandırma dosyasından TabBarController oluştur";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Tek bir dosya tüm sekme çubuğunu oluşturur: JSON, YAML, TOML, plist, XML, INI ve diğerlerini seçin ya da bir URL’den yükleyin.";
+"选择配置文件" = "Yapılandırma dosyası seçin";
+"从网络 URL 加载" = "URL’den yükle";
+"无法创建 TabBarController" = "TabBarController oluşturulamadı";
+"本页由配置文件 %@ 创建：" = "Bu sayfa %@ yapılandırmasından oluşturuldu:";
+"配置文件：模拟意外情况" = "Yapılandırma: benzetilmiş hatalar";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController güvenle oluşturuldu: %@ sekme";
+"查看" = "Görüntüle";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Kaydırırken gizle: kesintileri simüle et (issue #13)";
@@ -314,6 +323,8 @@
 "仅配色" = "Yalnızca renkler";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Dokun";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "İki sekme çubuğu tek bir yapılandırmayı paylaşır; her birinin kayıt defteri aynı sayfa kimliklerini farklı sayfalara eşler.";
+"两个 TabBar，同一个页面 ID" = "İki sekme çubuğu, tek sayfa kimliği";
 
 /* A plus button whose image is set later (demo row). */
 "加载图片" = "Görseli yükle";
@@ -349,7 +360,11 @@
 "展开全部 %@ 个模拟" = "%@ simülasyonun tümünü göster";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Simülasyon listesini daralt";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "%1$@ sekme atlandı: %2$@";
 
 /* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
 "网络图标" = "Ağ simgeleri";
 "网络图标、标题与配色" = "Ağ simgeleri, başlıklar ve renkler";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Yapılandırma dosyası";

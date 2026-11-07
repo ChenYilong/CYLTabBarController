@@ -210,16 +210,15 @@ def main():
         if not matches:
             sys.exit("%s is not in the manifest" % args.update)
         check_source({"repo": args.update, "commit": matches[0]["commit"]})
-        output = subprocess.check_output(["git", "ls-remote", "https://github.com/%s.git" % args.update, "HEAD"], text=True)
+        output = subprocess.check_output(["git", "ls-remote", "--", "https://github.com/%s.git" % args.update, "HEAD"], text=True)
         commit = output.split()[0] if output.split() else ""
-        # [EN] The remote's answer is data too: only a full hash goes into the manifest.
-        # [CN] 远端的返回值也是数据：只有完整的哈希才写入清单。
+        # [EN] Only a full commit hash reaches the manifest. [CN] 只有完整的提交哈希才会写入清单。
         if not COMMIT_RE.fullmatch(commit):
-            sys.exit("%s: git ls-remote returned no commit hash" % args.update)
+            sys.exit("unexpected ls-remote output for %s" % args.update)
         matches[0]["commit"] = commit
-        # [EN] Writes JSON to the fixed manifest path; no path comes from the data (Sonar S2083 sees the manifest as input).
-        # [CN] 把 JSON 写入固定的清单路径；路径不来自数据（Sonar S2083 把清单视为外部输入）。
-        MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")  # NOSONAR
+        with open(MANIFEST, "w", encoding="utf-8") as manifest_file:
+            json.dump(manifest, manifest_file, indent=2, ensure_ascii=False)
+            manifest_file.write("\n")
     SKILLS.mkdir(parents=True, exist_ok=True)
     vendor(manifest)
     return check()

@@ -29,7 +29,9 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Lottie](#cnlottie) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Lottie](#enlottie) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [PAG](#cnpag) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [PAG](#enpag) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Rive](#cnrive) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Rive](#enrive) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [GIF](#cngif) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [GIF](#engif) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [通用写法](#cn通用写法) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [The generic form](#enthe-generic-form) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [配置文件与 Android](#cn配置文件与-android) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Configuration files and Android](#enconfiguration-files-and-android) |
 | [注意事项](#cn注意事项) | [Things to watch for](#enthings-to-watch-for) |
 | [深入阅读](#cn深入阅读) | [Read more](#enread-more) |
 
@@ -148,12 +150,43 @@ attributes[CYLTabBarRiveSize] = NSValue(cgSize: CGSize(width: 32, height: 32))
 |:---|:---|
 | 所有选项见 [Rive-Animation.md](Rive-Animation.md)。文件使用数据绑定（view model）时不需要 `.riveInput`。 | All the options are in [Rive-Animation.md](Rive-Animation.md). A file with data binding (a view model) needs no `.riveInput`. |
 
+### [CN]GIF
+### [EN]GIF
+
+```ruby
+pod 'CYLTabBarController/GIF'
+```
+
+```objc
+// Objective-C
+NSDictionary *home = @{
+    CYLTabBarItemTitle         : @"首页",
+    CYLTabBarItemImage         : @"home_normal",
+    CYLTabBarItemSelectedImage : @"home_highlight",
+    CYLTabBarGIFFilePath       : [[NSBundle mainBundle] pathForResource:@"tab_home" ofType:@"gif"],
+    CYLTabBarGIFSize           : [NSValue valueWithCGSize:CGSizeMake(30, 30)],
+};
+```
+
+| 中文 | English |
+|:---|:---|
+| 通过 `CYLTabBarGIF…`（或通用 key）传入的 GIF 是动画：显示第一帧，选中 Tab 时播放一次并停在最后一帧。作为图片传入（`CYLTabBarItemImage` 传动图，或 `CYLTabBarItemImageURL`）的 GIF 循环播放，不需要子库。GIF 没有颜色图层，深色模式请提供 `CYLTabBarGIFDarkFilePath`。 | A GIF given by `CYLTabBarGIF…` (or the generic keys) is an animation: it shows its first frame, plays once when the tab is selected and stays on its last frame. A GIF given as an image (an animated `CYLTabBarItemImage`, or `CYLTabBarItemImageURL`) loops and needs no subspec. A GIF has no color layers: for Dark Mode, give `CYLTabBarGIFDarkFilePath`. |
+
 ### [CN]通用写法
 ### [EN]The generic form
 
 | 中文 | English |
 |:---|:---|
 | `CYLTabBarItemAttributesAddingAnimationFile()` 按文件扩展名选择动画库（`.json`、`.pag`、`.riv`、`.gif`），通用 key（`CYLTabBarAnimationURL`、`CYLTabBarAnimationFilePath`、`CYLTabBarAnimationSize`）也适用于任何动画库。需要混用动画库时推荐这种写法。播放速度用 `tabBarItemAnimationSpeed`，详见 [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md)。 | `CYLTabBarItemAttributesAddingAnimationFile()` picks the library from the file extension (`.json`, `.pag`, `.riv`, `.gif`), and the generic keys (`CYLTabBarAnimationURL`, `CYLTabBarAnimationFilePath`, `CYLTabBarAnimationSize`) work with any library. Prefer this form when mixing libraries. Set the speed with `tabBarItemAnimationSpeed`; see [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md). |
+
+### [CN]配置文件与 Android
+### [EN]Configuration files and Android
+
+| 中文 | English |
+|:---|:---|
+| 配置文件（`-initWithConfiguration:`，[Configuration-File.md](Configuration-File.md)）中可以写同样的 key（字符串形式）：通用 key、`CYLTabBarAnimationOptions`、各动画库的 key（按名称识别，未引入对应子库时被忽略，Tab 显示图片）。文件路径写 main bundle 中的文件名即可，本地文件必须存在；`.json` 必须是 Lottie 动画，`.gif` 必须以 GIF 签名开头，否则该 key 被移除并输出警告。 | A configuration file (`-initWithConfiguration:`, [Configuration-File.md](Configuration-File.md)) takes the same keys as strings: the generic keys, `CYLTabBarAnimationOptions`, and each library's keys (known by name: without its subspec they are ignored and the tab shows its image). A file name in the main bundle is enough for a path, and a local file must exist; a `.json` must be a Lottie animation and a `.gif` must start with a GIF signature, otherwise the key is removed with a warning. |
+| Android 版（[Android-Library.md](Android-Library.md)）读取同一份配置：GIF 由系统解码，总可播放；Lottie、PAG、Rive 在 App 引入 lottie-android、libpag、rive-android 时自动启用，没有时显示图片。 | The Android version ([Android-Library.md](Android-Library.md)) reads the same configuration: GIF is decoded by the platform and always plays; Lottie, PAG and Rive turn on when the app has lottie-android, libpag or rive-android, and show the image otherwise. |
+| Android 上可以运行与 iOS 示例对应的 `example-pag`、`example-gif`、`example-rive`（[Android-Examples.md](Android-Examples.md)），它们读取同样的动画文件。 | On Android, run `example-pag`, `example-gif` and `example-rive`, the twins of the iOS examples ([Android-Examples.md](Android-Examples.md)); they read the same animation files. |
 
 ## [CN]注意事项
 ## [EN]Things to watch for

@@ -1,0 +1,52 @@
+# proto-file: cyl_tabbar_configuration.proto
+# proto-message: cyl.CYLTabBarConfiguration
+# Protocol Buffers text format: no schema needed; a repeated field is written once per element.
+# Protocol Buffers 文本格式：无需结构定义；重复字段每个元素写一次。
+CYLTabBarControllerTabBarItemsAttributes {
+  CYLTabBarItemTitle: "Textproto"
+  CYLTabBarItemImage: "system:house"
+  CYLTabBarItemSelectedImage: "system:house.fill"
+  CYLTabBarItemIdentifier: "home"
+}
+CYLTabBarControllerTabBarItemsAttributes {
+  CYLTabBarItemTitle: "Message"
+  CYLTabBarItemImage: "system:message"
+  CYLTabBarItemSelectedImage: "system:message.fill"
+  CYLTabBarItemIdentifier: "message"
+  CYLTabBarItemPlatforms: "ios,android"
+}
+CYLTabBarControllerTabBarItemsAttributes {
+  CYLTabBarItemTitle: "Discover"
+  CYLTabBarItemImage: "system:safari"
+  CYLTabBarItemSelectedImage: "system:safari.fill"
+  CYLTabBarItemImageInsets: "{1, 0, -1, 0}"
+  CYLTabBarItemIdentifier: "discover"
+  CYLTabBarItemPageIdentifier: "web"
+  CYLTabBarItemPageParameters { key: "url" value: "https://github.com/ChenYilong/CYLTabBarController" }
+}
+CYLTabBarControllerTabBarItemsAttributes {
+  CYLTabBarItemTitle: "Me"
+  CYLTabBarItemImage: "system:person"
+  CYLTabBarItemSelectedImage: "system:person.fill"
+  CYLTabBarItemTitlePositionAdjustment: "{0, -1}"
+  CYLTabBarItemIdentifier: "me"
+  CYLTabBarItemMinimumAppVersion: "1.0.0"
+}
+CYLTabBarControllerImageInsets: "{0, 0, 0, 0}"
+CYLTabBarControllerTitlePositionAdjustment: "{0, -2}"
+CYLTabBarControllerStyleType: "default"
+CYLTabBarControllerContext: "CYLConfigurationDemo"
+CYLTabBarControllerThemeManagerName: "CYLConfigurationDemo"
+CYLTabBarControllerThemeIdentifier: "light"
+CYLTabBarControllerDarkThemeIdentifier: "dark"
+CYLTabBarControllerThemes {
+  CYLTabBarThemeIdentifier: "light"
+  CYLTabBarThemeValues { key: "CYLTabBarItemSelectedTitleColor" value: "#007AFF" }
+  CYLTabBarThemeValues { key: "CYLTabBarItemSelectedIconColor" value: "#007AFF" }
+}
+CYLTabBarControllerThemes {
+  CYLTabBarThemeIdentifier: "dark"
+  CYLTabBarThemeValues { key: "CYLTabBarItemSelectedTitleColor" value: "#0A84FF" }
+  CYLTabBarThemeValues { key: "CYLTabBarItemSelectedIconColor" value: "#0A84FF" }
+  CYLTabBarThemeValues { key: "CYLTabBarBackgroundColor" value: "#1C1C1E" }
+}

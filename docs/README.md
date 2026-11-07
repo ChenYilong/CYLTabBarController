@@ -14,10 +14,17 @@
 | 中文 | English |
 |:---|:---|
 | [AI 工具的 Skill：快速基于本库创建项目](Agent-Skills.md) | [Skills for AI tools: start a project on this library quickly](Agent-Skills.md) |
+| [Android API 对照表](Android-API-Map.md) | [The Android API map](Android-API-Map.md) |
+| [Android 演示迁移](Android-Demo-Migration.md) | [Android demo migration](Android-Demo-Migration.md) |
+| [Android 版 PAG、GIF、Rive 示例](Android-Examples.md) | [The Android PAG, GIF and Rive examples](Android-Examples.md) |
+| [Android 版 CYLTabBarController](Android-Library.md) | [CYLTabBarController for Android](Android-Library.md) |
+| [Android 库与 QMUI_Android 的 Tab 对比](Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's tabs](Android-QMUI-Comparison.md) |
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
+| [一个配置文件生成 TabBarController](Configuration-File.md) | [One configuration file, one TabBarController](Configuration-File.md) |
+| [配置文件相关脚本：导出、边界情况与测试](Configuration-Scripts.md) | [Configuration scripts: export, edge cases and tests](Configuration-Scripts.md) |
 | [自定义 TabBar 功能清单](Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](Custom-Tab-Bar-Features.md) |
 | [Demo 测试列表：设置分组与纯 Swift 版本](Demo-Test-List.md) | [The demo test list: settings groups and a pure Swift version](Demo-Test-List.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
@@ -33,6 +40,7 @@
 | [液态玻璃：标题画在背景图上的 PlusButton](PlusButton-Background-Image-Liquid-Glass.md) | [Liquid Glass: a PlusButton with its title on a background image](PlusButton-Background-Image-Liquid-Glass.md) |
 | [PlusButton 角标：每次点击都会变化](PlusButton-Badge.md) | [PlusButton badge: changes on every tap](PlusButton-Badge.md) |
 | [有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应](PlusButton-Lottie-TabIcon.md) | [Lottie tab icons and their files when there is a PlusButton](PlusButton-Lottie-TabIcon.md) |
+| [调研：配置文件与页面注册表中的 PlusButton 注册](PlusButton-Registration-Research.md) | [Research: registering the PlusButton through configurations and the page registry](PlusButton-Registration-Research.md) |
 | [PlusButton 的 slot：占位与数量一致](PlusButton-Slot.md) | [The PlusButton Slot: Placeholders and Matching Counts](PlusButton-Slot.md) |
 | [PlusButton 子控件响应各自的点击事件](PlusButton-Subview-Touches.md) | [Subviews of the PlusButton receive their own touches](PlusButton-Subview-Touches.md) |
 | [PlusButton 点击范围：扩大、按倍数放大与调试显示](PlusButton-Touchable-Area.md) | [PlusButton touchable area: grow it, scale it, and see it](PlusButton-Touchable-Area.md) |
@@ -50,7 +58,10 @@
 | [Tab 交互：点击动画、长按、滑动切换及其他](Tab-Interactions.md) | [Tab interactions: tap animations, long press, swipe, and more](Tab-Interactions.md) |
 | [单个 Tab 的颜色](Tab-Item-Colors.md) | [Per-tab Colors](Tab-Item-Colors.md) |
 | [Tab 的排列方式](Tab-Item-Positioning.md) | [Tab Item Positioning](Tab-Item-Positioning.md) |
+| [评审：页面注册表的实现是否符合最初的架构设计](Tab-Page-Registry-Review.md) | [Review: does the page registry implementation match the original design](Tab-Page-Registry-Review.md) |
+| [按页面 ID 获得 Tab 页面（页面注册表）](Tab-Page-Registry.md) | [Tab pages from page IDs (the page registry)](Tab-Page-Registry.md) |
 | [重复点击已选中 Tab 的内置操作](Tab-Reselect.md) | [Built-in Actions for Tapping the Selected Tab](Tab-Reselect.md) |
+| [调研：配置文件中的 Tab 如何对应到页面对象（跨端标识、注册表与顺序）](Tab-View-Controller-Resolution-Research.md) | [Research: how a tab in a configuration file finds its page object (cross-platform IDs, registries and order)](Tab-View-Controller-Resolution-Research.md) |
 | [TabBar 自定义工具集](TabBar-Customization-Toolkit.md) | [Tab bar customization toolkit](TabBar-Customization-Toolkit.md) |
 | [TabBar 的 hitTest 不再返回 nil，交给 super 处理](TabBar-HitTest-Super-Fallback.md) | [The tab bar's hitTest falls back to super instead of returning nil](TabBar-HitTest-Super-Fallback.md) |
 | [滚动时缩小或隐藏 TabBar](TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](TabBar-Minimize-On-Scroll.md) |
@@ -76,10 +87,17 @@
 ```text
 docs/
 ├── Agent-Skills.md
+├── Android-API-Map.md
+├── Android-Demo-Migration.md
+├── Android-Examples.md
+├── Android-Library.md
+├── Android-QMUI-Comparison.md
 ├── Bilingual-Documentation.md
 ├── CYLUtils-Helpers.md
 ├── Carthage-Example.md
 ├── Carthage.md
+├── Configuration-File.md
+├── Configuration-Scripts.md
 ├── Custom-Tab-Bar-Features.md
 ├── Demo-Test-List.md
 ├── FAQ.md
@@ -95,6 +113,7 @@ docs/
 ├── PlusButton-Background-Image-Liquid-Glass.md
 ├── PlusButton-Badge.md
 ├── PlusButton-Lottie-TabIcon.md
+├── PlusButton-Registration-Research.md
 ├── PlusButton-Slot.md
 ├── PlusButton-Subview-Touches.md
 ├── PlusButton-Touchable-Area.md
@@ -113,7 +132,10 @@ docs/
 ├── Tab-Interactions.md
 ├── Tab-Item-Colors.md
 ├── Tab-Item-Positioning.md
+├── Tab-Page-Registry-Review.md
+├── Tab-Page-Registry.md
 ├── Tab-Reselect.md
+├── Tab-View-Controller-Resolution-Research.md
 ├── TabBar-Customization-Toolkit.md
 ├── TabBar-HitTest-Super-Fallback.md
 ├── TabBar-Minimize-On-Scroll.md

@@ -17,6 +17,7 @@ scripts/plus-child-theme-test.sh "iPhone 17 Pro Max"        # plus child + theme
 scripts/scroll-hide-self-test.sh                            # scroll hiding, on a simulator
 python3 scripts/update-docs-navigation.py --check
 python3 scripts/sync-agent-skills.py --check
+scripts/publish-android.sh staging                          # Android library: Maven bundle, checked (local | staging | central | github)
 ```
 
 The `CYLTabBarController` scheme has no test action: use `scripts/unit-tests.sh`. Static analysis: `xcodebuild analyze` must report no warnings.

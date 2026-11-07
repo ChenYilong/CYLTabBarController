@@ -255,6 +255,15 @@
 "跳转与对比" = "Navigácia a porovnania";
 "角标" = "Odznaky";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nepodporuje: výšku panela určuje systém (FlatDesign a klasický štýl áno)";
+"从配置文件创建 TabBarController" = "Vytvoriť TabBarController z konfiguračného súboru";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Jeden súbor vytvorí celý panel kariet: zvoľte JSON, YAML, TOML, plist, XML, INI a ďalšie, alebo ho načítajte z URL.";
+"选择配置文件" = "Vyberte konfiguračný súbor";
+"从网络 URL 加载" = "Načítať z URL";
+"无法创建 TabBarController" = "TabBarController nie je možné vytvoriť";
+"本页由配置文件 %@ 创建：" = "Táto stránka bola vytvorená z konfigurácie %@:";
+"配置文件：模拟意外情况" = "Konfigurácia: simulované chyby";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController bezpečne vytvorený: kariet: %@";
+"查看" = "Zobraziť";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Skrytie pri posúvaní: simulácia prerušení (issue #13)";
@@ -314,6 +323,8 @@
 "仅配色" = "Iba farby";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Ťukni";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Dva panely kariet zdieľajú jednu konfiguráciu; register každého z nich priraďuje rovnaké ID stránok rôznym stránkam.";
+"两个 TabBar，同一个页面 ID" = "Dva panely kariet, jedno ID stránky";
 
 /* A plus button whose image is set later (demo row). */
 "加载图片" = "Načítať obrázok";
@@ -349,7 +360,11 @@
 "展开全部 %@ 个模拟" = "Zobraziť všetkých %@ simulácií";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Zbaliť zoznam simulácií";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "Preskočených %1$@ kariet: %2$@";
 
 /* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
 "网络图标" = "Ikony zo siete";
 "网络图标、标题与配色" = "Ikony zo siete, názvy a farby";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Konfiguračný súbor";

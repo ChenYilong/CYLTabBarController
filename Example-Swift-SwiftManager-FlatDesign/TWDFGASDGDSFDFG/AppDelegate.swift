@@ -14,6 +14,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ _: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        // [CN] 页面注册表的 Swift 示例（TabPages.swift）。 [EN] The Swift example of the page registry (TabPages.swift).
+        TabPages.register()
         return true
     }
 

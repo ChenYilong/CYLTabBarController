@@ -1,0 +1,40 @@
+{
+  "CYLTabBarControllerStyleType": "default",
+  "CYLTabBarControllerTitlePositionAdjustment": "{0, -3.5}",
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "首页",
+      "CYLTabBarItemSelectedTitle": "刷新",
+      "CYLTabBarItemIdentifier": "home",
+      "CYLTabBarItemImage": "home_normal",
+      "CYLTabBarItemSelectedImage": "home_highlight",
+      "CYLTabBarLottieFilePath": "green_lottie_tab_home.json",
+      "CYLTabBarLottieDarkFilePath": "green_lottie_tab_home_dark.json"
+    },
+    {
+      "CYLTabBarItemTitle": "同城",
+      "CYLTabBarItemIdentifier": "city",
+      "CYLTabBarItemImage": "fishpond_normal",
+      "CYLTabBarItemSelectedImage": "fishpond_highlight",
+      "CYLTabBarLottieFilePath": "green_lottie_tab_discover.json",
+      "CYLTabBarLottieDarkFilePath": "green_lottie_tab_discover_dark.json"
+    },
+    {
+      "CYLTabBarItemTitle": "消息",
+      "CYLTabBarItemIdentifier": "message",
+      "CYLTabBarItemImage": "message_normal",
+      "CYLTabBarItemDarkImage": "message_normal_night",
+      "CYLTabBarItemSelectedImage": "message_highlight",
+      "CYLTabBarLottieFilePath": "green_lottie_tab_news.json",
+      "CYLTabBarLottieDarkFilePath": "green_lottie_tab_news_dark.json"
+    },
+    {
+      "CYLTabBarItemTitle": "我的",
+      "CYLTabBarItemImage": "account_normal",
+      "CYLTabBarItemSelectedImage": "account_highlight",
+      "CYLTabBarLottieFilePath": "green_lottie_tab_mine.json",
+      "CYLTabBarLottieDarkFilePath": "green_lottie_tab_mine_dark.json",
+      "CYLTabBarItemPageIdentifier": "mine"
+    }
+  ]
+}

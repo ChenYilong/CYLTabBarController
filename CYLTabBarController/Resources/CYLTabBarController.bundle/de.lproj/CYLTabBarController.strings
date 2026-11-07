@@ -255,6 +255,15 @@
 "跳转与对比" = "Navigation und Vergleiche";
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Von Liquid Glass nicht unterstützt: Das System legt die Höhe der Tab-Bar fest (FlatDesign und der klassische Stil unterstützen es)";
+"从配置文件创建 TabBarController" = "TabBarController aus einer Konfigurationsdatei erstellen";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Eine Datei erzeugt die ganze Tab-Leiste: JSON, YAML, TOML, plist, XML, INI und mehr wählen oder von einer URL laden.";
+"选择配置文件" = "Konfigurationsdatei wählen";
+"从网络 URL 加载" = "Von einer URL laden";
+"无法创建 TabBarController" = "TabBarController konnte nicht erstellt werden";
+"本页由配置文件 %@ 创建：" = "Diese Seite wurde aus der Konfiguration %@ erstellt:";
+"配置文件：模拟意外情况" = "Konfiguration: simulierte Fehler";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController sicher erstellt: %@ Tabs";
+"查看" = "Ansehen";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Beim Scrollen ausblenden: Unterbrechungen simulieren (issue #13)";
@@ -314,6 +323,8 @@
 "仅配色" = "Nur Farben";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Tippen";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Zwei Tab-Leisten nutzen eine Konfiguration; jede Registry ordnet dieselben Seiten-IDs anderen Seiten zu.";
+"两个 TabBar，同一个页面 ID" = "Zwei Tab-Leisten, eine Seiten-ID";
 
 /* A plus button whose image is set later (demo row). */
 "加载图片" = "Bild laden";
@@ -349,7 +360,11 @@
 "展开全部 %@ 个模拟" = "Alle %@ Simulationen anzeigen";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Simulationsliste einklappen";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "%1$@ Tabs übersprungen: %2$@";
 
 /* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
 "网络图标" = "Netzwerksymbole";
 "网络图标、标题与配色" = "Netzwerksymbole, Titel und Farben";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Konfigurationsdatei";

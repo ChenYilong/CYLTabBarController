@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
  *      background image),
  *      row 20 picks a skin (theme) of the tab bar (`CYLThemeManager`, `CYLTabBarTheme`, issue #216),
  *      row 21 lists the scroll hiding simulations in an action sheet (`-cyl_presentScrollHideSimulationMenu`, issue #13),
+ *      row 22 creates a tab bar controller from a configuration file or URL (`UIViewController+CYLConfigurationDemo.h`),
+ *      then the simulated failures of configurations, one row each (`-cyl_configurationEdgeCaseCellForTableView:row:`),
  *      then the in-place tab item updates (`-cyl_tabBarItemUpdateCellForTableView:row:`): title, icon, network icon,
  *      all network icons, all local icons, GIF icon, all titles, replace neighboring tabs.
  * [CN] 列表顶部设置分组的 section：第 0 行为语言设置（`-cyl_languageCellForTableView:`），第 1 行为内存警告检查
@@ -42,7 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
  *      第 19 行 push 一个 PlusButton 之后才加载图片的 TabBarController（加载、替换、移除图片或加载背景图片），
  *      第 20 行选择 TabBar 的皮肤（主题，`CYLThemeManager`、`CYLTabBarTheme`，issue #216），
  *      第 21 行用操作表列出滚动隐藏的模拟（`-cyl_presentScrollHideSimulationMenu`，issue #13），
- *      之后是原地更新 Tab 的若干行
+ *      第 22 行由配置文件或 URL 创建 TabBarController（`UIViewController+CYLConfigurationDemo.h`），然后每个配置文件模拟意外情况一行
+ *      （`-cyl_configurationEdgeCaseCellForTableView:row:`），之后是原地更新 Tab 的若干行
  *      （`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、所有网络图标、所有本地图标、GIF 图标、所有标题、替换相邻 Tab 的页面。
  */
 FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
@@ -61,6 +64,7 @@ typedef NS_ENUM(NSInteger, CYLSettingsGroup) {
     CYLSettingsGroupPlusButton,           ///< [EN] The plus button's touchable area (#91), an image set later. [CN] PlusButton 可点击区域（#91）、之后才加载的图片。
     CYLSettingsGroupTabInteractions,      ///< [EN] Tap animation, sound, long press, swipe (#535, #118). [CN] 点击动画、声音、长按、滑动。
     CYLSettingsGroupHelpers,              ///< [EN] No base class, CYLUtils helpers (#535). [CN] 无需继承基类、CYLUtils 工具方法。
+    CYLSettingsGroupConfiguration,        ///< [EN] A tab bar controller from a configuration file, and the simulated failures. [CN] 由配置文件创建 TabBarController，以及模拟意外情况。
 };
 
 /*!

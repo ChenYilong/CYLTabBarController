@@ -255,6 +255,15 @@
 "跳转与对比" = "Navigáció és összehasonlítás";
 "角标" = "Jelvények";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nem támogatja: a lapsáv magasságát a rendszer adja meg (FlatDesign és a klasszikus stílus támogatja)";
+"从配置文件创建 TabBarController" = "TabBarController létrehozása konfigurációs fájlból";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Egyetlen fájl létrehozza a teljes lapsávot: válasszon JSON, YAML, TOML, plist, XML, INI vagy más formátumot, vagy töltse be URL-ről.";
+"选择配置文件" = "Válasszon konfigurációs fájlt";
+"从网络 URL 加载" = "Betöltés URL-ről";
+"无法创建 TabBarController" = "Nem sikerült létrehozni a TabBarControllert";
+"本页由配置文件 %@ 创建：" = "Ez az oldal a(z) %@ konfigurációból készült:";
+"配置文件：模拟意外情况" = "Konfiguráció: szimulált hibák";
+"已安全创建 TabBarController：%@ 个 Tab" = "A TabBarController biztonságosan létrejött: %@ lap";
+"查看" = "Megtekintés";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Elrejtés görgetéskor: megszakítások szimulálása (issue #13)";
@@ -314,6 +323,8 @@
 "仅配色" = "Csak színek";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Koppints";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Két lapsáv egy konfigurációt használ; mindkettő nyilvántartása ugyanazokat az oldalazonosítókat más-más oldalakhoz rendeli.";
+"两个 TabBar，同一个页面 ID" = "Két lapsáv, egy oldalazonosító";
 
 /* A plus button whose image is set later (demo row). */
 "加载图片" = "Kép betöltése";
@@ -349,7 +360,11 @@
 "展开全部 %@ 个模拟" = "Mind a(z) %@ szimuláció megjelenítése";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Szimulációs lista összecsukása";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "%1$@ lap kihagyva: %2$@";
 
 /* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
 "网络图标" = "Hálózati ikonok";
 "网络图标、标题与配色" = "Hálózati ikonok, címek és színek";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Konfigurációs fájl";

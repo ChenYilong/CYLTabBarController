@@ -255,6 +255,15 @@
 "跳转与对比" = "Navegació i comparacions";
 "角标" = "Insígnies";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "No compatible amb Liquid Glass: el sistema fixa l'alçada de la barra (FlatDesign i l'estil clàssic sí)";
+"从配置文件创建 TabBarController" = "Crea un TabBarController a partir d’un fitxer de configuració";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Un sol fitxer crea tota la barra de pestanyes: tria JSON, YAML, TOML, plist, XML, INI i més, o carrega’l des d’un URL.";
+"选择配置文件" = "Tria un fitxer de configuració";
+"从网络 URL 加载" = "Carrega des d’un URL";
+"无法创建 TabBarController" = "No s’ha pogut crear el TabBarController";
+"本页由配置文件 %@ 创建：" = "Aquesta pàgina s’ha creat a partir de la configuració %@:";
+"配置文件：模拟意外情况" = "Configuració: errors simulats";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController creat de manera segura: %@ pestanyes";
+"查看" = "Mostra";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Amagar en desplaçar: simular interrupcions (issue #13)";
@@ -314,6 +323,8 @@
 "仅配色" = "Només colors";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Toca'm";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Dues barres de pestanyes comparteixen una configuració; el registre de cadascuna associa els mateixos ID de pàgina a pàgines diferents.";
+"两个 TabBar，同一个页面 ID" = "Dues barres de pestanyes, un ID de pàgina";
 
 /* A plus button whose image is set later (demo row). */
 "加载图片" = "Carrega la imatge";
@@ -349,7 +360,11 @@
 "展开全部 %@ 个模拟" = "Mostra les %@ simulacions";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Amaga la llista de simulacions";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "%1$@ pestanyes omeses: %2$@";
 
 /* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
 "网络图标" = "Icones de la xarxa";
 "网络图标、标题与配色" = "Icones de la xarxa, títols i colors";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Fitxer de configuració";

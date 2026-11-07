@@ -255,6 +255,15 @@
 "跳转与对比" = "跳转与对比";
 "角标" = "角标";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）";
+"从配置文件创建 TabBarController" = "从配置文件创建 TabBarController";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。";
+"选择配置文件" = "选择配置文件";
+"从网络 URL 加载" = "从网络 URL 加载";
+"无法创建 TabBarController" = "无法创建 TabBarController";
+"本页由配置文件 %@ 创建：" = "本页由配置文件 %@ 创建：";
+"配置文件：模拟意外情况" = "配置文件：模拟意外情况";
+"已安全创建 TabBarController：%@ 个 Tab" = "已安全创建 TabBarController：%@ 个 Tab";
+"查看" = "查看";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "滚动隐藏：模拟意外情况（issue #13）";
@@ -314,6 +323,8 @@
 "仅配色" = "仅配色";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "点我";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。";
+"两个 TabBar，同一个页面 ID" = "两个 TabBar，同一个页面 ID";
 
 /* A plus button whose image is set later (demo row). */
 "加载图片" = "加载图片";
@@ -349,7 +360,11 @@
 "展开全部 %@ 个模拟" = "展开全部 %@ 个模拟";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "收起模拟列表";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "跳过 %1$@ 个 Tab：%2$@";
 
 /* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
 "网络图标" = "网络图标";
 "网络图标、标题与配色" = "网络图标、标题与配色";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "配置文件";
