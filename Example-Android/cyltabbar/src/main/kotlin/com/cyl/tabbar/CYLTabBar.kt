@@ -491,12 +491,12 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     }
 
     /** [EN] Drives the scroller once per frame (not from `computeScroll`, so it also runs without a draw pass). [CN] 每帧推进 scroller（不依赖 `computeScroll`，没有绘制时也能运行）。 */
-    private val scrollStep = object : Runnable {
-        override fun run() {
-            if (!scroller.computeScrollOffset()) return
-            scrollTo(scroller.currX.coerceIn(0, maxScrollX), 0)
-            postOnAnimation(this)
-        }
+    private val scrollStep = Runnable { stepScroll() }
+
+    private fun stepScroll() {
+        if (!scroller.computeScrollOffset()) return
+        scrollTo(scroller.currX.coerceIn(0, maxScrollX), 0)
+        postOnAnimation(scrollStep)
     }
 
     private fun startScrollStep() {
