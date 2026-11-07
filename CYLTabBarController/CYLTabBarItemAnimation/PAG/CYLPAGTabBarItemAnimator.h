@@ -21,7 +21,67 @@
 #import "CYLTabBarItemAnimator.h"
 #endif
 
+/*!
+ * [EN] 1 when libpag (or libpag-enterprise) is part of the build, 0 otherwise. Everything below, the PAG keys included,
+ *      exists only then: without libpag, using `CYLTabBarPAGURL` fails to build instead of being silently ignored. Use
+ *      `#if CYL_PAG_AVAILABLE` for PAG-only code of your own. CocoaPods: `pod 'CYLTabBarController/PAG'` (or
+ *      `PAGEnterprise`).
+ * [CN] 工程中引入了 libpag（或 libpag-enterprise）时为 1，否则为 0。以下所有内容（包括 PAG 的 key）只在此时存在：没有 libpag 时，
+ *      使用 `CYLTabBarPAGURL` 会编译失败，而不是被静默忽略。App 自己只用于 PAG 的代码可用 `#if CYL_PAG_AVAILABLE` 包住。
+ *      CocoaPods：`pod 'CYLTabBarController/PAG'`（或 `PAGEnterprise`）。
+ */
+#if __has_include(<libpag/PAGView.h>)
+#define CYL_PAG_AVAILABLE 1
+#else
+#define CYL_PAG_AVAILABLE 0
+#endif
+
+#if CYL_PAG_AVAILABLE
 NS_ASSUME_NONNULL_BEGIN
+
+/*!
+ * FIX: issue #604 — PAG animations (Tencent libpag), the same way as Lottie.
+ * [EN] Keys for a tab's PAG animation, used exactly like their Lottie twins and through the same pipeline: the view is
+ *      added in place of the tab's icon, plays when the tab is selected, stops when another one is, follows
+ *      `lottieAnimationViewContentMode`, is returned by `-[UIControl cyl_lottieAnimationView]` and posts
+ *      `CYLTabBarItemAnimationViewDidAddNotification`. Needs the `CYLTabBarController/PAG` subspec (the `libpag`
+ *      pod), which declares them here, next to the PAG animator (Core declares no library's keys). Use either the
+ *      Lottie keys or the PAG keys for a tab;
+ *      PAG has no playback speed, so `lottieAnimationSpeed` does not apply to it.
+ *      - `CYLTabBarPAGURL`: an NSURL of a .pag file; `CYLTabBarPAGFilePath`: its path (NSString). The URL wins.
+ *      - `CYLTabBarPAGSize`: the view size, an NSValue of CGSize (default: the icon placeholder size).
+ *      - `CYLTabBarPAGDarkURL` / `CYLTabBarPAGDarkFilePath`: the Dark Mode version, like `CYLTabBarLottieDarkURL`.
+ * [CN] Tab 的 PAG 动画 key，用法与对应的 Lottie key 完全相同，并走同一套流程：替换 Tab 图标显示，选中时播放，选中其他 Tab 时停止，
+ *      遵循 `lottieAnimationViewContentMode`，由 `-[UIControl cyl_lottieAnimationView]` 返回，并发送
+ *      `CYLTabBarItemAnimationViewDidAddNotification`。需要引入 `CYLTabBarController/PAG` 子库（依赖 `libpag` pod），这些 key 就声明在这里、
+ *      PAG animator 旁边（Core 不声明任何动画库的 key）。同一个 Tab 请使用 Lottie key 或 PAG key 之一；PAG 没有播放速度，`lottieAnimationSpeed` 对其无效。
+ *      - `CYLTabBarPAGURL`：.pag 文件的 NSURL；`CYLTabBarPAGFilePath`：其路径（NSString）。URL 优先。
+ *      - `CYLTabBarPAGSize`：视图尺寸，CGSize 的 NSValue（默认使用图标占位尺寸）。
+ *      - `CYLTabBarPAGDarkURL` / `CYLTabBarPAGDarkFilePath`：深色模式版本，与 `CYLTabBarLottieDarkURL` 相同。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarPAGURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarPAGFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarPAGSize;
+FOUNDATION_EXTERN NSString *const CYLTabBarPAGDarkURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarPAGDarkFilePath;
+
+/*!
+ * FIX: issue #604
+ * [EN] Returns `attributes` with a PAG animation added to each item, like `CYLTabBarItemsAttributesAddingLottieFiles`:
+ *      `CYLTabBarPAGFilePath` for "<name>.pag" in `bundle` (nil: the main bundle), and `CYLTabBarPAGDarkFilePath` for
+ *      "<name>_dark.pag" when that file exists. Names are matched by position; an item without a name, or whose file is
+ *      missing, is left as it is.
+ *
+ *          CYLTabBarItemsAttributesAddingPAGFiles(attributes, @[@"tab_home", @"tab_discover"], nil);
+ * [CN] 返回为每个 item 添加了 PAG 动画的 `attributes`，与 `CYLTabBarItemsAttributesAddingLottieFiles` 相同：`CYLTabBarPAGFilePath` 为
+ *      `bundle`（nil 表示 main bundle）中的「<名称>.pag」；存在「<名称>_dark.pag」时再加上 `CYLTabBarPAGDarkFilePath`。名称按位置对应；
+ *      没有名称或文件不存在的 item 保持不变。示例见上。
+ */
+FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFiles(NSArray<NSDictionary *> *attributes,
+                                                                                 NSArray<NSString *> *pagFileNames,
+                                                                                 NSBundle * _Nullable bundle);
+
+
 
 /*!
  * FIX: issue #604 — in the PAG subspecs (`PAG`, `PAGEnterprise`), next to the `CYLTabBarItemAnimation` subspec.
@@ -37,3 +97,4 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+#endif

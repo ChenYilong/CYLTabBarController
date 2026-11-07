@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Actions Builds"
+  short_description: "React Native GitHub Actions simulator/emulator build artifact patterns"
+  default_prompt: "Use $github-actions to set up React Native GitHub Actions builds and download artifacts with gh or API."

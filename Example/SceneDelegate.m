@@ -23,6 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
     self.window.frame = windowScene.coordinateSpace.bounds;
     self.window.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
     [self setUpBadgeAppearance];
+    // [EN] Issue #216: register the demo skins and make the one saved last time current, before the tab bar appears.
+    // [CN] Issue #216：在 TabBar 显示之前注册演示皮肤，并将上次保存的皮肤设为当前主题。
+    [UIViewController cyl_setUpThemeSettings];
     
     // Rebuilt after a language change (the language row in every list), so every text shows in the new language.
     [self.window cyl_setRootViewControllerProvider:^UIViewController *{

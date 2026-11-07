@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "CYLTabBarController"
-  s.version      = "1.99.72"
+  s.version      = "1.100.0"
   s.summary      = "Highly customizable tabBar and tabBarController for iOS"
   s.description  = "[EN]It is an iOS UI module library for adding animation to iOS tabbar items and icons with Lottie and Liquid Glass Animation.  [CN]【中国特色 TabBar】一行代码实现 Lottie +玻璃效果动画TabBar，支持中间带+号的TabBar样式，自带红点角标，支持动态刷新。【iOS26 & iPhone 17 supported】"
   s.homepage     = "https://github.com/ChenYilong/CYLTabBarController"
@@ -19,6 +19,9 @@ Pod::Spec.new do |s|
   s.subspec 'CYLUtils' do |utils|
     utils.source_files = 'CYLTabBarController/CYLUtils/**/*.{h,m}'
     utils.public_header_files = 'CYLTabBarController/CYLUtils/**/*.h'
+    # FIX: issue #216 — theme switching (skins) lives in `CYLUtils/CYLComponents/CYLTheme/`; its private header stays private.
+    # 换肤（主题切换）位于 `CYLUtils/CYLComponents/CYLTheme/`，其私有头文件不公开。
+    utils.private_header_files = 'CYLTabBarController/CYLUtils/CYLComponents/CYLTheme/CYLThemePrivate.h'
     # The library's resource bundle (localized strings now, images can go in it too), shipped as is, so its layout is
     # the same in every integration (see `CYLResourceBundle()`).
     utils.resources = ['CYLTabBarController/Resources/CYLTabBarController.bundle']
@@ -49,6 +52,7 @@ Pod::Spec.new do |s|
     'CYLTabBarController/CYLBadgeView/**/*', # the CYLBadgeView subspec above
     'CYLTabBarController/CYLTabBarItemAnimation/**/*', # the CYLTabBarItemAnimation subspec below
     'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}',
+    'CYLTabBarController/RiveSwift/**/*', # the Rive subspec below (Swift bridge)
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{swift}',
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{h,m}',
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-Swift/**/*.{h,m,swift}'
@@ -57,8 +61,10 @@ Pod::Spec.new do |s|
     # FIX: issue #604 — the interface to the CYLTabBarItemAnimation subspec, internal, not public API. Core does not depend
     # on that subspec: it checks at runtime that it is there.
     # 与 CYLTabBarItemAnimation 子库之间的接口，仅供内部使用，不属于公开 API。Core 不依赖该子库，而是在运行时检查它是否存在。
-    core.private_header_files = 'CYLTabBarController/UIControl+CYLTabBarItemAnimation.h', 'CYLTabBarController/CYLTabBarItemAnimationService.h'
+    core.private_header_files = 'CYLTabBarController/UIControl+CYLTabBarItemAnimation.h', 'CYLTabBarController/CYLTabBarItemAnimationService.h', 'CYLTabBarController/CYLTabBarController+CYLPrivate.h'
     # The resource bundle is part of CYLUtils (see above), which Core depends on. 资源包属于 Core 依赖的 CYLUtils。
+    # FIX: issue #535 — the tab tap sound. 点击 Tab 的音效。
+    core.frameworks = 'UIKit', 'AudioToolbox'
 
     
   end
@@ -88,7 +94,11 @@ Pod::Spec.new do |s|
                                     'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayer.h',
                                     'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h',
                                     'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h',
-                                    'CYLTabBarController/CYLTabBarItemAnimation/UIControl+CYLTabBarItemAnimationPlayer.h'
+                                    'CYLTabBarController/CYLTabBarItemAnimation/UIControl+CYLTabBarItemAnimationPlayer.h',
+                                    # The short path for libraries whose view plays itself (Rive): the protocols and the
+                                    # ready-made animator. 视图自己会播放的动画库（Rive）的简便方式：协议与现成的 animator。
+                                    'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h',
+                                    'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h'
     animation.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.h'
     animation.frameworks = 'UIKit'
   end
@@ -132,7 +142,9 @@ Pod::Spec.new do |s|
     pag.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
     # The PAG animator (#604), registered with CYLTabBarItemAnimatorRegistry. PAG 的 animator（#604），向注册表注册。
     pag.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
-    pag.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
+    # Public: the PAG keys and `CYLTabBarItemsAttributesAddingPAGFiles()` live here, not in Core.
+    # 公开：PAG 的 key 与 `CYLTabBarItemsAttributesAddingPAGFiles()` 位于这里，而不是 Core 中。
+    pag.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
     pag.dependency 'libpag', '>= 4.0'
   end
 
@@ -145,10 +157,50 @@ Pod::Spec.new do |s|
     pagenterprise.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
     # The PAG animator (#604), registered with CYLTabBarItemAnimatorRegistry. PAG 的 animator（#604），向注册表注册。
     pagenterprise.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
-    pagenterprise.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
+    pagenterprise.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
     pagenterprise.dependency 'libpag-enterprise', '>= 4.0'
+    # libpag-enterprise 4.4.x–4.5.98: the module's umbrella `libpag.h` imports `PAGView+Audio.h`, which the framework does
+    # not ship, so a modular import of libpag fails ("Could not build module 'libpag'"). The PAG animator imports only
+    # `PAGView.h` (complete), so its file is compiled without modules.
+    # libpag-enterprise 4.4.x–4.5.98：模块的 umbrella 头文件 `libpag.h` 引入了框架中不存在的 `PAGView+Audio.h`，以模块方式引入 libpag
+    # 会失败（"Could not build module 'libpag'"）。PAG animator 只引入完整的 `PAGView.h`，因此它的文件不使用模块编译。
+    pagenterprise.compiler_flags = '-fno-modules'
   end
   
+  # Rive animations (`RiveRuntime`), the same way as Lottie and PAG: `pod 'CYLTabBarController/Rive'`.
+  # Rive takes the short path of CYLTabBarItemAnimation: its Swift view (RiveSwift/) adopts
+  # `CYLTabBarItemAnimationPlayableView` / `CYLTabBarItemAnimationViewProviding`, and `CYLRiveTabBarItemAnimator` only
+  # registers a ready-made `CYLTabBarItemViewAnimator` for ".riv" files and declares Rive's keys and options; there is no
+  # Rive animator or player logic, and nothing in Core. RiveRuntime is a binary pod with a Swift API; 6.29 is the first
+  # version whose current API (`Worker`, `File`, `Rive`, `RiveUIView`) replaces the deprecated `RiveViewModel`.
+  # Rive 动画（`RiveRuntime`），用法与 Lottie、PAG 相同：`pod 'CYLTabBarController/Rive'`。Rive 使用 CYLTabBarItemAnimation 的简便方式：
+  # 其 Swift 视图（RiveSwift/）遵守 `CYLTabBarItemAnimationPlayableView` / `CYLTabBarItemAnimationViewProviding`，`CYLRiveTabBarItemAnimator`
+  # 只为 ".riv" 文件注册一个现成的 `CYLTabBarItemViewAnimator`，并声明 Rive 的 key 与选项；没有 Rive 专用的 animator 或播放器逻辑，Core 中也
+  # 没有任何 Rive 代码。RiveRuntime 为二进制 pod，提供 Swift API；6.29 起，其当前 API（`Worker`、`File`、`Rive`、`RiveUIView`）取代了已废弃的
+  # `RiveViewModel`。
+  s.subspec 'Rive' do |rive|
+    rive.dependency 'CYLTabBarController/Core'
+    rive.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
+    # The registration and keys, and the Swift view. 注册与 key，以及 Swift 视图。
+    rive.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.{h,m}', 'CYLTabBarController/RiveSwift/*.swift'
+    rive.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.h'
+    rive.dependency 'RiveRuntime', '~> 6.29'
+    # RiveRuntime requires iOS 14. RiveRuntime 要求 iOS 14。
+    rive.ios.deployment_target = '14.0'
+  end
+
+  # FIX: issue #605 — GIF tab icons that play once when selected, like Lottie, PAG and Rive. A GIF given as an image
+  # (`CYLTabBarItemImage`, `CYLTabBarItemImageURL`) loops and needs no subspec. No third-party library: ImageIO decodes it.
+  # 选中时播放一次的 GIF Tab 图标，用法与 Lottie、PAG、Rive 相同。作为图片传入（`CYLTabBarItemImage`、`CYLTabBarItemImageURL`）的 GIF 循环播放，
+  # 不需要子库。不依赖第三方库：由 ImageIO 解码。
+  s.subspec 'GIF' do |gif|
+    gif.dependency 'CYLTabBarController/Core'
+    gif.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
+    gif.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.{h,m}'
+    gif.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.h'
+    gif.frameworks = 'ImageIO', 'QuartzCore'
+  end
+
   s.subspec 'CYLFlatDesignTabBar' do |flatdesign|
     flatdesign.dependency "CYLTabBarController/CYLFlatDesignTabBar-ObjectiveC"
     flatdesign.ios.deployment_target = '13.0' # depends on LottieSwift

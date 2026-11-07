@@ -202,9 +202,45 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "Đẩy TabBarController với ngữ cảnh mới (PlusButton có chế độ xem con X có thể chạm, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Chạm vào X ở góc trên bên phải PlusButton: X đổi sang màu ngẫu nhiên, PlusButton không phản hồi";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Làm mới";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex và PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Chạm để chọn tab tiếp theo. Chỉ số không tính PlusButton: %1$@, selectedIndex: %2$@, hiện tại: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Phóng to rồi thu nhỏ";
+"从小放大" = "Phóng to";
+"弹性" = "Nảy";
+"弹性 + 烟花" = "Nảy + pháo hoa";
+"旋转" = "Xoay";
+"翻转" = "Lật";
+"飘散" = "Tan biến";
+"无" = "Không có";
+"Tab 点击动画（issue #535）" = "Hiệu ứng chạm tab (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Chạm để đổi hiệu ứng chạm của các tab và PlusButton. Hiện tại: %@";
+"长按了「%@」" = "Đã nhấn giữ \"%@\"";
+"左右滑动切换 Tab（issue #535）" = "Vuốt để chuyển tab (issue #535)";
+"长按 Tab（issue #535）" = "Nhấn giữ tab (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Bật công tắc, rồi vuốt trái hoặc phải trên trang để chuyển sang tab tiếp theo hoặc trước đó.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Bật công tắc, rồi nhấn giữ bất kỳ tab nào hoặc PlusButton để xem mã định danh của nó.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Xoay (chỉ tab này: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Khung hình + pháo hoa (mọi tab: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Phản hồi bên ngoài view cha (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Khi bật công tắc, phần nút nằm ngoài ô màu xám cũng phản hồi; mỗi lần chạm sẽ phát hiệu ứng phóng to. Số lần chạm: %@";
+"已找到" = "Đã tìm thấy";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Không tìm thấy (với use_frameworks, gói tài nguyên nằm trong framework)";
+"从 bundle 加载图片（issue #535）" = "Tải ảnh từ bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "Ảnh bên trái được đọc từ gói tài nguyên bằng CYLImageInBundle (không lưu đệm). CYLBundleImage trong bundle chính: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Đây là một UIViewController thông thường, không kế thừa CYLBaseViewController. Thanh điều hướng đã bị ẩn.";
+"不继承基类隐藏导航栏（issue #535）" = "Ẩn thanh điều hướng không cần lớp cơ sở (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "Công tắc đặt cyl_automaticNavigationSettingEnabled; chạm vào hàng để mở một UIViewController thông thường có đặt cyl_navigationBarHidden và cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "Trang %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Chuyển cảnh trượt (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Chạm để mở một UITabBarController của hệ thống: chạm vào tab hoặc kéo trang sang trái hay phải, trang sẽ trượt theo ngón tay.";
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "Thu nhỏ / ẩn TabBar khi cuộn (issue #13)";
@@ -219,3 +255,101 @@
 "跳转与对比" = "Điều hướng và so sánh";
 "角标" = "Huy hiệu";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass không hỗ trợ: hệ thống quyết định chiều cao thanh tab (FlatDesign và kiểu cổ điển hỗ trợ)";
+
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Ẩn khi cuộn: mô phỏng gián đoạn (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Chạy 1,5 giây sau khi chạm. Hãy cuộn xuống trước để ẩn TabBar. Mong đợi: TabBar hiện lại ngay, và quán tính không ẩn nó lần nữa.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Chạy 1,5 giây sau khi chạm. Mong đợi: TabBar không thay đổi vì điều này (không bị ẩn, và TabBar do App ẩn sẽ không hiện).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Chọn một gián đoạn; nó chạy sau 1,5 giây. Hãy cuộn xuống trước để ẩn TabBar.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Thủ công: chạm để bật ẩn khi cuộn, cuộn xuống để ẩn TabBar, rồi làm theo tiêu đề. Mong đợi: TabBar hiện lại ngay.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Chạy lần lượt mọi mô phỏng tự động và báo đạt / không đạt (khoảng 2 phút), cả trong console. Cũng có thể chạy bằng tham số khởi chạy -CYLScrollHideSelfTest YES.";
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Giao diện";
+"换肤（主题，issue #216）" = "Giao diện (chủ đề, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Chạm để chọn chủ đề: nền, biểu tượng và màu chữ của TabBar đổi ngay tại chỗ, với mọi kiểu TabBar. Hiện tại: %@";
+"选择主题" = "Chọn chủ đề";
+"默认" = "Mặc định";
+"西柚" = "Bưởi";
+"青草" = "Cỏ";
+"玫瑰粉" = "Hồng phấn";
+"春节" = "Tết Nguyên Đán";
+"跟随系统深色模式" = "Theo chế độ tối của hệ thống";
+"默认点击声" = "Tiếng nhấp mặc định";
+"中等触感反馈" = "Phản hồi xúc giác vừa";
+"无需继承基类与工具方法" = "Không cần lớp cơ sở, và tiện ích";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Tab trước / sau (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Tham chiếu yếu: còn sống lấy được %@, sau khi giải phóng là nil %@. Từ %@ đến nút tab đang chọn: %@";
+"点击声 + 触感反馈" = "Tiếng nhấp + xúc giác";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Nảy + pháo hoa ngôi sao (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Chạm vào mũi tên bên phải để gọi cyl_switchToAdjacentTabWithStep:-1 / 1. Giống như vuốt, bỏ qua PlusButton và kiểm tra đăng nhập. Kết quả lần trước: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Chạm để chuyển, rồi chạm vào tab bất kỳ hoặc PlusButton để nghe. Phản hồi xúc giác chỉ rung trên thiết bị thật. Hiện tại: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Chạm để chạy: cyl_setWeakAssociatedObject:forKey: trả về nil khi đối tượng được giải phóng; cyl_nearestControlBelowView: tìm nút của tab đang chọn từ biểu tượng của nó.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Chạm để chuyển. cyl_tabBarItemLongPressDuration: %@ giây, cyl_tabButtonLongPressMinimumDuration: %@ giây, cyl_tabBarItemDoubleTapInterval: %@ giây";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Tệp âm thanh tùy chỉnh (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Cuộn lên, không có hiệu ứng bỏ chọn (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Phóng to rồi thu nhỏ chậm (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Phóng to chậm (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: đối tượng liên kết yếu và tìm nút (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Thời gian nhấn giữ và khoảng chạm hai lần (issue #535 / #152)";
+"Tab 交互" = "Tương tác tab";
+"Tab 点击声音与触感反馈（issue #535）" = "Âm thanh và xúc giác khi chạm tab (issue #535)";
+"轻触感反馈" = "Phản hồi xúc giác nhẹ";
+"重触感反馈" = "Phản hồi xúc giác mạnh";
+"长按（#152）" = "Nhấn giữ (#152)";
+"播放 / 停止" = "Phát / Dừng";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Giáng sinh";
+"万圣节" = "Halloween";
+"情人节" = "Lễ tình nhân";
+"中秋节" = "Tết Trung thu";
+"复活节" = "Lễ Phục sinh";
+"新年" = "Năm mới";
+"夏日" = "Mùa hè";
+"生日" = "Sinh nhật";
+"太空" = "Không gian";
+"海洋" = "Đại dương";
+"换肤：节日与配色主题（%@ 种）" = "Giao diện: ngày lễ và màu sắc (%@)";
+"节日图标与配色" = "Biểu tượng ngày lễ và màu sắc";
+"仅配色" = "Chỉ màu sắc";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Chạm";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Tải hình ảnh";
+"替换为更大的图片" = "Thay bằng hình ảnh lớn hơn";
+"移除图片" = "Xóa hình ảnh";
+"加载背景图片" = "Tải hình nền";
+"2 秒后：%@" = "Sau 2 giây: %@";
+"PlusButton 图片之后才加载" = "Hình PlusButton được tải sau";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Chạm để chọn trường hợp và push một tab bar controller: lúc đầu PlusButton chưa có hình; 2 giây sau hình được tải, thay thế hoặc xóa, hoặc tải hình nền. Kết quả phải giống như hình được đặt khi khởi chạy.";
+"对照：启动时即有图片" = "So sánh: có hình khi khởi chạy";
+"对照：启动时即有更大的图片" = "So sánh: có hình lớn hơn khi khởi chạy";
+"对照：启动时即有背景图片" = "So sánh: có hình nền khi khởi chạy";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Chạm để quay lại hoặc đóng";
+"详情" = "Chi tiết";
+"拍照" = "Chụp ảnh";
+"从相册选择" = "Chọn từ album";
+"设置" = "Cài đặt";
+"关于我们" = "Về chúng tôi";
+"示例" = "Ví dụ";
+"撰写" = "Soạn";
+"好" = "OK";
+"编辑更多" = "Sửa mục Thêm";
+"新版本" = "Phiên bản mới";
+"打开 TabBar 场景展示" = "Mở thư viện tab bar";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Mỗi cảnh là một tab bar dựng bằng API công khai: kiểu dáng, hoạt ảnh, nhắc nhở, Lottie và các API tab mới";
+"TabBar 场景展示" = "Thư viện tab bar";
+
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Sao chép";
+/* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
+"展开全部 %@ 个模拟" = "Hiện tất cả %@ mô phỏng";
+/* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
+"收起模拟列表" = "Thu gọn danh sách mô phỏng";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Biểu tượng từ mạng";
+"网络图标、标题与配色" = "Biểu tượng từ mạng, tiêu đề và màu sắc";

@@ -18,11 +18,24 @@
 
 @implementation CYLMainRootViewController
 
++ (instancetype)currentRootViewController {
+    UIViewController *rootViewController = CYLGetRootWindow().rootViewController;
+    return [rootViewController isKindOfClass:self] ? (CYLMainRootViewController *)rootViewController : nil;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationBarHidden = YES;
     self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
-    [self createLiquidGlassTabBar];
+    // [EN] Scroll hiding self-test (issue #13, scripts/scroll-hide-self-test.sh): `-CYLScrollHideSelfTestFlatDesign YES`
+    //      starts on the FlatDesign tab bar, which code can hide on every system (Liquid Glass is minimized by the system).
+    // [CN] 滚动隐藏自测（issue #13，scripts/scroll-hide-self-test.sh）：`-CYLScrollHideSelfTestFlatDesign YES` 以扁平样式 TabBar 启动，
+    //      在所有系统上都可以用代码隐藏（液态玻璃由系统缩小）。
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"CYLScrollHideSelfTestFlatDesign"]) {
+        [self createFlatDesignTabBar];
+    } else {
+        [self createLiquidGlassTabBar];
+    }
 //    [self createFlatDesignTabBar];
 
 }

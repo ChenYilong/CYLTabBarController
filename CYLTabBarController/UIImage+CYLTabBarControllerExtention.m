@@ -336,6 +336,17 @@ static NSUInteger CYLRemoteImageCost(UIImage *image) {
     [[CYLImageCache sharedImageCache] cyl_loadImageWithURL:URL options:options finish:finish];
 }
 
++ (NSTimeInterval)cyl_GIFFrameDelayWithProperties:(NSDictionary *)properties {
+    // [EN] The frame's delay, unclamped first; browsers treat very short delays as 0.1 s.
+    // [CN] 帧时长，优先使用未修正值；与浏览器一致，过短的时长按 0.1 秒处理。
+    NSDictionary *gifProperties = properties[(__bridge NSString *)kCGImagePropertyGIFDictionary];
+    NSNumber *delay = gifProperties[(__bridge NSString *)kCGImagePropertyGIFUnclampedDelayTime];
+    if (delay.doubleValue <= 0) {
+        delay = gifProperties[(__bridge NSString *)kCGImagePropertyGIFDelayTime];
+    }
+    return (delay.doubleValue < 0.011) ? 0.1 : delay.doubleValue;
+}
+
 + (UIImage *)cyl_animatedImageWithGIFData:(NSData *)data {
     if (data.length == 0) {
         return nil;
@@ -355,15 +366,8 @@ static NSUInteger CYLRemoteImageCost(UIImage *image) {
         }
         [frames addObject:[UIImage imageWithCGImage:imageRef scale:scale orientation:UIImageOrientationUp]];
         CGImageRelease(imageRef);
-        // [EN] The frame's delay, unclamped first; browsers treat very short delays as 0.1 s.
-        // [CN] 帧时长，优先使用未修正值；与浏览器一致，过短的时长按 0.1 秒处理。
         NSDictionary *properties = (__bridge_transfer NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, index, NULL);
-        NSDictionary *gifProperties = properties[(__bridge NSString *)kCGImagePropertyGIFDictionary];
-        NSNumber *delay = gifProperties[(__bridge NSString *)kCGImagePropertyGIFUnclampedDelayTime];
-        if (delay.doubleValue <= 0) {
-            delay = gifProperties[(__bridge NSString *)kCGImagePropertyGIFDelayTime];
-        }
-        duration += (delay.doubleValue < 0.011) ? 0.1 : delay.doubleValue;
+        duration += [self cyl_GIFFrameDelayWithProperties:properties];
     }
     CFRelease(source);
     if (frames.count <= 1) {

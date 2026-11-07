@@ -1,0 +1,8 @@
+# Applying Liquid Glass to custom views videos
+
+Source: https://developer.apple.com/documentation/swiftui/applying-liquid-glass-to-custom-views
+
+Video links extracted from the Apple DocC page. These are kept out of the main doc to avoid bloating default agent context.
+
+- [A video showing examples including a Text view with Liquid Glass effects applied, a Text view with a custom shape, corner radius effect, and Liquid Glass effects applied, and a Text view with an orange tint color effect that responds to interactivity, with Liquid Glass effects applied.](https://docs-assets.developer.apple.com/published/85bf4e5c22fe2f62d80566ca86382194/liquid-glass-view-examples.mp4) Poster: [Poster image](https://docs-assets.developer.apple.com/published/4cf9ad90f1ea941a07f05e2c29ce2c92/liquid-glass-view-examples-poster%402x.png) Alt: A video showing examples including a Text view with Liquid Glass effects applied, a Text view with a custom shape, corner radius effect, and Liquid Glass effects applied, and a Text view with an orange tint color effect that responds to interactivity, with Liquid Glass effects applied.
+- [A video which shows two views, a scribble symbol on the left and a eraser symbol on the right, with Liquid Glass effects morphing in and out of each other as a button below them is pressed.](https://docs-assets.developer.apple.com/published/252b28fd67b8a82ae644e1aad1239153/liquid-glass-morph-views.mp4) Poster: [Poster image](https://docs-assets.developer.apple.com/published/1df64f75bbb77dd78e55d652d516c87b/liquid-glass-morph-views-poster%402x.png) Alt: A video which shows two views, a scribble symbol on the left and a eraser symbol on the right, with Liquid Glass effects morphing in and out of each other as a button below them is pressed.

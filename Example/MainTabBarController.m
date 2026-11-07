@@ -25,6 +25,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 @interface MainTabBarController ()<CYLTabBarControllerDelegate, CYLFlatDesignUITabBarControllerDelegate>
 
 @property (nonatomic, weak) UIButton *selectedCover;
+/// [EN] The covers of the first tab, kept: the decoration block runs again after a theme switch or a tab reload, and
+///      covering with the same views moves them instead of adding more.
+/// [CN] 第一个 Tab 的封面，保留下来：换肤或重新加载 Tab 后装饰 block 会再次执行，用同样的视图覆盖只会移动它们，不会再添加新的。
+@property (nonatomic, strong) UIButton *contentCover;
+@property (nonatomic, strong) UIButton *selectedContentCover;
 
 @property (nonatomic, assign) CGRect tabBarBounds;
 
@@ -62,8 +67,23 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         self.delegate = self;
         self.navigationController.navigationBar.hidden = YES;
         [self setUpLoginRequiredTabs];
+        [self setUpTabBarItemGestures];
     }
     return self;
+}
+
+/*!
+ * [EN] #152: gestures on the tab buttons and the plus button, with the block API. CYLFlatDesignMainTabBarController and
+ *      Example-Swift show the delegate method; all of them use -cyl_demo_handleTabBarItemGesture:control:viewController:.
+ * [CN] #152：Tab 按钮与 PlusButton 上的手势，使用 block 方式。CYLFlatDesignMainTabBarController 与 Example-Swift 演示代理方法；
+ *      都使用 -cyl_demo_handleTabBarItemGesture:control:viewController:。
+ */
+- (void)setUpTabBarItemGestures {
+    __weak __typeof(self) weakSelf = self;
+    self.cyl_tabBarItemGestureHandler = ^(CYLTabBarController *tabBarController, CYLTabBarItemGesture gesture,
+                                          UIControl *control, UIViewController *viewController) {
+        [weakSelf cyl_demo_handleTabBarItemGesture:gesture control:control viewController:viewController];
+    };
 }
 
 /*!
@@ -112,7 +132,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  */
 - (void)observeLottieAnimationViewDidAdd {
     __weak __typeof(self) weakSelf = self;
-    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationViewDidAddNotification
+    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemAnimationViewDidAddNotification
                                                       object:nil
                                                        queue:[NSOperationQueue mainQueue]
                                                   usingBlock:^(NSNotification * _Nonnull note) {
@@ -121,7 +141,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
             return;
         }
         NSLog(@"🟢 Lottie view added: tab %@, animationSpeed %@", @(tabButton.cyl_tabBarChildViewControllerIndex),
-              [(id)tabButton.cyl_lottieAnimationView valueForKey:@"animationSpeed"]);
+              [(id)tabButton.cyl_tabBarItemAnimationView valueForKey:@"animationSpeed"]);
     }];
 }
 
@@ -129,7 +149,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  * [EN] Issue #428: plays the Lottie icons 1.5 times as fast. No need to wait for the Lottie views to be added.
  * [CN] Issue #428：Lottie 图标以 1.5 倍速播放，无需等待 Lottie 视图添加完成。
  */
-- (CGFloat)lottieAnimationSpeed {
+- (CGFloat)tabBarItemAnimationSpeed {
     return 1.5;
 }
 
@@ -213,6 +233,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //    CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
         CYLTabBarItemTitle : CYLLocalizedString(@"首页"),
+        // [EN] #433: like JD, the selected Home tab reads "Refresh"; a re-tap replays its Lottie animation and is
+        //      reported to `cyl_tabBarItemGestureHandler` (-setUpTabBarItemGestures).
+        // [CN] #433：与京东一样，选中的「首页」显示「刷新」；再次点击重播 Lottie 动画，并回调 `cyl_tabBarItemGestureHandler`
+        //      （-setUpTabBarItemGestures）。
+        CYLTabBarItemSelectedTitle : CYLLocalizedString(@"刷新"),
         CYLTabBarItemIdentifier : @"home",  // #408: stays right when tabs are added or removed. Tab 增减后依然准确。
         // A name also loads "<name>_dark" when that image exists: here home_normal_dark (UIImage.cyl_darkImageNameSuffix).
         // 图片名会同时加载存在的「<name>_dark」：这里是 home_normal_dark（UIImage.cyl_darkImageNameSuffix）。
@@ -237,6 +262,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                  CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"],
         CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover_dark" ofType:@"json"],
+        // [EN] #216: the unselected icon's color follows the skin (the tab's file stays the same): gray, or red with the Grapefruit skin (a color skin: a holiday skin's icons are shown over the animations).
+        // [CN] #216：未选中图标的颜色跟随皮肤（Tab 的文件不变）：灰色，西柚皮肤时为红色（使用配色皮肤：节日皮肤的图标会显示在动画之上）。
+        CYLTabBarAnimationColors : @{ @"Icon_Discovery_Normal.**.Color" : [UIColor cyl_colorWithThemeProvider:^UIColor *(CYLThemeManager *manager, NSObject<NSCopying> *identifier, NSObject *theme) {
+            return [identifier isEqual:@"Grapefruit"] ? UIColor.systemRedColor : [UIColor colorWithWhite:0.498 alpha:1];
+        }] },
         //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     
@@ -522,12 +552,16 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 - (void)setSelectedCoverShow:(BOOL)show {
     UIControl *selectedTabButton = [self.viewControllers[0] cyl_tabButton];
     __weak __typeof(self) weakSelf = self;
+    if (!self.contentCover) {
+        self.contentCover = self.selectedCover;
+        self.selectedContentCover = self.selectedCover;
+    }
     // [CN] TODO:  如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
     // [EN] TODO:  Lottie animation icons need a delay; otherwise the replacement happens before the lottie animation has
     //      finished initializing, and the position is wrong.
     [selectedTabButton cyl_coverVisiableTabImageViewOrTabButton:YES
-                                                 contentNewView:self.selectedCover
-                                          seclectContentNewView:self.selectedCover
+                                                 contentNewView:self.contentCover
+                                          seclectContentNewView:self.selectedContentCover
                                                          offset:UIOffsetZero
                                                            show:show
                                         delayIfNeededForSeconds:0.1
@@ -714,16 +748,9 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     //        [self setSelectedCoverShow:NO];
     //    }
     BOOL should = YES;
-    
-    UIControl *selectedTabButton = [viewController.tabBarItem cyl_tabButton];
-    if (selectedTabButton.selected && [[[self class] cyl_topmostViewController] respondsToSelector:@selector(refresh)]) {
-        // [CN] 双重点击， 触发刷新。
-        // [EN] Double tap triggers a refresh.
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(
-                                                [[[self class] cyl_topmostViewController] performSelector:@selector(refresh)];
-                                                
-                                                );
-    }
+    // [EN] #152: re-tap, double tap and long press are handled by `cyl_tabBarItemGestureHandler`, see
+    //      -setUpTabBarItemGestures.
+    // [CN] #152：再次点击、双击与长按由 `cyl_tabBarItemGestureHandler` 处理，见 -setUpTabBarItemGestures。
     return should && shouldSelectViewControllerFromSuper;
 }
 
@@ -943,7 +970,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     return ![rootViewController isKindOfClass:[CYLHomeViewController class]];
 }
 
-- (UIViewContentMode)lottieAnimationViewContentMode {
+- (UIViewContentMode)tabBarItemAnimationViewContentMode {
     return UIViewContentModeScaleAspectFit;
 }
 
@@ -1019,6 +1046,65 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         presenter = presenter.presentedViewController;
     }
     [presenter presentViewController:alert animated:YES completion:nil];
+}
+
+@end
+
+@implementation CYLTabBarController (CYLTabBarItemGestureDemo)
+
+- (void)cyl_demo_handleTabBarItemGesture:(CYLTabBarItemGesture)gesture control:(UIControl *)control viewController:(UIViewController *)viewController {
+    UIViewController *contentViewController = [viewController cyl_getViewControllerInsteadOfNavigationController];
+    NSLog(@"🟣 #152 gesture %@ on \"%@\"", @(gesture), control.cyl_tabBarItemIdentifier);
+    switch (gesture) {
+        case CYLTabBarItemGestureReselect:
+            [self cyl_demo_scrollToTop:contentViewController];
+            break;
+        case CYLTabBarItemGestureDoubleTap:
+            if ([contentViewController respondsToSelector:@selector(refresh)]) {
+                CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(
+                    [contentViewController performSelector:@selector(refresh)];
+                );
+            }
+            break;
+        case CYLTabBarItemGestureLongPress:
+            [self cyl_demo_showActionsForControl:control];
+            break;
+    }
+}
+
+/// [EN] Scrolls the first scroll view of the page to its top. [CN] 将页面中的第一个滚动视图滚动到顶部。
+- (void)cyl_demo_scrollToTop:(UIViewController *)viewController {
+    UIView *view = viewController.isViewLoaded ? viewController.view : nil;
+    NSMutableArray<UIView *> *views = view ? [NSMutableArray arrayWithObject:view] : [NSMutableArray array];
+    while (views.count > 0) {
+        UIView *each = views.firstObject;
+        [views removeObjectAtIndex:0];
+        if ([each isKindOfClass:[UIScrollView class]]) {
+            UIScrollView *scrollView = (UIScrollView *)each;
+            [scrollView setContentOffset:CGPointMake(scrollView.contentOffset.x, -scrollView.adjustedContentInset.top) animated:YES];
+            return;
+        }
+        [views addObjectsFromArray:each.subviews];
+    }
+}
+
+/// [EN] The long press menu: the tab's identifier and a way to select it. [CN] 长按菜单：显示 Tab 标识，并可选中它。
+- (void)cyl_demo_showActionsForControl:(UIControl *)control {
+    NSString *identifier = control.cyl_tabBarItemIdentifier;
+    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:identifier
+                                                                    message:CYLLocalizedString(@"长按（#152）")
+                                                             preferredStyle:UIAlertControllerStyleActionSheet];
+    __weak __typeof(self) weakSelf = self;
+    if (identifier.length > 0 && ![control cyl_isPlusButton]) {
+        [sheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"选中") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [weakSelf cyl_selectTabBarItemWithIdentifier:identifier];
+        }]];
+    }
+    [sheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil]];
+    sheet.popoverPresentationController.sourceView = control;
+    sheet.popoverPresentationController.sourceRect = control.bounds;
+    UIViewController *presenter = self.presentedViewController ? nil : self;
+    [presenter presentViewController:sheet animated:YES completion:nil];
 }
 
 @end

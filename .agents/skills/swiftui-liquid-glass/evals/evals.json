@@ -1,0 +1,65 @@
+{
+  "skill_name": "swiftui-liquid-glass",
+  "evals": [
+    {
+      "id": 0,
+      "name": "static-status-badge-toolbar-affordance",
+      "prompt": "Review this iOS 26 SwiftUI sheet header plan: the sheet has a centered title, a Done button, and a top-left numeric count like `24` showing how many options expire that day. The current implementation places the count in `ToolbarItem(placement: .topBarLeading)` as a custom capsule with Liquid Glass styling, but tapping it only makes it visually grow and does nothing. What should the implementation change?",
+      "expected_output": "A Liquid Glass-aware review that identifies the count as a non-action status indicator, avoids placing it in a toolbar/control slot when it has no action, removes interactive glass affordance, and recommends static header placement plus accessibility metadata and UI verification.",
+      "files": [],
+      "assertions": [
+        "Identifies the numeric count as a status indicator rather than a standalone action or toolbar command.",
+        "Explains that custom toolbar/navigation items in iOS 26 can inherit Liquid Glass control affordance, so a non-action count in a toolbar slot can misleadingly look tappable.",
+        "Recommends moving the static count out of the toolbar/control surface or attaching it only to a real actionable control if an action is intended.",
+        "Requires avoiding `.interactive()` glass, `Button`, `NavigationLink`, or other press/hover affordances for the non-action count.",
+        "Includes accessibility guidance such as a meaningful label like \"24 options expiring\", a stable automation identifier, and static/non-button semantics.",
+        "Calls for visual or UI automation verification that the badge displays as a plain number and does not react as a tappable target."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "badge-attached-to-real-action",
+      "prompt": "Design an iOS 26 SwiftUI notification bell in a toolbar. The bell opens a notifications screen, and a small unread-count badge should show `7`. The team is unsure whether Liquid Glass makes the badge look like a separate control. Give implementation guidance.",
+      "expected_output": "Guidance that treats the toolbar bell as the actionable control, keeps the unread badge as subordinate status information, preserves a single accessible action, and uses Liquid Glass only on the actual button/control.",
+      "files": [],
+      "assertions": [
+        "Keeps the bell button as the single actionable toolbar control that opens notifications.",
+        "Treats the unread-count badge as subordinate status information, not an independent tappable control.",
+        "Recommends a combined accessibility label/value such as \"Notifications, 7 unread\" or equivalent VoiceOver meaning.",
+        "Avoids giving the badge its own Button, NavigationLink, gesture, or independent interactive Liquid Glass affordance.",
+        "Uses an iOS 26-appropriate toolbar/button treatment for the actual action while keeping the badge visually lightweight.",
+        "Mentions testing that the toolbar exposes one action target rather than separate bell and badge targets."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "mixed-glass-controls-and-status-audit",
+      "prompt": "Audit this SwiftUI iOS 26 dashboard design before coding: a floating Liquid Glass toolbar has Add, Filter, and Share controls; nearby static chips show `Synced`, `3 warnings`, and `Market closed`; a selected filter pill changes color but does not open anything; and a decorative glass panel sits behind a chart. Which elements should be interactive glass, which should be static, and what should be routed or tested?",
+      "expected_output": "A boundary-aware Liquid Glass audit that limits interactive glass to real controls, treats status chips and decorative panels as static/noninteractive, flags ambiguous selected pills, avoids overusing glass, and routes accessibility or layout concerns where appropriate.",
+      "files": [],
+      "assertions": [
+        "Allows `.interactive()` or glass button styles only for real actions such as Add, Filter, and Share.",
+        "Classifies `Synced`, `3 warnings`, and `Market closed` as status indicators that should not receive press/hover/tap affordance unless a real action is added.",
+        "Flags the selected filter pill as ambiguous if it looks tappable but has no action, and recommends either making the action explicit or restyling it as noninteractive state.",
+        "Warns against using Liquid Glass as broad decoration behind the chart when it distracts from content or creates unnecessary rendering cost.",
+        "Mentions availability gating and fallbacks for iOS versions before Liquid Glass support.",
+        "Routes detailed accessibility semantics, labels, traits, and automation identifiers to the accessibility skill while still noting that controls and status indicators need different semantics."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "content-layer-and-clear-glass-review",
+      "prompt": "Review this iOS 26 SwiftUI card design: a large dashboard chart sits inside a `.glassEffect(.clear)` rounded rectangle so the graph looks fancy over a bright gradient background, and the card has no controls. A nearby Play button opens a media preview. What should change before implementation?",
+      "expected_output": "A Liquid Glass-aware review that keeps static chart content out of the Liquid Glass functional layer, applies glass styling only to the real Play action if appropriate, recognizes configurable glass button styling, and requires clear-glass legibility treatment if clear glass remains over rich media.",
+      "files": [],
+      "assertions": [
+        "Warns that Liquid Glass should not be used as decoration for a static content-layer chart/card.",
+        "Recommends leaving the chart/card in the content layer or using standard materials/content styling instead of custom Liquid Glass.",
+        "Treats the Play button as the real actionable control and allows a standard Liquid Glass button style there.",
+        "Recognizes `.buttonStyle(.glass(.clear))` or equivalent configurable glass button styling as the appropriate API when a clear glass button variant is needed.",
+        "Requires clear glass legibility treatment such as dimming or contrast verification over the bright/rich background.",
+        "Mentions availability gating or fallback behavior for platforms before iOS 26 Liquid Glass support."
+      ]
+    }
+  ]
+}

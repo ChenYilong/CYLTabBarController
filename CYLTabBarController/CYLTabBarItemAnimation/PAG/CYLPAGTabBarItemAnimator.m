@@ -6,23 +6,46 @@
 //
 
 #import "CYLPAGTabBarItemAnimator.h"
+// [EN] Core's generic keys and helpers. [CN] Core 的通用 key 与工具函数。
+#if __has_include("../../CYLTabBarController.h")
+#import "../../CYLTabBarController.h"
+#else
+#import "CYLTabBarController.h"
+#endif
 
-// FIX: issue #604 — only with the PAG subspec; without it this file is empty and the class is never used.
-// 仅在引入 PAG 子库时编译；未引入时本文件为空，也不会使用该类。
-#if __has_include(<libpag/PAGView.h>)
+// FIX: issue #604 — only with libpag (`CYL_PAG_AVAILABLE`, the PAG subspec); without it this file is empty: no keys,
+// no class.
+// [CN] 仅在引入 libpag 时编译（`CYL_PAG_AVAILABLE`，PAG 子库）；未引入时本文件为空：没有 key，也没有类。
+#if CYL_PAG_AVAILABLE
 #import <libpag/PAGView.h>
+
+// [EN] The PAG keys, declared by the PAG subspec (aliases of the generic keys, see `attributeKeys`).
+// [CN] PAG 的 key，由 PAG 子库声明（通用 key 的别名，见 `attributeKeys`）。
+NSString *const CYLTabBarPAGURL = @"CYLTabBarPAGURL";
+NSString *const CYLTabBarPAGFilePath = @"CYLTabBarPAGFilePath";
+NSString *const CYLTabBarPAGSize = @"CYLTabBarPAGSize";
+NSString *const CYLTabBarPAGDarkURL = @"CYLTabBarPAGDarkURL";
+NSString *const CYLTabBarPAGDarkFilePath = @"CYLTabBarPAGDarkFilePath";
+
+NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFiles(NSArray<NSDictionary *> *attributes,
+                                                                 NSArray<NSString *> *pagFileNames,
+                                                                 NSBundle *bundle) {
+    // [EN] The generic helper with "<name>.pag": the same files, under the generic keys the PAG keys stand for.
+    // [CN] 使用「名称.pag」调用通用工具函数：文件相同，使用 PAG key 所对应的通用 key。
+    NSMutableArray *fileNames = [NSMutableArray arrayWithCapacity:pagFileNames.count];
+    for (id name in pagFileNames) {
+        BOOL hasName = [name isKindOfClass:[NSString class]] && [(NSString *)name length] > 0;
+        [fileNames addObject:hasName ? [(NSString *)name stringByAppendingPathExtension:@"pag"] : @""];
+    }
+    return CYLTabBarItemsAttributesAddingAnimationFiles(attributes, fileNames, bundle);
+}
+
 // The protocol and the registry of the `CYLTabBarItemAnimation` subspec (the source tree, or flattened by CocoaPods).
 // `CYLTabBarItemAnimation` 子库的协议与注册表（源码目录，或 CocoaPods 展平后）。
 #if __has_include("../CYLTabBarItemAnimatorRegistry.h")
 #import "../CYLTabBarItemAnimatorRegistry.h"
 #else
 #import "CYLTabBarItemAnimatorRegistry.h"
-#endif
-// Core's keys (`CYLTabBarPAG…`, `CYLTabBarAnimation…`). Core 的 key。
-#if __has_include("../../CYLTabBarController.h")
-#import "../../CYLTabBarController.h"
-#else
-#import "CYLTabBarController.h"
 #endif
 
 /// [EN] Plays a `PAGView`. [CN] 播放 `PAGView`。
@@ -111,6 +134,13 @@
         return nil;
     }
     PAGView *pagView = [[PAGView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+    // [EN] Rendered on the main thread, everywhere: a tab bar has several small PAGViews. With one render thread each, those
+    //      threads stalled inside the simulator's software OpenGL while holding their player's lock, and the first call that
+    //      needed it (`-stop`, `-setHidden:`) blocked the main thread: blank icons, no playback. One path on every target also
+    //      means that what the simulator shows is what a device runs.
+    // [CN] 所有环境都在主线程绘制：TabBar 中有多个很小的 PAGView。每个一个绘制线程时，这些线程会在模拟器的软件 OpenGL 内部卡住并持有播放器的锁，
+    //      之后第一个需要该锁的调用（`-stop`、`-setHidden:`）会阻塞主线程：图标空白，不播放。所有环境走同一条路径，模拟器上看到的就是真机运行的。
+    [pagView setSync:YES];
     [pagView setComposition:pagFile];
     // Like a Lottie view: plays once, shows its first frame until then. 与 Lottie 视图一致：播放一次，播放前显示第一帧。
     [pagView setRepeatCount:1];

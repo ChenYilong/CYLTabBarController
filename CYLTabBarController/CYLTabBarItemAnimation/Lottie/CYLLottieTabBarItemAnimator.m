@@ -30,6 +30,14 @@
 // 仅在引入 Lottie 库时编译；未引入时本文件为空，也不会使用该类。
 #if CYL_LOTTIE_AVAILABLE
 
+// [EN] FIX: issue #605 — first: the generated header below also declares the Swift views of the Rive subspec when both are in the
+//      build (e.g. Rive with FlatDesign, which brings Lottie), and those views adopt this header's protocols.
+// [CN] FIX: issue #605 — 需先引入：两者同时在构建中时（例如 Rive 与会引入 Lottie 的扁平样式），下面生成的头文件也声明了 Rive 子库的 Swift 视图，这些视图遵守本头文件的协议。
+#if __has_include("../CYLTabBarItemAnimationPlayableView.h")
+#import "../CYLTabBarItemAnimationPlayableView.h"
+#else
+#import "CYLTabBarItemAnimationPlayableView.h"
+#endif
 #if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 #import <CYLTabBarController/CYLTabBarController-Swift.h>
 #endif
@@ -52,9 +60,9 @@
 @implementation CYLLottieObjectiveCTabBarItemAnimationPlayer
 
 + (BOOL)isLottieView:(UIView *)view {
-    // Resolved at runtime, as before. 与原来一样在运行时解析。
-    Class lottieViewClass = NSClassFromString(@"LOTAnimationView");
-    return lottieViewClass && [view isKindOfClass:lottieViewClass];
+    // [EN] Inside the `__has_include` guard Lottie is linked (this file already uses the class), so no string lookup.
+    // [CN] 在 `__has_include` 守卫内 Lottie 已链接（本文件已直接使用该类），因此无需按字符串查找。
+    return [view isKindOfClass:[LOTAnimationView class]];
 }
 
 + (UIView *)viewWithURL:(NSURL *)URL {
@@ -127,6 +135,8 @@
 @implementation CYLLottieSwiftTabBarItemAnimationPlayer {
     /// [EN] Whether the dark colors are applied now (#442). [CN] 当前是否已应用深色颜色（#442）。
     BOOL _darkColorsApplied;
+    /// FIX: issue #216 — the keypaths `-applyColors:` set last. [CN] `-applyColors:` 上次设置的 keypath。
+    NSSet<NSString *> *_appliedColorKeypaths;
 }
 
 + (BOOL)isLottieView:(UIView *)view {
@@ -236,6 +246,41 @@
         }
     }];
     _darkColorsApplied = dark;
+    if ([view respondsToSelector:@selector(forceDrawingUpdate)]) {
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:@selector(forceDrawingUpdate)]);
+    }
+}
+
+/*!
+ * FIX: issue #216 — Lottie 4.x only.
+ * [EN] Sets `colors` (already resolved) with Lottie's value providers and removes the providers of the keypaths set by a
+ *      previous call that are no longer in it; nil removes them all.
+ * [CN] 用 Lottie 的 value provider 设置 `colors`（已解析），并移除上一次调用设置、这次不再包含的 keypath 的 provider；nil 移除全部。
+ */
+- (void)applyColors:(nullable NSDictionary<NSString *, UIColor *> *)colors traitCollection:(UITraitCollection *)traitCollection {
+    UIView *view = self.animationView;
+    SEL setColorSelector = @selector(setColorValue:forKeypathString:);
+    SEL removeColorSelector = @selector(removeValueProviderForKeypathString:);
+    if (!view || ![view respondsToSelector:setColorSelector] || ![view respondsToSelector:removeColorSelector]) {
+        return;
+    }
+    for (NSString *keypath in _appliedColorKeypaths) {
+        if (!colors[keypath]) {
+            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:removeColorSelector withObject:keypath]);
+        }
+    }
+    NSMutableSet<NSString *> *appliedKeypaths = [NSMutableSet set];
+    [colors enumerateKeysAndObjectsUsingBlock:^(NSString *keypath, UIColor *color, BOOL *stop) {
+        (void)stop;
+        if (![keypath isKindOfClass:[NSString class]] || ![color isKindOfClass:[UIColor class]]) {
+            return;
+        }
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:setColorSelector withObject:color withObject:keypath]);
+        [appliedKeypaths addObject:keypath];
+    }];
+    _appliedColorKeypaths = appliedKeypaths;
+    // [EN] `-applyColors:` carries the dark colors itself. [CN] `-applyColors:` 自己带有深色颜色。
+    _darkColorsApplied = NO;
     if ([view respondsToSelector:@selector(forceDrawingUpdate)]) {
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:@selector(forceDrawingUpdate)]);
     }

@@ -10,6 +10,8 @@
 // [CN] 与此类绑定的文档：
 //   - The shared tab icon animation subspec: CYLTabBarItemAnimation (protocol-oriented, open to any library) / Tab 图标动画共用子库：CYLTabBarItemAnimation（面向协议，可扩展任意动画库）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Item-Animation.md
+//   - Theme switching evaluation: integration with the animation components, gaps and improvements / 换肤实现评估：与动画组件的集成、差距与改进
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching-Evaluation.md
 // docs-binding:end
 
 #import <Foundation/Foundation.h>
@@ -33,7 +35,28 @@ NS_ASSUME_NONNULL_BEGIN
  *      协议，而不是本类）。它用同一套代码为所有动画库添加、播放、停止 Tab 动画并在深色模式下替换，只通过 `CYLTabBarItemAnimatorRegistry` 找到文件或
  *      视图对应的动画库，因此从不指定具体的动画库。
  */
+@protocol CYLTabBarItemAnimatorRegistering;
+@protocol CYLTabBarItemAnimationViewMaking;
+
 @interface CYLTabBarItemAnimationEngine : NSObject <CYLTabBarItemAnimationService>
+
+/// [EN] Chooses the library of a tab. [CN] 选择 Tab 使用的动画库。
+@property (nonatomic, strong, readonly) id<CYLTabBarItemAnimatorRegistering> registry;
+/// [EN] Makes the animation views and finds their players. [CN] 创建动画视图并查找其播放器。
+@property (nonatomic, strong, readonly) id<CYLTabBarItemAnimationViewMaking> factory;
+/// [EN] The animation for the current style (#442). [CN] 当前风格下的动画（#442）。
+@property (nonatomic, strong, readonly) id<CYLTabBarItemAnimationStyleSource> styleSource;
+/// [EN] The tab bar: its state, layout and notifications. [CN] Tab 栏：其状态、布局与通知。
+@property (nonatomic, strong, readonly) id<CYLTabBarItemAnimationHost> host;
+
+/// [EN] An engine over the given dependencies (dependency injection). [CN] 基于给定依赖的引擎（依赖注入）。
+- (instancetype)initWithRegistry:(id<CYLTabBarItemAnimatorRegistering>)registry
+                         factory:(id<CYLTabBarItemAnimationViewMaking>)factory
+                     styleSource:(id<CYLTabBarItemAnimationStyleSource>)styleSource
+                            host:(id<CYLTabBarItemAnimationHost>)host NS_DESIGNATED_INITIALIZER;
+/// [EN] The shared registry and factory, and Core's style source and host. [CN] 共享注册表与工厂，以及 Core 的风格来源与宿主。
+- (instancetype)init;
+
 @end
 
 NS_ASSUME_NONNULL_END

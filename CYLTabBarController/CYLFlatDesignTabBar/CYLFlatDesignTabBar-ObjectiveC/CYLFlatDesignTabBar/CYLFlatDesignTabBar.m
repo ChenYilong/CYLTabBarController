@@ -54,6 +54,14 @@
 - (void)cyl_flatDesignPlusButtonTouchUpInside:(UIControl *)plusButton;
 @end
 
+// [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
+// [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
+@interface CYLTabBarController (CYLTabButtonHighlight)
+- (void)cyl_tabButtonTouchDown:(UIControl *)control;
+- (void)cyl_tabButtonTouchUp:(UIControl *)control;
+@end
+
+
 @implementation CYLFlatDesignTabBar {
     NSInteger _selectedItemIndex;
     NSMutableArray *_buttons;
@@ -79,7 +87,7 @@
         // [EN] Observe only with an animation library (#604, checked at runtime so that any library works).
         if (CYLTabBarItemAnimationIsAvailable()) {
             __weak __typeof(self) weakSelf = self;
-            void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
+            void (^CYLTabBarItemAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
                 __strong typeof(self) self = weakSelf;
                 if (!self) {
                      return;
@@ -88,10 +96,10 @@
                 [self stopAllTabBarItemAnimations];
             };
             // FIX: issue #488 keep the token, see `-dealloc`. 保存 token，见 `-dealloc`。
-            _lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationPlayingNotification
+            _lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemAnimationPlayingNotification
                                                                                                 object:nil
                                                                                                  queue:[NSOperationQueue mainQueue]
-                                                                                            usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
+                                                                                            usingBlock:CYLTabBarItemAnimationPlayingNotificationBlock];
         }
     }
     return self;
@@ -457,6 +465,24 @@
 
 #pragma mark - Private
 
+/// [EN] Touch down / up on a tab button: the pressed animation of the tab bar controller.
+/// [CN] 手指按下 / 抬起 Tab 按钮：TabBarController 的按下动画。
+- (void)_tabBarDidTouchDownButton:(CYLFlatDesignTabBarButton *)tabBarButton {
+    UITabBarController *owningTabBarController = self.tabBarController;
+    if (!tabBarButton.cyl_isPlaceholder && [owningTabBarController isKindOfClass:[CYLTabBarController class]] &&
+        [owningTabBarController respondsToSelector:@selector(cyl_tabButtonTouchDown:)]) {
+        [(CYLTabBarController *)owningTabBarController cyl_tabButtonTouchDown:tabBarButton];
+    }
+}
+
+- (void)_tabBarDidTouchUpButton:(CYLFlatDesignTabBarButton *)tabBarButton {
+    UITabBarController *owningTabBarController = self.tabBarController;
+    if (!tabBarButton.cyl_isPlaceholder && [owningTabBarController isKindOfClass:[CYLTabBarController class]] &&
+        [owningTabBarController respondsToSelector:@selector(cyl_tabButtonTouchUp:)]) {
+        [(CYLTabBarController *)owningTabBarController cyl_tabButtonTouchUp:tabBarButton];
+    }
+}
+
 - (void)_tabBarDidSelectButton:(CYLFlatDesignTabBarButton *)tabBarButton {
     NSInteger selectedIndex = [_buttons indexOfObject:tabBarButton];
     CYLFlatDesignTabBarItem *item = self.items[selectedIndex];
@@ -471,6 +497,13 @@
     if (loginTabBarController && !tabBarButton.cyl_isPlaceholder &&
         selectedIndex < (NSInteger)loginTabBarController.viewControllers.count &&
         [loginTabBarController cyl_interceptLoginIfNeededForViewController:loginTabBarController.viewControllers[(NSUInteger)selectedIndex]]) {
+        return;
+    }
+    // [EN] A custom action tab (CYLCustomTabAction): not selected, not reported as a selection; its action runs instead.
+    // [CN] 使用自定义点击操作的 Tab（CYLCustomTabAction）：不选中、不作为选中上报，改为执行对应操作。
+    if (loginTabBarController && !tabBarButton.cyl_isPlaceholder &&
+        selectedIndex < (NSInteger)loginTabBarController.viewControllers.count &&
+        [loginTabBarController cyl_performCustomTabActionIfNeededForViewController:loginTabBarController.viewControllers[(NSUInteger)selectedIndex]]) {
         return;
     }
     
@@ -510,9 +543,17 @@
         // [CN] 系统方法
         // [EN] System method
         SEL sel = NSSelectorFromString(clickSelectorFromString);
-        if ([self.tabBarController respondsToSelector:sel]) {
+        // [EN] FIX: placeholder count mismatch — the system item of this button's view controller, not
+        //      `tabBar.items[selectedIndex]`: the system tab bar has no item for a placeholder slot, and a plus child view
+        //      controller's item is appended at its end, so the indexes after the slot differ (the last one was out of range).
+        // [CN] FIX：占位导致的数量不匹配——取该按钮对应控制器的系统 item，而不是 `tabBar.items[selectedIndex]`：系统 TabBar 中没有
+        //      占位 slot 的 item，PlusButton 子控制器的 item 被追加在末尾，因此 slot 之后的下标不一致（最后一个会越界）。
+        UITabBarItem *systemItem = item.childViewController.tabBarItem;
+        if (![self.tabBarController.tabBar.items containsObject:systemItem]) {
+            systemItem = nil;
+        }
+        if (systemItem && [self.tabBarController respondsToSelector:sel]) {
             //FIXME:  to delete cylflatdesign_tabBarController
-            UITabBarItem *systemItem = self.tabBarController.tabBar.items[selectedIndex];
             CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
             (
              [self.tabBarController performSelector:sel withObject:systemItem];
@@ -570,6 +611,10 @@
         button.tintColor = self.tintColor;
         button.selected = (item == self.selectedItem);
         [button addTarget:self action:@selector(_tabBarDidSelectButton:) forControlEvents:UIControlEventTouchUpInside];
+        // [EN] The pressed animation, forwarded to the tab bar controller at touch time (it may not be set yet here).
+        // [CN] 按下动画，在触摸时转给 TabBarController（此时可能尚未设置）。
+        [button addTarget:self action:@selector(_tabBarDidTouchDownButton:) forControlEvents:UIControlEventTouchDown];
+        [button addTarget:self action:@selector(_tabBarDidTouchUpButton:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
         // [CN] TODO:  对齐方案， 最简单。 移除PlusButton对应的item， 重新从 self.contentView 插入对齐。
         // [EN] TODO:  Alignment approach, the simplest one: remove the item corresponding to the PlusButton and re-insert
         //      it into self.contentView for alignment.
@@ -588,7 +633,7 @@
         // [EN] Animation reset is handled uniformly via CYLTabBarItemLottieAnimationPlayingNotification,
         //      so the manual reset was removed.
 //         [self stopAnimationOfAllLottieView];
-        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemAnimationPlayingNotification object:self];
         _selectedItemIndex = selectedIndex;
         for (NSInteger i = 0; i < _buttons.count; i++) {
             CYLFlatDesignTabBarButton *tabBarButton = _buttons[i];
@@ -721,7 +766,14 @@
         // [CN] FIXME:  to delete 自定义的index。
         // [EN] FIXME:  to delete the custom index.
 //        [self cyl_replace];(
-        CYLFlatDesignTabBarButton *plusButtonIndexPlaceholder = _buttons[self.cyl_plusButtonIndex];
+        // [EN] Never index past this tab bar's own buttons: the plus button index comes from the tab items count, which may
+        //      describe another tab bar or be stale while the items change.
+        // [CN] 不能越过本 TabBar 自己的按钮取下标：PlusButton 的 index 来自 Tab 数量，可能描述的是另一个 TabBar，或在 items 变化时已过期。
+        NSUInteger plusButtonIndex = self.cyl_plusButtonIndex;
+        if (plusButtonIndex >= _buttons.count) {
+            return;
+        }
+        CYLFlatDesignTabBarButton *plusButtonIndexPlaceholder = _buttons[plusButtonIndex];
         if (![plusButtonIndexPlaceholder.tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
             return;
         }
@@ -1073,13 +1125,39 @@
     return CGRectMake(x, y, w, h);
 }
 
+/*!
+ * [EN] A standalone tab bar: one the app added to a page by itself (e.g. the FlatDesign demo page), not the tab bar of a
+ *      CYLTabBarController (whose `delegate` is that controller). The owner lookup walks up from such a bar to the
+ *      CYLTabBarController the page is in, and used to give it that controller's plus button: its index belongs to the
+ *      other tab bar, so `_buttons[plusButtonIndex]` crashed with "index 2 beyond bounds [0 .. 1]" (popping back from a
+ *      four-tab page), and the shared plus button would be moved out of the controller's own tab bar.
+ * [CN] 独立 TabBar：App 自己添加到页面上的 TabBar（如扁平风格演示页），而不是某个 CYLTabBarController 的 TabBar（其 `delegate`
+ *      就是该控制器）。从这种 TabBar 向上查找会找到页面所在的 CYLTabBarController，以前会拿到那个控制器的 PlusButton：其 index
+ *      属于另一个 TabBar，所以 `_buttons[plusButtonIndex]` 数组越界崩溃（从四个 Tab 的页面返回时 "index 2 beyond bounds [0 .. 1]"），
+ *      而且共享的 PlusButton 会被移出控制器自己的 TabBar。
+ */
+- (BOOL)cyl_isStandaloneTabBar {
+    if ([self.delegate isKindOfClass:[CYLTabBarController class]]) {
+        return NO;
+    }
+    // [EN] Not inside any CYLTabBarController (not attached yet): keep the context lookup.
+    // [CN] 不在任何 CYLTabBarController 中（尚未挂上）：保留按 context 查找。
+    return [self cyl_owningTabBarController] != nil;
+}
+
 - (BOOL)hasPlusButton {
     // Bound to the CYLTabBarController that owns this tab bar, see `-[CYLTabBar hasPlusButton]`.
     // 绑定的是拥有本 TabBar 的 CYLTabBarController，见 `-[CYLTabBar hasPlusButton]`。
+    if ([self cyl_isStandaloneTabBar]) {
+        return NO;
+    }
     return [CYLPlusButton plusButtonForOwner:self] != nil;
 }
 
 - (BOOL)hasPlusChildViewController {
+    if ([self cyl_isStandaloneTabBar]) {
+        return NO;
+    }
     return [CYLPlusButton plusChildViewControllerForOwner:self] != nil;
 }
 

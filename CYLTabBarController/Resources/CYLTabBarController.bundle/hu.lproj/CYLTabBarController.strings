@@ -202,9 +202,45 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "TabBarController megjelenítése új környezettel (PlusButton koppintható X alnézettel, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Koppints a PlusButton jobb felső sarkában lévő X-re: az X véletlenszerű színt kap, a PlusButton nem reagál";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Frissítés";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex és a PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Koppintson a következő lap kiválasztásához. Index PlusButton nélkül: %1$@, selectedIndex: %2$@, most: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Nagyítás és kicsinyítés";
+"从小放大" = "Ránagyítás";
+"弹性" = "Pattanás";
+"弹性 + 烟花" = "Pattanás + tűzijáték";
+"旋转" = "Forgatás";
+"翻转" = "Átfordítás";
+"飘散" = "Elillanás";
+"无" = "Nincs";
+"Tab 点击动画（issue #535）" = "Lapok koppintási animációja (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Koppintson a lapok és a PlusButton koppintási animációjának váltásához. Jelenleg: %@";
+"长按了「%@」" = "Hosszan megnyomva: „%@”";
+"左右滑动切换 Tab（issue #535）" = "Lapváltás legyintéssel (issue #535)";
+"长按 Tab（issue #535）" = "Lapok hosszú megnyomása (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Kapcsolja be a kapcsolót, majd legyintsen balra vagy jobbra az oldalon a következő vagy az előző laphoz.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Kapcsolja be a kapcsolót, majd nyomjon hosszan bármelyik lapra vagy a PlusButtonra az azonosítója megjelenítéséhez.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Forgatás (csak ez a lap: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Képkockák + tűzijáték (minden lap: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Reagálás a szülőnézeten kívül (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Bekapcsolt kapcsolónál a gomb szürke dobozon kívüli része is reagál; minden koppintás lejátssza a méretezési animációt. Koppintások: %@";
+"已找到" = "Megtalálva";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Nem található (use_frameworks esetén az erőforráscsomag a frameworkben van)";
+"从 bundle 加载图片（issue #535）" = "Képek betöltése bundle-ből (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "A bal oldali kép az erőforráscsomagból töltődik be CYLImageInBundle segítségével (gyorsítótár nélkül). CYLBundleImage a fő bundle-ben: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Ez egy egyszerű UIViewController, amely nem a CYLBaseViewController leszármazottja. A navigációs sáv el van rejtve.";
+"不继承基类隐藏导航栏（issue #535）" = "Navigációs sáv elrejtése alaposztály nélkül (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "A kapcsoló beállítja: cyl_automaticNavigationSettingEnabled; koppintson a sorra egy egyszerű UIViewController megnyitásához, amely beállítja: cyl_navigationBarHidden és cyl_hidesAncestorNavigationBars.";
+"页面 %@" = "%@. oldal";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Csúszó átmenet (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Koppintson egy rendszer UITabBarController megnyitásához: koppintson egy lapra, vagy húzza az oldalt balra vagy jobbra, és az oldal követi az ujját.";
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "TabBar kicsinyítése / elrejtése görgetéskor (issue #13)";
@@ -219,3 +255,101 @@
 "跳转与对比" = "Navigáció és összehasonlítás";
 "角标" = "Jelvények";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nem támogatja: a lapsáv magasságát a rendszer adja meg (FlatDesign és a klasszikus stílus támogatja)";
+
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Elrejtés görgetéskor: megszakítások szimulálása (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "A koppintás után 1,5 mp-cel indul. Előbb görgessen le, hogy a TabBar elrejtődjön. Várt: a TabBar azonnal visszatér, és a lendület nem rejti el újra.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "A koppintás után 1,5 mp-cel indul. Várt: a TabBar ettől nem változik (nem rejtődik el, és az app által elrejtett TabBar nem jelenik meg).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Válasszon megszakítást; 1,5 mp múlva indul. Előbb görgessen le, hogy a TabBar elrejtődjön.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Kézi: koppintson az elrejtés görgetéskor bekapcsolásához, görgessen le a TabBar elrejtéséhez, majd tegye, amit a cím mond. Várt: a TabBar azonnal visszatér.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Sorban lefuttatja az összes automatikus szimulációt, és jelenti a sikert / hibát (kb. 2 perc), a konzolon is. A -CYLScrollHideSelfTest YES indítási argumentummal is futtatható.";
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Megjelenés";
+"换肤（主题，issue #216）" = "Megjelenés (téma, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Koppintson egy téma kiválasztásához: a TabBar háttere, ikonjai és szövegszínei a helyükön változnak, minden TabBar-stílusban. Most: %@";
+"选择主题" = "Válasszon témát";
+"默认" = "Alapértelmezett";
+"西柚" = "Grépfrút";
+"青草" = "Fű";
+"玫瑰粉" = "Rózsaszín rózsa";
+"春节" = "Tavaszünnep";
+"跟随系统深色模式" = "A rendszer sötét módjának követése";
+"默认点击声" = "Alapértelmezett kattanás";
+"中等触感反馈" = "Közepes haptikus visszajelzés";
+"无需继承基类与工具方法" = "Alaposztály nélkül, és segédeszközök";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Előző / következő lap (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Gyenge hivatkozás: élve megvan %@, felszabadítás után nil %@. %@ elemtől a kijelölt lap gombjáig: %@";
+"点击声 + 触感反馈" = "Kattanás + haptika";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Pattanás + csillagtűzijáték (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Koppintson a jobb oldali nyilakra a(z) cyl_switchToAdjacentTabWithStep:-1 / 1 hívásához. A húzáshoz hasonlóan kihagyja a PlusButtont és ellenőrzi a bejelentkezést. Utolsó eredmény: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Koppintson a váltáshoz, majd koppintson bármelyik lapra vagy a PlusButtonra a meghallgatáshoz. A haptika csak valódi eszközön rezeg. Most: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Koppintson a futtatáshoz: a(z) cyl_setWeakAssociatedObject:forKey: nil-t ad vissza az objektum felszabadítása után; a(z) cyl_nearestControlBelowView: a kijelölt lap ikonjából megtalálja a gombját.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Koppintson a váltáshoz. cyl_tabBarItemLongPressDuration: %@ mp, cyl_tabButtonLongPressMinimumDuration: %@ mp, cyl_tabBarItemDoubleTapInterval: %@ mp";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Saját hangfájl (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Felfelé hajtás, kijelölés megszüntetése animáció nélkül (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Lassú nagyítás és kicsinyítés (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Lassú ránagyítás (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: gyenge társított objektumok és gomb keresése (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Hosszú nyomás időtartama és dupla koppintás időköze (issue #535 / #152)";
+"Tab 交互" = "Lapinterakciók";
+"Tab 点击声音与触感反馈（issue #535）" = "Lapkoppintás hangja és haptikája (issue #535)";
+"轻触感反馈" = "Enyhe haptikus visszajelzés";
+"重触感反馈" = "Erős haptikus visszajelzés";
+"长按（#152）" = "Hosszú nyomás (#152)";
+"播放 / 停止" = "Lejátszás / Leállítás";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Karácsony";
+"万圣节" = "Halloween";
+"情人节" = "Valentin-nap";
+"中秋节" = "Holdünnep";
+"复活节" = "Húsvét";
+"新年" = "Újév";
+"夏日" = "Nyár";
+"生日" = "Születésnap";
+"太空" = "Világűr";
+"海洋" = "Óceán";
+"换肤：节日与配色主题（%@ 种）" = "Megjelenések: ünnepek és színek (%@)";
+"节日图标与配色" = "Ünnepi ikonok és színek";
+"仅配色" = "Csak színek";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Koppints";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Kép betöltése";
+"替换为更大的图片" = "Csere nagyobb képre";
+"移除图片" = "Kép eltávolítása";
+"加载背景图片" = "Háttérkép betöltése";
+"2 秒后：%@" = "2 másodperc múlva: %@";
+"PlusButton 图片之后才加载" = "Később betöltött PlusButton-kép";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Koppintson egy eset kiválasztásához és egy lapsáv-vezérlő megnyitásához: a PlusButtonnak eleinte nincs képe; 2 másodperc múlva a kép betöltődik, lecserélődik vagy eltűnik, vagy háttérkép töltődik be. Az eredménynek meg kell egyeznie az induláskor beállított képpel.";
+"对照：启动时即有图片" = "Összevetés: kép induláskor";
+"对照：启动时即有更大的图片" = "Összevetés: nagyobb kép induláskor";
+"对照：启动时即有背景图片" = "Összevetés: háttérkép induláskor";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Koppintson a visszalépéshez vagy bezáráshoz";
+"详情" = "Részletek";
+"拍照" = "Fénykép készítése";
+"从相册选择" = "Kiválasztás albumból";
+"设置" = "Beállítások";
+"关于我们" = "Rólunk";
+"示例" = "Példa";
+"撰写" = "Írás";
+"好" = "OK";
+"编辑更多" = "Továbbiak szerkesztése";
+"新版本" = "Új verzió";
+"打开 TabBar 场景展示" = "A lapsáv-galéria megnyitása";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Minden jelenet a nyilvános API-val épített lapsáv: stílusok, animációk, emlékeztetők, Lottie és az újabb lap-API-k";
+"TabBar 场景展示" = "Lapsáv-galéria";
+
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Másolás";
+/* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
+"展开全部 %@ 个模拟" = "Mind a(z) %@ szimuláció megjelenítése";
+/* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
+"收起模拟列表" = "Szimulációs lista összecsukása";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Hálózati ikonok";
+"网络图标、标题与配色" = "Hálózati ikonok, címek és színek";

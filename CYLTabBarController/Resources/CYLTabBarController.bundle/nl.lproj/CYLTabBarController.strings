@@ -202,9 +202,45 @@
 "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）" = "TabBarController met een nieuwe context pushen (PlusButton met een tikbare X-subweergave, issue #202)";
 "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应" = "Tik op de X rechtsboven op de PlusButton: de X krijgt een willekeurige kleur en de PlusButton reageert niet";
 
+/* FIX: issue #433 — the selected title of the demo Home tab. */
+"刷新" = "Vernieuwen";
+
 /* Issue #515: selectedIndex and the plus button demo row. */
 "selectedIndex 与 PlusButton（issue #515）" = "selectedIndex en de PlusButton (issue #515)";
 "点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@" = "Tik om het volgende tabblad te kiezen. Index zonder PlusButton: %1$@, selectedIndex: %2$@, nu: %3$@";
+
+/* Issue #535: tap animation, long press and swipe demo rows. */
+"放大再缩小" = "Vergroten en verkleinen";
+"从小放大" = "Inzoomen";
+"弹性" = "Stuiteren";
+"弹性 + 烟花" = "Stuiteren + vuurwerk";
+"旋转" = "Draaien";
+"翻转" = "Omdraaien";
+"飘散" = "Vervagen";
+"无" = "Geen";
+"Tab 点击动画（issue #535）" = "Tikanimatie van tabbladen (issue #535)";
+"点击切换 Tab 与 PlusButton 的点击动画，当前：%@" = "Tik om de tikanimatie van de tabbladen en de PlusButton te wisselen. Nu: %@";
+"长按了「%@」" = "Lang ingedrukt: ‘%@’";
+"左右滑动切换 Tab（issue #535）" = "Vegen om van tabblad te wisselen (issue #535)";
+"长按 Tab（issue #535）" = "Tabbladen lang indrukken (issue #535)";
+"打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。" = "Zet de schakelaar aan en veeg op de pagina naar links of rechts voor het volgende of vorige tabblad.";
+"打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。" = "Zet de schakelaar aan en druk lang op een tabblad of de PlusButton om de identificatie te zien.";
+
+/* Issue #535: more demo rows (outside bounds, bundle images, navigation bar, slide transition). */
+"旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）" = "Draaien (alleen dit tabblad: viewController.cyl_tabButtonAnimation)";
+"逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）" = "Frames + vuurwerk (alle tabbladen: cyl_defaultTabButtonAnimation)";
+"超出父视图响应点击（issue #535）" = "Reageren buiten de superview (issue #535)";
+"打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次" = "Met de schakelaar aan reageert ook het deel van de knop buiten het grijze vak; elke tik speelt de schaalanimatie af. Tikken: %@";
+"已找到" = "Gevonden";
+"未找到（use_frameworks 时资源包位于 framework 中）" = "Niet gevonden (met use_frameworks zit de resourcebundel in het framework)";
+"从 bundle 加载图片（issue #535）" = "Afbeeldingen laden uit een bundle (issue #535)";
+"左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@" = "De afbeelding links wordt met CYLImageInBundle uit de resourcebundel gelezen (zonder cache). CYLBundleImage in de hoofdbundel: %@";
+"这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。" = "Dit is een gewone UIViewController die niet van CYLBaseViewController erft. De navigatiebalk is verborgen.";
+"不继承基类隐藏导航栏（issue #535）" = "Navigatiebalk verbergen zonder basisklasse (issue #535)";
+"打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。" = "De schakelaar stelt cyl_automaticNavigationSettingEnabled in; tik op de rij om een gewone UIViewController te openen die cyl_navigationBarHidden en cyl_hidesAncestorNavigationBars instelt.";
+"页面 %@" = "Pagina %@";
+"滑动转场（CYLTabBarSlideTransitionAnimator）" = "Schuifovergang (CYLTabBarSlideTransitionAnimator)";
+"点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。" = "Tik om een systeem-UITabBarController te openen: tik op een tabblad of sleep de pagina naar links of rechts, en de pagina schuift mee met je vinger.";
 
 /* Issue #13: minimize / hide the tab bar on scroll demo row. */
 "滚动时缩小 / 隐藏 TabBar（issue #13）" = "TabBar verkleinen / verbergen bij scrollen (issue #13)";
@@ -219,3 +255,101 @@
 "跳转与对比" = "Navigatie en vergelijkingen";
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Niet ondersteund door Liquid Glass: het systeem bepaalt de hoogte van de tabbalk (FlatDesign en de klassieke stijl wel)";
+
+/* Issue #13: scroll hiding simulation section. */
+"滚动隐藏：模拟意外情况（issue #13）" = "Verbergen bij scrollen: onderbrekingen simuleren (issue #13)";
+"点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。" = "Wordt 1,5 s na het tikken uitgevoerd. Scrol eerst omlaag om de TabBar te verbergen. Verwacht: de TabBar komt meteen terug en het naglijden verbergt hem niet opnieuw.";
+"点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。" = "Wordt 1,5 s na het tikken uitgevoerd. Verwacht: de TabBar verandert hierdoor niet (wordt niet verborgen, en een door de app verborgen TabBar wordt niet getoond).";
+"选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。" = "Kies een onderbreking; die wordt na 1,5 s uitgevoerd. Scrol eerst omlaag om de TabBar te verbergen.";
+"手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。" = "Handmatig: tik om verbergen bij scrollen aan te zetten, scrol omlaag om de TabBar te verbergen en doe dan wat de titel zegt. Verwacht: de TabBar komt meteen terug.";
+"自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。" = "Voert alle automatische simulaties na elkaar uit en meldt geslaagd / mislukt (ongeveer 2 minuten), ook in de console. Ook uit te voeren met het startargument -CYLScrollHideSelfTest YES.";
+/* Issue #216: theme switching (skins) demo. */
+"换肤" = "Skin";
+"换肤（主题，issue #216）" = "Skin (thema, issue #216)";
+"点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@" = "Tik om een thema te kiezen: de achtergrond, symbolen en tekstkleuren van de TabBar wisselen ter plekke, in elke TabBar-stijl. Nu: %@";
+"选择主题" = "Kies een thema";
+"默认" = "Standaard";
+"西柚" = "Grapefruit";
+"青草" = "Gras";
+"玫瑰粉" = "Roze roos";
+"春节" = "Lentefeest";
+"跟随系统深色模式" = "Donkere modus van het systeem volgen";
+"默认点击声" = "Standaardklik";
+"中等触感反馈" = "Gemiddelde haptische feedback";
+"无需继承基类与工具方法" = "Zonder basisklasse, en hulpmiddelen";
+"切换到上一个 / 下一个 Tab（issue #535）" = "Vorige / volgende tab (issue #535)";
+"弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@" = "Zwakke verwijzing: gevonden tijdens leven %@, nil na vrijgave %@. Van %@ naar de knop van de geselecteerde tab: %@";
+"点击声 + 触感反馈" = "Klik + haptiek";
+"弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）" = "Stuiteren + sterrenvuurwerk (CYLTabButtonBounceAnimation.fireworksImage)";
+"点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@" = "Tik op de pijlen rechts om cyl_switchToAdjacentTabWithStep:-1 / 1 aan te roepen. Net als vegen slaat het de PlusButton over en controleert het de aanmelding. Laatste resultaat: %@";
+"点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@" = "Tik om te wisselen en tik daarna op een tab of de PlusButton om het te horen. Haptiek trilt alleen op een echt apparaat. Nu: %@";
+"点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。" = "Tik om uit te voeren: cyl_setWeakAssociatedObject:forKey: geeft nil zodra het object is vrijgegeven; cyl_nearestControlBelowView: vindt de knop van de geselecteerde tab vanaf het pictogram.";
+"点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒" = "Tik om te wisselen. cyl_tabBarItemLongPressDuration: %@ s, cyl_tabButtonLongPressMinimumDuration: %@ s, cyl_tabBarItemDoubleTapInterval: %@ s";
+"自定义音频文件（cyl_tabButtonTapSoundURL）" = "Eigen geluidsbestand (cyl_tabButtonTapSoundURL)";
+"向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）" = "Omhoog krullen, geen deselectie-animatie (CYLTabButtonFlipAnimation.direction = 5)";
+"慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）" = "Langzaam vergroten en verkleinen (CYLTabButtonScaleAnimation.duration = 1.2)";
+"慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）" = "Langzaam inzoomen (CYLTabButtonZoomInAnimation.duration = 1.2)";
+"CYLUtils 弱引用关联对象与查找按钮（issue #535）" = "CYLUtils: zwakke gekoppelde objecten en een knop zoeken (issue #535)";
+"长按时长与双击间隔（issue #535 / #152）" = "Duur van lang drukken en interval van dubbeltikken (issue #535 / #152)";
+"Tab 交互" = "Tabinteracties";
+"Tab 点击声音与触感反馈（issue #535）" = "Tikgeluid en haptiek van tabs (issue #535)";
+"轻触感反馈" = "Lichte haptische feedback";
+"重触感反馈" = "Sterke haptische feedback";
+"长按（#152）" = "Lang drukken (#152)";
+"播放 / 停止" = "Afspelen / Stoppen";
+
+/* Issue #216: the holiday skins and the theme list section. */
+"圣诞节" = "Kerstmis";
+"万圣节" = "Halloween";
+"情人节" = "Valentijnsdag";
+"中秋节" = "Midherfstfestival";
+"复活节" = "Pasen";
+"新年" = "Nieuwjaar";
+"夏日" = "Zomer";
+"生日" = "Verjaardag";
+"太空" = "Ruimte";
+"海洋" = "Oceaan";
+"换肤：节日与配色主题（%@ 种）" = "Skins: feestdagen en kleuren (%@)";
+"节日图标与配色" = "Feestdagsymbolen en kleuren";
+"仅配色" = "Alleen kleuren";
+/* Issue #535 demo: the button that sticks out of its superview. */
+"点我" = "Tik hier";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Afbeelding laden";
+"替换为更大的图片" = "Vervangen door een grotere afbeelding";
+"移除图片" = "Afbeelding verwijderen";
+"加载背景图片" = "Achtergrondafbeelding laden";
+"2 秒后：%@" = "Over 2 seconden: %@";
+"PlusButton 图片之后才加载" = "PlusButton-afbeelding later geladen";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Tik om een geval te kiezen en een tabbalkcontroller te pushen: de PlusButton heeft eerst geen afbeelding; 2 seconden later wordt de afbeelding geladen, vervangen of verwijderd, of een achtergrondafbeelding geladen. Het resultaat moet gelijk zijn aan een afbeelding die bij het starten is ingesteld.";
+"对照：启动时即有图片" = "Vergelijk: afbeelding bij starten";
+"对照：启动时即有更大的图片" = "Vergelijk: grotere afbeelding bij starten";
+"对照：启动时即有背景图片" = "Vergelijk: achtergrondafbeelding bij starten";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Tik om terug te gaan of te sluiten";
+"详情" = "Details";
+"拍照" = "Foto maken";
+"从相册选择" = "Kies uit album";
+"设置" = "Instellingen";
+"关于我们" = "Over ons";
+"示例" = "Voorbeeld";
+"撰写" = "Opstellen";
+"好" = "OK";
+"编辑更多" = "Meer bewerken";
+"新版本" = "Nieuwe versie";
+"打开 TabBar 场景展示" = "Tabbalkgalerij openen";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Elke scène is een tabbalk gebouwd met de openbare API: stijlen, animaties, meldingen, Lottie en de nieuwere tab-API's";
+"TabBar 场景展示" = "Tabbalkgalerij";
+
+/* Issue #13 demo: the context menu action that copies a row's title. */
+"复制" = "Kopieer";
+/* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
+"展开全部 %@ 个模拟" = "Alle %@ simulaties tonen";
+/* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
+"收起模拟列表" = "Simulatielijst inklappen";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Netwerkpictogrammen";
+"网络图标、标题与配色" = "Netwerkpictogrammen, titels en kleuren";

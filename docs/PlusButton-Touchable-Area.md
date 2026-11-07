@@ -164,7 +164,7 @@ static func plusButton() -> Any {
 }
 
 // At runtime, e.g. from a debug menu. 运行时调整，例如在调试菜单中。
-if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton.plusButton(forOwner: tabBarController) {
+if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton(forOwner: tabBarController) {
     plusButton.touchableAreaScale = 2          // twice as wide and tall 宽高各放大一倍
     plusButton.showsTouchableArea = true       // show it 显示
     plusButton.touchableAreaColor = UIColor.systemBlue.withAlphaComponent(0.25)

@@ -19,8 +19,7 @@ class TabBarCommon: NSObject {
         CYLPlusButtonSubclass.register()
         // Rebuilt after a language change too, so every text shows in the new language.
         UIApplication.shared.delegate?.window??.cyl_setRootViewControllerProvider {
-            let tabBarController = RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
-            tabBarController.tabBarStyleType = .liquidGlass
+            let tabBarController = RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController(), styleType: CYLDemoTabBarStyle.styleType, context: nil)
             tabBarController.selectedIndex = selectIndex
             return tabBarController
         }
@@ -46,7 +45,12 @@ class TabBarCommon: NSObject {
         CYLPlusButtonSubclass.register()
         // Rebuilt after a language change, so every text shows in the new language.
         UIApplication.shared.delegate?.window??.cyl_setRootViewControllerProvider {
-            RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
+            RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController(), styleType: CYLDemoTabBarStyle.styleType, context: nil)
+        }
+        // [EN] The navigation bar button of the settings list rebuilds the tab bar in the other style.
+        // [CN] 设置列表的导航栏按钮以另一种样式重建 TabBar。
+        CYLDemoTabBarStyle.rebuildRootViewController = {
+            setUpRootTabBarController()
         }
     }
     
@@ -88,16 +92,17 @@ class TabBarCommon: NSObject {
 
         let tabBarItemsAttributes = [tabBarItemHome, tabBarItemHealthy, tabBarItemFriends, tabBarItemMe]
         // [EN] #604: PAG animations (Tencent libpag) instead of Lottie, with the `CYLTabBarController/PAG` subspec. Each name is
-        //      "<name>.pag" in the main bundle (Example-Shared/PAGResources/pag-ios, fetched by `pod install`); "<name>_dark.pag" would be its Dark Mode version.
+        //      "<name>.pag" in the main bundle (Example-Shared/PAGResources/tab-icons, fetched by `pod install`); "<name>_dark.pag" would be its Dark Mode version.
         //      Without the subspec the PAG keys are ignored and the images show.
         // [CN] #604：使用 PAG 动画（腾讯 libpag）代替 Lottie，需引入 `CYLTabBarController/PAG` 子库。每个名称对应 main bundle 中的
-        //      「<名称>.pag」（Example-Shared/PAGResources/pag-ios，由 `pod install` 下载）；「<名称>_dark.pag」为其深色模式版本。未引入子库时忽略 PAG key，显示图片。
-        // [EN] #477: only some tabs are animated. Each tab takes its own file through
-        //      `CYLTabBarItemAttributesAddingAnimationFile()` ("<name>.pag": PAG, "<name>.json": Lottie, or the file type of
-        //      any library added later); "" leaves the second tab ("健康") with its images. Selecting it stops the animated tabs.
-        // [CN] #477：只有部分 Tab 有动画。每个 Tab 通过 `CYLTabBarItemAttributesAddingAnimationFile()` 使用自己的文件（「名称.pag」为 PAG，
-        //      「名称.json」为 Lottie，或以后新增动画库的文件类型）；"" 表示第二个 Tab（「健康」）保持图片。选中它时，有动画的 Tab 会停止。
-        let animationFiles = ["1.pag", "", "22.pag", "test2.pag"]
+        //      「<名称>.pag」（Example-Shared/PAGResources/tab-icons，由 `pod install` 下载）；「<名称>_dark.pag」为其深色模式版本。未引入子库时忽略 PAG key，显示图片。
+        // [EN] #477: each tab takes its own file through `CYLTabBarItemAttributesAddingAnimationFile()` ("<name>.pag": PAG,
+        //      "<name>.json": Lottie, or the file type of any library added later); "" would leave a tab with its images.
+        //      A tab icon's first frame shows until it is selected, so these files start with the icon visible.
+        // [CN] #477：每个 Tab 通过 `CYLTabBarItemAttributesAddingAnimationFile()` 使用自己的文件（「名称.pag」为 PAG，
+        //      「名称.json」为 Lottie，或以后新增动画库的文件类型）；"" 表示该 Tab 保持图片。
+        //      选中之前显示动画的第一帧，因此这些文件的第一帧就能看到图标。
+        let animationFiles = ["tab_home.pag", "tab_health.pag", "tab_moments.pag", "tab_me.pag"]
         return zip(tabBarItemsAttributes, animationFiles).map { attributes, fileName in
             var item = CYLTabBarItemAttributesAddingAnimationFile(attributes, fileName, nil)
             // [EN] The generic size key, for any animation library: `CYLTabBarAnimationSize` (only for the animated tabs).

@@ -543,7 +543,7 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
     if (!tabBarController) {
         return UIViewContentModeScaleAspectFit;
     }
-    return [tabBarController lottieAnimationViewContentMode];
+    return [tabBarController tabBarItemAnimationViewContentMode];
 }
 
 /// FIX: issue #428 — `-[CYLTabBarController lottieAnimationSpeed]` in flat design, resolved like `-_animationContentMode`.
@@ -552,7 +552,7 @@ static BOOL CYLAppearanceValueIsCustomized(id _Nullable value, id _Nullable defa
     if (!tabBarController) {
         return 1.0;
     }
-    return [tabBarController lottieAnimationSpeed];
+    return [tabBarController tabBarItemAnimationSpeed];
 }
 
 /// The tab bar controller that owns this button, in any style; see `-_animationContentMode`.

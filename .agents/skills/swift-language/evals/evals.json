@@ -1,0 +1,47 @@
+{
+  "skill_name": "swift-language",
+  "evals": [
+    {
+      "id": 0,
+      "name": "modern-language-refactor",
+      "prompt": "Review and modernize this Swift helper without changing behavior. Use current Swift language idioms where they help, but keep the answer concise.\n\n```swift\nenum Priority { case low, normal, high }\nenum ValidationError: Error { case empty, tooLong }\n\nfunc validateTitle(_ title: String) throws -> String {\n    if title.isEmpty {\n        throw ValidationError.empty\n    }\n    if title.count > 80 {\n        throw ValidationError.tooLong\n    }\n    return title.trimmingCharacters(in: .whitespacesAndNewlines)\n}\n\nfunc iconName(priority: Priority) -> String {\n    var name = \"circle\"\n    switch priority {\n    case .low:\n        name = \"arrow.down.circle\"\n    case .normal:\n        name = \"circle\"\n    case .high:\n        name = \"exclamationmark.circle\"\n    }\n    return name\n}\n\nfunc summarize(_ tags: [String]) -> String {\n    var urgentCount = 0\n    for tag in tags {\n        if tag == \"urgent\" { urgentCount += 1 }\n    }\n    return \"urgent: \\(urgentCount)\"\n}\n```",
+      "expected_output": "A concise modernization that uses guard preconditions, typed throws for the single validation error domain, switch expressions for conditional return, collection APIs such as count(where:), and explains why each change is appropriate.",
+      "files": [],
+      "assertions": [
+        "Uses `throws(ValidationError)` or explicitly recommends typed throws for the single validation error domain.",
+        "Uses `guard` for validation preconditions in `validateTitle(_:)`.",
+        "Rewrites `iconName(priority:)` with a `switch` expression or equivalent single-expression return without a mutable temporary variable.",
+        "Uses `count(where:)` rather than a manual loop for counting urgent tags.",
+        "Keeps the answer focused on Swift language idioms and does not expand into SwiftUI, concurrency, or lint configuration."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "swift63-interop-attributes",
+      "prompt": "Correct this Swift 6.3 interoperability/performance note for a team wiki. The draft says: `@c func export(_ bytes: UnsafeBufferPointer<UInt8>) -> Int32` is valid C export syntax, `@specialize` is the official function-specialization attribute, `@inline(always)` is just a hint, and module selectors are written `ModuleName.symbol`.\n\nGive a corrected note with minimal Swift examples.",
+      "expected_output": "A source-grounded correction that uses a C-compatible @c signature, names @specialized as the official explicit-specialization attribute, treats @inline(always) as a guaranteed inlining request that can fail when impossible, and uses ModuleName::symbol module selectors.",
+      "files": [],
+      "assertions": [
+        "Rejects `UnsafeBufferPointer<UInt8>` in an `@c` exported function signature because it is a Swift struct, not a C-representable parameter.",
+        "Shows an `@c` example using C-compatible pointer and scalar types, optionally with a custom C symbol name.",
+        "Uses `@specialized`, not `@specialize`, for explicit specialization.",
+        "States that Swift 6.3 `@inline(always)` guarantees inlining for direct calls and can produce an error when inlining is impossible.",
+        "Uses `ModuleName::symbol` syntax for module selectors."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "sibling-boundary-routing",
+      "prompt": "I have three cleanup requests in an iOS package: build full Codable API models with snake_case key strategies and date decoding, design locale-sensitive currency/date/list formatting for several markets, and decide whether a reusable Swift helper should use `some`, `any`, or `Never`. Which parts should the Swift language skill own, and which should be routed to sibling skills? Include only minimal examples.",
+      "expected_output": "A boundary-aware routing answer that keeps swift-language focused on core type-system features such as some/any/Never, routes deep Codable/API decoding to swift-codable, routes detailed formatting and localization-sensitive display work to swift-formatstyle or ios-localization, and avoids implementing the sibling domains.",
+      "files": [],
+      "assertions": [
+        "Says swift-language owns the core type-system/language decision around `some`, `any`, and `Never`.",
+        "Correctly explains that `Never` is uninhabited/bottom-type-like in expression contexts but does not implicitly conform to arbitrary protocols.",
+        "Routes full Codable API model design, key strategies, and date decoding to `swift-codable`.",
+        "Routes detailed FormatStyle and locale-sensitive display work to `swift-formatstyle` and mentions localization review when appropriate.",
+        "Does not provide a full Codable model suite or full formatting/localization implementation."
+      ]
+    }
+  ]
+}

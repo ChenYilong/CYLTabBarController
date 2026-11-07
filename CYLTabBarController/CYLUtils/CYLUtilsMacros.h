@@ -53,26 +53,31 @@
 #endif
 
 /*!
- * FIX: issue #604
- * [EN] 1 when Tencent's PAG library is in the project (`CYLTabBarController/PAG`, which depends on the `libpag` pod;
- *      `<libpag/PAGView.h>`), else 0. PAG animations use the same pipeline as Lottie (keys `CYLTabBarPAG…`), through
- *      `CYLPAGTabBarItemAnimator`. Use it, like `CYL_LOTTIE_AVAILABLE`, only after importing this header.
- * [CN] 工程中引入了腾讯 PAG 库时为 1，否则为 0（`CYLTabBarController/PAG`，依赖 `libpag` pod；`<libpag/PAGView.h>`）。PAG 动画与 Lottie
- *      使用同一套流程（key 为 `CYLTabBarPAG…`），由 `CYLPAGTabBarItemAnimator` 实现。与 `CYL_LOTTIE_AVAILABLE` 一样，只能在引入本头文件之后使用。
+ * [EN] On the Lottie keys (`CYLTabBarLottieURL`…) and `CYLTabBarItemsAttributesAddingLottieFiles`: nothing with Lottie;
+ *      without it, a compile warning. Those keys are released API, so they stay defined (code that uses them keeps
+ *      building, and the tab shows its image), but using one in a build without Lottie is most likely a forgotten pod.
+ *      The PAG and Rive keys go further: they do not exist without their library (`CYL_PAG_AVAILABLE`,
+ *      `CYL_RIVE_AVAILABLE`).
+ * [CN] 用于 Lottie 的 key（`CYLTabBarLottieURL`……）与 `CYLTabBarItemsAttributesAddingLottieFiles`：引入 Lottie 时无影响；
+ *      未引入时给出编译警告。这些 key 是已发布的 API，因此保持定义（使用它们的代码仍能编译，Tab 显示图片），但在没有 Lottie 的
+ *      构建中使用它们，多半是忘了引入 pod。PAG 与 Rive 的 key 更进一步：未引入动画库时不存在（`CYL_PAG_AVAILABLE`、
+ *      `CYL_RIVE_AVAILABLE`）。
  */
-#if __has_include(<libpag/PAGView.h>)
-#define CYL_PAG_AVAILABLE 1
+#if CYL_LOTTIE_AVAILABLE
+#define CYL_LOTTIE_REQUIRED
 #else
-#define CYL_PAG_AVAILABLE 0
+#define CYL_LOTTIE_REQUIRED __attribute__((deprecated("Lottie is not part of this build, so this is ignored and the tab shows its image. Add pod 'CYLTabBarController/Lottie' (or LottieSwift), or wrap the code in #if canImport(Lottie) / #if CYL_LOTTIE_AVAILABLE.")))
 #endif
 
 /*!
- * [EN] 1 when a tab icon animation library is in the project: Lottie or PAG. Each is a `CYLTabBarItemAnimator` of the
- *      `CYLTabBarItemAnimation` subspec, so the tab bar code is the same for both and works with either one alone.
- * [CN] 工程中引入了 Tab 图标动画库（Lottie 或 PAG）时为 1。二者都是 `CYLTabBarItemAnimation` 子库中的 `CYLTabBarItemAnimator`，因此 TabBar 代码
- *      对二者完全相同，单独引入任意一个即可工作。
+ * [EN] Core and CYLUtils have no compile-time switch per animation library (PAG, Rive, …): whether a tab animates is
+ *      decided at runtime by the animators registered with `CYLTabBarItemAnimatorRegistry` (the `CYLTabBarItemAnimation`
+ *      subspec), so adding a library changes nothing here. Each library's own header defines its switch
+ *      (`CYL_PAG_AVAILABLE`, `CYL_RIVE_AVAILABLE`), and its keys exist only when the library does.
+ * [CN] Core 与 CYLUtils 中没有各动画库（PAG、Rive……）的编译期开关：Tab 是否有动画在运行时由注册到 `CYLTabBarItemAnimatorRegistry`
+ *      的 animator 决定（`CYLTabBarItemAnimation` 子库），因此新增动画库时这里无需修改。各动画库在自己的头文件中定义开关
+ *      （`CYL_PAG_AVAILABLE`、`CYL_RIVE_AVAILABLE`），其 key 只在引入该动画库时存在。
  */
-#define CYL_TAB_ANIMATION_AVAILABLE (CYL_LOTTIE_AVAILABLE || CYL_PAG_AVAILABLE)
 
 #define CYL_DEPRECATED(explain) __attribute__((deprecated(explain)))
 

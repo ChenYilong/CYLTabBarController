@@ -16,25 +16,48 @@
 
 @implementation UITabBarItem (CYLTabBarControllerExtention)
 
+static const void *CYLTabBarItemAnimationURLKey = &CYLTabBarItemAnimationURLKey;
+static const void *CYLTabBarItemAnimationSizeValueKey = &CYLTabBarItemAnimationSizeValueKey;
+
+- (NSURL *)cyl_tabBarItemAnimationURL {
+    return objc_getAssociatedObject(self, CYLTabBarItemAnimationURLKey);
+}
+
+- (void)cyl_setTabBarItemAnimationURL:(NSURL *)URL {
+    objc_setAssociatedObject(self, CYLTabBarItemAnimationURLKey, URL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSValue *)cyl_tabBarItemAnimationSizeValue {
+    return objc_getAssociatedObject(self, CYLTabBarItemAnimationSizeValueKey);
+}
+
+- (void)cyl_setTabBarItemAnimationSizeValue:(NSValue *)sizeValue {
+    objc_setAssociatedObject(self, CYLTabBarItemAnimationSizeValueKey, sizeValue, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+#pragma mark - Deprecated Lottie names (compatibility) 已废弃的 Lottie 名称（兼容）
+
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (NSURL *)cyl_lottieURL {
-    NSURL *lottieURL = objc_getAssociatedObject(self, @selector(cyl_lottieURL));
-    return lottieURL;
+    return self.cyl_tabBarItemAnimationURL;
 }
 
 - (void)cyl_setLottieURL:(NSURL *)lottieURL {
-    NSURL *lottieURL_ = lottieURL;
-    objc_setAssociatedObject(self, @selector(cyl_lottieURL), lottieURL_, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.cyl_tabBarItemAnimationURL = lottieURL;
 }
 
 - (NSValue *)cyl_lottieSizeValue {
-    NSValue *lottieSizeValue = objc_getAssociatedObject(self, @selector(cyl_lottieSizeValue));
-    return lottieSizeValue;
+    return self.cyl_tabBarItemAnimationSizeValue;
 }
 
 - (void)cyl_setLottieSizeValue:(NSValue *)lottieSizeValue {
-    NSValue *lottieSizeValue_ = lottieSizeValue;
-    objc_setAssociatedObject(self, @selector(cyl_lottieSizeValue), lottieSizeValue_, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.cyl_tabBarItemAnimationSizeValue = lottieSizeValue;
 }
+
+#pragma clang diagnostic pop
 
 - (UIOffset)cyl_imagePositionAdjustment {
     NSValue *imagePositionAdjustmentObject = objc_getAssociatedObject(self, @selector(cyl_imagePositionAdjustment));
@@ -93,5 +116,37 @@
     return self.cyl_tabButton;
 }
 
+#pragma mark - Double tap
+
+- (void (^)(UITabBarItem *, NSInteger))cyl_doubleTapBlock {
+    return objc_getAssociatedObject(self, @selector(cyl_doubleTapBlock));
+}
+
+- (void)cyl_setDoubleTapBlock:(void (^)(UITabBarItem *, NSInteger))doubleTapBlock {
+    objc_setAssociatedObject(self, @selector(cyl_doubleTapBlock), doubleTapBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (void (^)(UITabBarItem *, UIView *))cyl_viewDidLayoutSubviewsBlock {
+    return objc_getAssociatedObject(self, @selector(cyl_viewDidLayoutSubviewsBlock));
+}
+
+- (void)cyl_setViewDidLayoutSubviewsBlock:(void (^)(UITabBarItem *, UIView *))viewDidLayoutSubviewsBlock {
+    objc_setAssociatedObject(self, @selector(cyl_viewDidLayoutSubviewsBlock), viewDidLayoutSubviewsBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    // [EN] Runs at the next layout. [CN] 在下一次布局时执行。
+    [self.cyl_tabButton.superview setNeedsLayout];
+}
+
 @end
 
+@implementation UITabBarAppearance (CYLTabBarControllerExtention)
+
+- (void)cyl_applyItemAppearanceWithBlock:(void (NS_NOESCAPE ^)(UITabBarItemAppearance *))block {
+    if (!block) {
+        return;
+    }
+    block(self.stackedLayoutAppearance);
+    block(self.inlineLayoutAppearance);
+    block(self.compactInlineLayoutAppearance);
+}
+
+@end

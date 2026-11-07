@@ -1,0 +1,74 @@
+{
+  "skill_name": "swift-concurrency",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Review this Swift 6.3/Xcode 26 concurrency build-settings plan: the team says Approachable Concurrency alone makes the whole module MainActor, strict concurrency should start at Targeted in Swift 6 mode, and CPU-heavy image decoding can stay on MainActor because nonisolated async functions now hop to a background executor. Correct the plan and give the smallest build-setting and code-level recommendations.",
+      "expected_output": "A source-grounded settings review that separates Approachable Concurrency from Default Actor Isolation, states that Swift 6 mode uses complete strict concurrency with errors, and recommends @concurrent/nonisolated offloading for CPU-heavy work instead of blocking MainActor.",
+      "files": [],
+      "assertions": [
+        "Separates Xcode's Approachable Concurrency setting from Default Actor Isolation and says MainActor-by-default requires Default Actor Isolation = MainActor.",
+        "States that Swift 6 / 6.3 language mode uses complete strict concurrency and emits errors, while Targeted or Minimal are Swift 5 migration settings.",
+        "Explains that nonisolated async functions stay on the caller's actor with nonisolated(nonsending) behavior unless @concurrent is used.",
+        "Recommends offloading CPU-heavy work with @concurrent and a nonisolated context rather than leaving it on MainActor.",
+        "Avoids broad architecture or SwiftUI state-management redesign beyond the concurrency settings and code-level fix."
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "A SwiftUI app with Default Actor Isolation set to MainActor has errors around a @Observable StickerModel conforming to Exportable, a PhotoProcessor async method, and a legacy SDK imported with @preconcurrency. Give a diagnostic remediation plan that preserves behavior, avoids unchecked Sendable unless truly justified, and explains which fixes belong in swift-concurrency rather than architecture or navigation skills.",
+      "expected_output": "A diagnostic remediation plan that uses @MainActor or isolated conformances for UI-bound state, explains nonisolated(nonsending) and @concurrent tradeoffs for PhotoProcessor work, treats @preconcurrency as temporary, and keeps architecture/navigation details as sibling handoffs.",
+      "files": [],
+      "assertions": [
+        "Uses @MainActor isolation or an isolated conformance such as extension StickerModel: @MainActor Exportable for UI-bound protocol conformance errors.",
+        "Explains when PhotoProcessor can stay on the caller's actor and when CPU-heavy work should move to @concurrent/nonisolated async code.",
+        "Prefers value immutability, actor isolation, or synchronization over adding @unchecked Sendable by default.",
+        "Treats @preconcurrency import as a temporary bridge for third-party modules with a documented removal plan.",
+        "Routes module architecture, navigation implementation, and detailed SwiftUI state ownership to sibling skills instead of expanding this skill's scope."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review this synchronization plan for a Swift 6.3 app: use an actor for a synchronous metrics counter called from C callbacks, put NSLock inside an actor for cache mutation, hold a Mutex while awaiting a network fetch, and ban NSLock because it is not Sendable. Replace it with a modern concurrency-safe plan for iOS 16 through iOS 26.",
+      "expected_output": "A synchronization review that chooses actors for async shared state, Mutex or OSAllocatedUnfairLock for synchronous state depending on deployment target, Atomic for simple counters or flags, avoids locks inside actors or across await, and corrects the NSLock Sendable claim without recommending it first.",
+      "files": [],
+      "assertions": [
+        "Uses an actor for shared mutable state when asynchronous access and actor hops are acceptable.",
+        "Uses Mutex for new code targeting iOS 18+ and OSAllocatedUnfairLock for iOS 16-17 support or ownership-assertion needs.",
+        "Uses Atomic for simple scalar counters or flags rather than an actor or full lock when appropriate.",
+        "Rejects locks inside actors and rejects holding any lock across await suspension points.",
+        "Corrects the claim that NSLock is not Sendable while still preferring modern state-protecting primitives for new Swift concurrency code."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "A team on Swift 6.3 / Xcode 26.5 wants to add async defer cleanup, wrap every cancellation path in withTaskCancellationShield, and fix a diagnostic from a closure with an explicit capture list passed to a nonisolated(nonsending) async parameter. Review the plan and give the smallest source-grounded correction.",
+      "expected_output": "A version-gated concurrency review that says async defer and withTaskCancellationShield are Swift 6.4 / Xcode 27 beta-era APIs, explains that async defer does not suppress cancellation, uses cancellation shields only for short cleanup or rollback when available, and gives the two documented Xcode 26.5 explicit-capture closure workarounds.",
+      "files": [],
+      "assertions": [
+        "Says async defer is a Swift 6.4 / Xcode 27 beta-era feature and should not be presented as available to Swift 6.3 / Xcode 26.5 projects.",
+        "Says withTaskCancellationShield is Swift 6.4 / iOS 27+ beta-era API and should be used only for short cleanup or rollback, not ordinary cancelable work.",
+        "Explains that async defer cleanup still observes task cancellation unless a cancellation shield is deliberately used.",
+        "For the Xcode 26.5 explicit-capture closure issue, recommends only the documented workarounds: remove explicit captures when safe, or use a local @Sendable nonisolated(nonsending) async function.",
+        "Avoids retargeting the whole project or skill guidance to Swift 6.4 / Xcode 27."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Review this Swift 6.3 buffer-processing plan. A synchronous Core Image callback fills an output buffer with DispatchQueue.concurrentPerform while reading UnsafeBufferPointer inputs, but strict concurrency rejects the captures. The team proposes replacing it unconditionally with one TaskGroup child per element, or else marking the whole utility nonisolated(unsafe). Give the smallest safe correction, including the memory-safety proof and cancellation behavior.",
+      "expected_output": "A source-grounded review that preserves concurrentPerform when a measured synchronous parallel-for is required, treats task groups as an async alternative rather than a drop-in replacement, confines any unsafe opt-out to audited local base-pointer bindings, and requires a concrete no-conflicting-access and lifetime proof.",
+      "files": [],
+      "assertions": [
+        "Distinguishes concurrentPerform's synchronous join from the async task-group boundary and rejects unconditional replacement.",
+        "Does not claim that finite CPU computation automatically blocks the cooperative executor or violates forward progress.",
+        "States that disjoint ranges or per-iteration element ownership prevent conflicting concurrent access and may therefore remove the need for synchronization, without characterizing disjointness itself as synchronization.",
+        "Identifies both UnsafeBufferPointer and UnsafeMutableBufferPointer captures as non-Sendable under Swift 6 complete checking and attributes the diagnostic to concurrentPerform's @Sendable operation.",
+        "Confines any nonisolated(unsafe) opt-out to local base-pointer bindings captured by the @Sendable closure rather than the whole utility or buffer view.",
+        "Requires an adjacent safety proof covering actual index/range arithmetic, bounds, initialization or mutation, aliasing and nonconflicting accesses, and pointer lifetime through the synchronous join.",
+        "Allows a proven nonconflicting in-place transform instead of imposing blanket input/output non-aliasing, and for a same-base element-wise transform proves read-before-write, same-index-only access, and cross-index nonoverlap.",
+        "Explains that concurrentPerform does not automatically inherit Swift task cancellation while allowing an explicit thread-safe cancellation design with defined partial-output semantics.",
+        "Requires representative benchmark-versus-serial measurement, serial-result equivalence testing, and caution about nested parallelism as engineering checks rather than Apple API guarantees."
+      ]
+    }
+  ]
+}

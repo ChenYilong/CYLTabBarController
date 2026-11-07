@@ -1,0 +1,47 @@
+{
+  "skill_name": "swiftui-navigation",
+  "evals": [
+    {
+      "id": 0,
+      "name": "typed-routes-and-tab-stacks",
+      "prompt": "Review this SwiftUI navigation plan: use one global NavigationPath because it is type-safe, push full Item models into it from every tab, and reset the shared path when switching tabs. Correct the plan for an iOS 26 app with Home, Search, and Profile tabs.",
+      "expected_output": "A modern SwiftUI navigation review that prefers typed route arrays for homogeneous app routes, reserves NavigationPath for heterogeneous route values, gives each tab its own NavigationStack/path or router, and stores lightweight stable identifiers rather than views or heavy models.",
+      "files": [],
+      "assertions": [
+        "Rejects the claim that NavigationPath is the type-safe default for homogeneous route enums.",
+        "Recommends a typed [Route] path or equivalent Hashable route enum for app-owned destinations.",
+        "Reserves NavigationPath for stacks that must contain heterogeneous route value types.",
+        "Requires one independent NavigationStack/path or router per tab so tab history is preserved.",
+        "Stores lightweight stable identifiers in routes instead of full view instances or heavy model objects."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "sheet-dismissal-availability",
+      "prompt": "Audit this sheet guidance: on iOS 26, call dismissalConfirmationDialog from every editing sheet to block accidental dismissals, use custom frames for form sheets, and drive all sheets from Boolean flags. Correct it using current SwiftUI sheet APIs.",
+      "expected_output": "A source-grounded sheet review that treats dismissalConfirmationDialog as macOS-only, uses interactiveDismissDisabled with explicit Save/Discard UI for iOS/iPadOS, recommends presentationSizing for sheet dimensions, and prefers enum-driven sheet(item:) routing for model-backed sheets.",
+      "files": [],
+      "assertions": [
+        "Does not recommend dismissalConfirmationDialog as an iOS/iPadOS API.",
+        "Uses interactiveDismissDisabled(_:) for iOS/iPadOS nonprogrammatic dismissal prevention when unsaved changes exist.",
+        "Requires explicit in-sheet Save/Discard or confirmation UI on iOS/iPadOS rather than relying on a missing system dismissal dialog.",
+        "Recommends presentationSizing(_:) values such as .form or .page instead of hard-coded sheet frames.",
+        "Prefers sheet(item:) with an Identifiable enum for model-backed or centralized modal routing."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "universal-links-and-search-tab",
+      "prompt": "Review this iOS 26 routing note: Universal Links should be handled primarily with onContinueUserActivity for NSUserActivityTypeBrowsingWeb, AASA changes take 24-48 hours to propagate, and Tab(role: .search) replaces the tab bar with a search field when selected. Correct the note.",
+      "expected_output": "A corrected SwiftUI navigation answer that handles Universal Links and custom schemes with onOpenURL, reserves onContinueUserActivity for Handoff and other user activities, gives TN3155-aligned AASA cache/debugging guidance, and describes Tab search role as system search-tab metadata with optional tabViewSearchActivation control.",
+      "files": [],
+      "assertions": [
+        "Uses .onOpenURL as the SwiftUI hook for Universal Links and custom URL schemes.",
+        "Reserves .onContinueUserActivity for Handoff or other declared NSUserActivity types rather than the primary Universal Link path.",
+        "Replaces fixed 24-48 hour AASA propagation guidance with CDN-backed retrieval, install-time download, roughly weekly device rechecks, no direct CDN invalidation, and developer mode for testing.",
+        "Describes Tab(value:role:) with .search as marking a dedicated search tab with system default title, icon, and pinning behavior.",
+        "Mentions tabViewSearchActivation(_:) when selection should control search activation, without saying the API replaces the tab bar with a search field."
+      ]
+    }
+  ]
+}

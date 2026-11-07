@@ -14,6 +14,17 @@
 #import <objc/runtime.h>
 #import "CYLTabBar.h"
 
+/*!
+ * [EN] The object at `index`, or nil when `array` is nil or `index` is out of range (negative, `NSNotFound` or too
+ *      large). Used instead of `@try` / `@catch` around subscripts: under ARC an exception can leak, and a `@try` around
+ *      several reads skips every read after the first that throws.
+ * [CN] 返回 `index` 处的对象；`array` 为 nil 或 `index` 越界（负数、`NSNotFound` 或过大）时返回 nil。用来代替下标外的
+ *      `@try` / `@catch`：ARC 下抛出异常可能泄漏内存，而包住多次读取的 `@try` 会在第一次抛出后跳过其余全部读取。
+ */
+static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUInteger index) {
+    return index < array.count ? array[index] : nil;
+}
+
 @implementation CYLTabBar (CYLTabBarControllerExtention)
 
 /*!
@@ -138,7 +149,12 @@
     //      No, it is limited to cyl_isChildViewControllerPlusButton
     NSMutableArray *subControls = [NSMutableArray arrayWithCapacity:self.cyl_visibleControls.count];
     [self.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull control, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([control cyl_isPlusButton] && ![CYLPlusButton plusChildViewControllerForOwner:self].cyl_plusViewControllerEverAdded) {
+        // [EN] FIX: placeholder count mismatch — the plus button view itself is never a view controller's control:
+        //      `cyl_visibleControls` adds it next to the tab button of its slot, so with a plus child view controller this
+        //      list had one control more than `viewControllers`. The slot's own tab button stays.
+        // [CN] FIX：占位导致的数量不匹配——PlusButton 视图本身从不对应任何控制器：`cyl_visibleControls` 会把它加在其 slot 的 Tab
+        //      按钮旁边，因此有 PlusButton 子控制器时本数组比 `viewControllers` 多一个。slot 自己的 Tab 按钮保留。
+        if ([CYLPlusButton isPlusButtonView:control]) {
             return;
         }
         [subControls addObject:control];
@@ -162,35 +178,27 @@
 }
 
 - (UIControl *)cyl_tabBarButtonWithTabIndex:(NSUInteger)tabIndex {
-    UIControl *selectedControl = [self cyl_visibleControlWithIndex:tabIndex];
-    
-    NSInteger plusViewControllerIndex = [self.tabBarController.viewControllers indexOfObject:[CYLPlusButton plusChildViewControllerForOwner:self]];
-    BOOL isPlusViewControllerAdded = [CYLPlusButton plusChildViewControllerForOwner:self].cyl_plusViewControllerEverAdded && (plusViewControllerIndex != NSNotFound);
-    
-    if (isPlusViewControllerAdded) {
-        return selectedControl;
+    // [EN] FIX: placeholder count mismatch — `tabIndex` is an index in `viewControllers`. First the tab button of that view
+    //      controller itself. Otherwise the tab buttons in order, without the plus button view: they match
+    //      `viewControllers` one to one in every style (the slot's tab button included). The index used to go into
+    //      `cyl_visibleControls` with a plus child view controller (the plus button view is in it: one off after the slot)
+    //      and into the list without plus controls otherwise (no slot button there on Liquid Glass with a placeholder).
+    // [CN] FIX：占位导致的数量不匹配——`tabIndex` 是 `viewControllers` 中的下标。先直接取该控制器的 Tab 按钮；否则按顺序取去掉
+    //      PlusButton 视图后的 Tab 按钮：在所有样式下都与 `viewControllers` 一一对应（包含 slot 的 Tab 按钮）。以前有 PlusButton 子控制器时
+    //      用这个下标取 `cyl_visibleControls`（其中包含 PlusButton 视图，slot 之后错一位），否则取去掉 Plus 控件的数组。
+    NSArray<UIViewController *> *viewControllers = self.tabBarController.viewControllers;
+    if (tabIndex < viewControllers.count) {
+        UIControl *tabButton = viewControllers[tabIndex].tabBarItem.cyl_tabButton;
+        if ([tabButton isKindOfClass:[UIControl class]] && tabButton.superview && ![CYLPlusButton isPlusButtonView:tabButton]) {
+            return tabButton;
+        }
     }
-    
-    @try {
-        selectedControl = [self cyl_subTabBarButtonsWithoutPlusButton][tabIndex];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
-    return selectedControl;
+    return CYLObjectAtIndex([self cyl_subTabBarButtons], tabIndex);
 }
 
 - (UIControl *)cyl_visibleControlWithIndex:(NSUInteger)index {
     UIControl *selectedControl;
-    @try {
-        NSArray *subControls = self.cyl_visibleControls;
-        selectedControl = subControls[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    selectedControl = CYLObjectAtIndex(self.cyl_visibleControls, index);
     return selectedControl;
 }
 
@@ -256,14 +264,8 @@
     if (NSNotFound == index) {
         return nil;
     }
-    @try {
-        //FIXME:  to delete cyl_subTabBarButtonsWithoutPlusButton
-        contentControl = [self.cyl_subTabBarButtons objectAtIndex:index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    //FIXME:  to delete cyl_subTabBarButtonsWithoutPlusButton
+    contentControl = CYLObjectAtIndex(self.cyl_subTabBarButtons, index);
     if (!contentControl) {
         return nil;
     }
@@ -292,34 +294,27 @@
     return fabs(WidthOffsetWithIndex);
 }
 
-- (UIControl *)cyl_selectedControl {
+- (UIControl * _Null_unspecified)cyl_selectedControl {
     UIControl *selectedControl = objc_getAssociatedObject(self, @selector(cyl_selectedControl));
     if (!selectedControl) {
-        @try {
-            do {
-                selectedControl = self.cyl_platterSelectedContentViews[0];
-                
-                if (selectedControl) {
-                    break;
-                }
-                selectedControl = self.cyl_platterContentViews[0];
-                
-                if (selectedControl) {
-                    break;
-                }
-                selectedControl = self.cyl_visibleControls[0];
-                
-                if (selectedControl) {
-                    break;
-                }
-            } while (false); // same as : 0, NO
-        } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
+        // [EN] Each candidate is read with a bounds check: the old `@try` around `[0]` jumped to `@catch` on the first empty
+        //      array, so the fallbacks after it never ran and this returned nil. Only controls count: the first subview of a
+        //      tab bar that is not Liquid Glass can be a background view.
+        // [CN] 每个候选都先检查下标再读取：原来 `[0]` 外的 `@try` 在第一个空数组处就跳到 `@catch`，后面的备选从未执行，结果返回 nil。
+        //      只接受控件：非液态玻璃 TabBar 的第一个子视图可能是背景视图。
+        for (NSArray *candidates in @[ self.cyl_platterSelectedContentViews ?: @[], self.cyl_platterContentViews ?: @[], self.cyl_visibleControls ?: @[] ]) {
+            id candidate = CYLObjectAtIndex(candidates, 0);
+            if ([candidate isKindOfClass:[UIControl class]]) {
+                selectedControl = candidate;
+                break;
+            }
         }
     }
-    return selectedControl;
+    // [EN] Still nil when the tab bar has no control yet. The header declares a nonnull return, and that public API stays as
+    //      released (making it nullable would change its Swift type), so the cast tells the static analyzer the nil is known.
+    // [CN] TabBar 还没有任何控件时仍为 nil。头文件声明的返回值为非空，该公开 API 保持已发布的样子（改为 nullable 会改变其 Swift 类型），
+    //      因此这里的转换告诉静态分析器：返回 nil 是已知的。
+    return (UIControl * _Nonnull)selectedControl;
 }
 
 - (void)cyl_setSelectedControl:(UIControl *)selectedControl {
@@ -348,10 +343,9 @@
         tabBarController = [self tabBarController];
     }
     
-    CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
-    if (!tabBar) {
-        tabBar = self;
-    }
+    // Its own tab bar when that is a CYLTabBar, otherwise this one (no tab bar controller, or a system tab bar).
+    UITabBar *controllerTabBar = tabBarController.tabBar;
+    CYLTabBar *tabBar = [controllerTabBar isKindOfClass:[CYLTabBar class]] ? (CYLTabBar *)controllerTabBar : self;
     // The plus button and its child view controller are bound to the controller (by its `context`), so ask it.
     // PlusButton 和它的子控制器绑定的是控制器（通过它的 `context`），所以向它询问。
     id plusOwner = tabBarController ?: self;
@@ -621,13 +615,7 @@
 - (UIView *)cyl_platterViewWithIndex:(NSInteger)index {
     //    - (BOOL)cyl_isPlatterView; {
     UIView *view = nil;
-    @try {
-        view = self.cyl_platterViews[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    view = CYLObjectAtIndex(self.cyl_platterViews, index);
     return view;
 }
 - (NSArray *)cyl_platterContentViews {
@@ -636,13 +624,7 @@
 
 - (UIView *)cyl_platterContentViewWithIndex:(NSInteger)index {
     UIView *view = nil;
-    @try {
-        view = self.cyl_platterContentViews[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    view = CYLObjectAtIndex(self.cyl_platterContentViews, index);
     return  view;
 }
 
@@ -792,26 +774,14 @@
 - (UIControl *)cyl_platterSelectedContentViewWithoutPlusButttonWithIndex:(NSInteger)index {
     //    - (BOOL)cyl_isPlatterView; {
     UIControl *view = nil;
-    @try {
-        view = self.cyl_platterSelectedContentViewsWithoutPlusButton[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    view = CYLObjectAtIndex(self.cyl_platterSelectedContentViewsWithoutPlusButton, index);
     return view;
 }
 
 - (UIControl *)cyl_platterSelectedContentViewWithIndex:(NSInteger)index {
     //    - (BOOL)cyl_isPlatterView; {
     UIControl *view = nil;
-    @try {
-        view = self.cyl_platterSelectedContentViews[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    view = CYLObjectAtIndex(self.cyl_platterSelectedContentViews, index);
     return view;
 }
 
@@ -822,13 +792,7 @@
 - (UIView *)cyl_platterPortalViewWithIndex:(NSInteger)index {
     //    - (BOOL)cyl_isPlatterView; {
     UIView *view = nil;
-    @try {
-        view = self.cyl_platterPortalViews[index];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-    }
+    view = CYLObjectAtIndex(self.cyl_platterPortalViews, index);
     return view;
 }
 

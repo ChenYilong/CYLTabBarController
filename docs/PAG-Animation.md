@@ -58,7 +58,7 @@ pod 'CYLTabBarController/PAGEnterprise'    # libpag-enterprise: audio, 3D, movie
 
 | 中文 | English |
 |:---|:---|
-| 库内部用 `CYL_PAG_AVAILABLE`（`__has_include(<libpag/PAGView.h>)`）识别是否引入了 PAG，与 `CYL_LOTTIE_AVAILABLE` 相同；`CYL_TAB_ANIMATION_AVAILABLE` 表示引入了 Lottie 或 PAG。未引入 PAG 子库时，PAG key 会被忽略，Tab 显示普通图片。Swift Package Manager 与 Carthage 暂不提供 PAG。 | Inside the library, `CYL_PAG_AVAILABLE` (`__has_include(<libpag/PAGView.h>)`) tells whether PAG is linked, like `CYL_LOTTIE_AVAILABLE`; `CYL_TAB_ANIMATION_AVAILABLE` means Lottie or PAG. Without the PAG subspec the PAG keys are ignored and the tabs show their images. Swift Package Manager and Carthage do not offer PAG yet. |
+| PAG 的 key（`CYLTabBarPAGURL`…）与 `CYLTabBarItemsAttributesAddingPAGFiles()` 声明在 PAG 子库自己的公开头文件 `CYLPAGTabBarItemAnimator.h` 中，Core 不包含任何动画库的 key；引入 PAG 子库后即可使用（`#import <CYLTabBarController/CYLTabBarController.h>` 已包含）。是否有动画在运行时由注册表决定，没有编译期开关。Swift Package Manager 与 Carthage 暂不提供 PAG。 | The PAG keys (`CYLTabBarPAGURL`…) and `CYLTabBarItemsAttributesAddingPAGFiles()` are declared in the PAG subspec's own public header, `CYLPAGTabBarItemAnimator.h`; Core declares no library's keys. They are available with the PAG subspec (`#import <CYLTabBarController/CYLTabBarController.h>` includes them). Whether tabs animate is decided at runtime by the registry; there is no compile-time switch. Swift Package Manager and Carthage do not offer PAG yet. |
 
 ## [CN]Key 对照
 ## [EN]Keys, side by side with Lottie
@@ -75,7 +75,7 @@ pod 'CYLTabBarController/PAGEnterprise'    # libpag-enterprise: audio, 3D, movie
 
 | 中文 | English |
 |:---|:---|
-| 同一个 Tab 请使用 Lottie key 或 PAG key 之一；两者都设置时以 Lottie 为准。不同的 Tab 可以分别使用 Lottie 和 PAG（需同时引入两个子库）。 | Use either the Lottie keys or the PAG keys for a tab; with both, Lottie wins. Different tabs can use Lottie and PAG (with both subspecs installed). |
+| 同一个 Tab 请使用 Lottie key 或 PAG key 之一；有值的 key 决定使用哪个动画库，见 [注册与选择动画库](Tab-Bar-Item-Animation.md#cn注册与选择动画库)。不同的 Tab 可以分别使用 Lottie 和 PAG（需同时引入两个子库）。 | Use either the Lottie keys or the PAG keys for a tab; the keys with a value decide which library plays it, see [Registering and choosing a library](Tab-Bar-Item-Animation.md#enregistering-and-choosing-a-library). Different tabs can use Lottie and PAG (with both subspecs installed). |
 
 ## [CN]各项关系
 ## [EN]How the pieces relate
@@ -84,7 +84,7 @@ pod 'CYLTabBarController/PAGEnterprise'    # libpag-enterprise: audio, 3D, movie
 flowchart TB
     subgraph Keys["tabBarItemsAttributes"]
         lk["CYLTabBarLottieURL / FilePath / Size<br/>DarkURL / DarkFilePath / DarkColors"]
-        pk["CYLTabBarPAGURL / FilePath / Size<br/>DarkURL / DarkFilePath"]
+        pk["CYLTabBarPAGURL / FilePath / Size<br/>DarkURL / DarkFilePath<br/>(declared by the PAG subspec)"]
         helper["CYLTabBarItemsAttributesAddingLottieFiles()<br/>CYLTabBarItemsAttributesAddingPAGFiles()"]
     end
 
@@ -95,7 +95,6 @@ flowchart TB
         core["CYLTabBarController/Core"]
     end
 
-    macros["CYL_LOTTIE_AVAILABLE · CYL_PAG_AVAILABLE<br/>CYL_TAB_ANIMATION_AVAILABLE"]
     pipeline["One animation pipeline<br/>(Lottie keys first, then PAG keys)<br/>lottieURLs · tabBarItem.cyl_lottieURL · dark registry"]
     choose{"CYLTabBarItemAnimatorRegistry animatorForURL:<br/>(by priority)"}
     lottieView["Lottie view, made by CYLLottieTabBarItemAnimator<br/>LOTAnimationView / CYLCompatibleLOTAnimationView"]
@@ -107,12 +106,8 @@ flowchart TB
     lottiePod --> core
     pagPod --> core
     pagEntPod --> core
-    pagEntPod --> macros
-    lottiePod --> macros
-    pagPod --> macros
     lk --> pipeline
     pk --> pipeline
-    macros --> pipeline
     pipeline --> choose
     choose -- "CYLLottieTabBarItemAnimator (other files)" --> lottieView
     choose -- "CYLPAGTabBarItemAnimator (.pag)" --> pagView
@@ -192,14 +187,14 @@ return pagAttributes.map { item in
 
 | 中文 | English |
 |:---|:---|
-| `Example-PAG`：由 `Example-Swift-03` 复制而来，Podfile 改为 `pod 'CYLTabBarController/PAG', :path => '../'`，4 个 Tab 使用 `Example-Shared/PAGResources/pag-ios` 中的 `1`、`2`、`22`、`test2`（Apache License 2.0），这些文件由 `pod install` 自动下载。在该目录执行 `pod install`，打开 `HealthyHome.xcworkspace` 运行。 | `Example-PAG`: copied from `Example-Swift-03`, with the Podfile set to `pod 'CYLTabBarController/PAG', :path => '../'`; its 4 tabs use `1`, `2`, `22` and `test2` from `Example-Shared/PAGResources/pag-ios` (Apache License 2.0), which `pod install` downloads. Run `pod install` in that folder and open `HealthyHome.xcworkspace`. |
+| `Example-PAG`：由 `Example-Swift-03` 复制而来，Podfile 改为 `pod 'CYLTabBarController/PAG', :path => '../'`，4 个 Tab 使用 `Example-Shared/PAGResources/tab-icons` 中的 `tab_home`、`tab_health`、`tab_moments`、`tab_me`（Apache License 2.0，取自 Tencent/libpag 与 libpag/pag-ios 的官方示例），这些文件由 `pod install` 自动下载。选择 Tab 图标时用尺寸小、第一帧就能看到图标的文件：选中之前 Tab 显示的是第一帧。该示例使用 libpag 4.5.101（尚未发布到 CocoaPods，Podfile 固定到官方 pag-ios 的 commit）。库让 Tab 图标的 PAGView 在主线程绘制（`-setSync:YES`）：异步绘制时，多个 PAGView 的绘制线程会卡在模拟器的软件 OpenGL 中并阻塞主线程，表现为图标空白、点击不播放。在该目录执行 `pod install`，打开 `HealthyHome.xcworkspace` 运行。 | `Example-PAG`: copied from `Example-Swift-03`, with the Podfile set to `pod 'CYLTabBarController/PAG', :path => '../'`; its 4 tabs use `tab_home`, `tab_health`, `tab_moments` and `tab_me` from `Example-Shared/PAGResources/tab-icons` (Apache License 2.0, from the official samples of Tencent/libpag and libpag/pag-ios), which `pod install` downloads. For a tab icon, pick a small file whose first frame shows the icon: a tab shows the first frame until it is selected. This demo uses libpag 4.5.101 (not on CocoaPods yet, so the Podfile pins the official pag-ios commit). The library makes the PAGViews of tab icons render on the main thread (`-setSync:YES`): rendering asynchronously, the render threads of several PAGViews stall inside the simulator's software OpenGL and block the main thread, which shows as blank icons and no playback. Run `pod install` in that folder and open `HealthyHome.xcworkspace`. |
 
 ## [CN]动效资源
 ## [EN]Animation files
 
 | 中文 | English |
 |:---|:---|
-| **按 pod 的方式获取，不直接复制进仓库**：动效文件与 libpag 一样在安装时下载。[`Example-Shared/PAGResources/pag-resources.json`](../Example-Shared/PAGResources/pag-resources.json) 列出 libpag 6 个官方仓库（pag-ios、pag-enterprise-ios、pag-android、pag-flutter、pag-enterprise-android、pag-web）中的 44 个不重复 `.pag` 文件（约 20 MB）与各仓库的 LICENSE，每个都固定到某个 commit 并记录 SHA-256。在 `Example-PAG` 中执行 `pod install` 时，Podfile 的 `pre_install` 会运行 [`scripts/fetch-pag-resources.py`](../scripts/fetch-pag-resources.py) 下载并校验；也可以直接运行该脚本（`--check` 只校验）。下载的文件已加入 `.gitignore`。 | **Fetched like a pod, not copied into the repository**: the animation files are downloaded on install, like libpag itself. [`Example-Shared/PAGResources/pag-resources.json`](../Example-Shared/PAGResources/pag-resources.json) lists the 44 unique `.pag` files (about 20 MB) of libpag's 6 official repositories (pag-ios, pag-enterprise-ios, pag-android, pag-flutter, pag-enterprise-android, pag-web) and their licenses, each pinned to a commit with its SHA-256. `pod install` in `Example-PAG` runs [`scripts/fetch-pag-resources.py`](../scripts/fetch-pag-resources.py) from the Podfile's `pre_install` to download and verify them; you can also run the script yourself (`--check` only verifies). The downloaded files are in `.gitignore`. |
+| **按 pod 的方式获取，不直接复制进仓库**：动效文件与 libpag 一样在安装时下载。[`Example-Shared/PAGResources/pag-resources.json`](../Example-Shared/PAGResources/pag-resources.json) 列出 libpag 6 个官方仓库（pag-ios、pag-enterprise-ios、pag-android、pag-flutter、pag-enterprise-android、pag-web）中的 44 个不重复 `.pag` 文件（约 20 MB）与各仓库的 LICENSE，每个都固定到某个 commit 并记录 SHA-256。在 `Example-PAG` 中执行 `pod install` 时，Podfile 的 `pre_install` 会运行 [`scripts/fetch-animation-resources.py`](../scripts/fetch-animation-resources.py) 下载并校验；也可以直接运行该脚本（`--check` 只校验）。下载的文件已加入 `.gitignore`。 | **Fetched like a pod, not copied into the repository**: the animation files are downloaded on install, like libpag itself. [`Example-Shared/PAGResources/pag-resources.json`](../Example-Shared/PAGResources/pag-resources.json) lists the 44 unique `.pag` files (about 20 MB) of libpag's 6 official repositories (pag-ios, pag-enterprise-ios, pag-android, pag-flutter, pag-enterprise-android, pag-web) and their licenses, each pinned to a commit with its SHA-256. `pod install` in `Example-PAG` runs [`scripts/fetch-animation-resources.py`](../scripts/fetch-animation-resources.py) from the Podfile's `pre_install` to download and verify them; you can also run the script yourself (`--check` only verifies). The downloaded files are in `.gitignore`. |
 | **许可**：pag-ios、pag-enterprise-ios、pag-flutter 为 Apache License 2.0，pag-android 为 MIT；pag-enterprise-android 需要商业授权，pag-web 没有许可文件。这些文件只从原仓库下载到你的电脑上，本仓库不分发它们；在 App 中发布任何文件之前，请自行确认其使用条款。详见 [PAGResources/README.md](../Example-Shared/PAGResources/README.md)。 | **Licenses**: Apache License 2.0 for pag-ios, pag-enterprise-ios and pag-flutter, MIT for pag-android; pag-enterprise-android requires a commercial license and pag-web has no license file. The files are only downloaded to your machine from their original repositories; this repository does not distribute them. Check the terms before you ship any of them in an app. See [PAGResources/README.md](../Example-Shared/PAGResources/README.md). |
 
 ## [CN]其他平台的参考
@@ -224,4 +219,8 @@ return pagAttributes.map { item in
 
 | 中文 | English |
 |:---|:---|
-| 本次修改在 Linux 环境中完成，无法运行 Xcode、CocoaPods 与 iOS 模拟器，因此**没有截图**，也未编译验证（PAG 的 API 按 libpag 公开头文件 `PAGView.h` 编写）。请在三种样式下运行 `Example-PAG`：确认 Tab 显示 PAG 动画、选中时播放一次、切换后上一个 Tab 回到第一帧、启动时选中的 Tab 显示最后一帧、切换深色模式（提供 `_dark.pag` 时）正常。验证后的截图请放在 `docs/assets/` 中，并用 `![](assets/文件名.png)` 引用。 | This change was made on Linux, where Xcode, CocoaPods and the iOS simulator cannot run, so there are **no screenshots** and it has not been compiled (the PAG calls follow libpag's public header `PAGView.h`). Run `Example-PAG` in all three styles and check: the tabs show PAG animations, a selected tab plays once, the previous tab goes back to its first frame, the tab selected at launch shows its last frame, and Dark Mode works (with `_dark.pag` files). Put screenshots from these checks in `docs/assets/` and reference them as `![](assets/file-name.png)`. |
+| 已在 iOS 26.5 模拟器（液态玻璃）上运行 `Example-PAG`（`pod 'CYLTabBarController/PAG', :path => '../'`，引用本地仓库）：Tab 显示 PAG 动画，选中时播放，切换后上一个 Tab 回到第一帧，与 Lottie 一致。「我的」Tab 是所有 Swift Demo 共用的测试列表。 | `Example-PAG` was run on the iOS 26.5 simulator (Liquid Glass), with `pod 'CYLTabBarController/PAG', :path => '../'` (the local repository): the tabs show PAG animations, a selected tab plays, and the previous tab goes back to its first frame, as with Lottie. The Me tab is the test list shared by every Swift demo. |
+| 注意：未选中的 Tab 显示动画的第一帧。Demo 使用的 `.pag` 是 libpag 的通用示例而非 Tab 图标，例如首页的玫瑰从几乎空白开始，因此未选中时几乎看不见。用作 Tab 图标的 PAG 文件，第一帧应是可辨认的图标。 | Note: a tab that is not selected shows the animation's first frame. The demo's `.pag` files are libpag's general samples, not tab icons; the home tab's rose, for example, starts almost empty, so it is barely visible when not selected. A PAG file made for a tab icon should start on a recognizable icon. |
+| 测试中修复：`Example-Shared/CYLPlusButtonBadgeDemo.swift` 中使用了 ObjC 的 `?:`（来自 #744），Swift 无法编译，所有 Swift Demo 都受影响，已改为 `??`。 | Fixed during testing: `Example-Shared/CYLPlusButtonBadgeDemo.swift` used ObjC's `?:` (from #744), which Swift does not compile, breaking every Swift demo; it is now `??`. |
+
+![](assets/pag-animation-tab-icons.png) ![](assets/pag-animation-test-list.png)

@@ -6,7 +6,7 @@
 //
 
 #import "HomeViewController.h"
-#import "AppDelegate.h"
+#import "SceneDelegate.h"
 
 @interface HomeViewController ()
 
@@ -34,7 +34,7 @@
 
 - (void)styleChanged:(UISegmentedControl *)styleControl {
     CYLTabBarStyleType styleType = (styleControl.selectedSegmentIndex == 1) ? CYLTabBarStyleTypeFlatDesign : CYLTabBarStyleTypeLiquidGlass;
-    [(AppDelegate *)[UIApplication sharedApplication].delegate showTabBarControllerWithStyle:styleType];
+    [(SceneDelegate *)self.view.window.windowScene.delegate showTabBarControllerWithStyle:styleType];
 }
 
 @end

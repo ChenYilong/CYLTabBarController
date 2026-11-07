@@ -35,6 +35,9 @@ extension CYLTabBarController {
     /// Shows the badge (1) once the tab bar is laid out, delayed like the ObjC demo's tab badges.
     /// TabBar 布局完成后显示角标（1），与 ObjC Demo 的 Tab 角标一样延迟显示。
     func demoShowPlusButtonBadgeAfterLayout() {
+        // [EN] #535: every Swift demo already calls this from `viewDidAppear(_:)`; turn the interaction demo on here too.
+        // [CN] #535：所有 Swift Demo 都已在 `viewDidAppear(_:)` 中调用本方法，因此也在这里开启交互演示。
+        demoSetUpInteractions()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
             self?.demoUpdatePlusButtonBadge(addingOne: false)
         }
@@ -60,13 +63,6 @@ extension CYLTabBarController {
         plusButton.tag = max(plusButton.tag, 0) + 1
         let badgeValue = "\(plusButton.tag)"
         plusButton.cyl_showBadgeValue(badgeValue, animationType: .bounce)
-        // [EN] With a plus child view controller there is a second layer: its system tab button, under the plus button. Update
-        // it too, the way the other tabs' badges are set (on the view controller), so both always show the same value.
-        // [CN] 有 PlusButton 子控制器时还有第二个图层：PlusButton 下方该子控制器的系统 Tab 按钮。与其他 Tab 一样（在控制器上设置）
-        // 同时更新它，两者始终显示相同的值。
-        if hasPlusChildViewController() {
-            CYLPlusButton.plusChildViewController(forOwner: self)?.cyl_showBadgeValue(badgeValue, animationType: .bounce)
-        }
         NSLog("[#535] plus button badge %ld (Liquid Glass: %@, from CYLUtils)", plusButton.tag, CYLUtils.isLiquidGlassActive() ? "YES" : "NO")
     }
 }
@@ -86,5 +82,30 @@ final class DemoPlusButton: CYLPlusButton, CYLPlusButtonSubclassing {
     // #408: the plus button's identifier. PlusButton 的标识。
     static func tabBarItemIdentifier() -> String {
         return "plus"
+    }
+}
+
+/*!
+ * #535 demo, shared by every Swift demo: the interaction features of `CYLTabBarController (CYLInteraction)`.
+ * [EN] Turns on a tap animation for the tabs and the plus button (bounce), a long press that shows the pressed button's
+ *      identifier, and swiping the page left or right to switch tabs. `demoShowPlusButtonBadgeAfterLayout()`, which every
+ *      Swift demo calls from `viewDidAppear(_:)`, calls it (it can run more than once). The ObjC demo turns them on from
+ *      its table rows instead.
+ * [CN] 开启 `CYLTabBarController (CYLInteraction)` 的交互功能：Tab 与 PlusButton 的点击动画（弹性）、长按弹出被长按按钮的标识，
+ *      以及左右滑动页面切换 Tab。由所有 Swift Demo 在 `viewDidAppear(_:)` 中调用的 `demoShowPlusButtonBadgeAfterLayout()` 调用它
+ *      （可以重复调用）。ObjC Demo 改为在列表行中开启。
+ */
+extension CYLTabBarController {
+
+    func demoSetUpInteractions() {
+        cyl_tabButtonTapAnimationType = .bounce
+        cyl_swipeToSwitchTabEnabled = true
+        cyl_didLongPressControlBlock = { tabBarController, control in
+            let name = control.cyl_tabBarItemDisplayName
+            let alert = UIAlertController(title: String(format: CYLLocalizedString("长按了「%@」"), name),
+                                          message: nil, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+            tabBarController.present(alert, animated: true)
+        }
     }
 }

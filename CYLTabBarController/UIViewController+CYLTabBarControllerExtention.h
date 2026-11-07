@@ -347,6 +347,17 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 @property (nonatomic, assign, setter=cyl_setTabBadgePointViewOffset:, getter=cyl_tabBadgePointViewOffset) UIOffset cyl_tabBadgePointViewOffset CYL_DEPRECATED("Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.");
 
+/*!
+ * [EN] How much of the bottom of `self.view` the tab bar covers, in `self.view`'s points: 0 when there is no tab bar, it
+ *      is hidden, or this page hides it (`hidesBottomBarWhenPushed`). For laying out subviews above the tab bar (e.g. a
+ *      floating button) in `-viewDidLayoutSubviews` or `-viewWillAppear:`, not in `-viewDidLoad`: it converts frames,
+ *      so the view must be in a window. Every style: the system tab bar (Liquid Glass, classic) and FlatDesign's own bar.
+ * [CN] TabBar 遮挡 `self.view` 底部的高度（`self.view` 坐标系）：没有 TabBar、TabBar 隐藏或本页面隐藏 TabBar（`hidesBottomBarWhenPushed`）
+ *      时为 0。用于在 TabBar 上方布局子视图（例如悬浮按钮），请在 `-viewDidLayoutSubviews` 或 `-viewWillAppear:` 中使用，不要在
+ *      `-viewDidLoad` 中使用：它会转换坐标，需要视图已在 window 上。适用于所有样式：系统 TabBar（液态玻璃、经典）与扁平样式自己的 TabBar。
+ */
+@property (nonatomic, readonly) CGFloat cyl_tabBarSpacingInViewCoordinator;
+
 @end
 
 NS_ASSUME_NONNULL_END

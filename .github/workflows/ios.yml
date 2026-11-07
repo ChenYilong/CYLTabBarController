@@ -1,0 +1,245 @@
+# [EN] iOS CI on GitHub-hosted macOS runners (free for this public repository). See docs/Mac-CI-CD.md.
+#      Runner: `macos-26` (Apple Silicon, stable image, default Xcode 26.x). To use another runner without editing this
+#      file, set the repository variable MACOS_RUNNER (Settings → Secrets and variables → Actions → Variables), e.g.
+#      `xcode-27` for the Xcode 27 public preview.
+# [CN] 在 GitHub 托管的 macOS runner 上运行 iOS CI（本公开仓库免费），见 docs/Mac-CI-CD.md。
+#      Runner：`macos-26`（Apple Silicon，稳定镜像，默认 Xcode 26.x）。想换 runner 而不改本文件时，设置仓库变量 MACOS_RUNNER
+#      （Settings → Secrets and variables → Actions → Variables），例如 `xcode-27`（Xcode 27 公开预览）。
+name: iOS
+
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # [EN] Decides whether the macOS jobs need to build. A pull request that only changes docs (docs/, *.md, assets/,
+  #      .github/FUNDING.yml) skips their steps; the jobs still run and report success, so required checks pass.
+  #      Pushes to master and manual runs always build.
+  # [CN] 判断 macOS job 是否需要编译。只修改文档（docs/、*.md、assets/、.github/FUNDING.yml）的 PR 会跳过这些 job 的步骤；job 仍然运行
+  #      并报告成功，因此必需检查可以通过。推送到 master 与手动运行总是编译。
+  changes:
+    name: Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        name: Code changed?
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          CODE=$(git diff --name-only "$BASE"...HEAD | grep -vE '^(docs/|assets/|\.github/FUNDING\.yml$)|\.md$' || true)
+          echo "Code files changed:"
+          echo "${CODE:-(none)}"
+          if [[ -n "$CODE" ]]; then echo "code=true"; else echo "code=false"; fi >> "$GITHUB_OUTPUT"
+
+  # [EN] The CI and release scripts. Separate from `changes`, whose failure would skip the macOS jobs.
+  # [CN] 检查 CI 与发布脚本。与 `changes` 分开：`changes` 失败会让 macOS job 被跳过。
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck scripts/*.sh
+
+  # [EN] Full `pod lib lint`, the verification CLAUDE.md asks for. [CN] 完整的 `pod lib lint`，即 CLAUDE.md 要求的验证。
+  lint:
+    name: pod lib lint
+    needs: changes
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: CocoaPods cache
+        if: needs.changes.outputs.code == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cocoapods/repos
+            ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-lint-${{ hashFiles('CYLTabBarController.podspec', '**/Podfile', '**/Podfile.lock') }}
+          restore-keys: pods-${{ runner.os }}-lint-
+      - name: Versions
+        if: needs.changes.outputs.code == 'true'
+        run: |
+          sw_vers
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i iphone
+          pod --version || sudo gem install cocoapods
+      - name: pod lib lint
+        if: needs.changes.outputs.code == 'true'
+        run: scripts/pod-lint.sh lib --verbose
+
+  # [EN] The framework target Carthage builds, then the static analyzer; a warning in the library's sources fails the job.
+  # [CN] Carthage 使用的 framework target，以及静态分析；本库源码中出现警告时该 job 失败。
+  framework:
+    name: Framework build and analyze
+    needs: changes
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build CYLTabBarController-Framework
+        if: needs.changes.outputs.code == 'true'
+        run: |
+          set -o pipefail
+          mkdir -p build
+          xcodebuild build \
+            -project CYLTabBarController.xcodeproj \
+            -scheme CYLTabBarController-Framework \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/DerivedData/framework \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/framework.log
+      - name: Analyze CYLTabBarController-Framework
+        if: needs.changes.outputs.code == 'true'
+        run: |
+          set -o pipefail
+          xcodebuild analyze \
+            -project CYLTabBarController.xcodeproj \
+            -scheme CYLTabBarController-Framework \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/DerivedData/framework \
+            CODE_SIGNING_ALLOWED=NO \
+            CLANG_ANALYZER_OUTPUT=plist-html \
+            CLANG_ANALYZER_OUTPUT_DIR="$PWD/build/analyzer" 2>&1 | tee build/analyze.log
+      - name: Warnings summary
+        if: always() && needs.changes.outputs.code == 'true'
+        run: |
+          {
+            echo "### Framework warnings"
+            echo
+            echo "| Step | Warnings |"
+            echo "|:---|---:|"
+            echo "| build | $(grep -c ': warning: ' build/framework.log || true) |"
+            echo "| analyze | $(grep -c ': warning: ' build/analyze.log || true) |"
+            echo
+            echo '```'
+            grep -h ': warning: ' build/framework.log build/analyze.log 2>/dev/null | sed "s|$PWD/||" | sort -u | head -200 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      # [EN] CLAUDE.md: no build or analyzer warnings in the library's own sources. The count was 0 on the first green run.
+      # [CN] CLAUDE.md：本库源码不允许有构建或静态分析警告。首次全绿运行时数量为 0。
+      - name: Fail on warnings
+        if: needs.changes.outputs.code == 'true'
+        run: |
+          COUNT=$(grep -h '\.[mh]:[0-9]*:[0-9]*: warning: ' build/framework.log build/analyze.log | sort -u | wc -l | tr -d ' ')
+          echo "Source warnings: $COUNT"
+          if [[ "$COUNT" -gt 0 ]]; then
+            grep -h '\.[mh]:[0-9]*:[0-9]*: warning: ' build/framework.log build/analyze.log | sort -u
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        # [EN] A log that cannot be uploaded (GitHub's artifact service timing out) must not fail the job.
+        # [CN] 日志上传失败（GitHub 的 artifact 服务超时）不应让 job 失败。
+        continue-on-error: true
+        if: always() && needs.changes.outputs.code == 'true'
+        with:
+          name: framework-logs
+          path: |
+            build/*.log
+            build/analyzer
+          if-no-files-found: ignore
+
+  # [EN] The unit tests of the CYLTabBarController-Framework scheme (CYLTabBarControllerTests) on an iOS simulator.
+  # [CN] 在 iOS 模拟器上运行 CYLTabBarController-Framework scheme 的单元测试（CYLTabBarControllerTests）。
+  unit-tests:
+    name: Unit tests
+    needs: changes
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: xcodebuild test
+        if: needs.changes.outputs.code == 'true'
+        run: scripts/unit-tests.sh
+      - uses: actions/upload-artifact@v4
+        # [EN] A log that cannot be uploaded (GitHub's artifact service timing out) must not fail the job.
+        # [CN] 日志上传失败（GitHub 的 artifact 服务超时）不应让 job 失败。
+        continue-on-error: true
+        if: always() && needs.changes.outputs.code == 'true'
+        with:
+          name: unit-tests-log
+          path: build/unit-tests.log
+          if-no-files-found: ignore
+
+  # [EN] Carthage, as an app would use it: build this checkout as an XCFramework.
+  # [CN] 与 App 的用法一致的 Carthage：把当前代码编译为 XCFramework。
+  carthage:
+    name: Carthage
+    needs: changes
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Carthage
+        if: needs.changes.outputs.code == 'true'
+        run: carthage version || brew install carthage
+      - name: carthage build
+        if: needs.changes.outputs.code == 'true'
+        run: carthage build --no-skip-current --use-xcframeworks --platform iOS
+
+  # [EN] Every demo, one job each; one failing demo does not stop the others.
+  # [CN] 每个 Demo 一个 job；一个 Demo 失败不会中止其他 Demo。
+  examples:
+    name: Demo ${{ matrix.demo }}
+    needs: changes
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        demo:
+          - .
+          - Example-Swift
+          - Example-Swift-02
+          - Example-Swift-03
+          - Example-Swift-04
+          - Example-SwiftUI
+          - Example-Swift-SwiftManager
+          - Example-Swift-SwiftManager-FlatDesign
+          - Example-network-download
+          - Example-Swift-Gallery
+          - Example-GIF
+    steps:
+      - uses: actions/checkout@v4
+      - name: CocoaPods
+        if: needs.changes.outputs.code == 'true'
+        run: pod --version || sudo gem install cocoapods
+      - name: CocoaPods cache
+        if: needs.changes.outputs.code == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cocoapods/repos
+            ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-${{ matrix.demo }}-${{ hashFiles('CYLTabBarController.podspec', '**/Podfile', '**/Podfile.lock') }}
+          restore-keys: pods-${{ runner.os }}-${{ matrix.demo }}-
+      - name: Build
+        if: needs.changes.outputs.code == 'true'
+        run: scripts/ci-build-example.sh "${{ matrix.demo }}"
+      - name: Summary
+        if: always() && needs.changes.outputs.code == 'true'
+        run: |
+          {
+            echo "| Demo | Scheme | Build | Warnings |"
+            echo "|:---|:---|:---:|---:|"
+            cat build/summary.md 2>/dev/null || echo "| ${{ matrix.demo }} | - | ❌ | - |"
+          } >> "$GITHUB_STEP_SUMMARY"

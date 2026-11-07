@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
+
+# Everything the user or the agent owns lives under one ignored root.
+# Keep the rules and templates, ignore real content.
+local/**
+!local/
+!local/README.md
+!local/memory/
+!local/memory/README.md
+!local/credentials/
+!local/credentials/README.md
+!local/credentials/TEMPLATE.md
+
+tmp/
+
+# Local QA helpers and experiments. The harness product is Markdown-only.
+scripts/
+tests/

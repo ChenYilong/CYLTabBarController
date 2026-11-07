@@ -32,7 +32,18 @@
 | [各样式的实现](#cn各样式的实现) | [How each style works](#enhow-each-style-works) |
 | [缩小时的 PlusButton](#cn缩小时的-plusbutton) | [The PlusButton in the minimized bar](#enthe-plusbutton-in-the-minimized-bar) |
 | [经典样式：iOS 25 及以前与 iOS 26 UI 兼容模式](#cn经典样式ios-25-及以前与-ios-26-ui-兼容模式) | [Classic style: iOS 25 and earlier, and iOS 26 UI compatibility mode](#enclassic-style-ios-25-and-earlier-and-ios-26-ui-compatibility-mode) |
+| [何时隐藏、何时恢复显示](#cn何时隐藏何时恢复显示) | [When the tab bar hides, and when it comes back](#enwhen-the-tab-bar-hides-and-when-it-comes-back) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [白名单：隐藏会话](#cn白名单隐藏会话) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [The whitelist: a hide session](#enthe-whitelist-a-hide-session) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [隐藏的条件](#cn隐藏的条件) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [When it hides](#enwhen-it-hides) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [恢复显示的场景](#cn恢复显示的场景) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [When it comes back](#enwhen-it-comes-back) |
+| [诊断日志：CYL_TAB_BAR_MINIMIZE_LOG](#cn诊断日志cyl_tab_bar_minimize_log) | [Diagnostic log: CYL_TAB_BAR_MINIMIZE_LOG](#endiagnostic-log-cyl_tab_bar_minimize_log) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [打开日志](#cn打开日志) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Turning it on](#enturning-it-on) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [日志内容](#cn日志内容) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [What it logs](#enwhat-it-logs) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [示例输出](#cn示例输出) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Sample output](#ensample-output) |
 | [演示](#cn演示) | [Demo](#endemo) |
+| [边界情况与自评](#cn边界情况与自评) | [Edge cases and self-assessment](#enedge-cases-and-self-assessment) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [自评记录](#cn自评记录) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Self-assessment rounds](#enself-assessment-rounds) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [边界情况清单](#cn边界情况清单) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Edge case list](#enedge-case-list) |
 | [限制](#cn限制) | [Limits](#enlimits) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
@@ -226,12 +237,347 @@ flowchart LR
 | **Guard**：每条路径都在 `CYLTabBarMinimizeModeForTabBarController()` 的 guard 之后，经典样式的代码只在液态玻璃未启用且不是扁平样式时运行；以下情况不隐藏 TabBar：App 自己隐藏的（`tabBar.hidden` 或 `alpha` 为 0）；不在父视图底部的（例如显示在顶部的 TabBar）；选中的导航控制器中，根页面之上被 push 的页面设置了 `hidesBottomBarWhenPushed`（TabBar 由 UIKit 移动，保持“滚动隐藏”状态，回到显示 TabBar 的页面后再显示）。iOS 26 UI 兼容模式下，系统的 `tabBarMinimizeBehavior` 被设为 `Never`，避免与系统重复处理。 | **Guards**: every path sits behind the guards of `CYLTabBarMinimizeModeForTabBarController()`; the classic code runs only when Liquid Glass is not active and the style is not FlatDesign. The tab bar is not hidden when the app hid it (`tabBar.hidden`, or `alpha` 0); when it is not at the bottom of its superview (e.g. a tab bar shown at the top); or when a page pushed above the root of the selected navigation controller sets `hidesBottomBarWhenPushed` (UIKit moves the bar then; it stays hidden by scrolling and is shown once a page that shows the bar is back). In iOS 26 UI compatibility mode the system's `tabBarMinimizeBehavior` is set to `Never`, so the system never acts as well. |
 | **跟随页面**：FlatDesign 以外，Core 中没有 push / pop 回调，因此经典样式除了在 TabBarController 布局时确认当前页面的滚动视图，还会每 0.5 秒（仅在 TabBarController 显示在窗口中时）再确认一次，使 push 的新页面同样生效。该定时器只在经典样式且取值为 OnScrollDown / OnScrollUp 时存在。 | **Following the page**: outside FlatDesign, core has no push / pop callback, so besides checking the current page's scroll view whenever the tab bar controller lays out, the classic path checks again every 0.5 s (only while the tab bar controller is in a window), so a newly pushed page works too. That timer exists only for the classic path with OnScrollDown / OnScrollUp. |
 
+## [CN]何时隐藏、何时恢复显示
+## [EN]When the tab bar hides, and when it comes back
+
+| 中文 | English |
+|:---|:---|
+| 滚动隐藏最容易出 bug 的地方是“何时恢复显示”。逻辑参考 Facebook App：只在用户向下滑动浏览内容时隐藏；任何打断浏览的情况都立即恢复显示，并且恢复之后，只有用户开始新的拖动才会再次隐藏，旧拖动的惯性不会。以下规则对三种样式都生效：扁平样式与经典样式恢复的是被滚动隐藏的 TabBar，液态玻璃恢复的是被系统缩小的 TabBar；App 自己用 `-setTabBarHidden:` 隐藏的 TabBar 不会被显示。 | The hard part of scroll hiding is when the tab bar comes back. The logic follows the Facebook app: hide only while the user scrolls down to read content; bring the bar back at once on anything that interrupts reading, and after that hide it again only on a new drag, never on the momentum of the old one. These rules hold for all three styles: FlatDesign and the classic style bring back a bar hidden by scrolling, Liquid Glass a bar the system minimized; a bar the app hid itself with `-setTabBarHidden:` is never shown. |
+
+### [CN]白名单：隐藏会话
+### [EN]The whitelist: a hide session
+
+| 中文 | English |
+|:---|:---|
+| 列举“何时恢复”的事件总会有遗漏，因此核心改为白名单：内存中只有一个标记（`_hideSessionActive`），只有在“隐藏会话”内，TabBar 才可以保持隐藏。开始会话的唯一方式是用户向下滚动浏览内容（液态玻璃为允许隐藏时系统缩小了 TabBar）。开始时记录上下文：滚动视图、选中的 Tab、当前显示的页面、窗口、取值与路径。 | Listing the events that bring the bar back always misses some, so the core is a whitelist: one flag in memory (`_hideSessionActive`), and the tab bar may stay hidden only inside a "hide session". The one way to start a session is the user scrolling down through content (for Liquid Glass, the system minimizing the bar while hiding is allowed). The session records its context: the scroll view, the selected tab, the page on screen, the window, the value and the path. |
+| 之后任何与该上下文不一致的情况（换了页面、换了 Tab、换了滚动视图、换了窗口、改了取值或样式），或 App 环境不再允许隐藏（App 不活跃、窗口不是 key window、有页面被 present、push / pop 转场中、滚动视图不在屏幕上），都会立即结束会话并恢复显示。没有被列举到的情况（例如从通知横幅打开的页面、分享面板、分屏尺寸变化）只要改变了上述任一项，同样会恢复。 | From then on, anything that does not match that context (another page, tab, scroll view or window, a changed value or style), or an app that no longer allows hiding (not active, window not key, something presented, a push or pop running, the scroll view off screen), ends the session at once and shows the bar. Situations nobody listed (a page opened from a notification banner, a share sheet, a split screen resize) bring it back too, as soon as they change any of these. |
+| 检查时机：每次滚动事件、TabBarController 每次布局、它的 `viewWillAppear:` / `viewDidAppear:` / `viewWillDisappear:` / `viewDidDisappear:` / `viewWillTransitionToSize:`、每个被监听的通知，以及 TabBar 隐藏期间每 0.25 秒的定时检查。会话结束后，只有新的拖动才会开始新的会话。 | It is checked on every scroll event, every layout of the tab bar controller, its `viewWillAppear:` / `viewDidAppear:` / `viewWillDisappear:` / `viewDidDisappear:` / `viewWillTransitionToSize:`, every observed notification, and every 0.25 s while the bar is hidden. After a session ends, only a new drag starts a new one. |
+
+```mermaid
+stateDiagram-v2
+    [*] --> Visible
+    Visible --> HideSession: user drags down, > 12pt, > 50pt into content, environment allows, new drag
+    HideSession --> Visible: scroll up / back at the top / content too short
+    HideSession --> Visible: context changed (page, tab, scroll view, window, value, style)
+    HideSession --> Visible: environment refuses (inactive, not key, presented, transition, off screen)
+    HideSession --> Visible: notification (resign active, background, foreground, memory, keyboard, other key window)
+    HideSession --> Visible: lifecycle (appear, disappear, size change)
+    Visible --> Visible: momentum after a restore (waits for a new drag)
+```
+
+### [CN]隐藏的条件
+### [EN]When it hides
+
+| 中文 | English |
+|:---|:---|
+| 用户正在拖动或拖动后的惯性滚动中（代码设置的偏移不算），同方向滚动超过 12pt。 | The user is dragging, or the scroll is decelerating after a drag (offsets set in code do not count), 12pt in one direction. |
+| 已经滚入内容超过 50pt（`CYLTabBarMinimizeHideStartDistance`），内容开头不隐藏；内容可滚动距离至少 100pt。 | More than 50pt into the content (`CYLTabBarMinimizeHideStartDistance`), never at its start; the content scrolls at least 100pt. |
+| 上次恢复之后，用户已经开始新的拖动。 | The user has started a new drag since the last restore. |
+| App 处于活跃状态、本窗口是 key window、没有任何页面被 present（弹框、操作表、模态页面）、没有 push / pop 正在进行、滚动视图在屏幕上（`-environmentAllowsHiding`）。 | The app is active, this window is the key window, nothing is presented (alert, action sheet, modal page), no push or pop is running, and the scroll view is on screen (`-environmentAllowsHiding`). |
+
+### [CN]恢复显示的场景
+### [EN]When it comes back
+
+| 场景 | 监听方式 | 行为 |
+|:---|:---|:---|
+| 向上滚动、回到顶部（包括点击状态栏）、内容变短不再能滚动 | 滚动视图的 `contentOffset`（KVO） | 恢复显示 |
+| 前后台切换 | `UIApplicationDidEnterBackground` / `WillEnterForeground` / `DidBecomeActive`，以及对应的 Scene 通知（iOS 13+，只处理本窗口的 Scene） | 恢复显示，等待新的拖动 |
+| 来电（接听时 App 失去活跃）、低电量弹框、任何系统弹框、控制中心、通知中心、App 切换器 | `UIApplicationWillResignActive`、`UISceneWillDeactivate` | 恢复显示，等待新的拖动 |
+| 点击推送打开 App，然后 push 到详情页 | 进入前台 / 变为活跃通知；随后的 push 按页面变化处理 | 恢复显示 |
+| push、pop（包括手势返回）、切换 Tab | 扁平样式的转场回调、TabBarController 布局时重新确认滚动视图、定时检查（安全网） | 恢复显示；转场进行中不隐藏 |
+| App 内的弹框、操作表、模态页面 | 定时检查 `presentedViewController`（隐藏期间每 0.25 秒） | 恢复显示，等待新的拖动 |
+| 显示在独立窗口中的弹框、HUD、浮层 | `UIWindowDidBecomeKey`（其他窗口）；定时检查本窗口是否仍是 key window | 恢复显示，等待新的拖动 |
+| 内存警告 | `UIApplicationDidReceiveMemoryWarning` | 恢复显示，等待新的拖动 |
+| 键盘弹出（输入不是浏览） | `UIKeyboardWillShow` | 恢复显示，键盘收起后 TabBar 已在 |
+| TabBarController 出现、消失（全屏模态页面、在它之上 push、外层容器切换） | `viewWillAppear:`、`viewDidAppear:`、`viewWillDisappear:`、`viewDidDisappear:` | 恢复显示，等待新的拖动 |
+| 旋转、分屏 / 台前调度尺寸变化 | `viewWillTransitionToSize:withTransitionCoordinator:` | 恢复显示，等待新的拖动 |
+| 其他任何改变会话上下文的情况 | 白名单检查（见上文） | 恢复显示，等待新的拖动 |
+| 关闭滚动隐藏（`NO` / `Never`）、样式改变 | 设置取值、每次布局 | 恢复显示 |
+
+| Scenario | How it is observed | Result |
+|:---|:---|:---|
+| Scrolling up, back at the top (also a tap on the status bar), content that no longer scrolls | The scroll view's `contentOffset` (KVO) | Shown |
+| Background / foreground switches | `UIApplicationDidEnterBackground` / `WillEnterForeground` / `DidBecomeActive`, and the matching scene notifications (iOS 13+, this window's scene only) | Shown, waits for a new drag |
+| A call (the app resigns active when it is answered), the low battery alert, any system alert, Control Center, Notification Center, the app switcher | `UIApplicationWillResignActive`, `UISceneWillDeactivate` | Shown, waits for a new drag |
+| Tapping a push notification opens the app, which then pushes a detail page | The foreground / become active notifications; the push that follows counts as a page change | Shown |
+| Push, pop (also the swipe back), tab switch | FlatDesign's transition callbacks, re-resolving the scroll view whenever the tab bar controller lays out, the check timer (safety net) | Shown; never hidden while a transition runs |
+| In-app alerts, action sheets, modal pages | The check timer looks at `presentedViewController` (every 0.25 s while hidden) | Shown, waits for a new drag |
+| Alerts, HUDs or overlays in a window of their own | `UIWindowDidBecomeKey` (another window); the check timer checks that this window is still key | Shown, waits for a new drag |
+| Memory warning | `UIApplicationDidReceiveMemoryWarning` | Shown, waits for a new drag |
+| The keyboard appears (typing is not reading) | `UIKeyboardWillShow` | Shown; the bar is there when the keyboard goes |
+| The tab bar controller appears or disappears (a full-screen modal, a push over it, an outer container switching) | `viewWillAppear:`, `viewDidAppear:`, `viewWillDisappear:`, `viewDidDisappear:` | Shown, waits for a new drag |
+| Rotation, a Split View / Stage Manager resize | `viewWillTransitionToSize:withTransitionCoordinator:` | Shown, waits for a new drag |
+| Anything else that changes the session's context | The whitelist check (see above) | Shown, waits for a new drag |
+| Scroll hiding turned off (`NO` / `Never`), a style change | Setting the value, every layout | Shown |
+
+```mermaid
+flowchart TD
+    S["user drags down, > 12pt, > 50pt into content"] --> G{"environmentAllowsHiding? new drag since restore?"}
+    G -->|"yes"| H["hide (FlatDesign / classic) — the system minimizes (Liquid Glass)"]
+    G -->|"no"| V["stay visible"]
+    H --> T["check timer every 0.25 s while hidden"]
+    N["notifications: resign active, background, foreground, active, memory warning, scene events, other key window"] --> R["restoreTabBar: show, wait for a new drag"]
+    T -->|"page changed / presented / not key / not active"| R
+    U["scroll up, back at the top, content too short"] --> E["show"]
+```
+
+| 中文 | English |
+|:---|:---|
+| 液态玻璃：UIKit 没有恢复已缩小 TabBar 的接口。恢复时，CYLTabBarController 通过 `super` 把系统的 `tabBarMinimizeBehavior` 设为 `Never`（让系统恢复 TabBar），并保持到用户开始新的拖动，再写回 App 的取值（与扁平样式、经典样式的新拖动规则一致：旧拖动的惯性或仍在屏幕上的弹框都不能再次缩小 TabBar）。App 设置新取值或样式不再是液态玻璃时也会结束保持。写入 `Never` 能否让系统恢复 TabBar 尚未在真机上验证；0.35 秒后的自检会在诊断日志中报告失败。 | Liquid Glass: UIKit has no API to expand a minimized tab bar. To restore it, CYLTabBarController sets the system's `tabBarMinimizeBehavior` to `Never` through `super` (so the system expands the bar) and holds it until the user starts a new drag, then writes the app's value back (the same new-drag rule as FlatDesign and classic: the old drag's momentum or an alert still on screen cannot minimize it again). A new value from the app, or a style that is no longer Liquid Glass, also ends the hold. Whether writing `Never` expands the bar is not verified on a device yet; a self-check 0.35 s later reports a failure in the diagnostic log. |
+| 来电：iOS 14 起，未接听的来电以横幅显示，App 保持活跃，横幅不遮挡 TabBar，因此不需要处理；接听或全屏来电时 App 失去活跃，TabBar 恢复显示。 | Calls: since iOS 14 an unanswered call shows as a banner, the app stays active and the banner does not cover the tab bar, so nothing is needed; when the call is answered or shown full screen the app resigns active and the tab bar comes back. |
+| 定时检查只在需要时运行：TabBar 被隐藏或缩小期间每 0.25 秒；经典样式在 TabBar 显示时每 0.5 秒确认一次当前页面（Core 中没有 push / pop 回调）；其他情况不运行。通知观察者与定时器只在开启滚动隐藏时存在。 | The check timer runs only when needed: every 0.25 s while the bar is hidden or minimized; for the classic style every 0.5 s while it is shown, to follow the page (core has no push / pop callback); otherwise not at all. The notification observers and the timer exist only while scroll hiding is on. |
+
+## [CN]诊断日志：CYL_TAB_BAR_MINIMIZE_LOG
+## [EN]Diagnostic log: CYL_TAB_BAR_MINIMIZE_LOG
+
+| 中文 | English |
+|:---|:---|
+| 想知道 TabBar 为何恢复显示、为何没有隐藏时，打开本库的诊断日志：把环境变量 `CYL_TAB_BAR_MINIMIZE_LOG` 设为 `1`。它与 `CYLTabBarMinimizeLog` 等价（两种写法都可以，任意一个为 `1` 即打开）；全大写写法便于在脚本与 CI 中使用。 | To find out why the tab bar came back, or why it did not hide, turn on the library's diagnostic log: set the environment variable `CYL_TAB_BAR_MINIMIZE_LOG` to `1`. It is the same as `CYLTabBarMinimizeLog` (either spelling works; the log is on when either one is `1`); the ALL_CAPS spelling suits scripts and CI. |
+| 默认关闭，Debug 构建也不例外，不影响性能。该变量在第一次需要日志时读取一次（`dispatch_once`），因此要在 App 启动前设置；运行中修改无效。 | Off by default, debug builds included, so it costs nothing. The variable is read once, the first time a log line could be written (`dispatch_once`), so set it before the app launches; changing it while the app runs has no effect. |
+| 日志只用 `NSLog` 打印到控制台（Xcode 控制台、Console.app 或 `simctl` 的输出），每行以 `[CYLTabBarController] scroll hiding:` 开头，不会上传或保存。 | The log only goes to the console through `NSLog` (the Xcode console, Console.app or the output of `simctl`); every line starts with `[CYLTabBarController] scroll hiding:`. Nothing is uploaded or stored. |
+
+### [CN]打开日志
+### [EN]Turning it on
+
+| 中文 | English |
+|:---|:---|
+| Xcode：Product → Scheme → Edit Scheme… → Run → Arguments → Environment Variables，添加 `CYL_TAB_BAR_MINIMIZE_LOG`，值为 `1`。在真机与模拟器上都可用。 | Xcode: Product → Scheme → Edit Scheme… → Run → Arguments → Environment Variables, add `CYL_TAB_BAR_MINIMIZE_LOG` with the value `1`. Works on devices and simulators. |
+| 命令行（模拟器）：`simctl` 会把以 `SIMCTL_CHILD_` 开头的变量去掉前缀后传给 App。`scripts/scroll-hide-self-test.sh` 就是这样打开日志的，CI 中的自测因此能解释每个 SKIP。 | Command line (simulator): `simctl` passes variables that start with `SIMCTL_CHILD_` to the app without the prefix. `scripts/scroll-hide-self-test.sh` turns the log on this way, so the CI self-test can explain every SKIP. |
+
+```sh
+# [EN] Launch the demo on a booted simulator with the log on.
+# [CN] 在已启动的模拟器上打开日志运行演示工程。
+SIMCTL_CHILD_CYL_TAB_BAR_MINIMIZE_LOG=1 xcrun simctl launch --console-pty booted CYL.CYLTabBarController
+```
+
+### [CN]日志内容
+### [EN]What it logs
+
+| 中文 | English |
+|:---|:---|
+| 每行的格式为 `scroll hiding: <事件> (<原因>)`。事件如下表；原因是英文短语，与代码中的判断一一对应，便于在源码中搜索。 | Each line reads `scroll hiding: <event> (<reason>)`. The events are listed below; the reasons are English phrases that match the checks in the code one to one, so they can be searched for in the source. |
+
+| 事件 / Event | 中文 | English |
+|:---|:---|:---|
+| `hide session begins` | 隐藏会话开始：扁平样式与经典样式为 `user scrolled down`（用户向下拖动），液态玻璃为 `system minimized`（系统缩小了 TabBar）。 | A hide session starts: `user scrolled down` for FlatDesign and classic, `system minimized` for Liquid Glass. |
+| `restore` | TabBar 恢复显示，括号中是原因，例如 `a view controller is presented`、`keyboard on screen`、`page or scroll view changed`、`scroll view off screen`、`tap outside the content (navigation bar, menu button, header)`，或触发恢复的通知名（如 `UIApplicationWillResignActiveNotification`）。 | The tab bar comes back; the reason is in parentheses, e.g. `a view controller is presented`, `keyboard on screen`, `page or scroll view changed`, `scroll view off screen`, `tap outside the content (navigation bar, menu button, header)`, or the name of the notification that caused it (e.g. `UIApplicationWillResignActiveNotification`). |
+| `the app takes the tab bar over` | App 自己调用了 `setTabBarHidden:YES` 或 `setTabBarHidden:NO`，滚动隐藏让出控制权。 | The app called `setTabBarHidden:YES` or `setTabBarHidden:NO` itself, and scroll hiding hands the tab bar over. |
+| `Liquid Glass: writing Never did not expand the minimized tab bar; trying hide / show` | 液态玻璃：写入 `Never` 没有恢复已缩小的 TabBar，改用第二种恢复方式。 | Liquid Glass: writing `Never` did not expand the minimized tab bar, so the second restore mechanism is used. |
+| `no longer hidden by scrolling` | TabBar 已被 App 或 UIKit 重新显示，不再算作滚动隐藏（`the tab bar was shown again by the app or UIKit`）。 | The tab bar was shown again by the app or UIKit and no longer counts as hidden by scrolling (`the tab bar was shown again by the app or UIKit`). |
+| `hidden by scrolling again` | 安全网：TabBar 仍是本库最近一次请求隐藏的、App 也没有接管，但标记丢失了，重新作为滚动隐藏处理（`our own hide was still in effect`）。 | Safety net: the tab bar is still hidden by the library's last request and the app has not taken it over, but the flag was lost; it is taken back as hidden by scrolling (`our own hide was still in effect`). |
+| `test hide refused` | 自测或 `-cyl_simulateHideOnScrollForTesting` 无法隐藏 TabBar，括号中是原因：`Liquid Glass: the system minimizes the bar`、`scroll hiding is off`、`no scroll tracker (…)`、环境拒绝的原因（如 `a view controller is presented`、`window not key, or its scene / the app not active`），或 `the bar did not hide (…)` 并附滚动视图的尺寸与偏移。 | The self-test or `-cyl_simulateHideOnScrollForTesting` could not hide the tab bar; the reason is in parentheses: `Liquid Glass: the system minimizes the bar`, `scroll hiding is off`, `no scroll tracker (…)`, the environment's refusal (e.g. `a view controller is presented`, `window not key, or its scene / the app not active`), or `the bar did not hide (…)` with the scroll view's sizes and offset. |
+
+### [CN]示例输出
+### [EN]Sample output
+
+| 中文 | English |
+|:---|:---|
+| 以下几行摘自 CI 模拟器上的一次自测（Xcode 27.2，iOS 27，扁平样式），省略了时间戳与进程信息。 | These lines come from one self-test run on the CI simulator (Xcode 27.2, iOS 27, FlatDesign), without the timestamps and process details. |
+
+```text
+[CYLTabBarController] scroll hiding: hide session begins (user scrolled down)
+[CYLTabBarController] scroll hiding: restore (a view controller is presented)
+[CYLTabBarController] scroll hiding: restore (page or scroll view changed)
+[CYLTabBarController] scroll hiding: restore (UIApplicationWillResignActiveNotification)
+[CYLTabBarController] scroll hiding: restore (UIKeyboardWillShowNotification)
+[CYLTabBarController] scroll hiding: the app takes the tab bar over (setTabBarHidden:NO)
+[CYLTabBarController] scroll hiding: test hide refused (a view controller is presented)
+```
+
+| 中文 | English |
+|:---|:---|
+| 在液态玻璃（默认演示，iOS 26+）上运行自测时，每个可自动化的模拟都会打印 `test hide refused (Liquid Glass: the system minimizes the bar)`：代码无法隐藏液态玻璃 TabBar，由系统负责缩小，因此这些模拟为 SKIP。 | Running the self-test on Liquid Glass (the default demo, iOS 26+) prints `test hide refused (Liquid Glass: the system minimizes the bar)` for every automatic simulation: code cannot hide a Liquid Glass tab bar (the system minimizes it), so those simulations are SKIP. |
+
 ## [CN]演示
 ## [EN]Demo
 
 | 中文 | English |
 |:---|:---|
 | 每个 Demo 列表顶部的设置分组新增「滚动时缩小 / 隐藏 TabBar（issue #13）」一行（`UIViewController+CYLSettingsSection`，Objective-C 与 Swift Demo 共用）。点击后依次为显示该列表的 TabBarController 设置 Automatic → OnScrollDown → OnScrollUp → Never，然后滚动列表即可：在液态玻璃 TabBar 中看到系统缩小 TabBar，在扁平样式 TabBar（Demo 中导航栏左侧的 FlatDesign 按钮）中看到 TabBar 隐藏与显示，在 iOS 25 及以前或开启 UI 兼容模式的 iOS 26 上看到经典 TabBar 隐藏与显示。 | The settings section at the top of every demo list has a new row, "Minimize / hide the TabBar on scroll (issue #13)" (`UIViewController+CYLSettingsSection`, shared by the Objective-C and Swift demos). Each tap sets the next value on the tab bar controller that shows the list (Automatic → OnScrollDown → OnScrollUp → Never); then scroll the list: in a Liquid Glass tab bar the system minimizes it, in a FlatDesign tab bar (the FlatDesign button on the left of the demo's navigation bar) it hides and shows, and on iOS 25 and earlier or on iOS 26 in UI compatibility mode the classic tab bar hides and shows. |
+
+<!-- edge-cases:start -->
+
+## [CN]边界情况与自评
+## [EN]Edge cases and self-assessment
+
+| 中文 | English |
+|:---|:---|
+| 滚动隐藏最难的是“何时恢复显示”。每一轮按满分 100 分给边界情况的兼容程度打分，列出减分项与加分项，修改代码与文档后再打分，直到不低于 90 分（至少五轮）。分数衡量的是设计对边界情况的覆盖程度；没有真机验证始终作为减分项保留，不会被当作已解决。 | The hard part of scroll hiding is when the bar comes back. Each round scores how well edge cases are handled (out of 100), lists deductions and positives, changes the code and the docs, and scores again, until the score is at least 90 (at least five rounds). The score measures how well the design covers edge cases; the lack of device testing stays a deduction and is never counted as solved. |
+| 演示：Objective-C Demo 的分组列表（液态玻璃与扁平样式页面）末尾新增「滚动隐藏：模拟意外情况（issue #13）」section。为免近 40 行占满页面，该 section 默认只显示两行：「滚动隐藏：模拟意外情况」（用操作表列出全部模拟）和「展开全部 N 个模拟」（点击展开逐行列表，再次点击「收起模拟列表」收起）。每行先开启滚动隐藏，点击 1.5 秒后触发对应的意外情况，留出时间先向下滚动隐藏 TabBar；行标题即触发的 API 或事件名称，副标题说明预期结果。无法用代码触发的系统事件（真实来电、低电量弹框）通过发送系统会发送的通知来模拟，真机上仍需手动验证。 | Demo: the grouped list of the Objective-C demo (Liquid Glass and FlatDesign pages) ends with a new section, "Scroll hiding: simulate interruptions (issue #13)". So that almost 40 rows do not flood the page, the section shows only two rows by default: "Scroll hiding: simulate interruptions" (an action sheet that lists every simulation) and "Show all N simulations" (tap to expand the row-by-row list; tap "Collapse the simulation list" to fold it again). Each row turns scroll hiding on and fires its interruption 1.5 s after the tap, so there is time to scroll down and hide the bar first; the row title names the API or event, the subtitle the expected result. System events code cannot trigger (a real call, the low battery alert) are simulated by posting the notifications the system posts; they still need checking by hand on a device. |
+| 自动自测：演示中的“Self-test”行（或以启动参数 -CYLScrollHideSelfTest YES 启动 App）依次运行全部可自动化的模拟：先滚入内容，用 cyl_simulateHideOnScrollForTesting 像向下滚动一样隐藏 TabBar，触发模拟，检查预期结果（恢复 / 仍隐藏 / App 接管），清理后继续；每项在控制台打印 PASS / FAIL / SKIP，最后弹框汇总（约 2 分钟）。液态玻璃无法用代码隐藏，请在扁平样式页面（导航栏左侧 FlatDesign）以及 iOS 18 / 17（经典样式）上运行。新增公开属性 cyl_isTabBarHiddenByScroll 用于判断 TabBar 是否被滚动隐藏。 | Automatic self-test: the demo's "Self-test" row (or launching the app with -CYLScrollHideSelfTest YES) runs every automatic simulation in turn: it scrolls into the content, hides the bar as a downward scroll would with cyl_simulateHideOnScrollForTesting, fires the simulation, checks the expected result (restored / still hidden / app took over), cleans up and goes on; each prints PASS / FAIL / SKIP in the console and an alert sums up (about 2 minutes). Liquid Glass cannot be hidden from code: run it on the FlatDesign page (FlatDesign on the left of the navigation bar) and on iOS 18 / 17 (classic style). The new public property cyl_isTabBarHiddenByScroll tells whether scroll hiding hides the bar. |
+| 系统事件的依据：Apple 文档写明，App 因“来电或短信等临时打断”进入非活跃状态，并且“无论是否使用 Scene，UIKit 都会发送 willResignActiveNotification”（[applicationWillResignActive(_:)](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/applicationwillresignactive(_:))）；“当浮层窗口弹出或设备锁定时”App 失去焦点（[willResignActiveNotification](https://developer.apple.com/documentation/uikit/uiapplication/willresignactivenotification)），低电量等系统弹框即属此类。滚动隐藏依据的是文档承诺的行为；真机是否与文档一致属于真机验证项。 | Why the system events are covered: Apple's documentation states that the app becomes inactive "because of temporary interruptions like an incoming phone call or SMS message", and that "UIKit posts a willResignActiveNotification regardless of whether your app uses scenes" ([applicationWillResignActive(_:)](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/applicationwillresignactive(_:))); the app "loses focus when an overlay window pops up or when the device is locked" ([willResignActiveNotification](https://developer.apple.com/documentation/uikit/uiapplication/willresignactivenotification)), which covers system alerts such as the low battery one. Scroll hiding relies on documented behavior; whether a device matches the documentation is part of device testing. |
+| 在模拟器上一条命令运行自测：在装有 Xcode 与 CocoaPods 的 Mac 上执行 scripts/scroll-hide-self-test.sh（可传入模拟器名称），脚本会安装依赖、构建演示工程、启动模拟器、以 -CYLScrollHideSelfTest YES 运行并输出每项 PASS / FAIL / SKIP，结束后没有 FAIL 时退出码为 0。设置 RUNTIME=iOS-18 时使用该运行时的 iPhone，缺少该运行时则自动下载（xcodebuild -downloadPlatform）并创建 iPhone。GitHub Actions 中的 “Scroll hiding self-test” workflow（与 ios.yml 相同的 runner：macos-26（Xcode 26），或仓库变量 MACOS_RUNNER 指定的 runner；使用其上最新的 iPhone 模拟器：扁平样式完整自测，以及默认演示的液态玻璃冒烟测试；iOS 18 经典样式请在本机用 RUNTIME=iOS-18 运行）调用同一脚本，可手动运行，修改该 workflow 或脚本的 PR 也会自动运行，日志作为 artifact 保存。 | Run the self-test on a simulator with one command: on a Mac with Xcode and CocoaPods, run scripts/scroll-hide-self-test.sh (optionally with a simulator name); it installs the pods, builds the demo, boots a simulator, launches it with -CYLScrollHideSelfTest YES and prints every PASS / FAIL / SKIP, then exits 0 when there is no FAIL. With RUNTIME=iOS-18 it uses an iPhone of that runtime, and downloads the runtime (xcodebuild -downloadPlatform) and creates an iPhone when it is missing. The "Scroll hiding self-test" GitHub Actions workflow (the same runner as ios.yml: macos-26 (Xcode 26), or the one the repository variable MACOS_RUNNER names; the newest iPhone simulator on it: the full FlatDesign self-test and a Liquid Glass smoke test of the default demo; run the iOS 18 classic style locally with RUNTIME=iOS-18) calls the same script: it can be run by hand, runs on pull requests that change the workflow or the script, and keeps the log as an artifact. |
+| 剩余 3 分的取得方式（扁平样式的 31 项自动模拟已在 CI 模拟器上全部通过，见第 19 轮）：① 经典样式：在 iOS 18 或 iOS 17 模拟器上运行自测（RUNTIME=iOS-18 scripts/scroll-hide-self-test.sh），并在 iOS 26 UI 兼容模式下检查一遍「测试与截图」中的清单（+1）；② 在 iOS 26 真机上确认写入 Never 能恢复被缩小的液态玻璃 TabBar——打开诊断日志（CYL_TAB_BAR_MINIMIZE_LOG=1）后不出现 “writing Never did not expand” 即通过（+1）；③ 在真机上接听真实来电并触发低电量弹框（或用其他手机拨打本机），确认 TabBar 恢复显示（+1）。三项都通过后即为 100 分。 | How to earn the last 3 points (the 31 automatic FlatDesign simulations all pass on the CI simulator, see round 19): (1) classic style: run the self-test on an iOS 18 or iOS 17 simulator (RUNTIME=iOS-18 scripts/scroll-hide-self-test.sh) and go through the checklist in "Testing and screenshots" in iOS 26 UI compatibility mode (+1); (2) on an iOS 26 device, confirm that writing Never expands a minimized Liquid Glass bar: with the diagnostic log on (CYL_TAB_BAR_MINIMIZE_LOG=1) the log must not show "writing Never did not expand" (+1); (3) on a device, answer a real call and trigger the low battery alert (or call the phone from another one) and confirm the bar comes back (+1). When all three pass, the score is 100. |
+
+### [CN]自评记录
+### [EN]Self-assessment rounds
+
+| 轮次 | 分数 | 减分项 | 加分项 | 本轮修改 |
+|:---|:---|:---|:---|:---|
+| 1 | 70 | 没有模拟意外情况的演示 −8；子控制器 presentation −4；App 自己隐藏后会被显示 −4；刚好够长的内容闪动 −3；横向分页选错滚动视图 −2；VoiceOver −3；hidesBottomBarWhenPushed 页面每 0.25 秒重复恢复 −1；iPad 多 Scene 的 key window −2；液态玻璃恢复方式未验证 −3 | 白名单隐藏会话；通知 + 生命周期 + 定时检查；新拖动规则；三种样式用 guard 隔离 | 新增演示 section（18 行）；App 的 setTabBarHidden: 接管 TabBar；检查子控制器的 presentedViewController；优先选择竖向滚动视图；隐藏需要 ≥ 200pt 可滚动距离（滞回） |
+| 2 | 80 | 没有真机验证 −5；VoiceOver / 切换控制 −3；液态玻璃恢复方式未验证 −3；iPad 多 Scene 的 key window 与活跃状态 −2；键盘显示时仍会隐藏 −2；Swift Demo 没有模拟 section −2；hidesBottomBarWhenPushed 页面重复恢复 −1；经典样式显示期间每 0.5 秒遍历视图 −1；系统事件以发送通知模拟 −1 | App 接管、子控制器 presentation、分页列表、滞回已处理；18 行模拟演示；用精简 UIKit 声明编译演示代码时发现并修复了 switch 中 block 导致的编译错误 | VoiceOver / 切换控制开启时不隐藏，状态变化时恢复；按 Scene 判断 key window 与活跃状态（iOS 13 / 15+）；键盘显示期间不隐藏；hidesBottomBarWhenPushed 页面只结束一次会话；新增 2 个演示行 |
+| 3 | 84 | 没有真机验证 −5；液态玻璃恢复方式未验证 −3；Swift Demo 没有模拟 −2；“减弱动态效果”下仍有滑动动画 −1；旋转没有演示 −1；没有调试日志，真机问题难以定位 −1；经典样式显示期间每 0.5 秒遍历视图 −1；长按上下文菜单预览是否算 present 未知 −1；系统事件以发送通知模拟 −1 | VoiceOver / 切换控制、按 Scene 判断焦点、键盘、hidesBottomBarWhenPushed 已处理；20 行模拟演示；30 个边界情况 | 模拟移入库中的演示辅助（UIViewController+CYLSettingsSection），设置分组第 8 行用操作表列出全部模拟，Swift Demo 同样可用；ObjC Demo 的 section 调用同一份代码；“减弱动态效果”下不执行滑动动画；监听减弱动态效果与低电量模式变化；新增旋转、减弱动态效果、低电量模式 3 个演示行（共 23 行） |
+| 4 | 88 | 没有真机验证 −5；液态玻璃恢复方式未验证 −3；没有诊断手段，真机上无法知道为何恢复 −1；经典样式显示期间每 0.5 秒遍历视图 −1；长按上下文菜单预览没有公开回调 −1；系统事件以发送通知模拟 −1 | 所有 Demo（含 Swift）都能运行全部模拟；减弱动态效果、低电量模式、旋转已处理；33 个边界情况 | 可选诊断日志（环境变量 CYLTabBarMinimizeLog=1）：会话开始、每次恢复及具体原因、App 接管；会话与环境检查给出具体原因；液态玻璃强制恢复后自检并记录；当前页面不变时复用滚动视图 2 秒 |
+| 5 | 90 ✅ | 没有真机验证 −5（需要 Xcode 与真机 / 模拟器）；液态玻璃恢复方式未验证 −3（需要 iOS 26 真机，诊断日志会报告失败）；长按上下文菜单预览没有公开回调 −1；真实来电与低电量弹框无法用代码触发，只能以通知模拟 −1 | 绑定上下文的白名单隐藏会话；25 项通知、生命周期与定时检查，每次恢复都有具体原因；所有 Demo 中的 23 个模拟；37 个边界情况；各样式用 guard 隔离；五种编译配置下无警告 | 全面复查：修复带着键盘进入后台后可能一直无法隐藏的问题；其余检查项（向上滚动恢复不受新拖动规则影响、自身调用不被当作 App 接管、滞回一致、动画期间各样式返回请求状态）无问题。分数达到 90，结束 |
+| 6 | 85 | 扩大审查范围（约 45 个场景）后发现：长按内容（上下文菜单、拖放、选择文字）不算打断 −1；侧滑菜单 / 抽屉移动控制器、容器转场没有回调 −2；Mac 上仍会隐藏 −1；顶部安全区变化（通话状态栏）−1；演示未覆盖子控制器 present、popover、抽屉、Scene 失活 −1；以及没有真机验证 −5、液态玻璃恢复方式未验证 −3、系统事件以通知模拟 −1 | 白名单会话的上下文可以继续扩展，新场景大多只需加入上下文比较 | 滚动视图上加入不拦截触摸的长按观察者；会话上下文加入控制器在窗口中的 frame 与顶部安全区；Mac Catalyst 与 Mac 上的 iOS App 不隐藏；演示新增 6 行（OverCurrentContext、popover、抽屉、顶部安全区、Scene 失活、手动长按），ObjC Demo 的角标行加入上下文菜单（共 29 行） |
+| 7 | 90 | 内容之外的点击（导航栏按钮、UIMenu 按钮、头部控件）不算打断，UIMenu 没有公开回调 −1；没有真机验证 −5（iPad 指针 / 触控板 / 鼠标滚轮滚动也需真机确认，计入此项）；液态玻璃恢复方式未验证 −3；系统事件以通知模拟 −1 | 长按、抽屉、安全区、Mac 已处理；29 行演示；43 个边界情况 | 控制器视图上加入不拦截触摸的点击观察者：TabBar 隐藏或缩小期间，所跟随滚动视图之外的点击结束会话；内容中的点击保持隐藏（与 Facebook 一致）；ObjC Demo 导航栏新增带 UIMenu 的按钮，演示新增“手动：点击导航栏按钮”（共 30 行） |
+| 8 | 92 | 没有真机验证 −5；液态玻璃：写入 Never 能否让系统恢复 TabBar 尚未验证 −2（恢复后被惯性再次缩小的风险已在本轮消除）；系统事件以通知模拟 −1 | 第 7 轮的点击观察者经复查无问题（不拦截触摸、内容中的点击保持隐藏）；进入本轮时为 91 分 | 液态玻璃：Never 保持到新的拖动开始（原为 0.35 秒），与其他样式的新拖动规则一致；App 设置新取值或离开液态玻璃时结束保持；演示新增“手动：恢复后不松手继续甩动”（共 31 行） |
+| 9 | 92 | 没有真机验证 −5；液态玻璃：写入 Never 能否恢复 TabBar 未验证 −2；真实来电与低电量弹框无法用代码触发 −1 | 复查第 6–8 轮：识别器的生命周期（控制器或视图释放时不会向已释放的目标发送消息）、恢复时的重入、嵌套 TabBarController 的点击观察者均无问题 | 演示新增 2 个真实触发（不是发送通知）：打开设置让 App 真正进入后台再回来；iPhone 上 tel:// 拨号提示这一真实系统弹框（共 33 行） |
+| 10 | 92（真机前的上限） | 没有真机验证 −5；液态玻璃：写入 Never 能否恢复 TabBar 未验证 −2；真实来电与低电量弹框无法用代码触发 −1。三项都只能在真机上解决，取得方式见本节开头 | 第 6–10 轮共处理 9 类新场景（长按、抽屉、安全区、Mac、内容外点击、液态玻璃惯性、真实触发、快照）；33 行演示；47 个边界情况；所有代码在五种编译配置下无警告 | 失去活跃、进入后台或其他窗口成为 key window 时，恢复不执行动画，App 切换器快照中 TabBar 已完整恢复；复查液态玻璃保持 / 释放路径与两个观察者，无问题。不在没有验证的情况下给出 100 分 |
+| 11 | 89 | 新的审查（iPad 多任务、辅助功能模式）发现：本 App 另一个 Scene 中的键盘会让本窗口无法隐藏 −1；其他 App 的键盘（侧拉 / 分屏）同样如此 −1；引导式访问开启或关闭不会恢复 −1；以及没有真机验证 −5、液态玻璃恢复未验证 −2、系统事件以通知模拟 −1 | 白名单会话使新问题只需局部修改 | 只有本地键盘（UIKeyboardIsLocalUserInfoKey）且本窗口是活跃 Scene 的 key window 时才记录键盘；引导式访问状态变化时恢复；演示新增“其他 App 的键盘（不应改变）”与引导式访问（共 35 行） |
+| 12 | 92 | 没有真机验证 −5；液态玻璃：写入 Never 能否恢复 TabBar 未验证 −2；真实来电与低电量弹框无法用代码触发 −1 | 第 11 轮的三项修复复查无问题；新增自动自测，把真机检查清单中的 28 项变为一次点击（或一个启动参数），并输出 PASS / FAIL；新增公开属性 cyl_isTabBarHiddenByScroll | 新增 cyl_isTabBarHiddenByScroll（只读）与 cyl_simulateHideOnScrollForTesting（仅用于自测）；自测执行器：滚入内容、模拟隐藏、触发、检查、清理，控制台逐项输出并弹框汇总；启动参数 -CYLScrollHideSelfTest YES 自动运行；演示新增“Self-test”行（共 36 行） |
+| 13 | 93 | 没有真机验证 −5；液态玻璃：两种恢复方式都未在真机上验证 −1（原 −2：现有两种相互独立的方式，同时失败的风险更低）；真实来电与低电量弹框无法用代码触发 −1 | 自测执行器复查无问题；稳定性（没有打断时不应恢复，否则 TabBar 会闪动）纳入自测 | 液态玻璃第二种恢复方式：写入 Never 后 0.35 秒仍处于缩小状态时，用 UIKit 的 setTabBarHidden: 隐藏再显示一次（通过 super，不被当作 App 的请求），每步写入诊断日志；新增 3 个演示与自测项：重复选中当前 Tab、重复开启（都不应恢复）、App 调用 setTabBarHidden:NO（共 39 行） |
+| 14 | 94 | 没有真机验证 −5；液态玻璃：两种恢复方式都未在真机上验证 −1 | “系统事件以通知模拟”一项取消：Apple 文档写明来电、短信等临时打断与弹出的浮层窗口都会发送 willResignActiveNotification（与是否使用 Scene 无关），滚动隐藏依据的是文档行为；真机是否与文档一致已包含在“真机验证”中，原先重复扣分 | 文档引用 Apple 的说明；新增 scripts/scroll-hide-self-test.sh：一条命令在模拟器上构建、运行自测并按 PASS / FAIL 返回退出码；新增 “Scroll hiding self-test” GitHub Actions workflow（macos-15，可手动运行，修改该 workflow 或脚本的 PR 自动运行） |
+| 15 | 94 | 没有真机验证 −5；液态玻璃：两种恢复方式都未在真机上验证 −1；首次模拟器运行没有实际测试（全部 SKIP）不加分 | 首次在 CI 模拟器（Xcode 27.2，iOS 27）上构建、安装并运行演示工程与自测；顺带修复 master 的两个编译错误 | CI 改用 xcode-27 runner、只测 iOS 27；脚本安装演示 App（而非 pod framework）并删除与之同名的 Pods scheme；第一次运行 39 项全部为 SKIP（“0 passed, 0 failed, 39 skipped”），因此：自测改为等 App 进入活跃状态、页面完成布局后再开始；每种无法隐藏的原因写入可选日志（CYLTabBarMinimizeLog=1，脚本已打开）；扁平样式 job 设置 REQUIRE_PASS=1，全部 SKIP 时判为失败 |
+| 16 | 94 | 没有真机验证 −5；液态玻璃：两种恢复方式都未在真机上验证 −1；模拟器自测尚未完整通过（等待下一次运行） | 首批真实结果（CI 模拟器，Xcode 27.2，iOS 27，扁平样式）：13 项通过——弹框、操作表、全屏与 pageSheet 模态、push / pop（含 hidesBottomBarWhenPushed）、切换 Tab、WillResignActive、进入后台 / 回到前台、点击推送、内存警告、浮层窗口、键盘 | 1 项失败：UIActivityViewController——模拟器上分享面板出现得晚于 2.7 秒的检查，并在清理之后才出现；它一直留在屏幕上，之后 25 项因“有页面 present”被（正确地）拒绝隐藏而 SKIP。自测改为：每行开始前关闭遗留的页面（从窗口的根控制器关闭，每 0.5 秒最多 10 秒）；“应恢复”的行在判为失败前每 0.5 秒再检查，最多再等 8 秒 |
+| 17 | 94 | 没有真机验证 −5；液态玻璃：两种恢复方式都未在真机上验证 −1；模拟器自测仍有 2 项失败（本轮已修复，等待下一次运行） | CI 模拟器（Xcode 27.2，iOS 27，扁平样式）完整跑完 39 项：29 项通过（分享面板在等待较慢的 present 后通过；此前被遗留页面阻塞的 16 项也通过：代码向下滚动、关闭再打开开关、再次打开开关、VoiceOver、减弱动态效果、低电量模式、OverCurrentContext、popover、抽屉、顶部安全区、场景失活、其他 App 的键盘、Guided Access、选中同一 Tab、App setTabBarHidden:NO），8 项 SKIP：5 项手动或真实系统操作，2 项未纳入自测（键盘保持 4 秒、旋转），以及自测这一行本身 | 2 项失败均已定位：① 代码滚动回顶部（点击状态栏）没有恢复：到达边缘的判断是精确比较，动画滚动在像素取整后可能停在离边缘不到一个点的位置，现允许 0.5 点误差，并记录该恢复；② App setTabBarHidden:YES 被忽略：自测在模拟隐藏后立即执行模拟，0.5 秒内与最近一次隐藏相同的请求被当作扁平样式的重放而忽略，自测现在隐藏后等待 0.6 秒再执行模拟，该 0.5 秒窗口写入“限制”。CI 改用与 ios.yml 相同的 macos-26 runner |
+| 18 | 94 | 没有真机验证 −5；液态玻璃：两种恢复方式都未在真机上验证 −1；macos-26 上的自测尚未通过（本轮已修复，等待下一次运行） | 诊断日志准确指出了原因，并借此发现并修复了一个真实缺陷：在 iOS 26.5 上 TabBar 可能一直保持隐藏 | 首次在 macos-26（Xcode 26.6，iOS 26.5 模拟器，扁平样式）上运行：39 项全部 SKIP。日志：第一次隐藏开始了会话，随后每一行都是“test hide refused (the bar did not hide (tab bar hidden already: YES …))”。原因：隐藏动画进行中扁平样式仍报告 TabBar 为显示，会话检查（validateHideSession）因此丢掉了“滚动隐藏”标记，而 TabBar 最终仍是隐藏的，之后再没有恢复它的途径。修复：我们自己的隐藏进行中时（调用期间及之后 0.5 秒）不再丢掉标记，丢掉时写入日志；安全网：TabBar 是我们最近一次请求隐藏的、App 也没有接管时，重新作为滚动隐藏处理；自测每行开始前先恢复遗留的隐藏 |
+| 19 | 97 | 经典样式（iOS 18 / 17、iOS 26 UI 兼容模式）未在 CI 中运行 −1；液态玻璃：写入 Never 的恢复方式未在真机上验证 −1；真实来电与系统弹框未在真机上验证 −1 | 首次完全通过：macos-26（Xcode 26.6，iOS 26.5 模拟器）上扁平样式 31 项全部通过、0 项失败，8 项 SKIP 均为预期（5 项手动或真实系统操作，2 项未纳入自测，以及自测这一行本身）；此前失败的分享面板、代码滚动回顶部（点击状态栏）、App setTabBarHidden:YES 都已通过，回到顶部的恢复记录为 “back at the edge the content starts from”；默认演示（液态玻璃）39 项按设计全部 SKIP。原“没有真机验证 −5”中的模拟器部分（−3）由此取得 | 无需修复：第 18 轮的修复（我们自己的隐藏进行中时不丢掉“滚动隐藏”标记）已足够，安全网在本次运行中没有被触发 |
+
+| Round | Score | Deductions | Positives | Changes in this round |
+|:---|:---|:---|:---|:---|
+| 1 | 70 | no demo of interruptions −8; child presentation −4; a bar the app hid gets shown −4; flicker on content just long enough −3; wrong scroll view in pagers −2; VoiceOver −3; repeated restores every 0.25 s on hidesBottomBarWhenPushed pages −1; key window with several iPad scenes −2; Liquid Glass restore unverified −3 | whitelist hide session; notifications + lifecycle + timer; new-drag rule; three styles isolated by guards | demo section (18 rows); the app's setTabBarHidden: takes the bar over; children's presentedViewController checked; vertical scroll views preferred; hiding needs 200pt of scrollable distance (hysteresis) |
+| 2 | 80 | no device testing −5; VoiceOver / Switch Control −3; Liquid Glass restore unverified −3; key window and active state with several iPad scenes −2; still hides with the keyboard up −2; no simulation section in the Swift demos −2; repeated restores on hidesBottomBarWhenPushed pages −1; the classic style walks views every 0.5 s while shown −1; system events simulated by posting notifications −1 | app takeover, child presentations, pager lists and hysteresis handled; an 18-row simulation demo; compiling the demo against minimal UIKit declarations found and fixed a build error (blocks in switch cases) | never hides with VoiceOver / Switch Control running, shown when their status changes; key window and active state per scene (iOS 13 / 15+); never hides with the keyboard up; one session end on hidesBottomBarWhenPushed pages; 2 more demo rows |
+| 3 | 84 | no device testing −5; Liquid Glass restore unverified −3; no simulations in the Swift demos −2; still slides with Reduce Motion −1; no rotation demo −1; no debug log, device issues are hard to trace −1; the classic style walks views every 0.5 s while shown −1; unknown whether a context menu preview counts as presented −1; system events simulated by posting notifications −1 | VoiceOver / Switch Control, focus per scene, keyboard, hidesBottomBarWhenPushed handled; a 20-row simulation demo; 30 edge cases | the simulations move into the library's demo helpers (UIViewController+CYLSettingsSection); settings row 8 lists them in an action sheet, so the Swift demos have them too; the ObjC demo section calls the same code; no slide with Reduce Motion; Reduce Motion and Low Power Mode changes observed; 3 more demo rows: rotation, Reduce Motion, Low Power Mode (23 rows) |
+| 4 | 88 | no device testing −5; Liquid Glass restore unverified −3; no diagnostics, on a device one cannot tell why the bar came back −1; the classic style walks views every 0.5 s while shown −1; context menu previews have no public callback −1; system events simulated by posting notifications −1 | every demo (Swift included) runs every simulation; Reduce Motion, Low Power Mode and rotation handled; 33 edge cases | opt-in diagnostic log (environment variable CYLTabBarMinimizeLog=1): session starts, every restore with its exact reason, app takeovers; session and environment checks report exact reasons; self-check and log after the Liquid Glass forced expand; the scroll view is reused for 2 s while the page stays the same |
+| 5 | 90 ✅ | no device testing −5 (needs Xcode and a device / simulator); Liquid Glass restore unverified −3 (needs an iOS 26 device; the diagnostic log reports a failure); context menu previews have no public callback −1; a real call and the low battery alert cannot be triggered from code, only simulated with notifications −1 | a whitelist hide session bound to its context; 25 notification, lifecycle and timer checks, every restore with its exact reason; 23 simulations in every demo; 37 edge cases; every style isolated by guards; no warnings in five build configurations | full review: fixed hiding staying blocked after going to the background with the keyboard up; the other checks (scroll-up restores regardless of the new-drag rule, our own calls never taken for the app's, consistent hysteresis, every style reports the request while animating) found no issue. Score 90 reached |
+| 6 | 85 | a wider review (about 45 scenarios) found: a long press on the content (context menu, drag, text selection) did not count as an interruption −1; a side menu / drawer moving the controller, container transitions have no callback −2; still hides on a Mac −1; top safe area changes (in-call status bar) −1; the demo did not cover child presentations, popovers, drawers, scene deactivation −1; plus no device testing −5, Liquid Glass restore unverified −3, system events simulated with notifications −1 | the whitelist session's context can be extended; most new scenarios only need one more context comparison | a long-press observer on the scroll view that never blocks touches; the session context now includes the controller's frame in its window and its top safe area; never hides with Mac Catalyst or an iOS app on a Mac; 6 more demo rows (OverCurrentContext, popover, drawer, top safe area, scene deactivation, manual long press) and a context menu on the ObjC demo's badge rows (29 rows) |
+| 7 | 90 | taps outside the content (navigation bar buttons, UIMenu buttons, header controls) did not count as interruptions, and UIMenu has no public callback −1; no device testing −5 (pointer / trackpad / mouse wheel scrolling on iPad also needs a device and is counted here); Liquid Glass restore unverified −3; system events simulated with notifications −1 | long press, drawers, safe area and Mac handled; 29 demo rows; 43 edge cases | a tap observer on the controller's view that never blocks touches: while the bar is hidden or minimized, a tap outside the followed scroll view ends the session; taps inside the content keep it hidden (as in Facebook); the ObjC demo's navigation bar gets a button with a UIMenu, and a "Manual: tap a navigation bar button" row (30 rows) |
+| 8 | 92 | no device testing −5; Liquid Glass: whether writing Never expands the bar is unverified −2 (the risk of momentum minimizing it again after a restore is removed in this round); system events simulated with notifications −1 | round 7's tap observer reviewed with no issue (never blocks touches, taps inside the content keep it hidden); 91 on entering this round | Liquid Glass: Never is held until a new drag starts (was 0.35 s), the same new-drag rule as the other styles; a new value from the app or leaving Liquid Glass ends the hold; a "Manual: after a restore, fling on without lifting" row (31 rows) |
+| 9 | 92 | no device testing −5; Liquid Glass: whether writing Never expands the bar is unverified −2; a real call and the low battery alert cannot be triggered from code −1 | rounds 6–8 reviewed: recognizer lifetime (no message to a released target when the controller or view goes), re-entrancy on restore, the tap observer of nested tab bar controllers; no issue | 2 real triggers in the demo (not posted notifications): opening Settings really sends the app to the background and back; the tel:// call prompt on iPhone is a real system alert (33 rows) |
+| 10 | 92（真机前的上限） | no device testing −5; Liquid Glass: whether writing Never expands the bar is unverified −2; a real call and the low battery alert cannot be triggered from code −1. All three can only be closed on a device; see the start of this section | rounds 6–10 handled 9 kinds of new scenarios (long press, drawers, safe area, Mac, taps outside the content, Liquid Glass momentum, real triggers, snapshots); 33 demo rows; 47 edge cases; no warnings in five build configurations | restores without animation when the app resigns active, goes to the background or another window becomes key, so the app switcher snapshot shows the bar fully back; the Liquid Glass hold / release path and both observers reviewed with no issue. No 100 is given without verification |
+| 11 | 89 | a new review (iPad multitasking, accessibility modes) found: a keyboard in another scene of this app keeps this window from hiding −1; so does another app's keyboard (Slide Over / Split View) −1; Guided Access on / off does not restore −1; plus no device testing −5, Liquid Glass restore unverified −2, system events simulated with notifications −1 | the whitelist session keeps new fixes local | the keyboard counts only when it is local (UIKeyboardIsLocalUserInfoKey) and this window is the key window of an active scene; Guided Access changes restore; demo rows for another app's keyboard (must not change) and Guided Access (35 rows) |
+| 12 | 92 | no device testing −5; Liquid Glass: whether writing Never expands the bar is unverified −2; a real call and the low battery alert cannot be triggered from code −1 | round 11's three fixes reviewed with no issue; an automatic self-test turns 28 items of the device checklist into one tap (or one launch argument) with PASS / FAIL output; a new public property cyl_isTabBarHiddenByScroll | new cyl_isTabBarHiddenByScroll (read-only) and cyl_simulateHideOnScrollForTesting (self-tests only); a self-test runner: scroll into content, simulate the hide, fire, check, clean up, one console line each and a summary alert; the launch argument -CYLScrollHideSelfTest YES runs it automatically; a "Self-test" demo row (36 rows) |
+| 13 | 93 | no device testing −5; Liquid Glass: neither restore mechanism verified on a device −1 (was −2: there are now two independent mechanisms, so both failing is less likely); a real call and the low battery alert cannot be triggered from code −1 | the self-test runner reviewed with no issue; stability (no restore without an interruption, or the bar flickers) is now part of the self-test | a second Liquid Glass mechanism: if the bar is still minimized 0.35 s after writing Never, hide and show it once with UIKit's setTabBarHidden: (through super, not taken for the app's request), each step logged; 3 more demo and self-test rows: re-selecting the current tab and turning it on again (must not restore), the app calling setTabBarHidden:NO (39 rows) |
+| 14 | 94 | no device testing −5; Liquid Glass: neither restore mechanism verified on a device −1 | the "system events simulated with notifications" item is dropped: Apple's documentation states that temporary interruptions such as calls and SMS, and overlay windows, post willResignActiveNotification (with or without scenes), so scroll hiding relies on documented behavior; whether a device matches it is already part of "device testing", so it was a double deduction | the docs cite Apple's documentation; new scripts/scroll-hide-self-test.sh builds, runs the self-test on a simulator with one command and exits by PASS / FAIL; a new "Scroll hiding self-test" GitHub Actions workflow (macos-15, by hand, and on pull requests that change the workflow or the script) |
+| 15 | 94 | no device testing −5; Liquid Glass: neither restore mechanism verified on a device −1; the first simulator run tested nothing (all SKIP), so no points for it | first build, install and run of the demo and the self-test on a CI simulator (Xcode 27.2, iOS 27); two master build errors fixed on the way | CI uses the xcode-27 runner, iOS 27 only; the script installs the demo app (not the pod framework) and removes the Pods scheme with the same name; the first run skipped all 39 rows ("0 passed, 0 failed, 39 skipped"), so: the self-test now starts once the app is active and the page is laid out; every reason the bar could not be hidden goes to the opt-in log (CYLTabBarMinimizeLog=1, turned on by the script); the FlatDesign job sets REQUIRE_PASS=1, so a run that skips everything fails |
+| 16 | 94 | no device testing −5; Liquid Glass: neither restore mechanism verified on a device −1; the simulator self-test has not fully passed yet (waiting for the next run) | first real results (CI simulator, Xcode 27.2, iOS 27, FlatDesign): 13 passed: alert, action sheet, full-screen and page sheet modals, push / pop (with hidesBottomBarWhenPushed), tab switch, WillResignActive, background / foreground, push notification tap, memory warning, overlay window, keyboard | 1 failed: UIActivityViewController: on the simulator the share sheet appeared after the 2.7 s check and after the cleanup; it stayed on screen, and the 25 rows after it were SKIP because scroll hiding (rightly) refuses to hide while a page is presented. The self-test now dismisses leftovers before each row (from the window's root controller, every 0.5 s for at most 10 s), and polls a restore row every 0.5 s for up to 8 s more before it fails |
+| 17 | 94 | no device testing −5; Liquid Glass: neither restore mechanism verified on a device −1; 2 simulator self-test rows still failed (fixed in this round, waiting for the next run) | the CI simulator (Xcode 27.2, iOS 27, FlatDesign) ran all 39 rows: 29 passed (the share sheet passed once the self-test waited for the slow presentation; 16 rows the leftover page blocked before passed too: scrolling down in code, turning the switch off and on, turning it on again, VoiceOver, Reduce Motion, Low Power Mode, OverCurrentContext, popover, drawer, top safe area, scene deactivation, the keyboard of other apps, Guided Access, selecting the same tab, app setTabBarHidden:NO); 8 SKIP: 5 manual or real system actions, 2 not part of the self-test (keyboard held for 4 s, rotation), and the self-test row itself | both failures traced: (1) scrolling back to the top in code (status bar tap) did not restore: the edge check compared exactly, and an animated scroll can end a fraction of a point away after pixel rounding; it now allows 0.5 pt and logs the restore; (2) the app's setTabBarHidden:YES was ignored: the self-test ran the simulation right after the simulated hide, and a request repeating the last hide within 0.5 s is taken for a FlatDesign replay; the self-test now waits 0.6 s after the hide, and the 0.5 s window is listed under Limits. CI moves to the same macos-26 runner as ios.yml |
+| 18 | 94 | no device testing −5; Liquid Glass: neither restore mechanism verified on a device −1; the self-test has not passed on macos-26 yet (fixed in this round, waiting for the next run) | the diagnostic log named the cause, which revealed and fixed a real defect: on iOS 26.5 the tab bar could stay hidden | first run on macos-26 (Xcode 26.6, iOS 26.5 simulator, FlatDesign): all 39 rows SKIP. Log: the first hide started a session, then every row logged "test hide refused (the bar did not hide (tab bar hidden already: YES …))". Cause: while the hide animation ran, FlatDesign still reported the bar as shown, so the session check (validateHideSession) dropped the "hidden by scrolling" flag while the bar ended up hidden, with nothing left to bring it back. Fix: the flag is not dropped while our own hide is under way (during the call and for 0.5 s after), and dropping it is logged; safety net: a bar hidden by our own last request, not taken over by the app since, is taken back as hidden by scrolling; the self-test shows a leftover hidden bar before each row |
+| 19 | 97 | classic style (iOS 18 / 17, iOS 26 UI compatibility mode) not run in CI −1; Liquid Glass: the Never restore not verified on a device −1; real calls and system alerts not verified on a device −1 | first clean pass: on macos-26 (Xcode 26.6, iOS 26.5 simulator) all 31 FlatDesign simulations pass, 0 fail; the 8 SKIP are expected (5 manual or real system actions, 2 not part of the self-test, and the self-test row itself); the share sheet, scrolling back to the top in code (status bar tap) and app setTabBarHidden:YES, which failed before, all pass; the restore at the top logs "back at the edge the content starts from"; the default demo (Liquid Glass) skips all 39 rows by design. This earns the simulator part (−3) of the former "no device testing −5" | nothing to fix: round 18's fix (the hidden-by-scroll flag is kept while our own hide is under way) was enough; the safety net did not fire in this run |
+
+### [CN]边界情况清单
+### [EN]Edge case list
+
+| 中文 | English |
+|:---|:---|
+| 状态：✅ 由代码处理；🧪 另有演示行（「滚动隐藏：模拟意外情况」section）；📱 只能在真机上手动验证。 | Status: ✅ handled in code; 🧪 also has a demo row (the "Scroll hiding: simulate interruptions" section); 📱 can only be checked by hand on a device. |
+
+| # | 场景 | 处理方式 | 状态 |
+|:---|:---|:---|:---|
+| 1 | 向上滚动 | 滚动方向反转超过 12pt | ✅ |
+| 2 | 回到顶部、点击状态栏回到顶部 | contentOffset 到达起始边缘（代码设置的偏移也算） | ✅🧪 |
+| 3 | 代码向下滚动（非用户拖动） | 只响应拖动或拖动后的惯性 | ✅🧪 |
+| 4 | 内容变短不再能滚动 | 可滚动距离 < 100pt 时恢复；隐藏需要 ≥ 200pt（滞回，防止闪动） | ✅ |
+| 5 | 内容开头 | 滚入超过 50pt 才隐藏 | ✅ |
+| 6 | 恢复后的惯性滚动 | 恢复后需要新的拖动 | ✅ |
+| 7 | 前后台切换 | App 与 Scene 通知；演示中另有真实触发（打开设置） | ✅🧪 |
+| 8 | 来电（接听） | WillResignActive | ✅🧪📱 |
+| 9 | 低电量弹框、系统弹框、权限请求 | WillResignActive；演示中另有真实系统弹框（iPhone 上的 tel:// 拨号提示） | ✅🧪📱 |
+| 10 | 控制中心、通知中心、App 切换器 | WillResignActive / DidEnterBackground | ✅📱 |
+| 11 | 点击推送打开 App 后 push | 前台通知 + 页面变化 | ✅🧪 |
+| 12 | push、pop、手势返回 | 会话上下文（页面）+ 转场中不隐藏 | ✅🧪 |
+| 13 | push 设置了 hidesBottomBarWhenPushed 的页面 | 交给 UIKit；返回后恢复 | ✅🧪 |
+| 14 | 切换 Tab（点击或代码） | 会话上下文（Tab） | ✅🧪 |
+| 15 | App 内 alert、actionSheet | presentedViewController（本控制器、选中 Tab、当前页面） | ✅🧪 |
+| 16 | 全屏模态页面、页面卡片 | presentedViewController + viewWillDisappear / viewWillAppear | ✅🧪 |
+| 17 | 子控制器自定义 presentation context | 检查选中 Tab 与当前页面的 presentedViewController | ✅ |
+| 18 | 分享面板 | presentedViewController | ✅🧪 |
+| 19 | 独立窗口中的 HUD、浮层 | UIWindowDidBecomeKey + key window 检查 | ✅🧪 |
+| 20 | 键盘弹出 | UIKeyboardWillShow | ✅🧪 |
+| 21 | 内存警告 | UIApplicationDidReceiveMemoryWarning | ✅🧪 |
+| 22 | 旋转、分屏 / 台前调度尺寸变化 | viewWillTransitionToSize | ✅🧪📱 |
+| 23 | App 自己隐藏 TabBar | App 的 setTabBarHidden: 接管 TabBar，滚动隐藏不再显示它 | ✅🧪 |
+| 24 | 关闭滚动隐藏、改变样式 | 设置取值、每次布局 | ✅🧪 |
+| 25 | 横向分页中的竖向列表 | 优先选择可以竖向滚动的滚动视图 | ✅ |
+| 26 | 滚动视图被替换或释放 | 会话上下文（滚动视图）+ weak | ✅ |
+| 27 | VoiceOver、切换控制开启或正在使用 | 不隐藏；状态变化时恢复 | ✅🧪 |
+| 28 | 键盘已显示时滚动（如搜索结果） | 键盘显示期间不隐藏 | ✅🧪 |
+| 29 | iPad 多窗口：另一个 Scene 中的键盘 | 只有本窗口是活跃 Scene 的 key window 时才记录键盘 | ✅ |
+| 30 | 其他 App 的键盘（侧拉、分屏） | UIKeyboardIsLocalUserInfoKey 为 NO 时忽略 | ✅🧪 |
+| 31 | 引导式访问开启或关闭 | UIAccessibilityGuidedAccessStatusDidChange | ✅🧪 |
+| 32 | 带着键盘进入后台 | 进入后台时清除键盘记录，回到前台由 WillShow 重新记录 | ✅ |
+| 33 | iPad 多窗口：另一个 Scene 获得焦点 | 按本 Scene 的 keyWindow 与 activationState 判断 | ✅📱 |
+| 34 | 开启“减弱动态效果” | 滚动隐藏不执行滑动动画；状态变化时恢复 | ✅🧪 |
+| 35 | 低电量模式开启或关闭 | NSProcessInfoPowerStateDidChange | ✅🧪 |
+| 36 | 长按内容：上下文菜单、拖放、选择文字 | 滚动视图上不拦截触摸的长按观察者 | ✅🧪 |
+| 37 | 侧滑菜单 / 抽屉把 TabBarController 移开、容器转场 | 会话上下文包含控制器在窗口中的 frame | ✅🧪 |
+| 38 | 通话 / 热点 / 录屏状态栏改变顶部安全区（iOS 12 时代） | 会话上下文包含控制器的顶部安全区 | ✅🧪 |
+| 39 | 点击内容之外：导航栏按钮、带 UIMenu 的按钮、头部分段控件、搜索框 | 控制器视图上不拦截触摸的点击观察者；内容中的点击保持隐藏（如 Facebook） | ✅🧪 |
+| 40 | App 切换器快照（失去活跃、进入后台时） | 窗口或 Scene 不活跃时恢复不执行动画，快照中 TabBar 已完整恢复 | ✅🧪 |
+| 41 | 液态玻璃：恢复后旧拖动的惯性 | 系统保持 Never，直到新的拖动开始 | ✅🧪 |
+| 42 | 液态玻璃：写入 Never 没有恢复 TabBar | 第二种方式：用 UIKit 的 setTabBarHidden: 隐藏再显示一次；每步写入诊断日志 | ✅📱 |
+| 43 | 重复选中当前 Tab、重复开启（不应恢复） | 上下文与取值不变，会话继续 | ✅🧪 |
+| 44 | App 调用 setTabBarHidden:NO | App 接管：显示 TabBar，并清除滚动隐藏状态 | ✅🧪 |
+| 45 | 不到 0.25 秒就关闭的弹框 | 设计如此：安全网每 0.25 秒检查一次，一闪而过的弹框不算打断 | ✅ |
+| 46 | iPad 指针、触控板、鼠标滚轮滚动 | 滚动手势的 isDragging；需真机确认 | 📱 |
+| 47 | Mac 上运行（Mac Catalyst、Apple 芯片 Mac 上的 iOS App） | 不隐藏 | ✅ |
+| 48 | 子控制器以 OverCurrentContext 方式 present | 当前页面的 presentedViewController | ✅🧪 |
+| 49 | iPad 弹出框（popover） | presentedViewController | ✅🧪 |
+| 50 | Scene 失去活跃（本 Scene） | UISceneWillDeactivate，按 Scene 过滤 | ✅🧪 |
+| 51 | 真机上定位“为何恢复 / 为何没恢复” | Xcode scheme 中设置环境变量 CYLTabBarMinimizeLog=1（脚本可用全大写写法 CYL_TAB_BAR_MINIMIZE_LOG=1）：打印会话开始、每次恢复及原因、App 接管、液态玻璃恢复自检 | ✅ |
+| 52 | 经典样式显示期间的页面检查开销 | 当前页面不变时复用滚动视图 2 秒，不重复遍历视图层级 | ✅ |
+| 53 | Swift Demo 中的模拟 | 设置分组第 8 行用操作表列出全部模拟 | 🧪 |
+| 54 | 经典样式：返回到 hidesBottomBarWhenPushed 页面之前的页面 | 会话只结束一次，不重复恢复；返回时随页面变化显示 | ✅🧪 |
+
+| # | Scenario | How it is handled | Status |
+|:---|:---|:---|:---|
+| 1 | Scrolling up | The direction reverses for 12pt | ✅ |
+| 2 | Back at the top, a status bar tap | contentOffset reaches the start edge (offsets set in code count too) | ✅🧪 |
+| 3 | Scrolling down in code (not a user drag) | Only drags and their momentum count | ✅🧪 |
+| 4 | Content that no longer scrolls | Shown below 100pt of scrollable distance; hiding needs 200pt (hysteresis, no flicker) | ✅ |
+| 5 | The start of the content | Hides only after 50pt into the content | ✅ |
+| 6 | Momentum after a restore | A new drag is needed after a restore | ✅ |
+| 7 | Background / foreground | App and scene notifications; the demo also triggers it for real (opening Settings) | ✅🧪 |
+| 8 | A call (answered) | WillResignActive | ✅🧪📱 |
+| 9 | Low battery alert, system alerts, permission requests | WillResignActive; the demo also shows a real system alert (the tel:// call prompt on iPhone) | ✅🧪📱 |
+| 10 | Control Center, Notification Center, the app switcher | WillResignActive / DidEnterBackground | ✅📱 |
+| 11 | A push notification tap that opens the app and pushes a page | Foreground notifications + page change | ✅🧪 |
+| 12 | Push, pop, swipe back | Session context (page) + no hiding during a transition | ✅🧪 |
+| 13 | Push of a page with hidesBottomBarWhenPushed | Left to UIKit; shown on the way back | ✅🧪 |
+| 14 | Tab switch (tap or code) | Session context (tab) | ✅🧪 |
+| 15 | In-app alert, action sheet | presentedViewController (this controller, the selected tab, the page) | ✅🧪 |
+| 16 | Full-screen modal, page sheet | presentedViewController + viewWillDisappear / viewWillAppear | ✅🧪 |
+| 17 | A child that defines its own presentation context | Checks the selected tab's and the page's presentedViewController | ✅ |
+| 18 | Share sheet | presentedViewController | ✅🧪 |
+| 19 | HUD or overlay in a window of its own | UIWindowDidBecomeKey + key window check | ✅🧪 |
+| 20 | The keyboard appears | UIKeyboardWillShow | ✅🧪 |
+| 21 | Memory warning | UIApplicationDidReceiveMemoryWarning | ✅🧪 |
+| 22 | Rotation, Split View / Stage Manager resize | viewWillTransitionToSize | ✅🧪📱 |
+| 23 | The app hides the tab bar itself | The app's setTabBarHidden: takes the bar over; scroll hiding never shows it | ✅🧪 |
+| 24 | Scroll hiding turned off, a style change | Setting the value, every layout | ✅🧪 |
+| 25 | A vertical list inside a horizontal pager | A vertically scrolling scroll view is preferred | ✅ |
+| 26 | The scroll view is replaced or released | Session context (scroll view) + weak | ✅ |
+| 27 | VoiceOver or Switch Control turned on or running | Never hides; shown when the status changes | ✅🧪 |
+| 28 | Scrolling while the keyboard is up (e.g. search results) | Never hides while the keyboard is up | ✅🧪 |
+| 29 | iPad multiple windows: a keyboard in another scene | The keyboard counts only while this window is the key window of an active scene | ✅ |
+| 30 | Another app's keyboard (Slide Over, Split View) | Ignored when UIKeyboardIsLocalUserInfoKey is NO | ✅🧪 |
+| 31 | Guided Access turned on or off | UIAccessibilityGuidedAccessStatusDidChange | ✅🧪 |
+| 32 | Going to the background with the keyboard up | The keyboard state is cleared on entering the background; WillShow records it again on return | ✅ |
+| 33 | iPad multiple windows: another scene takes focus | Uses this scene's keyWindow and activationState | ✅📱 |
+| 34 | Reduce Motion turned on | Scroll hiding does not slide; shown when the setting changes | ✅🧪 |
+| 35 | Low Power Mode turned on or off | NSProcessInfoPowerStateDidChange | ✅🧪 |
+| 36 | A long press on the content: context menu, drag and drop, text selection | A long-press observer on the scroll view that never blocks touches | ✅🧪 |
+| 37 | A side menu / drawer moving the tab bar controller away, a container transition | The session context includes the controller's frame in its window | ✅🧪 |
+| 38 | An in-call / hotspot / recording status bar changing the top safe area (iOS 12 era) | The session context includes the controller's top safe area | ✅🧪 |
+| 39 | A tap outside the content: navigation bar button, button with a UIMenu, header segmented control, search field | A tap observer on the controller's view that never blocks touches; taps inside the content keep it hidden (as in Facebook) | ✅🧪 |
+| 40 | The app switcher snapshot (on resign active, background) | Restores without animation while the window or scene is not active, so the snapshot shows the bar fully back | ✅🧪 |
+| 41 | Liquid Glass: the old drag's momentum after a restore | The system is held at Never until a new drag starts | ✅🧪 |
+| 42 | Liquid Glass: writing Never does not expand the bar | Second mechanism: hide and show once with UIKit's setTabBarHidden:; each step logged | ✅📱 |
+| 43 | Re-selecting the current tab, turning it on again (must not restore) | Context and value unchanged, the session goes on | ✅🧪 |
+| 44 | The app calls setTabBarHidden:NO | App takeover: shows the bar and clears the scroll-hidden state | ✅🧪 |
+| 45 | An alert dismissed within 0.25 s | By design: the safety net checks every 0.25 s; a flash that short does not interrupt reading | ✅ |
+| 46 | Pointer, trackpad and mouse wheel scrolling on iPad | The scroll gesture's isDragging; needs a device to confirm | 📱 |
+| 47 | Running on a Mac (Mac Catalyst, an iOS app on Apple silicon) | Never hides | ✅ |
+| 48 | A child presenting with OverCurrentContext | The page's presentedViewController | ✅🧪 |
+| 49 | An iPad popover | presentedViewController | ✅🧪 |
+| 50 | The scene deactivates (this scene) | UISceneWillDeactivate, filtered by scene | ✅🧪 |
+| 51 | On a device: why the bar came back, or did not | Set the environment variable CYLTabBarMinimizeLog=1 in the Xcode scheme (scripts can use the ALL_CAPS spelling CYL_TAB_BAR_MINIMIZE_LOG=1): logs session starts, every restore with its reason, app takeovers, the Liquid Glass restore self-check | ✅ |
+| 52 | Cost of the classic page check while the bar is shown | The scroll view is reused for 2 s while the page stays the same, without searching the view hierarchy again | ✅ |
+| 53 | Simulations in the Swift demos | Settings row 8 lists every simulation in an action sheet | 🧪 |
+| 54 | Classic: coming back from a hidesBottomBarWhenPushed page | The session ends once, no repeated restores; shown on the page change back | ✅🧪 |
+
+<!-- edge-cases:end -->
 
 ## [CN]限制
 ## [EN]Limits
@@ -242,6 +588,7 @@ flowchart LR
 | 扁平样式每次布局时会确认当前页面的滚动视图；页面替换了滚动视图（例如重新创建 tableView）时，下一次布局后会自动跟随。 | FlatDesign checks the current page's scroll view on every layout; when a page replaces its scroll view (e.g. creates a new table view), the next layout picks it up. |
 | iOS 18 以前的经典样式使用与扁平样式相同的下移动画，但页面的安全区不变：TabBar 隐藏期间，列表底部仍保留 TabBar 的内边距（扁平样式会更新安全区）。iOS 18 及以上由 UIKit 处理动画与安全区。代理回调 `willHideTabBar:` 等仅属于扁平样式（参数为 `CYLFlatDesignTabBar`），经典样式不发送。 | Before iOS 18 the classic style uses FlatDesign's move-down animation, but the page's safe area does not change: lists keep the tab bar's bottom inset while it is hidden (FlatDesign updates the safe area). On iOS 18 and later UIKit animates it and updates the safe area. Delegate callbacks such as `willHideTabBar:` belong to FlatDesign only (their parameter is a `CYLFlatDesignTabBar`); the classic style does not send them. |
 | 经典样式在 iOS 26 UI 兼容模式与 iOS 25 及以前的系统上尚未在真机上验证，iPad 上显示在顶部的 TabBar 不会被移动。 | The classic style has not been verified on a device in iOS 26 UI compatibility mode or on iOS 25 and earlier yet; on iPad a tab bar shown at the top is never moved. |
+| App 在滚动隐藏 TabBar 之后 0.5 秒内调用 `-setTabBarHidden:YES animated:`（与刚才的隐藏相同）时，该调用被当作扁平样式动画对本库请求的重放而忽略，TabBar 仍算作“被滚动隐藏”，之后向上滚动会显示它。超过 0.5 秒的调用，以及任何 `-setTabBarHidden:NO animated:`，都按 App 接管处理。 | When the app calls `-setTabBarHidden:YES animated:` within 0.5 s after scrolling hid the tab bar (the same as that hide), the call is taken for a FlatDesign animation replaying the library's request and ignored: the bar still counts as hidden by scrolling, and scrolling up shows it. Calls after 0.5 s, and any `-setTabBarHidden:NO animated:`, are taken as the app taking the tab bar over. |
 
 ## [CN]测试与截图
 ## [EN]Testing and screenshots
@@ -249,3 +596,11 @@ flowchart LR
 | 中文 | English |
 |:---|:---|
 | 本次修改在没有 Xcode、模拟器与真机的 Linux 环境中完成，无法运行 Demo，因此没有截图。新代码已用 clang（`-target arm64-apple-ios12.0 -fobjc-arc`，`-Weverything` 及 `-Wall -Wextra -Wunguarded-availability`）针对精简的 UIKit 声明做过语法与警告检查，并分别检查了三种编译配置：默认、不含 FlatDesign 子库（`CYL_FLATDESIGN_AVAILABLE` 为 0）、iOS 18 SDK（没有 iOS 26 接口）；Docs navigation 检查通过。请在 iOS 26（液态玻璃与 UI 兼容模式）以及 iOS 18 等旧系统的真机或模拟器上运行 Demo 验证后补充截图。 | This change was made on Linux without Xcode, a simulator or a device, so the demo could not be run and there are no screenshots. The new code was checked for syntax and warnings with clang (`-target arm64-apple-ios12.0 -fobjc-arc`, `-Weverything` and `-Wall -Wextra -Wunguarded-availability`) against minimal UIKit declarations, in three build configurations: default, without the FlatDesign subspec (`CYL_FLATDESIGN_AVAILABLE` 0), and the iOS 18 SDK (no iOS 26 APIs); the docs navigation check passes. Please run the demo on iOS 26 (Liquid Glass and UI compatibility mode) and on an older system such as iOS 18, on a device or simulator, and add screenshots. |
+
+| 中文 | English |
+|:---|:---|
+| 「模拟意外情况」section 默认收起的改动同样无法在本环境运行，没有截图：展开 / 收起行的代码已用 clang 针对精简的 UIKit 声明做过语法与警告检查，请在模拟器上点击「展开全部 N 个模拟」与「收起模拟列表」各一次确认行动画正常后补充截图。 | The change that collapses the "simulate interruptions" section could not be run here either, so it has no screenshot: the code of the expand / collapse row was checked for syntax and warnings with clang against minimal UIKit declarations. Please tap "Show all N simulations" and "Collapse the simulation list" once each in a simulator to confirm the row animation, and add a screenshot. |
+
+| 中文 | English |
+|:---|:---|
+| 生命周期场景（何时恢复显示）同样尚未在真机上验证。建议在真机上逐项检查，每项都在 TabBar 被滚动隐藏后进行：① 切到后台再回来；② 来电并接听，挂断后回到 App；③ 低电量弹框（或任一系统弹框，如权限请求）；④ 点击推送打开 App 并 push 到详情页；⑤ push 新页面、手势返回 pop；⑥ App 内的 UIAlertController（alert 与 actionSheet）、模态页面；⑦ 独立窗口中的 HUD；⑧ 模拟器的“模拟内存警告”；⑨ 点击搜索框弹出键盘；⑩ 旋转屏幕、iPad 分屏调整尺寸；⑪ 分享面板（UIActivityViewController）、全屏模态页面；⑫ 隐藏后不松手继续上下拖动、快速甩动后立即点击 Tab。预期：TabBar 都立即恢复显示，并且惯性滚动不会再次隐藏它，新的向下拖动才会隐藏。 | The lifecycle scenarios (when the bar comes back) are not verified on a device yet either. Check each on a device, each time after scrolling has hidden the tab bar: (1) go to the background and back; (2) receive and answer a call, hang up and return; (3) the low battery alert (or any system alert, such as a permission request); (4) tap a push notification that opens the app and pushes a detail page; (5) push a page, pop with the swipe back; (6) an in-app UIAlertController (alert and action sheet), a modal page; (7) a HUD in a window of its own; (8) the simulator's "Simulate Memory Warning"; (9) tap a search field so the keyboard appears; (10) rotate, resize in iPad Split View; (11) a share sheet (UIActivityViewController), a full-screen modal page; (12) keep dragging up and down without lifting the finger after the bar hides, fling and tap a tab right away. Expected: the tab bar comes back at once each time, momentum does not hide it again, and only a new drag down hides it. |

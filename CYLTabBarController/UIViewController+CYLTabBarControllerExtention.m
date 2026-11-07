@@ -494,16 +494,18 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (void)checkTabBarChildControllerValidityAtIndex:(NSUInteger)index {
     CYLTabBarController *tabBarController = [[self cyl_getViewControllerInsteadOfNavigationController] cyl_popSelectTabBarController];
-    @try {
-        UIViewController *viewController;
-        viewController = tabBarController.viewControllers[index];
+    // [EN] Bounds-checked instead of `@try`: an index that is not a tab only logs (DEBUG / BETA), as before.
+    // [CN] 用下标检查代替 `@try`：不是 Tab 的下标只打印日志（DEBUG / BETA），与以前一致。
+    NSArray<UIViewController *> *viewControllers = tabBarController.viewControllers;
+    if (index < viewControllers.count) {
+        UIViewController *viewController = viewControllers[index];
         UIButton *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
         UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:tabBarController];
         BOOL shouldConfigureSelectionStatus = (plusChildViewController) && ((index != [tabBarController.cyl_tabBar cyl_plusButtonIndex]) && (viewController != plusChildViewController));
         if (shouldConfigureSelectionStatus) {
             plusButton.selected = NO;
         }
-    } @catch (NSException *exception) {
+    } else {
 #if defined(DEBUG) || defined(BETA)
         NSString *formatString = @"\n\n\
         ------ BEGIN NSException Log ---------------------------------------------------------------------\n \
@@ -947,6 +949,37 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 #endif
+
+
+#pragma mark - Tab bar spacing
+
+- (CGFloat)cyl_tabBarSpacingInViewCoordinator {
+    if (!self.isViewLoaded || !self.view.window) {
+        return 0;
+    }
+    UITabBarController *tabBarController = self.tabBarController;
+    if (!tabBarController) {
+        return 0;
+    }
+    UIView *tabBar = tabBarController.tabBar;
+    if ([tabBarController isKindOfClass:[CYLTabBarController class]]) {
+        // [EN] FlatDesign draws its own bar. [CN] 扁平样式使用自己的 TabBar。
+        tabBar = ((CYLTabBarController *)tabBarController).cyl_tabBar ?: tabBar;
+    }
+    if (!tabBar || !tabBar.superview || tabBar.hidden || tabBar.alpha <= 0.01) {
+        return 0;
+    }
+    UINavigationController *navigationController = self.navigationController;
+    if (self.hidesBottomBarWhenPushed && navigationController && navigationController.viewControllers.firstObject != self) {
+        return 0;
+    }
+    CGRect tabBarFrame = [self.view convertRect:tabBar.bounds fromView:tabBar];
+    CGRect overlap = CGRectIntersection(self.view.bounds, tabBarFrame);
+    if (CGRectIsNull(overlap) || CGRectIsEmpty(overlap)) {
+        return 0;
+    }
+    return CGRectGetMaxY(self.view.bounds) - CGRectGetMinY(overlap);
+}
 
 @end
 

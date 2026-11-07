@@ -238,6 +238,13 @@ typedef NS_ENUM(NSInteger, CYLImageCacheExpireType) {
 + (nullable UIImage *)cyl_animatedImageWithGIFData:(NSData *)data;
 
 /*!
+ * FIX: issue #605
+ * [EN] The delay of a GIF frame, from `CGImageSourceCopyPropertiesAtIndex()`, as browsers read it.
+ * [CN] GIF 一帧的时长，来自 `CGImageSourceCopyPropertiesAtIndex()`，读取方式与浏览器相同。
+ */
++ (NSTimeInterval)cyl_GIFFrameDelayWithProperties:(NSDictionary *)properties;
+
+/*!
  * FIX: issue #601, #337, #215
  * [EN] Loads an image from `URL` with `CYLImageLoadOptionsDefault`, following `[CYLImageCache sharedImageCache]`: from
  *      memory, else from the disk cache (7 days by default, `maxDiskAge`), else downloads it. A GIF becomes an animated
@@ -260,5 +267,9 @@ typedef NS_ENUM(NSInteger, CYLImageCacheExpireType) {
                   completion:(void (^)(UIImage * _Nullable image))completion;
 
 @end
+
+// [EN] FIX: issue #535 — `CYLImageNamed`, `CYLBundleImage` and the other image loading functions are in CYLUtils
+//      (`UIImage+CYLUtils.h`).
+// [CN] FIX: issue #535 — `CYLImageNamed`、`CYLBundleImage` 等图片加载函数位于 CYLUtils（`UIImage+CYLUtils.h`）。
 
 NS_ASSUME_NONNULL_END

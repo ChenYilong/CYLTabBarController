@@ -781,6 +781,39 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 }
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
+
+#pragma mark - Views inserted into tab buttons
+
+/// [EN] Key of the weak control a marked view was inserted for. [CN] 被标记视图所属控件（弱引用）的 key。
+static const void *const CYLInsertedForTabControlKey = &CYLInsertedForTabControlKey;
+
+/// [EN] Every marked view, held weakly. [CN] 所有被标记的视图（弱引用）。
+static NSHashTable<UIView *> *CYLInsertedTabControlViewTable(void) {
+    static NSHashTable<UIView *> *table;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        table = [NSHashTable weakObjectsHashTable];
+    });
+    return table;
+}
+
+- (void)cyl_markAsInsertedForTabControl:(UIControl *)control {
+    [self cyl_setWeakAssociatedObject:control forKey:CYLInsertedForTabControlKey];
+    if (control) {
+        [CYLInsertedTabControlViewTable() addObject:self];
+    } else {
+        [CYLInsertedTabControlViewTable() removeObject:self];
+    }
+}
+
+- (UIControl *)cyl_insertedForTabControl {
+    return [self cyl_weakAssociatedObjectForKey:CYLInsertedForTabControlKey];
+}
+
++ (NSArray<UIView *> *)cyl_insertedTabControlViews {
+    return CYLInsertedTabControlViewTable().allObjects;
+}
+
 @end
 
 @implementation UIView (CYLTabBarMetrics)
@@ -805,10 +838,40 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     CYLTabBarItemWidth = tabBarItemWidth;
 }
 
+/*!
+ * [EN] The index of the plus button's slot (its placeholder or plus child view controller) in the `viewControllers` of
+ *      the tab bar controller this view belongs to, or NSNotFound. The slot is inserted by one rule in
+ *      `-[CYLTabBarController setViewControllers:]`; reading its index here keeps every style in step with it.
+ * [CN] PlusButton 的 slot（占位控制器或 PlusButton 子控制器）在本视图所属 TabBarController 的 `viewControllers` 中的下标，没有时返回
+ *      NSNotFound。slot 只由 `-[CYLTabBarController setViewControllers:]` 按一条规则插入；这里直接读取其下标，所有样式都与之保持一致。
+ */
+static NSUInteger CYLPlusSlotIndexOfOwner(UIView *owner) {
+    CYLTabBarController *tabBarController = [owner cyl_owningTabBarController];
+    if (!tabBarController) {
+        return NSNotFound;
+    }
+    UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:tabBarController];
+    return [tabBarController.viewControllers indexOfObjectPassingTest:^BOOL(UIViewController *viewController, NSUInteger idx, BOOL *stop) {
+        UIViewController *contentViewController = [viewController cyl_getViewControllerInsteadOfNavigationController];
+        return viewController.cyl_isPlaceholder || contentViewController.cyl_isPlaceholder ||
+               (plusChildViewController && (viewController == plusChildViewController || contentViewController == plusChildViewController));
+    }];
+}
+
 - (NSUInteger)cyl_plusButtonIndex {
     CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [CYLPlusButton plusButtonForOwner:self];
     if (!plusButton) {
         return CYLPlusButtonIndex;
+    }
+    // [EN] FIX: placeholder count mismatch — with a slot, its real index: Liquid Glass keeps it in the middle whatever
+    //      `+indexOfPlusButtonInTabBar` returns, and an odd tab count without one has no `+indexForTabbarItemsCount:`.
+    //      Without a slot (classic style, no plus child view controller) the plus button sits between the tabs, as before.
+    // [CN] FIX：占位导致的数量不匹配——有 slot 时返回其真实下标：液态玻璃无论 `+indexOfPlusButtonInTabBar` 返回什么都放在中间，
+    //      Tab 数为奇数且未实现该方法时 `+indexForTabbarItemsCount:` 没有结果。没有 slot 时（经典样式且无 PlusButton 子控制器），
+    //      PlusButton 位于 Tab 之间，与以前一致。
+    NSUInteger slotIndex = CYLPlusSlotIndexOfOwner(self);
+    if (slotIndex != NSNotFound) {
+        return slotIndex;
     }
     return [[plusButton class] indexForTabbarItemsCount:self.cyl_tabbarItemsCount];
 }

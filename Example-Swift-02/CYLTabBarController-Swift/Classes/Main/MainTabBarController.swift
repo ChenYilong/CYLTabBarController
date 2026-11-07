@@ -60,7 +60,7 @@ class MainTabBarController: CYLTabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tabBarStyleType = .liquidGlass
-        lottieAnimationSpeed = 1.5 // Issue #428: Lottie tab icons at 1.5x (no effect without Lottie) Lottie 图标 1.5 倍速
+        tabBarItemAnimationSpeed = 1.5 // Issue #428: tab icon animations at 1.5x (no effect without an animation subspec) Tab 图标动画 1.5 倍速
 
         UIApplication.shared.applicationSupportsShakeToEdit = true
         self.becomeFirstResponder()

@@ -31,12 +31,28 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_setValue:(id)value forKey:(NSString *)key;
 
 /*!
- * [EN] YES for a placeholder, e.g. the tab button under a plus button or a hidden view kept in place by
- *      `-cyl_setHidden:`. For a view controller, also YES when its navigation controller's root view controller is one.
- * [CN] 是否为占位对象，例如 PlusButton 下方的 Tab 按钮，或通过 `-cyl_setHidden:` 保留位置的视图。对视图控制器而言，
- *      其导航控制器的根控制器是占位对象时也为 YES。
+ * [EN] YES for the plus button's slot: the placeholder view controller of a plus button without a child view controller,
+ *      or the tab button under the plus button. For a view controller, also YES when its navigation controller's root
+ *      view controller is one. `-cyl_setHidden:` does not change it (it only changes visibility).
+ * [CN] 是否为 PlusButton 的 slot：没有子控制器的 PlusButton 对应的占位控制器，或 PlusButton 下方的 Tab 按钮。对视图控制器而言，
+ *      其导航控制器的根控制器是占位对象时也为 YES。`-cyl_setHidden:` 不会改变它（只改变可见性）。
  */
 @property (nonatomic, assign, getter=cyl_isPlaceholder, setter=cyl_setIsPlaceholder:) BOOL cyl_isPlaceholder;
+
+/*!
+ * [EN] Stores `object` as an associated object of the receiver under `key`, holding it weakly: it is not retained, and
+ *      `-cyl_weakAssociatedObjectForKey:` returns nil once it is deallocated. Use it to point back to an owner (e.g. a
+ *      child to its tab bar controller) without a retain cycle. nil removes the value.
+ * [CN] 以 `key` 把 `object` 保存为接收者的关联对象，且弱引用：不会被持有，释放后 `-cyl_weakAssociatedObjectForKey:` 返回 nil。
+ *      用于指回持有者（例如子控制器指向其 TabBarController）而不产生循环引用。传 nil 会移除该值。
+ */
+- (void)cyl_setWeakAssociatedObject:(nullable id)object forKey:(const void *)key;
+
+/*!
+ * [EN] The object stored with `-cyl_setWeakAssociatedObject:forKey:`, or nil (never set, removed, or deallocated).
+ * [CN] 通过 `-cyl_setWeakAssociatedObject:forKey:` 保存的对象；未设置、已移除或已释放时为 nil。
+ */
+- (nullable id)cyl_weakAssociatedObjectForKey:(const void *)key;
 
 @end
 

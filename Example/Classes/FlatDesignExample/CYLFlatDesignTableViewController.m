@@ -40,6 +40,15 @@
 
 @implementation CYLFlatDesignTableViewController
 
+// [EN] #216: the skin row shows the current theme, and a theme is also picked from a sheet while this list stays on screen.
+// [CN] #216：换肤行显示当前主题，而主题也可以在弹出列表中选择，此时本列表一直在屏幕上。
+- (void)cyl_themeDidChangeByManager:(CYLThemeManager *)manager identifier:(__kindof NSObject<NSCopying> *)identifier theme:(__kindof NSObject *)theme {
+    [super cyl_themeDidChangeByManager:manager identifier:identifier theme:theme];
+    if (self.isViewLoaded) {
+        [self.tableView reloadData];
+    }
+}
+
 
 - (instancetype)init {
     // [EN] Inset grouped sections with rounded corners, as in the Settings app.
@@ -70,6 +79,18 @@
     
     [self.navigationItem.leftBarButtonItem setTintColor:UIColor.redColor];
     [self.navigationItem.rightBarButtonItem setTintColor:UIColor.redColor];
+    // [EN] Issue #216: the skin button, as on the Liquid Glass home page; its themes open as a UIMenu, and picking one
+    //      restyles the tab bar in place. Issue #13: it is also the navigation bar button with a UIMenu of the "Manual: tap
+    //      a navigation bar button" simulation (a tap outside the content ends the scroll hiding session). Appended, so
+    //      `rightBarButtonItem` is unchanged.
+    // [CN] Issue #216：换肤按钮，与液态玻璃首页相同；主题以 UIMenu 打开，选择后 TabBar 原地更换外观。issue #13：它同时是“手动：点击
+    //      导航栏按钮”模拟中带 UIMenu 的导航栏按钮（在内容之外的点击会结束滚动隐藏会话）。追加在末尾，`rightBarButtonItem` 不变。
+    __weak __typeof(self) weakSelf = self;
+    UIMenu *themeMenu = [self cyl_themeMenuWithCompletion:^{
+        [weakSelf.tableView reloadData];
+    }];
+    UIBarButtonItem *themeBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"换肤") menu:themeMenu];
+    self.navigationItem.rightBarButtonItems = [self.navigationItem.rightBarButtonItems arrayByAddingObject:themeBarButtonItem];
     
     // ✅ iOS 26修复方案
     
@@ -102,13 +123,13 @@
 }
 
 - (void)flatDesignTabBar:(id)sender {
-    CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
+    CYLMainRootViewController *rootController = [CYLMainRootViewController currentRootViewController];
     [rootController createFlatDesignTabBar];
 }
 
 - (void)createNewTabBardynamically {
     [CYLPlusButtonSubclass registerPlusButton];
-    CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
+    CYLMainRootViewController *rootController = [CYLMainRootViewController currentRootViewController];
     [rootController createNewTabBarWithContext:NSStringFromClass([CYLTabBarController class])];
 }
 
@@ -125,6 +146,23 @@
         return [self cyl_demoRowCountInSection:section];
     }
     return 50;
+}
+
+/*!
+ * [EN] Issue #13: a context menu on the badge rows, for the "Manual: long press a row" simulation (a long press on the
+ *      content ends the scroll hiding session).
+ * [CN] issue #13：角标行的上下文菜单，用于“手动：长按某一行”模拟（在内容上长按会结束滚动隐藏会话）。
+ */
+- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point {
+    if (indexPath.section < [self cyl_demoSectionCount]) {
+        return nil;
+    }
+    return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu *(NSArray<UIMenuElement *> *suggestedActions) {
+        UIAction *copy = [UIAction actionWithTitle:CYLLocalizedString(@"复制") image:[UIImage systemImageNamed:@"doc.on.doc"] identifier:nil handler:^(__kindof UIAction *action) {
+            UIPasteboard.generalPasteboard.string = [tableView cellForRowAtIndexPath:indexPath].textLabel.text;
+        }];
+        return [UIMenu menuWithTitle:@"" children:@[ copy ]];
+    }];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
@@ -361,52 +399,188 @@ static char CYLTabBarDemoItemTitleKey;
 
 #pragma mark - CYLDemoSections
 
-/// [EN] A row of a demo section: a settings row (`CYLDemoRowSettings`) or a tab bar demo row (`CYLDemoRowTabBar`).
-/// [CN] 演示 section 中的一行：设置行（`CYLDemoRowSettings`）或 TabBar 演示行（`CYLDemoRowTabBar`）。
-static const NSInteger CYLDemoRowTabBar = 1000;
+/// [EN] The kinds of demo row, each with its own index. [CN] 演示行的种类，各有自己的序号。
+typedef NS_ENUM(NSInteger, CYLDemoRowKind) {
+    CYLDemoRowKindSettings,   ///< [EN] A settings row of the library. [CN] 库的设置行。
+    CYLDemoRowKindTabBarDemo, ///< [EN] A tab bar demo row of this demo. [CN] 本 Demo 的 TabBar 演示行。
+    CYLDemoRowKindTheme,      ///< [EN] A skin of the skin list (issue #216). [CN] 皮肤列表中的一个皮肤（issue #216）。
+    CYLDemoRowKindScrollHideSimulation, ///< [EN] A scroll hiding simulation (issue #13). [CN] 一个滚动隐藏模拟（issue #13）。
+    CYLDemoRowKindScrollHideSimulationToggle, ///< [EN] The row that expands / collapses the simulations. [CN] 展开 / 收起模拟列表的行。
+};
+
+/*!
+ * [EN] One row of a demo section: a settings row of the library, a tab bar demo row of this demo, a skin of the list, or
+ *      a scroll hiding simulation.
+ *      Each kind has its own index, instead of one number that encodes them all.
+ * [CN] 演示 section 中的一行：库的设置行、本 Demo 的 TabBar 演示行、皮肤列表中的一个皮肤，或一个滚动隐藏模拟。每种行各有自己的序号，而不是用一个数字同时表示它们。
+ */
+@interface CYLDemoRow : NSObject
+@property (nonatomic, assign, readonly) CYLDemoRowKind kind;
+@property (nonatomic, assign, readonly) NSInteger index;
++ (instancetype)settingsRow:(NSInteger)index;
++ (instancetype)tabBarDemoRow:(CYLTabBarDemoRow)index;
++ (instancetype)themeRow:(NSInteger)index;
++ (instancetype)scrollHideSimulationRow:(NSInteger)index;
++ (instancetype)scrollHideSimulationToggleRow;
+@end
+
+@implementation CYLDemoRow
+
++ (instancetype)rowWithIndex:(NSInteger)index kind:(CYLDemoRowKind)kind {
+    CYLDemoRow *row = [[self alloc] init];
+    row->_index = index;
+    row->_kind = kind;
+    return row;
+}
+
++ (instancetype)settingsRow:(NSInteger)index {
+    return [self rowWithIndex:index kind:CYLDemoRowKindSettings];
+}
+
++ (instancetype)tabBarDemoRow:(CYLTabBarDemoRow)index {
+    return [self rowWithIndex:index kind:CYLDemoRowKindTabBarDemo];
+}
+
++ (instancetype)themeRow:(NSInteger)index {
+    return [self rowWithIndex:index kind:CYLDemoRowKindTheme];
+}
+
++ (instancetype)scrollHideSimulationRow:(NSInteger)index {
+    return [self rowWithIndex:index kind:CYLDemoRowKindScrollHideSimulation];
+}
+
++ (instancetype)scrollHideSimulationToggleRow {
+    return [self rowWithIndex:0 kind:CYLDemoRowKindScrollHideSimulationToggle];
+}
+
+@end
+
+/// [EN] Key of the associated object that remembers whether the simulation list is expanded.
+/// [CN] 关联对象的 key，记录模拟列表是否展开。
+/// [EN] The settings row that lists the scroll hiding simulations in an action sheet (issue #13).
+/// [CN] 用操作表列出滚动隐藏模拟的设置行（issue #13）。
+static const NSInteger CYLScrollHideSimulationMenuSettingsRow = 21;
+static const void *const CYLScrollHideSimulationListExpandedKey = &CYLScrollHideSimulationListExpandedKey;
 
 @implementation UIViewController (CYLDemoSections)
 
+/// [EN] Whether the scroll hiding simulation list is expanded (collapsed by default). [CN] 滚动隐藏模拟列表是否展开（默认收起）。
+- (BOOL)cyl_isScrollHideSimulationListExpanded {
+    return [objc_getAssociatedObject(self, CYLScrollHideSimulationListExpandedKey) boolValue];
+}
+
+- (void)cyl_setScrollHideSimulationListExpanded:(BOOL)expanded {
+    objc_setAssociatedObject(self, CYLScrollHideSimulationListExpandedKey, @(expanded), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+/// [EN] The row that expands / collapses the simulation list. [CN] 展开 / 收起模拟列表的行。
+- (UITableViewCell *)cyl_scrollHideSimulationToggleCellForTableView:(UITableView *)tableView {
+    static NSString *const identifier = @"CYLScrollHideSimulationToggleCell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+        cell.textLabel.numberOfLines = 0;
+        cell.textLabel.textColor = tableView.tintColor ?: [UIColor systemBlueColor];
+    }
+    BOOL expanded = [self cyl_isScrollHideSimulationListExpanded];
+    cell.textLabel.text = expanded
+        ? CYLLocalizedString(@"收起模拟列表")
+        : [NSString stringWithFormat:CYLLocalizedString(@"展开全部 %@ 个模拟"), @([self cyl_scrollHideSimulationRowCount])];
+    if (@available(iOS 13.0, *)) {
+        cell.imageView.image = [UIImage systemImageNamed:expanded ? @"chevron.up" : @"chevron.down"];
+    }
+    return cell;
+}
+
+/// [EN] Expands or collapses the simulation list with a row animation. [CN] 以行动画展开或收起模拟列表。
+- (void)cyl_toggleScrollHideSimulationListAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
+    BOOL expand = ![self cyl_isScrollHideSimulationListExpanded];
+    [self cyl_setScrollHideSimulationListExpanded:expand];
+    if (!tableView.window) {
+        return;
+    }
+    // [EN] The simulation rows follow the toggle row. [CN] 模拟行紧跟在展开 / 收起行之后。
+    NSMutableArray<NSIndexPath *> *indexPaths = [NSMutableArray array];
+    for (NSInteger row = 0; row < [self cyl_scrollHideSimulationRowCount]; row++) {
+        [indexPaths addObject:[NSIndexPath indexPathForRow:indexPath.row + 1 + row inSection:indexPath.section]];
+    }
+    [tableView beginUpdates];
+    if (expand) {
+        [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+    } else {
+        [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+    }
+    [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    [tableView endUpdates];
+    if (!expand) {
+        // [EN] After collapsing, keep the toggle row on screen. [CN] 收起后让展开 / 收起行保持可见。
+        [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
+    }
+}
+
 /*!
- * [EN] The sections, by function: each row is a settings row index, or `CYLDemoRowTabBar` + a tab bar demo row. The
- *      settings rows follow `UIViewController+CYLSettingsSection.m`: 0 language, 1 memory warning, 2 title offset,
- *      3 standardAppearance, 4 login state, 5 plus button touchable area, 6 selectedIndex (#515), 7 minimize / hide the
- *      tab bar on scroll (#13, next to the show / hide row), then the tab item
- *      updates (title, icon, network icon, all network icons, all local icons, GIF, all titles, replace neighbors).
- *      Settings rows not listed here (a newer library) go to the first section.
- * [CN] 按功能分组的 section：每行为设置行的序号，或 `CYLDemoRowTabBar` + TabBar 演示行序号。设置行顺序见
- *      `UIViewController+CYLSettingsSection.m`（见上方英文）。此处未列出的设置行（更新的库）放在第一个 section。
+ * [EN] The sections: the library's settings groups (`-cyl_settingsGroups`), with this demo's tab bar rows added to the
+ *      appearance group and, right after it, one row per scroll hiding simulation (issue #13; the appearance group holds
+ *      the menu of the same simulations), and a last section for the navigation and comparison rows.
+ * [CN] 各 section：使用库提供的设置分组（`-cyl_settingsGroups`），本 Demo 的 TabBar 演示行加入外观分组，紧随其后是每个滚动隐藏模拟一行
+ *      （issue #13；外观分组中有这些模拟的菜单行），最后一个 section 放跳转与对比的行。
  */
 - (NSArray<NSDictionary *> *)cyl_demoSections {
-    NSInteger update = [self cyl_settingsRowCount] - [self cyl_tabBarItemUpdateRowCount];
-    NSMutableArray<NSDictionary *> *sections = [@[
-        @{ @"title" : CYLLocalizedString(@"通用"), @"rows" : @[ @0, @1 ] },
-        @{ @"title" : CYLLocalizedString(@"TabBar 外观"),
-           @"rows" : @[ @2, @3, @(CYLDemoRowTabBar + 0), @7, @(CYLDemoRowTabBar + 4), @(CYLDemoRowTabBar + 1),
-                        @(CYLDemoRowTabBar + 2), @(CYLDemoRowTabBar + 3) ] },
-        @{ @"title" : CYLLocalizedString(@"原地更新 Tab"),
-           @"rows" : @[ @(update + 0), @(update + 1), @(update + 2), @(update + 3), @(update + 4), @(update + 5), @(update + 6) ] },
-        @{ @"title" : CYLLocalizedString(@"Tab 页面、选中与登录"), @"rows" : @[ @(update + 7), @6, @4 ] },
-        @{ @"title" : @"PlusButton", @"rows" : @[ @5 ] },
-        @{ @"title" : CYLLocalizedString(@"跳转与对比"),
-           @"rows" : @[ @(CYLDemoRowTabBar + 5), @(CYLDemoRowTabBar + 6), @(CYLDemoRowTabBar + 7), @(CYLDemoRowTabBar + 8) ] },
-    ] mutableCopy];
-    NSMutableSet<NSNumber *> *listed = [NSMutableSet set];
-    for (NSDictionary *section in sections) {
-        [listed addObjectsFromArray:section[@"rows"]];
-    }
-    NSMutableArray<NSNumber *> *general = [sections[0][@"rows"] mutableCopy];
-    for (NSInteger row = 0; row < [self cyl_settingsRowCount]; row++) {
-        if (![listed containsObject:@(row)]) {
-            [general addObject:@(row)];
+    NSMutableArray<NSDictionary *> *sections = [NSMutableArray array];
+    for (NSNumber *group in [self cyl_settingsGroups]) {
+        CYLSettingsGroup settingsGroup = (CYLSettingsGroup)group.integerValue;
+        NSMutableArray<CYLDemoRow *> *rows = [NSMutableArray array];
+        for (NSNumber *row in [self cyl_settingsRowsInGroup:settingsGroup]) {
+            // [EN] Settings row 21 (the simulation menu) heads the simulation section below. [CN] 设置第 21 行（模拟菜单）放在下方模拟 section 的首行。
+            if (row.integerValue == CYLScrollHideSimulationMenuSettingsRow) {
+                continue;
+            }
+            [rows addObject:[CYLDemoRow settingsRow:row.integerValue]];
+        }
+        if (settingsGroup == CYLSettingsGroupTabBarAppearance) {
+            // [EN] Show / hide, height, item layout and background color of the tab bar.
+            // [CN] 显示 / 隐藏、高度、TabBarItem 布局与背景色。
+            [rows addObjectsFromArray:@[ [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowShowHideTabBar],
+                                         [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowTabBarHeight],
+                                         [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowItemNotCentered],
+                                         [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowItemCentered],
+                                         [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowItemBackgroundColor] ]];
+        }
+        [sections addObject:@{ @"title" : [self cyl_titleForSettingsGroup:settingsGroup], @"rows" : rows }];
+        if (settingsGroup == CYLSettingsGroupTabBarAppearance) {
+            // [EN] Issue #13: one row per simulated interruption of scroll hiding. [CN] issue #13：每个滚动隐藏的模拟意外情况一行。
+            // [EN] Settings row 21 (the same simulations in an action sheet) first, then a row that expands / collapses the
+            //      list. The list (almost 40 rows) is collapsed by default, so it does not flood the page.
+            // [CN] 先放设置第 21 行（操作表中的同样模拟），再放一行用于展开 / 收起列表。列表（近 40 行）默认收起，避免占满整个页面。
+            NSMutableArray<CYLDemoRow *> *simulationRows = [NSMutableArray arrayWithObjects:[CYLDemoRow settingsRow:CYLScrollHideSimulationMenuSettingsRow],
+                                                                                            [CYLDemoRow scrollHideSimulationToggleRow], nil];
+            if ([self cyl_isScrollHideSimulationListExpanded]) {
+                for (NSInteger simulationRow = 0; simulationRow < [self cyl_scrollHideSimulationRowCount]; simulationRow++) {
+                    [simulationRows addObject:[CYLDemoRow scrollHideSimulationRow:simulationRow]];
+                }
+            }
+            [sections addObject:@{ @"title" : CYLLocalizedString(@"滚动隐藏：模拟意外情况（issue #13）"), @"rows" : simulationRows }];
+        }
+        if (settingsGroup == CYLSettingsGroupPlusButton) {
+            // [EN] Issue #216: every skin, one row each (color themes and holiday skins).
+            // [CN] Issue #216：所有皮肤，每行一个（配色主题与节日皮肤）。
+            NSMutableArray<CYLDemoRow *> *themeRows = [NSMutableArray array];
+            for (NSInteger themeRow = 0; themeRow < [self cyl_themeListRowCount]; themeRow++) {
+                [themeRows addObject:[CYLDemoRow themeRow:themeRow]];
+            }
+            [sections addObject:@{ @"title" : [self cyl_themeListSectionTitle], @"rows" : themeRows }];
         }
     }
-    sections[0] = @{ @"title" : sections[0][@"title"], @"rows" : general };
+    [sections addObject:@{ @"title" : CYLLocalizedString(@"跳转与对比"),
+                           @"rows" : @[ [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowCompareSystemTabBar],
+                                        [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowPushSystemStyle],
+                                        [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowPushFlatDesign],
+                                        [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowPopPushDemo] ] }];
     return sections;
 }
 
-- (NSInteger)cyl_demoRowAtIndexPath:(NSIndexPath *)indexPath {
-    return [[self cyl_demoSections][indexPath.section][@"rows"][indexPath.row] integerValue];
+- (CYLDemoRow *)cyl_demoRowAtIndexPath:(NSIndexPath *)indexPath {
+    return [self cyl_demoSections][indexPath.section][@"rows"][indexPath.row];
 }
 
 - (NSInteger)cyl_demoSectionCount {
@@ -422,24 +596,46 @@ static const NSInteger CYLDemoRowTabBar = 1000;
 }
 
 - (UITableViewCell *)cyl_demoCellForTableView:(UITableView *)tableView indexPath:(NSIndexPath *)indexPath {
-    NSInteger row = [self cyl_demoRowAtIndexPath:indexPath];
-    if (row >= CYLDemoRowTabBar) {
-        return [self cyl_tabBarDemoCellForTableView:tableView row:row - CYLDemoRowTabBar];
+    CYLDemoRow *row = [self cyl_demoRowAtIndexPath:indexPath];
+    switch (row.kind) {
+        case CYLDemoRowKindScrollHideSimulationToggle:
+            return [self cyl_scrollHideSimulationToggleCellForTableView:tableView];
+        case CYLDemoRowKindTabBarDemo:
+            return [self cyl_tabBarDemoCellForTableView:tableView row:row.index];
+        case CYLDemoRowKindTheme:
+            return [self cyl_themeListCellForTableView:tableView row:row.index];
+        case CYLDemoRowKindScrollHideSimulation:
+            return [self cyl_scrollHideSimulationCellForTableView:tableView row:row.index];
+        case CYLDemoRowKindSettings:
+            return [self cyl_settingsCellForTableView:tableView row:row.index];
     }
-    return [self cyl_settingsCellForTableView:tableView atIndexPath:[NSIndexPath indexPathForRow:row inSection:CYLSettingsSection]];
 }
 
 - (void)cyl_demoDidSelectRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    NSInteger row = [self cyl_demoRowAtIndexPath:indexPath];
-    if (row >= CYLDemoRowTabBar) {
-        [self cyl_didSelectTabBarDemoRow:row - CYLDemoRowTabBar inTableView:nil];
+    CYLDemoRow *row = [self cyl_demoRowAtIndexPath:indexPath];
+    if (row.kind == CYLDemoRowKindScrollHideSimulationToggle) {
+        [self cyl_toggleScrollHideSimulationListAtIndexPath:indexPath inTableView:tableView];
         return;
     }
-    // [EN] The settings rows reload their own index paths in the settings section, which this grouped table does not
-    //      have: run the row without the table view, then reload the demo sections (e.g. the checkmarks).
-    // [CN] 设置行会刷新其在设置分组中的 indexPath，而分组后的列表中没有该分组：不传列表执行该行，然后刷新演示 section（如勾号）。
-    [self cyl_didSelectSettingsRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:CYLSettingsSection] inTableView:(UITableView *_Nonnull)nil];
+    if (row.kind == CYLDemoRowKindTabBarDemo) {
+        [self cyl_didSelectTabBarDemoRow:row.index inTableView:nil];
+        return;
+    }
+    if (row.kind == CYLDemoRowKindScrollHideSimulation) {
+        [self cyl_didSelectScrollHideSimulationRow:row.index];
+        return;
+    }
+    if (row.kind == CYLDemoRowKindTheme) {
+        [self cyl_didSelectThemeListRow:row.index];
+        // [EN] The checkmarks of the list and the skin row follow the new theme. [CN] 列表勾号与换肤行随新主题更新。
+        if (tableView.window) {
+            [tableView reloadData];
+        }
+        return;
+    }
+    // [EN] Run the row, then reload the demo sections (e.g. the checkmarks). [CN] 执行该行，然后刷新演示 section（如勾号）。
+    [self cyl_didSelectSettingsRow:row.index];
     if (tableView.window) {
         [tableView reloadSections:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, (NSUInteger)[self cyl_demoSectionCount])]
                  withRowAnimation:UITableViewRowAnimationNone];

@@ -19,15 +19,39 @@
 static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
 static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext;
+/// [EN] KVO context of the items' `badgeValue` (badge-changed animations). [CN] item 的 `badgeValue` 的 KVO context（角标变化动画）。
+static void *const CYLTabBarItemBadgeValueContext = (void*)&CYLTabBarItemBadgeValueContext;
 
 
 // Implemented in CYLTabBarController.m, issue #610 (and #22 for the pending blocks).
 @interface CYLTabBarController (CYLTabControlActions)
 - (void)cyl_bindTabControlActions;
 - (void)cyl_runPendingReloadBadgesBlocksIfReady;
+// [EN] Implemented in CYLTabBarController+CYLInteraction.m: a tab item's `badgeValue` changed.
+// [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：某个 Tab item 的 `badgeValue` 发生了变化。
+- (void)cyl_tabBarItemBadgeValueDidChange:(UITabBarItem *)item;
+// [EN] Implemented in CYLTabBarController.m: the plus button in the Liquid Glass layers, idempotent.
+// [CN] 在 CYLTabBarController.m 中实现：液态玻璃图层中的 PlusButton，可重复调用。
+- (void)cyl_layOutPlusButtonInLiquidGlassLayers;
+@end
+
+/// [EN] Key of the `hidden` value a view inserted by the library had before More editing hid it.
+/// [CN] 「More」编辑隐藏本库插入的视图之前，该视图原来的 `hidden` 值的 key。
+static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomizingKey;
+
+// [EN] FIX: issue #152 / #535 — implemented in CYLTabBarController+CYLInteraction.m.
+// [CN] FIX: issue #152 / #535 — 实现位于 CYLTabBarController+CYLInteraction.m。
+@interface CYLTabBarController (CYLLiquidGlassTabGestures)
+- (void)cyl_liquidGlassTabBarGestureRecognizerDidUpdate:(UIGestureRecognizer *)gestureRecognizer;
 @end
 
 @interface CYLTabBar () <UIGestureRecognizerDelegate>
+
+/// [EN] YES between `-beginCustomizingItems:` and `-endCustomizingAnimated:` (More editing). Unlike `isCustomizing`, it is
+///      already NO while UIKit animates the end of editing, so the layout requested then installs the views again.
+/// [CN] 在 `-beginCustomizingItems:` 与 `-endCustomizingAnimated:` 之间为 YES（「More」编辑）。与 `isCustomizing` 不同，UIKit 播放结束
+///      编辑的动画时它已是 NO，因此此时请求的布局会重新安装这些视图。
+@property (nonatomic, assign) BOOL cyl_isCustomizingItems;
 
 @property (nonatomic, strong) NSMutableSet<UIView *> *observedViews;
 /// Whether the last layout found the tab buttons in the iOS 27.1 vertical bar, see `-cyl_refreshTabButtonsAfterVerticalBar`.
@@ -42,8 +66,14 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
 @property (nonatomic, assign) BOOL cyl_isSettingItemTitles;
 /// Receives the `UIScrollEdgeElementContainerInteraction`s added to the tab bar, see `-addInteraction:`.
 @property (nonatomic, strong, nullable) UIView *cyl_scrollEdgeElementContainerView;
+/// [EN] The x of the first slot and the gap between slots of the last layout with a plus button (0 unless centered).
+/// [CN] 上次带 PlusButton 布局时第一个位置的 x 与位置间距（未居中时均为 0）。
+@property (nonatomic, assign) CGFloat cyl_itemLayoutLeading;
+@property (nonatomic, assign) CGFloat cyl_itemLayoutSpacing;
 /// FIX: issue #488. The token of the block-based Lottie observer: `-removeObserver:self` cannot remove it.
 @property (nonatomic, strong, nullable) id<NSObject> cyl_lottieAnimationPlayingObserver;
+/// [EN] While the library sets a classic style for itself: not synced to the appearances. [CN] 本库自己设置经典样式期间：不同步到 appearance。
+@property (nonatomic, assign) BOOL cyl_isSettingClassicStyleInternally;
 
 @end
 
@@ -52,6 +82,11 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
 @interface CYLPlusButton (CYLTabBarLayout)
 - (BOOL)cyl_isCenteredWithoutTitle;
 - (CGPoint)cyl_alignedCenterForCenter:(CGPoint)center;
+@end
+
+/// [EN] Implemented in CYLTabBarController.m. [CN] 实现于 CYLTabBarController.m。
+@interface CYLTabBarController (CYLOpaqueTabBarSafeAreaFix)
+- (void)cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded;
 @end
 
 @implementation CYLTabBar
@@ -86,6 +121,7 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
 }
 
 - (instancetype)sharedInit {
+    _syncsClassicStylesToAppearance = YES;
     // [CN] KVO注册监听
     // [EN] Register KVO observers
     _tabBarItemWidth = self.cyl_tabBarItemWidth;
@@ -94,7 +130,7 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
     // animation view to stop (#488). 仅在引入动画库时监听（#604，运行时判断，以支持任意动画库）：没有时没有需要停止的动画（#488）。
     if (CYLTabBarItemAnimationIsAvailable()) {
         __weak __typeof(self) weakSelf = self;
-        void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
+        void (^CYLTabBarItemAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
             __strong typeof(self) self = weakSelf;
             if (!self) {
                  return;
@@ -108,10 +144,10 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
         // FIX: issue #488 keep the token and remove it in `-dealloc`; it was dropped, so every tab bar (one per tab bar
         // controller, e.g. each time `window.rootViewController` is replaced) left an observer behind for good.
         // 保存 token 并在 `-dealloc` 中移除；以前直接丢弃，每个 TabBar（每次替换 `window.rootViewController` 都会新建）都会永久留下一个观察者。
-        self.cyl_lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationPlayingNotification
+        self.cyl_lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemAnimationPlayingNotification
                                                                                                     object:nil
                                                                                                      queue:[NSOperationQueue mainQueue]
-                                                                                                usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
+                                                                                                usingBlock:CYLTabBarItemAnimationPlayingNotificationBlock];
     }
     [self cyl_keepStackedItemLayoutOnHingedDevice];
     return self;
@@ -277,9 +313,140 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
                 }];
             }];
         }
+        // [EN] The color the items already show: not an app's style to sync. [CN] item 当前已显示的颜色：不是需要同步的 App 样式。
+        self.cyl_isSettingClassicStyleInternally = YES;
         self.unselectedItemTintColor = tabLabelTextColor;
+        self.cyl_isSettingClassicStyleInternally = NO;
     }
 #endif
+}
+
+#pragma mark - Classic styles and UITabBarAppearance
+
+/*!
+ * [EN] Since iOS 13, once a tab bar uses `UITabBarAppearance` (any `standardAppearance = ...`), UIKit ignores the classic
+ *      styles (`tintColor`, `barTintColor`, `unselectedItemTintColor`, `backgroundImage`, `shadowImage`, `barStyle`).
+ *      Each classic setter therefore also writes its value into `standardAppearance` (and `scrollEdgeAppearance` when
+ *      there is one), so both ways of styling keep working together. Only a value that changed is written. Not with
+ *      Liquid Glass, where the system draws the bar, nor while `syncsClassicStylesToAppearance` is NO.
+ * [CN] iOS 13 起，TabBar 一旦使用 `UITabBarAppearance`（任何 `standardAppearance = ...`），UIKit 就会忽略经典样式（`tintColor`、
+ *      `barTintColor`、`unselectedItemTintColor`、`backgroundImage`、`shadowImage`、`barStyle`）。因此每个经典 setter 同时把值写入
+ *      `standardAppearance`（存在 `scrollEdgeAppearance` 时也写入），两种设置方式可以同时使用。只写入发生变化的值。液态玻璃（由系统
+ *      绘制 TabBar）以及 `syncsClassicStylesToAppearance` 为 NO 时不同步。
+ */
+- (BOOL)cyl_shouldSyncClassicStyle {
+    if (@available(iOS 13.0, *)) {
+        return self.syncsClassicStylesToAppearance && !self.cyl_isSettingClassicStyleInternally && ![CYLUtils isLiquidGlassActive];
+    }
+    return NO;
+}
+
+- (void)cyl_syncClassicStyleWithBarBlock:(nullable void (^)(UITabBarAppearance *appearance))barBlock
+                               itemBlock:(nullable void (^)(UITabBarItemAppearance *itemAppearance))itemBlock API_AVAILABLE(ios(13.0)) {
+    void (^apply)(UITabBarAppearance *) = ^(UITabBarAppearance *appearance) {
+        if (barBlock) {
+            barBlock(appearance);
+        }
+        if (itemBlock) {
+            [appearance cyl_applyItemAppearanceWithBlock:itemBlock];
+        }
+    };
+    UITabBarAppearance *standardAppearance = [self.standardAppearance copy];
+    apply(standardAppearance);
+    self.standardAppearance = standardAppearance;
+    if (@available(iOS 15.0, *)) {
+        if (self.scrollEdgeAppearance) {
+            UITabBarAppearance *scrollEdgeAppearance = [self.scrollEdgeAppearance copy];
+            apply(scrollEdgeAppearance);
+            self.scrollEdgeAppearance = scrollEdgeAppearance;
+        }
+    }
+}
+
+/// [EN] `attributes` with the foreground color replaced (removed for nil). [CN] 替换（为 nil 时移除）前景色后的 `attributes`。
+static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDictionary<NSAttributedStringKey, id> *attributes, UIColor *_Nullable color) {
+    NSMutableDictionary<NSAttributedStringKey, id> *result = [attributes mutableCopy] ?: [NSMutableDictionary dictionary];
+    result[NSForegroundColorAttributeName] = color;
+    return [result copy];
+}
+
+- (void)setTintColor:(UIColor *)tintColor {
+    [super setTintColor:tintColor];
+    if (!tintColor || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:nil itemBlock:^(UITabBarItemAppearance *itemAppearance) {
+            itemAppearance.selected.iconColor = tintColor;
+            itemAppearance.selected.titleTextAttributes = CYLTitleAttributesWithColor(itemAppearance.selected.titleTextAttributes, tintColor);
+        }];
+    }
+}
+
+- (void)setUnselectedItemTintColor:(UIColor *)unselectedItemTintColor {
+    BOOL changed = !(unselectedItemTintColor == self.unselectedItemTintColor || [unselectedItemTintColor isEqual:self.unselectedItemTintColor]);
+    [super setUnselectedItemTintColor:unselectedItemTintColor];
+    if (!changed || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:nil itemBlock:^(UITabBarItemAppearance *itemAppearance) {
+            itemAppearance.normal.iconColor = unselectedItemTintColor;
+            itemAppearance.normal.titleTextAttributes = CYLTitleAttributesWithColor(itemAppearance.normal.titleTextAttributes, unselectedItemTintColor);
+        }];
+    }
+}
+
+- (void)setBarTintColor:(UIColor *)barTintColor {
+    BOOL changed = !(barTintColor == self.barTintColor || [barTintColor isEqual:self.barTintColor]);
+    [super setBarTintColor:barTintColor];
+    if (!changed || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:^(UITabBarAppearance *appearance) {
+            appearance.backgroundColor = barTintColor;
+        } itemBlock:nil];
+    }
+}
+
+- (void)setBackgroundImage:(UIImage *)backgroundImage {
+    BOOL changed = (backgroundImage != self.backgroundImage);
+    [super setBackgroundImage:backgroundImage];
+    if (!changed || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:^(UITabBarAppearance *appearance) {
+            appearance.backgroundImage = backgroundImage;
+        } itemBlock:nil];
+    }
+}
+
+- (void)setShadowImage:(UIImage *)shadowImage {
+    BOOL changed = (shadowImage != self.shadowImage);
+    [super setShadowImage:shadowImage];
+    if (!changed || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:^(UITabBarAppearance *appearance) {
+            appearance.shadowImage = shadowImage;
+        } itemBlock:nil];
+    }
+}
+
+- (void)setBarStyle:(UIBarStyle)barStyle {
+    BOOL changed = (barStyle != self.barStyle);
+    [super setBarStyle:barStyle];
+    if (!changed || ![self cyl_shouldSyncClassicStyle]) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        [self cyl_syncClassicStyleWithBarBlock:^(UITabBarAppearance *appearance) {
+            appearance.backgroundEffect = [UIBlurEffect effectWithStyle:(barStyle == UIBarStyleDefault) ? UIBlurEffectStyleSystemChromeMaterialLight : UIBlurEffectStyleSystemChromeMaterialDark];
+        } itemBlock:nil];
+    }
 }
 
 - (void)layoutSubviews {
@@ -306,6 +473,253 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
     // The tab titles may have moved: lay the plus button out again so its title follows them
     // (`+alignsTitleWithTabBarItemTitles`).
     [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];
+    [self cyl_fixTruncatedTabTitlesIfNeeded];
+    [self cyl_runItemLayoutBlocks];
+    // [EN] The bar is laid out again when it comes back after a pop: check the page's safe area under an opaque bar.
+    // [CN] pop 返回后 TabBar 会重新布局：检查不透明 TabBar 下页面的安全区域。
+    [self.tabBarController cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded];
+    // [EN] The Liquid Glass selected layer can appear in a tab bar layout pass only: put the plus button's stand-in in it
+    //      now rather than after a fixed delay. Idempotent; does nothing without Liquid Glass or a plus button.
+    // [CN] 液态玻璃的选中层可能只在 TabBar 的布局中出现：此时就放入 PlusButton 的替身，而不是固定延迟之后。可重复调用；没有液态玻璃
+    //      或 PlusButton 时不做任何事。
+    // [EN] Only for the controller that owns this tab bar: `-tabBarController` can fall back to another controller.
+    // [CN] 只针对拥有本 TabBar 的控制器：`-tabBarController` 可能回退到其他控制器。
+    CYLTabBarController *owningTabBarController = self.tabBarController;
+    if (owningTabBarController.cyl_tabBar == self) {
+        [owningTabBarController cyl_layOutPlusButtonInLiquidGlassLayers];
+    }
+}
+
+/*!
+ * [EN] UIKit bug on iOS 13 and 14: a tab title styled through `UITabBarAppearance` with a font larger than the default
+ *      (iOS 13), bold (iOS 13 and 14), or with a changed inline title color (iOS 14) keeps a too small width and is cut
+ *      off ("Mi…"). After UIKit's
+ *      layout, a title narrower than its text is widened to fit (at most the button's width) around the same center.
+ *      Fixed by Apple in iOS 15; nothing is done there.
+ * [CN] iOS 13、14 的 UIKit bug：通过 `UITabBarAppearance` 设置的 Tab 标题字号大于默认值（iOS 13）、为粗体（iOS 13、14），或修改了
+ *      横向布局的标题颜色（iOS 14）时，宽度不足，被截断（“我…”）。在 UIKit 布局之后，宽度不足以显示文字的标题会以原中心加宽到合适宽度（不超过按钮宽度）。
+ *      iOS 15 起系统已修复，不做处理。
+ */
+- (void)cyl_fixTruncatedTabTitlesIfNeeded {
+    if (@available(iOS 15.0, *)) {
+        return;
+    }
+    if (@available(iOS 13.0, *)) {
+        // [EN] Any title narrower than its text: on iOS 14 a changed inline title color cuts titles off too, not only bold.
+        // [CN] 任何宽度不足以显示文字的标题：iOS 14 上修改横向布局的标题颜色同样会截断标题，不只是粗体。
+        for (UIControl *tabButton in self.tabBarButtonArray) {
+            UILabel *label = [tabButton cyl_tabLabel];
+            if (!label || label.text.length == 0) {
+                continue;
+            }
+            CGSize fittingSize = [label sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
+            if (fittingSize.width <= CGRectGetWidth(label.bounds) + 0.5) {
+                continue;
+            }
+            CGPoint center = label.center;
+            CGRect bounds = label.bounds;
+            bounds.size.width = MIN(ceil(fittingSize.width), CGRectGetWidth(tabButton.bounds));
+            label.bounds = bounds;
+            label.center = center;
+        }
+    }
+}
+
+/// [EN] `-[UITabBarItem cyl_viewDidLayoutSubviewsBlock]` of every item, after the layout. [CN] 布局之后执行各 item 的 `cyl_viewDidLayoutSubviewsBlock`。
+- (void)cyl_runItemLayoutBlocks {
+    for (UITabBarItem *item in self.items) {
+        void (^block)(UITabBarItem *, UIView *) = item.cyl_viewDidLayoutSubviewsBlock;
+        UIView *view = block ? item.cyl_tabButton : nil;
+        if (view) {
+            block(item, view);
+        }
+    }
+}
+
+#pragma mark - More editing
+
+/*!
+ * [EN] More editing ("Edit" on the More page) lets the user drag items onto the tab bar, and UIKit moves and rebuilds the
+ *      tab buttons. The views the library inserted into them (`-cyl_markAsInsertedForTabControl:`) and the plus button
+ *      are hidden meanwhile, so none is left at a stale position, and they come back when editing ends; the next layout
+ *      puts the plus button's stand-in in the new buttons. The library does not support More editing as such: this only
+ *      keeps it from leaving views behind.
+ * [CN] 「More」编辑（More 页面中的 "Edit"）允许用户把 item 拖到 TabBar 上，UIKit 会移动并重建 Tab 按钮。编辑期间隐藏本库插入其中的视图
+ *      （`-cyl_markAsInsertedForTabControl:`）与 PlusButton，避免留在过时的位置；编辑结束后恢复，下一次布局会把 PlusButton 的替身放进
+ *      新按钮。本库并不支持「More」编辑本身，这里只是避免它留下残留视图。
+ */
+- (void)beginCustomizingItems:(NSArray<UITabBarItem *> *)items {
+    self.cyl_isCustomizingItems = YES;
+    [self cyl_setInsertedViewsHiddenForCustomizing:YES];
+    [super beginCustomizingItems:items];
+}
+
+- (BOOL)endCustomizingAnimated:(BOOL)animated {
+    BOOL changed = [super endCustomizingAnimated:animated];
+    self.cyl_isCustomizingItems = NO;
+    [self cyl_setInsertedViewsHiddenForCustomizing:NO];
+    [self setNeedsLayout];
+    // [EN] Again after UIKit's end-of-editing pass, which can rebuild the buttons. [CN] UIKit 结束编辑的处理可能重建按钮，之后再布局一次。
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf setNeedsLayout];
+    });
+    return changed;
+}
+
+/// [EN] Hides (YES) or restores (NO) the plus button and every inserted view inside this tab bar, in one pass.
+/// [CN] 一次性隐藏（YES）或恢复（NO）PlusButton 与本 TabBar 中所有被插入的视图。
+- (void)cyl_setInsertedViewsHiddenForCustomizing:(BOOL)hidden {
+    NSMutableArray<UIView *> *views = [NSMutableArray array];
+    for (UIView *view in [UIView cyl_insertedTabControlViews]) {
+        if ([view isDescendantOfView:self]) {
+            [views addObject:view];
+        }
+    }
+    UIView *plusButton = [CYLPlusButton plusButtonForOwner:self];
+    if ([plusButton isDescendantOfView:self]) {
+        [views addObject:plusButton];
+    }
+    for (UIView *view in views) {
+        if (hidden) {
+            if (!objc_getAssociatedObject(view, CYLHiddenBeforeCustomizingKey)) {
+                objc_setAssociatedObject(view, CYLHiddenBeforeCustomizingKey, @(view.hidden), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
+            view.hidden = YES;
+        } else {
+            NSNumber *hiddenBefore = objc_getAssociatedObject(view, CYLHiddenBeforeCustomizingKey);
+            if (hiddenBefore != nil) {
+                view.hidden = hiddenBefore.boolValue;
+                objc_setAssociatedObject(view, CYLHiddenBeforeCustomizingKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
+        }
+    }
+}
+
+#pragma mark - Item positioning (centered, item width, item spacing)
+
+/*!
+ * [EN] The classic tab bar lays its tab buttons out itself when there is a plus button, which used to fill the whole width
+ *      and ignore `itemPositioning`, `itemWidth` and `itemSpacing`. They are read as UIKit reads them: the
+ *      `standardAppearance` values (iOS 13+) when set, otherwise the tab bar's own properties.
+ * [CN] 有 PlusButton 时，经典 TabBar 自行布局 Tab 按钮，以前总是铺满整个宽度，忽略了 `itemPositioning`、`itemWidth`、`itemSpacing`。
+ *      这里按 UIKit 的方式读取：设置了 `standardAppearance` 中的值（iOS 13+）时使用它们，否则使用 TabBar 自身的属性。
+ */
+- (void)cyl_getItemPositioning:(UITabBarItemPositioning *)positioning itemWidth:(CGFloat *)itemWidth itemSpacing:(CGFloat *)itemSpacing {
+    UITabBarItemPositioning resolvedPositioning = self.itemPositioning;
+    CGFloat resolvedWidth = self.itemWidth;
+    CGFloat resolvedSpacing = self.itemSpacing;
+    if (@available(iOS 13.0, *)) {
+        UITabBarAppearance *appearance = self.standardAppearance;
+        if (appearance.stackedItemPositioning != UITabBarItemPositioningAutomatic) {
+            resolvedPositioning = appearance.stackedItemPositioning;
+        }
+        if (appearance.stackedItemWidth > 0) {
+            resolvedWidth = appearance.stackedItemWidth;
+        }
+        if (appearance.stackedItemSpacing > 0) {
+            resolvedSpacing = appearance.stackedItemSpacing;
+        }
+    }
+    // [EN] UIKit centers Automatic tabs in a regular horizontal size class (e.g. iPad): read it the same way, so a spacing
+    //      alone keeps UIKit's centered layout there instead of filling with gaps.
+    // [CN] UIKit 在 regular 水平尺寸类别（如 iPad）下把 Automatic 的 Tab 居中：这里按同样方式读取，因此只设置间距时，
+    //      在那里仍保持 UIKit 的居中布局，而不是铺满加间隙。
+    if (resolvedPositioning == UITabBarItemPositioningAutomatic &&
+        self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClassRegular) {
+        resolvedPositioning = UITabBarItemPositioningCentered;
+    }
+    *positioning = resolvedPositioning;
+    *itemWidth = resolvedWidth;
+    *itemSpacing = resolvedSpacing;
+}
+
+/*!
+ * [EN] The horizontal layout of `count` tab buttons plus, when `plusWidth` > 0, one plus button slot: the x of the first
+ *      slot (`leading`), the width of a tab slot and the gap between slots. Without centered positioning, an item width or
+ *      an item spacing it is the previous layout: leading 0, no gap, the tabs sharing the width left by the plus button.
+ *      Centered: the slots keep `itemWidth` (the shared width when 0) and `itemSpacing`, centered as a group; when they do
+ *      not fit, the previous layout is used.
+ * [CN] `count` 个 Tab 按钮（`plusWidth` > 0 时再加一个 PlusButton 位置）的横向布局：第一个位置的 x（`leading`）、Tab 位置的宽度、
+ *      位置之间的间距。未设置居中、item 宽度或间距时与以前的布局相同：leading 为 0、无间距，各 Tab 平分 PlusButton 之外的宽度。
+ *      居中时：各位置使用 `itemWidth`（为 0 时使用平分宽度）与 `itemSpacing`，整体居中；放不下时使用以前的布局。
+ */
+- (void)cyl_getItemLayoutForTabCount:(NSUInteger)count
+                           plusWidth:(CGFloat)plusWidth
+                             leading:(CGFloat *)leading
+                           itemWidth:(CGFloat *)itemWidth
+                             spacing:(CGFloat *)spacing {
+    UIEdgeInsets edgeInsets = self.cyl_itemEdgeInsets;
+    CGFloat availableWidth = MAX(0, self.cyl_boundsSize.width - edgeInsets.left - edgeInsets.right);
+    CGFloat fillWidth = count > 0 ? (availableWidth - plusWidth) / count : 0;
+    *leading = edgeInsets.left;
+    *itemWidth = fillWidth;
+    *spacing = 0;
+    UITabBarItemPositioning positioning = UITabBarItemPositioningAutomatic;
+    CGFloat customWidth = 0;
+    CGFloat customSpacing = 0;
+    [self cyl_getItemPositioning:&positioning itemWidth:&customWidth itemSpacing:&customSpacing];
+    if (count == 0) {
+        return;
+    }
+    NSUInteger slotCount = count + (plusWidth > 0 ? 1 : 0);
+    BOOL centered = (positioning == UITabBarItemPositioningCentered) || customWidth > 0;
+    if (!centered) {
+        // [EN] A spacing alone fills the width with gaps between the slots; the tab bar shows through them, e.g. as
+        //      separators between tabs that have a background color.
+        // [CN] 只设置间距时，各位置铺满宽度且之间留有间隙；TabBar 的背景透过间隙显示，例如作为有背景色的 Tab 之间的分隔线。
+        CGFloat gappedWidth = (availableWidth - plusWidth - customSpacing * (CGFloat)(slotCount - 1)) / count;
+        if (customSpacing > 0 && gappedWidth > 0) {
+            *itemWidth = gappedWidth;
+            *spacing = customSpacing;
+        }
+        return;
+    }
+    CGFloat width = customWidth > 0 ? customWidth : fillWidth;
+    CGFloat totalWidth = width * count + plusWidth + customSpacing * (CGFloat)(slotCount - 1);
+    if (totalWidth > availableWidth + 0.5) {
+        return;
+    }
+    *leading = edgeInsets.left + (availableWidth - totalWidth) * 0.5;
+    *itemWidth = width;
+    *spacing = customSpacing;
+}
+
+- (void)setCyl_itemEdgeInsets:(UIEdgeInsets)itemEdgeInsets {
+    if (UIEdgeInsetsEqualToEdgeInsets(_cyl_itemEdgeInsets, itemEdgeInsets)) {
+        return;
+    }
+    _cyl_itemEdgeInsets = itemEdgeInsets;
+    [self setNeedsLayout];
+}
+
+/*!
+ * [EN] Without a plus button UIKit lays the tab buttons out (and honors centered positioning itself). With
+ *      `cyl_itemEdgeInsets` they are laid out here instead, between the insets, the same way as with a plus button.
+ * [CN] 没有 PlusButton 时由 UIKit 布局 Tab 按钮（居中排列也由 UIKit 处理）。设置了 `cyl_itemEdgeInsets` 时改为在这里布局，
+ *      排列在两端空白之间，与有 PlusButton 时的方式相同。
+ */
+- (void)cyl_layoutTabButtonsWithItemEdgeInsetsIfNeeded {
+    UIEdgeInsets edgeInsets = self.cyl_itemEdgeInsets;
+    UITabBarItemPositioning positioning = UITabBarItemPositioningAutomatic;
+    CGFloat customWidth = 0;
+    CGFloat customSpacing = 0;
+    [self cyl_getItemPositioning:&positioning itemWidth:&customWidth itemSpacing:&customSpacing];
+    // [EN] UIKit does not leave gaps between filled tabs, so a fill with spacing is laid out here too.
+    // [CN] UIKit 铺满时不会在 Tab 之间留间隙，因此铺满加间距时同样在这里布局。
+    BOOL fillsWithSpacing = customSpacing > 0 && customWidth == 0 && positioning != UITabBarItemPositioningCentered;
+    if (((edgeInsets.left == 0 && edgeInsets.right == 0) && !fillsWithSpacing) || [CYLConstants isLiquidGlassActive]) {
+        return;
+    }
+    NSArray<UIControl *> *tabButtons = self.tabBarButtonArray;
+    CGFloat leading = 0, itemWidth = 0, spacing = 0;
+    [self cyl_getItemLayoutForTabCount:tabButtons.count plusWidth:0 leading:&leading itemWidth:&itemWidth spacing:&spacing];
+    [tabButtons enumerateObjectsUsingBlock:^(UIControl * _Nonnull tabButton, NSUInteger index, BOOL * _Nonnull stop) {
+        [self changeXForChildView:tabButton
+                       childViewX:leading + index * (itemWidth + spacing)
+                  tabBarItemWidth:itemWidth
+                            index:index];
+    }];
 }
 
 - (void)cyl_layoutTabBarSubviews {
@@ -343,9 +757,8 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
             }
         }
     }
-    CGFloat tabBarWidth = self.cyl_boundsSize.width;
-    
     if (!self.plusButtonActive) {
+        [self cyl_layoutTabButtonsWithItemEdgeInsetsIfNeeded];
         if (self.didLayoutSubViewsBlock) {
             self.didLayoutSubViewsBlock(self);
         }
@@ -354,11 +767,13 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
     
     BOOL addedToTabBar = [_plusButton.superview isEqual:self];
     if (!addedToTabBar && self.hasPlusButton) {
-        [self cyl_setTabBarItemWidth:(tabBarWidth) / self.cyl_tabbarItemsCount];
+        CGFloat leading = 0, itemWidth = 0, spacing = 0;
+        [self cyl_getItemLayoutForTabCount:self.cyl_tabbarItemsCount plusWidth:0 leading:&leading itemWidth:&itemWidth spacing:&spacing];
+        [self cyl_setTabBarItemWidth:itemWidth];
         [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIControl * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
             // [CN] 仅修改childView的x和宽度,yh值不变
             // [EN] Only change childView's x and width; the y and height values stay the same
-            CGFloat childViewX = buttonIndex * self.cyl_tabBarItemWidth;
+            CGFloat childViewX = leading + buttonIndex * (self.cyl_tabBarItemWidth + spacing);
             [self changeXForChildView:childView
                            childViewX:childViewX
                       tabBarItemWidth:self.cyl_tabBarItemWidth
@@ -370,11 +785,24 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
         }
         return;
     }
-    [self cyl_setTabBarItemWidth:(tabBarWidth - self.cyl_plusButtonWidth) / self.cyl_tabbarItemsCount];
+    CGFloat itemLeading = 0, layoutItemWidth = 0, itemSpacing = 0;
+    [self cyl_getItemLayoutForTabCount:self.cyl_tabbarItemsCount plusWidth:self.cyl_plusButtonWidth
+                               leading:&itemLeading itemWidth:&layoutItemWidth spacing:&itemSpacing];
+    self.cyl_itemLayoutLeading = itemLeading;
+    self.cyl_itemLayoutSpacing = itemSpacing;
+    [self cyl_setTabBarItemWidth:layoutItemWidth];
    // [CN] plusButtonIndex内部调整 PlusButton 的中心坐标，不能直接修改 center，否则会造成点击动画时的闪动bug，需要借助坐标系转换。
    // [EN] plusButtonIndex adjusts the PlusButton's center internally. Do not modify center directly, otherwise the
    //      button flickers during the tap animation; use a coordinate-space conversion instead.
     NSUInteger plusButtonIndex = [self plusButtonIndex];
+    // [EN] FIX: placeholder count mismatch — whether the plus button's slot is one of the tab buttons, read from
+    //      `viewControllers`, not from `cyl_hasPlusChildViewController`: on Liquid Glass a plus button without a child view
+    //      controller has a placeholder slot too, and every tab button after it got `cyl_tabBarItemVisibleIndex` + 1
+    //      (`-[CYLTabBar cyl_selectedIndex]` returned the next tab's index).
+    // [CN] FIX：占位导致的数量不匹配——PlusButton 的 slot 是否是 Tab 按钮之一，从 `viewControllers` 读取，而不是用
+    //      `cyl_hasPlusChildViewController`：液态玻璃下没有子控制器的 PlusButton 同样有占位 slot，以前它之后的每个 Tab 按钮的
+    //      `cyl_tabBarItemVisibleIndex` 都多 1（`-[CYLTabBar cyl_selectedIndex]` 返回下一个 Tab 的下标）。
+    BOOL isPlusSlotAmongTabButtons = ([self cyl_plusButtonViewControllerIndexWithFallback:NSNotFound] != NSNotFound);
     [self.tabBarButtonArray enumerateObjectsUsingBlock:^(UIControl * _Nonnull childView, NSUInteger buttonIndex, BOOL * _Nonnull stop) {
         // [CN] 调整UITabBarItem的位置
         // [EN] Adjust the position of the UITabBarItem
@@ -382,7 +810,7 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
         CGFloat visiableTabIndex = buttonIndex;
         CGFloat tabBarItemWidth = self.cyl_tabBarItemWidth;
         
-        if ([self cyl_hasPlusChildViewController]) {
+        if (isPlusSlotAmongTabButtons) {
             if (buttonIndex <= plusButtonIndex) {
                 childViewX = buttonIndex * self.cyl_tabBarItemWidth;
             } else {
@@ -400,6 +828,10 @@ static void *const CYLTabBarItemTitleContext = (void*)&CYLTabBarItemTitleContext
             }
         }
         
+        // [EN] Centered positioning, item spacing (see `-cyl_getItemLayoutForTabCount:…`): 0 by default.
+        // [CN] 居中与间距（见 `-cyl_getItemLayoutForTabCount:…`）：默认均为 0。
+        NSUInteger slotIndex = isPlusSlotAmongTabButtons ? buttonIndex : (NSUInteger)visiableTabIndex;
+        childViewX += self.cyl_itemLayoutLeading + slotIndex * self.cyl_itemLayoutSpacing;
         [childView cyl_setTabBarChildViewControllerIndex:buttonIndex];
         UIControl *selectedContentControl = [self cyl_selectedContentControlFromContentControl:childView];
         
@@ -525,6 +957,19 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         }
         return;
     }
+    if (context == CYLTabBarItemBadgeValueContext) {
+        // [EN] A badge appeared or changed (not removed): the tab's animation may play its badge-changed animation.
+        // [CN] 角标出现或变化（不是被移除）：该 Tab 的动画可以播放角标变化动画。
+        id oldValue = change[NSKeyValueChangeOldKey];
+        id newValue = change[NSKeyValueChangeNewKey];
+        BOOL hasNewValue = [newValue isKindOfClass:[NSString class]];
+        CYLTabBarController *tabBarController = [self tabBarController];
+        if (hasNewValue && ![oldValue isEqual:newValue] && [object isKindOfClass:[UITabBarItem class]] &&
+            [tabBarController respondsToSelector:@selector(cyl_tabBarItemBadgeValueDidChange:)]) {
+            [tabBarController cyl_tabBarItemBadgeValueDidChange:(UITabBarItem *)object];
+        }
+        return;
+    }
     if (context == CYLTabBarItemTitleContext) {
         id oldTitle = change[NSKeyValueChangeOldKey];
         id newTitle = change[NSKeyValueChangeNewKey];
@@ -585,8 +1030,16 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     }
 }
 
+/*!
+ * FIX: issue #257
+ * [EN] Every assignment sent a KVO notification, and `CYLTabBarController` then wrote `imageInsets` and
+ *      `titlePositionAdjustment` into every tab bar item again, which lays the tab bar out again. Notify only when the
+ *      value really changes.
+ * [CN] 以前每次赋值都会发出 KVO 通知，`CYLTabBarController` 随即重新写入所有 TabBarItem 的 `imageInsets` 和
+ *      `titlePositionAdjustment`，这又会导致 TabBar 重新布局。现在只在值真正改变时才通知。
+ */
 - (void)setTabImageViewDefaultOffset:(CGFloat)tabImageViewDefaultOffset {
-    if (tabImageViewDefaultOffset != 0.f) {
+    if (tabImageViewDefaultOffset != 0.f && tabImageViewDefaultOffset != _tabImageViewDefaultOffset) {
         [self willChangeValueForKey:@"tabImageViewDefaultOffset"];
         _tabImageViewDefaultOffset = tabImageViewDefaultOffset;
         [self didChangeValueForKey:@"tabImageViewDefaultOffset"];
@@ -673,11 +1126,16 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     CGFloat tabBarHeight = self.cyl_boundsSize.height;
     
     if (![CYLConstants isLiquidGlassActive]) {
+        // [EN] FIX: placeholder count mismatch — with a plus child view controller, over its tab (the slot), which
+        //      `-[CYLTabBarController setViewControllers:]` places by the same rule; without one, between the tabs as before.
+        // [CN] FIX：占位导致的数量不匹配——有 PlusButton 子控制器时位于其 Tab（slot）上方，slot 由 `-[CYLTabBarController setViewControllers:]`
+        //      按同一规则放置；没有时与以前一样位于 Tab 之间。
+        plusButtonIndex = [self cyl_plusButtonViewControllerIndexWithFallback:plusButtonIndex];
         CGFloat multiplierOfTabBarHeight = [self multiplierOfTabBarHeight];
         CGFloat constantOfPlusButtonCenterYOffset = [self constantOfPlusButtonCenterYOffsetForTabBarHeight:tabBarHeight];
         _plusButton.center = CGPointMake(tabBarWidth * 0.5, tabBarHeight * multiplierOfTabBarHeight + constantOfPlusButtonCenterYOffset);
         
-        CGFloat childViewX = plusButtonIndex * self.cyl_tabBarItemWidth;
+        CGFloat childViewX = self.cyl_itemLayoutLeading + plusButtonIndex * (self.cyl_tabBarItemWidth + self.cyl_itemLayoutSpacing);
         CGFloat tabBarItemWidth = CGRectGetWidth(self.plusButton.frame);
         [self changeXForChildView:self.plusButton
                        childViewX:childViewX
@@ -875,6 +1333,8 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     for (UITabBarItem *item in items) {
         [item addObserver:self forKeyPath:@"title" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew)
                   context:CYLTabBarItemTitleContext];
+        [item addObserver:self forKeyPath:@"badgeValue" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew)
+                  context:CYLTabBarItemBadgeValueContext];
     }
     self.cyl_titleObservedItems = items;
 }
@@ -882,6 +1342,7 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 - (void)cyl_stopObservingItemTitles {
     for (UITabBarItem *item in _cyl_titleObservedItems) {
         [item removeObserver:self forKeyPath:@"title" context:CYLTabBarItemTitleContext];
+        [item removeObserver:self forKeyPath:@"badgeValue" context:CYLTabBarItemBadgeValueContext];
     }
     _cyl_titleObservedItems = nil;
 }
@@ -1011,8 +1472,27 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     return (CGRectGetMinY(frame) + contentMaxY) * 0.5;
 }
 
+/*!
+ * FIX: issue #257, issue #522
+ * [EN] Measures, once, how far the image of an image-only tab (a tab button without a title label) has to move to be
+ *      vertically centered; `CYLTabBarController` observes the result and moves the images of its image-only tabs.
+ *      - The guard was `> 0`: a negative offset (an image below the center) was measured again on every layout pass
+ *        (any layout of the screen, e.g. after setting a label's text on a page), each time from the image that the
+ *        previous offset had already moved, so the icons jumped and the items were written again and again.
+ *        Any non-zero offset now ends the measurement.
+ *      - Nothing is measured when `CYLTabBarController.automaticallyAdjustsImageOnlyTabs` is NO.
+ * [CN] 只测量一次纯图标 Tab（没有标题 label 的 Tab 按钮）的图片需要移动多少才能垂直居中；`CYLTabBarController` 监听该结果，
+ *      并移动其纯图标 Tab 的图片。
+ *      - 以前的判断是 `> 0`：偏移为负（图片低于中心）时，每次布局（屏幕上任何布局，例如在页面上给 label 赋值后）都会重新测量，
+ *        且每次都基于已被上次偏移移动过的图片，于是图标跳动，item 被反复写入。现在任何非零偏移都会结束测量。
+ *      - `CYLTabBarController.automaticallyAdjustsImageOnlyTabs` 为 NO 时不做测量。
+ */
 - (void)setupTabImageViewDefaultOffset:(UIView *)tabBarButton {
-    if (self.tabImageViewDefaultOffset > 0) {
+    if (self.tabImageViewDefaultOffset != 0.f) {
+        return;
+    }
+    CYLTabBarController *tabBarController = self.tabBarController;
+    if ([tabBarController isKindOfClass:[CYLTabBarController class]] && !tabBarController.automaticallyAdjustsImageOnlyTabs) {
         return;
     }
     __block BOOL shouldCustomizeImageView = YES;
@@ -1260,6 +1740,15 @@ UISearchTab 会从 TabBar 分离出来单独显示。
  *      这里把这类 portal 视图移到该分支下方。
  */
 - (void)cyl_liquidGlassGestureRecognizerDidUpdate:(UIGestureRecognizer *)gestureRecognizer {
+    // [EN] FIX: issue #152 / #535 — in Liquid Glass these UIKit gestures receive every touch on the tab buttons, and a
+    //      gesture added by the library does not: the long press, Reselect and DoubleTap are recognized from them.
+    //      Every state is forwarded, before the checks below.
+    // [CN] FIX: issue #152 / #535 — 液态玻璃下，Tab 按钮上的每次触摸都由这些系统手势接收，库自己添加的手势收不到：长按、Reselect
+    //      与 DoubleTap 由它们识别。所有状态都转发，且在下方的判断之前。
+    CYLTabBarController *owningTabBarController = [self tabBarController];
+    if ([owningTabBarController respondsToSelector:@selector(cyl_liquidGlassTabBarGestureRecognizerDidUpdate:)]) {
+        [owningTabBarController cyl_liquidGlassTabBarGestureRecognizerDidUpdate:gestureRecognizer];
+    }
     if (gestureRecognizer.state != UIGestureRecognizerStateBegan && gestureRecognizer.state != UIGestureRecognizerStateChanged) {
         return;
     }
@@ -1406,3 +1895,88 @@ UISearchTab 会从 TabBar 分离出来单独显示。
 
 @end
 
+#pragma mark - Background, shadow and blur
+
+@implementation UITabBar (CYLBarBackground)
+
+- (nullable UIView *)cyl_backgroundView {
+    return [self cyl_valueForKey:@"_backgroundView"];
+}
+
+- (nullable UIImageView *)cyl_shadowImageView {
+    return self.cyl_tabShadowImageView;
+}
+
+- (nullable NSArray<UIVisualEffectView *> *)cyl_effectViews {
+    NSMutableArray<UIVisualEffectView *> *effectViews = [NSMutableArray array];
+    for (UIView *subview in self.cyl_backgroundView.subviews) {
+        // [EN] Exactly UIVisualEffectView: the shadow is drawn by a subclass. [CN] 必须恰好是 UIVisualEffectView：阴影由其子类绘制。
+        if ([subview isMemberOfClass:[UIVisualEffectView class]]) {
+            [effectViews addObject:(UIVisualEffectView *)subview];
+        }
+    }
+    return effectViews.count > 0 ? [effectViews copy] : nil;
+}
+
+- (nullable UIVisualEffectView *)cyl_effectView {
+    UIVisualEffectView *visibleEffectView = nil;
+    for (UIVisualEffectView *effectView in self.cyl_effectViews) {
+        if (!effectView.hidden && effectView.alpha > 0.01) {
+            visibleEffectView = effectView;
+        }
+    }
+    return visibleEffectView;
+}
+
+/// [EN] Writes into `standardAppearance` and `scrollEdgeAppearance` (when there is one). [CN] 写入 `standardAppearance` 与 `scrollEdgeAppearance`（存在时）。
+- (void)cyl_updateAppearancesWithBlock:(void (^)(UITabBarAppearance *appearance))block API_AVAILABLE(ios(13.0)) {
+    UITabBarAppearance *standardAppearance = [self.standardAppearance copy];
+    block(standardAppearance);
+    self.standardAppearance = standardAppearance;
+    if (@available(iOS 15.0, *)) {
+        if (self.scrollEdgeAppearance) {
+            UITabBarAppearance *scrollEdgeAppearance = [self.scrollEdgeAppearance copy];
+            block(scrollEdgeAppearance);
+            self.scrollEdgeAppearance = scrollEdgeAppearance;
+        }
+    }
+}
+
+- (nullable UIBlurEffect *)cyl_backgroundEffect {
+    if (@available(iOS 13.0, *)) {
+        return self.standardAppearance.backgroundEffect;
+    }
+    UIVisualEffect *effect = self.cyl_effectView.effect;
+    return [effect isKindOfClass:[UIBlurEffect class]] ? (UIBlurEffect *)effect : nil;
+}
+
+- (void)cyl_setBackgroundEffect:(nullable UIBlurEffect *)backgroundEffect {
+    if (@available(iOS 13.0, *)) {
+        [self cyl_updateAppearancesWithBlock:^(UITabBarAppearance *appearance) {
+            appearance.backgroundEffect = backgroundEffect;
+        }];
+        return;
+    }
+    for (UIVisualEffectView *effectView in self.cyl_effectViews) {
+        effectView.effect = backgroundEffect;
+    }
+}
+
+- (nullable UIColor *)cyl_effectForegroundColor {
+    if (@available(iOS 13.0, *)) {
+        return self.standardAppearance.backgroundColor;
+    }
+    return self.barTintColor;
+}
+
+- (void)cyl_setEffectForegroundColor:(nullable UIColor *)effectForegroundColor {
+    if (@available(iOS 13.0, *)) {
+        [self cyl_updateAppearancesWithBlock:^(UITabBarAppearance *appearance) {
+            appearance.backgroundColor = effectForegroundColor;
+        }];
+        return;
+    }
+    self.barTintColor = effectForegroundColor;
+}
+
+@end
