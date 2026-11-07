@@ -26,6 +26,10 @@
 #define kActualView ((UIView *)[self cyl_getActualBadgeSuperView])
 #define CYL_ACTUAL_BARBUTTON kActualView
 
+/// [EN] Above 0 while `-cyl_performOnBadgeLayers:` runs (UIKit, so the main thread only).
+/// [CN] `-cyl_performOnBadgeLayers:` 执行期间大于 0（UIKit，只在主线程）。
+static NSInteger CYLBadgeLayerPerformDepth = 0;
+
 @interface UIView (CYLBadgeAnchorLayout)
 - (void)cyl_layoutBadgeAtTopRightCorner;
 @end
@@ -149,11 +153,23 @@
  *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
  */
 - (void)cyl_showBadge {
-    [CYL_ACTUAL_BARBUTTON cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeNone];
+    [self cyl_showBadgeValue:@"" animationTypeValue:@(CYLBadgeAnimationTypeNone)];
 }
 
 - (void)cyl_showBadgeValue:(NSString *)value animationType:(CYLBadgeAnimationType)animationType {
-    [CYL_ACTUAL_BARBUTTON cyl_showBadgeValue:value animationType:animationType];
+    [self cyl_showBadgeValue:value animationTypeValue:@(animationType)];
+}
+
+- (void)cyl_showBadgeValue:(NSString *)value animationTypeValue:(NSNumber *)animationTypeValue {
+    if (CYLBadgeLayerPerformDepth == 0) {
+        [self cyl_performSelector:_cmd withObject:value withObject:animationTypeValue];
+        return;
+    }
+    [self cyl_showBadgeValueInThisLayer:value animationTypeValue:animationTypeValue];
+}
+
+- (void)cyl_showBadgeValueInThisLayer:(NSString *)value animationTypeValue:(NSNumber *)animationTypeValue {
+    [CYL_ACTUAL_BARBUTTON cyl_showBadgeValue:value animationType:(CYLBadgeAnimationType)animationTypeValue.integerValue];
 }
 
 - (BOOL)cyl_isShowBadge {
@@ -168,14 +184,26 @@
  *  clear badge
  */
 - (void)cyl_clearBadge {
+    if (CYLBadgeLayerPerformDepth == 0) {
+        [self cyl_performSelector:_cmd];
+        return;
+    }
     [CYL_ACTUAL_BARBUTTON cyl_clearBadge];
 }
 
 - (void)cyl_resumeBadge {
+    if (CYLBadgeLayerPerformDepth == 0) {
+        [self cyl_performSelector:_cmd];
+        return;
+    }
     [CYL_ACTUAL_BARBUTTON cyl_resumeBadge];
 }
 
 - (void)cyl_refreshBadge {
+    if (CYLBadgeLayerPerformDepth == 0) {
+        [self cyl_performSelector:_cmd];
+        return;
+    }
     [CYL_ACTUAL_BARBUTTON cyl_refreshBadge];
 }
 
@@ -421,38 +449,48 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 
 - (void)cyl_performSelector:(SEL)aSelector withObject:(nullable id)object1 withObject:(nullable id)object2 {
     if (aSelector == NULL) { return; }
-    UIControl *normalControl = nil;
-    UIControl *selectedControl = nil;
-    if (![self isKindOfClass:[UIControl class]] || ![CYLUtils isLiquidGlassActive]) {
+    [self cyl_performOnBadgeLayers:^(UIControl *control) {
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
         (
-         [self performSelector:aSelector withObject:object1 withObject:object2];
+         [control performSelector:aSelector withObject:object1 withObject:object2];
          )
+    }];
+}
+
+/*!
+ * FIX: issue #779
+ * [EN] The controls that draw this tab, one per layer: on Liquid Glass, the control in the normal layer and the one in the
+ *      selected layer, which is seen through the glass. A badge in only one of them was covered by the glass.
+ * [CN] 绘制该 Tab 的控件，每个图层一个：液态玻璃下是普通图层与选中图层（透过玻璃看到）中的控件。只在其中一个上显示角标时，角标会被玻璃遮挡。
+ */
+- (NSArray<UIControl *> *)cyl_badgeLayerControls {
+    if (![CYLUtils isLiquidGlassActive]) {
+        return @[ self ];
+    }
+    UIControl *counterpart = [self cyl_isPlatterSelectedControl] ? self.cyl_platterNormalControl : self.cyl_platterSelectedControl;
+    return (counterpart && counterpart != self) ? @[ self, counterpart ] : @[ self ];
+}
+
+/*!
+ * FIX: issue #779
+ * [EN] Runs `block` once per layer. Inside it, a badge method called on a control acts on that control only, so
+ *      `-[UIViewController cyl_showBadgeValue:animationType:]`, `-[UITabBarItem ...]` and a direct call on a tab button or a
+ *      plus button all reach both layers exactly once.
+ * [CN] 每个图层执行一次 `block`。在其中对控件调用角标方法时只作用于该控件，因此通过 UIViewController、UITabBarItem，或直接对 Tab 按钮、
+ *      PlusButton 调用，都恰好作用于两个图层各一次。
+ */
+- (void)cyl_performOnBadgeLayers:(void (NS_NOESCAPE ^)(UIControl *control))block {
+    if (CYLBadgeLayerPerformDepth > 0) {
+        block(self);
         return;
     }
-    if ([self cyl_isPlatterSelectedControl]) {
-        selectedControl = self;
-    } else {
-        normalControl = self;
+    CYLBadgeLayerPerformDepth++;
+    for (UIControl *control in [self cyl_badgeLayerControls]) {
+        block(control);
     }
-    CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-    (
-     if (normalControl) {
-         [normalControl performSelector:aSelector withObject:object1 withObject:object2];
-         UIControl *counterpart = normalControl.cyl_platterSelectedControl;
-         if (counterpart) {
-             [counterpart performSelector:aSelector withObject:object1 withObject:object2];
-         }
-     } else if (selectedControl) {
-         [selectedControl performSelector:aSelector withObject:object1 withObject:object2];
-         UIControl *counterpart = selectedControl.cyl_platterNormalControl;
-         if (counterpart) {
-             [counterpart performSelector:aSelector withObject:object1 withObject:object2];
-         }
-     }
-     );
+    CYLBadgeLayerPerformDepth--;
 }
- 
+
 - (BOOL)cyl_isReady {
     if (![CYLUtils isLiquidGlassActive]) {
         return YES;
@@ -482,6 +520,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadge:(UIView<CYLBadgeTextDisplaying> *)label {
+    // [EN] One view cannot be in two layers. [CN] 一个视图不能同时位于两个图层。
     [CYL_ACTUAL_BARBUTTON cyl_setBadge:label];
 }
 
@@ -490,7 +529,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeFont:(UIFont *)badgeFont {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeFont:badgeFont];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeFont:badgeFont]; }];
 }
 
 - (UIColor *)cyl_badgeBackgroundColor {
@@ -498,7 +537,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeBackgroundColor:(UIColor *)badgeBackgroundColor {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeBackgroundColor:badgeBackgroundColor];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeBackgroundColor:badgeBackgroundColor]; }];
 }
 
 - (UIColor *)cyl_badgeTextColor {
@@ -506,7 +545,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeTextColor:(UIColor *)badgeTextColor {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeTextColor:badgeTextColor];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeTextColor:badgeTextColor]; }];
 }
 
 - (CYLBadgeAnimationType)cyl_badgeAnimationType {
@@ -514,7 +553,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeAnimationType:(CYLBadgeAnimationType)animationType {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeAnimationType:animationType];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeAnimationType:animationType]; }];
 }
 
 // The badge lives on the actual badge super view (tab image / Lottie view), like the properties above.
@@ -523,7 +562,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeBorderColor:(UIColor *)badgeBorderColor {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeBorderColor:badgeBorderColor];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeBorderColor:badgeBorderColor]; }];
 }
 
 - (CGFloat)cyl_badgeBorderWidth {
@@ -531,7 +570,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeBorderWidth:(CGFloat)badgeBorderWidth {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeBorderWidth:badgeBorderWidth];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeBorderWidth:badgeBorderWidth]; }];
 }
 
 - (BOOL)cyl_badgeRespectsReduceMotion {
@@ -539,7 +578,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeRespectsReduceMotion:(BOOL)badgeRespectsReduceMotion {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeRespectsReduceMotion:badgeRespectsReduceMotion];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeRespectsReduceMotion:badgeRespectsReduceMotion]; }];
 }
 
 - (CGRect)cyl_badgeFrame {
@@ -547,7 +586,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeFrame:(CGRect)badgeFrame {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeFrame:badgeFrame];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeFrame:badgeFrame]; }];
 }
 
 - (void)cyl_setBadgeFrameValue:(NSValue *)cyl_badgeFrameValue {
@@ -560,7 +599,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeCenterOffset:(CGPoint)badgeCenterOffset {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeCenterOffset:badgeCenterOffset];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeCenterOffset:badgeCenterOffset]; }];
 }
 
 - (void)cyl_setBadgeCenterOffsetValue:(NSValue *)badgeCenterOffsetValue {
@@ -573,7 +612,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeMaximumBadgeNumber:(NSInteger)badgeMaximumBadgeNumber {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeMaximumBadgeNumber:badgeMaximumBadgeNumber];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeMaximumBadgeNumber:badgeMaximumBadgeNumber]; }];
 }
 
 - (void)cyl_setBadgeMaximumBadgeNumberValue:(NSNumber *)cyl_badgeMaximumBadgeNumberValue {
@@ -586,7 +625,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeMargin:(CGFloat)badgeMargin {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeMargin:badgeMargin];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeMargin:badgeMargin]; }];
 }
 
 - (void)cyl_setBadgeMarginValue:(NSNumber *)cyl_badgeMarginValue {
@@ -599,7 +638,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeRadius:(CGFloat)badgeRadius {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeRadius:badgeRadius];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeRadius:badgeRadius]; }];
 }
 
 - (void)cyl_setBadgeRadiusValue:(NSNumber *)cyl_badgeRadiusValue {
@@ -612,7 +651,7 @@ static UIImage *CYLBadgeImageFillingView(UIView *view) {
 }
 
 - (void)cyl_setBadgeCornerRadius:(CGFloat)cyl_badgeCornerRadius {
-    [CYL_ACTUAL_BARBUTTON cyl_setBadgeCornerRadius:cyl_badgeCornerRadius];
+    [self cyl_performOnBadgeLayers:^(UIControl *control) { [(UIView *)[control cyl_getActualBadgeSuperView] cyl_setBadgeCornerRadius:cyl_badgeCornerRadius]; }];
 }
 
 - (void)cyl_setBadgeCornerRadiusValue:(NSNumber *)cyl_badgeCornerRadiusValue {
