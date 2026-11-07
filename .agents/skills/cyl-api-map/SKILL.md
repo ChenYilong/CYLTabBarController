@@ -54,6 +54,7 @@ Read the document for the feature before using its API. The public API is in the
 | Animation subspec, adding a library | [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md) |
 | PAG | [PAG-Animation](../../../docs/PAG-Animation.md) |
 | Rive | [Rive-Animation](../../../docs/Rive-Animation.md) |
+| GIF: looping image or play once | [GIF-Animation](../../../docs/GIF-Animation.md) |
 | Mixing animated and static tabs | [Per-Tab-Animation](../../../docs/Per-Tab-Animation.md) |
 | Themes | [Theme-Switching](../../../docs/Theme-Switching.md) |
 | Theme evaluation | [Theme-Switching-Evaluation](../../../docs/Theme-Switching-Evaluation.md) |

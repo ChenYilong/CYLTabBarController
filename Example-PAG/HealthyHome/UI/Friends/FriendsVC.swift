@@ -12,7 +12,9 @@ class FriendsVC: ViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = CYLLocalizedString("通讯录")
+        // [EN] Only the navigation bar: `self.title` would also rename the tab, whose title is "Moments".
+        // [CN] 只设置导航栏：`self.title` 还会修改 Tab 的标题，而 Tab 的标题是「朋友圈」。
+        self.navigationItem.title = CYLLocalizedString("通讯录")
         self.view.backgroundColor = .purple
 
     }

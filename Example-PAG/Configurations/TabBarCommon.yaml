@@ -1,4 +1,4 @@
-CYLTabBarControllerStyleType: "liquidGlass"
+CYLTabBarControllerTabBarItemAnimationSpeed: "1.5"
 CYLTabBarControllerTabBarItemsAttributes:
   - CYLTabBarItemTitle: "首页"
     CYLTabBarItemImage: "Home"

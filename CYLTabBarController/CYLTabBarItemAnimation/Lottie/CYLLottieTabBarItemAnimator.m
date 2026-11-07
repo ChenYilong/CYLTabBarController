@@ -30,6 +30,14 @@
 // 仅在引入 Lottie 库时编译；未引入时本文件为空，也不会使用该类。
 #if CYL_LOTTIE_AVAILABLE
 
+// [EN] FIX: issue #605 — first: the generated header below also declares the Swift views of the Rive subspec when both are in the
+//      build (e.g. Rive with FlatDesign, which brings Lottie), and those views adopt this header's protocols.
+// [CN] FIX: issue #605 — 需先引入：两者同时在构建中时（例如 Rive 与会引入 Lottie 的扁平样式），下面生成的头文件也声明了 Rive 子库的 Swift 视图，这些视图遵守本头文件的协议。
+#if __has_include("../CYLTabBarItemAnimationPlayableView.h")
+#import "../CYLTabBarItemAnimationPlayableView.h"
+#else
+#import "CYLTabBarItemAnimationPlayableView.h"
+#endif
 #if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 #import <CYLTabBarController/CYLTabBarController-Swift.h>
 #endif

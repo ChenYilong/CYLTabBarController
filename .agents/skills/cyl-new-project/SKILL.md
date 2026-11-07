@@ -17,6 +17,7 @@ Every new demo in this repository is created with this skill. Source of truth: c
 | Lottie 2.5 (Objective-C) | `pod 'CYLTabBarController/Lottie'` | `Example-Swift-02` | use 15.0 |
 | PAG tab icons | `pod 'CYLTabBarController/PAG'` | `Example-PAG` | use 15.0 |
 | Rive tab icons | `pod 'CYLTabBarController/Rive'` (RiveRuntime ~> 6.29; CocoaPods only) | `Example-Rive`, `Example-SwiftUI-Rive` | subspec 14.0; demos use 15.4 |
+| GIF tab icons that play once | `pod 'CYLTabBarController/GIF'` (no third-party dependency) | `Example-GIF` | use 15.0 |
 | FlatDesign (the classic layout on every system) | `pod 'CYLTabBarController/CYLFlatDesignTabBar'` | `Example-network-download`, the root ObjC demo | subspec 13.0; use 15.0 |
 | Swift Package Manager | package URL or `relativePath = ..` (Core + FlatDesign + Lottie 4.x; no PAG or Rive) | `Example-Swift-SwiftManager-FlatDesign`, `Example-Swift-Gallery`, `Example-Swift-SwiftManager` (iOS 26) | package iOS 13; use 15.0 |
 | Carthage | `github "ChenYilong/CYLTabBarController"` (no Lottie, PAG or Rive) | `Example-Swift-Carthage` | 15.0 |

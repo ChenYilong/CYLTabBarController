@@ -618,6 +618,16 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
             return;
         }
     }
+    // FIX: issue #605
+    // [EN] The page shown by this tap can have changed its tab's title while loading (`self.title = …`). On the classic tab
+    //      bar, UIKit then replaces the tab's button with a new one, so the tapped button has left the tab bar. Go on with
+    //      the new button: laying out the tab bar gives it its animation (`-cyl_bindTabControlActions`), which then plays.
+    // [CN] 这次点击显示的页面可能在加载时修改了 Tab 的标题（`self.title = …`）。在经典 TabBar 上，UIKit 会用新按钮替换该 Tab 的按钮，被点击的按钮
+    //      已离开 TabBar。改用新按钮继续：布局 TabBar 时为它添加动画（`-cyl_bindTabControlActions`），然后播放。
+    if (!control.superview && [control cyl_isTabButton] && ![CYLConstants isLiquidGlassActive]) {
+        control = self.selectedViewController.tabBarItem.cyl_tabButton ?: control;
+        [self.cyl_tabBar layoutIfNeeded];
+    }
     UIViewController *vc = nil;
     [self tabChangedToSelectedViewController:vc control:control];
     [self cyl_setNeedsUpdateSelectedBackgroundColors];
@@ -894,6 +904,32 @@ static void CYLAddTabControlActionOnce(UIControl *control, id target, SEL action
     }
 }
 
+/*!
+ * FIX: issue #605
+ * [EN] Changing a tab item's title (`self.title = …` in a page, or a selected title) makes the classic tab bar replace the
+ *      tab's button with a new one, without the animation view added to the old one, so its static image was shown instead
+ *      for good. A new button of a tab with an animation gets it again: the selected tab's shows its last frame, as a
+ *      selected tab does at launch.
+ * [CN] 修改 tabBarItem 的标题（页面中的 `self.title = …`，或选中标题）会让经典 TabBar 用新按钮替换该 Tab 的按钮，而旧按钮上的动画视图不会带过来，
+ *      于是一直显示静态图片。有动画的 Tab 的新按钮重新添加动画：选中的 Tab 显示最后一帧，与启动时选中的 Tab 相同。
+ */
+- (void)cyl_restoreTabBarItemAnimationIfNeededForTabButton:(UIControl *)tabButton {
+    if (!self.tabBarItemAnimationViewAdded || tabButton.cyl_tabBarItemAnimationView) {
+        return;
+    }
+    UITabBarItem *item = [self cyl_tabBarItemForTabButton:tabButton];
+    NSURL *animationURL = item.cyl_tabBarItemAnimationURL;
+    if (!animationURL) {
+        return;
+    }
+    BOOL isSelected = (item == self.selectedViewController.tabBarItem);
+    [self addLottieImageWithControl:tabButton
+                          lottieURL:animationURL
+                    lottieSizeValue:item.cyl_tabBarItemAnimationSizeValue
+                          animation:isSelected
+                    defaultSelected:isSelected];
+}
+
 - (void)cyl_bindTabControlActions {
     if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]] || [CYLConstants isLiquidGlassActive]) {
         // [CN] 液态玻璃无法添加事件 放进手势响代理里处理。
@@ -955,6 +991,7 @@ static void CYLAddTabControlActionOnce(UIControl *control, id target, SEL action
         // [CN] 按下动画（`CYLTabButtonAnimation` 的 highlight / dehighlight），仅用于 Tab 按钮（PlusButton 自己添加，见
         //      CYLPlusButton.m）。
         if (isTabButton) {
+            [self cyl_restoreTabBarItemAnimationIfNeededForTabButton:control];
             CYLAddTabControlActionOnce(control, self, @selector(cyl_tabButtonTouchDown:), UIControlEventTouchDown);
             CYLAddTabControlActionOnce(control, self, @selector(cyl_tabButtonTouchUp:), UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel);
 

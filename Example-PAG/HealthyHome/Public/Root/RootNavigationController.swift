@@ -13,13 +13,17 @@ class RootNavigationController: CYLBaseNavigationController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // [CN] 背景颜色
-        // [EN] Background color
-        self.navigationBar.barTintColor = .hexColor("3A57ED")
-        // [CN] 标题设置
-        // [EN] Title settings
-        let dict: NSDictionary = [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 15)]
-        self.navigationBar.titleTextAttributes = dict as? [NSAttributedString.Key: AnyObject]
+        // [EN] A blue bar with a white title and white buttons. An appearance, because `barTintColor` does not draw on a Liquid
+        //      Glass navigation bar: the white title and buttons were on a light background there, and could not be read.
+        // [CN] 蓝色导航栏，白色标题与按钮。使用 appearance，因为 `barTintColor` 在液态玻璃导航栏上不绘制：白色的标题和按钮落在浅色背景上，无法看清。
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .hexColor("3A57ED")
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white, .font: UIFont.systemFont(ofSize: 17)]
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.compactAppearance = appearance
+        navigationBar.tintColor = .white
 
     }
     

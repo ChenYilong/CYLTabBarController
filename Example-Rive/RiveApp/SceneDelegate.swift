@@ -18,6 +18,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
         let window = UIWindow(windowScene: windowScene)
         window.rootViewController = Self.makeTabBarController()
+        // [EN] The navigation bar button of the settings list rebuilds the tab bar in the other style.
+        // [CN] 设置列表的导航栏按钮以另一种样式重建 TabBar。
+        CYLDemoTabBarStyle.rebuildRootViewController = { [weak window] in
+            window?.rootViewController = Self.makeTabBarController()
+        }
         window.makeKeyAndVisible()
         self.window = window
     }
@@ -31,7 +36,9 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         RivePlusButton.register()
         let tabs = Tab.allCases.filter { $0 != .timer }
         let tabBarController = RiveTabBarController(viewControllers: tabs.map(\.viewController),
-                                                    tabBarItemsAttributes: tabs.map(\.attributes))
+                                                    tabBarItemsAttributes: tabs.map(\.attributes),
+                                                    styleType: CYLDemoTabBarStyle.styleType,
+                                                    context: nil)
         tabBarController.applyCourseTabBarAppearance()
         return tabBarController
     }

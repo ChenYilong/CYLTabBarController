@@ -58,6 +58,7 @@ pod 'CYLTabBarController'                  # Core only: no animation code / 只�
 pod 'CYLTabBarController/LottieSwift'      # Lottie (lottie-ios 4.x) / Lottie
 pod 'CYLTabBarController/PAG'              # PAG (libpag) / PAG
 pod 'CYLTabBarController/Rive'             # Rive (RiveRuntime) / Rive
+pod 'CYLTabBarController/GIF'              # GIF (ImageIO, no third-party dependency) / GIF，不依赖第三方库
 # Any combination works / 可任意组合:
 pod 'CYLTabBarController/LottieSwift'
 pod 'CYLTabBarController/PAG'

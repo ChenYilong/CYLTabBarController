@@ -103,6 +103,7 @@
 | 4 | 82 / 100 | 配置文件与 46 个模拟意外情况（12） | The configuration file and the 46 simulated failures (12) |
 | 5 | 90 / 100 | 跳转与对比（13）、消息页的行（14） | Jump and compare (13), the message page rows (14) |
 | 6 | 100 / 100 | TabBar 场景展示（17）；Robolectric 测试覆盖每一组 | The Tab Bar Gallery (17); Robolectric tests cover every group |
+| 7 | 100 / 100 | 合并 #752（`4fcded52`，GIF Tab 图标 #605）后重新核对：`Example` 的列表行没有变化；新的 `Example-GIF` 是独立的演示 App（不是列表行），其三种 GIF 用法（GIF key 播放一次、通用 key、作为图片）在 Android 演示中对应 "GIF icon" 行、配置用例 B30 与 `Example-GIF` 导出的配置文件 | Checked again after merging #752 (`4fcded52`, GIF tab icons #605): the `Example` rows did not change; the new `Example-GIF` is a separate demo app (not table rows); its three GIF uses (a GIF key that plays once, the generic key, a GIF as an image) map to the Android demo's "GIF icon" row, configuration case B30 and `Example-GIF`'s exported configuration files |
 
 ## [CN]运行与验证
 ## [EN]Running and checking

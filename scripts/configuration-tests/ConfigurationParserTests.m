@@ -62,6 +62,20 @@ static id CYLNormalized(id value) {
         }
         return out;
     }
+    if ([value isKindOfClass:[NSString class]] && [value length] > 0) {
+        // [EN] A numeric string and a number compare equal: text formats (INI, properties, dotenv, XML) read "1.5" as a
+        //      number, JSON and Protobuf keep a string, and the library reads both (CYLTabBarControllerTabBarItemAnimationSpeed, B28).
+        // [CN] 数字字符串与数字视为相等：文本格式（INI、properties、dotenv、XML）把 "1.5" 读作数字，JSON 与 Protobuf 保留字符串，库两者都能读取
+        //      （CYLTabBarControllerTabBarItemAnimationSpeed，B28）。
+        NSScanner *scanner = [NSScanner scannerWithString:value];
+        double number = 0;
+        if ([scanner scanDouble:&number] && [scanner isAtEnd]) {
+            return [NSNumber numberWithDouble:number];
+        }
+    }
+    if ([value isKindOfClass:[NSNumber class]] && strcmp([value objCType], @encode(BOOL)) != 0 && strcmp([value objCType], "c") != 0) {
+        return [NSNumber numberWithDouble:[value doubleValue]];
+    }
     return value;
 }
 

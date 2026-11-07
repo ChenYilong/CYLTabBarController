@@ -1,3 +1,4 @@
+CYLTabBarControllerTabBarItemAnimationSpeed: "1.5"
 CYLTabBarControllerTabBarItemsAttributes:
   - CYLTabBarItemTitle: "Home"
     CYLTabBarItemImage: "system:house"

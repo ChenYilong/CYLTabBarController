@@ -1,6 +1,6 @@
 # Agent rules for this repository (any tool)
 
-CYLTabBarController is an iOS tab bar library (Objective-C, usable from Swift and SwiftUI) with classic, Liquid Glass and FlatDesign styles, a raised plus button, Lottie, PAG and Rive tab icons, and themes. Read these before touching code:
+CYLTabBarController is an iOS tab bar library (Objective-C, usable from Swift and SwiftUI) with classic, Liquid Glass and FlatDesign styles, a raised plus button, Lottie, PAG, Rive and GIF tab icons, and themes. Read these before touching code:
 
 - `README.md`: usage for app developers. `docs/`: one document per feature, each bound to its classes. Start from the `cyl-api-map` skill.
 - The headers under `CYLTabBarController/` are the public API.
@@ -18,7 +18,7 @@ When code, `docs/` and `README.md` disagree, code wins, then `docs/`. Fix the wr
 | `cyl-new-project` | Creating a new app or demo on this library. **Every new demo must follow it** |
 | `cyl-plus-button` | Writing or changing a plus button: title alignment, stand-in, images, limits |
 | `cyl-xcode-compat` | Touching a `.xcodeproj` or a deployment target; which Xcode or iOS a feature needs |
-| `cyl-tab-animation` | Lottie, PAG or Rive tab icons; suggest running the matching demo first |
+| `cyl-tab-animation` | Lottie, PAG, Rive or GIF tab icons; suggest running the matching demo first |
 | `cyl-theme` | Skins, in-place tab updates |
 | `cyl-api-map` | Finding the API and document for a feature |
 | `cyl-docs` | Adding a feature, editing `README.md` or `docs/` |

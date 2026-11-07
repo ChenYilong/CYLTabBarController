@@ -9,6 +9,35 @@ import CYLTabBarController
 import UIKit
 
 /*!
+ * [EN] The tab bar style of a demo, chosen from the navigation bar: FlatDesign, or the system's (Liquid Glass on iOS 26 and
+ *      later, the classic tab bar before), so the same animated tabs can be compared in all three. A demo gives its tab bar
+ *      `styleType` when it creates it, and sets `rebuildRootViewController` to show the button. The launch argument
+ *      `-CYLDemoTabBarFlatDesign YES` chooses FlatDesign too.
+ * [CN] Demo 的 TabBar 样式，在导航栏中选择：扁平样式，或系统样式（iOS 26 及以后为液态玻璃，之前为经典 TabBar），以便在三种样式下对比相同的动画 Tab。Demo 在
+ *      创建 TabBar 时传入 `styleType`，并设置 `rebuildRootViewController` 以显示按钮。启动参数 `-CYLDemoTabBarFlatDesign YES` 同样选择扁平样式。
+ */
+enum CYLDemoTabBarStyle {
+    private static let defaultsKey = "CYLDemoTabBarFlatDesign"
+    static var rebuildRootViewController: (() -> Void)?
+
+    static var isFlatDesign: Bool {
+        get { UserDefaults.standard.bool(forKey: defaultsKey) }
+        set { UserDefaults.standard.set(newValue, forKey: defaultsKey) }
+    }
+
+    static var styleType: CYLTabBarStyleType {
+        isFlatDesign ? .flatDesign : .default
+    }
+
+    fileprivate static var switchTitle: String {
+        if !isFlatDesign {
+            return "Flat Design"
+        }
+        return CYLConstants.isLiquidGlassActive() ? "Liquid Glass" : "Classic"
+    }
+}
+
+/*!
  * [EN] The ObjC demo's test list in pure Swift: every settings row of the library (language, appearance, in-place tab item
  *      updates, pages and login, the plus button, tab interactions, helpers), grouped like Settings. The rows, their cells
  *      and their actions come from the library (`UIViewController (CYLSettingsSection)`), so this list only lays them out.
@@ -46,6 +75,34 @@ class CYLSettingsDemoTableViewController: UITableViewController {
         // [CN] 换肤行显示当前主题，而选择主题时本列表一直在屏幕上（#216）。
         view.cyl_themeDidChangeBlock = { [weak self] in
             self?.reloadGroups()
+        }
+    }
+
+    override func didMove(toParent parent: UIViewController?) {
+        super.didMove(toParent: parent)
+        addTabBarStyleSwitch()
+    }
+
+    /// [EN] Only in the demos that can rebuild their tab bar in the other style. A list shown inside a page (Example-PAG) adds it
+    ///      to that page's navigation bar, next to the page's own buttons.
+    /// [CN] 仅在能以另一种样式重建 TabBar 的 Demo 中显示。显示在页面内部的列表（Example-PAG）把它添加到该页面的导航栏，排在页面自己的按钮旁边。
+    private func addTabBarStyleSwitch() {
+        guard CYLDemoTabBarStyle.rebuildRootViewController != nil else { return }
+        let host = parent.flatMap { $0 is UINavigationController ? nil : $0 } ?? self
+        let item = UIBarButtonItem(title: CYLDemoTabBarStyle.switchTitle, style: .plain, target: self, action: #selector(switchTabBarStyle))
+        var items = host.navigationItem.rightBarButtonItems ?? []
+        items.removeAll { $0.action == #selector(switchTabBarStyle) }
+        host.navigationItem.rightBarButtonItems = items + [item]
+    }
+
+    @objc private func switchTabBarStyle() {
+        // [EN] Stay on this tab: its list holds the button that switches back. [CN] 停留在当前 Tab：它的列表上有切换回去的按钮。
+        let selectedIndex = tabBarController?.selectedIndex
+        let window = view.window
+        CYLDemoTabBarStyle.isFlatDesign.toggle()
+        CYLDemoTabBarStyle.rebuildRootViewController?()
+        if let selectedIndex = selectedIndex, let rebuilt = window?.rootViewController as? UITabBarController {
+            rebuilt.selectedIndex = selectedIndex
         }
     }
 

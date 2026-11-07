@@ -683,6 +683,64 @@ def view_controller_classes(code):
     return classes, (max(set(navigation), key=navigation.count) if navigation else None)
 
 
+def add_subscript_assignments(code, items, report):
+    """[EN] Keys set after the literals (#605, Example-GIF): Swift / Objective-C `items[1][CYLTabBarGIFFilePath] = value`
+    (a literal, a bundle resource, a file URL), and `CYLTabBarItemAttributesAddingAnimationFile(items[1], "a.gif", nil)`
+    for the generic animation path. Values only known at runtime are reported.
+    [CN] 字面量之后设置的 key（#605，Example-GIF）：Swift / Objective-C 的 `items[1][CYLTabBarGIFFilePath] = value`（字面量、bundle 资源、
+    文件 URL），以及通用动画路径的 `CYLTabBarItemAttributesAddingAnimationFile(items[1], "a.gif", nil)`。只有运行时才知道的值写入报告。"""
+    for m in re.finditer(r'\b\w+\[(\d+)\]\[@?"?(CYL\w+)"?\]\s*=(?!=)\s*([^\n;]+)', code):
+        index, key, expr = int(m.group(1)), m.group(2), m.group(3).strip()
+        if key not in ITEM_KEYS or index >= len(items):
+            continue
+        # [EN] A local constant assigned once (`let size = NSValue(cgSize: ...)`). [CN] 只赋值一次的局部常量。
+        if re.fullmatch(r'\w+', expr):
+            definitions = re.findall(r'(?:\blet|\bvar|\*)\s*' + expr + r'\s*(?::\s*[\w.]+\s*)?=(?!=)\s*([^\n;]+)', code)
+            if len(definitions) == 1:
+                expr = definitions[0].strip()
+        try:
+            items[index][key] = evaluate(expr)
+        except Unresolved:
+            report.append('%s: only known at runtime; left out' % (ASSIGNMENT_FORMAT % (key, short(expr))))
+    for m in re.finditer(r'CYLTabBarItemAttributesAddingAnimationFile\(', code):
+        args = split_top(code[m.end():matching(code, m.end() - 1)])
+        index = re.match(r'\s*\w+\[(\d+)\]\s*$', args[0]) if args else None
+        name = string_value(args[1]) if len(args) > 1 else None
+        if index and name is not None and int(index.group(1)) < len(items):
+            items[int(index.group(1))]['CYLTabBarAnimationFilePath'] = name
+        else:
+            report.append('CYLTabBarItemAttributesAddingAnimationFile: not a literal tab index and file name; skipped')
+
+
+def animation_speed(path, code, report):
+    """[EN] `tabBarItemAnimationSpeed = 1.5` in this file, else in the other sources of the same example when they agree
+    (the speed is often set in the tab bar controller subclass).
+    [CN] 本文件中的 `tabBarItemAnimationSpeed = 1.5`，否则取同一示例其他源文件中一致的值（速度常在 TabBarController 子类中设置）。"""
+    pattern = re.compile(r'tabBarItemAnimationSpeed\s*=(?!=)\s*([0-9.]+)\b')
+    values = pattern.findall(code)
+    origin = None
+    if not values:
+        example = os.path.join(ROOT, os.path.relpath(path, ROOT).split(os.sep)[0])
+        for directory, dirs, files in os.walk(example):
+            dirs[:] = [d for d in dirs if d not in ('Pods', 'Configurations', 'build')]
+            for name in files:
+                if name.endswith(('.m', '.swift')):
+                    found = pattern.findall(strip_comments(open(os.path.join(directory, name), encoding='utf-8').read()))
+                    if found:
+                        values += found
+                        origin = os.path.relpath(os.path.join(directory, name), ROOT)
+    if not values:
+        return None
+    if len(set(values)) > 1:
+        report.append('tabBarItemAnimationSpeed: several values (%s); left out' % ', '.join(sorted(set(values))))
+        return None
+    if origin:
+        report.append('tabBarItemAnimationSpeed = %s, from %s' % (values[0], origin))
+    # [EN] A numeric string, as Protobuf field 7 is a string and the library reads both (B28). [CN] 数字字符串：Protobuf 字段 7 为字符串，库两者都能读取（B28）。
+    speed = float(values[0])
+    return str(int(speed)) if speed.is_integer() else str(speed)
+
+
 def top_level(code):
     top = {}
     m = re.findall(r'context:\s*' + STRING, code)
@@ -800,7 +858,11 @@ def extract(path):
         return None, report
     add_lottie_files(code, items, report)
     add_dark_colors(code, items, report)
+    add_subscript_assignments(code, items, report)
     configuration = top_level(code)
+    speed = animation_speed(path, code, report)
+    if speed:
+        configuration['CYLTabBarControllerTabBarItemAnimationSpeed'] = speed
     add_page_identifiers(code, items, report)
     configuration[ITEMS_KEY] = items
     return configuration, report

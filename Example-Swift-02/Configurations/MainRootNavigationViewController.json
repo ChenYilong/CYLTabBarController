@@ -1,6 +1,7 @@
 {
   "CYLTabBarControllerContext": "",
   "CYLTabBarControllerTitlePositionAdjustment": "{0, -3.5}",
+  "CYLTabBarControllerTabBarItemAnimationSpeed": "1.5",
   "CYLTabBarControllerTabBarItemsAttributes": [
     {
       "CYLTabBarItemTitle": "首页",
