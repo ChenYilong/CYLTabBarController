@@ -2,7 +2,10 @@
 <!-- [EN] The screens of the shared demo code, merged into every demo app. [CN] 共享演示代码的界面，合并到每个演示 App 中。 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application>
+    <!-- [EN] The same safe values as the demo apps: no backup, no clear-text traffic. [CN] 与演示 App 相同的安全设置：不备份，不允许明文流量。 -->
+    <application
+        android:allowBackup="false"
+        android:usesCleartextTraffic="false">
         <activity
             android:name="com.cyl.tabbar.demo.TwoTabBarsActivity"
             android:exported="false"

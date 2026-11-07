@@ -74,7 +74,11 @@ object DemoPlusButtonBadge {
         controller.cyl_tabButtonTapAnimationType = CYLEnums.CYLTabButtonTapAnimationType.Bounce
         controller.cyl_swipeToSwitchTabEnabled = true
         controller.cyl_didLongPressControlBlock = { tabBarController, control ->
-            val name = (control as? CYLTabBarItemButton)?.item?.title ?: (control as? CYLPlusButton)?.titleLabel?.text ?: "PlusButton"
+            val name = when (control) {
+                is CYLTabBarItemButton -> control.item.title
+                is CYLPlusButton -> control.titleLabel.text.toString().ifEmpty { "PlusButton" }
+                else -> "PlusButton"
+            }
             AlertDialog.Builder(tabBarController.activity).setTitle("Long pressed \"$name\"").setNegativeButton(android.R.string.cancel, null).show()
         }
     }

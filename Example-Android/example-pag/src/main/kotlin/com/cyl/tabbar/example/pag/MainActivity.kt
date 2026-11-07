@@ -21,7 +21,7 @@ import com.cyl.tabbar.demo.DemoTabBarActivity
  */
 class MainActivity : DemoTabBarActivity() {
 
-    private val animationFiles = listOf("tab_home.pag", "tab_health.pag", "tab_moments.pag", "tab_me.pag")
+    private val animationFiles = listOf("tab_home.pag", "tab_health.pag", TAB_MOMENTS, TAB_ME)
     private val themeListener = CYLThemeManager.Listener { _, _, _ -> applySkinAnimations() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,13 +87,15 @@ class MainActivity : DemoTabBarActivity() {
     private fun applySkinAnimations() {
         val controller = tabBarController ?: return
         val swaps = CYLThemeManager.defaultManager.currentThemeIdentifier == "Grapefruit"
-        controller.updateTabBarItemAtIndex(2, animation(if (swaps) "tab_me.pag" else "tab_moments.pag"))
-        controller.updateTabBarItemAtIndex(3, animation(if (swaps) "tab_moments.pag" else "tab_me.pag"))
+        controller.updateTabBarItemAtIndex(2, animation(if (swaps) TAB_ME else TAB_MOMENTS))
+        controller.updateTabBarItemAtIndex(3, animation(if (swaps) TAB_MOMENTS else TAB_ME))
     }
 
     companion object {
         /** [EN] The tab to select after the tab bar is created again (iOS `TabBarCommon.completionhandler`). [CN] 重新创建 TabBar 后选中的 Tab（iOS `TabBarCommon.completionhandler`）。 */
         const val SELECTED_INDEX = "selectedIndex"
+        private const val TAB_MOMENTS = "tab_moments.pag"
+        private const val TAB_ME = "tab_me.pag"
         val NAVIGATION_BAR_COLOR = Color.parseColor("#3A57ED")
     }
 }
