@@ -26,6 +26,7 @@
 		A1C0FFEE5A1D0F00D0000003 /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */; };
 		A1C0FFEE5A1D0F00D0000005 /* RiveTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE5A1D0F00D0000006 /* RiveTabBarController.swift */; };
 		A85B4D667BD72D9C31E30BBC /* CYLSettingsDemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D0C069C05195A044437DCC9 /* CYLSettingsDemoTableViewController.swift */; };
+		8270F4983C7222D1B11969F9 /* CYLDemoTabBarStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36FD68AE28A1C6B53E77085 /* CYLDemoTabBarStyle.swift */; };
 		A905CDB1E98C37058FE447D1 /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FF32281E56757A718BBBB4 /* SideMenu.swift */; };
 		AC7015914DF03E3B9C6AFEAF /* check.riv in Resources */ = {isa = PBXBuildFile; fileRef = E8DF93C34F3E7B872BF47F0F /* check.riv */; };
 		B0D4999FF5EE129B8EE2C3CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF527C082D0F487D0E94689 /* AppDelegate.swift */; };
@@ -56,6 +57,7 @@
 		4B1F9532677D6BA1B23891DE /* menu_button.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = menu_button.riv; sourceTree = "<group>"; };
 		4D8E9F1732B1A1048CFEFB23 /* HomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		5D0C069C05195A044437DCC9 /* CYLSettingsDemoTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLSettingsDemoTableViewController.swift; path = "../Example-Shared/CYLSettingsDemoTableViewController.swift"; sourceTree = SOURCE_ROOT; };
+		D36FD68AE28A1C6B53E77085 /* CYLDemoTabBarStyle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLDemoTabBarStyle.swift; path = "../Example-Shared/CYLDemoTabBarStyle.swift"; sourceTree = SOURCE_ROOT; };
 		5FF527C082D0F487D0E94689 /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		64CBB7661983D3BF1EC5DDFF /* SignInView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		6605666A33C2A6CE223AD2B5 /* CourseSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CourseSection.swift; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				5D0C069C05195A044437DCC9 /* CYLSettingsDemoTableViewController.swift */,
+				D36FD68AE28A1C6B53E77085 /* CYLDemoTabBarStyle.swift */,
 				A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */,
 			);
 			name = "Example-Shared";
@@ -429,6 +432,7 @@
 				A905CDB1E98C37058FE447D1 /* SideMenu.swift in Sources */,
 				24C9C0A04F6CFE6ADF0916D6 /* TabItems.swift in Sources */,
 				A85B4D667BD72D9C31E30BBC /* CYLSettingsDemoTableViewController.swift in Sources */,
+				8270F4983C7222D1B11969F9 /* CYLDemoTabBarStyle.swift in Sources */,
 				A1C0FFEE5A1D0F00D0000003 /* CYLPlusButtonBadgeDemo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

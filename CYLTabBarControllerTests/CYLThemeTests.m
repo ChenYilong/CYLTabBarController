@@ -596,6 +596,11 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
 @interface CYLGIFAnimationTests : XCTestCase
 @end
 
+/// [EN] Private: what a new tab button from UIKit takes over from the old one (#605). [CN] 私有：UIKit 新建的 Tab 按钮从旧按钮接管的内容。
+@interface CYLTabBarController (CYLReplacedTabButtonTesting)
+- (void)cyl_adoptTabButton:(UIControl *)tabButton forTabBarItem:(nullable UITabBarItem *)item;
+@end
+
 @implementation CYLGIFAnimationTests
 
 /// [EN] A GIF file of solid frames: red, green, blue, with these delays. [CN] 纯色帧组成的 GIF 文件：红、绿、蓝，时长如下。
@@ -652,6 +657,42 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     UIImage *image = [UIImage cyl_animatedImageWithGIFData:[NSData dataWithContentsOfURL:[self gifFileURL]]];
     XCTAssertEqual(image.images.count, 3U);
     XCTAssertEqualWithAccuracy(image.duration, 1.0, 0.01);
+}
+
+/// FIX: issue #605 — the classic tab bar replaces a tab's button when its title changes (`self.title = …` in a page).
+- (void)testANewTabButtonFromUIKitGetsItsTabsAnimationAgain {
+    UIViewController *staticTab = [UIViewController new];
+    UIViewController *animatedTab = [UIViewController new];
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ staticTab, animatedTab ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" },
+                                                                                                    @{ CYLTabBarItemTitle : @"B", CYLTabBarGIFURL : [self gifFileURL] } ]];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [window layoutIfNeeded];
+    // [EN] Real tab buttons, standing in for the new ones from UIKit: an animation needs the button's own image view.
+    // [CN] 用真实的 Tab 按钮代替 UIKit 新建的按钮：动画需要按钮自己的图片视图。
+    UIControl *newButton = animatedTab.tabBarItem.cyl_tabButton;
+    UIControl *newStaticButton = staticTab.tabBarItem.cyl_tabButton;
+    if (!newButton || !newStaticButton) {
+        window.hidden = YES;
+        XCTSkip(@"no tab buttons in this tab bar style");
+    }
+    [newButton.cyl_tabBarItemAnimationView removeFromSuperview];
+    [tabBarController setValue:@YES forKey:@"tabBarItemAnimationViewAdded"];
+
+    [tabBarController cyl_adoptTabButton:newButton forTabBarItem:animatedTab.tabBarItem];
+    UIView *animationView = newButton.cyl_tabBarItemAnimationView;
+    XCTAssertNotNil(animationView, @"the new button shows the animation, not the static image");
+    XCTAssertEqual(animatedTab.cyl_tabButton, newButton, @"the view controller's tab button is the new one");
+
+    [tabBarController cyl_adoptTabButton:newButton forTabBarItem:animatedTab.tabBarItem];
+    XCTAssertEqual(newButton.cyl_tabBarItemAnimationView, animationView, @"each layout pass adopts it again, without a second view");
+
+    [tabBarController cyl_adoptTabButton:newStaticButton forTabBarItem:staticTab.tabBarItem];
+    XCTAssertNil(newStaticButton.cyl_tabBarItemAnimationView, @"a tab without a file keeps its images");
+    XCTAssertEqual(staticTab.cyl_tabButton, newStaticButton);
+    window.hidden = YES;
 }
 
 - (void)testAFileThatIsNotAGIFMakesNoView {

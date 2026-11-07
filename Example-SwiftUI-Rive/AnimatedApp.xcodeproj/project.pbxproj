@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		05E01D9BF04C30EEE73BF392 /* Pods_AnimatedApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8CE6F5D715DFB016703F7D2 /* Pods_AnimatedApp.framework */; };
 		28A6EE30C16DFCB5CE2C16E3 /* CYLSettingsDemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E709C0BA997FC30A2E119A /* CYLSettingsDemoTableViewController.swift */; };
+		3C843375B1A0CE558EF7C619 /* CYLDemoTabBarStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D4D659B49C202968FFBE2D /* CYLDemoTabBarStyle.swift */; };
 		5BD9C4832FC031589738D87C /* TabItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DE611920E33A09E8C7E726 /* TabItems.swift */; };
 		9611278D27F364E500977157 /* AnimatedAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9611278C27F364E500977157 /* AnimatedAppApp.swift */; };
 		9611278F27F364E500977157 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9611278E27F364E500977157 /* ContentView.swift */; };
@@ -44,6 +45,7 @@
 /* Begin PBXFileReference section */
 		096BD0B31B7775C7A5ECC202 /* Pods-AnimatedApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnimatedApp.debug.xcconfig"; path = "Target Support Files/Pods-AnimatedApp/Pods-AnimatedApp.debug.xcconfig"; sourceTree = "<group>"; };
 		13E709C0BA997FC30A2E119A /* CYLSettingsDemoTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLSettingsDemoTableViewController.swift; path = "../Example-Shared/CYLSettingsDemoTableViewController.swift"; sourceTree = SOURCE_ROOT; };
+		80D4D659B49C202968FFBE2D /* CYLDemoTabBarStyle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLDemoTabBarStyle.swift; path = "../Example-Shared/CYLDemoTabBarStyle.swift"; sourceTree = SOURCE_ROOT; };
 		87DE611920E33A09E8C7E726 /* TabItems.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TabItems.swift; sourceTree = "<group>"; };
 		9611278927F364E500977157 /* AnimatedApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AnimatedApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9611278C27F364E500977157 /* AnimatedAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedAppApp.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 			isa = PBXGroup;
 			children = (
 				13E709C0BA997FC30A2E119A /* CYLSettingsDemoTableViewController.swift */,
+				80D4D659B49C202968FFBE2D /* CYLDemoTabBarStyle.swift */,
 			);
 			name = "Example-Shared";
 			sourceTree = "<group>";
@@ -412,6 +415,7 @@
 				D969F9D1C7E29AAB1B2B98AF /* RiveAnimation.swift in Sources */,
 				5BD9C4832FC031589738D87C /* TabItems.swift in Sources */,
 				28A6EE30C16DFCB5CE2C16E3 /* CYLSettingsDemoTableViewController.swift in Sources */,
+				3C843375B1A0CE558EF7C619 /* CYLDemoTabBarStyle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

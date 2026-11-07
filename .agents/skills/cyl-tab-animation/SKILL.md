@@ -15,6 +15,7 @@ Steps for app developers: [Tab-Icon-Animation-Quick-Start](../../../docs/Tab-Ico
 | Lottie 2.5 | `Lottie` | same | same | Objective-C | `Example-Swift-02` |
 | PAG | `PAG`, `PAGEnterprise` | `CYLTabBarPAGURL` / `CYLTabBarPAGFilePath` | `CYLTabBarPAGSize` | [PAG-Animation](../../../docs/PAG-Animation.md) | `Example-PAG` |
 | Rive | `Rive` | `CYLTabBarRiveURL` / `CYLTabBarRiveFilePath` | `CYLTabBarRiveSize` | iOS 14, CocoaPods only; options such as `CYLTabBarAnimationOptionRiveArtboard` on the URL | `Example-Rive`, `Example-SwiftUI-Rive` |
+
 | GIF | `GIF` (no third-party dependency) | `CYLTabBarGIFURL` / `CYLTabBarGIFFilePath` (local files) | `CYLTabBarGIFSize` | [GIF-Animation](../../../docs/GIF-Animation.md) | `Example-GIF` |
 - `pod 'CYLTabBarController'` alone has **no** animation code. Without a subspec the tabs show their images.
 - **A GIF plays according to the key that gives it.** `CYLTabBarItemImage` or `CYLTabBarItemImageURL`: an image, it loops, no subspec. The GIF keys or generic animation keys: an animation, it plays once when selected. Tell the user which one they get.
