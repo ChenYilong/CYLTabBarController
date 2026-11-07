@@ -4,4 +4,4 @@
 # [CN] Carthage 演示：唯一的依赖是 CYLTabBarController。`scripts/pod-lint.sh push` 会在每次发布后把下面一行更新为新版本
 #      （"~> <版本号>"）；在添加本演示后的第一次发布之前，它跟随 "master"。
 #      在自己的 App 中请指定发布版本，例如 github "ChenYilong/CYLTabBarController" ~> 1.99
-github "ChenYilong/CYLTabBarController" "master"
+github "ChenYilong/CYLTabBarController" ~> 1.100.0
