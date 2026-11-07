@@ -83,15 +83,11 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         if (controller?.adjustTabBarItemImageViewSizeDependOnSuperView != false) iconSize = iconSize.coerceAtMost(height - titleHeight)
         val offset = item.cyl_imagePositionAdjustment
         val contentHeight = iconSize + titleHeight
-        // [EN] FlatDesign (iOS `CYLFlatDesignTabBarButton`): the title 2 dp above the bottom and the icon centered above it; `layoutCentered` centers a lone icon or title. [CN] 扁平样式（iOS `CYLFlatDesignTabBarButton`）：标题位于底部上方 2 dp，图标在其上方居中；`layoutCentered` 使单独的图标或标题居中。
         val flat = tabBar?.styleRenderer is CYLFlatDesignTabBarStyle
-        val hasIcon = iconView.drawable != null || cyl_tabBarItemAnimationView != null || cyl_customIconView != null
-        val flatTitleHeight = titleLabel.measuredHeight
-        val flatTitleTop = if (!hasIcon && item.layoutCentered) (height - flatTitleHeight) / 2 else height - flatTitleHeight - (2 * density).toInt()
+        val flatTitleTop = flatTitleTop(density)
         if (flat && hasTitle) iconSize = iconSize.coerceAtMost(flatTitleTop)
-        val iconTop = if (flat) {
-            ((if (!hasTitle && item.layoutCentered) (height - iconSize) / 2f else (flatTitleTop - iconSize) / 2f) + insets.top * density + offset.vertical * density).toInt()
-        } else ((height - contentHeight) / 2f + insets.top * density + offset.vertical * density + (tabBar?.tabImageViewDefaultOffset ?: 0f) * density).toInt()
+        val iconTop = if (flat) flatIconTop(iconSize, flatTitleTop, hasTitle, density)
+                      else ((height - contentHeight) / 2f + insets.top * density + offset.vertical * density + (tabBar?.tabImageViewDefaultOffset ?: 0f) * density).toInt()
         val iconLeft = ((width - iconSize) / 2f + insets.left * density + offset.horizontal * density).toInt()
         iconView.layout(iconLeft, iconTop, iconLeft + iconSize, iconTop + iconSize)
         cyl_customIconView?.let { custom ->
@@ -111,7 +107,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         val controllerOffset = tabBar?.tabBarController?.titlePositionAdjustment ?: CYLOffset.zero
         val titleTop = ((if (flat) flatTitleTop.toFloat() else (iconTop + iconSize).toFloat()) + (titleOffset.vertical + controllerOffset.vertical) * density).toInt()
         val titleLeft = ((titleOffset.horizontal + controllerOffset.horizontal) * density).toInt()
-        titleLabel.layout(titleLeft, titleTop, titleLeft + width, titleTop + if (flat) flatTitleHeight else titleHeight)
+        titleLabel.layout(titleLeft, titleTop, titleLeft + width, titleTop + if (flat) titleLabel.measuredHeight else titleHeight)
         for (child in 0 until childCount) {
             val badge = getChildAt(child) as? CYLBadgeView ?: continue
             badge.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
@@ -165,6 +161,23 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         super.performClick()
         onTap?.invoke()
         return true
+    }
+
+    /**
+     * [EN] FlatDesign (iOS `CYLFlatDesignTabBarButton`): the title 2 dp above the bottom, or centered for a lone title with
+     *      `layoutCentered`.
+     * [CN] 扁平样式（iOS `CYLFlatDesignTabBarButton`）：标题位于底部上方 2 dp；只有标题且 `layoutCentered` 时居中。
+     */
+    private fun flatTitleTop(density: Float): Int {
+        val hasIcon = iconView.drawable != null || cyl_tabBarItemAnimationView != null || cyl_customIconView != null
+        val titleHeight = titleLabel.measuredHeight
+        return if (!hasIcon && item.layoutCentered) (height - titleHeight) / 2 else height - titleHeight - (2 * density).toInt()
+    }
+
+    /** [EN] FlatDesign: the icon centered above the title, or centered for a lone icon with `layoutCentered`. [CN] 扁平样式：图标在标题上方居中；只有图标且 `layoutCentered` 时居中。 */
+    private fun flatIconTop(iconSize: Int, titleTop: Int, hasTitle: Boolean, density: Float): Int {
+        val centerTop = if (!hasTitle && item.layoutCentered) (height - iconSize) / 2f else (titleTop - iconSize) / 2f
+        return (centerTop + item.cyl_imageInsets.top * density + item.cyl_imagePositionAdjustment.vertical * density).toInt()
     }
 
     /** [EN] Applies the item's title, images and colors for the current selection. [CN] 按当前选中状态应用标题、图片与颜色。 */

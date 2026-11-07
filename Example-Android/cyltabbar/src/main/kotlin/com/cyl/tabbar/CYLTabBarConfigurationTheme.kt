@@ -100,8 +100,8 @@ class CYLTabBarConfigurationTheme internal constructor(
         @JvmOverloads
         fun colorNamed(name: String, themeManagerName: Any = CYLThemeManagerNameDefault): CYLThemeColor =
             CYLThemeColor.cyl_colorWithName(name, themeManagerName) { manager, _, theme ->
-                (theme as? CYLTabBarConfigurationTheme)?.colorForName(name)
-                    ?: manager.themes.firstNotNullOfOrNull { (it as? CYLTabBarConfigurationTheme)?.colorForName(name) }
+                // [EN] The current skin first, then the manager's other skins. [CN] 先查当前皮肤，再查管理器中的其他皮肤。
+                (sequenceOf(theme) + manager.themes.asSequence()).firstNotNullOfOrNull { (it as? CYLTabBarConfigurationTheme)?.colorForName(name) }
                     ?: android.graphics.Color.TRANSPARENT
             }
     }
