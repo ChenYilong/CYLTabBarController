@@ -20,7 +20,7 @@ Main document: [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md)
 - Subspecs combine, and one tab bar can mix libraries and static tabs: [Per-Tab-Animation](../../../docs/Per-Tab-Animation.md).
 - Demo files: name them by use (`tab_home.pag`). A tab shows the first frame until it is selected, so pick a small file whose first frame shows the icon; a full-screen poster or a file that starts empty looks like a blank or still tab. Check a new file's frames before using it.
 - PAG and Rive files draw their own colors, and Liquid Glass ignores a background color in `standardAppearance`. White icons (the course's `icons.riv`) need a dark interface: the Rive demos set `overrideUserInterfaceStyle = .dark` on the tab bar controller.
-- On a simulator libpag draws with software OpenGL: icons can appear many seconds late, and the main thread can wait on libpag. Judge PAG playback on a device.
+- On a simulator several asynchronous `PAGView`s stall inside software OpenGL while holding their locks, which blocks the main thread: blank icons, no playback. The animator sets `-setSync:YES` on the simulator only. To debug playback, trace `-play` and `onAnimationUpdate:` rather than judging from screenshots.
 - `tabBarItemAnimationSpeed` sets the speed. PAG files are downloaded by `scripts/fetch-animation-resources.py` at `pod install`, not kept in the repository.
 
 ## Rules for the library
