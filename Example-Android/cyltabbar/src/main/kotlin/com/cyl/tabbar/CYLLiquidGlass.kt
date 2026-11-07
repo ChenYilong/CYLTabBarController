@@ -271,6 +271,10 @@ internal class CYLTabBarBackdrop {
         val pages = (sourceNode as? RenderNode) ?: RenderNode("CYLTabBarBackdropPages").also { sourceNode = it }
         pages.setPosition(0, 0, source.width, source.height)
         val recording = pages.beginRecording(source.width, source.height)
+        // [EN] The window's background first: pages are usually transparent where they have no content (the white is the
+        //      window's), so without it the glass would be clear there and the sharp page would show through it.
+        // [CN] 先绘制窗口背景：页面在没有内容的地方通常是透明的（白色来自窗口），没有它，玻璃在这些地方是透明的，清晰的页面会透出来。
+        recording.drawColor(windowBackgroundColor(source))
         source.draw(recording)
         pages.endRecording()
 
@@ -291,6 +295,14 @@ internal class CYLTabBarBackdrop {
         canvas.translate(rect.left, rect.top)
         canvas.drawRenderNode(shape)
         canvas.restore()
+    }
+
+    /** [EN] The color behind the pages: the window's background color, else the theme's `colorBackground`. [CN] 页面后面的颜色：窗口背景色，否则为主题的 `colorBackground`。 */
+    private fun windowBackgroundColor(source: View): Int {
+        (source.rootView.background as? android.graphics.drawable.ColorDrawable)?.let { return it.color or 0xFF000000.toInt() }
+        val value = android.util.TypedValue()
+        return if (source.context.theme.resolveAttribute(android.R.attr.colorBackground, value, true) && value.type >= android.util.TypedValue.TYPE_FIRST_COLOR_INT && value.type <= android.util.TypedValue.TYPE_LAST_COLOR_INT) value.data or 0xFF000000.toInt()
+               else android.graphics.Color.WHITE
     }
 
     /** [EN] Backdrop's order: vibrancy, then blur, then the lens on top. [CN] Backdrop 的顺序：先鲜艳度，再模糊，最后透镜。 */

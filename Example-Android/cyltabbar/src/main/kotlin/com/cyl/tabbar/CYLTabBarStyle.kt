@@ -343,14 +343,19 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
             inset(-width() * (grow - 1f) / 2f, -height() * (grow - 1f) / 2f)
         }
         val radius = shape.height() / 2f
-        // [EN] Backdrop's default `Shadow`: 24 dp, 4 dp down, 10 % black, so the dock shows on a white page as on iOS. [CN] Backdrop 默认的 `Shadow`：24 dp、向下 4 dp、10 % 黑色，使胶囊在白色页面上也可见，与 iOS 相同。
-        shadowPaint.color = if (dark) Color.BLACK else Color.WHITE
-        shadowPaint.setShadowLayer(12f * density, 0f, 4f * density, if (dark) 0x40000000 else 0x1A000000)
-        canvas.drawRoundRect(shape, radius, radius, shadowPaint)
+        // [EN] Backdrop's default `Shadow` (24 dp, 4 dp down, 10 % black), drawn outside the dock only, as Backdrop does: a filled
+        //      shape under the glass would show through as a white board wherever the glass is clear or not drawn.
+        // [CN] Backdrop 默认的 `Shadow`（24 dp、向下 4 dp、10 % 黑色），与 Backdrop 一样只绘制在胶囊外部：若在玻璃下方绘制填充形状，玻璃透明或未绘制的地方会露出白板。
+        drawShadowOutside(canvas, shape, radius, density, dark)
         val glass = pages != null && panelBackdrop.draw(canvas, pages, tabBar.x - pages.x + shape.left, tabBar.y - pages.y + shape.top, shape, radius,
             CYLGlassEffects(blurRadius = 8f * density, refractionHeight = 24f * density, refractionAmount = 24f * density))
-        paint.color = tint ?: if (dark) 0x66121212 else 0x66FAFAFA
-        if (!glass) paint.color = if (dark) 0xE6121212.toInt() else 0xE6FAFAFA.toInt()
+        // [EN] `LiquidBottomTabs`' container color is 40 % opaque, so the blurred, refracted page shows through: an app color
+        //      (`cyl_tabBarBackgroundColor`, often opaque white) keeps its hue at that opacity at most.
+        // [CN] `LiquidBottomTabs` 的容器色为 40 % 不透明度，模糊与折射后的页面因此可见：App 的颜色（`cyl_tabBarBackgroundColor`，常为不透明白色）保留色相，
+        //      不透明度最多为 40 %。
+        val base = tint ?: if (dark) 0xFF121212.toInt() else 0xFFFAFAFA.toInt()
+        paint.color = if (glass) androidx.core.graphics.ColorUtils.setAlphaComponent(base, minOf(Color.alpha(base), SURFACE_ALPHA))
+                      else androidx.core.graphics.ColorUtils.setAlphaComponent(base, 0xE6)
         val surface = paint.color
         canvas.drawRoundRect(shape, radius, radius, paint)
 
@@ -378,6 +383,21 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
         paint.color = if (dark) Color.WHITE else Color.BLACK
         paint.alpha = ((0.1f * (1f - press) + 0.03f * press) * 255).toInt()
         canvas.drawRoundRect(bubble, bubbleRadius, bubbleRadius, paint)
+    }
+
+    private val shadowPath = android.graphics.Path()
+
+    /** [EN] The dock's shadow with the dock itself cut out. [CN] 挖掉胶囊本身的胶囊阴影。 */
+    private fun drawShadowOutside(canvas: Canvas, shape: RectF, radius: Float, density: Float, dark: Boolean) {
+        shadowPath.rewind()
+        shadowPath.addRoundRect(shape, radius, radius, android.graphics.Path.Direction.CW)
+        canvas.save()
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) canvas.clipOutPath(shadowPath)
+        else @Suppress("DEPRECATION") canvas.clipPath(shadowPath, android.graphics.Region.Op.DIFFERENCE)
+        shadowPaint.color = Color.BLACK
+        shadowPaint.setShadowLayer(12f * density, 0f, 4f * density, if (dark) 0x40000000 else 0x1A000000)
+        canvas.drawRoundRect(shape, radius, radius, shadowPaint)
+        canvas.restore()
     }
 
     override fun drawAboveItems(tabBar: CYLTabBar, canvas: Canvas) {
@@ -451,5 +471,7 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
         const val SIDE_MARGIN = 16f
         const val BOTTOM_MARGIN = 12f
         const val PRESSED_SCALE = 78f / 56f
+        /** [EN] `LiquidBottomTabs`' container color: 0.4 opacity. [CN] `LiquidBottomTabs` 的容器色：0.4 不透明度。 */
+        const val SURFACE_ALPHA = 0x66
     }
 }
