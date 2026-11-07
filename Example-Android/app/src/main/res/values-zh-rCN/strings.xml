@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CYLTabBar 页面</string>
-    <string name="two_tab_bars">两个 TabBar，同一个页面 ID</string>
-    <string name="open_two_tab_bars">打开：两个 TabBar，同一个页面 ID</string>
-    <string name="open_in_browser">在浏览器中打开</string>
     <string name="double_tapped">已双击</string>
     <string name="skin_prefix">皮肤：</string>
 </resources>

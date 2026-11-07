@@ -10,6 +10,8 @@ android-library = "8.7.3"
 robolectric = "4.14.1"
 junit = "4.13.2"
 lottie = "6.6.2"
+libpag = "4.5.98"
+rive = "10.3.0"
 androidx-test-core = "1.6.1"
 
 [libraries]
@@ -20,6 +22,8 @@ json = { module = "org.json:json", version.ref = "json" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 junit = { module = "junit:junit", version.ref = "junit" }
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
+libpag = { module = "com.tencent.tav:libpag", version.ref = "libpag" }
+rive = { module = "app.rive:rive-android", version.ref = "rive" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
 
 [plugins]

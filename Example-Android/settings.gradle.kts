@@ -15,4 +15,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "CYLTabBarControllerAndroid"
-include(":tabpages", ":cyltabbar", ":app")
+include(":tabpages", ":cyltabbar", ":demokit", ":app", ":example-gif", ":example-pag", ":example-rive")

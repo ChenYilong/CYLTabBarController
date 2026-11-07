@@ -7,6 +7,11 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.ColorFilter
+import android.graphics.Paint
+import android.graphics.PixelFormat
+import android.graphics.drawable.Drawable
+import android.os.SystemClock
 import android.view.View
 import android.widget.ImageView
 
@@ -114,6 +119,56 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
             val view = CYLGIFTabBarItemAnimationView(context, contentMode)
             CYLTabBarItemAnimationFiles.localFile(context, fileURL) { file -> file?.readBytes()?.let { view.setData(it) } }
             return view
+        }
+    }
+}
+
+/**
+ * [EN] A GIF given as an image (`CYLTabBarItemImageURL`, `setTabBarItemIconWithURL`, a `CYLTabBarItemImage` Drawable): it
+ *      loops, selected or not, as `+[UIImage cyl_animatedImageWithGIFData:]` does on iOS (#605). Only the GIF keys
+ *      (`CYLTabBarGIFURL`...) play it once when the tab is selected.
+ * [CN] 作为图片传入的 GIF（`CYLTabBarItemImageURL`、`setTabBarItemIconWithURL`、作为 `CYLTabBarItemImage` 的 Drawable）：无论是否选中都循环播放，
+ *      与 iOS 的 `+[UIImage cyl_animatedImageWithGIFData:]` 一致（#605）。只有 GIF key（`CYLTabBarGIFURL` 等）才会在选中时播放一次。
+ */
+@Suppress("DEPRECATION") // [EN] Movie is deprecated, but it is the only API that seeks a GIF on API 23+. [CN] Movie 已废弃，但它是 API 23+ 上唯一能定位 GIF 时刻的接口。
+class CYLGIFDrawable private constructor(private val movie: android.graphics.Movie) : Drawable(), Runnable {
+    private val paint = Paint(Paint.FILTER_BITMAP_FLAG)
+    private val start = SystemClock.uptimeMillis()
+    private val duration = movie.duration().takeIf { it > 0 } ?: 1000
+
+    override fun draw(canvas: Canvas) {
+        val bounds = bounds
+        if (bounds.isEmpty || movie.width() <= 0 || movie.height() <= 0) return
+        movie.setTime(((SystemClock.uptimeMillis() - start) % duration).toInt())
+        canvas.save()
+        canvas.translate(bounds.left.toFloat(), bounds.top.toFloat())
+        canvas.scale(bounds.width() / movie.width().toFloat(), bounds.height() / movie.height().toFloat())
+        movie.draw(canvas, 0f, 0f, paint)
+        canvas.restore()
+        // [EN] The next frame, about 60 fps, while the drawable is shown. [CN] 显示期间约每秒 60 帧绘制下一帧。
+        scheduleSelf(this, SystemClock.uptimeMillis() + FRAME_MILLIS)
+    }
+
+    override fun run() = invalidateSelf()
+    override fun setAlpha(alpha: Int) { paint.alpha = alpha }
+    override fun setColorFilter(colorFilter: ColorFilter?) { paint.colorFilter = colorFilter }
+    @Deprecated("Deprecated in Java")
+    override fun getOpacity() = PixelFormat.TRANSLUCENT
+    override fun getIntrinsicWidth() = movie.width()
+    override fun getIntrinsicHeight() = movie.height()
+
+    companion object {
+        private const val FRAME_MILLIS = 16L
+
+        /** [EN] Whether `bytes` start with a GIF signature (GIF87a / GIF89a). [CN] `bytes` 是否以 GIF 签名（GIF87a / GIF89a）开头。 */
+        @JvmStatic
+        fun isGIF(bytes: ByteArray): Boolean = bytes.size >= 6 && String(bytes, 0, 6, Charsets.US_ASCII).let { it == "GIF87a" || it == "GIF89a" }
+
+        /** [EN] A looping drawable for GIF `bytes`; null when they are not a GIF. [CN] GIF `bytes` 的循环 Drawable；不是 GIF 时为 null。 */
+        @JvmStatic
+        fun fromBytes(bytes: ByteArray): CYLGIFDrawable? {
+            if (!isGIF(bytes)) return null
+            return android.graphics.Movie.decodeByteArray(bytes, 0, bytes.size)?.let { CYLGIFDrawable(it) }
         }
     }
 }

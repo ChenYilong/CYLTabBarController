@@ -37,17 +37,10 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-
-    sourceSets {
-        getByName("main") {
-            // The same configuration files as iOS, not a copy. 与 iOS 共用同一份配置文件，而不是副本。
-            assets.srcDir("../../CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations")
-        }
-    }
 }
 
 dependencies {
-    implementation(project(":cyltabbar"))
+    implementation(project(":demokit"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.material)

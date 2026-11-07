@@ -64,7 +64,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 状态：done 行为相同；adapted 用 Android 的对应方式实现（见说明）；n/a 只存在于 iOS（见说明），不计入分母。每组得分 = 分值 × 已完成行 /（行数 − n/a 行）。代码在 `Example-Android/app/src/main/kotlin/com/cyl/tabbar/demo/`。 | Status: done, the same behavior; adapted, done the Android way (see the note); n/a, iOS only (see the note), left out of the denominator. A group's score = points × rows done / (rows − n/a rows). The code is in `Example-Android/app/src/main/kotlin/com/cyl/tabbar/demo/`. |
+| 状态：done 行为相同；adapted 用 Android 的对应方式实现（见说明）；n/a 只存在于 iOS（见说明），不计入分母。每组得分 = 分值 × 已完成行 /（行数 − n/a 行）。代码在 `Example-Android/demokit/src/main/kotlin/com/cyl/tabbar/demo/`。 | Status: done, the same behavior; adapted, done the Android way (see the note); n/a, iOS only (see the note), left out of the denominator. A group's score = points × rows done / (rows − n/a rows). The code is in `Example-Android/demokit/src/main/kotlin/com/cyl/tabbar/demo/`. |
 
 | # | Android 实现 Implementation | 分值 Points | 得分 Score | 状态 Status | 说明 | Note |
 |:---|:---|:---|:---|:---|:---|:---|

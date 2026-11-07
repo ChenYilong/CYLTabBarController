@@ -22,6 +22,7 @@ import com.cyl.tabbar.cyl_badgeStyleCount
 import com.cyl.tabbar.cyl_badgeTitleForRow
 import com.cyl.tabbar.cyl_showBadgeValue
 import com.cyl.tabbar.cyl_simulateMemoryWarningAndShowResult
+import com.cyl.tabbar.demokit.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 /**
@@ -38,6 +39,8 @@ object DemoCatalog {
     const val MESSAGE = "message"
     const val DISCOVER = "discover"
     const val ME = "me"
+    /** [EN] Only the library's settings rows, as iOS `CYLSettingsDemoTableViewController` (the PAG, GIF and Rive examples). [CN] 只有库的设置行，对应 iOS `CYLSettingsDemoTableViewController`（PAG、GIF、Rive 示例）。 */
+    const val SETTINGS = "settings"
 
     /** [EN] The tab bar controller context of the demo's plus button. [CN] 演示 PlusButton 所属的 TabBarController context。 */
     const val PLUS_CONTEXT = "CYLConfigurationDemo"
@@ -50,6 +53,7 @@ object DemoCatalog {
                 startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))
             }))
         }
+        if (page.page == SETTINGS) return sections + settingsSections(page)
         sections += DemoSection("General", listOf(languageRow(), memoryWarningRow()))
         sections += DemoSection("Tab bar appearance", appearanceRows() + flatDesignRows())
         sections += DemoScrollHide.section(page)
@@ -75,6 +79,19 @@ object DemoCatalog {
         }
         return sections
     }
+
+    /** [EN] The settings groups of the library, in the iOS order. [CN] 库的设置分组，顺序与 iOS 相同。 */
+    private fun settingsSections(page: DemoListFragment) = listOf(
+        DemoSection("General", listOf(languageRow(), memoryWarningRow())),
+        DemoSection("Tab bar appearance", appearanceRows()),
+        DemoScrollHide.section(page),
+        DemoSection("Update tabs in place", DemoInteractions.tabItemUpdateRows()),
+        DemoSection("Tab pages, selection and login", DemoInteractions.pageRows()),
+        DemoSection("PlusButton", DemoInteractions.plusButtonRows()),
+        DemoSection("Tab interactions", DemoInteractions.interactionRows()),
+        DemoSection("No base class, and helpers", DemoInteractions.helperRows()),
+        DemoSection("Configuration file", DemoConfiguration.rows()),
+    )
 
     // MARK: - General 通用
 

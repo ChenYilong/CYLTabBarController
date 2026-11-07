@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- [EN] Tab images named in the tab attributes (CYLTabBarItemImage: "home"), found by name at run time: keep them. [CN] Tab 属性中按名称引用的图片（CYLTabBarItemImage: "home"），运行时按名称查找：保留它们。 -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/home,@drawable/home_selected,@drawable/message,@drawable/message_selected,@drawable/lianxiren,@drawable/lianxiren_selected,@drawable/me,@drawable/me_selected" />

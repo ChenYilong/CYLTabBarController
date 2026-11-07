@@ -3950,8 +3950,9 @@
   "note": "reads ImageIO frame properties (CGImageSourceCopyPropertiesAtIndex); Android decodes GIF timing itself"
  },
  "UIImage(CYLTabBarControllerExtention) +cyl_animatedImageWithGIFData:": {
-  "status": "n/a",
-  "note": "UIKit view / control / color / image / navigation helpers"
+  "status": "done",
+  "android": "CYLGIFDrawable.fromBytes(bytes)",
+  "note": "a looping Drawable (android.graphics.Movie); null when the bytes are not a GIF; used for GIF icons given as images"
  },
  "UIImage(CYLTabBarControllerExtention) +cyl_assetImageName:userInterfaceStyle:": {
   "status": "n/a",

@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.os.bundleOf
+import com.cyl.tabbar.demokit.R
 import androidx.fragment.app.Fragment
 
 /**

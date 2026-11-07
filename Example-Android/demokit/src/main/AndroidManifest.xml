@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- [EN] The screens of the shared demo code, merged into every demo app. [CN] 共享演示代码的界面，合并到每个演示 App 中。 -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name="com.cyl.tabbar.demo.TwoTabBarsActivity"
+            android:exported="false"
+            android:label="@string/two_tab_bars" />
+        <activity
+            android:name="com.cyl.tabbar.demo.DemoHostActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.cyl.tabbar.demo.DemoGalleryActivity"
+            android:exported="false" />
+        <!-- [EN] Keeps the language chosen in the demo (AppCompatDelegate.setApplicationLocales) before Android 13. [CN] 在 Android 13 之前保存演示中选择的语言。 -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
+    </application>
+</manifest>

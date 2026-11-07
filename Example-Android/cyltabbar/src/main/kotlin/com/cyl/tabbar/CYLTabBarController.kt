@@ -545,8 +545,22 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         }.start()
     }
 
+    /**
+     * [EN] An icon from a URL, a path, an asset name or a resolver name. A GIF loops (`CYLGIFDrawable`), as a GIF image does
+     *      on iOS (#605).
+     * [CN] 来自 URL、路径、asset 名称或解析器名称的图标。GIF 循环播放（`CYLGIFDrawable`），与 iOS 的 GIF 图片一致（#605）。
+     */
     private fun loadDrawable(url: String): android.graphics.drawable.Drawable? = try {
-        if (url.startsWith("http")) java.net.URI(url).toURL().openStream().use { android.graphics.drawable.Drawable.createFromStream(it, url) } else CYLTabBarConfiguration.imageResolver.drawable(activity, url)
+        val bytes = when {
+            url.startsWith("http") -> java.net.URI(url).toURL().openStream().use { it.readBytes() }
+            else -> CYLTabBarItemAnimationFiles.openLocal(activity, url)?.use { it.readBytes() }
+        }
+        when (bytes) {
+            null -> CYLTabBarConfiguration.imageResolver.drawable(activity, url)
+            // [EN] A GIF that cannot be decoded as a movie shows its first frame. [CN] 无法按动画解码的 GIF 显示其第一帧。
+            else -> (if (CYLGIFDrawable.isGIF(bytes)) CYLGIFDrawable.fromBytes(bytes) else null)
+                ?: android.graphics.drawable.BitmapDrawable(activity.resources, android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
+        }
     } catch (error: Exception) { null }
 
     /**
