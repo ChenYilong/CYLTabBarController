@@ -291,6 +291,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [Android 演示迁移](docs/Android-Demo-Migration.md) | [Android demo migration](docs/Android-Demo-Migration.md) |
 | [Android 版 PAG、GIF、Rive 示例](docs/Android-Examples.md) | [The Android PAG, GIF and Rive examples](docs/Android-Examples.md) |
 | [Android 版 CYLTabBarController](docs/Android-Library.md) | [CYLTabBarController for Android](docs/Android-Library.md) |
+| [Android 库与 QMUI_Android 的 Tab 对比](docs/Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's tabs](docs/Android-QMUI-Comparison.md) |
 | [中英文双语文档](docs/Bilingual-Documentation.md) | [Bilingual Documentation](docs/Bilingual-Documentation.md) |
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](docs/CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](docs/CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](docs/Carthage-Example.md) | [Carthage integration demo project](docs/Carthage-Example.md) |

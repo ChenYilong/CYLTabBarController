@@ -18,6 +18,7 @@
 | [Android 演示迁移](Android-Demo-Migration.md) | [Android demo migration](Android-Demo-Migration.md) |
 | [Android 版 PAG、GIF、Rive 示例](Android-Examples.md) | [The Android PAG, GIF and Rive examples](Android-Examples.md) |
 | [Android 版 CYLTabBarController](Android-Library.md) | [CYLTabBarController for Android](Android-Library.md) |
+| [Android 库与 QMUI_Android 的 Tab 对比](Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's tabs](Android-QMUI-Comparison.md) |
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
@@ -90,6 +91,7 @@ docs/
 ├── Android-Demo-Migration.md
 ├── Android-Examples.md
 ├── Android-Library.md
+├── Android-QMUI-Comparison.md
 ├── Bilingual-Documentation.md
 ├── CYLUtils-Helpers.md
 ├── Carthage-Example.md
