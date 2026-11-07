@@ -189,6 +189,18 @@ Pod::Spec.new do |s|
     rive.ios.deployment_target = '14.0'
   end
 
+  # FIX: issue #605 — GIF tab icons that play once when selected, like Lottie, PAG and Rive. A GIF given as an image
+  # (`CYLTabBarItemImage`, `CYLTabBarItemImageURL`) loops and needs no subspec. No third-party library: ImageIO decodes it.
+  # 选中时播放一次的 GIF Tab 图标，用法与 Lottie、PAG、Rive 相同。作为图片传入（`CYLTabBarItemImage`、`CYLTabBarItemImageURL`）的 GIF 循环播放，
+  # 不需要子库。不依赖第三方库：由 ImageIO 解码。
+  s.subspec 'GIF' do |gif|
+    gif.dependency 'CYLTabBarController/Core'
+    gif.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
+    gif.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.{h,m}'
+    gif.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.h'
+    gif.frameworks = 'ImageIO', 'QuartzCore'
+  end
+
   s.subspec 'CYLFlatDesignTabBar' do |flatdesign|
     flatdesign.dependency "CYLTabBarController/CYLFlatDesignTabBar-ObjectiveC"
     flatdesign.ios.deployment_target = '13.0' # depends on LottieSwift
