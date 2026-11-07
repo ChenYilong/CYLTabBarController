@@ -99,7 +99,8 @@ public final class CYLEnums {
 
     /** [EN] CYLBadgeAnimationType. [CN] 角标动画类型。 */
     public enum CYLBadgeAnimationType {
-        None(0), Scale(1), Shake(2), Bounce(3), Breathe(4);
+        // [EN] Scale, Shake, Bounce and Breathe repeat until the badge is cleared; the …Once types play once. [CN] Scale、Shake、Bounce 与 Breathe 一直重复到角标清除；…Once 类型只播放一次。
+        None(0), Scale(1), Shake(2), Bounce(3), Breathe(4), LeftRightOnce(5), RightLeftOnce(6), FadeInOnce(7), RollingOnce(8), ScaleOnce(9);
 
         public final int rawValue;
 

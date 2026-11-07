@@ -9,6 +9,7 @@ json = "20240303"
 android-library = "8.7.3"
 robolectric = "4.14.1"
 junit = "4.13.2"
+lottie = "6.6.2"
 androidx-test-core = "1.6.1"
 
 [libraries]
@@ -18,6 +19,7 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 json = { module = "org.json:json", version.ref = "json" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 junit = { module = "junit:junit", version.ref = "junit" }
+lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
 
 [plugins]

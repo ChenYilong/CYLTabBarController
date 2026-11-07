@@ -25,7 +25,7 @@ AGENTS = ROOT / ".agents"
 SKILLS = AGENTS / "skills"
 MANIFEST = AGENTS / "skills.json"
 LOCK = AGENTS / "skills.lock.json"
-NAME_RE = re.compile(r"^name:\s*['\"]?([^'\"\n]+?)['\"]?\s*$", re.M)
+SKILL_MD = "SKILL.md"
 VALID_NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 SKIPPED = {".git", ".github", ".DS_Store", "__pycache__"}
 UPSTREAM_LICENSE = "UPSTREAM-LICENSE"
@@ -37,8 +37,21 @@ def skill_name(skill_md):
     if not text.startswith("---"):
         return None
     end = text.find("\n---", 3)
-    match = NAME_RE.search(text[:end] if end > 0 else text)
-    return match.group(1).strip() if match else None
+    # [EN] Line by line, no backtracking regex. [CN] 逐行查找，不用回溯正则。
+    for line in (text[:end] if end > 0 else text).splitlines():
+        if line.startswith("name:"):
+            return line[len("name:"):].strip().strip("'\"").strip() or None
+    return None
+
+
+def with_name(text, name):
+    """[EN] `text` with its first `name:` line replaced. [CN] 替换第一行 `name:` 后的 `text`。"""
+    lines = text.split("\n")
+    for index, line in enumerate(lines):
+        if line.startswith("name:"):
+            lines[index] = "name: " + name
+            break
+    return "\n".join(lines)
 
 
 def integrity(folder):
@@ -71,6 +84,30 @@ def clone(repo, commit, into):
     subprocess.check_call(["git", "-C", str(into), "checkout", "-q", commit])
 
 
+def vendor_skill(source, checkout, relative, entries):
+    """[EN] Copies one skill of a checkout into SKILLS and records it in `entries`. [CN] 把检出中的一个 skill 复制到 SKILLS 并记入 `entries`。"""
+    origin = (checkout / source.get("root", "") / relative).resolve()
+    declared = skill_name(origin / SKILL_MD)
+    if not declared:
+        sys.exit("%s/%s: SKILL.md has no name" % (source["repo"], relative))
+    # [EN] Agent Skills names are lowercase and hyphenated; another name is replaced by the folder's name.
+    # [CN] Agent Skills 的名字只含小写字母和连字符；其他名字替换为文件夹名。
+    name = declared if VALID_NAME_RE.match(declared) else origin.name.split("--")[-1]
+    if name in entries or name.startswith("cyl-"):
+        sys.exit("%s/%s: the name %s is already taken" % (source["repo"], relative, name))
+    target = SKILLS / name
+    remove_folder(target)
+    excluded = set(source.get("exclude", []))
+    shutil.copytree(origin, target, symlinks=False, dirs_exist_ok=True,
+                    ignore=lambda _, names, excluded=excluded: [n for n in names if ignored(n) or n in excluded])
+    shutil.copy(checkout / source["licenseFile"], target / UPSTREAM_LICENSE)
+    if declared != name:
+        skill_md = target / SKILL_MD
+        skill_md.write_text(with_name(skill_md.read_text(encoding="utf-8"), name), encoding="utf-8")
+    entries[name] = {"source": source["repo"], "path": relative, "commit": source["commit"],
+                     "license": source["license"], "integrity": integrity(target)}
+
+
 def vendor(manifest):
     entries = {}
     with tempfile.TemporaryDirectory() as temp:
@@ -78,27 +115,7 @@ def vendor(manifest):
             checkout = pathlib.Path(temp) / str(index)
             clone(source["repo"], source["commit"], checkout)
             for relative in source["skills"]:
-                origin = (checkout / source.get("root", "") / relative).resolve()
-                declared = skill_name(origin / "SKILL.md")
-                if not declared:
-                    sys.exit("%s/%s: SKILL.md has no name" % (source["repo"], relative))
-                # [EN] Agent Skills names are lowercase and hyphenated; another name is replaced by the folder's name.
-                # [CN] Agent Skills 的名字只含小写字母和连字符；其他名字替换为文件夹名。
-                name = declared if VALID_NAME_RE.match(declared) else origin.name.split("--")[-1]
-                if name in entries or name.startswith("cyl-"):
-                    sys.exit("%s/%s: the name %s is already taken" % (source["repo"], relative, name))
-                target = SKILLS / name
-                remove_folder(target)
-                excluded = set(source.get("exclude", []))
-                shutil.copytree(origin, target, symlinks=False, dirs_exist_ok=True,
-                                ignore=lambda _, names: [n for n in names if ignored(n) or n in excluded])
-                shutil.copy(checkout / source["licenseFile"], target / UPSTREAM_LICENSE)
-                if declared != name:
-                    skill_md = target / "SKILL.md"
-                    text = skill_md.read_text(encoding="utf-8")
-                    skill_md.write_text(NAME_RE.sub("name: " + name, text, count=1), encoding="utf-8")
-                entries[name] = {"source": source["repo"], "path": relative, "commit": source["commit"],
-                                 "license": source["license"], "integrity": integrity(target)}
+                vendor_skill(source, checkout, relative, entries)
     tracked = set(entries)
     previous = json.loads(LOCK.read_text()).get("skills", {}) if LOCK.exists() else {}
     for name in set(previous) - tracked:
@@ -111,11 +128,11 @@ def coverage_problems():
     """[EN] A new document or demo must reach the project skills, so a new project can be started from them.
     [CN] 新文档或新 Demo 必须写入项目 skill，这样才能基于 skill 创建新项目。"""
     problems = []
-    api_map = (SKILLS / "cyl-api-map" / "SKILL.md").read_text(encoding="utf-8")
+    api_map = (SKILLS / "cyl-api-map" / SKILL_MD).read_text(encoding="utf-8")
     for document in sorted((ROOT / "docs").glob("*.md")):
         if document.name != "README.md" and not ignored(document.name) and "docs/%s)" % document.name not in api_map:
             problems.append("docs/%s: no row in the cyl-api-map skill" % document.name)
-    new_project = (SKILLS / "cyl-new-project" / "SKILL.md").read_text(encoding="utf-8")
+    new_project = (SKILLS / "cyl-new-project" / SKILL_MD).read_text(encoding="utf-8")
     output = subprocess.check_output(["git", "-C", str(ROOT), "ls-files", "-z", "Example*"], text=True)
     for demo in sorted({path.split("/")[0] for path in output.split("\0") if "/" in path}):
         if "`%s`" % demo not in new_project and "`%s/`" % demo not in new_project:
@@ -123,10 +140,9 @@ def coverage_problems():
     return problems
 
 
-def check():
+def lock_problems(entries):
+    """[EN] Vendored skills missing, edited by hand, or without their license. [CN] 缺失、被手动修改或缺少许可证的第三方 skill。"""
     problems = []
-    entries = json.loads(LOCK.read_text())["skills"] if LOCK.exists() else {}
-    on_disk = {p.name for p in SKILLS.iterdir() if p.is_dir()}
     for name, entry in entries.items():
         folder = SKILLS / name
         if not folder.is_dir():
@@ -135,15 +151,28 @@ def check():
             problems.append("%s: edited by hand; run the sync, or change the manifest" % name)
         elif not (folder / UPSTREAM_LICENSE).is_file():
             problems.append("%s: its upstream license is missing" % name)
+    return problems
+
+
+def folder_problems(on_disk, entries):
+    """[EN] Skill folders that are not in the lock file, or whose SKILL.md is missing or misnamed. [CN] 不在锁文件中、或 SKILL.md 缺失 / 名称不符的 skill 文件夹。"""
+    problems = []
     for name in sorted(on_disk - set(entries)):
         if not name.startswith("cyl-"):
             problems.append("%s: not in the lock file; only cyl-* skills are written here" % name)
     for name in sorted(on_disk):
-        skill_md = SKILLS / name / "SKILL.md"
+        skill_md = SKILLS / name / SKILL_MD
         if not skill_md.is_file():
             problems.append("%s: no SKILL.md" % name)
         elif skill_name(skill_md) != name:
             problems.append("%s: the frontmatter name differs from the folder" % name)
+    return problems
+
+
+def check():
+    entries = json.loads(LOCK.read_text())["skills"] if LOCK.exists() else {}
+    on_disk = {p.name for p in SKILLS.iterdir() if p.is_dir()}
+    problems = lock_problems(entries) + folder_problems(on_disk, entries)
     problems.extend(coverage_problems())
     link = ROOT / ".claude" / "skills"
     if not link.is_symlink() or link.resolve() != SKILLS.resolve():

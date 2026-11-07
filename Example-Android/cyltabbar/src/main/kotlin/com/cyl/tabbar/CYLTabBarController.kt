@@ -87,6 +87,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         val transaction = fragmentManager.beginTransaction()
         viewControllers.forEachIndexed { index, page ->
             if (!page.isAdded) transaction.add(pagesContainer.id, page, "$fragmentTag-$index")
+            // [EN] A tab unloaded by a memory warning creates its view again when selected (#426). [CN] 被内存警告卸载的 Tab 在选中时重新创建视图（#426）。
+            if (index == selectedIndex && page.isDetached) transaction.attach(page)
             if (index == selectedIndex) transaction.show(page) else transaction.hide(page)
         }
         transaction.commitNowAllowingStateLoss()
@@ -116,23 +118,118 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     var automaticallyAdjustsImageOnlyTabs: Boolean = true
     var adjustTabBarItemImageViewSizeDependOnSuperView: Boolean = true
     var unloadsUnselectedViewsOnMemoryWarning: Boolean = false
+    /** [EN] The playback speed of every tab animation (#428); 0, negative or not finite: the default. [CN] 所有 Tab 动画的播放速度（#428）；0、负数或非有限值表示默认值。 */
     var tabBarItemAnimationSpeed: Float = 1f
-    var noNeedUIDesignCompatibility: Boolean = false
+        set(value) {
+            field = value
+            for (button in tabBar.tabBarButtonArray) if (button.cyl_isTabBarItemAnimationReady()) button.cyl_setTabBarItemAnimationSpeed(value)
+        }
+    /** [EN] `noNeedUIDesignCompatibility`: false means FlatDesign (`tabBarStyleType`), true Liquid Glass; prefer `tabBarStyleType`. [CN] false 表示扁平样式（`tabBarStyleType`），true 表示液态玻璃；建议直接设置 `tabBarStyleType`。 */
+    var noNeedUIDesignCompatibility: Boolean
+        get() = tabBarStyleType != CYLEnums.CYLTabBarStyleType.FlatDesign
+        set(value) { tabBarStyleType = if (value) CYLEnums.CYLTabBarStyleType.LiquidGlass else CYLEnums.CYLTabBarStyleType.FlatDesign }
     var allowsVerticalBar: Boolean = false
-    var viewDidLayoutSubviewsBlock: ((CYLTabBarController) -> Unit)? = null
+    var viewDidLayoutSubviewsBlock: CYLViewDidLayoutSubViewsBlock? = null
+    /** [EN] The animation file of each animated tab, in tab order (`CYLTabBarAnimation…` and the library keys). [CN] 每个有动画的 Tab 的动画文件，按 Tab 顺序。 */
     val tabBarItemAnimationURLs: MutableList<String> = ArrayList()
+    /** [EN] The animation size of each animated tab (dp). [CN] 每个有动画的 Tab 的动画尺寸（dp）。 */
     val tabBarItemAnimationSizes: MutableList<CYLSize> = ArrayList()
-    val tabBarItemAnimationViewAdded: Boolean get() = false
+    /** [EN] Whether any tab shows an animation view. [CN] 是否有 Tab 显示动画视图。 */
+    val tabBarItemAnimationViewAdded: Boolean get() = tabBar.tabBarButtonArray.any { it.cyl_isTabBarItemAnimationReady() }
+
+    /** [EN] `lottieAnimationSpeed` (deprecated): `tabBarItemAnimationSpeed`. [CN] 已废弃：即 `tabBarItemAnimationSpeed`。 */
+    @Deprecated("Use tabBarItemAnimationSpeed", ReplaceWith("tabBarItemAnimationSpeed"))
+    var lottieAnimationSpeed: Float
+        get() = tabBarItemAnimationSpeed
+        set(value) { tabBarItemAnimationSpeed = value }
+    /** [EN] `lottieViewAdded` (deprecated): `tabBarItemAnimationViewAdded`. [CN] 已废弃：即 `tabBarItemAnimationViewAdded`。 */
+    @Deprecated("Use tabBarItemAnimationViewAdded", ReplaceWith("tabBarItemAnimationViewAdded"))
+    val lottieViewAdded: Boolean get() = tabBarItemAnimationViewAdded
+    /** [EN] `lottieURLs` (deprecated): `tabBarItemAnimationURLs`. [CN] 已废弃：即 `tabBarItemAnimationURLs`。 */
+    @Deprecated("Use tabBarItemAnimationURLs", ReplaceWith("tabBarItemAnimationURLs"))
+    val lottieURLs: MutableList<String> get() = tabBarItemAnimationURLs
+    /** [EN] `lottieSizes` (deprecated): `tabBarItemAnimationSizes`. [CN] 已废弃：即 `tabBarItemAnimationSizes`。 */
+    @Deprecated("Use tabBarItemAnimationSizes", ReplaceWith("tabBarItemAnimationSizes"))
+    val lottieSizes: MutableList<CYLSize> get() = tabBarItemAnimationSizes
+
+    /** [EN] `-lottieAnimationViewContentMode` (use `tabBarItemAnimationViewContentMode`); override in a subclass. [CN] 请使用 `tabBarItemAnimationViewContentMode`；可在子类中重写。 */
+    open fun lottieAnimationViewContentMode(): android.widget.ImageView.ScaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+    /** [EN] `-tabBarItemAnimationViewContentMode`: the scale of every animation view, for any library; default `lottieAnimationViewContentMode()`. [CN] 所有动画视图的缩放方式；默认为 `lottieAnimationViewContentMode()`。 */
+    open fun tabBarItemAnimationViewContentMode(): android.widget.ImageView.ScaleType = lottieAnimationViewContentMode()
+
+    /** [EN] Adds the animation of every tab that names one (#604), and shows the selected one's last frame (#389). [CN] 为每个指定了动画的 Tab 添加动画，并显示选中 Tab 的最后一帧（#389）。 */
+    private fun cyl_addTabBarItemAnimations() {
+        tabBarItemAnimationURLs.clear()
+        tabBarItemAnimationSizes.clear()
+        tabBar.tabBarButtonArray.forEachIndexed { index, button ->
+            val attributes = tabBarItemsAttributes.getOrNull(index) ?: return@forEachIndexed
+            val url = CYLTabBarItemAnimationURLOfAttributes(attributes) ?: return@forEachIndexed
+            val size = CYLTabBarConfiguration.sizeValue(CYLTabBarItemAttributesAnimationValue(attributes, CYLConstants.CYLTabBarAnimationSize))
+                ?: CYLConstants.cyl_tabBarItemAnimationSizeValue(null, button.item.image)
+            tabBarItemAnimationURLs += url
+            tabBarItemAnimationSizes += size
+            button.item.cyl_tabBarItemAnimationURL = url
+            button.item.cyl_tabBarItemAnimationSizeValue = size
+            button.cyl_addTabBarItemAnimationWithURL(url, size, tabBarItemAnimationViewContentMode(), tabBarItemAnimationSpeed)
+        }
+        cyl_playSelectedTabBarItemAnimation(defaultSelected = true)
+    }
+
+    /** [EN] Plays the selected tab's animation (or shows its last frame) and stops the others. [CN] 播放选中 Tab 的动画（或显示最后一帧），停止其他动画。 */
+    private fun cyl_playSelectedTabBarItemAnimation(defaultSelected: Boolean) {
+        if (tabBarItemAnimationURLs.isEmpty()) return
+        val selected = if (tabBar.plusButtonActive) tabBar.plusButton else tabBar.cyl_tabBarButtonWithTabIndex(selectedIndex)
+        val item = (selected as? CYLTabBarItemButton)?.item
+        tabBar.cyl_animationLottieImageWithSelectedControl(selected, item?.cyl_tabBarItemAnimationURL, item?.cyl_tabBarItemAnimationSizeValue, defaultSelected, tabBarItemAnimationViewContentMode())
+    }
 
     /** [EN] `selectedIndex`: setting it selects the page (no delegate questions). [CN] 设置即选中页面（不询问代理）。 */
     var selectedIndex: Int = 0
         set(value) {
             if (value < 0 || value >= viewControllers.size) return
+            val previous = field
             field = value
             tabBar.plusButtonActive = false
             showSelectedPage()
             tabBar.refreshSelection()
+            if (previous != value) cyl_playSelectedTabBarItemAnimation(defaultSelected = false)
+            if (previous != value && !revertingTransition) runTransition(previous, value)
         }
+
+    private var revertingTransition = false
+
+    /**
+     * [EN] Asks the delegate for a transition animator (`CYLTabBarSlideTransitionAnimator`) and, when it returns one, slides
+     *      the pages; an interaction controller (`CYLTabBarInteractiveTransition`) makes the pan drive it. A cancelled
+     *      interactive transition selects the previous tab again.
+     * [CN] 向代理询问转场动画对象（`CYLTabBarSlideTransitionAnimator`），返回时滑动切换页面；交互控制器（`CYLTabBarInteractiveTransition`）
+     *      让拖动驱动转场。取消的交互转场会重新选中之前的 Tab。
+     */
+    private fun runTransition(previous: Int, index: Int) {
+        val delegate = delegate ?: return
+        val from = viewControllers.getOrNull(previous) ?: return
+        val to = viewControllers.getOrNull(index) ?: return
+        val toView = to.view ?: return
+        val animator = delegate.tabBarController_animationControllerForTransition(this, from, to) ?: return
+        val fromView = from.view
+        val completion: (Boolean) -> Unit = { finished ->
+            if (finished) {
+                if (from.isHidden) fromView?.visibility = View.GONE
+            } else {
+                revertingTransition = true
+                selectedIndex = previous
+                revertingTransition = false
+                if (to.isHidden) toView.visibility = View.GONE
+            }
+        }
+        val interaction = delegate.tabBarController_interactionControllerForAnimationController(this, animator)
+        if (interaction != null) {
+            animator.prepare(fromView, toView, completion)
+            interaction.startInteractiveTransition(animator, pagesContainer.width)
+        } else {
+            animator.animateTransition(fromView, toView, completion)
+        }
+    }
     val selectedViewController: Fragment? get() = viewControllers.getOrNull(selectedIndex)
 
     var tabBarHidden: Boolean = false
@@ -185,7 +282,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         tabBarStyleType = (normalized[CYLConstants.CYLTabBarControllerStyleType] as? CYLEnums.CYLTabBarStyleType) ?: CYLEnums.CYLTabBarStyleType.Default
         context = normalized[CYLConstants.CYLTabBarControllerContext] as? String
         (normalized[CYLConstants.CYLTabBarControllerTabBarItemAnimationSpeed]?.toString()?.toFloatOrNull())?.takeIf { it > 0 && it.isFinite() }?.let { tabBarItemAnimationSpeed = it }
-        setViewControllers(pages ?: emptyList(), items)
+        setViewControllers(pages, items)
         cyl_adoptPendingPages()
         cyl_didInitialize()
     }
@@ -246,6 +343,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         if (selectedIndex >= viewControllers.size) selectedIndex = 0
         commitPages()
         tabBar.cyl_reloadTabButtons()
+        cyl_addTabBarItemAnimations()
         loadImageURLs()
         cyl_applyLaunchTabBarThemeIfNeeded()
         viewDidLayoutSubviewsBlock?.invoke(this)
@@ -289,6 +387,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     private fun showSelectedPage() {
         commitPages()
+        cyl_trackSelectedPageScrollView()
         if (cyl_hidesBadgeOfSelectedTab) {
             tabBar.tabBarButtonArray.forEachIndexed { index, button -> if (index == selectedIndex) button.cyl_pauseBadge() else if (button.cyl_isPauseBadge()) button.cyl_resumeBadge() }
         }
@@ -301,7 +400,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         val page = viewControllers.getOrNull(index) ?: return
         val delegate = delegate
         if (delegate?.tabBarController_shouldPerformCustomActionForViewController(this, page) ?: cyl_isCustomActionTabViewController(page)) {
-            delegate?.tabBarController_performCustomActionForViewController(this, page)
+            // [EN] `cyl_customTabActionHandler` when set, else the delegate. [CN] 设置了 `cyl_customTabActionHandler` 时用它，否则用代理。
+            cyl_customActionBlock?.invoke(this, page) ?: delegate?.tabBarController_performCustomActionForViewController(this, page)
             cyl_playTabButtonTapFeedback()
             delegate?.tabBarController_didRecognizeTabBarItemGesture(this, CYLEnums.CYLTabBarItemGesture.Tap, button, page)
             return
@@ -356,6 +456,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             tabBar.refreshSelection()
             delegate?.tabBarController_didSelectViewController(this, child)
         }
+        cyl_playTabButtonAnimationForControl(plusButton)
+        cyl_playTabButtonTapFeedback()
         delegate?.tabBarController_didSelectControl(this, plusButton)
     }
 
@@ -428,11 +530,15 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         if (url.startsWith("http")) java.net.URI(url).toURL().openStream().use { android.graphics.drawable.Drawable.createFromStream(it, url) } else CYLTabBarConfiguration.imageResolver.drawable(activity, url)
     } catch (error: Exception) { null }
 
-    /** [EN] `-setTabBarItemIconViewProvider:atIndex:`: a custom view in place of the icon. [CN] 用自定义视图代替图标。 */
-    fun setTabBarItemIconViewProvider(provider: ((CYLTabBarItemButton) -> View)?, index: Int) {
+    /**
+     * [EN] `-setTabBarItemIconViewProvider:atIndex:`: the tab shows `provider(selected)` in place of its icon, asked again when
+     *      its selection changes; null shows the icon again.
+     * [CN] Tab 用 `provider(selected)` 代替图标，选中状态变化时再次询问；null 恢复图标。
+     */
+    fun setTabBarItemIconViewProvider(provider: CYLTabBarItemIconViewProvider?, index: Int) {
         val button = tabBar.cyl_tabBarButtonWithTabIndex(index) ?: return
-        button.iconView.visibility = if (provider == null) View.VISIBLE else View.INVISIBLE
-        provider?.invoke(button)?.let { button.addView(it) }
+        button.cyl_iconViewProvider = provider
+        button.cyl_applyIconViewProvider()
     }
 
     fun updatePlusButtonWithAttributes(attributes: Map<String, Any?>) {
@@ -450,9 +556,24 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         setViewControllers(pages, items)
     }
 
-    /** [EN] `-performWhenTabBarItemsReady:`: Android lays out synchronously, so the block runs now. [CN] Android 同步布局，立即执行。 */
-    fun performWhenTabBarItemsReady(block: (CYLTabBarController) -> Unit) = block(this)
-    fun reloadBadgesWithBlock(block: (CYLTabBarController) -> Unit) = block(this)
+    /**
+     * [EN] `-performWhenTabBarItemsReady:`: runs `block` once the tab buttons are laid out (now when they are), e.g. to
+     *      show badges on them.
+     * [CN] Tab 按钮布局完成后执行 `block`（已布局时立即执行），例如在按钮上显示角标。
+     */
+    fun performWhenTabBarItemsReady(block: (CYLTabBarController) -> Unit) {
+        val ready = tabBar.isLaidOut && tabBar.tabBarButtonArray.all { it.width > 0 }
+        if (ready) return block(this)
+        tabBar.viewTreeObserver.addOnGlobalLayoutListener(object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                if (tabBar.tabBarButtonArray.any { it.width == 0 }) return
+                tabBar.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                block(this@CYLTabBarController)
+            }
+        })
+    }
+    /** [EN] `-reloadBadgesWithBlock:`: `block` sets the badges once the tab buttons are ready. [CN] Tab 按钮就绪后由 `block` 设置角标。 */
+    fun reloadBadgesWithBlock(block: (CYLTabBarController) -> Unit) = performWhenTabBarItemsReady(block)
     fun setViewDidLayoutSubViewsBlock(block: ((CYLTabBarController) -> Unit)?) { viewDidLayoutSubviewsBlock = block }
     fun setViewDidLayoutSubViewsBlockInvokeOnce(once: Boolean, block: ((CYLTabBarController) -> Unit)?) {
         viewDidLayoutSubviewsBlock = if (once && block != null) { controller -> block(controller); viewDidLayoutSubviewsBlock = null } else block
@@ -460,9 +581,42 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     fun updateImageInsets(insets: CYLEdgeInsets) { imageInsets = insets }
     fun hideTabBarShadowImageView() { tabBar.cyl_shadowColor = null; tabBar.refreshSelection() }
     fun setTintColor(@ColorInt color: Int) { tabBar.selectedTintColor = color; tabBar.refreshSelection() }
-    /** [EN] `-unloadViewsOfUnselectedViewControllers`: Android keeps hidden fragments; nothing to unload. [CN] Android 保留隐藏的 Fragment，无需卸载。 */
-    fun unloadViewsOfUnselectedViewControllers() { /* [EN] See above. [CN] 见上。 */ }
-    open fun shouldUnloadViewOfViewController(viewController: Fragment): Boolean = unloadsUnselectedViewsOnMemoryWarning
+    /**
+     * [EN] `-unloadViewsOfUnselectedViewControllers` (#426): detaches the tabs that are not selected, which destroys their
+     *      views (the page instances are kept); a detached tab creates its view again (`onCreateView`, the iOS
+     *      `-viewDidLoad`) when it is selected. Tabs for which `shouldUnloadViewOfViewController` returns false are kept.
+     * [CN] 分离未选中的 Tab（#426），销毁其视图（保留页面实例）；被分离的 Tab 在选中时重新创建视图（`onCreateView`，即 iOS 的 `-viewDidLoad`）。
+     *      `shouldUnloadViewOfViewController` 返回 false 的 Tab 保留。
+     */
+    fun unloadViewsOfUnselectedViewControllers() {
+        if (fragmentManager.isDestroyed || fragmentManager.isStateSaved) return
+        val transaction = fragmentManager.beginTransaction()
+        var changed = false
+        viewControllers.forEachIndexed { index, page ->
+            if (index != selectedIndex && page.isAdded && !page.isDetached && page.view != null && shouldUnloadViewOfViewController(page)) {
+                transaction.detach(page)
+                changed = true
+            }
+        }
+        if (changed) transaction.commitNowAllowingStateLoss()
+    }
+    /** [EN] `-shouldUnloadViewOfViewController:`: whether a tab may be unloaded; override it to keep some tabs. [CN] Tab 是否可以卸载；重写以保留部分 Tab。 */
+    open fun shouldUnloadViewOfViewController(viewController: Fragment): Boolean = true
+
+    /** [EN] A memory warning (`onTrimMemory` / `onLowMemory`): unloads when `unloadsUnselectedViewsOnMemoryWarning`. [CN] 内存警告：`unloadsUnselectedViewsOnMemoryWarning` 时卸载。 */
+    internal fun cyl_didReceiveMemoryWarning() {
+        if (unloadsUnselectedViewsOnMemoryWarning) unloadViewsOfUnselectedViewControllers()
+    }
+
+    private val memoryCallbacks: android.content.ComponentCallbacks2 = object : android.content.ComponentCallbacks2 {
+        override fun onTrimMemory(level: Int) {
+            @Suppress("DEPRECATION")
+            if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) cyl_didReceiveMemoryWarning()
+        }
+        override fun onConfigurationChanged(newConfig: android.content.res.Configuration) { /* [EN] Not a memory warning. [CN] 不是内存警告。 */ }
+        @Deprecated("Deprecated in Java")
+        override fun onLowMemory() = cyl_didReceiveMemoryWarning()
+    }.also { activity.registerComponentCallbacks(it) }
 
     // MARK: - CYLTabBarItemIdentifier 标识
 
@@ -482,10 +636,18 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     // MARK: - CYLLogin (#19) 登录
 
+    /** [EN] Whether the user is logged in: `cyl_loginStateProvider` when set, else the cached value. [CN] 用户是否已登录：设置了 `cyl_loginStateProvider` 时用它，否则为缓存值。 */
     var cyl_loggedIn: Boolean = false
+        get() = cyl_loginStateProvider?.invoke() ?: field
+    /** [EN] `cyl_loginStateProvider`: your app's own login state. [CN] App 自己的登录状态。 */
+    var cyl_loginStateProvider: (() -> Boolean)? = null
+    /** [EN] `cyl_loginHandler`: shows the login screen, then calls the completion with the result (`cyl_presentLoginBlock`). [CN] 展示登录界面，然后用结果调用 completion（即 `cyl_presentLoginBlock`）。 */
+    var cyl_loginHandler: ((CYLTabBarController, Fragment, CYLTabBarLoginCompletion) -> Unit)?
+        get() = cyl_presentLoginBlock
+        set(value) { cyl_presentLoginBlock = value }
     var cyl_loginRequiredTabBarItemIdentifiers: List<String> = emptyList()
     var cyl_loginRequiredBlock: ((CYLTabBarController, Fragment) -> Boolean)? = null
-    var cyl_presentLoginBlock: ((CYLTabBarController, Fragment, (Boolean) -> Unit) -> Unit)? = null
+    var cyl_presentLoginBlock: ((CYLTabBarController, Fragment, CYLTabBarLoginCompletion) -> Unit)? = null
 
     fun cyl_isLoginRequiredForViewController(viewController: Fragment): Boolean {
         cyl_loginRequiredBlock?.let { return it(this, viewController) }
@@ -507,7 +669,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     // MARK: - CYLTabBarItemGesture (#535) 手势
 
-    var cyl_tabBarItemGestureHandler: ((CYLTabBarController, CYLEnums.CYLTabBarItemGesture, View, Fragment?) -> Unit)? = null
+    var cyl_tabBarItemGestureHandler: CYLTabBarItemGestureHandler? = null
     var cyl_tabBarItemDoubleTapInterval: Double = 0.3
         set(value) { field = value; tabBar.tabBarButtonArray.forEach { it.doubleTapInterval = value } }
     var cyl_tabBarItemLongPressDuration: Double = 0.5
@@ -567,6 +729,14 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     var cyl_customActionTabBarItemIdentifiers: List<String> = emptyList()
     var cyl_customActionBlock: ((CYLTabBarController, Fragment) -> Unit)? = null
     var cyl_customActionShouldPerformBlock: ((CYLTabBarController, Fragment) -> Boolean)? = null
+    /** [EN] `cyl_shouldPerformCustomTabActionHandler`: whether a tab runs an action instead of being selected. [CN] Tab 是否执行动作而不是被选中。 */
+    var cyl_shouldPerformCustomTabActionHandler: ((CYLTabBarController, Fragment) -> Boolean)?
+        get() = cyl_customActionShouldPerformBlock
+        set(value) { cyl_customActionShouldPerformBlock = value }
+    /** [EN] `cyl_customTabActionHandler`: the action of such a tab. [CN] 这类 Tab 的动作。 */
+    var cyl_customTabActionHandler: ((CYLTabBarController, Fragment) -> Unit)?
+        get() = cyl_customActionBlock
+        set(value) { cyl_customActionBlock = value }
     fun cyl_isCustomActionTabViewController(viewController: Fragment): Boolean {
         cyl_customActionShouldPerformBlock?.let { return it(this, viewController) }
         val identifier = cyl_tabBarItemIdentifiers.getOrNull(viewControllers.indexOf(viewController)) ?: return false
@@ -580,35 +750,142 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     // MARK: - CYLInteraction (#535) 交互
 
+    /** [EN] The built-in tap animation; `cyl_defaultTabButtonAnimation` and the page's `cyl_tabButtonAnimation` take precedence. [CN] 内置点击动画；`cyl_defaultTabButtonAnimation` 与页面的 `cyl_tabButtonAnimation` 优先。 */
     var cyl_tabButtonTapAnimationType: CYLEnums.CYLTabButtonTapAnimationType = CYLEnums.CYLTabButtonTapAnimationType.None
+        set(value) { field = value; animationForTapAnimationType = CYLTabButtonAnimationForType(value) }
+    private var animationForTapAnimationType: CYLTabButtonAnimation? = null
+    /** [EN] `cyl_defaultTabButtonAnimation`: an animation object for every tab button and the plus button. [CN] 所有 Tab 按钮与 PlusButton 的动画对象。 */
+    var cyl_defaultTabButtonAnimation: CYLTabButtonAnimation? = null
     var cyl_tabButtonTapSoundEnabled: Boolean = false
+    /**
+     * [EN] `cyl_tabButtonTapSoundURL`: the sound of a tap (a file, `content:`, `android.resource:` or asset URI); null, or a
+     *      sound that cannot be played: the system click. The player is created once and released when it changes.
+     * [CN] 点击音效（文件、`content:`、`android.resource:` 或 asset URI）；null 或无法播放时使用系统点击声。播放器只创建一次，更换时释放。
+     */
+    var cyl_tabButtonTapSoundURL: android.net.Uri? = null
+        set(value) {
+            field = value
+            tapSoundPlayer?.release()
+            tapSoundPlayer = value?.let { uri -> try { android.media.MediaPlayer.create(activity, uri) } catch (error: RuntimeException) { null } }
+        }
+    private var tapSoundPlayer: android.media.MediaPlayer? = null
     var cyl_tabButtonHapticFeedbackEnabled: Boolean = false
     var cyl_tabButtonHapticFeedbackStyle: CYLEnums.CYLImpactFeedbackStyle = CYLEnums.CYLImpactFeedbackStyle.Light
-    var cyl_didLongPressControlBlock: ((CYLTabBarController, View) -> Unit)? = null
+    var cyl_didLongPressControlBlock: CYLTabBarControllerDidLongPressControlBlock? = null
     var cyl_tabButtonLongPressMinimumDuration: Double
         get() = cyl_tabBarItemLongPressDuration
         set(value) { cyl_tabBarItemLongPressDuration = value }
     var cyl_swipeToSwitchTabEnabled: Boolean = false
 
-    /** [EN] `-cyl_playTabButtonAnimationForControl:`: scale, zoom, bounce, rotation or flip of the icon. [CN] 图标的缩放、弹跳、旋转或翻转动画。 */
-    fun cyl_playTabButtonAnimationForControl(control: View) {
-        val icon = (control as? CYLTabBarItemButton)?.iconView ?: control
-        val animator = icon.animate().setDuration(250)
-        icon.scaleX = 1f; icon.scaleY = 1f; icon.rotation = 0f; icon.rotationY = 0f
-        when (cyl_tabButtonTapAnimationType) {
-            CYLEnums.CYLTabButtonTapAnimationType.None -> return
-            CYLEnums.CYLTabButtonTapAnimationType.Scale, CYLEnums.CYLTabButtonTapAnimationType.ZoomIn -> { icon.scaleX = 0.7f; icon.scaleY = 0.7f; animator.scaleX(1f).scaleY(1f).setInterpolator(android.view.animation.OvershootInterpolator()) }
-            CYLEnums.CYLTabButtonTapAnimationType.Bounce, CYLEnums.CYLTabButtonTapAnimationType.BounceWithFireworks -> animator.translationYBy(-10f * density).withEndAction { icon.animate().translationYBy(10f * density).setInterpolator(android.view.animation.BounceInterpolator()).start() }
-            CYLEnums.CYLTabButtonTapAnimationType.Rotation -> animator.rotationBy(360f).setDuration(400)
-            CYLEnums.CYLTabButtonTapAnimationType.Flip -> animator.rotationYBy(360f).setDuration(400)
-            CYLEnums.CYLTabButtonTapAnimationType.Fume, CYLEnums.CYLTabButtonTapAnimationType.Frame, CYLEnums.CYLTabButtonTapAnimationType.Lottie -> { icon.alpha = 0.3f; animator.alpha(1f) }
-        }
-        animator.start()
+    private fun iconViewOf(control: View): View = when (control) {
+        is CYLTabBarItemButton -> control.iconView
+        is CYLPlusButton -> control.imageView
+        else -> control
     }
 
-    /** [EN] `-cyl_playTabButtonTapFeedback`: the click sound and the haptic. [CN] 点击声音与触感。 */
+    private fun titleLabelOf(control: View): android.widget.TextView? = when (control) {
+        is CYLTabBarItemButton -> control.titleLabel.takeIf { it.text.isNotEmpty() }
+        is CYLPlusButton -> control.titleLabel.takeIf { it.text.isNotEmpty() }
+        else -> null
+    }
+
+    /** [EN] The page index of a tab button, or of the plus button when it has a child page; -1 otherwise. [CN] Tab 按钮的页面下标，或有子页面的 PlusButton；否则为 -1。 */
+    private fun viewControllerIndexForTabControl(control: View?): Int = when (control) {
+        is CYLTabBarItemButton -> control.index.takeIf { it in viewControllers.indices } ?: -1
+        is CYLPlusButton -> if (control.provider?.plusChildViewController() != null) viewControllers.size else -1
+        else -> -1
+    }
+
+    /** [EN] The animation of `control`: its page's `cyl_tabButtonAnimation`, else `cyl_defaultTabButtonAnimation`, else the type's. [CN] `control` 的动画：页面的 `cyl_tabButtonAnimation`，否则 `cyl_defaultTabButtonAnimation`，否则类型对应的动画。 */
+    private fun animationForTabControl(control: View): CYLTabButtonAnimation? {
+        val page = when (control) {
+            is CYLTabBarItemButton -> viewControllers.getOrNull(control.index)
+            is CYLPlusButton -> control.provider?.plusChildViewController()
+            else -> null
+        }
+        return page?.cyl_tabButtonAnimation ?: cyl_defaultTabButtonAnimation ?: animationForTapAnimationType
+    }
+
+    private var previousAnimatedControl: java.lang.ref.WeakReference<View>? = null
+    private val lastSelectAnimations = java.util.WeakHashMap<View, CYLTabButtonAnimation>()
+
+    /** [EN] When `control`'s last select animation is not `animation`, lets it undo what it left on the button. [CN] `control` 上次的选中动画不是 `animation` 时，让它撤销留在按钮上的状态。 */
+    private fun resetAnimationIfReplaced(control: View, animation: CYLTabButtonAnimation?) {
+        val last = lastSelectAnimations[control] ?: return
+        if (last === animation) return
+        if (last.cyl_respondsToSelector("cyl_resetTabButton")) last.cyl_resetTabButton(control, iconViewOf(control), titleLabelOf(control))
+        lastSelectAnimations.remove(control)
+    }
+
+    /**
+     * [EN] `-cyl_playTabButtonAnimationForControl:`: the button selected before plays its deselect animation, then this one
+     *      plays its select animation (or its reselect animation on a tap of the selected tab), as on iOS.
+     * [CN] 之前选中的按钮播放取消选中动画，然后本按钮播放选中动画（再次点击已选中的 Tab 时播放重选动画），与 iOS 一致。
+     */
+    fun cyl_playTabButtonAnimationForControl(control: View) {
+        val previous = previousAnimatedControl?.get()
+        if (previous != null && previous !== control) resetAnimationIfReplaced(previous, animationForTabControl(previous))
+        val index = viewControllerIndexForTabControl(control)
+        val previousIndex = viewControllerIndexForTabControl(previous)
+        val hasIndexes = index >= 0 && previousIndex >= 0
+        if (previous != null && previous !== control) {
+            val previousAnimation = animationForTabControl(previous)
+            if (previousAnimation.cyl_implements(CYLTabButtonAnimationStep.Deselect)) {
+                if (hasIndexes && previousAnimation!!.cyl_respondsToSelector("cyl_setToRight")) previousAnimation.cyl_setToRight(previousIndex < index)
+                previousAnimation!!.cyl_play(CYLTabButtonAnimationStep.Deselect, previous, iconViewOf(previous), titleLabelOf(previous))
+            }
+        }
+        // [EN] A plus button without a child page selects nothing: it is not recorded. [CN] 没有子页面的 PlusButton 不选中任何页面：不记录。
+        if (!(control is CYLPlusButton && index < 0)) previousAnimatedControl = java.lang.ref.WeakReference(control)
+        val animation = animationForTabControl(control)
+        resetAnimationIfReplaced(control, animation)
+        animation ?: return
+        lastSelectAnimations[control] = animation
+        val isReselect = previous === control && index >= 0 && (index == selectedIndex || control is CYLPlusButton)
+        if (isReselect && animation.cyl_implements(CYLTabButtonAnimationStep.Reselect)) {
+            animation.cyl_play(CYLTabButtonAnimationStep.Reselect, control, iconViewOf(control), titleLabelOf(control))
+            return
+        }
+        if (hasIndexes && animation.cyl_respondsToSelector("cyl_setFromLeft")) animation.cyl_setFromLeft(previousIndex < index)
+        animation.cyl_play(CYLTabButtonAnimationStep.Select, control, iconViewOf(control), titleLabelOf(control))
+    }
+
+    private var highlightedControl: java.lang.ref.WeakReference<View>? = null
+
+    /** [EN] Plays the highlight (finger down) or dehighlight (finger up) animation; one button is highlighted at a time. [CN] 播放按下或抬起动画；同一时间只有一个按钮处于按下状态。 */
+    internal fun cyl_setTabButtonHighlighted(highlighted: Boolean, control: View?) {
+        val current = highlightedControl?.get()
+        var target = control
+        if (highlighted) {
+            if (target == null || target === current) return
+            if (current != null) cyl_setTabButtonHighlighted(false, current)
+        } else {
+            target = target ?: current
+            if (target == null || target !== current) return
+        }
+        highlightedControl = if (highlighted) java.lang.ref.WeakReference(target) else null
+        val animation = animationForTabControl(target)
+        val step = if (highlighted) CYLTabButtonAnimationStep.Highlight else CYLTabButtonAnimationStep.Dehighlight
+        if (animation.cyl_implements(step)) animation!!.cyl_play(step, target, iconViewOf(target), titleLabelOf(target))
+    }
+
+    internal fun cyl_tabButtonTouchDown(control: View) = cyl_setTabButtonHighlighted(true, control)
+    internal fun cyl_tabButtonTouchUp(control: View) = cyl_setTabButtonHighlighted(false, control)
+
+    /** [EN] An item's `badgeValue` got a new value: plays its badge-changed animation on the next frame. [CN] item 的 `badgeValue` 有了新值：在下一帧播放角标变化动画。 */
+    internal fun cyl_tabBarItemBadgeValueDidChange(item: CYLTabBarItem) {
+        val control = item.cyl_visiableTabButton ?: return
+        val animation = animationForTabControl(control)
+        if (!animation.cyl_implements(CYLTabButtonAnimationStep.BadgeChanged)) return
+        control.post { animation!!.cyl_play(CYLTabButtonAnimationStep.BadgeChanged, control, control.iconView, null, control.cyl_badge) }
+    }
+
+    /** [EN] `-cyl_playTabButtonTapFeedback`: the tap sound (`cyl_tabButtonTapSoundURL`, else the click) and the haptic. [CN] 点击音效（`cyl_tabButtonTapSoundURL`，否则系统点击声）与触感。 */
     fun cyl_playTabButtonTapFeedback() {
-        if (cyl_tabButtonTapSoundEnabled) tabBar.playSoundEffect(SoundEffectConstants.CLICK)
+        if (cyl_tabButtonTapSoundEnabled) {
+            val player = tapSoundPlayer
+            if (player != null) { player.seekTo(0); player.start() } else tabBar.playSoundEffect(SoundEffectConstants.CLICK)
+        }
         if (cyl_tabButtonHapticFeedbackEnabled) tabBar.performHapticFeedback(if (cyl_tabButtonHapticFeedbackStyle == CYLEnums.CYLImpactFeedbackStyle.Light) HapticFeedbackConstants.KEYBOARD_TAP else HapticFeedbackConstants.LONG_PRESS)
     }
 
@@ -624,7 +901,9 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     // MARK: - CYLTabBarMinimize (#13) 滚动隐藏
 
     var cyl_tabBarMinimizeBehavior: CYLEnums.CYLTabBarMinimizeBehavior = CYLEnums.CYLTabBarMinimizeBehavior.Automatic
+    /** [EN] `cyl_hidesTabBarOnScroll`: the selected page's scrolling view is observed automatically, as on iOS. [CN] 自动观察选中页面的滚动视图，与 iOS 一致。 */
     var cyl_hidesTabBarOnScroll: Boolean = false
+        set(value) { field = value; if (value) cyl_trackSelectedPageScrollView() }
     var cyl_isTabBarHiddenByScroll: Boolean = false
         private set
     private var lastScrollY = 0
@@ -642,6 +921,13 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         }
     }
     fun cyl_simulateHideOnScrollForTesting() = cyl_scrollDidChange(20)
+
+    /** [EN] Finds the selected page's first scrolling view, after its layout, and tracks it. [CN] 在选中页面布局后找到其第一个滚动视图并观察它。 */
+    private fun cyl_trackSelectedPageScrollView() {
+        if (!cyl_hidesTabBarOnScroll) return
+        val root = selectedViewController?.view ?: return
+        root.post { findScrollingView(root)?.let { cyl_trackScrollView(it) } }
+    }
 
     // MARK: - CYLTheme (#216) 主题
 
@@ -744,6 +1030,9 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         /** [EN] `+cyl_activeTabBarController`: the most recently created live controller. [CN] 最近创建且仍存活的控制器。 */
         @JvmStatic fun cyl_activeTabBarController(): CYLTabBarController? = synchronized(active) { active.entries.maxByOrNull { it.value }?.key }
 
+        /** [EN] Every live controller, oldest first. [CN] 所有存活的控制器，按创建顺序。 */
+        internal fun cyl_liveTabBarControllers(): List<CYLTabBarController> = synchronized(active) { active.entries.sortedBy { it.value }.map { it.key } }
+
         /** [EN] `+cyl_tabBarControllerForContext:`: the most recent live controller of that context. [CN] 该 context 最近创建且仍存活的控制器。 */
         @JvmStatic fun cyl_tabBarControllerForContext(context: String?): CYLTabBarController? = synchronized(active) {
             active.entries.filter { (it.key.context ?: CYLPlusButton.DEFAULT_TAB_BAR_CONTEXT) == (context ?: CYLPlusButton.DEFAULT_TAB_BAR_CONTEXT) }.maxByOrNull { it.value }?.key
@@ -760,9 +1049,21 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             return null
         }
 
-        /** [EN] `+cyl_simulateMemoryWarning`: nothing to free on Android (hidden fragments keep their views). [CN] Android 上无需释放。 */
-        @JvmStatic fun cyl_simulateMemoryWarning() = Unit
-        @JvmStatic fun cyl_simulateMemoryWarningForTabBarController(tabBarController: CYLTabBarController) = tabBarController.unloadViewsOfUnselectedViewControllers()
+        /** [EN] `+cyl_simulateMemoryWarning`: a memory warning for the active controller. [CN] 为当前活跃的控制器模拟内存警告。 */
+        @JvmStatic fun cyl_simulateMemoryWarning() = cyl_simulateMemoryWarningForTabBarController(cyl_activeTabBarController())
+        /**
+         * [EN] `+cyl_simulateMemoryWarningForTabBarController:`: what a real memory warning does (`unloadsUnselectedViewsOnMemoryWarning`
+         *      unloads the unselected tabs, #426), then logs every tab: loaded or not, and its animation view.
+         * [CN] 执行真实内存警告的处理（`unloadsUnselectedViewsOnMemoryWarning` 卸载未选中的 Tab，#426），然后输出每个 Tab：是否已加载及其动画视图。
+         */
+        @JvmStatic fun cyl_simulateMemoryWarningForTabBarController(tabBarController: CYLTabBarController?) {
+            val controller = tabBarController ?: return
+            controller.cyl_didReceiveMemoryWarning()
+            controller.viewControllers.forEachIndexed { index, page ->
+                val button = controller.tabBar.cyl_tabBarButtonWithTabIndex(index)
+                android.util.Log.d("CYLTabBarController", "tab $index ${controller.tabBarItems.getOrNull(index)?.title ?: page.javaClass.simpleName}: view ${if (page.view != null) "loaded" else "unloaded"}, animation ${if (button?.cyl_isTabBarItemAnimationReady() == true) "added" else "none"}")
+            }
+        }
 
         /** [EN] `+cyl_defaultTabBarItemIdentifierForClass:`: the class name. [CN] 类名。 */
         @JvmStatic fun cyl_defaultTabBarItemIdentifierForClass(aClass: Class<*>): String = aClass.name
@@ -788,9 +1089,17 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         @JvmStatic fun loadConfigurationWithURL(url: String, completion: (Map<String, Any?>?, CYLTabBarConfiguration.CYLConfigurationException?) -> Unit) =
             CYLTabBarConfiguration.loadConfigurationWithURL(url, completion)
 
-        @JvmStatic fun loadTabBarControllerWithConfigurationURL(activity: FragmentActivity, url: String, completion: (CYLTabBarController?, CYLTabBarConfiguration.CYLConfigurationException?) -> Unit) {
-            CYLTabBarConfiguration.loadConfigurationWithURL(url) { configuration, error ->
-                if (configuration == null) { completion(null, error); return@loadConfigurationWithURL }
+        /** [EN] `+loadConfigurationWithURLRequest:completion:`. [CN] 使用自己的请求加载配置。 */
+        @JvmStatic fun loadConfigurationWithURLRequest(request: CYLTabBarConfiguration.CYLURLRequest, completion: (Map<String, Any?>?, CYLTabBarConfiguration.CYLConfigurationException?) -> Unit) =
+            CYLTabBarConfiguration.loadConfigurationWithURLRequest(request, completion)
+
+        @JvmStatic fun loadTabBarControllerWithConfigurationURL(activity: FragmentActivity, url: String, completion: (CYLTabBarController?, CYLTabBarConfiguration.CYLConfigurationException?) -> Unit) =
+            loadTabBarControllerWithConfigurationURLRequest(activity, CYLTabBarConfiguration.CYLURLRequest(url), completion)
+
+        /** [EN] `+loadTabBarControllerWithConfigurationURLRequest:completion:`: a controller from a configuration your request downloads. [CN] 用自己的请求下载配置并创建控制器。 */
+        @JvmStatic fun loadTabBarControllerWithConfigurationURLRequest(activity: FragmentActivity, request: CYLTabBarConfiguration.CYLURLRequest, completion: (CYLTabBarController?, CYLTabBarConfiguration.CYLConfigurationException?) -> Unit) {
+            CYLTabBarConfiguration.loadConfigurationWithURLRequest(request) { configuration, error ->
+                if (configuration == null) { completion(null, error); return@loadConfigurationWithURLRequest }
                 val controller = CYLTabBarController(activity, configuration)
                 if (controller.viewControllers.isEmpty()) completion(null, CYLTabBarConfiguration.CYLConfigurationException(CYLTabBarConfiguration.CYLTabBarConfigurationError.NoPages, "no tab found its page")) else completion(controller, null)
             }
@@ -838,3 +1147,22 @@ val Fragment.cyl_tabBarController: CYLTabBarController?
 
 /** [EN] `-cyl_owningTabBarController`: the controller this page (or a parent) is a tab of. [CN] 本页面（或其父页面）所属的控制器。 */
 fun Fragment.cyl_owningTabBarController(): CYLTabBarController? = CYLTabBarController.cyl_tabBarControllerOfFragment(this)
+
+// MARK: - Block types (the iOS typedefs) 回调类型（iOS 的 typedef）
+
+/** [EN] `CYLViewDidLayoutSubViewsBlock`: the controller laid its tab bar out. [CN] 控制器完成 TabBar 布局。 */
+typealias CYLViewDidLayoutSubViewsBlock = (tabBarController: CYLTabBarController) -> Unit
+/** [EN] `CYLTabBarDidLayoutSubViewsBlock`: the tab bar laid its buttons out. [CN] TabBar 完成按钮布局。 */
+typealias CYLTabBarDidLayoutSubViewsBlock = (tabBar: CYLTabBar) -> Unit
+/** [EN] `CYLTabBarControllerDidLongPressControlBlock`: a long press on a tab button. [CN] 长按 Tab 按钮。 */
+typealias CYLTabBarControllerDidLongPressControlBlock = (tabBarController: CYLTabBarController, control: View) -> Unit
+/** [EN] `CYLTabBarLoginCompletion` (#19): call it with the result of the login. [CN] 用登录结果调用它（#19）。 */
+typealias CYLTabBarLoginCompletion = (loggedIn: Boolean) -> Unit
+/** [EN] `CYLTabBarItemGestureHandler` (#535): a gesture on a tab button. [CN] Tab 按钮上的手势（#535）。 */
+typealias CYLTabBarItemGestureHandler = (tabBarController: CYLTabBarController, gesture: CYLEnums.CYLTabBarItemGesture, control: View, viewController: Fragment?) -> Unit
+/** [EN] `CYLTabBarItemIconViewProvider`: the view shown in place of a tab's icon, for its selection. [CN] 按选中状态代替 Tab 图标显示的视图。 */
+typealias CYLTabBarItemIconViewProvider = (selected: Boolean) -> View?
+/** [EN] `CYLTabBarControllerConfigurationCompletion`: a controller from a configuration, or the error. [CN] 由配置创建的控制器，或错误。 */
+typealias CYLTabBarControllerConfigurationCompletion = (tabBarController: CYLTabBarController?, error: CYLTabBarConfiguration.CYLConfigurationException?) -> Unit
+/** [EN] `CYLTabBarConfigurationCompletion`: a loaded configuration, or the error. [CN] 加载的配置，或错误。 */
+typealias CYLTabBarConfigurationCompletion = (configuration: Map<String, Any?>?, error: CYLTabBarConfiguration.CYLConfigurationException?) -> Unit

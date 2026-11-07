@@ -27,9 +27,21 @@ import kotlin.math.abs
  * [CN] 一个 Tab 的按钮（`UITabBarButton` / `CYLFlatDesignTabBarItem`）：图标在上、标题在下，带每个 Tab 的颜色与字体、角标宿主，以及上报给
  *      TabBar 的手势（点击、双击、长按、滑动）。
  */
+@android.annotation.SuppressLint("ViewConstructor") // [EN] Made by the tab bar for an item, never inflated. [CN] 由 TabBar 为 item 创建，不从 XML 加载。
 class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: Int) : FrameLayout(context) {
 
     val iconView = ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_INSIDE }
+    /** [EN] The view of `setTabBarItemIconViewProvider`, laid out in place of the icon. [CN] `setTabBarItemIconViewProvider` 提供的视图，代替图标布局。 */
+    internal var cyl_customIconView: View? = null
+    internal var cyl_iconViewProvider: CYLTabBarItemIconViewProvider? = null
+
+    /** [EN] Asks the icon view provider for the view of the current selection. [CN] 向图标视图 provider 请求当前选中状态的视图。 */
+    internal fun cyl_applyIconViewProvider() {
+        cyl_customIconView?.let { removeView(it) }
+        cyl_customIconView = cyl_iconViewProvider?.invoke(isSelected)?.also { custom -> (custom.parent as? ViewGroup)?.removeView(custom); addView(custom) }
+        iconView.visibility = if (cyl_customIconView == null && !cyl_isTabBarItemAnimationReady()) View.VISIBLE else View.INVISIBLE
+        requestLayout()
+    }
     val titleLabel = TextView(context).apply { gravity = Gravity.CENTER; maxLines = 1; textSize = 10f }
     internal var onTap: (() -> Unit)? = null
     internal var onDoubleTap: (() -> Unit)? = null
@@ -60,7 +72,9 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         val tabBar = parent as? CYLTabBar
         val hasTitle = titleLabel.text.isNotEmpty()
         titleLabel.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED)
-        val titleHeight = if (hasTitle) titleLabel.measuredHeight else 0
+        // [EN] `automaticallyAdjustsImageOnlyTabs` (default true): a tab without a title centers its icon; false keeps the title's room. [CN] 没有标题的 Tab 默认图标居中；false 时保留标题的空间。
+        val keepsTitleRoom = tabBar?.tabBarController?.automaticallyAdjustsImageOnlyTabs == false
+        val titleHeight = if (hasTitle || keepsTitleRoom) titleLabel.measuredHeight else 0
         val insets = item.cyl_imageInsets
         val controller = tabBar?.tabBarController
         val controllerInsets = controller?.imageInsets
@@ -72,6 +86,19 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         val iconTop = ((height - contentHeight) / 2f + insets.top * density + offset.vertical * density + (tabBar?.tabImageViewDefaultOffset ?: 0f) * density).toInt()
         val iconLeft = ((width - iconSize) / 2f + insets.left * density + offset.horizontal * density).toInt()
         iconView.layout(iconLeft, iconTop, iconLeft + iconSize, iconTop + iconSize)
+        cyl_customIconView?.let { custom ->
+            custom.measure(MeasureSpec.makeMeasureSpec(iconSize, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(iconSize, MeasureSpec.EXACTLY))
+            custom.layout(iconLeft, iconTop, iconLeft + iconSize, iconTop + iconSize)
+        }
+        cyl_tabBarItemAnimationView?.let { animation ->
+            // [EN] The animation view sits where the icon is, at its own size. [CN] 动画视图位于图标处，使用自己的尺寸。
+            val animationWidth = animation.layoutParams.width.takeIf { it > 0 } ?: iconSize
+            val animationHeight = animation.layoutParams.height.takeIf { it > 0 } ?: iconSize
+            animation.measure(MeasureSpec.makeMeasureSpec(animationWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(animationHeight, MeasureSpec.EXACTLY))
+            val centerX = iconLeft + iconSize / 2
+            val centerY = iconTop + iconSize / 2
+            animation.layout(centerX - animationWidth / 2, centerY - animationHeight / 2, centerX + animationWidth / 2, centerY + animationHeight / 2)
+        }
         val titleOffset = item.cyl_titlePositionAdjustment
         val controllerOffset = tabBar?.tabBarController?.titlePositionAdjustment ?: CYLOffset.zero
         val titleTop = (iconTop + iconSize + (titleOffset.vertical + controllerOffset.vertical) * density).toInt()
@@ -91,6 +118,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
+                (parent as? CYLTabBar)?.tabBarController?.cyl_tabButtonTouchDown(this)
                 downTime = event.eventTime
                 downX = event.x
                 longPressed = false
@@ -101,6 +129,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
             MotionEvent.ACTION_UP -> {
                 removeCallbacks(longPressRunnable)
                 isPressed = false
+                (parent as? CYLTabBar)?.tabBarController?.cyl_tabButtonTouchUp(this)
                 val dx = event.x - downX
                 if (abs(dx) > 48 * resources.displayMetrics.density) {
                     onSwipe?.invoke(dx < 0)
@@ -111,11 +140,15 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
                         onDoubleTap?.invoke()
                     } else {
                         lastTapTime = now
-                        onTap?.invoke()
+                        performClick()
                     }
                 }
             }
-            MotionEvent.ACTION_CANCEL -> { removeCallbacks(longPressRunnable); isPressed = false }
+            MotionEvent.ACTION_CANCEL -> {
+                removeCallbacks(longPressRunnable)
+                isPressed = false
+                (parent as? CYLTabBar)?.tabBarController?.cyl_tabButtonTouchUp(this)
+            }
         }
         return true
     }
@@ -128,7 +161,9 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
 
     /** [EN] Applies the item's title, images and colors for the current selection. [CN] 按当前选中状态应用标题、图片与颜色。 */
     fun apply(selected: Boolean, tabBar: CYLTabBar) {
+        val selectionChanged = isSelected != selected
         isSelected = selected
+        if (selectionChanged && cyl_iconViewProvider != null) cyl_applyIconViewProvider()
         titleLabel.text = if (selected) item.cyl_selectedTitle ?: item.title ?: "" else item.title ?: ""
         iconView.setImageDrawable((if (selected) item.selectedImage ?: item.image else item.image)?.mutate())
         val controller = tabBar.tabBarController
@@ -170,7 +205,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     /** [EN] `cyl_itemEdgeInsets`: insets of every tab button. [CN] 每个 Tab 按钮的边距。 */
     var cyl_itemEdgeInsets: CYLEdgeInsets = CYLEdgeInsets.zero
     /** [EN] `didLayoutSubViewsBlock`. [CN] 布局完成回调。 */
-    var didLayoutSubViewsBlock: ((CYLTabBar) -> Unit)? = null
+    var didLayoutSubViewsBlock: CYLTabBarDidLayoutSubViewsBlock? = null
     var syncsClassicStylesToAppearance = true
     /** [EN] `plusButton`: the plus button of this bar, or null. [CN] 本 TabBar 的 PlusButton，没有则为 null。 */
     var plusButton: CYLPlusButton? = null
@@ -188,6 +223,47 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     private val buttons = ArrayList<CYLTabBarItemButton>()
     private val shadow = View(context)
     private var titleAlignedPlusLabel: TextView? = null
+
+    // MARK: - UITabBar (CYLBarBackground) 背景
+
+    /** [EN] `cyl_shadowImageView`: the shadow line at the top of the bar (`cyl_tabBarShadowColor`). [CN] TabBar 顶部的阴影线。 */
+    val cyl_shadowImageView: View get() = shadow
+    /** [EN] `cyl_backgroundView`: a full-size view behind the tabs, for a background color, image or drawable. [CN] Tab 后面的全尺寸视图，用于背景颜色、图片或 drawable。 */
+    val cyl_backgroundView: View by lazy { View(context).also { addView(it, 0) } }
+    private var effectView: View? = null
+    /** [EN] `cyl_effectViews`: the effect views behind the tabs (the blur of `cyl_backgroundEffect`). [CN] Tab 后面的效果视图（`cyl_backgroundEffect` 的模糊）。 */
+    val cyl_effectViews: List<View> get() = listOfNotNull(effectView)
+    /** [EN] `cyl_effectView`: the first effect view, or null. [CN] 第一个效果视图，没有时为 null。 */
+    val cyl_effectView: View? get() = effectView
+    /**
+     * [EN] `cyl_backgroundEffect`: an effect drawn behind the tabs: a `RenderEffect` (Android 12+, e.g. a blur of
+     *      `cyl_backgroundView`'s drawable), applied to an effect view; null removes it. A `CYLThemeEffect` follows the theme.
+     * [CN] 绘制在 Tab 后面的效果：`RenderEffect`（Android 12+，例如对 `cyl_backgroundView` drawable 的模糊），应用到效果视图；null 移除。
+     *      `CYLThemeEffect` 会跟随主题。
+     */
+    var cyl_backgroundEffect: Any? = null
+        set(value) {
+            field = value
+            if (value == null) {
+                effectView?.let { removeView(it) }
+                effectView = null
+                return
+            }
+            val view = effectView ?: View(context).also { effectView = it; addView(it, if (indexOfChild(cyl_backgroundView) >= 0) 1 else 0) }
+            view.background = cyl_backgroundView.background?.constantState?.newDrawable()?.mutate() ?: background?.constantState?.newDrawable()?.mutate()
+            val effect = (value as? CYLThemeEffect)?.cyl_rawEffect ?: value
+            if (value is CYLThemeEffect) view.cyl_setThemeEffect(value)
+            else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) view.setRenderEffect(effect as? android.graphics.RenderEffect)
+            applyEffectForeground()
+        }
+    /** [EN] `cyl_effectForegroundColor`: a color laid over the effect view (a tint of the blur). [CN] 叠加在效果视图上的颜色（模糊的着色）。 */
+    @ColorInt var cyl_effectForegroundColor: Int? = null
+        set(value) { field = value; applyEffectForeground() }
+
+    private fun applyEffectForeground() {
+        val view = effectView ?: return
+        view.foreground = cyl_effectForegroundColor?.let { android.graphics.drawable.ColorDrawable(it) }
+    }
 
     init {
         setBackgroundColor(0xFFF9F9F9.toInt())
@@ -237,6 +313,13 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         refreshSelection()
         requestLayout()
         updateGlobals()
+    }
+
+    /** [EN] Dark Mode changed: every tab's animation swaps to the current style (#442). [CN] 深色模式变化：每个 Tab 的动画切换为当前风格（#442）。 */
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        for (button in buttons) button.cyl_reloadTabBarItemAnimationViewForCurrentStyle()
+        plusButton?.cyl_reloadTabBarItemAnimationViewForCurrentStyle()
     }
 
     /** [EN] The iOS globals `CYLTabbarItemsCount`, `CYLPlusButtonIndex`, `CYLPlusButtonWidth`, `CYLTabBarItemWidth`, `CYLTabBarHeight`: the latest tab bar's values. [CN] iOS 的全局变量：最近布局的 TabBar 的值。 */
@@ -296,6 +379,10 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         }
         plusButton?.let { layoutPlusButton(it, plusIndex * slotWidth + slotWidth / 2, slotWidth, density) }
         shadow.layout(0, 0, width, maxOf(1, (0.5f * density).toInt()))
+        for (background in listOfNotNull(if (childCount > 0 && getChildAt(0) !is CYLTabBarItemButton && getChildAt(0) !== shadow) getChildAt(0) else null, effectView)) {
+            background.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+            background.layout(0, 0, width, height)
+        }
         for (child in 0 until childCount) {
             // [EN] Badges of the plus button (or any direct child) follow their host after a layout. [CN] PlusButton（或任何直接子视图）的角标在布局后跟随宿主。
             val badge = getChildAt(child) as? CYLBadgeView ?: continue

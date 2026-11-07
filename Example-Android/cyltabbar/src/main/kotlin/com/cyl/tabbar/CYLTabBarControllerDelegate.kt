@@ -18,6 +18,16 @@ interface CYLTabBarControllerDelegate {
 
     fun tabBarController_didSelectViewController(tabBarController: CYLTabBarController, viewController: CYLViewController) { /* [EN] Optional. [CN] 可选。 */ }
 
+    /**
+     * [EN] `-tabBarController:animationControllerForTransitionFromViewController:toViewController:`: return a
+     *      `CYLTabBarSlideTransitionAnimator` to slide between the pages; null: no transition.
+     * [CN] 返回 `CYLTabBarSlideTransitionAnimator` 以滑动切换页面；null：无转场。
+     */
+    fun tabBarController_animationControllerForTransition(tabBarController: CYLTabBarController, fromViewController: CYLViewController, toViewController: CYLViewController): CYLTabBarSlideTransitionAnimator? = null
+
+    /** [EN] `-tabBarController:interactionControllerForAnimationController:`: a `CYLTabBarInteractiveTransition` while a pan drives the transition. [CN] 拖动驱动转场时返回 `CYLTabBarInteractiveTransition`。 */
+    fun tabBarController_interactionControllerForAnimationController(tabBarController: CYLTabBarController, animationController: CYLTabBarSlideTransitionAnimator): CYLTabBarInteractiveTransition? = null
+
     // MARK: - CYLTabBarControllerDelegate
 
     /** [EN] Issue #19: whether selecting `viewController` needs the user to be logged in. [CN] 选中该页面是否需要登录（issue #19）。 */

@@ -71,6 +71,17 @@ public final class CYLConstants {
     public static final String CYLTabBarRiveDarkURL = "CYLTabBarRiveDarkURL";
     public static final String CYLTabBarRiveDarkFilePath = "CYLTabBarRiveDarkFilePath";
     public static final String CYLTabBarRiveDarkColors = "CYLTabBarRiveDarkColors";
+    /** [EN] Rive options of `CYLTabBarAnimationURLWithOptions()` (CYLRiveTabBarItemAnimator.h); every value is a string. [CN] `CYLTabBarAnimationURLWithOptions()` 的 Rive 选项；值都是字符串。 */
+    public static final String CYLTabBarAnimationOptionRiveArtboard = "artboard";
+    public static final String CYLTabBarAnimationOptionRiveStateMachine = "stateMachine";
+    public static final String CYLTabBarAnimationOptionRiveActiveProperty = "active";
+    public static final String CYLTabBarAnimationOptionRiveActiveDuration = "duration";
+    public static final String CYLTabBarAnimationOptionRiveTriggerProperty = "trigger";
+    public static final String CYLTabBarAnimationOptionRiveColor = "color";
+    public static final String CYLTabBarAnimationOptionRiveInput = "input";
+    public static final String CYLTabBarAnimationOptionRiveTriggerInput = "triggerInput";
+    public static final String CYLTabBarAnimationOptionRiveAnimation = "animation";
+    public static final String CYLTabBarAnimationOptionRiveLegacyRuntime = "legacy";
 
     // MARK: - Configuration keys 配置键 (CYLTabBarController (CYLConfiguration))
 
@@ -109,5 +120,93 @@ public final class CYLConstants {
     @NonNull
     public static String describe(@NonNull Object value) {
         return String.valueOf(value);
+    }
+
+    // MARK: - Tab animations (CYLConstants.h) 动画
+
+    /**
+     * [EN] `+cyl_tabBarItemAnimationSizeValue:fromNormalImage:`: the animation size, else the normal image's size (dp), else the
+     *      icon placeholder size.
+     * [CN] 动画尺寸，否则普通图片的尺寸（dp），否则图标占位尺寸。
+     */
+    public static CYLSize cyl_tabBarItemAnimationSizeValue(@androidx.annotation.Nullable CYLSize animationSize, @androidx.annotation.Nullable android.graphics.drawable.Drawable normalImage) {
+        if (animationSize != null && (animationSize.getWidth() != 0f || animationSize.getHeight() != 0f)) {
+            return animationSize;
+        }
+        if (normalImage != null && normalImage.getIntrinsicWidth() > 0 && normalImage.getIntrinsicHeight() > 0) {
+            float density = android.content.res.Resources.getSystem().getDisplayMetrics().density;
+            return new CYLSize(normalImage.getIntrinsicWidth() / density, normalImage.getIntrinsicHeight() / density);
+        }
+        return new CYLSize(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
+    }
+
+    /** [EN] `+cyl_getTureLottieSizeValue:fromNormalImage:` (deprecated): use `cyl_tabBarItemAnimationSizeValue`. [CN] 请使用 `cyl_tabBarItemAnimationSizeValue`。 */
+    @Deprecated
+    public static CYLSize cyl_getTureLottieSizeValue(@androidx.annotation.Nullable CYLSize lottieSize, @androidx.annotation.Nullable android.graphics.drawable.Drawable normalImage) {
+        return cyl_tabBarItemAnimationSizeValue(lottieSize, normalImage);
+    }
+
+    /** [EN] `+cyl_registerDarkLottieURL:forLottieURL:` (deprecated): use the `CYLTabBarAnimationDarkURL` key. [CN] 请使用 `CYLTabBarAnimationDarkURL` 键。 */
+    @Deprecated
+    public static void cyl_registerDarkLottieURL(@androidx.annotation.NonNull String darkLottieURL, @androidx.annotation.NonNull String lottieURL) {
+        CYLTabBarItemAnimationStyleSource.INSTANCE.registerDarkURL(darkLottieURL, lottieURL);
+    }
+
+    /** [EN] `+cyl_registerLottieDarkColors:forLottieURL:` (deprecated): use the `CYLTabBarAnimationDarkColors` key. [CN] 请使用 `CYLTabBarAnimationDarkColors` 键。 */
+    @Deprecated
+    public static void cyl_registerLottieDarkColors(@androidx.annotation.NonNull java.util.Map<String, Integer> darkColors, @androidx.annotation.NonNull String lottieURL) {
+        CYLTabBarItemAnimationStyleSource.INSTANCE.registerDarkColors(darkColors, lottieURL);
+    }
+
+    /** [EN] `+cyl_lottieDarkColorsForLottieURL:` (deprecated). [CN] 已废弃。 */
+    @Deprecated
+    @androidx.annotation.Nullable
+    public static java.util.Map<String, Integer> cyl_lottieDarkColorsForLottieURL(@androidx.annotation.NonNull String lottieURL) {
+        return CYLTabBarItemAnimationStyleSource.INSTANCE.darkColorsForURL(lottieURL);
+    }
+
+    /** [EN] `+cyl_hasDarkLottieURLs` (deprecated). [CN] 已废弃。 */
+    @Deprecated
+    public static boolean cyl_hasDarkLottieURLs() {
+        return CYLTabBarItemAnimationStyleSource.INSTANCE.hasDarkURLs();
+    }
+
+    /** [EN] `+cyl_hasDarkLottieForLottieURL:` (deprecated). [CN] 已废弃。 */
+    @Deprecated
+    public static boolean cyl_hasDarkLottieForLottieURL(@androidx.annotation.NonNull String lottieURL) {
+        return CYLTabBarItemAnimationStyleSource.INSTANCE.hasDarkStyleForURL(lottieURL);
+    }
+
+    /**
+     * [EN] `+isTabBarItemAnimationEnabledWithURLs:tabBarItemsAttributes:`: an animation library is in the app, and `urls` is
+     *      not empty or a tab names an animation file (#477, any tab).
+     * [CN] App 中有动画库，且 `urls` 非空或有 Tab 指定了动画文件（#477，任一 Tab）。
+     */
+    public static boolean isTabBarItemAnimationEnabledWithURLs(@androidx.annotation.Nullable java.util.List<String> urls, @androidx.annotation.Nullable java.util.List<? extends java.util.Map<String, ?>> tabBarItemsAttributes) {
+        if (CYLTabBarItemAnimatorRegistry.Companion.animators().isEmpty()) {
+            return false;
+        }
+        if (urls != null && !urls.isEmpty()) {
+            return true;
+        }
+        if (tabBarItemsAttributes != null) {
+            for (java.util.Map<String, ?> item : tabBarItemsAttributes) {
+                if (item != null && CYLTabBarItemAnimationHostKt.CYLTabBarItemAttributesHaveAnimationFile(castAttributes(item))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** [EN] `+isLottieEnabledFromlottieURLs:tabBarItemsAttributes:` (deprecated). [CN] 已废弃。 */
+    @Deprecated
+    public static boolean isLottieEnabledFromlottieURLs(@androidx.annotation.Nullable java.util.List<String> lottieURLs, @androidx.annotation.Nullable java.util.List<? extends java.util.Map<String, ?>> tabBarItemsAttributes) {
+        return isTabBarItemAnimationEnabledWithURLs(lottieURLs, tabBarItemsAttributes);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static java.util.Map<String, Object> castAttributes(java.util.Map<String, ?> item) {
+        return (java.util.Map<String, Object>) item;
     }
 }

@@ -10,25 +10,28 @@ import android.os.Handler
 import android.os.Looper
 import androidx.core.content.ContextCompat
 import com.cyl.tabbar.pages.TabConfiguration
-import com.cyl.tabbar.pages.TabConfigurationFormats
 import java.io.File
 import java.net.HttpURLConnection
-import java.net.URL
 
 /**
  * [EN] `CYLTabBarController (CYLConfiguration)` on Android: `cyl_normalizedConfiguration`, the file and URL loaders,
  *      and the value conversions of a configuration file ("{a, b, c, d}" insets, "#RRGGBB" colors, "bold:15" fonts,
- *      "system:house" / drawable names through `CYLTabBarImageResolver`). The formats are the ones `TabConfigurationFormats`
- *      reads (JSON, XML plist, .properties); the iOS parser's other formats give `CYLTabBarConfigurationError.UnknownFormat`.
+ *      "system:house" / drawable names through `CYLTabBarImageResolver`). Every iOS format is read by `CYLTabBarConfigurationParser`.
  * [CN] Android 版 `CYLTabBarController (CYLConfiguration)`：`cyl_normalizedConfiguration`、文件与 URL 加载，以及配置文件值的转换
  *      （"{a, b, c, d}" 边距、"#RRGGBB" 颜色、"bold:15" 字体、"system:house" / drawable 名称通过 `CYLTabBarImageResolver`）。格式为
- *      `TabConfigurationFormats` 支持的格式（JSON、XML plist、.properties）；iOS 解析器的其他格式返回 `CYLTabBarConfigurationError.UnknownFormat`。
+ *      由 `CYLTabBarConfigurationParser` 读取 iOS 的全部格式。
  */
 object CYLTabBarConfiguration {
 
     /** [EN] `CYLTabBarConfigurationError` codes (the iOS values). [CN] 错误码（与 iOS 相同）。 */
     enum class CYLTabBarConfigurationError(val code: Int) {
-        UnknownFormat(1), InvalidSyntax(2), NotADictionary(3), FileNotFound(4), Network(5), Empty(6), TooLarge(7), TooDeep(8), NoTabs(9), MainThreadRequired(10), NoPages(11)
+        FileNotFound(1), UnknownFormat(2), InvalidSyntax(3), NotADictionary(4), Network(5), Empty(6), TooLarge(7), TooDeep(8), NoTabs(9), MainThreadRequired(10), NoPages(11);
+
+        companion object {
+            /** [EN] The error of a parser error code (`UnsupportedFormat` is `UnknownFormat`). [CN] 解析器错误码对应的错误（`UnsupportedFormat` 即 `UnknownFormat`）。 */
+            @JvmStatic
+            fun of(code: CYLTabBarConfigurationErrorCode): CYLTabBarConfigurationError = entries.first { it.code == code.rawValue }
+        }
     }
 
     class CYLConfigurationException(val error: CYLTabBarConfigurationError, message: String) : Exception(message)
@@ -42,6 +45,8 @@ object CYLTabBarConfiguration {
     @JvmStatic
     var imageResolver: CYLTabBarImageResolver = CYLTabBarImageResolver { context, name ->
         val resourceName = name.removePrefix("system:").substringBefore('.').replace('-', '_')
+        // [EN] Configuration files name images, so the resource is looked up by name. [CN] 配置文件写的是图片名称，因此按名称查找资源。
+        @android.annotation.SuppressLint("DiscouragedApi")
         val id = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
         when {
             id != 0 -> ContextCompat.getDrawable(context, id)
@@ -57,54 +62,106 @@ object CYLTabBarConfiguration {
     @Throws(CYLConfigurationException::class)
     fun configurationWithContentsOfFile(context: Context, path: String): Map<String, Any?> {
         val file = File(path)
-        val text = when {
+        val data = when {
             file.isFile -> {
+                // [EN] The size is checked before reading, as on iOS. [CN] 与 iOS 一样，读取前先检查大小。
                 if (file.length() > maximumFileSize) throw CYLConfigurationException(CYLTabBarConfigurationError.TooLarge, "$path is larger than 5 MB")
-                file.readText()
+                file.readBytes()
             }
             else -> try {
-                context.assets.open(path).bufferedReader().use { it.readText() }
+                context.assets.open(path).use { readLimited(it, path) }
             } catch (error: java.io.IOException) {
                 throw CYLConfigurationException(CYLTabBarConfigurationError.FileNotFound, "$path: ${error.message}")
             }
         }
-        return parse(text, TabConfigurationFormats.formatOf(path) ?: TabConfigurationFormats.detect(text))
+        return parse(data, CYLTabBarConfigurationParser.formatForPathExtension(path.substringAfterLast('/').substringAfterLast('.', "")))
     }
 
-    /** [EN] Parses a configuration text; `format` null detects it from the content. [CN] 解析配置文本；`format` 为 null 时按内容判断。 */
+    /** [EN] Reads at most 5 MB (API 23: no `readNBytes`). [CN] 最多读取 5 MB（API 23 没有 `readNBytes`）。 */
+    private fun readLimited(stream: java.io.InputStream, name: String): ByteArray {
+        val output = java.io.ByteArrayOutputStream()
+        val buffer = ByteArray(64 * 1024)
+        while (true) {
+            val count = stream.read(buffer)
+            if (count < 0) break
+            output.write(buffer, 0, count)
+            if (output.size() > maximumFileSize) throw CYLConfigurationException(CYLTabBarConfigurationError.TooLarge, "$name is larger than 5 MB")
+        }
+        return output.toByteArray()
+    }
+
+    /**
+     * [EN] Parses configuration data with `CYLTabBarConfigurationParser` (`Unknown`: detected from the content), then refuses
+     *      what holds no tab (an HTML page, an empty dictionary), as the iOS category does.
+     * [CN] 用 `CYLTabBarConfigurationParser` 解析配置数据（`Unknown` 时按内容判断），然后像 iOS 一样拒绝没有 Tab 的内容（HTML 页面、空字典）。
+     */
     @JvmStatic
     @Throws(CYLConfigurationException::class)
-    fun parse(text: String, format: com.cyl.tabbar.pages.TabConfigurationFormat): Map<String, Any?> {
-        if (text.isBlank()) throw CYLConfigurationException(CYLTabBarConfigurationError.Empty, "the configuration is empty")
-        if (text.trimStart().startsWith("<") && !text.trimStart().startsWith("<?xml") && !text.trimStart().startsWith("<plist")) {
+    fun parse(data: ByteArray, format: CYLTabBarConfigurationFormat): Map<String, Any?> {
+        val head = String(data, 0, minOf(data.size, 256), Charsets.UTF_8).trimStart('\uFEFF', ' ', '\n', '\r', '\t').lowercase()
+        if (head.startsWith("<!doctype html") || head.startsWith("<html")) {
             throw CYLConfigurationException(CYLTabBarConfigurationError.NoTabs, "an HTML page, not a configuration")
         }
         val root = try {
-            TabConfigurationFormats.parse(text, format)
-        } catch (error: Exception) {
-            throw CYLConfigurationException(CYLTabBarConfigurationError.InvalidSyntax, error.message ?: "invalid syntax")
+            CYLTabBarConfigurationParser.dictionaryWithData(data, format)
+        } catch (error: CYLTabBarConfigurationException) {
+            throw CYLConfigurationException(CYLTabBarConfigurationError.of(error.code), error.message ?: error.code.name)
         }
         if (root.isEmpty()) throw CYLConfigurationException(CYLTabBarConfigurationError.NoTabs, "no tab in the configuration")
         return root
     }
 
+    /** [EN] Parses a configuration text in one of the `tabpages` formats. [CN] 按 `tabpages` 的格式解析配置文本。 */
+    @JvmStatic
+    @Throws(CYLConfigurationException::class)
+    fun parse(text: String, format: com.cyl.tabbar.pages.TabConfigurationFormat): Map<String, Any?> = parse(text.toByteArray(Charsets.UTF_8), when (format.name.lowercase()) {
+        "json" -> CYLTabBarConfigurationFormat.JSON
+        "plist", "propertylist" -> CYLTabBarConfigurationFormat.PropertyList
+        "properties" -> CYLTabBarConfigurationFormat.Properties
+        else -> CYLTabBarConfigurationFormat.Unknown
+    })
+
     /** [EN] `+loadConfigurationWithURL:completion:`: downloads on a background thread (15 s timeout), completes on the main thread. [CN] 后台线程下载（15 秒超时），主线程回调。 */
     @JvmStatic
-    fun loadConfigurationWithURL(url: String, completion: (Map<String, Any?>?, CYLConfigurationException?) -> Unit) {
+    fun loadConfigurationWithURL(url: String, completion: (Map<String, Any?>?, CYLConfigurationException?) -> Unit) =
+        loadConfigurationWithURLRequest(CYLURLRequest(url), completion)
+
+    /**
+     * [EN] `NSURLRequest` for the configuration loaders: the URL, the timeout (seconds, default 15), the HTTP headers, the
+     *      method and whether the HTTP cache may answer.
+     * [CN] 配置加载使用的 `NSURLRequest`：URL、超时（秒，默认 15）、HTTP 头、方法，以及是否允许使用 HTTP 缓存。
+     */
+    data class CYLURLRequest @JvmOverloads constructor(
+        val url: String,
+        val timeoutInterval: Double = 15.0,
+        val allHTTPHeaderFields: Map<String, String> = emptyMap(),
+        val httpMethod: String = "GET",
+        val allowsCache: Boolean = true,
+    )
+
+    /** [EN] `+loadConfigurationWithURLRequest:completion:`: like `loadConfigurationWithURL` with your own request; the completion runs on the main thread. [CN] 使用自己的请求加载配置；回调在主线程执行。 */
+    fun loadConfigurationWithURLRequest(request: CYLURLRequest, completion: (Map<String, Any?>?, CYLConfigurationException?) -> Unit) {
         val main = Handler(Looper.getMainLooper())
+        val url = request.url
         Thread {
             var result: Map<String, Any?>? = null
             var failure: CYLConfigurationException? = null
             try {
                 val connection = java.net.URI(url).toURL().openConnection() as HttpURLConnection
-                connection.connectTimeout = 15_000
-                connection.readTimeout = 15_000
+                val timeout = (request.timeoutInterval.takeIf { it > 0 && it.isFinite() } ?: 15.0) * 1000
+                connection.connectTimeout = timeout.toInt()
+                connection.readTimeout = timeout.toInt()
+                connection.requestMethod = request.httpMethod
+                connection.useCaches = request.allowsCache
+                request.allHTTPHeaderFields.forEach { (name, value) -> connection.setRequestProperty(name, value) }
                 try {
                     if (connection.responseCode !in 200..299) throw CYLConfigurationException(CYLTabBarConfigurationError.Network, "HTTP ${connection.responseCode}")
                     val bytes = connection.inputStream.use { it.readBytes() }
                     if (bytes.size > maximumFileSize) throw CYLConfigurationException(CYLTabBarConfigurationError.TooLarge, "the response is larger than 5 MB")
-                    val downloaded = String(bytes, Charsets.UTF_8)
-                    result = parse(downloaded, TabConfigurationFormats.formatOf(url) ?: TabConfigurationFormats.detect(downloaded))
+                    // [EN] The format: the URL's extension, then the HTTP Content-Type, then the content (the parser sniffs it). [CN] 格式：URL 扩展名，然后 HTTP Content-Type，然后内容（由解析器判断）。
+                    val byExtension = CYLTabBarConfigurationParser.formatForPathExtension(java.net.URI(url).path.orEmpty().substringAfterLast('/').substringAfterLast('.', ""))
+                    val format = if (byExtension != CYLTabBarConfigurationFormat.Unknown) byExtension else CYLTabBarConfigurationParser.formatForMIMEType(connection.contentType)
+                    result = parse(bytes, format)
                 } finally {
                     connection.disconnect()
                 }
@@ -156,10 +213,8 @@ object CYLTabBarConfiguration {
             else -> return null
         }
         if (parts.size != count) return null
-        val numbers = parts.map { part ->
-            val number = if (part is Number) part.toFloat() else part.toString().trim().toFloatOrNull()
-            number ?: return null
-        }
+        val numbers = ArrayList<Float>(parts.size)
+        for (part in parts) numbers += (if (part is Number) part.toFloat() else part.toString().trim().toFloatOrNull()) ?: return null
         return if (numbers.all { it.isFinite() }) numbers else null
     }
 

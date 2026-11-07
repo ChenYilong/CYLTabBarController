@@ -23,7 +23,7 @@ interface CYLTabBarTheme {
     fun cyl_tabBarAppearanceForTabBarController(tabBarController: CYLTabBarController): CYLTabBarAppearance? = null
 
     /** [EN] `-cyl_customizeTabBarController:`: anything else. [CN] 其他自定义。 */
-    fun cyl_customizeTabBarController(tabBarController: CYLTabBarController) {}
+    fun cyl_customizeTabBarController(tabBarController: CYLTabBarController) { /* [EN] Optional. [CN] 可选。 */ }
 }
 
 /** [EN] `UITabBarAppearance`, the part the library sets. [CN] TabBar 外观（库设置的部分）。 */
@@ -44,6 +44,10 @@ data class CYLTabBarAppearance(
  */
 class CYLThemeManager(val name: String = CYLThemeManagerNameDefault) {
 
+    init {
+        CYLThemeManagerCenter.register(this)
+    }
+
     fun interface Listener {
         fun cyl_themeDidChangeByManager(manager: CYLThemeManager, identifier: Any?, theme: Any?)
     }
@@ -63,6 +67,8 @@ class CYLThemeManager(val name: String = CYLThemeManagerNameDefault) {
             field = value
             persisted?.edit()?.putString(persistenceKey, value?.toString())?.apply()
             for (listener in listeners) listener.cyl_themeDidChangeByManager(this, value, theme)
+            // [EN] Then every view and page of the live tab bar controllers' windows (UIView / UIViewController (CYLTheme)). [CN] 然后通知存活 TabBarController 窗口中的所有视图与页面。
+            CYLThemeDispatcher.dispatch(this, value, theme)
         }
     val currentTheme: Any? get() = currentThemeIdentifier?.let { themeForIdentifier(it) }
 

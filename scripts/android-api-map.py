@@ -67,6 +67,77 @@ def public_headers():
     return sorted(headers)
 
 
+MACROS = re.compile(r'\b(NS_\w+|CYL_\w+|DEPRECATED_MSG_ATTRIBUTE\([^)]*\)|API_\w+\([^)]*\)|UI_APPEARANCE_SELECTOR)\b')
+TYPEDEF_MARKERS = ('(^', 'NS_TYPED', 'NS_STRING_ENUM')
+
+
+def property_symbol(line, owner):
+    """[EN] The property of an "@property" line, or None. [CN] "@property" 行的属性，或 None。"""
+    body = line.split(';')[0]
+    body = re.sub(r'^@property\s*\([^)]*\)', '', body)
+    # [EN] Deprecation messages hold words that are not names ("... instead."). [CN] 废弃提示中的单词不是名称。
+    body = re.sub(r'"[^"]*"', '', body)
+    body = re.sub(r'\b\w*DEPRECATED\w*\s*\(\s*\)', '', body)
+    body = re.sub(r'NS_SWIFT_NAME\([^)]*\)', '', body)
+    body = MACROS.sub('', body)
+    body = re.sub(r'<[^>]*>', '', body)
+    block = re.search(r'\(\s*\^\s*(\w+)\s*\)', body)
+    names = [block.group(1)] if block else re.findall(r'\w+', body)
+    return ('property', owner, names[-1]) if names else None
+
+
+def extern_symbol(line):
+    """[EN] The function or constant of an extern line, or None. [CN] extern 行的函数或常量，或 None。"""
+    head = line.split(';')[0]
+    call = re.search(r'\b(\w+)\s*\(', head)
+    if call and call.group(1) not in ('NS_SWIFT_NAME', 'DEPRECATED_MSG_ATTRIBUTE', 'API_AVAILABLE'):
+        return ('function', '', call.group(1) + '()')
+    head = re.sub(r'\b(NS_\w+|CYL_\w+|DEPRECATED_MSG_ATTRIBUTE\([^)]*\)|API_\w+\([^)]*\)|const)\b', '', head)
+    names = re.findall(r'\w+', head)
+    return ('constant', '', names[-1]) if names else None
+
+
+def typedef_symbol(line):
+    """[EN] The enum or typedef of a "typedef" line, or None. [CN] "typedef" 行的枚举或类型，或 None。"""
+    m = re.match(r'typedef\s+NS_(ENUM|OPTIONS)\s*\(\s*\w+\s*,\s*(\w+)\s*\)', line)
+    if m:
+        return ('enum', '', m.group(2))
+    block = re.search(r'\(\s*\^\s*(\w+)\s*\)', line)
+    if block:
+        return ('typedef', '', block.group(1))
+    if ';' not in line or not (any(marker in line for marker in TYPEDEF_MARKERS) or line.startswith('typedef NSString')):
+        return None
+    # [EN] The last name before ";", without the trailing enum macros (no backtracking regex). [CN] ";" 前的最后一个名称，去掉末尾的枚举宏（不用回溯正则）。
+    words = re.findall(r'\w+', line.split(';')[0])
+    words = [word for word in words if not word.startswith(('NS_TYPED_', 'NS_STRING_ENUM'))]
+    return ('typedef', '', words[-1]) if words else None
+
+
+def owner_symbol(line):
+    """[EN] (owner, symbol) of an "@interface" / "@protocol" line, or None. [CN] "@interface" / "@protocol" 行的（所属，符号），或 None。"""
+    m = re.match(r'@interface\s+(\w+)\s*(?:\((\w*)\))?', line)
+    if m:
+        owner = m.group(1) + ('(%s)' % m.group(2) if m.group(2) is not None else '')
+        return owner, ('class' if m.group(2) is None else 'category', owner, owner)
+    m = re.match(r'@protocol\s+(\w+)\s*<', line)
+    if m:
+        return m.group(1), ('protocol', m.group(1), m.group(1))
+    return None
+
+
+def declaration_symbol(line, owner):
+    """[EN] The symbol a declaration line declares, or None. [CN] 声明行声明的符号，或 None。"""
+    if line.startswith(('-', '+')) and re.match(r'[-+]\s*\(', line):
+        return ('method', owner or '', selector_of(line.split(';')[0]))
+    if line.startswith('@property') and owner:
+        return property_symbol(line, owner)
+    if re.match(r'(?:FOUNDATION_EXTERN|UIKIT_EXTERN|extern)\b', line):
+        return extern_symbol(line)
+    if line.startswith('typedef'):
+        return typedef_symbol(line)
+    return None
+
+
 def symbols_of(path):
     """[EN] The public symbols of one header, in order: (kind, owner, name). [CN] 一个头文件的公开符号（kind、所属、名称）。"""
     text = strip_comments(open(os.path.join(ROOT, path), encoding='utf-8', errors='replace').read())
@@ -74,61 +145,22 @@ def symbols_of(path):
     owner = None
     pending = ''
     for raw in text.split('\n'):
-        line = raw.strip()
+        line = (pending + ' ' + raw.strip()).strip() if pending else raw.strip()
+        pending = ''
         if not line:
             continue
-        if pending:
-            line = pending + ' ' + line
-            pending = ''
-        m = re.match(r'@interface\s+(\w+)\s*(?:\((\w*)\))?', line)
-        if m:
-            owner = m.group(1) + ('(%s)' % m.group(2) if m.group(2) is not None else '')
-            symbols.append(('class' if m.group(2) is None else 'category', owner, owner))
-            continue
-        m = re.match(r'@protocol\s+(\w+)\s*<', line)
-        if m:
-            owner = m.group(1)
-            symbols.append(('protocol', owner, owner))
-            continue
-        if line.startswith('@end'):
+        declared = owner_symbol(line)
+        if declared:
+            owner = declared[0]
+            symbols.append(declared[1])
+        elif line.startswith('@end'):
             owner = None
-            continue
-        if line.startswith(('-', '+')) and re.match(r'[-+]\s*\(', line):
-            if ';' not in line:
-                pending = line
-                continue
-            symbols.append(('method', owner or '', selector_of(line.split(';')[0])))
-            continue
-        if line.startswith('@property') and owner:
-            body = line.split(';')[0]
-            body = re.sub(r'^@property\s*\([^)]*\)', '', body)
-            body = re.sub(r'NS_SWIFT_NAME\([^)]*\)', '', body)
-            body = re.sub(r'\b(NS_\w+|CYL_\w+|DEPRECATED_MSG_ATTRIBUTE\([^)]*\)|API_\w+\([^)]*\)|UI_APPEARANCE_SELECTOR)\b', '', body)
-            body = re.sub(r'<[^>]*>', '', body)
-            block = re.search(r'\(\s*\^\s*(\w+)\s*\)', body)
-            names = [block.group(1)] if block else re.findall(r'\w+', body)
-            if names:
-                symbols.append(('property', owner, names[-1]))
-            continue
-        if re.match(r'(?:FOUNDATION_EXTERN|UIKIT_EXTERN|extern)\b', line):
-            head = line.split(';')[0]
-            call = re.search(r'\b(\w+)\s*\(', head)
-            if call and call.group(1) not in ('NS_SWIFT_NAME', 'DEPRECATED_MSG_ATTRIBUTE', 'API_AVAILABLE'):
-                symbols.append(('function', '', call.group(1) + '()'))
-                continue
-            head = re.sub(r'\b(NS_\w+|CYL_\w+|DEPRECATED_MSG_ATTRIBUTE\([^)]*\)|API_\w+\([^)]*\)|const)\b', '', head)
-            names = re.findall(r'\w+', head)
-            if names:
-                symbols.append(('constant', '', names[-1]))
-            continue
-        m = re.match(r'typedef\s+NS_(ENUM|OPTIONS)\s*\(\s*\w+\s*,\s*(\w+)\s*\)', line)
-        if m:
-            symbols.append(('enum', '', m.group(2)))
-            continue
-        m = re.match(r'typedef\s+.*?\b(\w+)\s*(?:NS_TYPED_\w*ENUM|NS_STRING_ENUM)?\s*;', line)
-        if m and ('(^' in line or 'NS_TYPED' in line or 'NS_STRING_ENUM' in line or line.startswith('typedef NSString')):
-            symbols.append(('typedef', '', m.group(1)))
-            continue
+        elif line.startswith(('-', '+')) and re.match(r'[-+]\s*\(', line) and ';' not in line:
+            pending = line
+        else:
+            symbol = declaration_symbol(line, owner)
+            if symbol:
+                symbols.append(symbol)
     return symbols
 
 
@@ -166,11 +198,11 @@ def document(rows, mapping):
            '<!-- Generated by scripts/android-api-map.py from the public headers and Example-Android/cyltabbar/api-map.json; do not edit by hand. -->',
            '<!-- 由 scripts/android-api-map.py 根据公开头文件与 Example-Android/cyltabbar/api-map.json 生成；请勿手动编辑。 -->', '']
     percent, total = score(rows, mapping)
-    counts = {status: 0 for status in STATUSES}
+    counts = dict.fromkeys(STATUSES, 0)
     for row in rows:
         counts[mapping.get(row['key'], {}).get('status', 'planned')] += 1
     out += ['| 中文 | English |', '|:---|:---|',
-            '| iOS 库的每个公开符号（公开头文件中的类、协议、方法、属性、常量、枚举、函数）及其 Android 版本（`Example-Android/cyltabbar`，Kotlin 与 Java）。状态：done 行为相同；partial 部分行为（见说明）；planned 尚未移植；n/a 仅 iOS（UIKit、动画运行库、扁平样式、液态玻璃等），不计入完成率。 | Every public symbol of the iOS library (classes, protocols, methods, properties, constants, enums and functions of the public headers) with its Android version (`Example-Android/cyltabbar`, Kotlin and Java). Status: done, the same behavior; partial, part of it (see the note); planned, not ported yet; n/a, iOS only (UIKit, animation runtimes, FlatDesign, Liquid Glass...), left out of the score. |',
+            '| iOS 库的每个公开符号（公开头文件中的类、协议、方法、属性、常量、枚举、函数）及其 Android 版本（`Example-Android/cyltabbar`，Kotlin 与 Java）。状态：done 行为相同；partial 部分行为（见说明）；planned 尚未移植；n/a 仅 iOS（UIKit、扁平样式、液态玻璃、Core Animation 等），不计入完成率。 | Every public symbol of the iOS library (classes, protocols, methods, properties, constants, enums and functions of the public headers) with its Android version (`Example-Android/cyltabbar`, Kotlin and Java). Status: done, the same behavior; partial, part of it (see the note); planned, not ported yet; n/a, iOS only (UIKit, FlatDesign, Liquid Glass, Core Animation...), left out of the score. |',
             '| **迁移完成率：%d / 100**（done + 0.5 × partial，共 %d 个计入的符号；done %d、partial %d、planned %d、n/a %d）。 | **Migration score: %d / 100** (done + 0.5 × partial over %d counted symbols; done %d, partial %d, planned %d, n/a %d). |'
             % (percent, total, counts['done'], counts['partial'], counts['planned'], counts['n/a'], percent, total, counts['done'], counts['partial'], counts['planned'], counts['n/a']),
             '']
@@ -218,9 +250,8 @@ def with_navigation_of(existing, text):
     return text
 
 
-def main():
-    rows = inventory()
-    mapping = load_map()
+def problems_of(rows, mapping):
+    """[EN] Entries of the map that are not public symbols, or have an unknown status. [CN] 不是公开符号或状态未知的条目。"""
     problems = []
     keys = {row['key'] for row in rows}
     for key, entry in mapping.items():
@@ -228,21 +259,24 @@ def main():
             problems.append('api-map.json: %s is not a public iOS symbol' % key)
         if entry.get('status') not in STATUSES:
             problems.append('api-map.json: %s has the status %r; use one of %s' % (key, entry.get('status'), ', '.join(STATUSES)))
-    text = document(rows, mapping)
-    if '--list' in sys.argv:
-        for row in rows:
-            print('%s\t%s\t%s' % (row['kind'], row['header'], row['key']))
-        return 0
-    if '--check' in sys.argv:
-        current = open(DOC_PATH, encoding='utf-8').read() if os.path.exists(DOC_PATH) else ''
-        if problems:
-            print('\n'.join(problems))
-        if without_navigation(current).rstrip('\n') != without_navigation(text).rstrip('\n'):
-            problems.append('%s is out of date: run python3 scripts/android-api-map.py' % os.path.relpath(DOC_PATH, ROOT))
-            print(problems[-1])
-        if not problems:
-            print('docs/Android-API-Map.md is up to date (%d symbols, score %d).' % (len(rows), score(rows, mapping)[0]))
-        return 1 if problems else 0
+    return problems
+
+
+def check(rows, mapping, text, problems):
+    """[EN] `--check`: the document is up to date and the map is valid. [CN] `--check`：文档是最新的且对照表有效。"""
+    current = open(DOC_PATH, encoding='utf-8').read() if os.path.exists(DOC_PATH) else ''
+    if problems:
+        print('\n'.join(problems))
+    if without_navigation(current).rstrip('\n') != without_navigation(text).rstrip('\n'):
+        problems.append('%s is out of date: run python3 scripts/android-api-map.py' % os.path.relpath(DOC_PATH, ROOT))
+        print(problems[-1])
+    if not problems:
+        print('docs/Android-API-Map.md is up to date (%d symbols, score %d).' % (len(rows), score(rows, mapping)[0]))
+    return 1 if problems else 0
+
+
+def write(rows, mapping, text, problems):
+    """[EN] Writes the document, keeping its navigation blocks. [CN] 写入文档，保留其导航块。"""
     if problems:
         print('\n'.join(problems))
         return 1
@@ -251,6 +285,20 @@ def main():
         handle.write(with_navigation_of(existing, text))
     print('wrote %s: %d symbols, score %d' % (os.path.relpath(DOC_PATH, ROOT), len(rows), score(rows, mapping)[0]))
     return 0
+
+
+def main():
+    rows = inventory()
+    if '--list' in sys.argv:
+        for row in rows:
+            print('%s\t%s\t%s' % (row['kind'], row['header'], row['key']))
+        return 0
+    mapping = load_map()
+    problems = problems_of(rows, mapping)
+    text = document(rows, mapping)
+    if '--check' in sys.argv:
+        return check(rows, mapping, text, problems)
+    return write(rows, mapping, text, problems)
 
 
 if __name__ == '__main__':

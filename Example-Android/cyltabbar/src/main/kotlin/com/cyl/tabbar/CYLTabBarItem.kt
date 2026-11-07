@@ -24,8 +24,19 @@ class CYLTabBarItem(attributes: Map<String, Any?> = emptyMap()) {
     var title: String? = attributes[CYLConstants.CYLTabBarItemTitle] as? String
     var image: Drawable? = null
     var selectedImage: Drawable? = null
-    /** [EN] `UITabBarItem.badgeValue`; nil hides the badge. [CN] 角标文字；nil 隐藏角标。 */
+    /**
+     * [EN] `UITabBarItem.badgeValue`: shown on the tab button; null hides the badge. A new value plays the tab's
+     *      badge-changed animation (`CYLTabButtonAnimation`).
+     * [CN] 显示在 Tab 按钮上的角标；null 隐藏角标。新的值会播放该 Tab 的角标变化动画（`CYLTabButtonAnimation`）。
+     */
     var badgeValue: String? = null
+        set(value) {
+            val changed = value != field
+            field = value
+            val button = cyl_visiableTabButton ?: return
+            if (value == null) button.cyl_clearBadge() else button.cyl_showBadgeValue(value)
+            if (changed && value != null) (button.parent as? CYLTabBar)?.tabBarController()?.cyl_tabBarItemBadgeValueDidChange(this)
+        }
     var accessibilityIdentifier: String? = attributes[CYLConstants.CYLTabBarItemAccessibilityIdentifier] as? String
     var accessibilityLabel: String? = attributes[CYLConstants.CYLTabBarItemAccessibilityLabel] as? String
     var accessibilityHint: String? = attributes[CYLConstants.CYLTabBarItemAccessibilityHint] as? String
@@ -39,6 +50,16 @@ class CYLTabBarItem(attributes: Map<String, Any?> = emptyMap()) {
     /** [EN] The tab's animation file URL (Lottie, PAG, Rive...) and view size. [CN] 该 Tab 的动画文件 URL 与视图尺寸。 */
     var cyl_tabBarItemAnimationURL: String? = null
     var cyl_tabBarItemAnimationSizeValue: CYLSize? = null
+    /** [EN] `cyl_lottieURL` (deprecated): `cyl_tabBarItemAnimationURL`. [CN] 已废弃：即 `cyl_tabBarItemAnimationURL`。 */
+    @Deprecated("Use cyl_tabBarItemAnimationURL", ReplaceWith("cyl_tabBarItemAnimationURL"))
+    var cyl_lottieURL: String?
+        get() = cyl_tabBarItemAnimationURL
+        set(value) { cyl_tabBarItemAnimationURL = value }
+    /** [EN] `cyl_lottieSizeValue` (deprecated): `cyl_tabBarItemAnimationSizeValue`. [CN] 已废弃：即 `cyl_tabBarItemAnimationSizeValue`。 */
+    @Deprecated("Use cyl_tabBarItemAnimationSizeValue", ReplaceWith("cyl_tabBarItemAnimationSizeValue"))
+    var cyl_lottieSizeValue: CYLSize?
+        get() = cyl_tabBarItemAnimationSizeValue
+        set(value) { cyl_tabBarItemAnimationSizeValue = value }
     /** [EN] `cyl_imagePositionAdjustment`: moves the icon. [CN] 图标偏移。 */
     var cyl_imagePositionAdjustment: CYLOffset = CYLOffset.zero
     var cyl_titlePositionAdjustment: CYLOffset = CYLOffset.zero

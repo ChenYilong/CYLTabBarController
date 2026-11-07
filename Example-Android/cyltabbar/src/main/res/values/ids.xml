@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- [EN] View tag keys of the library. [CN] 库使用的视图 tag key。 -->
+<resources>
+    <item name="cyl_tab_bar_item_animation_player" type="id" />
+    <item name="cyl_tab_bar_item_view_animator" type="id" />
+    <item name="cyl_tab_bar_item_animation_view" type="id" />
+</resources>

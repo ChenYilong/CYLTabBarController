@@ -36,6 +36,8 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
+    // [EN] Only to test the Lottie animator found by reflection; apps add Lottie themselves. [CN] 仅用于测试通过反射找到的 Lottie animator；App 自行添加 Lottie。
+    testImplementation(libs.lottie)
     testImplementation(libs.androidx.test.core)
     testImplementation(kotlin("test"))
 }

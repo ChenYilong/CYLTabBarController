@@ -23,16 +23,27 @@ import androidx.annotation.ColorInt
  * [CN] `CYLBadgeView`：绘制在视图上的角标：红点、数字（超过 `cyl_badgeMaximumBadgeNumber` 显示 "99+"）或文字（"new"），带边框、
  *      圆角与动画（`CYLBadgeAnimationType`）。
  */
-class CYLBadgeView(context: Context) : View(context) {
+class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
 
     /** [EN] The view the badge belongs to. [CN] 角标所属的视图。 */
     var host: View? = null
         internal set
-    var text: String? = null
+    override var text: String? = null
         set(value) {
             field = value
             requestLayout(); invalidate()
         }
+    /** [EN] `CYLBadgeTextDisplaying.font`: `badgeFont`. [CN] 即 `badgeFont`。 */
+    override var font: CYLFont
+        get() = badgeFont
+        set(value) { badgeFont = value; requestLayout() }
+    /** [EN] `CYLBadgeTextDisplaying.textColor`: `badgeTextColor`. [CN] 即 `badgeTextColor`。 */
+    override var textColor: Int
+        get() = badgeTextColor
+        set(value) { badgeTextColor = value; invalidate() }
+    /** [EN] `textAlignment` as a `Gravity` (start, center or end). [CN] 以 `Gravity` 表示的对齐方式。 */
+    override var textGravity: Int = android.view.Gravity.CENTER
+        set(value) { field = value; invalidate() }
     @ColorInt var badgeBackgroundColor: Int = Color.RED
     @ColorInt var badgeTextColor: Int = Color.WHITE
     @ColorInt var badgeBorderColor: Int? = null
@@ -62,8 +73,10 @@ class CYLBadgeView(context: Context) : View(context) {
         setMeasuredDimension(width, height)
     }
 
+    private val rect = RectF()
+
     override fun onDraw(canvas: Canvas) {
-        val rect = RectF(0f, 0f, width.toFloat(), height.toFloat())
+        rect.set(0f, 0f, width.toFloat(), height.toFloat())
         val radius = badgeCornerRadius?.let { it * density } ?: (height / 2f)
         paint.style = Paint.Style.FILL
         paint.color = badgeBackgroundColor
@@ -79,19 +92,53 @@ class CYLBadgeView(context: Context) : View(context) {
         if (!isDot) {
             textPaint.color = badgeTextColor
             val y = height / 2f - (textPaint.descent() + textPaint.ascent()) / 2
-            canvas.drawText(text ?: "", width / 2f, y, textPaint)
+            val horizontal = textGravity and android.view.Gravity.HORIZONTAL_GRAVITY_MASK
+            val inset = badgeMargin * density + textPaint.measureText(text ?: "") / 2
+            val x = when (horizontal) {
+                android.view.Gravity.START, android.view.Gravity.LEFT -> inset
+                android.view.Gravity.END, android.view.Gravity.RIGHT -> width - inset
+                else -> width / 2f
+            }
+            canvas.drawText(text ?: "", x, y, textPaint)
         }
     }
 
-    /** [EN] Plays `type` once (none: nothing). [CN] 播放一次动画（none 不播放）。 */
+    private var running: android.animation.Animator? = null
+
+    /** [EN] Stops the running animation and resets the transform. [CN] 停止正在播放的动画并重置变换。 */
+    fun stopAnimation() {
+        running?.cancel()
+        running = null
+        scaleX = 1f; scaleY = 1f; translationX = 0f; translationY = 0f; alpha = 1f; rotationX = 0f
+    }
+
+    /**
+     * [EN] Plays `type` (the iOS `CYLBadgeAnimationType`): scale, shake, bounce and breathe repeat until the badge is cleared
+     *      or another animation plays; left-right, right-left, fade-in, rolling and scale play once. None: nothing.
+     * [CN] 播放 `type`（iOS 的 `CYLBadgeAnimationType`）：缩放、摇晃、弹跳与呼吸一直重复到角标清除或播放其他动画；左右、右左、淡入、滚动与缩放只播放一次。
+     */
     fun play(type: CYLEnums.CYLBadgeAnimationType) {
-        when (type) {
-            CYLEnums.CYLBadgeAnimationType.None -> Unit
-            CYLEnums.CYLBadgeAnimationType.Scale -> ObjectAnimator.ofPropertyValuesHolder(this, PropertyValuesHolder.ofFloat(SCALE_X, 0f, 1f), PropertyValuesHolder.ofFloat(SCALE_Y, 0f, 1f)).setDuration(250).apply { interpolator = OvershootInterpolator() }.start()
-            CYLEnums.CYLBadgeAnimationType.Shake -> ObjectAnimator.ofFloat(this, TRANSLATION_X, 0f, -6f * density, 6f * density, -4f * density, 4f * density, 0f).setDuration(400).start()
-            CYLEnums.CYLBadgeAnimationType.Bounce -> ObjectAnimator.ofFloat(this, TRANSLATION_Y, 0f, -8f * density, 0f, -4f * density, 0f).setDuration(500).start()
-            CYLEnums.CYLBadgeAnimationType.Breathe -> ObjectAnimator.ofFloat(this, ALPHA, 1f, 0.3f, 1f).setDuration(1200).apply { repeatCount = ObjectAnimator.INFINITE }.start()
+        stopAnimation()
+        val forever = ObjectAnimator.INFINITE
+        val animator: android.animation.Animator = when (type) {
+            CYLEnums.CYLBadgeAnimationType.None -> return
+            CYLEnums.CYLBadgeAnimationType.Scale -> ObjectAnimator.ofPropertyValuesHolder(this, PropertyValuesHolder.ofFloat(SCALE_X, 1.4f, 0.6f), PropertyValuesHolder.ofFloat(SCALE_Y, 1.4f, 0.6f)).setDuration(1000).apply { repeatCount = forever; repeatMode = ObjectAnimator.REVERSE }
+            CYLEnums.CYLBadgeAnimationType.Shake -> ObjectAnimator.ofFloat(this, TRANSLATION_X, 0f, -6f * density, 6f * density, -4f * density, 4f * density, 0f).setDuration(1000).apply { repeatCount = forever }
+            CYLEnums.CYLBadgeAnimationType.Bounce -> ObjectAnimator.ofFloat(this, TRANSLATION_Y, 0f, -8f * density, 0f, -4f * density, 0f).setDuration(1000).apply { repeatCount = forever }
+            CYLEnums.CYLBadgeAnimationType.Breathe -> ObjectAnimator.ofFloat(this, ALPHA, 1f, 0.1f, 1f).setDuration(1200).apply { repeatCount = forever }
+            CYLEnums.CYLBadgeAnimationType.LeftRightOnce -> ObjectAnimator.ofFloat(this, TRANSLATION_X, -10f * density, 0f).setDuration(400)
+            CYLEnums.CYLBadgeAnimationType.RightLeftOnce -> ObjectAnimator.ofFloat(this, TRANSLATION_X, 10f * density, 0f).setDuration(400)
+            CYLEnums.CYLBadgeAnimationType.FadeInOnce -> ObjectAnimator.ofFloat(this, ALPHA, 0f, 1f).setDuration(400)
+            CYLEnums.CYLBadgeAnimationType.RollingOnce -> ObjectAnimator.ofFloat(this, ROTATION_X, 90f, 0f).setDuration(400)
+            CYLEnums.CYLBadgeAnimationType.ScaleOnce -> ObjectAnimator.ofPropertyValuesHolder(this, PropertyValuesHolder.ofFloat(SCALE_X, 0f, 1f), PropertyValuesHolder.ofFloat(SCALE_Y, 0f, 1f)).setDuration(300).apply { interpolator = OvershootInterpolator() }
         }
+        running = animator
+        animator.start()
+    }
+
+    override fun onDetachedFromWindow() {
+        stopAnimation()
+        super.onDetachedFromWindow()
     }
 }
 
@@ -108,16 +155,28 @@ class CYLBadgeState internal constructor() {
     var paused = false
     var style = CYLEnums.CYLBadgeStyle.RedDot
     var animationType = CYLEnums.CYLBadgeAnimationType.None
-    var maximumBadgeNumber = 99
-    var centerOffset = CYLOffset.zero
-    var margin = 2f
-    var radius = 4f
-    var cornerRadius: Float? = null
-    var font = CYLFont(11f)
-    var backgroundColor = Color.RED
-    var textColor = Color.WHITE
-    var borderColor: Int? = null
-    var borderWidth = 0f
+    // [EN] A value set on the view wins over `CYLBadgeAppearance.globalAppearance` (#425); null follows it. [CN] 视图上设置的值优先于全局外观（#425）；null 跟随全局外观。
+    private val global get() = CYLBadgeAppearance.globalAppearance
+    internal var explicitMaximumBadgeNumber: Int? = null
+    internal var explicitCenterOffset: CYLOffset? = null
+    internal var explicitMargin: Float? = null
+    internal var explicitRadius: Float? = null
+    internal var explicitCornerRadius: Float? = null
+    internal var explicitFont: CYLFont? = null
+    internal var explicitBackgroundColor: Int? = null
+    internal var explicitTextColor: Int? = null
+    internal var explicitBorderColor: Int? = null
+    internal var explicitBorderWidth: Float? = null
+    var maximumBadgeNumber: Int get() = explicitMaximumBadgeNumber ?: global.maximumBadgeNumber; set(value) { explicitMaximumBadgeNumber = value }
+    var centerOffset: CYLOffset get() = explicitCenterOffset ?: global.centerOffset; set(value) { explicitCenterOffset = value }
+    var margin: Float get() = explicitMargin ?: global.margin; set(value) { explicitMargin = value }
+    var radius: Float get() = explicitRadius ?: global.radius; set(value) { explicitRadius = value }
+    var cornerRadius: Float? get() = explicitCornerRadius ?: global.cornerRadius.takeIf { it > 0 }; set(value) { explicitCornerRadius = value }
+    var font: CYLFont get() = explicitFont ?: global.font; set(value) { explicitFont = value }
+    var backgroundColor: Int get() = explicitBackgroundColor ?: global.backgroundColor; set(value) { explicitBackgroundColor = value }
+    var textColor: Int get() = explicitTextColor ?: global.textColor; set(value) { explicitTextColor = value }
+    var borderColor: Int? get() = explicitBorderColor ?: global.borderColor; set(value) { explicitBorderColor = value }
+    var borderWidth: Float get() = explicitBorderWidth ?: global.borderWidth; set(value) { explicitBorderWidth = value }
     var respectsReduceMotion = true
     var hostReplacedByIconView = false
     var keepShowingPlusButtonLabel = false
@@ -194,7 +253,7 @@ fun View.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnima
 /** [EN] `-cyl_clearBadge`: removes the badge. [CN] 移除角标。 */
 fun View.cyl_clearBadge() {
     val state = cyl_badgeState
-    state.badge?.let { (it.parent as? ViewGroup)?.removeView(it) }
+    state.badge?.let { it.stopAnimation(); (it.parent as? ViewGroup)?.removeView(it) }
     state.badge = null
     state.value = null
     state.paused = false
@@ -253,12 +312,12 @@ fun View.cyl_refreshBadge() {
     badge.bringToFront()
 }
 
-/** [EN] `-cyl_resetBadgeAppearance`: back to the defaults. [CN] 恢复默认外观。 */
+/** [EN] `-cyl_resetBadgeAppearance`: drops the values set on this view, so it follows `CYLBadgeAppearance` again. [CN] 清除本视图上设置的值，重新跟随 `CYLBadgeAppearance`。 */
 fun View.cyl_resetBadgeAppearance() {
     val state = cyl_badgeState
-    state.backgroundColor = Color.RED; state.textColor = Color.WHITE; state.borderColor = null; state.borderWidth = 0f
-    state.radius = 4f; state.cornerRadius = null; state.font = CYLFont(11f); state.margin = 2f; state.centerOffset = CYLOffset.zero
-    state.maximumBadgeNumber = 99
+    state.explicitBackgroundColor = null; state.explicitTextColor = null; state.explicitBorderColor = null; state.explicitBorderWidth = null
+    state.explicitRadius = null; state.explicitCornerRadius = null; state.explicitFont = null; state.explicitMargin = null; state.explicitCenterOffset = null
+    state.explicitMaximumBadgeNumber = null
     state.value?.let { cyl_showBadgeValue(it, CYLEnums.CYLBadgeAnimationType.None) }
 }
 

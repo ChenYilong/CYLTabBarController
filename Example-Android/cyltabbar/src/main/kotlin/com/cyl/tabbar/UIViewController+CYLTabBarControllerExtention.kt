@@ -24,7 +24,7 @@ val Fragment.cyl_tabIndex: Int get() = cyl_tabBarController?.viewControllers?.in
 private fun cyl_rootTab(fragment: Fragment): Fragment {
     var tab = fragment
     val controller = fragment.cyl_tabBarController ?: return fragment
-    while (tab !in controller.viewControllers && tab.parentFragment != null) tab = tab.parentFragment!!
+    while (tab !in controller.viewControllers && tab.parentFragment != null) tab = tab.requireParentFragment()
     return tab
 }
 
@@ -66,7 +66,18 @@ fun Fragment.cyl_popSelectTabBarChildViewControllerAtIndex(index: Int, animated:
     return target
 }
 
-fun Fragment.cyl_popSelectTabBarChildViewControllerAtIndex(index: Int, animated: Boolean, block: ((Fragment) -> Unit)?) {
+/** [EN] `CYLPopSelectTabBarChildViewControllerCompletion`: called with the selected page. [CN] 以选中的页面调用。 */
+typealias CYLPopSelectTabBarChildViewControllerCompletion = (selectedTabBarChildViewController: Fragment) -> Unit
+/**
+ * [EN] `CYLPushOrPopCompletionHandler`: `shouldPop` pops back to `viewControllerPopTo`; otherwise the page is pushed, after
+ *      selecting the tab at `index` when `shouldPopSelectTabBarChildViewController` (both ignored when popping).
+ * [CN] `shouldPop` 时弹回 `viewControllerPopTo`；否则 push 页面，`shouldPopSelectTabBarChildViewController` 时先选中第 `index` 个 Tab（弹回时两者被忽略）。
+ */
+typealias CYLPushOrPopCompletionHandler = (shouldPop: Boolean, viewControllerPopTo: Fragment?, shouldPopSelectTabBarChildViewController: Boolean, index: Int) -> Unit
+/** [EN] `CYLPushOrPopCallback`: gets the pages of the stack and decides through the completion handler. [CN] 获得栈中的页面，并通过 completion handler 决定行为。 */
+typealias CYLPushOrPopCallback = (viewControllers: List<Fragment>, completionHandler: CYLPushOrPopCompletionHandler) -> Unit
+
+fun Fragment.cyl_popSelectTabBarChildViewControllerAtIndex(index: Int, animated: Boolean, block: CYLPopSelectTabBarChildViewControllerCompletion?) {
     cyl_popSelectTabBarChildViewControllerAtIndex(index, animated)?.let { block?.invoke(it) }
 }
 
@@ -76,7 +87,7 @@ fun Fragment.cyl_popSelectTabBarChildViewControllerForClassType(classType: Class
     return if (index >= 0) cyl_popSelectTabBarChildViewControllerAtIndex(index, animated) else null
 }
 
-fun Fragment.cyl_popSelectTabBarChildViewControllerForClassType(classType: Class<out Fragment>, animated: Boolean, block: ((Fragment) -> Unit)?) {
+fun Fragment.cyl_popSelectTabBarChildViewControllerForClassType(classType: Class<out Fragment>, animated: Boolean, block: CYLPopSelectTabBarChildViewControllerCompletion?) {
     cyl_popSelectTabBarChildViewControllerForClassType(classType, animated)?.let { block?.invoke(it) }
 }
 
@@ -86,7 +97,7 @@ fun Fragment.cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier(ident
     return if (index >= 0) cyl_popSelectTabBarChildViewControllerAtIndex(index, animated) else null
 }
 
-fun Fragment.cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier(identifier: String, animated: Boolean, block: ((Fragment) -> Unit)?) {
+fun Fragment.cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier(identifier: String, animated: Boolean, block: CYLPopSelectTabBarChildViewControllerCompletion?) {
     cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier(identifier, animated)?.let { block?.invoke(it) }
 }
 
@@ -116,9 +127,42 @@ fun Fragment.cyl_pushOrPopToViewController(viewController: Fragment, animated: B
     }
 }
 
-fun Fragment.cyl_pushOrPopToViewController(viewController: Fragment, animated: Boolean, completion: (() -> Unit)?) {
-    cyl_pushOrPopToViewController(viewController, animated)
-    completion?.invoke()
+/** [EN] The pages of this page's tab: the tab's root, then its pushed pages. [CN] 本页面所在 Tab 的页面：根页面，然后是 push 的页面。 */
+private fun Fragment.cyl_stackViewControllers(): List<Fragment> {
+    val root = cyl_rootTab(this)
+    return listOf(root) + root.childFragmentManager.fragments.filter { it.isAdded }
+}
+
+/**
+ * [EN] `-cyl_pushOrPopToViewController:animated:callback:`: `callback` gets the pages of the stack and answers through its
+ *      completion handler: pop back to one of them, or push `viewController` (after selecting the tab at `index` when
+ *      asked; an invalid index pushes onto the current stack).
+ * [CN] `callback` 获得栈中的页面，并通过 completion handler 回答：弹回其中一个，或 push `viewController`（需要时先选中第 `index` 个 Tab；
+ *      下标无效时 push 到当前栈）。
+ */
+fun Fragment.cyl_pushOrPopToViewController(viewController: Fragment, animated: Boolean, callback: CYLPushOrPopCallback) =
+    cyl_pushOrPop(viewController, animated, null, callback)
+
+/** [EN] `-cyl_pushOrPopToViewController:animated:tabBarItemIdentifier:callback:`: the tab to select is given by its identifier (the handler's `index` is ignored). [CN] 要选中的 Tab 由标识给出（忽略 handler 中的 `index`）。 */
+fun Fragment.cyl_pushOrPopToViewController(viewController: Fragment, animated: Boolean, tabBarItemIdentifier: String, callback: CYLPushOrPopCallback) =
+    cyl_pushOrPop(viewController, animated, tabBarItemIdentifier, callback)
+
+private fun Fragment.cyl_pushOrPop(viewController: Fragment, animated: Boolean, identifier: String?, callback: CYLPushOrPopCallback) {
+    val stack = cyl_stackViewControllers()
+    callback(stack) { shouldPop, popTo, shouldSelect, index ->
+        val root = cyl_rootTab(this)
+        if (shouldPop && popTo != null) {
+            if (popTo === root) root.childFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            else while (root.childFragmentManager.fragments.lastOrNull() !== popTo && root.childFragmentManager.backStackEntryCount > 0) root.childFragmentManager.popBackStackImmediate()
+            return@callback
+        }
+        val controller = cyl_tabBarController
+        val target = if (identifier != null) controller?.cyl_indexOfTabBarItemIdentifier(identifier) ?: -1 else index
+        val tab = if (shouldSelect && controller != null && target in controller.viewControllers.indices) {
+            cyl_popSelectTabBarChildViewControllerAtIndex(target, animated)
+        } else root
+        (tab ?: root).cyl_pushViewController(viewController, animated)
+    }
 }
 
 /** [EN] `-cyl_handleNavigationBackAction`: pops the page's stack (to the root with `toRoot`). [CN] 弹出页面的返回栈（`toRoot` 回到根）。 */
