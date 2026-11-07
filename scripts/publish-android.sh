@@ -102,11 +102,15 @@ fi
 
 # 2. [EN] Credentials before any work that depends on them. [CN] 先检查凭据。
 if [ "$TARGET" = central ] && [ "$DRY_RUN" = 0 ]; then
-    [ -n "${MAVEN_CENTRAL_USERNAME:-}" ] && [ -n "${MAVEN_CENTRAL_PASSWORD:-}" ] || die "set MAVEN_CENTRAL_USERNAME and MAVEN_CENTRAL_PASSWORD (a Central Portal user token)"
+    if [ -z "${MAVEN_CENTRAL_USERNAME:-}" ] || [ -z "${MAVEN_CENTRAL_PASSWORD:-}" ]; then
+        die "set MAVEN_CENTRAL_USERNAME and MAVEN_CENTRAL_PASSWORD (a Central Portal user token)"
+    fi
     [ -n "${SIGNING_KEY:-}" ] || grep -qs '^signing.gnupg.keyName' "${GRADLE_USER_HOME:-$HOME/.gradle}/gradle.properties" || die "set SIGNING_KEY (and SIGNING_PASSWORD), or signing.gnupg.keyName in ~/.gradle/gradle.properties"
 fi
 if [ "$TARGET" = github ] && [ "$DRY_RUN" = 0 ]; then
-    [ -n "${GITHUB_ACTOR:-}" ] && [ -n "${GITHUB_TOKEN:-}" ] || die "set GITHUB_ACTOR and GITHUB_TOKEN (with write:packages)"
+    if [ -z "${GITHUB_ACTOR:-}" ] || [ -z "${GITHUB_TOKEN:-}" ]; then
+        die "set GITHUB_ACTOR and GITHUB_TOKEN (with write:packages)"
+    fi
 fi
 
 # 3. [EN] Publish. [CN] 发布。
