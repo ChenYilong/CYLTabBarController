@@ -29,6 +29,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    androidResources {
+        // [EN] The iOS folders an app does not need: app icons and the bundle's translations. [CN] App 不需要的 iOS 目录：App 图标与 bundle 的翻译。
+        ignoreAssetsPatterns += listOf("!<dir>AppIcon.appiconset", "!<dir>*.lproj", "!<dir>Configurations", "!Info.plist")
+    }
+
     kotlinOptions {
         jvmTarget = "17"
     }
@@ -41,6 +46,8 @@ android {
         getByName("main") {
             // [EN] Example-GIF's own GIF files, not a copy. [CN] Example-GIF 自己的 GIF 文件，而不是副本。
             assets.srcDir("../../Example-GIF/GIFApp/Resources")
+            // [EN] Example-GIF's image sets and colors, read by DemoAssets. [CN] Example-GIF 的图片集与颜色，由 DemoAssets 读取。
+            assets.srcDir("../../Example-GIF/GIFApp/Assets.xcassets")
         }
     }
 }

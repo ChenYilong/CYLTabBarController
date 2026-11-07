@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.cyl.tabbar.demo.DemoAssets
 
 /**
  * [EN] iOS `GuideViewController`: shown on first launch, three guide images to swipe, and a "5 Skip" button counting down;
@@ -28,8 +29,9 @@ class GuideActivity : AppCompatActivity() {
         supportActionBar?.hide()
         val width = resources.displayMetrics.widthPixels
         val pages = LinearLayout(this).apply {
-            for (image in listOf(R.drawable.guide_1, R.drawable.guide_2, R.drawable.guide_3)) {
-                addView(ImageView(context).apply { setImageResource(image); scaleType = ImageView.ScaleType.CENTER_CROP }, LinearLayout.LayoutParams(width, -1))
+            // [EN] The iOS guide images, `guideImage_<n>_750x1334` (`numOfPages = 3`). [CN] iOS 的引导图 `guideImage_<n>_750x1334`（`numOfPages = 3`）。
+            for (page in 1..3) {
+                addView(ImageView(context).apply { setImageDrawable(DemoAssets.drawable(context, "guideImage_${page}_750x1334")); scaleType = ImageView.ScaleType.CENTER_CROP }, LinearLayout.LayoutParams(width, -1))
             }
         }
         val scroll = object : HorizontalScrollView(this) {

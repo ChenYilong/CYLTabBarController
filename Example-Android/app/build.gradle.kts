@@ -34,6 +34,11 @@ android {
         unitTests.isIncludeAndroidResources = true
     }
 
+    androidResources {
+        // [EN] The iOS folders an app does not need: app icons and the bundle's translations. [CN] App 不需要的 iOS 目录：App 图标与 bundle 的翻译。
+        ignoreAssetsPatterns += listOf("!<dir>AppIcon.appiconset", "!<dir>*.lproj", "!<dir>Configurations", "!Info.plist")
+    }
+
     kotlinOptions {
         jvmTarget = "17"
     }

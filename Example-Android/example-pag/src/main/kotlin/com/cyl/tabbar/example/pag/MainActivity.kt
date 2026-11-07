@@ -41,11 +41,13 @@ class MainActivity : DemoTabBarActivity() {
     override fun makeTabBarController(style: CYLEnums.CYLTabBarStyleType): CYLTabBarController {
         CYLPlusButton.registerPlusButton(MenuPlusButton)
         val titles = listOf(R.string.tab_home, R.string.tab_health, R.string.tab_moments, R.string.tab_me).map(::getString)
-        val images = listOf("home", "message", "lianxiren", "me")
+        // [EN] The image names of `TabBarCommon.tabBarItemsAttributesForController()`, from Example-PAG's asset catalog. [CN] `TabBarCommon.tabBarItemsAttributesForController()` 中的图片名称，来自 Example-PAG 的资源目录。
+        val images = listOf("Home", "Message", "lianxiren", "Me")
         val items = titles.indices.map { index ->
             mapOf(CYLConstants.CYLTabBarItemTitle to titles[index], CYLConstants.CYLTabBarItemImage to images[index],
-                  CYLConstants.CYLTabBarItemSelectedImage to images[index] + "_selected") + animation(animationFiles[index])
-        }
+                  CYLConstants.CYLTabBarItemSelectedImage to images[index] + "Selected") + animation(animationFiles[index])
+        }.toMutableList()
+        items[1] = items[1] + (CYLConstants.CYLTabBarItemDarkImage to "Message_night")
         val pages = listOf(
             HomePage(),
             ColorPage.newInstance(R.string.tab_health, Color.BLUE),

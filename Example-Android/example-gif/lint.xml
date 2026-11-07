@@ -10,6 +10,4 @@
 <lint>
     <issue id="GradleDependency" severity="ignore" />
     <issue id="AndroidGradlePluginVersion" severity="ignore" />
-    <!-- [EN] Example-GIF ships its tab images at @2x only, as the iOS example; Android scales them. [CN] 与 iOS 示例一样，Example-GIF 的 Tab 图片只有 @2x；由 Android 缩放。 -->
-    <issue id="IconMissingDensityFolder" severity="ignore" />
 </lint>

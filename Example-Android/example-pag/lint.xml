@@ -10,6 +10,4 @@
 <lint>
     <issue id="GradleDependency" severity="ignore" />
     <issue id="AndroidGradlePluginVersion" severity="ignore" />
-    <!-- [EN] The iOS example ships @2x and @3x images only (xhdpi, xxhdpi); Android scales them. [CN] iOS 示例只有 @2x 与 @3x 图片（xhdpi、xxhdpi）；由 Android 缩放。 -->
-    <issue id="IconMissingDensityFolder" severity="ignore" />
 </lint>

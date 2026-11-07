@@ -22,6 +22,4 @@
     <issue id="AndroidGradlePluginVersion" severity="ignore" />
     <!-- [EN] The lint check of lifecycle 2.9 (from rive-android) crashes lint 8.7 (NonNullableMutableLiveDataDetector); this app has no LiveData. [CN] lifecycle 2.9（来自 rive-android）的 lint 检查会让 lint 8.7 崩溃（NonNullableMutableLiveDataDetector）；本 App 不使用 LiveData。 -->
     <issue id="NullSafeMutableLiveData" severity="ignore" />
-    <!-- [EN] The course's images are its iOS @3x assets (xxhdpi; PDFs rendered at 3x); Android scales them. [CN] 课程图片是其 iOS @3x 资源（xxhdpi；PDF 以 3 倍渲染）；由 Android 缩放。 -->
-    <issue id="IconMissingDensityFolder" severity="ignore" />
 </lint>

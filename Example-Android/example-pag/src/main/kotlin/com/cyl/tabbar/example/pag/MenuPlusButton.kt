@@ -3,10 +3,10 @@ package com.cyl.tabbar.example.pag
 import android.content.Context
 import android.graphics.Color
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.cyl.tabbar.CYLPlusButton
 import com.cyl.tabbar.CYLPlusButtonSubclassing
+import com.cyl.tabbar.demo.DemoAssets
 
 /**
  * [EN] Example-PAG's plus button (iOS `CYLPlusButtonSubclass`): the title "Menu" drawn on the tabbar_database background
@@ -19,7 +19,7 @@ object MenuPlusButton : CYLPlusButtonSubclassing {
     const val CONTEXT = "ExamplePAG"
 
     override fun plusButton(context: Context): CYLPlusButton = CYLPlusButton(context).apply {
-        background = ContextCompat.getDrawable(context, R.drawable.tabbar_database)
+        background = DemoAssets.drawable(context, "tabbar_database")
         setTitle(context.getString(R.string.menu), context.getString(R.string.menu), Color.WHITE)
         titleLabel.setTextColor(Color.WHITE)
         titleLabel.textSize = 15f

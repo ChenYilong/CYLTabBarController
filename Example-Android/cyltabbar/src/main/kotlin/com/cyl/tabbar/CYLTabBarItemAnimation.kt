@@ -429,27 +429,34 @@ internal object CYLReflection {
             method.name == name + "\$default" && java.lang.reflect.Modifier.isStatic(method.modifiers) && method.parameterTypes.size == args.size + 3
         }
         for (method in candidates) {
-            val types = method.parameterTypes
-            var mask = 0
-            val values = ArrayList<Any?>(types.size)
-            values += target
-            var fits = types[0].isInstance(target)
-            args.forEachIndexed { index, arg ->
-                val type = types[index + 1]
-                if (arg === DEFAULT) {
-                    mask = mask or (1 shl index)
-                    values += defaultValue(type).takeIf { type.isPrimitive }
-                } else {
-                    val adapted = adapt(arrayOf(type), arrayOf(arg))
-                    if (adapted == null) fits = false else values += adapted[0]
-                }
-            }
-            if (!fits) continue
-            values += mask
-            values += null
-            return try { method.invoke(null, *values.toTypedArray()) ?: Unit } catch (error: ReflectiveOperationException) { null } catch (error: RuntimeException) { null }
+            val values = kotlinDefaultArguments(method.parameterTypes, target, args) ?: continue
+            return try { method.invoke(null, *values) ?: Unit } catch (error: ReflectiveOperationException) { null } catch (error: RuntimeException) { null }
         }
         return null
+    }
+
+    /**
+     * [EN] The arguments of a `name$default` method: the target, the given arguments (adapted) or placeholders, the mask of
+     *      the defaulted parameters, and the unused marker; null when a given argument does not fit.
+     * [CN] `name$default` 方法的参数：目标、给定参数（已适配）或占位值、使用默认值的参数掩码，以及未使用的标记；给定参数类型不匹配时为 null。
+     */
+    private fun kotlinDefaultArguments(types: Array<Class<*>>, target: Any, args: Array<out Any?>): Array<Any?>? {
+        if (!types[0].isInstance(target)) return null
+        var mask = 0
+        val values = arrayOfNulls<Any?>(types.size)
+        values[0] = target
+        for ((index, arg) in args.withIndex()) {
+            val type = types[index + 1]
+            if (arg === DEFAULT) {
+                mask = mask or (1 shl index)
+                values[index + 1] = defaultValue(type).takeIf { type.isPrimitive }
+            } else {
+                val adapted = adapt(arrayOf(type), arrayOf(arg)) ?: return null
+                values[index + 1] = adapted[0]
+            }
+        }
+        values[types.size - 2] = mask
+        return values
     }
 
     /** [EN] The constant `name` of the enum `className`, or null. [CN] 枚举 `className` 中名为 `name` 的常量，或 null。 */

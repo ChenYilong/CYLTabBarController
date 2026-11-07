@@ -29,6 +29,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    androidResources {
+        // [EN] The iOS folders an app does not need: app icons and the bundle's translations. [CN] App 不需要的 iOS 目录：App 图标与 bundle 的翻译。
+        ignoreAssetsPatterns += listOf("!<dir>AppIcon.appiconset", "!<dir>*.lproj", "!<dir>Configurations", "!Info.plist")
+    }
+
     kotlinOptions {
         jvmTarget = "17"
     }
@@ -41,6 +46,8 @@ android {
         getByName("main") {
             // [EN] The PAG files of Example-PAG, downloaded by scripts/fetch-animation-resources.py (see Example-Shared/PAGResources). [CN] Example-PAG 的 PAG 文件，由 scripts/fetch-animation-resources.py 下载（见 Example-Shared/PAGResources）。
             assets.srcDir("../../Example-Shared/PAGResources/tab-icons")
+            // [EN] Example-PAG's image sets (tabs, plus button, guide), read by DemoAssets. [CN] Example-PAG 的图片集（Tab、PlusButton、引导页），由 DemoAssets 读取。
+            assets.srcDir("../../Example-PAG/HealthyHome/Assets.xcassets")
         }
     }
 }

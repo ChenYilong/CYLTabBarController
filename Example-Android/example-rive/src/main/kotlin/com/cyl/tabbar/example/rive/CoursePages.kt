@@ -25,13 +25,12 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.cyl.tabbar.CYLConstants
 import com.cyl.tabbar.CYLSize
 import com.cyl.tabbar.CYLTabBarAnimationURLWithOptions
 import com.cyl.tabbar.CYLTabBarItemAnimationFactory
+import com.cyl.tabbar.demo.DemoAssets
 import com.cyl.tabbar.demo.DemoCatalog
 import com.cyl.tabbar.demo.DemoListFragment
 
@@ -64,24 +63,33 @@ class RiveAnimation(file: String, options: Map<String, String> = emptyMap()) {
 private fun Context.dp(value: Float) = (value * resources.displayMetrics.density).toInt()
 
 /** [EN] iOS `TextStyle` with its font and size (`customFont`). [CN] iOS `TextStyle` 及其字体与字号（`customFont`）。 */
-private enum class TextStyle(val font: Int, val size: Float) {
-    LargeTitle(R.font.poppins_bold, 34f), Title(R.font.poppins_bold, 28f), Title2(R.font.poppins_bold, 24f), Title3(R.font.poppins_bold, 20f),
-    Body(R.font.inter_regular, 17f), Headline(R.font.inter_semibold, 17f), Subheadline(R.font.inter_regular, 15f), Subheadline2(R.font.inter_semibold, 15f),
-    Footnote(R.font.inter_regular, 13f), Footnote2(R.font.inter_semibold, 13f), Caption(R.font.inter_regular, 12f), Caption2(R.font.inter_semibold, 12f),
+private enum class TextStyle(val font: String, val size: Float) {
+    LargeTitle(POPPINS_BOLD, 34f), Title(POPPINS_BOLD, 28f), Title2(POPPINS_BOLD, 24f), Title3(POPPINS_BOLD, 20f),
+    Body(INTER_REGULAR, 17f), Headline(INTER_SEMIBOLD, 17f), Subheadline(INTER_REGULAR, 15f), Subheadline2(INTER_SEMIBOLD, 15f),
+    Footnote(INTER_REGULAR, 13f), Footnote2(INTER_SEMIBOLD, 13f), Caption(INTER_REGULAR, 12f), Caption2(INTER_SEMIBOLD, 12f),
 }
+
+/** [EN] The course's font files (Example-SwiftUI-Rive/AnimatedApp/Fonts). [CN] 课程的字体文件（Example-SwiftUI-Rive/AnimatedApp/Fonts）。 */
+private const val POPPINS_BOLD = "Poppins-Bold.ttf"
+private const val INTER_REGULAR = "Inter-Regular.ttf"
+private const val INTER_SEMIBOLD = "Inter-SemiBold.ttf"
 
 private fun Context.text(value: String, style: TextStyle? = null, @ColorInt color: Int? = null, alpha: Float = 1f): TextView = TextView(this).apply {
     text = value
-    style?.let { typeface = ResourcesCompat.getFont(context, it.font); textSize = it.size }
+    style?.let { typeface = DemoAssets.font(context, it.font); textSize = it.size }
     color?.let(::setTextColor)
     this.alpha = alpha
 }
 
 private fun rounded(@ColorInt color: Int, radius: Float) = GradientDrawable().apply { setColor(color); cornerRadius = radius }
 
-private fun Context.color(id: Int) = ContextCompat.getColor(this, id)
+/** [EN] A color set of the course's asset catalog ("Background", "Background 2", "Shadow"), dark in this dark app. [CN] 课程资源目录中的颜色集（"Background"、"Background 2"、"Shadow"），本 App 为深色。 */
+private fun Context.color(name: String) = DemoAssets.color(this, name, Color.BLACK)
 
 private fun Context.image(@DrawableRes id: Int) = ImageView(this).apply { setImageResource(id) }
+
+/** [EN] An image set of the course's asset catalog (PDFs rendered at the screen density). [CN] 课程资源目录中的图片集（PDF 按屏幕密度渲染）。 */
+private fun Context.image(name: String) = ImageView(this).apply { setImageDrawable(DemoAssets.drawable(context, name)) }
 
 private fun lp(width: Int, height: Int, block: LinearLayout.LayoutParams.() -> Unit = {}) = LinearLayout.LayoutParams(width, height).apply(block)
 
@@ -98,22 +106,22 @@ abstract class TitledPage(private val navigationTitle: String) : Fragment() {
 
 // MARK: - Chat: HomeView, VCard, HCard
 
-private data class Course(val title: String, val subtitle: String, val caption: String, val color: Int, val image: Int)
-private data class CourseSection(val title: String, val caption: String, val color: Int, val image: Int)
+private data class Course(val title: String, val subtitle: String, val caption: String, val color: Int, val image: String)
+private data class CourseSection(val title: String, val caption: String, val color: Int, val image: String)
 
 /** [EN] Model/Course.swift. [CN] Model/Course.swift。 */
 private val courses = listOf(
-    Course("Animations in SwiftUI", "Build and animate an iOS app from scratch", "20 sections - 3 hours", Color.parseColor("#7850F0"), R.drawable.topic_1),
-    Course("Build Quick Apps with SwiftUI", "Apply your Swift and SwiftUI knowledge by building real, quick and various applications from scratch", "47 sections - 11 hours", Color.parseColor("#6792FF"), R.drawable.topic_2),
-    Course("Build a SwiftUI app for iOS 15", "Design and code a SwiftUI 3 app with custom layouts, animations and gestures using Xcode 13, SF Symbols 3, Canvas, Concurrency, Searchable and a whole lot more", "21 sections - 4 hours", Color.parseColor("#005FE7"), R.drawable.topic_1),
+    Course("Animations in SwiftUI", "Build and animate an iOS app from scratch", "20 sections - 3 hours", Color.parseColor("#7850F0"), "Topic 1"),
+    Course("Build Quick Apps with SwiftUI", "Apply your Swift and SwiftUI knowledge by building real, quick and various applications from scratch", "47 sections - 11 hours", Color.parseColor("#6792FF"), "Topic 2"),
+    Course("Build a SwiftUI app for iOS 15", "Design and code a SwiftUI 3 app with custom layouts, animations and gestures using Xcode 13, SF Symbols 3, Canvas, Concurrency, Searchable and a whole lot more", "21 sections - 4 hours", Color.parseColor("#005FE7"), "Topic 1"),
 )
 
 /** [EN] Model/CourseSection.swift. [CN] Model/CourseSection.swift。 */
 private val courseSections = listOf(
-    CourseSection("State Machine", "Watch video - 15 mins", Color.parseColor("#9CC5FF"), R.drawable.topic_2),
-    CourseSection("Animated Menu", "Watch video - 10 mins", Color.parseColor("#6E6AE8"), R.drawable.topic_1),
-    CourseSection("Tab Bar", "Watch video - 8 mins", Color.parseColor("#005FE7"), R.drawable.topic_2),
-    CourseSection("Button", "Watch video - 9 mins", Color.parseColor("#BBA6FF"), R.drawable.topic_1),
+    CourseSection("State Machine", "Watch video - 15 mins", Color.parseColor("#9CC5FF"), "Topic 2"),
+    CourseSection("Animated Menu", "Watch video - 10 mins", Color.parseColor("#6E6AE8"), "Topic 1"),
+    CourseSection("Tab Bar", "Watch video - 8 mins", Color.parseColor("#005FE7"), "Topic 2"),
+    CourseSection("Button", "Watch video - 9 mins", Color.parseColor("#BBA6FF"), "Topic 1"),
 )
 
 /** [EN] Chat: iOS `HomeView`, "Courses" (VCard, sideways) then "Recent" (HCard). [CN] Chat：iOS `HomeView`，"Courses"（VCard，横向）然后 "Recent"（HCard）。 */
@@ -129,7 +137,7 @@ class CoursesPage : TitledPage("Chat") {
         recent.addView(context.text("Recent", TextStyle.Title3))
         courseSections.forEach { recent.addView(hCard(context, it), lp(-1, context.dp(110f)) { topMargin = context.dp(20f) }) }
         content.addView(recent)
-        return ScrollView(context).apply { setBackgroundColor(context.color(R.color.background)); addView(content) }
+        return ScrollView(context).apply { setBackgroundColor(context.color("Background")); addView(content) }
     }
 
     /** [EN] iOS `VCard`: 260 × 310, a gradient of the course color, three overlapping avatars, the topic image at the top right. [CN] iOS `VCard`：260 × 310，课程颜色的渐变，三个重叠的头像，右上角的主题图片。 */
@@ -143,7 +151,7 @@ class CoursesPage : TitledPage("Chat") {
             addView(View(context), lp(0, 0) { weight = 1f })
             addView(FrameLayout(context).apply {
                 listOf(4, 5, 6).shuffled().forEachIndexed { index, number ->
-                    val avatar = listOf(R.drawable.avatar_4, R.drawable.avatar_5, R.drawable.avatar_6)[number - 4]
+                    val avatar = "Avatar $number"
                     addView(context.image(avatar).apply { clipToOutline = true; background = GradientDrawable().apply { shape = GradientDrawable.OVAL }; outlineProvider = android.view.ViewOutlineProvider.BACKGROUND },
                         FrameLayout.LayoutParams(context.dp(44f), context.dp(44f)).apply { marginStart = index * context.dp(24f) })
                 }
@@ -205,7 +213,7 @@ class SideMenuPage : TitledPage("Search") {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val context = inflater.context
-        val background2 = context.color(R.color.background_2)
+        val background2 = context.color("Background 2")
         val menu = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(0, 0, 0, context.dp(8f)) }
         menu.addView(LinearLayout(context).apply {
             gravity = Gravity.CENTER_VERTICAL
@@ -287,7 +295,7 @@ class OnboardingPage : TitledPage("Start") {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val context = inflater.context
         val root = FrameLayout(context)
-        root.addView(context.image(R.drawable.spline).apply { blur(50f); translationX = context.dp(200f).toFloat(); translationY = context.dp(100f).toFloat() },
+        root.addView(context.image("Spline").apply { blur(50f); translationX = context.dp(200f).toFloat(); translationY = context.dp(100f).toFloat() },
             FrameLayout.LayoutParams(-2, -2, Gravity.CENTER))
         val shapes = RiveAnimation("shapes")
         root.addView(shapes.view(context, 400f, 800f).apply { blur(30f) }, FrameLayout.LayoutParams(-1, -1))
@@ -314,7 +322,7 @@ class OnboardingPage : TitledPage("Start") {
                 TextStyle.Footnote, alpha = 0.7f), lp(-1, -2) { topMargin = context.dp(16f) })
         }
         root.addView(content, FrameLayout.LayoutParams(-1, -1))
-        root.setBackgroundColor(context.color(R.color.background))
+        root.setBackgroundColor(context.color("Background"))
         root.post { shapes.play() }
         return root
     }
@@ -323,7 +331,7 @@ class OnboardingPage : TitledPage("Start") {
     private fun showModal(root: FrameLayout) {
         if (modal != null) return
         val context = root.context
-        val shadow = context.color(R.color.shadow)
+        val shadow = context.color("Shadow")
         val layer = FrameLayout(context).apply {
             setBackgroundColor((shadow and 0x00FFFFFF) or (0x66 shl 24))
             isClickable = true
@@ -396,7 +404,7 @@ class SignInPage : TitledPage("User") {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val context = inflater.context
         return ScrollView(context).apply {
-            setBackgroundColor(context.color(R.color.background))
+            setBackgroundColor(context.color("Background"))
             addView(FrameLayout(context).apply { setPadding(context.dp(16f), context.dp(16f), context.dp(16f), context.dp(16f)); addView(card(context) {}) })
         }
     }
@@ -410,8 +418,8 @@ class SignInPage : TitledPage("User") {
             val confetti = RiveAnimation("confetti", mapOf(CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to "State Machine 1",
                 CYLConstants.CYLTabBarAnimationOptionRiveTriggerInput to "Trigger explosion"))
             val handler = Handler(Looper.getMainLooper())
-            val email = field(context, R.drawable.icon_email, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
-            val password = field(context, R.drawable.icon_lock, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
+            val email = field(context, "Icon Email", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
+            val password = field(context, "Icon Lock", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
             val succeededView = checkSucceeded.view(context, 100f).apply { visibility = View.INVISIBLE }
             val failedView = checkFailed.view(context, 100f).apply { visibility = View.INVISIBLE }
             val secondary = Color.argb(153, 128, 128, 128)
@@ -424,42 +432,21 @@ class SignInPage : TitledPage("User") {
                 addView(context.text("Access to 240+ hours of content. Learn design and code, by building real apps with React and Swift.", color = secondary).apply { gravity = Gravity.CENTER }, gap())
                 addView(labeled(context, "Email", email, secondary), gap())
                 addView(labeled(context, "Password", password, secondary), gap())
-                addView(context.text("→  Sign in", TextStyle.Headline, Color.WHITE).apply {
-                    gravity = Gravity.CENTER
-                    setPadding(context.dp(20f), context.dp(20f), context.dp(20f), context.dp(20f))
-                    // [EN] `largeButton()`: F77D8E, corners 20 except the top left (8). [CN] `largeButton()`：F77D8E，左上角为 8，其余为 20。
-                    background = GradientDrawable().apply {
-                        setColor(Color.parseColor("#F77D8E"))
-                        val big = context.dp(20f).toFloat(); val small = context.dp(8f).toFloat()
-                        cornerRadii = floatArrayOf(small, small, big, big, big, big, big, big)
-                    }
-                    elevation = context.dp(10f).toFloat()
-                    setOnClickListener {
-                        val succeeded = email.text.isNotEmpty()
-                        succeededView.visibility = if (succeeded) View.VISIBLE else View.INVISIBLE
-                        failedView.visibility = if (succeeded) View.INVISIBLE else View.VISIBLE
-                        handler.postDelayed({ if (succeeded) checkSucceeded.play() else checkFailed.play() }, 1000)
-                        handler.postDelayed({
-                            if (succeeded) confetti.play()
-                            succeededView.visibility = View.INVISIBLE
-                            failedView.visibility = View.INVISIBLE
-                        }, 3000)
-                        if (succeeded) handler.postDelayed(close, 4000)
-                    }
+                addView(signInButton(context) {
+                    val succeeded = email.text.isNotEmpty()
+                    succeededView.visibility = if (succeeded) View.VISIBLE else View.INVISIBLE
+                    failedView.visibility = if (succeeded) View.INVISIBLE else View.VISIBLE
+                    handler.postDelayed({ if (succeeded) checkSucceeded.play() else checkFailed.play() }, 1000)
+                    handler.postDelayed({
+                        if (succeeded) confetti.play()
+                        succeededView.visibility = View.INVISIBLE
+                        failedView.visibility = View.INVISIBLE
+                    }, 3000)
+                    if (succeeded) handler.postDelayed(close, 4000)
                 }, gap())
-                addView(LinearLayout(context).apply {
-                    gravity = Gravity.CENTER_VERTICAL
-                    addView(View(context).apply { setBackgroundColor(Color.argb(26, 0, 0, 0)) }, lp(0, context.dp(1f)) { weight = 1f })
-                    addView(context.text("OR", TextStyle.Subheadline2, Color.argb(77, 0, 0, 0)), lp(-2, -2) { marginStart = context.dp(8f); marginEnd = context.dp(8f) })
-                    addView(View(context).apply { setBackgroundColor(Color.argb(26, 0, 0, 0)) }, lp(0, context.dp(1f)) { weight = 1f })
-                }, gap())
+                addView(orDivider(context), gap())
                 addView(context.text("Sign up with Email, Apple, Google", TextStyle.Subheadline, secondary), gap())
-                addView(LinearLayout(context).apply {
-                    listOf(R.drawable.logo_email, R.drawable.logo_apple, R.drawable.logo_google).forEachIndexed { index, logo ->
-                        if (index > 0) addView(View(context), lp(0, 0) { weight = 1f })
-                        addView(context.image(logo))
-                    }
-                }, gap())
+                addView(logos(context), gap())
             }
             return FrameLayout(context).apply {
                 // [EN] `.regularMaterial`, a 20 pt card with a light border and a soft shadow. [CN] `.regularMaterial`：20 pt 圆角卡片，带浅色描边与柔和阴影。
@@ -474,13 +461,43 @@ class SignInPage : TitledPage("User") {
             }
         }
 
+        /** [EN] `largeButton()`: F77D8E, corners 20 except the top left (8), "→ Sign in". [CN] `largeButton()`：F77D8E，左上角为 8，其余为 20，"→ Sign in"。 */
+        private fun signInButton(context: Context, logIn: () -> Unit) = context.text("→  Sign in", TextStyle.Headline, Color.WHITE).apply {
+            gravity = Gravity.CENTER
+            setPadding(context.dp(20f), context.dp(20f), context.dp(20f), context.dp(20f))
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#F77D8E"))
+                val big = context.dp(20f).toFloat()
+                val small = context.dp(8f).toFloat()
+                cornerRadii = floatArrayOf(small, small, big, big, big, big, big, big)
+            }
+            elevation = context.dp(10f).toFloat()
+            setOnClickListener { logIn() }
+        }
+
+        /** [EN] Two faint lines around "OR". [CN] "OR" 两侧的淡色线条。 */
+        private fun orDivider(context: Context) = LinearLayout(context).apply {
+            gravity = Gravity.CENTER_VERTICAL
+            addView(View(context).apply { setBackgroundColor(Color.argb(26, 0, 0, 0)) }, lp(0, context.dp(1f)) { weight = 1f })
+            addView(context.text("OR", TextStyle.Subheadline2, Color.argb(77, 0, 0, 0)), lp(-2, -2) { marginStart = context.dp(8f); marginEnd = context.dp(8f) })
+            addView(View(context).apply { setBackgroundColor(Color.argb(26, 0, 0, 0)) }, lp(0, context.dp(1f)) { weight = 1f })
+        }
+
+        /** [EN] The Email, Apple and Google logos, spread out. [CN] 均匀分布的 Email、Apple 与 Google 标志。 */
+        private fun logos(context: Context) = LinearLayout(context).apply {
+            listOf("Logo Email", "Logo Apple", "Logo Google").forEachIndexed { index, logo ->
+                if (index > 0) addView(View(context), lp(0, 0) { weight = 1f })
+                addView(context.image(logo))
+            }
+        }
+
         /** [EN] `customTextField(image:)`: white, 10 pt corners, a 10 % border, the icon at the leading edge. [CN] `customTextField(image:)`：白色、10 pt 圆角、10% 描边，图标在前端。 */
-        private fun field(context: Context, @DrawableRes icon: Int, type: Int) = EditText(context).apply {
+        private fun field(context: Context, icon: String, type: Int) = EditText(context).apply {
             inputType = type
             setTextColor(Color.BLACK)
             setPadding(context.dp(44f), context.dp(15f), context.dp(15f), context.dp(15f))
             background = GradientDrawable().apply { setColor(Color.WHITE); cornerRadius = context.dp(10f).toFloat(); setStroke(context.dp(1f), Color.argb(26, 0, 0, 0)) }
-            setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0)
+            setCompoundDrawablesRelativeWithIntrinsicBounds(DemoAssets.drawable(context, icon), null, null, null)
             compoundDrawablePadding = context.dp(12f)
             setPaddingRelative(context.dp(8f), context.dp(15f), context.dp(15f), context.dp(15f))
         }

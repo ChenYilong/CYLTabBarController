@@ -20,6 +20,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import com.cyl.tabbar.CYLEnums
+import com.cyl.tabbar.demo.DemoAssets
 import com.cyl.tabbar.cyl_addBadgeHelperTable
 import com.cyl.tabbar.cyl_pushViewController
 import com.cyl.tabbar.cyl_showNavigationBadgeValue
@@ -89,7 +90,7 @@ class HomePage : NavigationPage(R.string.tab_home) {
         cyl_addBadgeHelperTable()
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menu.add(Menu.NONE, R.id.full_screen, Menu.NONE, R.string.full_screen).setIcon(R.drawable.fullscreen).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+                menu.add(Menu.NONE, R.id.full_screen, Menu.NONE, R.string.full_screen).setIcon(DemoAssets.drawable(requireContext(), "屏幕全屏")).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
                 view.post { cyl_showNavigationBadgeValue("", CYLEnums.CYLBadgeAnimationType.Shake, Color.rgb(Random.nextInt(256), Random.nextInt(256), Random.nextInt(256))) }
             }
 

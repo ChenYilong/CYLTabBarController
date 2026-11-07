@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- [EN] The course's color assets (Example-SwiftUI-Rive Assets.xcassets/Colors). [CN] 课程的颜色资源（Example-SwiftUI-Rive Assets.xcassets/Colors）。 -->
-<resources>
-    <color name="background">#F2F6FF</color>
-    <color name="background_2">#17203A</color>
-    <color name="shadow">#4A5367</color>
-</resources>

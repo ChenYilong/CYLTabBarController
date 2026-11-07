@@ -375,6 +375,11 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         (attributes[CYLConstants.CYLTabBarItemSelectedImage] as? String)?.let { item.selectedImage = resolver.drawable(activity, it) }
         (attributes[CYLConstants.CYLTabBarItemImage] as? android.graphics.drawable.Drawable)?.let { item.image = it }
         (attributes[CYLConstants.CYLTabBarItemSelectedImage] as? android.graphics.drawable.Drawable)?.let { item.selectedImage = it }
+        // [EN] `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage` in night mode, as iOS picks them in Dark Mode. [CN] 夜间模式下使用 `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage`，与 iOS 深色模式一致。
+        if ((activity.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+            imageValue(attributes[CYLConstants.CYLTabBarItemDarkImage], resolver)?.let { item.image = it }
+            imageValue(attributes[CYLConstants.CYLTabBarItemSelectedDarkImage], resolver)?.let { item.selectedImage = it }
+        }
         if (item.selectedImage == null) item.selectedImage = item.image
         item.cyl_imageInsets = CYLTabBarConfiguration.edgeInsetsValue(attributes[CYLConstants.CYLTabBarItemImageInsets]) ?: CYLEdgeInsets.zero
         item.cyl_titlePositionAdjustment = CYLTabBarConfiguration.offsetValue(attributes[CYLConstants.CYLTabBarItemTitlePositionAdjustment]) ?: CYLOffset.zero
@@ -393,6 +398,12 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         item.cyl_tabBarItemAnimationSizeValue = listOf(CYLConstants.CYLTabBarAnimationSize, CYLConstants.CYLTabBarLottieSize, CYLConstants.CYLTabBarPAGSize, CYLConstants.CYLTabBarRiveSize, CYLConstants.CYLTabBarGIFSize)
             .firstNotNullOfOrNull { CYLTabBarConfiguration.sizeValue(attributes[it]) }
         return item
+    }
+
+    private fun imageValue(value: Any?, resolver: CYLTabBarConfiguration.CYLTabBarImageResolver): android.graphics.drawable.Drawable? = when (value) {
+        is android.graphics.drawable.Drawable -> value
+        is String -> resolver.drawable(activity, value)
+        else -> null
     }
 
     /** [EN] `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL` / `CYLTabBarItemImageURLSize`: icons downloaded after the tabs exist. [CN] 网络图标：Tab 创建后下载。 */
@@ -538,11 +549,13 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     /** [EN] `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`: downloads on a background thread. [CN] 后台线程下载图标。 */
     fun setTabBarItemIconWithURL(url: String, selectedURL: String?, size: CYLSize?, index: Int) {
-        Thread {
+        // [EN] One queue for every tab bar, so a URL is downloaded once and then read from the cache (as iOS `+cyl_loadImageWithURL:`).
+        // [CN] 所有 TabBar 共用一个队列，同一 URL 只下载一次，之后读取缓存（与 iOS 的 `+cyl_loadImageWithURL:` 一致）。
+        iconLoader.execute {
             val icon = loadDrawable(url)
             val selected = selectedURL?.let { loadDrawable(it) }
             Handler(Looper.getMainLooper()).post { setTabBarItemIcon(icon, selected, size, index) }
-        }.start()
+        }
     }
 
     /**
@@ -550,7 +563,15 @@ open class CYLTabBarController(val activity: FragmentActivity) {
      *      on iOS (#605).
      * [CN] 来自 URL、路径、asset 名称或解析器名称的图标。GIF 循环播放（`CYLGIFDrawable`），与 iOS 的 GIF 图片一致（#605）。
      */
-    private fun loadDrawable(url: String): android.graphics.drawable.Drawable? = try {
+    private fun loadDrawable(url: String): android.graphics.drawable.Drawable? {
+        iconCache.get(url)?.let { return it.newDrawable(activity.resources) }
+        val drawable = decodeDrawable(url) ?: return null
+        // [EN] A looping GIF is not shared (it keeps its own clock). [CN] 循环的 GIF 不共用（它有自己的时钟）。
+        if (drawable !is CYLGIFDrawable) drawable.constantState?.let { iconCache.put(url, it) }
+        return drawable
+    }
+
+    private fun decodeDrawable(url: String): android.graphics.drawable.Drawable? = try {
         val bytes = when {
             url.startsWith("http") -> java.net.URI(url).toURL().openStream().use { it.readBytes() }
             else -> CYLTabBarItemAnimationFiles.openLocal(activity, url)?.use { it.readBytes() }
@@ -1087,6 +1108,11 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         private fun registerActive(controller: CYLTabBarController) { synchronized(active) { active[controller] = ++created } }
 
         /** [EN] `+cyl_activeTabBarController`: the most recently created live controller. [CN] 最近创建且仍存活的控制器。 */
+        /** [EN] The queue that downloads and decodes the tab icons of every tab bar controller. [CN] 为所有 TabBarController 下载并解码 Tab 图标的队列。 */
+        private val iconLoader = java.util.concurrent.Executors.newSingleThreadExecutor()
+        /** [EN] Decoded tab icons by URL, shared by every tab bar controller. [CN] 按 URL 缓存的已解码 Tab 图标，所有 TabBarController 共用。 */
+        private val iconCache = android.util.LruCache<String, android.graphics.drawable.Drawable.ConstantState>(64)
+
         @JvmStatic fun cyl_activeTabBarController(): CYLTabBarController? = synchronized(active) { active.entries.maxByOrNull { it.value }?.key }
 
         /** [EN] Every live controller, oldest first. [CN] 所有存活的控制器，按创建顺序。 */

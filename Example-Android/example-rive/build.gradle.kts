@@ -29,6 +29,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    androidResources {
+        // [EN] The iOS folders an app does not need: app icons and the bundle's translations. [CN] App 不需要的 iOS 目录：App 图标与 bundle 的翻译。
+        ignoreAssetsPatterns += listOf("!<dir>AppIcon.appiconset", "!<dir>*.lproj", "!<dir>Configurations", "!Info.plist")
+    }
+
     kotlinOptions {
         jvmTarget = "17"
     }
@@ -41,6 +46,10 @@ android {
         getByName("main") {
             // [EN] The .riv files of Example-Rive / Example-SwiftUI-Rive, not a copy. [CN] Example-Rive / Example-SwiftUI-Rive 的 .riv 文件，而不是副本。
             assets.srcDir("../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets")
+            // [EN] The course's image sets and colors, read by DemoAssets. [CN] 课程的图片集与颜色，由 DemoAssets 读取。
+            assets.srcDir("../../Example-SwiftUI-Rive/AnimatedApp/Assets.xcassets")
+            // [EN] The course's fonts (Poppins, Inter). [CN] 课程的字体（Poppins、Inter）。
+            assets.srcDir("../../Example-SwiftUI-Rive/AnimatedApp/Fonts")
         }
     }
 }
