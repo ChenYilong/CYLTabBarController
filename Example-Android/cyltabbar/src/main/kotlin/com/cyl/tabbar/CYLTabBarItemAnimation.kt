@@ -279,7 +279,9 @@ interface CYLTabBarItemAnimationPlayableView {
 }
 
 /** [EN] `CYLTabBarItemAnimationViewProviding`: makes playable views for `CYLTabBarItemViewAnimator`. [CN] 为 `CYLTabBarItemViewAnimator` 创建可播放视图。 */
-fun interface CYLTabBarItemAnimationViewProviding {
+// [EN] kotlin:S6517: a plain interface on purpose; its implementations are named objects (`CYLGIFTabBarItemAnimationView.Provider`...) that are public API. [CN] kotlin:S6517：刻意使用普通接口；其实现是作为公开 API 的具名对象（`CYLGIFTabBarItemAnimationView.Provider` 等）。
+@Suppress("kotlin:S6517")
+interface CYLTabBarItemAnimationViewProviding {
     /** [EN] A view for `fileURL` with the `options` of the tab's URL; null when it cannot be made. [CN] `fileURL` 的视图（带 Tab URL 中的选项）；无法创建时为 null。 */
     fun cyl_animationViewWithFileURL(context: Context, fileURL: String, options: Map<String, String>, contentMode: ImageView.ScaleType): View?
 }

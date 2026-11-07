@@ -1694,7 +1694,7 @@ private class CYLProtobufReader(private val bytes: ByteArray) {
         when {
             kind == "string" -> message[name] = strictDecode(bytes.copyOfRange(payloadStart, payloadEnd), Charsets.UTF_8) ?: return false
             kind == "map" -> {
-                val entry = message(payloadStart, payloadEnd, "CYLMapEntry") ?: return false
+                val entry: Map<String, Any?> = message(payloadStart, payloadEnd, "CYLMapEntry") ?: return false
                 @Suppress("UNCHECKED_CAST")
                 val map = (message[name] as? Map<String, Any?>).orEmpty()
                 message[name] = map + (((entry["key"] as? String) ?: "") to (entry["value"] ?: ""))

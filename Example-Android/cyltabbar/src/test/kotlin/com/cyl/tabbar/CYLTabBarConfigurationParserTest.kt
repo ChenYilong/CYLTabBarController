@@ -157,13 +157,22 @@ class CYLTabBarConfigurationParserTest {
         var checks = 0
         for (json in files.filter { it.extension == "json" }) {
             val reference = comparable(parse(json, false))
-            for (file in files.filter { it.name.startsWith(json.nameWithoutExtension + ".") }) for (sniff in listOf(false, true)) {
-                checks++
-                val (parsed, error) = attempt(file, sniff)
-                if (parsed == null || comparable(parsed) != reference) failures += "${folder.parentFile?.name}/${file.name} (${if (sniff) "content" else "extension"}): ${error?.message ?: "different dictionary"}"
+            for (file in files.filter { it.name.startsWith(json.nameWithoutExtension + ".") }) {
+                checks += 2
+                compareFormat(file, reference, failures)
             }
         }
         return checks
+    }
+
+    /** [EN] One exported file, read by its extension and by its content, against the JSON. [CN] 一个导出文件，分别按扩展名与内容读取，与 JSON 比较。 */
+    private fun compareFormat(file: File, reference: Any?, failures: MutableList<String>) {
+        for (sniff in listOf(false, true)) {
+            val (parsed, error) = attempt(file, sniff)
+            if (parsed == null || comparable(parsed) != reference) {
+                failures += "${file.parentFile?.parentFile?.name}/${file.name} (${if (sniff) "content" else "extension"}): ${error?.message ?: "different dictionary"}"
+            }
+        }
     }
 
     @Test
