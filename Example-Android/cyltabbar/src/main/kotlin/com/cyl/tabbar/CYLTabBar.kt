@@ -375,6 +375,8 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         super.onConfigurationChanged(newConfig)
         for (button in buttons) button.cyl_reloadTabBarItemAnimationViewForCurrentStyle()
         plusButton?.cyl_reloadTabBarItemAnimationViewForCurrentStyle()
+        // [EN] A manager that follows Dark Mode (`identifierForTrait`, e.g. a dark skin of a configuration) switches now, as iOS does. [CN] 跟随深色模式的管理器（`identifierForTrait`，例如配置中的深色皮肤）立即切换，与 iOS 一致。
+        newConfig?.let { configuration -> tabBarController?.cyl_themeManager?.takeIf { it.identifierForTrait != null }?.updateThemeForTraitCollection(configuration) }
     }
 
     /** [EN] The iOS globals `CYLTabbarItemsCount`, `CYLPlusButtonIndex`, `CYLPlusButtonWidth`, `CYLTabBarItemWidth`, `CYLTabBarHeight`: the latest tab bar's values. [CN] iOS 的全局变量：最近布局的 TabBar 的值。 */

@@ -28,6 +28,7 @@ Read the document for the feature before using its API. The public API is in the
 | `setSelectedIndex:` with a plus button | [SelectedIndex-PlusButton](../../../docs/SelectedIndex-PlusButton.md) |
 | Update tabs without a rebuild | [Update-Tab-Bar-Items-In-Place](../../../docs/Update-Tab-Bar-Items-In-Place.md) |
 | One configuration file (JSON, YAML, plist, …, a URL) creates the tab bar; every key, file values, the error codes, the edge cases | [Configuration-File](../../../docs/Configuration-File.md) |
+| Skins in a configuration file: `CYLTabBarControllerThemes` / `ThemeIdentifier` / `DarkThemeIdentifier` / `ThemeManagerName`, `"@name"` tab values, reserved bar names (`CYLTabBarBackgroundColor`...), `CYLTabBarConfigurationTheme` (`colorNamed:`), iOS and Android | [Configuration-File](../../../docs/Configuration-File.md) |
 | Scripts: export the tabs written in code to configuration files, the edge-case checklist, the parser tests | [Configuration-Scripts](../../../docs/Configuration-Scripts.md) |
 | Tab pages from cross-platform page IDs: `CYLTabBarPageRegistry`, `CYLTabBarPage`, lookup order, reload, skipped tabs, asynchronous pages, Android | [Tab-Page-Registry](../../../docs/Tab-Page-Registry.md) |
 | Review of the page registry against its design, scores and the refactoring done | [Tab-Page-Registry-Review](../../../docs/Tab-Page-Registry-Review.md) |

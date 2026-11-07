@@ -3,6 +3,17 @@ CYLTabBarControllerContext: CYLConfigurationDemo
 CYLTabBarControllerStyleType: default
 CYLTabBarControllerImageInsets: "{0, 0, 0, 0}"
 CYLTabBarControllerTitlePositionAdjustment: "{0, -2}"
+CYLTabBarControllerThemeManagerName: CYLConfigurationDemo
+CYLTabBarControllerThemeIdentifier: light
+CYLTabBarControllerDarkThemeIdentifier: dark
+CYLTabBarControllerThemes:
+  light:
+    CYLTabBarItemSelectedTitleColor: "#007AFF"
+    CYLTabBarItemSelectedIconColor: "#007AFF"
+  dark:
+    CYLTabBarItemSelectedTitleColor: "#0A84FF"
+    CYLTabBarItemSelectedIconColor: "#0A84FF"
+    CYLTabBarBackgroundColor: "#1C1C1E"
 CYLTabBarControllerTabBarItemsAttributes:
   - CYLTabBarItemTitle: YAML
     CYLTabBarItemImage: system:house

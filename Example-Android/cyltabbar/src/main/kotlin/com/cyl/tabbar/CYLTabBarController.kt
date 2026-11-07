@@ -285,7 +285,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     private fun initWithConfiguration(configuration: Map<String, Any?>) {
         val appVersion = try { activity.packageManager.getPackageInfo(activity.packageName, 0).versionName } catch (error: Exception) { null }
-        val normalized = CYLTabBarConfiguration.cyl_normalizedConfiguration(configuration, "android", appVersion)
+        val darkMode = (activity.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val normalized = CYLTabBarConfiguration.cyl_normalizedConfiguration(configuration, "android", appVersion, darkMode)
         @Suppress("UNCHECKED_CAST")
         var items = (normalized[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] as? List<Map<String, Any?>>) ?: emptyList()
         @Suppress("UNCHECKED_CAST")
@@ -303,7 +304,30 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         (normalized[CYLConstants.CYLTabBarControllerTabBarItemAnimationSpeed]?.toString()?.toFloatOrNull())?.takeIf { it > 0 && it.isFinite() }?.let { tabBarItemAnimationSpeed = it }
         setViewControllers(pages, items)
         cyl_adoptPendingPages()
+        (normalized[CYLConfigurationThemes.INFO_KEY] as? CYLConfigurationThemes.Info)?.let { cyl_applyConfigurationThemes(it) }
         cyl_didInitialize()
+    }
+
+    /**
+     * [EN] Registers the skins of the configuration with the theme manager (`CYLTabBarControllerThemeManagerName`, or
+     *      `cyl_themeManager`), and applies the first one unless a skin was chosen before. With a dark skin, the manager
+     *      follows Dark Mode (`identifierForTrait`), unless it already has its own way or another skin was chosen.
+     * [CN] 把配置中的皮肤注册到主题管理器（`CYLTabBarControllerThemeManagerName` 或 `cyl_themeManager`），除非之前已选择皮肤，否则应用首个皮肤。
+     *      有深色皮肤时，管理器跟随深色模式（`identifierForTrait`），除非它已有自己的方式或已选择了其他皮肤。
+     */
+    private fun cyl_applyConfigurationThemes(info: CYLConfigurationThemes.Info) {
+        info.managerName?.let { cyl_themeManager = CYLThemeManagerCenter.themeManagerWithName(it) }
+        val manager = cyl_themeManager
+        for (theme in info.themes) manager.addThemeIdentifier(theme.identifier, theme)
+        val current = manager.currentThemeIdentifier
+        if (current == null) manager.currentThemeIdentifier = info.initial
+        val keepsChoice = current != null && current != info.base && current != info.dark
+        val dark = info.dark
+        if (dark != null && manager.identifierForTrait == null && !keepsChoice) {
+            val base = info.base
+            manager.identifierForTrait = { isDark -> if (isDark) dark else base }
+            manager.updateThemeForTraitCollection(activity.resources.configuration)
+        }
     }
 
     private fun excludedTab(item: Map<String, Any?>) = CYLTabBarSkippedTab(CYLTabBarPageSkipReason.EXCLUDED, CYLTabBarPageRegistry.pageIdentifierOfTab(item),

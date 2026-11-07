@@ -29,6 +29,7 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [配置键](#cn配置键) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Configuration keys](#enconfiguration-keys) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [新增的 item 键与文件中的写法](#cn新增的-item-键与文件中的写法) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [New item keys and file values](#ennew-item-keys-and-file-values) |
 | [从文件或 URL 创建](#cn从文件或-url-创建) | [From a file or a URL](#enfrom-a-file-or-a-url) |
+| [皮肤](#cn皮肤) | [Skins](#enskins) |
 | [支持的格式](#cn支持的格式) | [Supported formats](#ensupported-formats) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Protocol Buffers](#cnprotocol-buffers) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Protocol Buffers](#enprotocol-buffers) |
 | [流程](#cn流程) | [Flow](#enflow) |
@@ -92,6 +93,10 @@ let tabBarController = CYLTabBarController(configuration: [
 | `CYLTabBarControllerPageLookupOrder` | `NSArray<CYLTabBarPageSource>` | `"instance, shared"` 或数组 / or a list of `instance`、`resolver`、`shared`、`automatic` | 全部四个，顺序同左 / all four, in that order |
 | `CYLTabBarControllerAutomaticPageRegistration` | `NSNumber`（BOOL） | `true` / `false`、`yes` / `no`、`1` / `0` | `true` |
 | `CYLTabBarControllerTabBarItemAnimationSpeed` | `NSNumber`（`tabBarItemAnimationSpeed`） | 大于 0 的数字，如 `1.5` / a number above 0, e.g. `1.5` | 库的默认速度 / the library's default |
+| `CYLTabBarControllerThemes` | `NSDictionary`（标识 → 命名值）或数组 / (identifier → named values) or a list | `{light: {…}, dark: {…}}`，或 `[{CYLTabBarThemeIdentifier: …, CYLTabBarThemeValues: {…}}]`（见[皮肤](#cn皮肤) / see [Skins](#enskins)） | 无皮肤 / no skins |
+| `CYLTabBarControllerThemeIdentifier` | `NSString` | 字符串 / a string | 按字母顺序的第一个皮肤 / the first skin alphabetically |
+| `CYLTabBarControllerDarkThemeIdentifier` | `NSString` | 字符串 / a string | 不跟随深色模式 / no Dark Mode skin |
+| `CYLTabBarControllerThemeManagerName` | `NSString` | 字符串 / a string | TabBarController 的 `cyl_themeManager` / the controller's `cyl_themeManager` |
 
 ### [CN]新增的 item 键与文件中的写法
 ### [EN]New item keys and file values
@@ -149,6 +154,51 @@ CYLTabBarController.loadTabBarController(withConfigurationURL: url) { tabBarCont
 | 格式依次由文件扩展名、HTTP `Content-Type`、文件内容识别；扩展名未知或缺失时会根据内容自动识别。所有格式都解析为同一个字典，键与 `tabBarItemsAttributes` 完全一致。 | The format comes from the file name extension, then the HTTP `Content-Type`, then the content: an unknown or missing extension is detected from the content. Every format becomes the same dictionary, with the same keys as `tabBarItemsAttributes`. |
 | 文件不存在、格式错误或顶层不是字典时返回 nil，`error` 的 domain 为 `CYLTabBarConfigurationErrorDomain`，描述中包含行号。 | A missing file, a syntax error or a top level that is not a dictionary returns nil; `error` is in `CYLTabBarConfigurationErrorDomain`, and its description names the line. |
 | 下载使用 `NSURLSession`，遵循 URL 加载系统的缓存策略；返回的任务可以取消。建议准备一个本地文件作为下载失败时的兜底。 | Downloads use `NSURLSession` and follow the URL loading system's cache policy; the returned task can be cancelled. Keep a local file as a fallback for when the download fails. |
+
+## [CN]皮肤
+## [EN]Skins
+
+| 中文 | English |
+|:---|:---|
+| 参照 QMUI 的换肤（视图按名称引用皮肤中的值，皮肤切换时重新取值），配置文件可以带多套皮肤：`CYLTabBarControllerThemes` 中每个皮肤是一组命名值，Tab 的值写成 `"@name"` 时取当前皮肤中名为 `name` 的值。每个皮肤成为一个 `CYLTabBarConfigurationTheme`（`CYLTabBarTheme`），注册到主题管理器；切换皮肤沿用已有的原地更新与恢复（见[换肤](Theme-Switching.md)），不重新创建 TabBar 与页面。iOS 与 Android 读取同一个文件，行为相同。 | Following QMUI's skins (a view names a value of the skin, and takes it again when the skin changes), a configuration file can carry several skins: each skin in `CYLTabBarControllerThemes` is a set of named values, and a tab value written `"@name"` takes the value `name` of the current skin. Each skin becomes a `CYLTabBarConfigurationTheme` (a `CYLTabBarTheme`) registered with the theme manager; switching skins reuses the existing in-place update and restore (see [theme switching](Theme-Switching.md)), with no new tab bar and no new pages. iOS and Android read the same file the same way. |
+
+```json
+{
+  "CYLTabBarControllerThemeIdentifier": "light",
+  "CYLTabBarControllerDarkThemeIdentifier": "dark",
+  "CYLTabBarControllerThemes": {
+    "light": { "accent": "#007AFF", "homeIcon": "system:house", "CYLTabBarBackgroundColor": "#F9F9F9" },
+    "dark":  { "accent": "#0A84FF", "CYLTabBarBackgroundColor": "#1C1C1E" }
+  },
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    { "CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "@homeIcon", "CYLTabBarItemSelectedTitleColor": "@accent", "CYLTabBarItemIdentifier": "home" }
+  ]
+}
+```
+
+```objc
+// [EN] Switch, from anywhere. [CN] 在任何地方切换。
+CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = @"dark";
+// [EN] Views of the app follow the same skins. [CN] App 的视图跟随同样的皮肤。
+label.textColor = [CYLTabBarConfigurationTheme colorNamed:@"accent"];
+```
+
+```kotlin
+CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = "dark"
+label.cyl_themeValue = "textColor:accent"                       // Android theme values 主题值
+val accent = CYLTabBarConfigurationTheme.colorNamed("accent")   // a CYLThemeColor
+```
+
+| 规则 | Rule |
+|:---|:---|
+| 引用：Tab 的任何字符串值都可以是 `"@name"`（标题、图片、颜色、字体、URL、动画文件……），取值后按该键原有的规则转换与校验；`"@@text"` 表示普通文本 `"@text"`。没有皮肤时 `"@"` 开头的值保持原样。 | References: any string value of a tab can be `"@name"` (a title, an image, a color, a font, a URL, an animation file...); the value goes through that key's usual conversion and checks. `"@@text"` is the literal `"@text"`. Without skins, values starting with `"@"` stay as they are. |
+| 回退：某个皮肤没有的名称取自 `CYLTabBarControllerThemeIdentifier` 对应的基础皮肤（类似 QMUI 皮肤 style 的继承）；所有皮肤都没有时，该键被移除并输出警告。 | Fallback: a name a skin does not give comes from the base skin of `CYLTabBarControllerThemeIdentifier` (like QMUI skin styles inheriting); when no skin gives it, the key is left out with a warning. |
+| 整个 TabBar：保留名称 `CYLTabBarBackgroundColor`、`CYLTabBarShadowColor`、`CYLTabBarItemTitleColor`、`CYLTabBarItemSelectedTitleColor`、`CYLTabBarItemIconColor`、`CYLTabBarItemSelectedIconColor`、`CYLTabBarItemTitleFont`、`CYLTabBarItemSelectedTitleFont` 给出外观（iOS 13+ 为新的 `UITabBarAppearance`；Android 为 `CYLTabBarAppearance` 与标题字体）。皮肤没有这些名称时保留 App 自己的外观。 | The whole bar: the reserved names `CYLTabBarBackgroundColor`, `CYLTabBarShadowColor`, `CYLTabBarItemTitleColor`, `CYLTabBarItemSelectedTitleColor`, `CYLTabBarItemIconColor`, `CYLTabBarItemSelectedIconColor`, `CYLTabBarItemTitleFont` and `CYLTabBarItemSelectedTitleFont` give the appearance (a new `UITabBarAppearance` on iOS 13+; `CYLTabBarAppearance` and the title fonts on Android). A skin without them keeps the app's own appearance. |
+| Tab 对应：按 `CYLTabBarItemIdentifier`（没有标识时按保留 Tab 中的位置），因此被平台、最低版本或页面查找排除的 Tab 不会错位。没有 `"@name"` 的 Tab 保持不变。皮肤中的图标与其他 `CYLTabBarTheme` 一样，以图片原色显示；需要着色的图标请为皮肤提供图标颜色。 | Matching tabs: by `CYLTabBarItemIdentifier` (by position among the kept tabs without one), so tabs left out by platform, minimum version or page lookup do not shift. A tab without `"@name"` values stays as it is. A skin's icons show in their own colors, as with any `CYLTabBarTheme`; give icon colors for tinted icons. |
+| 首个皮肤：管理器之前已选择的皮肤（持久化，或 App 设置）保持不变；否则深色模式下用 `CYLTabBarControllerDarkThemeIdentifier`，其他情况用 `CYLTabBarControllerThemeIdentifier`。 | The first skin: a skin the manager had before (persisted, or set by the app) stays; otherwise the dark skin in Dark Mode, else `CYLTabBarControllerThemeIdentifier`. |
+| 深色模式：有深色皮肤时，管理器跟随系统外观（iOS 设置 `identifierForTrait` 与 `respondsSystemStyleAutomatically`；Android 设置 `identifierForTrait`，TabBar 在配置变化时切换），除非管理器已有自己的 `identifierForTrait`，或已选择了其他皮肤。 | Dark Mode: with a dark skin, the manager follows the system appearance (iOS sets `identifierForTrait` and `respondsSystemStyleAutomatically`; Android sets `identifierForTrait` and the tab bar switches on a configuration change), unless the manager already has its own `identifierForTrait`, or another skin was chosen. |
+| 管理器：默认是 TabBarController 的 `cyl_themeManager`（即默认管理器），因此 App 的视图与换肤菜单也能看到这些皮肤；示例文件用 `CYLTabBarControllerThemeManagerName: "CYLConfigurationDemo"`，不影响演示 App 自己的皮肤。 | The manager: by default the controller's `cyl_themeManager` (the default manager), so the app's views and skin menus see the skins too; the sample files use `CYLTabBarControllerThemeManagerName: "CYLConfigurationDemo"` so the demo app's own skins are not touched. |
+| 格式：字典形式适用于有嵌套字典的格式；列表形式 `{CYLTabBarThemeIdentifier, CYLTabBarThemeValues}` 用于 Protobuf（字段 8–11，消息 `CYLTabBarTheme`），XML 与 Protobuf 文本中只有一个皮肤时也可以直接写。示例 JSON、YAML、Protobuf 文本文件带有浅色 / 深色两套皮肤。 | Formats: the dictionary form fits every format with nested dictionaries; the list form `{CYLTabBarThemeIdentifier, CYLTabBarThemeValues}` is for Protobuf (fields 8–11, message `CYLTabBarTheme`), and a single skin can be written as is in XML and Protobuf text. The sample JSON, YAML and Protobuf text files carry a light and a dark skin. |
 
 ## [CN]支持的格式
 ## [EN]Supported formats

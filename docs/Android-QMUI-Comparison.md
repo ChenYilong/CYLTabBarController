@@ -107,6 +107,7 @@
 | `QMUISkinLayoutInflaterFactory`、`QMUISkinDef` | `CYLThemeLayoutInflaterFactory`、`app:cyl_theme…` | 布局属性 | Layout attributes |
 | `QMUISkinManager.register` / `unRegister` | `CYLThemeValues.register` / `unregister` | 对话框、其他 Activity | Dialogs, other activities |
 | `IQMUISkinHandlerSpan`、`IQMUISkinHandlerDecoration`、`IQMUISkinDispatchInterceptor` | `CYLThemeSpan`、`CYLThemeItemDecoration`、`CYLThemeDispatchInterceptor` | Span、列表分割线、拦截 | Spans, list decorations, interception |
+| 皮肤 style 中的命名属性（`?attr/name`）与 style 继承 / named skin attributes (`?attr/name`) and style inheritance | 配置文件中的 `CYLTabBarControllerThemes`、`"@name"` 值、回退到基础皮肤（iOS 与 Android） / `CYLTabBarControllerThemes`, `"@name"` values, base skin fallback in configuration files (iOS and Android) | 一个文件同时给出 Tab 与皮肤，见 [配置文件：皮肤](Configuration-File.md#cn皮肤) | One file gives the tabs and the skins, see [configuration file: skins](Configuration-File.md#enskins) |
 
 | 中文 | English |
 |:---|:---|

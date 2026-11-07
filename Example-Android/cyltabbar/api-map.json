@@ -1321,6 +1321,10 @@
   "status": "done",
   "android": "typealias CYLTabBarAsyncPageFactory"
  },
+ "CYLTabBarBackgroundColor": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarBackgroundColor"
+ },
  "CYLTabBarBadgeView": {
   "status": "done",
   "android": "CYLTabBarBadgeView"
@@ -1407,6 +1411,50 @@
  "CYLTabBarConfigurationParser +supportedPathExtensions": {
   "status": "done",
   "android": "CYLTabBarConfigurationParser.supportedPathExtensions"
+ },
+ "CYLTabBarConfigurationTheme": {
+  "status": "done",
+  "android": "CYLTabBarConfigurationTheme (also a CYLThemeValueProviding for View.cyl_themeValue)"
+ },
+ "CYLTabBarConfigurationTheme +colorNamed:": {
+  "status": "done",
+  "android": "CYLTabBarConfigurationTheme.colorNamed(name)"
+ },
+ "CYLTabBarConfigurationTheme +colorNamed:themeManagerName:": {
+  "status": "done",
+  "android": "CYLTabBarConfigurationTheme.colorNamed(name, themeManagerName)"
+ },
+ "CYLTabBarConfigurationTheme +new": {
+  "status": "done",
+  "android": "internal constructor (made by the configuration initializers)"
+ },
+ "CYLTabBarConfigurationTheme -colorForName:": {
+  "status": "done",
+  "android": "CYLTabBarConfigurationTheme.colorForName"
+ },
+ "CYLTabBarConfigurationTheme -fontForName:": {
+  "status": "done",
+  "android": "CYLTabBarConfigurationTheme.fontForName"
+ },
+ "CYLTabBarConfigurationTheme -imageForName:": {
+  "status": "done",
+  "android": "CYLTabBarConfigurationTheme.imageForName(context, name)"
+ },
+ "CYLTabBarConfigurationTheme -init": {
+  "status": "done",
+  "android": "internal constructor (made by the configuration initializers)"
+ },
+ "CYLTabBarConfigurationTheme -valueForName:": {
+  "status": "done",
+  "android": "CYLTabBarConfigurationTheme.valueForName"
+ },
+ "CYLTabBarConfigurationTheme identifier": {
+  "status": "done",
+  "android": "CYLTabBarConfigurationTheme.identifier"
+ },
+ "CYLTabBarConfigurationTheme values": {
+  "status": "done",
+  "android": "CYLTabBarConfigurationTheme.values"
  },
  "CYLTabBarController": {
   "status": "done",
@@ -2092,6 +2140,10 @@
   "status": "done",
   "android": "CYLConstants.CYLTabBarControllerContext"
  },
+ "CYLTabBarControllerDarkThemeIdentifier": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerDarkThemeIdentifier"
+ },
  "CYLTabBarControllerDelegate": {
   "status": "done",
   "android": "CYLTabBarControllerDelegate"
@@ -2163,6 +2215,18 @@
  "CYLTabBarControllerTabBarItemsAttributes": {
   "status": "done",
   "android": "CYLConstants.CYLTabBarControllerTabBarItemsAttributes"
+ },
+ "CYLTabBarControllerThemeIdentifier": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerThemeIdentifier"
+ },
+ "CYLTabBarControllerThemeManagerName": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerThemeManagerName"
+ },
+ "CYLTabBarControllerThemes": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerThemes"
  },
  "CYLTabBarControllerTitlePositionAdjustment": {
   "status": "done",
@@ -2958,6 +3022,10 @@
   "android": "CYLConstants.CYLTabBarRiveURL",
   "note": "played when libpag / rive-android is in the app"
  },
+ "CYLTabBarShadowColor": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarShadowColor"
+ },
  "CYLTabBarSkippedTab": {
   "status": "done",
   "android": "CYLTabBarSkippedTab (SkippedTab)"
@@ -3034,6 +3102,14 @@
  "CYLTabBarTheme -cyl_tabBarItemsAttributesForTabBarController:": {
   "status": "done",
   "android": "CYLTabBarTheme.cyl_tabBarItemsAttributesForTabBarController"
+ },
+ "CYLTabBarThemeIdentifier": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarThemeIdentifier"
+ },
+ "CYLTabBarThemeValues": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarThemeValues"
  },
  "CYLTabButtonAnimation": {
   "status": "done",

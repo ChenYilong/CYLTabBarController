@@ -462,6 +462,52 @@ FOUNDATION_EXTERN NSString *const CYLTabBarControllerAutomaticPageRegistration;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerTabBarItemAnimationSpeed;
 
 /*!
+ * [EN] Skins in a configuration (see docs/Configuration-File.md, "Skins"; the named values follow QMUI's skins):
+ *      - `CYLTabBarControllerThemes`: the skins, by identifier: a dictionary {"light": {values}, "dark": {values}}, or a
+ *        list of {`CYLTabBarThemeIdentifier`: "light", `CYLTabBarThemeValues`: {values}} (the Protobuf form). The values
+ *        are named: a tab value "@name" (e.g. `CYLTabBarItemTitleColor`: "@accent", `CYLTabBarItemImage`: "@homeIcon")
+ *        takes the value `name` of the current skin, and changes when the skin changes; "@@" starts a literal "@". The
+ *        names `CYLTabBarBackgroundColor`, `CYLTabBarShadowColor`, `CYLTabBarItemTitleColor`,
+ *        `CYLTabBarItemSelectedTitleColor`, `CYLTabBarItemIconColor`, `CYLTabBarItemSelectedIconColor`,
+ *        `CYLTabBarItemTitleFont` and `CYLTabBarItemSelectedTitleFont` style the whole tab bar. A name a skin does not
+ *        give comes from the skin of `CYLTabBarControllerThemeIdentifier`.
+ *      - `CYLTabBarControllerThemeIdentifier`: the skin used first, and the one others fall back to. Default: the first
+ *        identifier in alphabetical order.
+ *      - `CYLTabBarControllerDarkThemeIdentifier`: the skin used in Dark Mode (iOS 13+): the tab bar then follows the
+ *        system appearance, unless the manager already has its own `identifierForTrait`.
+ *      - `CYLTabBarControllerThemeManagerName`: the `CYLThemeManager` the skins are registered with (default: the tab bar
+ *        controller's `cyl_themeManager`, so the app's other views and skin menus see them too).
+ *      Each skin becomes a `CYLTabBarConfigurationTheme` (a `CYLTabBarTheme`) of that manager; switch with
+ *      `manager.currentThemeIdentifier = @"dark"`. A skin chosen before (persisted, or set by the app) is kept.
+ * [CN] 配置中的皮肤（见 docs/Configuration-File.md 的“皮肤”；按名称取值参照 QMUI 的换肤）：
+ *      - `CYLTabBarControllerThemes`：按标识组织的皮肤：字典 {"light": {值}, "dark": {值}}，或由 {`CYLTabBarThemeIdentifier`: "light",
+ *        `CYLTabBarThemeValues`: {值}} 组成的列表（Protobuf 的形式）。值按名称引用：Tab 的值写成 "@name"（例如 `CYLTabBarItemTitleColor`:
+ *        "@accent"、`CYLTabBarItemImage`: "@homeIcon"）时取当前皮肤中名为 `name` 的值，并随皮肤切换而变化；"@@" 表示以 "@" 开头的普通文本。
+ *        名称 `CYLTabBarBackgroundColor`、`CYLTabBarShadowColor`、`CYLTabBarItemTitleColor`、`CYLTabBarItemSelectedTitleColor`、
+ *        `CYLTabBarItemIconColor`、`CYLTabBarItemSelectedIconColor`、`CYLTabBarItemTitleFont`、`CYLTabBarItemSelectedTitleFont`
+ *        用于整个 TabBar。某个皮肤没有的名称取自 `CYLTabBarControllerThemeIdentifier` 对应的皮肤。
+ *      - `CYLTabBarControllerThemeIdentifier`：首先使用、也是其他皮肤回退的皮肤。默认：按字母顺序的第一个标识。
+ *      - `CYLTabBarControllerDarkThemeIdentifier`：深色模式（iOS 13+）使用的皮肤：TabBar 随系统外观切换，除非管理器已有自己的
+ *        `identifierForTrait`。
+ *      - `CYLTabBarControllerThemeManagerName`：注册皮肤的 `CYLThemeManager`（默认：TabBarController 的 `cyl_themeManager`，因此 App 的其他
+ *        视图与换肤菜单也能看到这些皮肤）。
+ *      每个皮肤成为该管理器的一个 `CYLTabBarConfigurationTheme`（`CYLTabBarTheme`）；用 `manager.currentThemeIdentifier = @"dark"` 切换。
+ *      之前已选择的皮肤（持久化的，或 App 设置的）保持不变。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerThemes;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerThemeIdentifier;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerDarkThemeIdentifier;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerThemeManagerName;
+/// [EN] The identifier of a skin in the list form of `CYLTabBarControllerThemes`. [CN] `CYLTabBarControllerThemes` 列表形式中皮肤的标识。
+FOUNDATION_EXTERN NSString *const CYLTabBarThemeIdentifier;
+/// [EN] The named values of a skin in the list form of `CYLTabBarControllerThemes`. [CN] `CYLTabBarControllerThemes` 列表形式中皮肤的命名值。
+FOUNDATION_EXTERN NSString *const CYLTabBarThemeValues;
+/// [EN] Skin value name: the background color of the whole tab bar. [CN] 皮肤值名称：整个 TabBar 的背景色。
+FOUNDATION_EXTERN NSString *const CYLTabBarBackgroundColor;
+/// [EN] Skin value name: the separator line on top of the tab bar. [CN] 皮肤值名称：TabBar 顶部分割线的颜色。
+FOUNDATION_EXTERN NSString *const CYLTabBarShadowColor;
+
+/*!
  * [EN] Item keys of the pages and of remote configurations (see docs/Tab-Page-Registry.md):
  *      - `CYLTabBarItemPageIdentifier`: NSString, the cross-platform ID of the tab's page, e.g. "home"; iOS and Android
  *        register what it creates (see `CYLTabBarPageRegistry`). Missing or "": `CYLTabBarItemIdentifier` is used. A
@@ -2070,6 +2116,41 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  * [CN] TabBar 跟随的管理器；未设置时为 `CYLThemeManagerCenter.defaultThemeManager`。用于测试，或 TabBar 跟随单独管理器的 App。
  */
 @property (nonatomic, strong, null_resettable) CYLThemeManager *cyl_themeManager;
+
+@end
+
+/*!
+ * [EN] A skin of a configuration file (`CYLTabBarControllerThemes`): its named values, and the tab bar look they give
+ *      (`CYLTabBarTheme`): the tabs' "@name" values, and the whole bar from the reserved names (`CYLTabBarBackgroundColor`
+ *      ...). Created by the configuration initializers and registered with the theme manager. Views of the app can use
+ *      the same values: `[CYLTabBarConfigurationTheme colorNamed:@"accent"]` is a color that follows the skin.
+ * [CN] 配置文件中的一个皮肤（`CYLTabBarControllerThemes`）：其命名值，以及这些值给出的 TabBar 外观（`CYLTabBarTheme`）：Tab 的 "@name"
+ *      值，以及由保留名称（`CYLTabBarBackgroundColor` 等）决定的整个 TabBar。由配置初始化方法创建并注册到主题管理器。App 的视图可以使用
+ *      同样的值：`[CYLTabBarConfigurationTheme colorNamed:@"accent"]` 是随皮肤变化的颜色。
+ */
+@interface CYLTabBarConfigurationTheme : NSObject <CYLTabBarTheme>
+
+/// [EN] The skin's identifier, e.g. "dark". [CN] 皮肤的标识，例如 "dark"。
+@property (nonatomic, copy, readonly) NSString *identifier;
+/// [EN] The named values, with the base skin's values for the names this skin does not give. [CN] 命名值；本皮肤没有的名称使用基础皮肤的值。
+@property (nonatomic, copy, readonly) NSDictionary<NSString *, id> *values;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+/// [EN] The value `name` as written in the file (a string, a number, a color from code), or nil. [CN] 文件中名为 `name` 的值（字符串、数字、代码中的颜色），没有时为 nil。
+- (nullable id)valueForName:(NSString *)name;
+/// [EN] The value `name` as a color ("#RRGGBB", "#RRGGBBAA", a UIColor), or nil. [CN] 名为 `name` 的值作为颜色（"#RRGGBB"、"#RRGGBBAA"、UIColor），否则为 nil。
+- (nullable UIColor *)colorForName:(NSString *)name;
+/// [EN] The value `name` as a font ("bold:15", "PingFangSC-Medium:12", a UIFont), or nil. [CN] 名为 `name` 的值作为字体（"bold:15"、"PingFangSC-Medium:12"、UIFont），否则为 nil。
+- (nullable UIFont *)fontForName:(NSString *)name;
+/// [EN] The value `name` as an image ("system:house", an image name, a UIImage), or nil. [CN] 名为 `name` 的值作为图片（"system:house"、图片名、UIImage），否则为 nil。
+- (nullable UIImage *)imageForName:(NSString *)name;
+
+/// [EN] A color that follows the skin of `CYLThemeManagerCenter.defaultThemeManager`: the value `name` of its current skin. [CN] 跟随 `CYLThemeManagerCenter.defaultThemeManager` 皮肤的颜色：其当前皮肤中名为 `name` 的值。
++ (UIColor *)colorNamed:(NSString *)name;
+/// [EN] The same for the manager named `managerName` (`CYLTabBarControllerThemeManagerName`). [CN] 同上，用于名为 `managerName` 的管理器（`CYLTabBarControllerThemeManagerName`）。
++ (UIColor *)colorNamed:(NSString *)name themeManagerName:(__kindof NSObject<NSCopying> *)managerName;
 
 @end
 

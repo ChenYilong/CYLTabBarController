@@ -235,9 +235,14 @@ object CYLTabBarConfiguration {
      *      `_CYLTabBarItemExcluded`）、重复标识重命名、样式名称、查找顺序与自动注册开关。值原样保留，由 `CYLTabBarController` 转换。
      */
     @JvmStatic
-    fun cyl_normalizedConfiguration(configuration: Map<String, Any?>, platform: String = "android", appVersion: String? = null): Map<String, Any?> {
+    @JvmOverloads
+    fun cyl_normalizedConfiguration(configuration: Map<String, Any?>, platform: String = "android", appVersion: String? = null, darkMode: Boolean = false): Map<String, Any?> {
         val normalized = LinkedHashMap<String, Any?>()
         for ((key, value) in configuration) if (value != null) normalized[key] = value
+        // [EN] Skins: the "@name" values of the tabs take the first skin's values (`CYLTabBarConfigurationTheme`). [CN] 皮肤：Tab 中的 "@name" 值取首个皮肤的值（`CYLTabBarConfigurationTheme`）。
+        val themes = if (normalized.containsKey(CYLConstants.CYLTabBarControllerThemes)) CYLConfigurationThemes.info(normalized, darkMode) else null
+        val initialValues = themes?.values?.get(themes.initial)
+        val itemReferences = ArrayList<Map<String, String>>()
         val items: List<Any?> = when (val value = normalized[CYLConstants.CYLTabBarControllerTabBarItemsAttributes]) {
             is List<*> -> value
             is Map<*, *> -> listOf(value)
@@ -246,7 +251,10 @@ object CYLTabBarConfiguration {
         }
         val seen = HashSet<String>()
         normalized[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] = items.map { item ->
-            val attributes = (item as? Map<*, *>)?.entries?.associate { it.key.toString() to it.value }?.toMutableMap() ?: return@map emptyMap<String, Any?>()
+            val references = LinkedHashMap<String, String>()
+            itemReferences += references
+            val raw = (item as? Map<*, *>)?.entries?.associate { it.key.toString() to it.value } ?: return@map emptyMap<String, Any?>()
+            val attributes = (if (initialValues != null) CYLConfigurationThemes.resolve(raw, initialValues, references) else raw).toMutableMap()
             val tab = com.cyl.tabbar.pages.TabItem(attributes)
             val reason = TabConfiguration.exclusionReason(tab, platform, appVersion)
             if (reason != null) {
@@ -270,6 +278,11 @@ object CYLTabBarConfiguration {
         normalized[CYLConstants.CYLTabBarControllerPageLookupOrder] =
             TabConfiguration.lookupOrder(normalized[CYLConstants.CYLTabBarControllerPageLookupOrder], normalized[CYLConstants.CYLTabBarControllerAutomaticPageRegistration])
         (normalized[CYLConstants.CYLTabBarControllerStyleType] as? String)?.let { normalized[CYLConstants.CYLTabBarControllerStyleType] = CYLEnums.CYLTabBarStyleType.fromName(it) }
+        if (themes != null) {
+            @Suppress("UNCHECKED_CAST")
+            CYLConfigurationThemes.finish(themes, normalized[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] as List<Map<String, Any?>>, itemReferences)
+            normalized[CYLConfigurationThemes.INFO_KEY] = themes
+        }
         return normalized
     }
 

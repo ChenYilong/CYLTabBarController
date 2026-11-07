@@ -36,3 +36,17 @@ CYLTabBarControllerImageInsets: "{0, 0, 0, 0}"
 CYLTabBarControllerTitlePositionAdjustment: "{0, -2}"
 CYLTabBarControllerStyleType: "default"
 CYLTabBarControllerContext: "CYLConfigurationDemo"
+CYLTabBarControllerThemeManagerName: "CYLConfigurationDemo"
+CYLTabBarControllerThemeIdentifier: "light"
+CYLTabBarControllerDarkThemeIdentifier: "dark"
+CYLTabBarControllerThemes {
+  CYLTabBarThemeIdentifier: "light"
+  CYLTabBarThemeValues { key: "CYLTabBarItemSelectedTitleColor" value: "#007AFF" }
+  CYLTabBarThemeValues { key: "CYLTabBarItemSelectedIconColor" value: "#007AFF" }
+}
+CYLTabBarControllerThemes {
+  CYLTabBarThemeIdentifier: "dark"
+  CYLTabBarThemeValues { key: "CYLTabBarItemSelectedTitleColor" value: "#0A84FF" }
+  CYLTabBarThemeValues { key: "CYLTabBarItemSelectedIconColor" value: "#0A84FF" }
+  CYLTabBarThemeValues { key: "CYLTabBarBackgroundColor" value: "#1C1C1E" }
+}

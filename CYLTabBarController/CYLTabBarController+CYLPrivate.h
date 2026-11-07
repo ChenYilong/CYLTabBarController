@@ -54,6 +54,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// [EN] Implemented in CYLTabBarController.m (CYLTheme, issue #216). [CN] 实现见 CYLTabBarController.m 中的 CYLTheme（issue #216）。
 @interface CYLTabBarController (CYLThemePrivate)
+/// [EN] Registers the skins of a normalized configuration (`CYLTabBarControllerThemes`) and applies the first one. [CN] 注册规范化配置中的皮肤（`CYLTabBarControllerThemes`）并应用首个皮肤。
+- (void)cyl_applyConfigurationThemes:(NSDictionary<NSString *, id> *)normalizedConfiguration;
 /// [EN] Once, when first shown: the theme chosen at launch. [CN] 首次显示时执行一次：应用启动时选择的主题。
 - (void)cyl_applyLaunchTabBarThemeIfNeeded;
 /// [EN] Implemented in the main implementation (tabBar.standardAppearance). [CN] 实现于主 implementation（tabBar.standardAppearance）。

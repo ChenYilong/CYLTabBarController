@@ -6,6 +6,7 @@
 //
 
 #import "CYLTabBarController.h"
+#import "CYLTabBarController+CYLPrivate.h"
 
 /// [EN] Private: marks a left-out tab; the same key as in CYLTabBarController.m. [CN] 私有：标记被排除的 Tab；与 CYLTabBarController.m 中的键相同。
 static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
@@ -510,7 +511,9 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
     return @[ CYLTabBarControllerViewControllers, CYLTabBarControllerTabBarItemsAttributes, CYLTabBarControllerImageInsets,
               CYLTabBarControllerTitlePositionAdjustment, CYLTabBarControllerStyleType, CYLTabBarControllerContext,
               CYLTabBarControllerPageRegistry, CYLTabBarControllerPageResolver, CYLTabBarControllerPageLookupOrder,
-              CYLTabBarControllerAutomaticPageRegistration, CYLTabBarControllerTabBarItemAnimationSpeed ];
+              CYLTabBarControllerAutomaticPageRegistration, CYLTabBarControllerTabBarItemAnimationSpeed,
+              CYLTabBarControllerThemes, CYLTabBarControllerThemeIdentifier, CYLTabBarControllerDarkThemeIdentifier,
+              CYLTabBarControllerThemeManagerName ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -1015,6 +1018,370 @@ static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nulla
     }];
 }
 
+
+#pragma mark - Skins (named values, after QMUI's skins)
+
+/// [EN] Private: the skins of a normalized configuration, for `-cyl_applyConfigurationThemes:`. [CN] 私有：规范化配置中的皮肤，供 `-cyl_applyConfigurationThemes:` 使用。
+static NSString *const CYLConfigurationThemesKey = @"_CYLTabBarControllerConfigurationThemes";
+static NSString *const CYLConfigurationThemesListKey = @"themes";
+static NSString *const CYLConfigurationThemesBaseKey = @"base";
+static NSString *const CYLConfigurationThemesDarkKey = @"dark";
+static NSString *const CYLConfigurationThemesInitialKey = @"initial";
+static NSString *const CYLConfigurationThemesManagerKey = @"manager";
+
+/// [EN] The named values of one skin: a dictionary (a Protobuf map too), without null values. [CN] 一个皮肤的命名值：字典（也可以是 Protobuf map），去掉 null 值。
+static NSDictionary<NSString *, id> *_Nullable CYLThemeValuesValue(id value) {
+    id map = CYLDictionaryFromMapEntries(value ?: @{});
+    if (![map isKindOfClass:[NSDictionary class]]) {
+        return nil;
+    }
+    NSMutableDictionary<NSString *, id> *values = [NSMutableDictionary dictionary];
+    for (id key in (NSDictionary *)map) {
+        id entry = ((NSDictionary *)map)[key];
+        if ([key isKindOfClass:[NSString class]] && ![entry isKindOfClass:[NSNull class]]) {
+            values[key] = entry;
+        }
+    }
+    return values;
+}
+
+/*!
+ * [EN] `CYLTabBarControllerThemes`: identifier -> named values, from the dictionary form or the list form (one skin of
+ *      the list form also arrives as a dictionary from XML or Protobuf text). nil when there is no valid skin.
+ * [CN] `CYLTabBarControllerThemes`：标识 -> 命名值，来自字典形式或列表形式（XML 或 Protobuf 文本中只有一个皮肤时，列表形式也会是字典）。
+ *      没有有效皮肤时为 nil。
+ */
+static NSDictionary<NSString *, NSDictionary<NSString *, id> *> *_Nullable CYLThemesValue(id value) {
+    NSArray *list = [value isKindOfClass:[NSArray class]] ? value : nil;
+    NSMutableDictionary<NSString *, NSDictionary<NSString *, id> *> *themes = [NSMutableDictionary dictionary];
+    if ([value isKindOfClass:[NSDictionary class]]) {
+        if (((NSDictionary *)value)[CYLTabBarThemeIdentifier]) {
+            list = @[ value ];
+        } else {
+            for (id key in (NSDictionary *)value) {
+                NSString *identifier = CYLStringValue(key);
+                NSDictionary *values = CYLThemeValuesValue(((NSDictionary *)value)[key]);
+                if (identifier.length > 0 && values) {
+                    themes[identifier] = values;
+                } else {
+                    CYLLogInvalidConfigurationValue(CYLTabBarControllerThemes, key);
+                }
+            }
+        }
+    }
+    for (id entry in list) {
+        NSDictionary *dictionary = [entry isKindOfClass:[NSDictionary class]] ? entry : nil;
+        NSString *identifier = CYLStringValue(dictionary[CYLTabBarThemeIdentifier]);
+        NSDictionary *values = CYLThemeValuesValue(dictionary[CYLTabBarThemeValues]);
+        if (identifier.length > 0 && values) {
+            themes[identifier] = values;
+        } else {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerThemes, entry);
+        }
+    }
+    if (themes.count == 0) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerThemes, value);
+        return nil;
+    }
+    return themes;
+}
+
+/*!
+ * [EN] A tab with its "@name" values taken from `values` (QMUI's `?attr/name`); the keys that refer to a name are added
+ *      to `references`. "@@text" is the literal "@text"; a name missing from `values` drops the key (with a warning).
+ * [CN] 用 `values` 替换 Tab 中的 "@name" 值（对应 QMUI 的 `?attr/name`）；引用名称的键记录到 `references`。"@@text" 表示普通文本 "@text"；
+ *      `values` 中没有的名称会移除该键（并输出警告）。
+ */
+static NSDictionary *CYLItemResolvingThemeReferences(NSDictionary *item, NSDictionary<NSString *, id> *values, NSMutableDictionary<NSString *, NSString *> *references) {
+    NSMutableDictionary *resolved = [item mutableCopy];
+    for (id key in item) {
+        id value = item[key];
+        if (![key isKindOfClass:[NSString class]] || ![value isKindOfClass:[NSString class]] || ![(NSString *)value hasPrefix:@"@"]) {
+            continue;
+        }
+        NSString *string = value;
+        if ([string hasPrefix:@"@@"]) {
+            resolved[key] = [string substringFromIndex:1];
+            continue;
+        }
+        NSString *name = [[string substringFromIndex:1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        if (name.length == 0) {
+            continue;
+        }
+        references[key] = name;
+        id themed = values[name];
+        if (themed) {
+            resolved[key] = themed;
+        } else {
+#if defined(DEBUG) || defined(BETA)
+            NSLog(@"🟡 CYLTabBarController configuration: no skin gives the value \"%@\" of %@; the key is left out.", name, key);
+#endif
+            [resolved removeObjectForKey:key];
+        }
+    }
+    return resolved;
+}
+
+/// [EN] Whether the screen is in Dark Mode now (iOS 13+). [CN] 屏幕当前是否为深色模式（iOS 13+）。
+static BOOL CYLScreenIsDark(void) {
+    if (@available(iOS 13.0, *)) {
+        return UITraitCollection.currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+    }
+    return NO;
+}
+
+@interface CYLTabBarConfigurationTheme ()
+- (instancetype)initWithIdentifier:(NSString *)identifier values:(NSDictionary<NSString *, id> *)values
+                        references:(NSDictionary<id, NSDictionary<NSString *, NSString *> *> *)references NS_DESIGNATED_INITIALIZER;
+@end
+
+@implementation CYLTabBarConfigurationTheme {
+    /// [EN] Per tab (its identifier, or its position without one): item key -> value name. [CN] 每个 Tab（其标识，没有时为位置）：item 键 -> 值名称。
+    NSDictionary<id, NSDictionary<NSString *, NSString *> *> *_references;
+}
+
+- (instancetype)initWithIdentifier:(NSString *)identifier values:(NSDictionary<NSString *, id> *)values
+                        references:(NSDictionary<id, NSDictionary<NSString *, NSString *> *> *)references {
+    if (self = [super init]) {
+        _identifier = [identifier copy];
+        _values = [values copy];
+        _references = [references copy];
+    }
+    return self;
+}
+
+- (nullable id)valueForName:(NSString *)name {
+    return [name isKindOfClass:[NSString class]] ? self.values[name] : nil;
+}
+
+- (nullable UIColor *)colorForName:(NSString *)name {
+    return CYLColorValue([self valueForName:name]);
+}
+
+- (nullable UIFont *)fontForName:(NSString *)name {
+    id value = [self valueForName:name];
+    return value ? CYLFontValue(value) : nil;
+}
+
+- (nullable UIImage *)imageForName:(NSString *)name {
+    id value = [self valueForName:name];
+    if ([value isKindOfClass:[UIImage class]]) {
+        return value;
+    }
+    if (![value isKindOfClass:[NSString class]]) {
+        return nil;
+    }
+    id image = CYLImageValue(value);
+    return [image isKindOfClass:[UIImage class]] ? image : [UIImage imageNamed:value];
+}
+
++ (UIColor *)cyl_colorNamed:(NSString *)name inManager:(CYLThemeManager *)manager theme:(id)theme {
+    UIColor *color = [theme isKindOfClass:[CYLTabBarConfigurationTheme class]] ? [(CYLTabBarConfigurationTheme *)theme colorForName:name] : nil;
+    if (color) {
+        return color;
+    }
+    // [EN] Another kind of theme is current: the first skin of the file that has the color. [CN] 当前是其他类型的主题：使用文件中第一个提供该颜色的皮肤。
+    for (id candidate in manager.themes) {
+        color = [candidate isKindOfClass:[CYLTabBarConfigurationTheme class]] ? [(CYLTabBarConfigurationTheme *)candidate colorForName:name] : nil;
+        if (color) {
+            return color;
+        }
+    }
+    return UIColor.clearColor;
+}
+
++ (UIColor *)colorNamed:(NSString *)name {
+    NSString *colorName = [name copy];
+    return [UIColor cyl_colorWithName:colorName themeProvider:^UIColor *(CYLThemeManager *manager, id identifier, id theme) {
+        return [CYLTabBarConfigurationTheme cyl_colorNamed:colorName inManager:manager theme:theme];
+    }];
+}
+
++ (UIColor *)colorNamed:(NSString *)name themeManagerName:(__kindof NSObject<NSCopying> *)managerName {
+    NSString *colorName = [name copy];
+    return [UIColor cyl_colorWithName:colorName themeManagerName:managerName provider:^UIColor *(CYLThemeManager *manager, id identifier, id theme) {
+        return [CYLTabBarConfigurationTheme cyl_colorNamed:colorName inManager:manager theme:theme];
+    }];
+}
+
+#pragma mark CYLTabBarTheme
+
+- (nullable NSArray<NSDictionary<NSString *, id> *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController {
+    NSMutableArray<NSDictionary<NSString *, id> *> *items = [NSMutableArray array];
+    BOOL themed = NO;
+    NSUInteger position = 0;
+    for (NSDictionary *item in tabBarController.tabBarItemsAttributes) {
+        if (![item isKindOfClass:[NSDictionary class]] || [item[CYLTabBarItemPlusSlotPlaceholderKey] boolValue]) {
+            continue;
+        }
+        NSString *identifier = CYLStringValue(item[CYLTabBarItemIdentifier]);
+        NSDictionary<NSString *, NSString *> *references = identifier.length > 0 ? _references[identifier] : _references[@(position)];
+        position++;
+        NSMutableDictionary *raw = [NSMutableDictionary dictionary];
+        for (NSString *key in references) {
+            id value = self.values[references[key]];
+            if (value) {
+                raw[key] = value;
+            }
+        }
+        themed = themed || raw.count > 0;
+        // [EN] An empty entry keeps that tab as it is. [CN] 空条目让该 Tab 保持不变。
+        [items addObject:raw.count > 0 ? CYLNormalizedItemAttributes(raw) : @{}];
+    }
+    return themed ? items : nil;
+}
+
+- (nullable UITabBarAppearance *)cyl_tabBarAppearanceForTabBarController:(CYLTabBarController *)tabBarController API_AVAILABLE(ios(13.0)) {
+    UIColor *background = [self colorForName:CYLTabBarBackgroundColor];
+    UIColor *shadow = [self colorForName:CYLTabBarShadowColor];
+    UIColor *titleColor = [self colorForName:CYLTabBarItemTitleColor];
+    UIColor *selectedTitleColor = [self colorForName:CYLTabBarItemSelectedTitleColor];
+    UIColor *iconColor = [self colorForName:CYLTabBarItemIconColor];
+    UIColor *selectedIconColor = [self colorForName:CYLTabBarItemSelectedIconColor];
+    UIFont *titleFont = [self fontForName:CYLTabBarItemTitleFont];
+    UIFont *selectedTitleFont = [self fontForName:CYLTabBarItemSelectedTitleFont] ?: titleFont;
+    if (!background && !shadow && !titleColor && !selectedTitleColor && !iconColor && !selectedIconColor && !titleFont && !selectedTitleFont) {
+        // [EN] No bar-wide values: the app's own appearance stays. [CN] 没有整个 TabBar 的值：保留 App 自己的外观。
+        return nil;
+    }
+    UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
+    [appearance configureWithDefaultBackground];
+    if (background) {
+        appearance.backgroundColor = background;
+    }
+    if (shadow) {
+        appearance.shadowColor = shadow;
+    }
+    [appearance cyl_applyItemAppearanceWithBlock:^(UITabBarItemAppearance *itemAppearance) {
+        NSMutableDictionary *normal = [itemAppearance.normal.titleTextAttributes mutableCopy] ?: [NSMutableDictionary dictionary];
+        if (titleColor) {
+            normal[NSForegroundColorAttributeName] = titleColor;
+        }
+        if (titleFont) {
+            normal[NSFontAttributeName] = titleFont;
+        }
+        itemAppearance.normal.titleTextAttributes = normal;
+        NSMutableDictionary *selected = [itemAppearance.selected.titleTextAttributes mutableCopy] ?: [NSMutableDictionary dictionary];
+        if (selectedTitleColor) {
+            selected[NSForegroundColorAttributeName] = selectedTitleColor;
+        }
+        if (selectedTitleFont) {
+            selected[NSFontAttributeName] = selectedTitleFont;
+        }
+        itemAppearance.selected.titleTextAttributes = selected;
+        if (iconColor) {
+            itemAppearance.normal.iconColor = iconColor;
+        }
+        if (selectedIconColor) {
+            itemAppearance.selected.iconColor = selectedIconColor;
+        }
+    }];
+    return appearance;
+}
+
+- (void)cyl_customizeTabBarController:(CYLTabBarController *)tabBarController {
+    if (@available(iOS 13.0, *)) {
+        return;
+    }
+    // [EN] Before iOS 13, the classic tab bar colors. [CN] iOS 13 以前使用经典的 TabBar 颜色。
+    UITabBar *tabBar = tabBarController.tabBar;
+    UIColor *background = [self colorForName:CYLTabBarBackgroundColor];
+    if (background) {
+        tabBar.barTintColor = background;
+    }
+    UIColor *selectedIconColor = [self colorForName:CYLTabBarItemSelectedIconColor];
+    if (selectedIconColor) {
+        tabBar.tintColor = selectedIconColor;
+    }
+    UIColor *iconColor = [self colorForName:CYLTabBarItemIconColor];
+    if (iconColor) {
+        tabBar.unselectedItemTintColor = iconColor;
+    }
+}
+
+@end
+
+/*!
+ * [EN] The skins of a configuration: the identifiers, the base skin (every skin falls back to its values), the dark one,
+ *      the one used first (a skin of the manager chosen before is kept), and the manager name. nil without skins.
+ * [CN] 配置中的皮肤：标识、基础皮肤（每个皮肤都回退到它的值）、深色皮肤、首先使用的皮肤（保留之前在管理器中选择的皮肤）与管理器名称。没有皮肤时为 nil。
+ */
+static NSMutableDictionary<NSString *, id> *_Nullable CYLThemesInfoOfConfiguration(NSDictionary<NSString *, id> *configuration) {
+    NSDictionary<NSString *, NSDictionary<NSString *, id> *> *themes = CYLThemesValue(configuration[CYLTabBarControllerThemes]);
+    if (!themes) {
+        return nil;
+    }
+    NSArray<NSString *> *identifiers = [themes.allKeys sortedArrayUsingSelector:@selector(compare:)];
+    NSString *base = CYLStringValue(configuration[CYLTabBarControllerThemeIdentifier]);
+    if (base && !themes[base]) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerThemeIdentifier, base);
+        base = nil;
+    }
+    base = base ?: identifiers.firstObject;
+    NSString *dark = CYLStringValue(configuration[CYLTabBarControllerDarkThemeIdentifier]);
+    if (dark && !themes[dark]) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerDarkThemeIdentifier, dark);
+        dark = nil;
+    }
+    id managerName = configuration[CYLTabBarControllerThemeManagerName];
+    if ([managerName isKindOfClass:[NSNumber class]]) {
+        managerName = [managerName stringValue];
+    }
+    if (managerName && (![managerName isKindOfClass:[NSString class]] || [(NSString *)managerName length] == 0)) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerThemeManagerName, managerName);
+        managerName = nil;
+    }
+    CYLThemeManager *manager = managerName ? [CYLThemeManagerCenter themeManagerWithName:managerName] : CYLThemeManagerCenter.defaultThemeManager;
+    id current = manager.currentThemeIdentifier;
+    NSString *initial = base;
+    if ([current isKindOfClass:[NSString class]] && themes[current]) {
+        initial = current;
+    } else if (dark && CYLScreenIsDark()) {
+        initial = dark;
+    }
+    NSMutableDictionary<NSString *, NSDictionary<NSString *, id> *> *merged = [NSMutableDictionary dictionary];
+    for (NSString *identifier in identifiers) {
+        NSMutableDictionary<NSString *, id> *values = [themes[base] mutableCopy];
+        [values addEntriesFromDictionary:themes[identifier]];
+        merged[identifier] = values;
+    }
+    NSMutableDictionary<NSString *, id> *info = [NSMutableDictionary dictionary];
+    info[CYLConfigurationThemesListKey] = merged;
+    info[CYLConfigurationThemesBaseKey] = base;
+    info[CYLConfigurationThemesDarkKey] = dark;
+    info[CYLConfigurationThemesInitialKey] = initial;
+    info[CYLConfigurationThemesManagerKey] = managerName;
+    return info;
+}
+
+/*!
+ * [EN] Turns the merged values into `CYLTabBarConfigurationTheme`s, with the "@name" keys of every kept tab: by its
+ *      identifier (made unique by then), or by its position among the kept tabs when it has none.
+ * [CN] 把合并后的值转换为 `CYLTabBarConfigurationTheme`，带上每个保留 Tab 的 "@name" 键：按其标识（此时已唯一），没有标识时按其在保留 Tab
+ *      中的位置。
+ */
+static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArray<NSDictionary *> *items, NSArray<NSDictionary<NSString *, NSString *> *> *itemReferences) {
+    NSMutableDictionary<id, NSDictionary<NSString *, NSString *> *> *references = [NSMutableDictionary dictionary];
+    NSUInteger position = 0;
+    for (NSUInteger index = 0; index < items.count && index < itemReferences.count; index++) {
+        NSDictionary *item = items[index];
+        if ([item[CYLTabBarItemExcludedKey] boolValue]) {
+            continue;
+        }
+        NSString *identifier = CYLStringValue(item[CYLTabBarItemIdentifier]);
+        if (itemReferences[index].count > 0) {
+            references[identifier.length > 0 ? identifier : @(position)] = itemReferences[index];
+        }
+        position++;
+    }
+    NSDictionary<NSString *, NSDictionary<NSString *, id> *> *merged = info[CYLConfigurationThemesListKey];
+    NSMutableArray<CYLTabBarConfigurationTheme *> *themes = [NSMutableArray array];
+    for (NSString *identifier in [merged.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
+        [themes addObject:[[CYLTabBarConfigurationTheme alloc] initWithIdentifier:identifier values:merged[identifier] references:references]];
+    }
+    info[CYLConfigurationThemesListKey] = themes;
+}
+
 @implementation CYLTabBarController (CYLConfiguration)
 
 + (NSDictionary<NSString *, id> *)cyl_normalizedConfiguration:(NSDictionary<NSString *, id> *)configuration {
@@ -1061,6 +1428,11 @@ static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nulla
         }
         normalized[CYLTabBarControllerAutomaticPageRegistration] = automatic;
     }
+    // [EN] Skins: the "@name" values of the tabs take the first skin's values (see `CYLTabBarControllerThemes`).
+    // [CN] 皮肤：Tab 中的 "@name" 值取首个皮肤的值（见 `CYLTabBarControllerThemes`）。
+    NSMutableDictionary<NSString *, id> *themesInfo = normalized[CYLTabBarControllerThemes] ? CYLThemesInfoOfConfiguration(normalized) : nil;
+    NSDictionary<NSString *, id> *initialValues = themesInfo ? themesInfo[CYLConfigurationThemesListKey][themesInfo[CYLConfigurationThemesInitialKey]] : nil;
+    NSMutableArray<NSDictionary<NSString *, NSString *> *> *itemReferences = [NSMutableArray array];
     id items = normalized[CYLTabBarControllerTabBarItemsAttributes];
     if ([items isKindOfClass:[NSDictionary class]]) {
         // One tab: formats without list syntax (Protobuf text, XML) give a dictionary. 只有一个 Tab：没有列表语法的格式（Protobuf 文本、XML）解析为字典。
@@ -1077,7 +1449,10 @@ static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nulla
                     continue;
                 }
                 if ([item isKindOfClass:[NSDictionary class]]) {
-                    NSDictionary *normalizedItem = CYLNormalizedItemAttributes(item);
+                    NSMutableDictionary<NSString *, NSString *> *references = [NSMutableDictionary dictionary];
+                    NSDictionary *source = initialValues ? CYLItemResolvingThemeReferences(item, initialValues, references) : item;
+                    [itemReferences addObject:references];
+                    NSDictionary *normalizedItem = CYLNormalizedItemAttributes(source);
                     NSString *reason = CYLExclusionReason(normalizedItem);
                     if (reason) {
                         // A marked placeholder: the tab (and a view controller from code) is left out (B22).
@@ -1099,6 +1474,7 @@ static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nulla
                     // 用占位保持与代码传入的子控制器的下标对应（B4）。
                     CYLLogInvalidConfigurationValue(CYLTabBarControllerTabBarItemsAttributes, item);
                     [normalizedItems addObject:@{}];
+                    [itemReferences addObject:@{}];
                 }
             }
         } else {
@@ -1106,6 +1482,10 @@ static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nulla
         }
         CYLMakeIdentifiersUnique(normalizedItems);
         normalized[CYLTabBarControllerTabBarItemsAttributes] = normalizedItems;
+    }
+    if (themesInfo) {
+        CYLFinishThemesInfo(themesInfo, normalized[CYLTabBarControllerTabBarItemsAttributes] ?: @[], itemReferences);
+        normalized[CYLConfigurationThemesKey] = themesInfo;
     }
     CYLWarnUnknownKeys(normalized, CYLKnownConfigurationKeys());
 #if defined(DEBUG) || defined(BETA)
@@ -1184,6 +1564,39 @@ static NSError *_Nullable CYLConfigurationPagesError(CYLTabBarController *_Nulla
 
 + (instancetype)tabBarControllerWithConfigurationFile:(NSString *)filePath error:(NSError **)error {
     return [[self alloc] initWithConfigurationFile:filePath error:error];
+}
+
+- (void)cyl_applyConfigurationThemes:(NSDictionary<NSString *, id> *)normalizedConfiguration {
+    NSDictionary<NSString *, id> *info = normalizedConfiguration[CYLConfigurationThemesKey];
+    if (![info isKindOfClass:[NSDictionary class]]) {
+        return;
+    }
+    id managerName = info[CYLConfigurationThemesManagerKey];
+    if (managerName) {
+        self.cyl_themeManager = [CYLThemeManagerCenter themeManagerWithName:managerName];
+    }
+    CYLThemeManager *manager = self.cyl_themeManager;
+    for (CYLTabBarConfigurationTheme *theme in info[CYLConfigurationThemesListKey]) {
+        [manager addThemeIdentifier:theme.identifier theme:theme];
+    }
+    NSString *base = info[CYLConfigurationThemesBaseKey];
+    NSString *dark = info[CYLConfigurationThemesDarkKey];
+    id current = manager.currentThemeIdentifier;
+    // [EN] A skin the app or the user chose before stays; otherwise the first one. [CN] App 或用户之前选择的皮肤保持不变；否则使用首个皮肤。
+    if (!current) {
+        manager.currentThemeIdentifier = info[CYLConfigurationThemesInitialKey];
+    }
+    if (@available(iOS 13.0, *)) {
+        // [EN] Dark Mode follows the system, unless the manager follows it its own way or another skin was chosen.
+        // [CN] 深色模式跟随系统，除非管理器有自己的跟随方式，或已选择了其他皮肤。
+        BOOL keepsChoice = current && ![current isEqual:base] && ![current isEqual:dark];
+        if (dark && !manager.identifierForTrait && !keepsChoice) {
+            manager.identifierForTrait = ^NSObject<NSCopying> *(UITraitCollection *trait) {
+                return trait.userInterfaceStyle == UIUserInterfaceStyleDark ? dark : base;
+            };
+            manager.respondsSystemStyleAutomatically = YES;
+        }
+    }
 }
 
 /// [EN] The timeout of `+loadConfigurationWithURL:completion:` (D5); the system default is 60 seconds. [CN] `+loadConfigurationWithURL:completion:` 的超时（D5）；系统默认 60 秒。

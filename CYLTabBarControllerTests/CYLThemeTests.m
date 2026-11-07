@@ -319,6 +319,85 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
 }
 
+#pragma mark - Skins in a configuration file 配置文件中的皮肤
+
+/// [EN] Two tabs from code, with skin names in their values. [CN] 两个代码传入的 Tab，值中带有皮肤名称。
+- (NSDictionary *)skinnedConfigurationWithManagerName:(NSString *)name themes:(id)themes {
+    return @{
+        CYLTabBarControllerViewControllers : @[ [[UIViewController alloc] init], [[UIViewController alloc] init] ],
+        CYLTabBarControllerThemeManagerName : name,
+        CYLTabBarControllerThemes : themes,
+        CYLTabBarControllerThemeIdentifier : @"light",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemTitle : @"@homeTitle", CYLTabBarItemIdentifier : @"home", CYLTabBarItemTitleColor : @"@accent" },
+            @{ CYLTabBarItemTitle : @"@@me", CYLTabBarItemIdentifier : @"me" },
+        ],
+    };
+}
+
+- (NSDictionary *)itemWithIdentifier:(NSString *)identifier ofTabBarController:(CYLTabBarController *)tabBarController {
+    for (NSDictionary *item in tabBarController.tabBarItemsAttributes) {
+        if ([item[CYLTabBarItemIdentifier] isEqual:identifier]) {
+            return item;
+        }
+    }
+    return nil;
+}
+
+- (void)testSkinsOfAConfigurationResolveNamedValuesAndRegisterWithTheManager {
+    NSString *name = [NSUUID UUID].UUIDString;
+    NSDictionary *themes = @{
+        @"light" : @{ @"homeTitle" : @"Home", @"accent" : @"#FF0000", CYLTabBarBackgroundColor : @"#FFFFFF" },
+        @"dark" : @{ @"homeTitle" : @"Home (dark)", CYLTabBarBackgroundColor : @"#000000" },
+    };
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithConfiguration:[self skinnedConfigurationWithManagerName:name themes:themes]];
+    CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:name];
+    XCTAssertEqual(tabBarController.cyl_themeManager, manager);
+    XCTAssertEqualObjects([manager.themeIdentifiers sortedArrayUsingSelector:@selector(compare:)], (@[ @"dark", @"light" ]));
+    XCTAssertEqualObjects(manager.currentThemeIdentifier, @"light", @"the first skin");
+
+    NSDictionary *home = [self itemWithIdentifier:@"home" ofTabBarController:tabBarController];
+    XCTAssertEqualObjects(home[CYLTabBarItemTitle], @"Home");
+    XCTAssertTrue([home[CYLTabBarItemTitleColor] isKindOfClass:[UIColor class]], @"a named value goes through the same conversion");
+    XCTAssertEqualObjects([self itemWithIdentifier:@"me" ofTabBarController:tabBarController][CYLTabBarItemTitle], @"@me", @"\"@@\" is a literal \"@\"");
+
+    CYLTabBarConfigurationTheme *dark = [manager themeForIdentifier:@"dark"];
+    XCTAssertTrue([dark isKindOfClass:[CYLTabBarConfigurationTheme class]]);
+    XCTAssertEqualObjects([dark valueForName:@"accent"], @"#FF0000", @"a name the skin does not give comes from the base skin");
+    NSArray<NSDictionary *> *darkItems = [dark cyl_tabBarItemsAttributesForTabBarController:tabBarController];
+    XCTAssertEqual(darkItems.count, 2u);
+    XCTAssertEqualObjects(darkItems.firstObject[CYLTabBarItemTitle], @"Home (dark)");
+    XCTAssertEqualObjects(darkItems.lastObject, @{}, @"a tab without names stays as it is");
+    UITabBarAppearance *appearance = [dark cyl_tabBarAppearanceForTabBarController:tabBarController];
+    CGFloat red = 1, green = 1, blue = 1;
+    XCTAssertTrue([appearance.backgroundColor getRed:&red green:&green blue:&blue alpha:NULL]);
+    XCTAssertEqualWithAccuracy(red + green + blue, 0, 0.01, @"the dark skin's bar color");
+    XCTAssertNotNil([CYLTabBarConfigurationTheme colorNamed:@"accent" themeManagerName:name]);
+}
+
+- (void)testSkinsAcceptTheListFormAndKeepASkinChosenBefore {
+    NSString *name = [NSUUID UUID].UUIDString;
+    CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:name];
+    [manager addThemeIdentifier:@"mine" theme:@"the app's own theme"];
+    manager.currentThemeIdentifier = @"mine";
+    // [EN] The Protobuf form: a list of skins, the values as map entries. [CN] Protobuf 形式：皮肤列表，值为 map 条目。
+    NSArray *themes = @[ @{ CYLTabBarThemeIdentifier : @"light", CYLTabBarThemeValues : @[ @{ @"key" : @"homeTitle", @"value" : @"Home" } ] } ];
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithConfiguration:[self skinnedConfigurationWithManagerName:name themes:themes]];
+    XCTAssertEqualObjects(manager.currentThemeIdentifier, @"mine", @"a skin chosen before stays");
+    NSDictionary *home = [self itemWithIdentifier:@"home" ofTabBarController:tabBarController];
+    XCTAssertEqualObjects(home[CYLTabBarItemTitle], @"Home");
+    XCTAssertNil(home[CYLTabBarItemTitleColor], @"a name no skin gives leaves the key out");
+    XCTAssertTrue([[manager themeForIdentifier:@"light"] isKindOfClass:[CYLTabBarConfigurationTheme class]]);
+}
+
+- (void)testWithoutSkinsAnAtSignIsPlainText {
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithConfiguration:@{
+        CYLTabBarControllerViewControllers : @[ [[UIViewController alloc] init] ],
+        CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"@homeTitle", CYLTabBarItemIdentifier : @"home" } ],
+    }];
+    XCTAssertEqualObjects([self itemWithIdentifier:@"home" ofTabBarController:tabBarController][CYLTabBarItemTitle], @"@homeTitle");
+}
+
 @end
 
 /// [EN] A tab bar theme with the given attributes. [CN] 使用给定 attributes 的 TabBar 主题。

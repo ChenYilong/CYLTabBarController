@@ -102,6 +102,15 @@ public final class CYLConstants {
     public static final String CYLTabBarControllerPageLookupOrder = "CYLTabBarControllerPageLookupOrder";
     public static final String CYLTabBarControllerAutomaticPageRegistration = "CYLTabBarControllerAutomaticPageRegistration";
     public static final String CYLTabBarControllerTabBarItemAnimationSpeed = "CYLTabBarControllerTabBarItemAnimationSpeed";
+    // [EN] Skins of a configuration (see CYLTabBarConfigurationTheme). [CN] 配置中的皮肤（见 CYLTabBarConfigurationTheme）。
+    public static final String CYLTabBarControllerThemes = "CYLTabBarControllerThemes";
+    public static final String CYLTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier";
+    public static final String CYLTabBarControllerDarkThemeIdentifier = "CYLTabBarControllerDarkThemeIdentifier";
+    public static final String CYLTabBarControllerThemeManagerName = "CYLTabBarControllerThemeManagerName";
+    public static final String CYLTabBarThemeIdentifier = "CYLTabBarThemeIdentifier";
+    public static final String CYLTabBarThemeValues = "CYLTabBarThemeValues";
+    public static final String CYLTabBarBackgroundColor = "CYLTabBarBackgroundColor";
+    public static final String CYLTabBarShadowColor = "CYLTabBarShadowColor";
 
     // MARK: - Notifications 通知 (names, posted through CYLNotificationCenter)
 

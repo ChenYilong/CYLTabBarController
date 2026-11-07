@@ -27,6 +27,16 @@ message CYLTabBarConfiguration {
   reserved 6;
   // A number, e.g. "1.5"; see CYLTabBarControllerTabBarItemAnimationSpeed. 数字，例如 "1.5"；见 CYLTabBarControllerTabBarItemAnimationSpeed。
   string CYLTabBarControllerTabBarItemAnimationSpeed = 7;
+  // [EN] Skins: named values that "@name" tab values refer to. [CN] 皮肤："@name" 形式的 Tab 值所引用的命名值。
+  repeated CYLTabBarTheme CYLTabBarControllerThemes = 8;
+  string CYLTabBarControllerThemeIdentifier = 9;
+  string CYLTabBarControllerDarkThemeIdentifier = 10;
+  string CYLTabBarControllerThemeManagerName = 11;
+}
+
+message CYLTabBarTheme {
+  string CYLTabBarThemeIdentifier = 1;
+  map<string, string> CYLTabBarThemeValues = 2;
 }
 
 message CYLTabBarItem {

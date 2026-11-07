@@ -83,6 +83,14 @@ NSString *const CYLTabBarControllerPageResolver = @"CYLTabBarControllerPageResol
 NSString *const CYLTabBarControllerPageLookupOrder = @"CYLTabBarControllerPageLookupOrder";
 NSString *const CYLTabBarControllerAutomaticPageRegistration = @"CYLTabBarControllerAutomaticPageRegistration";
 NSString *const CYLTabBarControllerTabBarItemAnimationSpeed = @"CYLTabBarControllerTabBarItemAnimationSpeed";
+NSString *const CYLTabBarControllerThemes = @"CYLTabBarControllerThemes";
+NSString *const CYLTabBarControllerThemeIdentifier = @"CYLTabBarControllerThemeIdentifier";
+NSString *const CYLTabBarControllerDarkThemeIdentifier = @"CYLTabBarControllerDarkThemeIdentifier";
+NSString *const CYLTabBarControllerThemeManagerName = @"CYLTabBarControllerThemeManagerName";
+NSString *const CYLTabBarThemeIdentifier = @"CYLTabBarThemeIdentifier";
+NSString *const CYLTabBarThemeValues = @"CYLTabBarThemeValues";
+NSString *const CYLTabBarBackgroundColor = @"CYLTabBarBackgroundColor";
+NSString *const CYLTabBarShadowColor = @"CYLTabBarShadowColor";
 NSString *const CYLTabBarAnimationOptions = @"CYLTabBarAnimationOptions";
 /// [EN] Private: marks a tab left out by `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` (set by the normalization).
 /// [CN] 私有：标记被 `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` 排除的 Tab（由规范化设置）。
@@ -2188,6 +2196,9 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
             // [EN] Validated by the normalizer (B28). [CN] 已由规范化检查（B28）。
             self.tabBarItemAnimationSpeed = animationSpeed.doubleValue;
         }
+        // [EN] Skins of the configuration (`CYLTabBarControllerThemes`): registered with the theme manager, the first one applied.
+        // [CN] 配置中的皮肤（`CYLTabBarControllerThemes`）：注册到主题管理器，并应用首个皮肤。
+        [self cyl_applyConfigurationThemes:normalized];
         
     }
     return self;

@@ -1637,7 +1637,13 @@ private object CYLProtobufSchema {
             4 to ("CYLTabBarControllerStyleType" to "string"),
             5 to ("CYLTabBarControllerContext" to "string"),
             7 to ("CYLTabBarControllerTabBarItemAnimationSpeed" to "string"),
+            // [EN] Skins (`CYLTabBarControllerThemes`). [CN] 皮肤（`CYLTabBarControllerThemes`）。
+            8 to ("CYLTabBarControllerThemes" to "repeated:CYLTabBarTheme"),
+            9 to ("CYLTabBarControllerThemeIdentifier" to "string"),
+            10 to ("CYLTabBarControllerDarkThemeIdentifier" to "string"),
+            11 to ("CYLTabBarControllerThemeManagerName" to "string"),
         ),
+        "CYLTabBarTheme" to mapOf(1 to ("CYLTabBarThemeIdentifier" to "string"), 2 to ("CYLTabBarThemeValues" to "map")),
         "CYLTabBarItem" to itemFields.withIndex().filter { it.value != null }.associate { (index, entry) -> index + 1 to field(entry!!) },
         "CYLMapEntry" to mapOf(1 to ("key" to "string"), 2 to ("value" to "string")),
     )

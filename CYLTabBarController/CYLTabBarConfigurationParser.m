@@ -2022,6 +2022,15 @@ static NSDictionary<NSString *, NSDictionary<NSNumber *, NSArray<NSString *> *> 
                 @4 : @[ @"CYLTabBarControllerStyleType", @"string" ],
                 @5 : @[ @"CYLTabBarControllerContext", @"string" ],
                 @7 : @[ @"CYLTabBarControllerTabBarItemAnimationSpeed", @"string" ],
+                // [EN] Skins (`CYLTabBarControllerThemes`). [CN] 皮肤（`CYLTabBarControllerThemes`）。
+                @8 : @[ @"CYLTabBarControllerThemes", @"repeated:CYLTabBarTheme" ],
+                @9 : @[ @"CYLTabBarControllerThemeIdentifier", @"string" ],
+                @10 : @[ @"CYLTabBarControllerDarkThemeIdentifier", @"string" ],
+                @11 : @[ @"CYLTabBarControllerThemeManagerName", @"string" ],
+            },
+            @"CYLTabBarTheme" : @{
+                @1 : @[ @"CYLTabBarThemeIdentifier", @"string" ],
+                @2 : @[ @"CYLTabBarThemeValues", @"map" ],
             },
             @"CYLTabBarItem" : @{
                 @1 : @[ @"CYLTabBarItemTitle", @"string" ],
