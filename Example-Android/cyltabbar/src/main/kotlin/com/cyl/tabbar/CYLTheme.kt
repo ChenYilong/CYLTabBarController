@@ -239,6 +239,9 @@ private fun View.applyColor(key: String, color: Int?) {
     }
 }
 
+/** [EN] The stroke of the view's shape background (the "border" theme value rule). [CN] 视图形状背景的描边（主题值规则 "border"）。 */
+internal fun View.cyl_applyThemeBorder(color: Int?) = applyColor("borderColor", color)
+
 /**
  * [EN] `-[CALayer cyl_setThemeColor:forKey:]` on a view (Android draws with views, not layers): sets the color property `key`
  *      (`backgroundColor`, `borderColor`, `shadowColor`, `textColor`, `tintColor`, or any `set<Key>(Int)`) from `color`
@@ -339,13 +342,26 @@ private fun View.reapplyRegisteredProperties() {
  * [CN] 重新设置登记的属性与主题颜色，刷新主题图片并重绘，通知实现了 `CYLThemeChangeObserving` 的视图，运行 `cyl_themeDidChangeBlock`，然后对每个子视图执行同样操作。
  */
 fun View.cyl_themeDidChangeByManager(manager: CYLThemeManager?, identifier: Any?, theme: Any?) {
+    if (manager != null) {
+        // [EN] QMUI's dispatch rules: an interceptor stops here; a view already reached in this change is skipped with its subviews. [CN] QMUI 的分发规则：拦截者在此停止；本次变化中已访问的视图连同子视图跳过。
+        if (cyl_interceptsThemeDispatch || (this is CYLThemeDispatchInterceptor && cyl_interceptThemeDispatch(manager, identifier, theme))) return
+        val stamp = manager.name + "#" + manager.themeVersion
+        if (getTag(R.id.cyl_theme_dispatched) == stamp) return
+        setTag(R.id.cyl_theme_dispatched, stamp)
+    }
+    if (!cyl_ignoresThemeApply) applyThemeChange(manager, identifier, theme)
+    (this as? ViewGroup)?.let { group -> for (index in 0 until group.childCount) group.getChildAt(index).cyl_themeDidChangeByManager(manager, identifier, theme) }
+}
+
+private fun View.applyThemeChange(manager: CYLThemeManager?, identifier: Any?, theme: Any?) {
     themeState(false)?.colors?.forEach { (key, color) -> applyColor(key, resolvedColor(color)) }
     reapplyRegisteredProperties()
     refreshThemeImages()
+    CYLThemeValues.applyThemeValues(this, force = manager == null)
+    CYLThemeValues.dispatchSpansAndDecorations(this, manager)
     invalidate()
     (this as? CYLThemeChangeObserving)?.cyl_themeDidChangeByManager(manager, identifier, theme)
     themeState(false)?.block?.invoke()
-    (this as? ViewGroup)?.let { group -> for (index in 0 until group.childCount) group.getChildAt(index).cyl_themeDidChangeByManager(manager, identifier, theme) }
 }
 
 /** [EN] `-cyl_applyCurrentTheme`: brings the view and its subviews to the current themes now. [CN] 立即让本视图及子视图使用当前主题。 */
@@ -375,5 +391,7 @@ internal object CYLThemeDispatcher {
             activity.window?.decorView?.cyl_themeDidChangeByManager(manager, identifier, theme)
             if (!activity.supportFragmentManager.isDestroyed) for (page in activity.supportFragmentManager.fragments) page.cyl_themeDidChangeByManager(manager, identifier, theme)
         }
+        // [EN] Then the roots registered with `CYLThemeValues.register` (dialogs, other activities). [CN] 然后是用 `CYLThemeValues.register` 登记的根对象（对话框、其他 Activity）。
+        for (root in CYLThemeValues.registeredRootViews(manager)) root.cyl_themeDidChangeByManager(manager, identifier, theme)
     }
 }

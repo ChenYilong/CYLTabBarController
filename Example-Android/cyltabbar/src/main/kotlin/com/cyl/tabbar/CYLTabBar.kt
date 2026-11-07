@@ -167,21 +167,51 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         titleLabel.text = if (selected) item.cyl_selectedTitle ?: item.title ?: "" else item.title ?: ""
         iconView.setImageDrawable((if (selected) item.selectedImage ?: item.image else item.image)?.mutate())
         val controller = tabBar.tabBarController
-        val titleColor = (if (selected) item.cyl_selectedTitleColor ?: controller?.cyl_tabBarItemSelectedTitleColor ?: tabBar.selectedTintColor
-                          else item.cyl_titleColor ?: controller?.cyl_tabBarItemTitleColor ?: tabBar.unselectedTintColor)
-        titleLabel.setTextColor(titleColor)
+        titleLabel.setTextColor(titleColor(selected, tabBar))
         val font = if (selected) item.cyl_selectedTitleFont ?: controller?.cyl_tabBarItemSelectedTitleFont ?: item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
                    else item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
         if (font != null) {
             titleLabel.textSize = font.size
             titleLabel.typeface = font.typeface ?: if (font.bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
         }
-        val iconColor = if (selected) item.cyl_selectedIconColor ?: controller?.cyl_tabBarItemSelectedImageColor else item.cyl_iconColor ?: controller?.cyl_tabBarItemImageColor
+        val iconColor = iconColor(selected, tabBar)
         if (iconColor != null) iconView.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN) else iconView.clearColorFilter()
         val background = if (selected) item.cyl_selectedBackgroundColor else item.cyl_backgroundColor
         setBackgroundColor(background ?: Color.TRANSPARENT)
         contentDescription = item.accessibilityLabel ?: titleLabel.text
         requestLayout()
+    }
+
+    /** [EN] The title color of the tab, selected or not. [CN] Tab 的标题颜色（选中或未选中）。 */
+    @ColorInt
+    internal fun titleColor(selected: Boolean, tabBar: CYLTabBar): Int {
+        val controller = tabBar.tabBarController
+        return if (selected) item.cyl_selectedTitleColor ?: controller?.cyl_tabBarItemSelectedTitleColor ?: tabBar.selectedTintColor
+               else item.cyl_titleColor ?: controller?.cyl_tabBarItemTitleColor ?: tabBar.unselectedTintColor
+    }
+
+    private fun iconColor(selected: Boolean, tabBar: CYLTabBar): Int? {
+        val controller = tabBar.tabBarController
+        return if (selected) item.cyl_selectedIconColor ?: controller?.cyl_tabBarItemSelectedImageColor else item.cyl_iconColor ?: controller?.cyl_tabBarItemImageColor
+    }
+
+    /**
+     * [EN] QMUI `setSelectFraction`: while the pages are swiped, the title (and a tinted icon) blends from the normal color
+     *      (0) to the selected one (1).
+     * [CN] QMUI 的 `setSelectFraction`：滑动翻页时，标题（以及着色的图标）从普通颜色（0）渐变到选中颜色（1）。
+     */
+    internal fun cyl_setSelectionFraction(fraction: Float, tabBar: CYLTabBar) {
+        titleLabel.setTextColor(CYLTabBarIndicator.blend(titleColor(false, tabBar), titleColor(true, tabBar), fraction))
+        val normal = iconColor(false, tabBar)
+        val selected = iconColor(true, tabBar)
+        if (normal != null && selected != null) iconView.setColorFilter(CYLTabBarIndicator.blend(normal, selected, fraction), PorterDuff.Mode.SRC_IN)
+    }
+
+    /** [EN] The width of the content (the title, or the icon without a title), in px. [CN] 内容宽度（标题，没有标题时为图标），像素。 */
+    internal fun cyl_contentWidth(): Int {
+        val title = titleLabel.text
+        if (title.isNotEmpty()) return kotlin.math.ceil(titleLabel.paint.measureText(title.toString())).toInt() + titleLabel.paddingLeft + titleLabel.paddingRight
+        return if (iconView.width > 0) iconView.width else ((item.cyl_iconSize?.width ?: CYLConstants.CYLTabBarItemImagePlaceholderWidth) * resources.displayMetrics.density).toInt()
     }
 }
 
@@ -222,6 +252,31 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     @ColorInt var cyl_shadowColor: Int? = 0x33000000
     private val buttons = ArrayList<CYLTabBarItemButton>()
     private val shadow = View(context)
+
+    // MARK: - Indicator and scroll mode (Android only, adapted from QMUITabSegment) 指示器与滚动模式（仅 Android，改编自 QMUITabSegment）
+
+    /** [EN] Android only: the selection indicator (`CYLTabBarIndicator`), or null (default, as on iOS). [CN] 仅 Android：选中指示条（`CYLTabBarIndicator`），默认 null（与 iOS 一致）。 */
+    var cyl_indicator: CYLTabBarIndicator? = null
+        set(value) { field = value; indicatorIndex = -1; layoutIndicator(animated = false); invalidate() }
+    /** [EN] Android only: the duration of the indicator's move to a newly selected tab, in seconds (default 0.2). [CN] 仅 Android：指示条移动到新选中 Tab 的时长（秒，默认 0.2）。 */
+    var cyl_indicatorAnimationDuration: Double = 0.2
+    /** [EN] Android only: `Fixed` (default) or `Scrollable` (`CYLTabBarScrollMode`). [CN] 仅 Android：`Fixed`（默认）或 `Scrollable`（`CYLTabBarScrollMode`）。 */
+    var cyl_scrollMode: CYLTabBarScrollMode = CYLTabBarScrollMode.Fixed
+        set(value) { field = value; scrollTo(0, 0); requestLayout() }
+    /** [EN] Android only: the room added to each tab's content in the scrollable mode, in dp (default 24). [CN] 仅 Android：滚动模式下每个 Tab 内容之外的空间（dp，默认 24）。 */
+    var cyl_itemSpaceInScrollMode: Float = 24f
+        set(value) { field = value; requestLayout() }
+    private var slotWidths = IntArray(0)
+    private var contentWidth = 0
+    private var indicatorIndex = -1
+    private var indicatorAnimator: android.animation.ValueAnimator? = null
+    private val scroller = android.widget.OverScroller(context)
+    private var velocityTracker: android.view.VelocityTracker? = null
+    private val touchSlop = android.view.ViewConfiguration.get(context).scaledTouchSlop
+    private var dragStartX = 0f
+    private var lastDragX = 0f
+    private var dragging = false
+    private val maxScrollX: Int get() = maxOf(0, contentWidth - width)
     private var titleAlignedPlusLabel: TextView? = null
 
     // MARK: - UITabBar (CYLBarBackground) 背景
@@ -351,38 +406,194 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             }
         }
         shadow.setBackgroundColor(cyl_shadowColor ?: Color.TRANSPARENT)
+        layoutIndicator(animated = true)
+        scrollSelectedTabIntoView()
+    }
+
+    private fun indicatorTarget(): Int = if (plusButtonActive) -1 else tabBarController?.selectedIndex ?: -1
+
+    /** [EN] `layoutIndicator`: puts the indicator on the selected tab, moving it there when `animated`. [CN] 把指示条放到选中 Tab 上，`animated` 时移动过去。 */
+    private fun layoutIndicator(animated: Boolean) {
+        val indicator = cyl_indicator ?: return
+        val target = indicatorTarget()
+        val targetButton = buttons.getOrNull(target)
+        if (targetButton == null || targetButton.width == 0) {
+            if (target < 0) indicator.hide()
+            indicatorIndex = if (targetButton == null) -1 else indicatorIndex
+            invalidate()
+            return
+        }
+        val previous = buttons.getOrNull(indicatorIndex)
+        indicatorAnimator?.cancel()
+        if (animated && previous != null && previous !== targetButton && cyl_indicatorAnimationDuration > 0) {
+            indicatorAnimator = android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
+                duration = (cyl_indicatorAnimationDuration * 1000).toLong()
+                addUpdateListener { layoutIndicatorInTransition(previous, targetButton, it.animatedValue as Float) }
+                addListener(object : android.animation.AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: android.animation.Animator) { if (indicatorAnimator === animation) indicatorAnimator = null }
+                })
+                start()
+            }
+        } else {
+            layoutIndicatorInTransition(targetButton, targetButton, 1f)
+        }
+        indicatorIndex = target
+    }
+
+    private fun indicatorLeft(button: CYLTabBarItemButton, follows: Boolean): Int =
+        if (follows) button.left + (button.width - minOf(button.width, button.cyl_contentWidth())) / 2 else button.left
+
+    private fun indicatorWidth(button: CYLTabBarItemButton, follows: Boolean): Int = if (follows) minOf(button.width, button.cyl_contentWidth()) else button.width
+
+    /** [EN] `layoutIndicatorInTransition`: between two tabs, position, width and color blended by `fraction`. [CN] 在两个 Tab 之间，按 `fraction` 渐变位置、宽度与颜色。 */
+    private fun layoutIndicatorInTransition(from: CYLTabBarItemButton, to: CYLTabBarItemButton, fraction: Float) {
+        val indicator = cyl_indicator ?: return
+        val follows = indicator.widthFollowsContent
+        val left = indicatorLeft(from, follows) + ((indicatorLeft(to, follows) - indicatorLeft(from, follows)) * fraction).toInt()
+        val width = indicatorWidth(from, follows) + ((indicatorWidth(to, follows) - indicatorWidth(from, follows)) * fraction).toInt()
+        indicator.update(left, width, CYLTabBarIndicator.blend(from.titleColor(true, this), to.titleColor(true, this), fraction))
+        invalidate()
+    }
+
+    /**
+     * [EN] Android only, QMUI `updateIndicatorPosition`: for a pager of the app, places the indicator (and blends the two
+     *      titles) between tab `index` and its neighbor: `offsetPercent` in (0, 1] moves towards `index + 1`, in [-1, 0)
+     *      towards `index - 1`; 0 puts it back on `index`. `CYLTabBarController.cyl_swipesBetweenPages` calls it itself.
+     * [CN] 仅 Android，QMUI 的 `updateIndicatorPosition`：供 App 自己的翻页控件使用，把指示条放在第 `index` 个 Tab 与相邻 Tab 之间（并渐变两个标题）：
+     *      `offsetPercent` 在 (0, 1] 时移向 `index + 1`，在 [-1, 0) 时移向 `index - 1`；0 时回到 `index`。
+     *      `CYLTabBarController.cyl_swipesBetweenPages` 会自行调用。
+     */
+    fun cyl_updateIndicatorPosition(index: Int, offsetPercent: Float) {
+        val from = buttons.getOrNull(index) ?: return
+        indicatorAnimator?.cancel()
+        if (offsetPercent == 0f) {
+            refreshSelection()
+            return
+        }
+        val to = buttons.getOrNull(if (offsetPercent < 0) index - 1 else index + 1) ?: return
+        val fraction = kotlin.math.abs(offsetPercent).coerceAtMost(1f)
+        from.cyl_setSelectionFraction(1 - fraction, this)
+        to.cyl_setSelectionFraction(fraction, this)
+        layoutIndicatorInTransition(from, to, fraction)
+    }
+
+    /** [EN] In the scrollable mode, scrolls the selected tab to the middle when it can. [CN] 滚动模式下，尽量把选中 Tab 滚动到中间。 */
+    private fun scrollSelectedTabIntoView() {
+        if (maxScrollX <= 0) return
+        val button = buttons.getOrNull(indicatorTarget()) ?: return
+        if (button.width == 0) return
+        val target = (button.left + button.width / 2 - width / 2).coerceIn(0, maxScrollX)
+        scroller.forceFinished(true)
+        scroller.startScroll(scrollX, 0, target - scrollX, 0, 250)
+        startScrollStep()
+    }
+
+    /** [EN] Drives the scroller once per frame (not from `computeScroll`, so it also runs without a draw pass). [CN] 每帧推进 scroller（不依赖 `computeScroll`，没有绘制时也能运行）。 */
+    private val scrollStep = object : Runnable {
+        override fun run() {
+            if (!scroller.computeScrollOffset()) return
+            scrollTo(scroller.currX.coerceIn(0, maxScrollX), 0)
+            postOnAnimation(this)
+        }
+    }
+
+    private fun startScrollStep() {
+        removeCallbacks(scrollStep)
+        postOnAnimation(scrollStep)
+    }
+
+    override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
+        super.onScrollChanged(l, t, oldl, oldt)
+        layoutFixedChildren()
+    }
+
+    override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
+        if (maxScrollX <= 0) return false
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> { dragStartX = event.x; lastDragX = event.x; dragging = !scroller.isFinished; scroller.forceFinished(true) }
+            MotionEvent.ACTION_MOVE -> if (abs(event.x - dragStartX) > touchSlop) { dragging = true; lastDragX = event.x }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> dragging = false
+        }
+        if (dragging) parent?.requestDisallowInterceptTouchEvent(true)
+        return dragging
+    }
+
+    @android.annotation.SuppressLint("ClickableViewAccessibility") // [EN] Dragging scrolls; taps go to the tab buttons. [CN] 拖动用于滚动；点击交给 Tab 按钮。
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (maxScrollX <= 0) return super.onTouchEvent(event)
+        val tracker = velocityTracker ?: android.view.VelocityTracker.obtain().also { velocityTracker = it }
+        tracker.addMovement(event)
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> { lastDragX = event.x; scroller.forceFinished(true) }
+            MotionEvent.ACTION_MOVE -> {
+                scrollTo((scrollX + (lastDragX - event.x)).toInt().coerceIn(0, maxScrollX), 0)
+                lastDragX = event.x
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                tracker.computeCurrentVelocity(1000)
+                scroller.fling(scrollX, 0, -tracker.xVelocity.toInt(), 0, 0, maxScrollX, 0, 0)
+                startScrollStep()
+                tracker.recycle()
+                velocityTracker = null
+                dragging = false
+            }
+        }
+        return true
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = ((tabBarController?.tabBarHeight ?: CYLConstants.CYLTabBarHeight) * resources.displayMetrics.density).toInt()
-        val slots = maxOf(slotCount(), 1)
-        val slotWidth = width / slots
-        for (button in buttons) {
-            button.measure(MeasureSpec.makeMeasureSpec(slotWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
-        }
         plusButton?.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
-        setMeasuredDimension(width, height)
-    }
-
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        val density = resources.displayMetrics.density
-        val slots = maxOf(slotCount(), 1)
-        val slotWidth = width / slots
+        slotWidths = computeSlotWidths(width)
+        contentWidth = slotWidths.sum()
         val plusIndex = plusButtonIndex()
         var slot = 0
         for ((index, button) in buttons.withIndex()) {
             if (index == plusIndex) slot++
-            val left = slot * slotWidth + (cyl_itemEdgeInsets.left * density).toInt()
-            button.layout(left, (cyl_itemEdgeInsets.top * density).toInt(), slot * slotWidth + slotWidth - (cyl_itemEdgeInsets.right * density).toInt(), height - (cyl_itemEdgeInsets.bottom * density).toInt())
+            button.measure(MeasureSpec.makeMeasureSpec(slotWidths.getOrElse(slot) { 0 }, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
             slot++
         }
-        plusButton?.let { layoutPlusButton(it, plusIndex * slotWidth + slotWidth / 2, slotWidth, density) }
-        shadow.layout(0, 0, width, maxOf(1, (0.5f * density).toInt()))
-        for (background in listOfNotNull(if (childCount > 0 && getChildAt(0) !is CYLTabBarItemButton && getChildAt(0) !== shadow) getChildAt(0) else null, effectView)) {
-            background.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
-            background.layout(0, 0, width, height)
+        setMeasuredDimension(width, height)
+    }
+
+    /**
+     * [EN] The width of each slot: equal slots in the fixed mode (and in the scrollable mode when the content fits), each
+     *      tab's content plus `cyl_itemSpaceInScrollMode` otherwise (QMUI `MODE_SCROLLABLE`).
+     * [CN] 每个 slot 的宽度：固定模式下等宽（滚动模式下内容放得下时也等宽），否则为每个 Tab 的内容加 `cyl_itemSpaceInScrollMode`（QMUI 的 `MODE_SCROLLABLE`）。
+     */
+    private fun computeSlotWidths(width: Int): IntArray {
+        val slots = slotCount()
+        val equal = IntArray(slots) { width / maxOf(slots, 1) }
+        if (cyl_scrollMode == CYLTabBarScrollMode.Fixed || slots == 0) return equal
+        val space = (cyl_itemSpaceInScrollMode * resources.displayMetrics.density).toInt()
+        val plusIndex = plusButtonIndex()
+        var button = 0
+        val widths = IntArray(slots) { slot ->
+            if (slot == plusIndex) maxOf(plusButton?.measuredWidth ?: 0, width / maxOf(slots, 1) / 2)
+            else buttons[button++].cyl_contentWidth() + space
         }
+        return if (widths.sum() <= width) equal else widths
+    }
+
+    private fun slotLeft(slot: Int): Int { var left = 0; for (index in 0 until slot) left += slotWidths.getOrElse(index) { 0 }; return left }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        val density = resources.displayMetrics.density
+        if (slotWidths.size != slotCount()) slotWidths = computeSlotWidths(width)
+        val plusIndex = plusButtonIndex()
+        var slot = 0
+        for ((index, button) in buttons.withIndex()) {
+            if (index == plusIndex) slot++
+            val slotStart = slotLeft(slot)
+            val left = slotStart + (cyl_itemEdgeInsets.left * density).toInt()
+            button.layout(left, (cyl_itemEdgeInsets.top * density).toInt(), slotStart + slotWidths.getOrElse(slot) { 0 } - (cyl_itemEdgeInsets.right * density).toInt(), height - (cyl_itemEdgeInsets.bottom * density).toInt())
+            slot++
+        }
+        plusButton?.let { plus -> val plusWidth = slotWidths.getOrElse(plusIndex) { 0 }; layoutPlusButton(plus, slotLeft(plusIndex) + plusWidth / 2, plusWidth, density) }
+        if (scrollX > maxScrollX) scrollTo(maxScrollX, 0)
+        layoutFixedChildren()
+        if (changed || indicatorAnimator == null) layoutIndicator(animated = false)
         for (child in 0 until childCount) {
             // [EN] Badges of the plus button (or any direct child) follow their host after a layout. [CN] PlusButton（或任何直接子视图）的角标在布局后跟随宿主。
             val badge = getChildAt(child) as? CYLBadgeView ?: continue
@@ -393,6 +604,16 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     }
 
     /** [EN] The plus button centered on `centerX`, its centerY from the multiplier and offset, grown down to the tab titles' line when the title is aligned. [CN] PlusButton 以 `centerX` 居中，centerY 来自倍数与偏移；标题对齐时向下延伸到 Tab 标题所在的线。 */
+    /** [EN] The shadow line, background and effect views stay in place while the tabs scroll. [CN] 阴影线、背景与效果视图在 Tab 滚动时保持不动。 */
+    private fun layoutFixedChildren() {
+        val density = resources.displayMetrics.density
+        shadow.layout(scrollX, 0, scrollX + width, maxOf(1, (0.5f * density).toInt()))
+        for (background in listOfNotNull(if (childCount > 0 && getChildAt(0) !is CYLTabBarItemButton && getChildAt(0) !== shadow) getChildAt(0) else null, effectView)) {
+            background.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+            background.layout(scrollX, 0, scrollX + width, height)
+        }
+    }
+
     private fun layoutPlusButton(plus: CYLPlusButton, centerX: Int, slotWidth: Int, density: Float) {
         val tabBarHeight = height / density
         val appliesOffset = plus.cyl_showsTitleInTabBarItem() || plus.cyl_appliesCenterYOffsetWithoutTitle || plus.provider != null
@@ -418,6 +639,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
+        cyl_indicator?.draw(canvas, paddingTop, height - paddingBottom, resources.displayMetrics.density)
         val plus = plusButton ?: return
         if (plus.showsTouchableArea) {
             // [EN] `showsTouchableArea` (#91): the touchable rect, for debugging. [CN] `showsTouchableArea`（#91）：绘制可点击区域，用于调试。
@@ -427,19 +649,19 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     }
 
     /** [EN] Whether a touch (in this bar's coordinates) falls in the plus button's touchable rect, inside or outside the bar (#91). [CN] 触摸（本 TabBar 坐标）是否落在 PlusButton 的可点击矩形内，无论在 TabBar 内外（#91）。 */
-    fun cyl_plusButtonTouchable(x: Float, y: Float): Boolean = plusButton?.touchableRect()?.contains(x.toInt(), y.toInt()) ?: false
+    fun cyl_plusButtonTouchable(x: Float, y: Float): Boolean = plusButton?.touchableRect()?.contains((x + scrollX).toInt(), y.toInt()) ?: false
 
     /** [EN] Sends a touch (in this bar's coordinates) to the plus button. [CN] 把触摸（本 TabBar 坐标）交给 PlusButton。 */
     fun cyl_dispatchTouchToPlusButton(event: MotionEvent): Boolean {
         val plus = plusButton ?: return false
-        val forwarded = MotionEvent.obtain(event).apply { offsetLocation(-plus.left.toFloat(), -plus.top.toFloat()) }
+        val forwarded = MotionEvent.obtain(event).apply { offsetLocation(scrollX - plus.left.toFloat(), -plus.top.toFloat()) }
         val handled = plus.dispatchTouchEvent(forwarded)
         forwarded.recycle()
         return handled
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        if (event.actionMasked == MotionEvent.ACTION_DOWN && cyl_plusButtonTouchable(event.x, event.y) && plusButton?.let { !Rect(it.left, it.top, it.right, it.bottom).contains(event.x.toInt(), event.y.toInt()) } == true) {
+        if (event.actionMasked == MotionEvent.ACTION_DOWN && cyl_plusButtonTouchable(event.x, event.y) && plusButton?.let { !Rect(it.left, it.top, it.right, it.bottom).contains((event.x + scrollX).toInt(), event.y.toInt()) } == true) {
             plusRoutedTouch = true
         }
         if (plusRoutedTouch) {

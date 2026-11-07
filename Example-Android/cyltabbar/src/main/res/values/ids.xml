@@ -4,4 +4,11 @@
     <item name="cyl_tab_bar_item_animation_player" type="id" />
     <item name="cyl_tab_bar_item_view_animator" type="id" />
     <item name="cyl_tab_bar_item_animation_view" type="id" />
+    <!-- [EN] Theme values (adapted from QMUI skin). [CN] 主题值（改编自 QMUI 换肤）。 -->
+    <item name="cyl_theme_value" type="id" />
+    <item name="cyl_theme_value_applied" type="id" />
+    <item name="cyl_theme_dispatched" type="id" />
+    <item name="cyl_theme_intercept_dispatch" type="id" />
+    <item name="cyl_theme_ignore_apply" type="id" />
+    <item name="cyl_theme_attach_listener" type="id" />
 </resources>

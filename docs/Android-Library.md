@@ -24,6 +24,7 @@
 |:---|:---|
 | [模块](#cn模块) | [Modules](#enmodules) |
 | [用法](#cn用法) | [Usage](#enusage) |
+| [仅 Android 的扩展](#cn仅-android-的扩展) | [Android-only extensions](#enandroid-only-extensions) |
 | [测试](#cn测试) | [Tests](#entests) |
 | [限制](#cn限制) | [Limits](#enlimits) |
 
@@ -87,12 +88,48 @@ CYLBadgeKt.cyl_showBadgeValue(controller.getTabBar().getTabBarButtonArray().get(
 | 角标：`CYLBadgeAppearance.globalAppearance`（#425，视图上的值优先）、`CYLBadgeTextDisplaying`、`CYLTabBarBadgeView`，工具栏菜单项（`MenuItem.cyl_showBadgeValue`）、`CYLTabBarItem.badgeValue` 与角标扩展、iOS 的全部动画类型（含 …Once），示例行（`ImageView.cyl_showBadgeForRow`）、`CYLBadgeHelperTableViewController`、`Fragment.cyl_showNavigationBadgeValue`。 | Badges: `CYLBadgeAppearance.globalAppearance` (#425, a value on the view wins), `CYLBadgeTextDisplaying`, `CYLTabBarBadgeView`, toolbar menu items (`MenuItem.cyl_showBadgeValue`), `CYLTabBarItem.badgeValue` and its badge extensions, every iOS animation type (the …Once ones too), the sample rows (`ImageView.cyl_showBadgeForRow`), `CYLBadgeHelperTableViewController`, `Fragment.cyl_showNavigationBadgeValue`. |
 | 内存警告（#426）：`unloadsUnselectedViewsOnMemoryWarning` 时，`onTrimMemory` / `onLowMemory` 分离未选中的 Tab（销毁视图、保留页面），选中时重新创建视图；`cyl_simulateMemoryWarning…`、`Fragment.cyl_simulateMemoryWarningAndShowResult`。导航：`CYLBaseNavigationController`（在根页面之上 push 时隐藏 TabBar）、`cyl_pushOrPopToViewController(…, callback)`。 | Memory warnings (#426): with `unloadsUnselectedViewsOnMemoryWarning`, `onTrimMemory` / `onLowMemory` detach the unselected tabs (views destroyed, pages kept), which create their views again when selected; `cyl_simulateMemoryWarning…`, `Fragment.cyl_simulateMemoryWarningAndShowResult`. Navigation: `CYLBaseNavigationController` (the tab bar hides above the root page), `cyl_pushOrPopToViewController(…, callback)`. |
 
+## [CN]仅 Android 的扩展
+## [EN]Android-only extensions
+
+| 中文 | English |
+|:---|:---|
+| 以下功能 iOS 没有，改编自 [QMUI_Android](https://github.com/Tencent/QMUI_Android)（MIT 许可证，移植的文件保留腾讯的版权声明）的 `QMUITabSegment` 与 `QMUISkinManager`，命名改用本库规范。全部默认关闭，不开启时行为与 iOS 相同。对比与评分见 [与 QMUI_Android 的对比](Android-QMUI-Comparison.md)。 | These features have no iOS counterpart. They are adapted from `QMUITabSegment` and `QMUISkinManager` of [QMUI_Android](https://github.com/Tencent/QMUI_Android) (MIT License; the ported files keep Tencent's copyright notice), renamed to this library's conventions. All are off by default, so without them the behavior matches iOS. Comparison and scores: [compared with QMUI_Android](Android-QMUI-Comparison.md). |
+
+```kotlin
+// [EN] Tabs: an indicator, swiping between pages, and the scrollable mode. [CN] Tab：指示条、滑动翻页与可滚动模式。
+controller.tabBar.cyl_indicator = CYLTabBarIndicator(height = 3f, top = false, widthFollowsContent = true, cornerRadius = 1.5f)
+controller.cyl_swipesBetweenPages = true
+controller.tabBar.cyl_scrollMode = CYLTabBarScrollMode.Scrollable
+controller.tabBar.cyl_updateIndicatorPosition(index, offsetPercent)   // from the app's own pager 来自 App 自己的翻页控件
+
+// [EN] Theme values: rules that name values of the current theme (a style, a Map or a provider). [CN] 主题值：按名称引用当前主题中值的规则（style、Map 或 provider）。
+CYLThemeManagerCenter.defaultThemeManager.addThemeIdentifier("dark", CYLThemeStyle(R.style.AppTheme_Dark))
+CYLThemeManagerCenter.defaultThemeManager.addThemeIdentifier("blue", mapOf("title" to Color.BLUE, "surface" to "#F0F4FF"))
+titleView.cyl_setThemeValue(CYLThemeValueBuilder().textColor("title").background("surface"))
+CYLThemeValues.installLayoutInflaterFactory(this)   // before super.onCreate: reads app:cyl_themeTextColor="title" in layouts 在 super.onCreate 之前
+CYLThemeValues.register(dialog)                      // follows theme changes outside the tab bar controller 在 TabBarController 之外也跟随主题
+CYLThemeValues.setRuleHandler("elevation") { view, _, value -> view.elevation = value.float ?: 0f }
+```
+
+| API | 中文 | English |
+|:---|:---|:---|
+| `CYLTabBar.cyl_indicator`（`CYLTabBarIndicator`） | 选中指示条：高度（dp）、上 / 下、跟随标题宽度或整个 Tab、固定颜色或跟随选中标题颜色、drawable、圆角；选中变化时移动（`cyl_indicatorAnimationDuration`，默认 0.2 秒），点击 PlusButton 子页面时隐藏。 | The selection indicator: height (dp), top / bottom, the title's width or the whole tab, a fixed color or the selected title color, a drawable, corners; it moves when the selection changes (`cyl_indicatorAnimationDuration`, 0.2 s by default) and hides while the plus button's page is shown. |
+| `CYLTabBar.cyl_scrollMode`、`cyl_itemSpaceInScrollMode` | `Scrollable`：每个 Tab 按内容加间距（默认 24 dp）定宽，总宽超过 TabBar 时可拖动和惯性滚动，选中的 Tab 滚到中间；放得下时仍等宽。背景、阴影线与 PlusButton 的点击区域不受滚动影响。 | `Scrollable`: each tab is its content plus a space (24 dp by default) wide; when the tabs are wider than the bar it drags and flings, and the selected tab scrolls to the middle; when they fit, they stay equal. The background, the shadow line and the plus button's touch area are not affected by scrolling. |
+| `CYLTabBarController.cyl_swipesBetweenPages` | 在页面上横向拖动切换到相邻 Tab：相邻页面、指示条与标题颜色跟随手指，超过 40% 或快速滑动后选中，否则弹回。子视图仍可沿该方向滚动时（横向列表、地图）不抢手势；点击时不能选中的 Tab（`shouldSelect` 为 false、自定义动作、需要登录）不会移动。选中后与点击一样通知代理，但不播放点击动画。 | A horizontal drag on the pages moves to the neighbor tab: the neighbor page, the indicator and the title colors follow the finger; past 40 % or after a fling it is selected, otherwise it springs back. A child that can still scroll that way (a horizontal list, a map) keeps the drag; a tab a tap could not select (`shouldSelect` false, a custom action, a login) does not move. The delegate is told as for a tap, without the tap animation. |
+| `CYLTabBar.cyl_updateIndicatorPosition(index, offsetPercent)` | 供 App 自己的翻页控件（如 ViewPager2 的 `onPageScrolled`）调用：`offsetPercent` 为正时移向下一个 Tab，为负时移向上一个，0 时回到 `index`。 | For an app's own pager (e.g. ViewPager2's `onPageScrolled`): a positive `offsetPercent` moves towards the next tab, a negative one towards the previous one, 0 back to `index`. |
+| `View.cyl_themeValue`、`CYLThemeValueBuilder` | 视图的主题规则 `"rule:name\|rule:name"`，立即应用，并在每次主题变化时应用。内置规则：`background`、`bgTintColor`、`textColor`、`hintColor`、`linkColor`、`src`、`tintColor`、`alpha`、`border`、`progressColor`、`tcTintColor`、`tclSrc` / `tctSrc` / `tcrSrc` / `tcbSrc`（TextView 四边的图）。 | The view's theme rules, `"rule:name\|rule:name"`, applied now and on every theme change. Built-in rules: `background`, `bgTintColor`, `textColor`, `hintColor`, `linkColor`, `src`, `tintColor`, `alpha`, `border`, `progressColor`, `tcTintColor`, `tclSrc` / `tctSrc` / `tcrSrc` / `tcbSrc` (a TextView's compound drawables). |
+| `CYLThemeStyle`、`Map` 主题、`CYLThemeValueProviding` / `Map` themes | 值名称的来源：`CYLThemeStyle(R.style.X)` 中的同名主题属性（先找 App 的，再找系统的，如 `colorAccent`）；`Map` 主题（例如来自配置文件）中的条目（颜色整数、`"#RRGGBB"`、ColorStateList、Drawable、数字、`CYLThemeColor` / `CYLThemeImage`）；provider 的返回值；没有主题时为视图 context 主题中的属性。 | Where value names come from: the theme attribute of that name in `CYLThemeStyle(R.style.X)` (the app's first, then the platform's, e.g. `colorAccent`); the entry of a `Map` theme (e.g. from a configuration file: a color Int, `"#RRGGBB"`, a ColorStateList, a Drawable, a number, a `CYLThemeColor` / `CYLThemeImage`); a provider's answer; with no theme, the attribute of the view's context theme. |
+| `app:cyl_theme…`、`CYLThemeValues.installLayoutInflaterFactory`、`applyAttributes` | 布局属性（`cyl_themeTextColor="title"`，或 `cyl_themeValue` 写完整字符串）。在 `super.onCreate` 之前安装 factory；`AppCompatActivity` 的视图替换保留（先询问其 delegate），`<fragment>` 仍由 Activity 处理。已有自己 factory 的 App 在自定义视图中调用 `applyAttributes(view, attrs)`。 | Layout attributes (`cyl_themeTextColor="title"`, or the whole string in `cyl_themeValue`). Install the factory before `super.onCreate`; an `AppCompatActivity` keeps its view replacement (its delegate is asked first) and `<fragment>` stays with the activity. Apps with their own factory call `applyAttributes(view, attrs)` in their custom views. |
+| `CYLThemeValues.register` / `unregister` | 让 Activity、Fragment、View、Dialog、Window、PopupWindow 在 TabBarController 之外也跟随主题；登记时立即应用当前主题。 | Lets an activity, fragment, view, dialog, window or popup window follow theme changes outside the tab bar controller; it gets the current theme when registered. |
+| `CYLThemeSpan`、`CYLThemeColorSpan`、`CYLThemeItemDecoration` | 主题变化时通知 TextView 文本中的 span 与 RecyclerView 的 ItemDecoration（RecyclerView 通过反射访问，库不依赖它），然后重绘。 | A theme change tells the spans of a TextView's text and the ItemDecorations of a RecyclerView (reached by reflection, so the library does not depend on it), then redraws. |
+| `cyl_interceptsThemeDispatch`、`CYLThemeDispatchInterceptor`、`cyl_ignoresThemeApply`、`cyl_themeValueManager`、`setRuleHandler` | 拦截某个子树、跳过视图自身、指定视图跟随的管理器、增加或替换规则。每次主题变化每个视图只处理一次，反射方法与属性 id 有缓存，之后才附加到窗口的视图（列表 cell、对话框）自动跟上当前主题。 | Keep a subtree out, skip a view itself, choose the manager a view follows, add or replace rules. Each view is handled once per theme change, reflected methods and attribute ids are cached, and views attached later (list cells, dialogs) catch up with the current theme. |
+
 ## [CN]测试
 ## [EN]Tests
 
 ```sh
 cd Example-Android
-gradle :cyltabbar:testDebugUnitTest   # Robolectric + JUnit: the controller, animations, transitions, themes, badges, memory warnings, every configuration format
+gradle :cyltabbar:testDebugUnitTest   # Robolectric + JUnit: the controller, animations, transitions, themes, badges, memory warnings, every configuration format, the Android-only extensions
 gradle :tabpages:test                 # 11 JVM tests of the registry and the configuration rules
 gradle :app:assembleDebug             # the demo app (needs the Android SDK)
 ```

@@ -9,6 +9,8 @@ import com.cyl.tabbar.CYLConstants
 import com.cyl.tabbar.CYLEnums
 import com.cyl.tabbar.CYLPlusButton
 import com.cyl.tabbar.CYLTabBarController
+import com.cyl.tabbar.CYLTabBarIndicator
+import com.cyl.tabbar.CYLTabBarScrollMode
 import com.cyl.tabbar.cyl_showBadgeValue
 
 /**
@@ -59,11 +61,26 @@ class MainActivity : AppCompatActivity() {
         title = getString(R.string.app_name) + " · " + style.name
         controller.tabBar.tabBarButtonArray.getOrNull(1)?.cyl_showBadgeValue("12")
         controller.tabBar.tabBarButtonArray.getOrNull(3)?.cyl_showBadgeValue("")
+        applyAndroidExtras(controller)
+    }
+
+    private var androidExtras = false
+
+    /**
+     * [EN] The Android-only extras adapted from QMUI_Android: a selection indicator, swiping between the pages, and the
+     *      scrollable mode (it scrolls once the tabs are wider than the bar). Off by default, as on iOS.
+     * [CN] 改编自 QMUI_Android 的仅 Android 功能：选中指示条、滑动翻页与可滚动模式（Tab 总宽超过 TabBar 时可滚动）。默认关闭，与 iOS 一致。
+     */
+    private fun applyAndroidExtras(controller: CYLTabBarController) {
+        controller.tabBar.cyl_indicator = if (androidExtras) CYLTabBarIndicator(height = 3f, top = true, cornerRadius = 1.5f) else null
+        controller.cyl_swipesBetweenPages = androidExtras
+        controller.tabBar.cyl_scrollMode = if (androidExtras) CYLTabBarScrollMode.Scrollable else CYLTabBarScrollMode.Fixed
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menu.add(Menu.NONE, MENU_FLAT, Menu.NONE, "FlatDesign")
         menu.add(Menu.NONE, MENU_GLASS, Menu.NONE, "LiquidGlass")
+        menu.add(Menu.NONE, MENU_EXTRAS, Menu.NONE, R.string.android_extras).isCheckable = true
         DemoTheme.all.forEachIndexed { index, theme -> menu.add(MENU_SKINS, MENU_SKIN + index, index, getString(R.string.skin_prefix) + theme.name) }
         return true
     }
@@ -72,6 +89,11 @@ class MainActivity : AppCompatActivity() {
         when {
             item.itemId == MENU_FLAT -> showTabBar(CYLEnums.CYLTabBarStyleType.FlatDesign)
             item.itemId == MENU_GLASS -> showTabBar(CYLEnums.CYLTabBarStyleType.LiquidGlass)
+            item.itemId == MENU_EXTRAS -> {
+                androidExtras = !androidExtras
+                item.isChecked = androidExtras
+                controller?.let { applyAndroidExtras(it) }
+            }
             item.itemId >= MENU_SKIN -> DemoTheme.apply(DemoTheme.all[item.itemId - MENU_SKIN].name)
             else -> return super.onOptionsItemSelected(item)
         }
@@ -82,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         const val MENU_FLAT = 1
         const val MENU_GLASS = 2
         const val MENU_SKINS = 3
+        const val MENU_EXTRAS = 4
         const val MENU_SKIN = 100
     }
 }

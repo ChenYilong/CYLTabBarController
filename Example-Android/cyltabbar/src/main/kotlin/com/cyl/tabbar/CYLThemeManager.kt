@@ -65,11 +65,15 @@ class CYLThemeManager(val name: String = CYLThemeManagerNameDefault) {
             val theme = value?.let { themeForIdentifier(it) }
             if (value != null && theme == null) return
             field = value
+            themeVersion++
             persisted?.edit()?.putString(persistenceKey, value?.toString())?.apply()
             for (listener in listeners) listener.cyl_themeDidChangeByManager(this, value, theme)
             // [EN] Then every view and page of the live tab bar controllers' windows (UIView / UIViewController (CYLTheme)). [CN] 然后通知存活 TabBarController 窗口中的所有视图与页面。
             CYLThemeDispatcher.dispatch(this, value, theme)
         }
+    /** [EN] Counts the theme changes; a view reached twice in one change is brought to it once. [CN] 主题变化次数；同一次变化中访问两次的视图只处理一次。 */
+    internal var themeVersion: Int = 0
+        private set
     val currentTheme: Any? get() = currentThemeIdentifier?.let { themeForIdentifier(it) }
 
     /** [EN] `persistsCurrentThemeIdentifier`: remembered across launches through `persistIn(context)`. [CN] 通过 `persistIn(context)` 跨启动记住当前主题。 */

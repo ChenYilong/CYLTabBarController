@@ -25,7 +25,7 @@
 | [总分](#cn总分) | [Totals](#entotals) |
 | [Tab 实现评分](#cntab-实现评分) | [Scores of the tab implementation](#enscores-of-the-tab-implementation) |
 | [主题切换与换肤评分](#cn主题切换与换肤评分) | [Scores of theme switching and skins](#enscores-of-theme-switching-and-skins) |
-| [可借鉴之处](#cn可借鉴之处) | [What to take from QMUI](#enwhat-to-take-from-qmui) |
+| [已移植](#cn已移植) | [Ported](#enported) |
 
 <!-- navigation:end -->
 
@@ -34,12 +34,13 @@
 
 | 表格 Table | CYLTabBarController | QMUI_Android | 差距 Gap |
 |:---|:---:|:---:|:---:|
-| Tab 实现（19 个维度） / The tab implementation (19 dimensions) | **79** | **60** | +19 |
-| 主题切换与换肤（16 个维度） / Theme switching and skins (16 dimensions) | **77** | **61** | +16 |
+| Tab 实现（19 个维度） / The tab implementation (19 dimensions) | **79 → 86** | **60** | +19 → +26 |
+| 主题切换与换肤（16 个维度） / Theme switching and skins (16 dimensions) | **77 → 83** | **61** | +16 → +22 |
 
 | 中文 | English |
 |:---|:---|
-| 两者定位不同：CYLTabBarController 是带页面管理的底部 TabBarController（对应 iOS 的 `UITabBarController`），QMUI 是顶部 / 底部通用的分段 Tab 控件，页面交给 `ViewPager` / `ViewPager2`。CYL 胜在页面管理、PlusButton、动画图标、配置文件、测试与持续维护；QMUI 胜在指示器、可滚动模式、滑动翻页联动、Maven 发布与生产验证，以及可覆盖任意 View 的换肤体系。 | The two aim at different things: CYLTabBarController is a bottom tab bar controller that manages pages (the Android counterpart of iOS `UITabBarController`); QMUI's is a general segmented tab control for the top or the bottom that leaves the pages to `ViewPager` / `ViewPager2`. CYL wins on page management, the plus button, animated icons, configuration files, tests and active maintenance; QMUI wins on the indicator, the scrollable mode, swipe paging, Maven distribution, production use, and a skin system that reaches any view. |
+| 「79 → 86」表示首次对比时的分数 → 移植 QMUI 落后维度之后的分数（见[已移植](#cn已移植)）。 | "79 → 86" is the score at the first comparison → the score after porting QMUI's code for the dimensions where we were behind (see [Ported](#enported)). |
+| 两者定位不同：CYLTabBarController 是带页面管理的底部 TabBarController（对应 iOS 的 `UITabBarController`），QMUI 是顶部 / 底部通用的分段 Tab 控件，页面交给 `ViewPager` / `ViewPager2`。CYL 胜在页面管理、PlusButton、动画图标、配置文件、测试与持续维护；首次对比时 QMUI 胜在指示器、可滚动模式、滑动翻页联动、Maven 发布与生产验证，以及可覆盖任意 View 的换肤体系；移植之后，QMUI 仍领先的是 Maven 发布与生产验证、一行代码绑定 ViewPager2 与按权重分配宽度。 | The two aim at different things: CYLTabBarController is a bottom tab bar controller that manages pages (the Android counterpart of iOS `UITabBarController`); QMUI's is a general segmented tab control for the top or the bottom that leaves the pages to `ViewPager` / `ViewPager2`. CYL wins on page management, the plus button, animated icons, configuration files, tests and active maintenance; At the first comparison QMUI won on the indicator, the scrollable mode, swipe paging, Maven distribution, production use, and a skin system that reaches any view; after the port, QMUI still leads on Maven distribution and production use, a one-line ViewPager2 binding and widths by weight. |
 
 ## [CN]Tab 实现评分
 ## [EN]Scores of the tab implementation
@@ -47,17 +48,17 @@
 | 维度 Dimension | CYL | QMUI | 说明 | Notes |
 |:---|:---:|:---:|:---|:---|
 | 定位与页面管理 / Scope and page management | 95 | 60 | CYL 管理 Fragment 页面、每个 Tab 的返回栈（`cyl_pushViewController`）与生命周期；QMUI 只是控件，页面由 ViewPager 管理 | CYL manages fragment pages, a back stack per tab (`cyl_pushViewController`) and their lifecycle; QMUI is a control only, ViewPager manages the pages |
-| Tab 内容与布局 / Item content and layout | 85 | 90 | QMUI：图标在上 / 下 / 左 / 右、宽高限制、图标缩放、字重渐变、间距；CYL：图标标题、布局样式、标题偏移、FlatDesign / Liquid Glass 样式 | QMUI: icon top / bottom / left / right, size limits, icon scale, typeface weight transition, gaps; CYL: icon and title, layout styles, title offsets, FlatDesign / Liquid Glass styles |
-| 选中动画 / Selection animation | 95 | 80 | CYL：点击动画、页面转场、Lottie / PAG / Rive / GIF 动画图标；QMUI：颜色插值、指示器滑动、图标缩放 | CYL: tap animations, page transitions, Lottie / PAG / Rive / GIF icons; QMUI: color interpolation, sliding indicator, icon scale |
-| 指示器与滚动模式 / Indicator and scroll mode | 20 | 95 | QMUI 有指示器、固定 / 可滚动模式、按权重分配宽度；CYL 没有指示器与可滚动模式 | QMUI has an indicator, fixed / scrollable modes and width by weight; CYL has neither an indicator nor a scrollable mode |
-| 滑动翻页联动 / Swipe paging | 30 | 90 | QMUI `setupWithViewPager` 与 ViewPager2 联动；CYL 不支持左右滑动切换 Tab | QMUI follows ViewPager / ViewPager2 (`setupWithViewPager`); CYL has no swipe between tabs |
+| Tab 内容与布局 / Item content and layout | 85 → 88 | 90 | QMUI：图标在上 / 下 / 左 / 右、宽高限制、图标缩放、字重渐变、间距；CYL：图标标题、布局样式、标题偏移、FlatDesign / Liquid Glass 样式 | QMUI: icon top / bottom / left / right, size limits, icon scale, typeface weight transition, gaps; CYL: icon and title, layout styles, title offsets, FlatDesign / Liquid Glass styles |
+| 选中动画 / Selection animation | 95 → 97 | 80 | CYL：点击动画、页面转场、Lottie / PAG / Rive / GIF 动画图标；QMUI：颜色插值、指示器滑动、图标缩放 | CYL: tap animations, page transitions, Lottie / PAG / Rive / GIF icons; QMUI: color interpolation, sliding indicator, icon scale |
+| 指示器与滚动模式 / Indicator and scroll mode | 20 → 90 | 95 | QMUI 有指示器、固定 / 可滚动模式、按权重分配宽度；CYL 移植后有 `cyl_indicator`（颜色或 drawable、上 / 下、跟随内容宽度、圆角、移动动画）与 `cyl_scrollMode`（按内容定宽、拖动与惯性滚动、选中 Tab 自动滚到中间），尚无按权重分配宽度 | QMUI has an indicator, fixed / scrollable modes and width by weight; after the port CYL has `cyl_indicator` (a color or a drawable, top / bottom, content width, corners, a moving animation) and `cyl_scrollMode` (width by content, drag and fling, the selected tab scrolled to the middle), but no width by weight |
+| 滑动翻页联动 / Swipe paging | 30 → 85 | 90 | QMUI `setupWithViewPager` 与 ViewPager2 联动；CYL 移植后有内置的 `cyl_swipesBetweenPages`（相邻页面跟随手指、子视图可横向滚动时不抢手势、遵守 `shouldSelect` 与登录），App 自己的翻页控件可调用 `cyl_updateIndicatorPosition`；尚无一行代码绑定 ViewPager2 | QMUI follows ViewPager / ViewPager2 (`setupWithViewPager`); after the port CYL has a built-in `cyl_swipesBetweenPages` (the neighbor page follows the finger, a child that scrolls sideways keeps the drag, `shouldSelect` and login are respected), and an app's own pager can call `cyl_updateIndicatorPosition`; there is no one-line ViewPager2 binding yet |
 | 角标 / Badges | 90 | 75 | CYL：数字、文字、红点、颜色、偏移、选中时隐藏；QMUI：数字与红点及其边距 | CYL: numbers, text, dots, colors, offsets, hiding on the selected tab; QMUI: numbers and dots with margins |
 | 中间凸起按钮 / Raised center button | 95 | 0 | CYL `CYLPlusButton`（可绑定页面、角标、动画）；QMUI 无 | CYL `CYLPlusButton` (with a page, a badge, animations); QMUI has none |
 | 配置与动态化 / Configuration and dynamic tabs | 98 | 55 | CYL：JSON / YAML / plist 等配置文件、网络 URL、页面注册表、按平台与版本过滤、异步页面；QMUI：代码 Builder，`replaceTab` / `notifyDataChanged` | CYL: configuration files (JSON, YAML, plist and more), network URLs, a page registry, filtering by platform and version, asynchronous pages; QMUI: a builder in code, `replaceTab` / `notifyDataChanged` |
 | 事件与手势 / Events and gestures | 90 | 85 | 两者都有选中、取消、重复选中、双击；CYL 另有长按、`shouldSelect` 与代理 | Both have select, unselect, reselect and double tap; CYL adds long press, `shouldSelect` and a delegate |
 | 跨平台一致性 / Cross-platform consistency | 95 | 30 | CYL 与 iOS 共用同一份配置文件与 API 名称；QMUI 的 iOS 版本 API 不同 | CYL shares the configuration file and API names with iOS; QMUI's iOS library has a different API |
 | API 设计 / API design | 75 | 80 | QMUI 是流畅的 Java Builder；CYL 用 Kotlin，但保留 iOS 风格的 `cyl_` 前缀名 | QMUI has a fluent Java builder; CYL is Kotlin but keeps iOS-style `cyl_` names |
-| 测试 / Tests | 85 | 10 | CYL 有 Robolectric 单元测试（cyltabbar 33、tabpages 11，另有示例测试）；QMUI 只有模板测试 | CYL has Robolectric unit tests (33 in cyltabbar, 11 in tabpages, plus example tests); QMUI has template tests only |
+| 测试 / Tests | 85 → 88 | 10 | CYL 有 Robolectric 单元测试（cyltabbar 33、tabpages 11，另有示例测试）；QMUI 只有模板测试 | CYL has Robolectric unit tests (33 in cyltabbar, 11 in tabpages, plus example tests); QMUI has template tests only |
 | 持续集成与静态分析 / CI and static analysis | 60 | 20 | CYL 有 SonarCloud 与 lint，但 GitHub Actions 尚未运行 Gradle；QMUI 无 CI | CYL has SonarCloud and lint, but GitHub Actions does not run Gradle yet; QMUI has no CI |
 | 文档 / Documentation | 90 | 60 | CYL 有中英双语文档与 API 对照表；QMUI 靠 Wiki 与示例 | CYL has bilingual documents and an API map; QMUI relies on its wiki and demo |
 | 示例 / Demos | 90 | 85 | CYL 有 4 个示例 App；QMUI 的 `qmuidemo` 有 6 个 Tab 示例 | CYL has 4 example apps; QMUI's `qmuidemo` has 6 tab demos |
@@ -65,15 +66,15 @@
 | 维护活跃度 / Maintenance | 95 | 30 | QMUI 最后一次提交是 2023-07；CYL 持续开发 | QMUI's last commit is from 2023-07; CYL is under active development |
 | 工具链 / Toolchain | 90 | 60 | CYL：AGP 8.7、compileSdk 35、minSdk 23、Kotlin 2.0；QMUI：compileSdk 31、minSdk 21 | CYL: AGP 8.7, compileSdk 35, minSdk 23, Kotlin 2.0; QMUI: compileSdk 31, minSdk 21 |
 | 体积与依赖 / Size and dependencies | 85 | 60 | CYL 的动画库是可选的（通过反射调用）；QMUI 的 Tab 需要引入整个 `qmui` 库 | CYL's animation libraries are optional (called through reflection); QMUI's tabs need the whole `qmui` library |
-| **平均 / Average** | **79** | **60** | | |
+| **平均 / Average** | **79 → 86** | **60** | | |
 
 ## [CN]主题切换与换肤评分
 ## [EN]Scores of theme switching and skins
 
 | 维度 Dimension | CYL | QMUI | 说明 | Notes |
 |:---|:---:|:---:|:---|:---|
-| 架构 / Architecture | 85 | 90 | QMUI：每套皮肤是一个 style，View 通过属性取值；CYL：`CYLThemeManager` 按标识管理任意主题对象 | QMUI: each skin is a style and views read attributes from it; CYL: `CYLThemeManager` manages any theme object by identifier |
-| 任意 View 覆盖 / Reaching any view | 70 | 95 | QMUI 通过 XML 属性、`LayoutInflater` Factory 与 20 种规则覆盖任意 View；CYL 为 View 提供背景、描边、阴影颜色、反射属性与效果 | QMUI reaches any view through XML attributes, a `LayoutInflater` factory and 20 rule handlers; CYL gives views background, border and shadow colors, reflected properties and effects |
+| 架构 / Architecture | 85 → 90 | 90 | QMUI：每套皮肤是一个 style，View 通过属性取值；CYL：`CYLThemeManager` 按标识管理任意主题对象 | QMUI: each skin is a style and views read attributes from it; CYL: `CYLThemeManager` manages any theme object by identifier |
+| 任意 View 覆盖 / Reaching any view | 70 → 92 | 95 | QMUI 通过 XML 属性、`LayoutInflater` Factory 与 20 种规则覆盖任意 View；CYL 移植后有主题值：`app:cyl_theme…` 布局属性与 `CYLThemeLayoutInflaterFactory`、`CYLThemeValueBuilder`、15 种内置规则与 `setRuleHandler`，值来自 style、Map 或 provider（QMUI 另有 5 种只用于其自带控件的规则） | QMUI reaches any view through XML attributes, a `LayoutInflater` factory and 20 rule handlers; after the port CYL has theme values: `app:cyl_theme…` layout attributes with `CYLThemeLayoutInflaterFactory`, `CYLThemeValueBuilder`, 15 built-in rules and `setRuleHandler`, with values from a style, a Map or a provider (QMUI's other 5 rules serve only its own widgets) |
 | TabBar 专属主题 / Tab bar themes | 98 | 75 | CYL `CYLTabBarTheme` 可替换 Tab、PlusButton、外观并自定义控制器；QMUI 只换 Tab 的颜色、图片与着色 | CYL `CYLTabBarTheme` replaces the tabs, the plus button and the appearance and customizes the controller; QMUI changes only tab colors, drawables and tints |
 | 运行时与远程皮肤 / Runtime and remote skins | 90 | 40 | CYL 支持主题生成器与网络图标；QMUI 皮肤只能是编译期的 style | CYL has theme generators and network icons; QMUI skins are compiled styles only |
 | 恢复原样 / Restoring the original | 90 | 60 | CYL 去掉主题时恢复 App 原本的 Tab 与 PlusButton；QMUI 只能切换到另一套皮肤 | CYL restores the app's own tabs and plus button when a theme is removed; QMUI can only switch to another skin |
@@ -82,17 +83,31 @@
 | 多个管理器 / Several managers | 85 | 85 | 两者都支持命名的多个管理器（`themeManagerWithName` / `QMUISkinManager.of`） | Both support several named managers (`themeManagerWithName` / `QMUISkinManager.of`) |
 | 切换过渡动画 / Transition animation | 25 | 20 | CYL 声明了 `themeChangeAnimationDuration`，但尚未生效；QMUI 无 | CYL declares `themeChangeAnimationDuration` but does not use it yet; QMUI has none |
 | 监听 / Listeners | 85 | 85 | 两者都有切换监听 | Both have change listeners |
-| 列表与富文本 / Lists and spans | 40 | 90 | QMUI 支持 RecyclerView 分割线与 Span；CYL 不支持 | QMUI handles RecyclerView decorations and spans; CYL does not |
-| 性能 / Performance | 65 | 85 | QMUI 有分发策略、拦截与缓存；CYL 部分依赖反射 | QMUI has dispatch strategies, interception and caching; CYL relies partly on reflection |
+| 列表与富文本 / Lists and spans | 40 → 80 | 90 | QMUI 支持 RecyclerView 分割线与 Span；CYL 移植后有 `CYLThemeSpan`、`CYLThemeColorSpan` 与 `CYLThemeItemDecoration`（通过反射访问 RecyclerView，未用真实 RecyclerView 测试） | QMUI handles RecyclerView decorations and spans; after the port CYL has `CYLThemeSpan`, `CYLThemeColorSpan` and `CYLThemeItemDecoration` (the RecyclerView is reached by reflection and was not tested with a real one) |
+| 性能 / Performance | 65 → 80 | 85 | QMUI 有分发策略、拦截与缓存；CYL 移植后每次变化每个视图只处理一次、缓存反射方法与属性 id、可拦截（`cyl_interceptsThemeDispatch`、`CYLThemeDispatchInterceptor`），新附加的视图自动跟上 | QMUI has dispatch strategies, interception and caching; after the port CYL handles each view once per change, caches reflected methods and attribute ids, can intercept (`cyl_interceptsThemeDispatch`, `CYLThemeDispatchInterceptor`), and views attached later catch up |
 | 易用性 / Ease of use | 85 | 75 | CYL 一行切换并自动作用于 TabBar；QMUI 需要在布局或代码里为每个 View 声明皮肤属性 | CYL switches in one line and reaches the tab bar automatically; QMUI needs skin attributes declared for each view in layouts or code |
-| 测试 / Tests | 60 | 10 | CYL 有主题相关单元测试；QMUI 无 | CYL has theme unit tests; QMUI has none |
+| 测试 / Tests | 60 → 75 | 10 | CYL 有主题相关单元测试；QMUI 无 | CYL has theme unit tests; QMUI has none |
 | 文档 / Documentation | 90 | 55 | CYL 有双语主题文档；QMUI 靠 Wiki | CYL has bilingual theme documents; QMUI relies on its wiki |
 | 跨平台一致性 / Cross-platform consistency | 95 | 30 | CYL 的主题 API 与 iOS `CYLThemeManager` 相同 | CYL's theme API matches iOS `CYLThemeManager` |
-| **平均 / Average** | **77** | **61** | | |
+| **平均 / Average** | **77 → 83** | **61** | | |
 
-## [CN]可借鉴之处
-## [EN]What to take from QMUI
+## [CN]已移植
+## [EN]Ported
 
 | 中文 | English |
 |:---|:---|
-| 按分差排序，CYL 可补齐：可选的滑动翻页联动（ViewPager2）、可选的选中指示器、发布到 Maven Central、在 GitHub Actions 中运行 Gradle 测试、让 `themeChangeAnimationDuration` 生效、通过 XML 属性为任意 View 换肤。 | By score gap, CYL could add: optional swipe paging (ViewPager2), an optional selection indicator, a Maven Central release, Gradle tests in GitHub Actions, a working `themeChangeAnimationDuration`, and XML attributes that skin any view. |
+| 对 QMUI 领先的维度，移植了 QMUI（MIT 许可证）的实现，命名改用本库规范（`cyl_` / `CYL`），iOS 一致的公开 API 不变。新增 API 都是仅 Android 的可选扩展，默认关闭，与 iOS 行为相同；移植的文件保留腾讯的版权与 MIT 许可声明。用法见 [Android 库](Android-Library.md#cn仅-android-的扩展)。 | For the dimensions where QMUI was ahead, its implementation (MIT License) was ported, renamed to this library's conventions (`cyl_` / `CYL`), with the iOS-matching public API unchanged. Every new API is an opt-in, Android-only extension, off by default, so the behavior matches iOS; the ported files keep Tencent's copyright and MIT notice. Usage: [Android library](Android-Library.md#enandroid-only-extensions). |
+
+| QMUI | CYL | 说明 | Notes |
+|:---|:---|:---|:---|
+| `QMUITabIndicator`、`layoutIndicator…`、`updateIndicatorPosition` | `CYLTabBarIndicator`、`CYLTabBar.cyl_indicator`、`cyl_updateIndicatorPosition` | 指示条与移动、颜色渐变 | The indicator, its move and color blend |
+| `MODE_SCROLLABLE`、`setItemSpaceInScrollMode` | `CYLTabBarScrollMode`、`cyl_scrollMode`、`cyl_itemSpaceInScrollMode` | 按内容定宽并可滚动 | Width by content, scrolling |
+| `QMUITabView.setSelectFraction`、`setupWithViewPager` | `cyl_swipesBetweenPages`（`CYLTabBarPagesContainer`） | 滑动翻页与标题渐变 | Swiping between pages, blended titles |
+| `QMUISkinValueBuilder`、`IQMUISkinRuleHandler` | `CYLThemeValueBuilder`、`CYLThemeRuleHandler`、`View.cyl_themeValue` | 主题规则 | Theme rules |
+| `QMUISkinLayoutInflaterFactory`、`QMUISkinDef` | `CYLThemeLayoutInflaterFactory`、`app:cyl_theme…` | 布局属性 | Layout attributes |
+| `QMUISkinManager.register` / `unRegister` | `CYLThemeValues.register` / `unregister` | 对话框、其他 Activity | Dialogs, other activities |
+| `IQMUISkinHandlerSpan`、`IQMUISkinHandlerDecoration`、`IQMUISkinDispatchInterceptor` | `CYLThemeSpan`、`CYLThemeItemDecoration`、`CYLThemeDispatchInterceptor` | Span、列表分割线、拦截 | Spans, list decorations, interception |
+
+| 中文 | English |
+|:---|:---|
+| 仍可补齐：发布到 Maven Central、在 GitHub Actions 中运行 Gradle 测试、让 `themeChangeAnimationDuration` 生效、一行代码绑定 ViewPager2、按权重分配 Tab 宽度。 | Still open: a Maven Central release, Gradle tests in GitHub Actions, a working `themeChangeAnimationDuration`, a one-line ViewPager2 binding, and tab widths by weight. |

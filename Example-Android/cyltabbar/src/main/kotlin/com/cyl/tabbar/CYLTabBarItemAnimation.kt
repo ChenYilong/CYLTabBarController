@@ -398,8 +398,14 @@ object CYLTabBarItemAnimationFiles {
 internal object CYLReflection {
     fun type(name: String): Class<*>? = try { Class.forName(name) } catch (error: ClassNotFoundException) { null } catch (error: LinkageError) { null }
 
+    /** [EN] Public methods by class, name and parameter count, looked up once (theme changes call setters often). [CN] 按类、名称与参数个数缓存的公开方法，只查找一次（主题变化会频繁调用 setter）。 */
+    private val methodCache = java.util.concurrent.ConcurrentHashMap<String, List<java.lang.reflect.Method>>()
+
+    private fun methods(type: Class<*>, name: String, count: Int): List<java.lang.reflect.Method> =
+        methodCache.getOrPut(type.name + "#" + name + "/" + count) { type.methods.filter { it.name == name && it.parameterTypes.size == count } }
+
     fun call(target: Any, name: String, vararg args: Any?): Any? {
-        val methods = target.javaClass.methods.filter { it.name == name && it.parameterTypes.size == args.size }
+        val methods = methods(target.javaClass, name, args.size)
         for (method in methods) {
             val adapted = adapt(method.parameterTypes, args) ?: continue
             return try { method.invoke(target, *adapted) ?: Unit } catch (error: ReflectiveOperationException) { null } catch (error: RuntimeException) { null }

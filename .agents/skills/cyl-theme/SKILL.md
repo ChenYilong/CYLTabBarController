@@ -24,3 +24,7 @@ Main document: [Theme-Switching](../../../docs/Theme-Switching.md). In-place upd
 ## Check
 
 `scripts/plus-child-theme-test.sh` and `STYLE=FlatDesign scripts/theme-screenshots.sh`; see [Plus-Child-Theme-Switching-Test](../../../docs/Plus-Child-Theme-Switching-Test.md).
+
+## Android: theme values (Android only)
+
+The Android library follows the same `CYLThemeManager` model. On top of it, theme values (adapted from QMUI_Android) let any view follow a theme by name: `View.cyl_themeValue = "textColor:title|background:surface"` (or `CYLThemeValueBuilder`, or `app:cyl_themeTextColor="title"` with `CYLThemeValues.installLayoutInflaterFactory` before `super.onCreate`). Names resolve in the current theme: a `CYLThemeStyle(R.style.X)` (theme attributes), a `Map`, or a `CYLThemeValueProviding`. Views outside a tab bar controller's activity need `CYLThemeValues.register(target)`. Never add these to the iOS API; they have no iOS twin. Details: docs/Android-Library.md, "Android-only extensions".

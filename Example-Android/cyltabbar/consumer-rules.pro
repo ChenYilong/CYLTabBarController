@@ -9,3 +9,11 @@
 -keep class com.airbnb.lottie.value.LottieValueCallback { public *; }
 -keep class org.libpag.PAGView { public *; }
 -keep class app.rive.runtime.kotlin.RiveAnimationView { public *; }
+
+# [EN] Theme values tell the CYLThemeItemDecoration of a RecyclerView through these methods (found by reflection).
+# [CN] 主题值通过这些方法（反射查找）通知 RecyclerView 的 CYLThemeItemDecoration。
+-keepclassmembers class androidx.recyclerview.widget.RecyclerView {
+    public int getItemDecorationCount();
+    public ** getItemDecorationAt(int);
+    public void invalidateItemDecorations();
+}

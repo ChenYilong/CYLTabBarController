@@ -58,7 +58,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     /** [EN] The root view: the pages above the tab bar. [CN] 根视图：页面在 TabBar 之上。 */
     val view: ViewGroup = CYLTabBarControllerView(activity).also { it.controller = this }
     /** [EN] The container of the pages. [CN] 页面容器。 */
-    val pagesContainer: FrameLayout = FrameLayout(activity).apply { id = View.generateViewId() }
+    val pagesContainer: FrameLayout = CYLTabBarPagesContainer(activity, this).apply { id = View.generateViewId() }
     /** [EN] `tabBar` / `cyl_tabBar`. [CN] TabBar。 */
     val tabBar: CYLTabBar = CYLTabBar(activity).apply { tabBarController = this@CYLTabBarController }
     val cyl_tabBar: CYLTabBar get() = tabBar
@@ -471,6 +471,54 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         cyl_tabBarItemGestureHandler?.invoke(this, gesture, button, viewControllers.getOrNull(button.index))
         delegate?.tabBarController_didRecognizeTabBarItemGesture(this, gesture, button, viewControllers.getOrNull(button.index))
         if (cyl_swipeToSwitchTabEnabled) cyl_switchToAdjacentTabWithStep(if (toLeft) 1 else -1, true)
+    }
+
+    // MARK: - Swiping between pages (Android only) 滑动翻页（仅 Android）
+
+    /**
+     * [EN] Android only (no iOS counterpart; adapted from QMUITabSegment with ViewPager): a horizontal drag on the pages moves
+     *      to the neighbor tab, with the pages, the indicator (`CYLTabBar.cyl_indicator`) and the titles following the finger.
+     *      Default false. Selecting this way tells the delegate as a tap does (`didSelectViewController`, `didSelectControl`),
+     *      without the tap animation. See docs/Android-Library.md.
+     * [CN] 仅 Android（iOS 无对应 API；改编自 QMUITabSegment 配合 ViewPager）：在页面上横向拖动切换到相邻 Tab，页面、指示条（`CYLTabBar.cyl_indicator`）
+     *      与标题跟随手指。默认 false。以此方式选中时与点击一样通知代理（`didSelectViewController`、`didSelectControl`），但没有点击动画。
+     *      见 docs/Android-Library.md。
+     */
+    var cyl_swipesBetweenPages: Boolean = false
+
+    /** [EN] The page at `index` when a tap would select it now (no custom action, no login, `shouldSelect`), else null. [CN] 点击能立即选中时返回第 `index` 个页面（无自定义动作、无需登录、`shouldSelect`），否则为 null。 */
+    internal fun cyl_swipeTargetPage(index: Int): Fragment? {
+        val page = viewControllers.getOrNull(index) ?: return null
+        if (tabBar.plusButtonActive || !page.isAdded) return null
+        val delegate = delegate
+        if (delegate?.tabBarController_shouldPerformCustomActionForViewController(this, page) ?: cyl_isCustomActionTabViewController(page)) return null
+        if (!cyl_loggedIn && (delegate?.tabBarController_requiresLoginToSelectViewController(this, page) ?: cyl_isLoginRequiredForViewController(page))) return null
+        if (delegate?.tabBarController_shouldSelectViewController(this, page) == false) return null
+        return page
+    }
+
+    /** [EN] Shows a page that has no view yet (a detached tab) under the selected one, for a swipe. [CN] 为滑动显示一个还没有视图的页面（被分离的 Tab）。 */
+    internal fun cyl_showPageForSwipe(page: Fragment): View? {
+        if (!pagesContainer.isAttachedToWindow || fragmentManager.isDestroyed || fragmentManager.isStateSaved) return null
+        val transaction = fragmentManager.beginTransaction()
+        if (page.isDetached) transaction.attach(page)
+        transaction.show(page).commitNowAllowingStateLoss()
+        return page.view
+    }
+
+    internal fun cyl_hidePageAfterSwipe(page: Fragment) {
+        if (fragmentManager.isDestroyed || fragmentManager.isStateSaved) return
+        fragmentManager.beginTransaction().hide(page).commitNowAllowingStateLoss()
+    }
+
+    /** [EN] Selects the tab a swipe ended on: the pages are already in place, so no transition runs. [CN] 选中滑动结束时的 Tab：页面已就位，不再运行转场。 */
+    internal fun cyl_selectIndexFromSwipe(index: Int) {
+        val page = viewControllers.getOrNull(index) ?: return
+        revertingTransition = true
+        selectedIndex = index
+        revertingTransition = false
+        delegate?.tabBarController_didSelectViewController(this, page)
+        tabBar.cyl_tabBarButtonWithTabIndex(index)?.let { delegate?.tabBarController_didSelectControl(this, it) }
     }
 
     internal fun cyl_plusButtonTapped(plusButton: CYLPlusButton) {

@@ -3,4 +3,5 @@
     <string name="app_name">CYLTabBar Pages</string>
     <string name="double_tapped">Double tapped</string>
     <string name="skin_prefix">Skin: </string>
+    <string name="android_extras">Indicator, swipe, scrollable</string>
 </resources>
