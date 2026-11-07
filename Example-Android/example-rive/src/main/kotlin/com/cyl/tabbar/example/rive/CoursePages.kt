@@ -109,19 +109,23 @@ abstract class TitledPage(private val navigationTitle: String) : Fragment() {
 private data class Course(val title: String, val subtitle: String, val caption: String, val color: Int, val image: String)
 private data class CourseSection(val title: String, val caption: String, val color: Int, val image: String)
 
+/** [EN] The course images of the iOS asset catalog. [CN] iOS 资源目录中的课程图片。 */
+private const val TOPIC_1 = "Topic 1"
+private const val TOPIC_2 = "Topic 2"
+
 /** [EN] Model/Course.swift. [CN] Model/Course.swift。 */
 private val courses = listOf(
-    Course("Animations in SwiftUI", "Build and animate an iOS app from scratch", "20 sections - 3 hours", Color.parseColor("#7850F0"), "Topic 1"),
-    Course("Build Quick Apps with SwiftUI", "Apply your Swift and SwiftUI knowledge by building real, quick and various applications from scratch", "47 sections - 11 hours", Color.parseColor("#6792FF"), "Topic 2"),
-    Course("Build a SwiftUI app for iOS 15", "Design and code a SwiftUI 3 app with custom layouts, animations and gestures using Xcode 13, SF Symbols 3, Canvas, Concurrency, Searchable and a whole lot more", "21 sections - 4 hours", Color.parseColor("#005FE7"), "Topic 1"),
+    Course("Animations in SwiftUI", "Build and animate an iOS app from scratch", "20 sections - 3 hours", Color.parseColor("#7850F0"), TOPIC_1),
+    Course("Build Quick Apps with SwiftUI", "Apply your Swift and SwiftUI knowledge by building real, quick and various applications from scratch", "47 sections - 11 hours", Color.parseColor("#6792FF"), TOPIC_2),
+    Course("Build a SwiftUI app for iOS 15", "Design and code a SwiftUI 3 app with custom layouts, animations and gestures using Xcode 13, SF Symbols 3, Canvas, Concurrency, Searchable and a whole lot more", "21 sections - 4 hours", Color.parseColor("#005FE7"), TOPIC_1),
 )
 
 /** [EN] Model/CourseSection.swift. [CN] Model/CourseSection.swift。 */
 private val courseSections = listOf(
-    CourseSection("State Machine", "Watch video - 15 mins", Color.parseColor("#9CC5FF"), "Topic 2"),
-    CourseSection("Animated Menu", "Watch video - 10 mins", Color.parseColor("#6E6AE8"), "Topic 1"),
-    CourseSection("Tab Bar", "Watch video - 8 mins", Color.parseColor("#005FE7"), "Topic 2"),
-    CourseSection("Button", "Watch video - 9 mins", Color.parseColor("#BBA6FF"), "Topic 1"),
+    CourseSection("State Machine", "Watch video - 15 mins", Color.parseColor("#9CC5FF"), TOPIC_2),
+    CourseSection("Animated Menu", "Watch video - 10 mins", Color.parseColor("#6E6AE8"), TOPIC_1),
+    CourseSection("Tab Bar", "Watch video - 8 mins", Color.parseColor("#005FE7"), TOPIC_2),
+    CourseSection("Button", "Watch video - 9 mins", Color.parseColor("#BBA6FF"), TOPIC_1),
 )
 
 /** [EN] Chat: iOS `HomeView`, "Courses" (VCard, sideways) then "Recent" (HCard). [CN] Chat：iOS `HomeView`，"Courses"（VCard，横向）然后 "Recent"（HCard）。 */
@@ -433,16 +437,12 @@ class SignInPage : TitledPage("User") {
                 addView(labeled(context, "Email", email, secondary), gap())
                 addView(labeled(context, "Password", password, secondary), gap())
                 addView(signInButton(context) {
-                    val succeeded = email.text.isNotEmpty()
-                    succeededView.visibility = if (succeeded) View.VISIBLE else View.INVISIBLE
-                    failedView.visibility = if (succeeded) View.INVISIBLE else View.VISIBLE
-                    handler.postDelayed({ if (succeeded) checkSucceeded.play() else checkFailed.play() }, 1000)
-                    handler.postDelayed({
-                        if (succeeded) confetti.play()
-                        succeededView.visibility = View.INVISIBLE
-                        failedView.visibility = View.INVISIBLE
-                    }, 3000)
-                    if (succeeded) handler.postDelayed(close, 4000)
+                    if (email.text.isNotEmpty()) {
+                        showCheck(handler, checkSucceeded, succeededView, failedView) { confetti.play() }
+                        handler.postDelayed(close, 4000)
+                    } else {
+                        showCheck(handler, checkFailed, failedView, succeededView) {}
+                    }
                 }, gap())
                 addView(orDivider(context), gap())
                 addView(context.text("Sign up with Email, Apple, Google", TextStyle.Subheadline, secondary), gap())
@@ -459,6 +459,20 @@ class SignInPage : TitledPage("User") {
                 addView(succeededView, FrameLayout.LayoutParams(context.dp(100f), context.dp(100f), Gravity.CENTER))
                 addView(failedView, FrameLayout.LayoutParams(context.dp(100f), context.dp(100f), Gravity.CENTER))
             }
+        }
+
+        /**
+         * [EN] Shows `shown` (hiding `hidden`), plays `check` 1 s later, and at 3 s hides both and runs `then`.
+         * [CN] 显示 `shown`（隐藏 `hidden`），1 秒后播放 `check`，3 秒时隐藏两者并执行 `then`。
+         */
+        private fun showCheck(handler: Handler, check: RiveAnimation, shown: View, hidden: View, then: () -> Unit) {
+            shown.visibility = View.VISIBLE
+            hidden.visibility = View.INVISIBLE
+            handler.postDelayed({ check.play() }, 1000)
+            handler.postDelayed({
+                then()
+                shown.visibility = View.INVISIBLE
+            }, 3000)
         }
 
         /** [EN] `largeButton()`: F77D8E, corners 20 except the top left (8), "→ Sign in". [CN] `largeButton()`：F77D8E，左上角为 8，其余为 20，"→ Sign in"。 */

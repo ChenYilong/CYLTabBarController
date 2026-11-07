@@ -237,11 +237,12 @@ static NSDictionary *CYLTestTab(NSString *title, NSString *pageIdentifier) {
     XCTAssertTrue([tabBarController.viewControllers[0] isKindOfClass:[CYLTabBarPagePlaceholder class]]);
     XCTAssertTrue(tabBarController.viewControllers[0].cyl_isPendingPage);
 
-    XCTestExpectation *swapped = [self expectationWithDescription:@"pages delivered"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [swapped fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2 handler:nil];
+    // [EN] Wait for the deliveries themselves, not a fixed delay: a busy CI runner may run the utility queue late.
+    // [CN] 等待页面真正送达，而不是固定延时：繁忙的 CI 机器可能延后执行 utility 队列。
+    NSPredicate *delivered = [NSPredicate predicateWithBlock:^BOOL(CYLTabBarController *controller, NSDictionary *bindings) {
+        return controller.cyl_pendingPages.count == 0;
+    }];
+    [self waitForExpectations:@[ [[XCTNSPredicateExpectation alloc] initWithPredicate:delivered object:tabBarController] ] timeout:10];
 
     XCTAssertEqual(tabBarController.cyl_pendingPages.count, 0u);
     XCTAssertEqualObjects([tabBarController.viewControllers valueForKey:@"title"], (@[ @"Later", @"home" ]), @"\"later\" swapped in, \"never\" removed");
