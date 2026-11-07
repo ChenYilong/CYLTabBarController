@@ -16,6 +16,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.ColorInt
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -70,6 +73,18 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     init {
         view.addView(pagesContainer, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
         view.addView(tabBar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        // [EN] Edge-to-edge windows (forced from Android 15) draw under the system bars, as iOS does: the pages keep clear of
+        //      the status bar and the sides, and the tab bar grows by the navigation bar like iOS's bottom safe area, so the
+        //      system bar no longer covers or cuts the items. The bars' insets stop here; the keyboard's go on to the pages.
+        // [CN] edge-to-edge 窗口（Android 15 起强制）绘制到系统栏下方，与 iOS 相同：页面避开状态栏与两侧，TabBar 像 iOS 的底部安全区一样
+        //      增高导航栏的高度，系统栏不再遮挡或切割各 Item。系统栏的 insets 在此消费，键盘的 insets 继续传给页面。
+        ViewCompat.setOnApplyWindowInsetsListener(view) { root, insets ->
+            val types = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            val bars = insets.getInsets(types)
+            root.setPadding(bars.left, bars.top, bars.right, 0)
+            tabBar.cyl_safeAreaBottom = bars.bottom
+            WindowInsetsCompat.Builder(insets).setInsets(types, Insets.NONE).build()
+        }
         // [EN] Fragments need their container in the window: transactions wait until `view` is attached. [CN] Fragment 需要容器已在窗口中：事务等到 `view` 附加后再提交。
         pagesContainer.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
@@ -1277,6 +1292,8 @@ class CYLTabBarControllerView(context: Context) : LinearLayout(context) {
 
     init {
         orientation = VERTICAL
+        // [EN] The tab bar's plus button draws above the bar, over the pages. [CN] TabBar 的 PlusButton 绘制在 TabBar 上方、页面之上。
+        clipChildren = false
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {

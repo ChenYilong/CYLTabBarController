@@ -267,6 +267,23 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     var cyl_itemSpaceInScrollMode: Float = 24f
         set(value) { field = value; requestLayout() }
     private var slotWidths = IntArray(0)
+
+    /**
+     * [EN] The system navigation bar's height (px), as iOS's bottom safe area: the bar grows by it, its background reaches
+     *      the screen's bottom edge, and the items stay in the top `tabBarHeight`. Set by the controller from the window
+     *      insets (edge-to-edge, forced from Android 15); 0 when the window is not edge-to-edge.
+     * [CN] 系统导航栏的高度（px），对应 iOS 的底部安全区：TabBar 增高该值，背景延伸到屏幕底边，各 Item 仍位于顶部的 `tabBarHeight` 内。
+     *      由控制器根据窗口 insets 设置（edge-to-edge，Android 15 起强制）；窗口不是 edge-to-edge 时为 0。
+     */
+    internal var cyl_safeAreaBottom: Int = 0
+        set(value) {
+            if (field == value) return
+            field = value
+            requestLayout()
+        }
+
+    /** [EN] The height of the items' area: the bar without the bottom safe area. [CN] Item 区域的高度：不含底部安全区的 TabBar 高度。 */
+    private val itemsHeight: Int get() = height - cyl_safeAreaBottom
     private var contentWidth = 0
     private var indicatorIndex = -1
     private var indicatorAnimator: android.animation.ValueAnimator? = null
@@ -324,6 +341,12 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         setBackgroundColor(0xFFF9F9F9.toInt())
         addView(shadow)
         isClickable = true
+        // [EN] The plus button rises above the bar and must not be cut (iOS: the tab bar does not clip); the root view
+        //      (`CYLTabBarControllerView`) does not clip either and sends touches on the raised part to it (#91).
+        // [CN] PlusButton 凸出 TabBar 上方，不能被裁剪（iOS：TabBar 不裁剪子视图）；根视图（`CYLTabBarControllerView`）同样不裁剪，
+        //      并把凸起部分上的触摸交给 PlusButton（#91）。
+        clipChildren = false
+        clipToPadding = false
     }
 
     /** [EN] `-hasPlusButton`. [CN] 是否有 PlusButton。 */
@@ -556,7 +579,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             button.measure(MeasureSpec.makeMeasureSpec(slotWidths.getOrElse(slot) { 0 }, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
             slot++
         }
-        setMeasuredDimension(width, height)
+        setMeasuredDimension(width, height + cyl_safeAreaBottom)
     }
 
     /**
@@ -589,7 +612,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             if (index == plusIndex) slot++
             val slotStart = slotLeft(slot)
             val left = slotStart + (cyl_itemEdgeInsets.left * density).toInt()
-            button.layout(left, (cyl_itemEdgeInsets.top * density).toInt(), slotStart + slotWidths.getOrElse(slot) { 0 } - (cyl_itemEdgeInsets.right * density).toInt(), height - (cyl_itemEdgeInsets.bottom * density).toInt())
+            button.layout(left, (cyl_itemEdgeInsets.top * density).toInt(), slotStart + slotWidths.getOrElse(slot) { 0 } - (cyl_itemEdgeInsets.right * density).toInt(), itemsHeight - (cyl_itemEdgeInsets.bottom * density).toInt())
             slot++
         }
         plusButton?.let { plus -> val plusWidth = slotWidths.getOrElse(plusIndex) { 0 }; layoutPlusButton(plus, slotLeft(plusIndex) + plusWidth / 2, plusWidth, density) }
@@ -617,12 +640,12 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     }
 
     private fun layoutPlusButton(plus: CYLPlusButton, centerX: Int, slotWidth: Int, density: Float) {
-        val tabBarHeight = height / density
+        val tabBarHeight = itemsHeight / density
         val appliesOffset = plus.cyl_showsTitleInTabBarItem() || plus.cyl_appliesCenterYOffsetWithoutTitle || plus.provider != null
         val offset = if (appliesOffset) plus.constantOfPlusButtonCenterYOffsetForTabBarHeight(tabBarHeight) else 0f
-        val centerY = (height * plus.multiplierOfTabBarHeight(tabBarHeight) + offset * density).toInt()
+        val centerY = (itemsHeight * plus.multiplierOfTabBarHeight(tabBarHeight) + offset * density).toInt()
         val w = if (plus.measuredWidth > 0) plus.measuredWidth else slotWidth
-        var h = if (plus.measuredHeight > 0) plus.measuredHeight else height
+        var h = if (plus.measuredHeight > 0) plus.measuredHeight else itemsHeight
         val top = centerY - h / 2
         if (plus.cyl_alignsTitleWithTabBarItemTitles() && plus.cyl_showsTitleInTabBarItem()) {
             // [EN] The plus title's center on the tab titles' line: the button grows down to that line. [CN] PlusButton 标题中心线与 Tab 标题对齐：按钮向下延伸到该线。
@@ -641,7 +664,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
-        cyl_indicator?.draw(canvas, paddingTop, height - paddingBottom, resources.displayMetrics.density)
+        cyl_indicator?.draw(canvas, paddingTop, itemsHeight - paddingBottom, resources.displayMetrics.density)
         val plus = plusButton ?: return
         if (plus.showsTouchableArea) {
             // [EN] `showsTouchableArea` (#91): the touchable rect, for debugging. [CN] `showsTouchableArea`（#91）：绘制可点击区域，用于调试。

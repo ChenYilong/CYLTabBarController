@@ -3,6 +3,9 @@ package com.cyl.tabbar
 import android.graphics.Color
 import android.os.Looper
 import android.view.View
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import org.robolectric.Robolectric
@@ -180,6 +183,10 @@ class CYLTabBarControllerTest {
         val x = (plus.left + plus.right) / 2f
         assertTrue(controller.tabBar.cyl_plusButtonTouchable(x, plus.top - 10f))
         assertFalse(controller.tabBar.cyl_plusButtonTouchable(x, plus.top - 200f))
+        // [EN] The raised part above the bar is drawn, not clipped by the bar or the root view. [CN] TabBar 上方的凸起部分会被绘制，不被 TabBar 或根视图裁剪。
+        assertTrue("the plus button rises above the bar", plus.top < 0)
+        assertFalse(controller.tabBar.clipChildren)
+        assertFalse(controller.view.clipChildren)
         plus.setTabLabelHidden(true)
         assertFalse(plus.cyl_showsTitleInTabBarItem())
         CYLPlusButton.removePlusButtonForTabBarContext("titled-plus")
@@ -312,5 +319,34 @@ class CYLTabBarControllerTest {
         controller.cyl_scrollDidChange(-30)
         assertFalse(controller.cyl_isTabBarHiddenByScroll)
         assertNotNull(CYLTabBarController.cyl_activeTabBarController())
+    }
+
+    /**
+     * [EN] Edge-to-edge (forced from Android 15): the pages keep clear of the status bar and the sides, and the tab bar grows by
+     *      the navigation bar (iOS's bottom safe area) while its items keep `tabBarHeight`, so the system bar does not cut them.
+     * [CN] edge-to-edge（Android 15 起强制）：页面避开状态栏与两侧，TabBar 增高导航栏的高度（iOS 的底部安全区），各 Item 保持 `tabBarHeight`，
+     *      系统栏不会切割它们。
+     */
+    @Test
+    fun keepsTheTabItemsClearOfTheSystemBars() = withActivity { activity ->
+        val controller = CYLTabBarController(activity, listOf(Page(), Page()), attributes("Home", "Me"))
+        activity.setContentView(controller.view)
+        idle()
+        val insets = WindowInsetsCompat.Builder()
+            .setInsets(WindowInsetsCompat.Type.statusBars(), Insets.of(0, 63, 0, 0))
+            .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.of(0, 0, 0, 48))
+            .build()
+        ViewCompat.dispatchApplyWindowInsets(controller.view, insets)
+        controller.view.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(2400, View.MeasureSpec.EXACTLY))
+        controller.view.layout(0, 0, 1080, 2400)
+
+        val density = activity.resources.displayMetrics.density
+        val itemsHeight = (controller.tabBarHeight * density).toInt()
+        assertEquals("the pages start below the status bar", 63, controller.view.paddingTop)
+        assertEquals("the bar grows by the navigation bar", itemsHeight + 48, controller.tabBar.height)
+        assertEquals("the bar reaches the screen's bottom edge", 2400, controller.tabBar.bottom)
+        for (button in controller.tabBar.tabBarButtonArray) {
+            assertEquals("an item keeps tabBarHeight, above the navigation bar", itemsHeight, button.height)
+        }
     }
 }
