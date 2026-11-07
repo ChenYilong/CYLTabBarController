@@ -149,7 +149,12 @@ object DemoScrollHide {
             try { activity.startLockTask() } catch (error: IllegalStateException) { /* [EN] Pinning not allowed. [CN] 不允许固定屏幕。 */ }
             later(HOLD) { try { activity.stopLockTask() } catch (error: IllegalStateException) { /* [EN] Not pinned. [CN] 未固定。 */ }; done() }
         },
-        Simulation("selectedIndex = the same tab (no change)", Kind.Keep, expectsVisible = false) { _, controller, done -> controller.selectedIndex = controller.selectedIndex; done() },
+        Simulation("selectedIndex = the same tab (no change)", Kind.Keep, expectsVisible = false) { _, controller, done ->
+            // [EN] The setter runs with the tab already selected, as an app selecting the same tab again. [CN] 以已选中的 Tab 调用 setter，如同 App 再次选中同一个 Tab。
+            val sameTab = controller.selectedIndex
+            controller.selectedIndex = sameTab
+            done()
+        },
         Simulation("cyl_hidesTabBarOnScroll = true again (no change)", Kind.Keep, expectsVisible = false) { _, controller, done -> controller.cyl_hidesTabBarOnScroll = true; done() },
         Simulation("App: setTabBarHidden(false)", Kind.Restore) { _, controller, done -> controller.setTabBarHidden(false, true); done() },
         Simulation("Self-test: run every automatic simulation, report PASS / FAIL", Kind.SelfTest),
