@@ -54,11 +54,9 @@ enum class CourseTab(val artboard: String, val stateMachine: String, val icon: I
     }
 }
 
-/** [EN] The course's colors. [CN] 课程的颜色。 */
+/** [EN] The course's accent color (iOS `RivePlusButton.courseColor`). [CN] 课程的强调色（iOS `RivePlusButton.courseColor`）。 */
 object CourseColors {
     val accent = Color.rgb(0x78, 0x50, 0xF0)
-    val background = Color.parseColor("#17203A")
-    val background2 = Color.parseColor("#EEF1F8")
 }
 
 /**
@@ -73,6 +71,8 @@ class MainActivity : DemoTabBarActivity() {
     private val themeListener = CYLThemeManager.Listener { _, _, _ -> applySkinAnimations() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // [EN] `CourseTabBarController`: `overrideUserInterfaceStyle = .dark`, the course is dark. [CN] `CourseTabBarController`：`overrideUserInterfaceStyle = .dark`，课程为深色。
+        delegate.localNightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
         super.onCreate(savedInstanceState)
         CYLThemeManager.defaultManager.addListener(themeListener)
     }

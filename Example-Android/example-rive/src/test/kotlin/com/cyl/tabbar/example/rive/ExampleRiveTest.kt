@@ -38,4 +38,19 @@ class ExampleRiveTest {
         assertTrue((controller.tabBarItemAttributesAtIndex(0)?.get(CYLConstants.CYLTabBarRiveURL) as String).contains("artboard=CHAT"))
         CYLThemeManager.defaultManager.currentThemeIdentifier = "Default"
     }
+
+    /**
+     * [EN] The methods the library calls by reflection exist in the rive-android of this app (classes inspected without
+     *      loading its native code).
+     * [CN] 库通过反射调用的方法在本 App 的 rive-android 中存在（只检查类，不加载其原生代码）。
+     */
+    @Test
+    fun riveAndroidHasTheReflectedMethods() {
+        val view = Class.forName("app.rive.runtime.kotlin.RiveAnimationView", false, javaClass.classLoader)
+        val methods = view.methods.map { it.name to it.parameterTypes.size }.toSet()
+        for (expected in listOf("setRiveBytes\$default" to 12, "play\$default" to 8, "play\$default" to 6, "setBooleanState" to 3, "fireState" to 2,
+                                 "reset" to 0, "stop" to 0, "pause" to 0)) {
+            assertTrue("$expected in RiveAnimationView", expected in methods)
+        }
+    }
 }

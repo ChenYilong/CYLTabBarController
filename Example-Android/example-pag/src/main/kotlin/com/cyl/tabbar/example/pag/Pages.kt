@@ -25,17 +25,48 @@ import com.cyl.tabbar.cyl_pushViewController
 import com.cyl.tabbar.cyl_showNavigationBadgeValue
 import kotlin.random.Random
 
+/**
+ * [EN] A page of a tab's navigation controller (iOS `ViewController` in a `RootNavigationController`): its title shows in the
+ *      action bar while it is on screen; a pushed page hides the tab bar (`hidesBottomBarWhenPushed`) and shows a back button.
+ * [CN] Tab 导航控制器中的页面（iOS `RootNavigationController` 中的 `ViewController`）：显示时其标题出现在 ActionBar 中；push 的页面隐藏 TabBar
+ *      （`hidesBottomBarWhenPushed`）并显示返回按钮。
+ */
+abstract class NavigationPage(@StringRes private val navigationTitle: Int, private val pushed: Boolean = false) : Fragment() {
+    override fun onResume() { super.onResume(); if (!isHidden) appear() }
+    override fun onPause() { if (pushed) disappear(); super.onPause() }
+    override fun onHiddenChanged(hidden: Boolean) { super.onHiddenChanged(hidden); if (!hidden) appear() }
+
+    private fun appear() {
+        val activity = activity as? MainActivity ?: return
+        activity.setNavigationTitle(if (navigationTitle != 0) getString(navigationTitle) else "")
+        activity.supportActionBar?.setDisplayHomeAsUpEnabled(pushed)
+        if (pushed) activity.tabBarController?.setTabBarHidden(true, true)
+    }
+
+    private fun disappear() {
+        val activity = activity as? MainActivity ?: return
+        activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        activity.tabBarController?.setTabBarHidden(false, true)
+    }
+}
+
 /** [EN] A page with a title and a color (iOS `HealthyVC`, `FriendsVC`, `WisdomVC`). [CN] 带标题与颜色的页面（iOS `HealthyVC`、`FriendsVC`、`WisdomVC`）。 */
-class ColorPage : Fragment() {
+class ColorPage : NavigationPage(0) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        TextView(inflater.context).apply {
-            setText(requireArguments().getInt(TITLE))
-            gravity = Gravity.CENTER
-            textSize = 20f
-            setTextColor(Color.WHITE)
+        View(inflater.context).apply {
             setBackgroundColor(requireArguments().getInt(COLOR))
             isClickable = true
         }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isHidden) (activity as? MainActivity)?.setNavigationTitle(getString(requireArguments().getInt(TITLE)))
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) (activity as? MainActivity)?.setNavigationTitle(getString(requireArguments().getInt(TITLE)))
+    }
 
     companion object {
         private const val TITLE = "title"
@@ -50,7 +81,7 @@ class ColorPage : Fragment() {
  * [CN] iOS `HomeVC`：带角标帮助列表（`cyl_addBadgeHelperTable`）的红色页面，"全屏" 菜单项上有随机颜色、抖动的红点角标
  *      （`cyl_showNavigationBadgeValue`），点击 push `ChildPage`。
  */
-class HomePage : Fragment() {
+class HomePage : NavigationPage(R.string.tab_home) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FrameLayout(inflater.context).apply { setBackgroundColor(Color.RED) }
 
@@ -76,7 +107,7 @@ class HomePage : Fragment() {
  *      (`TabBarCommon.enterApp`).
  * [CN] iOS `ChilderVC`：灰色页面上的网络图片；"下一页" push `NextPage`，点击页面重新创建 TabBar（`TabBarCommon.enterApp`）。
  */
-class ChildPage : Fragment() {
+class ChildPage : NavigationPage(0, pushed = true) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val context = inflater.context
         val image = ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_CROP; setBackgroundColor(Color.LTGRAY) }
@@ -85,15 +116,27 @@ class ChildPage : Fragment() {
             image.post { if (bitmap != null) image.setImageBitmap(bitmap) }
         }.start()
         return FrameLayout(context).apply {
+            setBackgroundColor(Color.WHITE)
             isClickable = true
             setOnClickListener { restart(-1) }
             addView(image, FrameLayout.LayoutParams(-1, -1))
             addView(TextView(context).apply { setText(R.string.child_hint); setTextColor(Color.WHITE); setShadowLayer(4f, 0f, 0f, Color.BLACK); gravity = Gravity.CENTER }, FrameLayout.LayoutParams(-1, -2, Gravity.CENTER))
-            addView(TextView(context).apply {
-                setText(R.string.next); textSize = 16f; setPadding(32, 32, 32, 32); setTextColor(Color.WHITE); setBackgroundColor(Color.argb(128, 0, 0, 0))
-                setOnClickListener { cyl_pushViewController(NextPage()) }
-            }, FrameLayout.LayoutParams(-2, -2, Gravity.TOP or Gravity.END))
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        // [EN] `addRightBarButtonItemTitle("next")`: a white title item. [CN] `addRightBarButtonItemTitle("next")`：白色标题按钮。
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menu.add(Menu.NONE, R.id.next_page, Menu.NONE, R.string.next).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                if (menuItem.itemId != R.id.next_page) return false
+                cyl_pushViewController(NextPage())
+                return true
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     companion object {
@@ -103,7 +146,7 @@ class ChildPage : Fragment() {
 }
 
 /** [EN] iOS `NextVC`: a tap creates the tab bar again with "Me" selected (`TabBarCommon.completionhandler(3)`). [CN] iOS `NextVC`：点击后重新创建 TabBar 并选中 "我的"（`TabBarCommon.completionhandler(3)`）。 */
-class NextPage : Fragment() {
+class NextPage : NavigationPage(0, pushed = true) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         TextView(inflater.context).apply {
             setText(R.string.next_hint)
@@ -119,4 +162,13 @@ private fun Fragment.restart(index: Int) {
     val activity = requireActivity()
     activity.startActivity(Intent(activity, MainActivity::class.java).putExtra(MainActivity.SELECTED_INDEX, index).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK))
     activity.finish()
+}
+
+/** [EN] iOS `MeVC`: "Me", the settings list (`CYLSettingsDemoTableViewController`) as a child. [CN] iOS `MeVC`："我的"，设置列表（`CYLSettingsDemoTableViewController`）作为子页面。 */
+class MePage : NavigationPage(R.string.tab_me) {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val list = FrameLayout(inflater.context).apply { id = View.generateViewId() }
+        if (savedInstanceState == null) childFragmentManager.beginTransaction().add(list.id, com.cyl.tabbar.demo.DemoListFragment.newInstance(com.cyl.tabbar.demo.DemoCatalog.SETTINGS)).commit()
+        return list
+    }
 }

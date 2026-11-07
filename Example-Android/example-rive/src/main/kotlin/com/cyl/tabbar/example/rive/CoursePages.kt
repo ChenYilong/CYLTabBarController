@@ -1,17 +1,20 @@
 package com.cyl.tabbar.example.rive
 
-import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
+import android.graphics.RenderEffect
+import android.graphics.Shader
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.InputType
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
@@ -19,6 +22,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.appcompat.widget.SwitchCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.cyl.tabbar.CYLConstants
 import com.cyl.tabbar.CYLSize
@@ -27,221 +35,460 @@ import com.cyl.tabbar.CYLTabBarItemAnimationFactory
 import com.cyl.tabbar.demo.DemoCatalog
 import com.cyl.tabbar.demo.DemoListFragment
 
+// [EN] A direct translation of the course screens of Example-SwiftUI-Rive, as Example-Rive shows them in its tabs
+//      (HomeView, VCard, HCard, SideMenu, OnboardingView, SignInView, RiveMenuButtonDemoView): the same texts, fonts, sizes,
+//      colors and timing; SwiftUI modifiers become views and drawables.
+// [CN] Example-SwiftUI-Rive 课程界面的直接翻译，与 Example-Rive 在各 Tab 中显示的相同（HomeView、VCard、HCard、SideMenu、OnboardingView、
+//      SignInView、RiveMenuButtonDemoView）：相同的文字、字体、尺寸、颜色与时序；SwiftUI 修饰符改为视图与 drawable。
+
 /**
- * [EN] A Rive animation outside the tab bar (iOS `RiveAnimation`): `CYLTabBarItemAnimationFactory` makes the view from a
+ * [EN] iOS `RiveAnimation` (Components/RiveAnimation.swift): `CYLTabBarItemAnimationFactory` makes the view from a
  *      `CYLTabBarAnimationURLWithOptions()` URL and its player plays and stops it, the same path the tab icons use.
- * [CN] TabBar 之外的 Rive 动画（iOS `RiveAnimation`）：`CYLTabBarItemAnimationFactory` 根据 `CYLTabBarAnimationURLWithOptions()` 生成的 URL
- *      创建视图，再由其播放器播放与停止，与 Tab 图标走同一条路径。
+ * [CN] iOS `RiveAnimation`（Components/RiveAnimation.swift）：`CYLTabBarItemAnimationFactory` 根据 `CYLTabBarAnimationURLWithOptions()`
+ *      生成的 URL 创建视图，再由其播放器播放与停止，与 Tab 图标走同一条路径。
  */
 class RiveAnimation(file: String, options: Map<String, String> = emptyMap()) {
-    private val url = CYLTabBarAnimationURLWithOptions(file, options) ?: file
+    private val url = CYLTabBarAnimationURLWithOptions("$file.riv", options) ?: "$file.riv"
     private var view: View? = null
 
-    /** [EN] The view, or an empty view when rive-android cannot make it. [CN] 视图；rive-android 无法创建时为空视图。 */
-    fun view(context: Context, size: Float): View =
-        (CYLTabBarItemAnimationFactory.animationViewWithURL(context, url, CYLSize(size, size), ImageView.ScaleType.FIT_CENTER) ?: View(context)).also { view = it }
+    /** [EN] The view (an empty view when rive-android cannot make it), sized `width` × `height` dp. [CN] 视图（rive-android 无法创建时为空视图），尺寸 `width` × `height` dp。 */
+    fun view(context: Context, width: Float, height: Float = width): View =
+        (CYLTabBarItemAnimationFactory.animationViewWithURL(context, url, CYLSize(width, height), ImageView.ScaleType.FIT_CENTER) ?: View(context)).also { view = it }
 
     fun play() = CYLTabBarItemAnimationFactory.playerForView(view)?.play()
     fun stop() = CYLTabBarItemAnimationFactory.playerForView(view)?.stop()
 }
 
+// MARK: - Styles (Styles/CustomFont.swift, CustomButton.swift, CustomTextField.swift) 样式
+
 private fun Context.dp(value: Float) = (value * resources.displayMetrics.density).toInt()
 
-private fun Context.title(text: String, size: Float = 28f, color: Int = Color.BLACK) = TextView(this).apply {
-    this.text = text
-    textSize = size
-    setTextColor(color)
-    setTypeface(typeface, Typeface.BOLD)
+/** [EN] iOS `TextStyle` with its font and size (`customFont`). [CN] iOS `TextStyle` 及其字体与字号（`customFont`）。 */
+private enum class TextStyle(val font: Int, val size: Float) {
+    LargeTitle(R.font.poppins_bold, 34f), Title(R.font.poppins_bold, 28f), Title2(R.font.poppins_bold, 24f), Title3(R.font.poppins_bold, 20f),
+    Body(R.font.inter_regular, 17f), Headline(R.font.inter_semibold, 17f), Subheadline(R.font.inter_regular, 15f), Subheadline2(R.font.inter_semibold, 15f),
+    Footnote(R.font.inter_regular, 13f), Footnote2(R.font.inter_semibold, 13f), Caption(R.font.inter_regular, 12f), Caption2(R.font.inter_semibold, 12f),
 }
 
-/** [EN] The course card colors and texts (iOS `courses` and `courseSections`). [CN] 课程卡片的颜色与文字（iOS `courses` 与 `courseSections`）。 */
+private fun Context.text(value: String, style: TextStyle? = null, @ColorInt color: Int? = null, alpha: Float = 1f): TextView = TextView(this).apply {
+    text = value
+    style?.let { typeface = ResourcesCompat.getFont(context, it.font); textSize = it.size }
+    color?.let(::setTextColor)
+    this.alpha = alpha
+}
+
+private fun rounded(@ColorInt color: Int, radius: Float) = GradientDrawable().apply { setColor(color); cornerRadius = radius }
+
+private fun Context.color(id: Int) = ContextCompat.getColor(this, id)
+
+private fun Context.image(@DrawableRes id: Int) = ImageView(this).apply { setImageResource(id) }
+
+private fun lp(width: Int, height: Int, block: LinearLayout.LayoutParams.() -> Unit = {}) = LinearLayout.LayoutParams(width, height).apply(block)
+
+/** [EN] `blur(radius:)`, on Android 12 and later (RenderEffect); earlier, the view stays sharp. [CN] `blur(radius:)`，Android 12 及以后（RenderEffect）；更早的版本不模糊。 */
+private fun View.blur(radius: Float) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.DECAL))
+}
+
+/** [EN] A page whose activity title is its navigation title while it is shown (the iOS navigation controller of each tab). [CN] 显示时把 Activity 标题设为其导航标题的页面（iOS 每个 Tab 的导航控制器）。 */
+abstract class TitledPage(private val navigationTitle: String) : Fragment() {
+    override fun onResume() { super.onResume(); if (!isHidden) activity?.title = navigationTitle }
+    override fun onHiddenChanged(hidden: Boolean) { super.onHiddenChanged(hidden); if (!hidden) activity?.title = navigationTitle }
+}
+
+// MARK: - Chat: HomeView, VCard, HCard
+
+private data class Course(val title: String, val subtitle: String, val caption: String, val color: Int, val image: Int)
+private data class CourseSection(val title: String, val caption: String, val color: Int, val image: Int)
+
+/** [EN] Model/Course.swift. [CN] Model/Course.swift。 */
 private val courses = listOf(
-    Triple("Animations in SwiftUI", "20 sections - 3 hours", "#7850F0"),
-    Triple("Build Quick Apps with SwiftUI", "47 sections - 11 hours", "#6792FF"),
-    Triple("Build a SwiftUI app for iOS 15", "21 sections - 4 hours", "#005FE7"),
-)
-private val sections = listOf(
-    Triple("State Machine", "Watch video - 15 mins", "#9CC5FF"),
-    Triple("Animated Menu", "Watch video - 10 mins", "#6E6AE8"),
-    Triple("Tab Bar", "Watch video - 8 mins", "#005FE7"),
-    Triple("Button", "Watch video - 9 mins", "#BBA6FF"),
+    Course("Animations in SwiftUI", "Build and animate an iOS app from scratch", "20 sections - 3 hours", Color.parseColor("#7850F0"), R.drawable.topic_1),
+    Course("Build Quick Apps with SwiftUI", "Apply your Swift and SwiftUI knowledge by building real, quick and various applications from scratch", "47 sections - 11 hours", Color.parseColor("#6792FF"), R.drawable.topic_2),
+    Course("Build a SwiftUI app for iOS 15", "Design and code a SwiftUI 3 app with custom layouts, animations and gestures using Xcode 13, SF Symbols 3, Canvas, Concurrency, Searchable and a whole lot more", "21 sections - 4 hours", Color.parseColor("#005FE7"), R.drawable.topic_1),
 )
 
-/** [EN] Chat (iOS `HomeView`): "Courses" cards to scroll sideways, then the "Recent" sections. [CN] Chat（iOS `HomeView`）：可横向滚动的 "Courses" 卡片，然后是 "Recent" 小节。 */
-class CoursesPage : Fragment() {
+/** [EN] Model/CourseSection.swift. [CN] Model/CourseSection.swift。 */
+private val courseSections = listOf(
+    CourseSection("State Machine", "Watch video - 15 mins", Color.parseColor("#9CC5FF"), R.drawable.topic_2),
+    CourseSection("Animated Menu", "Watch video - 10 mins", Color.parseColor("#6E6AE8"), R.drawable.topic_1),
+    CourseSection("Tab Bar", "Watch video - 8 mins", Color.parseColor("#005FE7"), R.drawable.topic_2),
+    CourseSection("Button", "Watch video - 9 mins", Color.parseColor("#BBA6FF"), R.drawable.topic_1),
+)
+
+/** [EN] Chat: iOS `HomeView`, "Courses" (VCard, sideways) then "Recent" (HCard). [CN] Chat：iOS `HomeView`，"Courses"（VCard，横向）然后 "Recent"（HCard）。 */
+class CoursesPage : TitledPage("Chat") {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val context = inflater.context
-        val column = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(context.dp(20f), context.dp(20f), context.dp(20f), context.dp(20f)) }
-        column.addView(context.title("Courses"))
-        val cards = LinearLayout(context)
-        for ((title, caption, color) in courses) cards.addView(card(context, title, caption, Color.parseColor(color), vertical = true),
-            LinearLayout.LayoutParams(context.dp(260f), context.dp(310f)).apply { marginEnd = context.dp(20f) })
-        column.addView(HorizontalScrollView(context).apply { isHorizontalScrollBarEnabled = false; addView(cards) }, LinearLayout.LayoutParams(-1, -2).apply { topMargin = context.dp(16f) })
-        column.addView(context.title("Recent", 20f), LinearLayout.LayoutParams(-2, -2).apply { topMargin = context.dp(24f) })
-        for ((title, caption, color) in sections) column.addView(card(context, title, caption, Color.parseColor(color), vertical = false),
-            LinearLayout.LayoutParams(-1, context.dp(110f)).apply { topMargin = context.dp(16f) })
-        return ScrollView(context).apply { setBackgroundColor(CourseColors.background2); addView(column) }
+        val content = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+        content.addView(context.text("Courses", TextStyle.LargeTitle), lp(-1, -2) { marginStart = context.dp(20f); marginEnd = context.dp(20f) })
+        val cards = LinearLayout(context).apply { setPadding(context.dp(20f), context.dp(20f), 0, context.dp(30f)); clipToPadding = false; clipChildren = false }
+        courses.forEach { cards.addView(vCard(context, it), lp(context.dp(260f), context.dp(310f)) { marginEnd = context.dp(20f) }) }
+        content.addView(HorizontalScrollView(context).apply { isHorizontalScrollBarEnabled = false; clipChildren = false; addView(cards) })
+        val recent = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(context.dp(20f), context.dp(20f), context.dp(20f), context.dp(20f)) }
+        recent.addView(context.text("Recent", TextStyle.Title3))
+        courseSections.forEach { recent.addView(hCard(context, it), lp(-1, context.dp(110f)) { topMargin = context.dp(20f) }) }
+        content.addView(recent)
+        return ScrollView(context).apply { setBackgroundColor(context.color(R.color.background)); addView(content) }
     }
 
-    private fun card(context: Context, title: String, caption: String, color: Int, vertical: Boolean) = LinearLayout(context).apply {
-        orientation = LinearLayout.VERTICAL
-        gravity = if (vertical) Gravity.TOP else Gravity.CENTER_VERTICAL
-        setPadding(context.dp(24f), context.dp(24f), context.dp(24f), context.dp(24f))
-        background = GradientDrawable().apply { cornerRadius = context.dp(30f).toFloat(); setColor(color) }
-        addView(context.title(title, if (vertical) 24f else 20f, Color.WHITE))
-        addView(TextView(context).apply { text = caption; setTextColor(Color.argb(180, 255, 255, 255)); textSize = 15f })
-    }
-}
-
-/**
- * [EN] Search (iOS `SideMenu`): the profile, then the "BROWSE" and "HISTORY" items; each item's icon is an artboard of
- *      icons.riv that plays when the item is tapped.
- * [CN] Search（iOS `SideMenu`）：个人信息，然后是 "BROWSE" 与 "HISTORY" 菜单项；每项的图标是 icons.riv 中的画板，点击时播放。
- */
-class SideMenuPage : Fragment() {
-    private val browse = listOf("Home" to ("HOME" to "HOME_interactivity"), "Search" to ("SEARCH" to "SEARCH_Interactivity"),
-                                "Favorites" to ("LIKE/STAR" to "STAR_Interactivity"), "Help" to ("CHAT" to "CHAT_Interactivity"))
-    private val history = listOf("History" to ("TIMER" to "TIMER_Interactivity"), "Notifications" to ("BELL" to "BELL_Interactivity"))
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val context = inflater.context
-        val column = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(context.dp(24f), context.dp(24f), context.dp(24f), context.dp(24f)) }
-        column.addView(context.title("Meng To", 17f, Color.WHITE))
-        column.addView(TextView(context).apply { text = "UI Designer"; setTextColor(Color.argb(180, 255, 255, 255)) })
-        for ((header, items) in listOf("BROWSE" to browse, "HISTORY" to history)) {
-            column.addView(TextView(context).apply { text = header; setTextColor(Color.argb(150, 255, 255, 255)); textSize = 13f },
-                LinearLayout.LayoutParams(-2, -2).apply { topMargin = context.dp(32f) })
-            for ((text, rive) in items) column.addView(menuItem(context, text, rive.first, rive.second))
-        }
-        return ScrollView(context).apply { setBackgroundColor(CourseColors.background); addView(column) }
-    }
-
-    private fun menuItem(context: Context, text: String, artboard: String, stateMachine: String): View {
-        val icon = RiveAnimation("icons.riv", mapOf(CYLConstants.CYLTabBarAnimationOptionRiveArtboard to artboard,
-            CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to stateMachine, CYLConstants.CYLTabBarAnimationOptionRiveInput to "active"))
-        return LinearLayout(context).apply {
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(0, context.dp(12f), 0, context.dp(12f))
-            addView(icon.view(context, 32f), LinearLayout.LayoutParams(context.dp(32f), context.dp(32f)))
-            addView(context.title(text, 17f, Color.WHITE), LinearLayout.LayoutParams(-2, -2).apply { marginStart = context.dp(14f) })
-            setOnClickListener { icon.play() }
-        }
-    }
-}
-
-/**
- * [EN] The plus button's page (iOS `OnboardingView`): the shapes.riv background, the title, and the button.riv button whose
- *      "active" animation plays before the sign-in dialog opens.
- * [CN] PlusButton 的页面（iOS `OnboardingView`）：shapes.riv 背景、标题，以及 button.riv 按钮，点击后播放 "active" 动画再打开登录对话框。
- */
-class OnboardingPage : Fragment() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val context = inflater.context
-        val shapes = RiveAnimation("shapes.riv")
-        val button = RiveAnimation("button.riv", mapOf(CYLConstants.CYLTabBarAnimationOptionRiveAnimation to "active"))
+    /** [EN] iOS `VCard`: 260 × 310, a gradient of the course color, three overlapping avatars, the topic image at the top right. [CN] iOS `VCard`：260 × 310，课程颜色的渐变，三个重叠的头像，右上角的主题图片。 */
+    private fun vCard(context: Context, course: Course): View {
         val column = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(context.dp(32f), context.dp(48f), context.dp(32f), context.dp(32f))
-            addView(context.title("Learn design & code", 40f))
-            addView(TextView(context).apply {
-                text = "Don’t skip design. Learn design and code, by building real apps with React and Swift. Complete courses about the best tools."
-                textSize = 17f; setTextColor(Color.DKGRAY)
-            }, LinearLayout.LayoutParams(-1, -2).apply { topMargin = context.dp(16f) })
-            val buttonView = FrameLayout(context).apply {
-                addView(button.view(context, 64f), FrameLayout.LayoutParams(-1, -1))
-                addView(TextView(context).apply { text = "Start the course"; setTypeface(typeface, Typeface.BOLD); gravity = Gravity.CENTER }, FrameLayout.LayoutParams(-1, -1))
-                setOnClickListener { button.play(); postDelayed({ SignInPage.showDialog(context) }, 800) }
-            }
-            addView(buttonView, LinearLayout.LayoutParams(context.dp(236f), context.dp(64f)).apply { topMargin = context.dp(40f) })
-            addView(TextView(context).apply {
-                text = "Purchase includes access to 30+ courses, 240+ premium tutorials, 120+ hours of videos, source files and certificates."
-                setTextColor(Color.GRAY)
-            }, LinearLayout.LayoutParams(-1, -2).apply { topMargin = context.dp(16f) })
+            setPadding(context.dp(30f), context.dp(30f), context.dp(30f), context.dp(30f))
+            addView(context.text(course.title, TextStyle.Title2, Color.WHITE), lp(context.dp(170f), -2))
+            addView(context.text(course.subtitle, color = Color.WHITE, alpha = 0.7f).apply { maxLines = 3 }, lp(-1, -2) { topMargin = context.dp(8f) })
+            addView(context.text(course.caption.uppercase(), TextStyle.Footnote2, Color.WHITE, 0.7f), lp(-2, -2) { topMargin = context.dp(8f) })
+            addView(View(context), lp(0, 0) { weight = 1f })
+            addView(FrameLayout(context).apply {
+                listOf(4, 5, 6).shuffled().forEachIndexed { index, number ->
+                    val avatar = listOf(R.drawable.avatar_4, R.drawable.avatar_5, R.drawable.avatar_6)[number - 4]
+                    addView(context.image(avatar).apply { clipToOutline = true; background = GradientDrawable().apply { shape = GradientDrawable.OVAL }; outlineProvider = android.view.ViewOutlineProvider.BACKGROUND },
+                        FrameLayout.LayoutParams(context.dp(44f), context.dp(44f)).apply { marginStart = index * context.dp(24f) })
+                }
+            })
         }
         return FrameLayout(context).apply {
-            setBackgroundColor(Color.WHITE)
-            addView(shapes.view(context, 400f), FrameLayout.LayoutParams(-1, -1))
+            background = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(course.color, (course.color and 0x00FFFFFF) or 0x80000000.toInt())).apply { cornerRadius = context.dp(30f).toFloat() }
+            elevation = context.dp(8f).toFloat()
+            outlineAmbientShadowColorCompat(course.color)
             addView(column, FrameLayout.LayoutParams(-1, -1))
-            post { shapes.play() }
+            addView(context.image(course.image), FrameLayout.LayoutParams(-2, -2, Gravity.TOP or Gravity.END).apply { setMargins(0, context.dp(20f), context.dp(20f), 0) })
         }
+    }
+
+    /** [EN] iOS `HCard`: the section color, title and caption, a divider, the topic image. [CN] iOS `HCard`：小节颜色、标题与说明、分隔线、主题图片。 */
+    private fun hCard(context: Context, section: CourseSection) = LinearLayout(context).apply {
+        gravity = Gravity.CENTER_VERTICAL
+        setPadding(context.dp(30f), context.dp(20f), context.dp(30f), context.dp(20f))
+        background = rounded(section.color, context.dp(30f).toFloat())
+        addView(LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(context.text(section.title, TextStyle.Title2, Color.WHITE))
+            addView(context.text(section.caption, TextStyle.Body, Color.WHITE), lp(-2, -2) { topMargin = context.dp(8f) })
+        }, lp(0, -2) { weight = 1f })
+        addView(View(context).apply { setBackgroundColor(Color.argb(60, 255, 255, 255)) }, lp(context.dp(1f), -1) { marginStart = context.dp(20f); marginEnd = context.dp(20f) })
+        addView(context.image(section.image))
     }
 }
 
+/** [EN] The colored shadow of the cards (`shadow(color: course.color.opacity(0.3))`), on Android 9 and later. [CN] 卡片的彩色阴影（`shadow(color: course.color.opacity(0.3))`），Android 9 及以后。 */
+private fun View.outlineAmbientShadowColorCompat(@ColorInt color: Int) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        outlineAmbientShadowColor = color
+        outlineSpotShadowColor = color
+    }
+}
+
+// MARK: - Search: SideMenu
+
 /**
- * [EN] Bell (iOS `settingsViewController(headerView: RiveMenuButtonDemoView())`): the menu_button.riv view with "Play / Stop"
- *      (state machine input "isOpen", held until stopped: duration 0) above the settings list.
- * [CN] Bell（iOS `settingsViewController(headerView: RiveMenuButtonDemoView())`）：设置列表上方是 menu_button.riv 视图与 "播放 / 停止" 按钮
- *      （状态机输入 "isOpen"，保持到停止：duration 为 0）。
+ * [EN] Search: iOS `SideMenu` on the background 17203A. Each item's icon is an artboard of icons.riv ("active" for 2 s); a tap
+ *      selects the item (the blue bar) and plays it. "Dark Mode" plays its icon while the switch is on.
+ * [CN] Search：位于 17203A 背景上的 iOS `SideMenu`。每项的图标是 icons.riv 中的画板（"active" 持续 2 秒）；点击选中该项（蓝色背景）并播放图标。
+ *      "Dark Mode" 开关打开期间播放其图标。
  */
-class BellPage : Fragment() {
+class SideMenuPage : TitledPage("Search") {
+    private data class MenuItem(val text: String, val artboard: String, val stateMachine: String, val duration: String = "2")
+
+    private val browse = listOf(MenuItem("Home", "HOME", "HOME_interactivity"), MenuItem("Search", "SEARCH", "SEARCH_Interactivity"),
+                                MenuItem("Favorites", "LIKE/STAR", "STAR_Interactivity"), MenuItem("Help", "CHAT", "CHAT_Interactivity"))
+    private val history = listOf(MenuItem("History", "TIMER", "TIMER_Interactivity"), MenuItem("Notifications", "BELL", "BELL_Interactivity"))
+    private val darkMode = MenuItem("Dark Mode", "SETTINGS", "SETTINGS_Interactivity", duration = "0")
+    private val rows = ArrayList<Pair<MenuItem, View>>()
+    private var selected = "Home"
+
+    private fun icon(item: MenuItem) = RiveAnimation("icons", mapOf(CYLConstants.CYLTabBarAnimationOptionRiveArtboard to item.artboard,
+        CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to item.stateMachine, CYLConstants.CYLTabBarAnimationOptionRiveInput to "active",
+        CYLConstants.CYLTabBarAnimationOptionRiveActiveDuration to item.duration))
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val context = inflater.context
+        val background2 = context.color(R.color.background_2)
+        val menu = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(0, 0, 0, context.dp(8f)) }
+        menu.addView(LinearLayout(context).apply {
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(context.dp(16f), context.dp(16f), context.dp(16f), context.dp(16f))
+            addView(context.image(android.R.drawable.ic_menu_myplaces).apply {
+                setColorFilter(Color.WHITE); setPadding(context.dp(12f), context.dp(12f), context.dp(12f), context.dp(12f))
+                background = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(Color.argb(51, 255, 255, 255)) }
+            }, lp(context.dp(48f), context.dp(48f)))
+            addView(LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                addView(context.text("Meng To", color = Color.WHITE).apply { textSize = 17f })
+                addView(context.text("UI Designer", color = Color.WHITE, alpha = 0.7f).apply { textSize = 15f })
+            }, lp(-2, -2) { marginStart = context.dp(12f) })
+        })
+        for ((header, items) in listOf("BROWSE" to browse, "HISTORY" to history)) {
+            menu.addView(context.text(header, color = Color.WHITE, alpha = 0.7f).apply { textSize = 15f; setTypeface(typeface, Typeface.BOLD) },
+                lp(-1, -2) { marginStart = context.dp(24f); topMargin = context.dp(40f) })
+            val group = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(context.dp(8f), context.dp(8f), context.dp(8f), context.dp(8f)) }
+            items.forEach { item ->
+                group.addView(View(context).apply { setBackgroundColor(Color.argb(26, 255, 255, 255)) }, lp(-1, context.dp(1f)) { marginStart = context.dp(16f); marginEnd = context.dp(16f) })
+                group.addView(row(context, item, background2))
+            }
+            menu.addView(group)
+        }
+        menu.addView(View(context), lp(0, 0) { weight = 1f })
+        val darkIcon = icon(darkMode)
+        menu.addView(LinearLayout(context).apply {
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(context.dp(20f), context.dp(20f), context.dp(20f), context.dp(20f))
+            addView(darkIcon.view(context, 32f).apply { alpha = 0.6f }, lp(context.dp(32f), context.dp(32f)))
+            addView(context.text(darkMode.text, TextStyle.Headline, Color.WHITE), lp(0, -2) { weight = 1f; marginStart = context.dp(14f) })
+            addView(SwitchCompat(context).apply { setOnCheckedChangeListener { _, on -> if (on) darkIcon.play() else darkIcon.stop() } })
+        })
+        return FrameLayout(context).apply {
+            setBackgroundColor(background2)
+            addView(ScrollView(context).apply {
+                isFillViewport = true
+                addView(menu)
+                background = rounded(background2, context.dp(30f).toFloat())
+            }, FrameLayout.LayoutParams(context.dp(288f), -1))
+        }
+    }
+
+    private fun row(context: Context, item: MenuItem, background2: Int): View {
+        val icon = icon(item)
+        return LinearLayout(context).apply {
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(context.dp(12f), context.dp(12f), context.dp(12f), context.dp(12f))
+            addView(icon.view(context, 32f).apply { alpha = 0.6f }, lp(context.dp(32f), context.dp(32f)))
+            addView(context.text(item.text, TextStyle.Headline, Color.WHITE), lp(-2, -2) { marginStart = context.dp(14f) })
+            setOnClickListener {
+                selected = item.text
+                updateSelection(background2)
+                icon.play()
+            }
+            rows += item to this
+            updateSelection(background2)
+        }
+    }
+
+    /** [EN] The selected item has the blue rounded background. [CN] 选中的项带蓝色圆角背景。 */
+    private fun updateSelection(background2: Int) {
+        rows.forEach { (item, view) -> view.background = rounded(if (item.text == selected) Color.rgb(0, 122, 255) else background2, view.context.dp(10f).toFloat()) }
+    }
+}
+
+// MARK: - Start: OnboardingView
+
+/**
+ * [EN] The plus button's page: iOS `OnboardingView`. The Spline image and shapes.riv, blurred, behind "Learn design & code";
+ *      button.riv plays its "active" animation and, 0.8 s later, the sign-in card comes in over a dimmed page, with a close
+ *      button under it.
+ * [CN] PlusButton 的页面：iOS `OnboardingView`。模糊的 Spline 图片与 shapes.riv 位于 "Learn design & code" 之后；button.riv 播放 "active"
+ *      动画，0.8 秒后登录卡片出现在变暗的页面上，下方有关闭按钮。
+ */
+class OnboardingPage : TitledPage("Start") {
+    private var modal: View? = null
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val context = inflater.context
+        val root = FrameLayout(context)
+        root.addView(context.image(R.drawable.spline).apply { blur(50f); translationX = context.dp(200f).toFloat(); translationY = context.dp(100f).toFloat() },
+            FrameLayout.LayoutParams(-2, -2, Gravity.CENTER))
+        val shapes = RiveAnimation("shapes")
+        root.addView(shapes.view(context, 400f, 800f).apply { blur(30f) }, FrameLayout.LayoutParams(-1, -1))
+        val button = RiveAnimation("button", mapOf(CYLConstants.CYLTabBarAnimationOptionRiveAnimation to "active"))
+        val content = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(context.dp(40f), context.dp(80f), context.dp(40f), context.dp(40f))
+            addView(context.text("Learn design & code", TextStyle.LargeTitle).apply { textSize = 60f; setLineSpacing(0f, 0.9f) }, lp(context.dp(260f), -2))
+            addView(context.text("Don’t skip design. Learn design and code, by building real apps with React and Swift. Complete courses about the best tools.",
+                TextStyle.Body, alpha = 0.7f), lp(-1, -2) { topMargin = context.dp(16f) })
+            addView(View(context), lp(0, 0) { weight = 1f })
+            addView(FrameLayout(context).apply {
+                addView(View(context).apply { background = rounded(Color.argb(77, 0, 0, 0), context.dp(30f).toFloat()); blur(10f); translationY = context.dp(10f).toFloat() }, FrameLayout.LayoutParams(-1, -1))
+                addView(button.view(context, 236f, 64f), FrameLayout.LayoutParams(-1, -1))
+                addView(context.text("→  Start the course", TextStyle.Headline, Color.BLACK).apply {
+                    gravity = Gravity.CENTER; translationX = context.dp(4f).toFloat(); translationY = context.dp(4f).toFloat()
+                }, FrameLayout.LayoutParams(-1, -1))
+                setOnClickListener {
+                    button.play()
+                    Handler(Looper.getMainLooper()).postDelayed({ if (isAdded) showModal(root) }, 800)
+                }
+            }, lp(context.dp(236f), context.dp(64f)))
+            addView(context.text("Purchase includes access to 30+ courses, 240+ premium tutorials, 120+ hours of videos, source files and certificates.",
+                TextStyle.Footnote, alpha = 0.7f), lp(-1, -2) { topMargin = context.dp(16f) })
+        }
+        root.addView(content, FrameLayout.LayoutParams(-1, -1))
+        root.setBackgroundColor(context.color(R.color.background))
+        root.post { shapes.play() }
+        return root
+    }
+
+    /** [EN] The sign-in card over a dimmed page (`Color("Shadow").opacity(0.4)`), and its white close button. [CN] 变暗页面上的登录卡片（`Color("Shadow").opacity(0.4)`）及其白色关闭按钮。 */
+    private fun showModal(root: FrameLayout) {
+        if (modal != null) return
+        val context = root.context
+        val shadow = context.color(R.color.shadow)
+        val layer = FrameLayout(context).apply {
+            setBackgroundColor((shadow and 0x00FFFFFF) or (0x66 shl 24))
+            isClickable = true
+            val card = SignInPage.card(context) { dismissModal(root) }
+            addView(card, FrameLayout.LayoutParams(-1, -2, Gravity.CENTER).apply { setMargins(context.dp(16f), 0, context.dp(16f), context.dp(40f)) })
+            addView(context.text("✕", color = Color.BLACK).apply {
+                gravity = Gravity.CENTER; textSize = 16f
+                background = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(Color.WHITE) }
+                elevation = context.dp(5f).toFloat()
+                setOnClickListener { dismissModal(root) }
+            }, FrameLayout.LayoutParams(context.dp(36f), context.dp(36f), Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL).apply { bottomMargin = context.dp(24f) })
+            alpha = 0f
+            translationY = -context.dp(50f).toFloat()
+        }
+        root.addView(layer, FrameLayout.LayoutParams(-1, -1))
+        layer.animate().alpha(1f).translationY(0f).setDuration(350).start()
+        modal = layer
+    }
+
+    private fun dismissModal(root: FrameLayout) {
+        val layer = modal ?: return
+        modal = null
+        layer.animate().alpha(0f).setDuration(250).withEndAction { root.removeView(layer) }.start()
+    }
+}
+
+// MARK: - Bell: settings with RiveMenuButtonDemoView
+
+/**
+ * [EN] Bell: iOS `settingsViewController(headerView: RiveMenuButtonDemoView())`. menu_button.riv (88 × 88, state machine
+ *      input "isOpen", held until stopped: duration 0) and "Play / Stop" above the settings list.
+ * [CN] Bell：iOS `settingsViewController(headerView: RiveMenuButtonDemoView())`。设置列表上方是 menu_button.riv（88 × 88，状态机输入
+ *      "isOpen"，保持到停止：duration 为 0）与 "播放 / 停止"。
+ */
+class BellPage : TitledPage("Bell") {
     private var isOn = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val context = inflater.context
-        val menuButton = RiveAnimation("menu_button.riv", mapOf(CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to "State Machine",
+        val menuButton = RiveAnimation("menu_button", mapOf(CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to "State Machine",
             CYLConstants.CYLTabBarAnimationOptionRiveInput to "isOpen", CYLConstants.CYLTabBarAnimationOptionRiveActiveDuration to "0"))
         val list = FrameLayout(context).apply { id = View.generateViewId() }
-        return LinearLayout(context).apply {
+        val header = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
-            addView(menuButton.view(context, 88f), LinearLayout.LayoutParams(context.dp(88f), context.dp(88f)).apply { topMargin = context.dp(16f) })
-            addView(Button(context).apply {
-                text = "Play / Stop"
+            setPadding(0, context.dp(16f), 0, context.dp(8f))
+            addView(menuButton.view(context, 88f), lp(context.dp(88f), context.dp(88f)))
+            addView(context.text(getString(R.string.play_stop)).apply {
+                textSize = 17f; setTypeface(typeface, Typeface.BOLD); setTextColor(Color.rgb(0, 122, 255)); setPadding(0, context.dp(12f), 0, 0)
                 setOnClickListener { isOn = !isOn; if (isOn) menuButton.play() else menuButton.stop() }
             })
-            addView(list, LinearLayout.LayoutParams(-1, 0, 1f))
-            if (savedInstanceState == null) childFragmentManager.beginTransaction().add(list.id, DemoListFragment.newInstance(DemoCatalog.SETTINGS)).commit()
+        }
+        if (savedInstanceState == null) childFragmentManager.beginTransaction().add(list.id, DemoListFragment.newInstance(DemoCatalog.SETTINGS)).commit()
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(header)
+            addView(list, lp(-1, 0) { weight = 1f })
         }
     }
 }
 
+// MARK: - User: SignInView
+
 /**
- * [EN] User (iOS `SignInView`): email and password; "Sign in" plays check.riv ("Check" with both fields, "Error" without)
- *      and, on success, confetti.riv.
- * [CN] User（iOS `SignInView`）：邮箱与密码；"Sign in" 播放 check.riv（两项都填时为 "Check"，否则为 "Error"），成功时再播放 confetti.riv。
+ * [EN] User: iOS `SignInView`. "Sign in" shows check.riv ("Check" with an email, "Error" without) 1 s later; on success
+ *      confetti.riv plays at 3 s and the card closes at 4 s when it is a modal.
+ * [CN] User：iOS `SignInView`。"Sign in" 1 秒后显示 check.riv（有邮箱时为 "Check"，否则为 "Error"）；成功时 3 秒播放 confetti.riv，作为弹层时 4 秒关闭卡片。
  */
-class SignInPage : Fragment() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        ScrollView(inflater.context).apply { setBackgroundColor(CourseColors.background2); addView(form(inflater.context)) }
+class SignInPage : TitledPage("User") {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val context = inflater.context
+        return ScrollView(context).apply {
+            setBackgroundColor(context.color(R.color.background))
+            addView(FrameLayout(context).apply { setPadding(context.dp(16f), context.dp(16f), context.dp(16f), context.dp(16f)); addView(card(context) {}) })
+        }
+    }
 
     companion object {
-        /** [EN] The sign-in form, also shown as a dialog by the onboarding. [CN] 登录表单，引导页也以对话框显示它。 */
-        fun form(context: Context): View {
-            val trigger = { name: String -> RiveAnimation("check.riv", mapOf(CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to "State Machine 1", CYLConstants.CYLTabBarAnimationOptionRiveTriggerInput to name)) }
-            val succeeded = trigger("Check")
-            val failed = trigger("Error")
-            val confetti = RiveAnimation("confetti.riv", mapOf(CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to "State Machine 1",
+        /** [EN] The sign-in card; `close` is iOS `show.toggle()`. [CN] 登录卡片；`close` 对应 iOS 的 `show.toggle()`。 */
+        fun card(context: Context, close: () -> Unit): View {
+            val trigger = { name: String -> RiveAnimation("check", mapOf(CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to "State Machine 1", CYLConstants.CYLTabBarAnimationOptionRiveTriggerInput to name)) }
+            val checkSucceeded = trigger("Check")
+            val checkFailed = trigger("Error")
+            val confetti = RiveAnimation("confetti", mapOf(CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to "State Machine 1",
                 CYLConstants.CYLTabBarAnimationOptionRiveTriggerInput to "Trigger explosion"))
-            val email = EditText(context).apply { hint = "Email"; inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS or InputType.TYPE_CLASS_TEXT }
-            val password = EditText(context).apply { hint = "Password"; inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD or InputType.TYPE_CLASS_TEXT }
-            val successView = succeeded.view(context, 100f).apply { visibility = View.INVISIBLE }
-            val failureView = failed.view(context, 100f).apply { visibility = View.INVISIBLE }
-            return LinearLayout(context).apply {
+            val handler = Handler(Looper.getMainLooper())
+            val email = field(context, R.drawable.icon_email, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
+            val password = field(context, R.drawable.icon_lock, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
+            val succeededView = checkSucceeded.view(context, 100f).apply { visibility = View.INVISIBLE }
+            val failedView = checkFailed.view(context, 100f).apply { visibility = View.INVISIBLE }
+            val secondary = Color.argb(153, 128, 128, 128)
+            val form = LinearLayout(context).apply {
                 orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER_HORIZONTAL
                 setPadding(context.dp(30f), context.dp(30f), context.dp(30f), context.dp(30f))
-                addView(context.title("Sign in", 34f))
-                addView(TextView(context).apply { text = "Access to 240+ hours of content. Learn design and code, by building real apps with React and Swift."; setTextColor(Color.DKGRAY) })
-                addView(email); addView(password)
-                addView(Button(context).apply {
-                    text = "Sign in"
-                    setOnClickListener {
-                        val ok = email.text.isNotBlank() && password.text.isNotBlank()
-                        successView.visibility = if (ok) View.VISIBLE else View.INVISIBLE
-                        failureView.visibility = if (ok) View.INVISIBLE else View.VISIBLE
-                        if (ok) { succeeded.play(); confetti.play() } else failed.play()
+                fun gap() = lp(-1, -2) { topMargin = context.dp(24f) }
+                addView(context.text("Sign in", TextStyle.LargeTitle))
+                addView(context.text("Access to 240+ hours of content. Learn design and code, by building real apps with React and Swift.", color = secondary).apply { gravity = Gravity.CENTER }, gap())
+                addView(labeled(context, "Email", email, secondary), gap())
+                addView(labeled(context, "Password", password, secondary), gap())
+                addView(context.text("→  Sign in", TextStyle.Headline, Color.WHITE).apply {
+                    gravity = Gravity.CENTER
+                    setPadding(context.dp(20f), context.dp(20f), context.dp(20f), context.dp(20f))
+                    // [EN] `largeButton()`: F77D8E, corners 20 except the top left (8). [CN] `largeButton()`：F77D8E，左上角为 8，其余为 20。
+                    background = GradientDrawable().apply {
+                        setColor(Color.parseColor("#F77D8E"))
+                        val big = context.dp(20f).toFloat(); val small = context.dp(8f).toFloat()
+                        cornerRadii = floatArrayOf(small, small, big, big, big, big, big, big)
                     }
-                })
-                addView(FrameLayout(context).apply {
-                    addView(confetti.view(context, 300f), FrameLayout.LayoutParams(-1, -1))
-                    addView(successView, FrameLayout.LayoutParams(context.dp(100f), context.dp(100f), Gravity.CENTER))
-                    addView(failureView, FrameLayout.LayoutParams(context.dp(100f), context.dp(100f), Gravity.CENTER))
-                }, LinearLayout.LayoutParams(-1, context.dp(220f)))
-                addView(TextView(context).apply { text = "Sign up with Email, Apple, Google"; setTextColor(Color.GRAY); gravity = Gravity.CENTER })
+                    elevation = context.dp(10f).toFloat()
+                    setOnClickListener {
+                        val succeeded = email.text.isNotEmpty()
+                        succeededView.visibility = if (succeeded) View.VISIBLE else View.INVISIBLE
+                        failedView.visibility = if (succeeded) View.INVISIBLE else View.VISIBLE
+                        handler.postDelayed({ if (succeeded) checkSucceeded.play() else checkFailed.play() }, 1000)
+                        handler.postDelayed({
+                            if (succeeded) confetti.play()
+                            succeededView.visibility = View.INVISIBLE
+                            failedView.visibility = View.INVISIBLE
+                        }, 3000)
+                        if (succeeded) handler.postDelayed(close, 4000)
+                    }
+                }, gap())
+                addView(LinearLayout(context).apply {
+                    gravity = Gravity.CENTER_VERTICAL
+                    addView(View(context).apply { setBackgroundColor(Color.argb(26, 0, 0, 0)) }, lp(0, context.dp(1f)) { weight = 1f })
+                    addView(context.text("OR", TextStyle.Subheadline2, Color.argb(77, 0, 0, 0)), lp(-2, -2) { marginStart = context.dp(8f); marginEnd = context.dp(8f) })
+                    addView(View(context).apply { setBackgroundColor(Color.argb(26, 0, 0, 0)) }, lp(0, context.dp(1f)) { weight = 1f })
+                }, gap())
+                addView(context.text("Sign up with Email, Apple, Google", TextStyle.Subheadline, secondary), gap())
+                addView(LinearLayout(context).apply {
+                    listOf(R.drawable.logo_email, R.drawable.logo_apple, R.drawable.logo_google).forEachIndexed { index, logo ->
+                        if (index > 0) addView(View(context), lp(0, 0) { weight = 1f })
+                        addView(context.image(logo))
+                    }
+                }, gap())
+            }
+            return FrameLayout(context).apply {
+                // [EN] `.regularMaterial`, a 20 pt card with a light border and a soft shadow. [CN] `.regularMaterial`：20 pt 圆角卡片，带浅色描边与柔和阴影。
+                background = GradientDrawable().apply {
+                    setColor(Color.argb(235, 255, 255, 255)); cornerRadius = context.dp(20f).toFloat(); setStroke(context.dp(1f), Color.argb(204, 255, 255, 255))
+                }
+                elevation = context.dp(12f).toFloat()
+                addView(form, FrameLayout.LayoutParams(-1, -2))
+                addView(confetti.view(context, 300f).apply { scaleX = 3f; scaleY = 3f; isClickable = false }, FrameLayout.LayoutParams(-1, -1))
+                addView(succeededView, FrameLayout.LayoutParams(context.dp(100f), context.dp(100f), Gravity.CENTER))
+                addView(failedView, FrameLayout.LayoutParams(context.dp(100f), context.dp(100f), Gravity.CENTER))
             }
         }
 
-        fun showDialog(context: Context) {
-            AlertDialog.Builder(context).setView(form(context)).setNegativeButton(android.R.string.cancel, null).show()
+        /** [EN] `customTextField(image:)`: white, 10 pt corners, a 10 % border, the icon at the leading edge. [CN] `customTextField(image:)`：白色、10 pt 圆角、10% 描边，图标在前端。 */
+        private fun field(context: Context, @DrawableRes icon: Int, type: Int) = EditText(context).apply {
+            inputType = type
+            setTextColor(Color.BLACK)
+            setPadding(context.dp(44f), context.dp(15f), context.dp(15f), context.dp(15f))
+            background = GradientDrawable().apply { setColor(Color.WHITE); cornerRadius = context.dp(10f).toFloat(); setStroke(context.dp(1f), Color.argb(26, 0, 0, 0)) }
+            setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0)
+            compoundDrawablePadding = context.dp(12f)
+            setPaddingRelative(context.dp(8f), context.dp(15f), context.dp(15f), context.dp(15f))
+        }
+
+        private fun labeled(context: Context, label: String, field: View, @ColorInt secondary: Int) = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(context.text(label, TextStyle.Subheadline, secondary))
+            addView(field, lp(-1, -2) { topMargin = context.dp(8f) })
         }
     }
 }

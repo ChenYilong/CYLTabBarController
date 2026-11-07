@@ -8,10 +8,7 @@ import com.cyl.tabbar.CYLEnums
 import com.cyl.tabbar.CYLPlusButton
 import com.cyl.tabbar.CYLTabBarController
 import com.cyl.tabbar.CYLThemeManager
-import com.cyl.tabbar.demo.DemoCatalog
-import com.cyl.tabbar.demo.DemoListFragment
 import com.cyl.tabbar.demo.DemoTabBarActivity
-import com.cyl.tabbar.demo.TextPageFragment
 
 /**
  * [EN] The Android port of Example-PAG (issue #604): four PAG tab icons played by libpag (`CYLTabBarAnimationFilePath`, the
@@ -29,6 +26,9 @@ class MainActivity : DemoTabBarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // [EN] `RootNavigationController`: an opaque 3A57ED bar with white titles and buttons. [CN] `RootNavigationController`：不透明的 3A57ED 导航栏，白色标题与按钮。
+        supportActionBar?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(NAVIGATION_BAR_COLOR))
+        supportActionBar?.setHomeAsUpIndicator(androidx.core.content.ContextCompat.getDrawable(this, androidx.appcompat.R.drawable.abc_ic_ab_back_material)?.mutate()?.apply { setTint(Color.WHITE) })
         CYLThemeManager.defaultManager.addListener(themeListener)
         if (GuideActivity.isFirstLaunch(this)) GuideActivity.show(this)
     }
@@ -48,9 +48,9 @@ class MainActivity : DemoTabBarActivity() {
         }
         val pages = listOf(
             HomePage(),
-            TextPageFragment.newInstance(titles[1], background = Color.BLUE),
-            TextPageFragment.newInstance(getString(R.string.contacts), background = Color.rgb(128, 0, 128)),
-            DemoListFragment.newInstance(DemoCatalog.SETTINGS),
+            ColorPage.newInstance(R.string.tab_health, Color.BLUE),
+            ColorPage.newInstance(R.string.contacts, Color.rgb(128, 0, 128)),
+            MePage(),
         )
         return CYLTabBarController(this, pages, items, style, MenuPlusButton.CONTEXT).apply {
             // [EN] Issue #428: tab icon animations at 1.5x. [CN] Issue #428：Tab 图标动画 1.5 倍速。
@@ -61,6 +61,19 @@ class MainActivity : DemoTabBarActivity() {
             hideTabBarShadowImageView()
             intent.getIntExtra(SELECTED_INDEX, -1).takeIf { it >= 0 }?.let { index -> view.post { selectedIndex = index } }
         }
+    }
+
+    /** [EN] The action bar title in white, as the iOS navigation bar. [CN] 白色的 ActionBar 标题，与 iOS 导航栏一致。 */
+    fun setNavigationTitle(text: String) {
+        title = android.text.SpannableString(text).apply { setSpan(android.text.style.ForegroundColorSpan(Color.WHITE), 0, length, 0) }
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            onBackPressedDispatcher.onBackPressed()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     /** [EN] The animation keys of a file, when it was downloaded (as `CYLTabBarItemAttributesAddingAnimationFile`). [CN] 文件已下载时的动画 key（对应 `CYLTabBarItemAttributesAddingAnimationFile`）。 */
@@ -81,5 +94,6 @@ class MainActivity : DemoTabBarActivity() {
     companion object {
         /** [EN] The tab to select after the tab bar is created again (iOS `TabBarCommon.completionhandler`). [CN] 重新创建 TabBar 后选中的 Tab（iOS `TabBarCommon.completionhandler`）。 */
         const val SELECTED_INDEX = "selectedIndex"
+        val NAVIGATION_BAR_COLOR = Color.parseColor("#3A57ED")
     }
 }

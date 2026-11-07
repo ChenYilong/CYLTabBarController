@@ -6,7 +6,6 @@ import androidx.test.core.app.ApplicationProvider
 import com.cyl.tabbar.CYLConstants
 import com.cyl.tabbar.CYLPlusButton
 import com.cyl.tabbar.CYLThemeManager
-import com.cyl.tabbar.demo.DemoListFragment
 import com.cyl.tabbar.demo.DemoTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -28,7 +27,7 @@ class ExamplePAGTest {
         shadowOf(Looper.getMainLooper()).idle()
         val controller = activity.tabBarController ?: error("no tab bar controller")
         assertEquals(4, controller.viewControllers.size)
-        assertTrue(controller.viewControllers.last() is DemoListFragment)
+        assertTrue(controller.viewControllers.last() is MePage)
         val plus: CYLPlusButton = controller.tabBar.plusButton ?: error("no plus button")
         assertEquals(context.getString(R.string.menu), plus.titleLabel.text.toString())
         assertEquals("the guide opens on first launch", GuideActivity::class.java.name, shadowOf(activity).nextStartedActivity?.component?.className)
@@ -42,5 +41,16 @@ class ExamplePAGTest {
             assertEquals("tab_moments.pag", controller.tabBarItemAttributesAtIndex(2)?.get(CYLConstants.CYLTabBarAnimationFilePath))
         }
         CYLThemeManager.defaultManager.currentThemeIdentifier = "Default"
+    }
+
+    /** [EN] The methods the library calls by reflection exist in the libpag of this app. [CN] 库通过反射调用的方法在本 App 的 libpag 中存在。 */
+    @Test
+    fun libpagHasTheReflectedMethods() {
+        val view = Class.forName("org.libpag.PAGView", false, javaClass.classLoader)
+        val methods = view.methods.map { it.name to it.parameterTypes.map { type -> type.simpleName } }.toSet()
+        for (expected in listOf("setPath" to listOf("String"), "flush" to emptyList(), "setScaleMode" to listOf("int"), "setRepeatCount" to listOf("int"),
+                                 "setProgress" to listOf("double"), "getProgress" to emptyList(), "play" to emptyList(), "stop" to emptyList())) {
+            assertTrue("$expected in PAGView", expected in methods)
+        }
     }
 }

@@ -414,6 +414,47 @@ internal object CYLReflection {
         return try { method.invoke(target, *args.toTypedArray()) ?: Unit } catch (error: ReflectiveOperationException) { null } catch (error: RuntimeException) { null }
     }
 
+    /** [EN] A placeholder for a parameter left to its Kotlin default (`callKotlin`). [CN] 使用 Kotlin 默认值的参数占位（`callKotlin`）。 */
+    val DEFAULT = Any()
+
+    /**
+     * [EN] Calls a Kotlin method with default parameters through its synthetic `name$default` method, so the parameters given
+     *      as `DEFAULT` take the library's own defaults (e.g. rive-android's `Fit.CONTAIN`, `Loop.AUTO`), not a guess. The
+     *      overload is the one whose parameter count is `args.size` and whose given arguments fit. Null when none fits.
+     * [CN] 通过 Kotlin 生成的 `name$default` 方法调用带默认参数的方法，传入 `DEFAULT` 的参数使用库自己的默认值（如 rive-android 的
+     *      `Fit.CONTAIN`、`Loop.AUTO`），而不是猜测的值。选择参数个数为 `args.size` 且给定参数类型匹配的重载。没有匹配时为 null。
+     */
+    fun callKotlin(target: Any, name: String, vararg args: Any?): Any? {
+        val candidates = target.javaClass.methods.filter { method ->
+            method.name == name + "\$default" && java.lang.reflect.Modifier.isStatic(method.modifiers) && method.parameterTypes.size == args.size + 3
+        }
+        for (method in candidates) {
+            val types = method.parameterTypes
+            var mask = 0
+            val values = ArrayList<Any?>(types.size)
+            values += target
+            var fits = types[0].isInstance(target)
+            args.forEachIndexed { index, arg ->
+                val type = types[index + 1]
+                if (arg === DEFAULT) {
+                    mask = mask or (1 shl index)
+                    values += defaultValue(type).takeIf { type.isPrimitive }
+                } else {
+                    val adapted = adapt(arrayOf(type), arrayOf(arg))
+                    if (adapted == null) fits = false else values += adapted[0]
+                }
+            }
+            if (!fits) continue
+            values += mask
+            values += null
+            return try { method.invoke(null, *values.toTypedArray()) ?: Unit } catch (error: ReflectiveOperationException) { null } catch (error: RuntimeException) { null }
+        }
+        return null
+    }
+
+    /** [EN] The constant `name` of the enum `className`, or null. [CN] 枚举 `className` 中名为 `name` 的常量，或 null。 */
+    fun enumConstant(className: String, name: String): Any? = type(className)?.enumConstants?.firstOrNull { (it as? Enum<*>)?.name == name }
+
     private fun defaultValue(type: Class<*>): Any? = when {
         type == java.lang.Boolean.TYPE -> false
         type == Integer.TYPE -> 0
@@ -651,24 +692,27 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
         val machine = stateMachine
         val trigger = options[CYLConstants.CYLTabBarAnimationOptionRiveTriggerInput] ?: options[CYLConstants.CYLTabBarAnimationOptionRiveTriggerProperty]
         val animation = options[CYLConstants.CYLTabBarAnimationOptionRiveAnimation]
+        val default = CYLReflection.DEFAULT
         when {
             machine != null && trigger != null -> CYLReflection.call(rive, "fireState", machine, trigger)
             machine != null -> {
                 setActive(true)
                 if (activeDuration > 0) handler.postDelayed({ setActive(false) }, (activeDuration * 1000).toLong())
             }
-            animation != null -> CYLReflection.callWithDefaults(rive, "play", mapOf(String::class.java to animation))
-            else -> { CYLReflection.callWithDefaults(rive, "reset"); CYLReflection.callWithDefaults(rive, "play") }
+            // [EN] rive-android `play(animationName, loop, direction, isStateMachine, settleInitialState)`. [CN] rive-android 的 `play(animationName, loop, direction, isStateMachine, settleInitialState)`。
+            animation != null -> CYLReflection.callKotlin(rive, "play", animation, default, default, false, default)
+            // [EN] `reset()`, then `play(loop, direction, settleInitialState)` with its defaults. [CN] `reset()` 后以默认值调用 `play(loop, direction, settleInitialState)`。
+            else -> { CYLReflection.call(rive, "reset"); CYLReflection.callKotlin(rive, "play", default, default, default) }
         }
     }
 
     override fun cyl_showAnimationViewLastFrame() {
-        if (stateMachine != null) setActive(true) else CYLReflection.callWithDefaults(rive, "pause")
+        if (stateMachine != null) setActive(true) else CYLReflection.call(rive, "pause")
     }
 
     override fun cyl_stopAnimationView() {
         handler.removeCallbacksAndMessages(null)
-        if (stateMachine != null) setActive(false) else { CYLReflection.callWithDefaults(rive, "stop"); CYLReflection.callWithDefaults(rive, "reset") }
+        if (stateMachine != null) setActive(false) else { CYLReflection.call(rive, "stop"); CYLReflection.call(rive, "reset") }
     }
 
     /** [EN] Provides the views of `CYLRiveTabBarItemAnimator`. [CN] 为 `CYLRiveTabBarItemAnimator` 提供视图。 */
@@ -678,11 +722,35 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
             val view = CYLRiveTabBarItemAnimationView(context, rive, options)
             CYLTabBarItemAnimationFiles.localFile(context, fileURL) { file ->
                 val bytes = file?.readBytes() ?: return@localFile
-                CYLReflection.callWithDefaults(rive, "setRiveBytes", mapOf(ByteArray::class.java to bytes))
-                options[CYLConstants.CYLTabBarAnimationOptionRiveArtboard]?.let { CYLReflection.call(rive, "setArtboardName", it) }
-                options[CYLConstants.CYLTabBarAnimationOptionRiveStateMachine]?.let { CYLReflection.callWithDefaults(rive, "play", mapOf(String::class.java to it, java.lang.Boolean.TYPE to true)) }
+                load(rive, bytes, options, contentMode)
             }
             return view
+        }
+
+        /**
+         * [EN] rive-android `setRiveBytes(bytes, artboardName, animationName, stateMachineName, autoplay, autoBind, fit,
+         *      alignment, loop)`, as its sample's `setRiveResource(…, stateMachineName = …)`: the artboard and the state machine
+         *      are given at load, a state machine runs (autoplay) so its inputs work, a linear animation waits to be played.
+         *      The other parameters keep rive-android's defaults; the tab's content mode picks the fit.
+         * [CN] rive-android 的 `setRiveBytes(bytes, artboardName, animationName, stateMachineName, autoplay, autoBind, fit, alignment, loop)`，
+         *      与其示例的 `setRiveResource(…, stateMachineName = …)` 相同：加载时传入画板与状态机，状态机运行（autoplay）以便输入生效，线性动画等待播放。
+         *      其他参数使用 rive-android 的默认值；Tab 的内容模式决定 fit。
+         */
+        private fun load(rive: View, bytes: ByteArray, options: Map<String, String>, contentMode: ImageView.ScaleType) {
+            val default = CYLReflection.DEFAULT
+            val stateMachine = options[CYLConstants.CYLTabBarAnimationOptionRiveStateMachine]
+            val fit = when (contentMode) {
+                ImageView.ScaleType.FIT_XY -> "FILL"
+                ImageView.ScaleType.CENTER_CROP -> "COVER"
+                else -> "CONTAIN"
+            }.let { CYLReflection.enumConstant("app.rive.runtime.kotlin.core.Fit", it) } ?: default
+            val loaded = CYLReflection.callKotlin(rive, "setRiveBytes", bytes, options[CYLConstants.CYLTabBarAnimationOptionRiveArtboard] ?: default,
+                default, stateMachine ?: default, stateMachine != null, default, fit, default, default)
+            // [EN] An older rive-android without these parameters: the bytes, then the artboard. [CN] 没有这些参数的旧版 rive-android：先设置数据，再设置画板。
+            if (loaded == null) {
+                CYLReflection.callWithDefaults(rive, "setRiveBytes", mapOf(ByteArray::class.java to bytes))
+                options[CYLConstants.CYLTabBarAnimationOptionRiveArtboard]?.let { CYLReflection.call(rive, "setArtboardName", it) }
+            }
         }
     }
 }
