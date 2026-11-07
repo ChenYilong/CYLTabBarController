@@ -115,7 +115,7 @@ pod 'CYLTabBarController', :modular_headers => true
 ```swift
 // Package.swift
 dependencies: [
-    .package(url: "https://github.com/ChenYilong/CYLTabBarController.git", from: "1.99.72"),
+    .package(url: "https://github.com/ChenYilong/CYLTabBarController.git", from: "1.100.0"),
 ],
 targets: [
     .target(name: "YourApp", dependencies: [

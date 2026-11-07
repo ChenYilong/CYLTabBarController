@@ -43,6 +43,7 @@
 		B7D4C755CD143ACE372A53DF /* tab_moments.pag in Resources */ = {isa = PBXBuildFile; fileRef = 5DDBC61E0EFE15EA384C6944 /* tab_moments.pag */; };
 		C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000004 /* SceneDelegate.swift */; };
 		DC4F14A3D431345E1C719293 /* CYLSettingsDemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570F6E92202376D43895876D /* CYLSettingsDemoTableViewController.swift */; };
+		C45007909C53257E911E7E8E /* CYLDemoTabBarStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225CFE82F2484B0A826F124 /* CYLDemoTabBarStyle.swift */; };
 		E4527749730DAF427484396C /* tab_home.pag in Resources */ = {isa = PBXBuildFile; fileRef = 15B09426CFDE645588779718 /* tab_home.pag */; };
 		E462EF3903016B48B7150636 /* Pods_HealthyHome_HealthyHomeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791B5EAC446039618D1575F4 /* Pods_HealthyHome_HealthyHomeUITests.framework */; };
 		F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */; };
@@ -109,6 +110,7 @@
 		49A270299539A5C33415EAAA /* Pods_HealthyHome.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HealthyHome.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A14B4CADF8B73766EB93756 /* Pods-HealthyHome.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHome.debug.xcconfig"; path = "Target Support Files/Pods-HealthyHome/Pods-HealthyHome.debug.xcconfig"; sourceTree = "<group>"; };
 		570F6E92202376D43895876D /* CYLSettingsDemoTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLSettingsDemoTableViewController.swift; path = "../Example-Shared/CYLSettingsDemoTableViewController.swift"; sourceTree = SOURCE_ROOT; };
+		E225CFE82F2484B0A826F124 /* CYLDemoTabBarStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoTabBarStyle.swift; path = "../Example-Shared/CYLDemoTabBarStyle.swift"; sourceTree = SOURCE_ROOT; };
 		57A3DC71B3DDFBD084B169F4 /* tab_me.pag */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_me.pag; path = "../Example-Shared/PAGResources/tab-icons/tab_me.pag"; sourceTree = SOURCE_ROOT; };
 		5DDBC61E0EFE15EA384C6944 /* tab_moments.pag */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_moments.pag; path = "../Example-Shared/PAGResources/tab-icons/tab_moments.pag"; sourceTree = SOURCE_ROOT; };
 		78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
@@ -165,6 +167,7 @@
 			children = (
 				78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */,
 				570F6E92202376D43895876D /* CYLSettingsDemoTableViewController.swift */,
+				E225CFE82F2484B0A826F124 /* CYLDemoTabBarStyle.swift */,
 				A2A9C3F58E83E7420A5303DB /* PAGResources */,
 				184C1C8C23F65A2800B23C7F /* HealthyHome */,
 				184C1CA323F65A2A00B23C7F /* HealthyHomeTests */,
@@ -684,6 +687,7 @@
 			files = (
 				F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				DC4F14A3D431345E1C719293 /* CYLSettingsDemoTableViewController.swift in Sources */,
+				C45007909C53257E911E7E8E /* CYLDemoTabBarStyle.swift in Sources */,
 				184C1CCC23F65A6700B23C7F /* FriendsVC.swift in Sources */,
 				184F198723F7C811002DBAE4 /* UIColor+Extension.swift in Sources */,
 				184C1CE623F65A9A00B23C7F /* RootTabBarController.swift in Sources */,
