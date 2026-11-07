@@ -1,6 +1,6 @@
 ---
 name: cyl-tab-animation
-description: "Animated tab icons in CYLTabBarController with Lottie, PAG or Rive: subspecs, keys, options, availability guards, and adding a new animation library. Use when adding animated tabs or touching the CYLTabBarItemAnimation subspec."
+description: "Animated tab icons in CYLTabBarController with Lottie, PAG, Rive or GIF: subspecs, keys, options, availability guards, and adding a new animation library. Use when adding animated tabs or touching the CYLTabBarItemAnimation subspec."
 ---
 
 # Animated tab icons
@@ -15,6 +15,7 @@ Steps for app developers: [Tab-Icon-Animation-Quick-Start](../../../docs/Tab-Ico
 | Lottie 2.5 | `Lottie` | same | same | Objective-C | `Example-Swift-02` |
 | PAG | `PAG`, `PAGEnterprise` | `CYLTabBarPAGURL` / `CYLTabBarPAGFilePath` | `CYLTabBarPAGSize` | [PAG-Animation](../../../docs/PAG-Animation.md) | `Example-PAG` |
 | Rive | `Rive` | `CYLTabBarRiveURL` / `CYLTabBarRiveFilePath` | `CYLTabBarRiveSize` | iOS 14, CocoaPods only; options such as `CYLTabBarAnimationOptionRiveArtboard` on the URL | `Example-Rive`, `Example-SwiftUI-Rive` |
+| GIF (#605) | `GIF` | `CYLTabBarGIFURL` / `CYLTabBarGIFFilePath` | `CYLTabBarGIFSize` | no third-party library (ImageIO); plays once, stays on the last frame; a GIF given as `CYLTabBarItemImage` loops instead | none yet |
 
 - `pod 'CYLTabBarController'` alone has **no** animation code. Without a subspec the tabs show their images.
 - Subspecs combine, and one tab bar can mix libraries and static tabs: [Per-Tab-Animation](../../../docs/Per-Tab-Animation.md).
