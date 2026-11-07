@@ -6,14 +6,22 @@ appcompat = "1.7.0"
 fragment = "1.8.5"
 material = "1.12.0"
 json = "20240303"
+android-library = "8.7.3"
+robolectric = "4.14.1"
+junit = "4.13.2"
+androidx-test-core = "1.6.1"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 json = { module = "org.json:json", version.ref = "json" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+junit = { module = "junit:junit", version.ref = "junit" }
+androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

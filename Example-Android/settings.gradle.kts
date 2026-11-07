@@ -14,5 +14,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "CYLTabBarPagesAndroid"
-include(":tabpages", ":app")
+rootProject.name = "CYLTabBarControllerAndroid"
+include(":tabpages", ":cyltabbar", ":app")

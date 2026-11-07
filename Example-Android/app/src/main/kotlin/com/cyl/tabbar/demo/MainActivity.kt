@@ -2,27 +2,36 @@ package com.cyl.tabbar.demo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import com.cyl.tabbar.pages.TabConfiguration
-import com.cyl.tabbar.pages.TabPages
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.cyl.tabbar.CYLConstants
+import com.cyl.tabbar.CYLEnums
+import com.cyl.tabbar.CYLPlusButton
+import com.cyl.tabbar.CYLTabBarController
+import com.cyl.tabbar.cyl_showBadgeValue
 
 /**
- * [EN] Reads cyl_tabbar_configuration.json, the iOS library's own sample file (shared as an asset), keeps the tabs
- *      for Android and this app version, finds each page by its page ID and shows them in a bottom navigation bar.
- * [CN] 读取 iOS 库自带的示例文件 cyl_tabbar_configuration.json（作为 asset 共用），保留适用于 Android 与本 App 版本的 Tab，
- *      按页面 ID 找到各页面，并显示在底部导航栏中。
+ * [EN] The iOS library's own sample file (shared as an asset) creates a `CYLTabBarController`: the tabs for Android and
+ *      this app version, each page found by its page ID (`DemoPages`), a plus button (`DemoPlusButton`), a badge, the
+ *      tap animation and the double tap.
+ * [CN] iOS 库自带的示例文件（作为 asset 共用）创建 `CYLTabBarController`：适用于 Android 与本 App 版本的 Tab、按页面 ID 找到的页面
+ *      （`DemoPages`）、PlusButton（`DemoPlusButton`）、角标、点击动画与双击。
  */
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         DemoPages.registerOnce()
-        val json = assets.open("cyl_tabbar_configuration.json").bufferedReader().use { it.readText() }
-        val appVersion = packageManager.getPackageInfo(packageName, 0).versionName
-        val tabs = TabConfiguration.tabs(json, platform = "android", appVersion = appVersion)
-        val pages = TabPages.resolve(tabs, Fragment::class.java, shared = DemoPages.shared)
-        TabBarBinder.bind(findViewById<BottomNavigationView>(R.id.tabs), supportFragmentManager, R.id.pages, "main", pages)
+        CYLPlusButton.registerPlusButton(DemoPlusButton.Provider)
+        val controller = CYLTabBarController.tabBarControllerWithConfigurationFile(this, "cyl_tabbar_configuration.json")
+        controller.cyl_tabButtonTapAnimationType = CYLEnums.CYLTabButtonTapAnimationType.Scale
+        controller.cyl_hidesBadgeOfSelectedTab = true
+        controller.cyl_tabBarItemGestureHandler = { tabBarController, gesture, _, page ->
+            if (gesture == CYLEnums.CYLTabBarItemGesture.DoubleTap) {
+                val index = page?.let { tabBarController.viewControllers.indexOf(it) } ?: -1
+                tabBarController.updateTabBarItemAtIndex(index, mapOf(CYLConstants.CYLTabBarItemTitle to getString(R.string.double_tapped)))
+            }
+        }
+        setContentView(controller.view)
+        controller.tabBar.tabBarButtonArray.getOrNull(1)?.cyl_showBadgeValue("12")
+        controller.tabBar.tabBarButtonArray.getOrNull(3)?.cyl_showBadgeValue("")
     }
 }

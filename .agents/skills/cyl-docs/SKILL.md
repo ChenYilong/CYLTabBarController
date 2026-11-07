@@ -17,6 +17,7 @@ Then run:
 ```sh
 python3 scripts/update-docs-navigation.py
 python3 scripts/sync-agent-skills.py --check
+python3 scripts/android-api-map.py --check   # after a public header changes 公开头文件变化后
 ```
 
 ## 1. Documentation is part of every new feature

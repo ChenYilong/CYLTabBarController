@@ -21,7 +21,7 @@ Every new demo in this repository is created with this skill. Source of truth: c
 | Swift Package Manager | package URL or `relativePath = ..` (Core + FlatDesign + Lottie 4.x; no PAG or Rive) | `Example-Swift-SwiftManager-FlatDesign`, `Example-Swift-Gallery`, `Example-Swift-SwiftManager` (iOS 26) | package iOS 13; use 15.0 |
 | Carthage | `github "ChenYilong/CYLTabBarController"` (no Lottie, PAG or Rive) | `Example-Swift-Carthage` | 15.0 |
 | Objective-C, every feature | root `CYLTabBarController.xcodeproj` + `Example/` | `Example/` (the Tab Bar Gallery has a scene per API) | 15.0 |
-| Android app reading the same configuration file (page IDs, platforms, versions; no tab bar code) | `Example-Android/tabpages` (pure Kotlin, Gradle) | `Example-Android` | Android SDK 35; see [Tab-Page-Registry](../../../docs/Tab-Page-Registry.md) |
+| Android app: `CYLTabBarController` for Android (the iOS API in Kotlin and Java) from the same configuration file | `Example-Android/cyltabbar` (Gradle; depends on `tabpages`) | `Example-Android` | minSdk 23, compileSdk 35; see [Android-Library](../../../docs/Android-Library.md) |
 
 `Example-Shared/` holds Swift sources that the Swift demos share; reuse it instead of copying. See [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md) for combining libraries and [Swift-Guide](../../../docs/Swift-Guide.md) for `import` failures.
 

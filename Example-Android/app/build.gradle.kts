@@ -1,5 +1,5 @@
-// The demo app: a bottom navigation bar built from the iOS library's configuration file, pages from page IDs.
-// 演示 App：用 iOS 库的配置文件生成底部导航栏，页面由页面 ID 获得。
+// The demo app: a CYLTabBarController built from the iOS library's configuration file, pages from page IDs.
+// 演示 App：用 iOS 库的配置文件创建 CYLTabBarController，页面由页面 ID 获得。
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -43,7 +43,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":tabpages"))
+    implementation(project(":cyltabbar"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.material)

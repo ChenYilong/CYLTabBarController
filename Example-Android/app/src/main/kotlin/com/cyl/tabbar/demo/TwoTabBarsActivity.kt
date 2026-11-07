@@ -2,37 +2,37 @@ package com.cyl.tabbar.demo
 
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import com.cyl.tabbar.pages.TabItem
-import com.cyl.tabbar.pages.TabPageRegistry
-import com.cyl.tabbar.pages.TabPages
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.cyl.tabbar.CYLConstants
+import com.cyl.tabbar.CYLTabBarController
+import com.cyl.tabbar.CYLTabBarPageRegistry
 
 /**
- * [EN] Two tab bars on one screen from the same tabs: each has its own registry, so the same page IDs ("home", "me")
- *      give different pages (blue and orange), like the iOS demo C16.
- * [CN] 同一屏幕上的两个 TabBar，使用同样的 Tab：各自有自己的注册表，因此相同的页面 ID（"home"、"me"）得到不同的页面（蓝色与橙色），
- *      与 iOS 演示 C16 相同。
+ * [EN] Two `CYLTabBarController`s on one screen (the iOS demo C16): the same page IDs, each tab bar with its own
+ *      `CYLTabBarPageRegistry`, so "home" and "me" give different pages.
+ * [CN] 同一屏幕上的两个 `CYLTabBarController`（iOS 演示 C16）：相同的页面 ID，各自的 `CYLTabBarPageRegistry`，因此 "home" 与 "me"
+ *      得到不同的页面。
  */
 class TwoTabBarsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_two_tab_bars)
-        val tabs = listOf(
-            TabItem(mapOf("CYLTabBarItemTitle" to "Home", "CYLTabBarItemImage" to "system:house", "CYLTabBarItemIdentifier" to "home")),
-            TabItem(mapOf("CYLTabBarItemTitle" to "Me", "CYLTabBarItemImage" to "system:person", "CYLTabBarItemIdentifier" to "me")),
-        )
-        bind("A", Color.argb(64, 0, 122, 255), R.id.tabsA, R.id.pagesA, tabs)
-        bind("B", Color.argb(64, 255, 149, 0), R.id.tabsB, R.id.pagesB, tabs)
-    }
-
-    private fun bind(name: String, color: Int, navigation: Int, container: Int, tabs: List<TabItem>) {
-        val registry = TabPageRegistry<Fragment>().apply {
-            register("home", "me") { id, _ -> TextPageFragment.newInstance("Tab bar $name · page ID \"$id\"", background = color) }
+        val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        for ((name, color) in listOf("A" to Color.argb(64, 0, 122, 255), "B" to Color.argb(64, 255, 149, 0))) {
+            val registry = CYLTabBarPageRegistry().apply {
+                registerPageProvider({ id, _ -> TextPageFragment.newInstance("Tab bar $name · page ID \"$id\"", background = color) }, listOf("home", "me"))
+            }
+            val controller = CYLTabBarController(this, mapOf(
+                CYLConstants.CYLTabBarControllerPageRegistry to registry,
+                CYLConstants.CYLTabBarControllerContext to "two-tab-bars-$name",
+                CYLConstants.CYLTabBarControllerTabBarItemsAttributes to listOf(
+                    mapOf(CYLConstants.CYLTabBarItemTitle to "Home", CYLConstants.CYLTabBarItemImage to "system:house", CYLConstants.CYLTabBarItemIdentifier to "home"),
+                    mapOf(CYLConstants.CYLTabBarItemTitle to "Me", CYLConstants.CYLTabBarItemImage to "system:person", CYLConstants.CYLTabBarItemIdentifier to "me"),
+                ),
+            ))
+            column.addView(controller.view, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
         }
-        val pages = TabPages.resolve(tabs, Fragment::class.java, registry = registry)
-        TabBarBinder.bind(findViewById<BottomNavigationView>(navigation), supportFragmentManager, container, "tabBar$name", pages)
+        setContentView(column)
     }
 }

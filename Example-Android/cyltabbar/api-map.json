@@ -1,0 +1,4971 @@
+{
+ "CYLAxis": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention)": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_opacityForever_Animation:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_opacityTimes_Animation:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_rotation:degree:direction:repeatCount:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_scaleFrom:toScale:durTimes:rep:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_shake_AnimationRepeatTimes:durTimes:forObj:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_bounce_AnimationRepeatTimes:durTimes:forObj:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_shakeAnimationRepeatTimes:duration:offset:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_bounceAnimationRepeatTimes:duration:offset:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_springAnimationForDuration:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_scale_AnimationRepeatTimes:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_leftRight_AnimationMoveDistance:repeatTimes:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rightLeft_AnimationMoveDistance:repeatTimes:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_fadeIn_AnimationRepeatTimes:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rolling_AnimationRepeatTimes:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_opacityForeverAnimationWithDuration:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_opacityTimesAnimationRepeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_rotationAnimationWithDuration:degree:direction:repeatCount:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_scaleAnimationFromScale:toScale:duration:repeatTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_shakeAnimationRepeatTimes:duration:forObj:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_bounceAnimationRepeatTimes:duration:forObj:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_scale_AnimationRepeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_leftRight_AnimationMoveDistance:repeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rightLeft_AnimationMoveDistance:repeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_fadeIn_AnimationRepeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rolling_AnimationRepeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; Android plays the badge animations with ObjectAnimator (`CYLBadgeView.play()`)"
+ },
+ "CYLBadgeAppearance": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance globalAppearance": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance backgroundColor": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance textColor": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance font": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance centerOffset": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance radius": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance margin": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance maximumBadgeNumber": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance cornerRadius": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance borderColor": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance borderWidth": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeAppearance -reset": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeStyle": {
+  "status": "done",
+  "android": "CYLEnums.CYLBadgeStyle"
+ },
+ "CYLBadgeAnimationType": {
+  "status": "done",
+  "android": "CYLEnums.CYLBadgeAnimationType"
+ },
+ "CYLBadgeProtocol": {
+  "status": "done",
+  "android": "View extensions in CYLBadge.kt"
+ },
+ "CYLBadgeProtocol cyl_badgeFont": {
+  "status": "done",
+  "android": "View.cyl_badgeFont"
+ },
+ "CYLBadgeProtocol cyl_badgeBackgroundColor": {
+  "status": "done",
+  "android": "View.cyl_badgeBackgroundColor"
+ },
+ "CYLBadgeProtocol cyl_badgeTextColor": {
+  "status": "done",
+  "android": "View.cyl_badgeTextColor"
+ },
+ "CYLBadgeProtocol cyl_badgeFrame": {
+  "status": "done",
+  "android": "View.cyl_badgeFrame"
+ },
+ "CYLBadgeProtocol cyl_badgeFrameValue": {
+  "status": "done",
+  "android": "View.cyl_badgeFrame",
+  "note": "the NSValue twin of the typed property"
+ },
+ "CYLBadgeProtocol cyl_badgeCenterOffset": {
+  "status": "done",
+  "android": "View.cyl_badgeCenterOffset"
+ },
+ "CYLBadgeProtocol cyl_badgeCenterOffsetValue": {
+  "status": "done",
+  "android": "View.cyl_badgeCenterOffset",
+  "note": "the NSValue twin of the typed property"
+ },
+ "CYLBadgeProtocol cyl_badgeAnimationType": {
+  "status": "done",
+  "android": "View.cyl_badgeAnimationType"
+ },
+ "CYLBadgeProtocol cyl_badgeAnimationTypeValue": {
+  "status": "done",
+  "android": "View.cyl_badgeAnimationType",
+  "note": "the NSValue twin of the typed property"
+ },
+ "CYLBadgeProtocol cyl_badgeMaximumBadgeNumber": {
+  "status": "done",
+  "android": "View.cyl_badgeMaximumBadgeNumber"
+ },
+ "CYLBadgeProtocol cyl_badgeMaximumBadgeNumberValue": {
+  "status": "done",
+  "android": "View.cyl_badgeMaximumBadgeNumber",
+  "note": "the NSValue twin of the typed property"
+ },
+ "CYLBadgeProtocol cyl_badgeRadius": {
+  "status": "done",
+  "android": "View.cyl_badgeRadius"
+ },
+ "CYLBadgeProtocol cyl_badgeRadiusValue": {
+  "status": "done",
+  "android": "View.cyl_badgeRadius",
+  "note": "the NSValue twin of the typed property"
+ },
+ "CYLBadgeProtocol cyl_badgeMargin": {
+  "status": "done",
+  "android": "View.cyl_badgeMargin"
+ },
+ "CYLBadgeProtocol cyl_badgeMarginValue": {
+  "status": "done",
+  "android": "View.cyl_badgeMargin",
+  "note": "the NSValue twin of the typed property"
+ },
+ "CYLBadgeProtocol cyl_badgeCornerRadius": {
+  "status": "done",
+  "android": "View.cyl_badgeCornerRadius"
+ },
+ "CYLBadgeProtocol cyl_badgeCornerRadiusValue": {
+  "status": "done",
+  "android": "View.cyl_badgeCornerRadius",
+  "note": "the NSValue twin of the typed property"
+ },
+ "CYLBadgeProtocol cyl_delayIfNeededForSeconds": {
+  "status": "done",
+  "android": "View.cyl_delayIfNeededForSeconds"
+ },
+ "CYLBadgeProtocol -cyl_isShowBadge": {
+  "status": "done",
+  "android": "View.cyl_isShowBadge()"
+ },
+ "CYLBadgeProtocol -cyl_showBadge": {
+  "status": "done",
+  "android": "View.cyl_showBadge()"
+ },
+ "CYLBadgeProtocol -cyl_showBadgeValue:animationType:": {
+  "status": "done",
+  "android": "View.cyl_showBadgeValue()"
+ },
+ "CYLBadgeProtocol -cyl_clearBadge": {
+  "status": "done",
+  "android": "View.cyl_clearBadge()"
+ },
+ "CYLBadgeProtocol -cyl_resumeBadge": {
+  "status": "done",
+  "android": "View.cyl_resumeBadge()"
+ },
+ "CYLBadgeProtocol -cyl_isPauseBadge": {
+  "status": "done",
+  "android": "View.cyl_isPauseBadge()"
+ },
+ "CYLBadgeProtocol -cyl_getActualBadgeSuperView": {
+  "status": "done",
+  "android": "View.cyl_getActualBadgeSuperView()"
+ },
+ "CYLBadgeProtocol -cyl_isReady": {
+  "status": "done",
+  "android": "View.cyl_isReady()"
+ },
+ "CYLBadgeProtocol -cyl_performSelector:": {
+  "status": "n/a",
+  "note": "Objective-C runtime"
+ },
+ "CYLBadgeProtocol -cyl_performSelector:withObject:": {
+  "status": "n/a",
+  "note": "Objective-C runtime"
+ },
+ "CYLBadgeProtocol -cyl_performSelector:withObject:withObject:": {
+  "status": "n/a",
+  "note": "Objective-C runtime"
+ },
+ "CYLBadgeProtocol cyl_delayIfNeededForSecondsValue": {
+  "status": "done",
+  "android": "View.cyl_delayIfNeededForSeconds",
+  "note": "the NSValue twin of the typed property"
+ },
+ "CYLBadgeTextDisplaying": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeTextDisplaying text": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeTextDisplaying font": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeTextDisplaying textColor": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLBadgeTextDisplaying textAlignment": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "UILabel(CYLBadgeTextDisplaying)": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLTabBarBadgeView": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLTabBarBadgeView badgeContentInset": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLTabBarBadgeView badgeLabel": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLTabBarBadgeView textAlignment": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLTabBarBadgeView textColor": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLTabBarBadgeView text": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "CYLTabBarBadgeView font": {
+  "status": "partial",
+  "android": "CYLBadgeView",
+  "note": "one badge view with the common appearance; the iOS appearance proxy and the text-displaying protocol are not separate types"
+ },
+ "UIBarButtonItem(CYLBadgeExtention)": {
+  "status": "planned",
+  "note": "badges on list cells and bar buttons are not ported (the View extensions work on any view)"
+ },
+ "UIBarButtonItem(CYLBadgeExtention) -cyl_isShowBadge": {
+  "status": "planned",
+  "note": "badges on list cells and bar buttons are not ported (the View extensions work on any view)"
+ },
+ "UIBarButtonItem(CYLBadgeExtention) -cyl_showBadge": {
+  "status": "planned",
+  "note": "badges on list cells and bar buttons are not ported (the View extensions work on any view)"
+ },
+ "UIBarButtonItem(CYLBadgeExtention) -cyl_showBadgeValue:animationType:": {
+  "status": "planned",
+  "note": "badges on list cells and bar buttons are not ported (the View extensions work on any view)"
+ },
+ "UIBarButtonItem(CYLBadgeExtention) -cyl_showBadgeValue:animationType:backgroundColor:": {
+  "status": "planned",
+  "note": "badges on list cells and bar buttons are not ported (the View extensions work on any view)"
+ },
+ "UIBarButtonItem(CYLBadgeExtention) -cyl_clearBadge": {
+  "status": "planned",
+  "note": "badges on list cells and bar buttons are not ported (the View extensions work on any view)"
+ },
+ "UIBarButtonItem(CYLBadgeExtention) -cyl_resumeBadge": {
+  "status": "planned",
+  "note": "badges on list cells and bar buttons are not ported (the View extensions work on any view)"
+ },
+ "UIBarButtonItem(CYLBadgeExtention) -cyl_isPauseBadge": {
+  "status": "planned",
+  "note": "badges on list cells and bar buttons are not ported (the View extensions work on any view)"
+ },
+ "UIControl(CYLBadgeExtention)": {
+  "status": "planned"
+ },
+ "UIControl(CYLBadgeExtention) -cyl_isShowBadge": {
+  "status": "planned"
+ },
+ "UIControl(CYLBadgeExtention) -cyl_showBadge": {
+  "status": "planned"
+ },
+ "UIControl(CYLBadgeExtention) -cyl_showBadgeValue:animationType:": {
+  "status": "planned"
+ },
+ "UIControl(CYLBadgeExtention) -cyl_clearBadge": {
+  "status": "planned"
+ },
+ "UIControl(CYLBadgeExtention) -cyl_resumeBadge": {
+  "status": "planned"
+ },
+ "UIControl(CYLBadgeExtention) -cyl_isPauseBadge": {
+  "status": "planned"
+ },
+ "UITabBarItem(CYLBadgeExtention)": {
+  "status": "planned"
+ },
+ "UITabBarItem(CYLBadgeExtention) -cyl_isShowBadge": {
+  "status": "planned"
+ },
+ "UITabBarItem(CYLBadgeExtention) -cyl_showBadge": {
+  "status": "planned"
+ },
+ "UITabBarItem(CYLBadgeExtention) -cyl_showBadgeValue:animationType:": {
+  "status": "planned"
+ },
+ "UITabBarItem(CYLBadgeExtention) -cyl_clearBadge": {
+  "status": "planned"
+ },
+ "UITabBarItem(CYLBadgeExtention) -cyl_resumeBadge": {
+  "status": "planned"
+ },
+ "UITabBarItem(CYLBadgeExtention) -cyl_isPauseBadge": {
+  "status": "planned"
+ },
+ "CYLBadgeAccessibilityDescription()": {
+  "status": "done",
+  "android": "CYLBadgeAccessibilityDescription(value)"
+ },
+ "UIView(CYLBadgeExtention)": {
+  "status": "done",
+  "android": "View.cyl_* extensions (CYLBadge.kt)"
+ },
+ "UIView(CYLBadgeExtention) cyl_badge": {
+  "status": "done",
+  "android": "View.cyl_badge"
+ },
+ "UIView(CYLBadgeExtention) -cyl_isShowBadge": {
+  "status": "done",
+  "android": "View.cyl_isShowBadge()"
+ },
+ "UIView(CYLBadgeExtention) -cyl_showBadge": {
+  "status": "done",
+  "android": "View.cyl_showBadge()"
+ },
+ "UIView(CYLBadgeExtention) -cyl_showBadgeValue:animationType:": {
+  "status": "done",
+  "android": "View.cyl_showBadgeValue()"
+ },
+ "UIView(CYLBadgeExtention) -cyl_showBadgeValue:": {
+  "status": "done",
+  "android": "View.cyl_showBadgeValue()"
+ },
+ "UIView(CYLBadgeExtention) -cyl_clearBadge": {
+  "status": "done",
+  "android": "View.cyl_clearBadge()"
+ },
+ "UIView(CYLBadgeExtention) -cyl_resumeBadge": {
+  "status": "done",
+  "android": "View.cyl_resumeBadge()"
+ },
+ "UIView(CYLBadgeExtention) -cyl_isPauseBadge": {
+  "status": "done",
+  "android": "View.cyl_isPauseBadge()"
+ },
+ "UIView(CYLBadgeExtention) -cyl_isHidden": {
+  "status": "done",
+  "android": "View.cyl_isHidden()"
+ },
+ "UIView(CYLBadgeExtention) -cyl_findBarButtonContentView": {
+  "status": "done",
+  "android": "View.cyl_findBarButtonContentView()"
+ },
+ "UIView(CYLBadgeExtention) cyl_keepShowingPlusButtonLabel": {
+  "status": "done",
+  "android": "View.cyl_keepShowingPlusButtonLabel"
+ },
+ "UIView(CYLBadgeExtention) cyl_badgeBorderColor": {
+  "status": "done",
+  "android": "View.cyl_badgeBorderColor"
+ },
+ "UIView(CYLBadgeExtention) cyl_badgeBorderWidth": {
+  "status": "done",
+  "android": "View.cyl_badgeBorderWidth"
+ },
+ "UIView(CYLBadgeExtention) cyl_badgeRespectsReduceMotion": {
+  "status": "done",
+  "android": "View.cyl_badgeRespectsReduceMotion"
+ },
+ "UIView(CYLBadgeExtention) -cyl_refreshBadge": {
+  "status": "done",
+  "android": "View.cyl_refreshBadge()"
+ },
+ "UIView(CYLBadgeExtention) cyl_badgeHostReplacedByIconView": {
+  "status": "done",
+  "android": "View.cyl_badgeHostReplacedByIconView"
+ },
+ "UIView(CYLBadgeExtention) -cyl_resetBadgeAppearance": {
+  "status": "done",
+  "android": "View.cyl_resetBadgeAppearance()"
+ },
+ "CYLBaseNavigationController": {
+  "status": "planned"
+ },
+ "CYLBaseTableViewController": {
+  "status": "planned"
+ },
+ "CYLBaseViewController": {
+  "status": "planned"
+ },
+ "CYLFlatDesignUITabBarControllerDelegate": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignUITabBarControllerDelegate -tabBarController:willShowTabBar:": {
+  "status": "n/a",
+  "note": "FlatDesign"
+ },
+ "CYLFlatDesignUITabBarControllerDelegate -tabBarController:didShowTabBar:": {
+  "status": "n/a",
+  "note": "FlatDesign"
+ },
+ "CYLFlatDesignUITabBarControllerDelegate -tabBarController:willHideTabBar:": {
+  "status": "n/a",
+  "note": "FlatDesign"
+ },
+ "CYLFlatDesignUITabBarControllerDelegate -tabBarController:didHideTabBar:": {
+  "status": "n/a",
+  "note": "FlatDesign"
+ },
+ "CYLTabBarItemImagePlaceholderWidth": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemImagePlaceholderWidth",
+  "note": "in dp"
+ },
+ "CYLTabBarItemImagePlaceholderHeight": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemImagePlaceholderHeight",
+  "note": "in dp"
+ },
+ "CYLTabBarStyleType": {
+  "status": "done",
+  "android": "CYLEnums.CYLTabBarStyleType"
+ },
+ "CYLTabBarMinimizeBehavior": {
+  "status": "done",
+  "android": "CYLEnums.CYLTabBarMinimizeBehavior"
+ },
+ "CYLConstants": {
+  "status": "done",
+  "android": "CYLConstants"
+ },
+ "CYLConstants +UIBasisWidthScale": {
+  "status": "n/a",
+  "note": "UIKit scale factors / Lottie URL registries"
+ },
+ "CYLConstants +UIBasisHeightScale": {
+  "status": "n/a",
+  "note": "UIKit scale factors / Lottie URL registries"
+ },
+ "CYLConstants +isLiquidGlassActive": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "CYLConstants +isUsedLiquidGlass": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "CYLConstants +cyl_getTureLottieSizeValue:fromNormalImage:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLConstants +cyl_tabBarItemAnimationSizeValue:fromNormalImage:": {
+  "status": "n/a",
+  "note": "UIKit scale factors / Lottie URL registries"
+ },
+ "CYLConstants +cyl_getURLFromString:": {
+  "status": "n/a",
+  "note": "UIKit scale factors / Lottie URL registries"
+ },
+ "CYLConstants +cyl_registerDarkLottieURL:forLottieURL:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLConstants +cyl_lottieURL:forTraitCollection:": {
+  "status": "n/a",
+  "note": "UIKit scale factors / Lottie URL registries"
+ },
+ "CYLConstants +cyl_registerLottieDarkColors:forLottieURL:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLConstants +cyl_lottieDarkColorsForLottieURL:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLConstants +cyl_hasDarkLottieURLs": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLConstants +cyl_hasDarkLottieForLottieURL:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLConstants +isLottieEnabledFromlottieURLs:tabBarItemsAttributes:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLConstants +isTabBarItemAnimationEnabledWithURLs:tabBarItemsAttributes:": {
+  "status": "n/a",
+  "note": "UIKit scale factors / Lottie URL registries"
+ },
+ "CYLFlatDesignTabBarDelegate": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarDelegate -tabBar:didSelectItem:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar delegate": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar items": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar tabBarItems": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar -addItemWithTitle:tabBarItemImage:tabBarItemSelectedImage:index:titlePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar selectedItem": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar selectedIndex": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar tabBarButtons": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar 0": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar tintColor": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar barTintColor": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar backgroundImage": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar shadowImage": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar useLayoutSafeAreaInsets": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar respectsVerticalStatusBarSafeArea": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar context": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar -hasPlusButton": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBar -hasPlusChildViewController": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarButton": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarButton -initWithTabBarItem:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarButton tabBarItem": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarButton imageView": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarButton titleLabel": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarButton -actualBadgeSuperView": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarHideTabBar": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItemDidChange": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem -initWithTitle:image:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:index:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem tabBarButton": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem enabled": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem index": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem title": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem image": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem selectedImage": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem childViewController": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem badgeValue": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem badgeColor": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem cylflatdesign_tabBarController": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem titlePositionAdjustment": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem 0": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem -setTitleTextAttributes:forState:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem -titleTextAttributesForState:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem -setBadgeTextAttributes:forState:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem -badgeTextAttributesForState:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem badgeSize": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem badgeContentInset": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem badgePositionAdjustment": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem imagePositionAdjustment": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem layoutCentered": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem backgroundColor": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem selectedBackgroundColor": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem imageInsets": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem lottieURL": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem lottieFilePath": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem lottieSizeValue": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLFlatDesignTabBarItem -actualBadgeSuperView": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UINavigationControllerExtensionDelegate": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:navigationBarDidChangeHeight:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didBeginTransitionFrom:to:operation:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didUpdateInteractiveFrom:to:percentComplete:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didUpdateInteractiveFrom:to:popGestureRecognizer:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:willEndTransitionFrom:to:operation:cancelled:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didEndTransitionFrom:to:operation:cancelled:": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UINavigationController(CYLFlatDesignTabBarPrivate)": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UINavigationController(CYLFlatDesignTabBarPrivate) cylflatdesign_customPopGestureRecognizer": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UINavigationController(CYLFlatDesignTabBarPrivate) +cyl_navigationBarActionHook": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLLocalizedTabBarItemsAttributes()": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; Android uses resources"
+ },
+ "UIView(CYLLocalization)": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; Android uses resources"
+ },
+ "UIView(CYLLocalization) -cyl_localizeTexts": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; Android uses resources"
+ },
+ "UIViewController(CYLLocalization)": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; Android uses resources"
+ },
+ "UIViewController(CYLLocalization) +cyl_pickerLanguages": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; Android uses resources"
+ },
+ "UIViewController(CYLLocalization) -cyl_languageCellForTableView:": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; Android uses resources"
+ },
+ "UIViewController(CYLLocalization) -cyl_presentLanguagePicker": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; Android uses resources"
+ },
+ "UIWindow(CYLLocalization)": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; Android uses resources"
+ },
+ "UIWindow(CYLLocalization) -cyl_setRootViewControllerProvider:": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; Android uses resources"
+ },
+ "+plusButton": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.plusButton()"
+ },
+ "+indexOfPlusButtonInTabBar": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.indexOfPlusButtonInTabBar()"
+ },
+ "+multiplierOfTabBarHeight:": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.multiplierOfTabBarHeight()"
+ },
+ "+constantOfPlusButtonCenterYOffsetForTabBarHeight:": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.constantOfPlusButtonCenterYOffsetForTabBarHeight()"
+ },
+ "+plusChildViewController": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.plusChildViewController()"
+ },
+ "+shouldSelectPlusChildViewController": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.shouldSelectPlusChildViewController()"
+ },
+ "+tabBarContext": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.tabBarContext()"
+ },
+ "+alignsTitleWithTabBarItemTitles": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.alignsTitleWithTabBarItemTitles()"
+ },
+ "+tabBarItemIdentifier": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.tabBarItemIdentifier()"
+ },
+ "-touchableRect": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.touchableRect()"
+ },
+ "+selectedContentView": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.selectedContentView()"
+ },
+ "+contentImage": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.contentImage()"
+ },
+ "+selectedContentImage": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.selectedContentImage()"
+ },
+ "-isLayoutCentered": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.isLayoutCentered()"
+ },
+ "+matchedTabBarContext:": {
+  "status": "done",
+  "android": "CYLPlusButtonSubclassing.matchedTabBarContext()"
+ },
+ "CYLExternPlusButton": {
+  "status": "done",
+  "android": "CYLPlusButton.CYLExternPlusButton"
+ },
+ "CYLPlusChildViewController": {
+  "status": "done",
+  "android": "CYLPlusButton.CYLPlusChildViewController"
+ },
+ "CYLPlusButton": {
+  "status": "done",
+  "android": "CYLPlusButton"
+ },
+ "CYLPlusButton +registerPlusButton": {
+  "status": "done",
+  "android": "CYLPlusButton.registerPlusButton"
+ },
+ "CYLPlusButton -cyl_setNeedsTitleAlignment": {
+  "status": "done",
+  "android": "CYLPlusButton.cyl_setNeedsTitleAlignment"
+ },
+ "CYLPlusButton touchableAreaOutsets": {
+  "status": "done",
+  "android": "CYLPlusButton.touchableAreaOutsets"
+ },
+ "CYLPlusButton touchableAreaScale": {
+  "status": "done",
+  "android": "CYLPlusButton.touchableAreaScale"
+ },
+ "CYLPlusButton showsTouchableArea": {
+  "status": "partial",
+  "android": "CYLPlusButton.showsTouchableArea",
+  "note": "kept, not drawn"
+ },
+ "CYLPlusButton touchableAreaColor": {
+  "status": "partial",
+  "android": "CYLPlusButton.touchableAreaColor",
+  "note": "kept, not drawn"
+ },
+ "CYLPlusButton -touchableRectInView:": {
+  "status": "done",
+  "android": "CYLPlusButton.touchableRectInView"
+ },
+ "CYLPlusButton -hitTestInteractiveSubview:withEvent:": {
+  "status": "done",
+  "android": "CYLPlusButton.hitTestInteractiveSubview"
+ },
+ "CYLPlusButton -cyl_showsTitleInTabBarItem": {
+  "status": "done",
+  "android": "CYLPlusButton.cyl_showsTitleInTabBarItem"
+ },
+ "CYLPlusButton cyl_appliesCenterYOffsetWithoutTitle": {
+  "status": "partial",
+  "android": "CYLPlusButton.cyl_appliesCenterYOffsetWithoutTitle",
+  "note": "kept, not drawn"
+ },
+ "CYLPlusButton +cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:": {
+  "status": "done",
+  "android": "CYLPlusButton.cyl_plusButtonWithImage"
+ },
+ "CYLPlusButton +removePlusButton": {
+  "status": "done",
+  "android": "CYLPlusButton.removePlusButton"
+ },
+ "CYLPlusButton +removePlusButtonForTabBarContext:": {
+  "status": "done",
+  "android": "CYLPlusButton.removePlusButtonForTabBarContext"
+ },
+ "CYLPlusButton +plusButtonForTabBarContext:": {
+  "status": "done",
+  "android": "CYLPlusButton.plusButtonForTabBarContext"
+ },
+ "CYLPlusButton +plusChildViewControllerForTabBarContext:": {
+  "status": "done",
+  "android": "CYLPlusButton.plusChildViewControllerForTabBarContext"
+ },
+ "CYLPlusButton +plusButtonWidthForTabBarContext:": {
+  "status": "done",
+  "android": "CYLPlusButton.plusButtonWidthForTabBarContext"
+ },
+ "CYLPlusButton +tabBarContextForOwner:": {
+  "status": "done",
+  "android": "CYLPlusButton.tabBarContextForOwner"
+ },
+ "CYLPlusButton +plusButtonForOwner:": {
+  "status": "done",
+  "android": "CYLPlusButton.plusButtonForOwner"
+ },
+ "CYLPlusButton +plusChildViewControllerForOwner:": {
+  "status": "done",
+  "android": "CYLPlusButton.plusChildViewControllerForOwner"
+ },
+ "CYLPlusButton +plusButtonWidthForOwner:": {
+  "status": "done",
+  "android": "CYLPlusButton.plusButtonWidthForOwner"
+ },
+ "CYLPlusButton +isPlusButtonView:": {
+  "status": "done",
+  "android": "CYLPlusButton.isPlusButtonView"
+ },
+ "CYLPlusButton -plusChildViewControllerButtonClicked:": {
+  "status": "done",
+  "android": "CYLPlusButton.plusChildViewControllerButtonClicked"
+ },
+ "CYLPlusButton +matchedTabBarContext": {
+  "status": "done",
+  "android": "CYLPlusButton.matchedTabBarContext"
+ },
+ "CYLPlusButton +hasPlusButtonForTabBarContext:": {
+  "status": "done",
+  "android": "CYLPlusButton.hasPlusButtonForTabBarContext"
+ },
+ "CYLPlusButton +hasPlusChildViewControllerForTabBarContext:": {
+  "status": "done",
+  "android": "CYLPlusButton.hasPlusChildViewControllerForTabBarContext"
+ },
+ "CYLPlusButton -multiplierOfTabBarHeight:": {
+  "status": "done",
+  "android": "CYLPlusButton.multiplierOfTabBarHeight"
+ },
+ "CYLPlusButton -constantOfPlusButtonCenterYOffsetForTabBarHeight:": {
+  "status": "done",
+  "android": "CYLPlusButton.constantOfPlusButtonCenterYOffsetForTabBarHeight"
+ },
+ "CYLPlusButton +indexForTabbarItemsCount:": {
+  "status": "done",
+  "android": "CYLPlusButton.indexForTabbarItemsCount"
+ },
+ "CYLPlusButton -setTabLabelHidden:": {
+  "status": "done",
+  "android": "CYLPlusButton.setTabLabelHidden"
+ },
+ "CYLPlusButton -cyl_title": {
+  "status": "done",
+  "android": "CYLPlusButton.cyl_title"
+ },
+ "CYLPlusButton -cyl_updateTitle:image:selectedImage:": {
+  "status": "done",
+  "android": "CYLPlusButton.cyl_updateTitle"
+ },
+ "CYLPlusButton(CYLPlusButtonDeprecated)": {
+  "status": "done",
+  "android": "CYLPlusButton (deprecated members)"
+ },
+ "CYLPlusButton(CYLPlusButtonDeprecated) +registerSubclass": {
+  "status": "done",
+  "android": "CYLPlusButton.registerSubclass"
+ },
+ "CYLPlusButton(CYLPlusButtonDeprecated) +multiplerInCenterY": {
+  "status": "n/a",
+  "note": "deprecated on iOS, no Android twin"
+ },
+ "UITabBar(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_fullHeight": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_boundsSize": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_boundsWidthOffset": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterViews": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterViewWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterContentViews": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterContentViewWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViews": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterVisualProviderFloatingSelectedContentView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewWithoutPlusButttonWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterPortalViews": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterPortalViewWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterLiquidLensView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterLiquidLensViewSubViews": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterLiquidLensViewContentView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterDestOutView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_contentView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterLiquidLensClearGlassView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_platterView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_portalView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_platterContentView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_platterViewWidth": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_platterViewSize": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_portalLayer": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewsWithoutPlusButton": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_tabBarSubviews": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) cyl_selectedControl": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_selectedControl": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_selectedIndex": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_visibleControls": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_subTabBarButtons": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_subTabBarButtonsWithoutPlusButton": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_tabBarButtonWithTabIndex:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_normalContentControlFromSelectedContentControl:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_selectedContentControlFromContentControl:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_animationLottieImageWithSelectedControl:lottieURL:size:defaultSelected:contentMode:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_stopAnimationOfAllLottieView": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_originalTabBarButtons": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_hasPlusChildViewController": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_cachedXOffsetWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_cachedWidthOffsetWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar(CYLTabBarControllerExtention) -cyl_shouldUpdateHiddenStatueForPlusButtonLabel": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLTabBar": {
+  "status": "done",
+  "android": "CYLTabBar"
+ },
+ "CYLTabBar tabImageViewDefaultOffset": {
+  "status": "done",
+  "android": "CYLTabBar.tabImageViewDefaultOffset"
+ },
+ "CYLTabBar syncsClassicStylesToAppearance": {
+  "status": "done",
+  "android": "CYLTabBar.syncsClassicStylesToAppearance"
+ },
+ "CYLTabBar context": {
+  "status": "done",
+  "android": "CYLTabBar.context_"
+ },
+ "CYLTabBar didLayoutSubViewsBlock": {
+  "status": "done",
+  "android": "CYLTabBar.didLayoutSubViewsBlock"
+ },
+ "CYLTabBar cyl_itemEdgeInsets": {
+  "status": "done",
+  "android": "CYLTabBar.cyl_itemEdgeInsets"
+ },
+ "CYLTabBar plusButton": {
+  "status": "done",
+  "android": "CYLTabBar.plusButton"
+ },
+ "CYLTabBar tabBarItemWidth": {
+  "status": "done",
+  "android": "CYLTabBar.tabBarItemWidth"
+ },
+ "CYLTabBar tabBarButtonArray": {
+  "status": "done",
+  "android": "CYLTabBar.tabBarButtonArray"
+ },
+ "CYLTabBar plusButtonActive": {
+  "status": "done",
+  "android": "CYLTabBar.plusButtonActive"
+ },
+ "CYLTabBar isLensViewLifed": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "CYLTabBar liquidGlassContinuousGestureRecognizer": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "CYLTabBar liquidGlassLongGestureRecognizer": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "CYLTabBar -plusButtonIndex": {
+  "status": "done",
+  "android": "CYLTabBar.plusButtonIndex"
+ },
+ "CYLTabBar -cyl_reloadTabButtons": {
+  "status": "done",
+  "android": "CYLTabBar.cyl_reloadTabButtons"
+ },
+ "CYLTabBar -hasPlusButton": {
+  "status": "done",
+  "android": "CYLTabBar.hasPlusButton"
+ },
+ "CYLTabBar -hasPlusChildViewController": {
+  "status": "done",
+  "android": "CYLTabBar.hasPlusChildViewController"
+ },
+ "CYLTabBar -isPlusButtonLayoutCentered": {
+  "status": "done",
+  "android": "CYLTabBar.isPlusButtonLayoutCentered"
+ },
+ "CYLTabBar -tabBarController": {
+  "status": "done",
+  "android": "CYLTabBar.tabBarController"
+ },
+ "UITabBar(CYLBarBackground)": {
+  "status": "partial",
+  "android": "CYLTabBar.setBackgroundColor / cyl_shadowColor",
+  "note": "a flat background and a shadow line; no blur effect views"
+ },
+ "UITabBar(CYLBarBackground) cyl_backgroundView": {
+  "status": "partial",
+  "android": "CYLTabBar.setBackgroundColor / cyl_shadowColor",
+  "note": "a flat background and a shadow line; no blur effect views"
+ },
+ "UITabBar(CYLBarBackground) cyl_shadowImageView": {
+  "status": "partial",
+  "android": "CYLTabBar.setBackgroundColor / cyl_shadowColor",
+  "note": "a flat background and a shadow line; no blur effect views"
+ },
+ "UITabBar(CYLBarBackground) cyl_effectViews": {
+  "status": "partial",
+  "android": "CYLTabBar.setBackgroundColor / cyl_shadowColor",
+  "note": "a flat background and a shadow line; no blur effect views"
+ },
+ "UITabBar(CYLBarBackground) cyl_effectView": {
+  "status": "partial",
+  "android": "CYLTabBar.setBackgroundColor / cyl_shadowColor",
+  "note": "a flat background and a shadow line; no blur effect views"
+ },
+ "UITabBar(CYLBarBackground) cyl_backgroundEffect": {
+  "status": "partial",
+  "android": "CYLTabBar.setBackgroundColor / cyl_shadowColor",
+  "note": "a flat background and a shadow line; no blur effect views"
+ },
+ "UITabBar(CYLBarBackground) cyl_effectForegroundColor": {
+  "status": "partial",
+  "android": "CYLTabBar.setBackgroundColor / cyl_shadowColor",
+  "note": "a flat background and a shadow line; no blur effect views"
+ },
+ "CYLTabBarConfigurationFormat": {
+  "status": "done",
+  "android": "CYLTabBarConfiguration.CYLTabBarConfigurationError",
+  "note": "the same codes"
+ },
+ "CYLTabBarConfigurationErrorDomain": {
+  "status": "partial",
+  "android": "CYLTabBarConfiguration.parse / TabConfigurationFormats",
+  "note": "JSON, XML plist and .properties; the other iOS formats are not parsed on Android"
+ },
+ "CYLTabBarConfigurationErrorCode": {
+  "status": "done",
+  "android": "CYLTabBarConfiguration.CYLTabBarConfigurationError",
+  "note": "the same codes"
+ },
+ "CYLTabBarConfigurationMaximumLength": {
+  "status": "partial",
+  "android": "CYLTabBarConfiguration.parse / TabConfigurationFormats",
+  "note": "JSON, XML plist and .properties; the other iOS formats are not parsed on Android"
+ },
+ "CYLTabBarConfigurationMaximumDepth": {
+  "status": "partial",
+  "android": "CYLTabBarConfiguration.parse / TabConfigurationFormats",
+  "note": "JSON, XML plist and .properties; the other iOS formats are not parsed on Android"
+ },
+ "CYLTabBarConfigurationParser": {
+  "status": "partial",
+  "android": "CYLTabBarConfiguration.parse / TabConfigurationFormats",
+  "note": "JSON, XML plist and .properties; the other iOS formats are not parsed on Android"
+ },
+ "CYLTabBarConfigurationParser +supportedPathExtensions": {
+  "status": "partial",
+  "android": "CYLTabBarConfiguration.parse / TabConfigurationFormats",
+  "note": "JSON, XML plist and .properties; the other iOS formats are not parsed on Android"
+ },
+ "CYLTabBarConfigurationParser +formatForPathExtension:": {
+  "status": "partial",
+  "android": "CYLTabBarConfiguration.parse / TabConfigurationFormats",
+  "note": "JSON, XML plist and .properties; the other iOS formats are not parsed on Android"
+ },
+ "CYLTabBarConfigurationParser +formatForMIMEType:": {
+  "status": "partial",
+  "android": "CYLTabBarConfiguration.parse / TabConfigurationFormats",
+  "note": "JSON, XML plist and .properties; the other iOS formats are not parsed on Android"
+ },
+ "CYLTabBarConfigurationParser +formatBySniffingData:": {
+  "status": "partial",
+  "android": "CYLTabBarConfiguration.parse / TabConfigurationFormats",
+  "note": "JSON, XML plist and .properties; the other iOS formats are not parsed on Android"
+ },
+ "CYLTabBarConfigurationParser +nameOfFormat:": {
+  "status": "partial",
+  "android": "CYLTabBarConfiguration.parse / TabConfigurationFormats",
+  "note": "JSON, XML plist and .properties; the other iOS formats are not parsed on Android"
+ },
+ "CYLTabBarConfigurationParser +dictionaryWithData:format:error:": {
+  "status": "partial",
+  "android": "CYLTabBarConfiguration.parse / TabConfigurationFormats",
+  "note": "JSON, XML plist and .properties; the other iOS formats are not parsed on Android"
+ },
+ "CYLTabBarConfigurationParser +dictionaryWithContentsOfFile:error:": {
+  "status": "partial",
+  "android": "CYLTabBarConfiguration.parse / TabConfigurationFormats",
+  "note": "JSON, XML plist and .properties; the other iOS formats are not parsed on Android"
+ },
+ "CYLTabButtonTapAnimationType": {
+  "status": "done",
+  "android": "CYLEnums.CYLTabButtonTapAnimationType"
+ },
+ "CYLTabBarController(CYLInteraction)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLInteraction) cyl_tabButtonTapAnimationType": {
+  "status": "partial",
+  "android": "CYLTabBarController.cyl_tabButtonTapAnimationType",
+  "note": "scale, zoom, bounce, rotation and flip; fume, frame, fireworks and Lottie fall back to a fade"
+ },
+ "CYLTabBarController(CYLInteraction) cyl_defaultTabButtonAnimation": {
+  "status": "planned",
+  "note": "custom tap animation objects and a custom tap sound are not ported"
+ },
+ "CYLTabBarController(CYLInteraction) -cyl_playTabButtonAnimationForControl:": {
+  "status": "partial",
+  "android": "CYLTabBarController.cyl_playTabButtonAnimationForControl",
+  "note": "scale, zoom, bounce, rotation and flip; fume, frame, fireworks and Lottie fall back to a fade"
+ },
+ "CYLTabBarController(CYLInteraction) cyl_tabButtonTapSoundEnabled": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabButtonTapSoundEnabled"
+ },
+ "CYLTabBarController(CYLInteraction) cyl_tabButtonTapSoundURL": {
+  "status": "planned",
+  "note": "custom tap animation objects and a custom tap sound are not ported"
+ },
+ "CYLTabBarController(CYLInteraction) cyl_tabButtonHapticFeedbackEnabled": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabButtonHapticFeedbackEnabled"
+ },
+ "CYLTabBarController(CYLInteraction) cyl_tabButtonHapticFeedbackStyle": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabButtonHapticFeedbackStyle"
+ },
+ "CYLTabBarController(CYLInteraction) -cyl_playTabButtonTapFeedback": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_playTabButtonTapFeedback"
+ },
+ "CYLTabBarController(CYLInteraction) cyl_didLongPressControlBlock": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_didLongPressControlBlock"
+ },
+ "CYLTabBarController(CYLInteraction) cyl_tabButtonLongPressMinimumDuration": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabButtonLongPressMinimumDuration"
+ },
+ "CYLTabBarController(CYLInteraction) cyl_swipeToSwitchTabEnabled": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_swipeToSwitchTabEnabled"
+ },
+ "CYLTabBarController(CYLInteraction) -cyl_switchToAdjacentTabWithStep:animated:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_switchToAdjacentTabWithStep"
+ },
+ "UIViewController(CYLTabButtonAnimation)": {
+  "status": "planned",
+  "note": "per-page custom tap animations are not ported"
+ },
+ "UIViewController(CYLTabButtonAnimation) cyl_tabButtonAnimation": {
+  "status": "planned",
+  "note": "custom tap animation objects and a custom tap sound are not ported"
+ },
+ "CYLTabBarItemTitle": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemTitle"
+ },
+ "CYLTabBarItemSelectedTitle": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemSelectedTitle"
+ },
+ "CYLTabBarItemImage": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemImage"
+ },
+ "CYLTabBarItemSelectedImage": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemSelectedImage"
+ },
+ "CYLTabBarItemDarkImage": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemDarkImage"
+ },
+ "CYLTabBarItemSelectedDarkImage": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemSelectedDarkImage"
+ },
+ "CYLTabBarItemImageURL": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemImageURL"
+ },
+ "CYLTabBarItemSelectedImageURL": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemSelectedImageURL"
+ },
+ "CYLTabBarItemImageURLSize": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemImageURLSize"
+ },
+ "CYLTabBarLottieFilePath": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLottieFilePath",
+  "note": "the key is read by the configuration and kept on `CYLTabBarItem.cyl_tabBarItemAnimationURL` / `SizeValue`; no animation runtime plays it yet"
+ },
+ "CYLTabBarLottieURL": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLottieURL",
+  "note": "the key is read by the configuration and kept on `CYLTabBarItem.cyl_tabBarItemAnimationURL` / `SizeValue`; no animation runtime plays it yet"
+ },
+ "CYLTabBarLottieSize": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLottieSize",
+  "note": "the key is read by the configuration and kept on `CYLTabBarItem.cyl_tabBarItemAnimationURL` / `SizeValue`; no animation runtime plays it yet"
+ },
+ "CYLTabBarLottieDarkURL": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLottieDarkURL",
+  "note": "the key is read by the configuration and kept on `CYLTabBarItem.cyl_tabBarItemAnimationURL` / `SizeValue`; no animation runtime plays it yet"
+ },
+ "CYLTabBarLottieDarkFilePath": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLottieDarkFilePath",
+  "note": "the key is read by the configuration and kept on `CYLTabBarItem.cyl_tabBarItemAnimationURL` / `SizeValue`; no animation runtime plays it yet"
+ },
+ "CYLTabBarLottieDarkColors": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLottieDarkColors",
+  "note": "the key is read by the configuration and kept on `CYLTabBarItem.cyl_tabBarItemAnimationURL` / `SizeValue`; no animation runtime plays it yet"
+ },
+ "CYLTabBarLottieLoopsWhenUnselected": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLottieLoopsWhenUnselected",
+  "note": "the key is read by the configuration and kept on `CYLTabBarItem.cyl_tabBarItemAnimationURL` / `SizeValue`; no animation runtime plays it yet"
+ },
+ "CYLTabBarItemsAttributesAddingLottieFiles()": {
+  "status": "planned",
+  "note": "attribute helper functions for animation files are not ported yet"
+ },
+ "CYLTabBarAnimationURL": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationURL"
+ },
+ "CYLTabBarAnimationFilePath": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationFilePath"
+ },
+ "CYLTabBarAnimationSize": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationSize"
+ },
+ "CYLTabBarAnimationDarkURL": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationDarkURL"
+ },
+ "CYLTabBarAnimationDarkFilePath": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationDarkFilePath"
+ },
+ "CYLTabBarAnimationDarkColors": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationDarkColors"
+ },
+ "CYLTabBarAnimationColors": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationColors"
+ },
+ "CYLTabBarAnimationOption": {
+  "status": "planned"
+ },
+ "CYLTabBarAnimationURLWithOptions()": {
+  "status": "planned",
+  "note": "attribute helper functions for animation files are not ported yet"
+ },
+ "CYLTabBarItemAttributesAddingAnimationFile()": {
+  "status": "planned",
+  "note": "attribute helper functions for animation files are not ported yet"
+ },
+ "CYLTabBarItemsAttributesAddingAnimationFiles()": {
+  "status": "planned",
+  "note": "attribute helper functions for animation files are not ported yet"
+ },
+ "CYLTabBarItemImageInsets": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemImageInsets"
+ },
+ "CYLTabBarItemTitlePositionAdjustment": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemTitlePositionAdjustment"
+ },
+ "CYLTabBarItemImagePositionAdjustment": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemImagePositionAdjustment"
+ },
+ "CYLTabBarItemIdentifier": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIdentifier"
+ },
+ "CYLTabBarControllerViewControllers": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerViewControllers"
+ },
+ "CYLTabBarControllerTabBarItemsAttributes": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerTabBarItemsAttributes"
+ },
+ "CYLTabBarControllerImageInsets": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerImageInsets"
+ },
+ "CYLTabBarControllerTitlePositionAdjustment": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerTitlePositionAdjustment"
+ },
+ "CYLTabBarControllerStyleType": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerStyleType"
+ },
+ "CYLTabBarControllerContext": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerContext"
+ },
+ "CYLTabBarControllerPageRegistry": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerPageRegistry"
+ },
+ "CYLTabBarControllerPageResolver": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerPageResolver"
+ },
+ "CYLTabBarControllerPageLookupOrder": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerPageLookupOrder"
+ },
+ "CYLTabBarControllerAutomaticPageRegistration": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerAutomaticPageRegistration"
+ },
+ "CYLTabBarControllerTabBarItemAnimationSpeed": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerTabBarItemAnimationSpeed"
+ },
+ "CYLTabBarItemPageIdentifier": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemPageIdentifier"
+ },
+ "CYLTabBarItemPageParameters": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemPageParameters"
+ },
+ "CYLTabBarItemPlatforms": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemPlatforms"
+ },
+ "CYLTabBarItemMinimumAppVersion": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemMinimumAppVersion"
+ },
+ "CYLTabBarAnimationOptions": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationOptions"
+ },
+ "CYLTabBarItemTitleColor": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemTitleColor"
+ },
+ "CYLTabBarItemSelectedTitleColor": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemSelectedTitleColor"
+ },
+ "CYLTabBarItemIconColor": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIconColor"
+ },
+ "CYLTabBarItemSelectedIconColor": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemSelectedIconColor"
+ },
+ "CYLTabBarItemSelectedBackgroundColor": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemSelectedBackgroundColor"
+ },
+ "CYLTabBarItemBackgroundColor": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemBackgroundColor"
+ },
+ "CYLTabBarItemTitleFont": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemTitleFont"
+ },
+ "CYLTabBarItemSelectedTitleFont": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemSelectedTitleFont"
+ },
+ "CYLTabBarItemAccessibilityIdentifier": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemAccessibilityIdentifier"
+ },
+ "CYLTabBarItemAccessibilityLabel": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemAccessibilityLabel"
+ },
+ "CYLTabBarItemAccessibilityHint": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemAccessibilityHint"
+ },
+ "CYLTabbarItemsCount": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabbarItemsCount"
+ },
+ "CYLPlusButtonIndex": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonIndex"
+ },
+ "CYLPlusButtonWidth": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonWidth"
+ },
+ "CYLTabBarItemWidth": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemWidth"
+ },
+ "CYLTabBarHeight": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarHeight"
+ },
+ "CYLTabBarLoginStateDidChangeNotification": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLoginStateDidChangeNotification"
+ },
+ "CYLTabBarReselectBehavior": {
+  "status": "done",
+  "android": "CYLEnums.CYLTabBarReselectBehavior"
+ },
+ "CYLTabBarItemGesture": {
+  "status": "done",
+  "android": "CYLEnums.CYLTabBarItemGesture"
+ },
+ "CYLTabBarControllerDelegate": {
+  "status": "done",
+  "android": "CYLTabBarControllerDelegate"
+ },
+ "CYLTabBarControllerDelegate -cyl_tabBarController:didLoadPage:forPlaceholder:atIndex:": {
+  "status": "done",
+  "android": "CYLTabBarControllerDelegate.cyl_tabBarController_didLoadPage"
+ },
+ "CYLTabBarControllerDelegate -tabBarController:requiresLoginToSelectViewController:": {
+  "status": "done",
+  "android": "CYLTabBarControllerDelegate.tabBarController_"
+ },
+ "CYLTabBarControllerDelegate -tabBarController:presentLoginForViewController:completion:": {
+  "status": "done",
+  "android": "CYLTabBarControllerDelegate.tabBarController_"
+ },
+ "CYLTabBarControllerDelegate -tabBarController:didSelectControl:": {
+  "status": "done",
+  "android": "CYLTabBarControllerDelegate.tabBarController_"
+ },
+ "CYLTabBarControllerDelegate -tabBarController:didRecognizeTabBarItemGesture:control:viewController:": {
+  "status": "done",
+  "android": "CYLTabBarControllerDelegate.tabBarController_"
+ },
+ "CYLTabBarControllerDelegate -tabBarController:didLongPressControl:": {
+  "status": "done",
+  "android": "CYLTabBarControllerDelegate.tabBarController_"
+ },
+ "CYLTabBarControllerDelegate -tabBarController:shouldPerformCustomActionForViewController:": {
+  "status": "done",
+  "android": "CYLTabBarControllerDelegate.tabBarController_"
+ },
+ "CYLTabBarControllerDelegate -tabBarController:performCustomActionForViewController:": {
+  "status": "done",
+  "android": "CYLTabBarControllerDelegate.tabBarController_"
+ },
+ "CYLTabBarControllerDelegate -tabBarController:shouldShowPlatterLiquidLensViewForControl:": {
+  "status": "partial",
+  "android": "CYLTabBarControllerDelegate.tabBarController_shouldShowPlatterLiquidLensViewForControl",
+  "note": "declared; Android has no lens view, the answer is ignored"
+ },
+ "CYLTabBarController": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController tabBarStyleType": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarStyleType"
+ },
+ "CYLTabBarController viewDidLayoutSubviewsBlock": {
+  "status": "done",
+  "android": "CYLTabBarController.viewDidLayoutSubviewsBlock"
+ },
+ "CYLTabBarController -setViewDidLayoutSubViewsBlock:": {
+  "status": "done",
+  "android": "CYLTabBarController.setViewDidLayoutSubViewsBlock"
+ },
+ "CYLTabBarController -setViewDidLayoutSubViewsBlockInvokeOnce:block:": {
+  "status": "done",
+  "android": "CYLTabBarController.setViewDidLayoutSubViewsBlockInvokeOnce"
+ },
+ "CYLTabBarController -reloadBadgesWithBlock:": {
+  "status": "partial",
+  "android": "CYLTabBarController.reloadBadgesWithBlock",
+  "note": "runs the block at once"
+ },
+ "CYLTabBarController -performWhenTabBarItemsReady:": {
+  "status": "partial",
+  "android": "CYLTabBarController.performWhenTabBarItemsReady",
+  "note": "runs the block at once (synchronous layout)"
+ },
+ "CYLTabBarController viewControllers": {
+  "status": "done",
+  "android": "CYLTabBarController.viewControllers"
+ },
+ "CYLTabBarController tabBarItemsAttributes": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarItemsAttributes"
+ },
+ "CYLTabBarController tabBarHeight": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarHeight"
+ },
+ "CYLTabBarController imageInsets": {
+  "status": "done",
+  "android": "CYLTabBarController.imageInsets"
+ },
+ "CYLTabBarController -updateImageInsets:": {
+  "status": "done",
+  "android": "CYLTabBarController.updateImageInsets"
+ },
+ "CYLTabBarController tabBar": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBar"
+ },
+ "CYLTabBarController cyl_tabBar": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBar"
+ },
+ "CYLTabBarController -lottieAnimationViewContentMode": {
+  "status": "planned",
+  "note": "animation runtimes are not ported"
+ },
+ "CYLTabBarController -tabBarItemAnimationViewContentMode": {
+  "status": "planned",
+  "note": "animation runtimes are not ported"
+ },
+ "CYLTabBarController unloadsUnselectedViewsOnMemoryWarning": {
+  "status": "partial",
+  "android": "CYLTabBarController.unloadsUnselectedViewsOnMemoryWarning",
+  "note": "kept; hidden Fragments keep their views on Android"
+ },
+ "CYLTabBarController -shouldUnloadViewOfViewController:": {
+  "status": "done",
+  "android": "CYLTabBarController.shouldUnloadViewOfViewController"
+ },
+ "CYLTabBarController -unloadViewsOfUnselectedViewControllers": {
+  "status": "partial",
+  "android": "CYLTabBarController.unloadViewsOfUnselectedViewControllers",
+  "note": "no-op"
+ },
+ "CYLTabBarController tabBarItemAnimationSpeed": {
+  "status": "partial",
+  "android": "CYLTabBarController.tabBarItemAnimationSpeed",
+  "note": "kept until an animation runtime is ported"
+ },
+ "CYLTabBarController titlePositionAdjustment": {
+  "status": "done",
+  "android": "CYLTabBarController.titlePositionAdjustment"
+ },
+ "CYLTabBarController automaticallyAdjustsImageOnlyTabs": {
+  "status": "partial",
+  "android": "CYLTabBarController.automaticallyAdjustsImageOnlyTabs",
+  "note": "kept; a tab without a title centers its icon by layout"
+ },
+ "CYLTabBarController imagePositionAdjustment": {
+  "status": "done",
+  "android": "CYLTabBarController.imagePositionAdjustment"
+ },
+ "CYLTabBarController adjustTabBarItemImageViewSizeDependOnSuperView": {
+  "status": "partial",
+  "android": "CYLTabBarController.adjustTabBarItemImageViewSizeDependOnSuperView",
+  "note": "kept, no effect"
+ },
+ "CYLTabBarController context": {
+  "status": "done",
+  "android": "CYLTabBarController.context"
+ },
+ "CYLTabBarController -initWithConfiguration:": {
+  "status": "done",
+  "android": "CYLTabBarController(activity, …)"
+ },
+ "CYLTabBarController +tabBarControllerWithConfiguration:": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarControllerWithConfiguration"
+ },
+ "CYLTabBarController -initWithViewControllers:tabBarItemsAttributes:": {
+  "status": "done",
+  "android": "CYLTabBarController(activity, …)"
+ },
+ "CYLTabBarController -initWithViewControllers:tabBaritemsAttributes:": {
+  "status": "done",
+  "android": "CYLTabBarController(activity, …)"
+ },
+ "CYLTabBarController +tabBarControllerWithViewControllers:tabBarItemsAttributes:": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarControllerWithViewControllers"
+ },
+ "CYLTabBarController -initWithViewControllers:tabBarItemsAttributes:imageInsets:titlePositionAdjustment:": {
+  "status": "done",
+  "android": "CYLTabBarController(activity, …)"
+ },
+ "CYLTabBarController +tabBarControllerWithViewControllers:tabBarItemsAttributes:imageInsets:titlePositionAdjustment:": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarControllerWithViewControllers"
+ },
+ "CYLTabBarController -initWithViewControllers:tabBarItemsAttributes:imageInsets:titlePositionAdjustment:context:": {
+  "status": "done",
+  "android": "CYLTabBarController(activity, …)"
+ },
+ "CYLTabBarController +tabBarControllerWithViewControllers:tabBarItemsAttributes:imageInsets:titlePositionAdjustment:context:": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarControllerWithViewControllers"
+ },
+ "CYLTabBarController -initWithViewControllers:tabBarItemsAttributes:styleType:context:": {
+  "status": "done",
+  "android": "CYLTabBarController(activity, …)"
+ },
+ "CYLTabBarController +tabBarControllerWithViewControllers:tabBarItemsAttributes:styleType:context:": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarControllerWithViewControllers"
+ },
+ "CYLTabBarController -initWithViewControllers:tabBarItemsAttributes:imageInsets:titlePositionAdjustment:styleType:context:": {
+  "status": "done",
+  "android": "CYLTabBarController(activity, …)"
+ },
+ "CYLTabBarController +tabBarControllerWithViewControllers:tabBarItemsAttributes:imageInsets:titlePositionAdjustment:styleType:context:": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarControllerWithViewControllers"
+ },
+ "CYLTabBarController -updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:": {
+  "status": "n/a",
+  "note": "UIKit internals / the app delegate and window"
+ },
+ "CYLTabBarController -updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:shouldSelect:": {
+  "status": "n/a",
+  "note": "UIKit internals / the app delegate and window"
+ },
+ "CYLTabBarController -hideTabBarShadowImageView": {
+  "status": "done",
+  "android": "CYLTabBarController.hideTabBarShadowImageView"
+ },
+ "CYLTabBarController -setTintColor:": {
+  "status": "done",
+  "android": "CYLTabBarController.setTintColor"
+ },
+ "CYLTabBarController -hasPlusButton": {
+  "status": "done",
+  "android": "CYLTabBarController.hasPlusButton"
+ },
+ "CYLTabBarController -hasPlusChildViewController": {
+  "status": "done",
+  "android": "CYLTabBarController.hasPlusChildViewController"
+ },
+ "CYLTabBarController -allItemsInTabBarCount": {
+  "status": "done",
+  "android": "CYLTabBarController.allItemsInTabBarCount"
+ },
+ "CYLTabBarController -appDelegate": {
+  "status": "n/a",
+  "note": "UIKit internals / the app delegate and window"
+ },
+ "CYLTabBarController -rootWindow": {
+  "status": "n/a",
+  "note": "UIKit internals / the app delegate and window"
+ },
+ "CYLTabBarController -reloadTabBarItemsWithAttributes:": {
+  "status": "done",
+  "android": "CYLTabBarController.reloadTabBarItemsWithAttributes"
+ },
+ "CYLTabBarController -updateTabBarItemAtIndex:attributes:": {
+  "status": "done",
+  "android": "CYLTabBarController.updateTabBarItemAtIndex"
+ },
+ "CYLTabBarController -updateTabBarItemForViewController:attributes:": {
+  "status": "done",
+  "android": "CYLTabBarController.updateTabBarItemForViewController"
+ },
+ "CYLTabBarController -tabBarItemAttributesAtIndex:": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarItemAttributesAtIndex"
+ },
+ "CYLTabBarController -updateTabBarItemsWithAttributes:": {
+  "status": "done",
+  "android": "CYLTabBarController.updateTabBarItemsWithAttributes"
+ },
+ "CYLTabBarController -setTabBarItemIconViewProvider:atIndex:": {
+  "status": "partial",
+  "android": "CYLTabBarController.setTabBarItemIconViewProvider",
+  "note": "the view is added over the icon"
+ },
+ "CYLTabBarController -setTabBarItemIconWithURL:selectedURL:size:atIndex:": {
+  "status": "done",
+  "android": "CYLTabBarController.setTabBarItemIconWithURL"
+ },
+ "CYLTabBarController -setTabBarItemIcon:selectedIcon:size:atIndex:": {
+  "status": "done",
+  "android": "CYLTabBarController.setTabBarItemIcon"
+ },
+ "CYLTabBarController -updatePlusButtonWithAttributes:": {
+  "status": "done",
+  "android": "CYLTabBarController.updatePlusButtonWithAttributes"
+ },
+ "CYLTabBarController -replaceViewControllerAtIndex:withViewController:attributes:": {
+  "status": "done",
+  "android": "CYLTabBarController.replaceViewControllerAtIndex"
+ },
+ "CYLTabBarController -visiableTabBarSize": {
+  "status": "done",
+  "android": "CYLTabBarController.visiableTabBarSize"
+ },
+ "CYLTabBarController -tabChangedToControl:": {
+  "status": "n/a",
+  "note": "UIKit internals / the app delegate and window"
+ },
+ "CYLTabBarController noNeedUIDesignCompatibility": {
+  "status": "partial",
+  "android": "CYLTabBarController.noNeedUIDesignCompatibility",
+  "note": "kept, no effect"
+ },
+ "CYLTabBarController allowsVerticalBar": {
+  "status": "partial",
+  "android": "CYLTabBarController.allowsVerticalBar",
+  "note": "kept, no effect"
+ },
+ "CYLTabBarController tabBarItemAnimationViewAdded": {
+  "status": "partial",
+  "android": "CYLTabBarController.tabBarItemAnimationViewAdded",
+  "note": "always false until an animation runtime is ported"
+ },
+ "CYLTabBarController tabBarItemAnimationURLs": {
+  "status": "partial",
+  "android": "CYLTabBarController.tabBarItemAnimationURLs",
+  "note": "empty until an animation runtime is ported"
+ },
+ "CYLTabBarController tabBarItemAnimationSizes": {
+  "status": "partial",
+  "android": "CYLTabBarController.tabBarItemAnimationSizes",
+  "note": "empty until an animation runtime is ported"
+ },
+ "CYLTabBarController tabBarHidden": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarHidden"
+ },
+ "CYLTabBarController -setTabBarHidden:animated:": {
+  "status": "done",
+  "android": "CYLTabBarController.setTabBarHidden"
+ },
+ "CYLTabBarController delegate": {
+  "status": "done",
+  "android": "CYLTabBarController.delegate"
+ },
+ "CYLTabBarController -changeItem:toItem:": {
+  "status": "n/a",
+  "note": "UIKit internals / the app delegate and window"
+ },
+ "CYLTabBarController(CYLTabBarItemIdentifier)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLTabBarItemIdentifier) cyl_selectedTabBarItemIdentifier": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_selectedTabBarItemIdentifier"
+ },
+ "CYLTabBarController(CYLTabBarItemIdentifier) -cyl_indexOfTabBarItemIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_indexOfTabBarItemIdentifier"
+ },
+ "CYLTabBarController(CYLTabBarItemIdentifier) -cyl_viewControllerWithTabBarItemIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_viewControllerWithTabBarItemIdentifier"
+ },
+ "CYLTabBarController(CYLTabBarItemIdentifier) -cyl_selectTabBarItemWithIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_selectTabBarItemWithIdentifier"
+ },
+ "CYLTabBarController(CYLTabBarItemIdentifier) cyl_tabBarItemIdentifiers": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarItemIdentifiers"
+ },
+ "CYLTabBarController(CYLTabBarItemIdentifier) -cyl_controlWithTabBarItemIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_controlWithTabBarItemIdentifier"
+ },
+ "CYLTabBarController(CYLTabBarItemIdentifier) -cyl_defaultTabBarItemIdentifierForViewController:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_defaultTabBarItemIdentifierForViewController"
+ },
+ "CYLTabBarController(CYLTabBarItemIdentifier) +cyl_defaultTabBarItemIdentifierForClass:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_defaultTabBarItemIdentifierForClass"
+ },
+ "CYLTabBarController(CYLLogin)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLLogin) cyl_loggedIn": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_loggedIn"
+ },
+ "CYLTabBarController(CYLLogin) cyl_loginStateProvider": {
+  "status": "planned"
+ },
+ "CYLTabBarController(CYLLogin) cyl_loginRequiredTabBarItemIdentifiers": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_loginRequiredTabBarItemIdentifiers"
+ },
+ "CYLTabBarController(CYLLogin) cyl_loginRequiredBlock": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_loginRequiredBlock"
+ },
+ "CYLTabBarController(CYLLogin) cyl_loginHandler": {
+  "status": "planned"
+ },
+ "CYLTabBarController(CYLLogin) -cyl_isLoginRequiredForViewController:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_isLoginRequiredForViewController"
+ },
+ "CYLTabBarController(CYLLogin) -cyl_interceptLoginIfNeededForViewController:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_interceptLoginIfNeededForViewController"
+ },
+ "CYLTabBarController(CYLTabBarItemGesture)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLTabBarItemGesture) cyl_tabBarItemGestureHandler": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarItemGestureHandler"
+ },
+ "CYLTabBarController(CYLTabBarItemGesture) cyl_tabBarItemDoubleTapInterval": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarItemDoubleTapInterval"
+ },
+ "CYLTabBarController(CYLTabBarItemGesture) cyl_tabBarItemLongPressDuration": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarItemLongPressDuration"
+ },
+ "CYLTabBarController(CYLSelectedIndexIgnoringPlusButton)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLSelectedIndexIgnoringPlusButton) cyl_viewControllersIgnoringPlusButton": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_viewControllersIgnoringPlusButton"
+ },
+ "CYLTabBarController(CYLSelectedIndexIgnoringPlusButton) cyl_selectedIndexIgnoringPlusButton": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_selectedIndexIgnoringPlusButton"
+ },
+ "CYLTabBarController(CYLSelectedIndexIgnoringPlusButton) -cyl_selectedIndexForIndexIgnoringPlusButton:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_selectedIndexForIndexIgnoringPlusButton"
+ },
+ "CYLTabBarController(CYLActiveTabBarController)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLActiveTabBarController) +cyl_tabBarControllerForContext:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarControllerForContext"
+ },
+ "CYLTabBarController(CYLActiveTabBarController) +cyl_activeTabBarController": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_activeTabBarController"
+ },
+ "CYLTabBarController(CYLActiveTabBarController) +cyl_simulateMemoryWarning": {
+  "status": "partial",
+  "android": "CYLTabBarController.cyl_simulateMemoryWarning",
+  "note": "no-op"
+ },
+ "CYLTabBarController(CYLActiveTabBarController) +cyl_simulateMemoryWarningForTabBarController:": {
+  "status": "partial",
+  "android": "CYLTabBarController.cyl_simulateMemoryWarningForTabBarController",
+  "note": "calls unloadViewsOfUnselectedViewControllers (no-op)"
+ },
+ "NSObject(CYLTabBarControllerReferenceExtension)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "NSObject(CYLTabBarControllerReferenceExtension) cyl_tabBarController": {
+  "status": "done",
+  "android": "Fragment.cyl_tabBarController"
+ },
+ "NSObject(CYLTabBarControllerReferenceExtension) -cyl_tabBarControllerForStyleType:": {
+  "status": "n/a",
+  "note": "style-type lookup / FlatDesign"
+ },
+ "NSObject(CYLTabBarControllerReferenceExtension) -cyl_owningTabBarController": {
+  "status": "done",
+  "android": "Fragment.cyl_owningTabBarController"
+ },
+ "NSObject(CYLTabBarControllerReferenceExtension) cylflatdesign_tabBarController": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "CYLTabBarTheme": {
+  "status": "done",
+  "android": "CYLTabBarTheme"
+ },
+ "CYLTabBarTheme -cyl_tabBarItemsAttributesForTabBarController:": {
+  "status": "done",
+  "android": "CYLTabBarTheme.cyl_tabBarItemsAttributesForTabBarController"
+ },
+ "CYLTabBarTheme -cyl_plusButtonAttributesForTabBarController:": {
+  "status": "done",
+  "android": "CYLTabBarTheme.cyl_plusButtonAttributesForTabBarController"
+ },
+ "CYLTabBarTheme -cyl_tabBarAppearanceForTabBarController:": {
+  "status": "done",
+  "android": "CYLTabBarTheme.cyl_tabBarAppearanceForTabBarController"
+ },
+ "CYLTabBarTheme -cyl_customizeTabBarController:": {
+  "status": "done",
+  "android": "CYLTabBarTheme.cyl_customizeTabBarController"
+ },
+ "CYLTabBarController(CYLTheme)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLTheme) -cyl_applyTabBarTheme:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_applyTabBarTheme"
+ },
+ "CYLTabBarController(CYLTheme) cyl_themeManager": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_themeManager"
+ },
+ "CYLTabBarController(CYLTabBarItemStyle)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarItemTitleFont": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarItemTitleFont"
+ },
+ "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarItemSelectedTitleFont": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarItemSelectedTitleFont"
+ },
+ "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarItemTitleColor": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarItemTitleColor"
+ },
+ "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarItemSelectedTitleColor": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarItemSelectedTitleColor"
+ },
+ "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarItemImageColor": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarItemImageColor"
+ },
+ "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarItemSelectedImageColor": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarItemSelectedImageColor"
+ },
+ "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarBackgroundColor": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_tabBarBackgroundColor"
+ },
+ "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarShadowColor": {
+  "status": "partial",
+  "android": "CYLTabBarController.cyl_tabBarShadowColor",
+  "note": "a 0.5 dp line"
+ },
+ "CYLTabBarController(CYLTabBarItemStyle) -cyl_didInitialize": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_didInitialize"
+ },
+ "CYLTabBarController(CYLOpaqueTabBarSafeArea)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLOpaqueTabBarSafeArea) cyl_fixesOpaqueTabBarSafeAreaInsets": {
+  "status": "partial",
+  "android": "CYLTabBarController.cyl_fixesOpaqueTabBarSafeAreaInsets",
+  "note": "kept, no effect"
+ },
+ "CYLTabBarController(CYLTabBarControllerDeprecated)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLTabBarControllerDeprecated) -hideTabBadgeBackgroundSeparator": {
+  "status": "n/a",
+  "note": "UIKit internals / the app delegate and window"
+ },
+ "CYLTabBarController(CYLTabBarMinimize)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLTabBarMinimize) cyl_tabBarMinimizeBehavior": {
+  "status": "partial",
+  "android": "CYLTabBarController.cyl_tabBarMinimizeBehavior",
+  "note": "hide / show on scroll; no minimized (small) bar"
+ },
+ "CYLTabBarController(CYLTabBarMinimize) cyl_hidesTabBarOnScroll": {
+  "status": "partial",
+  "android": "CYLTabBarController.cyl_hidesTabBarOnScroll",
+  "note": "the page calls `cyl_trackScrollView(view)` (iOS observes the scroll view itself)"
+ },
+ "CYLTabBarController(CYLTabBarMinimize) cyl_isTabBarHiddenByScroll": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_isTabBarHiddenByScroll"
+ },
+ "CYLTabBarController(CYLTabBarMinimize) -cyl_simulateHideOnScrollForTesting": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_simulateHideOnScrollForTesting"
+ },
+ "CYLTabBarItemAnimationPlayingNotification": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemAnimationPlayingNotification"
+ },
+ "CYLTabBarController(CYLPageRegistry)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLPageRegistry) cyl_pagesFromPageIdentifiers": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_pagesFromPageIdentifiers"
+ },
+ "CYLTabBarController(CYLPageRegistry) cyl_pageRegistry": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_pageRegistry"
+ },
+ "CYLTabBarController(CYLPageRegistry) cyl_pageResolver": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_pageResolver"
+ },
+ "CYLTabBarController(CYLPageRegistry) cyl_pageLookupOrder": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_pageLookupOrder"
+ },
+ "CYLTabBarController(CYLPageRegistry) cyl_skippedTabs": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_skippedTabs"
+ },
+ "CYLTabBarController(CYLPageRegistry) cyl_pendingPages": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_pendingPages"
+ },
+ "CYLTabBarController(CYLConfiguration)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLConfiguration) +cyl_normalizedConfiguration:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_normalizedConfiguration"
+ },
+ "CYLTabBarController(CYLConfiguration) +configurationWithContentsOfFile:error:": {
+  "status": "partial",
+  "android": "CYLTabBarController.configurationWithContentsOfFile",
+  "note": "JSON, XML plist, .properties"
+ },
+ "CYLTabBarController(CYLConfiguration) -initWithConfigurationFile:error:": {
+  "status": "partial",
+  "android": "CYLTabBarController(activity, …)",
+  "note": "a file path or an asset name"
+ },
+ "CYLTabBarController(CYLConfiguration) +tabBarControllerWithConfigurationFile:error:": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarControllerWithConfigurationFile"
+ },
+ "CYLTabBarController(CYLConfiguration) +loadConfigurationWithURL:completion:": {
+  "status": "partial",
+  "android": "CYLTabBarController.loadConfigurationWithURL",
+  "note": "HttpURLConnection, 15 s timeout; the URLRequest variants take a URL string"
+ },
+ "CYLTabBarController(CYLConfiguration) +loadConfigurationWithURLRequest:completion:": {
+  "status": "partial",
+  "android": "CYLTabBarController.loadConfigurationWithURL",
+  "note": "Android takes a URL string; headers / cache policy are not configurable"
+ },
+ "CYLTabBarController(CYLConfiguration) +loadTabBarControllerWithConfigurationURLRequest:completion:": {
+  "status": "partial",
+  "android": "CYLTabBarController.loadTabBarControllerWithConfigurationURL",
+  "note": "Android takes a URL string; headers / cache policy are not configurable"
+ },
+ "CYLTabBarController(CYLConfiguration) +loadTabBarControllerWithConfigurationURL:completion:": {
+  "status": "done",
+  "android": "CYLTabBarController.loadTabBarControllerWithConfigurationURL"
+ },
+ "CYLTabBarController(CYLReselect)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLReselect) cyl_reselectBehavior": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_reselectBehavior"
+ },
+ "CYLTabBarController(CYLSelectedTabBadge)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLSelectedTabBadge) cyl_hidesBadgeOfSelectedTab": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_hidesBadgeOfSelectedTab"
+ },
+ "CYLTabBarController(CYLCustomTabAction)": {
+  "status": "done",
+  "android": "CYLTabBarController"
+ },
+ "CYLTabBarController(CYLCustomTabAction) cyl_customActionTabBarItemIdentifiers": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_customActionTabBarItemIdentifiers"
+ },
+ "CYLTabBarController(CYLCustomTabAction) cyl_shouldPerformCustomTabActionHandler": {
+  "status": "planned"
+ },
+ "CYLTabBarController(CYLCustomTabAction) cyl_customTabActionHandler": {
+  "status": "planned"
+ },
+ "CYLTabBarController(CYLCustomTabAction) -cyl_isCustomActionTabViewController:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_isCustomActionTabViewController"
+ },
+ "CYLTabBarController(CYLCustomTabAction) -cyl_performCustomTabActionIfNeededForViewController:": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_performCustomTabActionIfNeededForViewController"
+ },
+ "CYLTabBarItemAnimationViewDidAddNotification": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemAnimationViewDidAddNotification"
+ },
+ "CYLTabBarStyleTypeDidChangeNotification": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarStyleTypeDidChangeNotification"
+ },
+ "CYLTabBarItemWidthDidChangeNotification": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemWidthDidChangeNotification"
+ },
+ "CYLTabBarItemAnimationViewMaking": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationViewMaking -animationViewWithURL:size:contentMode:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationViewMaking -playerForView:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationViewMaking -isAnimationView:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFactory": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFactory registry": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFactory -initWithRegistry:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFactory -init": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFactory +sharedFactory": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFactory +animationViewWithURL:size:contentMode:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFactory +playerForView:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFactory +isAnimationView:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayableView": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayableView -cyl_playAnimationView": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayableView -cyl_showAnimationViewLastFrame": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayableView -cyl_stopAnimationView": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayableView -cyl_applyAnimationViewColors:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationViewProviding": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationViewProviding +cyl_animationViewWithFileURL:options:contentMode:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayer": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayer animationView": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayer -play": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayer -showLastFrame": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayer -stop": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayer progress": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayer animationSpeed": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayer -applyDarkColors:traitCollection:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationPlayer -applyColors:traitCollection:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationBasePlayer": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationBasePlayer -initWithAnimationView:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationBasePlayer -init": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationBasePlayer +new": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationBasePlayer animationView": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorPriority": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFileMatching": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFileMatching identifier": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFileMatching -canAnimateFileAtURL:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFileMatching priority": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFileMatching fileExtensions": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationFileMatching attributeKeys": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationViewFactory": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationViewFactory -animationViewWithURL:size:contentMode:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimationViewFactory -playerForAnimationView:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimator": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistering": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistering -registerAnimator:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistering -unregisterAnimatorWithIdentifier:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistering -animators": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistering -animatorWithIdentifier:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistering -animatorForURL:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistering -animatorForAttributes:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistering -attributeKeyForGenericKey:inAttributes:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistering -bindURL:toAnimator:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistering -attributeKeysForGenericKey:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistering -fileExtensions": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry +sharedRegistry": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry +registerAnimator:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry +unregisterAnimatorWithIdentifier:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry +animators": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry +animatorWithIdentifier:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry +animatorForURL:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry +animatorForAttributes:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry +attributeKeyForGenericKey:inAttributes:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry +bindURL:toAnimator:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry +attributeKeysForGenericKey:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemAnimatorRegistry +fileExtensions": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemViewAnimator": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemViewAnimator -initWithIdentifier:fileExtensions:attributeKeys:viewProvider:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemViewAnimator -init": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemViewAnimator +new": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemViewAnimator viewProvider": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLLottieTabBarItemAnimator": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarPAGURL": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarPAGFilePath": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarPAGSize": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarPAGDarkURL": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarPAGDarkFilePath": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarItemsAttributesAddingPAGFiles()": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLPAGTabBarItemAnimator": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLRiveTabBarItemAnimator": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLRiveTabBarItemAnimator animator": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarRiveURL": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarRiveFilePath": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarRiveSize": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarRiveDarkURL": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarRiveDarkFilePath": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarRiveDarkColors": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarAnimationOptionRiveArtboard": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarAnimationOptionRiveStateMachine": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarAnimationOptionRiveActiveProperty": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarAnimationOptionRiveActiveDuration": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarAnimationOptionRiveTriggerProperty": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarAnimationOptionRiveColor": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarAnimationOptionRiveInput": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarAnimationOptionRiveTriggerInput": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarAnimationOptionRiveAnimation": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarAnimationOptionRiveLegacyRuntime": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "UIControl(CYLTabBarItemAnimationPlayer)": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "UIControl(CYLTabBarItemAnimationPlayer) cyl_tabBarItemAnimationPlayer": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "CYLTabBarPageSource": {
+  "status": "done",
+  "android": "CYLTabBarPageSource (PageSource)"
+ },
+ "CYLTabBarPageSourceInstanceRegistry": {
+  "status": "done",
+  "android": "CYLTabBarPageSource.INSTANCEREGISTRY"
+ },
+ "CYLTabBarPageSourceResolver": {
+  "status": "done",
+  "android": "CYLTabBarPageSource.RESOLVER"
+ },
+ "CYLTabBarPageSourceSharedRegistry": {
+  "status": "done",
+  "android": "CYLTabBarPageSource.SHAREDREGISTRY"
+ },
+ "CYLTabBarPageSourceAutomaticRegistration": {
+  "status": "done",
+  "android": "CYLTabBarPageSource.AUTOMATICREGISTRATION"
+ },
+ "CYLTabBarPageSkipReason": {
+  "status": "done",
+  "android": "CYLTabBarPageSkipReason (SkipReason)"
+ },
+ "CYLTabBarPageProviding": {
+  "status": "done",
+  "android": "CYLTabBarPageProviding"
+ },
+ "CYLTabBarPageProviding -pageProviderForPageIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarPageProviding.pageProviderForPageIdentifier"
+ },
+ "CYLTabBarPageRequest": {
+  "status": "done",
+  "android": "CYLTabBarPageRequest"
+ },
+ "CYLTabBarPageRequest pageIdentifier": {
+  "status": "done",
+  "android": "CYLTabBarPageRequest.pageIdentifier"
+ },
+ "CYLTabBarPageRequest tabIdentifier": {
+  "status": "done",
+  "android": "CYLTabBarPageRequest.tabIdentifier"
+ },
+ "CYLTabBarPageRequest title": {
+  "status": "done",
+  "android": "CYLTabBarPageRequest.title"
+ },
+ "CYLTabBarPageRequest parameters": {
+  "status": "done",
+  "android": "CYLTabBarPageRequest.parameters"
+ },
+ "CYLTabBarPageRequest attributes": {
+  "status": "done",
+  "android": "CYLTabBarPageRequest.attributes"
+ },
+ "CYLTabBarPageRequest +requestWithPageIdentifier:attributes:": {
+  "status": "done",
+  "android": "CYLTabBarPageRequest.requestWithPageIdentifier"
+ },
+ "CYLTabBarSkippedTab": {
+  "status": "done",
+  "android": "CYLTabBarSkippedTab (SkippedTab)"
+ },
+ "CYLTabBarSkippedTab reason": {
+  "status": "done",
+  "android": "CYLTabBarSkippedTab.reason"
+ },
+ "CYLTabBarSkippedTab pageIdentifier": {
+  "status": "done",
+  "android": "CYLTabBarSkippedTab.pageIdentifier"
+ },
+ "CYLTabBarSkippedTab title": {
+  "status": "done",
+  "android": "CYLTabBarSkippedTab.title"
+ },
+ "CYLTabBarSkippedTab attributes": {
+  "status": "done",
+  "android": "CYLTabBarSkippedTab.attributes"
+ },
+ "CYLTabBarSkippedTab detail": {
+  "status": "done",
+  "android": "CYLTabBarSkippedTab.detail"
+ },
+ "CYLTabBarSkippedTab +skippedTabWithReason:pageIdentifier:attributes:detail:": {
+  "status": "done",
+  "android": "CYLTabBarSkippedTab.skippedTabWithReason"
+ },
+ "CYLTabBarPageRegistry": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry"
+ },
+ "CYLTabBarPageRegistry sharedRegistry": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.sharedRegistry"
+ },
+ "CYLTabBarPageRegistry -registerPageProvider:forPageIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.registerPageProvider"
+ },
+ "CYLTabBarPageRegistry -registerPageProvider:forPageIdentifiers:": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.registerPageProvider"
+ },
+ "CYLTabBarPageRegistry -registerAsyncPageFactory:forPageIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.registerAsyncPageFactory"
+ },
+ "CYLTabBarPageRegistry -registerAsyncPageFactory:forPageIdentifiers:": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.registerAsyncPageFactory"
+ },
+ "CYLTabBarPageRegistry -registerPageFactory:forPageIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.registerPageFactory"
+ },
+ "CYLTabBarPageRegistry -registerPageFactory:forPageIdentifiers:": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.registerPageFactory"
+ },
+ "CYLTabBarPageRegistry -registerPageClass:": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.registerPageClass"
+ },
+ "CYLTabBarPageRegistry -unregisterPageIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.unregisterPageIdentifier"
+ },
+ "CYLTabBarPageRegistry -removeAllPageProviders": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.removeAllPageProviders"
+ },
+ "CYLTabBarPageRegistry -pageProviderForPageIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.pageProviderForPageIdentifier"
+ },
+ "CYLTabBarPageRegistry registeredPageIdentifiers": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.registeredPageIdentifiers"
+ },
+ "CYLTabBarPageRegistry automaticallyRegisteredPageClasses": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.automaticallyRegisteredPageClasses"
+ },
+ "CYLTabBarPageRegistry +rescanPageClasses": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.rescanPageClasses",
+  "note": "rescan is a no-op: ServiceLoader loads once"
+ },
+ "CYLTabBarPageRegistry +prepareAutomaticRegistrationInBackground": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.prepareAutomaticRegistrationInBackground"
+ },
+ "CYLTabBarPageRegistry defaultPageLookupOrder": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.defaultPageLookupOrder"
+ },
+ "CYLTabBarPageRegistry +pageIdentifierOfTab:": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.pageIdentifierOfTab"
+ },
+ "CYLTabBarPageRegistry +pagesOfTabs:registry:resolver:lookupOrder:keptTabs:skipped:": {
+  "status": "done",
+  "android": "CYLTabBarPageRegistry.pagesOfTabs"
+ },
+ "CYLTabBarPage": {
+  "status": "done",
+  "android": "CYLTabBarPage (TabPageFactory)"
+ },
+ "CYLTabBarPage +cylTabBarPageIdentifier": {
+  "status": "done",
+  "android": "TabPageFactory.pageId / create(tab)"
+ },
+ "CYLTabBarPage +cylTabBarPageWithAttributes:": {
+  "status": "done",
+  "android": "TabPageFactory.pageId / create(tab)"
+ },
+ "CYLTabBarPagePlaceholder": {
+  "status": "done",
+  "android": "CYLTabBarPagePlaceholder"
+ },
+ "UIViewController(CYLTabBarPageLoading)": {
+  "status": "done",
+  "android": "Fragment.cyl_* extensions"
+ },
+ "UIViewController(CYLTabBarPageLoading) cyl_isPendingPage": {
+  "status": "done",
+  "android": "Fragment.cyl_isPendingPage"
+ },
+ "UIViewController(CYLTabBarPageLoading) cyl_loadedPage": {
+  "status": "done",
+  "android": "Fragment.cyl_loadedPage"
+ },
+ "UIViewController(CYLTabBarPageLoading) cyl_pageLoadFailed": {
+  "status": "done",
+  "android": "Fragment.cyl_pageLoadFailed"
+ },
+ "UIViewController(CYLTabBarPageLoading) cyl_pageLoadHandler": {
+  "status": "done",
+  "android": "Fragment.cyl_pageLoadHandler"
+ },
+ "CYLTabBarSlideTransitionAnimator": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabBarSlideTransitionAnimator targetEdge": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabBarSlideTransitionAnimator duration": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabBarSlideTransitionAnimator -initWithTargetEdge:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabBarSlideTransitionAnimator -init": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabBarInteractiveTransition": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabBarInteractiveTransition gestureRecognizer": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabBarInteractiveTransition -initWithGestureRecognizer:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabBarInteractiveTransition -init": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cyl_playSelectAnimationWithTabButton:iconView:titleLabel:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cylPlaySelectAnimationWithTabButton:iconView:titleLabel:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cylPlayDeselectAnimationWithTabButton:iconView:titleLabel:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cylPlayReselectAnimationWithTabButton:iconView:titleLabel:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cylPlayHighlightAnimationWithTabButton:iconView:titleLabel:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cylPlayDehighlightAnimationWithTabButton:iconView:titleLabel:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cylPlayBadgeChangedAnimationWithTabButton:iconView:badgeView:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cyl_playDeselectAnimationWithTabButton:iconView:titleLabel:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cyl_resetTabButton:iconView:titleLabel:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation cyl_fromLeft": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation cyl_toRight": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cyl_playReselectAnimationWithTabButton:iconView:titleLabel:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cyl_playHighlightAnimationWithTabButton:iconView:titleLabel:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cyl_playDehighlightAnimationWithTabButton:iconView:titleLabel:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonAnimation -cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonScaleAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonScaleAnimation duration": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonZoomInAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonZoomInAnimation duration": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonBounceAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonBounceAnimation playsFireworks": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonBounceAnimation fireworksImage": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonRotationAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonFumeAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonPressAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonPressAnimation pressedScale": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonBlockAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonBlockAnimation selectAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonBlockAnimation deselectAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonBlockAnimation reselectAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonBlockAnimation highlightAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonBlockAnimation dehighlightAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonBlockAnimation badgeChangedAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonFlipAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonFlipAnimation direction": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonFlipAnimation disablesDeselectAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonFrameAnimation": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonFrameAnimation images": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonFrameAnimation playsFireworks": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CYLTabButtonFrameAnimation fireworksImage": {
+  "status": "planned",
+  "note": "custom tap animations / the slide transition between tabs are not ported"
+ },
+ "CALayer(CYLTheme)": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CALayer(CYLTheme) -cyl_setThemeColor:forKey:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CALayer(CYLTheme) -cyl_themeColorForKey:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CALayer(CYLTheme) -cyl_updateThemeColors": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CALayer(CYLTheme) cyl_themeBackgroundColor": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CALayer(CYLTheme) cyl_themeBorderColor": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CALayer(CYLTheme) cyl_themeShadowColor": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CYLThemeDidChangeNotification": {
+  "status": "done",
+  "android": "CYLThemeManager.Listener / CYLConstants.CYLThemeDidChangeNotification",
+  "note": "listeners instead of NSNotificationCenter"
+ },
+ "CYLThemeManager": {
+  "status": "done",
+  "android": "CYLThemeManager"
+ },
+ "CYLThemeManager -init": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CYLThemeManager +new": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CYLThemeManager name": {
+  "status": "done",
+  "android": "CYLThemeManager.name"
+ },
+ "CYLThemeManager 0": {
+  "status": "n/a",
+  "note": "a parsing artifact of a block property"
+ },
+ "CYLThemeManager identifierForTrait": {
+  "status": "done",
+  "android": "CYLThemeManager.identifierForTrait"
+ },
+ "CYLThemeManager themeIdentifiers": {
+  "status": "done",
+  "android": "CYLThemeManager.themeIdentifiers"
+ },
+ "CYLThemeManager themes": {
+  "status": "done",
+  "android": "CYLThemeManager.themes"
+ },
+ "CYLThemeManager currentThemeIdentifier": {
+  "status": "done",
+  "android": "CYLThemeManager.currentThemeIdentifier"
+ },
+ "CYLThemeManager currentTheme": {
+  "status": "done",
+  "android": "CYLThemeManager.currentTheme"
+ },
+ "CYLThemeManager persistsCurrentThemeIdentifier": {
+  "status": "done",
+  "android": "CYLThemeManager.persistsCurrentThemeIdentifier"
+ },
+ "CYLThemeManager themeChangeAnimationDuration": {
+  "status": "done",
+  "android": "CYLThemeManager.themeChangeAnimationDuration"
+ },
+ "CYLThemeManager themeGenerator": {
+  "status": "done",
+  "android": "CYLThemeManager.themeGenerator"
+ },
+ "CYLThemeManager themeIdentifierGenerator": {
+  "status": "done",
+  "android": "CYLThemeManager.themeIdentifierGenerator"
+ },
+ "CYLThemeManager -addThemeIdentifier:theme:": {
+  "status": "done",
+  "android": "CYLThemeManager.addThemeIdentifier(identifier, theme)"
+ },
+ "CYLThemeManager -removeThemeIdentifier:": {
+  "status": "done",
+  "android": "CYLThemeManager.removeThemeIdentifier(identifier)"
+ },
+ "CYLThemeManager -removeTheme:": {
+  "status": "done",
+  "android": "CYLThemeManager.removeTheme(theme)"
+ },
+ "CYLThemeManager -themeForIdentifier:": {
+  "status": "done",
+  "android": "CYLThemeManager.themeForIdentifier(identifier)"
+ },
+ "CYLThemeManager -identifierForTheme:": {
+  "status": "done",
+  "android": "CYLThemeManager.identifierForTheme(theme)"
+ },
+ "CYLThemeManager -updateThemeForTraitCollection:": {
+  "status": "done",
+  "android": "CYLThemeManager.updateThemeForTraitCollection(configuration)"
+ },
+ "CYLThemeManagerNameDefault": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CYLThemeManagerCenter": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CYLThemeManagerCenter defaultThemeManager": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CYLThemeManagerCenter themeManagers": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CYLThemeManagerCenter +themeManagerWithName:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CYLThemeManagerCenter +updateThemesForTraitCollection:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIColor(CYLTheme)": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIColor(CYLTheme) +cyl_colorWithThemeProvider:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIColor(CYLTheme) +cyl_colorWithName:themeProvider:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIColor(CYLTheme) +cyl_colorWithThemeManagerName:provider:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIColor(CYLTheme) +cyl_colorWithName:themeManagerName:provider:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIColor(CYLTheme) cyl_isThemeColor": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIColor(CYLTheme) cyl_themeColorName": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIColor(CYLTheme) cyl_rawColor": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIImage(CYLTheme)": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIImage(CYLTheme) +cyl_imageWithThemeProvider:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIImage(CYLTheme) +cyl_imageWithName:themeProvider:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIImage(CYLTheme) +cyl_imageWithThemeManagerName:provider:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIImage(CYLTheme) +cyl_imageWithName:themeManagerName:provider:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIImage(CYLTheme) cyl_isThemeImage": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIImage(CYLTheme) cyl_themeImageName": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIImage(CYLTheme) cyl_rawImage": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIView(CYLTheme)": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIView(CYLTheme) -cyl_registerThemeColorProperties:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIView(CYLTheme) -cyl_unregisterThemeColorProperties:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIView(CYLTheme) -cyl_themeDidChangeByManager:identifier:theme:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIView(CYLTheme) cyl_themeDidChangeBlock": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIView(CYLTheme) -cyl_applyCurrentTheme": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIViewController(CYLTheme)": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIViewController(CYLTheme) -cyl_themeDidChangeByManager:identifier:theme:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIVisualEffect(CYLTheme)": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIVisualEffect(CYLTheme) +cyl_effectWithThemeProvider:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIVisualEffect(CYLTheme) +cyl_effectWithThemeManagerName:provider:": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIVisualEffect(CYLTheme) cyl_isThemeEffect": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "UIVisualEffect(CYLTheme) cyl_rawEffect": {
+  "status": "planned",
+  "note": "theme colors / views (`UIColor+CYLTheme`, `UIView+CYLTheme`) are not ported yet"
+ },
+ "CYLLocalizedString()": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "CYLResourceBundle()": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "CYLSetLocalizationLanguage()": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "CYLLocalizationLanguageDidChangeNotification": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "CYLLocalizedStringForLanguage()": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "CYLLocalizationLanguage()": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "CYLUtils": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "CYLUtils +isLiquidGlassActive": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "NSObject(CYLUtils)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "NSObject(CYLUtils) -cyl_valueForKey:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "NSObject(CYLUtils) -cyl_setValue:forKey:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "NSObject(CYLUtils) cyl_isPlaceholder": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "NSObject(CYLUtils) -cyl_setWeakAssociatedObject:forKey:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "NSObject(CYLUtils) -cyl_weakAssociatedObjectForKey:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIBarItem(CYLUtils)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIBarItem(CYLUtils) -cyl_view": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UITabBarItem(CYLUtils)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UITabBarItem(CYLUtils) cyl_tabButton": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIView(CYLHitTestOutsideBounds)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIView(CYLHitTestOutsideBounds) cyl_respondsOutsideSuperviewBounds": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIView(CYLUtils)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIView(CYLUtils) -cyl_setHidden:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIView(CYLUtils) -cyl_isInvisiable": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIView(CYLUtils) -cyl_canNotResponseEvent": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIView(CYLUtils) -cyl_addScaleBounceAnimationWithCompletion:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIView(CYLUtils) -cyl_nearestControlBelowView:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIViewController(CYLUtils)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "UIViewController(CYLUtils) -cyl_getViewControllerInsteadOfNavigationController": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no Android counterpart"
+ },
+ "NSObject(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) cyl_context": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) cyl_isForceLandscape": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_forceUpdateInterfaceOrientation:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_sharedAppDelegate": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) +cyl_topmostViewController": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) +cyl_currentNavigationController": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) +cyl_dismissAll:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_ivarList": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_isContinuousGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_isLongGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_isPlusViewControllerAdded:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_removeObserver:forKeyPath:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_removeObserver:forKeyPath:context:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemRedColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGreenColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemBlueColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemOrangeColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemYellowColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemPinkColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemPurpleColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemTealColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemIndigoColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGrayColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGray2Color": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGray3Color": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGray4Color": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGray5Color": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGray6Color": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_labelColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_secondaryLabelColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_tertiaryLabelColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_quaternaryLabelColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_linkColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_placeholderTextColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_separatorColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_opaqueSeparatorColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGroupedBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemGroupedBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemGroupedBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemFillColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemFillColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemFillColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_quaternarySystemFillColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_lightTextColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_darkTextColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) +cyl_colorWithLightColor:darkColor:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_randomColor": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerDeprecated)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIColor(CYLTabBarControllerDeprecated) 5": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_lottieAnimationView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_isChildViewControllerPlusButton": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_isSelected": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_isLottieReady": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_isPlusControl": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_tabBarChildViewControllerIndex": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemIdentifier": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemDisplayName": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemVisibleIndex": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_shouldNotSelect": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_userInteractionDisabled": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_addLottieImageWithLottieURL:size:contentMode:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_addLottieImageWithLottieFilePath:size:contentMode:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_addLottieImageWithLottieURL:size:contentMode:animationSpeed:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_setLottieAnimationSpeed:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_reloadLottieAnimationViewForCurrentStyle": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_animationLottieImageWithLottieURL:size:defaultSelected:contentMode:": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_stopAnimationOfLottieView": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabImageViewWithNewView:show:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabImageViewWithNewView:offset:show:completion:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabButtonWithNewView:show:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabButtonWithNewView:offset:show:completion:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_isPlatterSelectedControl": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_platterSelectedControl": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_isPlatterNormalControl": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_platterNormalControl": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_coverTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_coverSeclectContentTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:contentNewView:seclectContentNewView:offset:show:delayIfNeededForSeconds:completion:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_hideControl": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtentionDeprecated)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtentionDeprecated) instead": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtentionDeprecated) -cyl_showTabBadgePoint": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtentionDeprecated) -cyl_removeTabBadgePoint": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarControllerExtentionDeprecated) -cyl_isShowTabBadgePoint": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarItemAnimation)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarItemAnimation) -cyl_tabBarItemAnimationView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarItemAnimation) -cyl_isTabBarItemAnimationReady": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarItemAnimation) -cyl_addTabBarItemAnimationWithURL:size:contentMode:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarItemAnimation) -cyl_addTabBarItemAnimationWithURL:size:contentMode:animationSpeed:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarItemAnimation) -cyl_setTabBarItemAnimationSpeed:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarItemAnimation) -cyl_reloadTabBarItemAnimationViewForCurrentStyle": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarItemAnimation) -cyl_replaceTabBarItemAnimationWithURL:size:contentMode:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarItemAnimation) -cyl_refreshTabBarItemAnimationColors": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarItemAnimation) -cyl_playTabBarItemAnimationWithURL:size:defaultSelected:contentMode:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIControl(CYLTabBarItemAnimation) -cyl_stopTabBarItemAnimation": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageLoadOptions": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCacheExpireType": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache +sharedImageCache": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache shouldCacheImagesInMemory": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache shouldCacheImagesOnDisk": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache maxMemoryCount": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache maxMemoryCost": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache maxDiskAge": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache diskCacheExpireType": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache maxDiskSize": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache diskCachePath": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache downloadTimeout": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache -imageFromCacheForURL:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache -removeImageForURL:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache -clearMemory": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache -clearDiskOnCompletion:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache -deleteOldFilesWithCompletion:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLImageCache -totalDiskSize": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_imageWithColor:size:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_imageWithColor:size:cornerRadius:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_imageWithLightImage:darkImage:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_imageWithImageInfo:darkImageInfo:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithLightImage:darkImage:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithOwner:lightImage:darkImage:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithOwner:lightImageName:darkImageName:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_assetImageName:userInterfaceStyle:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) cyl_darkImageNameSuffix": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_imageNamed:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_getImageFromImageInfo:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_tabItemPlaceholderImage": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_animatedImageWithGIFData:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_loadImageWithURL:completion:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_loadImageWithURL:options:completion:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UITabBarItem(CYLTabBarControllerExtention)": {
+  "status": "done",
+  "android": "CYLTabBarItem"
+ },
+ "UITabBarItem(CYLTabBarControllerExtention) cyl_selectedTabButton": {
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_selectedTabButton"
+ },
+ "UITabBarItem(CYLTabBarControllerExtention) cyl_visiableTabButton": {
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_visiableTabButton"
+ },
+ "UITabBarItem(CYLTabBarControllerExtention) cyl_tabBarItemAnimationURL": {
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_tabBarItemAnimationURL"
+ },
+ "UITabBarItem(CYLTabBarControllerExtention) cyl_tabBarItemAnimationSizeValue": {
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_tabBarItemAnimationSizeValue"
+ },
+ "UITabBarItem(CYLTabBarControllerExtention) cyl_imagePositionAdjustment": {
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_imagePositionAdjustment"
+ },
+ "UITabBarItem(CYLTabBarControllerExtention) -cyl_imageView": {
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_imageView"
+ },
+ "UITabBarItem(CYLTabBarControllerExtention) -cyl_imageViewInTabBarButton": {
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_imageViewInTabBarButton"
+ },
+ "UITabBarItem(CYLTabBarControllerExtention) cyl_doubleTapBlock": {
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_doubleTapBlock"
+ },
+ "UITabBarItem(CYLTabBarControllerExtention) cyl_viewDidLayoutSubviewsBlock": {
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_viewDidLayoutSubviewsBlock"
+ },
+ "UITabBarAppearance(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UITabBarAppearance"
+ },
+ "UITabBarAppearance(CYLTabBarControllerExtention) -cyl_applyItemAppearanceWithBlock:": {
+  "status": "n/a",
+  "note": "UITabBarAppearance"
+ },
+ "CYLBadgeRowHeight": {
+  "status": "planned"
+ },
+ "UITableViewCell(CYLBadgeExtention)": {
+  "status": "planned"
+ },
+ "UITableViewCell(CYLBadgeExtention) -cyl_showBadgeForRow:": {
+  "status": "planned"
+ },
+ "UITableViewCell(CYLBadgeExtention) +cyl_badgeTitleForRow:": {
+  "status": "planned"
+ },
+ "UITableViewCell(CYLBadgeExtention) +cyl_badgeStyleCount": {
+  "status": "planned"
+ },
+ "UITableViewCell(CYLBadgeExtention) -cyl_wrapsTextLabels": {
+  "status": "planned"
+ },
+ "UITableViewCell(CYLBadgeExtention) +cyl_setUpAutomaticRowHeightForTableView:": {
+  "status": "planned"
+ },
+ "UIViewController(CYLNavigationBadge)": {
+  "status": "planned"
+ },
+ "UIViewController(CYLNavigationBadge) -cyl_showNavigationBadgeValue:animationType:backgroundColor:": {
+  "status": "planned"
+ },
+ "CYLBadgeHelperTableViewController": {
+  "status": "planned"
+ },
+ "CYLBadgeHelperTableViewController didSelectRowHandler": {
+  "status": "planned"
+ },
+ "UIViewController(CYLBadgeExtention)": {
+  "status": "planned"
+ },
+ "UIViewController(CYLBadgeExtention) -cyl_addBadgeHelperTable": {
+  "status": "planned"
+ },
+ "UIView(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlusButton": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isRightToLeftLayout": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isTabButton": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlatterView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlatterContentView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlatterSelectedContentView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlatterPortalView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlatterLiquidLensView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlatterDestOutView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlatterLiquidLensClearGlassView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlatterLiquidLensTabSelectionView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlatterLiquidLensBackdropView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlatterVisualProviderFloatingSelectedContentView": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_imageView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isTabImageView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) cyl_tabBarItemIconView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) cyl_tabButtonCoverView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isTabLabel": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isButtonLabel": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isTabBadgeView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabBadgeView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isTabBackgroundView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabImageView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabLabel": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabShadowImageView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabEffectView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isLottieAnimationView": {
+  "status": "planned",
+  "note": "animated tab icons (Lottie / PAG / Rive runtimes for Android) are not ported yet"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabBackgroundView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_allSubviews": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_imageViewInTabBarButton": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_bringSubviewToFront:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_bringSubviewToTop:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_addPlatterViewThenBringSubviewToFront:": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isViewAddedToPlatterView:": {
+  "status": "n/a",
+  "note": "Liquid Glass is iOS 26 only"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_swappableImageViewViewInTabBarButton": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_takeSnapshot": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_takeSnapshotWithoutViews:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_markAsInsertedForTabControl:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) cyl_insertedForTabControl": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtention) +cyl_insertedTabControlViews": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtentionDeprecated)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtentionDeprecated) -cyl_tabBadgeBackgroundView": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtentionDeprecated) -cyl_tabBadgeBackgroundSeparator": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarControllerExtentionDeprecated) +cyl_tabBadgePointViewWithClolor:radius:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarMetrics)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarMetrics) cyl_tabbarItemsCount": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarMetrics) cyl_tabBarItemWidth": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarMetrics) -cyl_plusButtonIndex": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIView(CYLTabBarMetrics) -cyl_plusButtonWidth": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLSampleConfigurationURLString": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationDemo)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationDemo) +cyl_sampleConfigurationFilePaths": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationDemo) -cyl_configurationDemoCellForTableView:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationDemo) -cyl_presentConfigurationDemo": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationEdgeCases)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationEdgeCases) -cyl_configurationEdgeCaseRowCount": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationEdgeCases) +cyl_configurationEdgeCaseSectionTitle": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationEdgeCases) -cyl_configurationEdgeCaseCellForTableView:row:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationEdgeCases) -cyl_runConfigurationEdgeCaseAtRow:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLMemoryWarning)": {
+  "status": "planned"
+ },
+ "UIViewController(CYLMemoryWarning) -cyl_memoryWarningCellForTableView:": {
+  "status": "planned"
+ },
+ "UIViewController(CYLMemoryWarning) -cyl_simulateMemoryWarningAndShowResult": {
+  "status": "planned"
+ },
+ "UIViewController(CYLNavigationControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_disablePopGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_hideNavigationBarSeparator": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_navigationBarHidden": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_hidesBottomBarWhenPushed": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_hidesAncestorNavigationBars": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_automaticNavigationSettingEnabled": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_disableInteractivePopGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_enableInteractivePopGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_resetInteractivePopGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_hideNavigationBarSeparatorIfNeeded": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_shouldNavigationBarVisible": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_setNavigationBarVisibleIfNeeded:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_setNavigationBarHiddenIfNeeded:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_viewWillAppearNavigationSetting:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_viewWillDisappearNavigationSetting:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_viewDidDisappearNavigationSetting:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_viewDidAppearNavigationSetting:": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_deallocNavigationSetting": {
+  "status": "n/a",
+  "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "CYLSettingsSection": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "CYLSettingsGroup": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_settingsRowCount": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_settingsCellForTableView:atIndexPath:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_didSelectSettingsRowAtIndexPath:inTableView:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_settingsGroups": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_titleForSettingsGroup:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_settingsRowsInGroup:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_settingsCellForTableView:row:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_didSelectSettingsRow:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLScrollHideSimulation)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLScrollHideSimulation) -cyl_scrollHideSimulationRowCount": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLScrollHideSimulation) -cyl_scrollHideSimulationCellForTableView:row:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLScrollHideSimulation) -cyl_didSelectScrollHideSimulationRow:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLScrollHideSimulation) -cyl_presentScrollHideSimulationMenu": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLScrollHideSimulation) -cyl_runScrollHideSelfTest": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLTabBarControllerExtention)": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) cyl_tabBarItem": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) cylflatdesign_tabBarController": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_isSystemStyleTabBar": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_isFlatDesignStyleTabBar": {
+  "status": "n/a",
+  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+ },
+ "UIViewController(CYLTabBarControllerExtention) cyl_embedInTabBarController": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) cyl_tabIndex": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) cyl_tabBarItemIdentifier": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) cyl_tabButton": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) cyl_plusViewControllerEverAdded": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_isShowBadge": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_showBadge": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_showBadgeValue:animationType:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_clearBadge": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_resumeBadge": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_isPauseBadge": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerAtIndex:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerAtIndex:animated:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerAtIndex:completion:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForClassType:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForClassType:completion:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:animated:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:completion:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_pushOrPopToViewController:animated:callback:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_pushOrPopToViewController:animated:tabBarItemIdentifier:callback:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_pushViewController:animated:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_handleNavigationBackAction": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_handleNavigationBackActionWithAnimated:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_visiableTabButton": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_isEqualToViewController:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_addChildViewController:": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtentionDeprecated)": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtentionDeprecated) -cyl_showTabBadgePoint": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtentionDeprecated) -cyl_removeTabBadgePoint": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtentionDeprecated) -cyl_isShowTabBadgePoint": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtentionDeprecated) instead": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "UIViewController(CYLTabBarControllerExtentionDeprecated) cyl_tabBarSpacingInViewCoordinator": {
+  "status": "planned",
+  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+ },
+ "CYLTabBarItemUpdateRow": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLTabBarItemUpdate)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLTabBarItemUpdate) -cyl_tabBarItemUpdateRowCount": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLTabBarItemUpdate) -cyl_tabBarItemUpdateCellForTableView:row:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLTabBarItemUpdate) -cyl_didSelectTabBarItemUpdateRow:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) +cyl_setUpThemeSettings": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_themeSettingsCellForTableView:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_presentThemePickerFromView:completion:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_themeMenuWithCompletion:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_themeListSectionTitle": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_themeListRowCount": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_themeListCellForTableView:row:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_didSelectThemeListRow:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ }
+}

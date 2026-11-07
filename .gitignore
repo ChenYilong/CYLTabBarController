@@ -105,3 +105,6 @@ Example-SwiftUI-Rive/AnimatedApp.xcodeproj/project.xcworkspace/xcshareddata/swif
 
 # Removed from the repository (#760); kept locally only. 已从仓库移除（#760），只保留在本地。
 Example-loadTabBarIconsFroNework/
+
+# Python bytecode of the scripts 脚本的 Python 字节码
+__pycache__/
