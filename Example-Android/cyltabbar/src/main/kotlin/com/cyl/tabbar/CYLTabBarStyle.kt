@@ -329,6 +329,7 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
             CYLGlassEffects(blurRadius = 8f * density, refractionHeight = 24f * density, refractionAmount = 24f * density))
         paint.color = tint ?: if (dark) 0x66121212 else 0x66FAFAFA
         if (!glass) paint.color = if (dark) 0xE6121212.toInt() else 0xE6FAFAFA.toInt()
+        val surface = paint.color
         canvas.drawRoundRect(shape, radius, radius, paint)
 
         // [EN] The bubble behind the selected tab. [CN] 选中 Tab 后面的气泡。
@@ -344,8 +345,13 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
         bubble.set(centerX - width / 2f * sx, centerY - bubbleHeight / 2f * sy, centerX + width / 2f * sx, centerY + bubbleHeight / 2f * sy)
         val bubbleRadius = bubble.height() / 2f
         if (press > 0.01f && pages != null) {
+            // [EN] The pressed bubble magnifies the dock, not the bare page: the dock's own surface (its blur and vibrancy, then its
+            //      tint) through the bubble's lens and dispersion, so it never shows the page's color where the dock does not.
+            // [CN] 按下的气泡放大的是胶囊，而不是页面本身：胶囊自己的表面（其模糊与鲜艳度，再加上其着色）经过气泡的透镜与色散，因此不会显示胶囊上看不到的页面颜色。
             bubbleBackdrop.draw(canvas, pages, tabBar.x - pages.x + bubble.left, tabBar.y - pages.y + bubble.top, bubble, bubbleRadius,
-                CYLGlassEffects(saturation = 1f, refractionHeight = 10f * density * press, refractionAmount = 14f * density * press, chromaticAberration = true))
+                CYLGlassEffects(blurRadius = 8f * density, refractionHeight = 10f * density * press, refractionAmount = 14f * density * press, chromaticAberration = true))
+            paint.color = surface
+            canvas.drawRoundRect(bubble, bubbleRadius, bubbleRadius, paint)
         }
         paint.color = if (dark) Color.WHITE else Color.BLACK
         paint.alpha = ((0.1f * (1f - press) + 0.03f * press) * 255).toInt()

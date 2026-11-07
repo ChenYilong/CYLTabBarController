@@ -773,12 +773,35 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     private val touchableAreaPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
+    /** [EN] True while the plus button is drawn on its own, after everything else. [CN] 单独绘制 PlusButton（在其他内容之后）时为 true。 */
+    private var drawingPlusButtonLast = false
+
+    /** [EN] The plus button is skipped in the children's pass and drawn last by `dispatchDraw`. [CN] PlusButton 在子视图的绘制中跳过，由 `dispatchDraw` 最后绘制。 */
+    override fun drawChild(canvas: Canvas, child: View, drawingTime: Long): Boolean {
+        if (child === plusButton && !drawingPlusButtonLast) return false
+        return super.drawChild(canvas, child, drawingTime)
+    }
+
+    /**
+     * [EN] The plus button is always on top, as on iOS: drawn after the tabs, the style's layers above them (the Liquid
+     *      Glass dock's rim and bubble highlight) and the indicator, so nothing the bar draws cuts it where it rises past
+     *      the bar. Neither the bar nor the root view clips it, and the root view sends touches on its raised part to it
+     *      (`CYLTabBarControllerView.dispatchTouchEvent`, #91).
+     * [CN] PlusButton 始终在最上层，与 iOS 相同：在 Tab、样式在 Tab 之上绘制的内容（液态玻璃胶囊的边缘与气泡高光）以及指示条之后绘制，
+     *      因此凸出 TabBar 的部分不会被 TabBar 绘制的任何内容切割。TabBar 与根视图都不裁剪它，根视图把凸起部分上的触摸交给它
+     *      （`CYLTabBarControllerView.dispatchTouchEvent`，#91）。
+     */
     override fun dispatchDraw(canvas: Canvas) {
         styleRenderer.drawBehindItems(this, canvas)
         super.dispatchDraw(canvas)
         styleRenderer.drawAboveItems(this, canvas)
         cyl_indicator?.draw(canvas, cyl_itemsFrame.top + paddingTop, cyl_itemsFrame.top + itemsHeight - paddingBottom, resources.displayMetrics.density)
         val plus = plusButton ?: return
+        if (plus.visibility == View.VISIBLE || plus.animation != null) {
+            drawingPlusButtonLast = true
+            drawChild(canvas, plus, drawingTime)
+            drawingPlusButtonLast = false
+        }
         if (plus.showsTouchableArea) {
             // [EN] `showsTouchableArea` (#91): the touchable rect, for debugging. [CN] `showsTouchableArea`（#91）：绘制可点击区域，用于调试。
             touchableAreaPaint.color = plus.touchableAreaColor
