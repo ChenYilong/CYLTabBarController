@@ -283,6 +283,8 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         }
     /** [EN] The frame of the items inside the bar, from the style. [CN] Item 在 TabBar 中的区域，由样式给出。 */
     internal val cyl_itemsFrame = Rect()
+    /** [EN] The space between slots that the style chose in its last `itemsFrame` (centered items). [CN] 样式在最近一次 `itemsFrame` 中确定的 slot 间距（居中的 Item）。 */
+    internal var cyl_itemSpacing: Int = 0
     internal val cyl_touchSlop: Int get() = touchSlop
 
     // MARK: - CYLFlatDesignTabBar (FlatDesign style) 扁平样式

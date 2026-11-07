@@ -3026,6 +3026,26 @@
   "status": "done",
   "android": "CYLConstants.CYLTabBarShadowColor"
  },
+ "CYLTabBarBackgroundImage": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarBackgroundImage"
+ },
+ "CYLTabBarShadowImage": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarShadowImage"
+ },
+ "CYLTabBarStackedItemPositioning": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarStackedItemPositioning"
+ },
+ "CYLTabBarStackedItemWidth": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarStackedItemWidth"
+ },
+ "CYLTabBarStackedItemSpacing": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarStackedItemSpacing"
+ },
  "CYLTabBarSkippedTab": {
   "status": "done",
   "android": "CYLTabBarSkippedTab (SkippedTab)"

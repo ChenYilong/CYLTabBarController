@@ -506,6 +506,16 @@ FOUNDATION_EXTERN NSString *const CYLTabBarThemeValues;
 FOUNDATION_EXTERN NSString *const CYLTabBarBackgroundColor;
 /// [EN] Skin value name: the separator line on top of the tab bar. [CN] 皮肤值名称：TabBar 顶部分割线的颜色。
 FOUNDATION_EXTERN NSString *const CYLTabBarShadowColor;
+/// [EN] Skin value name: an image behind the whole tab bar (`UITabBarAppearance.backgroundImage`): a name, "system:<name>" or a path. [CN] 皮肤值名称：整个 TabBar 的背景图片（`UITabBarAppearance.backgroundImage`）：名称、"system:<名称>" 或路径。
+FOUNDATION_EXTERN NSString *const CYLTabBarBackgroundImage;
+/// [EN] Skin value name: the image of the line on top of the tab bar (`UITabBarAppearance.shadowImage`). [CN] 皮肤值名称：TabBar 顶部线条的图片（`UITabBarAppearance.shadowImage`）。
+FOUNDATION_EXTERN NSString *const CYLTabBarShadowImage;
+/// [EN] Skin value name: how the items share the width (`stackedItemPositioning`): "centered", "fill" or "automatic". [CN] 皮肤值名称：各 Item 如何分配宽度（`stackedItemPositioning`）："centered"、"fill" 或 "automatic"。
+FOUNDATION_EXTERN NSString *const CYLTabBarStackedItemPositioning;
+/// [EN] Skin value name: the width of each item when centered, in points (`stackedItemWidth`; 0: an equal share). [CN] 皮肤值名称：居中时每个 Item 的宽度（pt，`stackedItemWidth`；0 表示平分）。
+FOUNDATION_EXTERN NSString *const CYLTabBarStackedItemWidth;
+/// [EN] Skin value name: the space between centered items, in points (`stackedItemSpacing`). [CN] 皮肤值名称：居中的 Item 之间的间距（pt，`stackedItemSpacing`）。
+FOUNDATION_EXTERN NSString *const CYLTabBarStackedItemSpacing;
 
 /*!
  * [EN] Item keys of the pages and of remote configurations (see docs/Tab-Page-Registry.md):

@@ -1240,7 +1240,14 @@ static BOOL CYLScreenIsDark(void) {
     UIColor *selectedIconColor = [self colorForName:CYLTabBarItemSelectedIconColor];
     UIFont *titleFont = [self fontForName:CYLTabBarItemTitleFont];
     UIFont *selectedTitleFont = [self fontForName:CYLTabBarItemSelectedTitleFont] ?: titleFont;
-    if (!background && !shadow && !titleColor && !selectedTitleColor && !iconColor && !selectedIconColor && !titleFont && !selectedTitleFont) {
+    UIImage *backgroundImage = [self imageForName:CYLTabBarBackgroundImage];
+    UIImage *shadowImage = [self imageForName:CYLTabBarShadowImage];
+    NSString *positioning = [CYLStringValue([self valueForName:CYLTabBarStackedItemPositioning]) lowercaseString];
+    id itemWidth = [self valueForName:CYLTabBarStackedItemWidth];
+    id itemSpacing = [self valueForName:CYLTabBarStackedItemSpacing];
+    BOOL layout = positioning.length > 0 || [itemWidth respondsToSelector:@selector(doubleValue)] || [itemSpacing respondsToSelector:@selector(doubleValue)];
+    if (!background && !shadow && !titleColor && !selectedTitleColor && !iconColor && !selectedIconColor && !titleFont && !selectedTitleFont &&
+        !backgroundImage && !shadowImage && !layout) {
         // [EN] No bar-wide values: the app's own appearance stays. [CN] 没有整个 TabBar 的值：保留 App 自己的外观。
         return nil;
     }
@@ -1251,6 +1258,28 @@ static BOOL CYLScreenIsDark(void) {
     }
     if (shadow) {
         appearance.shadowColor = shadow;
+    }
+    if (backgroundImage) {
+        appearance.backgroundImage = backgroundImage;
+    }
+    if (shadowImage) {
+        appearance.shadowImage = shadowImage;
+    }
+    // [EN] How the items share the width: the system tab bar and the FlatDesign tab bar both read these. [CN] 各 Item 如何分配宽度：系统 TabBar 与扁平样式 TabBar 都会读取。
+    if ([positioning isEqualToString:@"centered"]) {
+        appearance.stackedItemPositioning = UITabBarItemPositioningCentered;
+    } else if ([positioning isEqualToString:@"fill"]) {
+        appearance.stackedItemPositioning = UITabBarItemPositioningFill;
+    } else if ([positioning isEqualToString:@"automatic"]) {
+        appearance.stackedItemPositioning = UITabBarItemPositioningAutomatic;
+    } else if (positioning.length > 0) {
+        CYLLogInvalidConfigurationValue(CYLTabBarStackedItemPositioning, positioning);
+    }
+    if ([itemWidth respondsToSelector:@selector(doubleValue)]) {
+        appearance.stackedItemWidth = MAX([itemWidth doubleValue], 0);
+    }
+    if ([itemSpacing respondsToSelector:@selector(doubleValue)]) {
+        appearance.stackedItemSpacing = MAX([itemSpacing doubleValue], 0);
     }
     [appearance cyl_applyItemAppearanceWithBlock:^(UITabBarItemAppearance *itemAppearance) {
         NSMutableDictionary *normal = [itemAppearance.normal.titleTextAttributes mutableCopy] ?: [NSMutableDictionary dictionary];

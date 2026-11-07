@@ -71,6 +71,11 @@ class CYLTabBarConfigurationTheme internal constructor(
             selectedTitleColor = colorForName(CYLConstants.CYLTabBarItemSelectedTitleColor),
             iconColor = colorForName(CYLConstants.CYLTabBarItemIconColor),
             selectedIconColor = colorForName(CYLConstants.CYLTabBarItemSelectedIconColor),
+            stackedItemPositioningCentered = (valueForName(CYLConstants.CYLTabBarStackedItemPositioning) as? String)?.lowercase() == "centered",
+            stackedItemWidth = (valueForName(CYLConstants.CYLTabBarStackedItemWidth) as? Number)?.toFloat()?.coerceAtLeast(0f) ?: 0f,
+            stackedItemSpacing = (valueForName(CYLConstants.CYLTabBarStackedItemSpacing) as? Number)?.toFloat()?.coerceAtLeast(0f) ?: 0f,
+            backgroundImage = imageForName(tabBarController.activity, CYLConstants.CYLTabBarBackgroundImage),
+            shadowImage = imageForName(tabBarController.activity, CYLConstants.CYLTabBarShadowImage),
         )
         // [EN] No bar-wide values: the app's own look stays. [CN] 没有整个 TabBar 的值：保留 App 自己的外观。
         return if (appearance == CYLTabBarAppearance()) null else appearance

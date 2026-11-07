@@ -42,6 +42,10 @@ data class CYLTabBarAppearance(
     val stackedItemPositioningCentered: Boolean = false,
     val stackedItemWidth: Float = 0f,
     val stackedItemSpacing: Float = 0f,
+    /** [EN] `backgroundImage`: drawn behind the whole bar (the classic and FlatDesign styles). [CN] 绘制在整个 TabBar 后面（经典与扁平样式）。 */
+    val backgroundImage: android.graphics.drawable.Drawable? = null,
+    /** [EN] `shadowImage`: the line on top of the bar (the classic and FlatDesign styles). [CN] TabBar 顶部的线条（经典与扁平样式）。 */
+    val shadowImage: android.graphics.drawable.Drawable? = null,
 )
 
 /**

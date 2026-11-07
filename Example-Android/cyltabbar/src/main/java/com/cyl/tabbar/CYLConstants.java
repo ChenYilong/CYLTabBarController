@@ -111,6 +111,15 @@ public final class CYLConstants {
     public static final String CYLTabBarThemeValues = "CYLTabBarThemeValues";
     public static final String CYLTabBarBackgroundColor = "CYLTabBarBackgroundColor";
     public static final String CYLTabBarShadowColor = "CYLTabBarShadowColor";
+    /** [EN] Skin value names of the bar's images and item layout, as on iOS (`UITabBarAppearance`). [CN] TabBar 图片与 Item 布局的皮肤值名称，与 iOS 相同（`UITabBarAppearance`）。 */
+    public static final String CYLTabBarBackgroundImage = "CYLTabBarBackgroundImage";
+    public static final String CYLTabBarShadowImage = "CYLTabBarShadowImage";
+    /** [EN] "centered", "fill" or "automatic". [CN] "centered"、"fill" 或 "automatic"。 */
+    public static final String CYLTabBarStackedItemPositioning = "CYLTabBarStackedItemPositioning";
+    /** [EN] dp; 0: an equal share. [CN] dp；0 表示平分。 */
+    public static final String CYLTabBarStackedItemWidth = "CYLTabBarStackedItemWidth";
+    /** [EN] dp between centered items. [CN] 居中的 Item 之间的间距（dp）。 */
+    public static final String CYLTabBarStackedItemSpacing = "CYLTabBarStackedItemSpacing";
 
     // MARK: - Notifications 通知 (names, posted through CYLNotificationCenter)
 

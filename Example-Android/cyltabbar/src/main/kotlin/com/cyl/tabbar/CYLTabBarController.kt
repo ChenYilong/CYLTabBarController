@@ -1227,6 +1227,17 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             appearance.selectedTitleColor?.let { cyl_tabBarItemSelectedTitleColor = it }
             appearance.iconColor?.let { cyl_tabBarItemImageColor = it }
             appearance.selectedIconColor?.let { cyl_tabBarItemSelectedImageColor = it }
+            // [EN] The bar's images and item layout go to the bar's appearance, which the classic and FlatDesign styles draw. [CN] TabBar 的图片与 Item 布局写入 TabBar 的外观，由经典与扁平样式绘制。
+            if (appearance.backgroundImage != null || appearance.shadowImage != null || appearance.stackedItemPositioningCentered) {
+                val current = tabBar.standardAppearance ?: CYLTabBarAppearance()
+                tabBar.standardAppearance = current.copy(
+                    backgroundImage = appearance.backgroundImage ?: current.backgroundImage,
+                    shadowImage = appearance.shadowImage ?: current.shadowImage,
+                    stackedItemPositioningCentered = appearance.stackedItemPositioningCentered || current.stackedItemPositioningCentered,
+                    stackedItemWidth = if (appearance.stackedItemPositioningCentered) appearance.stackedItemWidth else current.stackedItemWidth,
+                    stackedItemSpacing = if (appearance.stackedItemPositioningCentered) appearance.stackedItemSpacing else current.stackedItemSpacing,
+                )
+            }
         }
         tabBarTheme.cyl_customizeTabBarController(this)
     }

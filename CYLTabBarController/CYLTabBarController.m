@@ -91,6 +91,11 @@ NSString *const CYLTabBarThemeIdentifier = @"CYLTabBarThemeIdentifier";
 NSString *const CYLTabBarThemeValues = @"CYLTabBarThemeValues";
 NSString *const CYLTabBarBackgroundColor = @"CYLTabBarBackgroundColor";
 NSString *const CYLTabBarShadowColor = @"CYLTabBarShadowColor";
+NSString *const CYLTabBarBackgroundImage = @"CYLTabBarBackgroundImage";
+NSString *const CYLTabBarShadowImage = @"CYLTabBarShadowImage";
+NSString *const CYLTabBarStackedItemPositioning = @"CYLTabBarStackedItemPositioning";
+NSString *const CYLTabBarStackedItemWidth = @"CYLTabBarStackedItemWidth";
+NSString *const CYLTabBarStackedItemSpacing = @"CYLTabBarStackedItemSpacing";
 NSString *const CYLTabBarAnimationOptions = @"CYLTabBarAnimationOptions";
 /// [EN] Private: marks a tab left out by `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` (set by the normalization).
 /// [CN] 私有：标记被 `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` 排除的 Tab（由规范化设置）。

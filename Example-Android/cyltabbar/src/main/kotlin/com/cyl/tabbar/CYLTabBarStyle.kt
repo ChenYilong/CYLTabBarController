@@ -68,6 +68,44 @@ internal interface CYLTabBarStyleRenderer {
     }
 }
 
+/**
+ * [EN] `stackedItemPositioning == .centered` of the bar's appearance: the frame of items `stackedItemWidth` wide (or an equal
+ *      share), `stackedItemSpacing` apart, centered, and that spacing in px; null when the items fill the width (not
+ *      centered, or they do not fit). Shared by the classic and FlatDesign styles, as `UITabBar` and `CYLFlatDesignTabBar`
+ *      both follow it on iOS.
+ * [CN] TabBar 外观的 `stackedItemPositioning == .centered`：宽 `stackedItemWidth`（或平分）、间距 `stackedItemSpacing`、整体居中的 Item 区域，
+ *      以及该间距（像素）；铺满宽度时（未居中或放不下）为 null。经典与扁平样式共用，与 iOS 上 `UITabBar` 和 `CYLFlatDesignTabBar` 一致。
+ */
+internal fun CYLTabBar.cyl_centeredItemsFrame(width: Int, itemsHeight: Int, out: Rect): Int? {
+    val appearance = cyl_effectiveAppearance() ?: return null
+    val count = cyl_slotCount()
+    if (!appearance.stackedItemPositioningCentered || count == 0) return null
+    val density = resources.displayMetrics.density
+    val space = (appearance.stackedItemSpacing * density).coerceAtLeast(0f)
+    val each = if (appearance.stackedItemWidth > 0f) appearance.stackedItemWidth * density else (width - (count - 1) * space) / count
+    val total = (count * each + (count - 1) * space).roundToInt()
+    if (each <= 0f || total > width) return null
+    val left = (width - total) / 2
+    out.set(left, 0, left + total, itemsHeight)
+    return space.roundToInt()
+}
+
+/** [EN] The bar's background image: the appearance's, else the bar's own; false when there is none. [CN] TabBar 的背景图片：外观中的，否则为 TabBar 自己的；没有时返回 false。 */
+internal fun CYLTabBar.cyl_drawBackgroundImage(canvas: Canvas): Boolean {
+    val image = cyl_effectiveAppearance()?.backgroundImage ?: backgroundImage ?: return false
+    image.setBounds(0, 0, width, height)
+    image.draw(canvas)
+    return true
+}
+
+/** [EN] The bar's top-line image: the appearance's, else the bar's own; false when there is none. [CN] TabBar 顶部线条图片：外观中的，否则为 TabBar 自己的；没有时返回 false。 */
+internal fun CYLTabBar.cyl_drawShadowImage(canvas: Canvas): Boolean {
+    val image = cyl_effectiveAppearance()?.shadowImage ?: shadowImage ?: return false
+    image.setBounds(0, 0, width, image.intrinsicHeight.takeIf { it > 0 } ?: 1)
+    image.draw(canvas)
+    return true
+}
+
 /** [EN] Whether the app runs in Dark Mode. [CN] App 是否处于深色模式。 */
 private fun View.cyl_isDarkMode(): Boolean =
     (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
@@ -85,6 +123,18 @@ internal object CYLClassicTabBarStyle : CYLTabBarStyleRenderer {
 
     override fun applyBackgroundColor(tabBar: CYLTabBar, color: Int?) {
         tabBar.background = ColorDrawable(color ?: 0xFFF9F9F9.toInt())
+    }
+
+    override fun itemSpacing(tabBar: CYLTabBar): Int = tabBar.cyl_itemSpacing
+
+    override fun itemsFrame(tabBar: CYLTabBar, width: Int, height: Int, itemsHeight: Int, safeBottom: Int, out: Rect) {
+        tabBar.cyl_itemSpacing = tabBar.cyl_centeredItemsFrame(width, itemsHeight, out) ?: run { out.set(0, 0, width, itemsHeight); 0 }
+    }
+
+    /** [EN] `backgroundImage` / `shadowImage` of the appearance (or the bar), over the background color and the hairline. [CN] 外观（或 TabBar）的 `backgroundImage` / `shadowImage`，绘制在背景色与细线之上。 */
+    override fun drawBehindItems(tabBar: CYLTabBar, canvas: Canvas) {
+        tabBar.cyl_drawBackgroundImage(canvas)
+        tabBar.cyl_drawShadowImage(canvas)
     }
 }
 
@@ -116,39 +166,16 @@ internal class CYLFlatDesignTabBarStyle : CYLTabBarStyleRenderer {
         tabBar.barTintColor = color ?: Color.TRANSPARENT
     }
 
-    private var spacing = 0
-
-    override fun itemSpacing(tabBar: CYLTabBar): Int = spacing
+    override fun itemSpacing(tabBar: CYLTabBar): Int = tabBar.cyl_itemSpacing
 
     override fun itemsFrame(tabBar: CYLTabBar, width: Int, height: Int, itemsHeight: Int, safeBottom: Int, out: Rect) {
-        spacing = 0
-        val appearance = tabBar.cyl_effectiveAppearance()
-        val itemWidth = appearance?.stackedItemWidth ?: 0f
-        val count = tabBar.cyl_slotCount()
-        if (appearance?.stackedItemPositioningCentered == true && count > 0) {
-            // [EN] `.centered`: items of `stackedItemWidth` (or an equal share) spaced by `stackedItemSpacing`, centered; when they do not fit, they fill the width. [CN] `.centered`：item 宽为 `stackedItemWidth`（或平分），间距 `stackedItemSpacing`，整体居中；放不下时铺满宽度。
-            val density = tabBar.resources.displayMetrics.density
-            val space = (appearance.stackedItemSpacing * density).coerceAtLeast(0f)
-            val each = if (itemWidth > 0f) itemWidth * density else (width - (count - 1) * space) / count
-            val total = (count * each + (count - 1) * space).roundToInt()
-            if (each > 0f && total <= width) {
-                spacing = space.roundToInt()
-                val left = (width - total) / 2
-                out.set(left, 0, left + total, itemsHeight)
-                return
-            }
-        }
-        out.set(0, 0, width, itemsHeight)
+        tabBar.cyl_itemSpacing = tabBar.cyl_centeredItemsFrame(width, itemsHeight, out) ?: run { out.set(0, 0, width, itemsHeight); 0 }
     }
 
     override fun drawBehindItems(tabBar: CYLTabBar, canvas: Canvas) {
         val appearance = tabBar.cyl_effectiveAppearance()
         rect.set(0f, 0f, tabBar.width.toFloat(), tabBar.height.toFloat())
-        val image = tabBar.backgroundImage
-        if (image != null && appearance?.backgroundColor == null) {
-            image.setBounds(0, 0, tabBar.width, tabBar.height)
-            image.draw(canvas)
-        } else {
+        if (appearance?.backgroundColor != null || !tabBar.cyl_drawBackgroundImage(canvas)) {
             // [EN] `UIBlurEffectStyleProminent`: a strong blur under a near-opaque system background. [CN] `UIBlurEffectStyleProminent`：强模糊，上面是接近不透明的系统背景色。
             val pages = tabBar.tabBarController?.pagesContainer
             val dark = tabBar.cyl_isDarkMode()
@@ -162,13 +189,8 @@ internal class CYLFlatDesignTabBarStyle : CYLTabBarStyleRenderer {
             fillPaint.color = appearance?.backgroundColor ?: tabBar.barTintColor
             if (Color.alpha(fillPaint.color) > 0) canvas.drawRect(rect, fillPaint)
         }
-        val shadowImage = tabBar.shadowImage
         val density = tabBar.resources.displayMetrics.density
-        if (shadowImage != null) {
-            val height = shadowImage.intrinsicHeight.takeIf { it > 0 && appearance != null } ?: 1
-            shadowImage.setBounds(0, 0, tabBar.width, height)
-            shadowImage.draw(canvas)
-        } else {
+        if (!tabBar.cyl_drawShadowImage(canvas)) {
             val shadowColor = appearance?.shadowColor ?: return
             fillPaint.color = shadowColor
             canvas.drawRect(0f, 0f, tabBar.width.toFloat(), maxOf(1f, 0.5f * density), fillPaint)
