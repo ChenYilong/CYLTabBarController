@@ -349,13 +349,14 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
         drawShadowOutside(canvas, shape, radius, density, dark)
         val glass = pages != null && panelBackdrop.draw(canvas, pages, tabBar.x - pages.x + shape.left, tabBar.y - pages.y + shape.top, shape, radius,
             CYLGlassEffects(blurRadius = 8f * density, refractionHeight = 24f * density, refractionAmount = 24f * density))
-        // [EN] `LiquidBottomTabs`' container color is 40 % opaque, so the blurred, refracted page shows through: an app color
-        //      (`cyl_tabBarBackgroundColor`, often opaque white) keeps its hue at that opacity at most.
-        // [CN] `LiquidBottomTabs` 的容器色为 40 % 不透明度，模糊与折射后的页面因此可见：App 的颜色（`cyl_tabBarBackgroundColor`，常为不透明白色）保留色相，
-        //      不透明度最多为 40 %。
-        val base = tint ?: if (dark) 0xFF121212.toInt() else 0xFFFAFAFA.toInt()
-        paint.color = if (glass) androidx.core.graphics.ColorUtils.setAlphaComponent(base, minOf(Color.alpha(base), SURFACE_ALPHA))
-                      else androidx.core.graphics.ColorUtils.setAlphaComponent(base, 0xE6)
+        // [EN] The surface tint: `cyl_liquidGlassSurfaceColor` (or the app's `cyl_tabBarBackgroundColor`, often opaque white)
+        //      at `cyl_liquidGlassSurfaceOpacity` (default 0.4, `LiquidBottomTabs`' container), so the blurred page shows through.
+        // [CN] 表面着色：`cyl_liquidGlassSurfaceColor`（或 App 的 `cyl_tabBarBackgroundColor`，常为不透明白色），不透明度为
+        //      `cyl_liquidGlassSurfaceOpacity`（默认 0.4，即 `LiquidBottomTabs` 的容器），模糊后的页面因此可见。
+        val base = tabBar.cyl_liquidGlassSurfaceColor ?: tint ?: if (dark) 0xFF121212.toInt() else 0xFFFAFAFA.toInt()
+        val opacity = (tabBar.cyl_liquidGlassSurfaceOpacity * 255).roundToInt()
+        paint.color = if (glass) androidx.core.graphics.ColorUtils.setAlphaComponent(base, opacity)
+                      else androidx.core.graphics.ColorUtils.setAlphaComponent(base, maxOf(opacity, 0xE6))
         val surface = paint.color
         canvas.drawRoundRect(shape, radius, radius, paint)
 
@@ -471,7 +472,5 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
         const val SIDE_MARGIN = 16f
         const val BOTTOM_MARGIN = 12f
         const val PRESSED_SCALE = 78f / 56f
-        /** [EN] `LiquidBottomTabs`' container color: 0.4 opacity. [CN] `LiquidBottomTabs` 的容器色：0.4 不透明度。 */
-        const val SURFACE_ALPHA = 0x66
     }
 }

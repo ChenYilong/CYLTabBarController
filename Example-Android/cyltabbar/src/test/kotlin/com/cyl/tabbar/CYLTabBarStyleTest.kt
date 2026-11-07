@@ -181,4 +181,19 @@ class CYLTabBarStyleTest {
         assertEquals("back to the classic bar, with the app's background color", 0x80FF0000.toInt(), (controller.tabBar.background as ColorDrawable).color)
         assertEquals("below the pages again", controller.pagesContainer.bottom, controller.tabBar.top)
     }
+
+    /** [EN] The Liquid Glass surface tint: 0.4 by default (`LiquidBottomTabs`), kept between 0 and 1. [CN] 液态玻璃表面着色：默认 0.4（`LiquidBottomTabs`），限制在 0 到 1 之间。 */
+    @Test
+    fun theLiquidGlassSurfaceTintCanBeCustomized() = withActivity { activity ->
+        val controller = show(activity, CYLEnums.CYLTabBarStyleType.LiquidGlass)
+        val bar = controller.tabBar
+        assertEquals(0.4f, bar.cyl_liquidGlassSurfaceOpacity, 0f)
+        assertNull(bar.cyl_liquidGlassSurfaceColor)
+        bar.cyl_liquidGlassSurfaceOpacity = 2f
+        assertEquals(1f, bar.cyl_liquidGlassSurfaceOpacity, 0f)
+        bar.cyl_liquidGlassSurfaceOpacity = -1f
+        assertEquals(0f, bar.cyl_liquidGlassSurfaceOpacity, 0f)
+        bar.cyl_liquidGlassSurfaceColor = 0xFF336699.toInt()
+        assertEquals(0xFF336699.toInt(), bar.cyl_liquidGlassSurfaceColor)
+    }
 }

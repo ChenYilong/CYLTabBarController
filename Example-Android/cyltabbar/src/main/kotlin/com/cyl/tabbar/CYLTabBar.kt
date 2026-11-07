@@ -326,6 +326,26 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
      * [CN] 为与 iOS API 一致而保留。在 Android 上，控制器的根视图已让各 Item 避开系统栏与屏幕挖孔。
      */
     var useLayoutSafeAreaInsets: Boolean = true
+
+    // MARK: - Liquid Glass surface (Android only) 液态玻璃表面（仅 Android）
+
+    /**
+     * [EN] Android only: how opaque the Liquid Glass dock's surface tint is, from 0 (clear glass, the blurred page shows
+     *      fully) to 1 (a solid board). Default 0.4, the container opacity of Kyant's `LiquidBottomTabs`: a balance between
+     *      the blur and a readable bar. Takes effect at once.
+     * [CN] 仅 Android：液态玻璃胶囊表面着色的不透明度，0 为透明玻璃（模糊后的页面完全可见），1 为实心板。默认 0.4，即 Kyant `LiquidBottomTabs`
+     *      的容器不透明度：在模糊与清晰可读的 TabBar 之间取得平衡。立即生效。
+     */
+    var cyl_liquidGlassSurfaceOpacity: Float = 0.4f
+        set(value) { field = value.coerceIn(0f, 1f); invalidate() }
+    /**
+     * [EN] Android only: the color of the Liquid Glass surface tint (its alpha is ignored: `cyl_liquidGlassSurfaceOpacity`
+     *      sets it); null uses `cyl_tabBarBackgroundColor`, else `#FAFAFA` (light) / `#121212` (dark).
+     * [CN] 仅 Android：液态玻璃表面着色的颜色（忽略其透明度，由 `cyl_liquidGlassSurfaceOpacity` 决定）；null 时使用 `cyl_tabBarBackgroundColor`，
+     *      否则为 `#FAFAFA`（浅色）/ `#121212`（深色）。
+     */
+    @ColorInt var cyl_liquidGlassSurfaceColor: Int? = null
+        set(value) { field = value; invalidate() }
     var respectsVerticalStatusBarSafeArea: Boolean = false
 
     /** [EN] The appearance drawn now: the selected item's, else the bar's. [CN] 当前绘制所用的外观：选中 item 的，否则为 TabBar 的。 */
