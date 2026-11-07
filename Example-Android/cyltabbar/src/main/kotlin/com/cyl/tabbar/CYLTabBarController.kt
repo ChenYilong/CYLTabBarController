@@ -110,12 +110,14 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     }
 
     /**
-     * [EN] A bar that shows the pages through it (FlatDesign's blur, Liquid Glass) draws again with every frame of the pages.
-     *      Invalidating during the traversal draws it in the same frame, without asking for another one.
-     * [CN] 透出页面的 TabBar（扁平样式的模糊、液态玻璃）在页面每次重绘时一起重绘。在遍历过程中 invalidate 会在同一帧绘制，不会再请求一帧。
+     * [EN] A bar that shows the pages through it (FlatDesign's blur, Liquid Glass) draws again when the pages changed in this
+     *      frame (scrolling, an animation), and only then: invalidating it on every frame asked for the next frame forever
+     *      (60 fps while idle), which kept the main thread busy and delayed switching pages.
+     * [CN] 透出页面的 TabBar（扁平样式的模糊、液态玻璃）只在页面本帧有变化时（滚动、动画）重绘：每帧都 invalidate 会不断请求下一帧（空闲时也 60 fps），
+     *      使主线程一直忙碌，延迟页面切换。
      */
     private val backdropListener = android.view.ViewTreeObserver.OnPreDrawListener {
-        if (tabBar.styleRenderer.drawsPagesUnderTabBar) tabBar.invalidate()
+        if (tabBar.styleRenderer.drawsPagesUnderTabBar && pagesContainer.isDirty) tabBar.invalidate()
         true
     }
 
@@ -186,6 +188,12 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             if (index == selectedIndex && page.isDetached) transaction.attach(page)
             if (index == selectedIndex) transaction.show(page) else transaction.hide(page)
         }
+        // [EN] The plus button's page (`plusChildViewController`) leaves the screen when a tab is selected; it was added last,
+        //      so left shown it would cover the selected tab's page. On iOS it is one of the view controllers and is replaced.
+        // [CN] 选中 Tab 时 PlusButton 的页面（`plusChildViewController`）离开屏幕；它最后添加，若仍显示会盖住选中 Tab 的页面。iOS 上它是 viewControllers
+        //      之一，会被替换。
+        val plusChild = fragmentManager.findFragmentByTag("$fragmentTag-plus")
+        if (plusChild != null && plusChild.isAdded && !plusChild.isHidden && !tabBar.plusButtonActive) transaction.hide(plusChild)
         transaction.commitNowAllowingStateLoss()
     }
 

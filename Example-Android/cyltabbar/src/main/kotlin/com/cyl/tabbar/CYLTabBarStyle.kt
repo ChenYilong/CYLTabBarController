@@ -44,6 +44,8 @@ internal interface CYLTabBarStyleRenderer {
     fun itemsFrame(tabBar: CYLTabBar, width: Int, height: Int, itemsHeight: Int, safeBottom: Int, out: Rect) {
         out.set(0, 0, width, itemsHeight)
     }
+    /** [EN] The space between two slots, in px (FlatDesign's `stackedItemSpacing`). [CN] 相邻 slot 之间的间距（像素，扁平样式的 `stackedItemSpacing`）。 */
+    fun itemSpacing(tabBar: CYLTabBar): Int = 0
     fun onAttach(tabBar: CYLTabBar) {}
     fun onDetach(tabBar: CYLTabBar) {}
     /** [EN] Drawn behind the items. [CN] 绘制在 Item 后面。 */
@@ -114,7 +116,12 @@ internal class CYLFlatDesignTabBarStyle : CYLTabBarStyleRenderer {
         tabBar.barTintColor = color ?: Color.TRANSPARENT
     }
 
+    private var spacing = 0
+
+    override fun itemSpacing(tabBar: CYLTabBar): Int = spacing
+
     override fun itemsFrame(tabBar: CYLTabBar, width: Int, height: Int, itemsHeight: Int, safeBottom: Int, out: Rect) {
+        spacing = 0
         val appearance = tabBar.cyl_effectiveAppearance()
         val itemWidth = appearance?.stackedItemWidth ?: 0f
         val count = tabBar.cyl_slotCount()
@@ -125,6 +132,7 @@ internal class CYLFlatDesignTabBarStyle : CYLTabBarStyleRenderer {
             val each = if (itemWidth > 0f) itemWidth * density else (width - (count - 1) * space) / count
             val total = (count * each + (count - 1) * space).roundToInt()
             if (each > 0f && total <= width) {
+                spacing = space.roundToInt()
                 val left = (width - total) / 2
                 out.set(left, 0, left + total, itemsHeight)
                 return

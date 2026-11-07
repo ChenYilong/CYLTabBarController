@@ -88,6 +88,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         val hasIcon = iconView.drawable != null || cyl_tabBarItemAnimationView != null || cyl_customIconView != null
         val flatTitleHeight = titleLabel.measuredHeight
         val flatTitleTop = if (!hasIcon && item.layoutCentered) (height - flatTitleHeight) / 2 else height - flatTitleHeight - (2 * density).toInt()
+        if (flat && hasTitle) iconSize = iconSize.coerceAtMost(flatTitleTop)
         val iconTop = if (flat) {
             ((if (!hasTitle && item.layoutCentered) (height - iconSize) / 2f else (flatTitleTop - iconSize) / 2f) + insets.top * density + offset.vertical * density).toInt()
         } else ((height - contentHeight) / 2f + insets.top * density + offset.vertical * density + (tabBar?.tabImageViewDefaultOffset ?: 0f) * density).toInt()
@@ -696,7 +697,8 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
      */
     private fun computeSlotWidths(width: Int): IntArray {
         val slots = slotCount()
-        val equal = IntArray(slots) { width / maxOf(slots, 1) }
+        val spacing = styleRenderer.itemSpacing(this)
+        val equal = IntArray(slots) { (width - spacing * maxOf(slots - 1, 0)) / maxOf(slots, 1) }
         if (cyl_scrollMode == CYLTabBarScrollMode.Fixed || slots == 0) return equal
         val space = (cyl_itemSpaceInScrollMode * resources.displayMetrics.density).toInt()
         val plusIndex = plusButtonIndex()
@@ -708,7 +710,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         return if (widths.sum() <= width) equal else widths
     }
 
-    private fun slotLeft(slot: Int): Int { var left = cyl_itemsFrame.left; for (index in 0 until slot) left += slotWidths.getOrElse(index) { 0 }; return left }
+    private fun slotLeft(slot: Int): Int { var left = cyl_itemsFrame.left + slot * styleRenderer.itemSpacing(this); for (index in 0 until slot) left += slotWidths.getOrElse(index) { 0 }; return left }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val density = resources.displayMetrics.density

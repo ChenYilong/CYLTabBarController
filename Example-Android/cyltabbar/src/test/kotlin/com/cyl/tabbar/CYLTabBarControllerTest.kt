@@ -145,6 +145,12 @@ class CYLTabBarControllerTest {
         controller.tabBar.tabBarButtonArray[0].performClick()
         idle()
         assertFalse(controller.tabBar.plusButtonActive)
+        assertTrue("the plus button's page leaves the screen", TestPlusButton.child.isHidden)
+        assertFalse("the tapped tab's page shows again", controller.viewControllers[0].isHidden)
+        controller.tabBar.tabBarButtonArray[1].performClick()
+        idle()
+        assertEquals(1, controller.selectedIndex)
+        assertFalse(controller.viewControllers[1].isHidden)
         CYLPlusButton.removePlusButtonForTabBarContext("plus-test")
     }
 
