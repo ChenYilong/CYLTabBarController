@@ -187,7 +187,9 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     private val bubbleBackdrop = CYLTabBarBackdrop()
     private val highlight = CYLGlassHighlight()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val panel = RectF()
+    private val panelShape = RectF()
     private val bubble = RectF()
     private var tint: Int? = null
     private var host: CYLTabBar? = null
@@ -305,11 +307,16 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
 
         // [EN] The panel: vibrancy, an 8 dp blur and a 24 dp lens, grown by 16 dp while the bubble is pressed. [CN] 面板：鲜艳度、8 dp 模糊与 24 dp 透镜，按下气泡时放大 16 dp。
         val grow = 1f + 16f * density / panel.width().coerceAtLeast(1f) * press
-        val shape = RectF(panel).apply {
+        val shape = panelShape.apply {
+            set(panel)
             offset(offset, 0f)
             inset(-width() * (grow - 1f) / 2f, -height() * (grow - 1f) / 2f)
         }
         val radius = shape.height() / 2f
+        // [EN] Backdrop's default `Shadow`: 24 dp, 4 dp down, 10 % black, so the dock shows on a white page as on iOS. [CN] Backdrop 默认的 `Shadow`：24 dp、向下 4 dp、10 % 黑色，使胶囊在白色页面上也可见，与 iOS 相同。
+        shadowPaint.color = if (dark) Color.BLACK else Color.WHITE
+        shadowPaint.setShadowLayer(12f * density, 0f, 4f * density, if (dark) 0x40000000 else 0x1A000000)
+        canvas.drawRoundRect(shape, radius, radius, shadowPaint)
         val glass = pages != null && panelBackdrop.draw(canvas, pages, tabBar.x - pages.x + shape.left, tabBar.y - pages.y + shape.top, shape, radius,
             CYLGlassEffects(blurRadius = 8f * density, refractionHeight = 24f * density, refractionAmount = 24f * density))
         paint.color = tint ?: if (dark) 0x66121212 else 0x66FAFAFA
@@ -338,6 +345,8 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     }
 
     override fun drawAboveItems(tabBar: CYLTabBar, canvas: Canvas) {
+        // [EN] Backdrop's default `Highlight` on the dock: the 0.5 dp rim. [CN] 胶囊上 Backdrop 默认的 `Highlight`：0.5 dp 的边缘高光。
+        if (!panelShape.isEmpty) highlight.draw(canvas, panelShape, panelShape.height() / 2f, tabBar.resources.displayMetrics.density, 1f)
         val press = pressProgress.value
         if (press > 0.01f && !bubble.isEmpty) highlight.draw(canvas, bubble, bubble.height() / 2f, tabBar.resources.displayMetrics.density, press)
     }

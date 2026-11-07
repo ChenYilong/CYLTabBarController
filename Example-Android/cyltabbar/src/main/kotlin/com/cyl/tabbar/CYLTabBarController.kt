@@ -31,6 +31,8 @@ import java.util.WeakHashMap
  * [CN] Android 版 `CYLTabBarController`：`CYLTabBar` 上方的页面（Fragment），按下标选中，带 iOS 库的 PlusButton、角标、标识、登录拦截、主题、
  *      手势、滚动隐藏、页面注册表与配置。创建后显示 `view`（例如 `activity.setContentView(controller.view)`）。
  */
+private val SYSTEM_BAR_TYPES = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+
 open class CYLTabBarController(val activity: FragmentActivity) {
 
     constructor(activity: FragmentActivity, viewControllers: List<Fragment>, tabBarItemsAttributes: List<Map<String, Any?>>) :
@@ -61,7 +63,12 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     /** [EN] The root view: the pages above the tab bar. [CN] 根视图：页面在 TabBar 之上。 */
     val view: ViewGroup = CYLTabBarControllerView(activity).also { it.controller = this }
     /** [EN] The container of the pages. [CN] 页面容器。 */
-    val pagesContainer: FrameLayout = CYLTabBarPagesContainer(activity, this).apply { id = View.generateViewId() }
+    val pagesContainer: FrameLayout = CYLTabBarPagesContainer(activity, this).apply {
+        id = View.generateViewId()
+        // [EN] The root view does not clip (the plus button rises above the bar), so the pages clip themselves to their bounds. [CN] 根视图不裁剪（PlusButton 凸出 TabBar），因此页面自己按边界裁剪。
+        outlineProvider = android.view.ViewOutlineProvider.BOUNDS
+        clipToOutline = true
+    }
     /** [EN] `tabBar` / `cyl_tabBar`. [CN] TabBar。 */
     val tabBar: CYLTabBar = CYLTabBar(activity).apply { tabBarController = this@CYLTabBarController }
     val cyl_tabBar: CYLTabBar get() = tabBar
@@ -69,6 +76,38 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     private val fragmentTag = "CYLTabBarController-" + System.identityHashCode(this)
 
     private var pagesCommitPending = false
+
+    private var receivedInsetsSinceAttach = false
+
+    /**
+     * [EN] The safe area, as on iOS: the pages keep clear of the status bar and the sides, and the tab bar grows by the
+     *      navigation bar (`cyl_safeAreaBottom`) with its items above it, so the system bars neither cover nor cut them.
+     * [CN] 安全区，与 iOS 相同：页面避开状态栏与两侧，TabBar 增高导航栏的高度（`cyl_safeAreaBottom`），各 Item 位于其上方，系统栏不会遮挡或切割它们。
+     */
+    private fun applySafeArea(bars: Insets) {
+        view.setPadding(bars.left, bars.top, bars.right, 0)
+        tabBar.cyl_safeAreaBottom = bars.bottom
+    }
+
+    /** [EN] A bar floating over the pages (FlatDesign, Liquid Glass) is their bottom inset, so a list can scroll its last rows above it. [CN] 浮在页面之上的 TabBar（扁平样式、液态玻璃）作为页面的底部 inset，列表可把最后几行滚到 TabBar 上方。 */
+    private fun pagesBottomInset(): Int = if (tabBar.styleRenderer.drawsPagesUnderTabBar) cyl_overlayTabBarHeight() else 0
+
+    /** [EN] The part of the window's system bars that overlaps this view on screen. [CN] 窗口系统栏与本视图在屏幕上重叠的部分。 */
+    private fun applySafeAreaFromWindow() {
+        val window = ViewCompat.getRootWindowInsets(view) ?: return
+        val raw = window.getInsets(SYSTEM_BAR_TYPES)
+        val location = IntArray(2)
+        view.getLocationInWindow(location)
+        val root = view.rootView
+        val bars = Insets.of(
+            maxOf(0, raw.left - location[0]),
+            maxOf(0, raw.top - location[1]),
+            maxOf(0, location[0] + view.width - (root.width - raw.right)),
+            maxOf(0, location[1] + view.height - (root.height - raw.bottom)),
+        )
+        applySafeArea(bars)
+        ViewCompat.dispatchApplyWindowInsets(pagesContainer, WindowInsetsCompat.Builder(window).setInsets(SYSTEM_BAR_TYPES, Insets.of(0, 0, 0, pagesBottomInset())).build())
+    }
 
     /**
      * [EN] A bar that shows the pages through it (FlatDesign's blur, Liquid Glass) draws again with every frame of the pages.
@@ -94,17 +133,24 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         //      system bar no longer covers or cuts the items. The bars' insets stop here; the keyboard's go on to the pages.
         // [CN] edge-to-edge 窗口（Android 15 起强制）绘制到系统栏下方，与 iOS 相同：页面避开状态栏与两侧，TabBar 像 iOS 的底部安全区一样
         //      增高导航栏的高度，系统栏不再遮挡或切割各 Item。系统栏的 insets 在此消费，键盘的 insets 继续传给页面。
-        ViewCompat.setOnApplyWindowInsetsListener(view) { root, insets ->
-            val types = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
-            val bars = insets.getInsets(types)
-            root.setPadding(bars.left, bars.top, bars.right, 0)
-            tabBar.cyl_safeAreaBottom = bars.bottom
-            // [EN] A bar that floats over the pages (FlatDesign, Liquid Glass) gives them its height as their bottom inset, as iOS
-            //      does with the safe area, so a list can scroll its last rows above the bar.
-            // [CN] 浮在页面之上的 TabBar（扁平样式、液态玻璃）把自己的高度作为页面的底部 inset，与 iOS 的安全区相同，列表可把最后几行滚到 TabBar 上方。
-            val pagesBottom = if (tabBar.styleRenderer.drawsPagesUnderTabBar) cyl_overlayTabBarHeight() else 0
-            WindowInsetsCompat.Builder(insets).setInsets(types, Insets.of(0, 0, 0, pagesBottom)).build()
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
+            receivedInsetsSinceAttach = true
+            applySafeArea(insets.getInsets(SYSTEM_BAR_TYPES))
+            WindowInsetsCompat.Builder(insets).setInsets(SYSTEM_BAR_TYPES, Insets.of(0, 0, 0, pagesBottomInset())).build()
         }
+        // [EN] A controller shown in place of another (`setContentView` again, e.g. to switch styles) may get no insets: AppCompat's
+        //      action bar layout passes them to its content only when they change. Then the safe area is worked out from the
+        //      window's insets and where this view is on screen, as iOS does, or the system bars would cover the tabs.
+        // [CN] 替换另一个控制器显示时（再次 `setContentView`，例如切换样式）可能收不到 insets：AppCompat 的 ActionBar 布局只在 insets 变化时
+        //      才传给内容。此时按窗口的 insets 与本视图在屏幕上的位置计算安全区，与 iOS 相同，否则系统栏会遮挡各 Tab。
+        view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                receivedInsetsSinceAttach = false
+                ViewCompat.requestApplyInsets(v)
+                v.post { if (!receivedInsetsSinceAttach) applySafeAreaFromWindow() }
+            }
+            override fun onViewDetachedFromWindow(v: View) = Unit
+        })
         // [EN] Fragments need their container in the window: transactions wait until `view` is attached. [CN] Fragment 需要容器已在窗口中：事务等到 `view` 附加后再提交。
         pagesContainer.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
