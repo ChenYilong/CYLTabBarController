@@ -8,7 +8,5 @@
 		<string>Inter-SemiBold.ttf</string>
 		<string>Poppins-Bold.ttf</string>
 	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
 </dict>
 </plist>
