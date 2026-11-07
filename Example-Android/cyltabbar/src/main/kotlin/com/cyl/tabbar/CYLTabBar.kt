@@ -1,3 +1,6 @@
+// [EN] The method names are the iOS names on purpose (`cyl_…`, `tabBarController_…`), see docs/Android-API-Map.md. [CN] 方法名刻意沿用 iOS 名称（`cyl_…`、`tabBarController_…`），见 docs/Android-API-Map.md。
+@file:Suppress("FunctionName", "kotlin:S100")
+
 package com.cyl.tabbar
 
 import android.content.Context
@@ -60,7 +63,9 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         val titleHeight = if (hasTitle) titleLabel.measuredHeight else 0
         val insets = item.cyl_imageInsets
         val controller = tabBar?.tabBarController
-        var iconSize = ((item.cyl_iconSize?.height ?: controller?.imageInsets?.let { CYLConstants.CYLTabBarItemImagePlaceholderWidth - it.top - it.bottom } ?: CYLConstants.CYLTabBarItemImagePlaceholderWidth) * density).toInt()
+        val controllerInsets = controller?.imageInsets
+        val placeholderHeight = if (controllerInsets != null) CYLConstants.CYLTabBarItemImagePlaceholderWidth - controllerInsets.top - controllerInsets.bottom else CYLConstants.CYLTabBarItemImagePlaceholderWidth
+        var iconSize = ((item.cyl_iconSize?.height ?: placeholderHeight) * density).toInt()
         if (controller?.adjustTabBarItemImageViewSizeDependOnSuperView != false) iconSize = iconSize.coerceAtMost(height - titleHeight)
         val offset = item.cyl_imagePositionAdjustment
         val contentHeight = iconSize + titleHeight
@@ -289,27 +294,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             button.layout(left, (cyl_itemEdgeInsets.top * density).toInt(), slot * slotWidth + slotWidth - (cyl_itemEdgeInsets.right * density).toInt(), height - (cyl_itemEdgeInsets.bottom * density).toInt())
             slot++
         }
-        plusButton?.let { plus ->
-            val slotLeft = plusIndex * slotWidth
-            val centerX = slotLeft + slotWidth / 2
-            val tabBarHeight = height / density
-            val offset = if (plus.cyl_showsTitleInTabBarItem() || plus.cyl_appliesCenterYOffsetWithoutTitle || plus.provider != null) plus.constantOfPlusButtonCenterYOffsetForTabBarHeight(tabBarHeight) else 0f
-            val centerY = (height * plus.multiplierOfTabBarHeight(tabBarHeight) + offset * density).toInt()
-            val w = if (plus.measuredWidth > 0) plus.measuredWidth else slotWidth
-            var h = if (plus.measuredHeight > 0) plus.measuredHeight else height
-            var top = centerY - h / 2
-            if (plus.cyl_alignsTitleWithTabBarItemTitles() && plus.cyl_showsTitleInTabBarItem()) {
-                // [EN] The plus title's center on the tab titles' line: the button grows down to that line. [CN] PlusButton 标题中心线与 Tab 标题对齐：按钮向下延伸到该线。
-                val reference = buttons.firstOrNull { it.titleLabel.text.isNotEmpty() && it.titleLabel.visibility == View.VISIBLE }
-                if (reference != null) {
-                    val titleCenter = reference.top + (reference.titleLabel.top + reference.titleLabel.bottom) / 2
-                    val titleHeight = plus.titleLabel.measuredHeight.takeIf { it > 0 } ?: reference.titleLabel.height
-                    h = maxOf(h, titleCenter + titleHeight / 2 - top)
-                }
-            }
-            plus.layout(centerX - w / 2, top, centerX + w / 2, top + h)
-            plus.bringToFront()
-        }
+        plusButton?.let { layoutPlusButton(it, plusIndex * slotWidth + slotWidth / 2, slotWidth, density) }
         shadow.layout(0, 0, width, maxOf(1, (0.5f * density).toInt()))
         for (child in 0 until childCount) {
             // [EN] Badges of the plus button (or any direct child) follow their host after a layout. [CN] PlusButton（或任何直接子视图）的角标在布局后跟随宿主。
@@ -318,6 +303,28 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         }
         updateGlobals()
         didLayoutSubViewsBlock?.invoke(this)
+    }
+
+    /** [EN] The plus button centered on `centerX`, its centerY from the multiplier and offset, grown down to the tab titles' line when the title is aligned. [CN] PlusButton 以 `centerX` 居中，centerY 来自倍数与偏移；标题对齐时向下延伸到 Tab 标题所在的线。 */
+    private fun layoutPlusButton(plus: CYLPlusButton, centerX: Int, slotWidth: Int, density: Float) {
+        val tabBarHeight = height / density
+        val appliesOffset = plus.cyl_showsTitleInTabBarItem() || plus.cyl_appliesCenterYOffsetWithoutTitle || plus.provider != null
+        val offset = if (appliesOffset) plus.constantOfPlusButtonCenterYOffsetForTabBarHeight(tabBarHeight) else 0f
+        val centerY = (height * plus.multiplierOfTabBarHeight(tabBarHeight) + offset * density).toInt()
+        val w = if (plus.measuredWidth > 0) plus.measuredWidth else slotWidth
+        var h = if (plus.measuredHeight > 0) plus.measuredHeight else height
+        val top = centerY - h / 2
+        if (plus.cyl_alignsTitleWithTabBarItemTitles() && plus.cyl_showsTitleInTabBarItem()) {
+            // [EN] The plus title's center on the tab titles' line: the button grows down to that line. [CN] PlusButton 标题中心线与 Tab 标题对齐：按钮向下延伸到该线。
+            val reference = buttons.firstOrNull { it.titleLabel.text.isNotEmpty() && it.titleLabel.visibility == View.VISIBLE }
+            if (reference != null) {
+                val titleCenter = reference.top + (reference.titleLabel.top + reference.titleLabel.bottom) / 2
+                val titleHeight = plus.titleLabel.measuredHeight.takeIf { it > 0 } ?: reference.titleLabel.height
+                h = maxOf(h, titleCenter + titleHeight / 2 - top)
+            }
+        }
+        plus.layout(centerX - w / 2, top, centerX + w / 2, top + h)
+        plus.bringToFront()
     }
 
     private val touchableAreaPaint = Paint(Paint.ANTI_ALIAS_FLAG)

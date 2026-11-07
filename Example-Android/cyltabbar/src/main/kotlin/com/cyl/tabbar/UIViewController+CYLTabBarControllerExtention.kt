@@ -1,3 +1,6 @@
+// [EN] The method names are the iOS names on purpose (`cyl_…`, `tabBarController_…`), see docs/Android-API-Map.md. [CN] 方法名刻意沿用 iOS 名称（`cyl_…`、`tabBarController_…`），见 docs/Android-API-Map.md。
+@file:Suppress("FunctionName", "kotlin:S100")
+
 package com.cyl.tabbar
 
 import android.view.View
@@ -123,7 +126,13 @@ fun Fragment.cyl_handleNavigationBackAction() = cyl_handleNavigationBackActionWi
 
 fun Fragment.cyl_handleNavigationBackActionWithAnimated(animated: Boolean, toRoot: Boolean = false) {
     val manager = cyl_rootTab(this).childFragmentManager
-    if (toRoot) manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE) else manager.popBackStack()
+    // [EN] Without animation the pop is executed at once, as `popViewControllerAnimated:NO` returns synchronously. [CN] 不带动画时立即执行，如同 `popViewControllerAnimated:NO` 同步返回。
+    when {
+        toRoot && animated -> manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        toRoot -> manager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        animated -> manager.popBackStack()
+        else -> manager.popBackStackImmediate()
+    }
 }
 
 /** [EN] `-cyl_addChildViewController:`: adds a child page without the back stack. [CN] 添加子页面（不加入返回栈）。 */

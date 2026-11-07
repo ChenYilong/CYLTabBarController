@@ -1,3 +1,6 @@
+// [EN] The method names are the iOS names on purpose (`cyl_…`, `tabBarController_…`), see docs/Android-API-Map.md. [CN] 方法名刻意沿用 iOS 名称（`cyl_…`、`tabBarController_…`），见 docs/Android-API-Map.md。
+@file:Suppress("FunctionName", "kotlin:S100")
+
 package com.cyl.tabbar
 
 import android.content.Context
@@ -93,7 +96,7 @@ object CYLTabBarConfiguration {
             var result: Map<String, Any?>? = null
             var failure: CYLConfigurationException? = null
             try {
-                val connection = URL(url).openConnection() as HttpURLConnection
+                val connection = java.net.URI(url).toURL().openConnection() as HttpURLConnection
                 connection.connectTimeout = 15_000
                 connection.readTimeout = 15_000
                 try {
@@ -153,7 +156,10 @@ object CYLTabBarConfiguration {
             else -> return null
         }
         if (parts.size != count) return null
-        val numbers = parts.map { (it as? Number)?.toFloat() ?: it.toString().trim().toFloatOrNull() ?: return null }
+        val numbers = parts.map { part ->
+            val number = if (part is Number) part.toFloat() else part.toString().trim().toFloatOrNull()
+            number ?: return null
+        }
         return if (numbers.all { it.isFinite() }) numbers else null
     }
 

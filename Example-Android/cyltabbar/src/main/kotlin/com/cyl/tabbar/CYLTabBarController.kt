@@ -1,3 +1,6 @@
+// [EN] The method names are the iOS names on purpose (`cyl_…`, `tabBarController_…`), see docs/Android-API-Map.md. [CN] 方法名刻意沿用 iOS 名称（`cyl_…`、`tabBarController_…`），见 docs/Android-API-Map.md。
+@file:Suppress("FunctionName", "kotlin:S100")
+
 package com.cyl.tabbar
 
 import android.content.Context
@@ -69,7 +72,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         // [EN] Fragments need their container in the window: transactions wait until `view` is attached. [CN] Fragment 需要容器已在窗口中：事务等到 `view` 附加后再提交。
         pagesContainer.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) { if (pagesCommitPending) commitPages() }
-            override fun onViewDetachedFromWindow(v: View) {}
+            override fun onViewDetachedFromWindow(v: View) { /* [EN] Nothing to undo. [CN] 无需处理。 */ }
         })
         registerActive(this)
     }
@@ -173,38 +176,9 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         var pages = (normalized[CYLConstants.CYLTabBarControllerViewControllers] as? List<*>)?.filterIsInstance<Fragment>()?.distinct()
         if (pages != null && pages.isEmpty()) pages = null
         val skipped = ArrayList<CYLTabBarSkippedTab>()
-        if (pages != null) {
-            // [EN] From code, matched by index; an excluded tab takes its page out (B22). [CN] 代码传入，按下标对应；被排除的 Tab 连同页面一起移除（B22）。
-            val keptItems = ArrayList<Map<String, Any?>>()
-            val keptPages = ArrayList<Fragment>()
-            for (index in 0 until maxOf(items.size, pages.size)) {
-                val item = items.getOrNull(index)
-                if (item?.get(CYLTabBarConfiguration.EXCLUDED_KEY) == true) {
-                    skipped += CYLTabBarSkippedTab(CYLTabBarPageSkipReason.EXCLUDED, CYLTabBarPageRegistry.pageIdentifierOfTab(item), com.cyl.tabbar.pages.TabItem(item), item[CYLTabBarConfiguration.EXCLUSION_REASON_KEY] as? String)
-                    continue
-                }
-                keptItems += item ?: emptyMap()
-                pages.getOrNull(index)?.let { keptPages += it }
-            }
-            items = keptItems.take(keptPages.size).let { kept -> if (kept.size < keptPages.size) kept + List(keptPages.size - kept.size) { emptyMap<String, Any?>() } else kept }
-            pages = keptPages
-        } else {
-            pagesFromPageIdentifiers = true
-            cyl_pageRegistry = normalized[CYLConstants.CYLTabBarControllerPageRegistry] as? CYLTabBarPageProviding
-            @Suppress("UNCHECKED_CAST")
-            cyl_pageResolver = normalized[CYLConstants.CYLTabBarControllerPageResolver] as? CYLTabBarPageProvider
-            @Suppress("UNCHECKED_CAST")
-            cyl_pageLookupOrder = (normalized[CYLConstants.CYLTabBarControllerPageLookupOrder] as? List<CYLTabBarPageSource>) ?: CYLTabBarPageRegistry.defaultPageLookupOrder
-            val resolvable = ArrayList<Map<String, Any?>>()
-            for (item in items) {
-                if (item.isEmpty()) { skipped += CYLTabBarSkippedTab(CYLTabBarPageSkipReason.INVALID_TAB, null, null, "a placeholder for a tab that is not a dictionary"); continue }
-                if (item[CYLTabBarConfiguration.EXCLUDED_KEY] == true) { skipped += CYLTabBarSkippedTab(CYLTabBarPageSkipReason.EXCLUDED, CYLTabBarPageRegistry.pageIdentifierOfTab(item), com.cyl.tabbar.pages.TabItem(item), item[CYLTabBarConfiguration.EXCLUSION_REASON_KEY] as? String); continue }
-                resolvable += item
-            }
-            val kept = ArrayList<Map<String, Any?>>()
-            pages = CYLTabBarPageRegistry.pagesOfTabs(resolvable, cyl_pageRegistry, cyl_pageResolver, cyl_pageLookupOrder, kept, skipped)
-            items = kept
-        }
+        val kept = ArrayList<Map<String, Any?>>()
+        pages = if (pages != null) pagesFromCode(items, pages, kept, skipped) else pagesFromPageIdentifiers(normalized, items, kept, skipped)
+        items = kept
         cyl_skippedTabs = skipped
         imageInsets = (normalized[CYLConstants.CYLTabBarControllerImageInsets] as? CYLEdgeInsets) ?: CYLTabBarConfiguration.edgeInsetsValue(normalized[CYLConstants.CYLTabBarControllerImageInsets]) ?: CYLEdgeInsets.zero
         titlePositionAdjustment = (normalized[CYLConstants.CYLTabBarControllerTitlePositionAdjustment] as? CYLOffset) ?: CYLTabBarConfiguration.offsetValue(normalized[CYLConstants.CYLTabBarControllerTitlePositionAdjustment]) ?: CYLOffset.zero
@@ -216,8 +190,47 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         cyl_didInitialize()
     }
 
+    private fun excludedTab(item: Map<String, Any?>) = CYLTabBarSkippedTab(CYLTabBarPageSkipReason.EXCLUDED, CYLTabBarPageRegistry.pageIdentifierOfTab(item),
+        com.cyl.tabbar.pages.TabItem(item), item[CYLTabBarConfiguration.EXCLUSION_REASON_KEY] as? String)
+
+    /** [EN] Pages given from code, matched to the tabs by index; an excluded tab takes its page out (B22). [CN] 代码传入的页面，按下标对应 Tab；被排除的 Tab 连同页面一起移除（B22）。 */
+    private fun pagesFromCode(items: List<Map<String, Any?>>, pages: List<Fragment>, kept: MutableList<Map<String, Any?>>, skipped: MutableList<CYLTabBarSkippedTab>): List<Fragment> {
+        val keptPages = ArrayList<Fragment>()
+        for (index in 0 until maxOf(items.size, pages.size)) {
+            val item = items.getOrNull(index)
+            if (item?.get(CYLTabBarConfiguration.EXCLUDED_KEY) == true) {
+                skipped += excludedTab(item)
+                continue
+            }
+            kept += item ?: emptyMap()
+            pages.getOrNull(index)?.let { keptPages += it }
+        }
+        while (kept.size > keptPages.size) kept.removeAt(kept.size - 1)
+        while (kept.size < keptPages.size) kept += emptyMap<String, Any?>()
+        return keptPages
+    }
+
+    /** [EN] Pages resolved from the tabs' page IDs through the controller's page sources (docs/Tab-Page-Registry.md). [CN] 通过控制器的页面来源，按 Tab 的页面 ID 解析页面（docs/Tab-Page-Registry.md）。 */
+    private fun pagesFromPageIdentifiers(normalized: Map<String, Any?>, items: List<Map<String, Any?>>, kept: MutableList<Map<String, Any?>>, skipped: MutableList<CYLTabBarSkippedTab>): List<Fragment> {
+        pagesFromPageIdentifiers = true
+        cyl_pageRegistry = normalized[CYLConstants.CYLTabBarControllerPageRegistry] as? CYLTabBarPageProviding
+        @Suppress("UNCHECKED_CAST")
+        cyl_pageResolver = normalized[CYLConstants.CYLTabBarControllerPageResolver] as? CYLTabBarPageProvider
+        @Suppress("UNCHECKED_CAST")
+        cyl_pageLookupOrder = (normalized[CYLConstants.CYLTabBarControllerPageLookupOrder] as? List<CYLTabBarPageSource>) ?: CYLTabBarPageRegistry.defaultPageLookupOrder
+        val resolvable = ArrayList<Map<String, Any?>>()
+        for (item in items) {
+            when {
+                item.isEmpty() -> skipped += CYLTabBarSkippedTab(CYLTabBarPageSkipReason.INVALID_TAB, null, null, "a placeholder for a tab that is not a dictionary")
+                item[CYLTabBarConfiguration.EXCLUDED_KEY] == true -> skipped += excludedTab(item)
+                else -> resolvable += item
+            }
+        }
+        return CYLTabBarPageRegistry.pagesOfTabs(resolvable, cyl_pageRegistry, cyl_pageResolver, cyl_pageLookupOrder, kept, skipped)
+    }
+
     /** [EN] `-cyl_didInitialize`: a hook for subclasses, called once at the end of every initializer. [CN] 子类钩子，每个初始化方法末尾调用一次。 */
-    open fun cyl_didInitialize() {}
+    open fun cyl_didInitialize() { /* [EN] For subclasses. [CN] 供子类重写。 */ }
 
     /** [EN] `-setViewControllers:` with the attributes: builds the items and the tab buttons. [CN] 设置页面与属性：创建 item 与 Tab 按钮。 */
     fun setViewControllers(viewControllers: List<Fragment>, tabBarItemsAttributes: List<Map<String, Any?>>) {
@@ -412,7 +425,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     }
 
     private fun loadDrawable(url: String): android.graphics.drawable.Drawable? = try {
-        if (url.startsWith("http")) java.net.URL(url).openStream().use { android.graphics.drawable.Drawable.createFromStream(it, url) } else CYLTabBarConfiguration.imageResolver.drawable(activity, url)
+        if (url.startsWith("http")) java.net.URI(url).toURL().openStream().use { android.graphics.drawable.Drawable.createFromStream(it, url) } else CYLTabBarConfiguration.imageResolver.drawable(activity, url)
     } catch (error: Exception) { null }
 
     /** [EN] `-setTabBarItemIconViewProvider:atIndex:`: a custom view in place of the icon. [CN] 用自定义视图代替图标。 */
@@ -448,7 +461,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     fun hideTabBarShadowImageView() { tabBar.cyl_shadowColor = null; tabBar.refreshSelection() }
     fun setTintColor(@ColorInt color: Int) { tabBar.selectedTintColor = color; tabBar.refreshSelection() }
     /** [EN] `-unloadViewsOfUnselectedViewControllers`: Android keeps hidden fragments; nothing to unload. [CN] Android 保留隐藏的 Fragment，无需卸载。 */
-    fun unloadViewsOfUnselectedViewControllers() {}
+    fun unloadViewsOfUnselectedViewControllers() { /* [EN] See above. [CN] 见上。 */ }
     open fun shouldUnloadViewOfViewController(viewController: Fragment): Boolean = unloadsUnselectedViewsOnMemoryWarning
 
     // MARK: - CYLTabBarItemIdentifier 标识

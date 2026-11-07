@@ -1,3 +1,6 @@
+// [EN] The method names are the iOS names on purpose (`cyl_…`, `tabBarController_…`), see docs/Android-API-Map.md. [CN] 方法名刻意沿用 iOS 名称（`cyl_…`、`tabBarController_…`），见 docs/Android-API-Map.md。
+@file:Suppress("FunctionName", "kotlin:S100")
+
 package com.cyl.tabbar
 
 import android.animation.ObjectAnimator

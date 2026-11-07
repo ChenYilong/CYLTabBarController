@@ -163,12 +163,20 @@ def main():
         return check()
     manifest = json.loads(MANIFEST.read_text())
     if args.update:
+        # [EN] Only an "owner/repo" name reaches git and the manifest (no path or option). [CN] 只有 "owner/repo" 形式的名字才会传给 git 与清单（不含路径或选项）。
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", args.update):
+            sys.exit("%s is not an owner/repo name" % args.update)
         matches = [s for s in manifest["sources"] if s["repo"] == args.update]
         if not matches:
             sys.exit("%s is not in the manifest" % args.update)
-        output = subprocess.check_output(["git", "ls-remote", "https://github.com/%s.git" % args.update, "HEAD"], text=True)
-        matches[0]["commit"] = output.split()[0]
-        MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
+        output = subprocess.check_output(["git", "ls-remote", "--", "https://github.com/%s.git" % args.update, "HEAD"], text=True)
+        commit = output.split()[0]
+        if not re.fullmatch(r"[0-9a-f]{40}", commit):
+            sys.exit("unexpected ls-remote output for %s" % args.update)
+        matches[0]["commit"] = commit
+        with open(MANIFEST, "w", encoding="utf-8") as manifest_file:
+            json.dump(manifest, manifest_file, indent=2, ensure_ascii=False)
+            manifest_file.write("\n")
     SKILLS.mkdir(parents=True, exist_ok=True)
     vendor(manifest)
     return check()

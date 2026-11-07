@@ -31,6 +31,20 @@ static NSString *const CYLConfigurationRiveDarkURLKey = @"CYLTabBarRiveDarkURL";
 static NSString *const CYLConfigurationRiveDarkFilePathKey = @"CYLTabBarRiveDarkFilePath";
 static NSString *const CYLConfigurationRiveDarkColorsKey = @"CYLTabBarRiveDarkColors";
 /*!
+ * [EN] The Lottie keys by name too: their constants are `CYL_LOTTIE_REQUIRED` (a deprecation warning in a build without
+ *      Lottie, which CI treats as an error), while a configuration may name them in any build (B29). Same values as
+ *      CYLTabBarController.m.
+ * [CN] Lottie 的键同样按名称引用：它们的常量带 `CYL_LOTTIE_REQUIRED`（无 Lottie 的构建中是弃用警告，CI 视为错误），而配置在任何构建中都可以写
+ *      这些键（B29）。值与 CYLTabBarController.m 相同。
+ */
+static NSString *const CYLConfigurationLottieURLKey = @"CYLTabBarLottieURL";
+static NSString *const CYLConfigurationLottieFilePathKey = @"CYLTabBarLottieFilePath";
+static NSString *const CYLConfigurationLottieSizeKey = @"CYLTabBarLottieSize";
+static NSString *const CYLConfigurationLottieDarkURLKey = @"CYLTabBarLottieDarkURL";
+static NSString *const CYLConfigurationLottieDarkFilePathKey = @"CYLTabBarLottieDarkFilePath";
+static NSString *const CYLConfigurationLottieDarkColorsKey = @"CYLTabBarLottieDarkColors";
+static NSString *const CYLConfigurationLottieLoopsWhenUnselectedKey = @"CYLTabBarLottieLoopsWhenUnselected";
+/*!
  * [EN] Private: marks the entry the tab bar controller inserts for the PlusButton slot; the same key as in
  *      CYLTabBarController.m (#774).
  * [CN] 私有：标记 TabBarController 为 PlusButton 的 slot 插入的一项；与 CYLTabBarController.m 中的键相同（#774）。
@@ -440,7 +454,7 @@ static void CYLApplyAnimationOptions(NSMutableDictionary *item, NSDictionary<NSS
     }
     NSArray<NSArray<NSString *> *> *pairs = @[
         @[ CYLTabBarAnimationURL, CYLTabBarAnimationFilePath ], @[ CYLTabBarAnimationDarkURL, CYLTabBarAnimationDarkFilePath ],
-        @[ CYLTabBarLottieURL, CYLTabBarLottieFilePath ], @[ CYLTabBarLottieDarkURL, CYLTabBarLottieDarkFilePath ],
+        @[ CYLConfigurationLottieURLKey, CYLConfigurationLottieFilePathKey ], @[ CYLConfigurationLottieDarkURLKey, CYLConfigurationLottieDarkFilePathKey ],
         @[ CYLConfigurationPAGURLKey, CYLConfigurationPAGFilePathKey ], @[ CYLConfigurationPAGDarkURLKey, CYLConfigurationPAGDarkFilePathKey ],
         @[ CYLConfigurationRiveURLKey, CYLConfigurationRiveFilePathKey ], @[ CYLConfigurationRiveDarkURLKey, CYLConfigurationRiveDarkFilePathKey ],
     ];
@@ -490,8 +504,8 @@ static NSArray<NSString *> *CYLKnownItemKeys(void) {
     return @[ CYLTabBarItemTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage,
               CYLTabBarItemSelectedDarkImage, CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize,
               CYLTabBarItemImageInsets, CYLTabBarItemTitlePositionAdjustment, CYLTabBarItemImagePositionAdjustment,
-              CYLTabBarLottieFilePath, CYLTabBarLottieURL, CYLTabBarLottieSize, CYLTabBarItemIdentifier, CYLTabBarLottieDarkURL,
-              CYLTabBarLottieDarkFilePath, CYLTabBarLottieDarkColors, CYLTabBarItemPageIdentifier,
+              CYLConfigurationLottieFilePathKey, CYLConfigurationLottieURLKey, CYLConfigurationLottieSizeKey, CYLTabBarItemIdentifier, CYLConfigurationLottieDarkURLKey,
+              CYLConfigurationLottieDarkFilePathKey, CYLConfigurationLottieDarkColorsKey, CYLTabBarItemPageIdentifier,
               CYLTabBarItemPageParameters, CYLTabBarItemPlatforms, CYLTabBarItemMinimumAppVersion, CYLTabBarItemSelectedTitle, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
               CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemBackgroundColor,
               CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont, CYLTabBarItemAccessibilityIdentifier, CYLTabBarItemAccessibilityLabel,
@@ -500,7 +514,7 @@ static NSArray<NSString *> *CYLKnownItemKeys(void) {
               // [CN] Tab 动画（#604、#752）：通用键、选项、Lottie 的循环开关、PAG 与 Rive。
               CYLTabBarAnimationURL, CYLTabBarAnimationFilePath, CYLTabBarAnimationSize, CYLTabBarAnimationDarkURL,
               CYLTabBarAnimationDarkFilePath, CYLTabBarAnimationDarkColors, CYLTabBarAnimationColors, CYLTabBarAnimationOptions,
-              CYLTabBarLottieLoopsWhenUnselected,
+              CYLConfigurationLottieLoopsWhenUnselectedKey,
               CYLConfigurationPAGURLKey, CYLConfigurationPAGFilePathKey, CYLConfigurationPAGSizeKey, CYLConfigurationPAGDarkURLKey,
               CYLConfigurationPAGDarkFilePathKey, CYLConfigurationRiveURLKey, CYLConfigurationRiveFilePathKey, CYLConfigurationRiveSizeKey,
               CYLConfigurationRiveDarkURLKey, CYLConfigurationRiveDarkFilePathKey, CYLConfigurationRiveDarkColorsKey ];
@@ -842,7 +856,7 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
             item[key] = CYLOffsetValue(item[key], key);
         }
     }
-    for (NSString *key in @[ CYLTabBarItemImageURLSize, CYLTabBarLottieSize, CYLTabBarAnimationSize, CYLConfigurationPAGSizeKey,
+    for (NSString *key in @[ CYLTabBarItemImageURLSize, CYLConfigurationLottieSizeKey, CYLTabBarAnimationSize, CYLConfigurationPAGSizeKey,
                               CYLConfigurationRiveSizeKey ]) {
         if (item[key]) {
             item[key] = CYLSizeValue(item[key], key);
@@ -850,7 +864,7 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
     }
     // [EN] Animation URLs: Lottie's, the generic ones (any library) and PAG's / Rive's; a local file must exist, and a
     //      Lottie file must be readable (B17). [CN] 动画 URL：Lottie、通用（任何动画库）与 PAG / Rive；本地文件必须存在，Lottie 文件必须可读（B17）。
-    for (NSString *key in @[ CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarLottieURL, CYLTabBarLottieDarkURL,
+    for (NSString *key in @[ CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLConfigurationLottieURLKey, CYLConfigurationLottieDarkURLKey,
                               CYLTabBarAnimationURL, CYLTabBarAnimationDarkURL, CYLConfigurationPAGURLKey, CYLConfigurationPAGDarkURLKey,
                               CYLConfigurationRiveURLKey, CYLConfigurationRiveDarkURLKey ]) {
         id value = item[key];
@@ -867,7 +881,7 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
         }
         item[key] = checked;
     }
-    for (NSString *key in @[ CYLTabBarLottieFilePath, CYLTabBarLottieDarkFilePath, CYLTabBarAnimationFilePath, CYLTabBarAnimationDarkFilePath,
+    for (NSString *key in @[ CYLConfigurationLottieFilePathKey, CYLConfigurationLottieDarkFilePathKey, CYLTabBarAnimationFilePath, CYLTabBarAnimationDarkFilePath,
                               CYLConfigurationPAGFilePathKey, CYLConfigurationPAGDarkFilePathKey, CYLConfigurationRiveFilePathKey,
                               CYLConfigurationRiveDarkFilePathKey ]) {
         id value = item[key];
@@ -902,7 +916,7 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
         item[CYLTabBarItemPlatforms] = CYLPlatformsValue(item[CYLTabBarItemPlatforms]);
     }
     CYLWarnUnknownKeys(item, CYLKnownItemKeys());
-    for (NSString *key in @[ CYLTabBarLottieDarkColors, CYLTabBarAnimationDarkColors, CYLTabBarAnimationColors, CYLConfigurationRiveDarkColorsKey ]) {
+    for (NSString *key in @[ CYLConfigurationLottieDarkColorsKey, CYLTabBarAnimationDarkColors, CYLTabBarAnimationColors, CYLConfigurationRiveDarkColorsKey ]) {
         if (item[key]) {
             id colors = CYLDarkColorsValue(item[key], key);
             if (![colors isKindOfClass:[NSDictionary class]]) {
@@ -912,12 +926,12 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
             item[key] = colors;
         }
     }
-    if (item[CYLTabBarLottieLoopsWhenUnselected]) {
-        NSNumber *loops = CYLBoolValue(item[CYLTabBarLottieLoopsWhenUnselected]);
+    if (item[CYLConfigurationLottieLoopsWhenUnselectedKey]) {
+        NSNumber *loops = CYLBoolValue(item[CYLConfigurationLottieLoopsWhenUnselectedKey]);
         if (!loops) {
-            CYLLogInvalidConfigurationValue(CYLTabBarLottieLoopsWhenUnselected, item[CYLTabBarLottieLoopsWhenUnselected]);
+            CYLLogInvalidConfigurationValue(CYLConfigurationLottieLoopsWhenUnselectedKey, item[CYLConfigurationLottieLoopsWhenUnselectedKey]);
         }
-        item[CYLTabBarLottieLoopsWhenUnselected] = loops;
+        item[CYLConfigurationLottieLoopsWhenUnselectedKey] = loops;
     }
     if (item[CYLTabBarAnimationOptions]) {
         NSDictionary<NSString *, NSString *> *options = CYLAnimationOptionsValue(item[CYLTabBarAnimationOptions]);

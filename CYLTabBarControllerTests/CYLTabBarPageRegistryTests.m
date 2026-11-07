@@ -99,8 +99,9 @@ static NSDictionary *CYLTestTab(NSString *title, NSString *pageIdentifier) {
 
 - (void)testPageIdentifierFallsBackToTheTabIdentifier {
     XCTAssertEqualObjects([CYLTabBarPageRegistry pageIdentifierOfTab:@{ CYLTabBarItemIdentifier : @"home" }], @"home");
-    XCTAssertEqualObjects([CYLTabBarPageRegistry pageIdentifierOfTab:@{ CYLTabBarItemIdentifier : @"home", CYLTabBarItemPageIdentifier : @" " }], @"home");
-    XCTAssertEqualObjects([CYLTabBarPageRegistry pageIdentifierOfTab:@{ CYLTabBarItemIdentifier : @"home", CYLTabBarItemPageIdentifier : @"web" }], @"web");
+    // [EN] A dictionary literal has commas: parentheses keep it one macro argument. [CN] 字典字面量含逗号：用括号保证它是一个宏参数。
+    XCTAssertEqualObjects(([CYLTabBarPageRegistry pageIdentifierOfTab:@{ CYLTabBarItemIdentifier : @"home", CYLTabBarItemPageIdentifier : @" " }]), @"home");
+    XCTAssertEqualObjects(([CYLTabBarPageRegistry pageIdentifierOfTab:@{ CYLTabBarItemIdentifier : @"home", CYLTabBarItemPageIdentifier : @"web" }]), @"web");
     XCTAssertNil([CYLTabBarPageRegistry pageIdentifierOfTab:@{ CYLTabBarItemTitle : @"No ID" }]);
 }
 
