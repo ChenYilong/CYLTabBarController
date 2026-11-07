@@ -57,6 +57,7 @@ let package = Package(
                 // FIX: issue #604 — the CYLTabBarItemAnimation sources (CocoaPods `CYLTabBarItemAnimation` subspec, with Lottie):
                 // the shared engine, the animator protocol and registry, and one folder per library (`Lottie/`, and `PAG/` and
                 // `Rive/`, which are empty without libpag and RiveRuntime; SPM does not offer them).
+                // `GIF/` needs only ImageIO, so SPM builds it. `GIF/` 只需要 ImageIO，因此 SPM 会编译它。
                 // [CN] 共用引擎、animator 协议与注册表，以及每个动画库一个目录（`Lottie/`；`PAG/` 与 `Rive/` 在没有 libpag、RiveRuntime 时为空，
                 // SPM 不提供它们）。
                 .headerSearchPath("CYLTabBarItemAnimation"),

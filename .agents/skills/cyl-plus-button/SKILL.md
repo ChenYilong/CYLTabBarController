@@ -31,7 +31,7 @@ With YES on Liquid Glass the title moves into the tab item under the button (#63
 - Both draw **only the normal image**, selected or not. A selected image set by the app or a theme stays readable through `-imageForState:` and is used by FlatDesign and the classic tab bar.
 - With title alignment the two line up **by icon only**: take the icon's coordinates and ignore other subviews. With no drawn icon (background image, removed image) they line up by button center.
 - Keep this inside the plus button, behind a Liquid Glass guard. The guard is Liquid Glass active **and** not FlatDesign: `+isLiquidGlassActive` is also YES with FlatDesign on iOS 26.
-- A badge exists only on the real button, so where the glass covers it, it looks blurred. An icon with transparent parts can show a blurred halo in the glass: the mask that hid it was removed.
+- A badge goes through `-cyl_performSelector:` to both layers (#779): the real button and the stand-in, so it stays sharp in the glass. An icon with transparent parts can show a blurred halo in the glass: the mask that hid it was removed.
 
 ## Images that change later
 

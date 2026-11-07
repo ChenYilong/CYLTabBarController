@@ -49,6 +49,7 @@ Read the document for the feature before using its API. The public API is in the
 | Push from anywhere | [Push-From-Anywhere](../../../docs/Push-From-Anywhere.md) |
 | Accessibility identifiers, XCUITest | [Tab-Accessibility](../../../docs/Tab-Accessibility.md) |
 | Hit testing | [TabBar-HitTest-Super-Fallback](../../../docs/TabBar-HitTest-Super-Fallback.md) |
+| Adding animated tab icons: steps, notes, demos | [Tab-Icon-Animation-Quick-Start](../../../docs/Tab-Icon-Animation-Quick-Start.md) |
 | Animation subspec, adding a library | [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md) |
 | PAG | [PAG-Animation](../../../docs/PAG-Animation.md) |
 | Rive | [Rive-Animation](../../../docs/Rive-Animation.md) |

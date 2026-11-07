@@ -106,6 +106,18 @@
         "avdlee--xcode-build-fixer",
         "getsentry--xcodebuildmcp-cli"
       ]
+    },
+    {
+      "repo": "callstackincubator/agent-skills",
+      "commit": "59e9d17446a248b21d86f078fcd0bd2d36db1ca4",
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "requestedBy": "maintainer",
+      "root": "skills",
+      "skills": [
+        "github-actions",
+        "writing-user-docs"
+      ]
     }
   ]
 }

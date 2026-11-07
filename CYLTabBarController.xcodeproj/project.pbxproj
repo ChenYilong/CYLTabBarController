@@ -196,6 +196,8 @@
 		8DACA0464C4117FE762EB8F7 /* CYLLottieTabBarItemAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = 3820D2513ECDA3B496E0524A /* CYLLottieTabBarItemAnimator.m */; };
 		D32680751A692184B676DD6F /* CYLPAGTabBarItemAnimator.h in Headers */ = {isa = PBXBuildFile; fileRef = 583BAB7EA2F767CEBC4419B9 /* CYLPAGTabBarItemAnimator.h */; };
 		BBD2AFAEB8BFBB17475415D4 /* CYLPAGTabBarItemAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = 3983802FD43DC646F15A6B21 /* CYLPAGTabBarItemAnimator.m */; };
+		4C7A2E94D3F06B5A18E2C4D4 /* CYLGIFTabBarItemAnimator.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C7A2E92D3F06B5A18E2C4D2 /* CYLGIFTabBarItemAnimator.h */; };
+		4C7A2E95D3F06B5A18E2C4D5 /* CYLGIFTabBarItemAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C7A2E93D3F06B5A18E2C4D3 /* CYLGIFTabBarItemAnimator.m */; };
 		38EDE574C7DF0542DFB03DE0 /* CYLRiveTabBarItemAnimator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BA1748DE6F62127B09636D1 /* CYLRiveTabBarItemAnimator.h */; };
 		BC9D57D7EE707105A5DB73E9 /* CYLRiveTabBarItemAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = ECD54DD212D88AFAA6C50623 /* CYLRiveTabBarItemAnimator.m */; };
 		C0173C2C5CD33A9B2DBEF8C1 /* CYLTabBarItemAnimator.h in Headers */ = {isa = PBXBuildFile; fileRef = E39F55A213575AA1887779F6 /* CYLTabBarItemAnimator.h */; };
@@ -491,6 +493,8 @@
 		3820D2513ECDA3B496E0524A /* CYLLottieTabBarItemAnimator.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLLottieTabBarItemAnimator.m; sourceTree = "<group>"; };
 		583BAB7EA2F767CEBC4419B9 /* CYLPAGTabBarItemAnimator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLPAGTabBarItemAnimator.h; sourceTree = "<group>"; };
 		3983802FD43DC646F15A6B21 /* CYLPAGTabBarItemAnimator.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLPAGTabBarItemAnimator.m; sourceTree = "<group>"; };
+		4C7A2E92D3F06B5A18E2C4D2 /* CYLGIFTabBarItemAnimator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLGIFTabBarItemAnimator.h; sourceTree = "<group>"; };
+		4C7A2E93D3F06B5A18E2C4D3 /* CYLGIFTabBarItemAnimator.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLGIFTabBarItemAnimator.m; sourceTree = "<group>"; };
 		6BA1748DE6F62127B09636D1 /* CYLRiveTabBarItemAnimator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLRiveTabBarItemAnimator.h; sourceTree = "<group>"; };
 		ECD54DD212D88AFAA6C50623 /* CYLRiveTabBarItemAnimator.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLRiveTabBarItemAnimator.m; sourceTree = "<group>"; };
 		E39F55A213575AA1887779F6 /* CYLTabBarItemAnimator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLTabBarItemAnimator.h; sourceTree = "<group>"; };
@@ -612,6 +616,15 @@
 			path = PAG;
 			sourceTree = "<group>";
 		};
+		4C7A2E91D3F06B5A18E2C4D1 /* GIF */ = {
+			isa = PBXGroup;
+			children = (
+				4C7A2E92D3F06B5A18E2C4D2 /* CYLGIFTabBarItemAnimator.h */,
+				4C7A2E93D3F06B5A18E2C4D3 /* CYLGIFTabBarItemAnimator.m */,
+			);
+			path = GIF;
+			sourceTree = "<group>";
+		};
 		73DB6079BF3C0F72AC6F1C85 /* Rive */ = {
 			isa = PBXGroup;
 			children = (
@@ -641,6 +654,7 @@
 				6EA2C44A8C368537F1DCDCCE /* Lottie */,
 				A816E076D0164FC2E72B8EB5 /* PAG */,
 				73DB6079BF3C0F72AC6F1C85 /* Rive */,
+				4C7A2E91D3F06B5A18E2C4D1 /* GIF */,
 			);
 			path = CYLTabBarItemAnimation;
 			sourceTree = "<group>";
@@ -1070,6 +1084,7 @@
 				2562FD2648E2129DB58986EC /* CYLLottieTabBarItemAnimator.h in Headers */,
 				D32680751A692184B676DD6F /* CYLPAGTabBarItemAnimator.h in Headers */,
 				38EDE574C7DF0542DFB03DE0 /* CYLRiveTabBarItemAnimator.h in Headers */,
+				4C7A2E94D3F06B5A18E2C4D4 /* CYLGIFTabBarItemAnimator.h in Headers */,
 				C0173C2C5CD33A9B2DBEF8C1 /* CYLTabBarItemAnimator.h in Headers */,
 				6E178CF43F04FBDEC4A8AEBC /* CYLTabBarItemAnimatorRegistry.h in Headers */,
 				FEC9F8C46A3B167916110B50 /* CYLTabBarItemAnimationEngine.h in Headers */,
@@ -1448,6 +1463,7 @@
 				8DACA0464C4117FE762EB8F7 /* CYLLottieTabBarItemAnimator.m in Sources */,
 				BBD2AFAEB8BFBB17475415D4 /* CYLPAGTabBarItemAnimator.m in Sources */,
 				BC9D57D7EE707105A5DB73E9 /* CYLRiveTabBarItemAnimator.m in Sources */,
+				4C7A2E95D3F06B5A18E2C4D5 /* CYLGIFTabBarItemAnimator.m in Sources */,
 				1EAA35D90FD0D728D8E704E4 /* CYLTabBarItemAnimatorRegistry.m in Sources */,
 				D11710A099E10169AC0717C1 /* CYLTabBarItemAnimationEngine.m in Sources */,
 				CC5BAB5EC4893257406B559A /* CYLTabBarItemViewAnimator.m in Sources */,

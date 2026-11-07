@@ -13,6 +13,13 @@
 
 /// [CN] See `-[CYLTabBar plusButtonIndex]`. 见 `-[CYLTabBar plusButtonIndex]`。
 /// [EN] See `-[CYLTabBar plusButtonIndex]`.
+/// [EN] Implemented in UIControl+CYLBadgeExtention.m (issue #779). [CN] 在 UIControl+CYLBadgeExtention.m 中实现（issue #779）。
+@interface UIControl (CYLPlusButtonBadgeLayers)
+- (void)cyl_showBadgeValue:(NSString *)value animationTypeValue:(NSNumber *)animationTypeValue;
+- (void)cyl_showBadgeValueInThisLayer:(NSString *)value animationTypeValue:(NSNumber *)animationTypeValue;
+- (NSArray<UIControl *> *)cyl_badgeLayerControls;
+@end
+
 @interface CYLTabBar (CYLPlusButtonLayout)
 - (BOOL)cyl_showsVerticalBar;
 - (BOOL)cyl_showsMinimizedBar;
@@ -708,10 +715,10 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  * [CN] PlusButton 还没有图片时请求的角标，在布局重试用完后会被丢弃，而图片可能很久之后才到（例如来自网络）。这里保留最后一次请求，
  *      图片到达时再显示，使角标最终与启动时就有图片一样位于图片上。
  */
-- (void)cyl_showBadgeValue:(NSString *)value animationType:(CYLBadgeAnimationType)animationType {
+- (void)cyl_showBadgeValue:(NSString *)value animationTypeValue:(NSNumber *)animationTypeValue {
     objc_setAssociatedObject(self, CYLPlusButtonRequestedBadgeValueKey, value, OBJC_ASSOCIATION_COPY_NONATOMIC);
-    objc_setAssociatedObject(self, CYLPlusButtonRequestedBadgeAnimationTypeKey, @(animationType), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    [super cyl_showBadgeValue:value animationType:animationType];
+    objc_setAssociatedObject(self, CYLPlusButtonRequestedBadgeAnimationTypeKey, animationTypeValue, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [super cyl_showBadgeValue:value animationTypeValue:animationTypeValue];
 }
 
 - (void)cyl_clearBadge {
@@ -719,12 +726,31 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     [super cyl_clearBadge];
 }
 
+/// [EN] Also when the stand-in is made after the badge was asked for. [CN] 也包括在请求角标之后才创建替身的情况。
 - (void)cyl_showRequestedBadgeIfNeeded {
     NSString *value = objc_getAssociatedObject(self, CYLPlusButtonRequestedBadgeValueKey);
-    if (value && !self.cyl_badge.superview) {
-        NSNumber *animationType = objc_getAssociatedObject(self, CYLPlusButtonRequestedBadgeAnimationTypeKey);
-        [self cyl_showBadgeValue:value animationType:(CYLBadgeAnimationType)animationType.integerValue];
+    if (!value) {
+        return;
     }
+    NSNumber *animationType = objc_getAssociatedObject(self, CYLPlusButtonRequestedBadgeAnimationTypeKey);
+    for (UIControl *control in [self cyl_badgeLayerControls]) {
+        if (!control.cyl_badge.superview) {
+            [control cyl_showBadgeValueInThisLayer:value animationTypeValue:animationType];
+        }
+    }
+}
+
+/*!
+ * FIX: issue #779
+ * [EN] The plus button's two layers: the real button, and on Liquid Glass with a stand-in, the stand-in in the selected layer.
+ *      The glass splits the badge as it splits the icon: the real button draws the part above the glass, the stand-in the
+ *      part in it. With the badge on the real button only, the part in the glass was blurred.
+ * [CN] PlusButton 的两个图层：真实按钮，以及液态玻璃下选中图层中的替身。玻璃像分割图标一样分割角标：真实按钮绘制玻璃上方的部分，替身绘制
+ *      玻璃内的部分。只在真实按钮上显示角标时，玻璃内的部分是模糊的。
+ */
+- (NSArray<UIControl *> *)cyl_badgeLayerControls {
+    UIButton *standIn = _selectedContentView;
+    return (standIn && standIn != self && CYLPlusButtonIsInLiquidGlassTabBar(self)) ? @[ self, standIn ] : @[ self ];
 }
 
 #pragma mark - Title alignment
@@ -2127,6 +2153,7 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
                     [button setImage:selectedImage forState:UIControlStateHighlighted];
                 }
             }
+            [self cyl_showRequestedBadgeIfNeeded];
             return _selectedContentView;
         }
     }
@@ -2156,6 +2183,7 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     }
     _selectedContentView = selectedContentView;
     [self cyl_updateSelectedContentViewImage];
+    [self cyl_showRequestedBadgeIfNeeded];
     return _selectedContentView;
 }
 

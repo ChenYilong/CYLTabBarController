@@ -50,6 +50,7 @@
 | [TabBar 图库](Tab-Bar-Gallery.md) | [Tab Bar Gallery](Tab-Bar-Gallery.md) |
 | [Tab 图标动画共用子库：CYLTabBarItemAnimation（面向协议，可扩展任意动画库）](Tab-Bar-Item-Animation.md) | [The shared tab icon animation subspec: CYLTabBarItemAnimation (protocol-oriented, open to any library)](Tab-Bar-Item-Animation.md) |
 | [自定义 Tab 点击操作](Tab-Custom-Action.md) | [Custom Tab Actions](Tab-Custom-Action.md) |
+| [Tab 动画接入指南：Lottie、PAG、Rive](Tab-Icon-Animation-Quick-Start.md) | [Tab icon animation quick start: Lottie, PAG and Rive](Tab-Icon-Animation-Quick-Start.md) |
 | [Tab 交互：点击动画、长按、滑动切换及其他](Tab-Interactions.md) | [Tab interactions: tap animations, long press, swipe, and more](Tab-Interactions.md) |
 | [单个 Tab 的颜色](Tab-Item-Colors.md) | [Per-tab Colors](Tab-Item-Colors.md) |
 | [Tab 的排列方式](Tab-Item-Positioning.md) | [Tab Item Positioning](Tab-Item-Positioning.md) |
@@ -119,6 +120,7 @@ docs/
 ├── Tab-Bar-Gallery.md
 ├── Tab-Bar-Item-Animation.md
 ├── Tab-Custom-Action.md
+├── Tab-Icon-Animation-Quick-Start.md
 ├── Tab-Interactions.md
 ├── Tab-Item-Colors.md
 ├── Tab-Item-Positioning.md

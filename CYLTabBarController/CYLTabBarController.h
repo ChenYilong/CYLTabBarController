@@ -53,6 +53,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Gallery.md
 //   - Custom Tab Actions / 自定义 Tab 点击操作
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Custom-Action.md
+//   - Tab icon animation quick start: Lottie, PAG and Rive / Tab 动画接入指南：Lottie、PAG、Rive
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Icon-Animation-Quick-Start.md
 //   - Tab interactions: tap animations, long press, swipe, and more / Tab 交互：点击动画、长按、滑动切换及其他
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Interactions.md
 //   - Per-tab Colors / 单个 Tab 的颜色

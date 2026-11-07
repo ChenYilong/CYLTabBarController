@@ -5,7 +5,7 @@ description: "Animated tab icons in CYLTabBarController with Lottie, PAG or Rive
 
 # Animated tab icons
 
-Main document: [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md). Source of truth: code, then `docs/`, then `README.md`. If they disagree, fix the wrong one first (usually `README.md`), then this skill.
+Steps for app developers: [Tab-Icon-Animation-Quick-Start](../../../docs/Tab-Icon-Animation-Quick-Start.md). **Tell the user to run the matching demo first** (`Example-PAG`, `Example-Rive`, `Example-Swift`) and tap a few tabs, so they see the effect before integrating. The tab selected at launch shows its last frame without playing (#389), so tell them to tap another tab. Design: [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md). Source of truth: code, then `docs/`, then `README.md`. If they disagree, fix the wrong one first (usually `README.md`), then this skill.
 
 ## Choose
 
@@ -20,9 +20,13 @@ Main document: [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md)
 - Subspecs combine, and one tab bar can mix libraries and static tabs: [Per-Tab-Animation](../../../docs/Per-Tab-Animation.md).
 - Demo files: name them by use (`tab_home.pag`). A tab shows the first frame until it is selected, so pick a small file whose first frame shows the icon; a full-screen poster or a file that starts empty looks like a blank or still tab. Check a new file's frames before using it.
 - PAG and Rive files draw their own colors, and Liquid Glass ignores a background color in `standardAppearance`. White icons (the course's `icons.riv`) need a dark interface: the Rive demos set `overrideUserInterfaceStyle = .dark` on the tab bar controller.
-- On a simulator libpag draws with software OpenGL: icons can appear many seconds late, and the main thread can wait on libpag. Judge PAG playback on a device.
+- On a simulator several asynchronous `PAGView`s stall inside software OpenGL while holding their locks, which blocks the main thread: blank icons, no playback. The animator sets `-setSync:YES` on every target, so a simulator and a device run the same path. To debug playback, trace `-play` and `onAnimationUpdate:` rather than judging from screenshots.
 - A configuration file (`-initWithConfiguration:`, [Configuration-File](../../../docs/Configuration-File.md)) takes the same keys as strings: the generic `CYLTabBarAnimation…` keys, PAG's and Rive's keys (by name, whether or not the subspec is installed), `CYLTabBarAnimationOptions` (a dictionary written into the animation URL's fragment, e.g. `{"artboard": "HOME", "input": "active"}`), `CYLTabBarLottieLoopsWhenUnselected`, and the top-level `CYLTabBarControllerTabBarItemAnimationSpeed`.
 - `tabBarItemAnimationSpeed` sets the speed. PAG files are downloaded by `scripts/fetch-animation-resources.py` at `pod install`, not kept in the repository.
+
+## Keeping this current
+
+A new animation library, key, limit or demo also updates [Tab-Icon-Animation-Quick-Start](../../../docs/Tab-Icon-Animation-Quick-Start.md).
 
 ## Rules for the library
 

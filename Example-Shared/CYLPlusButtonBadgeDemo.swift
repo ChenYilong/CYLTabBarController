@@ -63,13 +63,6 @@ extension CYLTabBarController {
         plusButton.tag = max(plusButton.tag, 0) + 1
         let badgeValue = "\(plusButton.tag)"
         plusButton.cyl_showBadgeValue(badgeValue, animationType: .bounce)
-        // [EN] With a plus child view controller there is a second layer: its system tab button, under the plus button. Update
-        // it too, the way the other tabs' badges are set (on the view controller), so both always show the same value.
-        // [CN] 有 PlusButton 子控制器时还有第二个图层：PlusButton 下方该子控制器的系统 Tab 按钮。与其他 Tab 一样（在控制器上设置）
-        // 同时更新它，两者始终显示相同的值。
-        if hasPlusChildViewController() {
-            CYLPlusButton.plusChildViewController(forOwner: self)?.cyl_showBadgeValue(badgeValue, animationType: .bounce)
-        }
         NSLog("[#535] plus button badge %ld (Liquid Glass: %@, from CYLUtils)", plusButton.tag, CYLUtils.isLiquidGlassActive() ? "YES" : "NO")
     }
 }

@@ -134,6 +134,13 @@ NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFiles(NSArray<NSDictio
         return nil;
     }
     PAGView *pagView = [[PAGView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+    // [EN] Rendered on the main thread, everywhere: a tab bar has several small PAGViews. With one render thread each, those
+    //      threads stalled inside the simulator's software OpenGL while holding their player's lock, and the first call that
+    //      needed it (`-stop`, `-setHidden:`) blocked the main thread: blank icons, no playback. One path on every target also
+    //      means that what the simulator shows is what a device runs.
+    // [CN] 所有环境都在主线程绘制：TabBar 中有多个很小的 PAGView。每个一个绘制线程时，这些线程会在模拟器的软件 OpenGL 内部卡住并持有播放器的锁，
+    //      之后第一个需要该锁的调用（`-stop`、`-setHidden:`）会阻塞主线程：图标空白，不播放。所有环境走同一条路径，模拟器上看到的就是真机运行的。
+    [pagView setSync:YES];
     [pagView setComposition:pagFile];
     // Like a Lottie view: plays once, shows its first frame until then. 与 Lottie 视图一致：播放一次，播放前显示第一帧。
     [pagView setRepeatCount:1];

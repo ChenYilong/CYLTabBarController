@@ -7,6 +7,11 @@
 
 #import <XCTest/XCTest.h>
 #import <CYLTabBarController/CYLTabBarController.h>
+// [EN] Internal to the framework: not in its public headers. [CN] 框架内部的头文件，不属于其公开头文件。
+#import "../CYLTabBarController/CYLTabBarItemAnimation/GIF/CYLGIFTabBarItemAnimator.h"
+#import "../CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h"
+#import "../CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h"
+#import <ImageIO/ImageIO.h>
 
 /// [EN] A tab bar theme with a background color only. [CN] 只有背景色的 TabBar 主题。
 @interface CYLTestTabBarTheme : NSObject <CYLTabBarTheme>
@@ -502,6 +507,80 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
 + (id)plusButton {
     return [self new];
 }
+@end
+
+/*!
+ * FIX: issue #605
+ * [EN] A GIF given by an animation key plays once when asked; given as an image, it stays an animated image that loops.
+ * [CN] 通过动画 key 传入的 GIF 在要求时播放一次；作为图片传入时仍是循环播放的动图。
+ */
+@interface CYLGIFAnimationTests : XCTestCase
+@end
+
+@implementation CYLGIFAnimationTests
+
+/// [EN] A GIF file of solid frames: red, green, blue, with these delays. [CN] 纯色帧组成的 GIF 文件：红、绿、蓝，时长如下。
+- (NSURL *)gifFileURL {
+    NSURL *URL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl_gif_test.gif"]];
+    CGImageDestinationRef destination = CGImageDestinationCreateWithURL((__bridge CFURLRef)URL, CFSTR("com.compuserve.gif"), 3, NULL);
+    NSArray<UIColor *> *colors = @[ UIColor.redColor, UIColor.greenColor, UIColor.blueColor ];
+    NSArray<NSNumber *> *delays = @[ @0.1, @0.2, @0.7 ];
+    [colors enumerateObjectsUsingBlock:^(UIColor *color, NSUInteger index, BOOL *stop) {
+        NSDictionary *properties = @{ (__bridge NSString *)kCGImagePropertyGIFDictionary : @{ (__bridge NSString *)kCGImagePropertyGIFDelayTime : delays[index] } };
+        CGImageDestinationAddImage(destination, CYLTestImage(10, color).CGImage, (__bridge CFDictionaryRef)properties);
+    }];
+    XCTAssertTrue(CGImageDestinationFinalize(destination));
+    CFRelease(destination);
+    return URL;
+}
+
+- (void)testAGIFIsAnAnimationThatPlaysOnceAndEndsOnItsLastFrame {
+    NSURL *URL = [self gifFileURL];
+    id<CYLTabBarItemAnimator> animator = [CYLTabBarItemAnimatorRegistry animatorForURL:URL];
+    XCTAssertEqualObjects(animator.identifier, @"GIF");
+    UIImageView<CYLTabBarItemAnimationPlayableView> *view = (id)[animator animationViewWithURL:URL size:CGSizeMake(24, 24) contentMode:UIViewContentModeScaleAspectFit];
+    XCTAssertTrue(CGSizeEqualToSize(view.bounds.size, CGSizeMake(24, 24)));
+    UIImage *firstFrame = view.image;
+    XCTAssertNotNil(firstFrame, @"a tab shows its first frame until it is selected");
+
+    [view cyl_playAnimationView];
+    CAKeyframeAnimation *animation = (CAKeyframeAnimation *)[view.layer animationForKey:view.layer.animationKeys.firstObject];
+    XCTAssertEqual(animation.values.count, 3U);
+    XCTAssertEqual(animation.repeatCount, 0.f, @"once, not a loop");
+    XCTAssertEqualWithAccuracy(animation.duration, 1.0, 0.01);
+    XCTAssertEqualWithAccuracy(animation.keyTimes[2].doubleValue, 0.3, 0.01, @"each frame keeps its own delay");
+    XCTAssertNotEqual(view.image.CGImage, firstFrame.CGImage, @"the end state is the last frame");
+    UIImage *lastFrame = view.image;
+
+    [view cyl_stopAnimationView];
+    XCTAssertNil(view.layer.animationKeys);
+    XCTAssertEqual(view.image.CGImage, firstFrame.CGImage, @"stopping goes back to the first frame");
+
+    [view cyl_showAnimationViewLastFrame];
+    XCTAssertNil(view.layer.animationKeys, @"the tab selected at launch shows the last frame without playing");
+    XCTAssertEqual(view.image.CGImage, lastFrame.CGImage);
+}
+
+- (void)testTheGIFKeysAreAliasesOfTheGenericKeys {
+    NSURL *URL = [self gifFileURL];
+    XCTAssertEqualObjects(CYLTabBarItemAnimationURLFromAttributes(@{ CYLTabBarGIFURL : URL }, NULL), URL);
+    NSString *filePath = nil;
+    XCTAssertEqualObjects(CYLTabBarItemAnimationURLFromAttributes(@{ CYLTabBarGIFFilePath : URL.path }, &filePath).path, URL.path);
+    XCTAssertEqualObjects(filePath, URL.path);
+}
+
+- (void)testAGIFGivenAsAnImageStillLoops {
+    UIImage *image = [UIImage cyl_animatedImageWithGIFData:[NSData dataWithContentsOfURL:[self gifFileURL]]];
+    XCTAssertEqual(image.images.count, 3U);
+    XCTAssertEqualWithAccuracy(image.duration, 1.0, 0.01);
+}
+
+- (void)testAFileThatIsNotAGIFMakesNoView {
+    NSURL *URL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl_missing.gif"]];
+    [[NSFileManager defaultManager] removeItemAtURL:URL error:NULL];
+    XCTAssertNil([[CYLTabBarItemAnimatorRegistry animatorForURL:URL] animationViewWithURL:URL size:CGSizeMake(24, 24) contentMode:UIViewContentModeScaleAspectFit]);
+}
+
 @end
 
 @interface CYLThemeAnimationTests : XCTestCase
