@@ -22,7 +22,7 @@ class DemoPlusButton(context: Context) : CYLPlusButton(context) {
             setColor(Color.rgb(0, 122, 255))
         }
         setImageDrawable(ContextCompat.getDrawable(context, android.R.drawable.ic_input_add))
-        setColorFilter(Color.WHITE)
+        imageView.setColorFilter(Color.WHITE)
         minimumWidth = (56 * density).toInt()
         minimumHeight = (56 * density).toInt()
         touchableAreaScale = 1.2f

@@ -145,6 +145,67 @@ class CYLTabBarControllerTest {
         CYLPlusButton.removePlusButtonForTabBarContext("plus-test")
     }
 
+    object TitledPlusButton : CYLPlusButtonSubclassing {
+        override fun plusButton(context: android.content.Context) = CYLPlusButton.cyl_plusButtonWithImage(context, android.graphics.drawable.ColorDrawable(Color.BLUE).apply { setBounds(0, 0, 120, 120) }, "Plus", "Plus!", Color.RED).apply {
+            minimumWidth = 120; minimumHeight = 120
+            touchableAreaOutsets = CYLEdgeInsets(20f, 0f, 0f, 0f)
+        }
+        override fun indexOfPlusButtonInTabBar() = 1
+        override fun alignsTitleWithTabBarItemTitles() = true
+        override fun tabBarItemIdentifier() = "plus"
+        override fun tabBarContext() = "titled-plus"
+    }
+
+    @Test
+    fun plusButtonTitleAlignsWithTabTitlesAndTakesTouchesAboveTheBar() = withActivity { activity ->
+        CYLPlusButton.registerPlusButton(TitledPlusButton)
+        val controller = CYLTabBarController(activity, listOf(Page(), Page()), attributes("Home", "Me"), CYLEnums.CYLTabBarStyleType.Default, "titled-plus")
+        activity.setContentView(controller.view)
+        controller.view.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(1920, View.MeasureSpec.EXACTLY))
+        controller.view.layout(0, 0, 1080, 1920)
+        idle()
+        val plus = controller.tabBar.plusButton!!
+        assertEquals("plus", plus.cyl_tabBarItemIdentifier)
+        assertTrue(plus.cyl_showsTitleInTabBarItem())
+        assertEquals("Plus", plus.titleLabel.text)
+        val reference = controller.tabBar.tabBarButtonArray[0]
+        val tabTitleCenter = reference.top + (reference.titleLabel.top + reference.titleLabel.bottom) / 2
+        val plusTitleCenter = plus.top + (plus.titleLabel.top + plus.titleLabel.bottom) / 2
+        assertTrue("plus title line $plusTitleCenter near tab title line $tabTitleCenter", kotlin.math.abs(plusTitleCenter - tabTitleCenter) <= 2)
+        assertEquals(reference.titleLabel.textSize, plus.titleLabel.textSize, 0.5f)
+        assertEquals(1, controller.tabBar.plusButtonIndex())
+        assertEquals(2, CYLTabBar.CYLTabbarItemsCount)
+        assertEquals(1, CYLTabBar.CYLPlusButtonIndex)
+        // [EN] A touch 10 px above the bar, inside the outsets, reaches the plus button (#91). [CN] TabBar 上方 10 px、outsets 之内的触摸到达 PlusButton（#91）。
+        val x = (plus.left + plus.right) / 2f
+        assertTrue(controller.tabBar.cyl_plusButtonTouchable(x, plus.top - 10f))
+        assertFalse(controller.tabBar.cyl_plusButtonTouchable(x, plus.top - 200f))
+        plus.setTabLabelHidden(true)
+        assertFalse(plus.cyl_showsTitleInTabBarItem())
+        CYLPlusButton.removePlusButtonForTabBarContext("titled-plus")
+        assertFalse(controller.hasPlusButton())
+    }
+
+    @Test
+    fun fragmentExtensionsFindTheTabAndSelectOthers() = withActivity { activity ->
+        val pages = listOf(Page(), Page(), Page())
+        val controller = CYLTabBarController(activity, pages, attributes("Home", "Message", "Me"))
+        activity.setContentView(controller.view)
+        idle()
+        assertTrue(pages[1].cyl_isEmbedInTabBarController)
+        assertEquals(1, pages[1].cyl_tabIndex)
+        assertEquals("message", pages[1].cyl_tabBarItemIdentifier)
+        assertEquals(controller.tabBar.tabBarButtonArray[1], pages[1].cyl_tabButton)
+        pages[1].cyl_showBadgeValue("5")
+        assertTrue(controller.tabBar.tabBarButtonArray[1].cyl_isShowBadge())
+        assertEquals(pages[2], pages[0].cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier("me"))
+        assertEquals(2, controller.selectedIndex)
+        assertEquals(pages[0], pages[2].cyl_popSelectTabBarChildViewControllerForClassType(Page::class.java))
+        assertEquals(0, controller.selectedIndex)
+        assertTrue(pages[0].cyl_isEqualToViewController(pages[0]))
+        assertFalse(pages[0].cyl_isEqualToViewController(pages[1]))
+    }
+
     @Test
     fun reloadUpdatesTitlesAndKeepsPages() = withActivity { activity ->
         val pages = listOf(Page(), Page())
@@ -181,7 +242,7 @@ class CYLTabBarControllerTest {
 
     @Test
     fun configurationFromTheSharedFileResolvesPagesByIdAndSkipsTheRest() = withActivity { activity ->
-        val json = File(System.getProperty("cyl.sharedConfiguration")).readText()
+        val json = File(requireNotNull(System.getProperty("cyl.sharedConfiguration"))).readText()
         val registry = CYLTabBarPageRegistry()
         registry.registerPageProvider({ _, _ -> Page() }, listOf("home", "message", "me"))
         registry.registerPageFactory({ request -> if (request.parameters["url"] != null) Page() else null }, "web")

@@ -22,6 +22,9 @@ import androidx.annotation.ColorInt
  */
 class CYLBadgeView(context: Context) : View(context) {
 
+    /** [EN] The view the badge belongs to. [CN] 角标所属的视图。 */
+    var host: View? = null
+        internal set
     var text: String? = null
         set(value) {
             field = value
@@ -152,6 +155,7 @@ fun View.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnima
     val host = cyl_getActualBadgeSuperView() ?: return
     val badge = state.badge ?: CYLBadgeView(context).also {
         state.badge = it
+        it.host = this
         host.addView(it, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
     if (badge.parent !== host) {
@@ -221,7 +225,7 @@ fun View.cyl_isHidden(): Boolean {
 }
 
 /** [EN] `-cyl_getActualBadgeSuperView`: the parent the badge is added to. [CN] 角标实际添加到的父视图。 */
-fun View.cyl_getActualBadgeSuperView(): ViewGroup? = (this as? CYLTabBarItemButton) ?: (parent as? ViewGroup)
+fun View.cyl_getActualBadgeSuperView(): ViewGroup? = (this as? CYLTabBarItemButton) ?: (this as? CYLPlusButton) ?: (parent as? ViewGroup)
 
 /** [EN] `-cyl_isReady`: the view is laid out. [CN] 视图已布局。 */
 fun View.cyl_isReady(): Boolean = width > 0 && height > 0
@@ -236,7 +240,7 @@ fun View.cyl_refreshBadge() {
     val host = badge.parent as? ViewGroup ?: return
     badge.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
     val density = resources.displayMetrics.density
-    val anchor = if (this is CYLTabBarItemButton) iconView else this
+    val anchor = when (this) { is CYLTabBarItemButton -> iconView; is CYLPlusButton -> imageView; else -> this }
     val anchorRight = if (host === this) anchor.right else right
     val anchorTop = if (host === this) anchor.top else top
     val params = badge.layoutParams as? FrameLayout.LayoutParams ?: FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)

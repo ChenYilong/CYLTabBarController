@@ -964,11 +964,13 @@
  },
  "+multiplierOfTabBarHeight:": {
   "status": "done",
-  "android": "CYLPlusButtonSubclassing.multiplierOfTabBarHeight()"
+  "android": "CYLPlusButtonSubclassing.multiplierOfTabBarHeight()",
+  "note": "NaN means \"not implemented\": the preset applies"
  },
  "+constantOfPlusButtonCenterYOffsetForTabBarHeight:": {
   "status": "done",
-  "android": "CYLPlusButtonSubclassing.constantOfPlusButtonCenterYOffsetForTabBarHeight()"
+  "android": "CYLPlusButtonSubclassing.constantOfPlusButtonCenterYOffsetForTabBarHeight()",
+  "note": "NaN means \"not implemented\": the preset applies"
  },
  "+plusChildViewController": {
   "status": "done",
@@ -1043,14 +1045,12 @@
   "android": "CYLPlusButton.touchableAreaScale"
  },
  "CYLPlusButton showsTouchableArea": {
-  "status": "partial",
-  "android": "CYLPlusButton.showsTouchableArea",
-  "note": "kept, not drawn"
+  "status": "done",
+  "android": "CYLPlusButton.showsTouchableArea"
  },
  "CYLPlusButton touchableAreaColor": {
-  "status": "partial",
-  "android": "CYLPlusButton.touchableAreaColor",
-  "note": "kept, not drawn"
+  "status": "done",
+  "android": "CYLPlusButton.touchableAreaColor"
  },
  "CYLPlusButton -touchableRectInView:": {
   "status": "done",
@@ -1065,9 +1065,8 @@
   "android": "CYLPlusButton.cyl_showsTitleInTabBarItem"
  },
  "CYLPlusButton cyl_appliesCenterYOffsetWithoutTitle": {
-  "status": "partial",
-  "android": "CYLPlusButton.cyl_appliesCenterYOffsetWithoutTitle",
-  "note": "kept, not drawn"
+  "status": "done",
+  "android": "CYLPlusButton.cyl_appliesCenterYOffsetWithoutTitle"
  },
  "CYLPlusButton +cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:": {
   "status": "done",
@@ -1835,23 +1834,28 @@
  },
  "CYLTabbarItemsCount": {
   "status": "done",
-  "android": "CYLConstants.CYLTabbarItemsCount"
+  "android": "CYLTabBar.CYLTabbarItemsCount",
+  "note": "updated by the latest tab bar layout (dp)"
  },
  "CYLPlusButtonIndex": {
   "status": "done",
-  "android": "CYLConstants.CYLPlusButtonIndex"
+  "android": "CYLTabBar.CYLPlusButtonIndex",
+  "note": "updated by the latest tab bar layout (dp)"
  },
  "CYLPlusButtonWidth": {
   "status": "done",
-  "android": "CYLConstants.CYLPlusButtonWidth"
+  "android": "CYLTabBar.CYLPlusButtonWidth",
+  "note": "updated by the latest tab bar layout (dp)"
  },
  "CYLTabBarItemWidth": {
   "status": "done",
-  "android": "CYLConstants.CYLTabBarItemWidth"
+  "android": "CYLTabBar.CYLTabBarItemWidth",
+  "note": "updated by the latest tab bar layout (dp)"
  },
  "CYLTabBarHeight": {
   "status": "done",
-  "android": "CYLConstants.CYLTabBarHeight"
+  "android": "CYLTabBar.CYLTabBarHeight",
+  "note": "updated by the latest tab bar layout (dp)"
  },
  "CYLTabBarLoginStateDidChangeNotification": {
   "status": "done",
@@ -4761,156 +4765,161 @@
   "note": "the iOS demo settings list, not library behavior"
  },
  "UIViewController(CYLTabBarControllerExtention)": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment extensions (UIViewController+CYLTabBarControllerExtention.kt)"
  },
  "UIViewController(CYLTabBarControllerExtention) cyl_tabBarItem": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "n/a",
+  "note": "FlatDesign"
  },
  "UIViewController(CYLTabBarControllerExtention) cylflatdesign_tabBarController": {
   "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "note": "FlatDesign"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_isSystemStyleTabBar": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_isSystemStyleTabBar()"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_isFlatDesignStyleTabBar": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "Fragment.cyl_isFlatDesignStyleTabBar()"
  },
  "UIViewController(CYLTabBarControllerExtention) cyl_embedInTabBarController": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_isEmbedInTabBarController"
  },
  "UIViewController(CYLTabBarControllerExtention) cyl_tabIndex": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_tabIndex"
  },
  "UIViewController(CYLTabBarControllerExtention) cyl_tabBarItemIdentifier": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_tabBarItemIdentifier"
  },
  "UIViewController(CYLTabBarControllerExtention) cyl_tabButton": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_tabButton"
  },
  "UIViewController(CYLTabBarControllerExtention) cyl_plusViewControllerEverAdded": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "CYLPlusButton.cyl_plusViewControllerEverAdded"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_isShowBadge": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_isShowBadge()"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_showBadge": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_showBadge()"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_showBadgeValue:animationType:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_showBadgeValue(value, animationType)"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_clearBadge": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_clearBadge()"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_resumeBadge": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_resumeBadge()"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_isPauseBadge": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_isPauseBadge()"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerAtIndex:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_popSelectTabBarChildViewControllerAtIndex(index, animated, block)"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerAtIndex:animated:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_popSelectTabBarChildViewControllerAtIndex(index, animated, block)"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerAtIndex:completion:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_popSelectTabBarChildViewControllerAtIndex(index, animated, block)"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForClassType:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_popSelectTabBarChildViewControllerForClassType(classType, animated, block)"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForClassType:completion:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_popSelectTabBarChildViewControllerForClassType(classType, animated, block)"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier(identifier, animated, block)"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:animated:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier(identifier, animated, block)"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:completion:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier(identifier, animated, block)"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_pushOrPopToViewController:animated:callback:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_pushOrPopToViewController(viewController, animated, completion)",
+  "note": "a child Fragment on the back stack stands in for the navigation controller"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_pushOrPopToViewController:animated:tabBarItemIdentifier:callback:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_pushOrPopToViewController(viewController, animated, completion)",
+  "note": "a child Fragment on the back stack stands in for the navigation controller"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_pushViewController:animated:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_pushViewController(viewController, animated)",
+  "note": "a child Fragment on the back stack stands in for the navigation controller"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_handleNavigationBackAction": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_handleNavigationBackAction()",
+  "note": "a child Fragment on the back stack stands in for the navigation controller"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_handleNavigationBackActionWithAnimated:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_handleNavigationBackActionWithAnimated(animated)",
+  "note": "a child Fragment on the back stack stands in for the navigation controller"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_visiableTabButton": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_visiableTabButton()"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_isEqualToViewController:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_isEqualToViewController(compared)"
  },
  "UIViewController(CYLTabBarControllerExtention) -cyl_addChildViewController:": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment.cyl_addChildViewController(child)"
  },
  "UIViewController(CYLTabBarControllerExtentionDeprecated)": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "done",
+  "android": "Fragment extensions (UIViewController+CYLTabBarControllerExtention.kt)"
  },
  "UIViewController(CYLTabBarControllerExtentionDeprecated) -cyl_showTabBadgePoint": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "n/a",
+  "note": "deprecated on iOS since 1.19.0; use the badge methods"
  },
  "UIViewController(CYLTabBarControllerExtentionDeprecated) -cyl_removeTabBadgePoint": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "n/a",
+  "note": "deprecated on iOS since 1.19.0; use the badge methods"
  },
  "UIViewController(CYLTabBarControllerExtentionDeprecated) -cyl_isShowTabBadgePoint": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "n/a",
+  "note": "deprecated on iOS since 1.19.0; use the badge methods"
  },
  "UIViewController(CYLTabBarControllerExtentionDeprecated) instead": {
   "status": "planned",
   "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
  },
  "UIViewController(CYLTabBarControllerExtentionDeprecated) cyl_tabBarSpacingInViewCoordinator": {
-  "status": "planned",
-  "note": "the view controller helpers (navigation bar, selection shortcuts) are not ported"
+  "status": "n/a",
+  "note": "a UIKit layout value"
  },
  "CYLTabBarItemUpdateRow": {
   "status": "n/a",

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.MotionEvent
 import android.view.HapticFeedbackConstants
 import android.view.SoundEffectConstants
 import android.view.View
@@ -51,7 +52,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     // MARK: - Views
 
     /** [EN] The root view: the pages above the tab bar. [CN] 根视图：页面在 TabBar 之上。 */
-    val view: ViewGroup = LinearLayout(activity).apply { orientation = LinearLayout.VERTICAL }
+    val view: ViewGroup = CYLTabBarControllerView(activity).also { it.controller = this }
     /** [EN] The container of the pages. [CN] 页面容器。 */
     val pagesContainer: FrameLayout = FrameLayout(activity).apply { id = View.generateViewId() }
     /** [EN] `tabBar` / `cyl_tabBar`. [CN] TabBar。 */
@@ -232,6 +233,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         if (selectedIndex >= viewControllers.size) selectedIndex = 0
         commitPages()
         tabBar.cyl_reloadTabButtons()
+        loadImageURLs()
         cyl_applyLaunchTabBarThemeIfNeeded()
         viewDidLayoutSubviewsBlock?.invoke(this)
     }
@@ -261,6 +263,15 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         item.cyl_tabBarItemAnimationSizeValue = listOf(CYLConstants.CYLTabBarAnimationSize, CYLConstants.CYLTabBarLottieSize, CYLConstants.CYLTabBarPAGSize, CYLConstants.CYLTabBarRiveSize)
             .firstNotNullOfOrNull { CYLTabBarConfiguration.sizeValue(attributes[it]) }
         return item
+    }
+
+    /** [EN] `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL` / `CYLTabBarItemImageURLSize`: icons downloaded after the tabs exist. [CN] 网络图标：Tab 创建后下载。 */
+    private fun loadImageURLs() {
+        tabBarItemsAttributes.forEachIndexed { index, attributes ->
+            val url = attributes[CYLConstants.CYLTabBarItemImageURL] as? String ?: return@forEachIndexed
+            val selected = attributes[CYLConstants.CYLTabBarItemSelectedImageURL] as? String
+            setTabBarItemIconWithURL(url, selected, CYLTabBarConfiguration.sizeValue(attributes[CYLConstants.CYLTabBarItemImageURLSize]), index)
+        }
     }
 
     private fun showSelectedPage() {
@@ -327,6 +338,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             if (!child.isAdded) transaction.add(pagesContainer.id, child, "$fragmentTag-plus")
             for (page in viewControllers) if (page.isAdded) transaction.hide(page)
             transaction.show(child).commitNowAllowingStateLoss()
+            plusButton.cyl_plusViewControllerEverAdded = true
             tabBar.plusButtonActive = true
             tabBar.refreshSelection()
             delegate?.tabBarController_didSelectViewController(this, child)
@@ -383,8 +395,10 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     /** [EN] `-setTabBarItemIcon:selectedIcon:size:atIndex:`. [CN] 设置图标。 */
     fun setTabBarItemIcon(icon: android.graphics.drawable.Drawable?, selectedIcon: android.graphics.drawable.Drawable?, size: CYLSize?, index: Int) {
         val item = tabBarItems.getOrNull(index) ?: return
-        item.image = icon
-        item.selectedImage = selectedIcon ?: icon
+        if (icon == null && selectedIcon == null) return
+        item.image = icon ?: item.image
+        item.selectedImage = selectedIcon ?: icon ?: item.selectedImage
+        size?.let { item.cyl_iconSize = it }
         tabBar.refreshSelection()
     }
 
@@ -709,15 +723,29 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     companion object {
         private const val TAG = "CYLTabBarController"
-        private val active = WeakHashMap<CYLTabBarController, Boolean>()
+        private val active = WeakHashMap<CYLTabBarController, Long>()
+        private var created = 0L
 
-        private fun registerActive(controller: CYLTabBarController) { synchronized(active) { active[controller] = true } }
+        private fun registerActive(controller: CYLTabBarController) { synchronized(active) { active[controller] = ++created } }
 
         /** [EN] `+cyl_activeTabBarController`: the most recently created live controller. [CN] 最近创建且仍存活的控制器。 */
-        @JvmStatic fun cyl_activeTabBarController(): CYLTabBarController? = synchronized(active) { active.keys.lastOrNull() }
+        @JvmStatic fun cyl_activeTabBarController(): CYLTabBarController? = synchronized(active) { active.entries.maxByOrNull { it.value }?.key }
 
-        /** [EN] `+cyl_tabBarControllerForContext:`. [CN] 某 context 的控制器。 */
-        @JvmStatic fun cyl_tabBarControllerForContext(context: String?): CYLTabBarController? = synchronized(active) { active.keys.lastOrNull { (it.context ?: CYLPlusButton.DEFAULT_TAB_BAR_CONTEXT) == (context ?: CYLPlusButton.DEFAULT_TAB_BAR_CONTEXT) } }
+        /** [EN] `+cyl_tabBarControllerForContext:`: the most recent live controller of that context. [CN] 该 context 最近创建且仍存活的控制器。 */
+        @JvmStatic fun cyl_tabBarControllerForContext(context: String?): CYLTabBarController? = synchronized(active) {
+            active.entries.filter { (it.key.context ?: CYLPlusButton.DEFAULT_TAB_BAR_CONTEXT) == (context ?: CYLPlusButton.DEFAULT_TAB_BAR_CONTEXT) }.maxByOrNull { it.value }?.key
+        }
+
+        /** [EN] The live controller that holds `fragment` (or one of its parents) as a tab. [CN] 以 `fragment`（或其父 Fragment）为 Tab 的存活控制器。 */
+        @JvmStatic fun cyl_tabBarControllerOfFragment(fragment: Fragment): CYLTabBarController? {
+            val controllers = synchronized(active) { active.entries.sortedByDescending { it.value }.map { it.key } }
+            var candidate: Fragment? = fragment
+            while (candidate != null) {
+                controllers.firstOrNull { candidate in it.viewControllers || it.tabBar.plusButton?.provider?.plusChildViewController() === candidate }?.let { return it }
+                candidate = candidate.parentFragment
+            }
+            return null
+        }
 
         /** [EN] `+cyl_simulateMemoryWarning`: nothing to free on Android (hidden fragments keep their views). [CN] Android 上无需释放。 */
         @JvmStatic fun cyl_simulateMemoryWarning() = Unit
@@ -759,15 +787,41 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     }
 }
 
+/**
+ * [EN] The root view: the pages above the tab bar. A touch in the plus button's touchable rect above the bar (#91) goes to
+ *      the plus button, which is what `-hitTest:withEvent:` does on iOS.
+ * [CN] 根视图：页面在 TabBar 之上。落在 TabBar 上方 PlusButton 可点击矩形内的触摸（#91）交给 PlusButton，对应 iOS 的 `-hitTest:withEvent:`。
+ */
+class CYLTabBarControllerView(context: Context) : LinearLayout(context) {
+    internal var controller: CYLTabBarController? = null
+    private var routedToPlus = false
+
+    init {
+        orientation = VERTICAL
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        val tabBar = controller?.tabBar ?: return super.dispatchTouchEvent(event)
+        if (tabBar.visibility != View.VISIBLE) return super.dispatchTouchEvent(event)
+        val x = event.x - tabBar.left
+        val y = event.y - tabBar.top
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+            routedToPlus = y < 0 && tabBar.cyl_plusButtonTouchable(x, y)
+        }
+        if (routedToPlus) {
+            val inBar = MotionEvent.obtain(event).apply { setLocation(x, y) }
+            val handled = tabBar.cyl_dispatchTouchToPlusButton(inBar)
+            inBar.recycle()
+            if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) routedToPlus = false
+            return handled
+        }
+        return super.dispatchTouchEvent(event)
+    }
+}
+
 /** [EN] `NSObject (CYLTabBarControllerReferenceExtension)`: the tab bar controller of a Fragment. [CN] Fragment 所属的 TabBarController。 */
 val Fragment.cyl_tabBarController: CYLTabBarController?
-    get() = CYLTabBarController.cyl_activeTabBarController()?.takeIf { this in it.viewControllers } ?: cyl_owningTabBarController()
+    get() = CYLTabBarController.cyl_tabBarControllerOfFragment(this)
 
-fun Fragment.cyl_owningTabBarController(): CYLTabBarController? {
-    var fragment: Fragment? = this
-    while (fragment != null) {
-        CYLTabBarController.cyl_activeTabBarController()?.let { controller -> if (fragment in controller.viewControllers) return controller }
-        fragment = fragment.parentFragment
-    }
-    return null
-}
+/** [EN] `-cyl_owningTabBarController`: the controller this page (or a parent) is a tab of. [CN] 本页面（或其父页面）所属的控制器。 */
+fun Fragment.cyl_owningTabBarController(): CYLTabBarController? = CYLTabBarController.cyl_tabBarControllerOfFragment(this)

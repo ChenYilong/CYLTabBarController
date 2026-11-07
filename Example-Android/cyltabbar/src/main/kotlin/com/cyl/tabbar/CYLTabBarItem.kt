@@ -40,6 +40,8 @@ class CYLTabBarItem(attributes: Map<String, Any?> = emptyMap()) {
     var cyl_imagePositionAdjustment: CYLOffset = CYLOffset.zero
     var cyl_titlePositionAdjustment: CYLOffset = CYLOffset.zero
     var cyl_imageInsets: CYLEdgeInsets = CYLEdgeInsets.zero
+    /** [EN] An icon size (dp) set by `setTabBarItemIcon:selectedIcon:size:atIndex:` / `CYLTabBarItemImageURLSize`; null: the placeholder size. [CN] 由图标接口或 `CYLTabBarItemImageURLSize` 设置的图标尺寸（dp）；null 为占位尺寸。 */
+    var cyl_iconSize: CYLSize? = null
     /** [EN] `cyl_doubleTapBlock`: called with the item and its index on a double tap (#535). [CN] 双击回调（#535）。 */
     var cyl_doubleTapBlock: ((CYLTabBarItem, Int) -> Unit)? = null
     /** [EN] `cyl_viewDidLayoutSubviewsBlock`: called after the tab bar laid the tab's button out. [CN] 该 Tab 按钮布局完成后的回调。 */
