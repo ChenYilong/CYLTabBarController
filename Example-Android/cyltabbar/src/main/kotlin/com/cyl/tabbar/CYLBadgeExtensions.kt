@@ -220,7 +220,22 @@ private data class CYLBadgeSample(
     val cornerRadius: Float? = null,
     val reduceMotion: Boolean = false,
     val position: String? = null,
+    /** [EN] An iOS factory animation (`CYLBadgeHelperAnimation`) that no `CYLBadgeAnimationType` matches. [CN] 没有对应 `CYLBadgeAnimationType` 的 iOS 工厂动画（`CYLBadgeHelperAnimation`）。 */
+    val factory: ((CYLBadgeView) -> android.animation.Animator)? = null,
 )
+
+/** [EN] `cyl_rotationAnimationWithDuration:2 degree:2π direction:CYLAxisZ repeatCount:HUGE_VALF`: a full turn in the screen plane every 2 s. [CN] 每 2 秒在屏幕平面内转一整圈。 */
+private val CYLBadgeRotationForever: (CYLBadgeView) -> android.animation.Animator = { badge ->
+    android.animation.ObjectAnimator.ofFloat(badge, View.ROTATION, 0f, 360f).setDuration(2000).apply {
+        repeatCount = android.animation.ObjectAnimator.INFINITE
+        interpolator = android.view.animation.LinearInterpolator()
+    }
+}
+
+/** [EN] `cyl_rotationAnimationWithDuration:1 degree:π direction:CYLAxisY repeatCount:2`: half a turn around the vertical axis, twice. [CN] 绕竖直轴转半圈，共两次。 */
+private val CYLBadgeFlipTwice: (CYLBadgeView) -> android.animation.Animator = { badge ->
+    android.animation.ObjectAnimator.ofFloat(badge, View.ROTATION_Y, 0f, 180f).setDuration(1000).apply { repeatCount = 1 }
+}
 
 /** [EN] Every badge style and animation, in the order of the iOS samples. [CN] 每种角标样式与动画，顺序与 iOS 示例相同。 */
 private val CYLBadgeSamples: List<CYLBadgeSample> = run {
@@ -230,13 +245,13 @@ private val CYLBadgeSamples: List<CYLBadgeSample> = run {
         CYLBadgeSample("Bounce (forever)", "CYLBadgeAnimationTypeBounce", "3", CYLEnums.CYLBadgeAnimationType.Bounce),
         CYLBadgeSample("Breathe (forever)", "CYLBadgeAnimationTypeBreathe", "", CYLEnums.CYLBadgeAnimationType.Breathe),
         CYLBadgeSample("Shake, stops with Reduce Motion", "cyl_badgeRespectsReduceMotion", "3", CYLEnums.CYLBadgeAnimationType.Shake, reduceMotion = true),
-        CYLBadgeSample("Rotation (forever)", "cyl_rotationAnimationWithDuration:", "new", CYLEnums.CYLBadgeAnimationType.RollingOnce, repeats = -1),
+        CYLBadgeSample("Rotation (forever)", "cyl_rotationAnimationWithDuration:", "new", factory = CYLBadgeRotationForever),
         CYLBadgeSample("Spring (forever)", "cyl_springAnimationForDuration:", "3", CYLEnums.CYLBadgeAnimationType.ScaleOnce, repeats = -1),
         CYLBadgeSample("Shake ×3 (cyl_shakeAnimationRepeatTimes)", null, "3", CYLEnums.CYLBadgeAnimationType.Shake, repeats = 3),
         CYLBadgeSample("Bounce ×3 (cyl_bounceAnimationRepeatTimes)", null, "3", CYLEnums.CYLBadgeAnimationType.Bounce, repeats = 3),
         CYLBadgeSample("Scale ×3", "cyl_scaleAnimationFromScale:", "3", CYLEnums.CYLBadgeAnimationType.Scale, repeats = 3),
         CYLBadgeSample("Blink ×3", "cyl_opacityTimesAnimationRepeatTimes:", "", CYLEnums.CYLBadgeAnimationType.Breathe, repeats = 3),
-        CYLBadgeSample("Flip ×2", "cyl_rotationAnimationWithDuration:", "3", CYLEnums.CYLBadgeAnimationType.RollingOnce, repeats = 2),
+        CYLBadgeSample("Flip ×2", "cyl_rotationAnimationWithDuration:", "3", factory = CYLBadgeFlipTwice),
         CYLBadgeSample("Left to right once", "CYLBadgeAnimationTypeLeftRightOnce", "3", CYLEnums.CYLBadgeAnimationType.LeftRightOnce),
         CYLBadgeSample("Right to left once", "CYLBadgeAnimationTypeRightLeftOnce", "3", CYLEnums.CYLBadgeAnimationType.RightLeftOnce),
         CYLBadgeSample("Fade in once", "CYLBadgeAnimationTypeFadeInOnce", "3", CYLEnums.CYLBadgeAnimationType.FadeInOnce),
@@ -280,16 +295,34 @@ fun cyl_badgeStyleCount(): Int = CYLBadgeSamples.size
  *      with the row). Rows are reused: the previous badge and options are cleared first.
  * [CN] 在行的图标视图上显示示例图标与该行的角标（样式与动画随行变化）。行会复用：先清除之前的角标与选项。
  */
+/**
+ * [EN] `+cyl_badgeIcon`: the sample icon of the badge rows, the library's `cyl_badge_sample_icon` (the iOS resource bundle's
+ *      image) with 6 dp rounded corners on a 30 dp square, as on iOS; a blue square if the image cannot be decoded.
+ * [CN] `+cyl_badgeIcon`：角标示例行的图标，即库自带的 `cyl_badge_sample_icon`（iOS 资源 bundle 中的图片），在 30 dp 正方形上带 6 dp 圆角，
+ *      与 iOS 相同；图片无法解码时为蓝色方块。
+ */
+fun cyl_badgeIcon(view: View): android.graphics.drawable.Drawable {
+    val density = view.resources.displayMetrics.density
+    val bitmap = android.graphics.BitmapFactory.decodeResource(view.resources, R.drawable.cyl_badge_sample_icon)
+        ?: return GradientDrawable().apply { cornerRadius = 6 * density; setColor(Color.rgb(0, 122, 255)); setSize((30 * density).toInt(), (30 * density).toInt()) }
+    return androidx.core.graphics.drawable.RoundedBitmapDrawableFactory.create(view.resources, bitmap).apply {
+        cornerRadius = bitmap.width * 6f / 30f
+        setAntiAlias(true)
+    }
+}
+
 fun ImageView.cyl_showBadgeForRow(row: Int) {
     val sample = sampleForRow(row)
     val density = resources.displayMetrics.density
-    setImageDrawable(GradientDrawable().apply { cornerRadius = 6 * density; setColor(Color.rgb(0, 122, 255)); setSize((30 * density).toInt(), (30 * density).toInt()) })
-    (parent as? ViewGroup)?.clipChildren = false
+    setImageDrawable(cyl_badgeIcon(this))
+    // [EN] The badge rises above the icon, past the row's top while it animates: neither the row nor the list clips it (iOS: `clipsToBounds = NO`). [CN] 角标凸出图标，动画时会超出行的顶部：行与列表都不裁剪它（iOS：`clipsToBounds = NO`）。
+    (parent as? ViewGroup)?.let { row -> row.clipChildren = false; (row.parent as? ViewGroup)?.clipChildren = false }
     cyl_clearBadge()
     cyl_resetBadgeAppearance()
     applyBadgeSample(sample)
     cyl_showBadgeValue(sample.value, if (sample.repeats == 0) sample.animationType else CYLEnums.CYLBadgeAnimationType.None)
     if (sample.repeats != 0) repeatBadgeSampleAnimation(sample)
+    sample.factory?.let { factory -> cyl_badge?.let { badge -> badge.playAnimator(factory(badge)) } }
 }
 
 /** [EN] The appearance options of a sample row. [CN] 示例行的外观选项。 */

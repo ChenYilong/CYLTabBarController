@@ -300,9 +300,14 @@ object DemoTabs {
     val titles = listOf("Home", "Message", "Discover", "Me")
     val pages = listOf(DemoCatalog.HOME, DemoCatalog.MESSAGE, DemoCatalog.DISCOVER, DemoCatalog.ME)
 
+    /** [EN] The ObjC Example's tab images (copied into `assets/objc-example`), normal and selected. [CN] ObjC Example 的 Tab 图片（复制到 `assets/objc-example`），普通与选中。 */
+    private val objcImages = listOf("home", "message", "fishpond", "account")
+
     fun attributes(context: Context, count: Int = 4): List<Map<String, Any?>> = (0 until count).map { index ->
+        val name = objcImages[index % 4]
         mapOf(CYLConstants.CYLTabBarItemTitle to titles[index % 4] + (if (index >= 4) " ${index + 1}" else ""),
-              CYLConstants.CYLTabBarItemImage to androidx.core.content.ContextCompat.getDrawable(context, icons[index % 4]),
+              CYLConstants.CYLTabBarItemImage to (DemoAssets.drawable(context, "${name}_normal") ?: androidx.core.content.ContextCompat.getDrawable(context, icons[index % 4])),
+              CYLConstants.CYLTabBarItemSelectedImage to DemoAssets.drawable(context, "${name}_highlight"),
               CYLConstants.CYLTabBarItemIdentifier to pages[index % 4] + (if (index >= 4) "${index + 1}" else ""))
     }
 

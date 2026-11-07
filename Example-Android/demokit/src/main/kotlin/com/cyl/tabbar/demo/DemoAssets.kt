@@ -66,12 +66,17 @@ object DemoAssets {
 
     /** [EN] Decoded images, shared by every drawable made from them (one bitmap per name, density and appearance). [CN] 已解码的图片，由其生成的所有 drawable 共用（每个名称、密度与外观一个位图）。 */
     private val images = HashMap<String, Drawable.ConstantState>()
+    private val missing = HashSet<String>()
 
     /** [EN] The image `name` of the iOS assets (a new drawable over a shared bitmap), or null. [CN] iOS 资源中名为 `name` 的图片（共用位图的新 drawable），或 null。 */
     fun drawable(context: Context, name: String): Drawable? {
         val key = "$name@${context.resources.displayMetrics.densityDpi}@${isDark(context)}"
         synchronized(images) { images[key] }?.let { return it.newDrawable(context.resources) }
-        val drawable = decode(context, name) ?: return null
+        val drawable = decode(context, name) ?: run {
+            // [EN] Logged once per name: an image the iOS examples do not have (or this app does not package). [CN] 每个名称只记录一次：iOS 示例中没有（或本 App 未打包）的图片。
+            if (synchronized(missing) { missing.add(name) }) android.util.Log.w("CYLDemoAssets", "missing image: $name")
+            return null
+        }
         drawable.constantState?.let { state -> synchronized(images) { images[key] = state } }
         return drawable
     }

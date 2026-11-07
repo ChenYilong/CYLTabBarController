@@ -349,4 +349,33 @@ class CYLTabBarControllerTest {
             assertEquals("an item keeps tabBarHeight, above the navigation bar", itemsHeight, button.height)
         }
     }
+
+    /**
+     * [EN] A badge on a view that cannot hold children (an icon in a row): it stays on the icon's top-right corner instead of
+     *      joining the row's `LinearLayout`, and it fits its text when the text changes.
+     * [CN] 不能包含子视图的视图（行中的图标）上的角标：始终位于图标右上角，而不是成为行 `LinearLayout` 的子视图，并在文字变化时适配文字。
+     */
+    @Test
+    fun badgeOfAnIconInARowSitsOnItsCornerAndFitsItsText() = withActivity { activity ->
+        val row = android.widget.LinearLayout(activity).apply { orientation = android.widget.LinearLayout.HORIZONTAL }
+        val icon = android.widget.ImageView(activity)
+        row.addView(icon, android.widget.LinearLayout.LayoutParams(90, 90).apply { leftMargin = 40; topMargin = 30 })
+        row.addView(android.widget.TextView(activity).apply { text = "Title" })
+        activity.setContentView(row)
+        idle()
+        icon.cyl_showBadgeValue("3", CYLEnums.CYLBadgeAnimationType.None)
+        idle()
+        val badge = icon.cyl_badge!!
+        assertEquals("the badge does not join the row", 2, row.childCount)
+        assertEquals("centered on the icon's right edge", icon.right.toFloat(), (badge.left + badge.right) / 2f, 1f)
+        assertEquals("centered on the icon's top edge", icon.top.toFloat(), (badge.top + badge.bottom) / 2f, 1f)
+        val narrow = badge.width
+        icon.cyl_showBadgeValue("new", CYLEnums.CYLBadgeAnimationType.None)
+        assertTrue("\"new\" is wider than \"3\"", badge.width > narrow)
+        assertEquals(badge.measuredWidth, badge.width)
+        icon.cyl_badgeFont = CYLFont(20f)
+        assertEquals("a bigger font grows the badge", badge.measuredHeight, badge.height)
+        icon.cyl_clearBadge()
+        assertNull(icon.cyl_badge)
+    }
 }
