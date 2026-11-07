@@ -2,11 +2,25 @@
 // 纯 Kotlin（不依赖 Android）：页面注册表与配置规则，在 JVM 上测试。
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    `maven-publish`
+    signing
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
+    withJavadocJar()
+}
+
+// [EN] Published as io.github.chenyilong:cyltabbarcontroller-pages (scripts/publish-android.sh). [CN] 发布为 io.github.chenyilong:cyltabbarcontroller-pages。
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            artifactId = "cyltabbarcontroller-pages"
+            from(components["java"])
+        }
+    }
 }
 
 kotlin {

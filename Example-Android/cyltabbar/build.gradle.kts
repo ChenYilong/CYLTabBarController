@@ -3,6 +3,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    `maven-publish`
+    signing
 }
 
 android {
@@ -21,6 +23,12 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
     }
 
     testOptions {
@@ -48,4 +56,27 @@ tasks.withType<Test> {
     systemProperty("cyl.sharedConfiguration", rootProject.file("../CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations/cyl_tabbar_configuration.json").absolutePath)
     systemProperty("robolectric.dependency.repo.url", "https://maven-central.storage-download.googleapis.com/maven2")
     systemProperty("robolectric.dependency.repo.id", "central-mirror")
+}
+
+// [EN] Published as io.github.chenyilong:cyltabbarcontroller (scripts/publish-android.sh). Maven Central needs a javadoc jar:
+//      the Kotlin API is documented in docs/, so the jar carries those documents.
+// [CN] 发布为 io.github.chenyilong:cyltabbarcontroller（scripts/publish-android.sh）。Maven Central 需要 javadoc jar：Kotlin API
+//      的文档在 docs/ 中，因此该 jar 包含这些文档。
+val javadocJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("javadoc")
+    from(rootProject.file("../docs")) {
+        include("Android-Library.md", "Android-API-Map.md", "Configuration-File.md")
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                artifactId = "cyltabbarcontroller"
+                from(components["release"])
+                artifact(javadocJar)
+            }
+        }
+    }
 }

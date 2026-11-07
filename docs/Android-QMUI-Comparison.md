@@ -111,4 +111,4 @@
 
 | 中文 | English |
 |:---|:---|
-| 仍可补齐：发布到 Maven Central、在 GitHub Actions 中运行 Gradle 测试、让 `themeChangeAnimationDuration` 生效、一行代码绑定 ViewPager2、按权重分配 Tab 宽度。 | Still open: a Maven Central release, Gradle tests in GitHub Actions, a working `themeChangeAnimationDuration`, a one-line ViewPager2 binding, and tab widths by weight. |
+| 发布：`scripts/publish-android.sh` 已能一键发布到 Maven Central / GitHub Packages / Maven Local（见[发布到 Maven](Android-Library.md#cn发布到-maven)），首次发布需要维护者的凭据。仍可补齐：在 GitHub Actions 中运行 Gradle 测试、让 `themeChangeAnimationDuration` 生效、一行代码绑定 ViewPager2、按权重分配 Tab 宽度。 | Publishing: `scripts/publish-android.sh` publishes to Maven Central / GitHub Packages / Maven Local in one go (see [publishing to Maven](Android-Library.md#enpublishing-to-maven)); the first release needs the maintainer's credentials. Still open: Gradle tests in GitHub Actions, a working `themeChangeAnimationDuration`, a one-line ViewPager2 binding, and tab widths by weight. |

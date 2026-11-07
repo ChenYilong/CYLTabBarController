@@ -25,6 +25,7 @@
 | [模块](#cn模块) | [Modules](#enmodules) |
 | [用法](#cn用法) | [Usage](#enusage) |
 | [仅 Android 的扩展](#cn仅-android-的扩展) | [Android-only extensions](#enandroid-only-extensions) |
+| [发布到 Maven](#cn发布到-maven) | [Publishing to Maven](#enpublishing-to-maven) |
 | [测试](#cn测试) | [Tests](#entests) |
 | [限制](#cn限制) | [Limits](#enlimits) |
 
@@ -124,6 +125,38 @@ CYLThemeValues.setRuleHandler("elevation") { view, _, value -> view.elevation = 
 | `CYLThemeValues.register` / `unregister` | 让 Activity、Fragment、View、Dialog、Window、PopupWindow 在 TabBarController 之外也跟随主题；登记时立即应用当前主题。 | Lets an activity, fragment, view, dialog, window or popup window follow theme changes outside the tab bar controller; it gets the current theme when registered. |
 | `CYLThemeSpan`、`CYLThemeColorSpan`、`CYLThemeItemDecoration` | 主题变化时通知 TextView 文本中的 span 与 RecyclerView 的 ItemDecoration（RecyclerView 通过反射访问，库不依赖它），然后重绘。 | A theme change tells the spans of a TextView's text and the ItemDecorations of a RecyclerView (reached by reflection, so the library does not depend on it), then redraws. |
 | `cyl_interceptsThemeDispatch`、`CYLThemeDispatchInterceptor`、`cyl_ignoresThemeApply`、`cyl_themeValueManager`、`setRuleHandler` | 拦截某个子树、跳过视图自身、指定视图跟随的管理器、增加或替换规则。每次主题变化每个视图只处理一次，反射方法与属性 id 有缓存，之后才附加到窗口的视图（列表 cell、对话框）自动跟上当前主题。 | Keep a subtree out, skip a view itself, choose the manager a view follows, add or replace rules. Each view is handled once per theme change, reflected methods and attribute ids are cached, and views attached later (list cells, dialogs) catch up with the current theme. |
+
+## [CN]发布到 Maven
+## [EN]Publishing to Maven
+
+| 中文 | English |
+|:---|:---|
+| `scripts/publish-android.sh` 用 Gradle 一次发布两个库模块：`io.github.chenyilong:cyltabbarcontroller`（aar，即 `cyltabbar`）与它依赖的 `io.github.chenyilong:cyltabbarcontroller-pages`（jar，即 `tabpages`），带源码、javadoc（Kotlin API 的文档在 `docs/`，因此 javadoc jar 中是这些文档）、POM（MIT 许可证、开发者、SCM）与 Gradle 模块元数据。版本默认与 `CYLTabBarController.podspec` 一致，iOS 与 Android 同一个版本号。 | `scripts/publish-android.sh` publishes both library modules with Gradle in one go: `io.github.chenyilong:cyltabbarcontroller` (the aar, `cyltabbar`) and the `io.github.chenyilong:cyltabbarcontroller-pages` it depends on (the jar, `tabpages`), with sources, javadoc (the Kotlin API is documented in `docs/`, so the javadoc jar carries those documents), the POM (MIT license, developer, SCM) and the Gradle module metadata. The version follows `CYLTabBarController.podspec` by default, so iOS and Android share one version number. |
+
+```sh
+scripts/publish-android.sh                    # local: ~/.m2 (Maven Local), to try it in another project
+scripts/publish-android.sh staging            # Example-Android/build/staging-deploy + the Maven Central bundle, checked, not uploaded
+scripts/publish-android.sh central            # staging, then upload to Maven Central (Central Portal) and wait for validation
+scripts/publish-android.sh github             # GitHub Packages
+scripts/publish-android.sh central --version 1.100.1 --automatic   # another version; publish right after validation
+```
+
+```kotlin
+// [EN] In an app, once published. [CN] 发布后在 App 中使用。
+dependencies { implementation("io.github.chenyilong:cyltabbarcontroller:1.100.0") }
+```
+
+| 目标 Target | 需要 | Needs |
+|:---|:---|:---|
+| `local` | 无 | Nothing |
+| `staging` | 无（有签名私钥时一并签名） | Nothing (signs too when a key is set) |
+| `central` | `MAVEN_CENTRAL_USERNAME` / `MAVEN_CENTRAL_PASSWORD`（Central Portal 用户令牌）；`SIGNING_KEY`（ASCII 私钥）与 `SIGNING_PASSWORD`，或 `~/.gradle/gradle.properties` 中的 `signing.gnupg.keyName`；命名空间 `io.github.chenyilong` 在 central.sonatype.com 上验证过一次（`--group` 可改用其他已验证的命名空间） | `MAVEN_CENTRAL_USERNAME` / `MAVEN_CENTRAL_PASSWORD` (a Central Portal user token); `SIGNING_KEY` (an ASCII-armored key) and `SIGNING_PASSWORD`, or `signing.gnupg.keyName` in `~/.gradle/gradle.properties`; the namespace `io.github.chenyilong` verified once on central.sonatype.com (`--group` takes another verified namespace) |
+| `github` | `GITHUB_ACTOR`、`GITHUB_TOKEN`（`write:packages`），可选 `GITHUB_REPOSITORY` | `GITHUB_ACTOR`, `GITHUB_TOKEN` (`write:packages`), optional `GITHUB_REPOSITORY` |
+
+| 中文 | English |
+|:---|:---|
+| 流程：先运行 `tabpages` 测试、`cyltabbar` 单元测试与 `lintRelease`（`--skip-tests` 跳过），再发布。`staging` / `central` 检查每个产物都有主文件、POM、源码、javadoc、md5 / sha1 校验和以及 POM 的必填项；`central` 还要求每个文件都有签名，缺少时在上传前停止。上传包不含 `maven-metadata.xml`，通过 Central Portal 的 Publisher API 上传，之后每 10 秒查询一次状态，最多 10 分钟。默认 `USER_MANAGED`：校验通过后在 central.sonatype.com 上点击 "Publish"；`--automatic` 自动发布。`--dry-run` 只打印命令。 | Flow: the `tabpages` tests, the `cyltabbar` unit tests and `lintRelease` run first (`--skip-tests` skips them), then the publishing. `staging` / `central` check that every artifact has its main file, POM, sources, javadoc, md5 / sha1 checksums and the required POM fields; `central` also requires a signature for every file and stops before uploading when one is missing. The bundle leaves out `maven-metadata.xml` and goes up through the Central Portal Publisher API; the status is then checked every 10 seconds, for up to 10 minutes. `USER_MANAGED` by default: press "Publish" on central.sonatype.com after validation; `--automatic` publishes on its own. `--dry-run` only prints the commands. |
+| 已验证：`local`（安装到 `~/.m2`）与 `staging`（50 个文件的上传包，检查通过），以及用临时 GPG 私钥签名后 `gpg --verify` 结果为 Good signature。尚未实际上传到 Maven Central 或 GitHub Packages：需要维护者的凭据与命名空间验证。 | Verified: `local` (installed in `~/.m2`) and `staging` (a 50-file bundle that passes the checks), and signing with a throwaway GPG key, which `gpg --verify` reports as a good signature. Not yet uploaded to Maven Central or GitHub Packages: that needs the maintainer's credentials and the namespace verification. |
 
 ## [CN]测试
 ## [EN]Tests

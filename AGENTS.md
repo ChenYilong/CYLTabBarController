@@ -116,4 +116,5 @@ scripts/unit-tests.sh "iPhone 17 Pro Max"
 scripts/ci-build-example.sh <demo folder>
 python3 scripts/update-docs-navigation.py
 python3 scripts/sync-agent-skills.py --check
+scripts/publish-android.sh staging        # Android library: build and check the Maven bundle (local | staging | central | github)
 ```
