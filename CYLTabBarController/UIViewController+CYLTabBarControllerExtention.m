@@ -345,13 +345,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (nullable UIControl *)cyl_tabButton {
     UIControl *tabButton = objc_getAssociatedObject(self, @selector(cyl_tabButton));
-    // FIX: issue #605
-    // [EN] A stored button that left the tab bar was replaced by UIKit (the classic tab bar does that when a tab's title
-    //      changes): look up the current one below.
-    // [CN] 已离开 TabBar 的已存储按钮被 UIKit 替换了（经典 TabBar 在 Tab 标题变化时会这样）：在下面查找当前按钮。
-    BOOL isReplaced = (tabButton && !tabButton.superview && [tabButton cyl_isTabButton] && ![CYLConstants isLiquidGlassActive] &&
-                       self.cyl_tabBarController.tabBarStyleType != CYLTabBarStyleTypeFlatDesign);
-    if (tabButton && !isReplaced) {
+    if (tabButton) {
         //TODO:      if (tabButton && [tabButton isKindOfClass:[UIControl class]]) {
         return tabButton;
     }
