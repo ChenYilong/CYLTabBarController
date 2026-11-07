@@ -19,8 +19,7 @@ class TabBarCommon: NSObject {
         CYLPlusButtonSubclass.register()
         // Rebuilt after a language change too, so every text shows in the new language.
         UIApplication.shared.delegate?.window??.cyl_setRootViewControllerProvider {
-            let tabBarController = RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
-            tabBarController.tabBarStyleType = .liquidGlass
+            let tabBarController = RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController(), styleType: CYLDemoTabBarStyle.styleType, context: nil)
             tabBarController.selectedIndex = selectIndex
             return tabBarController
         }
@@ -46,7 +45,12 @@ class TabBarCommon: NSObject {
         CYLPlusButtonSubclass.register()
         // Rebuilt after a language change, so every text shows in the new language.
         UIApplication.shared.delegate?.window??.cyl_setRootViewControllerProvider {
-            RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
+            RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController(), styleType: CYLDemoTabBarStyle.styleType, context: nil)
+        }
+        // [EN] The navigation bar button of the settings list rebuilds the tab bar in the other style.
+        // [CN] 设置列表的导航栏按钮以另一种样式重建 TabBar。
+        CYLDemoTabBarStyle.rebuildRootViewController = {
+            setUpRootTabBarController()
         }
     }
     

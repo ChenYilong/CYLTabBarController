@@ -22,6 +22,7 @@
 | [Demo 测试列表：设置分组与纯 Swift 版本](Demo-Test-List.md) | [The demo test list: settings groups and a pure Swift version](Demo-Test-List.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
+| [GIF Tab 图标：循环的图片，或点击播放一次的动画](GIF-Animation.md) | [GIF tab icons: a looping image, or an animation that plays once when tapped](GIF-Animation.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
@@ -83,6 +84,7 @@ docs/
 ├── Demo-Test-List.md
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
+├── GIF-Animation.md
 ├── Image-Only-Tabs.md
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
@@ -125,9 +127,15 @@ docs/
     ├── demo-test-list-objc-classic.png
     ├── docs-navigation-index.png
     ├── flatdesign-standard-appearance-mapping.svg
+    ├── gif-classic.png
+    ├── gif-flat-design.png
+    ├── gif-liquid-glass.png
     ├── login-required-tabs-flow.svg
     ├── pag-animation-tab-icons.png
     ├── pag-animation-test-list.png
+    ├── pag-classic.png
+    ├── pag-flat-design.png
+    ├── pag-liquid-glass.png
     ├── plus-child-theme-switching.png
     ├── plusbutton-background-image-liquid-glass-selected.png
     ├── plusbutton-background-image-liquid-glass-swiftui.png
@@ -147,6 +155,9 @@ docs/
     ├── rive-animation-swiftui-test-list.png
     ├── rive-animation-tab-icons.png
     ├── rive-animation-test-list.png
+    ├── rive-classic.png
+    ├── rive-flat-design.png
+    ├── rive-liquid-glass.png
     ├── tab-interactions-long-press-classic.png
     ├── tab-interactions-long-press-flatdesign.png
     ├── tab-interactions-long-press-liquid-glass.png

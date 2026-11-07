@@ -7,6 +7,9 @@ target 'RiveApp' do
   # CYLTabBarController with Rive tab icons; it also brings the RiveRuntime pod.
   # CYLTabBarController 与 Rive Tab 图标；同时引入 RiveRuntime pod。
   pod 'CYLTabBarController/Rive', :path => '../'
+  # The FlatDesign style, chosen with the navigation bar button of the settings list. It also brings Lottie.
+  # 扁平样式，通过设置列表的导航栏按钮选择。它同时会引入 Lottie。
+  pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => '../'
 end
 
 post_install do |installer|

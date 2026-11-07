@@ -1,0 +1,21 @@
+platform :ios, '15.0'
+project 'GIFApp.xcodeproj'
+
+target 'GIFApp' do
+  use_frameworks!
+
+  # GIF tab icons that play once when selected. A GIF given as an image needs no subspec, and loops.
+  # 选中时播放一次的 GIF Tab 图标。作为图片传入的 GIF 不需要子库，并且循环播放。
+  pod 'CYLTabBarController/GIF', :path => '../'
+  # The FlatDesign style, chosen with the navigation bar button of the first tab. It also brings Lottie.
+  # 扁平样式，通过第一个 Tab 的导航栏按钮选择。它同时会引入 Lottie。
+  pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => '../'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+    end
+  end
+end

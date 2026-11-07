@@ -580,6 +580,16 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
             return;
         }
     }
+    // FIX: issue #605
+    // [EN] The page shown by this tap can have changed its tab's title while loading (`self.title = …`). On the classic tab
+    //      bar, UIKit then replaces the tab's button with a new one, so the tapped button has left the tab bar. Go on with
+    //      the new button: laying out the tab bar gives it its animation (`-cyl_bindTabControlActions`), which then plays.
+    // [CN] 这次点击显示的页面可能在加载时修改了 Tab 的标题（`self.title = …`）。在经典 TabBar 上，UIKit 会用新按钮替换该 Tab 的按钮，被点击的按钮
+    //      已离开 TabBar。改用新按钮继续：布局 TabBar 时为它添加动画（`-cyl_bindTabControlActions`），然后播放。
+    if (!control.superview && [control cyl_isTabButton] && ![CYLConstants isLiquidGlassActive]) {
+        control = self.selectedViewController.tabBarItem.cyl_tabButton ?: control;
+        [self.cyl_tabBar layoutIfNeeded];
+    }
     UIViewController *vc = nil;
     [self tabChangedToSelectedViewController:vc control:control];
     [self cyl_setNeedsUpdateSelectedBackgroundColors];
@@ -848,6 +858,40 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
  *      `tabBarController:didSelectControl:`，直到调用 `[tabBarController.view setNeedsLayout]`。现在 `CYLTabBar -layoutSubviews`
  *      也会调用本方法，新按钮在布局的同时就会加上点击事件。
  */
+/// [EN] Adds the action unless `control` already has it for the first of `events`. [CN] `control` 尚未为 `events` 中的第一个事件添加该事件时才添加。
+static void CYLAddTabControlActionOnce(UIControl *control, id target, SEL action, UIControlEvents events) {
+    UIControlEvents firstEvent = events & (~events + 1);
+    if (![[control actionsForTarget:target forControlEvent:firstEvent] containsObject:NSStringFromSelector(action)]) {
+        [control addTarget:target action:action forControlEvents:events];
+    }
+}
+
+/*!
+ * FIX: issue #605
+ * [EN] Changing a tab item's title (`self.title = …` in a page, or a selected title) makes the classic tab bar replace the
+ *      tab's button with a new one, without the animation view added to the old one, so its static image was shown instead
+ *      for good. A new button of a tab with an animation gets it again: the selected tab's shows its last frame, as a
+ *      selected tab does at launch.
+ * [CN] 修改 tabBarItem 的标题（页面中的 `self.title = …`，或选中标题）会让经典 TabBar 用新按钮替换该 Tab 的按钮，而旧按钮上的动画视图不会带过来，
+ *      于是一直显示静态图片。有动画的 Tab 的新按钮重新添加动画：选中的 Tab 显示最后一帧，与启动时选中的 Tab 相同。
+ */
+- (void)cyl_restoreTabBarItemAnimationIfNeededForTabButton:(UIControl *)tabButton {
+    if (!self.tabBarItemAnimationViewAdded || tabButton.cyl_tabBarItemAnimationView) {
+        return;
+    }
+    UITabBarItem *item = [self cyl_tabBarItemForTabButton:tabButton];
+    NSURL *animationURL = item.cyl_tabBarItemAnimationURL;
+    if (!animationURL) {
+        return;
+    }
+    BOOL isSelected = (item == self.selectedViewController.tabBarItem);
+    [self addLottieImageWithControl:tabButton
+                          lottieURL:animationURL
+                    lottieSizeValue:item.cyl_tabBarItemAnimationSizeValue
+                          animation:isSelected
+                    defaultSelected:isSelected];
+}
+
 - (void)cyl_bindTabControlActions {
     if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]] || [CYLConstants isLiquidGlassActive]) {
         // [CN] 液态玻璃无法添加事件 放进手势响代理里处理。
@@ -885,30 +929,34 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
             // counting: system tab buttons only), so without one every button reported 0. 无 PlusButton 时也记录正确下标。
             [control cyl_setTabBarChildViewControllerIndex:(NSInteger)controlTabIndex];
         }
-        // Remove first so repeated layout passes never add the action twice. 先移除，避免多次布局重复添加。
-        [control removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-        //to avoid invoking didSelectControl twice, because plusChildViewControllerButtonClicked will invoke setSelectedIndex
-        // The tab bar can lay out before the plus child view controller is added; the removal above then
-        // drops an action bound in that earlier pass. 加号子控制器添加前的布局可能已添加了事件，上面的移除会将其去掉。
+        // FIX: issue #605
+        // [EN] Added once, never removed and added again on a layout pass: UIKit's own action selects the tab and can lay the
+        //      tab bar out at once, and an action removed and added again during that dispatch does not run for this tap. So
+        //      a classic tab bar's animations neither played nor stopped when a tab was tapped.
+        // [CN] 只添加一次，不在布局时移除再添加：UIKit 自己的事件选中 Tab 时可能立即布局 TabBar，在这次派发中被移除又重新添加的事件不会为本次点击执行。
+        //      因此经典 TabBar 的动画在点击 Tab 时既不播放也不停止。
+        // to avoid invoking didSelectControl twice, because plusChildViewControllerButtonClicked will invoke setSelected
+        // [CN] 避免重复调用 didSelectControl：plusChildViewControllerButtonClicked 会调用 setSelected。
         if ([control cyl_isChildViewControllerPlusButton]) {
+            [control removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
             return;
         }
         UILabel *tabLabel = control.cyl_tabLabel;
         tabLabel.textAlignment = NSTextAlignmentCenter;
-        
+
         // [CN] FIX: iOS26 之前也不再使用点击事件， 而是在 `-setSelectedViewController` and `-setSelectedIndex`中处理
         // [EN] FIX: Before iOS26 tap events are no longer used either; this is handled in
         //      `-setSelectedViewController` and `-setSelectedIndex` instead
-        [control addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+        CYLAddTabControlActionOnce(control, self, action, UIControlEventTouchUpInside);
         // [EN] The pressed animation (`CYLTabButtonAnimation` highlight / dehighlight), on tab buttons only (the plus button
-        //      adds its own, CYLPlusButton.m); removed first, as above.
+        //      adds its own, CYLPlusButton.m).
         // [CN] 按下动画（`CYLTabButtonAnimation` 的 highlight / dehighlight），仅用于 Tab 按钮（PlusButton 自己添加，见
-        //      CYLPlusButton.m）；与上面一样先移除。
-        [control removeTarget:self action:@selector(cyl_tabButtonTouchDown:) forControlEvents:UIControlEventTouchDown];
-        [control removeTarget:self action:@selector(cyl_tabButtonTouchUp:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
+        //      CYLPlusButton.m）。
         if (isTabButton) {
-            [control addTarget:self action:@selector(cyl_tabButtonTouchDown:) forControlEvents:UIControlEventTouchDown];
-            [control addTarget:self action:@selector(cyl_tabButtonTouchUp:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
+            [self cyl_restoreTabBarItemAnimationIfNeededForTabButton:control];
+            CYLAddTabControlActionOnce(control, self, @selector(cyl_tabButtonTouchDown:), UIControlEventTouchDown);
+            CYLAddTabControlActionOnce(control, self, @selector(cyl_tabButtonTouchUp:), UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel);
+
         }
         
         // `selectedIndex` is NSNotFound while the "More" tab is selected; leave the buttons to UIKit then.

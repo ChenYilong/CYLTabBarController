@@ -1,6 +1,6 @@
 ---
 name: cyl-tab-animation
-description: "Animated tab icons in CYLTabBarController with Lottie, PAG or Rive: subspecs, keys, options, availability guards, and adding a new animation library. Use when adding animated tabs or touching the CYLTabBarItemAnimation subspec."
+description: "Animated tab icons in CYLTabBarController with Lottie, PAG, Rive or GIF: subspecs, keys, options, availability guards, and adding a new animation library. Use when adding animated tabs or touching the CYLTabBarItemAnimation subspec."
 ---
 
 # Animated tab icons
@@ -16,7 +16,11 @@ Steps for app developers: [Tab-Icon-Animation-Quick-Start](../../../docs/Tab-Ico
 | PAG | `PAG`, `PAGEnterprise` | `CYLTabBarPAGURL` / `CYLTabBarPAGFilePath` | `CYLTabBarPAGSize` | [PAG-Animation](../../../docs/PAG-Animation.md) | `Example-PAG` |
 | Rive | `Rive` | `CYLTabBarRiveURL` / `CYLTabBarRiveFilePath` | `CYLTabBarRiveSize` | iOS 14, CocoaPods only; options such as `CYLTabBarAnimationOptionRiveArtboard` on the URL | `Example-Rive`, `Example-SwiftUI-Rive` |
 
+| GIF | `GIF` (no third-party dependency) | `CYLTabBarGIFURL` / `CYLTabBarGIFFilePath` (local files) | `CYLTabBarGIFSize` | [GIF-Animation](../../../docs/GIF-Animation.md) | `Example-GIF` |
 - `pod 'CYLTabBarController'` alone has **no** animation code. Without a subspec the tabs show their images.
+- **A GIF plays according to the key that gives it.** `CYLTabBarItemImage` or `CYLTabBarItemImageURL`: an image, it loops, no subspec. The GIF keys or generic animation keys: an animation, it plays once when selected. Tell the user which one they get.
+- Every library works with Liquid Glass, FlatDesign and the classic tab bar. Check all three: `Example-GIF`, `Example-PAG` and `Example-Rive` switch from the navigation bar of the settings list, or with `-CYLDemoTabBarFlatDesign YES`. FlatDesign must be given as `styleType:` when the controller is created. On a simulator, check the classic tab bar on an iOS version before 26. PAG's OpenGL crashes the iOS 17.5 simulator on macOS 27 (`libCoreVMClient`): add `UIDesignRequiresCompatibility` to a copy of the built app's `Info.plist`, sign it again with `codesign -f -s - --deep`, and run it on iOS 26 instead.
+- On the classic tab bar, a tab item's title change makes UIKit replace the tab's button. The library restores the animation on the new button (`-cyl_bindTabControlActions`). A page that sets `self.title` renames its tab: use `navigationItem.title` to keep the tab's title.
 - Subspecs combine, and one tab bar can mix libraries and static tabs: [Per-Tab-Animation](../../../docs/Per-Tab-Animation.md).
 - Demo files: name them by use (`tab_home.pag`). A tab shows the first frame until it is selected, so pick a small file whose first frame shows the icon; a full-screen poster or a file that starts empty looks like a blank or still tab. Check a new file's frames before using it.
 - PAG and Rive files draw their own colors, and Liquid Glass ignores a background color in `standardAppearance`. White icons (the course's `icons.riv`) need a dark interface: the Rive demos set `overrideUserInterfaceStyle = .dark` on the tab bar controller.

@@ -87,7 +87,10 @@ extension CYLTabBarController {
     /// [EN] Call before the view loads. The course's icons are white, drawn for its dark navy bar.
     /// [CN] 在视图加载之前调用。课程的图标是白色的，为深蓝色 TabBar 设计。
     func applyCourseTabBarAppearance() {
-        tabBarStyleType = .liquidGlass
+        // [EN] FlatDesign is chosen when the controller is made and stays. [CN] 扁平样式在创建控制器时指定，保持不变。
+        if tabBarStyleType != .flatDesign {
+            tabBarStyleType = .liquidGlass
+        }
         let appearance = UITabBarAppearance()
         appearance.configureWithDefaultBackground()
         appearance.backgroundColor = UIColor(named: "Background 2")?.withAlphaComponent(0.8)

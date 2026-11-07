@@ -1,0 +1,27 @@
+{
+  "images": [
+    {
+      "idiom": "universal",
+      "filename": "account_normal@2x.png",
+      "scale": "2x"
+    },
+    {
+      "idiom": "universal",
+      "filename": "account_normal_dark_appearance@2x.png",
+      "scale": "2x",
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ]
+    }
+  ],
+  "info": {
+    "version": 1,
+    "author": "xcode"
+  },
+  "properties": {
+    "template-rendering-intent": "original"
+  }
+}

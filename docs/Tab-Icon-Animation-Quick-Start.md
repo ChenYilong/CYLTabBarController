@@ -59,6 +59,7 @@ cd Example-Swift && pod install && open *.xcworkspace
 | PAG | [Example-PAG](../Example-PAG) | `PAG` | [TabBarCommon.swift](../Example-PAG/HealthyHome/Tool/TabBarCommon.swift) |
 | Rive（UIKit） | [Example-Rive](../Example-Rive) | `Rive` | [TabItems.swift](../Example-SwiftUI-Rive/AnimatedApp/Navigation/TabItems.swift) |
 | Rive（SwiftUI） | [Example-SwiftUI-Rive](../Example-SwiftUI-Rive) | `Rive` | 同上 / The same file |
+| GIF | [Example-GIF](../Example-GIF) | `GIF` | [AppDelegate.swift](../Example-GIF/GIFApp/Classes/Other/AppDelegate.swift) |
 
 ## [CN]选择动画库
 ## [EN]Choose a library
@@ -69,6 +70,7 @@ cd Example-Swift && pod install && open *.xcworkspace
 | Lottie 2.5 | `CYLTabBarController/Lottie` | `.json` | 12.0 | - | 同上 / The same |
 | PAG | `CYLTabBarController/PAG`、`PAGEnterprise` | `.pag` | 12.0 | 只有 CocoaPods / CocoaPods only | [PAG](https://pag.io)（AE 导出 / exported from After Effects） |
 | Rive | `CYLTabBarController/Rive` | `.riv` | 14.0 | 只有 CocoaPods / CocoaPods only | [Rive](https://rive.app) |
+| GIF | `CYLTabBarController/GIF` | `.gif` | 12.0 | SPM、Carthage（通用 key / generic keys） | 任意 GIF，见 [GIF-Animation.md](GIF-Animation.md) / Any GIF, see [GIF-Animation.md](GIF-Animation.md) |
 
 | 中文 | English |
 |:---|:---|
@@ -151,13 +153,14 @@ attributes[CYLTabBarRiveSize] = NSValue(cgSize: CGSize(width: 32, height: 32))
 
 | 中文 | English |
 |:---|:---|
-| `CYLTabBarItemAttributesAddingAnimationFile()` 按文件扩展名选择动画库（`.json`、`.pag`、`.riv`），通用 key（`CYLTabBarAnimationURL`、`CYLTabBarAnimationFilePath`、`CYLTabBarAnimationSize`）也适用于任何动画库。需要混用动画库时推荐这种写法。播放速度用 `tabBarItemAnimationSpeed`，详见 [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md)。 | `CYLTabBarItemAttributesAddingAnimationFile()` picks the library from the file extension (`.json`, `.pag`, `.riv`), and the generic keys (`CYLTabBarAnimationURL`, `CYLTabBarAnimationFilePath`, `CYLTabBarAnimationSize`) work with any library. Prefer this form when mixing libraries. Set the speed with `tabBarItemAnimationSpeed`; see [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md). |
+| `CYLTabBarItemAttributesAddingAnimationFile()` 按文件扩展名选择动画库（`.json`、`.pag`、`.riv`、`.gif`），通用 key（`CYLTabBarAnimationURL`、`CYLTabBarAnimationFilePath`、`CYLTabBarAnimationSize`）也适用于任何动画库。需要混用动画库时推荐这种写法。播放速度用 `tabBarItemAnimationSpeed`，详见 [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md)。 | `CYLTabBarItemAttributesAddingAnimationFile()` picks the library from the file extension (`.json`, `.pag`, `.riv`, `.gif`), and the generic keys (`CYLTabBarAnimationURL`, `CYLTabBarAnimationFilePath`, `CYLTabBarAnimationSize`) work with any library. Prefer this form when mixing libraries. Set the speed with `tabBarItemAnimationSpeed`; see [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md). |
 
 ## [CN]注意事项
 ## [EN]Things to watch for
 
 | 现象 / Symptom | 原因 / Cause | 处理 / What to do |
 |:---|:---|:---|
+| GIF 一直循环，没有点击才播放 / A GIF keeps looping instead of playing when tapped | 它作为图片传入（`CYLTabBarItemImage`、`CYLTabBarItemImageURL`）/ It is given as an image (`CYLTabBarItemImage`, `CYLTabBarItemImageURL`) | 引入 `GIF` 子库并使用 `CYLTabBarGIFFilePath`，见 [GIF-Animation.md](GIF-Animation.md) / Add the `GIF` subspec and use `CYLTabBarGIFFilePath`, see [GIF-Animation.md](GIF-Animation.md) |
 | Tab 平时是空白的，点了才出现 / A tab is blank until tapped | 选中之前显示动画的第一帧，而文件第一帧是空的 / A tab shows the first frame until it is selected, and the file starts empty | 换第一帧就能看到图标的文件 / Use a file whose first frame shows the icon |
 | 图标小得看不出动画 / The animation cannot be seen | 素材是全屏或海报尺寸 / The file is a full-screen or poster animation | 用为图标制作的小尺寸素材，并设置尺寸 key / Use a small file made for icons, and set the size key |
 | 白色图标看不见 / White icons cannot be seen | 动画文件自带颜色，不受 `tintColor` 影响；液态玻璃也不使用 `standardAppearance` 的背景色 / Animation files draw their own colors, ignoring `tintColor`; Liquid Glass ignores a background color in `standardAppearance` | 换文件，或使用深色界面（Rive Demo 的做法）/ Change the file, or use a dark interface, as the Rive demos do |
@@ -176,4 +179,4 @@ attributes[CYLTabBarRiveSize] = NSValue(cgSize: CGSize(width: 32, height: 32))
 
 | 中文 | English |
 |:---|:---|
-| [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md)：子库的设计，以及如何接入新的动画库。[PAG-Animation.md](PAG-Animation.md)、[Rive-Animation.md](Rive-Animation.md)：各动画库的所有 key 与选项。[Per-Tab-Animation.md](Per-Tab-Animation.md)：混用动画库与静态 Tab。 | [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md): how the subspec is designed and how to add a library. [PAG-Animation.md](PAG-Animation.md) and [Rive-Animation.md](Rive-Animation.md): every key and option. [Per-Tab-Animation.md](Per-Tab-Animation.md): mixing libraries and static tabs. |
+| [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md)：子库的设计，以及如何接入新的动画库。[PAG-Animation.md](PAG-Animation.md)、[Rive-Animation.md](Rive-Animation.md)、[GIF-Animation.md](GIF-Animation.md)：各动画库的所有 key 与选项。[Per-Tab-Animation.md](Per-Tab-Animation.md)：混用动画库与静态 Tab。 | [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md): how the subspec is designed and how to add a library. [PAG-Animation.md](PAG-Animation.md) and [Rive-Animation.md](Rive-Animation.md): every key and option. [Per-Tab-Animation.md](Per-Tab-Animation.md): mixing libraries and static tabs. |
