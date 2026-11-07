@@ -202,7 +202,7 @@ def without_navigation(text):
     """[EN] The document without the blocks scripts/update-docs-navigation.py writes. [CN] 去掉 update-docs-navigation.py 写入的块。"""
     for pattern in NAV_BLOCKS:
         text = pattern.sub('', text)
-    return re.sub(r'\n{3,}', '\n\n', text)
+    return re.sub(r'\n+', '\n', text)
 
 
 def with_navigation_of(existing, text):
