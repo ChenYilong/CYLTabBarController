@@ -54,6 +54,11 @@ two places**:
 - **Debugging screenshots** that show the feature working (no bugs visible) are kept: save them in `docs/assets/` and
   embed them in the feature's `docs/` file.
 - **Final screenshots** of the finished feature also go into `README.md`.
+- **Screenshot layout**: a matrix (e.g. styles × libraries) stays a grid. Any other set of screenshots is stacked **top to
+  bottom**, one per row (a two-column table row each, or one image per line), never side by side: stacked, the same tab
+  bar item lines up vertically, so its states (selected, pressed, a value of a setting, before and after a fix) compare
+  at a glance. Crop each screenshot to the same region and width (e.g. only the tab bar), and label each row with the
+  state it shows. Example: `docs/Android-Liquid-Glass.md` (the dock at three surface opacities).
 - If a change could not be run (no simulator or device), say so in the document instead of adding screenshots, and
   never present a mock-up or a diagram as a screenshot.
 - **Attachment layout (Obsidian rule)**: a Markdown file's attachments live in an `assets/` folder **next to that file**,
