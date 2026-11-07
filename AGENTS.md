@@ -18,7 +18,7 @@ When code, `docs/` and `README.md` disagree, code wins, then `docs/`. Fix the wr
 | `cyl-new-project` | Creating a new app or demo on this library. **Every new demo must follow it** |
 | `cyl-plus-button` | Writing or changing a plus button: title alignment, stand-in, images, limits |
 | `cyl-xcode-compat` | Touching a `.xcodeproj` or a deployment target; which Xcode or iOS a feature needs |
-| `cyl-tab-animation` | Lottie, PAG or Rive tab icons |
+| `cyl-tab-animation` | Lottie, PAG or Rive tab icons; suggest running the matching demo first |
 | `cyl-theme` | Skins, in-place tab updates |
 | `cyl-api-map` | Finding the API and document for a feature |
 | `cyl-docs` | Adding a feature, editing `README.md` or `docs/` |
@@ -28,7 +28,7 @@ When code, `docs/` and `README.md` disagree, code wins, then `docs/`. Fix the wr
 
 ## Keep the skills current
 
-Every new API, feature, limit or demo updates, in the same change: the `docs/` file, `README.md`, and the `cyl-*` skills it affects (at least a row in `cyl-api-map`). The goal: someone can start a new project from these skills alone. `scripts/sync-agent-skills.py --check` fails when a document or a demo is missing from them.
+Every new API, feature, limit or demo updates, in the same change: the `docs/` file, `README.md`, and the `cyl-*` skills it affects (at least a row in `cyl-api-map`). The goal: someone can start a new project from these skills alone. `scripts/sync-agent-skills.py --check` fails when a document or a demo is missing from them. A change to animated tab icons also updates [docs/Tab-Icon-Animation-Quick-Start.md](docs/Tab-Icon-Animation-Quick-Start.md).
 
 ## Reading the bilingual docs and comments
 

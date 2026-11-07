@@ -66,7 +66,7 @@ func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene
 - Pass image names (`NSString`), not `UIImage`: names render as original and find their Dark images. Details in `README.md`, step 2.
 - Subclassing in Swift has two traps (override both initializers; `init(nibName:bundle:)` forwards only to super): [Swift-Guide](../../../docs/Swift-Guide.md), section 3. Never return another instance from `-init` (#404).
 - Objective-C: `README.md`, steps 2 to 4, and `Example/SceneDelegate.m`. SwiftUI: [SwiftUI-Integration](../../../docs/SwiftUI-Integration.md).
-- Plus button: `cyl-plus-button`. Animated icons: `cyl-tab-animation`. Skins: `cyl-theme`.
+- Plus button: `cyl-plus-button`. Animated icons: `cyl-tab-animation` and [Tab-Icon-Animation-Quick-Start](../../../docs/Tab-Icon-Animation-Quick-Start.md); suggest running the matching demo first. Skins: `cyl-theme`.
 
 ## 4. A demo inside this repository, in addition
 
