@@ -40,8 +40,8 @@ class RootTabBarController: CYLTabBarController {
                 self.updateTabBarItem(at: index, attributes: attributes)
             }
         }
-        setFile(3, swapsFiles ? "test2.pag" : "22.pag")
-        setFile(4, swapsFiles ? "22.pag" : "test2.pag")
+        setFile(3, swapsFiles ? "tab_me.pag" : "tab_moments.pag")
+        setFile(4, swapsFiles ? "tab_moments.pag" : "tab_me.pag")
     }
 
     override func viewDidLoad() {

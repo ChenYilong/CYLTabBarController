@@ -110,6 +110,10 @@ class CourseTabBarController: CYLTabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        // [EN] The course's Rive icons are white: in dark mode the glass of the tab bar keeps them, and their animation,
+        //      visible over light pages too. Liquid Glass ignores a background color in `standardAppearance`.
+        // [CN] 课程的 Rive 图标是白色的：深色模式下 TabBar 的玻璃让图标及其动画在浅色页面上也能看清。液态玻璃不使用 `standardAppearance` 的背景色。
+        overrideUserInterfaceStyle = .dark
         view.cyl_themeDidChangeBlock = { [weak self] in
             self?.applySkinAnimations()
         }

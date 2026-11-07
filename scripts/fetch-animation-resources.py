@@ -40,11 +40,15 @@ SHARED_DIR = os.path.realpath(os.path.join(ROOT, "Example-Shared"))
 #      manifest cannot write outside its folder or download from anywhere but these sources.
 # [CN] 清单是数据：从中读取的每个值在用作文件路径或 URL 之前都会校验，修改清单也无法写到其目录之外，或从以下来源以外的地址下载。
 ALLOWED_GITHUB_REPOSITORIES = {
+    "Tencent": frozenset({"libpag"}),
     "libpag": frozenset({
         "pag-ios", "pag-enterprise-ios", "pag-android", "pag-flutter", "pag-enterprise-android", "pag-web",
     }),
 }
 GITHUB_RAW_PREFIX = "https://raw.githubusercontent.com/"
+# [EN] Files kept in Git LFS ("lfs": true in the manifest): the raw URL only gives a small pointer file.
+# [CN] 保存在 Git LFS 中的文件（清单中的 "lfs": true）：raw 地址只能得到一个很小的指针文件。
+GITHUB_LFS_PREFIX = "https://media.githubusercontent.com/media/"
 
 FOLDER_PATTERN = re.compile(r"[A-Za-z][A-Za-z0-9]*Resources")
 COMMIT_PATTERN = re.compile(r"[0-9a-f]{40}")
@@ -82,7 +86,8 @@ def github_url(entry):
     commit, path = entry.get("commit", ""), entry.get("path", "")
     require(isinstance(commit, str) and COMMIT_PATTERN.fullmatch(commit), "invalid commit: {!r}".format(commit))
     require(isinstance(path, str) and SOURCE_PATH_PATTERN.fullmatch(path), "invalid source path: {!r}".format(path))
-    return "{}{}/{}/{}/{}".format(GITHUB_RAW_PREFIX, owner, name, commit, urllib.parse.quote(path))
+    prefix = GITHUB_LFS_PREFIX if entry.get("lfs") is True else GITHUB_RAW_PREFIX
+    return "{}{}/{}/{}/{}".format(prefix, owner, name, commit, urllib.parse.quote(path))
 
 
 def check_sha256(value, what):
@@ -154,7 +159,7 @@ def resource_folder(folder_name):
 
 def folder_downloads(folder):
     """[EN] The downloads of every manifest in `folder`. [CN] `folder` 中所有清单的下载项。"""
-    manifests = sorted(name for name in os.listdir(folder) if name.endswith("-resources.json"))
+    manifests = sorted(name for name in os.listdir(folder) if name.endswith("-resources.json") and not name.startswith("._"))
     require(manifests, "no *-resources.json in {}".format(folder))
     downloads = []
     for manifest_name in manifests:

@@ -187,7 +187,7 @@ return pagAttributes.map { item in
 
 | 中文 | English |
 |:---|:---|
-| `Example-PAG`：由 `Example-Swift-03` 复制而来，Podfile 改为 `pod 'CYLTabBarController/PAG', :path => '../'`，4 个 Tab 使用 `Example-Shared/PAGResources/pag-ios` 中的 `1`、`2`、`22`、`test2`（Apache License 2.0），这些文件由 `pod install` 自动下载。在该目录执行 `pod install`，打开 `HealthyHome.xcworkspace` 运行。 | `Example-PAG`: copied from `Example-Swift-03`, with the Podfile set to `pod 'CYLTabBarController/PAG', :path => '../'`; its 4 tabs use `1`, `2`, `22` and `test2` from `Example-Shared/PAGResources/pag-ios` (Apache License 2.0), which `pod install` downloads. Run `pod install` in that folder and open `HealthyHome.xcworkspace`. |
+| `Example-PAG`：由 `Example-Swift-03` 复制而来，Podfile 改为 `pod 'CYLTabBarController/PAG', :path => '../'`，4 个 Tab 使用 `Example-Shared/PAGResources/tab-icons` 中的 `tab_home`、`tab_health`、`tab_moments`、`tab_me`（Apache License 2.0，取自 Tencent/libpag 与 libpag/pag-ios 的官方示例），这些文件由 `pod install` 自动下载。选择 Tab 图标时用尺寸小、第一帧就能看到图标的文件：选中之前 Tab 显示的是第一帧。在该目录执行 `pod install`，打开 `HealthyHome.xcworkspace` 运行。 | `Example-PAG`: copied from `Example-Swift-03`, with the Podfile set to `pod 'CYLTabBarController/PAG', :path => '../'`; its 4 tabs use `tab_home`, `tab_health`, `tab_moments` and `tab_me` from `Example-Shared/PAGResources/tab-icons` (Apache License 2.0, from the official samples of Tencent/libpag and libpag/pag-ios), which `pod install` downloads. For a tab icon, pick a small file whose first frame shows the icon: a tab shows the first frame until it is selected. Run `pod install` in that folder and open `HealthyHome.xcworkspace`. |
 
 ## [CN]动效资源
 ## [EN]Animation files

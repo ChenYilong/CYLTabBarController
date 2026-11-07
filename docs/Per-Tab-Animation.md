@@ -47,8 +47,8 @@ NSArray *tabBarItemsAttributes = @[
 ```
 
 ```swift
-// Swift (Example-PAG)
-let animationFiles = ["1.pag", "", "22.pag", "test2.pag"]   // "" : static tab / 静态 Tab
+// Swift
+let animationFiles = ["tab_home.pag", "", "tab_moments.pag", "tab_me.pag"]   // "" : static tab / 静态 Tab
 let attributes = zip(tabBarItemsAttributes, animationFiles).map { attributes, fileName in
     CYLTabBarItemAttributesAddingAnimationFile(attributes, fileName, nil)
 }

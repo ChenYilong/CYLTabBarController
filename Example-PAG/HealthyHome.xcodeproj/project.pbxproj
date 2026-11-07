@@ -38,16 +38,12 @@
 		184F199023F7EE40002DBAE4 /* APPDelegate+Categories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F198F23F7EE40002DBAE4 /* APPDelegate+Categories.swift */; };
 		4672768B00F7389B9E4E50F8 /* Pods_HealthyHome.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49A270299539A5C33415EAAA /* Pods_HealthyHome.framework */; };
 		4D1BE67EE402613EB5A9BB00 /* Pods_HealthyHomeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95B70182D157AED1FB5147B7 /* Pods_HealthyHomeTests.framework */; };
-		556CE842B9062DDC7DF2B7A9 /* test2.pag in Resources */ = {isa = PBXBuildFile; fileRef = 57A3DC71B3DDFBD084B169F4 /* test2.pag */; };
-		61DAEAC8826B3FA13591202F /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */; };
-		727E633E0971BFF96CD5500C /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = 6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */; };
-		7E36C3D378B559F4FFC753C7 /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */; };
-		7FE57915337484F20F4615DE /* 22.pag in Resources */ = {isa = PBXBuildFile; fileRef = E33C5186E7E71F551470C4E6 /* 22.pag */; };
-		A520A43B0231F8A9A36D72A4 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */; };
-		B7D4C755CD143ACE372A53DF /* 2.pag in Resources */ = {isa = PBXBuildFile; fileRef = 5DDBC61E0EFE15EA384C6944 /* 2.pag */; };
+		556CE842B9062DDC7DF2B7A9 /* tab_me.pag in Resources */ = {isa = PBXBuildFile; fileRef = 57A3DC71B3DDFBD084B169F4 /* tab_me.pag */; };
+		7FE57915337484F20F4615DE /* tab_health.pag in Resources */ = {isa = PBXBuildFile; fileRef = E33C5186E7E71F551470C4E6 /* tab_health.pag */; };
+		B7D4C755CD143ACE372A53DF /* tab_moments.pag in Resources */ = {isa = PBXBuildFile; fileRef = 5DDBC61E0EFE15EA384C6944 /* tab_moments.pag */; };
 		C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000004 /* SceneDelegate.swift */; };
 		DC4F14A3D431345E1C719293 /* CYLSettingsDemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570F6E92202376D43895876D /* CYLSettingsDemoTableViewController.swift */; };
-		E4527749730DAF427484396C /* 1.pag in Resources */ = {isa = PBXBuildFile; fileRef = 15B09426CFDE645588779718 /* 1.pag */; };
+		E4527749730DAF427484396C /* tab_home.pag in Resources */ = {isa = PBXBuildFile; fileRef = 15B09426CFDE645588779718 /* tab_home.pag */; };
 		E462EF3903016B48B7150636 /* Pods_HealthyHome_HealthyHomeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791B5EAC446039618D1575F4 /* Pods_HealthyHome_HealthyHomeUITests.framework */; };
 		F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */; };
 /* End PBXBuildFile section */
@@ -70,7 +66,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		15B09426CFDE645588779718 /* 1.pag */ = {isa = PBXFileReference; lastKnownFileType = file; name = 1.pag; path = "../Example-Shared/PAGResources/pag-ios/1.pag"; sourceTree = SOURCE_ROOT; };
+		15B09426CFDE645588779718 /* tab_home.pag */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_home.pag; path = "../Example-Shared/PAGResources/tab-icons/tab_home.pag"; sourceTree = SOURCE_ROOT; };
 		184C1C8A23F65A2800B23C7F /* HealthyHome.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthyHome.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		184C1C9123F65A2800B23C7F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		184C1C9423F65A2800B23C7F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -110,24 +106,20 @@
 		184F198D23F7E8A3002DBAE4 /* NextVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextVC.swift; sourceTree = "<group>"; };
 		184F198F23F7EE40002DBAE4 /* APPDelegate+Categories.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "APPDelegate+Categories.swift"; sourceTree = "<group>"; };
 		1B5D87387AC5D7147E41C28C /* Pods-HealthyHomeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHomeTests.debug.xcconfig"; path = "Target Support Files/Pods-HealthyHomeTests/Pods-HealthyHomeTests.debug.xcconfig"; sourceTree = "<group>"; };
-		346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_news.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_news.json; sourceTree = SOURCE_ROOT; };
-		4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_home.json; sourceTree = SOURCE_ROOT; };
 		49A270299539A5C33415EAAA /* Pods_HealthyHome.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HealthyHome.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A14B4CADF8B73766EB93756 /* Pods-HealthyHome.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHome.debug.xcconfig"; path = "Target Support Files/Pods-HealthyHome/Pods-HealthyHome.debug.xcconfig"; sourceTree = "<group>"; };
 		570F6E92202376D43895876D /* CYLSettingsDemoTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLSettingsDemoTableViewController.swift; path = "../Example-Shared/CYLSettingsDemoTableViewController.swift"; sourceTree = SOURCE_ROOT; };
-		57A3DC71B3DDFBD084B169F4 /* test2.pag */ = {isa = PBXFileReference; lastKnownFileType = file; name = test2.pag; path = "../Example-Shared/PAGResources/pag-ios/test2.pag"; sourceTree = SOURCE_ROOT; };
-		5DDBC61E0EFE15EA384C6944 /* 2.pag */ = {isa = PBXFileReference; lastKnownFileType = file; name = 2.pag; path = "../Example-Shared/PAGResources/pag-ios/2.pag"; sourceTree = SOURCE_ROOT; };
-		6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json; sourceTree = SOURCE_ROOT; };
+		57A3DC71B3DDFBD084B169F4 /* tab_me.pag */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_me.pag; path = "../Example-Shared/PAGResources/tab-icons/tab_me.pag"; sourceTree = SOURCE_ROOT; };
+		5DDBC61E0EFE15EA384C6944 /* tab_moments.pag */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_moments.pag; path = "../Example-Shared/PAGResources/tab-icons/tab_moments.pag"; sourceTree = SOURCE_ROOT; };
 		78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
 		791B5EAC446039618D1575F4 /* Pods_HealthyHome_HealthyHomeUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HealthyHome_HealthyHomeUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8DD79CA3F2DFB6CFCB202B2C /* Pods-HealthyHome-HealthyHomeUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHome-HealthyHomeUITests.debug.xcconfig"; path = "Target Support Files/Pods-HealthyHome-HealthyHomeUITests/Pods-HealthyHome-HealthyHomeUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		95B70182D157AED1FB5147B7 /* Pods_HealthyHomeTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HealthyHomeTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_discover.json; sourceTree = SOURCE_ROOT; };
 		B1BF0CD0D82597168C29F214 /* Pods-HealthyHome-HealthyHomeUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHome-HealthyHomeUITests.release.xcconfig"; path = "Target Support Files/Pods-HealthyHome-HealthyHomeUITests/Pods-HealthyHome-HealthyHomeUITests.release.xcconfig"; sourceTree = "<group>"; };
 		BB7EFE8FB9B45E33A24FDB92 /* Pods-HealthyHome.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHome.release.xcconfig"; path = "Target Support Files/Pods-HealthyHome/Pods-HealthyHome.release.xcconfig"; sourceTree = "<group>"; };
 		C1A5CE0E2E00000000000004 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		D496295660CB726F51EEFE39 /* Pods-HealthyHomeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHomeTests.release.xcconfig"; path = "Target Support Files/Pods-HealthyHomeTests/Pods-HealthyHomeTests.release.xcconfig"; sourceTree = "<group>"; };
-		E33C5186E7E71F551470C4E6 /* 22.pag */ = {isa = PBXFileReference; lastKnownFileType = file; name = 22.pag; path = "../Example-Shared/PAGResources/pag-ios/22.pag"; sourceTree = SOURCE_ROOT; };
+		E33C5186E7E71F551470C4E6 /* tab_health.pag */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_health.pag; path = "../Example-Shared/PAGResources/tab-icons/tab_health.pag"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,7 +165,7 @@
 			children = (
 				78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */,
 				570F6E92202376D43895876D /* CYLSettingsDemoTableViewController.swift */,
-				A2A9C3F58E83E7420A5303DB /* LottieResources */,
+				A2A9C3F58E83E7420A5303DB /* PAGResources */,
 				184C1C8C23F65A2800B23C7F /* HealthyHome */,
 				184C1CA323F65A2A00B23C7F /* HealthyHomeTests */,
 				184C1CAE23F65A2A00B23C7F /* HealthyHomeUITests */,
@@ -378,19 +370,15 @@
 			path = Guide;
 			sourceTree = "<group>";
 		};
-		A2A9C3F58E83E7420A5303DB /* LottieResources */ = {
+		A2A9C3F58E83E7420A5303DB /* PAGResources */ = {
 			isa = PBXGroup;
 			children = (
-				4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */,
-				15B09426CFDE645588779718 /* 1.pag */,
-				5DDBC61E0EFE15EA384C6944 /* 2.pag */,
-				57A3DC71B3DDFBD084B169F4 /* test2.pag */,
-				E33C5186E7E71F551470C4E6 /* 22.pag */,
-				A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */,
-				346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */,
-				6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */,
+				15B09426CFDE645588779718 /* tab_home.pag */,
+				5DDBC61E0EFE15EA384C6944 /* tab_moments.pag */,
+				57A3DC71B3DDFBD084B169F4 /* tab_me.pag */,
+				E33C5186E7E71F551470C4E6 /* tab_health.pag */,
 			);
-			name = LottieResources;
+			name = PAGResources;
 			sourceTree = "<group>";
 		};
 		F45CB2C42A8D05A6BD28059F /* Pods */ = {
@@ -518,14 +506,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				61DAEAC8826B3FA13591202F /* green_lottie_tab_home.json in Resources */,
-				E4527749730DAF427484396C /* 1.pag in Resources */,
-				B7D4C755CD143ACE372A53DF /* 2.pag in Resources */,
-				556CE842B9062DDC7DF2B7A9 /* test2.pag in Resources */,
-				7FE57915337484F20F4615DE /* 22.pag in Resources */,
-				7E36C3D378B559F4FFC753C7 /* green_lottie_tab_discover.json in Resources */,
-				A520A43B0231F8A9A36D72A4 /* green_lottie_tab_news.json in Resources */,
-				727E633E0971BFF96CD5500C /* green_lottie_tab_mine.json in Resources */,
+				E4527749730DAF427484396C /* tab_home.pag in Resources */,
+				B7D4C755CD143ACE372A53DF /* tab_moments.pag in Resources */,
+				556CE842B9062DDC7DF2B7A9 /* tab_me.pag in Resources */,
+				7FE57915337484F20F4615DE /* tab_health.pag in Resources */,
 				184C1C9A23F65A2A00B23C7F /* LaunchScreen.storyboard in Resources */,
 				184C1C9723F65A2A00B23C7F /* Assets.xcassets in Resources */,
 				184C1C9523F65A2800B23C7F /* Main.storyboard in Resources */,

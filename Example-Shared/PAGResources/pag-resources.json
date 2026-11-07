@@ -30,6 +30,11 @@
       "repository": "libpag/pag-web",
       "commit": "83e30df6176e80d640c362a1d433a939016ef115",
       "license": "None: the repository has no license file"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "license": "Apache-2.0"
     }
   ],
   "files": [
@@ -424,6 +429,49 @@
       "file": "pag-web/test.pag",
       "size": 108114,
       "sha256": "68312618dc50af3daf3efb97ccabe809c177fc5de91b37229fc54619f4679304"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "LICENSE.txt",
+      "file": "tab-icons/LICENSE.txt",
+      "size": 116512,
+      "sha256": "564047c2ea762f7b50d3c7d191b8305a464d3def329ad6ef259ec3228823a353"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "assets/refreshing.pag",
+      "lfs": true,
+      "file": "tab-icons/tab_home.pag",
+      "size": 1582,
+      "sha256": "069f7cf1b54f5d7a896deffc6fafd622e3ed439550a64df2ec329e1b99a6d72f"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "assets/wstask_circle.pag",
+      "lfs": true,
+      "file": "tab-icons/tab_health.pag",
+      "size": 2627,
+      "sha256": "abfac793abe73ef23a3cb4464b1dda573fd1a64cf3f36c9d4076a0e271c2d864"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "assets/like.pag",
+      "lfs": true,
+      "file": "tab-icons/tab_me.pag",
+      "size": 6922,
+      "sha256": "bc40511dc95bf2452a89fda2d494e2d3c3d74aacf39623fcbe22f7a242bbe1b0"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/2.pag",
+      "file": "tab-icons/tab_moments.pag",
+      "size": 2366,
+      "sha256": "86262b2775863b102d6679ca4a1e1f54479c5b5a7fac2b6e4a450d25d6b1a0ed"
     }
   ]
 }

@@ -9,6 +9,7 @@
 
 | 子目录 / Folder | 来源 / Source | 许可 / License |
 |:---|:---|:---|
+| `tab-icons/` | `Example-PAG` 的 4 个 Tab 图标，名称表示用途 / The 4 tab icons of `Example-PAG`, named by use: [Tencent/libpag](https://github.com/Tencent/libpag) `assets`（`refreshing`、`wstask_circle`、`like`，Git LFS）、[libpag/pag-ios](https://github.com/libpag/pag-ios)（`2`） | Apache License 2.0 |
 | `pag-ios/` | [libpag/pag-ios](https://github.com/libpag/pag-ios) `sample/pag-ios/assets` | Apache License 2.0 |
 | `pag-enterprise-ios/` | [libpag/pag-enterprise-ios](https://github.com/libpag/pag-enterprise-ios) `sample/asset` | Apache License 2.0 |
 | `pag-android/` | [libpag/pag-android](https://github.com/libpag/pag-android) `sample/app/src/main/assets` | MIT |
