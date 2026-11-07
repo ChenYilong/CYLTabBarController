@@ -110,10 +110,8 @@ if [[ "$TARGET" = central ]] && [[ "$DRY_RUN" = 0 ]]; then
     fi
     [[ -n "${SIGNING_KEY:-}" ]] || grep -qs '^signing.gnupg.keyName' "${GRADLE_USER_HOME:-$HOME/.gradle}/gradle.properties" || die "set SIGNING_KEY (and SIGNING_PASSWORD), or signing.gnupg.keyName in ~/.gradle/gradle.properties"
 fi
-if [[ "$TARGET" = github ]] && [[ "$DRY_RUN" = 0 ]]; then
-    if [[ -z "${GITHUB_ACTOR:-}" ]] || [[ -z "${GITHUB_TOKEN:-}" ]]; then
-        die "set GITHUB_ACTOR and GITHUB_TOKEN (with write:packages)"
-    fi
+if [[ "$TARGET" = github && "$DRY_RUN" = 0 && ( -z "${GITHUB_ACTOR:-}" || -z "${GITHUB_TOKEN:-}" ) ]]; then
+    die "set GITHUB_ACTOR and GITHUB_TOKEN (with write:packages)"
 fi
 
 # 3. [EN] Publish. [CN] 发布。
