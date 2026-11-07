@@ -13,6 +13,7 @@ import argparse
 import base64
 import hashlib
 import json
+import os
 import pathlib
 import re
 import shutil
@@ -25,8 +26,11 @@ AGENTS = ROOT / ".agents"
 SKILLS = AGENTS / "skills"
 MANIFEST = AGENTS / "skills.json"
 LOCK = AGENTS / "skills.lock.json"
-NAME_RE = re.compile(r"^name:\s*['\"]?([^'\"\n]+?)['\"]?\s*$", re.M)
-VALID_NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+NAME_LINE_RE = re.compile(r"^name:(.*)$", re.M)
+VALID_NAME_RE = re.compile(r"[a-z0-9]+(-[a-z0-9]+)*")
+REPOSITORY_RE = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
+COMMIT_RE = re.compile(r"[0-9a-f]{40}")
+SKILL_FILE = "SKILL.md"
 SKIPPED = {".git", ".github", ".DS_Store", "__pycache__"}
 UPSTREAM_LICENSE = "UPSTREAM-LICENSE"
 
@@ -37,8 +41,33 @@ def skill_name(skill_md):
     if not text.startswith("---"):
         return None
     end = text.find("\n---", 3)
-    match = NAME_RE.search(text[:end] if end > 0 else text)
-    return match.group(1).strip() if match else None
+    match = NAME_LINE_RE.search(text[:end] if end > 0 else text)
+    return match.group(1).strip().strip("'\"") if match else None
+
+
+def child_path(base, relative):
+    """[EN] `base`/`relative`, refused when it leaves `base`: manifests, lock files and third-party SKILL.md files are data.
+    [CN] `base`/`relative`，超出 `base` 时拒绝：清单、锁文件与第三方 SKILL.md 都是数据，不可信。"""
+    root = os.path.realpath(base)
+    path = os.path.realpath(os.path.join(root, str(relative)))
+    if os.path.commonpath([root, path]) != root:
+        sys.exit("Path outside %s: %s" % (root, relative))
+    return pathlib.Path(path)
+
+
+def installed_skill_folder(name):
+    """[EN] The folder of a skill, for a valid skill name only. [CN] 技能的文件夹，只接受有效的技能名。"""
+    if not VALID_NAME_RE.fullmatch(str(name)):
+        sys.exit("Invalid skill name: %r" % (name,))
+    return child_path(SKILLS, name)
+
+
+def check_source(source):
+    """[EN] Checks a manifest entry before it becomes a URL or a git argument. [CN] 在用作 URL 或 git 参数之前校验清单项。"""
+    if not REPOSITORY_RE.fullmatch(str(source.get("repo", ""))):
+        sys.exit("Invalid repository: %r" % (source.get("repo"),))
+    if not COMMIT_RE.fullmatch(str(source.get("commit", ""))):
+        sys.exit("%s: the commit must be a full hash" % source["repo"])
 
 
 def integrity(folder):
@@ -71,38 +100,44 @@ def clone(repo, commit, into):
     subprocess.check_call(["git", "-C", str(into), "checkout", "-q", commit])
 
 
+def vendor_skill(source, relative, checkout, entries):
+    """[EN] Copies one skill of `checkout` and records it. [CN] 拷贝 `checkout` 中的一个技能并记录。"""
+    origin = child_path(checkout, os.path.join(source.get("root", ""), relative))
+    declared = skill_name(origin / SKILL_FILE)
+    if not declared:
+        sys.exit("%s/%s: %s has no name" % (source["repo"], relative, SKILL_FILE))
+    # [EN] Agent Skills names are lowercase and hyphenated; another name is replaced by the folder's name.
+    # [CN] Agent Skills 的名字只含小写字母和连字符；其他名字替换为文件夹名。
+    name = declared if VALID_NAME_RE.fullmatch(declared) else origin.name.split("--")[-1]
+    if name in entries or name.startswith("cyl-"):
+        sys.exit("%s/%s: the name %s is already taken" % (source["repo"], relative, name))
+    target = installed_skill_folder(name)
+    remove_folder(target)
+    excluded = frozenset(source.get("exclude", []))
+    def ignore_names(_, names, excluded=excluded):
+        return [n for n in names if ignored(n) or n in excluded]
+    shutil.copytree(origin, target, symlinks=False, dirs_exist_ok=True, ignore=ignore_names)
+    shutil.copy(child_path(checkout, source["licenseFile"]), target / UPSTREAM_LICENSE)
+    if declared != name:
+        skill_md = target / SKILL_FILE
+        text = skill_md.read_text(encoding="utf-8")
+        skill_md.write_text(NAME_LINE_RE.sub("name: " + name, text, count=1), encoding="utf-8")
+    entries[name] = {"source": source["repo"], "path": relative, "commit": source["commit"],
+                     "license": source["license"], "integrity": integrity(target)}
+
+
 def vendor(manifest):
     entries = {}
     with tempfile.TemporaryDirectory() as temp:
         for index, source in enumerate(manifest["sources"]):
+            check_source(source)
             checkout = pathlib.Path(temp) / str(index)
             clone(source["repo"], source["commit"], checkout)
             for relative in source["skills"]:
-                origin = (checkout / source.get("root", "") / relative).resolve()
-                declared = skill_name(origin / "SKILL.md")
-                if not declared:
-                    sys.exit("%s/%s: SKILL.md has no name" % (source["repo"], relative))
-                # [EN] Agent Skills names are lowercase and hyphenated; another name is replaced by the folder's name.
-                # [CN] Agent Skills 的名字只含小写字母和连字符；其他名字替换为文件夹名。
-                name = declared if VALID_NAME_RE.match(declared) else origin.name.split("--")[-1]
-                if name in entries or name.startswith("cyl-"):
-                    sys.exit("%s/%s: the name %s is already taken" % (source["repo"], relative, name))
-                target = SKILLS / name
-                remove_folder(target)
-                excluded = set(source.get("exclude", []))
-                shutil.copytree(origin, target, symlinks=False, dirs_exist_ok=True,
-                                ignore=lambda _, names: [n for n in names if ignored(n) or n in excluded])
-                shutil.copy(checkout / source["licenseFile"], target / UPSTREAM_LICENSE)
-                if declared != name:
-                    skill_md = target / "SKILL.md"
-                    text = skill_md.read_text(encoding="utf-8")
-                    skill_md.write_text(NAME_RE.sub("name: " + name, text, count=1), encoding="utf-8")
-                entries[name] = {"source": source["repo"], "path": relative, "commit": source["commit"],
-                                 "license": source["license"], "integrity": integrity(target)}
-    tracked = set(entries)
+                vendor_skill(source, relative, checkout, entries)
     previous = json.loads(LOCK.read_text()).get("skills", {}) if LOCK.exists() else {}
-    for name in set(previous) - tracked:
-        remove_folder(SKILLS / name)
+    for name in set(previous) - set(entries):
+        remove_folder(installed_skill_folder(name))
     LOCK.write_text(json.dumps({"schemaVersion": 1, "skills": dict(sorted(entries.items()))}, indent=2) + "\n")
     print("Vendored %d skills from %d repositories." % (len(entries), len(manifest["sources"])))
 
@@ -123,28 +158,36 @@ def coverage_problems():
     return problems
 
 
-def check():
+def lock_problems(entries):
     problems = []
-    entries = json.loads(LOCK.read_text())["skills"] if LOCK.exists() else {}
-    on_disk = {p.name for p in SKILLS.iterdir() if p.is_dir()}
     for name, entry in entries.items():
-        folder = SKILLS / name
+        folder = installed_skill_folder(name)
         if not folder.is_dir():
             problems.append("%s: in the lock file, missing on disk" % name)
         elif integrity(folder) != entry["integrity"]:
             problems.append("%s: edited by hand; run the sync, or change the manifest" % name)
         elif not (folder / UPSTREAM_LICENSE).is_file():
             problems.append("%s: its upstream license is missing" % name)
-    for name in sorted(on_disk - set(entries)):
-        if not name.startswith("cyl-"):
-            problems.append("%s: not in the lock file; only cyl-* skills are written here" % name)
+    return problems
+
+
+def folder_problems(on_disk, entries):
+    problems = []
     for name in sorted(on_disk):
-        skill_md = SKILLS / name / "SKILL.md"
+        if name not in entries and not name.startswith("cyl-"):
+            problems.append("%s: not in the lock file; only cyl-* skills are written here" % name)
+        skill_md = SKILLS / name / SKILL_FILE
         if not skill_md.is_file():
-            problems.append("%s: no SKILL.md" % name)
+            problems.append("%s: no %s" % (name, SKILL_FILE))
         elif skill_name(skill_md) != name:
             problems.append("%s: the frontmatter name differs from the folder" % name)
-    problems.extend(coverage_problems())
+    return problems
+
+
+def check():
+    entries = json.loads(LOCK.read_text())["skills"] if LOCK.exists() else {}
+    on_disk = {p.name for p in SKILLS.iterdir() if p.is_dir()}
+    problems = lock_problems(entries) + folder_problems(on_disk, entries) + coverage_problems()
     link = ROOT / ".claude" / "skills"
     if not link.is_symlink() or link.resolve() != SKILLS.resolve():
         problems.append(".claude/skills must be a symlink to ../.agents/skills")
@@ -166,6 +209,7 @@ def main():
         matches = [s for s in manifest["sources"] if s["repo"] == args.update]
         if not matches:
             sys.exit("%s is not in the manifest" % args.update)
+        check_source({"repo": args.update, "commit": matches[0]["commit"]})
         output = subprocess.check_output(["git", "ls-remote", "https://github.com/%s.git" % args.update, "HEAD"], text=True)
         matches[0]["commit"] = output.split()[0]
         MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
