@@ -1,0 +1,4 @@
+interface:
+  display_name: "iOS Simulator"
+  short_description: "Build, test and drive iOS simulators"
+  default_prompt: "Use the iOS simulator skill to build, launch, and navigate my app."

@@ -13,6 +13,7 @@
 
 | 中文 | English |
 |:---|:---|
+| [AI 工具的 Skill：快速基于本库创建项目](Agent-Skills.md) | [Skills for AI tools: start a project on this library quickly](Agent-Skills.md) |
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
@@ -72,6 +73,7 @@
 
 ```text
 docs/
+├── Agent-Skills.md
 ├── Bilingual-Documentation.md
 ├── CYLUtils-Helpers.md
 ├── Carthage-Example.md

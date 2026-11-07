@@ -1,0 +1,62 @@
+---
+name: cyl-api-map
+description: "Map of CYLTabBarController features to the document that holds their API, limits and demo. Use to find the right API before writing tab bar code, instead of guessing or adding a new one."
+---
+
+# Feature to document
+
+Read the document for the feature before using its API. The public API is in the headers under `CYLTabBarController/`; the entry header is `CYLTabBarController.h`. Source of truth: code, then `docs/`, then `README.md`. If they disagree, fix the wrong one first (usually `README.md`), then this skill.
+
+| Feature | Document |
+|:---|:---|
+| Installing, Swift, `import` failures | [Swift-Guide](../../../docs/Swift-Guide.md) |
+| SwiftUI | [SwiftUI-Integration](../../../docs/SwiftUI-Integration.md) |
+| Carthage | [Carthage](../../../docs/Carthage.md) |
+| Carthage demo | [Carthage-Example](../../../docs/Carthage-Example.md) |
+| Every customization and its API | [Custom-Tab-Bar-Features](../../../docs/Custom-Tab-Bar-Features.md) |
+| Small customizations (double tap, item styles) | [TabBar-Customization-Toolkit](../../../docs/TabBar-Customization-Toolkit.md) |
+| Gallery of scenes, one per API | [Tab-Bar-Gallery](../../../docs/Tab-Bar-Gallery.md) |
+| The demo settings list | [Demo-Test-List](../../../docs/Demo-Test-List.md) |
+| FAQ | [FAQ](../../../docs/FAQ.md) |
+| Plus button rules | [PlusButton](../../../docs/PlusButton.md) |
+| Plus button: slot, counts | [PlusButton-Slot](../../../docs/PlusButton-Slot.md) |
+| Plus button: badge | [PlusButton-Badge](../../../docs/PlusButton-Badge.md) |
+| Plus button: background image | [PlusButton-Background-Image-Liquid-Glass](../../../docs/PlusButton-Background-Image-Liquid-Glass.md) |
+| Plus button: touchable area | [PlusButton-Touchable-Area](../../../docs/PlusButton-Touchable-Area.md) |
+| Plus button: subview touches | [PlusButton-Subview-Touches](../../../docs/PlusButton-Subview-Touches.md) |
+| Plus button with Lottie tab icons | [PlusButton-Lottie-TabIcon](../../../docs/PlusButton-Lottie-TabIcon.md) |
+| `setSelectedIndex:` with a plus button | [SelectedIndex-PlusButton](../../../docs/SelectedIndex-PlusButton.md) |
+| Update tabs without a rebuild | [Update-Tab-Bar-Items-In-Place](../../../docs/Update-Tab-Bar-Items-In-Place.md) |
+| Image-only tabs | [Image-Only-Tabs](../../../docs/Image-Only-Tabs.md) |
+| Per-tab colors | [Tab-Item-Colors](../../../docs/Tab-Item-Colors.md) |
+| Tab positioning, width, spacing | [Tab-Item-Positioning](../../../docs/Tab-Item-Positioning.md) |
+| A different title when selected | [TabBarItem-Selected-Title](../../../docs/TabBarItem-Selected-Title.md) |
+| FlatDesign appearance | [FlatDesign-StandardAppearance](../../../docs/FlatDesign-StandardAppearance.md) |
+| Tab gestures, double tap | [TabBarItem-Gestures](../../../docs/TabBarItem-Gestures.md) |
+| Tap animations, haptics, interactions | [Tab-Interactions](../../../docs/Tab-Interactions.md) |
+| Reselect: pop or scroll to top | [Tab-Reselect](../../../docs/Tab-Reselect.md) |
+| A tab runs an action | [Tab-Custom-Action](../../../docs/Tab-Custom-Action.md) |
+| Login-required tabs | [Login-Required-Tabs](../../../docs/Login-Required-Tabs.md) |
+| Hide or minimize on scroll | [TabBar-Minimize-On-Scroll](../../../docs/TabBar-Minimize-On-Scroll.md) |
+| Push from anywhere | [Push-From-Anywhere](../../../docs/Push-From-Anywhere.md) |
+| Accessibility identifiers, XCUITest | [Tab-Accessibility](../../../docs/Tab-Accessibility.md) |
+| Hit testing | [TabBar-HitTest-Super-Fallback](../../../docs/TabBar-HitTest-Super-Fallback.md) |
+| Animation subspec, adding a library | [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md) |
+| PAG | [PAG-Animation](../../../docs/PAG-Animation.md) |
+| Rive | [Rive-Animation](../../../docs/Rive-Animation.md) |
+| Mixing animated and static tabs | [Per-Tab-Animation](../../../docs/Per-Tab-Animation.md) |
+| Themes | [Theme-Switching](../../../docs/Theme-Switching.md) |
+| Theme evaluation | [Theme-Switching-Evaluation](../../../docs/Theme-Switching-Evaluation.md) |
+| Theme evaluation against QMUI | [Theme-Switching-QMUI-Evaluation](../../../docs/Theme-Switching-QMUI-Evaluation.md) |
+| Plus child theme test | [Plus-Child-Theme-Switching-Test](../../../docs/Plus-Child-Theme-Switching-Test.md) |
+| Helpers in CYLUtils | [CYLUtils-Helpers](../../../docs/CYLUtils-Helpers.md) |
+| Liquid Glass robustness | [Liquid-Glass-Robustness](../../../docs/Liquid-Glass-Robustness.md) |
+| CI and releases | [Mac-CI-CD](../../../docs/Mac-CI-CD.md) |
+| Bilingual documents | [Bilingual-Documentation](../../../docs/Bilingual-Documentation.md) |
+| Agent skills in this repository | [Agent-Skills](../../../docs/Agent-Skills.md) |
+
+`python3 scripts/sync-agent-skills.py --check` fails when a document in `docs/` is missing here. A new document gets a row in the same change.
+
+## Styles
+
+`tabBarStyleType`: `CYLTabBarStyleTypeDefault`, `CYLTabBarStyleTypeSystem`, `CYLTabBarStyleTypeFlatDesign`, `CYLTabBarStyleTypeLiquidGlass`. See `cyl-xcode-compat` for which system shows what.

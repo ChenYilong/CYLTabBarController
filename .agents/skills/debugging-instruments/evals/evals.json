@@ -1,0 +1,48 @@
+{
+  "skill_name": "debugging-instruments",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I need a concise profiling plan for an iOS app that has a slow feed refresh, battery-drain complaints, and a CI job that should collect a Time Profiler trace with xctrace. Include the Instruments templates or instruments to use, and show both the basic xctrace launch command and the command shape if we add Allocations to the same Time Profiler recording.",
+      "expected_output": "A source-grounded Instruments plan that chooses current template names, profiles on device, uses Power Profiler for battery work, shows xctrace launch syntax with the required -- separator, and uses --instrument for adding Allocations to a Time Profiler recording.",
+      "files": [],
+      "expectations": [
+        "Recommends Time Profiler for CPU or slow interaction triage.",
+        "Recommends Power Profiler, not Energy Log, for battery or energy-impact analysis.",
+        "Mentions profiling on a physical device for realistic measurements.",
+        "Shows xcrun xctrace record using --launch -- before the app command or bundle path.",
+        "Uses --instrument for adding an extra instrument to a template rather than repeating --template for multiple instruments.",
+        "Does not claim that Energy Log is the current Instruments template name."
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "Review this debugging plan: use the Leaks template to prove every retain cycle, run leaks --atExit -- ./MyApp.app/MyApp for our iOS build, call any 250 ms main-thread pause a severe hang, and enable Thread Sanitizer on a real iPhone test run. Correct the plan.",
+      "expected_output": "A correction-focused review that narrows leak, hang, Memory Graph, and Thread Sanitizer guidance using Apple-documented behavior.",
+      "files": [],
+      "expectations": [
+        "Explains that Leaks detects leaked allocations or isolated cycles but not every still-reachable retain cycle.",
+        "Recommends Memory Graph Debugger and Allocations generation marks for iOS retain-cycle or growth triage.",
+        "Uses exported .memgraph files with leaks for CLI memory-graph inspection instead of presenting --atExit as the default iOS app workflow.",
+        "Routes detailed .memgraph capture, ownership-path proof, and persistent heap-growth analysis to the ios-memgraph-analysis skill.",
+        "States that a few hundred milliseconds can feel unresponsive and that Apple tools typically report main-run-loop busy periods over 250 ms.",
+        "States that Thread Sanitizer for iOS-family apps runs in Simulator, while Apple documents device support only for 64-bit macOS apps.",
+        "Does not expand into MetricKit payload handling beyond a concise handoff to the metrickit skill."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My SwiftUI screen stutters while scrolling and I also want production hang telemetry in MetricKit plus a new Swift Testing benchmark. What should this debugging skill handle directly, and what should move to adjacent skills?",
+      "expected_output": "A boundary-aware answer that keeps Instruments and LLDB guidance in debugging-instruments while routing SwiftUI remediation, MetricKit ingestion, and Swift Testing test design to sibling skills.",
+      "files": [],
+      "expectations": [
+        "Keeps Instruments capture guidance in scope, such as SwiftUI or Animation Hitches with Time Profiler on device.",
+        "Routes SwiftUI code-level remediation patterns to the swiftui-performance skill.",
+        "Routes MetricManager report-sequence setup, DiagnosticReport processing, or HangDiagnostic ingestion details to the metrickit skill, including legacy compatibility when required.",
+        "Routes Swift Testing or XCTest benchmark organization details to the swift-testing skill.",
+        "Mentions OSSignposter or signposts as useful instrumentation for correlating app intervals with Instruments.",
+        "Does not collapse the sibling skills by giving a full MetricKit ingestion implementation or full SwiftUI refactor recipe."
+      ]
+    }
+  ]
+}

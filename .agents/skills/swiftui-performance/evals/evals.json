@@ -1,0 +1,58 @@
+{
+  "skill_name": "swiftui-performance",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review a SwiftUI feed that stutters while scrolling, decodes thumbnails in rows, filters inside ForEach, and includes a UIViewRepresentable video preview in some rows. Give a concise profiling plan and the first remediation targets.",
+      "expected_output": "A source-grounded SwiftUI performance review that profiles Release builds on device, uses current SwiftUI Instruments lanes, correlates with Time Profiler or Hangs/Hitches, and proposes targeted fixes without turning into a broad architecture rewrite.",
+      "files": [],
+      "expectations": [
+        "Recommends the SwiftUI template in Instruments on a Release build and real device where possible.",
+        "Mentions current SwiftUI lanes such as Update Groups, Long View Body Updates, Long Representable Updates or Representable Updates, Other Long Updates or Other Updates, and Cause & Effect Graph.",
+        "Correlates SwiftUI lanes with Time Profiler and Hangs/Hitches when needed.",
+        "Flags image decoding, filtering inside ForEach or body, unstable identity, and representable update work as likely first targets.",
+        "Keeps remediation targeted to the measured hot path and does not propose a full app architecture rewrite."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A LazyVStack screen loses per-row draft state after scrolling away, scroll-to-id jumps as rows load, and the row body has `if item.isVisible { Row(item) }`. Explain the likely SwiftUI performance and correctness issues.",
+      "expected_output": "Lazy-stack guidance that reflects current SwiftUI behavior: offscreen lazy rows can be removed and later deleted with view-local state, lazy stacks estimate offscreen sizes, and ForEach rows should have stable identity and constant top-level row shape.",
+      "files": [],
+      "expectations": [
+        "States that lazy stacks may remove offscreen rows and later delete the views and view-local state rather than promising row state survives scrolling.",
+        "Recommends storing durable row state outside the row view when it must survive scrolling away.",
+        "Recommends prefiltering data before ForEach instead of using an if branch that produces zero or one top-level row per element.",
+        "Mentions constant top-level subview count per ForEach element and stable identity.",
+        "Warns against absolute content-size or offset assumptions because lazy stacks estimate offscreen sizes.",
+        "Does not claim onAppear is guaranteed to be the first setup point for row data."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "My SwiftUI screen has janky scrolling, a custom transition whose curve feels wrong, a MetricKit hang dashboard request, and a NavigationStack deep-link bug. What should the SwiftUI performance skill handle directly, and what should move to sibling skills?",
+      "expected_output": "A boundary-aware answer that owns runtime profiling and SwiftUI performance remediation while routing animation tuning, production MetricKit telemetry, and navigation/deep-link behavior to sibling skills.",
+      "files": [],
+      "expectations": [
+        "Keeps SwiftUI profiling, update fan-out, body cost, identity churn, lazy container behavior, image work, and representable update cost in swiftui-performance scope.",
+        "Routes transition curve, timing, and animation API details to swiftui-animation when those are the primary issue.",
+        "Routes MetricManager report-sequence or DiagnosticReport ingestion details to the metrickit skill, including legacy compatibility when required.",
+        "Routes NavigationStack routing and deep-link bug design to swiftui-navigation.",
+        "Does not collapse sibling boundaries by giving full implementations for MetricKit, navigation routing, or animation tuning."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Review this proposed fix for a slow SwiftUI results screen: move every filtered collection into @State, refresh it opportunistically from onAppear, add equatable() to every row, and report the code review conclusions as confirmed performance findings before collecting a trace.",
+      "expected_output": "A correction that rejects @State as an unspecified cache, requires explicit ownership and refresh triggers for derived values, limits equatable() to cases where comparison is cheaper and value-semantic, and labels code-only conclusions as hypotheses until a comparable Instruments capture confirms them.",
+      "files": [],
+      "expectations": [
+        "Rejects using `@State` as a generic cache for arbitrary filtered collections.",
+        "Requires derived values to have a clear owner and explicit refresh trigger tied to their inputs.",
+        "Uses `equatable()` only when equality is cheaper than subtree recomputation and the inputs have stable value semantics.",
+        "Labels code-review conclusions as hypotheses rather than trace-backed findings.",
+        "Requests a comparable Release-on-device Instruments capture before and after the targeted fix."
+      ]
+    }
+  ]
+}

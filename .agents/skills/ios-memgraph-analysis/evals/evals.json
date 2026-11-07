@@ -1,0 +1,50 @@
+{
+  "skill_name": "ios-memgraph-analysis",
+  "evals": [
+    {
+      "id": 0,
+      "name": "dismissed-editor-ownership-proof",
+      "prompt": "EditorViewModel should deallocate after I dismiss an editor, but memory keeps growing. Design a Simulator memgraph investigation that proves the app-owned ownership path and verifies the eventual fix. I have two Simulators booted.",
+      "expected_output": "A lifetime-driven memgraph workflow that requires an explicit Simulator, captures one exact app process, preserves raw evidence, follows an app-owned type/path, and repeats the same flow after one ownership fix.",
+      "files": [],
+      "expectations": [
+        "Defines dismissal plus legitimate asynchronous cleanup as the expected EditorViewModel release boundary.",
+        "Requires an explicit Simulator UDID because two devices are booted and rejects ambiguous process matches.",
+        "Captures or exports a `.memgraph` after the release boundary and preserves the graph plus raw leaks output and manifest.",
+        "Starts from the app-owned EditorViewModel or its allocation stack and uses bounded trace/reference/grouped evidence to find the first app-controlled strong edge.",
+        "Distinguishes an unreachable cycle from a still-reachable abandoned owner.",
+        "Verifies by repeating the identical flow and querying the same type/path rather than relying on RSS or graph size."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "zero-leaks-persistent-growth",
+      "prompt": "`leaks` reports zero, but every open/close cycle adds about 8 MB and it never falls. What should I do with baseline and post-flow memgraphs? Include how vmmap, heap, traceTree/referenceTree, and Malloc Stack Logging fit together.",
+      "expected_output": "A correction-focused workflow that treats zero leaks as compatible with reachable growth, uses comparable pre/post graphs to locate and classify heap growth, and chooses ownership or allocation evidence based on Malloc Stack Logging availability.",
+      "files": [],
+      "expectations": [
+        "States that zero unreachable leaks does not rule out reachable but abandoned objects, caches, buffers, or heap regressions.",
+        "Uses matching baseline and post-flow graphs and `vmmap -summary` to locate the growing memory region.",
+        "Uses `heap --diffFrom=<baseline.memgraph> <post.memgraph>` to identify object types present in the post-flow heap but not the baseline.",
+        "Uses `heap --addresses=<pattern> <post.memgraph>` followed by `leaks --traceTree` or a grouped reference tree for ownership clues.",
+        "Uses a complete address-mode command such as `malloc_history post.memgraph -fullStacks <address>`, takes the address from `heap --addresses`, requires Malloc Stack Logging evidence, and keeps its setting identical across comparisons.",
+        "Preserves raw tool output and avoids treating text-parser columns as a stable API."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "weak-fix-claim-review",
+      "prompt": "I added `[weak self]` everywhere. The new graph file is smaller, RSS is down, and leaks reports 12 instead of 19 entries, so the retain-cycle bug is fixed. Review that conclusion and give me a proof standard.",
+      "expected_output": "A skeptical review that rejects aggregate metrics as ownership proof, requires a defined lifetime and app-owned path, evaluates weak/unowned semantics, and specifies same-flow repeated verification.",
+      "files": [],
+      "expectations": [
+        "Rejects graph file size, one RSS reading, and aggregate leak count as sufficient proof.",
+        "Requires naming the object, expected release event, and original app-owned ownership path or isolated cycle.",
+        "Warns that blanket `[weak self]` can hide lifecycle reasoning and may change required work semantics.",
+        "Uses weak only when the owner may legitimately disappear and unowned only with a proven lifetime guarantee.",
+        "Requires matching builds, settings, flows, cleanup wait, and repeated captures.",
+        "Calls the fix supported only when the same type/path or attributable pre/post growth disappears."
+      ]
+    }
+  ]
+}
