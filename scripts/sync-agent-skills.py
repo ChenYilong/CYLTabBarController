@@ -146,11 +146,11 @@ def coverage_problems():
     """[EN] A new document or demo must reach the project skills, so a new project can be started from them.
     [CN] 新文档或新 Demo 必须写入项目 skill，这样才能基于 skill 创建新项目。"""
     problems = []
-    api_map = (SKILLS / "cyl-api-map" / "SKILL.md").read_text(encoding="utf-8")
+    api_map = (SKILLS / "cyl-api-map" / SKILL_FILE).read_text(encoding="utf-8")
     for document in sorted((ROOT / "docs").glob("*.md")):
         if document.name != "README.md" and not ignored(document.name) and "docs/%s)" % document.name not in api_map:
             problems.append("docs/%s: no row in the cyl-api-map skill" % document.name)
-    new_project = (SKILLS / "cyl-new-project" / "SKILL.md").read_text(encoding="utf-8")
+    new_project = (SKILLS / "cyl-new-project" / SKILL_FILE).read_text(encoding="utf-8")
     output = subprocess.check_output(["git", "-C", str(ROOT), "ls-files", "-z", "Example*"], text=True)
     for demo in sorted({path.split("/")[0] for path in output.split("\0") if "/" in path}):
         if "`%s`" % demo not in new_project and "`%s/`" % demo not in new_project:
@@ -211,8 +211,15 @@ def main():
             sys.exit("%s is not in the manifest" % args.update)
         check_source({"repo": args.update, "commit": matches[0]["commit"]})
         output = subprocess.check_output(["git", "ls-remote", "https://github.com/%s.git" % args.update, "HEAD"], text=True)
-        matches[0]["commit"] = output.split()[0]
-        MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
+        commit = output.split()[0] if output.split() else ""
+        # [EN] The remote's answer is data too: only a full hash goes into the manifest.
+        # [CN] 远端的返回值也是数据：只有完整的哈希才写入清单。
+        if not COMMIT_RE.fullmatch(commit):
+            sys.exit("%s: git ls-remote returned no commit hash" % args.update)
+        matches[0]["commit"] = commit
+        # [EN] Writes JSON to the fixed manifest path; no path comes from the data (Sonar S2083 sees the manifest as input).
+        # [CN] 把 JSON 写入固定的清单路径；路径不来自数据（Sonar S2083 把清单视为外部输入）。
+        MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")  # NOSONAR
     SKILLS.mkdir(parents=True, exist_ok=True)
     vendor(manifest)
     return check()
