@@ -43,6 +43,13 @@
       "license": "PolyForm-Perimeter-1.0.0",
       "integrity": "sha256-abOvRLT0xowOiL9uwr3f/kJ91USC2fo8XDy9OAK/Z1g="
     },
+    "github-actions": {
+      "source": "callstackincubator/agent-skills",
+      "path": "github-actions",
+      "commit": "59e9d17446a248b21d86f078fcd0bd2d36db1ca4",
+      "license": "MIT",
+      "integrity": "sha256-GqiR9M+u/EW37bzWTTIlCW96q4sIkuZzcoNIWBWd5zU="
+    },
     "hig": {
       "source": "Prisma-Labs-Dev/apple-skills",
       "path": "hig",
@@ -266,6 +273,13 @@
       "commit": "90d180768169d5b422790042fe1606976abb1a0c",
       "license": "MIT",
       "integrity": "sha256-XJ1xvUEb26WQjReH+eKLYfAOlmzRPo1/SSMytcB9UXE="
+    },
+    "writing-user-docs": {
+      "source": "callstackincubator/agent-skills",
+      "path": "writing-user-docs",
+      "commit": "59e9d17446a248b21d86f078fcd0bd2d36db1ca4",
+      "license": "MIT",
+      "integrity": "sha256-LLijFn7Hmsx0OVXKclHakvtGO/n2ncLenca8946GHOc="
     },
     "xcode-build-fixer": {
       "source": "JordanCoin/ios-skills-collection",

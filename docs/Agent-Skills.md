@@ -61,6 +61,7 @@
 | [rshankras/claude-code-apple-skills](https://github.com/rshankras/claude-code-apple-skills) | 184 | 12 | MIT | UI 审查、TDD、迁移、真机运行 / UI review, TDD, migration, running on a device |
 | [droidrun/mobile-harness](https://github.com/droidrun/mobile-harness) | 1 | 1（不含图片 / without images） | MIT | 设备控制；需要自行安装 `mobilerun-core` / Device control; `mobilerun-core` must be installed first |
 | [Prisma-Labs-Dev/apple-skills](https://github.com/Prisma-Labs-Dev/apple-skills) | 34 | 6 | MIT | UIKit、Core Animation、Core Haptics、XCUITest、HIG 参考 / UIKit, Core Animation, Core Haptics, XCUITest and HIG references |
+| [callstackincubator/agent-skills](https://github.com/callstackincubator/agent-skills) | 10 | 2 | MIT | GitHub Actions 工作流、面向用户的文档 / GitHub Actions workflows, user-facing documentation |
 | [JordanCoin/ios-skills-collection](https://github.com/JordanCoin/ios-skills-collection)（GitHub 搜索 / GitHub search） | 206 | 6 | MIT | UIKit 布局与模式、UIKit 无障碍、Xcode 工程分析、XcodeBuildMCP / UIKit layout and patterns, UIKit accessibility, Xcode project analysis, XcodeBuildMCP |
 
 | 中文 | English |
