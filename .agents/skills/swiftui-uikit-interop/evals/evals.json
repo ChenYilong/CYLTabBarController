@@ -1,0 +1,41 @@
+{
+  "skill_name": "swiftui-uikit-interop",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review this SwiftUI wrapper for a legacy search bar:\n\n```swift\nstruct SearchBar: UIViewRepresentable {\n    @Binding var text: String\n    var onSearch: (String) -> Void\n\n    func makeCoordinator() -> Coordinator { Coordinator(self) }\n\n    func makeUIView(context: Context) -> UISearchBar {\n        let bar = UISearchBar()\n        bar.delegate = context.coordinator\n        return bar\n    }\n\n    func updateUIView(_ uiView: UISearchBar, context: Context) {\n        if uiView.text != text { uiView.text = text }\n    }\n\n    final class Coordinator: NSObject, UISearchBarDelegate {\n        var parent: SearchBar\n        init(_ parent: SearchBar) { self.parent = parent }\n        func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {\n            parent.onSearch(parent.text)\n        }\n    }\n}\n```\n\nWhat should change for correctness under SwiftUI/UIKit interop?",
+      "expected_output": "A review that keeps delegate setup in makeUIView, adds an explicit coordinator parent refresh in updateUIView, preserves guarded state updates, and explains why copied closures or non-binding state can go stale.",
+      "files": [],
+      "assertions": [
+        "States that SwiftUI does not automatically update a coordinator's stored parent property and recommends assigning context.coordinator.parent = self in updateUIView.",
+        "Keeps UISearchBar delegate assignment in makeUIView instead of moving it to updateUIView.",
+        "Keeps or recommends a guard before writing uiView.text to avoid redundant update loops.",
+        "Explains that bindings remain connected but copied closures or non-binding values in the coordinator can become stale without refresh."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I have a UIKit DashboardViewController inside a mixed UIKit/SwiftUI app. It reads an @Observable AppState and currently runs a Task loop with withObservationTracking and Task.sleep(for: .zero) to refresh labels. Rewrite the approach for an iOS 26-first app that still mentions the iOS 18 and iOS 15-16 fallback story.",
+      "expected_output": "A migration answer that replaces polling with UIKit automatic observation tracking, uses updateProperties or cell configuration update handlers, notes UIObservationTrackingEnabled for iOS 18 but not iOS 26, and keeps Combine as the old ObservableObject fallback.",
+      "files": [],
+      "assertions": [
+        "Rejects a polling or Task.sleep loop around withObservationTracking.",
+        "Uses UIKit automatic observation tracking through updateProperties, layoutSubviews, or configurationUpdateHandler for @Observable model reads.",
+        "States that UIObservationTrackingEnabled is required on iOS 18 and not required on iOS 26 and later.",
+        "Mentions Combine/objectWillChange as the fallback for iOS 15-16 or existing ObservableObject models."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Which skill should handle this request: 'My SwiftUI screen needs a PDF viewer, a rich text editor, a web help center, and a legacy UIKit share/mail/message flow. I also need a collection view cell that hosts SwiftUI content with swipe actions.' Give the routing and the key interop guidance without turning it into a PDFKit, WebKit, or PhotoKit tutorial.",
+      "expected_output": "A boundary-aware answer that uses swiftui-uikit-interop for representable and hosting patterns, routes PDF details to pdfkit and WebKit details to swiftui-webkit, mentions modern native alternatives where appropriate, and correctly describes UIHostingConfiguration swipe action behavior.",
+      "files": [],
+      "assertions": [
+        "Routes general UIViewRepresentable, UIViewControllerRepresentable, UIHostingController, MessageUI wrappers, and UIHostingConfiguration guidance to swiftui-uikit-interop.",
+        "Routes PDFView, PDFDocument, PDF annotations, thumbnails, and PDF-specific behavior to pdfkit rather than expanding this skill into a PDFKit tutorial.",
+        "Routes native iOS 26 WebView/WebPage work to swiftui-webkit rather than recommending a WKWebView wrapper as the default.",
+        "States that UIHostingConfiguration can bridge SwiftUI swipeActions in list layouts, while UIKit swipe configuration remains appropriate when UIKit owns those actions."
+      ]
+    }
+  ]
+}

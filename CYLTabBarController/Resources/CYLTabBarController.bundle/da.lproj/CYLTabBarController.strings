@@ -305,6 +305,7 @@
 "轻触感反馈" = "Let haptik";
 "重触感反馈" = "Kraftig haptik";
 "长按（#152）" = "Langt tryk (#152)";
+"播放 / 停止" = "Afspil / Stop";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "Jul";
@@ -324,6 +325,35 @@
 "点我" = "Tryk her";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "To fanelinjer deler én konfiguration; hver lines register knytter de samme side-id’er til forskellige sider.";
 "两个 TabBar，同一个页面 ID" = "To fanelinjer, ét side-id";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Indlæs billedet";
+"替换为更大的图片" = "Erstat med et større billede";
+"移除图片" = "Fjern billedet";
+"加载背景图片" = "Indlæs et baggrundsbillede";
+"2 秒后：%@" = "Om 2 sekunder: %@";
+"PlusButton 图片之后才加载" = "PlusButton-billede indlæst senere";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Tryk for at vælge et tilfælde og pushe en fanelinjecontroller: PlusButton har først intet billede; 2 sekunder senere indlæses, erstattes eller fjernes billedet, eller der indlæses et baggrundsbillede. Resultatet skal svare til et billede, der er angivet ved start.";
+"对照：启动时即有图片" = "Sammenlign: billede ved start";
+"对照：启动时即有更大的图片" = "Sammenlign: større billede ved start";
+"对照：启动时即有背景图片" = "Sammenlign: baggrundsbillede ved start";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Tryk for at gå tilbage eller lukke";
+"详情" = "Detaljer";
+"拍照" = "Tag et foto";
+"从相册选择" = "Vælg fra album";
+"设置" = "Indstillinger";
+"关于我们" = "Om os";
+"示例" = "Eksempel";
+"撰写" = "Skriv";
+"好" = "OK";
+"编辑更多" = "Rediger Mere";
+"新版本" = "Ny version";
+"打开 TabBar 场景展示" = "Åbn fanelinjegalleriet";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Hver scene er en fanelinje bygget med det offentlige API: typografier, animationer, påmindelser, Lottie og de nyere fane-API'er";
+"TabBar 场景展示" = "Fanelinjegalleri";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Kopiér";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
@@ -332,3 +362,9 @@
 "收起模拟列表" = "Skjul listen over simuleringer";
 /* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
 "跳过 %1$@ 个 Tab：%2$@" = "%1$@ faner sprunget over: %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Netværksikoner";
+"网络图标、标题与配色" = "Netværksikoner, titler og farver";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Konfigurationsfil";

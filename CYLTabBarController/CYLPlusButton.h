@@ -11,6 +11,10 @@
 // [CN] 与此类绑定的文档：
 //   - Custom Tab Bar Feature Checklist / 自定义 TabBar 功能清单
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Custom-Tab-Bar-Features.md
+//   - Plus child theme switching test / PlusButton 子控制器换肤测试
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Plus-Child-Theme-Switching-Test.md
+//   - Liquid Glass: a PlusButton with its title on a background image / 液态玻璃：标题画在背景图上的 PlusButton
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Background-Image-Liquid-Glass.md
 //   - PlusButton badge: changes on every tap / PlusButton 角标：每次点击都会变化
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Badge.md
 //   - Research: registering the PlusButton through configurations and the page registry / 调研：配置文件与页面注册表中的 PlusButton 注册
@@ -21,6 +25,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Subview-Touches.md
 //   - PlusButton touchable area: grow it, scale it, and see it / PlusButton 点击范围：扩大、按倍数放大与调试显示
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Touchable-Area.md
+//   - How the PlusButton works: the real button, its Liquid Glass stand-in and selected images / PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md
 //   - selectedIndex and the PlusButton: the selected title and image match / selectedIndex 与 PlusButton：选中的文字与图片一致
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SelectedIndex-PlusButton.md
 //   - Using CYLTabBarController in Swift / 在 Swift 项目中使用 CYLTabBarController
@@ -148,6 +154,10 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
  *      - The plus button and the tab items are in different view hierarchies, so the item title's center is converted
  *        into the plus button's coordinate space. Only the plus button title's centerY moves.
  *      - Not implemented, or NO: the title stays where the plus button lays it out, as before.
+ *      - A plus button drawn with a background image only, its title on that picture: better not implemented. The title
+ *        would leave the middle of the picture for the tab titles' line and take their font and colors. Such a button is
+ *        placed by `+multiplierOfTabBarHeight:` and `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` in every style
+ *        (see docs/PlusButton-Background-Image-Liquid-Glass.md).
  * [CN] 返回 YES 时，PlusButton 的标题与 TabBarItem 的标题保持一致，适用于所有 TabBar 样式（系统 TabBar、液态玻璃、扁平样式）：同一中心线、
  *      相同的字体与字号、未选中 Tab 标题的颜色，以及 PlusButton 选中时使用选中 Tab 标题的颜色。PlusButton 无需任何自定义；
  *      支持使用与未使用 `UIButtonConfiguration` 的按钮，并会替换其原有的标题字体和颜色。
@@ -155,6 +165,12 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
  *        标题时，不做任何调整。
  *      - PlusButton 与 TabBarItem 不在同一视图层级，因此会把 item 标题的中心点转换到 PlusButton 的坐标系。只调整 PlusButton 标题的 centerY。
  *      - 未实现或返回 NO：标题保持 PlusButton 自身布局的位置，与旧版本一致。
+ *      - 只用背景图片绘制、标题画在图上的 PlusButton：建议不实现。否则标题会离开图片中心、移到 Tab 标题所在的线上，并使用其字体和颜色。
+ *        这种按钮在所有样式下都按 `+multiplierOfTabBarHeight:` 与 `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` 放置
+ *        （见 docs/PlusButton-Background-Image-Liquid-Glass.md）。
+ * [EN] With this, the stand-in in the Liquid Glass selected layer lines up with the plus button by icon only; other subviews are
+ *      not considered: https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md
+ * [CN] 实现后，液态玻璃选中图层中的替身与 PlusButton 只对齐图标，不考虑其他子视图，见上面的链接。
  */
 + (BOOL)alignsTitleWithTabBarItemTitles;
 
@@ -181,7 +197,9 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
 
 /*!
  * iOS26+ selectedContentView 只有在选中状态下会显示。
- * [EN] iOS 26+. Returns the button shown as the plus button's selected-state content.
+ * [EN] iOS 26+. Returns the button shown as the plus button's selected-state content. With a plus child view controller on
+ *      Liquid Glass (not FlatDesign) its image is replaced by the plus button's normal image, in every state: https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md
+ * [CN] 有 PlusButton 子控制器且为液态玻璃（非扁平样式）时，其所有状态的图片都被替换为 PlusButton 普通状态的图片，见上面的链接。
  * [CN] iOS 26+。返回作为 PlusButton 选中态内容展示的按钮。
  */
 + (UIButton *)selectedContentView;
@@ -195,8 +213,10 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
 
 /*!
  * iOS26+  如果plusButton只有图片没有label，更简单的方式是实现下面这个代理。
- * [EN] iOS 26+. Returns the image used as the plus button's selected-state content.
- * [CN] iOS 26+。返回 PlusButton 选中态内容所使用的图片。
+ * [EN] iOS 26+. Returns the image used as the plus button's selected-state content. Ignored with a plus child view controller
+ *      on Liquid Glass (not FlatDesign): the stand-in shows the plus button's normal image: https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md
+ * [CN] iOS 26+。返回 PlusButton 选中态内容所使用的图片。有 PlusButton 子控制器且为液态玻璃（非扁平样式）时被忽略：替身显示 PlusButton
+ *      普通状态的图片。见上面的链接。
  */
 + (UIImage *)selectedContentImage;
 
@@ -207,6 +227,8 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
 
 /*!
  * Snapshot of plusButton, iOS26+
+ * [EN] Ignored with a plus child view controller on Liquid Glass (not FlatDesign), see `+selectedContentImage`: https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md
+ * [CN] 有 PlusButton 子控制器且为液态玻璃（非扁平样式）时被忽略，见 `+selectedContentImage` 与上面的链接。
  */
 @property (nonatomic, strong) UIImage *selectedContentImage;
 
@@ -519,9 +541,13 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
  *      item under it (Liquid Glass, `-cyl_showsTitleInTabBarItem`); `image` (normal and highlighted) and `selectedImage`
  *      (nil keeps them), drawn as given, also on its stand-in in the Liquid Glass selected layer. See
  *      `-[CYLTabBarController updatePlusButtonWithAttributes:]` for images from names, paths or URLs.
+ *      With a plus child view controller on Liquid Glass (not FlatDesign), `selectedImage` stays on the plus button but its
+ *      stand-in ignores it and shows the normal image. FlatDesign and the classic tab bar use it: https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md
  * [CN] 原地修改 PlusButton，适用于所有样式：`title`（nil 保持不变），由 PlusButton 或其下方的 TabBarItem 显示（液态玻璃，
  *      `-cyl_showsTitleInTabBarItem`）；`image`（普通与高亮状态）和 `selectedImage`（nil 保持不变）按原样绘制，液态玻璃选中图层中的替身
  *      也会更新。图片来自图片名、路径或 URL 时，见 `-[CYLTabBarController updatePlusButtonWithAttributes:]`。
+ *      有 PlusButton 子控制器且为液态玻璃（非扁平样式）时，`selectedImage` 保留在 PlusButton 上，但替身忽略它并显示普通状态的图片；
+ *      扁平样式与经典 TabBar 使用它。见上面的链接。
  */
 - (void)cyl_updateTitle:(nullable NSString *)title image:(nullable UIImage *)image selectedImage:(nullable UIImage *)selectedImage;
 

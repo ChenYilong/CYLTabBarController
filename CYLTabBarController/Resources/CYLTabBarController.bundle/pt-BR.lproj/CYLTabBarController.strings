@@ -305,6 +305,7 @@
 "轻触感反馈" = "Resposta tátil leve";
 "重触感反馈" = "Resposta tátil forte";
 "长按（#152）" = "Toque longo (#152)";
+"播放 / 停止" = "Reproduzir / Parar";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "Natal";
@@ -324,6 +325,35 @@
 "点我" = "Toque aqui";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Duas barras de abas usam a mesma configuração; o registro de cada uma associa os mesmos IDs de página a páginas diferentes.";
 "两个 TabBar，同一个页面 ID" = "Duas barras de abas, um ID de página";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Carregar a imagem";
+"替换为更大的图片" = "Substituir por uma imagem maior";
+"移除图片" = "Remover a imagem";
+"加载背景图片" = "Carregar uma imagem de fundo";
+"2 秒后：%@" = "Em 2 segundos: %@";
+"PlusButton 图片之后才加载" = "Imagem do PlusButton carregada depois";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Toque para escolher um caso e fazer push de um tab bar controller: o PlusButton começa sem imagem; 2 segundos depois a imagem é carregada, substituída ou removida, ou uma imagem de fundo é carregada. O resultado deve ser igual a uma imagem definida na inicialização.";
+"对照：启动时即有图片" = "Comparar: imagem na inicialização";
+"对照：启动时即有更大的图片" = "Comparar: imagem maior na inicialização";
+"对照：启动时即有背景图片" = "Comparar: imagem de fundo na inicialização";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Toque para voltar ou fechar";
+"详情" = "Detalhe";
+"拍照" = "Tirar foto";
+"从相册选择" = "Escolher do álbum";
+"设置" = "Ajustes";
+"关于我们" = "Sobre nós";
+"示例" = "Exemplo";
+"撰写" = "Escrever";
+"好" = "OK";
+"编辑更多" = "Editar Mais";
+"新版本" = "Nova versão";
+"打开 TabBar 场景展示" = "Abrir a galeria de tab bars";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Cada cena é uma tab bar criada com a API pública: estilos, animações, avisos, Lottie e as novas APIs de abas";
+"TabBar 场景展示" = "Galeria de tab bars";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Copiar";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
@@ -332,3 +362,9 @@
 "收起模拟列表" = "Recolher a lista de simulações";
 /* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
 "跳过 %1$@ 个 Tab：%2$@" = "%1$@ abas ignoradas: %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Ícones da rede";
+"网络图标、标题与配色" = "Ícones da rede, títulos e cores";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Arquivo de configuração";

@@ -13,6 +13,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Configuration-File.md
 //   - Custom Tab Bar Feature Checklist / 自定义 TabBar 功能清单
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Custom-Tab-Bar-Features.md
+//   - The demo test list: settings groups and a pure Swift version / Demo 测试列表：设置分组与纯 Swift 版本
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Demo-Test-List.md
 //   - CYLTabBarController FAQ / CYLTabBarController 常见问题
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/FAQ.md
 //   - FlatDesign × UITabBarAppearance
@@ -23,12 +25,20 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Liquid-Glass-Robustness.md
 //   - Tabs That Need Login / 需要登录的 Tab
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Login-Required-Tabs.md
+//   - PAG animated tab icons (used like Lottie) / PAG 动画 Tab 图标（与 Lottie 用法相同）
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PAG-Animation.md
+//   - Only some tabs animated (Lottie or PAG) / 只有部分 Tab 有动画（Lottie 或 PAG）
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Per-Tab-Animation.md
+//   - Plus child theme switching test / PlusButton 子控制器换肤测试
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Plus-Child-Theme-Switching-Test.md
 //   - PlusButton badge: changes on every tap / PlusButton 角标：每次点击都会变化
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Badge.md
 //   - Lottie tab icons and their files when there is a PlusButton / 有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Lottie-TabIcon.md
 //   - The PlusButton Slot: Placeholders and Matching Counts / PlusButton 的 slot：占位与数量一致
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton-Slot.md
+//   - How the PlusButton works: the real button, its Liquid Glass stand-in and selected images / PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md
 //   - Get the navigation controller and push from anywhere / 在任意位置获取导航控制器并 Push
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Push-From-Anywhere.md
 //   - selectedIndex and the PlusButton: the selected title and image match / selectedIndex 与 PlusButton：选中的文字与图片一致
@@ -63,6 +73,10 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBarItem-Gestures.md
 //   - Selected title: a different title on the selected tab (like JD's "Refresh") / 选中标题：选中的 Tab 显示不同文字（如京东「刷新」）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBarItem-Selected-Title.md
+//   - Theme switching evaluation: integration with the animation components, gaps and improvements / 换肤实现评估：与动画组件的集成、差距与改进
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching-Evaluation.md
+//   - Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve / 换肤实现评估：与 QMUI 的差距、架构符合度与改进建议
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching-QMUI-Evaluation.md
 //   - Theme switching (skins) / 换肤（主题切换）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Theme-Switching.md
 //   - Update Tabs in Place: Titles, Icons, Network Icons and Pages / 原地更新 Tab：标题、图标、网络图标与替换页面
@@ -192,9 +206,9 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedDarkImage;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImageURL;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedImageURL;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImageURLSize;
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieFilePath;
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieURL;
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieFilePath CYL_LOTTIE_REQUIRED;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieURL CYL_LOTTIE_REQUIRED;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize CYL_LOTTIE_REQUIRED;
 /*!
  * FIX: issue #442
  * [EN] Optional Dark Mode versions of `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath` (an NSURL / a file path). A
@@ -209,8 +223,8 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize;
  *      所以设置了 `CYLTabBarLottieURL` 的 Tab 以前在深色模式下保持浅色样式，与图片无关。设置后，界面风格为深色时（系统设置或
  *      `overrideUserInterfaceStyle`）Tab 显示深色动画，并自动切换，选中状态保持不变。示例见上。
  */
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkURL;
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkURL CYL_LOTTIE_REQUIRED;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkFilePath CYL_LOTTIE_REQUIRED;
 /*!
  * FIX: issue #442 — Lottie 4.x (`CYLTabBarController/LottieSwift`, `CYLFlatDesignTabBar`, SPM)
  * [EN] One Lottie file for both styles: an NSDictionary of keypath -> UIColor, the colors used where the interface style
@@ -233,7 +247,7 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkFilePath;
  *      Lottie 2.x（`CYLTabBarController/LottieObjectiveC`）不支持，请使用 `CYLTabBarLottieDarkFilePath`。深色文件与深色颜色可同时设置，
  *      此时颜色作用于深色文件。
  */
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkColors;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkColors CYL_LOTTIE_REQUIRED;
 
 /*!
  * [EN] Optional, per tab (an NSNumber BOOL, default NO): the tab's Lottie animation (`CYLTabBarLottieURL` /
@@ -243,7 +257,7 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkColors;
  *      **未选中**时循环播放以吸引点击，选中时暂停，而不是在选中时播放一次。支持 Lottie 2.x 与 4.x，适用于所有样式。见
  *      docs/Custom-Tab-Bar-Features.md。
  */
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieLoopsWhenUnselected;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieLoopsWhenUnselected CYL_LOTTIE_REQUIRED;
 
 /*!
  * [EN] Returns `attributes` with a Lottie animation added to each item: `CYLTabBarLottieFilePath` for "<name>.json" in
@@ -264,6 +278,100 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieLoopsWhenUnselected;
  */
 FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingLottieFiles(NSArray<NSDictionary *> *attributes,
                                                                                     NSArray<NSString *> *lottieFileNames,
+                                                                                    NSBundle * _Nullable bundle) CYL_LOTTIE_REQUIRED;
+
+/*!
+ * FIX: issue #604 — generic animation keys, for every animation library.
+ * [EN] Keys for a tab's animation that do not name a library: the file decides which library plays it (".json" Lottie,
+ *      ".pag" PAG, or the file type of any library added later, see `CYLTabBarItemAnimatorRegistry`). They work like the
+ *      Lottie keys, and each library's own keys (`CYLTabBarLottie…`, `CYLTabBarPAG…`) keep working too.
+ *      - `CYLTabBarAnimationURL` (NSURL) / `CYLTabBarAnimationFilePath` (NSString): the file; the URL wins.
+ *      - `CYLTabBarAnimationSize`: the view size, an NSValue of CGSize (default: the icon placeholder size).
+ *      - `CYLTabBarAnimationDarkURL` / `CYLTabBarAnimationDarkFilePath`: the Dark Mode version (#442).
+ *      - `CYLTabBarAnimationDarkColors`: keypath -> UIColor for Dark Mode, for libraries that support it (Lottie 4.x).
+ * [CN] 不指定动画库的 Tab 动画 key：由文件决定使用哪个动画库播放（".json" 为 Lottie，".pag" 为 PAG，或以后新增的动画库对应的文件类型，
+ *      见 `CYLTabBarItemAnimatorRegistry`）。用法与 Lottie key 相同，各动画库自己的 key（`CYLTabBarLottie…`、`CYLTabBarPAG…`）也仍然有效。
+ *      - `CYLTabBarAnimationURL`（NSURL）/ `CYLTabBarAnimationFilePath`（NSString）：动画文件，URL 优先。
+ *      - `CYLTabBarAnimationSize`：视图尺寸，CGSize 的 NSValue（默认使用图标占位尺寸）。
+ *      - `CYLTabBarAnimationDarkURL` / `CYLTabBarAnimationDarkFilePath`：深色模式版本（#442）。
+ *      - `CYLTabBarAnimationDarkColors`：深色模式下 keypath -> UIColor，用于支持该功能的动画库（Lottie 4.x）。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationSize;
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationDarkURL;
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationDarkFilePath;
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationDarkColors;
+/*!
+ * FIX: issue #216
+ * [EN] `CYLTabBarAnimationColors`: keypath -> UIColor applied in every appearance, for libraries that support color
+ *      overrides (Lottie 4.x, Rive). A theme color (`+[UIColor cyl_colorWithThemeProvider:]`) is resolved again on every
+ *      theme change, so the animation follows the skin; `CYLTabBarAnimationDarkColors` is added on top of it in Dark Mode.
+ * [CN] `CYLTabBarAnimationColors`：在所有外观下应用的 keypath -> UIColor，用于支持颜色覆盖的动画库（Lottie 4.x、Rive）。
+ *      主题颜色（`+[UIColor cyl_colorWithThemeProvider:]`）会在每次主题切换时重新解析，使动画跟随皮肤；深色模式下再叠加
+ *      `CYLTabBarAnimationDarkColors`。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarAnimationColors;
+
+/*!
+ * [EN] Options of a tab animation, for `CYLTabBarAnimationURLWithOptions()`. Each library declares the options it reads
+ *      in its own subspec (e.g. `CYLTabBarAnimationOptionRiveArtboard` in the `Rive` subspec); Core only carries them.
+ * [CN] Tab 动画的选项，用于 `CYLTabBarAnimationURLWithOptions()`。每个动画库在自己的子库中声明它读取的选项（例如 `Rive` 子库中的
+ *      `CYLTabBarAnimationOptionRiveArtboard`）；Core 只负责传递。
+ */
+typedef NSString *CYLTabBarAnimationOption NS_TYPED_EXTENSIBLE_ENUM;
+
+/*!
+ * [EN] The URL of a tab animation with options: `fileURL` with `options` in its fragment, for `CYLTabBarAnimationURL` (or a
+ *      library's own URL key) and `CYLTabBarAnimationDarkURL`. The file's library reads the options, e.g. which artboard
+ *      of a Rive file a tab plays, so several tabs can use one file. Each URL stays a different tab animation (it is
+ *      also the key of its Dark Mode version). Returns nil when `fileURL` is nil.
+ *
+ *          NSURL *iconSet = [[NSBundle mainBundle] URLForResource:@"icon-set" withExtension:@"riv"];
+ *          home[CYLTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions(iconSet, @{
+ *              CYLTabBarAnimationOptionRiveArtboard : @"HOME",
+ *          });
+ *          // Swift: CYLTabBarAnimationURLWithOptions(iconSet, [.riveArtboard: "HOME"])
+ * [CN] 带选项的 Tab 动画 URL：`fileURL` 加上写在 fragment 中的 `options`，用于 `CYLTabBarAnimationURL`（或动画库自己的 URL key）与
+ *      `CYLTabBarAnimationDarkURL`。由文件对应的动画库读取选项，例如 Tab 播放 Rive 文件中的哪个画板，因此多个 Tab 可以使用同一个文件。每个 URL
+ *      仍是不同的 Tab 动画（也是其深色模式版本的 key）。`fileURL` 为 nil 时返回 nil。示例见上。
+ */
+FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarAnimationURLWithOptions(NSURL * _Nullable fileURL,
+                                                                     NSDictionary<CYLTabBarAnimationOption, NSString *> * _Nullable options);
+
+/*!
+ * FIX: issue #477 — only some tabs animated, with any animation library.
+ * [EN] Returns one tab's `attributes` with an animation added (`CYLTabBarAnimationFilePath`, and
+ *      `CYLTabBarAnimationDarkFilePath` when "<name>_dark.<ext>" exists), so that only that tab is animated and the others
+ *      keep their images. `fileName` is "<name>.<ext>" for that file, or "<name>" for the first file found with the
+ *      extensions of the libraries in the build, in their lookup order (PAG ".pag", Lottie ".json" / ".lottie", or any
+ *      library added later). `bundle` nil means the main bundle. A missing file, or no animation library, leaves
+ *      `attributes` as they are. Animated and static tabs, and tabs of different libraries, can be mixed in one tab bar,
+ *      in every style.
+ *
+ *          NSArray *attributes = @[
+ *              homeAttributes,                                                                     // images only
+ *              CYLTabBarItemAttributesAddingAnimationFile(messageAttributes, @"tab_message.json", nil), // Lottie
+ *              CYLTabBarItemAttributesAddingAnimationFile(mineAttributes, @"tab_mine.pag", nil),        // PAG
+ *          ];
+ * [CN] 返回添加了动画的单个 Tab 的 `attributes`（`CYLTabBarAnimationFilePath`；存在「名称_dark.扩展名」时再加上
+ *      `CYLTabBarAnimationDarkFilePath`），使只有该 Tab 有动画，其他 Tab 保持图片。`fileName` 为「名称.扩展名」时使用该文件；为「名称」时，
+ *      按查找顺序使用构建中各动画库的扩展名（PAG ".pag"、Lottie ".json" / ".lottie"，或以后新增的动画库），取第一个存在的文件。`bundle` 为 nil
+ *      表示 main bundle。文件不存在或没有动画库时 `attributes` 保持不变。同一个 TabBar 中可以混用有动画与无动画的 Tab，以及不同动画库的 Tab，
+ *      所有样式均支持。示例见上。
+ */
+FOUNDATION_EXTERN NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(NSDictionary *attributes,
+                                                                          NSString *fileName,
+                                                                          NSBundle * _Nullable bundle);
+
+/*!
+ * [EN] The same for every tab, by position: an empty name or `NSNull` leaves that tab static (#477).
+ *
+ *          CYLTabBarItemsAttributesAddingAnimationFiles(attributes, @[@"tab_home.json", @"", @"tab_mine.pag"], nil);
+ * [CN] 按位置为每个 Tab 执行上面的操作：名称为空字符串或 `NSNull` 的 Tab 保持静态（#477）。示例见上。
+ */
+FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingAnimationFiles(NSArray<NSDictionary *> *attributes,
+                                                                                    NSArray *fileNames,
                                                                                     NSBundle * _Nullable bundle);
 FOUNDATION_EXTERN NSString *const CYLTabBarItemImageInsets;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemTitlePositionAdjustment;
@@ -671,7 +779,11 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 
 /*!
  * [EN] Sets the block invoked in `-viewDidLayoutSubviews`, marked to run only once. Note: `invokeOnce` is currently ignored and always treated as YES.
+ *      It runs once more after the tab buttons or their contents are set up again: a theme switch (`CYLTabBarTheme`),
+ *      `-reloadTabBarItemsWithAttributes:`, replacing a tab. Write it so it can run again (e.g. cover with the same views).
  * [CN] 设置在 -viewDidLayoutSubviews 中回调的 block，并标记为只执行一次。注意：目前 invokeOnce 参数未被使用，始终按 YES 处理。
+ *      Tab 按钮或其内容重新设置后会再执行一次：换肤（`CYLTabBarTheme`）、`-reloadTabBarItemsWithAttributes:`、替换 Tab。
+ *      请保证它可以重复执行（例如用同样的视图覆盖）。
  */
 - (void)setViewDidLayoutSubViewsBlockInvokeOnce:(BOOL)invokeOnce block:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock;
 
@@ -773,7 +885,16 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  * [EN] Content mode of the Lottie animation views. Default is UIViewContentModeScaleAspectFit; override in a subclass to change it.
  * [CN] Lottie 动画视图的 contentMode，默认 UIViewContentModeScaleAspectFit，可在子类中重写修改。
  */
-- (UIViewContentMode)lottieAnimationViewContentMode;
+- (UIViewContentMode)lottieAnimationViewContentMode DEPRECATED_MSG_ATTRIBUTE("Use -tabBarItemAnimationViewContentMode");
+
+/*!
+ * FIX: issue #604
+ * [EN] Content mode of the tab icon animation views, for any library. Default: `-lottieAnimationViewContentMode`
+ *      (UIViewContentModeScaleAspectFit), so an old override keeps working; override this one in a subclass instead.
+ * [CN] Tab 图标动画视图的 contentMode，适用于任意动画库。默认值为 `-lottieAnimationViewContentMode`（UIViewContentModeScaleAspectFit），
+ *      因此旧的重写仍然有效；请改为在子类中重写本方法。
+ */
+- (UIViewContentMode)tabBarItemAnimationViewContentMode;
 
 /*!
  * [EN] Issue #426: when YES, a memory warning unloads the views of the tabs that are not selected, and UIKit loads them
@@ -820,7 +941,15 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  *      无需等待动画视图添加完成（issue #428）。只修改某一个 Tab 时，可监听 `CYLTabBarItemLottieAnimationViewDidAddNotification`，
  *      或调用 `-[UIControl cyl_setLottieAnimationSpeed:]`。0、负数或非有限值表示默认值。只有集成了 Lottie 才会生效。
  */
-@property (nonatomic, assign) CGFloat lottieAnimationSpeed;
+@property (nonatomic, assign) CGFloat lottieAnimationSpeed DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationSpeed");
+
+/*!
+ * FIX: issue #604
+ * [EN] Playback speed of the tab icon animation views, for any library (the same value as the deprecated
+ *      `lottieAnimationSpeed`; see it for the details). Default is 1.0.
+ * [CN] Tab 图标动画视图的播放速度，适用于任意动画库（与已废弃的 `lottieAnimationSpeed` 为同一个值，详见其说明）。默认 1.0。
+ */
+@property (nonatomic, assign) CGFloat tabBarItemAnimationSpeed;
 
 /*!
  * To set both Item label text attributes in the tabBar,
@@ -1222,11 +1351,11 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` and `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL`
  *      (the URL keys win), each any source `-setTabBarItemIcon:selectedIcon:size:atIndex:` takes: a `UIImage`, an image
  *      name, a file path, an `NSURL` or an `http(s)` string, downloaded and cached when remote. The images are scaled to
- *      `CYLTabBarItemImageURLSize`, else to the plus button's current image size. See `-[CYLPlusButton cyl_updateTitle:image:selectedImage:]`.
+ *      `CYLTabBarItemImageURLSize`, else to the plus button's current image size. With a plus child view controller on Liquid Glass (not FlatDesign), the stand-in ignores the selected keys: https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md See `-[CYLPlusButton cyl_updateTitle:image:selectedImage:]`.
  * [CN] 适用于 PlusButton 的 `-updateTabBarItemAtIndex:attributes:`，原地更新，适用于所有样式：`CYLTabBarItemTitle`；
  *      `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` 与 `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL`（URL 键优先），
  *      均支持 `-setTabBarItemIcon:selectedIcon:size:atIndex:` 的所有来源：`UIImage`、图片名、文件路径、`NSURL` 或 `http(s)` 字符串，
- *      网络图片会下载并缓存。图片缩放到 `CYLTabBarItemImageURLSize`，未设置时缩放到 PlusButton 当前图片的尺寸。见
+ *      网络图片会下载并缓存。图片缩放到 `CYLTabBarItemImageURLSize`，未设置时缩放到 PlusButton 当前图片的尺寸。有 PlusButton 子控制器且为液态玻璃（非扁平样式）时，替身忽略选中图片的 key，见上面的链接。见
  *      `-[CYLPlusButton cyl_updateTitle:image:selectedImage:]`。
  * @return [EN] NO without a plus button. [CN] 没有 PlusButton 时返回 NO。
  */
@@ -1332,10 +1461,17 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  */
 @property (nonatomic, assign) BOOL allowsVerticalBar;
 
-@property (nonatomic, assign, getter=isLottieViewAdded, readonly) BOOL lottieViewAdded;
+@property (nonatomic, assign, getter=isLottieViewAdded, readonly) BOOL lottieViewAdded DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationViewAdded");
 
-@property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs;
-@property (nonatomic, strong, readonly) NSMutableArray *lottieSizes;
+@property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationURLs");
+@property (nonatomic, strong, readonly) NSMutableArray *lottieSizes DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationSizes");
+
+/// [EN] YES once the tab icon animation views were added (any library). [CN] Tab 图标动画视图已添加时为 YES（任意动画库）。
+@property (nonatomic, assign, getter=isTabBarItemAnimationViewAdded, readonly) BOOL tabBarItemAnimationViewAdded;
+/// [EN] The animation file of each animated tab, in order. [CN] 各个带动画的 Tab 的动画文件，按顺序。
+@property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *tabBarItemAnimationURLs;
+/// [EN] The animation size (NSValue of CGSize) of each animated tab, in order. [CN] 各个带动画的 Tab 的动画尺寸（CGSize 的 NSValue），按顺序。
+@property (nonatomic, strong, readonly) NSMutableArray *tabBarItemAnimationSizes;
 
 /**
  [CN] 显示或隐藏 TabBar，所有样式都生效：扁平样式为 CYLFlatDesignTabBar，液态玻璃与经典样式为系统 TabBar（iOS 18 起由 UIKit 执行动画；iOS 18 以前的经典样式使用与扁平样式相同的下移动画）。
@@ -1822,12 +1958,44 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 
 /*!
  * [EN] The titles and icons of the tabs in this theme, shaped like `tabBarItemsAttributes` (one entry per tab, none for
- *      the plus button), applied with `-updateTabBarItemsWithAttributes:`: e.g. holiday icons. A missing key keeps the
- *      current value, so give the keys the app's own attributes use.
- * [CN] 该主题下各 Tab 的标题与图标，结构与 `tabBarItemsAttributes` 相同（每个 Tab 一项，PlusButton 不占项），通过
- *      `-updateTabBarItemsWithAttributes:` 应用：例如节日图标。未提供的 key 保持当前值，因此请提供与 App 自身 attributes 相同的 key。
+ *      the plus button): e.g. holiday icons.
+ *      - Titles and the other keys are applied with `-updateTabBarItemsWithAttributes:`. A missing key keeps the current
+ *        value, so give the keys the app's own attributes use.
+ *      - Icons (`CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` with their dark images, or `CYLTabBarItemImageURL` /
+ *        `CYLTabBarItemSelectedImageURL` / `CYLTabBarItemImageURLSize`, which win) are shown like
+ *        `-setTabBarItemIcon:selectedIcon:size:atIndex:`: a view in place of the tab's icon, in every style, also over a
+ *        Lottie icon, in the image's own colors (give a faded image for the unselected look). Any source that method
+ *        takes: a UIImage, a name, a path, a URL. `tabBarItem.image` and `tabBarItemsAttributes` keep the app's icons.
+ *      - A tab with no icon in the next theme (or with no theme) gets back the icon it had before, unless the app
+ *        replaced the theme's icon meanwhile.
+ * [CN] 该主题下各 Tab 的标题与图标，结构与 `tabBarItemsAttributes` 相同（每个 Tab 一项，PlusButton 不占项）：例如节日图标。
+ *      - 标题与其他 key 通过 `-updateTabBarItemsWithAttributes:` 应用。未提供的 key 保持当前值，因此请提供与 App 自身 attributes 相同的 key。
+ *      - 图标（`CYLTabBarItemImage` / `CYLTabBarItemSelectedImage` 及其深色图片，或优先使用的 `CYLTabBarItemImageURL` /
+ *        `CYLTabBarItemSelectedImageURL` / `CYLTabBarItemImageURLSize`）与 `-setTabBarItemIcon:selectedIcon:size:atIndex:` 的显示方式
+ *        相同：以视图替换 Tab 的图标，适用于所有样式，也能覆盖 Lottie 图标，按图片原色绘制（未选中样式请提供半透明图片）。支持该方法的
+ *        所有来源：UIImage、图片名、文件路径、URL。`tabBarItem.image` 与 `tabBarItemsAttributes` 保留 App 自己的图标。
+ *      - 下一个主题中没有图标（或没有主题）的 Tab 恢复原来的图标，除非 App 期间替换了主题图标。
  */
 - (nullable NSArray<NSDictionary<NSString *, id> *> *)cyl_tabBarItemsAttributesForTabBarController:(CYLTabBarController *)tabBarController;
+
+/*!
+ * [EN] The plus button in this theme, with the keys of `-updatePlusButtonWithAttributes:` (the "change all titles" and
+ *      "change all network icons" demo rows): `CYLTabBarItemTitle`; `CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`,
+ *      or `CYLTabBarItemImageURL` / `CYLTabBarItemSelectedImageURL` (which win) with `CYLTabBarItemImageURLSize`. Any
+ *      source that method takes: a UIImage, a name, a path, an `NSURL` or an `http(s)` string, downloaded and cached.
+ *      - Every style, also on the plus button's stand-in in the Liquid Glass selected layer.
+ *      - A key the next theme does not give (or no theme) gets back the plus button's own title or image, unless the
+ *        app changed it meanwhile. An image still downloading is dropped when another theme comes in between.
+ *      - Nothing happens without a plus button.
+ * [CN] 该主题下的 PlusButton，使用 `-updatePlusButtonWithAttributes:` 的 key（演示中“批量更换标题”“批量下载网络图标”行使用的实现）：
+ *      `CYLTabBarItemTitle`；`CYLTabBarItemImage` / `CYLTabBarItemSelectedImage`，或优先使用的 `CYLTabBarItemImageURL` /
+ *      `CYLTabBarItemSelectedImageURL` 及 `CYLTabBarItemImageURLSize`。支持该方法的所有来源：UIImage、图片名、文件路径、`NSURL` 或
+ *      `http(s)` 字符串（会下载并缓存）。
+ *      - 适用于所有样式，液态玻璃选中图层中的 PlusButton 替身也会更新。
+ *      - 下一个主题未提供的 key（或没有主题）恢复 PlusButton 自己的标题或图片，除非 App 期间修改过。仍在下载的图片在期间切换其他主题时丢弃。
+ *      - 没有 PlusButton 时不做任何事。
+ */
+- (nullable NSDictionary<NSString *, id> *)cyl_plusButtonAttributesForTabBarController:(CYLTabBarController *)tabBarController;
 
 /*!
  * [EN] The appearance of the tab bar in this theme: background, item colors, selection indicator... Assigned to
@@ -1839,8 +2007,9 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 - (nullable UITabBarAppearance *)cyl_tabBarAppearanceForTabBarController:(CYLTabBarController *)tabBarController API_AVAILABLE(ios(13.0));
 
 /*!
- * [EN] Anything else, after the items and the appearance: the plus button, `tabBar.tintColor` before iOS 13...
- * [CN] 其他内容，在更新 item 与外观之后调用：PlusButton、iOS 13 以前的 `tabBar.tintColor` 等。
+ * [EN] Anything else, after the items, the plus button and the appearance: `tabBar.tintColor` before iOS 13, the tint
+ *      of the pages...
+ * [CN] 其他内容，在更新 item、PlusButton 与外观之后调用：iOS 13 以前的 `tabBar.tintColor`、页面的 tint 等。
  */
 - (void)cyl_customizeTabBarController:(CYLTabBarController *)tabBarController;
 
@@ -1856,6 +2025,8 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      主题）。不遵守 `CYLTabBarTheme` 的主题会让 TabBar 恢复 App 自己的外观。其他管理器的主题仅在遵守 `CYLTabBarTheme` 时应用。
  *      液态玻璃、系统 TabBar、扁平样式均适用。
  */
+@class CYLThemeManager;
+
 @interface CYLTabBarController (CYLTheme)
 
 /*!
@@ -1865,6 +2036,13 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      主题切换时会自动调用。
  */
 - (void)cyl_applyTabBarTheme:(nullable id)theme;
+
+/*!
+ * [EN] The manager whose theme the tab bar follows; `CYLThemeManagerCenter.defaultThemeManager` unless set. For tests, or
+ *      an app whose tab bar follows a manager of its own.
+ * [CN] TabBar 跟随的管理器；未设置时为 `CYLThemeManagerCenter.defaultThemeManager`。用于测试，或 TabBar 跟随单独管理器的 App。
+ */
+@property (nonatomic, strong, null_resettable) CYLThemeManager *cyl_themeManager;
 
 @end
 
@@ -2060,6 +2238,8 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 - (BOOL)cyl_simulateHideOnScrollForTesting;
 
 @end
+
+FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotification DEPRECATED_MSG_ATTRIBUTE("Use CYLTabBarItemAnimationPlayingNotification");
 
 /*!
  * [EN] Completion of `+loadTabBarControllerWithConfigurationURL:completion:`, on the main queue: a tab bar controller, or
@@ -2317,7 +2497,6 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
 
 @end
 
-FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotification;
 
 /*!
  * [EN] Posted after a Lottie animation view is added to a tab button (issue #428). The notification's `object` is the tab
@@ -2328,7 +2507,16 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotificatio
  *      `-[UIControl cyl_lottieAnimationView]` 取得动画视图。在主队列发送，此时已设置 `-[CYLTabBarController lottieAnimationSpeed]`，
  *      在回调中设置的值不会被覆盖。液态玻璃样式中每个 Tab 有普通与选中两个按钮，因此各发送一次。
  */
-FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification DEPRECATED_MSG_ATTRIBUTE("Use CYLTabBarItemAnimationViewDidAddNotification");
+
+/*!
+ * FIX: issue #604
+ * [EN] Library-neutral names of the two notifications above, for any animation library (Lottie, PAG, Rive…). They have the
+ *      same values, so an observer of either name gets the notification; the Lottie names stay for compatibility.
+ * [CN] 上面两个通知的通用名称，适用于任意动画库（Lottie、PAG、Rive…）。取值相同，因此观察任一名称都能收到通知；Lottie 名称为兼容而保留。
+ */
+FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemAnimationPlayingNotification;
+FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemAnimationViewDidAddNotification;
 
 // [CN] * 液态玻璃开关变化
 // [EN] Liquid Glass toggle changed

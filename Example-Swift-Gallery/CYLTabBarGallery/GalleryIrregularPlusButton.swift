@@ -31,7 +31,7 @@ final class GalleryIrregularPlusButton: CYLPlusButton, CYLPlusButtonSubclassing 
         return Gallery.irregularContext
     }
 
-    static func indexOfPlusButtonInTabBar() -> Int {
+    static func indexOfPlusButtonInTabBar() -> UInt {
         return 2
     }
 

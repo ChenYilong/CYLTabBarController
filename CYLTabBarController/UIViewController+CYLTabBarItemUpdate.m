@@ -7,23 +7,10 @@
 
 #import "UIViewController+CYLTabBarItemUpdate.h"
 #import "CYLTabBarController.h"
+#import "CYLTabBarController+CYLPrivate.h"
 #import <objc/runtime.h>
 
 static NSString *const CYLTabBarItemUpdateCellIdentifier = @"CYLTabBarItemUpdateCell";
-
-/// [EN] Rows, each one switching one thing on the tab, or back.
-/// [CN] 每行切换 Tab 的一项，或恢复。
-typedef NS_ENUM(NSInteger, CYLTabBarItemUpdateRow) {
-    CYLTabBarItemUpdateRowTitle,        // `-updateTabBarItemForViewController:attributes:`
-    CYLTabBarItemUpdateRowIconView,     // `-setTabBarItemIconViewProvider:atIndex:`
-    CYLTabBarItemUpdateRowNetworkIcon,  // `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`
-    CYLTabBarItemUpdateRowAllNetworkIcons, // the same, for every tab
-    CYLTabBarItemUpdateRowAllLocalIcons,   // `-setTabBarItemIcon:selectedIcon:size:atIndex:`, local images, for every tab
-    CYLTabBarItemUpdateRowGIFIcon,      // the same, with a GIF
-    CYLTabBarItemUpdateRowAllTitles,    // `-updateTabBarItemsWithAttributes:`
-    CYLTabBarItemUpdateRowReplaceNeighbors, // `-replaceViewControllerAtIndex:withViewController:attributes:`, issue #481
-    CYLTabBarItemUpdateRowCount,
-};
 
 static char CYLTabBarItemInitialAttributesKey;
 static char CYLTabBarItemTitleUpdatedKey;
@@ -282,6 +269,21 @@ static char CYLReplacedNeighborsKey;
     return @[ @"img_tab_home_0", @"img_tab_home_1" ];
 }
 
+- (void)cyl_updatePlusButtonIconsOfAllIconsRow:(NSInteger)row
+                                     restoring:(BOOL)restoring
+                            inTabBarController:(CYLTabBarController *)tabBarController {
+    if (restoring) {
+        NSMutableDictionary *imageAttributes = [[self cyl_initialPlusButtonAttributesOfTabBarController:tabBarController] mutableCopy];
+        [imageAttributes removeObjectForKey:CYLTabBarItemTitle];
+        if (imageAttributes.count > 0) {
+            [tabBarController updatePlusButtonWithAttributes:imageAttributes];
+        }
+        return;
+    }
+    NSArray *plusIcons = [self cyl_plusButtonIconsOfAllIconsRow:row];
+    [tabBarController updatePlusButtonWithAttributes:@{ CYLTabBarItemImageURL : plusIcons[0], CYLTabBarItemSelectedImageURL : plusIcons[1] }];
+}
+
 /*!
  * [EN] Updates the icon of every tab with the icons of `row`, network or local (`-setTabBarItemIcon:selectedIcon:size:atIndex:`);
  *      tapped again, the icons of the `tabBarItemsAttributes` given at initialization.
@@ -311,17 +313,11 @@ static char CYLReplacedNeighborsKey;
         }
         tabIndex++;
     }
-    // [EN] The plus button's images too: the row's, or the initial ones. [CN] PlusButton 的图片也一并修改：该行的，或初始的。
-    NSDictionary *initialPlusAttributes = [self cyl_initialPlusButtonAttributesOfTabBarController:tabBarController];
-    if (isActive) {
-        NSMutableDictionary *imageAttributes = [initialPlusAttributes mutableCopy];
-        [imageAttributes removeObjectForKey:CYLTabBarItemTitle];
-        if (imageAttributes.count > 0) {
-            [tabBarController updatePlusButtonWithAttributes:imageAttributes];
-        }
-    } else {
-        NSArray *plusIcons = [self cyl_plusButtonIconsOfAllIconsRow:row];
-        [tabBarController updatePlusButtonWithAttributes:@{ CYLTabBarItemImageURL : plusIcons[0], CYLTabBarItemSelectedImageURL : plusIcons[1] }];
+    // [EN] The plus button's images too: the row's, or the initial ones. A button whose picture is its background image is
+    //      left as it is, as with a theme: an icon would sit over the picture, beside the title.
+    // [CN] PlusButton 的图片也一并修改：该行的，或初始的。以背景图为图片的按钮保持原样，与主题相同：图标会盖在图片上、挤在标题旁边。
+    if (![[CYLPlusButton plusButtonForOwner:tabBarController] cyl_drawsTitleOverBackgroundImage]) {
+        [self cyl_updatePlusButtonIconsOfAllIconsRow:row restoring:isActive inTabBarController:tabBarController];
     }
     // [EN] One of the two rows at a time. [CN] 两行同一时间只有一行生效。
     objc_setAssociatedObject(tabBarController, key, (isActive ? nil : @YES), OBJC_ASSOCIATION_RETAIN_NONATOMIC);

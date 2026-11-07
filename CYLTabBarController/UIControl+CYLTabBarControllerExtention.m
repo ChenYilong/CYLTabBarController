@@ -12,20 +12,7 @@
 #import "CYLConstants.h"
 #import "CYLTabBarController.h"
 
-#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
-#import <CYLTabBarController/CYLTabBarController-Swift.h>
-#else
-#endif
-
-#if __has_include(<Lottie/Lottie.h>)
-#import <Lottie/Lottie.h>
-#else
-#endif
-
-#if __has_include(<Lottie/Lottie-Swift.h>)
-#import <Lottie/Lottie-Swift.h>
-#else
-#endif
+#import "UIControl+CYLTabBarItemAnimation.h"
 
 #import "UITabBarItem+CYLTabBarControllerExtention.h"
 #import "CYLPlusButton.h"
@@ -211,6 +198,13 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     objc_setAssociatedObject(self, @selector(cyl_tabBarItemIdentifier), [tabBarItemIdentifier copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+- (NSString *)cyl_tabBarItemDisplayName {
+    if (self.accessibilityLabel.length > 0) {
+        return self.accessibilityLabel;
+    }
+    return self.cyl_tabBarItemIdentifier ?: NSStringFromClass([self class]);
+}
+
 - (NSString *)cyl_tabBarItemIdentifier {
     NSString *identifier = objc_getAssociatedObject(self, @selector(cyl_tabBarItemIdentifier));
     if (identifier) {
@@ -241,18 +235,15 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     return viewControllers[index].cyl_tabBarItemIdentifier;
 }
 
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (BOOL)cyl_isLottieReady {
-    if (self.cyl_tabBarController.lottieURLs.count > 0) {
-        return self.cyl_tabBarController.lottieViewAdded;
-    }
-    if (self.cyl_lottieAnimationView) {
-        UIView *view = (UIView *)self.cyl_lottieAnimationView;
-        if (view && [view respondsToSelector:@selector(frame)]) {
-            return view.frame.size.width > 10;
-        }
-    }
-    return NO;
+    return [self cyl_isTabBarItemAnimationReady];
 }
+
+#pragma clang diagnostic pop
 
 - (BOOL)cyl_isSelected {
     NSUInteger tabBarSelectedIndex = self.cyl_tabBarController.selectedIndex;
@@ -269,25 +260,15 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     return [CYLPlusButton isPlusButtonView:self] || [self cyl_isChildViewControllerPlusButton];
 }
 
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (nullable UIView *)cyl_lottieAnimationView {
-    if ([self cyl_isPlusControl]) {
-        return nil;
-    }
-    UIView *animationView = nil;
-    for (UIView *subview in self.subviews) {
-        if ([subview cyl_isLottieAnimationView]) {
-            animationView = subview;
-            return animationView;
-        }
-        for (UIView *subsubview in subview.subviews) {
-            if ([subsubview cyl_isLottieAnimationView]) {
-                animationView = subsubview;
-                return animationView;
-            }
-        }
-    }
-    return nil;
+    return [self cyl_tabBarItemAnimationView];
 }
+
+#pragma clang diagnostic pop
 
 #define cyl_replaceTabImageViewWithNewViewcyl_isReadydelaySeconds 0
 - (void)cyl_replaceTabImageViewWithNewView:(UIView *)newView
@@ -500,446 +481,71 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     !completion?:completion(NO, self, nil);
 }
 
+#pragma mark - Lottie-named API (kept for compatibility)
+
+// [EN] FIX: issue #604 — the animation code is in the `CYLTabBarItemAnimation` subspec, which comes only with a Lottie or a
+//      PAG subspec. These public methods hand over to it when it is in the build, and do nothing otherwise, as the Lottie
+//      methods did without Lottie.
+// [CN] 动画代码位于 `CYLTabBarItemAnimation` 子库中，只有引入 Lottie 或 PAG 子库时才会包含它。这些公开方法在构建中包含该子库时交给它处理，
+//      否则不做处理，与原来未引入 Lottie 时的 Lottie 方法一致。
+
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)cyl_addLottieImageWithLottieURL:(nullable NSURL *)lottieURL
                                    size:(CGSize)size
                             contentMode:(UIViewContentMode)contentMode {
-    NSString *lottieFilePath = [lottieURL path];
-    [self cyl_addLottieImageWithLottieFilePath:lottieFilePath size:size contentMode:contentMode];
+    if (CYLTabBarItemAnimationIsAvailable()) {
+        [self cyl_addTabBarItemAnimationWithURL:lottieURL size:size contentMode:contentMode];
+    }
 }
-
-#if CYL_LOTTIE_AVAILABLE
-static UIView *CYLMakeLottieAnimationView(NSURL *sourceURL, NSURL *shownURL, CGSize size, UIViewContentMode contentMode);
-static void CYLApplyLottieDarkColors(UIView *lottieView, UITraitCollection *traitCollection);
-#endif
 
 - (void)cyl_addLottieImageWithLottieFilePath:(NSString *)lottieFilePath
                                         size:(CGSize)size
                                  contentMode:(UIViewContentMode)contentMode {
-    NSURL *lottieURL = [CYLConstants cyl_getURLFromString:lottieFilePath];
-    if (!lottieURL) {
-        return;
+    if (CYLTabBarItemAnimationIsAvailable()) {
+        [self cyl_addTabBarItemAnimationWithURL:[CYLConstants cyl_getURLFromString:lottieFilePath] size:size contentMode:contentMode];
     }
-    if ([self cyl_isPlusControl]) {
-        return;
-    }
-#if CYL_LOTTIE_AVAILABLE
-    // FIX: Lottie icons invisible in FlatDesign. No `CYLTabBarLottieSize` means a zero size; both Lottie flavors need
-    // the placeholder size, otherwise the animation view is 0 x 0. Only compiled with Lottie, so that the analyzer
-    // does not report a dead store without it.
-    // 未设置 `CYLTabBarLottieSize` 时 size 为 0，两种 Lottie 都需要使用占位尺寸，否则动画视图为 0 x 0（扁平样式下图标不显示）。
-    if (CGSizeEqualToSize(CGSizeZero, size)) {
-        size = CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
-    }
-    // FIX: issue #442 — first: does this animation use a #442 key (`CYLTabBarLottieDarkURL` / `…DarkFilePath` /
-    // `…DarkColors`)? Without one, everything below is the original path. 首先判断该动画是否使用了 #442 新增的 key；
-    // 没有时，下面的逻辑与原来完全相同。
-    BOOL followsDarkMode = [CYLConstants cyl_hasDarkLottieForLottieURL:lottieURL];
-    UIView *shownLottieView = self.cyl_lottieAnimationView;
-    if (shownLottieView) {
-        if (followsDarkMode) {
-            [self cyl_replaceLottieAnimationView:shownLottieView
-                                   withLottieURL:[CYLConstants cyl_lottieURL:lottieURL forTraitCollection:self.traitCollection]
-                                       sourceURL:lottieURL];
-            CYLApplyLottieDarkColors(self.cyl_lottieAnimationView, self.traitCollection);
-        }
-        return;
-    }
-    // The dark animation where the style is dark. 深色风格下使用深色动画。
-    NSURL *styleLottieURL = followsDarkMode ? [CYLConstants cyl_lottieURL:lottieURL forTraitCollection:self.traitCollection] : lottieURL;
-    UIView *lottieView = CYLMakeLottieAnimationView(lottieURL, styleLottieURL, size, contentMode);
-    if (!lottieView) {
-        return;
-    }
-    if (followsDarkMode) {
-        CYLApplyLottieDarkColors(lottieView, self.traitCollection);
-    }
-    [self cyl_replaceTabImageViewWithNewView:lottieView show:YES];
-    [self cyl_postLottieAnimationViewDidAddNotification];
-#else
-    (void)size;
-    (void)contentMode;
-#endif
-}
-
-#pragma mark - Dark Mode Lottie (#442)
-
-#if CYL_LOTTIE_AVAILABLE
-
-static const void *CYLLottieSourceURLKey = &CYLLottieSourceURLKey;
-static const void *CYLLottieShownURLKey = &CYLLottieShownURLKey;
-
-/*!
- * [EN] A Lottie view playing `shownURL`, the version of `sourceURL` (the light animation the tab was given) for the
- *      current style. Both are kept on the view, so it can be swapped when the style changes.
- * [CN] 播放 `shownURL` 的 Lottie 视图；`shownURL` 是 `sourceURL`（Tab 设置的浅色动画）在当前风格下的版本。两者都保存在视图上，
- *      以便风格变化时替换。
- */
-static UIView *CYLMakeLottieAnimationView(NSURL *sourceURL, NSURL *shownURL, CGSize size, UIViewContentMode contentMode) {
-    UIView *lottieView = nil;
-    // Each Lottie library behind its own guard, as elsewhere; the first one linked makes the view.
-    // 与其他代码一致，每个 Lottie 库各用一个 guard；由先引入的库创建视图。
-#if __has_include(<Lottie/Lottie.h>)
-    if (!lottieView && [LOTAnimationView instancesRespondToSelector:@selector(initWithContentsOfURL:)]) {
-        lottieView = [[LOTAnimationView alloc] initWithContentsOfURL:shownURL];
-    }
-#endif
-#if __has_include(<Lottie/Lottie-Swift.h>)
-    if (!lottieView && [CYLCompatibleLOTAnimationView instancesRespondToSelector:@selector(initWithCompatibleAnimation:)]) {
-        CYLCompatibleLOTAnimation *composition = [[CYLCompatibleLOTAnimation alloc] initWithFilepath:shownURL.path];
-        lottieView = [[CYLCompatibleLOTAnimationView alloc] initWithCompatibleAnimation:composition];
-    }
-#endif
-    if (!lottieView) {
-        return nil;
-    }
-    lottieView.frame = CGRectMake(0, 0, size.width, size.height);
-    lottieView.userInteractionEnabled = NO;
-    lottieView.contentMode = contentMode;
-    lottieView.translatesAutoresizingMaskIntoConstraints = YES;// FIX: issue #653, see `_CYLTabButtonLayoutTracker`
-    [lottieView setClipsToBounds:NO];
-    // Remembered only for animations that use a #442 key, to swap them when the style changes.
-    // 仅为使用了 #442 新增 key 的动画记录，以便风格变化时替换。
-    if ([CYLConstants cyl_hasDarkLottieForLottieURL:sourceURL]) {
-        objc_setAssociatedObject(lottieView, CYLLottieSourceURLKey, sourceURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        objc_setAssociatedObject(lottieView, CYLLottieShownURLKey, shownURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    return lottieView;
-}
-
-/// Copies the playback state (progress, speed) of one Lottie view to another and draws it. Lottie ObjC: by class;
-/// Lottie Swift: only what the views respond to. 复制播放状态：Lottie ObjC 按类型判断；Lottie Swift 只调用能响应的方法。
-static void CYLCopyLottieAnimationState(UIView *fromView, UIView *toView) {
-#if __has_include(<Lottie/Lottie.h>)
-    if ([fromView isKindOfClass:[LOTAnimationView class]] && [toView isKindOfClass:[LOTAnimationView class]]) {
-        LOTAnimationView *from = (LOTAnimationView *)fromView;
-        LOTAnimationView *to = (LOTAnimationView *)toView;
-        to.animationSpeed = from.animationSpeed;
-        to.animationProgress = from.animationProgress;
-        [to forceDrawingUpdate];
-        return;
-    }
-#endif
-#if __has_include(<Lottie/Lottie-Swift.h>)
-    CYLCompatibleLOTAnimationView *from = (CYLCompatibleLOTAnimationView *)fromView;
-    CYLCompatibleLOTAnimationView *to = (CYLCompatibleLOTAnimationView *)toView;
-    if ([from respondsToSelector:@selector(animationSpeed)] && [to respondsToSelector:@selector(setAnimationSpeed:)]) {
-        to.animationSpeed = from.animationSpeed;
-    }
-    if ([from respondsToSelector:@selector(animationProgress)] && [to respondsToSelector:@selector(setAnimationProgress:)]) {
-        to.animationProgress = from.animationProgress;
-    }
-    if ([toView respondsToSelector:@selector(forceDrawingUpdate)]) {
-        [toView cyl_performSelector:@selector(forceDrawingUpdate)];
-    }
-#endif
-}
-
-static const void *CYLLottieDarkColorsAppliedKey = &CYLLottieDarkColorsAppliedKey;
-
-/*!
- * FIX: issue #442 — Lottie 4.x only.
- * [EN] Sets the dark colors registered for the view's animation (`CYLTabBarLottieDarkColors`) with Lottie's value
- *      providers where `traitCollection` is dark, and removes them otherwise, so one file follows Dark Mode. Does nothing
- *      when they are already in that state, or without dark colors.
- * [CN] `traitCollection` 为深色时，用 Lottie 的 value provider 设置为该动画注册的深色颜色（`CYLTabBarLottieDarkColors`），否则移除，
- *      使一份文件即可适配深色模式。状态未变化或没有深色颜色时不做处理。
- */
-static void CYLApplyLottieDarkColors(UIView *lottieView, UITraitCollection *traitCollection) {
-    // First: `CYLTabBarLottieDarkColors` registered with usable values for this animation. 首先：该动画注册了有效的深色颜色。
-    NSURL *sourceURL = lottieView ? objc_getAssociatedObject(lottieView, CYLLottieSourceURLKey) : nil;
-    NSDictionary<NSString *, UIColor *> *darkColors = sourceURL ? [CYLConstants cyl_lottieDarkColorsForLottieURL:sourceURL] : nil;
-    if (darkColors.count == 0) {
-        return;
-    }
-    // Then: Lottie 4.x (Lottie Swift) only. 其次：仅 Lottie 4.x（Lottie Swift）。
-#if __has_include(<Lottie/Lottie-Swift.h>)
-    // Methods added to `CYLCompatibleLOTAnimationView` for #442: call them only when the view responds to them.
-    // #442 为 `CYLCompatibleLOTAnimationView` 新增的方法：仅在视图能响应时调用。
-    SEL setColorSelector = @selector(setColorValue:forKeypathString:);
-    SEL removeColorSelector = @selector(removeValueProviderForKeypathString:);
-    if (![lottieView respondsToSelector:setColorSelector] || ![lottieView respondsToSelector:removeColorSelector]) {
-        return;
-    }
-    BOOL dark = NO;
-    if (@available(iOS 13.0, *)) {
-        dark = (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark);
-    }
-    if ([objc_getAssociatedObject(lottieView, CYLLottieDarkColorsAppliedKey) boolValue] == dark) {
-        return;
-    }
-    [darkColors enumerateKeysAndObjectsUsingBlock:^(NSString *keypath, UIColor *color, BOOL *stop) {
-        (void)stop;
-        if (![keypath isKindOfClass:[NSString class]] || ![color isKindOfClass:[UIColor class]]) {
-            return;
-        }
-        if (dark) {
-            UIColor *resolvedColor = color;
-            if (@available(iOS 13.0, *)) {
-                resolvedColor = [color resolvedColorWithTraitCollection:traitCollection];
-            }
-            [lottieView cyl_performSelector:setColorSelector withObject:resolvedColor withObject:keypath];
-        } else {
-            [lottieView cyl_performSelector:removeColorSelector withObject:keypath];
-        }
-    }];
-    objc_setAssociatedObject(lottieView, CYLLottieDarkColorsAppliedKey, @(dark), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    if ([lottieView respondsToSelector:@selector(forceDrawingUpdate)]) {
-        [lottieView cyl_performSelector:@selector(forceDrawingUpdate)];
-    }
-#else
-    (void)traitCollection;
-#endif
-}
-
-#endif
-
-/*!
- * [EN] Swaps `lottieView` for one playing `lottieURL` in place (frame, layout tracking, visibility, playback state),
- *      unless it already plays it. Only for animations that use a #442 key: `sourceURL` is the light animation the tab
- *      was given (nil: the one recorded on the view).
- * [CN] 若 `lottieView` 播放的不是 `lottieURL`，原地替换为播放 `lottieURL` 的视图（保持位置、布局跟踪、可见性和播放状态）。仅用于
- *      使用了 #442 新增 key 的动画：`sourceURL` 为 Tab 设置的浅色动画（nil 表示视图上记录的那个）。
- */
-- (void)cyl_replaceLottieAnimationView:(UIView *)lottieView withLottieURL:(NSURL *)lottieURL sourceURL:(NSURL *)sourceURL {
-    // First: an animation that uses a #442 key. 首先：使用了 #442 新增 key 的动画。
-    if (![CYLConstants cyl_hasDarkLottieURLs] || !lottieView || !lottieURL) {
-        return;
-    }
-#if CYL_LOTTIE_AVAILABLE
-    sourceURL = sourceURL ?: objc_getAssociatedObject(lottieView, CYLLottieSourceURLKey);
-    if (![CYLConstants cyl_hasDarkLottieForLottieURL:sourceURL]) {
-        return;
-    }
-    // A view made before the key was set plays the light animation. 设置 key 之前创建的视图播放的是浅色动画。
-    NSURL *shownURL = objc_getAssociatedObject(lottieView, CYLLottieShownURLKey) ?: sourceURL;
-    UIView *superview = lottieView.superview;
-    if (!superview || [shownURL isEqual:lottieURL]) {
-        if (!objc_getAssociatedObject(lottieView, CYLLottieSourceURLKey)) {
-            objc_setAssociatedObject(lottieView, CYLLottieSourceURLKey, sourceURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            objc_setAssociatedObject(lottieView, CYLLottieShownURLKey, shownURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-        return;
-    }
-    UIView *newLottieView = CYLMakeLottieAnimationView(sourceURL, lottieURL, lottieView.bounds.size, lottieView.contentMode);
-    if (!newLottieView) {
-        return;
-    }
-    newLottieView.center = lottieView.center;
-    newLottieView.transform = lottieView.transform;
-    newLottieView.autoresizingMask = lottieView.autoresizingMask;
-    newLottieView.hidden = lottieView.hidden;
-    newLottieView.alpha = lottieView.alpha;
-    CYLCopyLottieAnimationState(lottieView, newLottieView);
-    [superview insertSubview:newLottieView aboveSubview:lottieView];
-    [newLottieView cyl_markAsInsertedForTabControl:lottieView.cyl_insertedForTabControl ?: self];
-    for (UIView *subview in superview.subviews) {
-        if ([subview isKindOfClass:[_CYLTabButtonLayoutTracker class]]) {
-            [(_CYLTabButtonLayoutTracker *)subview cyl_replaceTrackedView:lottieView withView:newLottieView];
-        }
-    }
-    [lottieView removeFromSuperview];
-#else
-    (void)sourceURL;
-#endif
-}
-
-- (void)cyl_reloadLottieAnimationViewForCurrentStyle {
-    // First: only when a #442 key is in use. 首先：仅在使用了 #442 新增的 key 时处理。
-    if (![CYLConstants cyl_hasDarkLottieURLs]) {
-        return;
-    }
-#if CYL_LOTTIE_AVAILABLE
-    UIView *lottieView = self.cyl_lottieAnimationView;
-    NSURL *sourceURL = lottieView ? objc_getAssociatedObject(lottieView, CYLLottieSourceURLKey) : nil;
-    if (![CYLConstants cyl_hasDarkLottieForLottieURL:sourceURL]) {
-        return;
-    }
-    [self cyl_replaceLottieAnimationView:lottieView
-                           withLottieURL:[CYLConstants cyl_lottieURL:sourceURL forTraitCollection:self.traitCollection]
-                               sourceURL:sourceURL];
-    CYLApplyLottieDarkColors(self.cyl_lottieAnimationView, self.traitCollection);
-#endif
 }
 
 - (void)cyl_addLottieImageWithLottieURL:(nullable NSURL *)lottieURL
                                    size:(CGSize)size
                             contentMode:(UIViewContentMode)contentMode
                          animationSpeed:(CGFloat)animationSpeed {
-    BOOL hadLottieAnimationView = (self.cyl_lottieAnimationView != nil);
-    [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
-    if (!hadLottieAnimationView) {
-        [self cyl_setLottieAnimationSpeed:animationSpeed];
+    if (CYLTabBarItemAnimationIsAvailable()) {
+        [self cyl_addTabBarItemAnimationWithURL:lottieURL size:size contentMode:contentMode animationSpeed:animationSpeed];
     }
 }
 
 - (void)cyl_setLottieAnimationSpeed:(CGFloat)animationSpeed {
-    if (animationSpeed <= 0) {
-        return;
+    if (CYLTabBarItemAnimationIsAvailable()) {
+        [self cyl_setTabBarItemAnimationSpeed:animationSpeed];
     }
-#if __has_include(<Lottie/Lottie.h>)
-    LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
-    if ([lottieView isKindOfClass:[LOTAnimationView class]]) {
-        lottieView.animationSpeed = animationSpeed;
-    }
-#endif
-#if __has_include(<Lottie/Lottie-Swift.h>)
-    CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-    if ([lottieView respondsToSelector:@selector(setAnimationSpeed:)]) {
-        lottieView.animationSpeed = animationSpeed;
-    }
-#endif
 }
 
-/// FIX: issue #428 — posted asynchronously, so that `-cyl_addLottieImageWithLottieURL:size:contentMode:animationSpeed:`
-/// has set the default speed before observers run, and a speed set by an observer is kept.
-- (void)cyl_postLottieAnimationViewDidAddNotification {
-    __weak UIControl *weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIControl *tabButton = weakSelf;
-        if (!tabButton.cyl_lottieAnimationView) {
-            return;
-        }
-        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationViewDidAddNotification object:tabButton];
-    });
+- (void)cyl_reloadLottieAnimationViewForCurrentStyle {
+    if (CYLTabBarItemAnimationIsAvailable()) {
+        [self cyl_reloadTabBarItemAnimationViewForCurrentStyle];
+    }
 }
 
 - (void)cyl_animationLottieImageWithLottieURL:(NSURL *)lottieURL
                                          size:(CGSize)size
                               defaultSelected:(BOOL)defaultSelected
                                   contentMode:(UIViewContentMode)contentMode {
-    if ([self cyl_isPlusControl]) {
-        return;
+    if (CYLTabBarItemAnimationIsAvailable()) {
+        [self cyl_playTabBarItemAnimationWithURL:lottieURL size:size defaultSelected:defaultSelected contentMode:contentMode];
     }
-    if (!lottieURL) {
-        return;
-    }
-    
-#if __has_include(<Lottie/Lottie.h>)
-    
-    //_UITabButton
-    [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
-    LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
-    if (!lottieView) {
-        [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
-    }
-    lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
-    if (!lottieView || ![lottieView isKindOfClass:[LOTAnimationView class]]) {
-        return;
-    }
-    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
-
-    dispatch_async(dispatch_get_main_queue(),^{
-        
-        if (defaultSelected) {
-            // [CN] Avoid triggering Lottie animation when index == 0 on app startup. 希望Lottie icon 启动后 index== 0 不执行动画 #389
-            // [EN] Avoid triggering Lottie animation when index == 0 on app startup. #389
-            lottieView.animationProgress = 1;
-            [lottieView forceDrawingUpdate];
-        } else {
-            lottieView.animationProgress = 0;
-            [lottieView play];
-        }
-    });
-#endif
-    
-    
-#if __has_include(<Lottie/Lottie-Swift.h>)
-    
-    //_UITabButton
-    [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
-    CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-    if (!lottieView) {
-        [self cyl_addLottieImageWithLottieURL:lottieURL size:size contentMode:contentMode];
-    }
-    lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-    if (!lottieView || ![NSStringFromClass([lottieView class]) containsString:NSStringFromClass([CYLCompatibleLOTAnimationView class])]) {
-        return;
-    }
-    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemLottieAnimationPlayingNotification object:self];
-
-// [CN] dispatch_async(dispatch_get_main_queue(),^{  不能增加dispatch_get_main_queue判断，否则暂停与播放，可能错乱。
-// [EN] dispatch_async(dispatch_get_main_queue(),^{  The dispatch_get_main_queue check must not be added; otherwise pause
-//      and play may get out of order.
-
-        if (defaultSelected) {
-            // [CN] Avoid triggering Lottie animation when index == 0 on app startup. 希望Lottie icon 启动后 index== 0 不执行动画 #389
-            // [EN] Avoid triggering Lottie animation when index == 0 on app startup. #389
-            lottieView.animationProgress = 1;
-            [lottieView forceDrawingUpdate];
-        } else {
-            lottieView.animationProgress = 0;
-            /// [CN] 播放到指定进度（0-1）
-            /// [EN] Play to the given progress (0-1)
-            [lottieView play];
-        }
-//    });
-#endif
 }
 
-/*!
-  [CN] 通过(lottieView.animationProgress > 0) 判断，以及放置在 dispatch_get_main_queue， 尝试 修复扁平风格 CYLFlatDesignTabBar 第一次初始化时，可能展示失败的问题。
- 其中 通过(lottieView.animationProgress > 0) 判断 ， 可以降低80%的发生几率， 但并不保证100%完全避免，
- 不能增加dispatch_get_main_queue判断，否则暂停与播放，可能错乱。
-  [EN] The (lottieView.animationProgress > 0) check, plus running on dispatch_get_main_queue, try to fix an issue where
-       the flat design style CYLFlatDesignTabBar may fail to display on its first initialization.
-       The (lottieView.animationProgress > 0) check lowers the chance of it happening by 80%, but does not guarantee
-       avoiding it 100%.
-       The dispatch_get_main_queue check must not be added; otherwise pause and play may get out of order.
- */
 - (void)cyl_stopAnimationOfLottieView {
-    //    dispatch_async(dispatch_get_main_queue(),^{
-#if __has_include(<Lottie/Lottie.h>)
-    if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
-        LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
-            
-        if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]] && (lottieView.animationProgress > 0)) {
-            [lottieView stop];
-        }
+    if (CYLTabBarItemAnimationIsAvailable()) {
+        [self cyl_stopTabBarItemAnimation];
     }
-#if CYL_FLATDESIGN_AVAILABLE
-        
-    else if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-        LOTAnimationView *lottieView = (LOTAnimationView *)self.cyl_lottieAnimationView;
-            
-        if (lottieView && [lottieView isKindOfClass:[LOTAnimationView class]] && (lottieView.animationProgress > 0)) {
-            [lottieView stop];
-        }
-    }
-#endif
-        
-        
-#endif
-        
-        
-#if __has_include(<Lottie/Lottie-Swift.h>)
-        
-    if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
-            
-        CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-            
-        if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
-            [lottieView stop];
-        }
-    }
-        
-#if CYL_FLATDESIGN_AVAILABLE
-    //TODO:   仅仅保留一个 else if or else 即可
-    else if ([self.cyl_tabBarController.tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-        CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-        if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
-            [lottieView stop];
-        }
-    }  else {
-        CYLCompatibleLOTAnimationView *lottieView = (CYLCompatibleLOTAnimationView *)self.cyl_lottieAnimationView;
-        if (lottieView && [lottieView isKindOfClass:[CYLCompatibleLOTAnimationView class]] && (lottieView.animationProgress > 0)) {
-            [lottieView stop];
-        }
-    }
-#endif
-        
-#endif
-    //    });
 }
+
+#pragma clang diagnostic pop
 
 #pragma mark - private method
 
@@ -1098,3 +704,22 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 @end
 
+#pragma mark - CYLTabBarItemAnimationCoreSupport (#604)
+
+@implementation UIView (CYLTabBarItemAnimationCoreSupport)
+
+- (void)cyl_replaceTrackedSubview:(UIView *)view withView:(UIView *)newView {
+    // [EN] The new view (e.g. the Dark Mode version of an animation) keeps the mark of the view it replaces.
+    // [CN] 新视图（例如动画的深色版本）沿用被替换视图的标记。
+    UIControl *tabControl = view.cyl_insertedForTabControl ?: ([self isKindOfClass:[UIControl class]] ? (UIControl *)self : nil);
+    if (tabControl) {
+        [newView cyl_markAsInsertedForTabControl:tabControl];
+    }
+    for (UIView *subview in self.subviews) {
+        if ([subview isKindOfClass:[_CYLTabButtonLayoutTracker class]]) {
+            [(_CYLTabButtonLayoutTracker *)subview cyl_replaceTrackedView:view withView:newView];
+        }
+    }
+}
+
+@end

@@ -1,0 +1,49 @@
+{
+  "skill_name": "ios-accessibility",
+  "evals": [
+    {
+      "id": 0,
+      "name": "assistive-technology-review",
+      "prompt": "Review this SwiftUI shopping cart screen for accessibility before implementation: each row has an icon, product name, price, stepper-like +/- icons built with tap gestures, a swipe-to-delete action, duplicate \"Edit\" buttons, a favorite heart-only button, a checkout sheet, and product photos. Product wants VoiceOver, Voice Control, Switch Control, Dynamic Type, and Reduce Motion support. What should we fix?",
+      "expected_output": "A practical accessibility review that covers labels, values, traits, grouping, gesture alternatives, Voice Control input labels, Switch Control custom actions, focus restoration, Dynamic Type, decorative/content images, and Reduce Motion.",
+      "files": [],
+      "assertions": [
+        "Requires meaningful accessibility labels, values, and traits for icon-only buttons and custom stepper controls without putting control types like \"button\" in the label.",
+        "Recommends grouping each cart row with `accessibilityElement(children: .combine)` or an equivalent pattern to reduce VoiceOver and Switch Control scan stops.",
+        "Provides `.accessibilityAction(named:)` custom actions for swipe-to-delete, favorite, quantity changes, or other gesture-only behavior so Switch Control and VoiceOver can operate them.",
+        "Mentions Voice Control testing with \"Show Names\" and/or \"Show Numbers\" and recommends unique, speakable labels plus `accessibilityInputLabels` for long or awkward names.",
+        "Requires returning accessibility focus to the checkout trigger after dismissing the sheet with `@AccessibilityFocusState` or an equivalent UIKit notification.",
+        "Covers Dynamic Type and Reduce Motion using system text styles, adaptive layout, `@ScaledMetric`, and `accessibilityReduceMotion` rather than fixed fonts or motion-only feedback."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "nutrition-labels-current-categories",
+      "prompt": "We're preparing App Store Accessibility Nutrition Labels for a media-heavy iOS 26 app. The team wants to claim VoiceOver, Switch Control, Full Keyboard Access, Closed Captions / SDH, Audio Descriptions, Larger Text, Reduce Motion, and Increase Contrast. Audit this list against Apple's current label categories and tell us what evidence to collect before answering in App Store Connect.",
+      "expected_output": "A source-grounded label audit that corrects stale category names, routes non-label assistive technology work appropriately, and describes evidence needed for common-task claims.",
+      "files": [],
+      "assertions": [
+        "Lists the current App Store Accessibility Nutrition Label categories as VoiceOver, Voice Control, Larger Text, Dark Interface, Differentiate Without Color Alone, Sufficient Contrast, Reduced Motion, Captions, and Audio Descriptions.",
+        "States that Switch Control and Full Keyboard Access are important accessibility work but are not current App Store Accessibility Nutrition Label categories.",
+        "Renames Closed Captions / SDH to Captions and Increase Contrast to Sufficient Contrast, while also covering Audio Descriptions and Reduced Motion.",
+        "Explains that labels should be claimed only when users can complete all common tasks with that feature on the relevant device type.",
+        "Calls for evidence such as a common-task test matrix, VoiceOver and Voice Control testing, text-size testing to at least 200% where supported, contrast checks, Reduce Motion checks, and caption/audio-description track or transcript review.",
+        "Warns that App Store accessibility label answers must remain accurate and should not be treated as marketing claims."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "focus-boundary-routing",
+      "prompt": "A team asks the iOS accessibility skill to fix all focus bugs in a SwiftUI iPad app: VoiceOver focus is lost after closing a custom modal, Tab order skips a custom card, arrow-key movement between panels feels wrong, a tvOS build needs UIFocusGuide routing, and Voice Control names are duplicated. Give a concise scope review and the first fixes.",
+      "expected_output": "A boundary-aware accessibility focus answer that fixes assistive-technology focus and Voice Control issues while routing keyboard, directional, tvOS, and UIFocusGuide work to the focus-engine skill.",
+      "files": [],
+      "assertions": [
+        "Keeps VoiceOver/accessibility focus restoration after modal dismissal in ios-accessibility scope and recommends `@AccessibilityFocusState` or accessibility notifications.",
+        "Keeps duplicate Voice Control names in ios-accessibility scope and recommends unique, speakable labels and `accessibilityInputLabels` where appropriate.",
+        "Routes Tab order, `.focusable()`, `@FocusState`, arrow-key movement, focus sections, tvOS directional focus, and `UIFocusGuide` details to the focus-engine skill rather than expanding the accessibility skill into that domain.",
+        "Explains the distinction between accessibility focus for assistive technologies and keyboard/directional focus in the scene.",
+        "Still notes that accessibility element order can affect VoiceOver, Switch Control, Voice Control, and Full Keyboard Access traversal when reviewing user-facing UI."
+      ]
+    }
+  ]
+}

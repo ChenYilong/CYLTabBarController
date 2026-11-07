@@ -7,11 +7,145 @@
 //
 
 #import "CYLConstants.h"
+#import "UIControl+CYLTabBarItemAnimation.h"
 #if __has_include(<CYLTabBarController/CYLTabBarController.h>)
 #import <CYLTabBarController/CYLTabBarController.h>
 #else
 #import "CYLTabBarController.h"
 #endif
+
+/*!
+ * FIX: issue #442
+ * [EN] The dark versions and dark colors registered for light animation URLs (`absoluteString`), kept in one instance
+ *      instead of global dictionaries. It is Core's `CYLTabBarItemAnimationStyleSource`; the `CYLConstants` class methods
+ *      below forward to it. Main thread only, like the tab bar that uses it.
+ * [CN] 为浅色动画 URL（`absoluteString`）注册的深色版本与深色颜色，保存在一个实例中，而不是全局字典。它就是 Core 的
+ *      `CYLTabBarItemAnimationStyleSource`；下面 `CYLConstants` 的类方法都转发给它。与使用它的 Tab 栏一样只在主线程使用。
+ */
+@interface CYLTabBarItemAnimationStyleRegistry : NSObject <CYLTabBarItemAnimationStyleSource>
+- (void)registerDarkURL:(NSURL *)darkURL forURL:(NSURL *)URL;
+- (void)registerDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forURL:(NSURL *)URL;
+/// [EN] FIX: issue #216 — the colors of every appearance (`CYLTabBarAnimationColors`). [CN] 所有外观下的颜色（`CYLTabBarAnimationColors`）。
+- (void)registerColors:(NSDictionary<NSString *, UIColor *> *)colors forURL:(NSURL *)URL;
+@end
+
+@implementation CYLTabBarItemAnimationStyleRegistry {
+    NSMutableDictionary<NSString *, NSURL *> *_darkURLs;
+    NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *_darkColors;
+    NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *_colors;
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _darkURLs = [NSMutableDictionary dictionary];
+        _darkColors = [NSMutableDictionary dictionary];
+        _colors = [NSMutableDictionary dictionary];
+    }
+    return self;
+}
+
+static NSString *CYLTabBarItemAnimationStyleKey(NSURL *URL) {
+    return [URL isKindOfClass:[NSURL class]] ? URL.absoluteString : nil;
+}
+
+- (void)registerDarkURL:(NSURL *)darkURL forURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    if (key.length == 0) {
+        return;
+    }
+    // Only a real URL counts; anything else clears it. 只接受 NSURL，其他值视为清除。
+    _darkURLs[key] = [darkURL isKindOfClass:[NSURL class]] ? darkURL : nil;
+}
+
+/// [EN] Only keypath (non-empty NSString) -> UIColor pairs count; nil without any. [CN] 只保留「非空 NSString keypath -> UIColor」；没有时为 nil。
+static NSDictionary<NSString *, UIColor *> *_Nullable CYLTabBarItemAnimationValidColors(NSDictionary<NSString *, UIColor *> *colors) {
+    NSMutableDictionary<NSString *, UIColor *> *validColors = [NSMutableDictionary dictionary];
+    if ([colors isKindOfClass:[NSDictionary class]]) {
+        [colors enumerateKeysAndObjectsUsingBlock:^(id keypath, id color, BOOL *stop) {
+            (void)stop;
+            if ([keypath isKindOfClass:[NSString class]] && [(NSString *)keypath length] > 0 && [color isKindOfClass:[UIColor class]]) {
+                validColors[keypath] = color;
+            }
+        }];
+    }
+    return validColors.count > 0 ? [validColors copy] : nil;
+}
+
+- (void)registerDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    if (key.length == 0) {
+        return;
+    }
+    _darkColors[key] = CYLTabBarItemAnimationValidColors(darkColors);
+}
+
+- (void)registerColors:(NSDictionary<NSString *, UIColor *> *)colors forURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    if (key.length == 0) {
+        return;
+    }
+    _colors[key] = CYLTabBarItemAnimationValidColors(colors);
+}
+
+#pragma mark - CYLTabBarItemAnimationStyleSource
+
+- (BOOL)hasStyleVariants {
+    return _darkURLs.count > 0 || _darkColors.count > 0 || _colors.count > 0;
+}
+
+- (BOOL)hasStyleVariantForURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    return key.length > 0 && (_darkURLs[key] != nil || _darkColors[key].count > 0 || _colors[key].count > 0);
+}
+
+- (NSURL *)URL:(NSURL *)URL forTraitCollection:(UITraitCollection *)traitCollection {
+    if (!URL) {
+        return nil;
+    }
+    if (@available(iOS 13.0, *)) {
+        NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+        if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark && key.length > 0) {
+            return _darkURLs[key] ?: URL;
+        }
+    }
+    return URL;
+}
+
+- (NSDictionary<NSString *, UIColor *> *)darkColorsForURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    return key.length > 0 ? _darkColors[key] : nil;
+}
+
+- (NSDictionary<NSString *, UIColor *> *)colorsForURL:(NSURL *)URL {
+    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
+    return key.length > 0 ? _colors[key] : nil;
+}
+
+@end
+
+/// [EN] Core's style source: the one style registry. [CN] Core 的风格来源：唯一的风格注册表。
+static CYLTabBarItemAnimationStyleRegistry *CYLTabBarItemAnimationSharedStyleRegistry(void) {
+    static CYLTabBarItemAnimationStyleRegistry *registry;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        registry = [[CYLTabBarItemAnimationStyleRegistry alloc] init];
+    });
+    return registry;
+}
+
+id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(void) {
+    return CYLTabBarItemAnimationSharedStyleRegistry();
+}
+
+void CYLTabBarItemAnimationRegisterDarkStyle(NSURL *URL, NSURL *darkURL, NSDictionary<NSString *, UIColor *> *darkColors) {
+    CYLTabBarItemAnimationStyleRegistry *registry = CYLTabBarItemAnimationSharedStyleRegistry();
+    [registry registerDarkURL:darkURL forURL:URL];
+    [registry registerDarkColors:darkColors forURL:URL];
+}
+
+void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictionary<NSString *, UIColor *> *colors) {
+    [CYLTabBarItemAnimationSharedStyleRegistry() registerColors:colors forURL:URL];
+}
 
 @implementation CYLConstants
 
@@ -43,7 +177,17 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
     return [CYLUtils isLiquidGlassActive];
 }
 
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 + (NSValue *)cyl_getTureLottieSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage {
+    return [self cyl_tabBarItemAnimationSizeValue:lottieSizeValue fromNormalImage:normalImage];
+}
+
+#pragma clang diagnostic pop
+
++ (NSValue *)cyl_tabBarItemAnimationSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage {
     NSValue *tureLottieSizeValue = nil;
     do {
         if (!CGSizeEqualToSize(CGSizeZero, [lottieSizeValue CGSizeValue])) {
@@ -119,81 +263,35 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
 */
 #pragma mark - Dark Mode Lottie (#442)
 
-/// Light Lottie URL (`absoluteString`) -> its dark version. Main thread only, like the tab bar that uses it.
-static NSMutableDictionary<NSString *, NSURL *> *CYLDarkLottieURLs(void) {
-    static NSMutableDictionary<NSString *, NSURL *> *darkLottieURLs;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        darkLottieURLs = [NSMutableDictionary dictionary];
-    });
-    return darkLottieURLs;
-}
-
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 + (void)cyl_registerDarkLottieURL:(NSURL *)darkLottieURL forLottieURL:(NSURL *)lottieURL {
-    NSString *key = [lottieURL isKindOfClass:[NSURL class]] ? lottieURL.absoluteString : nil;
-    if (key.length == 0) {
-        return;
-    }
-    // Only a real URL counts; anything else clears it. 只接受 NSURL，其他值视为清除。
-    CYLDarkLottieURLs()[key] = [darkLottieURL isKindOfClass:[NSURL class]] ? darkLottieURL : nil;
+    [CYLTabBarItemAnimationSharedStyleRegistry() registerDarkURL:darkLottieURL forURL:lottieURL];
 }
 
 + (NSURL *)cyl_lottieURL:(NSURL *)lottieURL forTraitCollection:(UITraitCollection *)traitCollection {
-    if (!lottieURL) {
-        return nil;
-    }
-    if (@available(iOS 13.0, *)) {
-        if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-            return CYLDarkLottieURLs()[lottieURL.absoluteString] ?: lottieURL;
-        }
-    }
-    return lottieURL;
-}
-
-/// Light Lottie URL (`absoluteString`) -> keypath -> dark color (Lottie 4.x). Main thread only.
-static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *CYLLottieDarkColors(void) {
-    static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *lottieDarkColors;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        lottieDarkColors = [NSMutableDictionary dictionary];
-    });
-    return lottieDarkColors;
+    return [CYLTabBarItemAnimationSharedStyleRegistry() URL:lottieURL forTraitCollection:traitCollection];
 }
 
 + (void)cyl_registerLottieDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forLottieURL:(NSURL *)lottieURL {
-    NSString *key = [lottieURL isKindOfClass:[NSURL class]] ? lottieURL.absoluteString : nil;
-    if (key.length == 0) {
-        return;
-    }
-    // Only keypath (non-empty NSString) -> UIColor pairs count. 只保留「非空 NSString keypath -> UIColor」。
-    NSMutableDictionary<NSString *, UIColor *> *validColors = [NSMutableDictionary dictionary];
-    if ([darkColors isKindOfClass:[NSDictionary class]]) {
-        [darkColors enumerateKeysAndObjectsUsingBlock:^(id keypath, id color, BOOL *stop) {
-            (void)stop;
-            if ([keypath isKindOfClass:[NSString class]] && [(NSString *)keypath length] > 0 && [color isKindOfClass:[UIColor class]]) {
-                validColors[keypath] = color;
-            }
-        }];
-    }
-    CYLLottieDarkColors()[key] = validColors.count > 0 ? [validColors copy] : nil;
+    [CYLTabBarItemAnimationSharedStyleRegistry() registerDarkColors:darkColors forURL:lottieURL];
 }
 
 + (BOOL)cyl_hasDarkLottieForLottieURL:(NSURL *)lottieURL {
-    NSString *key = [lottieURL isKindOfClass:[NSURL class]] ? lottieURL.absoluteString : nil;
-    if (key.length == 0) {
-        return NO;
-    }
-    return CYLDarkLottieURLs()[key] != nil || CYLLottieDarkColors()[key].count > 0;
+    return [CYLTabBarItemAnimationSharedStyleRegistry() hasStyleVariantForURL:lottieURL];
 }
 
 + (NSDictionary<NSString *, UIColor *> *)cyl_lottieDarkColorsForLottieURL:(NSURL *)lottieURL {
-    NSString *key = lottieURL.absoluteString;
-    return key.length > 0 ? CYLLottieDarkColors()[key] : nil;
+    return [CYLTabBarItemAnimationSharedStyleRegistry() darkColorsForURL:lottieURL];
 }
 
 + (BOOL)cyl_hasDarkLottieURLs {
-    return CYLDarkLottieURLs().count > 0 || CYLLottieDarkColors().count > 0;
+    return [CYLTabBarItemAnimationSharedStyleRegistry() hasStyleVariants];
 }
+
+#pragma clang diagnostic pop
 
 + (NSURL *)cyl_getURLFromString:(NSString *)string {
     if (!string) {
@@ -214,27 +312,45 @@ static NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *C
     return URL;
 }
 
+/// FIX: issue #604 — YES when `attributes` give an animation file of any library in the build (generic keys, or each
+/// library's own keys). `attributes` 中设置了构建中任意动画库的文件时返回 YES（通用 key，或各动画库自己的 key）。
+static BOOL CYLTabBarItemAttributesHaveAnimationFile(NSDictionary *attributes) {
+    return CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationURL) != nil ||
+           CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationFilePath) != nil;
+}
+
+// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
+// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 + (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
-    // Lottie ObjC (`<Lottie/Lottie.h>`) or Lottie Swift (`<Lottie/Lottie-Swift.h>`); without either, never enabled.
-    // 引入 Lottie ObjC 或 Lottie Swift 之一时才可能启用；两者都没有时恒为 NO。
-#if CYL_LOTTIE_AVAILABLE
-    NSInteger lottieURLCount = lottieURLs.count;
-    BOOL isLottieEnabled = lottieURLCount > 0 ;
+    return [self isTabBarItemAnimationEnabledWithURLs:lottieURLs tabBarItemsAttributes:tabBarItemsAttributes];
+}
+
+#pragma clang diagnostic pop
+
++ (BOOL)isTabBarItemAnimationEnabledWithURLs:(NSArray<NSURL *> *)URLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
+    // FIX: issue #604 — only with an animation library, i.e. the `CYLTabBarItemAnimation` service, checked at runtime
+    // so that any library works (Lottie, PAG or one added later); without one, never enabled.
+    // 仅在引入动画库（即 `CYLTabBarItemAnimation` 服务）时启用，在运行时判断，以支持任意动画库（Lottie、PAG 或以后新增的库）；没有时恒为 NO。
+    if (!CYLTabBarItemAnimationIsAvailable()) {
+        return NO;
+    }
+    NSInteger URLCount = URLs.count;
+    BOOL isLottieEnabled = URLCount > 0 ;
     BOOL isLottieEnabledFromAttributes = NO;
     if (tabBarItemsAttributes && tabBarItemsAttributes.count > 0) {
-        // [EN] Checked instead of `@try`: the first attributes entry must be a dictionary to be read.
-        // [CN] 用检查代替 `@try`：第一个属性项必须是字典才读取。
-        NSDictionary *firstAttributes = tabBarItemsAttributes.firstObject;
-        if ([firstAttributes isKindOfClass:[NSDictionary class]]) {
-            isLottieEnabledFromAttributes = firstAttributes[CYLTabBarLottieURL] || firstAttributes[CYLTabBarLottieFilePath];
+        // [EN] Checked instead of `@try`: only dictionaries are read. FIX: issue #477 — any tab, not only the first: only
+        //      some tabs may have an animation, of any library (Lottie, PAG, Rive).
+        // [CN] 用检查代替 `@try`：只读取字典。任意一个 Tab，而不只是第一个：可能只有部分 Tab 有动画，且可以是任一动画库（Lottie、PAG、Rive）。
+        for (NSDictionary *item in tabBarItemsAttributes) {
+            if ([item isKindOfClass:[NSDictionary class]] && CYLTabBarItemAttributesHaveAnimationFile(item)) {
+                isLottieEnabledFromAttributes = YES;
+                break;
+            }
         }
     }
     return isLottieEnabled || isLottieEnabledFromAttributes;
-#else
-    (void)lottieURLs;
-    (void)tabBarItemsAttributes;
-    return NO;
-#endif
 }
 
 @end

@@ -13,6 +13,7 @@
 
 | 中文 | English |
 |:---|:---|
+| [AI 工具的 Skill：快速基于本库创建项目](Agent-Skills.md) | [Skills for AI tools: start a project on this library quickly](Agent-Skills.md) |
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
@@ -20,24 +21,32 @@
 | [一个配置文件生成 TabBarController](Configuration-File.md) | [One configuration file, one TabBarController](Configuration-File.md) |
 | [配置文件相关脚本：导出、边界情况与测试](Configuration-Scripts.md) | [Configuration scripts: export, edge cases and tests](Configuration-Scripts.md) |
 | [自定义 TabBar 功能清单](Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](Custom-Tab-Bar-Features.md) |
+| [Demo 测试列表：设置分组与纯 Swift 版本](Demo-Test-List.md) | [The demo test list: settings groups and a pure Swift version](Demo-Test-List.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](Mac-CI-CD.md) |
+| [PAG 动画 Tab 图标（与 Lottie 用法相同）](PAG-Animation.md) | [PAG animated tab icons (used like Lottie)](PAG-Animation.md) |
+| [只有部分 Tab 有动画（Lottie 或 PAG）](Per-Tab-Animation.md) | [Only some tabs animated (Lottie or PAG)](Per-Tab-Animation.md) |
+| [PlusButton 子控制器换肤测试](Plus-Child-Theme-Switching-Test.md) | [Plus child theme switching test](Plus-Child-Theme-Switching-Test.md) |
+| [液态玻璃：标题画在背景图上的 PlusButton](PlusButton-Background-Image-Liquid-Glass.md) | [Liquid Glass: a PlusButton with its title on a background image](PlusButton-Background-Image-Liquid-Glass.md) |
 | [PlusButton 角标：每次点击都会变化](PlusButton-Badge.md) | [PlusButton badge: changes on every tap](PlusButton-Badge.md) |
 | [有 PlusButton 时，Tab 的 Lottie 图标与 Lottie 文件对应](PlusButton-Lottie-TabIcon.md) | [Lottie tab icons and their files when there is a PlusButton](PlusButton-Lottie-TabIcon.md) |
 | [调研：配置文件与页面注册表中的 PlusButton 注册](PlusButton-Registration-Research.md) | [Research: registering the PlusButton through configurations and the page registry](PlusButton-Registration-Research.md) |
 | [PlusButton 的 slot：占位与数量一致](PlusButton-Slot.md) | [The PlusButton Slot: Placeholders and Matching Counts](PlusButton-Slot.md) |
 | [PlusButton 子控件响应各自的点击事件](PlusButton-Subview-Touches.md) | [Subviews of the PlusButton receive their own touches](PlusButton-Subview-Touches.md) |
 | [PlusButton 点击范围：扩大、按倍数放大与调试显示](PlusButton-Touchable-Area.md) | [PlusButton touchable area: grow it, scale it, and see it](PlusButton-Touchable-Area.md) |
+| [PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片](PlusButton.md) | [How the PlusButton works: the real button, its Liquid Glass stand-in and selected images](PlusButton.md) |
 | [在任意位置获取导航控制器并 Push](Push-From-Anywhere.md) | [Get the navigation controller and push from anywhere](Push-From-Anywhere.md) |
+| [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](Rive-Animation.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
 | [Tab 的无障碍与 UI 测试](Tab-Accessibility.md) | [Tab Accessibility and UI Tests](Tab-Accessibility.md) |
 | [TabBar 图库](Tab-Bar-Gallery.md) | [Tab Bar Gallery](Tab-Bar-Gallery.md) |
+| [Tab 图标动画共用子库：CYLTabBarItemAnimation（面向协议，可扩展任意动画库）](Tab-Bar-Item-Animation.md) | [The shared tab icon animation subspec: CYLTabBarItemAnimation (protocol-oriented, open to any library)](Tab-Bar-Item-Animation.md) |
 | [自定义 Tab 点击操作](Tab-Custom-Action.md) | [Custom Tab Actions](Tab-Custom-Action.md) |
 | [Tab 交互：点击动画、长按、滑动切换及其他](Tab-Interactions.md) | [Tab interactions: tap animations, long press, swipe, and more](Tab-Interactions.md) |
 | [单个 Tab 的颜色](Tab-Item-Colors.md) | [Per-tab Colors](Tab-Item-Colors.md) |
@@ -51,6 +60,8 @@
 | [滚动时缩小或隐藏 TabBar](TabBar-Minimize-On-Scroll.md) | [Minimize or hide the TabBar on scroll](TabBar-Minimize-On-Scroll.md) |
 | [TabBarItem 手势：再次点击、双击与长按](TabBarItem-Gestures.md) | [Tab bar item gestures: reselect, double tap and long press](TabBarItem-Gestures.md) |
 | [选中标题：选中的 Tab 显示不同文字（如京东「刷新」）](TabBarItem-Selected-Title.md) | [Selected title: a different title on the selected tab (like JD's "Refresh")](TabBarItem-Selected-Title.md) |
+| [换肤实现评估：与动画组件的集成、差距与改进](Theme-Switching-Evaluation.md) | [Theme switching evaluation: integration with the animation components, gaps and improvements](Theme-Switching-Evaluation.md) |
+| [换肤实现评估：与 QMUI 的差距、架构符合度与改进建议](Theme-Switching-QMUI-Evaluation.md) | [Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve](Theme-Switching-QMUI-Evaluation.md) |
 | [换肤（主题切换）](Theme-Switching.md) | [Theme switching (skins)](Theme-Switching.md) |
 | [原地更新 Tab：标题、图标、网络图标与替换页面](Update-Tab-Bar-Items-In-Place.md) | [Update Tabs in Place: Titles, Icons, Network Icons and Pages](Update-Tab-Bar-Items-In-Place.md) |
 
@@ -68,6 +79,7 @@
 
 ```text
 docs/
+├── Agent-Skills.md
 ├── Bilingual-Documentation.md
 ├── CYLUtils-Helpers.md
 ├── Carthage-Example.md
@@ -75,25 +87,33 @@ docs/
 ├── Configuration-File.md
 ├── Configuration-Scripts.md
 ├── Custom-Tab-Bar-Features.md
+├── Demo-Test-List.md
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
 ├── Image-Only-Tabs.md
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
 ├── Mac-CI-CD.md
+├── PAG-Animation.md
+├── Per-Tab-Animation.md
+├── Plus-Child-Theme-Switching-Test.md
+├── PlusButton-Background-Image-Liquid-Glass.md
 ├── PlusButton-Badge.md
 ├── PlusButton-Lottie-TabIcon.md
 ├── PlusButton-Registration-Research.md
 ├── PlusButton-Slot.md
 ├── PlusButton-Subview-Touches.md
 ├── PlusButton-Touchable-Area.md
+├── PlusButton.md
 ├── Push-From-Anywhere.md
 ├── README.md
+├── Rive-Animation.md
 ├── SelectedIndex-PlusButton.md
 ├── Swift-Guide.md
 ├── SwiftUI-Integration.md
 ├── Tab-Accessibility.md
 ├── Tab-Bar-Gallery.md
+├── Tab-Bar-Item-Animation.md
 ├── Tab-Custom-Action.md
 ├── Tab-Interactions.md
 ├── Tab-Item-Colors.md
@@ -107,17 +127,56 @@ docs/
 ├── TabBar-Minimize-On-Scroll.md
 ├── TabBarItem-Gestures.md
 ├── TabBarItem-Selected-Title.md
+├── Theme-Switching-Evaluation.md
+├── Theme-Switching-QMUI-Evaluation.md
 ├── Theme-Switching.md
 ├── Update-Tab-Bar-Items-In-Place.md
 └── assets/
+    ├── demo-test-list-objc-classic.png
     ├── docs-navigation-index.png
     ├── flatdesign-standard-appearance-mapping.svg
     ├── login-required-tabs-flow.svg
+    ├── pag-animation-tab-icons.png
+    ├── pag-animation-test-list.png
+    ├── plus-child-theme-switching.png
+    ├── plusbutton-background-image-liquid-glass-selected.png
+    ├── plusbutton-background-image-liquid-glass-swiftui.png
+    ├── plusbutton-background-image-liquid-glass.png
+    ├── plusbutton-background-title-centered-pag.png
+    ├── plusbutton-image-loaded-later.png
+    ├── plusbutton-overlap-classic.png
+    ├── plusbutton-overlap-flat.png
+    ├── plusbutton-overlap-lg.png
     ├── plusbutton-subview-touches-issue-202.png
     ├── readme-english-before-reading.png
     ├── readme-english-bilingual-contents.png
     ├── readme-english-header-badges.png
+    ├── rive-animation-onboarding-button.png
+    ├── rive-animation-plus-button.png
+    ├── rive-animation-search-tab-frames.png
+    ├── rive-animation-swiftui-test-list.png
+    ├── rive-animation-tab-icons.png
+    ├── rive-animation-test-list.png
+    ├── tab-interactions-long-press-classic.png
+    ├── tab-interactions-long-press-flatdesign.png
+    ├── tab-interactions-long-press-liquid-glass.png
+    ├── tab-interactions-navigation-bar-hidden-classic.png
+    ├── tab-interactions-outside-superview-classic.png
+    ├── tab-interactions-outside-superview-liquid-glass.png
+    ├── tab-interactions-slide-transition.png
+    ├── tab-interactions-star-fireworks-flatdesign.png
+    ├── tab-interactions-swipe-classic.png
+    ├── tab-interactions-swipe-liquid-glass.png
+    ├── tab-interactions-swipe-login-classic.png
+    ├── theme-switching-flat-design.png
     ├── theme-switching-holiday-icons.png
+    ├── theme-switching-liquid-glass.png
+    ├── theme-switching-objc-flat-design-grapefruit.png
+    ├── theme-switching-objc-liquid-glass-grapefruit.png
+    ├── theme-switching-pag-grapefruit.png
+    ├── theme-switching-rive-grapefruit.png
+    ├── theme-switching-runtime-christmas-to-pink-rose.png
+    ├── theme-switching-swiftui-rive-grapefruit.png
     ├── update-tab-bar-items-all-local-icons.png
     ├── update-tab-bar-items-all-network-icons-badges.png
     ├── update-tab-bar-items-all-network-icons-restored.png

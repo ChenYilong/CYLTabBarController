@@ -305,6 +305,7 @@
 "轻触感反馈" = "Ľahká haptická odozva";
 "重触感反馈" = "Silná haptická odozva";
 "长按（#152）" = "Dlhé stlačenie (#152)";
+"播放 / 停止" = "Prehrať / Zastaviť";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "Vianoce";
@@ -324,6 +325,35 @@
 "点我" = "Ťukni";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Dva panely kariet zdieľajú jednu konfiguráciu; register každého z nich priraďuje rovnaké ID stránok rôznym stránkam.";
 "两个 TabBar，同一个页面 ID" = "Dva panely kariet, jedno ID stránky";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Načítať obrázok";
+"替换为更大的图片" = "Nahradiť väčším obrázkom";
+"移除图片" = "Odstrániť obrázok";
+"加载背景图片" = "Načítať obrázok pozadia";
+"2 秒后：%@" = "O 2 sekundy: %@";
+"PlusButton 图片之后才加载" = "Obrázok PlusButton načítaný neskôr";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Ťuknutím vyberte prípad a otvorte ovládač panela kariet: PlusButton spočiatku nemá obrázok; po 2 sekundách sa obrázok načíta, nahradí alebo odstráni, alebo sa načíta obrázok pozadia. Výsledok by mal zodpovedať obrázku nastavenému pri spustení.";
+"对照：启动时即有图片" = "Porovnanie: obrázok pri spustení";
+"对照：启动时即有更大的图片" = "Porovnanie: väčší obrázok pri spustení";
+"对照：启动时即有背景图片" = "Porovnanie: obrázok pozadia pri spustení";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Ťuknutím sa vrátite alebo zatvoríte";
+"详情" = "Podrobnosti";
+"拍照" = "Odfotiť";
+"从相册选择" = "Vybrať z albumu";
+"设置" = "Nastavenia";
+"关于我们" = "O nás";
+"示例" = "Príklad";
+"撰写" = "Napísať";
+"好" = "OK";
+"编辑更多" = "Upraviť Ďalšie";
+"新版本" = "Nová verzia";
+"打开 TabBar 场景展示" = "Otvoriť galériu panelov kariet";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Každá scéna je panel kariet vytvorený verejným API: štýly, animácie, upozornenia, Lottie a novšie API kariet";
+"TabBar 场景展示" = "Galéria panelov kariet";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Kopírovať";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
@@ -332,3 +362,9 @@
 "收起模拟列表" = "Zbaliť zoznam simulácií";
 /* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
 "跳过 %1$@ 个 Tab：%2$@" = "Preskočených %1$@ kariet: %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Ikony zo siete";
+"网络图标、标题与配色" = "Ikony zo siete, názvy a farby";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Konfiguračný súbor";

@@ -1,0 +1,477 @@
+{
+  "comment": "Fetched by scripts/fetch-animation-resources.py (run by `pod install` in Example-PAG); the files themselves are not in this repository.",
+  "repositories": [
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "license": "Apache-2.0"
+    },
+    {
+      "repository": "libpag/pag-enterprise-ios",
+      "commit": "70d428e62a19d51278a85016cda106d9ed4d7527",
+      "license": "Apache-2.0"
+    },
+    {
+      "repository": "libpag/pag-android",
+      "commit": "2df129774916f69a114edf83d8a1dc1fc9f9db56",
+      "license": "MIT"
+    },
+    {
+      "repository": "libpag/pag-flutter",
+      "commit": "46a46b44d557c9c243a8e5fe3bc86194b71bbfed",
+      "license": "Apache-2.0"
+    },
+    {
+      "repository": "libpag/pag-enterprise-android",
+      "commit": "0ae3165e3903b01f9fefbb004774f106db2d1ce7",
+      "license": "Commercial: requires a valid commercial PAG license (see its LICENSE)"
+    },
+    {
+      "repository": "libpag/pag-web",
+      "commit": "83e30df6176e80d640c362a1d433a939016ef115",
+      "license": "None: the repository has no license file"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "license": "Apache-2.0"
+    }
+  ],
+  "files": [
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "LICENSE",
+      "file": "pag-ios/LICENSE",
+      "size": 9480,
+      "sha256": "a4ddf2289697aaba6c02064e0d90fa77b5a917f53c1459dc3f5af26a00f57f62"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/0.pag",
+      "file": "pag-ios/0.pag",
+      "size": 7344,
+      "sha256": "882e8a34d8af6fb297ef7730d4a5bc62d028053762da00f820f89e7269953840"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/1.pag",
+      "file": "pag-ios/1.pag",
+      "size": 2085,
+      "sha256": "806d8f95e636d9f3c7ae59cdb89964d9d0106f84d5ee98e8905ec4c62b19bda2"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/10.pag",
+      "file": "pag-ios/10.pag",
+      "size": 3651,
+      "sha256": "b1bf73eeb564d6253874f7a767aaedac11ee2fe66a89ce5d75b81172306ef7ef"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/11.pag",
+      "file": "pag-ios/11.pag",
+      "size": 39351,
+      "sha256": "d4f48e423f6f8ae395edc927a524b12c15a2332196d9704d17b0ada83cdb4d9a"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/12.pag",
+      "file": "pag-ios/12.pag",
+      "size": 25117,
+      "sha256": "70fb088a60593d357c6ecb1eb56e4469241b4086822a0641908207f09587567b"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/13.pag",
+      "file": "pag-ios/13.pag",
+      "size": 12093,
+      "sha256": "dc8d08c059c9afb35060e0a90f90cbe3f3c76acc299b7a4bab8d1d9cdda25924"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/14.pag",
+      "file": "pag-ios/14.pag",
+      "size": 60385,
+      "sha256": "73f323f3bbe5476a53d974812bb9423d2851531fd76d68ce0500e684460ef2cb"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/15.pag",
+      "file": "pag-ios/15.pag",
+      "size": 18686,
+      "sha256": "5d21f7ab9025ffdece68a3d5f39823b9c891f9ffeaa99f305d9e47e5f3324a41"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/16.pag",
+      "file": "pag-ios/16.pag",
+      "size": 83559,
+      "sha256": "d0b67ce5052ae6a602ac57285f6c560b2019bc33d3217971236b9b489f3b8c1f"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/17.pag",
+      "file": "pag-ios/17.pag",
+      "size": 250453,
+      "sha256": "a48f6a404aabdf48e658da18204a529c29a51e0294d785bd8304d9753d3b3198"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/18.pag",
+      "file": "pag-ios/18.pag",
+      "size": 15331,
+      "sha256": "207f2f69635883ad490ee8c4d27366addd11237330b3c28accc097724a79dd2a"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/19.pag",
+      "file": "pag-ios/19.pag",
+      "size": 53184,
+      "sha256": "647e89768a65b3dd6627c9d75394fd5cd04ad65dba4f094aa97f6c0ce6ae19b2"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/2.pag",
+      "file": "pag-ios/2.pag",
+      "size": 2366,
+      "sha256": "86262b2775863b102d6679ca4a1e1f54479c5b5a7fac2b6e4a450d25d6b1a0ed"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/20.pag",
+      "file": "pag-ios/20.pag",
+      "size": 4041,
+      "sha256": "72e28eb5af6e730a92f68ee0e44750ec65342c9d4800d1662df85d4da597869f"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/21.pag",
+      "file": "pag-ios/21.pag",
+      "size": 39081,
+      "sha256": "0c7afab1c5070241dfd0ae8aa3906fd3982ce7ef242afc6ed3bba89af34b470a"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/22.pag",
+      "file": "pag-ios/22.pag",
+      "size": 2362,
+      "sha256": "69fc9a0e735aba25af7d7b8920e62dad89d54528f273ae31e0e7380327e379a9"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/3.pag",
+      "file": "pag-ios/3.pag",
+      "size": 8669,
+      "sha256": "904632673e99e9bff11f886638b46b6ed4c591e29d1e3c6113448391957afd18"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/4.pag",
+      "file": "pag-ios/4.pag",
+      "size": 9458,
+      "sha256": "213ee049acdc511249bbccd8f9b4fd978e6cbe1ddf767a1146d651175927d6e7"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/5.pag",
+      "file": "pag-ios/5.pag",
+      "size": 24008,
+      "sha256": "53965e509439dcf98d92fbb94481d2ffa699dae2083adcdfa944df5f267c15e4"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/6.pag",
+      "file": "pag-ios/6.pag",
+      "size": 14700,
+      "sha256": "222490f1895749b420cb7551ecb5d3b6426c763e08eb5fd0443d18e17346e4d5"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/7.pag",
+      "file": "pag-ios/7.pag",
+      "size": 5745,
+      "sha256": "dfb8690509d72dc503af2b123f2b1d969843b2efe03bd851a20cb16617c4ef79"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/8.pag",
+      "file": "pag-ios/8.pag",
+      "size": 10218,
+      "sha256": "77e9e5ab022b46dd9dd9e51553a410ce3dd33ef78e909a7515c861baf3a53182"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/9.pag",
+      "file": "pag-ios/9.pag",
+      "size": 35537,
+      "sha256": "45ba151ecb5f8ccdb1d01501358e782cc2ad631abb3eb705fd17d93ebb8ac767"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/data-TimeStretch.pag",
+      "file": "pag-ios/data-TimeStretch.pag",
+      "size": 2783,
+      "sha256": "b4e5ca10a5e12f464a9c2d33327fcf8551ed20b9cf818def2e903ed5f5ba5352"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/data_video.pag",
+      "file": "pag-ios/data_video.pag",
+      "size": 404729,
+      "sha256": "430d5de966ce9b821047c3d2a5bc96c8d61d307b18e7f31b9d2be50f3d825b1c"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/jisha.pag",
+      "file": "pag-ios/jisha.pag",
+      "size": 2383189,
+      "sha256": "17ab647f72aacf12254b714aa3e47fbbc00b9208c0a2ca8dbc90e9b88dead24f"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/moonlight.pag",
+      "file": "pag-ios/moonlight.pag",
+      "size": 14303,
+      "sha256": "747ac418aab921de3c22f9814fa74ec641bfcfaf99a0bddb8d11ff222166fc75"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/particle_video.pag",
+      "file": "pag-ios/particle_video.pag",
+      "size": 1985560,
+      "sha256": "7f04a2aa28b3e9ddd3d4eef548ae9e7a4cbc05f4f106a6d80d77e1dc0779970f"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/replacement.pag",
+      "file": "pag-ios/replacement.pag",
+      "size": 12082,
+      "sha256": "ee3cd36971d332c82ea1d53d34065697dfe6c4c1c38d91d9d29e954ad2448eb3"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/small.pag",
+      "file": "pag-ios/small.pag",
+      "size": 1608451,
+      "sha256": "53f2dc9fc1c821b0bc2036c66c40de36748c9aef2b31d4ddd4315c635b7fad19"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/test.pag",
+      "file": "pag-ios/test.pag",
+      "size": 1784292,
+      "sha256": "bcafe72cdd342e1c9442b0e985f65dbed503935e43763293017baa2de3de3614"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/test2.pag",
+      "file": "pag-ios/test2.pag",
+      "size": 2640,
+      "sha256": "7074467a96fc720fee9b9772d4359bee9b3c955210653fa446e0d54dc9789bfd"
+    },
+    {
+      "repository": "libpag/pag-enterprise-ios",
+      "commit": "70d428e62a19d51278a85016cda106d9ed4d7527",
+      "path": "LICENSE",
+      "file": "pag-enterprise-ios/LICENSE",
+      "size": 9480,
+      "sha256": "a4ddf2289697aaba6c02064e0d90fa77b5a917f53c1459dc3f5af26a00f57f62"
+    },
+    {
+      "repository": "libpag/pag-enterprise-ios",
+      "commit": "70d428e62a19d51278a85016cda106d9ed4d7527",
+      "path": "sample/asset/3D_BOX.pag",
+      "file": "pag-enterprise-ios/3D_BOX.pag",
+      "size": 536121,
+      "sha256": "439f0840311e0ba35e0856b4d3a255c13b21ebb4275a8880adf8b0a51994b678"
+    },
+    {
+      "repository": "libpag/pag-enterprise-ios",
+      "commit": "70d428e62a19d51278a85016cda106d9ed4d7527",
+      "path": "sample/asset/audio.pag",
+      "file": "pag-enterprise-ios/audio.pag",
+      "size": 2396396,
+      "sha256": "588aa306cba573fabcb8a2c715be30e3546d9ea470e64c3bb840c361a6cb2516"
+    },
+    {
+      "repository": "libpag/pag-enterprise-ios",
+      "commit": "70d428e62a19d51278a85016cda106d9ed4d7527",
+      "path": "sample/asset/sizhi.pag",
+      "file": "pag-enterprise-ios/sizhi.pag",
+      "size": 2345667,
+      "sha256": "1da24fe93e316365b294a790a96cb35d872523f0d3406f4e702e71c6e2126576"
+    },
+    {
+      "repository": "libpag/pag-android",
+      "commit": "2df129774916f69a114edf83d8a1dc1fc9f9db56",
+      "path": "LICENSE",
+      "file": "pag-android/LICENSE",
+      "size": 1083,
+      "sha256": "7a0f720422f183204a452e3b7627c976d2b4f5bb07e392b90bb446902a79ed93"
+    },
+    {
+      "repository": "libpag/pag-android",
+      "commit": "2df129774916f69a114edf83d8a1dc1fc9f9db56",
+      "path": "sample/app/src/main/assets/2J.pag",
+      "file": "pag-android/2J.pag",
+      "size": 60381,
+      "sha256": "2ab342975de1ff79ad641c865e4a3227251a53d76d6c7ee603cb9ccc5e9bad5c"
+    },
+    {
+      "repository": "libpag/pag-android",
+      "commit": "2df129774916f69a114edf83d8a1dc1fc9f9db56",
+      "path": "sample/app/src/main/assets/particle_video.pag",
+      "file": "pag-android/particle_video.pag",
+      "size": 2684306,
+      "sha256": "af708bd09d83648b73d2ddfb872f32b864f4c9c2f2a1abfad266c36e2b8b40ba"
+    },
+    {
+      "repository": "libpag/pag-flutter",
+      "commit": "46a46b44d557c9c243a8e5fe3bc86194b71bbfed",
+      "path": "LICENSE",
+      "file": "pag-flutter/LICENSE",
+      "size": 84077,
+      "sha256": "a1e694fd784ec36f03cc640e0f51caa1a27e7a9520f1eb06bb8f84f9309206ac"
+    },
+    {
+      "repository": "libpag/pag-flutter",
+      "commit": "46a46b44d557c9c243a8e5fe3bc86194b71bbfed",
+      "path": "example/data/dance.pag",
+      "file": "pag-flutter/dance.pag",
+      "size": 6922,
+      "sha256": "bc40511dc95bf2452a89fda2d494e2d3c3d74aacf39623fcbe22f7a242bbe1b0"
+    },
+    {
+      "repository": "libpag/pag-flutter",
+      "commit": "46a46b44d557c9c243a8e5fe3bc86194b71bbfed",
+      "path": "example/data/fans.pag",
+      "file": "pag-flutter/fans.pag",
+      "size": 2858,
+      "sha256": "cd603a264f2a517de012e2681f2070bde82d42642fc2962d71bd418b2af5eb94"
+    },
+    {
+      "repository": "libpag/pag-flutter",
+      "commit": "46a46b44d557c9c243a8e5fe3bc86194b71bbfed",
+      "path": "example/data/large.pag",
+      "file": "pag-flutter/large.pag",
+      "size": 2331106,
+      "sha256": "f1e1c8f14519e811219fc7f9f102ce2542d7769db10b0e6c9ebadb776744cb51"
+    },
+    {
+      "repository": "libpag/pag-enterprise-android",
+      "commit": "0ae3165e3903b01f9fefbb004774f106db2d1ce7",
+      "path": "LICENSE",
+      "file": "pag-enterprise-android/LICENSE",
+      "size": 435,
+      "sha256": "d00d2c3445f9cb11bb483f52cba087c0cb0835c19882502f352ee1902cde54c6"
+    },
+    {
+      "repository": "libpag/pag-web",
+      "commit": "83e30df6176e80d640c362a1d433a939016ef115",
+      "path": "assets/music.pag",
+      "file": "pag-web/music.pag",
+      "size": 976722,
+      "sha256": "5822f50ba1792a8184ebd78f4ce35383fcdfb43faabe073815fb57e1324c232f"
+    },
+    {
+      "repository": "libpag/pag-web",
+      "commit": "83e30df6176e80d640c362a1d433a939016ef115",
+      "path": "assets/simple_text.pag",
+      "file": "pag-web/simple_text.pag",
+      "size": 250,
+      "sha256": "a7894d71dc527706cb7b3833cea579b067e9c599a051640c953c55dd787f65f0"
+    },
+    {
+      "repository": "libpag/pag-web",
+      "commit": "83e30df6176e80d640c362a1d433a939016ef115",
+      "path": "assets/snowman.pag",
+      "file": "pag-web/snowman.pag",
+      "size": 46155,
+      "sha256": "450e2be56a34a8744de4db72dfbdf371dcc3f58367020c8bb2f44494fb407b8d"
+    },
+    {
+      "repository": "libpag/pag-web",
+      "commit": "83e30df6176e80d640c362a1d433a939016ef115",
+      "path": "assets/test.pag",
+      "file": "pag-web/test.pag",
+      "size": 108114,
+      "sha256": "68312618dc50af3daf3efb97ccabe809c177fc5de91b37229fc54619f4679304"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "LICENSE.txt",
+      "file": "tab-icons/LICENSE.txt",
+      "size": 116512,
+      "sha256": "564047c2ea762f7b50d3c7d191b8305a464d3def329ad6ef259ec3228823a353"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "assets/refreshing.pag",
+      "lfs": true,
+      "file": "tab-icons/tab_home.pag",
+      "size": 1582,
+      "sha256": "069f7cf1b54f5d7a896deffc6fafd622e3ed439550a64df2ec329e1b99a6d72f"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "assets/wstask_circle.pag",
+      "lfs": true,
+      "file": "tab-icons/tab_health.pag",
+      "size": 2627,
+      "sha256": "abfac793abe73ef23a3cb4464b1dda573fd1a64cf3f36c9d4076a0e271c2d864"
+    },
+    {
+      "repository": "Tencent/libpag",
+      "commit": "5faac72964023cc3ebc2f4395d78023d3a187ae4",
+      "path": "assets/like.pag",
+      "lfs": true,
+      "file": "tab-icons/tab_me.pag",
+      "size": 6922,
+      "sha256": "bc40511dc95bf2452a89fda2d494e2d3c3d74aacf39623fcbe22f7a242bbe1b0"
+    },
+    {
+      "repository": "libpag/pag-ios",
+      "commit": "8c3128d349f17031eeddc3373d4c7e7db7da8193",
+      "path": "sample/pag-ios/assets/2.pag",
+      "file": "tab-icons/tab_moments.pag",
+      "size": 2366,
+      "sha256": "86262b2775863b102d6679ca4a1e1f54479c5b5a7fac2b6e4a450d25d6b1a0ed"
+    }
+  ]
+}

@@ -305,6 +305,7 @@
 "轻触感反馈" = "Respuesta háptica ligera";
 "重触感反馈" = "Respuesta háptica fuerte";
 "长按（#152）" = "Pulsación larga (#152)";
+"播放 / 停止" = "Reproducir / Detener";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "Navidad";
@@ -324,6 +325,35 @@
 "点我" = "Tócame";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Dos barras de pestañas comparten una configuración; el registro de cada una asigna los mismos ID de página a páginas distintas.";
 "两个 TabBar，同一个页面 ID" = "Dos barras de pestañas, un ID de página";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Cargar la imagen";
+"替换为更大的图片" = "Reemplazar por una imagen más grande";
+"移除图片" = "Quitar la imagen";
+"加载背景图片" = "Cargar una imagen de fondo";
+"2 秒后：%@" = "En 2 segundos: %@";
+"PlusButton 图片之后才加载" = "Imagen del PlusButton cargada después";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Toca para elegir un caso y hacer push de un controlador de barra de pestañas: el PlusButton no tiene imagen al principio; 2 segundos después se carga, reemplaza o quita la imagen, o se carga una imagen de fondo. El resultado debe coincidir con una imagen definida al iniciar.";
+"对照：启动时即有图片" = "Comparar: imagen al iniciar";
+"对照：启动时即有更大的图片" = "Comparar: imagen más grande al iniciar";
+"对照：启动时即有背景图片" = "Comparar: imagen de fondo al iniciar";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Toca para volver o cerrar";
+"详情" = "Detalle";
+"拍照" = "Hacer una foto";
+"从相册选择" = "Elegir del álbum";
+"设置" = "Ajustes";
+"关于我们" = "Acerca de";
+"示例" = "Ejemplo";
+"撰写" = "Redactar";
+"好" = "OK";
+"编辑更多" = "Editar Más";
+"新版本" = "Nueva versión";
+"打开 TabBar 场景展示" = "Abrir la galería de barras de pestañas";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Cada escena es una barra de pestañas creada con la API pública: estilos, animaciones, avisos, Lottie y las nuevas API de pestañas";
+"TabBar 场景展示" = "Galería de barras de pestañas";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Copiar";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
@@ -332,3 +362,9 @@
 "收起模拟列表" = "Contraer la lista de simulaciones";
 /* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
 "跳过 %1$@ 个 Tab：%2$@" = "%1$@ pestañas omitidas: %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Iconos de red";
+"网络图标、标题与配色" = "Iconos de red, títulos y colores";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Archivo de configuración";

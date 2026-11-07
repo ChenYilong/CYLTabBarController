@@ -60,10 +60,10 @@ final class GalleryPressAndReselectAnimation: CYLTabButtonBlockAnimation {
         super.init()
         let press = self.press
         highlightAnimation = { button, iconView, titleLabel in
-            press.cyl_playHighlightAnimation?(withTabButton: button, iconView: iconView, titleLabel: titleLabel)
+            press.cyl_playHighlight?(withTabButton: button, iconView: iconView, titleLabel: titleLabel)
         }
         dehighlightAnimation = { button, iconView, titleLabel in
-            press.cyl_playDehighlightAnimation?(withTabButton: button, iconView: iconView, titleLabel: titleLabel)
+            press.cyl_playDehighlight?(withTabButton: button, iconView: iconView, titleLabel: titleLabel)
         }
         reselectAnimation = { _, iconView, _ in
             Gallery.playKeyframes(on: iconView, keyPath: "transform.rotation.z", values: [0, Double.pi, 2 * Double.pi], duration: 0.5)

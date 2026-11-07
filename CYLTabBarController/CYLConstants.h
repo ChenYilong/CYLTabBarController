@@ -139,7 +139,11 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
  * [EN] Returns the Lottie size to use: `lottieSizeValue` if non-zero, else the normal image size, else the default placeholder size.
  * [CN] 返回实际使用的 Lottie 尺寸：优先 lottieSizeValue（非零），其次普通图片尺寸，最后使用默认占位尺寸。
  */
-+ (NSValue *)cyl_getTureLottieSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage;
++ (NSValue *)cyl_getTureLottieSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage DEPRECATED_MSG_ATTRIBUTE("Use +cyl_tabBarItemAnimationSizeValue:fromNormalImage:");
+
+/// [EN] The size of a tab's animation: `sizeValue`, or the normal image's size, or the placeholder size (any library).
+/// [CN] Tab 动画的尺寸：`sizeValue`，否则为普通图片的尺寸，再否则为占位尺寸（任意动画库）。
++ (NSValue *)cyl_tabBarItemAnimationSizeValue:(NSValue *)sizeValue fromNormalImage:(UIImage *)normalImage;
 
 /*!
  * [EN] Returns a file URL for a local file path, or nil if the file does not exist.
@@ -154,7 +158,7 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
  * [CN] 将 `darkLottieURL` 注册为 `lottieURL` 处 Lottie 动画的深色模式版本（传 nil 移除）。`tabBarItemsAttributes` 中的
  *      `CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath` 会自动调用。
  */
-+ (void)cyl_registerDarkLottieURL:(NSURL *)darkLottieURL forLottieURL:(NSURL *)lottieURL;
++ (void)cyl_registerDarkLottieURL:(NSURL *)darkLottieURL forLottieURL:(NSURL *)lottieURL DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDarkURL / CYLTabBarAnimationDarkFilePath tab item keys");
 
 /*!
  * [EN] The Lottie animation to show for `traitCollection`: the registered dark version where the style is dark,
@@ -162,7 +166,7 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
  * [CN] 在 `traitCollection` 下应显示的 Lottie 动画：风格为深色时返回已注册的深色版本，否则（以及 iOS 13 以下）返回 `lottieURL`。
  *      `lottieURL` 为 nil 时返回 nil；`traitCollection` 为 nil 时按浅色处理。
  */
-+ (NSURL *)cyl_lottieURL:(NSURL *)lottieURL forTraitCollection:(UITraitCollection *)traitCollection;
++ (NSURL *)cyl_lottieURL:(NSURL *)lottieURL forTraitCollection:(UITraitCollection *)traitCollection DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDarkURL tab item key");
 
 /*!
  * FIX: issue #442 (Lottie 4.x)
@@ -171,33 +175,36 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
  * [CN] 为 `lottieURL` 处的 Lottie 动画注册 `darkColors`（keypath -> UIColor）：一份动画文件即可适配深色模式（传 nil 移除）。
  *      `tabBarItemsAttributes` 中的 `CYLTabBarLottieDarkColors` 会自动调用。
  */
-+ (void)cyl_registerLottieDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forLottieURL:(NSURL *)lottieURL;
++ (void)cyl_registerLottieDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forLottieURL:(NSURL *)lottieURL DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDarkColors tab item key");
 
 /*!
  * [EN] The dark colors registered for `lottieURL`, nil when there are none.
  * [CN] 为 `lottieURL` 注册的深色颜色，没有时为 nil。
  */
-+ (NSDictionary<NSString *, UIColor *> *)cyl_lottieDarkColorsForLottieURL:(NSURL *)lottieURL;
++ (NSDictionary<NSString *, UIColor *> *)cyl_lottieDarkColorsForLottieURL:(NSURL *)lottieURL DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDarkColors tab item key");
 
 /*!
  * [EN] YES once a dark Lottie animation or dark Lottie colors have been registered: only then does a change of style
  *      reload Lottie icons.
  * [CN] 注册过深色 Lottie 动画或深色 Lottie 颜色后为 YES：只有这时切换深浅色才会重新加载 Lottie 图标。
  */
-+ (BOOL)cyl_hasDarkLottieURLs;
++ (BOOL)cyl_hasDarkLottieURLs DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDark… tab item keys");
 
 /*!
  * [EN] YES when a dark animation or dark colors are registered for `lottieURL`. Lottie icons without them never run
  *      any of the #442 code.
  * [CN] 为 `lottieURL` 注册了深色动画或深色颜色时为 YES。没有注册的 Lottie 图标不会执行任何 #442 相关代码。
  */
-+ (BOOL)cyl_hasDarkLottieForLottieURL:(NSURL *)lottieURL;
++ (BOOL)cyl_hasDarkLottieForLottieURL:(NSURL *)lottieURL DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDark… tab item keys");
 
 /*!
  * [EN] Returns YES if Lottie is linked and either `lottieURLs` is non-empty or the first item attributes specify a Lottie URL or file path.
  * [CN] 判断是否启用 Lottie：需集成 Lottie，且 lottieURLs 非空或第一个 TabBarItem 属性中指定了 Lottie URL / 文件路径。
  */
-+ (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
++ (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes DEPRECATED_MSG_ATTRIBUTE("Use +isTabBarItemAnimationEnabledWithURLs:tabBarItemsAttributes:");
+
+/// [EN] YES when `URLs` is not empty or a tab item has an animation file (any library). [CN] `URLs` 非空或某个 Tab item 有动画文件时返回 YES（任意动画库）。
++ (BOOL)isTabBarItemAnimationEnabledWithURLs:(NSArray<NSURL *> *)URLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
 
 @end
 
@@ -234,6 +241,11 @@ CG_INLINE UIWindow *CYLGetRootWindow(void) {
     return window;
 }
 
+/*!
+ * [EN] The topmost presented view controller from the window's root (the root itself when nothing is presented), so it can
+ *      be a `UIAlertController`. Check its class before casting it.
+ * [CN] 从窗口根控制器开始，最顶层被 present 的控制器（没有 present 时为根控制器本身），因此可能是 `UIAlertController`。强转前请先判断类型。
+ */
 CG_INLINE UIViewController *CYLGetRootViewController(void) {
     UIViewController *rootViewController ;
     UIWindow *window = CYLGetRootWindow();

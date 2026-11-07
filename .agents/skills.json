@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "note": "Third-party agent skills vendored into .agents/skills. Edit this file, then run: python3 scripts/sync-agent-skills.py. Do not edit vendored skills by hand. cyl-* skills are this project's own and are not listed here.",
+  "sources": [
+    {
+      "repo": "dpearson2699/swift-ios-skills",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "licenseFile": "LICENSE",
+      "requestedBy": "maintainer",
+      "root": "skills",
+      "skills": [
+        "swiftui-liquid-glass",
+        "swiftui-uikit-interop",
+        "swiftui-navigation",
+        "swiftui-patterns",
+        "swiftui-animation",
+        "swiftui-gestures",
+        "swiftui-performance",
+        "ios-accessibility",
+        "ios-localization",
+        "debugging-instruments",
+        "ios-memgraph-analysis",
+        "swift-concurrency",
+        "swift-language",
+        "swift-testing",
+        "swift-api-design-guidelines",
+        "swift-architecture"
+      ]
+    },
+    {
+      "repo": "conorluddy/ios-simulator-skill",
+      "commit": "30d2ea43ef88d353f4de560e7b7f132e05c502ab",
+      "license": "MIT",
+      "licenseFile": "LICENSE.md",
+      "requestedBy": "maintainer",
+      "root": "ios-simulator-skill/skills",
+      "skills": [
+        "ios-simulator-skill"
+      ]
+    },
+    {
+      "repo": "rshankras/claude-code-apple-skills",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "requestedBy": "maintainer",
+      "root": "skills",
+      "skills": [
+        "ios/ui-review",
+        "ios/run-device",
+        "ios/migration-patterns",
+        "ios/accessibility-audit",
+        "design/liquid-glass",
+        "design/sf-symbols",
+        "design/animation-patterns",
+        "testing/tdd-bug-fix",
+        "testing/tdd-feature",
+        "testing/characterization-test-generator",
+        "testing/snapshot-test-setup",
+        "swift/memory"
+      ]
+    },
+    {
+      "repo": "droidrun/mobile-harness",
+      "commit": "321868e6de647d68f9520e9a36da1fc67538c4c7",
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "requestedBy": "maintainer",
+      "root": "",
+      "skills": [
+        "."
+      ],
+      "exclude": [
+        "assets"
+      ]
+    },
+    {
+      "repo": "Prisma-Labs-Dev/apple-skills",
+      "commit": "498626005e65783ebe8570a103b2335cf397768c",
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "requestedBy": "maintainer",
+      "root": "skills",
+      "skills": [
+        "uikit",
+        "ios-liquid-glass",
+        "core-animation",
+        "corehaptics",
+        "xcuitest",
+        "hig"
+      ]
+    },
+    {
+      "repo": "JordanCoin/ios-skills-collection",
+      "commit": "90d180768169d5b422790042fe1606976abb1a0c",
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "requestedBy": "github-search",
+      "root": "skills",
+      "skills": [
+        "arimunandar--uikit-legacy",
+        "arimunandar--uikit-layouting",
+        "rgmez--uikit-accessibility-auditor",
+        "avdlee--xcode-project-analyzer",
+        "avdlee--xcode-build-fixer",
+        "getsentry--xcodebuildmcp-cli"
+      ]
+    }
+  ]
+}

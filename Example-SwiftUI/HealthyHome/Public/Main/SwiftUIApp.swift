@@ -61,7 +61,8 @@ final class TabBarBridge: ObservableObject {
     /// [CN] 仅在 TabBarController 有 PlusButton 时返回。
     var plusButton: CYLPlusButton? {
         guard let tabBarController, tabBarController.hasPlusButton() else { return nil }
-        return CYLPlusButton.plusButton(forOwner: tabBarController)
+        // [EN] `+plusButtonForOwner:` is imported into Swift as an initializer. [CN] `+plusButtonForOwner:` 在 Swift 中导入为构造方法。
+        return CYLPlusButton(forOwner: tabBarController)
     }
 
     func select(_ identifier: String) {

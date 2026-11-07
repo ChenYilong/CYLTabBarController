@@ -305,6 +305,7 @@
 "轻触感反馈" = "Retour haptique léger";
 "重触感反馈" = "Retour haptique fort";
 "长按（#152）" = "Appui long (#152)";
+"播放 / 停止" = "Lire / Arrêter";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "Noël";
@@ -324,6 +325,35 @@
 "点我" = "Touchez-moi";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Deux barres d’onglets partagent une configuration ; le registre de chacune associe les mêmes ID de page à des pages différentes.";
 "两个 TabBar，同一个页面 ID" = "Deux barres d’onglets, un ID de page";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Charger l’image";
+"替换为更大的图片" = "Remplacer par une image plus grande";
+"移除图片" = "Supprimer l’image";
+"加载背景图片" = "Charger une image de fond";
+"2 秒后：%@" = "Dans 2 secondes : %@";
+"PlusButton 图片之后才加载" = "Image du PlusButton chargée plus tard";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Touchez pour choisir un cas et pousser un contrôleur de barre d’onglets : le PlusButton n’a d’abord pas d’image ; 2 secondes plus tard, l’image est chargée, remplacée ou supprimée, ou une image de fond est chargée. Le résultat doit être identique à une image définie au lancement.";
+"对照：启动时即有图片" = "Comparer : image au lancement";
+"对照：启动时即有更大的图片" = "Comparer : image plus grande au lancement";
+"对照：启动时即有背景图片" = "Comparer : image de fond au lancement";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Touchez pour revenir ou fermer";
+"详情" = "Détail";
+"拍照" = "Prendre une photo";
+"从相册选择" = "Choisir dans l’album";
+"设置" = "Réglages";
+"关于我们" = "À propos";
+"示例" = "Exemple";
+"撰写" = "Rédiger";
+"好" = "OK";
+"编辑更多" = "Modifier « Plus »";
+"新版本" = "Nouvelle version";
+"打开 TabBar 场景展示" = "Ouvrir la galerie de barres d’onglets";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Chaque scène est une barre d’onglets construite avec l’API publique : styles, animations, rappels, Lottie et les nouvelles API d’onglets";
+"TabBar 场景展示" = "Galerie de barres d’onglets";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Copier";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
@@ -332,3 +362,9 @@
 "收起模拟列表" = "Replier la liste des simulations";
 /* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
 "跳过 %1$@ 个 Tab：%2$@" = "%1$@ onglets ignorés : %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Icônes réseau";
+"网络图标、标题与配色" = "Icônes réseau, titres et couleurs";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Fichier de configuration";

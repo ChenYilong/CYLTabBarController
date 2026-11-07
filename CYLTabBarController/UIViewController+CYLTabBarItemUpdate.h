@@ -9,6 +9,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// [EN] Rows, each one switching one thing on the tab, or back.
+/// [CN] 每行切换 Tab 的一项，或恢复。
+typedef NS_ENUM(NSInteger, CYLTabBarItemUpdateRow) {
+    CYLTabBarItemUpdateRowTitle,        // `-updateTabBarItemForViewController:attributes:`
+    CYLTabBarItemUpdateRowIconView,     // `-setTabBarItemIconViewProvider:atIndex:`
+    CYLTabBarItemUpdateRowNetworkIcon,  // `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`
+    CYLTabBarItemUpdateRowAllNetworkIcons, // the same, for every tab
+    CYLTabBarItemUpdateRowAllLocalIcons,   // `-setTabBarItemIcon:selectedIcon:size:atIndex:`, local images, for every tab
+    CYLTabBarItemUpdateRowGIFIcon,      // the same, with a GIF
+    CYLTabBarItemUpdateRowAllTitles,    // `-updateTabBarItemsWithAttributes:`
+    CYLTabBarItemUpdateRowReplaceNeighbors, // `-replaceViewControllerAtIndex:withViewController:attributes:`, issue #481
+    CYLTabBarItemUpdateRowCount,
+};
+
 /*!
  * [EN] Issue #601: rows that try the in-place tab item updates of `CYLTabBarController`, in every tab bar style, on the tab
  *      of this view controller (no new tab bar, no new view controllers). Each row switches one thing, and back on a second

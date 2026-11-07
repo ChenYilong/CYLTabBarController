@@ -132,7 +132,7 @@ enum Gallery {
     }
 
     static func setBackgroundColor(of tabBarController: UITabBarController, to color: UIColor) {
-        let appearance = tabBarController.tabBar.standardAppearance.copy() as? UITabBarAppearance ?? UITabBarAppearance()
+        let appearance = tabBarController.tabBar.standardAppearance.copy()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = color
         appearance.shadowColor = .clear
@@ -155,13 +155,13 @@ enum Gallery {
 
     /// [EN] Runs `body` with each tab button once the tab bar has them. [CN] TabBar 的按钮就绪后，对每个 Tab 按钮执行 `body`。
     static func forEachTabButton(of tabBarController: CYLTabBarController, _ body: @escaping (UIControl, Int) -> Void) {
-        tabBarController.performWhenTabBarItemsReady { controller in
+        tabBarController.perform(whenTabBarItemsReady: { controller in
             for (index, viewController) in (controller.viewControllers ?? []).enumerated() {
                 if let button = tabButton(of: viewController) {
                     body(button, index)
                 }
             }
-        }
+        })
     }
 
     static func iconView(of tabBarController: UITabBarController, at index: Int) -> UIView? {
@@ -204,7 +204,6 @@ enum Gallery {
 
     /// [EN] A bubble with `text`, added to `button` at `frame`. [CN] 在 `button` 的 `frame` 处添加一个带 `text` 的气泡。
     @discardableResult
-    @discardableResult
     static func addBubble(to button: UIView, text: String, color: UIColor, frame: CGRect, font: UIFont) -> UIView {
         let bubble = UIImageView(image: bubbleImage(color: color))
         bubble.frame = frame
@@ -245,9 +244,9 @@ enum Gallery {
         }
         let firstPage = viewControllers[first]
         let secondPage = viewControllers[second]
-        return tabBarController.replaceViewController(at: first, with: UIViewController(), attributes: nil)
-            && tabBarController.replaceViewController(at: second, with: firstPage, attributes: nil)
-            && tabBarController.replaceViewController(at: first, with: secondPage, attributes: nil)
+        return tabBarController.replaceViewController(at: UInt(first), with: UIViewController(), attributes: nil)
+            && tabBarController.replaceViewController(at: UInt(second), with: firstPage, attributes: nil)
+            && tabBarController.replaceViewController(at: UInt(first), with: secondPage, attributes: nil)
     }
 
     /*!

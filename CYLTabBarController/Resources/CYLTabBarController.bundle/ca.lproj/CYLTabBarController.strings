@@ -305,6 +305,7 @@
 "轻触感反馈" = "Resposta hàptica lleugera";
 "重触感反馈" = "Resposta hàptica forta";
 "长按（#152）" = "Pulsació llarga (#152)";
+"播放 / 停止" = "Reprodueix / Atura";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "Nadal";
@@ -324,6 +325,35 @@
 "点我" = "Toca'm";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Dues barres de pestanyes comparteixen una configuració; el registre de cadascuna associa els mateixos ID de pàgina a pàgines diferents.";
 "两个 TabBar，同一个页面 ID" = "Dues barres de pestanyes, un ID de pàgina";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Carrega la imatge";
+"替换为更大的图片" = "Substitueix per una imatge més gran";
+"移除图片" = "Elimina la imatge";
+"加载背景图片" = "Carrega una imatge de fons";
+"2 秒后：%@" = "D’aquí a 2 segons: %@";
+"PlusButton 图片之后才加载" = "Imatge del PlusButton carregada després";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Toca per triar un cas i fer push d’un controlador de barra de pestanyes: el PlusButton al principi no té imatge; 2 segons després la imatge es carrega, se substitueix o s’elimina, o es carrega una imatge de fons. El resultat ha de coincidir amb una imatge definida en iniciar.";
+"对照：启动时即有图片" = "Comparació: imatge en iniciar";
+"对照：启动时即有更大的图片" = "Comparació: imatge més gran en iniciar";
+"对照：启动时即有背景图片" = "Comparació: imatge de fons en iniciar";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Toca per tornar o tancar";
+"详情" = "Detall";
+"拍照" = "Fes una foto";
+"从相册选择" = "Tria de l’àlbum";
+"设置" = "Configuració";
+"关于我们" = "Sobre nosaltres";
+"示例" = "Exemple";
+"撰写" = "Redacta";
+"好" = "D’acord";
+"编辑更多" = "Edita Més";
+"新版本" = "Versió nova";
+"打开 TabBar 场景展示" = "Obre la galeria de barres de pestanyes";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Cada escena és una barra de pestanyes feta amb l’API pública: estils, animacions, avisos, Lottie i les API de pestanyes més noves";
+"TabBar 场景展示" = "Galeria de barres de pestanyes";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Copia";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
@@ -332,3 +362,9 @@
 "收起模拟列表" = "Amaga la llista de simulacions";
 /* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
 "跳过 %1$@ 个 Tab：%2$@" = "%1$@ pestanyes omeses: %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Icones de la xarxa";
+"网络图标、标题与配色" = "Icones de la xarxa, títols i colors";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Fitxer de configuració";

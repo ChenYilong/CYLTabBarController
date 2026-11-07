@@ -123,14 +123,18 @@
 }
 
 - (void)flatDesignTabBar:(id)sender {
-    CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
+    CYLMainRootViewController *rootController = [CYLMainRootViewController currentRootViewController];
     [rootController createFlatDesignTabBar];
 }
 
 - (void)createNewTabBardynamically {
-//    [CYLPlusButtonSubclass registerPlusButton];
-    CYLMainRootViewController *rootController = (CYLMainRootViewController *)CYLGetRootViewController();
-    [rootController createNewTabBarWithContext:NSStringFromClass([self class])];
+    // [EN] As the FlatDesign page's "Liquid Glass" button: the plus button is registered and the new tab bar uses its
+    //      context. With this page's class as the context no plus button matched, so the new tab bar had none.
+    // [CN] 与扁平样式页面的“Liquid Glass”按钮相同：注册 PlusButton，新 TabBar 使用其 context。以前使用本页面的类名作为 context，
+    //      没有与之匹配的 PlusButton，因此新 TabBar 没有 PlusButton。
+    [CYLPlusButtonSubclass registerPlusButton];
+    CYLMainRootViewController *rootController = [CYLMainRootViewController currentRootViewController];
+    [rootController createNewTabBarWithContext:NSStringFromClass([CYLTabBarController class])];
 }
 
 #pragma mark - Methods
@@ -154,8 +158,8 @@
     if ([self isGallerySection:indexPath.section]) {
         UITableViewCell *galleryCell = [tableView dequeueReusableCellWithIdentifier:@"GalleryCell"] ?:
             [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"GalleryCell"];
-        galleryCell.textLabel.text = @"Open the tab bar gallery";
-        galleryCell.detailTextLabel.text = @"Every scene is a tab bar built with the public API: styles, animations, reminders, Lottie and the newer tab APIs";
+        galleryCell.textLabel.text = CYLLocalizedString(@"打开 TabBar 场景展示");
+        galleryCell.detailTextLabel.text = CYLLocalizedString(@"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API");
         [galleryCell cyl_wrapsTextLabels];
         galleryCell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         return galleryCell;

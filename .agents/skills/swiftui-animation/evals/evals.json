@@ -1,0 +1,61 @@
+{
+  "skill_name": "swiftui-animation",
+  "evals": [
+    {
+      "id": 0,
+      "name": "symbol-effects-variable-value",
+      "prompt": "Review this SwiftUI animation note for iOS 26: `Image(systemName: \"wifi\").symbolVariableColor(value: signal)` is the right way to show variable SF Symbol fill, and `.wiggle`, `.breathe`, and `.rotate` are all iOS 17 symbol effects. Correct the note and include minimal Swift examples.",
+      "expected_output": "A source-grounded correction that replaces the nonexistent symbolVariableColor guidance with Image(systemName:variableValue:), mentions symbolVariableValueMode(_:) for iOS 26 rendering mode control, separates iOS 17 symbol effects from iOS 18+ effects, and keeps the answer focused on SwiftUI animation/SF Symbols.",
+      "files": [],
+      "assertions": [
+        "Rejects `.symbolVariableColor(value:)` as unsupported guidance.",
+        "Uses `Image(systemName:variableValue:)` for variable SF Symbol values.",
+        "Mentions `symbolVariableValueMode(_:)` as iOS 26 rendering-mode control for variable values.",
+        "Marks `.breathe`, `.rotate`, and `.wiggle` as iOS 18+ symbol effects.",
+        "Keeps the response focused on SwiftUI animation/SF Symbols rather than general icon design or layout."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "core-animation-bridge-review",
+      "prompt": "Review this bridge plan: use Core Animation whenever a custom cubic Bezier timing curve is needed because SwiftUI cannot do that, force ProMotion animations to run at 120 fps with CADisplayLink, and set `spring.delegate = uiView.next as? CAAnimationDelegate` from a UIViewRepresentable. Correct it for modern SwiftUI/Core Animation.",
+      "expected_output": "A corrected bridge review that uses SwiftUI UnitCurve.bezier/Animation.timingCurve for view-level cubic Bezier timing, reserves Core Animation for CALayer-specific properties or frame-synchronized drawing, frames preferredFrameRateRange as a system-managed hint, and assigns CAAnimationDelegate to the UIViewRepresentable Coordinator.",
+      "files": [],
+      "assertions": [
+        "States that SwiftUI supports custom cubic Bezier timing through `UnitCurve.bezier` and `Animation.timingCurve(_:duration:)`.",
+        "Reserves Core Animation for layer-specific properties, additive/path animations, or display-link-driven custom rendering rather than every custom timing curve.",
+        "Explains that `preferredFrameRateRange` is a hint and apps must adapt to system-selected refresh rates.",
+        "Uses the `UIViewRepresentable` Coordinator as the `CAAnimationDelegate`, not `uiView.next`.",
+        "Warns to invalidate `CADisplayLink` and avoid unnecessary display links."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "animation-boundary-routing",
+      "prompt": "I am cleaning up a SwiftUI dashboard with broad `.animation(.default)` modifiers, a numeric counter that should animate in place, a matched hero transition from a grid into a detail screen, a custom grid layout, and a deep-link NavigationStack path. Which work should the SwiftUI animation skill own, and what should be routed to sibling skills? Include only minimal examples.",
+      "expected_output": "A boundary-aware answer that keeps swiftui-animation focused on scoped implicit animation, ContentTransition, matched geometry/zoom transition hooks, and Reduce Motion handling, while routing detailed NavigationStack/deep-link design to swiftui-navigation and grid/layout work to swiftui-layout-components.",
+      "files": [],
+      "assertions": [
+        "Says swiftui-animation owns scoped animation replacement for broad `.animation(.default)` use.",
+        "Uses `contentTransition(.numericText(...))` paired with an explicit or value-bound animation for the counter.",
+        "Keeps matched geometry or navigation zoom guidance focused on animation hookup rather than full navigation architecture.",
+        "Routes detailed NavigationStack path/deep-link work to `swiftui-navigation`.",
+        "Routes custom grid/layout implementation details to `swiftui-layout-components` and does not implement the sibling domains."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "phase-keyframe-sendable-review",
+      "prompt": "Review this SwiftUI animation note: `PhaseAnimator(phases, trigger: tapCount)` runs through every phase once each time `tapCount` changes, and Swift 6 code can freely read `@State` from nested helper closures inside `keyframeAnimator`. Correct the note and give minimal alternatives.",
+      "expected_output": "A correction that says trigger-based PhaseAnimator advances to the next phase per trigger change rather than playing a full one-shot cycle, suggests KeyframeAnimator or explicit phase state for a full tap-triggered timeline, and handles Swift 6 @Sendable keyframe closures by capturing state/environment values before the modifier or passing values through the animated model.",
+      "files": [],
+      "assertions": [
+        "Corrects trigger-based `PhaseAnimator` semantics to one phase advance per trigger change, not a full cycle.",
+        "Suggests `KeyframeAnimator` or explicit phase state when a full tap-triggered sequence is required.",
+        "Mentions Swift 6 `@Sendable` closure constraints for `keyframeAnimator` content/keyframe closures.",
+        "Avoids direct `@State`/`@Environment` reads inside nested helper closures by capturing plain values before the modifier or passing values through the animated value model.",
+        "Keeps the response focused on SwiftUI animation instead of expanding into navigation or layout architecture."
+      ]
+    }
+  ]
+}

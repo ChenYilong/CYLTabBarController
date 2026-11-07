@@ -305,6 +305,7 @@
 "轻触感反馈" = "Phản hồi xúc giác nhẹ";
 "重触感反馈" = "Phản hồi xúc giác mạnh";
 "长按（#152）" = "Nhấn giữ (#152)";
+"播放 / 停止" = "Phát / Dừng";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "Giáng sinh";
@@ -324,6 +325,35 @@
 "点我" = "Chạm";
 "两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Hai thanh tab dùng chung một cấu hình; sổ đăng ký của mỗi thanh ánh xạ cùng ID trang tới các trang khác nhau.";
 "两个 TabBar，同一个页面 ID" = "Hai thanh tab, một ID trang";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Tải hình ảnh";
+"替换为更大的图片" = "Thay bằng hình ảnh lớn hơn";
+"移除图片" = "Xóa hình ảnh";
+"加载背景图片" = "Tải hình nền";
+"2 秒后：%@" = "Sau 2 giây: %@";
+"PlusButton 图片之后才加载" = "Hình PlusButton được tải sau";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Chạm để chọn trường hợp và push một tab bar controller: lúc đầu PlusButton chưa có hình; 2 giây sau hình được tải, thay thế hoặc xóa, hoặc tải hình nền. Kết quả phải giống như hình được đặt khi khởi chạy.";
+"对照：启动时即有图片" = "So sánh: có hình khi khởi chạy";
+"对照：启动时即有更大的图片" = "So sánh: có hình lớn hơn khi khởi chạy";
+"对照：启动时即有背景图片" = "So sánh: có hình nền khi khởi chạy";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Chạm để quay lại hoặc đóng";
+"详情" = "Chi tiết";
+"拍照" = "Chụp ảnh";
+"从相册选择" = "Chọn từ album";
+"设置" = "Cài đặt";
+"关于我们" = "Về chúng tôi";
+"示例" = "Ví dụ";
+"撰写" = "Soạn";
+"好" = "OK";
+"编辑更多" = "Sửa mục Thêm";
+"新版本" = "Phiên bản mới";
+"打开 TabBar 场景展示" = "Mở thư viện tab bar";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Mỗi cảnh là một tab bar dựng bằng API công khai: kiểu dáng, hoạt ảnh, nhắc nhở, Lottie và các API tab mới";
+"TabBar 场景展示" = "Thư viện tab bar";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Sao chép";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
@@ -332,3 +362,9 @@
 "收起模拟列表" = "Thu gọn danh sách mô phỏng";
 /* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
 "跳过 %1$@ 个 Tab：%2$@" = "Đã bỏ qua %1$@ tab: %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Biểu tượng từ mạng";
+"网络图标、标题与配色" = "Biểu tượng từ mạng, tiêu đề và màu sắc";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Tệp cấu hình";

@@ -41,7 +41,9 @@ extension UserDefaults {
     static func isFirstLaunchOfNewVersion() -> Bool {
         // [CN] 主程序此版本好
         // [EN] Current version of the main app
-        let majorVersion = appVersion as! String
+        guard let majorVersion = appVersion as? String else {
+            return false
+        }
         // [CN] 上次启动的版本号
         // [EN] Version from the last launch
         let hasBeenLaunchOfNewVersion = "hasBeenLaunchOfNewVersion"

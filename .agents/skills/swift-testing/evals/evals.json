@@ -1,0 +1,46 @@
+{
+  "skill_name": "swift-testing",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Review this migration plan from XCTest to Swift Testing: keep the XCTestCase subclass, convert setUp/tearDown into a shared singleton fixture, put @available on the whole suite type for iOS 18 APIs, replace every XCTest assertion with #expect including XCTUnwrap, keep XCTFail(\"missing user\") inside shared helper code, leave SwiftPM's test framework interoperability mode unspecified, and move UI tests into Swift Testing because they think it replaces XCTest everywhere. They also want to know whether XCTest and Swift Testing can coexist during migration and whether cross-framework APIs are forbidden. Give corrected guidance with concise Swift examples where useful.",
+      "expected_output": "A migration review that converts XCTestCase classes into Swift Testing suites or free functions, uses isolated per-test fixtures, puts availability on test functions rather than suite types, maps XCTAssert/XCTUnwrap/XCTFail to #expect/#require/Issue.record, preserves XCTest for UI testing, and explains Xcode 27/SwiftPM interoperability modes without claiming cross-framework APIs are categorically forbidden, including the difference between pre-Xcode 27 inherited limited mode and new Xcode 27 complete mode.",
+      "files": [],
+      "assertions": [
+        "Rejects keeping XCTestCase inheritance for migrated Swift Testing unit tests and uses @Test functions or suites instead.",
+        "Recommends per-test fixture setup using suite init or isolated fixtures rather than shared singleton mutable state.",
+        "States that @available belongs on individual @Test functions, not on suite types or containing types.",
+        "Explains that not every XCTest assertion should become #expect and uses #require for required values or unwraps.",
+        "Keeps XCUITest UI tests on XCTest rather than claiming Swift Testing replaces XCTest everywhere.",
+        "Explains current XCTest/Swift Testing interoperability modes, distinguishes pre-Xcode 27 inherited limited mode from new Xcode 27 complete mode, and prefers complete or strict mode during migration instead of leaving SwiftPM interop unspecified.",
+        "Avoids saying cross-framework APIs are categorically forbidden while still preferring native Swift Testing APIs for new Swift Testing tests."
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "I'm targeting iOS 26 with Swift 6.3 and wrote Swift Testing samples using #expect(exitsWith: .failure) in an exit-test closure that reads a local expectedCode, Test.cancel() in a sync test that awaits a network check, Issue.record(severity: .warning), and Attachment(image, named:).record(). Review the samples for current API spelling, availability, platform support, which pieces are Swift 6.2/Xcode 26.0 versus Swift 6.3/Xcode 26.4-era APIs, and any code-shape fixes.",
+      "expected_output": "An advanced Swift Testing review that uses processExitsWith for exit tests, notes exit testing availability and supported runtime targets, fixes async Test.cancel sample shape, notes Swift 6.3/Xcode 26.4 availability for warning severity and image attachments, and records images with Attachment.record(..., as:).",
+      "files": [],
+      "assertions": [
+        "Replaces stale #expect(exitsWith:) with #expect(processExitsWith:).",
+        "States that exit testing requires Swift 6.2/Xcode 26.0 or newer and is not supported on iOS/tvOS/watchOS runtime targets.",
+        "Mentions Swift 6.3 capture-list requirements when discussing captured parent-process values in exit tests.",
+        "Marks the Test.cancel example async when it awaits work and explains Test.cancel requires Swift 6.3/Xcode 26.4 or newer.",
+        "Uses Issue.record(..., severity: .warning) and image Attachment.record(..., named: ..., as: .png) with Swift 6.3/Xcode 26.4 availability."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Plan tests for a SwiftUI checkout flow: unit-test a price calculator, verify async coupon events, snapshot the checkout screen in dark mode and Dynamic Type, measure parser performance, and automate the login-to-checkout UI path. Which pieces should use Swift Testing, which should stay with XCTest or snapshot tooling, and how should the test files be organized during migration?",
+      "expected_output": "A boundary-aware test plan that uses Swift Testing for unit and async behavior tests, confirmation for callback/event checks, XCTest/XCUITest for UI automation and performance measurement, snapshot tooling for visual regression, and allows mixed files during migration while preferring clear separation for maintainability.",
+      "files": [],
+      "assertions": [
+        "Uses Swift Testing for pure unit/business logic tests such as the price calculator.",
+        "Uses confirmation or Swift concurrency patterns for async coupon events instead of sleeps.",
+        "Keeps UI automation with XCTest/XCUITest.",
+        "Keeps performance measurement and common snapshot testing flows in XCTest or dedicated snapshot tooling.",
+        "States that XCTest and Swift Testing can coexist during migration while recommending clear file or target organization when it reduces confusion."
+      ]
+    }
+  ]
+}

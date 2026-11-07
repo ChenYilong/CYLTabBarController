@@ -1,0 +1,18 @@
+platform :ios, '15.4'
+project 'RiveApp.xcodeproj'
+
+target 'RiveApp' do
+  use_frameworks!
+
+  # CYLTabBarController with Rive tab icons; it also brings the RiveRuntime pod.
+  # CYLTabBarController 与 Rive Tab 图标；同时引入 RiveRuntime pod。
+  pod 'CYLTabBarController/Rive', :path => '../'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.4'
+    end
+  end
+end

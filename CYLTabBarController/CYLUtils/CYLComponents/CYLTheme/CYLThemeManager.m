@@ -10,6 +10,7 @@
 #import "CYLThemePrivate.h"
 #import "UIView+CYLTheme.h"
 #import "UIViewController+CYLTheme.h"
+#import "CALayer+CYLTheme.h"
 
 NSNotificationName const CYLThemeDidChangeNotification = @"CYLThemeDidChangeNotification";
 
@@ -35,6 +36,41 @@ static NSArray<UIWindow *> *CYLThemeApplicationWindows(void) {
     // [EN] Before iOS 13, or an app without scenes. [CN] iOS 13 以前，或未使用 scene 的 App。
     return application.windows;
 #pragma clang diagnostic pop
+}
+
+/// [EN] The layer colors of `view` and its subviews. [CN] `view` 及其子视图的 layer 颜色。
+static void CYLThemeRefreshLayerColorsOfViewTree(UIView *view) {
+    [view.layer cyl_updateThemeColors];
+    for (UIView *subview in [view.subviews copy]) {
+        CYLThemeRefreshLayerColorsOfViewTree(subview);
+    }
+}
+
+/// [EN] The loaded views of `viewController` and its children / presented ones that are not in a window.
+/// [CN] `viewController` 及其子控制器、present 出的控制器中已加载但不在 window 上的 view。
+static void CYLThemeRefreshLayerColorsOfDetachedViews(UIViewController *viewController) {
+    if (viewController.isViewLoaded && !viewController.view.window && !viewController.view.superview) {
+        CYLThemeRefreshLayerColorsOfViewTree(viewController.view);
+    }
+    for (UIViewController *childViewController in [viewController.childViewControllers copy]) {
+        CYLThemeRefreshLayerColorsOfDetachedViews(childViewController);
+    }
+    UIViewController *presentedViewController = viewController.presentedViewController;
+    if (presentedViewController && presentedViewController.presentingViewController == viewController) {
+        CYLThemeRefreshLayerColorsOfDetachedViews(presentedViewController);
+    }
+}
+
+void CYLThemeRefreshTraitDependentValues(void) {
+    for (UIWindow *window in CYLThemeApplicationWindows()) {
+        if (window.hidden) {
+            continue;
+        }
+        CYLThemeRefreshLayerColorsOfViewTree(window);
+        if (window.rootViewController) {
+            CYLThemeRefreshLayerColorsOfDetachedViews(window.rootViewController);
+        }
+    }
 }
 
 @interface CYLThemeManager ()
@@ -113,9 +149,39 @@ static NSArray<UIWindow *> *CYLThemeApplicationWindows(void) {
     }
 }
 
+#pragma mark - Persistence
+
+- (NSString *)cyl_persistenceKey {
+    return [NSString stringWithFormat:@"CYLThemeManager.%@.currentThemeIdentifier", self.name];
+}
+
+- (nullable NSObject<NSCopying> *)cyl_savedThemeIdentifier {
+    id identifier = [[NSUserDefaults standardUserDefaults] objectForKey:[self cyl_persistenceKey]];
+    return ([identifier isKindOfClass:[NSString class]] || [identifier isKindOfClass:[NSNumber class]]) ? identifier : nil;
+}
+
+- (void)setPersistsCurrentThemeIdentifier:(BOOL)persistsCurrentThemeIdentifier {
+    _persistsCurrentThemeIdentifier = persistsCurrentThemeIdentifier;
+    if (!persistsCurrentThemeIdentifier) {
+        return;
+    }
+    NSObject<NSCopying> *savedIdentifier = [self cyl_savedThemeIdentifier];
+    if (!_currentThemeIdentifier && savedIdentifier && ([self themeForIdentifier:savedIdentifier] || self.themeGenerator)) {
+        self.currentThemeIdentifier = savedIdentifier;
+    }
+}
+
+- (void)cyl_saveCurrentThemeIdentifierIfNeeded {
+    NSObject<NSCopying> *identifier = _currentThemeIdentifier;
+    if (_persistsCurrentThemeIdentifier && ([identifier isKindOfClass:[NSString class]] || [identifier isKindOfClass:[NSNumber class]])) {
+        [[NSUserDefaults standardUserDefaults] setObject:identifier forKey:[self cyl_persistenceKey]];
+    }
+}
+
 #pragma mark - Current theme
 
 - (void)setCurrentThemeIdentifier:(NSObject<NSCopying> *)currentThemeIdentifier {
+    NSAssert(NSThread.isMainThread, @"CYLThemeManager: change the theme on the main thread.");
     if (!currentThemeIdentifier) {
         return;
     }
@@ -133,12 +199,14 @@ static NSArray<UIWindow *> *CYLThemeApplicationWindows(void) {
     BOOL themeChanged = _currentThemeIdentifier && ![_currentThemeIdentifier isEqual:currentThemeIdentifier];
     _currentThemeIdentifier = [currentThemeIdentifier copy];
     _currentTheme = theme;
+    [self cyl_saveCurrentThemeIdentifierIfNeeded];
     if (themeChanged) {
         [self cyl_notifyThemeChanged];
     }
 }
 
 - (void)setCurrentTheme:(NSObject *)currentTheme {
+    NSAssert(NSThread.isMainThread, @"CYLThemeManager: change the theme on the main thread.");
     if (!currentTheme) {
         return;
     }
@@ -156,6 +224,7 @@ static NSArray<UIWindow *> *CYLThemeApplicationWindows(void) {
     BOOL themeChanged = _currentTheme && ![_currentTheme isEqual:currentTheme];
     _currentTheme = currentTheme;
     _currentThemeIdentifier = identifier;
+    [self cyl_saveCurrentThemeIdentifierIfNeeded];
     if (themeChanged) {
         [self cyl_notifyThemeChanged];
     }
@@ -191,6 +260,10 @@ static NSArray<UIWindow *> *CYLThemeApplicationWindows(void) {
     }
     [self.cyl_themeIdentifiers addObject:[identifier copy]];
     [self.cyl_themes addObject:theme];
+    // [EN] The saved theme, registered now. [CN] 保存的主题，此时才注册。
+    if (_persistsCurrentThemeIdentifier && !_currentThemeIdentifier && [identifier isEqual:[self cyl_savedThemeIdentifier]]) {
+        self.currentThemeIdentifier = identifier;
+    }
 }
 
 // [EN] Identifiers and themes are kept as pairs at the same index: removing one removes the pair.
@@ -214,9 +287,29 @@ static NSArray<UIWindow *> *CYLThemeApplicationWindows(void) {
 #pragma mark - Notify
 
 - (void)cyl_notifyThemeChanged {
+    // [EN] A cross-fade: a snapshot over each visible window, restyled underneath, then faded out.
+    // [CN] 交叉淡入淡出：每个可见 window 上覆盖其截图，在其下更新样式，然后淡出截图。
+    NSMutableArray<UIView *> *snapshots = [NSMutableArray array];
+    if (self.themeChangeAnimationDuration > 0) {
+        for (UIWindow *window in CYLThemeApplicationWindows()) {
+            if (window.hidden || window.alpha <= 0.01) {
+                continue;
+            }
+            UIView *snapshot = [window snapshotViewAfterScreenUpdates:NO];
+            if (!snapshot) {
+                continue;
+            }
+            snapshot.frame = window.bounds;
+            snapshot.userInteractionEnabled = NO;
+            [window addSubview:snapshot];
+            [snapshots addObject:snapshot];
+        }
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:CYLThemeDidChangeNotification object:self];
     NSObject<NSCopying> *identifier = self.currentThemeIdentifier;
     NSObject *theme = self.currentTheme;
+    // [EN] Numbered, so a view reached several times below is updated once. [CN] 编号，使下面多次到达的视图只更新一次。
+    CYLThemeBeginChange();
     for (UIWindow *window in CYLThemeApplicationWindows()) {
         if (window.hidden || window.alpha <= 0.01 || !window.rootViewController) {
             continue;
@@ -226,6 +319,24 @@ static NSArray<UIWindow *> *CYLThemeApplicationWindows(void) {
         // [CN] 某些 present 方式下一个 window 上有多个控制器的视图：遍历整个 window。
         [window cyl_themeDidChangeByManager:self identifier:identifier theme:theme enumeratesSubviews:YES];
     }
+    // [EN] Views holding theme values that are in no visible window and no view controller reached them (e.g. a view
+    //      removed to be added again later): those remembered on a previous change or when their values were set.
+    // [CN] 持有主题值、但不在可见 window 中、也没有被控制器到达的视图（例如暂时移除、之后再添加的视图）：在之前的切换中或设置其值时记住的视图。
+    for (UIView *view in CYLThemeTrackedViews()) {
+        [view cyl_themeDidChangeByManager:self identifier:identifier theme:theme enumeratesSubviews:YES];
+    }
+    if (snapshots.count > 0) {
+        [UIView animateWithDuration:self.themeChangeAnimationDuration delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+            for (UIView *snapshot in snapshots) {
+                snapshot.alpha = 0;
+            }
+        } completion:^(BOOL finished) {
+            for (UIView *snapshot in snapshots) {
+                [snapshot removeFromSuperview];
+            }
+        }];
+    }
+    CYLThemeEndChange();
 }
 
 @end

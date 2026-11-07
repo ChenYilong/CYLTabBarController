@@ -1,0 +1,39 @@
+MIT License
+
+Copyright (c) 2026 JordanCoin
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+THIRD-PARTY LICENSES
+
+The plugin infrastructure (hooks, routing, install scripts, router skill) is MIT.
+
+Individual skills retain their original licenses:
+
+- skills/dpearson2699--*/ (76 skills):
+  PolyForm Perimeter License 1.0.0
+  Required Notice: Copyright (c) 2025 dpearson2699 (https://github.com/dpearson2699)
+  Full license: https://polyformproject.org/licenses/perimeter/1.0.0/
+
+- All other skills: MIT License (see each upstream repo for details)
+
+Each skill directory is attributed to its original author via the
+{author}-- prefix. See sources.json for upstream repo links.
