@@ -7719,6 +7719,10 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     CFTimeInterval _lastOwnRequestTime;
     /// [EN] The app took the tab bar over after scroll hiding's last request. [CN] 滚动隐藏最近一次请求之后，App 接管了 TabBar。
     BOOL _appTookTabBarOver;
+    /// [EN] The app hid the tab bar while scroll hiding is on, at a moment it could not be adopted yet (e.g. a pushed page
+    ///      covers the scroll view): adopted as hidden by scrolling as soon as it can be.
+    /// [CN] 滚动隐藏开启期间 App 隐藏了 TabBar，但当时还不能接管（例如被 push 的页面挡住了滚动视图）：一旦可以就作为滚动隐藏接管。
+    BOOL _appHiddenPendingAdoption;
 }
 
 - (instancetype)initWithTabBarController:(CYLTabBarController *)tabBarController {
@@ -8193,7 +8197,7 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
 /// [CN] 仅在需要时运行定时检查：经典样式始终运行（页面变化）；任何路径在 TabBar 被滚动隐藏或缩小期间运行（此时间隔更短）。其他情况停止。
 - (void)updateCheckTimer {
     NSTimeInterval interval = 0;
-    if ([self isTabBarHiddenOrMinimizedByScroll]) {
+    if ([self isTabBarHiddenOrMinimizedByScroll] || _appHiddenPendingAdoption) {
         interval = CYLTabBarMinimizeRestoreCheckInterval;
     } else if (CYLTabBarMinimizeModeClassic == _mode) {
         interval = CYLTabBarMinimizeClassicPageCheckInterval;
@@ -8231,6 +8235,7 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     if (tabBarController.viewIfLoaded.window) {
         [tabBarController cyl_updateTabBarMinimizeTracking];
     }
+    [self adoptAppHiddenTabBarIfPossible];
     [self validateHideSession];
     [self updateCheckTimer];
 }
@@ -8319,6 +8324,12 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     BOOL minimizesOnScrollUp = (CYLTabBarMinimizeBehaviorOnScrollUp == behavior);
     if (!minimizesOnScrollDown && !minimizesOnScrollUp) {
         return;
+    }
+    // [EN] A bar the app hid, waiting to be adopted: adopted at the latest when the user scrolls, so the scroll that
+    //      follows (up, or back to the top) can show it.
+    // [CN] 等待接管的、App 隐藏的 TabBar：最晚在用户滚动时接管，使随后的滚动（向上或回到顶部）能显示它。
+    if (_appHiddenPendingAdoption && scrollView.isTracking) {
+        [self adoptAppHiddenTabBarIfPossible];
     }
     UIEdgeInsets insets = scrollView.adjustedContentInset;
     CGFloat minOffsetY = -insets.top;
@@ -8521,6 +8532,66 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
 }
 
 /*!
+ * [EN] Why a bar the app hid cannot be adopted as hidden by scrolling right now, or nil when it can: scroll hiding must
+ *      be on (FlatDesign or classic), the tracked scroll view on screen, the app environment must allow hiding (no page
+ *      presented, no keyboard, no transition, …), and the page must not hide the bar itself (`hidesBottomBarWhenPushed`).
+ * [CN] App 隐藏的 TabBar 此刻不能作为滚动隐藏接管的原因，可以接管时返回 nil：滚动隐藏需开启（扁平样式或经典样式）、跟踪的滚动视图在屏幕上、
+ *      App 环境允许隐藏（没有 present 的页面、没有键盘、没有转场……），且页面自身不隐藏 TabBar（`hidesBottomBarWhenPushed`）。
+ */
+- (nullable NSString *)appHiddenTabBarAdoptionRefusalReason {
+    CYLTabBarController *tabBarController = self.tabBarController;
+    if (!tabBarController || (CYLTabBarMinimizeModeFlatDesign != _mode && CYLTabBarMinimizeModeClassic != _mode) ||
+        !tabBarController.cyl_hidesTabBarOnScroll) {
+        return @"scroll hiding is off";
+    }
+    if (!tabBarController.isTabBarHidden && !_lastOwnRequestHidden) {
+        return @"the tab bar is shown";
+    }
+    if (!self.scrollView.window) {
+        return @"no scroll view on screen";
+    }
+    NSString *refusal = [self environmentRefusalReason];
+    if (refusal) {
+        return refusal;
+    }
+    if (CYLTabBarMinimizeModeClassic == _mode && CYLTabBarMinimizeClassicPageHidesTabBar(tabBarController.selectedViewController)) {
+        return @"the page hides the tab bar (hidesBottomBarWhenPushed)";
+    }
+#if CYL_FLATDESIGN_AVAILABLE
+    if (CYLTabBarMinimizeModeFlatDesign == _mode && tabBarController.cyl_tabBar.superview != tabBarController.view) {
+        return @"a transition holds the tab bar";
+    }
+#endif
+    return nil;
+}
+
+/// [EN] Adopts a bar the app hid as hidden by scrolling when it can be (see above). [CN] 在可以时（见上）把 App 隐藏的 TabBar 作为滚动隐藏接管。
+- (void)adoptAppHiddenTabBarIfPossible {
+    if (!_appHiddenPendingAdoption) {
+        return;
+    }
+    // [EN] The app (or UIKit) showed the bar again in the meantime: nothing to adopt.
+    // [CN] 期间 App（或 UIKit）已重新显示 TabBar：无需接管。
+    BOOL ownHideUnderWay = _lastOwnRequestHidden && CACurrentMediaTime() - _lastOwnRequestTime < 0.5;
+    if (!self.tabBarController.isTabBarHidden && !ownHideUnderWay) {
+        _appHiddenPendingAdoption = NO;
+        return;
+    }
+    if ([self appHiddenTabBarAdoptionRefusalReason]) {
+        return;
+    }
+    _appHiddenPendingAdoption = NO;
+    _appTookTabBarOver = NO;
+    _hiddenByScroll = YES;
+    _needsNewDrag = NO;
+    _scrolledDistance = 0;
+    _lastSeenTracking = self.scrollView.isTracking;
+    CYLTabBarMinimizeLog(@"the app hid the tab bar", @"kept as hidden by scrolling: a restore or scrolling up shows it");
+    [self beginHideSession];
+    [self updateCheckTimer];
+}
+
+/*!
  * [EN] The app called `-setTabBarHidden:animated:` itself: it owns the tab bar from now on. A bar hidden by scrolling is
  *      no longer ours to show (it stays as the app wants), and the session ends. Ignored: scroll hiding's own calls, and
  *      a FlatDesign replay of our own last request within 0.5 s.
@@ -8534,6 +8605,31 @@ static void CYLTabBarMinimizeLog(NSString *event, NSString *reason) {
     if (hidden == _lastOwnRequestHidden && CACurrentMediaTime() - _lastOwnRequestTime < 0.5) {
         return;
     }
+    // [EN] FIX: issue #13 — scroll hiding has priority over the app's hide (FlatDesign and classic). The app's
+    //      `setTabBarHidden:YES` only applies to the current state: a bar already hidden by scrolling stays ours, and a
+    //      shown bar is adopted as hidden by scrolling (now, or as soon as the page allows it), so scrolling up, back to
+    //      the top, or any interruption still shows it, and scroll hiding keeps working afterwards. Before, the app's
+    //      hide took the bar over for good: scroll hiding could neither show nor hide it again.
+    // [CN] FIX: issue #13 —— 滚动隐藏的优先级高于 App 的隐藏（扁平样式与经典样式）。App 的 `setTabBarHidden:YES` 只作用于当前状态：
+    //      已被滚动隐藏的 TabBar 仍由滚动隐藏负责；显示中的 TabBar 作为滚动隐藏接管（立即，或在页面允许时），因此向上滚动、回到顶部或任何
+    //      打断仍会显示它，之后滚动隐藏继续工作。以前 App 的隐藏会永久接管 TabBar：滚动隐藏既不能再显示它，也不能再隐藏它。
+    if (hidden && (CYLTabBarMinimizeModeFlatDesign == _mode || CYLTabBarMinimizeModeClassic == _mode) &&
+        self.tabBarController.cyl_hidesTabBarOnScroll) {
+        // [EN] Treated like our own request: replays within 0.5 s are ignored, and the session check waits for the hide.
+        // [CN] 按我们自己的请求处理：0.5 秒内的重放被忽略，会话检查会等待隐藏完成。
+        _lastOwnRequestHidden = YES;
+        _lastOwnRequestTime = CACurrentMediaTime();
+        _appTookTabBarOver = NO;
+        if (_hiddenByScroll) {
+            CYLTabBarMinimizeLog(@"the app hides the tab bar too", @"scroll hiding keeps it; a restore shows it");
+            return;
+        }
+        _appHiddenPendingAdoption = YES;
+        [self adoptAppHiddenTabBarIfPossible];
+        [self updateCheckTimer];
+        return;
+    }
+    _appHiddenPendingAdoption = NO;
     // [EN] Any accepted app request: the safety net in -minimizeTabBar no longer takes the bar back.
     // [CN] 任何被接受的 App 请求：-minimizeTabBar 中的安全网不再收回 TabBar。
     _appTookTabBarOver = YES;
