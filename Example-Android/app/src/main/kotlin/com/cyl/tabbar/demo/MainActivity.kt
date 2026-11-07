@@ -1,6 +1,9 @@
 package com.cyl.tabbar.demo
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.cyl.tabbar.CYLConstants
 import com.cyl.tabbar.CYLEnums
@@ -11,17 +14,36 @@ import com.cyl.tabbar.cyl_showBadgeValue
 /**
  * [EN] The iOS library's own sample file (shared as an asset) creates a `CYLTabBarController`: the tabs for Android and
  *      this app version, each page found by its page ID (`DemoPages`), a plus button (`DemoPlusButton`), a badge, the
- *      tap animation and the double tap.
+ *      tap animation and the double tap. The four tabs are the demo lists of the iOS Example (`DemoListFragment`), and
+ *      the action bar has its buttons: FlatDesign, Liquid Glass and the skins.
  * [CN] iOS 库自带的示例文件（作为 asset 共用）创建 `CYLTabBarController`：适用于 Android 与本 App 版本的 Tab、按页面 ID 找到的页面
- *      （`DemoPages`）、PlusButton（`DemoPlusButton`）、角标、点击动画与双击。
+ *      （`DemoPages`）、PlusButton（`DemoPlusButton`）、角标、点击动画与双击。四个 Tab 是 iOS Example 的演示列表（`DemoListFragment`），
+ *      ActionBar 上有对应的按钮：扁平样式、液态玻璃与皮肤。
  */
 class MainActivity : AppCompatActivity() {
+
+    private var controller: CYLTabBarController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DemoPages.registerOnce()
+        DemoTheme.registerOnce()
         CYLPlusButton.registerPlusButton(DemoPlusButton.Provider)
+        showTabBar(CYLEnums.CYLTabBarStyleType.Default)
+        // [EN] Back pops the pages pushed on the selected tab first (`cyl_pushViewController`). [CN] 返回键先弹出选中 Tab 上 push 的页面（`cyl_pushViewController`）。
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val page = controller?.selectedViewController
+                if (page != null && page.isAdded && page.childFragmentManager.backStackEntryCount > 0) page.childFragmentManager.popBackStack() else finish()
+            }
+        })
+    }
+
+    /** [EN] Creates the tab bar controller from the shared file, in `style` (the iOS "FlatDesign" / "LiquidGlass" buttons). [CN] 由共用文件以 `style` 样式创建 TabBarController（对应 iOS 的 "FlatDesign" / "LiquidGlass" 按钮）。 */
+    private fun showTabBar(style: CYLEnums.CYLTabBarStyleType) {
+        controller?.let { old -> supportFragmentManager.beginTransaction().apply { old.viewControllers.forEach { if (it.isAdded) remove(it) } }.commitNowAllowingStateLoss() }
         val controller = CYLTabBarController.tabBarControllerWithConfigurationFile(this, "cyl_tabbar_configuration.json")
+        controller.tabBarStyleType = style
         controller.cyl_tabButtonTapAnimationType = CYLEnums.CYLTabButtonTapAnimationType.Scale
         controller.cyl_hidesBadgeOfSelectedTab = true
         controller.cyl_tabBarItemGestureHandler = { tabBarController, gesture, _, page ->
@@ -30,8 +52,34 @@ class MainActivity : AppCompatActivity() {
                 tabBarController.updateTabBarItemAtIndex(index, mapOf(CYLConstants.CYLTabBarItemTitle to getString(R.string.double_tapped)))
             }
         }
+        this.controller = controller
         setContentView(controller.view)
+        title = getString(R.string.app_name) + " · " + style.name
         controller.tabBar.tabBarButtonArray.getOrNull(1)?.cyl_showBadgeValue("12")
         controller.tabBar.tabBarButtonArray.getOrNull(3)?.cyl_showBadgeValue("")
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menu.add(Menu.NONE, MENU_FLAT, Menu.NONE, "FlatDesign")
+        menu.add(Menu.NONE, MENU_GLASS, Menu.NONE, "LiquidGlass")
+        DemoTheme.all.forEachIndexed { index, theme -> menu.add(MENU_SKINS, MENU_SKIN + index, index, getString(R.string.skin_prefix) + theme.name) }
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when {
+            item.itemId == MENU_FLAT -> showTabBar(CYLEnums.CYLTabBarStyleType.FlatDesign)
+            item.itemId == MENU_GLASS -> showTabBar(CYLEnums.CYLTabBarStyleType.LiquidGlass)
+            item.itemId >= MENU_SKIN -> DemoTheme.apply(DemoTheme.all[item.itemId - MENU_SKIN].name)
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return true
+    }
+
+    private companion object {
+        const val MENU_FLAT = 1
+        const val MENU_GLASS = 2
+        const val MENU_SKINS = 3
+        const val MENU_SKIN = 100
     }
 }

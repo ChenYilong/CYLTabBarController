@@ -71,8 +71,19 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         view.addView(tabBar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         // [EN] Fragments need their container in the window: transactions wait until `view` is attached. [CN] Fragment 需要容器已在窗口中：事务等到 `view` 附加后再提交。
         pagesContainer.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(v: View) { if (pagesCommitPending) commitPages() }
-            override fun onViewDetachedFromWindow(v: View) { /* [EN] Nothing to undo. [CN] 无需处理。 */ }
+            override fun onViewAttachedToWindow(v: View) {
+                if (pagesCommitPending) commitPages()
+                v.viewTreeObserver.addOnWindowFocusChangeListener(windowFocusListener)
+                v.viewTreeObserver.addOnGlobalLayoutListener(keyboardListener)
+            }
+            override fun onViewDetachedFromWindow(v: View) {
+                v.viewTreeObserver.removeOnWindowFocusChangeListener(windowFocusListener)
+                v.viewTreeObserver.removeOnGlobalLayoutListener(keyboardListener)
+            }
+        })
+        // [EN] The activity pausing (a call, another app, the recents screen) shows a bar hidden by scrolling (#13). [CN] Activity 暂停（来电、其他 App、最近任务）时恢复滚动隐藏的 TabBar（#13）。
+        activity.lifecycle.addObserver(androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_PAUSE) cyl_restoreTabBarHiddenByScroll()
         })
         registerActive(this)
     }
@@ -192,6 +203,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             tabBar.plusButtonActive = false
             showSelectedPage()
             tabBar.refreshSelection()
+            // [EN] Another tab: a bar hidden by scrolling comes back (issue #13, as on iOS). [CN] 切换到其他 Tab：滚动隐藏的 TabBar 恢复显示（issue #13，与 iOS 一致）。
+            if (previous != value) cyl_restoreTabBarHiddenByScroll()
             if (previous != value) cyl_playSelectedTabBarItemAnimation(defaultSelected = false)
             if (previous != value && !revertingTransition) runTransition(previous, value)
         }
@@ -235,8 +248,13 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     var tabBarHidden: Boolean = false
         set(value) { setTabBarHidden(value, false) }
 
-    /** [EN] `-setTabBarHidden:animated:`. [CN] 隐藏 / 显示 TabBar。 */
+    /** [EN] `-setTabBarHidden:animated:`: the app hides or shows the bar, which ends a scroll hiding session. [CN] App 隐藏或显示 TabBar，结束滚动隐藏会话。 */
     fun setTabBarHidden(hidden: Boolean, animated: Boolean) {
+        cyl_isTabBarHiddenByScroll = false
+        applyTabBarHidden(hidden, animated)
+    }
+
+    private fun applyTabBarHidden(hidden: Boolean, animated: Boolean) {
         val wasHidden = tabBar.visibility != View.VISIBLE
         if (wasHidden == hidden) return
         if (animated) {
@@ -605,6 +623,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     /** [EN] A memory warning (`onTrimMemory` / `onLowMemory`): unloads when `unloadsUnselectedViewsOnMemoryWarning`. [CN] 内存警告：`unloadsUnselectedViewsOnMemoryWarning` 时卸载。 */
     internal fun cyl_didReceiveMemoryWarning() {
+        cyl_restoreTabBarHiddenByScroll()
         if (unloadsUnselectedViewsOnMemoryWarning) unloadViewsOfUnselectedViewControllers()
     }
 
@@ -903,7 +922,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     var cyl_tabBarMinimizeBehavior: CYLEnums.CYLTabBarMinimizeBehavior = CYLEnums.CYLTabBarMinimizeBehavior.Automatic
     /** [EN] `cyl_hidesTabBarOnScroll`: the selected page's scrolling view is observed automatically, as on iOS. [CN] 自动观察选中页面的滚动视图，与 iOS 一致。 */
     var cyl_hidesTabBarOnScroll: Boolean = false
-        set(value) { field = value; if (value) cyl_trackSelectedPageScrollView() }
+        set(value) { field = value; if (value) cyl_trackSelectedPageScrollView() else cyl_restoreTabBarHiddenByScroll() }
     var cyl_isTabBarHiddenByScroll: Boolean = false
         private set
     private var lastScrollY = 0
@@ -913,13 +932,36 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     }
     fun cyl_scrollDidChange(delta: Int) {
         if (!cyl_hidesTabBarOnScroll || cyl_tabBarMinimizeBehavior == CYLEnums.CYLTabBarMinimizeBehavior.Never) return
+        // [EN] With the keyboard up the bar stays (iOS does not hide it while typing). [CN] 键盘弹出时 TabBar 保持显示（iOS 输入时不隐藏）。
+        if (isKeyboardVisible()) return
         val down = delta > 0
         val hide = when (cyl_tabBarMinimizeBehavior) { CYLEnums.CYLTabBarMinimizeBehavior.OnScrollUp -> !down; else -> down }
+        // [EN] The app hid the bar itself: scrolling does not show it. [CN] App 自己隐藏了 TabBar：滚动不会显示它。
+        if (!cyl_isTabBarHiddenByScroll && tabBar.visibility != View.VISIBLE) return
         if (hide != cyl_isTabBarHiddenByScroll && kotlin.math.abs(delta) > 4) {
             cyl_isTabBarHiddenByScroll = hide
-            setTabBarHidden(hide, true)
+            applyTabBarHidden(hide, true)
         }
     }
+
+    /**
+     * [EN] Shows a bar hidden by scrolling, as iOS does after an interruption (issue #13): another tab, a push or pop, a
+     *      dialog or another window taking the focus, the activity pausing, the keyboard, a memory warning, scroll hiding
+     *      turned off. A bar the app hid itself stays hidden.
+     * [CN] 恢复滚动隐藏的 TabBar，与 iOS 在意外情况之后的行为一致（issue #13）：切换 Tab、push 或 pop、弹窗或其他窗口获得焦点、Activity 暂停、
+     *      键盘弹出、内存警告、关闭滚动隐藏。App 自己隐藏的 TabBar 保持隐藏。
+     */
+    internal fun cyl_restoreTabBarHiddenByScroll() {
+        if (!cyl_isTabBarHiddenByScroll) return
+        cyl_isTabBarHiddenByScroll = false
+        applyTabBarHidden(false, true)
+    }
+
+    private fun isKeyboardVisible(): Boolean =
+        androidx.core.view.ViewCompat.getRootWindowInsets(view)?.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime()) == true
+
+    private val windowFocusListener = android.view.ViewTreeObserver.OnWindowFocusChangeListener { hasFocus -> if (!hasFocus) cyl_restoreTabBarHiddenByScroll() }
+    private val keyboardListener = android.view.ViewTreeObserver.OnGlobalLayoutListener { if (isKeyboardVisible()) cyl_restoreTabBarHiddenByScroll() }
     fun cyl_simulateHideOnScrollForTesting() = cyl_scrollDidChange(20)
 
     /** [EN] Finds the selected page's first scrolling view, after its layout, and tracks it. [CN] 在选中页面布局后找到其第一个滚动视图并观察它。 */

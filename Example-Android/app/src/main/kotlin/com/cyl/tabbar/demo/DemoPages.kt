@@ -36,11 +36,12 @@ object DemoPages {
             ContextCompat.getDrawable(context, icons[symbol] ?: android.R.drawable.ic_menu_help)
         }
         val shared = CYLTabBarPageRegistry.sharedRegistry
-        shared.registerPageProvider({ id, tab -> TextPageFragment.newInstance("${TabItem(tab).title}\npage ID: $id", opensTwoTabBars = true) }, "home")
-        shared.registerPageProvider({ id, tab -> TextPageFragment.newInstance("${TabItem(tab).title}\npage ID: $id") }, listOf("message", "discover", "me"))
+        // [EN] The four tabs are the demo lists ported from the iOS Example (docs/Android-Demo-Migration.md). [CN] 四个 Tab 是移植自 iOS Example 的演示列表（docs/Android-Demo-Migration.md）。
+        shared.registerPageProvider({ id, _ -> DemoListFragment.newInstance(id) }, listOf("home", "message", "discover", "me"))
         shared.registerPageFactory({ request ->
             val url = request.parameters["url"] as? String
-            TextPageFragment.newInstance("Web\npage ID: ${request.pageIdentifier}\nCYLTabBarItemPageParameters.url:\n${url ?: "(no url)"}", url = url)
+            // [EN] The Discover tab of the iOS Example (`CYLSameCityViewController`), with the URL of its parameters. [CN] iOS Example 的发现 Tab（`CYLSameCityViewController`），带参数中的 URL。
+            DemoListFragment.newInstance(DemoCatalog.DISCOVER, url ?: "(no url)")
         }, "web")
     }
 }

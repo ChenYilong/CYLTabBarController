@@ -30,6 +30,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     kotlinOptions {
         jvmTarget = "17"
     }
@@ -47,4 +51,9 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.material)
+    // [EN] The Lottie scene of the gallery; the library finds Lottie by reflection. [CN] 展示页的 Lottie 场景；库通过反射找到 Lottie。
+    implementation(libs.lottie)
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
 }

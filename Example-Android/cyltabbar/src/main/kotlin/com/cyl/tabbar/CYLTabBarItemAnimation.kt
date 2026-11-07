@@ -8,6 +8,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import java.io.File
@@ -470,6 +471,7 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
     override fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType): View? {
         val view = CYLReflection.newInstance(VIEW_CLASS, context) as? View ?: return null
         val file = url.substringBefore('#')
+        setFailureListener(view, file)
         val loaded = when {
             CYLTabBarItemAnimationFiles.isRemote(file) -> CYLReflection.call(view, "setAnimationFromUrl", file)
             CYLTabBarItemAnimationFiles.assetName(file) != null -> CYLReflection.call(view, "setAnimation", CYLTabBarItemAnimationFiles.assetName(file))
@@ -478,6 +480,29 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
         loaded ?: return null
         (view as? ImageView)?.scaleType = contentMode
         return view
+    }
+
+    /**
+     * [EN] Lottie throws on the main thread when a file cannot be loaded or parsed, unless a failure listener is set: the
+     *      listener drops the animation view, so the tab shows its image, as on iOS.
+     * [CN] 文件无法加载或解析时，Lottie 会在主线程抛出异常，除非设置了失败监听：监听移除动画视图，Tab 显示其图片，与 iOS 一致。
+     */
+    private fun setFailureListener(view: View, file: String) {
+        val listenerType = CYLReflection.type("com.airbnb.lottie.LottieListener") ?: return
+        val listener = java.lang.reflect.Proxy.newProxyInstance(listenerType.classLoader, arrayOf(listenerType)) { proxy, method, args ->
+            when (method.name) {
+                "onResult" -> {
+                    Log.w("CYLTabBarController", "Lottie could not load $file: ${(args?.firstOrNull() as? Throwable)?.message}")
+                    view.post { (view.parent as? View)?.cyl_replaceTabBarItemAnimationWithURL(null, null) }
+                    null
+                }
+                "hashCode" -> System.identityHashCode(proxy)
+                "equals" -> proxy === args?.firstOrNull()
+                "toString" -> "CYLLottieFailureListener"
+                else -> null
+            }
+        }
+        CYLReflection.call(view, "setFailureListener", listener)
     }
 
     override fun playerForAnimationView(view: View): CYLTabBarItemAnimationPlayer? =

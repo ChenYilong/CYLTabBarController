@@ -112,6 +112,8 @@ private fun Fragment.cyl_pushContainerId(): Int? = (view as? android.view.ViewGr
 /** [EN] `-cyl_pushViewController:animated:`: shows `viewController` over this page (a child Fragment on the back stack). [CN] 在本页面之上显示 `viewController`（子 Fragment，加入返回栈）。 */
 fun Fragment.cyl_pushViewController(viewController: Fragment, animated: Boolean = true) {
     val container = cyl_pushContainerId() ?: return
+    // [EN] A push shows a bar hidden by scrolling (#13). [CN] push 时恢复滚动隐藏的 TabBar（#13）。
+    cyl_tabBarController?.cyl_restoreTabBarHiddenByScroll()
     childFragmentManager.beginTransaction().apply {
         if (animated) setTransition(androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         add(container, viewController).addToBackStack(null)
@@ -170,6 +172,7 @@ fun Fragment.cyl_handleNavigationBackAction() = cyl_handleNavigationBackActionWi
 
 fun Fragment.cyl_handleNavigationBackActionWithAnimated(animated: Boolean, toRoot: Boolean = false) {
     val manager = cyl_rootTab(this).childFragmentManager
+    cyl_tabBarController?.cyl_restoreTabBarHiddenByScroll()
     // [EN] Without animation the pop is executed at once, as `popViewControllerAnimated:NO` returns synchronously. [CN] 不带动画时立即执行，如同 `popViewControllerAnimated:NO` 同步返回。
     when {
         toRoot && animated -> manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
