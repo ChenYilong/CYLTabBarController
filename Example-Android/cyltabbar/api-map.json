@@ -772,6 +772,15 @@
   "status": "n/a",
   "note": "FlatDesign"
  },
+ "CYLGIFTabBarItemAnimator": {
+  "status": "done",
+  "android": "CYLGIFTabBarItemAnimator",
+  "note": "always registered: the platform decodes GIFs; views drawn with android.graphics.Movie (plays once, launch tab shows the last frame)"
+ },
+ "CYLGIFTabBarItemAnimator animator": {
+  "status": "done",
+  "android": "CYLGIFTabBarItemAnimator.animator"
+ },
  "CYLImageCache": {
   "status": "n/a",
   "note": "UIKit view / control / color / image / navigation helpers"
@@ -2166,6 +2175,26 @@
  "CYLTabBarDidLayoutSubViewsBlock": {
   "status": "done",
   "android": "typealias CYLTabBarDidLayoutSubViewsBlock"
+ },
+ "CYLTabBarGIFDarkFilePath": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarGIFDarkFilePath"
+ },
+ "CYLTabBarGIFDarkURL": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarGIFDarkURL"
+ },
+ "CYLTabBarGIFFilePath": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarGIFFilePath"
+ },
+ "CYLTabBarGIFSize": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarGIFSize"
+ },
+ "CYLTabBarGIFURL": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarGIFURL"
  },
  "CYLTabBarHeight": {
   "status": "done",
@@ -3915,6 +3944,10 @@
  "UIImage(CYLTabBarControllerExtention)": {
   "status": "n/a",
   "note": "UIKit view / control / color / image / navigation helpers"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_GIFFrameDelayWithProperties:": {
+  "status": "n/a",
+  "note": "reads ImageIO frame properties (CGImageSourceCopyPropertiesAtIndex); Android decodes GIF timing itself"
  },
  "UIImage(CYLTabBarControllerExtention) +cyl_animatedImageWithGIFData:": {
   "status": "n/a",

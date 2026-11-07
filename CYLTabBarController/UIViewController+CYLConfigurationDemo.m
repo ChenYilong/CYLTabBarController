@@ -264,7 +264,8 @@ static NSArray<NSArray<NSString *> *> *CYLConfigurationEdgeCases(void) {
         @[ @"C16", @"Two tab bars, one page ID" ], @[ @"C18", @"Lookup order and automatic registration" ],
         @[ @"B22", @"Other platforms and newer versions" ],
         @[ @"B23", @"Invalid platforms, versions and parameters" ], @[ @"B27", @"Reload with new tabs (code)" ],
-        @[ @"C20", @"Asynchronous pages (code)" ], @[ @"B28", @"Animation keys, options and speed" ], @[ @"B13", @"Invalid URLs and Lottie files" ],
+        @[ @"C20", @"Asynchronous pages (code)" ], @[ @"B28", @"Animation keys, options and speed" ], @[ @"B30", @"GIF keys and a file that is not a GIF" ],
+        @[ @"B13", @"Invalid URLs and Lottie files" ],
         @[ @"B12", @"Duplicate identifiers" ], @[ @"B11", @"Misspelled keys" ], @[ @"B19", @"Invalid colors and fonts" ], @[ @"B21", @"Empty strings" ],
         @[ @"A12", @"Truncated protobuf" ],
         @[ @"A12", @"Corrupted binary plist" ], @[ @"A14", @"XML external entity" ], @[ @"A2", @"Missing file" ],
@@ -526,6 +527,14 @@ static NSData *CYLEdgeCaseData(NSString *text) {
         // [CN] B28 / B29：带选项的 Rive URL（动画库可能未安装：Tab 显示图片）、指向不存在文件的通用动画路径（丢弃）、不是字典的选项、无效的
         //      速度与无效的循环开关（忽略并警告）。所有情况下 Tab 都会创建。
         fromFile(@"animation.json", CYLEdgeCaseData(@"{\"CYLTabBarControllerTabBarItemAnimationSpeed\": \"fast\", \"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarRiveURL\": \"https://example.com/icons.riv\", \"CYLTabBarAnimationOptions\": {\"artboard\": \"HOME\", \"input\": \"active\", \"duration\": 2, \"bad\": [1, 2]}}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemImage\": \"system:person\", \"CYLTabBarItemIdentifier\": \"me\", \"CYLTabBarAnimationFilePath\": \"no_such_animation.pag\", \"CYLTabBarAnimationOptions\": \"not a dictionary\", \"CYLTabBarLottieLoopsWhenUnselected\": \"maybe\"}]}"));
+    } else if ([title isEqualToString:@"GIF keys and a file that is not a GIF"]) {
+        // [EN] B30 (#605): a ".gif" that holds text is refused by its signature (the tab shows its image); a GIF URL with a
+        //      size is kept, and plays only with the GIF subspec.
+        // [CN] B30（#605）：内容是文本的 ".gif" 因签名不对被拒绝（Tab 显示图片）；带尺寸的 GIF URL 保留，只有引入 GIF 子库时才播放。
+        NSString *fakeGIF = [NSTemporaryDirectory() stringByAppendingPathComponent:@"not_a_gif.gif"];
+        [CYLEdgeCaseData(@"this is not a GIF") writeToFile:fakeGIF atomically:YES];
+        NSString *json = [NSString stringWithFormat:@"{\"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"Home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarGIFFilePath\": \"%@\"}, {\"CYLTabBarItemTitle\": \"Me\", \"CYLTabBarItemImage\": \"system:person\", \"CYLTabBarItemIdentifier\": \"me\", \"CYLTabBarGIFURL\": \"https://example.com/tab_me.gif\", \"CYLTabBarGIFSize\": \"{30, 30}\"}]}", fakeGIF];
+        fromFile(@"gif.json", CYLEdgeCaseData(json));
     } else if ([title isEqualToString:@"Other platforms and newer versions"]) {
         // [EN] B22: "android only" and "version 999" are left out on iOS; the other two tabs stay.
         // [CN] B22："仅 Android" 与 "版本 999" 在 iOS 上不显示；其余两个 Tab 保留。

@@ -2078,6 +2078,12 @@ static NSDictionary<NSString *, NSDictionary<NSNumber *, NSArray<NSString *> *> 
                 @54 : @[ @"CYLTabBarRiveDarkURL", @"string" ],
                 @55 : @[ @"CYLTabBarRiveDarkFilePath", @"string" ],
                 @56 : @[ @"CYLTabBarRiveDarkColors", @"map" ],
+                // [EN] GIF tab icons (#605). [CN] GIF Tab 图标（#605）。
+                @57 : @[ @"CYLTabBarGIFURL", @"string" ],
+                @58 : @[ @"CYLTabBarGIFFilePath", @"string" ],
+                @59 : @[ @"CYLTabBarGIFSize", @"string" ],
+                @60 : @[ @"CYLTabBarGIFDarkURL", @"string" ],
+                @61 : @[ @"CYLTabBarGIFDarkFilePath", @"string" ],
             },
             @"CYLMapEntry" : @{
                 @1 : @[ @"key", @"string" ],

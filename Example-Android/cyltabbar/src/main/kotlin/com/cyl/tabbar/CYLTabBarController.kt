@@ -368,10 +368,10 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         item.cyl_selectedBackgroundColor = CYLTabBarConfiguration.colorValue(attributes[CYLConstants.CYLTabBarItemSelectedBackgroundColor])
         item.cyl_titleFont = CYLFont.fromConfigurationValue(attributes[CYLConstants.CYLTabBarItemTitleFont])
         item.cyl_selectedTitleFont = CYLFont.fromConfigurationValue(attributes[CYLConstants.CYLTabBarItemSelectedTitleFont])
-        item.cyl_tabBarItemAnimationURL = listOf(CYLConstants.CYLTabBarAnimationURL, CYLConstants.CYLTabBarLottieURL, CYLConstants.CYLTabBarPAGURL, CYLConstants.CYLTabBarRiveURL,
-                                                 CYLConstants.CYLTabBarAnimationFilePath, CYLConstants.CYLTabBarLottieFilePath, CYLConstants.CYLTabBarPAGFilePath, CYLConstants.CYLTabBarRiveFilePath)
+        item.cyl_tabBarItemAnimationURL = listOf(CYLConstants.CYLTabBarAnimationURL, CYLConstants.CYLTabBarLottieURL, CYLConstants.CYLTabBarPAGURL, CYLConstants.CYLTabBarRiveURL, CYLConstants.CYLTabBarGIFURL,
+                                                 CYLConstants.CYLTabBarAnimationFilePath, CYLConstants.CYLTabBarLottieFilePath, CYLConstants.CYLTabBarPAGFilePath, CYLConstants.CYLTabBarRiveFilePath, CYLConstants.CYLTabBarGIFFilePath)
             .firstNotNullOfOrNull { attributes[it] as? String }
-        item.cyl_tabBarItemAnimationSizeValue = listOf(CYLConstants.CYLTabBarAnimationSize, CYLConstants.CYLTabBarLottieSize, CYLConstants.CYLTabBarPAGSize, CYLConstants.CYLTabBarRiveSize)
+        item.cyl_tabBarItemAnimationSizeValue = listOf(CYLConstants.CYLTabBarAnimationSize, CYLConstants.CYLTabBarLottieSize, CYLConstants.CYLTabBarPAGSize, CYLConstants.CYLTabBarRiveSize, CYLConstants.CYLTabBarGIFSize)
             .firstNotNullOfOrNull { CYLTabBarConfiguration.sizeValue(attributes[it]) }
         return item
     }

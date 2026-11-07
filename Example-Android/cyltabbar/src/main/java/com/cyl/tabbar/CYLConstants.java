@@ -71,6 +71,12 @@ public final class CYLConstants {
     public static final String CYLTabBarRiveDarkURL = "CYLTabBarRiveDarkURL";
     public static final String CYLTabBarRiveDarkFilePath = "CYLTabBarRiveDarkFilePath";
     public static final String CYLTabBarRiveDarkColors = "CYLTabBarRiveDarkColors";
+    /** [EN] GIF keys (#605, CYLGIFTabBarItemAnimator.h): a GIF plays once when its tab is selected. [CN] GIF 键（#605）：选中 Tab 时播放一次。 */
+    public static final String CYLTabBarGIFURL = "CYLTabBarGIFURL";
+    public static final String CYLTabBarGIFFilePath = "CYLTabBarGIFFilePath";
+    public static final String CYLTabBarGIFSize = "CYLTabBarGIFSize";
+    public static final String CYLTabBarGIFDarkURL = "CYLTabBarGIFDarkURL";
+    public static final String CYLTabBarGIFDarkFilePath = "CYLTabBarGIFDarkFilePath";
     /** [EN] Rive options of `CYLTabBarAnimationURLWithOptions()` (CYLRiveTabBarItemAnimator.h); every value is a string. [CN] `CYLTabBarAnimationURLWithOptions()` 的 Rive 选项；值都是字符串。 */
     public static final String CYLTabBarAnimationOptionRiveArtboard = "artboard";
     public static final String CYLTabBarAnimationOptionRiveStateMachine = "stateMachine";

@@ -1574,6 +1574,8 @@ private object CYLProtobufSchema {
         "map:CYLTabBarAnimationDarkColors", "map:CYLTabBarAnimationColors", "map:CYLTabBarAnimationOptions", "CYLTabBarLottieLoopsWhenUnselected",
         "CYLTabBarPAGURL", "CYLTabBarPAGFilePath", "CYLTabBarPAGSize", "CYLTabBarPAGDarkURL", "CYLTabBarPAGDarkFilePath",
         "CYLTabBarRiveURL", "CYLTabBarRiveFilePath", "CYLTabBarRiveSize", "CYLTabBarRiveDarkURL", "CYLTabBarRiveDarkFilePath", "map:CYLTabBarRiveDarkColors",
+        // [EN] GIF tab icons (#605), fields 57–61. [CN] GIF Tab 图标（#605），字段 57–61。
+        "CYLTabBarGIFURL", "CYLTabBarGIFFilePath", "CYLTabBarGIFSize", "CYLTabBarGIFDarkURL", "CYLTabBarGIFDarkFilePath",
     )
 
     private fun field(entry: String): Pair<String, String> =

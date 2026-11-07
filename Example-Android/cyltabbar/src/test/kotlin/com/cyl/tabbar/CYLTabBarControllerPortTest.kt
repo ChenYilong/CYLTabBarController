@@ -284,6 +284,28 @@ class CYLTabBarControllerPortTest {
         assertEquals(0f, player.progress, 0.01f)
     }
 
+    @Test
+    fun gifAnimatorIsRegisteredAndGIFKeysAreRead() = withActivity { activity ->
+        val gif = CYLTabBarItemAnimatorRegistry.sharedRegistry.animatorWithIdentifier("GIF")
+        assertNotNull("GIF needs no library", gif)
+        assertSame(gif, CYLTabBarItemAnimatorRegistry.animatorForURL("https://example.com/tab_home.gif"))
+        assertSame(gif, CYLTabBarItemAnimatorRegistry.animatorForAttributes(mapOf(CYLConstants.CYLTabBarGIFFilePath to "tab.gif")))
+        // [EN] A 1 × 1 GIF89a. [CN] 1 × 1 的 GIF89a。
+        val bytes = android.util.Base64.decode("R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==", android.util.Base64.DEFAULT)
+        val file = File.createTempFile("tab", ".gif").apply { writeBytes(bytes) }
+        val tabs = listOf(mapOf(CYLConstants.CYLTabBarItemTitle to "Home", CYLConstants.CYLTabBarGIFFilePath to file.absolutePath, CYLConstants.CYLTabBarGIFSize to "{24, 24}"),
+                          mapOf(CYLConstants.CYLTabBarItemTitle to "Me"))
+        val controller = controllerIn(activity, listOf(Page(), Page()), tabs)
+        idle()
+        val button = controller.tabBar.tabBarButtonArray[0]
+        assertTrue(button.cyl_isTabBarItemAnimationReady())
+        val view = button.cyl_tabBarItemAnimationView as CYLGIFTabBarItemAnimationView
+        assertEquals(CYLSize(24f, 24f), controller.tabBarItemAnimationSizes[0])
+        val player = button.cyl_tabBarItemAnimationPlayer!!
+        player.play(); player.stop(); player.showLastFrame()
+        assertTrue(view.duration > 0)
+    }
+
     // MARK: - Themes 主题
 
     class ThemePage : Fragment(), CYLThemeChangeObserving {

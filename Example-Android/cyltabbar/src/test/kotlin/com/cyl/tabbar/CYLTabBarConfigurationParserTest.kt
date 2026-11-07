@@ -66,6 +66,18 @@ class CYLTabBarConfigurationParserTest {
     }
 
     @Test
+    fun protobufReadsTheGIFFields57To61() {
+        // [EN] An item with field 58 (`CYLTabBarGIFFilePath`, tag 58 << 3 | 2 = 0xD2 0x03) inside top-level field 1. [CN] 顶层字段 1 中带字段 58 的 item。
+        val path = "tab_home.gif".toByteArray()
+        val item = byteArrayOf(0xD2.toByte(), 0x03, path.size.toByte()) + path
+        val message = byteArrayOf(0x0A, item.size.toByte()) + item
+        val configuration = CYLTabBarConfigurationParser.dictionaryWithData(message, CYLTabBarConfigurationFormat.Protobuf)
+        @Suppress("UNCHECKED_CAST")
+        val items = configuration["CYLTabBarControllerTabBarItemsAttributes"] as List<Map<String, Any?>>
+        assertEquals("tab_home.gif", items[0]["CYLTabBarGIFFilePath"])
+    }
+
+    @Test
     fun everySampleGivesTheTabsOfTheJSONSample() {
         val expected = itemsWithoutFirstTitle(parse(File(samples, "cyl_tabbar_configuration.json"), false))
         assertNotNull(expected)

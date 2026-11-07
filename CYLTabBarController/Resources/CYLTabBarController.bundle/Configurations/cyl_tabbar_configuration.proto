@@ -89,4 +89,10 @@ message CYLTabBarItem {
   string CYLTabBarRiveDarkURL = 54;
   string CYLTabBarRiveDarkFilePath = 55;
   map<string, string> CYLTabBarRiveDarkColors = 56;
+  // GIF tab icons (#605). GIF Tab 图标（#605）。
+  string CYLTabBarGIFURL = 57;
+  string CYLTabBarGIFFilePath = 58;
+  string CYLTabBarGIFSize = 59;
+  string CYLTabBarGIFDarkURL = 60;
+  string CYLTabBarGIFDarkFilePath = 61;
 }

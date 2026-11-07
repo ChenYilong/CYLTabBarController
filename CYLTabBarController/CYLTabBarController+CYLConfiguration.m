@@ -13,10 +13,10 @@ static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
 static NSString *const CYLTabBarItemExclusionReasonKey = @"_CYLTabBarItemExclusionReason";
 
 /*!
- * [EN] The keys of the PAG and Rive subspecs (`CYLTabBarPAG…`, `CYLTabBarRive…`), by name: their constants exist only
+ * [EN] The keys of the PAG, Rive and GIF subspecs (`CYLTabBarPAG…`, `CYLTabBarRive…`, `CYLTabBarGIF…`, #605), by name: their constants exist only
  *      when that subspec is part of the build, while a configuration may name them whether or not the library is
  *      installed (a library that is not installed ignores its keys, B29). The values are converted like the Lottie keys.
- * [CN] PAG 与 Rive 子库的键（`CYLTabBarPAG…`、`CYLTabBarRive…`），按名称引用：它们的常量只在该子库参与编译时存在，而配置无论动画库是否
+ * [CN] PAG、Rive 与 GIF 子库的键（`CYLTabBarPAG…`、`CYLTabBarRive…`、`CYLTabBarGIF…`，#605），按名称引用：它们的常量只在该子库参与编译时存在，而配置无论动画库是否
  *      安装都可以写这些键（未安装的动画库会忽略自己的键，B29）。值的转换与 Lottie 键相同。
  */
 static NSString *const CYLConfigurationPAGURLKey = @"CYLTabBarPAGURL";
@@ -30,6 +30,11 @@ static NSString *const CYLConfigurationRiveSizeKey = @"CYLTabBarRiveSize";
 static NSString *const CYLConfigurationRiveDarkURLKey = @"CYLTabBarRiveDarkURL";
 static NSString *const CYLConfigurationRiveDarkFilePathKey = @"CYLTabBarRiveDarkFilePath";
 static NSString *const CYLConfigurationRiveDarkColorsKey = @"CYLTabBarRiveDarkColors";
+static NSString *const CYLConfigurationGIFURLKey = @"CYLTabBarGIFURL";
+static NSString *const CYLConfigurationGIFFilePathKey = @"CYLTabBarGIFFilePath";
+static NSString *const CYLConfigurationGIFSizeKey = @"CYLTabBarGIFSize";
+static NSString *const CYLConfigurationGIFDarkURLKey = @"CYLTabBarGIFDarkURL";
+static NSString *const CYLConfigurationGIFDarkFilePathKey = @"CYLTabBarGIFDarkFilePath";
 /*!
  * [EN] The Lottie keys by name too: their constants are `CYL_LOTTIE_REQUIRED` (a deprecation warning in a build without
  *      Lottie, which CI treats as an error), while a configuration may name them in any build (B29). Same values as
@@ -281,6 +286,13 @@ static BOOL CYLFileExists(NSString *path) {
  */
 static BOOL CYLIsReadableLottieFile(NSString *path) {
     NSString *extension = path.pathExtension.lowercaseString;
+    // [EN] FIX: issue #605 — a ".gif" must start with a GIF signature (B30). [CN] ".gif" 文件必须以 GIF 签名开头（B30）。
+    if ([extension isEqualToString:@"gif"]) {
+        NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath:path];
+        NSData *head = [handle readDataOfLength:6];
+        [handle closeFile];
+        return head.length == 6 && (memcmp(head.bytes, "GIF87a", 6) == 0 || memcmp(head.bytes, "GIF89a", 6) == 0);
+    }
     if ([extension isEqualToString:@"lottie"]) {
         NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath:path];
         NSData *head = [handle readDataOfLength:4];
@@ -457,6 +469,7 @@ static void CYLApplyAnimationOptions(NSMutableDictionary *item, NSDictionary<NSS
         @[ CYLConfigurationLottieURLKey, CYLConfigurationLottieFilePathKey ], @[ CYLConfigurationLottieDarkURLKey, CYLConfigurationLottieDarkFilePathKey ],
         @[ CYLConfigurationPAGURLKey, CYLConfigurationPAGFilePathKey ], @[ CYLConfigurationPAGDarkURLKey, CYLConfigurationPAGDarkFilePathKey ],
         @[ CYLConfigurationRiveURLKey, CYLConfigurationRiveFilePathKey ], @[ CYLConfigurationRiveDarkURLKey, CYLConfigurationRiveDarkFilePathKey ],
+        @[ CYLConfigurationGIFURLKey, CYLConfigurationGIFFilePathKey ], @[ CYLConfigurationGIFDarkURLKey, CYLConfigurationGIFDarkFilePathKey ],
     ];
     for (NSArray<NSString *> *pair in pairs) {
         NSURL *URL = [item[pair[0]] isKindOfClass:[NSURL class]] ? item[pair[0]] : nil;
@@ -510,14 +523,16 @@ static NSArray<NSString *> *CYLKnownItemKeys(void) {
               CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemBackgroundColor,
               CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont, CYLTabBarItemAccessibilityIdentifier, CYLTabBarItemAccessibilityLabel,
               CYLTabBarItemAccessibilityHint,
-              // [EN] Tab animations (#604, #752): the generic keys, the options, Lottie's loop flag, PAG and Rive.
-              // [CN] Tab 动画（#604、#752）：通用键、选项、Lottie 的循环开关、PAG 与 Rive。
+              // [EN] Tab animations (#604, #752, #605): the generic keys, the options, Lottie's loop flag, PAG, Rive and GIF.
+              // [CN] Tab 动画（#604、#752、#605）：通用键、选项、Lottie 的循环开关、PAG、Rive 与 GIF。
               CYLTabBarAnimationURL, CYLTabBarAnimationFilePath, CYLTabBarAnimationSize, CYLTabBarAnimationDarkURL,
               CYLTabBarAnimationDarkFilePath, CYLTabBarAnimationDarkColors, CYLTabBarAnimationColors, CYLTabBarAnimationOptions,
               CYLConfigurationLottieLoopsWhenUnselectedKey,
               CYLConfigurationPAGURLKey, CYLConfigurationPAGFilePathKey, CYLConfigurationPAGSizeKey, CYLConfigurationPAGDarkURLKey,
               CYLConfigurationPAGDarkFilePathKey, CYLConfigurationRiveURLKey, CYLConfigurationRiveFilePathKey, CYLConfigurationRiveSizeKey,
-              CYLConfigurationRiveDarkURLKey, CYLConfigurationRiveDarkFilePathKey, CYLConfigurationRiveDarkColorsKey ];
+              CYLConfigurationRiveDarkURLKey, CYLConfigurationRiveDarkFilePathKey, CYLConfigurationRiveDarkColorsKey,
+              CYLConfigurationGIFURLKey, CYLConfigurationGIFFilePathKey, CYLConfigurationGIFSizeKey, CYLConfigurationGIFDarkURLKey,
+              CYLConfigurationGIFDarkFilePathKey ];
 }
 
 #if defined(DEBUG) || defined(BETA)
@@ -857,7 +872,7 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
         }
     }
     for (NSString *key in @[ CYLTabBarItemImageURLSize, CYLConfigurationLottieSizeKey, CYLTabBarAnimationSize, CYLConfigurationPAGSizeKey,
-                              CYLConfigurationRiveSizeKey ]) {
+                              CYLConfigurationRiveSizeKey, CYLConfigurationGIFSizeKey ]) {
         if (item[key]) {
             item[key] = CYLSizeValue(item[key], key);
         }
@@ -866,7 +881,7 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
     //      Lottie file must be readable (B17). [CN] 动画 URL：Lottie、通用（任何动画库）与 PAG / Rive；本地文件必须存在，Lottie 文件必须可读（B17）。
     for (NSString *key in @[ CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLConfigurationLottieURLKey, CYLConfigurationLottieDarkURLKey,
                               CYLTabBarAnimationURL, CYLTabBarAnimationDarkURL, CYLConfigurationPAGURLKey, CYLConfigurationPAGDarkURLKey,
-                              CYLConfigurationRiveURLKey, CYLConfigurationRiveDarkURLKey ]) {
+                              CYLConfigurationRiveURLKey, CYLConfigurationRiveDarkURLKey, CYLConfigurationGIFURLKey, CYLConfigurationGIFDarkURLKey ]) {
         id value = item[key];
         if (!value) {
             continue;
@@ -883,7 +898,7 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
     }
     for (NSString *key in @[ CYLConfigurationLottieFilePathKey, CYLConfigurationLottieDarkFilePathKey, CYLTabBarAnimationFilePath, CYLTabBarAnimationDarkFilePath,
                               CYLConfigurationPAGFilePathKey, CYLConfigurationPAGDarkFilePathKey, CYLConfigurationRiveFilePathKey,
-                              CYLConfigurationRiveDarkFilePathKey ]) {
+                              CYLConfigurationRiveDarkFilePathKey, CYLConfigurationGIFFilePathKey, CYLConfigurationGIFDarkFilePathKey ]) {
         id value = item[key];
         NSString *path = [value isKindOfClass:[NSString class]] ? CYLMainBundlePath(value) : nil;
         if (value && (!CYLFileExists(path) || !CYLIsReadableLottieFile(path))) {

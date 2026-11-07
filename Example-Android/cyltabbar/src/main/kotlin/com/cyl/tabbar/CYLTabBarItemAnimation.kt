@@ -205,6 +205,8 @@ open class CYLTabBarItemAnimatorRegistry : CYLTabBarItemAnimatorRegistering {
                 CYLLottieTabBarItemAnimator.takeIf { it.isAvailable }?.let { registerAnimator(it) }
                 CYLPAGTabBarItemAnimator.takeIf { it.isAvailable }?.let { registerAnimator(it) }
                 if (CYLRiveTabBarItemAnimator.isAvailable) registerAnimator(CYLRiveTabBarItemAnimator.animator)
+                // [EN] GIF needs no library: the platform decodes it, as ImageIO does on iOS. [CN] GIF 不需要额外的库：由系统解码，如同 iOS 的 ImageIO。
+                registerAnimator(CYLGIFTabBarItemAnimator.animator)
             }
         }
         fun registerAnimator(animator: CYLTabBarItemAnimator) = sharedRegistry.registerAnimator(animator)

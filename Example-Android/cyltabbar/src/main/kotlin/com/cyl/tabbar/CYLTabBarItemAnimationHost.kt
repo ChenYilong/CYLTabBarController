@@ -221,11 +221,11 @@ internal fun CYLTabBarItemAttributesAnimationValue(attributes: Map<String, Any?>
     attributes[genericKey]?.let { return it }
     CYLTabBarItemAnimatorRegistry.attributeKeyForGenericKey(genericKey, attributes)?.let { key -> attributes[key]?.let { return it } }
     val known = mapOf(
-        CYLConstants.CYLTabBarAnimationURL to listOf(CYLConstants.CYLTabBarLottieURL, CYLConstants.CYLTabBarPAGURL, CYLConstants.CYLTabBarRiveURL),
-        CYLConstants.CYLTabBarAnimationFilePath to listOf(CYLConstants.CYLTabBarLottieFilePath, CYLConstants.CYLTabBarPAGFilePath, CYLConstants.CYLTabBarRiveFilePath),
-        CYLConstants.CYLTabBarAnimationSize to listOf(CYLConstants.CYLTabBarLottieSize, CYLConstants.CYLTabBarPAGSize, CYLConstants.CYLTabBarRiveSize),
-        CYLConstants.CYLTabBarAnimationDarkURL to listOf(CYLConstants.CYLTabBarLottieDarkURL, CYLConstants.CYLTabBarPAGDarkURL, CYLConstants.CYLTabBarRiveDarkURL),
-        CYLConstants.CYLTabBarAnimationDarkFilePath to listOf(CYLConstants.CYLTabBarLottieDarkFilePath, CYLConstants.CYLTabBarPAGDarkFilePath, CYLConstants.CYLTabBarRiveDarkFilePath),
+        CYLConstants.CYLTabBarAnimationURL to listOf(CYLConstants.CYLTabBarLottieURL, CYLConstants.CYLTabBarPAGURL, CYLConstants.CYLTabBarRiveURL, CYLConstants.CYLTabBarGIFURL),
+        CYLConstants.CYLTabBarAnimationFilePath to listOf(CYLConstants.CYLTabBarLottieFilePath, CYLConstants.CYLTabBarPAGFilePath, CYLConstants.CYLTabBarRiveFilePath, CYLConstants.CYLTabBarGIFFilePath),
+        CYLConstants.CYLTabBarAnimationSize to listOf(CYLConstants.CYLTabBarLottieSize, CYLConstants.CYLTabBarPAGSize, CYLConstants.CYLTabBarRiveSize, CYLConstants.CYLTabBarGIFSize),
+        CYLConstants.CYLTabBarAnimationDarkURL to listOf(CYLConstants.CYLTabBarLottieDarkURL, CYLConstants.CYLTabBarPAGDarkURL, CYLConstants.CYLTabBarRiveDarkURL, CYLConstants.CYLTabBarGIFDarkURL),
+        CYLConstants.CYLTabBarAnimationDarkFilePath to listOf(CYLConstants.CYLTabBarLottieDarkFilePath, CYLConstants.CYLTabBarPAGDarkFilePath, CYLConstants.CYLTabBarRiveDarkFilePath, CYLConstants.CYLTabBarGIFDarkFilePath),
         CYLConstants.CYLTabBarAnimationDarkColors to listOf(CYLConstants.CYLTabBarLottieDarkColors, CYLConstants.CYLTabBarRiveDarkColors),
     )
     return known[genericKey]?.firstNotNullOfOrNull { attributes[it] }

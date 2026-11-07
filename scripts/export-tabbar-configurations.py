@@ -58,9 +58,10 @@ ITEM_KEYS = [
     'CYLTabBarItemSelectedBackgroundColor', 'CYLTabBarItemBackgroundColor', 'CYLTabBarItemTitleFont', 'CYLTabBarItemSelectedTitleFont',
     'CYLTabBarItemAccessibilityIdentifier', 'CYLTabBarItemAccessibilityLabel', 'CYLTabBarItemAccessibilityHint',
     'CYLTabBarItemPageIdentifier', 'CYLTabBarItemPageParameters', 'CYLTabBarItemPlatforms', 'CYLTabBarItemMinimumAppVersion',
-    # [EN] Tab animations (#604, #752), Protobuf fields 37-56. [CN] Tab 动画（#604、#752），Protobuf 字段 37–56。
+    # [EN] Tab animations (#604, #752, #605), Protobuf fields 37-61. [CN] Tab 动画（#604、#752、#605），Protobuf 字段 37–61。
     'CYLTabBarAnimationURL', 'CYLTabBarAnimationFilePath', 'CYLTabBarAnimationSize', 'CYLTabBarAnimationDarkURL', 'CYLTabBarAnimationDarkFilePath', 'CYLTabBarAnimationDarkColors', 'CYLTabBarAnimationColors', 'CYLTabBarAnimationOptions', 'CYLTabBarLottieLoopsWhenUnselected',
     'CYLTabBarPAGURL', 'CYLTabBarPAGFilePath', 'CYLTabBarPAGSize', 'CYLTabBarPAGDarkURL', 'CYLTabBarPAGDarkFilePath', 'CYLTabBarRiveURL', 'CYLTabBarRiveFilePath', 'CYLTabBarRiveSize', 'CYLTabBarRiveDarkURL', 'CYLTabBarRiveDarkFilePath', 'CYLTabBarRiveDarkColors',
+    'CYLTabBarGIFURL', 'CYLTabBarGIFFilePath', 'CYLTabBarGIFSize', 'CYLTabBarGIFDarkURL', 'CYLTabBarGIFDarkFilePath',
 ]
 ITEMS_KEY = 'CYLTabBarControllerTabBarItemsAttributes'
 TOP_KEYS = ['CYLTabBarControllerContext', 'CYLTabBarControllerStyleType', 'CYLTabBarControllerImageInsets',
