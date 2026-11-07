@@ -1,5 +1,6 @@
 // [EN] The method names are the iOS names on purpose (`cyl_…`, `tabBarController_…`), see docs/Android-API-Map.md. [CN] 方法名刻意沿用 iOS 名称（`cyl_…`、`tabBarController_…`），见 docs/Android-API-Map.md。
-@file:Suppress("FunctionName", "kotlin:S100")
+// [EN] kotlin:S1133: the deprecated members are the twins of deprecated iOS API, kept until iOS removes them. [CN] kotlin:S1133：已废弃的成员与 iOS 已废弃的 API 对应，在 iOS 移除前保留。
+@file:Suppress("FunctionName", "kotlin:S100", "kotlin:S1133")
 
 package com.cyl.tabbar
 

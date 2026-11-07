@@ -229,38 +229,44 @@ object DemoInteractions {
     private val longPressDurations = listOf(0.3, 0.5, 1.0)
     private val doubleTapIntervals = listOf(0.2, 0.3, 0.5)
 
+    private fun tapAnimationRow() = DemoRow("Tab tap animation (issue #535)", { "Tap to switch the tap animation of the tabs and the PlusButton, current: ${tapSteps[tabBarController?.let { tapStepOf[it] } ?: 0].name}" }) {
+        val controller = tabBarController ?: return@DemoRow
+        choose("Tab tap animation", tapSteps.map { it.name }, tapStepOf[controller] ?: 0) { index ->
+            tapStepOf[controller] = index
+            val step = tapSteps[index]
+            controller.cyl_defaultTabButtonAnimation = null
+            controller.viewControllers.forEach { it.cyl_tabButtonAnimation = null }
+            controller.cyl_tabButtonTapAnimationType = step.type
+            val animation = step.animation?.invoke()
+            if (step.oneTab) controller.selectedViewController?.cyl_tabButtonAnimation = animation else controller.cyl_defaultTabButtonAnimation = animation
+            controller.tabBar.tabBarButtonArray.getOrNull(controller.selectedIndex)?.let { controller.cyl_playTabButtonAnimationForControl(it) }
+        }
+    }
+
+    private fun feedbackRow() = DemoRow("Tab tap sound and haptic feedback (issue #535)", { "Current: ${feedbackSteps[tabBarController?.let { feedbackStepOf[it] } ?: 0].name}" }) {
+        val controller = tabBarController ?: return@DemoRow
+        choose("Tap feedback", feedbackSteps.map { it.name }, feedbackStepOf[controller] ?: 0) { index ->
+            feedbackStepOf[controller] = index
+            val step = feedbackSteps[index]
+            controller.cyl_tabButtonTapSoundEnabled = step.sound
+            controller.cyl_tabButtonTapSoundURL = if (step.custom) RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) else null
+            controller.cyl_tabButtonHapticFeedbackEnabled = step.haptic != null
+            step.haptic?.let { controller.cyl_tabButtonHapticFeedbackStyle = it }
+            controller.cyl_playTabButtonTapFeedback()
+        }
+    }
+
+    private fun longPressRow() = DemoRow("Long press a tab (issue #535)", { "cyl_didLongPressControlBlock: ${if (tabBarController?.cyl_didLongPressControlBlock != null) "on" else "off"}" }) {
+        val controller = tabBarController ?: return@DemoRow
+        controller.cyl_didLongPressControlBlock = if (controller.cyl_didLongPressControlBlock != null) null else { tabBarController, control ->
+            android.widget.Toast.makeText(tabBarController.activity, "Long pressed: " + ((control as? com.cyl.tabbar.CYLTabBarItemButton)?.item?.title ?: "PlusButton"), android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
     fun interactionRows() = listOf(
-        DemoRow("Tab tap animation (issue #535)", { "Tap to switch the tap animation of the tabs and the PlusButton, current: ${tapSteps[tabBarController?.let { tapStepOf[it] } ?: 0].name}" }) {
-            val controller = tabBarController ?: return@DemoRow
-            choose("Tab tap animation", tapSteps.map { it.name }, tapStepOf[controller] ?: 0) { index ->
-                tapStepOf[controller] = index
-                val step = tapSteps[index]
-                controller.cyl_defaultTabButtonAnimation = null
-                controller.viewControllers.forEach { it.cyl_tabButtonAnimation = null }
-                controller.cyl_tabButtonTapAnimationType = step.type
-                val animation = step.animation?.invoke()
-                if (step.oneTab) controller.selectedViewController?.cyl_tabButtonAnimation = animation else controller.cyl_defaultTabButtonAnimation = animation
-                controller.tabBar.tabBarButtonArray.getOrNull(controller.selectedIndex)?.let { controller.cyl_playTabButtonAnimationForControl(it) }
-            }
-        },
-        DemoRow("Tab tap sound and haptic feedback (issue #535)", { "Current: ${feedbackSteps[tabBarController?.let { feedbackStepOf[it] } ?: 0].name}" }) {
-            val controller = tabBarController ?: return@DemoRow
-            choose("Tap feedback", feedbackSteps.map { it.name }, feedbackStepOf[controller] ?: 0) { index ->
-                feedbackStepOf[controller] = index
-                val step = feedbackSteps[index]
-                controller.cyl_tabButtonTapSoundEnabled = step.sound
-                controller.cyl_tabButtonTapSoundURL = if (step.custom) RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) else null
-                controller.cyl_tabButtonHapticFeedbackEnabled = step.haptic != null
-                step.haptic?.let { controller.cyl_tabButtonHapticFeedbackStyle = it }
-                controller.cyl_playTabButtonTapFeedback()
-            }
-        },
-        DemoRow("Long press a tab (issue #535)", { "cyl_didLongPressControlBlock: ${if (tabBarController?.cyl_didLongPressControlBlock != null) "on" else "off"}" }) {
-            val controller = tabBarController ?: return@DemoRow
-            controller.cyl_didLongPressControlBlock = if (controller.cyl_didLongPressControlBlock != null) null else { tabBarController, control ->
-                android.widget.Toast.makeText(tabBarController.activity, "Long pressed: " + ((control as? com.cyl.tabbar.CYLTabBarItemButton)?.item?.title ?: "PlusButton"), android.widget.Toast.LENGTH_SHORT).show()
-            }
-        },
+        tapAnimationRow(),
+        feedbackRow(),
+        longPressRow(),
         DemoRow("Long press duration and double tap interval (issue #535 / #152)", {
             "cyl_tabBarItemLongPressDuration = ${tabBarController?.cyl_tabBarItemLongPressDuration} s, cyl_tabBarItemDoubleTapInterval = ${tabBarController?.cyl_tabBarItemDoubleTapInterval} s"
         }) {

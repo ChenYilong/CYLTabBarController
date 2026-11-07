@@ -202,15 +202,11 @@ object DemoGallery {
                 },
                 tabBar("Suggest a click", "The middle tab pulses every 3 s until it is selected") { activity ->
                     controller(activity, 5).also { c ->
-                        val handler = Handler(Looper.getMainLooper())
-                        val pulse = object : Runnable {
-                            override fun run() {
-                                if (c.selectedIndex == 2 || activity.isFinishing) return
-                                c.tabBar.tabBarButtonArray.getOrNull(2)?.let { CYLTabButtonScaleAnimation().cyl_playSelectAnimationWithTabButton(it, it.iconView, it.titleLabel) }
-                                handler.postDelayed(this, 3000)
-                            }
+                        repeating(1000, 3000) {
+                            val pulses = c.selectedIndex != 2 && !activity.isFinishing
+                            if (pulses) c.tabBar.tabBarButtonArray.getOrNull(2)?.let { CYLTabButtonScaleAnimation().cyl_playSelectAnimationWithTabButton(it, it.iconView, it.titleLabel) }
+                            pulses
                         }
-                        handler.postDelayed(pulse, 1000)
                     }
                 },
             ),
@@ -371,17 +367,21 @@ object DemoGallery {
     private fun badgeAnimationScene(activity: FragmentActivity, animation: (View, View, View?) -> Unit): CYLTabBarController =
         controller(activity, 4).also { c ->
             c.cyl_defaultTabButtonAnimation = CYLTabButtonBlockAnimation().apply { badgeChangedAnimation = animation }
-            val handler = Handler(Looper.getMainLooper())
             var count = 0
-            val tick = object : Runnable {
-                override fun run() {
-                    if (activity.isFinishing) return
-                    c.tabBar.tabBarButtonArray.getOrNull(1)?.cyl_showBadgeValue((++count).toString())
-                    handler.postDelayed(this, 2000)
-                }
+            repeating(1000, 2000) {
+                if (!activity.isFinishing) c.tabBar.tabBarButtonArray.getOrNull(1)?.cyl_showBadgeValue((++count).toString())
+                !activity.isFinishing
             }
-            handler.postDelayed(tick, 1000)
         }
+
+    /** [EN] Runs `step` after `initialDelay` ms, then every `interval` ms while it returns true. [CN] `initialDelay` 毫秒后运行 `step`，之后每 `interval` 毫秒运行一次，直到它返回 false。 */
+    private fun repeating(initialDelay: Long, interval: Long, step: () -> Boolean) {
+        val handler = Handler(Looper.getMainLooper())
+        fun tick() {
+            if (step()) handler.postDelayed(::tick, interval)
+        }
+        handler.postDelayed(::tick, initialDelay)
+    }
 
     private const val LARGE_PLUS = "GalleryLargePlus"
     private val largePlus = object : CYLPlusButtonSubclassing {

@@ -154,10 +154,14 @@ open class CYLTabButtonRotationAnimation : CYLTabButtonAnimation {
     }
 }
 
+/** [EN] The keys of the fume animation's running animators. [CN] 飘散动画正在运行的 animator 的键。 */
+private const val FUME_ICON = "fume.icon"
+private const val FUME_TITLE = "fume.title"
+
 /** [EN] The icon moves down while the title floats up and fades out; deselecting brings them back. [CN] 图标下移、标题上浮并淡出；取消选中时恢复。 */
 open class CYLTabButtonFumeAnimation : CYLTabButtonAnimation {
     override fun cyl_playSelectAnimationWithTabButton(button: View, iconView: View, titleLabel: TextView?) {
-        iconView.cyl_start("fume.icon", ObjectAnimator.ofFloat(iconView, "translationY", 0f, iconView.dp(4f)).setDuration((CYLTabButtonAnimationDuration / 2 * 1000).toLong()))
+        iconView.cyl_start(FUME_ICON, ObjectAnimator.ofFloat(iconView, "translationY", 0f, iconView.dp(4f)).setDuration((CYLTabButtonAnimationDuration / 2 * 1000).toLong()))
         titleLabel ?: return
         val set = AnimatorSet().apply {
             playTogether(
@@ -173,11 +177,11 @@ open class CYLTabButtonFumeAnimation : CYLTabButtonAnimation {
                 }
             })
         }
-        titleLabel.cyl_start("fume.title", set)
+        titleLabel.cyl_start(FUME_TITLE, set)
     }
 
     override fun cyl_playDeselectAnimationWithTabButton(button: View, iconView: View, titleLabel: TextView?) {
-        iconView.cyl_cancel("fume.icon")
+        iconView.cyl_cancel(FUME_ICON)
         iconView.translationY = 0f
         titleLabel ?: return
         val set = AnimatorSet().apply {
@@ -187,14 +191,14 @@ open class CYLTabButtonFumeAnimation : CYLTabButtonAnimation {
             )
             duration = (CYLTabButtonAnimationDuration * 1000).toLong()
         }
-        titleLabel.cyl_start("fume.title", set)
+        titleLabel.cyl_start(FUME_TITLE, set)
     }
 
     override fun cyl_resetTabButton(button: View, iconView: View, titleLabel: TextView?) {
-        iconView.cyl_cancel("fume.icon")
+        iconView.cyl_cancel(FUME_ICON)
         iconView.translationY = 0f
         titleLabel ?: return
-        titleLabel.cyl_cancel("fume.title")
+        titleLabel.cyl_cancel(FUME_TITLE)
         titleLabel.translationY = 0f; titleLabel.scaleX = 1f; titleLabel.scaleY = 1f; titleLabel.alpha = 1f
     }
 }

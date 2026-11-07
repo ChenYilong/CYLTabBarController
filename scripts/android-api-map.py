@@ -77,7 +77,8 @@ def property_symbol(line, owner):
     body = re.sub(r'^@property\s*\([^)]*\)', '', body)
     # [EN] Deprecation messages hold words that are not names ("... instead."). [CN] 废弃提示中的单词不是名称。
     body = re.sub(r'"[^"]*"', '', body)
-    body = re.sub(r'\b\w*DEPRECATED\w*\s*\(\s*\)', '', body)
+    # [EN] Empty-argument macros whose name contains DEPRECATED; one quantifier per token, so no backtracking. [CN] 名称含 DEPRECATED 的空参数宏；每个记号只有一个量词，不会回溯。
+    body = re.sub(r'\b(\w+)\s*\(\s*\)', lambda m: '' if 'DEPRECATED' in m.group(1) else m.group(0), body)
     body = re.sub(r'NS_SWIFT_NAME\([^)]*\)', '', body)
     body = MACROS.sub('', body)
     body = re.sub(r'<[^>]*>', '', body)

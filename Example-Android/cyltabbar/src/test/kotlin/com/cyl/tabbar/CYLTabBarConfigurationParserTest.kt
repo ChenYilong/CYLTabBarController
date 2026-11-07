@@ -146,20 +146,24 @@ class CYLTabBarConfigurationParserTest {
         val folders = root.listFiles().orEmpty().filter { it.name.startsWith("Example") }.map { File(it, "Configurations") }.filter { it.isDirectory }
         assertTrue("exported configurations", folders.isNotEmpty())
         val failures = ArrayList<String>()
-        var checks = 0
-        for (folder in folders) {
-            val files = folder.listFiles().orEmpty().sortedBy { it.name }
-            for (json in files.filter { it.extension == "json" }) {
-                val reference = comparable(parse(json, false))
-                for (file in files.filter { it.name.startsWith(json.nameWithoutExtension + ".") }) for (sniff in listOf(false, true)) {
-                    checks++
-                    val (parsed, error) = attempt(file, sniff)
-                    if (parsed == null || comparable(parsed) != reference) failures += "${folder.parentFile?.name}/${file.name} (${if (sniff) "content" else "extension"}): ${error?.message ?: "different dictionary"}"
-                }
-            }
-        }
+        val checks = folders.sumOf { compareExports(it, failures) }
         assertTrue("files compared", checks > folders.size)
         assertTrue(failures.joinToString("\n"), failures.isEmpty())
+    }
+
+    /** [EN] Compares every format of each JSON export of `folder` with the JSON; returns the number of comparisons. [CN] 将 `folder` 中每个 JSON 导出的各种格式与 JSON 比较；返回比较次数。 */
+    private fun compareExports(folder: File, failures: MutableList<String>): Int {
+        val files = folder.listFiles().orEmpty().sortedBy { it.name }
+        var checks = 0
+        for (json in files.filter { it.extension == "json" }) {
+            val reference = comparable(parse(json, false))
+            for (file in files.filter { it.name.startsWith(json.nameWithoutExtension + ".") }) for (sniff in listOf(false, true)) {
+                checks++
+                val (parsed, error) = attempt(file, sniff)
+                if (parsed == null || comparable(parsed) != reference) failures += "${folder.parentFile?.name}/${file.name} (${if (sniff) "content" else "extension"}): ${error?.message ?: "different dictionary"}"
+            }
+        }
+        return checks
     }
 
     @Test

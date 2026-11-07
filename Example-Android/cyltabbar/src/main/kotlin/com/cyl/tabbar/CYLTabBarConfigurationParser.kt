@@ -98,6 +98,20 @@ private fun syntaxError(formatName: String, line: Int, reason: String): CYLTabBa
 private fun tooDeepError(formatName: String) = configurationError(
     CYLTabBarConfigurationErrorCode.TooDeep, "$formatName configuration: nested deeper than $CYLTabBarConfigurationMaximumDepth levels.")
 
+// [EN] Reasons and format names used by several parsers. [CN] 多个解析器共用的原因与格式名称。
+private const val UNTERMINATED_ARRAY = "unterminated array"
+private const val UNTERMINATED_STRING = "unterminated string"
+private const val INVALID_UNICODE_ESCAPE = "invalid unicode escape"
+private const val INVALID_KEY = "invalid key"
+private const val EXPECTED_CLOSING_BRACKET = "expected ']'"
+private const val EXPECTED_KEY_VALUE = "expected \"key = value\""
+private const val KEY_CONFLICT = "key conflicts with an existing value"
+private const val INVALID_XML = "invalid XML"
+private const val FORMAT_PROTOBUF_TEXT = "Protobuf text"
+private const val FORMAT_PROPERTY_LIST = "Property List"
+private const val INVALID_PROPERTY_LIST = "invalid property list"
+private const val INVALID_CONTENT = "invalid content"
+
 /** [EN] The deepest nesting of { [ ( outside quoted strings. [CN] 引号外 { [ ( 的最大嵌套深度。 */
 private fun bracketDepth(text: String): Int {
     var depth = 0
@@ -106,15 +120,14 @@ private fun bracketDepth(text: String): Int {
     var i = 0
     while (i < text.length) {
         val c = text[i]
-        if (quote != 0.toChar()) {
-            if (c == '\\') i++ else if (c == quote) quote = 0.toChar()
-        } else if (c == '"' || c == '\'') {
-            quote = c
-        } else if (c == '{' || c == '[' || c == '(') {
-            depth++
-            deepest = maxOf(deepest, depth)
-        } else if ((c == '}' || c == ']' || c == ')') && depth > 0) {
-            depth--
+        when {
+            quote != 0.toChar() -> if (c == '\\') i++ else if (c == quote) quote = 0.toChar()
+            c == '"' || c == '\'' -> quote = c
+            c == '{' || c == '[' || c == '(' -> {
+                depth++
+                deepest = maxOf(deepest, depth)
+            }
+            (c == '}' || c == ']' || c == ')') && depth > 0 -> depth--
         }
         i++
     }
@@ -252,21 +265,26 @@ private fun readDoubleQuoted(text: String, cursor: CYLCursor): String? {
             return output.toString()
         }
         if (c == '\\' && i + 1 < text.length) {
-            val e = text[i + 1]
-            i += 2
-            if (e == 'u' || e == 'U') {
-                val count = if (e == 'u') 4 else 8
-                if (i + count > text.length || !appendUnicodeEscape(output, text.substring(i, i + count))) return null
-                i += count
-            } else {
-                output.append(simpleEscape(e) ?: e.toString())
-            }
+            i = appendEscape(text, i, output) ?: return null
             continue
         }
         output.append(c)
         i++
     }
     return null
+}
+
+/** [EN] Appends the escape at `i` (on the backslash); the index after it, or null when a \u escape is invalid. [CN] 追加 `i` 处（反斜杠）的转义；返回其后的下标，\u 转义无效时为 null。 */
+private fun appendEscape(text: String, i: Int, output: StringBuilder): Int? {
+    val e = text[i + 1]
+    if (e != 'u' && e != 'U') {
+        output.append(simpleEscape(e) ?: e.toString())
+        return i + 2
+    }
+    val count = if (e == 'u') 4 else 8
+    val start = i + 2
+    if (start + count > text.length || !appendUnicodeEscape(output, text.substring(start, start + count))) return null
+    return start + count
 }
 
 /** [EN] A single-quoted string; `doubledQuoteEscapes`: YAML's '' for one quote. [CN] 单引号字符串；`doubledQuoteEscapes`：YAML 用 '' 表示一个引号。 */
@@ -350,18 +368,21 @@ private fun splitDottedKey(key: String): List<String>? {
     val parts = ArrayList<String>()
     val cursor = CYLCursor(0)
     while (cursor.index <= key.length) {
-        while (cursor.index < key.length && isInlineSpace(key[cursor.index])) cursor.index++
+        skipInlineSpace(key, cursor)
         if (cursor.index >= key.length) return null
         val part = readDottedKeyPart(key, cursor)
-        if (part.isNullOrEmpty()) return null
+        if (part.isNullOrEmpty() || parts.size >= CYLTabBarConfigurationMaximumDepth) return null
         parts += part
-        if (parts.size > CYLTabBarConfigurationMaximumDepth) return null
-        while (cursor.index < key.length && isInlineSpace(key[cursor.index])) cursor.index++
-        if (cursor.index >= key.length) break
+        skipInlineSpace(key, cursor)
+        if (cursor.index >= key.length) return parts
         if (key[cursor.index] != '.') return null
         cursor.index++
     }
     return parts
+}
+
+private fun skipInlineSpace(text: String, cursor: CYLCursor) {
+    while (cursor.index < text.length && isInlineSpace(text[cursor.index])) cursor.index++
 }
 
 /** [EN] Dictionaries whose keys are all non-negative integers become arrays, in the order of the numbers. [CN] 键全为非负整数的字典转为数组，按数字排序。 */
@@ -460,7 +481,7 @@ private class CYLJSONReader(private val text: String) {
         while (true) {
             list += value()
             skipSpace()
-            if (index >= text.length) fail("unterminated array")
+            if (index >= text.length) fail(UNTERMINATED_ARRAY)
             when (text[index++]) {
                 ',' -> continue
                 ']' -> return list
@@ -481,7 +502,7 @@ private class CYLJSONReader(private val text: String) {
                 else -> output.append(c)
             }
         }
-        fail("unterminated string")
+        fail(UNTERMINATED_STRING)
     }
 
     private fun escape(output: StringBuilder) {
@@ -494,8 +515,8 @@ private class CYLJSONReader(private val text: String) {
             'r' -> output.append('\r')
             't' -> output.append('\t')
             'u' -> {
-                if (index + 4 > text.length) fail("invalid unicode escape")
-                val code = hexValue(text.substring(index, index + 4)) ?: fail("invalid unicode escape")
+                if (index + 4 > text.length) fail(INVALID_UNICODE_ESCAPE)
+                val code = hexValue(text.substring(index, index + 4)) ?: fail(INVALID_UNICODE_ESCAPE)
                 output.append(code.toInt().toChar())
                 index += 4
             }
@@ -723,9 +744,9 @@ private class CYLYAMLParser(text: String) {
 
     private fun mappingValue(valueText: String, indent: Int, line: CYLYAMLLine): Any? {
         if (valueText.isEmpty()) {
-            val next = current()
-            val nested = next != null && (next.indent > indent || (next.indent == indent && isSequenceEntry(next.text)))
-            return if (nested) parseBlock(next!!.indent) else CYLNull
+            val next = current() ?: return CYLNull
+            val nested = next.indent > indent || (next.indent == indent && isSequenceEntry(next.text))
+            return if (nested) parseBlock(next.indent) else CYLNull
         }
         if (valueText.startsWith("|") || valueText.startsWith(">")) return blockScalar(valueText.startsWith(">"), indent)
         return scalarOrFlow(valueText, line)
@@ -931,19 +952,21 @@ private class CYLTOMLParser(private val text: String) {
         var inDouble = false
         while (!atEnd()) {
             val c = peek()
-            if (c == '"' && !inSingle) inDouble = !inDouble
-            else if (c == '\'' && !inDouble) inSingle = !inSingle
-            else if ((!inSingle && !inDouble && c in terminators) || c == '\n') break
+            when {
+                c == '"' && !inSingle -> inDouble = !inDouble
+                c == '\'' && !inDouble -> inSingle = !inSingle
+                (!inSingle && !inDouble && c in terminators) || c == '\n' -> break
+            }
             index++
         }
         val raw = text.substring(start, index)
-        var parts = splitDottedKey(raw)
-        if (parts != null && !raw.contains('"') && !raw.contains('\'')) {
-            if (parts.any { part -> part.any { !(it.isLetterOrDigit() && it.code < 128) && it != '_' && it != '-' } }) parts = null
-        }
-        if (parts == null) fail("invalid key")
+        val parts = splitDottedKey(raw)?.takeIf { raw.contains('"') || raw.contains('\'') || it.all(::isBareKey) }
+        if (parts == null) fail(INVALID_KEY)
         return parts
     }
+
+    /** [EN] A bare TOML key: ASCII letters, digits, '_' and '-'. [CN] TOML 裸键：ASCII 字母、数字、'_' 与 '-'。 */
+    private fun isBareKey(part: String) = part.all { (it.isLetterOrDigit() && it.code < 128) || it == '_' || it == '-' }
 
     private fun parseValue(): Any? {
         depth++
@@ -962,7 +985,7 @@ private class CYLTOMLParser(private val text: String) {
         val c = peek()
         return when {
             hasPrefix("\"\"\"") || hasPrefix("'''") -> multilineString(c == '\'')
-            c == '"' -> quoted { readDoubleQuoted(text, it) } ?: run { fail("unterminated string"); null }
+            c == '"' -> quoted { readDoubleQuoted(text, it) } ?: run { fail(UNTERMINATED_STRING); null }
             c == '\'' -> quoted { readSingleQuoted(text, it, false) } ?: run { fail("unterminated literal string"); null }
             c == '[' -> array()
             c == '{' -> inlineTable()
@@ -998,7 +1021,7 @@ private class CYLTOMLParser(private val text: String) {
         while (error == null) {
             skipSpaceNewlinesAndComments()
             if (atEnd()) {
-                fail("unterminated array")
+                fail(UNTERMINATED_ARRAY)
                 return null
             }
             if (peek() == ']') {
@@ -1083,7 +1106,7 @@ private class CYLTOMLParser(private val text: String) {
         index++
         val path = parseKeyUntil("]")
         if (path == null || peek() != ']') {
-            fail("expected ']'")
+            fail(EXPECTED_CLOSING_BRACKET)
             return null
         }
         index++
@@ -1098,13 +1121,13 @@ private class CYLTOMLParser(private val text: String) {
     private fun keyValue(table: MutableMap<String, Any?>): Boolean {
         val key = parseKeyUntil("=")
         if (key == null || peek() != '=') {
-            fail("expected \"key = value\"")
+            fail(EXPECTED_KEY_VALUE)
             return false
         }
         index++
         val value = parseValue() ?: return false
         if (!setValueAtPath(table, key, value)) {
-            fail("key conflicts with an existing value")
+            fail(KEY_CONFLICT)
             return false
         }
         expectEndOfLine()
@@ -1138,19 +1161,24 @@ private object CYLFlatFormats {
             val line = trimmed(raw)
             if (line.isEmpty() || line.startsWith(";") || line.startsWith("#")) return@forEachIndexed
             if (line.startsWith("[")) {
-                if (!line.endsWith("]")) throw syntaxError("INI", number, "expected ']'")
+                if (!line.endsWith("]")) throw syntaxError("INI", number, EXPECTED_CLOSING_BRACKET)
                 section = splitDottedKey(line.substring(1, line.length - 1)) ?: throw syntaxError("INI", number, "invalid section name")
                 return@forEachIndexed
             }
-            val equals = line.indexOf('=')
-            val colon = line.indexOf(':')
-            val separator = if (equals < 0 || (colon >= 0 && colon < equals)) colon else equals
-            if (separator < 0) throw syntaxError("INI", number, "expected \"key = value\"")
-            val key = splitDottedKey(line.substring(0, separator)) ?: throw syntaxError("INI", number, "invalid key")
+            val separator = iniSeparatorIndex(line)
+            if (separator < 0) throw syntaxError("INI", number, EXPECTED_KEY_VALUE)
+            val key = splitDottedKey(line.substring(0, separator)) ?: throw syntaxError("INI", number, INVALID_KEY)
             val value = unquotedOrTypedValue(line.substring(separator + 1))
-            if (!setValueAtPath(root, section + key, value)) throw syntaxError("INI", number, "key conflicts with an existing value")
+            if (!setValueAtPath(root, section + key, value)) throw syntaxError("INI", number, KEY_CONFLICT)
         }
         return arraysFromNumericKeys(root)
+    }
+
+    /** [EN] The first '=' or ':' of an INI line, -1 without one. [CN] INI 行中第一个 '=' 或 ':'，没有时为 -1。 */
+    private fun iniSeparatorIndex(line: String): Int {
+        val equals = line.indexOf('=')
+        val colon = line.indexOf(':')
+        return if (equals < 0 || (colon >= 0 && colon < equals)) colon else equals
     }
 
     private fun unescaped(text: String): String {
@@ -1198,7 +1226,7 @@ private object CYLFlatFormats {
         val dotted = key.replace("__", ".")
         val path = if (dotted.contains('"')) splitDottedKey(dotted) else dotted.split('.')
         if (path.isNullOrEmpty() || path.size > CYLTabBarConfigurationMaximumDepth || path.any { it.isEmpty() }) {
-            throw syntaxError("Properties", number, "invalid key")
+            throw syntaxError("Properties", number, INVALID_KEY)
         }
         return path
     }
@@ -1218,17 +1246,22 @@ private object CYLFlatFormats {
                 index++
                 line = line.substring(0, line.length - 1) + trimmed(all[index])
             }
-            if (line.startsWith("export ")) line = trimmed(line.substring(7))
-            val separator = separatorIndex(line)
-            if (separator < 0) throw syntaxError("Properties", number, "expected \"key = value\"")
-            val key = unescaped(line.substring(0, separator))
-            var rest = trimSpaces(line.substring(separator))
-            if (rest.startsWith("=") || rest.startsWith(":")) rest = trimSpaces(rest.substring(1))
-            val value = if (rest.length >= 2 && (rest.startsWith("\"") || rest.startsWith("'"))) unquotedOrTypedValue(rest) else typedScalar(unescaped(rest), false)
-            if (!setValueAtPath(root, propertiesPath(key, number), value)) throw syntaxError("Properties", number, "key conflicts with an existing value")
+            setProperty(root, line, number)
             index++
         }
         return arraysFromNumericKeys(root)
+    }
+
+    /** [EN] One `key = value` line (continuations joined) of a properties or dotenv file. [CN] properties 或 dotenv 文件中的一行 `key = value`（已合并续行）。 */
+    private fun setProperty(root: MutableMap<String, Any?>, logicalLine: String, number: Int) {
+        val line = if (logicalLine.startsWith("export ")) trimmed(logicalLine.substring(7)) else logicalLine
+        val separator = separatorIndex(line)
+        if (separator < 0) throw syntaxError("Properties", number, EXPECTED_KEY_VALUE)
+        val key = unescaped(line.substring(0, separator))
+        var rest = trimSpaces(line.substring(separator))
+        if (rest.startsWith("=") || rest.startsWith(":")) rest = trimSpaces(rest.substring(1))
+        val value = if (rest.length >= 2 && (rest.startsWith("\"") || rest.startsWith("'"))) unquotedOrTypedValue(rest) else typedScalar(unescaped(rest), false)
+        if (!setValueAtPath(root, propertiesPath(key, number), value)) throw syntaxError("Properties", number, KEY_CONFLICT)
     }
 }
 
@@ -1284,15 +1317,15 @@ private object CYLXMLFormat {
         } catch (error: CYLXMLTooDeep) {
             throw tooDeepError("XML")
         } catch (error: org.xml.sax.SAXParseException) {
-            throw syntaxError("XML", error.lineNumber.coerceAtLeast(0), error.message ?: "invalid XML")
+            throw syntaxError("XML", error.lineNumber.coerceAtLeast(0), error.message ?: INVALID_XML)
         } catch (error: SAXException) {
-            throw syntaxError("XML", 0, error.message ?: "invalid XML")
+            throw syntaxError("XML", 0, error.message ?: INVALID_XML)
         } catch (error: java.io.IOException) {
-            throw syntaxError("XML", 0, error.message ?: "invalid XML")
+            throw syntaxError("XML", 0, error.message ?: INVALID_XML)
         } catch (error: javax.xml.parsers.ParserConfigurationException) {
             throw syntaxError("XML", 0, error.message ?: "no XML parser")
         }
-        val root = builder.root ?: throw syntaxError("XML", 0, "invalid XML")
+        val root = builder.root ?: throw syntaxError("XML", 0, INVALID_XML)
         val value = value(root)
         if (value is Map<*, *>) return value
         throw configurationError(CYLTabBarConfigurationErrorCode.NotADictionary, "XML configuration: the root element must contain elements")
@@ -1329,7 +1362,7 @@ private class CYLTextProtoParser(private val text: String) {
     private fun currentLine(): Int = 1 + (0 until minOf(index, text.length)).count { text[it] == '\n' }
 
     private fun fail(reason: String) {
-        if (error == null) error = syntaxError("Protobuf text", currentLine(), reason)
+        if (error == null) error = syntaxError(FORMAT_PROTOBUF_TEXT, currentLine(), reason)
     }
 
     private fun atEnd() = index >= text.length
@@ -1352,7 +1385,7 @@ private class CYLTextProtoParser(private val text: String) {
         if (peek() == '[') {
             val end = text.indexOf(']', index)
             if (end < 0) {
-                fail("expected ']'")
+                fail(EXPECTED_CLOSING_BRACKET)
                 return null
             }
             val name = text.substring(index + 1, end)
@@ -1401,7 +1434,7 @@ private class CYLTextProtoParser(private val text: String) {
                 val count = if (e == 'u') 4 else 8
                 val character = StringBuilder()
                 if (index + count > text.length || !appendUnicodeEscape(character, text.substring(index, index + count))) {
-                    fail("invalid unicode escape")
+                    fail(INVALID_UNICODE_ESCAPE)
                     return false
                 }
                 index += count
@@ -1436,7 +1469,7 @@ private class CYLTextProtoParser(private val text: String) {
             }
             if (!appendEscape(bytes)) return null
         }
-        fail("unterminated string")
+        fail(UNTERMINATED_STRING)
         return null
     }
 
@@ -1461,19 +1494,24 @@ private class CYLTextProtoParser(private val text: String) {
             fail("expected a value")
             return null
         }
-        if (token == "true" || token == "True" || token == "t") return true
-        if (token == "false" || token == "False" || token == "f") return false
-        var numeric = token
-        if (numeric.length > 1 && (numeric.endsWith("f") || numeric.endsWith("F")) && !numeric.startsWith("0x") && !numeric.startsWith("0X")) {
-            numeric = numeric.substring(0, numeric.length - 1)
+        return protobufScalarToken(token)
+    }
+
+    /** [EN] true / false (True, t...), a number (a float suffix f allowed), or the identifier itself (an enum value). [CN] true / false（True、t……）、数字（允许浮点后缀 f），或标识符本身（枚举值）。 */
+    private fun protobufScalarToken(token: String): Any = when (token) {
+        "true", "True", "t" -> true
+        "false", "False", "f" -> false
+        else -> {
+            val hex = token.startsWith("0x") || token.startsWith("0X")
+            val numeric = if (token.length > 1 && (token.endsWith("f") || token.endsWith("F")) && !hex) token.dropLast(1) else token
+            numberFromString(numeric, false) ?: token
         }
-        return numberFromString(numeric, false) ?: token
     }
 
     private fun parseValue(): Any? {
         depth++
         if (depth > CYLTabBarConfigurationMaximumDepth) {
-            if (error == null) error = tooDeepError("Protobuf text")
+            if (error == null) error = tooDeepError(FORMAT_PROTOBUF_TEXT)
             depth--
             return null
         }
@@ -1541,19 +1579,29 @@ private class CYLTextProtoParser(private val text: String) {
             }
             if (terminator != 0.toChar() && peek() == terminator) break
             val name = parseName() ?: return null
-            skipSpaceAndComments()
-            if (peek() == ':') {
-                index++
-                skipSpaceAndComments()
-            } else if (peek() != '{' && peek() != '<') {
-                fail("expected ':' or '{' after \"$name\"")
-                return null
-            }
+            if (!skipFieldSeparator(name)) return null
             addField(message, repeated, name, parseValue() ?: return null)
             skipSpaceAndComments()
             if (peek() == ',' || peek() == ';') index++
         }
         return if (error != null) null else message
+    }
+
+    /** [EN] The ':' after a field name (optional before a message); false, with the error set, when missing. [CN] 字段名后的 ':'（消息前可省略）；缺少时设置错误并返回 false。 */
+    private fun skipFieldSeparator(name: String): Boolean {
+        skipSpaceAndComments()
+        when (peek()) {
+            ':' -> {
+                index++
+                skipSpaceAndComments()
+            }
+            '{', '<' -> Unit
+            else -> {
+                fail("expected ':' or '{' after \"$name\"")
+                return false
+            }
+        }
+        return true
     }
 }
 
@@ -1620,18 +1668,20 @@ private class CYLProtobufReader(private val bytes: ByteArray) {
             if (key ushr 3 == 0L) return null
             val number = key ushr 3
             val field = if (number <= Int.MAX_VALUE) fields[number.toInt()] else null
-            when ((key and 7).toInt()) {
-                0 -> varint(cursor, end) ?: return null
-                1, 5 -> {
-                    val size = if ((key and 7).toInt() == 1) 8 else 4
-                    if (cursor.index + size > end) return null
-                    cursor.index += size
-                }
-                2 -> if (!lengthDelimited(cursor, end, field, message)) return null
-                else -> return null
-            }
+            if (!skipOrReadField((key and 7).toInt(), cursor, end, field, message)) return null
         }
         return message
+    }
+
+    /** [EN] One field by its wire type: varints and fixed sizes are skipped, length-delimited ones read; false when broken. [CN] 按线路类型处理一个字段：跳过 varint 与定长字段，读取长度分隔字段；损坏时返回 false。 */
+    private fun skipOrReadField(wireType: Int, cursor: CYLCursor, end: Int, field: Pair<String, String>?, message: MutableMap<String, Any?>): Boolean = when (wireType) {
+        0 -> varint(cursor, end) != null
+        1, 5 -> {
+            val size = if (wireType == 1) 8 else 4
+            (cursor.index + size <= end).also { if (it) cursor.index += size }
+        }
+        2 -> lengthDelimited(cursor, end, field, message)
+        else -> false
     }
 
     private fun lengthDelimited(cursor: CYLCursor, end: Int, field: Pair<String, String>?, message: MutableMap<String, Any?>): Boolean {
@@ -1646,9 +1696,8 @@ private class CYLProtobufReader(private val bytes: ByteArray) {
             kind == "map" -> {
                 val entry = message(payloadStart, payloadEnd, "CYLMapEntry") ?: return false
                 @Suppress("UNCHECKED_CAST")
-                val map = (message[name] as? MutableMap<String, Any?>) ?: LinkedHashMap()
-                map[(entry["key"] as? String) ?: ""] = entry["value"] ?: ""
-                message[name] = map
+                val map = (message[name] as? Map<String, Any?>).orEmpty()
+                message[name] = map + (((entry["key"] as? String) ?: "") to (entry["value"] ?: ""))
             }
             kind.startsWith("repeated:") -> {
                 val element = message(payloadStart, payloadEnd, kind.removePrefix("repeated:")) ?: return false
@@ -1727,20 +1776,26 @@ private class CYLBinaryPropertyList(private val bytes: ByteArray) {
         while (stack.isNotEmpty()) {
             val (objectIndex, depth) = stack.removeLast()
             visits++
-            if (visits > 100_000 || objectIndex !in 0 until objectCount) return false
-            val offset = objectOffset(objectIndex)
-            if (offset !in 0 until tableOffset) return false
-            val type = (bytes[offset.toInt()].toInt() and 0xFF) shr 4
-            if (type != 0xA && type != 0xC && type != 0xD) continue
-            if (depth > CYLTabBarConfigurationMaximumDepth) {
-                tooDeep = true
-                return false
-            }
-            val (count, position) = countAndPosition(offset) ?: return false
-            val references = if (type == 0xD) count * 2 else count
-            if (count > objectCount || references > (tableOffset - position) / referenceSize || stack.size + references > 200_000) return false
-            for (i in 0 until references) stack.addLast(readBigEndian(position + i * referenceSize, referenceSize) to depth + 1)
+            if (visits > 100_000 || !pushChildren(objectIndex, depth, stack)) return false
         }
+        return true
+    }
+
+    /** [EN] Checks one object and pushes the objects an array, set or dictionary refers to; false when unsafe. [CN] 检查一个对象，并压入数组、集合或字典引用的对象；不安全时返回 false。 */
+    private fun pushChildren(objectIndex: Long, depth: Int, stack: ArrayDeque<Pair<Long, Int>>): Boolean {
+        if (objectIndex !in 0 until objectCount) return false
+        val offset = objectOffset(objectIndex)
+        if (offset !in 0 until tableOffset) return false
+        val type = (bytes[offset.toInt()].toInt() and 0xFF) shr 4
+        if (type != 0xA && type != 0xC && type != 0xD) return true
+        if (depth > CYLTabBarConfigurationMaximumDepth) {
+            tooDeep = true
+            return false
+        }
+        val (count, position) = countAndPosition(offset) ?: return false
+        val references = if (type == 0xD) count * 2 else count
+        if (count > objectCount || references > (tableOffset - position) / referenceSize || stack.size + references > 200_000) return false
+        for (i in 0 until references) stack.addLast(readBigEndian(position + i * referenceSize, referenceSize) to depth + 1)
         return true
     }
 
@@ -1748,7 +1803,7 @@ private class CYLBinaryPropertyList(private val bytes: ByteArray) {
     fun decode(): Any? = try {
         value(topObject)
     } catch (error: IndexOutOfBoundsException) {
-        throw syntaxError("Property List", 0, "invalid binary property list structure")
+        throw syntaxError(FORMAT_PROPERTY_LIST, 0, "invalid binary property list structure")
     }
 
     private fun references(position: Long, count: Long): List<Long> = (0 until count).map { readBigEndian(position + it * referenceSize, referenceSize) }
@@ -1769,7 +1824,7 @@ private class CYLBinaryPropertyList(private val bytes: ByteArray) {
             0x8 -> mapOf("CF\$UID" to readBigEndian(offset + 1, low + 1))
             0xA, 0xC -> countAndPosition(offset)?.let { (count, position) -> ArrayList(references(position, count).map { value(it) }) }
             0xD -> countAndPosition(offset)?.let { (count, position) -> dictionary(position, count) }
-            else -> throw syntaxError("Property List", 0, "unknown binary property list object")
+            else -> throw syntaxError(FORMAT_PROPERTY_LIST, 0, "unknown binary property list object")
         }
     }
 
@@ -1804,11 +1859,11 @@ private object CYLXMLPropertyList {
         val document = try {
             builder.parse(InputSource(StringReader(text)))
         } catch (error: SAXException) {
-            throw syntaxError("Property List", 0, error.message ?: "invalid property list")
+            throw syntaxError(FORMAT_PROPERTY_LIST, 0, error.message ?: INVALID_PROPERTY_LIST)
         }
         val root = document.documentElement
         val element = if (root.tagName == "plist") children(root).firstOrNull() else root
-        return element?.let { value(it) } ?: throw syntaxError("Property List", 0, "invalid property list")
+        return element?.let { value(it) } ?: throw syntaxError(FORMAT_PROPERTY_LIST, 0, INVALID_PROPERTY_LIST)
     }
 
     private fun children(node: Node): List<Element> = (0 until node.childNodes.length).mapNotNull { node.childNodes.item(it) as? Element }
@@ -1819,7 +1874,7 @@ private object CYLXMLPropertyList {
             val elements = children(element)
             var i = 0
             while (i + 1 < elements.size) {
-                if (elements[i].tagName != "key") throw syntaxError("Property List", 0, "expected <key> in <dict>")
+                if (elements[i].tagName != "key") throw syntaxError(FORMAT_PROPERTY_LIST, 0, "expected <key> in <dict>")
                 map[elements[i].textContent] = value(elements[i + 1])
                 i += 2
             }
@@ -1827,22 +1882,22 @@ private object CYLXMLPropertyList {
         }
         "array" -> ArrayList(children(element).map { value(it) })
         "string" -> element.textContent
-        "integer" -> element.textContent.trim().let { it.toLongOrNull() ?: it.toDoubleOrNull() ?: throw syntaxError("Property List", 0, "invalid <integer>") }
-        "real" -> element.textContent.trim().toDoubleOrNull() ?: throw syntaxError("Property List", 0, "invalid <real>")
+        "integer" -> element.textContent.trim().let { it.toLongOrNull() ?: it.toDoubleOrNull() ?: throw syntaxError(FORMAT_PROPERTY_LIST, 0, "invalid <integer>") }
+        "real" -> element.textContent.trim().toDoubleOrNull() ?: throw syntaxError(FORMAT_PROPERTY_LIST, 0, "invalid <real>")
         "true" -> true
         "false" -> false
         "date" -> date(element.textContent.trim())
         "data" -> base64(element.textContent)
-        else -> throw syntaxError("Property List", 0, "unknown element <${element.tagName}>")
+        else -> throw syntaxError(FORMAT_PROPERTY_LIST, 0, "unknown element <${element.tagName}>")
     }
 
     private fun date(text: String): java.util.Date {
         val format = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
         format.timeZone = java.util.TimeZone.getTimeZone("UTC")
         return try {
-            format.parse(text) ?: throw syntaxError("Property List", 0, "invalid <date>")
+            format.parse(text) ?: throw syntaxError(FORMAT_PROPERTY_LIST, 0, "invalid <date>")
         } catch (error: java.text.ParseException) {
-            throw syntaxError("Property List", 0, "invalid <date>")
+            throw syntaxError(FORMAT_PROPERTY_LIST, 0, "invalid <date>")
         }
     }
 
@@ -1870,7 +1925,7 @@ private object CYLXMLPropertyList {
 private class CYLOpenStepParser(private val text: String) {
     private var index = 0
 
-    private fun fail(reason: String): Nothing = throw syntaxError("Property List", 0, reason)
+    private fun fail(reason: String): Nothing = throw syntaxError(FORMAT_PROPERTY_LIST, 0, reason)
 
     private fun atEnd() = index >= text.length
 
@@ -1929,7 +1984,7 @@ private class CYLOpenStepParser(private val text: String) {
             if (atEnd()) break
             escape(output)
         }
-        fail("unterminated string")
+        fail(UNTERMINATED_STRING)
     }
 
     private fun escape(output: StringBuilder) {
@@ -1943,7 +1998,7 @@ private class CYLOpenStepParser(private val text: String) {
             }
             e == 'U' -> {
                 val end = minOf(index + 4, text.length)
-                if (!appendUnicodeEscape(output, text.substring(index, end))) fail("invalid unicode escape")
+                if (!appendUnicodeEscape(output, text.substring(index, end))) fail(INVALID_UNICODE_ESCAPE)
                 index = end
             }
             else -> output.append(when (e) { 'n' -> '\n'; 't' -> '\t'; 'r' -> '\r'; 'a' -> '\u0007'; 'b' -> '\b'; 'f' -> '\u000C'; 'v' -> '\u000B'; else -> e })
@@ -1969,7 +2024,7 @@ private class CYLOpenStepParser(private val text: String) {
         val list = ArrayList<Any?>()
         while (true) {
             skipSpaceAndComments()
-            if (atEnd()) fail("unterminated array")
+            if (atEnd()) fail(UNTERMINATED_ARRAY)
             if (text[index] == ')') { index++; return list }
             list += value()
             skipSpaceAndComments()
@@ -1985,19 +2040,28 @@ private class CYLOpenStepParser(private val text: String) {
             if (atEnd()) fail("unterminated dictionary")
             if (text[index] == '}') { index++; return map }
             val key = value() as? String ?: fail("a key must be a string")
-            skipSpaceAndComments()
-            if (!atEnd() && text[index] == ';') {
-                // [EN] A .strings entry "key"; means key = key. [CN] .strings 的 "key"; 表示 key = key。
-                index++
-                map[key] = key
-                continue
-            }
-            if (atEnd() || text[index] != '=') fail("expected '='")
-            index++
-            map[key] = value()
-            skipSpaceAndComments()
-            if (!atEnd() && text[index] == ';') index++ else if (atEnd() || text[index] != '}') fail("expected ';'")
+            map[key] = entryValue(key)
         }
+    }
+
+    private fun isAt(c: Char) = !atEnd() && text[index] == c
+
+    /** [EN] The value after a key: `= value;`, or the key itself for a .strings entry `"key";`. [CN] 键之后的值：`= value;`，或 .strings 条目 `"key";` 的键本身。 */
+    private fun entryValue(key: String): Any? {
+        skipSpaceAndComments()
+        if (isAt(';')) {
+            index++
+            return key
+        }
+        if (!isAt('=')) fail("expected '='")
+        index++
+        val value = value()
+        skipSpaceAndComments()
+        when {
+            isAt(';') -> index++
+            !isAt('}') -> fail("expected ';'")
+        }
+        return value
     }
 }
 
@@ -2009,7 +2073,7 @@ private object CYLPropertyList {
             plist.isSafe()
             return plist.decode()
         }
-        val source = text ?: throw syntaxError("Property List", 0, "the file is not UTF-8 text")
+        val source = text ?: throw syntaxError(FORMAT_PROPERTY_LIST, 0, "the file is not UTF-8 text")
         if (trimmed(source).startsWith("<")) return CYLXMLPropertyList.parse(source)
         return CYLOpenStepParser(source).parseDocument()
     }
@@ -2083,13 +2147,13 @@ object CYLTabBarConfigurationParser {
     fun nameOfFormat(format: CYLTabBarConfigurationFormat): String = when (format) {
         CYLTabBarConfigurationFormat.JSON -> "JSON"
         CYLTabBarConfigurationFormat.JSON5 -> "JSON5"
-        CYLTabBarConfigurationFormat.PropertyList -> "Property List"
+        CYLTabBarConfigurationFormat.PropertyList -> FORMAT_PROPERTY_LIST
         CYLTabBarConfigurationFormat.YAML -> "YAML"
         CYLTabBarConfigurationFormat.TOML -> "TOML"
         CYLTabBarConfigurationFormat.INI -> "INI"
         CYLTabBarConfigurationFormat.Properties -> "Properties"
         CYLTabBarConfigurationFormat.XML -> "XML"
-        CYLTabBarConfigurationFormat.ProtobufText -> "Protobuf text"
+        CYLTabBarConfigurationFormat.ProtobufText -> FORMAT_PROTOBUF_TEXT
         CYLTabBarConfigurationFormat.Protobuf -> "Protobuf"
         CYLTabBarConfigurationFormat.Unknown -> "Unknown"
     }
@@ -2125,17 +2189,18 @@ object CYLTabBarConfigurationParser {
             val isPlist = content.contains("<plist") || content.contains("DOCTYPE plist")
             return if (isPlist) CYLTabBarConfigurationFormat.PropertyList else CYLTabBarConfigurationFormat.XML
         }
-        for (candidate in sniffCandidates(content)) {
-            // [EN] Plain text is a valid YAML scalar, not a configuration. [CN] 纯文本是合法的 YAML 标量，但不是配置。
-            if (candidate == CYLTabBarConfigurationFormat.YAML && !content.contains(':')) continue
-            try {
-                parseData(utf8, candidate)
-                return candidate
-            } catch (error: CYLTabBarConfigurationException) {
-                if (error.code == CYLTabBarConfigurationErrorCode.TooDeep) return candidate
-            }
-        }
-        return CYLTabBarConfigurationFormat.Unknown
+        // [EN] Plain text is a valid YAML scalar, not a configuration. [CN] 纯文本是合法的 YAML 标量，但不是配置。
+        return sniffCandidates(content).firstOrNull { candidate ->
+            (candidate != CYLTabBarConfigurationFormat.YAML || content.contains(':')) && readsAs(utf8, candidate)
+        } ?: CYLTabBarConfigurationFormat.Unknown
+    }
+
+    /** [EN] Whether `data` reads as `format` (too deep counts: the format is right). [CN] `data` 能否按 `format` 读取（过深也算：格式正确）。 */
+    private fun readsAs(data: ByteArray, format: CYLTabBarConfigurationFormat): Boolean = try {
+        parseData(data, format)
+        true
+    } catch (error: CYLTabBarConfigurationException) {
+        error.code == CYLTabBarConfigurationErrorCode.TooDeep
     }
 
     /**
@@ -2233,16 +2298,16 @@ object CYLTabBarConfigurationParser {
                 throw syntaxError(formatName, 0, error.message?.removePrefix("JSON configuration: ") ?: "invalid JSON")
             }
         }
-        CYLTabBarConfigurationFormat.YAML -> CYLYAMLParser(text).let { parser -> parser.parse() ?: throw (parser.error ?: syntaxError(formatName, 0, "invalid content")) }
+        CYLTabBarConfigurationFormat.YAML -> CYLYAMLParser(text).let { parser -> parser.parse() ?: throw (parser.error ?: syntaxError(formatName, 0, INVALID_CONTENT)) }
         CYLTabBarConfigurationFormat.TOML -> CYLTOMLParser(text.replace("\r\n", "\n").replace('\r', '\n')).let { parser ->
-            parser.parse() ?: throw (parser.error ?: syntaxError(formatName, 0, "invalid content"))
+            parser.parse() ?: throw (parser.error ?: syntaxError(formatName, 0, INVALID_CONTENT))
         }
         CYLTabBarConfigurationFormat.INI -> CYLFlatFormats.ini(text)
         CYLTabBarConfigurationFormat.Properties -> CYLFlatFormats.properties(text)
         CYLTabBarConfigurationFormat.ProtobufText -> CYLTextProtoParser(text).let { parser ->
-            parser.parseFieldsUntil(0.toChar()) ?: throw (parser.error ?: syntaxError(formatName, 0, "invalid content"))
+            parser.parseFieldsUntil(0.toChar()) ?: throw (parser.error ?: syntaxError(formatName, 0, INVALID_CONTENT))
         }
-        else -> throw syntaxError(formatName, 0, "invalid content")
+        else -> throw syntaxError(formatName, 0, INVALID_CONTENT)
     }
 
     private fun propertyList(data: ByteArray, text: String?, formatName: String): Any? {
@@ -2265,7 +2330,7 @@ object CYLTabBarConfigurationParser {
             try {
                 CYLOpenStepParser("{\n$text\n}").parseDocument()
             } catch (ignored: CYLTabBarConfigurationException) {
-                throw syntaxError(formatName, 0, error.message?.removePrefix("Property List configuration: ") ?: "invalid property list")
+                throw syntaxError(formatName, 0, error.message?.removePrefix("$FORMAT_PROPERTY_LIST configuration: ") ?: INVALID_PROPERTY_LIST)
             }
         }
     }

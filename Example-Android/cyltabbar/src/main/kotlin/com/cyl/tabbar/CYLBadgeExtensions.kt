@@ -1,5 +1,6 @@
 // [EN] The method names are the iOS names on purpose (`cyl_…`), see docs/Android-API-Map.md. [CN] 方法名刻意沿用 iOS 名称（`cyl_…`），见 docs/Android-API-Map.md。
-@file:Suppress("FunctionName", "kotlin:S100")
+// [EN] kotlin:S1133: the deprecated members are the twins of deprecated iOS API, kept until iOS removes them. [CN] kotlin:S1133：已废弃的成员与 iOS 已废弃的 API 对应，在 iOS 移除前保留。
+@file:Suppress("FunctionName", "kotlin:S100", "kotlin:S1133")
 
 package com.cyl.tabbar
 
@@ -37,6 +38,8 @@ import androidx.fragment.app.Fragment
  *      built-in default. Badges shown later use the new defaults.
  * [CN] `CYLBadgeAppearance`（#425）：App 级默认角标样式。视图上设置的值优先于它，它优先于内置默认值。之后显示的角标使用新的默认值。
  */
+// [EN] kotlin:S6515: a class with one shared instance on purpose, as iOS `+[CYLBadgeAppearance appearance]`; the instance type stays public API. [CN] kotlin:S6515：刻意为只有一个共享实例的类，与 iOS `+[CYLBadgeAppearance appearance]` 相同；实例类型是公开 API。
+@Suppress("kotlin:S6515")
 class CYLBadgeAppearance private constructor() {
     /** [EN] Background color, red by default (`reset()` restores it). [CN] 背景色，默认红色（`reset()` 恢复）。 */
     @ColorInt var backgroundColor: Int = Color.RED
@@ -284,6 +287,13 @@ fun ImageView.cyl_showBadgeForRow(row: Int) {
     (parent as? ViewGroup)?.clipChildren = false
     cyl_clearBadge()
     cyl_resetBadgeAppearance()
+    applyBadgeSample(sample)
+    cyl_showBadgeValue(sample.value, if (sample.repeats == 0) sample.animationType else CYLEnums.CYLBadgeAnimationType.None)
+    if (sample.repeats != 0) repeatBadgeSampleAnimation(sample)
+}
+
+/** [EN] The appearance options of a sample row. [CN] 示例行的外观选项。 */
+private fun ImageView.applyBadgeSample(sample: CYLBadgeSample) {
     if (sample.colors) { cyl_badgeBackgroundColor = Color.rgb(128, 0, 128); cyl_badgeTextColor = Color.YELLOW }
     if (sample.font) cyl_badgeFont = CYLFont(12f, Typeface.create(Typeface.DEFAULT, Typeface.ITALIC))
     if (sample.border) {
@@ -300,17 +310,17 @@ fun ImageView.cyl_showBadgeForRow(row: Int) {
     sample.cornerRadius?.let { cyl_badgeCornerRadius = it }
     sample.maximum?.let { cyl_badgeMaximumBadgeNumber = it }
     cyl_badgeRespectsReduceMotion = sample.reduceMotion
-    cyl_showBadgeValue(sample.value, if (sample.repeats == 0) sample.animationType else CYLEnums.CYLBadgeAnimationType.None)
-    if (sample.repeats != 0) {
-        // [EN] The CAAnimation factory samples: the same animation, repeated a few times or forever. [CN] CAAnimation 工厂示例：同一动画重复几次或一直重复。
-        val badge = cyl_badge ?: return
-        var left = sample.repeats
-        fun again() {
-            badge.play(sample.animationType)
-            if (left < 0 || --left > 0) badge.postDelayed({ if (badge.isAttachedToWindow) again() }, 1000)
-        }
-        again()
+}
+
+/** [EN] The CAAnimation factory samples: the same animation, repeated a few times or forever. [CN] CAAnimation 工厂示例：同一动画重复几次或一直重复。 */
+private fun ImageView.repeatBadgeSampleAnimation(sample: CYLBadgeSample) {
+    val badge = cyl_badge ?: return
+    var left = sample.repeats
+    fun again() {
+        badge.play(sample.animationType)
+        if (left < 0 || --left > 0) badge.postDelayed({ if (badge.isAttachedToWindow) again() }, 1000)
     }
+    again()
 }
 
 /** [EN] `-cyl_wrapsTextLabels`: the row's texts wrap onto as many lines as they need, never ellipsized. [CN] 行中的文字按需换行，不省略。 */

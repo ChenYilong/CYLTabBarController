@@ -256,7 +256,8 @@ object DemoConfiguration {
         },
         EdgeCase("D3", "HTTP 404") { finish -> fromURL("https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/no_such_configuration.json", 15.0, finish) },
         EdgeCase("D4", "Unknown host") { finish -> fromURL("https://configuration.cyltabbarcontroller.invalid/tabbar.json", 15.0, finish) },
-        EdgeCase("D5", "Server timeout (3 s)") { finish -> fromURL("https://10.255.255.1/tabbar.json", 3.0, finish) },
+        // [EN] 10.255.255.1 is not routed, so the request can only time out (the same address as the iOS case). [CN] 10.255.255.1 不可路由，请求只会超时（与 iOS 用例相同的地址）。
+        EdgeCase("D5", "Server timeout (3 s)") { finish -> fromURL("https://10.255.255.1/tabbar.json", 3.0, finish) }, // NOSONAR kotlin:S1313: a deliberately unreachable address
         EdgeCase("D10", "Request cancelled") { finish ->
             // [EN] Android's loader returns no task to cancel: the caller drops the result, which is what a cancelled request gives. [CN] Android 的加载方法不返回可取消的任务：调用方丢弃结果，与取消请求的效果相同。
             var cancelled = false

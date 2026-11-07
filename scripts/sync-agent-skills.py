@@ -146,11 +146,11 @@ def coverage_problems():
     """[EN] A new document or demo must reach the project skills, so a new project can be started from them.
     [CN] 新文档或新 Demo 必须写入项目 skill，这样才能基于 skill 创建新项目。"""
     problems = []
-    api_map = (SKILLS / "cyl-api-map" / "SKILL.md").read_text(encoding="utf-8")
+    api_map = (SKILLS / "cyl-api-map" / SKILL_FILE).read_text(encoding="utf-8")
     for document in sorted((ROOT / "docs").glob("*.md")):
         if document.name != "README.md" and not ignored(document.name) and "docs/%s)" % document.name not in api_map:
             problems.append("docs/%s: no row in the cyl-api-map skill" % document.name)
-    new_project = (SKILLS / "cyl-new-project" / "SKILL.md").read_text(encoding="utf-8")
+    new_project = (SKILLS / "cyl-new-project" / SKILL_FILE).read_text(encoding="utf-8")
     output = subprocess.check_output(["git", "-C", str(ROOT), "ls-files", "-z", "Example*"], text=True)
     for demo in sorted({path.split("/")[0] for path in output.split("\0") if "/" in path}):
         if "`%s`" % demo not in new_project and "`%s/`" % demo not in new_project:

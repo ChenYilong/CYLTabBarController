@@ -1,5 +1,6 @@
 // [EN] The method names are the iOS names on purpose (`cyl_…`), see docs/Android-API-Map.md. [CN] 方法名刻意沿用 iOS 名称（`cyl_…`），见 docs/Android-API-Map.md。
-@file:Suppress("FunctionName", "kotlin:S100")
+// [EN] kotlin:S117: the `cyl_…` property names are the iOS names, like the methods. [CN] kotlin:S117：`cyl_…` 属性名与方法一样沿用 iOS 名称。
+@file:Suppress("FunctionName", "kotlin:S100", "kotlin:S117")
 
 package com.cyl.tabbar
 
@@ -190,7 +191,7 @@ class CYLThemeEffect private constructor(private val managerName: Any, private v
 // MARK: - Views 视图
 
 /** [EN] A view or a page that wants to know about theme changes (the overridable `-cyl_themeDidChangeByManager:…`). [CN] 需要知道主题变化的视图或页面（可重写的 `-cyl_themeDidChangeByManager:…`）。 */
-interface CYLThemeChangeObserving {
+fun interface CYLThemeChangeObserving {
     fun cyl_themeDidChangeByManager(manager: CYLThemeManager?, identifier: Any?, theme: Any?)
 }
 

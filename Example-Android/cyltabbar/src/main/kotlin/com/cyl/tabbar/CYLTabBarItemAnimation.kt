@@ -279,7 +279,7 @@ interface CYLTabBarItemAnimationPlayableView {
 }
 
 /** [EN] `CYLTabBarItemAnimationViewProviding`: makes playable views for `CYLTabBarItemViewAnimator`. [CN] 为 `CYLTabBarItemViewAnimator` 创建可播放视图。 */
-interface CYLTabBarItemAnimationViewProviding {
+fun interface CYLTabBarItemAnimationViewProviding {
     /** [EN] A view for `fileURL` with the `options` of the tab's URL; null when it cannot be made. [CN] `fileURL` 的视图（带 Tab URL 中的选项）；无法创建时为 null。 */
     fun cyl_animationViewWithFileURL(context: Context, fileURL: String, options: Map<String, String>, contentMode: ImageView.ScaleType): View?
 }
@@ -341,6 +341,9 @@ open class CYLTabBarItemViewAnimator(
  * [CN] 打开 Tab 的动画文件：`http(s)` URL（下载一次到缓存）、`file:` URL 或绝对路径、`file:///android_asset/…`、`asset:…`、
  *      `android.resource:` / `content:` URI，或 App assets 中的文件名。对加载路径的动画库（PAG）返回本地文件，对其他（Lottie、Rive）返回流。
  */
+/** [EN] The URL prefix of a file in the app's assets. [CN] App assets 中文件的 URL 前缀。 */
+private const val ANDROID_ASSET_PREFIX = "file:///android_asset/"
+
 object CYLTabBarItemAnimationFiles {
     private val executor = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -349,7 +352,7 @@ object CYLTabBarItemAnimationFiles {
 
     /** [EN] The asset name of `url`, or null when it is not an asset. [CN] `url` 对应的 asset 名称；不是 asset 时为 null。 */
     fun assetName(url: String): String? = when {
-        url.startsWith("file:///android_asset/") -> url.removePrefix("file:///android_asset/")
+        url.startsWith(ANDROID_ASSET_PREFIX) -> url.removePrefix(ANDROID_ASSET_PREFIX)
         url.startsWith("asset:///") -> url.removePrefix("asset:///")
         url.startsWith("asset:") -> url.removePrefix("asset:")
         url.contains(':') || url.startsWith("/") -> null
@@ -370,7 +373,7 @@ object CYLTabBarItemAnimationFiles {
     /** [EN] A local file of `url` (copied to the cache when it is an asset, a stream or remote), delivered on the main thread. [CN] `url` 的本地文件（asset、流或远程文件会复制到缓存），在主线程回调。 */
     fun localFile(context: Context, url: String, completion: (File?) -> Unit) {
         if (url.startsWith("/") && File(url).exists()) return completion(File(url))
-        if (url.startsWith("file:") && !url.startsWith("file:///android_asset/")) return completion(Uri.parse(url).path?.let { File(it) }?.takeIf { it.exists() })
+        if (url.startsWith("file:") && !url.startsWith(ANDROID_ASSET_PREFIX)) return completion(Uri.parse(url).path?.let { File(it) }?.takeIf { it.exists() })
         val appContext = context.applicationContext
         executor.execute {
             val name = "cyl-animation-" + Integer.toHexString(url.hashCode()) + "." + CYLTabBarAnimationFileExtension(url).ifEmpty { "bin" }

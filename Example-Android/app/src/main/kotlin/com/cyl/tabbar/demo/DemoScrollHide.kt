@@ -218,14 +218,21 @@ object DemoScrollHide {
             if (!page.isAdded) return@later
             simulation.fire(page, controller) {
                 later(HOLD) {
-                    val visible = controller.tabBar.visibility == View.VISIBLE && !controller.cyl_isTabBarHiddenByScroll
-                    val pass = visible == simulation.expectsVisible
-                    completion((if (pass) "PASS" else "FAIL") + ": the bar is " + (if (visible) "shown" else "hidden") + ", expected " + (if (simulation.expectsVisible) "shown" else "hidden"))
+                    completion(verdict(controller, simulation))
                     if (!simulation.expectsVisible) controller.setTabBarHidden(false, true)
                 }
             }
         }
     }
+
+    /** [EN] "PASS" or "FAIL", with the state of the bar and the expected one. [CN] "PASS" 或 "FAIL"，以及 TabBar 的状态与预期状态。 */
+    private fun verdict(controller: CYLTabBarController, simulation: Simulation): String {
+        val visible = controller.tabBar.visibility == View.VISIBLE && !controller.cyl_isTabBarHiddenByScroll
+        val result = if (visible == simulation.expectsVisible) "PASS" else "FAIL"
+        return "$result: the bar is ${shownOrHidden(visible)}, expected ${shownOrHidden(simulation.expectsVisible)}"
+    }
+
+    private fun shownOrHidden(visible: Boolean) = if (visible) "shown" else "hidden"
 
     private fun selfTest(page: DemoListFragment, controller: CYLTabBarController) {
         val automatic = simulations.indices.filter { simulations[it].kind == Kind.Restore || simulations[it].kind == Kind.Keep }

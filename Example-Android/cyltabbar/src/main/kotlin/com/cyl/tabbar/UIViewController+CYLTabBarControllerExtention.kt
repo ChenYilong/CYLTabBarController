@@ -154,17 +154,29 @@ private fun Fragment.cyl_pushOrPop(viewController: Fragment, animated: Boolean, 
     callback(stack) { shouldPop, popTo, shouldSelect, index ->
         val root = cyl_rootTab(this)
         if (shouldPop && popTo != null) {
-            if (popTo === root) root.childFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-            else while (root.childFragmentManager.fragments.lastOrNull() !== popTo && root.childFragmentManager.backStackEntryCount > 0) root.childFragmentManager.popBackStackImmediate()
+            cyl_popTo(root, popTo)
             return@callback
         }
-        val controller = cyl_tabBarController
-        val target = if (identifier != null) controller?.cyl_indexOfTabBarItemIdentifier(identifier) ?: -1 else index
-        val tab = if (shouldSelect && controller != null && target in controller.viewControllers.indices) {
-            cyl_popSelectTabBarChildViewControllerAtIndex(target, animated)
-        } else root
+        val tab = if (shouldSelect) cyl_selectTabForPush(identifier, index, animated) else null
         (tab ?: root).cyl_pushViewController(viewController, animated)
     }
+}
+
+/** [EN] Pops the tab's stack back to `popTo` (the root pops everything). [CN] 把 Tab 的栈弹回 `popTo`（根页面则全部弹出）。 */
+private fun cyl_popTo(root: Fragment, popTo: Fragment) {
+    val manager = root.childFragmentManager
+    if (popTo === root) {
+        manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        return
+    }
+    while (manager.fragments.lastOrNull() !== popTo && manager.backStackEntryCount > 0) manager.popBackStackImmediate()
+}
+
+/** [EN] Selects the tab to push onto (by identifier, else by index); null when it does not exist. [CN] 选中要 push 的 Tab（按标识，否则按下标）；不存在时为 null。 */
+private fun Fragment.cyl_selectTabForPush(identifier: String?, index: Int, animated: Boolean): Fragment? {
+    val controller = cyl_tabBarController ?: return null
+    val target = if (identifier != null) controller.cyl_indexOfTabBarItemIdentifier(identifier) else index
+    return if (target in controller.viewControllers.indices) cyl_popSelectTabBarChildViewControllerAtIndex(target, animated) else null
 }
 
 /** [EN] `-cyl_handleNavigationBackAction`: pops the page's stack (to the root with `toRoot`). [CN] 弹出页面的返回栈（`toRoot` 回到根）。 */

@@ -1,5 +1,6 @@
 // [EN] The method names are the iOS names on purpose (`cyl_…`, `tabBarController_…`), see docs/Android-API-Map.md. [CN] 方法名刻意沿用 iOS 名称（`cyl_…`、`tabBarController_…`），见 docs/Android-API-Map.md。
-@file:Suppress("FunctionName", "kotlin:S100")
+// [EN] kotlin:S1133: the deprecated members are the twins of deprecated iOS API, kept until iOS removes them. [CN] kotlin:S1133：已废弃的成员与 iOS 已废弃的 API 对应，在 iOS 移除前保留。
+@file:Suppress("FunctionName", "kotlin:S100", "kotlin:S1133")
 
 package com.cyl.tabbar
 
@@ -847,13 +848,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         val index = viewControllerIndexForTabControl(control)
         val previousIndex = viewControllerIndexForTabControl(previous)
         val hasIndexes = index >= 0 && previousIndex >= 0
-        if (previous != null && previous !== control) {
-            val previousAnimation = animationForTabControl(previous)
-            if (previousAnimation.cyl_implements(CYLTabButtonAnimationStep.Deselect)) {
-                if (hasIndexes && previousAnimation!!.cyl_respondsToSelector("cyl_setToRight")) previousAnimation.cyl_setToRight(previousIndex < index)
-                previousAnimation!!.cyl_play(CYLTabButtonAnimationStep.Deselect, previous, iconViewOf(previous), titleLabelOf(previous))
-            }
-        }
+        if (previous != null && previous !== control) playDeselectAnimation(previous, if (hasIndexes) previousIndex < index else null)
         // [EN] A plus button without a child page selects nothing: it is not recorded. [CN] 没有子页面的 PlusButton 不选中任何页面：不记录。
         if (!(control is CYLPlusButton && index < 0)) previousAnimatedControl = java.lang.ref.WeakReference(control)
         val animation = animationForTabControl(control)
@@ -867,6 +862,14 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         }
         if (hasIndexes && animation.cyl_respondsToSelector("cyl_setFromLeft")) animation.cyl_setFromLeft(previousIndex < index)
         animation.cyl_play(CYLTabButtonAnimationStep.Select, control, iconViewOf(control), titleLabelOf(control))
+    }
+
+    /** [EN] The deselect step of the previous tab; `toRight` when both tabs have an index. [CN] 上一个 Tab 的取消选中动画；两个 Tab 都有下标时传入 `toRight`。 */
+    private fun playDeselectAnimation(previous: View, toRight: Boolean?) {
+        val animation = animationForTabControl(previous) ?: return
+        if (!animation.cyl_implements(CYLTabButtonAnimationStep.Deselect)) return
+        if (toRight != null && animation.cyl_respondsToSelector("cyl_setToRight")) animation.cyl_setToRight(toRight)
+        animation.cyl_play(CYLTabButtonAnimationStep.Deselect, previous, iconViewOf(previous), titleLabelOf(previous))
     }
 
     private var highlightedControl: java.lang.ref.WeakReference<View>? = null

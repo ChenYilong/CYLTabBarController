@@ -213,9 +213,8 @@ object CYLTabBarConfiguration {
             else -> return null
         }
         if (parts.size != count) return null
-        val numbers = ArrayList<Float>(parts.size)
-        for (part in parts) numbers += (if (part is Number) part.toFloat() else part.toString().trim().toFloatOrNull()) ?: return null
-        return if (numbers.all { it.isFinite() }) numbers else null
+        val numbers = parts.mapNotNull { part -> if (part is Number) part.toFloat() else part.toString().trim().toFloatOrNull() }
+        return if (numbers.size == count && numbers.all { it.isFinite() }) numbers else null
     }
 
     /** [EN] A BOOL: true / false, yes / no, 1 / 0. [CN] 布尔值。 */
