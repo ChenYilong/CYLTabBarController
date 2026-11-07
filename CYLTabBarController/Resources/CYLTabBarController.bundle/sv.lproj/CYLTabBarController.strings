@@ -255,6 +255,15 @@
 "跳转与对比" = "Navigering och jämförelser";
 "角标" = "Märken";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Stöds inte av Liquid Glass: systemet bestämmer flikfältets höjd (FlatDesign och klassisk stil stöder det)";
+"从配置文件创建 TabBarController" = "Skapa en TabBarController från en konfigurationsfil";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "En fil skapar hela flikfältet: välj JSON, YAML, TOML, plist, XML, INI med flera, eller läs in från en URL.";
+"选择配置文件" = "Välj en konfigurationsfil";
+"从网络 URL 加载" = "Läs in från en URL";
+"无法创建 TabBarController" = "Det gick inte att skapa TabBarController";
+"本页由配置文件 %@ 创建：" = "Den här sidan skapades från konfigurationen %@:";
+"配置文件：模拟意外情况" = "Konfiguration: simulerade fel";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController skapad säkert: %@ flikar";
+"查看" = "Visa";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Dölj vid rullning: simulera avbrott (issue #13)";
@@ -296,6 +305,7 @@
 "轻触感反馈" = "Lätt haptik";
 "重触感反馈" = "Kraftig haptik";
 "长按（#152）" = "Långt tryck (#152)";
+"播放 / 停止" = "Spela / Stoppa";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "Jul";
@@ -313,9 +323,48 @@
 "仅配色" = "Endast färger";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Tryck här";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Två flikfält delar en konfiguration; vart och ett av registren kopplar samma sid-ID till olika sidor.";
+"两个 TabBar，同一个页面 ID" = "Två flikfält, ett sid-ID";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Läs in bilden";
+"替换为更大的图片" = "Ersätt med en större bild";
+"移除图片" = "Ta bort bilden";
+"加载背景图片" = "Läs in en bakgrundsbild";
+"2 秒后：%@" = "Om 2 sekunder: %@";
+"PlusButton 图片之后才加载" = "PlusButton-bild som läses in senare";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Tryck för att välja ett fall och pusha en flikfältskontroller: PlusButton har först ingen bild; 2 sekunder senare läses bilden in, ersätts eller tas bort, eller så läses en bakgrundsbild in. Resultatet ska motsvara en bild som angavs vid start.";
+"对照：启动时即有图片" = "Jämför: bild vid start";
+"对照：启动时即有更大的图片" = "Jämför: större bild vid start";
+"对照：启动时即有背景图片" = "Jämför: bakgrundsbild vid start";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Tryck för att gå tillbaka eller stänga";
+"详情" = "Detaljer";
+"拍照" = "Ta en bild";
+"从相册选择" = "Välj från album";
+"设置" = "Inställningar";
+"关于我们" = "Om oss";
+"示例" = "Exempel";
+"撰写" = "Skriv";
+"好" = "OK";
+"编辑更多" = "Redigera Mer";
+"新版本" = "Ny version";
+"打开 TabBar 场景展示" = "Öppna flikfältsgalleriet";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Varje scen är ett flikfält byggt med det publika API:t: stilar, animationer, påminnelser, Lottie och de nyare flik-API:erna";
+"TabBar 场景展示" = "Flikfältsgalleri";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Kopiera";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
 "展开全部 %@ 个模拟" = "Visa alla %@ simuleringar";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Fäll ihop simuleringslistan";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "%1$@ flikar hoppades över: %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Nätverkssymboler";
+"网络图标、标题与配色" = "Nätverkssymboler, titlar och färger";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Konfigurationsfil";

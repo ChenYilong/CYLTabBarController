@@ -18,7 +18,6 @@
     CGFloat _buttonImageHeight;
 }
 
-+ (CYLMainRootViewController *)mainRootViewController;
 
 @end
 
@@ -334,7 +333,7 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
                                                   handler:^(UIAlertAction *action) {
         // handle choose
 
-        CYLMainRootViewController *rootController = [CYLPlusButtonSubclass mainRootViewController];
+        CYLMainRootViewController *rootController = [CYLMainRootViewController currentRootViewController];
         [rootController createLiquidGlassTabBarWithPlusButtonClass:nextPlusButtonClass];
 
     }]];
@@ -344,7 +343,7 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
                                                   handler:^(UIAlertAction *action) {
         // handle choose
 
-        CYLMainRootViewController *rootController = [CYLPlusButtonSubclass mainRootViewController];
+        CYLMainRootViewController *rootController = [CYLMainRootViewController currentRootViewController];
         [rootController createFlatDesignTabBarWithPlusButtonClass:nextPlusButtonClass];
 
     }]];
@@ -486,14 +485,6 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 
 + (NSString *)plusButtonTitle {
     return CYLLocalizedString(@"发布");
-}
-
-/// The window's root view controller. Not `CYLGetRootViewController()`: inside an alert action handler the action sheet
-/// is still presented (iOS 26), and that returns the `UIAlertController`.
-/// 窗口的根控制器。不能用 `CYLGetRootViewController()`：在 alert 的 action 回调中 action sheet 仍处于 present 状态（iOS 26），它会返回 `UIAlertController`。
-+ (CYLMainRootViewController *)mainRootViewController {
-    UIViewController *rootViewController = CYLGetRootWindow().rootViewController;
-    return [rootViewController isKindOfClass:[CYLMainRootViewController class]] ? (CYLMainRootViewController *)rootViewController : nil;
 }
 
 + (Class)alternatePlusButtonClassForOwner:(id)owner {

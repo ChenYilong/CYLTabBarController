@@ -255,6 +255,15 @@
 "跳转与对比" = "Navigare și comparații";
 "角标" = "Insigne";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Nu este acceptat de Liquid Glass: sistemul stabilește înălțimea barei (FlatDesign și stilul clasic acceptă)";
+"从配置文件创建 TabBarController" = "Creează un TabBarController dintr-un fișier de configurare";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Un singur fișier creează întreaga bară de file: alege JSON, YAML, TOML, plist, XML, INI și altele sau încarcă-l de la un URL.";
+"选择配置文件" = "Alege un fișier de configurare";
+"从网络 URL 加载" = "Încarcă de la un URL";
+"无法创建 TabBarController" = "Nu s-a putut crea TabBarController";
+"本页由配置文件 %@ 创建：" = "Această pagină a fost creată din configurația %@:";
+"配置文件：模拟意外情况" = "Configurare: defecțiuni simulate";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController creat în siguranță: %@ file";
+"查看" = "Vezi";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Ascundere la derulare: simularea întreruperilor (issue #13)";
@@ -296,6 +305,7 @@
 "轻触感反馈" = "Feedback haptic ușor";
 "重触感反馈" = "Feedback haptic puternic";
 "长按（#152）" = "Apăsare lungă (#152)";
+"播放 / 停止" = "Redare / Oprire";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "Crăciun";
@@ -313,9 +323,48 @@
 "仅配色" = "Doar culori";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Atinge";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Două bare de file folosesc aceeași configurație; registrul fiecăreia asociază aceleași ID-uri de pagină cu pagini diferite.";
+"两个 TabBar，同一个页面 ID" = "Două bare de file, un ID de pagină";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Încarcă imaginea";
+"替换为更大的图片" = "Înlocuiește cu o imagine mai mare";
+"移除图片" = "Elimină imaginea";
+"加载背景图片" = "Încarcă o imagine de fundal";
+"2 秒后：%@" = "Peste 2 secunde: %@";
+"PlusButton 图片之后才加载" = "Imaginea PlusButton încărcată mai târziu";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Atinge pentru a alege un caz și a deschide un tab bar controller: la început PlusButton nu are imagine; după 2 secunde imaginea este încărcată, înlocuită sau eliminată ori se încarcă o imagine de fundal. Rezultatul trebuie să fie la fel ca pentru o imagine setată la pornire.";
+"对照：启动时即有图片" = "Comparație: imagine la pornire";
+"对照：启动时即有更大的图片" = "Comparație: imagine mai mare la pornire";
+"对照：启动时即有背景图片" = "Comparație: imagine de fundal la pornire";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Atinge pentru a reveni sau a închide";
+"详情" = "Detalii";
+"拍照" = "Fă o fotografie";
+"从相册选择" = "Alege din album";
+"设置" = "Configurări";
+"关于我们" = "Despre noi";
+"示例" = "Exemplu";
+"撰写" = "Compune";
+"好" = "OK";
+"编辑更多" = "Editează Mai multe";
+"新版本" = "Versiune nouă";
+"打开 TabBar 场景展示" = "Deschide galeria de tab bar-uri";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Fiecare scenă este un tab bar construit cu API-ul public: stiluri, animații, mementouri, Lottie și noile API-uri de file";
+"TabBar 场景展示" = "Galerie de tab bar-uri";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Copiază";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
 "展开全部 %@ 个模拟" = "Afișează toate cele %@ simulări";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Restrânge lista de simulări";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "%1$@ file omise: %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Pictograme din rețea";
+"网络图标、标题与配色" = "Pictograme din rețea, titluri și culori";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Fișier de configurare";

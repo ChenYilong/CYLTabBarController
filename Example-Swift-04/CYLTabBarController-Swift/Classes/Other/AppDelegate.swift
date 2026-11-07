@@ -44,7 +44,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
         // Lottie 图标及其深色版本（<名称>_dark.json → CYLTabBarLottieDarkFilePath）。
         // Shown with a Lottie subspec (e.g. pod 'CYLTabBarController/LottieSwift'); the Core subspec keeps the images.
         // 需引入 Lottie 子库（如 pod 'CYLTabBarController/LottieSwift'）才显示；只引入 Core 时仍显示图片。
+        // [EN] Only with Lottie: in a build without it the Lottie keys warn (`CYL_LOTTIE_REQUIRED`) and would be ignored.
+        // [CN] 仅在引入 Lottie 时：没有 Lottie 的构建中 Lottie key 会给出警告（`CYL_LOTTIE_REQUIRED`），且不起作用。
+        #if canImport(Lottie)
         let lottieTabBarItemsAttributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
+        #else
+        let lottieTabBarItemsAttributes = tabBarItemsAttributes
+        #endif
         // #535: a plus button, registered before the tab bar controller is created, to show its badge (MainTabBarController.swift).
         // #535：在创建 TabBarController 之前注册 PlusButton，用于演示其角标（见 MainTabBarController.swift）。
         DemoPlusButton.register()

@@ -8,6 +8,7 @@
 
 #import "UIViewController+CYLTheme.h"
 #import "CYLThemeManager.h"
+#import "CYLThemePrivate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,6 +29,15 @@ NS_ASSUME_NONNULL_BEGIN
     }
     if (self.isViewLoaded) {
         [self setNeedsStatusBarAppearanceUpdate];
+        // [EN] A loaded view out of every window (a tab not selected, a page under the top of a navigation stack) is not
+        //      reached through the windows: update it here, so it is right when shown. Only the top of such a detached
+        //      tree; its subviews follow.
+        // [CN] 已加载但不在任何 window 中的视图（未选中的 Tab、导航栈中栈顶以下的页面）无法通过 window 到达：在这里更新，显示时即为正确样式。
+        //      只处理这类脱离视图树的顶层视图，其子视图随之更新。
+        UIView *view = self.view;
+        if (!view.window && !view.superview) {
+            [view cyl_themeDidChangeByManager:manager identifier:identifier theme:theme enumeratesSubviews:YES];
+        }
     }
 }
 

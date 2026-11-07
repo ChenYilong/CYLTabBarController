@@ -9,19 +9,10 @@
 #import "CYLTabBar+CYLTabBarControllerExtention.h"
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "UIControl+CYLTabBarControllerExtention.h"
+#import "UIControl+CYLTabBarItemAnimation.h"
 #import "CYLTabBarController.h"
 #import <objc/runtime.h>
 #import "CYLTabBar.h"
-
-#if __has_include(<Lottie/Lottie.h>)
-#import <Lottie/Lottie.h>
-#else
-#endif
-
-#if __has_include(<Lottie/Lottie-Swift.h>)
-#import <Lottie/Lottie-Swift.h>
-#else
-#endif
 
 /*!
  * [EN] The object at `index`, or nil when `array` is nil or `index` is out of range (negative, `NSNotFound` or too
@@ -216,72 +207,19 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
                                                size:(CGSize)size
                                     defaultSelected:(BOOL)defaultSelected
                                         contentMode:(UIViewContentMode)contentMode {
-#if __has_include(<Lottie/Lottie.h>)
-    if (!lottieURL) {
-        return;
+    // FIX: issue #604 — any animation library, through the `CYLTabBarItemAnimation` subspec when it is in the build.
+    // 任意动画库：构建中包含 `CYLTabBarItemAnimation` 子库时由它处理。
+    if (CYLTabBarItemAnimationIsAvailable()) {
+        [self cyl_playTabBarItemAnimationWithSelectedControl:selectedControl URL:lottieURL size:size defaultSelected:defaultSelected contentMode:contentMode];
     }
-    // [CN] 统一使用CYLTabBarItemLottieAnimationPlayingNotification进行动画重置， 故删除手动重置。
-    // [EN] Animation reset is handled uniformly via CYLTabBarItemLottieAnimationPlayingNotification,
-    //      so the manual reset was removed.
-    // [self cyl_stopAnimationOfAllLottieView];
-    [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected contentMode:contentMode];
-    
-#endif
-    
-#if __has_include(<Lottie/Lottie-Swift.h>)
-    if (!lottieURL) {
-        return;
-    }
-    // [CN] 统一使用CYLTabBarItemLottieAnimationPlayingNotification进行动画重置， 故删除手动重置。
-    // [EN] Animation reset is handled uniformly via CYLTabBarItemLottieAnimationPlayingNotification,
-    //      so the manual reset was removed.
-    // [self cyl_stopAnimationOfAllLottieView];
-    [selectedControl cyl_animationLottieImageWithLottieURL:lottieURL size:size defaultSelected:defaultSelected contentMode:contentMode];
-#endif
 }
 
 - (void)cyl_stopAnimationOfAllLottieView {
-#if __has_include(<Lottie/Lottie.h>)
-    if ([self isKindOfClass:[CYLTabBar class]]) {
-        [self.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [obj cyl_stopAnimationOfLottieView];
-        }];
-        [self.cyl_platterSelectedContentViews enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [obj cyl_stopAnimationOfLottieView];
-        }];
+    // FIX: issue #604 — any animation library, through the `CYLTabBarItemAnimation` subspec when it is in the build.
+    // 任意动画库：构建中包含 `CYLTabBarItemAnimation` 子库时由它处理。
+    if (CYLTabBarItemAnimationIsAvailable()) {
+        [self cyl_stopAllTabBarItemAnimations];
     }
-#if CYL_FLATDESIGN_AVAILABLE
-    else if ([self isKindOfClass:[CYLFlatDesignTabBar class]]) {
-        CYLFlatDesignTabBar *flatDesignTabBar = (CYLFlatDesignTabBar *)self;
-        [flatDesignTabBar.tabBarItems enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [obj cyl_stopAnimationOfLottieView];
-        }];
-    }
-#endif
-
-
-#endif
-    
-#if __has_include(<Lottie/Lottie-Swift.h>)
-    if ([self isKindOfClass:[CYLTabBar class]]) {
-        [self.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [obj cyl_stopAnimationOfLottieView];
-        }];
-        [self.cyl_platterSelectedContentViews enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [obj cyl_stopAnimationOfLottieView];
-        }];
-    }
-#if CYL_FLATDESIGN_AVAILABLE
-
-    else if ([self isKindOfClass:[CYLFlatDesignTabBar class]]) {
-        CYLFlatDesignTabBar *flatDesignTabBar = (CYLFlatDesignTabBar *)self;
-        [flatDesignTabBar.tabBarItems enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [obj cyl_stopAnimationOfLottieView];
-        }];
-    }
-#endif
-    
-#endif
 }
 
 /*!
@@ -356,7 +294,7 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
     return fabs(WidthOffsetWithIndex);
 }
 
-- (UIControl *)cyl_selectedControl {
+- (UIControl * _Null_unspecified)cyl_selectedControl {
     UIControl *selectedControl = objc_getAssociatedObject(self, @selector(cyl_selectedControl));
     if (!selectedControl) {
         // [EN] Each candidate is read with a bounds check: the old `@try` around `[0]` jumped to `@catch` on the first empty
@@ -405,10 +343,9 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
         tabBarController = [self tabBarController];
     }
     
-    CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
-    if (!tabBar) {
-        tabBar = self;
-    }
+    // Its own tab bar when that is a CYLTabBar, otherwise this one (no tab bar controller, or a system tab bar).
+    UITabBar *controllerTabBar = tabBarController.tabBar;
+    CYLTabBar *tabBar = [controllerTabBar isKindOfClass:[CYLTabBar class]] ? (CYLTabBar *)controllerTabBar : self;
     // The plus button and its child view controller are bound to the controller (by its `context`), so ask it.
     // PlusButton 和它的子控制器绑定的是控制器（通过它的 `context`），所以向它询问。
     id plusOwner = tabBarController ?: self;
@@ -862,4 +799,3 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
 
 
 @end
-

@@ -8,22 +8,13 @@
 
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "CYLPlusButton.h"
-#if __has_include(<Lottie/Lottie.h>)
-#import <Lottie/Lottie.h>
-#else
-#endif
-
-#if __has_include(<Lottie/Lottie-Swift.h>)
-#import <Lottie/Lottie-Swift.h>
-#else
-#endif
-
 #if __has_include(<CYLTabBarController/CYLTabBarController.h>)
 #import <CYLTabBarController/CYLTabBarController.h>
 #else
 #import "CYLTabBarController.h"
 #endif
 #import "NSObject+CYLTabBarControllerExtention.h"
+#import "UIControl+CYLTabBarItemAnimation.h"
 #import <objc/runtime.h>
 
 @implementation UIView (CYLTabBarControllerExtention)
@@ -506,37 +497,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (BOOL)cyl_isLottieAnimationView {
-    BOOL isKindOfClass = [self isKindOfClass:[UIView class]];
-    BOOL isClass = [self isMemberOfClass:[UIView class]];
-    BOOL isKind = isKindOfClass && !isClass;
-    if (!isKind) {
+    // FIX: issue #604 — the animation view of any library; NO without the `CYLTabBarItemAnimation` subspec.
+    // 任意动画库的动画视图；构建中没有 `CYLTabBarItemAnimation` 子库时为 NO。
+    if (!CYLTabBarItemAnimationIsAvailable()) {
         return NO;
     }
-
-    Class classType = nil;
-
-#if __has_include(<Lottie/Lottie.h>)
-    // Prefer Objective-C Lottie class when available at compile time
-    Class swiftCompatClass = NSClassFromString(@"LOTAnimationView");
-    if (swiftCompatClass) {
-        classType = swiftCompatClass;
-    }
-#endif
-
-#if __has_include(<Lottie/Lottie-Swift.h>)
-    // Avoid sending messages to a forward-declared class; resolve at runtime instead
-    NSString *swiftCompatClassString = @"CYLCompatibleLOTAnimationView";
-
-    if ( [NSStringFromClass([self class]) containsString:swiftCompatClassString]) {
-        return YES;
-    }
-#endif
-
-    if (!classType) {
-        return NO;
-    }
-    BOOL isLottieAnimationView = ([self isKindOfClass:classType] || [self isMemberOfClass:classType]);
-    return isLottieAnimationView;
+    return [self cyl_isTabBarItemAnimationView];
 }
 CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 - (UIView *)cyl_tabBadgeBackgroundSeparator {
@@ -915,4 +881,3 @@ static NSUInteger CYLPlusSlotIndexOfOwner(UIView *owner) {
 }
 
 @end
-

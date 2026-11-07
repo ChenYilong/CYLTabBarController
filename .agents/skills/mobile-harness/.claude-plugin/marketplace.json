@@ -1,0 +1,16 @@
+{
+  "name": "mobile-harness",
+  "description": "Droidrun's mobile-harness plugin for Claude Code.",
+  "owner": {
+    "name": "Droidrun",
+    "url": "https://github.com/droidrun"
+  },
+  "plugins": [
+    {
+      "name": "mobile-harness",
+      "source": "./",
+      "description": "Portable Android and iOS device-control harness for agents. Use when an agent needs to control or automate Android/iOS devices — tap, swipe, screenshot, app control — locally (ADB/Portal/Simulator) or on Mobilerun cloud devices.",
+      "homepage": "https://github.com/droidrun/mobile-harness"
+    }
+  ]
+}

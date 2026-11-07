@@ -4,4 +4,6 @@
 
 #import "OCSwift.h"
 
-#import "CYLTabBarController.h"
+// As a module, not textually: the app's header search paths include the framework's Headers, so a quoted import parsed
+// the headers a second time next to the module and warned "duplicate definition of category" (CAAnimation).
+@import CYLTabBarController;

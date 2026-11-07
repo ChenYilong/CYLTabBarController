@@ -7,19 +7,12 @@
 
 import UIKit
 
-// [EN] Shows the gallery list in a navigation controller; no storyboard, no scenes.
-// [CN] 在导航控制器中显示图库列表；不使用 storyboard 与 scene。
+// [EN] The app's entry point; SceneDelegate.swift shows the gallery list. No storyboard.
+// [CN] App 的入口；图库列表由 SceneDelegate.swift 显示。不使用 storyboard。
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    var window: UIWindow?
-
-    func application(_: UIApplication,
-                     didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        let window = UIWindow(frame: UIScreen.main.bounds)
-        window.rootViewController = UINavigationController(rootViewController: GalleryViewController())
-        window.makeKeyAndVisible()
-        self.window = window
-        return true
+    func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        true
     }
 }

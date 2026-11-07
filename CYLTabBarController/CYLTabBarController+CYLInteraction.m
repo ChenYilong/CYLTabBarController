@@ -7,6 +7,7 @@
 
 #import "CYLTabBarController+CYLInteraction.h"
 #import "CYLTabBarController.h"
+#import "UIControl+CYLTabBarControllerExtention.h"
 #import <objc/runtime.h>
 #import <AudioToolbox/AudioToolbox.h>
 
@@ -158,16 +159,13 @@ static UIView *CYLTabButtonIconView(UIControl *control) {
             return subview;
         }
     }
-#if CYL_LOTTIE_AVAILABLE
-    // [EN] Only when the Lottie library is integrated: a tab with a Lottie icon animates the Lottie view.
-    // [CN] 仅在引入 Lottie 库时：有 Lottie 图标的 Tab 对 Lottie 视图播放动画。
-    if ([control respondsToSelector:@selector(cyl_lottieAnimationView)]) {
-        UIView *lottieView = [control cyl_lottieAnimationView];
-        if (lottieView) {
-            return lottieView;
-        }
+    // [EN] FIX: issue #604 — a tab with an animated icon (Lottie, PAG, Rive…) animates its animation view; nil without an
+    //      animation subspec, so no compile-time switch is needed.
+    // [CN] 有动画图标的 Tab（Lottie、PAG、Rive…）对其动画视图播放动画；未引入动画子库时为 nil，因此无需编译开关。
+    UIView *animationView = control.cyl_tabBarItemAnimationView;
+    if (animationView) {
+        return animationView;
     }
-#endif
     if ([control isKindOfClass:[UIButton class]]) {
         return ((UIButton *)control).imageView ?: control;
     }
@@ -215,6 +213,26 @@ static NSArray<UIControl *> *CYLTabButtonLayers(UIControl *control) {
 }
 
 #pragma mark - Animations
+
+static const void *CYLLastSelectAnimationKey = &CYLLastSelectAnimationKey;
+
+/*!
+ * [EN] When `control`'s last select animation is not `animation`, lets it undo what it left on the button (all layers in
+ *      Liquid Glass), then forgets it.
+ * [CN] 若 `control` 上一次的选中动画不是 `animation`，让它撤销留在按钮上的状态（液态玻璃下包括所有图层），然后不再记录。
+ */
+static void CYLTabButtonResetAnimationIfReplaced(UIControl *control, id<CYLTabButtonAnimation> _Nullable animation) {
+    id<CYLTabButtonAnimation> lastAnimation = objc_getAssociatedObject(control, CYLLastSelectAnimationKey);
+    if (!lastAnimation || lastAnimation == animation) {
+        return;
+    }
+    if ([lastAnimation respondsToSelector:@selector(cyl_resetTabButton:iconView:titleLabel:)]) {
+        for (UIControl *layer in CYLTabButtonLayers(control)) {
+            [lastAnimation cyl_resetTabButton:layer iconView:CYLTabButtonIconView(layer) titleLabel:CYLTabButtonTitleLabel(layer)];
+        }
+    }
+    objc_setAssociatedObject(control, CYLLastSelectAnimationKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
 
 static id<CYLTabButtonAnimation> _Nullable CYLTabButtonAnimationForType(CYLTabButtonTapAnimationType type) {
     switch (type) {
@@ -436,6 +454,12 @@ static void CYLPlayTabButtonBadgeChangedAnimation(id<CYLTabButtonAnimation> anim
     }
     // [EN] Held weakly (CYLUtils): a tab button can be replaced by UIKit. [CN] 弱引用（CYLUtils）：Tab 按钮可能被 UIKit 替换。
     UIControl *previousControl = [self cyl_weakAssociatedObjectForKey:CYLPreviousAnimatedControlKey];
+    // [EN] A button keeps the state its last select animation left (a held frame, a hidden title); when another animation
+    //      takes over, that one resets it first.
+    // [CN] 按钮保留其上一次选中动画留下的状态（保持的帧、隐藏的标题）；当其他动画接管时，先由上一次的动画撤销该状态。
+    if (previousControl && previousControl != control) {
+        CYLTabButtonResetAnimationIfReplaced(previousControl, [self cyl_animationForTabControl:previousControl]);
+    }
     NSUInteger index = [self cyl_viewControllerIndexForTabControl:control];
     NSUInteger previousIndex = [self cyl_viewControllerIndexForTabControl:previousControl];
     BOOL hasIndexes = (index != NSNotFound && previousIndex != NSNotFound);
@@ -462,9 +486,11 @@ static void CYLPlayTabButtonBadgeChangedAnimation(id<CYLTabButtonAnimation> anim
     }
 
     id<CYLTabButtonAnimation> animation = [self cyl_animationForTabControl:control];
+    CYLTabButtonResetAnimationIfReplaced(control, animation);
     if (!animation) {
         return;
     }
+    objc_setAssociatedObject(control, CYLLastSelectAnimationKey, animation, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     // [EN] A tap on the button animated last whose tab is still selected (a reselect) plays the reselect animation when
     //      the animation has one.
     // [CN] 点击上一次播放动画、且其 Tab 仍处于选中状态的按钮（重复点击）时，若动画实现了重复点击动画，则播放它。
@@ -618,7 +644,7 @@ static const void *CYLHighlightedTabControlKey = &CYLHighlightedTabControlKey;
 
 - (UIImpactFeedbackStyle)cyl_tabButtonHapticFeedbackStyle {
     NSNumber *style = objc_getAssociatedObject(self, @selector(cyl_tabButtonHapticFeedbackStyle));
-    return style ? (UIImpactFeedbackStyle)style.integerValue : UIImpactFeedbackStyleMedium;
+    return style != nil ? (UIImpactFeedbackStyle)style.integerValue : UIImpactFeedbackStyleMedium;
 }
 
 - (void)cyl_setTabButtonHapticFeedbackStyle:(UIImpactFeedbackStyle)tabButtonHapticFeedbackStyle {
@@ -661,7 +687,7 @@ static const void *CYLHighlightedTabControlKey = &CYLHighlightedTabControlKey;
 
 - (NSTimeInterval)cyl_tabButtonLongPressMinimumDuration {
     NSNumber *duration = objc_getAssociatedObject(self, @selector(cyl_tabButtonLongPressMinimumDuration));
-    return duration ? duration.doubleValue : 0.5;
+    return duration != nil ? duration.doubleValue : 0.5;
 }
 
 /*!

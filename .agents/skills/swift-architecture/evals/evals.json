@@ -1,0 +1,45 @@
+{
+  "skill_name": "swift-architecture",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "A small SwiftUI travel app has three CRUD screens, async loading from a service, simple search, and one edit sheet. The team wants to start with TCA because it sounds more testable. Review the architecture choice for Swift 6.3 and recommend the smallest pattern that still keeps the code testable.",
+      "expected_output": "A scope-aware architecture review that recommends MV with @Observable as the default starting point, explains when MVVM or TCA would become justified, and keeps detailed SwiftUI state wiring out of scope except for handoff notes.",
+      "files": [],
+      "expectations": [
+        "Recommends starting with MV and @Observable for the described small-to-medium SwiftUI app instead of defaulting to TCA.",
+        "Explains the upgrade triggers for MVVM or TCA in terms of transformed view state, deterministic state transitions, side effects, feature composition, or testing pressure.",
+        "Keeps dependencies injected rather than created inside views or stores.",
+        "Mentions @MainActor for UI-observed Observable state or otherwise preserves Swift 6 data-race safety.",
+        "Routes detailed SwiftUI state ownership and sheet/navigation implementation to swiftui-patterns or swiftui-navigation instead of expanding this skill's scope."
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "We're migrating an iOS 16 UIKit-heavy app that uses Coordinators, ObservableObject view models, and a few VIPER modules. New features are SwiftUI, but the old modules are still shipping. Write a migration plan that modernizes Observation without forcing one architecture everywhere.",
+      "expected_output": "An incremental migration plan that replaces ObservableObject with @Observable where iOS 17+ is available, preserves Coordinator or VIPER boundaries for legacy UIKit modules, and allows different modules to adopt MV, MVVM, or TCA where justified.",
+      "files": [],
+      "expectations": [
+        "Describes ObservableObject to @Observable migration using State for owned observable objects, plain properties for read-only injected objects, and Bindable only when bindings are needed.",
+        "Treats VIPER as a legacy or strict-boundary maintenance pattern rather than the default for new SwiftUI work.",
+        "Keeps Coordinators for UIKit or hybrid complex navigation but recommends NavigationStack/path routing for pure SwiftUI flows.",
+        "Allows architecture to vary by feature module while warning against mixing patterns inconsistently inside a single module.",
+        "Identifies sibling handoffs for detailed concurrency diagnostics, navigation routing, and Swift Testing implementation."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A product lead asks for one architecture memo covering SwiftUI state ownership, deep links and tab routing, actor isolation errors, app-wide module boundaries, and test strategy. Split what belongs in swift-architecture versus adjacent skills, then give the architecture-level recommendations.",
+      "expected_output": "A boundary-routing memo that keeps architecture selection, module boundaries, dependency direction, and migration strategy in swift-architecture while routing detailed SwiftUI state, navigation, concurrency, and test harness mechanics to sibling skills.",
+      "files": [],
+      "expectations": [
+        "Keeps pattern selection, module boundaries, dependency direction, and migration strategy in swift-architecture scope.",
+        "Routes detailed SwiftUI @State/@Bindable/@Environment ownership and view composition to swiftui-patterns.",
+        "Routes deep links, tabs, sheets, NavigationStack, and route-model implementation to swiftui-navigation.",
+        "Routes actor isolation, Sendable, strict-concurrency diagnostics, and default MainActor isolation details to swift-concurrency.",
+        "Routes detailed Swift Testing syntax, fixtures, parameterized tests, and suite organization to swift-testing.",
+        "Still provides a concise architecture-level recommendation rather than only listing handoffs."
+      ]
+    }
+  ]
+}

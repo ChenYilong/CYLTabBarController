@@ -25,6 +25,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 @interface MainTabBarController ()<CYLTabBarControllerDelegate, CYLFlatDesignUITabBarControllerDelegate>
 
 @property (nonatomic, weak) UIButton *selectedCover;
+/// [EN] The covers of the first tab, kept: the decoration block runs again after a theme switch or a tab reload, and
+///      covering with the same views moves them instead of adding more.
+/// [CN] 第一个 Tab 的封面，保留下来：换肤或重新加载 Tab 后装饰 block 会再次执行，用同样的视图覆盖只会移动它们，不会再添加新的。
+@property (nonatomic, strong) UIButton *contentCover;
+@property (nonatomic, strong) UIButton *selectedContentCover;
 
 @property (nonatomic, assign) CGRect tabBarBounds;
 
@@ -127,7 +132,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  */
 - (void)observeLottieAnimationViewDidAdd {
     __weak __typeof(self) weakSelf = self;
-    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationViewDidAddNotification
+    [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemAnimationViewDidAddNotification
                                                       object:nil
                                                        queue:[NSOperationQueue mainQueue]
                                                   usingBlock:^(NSNotification * _Nonnull note) {
@@ -136,7 +141,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
             return;
         }
         NSLog(@"🟢 Lottie view added: tab %@, animationSpeed %@", @(tabButton.cyl_tabBarChildViewControllerIndex),
-              [(id)tabButton.cyl_lottieAnimationView valueForKey:@"animationSpeed"]);
+              [(id)tabButton.cyl_tabBarItemAnimationView valueForKey:@"animationSpeed"]);
     }];
 }
 
@@ -144,7 +149,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  * [EN] Issue #428: plays the Lottie icons 1.5 times as fast. No need to wait for the Lottie views to be added.
  * [CN] Issue #428：Lottie 图标以 1.5 倍速播放，无需等待 Lottie 视图添加完成。
  */
-- (CGFloat)lottieAnimationSpeed {
+- (CGFloat)tabBarItemAnimationSpeed {
     return 1.5;
 }
 
@@ -257,6 +262,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                  CYLTabBarItemImagePositionAdjustment: [NSValue valueWithUIOffset:UIOffsetMake(firstXOffset, -3.5)],
         CYLTabBarLottieFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover" ofType:@"json"],
         CYLTabBarLottieDarkFilePath : [[NSBundle mainBundle] pathForResource:@"green_lottie_tab_discover_dark" ofType:@"json"],
+        // [EN] #216: the unselected icon's color follows the skin (the tab's file stays the same): gray, or red with the Grapefruit skin (a color skin: a holiday skin's icons are shown over the animations).
+        // [CN] #216：未选中图标的颜色跟随皮肤（Tab 的文件不变）：灰色，西柚皮肤时为红色（使用配色皮肤：节日皮肤的图标会显示在动画之上）。
+        CYLTabBarAnimationColors : @{ @"Icon_Discovery_Normal.**.Color" : [UIColor cyl_colorWithThemeProvider:^UIColor *(CYLThemeManager *manager, NSObject<NSCopying> *identifier, NSObject *theme) {
+            return [identifier isEqual:@"Grapefruit"] ? UIColor.systemRedColor : [UIColor colorWithWhite:0.498 alpha:1];
+        }] },
         //                                                  CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     
@@ -542,12 +552,16 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 - (void)setSelectedCoverShow:(BOOL)show {
     UIControl *selectedTabButton = [self.viewControllers[0] cyl_tabButton];
     __weak __typeof(self) weakSelf = self;
+    if (!self.contentCover) {
+        self.contentCover = self.selectedCover;
+        self.selectedContentCover = self.selectedCover;
+    }
     // [CN] TODO:  如果是Lottie 动画icon需要添加延迟， 否则， 会在lottie动画未初始化完成前， 就替换， 位置错误。
     // [EN] TODO:  Lottie animation icons need a delay; otherwise the replacement happens before the lottie animation has
     //      finished initializing, and the position is wrong.
     [selectedTabButton cyl_coverVisiableTabImageViewOrTabButton:YES
-                                                 contentNewView:self.selectedCover
-                                          seclectContentNewView:self.selectedCover
+                                                 contentNewView:self.contentCover
+                                          seclectContentNewView:self.selectedContentCover
                                                          offset:UIOffsetZero
                                                            show:show
                                         delayIfNeededForSeconds:0.1
@@ -956,7 +970,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     return ![rootViewController isKindOfClass:[CYLHomeViewController class]];
 }
 
-- (UIViewContentMode)lottieAnimationViewContentMode {
+- (UIViewContentMode)tabBarItemAnimationViewContentMode {
     return UIViewContentModeScaleAspectFit;
 }
 

@@ -1,0 +1,50 @@
+{
+  "skill_name": "swift-api-design-guidelines",
+  "evals": [
+    {
+      "id": 0,
+      "name": "api-review-naming-labels",
+      "prompt": "Review this proposed Swift API surface for a shared design system module and suggest corrected names, argument labels, and call sites. Keep the answer concise and explain the Swift API Design Guidelines rule behind each change.\n\n```swift\npublic struct ThemePalette {\n    public mutating func add(color: UIColor)\n    public mutating func remove(index: Int) -> UIColor\n    public func colorWithName(_ string: String) -> UIColor?\n    public func containsColor(_ color: UIColor) -> Bool\n    public static func createDefaultPalette() -> ThemePalette\n}\n\nlet palette = ThemePalette.createDefaultPalette()\npalette.colorWithName(\"warning\")\n```",
+      "expected_output": "A concise API design review that corrects labels and names using Swift API Design Guidelines: grammatical first-argument omission, role-based names, needed prepositions, needless-word removal, Boolean assertion naming, and make-prefix factory naming.",
+      "files": [],
+      "expectations": [
+        "Recommends `add(_ color:)` or an equivalent fluent `add(_:)` form for adding a color instead of `add(color:)`.",
+        "Recommends a prepositional label such as `remove(at:)` for position-based removal.",
+        "Replaces weak names such as `_ string` with a role-based label/name such as `named name` or `forName name`.",
+        "Removes needless type repetition from names such as `containsColor` when the argument type already conveys color.",
+        "Uses the `make` prefix for a factory method instead of `createDefaultPalette`.",
+        "Explains changes in terms of call-site clarity and Swift API Design Guidelines rather than generic style preference."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "mutating-pairs-doc-comments",
+      "prompt": "I am designing a public Swift `TextBuffer` API. Please propose corrected mutating/nonmutating pair names and documentation comments for these operations: sort lines in-place vs return sorted lines, strip all newline characters in-place vs return a copy with newlines stripped, and union the buffer's tag set in-place vs return a combined tag set. Include any needed complexity notes for non-O(1) computed properties.\n\nCurrent draft:\n\n```swift\npublic struct TextBuffer {\n    public var totalCharacterCount: Int { lines.reduce(0) { $0 + $1.count } }\n    public mutating func formSortLines()\n    public func sortLines() -> TextBuffer\n    public mutating func stripNewlines()\n    public func strippedNewlines() -> TextBuffer\n    public mutating func unionTags(_ tags: Set<String>)\n    public func formUnionTags(_ tags: Set<String>) -> Set<String>\n}\n```",
+      "expected_output": "Corrected API names and documentation comments that apply side-effect naming, -ed/-ing direct-object guidance, form-prefix noun-operation guidance, and non-O(1) computed-property complexity documentation.",
+      "files": [],
+      "expectations": [
+        "Uses imperative mutating names and participle nonmutating names for verb-described operations, such as `sortLines()` / `sortedLines()`.",
+        "Uses `strippingNewlines()` rather than `strippedNewlines()` for the nonmutating direct-object operation.",
+        "Uses noun/form-noun pairing for set-like union, with nonmutating `union...` and mutating `formUnion...` naming.",
+        "Adds documentation comment summaries that describe what methods do and return, and what properties are.",
+        "Documents the complexity of `totalCharacterCount` because it is a non-O(1) computed property.",
+        "Does not present `formSortLines()` or `formUnionTags()` returning a value as the corrected design."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "sibling-boundary-language-features",
+      "prompt": "I need help with three Swift cleanup items in a package: choose better public API names and argument labels for `func fetchDataWithId(_ id: String)`, decide whether to use `some` or `any` for a protocol return type, and configure SwiftLint to enforce identifier naming. Which parts should the Swift API Design Guidelines skill own, and which should be routed elsewhere? Give a short routing answer with minimal concrete examples.",
+      "expected_output": "A boundary-aware answer that uses swift-api-design-guidelines for naming and argument labels, routes language feature details to swift-language, routes lint configuration to swiftlint, and avoids expanding this skill into those sibling domains.",
+      "files": [],
+      "expectations": [
+        "Says swift-api-design-guidelines owns public API naming, role-based names, and argument-label/call-site clarity for `fetchDataWithId(_:)`.",
+        "Gives a minimal API-design example such as `fetchData(id:)` or a more domain-specific role name without over-implementing the whole API.",
+        "Routes `some` vs `any` protocol type-system guidance to the swift-language skill or domain.",
+        "Routes SwiftLint configuration and identifier-name enforcement to the swiftlint skill or domain.",
+        "Does not provide a full SwiftLint configuration or a full opaque/existential type tutorial.",
+        "Preserves sibling-skill boundaries while giving enough API-design guidance to be useful."
+      ]
+    }
+  ]
+}

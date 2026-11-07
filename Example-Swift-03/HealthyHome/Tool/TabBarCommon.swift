@@ -90,6 +90,9 @@ class TabBarCommon: NSObject {
         // #442 (Lottie 4.x): one Lottie file per tab follows Dark Mode, its colors set with Lottie's value providers.
         // Shown in SwiftManager (SPM, Lottie 4.x); this project's Core subspec keeps the images.
         // 每个 Tab 一份 Lottie 文件适配深色模式。SwiftManager（SPM，Lottie 4.x）中显示；本工程只引入 Core 子库，仍显示图片。
+        // [EN] Only with Lottie: in a build without it the Lottie keys warn (`CYL_LOTTIE_REQUIRED`) and would be ignored.
+        // [CN] 仅在引入 Lottie 时：没有 Lottie 的构建中 Lottie key 会给出警告（`CYL_LOTTIE_REQUIRED`），且不起作用。
+        #if canImport(Lottie)
         let lottieAttributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
         let darkColors = ["Icon_Shop", "Icon_Discovery", "Icon_Knowledge", "Icon_Mine"].map { layer -> [String: UIColor] in
             // Gray outline of the unselected icon → light gray, pale fill of the selected one → dark green.
@@ -102,6 +105,9 @@ class TabBarCommon: NSObject {
             item[CYLTabBarLottieDarkColors] = colors
             return item
         }
+        #else
+        return tabBarItemsAttributes
+        #endif
     }
 
     

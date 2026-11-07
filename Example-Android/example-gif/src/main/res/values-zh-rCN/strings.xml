@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CYLTabBar GIF</string>
+    <string name="tab_home">首页</string>
+    <string name="tab_city">同城</string>
+    <string name="tab_message">消息</string>
+    <string name="tab_me">我的</string>
+</resources>

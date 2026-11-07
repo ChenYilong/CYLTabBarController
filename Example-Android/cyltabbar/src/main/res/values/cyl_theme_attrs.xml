@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  [EN] Android only: theme values in layouts (adapted from QMUI_Android's QMUISkinDef, MIT License, Copyright (C) 2017-2018
+       THL A29 Limited, a Tencent company). Each attribute names a value of the current theme, e.g.
+       app:cyl_themeTextColor="title"; app:cyl_themeValue takes the whole "rule:name|rule:name" string. They are read by
+       CYLThemeLayoutInflaterFactory (CYLThemeValues.installLayoutInflaterFactory) or CYLThemeValues.applyAttributes.
+  [CN] 仅 Android：布局中的主题值（改编自 QMUI_Android 的 QMUISkinDef，MIT 许可证，Copyright (C) 2017-2018 THL A29 Limited, a Tencent company）。
+       每个属性指定当前主题中的一个值，例如 app:cyl_themeTextColor="title"；app:cyl_themeValue 接受完整的 "rule:name|rule:name" 字符串。
+       由 CYLThemeLayoutInflaterFactory（CYLThemeValues.installLayoutInflaterFactory）或 CYLThemeValues.applyAttributes 读取。
+-->
+<resources>
+    <declare-styleable name="CYLThemeValue">
+        <attr name="cyl_themeValue" format="string" />
+        <attr name="cyl_themeBackground" format="string" />
+        <attr name="cyl_themeBgTintColor" format="string" />
+        <attr name="cyl_themeTextColor" format="string" />
+        <attr name="cyl_themeHintColor" format="string" />
+        <attr name="cyl_themeLinkColor" format="string" />
+        <attr name="cyl_themeSrc" format="string" />
+        <attr name="cyl_themeTintColor" format="string" />
+        <attr name="cyl_themeAlpha" format="string" />
+        <attr name="cyl_themeBorder" format="string" />
+        <attr name="cyl_themeProgressColor" format="string" />
+        <attr name="cyl_themeTextCompoundTintColor" format="string" />
+        <attr name="cyl_themeTextCompoundLeftSrc" format="string" />
+        <attr name="cyl_themeTextCompoundTopSrc" format="string" />
+        <attr name="cyl_themeTextCompoundRightSrc" format="string" />
+        <attr name="cyl_themeTextCompoundBottomSrc" format="string" />
+    </declare-styleable>
+</resources>

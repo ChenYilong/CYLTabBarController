@@ -1,0 +1,53 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '15.0'
+project 'HealthyHome.xcodeproj'
+#source 'https://github.com/CocoaPods/Specs.git'
+
+target 'HealthyHome' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for HealthyHome
+
+#  pod 'CYLTabBarController/PAG'
+  # #604: PAG tab icons (Tencent libpag), the same way as `CYLTabBarController/LottieSwift`.
+  # #604：PAG Tab 图标（腾讯 libpag），用法与 `CYLTabBarController/LottieSwift` 相同。
+  pod 'CYLTabBarController/PAG', :path => '../'
+  # libpag 4.5.101, not on CocoaPods trunk yet: pinned to the commit that ships it, as the official pag-ios does.
+  # libpag 4.5.101 尚未发布到 CocoaPods trunk：固定到官方 pag-ios 中包含它的 commit。
+  pod 'libpag', :git => 'https://github.com/libpag/pag-ios.git', :commit => '12613de91b049b3d8afc0c09ae1bb48df6a6acec'
+  # The FlatDesign style, chosen with the navigation bar button of the settings list. It also brings Lottie.
+  # 扁平样式，通过设置列表的导航栏按钮选择。它同时会引入 Lottie。
+  pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => '../'
+  # Or PAG Enterprise (audio, 3D, movie layers), instead of the line above, not with it. 或使用企业版，替换上一行，二者不要同时引入：
+  # pod 'CYLTabBarController/PAGEnterprise', :path => '../'
+
+
+
+
+
+  target 'HealthyHomeTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'HealthyHomeUITests' do
+    # Pods for testing
+  end
+
+end
+# [EN] #604: the .pag files are not in the repository; download them (pinned, SHA-256 checked) like the pods themselves.
+# [CN] #604：.pag 文件不在仓库中，与 pod 本身一样在安装时下载（固定版本，校验 SHA-256）。
+pre_install do |installer|
+  # Pods/ is Example-PAG/Pods, so the script is two levels up. Pods/ 即 Example-PAG/Pods，脚本在其上两级。
+  script = File.expand_path('../../scripts/fetch-animation-resources.py', installer.sandbox.root.to_s)
+  system('python3', script, 'PAGResources') || abort('[!] Could not download the PAG files: python3 ' + script)
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
+    end
+  end
+end

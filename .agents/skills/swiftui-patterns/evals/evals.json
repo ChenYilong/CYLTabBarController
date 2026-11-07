@@ -1,0 +1,81 @@
+{
+  "skill_name": "swiftui-patterns",
+  "evals": [
+    {
+      "id": 0,
+      "name": "observation-actor-ownership",
+      "prompt": "Design the SwiftUI state architecture for an iOS 26 profile settings screen. The screen edits a profile name, stores a theme preference in UserDefaults, loads remote suggestions asynchronously, and passes editable state into child fields. Use modern Observation and explain what should be @MainActor, @State, @Bindable, @Environment, and .task.",
+      "expected_output": "A modern SwiftUI patterns answer that uses a UI-bound @MainActor @Observable store owned by @State, @Bindable only where bindings are needed, environment injection for deeply shared state, .task for cancellable async loading, and either keeps @AppStorage in views or uses normal UserDefaults-backed stored properties inside observable models.",
+      "files": [],
+      "assertions": [
+        "Uses `@MainActor` for the UI-bound observable store or view model without claiming every observable domain model must be main-actor isolated.",
+        "Uses `@State` in the owning view for the observable object lifecycle.",
+        "Uses `@Bindable` only where a child view needs `$property` bindings.",
+        "Uses `@Environment(Type.self)` for shared observable state instead of `@EnvironmentObject` on iOS 17+.",
+        "Uses `.task` or `.task(id:)` for async loading and mentions automatic cancellation.",
+        "Avoids putting `@AppStorage` directly inside an `@Observable` class for view reactivity; uses view-level `@AppStorage` or normal UserDefaults-backed stored properties instead."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "migration-accuracy-review",
+      "prompt": "Review this SwiftUI iOS 26 migration note: always mark every @Observable type @MainActor; `Color(uiColor:)` is deprecated and replaced by shader libraries; SwiftUI `.copyable`, `.cuttable`, and `.pasteDestination` are iOS 16 APIs; `matchedTransitionSource` and `navigationTransition(.zoom)` are iOS 26 only; `PreviewProvider`, `EditButton`, and `.onDelete` are all deprecated. Correct the note.",
+      "expected_output": "A source-grounded correction that narrows actor isolation to UI-bound observable state, keeps Color(uiColor:) valid for UIKit bridging, states current Apple docs list copy/cut/command paste modifiers as macOS 13+ and iOS/iPadOS 27 beta rather than iOS 16/iOS 26 defaults, marks matchedTransitionSource/navigation zoom as iOS 18+, and distinguishes modern defaults from APIs that are not formally deprecated.",
+      "files": [],
+      "assertions": [
+        "Narrows `@MainActor` guidance to UI-bound observable stores/view models and avoids a universal rule for every `@Observable` type.",
+        "States that `Color(uiColor:)` remains valid for bridging existing UIKit colors.",
+        "Does not recommend `.copyable`, `.cuttable`, or command-based `.pasteDestination(for:action:validator:)` as iOS 16 or iOS 26 defaults; cites current Apple docs as macOS 13+ and iOS/iPadOS 27 beta for those command modifiers.",
+        "Corrects `matchedTransitionSource` and `navigationTransition(.zoom)` availability to iOS 18+.",
+        "Treats `#Preview` as the modern preview default without falsely saying all `PreviewProvider` use is compiler-deprecated.",
+        "Treats `EditButton`, `.onDelete`, and `.onMove` as still valid for edit-mode list workflows while recommending `.swipeActions` for contextual row actions."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "sibling-boundary-routing",
+      "prompt": "A SwiftUI dashboard needs a shared store, child edit forms, async refresh, a NavigationStack path with deep links, a large searchable grid, a matched hero transition, and iOS 26 Liquid Glass scroll-edge polish. Which parts should the swiftui-patterns skill own, and what should be routed to sibling skills?",
+      "expected_output": "A boundary-aware routing answer that keeps swiftui-patterns focused on MV architecture, Observation ownership, binding/environment wiring, view decomposition, and .task refresh, while routing NavigationStack/deep links to swiftui-navigation, grid/search/layout work to swiftui-layout-components, detailed matched-transition work to swiftui-animation, and Liquid Glass polish to swiftui-liquid-glass.",
+      "files": [],
+      "assertions": [
+        "Keeps shared store ownership, `@Observable`, `@State`, `@Bindable`, and environment wiring in `swiftui-patterns` scope.",
+        "Keeps async refresh with `.task` or `.refreshable` in `swiftui-patterns` scope.",
+        "Routes NavigationStack path and deep-link implementation details to `swiftui-navigation`.",
+        "Routes large searchable grid, layout, List/Form/Search UI details to `swiftui-layout-components`.",
+        "Routes detailed matched hero transition implementation to `swiftui-animation`.",
+        "Routes iOS 26 Liquid Glass and scroll-edge visual treatment details to `swiftui-liquid-glass`."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "decomposition-and-preview-isolation",
+      "prompt": "Review a 420-line SwiftUI account dashboard. Its header is a small stateless computed `some View`; its activity section has substantial branching, starts async work, reads only two properties from a large @Observable store, and would be useful to preview alone. The file is split into extensions with `// MARK:` headings. Its current preview makes dependencies optional to avoid crashes and then loads the signed-in user from the live API and production SwiftData store. Give a focused refactor and preview-construction plan, and say where advanced cancellation and search debounce guidance belongs.",
+      "expected_output": "A focused SwiftUI patterns review that keeps the tiny stateless header computed, extracts the complex activity section into a dedicated View based on branching/lifecycle/dependency/preview/data-flow signals, treats extensions and MARK comments as organization only, builds deterministic loaded/loading/empty/error previews with every required dependency and isolated persistence installed, preserves required dependency types, avoids live services and global state, and routes advanced cancellation/debounce to swift-concurrency.",
+      "files": [],
+      "assertions": [
+        "Uses meaningful branching or substantial layout, local state or async lifecycle, narrower Observation dependencies, independent preview value, and parent data-flow clarity as extraction signals rather than requiring reuse.",
+        "Keeps the small stateless header as a computed `some View` property.",
+        "Explains that extensions and `// MARK:` headings organize a file but do not replace dedicated-view decomposition.",
+        "Covers deterministic loaded, meaningful loading, empty, and error preview states.",
+        "Installs every required environment dependency and uses isolated in-memory or temporary persistence fixtures.",
+        "Avoids live networking, authentication, production databases, keychain state, and global singletons in previews.",
+        "Keeps required dependencies nonoptional and fixes preview composition instead of weakening production types.",
+        "Routes advanced cancellation, debounce, clocks, or AsyncSequence details to the `swift-concurrency` skill."
+      ]
+    },
+    {
+      "id": 4,
+      "name": "behavior-preserving-view-refactor",
+      "prompt": "Refactor a 360-line SwiftUI editor without changing its layout or behavior. The body contains large sections, a Save button with validation and persistence inline, and a task modifier that mixes loading policy with UI state. Give the refactor contract and verification plan.",
+      "expected_output": "A behavior-preserving structure refactor that extracts meaningful dedicated views, turns non-trivial body closures into thin named methods, keeps business rules and reusable effects in services/models, preserves layout/navigation/accessibility/timing, and verifies both compilation and useful previews.",
+      "files": [],
+      "assertions": [
+        "Preserves layout, navigation, accessibility, side-effect timing, and domain behavior because the request is structure-only.",
+        "Extracts meaningful sections into dedicated View types rather than replacing the screen with many large computed `some View` properties.",
+        "Moves non-trivial Save and task closures to thin named methods so `body` reads as UI.",
+        "Keeps validation, persistence, and reusable loading policy in services or models rather than hiding business logic in view methods.",
+        "Builds the affected target and renders independently useful deterministic previews after refactoring."
+      ]
+    }
+  ]
+}

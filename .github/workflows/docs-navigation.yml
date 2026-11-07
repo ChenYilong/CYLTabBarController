@@ -9,6 +9,10 @@ on:
       - "docs/**"
       - "CYLTabBarController/**/*.h"
       - "scripts/update-docs-navigation.py"
+      - "scripts/sync-agent-skills.py"
+      - ".agents/**"
+      - ".claude/**"
+      - "Example*/**"
   push:
     branches: [master]
     paths:
@@ -16,6 +20,10 @@ on:
       - "docs/**"
       - "CYLTabBarController/**/*.h"
       - "scripts/update-docs-navigation.py"
+      - "scripts/sync-agent-skills.py"
+      - ".agents/**"
+      - ".claude/**"
+      - "Example*/**"
 
 permissions:
   contents: read
@@ -24,6 +32,8 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Check the navigation
         run: python3 scripts/update-docs-navigation.py --check
+      - name: Check the agent skills
+        run: python3 scripts/sync-agent-skills.py --check

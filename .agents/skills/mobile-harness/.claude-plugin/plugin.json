@@ -1,0 +1,15 @@
+{
+  "name": "mobile-harness",
+  "description": "Portable Android and iOS device-control harness for agents. Use when an agent needs to control or automate Android/iOS devices — tap, swipe, screenshot, app control — locally (ADB/Portal/Simulator) or on Mobilerun cloud devices.",
+  "author": {
+    "name": "Droidrun",
+    "url": "https://github.com/droidrun"
+  },
+  "homepage": "https://github.com/droidrun/mobile-harness",
+  "repository": "https://github.com/droidrun/mobile-harness",
+  "license": "MIT",
+  "supportUrl": "https://github.com/droidrun/mobile-harness/issues",
+  "privacyPolicyUrl": "https://cloud.mobilerun.ai/legal/privacy-policy",
+  "documentationUrl": "https://github.com/droidrun/mobile-harness#readme",
+  "termsOfServiceUrl": "https://cloud.mobilerun.ai/legal/terms-of-service"
+}

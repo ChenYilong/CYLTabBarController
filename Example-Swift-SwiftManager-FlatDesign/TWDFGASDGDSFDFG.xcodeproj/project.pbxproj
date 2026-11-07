@@ -37,6 +37,7 @@
 		7FC449381153484D34773260 /* tabbar_room_roomStyle.json in Resources */ = {isa = PBXBuildFile; fileRef = D95ECFACFC37FF291252DEC7 /* tabbar_room_roomStyle.json */; };
 		75D199E1E3DCCED4E79990B0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C4832CA275DE4090AA78F5C /* Main.storyboard */; };
 		87F47C6E723880AACE24971E /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FAD215DDFE0E89CF5431A7 /* MainTabBarController.swift */; };
+		C141A09845141359932C78A8 /* TabPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC5632D0049B91CD0650975 /* TabPages.swift */; };
 		51E56939A7076E52F07962B9 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505709449166D10139D5C6EE /* SceneDelegate.swift */; };
 		1124AC0201D69C8AFE54D1B7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38519FD3E540335F54821C44 /* ViewController.swift */; };
 /* End PBXBuildFile section */
@@ -72,6 +73,7 @@
 		D95ECFACFC37FF291252DEC7 /* tabbar_room_roomStyle.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = tabbar_room_roomStyle.json; sourceTree = "<group>"; };
 		9128E5B92B3FAD259EBB3D5C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		83FAD215DDFE0E89CF5431A7 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
+		7EC5632D0049B91CD0650975 /* TabPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPages.swift; sourceTree = "<group>"; };
 		505709449166D10139D5C6EE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		38519FD3E540335F54821C44 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -143,6 +145,7 @@
 				952257D8B9158439CAC26D25 /* LottieResources */,
 				3C4832CA275DE4090AA78F5C /* Main.storyboard */,
 				83FAD215DDFE0E89CF5431A7 /* MainTabBarController.swift */,
+				7EC5632D0049B91CD0650975 /* TabPages.swift */,
 				505709449166D10139D5C6EE /* SceneDelegate.swift */,
 				38519FD3E540335F54821C44 /* ViewController.swift */,
 			);
@@ -249,6 +252,7 @@
 				46C63602F8CB46649B917608 /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				B9BC1761FBD8545416E19419 /* AppDelegate.swift in Sources */,
 				87F47C6E723880AACE24971E /* MainTabBarController.swift in Sources */,
+				C141A09845141359932C78A8 /* TabPages.swift in Sources */,
 				51E56939A7076E52F07962B9 /* SceneDelegate.swift in Sources */,
 				1124AC0201D69C8AFE54D1B7 /* ViewController.swift in Sources */,
 			);

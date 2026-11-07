@@ -1,0 +1,12 @@
+# Graduated enforcement — testing/tdd-feature.
+# Merge into your project's .swiftlint.yml (see generators/ci-cd-setup).
+custom_rules:
+  xctest_in_unit_tests:
+    # Scoped to unit-test paths ONLY. XCUITest still requires XCTest —
+    # never ban the import globally.
+    name: "XCTest in unit tests"
+    message: "New unit tests use Swift Testing (import Testing). XCTest remains only for XCUITest UI-test targets."
+    regex: '^import XCTest$'
+    included: ".*Tests/.*"
+    excluded: ".*UITests?/.*"
+    severity: warning

@@ -255,6 +255,15 @@
 "跳转与对比" = "이동 및 비교";
 "角标" = "배지";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass에서는 지원되지 않음: 탭 바 높이는 시스템이 정합니다(FlatDesign과 클래식 스타일은 지원)";
+"从配置文件创建 TabBarController" = "구성 파일로 TabBarController 만들기";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "파일 하나로 탭 바 전체를 만듭니다: JSON, YAML, TOML, plist, XML, INI 등을 선택하거나 URL에서 불러옵니다.";
+"选择配置文件" = "구성 파일 선택";
+"从网络 URL 加载" = "URL에서 불러오기";
+"无法创建 TabBarController" = "TabBarController를 만들 수 없습니다";
+"本页由配置文件 %@ 创建：" = "이 페이지는 구성 %@에서 만들어졌습니다:";
+"配置文件：模拟意外情况" = "구성 파일: 오류 상황 시뮬레이션";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController를 안전하게 만들었습니다: 탭 %@개";
+"查看" = "보기";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "스크롤 시 숨기기: 예외 상황 시뮬레이션 (issue #13)";
@@ -296,6 +305,7 @@
 "轻触感反馈" = "약한 햅틱";
 "重触感反馈" = "강한 햅틱";
 "长按（#152）" = "길게 누르기 (#152)";
+"播放 / 停止" = "재생 / 정지";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "크리스마스";
@@ -313,9 +323,48 @@
 "仅配色" = "색상만";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "탭하기";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "두 탭 바가 같은 구성을 사용하고, 각자의 레지스트리가 같은 페이지 ID를 서로 다른 페이지에 연결합니다.";
+"两个 TabBar，同一个页面 ID" = "두 탭 바, 같은 페이지 ID";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "이미지 불러오기";
+"替换为更大的图片" = "더 큰 이미지로 교체";
+"移除图片" = "이미지 제거";
+"加载背景图片" = "배경 이미지 불러오기";
+"2 秒后：%@" = "2초 후: %@";
+"PlusButton 图片之后才加载" = "나중에 불러오는 PlusButton 이미지";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "탭하여 시나리오를 고르고 TabBarController를 push합니다. PlusButton은 처음에 이미지가 없고, 2초 후 이미지를 불러오거나 교체하거나 제거하거나 배경 이미지를 불러옵니다. 결과는 시작 시 이미지를 설정한 경우와 같아야 합니다.";
+"对照：启动时即有图片" = "비교: 시작 시 이미지 있음";
+"对照：启动时即有更大的图片" = "비교: 시작 시 더 큰 이미지 있음";
+"对照：启动时即有背景图片" = "비교: 시작 시 배경 이미지 있음";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "탭하여 돌아가기 또는 닫기";
+"详情" = "상세";
+"拍照" = "사진 찍기";
+"从相册选择" = "앨범에서 선택";
+"设置" = "설정";
+"关于我们" = "회사 소개";
+"示例" = "예시";
+"撰写" = "작성";
+"好" = "확인";
+"编辑更多" = "더 보기 편집";
+"新版本" = "새 버전";
+"打开 TabBar 场景展示" = "TabBar 갤러리 열기";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "모든 장면은 공개 API로 만든 TabBar입니다: 스타일, 애니메이션, 알림, Lottie, 새로운 Tab API";
+"TabBar 场景展示" = "TabBar 갤러리";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "복사";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
 "展开全部 %@ 个模拟" = "시뮬레이션 %@개 모두 보기";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "시뮬레이션 목록 접기";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "탭 %1$@개 건너뜀: %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "네트워크 아이콘";
+"网络图标、标题与配色" = "네트워크 아이콘, 제목과 색상";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "구성 파일";

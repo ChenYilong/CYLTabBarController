@@ -29,6 +29,7 @@
 | [建议与对应功能](#cn建议与对应功能) | [Suggestions and what they became](#ensuggestions-and-what-they-became) |
 | [点击动画](#cn点击动画) | [Tap animations](#entap-animations) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [重复点击与按下动画](#cn重复点击与按下动画) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Reselect and pressed animations](#enreselect-and-pressed-animations) |
+| [点击声音与触感反馈](#cn点击声音与触感反馈) | [Tap sound and haptics](#entap-sound-and-haptics) |
 | [长按](#cn长按) | [Long press](#enlong-press) |
 | [左右滑动切换 Tab](#cn左右滑动切换-tab) | [Swipe to switch tabs](#enswipe-to-switch-tabs) |
 | [超出父视图的子视图响应点击](#cn超出父视图的子视图响应点击) | [Subviews that respond outside their superview](#ensubviews-that-respond-outside-their-superview) |
@@ -43,6 +44,11 @@
 | [兼容性与隔离](#cn兼容性与隔离) | [Compatibility and guards](#encompatibility-and-guards) |
 | [各项关系图](#cn各项关系图) | [How the pieces relate](#enhow-the-pieces-relate) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [点击动画](#cn点击动画-1) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Tap animations](#entap-animations-1) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [长按](#cn长按-1) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Long press](#enlong-press-1) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [左右滑动切换 Tab](#cn左右滑动切换-tab-1) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Swipe to switch tabs](#enswipe-to-switch-tabs-1) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [滑动转场](#cn滑动转场) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Slide transition](#enslide-transition) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [超出父视图响应点击与不继承基类隐藏导航栏](#cn超出父视图响应点击与不继承基类隐藏导航栏) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Touches outside the superview, and the navigation bar without a base class](#entouches-outside-the-superview-and-the-navigation-bar-without-a-base-class) |
 | [待办](#cn待办) | [To do](#ento-do) |
 
 <!-- navigation:end -->
@@ -110,6 +116,10 @@ messageNavigationController.cyl_tabButtonAnimation = [[CYLTabButtonRotationAnima
 tabBarController.cyl_tabButtonTapAnimationType = .bounce
 ```
 
+| 中文 | English |
+|:---|:---|
+| 一个动画可能在按钮上留下状态：逐帧动画在 Tab 选中期间保持最后一帧，Fume 在选中期间隐藏标题。若 Tab 选中期间换成另一个动画（例如修改 `cyl_tabButtonTapAnimationType`），TabBarController 会先调用上一个动画可选实现的 `-cyl_resetTabButton:iconView:titleLabel:` 撤销这些状态，再播放新的动画。自己实现 `<CYLTabButtonAnimation>` 时，如果选中动画留下的状态需要由取消选中动画撤销，也请实现该方法。逐帧动画取消选中时倒序播放，结束后恢复显示图标本身。 | An animation can leave state on the button: the frame animation keeps its last frame while the tab is selected, and Fume hides the title. When another animation takes over while the tab is selected (e.g. `cyl_tabButtonTapAnimationType` changes), the tab bar controller first calls the previous animation's optional `-cyl_resetTabButton:iconView:titleLabel:` to undo that state, then plays the new one. When your own `<CYLTabButtonAnimation>` leaves state that its deselect animation would undo, implement it too. The frame animation's deselect plays the frames in reverse, then shows the icon itself again. |
+
 ### [CN]重复点击与按下动画
 ### [EN]Reselect and pressed animations
 
@@ -132,6 +142,23 @@ tabBarController.cyl_defaultTabButtonAnimation = [CYLTabButtonPressAnimation new
     [[CYLTabButtonRotationAnimation new] cyl_playSelectAnimationWithTabButton:button iconView:iconView titleLabel:titleLabel];
 }
 @end
+```
+
+## [CN]点击声音与触感反馈
+## [EN]Tap sound and haptics
+
+| 中文 | English |
+|:---|:---|
+| 点击 Tab 或 PlusButton 时可以播放声音和触感反馈，默认都关闭。它们在 `-tabBarController:didSelectControl:` 之前与点击动画一起播放，因此场景相同：点击、再次点击已选中的 Tab、滑动切换、代码修改 `selectedIndex`；被登录检查拒绝的点击不会播放。 | A tap on a tab or the plus button can play a sound and a haptic; both are off by default. They play with the tap animation, right before `-tabBarController:didSelectControl:`, so in the same cases: a tap, a repeated tap on the selected tab, a swipe, a change of `selectedIndex` in code; not a tap refused by the login check. |
+| 声音：默认是系统键盘点击声，也可以用 `cyl_tabButtonTapSoundURL` 指定本地音频文件（.caf、.wav、.aif，最长 30 秒）。与所有系统音效一样，受静音开关与系统音量控制。音效只创建一次，更换时释放（issue 中的示例代码每次点击都会新建且从不释放）。 | Sound: the system keyboard click by default, or a local file through `cyl_tabButtonTapSoundURL` (.caf, .wav or .aif, at most 30 seconds). Like any system sound, it follows the ring/silent switch and the volume. The sound is created once and released when it changes (the issue's sample code created one on every tap and never released it). |
+| 触感反馈：`UIImpactFeedbackGenerator`，强度由 `cyl_tabButtonHapticFeedbackStyle` 设置（默认 Medium）。只有带 Taptic Engine 的真机会振动，模拟器不会。 | Haptics: `UIImpactFeedbackGenerator`, with the strength in `cyl_tabButtonHapticFeedbackStyle` (default Medium). Only a device with a Taptic Engine vibrates; the simulator does not. |
+
+```objc
+tabBarController.cyl_tabButtonTapSoundEnabled = YES;
+tabBarController.cyl_tabButtonHapticFeedbackEnabled = YES;
+tabBarController.cyl_tabButtonHapticFeedbackStyle = UIImpactFeedbackStyleLight;
+// [EN] Optional: your own sound. [CN] 可选：自己的音效。
+tabBarController.cyl_tabButtonTapSoundURL = [[NSBundle mainBundle] URLForResource:@"tap" withExtension:@"caf"];
 ```
 
 ## [CN]长按
@@ -230,6 +257,8 @@ self.cyl_hidesAncestorNavigationBars = YES;
 | Hide the navigation bar without a base class (issue #535) | `cyl_automaticNavigationSettingEnabled`, `cyl_navigationBarHidden`, `cyl_hidesAncestorNavigationBars` | The switch sets the automatic mode; tap the row to push a plain UIViewController and compare the bar with the switch off and on |
 | Slide transition (CYLTabBarSlideTransitionAnimator) | `CYLTabBarSlideTransitionAnimator`, `CYLTabBarInteractiveTransition` | Tap to open a system UITabBarController, then tap a tab or drag the page |
 | Swift Demo（Example-Swift、-02、-03、-04、Carthage、SwiftManager-FlatDesign、SwiftUI）：共享文件 `Example-Shared/CYLPlusButtonBadgeDemo.swift` 中的 `demoSetUpInteractions()` 开启弹性点击动画、长按弹窗与滑动切换；它由各 TabBarController 在 `viewDidAppear(_:)` 中已调用的 `demoShowPlusButtonBadgeAfterLayout()` 调用，因此各 Demo 的代码无需修改。 | Swift demos (Example-Swift, -02, -03, -04, Carthage, SwiftManager-FlatDesign, SwiftUI): `demoSetUpInteractions()` in the shared `Example-Shared/CYLPlusButtonBadgeDemo.swift` turns on the bounce tap animation, the long press alert and swiping; `demoShowPlusButtonBadgeAfterLayout()`, which each tab bar controller already calls in `viewDidAppear(_:)`, calls it, so the demos' own code is unchanged. |
+| Swift 测试列表：`Example-Shared/CYLSettingsDemoTableViewController.swift` 是 ObjC Demo 测试列表的纯 Swift 版本，按库提供的分组（`-cyl_settingsGroups`、`-cyl_settingsRowsInGroup:`）显示所有设置行，包括本页的全部演示行。Example-Rive 与 Example-SwiftUI-Rive 的 Bell Tab、Example-PAG 的「我的」Tab 使用它。 | The Swift test list: `Example-Shared/CYLSettingsDemoTableViewController.swift` is the ObjC demo's test list in pure Swift; it shows every settings row in the library's groups (`-cyl_settingsGroups`, `-cyl_settingsRowsInGroup:`), including every demo row of this page. The Bell tab of Example-Rive and Example-SwiftUI-Rive, and the Me tab of Example-PAG, use it. |
+| 新增的演示行：「Tab 点击声音与触感反馈」「长按时长与双击间隔」「切换到上一个 / 下一个 Tab」「CYLUtils 弱引用关联对象与查找按钮」；点击动画行还依次演示设置了属性的动画类（慢速放大、星星烟花、向上卷页等）。 | Rows added later: "Tab tap sound and haptics", "Long press duration and double tap interval", "Previous / next tab" and "CYLUtils weak associated objects and finding a button"; the tap animation row also cycles the animation classes with their properties (slow scale, star fireworks, curl up and more). |
 | 所有 Demo 仍只导入 CYLTabBarController，Podfile 与 Package 无需修改。演示文案已加入全部 33 种语言。 | Every demo still imports only CYLTabBarController; no Podfile or package changes. The demo texts are in all 33 languages. |
 
 ### [CN]角标变化动画
@@ -311,6 +340,9 @@ tabBarController.cyl_defaultTabButtonAnimation = animation
 | `-cyl_playTabButtonAnimationForControl:` | 立即播放某个按钮的点击动画 | `CYLTabBarController+CYLInteraction.h` |
 | `cyl_didLongPressControlBlock` / `-tabBarController:didLongPressControl:` | 长按回调 | `CYLTabBarController+CYLInteraction.h` / `CYLTabBarController.h` |
 | `cyl_tabButtonLongPressMinimumDuration` | 长按时长，默认 0.5 秒 | `CYLTabBarController+CYLInteraction.h` |
+| `cyl_tabButtonTapSoundEnabled` / `cyl_tabButtonTapSoundURL` / `cyl_tabButtonHapticFeedbackEnabled` / `cyl_tabButtonHapticFeedbackStyle` / `-cyl_playTabButtonTapFeedback` | 点击声音与触感反馈，默认关闭 | `CYLTabBarController+CYLInteraction.h` |
+| `-cyl_resetTabButton:iconView:titleLabel:`（可选） | 其他动画接管按钮时，撤销本动画留下的状态 | `CYLTabButtonAnimation.h` |
+| `UIControl.cyl_tabBarItemDisplayName` | 用于显示的 Tab 名称：标题、标识或类名 | `UIControl+CYLTabBarControllerExtention.h` |
 | `cyl_swipeToSwitchTabEnabled` / `-cyl_switchToAdjacentTabWithStep:animated:` | 左右滑动切换 Tab / 代码切换到相邻 Tab | `CYLTabBarController+CYLInteraction.h` |
 | `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:` | 角标出现或变化时的动画（可选协议方法） | `CYLTabButtonAnimation.h` |
 | `-cylPlay…AnimationWithTabButton:…` | 协议方法的无下划线写法（Swift：`cylPlay…Animation(withTabButton:…)`），优先于 `cyl_play…` 调用 | `CYLTabButtonAnimation.h` |
@@ -328,6 +360,9 @@ tabBarController.cyl_defaultTabButtonAnimation = animation
 | `-cyl_playTabButtonAnimationForControl:` | Plays a button's tap animation now | `CYLTabBarController+CYLInteraction.h` |
 | `cyl_didLongPressControlBlock` / `-tabBarController:didLongPressControl:` | The long press callback | `CYLTabBarController+CYLInteraction.h` / `CYLTabBarController.h` |
 | `cyl_tabButtonLongPressMinimumDuration` | How long a long press is, default 0.5 s | `CYLTabBarController+CYLInteraction.h` |
+| `cyl_tabButtonTapSoundEnabled` / `cyl_tabButtonTapSoundURL` / `cyl_tabButtonHapticFeedbackEnabled` / `cyl_tabButtonHapticFeedbackStyle` / `-cyl_playTabButtonTapFeedback` | Tap sound and haptics, off by default | `CYLTabBarController+CYLInteraction.h` |
+| `-cyl_resetTabButton:iconView:titleLabel:` (optional) | Undoes what this animation left on a button when another animation takes over | `CYLTabButtonAnimation.h` |
+| `UIControl.cyl_tabBarItemDisplayName` | A name to show for a tab: its title, identifier or class name | `UIControl+CYLTabBarControllerExtention.h` |
 | `cyl_swipeToSwitchTabEnabled` / `-cyl_switchToAdjacentTabWithStep:animated:` | Swipe to switch tabs / switch to the adjacent tab in code | `CYLTabBarController+CYLInteraction.h` |
 | `-cyl_playBadgeChangedAnimationWithTabButton:iconView:badgeView:` | The animation when a badge appears or changes (optional protocol method) | `CYLTabButtonAnimation.h` |
 | `-cylPlay…AnimationWithTabButton:…` | The underscore-free spelling of the protocol methods (Swift: `cylPlay…Animation(withTabButton:…)`), called before `cyl_play…` | `CYLTabButtonAnimation.h` |
@@ -387,15 +422,55 @@ flowchart TD
 
 | 中文 | English |
 |:---|:---|
-| 已在模拟器上验证（PR #744）：iOS 26.5 与 iOS 17.5 编译无警告，`pod lib lint --quick` 与文档导航检查通过。 | Checked on the simulator (PR #744): builds on iOS 26.5 and iOS 17.5 with no warnings; `pod lib lint --quick` and the docs navigation check pass. |
-| 扁平样式：13 种点击动画、长按、长按时长与双击间隔生效、滑动切换（含 PlusButton 页面）、上一个 / 下一个 Tab、CYLUtils 与 bundle 图片行、滑动转场演示，全部通过。 | FlatDesign: the 13 tap animation steps, long press, the long press duration and double tap interval taking effect, swipe (including the plus button's page), previous / next tab, the CYLUtils and bundle image rows, and the slide transition demo all pass. |
-| 液态玻璃（iOS 26.5）：滑动切换（带滑动动画）与长按通过。经典样式（iOS 17.5）：滑动切换（带滑动动画，在需要登录的 Tab 处停下并发起登录）通过。 | Liquid Glass (iOS 26.5): swipe (with the slide) and long press pass. Classic style (iOS 17.5): swipe (with the slide, stopping at a tab that needs login and starting the login) passes. |
+| 在模拟器上验证（PR #744 与 #752）：iOS 26.5 与 iOS 17.5 编译无警告，`pod lib lint --quick` 与文档导航检查通过。扁平样式、液态玻璃（iOS 26.5，Example-Rive）与经典样式（iOS 17.5，ObjC Demo）中，以下各项均通过：13 种点击动画、长按、长按时长与双击间隔生效、左右滑动切换（含 PlusButton 页面与需要登录的 Tab）、上一个 / 下一个 Tab、不继承基类隐藏导航栏、超出父视图响应点击、CYLUtils 与 bundle 图片行、滑动转场演示。点击声音与触感反馈只验证了不会出错：模拟器不会振动，声音未在真机上试听。 | Checked on the simulator (PRs #744 and #752): builds on iOS 26.5 and iOS 17.5 with no warnings; `pod lib lint --quick` and the docs navigation check pass. In FlatDesign, Liquid Glass (iOS 26.5, Example-Rive) and the classic style (iOS 17.5, the ObjC demo), all of these pass: the 13 tap animation steps, long press, the long press duration and double tap interval taking effect, swipe (including the plus button's page and a tab that needs login), previous / next tab, the navigation bar without a base class, touches outside the superview, the CYLUtils and bundle image rows, and the slide transition demo. The tap sound and haptics were only checked not to fail: the simulator does not vibrate, and the sound was not listened to on a device. |
+
+### [CN]点击动画
+### [EN]Tap animations
+
+| 中文 | English |
+|:---|:---|
+| 扁平样式：「弹性 + 星星烟花」（`CYLTabButtonBounceAnimation.fireworksImage`，SF Symbol 粒子保持黄色）。 | FlatDesign: "Bounce + star fireworks" (`CYLTabButtonBounceAnimation.fireworksImage`; the SF Symbol particles keep their yellow). |
+
+![](assets/tab-interactions-star-fireworks-flatdesign.png)
+
+### [CN]长按
+### [EN]Long press
+
+| 中文 | English |
+|:---|:---|
+| 依次为扁平样式、液态玻璃、经典样式：长按弹出被长按 Tab 的名称，抬起手指后不会选中该 Tab。 | FlatDesign, Liquid Glass and the classic style: a long press shows the pressed tab's name, and lifting the finger does not select it. |
+
+![](assets/tab-interactions-long-press-flatdesign.png) ![](assets/tab-interactions-long-press-liquid-glass.png) ![](assets/tab-interactions-long-press-classic.png)
+
+### [CN]左右滑动切换 Tab
+### [EN]Swipe to switch tabs
+
+| 中文 | English |
+|:---|:---|
+| 液态玻璃（滑动中，TabBar 保持显示）；经典样式 iOS 17（逐帧：旧页面滑出、新页面滑入）；经典样式中滑到需要登录的 Tab 时停下并发起登录。 | Liquid Glass (mid-swipe, the tab bar stays visible); the classic style on iOS 17 (frame by frame: the old page slides out, the new one in); in the classic style, a swipe to a tab that needs login stops there and starts the login. |
+
+![](assets/tab-interactions-swipe-liquid-glass.png) ![](assets/tab-interactions-swipe-login-classic.png)
+
+![](assets/tab-interactions-swipe-classic.png)
+
+### [CN]滑动转场
+### [EN]Slide transition
+
+![](assets/tab-interactions-slide-transition.png)
+
+### [CN]超出父视图响应点击与不继承基类隐藏导航栏
+### [EN]Touches outside the superview, and the navigation bar without a base class
+
+| 中文 | English |
+|:---|:---|
+| 依次为液态玻璃与经典样式：打开开关后，点击灰框外的按钮部分也会计数；经典样式中 push 的普通 UIViewController 隐藏了导航栏。 | Liquid Glass and the classic style: with the switch on, taps on the part of the button outside the gray box count; in the classic style, the plain UIViewController pushed has no navigation bar. |
+
+![](assets/tab-interactions-outside-superview-liquid-glass.png) ![](assets/tab-interactions-outside-superview-classic.png) ![](assets/tab-interactions-navigation-bar-hidden-classic.png)
 
 ## [CN]待办
 ## [EN]To do
 
 | 中文 | English |
 |:---|:---|
-| 1. 在液态玻璃与经典样式（iOS 17）中复测以下演示行（扁平样式已全部通过；滑动切换与长按已在三种样式中通过）：点击动画、长按时长与双击间隔、上一个 / 下一个 Tab、不继承基类隐藏导航栏、超出父视图响应点击。不能完全支持的样式在演示行副标题或弹框中提示。 | 1. Re-check these demo rows in Liquid Glass and the classic style (iOS 17); they all pass in FlatDesign, and swipe and long press already pass in all three styles: the tap animations, the long press duration and double tap interval, previous / next tab, the navigation bar without a base class, and touches outside the superview. Where a style cannot fully support a row, say so in the row's subtitle or an alert. |
-| 2. 文档截图：本轮新增功能（点击声音与触感反馈、长按、滑动切换、点击动画、CYLUtils 工具方法）的无异常截图尚未放入 `docs/assets/` 并在本文档中引用；按仓库规则补齐，最终截图同时放入 `README.md`。 | 2. Screenshots: bug-free screenshots of this round's features (tap sound and haptics, long press, swipe to switch tabs, the tap animations, the CYLUtils helpers) are not yet in `docs/assets/` or referenced here. Add them as the repository rules require, with the final ones in `README.md` too. |
-| 3. 在真机上验证点击声音与触感反馈（模拟器不会振动）。 | 3. Check the tap sound and haptics on a device (the simulator does not vibrate). |
+| 已完成：液态玻璃与经典样式中复测点击动画、长按时长与双击间隔、上一个 / 下一个 Tab、不继承基类隐藏导航栏、超出父视图响应点击（均通过，见上方截图）；补齐截图。 | Done: the re-check in Liquid Glass and the classic style of the tap animations, the long press duration and double tap interval, previous / next tab, the navigation bar without a base class and touches outside the superview (all pass, see the screenshots above); the screenshots. |
+| 仍待完成：在真机上验证点击声音与触感反馈（模拟器不会振动）。 | Still open: check the tap sound and haptics on a device (the simulator does not vibrate). |

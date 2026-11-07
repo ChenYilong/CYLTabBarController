@@ -20,20 +20,6 @@
                ReferencedContainer = "container:CYLTabBarController.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9AE9428C1BDC91B900354519"
-               BuildableName = "CYLTabBarControllerTests.xctest"
-               BlueprintName = "CYLTabBarControllerTests"
-               ReferencedContainer = "container:CYLTabBarController.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -51,16 +37,6 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9AE9428C1BDC91B900354519"
-               BuildableName = "CYLTabBarControllerTests.xctest"
-               BlueprintName = "CYLTabBarControllerTests"
-               ReferencedContainer = "container:CYLTabBarController.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

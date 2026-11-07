@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CYLTabBar 页面</string>
+    <string name="double_tapped">已双击</string>
+    <string name="skin_prefix">皮肤：</string>
+    <string name="android_extras">指示条、滑动翻页、可滚动</string>
+</resources>

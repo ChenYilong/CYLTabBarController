@@ -255,6 +255,15 @@
 "跳转与对比" = "Navigatie en vergelijkingen";
 "角标" = "Badges";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Niet ondersteund door Liquid Glass: het systeem bepaalt de hoogte van de tabbalk (FlatDesign en de klassieke stijl wel)";
+"从配置文件创建 TabBarController" = "TabBarController maken van een configuratiebestand";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Eén bestand maakt de hele tabbalk: kies JSON, YAML, TOML, plist, XML, INI en meer, of laad het van een URL.";
+"选择配置文件" = "Kies een configuratiebestand";
+"从网络 URL 加载" = "Laden van een URL";
+"无法创建 TabBarController" = "Kan de TabBarController niet maken";
+"本页由配置文件 %@ 创建：" = "Deze pagina is gemaakt van de configuratie %@:";
+"配置文件：模拟意外情况" = "Configuratie: gesimuleerde fouten";
+"已安全创建 TabBarController：%@ 个 Tab" = "TabBarController veilig gemaakt: %@ tabbladen";
+"查看" = "Bekijken";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Verbergen bij scrollen: onderbrekingen simuleren (issue #13)";
@@ -296,6 +305,7 @@
 "轻触感反馈" = "Lichte haptische feedback";
 "重触感反馈" = "Sterke haptische feedback";
 "长按（#152）" = "Lang drukken (#152)";
+"播放 / 停止" = "Afspelen / Stoppen";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "Kerstmis";
@@ -313,9 +323,48 @@
 "仅配色" = "Alleen kleuren";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Tik hier";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Twee tabbalken delen één configuratie; het register van elke balk koppelt dezelfde pagina-ID’s aan andere pagina’s.";
+"两个 TabBar，同一个页面 ID" = "Twee tabbalken, één pagina-ID";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Afbeelding laden";
+"替换为更大的图片" = "Vervangen door een grotere afbeelding";
+"移除图片" = "Afbeelding verwijderen";
+"加载背景图片" = "Achtergrondafbeelding laden";
+"2 秒后：%@" = "Over 2 seconden: %@";
+"PlusButton 图片之后才加载" = "PlusButton-afbeelding later geladen";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Tik om een geval te kiezen en een tabbalkcontroller te pushen: de PlusButton heeft eerst geen afbeelding; 2 seconden later wordt de afbeelding geladen, vervangen of verwijderd, of een achtergrondafbeelding geladen. Het resultaat moet gelijk zijn aan een afbeelding die bij het starten is ingesteld.";
+"对照：启动时即有图片" = "Vergelijk: afbeelding bij starten";
+"对照：启动时即有更大的图片" = "Vergelijk: grotere afbeelding bij starten";
+"对照：启动时即有背景图片" = "Vergelijk: achtergrondafbeelding bij starten";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Tik om terug te gaan of te sluiten";
+"详情" = "Details";
+"拍照" = "Foto maken";
+"从相册选择" = "Kies uit album";
+"设置" = "Instellingen";
+"关于我们" = "Over ons";
+"示例" = "Voorbeeld";
+"撰写" = "Opstellen";
+"好" = "OK";
+"编辑更多" = "Meer bewerken";
+"新版本" = "Nieuwe versie";
+"打开 TabBar 场景展示" = "Tabbalkgalerij openen";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Elke scène is een tabbalk gebouwd met de openbare API: stijlen, animaties, meldingen, Lottie en de nieuwere tab-API's";
+"TabBar 场景展示" = "Tabbalkgalerij";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Kopieer";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
 "展开全部 %@ 个模拟" = "Alle %@ simulaties tonen";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Simulatielijst inklappen";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "%1$@ tabbladen overgeslagen: %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Netwerkpictogrammen";
+"网络图标、标题与配色" = "Netwerkpictogrammen, titels en kleuren";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Configuratiebestand";

@@ -255,6 +255,15 @@
 "跳转与对比" = "Nawigacja i porównania";
 "角标" = "Plakietki";
 "液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）" = "Liquid Glass nie obsługuje: wysokość paska ustala system (FlatDesign i styl klasyczny obsługują)";
+"从配置文件创建 TabBarController" = "Utwórz TabBarController z pliku konfiguracyjnego";
+"一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。" = "Jeden plik tworzy cały pasek kart: wybierz JSON, YAML, TOML, plist, XML, INI i inne lub wczytaj z adresu URL.";
+"选择配置文件" = "Wybierz plik konfiguracyjny";
+"从网络 URL 加载" = "Wczytaj z adresu URL";
+"无法创建 TabBarController" = "Nie można utworzyć TabBarController";
+"本页由配置文件 %@ 创建：" = "Ta strona została utworzona z konfiguracji %@:";
+"配置文件：模拟意外情况" = "Konfiguracja: symulowane awarie";
+"已安全创建 TabBarController：%@ 个 Tab" = "Bezpiecznie utworzono TabBarController: kart: %@";
+"查看" = "Pokaż";
 
 /* Issue #13: scroll hiding simulation section. */
 "滚动隐藏：模拟意外情况（issue #13）" = "Ukrywanie przy przewijaniu: symulacja przerwań (issue #13)";
@@ -296,6 +305,7 @@
 "轻触感反馈" = "Lekka haptyka";
 "重触感反馈" = "Silna haptyka";
 "长按（#152）" = "Długie naciśnięcie (#152)";
+"播放 / 停止" = "Odtwórz / Zatrzymaj";
 
 /* Issue #216: the holiday skins and the theme list section. */
 "圣诞节" = "Boże Narodzenie";
@@ -313,9 +323,48 @@
 "仅配色" = "Tylko kolory";
 /* Issue #535 demo: the button that sticks out of its superview. */
 "点我" = "Stuknij";
+"两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。" = "Dwa paski kart korzystają z jednej konfiguracji; rejestr każdego z nich przypisuje te same ID stron do różnych stron.";
+"两个 TabBar，同一个页面 ID" = "Dwa paski kart, jeden ID strony";
+
+/* A plus button whose image is set later (demo row). */
+"加载图片" = "Wczytaj obraz";
+"替换为更大的图片" = "Zastąp większym obrazem";
+"移除图片" = "Usuń obraz";
+"加载背景图片" = "Wczytaj obraz tła";
+"2 秒后：%@" = "Za 2 sekundy: %@";
+"PlusButton 图片之后才加载" = "Obraz PlusButton wczytany później";
+"点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。" = "Stuknij, aby wybrać przypadek i wypchnąć kontroler paska kart: PlusButton początkowo nie ma obrazu; po 2 sekundach obraz jest wczytywany, zastępowany lub usuwany albo wczytywany jest obraz tła. Wynik powinien być taki sam jak przy obrazie ustawionym przy uruchomieniu.";
+"对照：启动时即有图片" = "Porównanie: obraz przy uruchomieniu";
+"对照：启动时即有更大的图片" = "Porównanie: większy obraz przy uruchomieniu";
+"对照：启动时即有背景图片" = "Porównanie: obraz tła przy uruchomieniu";
+
+/* Tab bar gallery demo (#758). */
+"点击返回或关闭" = "Stuknij, aby wrócić lub zamknąć";
+"详情" = "Szczegóły";
+"拍照" = "Zrób zdjęcie";
+"从相册选择" = "Wybierz z albumu";
+"设置" = "Ustawienia";
+"关于我们" = "O nas";
+"示例" = "Przykład";
+"撰写" = "Napisz";
+"好" = "OK";
+"编辑更多" = "Edytuj Więcej";
+"新版本" = "Nowa wersja";
+"打开 TabBar 场景展示" = "Otwórz galerię pasków kart";
+"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API" = "Każda scena to pasek kart zbudowany za pomocą publicznego API: style, animacje, przypomnienia, Lottie i nowsze API kart";
+"TabBar 场景展示" = "Galeria pasków kart";
+
 /* Issue #13 demo: the context menu action that copies a row's title. */
 "复制" = "Kopiuj";
 /* Issue #13 demo: the row that expands the collapsed list of scroll hiding simulations; %@ is their count. */
 "展开全部 %@ 个模拟" = "Pokaż wszystkie symulacje (%@)";
 /* Issue #13 demo: the row that collapses the list of scroll hiding simulations. */
 "收起模拟列表" = "Zwiń listę symulacji";
+/* Configuration demo: the tabs that got no page (docs/Tab-Page-Registry.md). */
+"跳过 %1$@ 个 Tab：%2$@" = "Pominięto %1$@ kart: %2$@";
+
+/* Issue #216: the network skin (icons downloaded from the network, titles, colors). */
+"网络图标" = "Ikony z sieci";
+"网络图标、标题与配色" = "Ikony z sieci, tytuły i kolory";
+/* The settings group of the configuration file rows (docs/Configuration-File.md). */
+"配置文件" = "Plik konfiguracji";

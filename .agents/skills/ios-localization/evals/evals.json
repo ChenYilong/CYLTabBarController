@@ -1,0 +1,49 @@
+{
+  "skill_name": "ios-localization",
+  "evals": [
+    {
+      "id": 0,
+      "name": "generated-symbols-plurals",
+      "prompt": "I am updating an iOS 26 SwiftUI booking app for localization. We have a new Localizable.xcstrings file, a manually managed key named room_available whose English value is \"Book this room\", and a parameterized key named landmarks_count for \"42 landmarks\". Give me a concise migration plan and Swift snippets that use Xcode generated localizable symbols, plural-friendly placeholders, and modern string APIs. Also say what to do with old NSLocalizedString calls.",
+      "expected_output": "A concise migration plan that uses String Catalogs, generated symbols, correct positional named placeholders, modern String(localized:) / LocalizedStringResource guidance, plural variants, and legacy NSLocalizedString migration notes.",
+      "files": [],
+      "expectations": [
+        "Frames String Catalogs as the Xcode 15+ recommended workflow and does not claim they require iOS 17.",
+        "Mentions enabling Generate String Catalog Symbols and using stable manually managed keys.",
+        "Uses generated symbol examples such as Text(.roomAvailable) and Text(.landmarksCount(count: 42)).",
+        "Uses a positional named placeholder such as %1$(count)lld for the parameterized generated symbol.",
+        "Distinguishes String(localized:) for resolved strings from LocalizedStringResource for deferred or system-framework resolution.",
+        "Treats NSLocalizedString as legacy for new Swift code while acknowledging literal keys can still be exported or migrated."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "package-bundle-localization",
+      "prompt": "Please review this Swift package localization setup. SharedUI has Resources/Localizable.xcstrings and Package.swift includes .process(\"Resources\"). Inside the package target we wrote Text(\"Save\") and String(localized: \"settings.title\") with no bundle argument. In the app target the same keys work, but in the package they fall back to English. What should we change?",
+      "expected_output": "A review that explains package resources need explicit bundle lookup, recommends bundle: .module for Swift Package strings and SwiftUI Text, and keeps the guidance scoped to localization rather than package architecture.",
+      "files": [],
+      "expectations": [
+        "States that code outside the main app bundle needs an explicit bundle for localized resources.",
+        "Recommends String(localized: \"settings.title\", bundle: .module) or equivalent for Swift Package code.",
+        "Recommends SwiftUI Text with an explicit package bundle, such as Text(\"Save\", bundle: .module), or an equivalent localized label wrapper.",
+        "Does not claim SwiftUI Text inside a package automatically uses .module.",
+        "Mentions verifying the .xcstrings file is included in the package target resources.",
+        "Keeps the answer focused on localization bundle lookup rather than unrelated package architecture."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "formatstyle-boundary",
+      "prompt": "I am not adding new languages yet. I need to design a custom ParseableFormatStyle for follower counts like 12.5K, audit Date.IntervalFormatStyle usage, and format URLs for display. Should the iOS localization skill own this, or is there a better skill/domain? Give a short routing answer with the minimum localization advice that still matters.",
+      "expected_output": "A boundary answer that routes deep standalone FormatStyle API design to swift-formatstyle while giving minimal locale-facing localization cautions.",
+      "files": [],
+      "expectations": [
+        "Routes custom ParseableFormatStyle, Date.IntervalFormatStyle, and URL.FormatStyle design to the swift-formatstyle skill or domain.",
+        "Explains that ios-localization covers FormatStyle when the task is locale-aware display for localization and internationalization.",
+        "Keeps minimum localization advice, such as not hardcoding user-facing formats and respecting user locale.",
+        "Does not expand into a full custom FormatStyle implementation.",
+        "Does not collapse swift-formatstyle's standalone formatting scope into ios-localization."
+      ]
+    }
+  ]
+}

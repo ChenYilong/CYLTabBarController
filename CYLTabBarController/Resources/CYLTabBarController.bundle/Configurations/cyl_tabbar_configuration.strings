@@ -1,0 +1,12 @@
+/* .strings: the "key" = "value"; format of localization files; nested values use OpenStep syntax. */
+/* .strings：本地化文件的 "key" = "value"; 格式；嵌套值使用 OpenStep 语法。 */
+"CYLTabBarControllerContext" = "CYLConfigurationDemo";
+"CYLTabBarControllerStyleType" = "default";
+"CYLTabBarControllerImageInsets" = "{0, 0, 0, 0}";
+"CYLTabBarControllerTitlePositionAdjustment" = "{0, -2}";
+"CYLTabBarControllerTabBarItemsAttributes" = (
+    { CYLTabBarItemTitle = Strings; CYLTabBarItemImage = "system:house"; CYLTabBarItemSelectedImage = "system:house.fill"; CYLTabBarItemIdentifier = home; },
+    { CYLTabBarItemTitle = Message; CYLTabBarItemImage = "system:message"; CYLTabBarItemSelectedImage = "system:message.fill"; CYLTabBarItemIdentifier = message; CYLTabBarItemPlatforms = "ios,android"; },
+    { CYLTabBarItemTitle = Discover; CYLTabBarItemImage = "system:safari"; CYLTabBarItemSelectedImage = "system:safari.fill"; CYLTabBarItemIdentifier = discover; CYLTabBarItemPageIdentifier = web; CYLTabBarItemPageParameters = { url = "https://github.com/ChenYilong/CYLTabBarController"; }; CYLTabBarItemImageInsets = "{1, 0, -1, 0}"; },
+    { CYLTabBarItemTitle = Me; CYLTabBarItemImage = "system:person"; CYLTabBarItemSelectedImage = "system:person.fill"; CYLTabBarItemIdentifier = me; CYLTabBarItemMinimumAppVersion = "1.0.0"; CYLTabBarItemTitlePositionAdjustment = "{0, -1}"; }
+);

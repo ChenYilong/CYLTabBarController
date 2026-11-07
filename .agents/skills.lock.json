@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "skills": {
+    "accessibility-audit": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "ios/accessibility-audit",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-M243go/bnsKvsyNSl9qExWDvG+Y4GOMQiXEMyqE56LQ="
+    },
+    "animation-patterns": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "design/animation-patterns",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-K7C3uuRqcN/c8mNHOoKWA++opxPzp+3HzhaRVuNcxY8="
+    },
+    "characterization-test-generator": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "testing/characterization-test-generator",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-epuna2eiN8GPjHEf2h/tQ6U9vr0tJ5jK5ultZwGSInc="
+    },
+    "core-animation": {
+      "source": "Prisma-Labs-Dev/apple-skills",
+      "path": "core-animation",
+      "commit": "498626005e65783ebe8570a103b2335cf397768c",
+      "license": "MIT",
+      "integrity": "sha256-jf9FGVk/fM6sWkYtLjSWXI47h7DG1hlG/dIoVvx/DVo="
+    },
+    "corehaptics": {
+      "source": "Prisma-Labs-Dev/apple-skills",
+      "path": "corehaptics",
+      "commit": "498626005e65783ebe8570a103b2335cf397768c",
+      "license": "MIT",
+      "integrity": "sha256-oAqAuhX5SV+jNVkFmu/9ISXTTJmijkDkCCONCxnbJWw="
+    },
+    "debugging-instruments": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "debugging-instruments",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-abOvRLT0xowOiL9uwr3f/kJ91USC2fo8XDy9OAK/Z1g="
+    },
+    "github-actions": {
+      "source": "callstackincubator/agent-skills",
+      "path": "github-actions",
+      "commit": "59e9d17446a248b21d86f078fcd0bd2d36db1ca4",
+      "license": "MIT",
+      "integrity": "sha256-GqiR9M+u/EW37bzWTTIlCW96q4sIkuZzcoNIWBWd5zU="
+    },
+    "hig": {
+      "source": "Prisma-Labs-Dev/apple-skills",
+      "path": "hig",
+      "commit": "498626005e65783ebe8570a103b2335cf397768c",
+      "license": "MIT",
+      "integrity": "sha256-rHcRzlrE3mQD5KnDaMZ811jTwubTEoM6D2WxCjSPyQE="
+    },
+    "ios-accessibility": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "ios-accessibility",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-GqMXCAOTobR7Zk+xRq2VRNg+Xlkx1XXV1hI/UdFpHNo="
+    },
+    "ios-liquid-glass": {
+      "source": "Prisma-Labs-Dev/apple-skills",
+      "path": "ios-liquid-glass",
+      "commit": "498626005e65783ebe8570a103b2335cf397768c",
+      "license": "MIT",
+      "integrity": "sha256-mKiaA3w02ADFvqnQHxUV94MQwJGEm+hEISTaglw2ycg="
+    },
+    "ios-localization": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "ios-localization",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-oo2r9t+61sb5i9MOFD5m/CMocGN3wCcJHIC/BHnFSBM="
+    },
+    "ios-memgraph-analysis": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "ios-memgraph-analysis",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-eu1kVp/Axpwm0zjZx66PLzafX8hAt3Q3CzLo33jXKnE="
+    },
+    "ios-simulator-skill": {
+      "source": "conorluddy/ios-simulator-skill",
+      "path": "ios-simulator-skill",
+      "commit": "30d2ea43ef88d353f4de560e7b7f132e05c502ab",
+      "license": "MIT",
+      "integrity": "sha256-HKDciFyN6/ug7aMczO+ppbZrarwa3u4IIgDrXrYiHCQ="
+    },
+    "liquid-glass": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "design/liquid-glass",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-53pWShByfW5q6KPdKzpVI6wp7DltAA5q47ovb7EEq+w="
+    },
+    "memory": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "swift/memory",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-6LgLRMxzmH5kL9aKpIPlNayfiZUfaU2YR0bmA+ZX/EQ="
+    },
+    "migration-patterns": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "ios/migration-patterns",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-Um+hbrWnRO7FpaqVcpP9WmhMBcS8nxZzQ+mPPIptDWE="
+    },
+    "mobile-harness": {
+      "source": "droidrun/mobile-harness",
+      "path": ".",
+      "commit": "321868e6de647d68f9520e9a36da1fc67538c4c7",
+      "license": "MIT",
+      "integrity": "sha256-wNjoWhcVkdrn8QYQIU4PYqdbl5+3SyqqHgi8r+0w2BY="
+    },
+    "run-device": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "ios/run-device",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-zxiRYCZI+se3zaIKSxcJll7ojDdjEhbcOkhIp4hRT80="
+    },
+    "sf-symbols": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "design/sf-symbols",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-bGUcMGcgyjVPHoVdH/4iFymZxQ1sf6HynP0qBB/jqZY="
+    },
+    "snapshot-test-setup": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "testing/snapshot-test-setup",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-GlYKyHlqXXHTmNo3BPR7urPXprmNpEAcSlmKf1HNK3c="
+    },
+    "swift-api-design-guidelines": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swift-api-design-guidelines",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-MnzFuLIgJT7To6fo4zB3XFvrUTbHuHzJNXE7zt7Dv0o="
+    },
+    "swift-architecture": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swift-architecture",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-j0gRrsmi8wodUn9aNUQNWCs9itjtsMN0vezLRGpX6bw="
+    },
+    "swift-concurrency": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swift-concurrency",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-l8fBbJH8xOfMKRc1cyk6irT9pMpt86YcIuVvvowJ1oY="
+    },
+    "swift-language": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swift-language",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-Ud5H5G3DNBrEXCsFg4Dy4ffV2r+T/+aBh0ZM2jUMTxM="
+    },
+    "swift-testing": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swift-testing",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-y3aIkpXigB/Ce/pAaXOPI+O0HipfIDRRVtqank7w18c="
+    },
+    "swiftui-animation": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swiftui-animation",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-B+662pjHIshgojKySDui5NxV9qh0s6VO4iUWaiaI3Hc="
+    },
+    "swiftui-gestures": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swiftui-gestures",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-7EPJDTVUuV7rrcPZCUnBIYr4fhyKLBd2miTJDTDHYo0="
+    },
+    "swiftui-liquid-glass": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swiftui-liquid-glass",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-5icjA7bp8rx3MLE0raz8hh7b1rNpCZju8sU2+T9r2xM="
+    },
+    "swiftui-navigation": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swiftui-navigation",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-31FI78PPOzTp4dPJePbiEcCy33llutdY3sgalTe6NPM="
+    },
+    "swiftui-patterns": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swiftui-patterns",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-Nbqhw0UVnRxS3RZL/2PUC+ilQhg0EkXMNYSKV+mZM2g="
+    },
+    "swiftui-performance": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swiftui-performance",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-9X4QGCNttZ4Zte+hO4eOhPrMgrf+B40Kb0uArLRsbJ8="
+    },
+    "swiftui-uikit-interop": {
+      "source": "dpearson2699/swift-ios-skills",
+      "path": "swiftui-uikit-interop",
+      "commit": "8d90fd121a263355a4fb44fd082af1416a5c1c2a",
+      "license": "PolyForm-Perimeter-1.0.0",
+      "integrity": "sha256-R2bo1uyIwqILd338jeePfQ5XMvEVHB50H2Hfbck84qo="
+    },
+    "tdd-bug-fix": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "testing/tdd-bug-fix",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-6TIr6vY0Ke73pnfnx+PQ0LD6xPCP3WkPc05z8dSEAdE="
+    },
+    "tdd-feature": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "testing/tdd-feature",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-CuJvWEXmmYBHMojGC49rdFwSNz6oHpkuDlEEWs+pLMc="
+    },
+    "ui-review": {
+      "source": "rshankras/claude-code-apple-skills",
+      "path": "ios/ui-review",
+      "commit": "eb2ddbc8962c1e21f2b0290d9cdb4c825ef85a23",
+      "license": "MIT",
+      "integrity": "sha256-BsGpCOGTeY6s7a1w7pjoINbD38CBrcVO4GLKVGO/kkA="
+    },
+    "uikit": {
+      "source": "Prisma-Labs-Dev/apple-skills",
+      "path": "uikit",
+      "commit": "498626005e65783ebe8570a103b2335cf397768c",
+      "license": "MIT",
+      "integrity": "sha256-DInPFGhJuEBPHNPeFoGRtbVszNbKWlQPk7FPPHQeOzw="
+    },
+    "uikit-accessibility-auditor": {
+      "source": "JordanCoin/ios-skills-collection",
+      "path": "rgmez--uikit-accessibility-auditor",
+      "commit": "90d180768169d5b422790042fe1606976abb1a0c",
+      "license": "MIT",
+      "integrity": "sha256-9jfp1Yn9UT5H/nZ7b155pGkUg/P6lwttfbgP1W16uk4="
+    },
+    "uikit-layouting": {
+      "source": "JordanCoin/ios-skills-collection",
+      "path": "arimunandar--uikit-layouting",
+      "commit": "90d180768169d5b422790042fe1606976abb1a0c",
+      "license": "MIT",
+      "integrity": "sha256-JdWzdKMPs4ljwRxyA7BZ5/wnep/GPG+N6tfJHWcxi9c="
+    },
+    "uikit-legacy": {
+      "source": "JordanCoin/ios-skills-collection",
+      "path": "arimunandar--uikit-legacy",
+      "commit": "90d180768169d5b422790042fe1606976abb1a0c",
+      "license": "MIT",
+      "integrity": "sha256-XJ1xvUEb26WQjReH+eKLYfAOlmzRPo1/SSMytcB9UXE="
+    },
+    "writing-user-docs": {
+      "source": "callstackincubator/agent-skills",
+      "path": "writing-user-docs",
+      "commit": "59e9d17446a248b21d86f078fcd0bd2d36db1ca4",
+      "license": "MIT",
+      "integrity": "sha256-LLijFn7Hmsx0OVXKclHakvtGO/n2ncLenca8946GHOc="
+    },
+    "xcode-build-fixer": {
+      "source": "JordanCoin/ios-skills-collection",
+      "path": "avdlee--xcode-build-fixer",
+      "commit": "90d180768169d5b422790042fe1606976abb1a0c",
+      "license": "MIT",
+      "integrity": "sha256-JinxLJM5qp74ZBTXgkR5SGYSzXFKQs1BUw7VFP8xiuE="
+    },
+    "xcode-project-analyzer": {
+      "source": "JordanCoin/ios-skills-collection",
+      "path": "avdlee--xcode-project-analyzer",
+      "commit": "90d180768169d5b422790042fe1606976abb1a0c",
+      "license": "MIT",
+      "integrity": "sha256-97J+esX0mt8Egc4L9PDAqo0WZc14INoF5vBupJfR2GY="
+    },
+    "xcodebuildmcp-cli": {
+      "source": "JordanCoin/ios-skills-collection",
+      "path": "getsentry--xcodebuildmcp-cli",
+      "commit": "90d180768169d5b422790042fe1606976abb1a0c",
+      "license": "MIT",
+      "integrity": "sha256-yqDG+yxxTEGT3GFJahioWyqN1V2zCx6BsykUbZu2Hxk="
+    },
+    "xcuitest": {
+      "source": "Prisma-Labs-Dev/apple-skills",
+      "path": "xcuitest",
+      "commit": "498626005e65783ebe8570a103b2335cf397768c",
+      "license": "MIT",
+      "integrity": "sha256-nnK1iMt81TDWYs9HxQdChzNjw3YM1nPyqm+9FX7YTn0="
+    }
+  }
+}

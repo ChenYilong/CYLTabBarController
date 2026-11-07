@@ -24,6 +24,7 @@
 
 | 中文 | English |
 |:---|:---|
+| [液态玻璃：角标显示在两个图层](#cn液态玻璃角标显示在两个图层) | [Liquid Glass: the badge is in both layers](#enliquid-glass-the-badge-is-in-both-layers) |
 | [问题](#cn问题) | [The problem](#enthe-problem) |
 | [修复后的行为](#cn修复后的行为) | [Behavior after the fix](#enbehavior-after-the-fix) |
 | [用法：在 didSelectControl 中更新角标](#cn用法在-didselectcontrol-中更新角标) | [Usage: update the badge in didSelectControl](#enusage-update-the-badge-in-didselectcontrol) |
@@ -33,6 +34,13 @@
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
 <!-- navigation:end -->
+
+## [CN]液态玻璃：角标显示在两个图层
+## [EN]Liquid Glass: the badge is in both layers
+
+| 中文 | English |
+|:---|:---|
+| [#779](https://github.com/ChenYilong/CYLTabBarController/issues/779)：只在一个图层显示的角标会被玻璃遮挡，看起来发灰或模糊。现在直接对 Tab 按钮或 PlusButton 调用角标方法，与对 `UIViewController` 调用一样，都通过 `-cyl_performSelector:` 作用于两个图层，每个图层一次：普通图层与选中图层的 Tab 按钮；PlusButton 则是真实按钮与替身（`-selectedContentView`）。替身在请求角标之后才创建时也会补上。不需要再同时为 PlusButton 子控制器设置一次角标。 | [#779](https://github.com/ChenYilong/CYLTabBarController/issues/779): a badge in only one layer was covered by the glass and looked gray or blurred. Badge methods called directly on a tab button or a plus button now work like those of `UIViewController`: through `-cyl_performSelector:` they act on both layers, once each: the tab buttons of the normal and selected layers, and for a plus button the real button and its stand-in (`-selectedContentView`). A stand-in made after the badge was asked for gets it too. Setting the badge again on the plus child view controller is no longer needed. |
 
 ## [CN]问题
 ## [EN]The problem
@@ -79,7 +87,7 @@ class MainTabBarController: CYLTabBarController {
     override func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
         // [CN] 守卫：仅在有 PlusButton 时处理  [EN] Guard: plus button code only with a plus button
         guard hasPlusButton(), control.cyl_isPlusControl() else { return }
-        guard let plusButton = CYLPlusButton.plusButton(forOwner: self) else { return }
+        guard let plusButton = CYLPlusButton(forOwner: self) else { return }
 
         plusButton.tag += 1                                   // [CN] 每次点击加 1  [EN] +1 per tap
         let badgeValue = "\(plusButton.tag)"

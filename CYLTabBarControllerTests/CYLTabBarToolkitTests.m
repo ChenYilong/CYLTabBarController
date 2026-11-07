@@ -26,6 +26,21 @@
     return tabBarController;
 }
 
+#pragma mark - Type safety
+
+/// [EN] A tab bar controller whose tab bar is a plain UITabBar: only CYLTabBar has the plus button label check.
+/// [CN] TabBar 是系统 UITabBar 的控制器：只有 CYLTabBar 才有 PlusButton 标题的判断方法。
+- (void)testSelectionUpdateAcceptsASystemTabBar {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UITabBarController *systemTabBarController = [[UITabBarController alloc] init];
+    UIViewController *first = [[UIViewController alloc] init];
+    UIViewController *second = [[UIViewController alloc] init];
+    systemTabBarController.viewControllers = @[ first, second ];
+    XCTAssertFalse([systemTabBarController.tabBar isKindOfClass:[CYLTabBar class]]);
+    XCTAssertNoThrow([tabBarController updateSelectionStatusIfNeededForTabBarController:systemTabBarController
+                                                             shouldSelectViewController:second]);
+}
+
 #pragma mark - Double tap
 
 /// [EN] The per-tab block; the taps themselves are recognized by the tab bar item gestures (docs/TabBarItem-Gestures.md).
@@ -100,7 +115,7 @@
     tabBarController.cyl_tabBarItemSelectedTitleColor = UIColor.systemGreenColor;
     tabBarController.cyl_tabBarItemImageColor = UIColor.systemGrayColor;
     tabBarController.cyl_tabBarBackgroundColor = UIColor.whiteColor;
-    tabBarController.cyl_tabBarShadowColor = UIColor.clearColor;
+    tabBarController.cyl_tabBarShadowColor = UIColor.systemRedColor;
 
     XCTAssertEqualObjects(tabBarController.cyl_tabBarItemSelectedTitleColor, UIColor.systemGreenColor, @"the getter returns the value set");
     UITabBarAppearance *appearance = tabBarController.tabBar.standardAppearance;
@@ -110,7 +125,13 @@
         XCTAssertEqualObjects(itemAppearance.normal.iconColor, UIColor.systemGrayColor);
     }
     XCTAssertEqualObjects(appearance.backgroundColor, UIColor.whiteColor);
-    XCTAssertEqualObjects(appearance.shadowColor, UIColor.clearColor);
+    XCTAssertEqualObjects(appearance.shadowColor, UIColor.systemRedColor);
+
+    // [EN] No shadow: the getter returns the color that was set, but UITabBarAppearance reads a clear shadow back as nil.
+    // [CN] 没有阴影：getter 返回设置的颜色，但 UITabBarAppearance 把透明阴影读回为 nil。
+    tabBarController.cyl_tabBarShadowColor = UIColor.clearColor;
+    XCTAssertEqualObjects(tabBarController.cyl_tabBarShadowColor, UIColor.clearColor);
+    XCTAssertNil(tabBarController.tabBar.standardAppearance.shadowColor);
 }
 
 #pragma mark - Layout helpers

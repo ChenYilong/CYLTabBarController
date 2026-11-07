@@ -1,0 +1,47 @@
+{
+  "skill_name": "swiftui-gestures",
+  "evals": [
+    {
+      "id": 0,
+      "name": "gesture-composition-precedence",
+      "prompt": "Review this SwiftUI interaction plan: a parent VStack uses .gesture(TapGesture()) and a child image uses .onTapGesture. The author says the parent always swallows the child tap, so they want to replace everything with highPriorityGesture. Explain the correct precedence model, when to use .gesture, .simultaneousGesture, .highPriorityGesture, and how GestureMask changes subview participation.",
+      "expected_output": "A correction-focused review that states .gesture has lower precedence than existing child/view gestures, uses simultaneous gestures only when both handlers should run, uses high priority only when the parent should win, and describes GestureMask cases accurately.",
+      "files": [],
+      "assertions": [
+        "States that .gesture attaches with lower precedence than gestures already defined by the view or its children, rather than saying it always swallows child gestures.",
+        "Explains .simultaneousGesture as the choice when parent and child handlers should both process the same interaction.",
+        "Explains .highPriorityGesture as the choice when the added parent gesture should take precedence over existing gestures.",
+        "Describes GestureMask .gesture, .subviews, .all, and .none in terms of enabling the added gesture and/or subview hierarchy gestures.",
+        "Keeps the answer focused on gesture conflict resolution and does not turn the task into broader navigation, layout, or architecture guidance."
+      ]
+    },
+    {
+      "id": 1,
+      "name": "gesture-api-availability-review",
+      "prompt": "Audit this SwiftUI gesture guidance for iOS 26: use MagnificationGesture and RotationGesture because they are still the newest types, DragGesture.Value.velocity is only safe on iOS 17 and later, and UIGestureRecognizerRepresentable can be used on any iOS 16 SwiftUI screen. Give corrected modern guidance with availability notes.",
+      "expected_output": "A modern SwiftUI gesture availability review that recommends MagnifyGesture and RotateGesture for iOS 17+, identifies DragGesture.Value.velocity as available back to iOS 13, and treats UIGestureRecognizerRepresentable as iOS 18+ gesture-specific interop.",
+      "files": [],
+      "assertions": [
+        "Recommends MagnifyGesture instead of MagnificationGesture for iOS 17+ pinch/magnification work.",
+        "Recommends RotateGesture instead of RotationGesture for iOS 17+ rotation work.",
+        "Does not claim DragGesture.Value.velocity is iOS 17-only; identifies it as available on the same iOS 13+ baseline as DragGesture.Value.",
+        "Identifies UIGestureRecognizerRepresentable as iOS 18+ and limits it to UIKit gesture recognizer interop.",
+        "Uses Sosumi or official Apple documentation URLs when citing Apple API availability."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "gesture-boundary-accessibility",
+      "prompt": "A custom card grid uses onTapGesture for every delete button, drag gestures for reordering, a custom swipe recognizer, and then asks for navigation routing and grid layout cleanup in the same patch. Which parts belong in swiftui-gestures, what accessibility fixes should be made for gesture-only actions, and what should be handed to sibling skills?",
+      "expected_output": "A boundary-aware review that keeps gesture recognition/composition/accessibility alternatives in swiftui-gestures, changes plain tap actions into Buttons where appropriate, and routes layout, navigation, and broad state architecture to sibling skills.",
+      "files": [],
+      "assertions": [
+        "Keeps tap, drag, swipe recognition, gesture composition, GestureState, and gesture-specific accessibility alternatives in the swiftui-gestures scope.",
+        "Recommends Button or ButtonStyle for plain single-tap actions such as delete instead of onTapGesture-only controls.",
+        "Requires accessible alternatives such as accessibility actions for drag, swipe, or gesture-only interactions.",
+        "Routes grid/list/layout cleanup to swiftui-layout-components.",
+        "Routes navigation routing and destination modeling to swiftui-navigation, and broad state architecture to swiftui-patterns."
+      ]
+    }
+  ]
+}

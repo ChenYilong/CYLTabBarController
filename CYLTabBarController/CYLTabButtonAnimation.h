@@ -108,6 +108,17 @@ NS_ASSUME_NONNULL_BEGIN
                                     titleLabel:(nullable UILabel *)titleLabel;
 
 /*!
+ * [EN] Undoes what this animation left on the button (a held frame, a hidden title, a moved icon) when another animation
+ *      takes over the button, e.g. after `cyl_tabButtonTapAnimationType` changes while the tab is selected. Implement it
+ *      when the select animation leaves a state that its own deselect animation would undo.
+ * [CN] 当其他动画接管该按钮时（例如 Tab 选中期间修改了 `cyl_tabButtonTapAnimationType`），撤销本动画在按钮上留下的状态（保持的帧、
+ *      隐藏的标题、移动过的图标）。若选中动画留下的状态需要由自己的取消选中动画来撤销，就应实现本方法。
+ */
+- (void)cyl_resetTabButton:(UIControl *)button
+                  iconView:(UIView *)iconView
+                titleLabel:(nullable UILabel *)titleLabel;
+
+/*!
  * [EN] Set before the select animation: YES when the button selected before is on the left of this one.
  * [CN] 在选中动画之前设置：之前选中的按钮位于本按钮左侧时为 YES。
  */
@@ -273,8 +284,9 @@ typedef void (^CYLTabButtonBadgeAnimationBlock)(UIControl *button, UIView *iconV
 @end
 
 /*!
- * [EN] Plays `images` as frames on the icon, and in reverse when deselected (TLFrameAnimation).
- * [CN] 在图标上逐帧播放 `images`，取消选中时倒序播放（TLFrameAnimation）。
+ * [EN] Plays `images` as frames on the icon and keeps the last one while selected; when deselected, plays them in
+ *      reverse, then shows the icon itself again (TLFrameAnimation).
+ * [CN] 在图标上逐帧播放 `images`，选中期间保持最后一帧；取消选中时倒序播放，结束后恢复显示图标本身（TLFrameAnimation）。
  */
 @interface CYLTabButtonFrameAnimation : NSObject <CYLTabButtonAnimation>
 @property (nonatomic, copy, nullable) NSArray<UIImage *> *images;

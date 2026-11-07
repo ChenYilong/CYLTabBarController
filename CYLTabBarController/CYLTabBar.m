@@ -14,6 +14,7 @@
 #import "CYLTabBar+CYLTabBarControllerExtention.h"
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "UIImage+CYLTabBarControllerExtention.h"
+#import "UIControl+CYLTabBarItemAnimation.h"
 
 static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
@@ -125,25 +126,29 @@ static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomi
     // [EN] Register KVO observers
     _tabBarItemWidth = self.cyl_tabBarItemWidth;
     [self addObserver:self forKeyPath:@"tabBarItemWidth" options:NSKeyValueObservingOptionNew context:CYLTabBarContext];
-    // Only with a Lottie library: without one there is no Lottie view to stop (#488).
-    // 仅在引入 Lottie 库时监听：没有 Lottie 时没有需要停止的动画（#488）。
-#if CYL_LOTTIE_AVAILABLE
-    __weak __typeof(self) weakSelf = self;
-    void (^CYLTabBarItemLottieAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
-        __strong typeof(self) self = weakSelf;
-        if (!self) {
-             return;
-        }
-        [self cyl_stopAnimationOfAllLottieView];
-    };
-    // FIX: issue #488 keep the token and remove it in `-dealloc`; it was dropped, so every tab bar (one per tab bar
-    // controller, e.g. each time `window.rootViewController` is replaced) left an observer behind for good.
-    // 保存 token 并在 `-dealloc` 中移除；以前直接丢弃，每个 TabBar（每次替换 `window.rootViewController` 都会新建）都会永久留下一个观察者。
-    self.cyl_lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemLottieAnimationPlayingNotification
-                                                                                                object:nil
-                                                                                                 queue:[NSOperationQueue mainQueue]
-                                                                                            usingBlock:CYLTabBarItemLottieAnimationPlayingNotificationBlock];
-#endif
+    // Only with an animation library (#604, checked at runtime so that any library works): without one there is no
+    // animation view to stop (#488). 仅在引入动画库时监听（#604，运行时判断，以支持任意动画库）：没有时没有需要停止的动画（#488）。
+    if (CYLTabBarItemAnimationIsAvailable()) {
+        __weak __typeof(self) weakSelf = self;
+        void (^CYLTabBarItemAnimationPlayingNotificationBlock)(NSNotification *) = ^(NSNotification *notification) {
+            __strong typeof(self) self = weakSelf;
+            if (!self) {
+                 return;
+            }
+            // Library-neutral (#604): every animation library (Lottie, PAG), from the `CYLTabBarItemAnimation` subspec.
+            // 与动画库无关：所有动画库（Lottie、PAG），由 `CYLTabBarItemAnimation` 子库处理。
+            if (CYLTabBarItemAnimationIsAvailable()) {
+                [self cyl_stopAllTabBarItemAnimations];
+            }
+        };
+        // FIX: issue #488 keep the token and remove it in `-dealloc`; it was dropped, so every tab bar (one per tab bar
+        // controller, e.g. each time `window.rootViewController` is replaced) left an observer behind for good.
+        // 保存 token 并在 `-dealloc` 中移除；以前直接丢弃，每个 TabBar（每次替换 `window.rootViewController` 都会新建）都会永久留下一个观察者。
+        self.cyl_lottieAnimationPlayingObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemAnimationPlayingNotification
+                                                                                                    object:nil
+                                                                                                     queue:[NSOperationQueue mainQueue]
+                                                                                                usingBlock:CYLTabBarItemAnimationPlayingNotificationBlock];
+    }
     [self cyl_keepStackedItemLayoutOnHingedDevice];
     return self;
 }
@@ -583,7 +588,7 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
             view.hidden = YES;
         } else {
             NSNumber *hiddenBefore = objc_getAssociatedObject(view, CYLHiddenBeforeCustomizingKey);
-            if (hiddenBefore) {
+            if (hiddenBefore != nil) {
                 view.hidden = hiddenBefore.boolValue;
                 objc_setAssociatedObject(view, CYLHiddenBeforeCustomizingKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             }

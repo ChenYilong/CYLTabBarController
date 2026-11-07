@@ -19,6 +19,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CYLMainRootViewController : UINavigationController
 
+/*!
+ * [EN] The window's root view controller when it is a CYLMainRootViewController, otherwise nil. Use this instead of casting
+ *      `CYLGetRootViewController()`, which returns the topmost presented view controller, e.g. a `UIAlertController`.
+ * [CN] 窗口的根控制器是 CYLMainRootViewController 时返回它，否则返回 nil。请用它代替对 `CYLGetRootViewController()` 的强转：
+ *      后者返回最顶层被 present 的控制器，例如 `UIAlertController`。
+ */
++ (nullable instancetype)currentRootViewController;
+
 - (CYLTabBarController *)createLiquidGlassTabBar;
 - (CYLTabBarController *)createNewTabBarWithContext:(NSString *)context;
 - (CYLFlatDesignMainTabBarController *)createFlatDesignTabBar;

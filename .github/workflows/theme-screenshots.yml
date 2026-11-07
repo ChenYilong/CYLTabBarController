@@ -1,0 +1,55 @@
+# [EN] Screenshots of the skins (issue #216, scripts/theme-screenshots.sh): the ObjC demo launched once per theme on an
+#      iOS simulator, in the default style (Liquid Glass) and in FlatDesign. The screenshots are an artifact of the run,
+#      to put into docs/assets/ and the README. Runs by hand, and on pull requests that change the script or this file.
+# [CN] 换肤截图（issue #216，scripts/theme-screenshots.sh）：在 iOS 模拟器上为每个主题启动一次 ObjC Demo，分别使用默认样式（液态玻璃）与
+#      扁平样式。截图作为本次运行的 artifact，可放入 docs/assets/ 与 README。手动运行，修改脚本或本文件的 PR 也会运行。
+name: Theme screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      themes:
+        description: "Theme identifiers, comma separated (empty: the default list)"
+        required: false
+        default: ""
+  pull_request:
+    paths:
+      - ".github/workflows/theme-screenshots.yml"
+      - "scripts/theme-screenshots.sh"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: theme-screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    name: screenshots (${{ matrix.style }})
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        style: [ Default, FlatDesign ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Screenshots
+        env:
+          STYLE: ${{ matrix.style }}
+          THEMES_INPUT: ${{ github.event.inputs.themes }}
+        run: |
+          if [ -n "$THEMES_INPUT" ]; then export THEMES="$THEMES_INPUT"; fi
+          scripts/theme-screenshots.sh
+      - uses: actions/upload-artifact@v4
+        # [EN] A log that cannot be uploaded (GitHub's artifact service timing out) must not fail the job.
+        # [CN] 日志上传失败（GitHub 的 artifact 服务超时）不应让 job 失败。
+        continue-on-error: true
+        if: always()
+        with:
+          name: theme-screenshots-${{ matrix.style }}
+          path: |
+            build/theme-screenshots/*.png
+            build/theme-screenshots-build/build.log
+          if-no-files-found: warn
