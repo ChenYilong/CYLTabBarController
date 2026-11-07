@@ -78,50 +78,23 @@ struct SideMenu: View {
     }
     
     var browse: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ForEach(menuItems) { item in
-                Rectangle()
-                    .frame(height: 1)
-                    .opacity(0.1)
-                    .padding(.horizontal, 16)
-                
-                HStack(spacing: 14) {
-                    item.icon.view()
-                        .frame(width: 32, height: 32)
-                        .opacity(0.6)
-                    Text(item.text)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(12)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(.blue)
-                        .frame(maxWidth: selectedMenu == item.menu ? .infinity : 0)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                )
-                .background(Color("Background 2"))
-                .onTapGesture {
-                    withAnimation(.timingCurve(0.2, 0.8, 0.2, 1)) {
-                        selectedMenu = item.menu
-                    }
-                    // [EN] "active" is YES for 2 seconds (the icon's "duration" option). [CN] "active" 为 YES 两秒（图标的 "duration" 选项）。
-                    item.icon.play()
-                }
-            }
-        }
-        .font(.headline)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(8)
+        menuSection(menuItems)
     }
-    
+
     var history: some View {
+        menuSection(menuItems2)
+    }
+
+    /// [EN] One section of the menu: a row per item; tapping a row selects it and plays its icon.
+    /// [CN] 菜单的一个分区：每项一行；点击一行即选中该项并播放其图标。
+    private func menuSection(_ items: [MenuItem]) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            ForEach(menuItems2) { item in
+            ForEach(items) { item in
                 Rectangle()
                     .frame(height: 1)
                     .opacity(0.1)
                     .padding(.horizontal, 16)
-                
+
                 HStack(spacing: 14) {
                     item.icon.view()
                         .frame(width: 32, height: 32)
