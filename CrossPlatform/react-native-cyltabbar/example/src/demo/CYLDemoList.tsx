@@ -52,7 +52,23 @@ export function badgeAccessibilityText(value: string) {
   return /^\d+$/.test(value) ? `${value} new messages` : value;
 }
 
-export function CYLDemoList({ colors, tint, values, switches, currentSkin, badgeSubtitle, header, onRow, onSwitch }: Props) {
+/** [EN] What a skin row says it changes. [CN] 皮肤行说明它改变的内容。 */
+function skinSubtitle(skin: CYLSkin): string {
+  if (skin.network) {
+    return 'Network icons, titles and colors';
+  }
+  return skin.icons ? 'Holiday icons and colors' : 'Colors only';
+}
+
+/** [EN] A switch row reports on / off; a skin row reports whether it is the current skin. [CN] 开关行报告开 / 关；皮肤行报告是否为当前皮肤。 */
+function rowAccessibilityState(item: CYLDemoRow, isSwitch: boolean, switches: Record<string, boolean>, currentSkin: string) {
+  if (isSwitch) {
+    return { checked: !!switches[item.id] };
+  }
+  return item.skin ? { selected: item.skin.name === currentSkin } : undefined;
+}
+
+export function CYLDemoList({ colors, tint, values, switches, currentSkin, badgeSubtitle, header, onRow, onSwitch }: Readonly<Props>) {
   const sections = [
     ...DATA.sections.map((section) => ({
       title: section.title,
@@ -61,7 +77,7 @@ export function CYLDemoList({ colors, tint, values, switches, currentSkin, badge
             id: `skin:${skin.name}`,
             icon: null,
             title: skin.name,
-            subtitle: skin.network ? 'Network icons, titles and colors' : skin.icons ? 'Holiday icons and colors' : 'Colors only',
+            subtitle: skinSubtitle(skin),
             accessory: 'none',
             skin,
           }))
@@ -153,7 +169,7 @@ export function CYLDemoList({ colors, tint, values, switches, currentSkin, badge
             accessible={grouped}
             accessibilityRole={isSwitch ? 'switch' : 'button'}
             accessibilityLabel={grouped ? label : undefined}
-            accessibilityState={isSwitch ? { checked: !!switches[item.id] } : item.skin ? { selected: item.skin.name === currentSkin } : undefined}
+            accessibilityState={rowAccessibilityState(item, isSwitch, switches, currentSkin)}
             onPress={() => (isSwitch ? onSwitch(item, !switches[item.id]) : onRow(item, index))}
             style={({ pressed }) => [
               styles.row,

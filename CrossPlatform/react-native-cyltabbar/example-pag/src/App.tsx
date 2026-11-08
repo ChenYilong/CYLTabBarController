@@ -73,7 +73,7 @@ const THEMES = {
 
 type Page = { title: string; render: (push: (page: Page) => void) => ReactNode; right?: { label: string; page: Page } };
 
-function ColorPage({ color }: { color: string }) {
+function ColorPage({ color }: Readonly<{ color: string }>) {
   return <View style={[styles.fill, { backgroundColor: color }]} />;
 }
 
@@ -84,7 +84,7 @@ const childPage: Page = {
   render: () => <Image source={{ uri: BACKGROUND_IMAGE }} style={styles.fill} resizeMode="cover" />,
 };
 
-function MePage({ styleIndex, onStyle, badges, onBadges }: { styleIndex: number; onStyle: () => void; badges: boolean; onBadges: (on: boolean) => void }) {
+function MePage({ styleIndex, onStyle, badges, onBadges }: Readonly<{ styleIndex: number; onStyle: () => void; badges: boolean; onBadges: (on: boolean) => void }>) {
   return (
     <ScrollView style={styles.fillWhite} contentContainerStyle={styles.list}>
       <Text style={styles.sectionTitle}>{chinese ? 'TabBar 外观' : 'Tab bar appearance'}</Text>
@@ -105,7 +105,7 @@ function MePage({ styleIndex, onStyle, badges, onBadges }: { styleIndex: number;
 
 // MARK: - Navigation (RootNavigationController: a blue bar, white title and buttons) 导航（蓝色导航栏，白色标题与按钮）
 
-function Stack({ root }: { root: Page }) {
+function Stack({ root }: Readonly<{ root: Page }>) {
   const [stack, setStack] = useState<Page[]>([root]);
   useEffect(() => setStack([root]), [root]);
   const top = stack[stack.length - 1]!;

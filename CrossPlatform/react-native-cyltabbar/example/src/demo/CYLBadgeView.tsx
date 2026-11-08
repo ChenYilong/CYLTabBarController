@@ -111,7 +111,7 @@ function animatedStyle(name: string, progress: Animated.Value, width: number) {
 }
 
 /** The badge, absolutely placed over a host of `hostSize`. 放在 `hostSize` 大小宿主上的角标（绝对定位）。 */
-export function CYLBadgeView({ sample, hostSize }: { sample: CYLBadgeSample; hostSize: number }) {
+export function CYLBadgeView({ sample, hostSize }: Readonly<{ sample: CYLBadgeSample; hostSize: number }>) {
   const dark = useColorScheme() === 'dark';
   const progress = useRef(new Animated.Value(0)).current;
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -142,7 +142,8 @@ export function CYLBadgeView({ sample, hostSize }: { sample: CYLBadgeSample; hos
   const offset = (sample.position && offsets[sample.position]) || [0, 0];
   const centerX = hostSize + 2 + offset[0]!;
   const centerY = offset[1]!;
-  const borderColor = sample.borderColor === 'dynamic' ? (dark ? '#FFFFFF' : '#000000') : sample.borderColor;
+  const dynamicBorderColor = dark ? '#FFFFFF' : '#000000';
+  const borderColor = sample.borderColor === 'dynamic' ? dynamicBorderColor : sample.borderColor;
   return (
     <Animated.View
       onLayout={(event) => setSize(event.nativeEvent.layout)}

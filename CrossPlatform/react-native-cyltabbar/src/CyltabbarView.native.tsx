@@ -135,50 +135,86 @@ function imageValue(image?: CYLTabBarImage | null): string {
   return Image.resolveAssetSource(image)?.uri ?? '';
 }
 
+/** [EN] How a prop is copied: when truthy, or when not null. [CN] 属性的复制条件：为真值时，或不为 null 时。 */
+type CYLKeyRule = 'truthy' | 'defined';
+type CYLKeyMap = ReadonlyArray<readonly [prop: string, key: string, rule: CYLKeyRule]>;
+
+const CONTROLLER_KEYS: CYLKeyMap = [
+  ['styleType', 'CYLTabBarControllerStyleType', 'truthy'],
+  ['userInterfaceStyle', 'CYLTabBarControllerUserInterfaceStyle', 'truthy'],
+  ['tapAnimation', 'CYLTabBarControllerTabButtonTapAnimation', 'truthy'],
+  ['swipeToSwitchTab', 'CYLTabBarControllerSwipeToSwitchTab', 'defined'],
+  ['animationSpeed', 'CYLTabBarControllerTabBarItemAnimationSpeed', 'defined'],
+];
+
+const ITEM_KEYS: CYLKeyMap = [
+  ['title', 'CYLTabBarItemTitle', 'defined'],
+  ['identifier', 'CYLTabBarItemIdentifier', 'defined'],
+];
+
+const PLUS_BUTTON_KEYS: CYLKeyMap = [
+  ['title', 'CYLTabBarItemTitle', 'defined'],
+  ['titleColor', 'CYLTabBarItemTitleColor', 'truthy'],
+  ['selectedTitleColor', 'CYLTabBarItemSelectedTitleColor', 'truthy'],
+  ['titleFont', 'CYLTabBarItemTitleFont', 'defined'],
+  ['index', 'CYLPlusButtonIndexInTabBar', 'defined'],
+  ['centerYMultiplier', 'CYLPlusButtonCenterYMultiplier', 'defined'],
+  ['centerYOffset', 'CYLPlusButtonCenterYOffset', 'defined'],
+  ['alignsTitle', 'CYLPlusButtonAlignsTitle', 'defined'],
+  ['keepsTitleVisible', 'CYLPlusButtonKeepsTitleVisible', 'defined'],
+  ['showsSelection', 'CYLPlusButtonShowsSelection', 'defined'],
+  ['identifier', 'CYLTabBarItemIdentifier', 'truthy'],
+  ['pageIdentifier', 'CYLTabBarItemPageIdentifier', 'truthy'],
+  ['size', 'CYLPlusButtonSize', 'truthy'],
+  ['imageSize', 'CYLPlusButtonImageSize', 'truthy'],
+];
+
+/** [EN] Copies the props of `source` that pass their rule into `target`, under their keys. [CN] 把 `source` 中满足条件的属性按 key 复制到 `target`。 */
+function copyKeys(target: Record<string, unknown>, source: object, keys: CYLKeyMap): void {
+  const values = source as Record<string, unknown>;
+  for (const [prop, key, rule] of keys) {
+    const value = values[prop];
+    if (rule === 'truthy' ? Boolean(value) : value != null) {
+      target[key] = value;
+    }
+  }
+}
+
+function itemAttributes({ title, image, selectedImage, identifier, ...rest }: CYLTabBarItem): Record<string, unknown> {
+  const item: Record<string, unknown> = { ...rest };
+  copyKeys(item, { title, identifier }, ITEM_KEYS);
+  addImage(item, 'CYLTabBarItemImage', image);
+  addImage(item, 'CYLTabBarItemSelectedImage', selectedImage);
+  return item;
+}
+
+function plusButtonAttributes(plusButton: CYLTabBarPlusButton): Record<string, unknown> {
+  const plus: Record<string, unknown> = {};
+  copyKeys(plus, plusButton, PLUS_BUTTON_KEYS);
+  addImage(plus, 'CYLTabBarItemImage', plusButton.image);
+  addImage(plus, 'CYLTabBarItemSelectedImage', plusButton.selectedImage);
+  addImage(plus, 'CYLPlusButtonBackgroundImage', plusButton.backgroundImage);
+  return plus;
+}
+
 export function buildConfiguration(props: CYLTabBarProps): Record<string, unknown> {
   const configuration: Record<string, unknown> = {};
-  if (props.styleType) {
-    configuration.CYLTabBarControllerStyleType = props.styleType;
-  }
-  if (props.userInterfaceStyle) configuration.CYLTabBarControllerUserInterfaceStyle = props.userInterfaceStyle;
-  if (props.tapAnimation) configuration.CYLTabBarControllerTabButtonTapAnimation = props.tapAnimation;
-  if (props.swipeToSwitchTab != null) configuration.CYLTabBarControllerSwipeToSwitchTab = props.swipeToSwitchTab;
-  if (props.animationSpeed != null) configuration.CYLTabBarControllerTabBarItemAnimationSpeed = props.animationSpeed;
+  copyKeys(configuration, props, CONTROLLER_KEYS);
   if (props.items) {
-    configuration.CYLTabBarControllerTabBarItemsAttributes = props.items.map(
-      ({ title, image, selectedImage, identifier, ...rest }) => {
-        const item: Record<string, unknown> = { ...rest };
-        if (title != null) item.CYLTabBarItemTitle = title;
-        if (identifier != null) item.CYLTabBarItemIdentifier = identifier;
-        addImage(item, 'CYLTabBarItemImage', image);
-        addImage(item, 'CYLTabBarItemSelectedImage', selectedImage);
-        return item;
-      }
-    );
+    configuration.CYLTabBarControllerTabBarItemsAttributes = props.items.map(itemAttributes);
   }
   if (props.plusButton) {
-    const p = props.plusButton;
-    const plus: Record<string, unknown> = {};
-    if (p.title != null) plus.CYLTabBarItemTitle = p.title;
-    if (p.titleColor) plus.CYLTabBarItemTitleColor = p.titleColor;
-    if (p.selectedTitleColor) plus.CYLTabBarItemSelectedTitleColor = p.selectedTitleColor;
-    if (p.titleFont != null) plus.CYLTabBarItemTitleFont = p.titleFont;
-    if (p.index != null) plus.CYLPlusButtonIndexInTabBar = p.index;
-    if (p.centerYMultiplier != null) plus.CYLPlusButtonCenterYMultiplier = p.centerYMultiplier;
-    if (p.centerYOffset != null) plus.CYLPlusButtonCenterYOffset = p.centerYOffset;
-    if (p.alignsTitle != null) plus.CYLPlusButtonAlignsTitle = p.alignsTitle;
-    if (p.keepsTitleVisible != null) plus.CYLPlusButtonKeepsTitleVisible = p.keepsTitleVisible;
-    if (p.showsSelection != null) plus.CYLPlusButtonShowsSelection = p.showsSelection;
-    if (p.identifier) plus.CYLTabBarItemIdentifier = p.identifier;
-    if (p.pageIdentifier) plus.CYLTabBarItemPageIdentifier = p.pageIdentifier;
-    if (p.size) plus.CYLPlusButtonSize = p.size;
-    if (p.imageSize) plus.CYLPlusButtonImageSize = p.imageSize;
-    addImage(plus, 'CYLTabBarItemImage', p.image);
-    addImage(plus, 'CYLTabBarItemSelectedImage', p.selectedImage);
-    addImage(plus, 'CYLPlusButtonBackgroundImage', p.backgroundImage);
-    configuration.CYLTabBarControllerPlusButton = plus;
+    configuration.CYLTabBarControllerPlusButton = plusButtonAttributes(props.plusButton);
   }
   return { ...configuration, ...props.configuration };
+}
+
+/** [EN] The native login state: -1 unknown (the library's cached state is used), 1 logged in, 0 logged out. [CN] 原生登录状态：-1 未知（使用库缓存的状态），1 已登录，0 未登录。 */
+function loginStateValue(loggedIn: boolean | undefined): number {
+  if (loggedIn === undefined) {
+    return -1;
+  }
+  return loggedIn ? 1 : 0;
 }
 
 /**
@@ -230,7 +266,7 @@ export function CYLTabBar(props: CYLTabBarProps) {
       badgeStyles={badgeStyles ? JSON.stringify(badgeStyles) : ''}
       plusButtonBadgeStyle={plusButtonBadge ? JSON.stringify(plusButtonBadge) : ''}
       tabCoverImages={(tabCoverImages ?? []).map(imageValue)}
-      loginState={loggedIn === undefined ? -1 : loggedIn ? 1 : 0}
+      loginState={loginStateValue(loggedIn)}
       onLoginStateChange={(event) => onLoginStateChange?.(event.nativeEvent.loggedIn)}
       onLoginRequest={(event) =>
         onLoginRequest?.(event.nativeEvent.index, event.nativeEvent.identifier, event.nativeEvent.title)

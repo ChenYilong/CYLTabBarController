@@ -57,6 +57,7 @@ android {
             // [CN] R8 压缩并混淆 release 包（Flutter 会加入自己的规则与本目录的 proguard-rules.pro）。
             isMinifyEnabled = true
             isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
     }
 }
