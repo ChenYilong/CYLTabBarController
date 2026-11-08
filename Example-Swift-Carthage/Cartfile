@@ -1,7 +1,7 @@
-# [EN] Carthage demo: CYLTabBarController is the only dependency. `scripts/pod-lint.sh push` moves the line below to
-#      each new release ("~> <version>"); until the first release after this demo was added, it follows "master".
-#      In your own app, pin a release, e.g. github "ChenYilong/CYLTabBarController" ~> 1.99
-# [CN] Carthage 演示：唯一的依赖是 CYLTabBarController。`scripts/pod-lint.sh push` 会在每次发布后把下面一行更新为新版本
-#      （"~> <版本号>"）；在添加本演示后的第一次发布之前，它跟随 "master"。
-#      在自己的 App 中请指定发布版本，例如 github "ChenYilong/CYLTabBarController" ~> 1.99
+# [EN] Carthage demo: CYLTabBarController is the only dependency, as a prebuilt XCFramework (docs/Carthage.md).
+#      1.100.0 has no XCFramework, so the line below still builds it from source; the next
+#      `scripts/pod-lint.sh bump <version>` rewrites it as binary "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController.json" ~> <version>.
+# [CN] Carthage 演示：唯一的依赖是 CYLTabBarController，使用预编译的 XCFramework（docs/Carthage.md）。1.100.0 没有 XCFramework，
+#      因此下面一行仍从源码编译；下一次 `scripts/pod-lint.sh bump <版本号>` 会把它改为
+#      binary "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController.json" ~> <版本号>。
 github "ChenYilong/CYLTabBarController" ~> 1.100.0

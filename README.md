@@ -673,10 +673,10 @@ pod 'CYLTabBarController', '~> 1.100.0'
 
 | 中文 | English |
 |:---|:---|
-| 除了 CocoaPods 和 Swift Package Manager，也可以通过 [Carthage](https://github.com/Carthage/Carthage) 集成本库。在 `Cartfile` 中添加： | In addition to CocoaPods and Swift Package Manager, you can integrate the library with [Carthage](https://github.com/Carthage/Carthage). Add the following to `Cartfile`: |
+| 除了 CocoaPods 和 Swift Package Manager，也可以通过 [Carthage](https://github.com/Carthage/Carthage) 集成本库：每个版本都附带预编译的 XCFramework。在 `Cartfile` 中添加： | In addition to CocoaPods and Swift Package Manager, you can integrate the library with [Carthage](https://github.com/Carthage/Carthage): every release ships a prebuilt XCFramework. Add the following to `Cartfile`: |
 
 ```
-github "ChenYilong/CYLTabBarController"
+binary "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController.json"
 ```
 
 | 中文 | English |
@@ -689,11 +689,11 @@ carthage update --use-xcframeworks --platform iOS
 
 | 中文 | English |
 |:---|:---|
-| 构建完成后，将生成的 `CYLTabBarController.xcframework` 拖入工程，并在 "Frameworks, Libraries, and Embedded Content" 中设置为 `Embed & Sign`。 | After the build completes, drag `CYLTabBarController.xcframework` into the project and set it to `Embed & Sign` under "Frameworks, Libraries, and Embedded Content". |
+| 下载完成后，将 `Carthage/Build/CYLTabBarController.xcframework` 拖入工程，并在 "Frameworks, Libraries, and Embedded Content" 中设置为 `Embed & Sign`。 | Once it is downloaded, drag `Carthage/Build/CYLTabBarController.xcframework` into the project and set it to `Embed & Sign` under "Frameworks, Libraries, and Embedded Content". |
 
 | 中文 | English |
 |:---|:---|
-| 说明：Carthage 构建的 framework 包含核心功能、角标、扁平样式与资源包（多语言文案），不含 Lottie 动画（`LottieSwift` 目录，需要时请使用 CocoaPods 或 SPM）；最低支持 iOS 15.0（当前 Xcode 支持的最低版本）。发布新版本时，`scripts/pod-lint.sh push` 会顺便更新演示工程 `Cartfile` 中的版本。详见 [docs/Carthage.md](docs/Carthage.md)（[#384](https://github.com/ChenYilong/CYLTabBarController/issues/384)）。 | Note: the framework Carthage builds contains the core, badges, the flat design style and the resource bundle (localized strings), without Lottie animations (the `LottieSwift` folder; use CocoaPods or SPM for them); it supports iOS 15.0 and later (the lowest version current Xcode supports). On release, `scripts/pod-lint.sh push` also updates the version in the demo's `Cartfile`. See [docs/Carthage.md](docs/Carthage.md) ([#384](https://github.com/ChenYilong/CYLTabBarController/issues/384)). |
+| 说明：第一个附带 XCFramework 的版本是 1.100.0 之后的下一个版本，此前（至 1.100.0）仍用 `github "ChenYilong/CYLTabBarController" ~> 1.100.0`。之所以改用预编译版本：本仓库包含 Flutter 示例的 Xcode 工程，Carthage 无法从源码编译本仓库。该 framework 包含核心功能、角标、扁平样式与资源包（多语言文案），不含 Lottie 动画（`LottieSwift` 目录，需要时请使用 CocoaPods 或 SPM）；最低支持 iOS 15.0。发布时 `scripts/pod-lint.sh bump` 更新二进制规格 `CYLTabBarController.json`，Release workflow 上传 zip。详见 [docs/Carthage.md](docs/Carthage.md)（[#384](https://github.com/ChenYilong/CYLTabBarController/issues/384)）。 | Note: the first release with an XCFramework is the one after 1.100.0; up to 1.100.0, use `github "ChenYilong/CYLTabBarController" ~> 1.100.0`. Why prebuilt: this repository holds the Flutter examples' Xcode projects, so Carthage cannot build it from source. The framework contains the core, badges, the flat design style and the resource bundle (localized strings), without Lottie animations (the `LottieSwift` folder; use CocoaPods or SPM for them); it supports iOS 15.0 and later. On release, `scripts/pod-lint.sh bump` updates the binary spec `CYLTabBarController.json` and the Release workflow uploads the zip. See [docs/Carthage.md](docs/Carthage.md) ([#384](https://github.com/ChenYilong/CYLTabBarController/issues/384)). |
 | 演示工程：`Example-Swift-Carthage`（复制自 `Example-Swift-03`，改用 Carthage 集成），运行步骤与差异见 [docs/Carthage-Example.md](docs/Carthage-Example.md)。 | Demo project: `Example-Swift-Carthage` (a copy of `Example-Swift-03` integrated with Carthage); see [docs/Carthage-Example.md](docs/Carthage-Example.md) for how to run it and what differs. |
 
 ### [CN]第二步：设置 CYLTabBarController 的两个数组
