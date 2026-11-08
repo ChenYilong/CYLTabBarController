@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The network skin downloads its tab and plus button icons, as the Objective-C example does (debug builds get the
+         permission from Flutter's debug manifest only). 网络皮肤会下载 Tab 与 PlusButton 图标，与 Objective-C 示例相同（Flutter 只在 debug manifest
+         中声明该权限）。 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="flutter_cyltabbar_example"
         android:name="${applicationName}"

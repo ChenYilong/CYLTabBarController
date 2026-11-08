@@ -7,12 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0C80B921A6F3F58F76C31292 /* libPods-CyltabbarExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-CyltabbarExample.a */; };
+		0D3076B2A7534FEFAD5D536E /* green_lottie_tab_news_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 9DA7B521B8514204A8080998 /* green_lottie_tab_news_dark.json */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		2C81AEFA7CF94972A936008D /* green_lottie_tab_home_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 9532E828EBA4407F86B2AE1A /* green_lottie_tab_home_dark.json */; };
+		4E52BBE5327045E798685CB3 /* green_lottie_tab_mine_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = B62AA363A7264B658C97E828 /* green_lottie_tab_mine_dark.json */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		761780EF2CA45674006654EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EE2CA45674006654EF /* SceneDelegate.swift */; };
+		7C675A0A460E4FF4941C4455 /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = 5745430701C14866B9ED5C41 /* green_lottie_tab_mine.json */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		854F26919C5B48578653DD22 /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 3B989A598E344D8D9C95E5A2 /* green_lottie_tab_home.json */; };
 		92AE3D56AA595020E5110757 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		A98B3E8B491048B08DD3D6E0 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = E4F770CD0B504832962CF6F9 /* green_lottie_tab_news.json */; };
+		B1030FD6A43C4509A2E65E27 /* green_lottie_tab_discover_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = ACDD9A07A8D94A4B9DB70058 /* green_lottie_tab_discover_dark.json */; };
+		B5BF6AB94C13D83B66CB5363 /* Pods_CyltabbarExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6470FDD302B9C2F6951F28CA /* Pods_CyltabbarExample.framework */; };
+		E36798DE9C7B4026B510434C /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = BA9FDF8FEBB549F29290E1E8 /* green_lottie_tab_discover.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,11 +29,19 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = CyltabbarExample/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = CyltabbarExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-CyltabbarExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CyltabbarExample.debug.xcconfig"; path = "Target Support Files/Pods-CyltabbarExample/Pods-CyltabbarExample.debug.xcconfig"; sourceTree = "<group>"; };
+		3B989A598E344D8D9C95E5A2 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_home.json; sourceTree = SOURCE_ROOT; };
 		5709B34CF0A7D63546082F79 /* Pods-CyltabbarExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CyltabbarExample.release.xcconfig"; path = "Target Support Files/Pods-CyltabbarExample/Pods-CyltabbarExample.release.xcconfig"; sourceTree = "<group>"; };
-		5DCACB8F33CDC322A6C60F78 /* libPods-CyltabbarExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CyltabbarExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5745430701C14866B9ED5C41 /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json; sourceTree = SOURCE_ROOT; };
+		6470FDD302B9C2F6951F28CA /* Pods_CyltabbarExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CyltabbarExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = CyltabbarExample/AppDelegate.swift; sourceTree = "<group>"; };
 		761780EE2CA45674006654EF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = CyltabbarExample/SceneDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = CyltabbarExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		9532E828EBA4407F86B2AE1A /* green_lottie_tab_home_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home_dark.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_home_dark.json; sourceTree = SOURCE_ROOT; };
+		9DA7B521B8514204A8080998 /* green_lottie_tab_news_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_news_dark.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_news_dark.json; sourceTree = SOURCE_ROOT; };
+		ACDD9A07A8D94A4B9DB70058 /* green_lottie_tab_discover_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover_dark.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_discover_dark.json; sourceTree = SOURCE_ROOT; };
+		B62AA363A7264B658C97E828 /* green_lottie_tab_mine_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine_dark.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_mine_dark.json; sourceTree = SOURCE_ROOT; };
+		BA9FDF8FEBB549F29290E1E8 /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_discover.json; sourceTree = SOURCE_ROOT; };
+		E4F770CD0B504832962CF6F9 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_news.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_news.json; sourceTree = SOURCE_ROOT; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -34,7 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C80B921A6F3F58F76C31292 /* libPods-CyltabbarExample.a in Frameworks */,
+				B5BF6AB94C13D83B66CB5363 /* Pods_CyltabbarExample.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -58,7 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				5DCACB8F33CDC322A6C60F78 /* libPods-CyltabbarExample.a */,
+				6470FDD302B9C2F6951F28CA /* Pods_CyltabbarExample.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -73,6 +89,14 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				B62AA363A7264B658C97E828 /* green_lottie_tab_mine_dark.json */,
+				5745430701C14866B9ED5C41 /* green_lottie_tab_mine.json */,
+				9DA7B521B8514204A8080998 /* green_lottie_tab_news_dark.json */,
+				E4F770CD0B504832962CF6F9 /* green_lottie_tab_news.json */,
+				ACDD9A07A8D94A4B9DB70058 /* green_lottie_tab_discover_dark.json */,
+				BA9FDF8FEBB549F29290E1E8 /* green_lottie_tab_discover.json */,
+				9532E828EBA4407F86B2AE1A /* green_lottie_tab_home_dark.json */,
+				3B989A598E344D8D9C95E5A2 /* green_lottie_tab_home.json */,
 				13B07FAE1A68108700A75B9A /* CyltabbarExample */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -161,6 +185,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E52BBE5327045E798685CB3 /* green_lottie_tab_mine_dark.json in Resources */,
+				7C675A0A460E4FF4941C4455 /* green_lottie_tab_mine.json in Resources */,
+				0D3076B2A7534FEFAD5D536E /* green_lottie_tab_news_dark.json in Resources */,
+				A98B3E8B491048B08DD3D6E0 /* green_lottie_tab_news.json in Resources */,
+				B1030FD6A43C4509A2E65E27 /* green_lottie_tab_discover_dark.json in Resources */,
+				E36798DE9C7B4026B510434C /* green_lottie_tab_discover.json in Resources */,
+				2C81AEFA7CF94972A936008D /* green_lottie_tab_home_dark.json in Resources */,
+				854F26919C5B48578653DD22 /* green_lottie_tab_home.json in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				92AE3D56AA595020E5110757 /* PrivacyInfo.xcprivacy in Resources */,
@@ -241,12 +273,14 @@
 				"${PODS_ROOT}/../../../../../CYLTabBarController/Resources/CYLTabBarController.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact/React-cxxreact_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-timing/React-timing_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/lottie-ios/LottiePrivacyInfo.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-cxxreact_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-timing_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/LottiePrivacyInfo.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -369,6 +403,29 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_ROOT}/ReactCommon",
+					"${PODS_ROOT}/ReactCommon/react/nativemodule/core",
+					"${PODS_ROOT}/React-runtimeexecutor",
+					"${PODS_ROOT}/React-runtimeexecutor/platform/ios",
+					"${PODS_ROOT}/ReactCommon-Samples",
+					"${PODS_ROOT}/ReactCommon-Samples/platform/ios",
+					"${PODS_ROOT}/React-Fabric/react/renderer/components/view/platform/cxx",
+					"${PODS_ROOT}/React-Fabric/react/renderer/components/scrollview/platform/cxx",
+					"${PODS_ROOT}/React-Fabric/react/renderer/components/scrollview/platform/ios",
+					"${PODS_ROOT}/React-FabricComponents/react/renderer/textlayoutmanager/platform/ios",
+					"${PODS_ROOT}/React-FabricComponents/react/renderer/components/text/platform/cxx",
+					"${PODS_ROOT}/React-FabricComponents/react/renderer/components/textinput/platform/ios",
+					"${PODS_ROOT}/React-FabricComponents/react/renderer/components/switch/iosswitch",
+					"${PODS_ROOT}/React-NativeModulesApple",
+					"${PODS_ROOT}/React-bridging",
+					"${PODS_ROOT}/React-graphics",
+					"${PODS_ROOT}/React-graphics/react/renderer/graphics/platform/ios",
+					"${PODS_ROOT}/React-featureflags",
+					"${PODS_ROOT}/React-renderercss",
+					"${PODS_ROOT}/React-cxxstableapi",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
 				LIBRARY_SEARCH_PATHS = (
@@ -441,6 +498,29 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_ROOT}/ReactCommon",
+					"${PODS_ROOT}/ReactCommon/react/nativemodule/core",
+					"${PODS_ROOT}/React-runtimeexecutor",
+					"${PODS_ROOT}/React-runtimeexecutor/platform/ios",
+					"${PODS_ROOT}/ReactCommon-Samples",
+					"${PODS_ROOT}/ReactCommon-Samples/platform/ios",
+					"${PODS_ROOT}/React-Fabric/react/renderer/components/view/platform/cxx",
+					"${PODS_ROOT}/React-Fabric/react/renderer/components/scrollview/platform/cxx",
+					"${PODS_ROOT}/React-Fabric/react/renderer/components/scrollview/platform/ios",
+					"${PODS_ROOT}/React-FabricComponents/react/renderer/textlayoutmanager/platform/ios",
+					"${PODS_ROOT}/React-FabricComponents/react/renderer/components/text/platform/cxx",
+					"${PODS_ROOT}/React-FabricComponents/react/renderer/components/textinput/platform/ios",
+					"${PODS_ROOT}/React-FabricComponents/react/renderer/components/switch/iosswitch",
+					"${PODS_ROOT}/React-NativeModulesApple",
+					"${PODS_ROOT}/React-bridging",
+					"${PODS_ROOT}/React-graphics",
+					"${PODS_ROOT}/React-graphics/react/renderer/graphics/platform/ios",
+					"${PODS_ROOT}/React-featureflags",
+					"${PODS_ROOT}/React-renderercss",
+					"${PODS_ROOT}/React-cxxstableapi",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
 				LIBRARY_SEARCH_PATHS = (

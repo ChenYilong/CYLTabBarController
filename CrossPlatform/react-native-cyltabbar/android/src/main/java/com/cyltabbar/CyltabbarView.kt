@@ -32,6 +32,8 @@ class CyltabbarView(private val reactContext: ThemedReactContext) : CYLTabBarHos
     didTapPlusButton = { dispatch(PlusButtonPressEvent(surfaceId(), id, tabBarController?.context.orEmpty())) }
     preferredHeightDidChange = { height -> dispatch(TabBarLayoutEvent(surfaceId(), id, height.toDouble())) }
     didLongPressTab = { index, identifier, title -> dispatch(TabLongPressEvent(surfaceId(), id, index, identifier, title)) }
+    didRequestLogin = { index, identifier, title -> dispatch(TabLongPressEvent(surfaceId(), id, index, identifier, title, "topLoginRequest")) }
+    loginStateDidChange = { loggedIn -> dispatch(LoginStateEvent(surfaceId(), id, loggedIn)) }
   }
 
   private var configurationJSON: String? = null
@@ -69,14 +71,26 @@ class TabSelectEvent(surfaceId: Int, viewId: Int, private val index: Int, privat
   }
 }
 
-class TabLongPressEvent(surfaceId: Int, viewId: Int, private val index: Int, private val identifier: String, private val title: String) :
-  Event<TabLongPressEvent>(surfaceId, viewId) {
-  override fun getEventName() = "topTabLongPress"
+/** [EN] A tab with its title: a long press, or a login request (`topLoginRequest`). [CN] 带标题的 Tab 事件：长按或登录请求。 */
+class TabLongPressEvent(
+  surfaceId: Int,
+  viewId: Int,
+  private val index: Int,
+  private val identifier: String,
+  private val title: String,
+  private val name: String = "topTabLongPress",
+) : Event<TabLongPressEvent>(surfaceId, viewId) {
+  override fun getEventName() = name
   override fun getEventData(): WritableMap = Arguments.createMap().apply {
     putInt("index", index)
     putString("identifier", identifier)
     putString("title", title)
   }
+}
+
+class LoginStateEvent(surfaceId: Int, viewId: Int, private val loggedIn: Boolean) : Event<LoginStateEvent>(surfaceId, viewId) {
+  override fun getEventName() = "topLoginStateChange"
+  override fun getEventData(): WritableMap = Arguments.createMap().apply { putBoolean("loggedIn", loggedIn) }
 }
 
 class PlusButtonPressEvent(surfaceId: Int, viewId: Int, private val context: String) : Event<PlusButtonPressEvent>(surfaceId, viewId) {

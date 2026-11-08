@@ -209,7 +209,7 @@
  "CYLBadgeAppearance": {
   "status": "done",
   "android": "CYLBadgeAppearance",
-  "note": "Android defaults: 11 sp font, 2 dp margin"
+  "note": "Android defaults as on iOS: bold 9 sp font, 8 dp margin; the badge centered 2 dp right of its anchor's top-right corner (tabs: the 22 dp image view on Liquid Glass, else the image)"
  },
  "CYLBadgeAppearance -reset": {
   "status": "done",
@@ -5399,5 +5399,73 @@
  "CYLTabBarHostView didLongPressTab": {
   "status": "done",
   "android": "CYLTabBarHostView.didLongPressTab"
+ },
+ "CYLPlusButtonImageSize": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonImageSize"
+ },
+ "CYLPlusButtonShowsSelection": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonShowsSelection",
+  "note": "Android always shows the selection"
+ },
+ "CYLPlusButtonSize": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonSize"
+ },
+ "CYLTabBarControllerLoginRequiredTabBarItemIdentifiers": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers",
+  "note": "a list or one comma-separated string"
+ },
+ "CYLTabBarHostBadgeAnimation": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_ANIMATION"
+ },
+ "CYLTabBarHostBadgeCenterOffset": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_CENTER_OFFSET"
+ },
+ "CYLTabBarHostBadgeColor": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_COLOR"
+ },
+ "CYLTabBarHostBadgeRadius": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_RADIUS"
+ },
+ "CYLTabBarHostBadgeValue": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_VALUE"
+ },
+ "CYLTabBarHostView -resetLoggedIn": {
+  "status": "done",
+  "android": "CYLTabBarHostView.resetLoggedIn()"
+ },
+ "CYLTabBarHostView badgeAttributes": {
+  "status": "done",
+  "android": "CYLTabBarHostView.badgeAttributes"
+ },
+ "CYLTabBarHostView didRequestLogin": {
+  "status": "done",
+  "android": "CYLTabBarHostView.didRequestLogin"
+ },
+ "CYLTabBarHostView loggedIn": {
+  "status": "done",
+  "android": "CYLTabBarHostView.loggedIn",
+  "note": "cached in SharedPreferences, as NSUserDefaults on iOS"
+ },
+ "CYLTabBarHostView loginStateDidChange": {
+  "status": "done",
+  "android": "CYLTabBarHostView.loginStateDidChange"
+ },
+ "CYLTabBarHostView plusButtonBadgeAttributes": {
+  "status": "done",
+  "android": "CYLTabBarHostView.plusButtonBadgeAttributes"
+ },
+ "CYLTabBarHostView tabCoverImages": {
+  "status": "done",
+  "android": "CYLTabBarHostView.tabCoverImages",
+  "note": "CYLTabBarItemButton.cyl_coverView"
  }
 }

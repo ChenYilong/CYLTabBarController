@@ -96,6 +96,42 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
             applyBadgeValues()
         }
 
+    /**
+     * [EN] Badges with a style, one per tab, taking precedence over [badgeValues] for the tabs they cover: maps with
+     *      [BADGE_VALUE] (as in [badgeValues]), and optionally [BADGE_COLOR] ("#RRGGBB" or a color Int), [BADGE_ANIMATION]
+     *      (a [CYLEnums.CYLBadgeAnimationType], its raw value or its name: "scale", "shake", "bounce", "breathe"...),
+     *      [BADGE_RADIUS] (the dot's radius, dp) and [BADGE_CENTER_OFFSET] ([x, y] in dp). An empty map or null leaves the
+     *      tab to [badgeValues]. As `badgeAttributes` on iOS.
+     * [CN] 带样式的角标，每个 Tab 一个，覆盖 [badgeValues] 中对应的 Tab：map 包含 [BADGE_VALUE]（写法同 [badgeValues]），可选 [BADGE_COLOR]
+     *      （"#RRGGBB" 或颜色 Int）、[BADGE_ANIMATION]（[CYLEnums.CYLBadgeAnimationType]、其 rawValue 或名称："scale"、"shake"、"bounce"、
+     *      "breathe" 等）、[BADGE_RADIUS]（红点半径，dp）与 [BADGE_CENTER_OFFSET]（[x, y]，dp）。空 map 或 null 表示该 Tab 使用 [badgeValues]。
+     *      与 iOS 的 `badgeAttributes` 相同。
+     */
+    var badgeAttributes: List<Map<String, Any?>?> = emptyList()
+        set(value) {
+            field = value
+            applyBadgeValues()
+        }
+
+    /** [EN] The plus button's badge with a style, as an entry of [badgeAttributes]; wins over [plusButtonBadgeValue]. [CN] 带样式的 PlusButton 角标，写法同 [badgeAttributes] 的一项；优先于 [plusButtonBadgeValue]。 */
+    var plusButtonBadgeAttributes: Map<String, Any?>? = null
+        set(value) {
+            field = value
+            applyBadgeValues()
+        }
+
+    /**
+     * [EN] An image covering each tab's icon in both states ([CYLTabBarItemButton.cyl_coverView]), or null for none: a
+     *      Drawable, a drawable name, a file path or a URL (loaded on a background thread, or by [imageResolver]).
+     * [CN] 覆盖每个 Tab 图标的图片（两种状态，[CYLTabBarItemButton.cyl_coverView]），null 表示没有：Drawable、drawable 名称、文件路径或
+     *      URL（在后台线程加载，或由 [imageResolver] 加载）。
+     */
+    var tabCoverImages: List<Any?> = emptyList()
+        set(value) {
+            field = value
+            loadTabCoverImages(value)
+        }
+
     /** [EN] Also count what rises above the bar (plus button, badges) in [preferredHeight], for hosts that clip, like Flutter. [CN] [preferredHeight] 同时包含高出 TabBar 的部分，供会裁剪的宿主使用，例如 Flutter。 */
     var heightIncludesOverflow: Boolean = false
 
@@ -108,6 +144,43 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     /** [EN] A long press on a tab (its index) or on the plus button (-1), with the title it shows. [CN] 长按 Tab（其下标）或 PlusButton（-1），以及显示的标题。 */
     var didLongPressTab: ((index: Int, identifier: String, title: String) -> Unit)? = null
     var didTapPlusButton: (() -> Unit)? = null
+
+    /**
+     * [EN] Login (#19), as iOS: [loggedIn] is the controller's `cyl_loggedIn`. While logged out, a tap on a tab listed in
+     *      `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers` does not select it: [didRequestLogin] reports it (index,
+     *      identifier, title), and the app shows its login screen, then sets [loggedIn] and [selectedIndex] once logged in.
+     *      Logging out while such a tab is selected selects the first tab that does not need login, reported by [didSelectTab].
+     * [CN] 登录（#19），与 iOS 相同：[loggedIn] 即控制器的 `cyl_loggedIn`。未登录时，点击需要登录的 Tab 不会选中它：[didRequestLogin] 报告该 Tab，
+     *      App 展示登录界面，登录后设置 [loggedIn] 与 [selectedIndex]。选中这类 Tab 时退出登录，会选中第一个不需要登录的 Tab，并通过 [didSelectTab] 报告。
+     */
+    var loggedIn: Boolean = false
+        set(value) {
+            field = value
+            loggedInSet = true
+            val controller = tabBarController ?: return
+            if (controller.cyl_loggedIn == value) return
+            val before = controller.selectedIndex
+            controller.cyl_loggedIn = value
+            // [EN] A selection the app set while logged out (it may come before the login state) is applied now.
+            // [CN] App 在未登录时设置的选中（可能先于登录状态到达）现在生效。
+            if (value) return applySelectedIndex()
+            val after = controller.selectedIndex
+            if (after != before && after >= 0) didSelectTab?.invoke(after, controller.cyl_tabBarItemIdentifiers.getOrNull(after).orEmpty())
+        }
+    var didRequestLogin: ((index: Int, identifier: String, title: String) -> Unit)? = null
+    /**
+     * [EN] The login state the tab bar uses, reported once it is built: until the app sets [loggedIn], the state the library
+     *      cached (`cyl_loggedIn`, kept across launches), so the app can start from it.
+     * [CN] TabBar 使用的登录状态，在 TabBar 创建后报告：App 设置 [loggedIn] 之前为库缓存的状态（`cyl_loggedIn`，重启后保留），App 可以从它开始。
+     */
+    var loginStateDidChange: ((loggedIn: Boolean) -> Unit)? = null
+    /** [EN] The app set [loggedIn]. [CN] App 设置过 [loggedIn]。 */
+    private var loggedInSet = false
+
+    /** [EN] Forgets the state the app set with [loggedIn]: the next tab bar built uses the cached state again. [CN] 忘记 App 通过 [loggedIn] 设置的状态：之后创建的 TabBar 重新使用缓存的状态。 */
+    fun resetLoggedIn() {
+        loggedInSet = false
+    }
     var preferredHeightDidChange: ((height: Float) -> Unit)? = null
 
     /**
@@ -206,7 +279,8 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
 
     private fun attributesWithImages(attributes: Map<*, *>, resolver: ((Any?) -> Drawable?)?): Map<String, Any?> {
         val result = attributes.entries.associate { it.key.toString() to it.value }.toMutableMap()
-        for (key in listOf(CYLConstants.CYLTabBarItemImage, CYLConstants.CYLTabBarItemSelectedImage)) {
+        for (key in listOf(CYLConstants.CYLTabBarItemImage, CYLConstants.CYLTabBarItemSelectedImage, CYLConstants.CYLTabBarItemDarkImage,
+                CYLConstants.CYLTabBarItemSelectedDarkImage, CYLConstants.CYLPlusButtonBackgroundImage)) {
             val value = result[key] ?: continue
             (resolver?.invoke(value) ?: (value as? String)?.takeIf { it.contains("://") }?.let { urlImage(it) })?.let { result[key] = it }
         }
@@ -276,6 +350,21 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
                 else (configuration[CYLConstants.CYLTabBarControllerPlusButton] as? Map<*, *>)?.get(CYLConstants.CYLTabBarItemTitle)?.toString().orEmpty()
             didLongPressTab?.invoke(index, identifier, title)
         }
+        // [EN] The app's state once it set one; until then the cached one. [CN] App 设置过时使用其状态；之前使用缓存的状态。
+        // [EN] `tabBarController` is still unset here, so the setter only stores the value. [CN] 此时 `tabBarController` 尚未设置，setter 只保存值。
+        if (loggedInSet) {
+            controller.cyl_loggedIn = loggedIn
+        } else {
+            loggedIn = controller.cyl_loggedIn
+            loggedInSet = false
+        }
+        loginStateDidChange?.invoke(loggedIn)
+        // [EN] The app shows the login screen: the tab is not selected now (see [didRequestLogin]). [CN] 由 App 展示登录界面：此时不选中该 Tab。
+        controller.cyl_loginHandler = { tabBarController, page, completion ->
+            completion(false)
+            val index = tabBarController.viewControllers.indexOf(page)
+            didRequestLogin?.invoke(index, tabBarController.cyl_tabBarItemIdentifiers.getOrNull(index).orEmpty(), tabBarController.tabBarItems.getOrNull(index)?.title.orEmpty())
+        }
         tabBarController = controller
         preferredHeight = 0f
         addView(controller.view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
@@ -288,6 +377,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         }
         applySelectedIndex()
         applyBadgeValues()
+        applyTabCoverImages()
     }
 
     private fun plusIdentifier(configuration: Map<String, Any?>): String =
@@ -308,7 +398,11 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
 
     private fun applySelectedIndex() {
         val controller = tabBarController ?: return
-        if (selectedIndex in controller.viewControllers.indices && controller.selectedIndex != selectedIndex) controller.selectedIndex = selectedIndex
+        val page = controller.viewControllers.getOrNull(selectedIndex) ?: return
+        // [EN] Never a tab that needs login while logged out, whatever the order the app sets the values in (as iOS).
+        // [CN] 未登录时不选中需要登录的 Tab，无论 App 以何种顺序设置这些值（与 iOS 相同）。
+        if (!controller.cyl_loggedIn && controller.cyl_isLoginRequiredForViewController(page)) return
+        if (controller.selectedIndex != selectedIndex) controller.selectedIndex = selectedIndex
     }
 
     private fun applyBadgeValues() {
@@ -316,20 +410,19 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         val values = badgeValues
         val animation = badgeAnimationType
         // [EN] Badges sit on the tab buttons, which exist once the bar is laid out. [CN] 角标位于 Tab 按钮上，TabBar 布局后按钮才存在。
+        val styles = badgeAttributes
         controller.performWhenTabBarItemsReady { tabBarController ->
             tabBarController.tabBarItems.forEachIndexed { index, item ->
-                when (val value = values.getOrNull(index).orEmpty()) {
-                    "" -> item.cyl_clearBadge()
-                    "dot" -> item.cyl_showBadge()
-                    else -> item.cyl_showBadgeValue(value, animation)
-                }
+                val button = item.cyl_visiableTabButton ?: return@forEachIndexed
+                val style = styles.getOrNull(index)?.takeIf { it.isNotEmpty() } ?: mapOf(BADGE_VALUE to values.getOrNull(index).orEmpty())
+                showBadge(button, style, animation)
             }
             applyPlusButtonBadge()
         }
     }
 
     /** [EN] The plus button and the badge last shown on it. [CN] 最近显示角标的 PlusButton 与角标值。 */
-    private var shownPlusButtonBadge: Pair<CYLPlusButton, String>? = null
+    private var shownPlusButtonBadge: Pair<CYLPlusButton, Map<String, Any?>>? = null
 
     /**
      * [EN] The plus button joins the tab bar during a layout, possibly after the tab buttons: applied then too, and only when
@@ -338,17 +431,81 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
      */
     private fun applyPlusButtonBadge() {
         val plusButton = tabBarController?.tabBar?.plusButton ?: return
-        val value = plusButtonBadgeValue.orEmpty()
+        val style = plusButtonBadgeAttributes?.takeIf { it.isNotEmpty() } ?: mapOf(BADGE_VALUE to plusButtonBadgeValue.orEmpty())
         val shown = shownPlusButtonBadge
-        if (shown != null && shown.first === plusButton && shown.second == value) return
-        shownPlusButtonBadge = plusButton to value
-        when (value) {
-            "" -> plusButton.cyl_clearBadge()
-            "dot" -> plusButton.cyl_showBadge()
-            else -> plusButton.cyl_showBadgeValue(value, badgeAnimationType)
-        }
+        if (shown != null && shown.first === plusButton && shown.second == style) return
+        shownPlusButtonBadge = plusButton to style
+        showBadge(plusButton, style, badgeAnimationType)
         // [EN] A badge can rise above the plus button: measured again once it is laid out. [CN] 角标可能高出 PlusButton：布局后重新计算高度。
         plusButton.post { updatePreferredHeight() }
+    }
+
+    /** [EN] Shows the badge `style` describes on `target` (a tab button or the plus button), its look first. [CN] 在 `target`（Tab 按钮或 PlusButton）上显示 `style` 描述的角标，先设置外观。 */
+    private fun showBadge(target: View, style: Map<String, Any?>, fallback: CYLEnums.CYLBadgeAnimationType) {
+        val text = when (val value = style[BADGE_VALUE]) { is String -> value; is Number -> value.toString(); else -> "" }
+        when (val color = style[BADGE_COLOR]) {
+            is Int -> target.cyl_badgeBackgroundColor = color
+            is String -> CYLTabBarConfiguration.colorValue(color)?.let { target.cyl_badgeBackgroundColor = it }
+        }
+        (style[BADGE_RADIUS] as? Number)?.let { target.cyl_badgeRadius = it.toFloat() }
+        (style[BADGE_CENTER_OFFSET] as? List<*>)?.takeIf { it.size == 2 }?.let { offset ->
+            val x = (offset[0] as? Number)?.toFloat(); val y = (offset[1] as? Number)?.toFloat()
+            if (x != null && y != null) target.cyl_badgeCenterOffset = CYLOffset(x, y)
+        }
+        val animation = badgeAnimation(style[BADGE_ANIMATION]) ?: fallback
+        when (text) {
+            "" -> target.cyl_clearBadge()
+            // [EN] A dot animates only with an animation of its own, as on iOS. [CN] 红点仅在自身指定动画时播放，与 iOS 相同。
+            "dot" -> if (style[BADGE_ANIMATION] == null) target.cyl_showBadge() else target.cyl_showBadgeValue("", animation)
+            else -> target.cyl_showBadgeValue(text, animation)
+        }
+    }
+
+    private fun badgeAnimation(value: Any?): CYLEnums.CYLBadgeAnimationType? = when (value) {
+        is CYLEnums.CYLBadgeAnimationType -> value
+        is Number -> CYLEnums.CYLBadgeAnimationType.entries.firstOrNull { it.rawValue == value.toInt() }
+        is String -> CYLEnums.CYLBadgeAnimationType.entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+        else -> null
+    }
+
+    /** [EN] [tabCoverImages] loaded (Drawable or null). [CN] 已加载的 [tabCoverImages]（Drawable 或 null）。 */
+    private var loadedTabCoverImages: List<Drawable?>? = null
+    private var coverGeneration = 0
+
+    private fun loadTabCoverImages(values: List<Any?>) {
+        val generation = ++coverGeneration
+        val resolver = imageResolver
+        imageLoader.execute {
+            val images = values.map { value ->
+                resolver?.invoke(value) ?: when (value) {
+                    is Drawable -> value
+                    is String -> if (value.contains("://")) urlImage(value) else CYLTabBarConfiguration.imageResolver.drawable(context, value)
+                    else -> null
+                }
+            }
+            mainHandler.post {
+                if (generation != coverGeneration) return@post
+                loadedTabCoverImages = images
+                applyTabCoverImages()
+            }
+        }
+    }
+
+    /** [EN] Covers the tab buttons with the loaded images; a tab without one shows its icon. [CN] 用已加载的图片覆盖 Tab 按钮；没有图片的 Tab 显示其图标。 */
+    private fun applyTabCoverImages() {
+        val controller = tabBarController ?: return
+        val images = loadedTabCoverImages ?: return
+        controller.performWhenTabBarItemsReady { tabBarController ->
+            tabBarController.tabBarItems.forEachIndexed { index, item ->
+                val button = item.cyl_visiableTabButton ?: return@forEachIndexed
+                button.cyl_coverView = images.getOrNull(index)?.let { image ->
+                    android.widget.ImageView(context).apply {
+                        setImageDrawable(image.constantState?.newDrawable()?.mutate() ?: image)
+                        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                    }
+                }
+            }
+        }
     }
 
     private fun updatePreferredHeight() {
@@ -431,6 +588,13 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     }
 
     companion object {
+        /** [EN] Keys of [badgeAttributes] / [plusButtonBadgeAttributes], as on iOS. [CN] [badgeAttributes] / [plusButtonBadgeAttributes] 的键，与 iOS 相同。 */
+        const val BADGE_VALUE = "value"
+        const val BADGE_COLOR = "color"
+        const val BADGE_ANIMATION = "animation"
+        const val BADGE_RADIUS = "radius"
+        const val BADGE_CENTER_OFFSET = "centerOffset"
+
         /** [EN] The room left above the icons for a badge, in dp. [CN] 图标上方为角标留出的空间（dp）。 */
         private const val BADGE_ROOM_DP = 8f
         /** [EN] The room an animated badge grows into, in dp. [CN] 动画角标放大时占用的空间（dp）。 */

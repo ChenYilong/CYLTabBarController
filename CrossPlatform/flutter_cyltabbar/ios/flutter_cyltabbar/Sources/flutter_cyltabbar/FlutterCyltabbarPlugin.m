@@ -75,6 +75,13 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         _hostView.didLongPressTab = ^(NSInteger index, NSString *identifier, NSString *title) {
             [weakChannel invokeMethod:@"onTabLongPress" arguments:@{ @"index" : @(index), @"identifier" : identifier, @"title" : title }];
         };
+        _hostView.didRequestLogin = ^(NSInteger index, NSString *identifier, NSString *title) {
+            [weakChannel invokeMethod:@"onLoginRequest" arguments:@{ @"index" : @(index), @"identifier" : identifier, @"title" : title }];
+        };
+        _hostView.loginStateDidChange = ^(BOOL loggedIn) {
+            [weakChannel invokeMethod:@"onLoginStateChange" arguments:@(loggedIn)];
+        };
+        [self applyLoggedIn:arguments[@"loggedIn"]];
         id selectedIndex = arguments[@"selectedIndex"];
         _hostView.selectedIndex = [selectedIndex isKindOfClass:[NSNumber class]] ? [selectedIndex integerValue] : -1;
         id badgeValues = arguments[@"badgeValues"];
@@ -83,6 +90,9 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         _hostView.plusButtonBadgeValue = [plusButtonBadgeValue isKindOfClass:[NSString class]] ? plusButtonBadgeValue : nil;
         id badgeAnimation = arguments[@"badgeAnimation"];
         _hostView.badgeAnimationType = [badgeAnimation isKindOfClass:[NSNumber class]] ? [badgeAnimation integerValue] : 0;
+        [self applyBadgeStyles:arguments[@"badgeStyles"]];
+        [self applyPlusButtonBadge:arguments[@"plusButtonBadge"]];
+        [self applyTabCoverImages:arguments[@"tabCoverImages"]];
         id configuration = arguments[@"configuration"];
         [_hostView setConfigurationJSON:[configuration isKindOfClass:[NSString class]] ? configuration : nil];
         __weak __typeof(self) weakSelf = self;
@@ -97,6 +107,27 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
     return _hostView;
 }
 
+- (void)applyBadgeStyles:(id)value {
+    _hostView.badgeAttributes = [value isKindOfClass:[NSArray class]] ? value : nil;
+}
+
+- (void)applyPlusButtonBadge:(id)value {
+    _hostView.plusButtonBadgeAttributes = [value isKindOfClass:[NSDictionary class]] ? value : nil;
+}
+
+/// [EN] A bool sets the app's login state; null leaves it to the state the library cached. [CN] 布尔值设置 App 的登录状态；null 时使用库缓存的状态。
+- (void)applyLoggedIn:(id)value {
+    if ([value isKindOfClass:[NSNumber class]]) {
+        _hostView.loggedIn = [value boolValue];
+    } else {
+        [_hostView resetLoggedIn];
+    }
+}
+
+- (void)applyTabCoverImages:(id)value {
+    _hostView.tabCoverImages = [value isKindOfClass:[NSArray class]] ? value : nil;
+}
+
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     id arguments = call.arguments;
     if ([call.method isEqualToString:@"setConfiguration"]) {
@@ -109,6 +140,14 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         _hostView.plusButtonBadgeValue = [arguments isKindOfClass:[NSString class]] ? arguments : nil;
     } else if ([call.method isEqualToString:@"setBadgeAnimation"]) {
         _hostView.badgeAnimationType = [arguments isKindOfClass:[NSNumber class]] ? [arguments integerValue] : 0;
+    } else if ([call.method isEqualToString:@"setBadgeStyles"]) {
+        [self applyBadgeStyles:arguments];
+    } else if ([call.method isEqualToString:@"setPlusButtonBadge"]) {
+        [self applyPlusButtonBadge:arguments];
+    } else if ([call.method isEqualToString:@"setTabCoverImages"]) {
+        [self applyTabCoverImages:arguments];
+    } else if ([call.method isEqualToString:@"setLoggedIn"]) {
+        [self applyLoggedIn:arguments];
     } else {
         result(FlutterMethodNotImplemented);
         return;

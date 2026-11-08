@@ -435,8 +435,8 @@ The directory structure is organized as follows:
 | `Example-Swift-02` | Swift，Lottie 2.5（Objective-C）/ Swift, Lottie 2.5 (Objective-C) | 15.0 |
 | `Example-SwiftUI` | SwiftUI App，只用 Core / SwiftUI app, Core only | 15.0 |
 | `Example-PAG` | PAG 动画图标 / PAG tab icons | 15.0 |
-| `Example-Rive` | Rive 动画图标 / Rive tab icons | 15.4 |
-| `Example-SwiftUI-Rive` | SwiftUI + Rive | 15.4 |
+| `Example-Rive` | Rive 动画图标 / Rive tab icons | 15.0 |
+| `Example-SwiftUI-Rive` | SwiftUI + Rive | 15.0 |
 | `Example-GIF` | GIF 动画图标与循环图片的对比 / GIF tab icons, next to a looping image | 15.0 |
 | `Example-network-download` | 扁平样式 / FlatDesign | 15.0 |
 | `Example-Swift-SwiftManager` | Swift Package Manager | 26.0 |
@@ -447,9 +447,9 @@ The directory structure is organized as follows:
 | `CrossPlatform/react-native-cyltabbar/example` | React Native 组件示例，iOS 与 Android（[文档](docs/Cross-Platform-Components.md)）/ The React Native component's example, iOS and Android ([doc](docs/Cross-Platform-Components.md)) | 15.1 |
 | `CrossPlatform/flutter_cyltabbar/example` | Flutter 组件示例，iOS 与 Android（[文档](docs/Cross-Platform-Components.md)）/ The Flutter component's example, iOS and Android ([doc](docs/Cross-Platform-Components.md)) | 15.0 |
 | `CrossPlatform/react-native-cyltabbar/example-pag` | `Example-PAG` 的 React Native 版本，iOS 与 Android（[文档](docs/Cross-Platform-Components.md#cn动效图标示例)）/ The React Native version of `Example-PAG`, iOS and Android ([doc](docs/Cross-Platform-Components.md#enanimated-icon-demos)) | 15.1 |
-| `CrossPlatform/react-native-cyltabbar/example-rive` | `Example-Rive` 的 React Native 版本，iOS 与 Android（[文档](docs/Cross-Platform-Components.md#cn动效图标示例)）/ The React Native version of `Example-Rive`, iOS and Android ([doc](docs/Cross-Platform-Components.md#enanimated-icon-demos)) | 15.4 |
+| `CrossPlatform/react-native-cyltabbar/example-rive` | `Example-Rive` 的 React Native 版本，iOS 与 Android（[文档](docs/Cross-Platform-Components.md#cn动效图标示例)）/ The React Native version of `Example-Rive`, iOS and Android ([doc](docs/Cross-Platform-Components.md#enanimated-icon-demos)) | 15.1 |
 | `CrossPlatform/flutter_cyltabbar/example_pag` | `Example-PAG` 的 Flutter 版本，iOS 与 Android（[文档](docs/Cross-Platform-Components.md#cn动效图标示例)）/ The Flutter version of `Example-PAG`, iOS and Android ([doc](docs/Cross-Platform-Components.md#enanimated-icon-demos)) | 15.0 |
-| `CrossPlatform/flutter_cyltabbar/example_rive` | `Example-Rive` 的 Flutter 版本，iOS 与 Android（[文档](docs/Cross-Platform-Components.md#cn动效图标示例)）/ The Flutter version of `Example-Rive`, iOS and Android ([doc](docs/Cross-Platform-Components.md#enanimated-icon-demos)) | 15.4 |
+| `CrossPlatform/flutter_cyltabbar/example_rive` | `Example-Rive` 的 Flutter 版本，iOS 与 Android（[文档](docs/Cross-Platform-Components.md#cn动效图标示例)）/ The Flutter version of `Example-Rive`, iOS and Android ([doc](docs/Cross-Platform-Components.md#enanimated-icon-demos)) | 15.0 |
 
 ### [CN]版本要求
 ### [EN]Version requirements

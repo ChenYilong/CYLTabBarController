@@ -199,7 +199,6 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     private val panel = RectF()
     private val panelShape = RectF()
     private val bubble = RectF()
-    private var tint: Int? = null
     private var host: CYLTabBar? = null
 
     /** [EN] The bubble's position, in slots. [CN] 气泡的位置（以 slot 为单位）。 */
@@ -245,7 +244,6 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
         tabBar.background = null
         tabBar.setWillNotDraw(false)
         tabBar.cyl_setShadowVisible(false)
-        tint = tabBar.tabBarController?.cyl_tabBarBackgroundColor
         positioned = false
     }
 
@@ -255,8 +253,8 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     }
 
     override fun applyBackgroundColor(tabBar: CYLTabBar, color: Int?) {
-        tint = color
-        tabBar.invalidate()
+        // [EN] Ignored, as on iOS 26: the glass does not take the bar's background color (a skin's opaque background shows
+        //      only in the classic bar and FlatDesign). [CN] 与 iOS 26 相同，忽略：玻璃不使用 TabBar 的背景色（皮肤的不透明背景只在经典样式与扁平样式中显示）。
     }
 
     override fun onSelectionChanged(tabBar: CYLTabBar, animated: Boolean) {
@@ -327,7 +325,7 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
         canvas.drawRoundRect(shape, radius, radius, shadowPaint)
         val glass = pages != null && panelBackdrop.draw(canvas, pages, tabBar.x - pages.x + shape.left, tabBar.y - pages.y + shape.top, shape, radius,
             CYLGlassEffects(blurRadius = 8f * density, refractionHeight = 24f * density, refractionAmount = 24f * density))
-        paint.color = tint ?: if (dark) 0x66121212 else 0x66FAFAFA
+        paint.color = if (dark) 0x66121212 else 0x66FAFAFA
         if (!glass) paint.color = if (dark) 0xE6121212.toInt() else 0xE6FAFAFA.toInt()
         val surface = paint.color
         canvas.drawRoundRect(shape, radius, radius, paint)

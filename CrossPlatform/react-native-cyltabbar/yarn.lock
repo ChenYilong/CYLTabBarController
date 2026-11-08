@@ -6064,6 +6064,7 @@ __metadata:
     react-native: "npm:0.88.0"
     react-native-builder-bob: "npm:^0.44.1"
     react-native-monorepo-config: "npm:^0.4.0"
+    react-native-safe-area-context: "npm:^5.11.1"
   languageName: unknown
   linkType: soft
 

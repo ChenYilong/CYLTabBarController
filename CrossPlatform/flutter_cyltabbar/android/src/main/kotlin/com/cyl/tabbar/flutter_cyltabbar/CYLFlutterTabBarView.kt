@@ -50,10 +50,18 @@ internal class CYLFlutterTabBarView(
     hostView.didLongPressTab = { index, identifier, title ->
       channel.invokeMethod("onTabLongPress", mapOf("index" to index, "identifier" to identifier, "title" to title))
     }
+    hostView.didRequestLogin = { index, identifier, title ->
+      channel.invokeMethod("onLoginRequest", mapOf("index" to index, "identifier" to identifier, "title" to title))
+    }
+    hostView.loginStateDidChange = { loggedIn -> channel.invokeMethod("onLoginStateChange", loggedIn) }
+    applyLoggedIn(arguments["loggedIn"])
     hostView.plusButtonBadgeValue = arguments["plusButtonBadgeValue"] as? String
     hostView.badgeAnimationType = badgeAnimation(arguments["badgeAnimation"])
     hostView.selectedIndex = (arguments["selectedIndex"] as? Number)?.toInt() ?: -1
     hostView.badgeValues = (arguments["badgeValues"] as? List<*>)?.map { it?.toString().orEmpty() } ?: emptyList()
+    hostView.badgeAttributes = badgeStyles(arguments["badgeStyles"])
+    hostView.plusButtonBadgeAttributes = badgeStyle(arguments["plusButtonBadge"])
+    hostView.tabCoverImages = (arguments["tabCoverImages"] as? List<*>).orEmpty()
     hostView.setConfigurationJSON(arguments["configuration"] as? String)
   }
 
@@ -71,6 +79,10 @@ internal class CYLFlutterTabBarView(
       "setBadgeValues" -> hostView.badgeValues = (call.arguments as? List<*>)?.map { it?.toString().orEmpty() } ?: emptyList()
       "setPlusButtonBadgeValue" -> hostView.plusButtonBadgeValue = call.arguments as? String
       "setBadgeAnimation" -> hostView.badgeAnimationType = badgeAnimation(call.arguments)
+      "setBadgeStyles" -> hostView.badgeAttributes = badgeStyles(call.arguments)
+      "setPlusButtonBadge" -> hostView.plusButtonBadgeAttributes = badgeStyle(call.arguments)
+      "setTabCoverImages" -> hostView.tabCoverImages = (call.arguments as? List<*>).orEmpty()
+      "setLoggedIn" -> applyLoggedIn(call.arguments)
       else -> return result.notImplemented()
     }
     result.success(null)
@@ -95,6 +107,16 @@ internal class CYLFlutterTabBarView(
     }
     return null
   }
+
+  /** [EN] A bool sets the app's login state; null leaves it to the state the library cached. [CN] 布尔值设置 App 的登录状态；null 时使用库缓存的状态。 */
+  private fun applyLoggedIn(value: Any?) {
+    if (value is Boolean) hostView.loggedIn = value else hostView.resetLoggedIn()
+  }
+
+  private fun badgeStyle(value: Any?): Map<String, Any?>? =
+    (value as? Map<*, *>)?.entries?.associate { (key, entry) -> key.toString() to entry }
+
+  private fun badgeStyles(value: Any?): List<Map<String, Any?>?> = (value as? List<*>)?.map(::badgeStyle).orEmpty()
 
   private fun badgeAnimation(value: Any?): CYLEnums.CYLBadgeAnimationType =
     CYLEnums.CYLBadgeAnimationType.values().firstOrNull { it.rawValue == (value as? Number)?.toInt() } ?: CYLEnums.CYLBadgeAnimationType.None

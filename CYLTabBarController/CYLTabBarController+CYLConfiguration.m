@@ -524,13 +524,16 @@ static NSDictionary<NSString *, id> *_Nullable CYLPlusButtonAttributesValue(id v
             attributes[key] = [title description];
         }
     }
-    id image = CYLImageValue(value[CYLTabBarItemImage]);
-    if ([image isKindOfClass:[UIImage class]]) {
-        attributes[CYLTabBarItemImage] = image;
-    } else if ([image isKindOfClass:[NSString class]] && [UIImage imageNamed:image]) {
-        attributes[CYLTabBarItemImage] = [UIImage imageNamed:image];
-    } else if ([image isKindOfClass:[NSString class]] && [image isAbsolutePath] && [UIImage imageWithContentsOfFile:image]) {
-        attributes[CYLTabBarItemImage] = [UIImage imageWithContentsOfFile:image];
+    // [EN] The image, and the selected one (`CYLPlusButtonSubclass`'s highlighted image). [CN] 图片与选中图片（`CYLPlusButtonSubclass` 的高亮图片）。
+    for (NSString *key in @[ CYLTabBarItemImage, CYLTabBarItemSelectedImage ]) {
+        id image = CYLImageValue(value[key]);
+        if ([image isKindOfClass:[UIImage class]]) {
+            attributes[key] = image;
+        } else if ([image isKindOfClass:[NSString class]] && [UIImage imageNamed:image]) {
+            attributes[key] = [UIImage imageNamed:image];
+        } else if ([image isKindOfClass:[NSString class]] && [image isAbsolutePath] && [UIImage imageWithContentsOfFile:image]) {
+            attributes[key] = [UIImage imageWithContentsOfFile:image];
+        }
     }
     UIColor *selectedTitleColor = CYLColorValue(value[CYLTabBarItemSelectedTitleColor]);
     if (selectedTitleColor) {
@@ -563,7 +566,13 @@ static NSDictionary<NSString *, id> *_Nullable CYLPlusButtonAttributesValue(id v
             CYLLogInvalidConfigurationValue(key, value[key]);
         }
     }
-    for (NSString *key in @[ CYLPlusButtonAlignsTitle, CYLPlusButtonKeepsTitleVisible ]) {
+    for (NSString *key in @[ CYLPlusButtonSize, CYLPlusButtonImageSize ]) {
+        NSValue *size = value[key] ? CYLSizeValue(value[key], key) : nil;
+        if (size) {
+            attributes[key] = size;
+        }
+    }
+    for (NSString *key in @[ CYLPlusButtonAlignsTitle, CYLPlusButtonKeepsTitleVisible, CYLPlusButtonShowsSelection ]) {
         NSNumber *flag = value[key] ? CYLBoolValue(value[key]) : nil;
         if (flag) {
             attributes[key] = flag;
@@ -610,7 +619,8 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
               CYLTabBarControllerAutomaticPageRegistration, CYLTabBarControllerTabBarItemAnimationSpeed,
               CYLTabBarControllerThemes, CYLTabBarControllerThemeIdentifier, CYLTabBarControllerDarkThemeIdentifier,
               CYLTabBarControllerThemeManagerName, CYLTabBarControllerPlusButton, CYLTabBarControllerPlusButtonAction,
-              CYLTabBarControllerUserInterfaceStyle, CYLTabBarControllerTabButtonTapAnimation, CYLTabBarControllerSwipeToSwitchTab ];
+              CYLTabBarControllerUserInterfaceStyle, CYLTabBarControllerTabButtonTapAnimation, CYLTabBarControllerSwipeToSwitchTab,
+              CYLTabBarControllerLoginRequiredTabBarItemIdentifiers ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -1342,9 +1352,14 @@ static BOOL CYLScreenIsDark(void) {
         return nil;
     }
     UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
-    [appearance configureWithDefaultBackground];
+    // [EN] A background color asks for an opaque bar, as the example's skins (`CYLDemoTheme`): over the default (blurred)
+    //      background, Liquid Glass did not show it. [CN] 背景色需要不透明的 TabBar，与示例的皮肤（`CYLDemoTheme`）相同：
+    //      在默认（模糊）背景上，液态玻璃不显示该颜色。
     if (background) {
+        [appearance configureWithOpaqueBackground];
         appearance.backgroundColor = background;
+    } else {
+        [appearance configureWithDefaultBackground];
     }
     if (shadow) {
         appearance.shadowColor = shadow;
@@ -1542,6 +1557,25 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
         }
         normalized[CYLTabBarControllerSwipeToSwitchTab] = swipe;
     }
+    // [EN] Tabs that need login: an array of strings, or a comma-separated string. [CN] 需要登录的 Tab：字符串数组或逗号分隔的字符串。
+    id loginRequired = normalized[CYLTabBarControllerLoginRequiredTabBarItemIdentifiers];
+    if (loginRequired) {
+        if ([loginRequired isKindOfClass:[NSString class]]) {
+            loginRequired = [loginRequired componentsSeparatedByString:@","];
+        }
+        NSMutableArray<NSString *> *identifiers = [NSMutableArray array];
+        if ([loginRequired isKindOfClass:[NSArray class]]) {
+            for (id identifier in (NSArray *)loginRequired) {
+                NSString *trimmed = [identifier isKindOfClass:[NSString class]] ? [identifier stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] : nil;
+                if (trimmed.length > 0) {
+                    [identifiers addObject:trimmed];
+                }
+            }
+        } else {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, loginRequired);
+        }
+        normalized[CYLTabBarControllerLoginRequiredTabBarItemIdentifiers] = [identifiers copy];
+    }
     if (normalized[CYLTabBarControllerPlusButtonAction] && !(blockClass && [normalized[CYLTabBarControllerPlusButtonAction] isKindOfClass:blockClass])) {
         CYLLogInvalidConfigurationValue(CYLTabBarControllerPlusButtonAction, normalized[CYLTabBarControllerPlusButtonAction]);
         [normalized removeObjectForKey:CYLTabBarControllerPlusButtonAction];
@@ -1707,9 +1741,18 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
     NSString *base = info[CYLConfigurationThemesBaseKey];
     NSString *dark = info[CYLConfigurationThemesDarkKey];
     id current = manager.currentThemeIdentifier;
+    // [EN] A skin of an earlier configuration that this one does not have is not a choice to keep: before, it stayed
+    //      current and none of this configuration's skins was applied (a React Native or Flutter app changing skins).
+    // [CN] 之前配置中的皮肤、而本配置中没有，不属于需要保留的选择：之前它仍为当前皮肤，本配置的皮肤都不会生效（React Native 或 Flutter App 切换皮肤时）。
+    BOOL listed = NO;
+    for (CYLTabBarConfigurationTheme *theme in info[CYLConfigurationThemesListKey]) {
+        listed = listed || [theme.identifier isEqual:current];
+    }
+    BOOL staleConfigurationSkin = !listed && [manager.currentTheme isKindOfClass:[CYLTabBarConfigurationTheme class]];
     // [EN] A skin the app or the user chose before stays; otherwise the first one. [CN] App 或用户之前选择的皮肤保持不变；否则使用首个皮肤。
-    if (!current) {
+    if (!current || staleConfigurationSkin) {
         manager.currentThemeIdentifier = info[CYLConfigurationThemesInitialKey];
+        current = staleConfigurationSkin ? nil : current;
     }
     if (@available(iOS 13.0, *)) {
         // [EN] Dark Mode follows the system, unless the manager follows it its own way or another skin was chosen.

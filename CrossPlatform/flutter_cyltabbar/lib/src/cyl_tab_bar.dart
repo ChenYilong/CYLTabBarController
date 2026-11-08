@@ -60,7 +60,10 @@ class CYLTabBarItem {
 class CYLTabBarPlusButton {
   const CYLTabBarPlusButton({
     this.image,
+    this.selectedImage,
     this.backgroundImage,
+    this.size,
+    this.imageSize,
     this.title,
     this.titleColor,
     this.selectedTitleColor,
@@ -70,13 +73,23 @@ class CYLTabBarPlusButton {
     this.centerYOffset,
     this.alignsTitle,
     this.keepsTitleVisible,
+    this.showsSelection,
     this.identifier,
     this.pageIdentifier,
   }) : assert(image != null || backgroundImage != null, 'a plus button needs an image or a background image');
 
   /// The button's image; or [backgroundImage], a picture with the title drawn on it.
   final CYLTabBarImage? image;
+
+  /// The image while it is selected or touched.
+  final CYLTabBarImage? selectedImage;
   final CYLTabBarImage? backgroundImage;
+
+  /// Its size in logical pixels (default: its image and title), as a subclass sets its bounds.
+  final Size? size;
+
+  /// The size its images are drawn at, aspect fit (e.g. a 512 px network image).
+  final Size? imageSize;
 
   /// Give it a title when the tab titles are aligned (the plus button's title then lines up with them).
   final String? title;
@@ -101,6 +114,9 @@ class CYLTabBarPlusButton {
   /// Keeps the title visible on Liquid Glass.
   final bool? keepsTitleVisible;
 
+  /// Liquid Glass: the selection stays under the button while its own page is selected (Android always shows it).
+  final bool? showsSelection;
+
   final String? identifier;
 
   /// The plus button selects a page of its own: [CYLTabBar.onTabSelect] gets index -1 and [identifier].
@@ -108,6 +124,9 @@ class CYLTabBarPlusButton {
 
   Map<String, Object?> toConfiguration() => {
         if (image != null) 'CYLTabBarItemImage': image!.value,
+        if (selectedImage != null) 'CYLTabBarItemSelectedImage': selectedImage!.value,
+        if (size != null) 'CYLPlusButtonSize': [size!.width, size!.height],
+        if (imageSize != null) 'CYLPlusButtonImageSize': [imageSize!.width, imageSize!.height],
         if (backgroundImage != null) 'CYLPlusButtonBackgroundImage': backgroundImage!.value,
         if (title != null) 'CYLTabBarItemTitle': title,
         if (titleColor != null) 'CYLTabBarItemTitleColor': titleColor,
@@ -118,6 +137,7 @@ class CYLTabBarPlusButton {
         if (centerYOffset != null) 'CYLPlusButtonCenterYOffset': centerYOffset,
         if (alignsTitle != null) 'CYLPlusButtonAlignsTitle': alignsTitle,
         if (keepsTitleVisible != null) 'CYLPlusButtonKeepsTitleVisible': keepsTitleVisible,
+        if (showsSelection != null) 'CYLPlusButtonShowsSelection': showsSelection,
         if (identifier != null) 'CYLTabBarItemIdentifier': identifier,
         if (pageIdentifier != null) 'CYLTabBarItemPageIdentifier': pageIdentifier,
       };
@@ -125,6 +145,33 @@ class CYLTabBarPlusButton {
 
 /// The animation of text badges (`CYLBadgeAnimationType`).
 enum CYLTabBarBadgeAnimation { none, scale, shake, bounce, breathe, leftRightOnce, rightLeftOnce, fadeInOnce, rollingOnce, scaleOnce }
+
+/// A badge with a style (`CYLTabBarHostView.badgeAttributes`).
+@immutable
+class CYLTabBarBadge {
+  const CYLTabBarBadge(this.value, {this.color, this.animation, this.radius, this.centerOffset});
+
+  /// `''` none, `'dot'` a red dot, anything else a number or text.
+  final String value;
+
+  /// A color such as `'#AF52DE'`.
+  final String? color;
+  final CYLTabBarBadgeAnimation? animation;
+
+  /// The dot's radius.
+  final double? radius;
+
+  /// Moves the badge from the icon's top-right corner.
+  final Offset? centerOffset;
+
+  Map<String, Object?> toMap() => {
+        'value': value,
+        if (color != null) 'color': color,
+        if (animation != null) 'animation': animation!.name,
+        if (radius != null) 'radius': radius,
+        if (centerOffset != null) 'centerOffset': [centerOffset!.dx, centerOffset!.dy],
+      };
+}
 
 /// The native tab bar of CYLTabBarController (iOS) and its Android port.
 ///
@@ -148,9 +195,15 @@ class CYLTabBar extends StatefulWidget {
     this.badgeValues = const [],
     this.plusButtonBadgeValue = '',
     this.badgeAnimation = CYLTabBarBadgeAnimation.none,
+    this.badgeStyles = const [],
+    this.plusButtonBadge,
+    this.tabCoverImages = const [],
     this.onTabSelect,
     this.onPlusButtonPress,
     this.onTabLongPress,
+    this.loggedIn,
+    this.onLoginRequest,
+    this.onLoginStateChange,
   });
 
   /// The tabs: `CYLTabBarControllerTabBarItemsAttributes`.
@@ -187,6 +240,15 @@ class CYLTabBar extends StatefulWidget {
 
   final CYLTabBarBadgeAnimation badgeAnimation;
 
+  /// Badges with a style, one per tab; null leaves the tab to [badgeValues].
+  final List<CYLTabBarBadge?> badgeStyles;
+
+  /// The plus button's badge with a style; wins over [plusButtonBadgeValue].
+  final CYLTabBarBadge? plusButtonBadge;
+
+  /// An image covering each tab's icon in both states, null for none.
+  final List<CYLTabBarImage?> tabCoverImages;
+
   /// A tab was selected by a tap: its index in [items] and its identifier; the plus button's own page gives index -1.
   final void Function(int index, String identifier)? onTabSelect;
 
@@ -194,6 +256,16 @@ class CYLTabBar extends StatefulWidget {
 
   /// A long press on a tab (its index) or the plus button (-1), with the title it shows.
   final void Function(int index, String identifier, String title)? onTabLongPress;
+
+  /// Login (issue #19): whether the user is logged in. While logged out, tapping a tab listed in the configuration's
+  /// `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers` calls [onLoginRequest] instead of selecting it; show your
+  /// login screen, then set [loggedIn] and [selectedIndex]. Left null, the tab bar uses the state the library cached (kept
+  /// across launches) and reports it with [onLoginStateChange].
+  final bool? loggedIn;
+  final void Function(int index, String identifier, String title)? onLoginRequest;
+
+  /// The login state the tab bar uses, sent once it is built: start from it to keep the login across launches.
+  final ValueChanged<bool>? onLoginStateChange;
 
   /// The configuration sent to the native library.
   Map<String, Object?> buildConfiguration() => {
@@ -224,7 +296,15 @@ class _CYLTabBarState extends State<CYLTabBar> {
         'badgeValues': widget.badgeValues,
         'plusButtonBadgeValue': widget.plusButtonBadgeValue,
         'badgeAnimation': widget.badgeAnimation.index,
+        'badgeStyles': _badgeStyles(widget),
+        'plusButtonBadge': widget.plusButtonBadge?.toMap(),
+        'tabCoverImages': _coverImages(widget),
+        'loggedIn': widget.loggedIn,
       };
+
+  static List<Map<String, Object?>?> _badgeStyles(CYLTabBar bar) => [for (final badge in bar.badgeStyles) badge?.toMap()];
+
+  static List<String?> _coverImages(CYLTabBar bar) => [for (final image in bar.tabCoverImages) image?.value];
 
   @override
   void didUpdateWidget(CYLTabBar oldWidget) {
@@ -247,6 +327,21 @@ class _CYLTabBarState extends State<CYLTabBar> {
     if (widget.badgeAnimation != oldWidget.badgeAnimation) {
       channel?.invokeMethod<void>('setBadgeAnimation', widget.badgeAnimation.index);
     }
+    final badgeStyles = _badgeStyles(widget);
+    if (jsonEncode(badgeStyles) != jsonEncode(_badgeStyles(oldWidget))) {
+      channel?.invokeMethod<void>('setBadgeStyles', badgeStyles);
+    }
+    final plusButtonBadge = widget.plusButtonBadge?.toMap();
+    if (jsonEncode(plusButtonBadge) != jsonEncode(oldWidget.plusButtonBadge?.toMap())) {
+      channel?.invokeMethod<void>('setPlusButtonBadge', plusButtonBadge);
+    }
+    final coverImages = _coverImages(widget);
+    if (!listEquals(coverImages, _coverImages(oldWidget))) {
+      channel?.invokeMethod<void>('setTabCoverImages', coverImages);
+    }
+    if (widget.loggedIn != oldWidget.loggedIn) {
+      channel?.invokeMethod<void>('setLoggedIn', widget.loggedIn);
+    }
   }
 
   void _onPlatformViewCreated(int id) {
@@ -265,6 +360,13 @@ class _CYLTabBarState extends State<CYLTabBar> {
             widget.onTabLongPress?.call(
                 arguments['index'] as int, (arguments['identifier'] as String?) ?? '', (arguments['title'] as String?) ?? '');
           }
+        case 'onLoginRequest':
+          if (arguments is Map) {
+            widget.onLoginRequest?.call(
+                arguments['index'] as int, (arguments['identifier'] as String?) ?? '', (arguments['title'] as String?) ?? '');
+          }
+        case 'onLoginStateChange':
+          widget.onLoginStateChange?.call(arguments == true);
         case 'onTouchableRects':
           if (mounted) setState(() => _touchableRects = CYLTouchRegions.parse(arguments));
         case 'onTabBarLayout':

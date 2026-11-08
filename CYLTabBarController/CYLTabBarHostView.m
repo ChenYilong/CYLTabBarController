@@ -8,6 +8,7 @@
 
 #import "CYLTabBarHostView.h"
 #import "CYLTabBarController.h"
+#import <objc/runtime.h>
 
 /// [EN] The pages of the configuration's tabs, in order, without the plus button's placeholder page (Liquid Glass).
 /// [CN] 配置中各 Tab 的页面，按顺序，不含 PlusButton 的占位页面（液态玻璃）。
@@ -36,11 +37,90 @@ static const CGFloat CYLTabBarHostBadgeRoom = 8;
 @property (nonatomic, assign, readwrite) CGFloat preferredHeight;
 @end
 
+NSString *const CYLTabBarHostBadgeValue = @"value";
+NSString *const CYLTabBarHostBadgeColor = @"color";
+NSString *const CYLTabBarHostBadgeAnimation = @"animation";
+NSString *const CYLTabBarHostBadgeRadius = @"radius";
+NSString *const CYLTabBarHostBadgeCenterOffset = @"centerOffset";
+
+/// [EN] "#RRGGBB" / "#RRGGBBAA" or a UIColor; nil otherwise. [CN] "#RRGGBB" / "#RRGGBBAA" 或 UIColor；其他为 nil。
+static UIColor *_Nullable CYLTabBarHostColor(id value) {
+    if ([value isKindOfClass:[UIColor class]]) {
+        return value;
+    }
+    if (![value isKindOfClass:[NSString class]] || ![value hasPrefix:@"#"]) {
+        return nil;
+    }
+    NSString *hex = [value substringFromIndex:1];
+    unsigned long long number = 0;
+    if ((hex.length != 6 && hex.length != 8) || ![[NSScanner scannerWithString:hex] scanHexLongLong:&number]) {
+        return nil;
+    }
+    CGFloat alpha = hex.length == 8 ? (number & 0xFF) / 255.0 : 1;
+    unsigned long long rgb = hex.length == 8 ? number >> 8 : number;
+    return [UIColor colorWithRed:((rgb >> 16) & 0xFF) / 255.0 green:((rgb >> 8) & 0xFF) / 255.0 blue:(rgb & 0xFF) / 255.0 alpha:alpha];
+}
+
+/// [EN] A `CYLBadgeAnimationType` number or name; `fallback` otherwise. [CN] `CYLBadgeAnimationType` 数字或名称；其他为 `fallback`。
+static CYLBadgeAnimationType CYLTabBarHostAnimation(id value, CYLBadgeAnimationType fallback) {
+    if ([value isKindOfClass:[NSNumber class]] && [value unsignedIntegerValue] <= CYLBadgeAnimationTypeScaleOnce) {
+        return (CYLBadgeAnimationType)[value unsignedIntegerValue];
+    }
+    if ([value isKindOfClass:[NSString class]]) {
+        NSArray<NSString *> *names = @[ @"none", @"scale", @"shake", @"bounce", @"breathe", @"leftrightonce", @"rightleftonce",
+                                        @"fadeinonce", @"rollingonce", @"scaleonce" ];
+        NSUInteger index = [names indexOfObject:[value lowercaseString]];
+        if (index != NSNotFound) {
+            return (CYLBadgeAnimationType)index;
+        }
+    }
+    return fallback;
+}
+
+/// [EN] Shows the badge `attributes` describe on `target` (a page or the plus button), its style first. [CN] 在 `target`（页面或 PlusButton）上显示 `attributes` 描述的角标，先设置样式。
+static void CYLTabBarHostShowBadge(id<CYLBadgeProtocol> target, NSDictionary *attributes, CYLBadgeAnimationType animationType) {
+    id value = attributes[CYLTabBarHostBadgeValue];
+    NSString *text = [value isKindOfClass:[NSString class]] ? value : ([value isKindOfClass:[NSNumber class]] ? [value stringValue] : @"");
+    UIColor *color = CYLTabBarHostColor(attributes[CYLTabBarHostBadgeColor]);
+    if (color) {
+        target.cyl_badgeBackgroundColor = color;
+    }
+    if ([attributes[CYLTabBarHostBadgeRadius] isKindOfClass:[NSNumber class]]) {
+        target.cyl_badgeRadius = [attributes[CYLTabBarHostBadgeRadius] doubleValue];
+    }
+    id offset = attributes[CYLTabBarHostBadgeCenterOffset];
+    if ([offset isKindOfClass:[NSArray class]] && [offset count] == 2) {
+        target.cyl_badgeCenterOffset = CGPointMake([offset[0] doubleValue], [offset[1] doubleValue]);
+    } else if ([offset isKindOfClass:[NSValue class]] && strcmp([offset objCType], @encode(CGPoint)) == 0) {
+        target.cyl_badgeCenterOffset = [offset CGPointValue];
+    }
+    CYLBadgeAnimationType animation = CYLTabBarHostAnimation(attributes[CYLTabBarHostBadgeAnimation], animationType);
+    if (text.length == 0) {
+        [target cyl_clearBadge];
+    } else if ([text isEqualToString:@"dot"]) {
+        // [EN] A dot animates only with an animation of its own (`badgeAnimationType` is for text badges), as
+        //      `cyl_showBadgeValue:@""`. [CN] 红点仅在自身指定动画时播放（`badgeAnimationType` 用于文字角标），与 `cyl_showBadgeValue:@""` 相同。
+        if (!attributes[CYLTabBarHostBadgeAnimation] || animation == CYLBadgeAnimationTypeNone) {
+            [target cyl_showBadge];
+        } else {
+            [target cyl_showBadgeValue:@"" animationType:animation];
+        }
+    } else {
+        [target cyl_showBadgeValue:text animationType:animation];
+    }
+}
+
 @implementation CYLTabBarHostView {
     /// [EN] Bumped by every new configuration, so a slow image load of an older one is dropped. [CN] 每份新配置加一，较早配置的慢速图片加载结果会被丢弃。
     NSUInteger _generation;
     /// [EN] The configuration with its images loaded, waiting for a window and a width. [CN] 已加载图片、等待 window 与宽度的配置。
     NSDictionary<NSString *, id> *_pendingConfiguration;
+    /// [EN] `tabCoverImages` loaded (UIImage or NSNull), and the tab buttons now covered. [CN] 已加载的 `tabCoverImages`（UIImage 或 NSNull），以及当前被覆盖的 Tab 按钮。
+    NSArray *_loadedTabCoverImages;
+    NSMutableArray<NSArray *> *_coveredTabButtons; ///< [EN] @[button, cover, selected cover]. [CN] @[按钮, 覆盖视图, 选中覆盖视图]。
+    NSUInteger _coverGeneration;
+    /// [EN] The app set `loggedIn`. [CN] App 设置过 `loggedIn`。
+    BOOL _loggedInSet;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -102,10 +182,19 @@ static const CGFloat CYLTabBarHostBadgeRoom = 8;
     return YES;
 }
 
+/*!
+ * [EN] An image loaded from a value (a file, an asset, a URL) is drawn as is, as an image name or a path in a configuration
+ *      (#535): left automatic, the tab bar drew a full color icon as a gray template silhouette.
+ * [CN] 由值（文件、asset、URL）加载的图片按原图绘制，与配置中的图片名或路径相同（#535）：保持 automatic 时，TabBar 会把全彩图标画成灰色模板剪影。
+ */
+static UIImage *CYLTabBarHostOriginalImage(UIImage *image) {
+    return image.renderingMode == UIImageRenderingModeAutomatic ? [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] : image;
+}
+
 + (id)imageForValue:(id)value resolver:(UIImage * (^)(id))resolver {
     UIImage *image = resolver ? resolver(value) : nil;
     if (image) {
-        return image;
+        return CYLTabBarHostOriginalImage(image);
     }
     if (![value isKindOfClass:[NSString class]]) {
         return value;
@@ -117,12 +206,13 @@ static const CGFloat CYLTabBarHostBadgeRoom = 8;
     }
     NSData *data = [NSData dataWithContentsOfURL:URL];
     image = data ? [UIImage imageWithData:data scale:UIScreen.mainScreen.scale] : nil;
-    return image ?: value;
+    return image ? CYLTabBarHostOriginalImage(image) : value;
 }
 
 + (NSDictionary *)attributes:(NSDictionary *)attributes withImagesResolvedBy:(UIImage * (^)(id))resolver {
     NSMutableDictionary *result = [attributes mutableCopy];
-    for (NSString *key in @[ CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLPlusButtonBackgroundImage ]) {
+    for (NSString *key in @[ CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage, CYLTabBarItemSelectedDarkImage,
+                             CYLPlusButtonBackgroundImage ]) {
         if (result[key]) {
             result[key] = [self imageForValue:result[key] resolver:resolver];
         }
@@ -226,9 +316,29 @@ static const CGFloat CYLTabBarHostBadgeRoom = 8;
     tabBarController.cyl_didLongPressControlBlock = ^(CYLTabBarController *controller, UIControl *control) {
         [weakHost didLongPressControl:control];
     };
+    // [EN] The app's state once it set one; until then the cached one. [CN] App 设置过时使用其状态；之前使用缓存的状态。
+    if (_loggedInSet) {
+        tabBarController.cyl_loggedIn = _loggedIn;
+    } else {
+        _loggedIn = tabBarController.cyl_loggedIn;
+    }
+    !self.loginStateDidChange ?: self.loginStateDidChange(_loggedIn);
+    // [EN] The app shows the login screen: the tab is not selected now (see `didRequestLogin`).
+    // [CN] 由 App 展示登录界面：此时不选中该 Tab（见 `didRequestLogin`）。
+    tabBarController.cyl_loginHandler = ^(CYLTabBarController *controller, UIViewController *viewController, CYLTabBarLoginCompletion completion) {
+        completion(NO);
+        __strong __typeof(weakHost) host = weakHost;
+        if (!host.didRequestLogin) {
+            return;
+        }
+        NSUInteger index = [CYLTabBarHostPages(controller) indexOfObject:viewController];
+        host.didRequestLogin(index == NSNotFound ? -1 : (NSInteger)index, viewController.cyl_tabBarItemIdentifier ?: @"",
+                             viewController.tabBarItem.title ?: @"");
+    };
     self.tabBarController = tabBarController;
     [self applySelectedIndex];
     [self applyBadgeValues];
+    [self applyTabCoverImages];
     [self setNeedsLayout];
 }
 
@@ -320,6 +430,36 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
 
 #pragma mark - Selection and badges
 
+- (void)resetLoggedIn {
+    _loggedInSet = NO;
+    _loggedIn = NO;
+}
+
+- (void)setLoggedIn:(BOOL)loggedIn {
+    _loggedIn = loggedIn;
+    _loggedInSet = YES;
+    CYLTabBarController *controller = _tabBarController;
+    if (!controller || controller.cyl_loggedIn == loggedIn) {
+        return;
+    }
+    NSArray<UIViewController *> *pages = CYLTabBarHostPages(controller);
+    UIViewController *before = controller.selectedViewController;
+    controller.cyl_loggedIn = loggedIn;
+    if (loggedIn) {
+        // [EN] A selection the app set while logged out (it may come before the login state) is applied now.
+        // [CN] App 在未登录时设置的选中（可能先于登录状态到达）现在生效。
+        [self applySelectedIndex];
+        return;
+    }
+    // [EN] Logging out moved the selection away from a tab that needs login: tell the app. [CN] 退出登录使选中离开了需要登录的 Tab：通知 App。
+    UIViewController *after = controller.selectedViewController;
+    NSUInteger index = [pages indexOfObject:after];
+    if (after != before && index != NSNotFound) {
+        _selectedIndex = (NSInteger)index;
+        !self.didSelectTab ?: self.didSelectTab((NSInteger)index, after.cyl_tabBarItemIdentifier ?: @"");
+    }
+}
+
 - (void)setSelectedIndex:(NSInteger)selectedIndex {
     _selectedIndex = selectedIndex;
     [self applySelectedIndex];
@@ -331,6 +471,11 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
         return;
     }
     UIViewController *page = pages[(NSUInteger)_selectedIndex];
+    // [EN] Never a tab that needs login while logged out, whatever the order the app sets the values in.
+    // [CN] 未登录时不选中需要登录的 Tab，无论 App 以何种顺序设置这些值。
+    if (!_tabBarController.cyl_loggedIn && [_tabBarController cyl_isLoginRequiredForViewController:page]) {
+        return;
+    }
     if (_tabBarController.selectedViewController != page) {
         _tabBarController.selectedViewController = page;
     }
@@ -341,34 +486,108 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
     [self applyBadgeValues];
 }
 
+- (void)setBadgeAttributes:(NSArray *)badgeAttributes {
+    _badgeAttributes = [badgeAttributes copy];
+    [self applyBadgeValues];
+}
+
+- (void)setPlusButtonBadgeAttributes:(NSDictionary<NSString *, id> *)plusButtonBadgeAttributes {
+    _plusButtonBadgeAttributes = [plusButtonBadgeAttributes copy];
+    [self applyBadgeValues];
+}
+
 - (void)applyBadgeValues {
     NSArray<NSString *> *badgeValues = _badgeValues;
-    // [EN] Badges sit on the tab buttons, which exist once the tab bar is laid out. [CN] 角标位于 Tab 按钮上，TabBar 布局后按钮才存在。
-    NSString *plusButtonBadgeValue = _plusButtonBadgeValue ?: @"";
+    NSArray *badgeAttributes = _badgeAttributes;
+    NSDictionary *plusButtonBadge = _plusButtonBadgeAttributes.count > 0 ? _plusButtonBadgeAttributes : @{ CYLTabBarHostBadgeValue : _plusButtonBadgeValue ?: @"" };
     CYLBadgeAnimationType animationType = (CYLBadgeAnimationType)_badgeAnimationType;
+    // [EN] Badges sit on the tab buttons, which exist once the tab bar is laid out. [CN] 角标位于 Tab 按钮上，TabBar 布局后按钮才存在。
     [_tabBarController performWhenTabBarItemsReady:^(CYLTabBarController *tabBarController) {
         [CYLTabBarHostPages(tabBarController) enumerateObjectsUsingBlock:^(UIViewController *page, NSUInteger index, BOOL *stop) {
-            id value = index < badgeValues.count ? badgeValues[index] : @"";
-            NSString *text = [value isKindOfClass:[NSString class]] ? value : @"";
-            if (text.length == 0) {
-                [page cyl_clearBadge];
-            } else if ([text isEqualToString:@"dot"]) {
-                [page cyl_showBadge];
-            } else {
-                [page cyl_showBadgeValue:text animationType:animationType];
+            NSDictionary *attributes = index < badgeAttributes.count && [badgeAttributes[index] isKindOfClass:[NSDictionary class]] ? badgeAttributes[index] : nil;
+            if (attributes.count == 0) {
+                id value = index < badgeValues.count ? badgeValues[index] : @"";
+                attributes = @{ CYLTabBarHostBadgeValue : [value isKindOfClass:[NSString class]] ? value : @"" };
             }
+            CYLTabBarHostShowBadge(page, attributes, animationType);
         }];
         CYLPlusButton *plusButton = [CYLPlusButton plusButtonForTabBarContext:tabBarController.context];
-        if (!plusButton) {
-            return;
+        if (plusButton) {
+            CYLTabBarHostShowBadge(plusButton, plusButtonBadge, animationType);
         }
-        if (plusButtonBadgeValue.length == 0) {
-            [plusButton cyl_clearBadge];
-        } else if ([plusButtonBadgeValue isEqualToString:@"dot"]) {
-            [plusButton cyl_showBadge];
-        } else {
-            [plusButton cyl_showBadgeValue:plusButtonBadgeValue animationType:animationType];
+    }];
+}
+
+- (void)setTabCoverImages:(NSArray *)tabCoverImages {
+    _tabCoverImages = [tabCoverImages copy];
+    NSArray *values = _tabCoverImages ?: @[];
+    UIImage * (^resolver)(id) = self.imageResolver;
+    NSUInteger generation = ++_coverGeneration;
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        NSMutableArray *images = [NSMutableArray arrayWithCapacity:values.count];
+        for (id value in values) {
+            id image = [CYLTabBarHostView imageForValue:value resolver:resolver];
+            if ([image isKindOfClass:[NSString class]]) {
+                image = [UIImage imageNamed:image];
+            }
+            [images addObject:[image isKindOfClass:[UIImage class]] ? image : [NSNull null]];
         }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            __strong __typeof(weakSelf) self = weakSelf;
+            if (!self || generation != self->_coverGeneration) {
+                return;
+            }
+            self->_loadedTabCoverImages = images;
+            [self applyTabCoverImages];
+        });
+    });
+}
+
+/// [EN] Covers the tab buttons with the loaded images, removing the covers of an earlier list first.
+/// [CN] 用已加载的图片覆盖 Tab 按钮，先移除之前列表的覆盖。
+- (void)applyTabCoverImages {
+    CYLTabBarController *controller = _tabBarController;
+    NSArray *images = _loadedTabCoverImages;
+    if (!controller || !images) {
+        return;
+    }
+    [controller performWhenTabBarItemsReady:^(CYLTabBarController *tabBarController) {
+        for (NSArray *covered in self->_coveredTabButtons) {
+            UIControl *button = covered[0];
+            [covered[1] removeFromSuperview];
+            [covered[2] removeFromSuperview];
+            [button cyl_coverVisiableTabImageViewOrTabButton:YES contentNewView:covered[1] seclectContentNewView:covered[2]
+                                                     offset:UIOffsetZero show:NO delayIfNeededForSeconds:0 completion:^(BOOL isReplaced, UIControl *tabBarButton, UIView *newView) {}];
+        }
+        self->_coveredTabButtons = [NSMutableArray array];
+        [CYLTabBarHostPages(tabBarController) enumerateObjectsUsingBlock:^(UIViewController *page, NSUInteger index, BOOL *stop) {
+            UIImage *image = index < images.count && [images[index] isKindOfClass:[UIImage class]] ? images[index] : nil;
+            UIControl *button = page.cyl_tabButton;
+            if (!image || !button) {
+                return;
+            }
+            // [EN] A button holding the image, as the Objective-C example's `-selectedCover`: an image view here was taken
+            //      for the tab's own icon by the views shown in place of it (a skin's network icons), and hidden on every
+            //      selection change. [CN] 与 Objective-C 示例的 `-selectedCover` 相同，用按钮承载图片：使用 image view 时，替换图标的视图
+            //      （皮肤的网络图标）会把它当成 Tab 自身的图标，在每次切换选中时将其隐藏。
+            UIView * (^cover)(void) = ^UIView * {
+                UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+                [button setImage:image forState:UIControlStateNormal];
+                button.frame = (CGRect){CGPointZero, image.size};
+                button.contentMode = UIViewContentModeCenter;
+                button.imageView.contentMode = UIViewContentModeScaleAspectFit;
+                button.userInteractionEnabled = NO;
+                // [EN] Decoration over the tab: VoiceOver reads the tab. [CN] Tab 上的装饰：VoiceOver 朗读 Tab 本身。
+                button.accessibilityElementsHidden = YES;
+                return button;
+            };
+            UIView *contentCover = cover();
+            UIView *selectedCover = cover();
+            [button cyl_coverVisiableTabImageViewOrTabButton:YES contentNewView:contentCover seclectContentNewView:selectedCover
+                                                     offset:UIOffsetZero show:YES delayIfNeededForSeconds:0.1 completion:^(BOOL isReplaced, UIControl *tabBarButton, UIView *newView) {}];
+            [self->_coveredTabButtons addObject:@[ button, contentCover, selectedCover ]];
+        }];
     }];
 }
 
@@ -423,23 +642,70 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
 
 #pragma mark - UITabBarControllerDelegate
 
+/*!
+ * [EN] The host is the tab bar controller's delegate, in place of the controller itself, which is its own delegate
+ *      otherwise (as the Objective-C example's subclass is, calling `super`). The delegate methods the host does not
+ *      handle go to the controller, so it keeps its own behavior: the tap recognizer, login and custom tab actions,
+ *      placeholders, and the Liquid Glass lens decisions for the plus button's page.
+ * [CN] 宿主代替 TabBarController 担任其 delegate；否则 controller 自己就是 delegate（Objective-C 示例的子类即如此，并调用 `super`）。宿主
+ *      未处理的 delegate 方法交给 controller，使其保留自身行为：点击识别、登录与自定义 Tab 操作、占位控制器，以及 PlusButton 页面的液态玻璃放大镜判断。
+ */
+static BOOL CYLTabBarHostIsDelegateSelector(SEL selector) {
+    for (Protocol *protocol in @[ @protocol(UITabBarControllerDelegate), @protocol(CYLTabBarControllerDelegate) ]) {
+        if (protocol_getMethodDescription(protocol, selector, NO, YES).name || protocol_getMethodDescription(protocol, selector, YES, YES).name) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (BOOL)respondsToSelector:(SEL)selector {
+    if ([super respondsToSelector:selector]) {
+        return YES;
+    }
+    return CYLTabBarHostIsDelegateSelector(selector) && [_tabBarController respondsToSelector:selector];
+}
+
+- (id)forwardingTargetForSelector:(SEL)selector {
+    if (CYLTabBarHostIsDelegateSelector(selector) && [_tabBarController respondsToSelector:selector]) {
+        return _tabBarController;
+    }
+    return [super forwardingTargetForSelector:selector];
+}
+
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
-    [_tabBarController updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
-    return YES;
+    CYLTabBarController *controller = _tabBarController;
+    // [EN] The plus button's own page is selected by the plus button (its page key), which the controller's check, made for
+    //      tabs, refuses as the plus slot. [CN] PlusButton 自己的页面由 PlusButton 选中（其页面键）；controller 为 Tab 设计的检查会把它当作 PlusButton 的位置而拒绝。
+    if (viewController && viewController == [CYLPlusButton plusChildViewControllerForTabBarContext:controller.context]) {
+        [controller updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
+        return YES;
+    }
+    return [controller tabBarController:tabBarController shouldSelectViewController:viewController];
+}
+
+/// [EN] Every tap on a tab, also on the selected one, as `-tabBarController:didSelectControl:` in the Objective-C example.
+/// [CN] 每次点击 Tab（包括已选中的 Tab），与 Objective-C 示例中的 `-tabBarController:didSelectControl:` 相同。
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+    CYLTabBarController *controller = _tabBarController;
+    if (![control cyl_isTabButton] || [control cyl_isPlusControl]) {
+        return;
+    }
+    UIViewController *selected = controller.selectedViewController;
+    NSUInteger index = [CYLTabBarHostPages(controller) indexOfObject:selected];
+    if (index != NSNotFound) {
+        !self.didSelectTab ?: self.didSelectTab((NSInteger)index, selected.cyl_tabBarItemIdentifier ?: @"");
+    }
 }
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController {
-    NSUInteger index = [CYLTabBarHostPages(tabBarController) indexOfObject:viewController];
-    if (index == NSNotFound) {
-        // [EN] The plus button's own page: index -1 and the plus button's identifier. [CN] PlusButton 自己的页面：下标 -1 与 PlusButton 的标识。
-        CYLTabBarController *controller = _tabBarController;
-        if (viewController && viewController == [CYLPlusButton plusChildViewControllerForTabBarContext:controller.context]) {
-            NSString *identifier = [CYLPlusButton plusButtonForTabBarContext:controller.context].cyl_tabBarItemIdentifier ?: @"";
-            !self.didSelectTab ?: self.didSelectTab(-1, identifier);
-        }
-        return;
+    // [EN] The tabs are reported by `-tabBarController:didSelectControl:`; here only the plus button's own page: index -1
+    //      and the plus button's identifier. [CN] Tab 由 `-tabBarController:didSelectControl:` 上报；这里只处理 PlusButton 自己的页面：下标 -1 与 PlusButton 的标识。
+    CYLTabBarController *controller = _tabBarController;
+    if (viewController && viewController == [CYLPlusButton plusChildViewControllerForTabBarContext:controller.context]) {
+        NSString *identifier = [CYLPlusButton plusButtonForTabBarContext:controller.context].cyl_tabBarItemIdentifier ?: @"";
+        !self.didSelectTab ?: self.didSelectTab(-1, identifier);
     }
-    !self.didSelectTab ?: self.didSelectTab((NSInteger)index, viewController.cyl_tabBarItemIdentifier ?: @"");
 }
 
 @end

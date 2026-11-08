@@ -34,7 +34,9 @@ using namespace facebook::react;
   return self;
 }
 
-/// A file name of the main bundle becomes its file URL, the options (the fragment) kept. 主 bundle 中的文件名转为其文件 URL，保留选项（fragment）。
+#if CYL_RN_ANIMATION_AVAILABLE
+/// [EN] A file name of the main bundle becomes its file URL, the options (the fragment) kept.
+/// [CN] 主 bundle 中的文件名转为其文件 URL，保留选项（fragment）。
 static NSURL *CYLRNAnimationURL(NSString *source)
 {
   NSURL *URL = [NSURL URLWithString:source];
@@ -52,6 +54,7 @@ static NSURL *CYLRNAnimationURL(NSString *source)
   components.percentEncodedFragment = fragment;
   return components.URL;
 }
+#endif
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {

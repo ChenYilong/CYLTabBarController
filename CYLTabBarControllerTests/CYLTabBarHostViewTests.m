@@ -17,6 +17,10 @@ static UIImage *CYLHostTestsImage(void) {
     }];
 }
 
+@interface CYLTabBarHostView (CYLTabBarHostViewTests)
++ (id)imageForValue:(id)value resolver:(UIImage * (^)(id))resolver;
+@end
+
 @interface CYLTabBarHostViewTests : XCTestCase
 @property (nonatomic, strong) UIWindow *window;
 @end
@@ -133,6 +137,29 @@ static void CYLHostTestsTap(CYLPlusButton *plusButton) {
     XCTAssertFalse([(id)plusButtonClass respondsToSelector:@selector(plusChildViewController)]);
 }
 
+- (void)testPlusButtonImageSizeDrawsItsImagesAspectFit {
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(80, 40)];
+    UIImage *wide = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [UIColor.blueColor setFill];
+        [context fillRect:CGRectMake(0, 0, 80, 40)];
+    }];
+    [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : @"host-tests-image-size",
+        CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a" },
+                                                      @{ CYLTabBarItemTitle : @"B", CYLTabBarItemIdentifier : @"b" } ],
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : wide,
+                                           CYLTabBarItemSelectedImage : wide, CYLPlusButtonImageSize : @"{20, 20}" },
+    }];
+    UIButton *plusButton = [CYLPlusButton plusButtonForTabBarContext:@"host-tests-image-size"];
+    UIImage *image = [plusButton imageForState:UIControlStateNormal];
+    if (@available(iOS 15.0, *)) {
+        image = image ?: plusButton.configuration.image;
+    }
+    XCTAssertEqualWithAccuracy(image.size.width, 20, 0.5, @"aspect fit in 20 × 20");
+    XCTAssertEqualWithAccuracy(image.size.height, 10, 0.5);
+    XCTAssertEqualWithAccuracy([plusButton imageForState:UIControlStateSelected].size.width, 20, 0.5);
+}
+
 - (void)testPlusButtonWithoutLayoutKeysKeepsTheDefaults {
     [CYLPlusButton cyl_registerPlusButtonWithAttributes:@{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : CYLHostTestsImage() }
                                                  action:nil context:@"host-tests-defaults"];
@@ -195,6 +222,76 @@ static void CYLHostTestsTap(CYLPlusButton *plusButton) {
     [self waitForExpectations:@[ [self expectationForPredicate:built evaluatedWithObject:hostView handler:nil] ] timeout:5];
 }
 
+/// [EN] The key `cyl_loggedIn` is cached under. [CN] `cyl_loggedIn` 的缓存键。
+static NSString *const CYLHostTestsLoggedInKey = @"CYLTabBarControllerLoggedIn";
+
+- (NSDictionary *)loginConfiguration {
+    return @{ CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a" },
+                                                            @{ CYLTabBarItemTitle : @"B", CYLTabBarItemIdentifier : @"b" } ],
+              CYLTabBarControllerLoginRequiredTabBarItemIdentifiers : @[ @"b" ] };
+}
+
+- (void)testWithoutTheAppsLoginStateTheCachedOneIsUsedAndReported {
+    BOOL saved = [NSUserDefaults.standardUserDefaults boolForKey:CYLHostTestsLoggedInKey];
+    [NSUserDefaults.standardUserDefaults setBool:YES forKey:CYLHostTestsLoggedInKey];
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    __block NSNumber *reported;
+    hostView.loginStateDidChange = ^(BOOL loggedIn) {
+        reported = @(loggedIn);
+    };
+    hostView.configuration = [self loginConfiguration];
+    [self waitForTabBarControllerOf:hostView];
+    XCTAssertEqualObjects(reported, @YES);
+    XCTAssertTrue(hostView.loggedIn);
+    XCTAssertTrue(hostView.tabBarController.cyl_loggedIn);
+    [NSUserDefaults.standardUserDefaults setBool:saved forKey:CYLHostTestsLoggedInKey];
+}
+
+- (void)testTheAppsLoginStateWinsAndATabThatNeedsLoginIsRequested {
+    BOOL saved = [NSUserDefaults.standardUserDefaults boolForKey:CYLHostTestsLoggedInKey];
+    [NSUserDefaults.standardUserDefaults setBool:YES forKey:CYLHostTestsLoggedInKey];
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    __block NSNumber *reported;
+    __block NSString *requested;
+    hostView.loginStateDidChange = ^(BOOL loggedIn) {
+        reported = @(loggedIn);
+    };
+    hostView.didRequestLogin = ^(NSInteger index, NSString *identifier, NSString *title) {
+        requested = [NSString stringWithFormat:@"%@ %@ %@", @(index), identifier, title];
+    };
+    hostView.loggedIn = NO;
+    hostView.configuration = [self loginConfiguration];
+    [self waitForTabBarControllerOf:hostView];
+    CYLTabBarController *tabBarController = hostView.tabBarController;
+    XCTAssertEqualObjects(reported, @NO);
+    XCTAssertFalse(tabBarController.cyl_loggedIn);
+    // [EN] Logged out: the tab is not selected, the app is asked to log in. [CN] 未登录：不选中该 Tab，请求 App 登录。
+    UIViewController *second = tabBarController.viewControllers[1];
+    XCTAssertTrue([tabBarController cyl_interceptLoginIfNeededForViewController:second]);
+    XCTAssertEqualObjects(requested, @"1 b B");
+    hostView.selectedIndex = 1;
+    XCTAssertEqual(tabBarController.selectedIndex, 0u);
+    // [EN] Logging in applies the selection set before it; logging out there goes back to the first tab.
+    // [CN] 登录后，之前设置的选中生效；在此退出登录回到第一个 Tab。
+    hostView.loggedIn = YES;
+    XCTAssertEqual(tabBarController.selectedIndex, 1u);
+    __block NSInteger selectedIndex = -1;
+    hostView.didSelectTab = ^(NSInteger index, NSString *identifier) {
+        selectedIndex = index;
+    };
+    hostView.loggedIn = NO;
+    XCTAssertEqual(tabBarController.selectedIndex, 0u);
+    XCTAssertEqual(selectedIndex, 0);
+    // [EN] After a reset the next tab bar uses the cached state again. [CN] 重置后，之后创建的 TabBar 重新使用缓存的状态。
+    [NSUserDefaults.standardUserDefaults setBool:YES forKey:CYLHostTestsLoggedInKey];
+    [hostView resetLoggedIn];
+    hostView.configuration = nil;
+    hostView.configuration = [self loginConfiguration];
+    [self waitForTabBarControllerOf:hostView];
+    XCTAssertEqualObjects(reported, @YES);
+    [NSUserDefaults.standardUserDefaults setBool:saved forKey:CYLHostTestsLoggedInKey];
+}
+
 - (void)testInvalidJSONChangesNothing {
     CYLTabBarHostView *hostView = [[CYLTabBarHostView alloc] init];
     XCTAssertFalse([hostView setConfigurationJSON:@"[1, 2]"]);
@@ -231,9 +328,38 @@ static void CYLHostTestsTap(CYLPlusButton *plusButton) {
     CYLTabBarController *tabBarController = hostView.tabBarController;
     XCTAssertEqual(tabBarController.selectedIndex, 1u);
     UIViewController *first = tabBarController.viewControllers.firstObject;
-    [(id<UITabBarControllerDelegate>)hostView tabBarController:tabBarController didSelectViewController:first];
+    // [EN] Every tap is reported (`-tabBarController:didSelectControl:`), also again on the selected tab.
+    // [CN] 每次点击都会上报（`-tabBarController:didSelectControl:`），再次点击已选中的 Tab 也会上报。
+    tabBarController.selectedIndex = 0;
+    [tabBarController.tabBar layoutIfNeeded];
+    UIControl *button = first.cyl_tabButton;
+    XCTAssertNotNil(button);
+    id<CYLTabBarControllerDelegate> delegate = (id<CYLTabBarControllerDelegate>)hostView;
+    [delegate tabBarController:tabBarController didSelectControl:button];
     XCTAssertEqual(selectedIndex, 0);
     XCTAssertEqualObjects(selectedIdentifier, @"a");
+    selectedIndex = -1;
+    [delegate tabBarController:tabBarController didSelectControl:button];
+    XCTAssertEqual(selectedIndex, 0);
+    // [EN] A page change alone reports nothing for a tab: the tap did. [CN] 仅页面变化不会为 Tab 上报：点击已上报。
+    selectedIndex = -1;
+    [(id<UITabBarControllerDelegate>)hostView tabBarController:tabBarController didSelectViewController:first];
+    XCTAssertEqual(selectedIndex, -1);
+}
+
+- (void)testTheControllerKeepsItsOwnDelegateBehavior {
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    hostView.configuration = @{ CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A" }, @{ CYLTabBarItemTitle : @"B" } ] };
+    [self waitForTabBarControllerOf:hostView];
+    CYLTabBarController *tabBarController = hostView.tabBarController;
+    XCTAssertEqual(tabBarController.delegate, (id)hostView);
+    // [EN] The delegate methods the host does not handle go to the controller (e.g. the Liquid Glass lens decision).
+    // [CN] 宿主未处理的 delegate 方法交给 controller（例如液态玻璃放大镜的判断）。
+    SEL lens = @selector(tabBarController:shouldShowPlatterLiquidLensViewForControl:);
+    XCTAssertEqual([hostView respondsToSelector:lens], [tabBarController respondsToSelector:lens]);
+    XCTAssertFalse([hostView respondsToSelector:NSSelectorFromString(@"cyl_notADelegateMethod")]);
+    // [EN] The controller's own `shouldSelect…`: the selected page is not selected again. [CN] controller 自己的 `shouldSelect…`：已选中的页面不会再次选中。
+    XCTAssertFalse([(id<UITabBarControllerDelegate>)hostView tabBarController:tabBarController shouldSelectViewController:tabBarController.selectedViewController]);
 }
 
 - (void)testImageURLsAreLoadedBeforeTheTabBarIsBuilt {
@@ -267,6 +393,52 @@ static void CYLHostTestsTap(CYLPlusButton *plusButton) {
     hostView.configuration = @{ CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A" }, @{ CYLTabBarItemTitle : @"B" } ] };
     [self waitForTabBarControllerOf:hostView];
     XCTAssertEqual(hostView.tabBarController.viewControllers.count, 2u);
+}
+
+/// [EN] A controller in a window with the plus button's page selected. [CN] 放入 window 并选中 PlusButton 页面的控制器。
+- (CYLTabBarController *)controllerWithSelectedPlusPage:(UIViewController *)page context:(NSString *)context plusButton:(NSDictionary *)plusButton {
+    NSMutableDictionary *attributes = [@{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : CYLHostTestsImage(),
+                                          CYLTabBarItemPageIdentifier : @"post" } mutableCopy];
+    [attributes addEntriesFromDictionary:plusButton];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : context,
+        CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a" },
+                                                      @{ CYLTabBarItemTitle : @"B", CYLTabBarItemIdentifier : @"b" } ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *pageAttributes) {
+            return [pageIdentifier isEqualToString:@"post"] ? page : [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : attributes,
+    }];
+    self.window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    self.window.rootViewController = tabBarController;
+    self.window.hidden = NO;
+    [self.window layoutIfNeeded];
+    tabBarController.selectedViewController = page;
+    return tabBarController;
+}
+
+- (void)testAPlusPageWithoutATitleTakesThePlusButtonTitle {
+    UIViewController *untitled = [[UIViewController alloc] init];
+    [self controllerWithSelectedPlusPage:untitled context:@"host-tests-plus-title" plusButton:@{}];
+    XCTAssertEqualObjects(untitled.title, @"Post", @"the system tab of the selected plus page shows it on Liquid Glass");
+    UIViewController *titled = [[UIViewController alloc] init];
+    titled.title = @"Compose";
+    [self controllerWithSelectedPlusPage:titled context:@"host-tests-plus-own-title" plusButton:@{}];
+    XCTAssertEqualObjects(titled.title, @"Compose", @"a page's own title is kept");
+}
+
+- (void)testShowsSelectionKeepsTheLensUnderTheSelectedPlusButton {
+    if (![CYLConstants isLiquidGlassActive]) {
+        return;
+    }
+    CYLTabBarController *plain = [self controllerWithSelectedPlusPage:[[UIViewController alloc] init] context:@"host-tests-lens-default" plusButton:@{}];
+    BOOL plainShows = [plain tabBarController:plain shouldShowPlatterLiquidLensViewForControl:[[UIControl alloc] init]];
+    CYLTabBarController *shows = [self controllerWithSelectedPlusPage:[[UIViewController alloc] init] context:@"host-tests-lens-shows"
+                                                           plusButton:@{ CYLPlusButtonShowsSelection : @YES }];
+    XCTAssertTrue([shows tabBarController:shows shouldShowPlatterLiquidLensViewForControl:[[UIControl alloc] init]]);
+    if (![plain.tabBar isPlusButtonLayoutCentered]) {
+        XCTAssertFalse(plainShows, @"without the key: the library hides it while the plus page is selected");
+    }
 }
 
 - (void)testThePlusButtonPageIsNotATabAndReportsMinusOne {
@@ -355,6 +527,67 @@ static void CYLHostTestsTap(CYLPlusButton *plusButton) {
     // [EN] Without the overflow, the whole view takes touches, as before. [CN] 不含高出部分时，整个视图接收触摸，与以前相同。
     hostView.heightIncludesOverflow = NO;
     XCTAssertNotNil([hostView hitTest:strip withEvent:nil]);
+}
+
+#pragma mark - Skins, images and FlatDesign badges
+
+- (void)testASkinOfAnEarlierConfigurationIsReplacedButTheAppsOwnSkinStays {
+    NSString *managerName = @"host-tests-skins";
+    NSDictionary * (^configuration)(NSString *) = ^NSDictionary *(NSString *skin) {
+        return @{
+            CYLTabBarControllerContext : [@"host-tests-skins-" stringByAppendingString:skin],
+            CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a" } ],
+            CYLTabBarControllerThemes : @{ skin : @{ CYLTabBarItemSelectedTitleColor : @"#FF0000" } },
+            CYLTabBarControllerThemeManagerName : managerName,
+        };
+    };
+    CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:managerName];
+    [CYLTabBarController tabBarControllerWithConfiguration:configuration(@"Default")];
+    XCTAssertEqualObjects(manager.currentThemeIdentifier, @"Default");
+    [CYLTabBarController tabBarControllerWithConfiguration:configuration(@"Christmas")];
+    XCTAssertEqualObjects(manager.currentThemeIdentifier, @"Christmas", @"a skin only an earlier configuration had is not kept");
+    [manager addThemeIdentifier:@"App" theme:[[NSObject alloc] init]];
+    manager.currentThemeIdentifier = @"App";
+    [CYLTabBarController tabBarControllerWithConfiguration:configuration(@"Ocean")];
+    XCTAssertEqualObjects(manager.currentThemeIdentifier, @"App", @"a skin the app chose stays");
+}
+
+- (void)testImagesLoadedFromValuesAreDrawnAsTheyAre {
+    UIImage *image = CYLHostTestsImage();
+    XCTAssertEqual(image.renderingMode, UIImageRenderingModeAutomatic);
+    UIImage *loaded = [CYLTabBarHostView imageForValue:@"file:///icon.png" resolver:^UIImage *(id value) { return image; }];
+    XCTAssertEqual(loaded.renderingMode, UIImageRenderingModeAlwaysOriginal, @"full color icons keep their colors, as image names");
+    UIImage *template = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIImage *kept = [CYLTabBarHostView imageForValue:@"file:///icon.png" resolver:^UIImage *(id value) { return template; }];
+    XCTAssertEqual(kept.renderingMode, UIImageRenderingModeAlwaysTemplate, @"a rendering mode chosen by the resolver stays");
+}
+
+- (void)testFlatDesignBadgesOfPagesOutsideANavigationControllerGoOnTheFlatButtons {
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : @"host-tests-flat-badges",
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a", CYLTabBarItemImage : CYLHostTestsImage() },
+                                                      @{ CYLTabBarItemTitle : @"B", CYLTabBarItemIdentifier : @"b", CYLTabBarItemImage : CYLHostTestsImage() } ],
+    }];
+    if (tabBarController.tabBarStyleType != CYLTabBarStyleTypeFlatDesign) {
+        return;
+    }
+    self.window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    self.window.rootViewController = tabBarController;
+    self.window.hidden = NO;
+    [self.window layoutIfNeeded];
+    UIViewController *page = tabBarController.viewControllers[1];
+    XCTAssertNil(page.navigationController);
+    id host = [page cyl_getActualBadgeSuperView];
+    XCTAssertTrue([host isKindOfClass:[UIView class]]);
+    UIView *ancestor = host;
+    while (ancestor && ![ancestor isKindOfClass:[CYLFlatDesignTabBar class]]) {
+        ancestor = ancestor.superview;
+    }
+    XCTAssertNotNil(ancestor, @"the badge sits on a visible flat button, not on the hidden system tab button");
 }
 
 @end

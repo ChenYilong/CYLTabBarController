@@ -64,6 +64,64 @@ class CYLTabBarHostViewTest {
         if (identifiers) mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemIdentifier to it.lowercase()) else mapOf(CYLConstants.CYLTabBarItemTitle to it)
     }
 
+    private fun loginConfiguration() = mapOf(
+        CYLConstants.CYLTabBarControllerTabBarItemsAttributes to items("A", "B"),
+        CYLConstants.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers to listOf("b"),
+    )
+
+    /** [EN] Where the library caches `cyl_loggedIn` (the iOS NSUserDefaults key). [CN] 库缓存 `cyl_loggedIn` 的位置（iOS NSUserDefaults 键）。 */
+    private fun cacheLoggedIn(activity: FragmentActivity, value: Boolean) =
+        activity.getSharedPreferences("CYLTabBarController", android.content.Context.MODE_PRIVATE).edit().putBoolean("CYLTabBarControllerLoggedIn", value).commit()
+
+    @Test
+    fun withoutTheAppsLoginStateTheCachedOneIsUsedAndReported() = withActivity { activity ->
+        cacheLoggedIn(activity, true)
+        val host = hostView(activity)
+        var reported: Boolean? = null
+        host.loginStateDidChange = { reported = it }
+        host.configuration = loginConfiguration()
+        val controller = waitForController(host)
+        assertEquals(true, reported)
+        assertTrue(host.loggedIn)
+        assertTrue(controller.cyl_loggedIn)
+    }
+
+    @Test
+    fun theAppsLoginStateWinsAndATabThatNeedsLoginIsRequested() = withActivity { activity ->
+        cacheLoggedIn(activity, true)
+        val host = hostView(activity)
+        var reported: Boolean? = null
+        var requested: String? = null
+        host.loginStateDidChange = { reported = it }
+        host.didRequestLogin = { index, identifier, title -> requested = "$index $identifier $title" }
+        host.loggedIn = false
+        host.configuration = loginConfiguration()
+        val controller = waitForController(host)
+        assertEquals(false, reported)
+        assertFalse(controller.cyl_loggedIn)
+        // [EN] Logged out: the tab is not selected, the app is asked to log in. [CN] 未登录：不选中该 Tab，请求 App 登录。
+        assertTrue(controller.cyl_interceptLoginIfNeededForViewController(controller.viewControllers[1]))
+        assertEquals("1 b B", requested)
+        host.selectedIndex = 1
+        assertEquals(0, controller.selectedIndex)
+        // [EN] Logging in applies the selection set before it; logging out there goes back to the first tab.
+        // [CN] 登录后，之前设置的选中生效；在此退出登录回到第一个 Tab。
+        host.loggedIn = true
+        assertEquals(1, controller.selectedIndex)
+        var selected = -1
+        host.didSelectTab = { index, _ -> selected = index }
+        host.loggedIn = false
+        assertEquals(0, controller.selectedIndex)
+        assertEquals(0, selected)
+        // [EN] After a reset the next tab bar uses the cached state again. [CN] 重置后，之后创建的 TabBar 重新使用缓存的状态。
+        cacheLoggedIn(activity, true)
+        host.resetLoggedIn()
+        host.configuration = null
+        host.configuration = loginConfiguration()
+        waitForController(host)
+        assertEquals(true, reported)
+    }
+
     @Test
     fun invalidJSONChangesNothing() = withActivity { activity ->
         val host = CYLTabBarHostView(activity)
@@ -151,6 +209,21 @@ class CYLTabBarHostViewTest {
         assertEquals(1 to 0, tapsA to tapsB)
         plusB!!.plusChildViewControllerButtonClicked()
         assertEquals(1 to 1, tapsA to tapsB)
+    }
+
+    @Test
+    fun plusButtonImageSizeDrawsItsImagesAspectFit() = withActivity { activity ->
+        val wide = BitmapDrawable(activity.resources, Bitmap.createBitmap(160, 80, Bitmap.Config.ARGB_8888))
+        CYLPlusButton.cyl_registerPlusButtonWithAttributes(activity, mapOf(
+            CYLConstants.CYLTabBarItemTitle to "Post",
+            CYLConstants.CYLTabBarItemImage to wide,
+            CYLConstants.CYLPlusButtonImageSize to listOf(20, 20),
+        ), null, "host-test-image-size")
+        val plusButton = CYLPlusButton.plusButtonForTabBarContext("host-test-image-size", activity)!!
+        val density = activity.resources.displayMetrics.density
+        val drawable = plusButton.imageView.drawable
+        assertEquals("aspect fit in 20 × 20 dp", (20 * density).toInt(), drawable.intrinsicWidth)
+        assertEquals((10 * density).toInt(), drawable.intrinsicHeight)
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.cyltabbar
 
 import com.cyl.tabbar.CYLEnums
+import com.cyl.tabbar.CYLTabBarHostView
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.SimpleViewManager
@@ -56,11 +57,35 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     view?.badgeAnimationType = CYLEnums.CYLBadgeAnimationType.values().firstOrNull { it.rawValue == value } ?: CYLEnums.CYLBadgeAnimationType.None
   }
 
+  @ReactProp(name = "badgeStyles")
+  override fun setBadgeStyles(view: CyltabbarView?, value: String?) {
+    val list = value?.takeIf { it.isNotEmpty() }?.let { runCatching { org.json.JSONArray(it) }.getOrNull() }
+    view?.badgeAttributes = list?.let { array -> (0 until array.length()).map { (array.opt(it) as? org.json.JSONObject)?.let(CYLTabBarHostView::toMap) } }.orEmpty()
+  }
+
+  @ReactProp(name = "plusButtonBadgeStyle")
+  override fun setPlusButtonBadgeStyle(view: CyltabbarView?, value: String?) {
+    view?.plusButtonBadgeAttributes = value?.takeIf { it.isNotEmpty() }?.let { runCatching { CYLTabBarHostView.toMap(org.json.JSONObject(it)) }.getOrNull() }
+  }
+
+  /** [EN] 1 logged in, 0 logged out, -1 not set: the host uses the cached state. [CN] 1 已登录，0 未登录，-1 未设置：宿主使用缓存的状态。 */
+  @ReactProp(name = "loginState", defaultInt = -1)
+  override fun setLoginState(view: CyltabbarView?, value: Int) {
+    if (value >= 0) view?.loggedIn = value == 1 else view?.resetLoggedIn()
+  }
+
+  @ReactProp(name = "tabCoverImages")
+  override fun setTabCoverImages(view: CyltabbarView?, value: ReadableArray?) {
+    view?.tabCoverImages = (0 until (value?.size() ?: 0)).map { value?.getString(it)?.takeIf { image -> image.isNotEmpty() } }
+  }
+
   override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Any> = mutableMapOf(
     "topTabSelect" to mapOf("registrationName" to "onTabSelect"),
     "topPlusButtonPress" to mapOf("registrationName" to "onPlusButtonPress"),
     "topTabBarLayout" to mapOf("registrationName" to "onTabBarLayout"),
     "topTabLongPress" to mapOf("registrationName" to "onTabLongPress"),
+    "topLoginRequest" to mapOf("registrationName" to "onLoginRequest"),
+    "topLoginStateChange" to mapOf("registrationName" to "onLoginStateChange"),
   )
 
   companion object {

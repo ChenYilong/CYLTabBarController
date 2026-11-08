@@ -72,12 +72,21 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+// [EN] The Lottie tab icons of the Objective-C example (Example/Classes/Other/LottieResources), read as assets.
+// [CN] Objective-C 示例的 Lottie Tab 图标（Example/Classes/Other/LottieResources），作为 assets 读取。
+def cylRepository = file("${projectDir}/../../../../..")
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace "cyltabbar.example"
+    sourceSets {
+        main {
+            assets.srcDir("${cylRepository}/Example/Classes/Other/LottieResources")
+        }
+    }
     defaultConfig {
         applicationId "cyltabbar.example"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -110,6 +119,8 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    // The Lottie tab icons (the library plays them when lottie-android is present). Lottie Tab 图标（引入 lottie-android 时库会播放）。
+    implementation("com.airbnb.android:lottie:6.6.2")
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

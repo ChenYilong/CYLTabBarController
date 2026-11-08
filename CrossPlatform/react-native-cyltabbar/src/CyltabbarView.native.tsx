@@ -18,7 +18,13 @@ export type CYLTabBarPlusButton = {
   title?: string;
   /** The button's image; or `backgroundImage`, a picture with the title drawn on it. */
   image?: CYLTabBarImage;
+  /** The image while it is selected or touched. */
+  selectedImage?: CYLTabBarImage;
   backgroundImage?: CYLTabBarImage;
+  /** Its size in points / dp, `[width, height]` (default: its image and title). */
+  size?: [number, number];
+  /** The size its images are drawn at, aspect fit, `[width, height]` (e.g. a 512 px network image). */
+  imageSize?: [number, number];
   titleColor?: string;
   selectedTitleColor?: string;
   /** A font as in a configuration file: a size (15), "bold:15", "Menlo-Regular:12". */
@@ -32,6 +38,8 @@ export type CYLTabBarPlusButton = {
   alignsTitle?: boolean;
   /** Keeps the title visible on Liquid Glass. */
   keepsTitleVisible?: boolean;
+  /** Liquid Glass: the selection stays under the button while its own page is selected (Android always shows it). */
+  showsSelection?: boolean;
   identifier?: string;
   /** The plus button selects a page of its own: `onTabSelect(-1, identifier)`. */
   pageIdentifier?: string;
@@ -44,6 +52,19 @@ export type CYLTabBarBadgeAnimation =
 const BADGE_ANIMATIONS: CYLTabBarBadgeAnimation[] = [
   'none', 'scale', 'shake', 'bounce', 'breathe', 'leftRightOnce', 'rightLeftOnce', 'fadeInOnce', 'rollingOnce', 'scaleOnce',
 ];
+
+/** A badge with a style (`CYLTabBarHostView.badgeAttributes`). */
+export type CYLTabBarBadge = {
+  /** "" none, "dot" a red dot, anything else a number or text. */
+  value: string;
+  /** A color such as "#AF52DE". */
+  color?: string;
+  animation?: CYLTabBarBadgeAnimation;
+  /** The dot's radius. */
+  radius?: number;
+  /** Moves the badge from the icon's top-right corner, `[x, y]`. */
+  centerOffset?: [number, number];
+};
 
 export type CYLTabBarProps = ViewProps & {
   /** The tabs. They become CYLTabBarControllerTabBarItemsAttributes. */
@@ -66,11 +87,27 @@ export type CYLTabBarProps = ViewProps & {
   /** The plus button's badge: "" none, "dot" a red dot, anything else a text. */
   plusButtonBadgeValue?: string;
   badgeAnimation?: CYLTabBarBadgeAnimation;
+  /** Badges with a style, one per tab (null leaves the tab to `badgeValues`). */
+  badgeStyles?: (CYLTabBarBadge | null)[];
+  /** The plus button's badge with a style; wins over `plusButtonBadgeValue`. */
+  plusButtonBadge?: CYLTabBarBadge;
+  /** An image covering each tab's icon in both states, null for none. */
+  tabCoverImages?: (CYLTabBarImage | null)[];
   /** A tab was tapped; the plus button's own page (`plusButton.pageIdentifier`) gives index -1. */
   onTabSelect?: (index: number, identifier: string) => void;
   onPlusButtonPress?: () => void;
   /** A long press on a tab (its index) or the plus button (-1), with the title it shows. */
   onTabLongPress?: (index: number, identifier: string, title: string) => void;
+  /**
+   * Login (issue #19): whether the user is logged in. While logged out, tapping a tab listed in the configuration's
+   * `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers` calls `onLoginRequest` instead of selecting it; show your
+   * login screen, then set `loggedIn` and `selectedIndex`. Left undefined, the tab bar uses the state the library cached
+   * (kept across launches) and reports it with `onLoginStateChange`.
+   */
+  loggedIn?: boolean;
+  onLoginRequest?: (index: number, identifier: string, title: string) => void;
+  /** The login state the tab bar uses, sent once it is built: start from it to keep the login across launches. */
+  onLoginStateChange?: (loggedIn: boolean) => void;
 };
 
 /**
@@ -89,6 +126,13 @@ function addImage(target: Record<string, unknown>, key: string, image?: CYLTabBa
   if (source?.uri) {
     target[key] = source.uri;
   }
+}
+
+/** A required image's URL, or a name / URL string as it is; "" for none. */
+function imageValue(image?: CYLTabBarImage | null): string {
+  if (image == null) return '';
+  if (typeof image === 'string') return image;
+  return Image.resolveAssetSource(image)?.uri ?? '';
 }
 
 export function buildConfiguration(props: CYLTabBarProps): Record<string, unknown> {
@@ -124,9 +168,13 @@ export function buildConfiguration(props: CYLTabBarProps): Record<string, unknow
     if (p.centerYOffset != null) plus.CYLPlusButtonCenterYOffset = p.centerYOffset;
     if (p.alignsTitle != null) plus.CYLPlusButtonAlignsTitle = p.alignsTitle;
     if (p.keepsTitleVisible != null) plus.CYLPlusButtonKeepsTitleVisible = p.keepsTitleVisible;
+    if (p.showsSelection != null) plus.CYLPlusButtonShowsSelection = p.showsSelection;
     if (p.identifier) plus.CYLTabBarItemIdentifier = p.identifier;
     if (p.pageIdentifier) plus.CYLTabBarItemPageIdentifier = p.pageIdentifier;
+    if (p.size) plus.CYLPlusButtonSize = p.size;
+    if (p.imageSize) plus.CYLPlusButtonImageSize = p.imageSize;
     addImage(plus, 'CYLTabBarItemImage', p.image);
+    addImage(plus, 'CYLTabBarItemSelectedImage', p.selectedImage);
     addImage(plus, 'CYLPlusButtonBackgroundImage', p.backgroundImage);
     configuration.CYLTabBarControllerPlusButton = plus;
   }
@@ -151,10 +199,16 @@ export function CYLTabBar(props: CYLTabBarProps) {
     onTabSelect,
     onPlusButtonPress,
     onTabLongPress,
+    onLoginRequest,
+    onLoginStateChange,
+    loggedIn,
     selectedIndex,
     badgeValues,
     plusButtonBadgeValue,
     badgeAnimation,
+    badgeStyles,
+    plusButtonBadge,
+    tabCoverImages,
     ...rest
   } = props;
   const [height, setHeight] = useState<number | undefined>(undefined);
@@ -173,6 +227,14 @@ export function CYLTabBar(props: CYLTabBarProps) {
       badgeValues={badgeValues ?? []}
       plusButtonBadgeValue={plusButtonBadgeValue ?? ''}
       badgeAnimation={Math.max(0, BADGE_ANIMATIONS.indexOf(badgeAnimation ?? 'none'))}
+      badgeStyles={badgeStyles ? JSON.stringify(badgeStyles) : ''}
+      plusButtonBadgeStyle={plusButtonBadge ? JSON.stringify(plusButtonBadge) : ''}
+      tabCoverImages={(tabCoverImages ?? []).map(imageValue)}
+      loginState={loggedIn === undefined ? -1 : loggedIn ? 1 : 0}
+      onLoginStateChange={(event) => onLoginStateChange?.(event.nativeEvent.loggedIn)}
+      onLoginRequest={(event) =>
+        onLoginRequest?.(event.nativeEvent.index, event.nativeEvent.identifier, event.nativeEvent.title)
+      }
       onTabLongPress={(event) =>
         onTabLongPress?.(event.nativeEvent.index, event.nativeEvent.identifier, event.nativeEvent.title)
       }

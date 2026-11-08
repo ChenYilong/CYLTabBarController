@@ -112,6 +112,8 @@ docs/
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
 ├── Mac-CI-CD.md
+├── ObjC-Example-Parity/
+│   └── README.md
 ├── PAG-Animation.md
 ├── Per-Tab-Animation.md
 ├── Plus-Child-Theme-Switching-Test.md
@@ -167,6 +169,8 @@ docs/
     ├── gif-flat-design.png
     ├── gif-liquid-glass.png
     ├── login-required-tabs-flow.svg
+    ├── login-required-tabs-flutter-ios-logged-in.png
+    ├── login-required-tabs-react-native-android-alert.png
     ├── pag-animation-tab-icons.png
     ├── pag-animation-test-list.png
     ├── pag-classic.png

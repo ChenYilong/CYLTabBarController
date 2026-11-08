@@ -51,6 +51,14 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
         }
     }
 
+    /** [EN] `CYLPlusButtonSize` in pixels, or null for the size of the image and the title. [CN] 以像素表示的 `CYLPlusButtonSize`；null 时为图片与标题的尺寸。 */
+    internal var cyl_configurationSize: android.util.Size? = null
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        cyl_configurationSize?.let { setMeasuredDimension(it.width, it.height) }
+    }
+
     override fun plusChildViewControllerButtonClicked() {
         super.plusChildViewControllerButtonClicked()
         action?.invoke(this)
@@ -58,6 +66,9 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
 
     private class Provider(
         private val image: Drawable?,
+        private val selectedImage: Drawable?,
+        private val size: CYLSize?,
+        private val imageSize: CYLSize?,
         private val backgroundImage: Drawable?,
         private val title: String?,
         private val selectedTitle: String?,
@@ -88,7 +99,12 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
                     cyl_badgeCenterOffset = CYLOffset(-(backgroundImage.intrinsicWidth - visible.right) / density, visible.top / density)
                 }
             } else if (image != null) {
-                setImageDrawable(image.constantState?.newDrawable()?.mutate() ?: image)
+                setImageDrawable(fitted(image.constantState?.newDrawable()?.mutate() ?: image))
+                selectedImage?.let { setSelectedImageDrawable(fitted(it.constantState?.newDrawable()?.mutate() ?: it)) }
+            }
+            size?.let {
+                val density = resources.displayMetrics.density
+                cyl_configurationSize = android.util.Size((it.width * density).toInt(), (it.height * density).toInt())
             }
             setTitle(title, selectedTitle, selectedTitleColor)
             titleColor?.let {
@@ -98,6 +114,27 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
             titleSize?.let { titleLabel.textSize = it }
             if (keepsTitleVisible || backgroundImage != null) titleLabel.visibility = android.view.View.VISIBLE
         }
+        /**
+         * [EN] `CYLPlusButtonImageSize`: the image drawn aspect fit in that size (dp), e.g. a 512 px network image, as iOS.
+         * [CN] `CYLPlusButtonImageSize`：图片按该尺寸（dp）等比绘制，例如 512px 的网络图片，与 iOS 相同。
+         */
+        private fun CYLPlusButton.fitted(drawable: Drawable): Drawable {
+            val target = imageSize ?: return drawable
+            val width = drawable.intrinsicWidth
+            val height = drawable.intrinsicHeight
+            if (width <= 0 || height <= 0) return drawable
+            val density = resources.displayMetrics.density
+            val scale = minOf(target.width * density / width, target.height * density / height)
+            val fittedWidth = (width * scale).toInt().coerceAtLeast(1)
+            val fittedHeight = (height * scale).toInt().coerceAtLeast(1)
+            val bitmap = android.graphics.Bitmap.createBitmap(fittedWidth, fittedHeight, android.graphics.Bitmap.Config.ARGB_8888)
+            val bounds = android.graphics.Rect(drawable.bounds)
+            drawable.setBounds(0, 0, fittedWidth, fittedHeight)
+            drawable.draw(android.graphics.Canvas(bitmap))
+            drawable.bounds = bounds
+            return android.graphics.drawable.BitmapDrawable(resources, bitmap)
+        }
+
         override fun indexOfPlusButtonInTabBar(): Int = index ?: CYLPlusButton.INDEX_NOT_SET
         override fun multiplierOfTabBarHeight(tabBarHeight: Float): Float = centerYMultiplier ?: CYLPlusButton.NOT_IMPLEMENTED
         override fun constantOfPlusButtonCenterYOffsetForTabBarHeight(tabBarHeight: Float): Float = centerYOffset ?: CYLPlusButton.NOT_IMPLEMENTED
@@ -192,6 +229,9 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
             val font = CYLFont.fromConfigurationValue(attributes[CYLConstants.CYLTabBarItemTitleFont])
             CYLPlusButton.registerPlusButton(Provider(
                 image = image,
+                selectedImage = drawable(viewContext, attributes[CYLConstants.CYLTabBarItemSelectedImage]),
+                size = CYLTabBarConfiguration.sizeValue(attributes[CYLConstants.CYLPlusButtonSize])?.takeIf { it.width > 0 && it.height > 0 },
+                imageSize = CYLTabBarConfiguration.sizeValue(attributes[CYLConstants.CYLPlusButtonImageSize])?.takeIf { it.width > 0 && it.height > 0 },
                 backgroundImage = backgroundImage,
                 title = title,
                 selectedTitle = attributes[CYLConstants.CYLTabBarItemSelectedTitle]?.toString(),

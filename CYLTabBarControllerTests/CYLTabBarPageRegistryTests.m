@@ -151,7 +151,7 @@ static NSDictionary *CYLTestTab(NSString *title, NSString *pageIdentifier) {
     } forPageIdentifiers:@[ @"first", @"second" ]];
     NSArray *tabs = @[ @"not a tab", @{ CYLTabBarItemTitle : @"No ID" }, CYLTestTab(@"Raises", @"raises"), CYLTestTab(@"Nested", @"nested"),
                        CYLTestTab(@"First", @"first"), CYLTestTab(@"Second", @"second"), CYLTestTab(@"Unknown", @"unknown") ];
-    NSMutableArray<NSDictionary *> *kept = [NSMutableArray array];
+    NSMutableArray<NSDictionary<NSString *, id> *> *kept = [NSMutableArray array];
     NSMutableArray<CYLTabBarSkippedTab *> *skipped = [NSMutableArray array];
     NSArray *pages = [CYLTabBarPageRegistry pagesOfTabs:tabs registry:registry resolver:nil
                                             lookupOrder:@[ CYLTabBarPageSourceInstanceRegistry ] keptTabs:kept skipped:skipped];

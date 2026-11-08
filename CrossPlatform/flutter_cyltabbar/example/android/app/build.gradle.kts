@@ -4,8 +4,17 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// [EN] The Lottie tab icons of the Objective-C example (Example/Classes/Other/LottieResources), read as assets.
+// [CN] Objective-C 示例的 Lottie Tab 图标（Example/Classes/Other/LottieResources），作为 assets 读取。
+val cylRepository = file("$projectDir/../../../../..")
+
 android {
     namespace = "com.cyl.tabbar.flutter_cyltabbar_example"
+    sourceSets {
+        getByName("main") {
+            assets.srcDir("$cylRepository/Example/Classes/Other/LottieResources")
+        }
+    }
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -46,4 +55,9 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // [EN] The Lottie tab icons (the library plays them when lottie-android is present). [CN] Lottie Tab 图标（引入 lottie-android 时库会播放）。
+    implementation("com.airbnb.android:lottie:6.6.2")
 }

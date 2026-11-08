@@ -6,9 +6,17 @@ require Pod::Executable.execute_command('node', ['-p',
   )', __dir__]).strip
 
 platform :ios, min_ios_version_supported
+
+ENV['SWIFT_VERSION'] = '5'
+
+project 'CyltabbarExample.xcodeproj'
+
 prepare_react_native_project!
 
-linkage = ENV['USE_FRAMEWORKS']
+# The Lottie tab icons need the Swift headers of lottie-ios and of the library's Lottie bridge, which CocoaPods
+# generates for frameworks only: static frameworks, as the Objective-C example's `use_frameworks!`.
+# Lottie Tab 图标需要 lottie-ios 与库中 Lottie 桥接的 Swift 头文件，CocoaPods 只为 framework 生成：使用静态 framework，与 Objective-C 示例的 `use_frameworks!` 相同。
+linkage = ENV['USE_FRAMEWORKS'] || 'static'
 if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
   use_frameworks! :linkage => linkage.to_sym
@@ -18,7 +26,8 @@ target 'CyltabbarExample' do
   config = use_native_modules!
 
   # CYLTabBarController from this repository, for debugging the library together with the component.
-  pod 'CYLTabBarController', :path => '../../../..'
+  # The Objective-C example's subspec: FlatDesign and Lottie 4.x. ObjC 示例使用的子库：扁平样式与 Lottie 4.x。
+  pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => '../../../..'
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -33,5 +42,15 @@ target 'CyltabbarExample' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    # [EN] Every pod at React Native's minimum deployment target (15.1, `min_ios_version_supported`): the 15.0 of
+    #      AGENTS.md ("Xcode projects") is below what React Native supports. Some pods declare less (lottie-ios iOS 13,
+    #      RiveRuntime's resource bundle iOS 14.0), which Xcode 26 no longer builds.
+    # [CN] 所有 pod 使用 React Native 的最低部署版本（15.1，`min_ios_version_supported`）：AGENTS.md（Xcode projects）中的 15.0
+    #      低于 React Native 的支持版本。部分 pod 声明的版本更低（lottie-ios iOS 13、RiveRuntime 资源包 iOS 14.0），Xcode 26 已不再支持。
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = min_ios_version_supported
+      end
+    end
   end
 end

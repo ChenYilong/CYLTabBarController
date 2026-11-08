@@ -1,0 +1,865 @@
+{
+ "comment": "[EN] The demo list of the Objective-C example (UIViewController+CYLSettingsSection.m, UITableViewCell+CYLBadgeExtention.m), shared by the React Native and Flutter examples (scripts/sync-example-shared.py copies it). {name} is filled in at run time. [CN] Objective-C 示例的演示列表，React Native 与 Flutter 示例共用（scripts/sync-example-shared.py 负责复制）；{name} 在运行时填入。",
+ "sections": [
+  {
+   "id": "general",
+   "title": "General",
+   "rows": [
+    {
+     "id": "language",
+     "icon": null,
+     "title": "🌐 Language：🇺🇸 English",
+     "subtitle": "Tap to change the language",
+     "accessory": "chevron"
+    },
+    {
+     "id": "memoryWarning",
+     "icon": "memorychip",
+     "title": "Simulate memory warning",
+     "subtitle": "Unloads unselected tabs; they load again when selected",
+     "accessory": "none"
+    }
+   ]
+  },
+  {
+   "id": "appearance",
+   "title": "Tab bar appearance",
+   "rows": [
+    {
+     "id": "titleOffset",
+     "icon": "arrow_up_arrow_down",
+     "title": "Title offset (titlePositionAdjustment)",
+     "subtitle": "Tap to switch the vertical offset of all tab titles, current: {titleOffset}",
+     "accessory": "none"
+    },
+    {
+     "id": "standardAppearance",
+     "icon": "paintpalette",
+     "title": "standardAppearance theme (shared by Liquid Glass and FlatDesign)",
+     "subtitle": "Tap to switch tabBar.standardAppearance, current: {appearance}",
+     "accessory": "none"
+    },
+    {
+     "id": "skin",
+     "icon": "paintbrush_pointed",
+     "title": "Skin (theme, issue #216)",
+     "subtitle": "Tap to pick a theme: the TabBar background, icons and text colors change in place, in every TabBar style. Now: {skin}",
+     "accessory": "none"
+    },
+    {
+     "id": "scrollBehavior",
+     "icon": "arrow_up_and_down",
+     "title": "Minimize / hide the TabBar on scroll (issue #13)",
+     "subtitle": "Tap to change the scroll behavior. Now: {scrollBehavior}. Liquid Glass (iOS 26+): the system minimizes the TabBar; FlatDesign and the classic style (iOS 25 and earlier, iOS 26 UI compatibility mode): the TabBar hides.",
+     "accessory": "none"
+    },
+    {
+     "id": "flatShowHide",
+     "icon": "eye",
+     "title": "Show / hide CYLFlatDesignTabBar",
+     "subtitle": "Not supported by this tab bar style: FlatDesign (CYLFlatDesignTabBar) only",
+     "accessory": "none"
+    },
+    {
+     "id": "flatHeight",
+     "icon": "rectangle_compress_vertical",
+     "title": "Change CYLFlatDesignTabBar height",
+     "subtitle": "Not supported by Liquid Glass: the system sets the tab bar height (FlatDesign and the classic style support it)",
+     "accessory": "none"
+    },
+    {
+     "id": "flatNotCentered",
+     "icon": "text_alignleft",
+     "title": "CYLFlatDesignTabBarItem: not centered (system style)",
+     "subtitle": "Not supported by this tab bar style: FlatDesign (CYLFlatDesignTabBar) only",
+     "accessory": "none"
+    },
+    {
+     "id": "flatCentered",
+     "icon": "text_aligncenter",
+     "title": "CYLFlatDesignTabBarItem: centered",
+     "subtitle": "Not supported by this tab bar style: FlatDesign (CYLFlatDesignTabBar) only",
+     "accessory": "none"
+    },
+    {
+     "id": "flatBackground",
+     "icon": "paintbrush",
+     "title": "Set CYLFlatDesignTabBarItem background color",
+     "subtitle": "Not supported by this tab bar style: FlatDesign (CYLFlatDesignTabBar) only",
+     "accessory": "none"
+    }
+   ]
+  },
+  {
+   "id": "scrollSimulations",
+   "title": "Scroll hiding: simulate interruptions (issue #13)",
+   "rows": [
+    {
+     "id": "scrollSimulation",
+     "icon": "exclamationmark_triangle",
+     "title": "Scroll hiding: simulate interruptions (issue #13)",
+     "subtitle": "Choose an interruption; it fires after 1.5 s. Scroll down first to hide the TabBar.",
+     "accessory": "chevron"
+    },
+    {
+     "id": "scrollSimulationsToggle",
+     "icon": "chevron_down",
+     "title": "Show all 39 simulations",
+     "subtitle": "",
+     "accessory": "none",
+     "link": true
+    }
+   ]
+  },
+  {
+   "id": "updateTabs",
+   "title": "Update tabs in place",
+   "rows": [
+    {
+     "id": "changeTabTitle",
+     "icon": "textformat",
+     "title": "Change tab title",
+     "subtitle": "Changes this page's tab title in place; tap again to restore",
+     "accessory": "none"
+    },
+    {
+     "id": "switchTabIcon",
+     "icon": "photo",
+     "title": "Switch tab icon",
+     "subtitle": "Shows a custom view as this page's tab icon; tap again to restore",
+     "accessory": "none"
+    },
+    {
+     "id": "downloadNetworkIcon",
+     "icon": "photo_badge_arrow_down",
+     "title": "Download network icon",
+     "subtitle": "Downloads this page's tab icon from the network (cached); tap again to restore",
+     "accessory": "none"
+    },
+    {
+     "id": "allNetworkIcons",
+     "icon": "icloud_and_arrow_down",
+     "title": "Change all network icons",
+     "subtitle": "Downloads and updates the icons of all tabs; tap again to restore the initial icons",
+     "accessory": "none"
+    },
+    {
+     "id": "allLocalIcons",
+     "icon": "rectangle_stack",
+     "title": "Change all local icons",
+     "subtitle": "Updates the icons of all tabs with local images (name, file path, UIImage, file URL); tap again to restore",
+     "accessory": "none"
+    },
+    {
+     "id": "gifIcon",
+     "icon": "sparkle",
+     "title": "GIF icon",
+     "subtitle": "Shows an animated GIF as this page's tab icon; tap again to restore",
+     "accessory": "none"
+    },
+    {
+     "id": "allTitles",
+     "icon": "list_bullet",
+     "title": "Change all titles",
+     "subtitle": "Updates the titles of all tabs at once; tap again to restore",
+     "accessory": "none"
+    }
+   ]
+  },
+  {
+   "id": "pages",
+   "title": "Tab pages, selection and login",
+   "rows": [
+    {
+     "id": "replaceNeighbors",
+     "icon": "arrow_left_arrow_right",
+     "title": "Replace neighboring tabs",
+     "subtitle": "Shows other pages in the tabs on both sides of this tab (issue #481); tap again to restore",
+     "accessory": "none"
+    },
+    {
+     "id": "selectedIndex",
+     "icon": "arrow_right_square",
+     "title": "selectedIndex and the PlusButton (issue #515)",
+     "subtitle": "Tap to select the next tab. Index without the PlusButton: {indexWithoutPlus}, selectedIndex: {selectedIndex}, now: {selectedTitle}",
+     "accessory": "none"
+    },
+    {
+     "id": "login",
+     "icon": "person_crop_circle_badge_xmark",
+     "title": "Login state: {login}",
+     "subtitle": "Switch on means logged in, off means logged out (cached locally). While logged out, tapping “Messages, Me” shows the login screen first, then switches to that tab after logging in; while logged in, it switches right away.",
+     "accessory": "switch"
+    }
+   ]
+  },
+  {
+   "id": "plusButton",
+   "title": "PlusButton",
+   "rows": [
+    {
+     "id": "touchableArea",
+     "icon": "hand_point_up_left",
+     "title": "PlusButton touchable area (issue #91)",
+     "subtitle": "Turn the switch on to show the touchable area in translucent red, off to restore the normal look; drag the slider to multiply the area. Now: {touchScale}",
+     "accessory": "switch",
+     "slider": true
+    },
+    {
+     "id": "imageLater",
+     "icon": "photo_badge_arrow_down",
+     "title": "PlusButton image loaded later",
+     "subtitle": "Tap to pick a case and push a tab bar controller: its PlusButton has no image at first; 2 seconds later the image is loaded, replaced or removed, or a background image is loaded. The result should match an image set at launch.",
+     "accessory": "chevron"
+    }
+   ]
+  },
+  {
+   "id": "skins",
+   "title": "Skins: holidays and colors (17)",
+   "rows": [],
+   "skins": true
+  },
+  {
+   "id": "interactions",
+   "title": "Tab interactions",
+   "rows": [
+    {
+     "id": "tapAnimation",
+     "icon": "sparkles",
+     "title": "Tab tap animation (issue #535)",
+     "subtitle": "Tap to switch the tap animation of the tabs and the PlusButton. Now: {tapAnimation}",
+     "accessory": "none"
+    },
+    {
+     "id": "tapSound",
+     "icon": "speaker_wave_2",
+     "title": "Tab tap sound and haptics (issue #535)",
+     "subtitle": "Tap to switch, then tap any tab or the PlusButton to hear it. Haptics vibrate on a real device only. Now: {tapSound}",
+     "accessory": "none"
+    },
+    {
+     "id": "longPress",
+     "icon": "hand_tap",
+     "title": "Long press on tabs (issue #535)",
+     "subtitle": "Turn the switch on, then long-press any tab or the PlusButton to see its identifier.",
+     "accessory": "switch"
+    },
+    {
+     "id": "longPressDuration",
+     "icon": "timer",
+     "title": "Long press duration and double tap interval (issue #535 / #152)",
+     "subtitle": "Tap to switch. cyl_tabBarItemLongPressDuration: {longPress} s, cyl_tabButtonLongPressMinimumDuration: {longPress} s, cyl_tabBarItemDoubleTapInterval: {doubleTap} s",
+     "accessory": "none"
+    },
+    {
+     "id": "swipe",
+     "icon": "hand_draw",
+     "title": "Swipe to switch tabs (issue #535)",
+     "subtitle": "Turn the switch on, then swipe left or right on the page to go to the next or previous tab.",
+     "accessory": "switch"
+    },
+    {
+     "id": "adjacentTab",
+     "icon": "arrow_left_arrow_right",
+     "title": "Previous / next tab (issue #535)",
+     "subtitle": "Tap the arrows on the right to call cyl_switchToAdjacentTabWithStep:-1 / 1. Like a swipe, it skips the PlusButton and checks login. Last result: {adjacent}",
+     "accessory": "arrows"
+    },
+    {
+     "id": "slideTransition",
+     "icon": "rectangle_split_3x1",
+     "title": "Slide transition (CYLTabBarSlideTransitionAnimator)",
+     "subtitle": "Tap to open a system UITabBarController: tap a tab or drag the page left or right, and the page slides with your finger.",
+     "accessory": "chevron"
+    }
+   ]
+  },
+  {
+   "id": "helpers",
+   "title": "No base class, and helpers",
+   "rows": [
+    {
+     "id": "hideNavigationBar",
+     "icon": "menubar_rectangle",
+     "title": "Hide the navigation bar without a base class (issue #535)",
+     "subtitle": "The switch sets cyl_automaticNavigationSettingEnabled; tap the row to push a plain UIViewController that sets cyl_navigationBarHidden and cyl_hidesAncestorNavigationBars.",
+     "accessory": "switch"
+    },
+    {
+     "id": "outsideBounds",
+     "icon": null,
+     "title": "Respond outside the superview (issue #535)",
+     "subtitle": "With the switch on, the part of the button outside the gray box responds too; each tap plays the scale animation. Taps: {outsideTaps}",
+     "accessory": "switch",
+     "button": "Tap me"
+    },
+    {
+     "id": "bundleImage",
+     "icon": "@cyl_badge_sample_icon",
+     "title": "Load images from a bundle (issue #535)",
+     "subtitle": "The image on the left is read from the resource bundle with CYLImageInBundle (not cached). CYLBundleImage in the main bundle: Found CYLImagePathInBundle ✓ (cyl_badge_sample_icon@3x.png) · CYLBundleImagePath ✓ · CYLBundleImageData 11 KB · CYLBundleImageFromData ✓ (@3x) · CYLImageNamed ✓",
+     "accessory": "none"
+    },
+    {
+     "id": "weakAssociation",
+     "icon": "wrench_and_screwdriver",
+     "title": "CYLUtils weak associated objects and finding a button (issue #535)",
+     "subtitle": "Tap to run: cyl_setWeakAssociatedObject:forKey: returns nil once the object is released; cyl_nearestControlBelowView: finds the selected tab's button from its icon.",
+     "accessory": "none"
+    }
+   ]
+  },
+  {
+   "id": "configuration",
+   "title": "Configuration file",
+   "rows": [
+    {
+     "id": "configurationFile",
+     "icon": "doc_text",
+     "title": "Create a TabBarController from a configuration file",
+     "subtitle": "One file builds the whole tab bar: choose JSON, YAML, TOML, plist, XML, INI and more, or load it from a URL.",
+     "accessory": "chevron"
+    },
+    {
+     "id": "configurationA3",
+     "icon": "exclamationmark_triangle",
+     "title": "A3 · Empty file",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA4",
+     "icon": "exclamationmark_triangle",
+     "title": "A4 · Comments only",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA13",
+     "icon": "exclamationmark_triangle",
+     "title": "A13 · Malformed JSON",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA11",
+     "icon": "exclamationmark_triangle",
+     "title": "A11 · Top level is a list",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA7",
+     "icon": "exclamationmark_triangle",
+     "title": "A7 · YAML in a .json file",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA5",
+     "icon": "exclamationmark_triangle",
+     "title": "A5 · Not UTF-8",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA16",
+     "icon": "exclamationmark_triangle",
+     "title": "A16 · UTF-16 encoded",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA10",
+     "icon": "exclamationmark_triangle",
+     "title": "A10 · Nested 10,000 levels",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA9",
+     "icon": "exclamationmark_triangle",
+     "title": "A9 · A 6 MB file",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB1",
+     "icon": "exclamationmark_triangle",
+     "title": "B1 · No tabs",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationD7",
+     "icon": "exclamationmark_triangle",
+     "title": "D7 · An HTML page (file)",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB5",
+     "icon": "exclamationmark_triangle",
+     "title": "B5 · Wrong types and null",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB7",
+     "icon": "exclamationmark_triangle",
+     "title": "B7 · NaN and Infinity insets",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB9",
+     "icon": "exclamationmark_triangle",
+     "title": "B9 · Unknown style",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationC11",
+     "icon": "exclamationmark_triangle",
+     "title": "C11 · Unregistered page IDs",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationC12",
+     "icon": "exclamationmark_triangle",
+     "title": "C12 · A page provider raises (code)",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationC13",
+     "icon": "exclamationmark_triangle",
+     "title": "C13 · Pages that cannot be tabs (code)",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationC14",
+     "icon": "exclamationmark_triangle",
+     "title": "C14 · Automatic registration (CYLTabBarPage)",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationC15",
+     "icon": "exclamationmark_triangle",
+     "title": "C15 · Registry and resolver of wrong types",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationC16",
+     "icon": "exclamationmark_triangle",
+     "title": "C16 · Two tab bars, one page ID",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationC18",
+     "icon": "exclamationmark_triangle",
+     "title": "C18 · Lookup order and automatic registration",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB22",
+     "icon": "exclamationmark_triangle",
+     "title": "B22 · Other platforms and newer versions",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB23",
+     "icon": "exclamationmark_triangle",
+     "title": "B23 · Invalid platforms, versions and parameters",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB27",
+     "icon": "exclamationmark_triangle",
+     "title": "B27 · Reload with new tabs (code)",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationC20",
+     "icon": "exclamationmark_triangle",
+     "title": "C20 · Asynchronous pages (code)",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB28",
+     "icon": "exclamationmark_triangle",
+     "title": "B28 · Animation keys, options and speed",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB30",
+     "icon": "exclamationmark_triangle",
+     "title": "B30 · GIF keys and a file that is not a GIF",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB13",
+     "icon": "exclamationmark_triangle",
+     "title": "B13 · Invalid URLs and Lottie files",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB12",
+     "icon": "exclamationmark_triangle",
+     "title": "B12 · Duplicate identifiers",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB11",
+     "icon": "exclamationmark_triangle",
+     "title": "B11 · Misspelled keys",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB19",
+     "icon": "exclamationmark_triangle",
+     "title": "B19 · Invalid colors and fonts",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB21",
+     "icon": "exclamationmark_triangle",
+     "title": "B21 · Empty strings",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA12",
+     "icon": "exclamationmark_triangle",
+     "title": "A12 · Truncated protobuf",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA12b",
+     "icon": "exclamationmark_triangle",
+     "title": "A12 · Corrupted binary plist",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA14",
+     "icon": "exclamationmark_triangle",
+     "title": "A14 · XML external entity",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationA2",
+     "icon": "exclamationmark_triangle",
+     "title": "A2 · Missing file",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationE1",
+     "icon": "exclamationmark_triangle",
+     "title": "E1 · Created on a background thread",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationC6",
+     "icon": "exclamationmark_triangle",
+     "title": "C6 · Non-controllers and duplicates (code)",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationB18",
+     "icon": "exclamationmark_triangle",
+     "title": "B18 · Configuration is not a dictionary (code)",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationC9",
+     "icon": "exclamationmark_triangle",
+     "title": "C9 · Empty view controller list (code)",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationD4",
+     "icon": "exclamationmark_triangle",
+     "title": "D4 · Unknown host",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationD5",
+     "icon": "exclamationmark_triangle",
+     "title": "D5 · Server timeout (3 s)",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationD10",
+     "icon": "exclamationmark_triangle",
+     "title": "D10 · Request cancelled",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationC10",
+     "icon": "exclamationmark_triangle",
+     "title": "C10 · Request without a URL",
+     "subtitle": "",
+     "accessory": "none"
+    },
+    {
+     "id": "configurationD7n",
+     "icon": "exclamationmark_triangle",
+     "title": "D7 · An HTML page (network)",
+     "subtitle": "",
+     "accessory": "none"
+    }
+   ]
+  },
+  {
+   "id": "navigation",
+   "title": "Navigation and comparisons",
+   "rows": [
+    {
+     "id": "compareSystem",
+     "icon": "rectangle_split_2x1",
+     "title": "Compare with the system UITabBar",
+     "subtitle": "",
+     "accessory": "chevron"
+    },
+    {
+     "id": "pushSystem",
+     "icon": "iphone",
+     "title": "Push to a system UITabBarController (another plus button)",
+     "subtitle": "",
+     "accessory": "chevron"
+    },
+    {
+     "id": "pushFlat",
+     "icon": "square_stack_3d_up",
+     "title": "Push to another CYLFlatDesignTabBarController (another plus button)",
+     "subtitle": "",
+     "accessory": "chevron"
+    },
+    {
+     "id": "popPush",
+     "icon": "arrow_uturn_backward",
+     "title": "cyl_pop / cyl_push method demo",
+     "subtitle": "",
+     "accessory": "chevron"
+    }
+   ]
+  },
+  {
+   "id": "gallery",
+   "title": "Tab Bar Gallery",
+   "rows": [
+    {
+     "id": "gallery",
+     "icon": null,
+     "title": "Open the tab bar gallery",
+     "subtitle": "Every scene is a tab bar built with the public API: styles, animations, reminders, Lottie and the newer tab APIs",
+     "accessory": "chevron"
+    }
+   ]
+  }
+ ],
+ "badgeSamples": [
+  {
+   "title": "1. Scale (forever)",
+   "value": "3",
+   "animation": "scale"
+  },
+  {
+   "title": "2. Shake (forever)",
+   "value": "3",
+   "animation": "shake"
+  },
+  {
+   "title": "3. Bounce (forever)",
+   "value": "3",
+   "animation": "bounce"
+  },
+  {
+   "title": "4. Breathe (forever)",
+   "value": "",
+   "animation": "breathe"
+  },
+  {
+   "title": "5. Shake, stops with Reduce Motion (cyl_badgeRespectsReduceMotion)",
+   "value": "3",
+   "animation": "shake",
+   "reduceMotion": true
+  },
+  {
+   "title": "6. Rotation (forever)",
+   "value": "new",
+   "animation": "rotation"
+  },
+  {
+   "title": "7. Spring (forever)",
+   "value": "3",
+   "animation": "springForever"
+  },
+  {
+   "title": "8. Shake ×3 (cyl_shakeAnimationRepeatTimes)",
+   "value": "3",
+   "animation": "shake3"
+  },
+  {
+   "title": "9. Bounce ×3 (cyl_bounceAnimationRepeatTimes)",
+   "value": "3",
+   "animation": "bounce3"
+  },
+  {
+   "title": "10. Scale ×3 (cyl_scaleAnimationFromScale:)",
+   "value": "3",
+   "animation": "scale3"
+  },
+  {
+   "title": "11. Blink ×3 (cyl_opacityTimesAnimationRepeatTimes:)",
+   "value": "",
+   "animation": "blink3"
+  },
+  {
+   "title": "12. Flip ×2 (cyl_rotationAnimationWithDuration:)",
+   "value": "3",
+   "animation": "flip2"
+  },
+  {
+   "title": "13. Left to right once (CYLBadgeAnimationTypeLeftRightOnce)",
+   "value": "3",
+   "animation": "leftRightOnce"
+  },
+  {
+   "title": "14. Right to left once (CYLBadgeAnimationTypeRightLeftOnce)",
+   "value": "3",
+   "animation": "rightLeftOnce"
+  },
+  {
+   "title": "15. Fade in once (CYLBadgeAnimationTypeFadeInOnce)",
+   "value": "3",
+   "animation": "fadeInOnce"
+  },
+  {
+   "title": "16. Rolling once (CYLBadgeAnimationTypeRollingOnce)",
+   "value": "3",
+   "animation": "rollingOnce"
+  },
+  {
+   "title": "17. Scale once (CYLBadgeAnimationTypeScaleOnce)",
+   "value": "3",
+   "animation": "scaleOnce"
+  },
+  {
+   "title": "18. Spring once (cyl_springAnimationForDuration:)",
+   "value": "3",
+   "animation": "springOnce"
+  },
+  {
+   "title": "19. Red dot (cyl_showBadge)",
+   "value": ""
+  },
+  {
+   "title": "20. Number (cyl_showBadgeValue:)",
+   "value": "8"
+  },
+  {
+   "title": "21. Number above maximum (cyl_badgeMaximumBadgeNumber)",
+   "value": "100"
+  },
+  {
+   "title": "22. Custom maximum (9)",
+   "value": "10",
+   "maximum": 9
+  },
+  {
+   "title": "23. New (cyl_showBadgeValue:@\"new\")",
+   "value": "new"
+  },
+  {
+   "title": "24. NEW (cyl_showBadgeValue:@\"NEW\")",
+   "value": "NEW"
+  },
+  {
+   "title": "25. Other text (cyl_showBadgeValue:)",
+   "value": "hot"
+  },
+  {
+   "title": "26. Custom colors (cyl_badgeBackgroundColor / cyl_badgeTextColor)",
+   "value": "5",
+   "color": "#800080",
+   "textColor": "#FFFF00"
+  },
+  {
+   "title": "27. Custom font (cyl_badgeFont)",
+   "value": "5",
+   "italic": true,
+   "fontSize": 12
+  },
+  {
+   "title": "28. Border (cyl_badgeBorderColor / cyl_badgeBorderWidth)",
+   "value": "5",
+   "borderColor": "#FFFFFF",
+   "borderWidth": 2
+  },
+  {
+   "title": "29. Border following Dark Mode (cyl_badgeBorderColor)",
+   "value": "5",
+   "borderColor": "dynamic",
+   "borderWidth": 2
+  },
+  {
+   "title": "30. Red dot radius (cyl_badgeRadius)",
+   "value": "",
+   "radius": 6
+  },
+  {
+   "title": "31. Margin (cyl_badgeMargin)",
+   "value": "5",
+   "margin": 14
+  },
+  {
+   "title": "32. Corner radius (cyl_badgeCornerRadius)",
+   "value": "new",
+   "cornerRadius": 3
+  },
+  {
+   "title": "33. Top left (cyl_badgeCenterOffset)",
+   "value": "5",
+   "position": "topLeft"
+  },
+  {
+   "title": "34. Bottom left (cyl_badgeCenterOffset)",
+   "value": "5",
+   "position": "bottomLeft"
+  },
+  {
+   "title": "35. Bottom right (cyl_badgeCenterOffset)",
+   "value": "5",
+   "position": "bottomRight"
+  }
+ ]
+}
