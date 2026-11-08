@@ -532,7 +532,9 @@ static NSString *const CYLHostTestsLoggedInKey = @"CYLTabBarControllerLoggedIn";
 #pragma mark - Skins, images and FlatDesign badges
 
 - (void)testASkinOfAnEarlierConfigurationIsReplacedButTheAppsOwnSkinStays {
-    NSString *managerName = @"host-tests-skins";
+    // [EN] A manager of its own each run: managers are shared by name and remember the app's choice (-test-iterations).
+    // [CN] 每次运行使用自己的管理器：管理器按名称共享并记住 App 的选择（-test-iterations）。
+    NSString *managerName = [@"host-tests-skins-" stringByAppendingString:NSUUID.UUID.UUIDString];
     NSDictionary * (^configuration)(NSString *) = ^NSDictionary *(NSString *skin) {
         return @{
             CYLTabBarControllerContext : [@"host-tests-skins-" stringByAppendingString:skin],
