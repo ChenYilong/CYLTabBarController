@@ -68,6 +68,13 @@ controller.cyl_defaultTabButtonAnimation = CYLTabButtonBlockAnimation().apply { 
 // [CN] 动画图标：App 引入 lottie-android / libpag / rive-android 时，带 CYLTabBarAnimationFilePath 的 Tab 会播放动画。
 CYLBadgeAppearance.globalAppearance.backgroundColor = Color.MAGENTA   // app-wide badges (#425) 全局角标外观
 controller.cyl_themeManager.currentThemeIdentifier = "dark"       // themes (#216) 换肤
+
+// [EN] Only the bar, the pages drawn by the host (what the React Native and Flutter components use), see
+//      docs/Cross-Platform-Components.md. [CN] 只要 TabBar，页面由宿主绘制（React Native 与 Flutter 组件使用的视图），见
+//      docs/Cross-Platform-Components.md。
+val bar = CYLTabBarHostView(activity).apply { didSelectTab = { index, _ -> showPage(index) } }
+bar.configuration = mapOf(CYLConstants.CYLTabBarControllerTabBarItemsAttributes to items,
+    CYLConstants.CYLTabBarControllerPlusButton to mapOf(CYLConstants.CYLTabBarItemTitle to "Post", CYLConstants.CYLTabBarItemImage to "post_normal"))
 ```
 
 ```java

@@ -2008,9 +2008,11 @@ static BOOL CYLIsTextProtoNameCharacter(unichar c) {
 /*!
  * [EN] The built-in schema of a binary configuration, the same as Configurations/cyl_tabbar_configuration.proto:
  *      message name -> field number -> @[field name, kind]. Kinds: "string", "map" (map<string, string>), or
- *      "repeated:<Message>". Field numbers never change; unknown fields are skipped.
+ *      "repeated:<Message>", or "message:<Message>" (a single nested message). Field numbers never change; unknown fields are
+ *      skipped.
  * [CN] 二进制配置的内置结构定义，与 Configurations/cyl_tabbar_configuration.proto 相同：消息名 -> 字段编号 -> @[字段名, 类型]。
- *      类型为 "string"、"map"（map<string, string>）或 "repeated:<消息名>"。字段编号永不改变；未知字段会被跳过。
+ *      类型为 "string"、"map"（map<string, string>）、"repeated:<消息名>" 或 "message:<消息名>"（单个嵌套消息）。字段编号永不改变；
+ *      未知字段会被跳过。
  */
 static NSDictionary<NSString *, NSDictionary<NSNumber *, NSArray<NSString *> *> *> *CYLProtobufSchema(void) {
     // A literal each time (cheap, and thread-safe without dispatch_once). 每次返回字面量（开销小，且无需 dispatch_once 即线程安全）。
@@ -2027,6 +2029,9 @@ static NSDictionary<NSString *, NSDictionary<NSNumber *, NSArray<NSString *> *> 
                 @9 : @[ @"CYLTabBarControllerThemeIdentifier", @"string" ],
                 @10 : @[ @"CYLTabBarControllerDarkThemeIdentifier", @"string" ],
                 @11 : @[ @"CYLTabBarControllerThemeManagerName", @"string" ],
+                // [EN] `CYLTabBarControllerPlusButton`: the item keys it uses (title, image, selected title and color).
+                // [CN] `CYLTabBarControllerPlusButton`：使用 item 的键（标题、图片、选中标题与颜色）。
+                @12 : @[ @"CYLTabBarControllerPlusButton", @"message:CYLTabBarItem" ],
             },
             @"CYLTabBarTheme" : @{
                 @1 : @[ @"CYLTabBarThemeIdentifier", @"string" ],
@@ -2187,6 +2192,15 @@ static NSMutableDictionary *_Nullable CYLDecodeProtobufMessage(const uint8_t *by
             NSMutableArray *array = message[name] ?: [NSMutableArray array];
             [array addObject:element];
             message[name] = array;
+        } else if ([kind hasPrefix:@"message:"]) {
+            NSMutableDictionary *element = CYLDecodeProtobufMessage(payload, (NSUInteger)size, [kind substringFromIndex:8]);
+            if (!element) {
+                return nil;
+            }
+            // [EN] A message given twice is merged, as protobuf does. [CN] 出现两次的消息会合并，与 protobuf 相同。
+            NSMutableDictionary *merged = message[name] ?: [NSMutableDictionary dictionary];
+            [merged addEntriesFromDictionary:element];
+            message[name] = merged;
         }
     }
     return message;

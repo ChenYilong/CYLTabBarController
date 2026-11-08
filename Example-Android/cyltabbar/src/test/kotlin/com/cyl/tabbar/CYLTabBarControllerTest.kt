@@ -145,6 +145,12 @@ class CYLTabBarControllerTest {
         controller.tabBar.tabBarButtonArray[0].performClick()
         idle()
         assertFalse(controller.tabBar.plusButtonActive)
+        assertTrue("the plus button's page leaves the screen", TestPlusButton.child.isHidden)
+        assertFalse("the tapped tab's page shows again", controller.viewControllers[0].isHidden)
+        controller.tabBar.tabBarButtonArray[1].performClick()
+        idle()
+        assertEquals(1, controller.selectedIndex)
+        assertFalse(controller.viewControllers[1].isHidden)
         CYLPlusButton.removePlusButtonForTabBarContext("plus-test")
     }
 
@@ -377,5 +383,44 @@ class CYLTabBarControllerTest {
         assertEquals("a bigger font grows the badge", badge.measuredHeight, badge.height)
         icon.cyl_clearBadge()
         assertNull(icon.cyl_badge)
+    }
+
+    object BadgedPlusButton : CYLPlusButtonSubclassing {
+        override fun plusButton(context: android.content.Context) = CYLPlusButton.cyl_plusButtonWithImage(context, android.graphics.drawable.ColorDrawable(Color.BLUE).apply { setBounds(0, 0, 120, 120) }, "Menu", null, null).apply {
+            background = android.graphics.drawable.ColorDrawable(Color.MAGENTA)
+            minimumWidth = 150; minimumHeight = 150
+        }
+        override fun indexOfPlusButtonInTabBar() = 1
+        override fun tabBarContext() = "badged-plus"
+    }
+
+    /**
+     * [EN] Each tap of the demo's plus button raises its badge: the button keeps its size (its badge used to widen it, which
+     *      stretched its image a little more each time) and the badge stays on the icon's corner.
+     * [CN] 演示中每次点击 PlusButton 都会增加角标：按钮保持尺寸（以前角标会加宽按钮，每次都把图片多拉伸一点），角标保持在图标右上角。
+     */
+    @Test
+    fun aPlusButtonBadgeNeverResizesTheButton() = withActivity { activity ->
+        CYLPlusButton.registerPlusButton(BadgedPlusButton)
+        val controller = CYLTabBarController(activity, listOf(Page(), Page()), attributes("Home", "Me"), CYLEnums.CYLTabBarStyleType.Default, "badged-plus")
+        activity.setContentView(controller.view)
+        fun layout() {
+            controller.view.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(1920, View.MeasureSpec.EXACTLY))
+            controller.view.layout(0, 0, 1080, 1920)
+        }
+        idle(); layout()
+        val plus = controller.tabBar.plusButton!!
+        val width = plus.width
+        val height = plus.height
+        for (value in 1..5) {
+            plus.cyl_showBadgeValue(value.toString(), CYLEnums.CYLBadgeAnimationType.None)
+            idle(); layout()
+            assertEquals("width after badge $value", width, plus.width)
+            assertEquals("height after badge $value", height, plus.height)
+        }
+        val badge = plus.cyl_badge!!
+        assertEquals("on the icon's right edge", plus.imageView.right.toFloat(), (badge.left + badge.right) / 2f, 1f)
+        assertEquals("on the icon's top edge", plus.imageView.top.toFloat(), (badge.top + badge.bottom) / 2f, 1f)
+        CYLPlusButton.removePlusButtonForTabBarContext("badged-plus")
     }
 }

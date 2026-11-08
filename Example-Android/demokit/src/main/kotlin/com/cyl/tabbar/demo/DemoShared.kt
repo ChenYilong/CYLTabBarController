@@ -14,28 +14,45 @@ import com.cyl.tabbar.CYLTabBarItemButton
 import com.cyl.tabbar.cyl_showBadgeValue
 
 /**
- * [EN] The tab bar style of a demo, chosen from the action bar (iOS `CYLDemoTabBarStyle`): FlatDesign or the default
- *      style, so the same animated tabs can be compared. Kept in the app's preferences; `rebuild` creates the tab bar again.
- * [CN] 演示的 TabBar 样式，通过 ActionBar 选择（iOS `CYLDemoTabBarStyle`）：扁平样式或默认样式，便于比较同样的动画 Tab。保存在 App 的偏好设置中；
- *      `rebuild` 重新创建 TabBar。
+ * [EN] The tab bar style of a demo, chosen from the action bar as in the iOS examples, which have a "Liquid Glass" and a
+ *      "Flat Design" button: each switches to its style, the active one is checked, and tapping it again goes back to the
+ *      classic bar, so the same tabs can be compared. Kept in the app's preferences; `rebuild` creates the tab bar again.
+ * [CN] 演示的 TabBar 样式，与 iOS 示例一样在 ActionBar 中选择："液态玻璃" 与 "扁平样式" 两个按钮各自切换到对应样式，当前样式带勾选，
+ *      再次点击则回到经典 TabBar，便于比较同样的 Tab。保存在 App 的偏好设置中；`rebuild` 重新创建 TabBar。
  */
 object DemoTabBarStyle {
-    private const val KEY = "CYLDemoTabBarFlatDesign"
-    private const val MENU_ID = 0x5717
+    private const val PREFERENCES = "CYLDemoTabBarFlatDesign"
+    /** [EN] The earlier flat-or-not switch, still read so a saved choice is kept. [CN] 之前的扁平开关，仍会读取以保留已保存的选择。 */
+    private const val LEGACY_FLAT_KEY = "CYLDemoTabBarFlatDesign"
+    private const val STYLE_KEY = "CYLDemoTabBarStyle"
+    private const val MENU_GLASS = 0x5716
+    private const val MENU_FLAT = 0x5717
 
-    fun isFlatDesign(context: Context) = context.getSharedPreferences(KEY, Context.MODE_PRIVATE).getBoolean(KEY, false)
-
-    fun styleType(context: Context) = if (isFlatDesign(context)) CYLEnums.CYLTabBarStyleType.FlatDesign else CYLEnums.CYLTabBarStyleType.Default
-
-    /** [EN] Adds the switch to the action bar: its title is the style it switches to. [CN] 在 ActionBar 中添加切换按钮：标题为将切换到的样式。 */
-    fun addMenuItem(context: Context, menu: Menu) {
-        menu.add(Menu.NONE, MENU_ID, Menu.NONE, if (isFlatDesign(context)) "Default" else "Flat Design").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+    fun styleType(context: Context): CYLEnums.CYLTabBarStyleType {
+        val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+        preferences.getString(STYLE_KEY, null)?.let { name -> runCatching { return CYLEnums.CYLTabBarStyleType.valueOf(name) } }
+        return if (preferences.getBoolean(LEGACY_FLAT_KEY, false)) CYLEnums.CYLTabBarStyleType.FlatDesign else CYLEnums.CYLTabBarStyleType.Default
     }
 
-    /** [EN] Handles the switch; true when `item` was it. [CN] 处理切换；`item` 是该按钮时返回 true。 */
+    fun isFlatDesign(context: Context) = styleType(context) == CYLEnums.CYLTabBarStyleType.FlatDesign
+
+    /** [EN] Adds the "Liquid Glass" and "Flat Design" buttons; the active style is checked. [CN] 添加 "液态玻璃" 与 "扁平样式" 按钮；当前样式带勾选。 */
+    fun addMenuItem(context: Context, menu: Menu) {
+        val style = styleType(context)
+        fun title(name: String, active: Boolean) = if (active) "✓ $name" else name
+        menu.add(Menu.NONE, MENU_GLASS, Menu.NONE, title("Liquid Glass", style == CYLEnums.CYLTabBarStyleType.LiquidGlass)).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+        menu.add(Menu.NONE, MENU_FLAT, Menu.NONE, title("Flat Design", style == CYLEnums.CYLTabBarStyleType.FlatDesign)).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+    }
+
+    /** [EN] Handles both buttons; true when `item` was one of them. [CN] 处理两个按钮；`item` 是其中之一时返回 true。 */
     fun onMenuItemSelected(context: Context, item: MenuItem, rebuild: () -> Unit): Boolean {
-        if (item.itemId != MENU_ID) return false
-        context.getSharedPreferences(KEY, Context.MODE_PRIVATE).edit().putBoolean(KEY, !isFlatDesign(context)).apply()
+        val chosen = when (item.itemId) {
+            MENU_GLASS -> CYLEnums.CYLTabBarStyleType.LiquidGlass
+            MENU_FLAT -> CYLEnums.CYLTabBarStyleType.FlatDesign
+            else -> return false
+        }
+        val next = if (styleType(context) == chosen) CYLEnums.CYLTabBarStyleType.Default else chosen
+        context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit().putString(STYLE_KEY, next.name).putBoolean(LEGACY_FLAT_KEY, false).apply()
         rebuild()
         return true
     }

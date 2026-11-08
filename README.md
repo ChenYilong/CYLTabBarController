@@ -133,6 +133,7 @@ Update to CYLTabBarController 1.99.66 to see the demo:
 | ✅ Android 版 PAG、GIF、Rive 示例（[Android 示例](docs/Android-Examples.md)）：`Example-PAG`、`Example-GIF`、`Example-Rive` 在 `Example-Android` 中各有 Android 版本（`example-pag`、`example-gif`、`example-rive`），Tab、PlusButton、页面与 iOS 相同，直接读取 iOS 示例的动画文件；共用 `demokit` 中的设置列表与 PlusButton 角标演示。Android 库新增 `CYLGIFDrawable`：作为图片传入的 GIF 循环播放。 | ✅ The Android PAG, GIF and Rive examples ([Android examples](docs/Android-Examples.md)): `Example-PAG`, `Example-GIF` and `Example-Rive` each have an Android version in `Example-Android` (`example-pag`, `example-gif`, `example-rive`) with the same tabs, plus buttons and pages, reading the iOS examples' own animation files; they share the settings list and the plus button badge demo of `demokit`. New in the Android library: `CYLGIFDrawable`, a GIF given as an image loops. |
 | ✅ Android 独有的扩展，改编自 QMUI_Android（[Android 库](docs/Android-Library.md#cn仅-android-的扩展)，[对比与评分](docs/Android-QMUI-Comparison.md)）：选中指示条（`CYLTabBarIndicator`）、可滚动模式（`cyl_scrollMode`）、滑动翻页（`cyl_swipesBetweenPages`），以及主题值：`View.cyl_themeValue` 规则、`app:cyl_theme…` 布局属性、style / Map 主题、Span 与列表分割线、拦截与 `register`。全部默认关闭，iOS 一致的 API 不变；Tab 评分 79 → 86，换肤 77 → 83（QMUI 60 / 61）。 | ✅ Android-only extensions adapted from QMUI_Android ([Android library](docs/Android-Library.md#enandroid-only-extensions), [comparison and scores](docs/Android-QMUI-Comparison.md)): a selection indicator (`CYLTabBarIndicator`), the scrollable mode (`cyl_scrollMode`), swiping between pages (`cyl_swipesBetweenPages`), and theme values: `View.cyl_themeValue` rules, `app:cyl_theme…` layout attributes, style / Map themes, spans and list decorations, interception and `register`. All off by default, with the iOS-matching API unchanged; tab score 79 → 86, skins 77 → 83 (QMUI 60 / 61). |
 | ✅ Android 库一键发布到 Maven（[Android 库：发布到 Maven](docs/Android-Library.md#cn发布到-maven)）：`scripts/publish-android.sh` 用 Gradle 发布 `io.github.chenyilong:cyltabbarcontroller` 与 `cyltabbarcontroller-pages`（源码、javadoc、POM、签名），目标为 Maven Local、Maven Central（Central Portal，上传前检查）或 GitHub Packages；版本与 podspec 一致。 | ✅ One script publishes the Android library to Maven ([Android library: publishing to Maven](docs/Android-Library.md#enpublishing-to-maven)): `scripts/publish-android.sh` publishes `io.github.chenyilong:cyltabbarcontroller` and `cyltabbarcontroller-pages` with Gradle (sources, javadoc, POM, signatures) to Maven Local, Maven Central (the Central Portal, checked before uploading) or GitHub Packages; the version follows the podspec. |
+| ✅ React Native 与 Flutter 组件（[总览](docs/Cross-Platform-Components.md)、[React Native 接入](docs/React-Native-Component.md)、[Flutter 接入](docs/Flutter-Component.md)）：`CrossPlatform/react-native-cyltabbar`（Fabric 原生组件）与 `CrossPlatform/flutter_cyltabbar`（平台视图，iOS 使用 Swift Package Manager），iOS 与 Android 共用一份配置，组件只绘制原生 TabBar，页面由 JS / Dart 绘制；示例直接引用本仓库的 iOS 与 Android 库源码，方便调试。两者都基于新增的 `CYLTabBarHostView`（iOS 与 Android），原生 App 也可以直接使用它。配置文件新增 `CYLTabBarControllerPlusButton` 与 `CYLTabBarControllerPlusButtonAction`（Protobuf 字段 12），只用配置也能显示 PlusButton，每个 context 一个；PlusButton 的背景图、位置、标题样式与自己的页面，以及顶层键 `CYLTabBarControllerUserInterfaceStyle`、`CYLTabBarControllerTabButtonTapAnimation`、`CYLTabBarControllerSwipeToSwitchTab`。`Example-PAG` 与 `Example-Rive` 各有 React Native 与 Flutter 版本，页面动画用 `CYLAnimationView`。 | ✅ React Native and Flutter components ([overview](docs/Cross-Platform-Components.md), [React Native integration](docs/React-Native-Component.md), [Flutter integration](docs/Flutter-Component.md)): `CrossPlatform/react-native-cyltabbar` (a Fabric native component) and `CrossPlatform/flutter_cyltabbar` (a platform view, Swift Package Manager on iOS) share one configuration on iOS and Android; the component draws only the native tab bar and JS / Dart draws the pages. The examples use this repository's iOS and Android library sources, for debugging. Both are built on the new `CYLTabBarHostView` (iOS and Android), which native apps can use directly. New configuration keys `CYLTabBarControllerPlusButton` and `CYLTabBarControllerPlusButtonAction` (Protobuf field 12) show a plus button from a configuration alone, one per context; the plus button's background image, position, title style and own page, and the top-level keys `CYLTabBarControllerUserInterfaceStyle`, `CYLTabBarControllerTabButtonTapAnimation`, `CYLTabBarControllerSwipeToSwitchTab`. `Example-PAG` and `Example-Rive` each have a React Native and a Flutter version, with `CYLAnimationView` for animations in a page. |
 | ✅ 换肤（主题切换，[#216](https://github.com/ChenYilong/CYLTabBarController/issues/216)、[#136](https://github.com/ChenYilong/CYLTabBarController/issues/136)）：`CYLUtils` 新增换肤组件 `CYLThemeManager`（位于 `CYLUtils/CYLComponents/CYLTheme/`），一行 `CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = @"Spring Festival";` 即可切换皮肤；主题对象遵守 `CYLTabBarTheme` 后，TabBar 的背景、item 颜色、标题与图标（例如节日图标）在液态玻璃、系统 TabBar、扁平样式中原地更新，无需重建 TabBar；支持跟随系统深色模式、跟随主题的颜色 `+[UIColor cyl_colorWithThemeProvider:]`，示例新增“换肤”按钮，并单独列出十六套主题（五个配色主题与圣诞节、万圣节、春节等十一个节日皮肤，图标为 MIT 许可的 Fluent Emoji），详见 [docs/Theme-Switching.md](docs/Theme-Switching.md)。 | ✅ Skins (theme switching, [#216](https://github.com/ChenYilong/CYLTabBarController/issues/216), [#136](https://github.com/ChenYilong/CYLTabBarController/issues/136)): `CYLUtils` gets a theme component, `CYLThemeManager` (in `CYLUtils/CYLComponents/CYLTheme/`); one line, `CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = @"Spring Festival";`, switches the skin. With theme objects that adopt `CYLTabBarTheme`, the tab bar's background, item colors, titles and icons (e.g. holiday icons) change in place in Liquid Glass, the system tab bar and FlatDesign, without rebuilding the tab bar; themes can follow the system Dark Mode, colors can follow the theme (`+[UIColor cyl_colorWithThemeProvider:]`), and the examples get a "Skin" button and a section that lists sixteen themes (five color themes and eleven holiday skins such as Christmas, Halloween and Spring Festival, with MIT-licensed Fluent Emoji icons). See [docs/Theme-Switching.md](docs/Theme-Switching.md). |
 | ✅ Tab 动画接入指南：Lottie、PAG、Rive 三种动画的接入步骤、注意事项与 Demo 地址，先运行 Demo 体验再接入，见 [docs/Tab-Icon-Animation-Quick-Start.md](docs/Tab-Icon-Animation-Quick-Start.md)。 | ✅ Tab icon animation quick start: steps, things to watch for and demo links for Lottie, PAG and Rive; try a demo first, then integrate. See [docs/Tab-Icon-Animation-Quick-Start.md](docs/Tab-Icon-Animation-Quick-Start.md). |
 | ✅ AI 工具的 skill：`cyl-new-project`、`cyl-plus-button` 等项目专属 skill，以及精选的第三方 iOS skill，帮助快速基于本库创建项目，见 [docs/Agent-Skills.md](docs/Agent-Skills.md)。 | ✅ Skills for AI tools: project skills such as `cyl-new-project` and `cyl-plus-button`, and selected third-party iOS skills, to start a project on this library quickly. See [docs/Agent-Skills.md](docs/Agent-Skills.md). |
@@ -261,6 +262,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [点击 PlusButton 跳转到指定 UIViewController](#cn点击-plusbutton-跳转到指定-uiviewcontroller) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Navigating to a UIViewController by tapping the PlusButton](#ennavigating-to-a-uiviewcontroller-by-tapping-the-plusbutton) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [让 TabBarItem 仅显示图标并使图标垂直居中](#cn让-tabbaritem-仅显示图标并使图标垂直居中) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Display only icons in TabBarItems and center them vertically](#endisplay-only-icons-in-tabbaritems-and-center-them-vertically) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [多 TabBar 嵌套并指定 PlusButton 位置](#cn多-tabbar-嵌套并指定-plusbutton-位置) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Nesting multiple TabBars and specifying the PlusButton position](#ennesting-multiple-tabbars-and-specifying-the-plusbutton-position) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [在 React Native 与 Flutter 中使用 CYLTabBarController](#cn在-react-native-与-flutter-中使用-cyltabbarcontroller) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Using CYLTabBarController in React Native and Flutter](#enusing-cyltabbarcontroller-in-react-native-and-flutter) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [在 Swift 项目中使用 CYLTabBarController](#cn在-swift-项目中使用-cyltabbarcontroller) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Using CYLTabBarController in a Swift project](#enusing-cyltabbarcontroller-in-a-swift-project) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [搭配 Storyboard 使用 CYLTabBarController](#cn搭配-storyboard-使用-cyltabbarcontroller) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Using CYLTabBarController with Storyboard](#enusing-cyltabbarcontroller-with-storyboard) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [源码实现原理](#cn源码实现原理) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Implementation details](#enimplementation-details) |
@@ -301,10 +303,12 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [使用 Carthage 集成](docs/Carthage.md) | [Integrating with Carthage](docs/Carthage.md) |
 | [一个配置文件生成 TabBarController](docs/Configuration-File.md) | [One configuration file, one TabBarController](docs/Configuration-File.md) |
 | [配置文件相关脚本：导出、边界情况与测试](docs/Configuration-Scripts.md) | [Configuration scripts: export, edge cases and tests](docs/Configuration-Scripts.md) |
+| [React Native 与 Flutter 组件](docs/Cross-Platform-Components.md) | [React Native and Flutter components](docs/Cross-Platform-Components.md) |
 | [自定义 TabBar 功能清单](docs/Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](docs/Custom-Tab-Bar-Features.md) |
 | [Demo 测试列表：设置分组与纯 Swift 版本](docs/Demo-Test-List.md) | [The demo test list: settings groups and a pure Swift version](docs/Demo-Test-List.md) |
 | [CYLTabBarController 常见问题](docs/FAQ.md) | [CYLTabBarController FAQ](docs/FAQ.md) |
 | [FlatDesign × UITabBarAppearance](docs/FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](docs/FlatDesign-StandardAppearance.md) |
+| [Flutter 接入：flutter_cyltabbar](docs/Flutter-Component.md) | [Flutter integration: flutter_cyltabbar](docs/Flutter-Component.md) |
 | [GIF Tab 图标：循环的图片，或点击播放一次的动画](docs/GIF-Animation.md) | [GIF tab icons: a looping image, or an animation that plays once when tapped](docs/GIF-Animation.md) |
 | [纯图标 Tab 的自动居中](docs/Image-Only-Tabs.md) | [Automatic centering of image-only tabs](docs/Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](docs/Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](docs/Liquid-Glass-Robustness.md) |
@@ -322,6 +326,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [PlusButton 点击范围：扩大、按倍数放大与调试显示](docs/PlusButton-Touchable-Area.md) | [PlusButton touchable area: grow it, scale it, and see it](docs/PlusButton-Touchable-Area.md) |
 | [PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片](docs/PlusButton.md) | [How the PlusButton works: the real button, its Liquid Glass stand-in and selected images](docs/PlusButton.md) |
 | [在任意位置获取导航控制器并 Push](docs/Push-From-Anywhere.md) | [Get the navigation controller and push from anywhere](docs/Push-From-Anywhere.md) |
+| [React Native 接入：react-native-cyltabbar](docs/React-Native-Component.md) | [React Native integration: react-native-cyltabbar](docs/React-Native-Component.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](docs/Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](docs/Rive-Animation.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](docs/SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](docs/SelectedIndex-PlusButton.md) |
 | [在 Swift 项目中使用 CYLTabBarController](docs/Swift-Guide.md) | [Using CYLTabBarController in Swift](docs/Swift-Guide.md) |
@@ -404,6 +409,7 @@ The directory structure is organized as follows:
  ```Objective-C
 
 ├── CYLTabBarController  # 核心库文件夹；不使用 CocoaPods 时可直接拖入项目 / The library; drag it into your project if you do not use CocoaPods
+├── CrossPlatform        # React Native 与 Flutter 组件及示例 / The React Native and Flutter components and their examples
 └── Example
     └── Classes
         ├── Module       # 模块类文件夹 / Module classes
@@ -438,6 +444,12 @@ The directory structure is organized as follows:
 | `Example-Swift-Gallery` | Swift Package Manager，纯 Swift 图库 / Swift Package Manager, a pure Swift gallery | 15.0 |
 | `Example-Swift-Carthage` | Carthage | 15.0 |
 | `Example-Shared` | Swift Demo 共用的源码，不是独立工程 / Sources shared by the Swift demos, not a project | - |
+| `CrossPlatform/react-native-cyltabbar/example` | React Native 组件示例，iOS 与 Android（[文档](docs/Cross-Platform-Components.md)）/ The React Native component's example, iOS and Android ([doc](docs/Cross-Platform-Components.md)) | 15.1 |
+| `CrossPlatform/flutter_cyltabbar/example` | Flutter 组件示例，iOS 与 Android（[文档](docs/Cross-Platform-Components.md)）/ The Flutter component's example, iOS and Android ([doc](docs/Cross-Platform-Components.md)) | 15.0 |
+| `CrossPlatform/react-native-cyltabbar/example-pag` | `Example-PAG` 的 React Native 版本，iOS 与 Android（[文档](docs/Cross-Platform-Components.md#cn动效图标示例)）/ The React Native version of `Example-PAG`, iOS and Android ([doc](docs/Cross-Platform-Components.md#enanimated-icon-demos)) | 15.1 |
+| `CrossPlatform/react-native-cyltabbar/example-rive` | `Example-Rive` 的 React Native 版本，iOS 与 Android（[文档](docs/Cross-Platform-Components.md#cn动效图标示例)）/ The React Native version of `Example-Rive`, iOS and Android ([doc](docs/Cross-Platform-Components.md#enanimated-icon-demos)) | 15.4 |
+| `CrossPlatform/flutter_cyltabbar/example_pag` | `Example-PAG` 的 Flutter 版本，iOS 与 Android（[文档](docs/Cross-Platform-Components.md#cn动效图标示例)）/ The Flutter version of `Example-PAG`, iOS and Android ([doc](docs/Cross-Platform-Components.md#enanimated-icon-demos)) | 15.0 |
+| `CrossPlatform/flutter_cyltabbar/example_rive` | `Example-Rive` 的 Flutter 版本，iOS 与 Android（[文档](docs/Cross-Platform-Components.md#cn动效图标示例)）/ The Flutter version of `Example-Rive`, iOS and Android ([doc](docs/Cross-Platform-Components.md#enanimated-icon-demos)) | 15.4 |
 
 ### [CN]版本要求
 ### [EN]Version requirements
@@ -1774,6 +1786,34 @@ cell.textLabel?.text = String(format: CYLLocalizedString("我是第%ld行"), ind
 | context 相同的多个 TabBarController 各自有一个 PlusButton：第一个使用注册的实例，其余的使用同一个类的 `+plusButton` / `+plusChildViewController` 新建的实例（所以这两个方法每次调用应返回新实例）。 | TabBarControllers that share a context each get their own PlusButton: the first uses the registered instance, the others new instances from the same class's `+plusButton` / `+plusChildViewController` (so these should return a new instance on every call). |
 | 用 `+[CYLPlusButton plusButtonForTabBarContext:]` 和 `+[CYLPlusButton plusChildViewControllerForTabBarContext:]` 读取某个 context 的 PlusButton 及其子控制器。`CYLExternPlusButton` 与 `CYLPlusChildViewController` 指向最后注册的那一个。 | Read the PlusButton and the child view controller of a context with `+[CYLPlusButton plusButtonForTabBarContext:]` and `+[CYLPlusButton plusChildViewControllerForTabBarContext:]`. `CYLExternPlusButton` and `CYLPlusChildViewController` point at the one registered last. |
 | Demo 里有两个 PlusButton（`CYLPlusButtonSubclass`、继承自它且只改了图标、标题和 context 的 `CYLSecondPlusButtonSubclass`），点击 PlusButton 切换样式、或点击 table cell push 另一个 TabBarController 时，会显示另一个 PlusButton。 | The demo has two PlusButtons (`CYLPlusButtonSubclass`, and `CYLSecondPlusButtonSubclass`, which inherits from it and only changes the icon, the title and the context). Switching the style from the PlusButton, or pushing another TabBarController from a table cell, shows the other PlusButton. |
+### [CN]在 React Native 与 Flutter 中使用 CYLTabBarController
+### [EN]Using CYLTabBarController in React Native and Flutter
+
+| 中文 | English |
+|:---|:---|
+| `CrossPlatform/` 中的 `react-native-cyltabbar` 与 `flutter_cyltabbar` 提供原生 TabBar 组件，iOS 与 Android 共用一份[配置文件](docs/Configuration-File.md)的键，页面由 JS / Dart 绘制。**建议先运行示例**：React Native 见 [React Native 接入](docs/React-Native-Component.md)，Flutter 见 [Flutter 接入](docs/Flutter-Component.md)；原理与原生 App 中的 `CYLTabBarHostView` 见[总览](docs/Cross-Platform-Components.md)。 | `react-native-cyltabbar` and `flutter_cyltabbar` in `CrossPlatform/` provide a native tab bar component; iOS and Android share the keys of one [configuration file](docs/Configuration-File.md), and JS / Dart draws the pages. **Run an example first**: see [React Native integration](docs/React-Native-Component.md) and [Flutter integration](docs/Flutter-Component.md); how it works, and `CYLTabBarHostView` in a native app: [the overview](docs/Cross-Platform-Components.md). |
+
+```tsx
+<CYLTabBar items={items} styleType="liquidGlass" plusButton={{ title: 'Post', image: require('./post.png') }}
+           selectedIndex={index} badgeValues={['', 'dot']} onTabSelect={(i) => setIndex(i)} />
+```
+
+```dart
+CYLTabBar(items: items, styleType: 'liquidGlass', selectedIndex: index, badgeValues: const ['', 'dot'],
+          onTabSelect: (i, identifier) => setState(() => index = i))
+```
+
+| React Native | Flutter |
+|:---|:---|
+| ![React Native, iOS](assets/react-native-component-ios-bar.png) | ![Flutter, iOS](assets/flutter-component-ios-bar.png) |
+| ![React Native, Android](assets/react-native-component-android-bar.png) | ![Flutter, Android](assets/flutter-component-android-bar.png) |
+| ![React Native PAG, iOS](assets/react-native-pag-ios-bar.png) | ![Flutter PAG, Android](assets/flutter-pag-android-bar.png) |
+| ![React Native Rive, iOS](assets/react-native-rive-ios-bar.png) | ![Flutter Rive, Android](assets/flutter-rive-android-bar.png) |
+
+| 中文 | English |
+|:---|:---|
+| PAG 与 Rive 动效图标示例各有 React Native 与 Flutter 版本，TabBar 与 `Example-PAG`、`Example-Rive` 一致；页面中的动画用 `CYLAnimationView` 播放。见[动效图标示例](docs/Cross-Platform-Components.md#cn动效图标示例)。 | The PAG and Rive animated-icon demos each have a React Native and a Flutter version, with the same tab bar as `Example-PAG` and `Example-Rive`; animations in a page play through `CYLAnimationView`. See [Animated-icon demos](docs/Cross-Platform-Components.md#enanimated-icon-demos). |
+
 ### [CN]在 Swift 项目中使用 CYLTabBarController
 ### [EN]Using CYLTabBarController in a Swift project
 

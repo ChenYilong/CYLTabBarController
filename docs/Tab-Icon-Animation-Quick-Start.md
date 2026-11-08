@@ -62,6 +62,8 @@ cd Example-Swift && pod install && open *.xcworkspace
 | Rive（UIKit） | [Example-Rive](../Example-Rive) | `Rive` | [TabItems.swift](../Example-SwiftUI-Rive/AnimatedApp/Navigation/TabItems.swift) |
 | Rive（SwiftUI） | [Example-SwiftUI-Rive](../Example-SwiftUI-Rive) | `Rive` | 同上 / The same file |
 | GIF | [Example-GIF](../Example-GIF) | `GIF` | [AppDelegate.swift](../Example-GIF/GIFApp/Classes/Other/AppDelegate.swift) |
+| PAG、Rive（React Native） | [react-native-cyltabbar](../CrossPlatform/react-native-cyltabbar) `example-pag`、`example-rive` | `PAG` / `Rive` 子库 + `CYLTabBarHostView` / subspec + `CYLTabBarHostView` | [example-rive/src/App.tsx](../CrossPlatform/react-native-cyltabbar/example-rive/src/App.tsx) |
+| PAG、Rive（Flutter） | [flutter_cyltabbar](../CrossPlatform/flutter_cyltabbar) `example_pag`、`example_rive` | 同上 / The same | [example_rive/lib/main.dart](../CrossPlatform/flutter_cyltabbar/example_rive/lib/main.dart) |
 
 ## [CN]选择动画库
 ## [EN]Choose a library
@@ -187,6 +189,7 @@ NSDictionary *home = @{
 | 配置文件（`-initWithConfiguration:`，[Configuration-File.md](Configuration-File.md)）中可以写同样的 key（字符串形式）：通用 key、`CYLTabBarAnimationOptions`、各动画库的 key（按名称识别，未引入对应子库时被忽略，Tab 显示图片）。文件路径写 main bundle 中的文件名即可，本地文件必须存在；`.json` 必须是 Lottie 动画，`.gif` 必须以 GIF 签名开头，否则该 key 被移除并输出警告。 | A configuration file (`-initWithConfiguration:`, [Configuration-File.md](Configuration-File.md)) takes the same keys as strings: the generic keys, `CYLTabBarAnimationOptions`, and each library's keys (known by name: without its subspec they are ignored and the tab shows its image). A file name in the main bundle is enough for a path, and a local file must exist; a `.json` must be a Lottie animation and a `.gif` must start with a GIF signature, otherwise the key is removed with a warning. |
 | Android 版（[Android-Library.md](Android-Library.md)）读取同一份配置：GIF 由系统解码，总可播放；Lottie、PAG、Rive 在 App 引入 lottie-android、libpag、rive-android 时自动启用，没有时显示图片。 | The Android version ([Android-Library.md](Android-Library.md)) reads the same configuration: GIF is decoded by the platform and always plays; Lottie, PAG and Rive turn on when the app has lottie-android, libpag or rive-android, and show the image otherwise. |
 | Android 上可以运行与 iOS 示例对应的 `example-pag`、`example-gif`、`example-rive`（[Android-Examples.md](Android-Examples.md)），它们读取同样的动画文件。 | On Android, run `example-pag`, `example-gif` and `example-rive`, the twins of the iOS examples ([Android-Examples.md](Android-Examples.md)); they read the same animation files. |
+| React Native 与 Flutter 中，TabBar 配置写同样的 key；页面中的动画用 `CYLAnimationView` 播放，它使用同一个动画引擎。见 [React Native 与 Flutter 组件](Cross-Platform-Components.md#cn动效图标示例)。 | In React Native and Flutter, the tab bar configuration takes the same keys; animations in a page play through `CYLAnimationView`, on the same animation engine. See [React Native and Flutter components](Cross-Platform-Components.md#enanimated-icon-demos). |
 
 ## [CN]注意事项
 ## [EN]Things to watch for

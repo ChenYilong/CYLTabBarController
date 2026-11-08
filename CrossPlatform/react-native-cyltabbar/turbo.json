@@ -1,0 +1,45 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".nvmrc", ".yarnrc.yml"],
+  "globalEnv": ["NODE_ENV"],
+  "tasks": {
+    "build:android": {
+      "env": ["ANDROID_HOME"],
+      "inputs": [
+        "package.json",
+        "react-native.config.js",
+        "nitro.json",
+        "android",
+        "!android/build",
+        "cpp",
+        "src/**",
+        "example/package.json",
+        "example/android",
+        "!example/android/.gradle",
+        "!example/android/build",
+        "!example/android/app/build"
+      ],
+      "outputs": []
+    },
+    "build:ios": {
+      "env": [
+        "RCT_REMOVE_LEGACY_ARCH",
+        "RCT_USE_RN_DEP",
+        "RCT_USE_PREBUILT_RNCORE"
+      ],
+      "inputs": [
+        "package.json",
+        "*.podspec",
+        "nitro.json",
+        "ios",
+        "cpp",
+        "src/**",
+        "example/package.json",
+        "example/ios",
+        "!example/ios/build",
+        "!example/ios/Pods"
+      ],
+      "outputs": []
+    }
+  }
+}

@@ -189,6 +189,23 @@ object CYLTabBarConfiguration {
     @JvmStatic
     fun sizeValue(value: Any?): CYLSize? = numbers(value, 2, listOf("width", "height"))?.let { CYLSize(it[0], it[1]) }
 
+    /**
+     * [EN] A tap animation name ("none", "scale", "zoomIn", "bounce", "bounceWithFireworks", "rotation", "flip", "fume") or
+     *      its number, as `CYLTabBarControllerTabButtonTapAnimation` on iOS; null when it is neither.
+     * [CN] 点击动画名称（"none"、"scale"、"zoomIn"、"bounce"、"bounceWithFireworks"、"rotation"、"flip"、"fume"）或其数字，与 iOS 的
+     *      `CYLTabBarControllerTabButtonTapAnimation` 相同；两者都不是时返回 null。
+     */
+    @JvmStatic
+    fun tapAnimationValue(value: Any?): CYLEnums.CYLTabButtonTapAnimationType? {
+        val names = listOf("none", "scale", "zoomin", "bounce", "bouncewithfireworks", "rotation", "flip", "fume")
+        val index = when (value) {
+            is String -> names.indexOf(value.trim().lowercase())
+            is Number -> value.toInt().takeIf { it in names.indices } ?: -1
+            else -> -1
+        }
+        return CYLEnums.CYLTabButtonTapAnimationType.values().firstOrNull { it.rawValue == index && index >= 0 }
+    }
+
     /** [EN] "#RGB", "#RRGGBB" or "#RRGGBBAA" (the iOS order). [CN] 三种十六进制写法（与 iOS 相同的顺序）。 */
     @JvmStatic
     fun colorValue(value: Any?): Int? {

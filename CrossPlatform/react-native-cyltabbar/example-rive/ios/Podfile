@@ -1,0 +1,47 @@
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+# RiveRuntime needs iOS 15.4, as Example-Rive. RiveRuntime 需要 iOS 15.4，与 Example-Rive 相同。
+platform :ios, '15.4'
+prepare_react_native_project!
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+target 'CyltabbarExample' do
+  config = use_native_modules!
+
+  # CYLTabBarController from this repository with its Rive subspec (RiveRuntime), as Example-Rive.
+  pod 'CYLTabBarController/Rive', :path => '../../../..'
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
+    )
+    # [EN] RiveRuntime's resource bundle target says iOS 14.0, below what this Xcode builds: raised as Example-Rive does.
+    # [CN] RiveRuntime 的资源包 target 声明 iOS 14.0，低于当前 Xcode 支持的版本：与 Example-Rive 相同，提高到 15.4。
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |build_configuration|
+        if build_configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 15.4
+          build_configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.4'
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,52 @@
+# Uncomment this line to define a global platform for your project
+# [EN] RiveRuntime needs iOS 15.4, as Example-Rive. [CN] RiveRuntime 需要 iOS 15.4，与 Example-Rive 相同。
+platform :ios, '15.4'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  # [EN] Static: CYLTabBarController is a static framework. [CN] 静态链接：CYLTabBarController 是静态 framework。
+  use_frameworks! :linkage => :static
+
+  # [EN] This repository's CYLTabBarController with its Rive subspec (RiveRuntime), as Example-Rive.
+  # [CN] 本仓库的 CYLTabBarController 及其 Rive 子库（RiveRuntime），与 Example-Rive 相同。
+  pod 'CYLTabBarController/Rive', :path => '../../../..'
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    # [EN] RiveRuntime's resource bundle target says iOS 14.0, below what this Xcode builds. [CN] RiveRuntime 的资源包 target 声明 iOS 14.0，低于当前 Xcode 支持的版本。
+    target.build_configurations.each do |build_configuration|
+      build_configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.4' if build_configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 15.4
+    end
+  end
+end

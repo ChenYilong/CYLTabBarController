@@ -730,7 +730,24 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
 
     /** [EN] Provides the views of `CYLRiveTabBarItemAnimator`. [CN] 为 `CYLRiveTabBarItemAnimator` 提供视图。 */
     object Provider : CYLTabBarItemAnimationViewProviding {
+        @Volatile private var riveInitialized = false
+
+        /**
+         * [EN] rive-android needs `Rive.init(context)` before its first view (its androidx.startup initializer is not in every
+         *      app, e.g. a React Native or Flutter app): called once here, by reflection, with the library's default renderer.
+         * [CN] rive-android 在创建第一个视图之前需要 `Rive.init(context)`（并非每个 App 都有其 androidx.startup 初始化器，例如 React Native 或
+         *      Flutter App）：这里通过反射调用一次，使用该库的默认渲染器。
+         */
+        private fun initializeRive(context: Context) {
+            if (riveInitialized) return
+            riveInitialized = true
+            val rive = CYLReflection.type("app.rive.runtime.kotlin.core.Rive") ?: return
+            val instance = runCatching { rive.getField("INSTANCE").get(null) }.getOrNull() ?: return
+            runCatching { CYLReflection.callKotlin(instance, "init", context.applicationContext, CYLReflection.DEFAULT) }
+        }
+
         override fun cyl_animationViewWithFileURL(context: Context, fileURL: String, options: Map<String, String>, contentMode: ImageView.ScaleType): View? {
+            initializeRive(context)
             val rive = CYLReflection.newInstance(CYLRiveTabBarItemAnimator.VIEW_CLASS, context) as? View ?: return null
             val view = CYLRiveTabBarItemAnimationView(context, rive, options)
             CYLTabBarItemAnimationFiles.localFile(context, fileURL) { file ->

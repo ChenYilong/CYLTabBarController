@@ -93,6 +93,11 @@ Every new feature and user-visible change ships with bilingual documentation in 
 - **Verify** before pushing: `pod lib lint CYLTabBarController.podspec --quick`, plus a build or static check of the
   changed code. Say plainly what could not be verified.
 
+- **React Native and Flutter components** live in `CrossPlatform/` ([docs/Cross-Platform-Components.md](docs/Cross-Platform-Components.md)),
+  thin wrappers around `CYLTabBarHostView` (iOS and Android): put shared behavior in the host view, not in a wrapper.
+  Their examples use this repository's iOS pod and Android sources: a library change that affects configuration
+  initialization, the plus button or badges is checked in them too. A configuration key they need goes into both
+  libraries (iOS and `Example-Android`), never only into a wrapper.
 - **New demos** follow the `cyl-new-project` skill. **PlusButton with forced title alignment**: give it a title; see `cyl-plus-button`.
 - **Xcode project files** keep the ObjC example's format (`objectVersion = 46`, `compatibilityVersion = "Xcode 3.2"`, no folder sync, deployment target below 27), or CI on Xcode 26 fails. Check before committing any `.xcodeproj` change. Full rules: the `cyl-xcode-compat` skill.
 - **Simulator**: run `scripts/free-ram.sh` before every simulator use. Details and common failures: the `cyl-verify` skill.

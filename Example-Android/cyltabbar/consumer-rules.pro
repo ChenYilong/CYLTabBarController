@@ -7,8 +7,13 @@
 -keep class com.airbnb.lottie.LottieProperty { *; }
 -keep class com.airbnb.lottie.model.KeyPath { public *; }
 -keep class com.airbnb.lottie.value.LottieValueCallback { public *; }
--keep class org.libpag.PAGView { public *; }
+# [EN] libpag's native code looks its Java classes up by name as well: the rule libpag documents.
+# [CN] libpag 的 native 代码同样按名称查找其 Java 类：即 libpag 文档给出的规则。
+-keep class org.libpag.** { *; }
+-keep class androidx.exifinterface.** { *; }
 -keep class app.rive.runtime.kotlin.RiveAnimationView { public *; }
+-keep class app.rive.runtime.kotlin.core.Rive { public *; }
+-keep enum app.rive.runtime.kotlin.core.Fit { *; }
 
 # [EN] Theme values tell the CYLThemeItemDecoration of a RecyclerView through these methods (found by reflection).
 # [CN] 主题值通过这些方法（反射查找）通知 RecyclerView 的 CYLThemeItemDecoration。

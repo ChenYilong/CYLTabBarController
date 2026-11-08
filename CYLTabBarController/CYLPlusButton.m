@@ -2534,3 +2534,167 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
 }
 
 @end
+
+#pragma mark - A plus button from attributes (CYLTabBarControllerPlusButton)
+
+/// [EN] Internal: the plus button's own page, found by `-initWithConfiguration:` (`CYLTabBarItemPageIdentifier`).
+/// [CN] 内部使用：PlusButton 自己的页面，由 `-initWithConfiguration:` 查找（`CYLTabBarItemPageIdentifier`）。
+NSString *const CYLConfigurationPlusButtonPageKey = @"CYLConfigurationPlusButtonPage";
+
+static const void *CYLConfigurationPlusButtonEntryKey = &CYLConfigurationPlusButtonEntryKey;
+static NSString *const CYLConfigurationPlusButtonAttributesKey = @"attributes";
+static NSString *const CYLConfigurationPlusButtonActionKey = @"action";
+static NSString *const CYLConfigurationPlusButtonContextKey = @"context";
+static NSString *const CYLConfigurationPlusButtonDefaultContext = @"CYLTabBarController";
+
+/*!
+ * [EN] The plus button of `CYLTabBarControllerPlusButton`. Each registration makes a subclass of its own, which holds that
+ *      configuration's attributes, action and context, and gets only the class methods its keys ask for: optional methods
+ *      such as `+indexOfPlusButtonInTabBar` or `+plusChildViewController` change the library's behavior just by being
+ *      there. So two configurations (two React Native or Flutter tab bars, two contexts) never share answers.
+ * [CN] `CYLTabBarControllerPlusButton` 的 PlusButton。每次注册生成一个自己的子类，保存该配置的属性、点击回调与 context，并且只添加其键所需的
+ *      类方法：`+indexOfPlusButtonInTabBar`、`+plusChildViewController` 等可选方法只要存在就会改变库的行为。因此两份配置（两个 React Native
+ *      或 Flutter TabBar、两个 context）不会共用回答。
+ */
+@interface CYLConfigurationPlusButton : CYLPlusButton <CYLPlusButtonSubclassing>
+@end
+
+@implementation CYLConfigurationPlusButton
+
++ (NSDictionary *)cyl_configurationEntry {
+    return objc_getAssociatedObject(self, CYLConfigurationPlusButtonEntryKey);
+}
+
++ (NSDictionary<NSString *, id> *)cyl_configurationAttributes {
+    return [self cyl_configurationEntry][CYLConfigurationPlusButtonAttributesKey];
+}
+
++ (id)plusButton {
+    NSDictionary<NSString *, id> *attributes = [self cyl_configurationAttributes];
+    NSString *title = attributes[CYLTabBarItemTitle] ?: @"";
+    UIImage *backgroundImage = attributes[CYLPlusButtonBackgroundImage];
+    CYLConfigurationPlusButton *button;
+    if ([backgroundImage isKindOfClass:[UIImage class]]) {
+        // [EN] A title drawn on a background image, the button the size of the image (Example-PAG's "Menu").
+        // [CN] 画在背景图上的标题，按钮与图片同样大小（Example-PAG 的「菜单」）。
+        button = [[self alloc] init];
+        [button setBackgroundImage:backgroundImage forState:UIControlStateNormal];
+        // [EN] The same image when highlighted, so the button does not darken on touch. [CN] 高亮时使用同一图片，按下时按钮不会变暗。
+        [button setBackgroundImage:backgroundImage forState:UIControlStateHighlighted];
+        button.titleLabel.textAlignment = NSTextAlignmentCenter;
+        [button setTitle:title forState:UIControlStateNormal];
+        [button setTitle:attributes[CYLTabBarItemSelectedTitle] ?: title forState:UIControlStateSelected];
+        [button sizeToFit];
+    } else {
+        button = [self cyl_plusButtonWithImage:attributes[CYLTabBarItemImage]
+                                         title:title
+                                 selectedTitle:attributes[CYLTabBarItemSelectedTitle]
+                            selectedTitleColor:attributes[CYLTabBarItemSelectedTitleColor]];
+    }
+    UIColor *titleColor = attributes[CYLTabBarItemTitleColor];
+    if ([titleColor isKindOfClass:[UIColor class]]) {
+        [button setTitleColor:titleColor forState:UIControlStateNormal];
+        [button setTitleColor:attributes[CYLTabBarItemSelectedTitleColor] ?: titleColor forState:UIControlStateSelected];
+    }
+    UIFont *font = attributes[CYLTabBarItemTitleFont];
+    if ([font isKindOfClass:[UIFont class]]) {
+        button.titleLabel.font = font;
+    }
+    if ([attributes[CYLPlusButtonKeepsTitleVisible] boolValue]) {
+        button.cyl_keepShowingPlusButtonLabel = YES;
+    }
+    // [EN] Taps reach `cyl_configurationPlusButtonTapped` through the tab bar controller's tap report
+    //      (`-cyl_sendDidSelectControl:`), once per tap in every style, also when its own page is selected by the system tab
+    //      button under it (Liquid Glass). [CN] 点击通过 TabBarController 的点击上报（`-cyl_sendDidSelectControl:`）到达
+    //      `cyl_configurationPlusButtonTapped`：所有样式下每次点击一次，包括其页面由其下方的系统 Tab 按钮选中时（液态玻璃）。
+    return button;
+}
+
++ (NSString *)tabBarContext {
+    return [self cyl_configurationEntry][CYLConfigurationPlusButtonContextKey] ?: CYLConfigurationPlusButtonDefaultContext;
+}
+
++ (BOOL)alignsTitleWithTabBarItemTitles {
+    NSDictionary<NSString *, id> *attributes = [self cyl_configurationAttributes];
+    if ([attributes[CYLPlusButtonAlignsTitle] isKindOfClass:[NSNumber class]]) {
+        return [attributes[CYLPlusButtonAlignsTitle] boolValue];
+    }
+    return [attributes[CYLTabBarItemTitle] length] > 0 && !attributes[CYLPlusButtonBackgroundImage];
+}
+
+/// [EN] Asked at layout time: answered by this button's class, so by its own configuration. [CN] 布局时询问：由本按钮的类、即其自己的配置回答。
+- (BOOL)cyl_alignsTitleWithTabBarItemTitles {
+    return [[self class] alignsTitleWithTabBarItemTitles];
+}
+
+- (void)cyl_configurationPlusButtonTapped {
+    void (^action)(CYLPlusButton *) = [[self class] cyl_configurationEntry][CYLConfigurationPlusButtonActionKey];
+    !action ?: action(self);
+}
+
+/// [EN] Adds the optional class methods the attributes ask for. [CN] 添加属性所需的可选类方法。
++ (void)cyl_addClassMethodsForAttributes:(NSDictionary<NSString *, id> *)attributes {
+    Class metaClass = object_getClass(self);
+    if ([attributes[CYLPlusButtonIndexInTabBar] isKindOfClass:[NSNumber class]]) {
+        NSUInteger index = [attributes[CYLPlusButtonIndexInTabBar] unsignedIntegerValue];
+        class_addMethod(metaClass, @selector(indexOfPlusButtonInTabBar), imp_implementationWithBlock(^NSUInteger(id cls) {
+            return index;
+        }), "Q@:");
+    }
+    if ([attributes[CYLPlusButtonCenterYMultiplier] isKindOfClass:[NSNumber class]]) {
+        CGFloat multiplier = [attributes[CYLPlusButtonCenterYMultiplier] doubleValue];
+        class_addMethod(metaClass, @selector(multiplierOfTabBarHeight:), imp_implementationWithBlock(^CGFloat(id cls, CGFloat tabBarHeight) {
+            return multiplier;
+        }), "d@:d");
+    }
+    if ([attributes[CYLPlusButtonCenterYOffset] isKindOfClass:[NSNumber class]]) {
+        CGFloat offset = [attributes[CYLPlusButtonCenterYOffset] doubleValue];
+        class_addMethod(metaClass, @selector(constantOfPlusButtonCenterYOffsetForTabBarHeight:), imp_implementationWithBlock(^CGFloat(id cls, CGFloat tabBarHeight) {
+            return offset;
+        }), "d@:d");
+    }
+    NSString *identifier = attributes[CYLTabBarItemIdentifier];
+    if ([identifier isKindOfClass:[NSString class]] && identifier.length > 0) {
+        class_addMethod(metaClass, @selector(tabBarItemIdentifier), imp_implementationWithBlock(^NSString *(id cls) {
+            return identifier;
+        }), "@@:");
+    }
+    UIViewController *page = attributes[CYLConfigurationPlusButtonPageKey];
+    if ([page isKindOfClass:[UIViewController class]]) {
+        class_addMethod(metaClass, @selector(plusChildViewController), imp_implementationWithBlock(^UIViewController *(id cls) {
+            return page;
+        }), "@@:");
+    }
+}
+
+@end
+
+@implementation CYLPlusButton (CYLConfigurationPlusButton)
+
++ (void)cyl_registerPlusButtonWithAttributes:(NSDictionary<NSString *, id> *)attributes
+                                      action:(void (^)(CYLPlusButton *))action
+                                     context:(NSString *)context {
+    BOOL hasImage = [attributes[CYLTabBarItemImage] isKindOfClass:[UIImage class]]
+        || [attributes[CYLPlusButtonBackgroundImage] isKindOfClass:[UIImage class]];
+    if (!hasImage) {
+        return;
+    }
+    static NSUInteger counter = 0;
+    NSString *className = [NSString stringWithFormat:@"CYLConfigurationPlusButton_%lu", (unsigned long)++counter];
+    Class class = objc_allocateClassPair([CYLConfigurationPlusButton class], className.UTF8String, 0);
+    if (!class) {
+        return;
+    }
+    objc_registerClassPair(class);
+    NSMutableDictionary *entry = [NSMutableDictionary dictionary];
+    entry[CYLConfigurationPlusButtonAttributesKey] = [attributes copy];
+    entry[CYLConfigurationPlusButtonContextKey] = context.length > 0 ? [context copy] : CYLConfigurationPlusButtonDefaultContext;
+    if (action) {
+        entry[CYLConfigurationPlusButtonActionKey] = [action copy];
+    }
+    objc_setAssociatedObject(class, CYLConfigurationPlusButtonEntryKey, [entry copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [(Class)class cyl_addClassMethodsForAttributes:attributes];
+    [(Class)class registerPlusButton];
+}
+
+@end

@@ -83,6 +83,19 @@ NSString *const CYLTabBarControllerPageResolver = @"CYLTabBarControllerPageResol
 NSString *const CYLTabBarControllerPageLookupOrder = @"CYLTabBarControllerPageLookupOrder";
 NSString *const CYLTabBarControllerAutomaticPageRegistration = @"CYLTabBarControllerAutomaticPageRegistration";
 NSString *const CYLTabBarControllerTabBarItemAnimationSpeed = @"CYLTabBarControllerTabBarItemAnimationSpeed";
+NSString *const CYLTabBarControllerPlusButton = @"CYLTabBarControllerPlusButton";
+NSString *const CYLTabBarControllerPlusButtonAction = @"CYLTabBarControllerPlusButtonAction";
+/// [EN] Defined in CYLPlusButton.m: the plus button page, passed with its attributes. [CN] 定义在 CYLPlusButton.m：随属性传递的 PlusButton 页面。
+FOUNDATION_EXTERN NSString *const CYLConfigurationPlusButtonPageKey;
+NSString *const CYLPlusButtonBackgroundImage = @"CYLPlusButtonBackgroundImage";
+NSString *const CYLPlusButtonIndexInTabBar = @"CYLPlusButtonIndexInTabBar";
+NSString *const CYLPlusButtonCenterYMultiplier = @"CYLPlusButtonCenterYMultiplier";
+NSString *const CYLPlusButtonCenterYOffset = @"CYLPlusButtonCenterYOffset";
+NSString *const CYLPlusButtonAlignsTitle = @"CYLPlusButtonAlignsTitle";
+NSString *const CYLPlusButtonKeepsTitleVisible = @"CYLPlusButtonKeepsTitleVisible";
+NSString *const CYLTabBarControllerUserInterfaceStyle = @"CYLTabBarControllerUserInterfaceStyle";
+NSString *const CYLTabBarControllerTabButtonTapAnimation = @"CYLTabBarControllerTabButtonTapAnimation";
+NSString *const CYLTabBarControllerSwipeToSwitchTab = @"CYLTabBarControllerSwipeToSwitchTab";
 NSString *const CYLTabBarControllerThemes = @"CYLTabBarControllerThemes";
 NSString *const CYLTabBarControllerThemeIdentifier = @"CYLTabBarControllerThemeIdentifier";
 NSString *const CYLTabBarControllerDarkThemeIdentifier = @"CYLTabBarControllerDarkThemeIdentifier";
@@ -2145,6 +2158,31 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
     UIOffset titlePositionAdjustment = titlePositionAdjustmentValue ? titlePositionAdjustmentValue.UIOffsetValue : UIOffsetZero;
     CYLTabBarStyleType styleType = (CYLTabBarStyleType)[normalized[CYLTabBarControllerStyleType] integerValue];
     NSString *context = normalized[CYLTabBarControllerContext];
+    // [EN] Before the tab bar is made: it looks up the plus button of its context. [CN] 在创建 TabBar 之前：TabBar 会查找其 context 的 PlusButton。
+    if (normalized[CYLTabBarControllerPlusButton]) {
+        NSMutableDictionary *plusButtonAttributes = [normalized[CYLTabBarControllerPlusButton] mutableCopy];
+        // [EN] A page of its own (`CYLTabBarItemPageIdentifier`), found like a tab's page; it needs a place among the tabs,
+        //      the middle when none is given. [CN] 自己的页面（`CYLTabBarItemPageIdentifier`），按 Tab 页面的方式查找；它需要在各 Tab 中的位置，
+        //      未给出时居中。
+        NSString *plusPageIdentifier = plusButtonAttributes[CYLTabBarItemPageIdentifier];
+        if ([plusPageIdentifier isKindOfClass:[NSString class]] && plusPageIdentifier.length > 0) {
+            NSArray<UIViewController *> *pages = [CYLTabBarPageRegistry pagesOfTabs:@[ @{ CYLTabBarItemPageIdentifier : plusPageIdentifier } ]
+                                                                           registry:[normalized[CYLTabBarControllerPageRegistry] conformsToProtocol:@protocol(CYLTabBarPageProviding)] ? normalized[CYLTabBarControllerPageRegistry] : nil
+                                                                           resolver:normalized[CYLTabBarControllerPageResolver]
+                                                                        lookupOrder:CYLPageLookupOrderOfConfiguration(normalized)
+                                                                           keptTabs:nil
+                                                                            skipped:nil];
+            if (pages.firstObject) {
+                plusButtonAttributes[CYLConfigurationPlusButtonPageKey] = pages.firstObject;
+                if (!plusButtonAttributes[CYLPlusButtonIndexInTabBar]) {
+                    plusButtonAttributes[CYLPlusButtonIndexInTabBar] = @(tabBarItemsAttributes.count / 2);
+                }
+            }
+        }
+        [CYLPlusButton cyl_registerPlusButtonWithAttributes:plusButtonAttributes
+                                                      action:normalized[CYLTabBarControllerPlusButtonAction]
+                                                     context:context];
+    }
     if (self = [super init]) {
         _imageInsets = imageInsets;
         _titlePositionAdjustment = titlePositionAdjustment;
@@ -2208,6 +2246,22 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
         if (animationSpeed) {
             // [EN] Validated by the normalizer (B28). [CN] 已由规范化检查（B28）。
             self.tabBarItemAnimationSpeed = animationSpeed.doubleValue;
+        }
+        // [EN] Appearance and interactions of the configuration, validated by the normalizer.
+        // [CN] 配置中的外观与交互，已由规范化检查。
+        NSNumber *userInterfaceStyle = normalized[CYLTabBarControllerUserInterfaceStyle];
+        if (userInterfaceStyle) {
+            if (@available(iOS 13.0, *)) {
+                self.overrideUserInterfaceStyle = (UIUserInterfaceStyle)userInterfaceStyle.integerValue;
+            }
+        }
+        NSNumber *tapAnimation = normalized[CYLTabBarControllerTabButtonTapAnimation];
+        if (tapAnimation) {
+            self.cyl_tabButtonTapAnimationType = (CYLTabButtonTapAnimationType)tapAnimation.integerValue;
+        }
+        NSNumber *swipeToSwitchTab = normalized[CYLTabBarControllerSwipeToSwitchTab];
+        if (swipeToSwitchTab) {
+            self.cyl_swipeToSwitchTabEnabled = swipeToSwitchTab.boolValue;
         }
         // [EN] Skins of the configuration (`CYLTabBarControllerThemes`): registered with the theme manager, the first one applied.
         // [CN] 配置中的皮肤（`CYLTabBarControllerThemes`）：注册到主题管理器，并应用首个皮肤。
@@ -5167,6 +5221,18 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 - (void)cyl_sendDidSelectControl:(UIControl *)control {
     [self cyl_playTabButtonAnimationForControl:control];
     [self cyl_playTabButtonTapFeedback];
+    // [EN] The plus button of a configuration (`CYLTabBarControllerPlusButtonAction`): its action, once per reported tap.
+    // [CN] 配置中的 PlusButton（`CYLTabBarControllerPlusButtonAction`）：每次上报的点击执行一次其回调。
+    if (control.cyl_isPlusControl) {
+        CYLPlusButton *plusButton = [CYLPlusButton plusButtonForTabBarContext:self.context];
+        SEL tapped = NSSelectorFromString(@"cyl_configurationPlusButtonTapped");
+        if ([plusButton respondsToSelector:tapped]) {
+            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+            (
+             [plusButton performSelector:tapped];
+             );
+        }
+    }
     SEL action = @selector(tabBarController:didSelectControl:);
     if ([self.delegate respondsToSelector:action]) {
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS

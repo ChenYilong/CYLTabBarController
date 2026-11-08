@@ -47,6 +47,9 @@ object TabConfigurationFormats {
         TabConfigurationFormat.PROPERTIES -> parseProperties(text)
     }
 
+    private const val ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD"
+    private const val ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema"
+
     // [EN] External entities and DTD loading are off (the iOS parser does the same, edge case A14). [CN] 关闭外部实体与 DTD 加载（iOS 解析器相同，边界情况 A14）。
     private fun parsePlist(text: String): Map<String, Any?> {
         val factory = DocumentBuilderFactory.newInstance().apply {
@@ -54,7 +57,11 @@ object TabConfigurationFormats {
             isExpandEntityReferences = false
             isXIncludeAware = false
             setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
-            for (attribute in listOf(XMLConstants.ACCESS_EXTERNAL_DTD, XMLConstants.ACCESS_EXTERNAL_SCHEMA)) {
+            // [EN] The values of XMLConstants.ACCESS_EXTERNAL_DTD / ACCESS_EXTERNAL_SCHEMA, written out: android.jar lacks those
+            //      constants, and the React Native and Flutter components compile these sources against it.
+            // [CN] 即 XMLConstants.ACCESS_EXTERNAL_DTD / ACCESS_EXTERNAL_SCHEMA 的值：android.jar 没有这两个常量，而 React Native 与
+            //      Flutter 组件会基于它编译这些源码。
+            for (attribute in listOf(ACCESS_EXTERNAL_DTD, ACCESS_EXTERNAL_SCHEMA)) {
                 try {
                     setAttribute(attribute, "")
                 } catch (ignored: IllegalArgumentException) {

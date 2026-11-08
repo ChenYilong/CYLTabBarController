@@ -102,6 +102,25 @@ public final class CYLConstants {
     public static final String CYLTabBarControllerPageLookupOrder = "CYLTabBarControllerPageLookupOrder";
     public static final String CYLTabBarControllerAutomaticPageRegistration = "CYLTabBarControllerAutomaticPageRegistration";
     public static final String CYLTabBarControllerTabBarItemAnimationSpeed = "CYLTabBarControllerTabBarItemAnimationSpeed";
+    // [EN] The plus button of a configuration (CYLConfigurationPlusButton): a map, and a code-only tap action.
+    // [CN] 配置中的 PlusButton（CYLConfigurationPlusButton）：一个 map，以及仅代码可用的点击回调。
+    public static final String CYLTabBarControllerPlusButton = "CYLTabBarControllerPlusButton";
+    public static final String CYLTabBarControllerPlusButtonAction = "CYLTabBarControllerPlusButtonAction";
+    // [EN] More keys of the plus button map: a background image with the title on it, its place, its vertical center, title
+    //      alignment, a title kept visible, and a page of its own (CYLTabBarItemPageIdentifier). Same names as iOS.
+    // [CN] PlusButton map 的更多键：标题画在其上的背景图、位置、垂直中心、标题对齐、保持显示标题，以及自己的页面（CYLTabBarItemPageIdentifier）。与 iOS 同名。
+    public static final String CYLPlusButtonBackgroundImage = "CYLPlusButtonBackgroundImage";
+    public static final String CYLPlusButtonIndexInTabBar = "CYLPlusButtonIndexInTabBar";
+    public static final String CYLPlusButtonCenterYMultiplier = "CYLPlusButtonCenterYMultiplier";
+    public static final String CYLPlusButtonCenterYOffset = "CYLPlusButtonCenterYOffset";
+    public static final String CYLPlusButtonAlignsTitle = "CYLPlusButtonAlignsTitle";
+    public static final String CYLPlusButtonKeepsTitleVisible = "CYLPlusButtonKeepsTitleVisible";
+    // [EN] Appearance and interactions: "light" / "dark" / "system" (iOS only: Android follows the system), a tap animation
+    //      name ("bounce"...), swiping on the tab bar to switch tabs.
+    // [CN] 外观与交互："light" / "dark" / "system"（仅 iOS：Android 跟随系统）、点击动画名称（"bounce" 等）、在 TabBar 上滑动切换 Tab。
+    public static final String CYLTabBarControllerUserInterfaceStyle = "CYLTabBarControllerUserInterfaceStyle";
+    public static final String CYLTabBarControllerTabButtonTapAnimation = "CYLTabBarControllerTabButtonTapAnimation";
+    public static final String CYLTabBarControllerSwipeToSwitchTab = "CYLTabBarControllerSwipeToSwitchTab";
     // [EN] Skins of a configuration (see CYLTabBarConfigurationTheme). [CN] 配置中的皮肤（见 CYLTabBarConfigurationTheme）。
     public static final String CYLTabBarControllerThemes = "CYLTabBarControllerThemes";
     public static final String CYLTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier";

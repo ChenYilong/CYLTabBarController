@@ -1,0 +1,71 @@
+ext.Cyltabbar = [
+  minSdkVersion: 24,
+  compileSdkVersion: 36
+]
+
+ext.getExtOrDefault = { prop ->
+  if (rootProject.ext.has(prop)) {
+    return rootProject.ext.get(prop)
+  }
+
+  return Cyltabbar[prop]
+}
+
+// [EN] Inside the CYLTabBarController repository, compile the local Android library sources (Example-Android/cyltabbar and
+//      tabpages), so a change there shows up in the React Native example without publishing. Elsewhere (installed from npm),
+//      use the published library io.github.chenyilong:cyltabbarcontroller.
+// [CN] 在 CYLTabBarController 仓库内，直接编译本地 Android 库源码（Example-Android/cyltabbar 与 tabpages），改动无需发布即可在
+//      React Native 示例中生效。在其他地方（从 npm 安装）使用已发布的 io.github.chenyilong:cyltabbarcontroller。
+def cylAndroidRoot = file(project.findProperty("cylAndroidRoot") ?: "${projectDir}/../../../Example-Android")
+def cylUseLocalSources = new File(cylAndroidRoot, "cyltabbar/src/main/kotlin").exists()
+def cylAndroidVersion = project.findProperty("cylAndroidVersion") ?: "1.100.0"
+
+apply plugin: "com.android.library"
+
+if (project.extensions.findByName("kotlin") == null) {
+  apply plugin: "kotlin-android"
+}
+
+
+apply plugin: "com.facebook.react"
+
+android {
+  // [EN] The library sources use com.cyl.tabbar.R. [CN] 库源码使用 com.cyl.tabbar.R。
+  namespace cylUseLocalSources ? "com.cyl.tabbar" : "com.cyltabbar"
+
+  compileSdkVersion getExtOrDefault("compileSdkVersion")
+
+  defaultConfig {
+    minSdkVersion getExtOrDefault("minSdkVersion")
+    // [EN] The library's sources are compiled here, not its module: its R8 rules (classes found by reflection, such as
+    //      libpag's PAGView) must come along, or a minified release build removes them and the tabs show their images.
+    // [CN] 这里编译的是库的源码而不是它的模块：必须一并带上库的 R8 规则（反射查找的类，如 libpag 的 PAGView），否则开启混淆的发布版会删除它们，
+    //      Tab 只显示图片。
+    if (cylUseLocalSources) {
+      consumerProguardFiles "${cylAndroidRoot}/cyltabbar/consumer-rules.pro"
+    }
+  }
+
+  if (cylUseLocalSources) {
+    sourceSets {
+      main {
+        java.srcDirs += [
+          "${cylAndroidRoot}/cyltabbar/src/main/java",
+          "${cylAndroidRoot}/cyltabbar/src/main/kotlin",
+          "${cylAndroidRoot}/tabpages/src/main/kotlin",
+        ]
+        res.srcDirs += ["${cylAndroidRoot}/cyltabbar/src/main/res"]
+      }
+    }
+  }
+}
+
+dependencies {
+  implementation "com.facebook.react:react-android"
+  if (cylUseLocalSources) {
+    implementation "androidx.appcompat:appcompat:1.7.0"
+    implementation "androidx.fragment:fragment-ktx:1.8.5"
+  } else {
+    implementation "io.github.chenyilong:cyltabbarcontroller:${cylAndroidVersion}"
+  }
+}

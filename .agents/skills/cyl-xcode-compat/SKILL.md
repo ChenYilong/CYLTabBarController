@@ -77,6 +77,11 @@ to 15.0 (FlatDesign's project level, `Example-Swift-04`'s app target).
 - No effective deployment target newer than the CI SDK: no `IPHONEOS_DEPLOYMENT_TARGET` of 27 or more, not even at the
   project level when a target overrides it.
 - Scheme files (`*.xcscheme`) may keep `version="1.7"`; Xcode 15 and later read it.
+- **Exception**: `CrossPlatform/flutter_cyltabbar/example*/ios/Runner.xcodeproj` (`example`, `example_pag`, `example_rive`) keeps `objectVersion = 54` (Xcode 12
+  format, no folder sync), because `flutter build` sets it back to 54 on every build; its `compatibilityVersion` is
+  still `"Xcode 3.2"`. `example` uses Swift Package Manager (`XCLocalSwiftPackageReference` to Flutter's generated package),
+  which Flutter adds; `example_pag` and `example_rive` use CocoaPods. The React Native examples (`CrossPlatform/react-native-cyltabbar/example*/ios`) follow the rule
+  (46), with React Native's minimum deployment target, 15.1 (15.4 for `example-rive`).
 
 **Check it** (each line must print `46` and `"Xcode 3.2"` and nothing else):
 

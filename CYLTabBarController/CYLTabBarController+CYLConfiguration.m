@@ -506,6 +506,102 @@ static NSNumber *_Nullable CYLAnimationSpeedValue(id value) {
     return (number && isfinite(speed) && speed > 0) ? number : nil;
 }
 
+static UIColor *_Nullable CYLColorValue(id value);
+static UIFont *_Nullable CYLFontValue(id value);
+static NSNumber *_Nullable CYLBoolValue(id value);
+
+/// [EN] `CYLTabBarControllerPlusButton`: the title, image and selected title color as the plus button needs them; nil when
+///      it is not a dictionary. [CN] `CYLTabBarControllerPlusButton`：按 PlusButton 需要转换标题、图片与选中标题颜色；不是字典时为 nil。
+static NSDictionary<NSString *, id> *_Nullable CYLPlusButtonAttributesValue(id value) {
+    if (![value isKindOfClass:[NSDictionary class]]) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerPlusButton, value);
+        return nil;
+    }
+    NSMutableDictionary<NSString *, id> *attributes = [NSMutableDictionary dictionary];
+    for (NSString *key in @[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle ]) {
+        id title = value[key];
+        if ([title isKindOfClass:[NSString class]] || [title isKindOfClass:[NSNumber class]]) {
+            attributes[key] = [title description];
+        }
+    }
+    id image = CYLImageValue(value[CYLTabBarItemImage]);
+    if ([image isKindOfClass:[UIImage class]]) {
+        attributes[CYLTabBarItemImage] = image;
+    } else if ([image isKindOfClass:[NSString class]] && [UIImage imageNamed:image]) {
+        attributes[CYLTabBarItemImage] = [UIImage imageNamed:image];
+    } else if ([image isKindOfClass:[NSString class]] && [image isAbsolutePath] && [UIImage imageWithContentsOfFile:image]) {
+        attributes[CYLTabBarItemImage] = [UIImage imageWithContentsOfFile:image];
+    }
+    UIColor *selectedTitleColor = CYLColorValue(value[CYLTabBarItemSelectedTitleColor]);
+    if (selectedTitleColor) {
+        attributes[CYLTabBarItemSelectedTitleColor] = selectedTitleColor;
+    }
+    UIColor *titleColor = CYLColorValue(value[CYLTabBarItemTitleColor]);
+    if (titleColor) {
+        attributes[CYLTabBarItemTitleColor] = titleColor;
+    }
+    UIFont *font = CYLFontValue(value[CYLTabBarItemTitleFont]);
+    if (font) {
+        attributes[CYLTabBarItemTitleFont] = font;
+    }
+    id backgroundImage = CYLImageValue(value[CYLPlusButtonBackgroundImage]);
+    if ([backgroundImage isKindOfClass:[NSString class]]) {
+        backgroundImage = [UIImage imageNamed:backgroundImage] ?: ([backgroundImage isAbsolutePath] ? [UIImage imageWithContentsOfFile:backgroundImage] : nil);
+    }
+    if ([backgroundImage isKindOfClass:[UIImage class]]) {
+        attributes[CYLPlusButtonBackgroundImage] = backgroundImage;
+    }
+    // [EN] Numbers: a position and a vertical center. [CN] 数字：位置与垂直中心。
+    for (NSString *key in @[ CYLPlusButtonIndexInTabBar, CYLPlusButtonCenterYMultiplier, CYLPlusButtonCenterYOffset ]) {
+        id number = value[key];
+        if ([number isKindOfClass:[NSString class]]) {
+            number = @([number doubleValue]);
+        }
+        if ([number isKindOfClass:[NSNumber class]] && isfinite([number doubleValue]) && !([key isEqualToString:CYLPlusButtonIndexInTabBar] && [number doubleValue] < 0)) {
+            attributes[key] = number;
+        } else if (value[key]) {
+            CYLLogInvalidConfigurationValue(key, value[key]);
+        }
+    }
+    for (NSString *key in @[ CYLPlusButtonAlignsTitle, CYLPlusButtonKeepsTitleVisible ]) {
+        NSNumber *flag = value[key] ? CYLBoolValue(value[key]) : nil;
+        if (flag) {
+            attributes[key] = flag;
+        }
+    }
+    for (NSString *key in @[ CYLTabBarItemIdentifier, CYLTabBarItemPageIdentifier ]) {
+        if ([value[key] isKindOfClass:[NSString class]] && [value[key] length] > 0) {
+            attributes[key] = value[key];
+        }
+    }
+    return attributes;
+}
+
+/// [EN] "light", "dark", "system" → UIUserInterfaceStyle. [CN] "light"、"dark"、"system" → UIUserInterfaceStyle。
+static NSNumber *_Nullable CYLUserInterfaceStyleValue(id value) {
+    NSDictionary<NSString *, NSNumber *> *names = @{ @"system" : @0, @"unspecified" : @0, @"light" : @1, @"dark" : @2 };
+    if ([value isKindOfClass:[NSString class]]) {
+        return names[[value lowercaseString]];
+    }
+    if ([value isKindOfClass:[NSNumber class]] && [value integerValue] >= 0 && [value integerValue] <= 2) {
+        return value;
+    }
+    return nil;
+}
+
+/// [EN] A tap animation name → CYLTabButtonTapAnimationType. [CN] 点击动画名称 → CYLTabButtonTapAnimationType。
+static NSNumber *_Nullable CYLTapAnimationValue(id value) {
+    NSArray<NSString *> *names = @[ @"none", @"scale", @"zoomin", @"bounce", @"bouncewithfireworks", @"rotation", @"flip", @"fume" ];
+    if ([value isKindOfClass:[NSString class]]) {
+        NSUInteger index = [names indexOfObject:[value lowercaseString]];
+        return index == NSNotFound ? nil : @(index);
+    }
+    if ([value isKindOfClass:[NSNumber class]] && [value integerValue] >= 0 && [value integerValue] < (NSInteger)names.count) {
+        return value;
+    }
+    return nil;
+}
+
 /// [EN] Every key the library reads. [CN] 本库读取的所有键。
 static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
     return @[ CYLTabBarControllerViewControllers, CYLTabBarControllerTabBarItemsAttributes, CYLTabBarControllerImageInsets,
@@ -513,7 +609,8 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
               CYLTabBarControllerPageRegistry, CYLTabBarControllerPageResolver, CYLTabBarControllerPageLookupOrder,
               CYLTabBarControllerAutomaticPageRegistration, CYLTabBarControllerTabBarItemAnimationSpeed,
               CYLTabBarControllerThemes, CYLTabBarControllerThemeIdentifier, CYLTabBarControllerDarkThemeIdentifier,
-              CYLTabBarControllerThemeManagerName ];
+              CYLTabBarControllerThemeManagerName, CYLTabBarControllerPlusButton, CYLTabBarControllerPlusButtonAction,
+              CYLTabBarControllerUserInterfaceStyle, CYLTabBarControllerTabButtonTapAnimation, CYLTabBarControllerSwipeToSwitchTab ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -1420,6 +1517,34 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
             CYLLogInvalidConfigurationValue(CYLTabBarControllerTabBarItemAnimationSpeed, normalized[CYLTabBarControllerTabBarItemAnimationSpeed]);
         }
         normalized[CYLTabBarControllerTabBarItemAnimationSpeed] = speed;
+    }
+    if (normalized[CYLTabBarControllerPlusButton]) {
+        normalized[CYLTabBarControllerPlusButton] = CYLPlusButtonAttributesValue(normalized[CYLTabBarControllerPlusButton]);
+    }
+    if (normalized[CYLTabBarControllerUserInterfaceStyle]) {
+        NSNumber *style = CYLUserInterfaceStyleValue(normalized[CYLTabBarControllerUserInterfaceStyle]);
+        if (!style) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerUserInterfaceStyle, normalized[CYLTabBarControllerUserInterfaceStyle]);
+        }
+        normalized[CYLTabBarControllerUserInterfaceStyle] = style;
+    }
+    if (normalized[CYLTabBarControllerTabButtonTapAnimation]) {
+        NSNumber *animation = CYLTapAnimationValue(normalized[CYLTabBarControllerTabButtonTapAnimation]);
+        if (!animation) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerTabButtonTapAnimation, normalized[CYLTabBarControllerTabButtonTapAnimation]);
+        }
+        normalized[CYLTabBarControllerTabButtonTapAnimation] = animation;
+    }
+    if (normalized[CYLTabBarControllerSwipeToSwitchTab]) {
+        NSNumber *swipe = CYLBoolValue(normalized[CYLTabBarControllerSwipeToSwitchTab]);
+        if (!swipe) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerSwipeToSwitchTab, normalized[CYLTabBarControllerSwipeToSwitchTab]);
+        }
+        normalized[CYLTabBarControllerSwipeToSwitchTab] = swipe;
+    }
+    if (normalized[CYLTabBarControllerPlusButtonAction] && !(blockClass && [normalized[CYLTabBarControllerPlusButtonAction] isKindOfClass:blockClass])) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerPlusButtonAction, normalized[CYLTabBarControllerPlusButtonAction]);
+        [normalized removeObjectForKey:CYLTabBarControllerPlusButtonAction];
     }
     if (normalized[CYLTabBarControllerAutomaticPageRegistration]) {
         NSNumber *automatic = CYLBoolValue(normalized[CYLTabBarControllerAutomaticPageRegistration]);
