@@ -108,3 +108,6 @@ Example-loadTabBarIconsFroNework/
 
 # Python bytecode of the scripts 脚本的 Python 字节码
 __pycache__/
+
+# macOS AppleDouble metadata written on external volumes: never commit
+._*

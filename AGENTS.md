@@ -104,6 +104,19 @@ Every new feature and user-visible change ships with bilingual documentation in 
 
 ## Git and pull requests
 
+- **Never commit `._*` files.** macOS writes these AppleDouble metadata files next to every file on an external volume
+  (e.g. `._.claude`, `._.git`, `._.github`, `._.gitignore`, `._.pullapprove.yml`, `._ChatKit`). `.gitignore` excludes
+  `._*`. Before git commands, delete them, including the ones in `.git/objects` (`._pack-*.idx` makes git report
+  `non-monotonic index`):
+
+  ```sh
+  find . -name '._*' -not -path './.git/*' -delete
+  find .git/objects -type f -name '._*' -delete
+  git fsck --full
+  ```
+
+  Some were committed anyway: take them out of the repository with `git rm --cached` in a new commit; an unpushed commit
+  that holds only them is undone instead. Rewriting pushed history needs a force push: ask first.
 - Branch from the latest `master` for each issue or feature.
 - Commit messages are in English, Conventional Commits as configured for commitizen in `package.json`
   (`feat: ✨ …`, `fix: 🐛 …`, `docs: 📝 …`).
