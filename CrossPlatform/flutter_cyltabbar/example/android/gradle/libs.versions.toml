@@ -1,0 +1,7 @@
+# [EN] Versions of the example's own Android dependencies (Gradle reads this file by default).
+# [CN] 示例自身 Android 依赖的版本（Gradle 默认读取此文件）。
+[versions]
+lottie = "6.6.2"
+
+[libraries]
+lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }

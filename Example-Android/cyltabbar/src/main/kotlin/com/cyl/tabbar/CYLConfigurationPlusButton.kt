@@ -1,3 +1,7 @@
+// [EN] `cyl_registerPlusButtonWithAttributes` keeps the iOS method name and the project's `cyl_` prefix (AGENTS.md).
+// [CN] `cyl_registerPlusButtonWithAttributes` 保留 iOS 方法名与项目的 `cyl_` 前缀（见 AGENTS.md）。
+@file:Suppress("FunctionName", "kotlin:S100")
+
 package com.cyl.tabbar
 
 import android.content.Context

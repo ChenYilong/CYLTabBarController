@@ -5,7 +5,7 @@
  * Objective-C 示例的演示列表，每个 Tab 都显示。行数据来自 Example-Shared/CYLDemoList/demo-list.json（由 scripts/sync-example-shared.py
  * 复制到这里）；`values` 填入「{name}」部分，`onRow` 处理点击。
  */
-import { Image, Platform, Pressable, SectionList, StyleSheet, Switch, Text, View, type ImageSourcePropType } from 'react-native';
+import { Image, Pressable, SectionList, StyleSheet, Switch, Text, View, type ImageSourcePropType } from 'react-native';
 import { CYLBadgeView, type CYLBadgeSample } from './CYLBadgeView';
 import { DEMO_ICONS } from './icons';
 import { SKINS, THEME_ICONS, type CYLSkin } from '../CYLSkins';
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   swatch: { width: 24, height: 24, borderRadius: 12, marginRight: 16, alignItems: 'center', justifyContent: 'center' },
   swatchGlyph: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
   texts: { flex: 1 },
-  title: { fontSize: 17, fontWeight: Platform.OS === 'ios' ? '500' : '500' },
+  title: { fontSize: 17, fontWeight: '500' },
   subtitle: { fontSize: 13, marginTop: 2 },
   chevron: { width: 9, height: 14, marginLeft: 8 },
   check: { fontSize: 17, fontWeight: '600', marginLeft: 8 },

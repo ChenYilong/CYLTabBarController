@@ -387,9 +387,9 @@ object CYLThemeValues {
 
     private val builtInHandlers: Map<String, CYLThemeRuleHandler> = mapOf(
         CYLThemeValueBuilder.BACKGROUND to CYLThemeRuleHandler { view, _, value ->
-            val background = view.background
+            val gradient = view.background as? GradientDrawable
             val color = (value.raw as? Int) ?: (value.raw as? CYLThemeColor)?.cyl_rawColor
-            if (color != null && background is GradientDrawable) background.setColor(color) else setBackgroundKeepingPadding(view, value.drawable)
+            if (gradient == null || color == null) setBackgroundKeepingPadding(view, value.drawable) else gradient.setColor(color)
         },
         CYLThemeValueBuilder.BG_TINT_COLOR to CYLThemeRuleHandler { view, _, value -> view.backgroundTintList = value.colorStateList },
         CYLThemeValueBuilder.TEXT_COLOR to CYLThemeRuleHandler { view, _, value -> value.colorStateList?.let { (view as? TextView)?.setTextColor(it) } },

@@ -47,8 +47,9 @@ object TabConfigurationFormats {
         TabConfigurationFormat.PROPERTIES -> parseProperties(text)
     }
 
-    private const val ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD"
-    private const val ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema"
+    // [EN] JAXP property names (identifiers, not URLs that are fetched). [CN] JAXP 属性名（是标识符，不是会被访问的 URL）。
+    private const val ACCESS_EXTERNAL_DTD = XMLConstants.ACCESS_EXTERNAL_DTD
+    private const val ACCESS_EXTERNAL_SCHEMA = XMLConstants.ACCESS_EXTERNAL_SCHEMA
 
     // [EN] External entities and DTD loading are off (the iOS parser does the same, edge case A14). [CN] 关闭外部实体与 DTD 加载（iOS 解析器相同，边界情况 A14）。
     private fun parsePlist(text: String): Map<String, Any?> {

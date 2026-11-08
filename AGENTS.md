@@ -204,6 +204,10 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
 
   Some were committed anyway: take them out of the repository with `git rm --cached` in a new commit; an unpushed commit
   that holds only them is undone instead. Rewriting pushed history needs a force push: ask first.
+- **Never commit `*.lock` files** (`Podfile.lock`, `yarn.lock`, `pubspec.lock`, `Gemfile.lock`): `.gitignore` excludes
+  `*.lock`. Gradle's `gradle.lockfile` (and `settings-gradle.lockfile`) does not end in `.lock` and stays committed.
+  SonarCloud's "lock file is missing" rules for `*.lock` files (`text:S8568` Gemfile, `text:S8571` pubspec, and the
+  like) are therefore switched off in `.sonarcloud.properties`, not fixed by committing a lock file.
 - **Push over SSH first**: `git push origin <branch>` (`origin` is `git@github.com:ChenYilong/CYLTabBarController.git`).
   Use HTTPS with the `gh` credential helper only when SSH fails: its token has no `workflow` scope, so GitHub rejects
   any push that changes `.github/workflows/*` ("refusing to allow an OAuth App to create or update workflow").

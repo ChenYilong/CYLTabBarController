@@ -43,6 +43,10 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // [EN] R8 shrinks and obfuscates the release build (Flutter adds its rules and this folder's proguard-rules.pro).
+            // [CN] R8 压缩并混淆 release 包（Flutter 会加入自己的规则与本目录的 proguard-rules.pro）。
+            isMinifyEnabled = true
+            isShrinkResources = true
         }
     }
 }
@@ -59,5 +63,5 @@ flutter {
 
 dependencies {
     // [EN] The Lottie tab icons (the library plays them when lottie-android is present). [CN] Lottie Tab 图标（引入 lottie-android 时库会播放）。
-    implementation("com.airbnb.android:lottie:6.6.2")
+    implementation(libs.lottie)
 }
