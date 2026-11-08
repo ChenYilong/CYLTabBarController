@@ -304,13 +304,15 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         set(value) {
             if (value < 0 || value >= viewControllers.size) return
             val previous = field
+            // [EN] Back from the plus button's page to the same tab: its animation plays again. [CN] 从 PlusButton 页面回到同一个 Tab：其动画再次播放。
+            val fromPlusPage = tabBar.plusButtonActive
             field = value
             tabBar.plusButtonActive = false
             showSelectedPage()
             tabBar.refreshSelection()
             // [EN] Another tab: a bar hidden by scrolling comes back (issue #13, as on iOS). [CN] 切换到其他 Tab：滚动隐藏的 TabBar 恢复显示（issue #13，与 iOS 一致）。
             if (previous != value) cyl_restoreTabBarHiddenByScroll()
-            if (previous != value) cyl_playSelectedTabBarItemAnimation(defaultSelected = false)
+            if (previous != value || fromPlusPage) cyl_playSelectedTabBarItemAnimation(defaultSelected = false)
             if (previous != value && !revertingTransition) runTransition(previous, value)
         }
 
@@ -405,7 +407,22 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         titlePositionAdjustment = (normalized[CYLConstants.CYLTabBarControllerTitlePositionAdjustment] as? CYLOffset) ?: CYLTabBarConfiguration.offsetValue(normalized[CYLConstants.CYLTabBarControllerTitlePositionAdjustment]) ?: CYLOffset.zero
         tabBarStyleType = (normalized[CYLConstants.CYLTabBarControllerStyleType] as? CYLEnums.CYLTabBarStyleType) ?: CYLEnums.CYLTabBarStyleType.Default
         context = normalized[CYLConstants.CYLTabBarControllerContext] as? String
+        // [EN] Before the tabs are set: the tab bar looks up the plus button of its context. [CN] 在设置 Tab 之前：TabBar 会查找其 context 的 PlusButton。
+        // [EN] A plus button page (`CYLTabBarItemPageIdentifier`) is found like a tab's page. [CN] PlusButton 的页面按 Tab 页面的方式查找。
+        CYLConfigurationPlusButton.registerIfNeeded(activity, normalized, context, items.size) { identifier ->
+            CYLTabBarPageRegistry.pagesOfTabs(listOf(mapOf(CYLConstants.CYLTabBarItemPageIdentifier to identifier)), cyl_pageRegistry, cyl_pageResolver,
+                cyl_pageLookupOrder, ArrayList(), ArrayList()).firstOrNull()
+        }
         (normalized[CYLConstants.CYLTabBarControllerTabBarItemAnimationSpeed]?.toString()?.toFloatOrNull())?.takeIf { it > 0 && it.isFinite() }?.let { tabBarItemAnimationSpeed = it }
+        // [EN] Interactions of the configuration; `CYLTabBarControllerUserInterfaceStyle` is iOS only (Android follows the system).
+        // [CN] 配置中的交互；`CYLTabBarControllerUserInterfaceStyle` 仅用于 iOS（Android 跟随系统）。
+        CYLTabBarConfiguration.tapAnimationValue(normalized[CYLConstants.CYLTabBarControllerTabButtonTapAnimation])?.let { cyl_tabButtonTapAnimationType = it }
+        CYLTabBarConfiguration.boolValue(normalized[CYLConstants.CYLTabBarControllerSwipeToSwitchTab])?.let { cyl_swipeToSwitchTabEnabled = it }
+        // [EN] Tabs that need login: a list of strings, or a comma-separated string (as iOS). [CN] 需要登录的 Tab：字符串列表或逗号分隔的字符串（与 iOS 相同）。
+        when (val loginRequired = normalized[CYLConstants.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers]) {
+            is String -> cyl_loginRequiredTabBarItemIdentifiers = loginRequired.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+            is List<*> -> cyl_loginRequiredTabBarItemIdentifiers = loginRequired.mapNotNull { (it as? String)?.trim()?.takeIf { identifier -> identifier.isNotEmpty() } }
+        }
         setViewControllers(pages, items)
         cyl_adoptPendingPages()
         (normalized[CYLConfigurationThemes.INFO_KEY] as? CYLConfigurationThemes.Info)?.let { cyl_applyConfigurationThemes(it) }
@@ -423,7 +440,10 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         info.managerName?.let { cyl_themeManager = CYLThemeManagerCenter.themeManagerWithName(it) }
         val manager = cyl_themeManager
         for (theme in info.themes) manager.addThemeIdentifier(theme.identifier, theme)
-        val current = manager.currentThemeIdentifier
+        // [EN] A skin of an earlier configuration that this one does not have is not a choice to keep (as iOS).
+        // [CN] 之前配置中的皮肤、而本配置中没有，不属于需要保留的选择（与 iOS 相同）。
+        val stale = manager.currentTheme is CYLTabBarConfigurationTheme && info.themes.none { it.identifier == manager.currentThemeIdentifier }
+        val current = manager.currentThemeIdentifier.takeUnless { stale }
         if (current == null) manager.currentThemeIdentifier = info.initial
         val keepsChoice = current != null && current != info.base && current != info.dark
         val dark = info.dark
@@ -661,6 +681,12 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             plusButton.cyl_plusViewControllerEverAdded = true
             tabBar.plusButtonActive = true
             tabBar.refreshSelection()
+            // [EN] The tab selected before goes back to its unselected look, its animation too, as on iOS, where the system
+            //      deselects the tab when the plus button's page is selected. Before, its animation kept the selected frame
+            //      until another tab was selected.
+            // [CN] 之前选中的 Tab 恢复未选中外观（包括其动画），与 iOS 相同：选中 PlusButton 的页面时系统会取消该 Tab 的选中。此前其动画一直停在选中帧，
+            //      直到选中另一个 Tab。
+            cyl_playSelectedTabBarItemAnimation(defaultSelected = false)
             delegate?.tabBarController_didSelectViewController(this, child)
         }
         cyl_playTabButtonAnimationForControl(plusButton)
@@ -868,9 +894,24 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     // MARK: - CYLLogin (#19) 登录
 
-    /** [EN] Whether the user is logged in: `cyl_loginStateProvider` when set, else the cached value. [CN] 用户是否已登录：设置了 `cyl_loginStateProvider` 时用它，否则为缓存值。 */
-    var cyl_loggedIn: Boolean = false
-        get() = cyl_loginStateProvider?.invoke() ?: field
+    /**
+     * [EN] Whether the user is logged in: `cyl_loginStateProvider` when set, else the cached value. As iOS (NSUserDefaults), the
+     *      cached value is kept across launches, in the app's SharedPreferences.
+     * [CN] 用户是否已登录：设置了 `cyl_loginStateProvider` 时用它，否则为缓存值。与 iOS（NSUserDefaults）相同，缓存值保存在 App 的 SharedPreferences 中，重启后保留。
+     */
+    var cyl_loggedIn: Boolean
+        get() = cyl_loginStateProvider?.invoke() ?: loginPreferences().getBoolean(LOGGED_IN_KEY, false)
+        set(value) {
+            loginPreferences().edit().putBoolean(LOGGED_IN_KEY, value).apply()
+            // [EN] As iOS: logging out while a tab that needs login is selected selects the first tab that does not.
+            // [CN] 与 iOS 相同：选中需要登录的 Tab 时退出登录，会选中第一个不需要登录的 Tab。
+            if (value) return
+            fun requiresLogin(page: Fragment) = delegate?.tabBarController_requiresLoginToSelectViewController(this, page) ?: cyl_isLoginRequiredForViewController(page)
+            val selected = viewControllers.getOrNull(selectedIndex) ?: return
+            if (!requiresLogin(selected)) return
+            viewControllers.indexOfFirst { !requiresLogin(it) }.takeIf { it >= 0 }?.let { selectedIndex = it }
+        }
+    private fun loginPreferences() = activity.getSharedPreferences(LOGIN_PREFERENCES, android.content.Context.MODE_PRIVATE)
     /** [EN] `cyl_loginStateProvider`: your app's own login state. [CN] App 自己的登录状态。 */
     var cyl_loginStateProvider: (() -> Boolean)? = null
     /** [EN] `cyl_loginHandler`: shows the login screen, then calls the completion with the result (`cyl_presentLoginBlock`). [CN] 展示登录界面，然后用结果调用 completion（即 `cyl_presentLoginBlock`）。 */
@@ -1307,6 +1348,9 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         internal fun cyl_liveTabBarControllers(): List<CYLTabBarController> = synchronized(active) { active.entries.sortedBy { it.value }.map { it.key } }
 
         /** [EN] `+cyl_tabBarControllerForContext:`: the most recent live controller of that context. [CN] 该 context 最近创建且仍存活的控制器。 */
+        /** [EN] Where the login state is cached; the key is the iOS NSUserDefaults key. [CN] 登录状态的缓存位置；键与 iOS 的 NSUserDefaults 键相同。 */
+        private const val LOGIN_PREFERENCES = "CYLTabBarController"
+        private const val LOGGED_IN_KEY = "CYLTabBarControllerLoggedIn"
         @JvmStatic fun cyl_tabBarControllerForContext(context: String?): CYLTabBarController? = synchronized(active) {
             active.entries.filter { (it.key.context ?: CYLPlusButton.DEFAULT_TAB_BAR_CONTEXT) == (context ?: CYLPlusButton.DEFAULT_TAB_BAR_CONTEXT) }.maxByOrNull { it.value }?.key
         }

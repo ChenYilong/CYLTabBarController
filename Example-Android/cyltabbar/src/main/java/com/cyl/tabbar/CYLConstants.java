@@ -102,6 +102,37 @@ public final class CYLConstants {
     public static final String CYLTabBarControllerPageLookupOrder = "CYLTabBarControllerPageLookupOrder";
     public static final String CYLTabBarControllerAutomaticPageRegistration = "CYLTabBarControllerAutomaticPageRegistration";
     public static final String CYLTabBarControllerTabBarItemAnimationSpeed = "CYLTabBarControllerTabBarItemAnimationSpeed";
+    // [EN] The plus button of a configuration (CYLConfigurationPlusButton): a map, and a code-only tap action.
+    // [CN] 配置中的 PlusButton（CYLConfigurationPlusButton）：一个 map，以及仅代码可用的点击回调。
+    public static final String CYLTabBarControllerPlusButton = "CYLTabBarControllerPlusButton";
+    public static final String CYLTabBarControllerPlusButtonAction = "CYLTabBarControllerPlusButtonAction";
+    // [EN] More keys of the plus button map: a background image with the title on it, its place, its vertical center, title
+    //      alignment, a title kept visible, and a page of its own (CYLTabBarItemPageIdentifier). Same names as iOS.
+    // [CN] PlusButton map 的更多键：标题画在其上的背景图、位置、垂直中心、标题对齐、保持显示标题，以及自己的页面（CYLTabBarItemPageIdentifier）。与 iOS 同名。
+    public static final String CYLPlusButtonBackgroundImage = "CYLPlusButtonBackgroundImage";
+    public static final String CYLPlusButtonIndexInTabBar = "CYLPlusButtonIndexInTabBar";
+    public static final String CYLPlusButtonCenterYMultiplier = "CYLPlusButtonCenterYMultiplier";
+    public static final String CYLPlusButtonCenterYOffset = "CYLPlusButtonCenterYOffset";
+    public static final String CYLPlusButtonAlignsTitle = "CYLPlusButtonAlignsTitle";
+    public static final String CYLPlusButtonKeepsTitleVisible = "CYLPlusButtonKeepsTitleVisible";
+    /**
+     * [EN] iOS Liquid Glass: shows the selection under the plus button while its own page is selected. Android always shows
+     *      it, so the key is read only on iOS; same name for one configuration on both.
+     * [CN] iOS 液态玻璃：选中 PlusButton 自己的页面时，在其下方显示选中效果。Android 总是显示，因此只有 iOS 读取该键；同名以便两端共用一份配置。
+     */
+    public static final String CYLPlusButtonShowsSelection = "CYLPlusButtonShowsSelection";
+    /** [EN] The plus button's size in dp ("{55, 80}" or [55, 80]), as a subclass sets it. [CN] PlusButton 的尺寸（dp，"{55, 80}" 或 [55, 80]），与子类设置的相同。 */
+    public static final String CYLPlusButtonSize = "CYLPlusButtonSize";
+    /** [EN] The size (dp) the plus button's images are drawn at, aspect fit. [CN] PlusButton 图片的绘制尺寸（dp），等比缩放。 */
+    public static final String CYLPlusButtonImageSize = "CYLPlusButtonImageSize";
+    // [EN] Appearance and interactions: "light" / "dark" / "system" (iOS only: Android follows the system), a tap animation
+    //      name ("bounce"...), swiping on the tab bar to switch tabs.
+    // [CN] 外观与交互："light" / "dark" / "system"（仅 iOS：Android 跟随系统）、点击动画名称（"bounce" 等）、在 TabBar 上滑动切换 Tab。
+    public static final String CYLTabBarControllerUserInterfaceStyle = "CYLTabBarControllerUserInterfaceStyle";
+    public static final String CYLTabBarControllerTabButtonTapAnimation = "CYLTabBarControllerTabButtonTapAnimation";
+    public static final String CYLTabBarControllerSwipeToSwitchTab = "CYLTabBarControllerSwipeToSwitchTab";
+    /** [EN] The identifiers of the tabs that need login (`cyl_loginRequiredTabBarItemIdentifiers`, #19). [CN] 需要登录的 Tab 的标识（#19）。 */
+    public static final String CYLTabBarControllerLoginRequiredTabBarItemIdentifiers = "CYLTabBarControllerLoginRequiredTabBarItemIdentifiers";
     // [EN] Skins of a configuration (see CYLTabBarConfigurationTheme). [CN] 配置中的皮肤（见 CYLTabBarConfigurationTheme）。
     public static final String CYLTabBarControllerThemes = "CYLTabBarControllerThemes";
     public static final String CYLTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier";

@@ -1,5 +1,8 @@
 # Uncomment the next line to define a global platform for your project
 platform :ios, '15.0'
+
+ENV['SWIFT_VERSION'] = '5'
+
 project 'HealthyHome.xcodeproj'
 #source 'https://github.com/CocoaPods/Specs.git'
 
@@ -15,7 +18,9 @@ target 'HealthyHome' do
   pod 'CYLTabBarController/PAG', :path => '../'
   # libpag 4.5.101, not on CocoaPods trunk yet: pinned to the commit that ships it, as the official pag-ios does.
   # libpag 4.5.101 尚未发布到 CocoaPods trunk：固定到官方 pag-ios 中包含它的 commit。
-  pod 'libpag', :git => 'https://github.com/libpag/pag-ios.git', :commit => '12613de91b049b3d8afc0c09ae1bb48df6a6acec'
+  # [EN] Third-party code: its warnings (OpenGL deprecated since iOS 12 in PAGSurface.h) are not ours to fix.
+  # [CN] 第三方代码：其警告（PAGSurface.h 中自 iOS 12 起弃用的 OpenGL）不由本库修复。
+  pod 'libpag', :git => 'https://github.com/libpag/pag-ios.git', :commit => '12613de91b049b3d8afc0c09ae1bb48df6a6acec', :inhibit_warnings => true
   # The FlatDesign style, chosen with the navigation bar button of the settings list. It also brings Lottie.
   # 扁平样式，通过设置列表的导航栏按钮选择。它同时会引入 Lottie。
   pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => '../'

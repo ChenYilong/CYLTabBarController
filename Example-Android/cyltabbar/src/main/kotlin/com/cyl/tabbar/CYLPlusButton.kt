@@ -158,7 +158,13 @@ open class CYLPlusButton(context: Context) : FrameLayout(context) {
 
     override fun setSelected(selected: Boolean) {
         super.setSelected(selected)
-        imageView.setImageDrawable(if (selected && selectedImage != null) selectedImage else normalImage)
+        // [EN] As iOS (docs/PlusButton.md): with a page of its own on Liquid Glass, the plus button keeps its normal image
+        //      while selected; the selection shows under it. FlatDesign and the classic bar keep the selected image.
+        // [CN] 与 iOS 相同（docs/PlusButton.md）：液态玻璃下 PlusButton 有自己的页面时，选中后仍显示普通图片，选中效果显示在其下方。
+        //      扁平样式与经典样式仍使用选中图片。
+        val keepsNormalImage = provider?.plusChildViewController() != null &&
+            (parent as? CYLTabBar)?.styleRenderer is CYLLiquidGlassTabBarStyle
+        imageView.setImageDrawable(if (selected && selectedImage != null && !keepsNormalImage) selectedImage else normalImage)
         val content = selectedContent ?: provider?.selectedContentView(context)?.also { selectedContent = it; addView(it, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)) }
         content?.visibility = if (selected) View.VISIBLE else View.GONE
         imageView.visibility = if (selected && content != null) View.INVISIBLE else View.VISIBLE

@@ -92,6 +92,22 @@ class CYLConfigurationThemesTest {
     }
 
     @Test
+    fun aSkinOfAnEarlierConfigurationIsReplacedButTheAppsOwnSkinStays() = withActivity { activity ->
+        val name = UUID.randomUUID().toString()
+        val manager = CYLThemeManagerCenter.themeManagerWithName(name)
+        fun build(skin: String) = CYLTabBarController(activity, configuration(name, mapOf(skin to mapOf("accent" to "#FF0000")),
+            mapOf(CYLConstants.CYLTabBarControllerThemeIdentifier to skin)))
+        build("Default")
+        assertEquals("Default", manager.currentThemeIdentifier)
+        build("Christmas")
+        assertEquals("a skin only an earlier configuration had is not kept", "Christmas", manager.currentThemeIdentifier)
+        manager.addThemeIdentifier("App", Any())
+        manager.currentThemeIdentifier = "App"
+        build("Ocean")
+        assertEquals("a skin the app chose stays", "App", manager.currentThemeIdentifier)
+    }
+
+    @Test
     fun theListFormAndProtobufMapsAndAChosenSkin() = withActivity { activity ->
         val name = UUID.randomUUID().toString()
         val manager = CYLThemeManagerCenter.themeManagerWithName(name)

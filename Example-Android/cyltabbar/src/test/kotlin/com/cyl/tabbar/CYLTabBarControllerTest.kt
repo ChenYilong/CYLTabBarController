@@ -373,7 +373,9 @@ class CYLTabBarControllerTest {
         idle()
         val badge = icon.cyl_badge!!
         assertEquals("the badge does not join the row", 2, row.childCount)
-        assertEquals("centered on the icon's right edge", icon.right.toFloat(), (badge.left + badge.right) / 2f, 1f)
+        // [EN] As iOS (`-cyl_layoutBadgeAtTopRightCorner`): 2 dp right of the right edge. [CN] 与 iOS 相同：右边缘右侧 2 dp。
+        val gap = CYL_BADGE_CORNER_GAP_DP * icon.resources.displayMetrics.density
+        assertEquals("centered 2 dp right of the icon's right edge", icon.right + gap, (badge.left + badge.right) / 2f, 1f)
         assertEquals("centered on the icon's top edge", icon.top.toFloat(), (badge.top + badge.bottom) / 2f, 1f)
         val narrow = badge.width
         icon.cyl_showBadgeValue("new", CYLEnums.CYLBadgeAnimationType.None)

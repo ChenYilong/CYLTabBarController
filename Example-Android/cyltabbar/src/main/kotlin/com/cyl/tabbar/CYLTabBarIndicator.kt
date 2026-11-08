@@ -53,7 +53,7 @@ class CYLTabBarIndicator @JvmOverloads constructor(
     val height: Float = 2f,
     val top: Boolean = false,
     val widthFollowsContent: Boolean = true,
-    @ColorInt val color: Int? = null,
+    @param:ColorInt val color: Int? = null,
     val drawable: Drawable? = null,
     val cornerRadius: Float = 0f,
 ) {

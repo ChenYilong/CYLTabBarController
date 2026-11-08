@@ -630,8 +630,12 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     UIControl *viewControllerControl = viewControllerItem.cyl_tabButton;
     UITabBarItem *navigationViewControllerItem = viewController.navigationController.tabBarItem;
 #if CYL_FLATDESIGN_AVAILABLE
-    if (viewControllerItem && !viewControllerControl) {
-        
+    // [EN] FlatDesign draws its own buttons: they host the badge even when the item still has a system tab button (a page
+    //      that is not in a navigation controller, e.g. a React Native or Flutter host's page), which is off screen.
+    // [CN] 扁平样式绘制自己的按钮：即使 item 仍有系统 Tab 按钮（不在导航控制器中的页面，例如 React Native 或 Flutter 宿主的页面），
+    //      该按钮也不在屏幕上，角标由扁平按钮承载。
+    if (viewControllerItem) {
+
         CYLTabBarController *flatDesignTabBarController = (CYLTabBarController * )viewController.cylflatdesign_tabBarController;
         CYLFlatDesignTabBar *pureCustomTabBar = (CYLFlatDesignTabBar * )flatDesignTabBarController.cyl_tabBar;
         if ([pureCustomTabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {

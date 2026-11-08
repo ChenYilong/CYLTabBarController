@@ -282,6 +282,7 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
  */
 + (void)registerPlusButton;
 
+
 /*!
  * [EN] Lays the plus button out again when its class returns YES from `+alignsTitleWithTabBarItemTitles`, so its title
  *      follows the tab item titles. The tab bars call it after their own layout; call it after moving the tab titles
@@ -550,6 +551,24 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
  *      扁平样式与经典 TabBar 使用它。见上面的链接。
  */
 - (void)cyl_updateTitle:(nullable NSString *)title image:(nullable UIImage *)image selectedImage:(nullable UIImage *)selectedImage;
+
+@end
+
+@interface CYLPlusButton (CYLConfigurationPlusButton)
+
+/*!
+ * [EN] Registers a plus button made from attributes for `context` (nil: the default context), the way
+ *      `CYLTabBarControllerPlusButton` of a configuration does: `CYLTabBarItemTitle`, `CYLTabBarItemImage` (a UIImage),
+ *      `CYLTabBarItemSelectedTitle`, `CYLTabBarItemSelectedTitleColor` (a UIColor). `action` runs on each tap. Without an
+ *      image, nothing is registered. Each context keeps its own plus button, attributes and action; registering again for
+ *      the same context replaces them.
+ * [CN] 根据属性为 `context`（nil 为默认 context）注册一个 PlusButton，与配置中的 `CYLTabBarControllerPlusButton` 相同：
+ *      `CYLTabBarItemTitle`、`CYLTabBarItemImage`（UIImage）、`CYLTabBarItemSelectedTitle`、`CYLTabBarItemSelectedTitleColor`（UIColor）。
+ *      每次点击执行 `action`。没有图片时不注册。每个 context 有自己的 PlusButton、属性与点击回调；为同一 context 再次注册会替换它们。
+ */
++ (void)cyl_registerPlusButtonWithAttributes:(NSDictionary<NSString *, id> *)attributes
+                                      action:(nullable void (^)(CYLPlusButton *plusButton))action
+                                     context:(nullable NSString *)context;
 
 @end
 

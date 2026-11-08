@@ -115,6 +115,7 @@
 #import "UIViewController+CYLConfigurationDemo.h"
 #import "CYLTabBarConfigurationParser.h"
 #import "CYLTabBarPageRegistry.h"
+#import "CYLTabBarHostView.h"
 #import "UIViewController+CYLSettingsSection.h"
 #import "UIViewController+CYLThemeSettings.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
@@ -460,6 +461,101 @@ FOUNDATION_EXTERN NSString *const CYLTabBarControllerAutomaticPageRegistration;
  *      1 为文件本身的速度。未设置时使用默认值。无效（0、负数、NaN、不是数字）时忽略并输出警告。
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerTabBarItemAnimationSpeed;
+
+/*!
+ * [EN] The plus button of a configuration, so a configuration alone (a file, a URL, React Native or Flutter) can show one:
+ *      - `CYLTabBarControllerPlusButton`: a dictionary with `CYLTabBarItemTitle`, `CYLTabBarItemImage` (an image name,
+ *        "system:<SF Symbol>" or a UIImage), and optionally `CYLTabBarItemSelectedTitle` and
+ *        `CYLTabBarItemSelectedTitleColor` ("#RRGGBB" or a UIColor). It is registered for this configuration's
+ *        `CYLTabBarControllerContext`, before the tab bar is made: give the configuration its own context so other tab bar
+ *        controllers keep theirs. The plus button sits in the middle, so give an even number of tabs. With a title, the title
+ *        lines up with the tab titles (`+alignsTitleWithTabBarItemTitles`). Not a dictionary: ignored with a warning.
+ *      - `CYLTabBarControllerPlusButtonAction`: a block `void (^)(CYLPlusButton *plusButton)` (code only), run when the plus
+ *        button is tapped.
+ * [CN] 配置中的 PlusButton，只用配置（文件、URL、React Native 或 Flutter）也能显示：
+ *      - `CYLTabBarControllerPlusButton`：字典，包含 `CYLTabBarItemTitle`、`CYLTabBarItemImage`（图片名、"system:<SF Symbol>" 或
+ *        UIImage），可选 `CYLTabBarItemSelectedTitle` 与 `CYLTabBarItemSelectedTitleColor`（"#RRGGBB" 或 UIColor）。在创建 TabBar 之前
+ *        为该配置的 `CYLTabBarControllerContext` 注册：请为配置设置独立的 context，以免影响其他 TabBarController。PlusButton
+ *        位于中间，因此 Tab 数量应为偶数。有标题时标题与 Tab 标题对齐（`+alignsTitleWithTabBarItemTitles`）。不是字典时忽略并输出警告。
+ *      - `CYLTabBarControllerPlusButtonAction`：block `void (^)(CYLPlusButton *plusButton)`（仅代码），点击 PlusButton 时执行。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerPlusButton;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerPlusButtonAction;
+
+/*!
+ * [EN] More keys of the `CYLTabBarControllerPlusButton` dictionary, for the layouts the `CYLPlusButtonSubclassing` methods
+ *      give in code (Example-PAG, Example-Rive):
+ *      - `CYLPlusButtonBackgroundImage`: an image drawn as the button's background, the title on it (an image name, a path or
+ *        a UIImage); the button takes the image's size. Use it instead of `CYLTabBarItemImage` for a title on a picture.
+ *      - `CYLTabBarItemTitleColor` ("#RRGGBB" or a UIColor) and `CYLTabBarItemTitleFont` (as for tabs): the title's look.
+ *      - `CYLPlusButtonIndexInTabBar`: NSNumber, its place among the tabs (`+indexOfPlusButtonInTabBar`). Default: the middle.
+ *      - `CYLPlusButtonCenterYMultiplier` / `CYLPlusButtonCenterYOffset`: NSNumbers, its vertical center
+ *        (`+multiplierOfTabBarHeight:` / `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`).
+ *      - `CYLPlusButtonAlignsTitle`: BOOL, whether the title lines up with the tab titles (`+alignsTitleWithTabBarItemTitles`).
+ *        Default: YES with a title and no background image.
+ *      - `CYLPlusButtonKeepsTitleVisible`: BOOL, the title stays visible on Liquid Glass (`cyl_keepShowingPlusButtonLabel`).
+ *      - `CYLPlusButtonShowsSelection`: BOOL, Liquid Glass shows the selection (the lens and the selected title) under the
+ *        plus button while its own page is selected, as an app returning YES from
+ *        `-tabBarController:shouldShowPlatterLiquidLensViewForControl:` (the Objective-C example). Default: NO. Android
+ *        always shows it.
+ *      - `CYLPlusButtonSize`: the button's size ("{55, 80}", [55, 80] or an NSValue of CGSize), as a subclass sets its
+ *        bounds. Default: the size of its image and title.
+ *      - `CYLPlusButtonImageSize`: the size its images are drawn at, aspect fit (same formats), e.g. for an image downloaded
+ *        at 512 px, as the example draws a skin's image in the old image's frame. Default: the images' own size.
+ *      - `CYLTabBarItemIdentifier`: its identifier (`+tabBarItemIdentifier`).
+ *      - `CYLTabBarItemPageIdentifier`: the plus button selects a page of its own, found like a tab's page (the configuration's
+ *        resolver, registry or the shared registry; `+plusChildViewController`).
+ * [CN] `CYLTabBarControllerPlusButton` 字典的更多键，对应代码中 `CYLPlusButtonSubclassing` 方法给出的布局（Example-PAG、Example-Rive）：
+ *      - `CYLPlusButtonBackgroundImage`：作为按钮背景绘制的图片，标题画在上面（图片名、路径或 UIImage）；按钮采用图片的尺寸。需要把标题画在图上时，
+ *        用它代替 `CYLTabBarItemImage`。
+ *      - `CYLTabBarItemTitleColor`（"#RRGGBB" 或 UIColor）与 `CYLTabBarItemTitleFont`（与 Tab 相同）：标题的外观。
+ *      - `CYLPlusButtonIndexInTabBar`：NSNumber，在各 Tab 中的位置（`+indexOfPlusButtonInTabBar`）。默认居中。
+ *      - `CYLPlusButtonCenterYMultiplier` / `CYLPlusButtonCenterYOffset`：NSNumber，垂直中心位置
+ *        （`+multiplierOfTabBarHeight:` / `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`）。
+ *      - `CYLPlusButtonAlignsTitle`：BOOL，标题是否与 Tab 标题对齐（`+alignsTitleWithTabBarItemTitles`）。默认：有标题且没有背景图时为 YES。
+ *      - `CYLPlusButtonKeepsTitleVisible`：BOOL，液态玻璃下保持显示标题（`cyl_keepShowingPlusButtonLabel`）。
+ *      - `CYLPlusButtonShowsSelection`：BOOL，选中 PlusButton 自己的页面时，液态玻璃在 PlusButton 下方显示选中效果（放大镜与选中标题），
+ *        与 App 在 `-tabBarController:shouldShowPlatterLiquidLensViewForControl:` 中返回 YES 相同（Objective-C 示例）。默认：NO。
+ *        Android 总是显示。
+ *      - `CYLPlusButtonSize`：按钮尺寸（"{55, 80}"、[55, 80] 或 CGSize 的 NSValue），与子类设置 bounds 相同。默认：图片与标题的尺寸。
+ *      - `CYLPlusButtonImageSize`：图片的绘制尺寸，等比缩放（格式同上），例如 512px 的网络图片，与示例在原图片区域内绘制皮肤图片相同。默认：图片自身尺寸。
+ *      - `CYLTabBarItemIdentifier`：其标识（`+tabBarItemIdentifier`）。
+ *      - `CYLTabBarItemPageIdentifier`：PlusButton 选中自己的页面，按 Tab 页面的方式查找（配置的解析回调、注册表或全局注册表；
+ *        `+plusChildViewController`）。
+ */
+FOUNDATION_EXTERN NSString *const CYLPlusButtonBackgroundImage;
+FOUNDATION_EXTERN NSString *const CYLPlusButtonIndexInTabBar;
+FOUNDATION_EXTERN NSString *const CYLPlusButtonCenterYMultiplier;
+FOUNDATION_EXTERN NSString *const CYLPlusButtonCenterYOffset;
+FOUNDATION_EXTERN NSString *const CYLPlusButtonAlignsTitle;
+FOUNDATION_EXTERN NSString *const CYLPlusButtonKeepsTitleVisible;
+FOUNDATION_EXTERN NSString *const CYLPlusButtonShowsSelection;
+FOUNDATION_EXTERN NSString *const CYLPlusButtonSize;
+FOUNDATION_EXTERN NSString *const CYLPlusButtonImageSize;
+
+/*!
+ * [EN] Interaction and appearance keys of a configuration:
+ *      - `CYLTabBarControllerUserInterfaceStyle`: "light", "dark" or "system" (default): the tab bar controller's
+ *        `overrideUserInterfaceStyle` (iOS 13+), e.g. dark glass for white icons.
+ *      - `CYLTabBarControllerTabButtonTapAnimation`: "none", "scale", "zoomIn", "bounce", "bounceWithFireworks", "rotation",
+ *        "flip" or "fume" (`cyl_tabButtonTapAnimationType`).
+ *      - `CYLTabBarControllerSwipeToSwitchTab`: BOOL, swiping on the tab bar switches tabs (`cyl_swipeToSwitchTabEnabled`).
+ *      - `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers`: the identifiers (`CYLTabBarItemIdentifier`) of the tabs
+ *        that need login (`cyl_loginRequiredTabBarItemIdentifiers`, issue #19), e.g. ["message", "mine"]; an array of
+ *        strings or a comma-separated string.
+ * [CN] 配置中的交互与外观键：
+ *      - `CYLTabBarControllerUserInterfaceStyle`："light"、"dark" 或 "system"（默认）：TabBarController 的 `overrideUserInterfaceStyle`
+ *        （iOS 13+），例如为白色图标使用深色玻璃。
+ *      - `CYLTabBarControllerTabButtonTapAnimation`："none"、"scale"、"zoomIn"、"bounce"、"bounceWithFireworks"、"rotation"、"flip" 或
+ *        "fume"（`cyl_tabButtonTapAnimationType`）。
+ *      - `CYLTabBarControllerSwipeToSwitchTab`：BOOL，在 TabBar 上滑动切换 Tab（`cyl_swipeToSwitchTabEnabled`）。
+ *      - `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers`：需要登录的 Tab 的标识（`CYLTabBarItemIdentifier`）
+ *        （`cyl_loginRequiredTabBarItemIdentifiers`，issue #19），例如 ["message", "mine"]；字符串数组或逗号分隔的字符串。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerUserInterfaceStyle;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerTabButtonTapAnimation;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerSwipeToSwitchTab;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerLoginRequiredTabBarItemIdentifiers;
 
 /*!
  * [EN] Skins in a configuration (see docs/Configuration-File.md, "Skins"; the named values follow QMUI's skins):

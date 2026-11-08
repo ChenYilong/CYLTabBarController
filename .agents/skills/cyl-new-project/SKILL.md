@@ -16,13 +16,15 @@ Every new demo in this repository is created with this skill. Source of truth: c
 | Lottie 4.x tab icons | `pod 'CYLTabBarController/LottieSwift'` | `Example-Swift` | subspec 13.0; use 15.0 |
 | Lottie 2.5 (Objective-C) | `pod 'CYLTabBarController/Lottie'` | `Example-Swift-02` | use 15.0 |
 | PAG tab icons | `pod 'CYLTabBarController/PAG'` | `Example-PAG` | use 15.0 |
-| Rive tab icons | `pod 'CYLTabBarController/Rive'` (RiveRuntime ~> 6.29; CocoaPods only) | `Example-Rive`, `Example-SwiftUI-Rive` | subspec 14.0; demos use 15.4 |
+| Rive tab icons | `pod 'CYLTabBarController/Rive'` (RiveRuntime ~> 6.29; CocoaPods only) | `Example-Rive`, `Example-SwiftUI-Rive` | subspec 14.0; demos use 15.0 |
 | GIF tab icons that play once | `pod 'CYLTabBarController/GIF'` (no third-party dependency) | `Example-GIF` | use 15.0 |
 | FlatDesign (the classic layout on every system) | `pod 'CYLTabBarController/CYLFlatDesignTabBar'` | `Example-network-download`, the root ObjC demo | subspec 13.0; use 15.0 |
 | Swift Package Manager | package URL or `relativePath = ..` (Core + FlatDesign + Lottie 4.x; no PAG or Rive) | `Example-Swift-SwiftManager-FlatDesign`, `Example-Swift-Gallery`, `Example-Swift-SwiftManager` (iOS 26) | package iOS 13; use 15.0 |
 | Carthage | `github "ChenYilong/CYLTabBarController"` (no Lottie, PAG or Rive) | `Example-Swift-Carthage` | 15.0 |
 | Objective-C, every feature | root `CYLTabBarController.xcodeproj` + `Example/` | `Example/` (the Tab Bar Gallery has a scene per API) | 15.0 |
 | Android app: `CYLTabBarController` for Android (the iOS API in Kotlin and Java) from the same configuration file | `Example-Android/cyltabbar` (Gradle; depends on `tabpages`) | `Example-Android` | minSdk 23, compileSdk 35; see [Android-Library](../../../docs/Android-Library.md) |
+| React Native or Flutter app: the native tab bar, pages drawn in JS / Dart | `CrossPlatform/react-native-cyltabbar` (Fabric) or `CrossPlatform/flutter_cyltabbar` (platform view); Flutter on Android needs `FlutterFragmentActivity` | `CrossPlatform/*/example` | iOS 15.1 (RN) / 15.0 (Flutter); follow [React-Native-Component](../../../docs/React-Native-Component.md) or [Flutter-Component](../../../docs/Flutter-Component.md); a native app that draws its own pages: `CYLTabBarHostView` |
+| React Native or Flutter app with PAG / Rive tab icons | The same component plus the iOS subspec `CYLTabBarController/PAG` or `/Rive` (CocoaPods; Flutter turns Swift Package Manager off) and libpag / rive-android on Android; `CYLAnimationView` for animations in a page | `CrossPlatform/react-native-cyltabbar/example-pag`, `example-rive`; `CrossPlatform/flutter_cyltabbar/example_pag`, `example_rive` | the Podfile's `post_install` sets every pod to iOS 15.0 (React Native: 15.1), as AGENTS.md "Xcode projects"; reuse the native demo's files: add them to the iOS app target, point Android `assets.srcDirs` at them; see [Cross-Platform-Components](../../../docs/Cross-Platform-Components.md#enanimated-icon-demos) |
 
 `Example-Shared/` holds Swift sources that the Swift demos share; reuse it instead of copying. See [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md) for combining libraries and [Swift-Guide](../../../docs/Swift-Guide.md) for `import` failures.
 
@@ -79,3 +81,7 @@ func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene
 5. Add it to the table in section 1 and to the demo list in `README.md`.
 6. Build: `scripts/ci-build-example.sh <folder>`, then follow `cyl-verify`.
 7. Check the project format with the commands in `cyl-xcode-compat`.
+
+## Podfile, app icon, launch screen
+
+Every Xcode project checks its Podfile (top lines `platform :ios, '15.0'`, `ENV['SWIFT_VERSION'] = '5'`, `project '<name>.xcodeproj'`; a `post_install` hook that sets `IPHONEOS_DEPLOYMENT_TARGET` to 15.0 on every pod), and copies the ObjC example's app icon and launch screen when it has none. Full rule and exceptions (one `post_install` only, React Native minimum 15.1): AGENTS.md, "Xcode projects: Podfile, app icon, launch screen".

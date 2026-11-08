@@ -45,7 +45,7 @@ class CYLBadgeAppearance private constructor() {
     @ColorInt var backgroundColor: Int = Color.RED
     /** [EN] Text color, white by default. [CN] 文字颜色，默认白色。 */
     @ColorInt var textColor: Int = Color.WHITE
-    /** [EN] Text font, 11 sp by default. [CN] 字体，默认 11 sp。 */
+    /** [EN] Text font, bold 9 sp by default, as on iOS. [CN] 字体，默认粗体 9 sp，与 iOS 相同。 */
     var font: CYLFont = DEFAULT_FONT
     /** [EN] Offset of the badge center from the host's top-right corner (dp); not finite: 0. [CN] 角标中心相对宿主右上角的偏移（dp）；非有限值视为 0。 */
     var centerOffset: CYLOffset = CYLOffset.zero
@@ -53,7 +53,7 @@ class CYLBadgeAppearance private constructor() {
     /** [EN] Radius of the red dot (dp); 0, negative or not finite restores 4. [CN] 红点半径（dp）；0、负数或非有限值恢复为 4。 */
     var radius: Float = DEFAULT_RADIUS
         set(value) { field = if (value > 0 && value.isFinite()) value else DEFAULT_RADIUS }
-    /** [EN] Space around the text of number and text badges (dp); negative or not finite: 0. [CN] 数字与文字角标的文字边距（dp）；负数或非有限值视为 0。 */
+    /** [EN] Space added once to the text's width and height in number and text badges (dp), 8 by default as on iOS; negative or not finite: 0. [CN] 数字与文字角标在文字宽度与高度上各加一次的边距（dp），默认 8，与 iOS 相同；负数或非有限值视为 0。 */
     var margin: Float = DEFAULT_MARGIN
         set(value) { field = if (value.isFinite()) value.coerceAtLeast(0f) else 0f }
     /** [EN] Numbers above it show as "<maximum>+"; below 1: 1. [CN] 超过它的数字显示为 "<maximum>+"；小于 1 时为 1。 */
@@ -75,9 +75,10 @@ class CYLBadgeAppearance private constructor() {
     }
 
     companion object {
-        private val DEFAULT_FONT = CYLFont(11f)
+        // [EN] iOS `kCYLBadgeDefaultFont` (bold 9 pt) and `CYLBadgeAppearance`'s margin, 8 pt. [CN] iOS 的 `kCYLBadgeDefaultFont`（粗体 9 pt）与 `CYLBadgeAppearance` 的边距 8 pt。
+        private val DEFAULT_FONT = CYLFont(9f, bold = true)
         private const val DEFAULT_RADIUS = 4f
-        private const val DEFAULT_MARGIN = 2f
+        private const val DEFAULT_MARGIN = 8f
         /** [EN] The shared global appearance. [CN] 共享的全局外观。 */
         @JvmStatic
         val globalAppearance: CYLBadgeAppearance = CYLBadgeAppearance()

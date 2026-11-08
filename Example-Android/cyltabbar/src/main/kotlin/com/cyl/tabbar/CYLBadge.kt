@@ -53,9 +53,9 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
         set(value) { field = value; requestLayout(); invalidate() }
     var badgeCornerRadius: Float? = null
         set(value) { field = value; invalidate() }
-    var badgeFont: CYLFont = CYLFont(11f)
+    var badgeFont: CYLFont = CYLFont(9f, bold = true)
         set(value) { field = value; requestLayout(); invalidate() }
-    var badgeMargin: Float = 2f
+    var badgeMargin: Float = 8f
         set(value) { field = value; requestLayout(); invalidate() }
     private var refreshing = false
 
@@ -86,8 +86,11 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
         }
         textPaint.textSize = android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, badgeFont.size, resources.displayMetrics)
         textPaint.typeface = badgeFont.typeface ?: if (badgeFont.bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
-        val height = (textPaint.fontSpacing + badgeMargin * 2 * density).toInt()
-        val width = maxOf(height, (textPaint.measureText(text) + badgeMargin * 2 * density + height / 2).toInt())
+        // [EN] As iOS (`-cyl_adjustLabelWidth:` and `-cyl_addMargin`): the text's size plus `badgeMargin` once in each
+        //      direction, never narrower than tall. [CN] 与 iOS 相同（`-cyl_adjustLabelWidth:` 与 `-cyl_addMargin`）：文字尺寸在两个方向各加一次
+        //      `badgeMargin`，宽度不小于高度。
+        val height = (kotlin.math.ceil(textPaint.fontSpacing) + badgeMargin * density).toInt()
+        val width = maxOf(height, (kotlin.math.ceil(textPaint.measureText(text)) + badgeMargin * density).toInt())
         setMeasuredDimension(width, height)
     }
 
@@ -111,7 +114,7 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
             textPaint.color = badgeTextColor
             val y = height / 2f - (textPaint.descent() + textPaint.ascent()) / 2
             val horizontal = textGravity and android.view.Gravity.HORIZONTAL_GRAVITY_MASK
-            val inset = badgeMargin * density + textPaint.measureText(text ?: "") / 2
+            val inset = badgeMargin * density / 2 + textPaint.measureText(text ?: "") / 2
             val x = when (horizontal) {
                 android.view.Gravity.START, android.view.Gravity.LEFT -> inset
                 android.view.Gravity.END, android.view.Gravity.RIGHT -> width - inset
@@ -354,6 +357,20 @@ private fun View.cyl_detachBadge(badge: CYLBadgeView) {
     (badge.parent as? ViewGroup)?.removeView(badge)
 }
 
+/**
+ * [EN] `-[UIView cyl_layoutBadgeAtTopRightCorner]`: the badge's left and top for an anchor whose top-right corner is
+ *      (`anchorRight`, `anchorTop`): its center at (right + 2, top) plus `cyl_badgeCenterOffset`, as on iOS.
+ * [CN] 锚点右上角为 (`anchorRight`, `anchorTop`) 时角标的 left 与 top：中心位于 (right + 2, top) 再加上 `cyl_badgeCenterOffset`，与 iOS 相同。
+ */
+internal fun cyl_badgeOrigin(anchorRight: Int, anchorTop: Int, badge: View, offset: CYLOffset, density: Float): Pair<Int, Int> {
+    val left = (anchorRight + CYL_BADGE_CORNER_GAP_DP * density - badge.measuredWidth / 2f + offset.horizontal * density).toInt()
+    val top = (anchorTop - badge.measuredHeight / 2f + offset.vertical * density).toInt()
+    return left to top
+}
+
+/** [EN] iOS puts a badge's center 2 pt right of its host's right edge. [CN] iOS 把角标中心放在宿主右边缘右侧 2 pt 处。 */
+internal const val CYL_BADGE_CORNER_GAP_DP = 2f
+
 /** [EN] `-cyl_refreshBadge`: places the badge at the top-right corner plus `cyl_badgeCenterOffset`. [CN] 把角标放到右上角并加上偏移。 */
 fun View.cyl_refreshBadge() {
     val state = cyl_badgeState
@@ -362,8 +379,7 @@ fun View.cyl_refreshBadge() {
     val density = resources.displayMetrics.density
     state.overlayHost?.let {
         // [EN] In the parent's overlay: the view's top-right corner in the parent's coordinates. [CN] 在父视图的 overlay 中：视图右上角在父视图中的坐标。
-        val left = (right - badge.measuredWidth / 2 + state.centerOffset.horizontal * density).toInt()
-        val top = (top - badge.measuredHeight / 2 + state.centerOffset.vertical * density).toInt()
+        val (left, top) = cyl_badgeOrigin(right, top, badge, state.centerOffset, density)
         badge.layout(left, top, left + badge.measuredWidth, top + badge.measuredHeight)
         return
     }

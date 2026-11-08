@@ -222,7 +222,11 @@ Pod::Spec.new do |s|
     'OTHER_LIBTOOLFLAGS' => '-no_warning_for_no_symbols',
     'WARNING_CFLAGS' => [
     '-Werror=undeclared-selector',
-    '-Werror=incomplete-implementation'
+    '-Werror=incomplete-implementation',
+    # libpag's umbrella header `libpag.h` leaves out its C++ headers (pag/*.h), so every file of this pod that sees the
+    # libpag module warns "umbrella header for module 'libpag' does not include header". Third-party module map: not ours to fix.
+    # libpag 的 umbrella 头文件 `libpag.h` 未包含其 C++ 头文件（pag/*.h），本 pod 中看到 libpag 模块的文件都会报该警告。属于第三方模块映射，不由本库修复。
+    '-Wno-incomplete-umbrella'
     ]
   }
   

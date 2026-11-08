@@ -43,6 +43,53 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         requestLayout()
     }
     val titleLabel = TextView(context).apply { gravity = Gravity.CENTER; maxLines = 1; textSize = 10f }
+
+    /**
+     * [EN] `-[UIControl cyl_coverVisiableTabImageViewOrTabButton:YES ...]`: a view covering the whole tab button (icon,
+     *      animation, custom icon view and title) in both states, centered on it at its own size, or null to show them
+     *      again. The badge is cleared while the button is covered and resumed after, as on iOS.
+     * [CN] 覆盖整个 Tab 按钮（图标、动画、自定义图标视图与标题）的视图，两种状态相同，以其自身尺寸居中于按钮；null 表示重新显示。覆盖期间清除角标，
+     *      取消后恢复，与 iOS 相同。
+     */
+    var cyl_coverView: View? = null
+        set(value) {
+            if (field === value) return
+            field?.let { removeView(it) }
+            field = value
+            // [EN] Drawn above the icon, the animation view added later and the title. [CN] 绘制在图标、之后添加的动画视图与标题之上。
+            value?.let { cover -> (cover.parent as? ViewGroup)?.removeView(cover); cover.translationZ = 1000f; addView(cover) }
+            val covered = value != null
+            iconView.alpha = if (covered) 0f else 1f
+            cyl_customIconView?.alpha = if (covered) 0f else 1f
+            cyl_tabBarItemAnimationView?.alpha = if (covered) 0f else 1f
+            titleLabel.alpha = if (covered) 0f else 1f
+            if (covered) cyl_clearBadge() else cyl_resumeBadge()
+            requestLayout()
+        }
+    /**
+     * [EN] The view iOS puts the badge on: the tab's image view. Liquid Glass (UIKit's floating tab bar) draws it 22 pt
+     *      square; the other styles at the image's size, within the icon box. Centered on the icon.
+     * [CN] iOS 放置角标的视图：Tab 的图片视图。液态玻璃（UIKit 的悬浮 TabBar）中为 22 pt 的正方形；其他样式中为图片尺寸（不超过图标区域）。居中于图标。
+     */
+    internal fun cyl_badgeAnchorRect(): android.graphics.Rect {
+        val density = resources.displayMetrics.density
+        val liquidGlass = (parent as? CYLTabBar)?.styleRenderer is CYLLiquidGlassTabBarStyle
+        val drawable = iconView.drawable
+        val anchorWidth = when {
+            liquidGlass -> (CYL_LIQUID_GLASS_TAB_IMAGE_DP * density).toInt()
+            drawable != null && drawable.intrinsicWidth > 0 -> drawable.intrinsicWidth
+            else -> iconView.width
+        }.coerceAtMost(iconView.width.takeIf { it > 0 } ?: Int.MAX_VALUE)
+        val anchorHeight = when {
+            liquidGlass -> (CYL_LIQUID_GLASS_TAB_IMAGE_DP * density).toInt()
+            drawable != null && drawable.intrinsicHeight > 0 -> drawable.intrinsicHeight
+            else -> iconView.height
+        }.coerceAtMost(iconView.height.takeIf { it > 0 } ?: Int.MAX_VALUE)
+        val centerX = (iconView.left + iconView.right) / 2
+        val centerY = (iconView.top + iconView.bottom) / 2
+        return android.graphics.Rect(centerX - anchorWidth / 2, centerY - anchorHeight / 2, centerX + anchorWidth / 2, centerY + anchorHeight / 2)
+    }
+
     internal var onTap: (() -> Unit)? = null
     internal var onDoubleTap: (() -> Unit)? = null
     internal var onLongPress: (() -> Unit)? = null
@@ -94,6 +141,12 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
             custom.measure(MeasureSpec.makeMeasureSpec(iconSize, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(iconSize, MeasureSpec.EXACTLY))
             custom.layout(iconLeft, iconTop, iconLeft + iconSize, iconTop + iconSize)
         }
+        cyl_coverView?.let { cover ->
+            cover.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+            val coverCenterX = width / 2
+            val coverCenterY = height / 2
+            cover.layout(coverCenterX - cover.measuredWidth / 2, coverCenterY - cover.measuredHeight / 2, coverCenterX + cover.measuredWidth / 2, coverCenterY + cover.measuredHeight / 2)
+        }
         cyl_tabBarItemAnimationView?.let { animation ->
             // [EN] The animation view sits where the icon is, at its own size. [CN] 动画视图位于图标处，使用自己的尺寸。
             val animationWidth = animation.layoutParams.width.takeIf { it > 0 } ?: iconSize
@@ -112,8 +165,8 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
             val badge = getChildAt(child) as? CYLBadgeView ?: continue
             badge.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
             val state = cyl_badgeState
-            val badgeLeft = (iconView.right - badge.measuredWidth / 2 + state.centerOffset.horizontal * density).toInt()
-            val badgeTop = (iconView.top - badge.measuredHeight / 2 + state.centerOffset.vertical * density).toInt()
+            val anchor = cyl_badgeAnchorRect()
+            val (badgeLeft, badgeTop) = cyl_badgeOrigin(anchor.right, anchor.top, badge, state.centerOffset, density)
             badge.layout(badgeLeft, badgeTop, badgeLeft + badge.measuredWidth, badgeTop + badge.measuredHeight)
         }
         item.cyl_viewDidLayoutSubviewsBlock?.let { block -> tabBar?.let { block(it, item, index) } }
@@ -203,12 +256,23 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         requestLayout()
     }
 
-    /** [EN] The title color of the tab, selected or not. [CN] Tab 的标题颜色（选中或未选中）。 */
+    /**
+     * [EN] The title color of the tab, selected or not. Liquid Glass, as on iOS 26: the system draws the unselected titles in
+     *      its own color (the bar's `unselectedTintColor`), whatever title color the app sets; only the selected one is
+     *      customized.
+     * [CN] Tab 的标题颜色（选中或未选中）。液态玻璃与 iOS 26 相同：未选中的标题由系统以自己的颜色绘制（TabBar 的 `unselectedTintColor`），
+     *      与 App 设置的标题颜色无关；只有选中的标题可以自定义。
+     */
     @ColorInt
     internal fun titleColor(selected: Boolean, tabBar: CYLTabBar): Int {
         val controller = tabBar.tabBarController
-        return if (selected) item.cyl_selectedTitleColor ?: controller?.cyl_tabBarItemSelectedTitleColor ?: tabBar.selectedTintColor
-               else item.cyl_titleColor ?: controller?.cyl_tabBarItemTitleColor ?: tabBar.unselectedTintColor
+        if (selected) {
+            return item.cyl_selectedTitleColor ?: controller?.cyl_tabBarItemSelectedTitleColor ?: tabBar.selectedTintColor
+        }
+        if (tabBar.styleRenderer is CYLLiquidGlassTabBarStyle) {
+            return tabBar.unselectedTintColor
+        }
+        return item.cyl_titleColor ?: controller?.cyl_tabBarItemTitleColor ?: tabBar.unselectedTintColor
     }
 
     private fun iconColor(selected: Boolean, tabBar: CYLTabBar): Int? {
@@ -559,7 +623,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
                     plus.titleLabel.typeface = reference.titleLabel.typeface
                     plus.titleLabel.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, reference.titleLabel.textSize)
                     val selectedColor = controller.cyl_tabBarItemSelectedTitleColor ?: selectedTintColor
-                    val normalColor = controller.cyl_tabBarItemTitleColor ?: unselectedTintColor
+                    // [EN] Liquid Glass: unselected in the system color, as the tab titles. [CN] 液态玻璃：未选中时与 Tab 标题一样使用系统颜色。
+                    val normalColor = if (styleRenderer is CYLLiquidGlassTabBarStyle) unselectedTintColor
+                                      else controller.cyl_tabBarItemTitleColor ?: unselectedTintColor
                     plus.titleLabel.setTextColor(if (plusButtonActive) selectedColor else normalColor)
                 }
             } else if (!plusButtonActive || plus.cyl_selectedTitleColor == null) {
@@ -792,14 +858,25 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         val centerY = cyl_itemsFrame.top + (itemsHeight * plus.multiplierOfTabBarHeight(tabBarHeight) + offset * density).toInt()
         val w = if (plus.measuredWidth > 0) plus.measuredWidth else slotWidth
         var h = if (plus.measuredHeight > 0) plus.measuredHeight else itemsHeight
-        val top = centerY - h / 2
+        var top = centerY - h / 2
         if (plus.cyl_alignsTitleWithTabBarItemTitles() && plus.cyl_showsTitleInTabBarItem()) {
-            // [EN] The plus title's center on the tab titles' line: the button grows down to that line. [CN] PlusButton 标题中心线与 Tab 标题对齐：按钮向下延伸到该线。
+            // [EN] As iOS (`-[CYLPlusButton cyl_alignedCenterForCenter:]`): the plus title's center on the tab titles' line and
+            //      the image right above its title, so the image is placed by the titles, not by the height methods, and sits
+            //      where it does on iOS. Before, the button kept its top and grew down to that line, which left the image
+            //      higher than on iOS.
+            // [CN] 与 iOS 相同（`-[CYLPlusButton cyl_alignedCenterForCenter:]`）：PlusButton 标题中心线与 Tab 标题对齐，图片紧贴在其标题上方，
+            //      因此图片按标题定位，而不是按高度方法，与 iOS 位置相同。此前按钮保持顶部不动并向下延伸到该线，图片比 iOS 高。
             val reference = buttons.firstOrNull { it.titleLabel.text.isNotEmpty() && it.titleLabel.visibility == View.VISIBLE }
             if (reference != null) {
                 val titleCenter = reference.top + (reference.titleLabel.top + reference.titleLabel.bottom) / 2
                 val titleHeight = plus.titleLabel.measuredHeight.takeIf { it > 0 } ?: reference.titleLabel.height
-                h = maxOf(h, titleCenter + titleHeight / 2 - top)
+                val imageHeight = plus.imageView.drawable?.intrinsicHeight?.takeIf { it > 0 }
+                if (imageHeight != null) {
+                    h = imageHeight + titleHeight
+                    top = titleCenter + titleHeight / 2 - h
+                } else {
+                    h = maxOf(h, titleCenter + titleHeight / 2 - top)
+                }
             }
         }
         plus.layout(centerX - w / 2, top, centerX + w / 2, top + h)
@@ -882,3 +959,6 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         @JvmStatic var CYLTabBarHeight: Float = CYLConstants.CYLTabBarHeight
     }
 }
+
+/** [EN] The size of a tab's image view in UIKit's Liquid Glass tab bar, where iOS anchors its badge. [CN] UIKit 液态玻璃 TabBar 中 Tab 图片视图的尺寸，iOS 角标锚定于此。 */
+internal const val CYL_LIQUID_GLASS_TAB_IMAGE_DP = 22f

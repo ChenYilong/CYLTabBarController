@@ -209,7 +209,7 @@
  "CYLBadgeAppearance": {
   "status": "done",
   "android": "CYLBadgeAppearance",
-  "note": "Android defaults: 11 sp font, 2 dp margin"
+  "note": "Android defaults as on iOS: bold 9 sp font, 8 dp margin; the badge centered 2 dp right of its anchor's top-right corner (tabs: the 22 dp image view on Liquid Glass, else the image)"
  },
  "CYLBadgeAppearance -reset": {
   "status": "done",
@@ -5299,5 +5299,198 @@
  "UIWindow(CYLLocalization) -cyl_setRootViewControllerProvider:": {
   "status": "n/a",
   "note": "the iOS bundle localization; Android uses resources"
+ },
+ "CYLTabBarControllerPlusButton": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerPlusButton"
+ },
+ "CYLTabBarControllerPlusButtonAction": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerPlusButtonAction",
+  "note": "(CYLPlusButton) -> Unit"
+ },
+ "CYLPlusButtonBackgroundImage": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonBackgroundImage"
+ },
+ "CYLPlusButtonIndexInTabBar": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonIndexInTabBar"
+ },
+ "CYLPlusButtonCenterYMultiplier": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonCenterYMultiplier"
+ },
+ "CYLPlusButtonCenterYOffset": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonCenterYOffset"
+ },
+ "CYLPlusButtonAlignsTitle": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonAlignsTitle"
+ },
+ "CYLPlusButtonKeepsTitleVisible": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonKeepsTitleVisible"
+ },
+ "CYLTabBarControllerTabButtonTapAnimation": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerTabButtonTapAnimation"
+ },
+ "CYLTabBarControllerSwipeToSwitchTab": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerSwipeToSwitchTab"
+ },
+ "CYLTabBarControllerUserInterfaceStyle": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerUserInterfaceStyle",
+  "note": "read but not applied: Android follows the system night mode"
+ },
+ "CYLPlusButton(CYLConfigurationPlusButton) +cyl_registerPlusButtonWithAttributes:action:context:": {
+  "status": "done",
+  "android": "CYLPlusButton.cyl_registerPlusButtonWithAttributes"
+ },
+ "CYLPlusButton(CYLConfigurationPlusButton)": {
+  "status": "done",
+  "android": "CYLConfigurationPlusButton"
+ },
+ "CYLTabBarHostView": {
+  "status": "done",
+  "android": "CYLTabBarHostView"
+ },
+ "CYLTabBarHostView configuration": {
+  "status": "done",
+  "android": "CYLTabBarHostView.configuration"
+ },
+ "CYLTabBarHostView -setConfigurationJSON:": {
+  "status": "done",
+  "android": "CYLTabBarHostView.setConfigurationJSON"
+ },
+ "CYLTabBarHostView imageResolver": {
+  "status": "done",
+  "android": "CYLTabBarHostView.imageResolver",
+  "note": "(Any?) -> Drawable?"
+ },
+ "CYLTabBarHostView selectedIndex": {
+  "status": "done",
+  "android": "CYLTabBarHostView.selectedIndex"
+ },
+ "CYLTabBarHostView badgeValues": {
+  "status": "done",
+  "android": "CYLTabBarHostView.badgeValues"
+ },
+ "CYLTabBarHostView heightIncludesOverflow": {
+  "status": "done",
+  "android": "CYLTabBarHostView.heightIncludesOverflow"
+ },
+ "CYLTabBarHostView preferredHeight": {
+  "status": "done",
+  "android": "CYLTabBarHostView.preferredHeight",
+  "note": "dp"
+ },
+ "CYLTabBarHostView didSelectTab": {
+  "status": "done",
+  "android": "CYLTabBarHostView.didSelectTab"
+ },
+ "CYLTabBarHostView didTapPlusButton": {
+  "status": "done",
+  "android": "CYLTabBarHostView.didTapPlusButton"
+ },
+ "CYLTabBarHostView preferredHeightDidChange": {
+  "status": "done",
+  "android": "CYLTabBarHostView.preferredHeightDidChange"
+ },
+ "CYLTabBarHostView touchableRects": {
+  "status": "done",
+  "android": "CYLTabBarHostView.touchableRects",
+  "note": "List<RectF> in dp"
+ },
+ "CYLTabBarHostView touchableRectsDidChange": {
+  "status": "done",
+  "android": "CYLTabBarHostView.touchableRectsDidChange"
+ },
+ "CYLTabBarHostView tabBarController": {
+  "status": "done",
+  "android": "CYLTabBarHostView.tabBarController"
+ },
+ "CYLTabBarHostView plusButtonBadgeValue": {
+  "status": "done",
+  "android": "CYLTabBarHostView.plusButtonBadgeValue"
+ },
+ "CYLTabBarHostView badgeAnimationType": {
+  "status": "done",
+  "android": "CYLTabBarHostView.badgeAnimationType"
+ },
+ "CYLTabBarHostView didLongPressTab": {
+  "status": "done",
+  "android": "CYLTabBarHostView.didLongPressTab"
+ },
+ "CYLPlusButtonImageSize": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonImageSize"
+ },
+ "CYLPlusButtonShowsSelection": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonShowsSelection",
+  "note": "Android always shows the selection"
+ },
+ "CYLPlusButtonSize": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonSize"
+ },
+ "CYLTabBarControllerLoginRequiredTabBarItemIdentifiers": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers",
+  "note": "a list or one comma-separated string"
+ },
+ "CYLTabBarHostBadgeAnimation": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_ANIMATION"
+ },
+ "CYLTabBarHostBadgeCenterOffset": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_CENTER_OFFSET"
+ },
+ "CYLTabBarHostBadgeColor": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_COLOR"
+ },
+ "CYLTabBarHostBadgeRadius": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_RADIUS"
+ },
+ "CYLTabBarHostBadgeValue": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_VALUE"
+ },
+ "CYLTabBarHostView -resetLoggedIn": {
+  "status": "done",
+  "android": "CYLTabBarHostView.resetLoggedIn()"
+ },
+ "CYLTabBarHostView badgeAttributes": {
+  "status": "done",
+  "android": "CYLTabBarHostView.badgeAttributes"
+ },
+ "CYLTabBarHostView didRequestLogin": {
+  "status": "done",
+  "android": "CYLTabBarHostView.didRequestLogin"
+ },
+ "CYLTabBarHostView loggedIn": {
+  "status": "done",
+  "android": "CYLTabBarHostView.loggedIn",
+  "note": "cached in SharedPreferences, as NSUserDefaults on iOS"
+ },
+ "CYLTabBarHostView loginStateDidChange": {
+  "status": "done",
+  "android": "CYLTabBarHostView.loginStateDidChange"
+ },
+ "CYLTabBarHostView plusButtonBadgeAttributes": {
+  "status": "done",
+  "android": "CYLTabBarHostView.plusButtonBadgeAttributes"
+ },
+ "CYLTabBarHostView tabCoverImages": {
+  "status": "done",
+  "android": "CYLTabBarHostView.tabCoverImages",
+  "note": "CYLTabBarItemButton.cyl_coverView"
  }
 }
