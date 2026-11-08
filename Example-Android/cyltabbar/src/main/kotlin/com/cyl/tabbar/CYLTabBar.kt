@@ -614,29 +614,38 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     internal fun refreshSelection() {
         val controller = tabBarController ?: return
         buttons.forEachIndexed { index, button -> button.apply(index == controller.selectedIndex && !plusButtonActive, this) }
-        plusButton?.let { plus ->
-            plus.isSelected = plusButtonActive
-            if (plus.cyl_alignsTitleWithTabBarItemTitles()) {
-                // [EN] The tab titles' font and colors (the selected tab's color while the plus button is selected). [CN] Tab 标题的字体与颜色（PlusButton 选中时用选中 Tab 的颜色）。
-                val reference = buttons.firstOrNull { it.titleLabel.text.isNotEmpty() && it.titleLabel.visibility == View.VISIBLE }
-                if (reference != null) {
-                    plus.titleLabel.typeface = reference.titleLabel.typeface
-                    plus.titleLabel.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, reference.titleLabel.textSize)
-                    val selectedColor = controller.cyl_tabBarItemSelectedTitleColor ?: selectedTintColor
-                    // [EN] Liquid Glass: unselected in the system color, as the tab titles. [CN] 液态玻璃：未选中时与 Tab 标题一样使用系统颜色。
-                    val normalColor = if (styleRenderer is CYLLiquidGlassTabBarStyle) unselectedTintColor
-                                      else controller.cyl_tabBarItemTitleColor ?: unselectedTintColor
-                    plus.titleLabel.setTextColor(if (plusButtonActive) selectedColor else normalColor)
-                }
-            } else if (!plusButtonActive || plus.cyl_selectedTitleColor == null) {
-                plus.titleLabel.setTextColor(unselectedTintColor)
-            }
-        }
+        plusButton?.let { refreshPlusButtonTitle(it, controller) }
         shadow.setBackgroundColor(cyl_shadowColor ?: Color.TRANSPARENT)
         layoutIndicator(animated = true)
         scrollSelectedTabIntoView()
         styleRenderer.onSelectionChanged(this, animated = true)
         invalidate()
+    }
+
+    /** [EN] The plus button's selection and title colors, after a selection change. [CN] 选中状态变化后，PlusButton 的选中状态与标题颜色。 */
+    private fun refreshPlusButtonTitle(plus: CYLPlusButton, controller: CYLTabBarController) {
+        plus.isSelected = plusButtonActive
+        if (plus.cyl_alignsTitleWithTabBarItemTitles()) {
+            alignPlusButtonTitle(plus, controller)
+        } else if (!plusButtonActive || plus.cyl_selectedTitleColor == null) {
+            plus.titleLabel.setTextColor(unselectedTintColor)
+        }
+    }
+
+    /**
+     * [EN] The tab titles' font and colors for an aligned plus button title (the selected tab's color while the plus
+     *      button is selected).
+     * [CN] 对齐的 PlusButton 标题使用 Tab 标题的字体与颜色（PlusButton 选中时用选中 Tab 的颜色）。
+     */
+    private fun alignPlusButtonTitle(plus: CYLPlusButton, controller: CYLTabBarController) {
+        val reference = buttons.firstOrNull { it.titleLabel.text.isNotEmpty() && it.titleLabel.visibility == View.VISIBLE } ?: return
+        plus.titleLabel.typeface = reference.titleLabel.typeface
+        plus.titleLabel.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, reference.titleLabel.textSize)
+        val selectedColor = controller.cyl_tabBarItemSelectedTitleColor ?: selectedTintColor
+        // [EN] Liquid Glass: unselected in the system color, as the tab titles. [CN] 液态玻璃：未选中时与 Tab 标题一样使用系统颜色。
+        val normalColor = if (styleRenderer is CYLLiquidGlassTabBarStyle) unselectedTintColor
+                          else controller.cyl_tabBarItemTitleColor ?: unselectedTintColor
+        plus.titleLabel.setTextColor(if (plusButtonActive) selectedColor else normalColor)
     }
 
     private fun indicatorTarget(): Int = if (plusButtonActive) -1 else tabBarController?.selectedIndex ?: -1

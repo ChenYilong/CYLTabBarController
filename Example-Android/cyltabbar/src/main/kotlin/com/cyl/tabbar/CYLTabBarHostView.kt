@@ -558,14 +558,9 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         val rects = mutableListOf<Rect>()
         if (tabBar != null && tabBar.isLaidOut) {
             rects += rectInView(tabBar, Rect(0, 0, tabBar.width, tabBar.height))
-            val plusButton = tabBar.plusButton
-            if (plusButton != null && plusButton.isAttachedToWindow && plusButton.visibility == VISIBLE) {
-                val frame = Rect(0, 0, plusButton.width, plusButton.height)
-                for (index in 0 until plusButton.childCount) {
-                    val child = plusButton.getChildAt(index)
-                    if (child.visibility == VISIBLE) frame.union(child.left + child.translationX.toInt(), child.top + child.translationY.toInt(), child.right + child.translationX.toInt(), child.bottom + child.translationY.toInt())
-                }
-                val plusRect = rectInView(plusButton, frame)
+            val plusButton = tabBar.plusButton?.takeIf { it.isAttachedToWindow && it.visibility == VISIBLE }
+            if (plusButton != null) {
+                val plusRect = rectInView(plusButton, plusButtonFrame(plusButton))
                 rects += plusRect
                 // [EN] The part of the plus button in the strip lies outside the content: this view hands its touches over.
                 // [CN] PlusButton 位于透明区域中的部分在内容之外：由本视图转交其触摸。
@@ -579,6 +574,23 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         val density = resources.displayMetrics.density
         touchableRects = rects.map { RectF(it.left / density, it.top / density, it.right / density, it.bottom / density) }
         touchableRectsDidChange?.invoke(touchableRects)
+    }
+
+    /**
+     * [EN] The plus button's frame with its visible children (its badge and a title that reach outside it), in its
+     *      own coordinates.
+     * [CN] PlusButton 及其可见子视图（超出其范围的角标与标题）的范围，以其自身坐标表示。
+     */
+    private fun plusButtonFrame(plusButton: CYLPlusButton): Rect {
+        val frame = Rect(0, 0, plusButton.width, plusButton.height)
+        for (index in 0 until plusButton.childCount) {
+            val child = plusButton.getChildAt(index)
+            if (child.visibility != VISIBLE) continue
+            val dx = child.translationX.toInt()
+            val dy = child.translationY.toInt()
+            frame.union(child.left + dx, child.top + dy, child.right + dx, child.bottom + dy)
+        }
+        return frame
     }
 
     /** [EN] `rect`, in the coordinates of `view`, in this view's coordinates. [CN] 把 `view` 坐标中的 `rect` 转为本视图坐标。 */

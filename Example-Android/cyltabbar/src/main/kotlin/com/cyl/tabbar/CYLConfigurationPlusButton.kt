@@ -165,16 +165,16 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
             val pixels = IntArray(width * height)
             bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
             bitmap.recycle()
-            var left = width; var top = height; var right = -1; var bottom = -1
-            for (y in 0 until height) for (x in 0 until width) {
-                if (pixels[y * width + x] ushr 24 > VISIBLE_ALPHA) {
-                    if (x < left) left = x
-                    if (x > right) right = x
-                    if (y < top) top = y
-                    if (y > bottom) bottom = y
-                }
-            }
-            return if (right < 0) null else android.graphics.Rect(left, top, right + 1, bottom + 1)
+            fun visible(x: Int, y: Int) = pixels[y * width + x] ushr 24 > VISIBLE_ALPHA
+            fun rowVisible(y: Int) = (0 until width).any { visible(it, y) }
+            // [EN] The first and last visible rows, then the first and last visible columns between them.
+            // [CN] 先找第一行与最后一行可见像素，再在两者之间找第一列与最后一列。
+            val top = (0 until height).firstOrNull(::rowVisible) ?: return null
+            val bottom = (height - 1 downTo top).first(::rowVisible)
+            fun columnVisible(x: Int) = (top..bottom).any { visible(x, it) }
+            val left = (0 until width).first(::columnVisible)
+            val right = (width - 1 downTo left).first(::columnVisible)
+            return android.graphics.Rect(left, top, right + 1, bottom + 1)
         }
 
         /** [EN] The alpha above which a pixel counts as visible. [CN] 高于此值的像素视为可见。 */
