@@ -44,6 +44,7 @@ With YES on Liquid Glass the title moves into the tab item under the button (#63
 ## Other limits
 
 - iOS 27.1 vertical bar (`allowsVerticalBar`, unfolded iPhone Duo): the Y offset methods are ignored, because the button is centered in the bar.
+- Touchable area on Liquid Glass: points above the bar reach the plus button through `CYLTabBarOverflowTouchView` (iOS 26+), but a point in a neighboring tab's column goes to the system tab bar's gesture, not the plus button. Do not override `-touchableRect` to return `frame`: it disables `touchableAreaOutsets` and `touchableAreaScale`.
 - Height and touches: [PlusButton-Touchable-Area](../../../docs/PlusButton-Touchable-Area.md), [PlusButton-Subview-Touches](../../../docs/PlusButton-Subview-Touches.md).
 - `selectedIndex` and the slot: [SelectedIndex-PlusButton](../../../docs/SelectedIndex-PlusButton.md), [PlusButton-Slot](../../../docs/PlusButton-Slot.md).
 - Badge: [PlusButton-Badge](../../../docs/PlusButton-Badge.md). Background image: [PlusButton-Background-Image-Liquid-Glass](../../../docs/PlusButton-Background-Image-Liquid-Glass.md).

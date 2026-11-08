@@ -276,11 +276,11 @@ jobs:
 
 | 中文 | English |
 |:---|:---|
-| ~~**TODO 1**~~ 已完成：采用方案 A（GitHub 托管 runner），主 runner 为 `xcode-27`。 | ~~**TODO 1**~~ Done: option A (GitHub-hosted runners), with `xcode-27` as the main runner. |
-| **TODO 2** 仓库 Settings → Actions → General：允许 GitHub Actions；对外部贡献者的 fork PR 设置「需要批准」。 | **TODO 2** Repository Settings → Actions → General: allow GitHub Actions; require approval for workflows from fork pull requests by outside contributors. |
+| ~~**TODO 1**~~ 已完成：采用方案 A（GitHub 托管 runner），主 runner 为 `macos-26`（2026-11-04 前为 `xcode-27`）。 | ~~**TODO 1**~~ Done: option A (GitHub-hosted runners), with `macos-26` as the main runner (`xcode-27` before 2026-11-04). |
+| ~~**TODO 2**~~ 已完成：GitHub Actions 已启用（CI 在每个 PR 上运行）；外部 fork PR 的工作流需要批准，设置为「首次贡献者」（2026-11-09 通过 GitHub API 确认）。 | ~~**TODO 2**~~ Done: GitHub Actions is enabled (CI runs on every pull request); workflows from fork pull requests need approval, set to "first-time contributors" (checked through the GitHub API on 2026-11-09). |
 | ~~**TODO 3**~~ 已完成：仓库 Secret `COCOAPODS_TRUNK_TOKEN` 已添加（2026-11-04）。由于该 token 曾出现在对话中，建议重新 `pod trunk register` 生成新 token、更新 Secret，并用 `pod trunk me clean-sessions` 使旧 token 失效。 | ~~**TODO 3**~~ Done: the repository secret `COCOAPODS_TRUNK_TOKEN` is set (2026-11-04). As that token appeared in a chat, register a new trunk session, update the secret, and invalidate the old token with `pod trunk me clean-sessions`. |
 | ~~**TODO 4**~~ 已完成：CI 已在 PR #763 中运行，首次全部通过，结果见「首次运行结果」。 | ~~**TODO 4**~~ Done: CI runs in PR #763 and passed in full; see "First run results". |
-| **TODO 5** CI 稳定后，在仓库 Settings → Branches 中把这些检查设为 master 的必需检查。 | **TODO 5** Once CI is stable, make these checks required for master in Settings → Branches. |
+| **TODO 5** CI 稳定后，在仓库 Settings → Branches 中把这些检查设为 master 的必需检查。2026-11-09 确认：master 尚无分支保护。 | **TODO 5** Once CI is stable, make these checks required for master in Settings → Branches. Checked on 2026-11-09: master has no branch protection yet. |
 
 ## [CN]来源
 ## [EN]Sources

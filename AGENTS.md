@@ -209,6 +209,19 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
   SonarCloud's "lock file is missing" findings (`text:S8564` package.json, `text:S8568` Gemfile, `text:S8571`
   pubspec.yaml) are therefore avoided by excluding those manifests in `.sonarcloud.properties` (`sonar.exclusions`;
   automatic analysis ignores `sonar.issue.ignore.*` there), never by committing a lock file.
+- **Before every commit, check `docs/` for stale notes**: search every document in `docs/` (and `README.md`) for `TODO`
+  and for notes left by an environment that could not run the code ("Linux", "without Xcode", "no simulator",
+  "no screenshots", `无法运行`, `没有截图`):
+
+  ```sh
+  grep -rn -i -E "TODO|Linux|without Xcode|no (iOS )?simulator|no screenshots?|无法(编译|运行)|没有截图|暂无(测试)?截图" docs README.md
+  ```
+
+  For each hit about a feature: test it (build, unit tests, run it on the simulator or emulator), then update the
+  document with what was verified and the test screenshots (`docs/assets/`, layout as the `cyl-docs` skill says), and
+  `README.md` when its section is affected. A finished TODO becomes DONE with its evidence; a TODO that only the
+  maintainer can do (a repository setting, a release) stays, with what was checked and when. A bug found while testing
+  is fixed in the same change. Details: the `cyl-docs` skill, "Stale notes before every commit".
 - **Push over SSH first**: `git push origin <branch>` (`origin` is `git@github.com:ChenYilong/CYLTabBarController.git`).
   Use HTTPS with the `gh` credential helper only when SSH fails: its token has no `workflow` scope, so GitHub rejects
   any push that changes `.github/workflows/*` ("refusing to allow an OAuth App to create or update workflow").

@@ -294,7 +294,51 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 #else
 #endif
 
+/*!
+ * [EN] FIX: issue #91 — iOS 26 and later put the tab bar in a wrapper view only as tall as the bar, so UIKit never asks
+ *      `-[CYLTabBar hitTest:withEvent:]` about a point above the bar: the raised part of the plus button and a touchable
+ *      area grown with `touchableAreaOutsets` / `touchableAreaScale` went to the page behind (or to the scroll edge
+ *      effect's touch blocker). This transparent view, in front of everything in the controller's view, asks the tab bar
+ *      about points above the bar and keeps only the plus button (and its subviews); every other point returns nil, so
+ *      the pages get their touches as before. The classic style and FlatDesign do not need it: their bar's superview is
+ *      the controller's view, which already asks the tab bar.
+ * [CN] FIX: issue #91 — iOS 26 及以上把 TabBar 放在只有 TabBar 高度的容器视图中，UIKit 不会就 TabBar 上方的点询问
+ *      `-[CYLTabBar hitTest:withEvent:]`：PlusButton 凸出的部分、以及用 `touchableAreaOutsets` / `touchableAreaScale` 扩大的点击区域，
+ *      触摸会交给后面的页面（或滚动边缘效果的触摸拦截视图）。这个透明视图位于控制器视图的最前面，就 TabBar 上方的点询问 TabBar，
+ *      只保留 PlusButton（及其子视图）；其他点返回 nil，页面照常接收触摸。经典样式与扁平样式不需要它：其 TabBar 的父视图就是控制器的视图，
+ *      已经会询问 TabBar。
+ */
+@interface CYLTabBarOverflowTouchView : UIView
+@property (nonatomic, weak) UITabBar *tabBar;
+@end
+
+@implementation CYLTabBarOverflowTouchView
+
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UITabBar *tabBar = self.tabBar;
+    if (!tabBar.window || tabBar.hidden || tabBar.alpha < 0.01 || !tabBar.userInteractionEnabled
+        || ![tabBar isKindOfClass:[CYLTabBar class]]) {
+        return nil;
+    }
+    CGPoint tabBarPoint = [self convertPoint:point toView:tabBar];
+    // [EN] On the bar itself UIKit already routes the touch. [CN] TabBar 本身范围内的触摸 UIKit 已经能正确分发。
+    if ([tabBar pointInside:tabBarPoint withEvent:event]) {
+        return nil;
+    }
+    UIView *plusButton = ((CYLTabBar *)tabBar).plusButton;
+    if (!plusButton) {
+        return nil;
+    }
+    UIView *hit = [tabBar hitTest:tabBarPoint withEvent:event];
+    return [hit isDescendantOfView:plusButton] ? hit : nil;
+}
+
+@end
+
 @interface CYLTabBarController () <UITabBarControllerDelegate>
+
+/// [EN] iOS 26+: routes points above the bar to the plus button (issue #91). [CN] iOS 26+：把 TabBar 上方的点交给 PlusButton（issue #91）。
+@property (nonatomic, strong, nullable) CYLTabBarOverflowTouchView *cyl_overflowTouchView;
 
 /// [EN] Page registry state (docs/Tab-Page-Registry.md): whether the tabs came from page IDs, the sources, the pages by
 ///      ID (for `-reloadTabBarItemsWithAttributes:`) and the skipped tabs.
@@ -1199,6 +1243,8 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
     // Issue #601: tab buttons created again (e.g. after a rotation) get their icon views again.
     [self cyl_setNeedsUpdateTabBarItemIconViews];
     [self cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded];
+    // [EN] FIX: issue #91 — points above the bar reach the plus button on iOS 26+ too. [CN] iOS 26+ 上 TabBar 上方的点也能到达 PlusButton。
+    [self cyl_updateOverflowTouchView];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         // FIX: issue #585, #543 (follow-up to #93, #392)
         // [EN] The forced `-layoutSubviews` below is an iOS 10 workaround: #93 (iOS 10.0–10.2) and #392 (iOS 10.3.x, items
@@ -1301,6 +1347,36 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
         !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
     }
 
+}
+
+/*!
+ * [EN] FIX: issue #91 — installs `CYLTabBarOverflowTouchView` in front of the controller's view while the tab bar lives in
+ *      a wrapper view of its own (iOS 26 and later), and removes it otherwise.
+ * [CN] FIX: issue #91 — TabBar 位于自己的容器视图中时（iOS 26 及以上）在控制器视图最前面安装 `CYLTabBarOverflowTouchView`，否则移除。
+ */
+- (void)cyl_updateOverflowTouchView {
+    UITabBar *tabBar = self.tabBar;
+    BOOL needed = self.isViewLoaded && tabBar.superview && tabBar.superview != self.view;
+    CYLTabBarOverflowTouchView *touchView = self.cyl_overflowTouchView;
+    if (!needed) {
+        [touchView removeFromSuperview];
+        self.cyl_overflowTouchView = nil;
+        return;
+    }
+    if (!touchView) {
+        touchView = [[CYLTabBarOverflowTouchView alloc] initWithFrame:self.view.bounds];
+        touchView.backgroundColor = UIColor.clearColor;
+        touchView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        touchView.accessibilityElementsHidden = YES;   // [EN] Not a control: VoiceOver reads the plus button. [CN] 不是控件：VoiceOver 读 PlusButton。
+        self.cyl_overflowTouchView = touchView;
+    }
+    touchView.tabBar = tabBar;
+    if (touchView.superview != self.view) {
+        [self.view addSubview:touchView];
+    } else if (self.view.subviews.lastObject != touchView) {
+        [self.view bringSubviewToFront:touchView];
+    }
+    touchView.frame = self.view.bounds;
 }
 
 - (void)viewWillLayoutSubviews {

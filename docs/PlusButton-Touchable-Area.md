@@ -111,7 +111,7 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-    touch["Touch at a point"] --> ask["The tab bar's -hitTest: is asked<br/>(also for points outside the bar)"]
+    touch["Touch at a point"] --> ask["The tab bar's -hitTest: is asked<br/>(above the bar on iOS 26+: through CYLTabBarOverflowTouchView)"]
     ask --> hasPlus{"Has a plus button?"}
     hasPlus -- no --> tabs["Tab buttons, then the default hit test"]
     hasPlus -- yes --> convert["Area = touchableRectInView: tab bar<br/>(converted from the button's superview)"]
@@ -136,6 +136,8 @@ flowchart TD
 | 扁平样式子控制器 / FlatDesign child view controller | 有子控制器时整个区域被忽略，TabBar 之外的凸起部分点击会穿透。现在 TabBar 外的部分交给 PlusButton，TabBar 内保持原样。 | With a child view controller the area was ignored, so taps on the raised part outside the bar fell through. The part outside the bar now goes to the plus button; inside the bar nothing changes. |
 | 液态玻璃坐标 / Liquid Glass coordinates | PlusButton 位于 platter 中，不是 TabBar 的直接子视图，现在先转换坐标（与 #653 的 Tab 按钮相同）。 | The plus button sits in the platter, not directly in the tab bar; the area is now converted first (as for the tab buttons in #653). |
 | TouchUpOutside | TabBar 把触摸交给了 PlusButton，但点在按钮之外时 UIControl 发送的是 `TouchUpOutside`，点击无效。现在 `-pointInside:withEvent:` 覆盖整个区域。 | The tab bar handed the touch to the plus button, but outside the button UIControl sent `TouchUpOutside`, so nothing happened. `-pointInside:withEvent:` now covers the whole area. |
+| iOS 26 TabBar 上方 / above the bar on iOS 26 | iOS 26 及以上 TabBar 位于只有 TabBar 高度的容器视图中，UIKit 不会就 TabBar 上方的点询问 TabBar：PlusButton 凸出部分与扩大的区域点击无效（被页面或滚动边缘效果的触摸拦截视图接收）。现在 `CYLTabBarController` 在其视图最前面放一个透明的 `CYLTabBarOverflowTouchView`，就 TabBar 上方的点询问 TabBar，只保留 PlusButton，其他点照常交给页面。 | On iOS 26 and later the tab bar sits in a wrapper view only as tall as the bar, so UIKit never asks it about a point above the bar: taps on the raised part of the plus button and on the grown area did nothing (the page, or the scroll edge effect's touch blocker, took them). `CYLTabBarController` now puts a transparent `CYLTabBarOverflowTouchView` in front of its view: it asks the tab bar about points above the bar, keeps only the plus button, and leaves every other point to the pages. |
+| 示例的 `-touchableRect` / the example's `-touchableRect` | ObjC 示例的 `CYLPlusButtonSubclass` 重写 `-touchableRect` 返回 `frame`，使 `touchableAreaOutsets` 与滑块都不起作用（覆盖层始终是按钮大小）。已删除该重写。 | The ObjC example's `CYLPlusButtonSubclass` overrode `-touchableRect` to return `frame`, which disabled `touchableAreaOutsets` and the slider (the overlay always had the button's size). The override is removed. |
 
 ## [CN]代码演示
 ## [EN]Code
@@ -197,8 +199,8 @@ if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton(forOwner: ta
 | 中文 | English |
 |:---|:---|
 | **可行，已实现。** 放大只改变点击判断用的矩形，不改变按钮的 frame、布局或外观，因此可以在运行时随时修改，立即生效，无需重新布局 TabBar。 | **Yes, and it is implemented.** Scaling only changes the rectangle used for hit testing, not the button's frame, layout or look, so it can change at any time at runtime and takes effect immediately, without laying the tab bar out again. |
-| **注意 1：与 Tab 按钮重叠。** 区域放大后可能盖住相邻 Tab 按钮的一部分；PlusButton 优先判断，重叠部分会交给 PlusButton。滑块上限设为 3 倍，调试时打开覆盖层即可看到。 | **Note 1: overlapping tab buttons.** A larger area can cover part of the neighboring tab buttons; the plus button is checked first, so the overlap goes to it. The slider stops at 3×; turn the overlay on to see it. |
-| **注意 2：覆盖层被裁剪。** 父视图裁剪边界时（如液态玻璃的 platter），覆盖层也会被裁剪，但点击判断仍使用完整区域。 | **Note 2: a clipped overlay.** When the superview clips (e.g. Liquid Glass's platter), the overlay is clipped too, while hit testing still uses the whole area. |
+| **注意 1：与 Tab 按钮重叠。** 区域放大后可能盖住相邻 Tab 按钮的一部分。经典样式与扁平样式中 PlusButton 优先判断，重叠部分交给 PlusButton。液态玻璃中，位于相邻 Tab 那一列（TabBar 内或其上方）的点会被系统 TabBar 自己的手势接收，PlusButton 不会触发；PlusButton 所在列的上方与下方正常。滑块上限设为 3 倍，调试时打开覆盖层即可看到。 | **Note 1: overlapping tab buttons.** A larger area can cover part of the neighboring tab buttons. In the classic style and FlatDesign the plus button is checked first, so the overlap goes to it. In Liquid Glass, a point in a neighboring tab's column (in the bar or above it) is taken by the system tab bar's own gesture and the plus button does not fire; above and below the plus button's own column it works. The slider goes up to 3×; turn the overlay on to see it while debugging. |
+| **注意 2：覆盖层的父视图。** 覆盖层加在 PlusButton 的父视图中。父视图裁剪边界时覆盖层也会被裁剪，但点击判断仍使用完整区域；在 iOS 26.1 的液态玻璃中父视图是 TabBar，没有裁剪（见下方截图）。 | **Note 2: the overlay's superview.** The overlay goes in the plus button's superview. A superview that clips would clip the overlay too, while hit testing still uses the whole area; in Liquid Glass on iOS 26.1 that superview is the tab bar, which does not clip (see the screenshots below). |
 | **注意 3：扁平样式 + 子控制器。** TabBar 内部的点击仍交给下方的 Tab 按钮（行为不变），只有区域中位于 TabBar 之外的部分交给 PlusButton。 | **Note 3: FlatDesign with a child view controller.** Taps inside the bar still go to the tab button below (unchanged); only the part of the area outside the bar goes to the plus button. |
 | 线上建议使用固定的 `touchableAreaOutsets`；滑块与覆盖层用于调试时找到合适的值。 | In production, use fixed `touchableAreaOutsets`; the slider and the overlay are for finding the right values while debugging. |
 
@@ -207,4 +209,8 @@ if tabBarController.hasPlusButton(), let plusButton = CYLPlusButton(forOwner: ta
 
 | 中文 | English |
 |:---|:---|
-| 本次修改在 Linux 环境中完成，无法运行 Xcode 和 iOS 模拟器，因此**没有截图**，也没有在设备上验证。建议在三种样式下：① 打开演示行的开关，确认红色区域覆盖按钮及其下方间隙；② 点击间隙，确认触发 PlusButton 而不是下方页面；③ 拖动滑块，确认区域实时变化；④ 关闭开关，确认恢复正常外观。验证后的截图请放在 `docs/assets/` 中，并用 `![](assets/文件名.png)` 引用。 | This change was made on Linux, where Xcode and the iOS simulator cannot run, so there are **no screenshots** and it was not verified on a device. In all three styles: ① turn the demo row's switch on and check that the red area covers the button and the gap below it; ② tap the gap and check that the plus button fires, not the page behind; ③ drag the slider and check that the area follows; ④ turn the switch off and check that the normal look is back. Put screenshots from these checks in `docs/assets/` and reference them as `![](assets/file-name.png)`. |
+| 2026-11-09 在 iPhone 17 Pro Max 模拟器（iOS 26.1，液态玻璃，Xcode 27.2）上运行 ObjC 示例 `Example` 验证：① 打开演示行开关后，红色区域覆盖按钮及 `touchableAreaOutsets` 扩展的部分；② 点击按钮上方凸出部分、扩展区域内按钮所在列的点，都会打开 PlusButton 的页面（修复前无效，见「修复的问题」）；③ 拖动滑块到 2.1 倍，区域随之以按钮为中心放大（修复前始终是按钮大小）；④ 关闭开关后恢复正常外观。相邻 Tab 那一列的点不会触发 PlusButton（注意 1）。经典样式与扁平样式的截图尚未添加。 | Verified on 2026-11-09 with the ObjC `Example` on an iPhone 17 Pro Max simulator (iOS 26.1, Liquid Glass, Xcode 27.2): ① with the demo row's switch on, the red area covers the button and what `touchableAreaOutsets` adds; ② a tap on the raised part above the bar, or anywhere in the area in the plus button's column, opens the plus button's page (it did nothing before the fix, see "What was fixed"); ③ at 2.1× on the slider the area grows around the button (before the fix it kept the button's size); ④ with the switch off the normal look is back. A point in a neighboring tab's column does not fire the plus button (note 1). Screenshots of the classic style and FlatDesign are not added yet. |
+| 开关打开，1.0 倍（`touchableAreaOutsets` 为 0, 8, 12, 8）： | Switch on, 1.0× (`touchableAreaOutsets` of 0, 8, 12, 8): |
+| ![PlusButton 点击范围 1.0 倍](assets/plusbutton-touchable-area-1x.png) | ![PlusButton touchable area at 1.0x](assets/plusbutton-touchable-area-1x.png) |
+| 滑块 2.1 倍： | Slider at 2.1×: |
+| ![PlusButton 点击范围 2.1 倍](assets/plusbutton-touchable-area-2x.png) | ![PlusButton touchable area at 2.1x](assets/plusbutton-touchable-area-2x.png) |

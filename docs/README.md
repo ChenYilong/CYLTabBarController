@@ -192,6 +192,8 @@ docs/
     ├── plusbutton-overlap-flat.png
     ├── plusbutton-overlap-lg.png
     ├── plusbutton-subview-touches-issue-202.png
+    ├── plusbutton-touchable-area-1x.png
+    ├── plusbutton-touchable-area-2x.png
     ├── react-native-component-android-bar.png
     ├── react-native-component-android.png
     ├── react-native-component-ios-bar.png
