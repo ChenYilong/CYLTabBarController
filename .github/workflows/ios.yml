@@ -192,9 +192,16 @@ jobs:
       - name: Install Carthage
         if: needs.changes.outputs.code == 'true'
         run: carthage version || brew install carthage
+      # [EN] Carthage lists the schemes of every Xcode project in the checkout. The Flutter examples' Runner projects
+      #      need packages that only `flutter pub get` creates (`Flutter/ephemeral`), so listing them fails: remove the
+      #      React Native and Flutter folders from this throwaway checkout first. They are not part of the framework.
+      # [CN] Carthage 会列出检出目录中每个 Xcode 工程的 scheme。Flutter 示例的 Runner 工程依赖只有 `flutter pub get` 才会生成的包
+      #      （`Flutter/ephemeral`），列出时会失败：先从这个临时检出目录中删除 React Native 与 Flutter 文件夹，它们不属于框架。
       - name: carthage build
         if: needs.changes.outputs.code == 'true'
-        run: carthage build --no-skip-current --use-xcframeworks --platform iOS
+        run: |
+          rm -rf CrossPlatform
+          carthage build --no-skip-current --use-xcframeworks --platform iOS
 
   # [EN] Every demo, one job each; one failing demo does not stop the others.
   # [CN] 每个 Demo 一个 job；一个 Demo 失败不会中止其他 Demo。
