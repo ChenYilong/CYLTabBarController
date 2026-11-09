@@ -271,7 +271,9 @@ docs/
     ├── update-tab-bar-items-switch-tab-icon.png
     ├── update-tab-bar-items-tab-item-badge-selected-layer.png
     ├── update-tab-bar-items-wrapped-cells-flatdesign.png
-    └── update-tab-bar-items-wrapped-cells.png
+    ├── update-tab-bar-items-wrapped-cells.png
+    ├── update-tab-navigation-title-changed.png
+    └── update-tab-navigation-title-restored.png
 ```
 
 <!-- navigation:end -->

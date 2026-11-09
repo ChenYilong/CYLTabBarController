@@ -2246,6 +2246,17 @@
   "status": "done",
   "android": "CYLConstants.CYLTabBarLocalizationBundleName"
  },
+ "CYLTabBarItemTitleDidChangeNotification": {
+  "status": "planned",
+  "note": "Android pages have no navigation bar title of their own yet"
+ },
+ "UIViewController(CYLTabBarItemTitle) cyl_tabBarItemTitle": {
+  "status": "planned"
+ },
+ "UIViewController(CYLTabBarItemTitle) cyl_navigationTitleFollowsTabBarItemTitle": {
+  "status": "planned",
+  "note": "Android pages have no navigation bar title of their own yet"
+ },
  "CYLTabBarControllerThemes": {
   "status": "done",
   "android": "CYLConstants.CYLTabBarControllerThemes"

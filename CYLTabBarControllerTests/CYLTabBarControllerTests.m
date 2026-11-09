@@ -120,6 +120,40 @@
     [fileManager removeItemAtPath:folder error:NULL];
 }
 
+/// [EN] `cyl_navigationTitleFollowsTabBarItemTitle`: the navigation bar title is the tab title when the tab is set up and
+///      after an in-place update, which also posts `CYLTabBarItemTitleDidChangeNotification`; a page that does not follow
+///      keeps its own title.
+/// [CN] `cyl_navigationTitleFollowsTabBarItemTitle`：Tab 设置时与原地更新后，导航栏标题都是 Tab 标题，更新还会发送
+///      `CYLTabBarItemTitleDidChangeNotification`；不跟随的页面保留自己的标题。
+- (void)testNavigationTitleFollowsTabBarItemTitle {
+    UIViewController *home = [[UIViewController alloc] init];
+    UIViewController *me = [[UIViewController alloc] init];
+    CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(home);
+    me.navigationItem.title = @"Mine";
+    UINavigationController *homeNavigation = [[UINavigationController alloc] initWithRootViewController:home];
+    UINavigationController *meNavigation = [[UINavigationController alloc] initWithRootViewController:me];
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ homeNavigation, meNavigation ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"Home" }, @{ CYLTabBarItemTitle : @"Me" } ]];
+    XCTAssertEqualObjects(home.navigationItem.title, @"Home", @"set when the tab is set up");
+    XCTAssertEqualObjects(CYL_TAB_BAR_ITEM_TITLE(home), @"Home");
+    XCTAssertEqualObjects(CYL_TAB_BAR_ITEM_TITLE(me), @"Me");
+    __block NSString *notifiedTitle = nil;
+    __block id notifiedPage = nil;
+    id observer = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemTitleDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+        if (note.object == home) {
+            notifiedPage = note.object;
+            notifiedTitle = note.userInfo[CYLTabBarItemTitle];
+        }
+    }];
+    [tabBarController updateTabBarItemsWithAttributes:@[ @{ CYLTabBarItemTitle : @"★ Home" }, @{ CYLTabBarItemTitle : @"★ Me" } ]];
+    [[NSNotificationCenter defaultCenter] removeObserver:observer];
+    XCTAssertEqualObjects(home.navigationItem.title, @"★ Home", @"follows the in-place update");
+    XCTAssertEqualObjects(CYL_TAB_BAR_ITEM_TITLE(home), @"★ Home");
+    XCTAssertEqual(notifiedPage, home);
+    XCTAssertEqualObjects(notifiedTitle, @"★ Home");
+    XCTAssertEqualObjects(me.navigationItem.title, @"Mine", @"a page that does not follow keeps its own title");
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{

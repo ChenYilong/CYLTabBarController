@@ -2772,6 +2772,39 @@ FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemAnimationViewDidAddNotif
 // FxxOUNDATION_EXTERN NSString *const CYLTabBarDarkModeShowDarkDidChangeNotification;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidChangeNotification;
 
+/*!
+ * [EN] Posted when a tab's title changes in place (`-updateTabBarItemsWithAttributes:`, `-updateTabBarItemAtIndex:…`, and
+ *      the APIs built on them). The object is the tab's page (the root view controller of its navigation controller);
+ *      `userInfo[CYLTabBarItemTitle]` is the new title.
+ * [CN] Tab 标题原地变化时发送（`-updateTabBarItemsWithAttributes:`、`-updateTabBarItemAtIndex:…` 以及基于它们的接口）。object 为该 Tab 的
+ *      页面（导航控制器的根控制器）；`userInfo[CYLTabBarItemTitle]` 为新标题。
+ */
+FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemTitleDidChangeNotification;
+
+/*!
+ * [EN] The tab title of a page, for its navigation bar. A page's `title` sets both its tab and its navigation bar, and a
+ *      tab title changed later (in place, by a skin, by a configuration file) never reached the navigation bar.
+ *      `cyl_tabBarItemTitle` reads the tab's current title, also in `-viewDidLoad`; with
+ *      `cyl_navigationTitleFollowsTabBarItemTitle`, the library sets `navigationItem.title` now and on every later change.
+ * [CN] 页面的 Tab 标题，用于其导航栏。页面的 `title` 会同时设置 Tab 与导航栏，而之后修改的 Tab 标题（原地更新、皮肤、配置文件）不会传到导航栏。
+ *      `cyl_tabBarItemTitle` 读取 Tab 的当前标题（在 `-viewDidLoad` 中也可以）；设置 `cyl_navigationTitleFollowsTabBarItemTitle` 后，本库立即并在
+ *      之后每次变化时设置 `navigationItem.title`。
+ */
+@interface UIViewController (CYLTabBarItemTitle)
+
+/// [EN] The current title of the tab this page is in (its normal title, also while a selected title shows), nil outside a tab. [CN] 本页面所在 Tab 的当前标题（普通标题，显示选中标题时也是），不在 Tab 中时为 nil。
+@property (nonatomic, copy, readonly, nullable) NSString *cyl_tabBarItemTitle;
+
+/// [EN] YES: `navigationItem.title` is the tab's title, now and after every change. Default NO. [CN] YES：`navigationItem.title` 为 Tab 的标题，立即生效并在之后每次变化时更新。默认 NO。
+@property (nonatomic, assign) BOOL cyl_navigationTitleFollowsTabBarItemTitle;
+
+@end
+
+/// [EN] The current tab title of `viewController` (e.g. `self` in `-viewDidLoad`). [CN] `viewController` 的当前 Tab 标题（例如在 `-viewDidLoad` 中传入 `self`）。
+#define CYL_TAB_BAR_ITEM_TITLE(viewController) ([(viewController) cyl_tabBarItemTitle])
+/// [EN] Makes the navigation bar title of `viewController` follow its tab title. [CN] 让 `viewController` 的导航栏标题跟随其 Tab 标题。
+#define CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(viewController) ((viewController).cyl_navigationTitleFollowsTabBarItemTitle = YES)
+
 NS_ASSUME_NONNULL_END
 
 // [EN] FIX: issue #535 — tap animations, long press and swipe to switch tabs; they extend the class declared above.

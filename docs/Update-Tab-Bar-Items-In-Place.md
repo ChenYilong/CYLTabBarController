@@ -34,6 +34,7 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [自定义 tabBar.items（#22）/ Customizing tabBar.items (#22)](#自定义-tabbaritems22-customizing-tabbaritems-22) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [自定义 tabBar.items（#22）/ Customizing tabBar.items (#22)](#自定义-tabbaritems22-customizing-tabbaritems-22) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [替换 Tab 的页面（#481）/ Replacing a tab's page (#481)](#替换-tab-的页面481-replacing-a-tabs-page-481) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [替换 Tab 的页面（#481）/ Replacing a tab's page (#481)](#替换-tab-的页面481-replacing-a-tabs-page-481) |
 | [API](#api) | [API](#api) |
+| [导航栏标题跟随 Tab 标题](#导航栏标题跟随-tab-标题--navigation-bar-title-follows-the-tab-title) | [Navigation bar title follows the tab title](#导航栏标题跟随-tab-标题--navigation-bar-title-follows-the-tab-title) |
 | [Demo](#demo) | [Demo](#demo) |
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
 | [角标](#角标--badges) | [Badges](#角标--badges) |
@@ -176,6 +177,29 @@ cache.downloadTimeout = 15;
 | `CYLImageCache`、`CYLImageLoadOptions`、`CYLImageCacheExpireType`、`+[UIImage cyl_loadImageWithURL:options:completion:]` | 缓存与加载选项 / Cache and load options |
 | `-performWhenTabBarItemsReady:` | item 创建后执行（#22）/ Runs once the items exist (#22) |
 | `-replaceViewControllerAtIndex:withViewController:attributes:` | 替换一个 Tab 的页面（#481）/ Replace one tab's page (#481) |
+
+## 导航栏标题跟随 Tab 标题 / Navigation bar title follows the tab title
+
+| 中文 | English |
+|:---|:---|
+| 页面的 `title` 会同时设置 Tab 与导航栏，而原地修改的 Tab 标题（本页的 API、皮肤、配置文件）不会传到导航栏。在创建 Tab 时让页面跟随 Tab 标题即可，不需要在 `-viewDidLoad` 中再设置标题：本库在 Tab 设置时与之后每次修改时设置 `navigationItem.title`，并发送 `CYLTabBarItemTitleDidChangeNotification`（object 为页面，`userInfo[CYLTabBarItemTitle]` 为新标题）。`CYL_TAB_BAR_ITEM_TITLE(page)` 随时读取当前的 Tab 标题（显示选中标题时返回普通标题）。 | A page's `title` sets both its tab and its navigation bar, and a tab title changed in place (this page's API, skins, configuration files) never reached the navigation bar. Make the page follow its tab title where the tabs are created; there is no need to set a title in `-viewDidLoad`: the library sets `navigationItem.title` when the tab is set up and on every later change, and posts `CYLTabBarItemTitleDidChangeNotification` (the object is the page, `userInfo[CYLTabBarItemTitle]` the new title). `CYL_TAB_BAR_ITEM_TITLE(page)` reads the current tab title at any time (the normal title while a selected title shows). |
+
+```objc
+// Where the tabs are created (the ObjC example: MainTabBarController.m). 创建 Tab 的位置（ObjC 示例：MainTabBarController.m）。
+for (UIViewController *viewController in viewControllers) {
+    CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(viewController.cyl_getViewControllerInsteadOfNavigationController);
+}
+// Later, anywhere: 之后任意位置：
+NSString *title = CYL_TAB_BAR_ITEM_TITLE(self);
+```
+
+| 中文 | English |
+|:---|:---|
+| 2026-11-09 在 iPhone 17 Pro Max 模拟器（iOS 26.1，液态玻璃）上验证：启动后各 Tab 的导航栏标题即 Tab 标题；「批量更换标题」后导航栏显示「★ Nearby」，恢复后显示「Nearby」。单元测试 `testNavigationTitleFollowsTabBarItemTitle`。ObjC 示例去掉了重复设置标题的代码（以前每个页面再设置一次 `title`，液态玻璃下加上「 (Liquid)」，且不跟随之后的修改）。Android 尚未提供。 | Verified on 2026-11-09 on an iPhone 17 Pro Max simulator (iOS 26.1, Liquid Glass): at launch each tab's navigation bar title is its tab title; after "Change all titles" the navigation bar reads "★ Nearby", and "Nearby" after restoring. Unit test: `testNavigationTitleFollowsTabBarItemTitle`. The ObjC example drops the code that set the titles a second time (each page set `title` again, with " (Liquid)" on Liquid Glass, and never followed later changes). Not on Android yet. |
+| 「批量更换标题」之后（导航栏与 Tab 同步）： | After "Change all titles" (the navigation bar follows the tab): |
+| ![导航栏标题跟随 Tab 标题](assets/update-tab-navigation-title-changed.png) | ![The navigation bar title follows the tab title](assets/update-tab-navigation-title-changed.png) |
+| 恢复之后： | After restoring: |
+| ![恢复后的导航栏标题](assets/update-tab-navigation-title-restored.png) | ![The navigation bar title after restoring](assets/update-tab-navigation-title-restored.png) |
 
 ## Demo
 

@@ -181,13 +181,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     ];
     for (NSInteger i = 0; i < self.tabBarItemsAttributesForTabBar.count; i++) {
         UIViewController *vc = viewControllers[i];
-        NSDictionary *firstTabBarItemsAttributes = self.tabBarItemsAttributesForTabBar[i];
-        //        vc.title = firstTabBarItemsAttributes[CYLTabBarItemTitle];
-        NSString *title = firstTabBarItemsAttributes[CYLTabBarItemTitle];
-        if ([CYLConstants isLiquidGlassActive]) {
-            title = [NSString stringWithFormat:@"%@%@", firstTabBarItemsAttributes[CYLTabBarItemTitle],CYLLocalizedString(@"（液态）")];
-        }
-        vc.cyl_getViewControllerInsteadOfNavigationController.title  = title;
+        // [EN] The navigation bar title is the tab title, also after it changes in place ("Change all titles", skins):
+        //      no page sets `title` itself any more (it set the tab title a second time and never followed changes).
+        // [CN] 导航栏标题即 Tab 标题，原地修改后（「批量更换标题」、皮肤）也会同步：页面不再自己设置 `title`（以前会再设置一次 Tab 标题，
+        //      而且不跟随之后的修改）。
+        CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(vc.cyl_getViewControllerInsteadOfNavigationController);
         
         //        [self setupChildViewController:nav
         //                                 title:titles[i]

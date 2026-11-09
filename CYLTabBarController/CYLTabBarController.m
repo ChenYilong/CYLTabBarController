@@ -221,6 +221,29 @@ static void CYLSetNeedsUpdateTabBarItemSelectedTitles(CYLTabBarController *tabBa
     });
 }
 NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
+NSNotificationName const CYLTabBarItemTitleDidChangeNotification = @"CYLTabBarItemTitleDidChangeNotification";
+
+static const void *CYLNavigationTitleFollowsTabBarItemTitleKey = &CYLNavigationTitleFollowsTabBarItemTitleKey;
+
+/*!
+ * [EN] A tab's title changed in place: the pages that follow it get it as their navigation bar title, and
+ *      `CYLTabBarItemTitleDidChangeNotification` is posted with the page.
+ * [CN] Tab 标题已原地修改：跟随它的页面把它设为导航栏标题，并发送带有该页面的 `CYLTabBarItemTitleDidChangeNotification`。
+ */
+/// [EN] Sets the navigation bar title of a page that follows its tab title. [CN] 为跟随 Tab 标题的页面设置导航栏标题。
+static void CYLApplyNavigationTitleOfFollowingPage(UIViewController *viewController, NSString *_Nullable title) {
+    UIViewController *page = [viewController cyl_getViewControllerInsteadOfNavigationController] ?: viewController;
+    if (title.length > 0 && [objc_getAssociatedObject(page, CYLNavigationTitleFollowsTabBarItemTitleKey) boolValue]) {
+        page.navigationItem.title = title;
+    }
+}
+
+static void CYLTabBarItemTitleDidChange(UIViewController *viewController, NSString *title) {
+    CYLApplyNavigationTitleOfFollowingPage(viewController, title);
+    UIViewController *page = [viewController cyl_getViewControllerInsteadOfNavigationController] ?: viewController;
+    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemTitleDidChangeNotification object:page
+                                                      userInfo:@{ CYLTabBarItemTitle : title ?: @"" }];
+}
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
 NSString *const CYLTabBarLottieDarkColors = @"CYLTabBarLottieDarkColors";
@@ -1917,6 +1940,9 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
             // [EN] The title shown while the tab is selected.
             // [CN] 选中时显示的标题。
             CYLRememberTabBarItemSelectedTitle(viewController, attributes, setup.title);
+            // [EN] A page that follows its tab title gets it as its navigation bar title as soon as the tab is set up.
+            // [CN] 跟随 Tab 标题的页面在 Tab 设置时即获得导航栏标题。
+            CYLApplyNavigationTitleOfFollowingPage(viewController, setup.title);
             setup.titlePositionAdjustment = [attributes[CYLTabBarItemTitlePositionAdjustment] UIOffsetValue];
             setup.imagePositionAdjustment = [attributes[CYLTabBarItemImagePositionAdjustment] UIOffsetValue];
             setup.imageInsets = [attributes[CYLTabBarItemImageInsets] UIEdgeInsetsValue];
@@ -2990,6 +3016,9 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
         if (title) { tabBarItem.title = title; }
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
+        if (title) {
+            CYLTabBarItemTitleDidChange(viewController, title);
+        }
         // FIX: issue #433
         // [EN] The selected tab shows its selected title, not the new normal title.
         // [CN] 选中的 Tab 显示选中标题，而不是新的普通标题。
@@ -3014,6 +3043,9 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
         if (title) { tabBarItem.title = title; }
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
+    }
+    if (title) {
+        CYLTabBarItemTitleDidChange(viewController, title);
     }
     // FIX: issue #433
     // [EN] The selected tab shows its selected title, not the new normal title.
@@ -7524,6 +7556,40 @@ static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
 
 - (BOOL)cyl_pagesFromPageIdentifiers {
     return self.pagesFromPageIdentifiers;
+}
+
+@end
+
+#pragma mark - UIViewController (CYLTabBarItemTitle)
+
+@implementation UIViewController (CYLTabBarItemTitle)
+
+- (nullable NSString *)cyl_tabBarItemTitle {
+    UIViewController *tab = self.navigationController.viewControllers.firstObject == self ? self.navigationController : self;
+    // [EN] The normal title, also while the selected title shows (#433). [CN] 普通标题，显示选中标题时也是（#433）。
+    NSString *normalTitle = objc_getAssociatedObject(tab, CYLTabBarItemNormalTitleKey);
+    if (normalTitle.length > 0) {
+        return normalTitle;
+    }
+#if CYL_FLATDESIGN_AVAILABLE
+    NSString *flatTitle = tab.cyl_tabBarItem.title;
+    if (flatTitle.length > 0 && tab.cyl_tabBarController.tabBarStyleType == CYLTabBarStyleTypeFlatDesign) {
+        return flatTitle;
+    }
+#endif
+    return tab.tabBarItem.title.length > 0 ? tab.tabBarItem.title : nil;
+}
+
+- (BOOL)cyl_navigationTitleFollowsTabBarItemTitle {
+    return [objc_getAssociatedObject(self, CYLNavigationTitleFollowsTabBarItemTitleKey) boolValue];
+}
+
+- (void)setCyl_navigationTitleFollowsTabBarItemTitle:(BOOL)follows {
+    objc_setAssociatedObject(self, CYLNavigationTitleFollowsTabBarItemTitleKey, @(follows), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    NSString *title = follows ? self.cyl_tabBarItemTitle : nil;
+    if (title) {
+        self.navigationItem.title = title;
+    }
 }
 
 @end
