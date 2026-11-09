@@ -456,6 +456,10 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
     tabBarController.tabBar.semanticContentAttribute = attribute;
 }
 
+- (NSString *)simulateMemoryWarning {
+    return CYLSimulateMemoryWarningReport(_tabBarController);
+}
+
 - (void)setTabBarHidden:(BOOL)tabBarHidden {
     if (tabBarHidden == _tabBarHidden) {
         return;
@@ -532,12 +536,20 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
 }
 
 - (void)applyBadgeValues {
-    NSArray<NSString *> *badgeValues = _badgeValues;
-    NSArray *badgeAttributes = _badgeAttributes;
-    NSDictionary *plusButtonBadge = _plusButtonBadgeAttributes.count > 0 ? _plusButtonBadgeAttributes : @{ CYLTabBarHostBadgeValue : _plusButtonBadgeValue ?: @"" };
-    CYLBadgeAnimationType animationType = (CYLBadgeAnimationType)_badgeAnimationType;
-    // [EN] Badges sit on the tab buttons, which exist once the tab bar is laid out. [CN] 角标位于 Tab 按钮上，TabBar 布局后按钮才存在。
+    // [EN] Badges sit on the tab buttons, which exist once the tab bar is laid out. The values are read when the block runs, as
+    //      the Android host: a block that waited for a layout shows the current badges, never older ones.
+    // [CN] 角标位于 Tab 按钮上，TabBar 布局后按钮才存在。与 Android 宿主相同，在 block 执行时读取值：等待布局的 block 显示当前的角标，
+    //      而不是旧的。
+    __weak __typeof(self) weakSelf = self;
     [_tabBarController performWhenTabBarItemsReady:^(CYLTabBarController *tabBarController) {
+        __strong __typeof(weakSelf) host = weakSelf;
+        if (!host) {
+            return;
+        }
+        NSArray<NSString *> *badgeValues = host->_badgeValues;
+        NSArray *badgeAttributes = host->_badgeAttributes;
+        NSDictionary *plusButtonBadge = host->_plusButtonBadgeAttributes.count > 0 ? host->_plusButtonBadgeAttributes : @{ CYLTabBarHostBadgeValue : host->_plusButtonBadgeValue ?: @"" };
+        CYLBadgeAnimationType animationType = (CYLBadgeAnimationType)host->_badgeAnimationType;
         [CYLTabBarHostPages(tabBarController) enumerateObjectsUsingBlock:^(UIViewController *page, NSUInteger index, BOOL *stop) {
             NSDictionary *attributes = index < badgeAttributes.count && [badgeAttributes[index] isKindOfClass:[NSDictionary class]] ? badgeAttributes[index] : nil;
             if (attributes.count == 0) {
@@ -583,11 +595,12 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
 /// [CN] 用已加载的图片覆盖 Tab 按钮，先移除之前列表的覆盖。
 - (void)applyTabCoverImages {
     CYLTabBarController *controller = _tabBarController;
-    NSArray *images = _loadedTabCoverImages;
-    if (!controller || !images) {
+    if (!controller || !_loadedTabCoverImages) {
         return;
     }
+    // [EN] Read when the block runs, as the badges. [CN] 与角标相同，在 block 执行时读取。
     [controller performWhenTabBarItemsReady:^(CYLTabBarController *tabBarController) {
+        NSArray *images = self->_loadedTabCoverImages;
         for (NSArray *covered in self->_coveredTabButtons) {
             UIControl *button = covered[0];
             [covered[1] removeFromSuperview];

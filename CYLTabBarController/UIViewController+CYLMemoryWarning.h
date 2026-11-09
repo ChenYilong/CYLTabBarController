@@ -9,6 +9,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class CYLTabBarController;
+
+/*!
+ * [EN] Simulates a memory warning for `tabBarController` (`+[CYLTabBarController cyl_simulateMemoryWarningForTabBarController:]`)
+ *      and returns what happened to each tab, one line per tab ("Messages: unloaded", "Home: kept: selected"…), in the
+ *      app's language: the message of `-cyl_simulateMemoryWarningAndShowResult`, for any UI (e.g. `CYLTabBarHostView`).
+ * [CN] 对 `tabBarController` 模拟内存警告（`+[CYLTabBarController cyl_simulateMemoryWarningForTabBarController:]`），
+ *      并返回每个 Tab 的结果，每个 Tab 一行（如「消息: 已卸载」「首页: 保留：当前选中」），使用 App 语言：即
+ *      `-cyl_simulateMemoryWarningAndShowResult` 弹窗的内容，可用于任何界面（例如 `CYLTabBarHostView`）。
+ */
+FOUNDATION_EXTERN NSString *CYLSimulateMemoryWarningReport(CYLTabBarController *_Nullable tabBarController);
+
 /*!
  * [EN] A memory warning check for `unloadsUnselectedViewsOnMemoryWarning` (issue #426), in every tab bar style: a table
  *      row, and the action that simulates the warning and shows what happened to each tab. Part of the settings section,

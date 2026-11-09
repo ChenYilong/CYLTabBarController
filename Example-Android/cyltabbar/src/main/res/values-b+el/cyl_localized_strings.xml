@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Κουμπί συν</string>
     <string name="cyl_badge_new_lowercase">νέο</string>
     <string name="cyl_badge_new_uppercase">ΝΕΟ</string>
+    <string name="cyl_memory_warning_title">Προσομοίωση προειδοποίησης μνήμης</string>
+    <string name="cyl_memory_warning_detail">Αποφορτώνει τις μη επιλεγμένες καρτέλες· φορτώνονται ξανά όταν επιλεγούν</string>
+    <string name="cyl_memory_warning_alert_title">Προειδοποίηση μνήμης</string>
+    <string name="cyl_memory_warning_no_controller">Όχι σε CYLTabBarController: δεν υπάρχουν καρτέλες για αποφόρτωση.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: καμία καρτέλα δεν αποφορτώθηκε.</string>
+    <string name="cyl_memory_warning_not_loaded">δεν φορτώθηκε</string>
+    <string name="cyl_memory_warning_unloaded">αποφορτώθηκε</string>
+    <string name="cyl_memory_warning_kept_selected">διατηρήθηκε: επιλεγμένη</string>
+    <string name="cyl_memory_warning_kept_should_unload">διατηρήθηκε: το shouldUnload επέστρεψε NO</string>
+    <string name="cyl_memory_warning_kept">διατηρήθηκε</string>
 </resources>

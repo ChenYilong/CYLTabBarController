@@ -5479,5 +5479,27 @@
  "CYLTabBarHostView tabBarHidden": {
   "status": "done",
   "android": "CYLTabBarHostView.tabBarHidden"
+ },
+ "CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning"
+ },
+ "CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers",
+  "note": "a list or one comma-separated string"
+ },
+ "CYLTabBarController cyl_keepsLoadedTabBarItemIdentifiers": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_keepsLoadedTabBarItemIdentifiers"
+ },
+ "CYLSimulateMemoryWarningReport()": {
+  "status": "done",
+  "android": "CYLSimulateMemoryWarningReport(context, controller)",
+  "note": "in CYLLocalization.language"
+ },
+ "CYLTabBarHostView -simulateMemoryWarning": {
+  "status": "done",
+  "android": "CYLTabBarHostView.simulateMemoryWarning()"
  }
 }

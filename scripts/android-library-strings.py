@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-[EN] Writes the Android library's texts that iOS reads from its string tables (the badge and plus button accessibility
-     texts) into Android resources, one values-<language> folder per iOS .lproj folder, so both platforms say the same
+[EN] Writes the Android library's texts that iOS reads from its string tables (badge and plus button accessibility texts,
+     the memory warning check) into Android resources, one values-<language> folder per iOS .lproj folder, so both platforms say the same
      thing in every language. Run it after changing CYLTabBarController.bundle/*.lproj; `--check` fails when a file is
      out of date (for CI).
-[CN] 把 iOS 从字符串表读取的 Android 库文字（角标与 PlusButton 的无障碍文字）写入 Android 资源，每个 iOS .lproj 文件夹对应一个
+[CN] 把 iOS 从字符串表读取的 Android 库文字（角标与 PlusButton 的无障碍文字、内存警告检查）写入 Android 资源，每个 iOS .lproj 文件夹对应一个
      values-<语言> 文件夹，使两个平台在每种语言中说法一致。修改 CYLTabBarController.bundle/*.lproj 后运行；`--check` 在文件过期时失败（用于 CI）。
 """
 import os
@@ -23,6 +23,16 @@ STRINGS = {
     'cyl_plus_button': '加号按钮',
     'cyl_badge_new_lowercase': 'new',
     'cyl_badge_new_uppercase': 'NEW',
+    'cyl_memory_warning_title': '模拟内存警告',
+    'cyl_memory_warning_detail': '卸载未选中的 Tab，切换时重新加载',
+    'cyl_memory_warning_alert_title': '内存警告',
+    'cyl_memory_warning_no_controller': '不在 CYLTabBarController 中，没有可卸载的 Tab。',
+    'cyl_memory_warning_disabled': 'unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。',
+    'cyl_memory_warning_not_loaded': '未加载',
+    'cyl_memory_warning_unloaded': '已卸载',
+    'cyl_memory_warning_kept_selected': '保留：当前选中',
+    'cyl_memory_warning_kept_should_unload': '保留：shouldUnload 返回 NO',
+    'cyl_memory_warning_kept': '保留',
 }
 PAIR = re.compile(r'^"((?:[^"\\]|\\.)*)"\s*=\s*"((?:[^"\\]|\\.)*)";', re.M)
 

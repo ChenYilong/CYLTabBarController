@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Buton plus</string>
     <string name="cyl_badge_new_lowercase">nou</string>
     <string name="cyl_badge_new_uppercase">NOU</string>
+    <string name="cyl_memory_warning_title">Simulează avertisment de memorie</string>
+    <string name="cyl_memory_warning_detail">Descarcă filele neselectate; se reîncarcă la selectare</string>
+    <string name="cyl_memory_warning_alert_title">Avertisment de memorie</string>
+    <string name="cyl_memory_warning_no_controller">Nu este într-un CYLTabBarController: nicio filă de descărcat.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: nicio filă descărcată.</string>
+    <string name="cyl_memory_warning_not_loaded">neîncărcată</string>
+    <string name="cyl_memory_warning_unloaded">descărcată</string>
+    <string name="cyl_memory_warning_kept_selected">păstrată: selectată</string>
+    <string name="cyl_memory_warning_kept_should_unload">păstrată: shouldUnload a returnat NO</string>
+    <string name="cyl_memory_warning_kept">păstrată</string>
 </resources>

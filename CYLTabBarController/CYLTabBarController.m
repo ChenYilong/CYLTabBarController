@@ -102,6 +102,8 @@ NSString *const CYLTabBarControllerUserInterfaceStyle = @"CYLTabBarControllerUse
 NSString *const CYLTabBarControllerTabButtonTapAnimation = @"CYLTabBarControllerTabButtonTapAnimation";
 NSString *const CYLTabBarControllerSwipeToSwitchTab = @"CYLTabBarControllerSwipeToSwitchTab";
 NSString *const CYLTabBarControllerLoginRequiredTabBarItemIdentifiers = @"CYLTabBarControllerLoginRequiredTabBarItemIdentifiers";
+NSString *const CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning = @"CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning";
+NSString *const CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers = @"CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers";
 NSString *const CYLTabBarControllerThemes = @"CYLTabBarControllerThemes";
 NSString *const CYLTabBarControllerThemeIdentifier = @"CYLTabBarControllerThemeIdentifier";
 NSString *const CYLTabBarControllerDarkThemeIdentifier = @"CYLTabBarControllerDarkThemeIdentifier";
@@ -1406,7 +1408,16 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
 }
 
 - (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController {
-    return YES;
+    NSString *identifier = viewController.cyl_tabBarItemIdentifier;
+    return !(identifier && [self.cyl_keepsLoadedTabBarItemIdentifiers containsObject:identifier]);
+}
+
+- (NSArray<NSString *> *)cyl_keepsLoadedTabBarItemIdentifiers {
+    return objc_getAssociatedObject(self, @selector(cyl_keepsLoadedTabBarItemIdentifiers)) ?: @[];
+}
+
+- (void)setCyl_keepsLoadedTabBarItemIdentifiers:(NSArray<NSString *> *)identifiers {
+    objc_setAssociatedObject(self, @selector(cyl_keepsLoadedTabBarItemIdentifiers), [identifiers copy], OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 - (void)unloadViewsOfUnselectedViewControllers {
@@ -2285,6 +2296,14 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
         NSArray<NSString *> *loginRequired = normalized[CYLTabBarControllerLoginRequiredTabBarItemIdentifiers];
         if (loginRequired) {
             self.cyl_loginRequiredTabBarItemIdentifiers = loginRequired;
+        }
+        NSNumber *unloads = normalized[CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning];
+        if (unloads) {
+            self.unloadsUnselectedViewsOnMemoryWarning = unloads.boolValue;
+        }
+        NSArray<NSString *> *keepsLoaded = normalized[CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers];
+        if (keepsLoaded) {
+            self.cyl_keepsLoadedTabBarItemIdentifiers = keepsLoaded;
         }
         // [EN] Skins of the configuration (`CYLTabBarControllerThemes`): registered with the theme manager, the first one applied.
         // [CN] 配置中的皮肤（`CYLTabBarControllerThemes`）：注册到主题管理器，并应用首个皮肤。

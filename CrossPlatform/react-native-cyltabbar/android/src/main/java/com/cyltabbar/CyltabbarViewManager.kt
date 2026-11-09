@@ -86,6 +86,12 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     view?.tabBarHidden = value
   }
 
+  /** [EN] Each increase simulates a memory warning once (onMemoryWarning). [CN] 每次增大模拟一次内存警告（onMemoryWarning）。 */
+  @ReactProp(name = "memoryWarningRequest", defaultInt = 0)
+  override fun setMemoryWarningRequest(view: CyltabbarView?, value: Int) {
+    view?.memoryWarningRequest = value
+  }
+
   @ReactProp(name = "tabCoverImages")
   override fun setTabCoverImages(view: CyltabbarView?, value: ReadableArray?) {
     view?.tabCoverImages = (0 until (value?.size() ?: 0)).map { value?.getString(it)?.takeIf { image -> image.isNotEmpty() } }
@@ -98,6 +104,7 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     "topTabLongPress" to mapOf("registrationName" to "onTabLongPress"),
     "topLoginRequest" to mapOf("registrationName" to "onLoginRequest"),
     "topLoginStateChange" to mapOf("registrationName" to "onLoginStateChange"),
+    "topMemoryWarning" to mapOf("registrationName" to "onMemoryWarning"),
   )
 
   companion object {

@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Pulsante più</string>
     <string name="cyl_badge_new_lowercase">nuovo</string>
     <string name="cyl_badge_new_uppercase">NUOVO</string>
+    <string name="cyl_memory_warning_title">Simula avviso di memoria</string>
+    <string name="cyl_memory_warning_detail">Scarica i pannelli non selezionati; si ricaricano quando selezionati</string>
+    <string name="cyl_memory_warning_alert_title">Avviso di memoria</string>
+    <string name="cyl_memory_warning_no_controller">Non in un CYLTabBarController: nessun pannello da scaricare.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: nessun pannello scaricato.</string>
+    <string name="cyl_memory_warning_not_loaded">non caricato</string>
+    <string name="cyl_memory_warning_unloaded">scaricato</string>
+    <string name="cyl_memory_warning_kept_selected">mantenuto: selezionato</string>
+    <string name="cyl_memory_warning_kept_should_unload">mantenuto: shouldUnload ha restituito NO</string>
+    <string name="cyl_memory_warning_kept">mantenuto</string>
 </resources>

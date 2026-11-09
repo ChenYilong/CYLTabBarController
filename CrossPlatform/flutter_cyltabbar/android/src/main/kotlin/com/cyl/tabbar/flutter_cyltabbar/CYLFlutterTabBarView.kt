@@ -87,6 +87,7 @@ internal class CYLFlutterTabBarView(
       "setTabCoverImages" -> hostView.tabCoverImages = (call.arguments as? List<*>).orEmpty()
       "setLoggedIn" -> applyLoggedIn(call.arguments)
       "setTabBarHidden" -> hostView.tabBarHidden = call.arguments == true
+      "simulateMemoryWarning" -> return result.success(hostView.simulateMemoryWarning())
       "setLanguage" -> hostView.language = (call.arguments as? String)?.takeIf { it.isNotEmpty() }
       else -> return result.notImplemented()
     }

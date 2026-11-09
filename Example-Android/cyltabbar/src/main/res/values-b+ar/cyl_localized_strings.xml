@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">زر الإضافة</string>
     <string name="cyl_badge_new_lowercase">جديد</string>
     <string name="cyl_badge_new_uppercase">جديد</string>
+    <string name="cyl_memory_warning_title">محاكاة تحذير الذاكرة</string>
+    <string name="cyl_memory_warning_detail">يفرّغ علامات التبويب غير المحددة، وتُحمَّل من جديد عند تحديدها</string>
+    <string name="cyl_memory_warning_alert_title">تحذير الذاكرة</string>
+    <string name="cyl_memory_warning_no_controller">ليس داخل CYLTabBarController: لا توجد علامات تبويب لتفريغها.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: لم يُفرَّغ أي تبويب.</string>
+    <string name="cyl_memory_warning_not_loaded">غير محمّل</string>
+    <string name="cyl_memory_warning_unloaded">تم التفريغ</string>
+    <string name="cyl_memory_warning_kept_selected">محفوظ: محدد</string>
+    <string name="cyl_memory_warning_kept_should_unload">محفوظ: أعاد shouldUnload القيمة NO</string>
+    <string name="cyl_memory_warning_kept">محفوظ</string>
 </resources>

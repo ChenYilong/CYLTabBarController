@@ -18,33 +18,13 @@ static UIViewController *CYLMemoryWarningRootViewController(UIViewController *vi
     return viewController;
 }
 
-@implementation UIViewController (CYLMemoryWarning)
-
-- (UITableViewCell *)cyl_memoryWarningCellForTableView:(UITableView *)tableView {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLMemoryWarningCellIdentifier];
-    if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLMemoryWarningCellIdentifier];
-        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
-        cell.detailTextLabel.textColor = [UIColor grayColor];
-        if (@available(iOS 13.0, *)) {
-            cell.imageView.image = [UIImage systemImageNamed:@"memorychip"];
-        }
-    }
-    cell.textLabel.text = CYLLocalizedString(@"模拟内存警告");
-    cell.detailTextLabel.text = CYLLocalizedString(@"卸载未选中的 Tab，切换时重新加载");
-    return cell;
-}
-
-- (void)cyl_simulateMemoryWarningAndShowResult {
-    CYLTabBarController *tabBarController = [self cyl_owningTabBarController] ?: [self cyl_tabBarController];
+NSString *CYLSimulateMemoryWarningReport(CYLTabBarController *tabBarController) {
     NSArray<UIViewController *> *viewControllers = tabBarController.viewControllers;
     NSMutableArray<NSNumber *> *wasLoaded = [NSMutableArray arrayWithCapacity:viewControllers.count];
     for (UIViewController *viewController in viewControllers) {
         [wasLoaded addObject:@(CYLMemoryWarningRootViewController(viewController).isViewLoaded)];
     }
-
     [CYLTabBarController cyl_simulateMemoryWarningForTabBarController:tabBarController];
-
     NSMutableString *message = [NSMutableString string];
     if (!tabBarController) {
         [message appendString:CYLLocalizedString(@"不在 CYLTabBarController 中，没有可卸载的 Tab。")];
@@ -72,7 +52,29 @@ static UIViewController *CYLMemoryWarningRootViewController(UIViewController *vi
         }
         [message appendFormat:@"%@%@: %@", (message.length ? @"\n" : @""), title, status];
     }];
+    return [message copy];
+}
 
+@implementation UIViewController (CYLMemoryWarning)
+
+- (UITableViewCell *)cyl_memoryWarningCellForTableView:(UITableView *)tableView {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CYLMemoryWarningCellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CYLMemoryWarningCellIdentifier];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:15];
+        cell.detailTextLabel.textColor = [UIColor grayColor];
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"memorychip"];
+        }
+    }
+    cell.textLabel.text = CYLLocalizedString(@"模拟内存警告");
+    cell.detailTextLabel.text = CYLLocalizedString(@"卸载未选中的 Tab，切换时重新加载");
+    return cell;
+}
+
+- (void)cyl_simulateMemoryWarningAndShowResult {
+    CYLTabBarController *tabBarController = [self cyl_owningTabBarController] ?: [self cyl_tabBarController];
+    NSString *message = CYLSimulateMemoryWarningReport(tabBarController);
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:CYLLocalizedString(@"内存警告")
                                                                              message:message
                                                                       preferredStyle:UIAlertControllerStyleAlert];

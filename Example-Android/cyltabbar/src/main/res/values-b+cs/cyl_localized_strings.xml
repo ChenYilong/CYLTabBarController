@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Tlačítko plus</string>
     <string name="cyl_badge_new_lowercase">nové</string>
     <string name="cyl_badge_new_uppercase">NOVÉ</string>
+    <string name="cyl_memory_warning_title">Simulovat varování o paměti</string>
+    <string name="cyl_memory_warning_detail">Uvolní nevybrané karty; po výběru se znovu načtou</string>
+    <string name="cyl_memory_warning_alert_title">Varování o paměti</string>
+    <string name="cyl_memory_warning_no_controller">Není v CYLTabBarController: žádné karty k uvolnění.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: žádná karta nebyla uvolněna.</string>
+    <string name="cyl_memory_warning_not_loaded">nenačteno</string>
+    <string name="cyl_memory_warning_unloaded">uvolněno</string>
+    <string name="cyl_memory_warning_kept_selected">ponecháno: vybráno</string>
+    <string name="cyl_memory_warning_kept_should_unload">ponecháno: shouldUnload vrátilo NO</string>
+    <string name="cyl_memory_warning_kept">ponecháno</string>
 </resources>

@@ -328,6 +328,36 @@ static NSString *const CYLHostTestsLoggedInKey = @"CYLTabBarControllerLoggedIn";
     XCTAssertGreaterThan(hostView.touchableRects.count, 0u);
 }
 
+- (void)testAMemoryWarningUnloadsTheUnselectedTabsButTheOnesKeptLoaded {
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    hostView.language = @"en";
+    hostView.configuration = @{ CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a" },
+                                                                               @{ CYLTabBarItemTitle : @"B", CYLTabBarItemIdentifier : @"b" },
+                                                                               @{ CYLTabBarItemTitle : @"C", CYLTabBarItemIdentifier : @"c" },
+                                                                               @{ CYLTabBarItemTitle : @"D", CYLTabBarItemIdentifier : @"d" } ],
+                                CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning : @"true",
+                                CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers : @"a, b" };
+    [self waitForTabBarControllerOf:hostView];
+    CYLTabBarController *tabBarController = hostView.tabBarController;
+    XCTAssertTrue(tabBarController.unloadsUnselectedViewsOnMemoryWarning);
+    XCTAssertEqualObjects(tabBarController.cyl_keepsLoadedTabBarItemIdentifiers, (@[ @"a", @"b" ]));
+    // [EN] Load every tab but D, then select C. [CN] 加载除 D 以外的所有 Tab，然后选中 C。
+    for (NSInteger index = 0; index < 3; index++) {
+        hostView.selectedIndex = index;
+        [tabBarController.selectedViewController loadViewIfNeeded];
+    }
+    hostView.selectedIndex = 2;
+    NSString *report = [hostView simulateMemoryWarning];
+    // [EN] The host loads every (transparent) page when it builds the tab bar, as on Android: D, never selected, is unloaded.
+    // [CN] 宿主在创建 TabBar 时加载所有（透明的）页面，与 Android 相同：从未选中的 D 被卸载。
+    XCTAssertEqualObjects([report stringByReplacingOccurrencesOfString:@"\n" withString:@" | "],
+                          @"A: kept: shouldUnload returned NO | B: kept: shouldUnload returned NO | C: kept: selected | D: unloaded");
+    hostView.selectedIndex = 0;
+    [hostView simulateMemoryWarning];
+    XCTAssertFalse(tabBarController.viewControllers[2].isViewLoaded);
+    hostView.language = nil;
+}
+
 - (void)testInvalidJSONChangesNothing {
     CYLTabBarHostView *hostView = [[CYLTabBarHostView alloc] init];
     XCTAssertFalse([hostView setConfigurationJSON:@"[1, 2]"]);

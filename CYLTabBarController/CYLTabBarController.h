@@ -543,6 +543,11 @@ FOUNDATION_EXTERN NSString *const CYLPlusButtonImageSize;
  *      - `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers`: the identifiers (`CYLTabBarItemIdentifier`) of the tabs
  *        that need login (`cyl_loginRequiredTabBarItemIdentifiers`, issue #19), e.g. ["message", "mine"]; an array of
  *        strings or a comma-separated string.
+ *      - `CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`: BOOL, a memory warning unloads the views of the tabs
+ *        that are not selected (`unloadsUnselectedViewsOnMemoryWarning`, issue #426).
+ *      - `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`: the identifiers of the tabs a memory warning never unloads
+ *        (`cyl_keepsLoadedTabBarItemIdentifiers`), what overriding `-shouldUnloadViewOfViewController:` does in code; an
+ *        array of strings or a comma-separated string.
  * [CN] 配置中的交互与外观键：
  *      - `CYLTabBarControllerUserInterfaceStyle`："light"、"dark" 或 "system"（默认）：TabBarController 的 `overrideUserInterfaceStyle`
  *        （iOS 13+），例如为白色图标使用深色玻璃。
@@ -551,11 +556,17 @@ FOUNDATION_EXTERN NSString *const CYLPlusButtonImageSize;
  *      - `CYLTabBarControllerSwipeToSwitchTab`：BOOL，在 TabBar 上滑动切换 Tab（`cyl_swipeToSwitchTabEnabled`）。
  *      - `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers`：需要登录的 Tab 的标识（`CYLTabBarItemIdentifier`）
  *        （`cyl_loginRequiredTabBarItemIdentifiers`，issue #19），例如 ["message", "mine"]；字符串数组或逗号分隔的字符串。
+ *      - `CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`：BOOL，收到内存警告时卸载未选中 Tab 的视图
+ *        （`unloadsUnselectedViewsOnMemoryWarning`，issue #426）。
+ *      - `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`：内存警告时不卸载的 Tab 的标识（`cyl_keepsLoadedTabBarItemIdentifiers`），
+ *        相当于在代码中重写 `-shouldUnloadViewOfViewController:`；字符串数组或逗号分隔的字符串。
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerUserInterfaceStyle;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerTabButtonTapAnimation;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerSwipeToSwitchTab;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerLoginRequiredTabBarItemIdentifiers;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers;
 
 /*!
  * [EN] Skins in a configuration (see docs/Configuration-File.md, "Skins"; the named values follow QMUI's skins):
@@ -1082,10 +1093,19 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 @property (nonatomic, assign) BOOL unloadsUnselectedViewsOnMemoryWarning;
 
 /*!
+ * [EN] Issue #426: the identifiers (`CYLTabBarItemIdentifier`) of the tabs `-unloadViewsOfUnselectedViewControllers` never
+ *      unloads, without a subclass (e.g. from a configuration, `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`).
+ * [CN] Issue #426：`-unloadViewsOfUnselectedViewControllers` 不会卸载的 Tab 的标识（`CYLTabBarItemIdentifier`），无需子类
+ *      （例如来自配置的 `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`）。
+ */
+@property (nonatomic, copy) NSArray<NSString *> *cyl_keepsLoadedTabBarItemIdentifiers;
+
+/*!
  * [EN] Issue #426: whether `-unloadViewsOfUnselectedViewControllers` may unload this tab's view controller (an element of
- *      `viewControllers`). Default is YES; override in a subclass to keep some tabs loaded.
+ *      `viewControllers`). Default: YES, except for the tabs in `cyl_keepsLoadedTabBarItemIdentifiers`; override in a
+ *      subclass to keep other tabs loaded.
  * [CN] Issue #426：`-unloadViewsOfUnselectedViewControllers` 是否可以卸载该 Tab 的 ViewController（`viewControllers` 中的元素）。
- *      默认 YES，可在子类中重写以保留部分 Tab。
+ *      默认 YES，`cyl_keepsLoadedTabBarItemIdentifiers` 中的 Tab 除外；可在子类中重写以保留其他 Tab。
  */
 - (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController;
 

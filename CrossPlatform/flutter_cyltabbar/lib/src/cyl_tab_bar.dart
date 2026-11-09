@@ -206,6 +206,8 @@ class CYLTabBar extends StatefulWidget {
     this.onLoginStateChange,
     this.language,
     this.tabBarHidden = false,
+    this.memoryWarningRequest = 0,
+    this.onMemoryWarning,
   });
 
   /// The tabs: `CYLTabBarControllerTabBarItemsAttributes`.
@@ -277,6 +279,13 @@ class CYLTabBar extends StatefulWidget {
   /// Hides or shows the tab bar, animated, in every style (`-[CYLTabBarController setTabBarHidden:animated:]`). A hidden
   /// tab bar takes no touches: the page under it gets them.
   final bool tabBarHidden;
+
+  /// Issue #426: each increase simulates a memory warning once (`+[CYLTabBarController cyl_simulateMemoryWarningForTabBarController:]`);
+  /// [onMemoryWarning] then reports what happened to each tab, one line per tab, in the library's language. The
+  /// configuration decides what is unloaded (`CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`,
+  /// `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`).
+  final int memoryWarningRequest;
+  final ValueChanged<String>? onMemoryWarning;
 
   /// The configuration sent to the native library.
   Map<String, Object?> buildConfiguration() => {
@@ -351,6 +360,11 @@ class _CYLTabBarState extends State<CYLTabBar> {
     final coverImages = _coverImages(widget);
     if (!listEquals(coverImages, _coverImages(oldWidget))) {
       channel?.invokeMethod<void>('setTabCoverImages', coverImages);
+    }
+    if (widget.memoryWarningRequest > oldWidget.memoryWarningRequest) {
+      channel?.invokeMethod<String>('simulateMemoryWarning').then((report) {
+        if (report != null) widget.onMemoryWarning?.call(report);
+      });
     }
     if (widget.tabBarHidden != oldWidget.tabBarHidden) {
       channel?.invokeMethod<void>('setTabBarHidden', widget.tabBarHidden);

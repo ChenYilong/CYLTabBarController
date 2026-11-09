@@ -6,7 +6,7 @@
     "Choose a theme", "Follow the system Dark Mode",
     "Login required", "Log in to view “{title}”", "Log in", "Cancel",
     "Login state: logged in", "Login state: logged out",
-    "Language", "Follow system", "Tap to change the language",
+    "Language", "Follow system", "Tap to change the language", "Memory warning", "OK",
     "Original", "None",
     "Network icons, titles and colors", "Holiday icons and colors", "Colors only", "Badges",
     "New content", "{count} new messages", "{page} CYLTabBarController on iOS {version}",

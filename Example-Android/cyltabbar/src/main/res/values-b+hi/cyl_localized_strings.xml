@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">प्लस बटन</string>
     <string name="cyl_badge_new_lowercase">नया</string>
     <string name="cyl_badge_new_uppercase">नया</string>
+    <string name="cyl_memory_warning_title">मेमोरी चेतावनी का अनुकरण करें</string>
+    <string name="cyl_memory_warning_detail">न चुने गए टैब अनलोड करता है; चुनने पर फिर से लोड होते हैं</string>
+    <string name="cyl_memory_warning_alert_title">मेमोरी चेतावनी</string>
+    <string name="cyl_memory_warning_no_controller">CYLTabBarController में नहीं: अनलोड करने के लिए कोई टैब नहीं।</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: कोई टैब अनलोड नहीं हुआ।</string>
+    <string name="cyl_memory_warning_not_loaded">लोड नहीं हुआ</string>
+    <string name="cyl_memory_warning_unloaded">अनलोड किया गया</string>
+    <string name="cyl_memory_warning_kept_selected">रखा गया: चुना हुआ</string>
+    <string name="cyl_memory_warning_kept_should_unload">रखा गया: shouldUnload ने NO लौटाया</string>
+    <string name="cyl_memory_warning_kept">रखा गया</string>
 </resources>

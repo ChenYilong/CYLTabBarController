@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Botó més</string>
     <string name="cyl_badge_new_lowercase">nou</string>
     <string name="cyl_badge_new_uppercase">NOU</string>
+    <string name="cyl_memory_warning_title">Simula un avís de memòria</string>
+    <string name="cyl_memory_warning_detail">Descarrega les pestanyes no seleccionades; es tornen a carregar en seleccionar-les</string>
+    <string name="cyl_memory_warning_alert_title">Avís de memòria</string>
+    <string name="cyl_memory_warning_no_controller">No és dins d’un CYLTabBarController: no hi ha pestanyes per descarregar.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: no s’ha descarregat cap pestanya.</string>
+    <string name="cyl_memory_warning_not_loaded">no carregada</string>
+    <string name="cyl_memory_warning_unloaded">descarregada</string>
+    <string name="cyl_memory_warning_kept_selected">mantinguda: seleccionada</string>
+    <string name="cyl_memory_warning_kept_should_unload">mantinguda: shouldUnload ha retornat NO</string>
+    <string name="cyl_memory_warning_kept">mantinguda</string>
 </resources>

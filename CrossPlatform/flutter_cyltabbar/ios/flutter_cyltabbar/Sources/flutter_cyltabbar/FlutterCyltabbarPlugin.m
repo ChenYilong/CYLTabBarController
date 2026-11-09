@@ -154,6 +154,9 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         [self applyPlusButtonBadge:arguments];
     } else if ([call.method isEqualToString:@"setTabCoverImages"]) {
         [self applyTabCoverImages:arguments];
+    } else if ([call.method isEqualToString:@"simulateMemoryWarning"]) {
+        result([_hostView simulateMemoryWarning]);
+        return;
     } else if ([call.method isEqualToString:@"setTabBarHidden"]) {
         _hostView.tabBarHidden = [arguments isKindOfClass:[NSNumber class]] && [arguments boolValue];
     } else if ([call.method isEqualToString:@"setLanguage"]) {

@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Plus-Taste</string>
     <string name="cyl_badge_new_lowercase">neu</string>
     <string name="cyl_badge_new_uppercase">NEU</string>
+    <string name="cyl_memory_warning_title">Speicherwarnung simulieren</string>
+    <string name="cyl_memory_warning_detail">Entlädt nicht ausgewählte Tabs; sie laden beim Auswählen neu</string>
+    <string name="cyl_memory_warning_alert_title">Speicherwarnung</string>
+    <string name="cyl_memory_warning_no_controller">Nicht in einem CYLTabBarController: keine Tabs zum Entladen.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: kein Tab entladen.</string>
+    <string name="cyl_memory_warning_not_loaded">nicht geladen</string>
+    <string name="cyl_memory_warning_unloaded">entladen</string>
+    <string name="cyl_memory_warning_kept_selected">behalten: ausgewählt</string>
+    <string name="cyl_memory_warning_kept_should_unload">behalten: shouldUnload gab NO zurück</string>
+    <string name="cyl_memory_warning_kept">behalten</string>
 </resources>

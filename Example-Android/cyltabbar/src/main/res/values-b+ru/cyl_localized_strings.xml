@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Кнопка «плюс»</string>
     <string name="cyl_badge_new_lowercase">новое</string>
     <string name="cyl_badge_new_uppercase">НОВОЕ</string>
+    <string name="cyl_memory_warning_title">Смоделировать нехватку памяти</string>
+    <string name="cyl_memory_warning_detail">Выгружает невыбранные вкладки; они загрузятся снова при выборе</string>
+    <string name="cyl_memory_warning_alert_title">Нехватка памяти</string>
+    <string name="cyl_memory_warning_no_controller">Не в CYLTabBarController: нет вкладок для выгрузки.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: вкладки не выгружены.</string>
+    <string name="cyl_memory_warning_not_loaded">не загружена</string>
+    <string name="cyl_memory_warning_unloaded">выгружена</string>
+    <string name="cyl_memory_warning_kept_selected">оставлена: выбрана</string>
+    <string name="cyl_memory_warning_kept_should_unload">оставлена: shouldUnload вернул NO</string>
+    <string name="cyl_memory_warning_kept">оставлена</string>
 </resources>

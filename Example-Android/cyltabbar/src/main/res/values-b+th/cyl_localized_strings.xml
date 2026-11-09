@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">ปุ่มบวก</string>
     <string name="cyl_badge_new_lowercase">ใหม่</string>
     <string name="cyl_badge_new_uppercase">ใหม่</string>
+    <string name="cyl_memory_warning_title">จำลองคำเตือนหน่วยความจำ</string>
+    <string name="cyl_memory_warning_detail">ปล่อยแท็บที่ไม่ได้เลือก และโหลดใหม่เมื่อเลือก</string>
+    <string name="cyl_memory_warning_alert_title">คำเตือนหน่วยความจำ</string>
+    <string name="cyl_memory_warning_no_controller">ไม่ได้อยู่ใน CYLTabBarController: ไม่มีแท็บให้ปล่อย</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: ไม่มีแท็บถูกปล่อย</string>
+    <string name="cyl_memory_warning_not_loaded">ยังไม่โหลด</string>
+    <string name="cyl_memory_warning_unloaded">ปล่อยแล้ว</string>
+    <string name="cyl_memory_warning_kept_selected">คงไว้: ถูกเลือก</string>
+    <string name="cyl_memory_warning_kept_should_unload">คงไว้: shouldUnload คืนค่า NO</string>
+    <string name="cyl_memory_warning_kept">คงไว้</string>
 </resources>

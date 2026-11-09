@@ -16,6 +16,8 @@ static id CYLRNJSONObject(NSString *JSON);
   NSString *_configurationJSON;
   NSString *_badgeStylesJSON;
   NSString *_plusButtonBadgeStyleJSON;
+  /// [EN] The last memory warning request handled. [CN] 最近处理的内存警告请求。
+  int _memoryWarningRequest;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -68,6 +70,15 @@ static id CYLRNJSONObject(NSString *JSON);
   }
   _hostView.selectedIndex = newViewProps.selectedIndex;
   _hostView.tabBarHidden = newViewProps.tabBarHidden;
+  // [EN] A new request simulates a memory warning once. [CN] 新的请求模拟一次内存警告。
+  if (newViewProps.memoryWarningRequest > _memoryWarningRequest) {
+    NSString *report = [_hostView simulateMemoryWarning];
+    if (_eventEmitter) {
+      std::static_pointer_cast<CyltabbarViewEventEmitter const>(_eventEmitter)
+          ->onMemoryWarning(CyltabbarViewEventEmitter::OnMemoryWarning{.report = std::string(report.UTF8String)});
+    }
+  }
+  _memoryWarningRequest = newViewProps.memoryWarningRequest;
   // [EN] After the selection: logging out may move it away from a tab that needs login. [CN] 在选中之后：退出登录可能使选中离开需要登录的 Tab。
   // [EN] -1: not set, the host uses the cached state. [CN] -1：未设置，宿主使用缓存的状态。
   if (newViewProps.loginState >= 0) {
@@ -129,6 +140,7 @@ static id CYLRNJSONObject(NSString *JSON)
   _hostView.tabCoverImages = nil;
   [_hostView resetLoggedIn];
   _hostView.tabBarHidden = NO;
+  _memoryWarningRequest = 0;
   _badgeStylesJSON = nil;
   _plusButtonBadgeStyleJSON = nil;
   _hostView.selectedIndex = -1;

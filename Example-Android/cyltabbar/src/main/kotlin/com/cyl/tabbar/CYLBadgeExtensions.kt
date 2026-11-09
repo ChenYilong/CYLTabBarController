@@ -471,8 +471,8 @@ fun Fragment.cyl_memoryWarningCellForTableView(parent: ViewGroup): View {
     return LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
         setPadding((16 * density).toInt(), (10 * density).toInt(), (16 * density).toInt(), (10 * density).toInt())
-        addView(TextView(context).apply { setText(R.string.cyl_memory_warning_title); textSize = 15f; setTypeface(typeface, Typeface.BOLD) })
-        addView(TextView(context).apply { setText(R.string.cyl_memory_warning_detail); setTextColor(Color.GRAY) })
+        addView(TextView(context).apply { text = CYLLocalization.string(context, R.string.cyl_memory_warning_title); textSize = 15f; setTypeface(typeface, Typeface.BOLD) })
+        addView(TextView(context).apply { text = CYLLocalization.string(context, R.string.cyl_memory_warning_detail); setTextColor(Color.GRAY) })
     }
 }
 
@@ -484,16 +484,32 @@ fun Fragment.cyl_memoryWarningCellForTableView(parent: ViewGroup): View {
 fun Fragment.cyl_simulateMemoryWarningAndShowResult() {
     val context = context ?: return
     val controller = cyl_owningTabBarController() ?: cyl_tabBarController ?: CYLTabBarController.cyl_activeTabBarController()
+    val message = CYLSimulateMemoryWarningReport(context, controller)
+    AlertDialog.Builder(context).setTitle(CYLLocalization.string(context, R.string.cyl_memory_warning_alert_title)).setMessage(message)
+        .setPositiveButton(android.R.string.ok, null).show()
+}
+
+/**
+ * [EN] `CYLSimulateMemoryWarningReport()`: simulates a memory warning for `controller` and returns what happened to each tab,
+ *      one line per tab, in [CYLLocalization.language]: the message of `cyl_simulateMemoryWarningAndShowResult`, for any UI
+ *      (e.g. `CYLTabBarHostView`).
+ * [CN] 对 `controller` 模拟内存警告，并返回每个 Tab 的结果（每个 Tab 一行），使用 [CYLLocalization.language]：即
+ *      `cyl_simulateMemoryWarningAndShowResult` 弹窗的内容，可用于任何界面（例如 `CYLTabBarHostView`）。
+ */
+fun CYLSimulateMemoryWarningReport(context: Context, controller: CYLTabBarController?): String {
     val pages = controller?.viewControllers.orEmpty()
     val wasLoaded = pages.map { it.view != null }
     CYLTabBarController.cyl_simulateMemoryWarningForTabBarController(controller)
+    val text = { id: Int -> CYLLocalization.string(context, id) }
     val lines = ArrayList<String>()
     when {
-        controller == null -> lines += context.getString(R.string.cyl_memory_warning_no_controller)
-        !controller.unloadsUnselectedViewsOnMemoryWarning -> lines += context.getString(R.string.cyl_memory_warning_disabled)
+        controller == null -> lines += text(R.string.cyl_memory_warning_no_controller)
+        !controller.unloadsUnselectedViewsOnMemoryWarning -> lines += text(R.string.cyl_memory_warning_disabled)
     }
     pages.forEachIndexed { index, page ->
-        val title = controller?.tabBarItems?.getOrNull(index)?.title ?: page.javaClass.simpleName
+        // [EN] The title the tab shows, as iOS `tabBarItem.title`: the selected title on the selected tab. [CN] Tab 显示的标题，与 iOS 相同：选中的 Tab 显示选中标题。
+        val item = controller?.tabBarItems?.getOrNull(index)
+        val title = (if (index == controller?.selectedIndex) item?.cyl_selectedTitle else null) ?: item?.title ?: page.javaClass.simpleName
         val status = when {
             !wasLoaded[index] -> R.string.cyl_memory_warning_not_loaded
             page.view == null -> R.string.cyl_memory_warning_unloaded
@@ -501,9 +517,9 @@ fun Fragment.cyl_simulateMemoryWarningAndShowResult() {
             controller?.unloadsUnselectedViewsOnMemoryWarning == true && !controller.shouldUnloadViewOfViewController(page) -> R.string.cyl_memory_warning_kept_should_unload
             else -> R.string.cyl_memory_warning_kept
         }
-        lines += "$title: ${context.getString(status)}"
+        lines += "$title: ${text(status)}"
     }
-    AlertDialog.Builder(context).setTitle(R.string.cyl_memory_warning_alert_title).setMessage(lines.joinToString("\n")).setPositiveButton(android.R.string.ok, null).show()
+    return lines.joinToString("\n")
 }
 
 // MARK: - Base view controllers 基类

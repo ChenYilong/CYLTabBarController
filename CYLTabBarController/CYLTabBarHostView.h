@@ -177,6 +177,15 @@ FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
  *      `touchableRects` 为空，触摸交给其下方的页面。
  */
 @property (nonatomic, assign) BOOL tabBarHidden;
+/*!
+ * [EN] Simulates a memory warning for the tab bar controller and returns what happened to each tab, one line per tab, in
+ *      the library's language (`CYLSimulateMemoryWarningReport()`, issue #426). The configuration decides what is unloaded:
+ *      `CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`, `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`.
+ * [CN] 对 TabBarController 模拟内存警告，并返回每个 Tab 的结果（每个 Tab 一行），使用库的语言（`CYLSimulateMemoryWarningReport()`，
+ *      issue #426）。卸载哪些 Tab 由配置决定：`CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`、
+ *      `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`。
+ */
+- (NSString *)simulateMemoryWarning;
 
 /// [EN] The plus button of `CYLTabBarControllerPlusButton` was tapped. [CN] 点击了 `CYLTabBarControllerPlusButton` 的 PlusButton。
 @property (nonatomic, copy, nullable) void (^didTapPlusButton)(void);

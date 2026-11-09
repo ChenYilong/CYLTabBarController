@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Plusknop</string>
     <string name="cyl_badge_new_lowercase">nieuw</string>
     <string name="cyl_badge_new_uppercase">NIEUW</string>
+    <string name="cyl_memory_warning_title">Geheugenwaarschuwing simuleren</string>
+    <string name="cyl_memory_warning_detail">Ontlaadt niet-geselecteerde tabs; ze laden opnieuw bij selectie</string>
+    <string name="cyl_memory_warning_alert_title">Geheugenwaarschuwing</string>
+    <string name="cyl_memory_warning_no_controller">Niet in een CYLTabBarController: geen tabs om te ontladen.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: geen tab ontladen.</string>
+    <string name="cyl_memory_warning_not_loaded">niet geladen</string>
+    <string name="cyl_memory_warning_unloaded">ontladen</string>
+    <string name="cyl_memory_warning_kept_selected">behouden: geselecteerd</string>
+    <string name="cyl_memory_warning_kept_should_unload">behouden: shouldUnload gaf NO terug</string>
+    <string name="cyl_memory_warning_kept">behouden</string>
 </resources>

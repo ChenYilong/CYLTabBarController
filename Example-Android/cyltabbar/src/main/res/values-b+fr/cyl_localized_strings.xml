@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Bouton plus</string>
     <string name="cyl_badge_new_lowercase">nouv.</string>
     <string name="cyl_badge_new_uppercase">NOUV.</string>
+    <string name="cyl_memory_warning_title">Simuler un avertissement mémoire</string>
+    <string name="cyl_memory_warning_detail">Décharge les onglets non sélectionnés ; rechargés à la sélection</string>
+    <string name="cyl_memory_warning_alert_title">Avertissement mémoire</string>
+    <string name="cyl_memory_warning_no_controller">Pas dans un CYLTabBarController : aucun onglet à décharger.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO : aucun onglet déchargé.</string>
+    <string name="cyl_memory_warning_not_loaded">non chargé</string>
+    <string name="cyl_memory_warning_unloaded">déchargé</string>
+    <string name="cyl_memory_warning_kept_selected">conservé : sélectionné</string>
+    <string name="cyl_memory_warning_kept_should_unload">conservé : shouldUnload a renvoyé NO</string>
+    <string name="cyl_memory_warning_kept">conservé</string>
 </resources>

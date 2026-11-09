@@ -133,6 +133,10 @@ public final class CYLConstants {
     public static final String CYLTabBarControllerSwipeToSwitchTab = "CYLTabBarControllerSwipeToSwitchTab";
     /** [EN] The identifiers of the tabs that need login (`cyl_loginRequiredTabBarItemIdentifiers`, #19). [CN] 需要登录的 Tab 的标识（#19）。 */
     public static final String CYLTabBarControllerLoginRequiredTabBarItemIdentifiers = "CYLTabBarControllerLoginRequiredTabBarItemIdentifiers";
+    /** [EN] A memory warning unloads the unselected tabs (`unloadsUnselectedViewsOnMemoryWarning`, #426). [CN] 内存警告时卸载未选中的 Tab（#426）。 */
+    public static final String CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning = "CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning";
+    /** [EN] The tabs a memory warning never unloads (`cyl_keepsLoadedTabBarItemIdentifiers`). [CN] 内存警告时不卸载的 Tab（`cyl_keepsLoadedTabBarItemIdentifiers`）。 */
+    public static final String CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers = "CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers";
     // [EN] Skins of a configuration (see CYLTabBarConfigurationTheme). [CN] 配置中的皮肤（见 CYLTabBarConfigurationTheme）。
     public static final String CYLTabBarControllerThemes = "CYLTabBarControllerThemes";
     public static final String CYLTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier";

@@ -119,6 +119,14 @@ export type CYLTabBarProps = ViewProps & {
    * tab bar takes no touches: the page under it gets them.
    */
   tabBarHidden?: boolean;
+  /**
+   * Issue #426: each increase simulates a memory warning once (`+[CYLTabBarController cyl_simulateMemoryWarningForTabBarController:]`);
+   * `onMemoryWarning` then reports what happened to each tab, one line per tab, in the library's language. The
+   * configuration decides what is unloaded (`CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`,
+   * `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`).
+   */
+  memoryWarningRequest?: number;
+  onMemoryWarning?: (report: string) => void;
 };
 
 /**
@@ -215,6 +223,8 @@ export function CYLTabBar(props: CYLTabBarProps) {
     loggedIn,
     language,
     tabBarHidden,
+    memoryWarningRequest,
+    onMemoryWarning,
     selectedIndex,
     badgeValues,
     plusButtonBadgeValue,
@@ -246,6 +256,8 @@ export function CYLTabBar(props: CYLTabBarProps) {
       loginState={loggedIn === undefined ? -1 : loggedIn ? 1 : 0}
       language={language ?? ''}
       tabBarHidden={tabBarHidden ?? false}
+      memoryWarningRequest={memoryWarningRequest ?? 0}
+      onMemoryWarning={(event) => onMemoryWarning?.(event.nativeEvent.report)}
       onLoginStateChange={(event) => onLoginStateChange?.(event.nativeEvent.loggedIn)}
       onLoginRequest={(event) =>
         onLoginRequest?.(event.nativeEvent.index, event.nativeEvent.identifier, event.nativeEvent.title)

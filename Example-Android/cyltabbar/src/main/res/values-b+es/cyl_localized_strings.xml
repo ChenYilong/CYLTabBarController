@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Botón más</string>
     <string name="cyl_badge_new_lowercase">nuevo</string>
     <string name="cyl_badge_new_uppercase">NUEVO</string>
+    <string name="cyl_memory_warning_title">Simular aviso de memoria</string>
+    <string name="cyl_memory_warning_detail">Descarga las pestañas no seleccionadas; se recargan al seleccionarlas</string>
+    <string name="cyl_memory_warning_alert_title">Aviso de memoria</string>
+    <string name="cyl_memory_warning_no_controller">No está en un CYLTabBarController: no hay pestañas que descargar.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: no se descargó ninguna pestaña.</string>
+    <string name="cyl_memory_warning_not_loaded">no cargada</string>
+    <string name="cyl_memory_warning_unloaded">descargada</string>
+    <string name="cyl_memory_warning_kept_selected">conservada: seleccionada</string>
+    <string name="cyl_memory_warning_kept_should_unload">conservada: shouldUnload devolvió NO</string>
+    <string name="cyl_memory_warning_kept">conservada</string>
 </resources>

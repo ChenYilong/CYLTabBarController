@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Tipka plus</string>
     <string name="cyl_badge_new_lowercase">novo</string>
     <string name="cyl_badge_new_uppercase">NOVO</string>
+    <string name="cyl_memory_warning_title">Simuliraj upozorenje o memoriji</string>
+    <string name="cyl_memory_warning_detail">Oslobađa neodabrane kartice; ponovno se učitavaju kad se odaberu</string>
+    <string name="cyl_memory_warning_alert_title">Upozorenje o memoriji</string>
+    <string name="cyl_memory_warning_no_controller">Nije u CYLTabBarControlleru: nema kartica za oslobađanje.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: nijedna kartica nije oslobođena.</string>
+    <string name="cyl_memory_warning_not_loaded">nije učitano</string>
+    <string name="cyl_memory_warning_unloaded">oslobođeno</string>
+    <string name="cyl_memory_warning_kept_selected">zadržano: odabrano</string>
+    <string name="cyl_memory_warning_kept_should_unload">zadržano: shouldUnload je vratio NO</string>
+    <string name="cyl_memory_warning_kept">zadržano</string>
 </resources>

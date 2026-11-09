@@ -620,7 +620,8 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
               CYLTabBarControllerThemes, CYLTabBarControllerThemeIdentifier, CYLTabBarControllerDarkThemeIdentifier,
               CYLTabBarControllerThemeManagerName, CYLTabBarControllerPlusButton, CYLTabBarControllerPlusButtonAction,
               CYLTabBarControllerUserInterfaceStyle, CYLTabBarControllerTabButtonTapAnimation, CYLTabBarControllerSwipeToSwitchTab,
-              CYLTabBarControllerLoginRequiredTabBarItemIdentifiers ];
+              CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning,
+              CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -1557,24 +1558,34 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
         }
         normalized[CYLTabBarControllerSwipeToSwitchTab] = swipe;
     }
-    // [EN] Tabs that need login: an array of strings, or a comma-separated string. [CN] 需要登录的 Tab：字符串数组或逗号分隔的字符串。
-    id loginRequired = normalized[CYLTabBarControllerLoginRequiredTabBarItemIdentifiers];
-    if (loginRequired) {
-        if ([loginRequired isKindOfClass:[NSString class]]) {
-            loginRequired = [loginRequired componentsSeparatedByString:@","];
+    // [EN] Lists of tab identifiers: an array of strings, or a comma-separated string. [CN] Tab 标识列表：字符串数组或逗号分隔的字符串。
+    for (NSString *key in @[ CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers ]) {
+        id list = normalized[key];
+        if (!list) {
+            continue;
+        }
+        if ([list isKindOfClass:[NSString class]]) {
+            list = [list componentsSeparatedByString:@","];
         }
         NSMutableArray<NSString *> *identifiers = [NSMutableArray array];
-        if ([loginRequired isKindOfClass:[NSArray class]]) {
-            for (id identifier in (NSArray *)loginRequired) {
+        if ([list isKindOfClass:[NSArray class]]) {
+            for (id identifier in (NSArray *)list) {
                 NSString *trimmed = [identifier isKindOfClass:[NSString class]] ? [identifier stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] : nil;
                 if (trimmed.length > 0) {
                     [identifiers addObject:trimmed];
                 }
             }
         } else {
-            CYLLogInvalidConfigurationValue(CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, loginRequired);
+            CYLLogInvalidConfigurationValue(key, list);
         }
-        normalized[CYLTabBarControllerLoginRequiredTabBarItemIdentifiers] = [identifiers copy];
+        normalized[key] = [identifiers copy];
+    }
+    if (normalized[CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning]) {
+        NSNumber *unloads = CYLBoolValue(normalized[CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning]);
+        if (!unloads) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning, normalized[CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning]);
+        }
+        normalized[CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning] = unloads;
     }
     if (normalized[CYLTabBarControllerPlusButtonAction] && !(blockClass && [normalized[CYLTabBarControllerPlusButtonAction] isKindOfClass:blockClass])) {
         CYLLogInvalidConfigurationValue(CYLTabBarControllerPlusButtonAction, normalized[CYLTabBarControllerPlusButtonAction]);

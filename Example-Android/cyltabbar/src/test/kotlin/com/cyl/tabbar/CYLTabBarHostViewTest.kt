@@ -139,6 +139,84 @@ class CYLTabBarHostViewTest {
     }
 
     @Test
+    fun aMemoryWarningUnloadsTheUnselectedTabsButTheOnesKeptLoaded() = withActivity { activity ->
+        val host = hostView(activity)
+        host.configuration = mapOf(
+            CYLConstants.CYLTabBarControllerTabBarItemsAttributes to items("A", "B", "C", "D").mapIndexed { index, item ->
+                if (index == 2) item + (CYLConstants.CYLTabBarItemSelectedTitle to "C selected") else item
+            },
+            CYLConstants.CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning to "true",
+            CYLConstants.CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers to "a, b",
+        )
+        val controller = waitForController(host)
+        assertTrue(controller.unloadsUnselectedViewsOnMemoryWarning)
+        assertEquals(listOf("a", "b"), controller.cyl_keepsLoadedTabBarItemIdentifiers)
+        // [EN] Load every tab but D, then select C. [CN] 加载除 D 以外的所有 Tab，然后选中 C。
+        for (index in 0..2) {
+            host.selectedIndex = index
+            shadowOf(Looper.getMainLooper()).idle()
+        }
+        // [EN] The host creates every (empty) page when it builds the tab bar, as on iOS: D, never selected, is unloaded.
+        // [CN] 宿主在创建 TabBar 时创建所有（空白的）页面，与 iOS 相同：从未选中的 D 被卸载。
+        assertEquals("A: kept: shouldUnload returned NO\nB: kept: shouldUnload returned NO\nC selected: kept: selected\nD: unloaded", host.simulateMemoryWarning())
+        host.selectedIndex = 0
+        shadowOf(Looper.getMainLooper()).idle()
+        host.badgeValues = listOf("", "8", "100", "NEW")
+        shadowOf(Looper.getMainLooper()).idle()
+        host.simulateMemoryWarning()
+        shadowOf(Looper.getMainLooper()).idle()
+        assertNull(controller.viewControllers[2].view)
+        // [EN] Unloading pages keeps the tab badges. [CN] 卸载页面不影响 Tab 角标。
+        assertSame(controller, host.tabBarController)
+        assertEquals("8", controller.tabBar.cyl_tabBarButtonWithTabIndex(1)?.cyl_badge?.text)
+    }
+
+    @Test
+    fun aBadgeBlockThatWaitedForALayoutDoesNotUndoLaterBadges() = withActivity { activity ->
+        // [EN] React Native lays this view out itself: a badge block set before the tab buttons were ready waits for a global
+        //      layout, while later badges are applied at once. When a layout pass finally comes (a memory warning detaches
+        //      pages), the waiting block must show the current badges, not the ones of its time.
+        // [CN] React Native 自行布局本视图：Tab 按钮就绪前设置的角标 block 会等待一次全局布局，而之后的角标立即应用。最终出现布局时
+        //      （内存警告分离页面），等待中的 block 必须显示当前的角标，而不是当时的角标。
+        val host = hostView(activity)
+        host.configuration = mapOf(CYLConstants.CYLTabBarControllerTabBarItemsAttributes to items("A", "B"))
+        val controller = waitForController(host)
+        val tabBar = controller.tabBar
+        tabBar.cyl_tabBarButtonWithTabIndex(1)?.let { it.layout(0, 0, 0, 0) }
+        host.badgeValues = listOf("", "")
+        tabBar.cyl_tabBarButtonWithTabIndex(1)?.let { it.layout(0, 0, 100, 100) }
+        host.badgeValues = listOf("", "8")
+        assertEquals("8", tabBar.cyl_tabBarButtonWithTabIndex(1)?.cyl_badge?.text)
+        tabBar.viewTreeObserver.dispatchOnGlobalLayout()
+        assertEquals("8", tabBar.cyl_tabBarButtonWithTabIndex(1)?.cyl_badge?.text)
+    }
+
+    @Test
+    fun aBlockWaitingForTheTabButtonsRunsAfterAManualLayout() = withActivity { activity ->
+        // [EN] React Native lays its native views out itself, outside a layout pass: no global layout event comes, but the tab
+        //      bar's own layout does, and the waiting block runs then. [CN] React Native 自行布局其原生视图，不经过布局流程：不会收到全局
+        //      布局事件，但 TabBar 自身的布局会发生，等待中的 block 随之执行。
+        val host = hostView(activity)
+        host.configuration = mapOf(CYLConstants.CYLTabBarControllerTabBarItemsAttributes to items("A", "B"))
+        val controller = waitForController(host)
+        val tabBar = controller.tabBar
+        tabBar.cyl_tabBarButtonWithTabIndex(1)?.layout(0, 0, 0, 0)
+        var runs = 0
+        controller.performWhenTabBarItemsReady { runs++ }
+        assertEquals(0, runs)
+        tabBar.requestLayout()
+        tabBar.measure(android.view.View.MeasureSpec.makeMeasureSpec(tabBar.width, android.view.View.MeasureSpec.EXACTLY),
+            android.view.View.MeasureSpec.makeMeasureSpec(tabBar.height, android.view.View.MeasureSpec.EXACTLY))
+        tabBar.layout(tabBar.left, tabBar.top, tabBar.right, tabBar.bottom)
+        assertEquals(1, runs)
+        // [EN] Once only, also when a global layout comes later. [CN] 只执行一次，之后发生全局布局也不会再执行。
+        tabBar.viewTreeObserver.dispatchOnGlobalLayout()
+        tabBar.requestLayout()
+        tabBar.layout(tabBar.left, tabBar.top, tabBar.right, tabBar.bottom)
+        assertEquals(1, runs)
+    }
+
+    @Test
     fun invalidJSONChangesNothing() = withActivity { activity ->
         val host = CYLTabBarHostView(activity)
         assertFalse(host.setConfigurationJSON("[1, 2]"))

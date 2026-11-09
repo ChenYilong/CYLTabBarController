@@ -385,6 +385,9 @@ function CYLMainTabBar({
   // -[CYLFlatDesignTableViewController tableView:didSelectRowAtIndexPath:]: setTabBarHidden:!isTabBarHidden animated:YES,
   // in every style. 在所有样式下切换 TabBar 的显示与隐藏。
   const [tabBarHidden, setTabBarHidden] = useState(false);
+  // -[UIViewController cyl_simulateMemoryWarningAndShowResult]: each tap asks the tab bar for one simulated memory warning.
+  // 每次点击请求 TabBar 模拟一次内存警告。
+  const [memoryWarningRequest, setMemoryWarningRequest] = useState(0);
   // As the Objective-C example, the cover goes on after the tab icons: a skin's icons replace the tab's icon views, so
   // the cover is put back once they are in (network icons are downloaded first). 与 Objective-C 示例相同，封面在 Tab 图标之后添加：
   // 皮肤的图标会替换 Tab 的图标视图，因此在其就绪后重新添加封面（网络图标需要先下载）。
@@ -485,6 +488,7 @@ function CYLMainTabBar({
             if (row.skin) return skinPicker.choose(row.skin.name);
             if (row.id === 'skin') return setSkinMenuVisible(true);
             if (row.id === 'flatShowHide') return setTabBarHidden((hidden) => !hidden);
+            if (row.id === 'memoryWarning') return setMemoryWarningRequest((request) => request + 1);
             if (row.id === 'language') return presentLanguagePicker(onLanguageChange, () => setLanguageMenuVisible(true));
             if (row.badge) {
               // -[CYLHomeViewController tableView:didSelectRowAtIndexPath:]: an orange page (the "Home (n)" navigation title
@@ -522,6 +526,8 @@ function CYLMainTabBar({
         onLoginStateChange={onLoggedInChange}
         language={language}
         tabBarHidden={tabBarHidden}
+        memoryWarningRequest={memoryWarningRequest}
+        onMemoryWarning={(report) => Alert.alert(t('Memory warning'), report, [{ text: t('OK') }])}
         // -[MainTabBarController cyl_demo_presentLoginForViewController:completion:]: "Messages" and "Me" need login; the
         // alert logs in, then selects the tapped tab. 「Messages」「Me」需要登录；弹窗登录后选中所点击的 Tab。
         onLoginRequest={(index, _identifier, title) =>
@@ -579,6 +585,10 @@ const CONFIGURATION = {
   CYLTabBarControllerTitlePositionAdjustment: [0, -3.5],
   // -[MainTabBarController setUpLoginRequiredTabs] (issue #19). 需要登录的 Tab。
   CYLTabBarControllerLoginRequiredTabBarItemIdentifiers: ['message', 'CYLMineViewController'],
+  // MainTabBarController: unloadsUnselectedViewsOnMemoryWarning = YES and -shouldUnloadViewOfViewController: keeps the home
+  // tab (issue #426). 卸载未选中的 Tab，并保留首页 Tab。
+  CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning: true,
+  CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers: ['home'],
   CYLTabBarControllerThemes: {
     Default: {
       CYLTabBarItemTitleColor: '#FF0000',

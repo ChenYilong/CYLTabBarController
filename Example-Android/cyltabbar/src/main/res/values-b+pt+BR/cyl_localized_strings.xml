@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Botão mais</string>
     <string name="cyl_badge_new_lowercase">novo</string>
     <string name="cyl_badge_new_uppercase">NOVO</string>
+    <string name="cyl_memory_warning_title">Simular aviso de memória</string>
+    <string name="cyl_memory_warning_detail">Descarrega as abas não selecionadas; recarregam ao selecionar</string>
+    <string name="cyl_memory_warning_alert_title">Aviso de memória</string>
+    <string name="cyl_memory_warning_no_controller">Não está em um CYLTabBarController: nenhuma aba para descarregar.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: nenhuma aba descarregada.</string>
+    <string name="cyl_memory_warning_not_loaded">não carregada</string>
+    <string name="cyl_memory_warning_unloaded">descarregada</string>
+    <string name="cyl_memory_warning_kept_selected">mantida: selecionada</string>
+    <string name="cyl_memory_warning_kept_should_unload">mantida: shouldUnload retornou NO</string>
+    <string name="cyl_memory_warning_kept">mantida</string>
 </resources>

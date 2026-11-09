@@ -116,6 +116,10 @@ const _configuration = {
     'message',
     'CYLMineViewController',
   ],
+  // MainTabBarController: unloadsUnselectedViewsOnMemoryWarning = YES and -shouldUnloadViewOfViewController: keeps the home
+  // tab (issue #426). 卸载未选中的 Tab，并保留首页 Tab。
+  'CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning': true,
+  'CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers': ['home'],
   'CYLTabBarControllerThemes': {
     'Default': {
       'CYLTabBarItemTitleColor': '#FF0000',
@@ -446,6 +450,9 @@ class _ExamplePageState extends State<CYLExamplePage> {
   // -[CYLFlatDesignTableViewController tableView:didSelectRowAtIndexPath:]: setTabBarHidden:!isTabBarHidden animated:YES,
   // in every style. 在所有样式下切换 TabBar 的显示与隐藏。
   bool _tabBarHidden = false;
+  // -[UIViewController cyl_simulateMemoryWarningAndShowResult]: each tap asks the tab bar for one simulated memory warning.
+  // 每次点击请求 TabBar 模拟一次内存警告。
+  int _memoryWarningRequest = 0;
   bool _plusPageSelected = false;
   List<CYLTabBarBadge?> _badges = const [];
   bool _decorated = false;
@@ -795,6 +802,9 @@ class _ExamplePageState extends State<CYLExamplePage> {
                         }
                         if (row.id == 'skin') return _showSkinMenu(dark);
                         if (row.id == 'language') return _showLanguagePicker();
+                        if (row.id == 'memoryWarning') {
+                          return setState(() => _memoryWarningRequest++);
+                        }
                         if (row.id == 'flatShowHide') {
                           return setState(() => _tabBarHidden = !_tabBarHidden);
                         }
@@ -850,6 +860,20 @@ class _ExamplePageState extends State<CYLExamplePage> {
         onLoginStateChange: widget.onLoggedInChange,
         language: widget.language,
         tabBarHidden: _tabBarHidden,
+        memoryWarningRequest: _memoryWarningRequest,
+        onMemoryWarning: (report) => showDialog<void>(
+          context: context,
+          builder: (dialogContext) => AlertDialog.adaptive(
+            title: Text(t('Memory warning')),
+            content: Text(report),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text(t('OK')),
+              ),
+            ],
+          ),
+        ),
         // -[MainTabBarController cyl_demo_presentLoginForViewController:completion:]: "Messages" and "Me" need login; the
         // alert logs in, then selects the tapped tab. 「Messages」「Me」需要登录；弹窗登录后选中所点击的 Tab。
         onLoginRequest: (index, identifier, title) => showDialog<void>(

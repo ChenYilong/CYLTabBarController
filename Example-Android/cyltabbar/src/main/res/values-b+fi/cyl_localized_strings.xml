@@ -7,4 +7,14 @@
     <string name="cyl_plus_button">Plus-painike</string>
     <string name="cyl_badge_new_lowercase">uusi</string>
     <string name="cyl_badge_new_uppercase">UUSI</string>
+    <string name="cyl_memory_warning_title">Simuloi muistivaroitus</string>
+    <string name="cyl_memory_warning_detail">Vapauttaa valitsemattomat välilehdet; ne ladataan uudelleen valittaessa</string>
+    <string name="cyl_memory_warning_alert_title">Muistivaroitus</string>
+    <string name="cyl_memory_warning_no_controller">Ei CYLTabBarControllerissa: ei vapautettavia välilehtiä.</string>
+    <string name="cyl_memory_warning_disabled">unloadsUnselectedViewsOnMemoryWarning = NO: välilehtiä ei vapautettu.</string>
+    <string name="cyl_memory_warning_not_loaded">ei ladattu</string>
+    <string name="cyl_memory_warning_unloaded">vapautettu</string>
+    <string name="cyl_memory_warning_kept_selected">säilytetty: valittu</string>
+    <string name="cyl_memory_warning_kept_should_unload">säilytetty: shouldUnload palautti NO</string>
+    <string name="cyl_memory_warning_kept">säilytetty</string>
 </resources>

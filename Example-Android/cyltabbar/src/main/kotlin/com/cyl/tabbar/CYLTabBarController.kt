@@ -418,11 +418,10 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         // [CN] 配置中的交互；`CYLTabBarControllerUserInterfaceStyle` 仅用于 iOS（Android 跟随系统）。
         CYLTabBarConfiguration.tapAnimationValue(normalized[CYLConstants.CYLTabBarControllerTabButtonTapAnimation])?.let { cyl_tabButtonTapAnimationType = it }
         CYLTabBarConfiguration.boolValue(normalized[CYLConstants.CYLTabBarControllerSwipeToSwitchTab])?.let { cyl_swipeToSwitchTabEnabled = it }
-        // [EN] Tabs that need login: a list of strings, or a comma-separated string (as iOS). [CN] 需要登录的 Tab：字符串列表或逗号分隔的字符串（与 iOS 相同）。
-        when (val loginRequired = normalized[CYLConstants.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers]) {
-            is String -> cyl_loginRequiredTabBarItemIdentifiers = loginRequired.split(',').map { it.trim() }.filter { it.isNotEmpty() }
-            is List<*> -> cyl_loginRequiredTabBarItemIdentifiers = loginRequired.mapNotNull { (it as? String)?.trim()?.takeIf { identifier -> identifier.isNotEmpty() } }
-        }
+        // [EN] Lists of tab identifiers: a list of strings, or a comma-separated string (as iOS). [CN] Tab 标识列表：字符串列表或逗号分隔的字符串（与 iOS 相同）。
+        identifierList(normalized[CYLConstants.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers])?.let { cyl_loginRequiredTabBarItemIdentifiers = it }
+        CYLTabBarConfiguration.boolValue(normalized[CYLConstants.CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning])?.let { unloadsUnselectedViewsOnMemoryWarning = it }
+        identifierList(normalized[CYLConstants.CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers])?.let { cyl_keepsLoadedTabBarItemIdentifiers = it }
         setViewControllers(pages, items)
         cyl_adoptPendingPages()
         (normalized[CYLConfigurationThemes.INFO_KEY] as? CYLConfigurationThemes.Info)?.let { cyl_applyConfigurationThemes(it) }
@@ -819,15 +818,30 @@ open class CYLTabBarController(val activity: FragmentActivity) {
      * [CN] Tab 按钮布局完成后执行 `block`（已布局时立即执行），例如在按钮上显示角标。
      */
     fun performWhenTabBarItemsReady(block: (CYLTabBarController) -> Unit) {
-        val ready = tabBar.isLaidOut && tabBar.tabBarButtonArray.all { it.width > 0 }
-        if (ready) return block(this)
-        tabBar.viewTreeObserver.addOnGlobalLayoutListener(object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                if (tabBar.tabBarButtonArray.any { it.width == 0 }) return
-                tabBar.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                block(this@CYLTabBarController)
+        val ready = { tabBar.isLaidOut && tabBar.tabBarButtonArray.all { it.width > 0 } }
+        if (ready()) return block(this)
+        // [EN] Waits for whichever comes first: a global layout, or a layout of the tab bar itself. A view laid out by hand,
+        //      outside a layout pass (React Native lays out its native views itself), gets no global layout event, so waiting
+        //      for it alone could wait forever. The block runs once.
+        // [CN] 等待最先发生的事件：一次全局布局，或 TabBar 自身的一次布局。在布局流程之外手动布局的视图（React Native 自行布局其原生视图）
+        //      不会收到全局布局事件，只等待它可能会一直等下去。block 只执行一次。
+        val observer = tabBar.viewTreeObserver
+        var done = false
+        lateinit var globalLayout: android.view.ViewTreeObserver.OnGlobalLayoutListener
+        lateinit var layoutChange: View.OnLayoutChangeListener
+        val runIfReady = {
+            if (!done && ready()) {
+                done = true
+                if (observer.isAlive) observer.removeOnGlobalLayoutListener(globalLayout)
+                tabBar.viewTreeObserver.removeOnGlobalLayoutListener(globalLayout)
+                tabBar.removeOnLayoutChangeListener(layoutChange)
+                block(this)
             }
-        })
+        }
+        globalLayout = android.view.ViewTreeObserver.OnGlobalLayoutListener { runIfReady() }
+        layoutChange = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> runIfReady() }
+        observer.addOnGlobalLayoutListener(globalLayout)
+        tabBar.addOnLayoutChangeListener(layoutChange)
     }
     /** [EN] `-reloadBadgesWithBlock:`: `block` sets the badges once the tab buttons are ready. [CN] Tab 按钮就绪后由 `block` 设置角标。 */
     fun reloadBadgesWithBlock(block: (CYLTabBarController) -> Unit) = performWhenTabBarItemsReady(block)
@@ -857,8 +871,27 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         }
         if (changed) transaction.commitNowAllowingStateLoss()
     }
-    /** [EN] `-shouldUnloadViewOfViewController:`: whether a tab may be unloaded; override it to keep some tabs. [CN] Tab 是否可以卸载；重写以保留部分 Tab。 */
-    open fun shouldUnloadViewOfViewController(viewController: Fragment): Boolean = true
+    /**
+     * [EN] `-shouldUnloadViewOfViewController:`: true, except for the tabs in [cyl_keepsLoadedTabBarItemIdentifiers]; override
+     *      to keep other tabs loaded.
+     * [CN] 返回 true，[cyl_keepsLoadedTabBarItemIdentifiers] 中的 Tab 除外；可重写以保留其他 Tab。
+     */
+    open fun shouldUnloadViewOfViewController(viewController: Fragment): Boolean =
+        cyl_tabBarItemIdentifiers.getOrNull(viewControllers.indexOf(viewController)) !in cyl_keepsLoadedTabBarItemIdentifiers
+
+    /**
+     * [EN] `cyl_keepsLoadedTabBarItemIdentifiers`: the tabs a memory warning never unloads, without a subclass (e.g. from
+     *      `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`).
+     * [CN] 内存警告时不卸载的 Tab，无需子类（例如来自 `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`）。
+     */
+    var cyl_keepsLoadedTabBarItemIdentifiers: List<String> = emptyList()
+
+    /** [EN] A list of strings or a comma-separated string, trimmed; null for anything else. [CN] 字符串列表或逗号分隔的字符串（去除空白）；其他值为 null。 */
+    private fun identifierList(value: Any?): List<String>? = when (value) {
+        is String -> value.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+        is List<*> -> value.mapNotNull { (it as? String)?.trim()?.takeIf { identifier -> identifier.isNotEmpty() } }
+        else -> null
+    }
 
     /** [EN] A memory warning (`onTrimMemory` / `onLowMemory`): unloads when `unloadsUnselectedViewsOnMemoryWarning`. [CN] 内存警告：`unloadsUnselectedViewsOnMemoryWarning` 时卸载。 */
     internal fun cyl_didReceiveMemoryWarning() {
