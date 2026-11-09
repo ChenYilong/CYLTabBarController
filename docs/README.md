@@ -25,6 +25,7 @@
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
 | [一个配置文件生成 TabBarController](Configuration-File.md) | [One configuration file, one TabBarController](Configuration-File.md) |
+| [配置文件的本地化文本](Configuration-Localization.md) | [Localized texts in a configuration file](Configuration-Localization.md) |
 | [配置文件相关脚本：导出、边界情况与测试](Configuration-Scripts.md) | [Configuration scripts: export, edge cases and tests](Configuration-Scripts.md) |
 | [React Native 与 Flutter 组件](Cross-Platform-Components.md) | [React Native and Flutter components](Cross-Platform-Components.md) |
 | [自定义 TabBar 功能清单](Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](Custom-Tab-Bar-Features.md) |
@@ -102,6 +103,7 @@ docs/
 ├── Carthage-Example.md
 ├── Carthage.md
 ├── Configuration-File.md
+├── Configuration-Localization.md
 ├── Configuration-Scripts.md
 ├── Cross-Platform-Components.md
 ├── Custom-Tab-Bar-Features.md
@@ -160,6 +162,8 @@ docs/
     ├── android-liquid-glass-surface-040.png
     ├── android-liquid-glass-surface-100.png
     ├── android-liquid-glass-surface-slider.png
+    ├── configuration-localization-en.png
+    ├── configuration-localization-zh-hans.png
     ├── demo-test-list-objc-classic.png
     ├── docs-navigation-index.png
     ├── flatdesign-standard-appearance-mapping.svg

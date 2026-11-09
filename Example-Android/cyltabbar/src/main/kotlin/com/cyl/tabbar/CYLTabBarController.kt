@@ -392,7 +392,9 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     private fun initWithConfiguration(configuration: Map<String, Any?>) {
         val appVersion = try { activity.packageManager.getPackageInfo(activity.packageName, 0).versionName } catch (error: Exception) { null }
         val darkMode = (activity.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        val normalized = CYLTabBarConfiguration.cyl_normalizedConfiguration(configuration, "android", appVersion, darkMode)
+        // [EN] Localized texts first, as on iOS (CYLTabBarControllerLocalization). [CN] 与 iOS 一样先本地化文本。
+        val localized = CYLTabBarConfigurationLocalization.localize(activity, configuration)
+        val normalized = CYLTabBarConfiguration.cyl_normalizedConfiguration(localized, "android", appVersion, darkMode)
         @Suppress("UNCHECKED_CAST")
         var items = (normalized[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] as? List<Map<String, Any?>>) ?: emptyList()
         @Suppress("UNCHECKED_CAST")

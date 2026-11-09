@@ -2229,6 +2229,23 @@
   "status": "done",
   "android": "CYLConstants.CYLTabBarControllerThemeManagerName"
  },
+ "CYLTabBarControllerLocalization": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerLocalization",
+  "note": "read by CYLTabBarConfigurationLocalization (the same .strings files and location routes)"
+ },
+ "CYLTabBarLocalizationTableName": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLocalizationTableName"
+ },
+ "CYLTabBarLocalizationPath": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLocalizationPath"
+ },
+ "CYLTabBarLocalizationBundleName": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLocalizationBundleName"
+ },
  "CYLTabBarControllerThemes": {
   "status": "done",
   "android": "CYLConstants.CYLTabBarControllerThemes"

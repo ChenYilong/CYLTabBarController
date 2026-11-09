@@ -74,7 +74,11 @@ object CYLTabBarConfiguration {
                 throw CYLConfigurationException(CYLTabBarConfigurationError.FileNotFound, "$path: ${error.message}")
             }
         }
-        return parse(data, CYLTabBarConfigurationParser.formatForPathExtension(path.substringAfterLast('/').substringAfterLast('.', "")))
+        val configuration = parse(data, CYLTabBarConfigurationParser.formatForPathExtension(path.substringAfterLast('/').substringAfterLast('.', "")))
+        if (CYLConstants.CYLTabBarControllerLocalization !in configuration) return configuration
+        // [EN] A relative `CYLTabBarLocalizationPath` is resolved against this file (or asset). [CN] 相对的 `CYLTabBarLocalizationPath` 相对于本文件（或 asset）。
+        val source = if (file.isFile) (file.absoluteFile.parent ?: "") else "asset:" + path.substringBeforeLast('/', "")
+        return configuration + (CYLTabBarConfigurationLocalization.FILE_DIRECTORY_KEY to source)
     }
 
     /** [EN] Reads at most 5 MB (API 23: no `readNBytes`). [CN] 最多读取 5 MB（API 23 没有 `readNBytes`）。 */

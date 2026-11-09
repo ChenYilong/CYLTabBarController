@@ -11,6 +11,8 @@
 // [CN] 与此类绑定的文档：
 //   - One configuration file, one TabBarController / 一个配置文件生成 TabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Configuration-File.md
+//   - Localized texts in a configuration file / 配置文件的本地化文本
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Configuration-Localization.md
 //   - Custom Tab Bar Feature Checklist / 自定义 TabBar 功能清单
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Custom-Tab-Bar-Features.md
 //   - The demo test list: settings groups and a pure Swift version / Demo 测试列表：设置分组与纯 Swift 版本
@@ -594,6 +596,37 @@ FOUNDATION_EXTERN NSString *const CYLTabBarControllerThemes;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerThemeIdentifier;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerDarkThemeIdentifier;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerThemeManagerName;
+/*!
+ * [EN] Configuration key: localized texts (docs/Configuration-File.md, "Localization"). YES (or "true"), the name of a
+ *      strings table, or a dictionary with `CYLTabBarLocalizationTableName`, `CYLTabBarLocalizationPath` and
+ *      `CYLTabBarLocalizationBundleName`. With it, every `CYLTabBarItemTitle`, `CYLTabBarItemSelectedTitle`,
+ *      `CYLTabBarItemAccessibilityLabel` and `CYLTabBarItemAccessibilityHint` in the configuration (tabs, the plus button,
+ *      skins) is a key looked up in `{language}.lproj/{table}.strings` for the library's language
+ *      (`CYLLocalizationLanguage()`); a key with no translation stays as it is, as with `NSLocalizedString`. Android reads
+ *      the same files, so one configuration and its tables serve every platform.
+ * [CN] 配置键：本地化文本（docs/Configuration-File.md「本地化」）。值为 YES（或 "true"）、字符串表名，或包含
+ *      `CYLTabBarLocalizationTableName`、`CYLTabBarLocalizationPath`、`CYLTabBarLocalizationBundleName` 的字典。设置后，配置中（Tab、
+ *      PlusButton、皮肤）所有 `CYLTabBarItemTitle`、`CYLTabBarItemSelectedTitle`、`CYLTabBarItemAccessibilityLabel`、
+ *      `CYLTabBarItemAccessibilityHint` 都作为键，在本库当前语言（`CYLLocalizationLanguage()`）的 `{语言}.lproj/{表名}.strings` 中查找；
+ *      没有译文的键保持原样，与 `NSLocalizedString` 相同。Android 读取同样的文件，一份配置及其字符串表适用于所有平台。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerLocalization;
+/// [EN] The strings table, without ".strings" (default "Localizable"). [CN] 字符串表名，不含 ".strings"（默认 "Localizable"）。
+FOUNDATION_EXTERN NSString *const CYLTabBarLocalizationTableName;
+/*!
+ * [EN] The folder that holds the `{language}.lproj` folders, always in the app (never in this library), as a location
+ *      route (docs/Configuration-Localization.md): "bundle:<path>" (the app's resources), "sandbox:Documents/…",
+ *      "sandbox:Caches/…" or "sandbox:tmp/…" (tables downloaded at run time; the same names on Android), a "file:" URL, an
+ *      absolute path, "~/…" (the app's home folder), or a path relative to the configuration file's folder (to the app's
+ *      resources when the configuration did not come from a file). Takes precedence over `CYLTabBarLocalizationBundleName`.
+ * [CN] 存放 `{语言}.lproj` 文件夹的目录，始终位于 App 中（不在本库中），写作位置路由（docs/Configuration-Localization.md）：
+ *      "bundle:<路径>"（App 资源）、"sandbox:Documents/…"、"sandbox:Caches/…" 或 "sandbox:tmp/…"（运行时下载的字符串表；Android 使用相同的名称）、
+ *      "file:" URL、绝对路径、"~/…"（App 主目录），或相对于配置文件所在目录的路径（配置不是来自文件时，相对于 App 资源目录）。
+ *      优先于 `CYLTabBarLocalizationBundleName`。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarLocalizationPath;
+/// [EN] A resource bundle in the app ("Texts" or "Texts.bundle"; Android: a folder in the assets); default the main bundle (Android: the assets root). [CN] App 中的资源包（"Texts" 或 "Texts.bundle"；Android：assets 中的文件夹）；默认 main bundle（Android：assets 根目录）。
+FOUNDATION_EXTERN NSString *const CYLTabBarLocalizationBundleName;
 /// [EN] The identifier of a skin in the list form of `CYLTabBarControllerThemes`. [CN] `CYLTabBarControllerThemes` 列表形式中皮肤的标识。
 FOUNDATION_EXTERN NSString *const CYLTabBarThemeIdentifier;
 /// [EN] The named values of a skin in the list form of `CYLTabBarControllerThemes`. [CN] `CYLTabBarControllerThemes` 列表形式中皮肤的命名值。

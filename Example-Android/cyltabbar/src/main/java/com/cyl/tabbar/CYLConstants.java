@@ -138,6 +138,12 @@ public final class CYLConstants {
     public static final String CYLTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier";
     public static final String CYLTabBarControllerDarkThemeIdentifier = "CYLTabBarControllerDarkThemeIdentifier";
     public static final String CYLTabBarControllerThemeManagerName = "CYLTabBarControllerThemeManagerName";
+    // [EN] Localized texts of a configuration (see CYLTabBarConfigurationLocalization, docs/Configuration-File.md).
+    // [CN] 配置中的本地化文本（见 CYLTabBarConfigurationLocalization、docs/Configuration-File.md）。
+    public static final String CYLTabBarControllerLocalization = "CYLTabBarControllerLocalization";
+    public static final String CYLTabBarLocalizationTableName = "CYLTabBarLocalizationTableName";
+    public static final String CYLTabBarLocalizationPath = "CYLTabBarLocalizationPath";
+    public static final String CYLTabBarLocalizationBundleName = "CYLTabBarLocalizationBundleName";
     public static final String CYLTabBarThemeIdentifier = "CYLTabBarThemeIdentifier";
     public static final String CYLTabBarThemeValues = "CYLTabBarThemeValues";
     public static final String CYLTabBarBackgroundColor = "CYLTabBarBackgroundColor";

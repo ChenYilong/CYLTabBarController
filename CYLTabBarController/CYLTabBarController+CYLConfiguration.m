@@ -620,7 +620,7 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
               CYLTabBarControllerThemes, CYLTabBarControllerThemeIdentifier, CYLTabBarControllerDarkThemeIdentifier,
               CYLTabBarControllerThemeManagerName, CYLTabBarControllerPlusButton, CYLTabBarControllerPlusButtonAction,
               CYLTabBarControllerUserInterfaceStyle, CYLTabBarControllerTabButtonTapAnimation, CYLTabBarControllerSwipeToSwitchTab,
-              CYLTabBarControllerLoginRequiredTabBarItemIdentifiers ];
+              CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, CYLTabBarControllerLocalization ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -1525,6 +1525,201 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
 
 @implementation CYLTabBarController (CYLConfiguration)
 
+#pragma mark - Localization (CYLTabBarControllerLocalization)
+
+/// [EN] Private: the folder of the configuration file, set by the file loader. [CN] 私有：配置文件所在目录，由文件加载方法设置。
+static NSString *const CYLConfigurationFileDirectoryKey = @"_CYLTabBarControllerConfigurationFileDirectory";
+
+/// [EN] The text keys whose values are localization keys. [CN] 值为本地化键的文本键。
+static NSArray<NSString *> *CYLLocalizedConfigurationKeys(void) {
+    return @[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemAccessibilityLabel, CYLTabBarItemAccessibilityHint ];
+}
+
+/*!
+ * [EN] A folder in the app's sandbox, for tables downloaded at run time: "sandbox:Documents/…" (Android: `filesDir`),
+ *      "sandbox:Caches/…" (Android: `cacheDir`), "sandbox:tmp/…", or "sandbox:<path>" below the app's home folder.
+ * [CN] App 沙盒中的目录，用于运行时下载的字符串表："sandbox:Documents/…"（Android：`filesDir`）、"sandbox:Caches/…"（Android：`cacheDir`）、
+ *      "sandbox:tmp/…"，或 "sandbox:<路径>"（App 主目录之下）。
+ */
+static NSString *CYLLocalizationSandboxPath(NSString *rest) {
+    while ([rest hasPrefix:@"/"]) {
+        rest = [rest substringFromIndex:1];
+    }
+    NSArray<NSString *> *parts = [rest componentsSeparatedByString:@"/"];
+    NSString *first = parts.firstObject ?: @"";
+    NSString *remainder = parts.count > 1 ? [[parts subarrayWithRange:NSMakeRange(1, parts.count - 1)] componentsJoinedByString:@"/"] : @"";
+    NSString *root = nil;
+    if ([first isEqualToString:@"Documents"]) {
+        root = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
+    } else if ([first isEqualToString:@"Caches"]) {
+        root = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
+    } else if ([first isEqualToString:@"tmp"]) {
+        root = NSTemporaryDirectory();
+    }
+    return root ? [root stringByAppendingPathComponent:remainder] : [NSHomeDirectory() stringByAppendingPathComponent:rest];
+}
+
+/*!
+ * [EN] The location routes of `CYLTabBarLocalizationPath` (docs/Configuration-Localization.md), checked in this order:
+ *      "bundle:<path>" in the app's resources, "sandbox:<Documents|Caches|tmp>/<path>" in the app's sandbox, "file:" URL,
+ *      "/…" absolute, "~/…" the app's home folder, anything else relative to `baseDirectory` (the configuration file's
+ *      folder, else the app's resources).
+ * [CN] `CYLTabBarLocalizationPath` 的位置路由（docs/Configuration-Localization.md），按以下顺序判断："bundle:<路径>" App 资源，
+ *      "sandbox:<Documents|Caches|tmp>/<路径>" App 沙盒，"file:" URL，"/…" 绝对路径，"~/…" App 主目录，其余相对于 `baseDirectory`
+ *      （配置文件所在目录，否则为 App 资源目录）。
+ */
+static NSString *CYLLocalizationResolvedPath(NSString *path, NSString *baseDirectory) {
+    if ([path hasPrefix:@"bundle:"]) {
+        NSString *rest = [path substringFromIndex:@"bundle:".length];
+        while ([rest hasPrefix:@"/"]) {
+            rest = [rest substringFromIndex:1];
+        }
+        return [NSBundle.mainBundle.resourcePath ?: @"" stringByAppendingPathComponent:rest];
+    }
+    if ([path hasPrefix:@"file:"]) {
+        return [NSURL URLWithString:path].path ?: path;
+    }
+    if ([path hasPrefix:@"sandbox:"]) {
+        return CYLLocalizationSandboxPath([path substringFromIndex:@"sandbox:".length]);
+    }
+    path = [path stringByExpandingTildeInPath];
+    if (path.isAbsolutePath) {
+        return path;
+    }
+    return [baseDirectory stringByAppendingPathComponent:path];
+}
+
+/*!
+ * [EN] The folder of the `.lproj` folders, and the table name, for a `CYLTabBarControllerLocalization` value; nil when it is
+ *      off or invalid.
+ * [CN] 根据 `CYLTabBarControllerLocalization` 的值得到 `.lproj` 文件夹所在目录与表名；关闭或无效时为 nil。
+ */
+static NSString *_Nullable CYLLocalizationDirectory(id value, NSString *_Nullable fileDirectory, NSString *_Nonnull *_Nonnull table) {
+    *table = @"Localizable";
+    NSString *resources = NSBundle.mainBundle.resourcePath ?: @"";
+    if ([value isKindOfClass:[NSNumber class]]) {
+        return [value boolValue] ? resources : nil;
+    }
+    if ([value isKindOfClass:[NSString class]]) {
+        NSString *text = [(NSString *)value stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+        if ([text.lowercaseString isEqualToString:@"true"] || [text.lowercaseString isEqualToString:@"yes"]) {
+            return resources;
+        }
+        if (text.length == 0 || [text.lowercaseString isEqualToString:@"false"] || [text.lowercaseString isEqualToString:@"no"]) {
+            return nil;
+        }
+        *table = text;
+        return resources;
+    }
+    if (![value isKindOfClass:[NSDictionary class]]) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerLocalization, value);
+        return nil;
+    }
+    NSDictionary *info = value;
+    NSString *tableName = CYLStringValue(info[CYLTabBarLocalizationTableName]);
+    if (tableName.length > 0) {
+        *table = [tableName hasSuffix:@".strings"] ? [tableName stringByDeletingPathExtension] : tableName;
+    }
+    NSString *path = CYLStringValue(info[CYLTabBarLocalizationPath]);
+    if (path.length > 0) {
+        return CYLLocalizationResolvedPath(path, fileDirectory ?: resources);
+    }
+    NSString *bundleName = CYLStringValue(info[CYLTabBarLocalizationBundleName]);
+    if (bundleName.length > 0 && ![bundleName isEqualToString:@"main"]) {
+        NSString *name = [bundleName hasSuffix:@".bundle"] ? bundleName : [bundleName stringByAppendingPathExtension:@"bundle"];
+        NSString *bundlePath = [NSBundle.mainBundle pathForResource:name ofType:nil];
+        if (!bundlePath) {
+            CYLLogInvalidConfigurationValue(CYLTabBarLocalizationBundleName, bundleName);
+            return nil;
+        }
+        return bundlePath;
+    }
+    return resources;
+}
+
+/*!
+ * [EN] The strings of `<directory>/{language}.lproj/{table}.strings`, trying the language, then its script ("zh-Hans" for
+ *      "zh-Hans-CN"), its language code, "Base" and "en".
+ * [CN] 读取 `<目录>/{语言}.lproj/{表名}.strings`，依次尝试该语言、其文字（"zh-Hans-CN" 的 "zh-Hans"）、语言代码、"Base" 与 "en"。
+ */
+static NSDictionary<NSString *, NSString *> *_Nullable CYLLocalizationStrings(NSString *directory, NSString *table, NSString *language) {
+    NSMutableArray<NSString *> *candidates = [NSMutableArray array];
+    NSArray<NSString *> *parts = [language componentsSeparatedByString:@"-"];
+    [candidates addObject:language];
+    if (parts.count > 2) {
+        [candidates addObject:[NSString stringWithFormat:@"%@-%@", parts[0], parts[1]]];
+    }
+    if (parts.count > 1) {
+        [candidates addObject:parts[0]];
+    }
+    [candidates addObjectsFromArray:@[ @"Base", @"en" ]];
+    for (NSString *candidate in candidates) {
+        NSString *file = [[directory stringByAppendingPathComponent:[candidate stringByAppendingPathExtension:@"lproj"]]
+                          stringByAppendingPathComponent:[table stringByAppendingPathExtension:@"strings"]];
+        NSDictionary *strings = [NSDictionary dictionaryWithContentsOfFile:file];
+        if ([strings isKindOfClass:[NSDictionary class]]) {
+            return strings;
+        }
+    }
+    return nil;
+}
+
+/// [EN] `object` with every text value translated, at any depth. [CN] 翻译 `object` 中任意层级的所有文本值。
+static id CYLLocalizedConfigurationObject(id object, NSDictionary<NSString *, NSString *> *strings) {
+    if ([object isKindOfClass:[NSArray class]]) {
+        NSMutableArray *array = [NSMutableArray arrayWithCapacity:[object count]];
+        for (id element in object) {
+            [array addObject:CYLLocalizedConfigurationObject(element, strings)];
+        }
+        return array;
+    }
+    if (![object isKindOfClass:[NSDictionary class]]) {
+        return object;
+    }
+    NSMutableDictionary *dictionary = [object mutableCopy];
+    NSArray<NSString *> *textKeys = CYLLocalizedConfigurationKeys();
+    for (id key in object) {
+        id value = object[key];
+        if ([textKeys containsObject:key] && [value isKindOfClass:[NSString class]]) {
+            NSString *translation = strings[value];
+            if ([translation isKindOfClass:[NSString class]]) {
+                dictionary[key] = translation;
+            }
+        } else if ([value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSDictionary class]]) {
+            dictionary[key] = CYLLocalizedConfigurationObject(value, strings);
+        }
+    }
+    return dictionary;
+}
+
+/*!
+ * [EN] Translates the texts of `configuration` when it has `CYLTabBarControllerLocalization`; removes the private file folder.
+ * [CN] 配置包含 `CYLTabBarControllerLocalization` 时翻译其中的文本；并移除私有的文件目录键。
+ */
+static void CYLApplyConfigurationLocalization(NSMutableDictionary<NSString *, id> *configuration) {
+    NSString *fileDirectory = CYLStringValue(configuration[CYLConfigurationFileDirectoryKey]);
+    [configuration removeObjectForKey:CYLConfigurationFileDirectoryKey];
+    id value = configuration[CYLTabBarControllerLocalization];
+    if (!value) {
+        return;
+    }
+    NSString *table = nil;
+    NSString *directory = CYLLocalizationDirectory(value, fileDirectory, &table);
+    if (!directory) {
+        return;
+    }
+    NSString *language = CYLLocalizationLanguage();
+    NSDictionary<NSString *, NSString *> *strings = CYLLocalizationStrings(directory, table, language);
+    if (!strings) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🟡 CYLTabBarController configuration: no %@.strings for %@ in %@; the texts stay as they are.", table, language, directory);
+#endif
+        return;
+    }
+    NSDictionary *localized = CYLLocalizedConfigurationObject(configuration, strings);
+    [configuration setDictionary:localized];
+}
+
 + (NSDictionary<NSString *, id> *)cyl_normalizedConfiguration:(NSDictionary<NSString *, id> *)configuration {
     if (![configuration isKindOfClass:[NSDictionary class]]) {
         // E.g. an untyped JSON result that is a list (B18). 例如类型不明、实际为数组的 JSON 结果（B18）。
@@ -1537,6 +1732,8 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
             [normalized removeObjectForKey:key];
         }
     }
+    // [EN] Localized texts first, so every later step sees the translated values. [CN] 先本地化文本，后续步骤看到的都是翻译后的值。
+    CYLApplyConfigurationLocalization(normalized);
     if (normalized[CYLTabBarControllerViewControllers]) {
         normalized[CYLTabBarControllerViewControllers] = CYLValidViewControllers(normalized[CYLTabBarControllerViewControllers]);
     }
@@ -1721,6 +1918,12 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
             *error = tabsError;
         }
         return nil;
+    }
+    if (configuration[CYLTabBarControllerLocalization]) {
+        // [EN] A relative `CYLTabBarLocalizationPath` is resolved against this file's folder. [CN] 相对的 `CYLTabBarLocalizationPath` 相对于本文件所在目录。
+        NSMutableDictionary<NSString *, id> *withDirectory = [configuration mutableCopy];
+        withDirectory[CYLConfigurationFileDirectoryKey] = [path stringByDeletingLastPathComponent];
+        configuration = withDirectory;
     }
     return configuration;
 }
