@@ -80,6 +80,12 @@ export type CYLTabBarProps = ViewProps & {
   /** The playback speed of the animated tab icons (1: the file's own). */
   animationSpeed?: number;
   plusButton?: CYLTabBarPlusButton;
+  /**
+   * A resource route to a configuration file built into the app or in its sandbox (docs/Resource-Routes.md), e.g.
+   * "bundle:Configurations?name=tabbar" or "sandbox:Caches/tabbar?name=tabbar&theme=dark". The file is read first;
+   * the other props and `configuration` win over its keys.
+   */
+  configurationRoute?: string;
   /** Any other key of the configuration file (docs/Configuration-File.md); it wins over the props above. */
   configuration?: Record<string, unknown>;
   selectedIndex?: number;
@@ -224,6 +230,9 @@ function plusButtonAttributes(plusButton: CYLTabBarPlusButton): Record<string, u
 
 export function buildConfiguration(props: CYLTabBarProps): Record<string, unknown> {
   const configuration: Record<string, unknown> = {};
+  if (props.configurationRoute) {
+    configuration.CYLTabBarControllerConfigurationRoute = props.configurationRoute;
+  }
   copyKeys(configuration, props, CONTROLLER_KEYS);
   if (props.items) {
     configuration.CYLTabBarControllerTabBarItemsAttributes = props.items.map(itemAttributes);
@@ -281,7 +290,7 @@ export function CYLTabBar(props: CYLTabBarProps) {
   const configuration = useMemo(
     () => JSON.stringify(buildConfiguration(props)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.items, props.styleType, props.plusButton, props.configuration, props.userInterfaceStyle, props.tapAnimation,
+    [props.items, props.styleType, props.plusButton, props.configuration, props.configurationRoute, props.userInterfaceStyle, props.tapAnimation,
       props.swipeToSwitchTab, props.animationSpeed]
   );
   return (

@@ -22,7 +22,7 @@ import java.io.File
  *      用例与编号与 iOS 的 `UIViewController+CYLConfigurationDemo` 相同（A2 到 E1）。每行显示结果：创建的 Tab、跳过的 Tab 及原因，或错误及其代码。
  */
 object DemoConfiguration {
-    const val SAMPLE_URL = "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations/cyl_tabbar_configuration.yaml"
+    const val SAMPLE_URL = "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/Example-Shared/Configurations/cyl_tabbar_configuration.yaml"
     private const val TABS = """[{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home"}, {"CYLTabBarItemTitle": "Me", "CYLTabBarItemImage": "system:person", "CYLTabBarItemIdentifier": "me"}]"""
     private const val JSON = """{"CYLTabBarControllerTabBarItemsAttributes": $TABS}"""
 
@@ -112,32 +112,26 @@ object DemoConfiguration {
         mapOf(CYLConstants.CYLTabBarItemTitle to identifier.replaceFirstChar { it.uppercase() }, CYLConstants.CYLTabBarItemImage to "system:house", CYLConstants.CYLTabBarItemIdentifier to identifier)
     }
 
+    /** [EN] A case that reads one text file. [CN] 读取一个文本文件的情况。 */
+    private fun fileCase(id: String, title: String, fileName: String, content: String) =
+        EdgeCase(id, title) { finish -> fromFile(fileName, text(content), finish) }
+
     private val edgeCases: List<EdgeCase> = listOf(
         EdgeCase("A3", "Empty file") { finish -> fromFile("empty.json", ByteArray(0), finish) },
-        EdgeCase("A4", "Comments only") { finish -> fromFile("comments.yaml", text("# nothing but comments\n"), finish) },
-        EdgeCase("A13", "Malformed JSON") { finish -> fromFile("malformed.json", text("""{"CYLTabBarControllerTabBarItemsAttributes": [ {"CYLTabBarItemTitle": "Home" """), finish) },
+        fileCase("A4", "Comments only", "comments.yaml", "# nothing but comments\n"),
+        fileCase("A13", "Malformed JSON", "malformed.json", """{"CYLTabBarControllerTabBarItemsAttributes": [ {"CYLTabBarItemTitle": "Home" """),
         EdgeCase("A11", "Top level is a list") { finish -> fromFile("list.json", text(TABS), finish) },
-        EdgeCase("A7", "YAML in a .json file") { finish ->
-            fromFile("yaml.json", text("CYLTabBarControllerTabBarItemsAttributes:\n  - CYLTabBarItemTitle: Home\n    CYLTabBarItemImage: system:house\n    CYLTabBarItemIdentifier: home\n  - CYLTabBarItemTitle: Me\n    CYLTabBarItemImage: system:person\n    CYLTabBarItemIdentifier: me\n"), finish)
-        },
+        fileCase("A7", "YAML in a .json file", "yaml.json", "CYLTabBarControllerTabBarItemsAttributes:\n  - CYLTabBarItemTitle: Home\n    CYLTabBarItemImage: system:house\n    CYLTabBarItemIdentifier: home\n  - CYLTabBarItemTitle: Me\n    CYLTabBarItemImage: system:person\n    CYLTabBarItemIdentifier: me\n"),
         EdgeCase("A5", "Not UTF-8") { finish -> fromFile("latin.json", byteArrayOf('{'.code.toByte(), '"'.code.toByte(), 0xC3.toByte(), 0x28, '"'.code.toByte(), ':'.code.toByte(), '1'.code.toByte(), '}'.code.toByte()), finish) },
         EdgeCase("A16", "UTF-16 encoded") { finish -> fromFile("utf16.json", byteArrayOf(0xFF.toByte(), 0xFE.toByte()) + JSON.toByteArray(Charsets.UTF_16LE), finish) },
-        EdgeCase("A10", "Nested 10,000 levels") { finish -> fromFile("deep.json", text("""{"CYLTabBarControllerTabBarItemsAttributes": ${"[".repeat(10000)}${"]".repeat(10000)}}"""), finish) },
+        fileCase("A10", "Nested 10,000 levels", "deep.json", """{"CYLTabBarControllerTabBarItemsAttributes": ${"[".repeat(10000)}${"]".repeat(10000)}}"""),
         EdgeCase("A9", "A 6 MB file") { finish -> fromFile("huge.json", ByteArray(6 * 1024 * 1024) { ' '.code.toByte() }, finish) },
-        EdgeCase("B1", "No tabs") { finish -> fromFile("no_tabs.json", text("""{"CYLTabBarControllerContext": "NoTabs"}"""), finish) },
-        EdgeCase("D7", "An HTML page (file)") { finish -> fromFile("portal.xml", text("<html><head><title>Wi-Fi</title></head><body><form>Accept</form></body></html>"), finish) },
-        EdgeCase("B5", "Wrong types and null") { finish ->
-            fromFile("types.json", text("""{"CYLTabBarControllerContext": [1, 2], "CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": ["a", "list"], "CYLTabBarItemImage": null, "CYLTabBarItemIdentifier": 7, "CYLTabBarItemPageIdentifier": "home"}, "not a tab", {"CYLTabBarItemTitle": 42, "CYLTabBarItemImage": {"a": 1}, "CYLTabBarItemIdentifier": "me"}]}"""), finish)
-        },
-        EdgeCase("B7", "NaN and Infinity insets") { finish ->
-            fromFile("nan.yaml", text("CYLTabBarControllerImageInsets: \"{nan, 0, 0, 0}\"\nCYLTabBarControllerTitlePositionAdjustment: [1e999, -3]\nCYLTabBarControllerTabBarItemsAttributes:\n  - CYLTabBarItemTitle: Home\n    CYLTabBarItemIdentifier: home\n    CYLTabBarItemImage: system:house\n    CYLTabBarItemImageInsets: \"{inf, 0, -inf, 0}\"\n    CYLTabBarLottieSize: \"{-24, 0}\"\n"), finish)
-        },
-        EdgeCase("B9", "Unknown style") { finish ->
-            fromFile("style.toml", text("CYLTabBarControllerStyleType = 99\n[[CYLTabBarControllerTabBarItemsAttributes]]\nCYLTabBarItemTitle = \"Home\"\nCYLTabBarItemIdentifier = \"home\"\nCYLTabBarItemImage = \"system:house\"\n"), finish)
-        },
-        EdgeCase("C11", "Unregistered page IDs") { finish ->
-            fromFile("unregistered.json", text("""{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home"}, {"CYLTabBarItemTitle": "Unknown", "CYLTabBarItemPageIdentifier": "no_such_page"}, {"CYLTabBarItemTitle": "No ID"}]}"""), finish)
-        },
+        fileCase("B1", "No tabs", "no_tabs.json", """{"CYLTabBarControllerContext": "NoTabs"}"""),
+        fileCase("D7", "An HTML page (file)", "portal.xml", "<html><head><title>Wi-Fi</title></head><body><form>Accept</form></body></html>"),
+        fileCase("B5", "Wrong types and null", "types.json", """{"CYLTabBarControllerContext": [1, 2], "CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": ["a", "list"], "CYLTabBarItemImage": null, "CYLTabBarItemIdentifier": 7, "CYLTabBarItemPageIdentifier": "home"}, "not a tab", {"CYLTabBarItemTitle": 42, "CYLTabBarItemImage": {"a": 1}, "CYLTabBarItemIdentifier": "me"}]}"""),
+        fileCase("B7", "NaN and Infinity insets", "nan.yaml", "CYLTabBarControllerImageInsets: \"{nan, 0, 0, 0}\"\nCYLTabBarControllerTitlePositionAdjustment: [1e999, -3]\nCYLTabBarControllerTabBarItemsAttributes:\n  - CYLTabBarItemTitle: Home\n    CYLTabBarItemIdentifier: home\n    CYLTabBarItemImage: system:house\n    CYLTabBarItemImageInsets: \"{inf, 0, -inf, 0}\"\n    CYLTabBarLottieSize: \"{-24, 0}\"\n"),
+        fileCase("B9", "Unknown style", "style.toml", "CYLTabBarControllerStyleType = 99\n[[CYLTabBarControllerTabBarItemsAttributes]]\nCYLTabBarItemTitle = \"Home\"\nCYLTabBarItemIdentifier = \"home\"\nCYLTabBarItemImage = \"system:house\"\n"),
+        fileCase("C11", "Unregistered page IDs", "unregistered.json", """{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home"}, {"CYLTabBarItemTitle": "Unknown", "CYLTabBarItemPageIdentifier": "no_such_page"}, {"CYLTabBarItemTitle": "No ID"}]}"""),
         EdgeCase("C12", "A page provider raises (code)") { finish ->
             val registry = CYLTabBarPageRegistry().apply { registerPageProvider({ _, _ -> throw IllegalStateException("a provider that raises") }, "raises") }
             fromCode(mapOf(CYLConstants.CYLTabBarControllerPageRegistry to registry,
@@ -150,26 +144,16 @@ object DemoConfiguration {
             fromCode(mapOf(CYLConstants.CYLTabBarControllerPageResolver to resolver,
                 CYLConstants.CYLTabBarControllerTabBarItemsAttributes to listOf("nil", "sharedA", "sharedB", "home").map { mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemPageIdentifier to it) }), finish)
         },
-        EdgeCase("C14", "Automatic registration (TabPageFactory)") { finish ->
-            fromFile("automatic.json", text("""{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Auto", "CYLTabBarItemImage": "system:star", "CYLTabBarItemPageIdentifier": "auto"}, {"CYLTabBarItemTitle": "Conflict", "CYLTabBarItemPageIdentifier": "conflict"}]}"""), finish)
-        },
-        EdgeCase("C15", "Registry and resolver of wrong types") { finish ->
-            fromFile("wrong_registry.json", text("""{"CYLTabBarControllerPageRegistry": "MyRegistry", "CYLTabBarControllerPageResolver": "resolve:", "CYLTabBarControllerTabBarItemsAttributes": $TABS}"""), finish)
-        },
+        fileCase("C14", "Automatic registration (TabPageFactory)", "automatic.json", """{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Auto", "CYLTabBarItemImage": "system:star", "CYLTabBarItemPageIdentifier": "auto"}, {"CYLTabBarItemTitle": "Conflict", "CYLTabBarItemPageIdentifier": "conflict"}]}"""),
+        fileCase("C15", "Registry and resolver of wrong types", "wrong_registry.json", """{"CYLTabBarControllerPageRegistry": "MyRegistry", "CYLTabBarControllerPageResolver": "resolve:", "CYLTabBarControllerTabBarItemsAttributes": $TABS}"""),
         EdgeCase("C16", "Two tab bars, one page ID") { finish ->
             startActivity(android.content.Intent(requireContext(), TwoTabBarsActivity::class.java))
             finish(null, null)
             results["C16Two tab bars, one page ID"] = "Two tab bars use one configuration; their own registries map the same page IDs to different pages."
         },
-        EdgeCase("C18", "Lookup order and automatic registration") { finish ->
-            fromFile("lookup_order.json", text("""{"CYLTabBarControllerPageLookupOrder": "shared, bogus", "CYLTabBarControllerAutomaticPageRegistration": "no", "CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home"}, {"CYLTabBarItemTitle": "Auto", "CYLTabBarItemPageIdentifier": "auto"}, {"CYLTabBarItemTitle": "Maybe", "CYLTabBarItemPageIdentifier": "maybe"}]}"""), finish)
-        },
-        EdgeCase("B22", "Other platforms and newer versions") { finish ->
-            fromFile("platforms.json", text("""{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemPlatforms": ["ios", "android"]}, {"CYLTabBarItemTitle": "iOS only", "CYLTabBarItemIdentifier": "message", "CYLTabBarItemPlatforms": "ios"}, {"CYLTabBarItemTitle": "Version 999", "CYLTabBarItemIdentifier": "discover", "CYLTabBarItemMinimumAppVersion": "999.0"}, {"CYLTabBarItemTitle": "Me", "CYLTabBarItemImage": "system:person", "CYLTabBarItemIdentifier": "me", "CYLTabBarItemMinimumAppVersion": "0.1"}]}"""), finish)
-        },
-        EdgeCase("B23", "Invalid platforms, versions and parameters") { finish ->
-            fromFile("invalid_remote.json", text("""{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemPlatforms": 42, "CYLTabBarItemMinimumAppVersion": "abc"}, {"CYLTabBarItemTitle": "Web", "CYLTabBarItemImage": "system:globe", "CYLTabBarItemPageIdentifier": "web", "CYLTabBarItemPageParameters": ["not", "a", "dictionary"], "CYLTabBarItemMinimumAppVersion": "2.x"}]}"""), finish)
-        },
+        fileCase("C18", "Lookup order and automatic registration", "lookup_order.json", """{"CYLTabBarControllerPageLookupOrder": "shared, bogus", "CYLTabBarControllerAutomaticPageRegistration": "no", "CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home"}, {"CYLTabBarItemTitle": "Auto", "CYLTabBarItemPageIdentifier": "auto"}, {"CYLTabBarItemTitle": "Maybe", "CYLTabBarItemPageIdentifier": "maybe"}]}"""),
+        fileCase("B22", "Other platforms and newer versions", "platforms.json", """{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemPlatforms": ["ios", "android"]}, {"CYLTabBarItemTitle": "iOS only", "CYLTabBarItemIdentifier": "message", "CYLTabBarItemPlatforms": "ios"}, {"CYLTabBarItemTitle": "Version 999", "CYLTabBarItemIdentifier": "discover", "CYLTabBarItemMinimumAppVersion": "999.0"}, {"CYLTabBarItemTitle": "Me", "CYLTabBarItemImage": "system:person", "CYLTabBarItemIdentifier": "me", "CYLTabBarItemMinimumAppVersion": "0.1"}]}"""),
+        fileCase("B23", "Invalid platforms, versions and parameters", "invalid_remote.json", """{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemPlatforms": 42, "CYLTabBarItemMinimumAppVersion": "abc"}, {"CYLTabBarItemTitle": "Web", "CYLTabBarItemImage": "system:globe", "CYLTabBarItemPageIdentifier": "web", "CYLTabBarItemPageParameters": ["not", "a", "dictionary"], "CYLTabBarItemMinimumAppVersion": "2.x"}]}"""),
         EdgeCase("B27", "Reload with new tabs (code)") { finish ->
             val controller = CYLTabBarController(requireActivity(), mapOf(CYLConstants.CYLTabBarControllerTabBarItemsAttributes to tabs("home", "me")))
             val home = controller.viewControllers.firstOrNull()
@@ -195,28 +179,16 @@ object DemoConfiguration {
                     mapOf(CYLConstants.CYLTabBarItemTitle to "Home", CYLConstants.CYLTabBarItemImage to "system:house", CYLConstants.CYLTabBarItemIdentifier to "home"),
                     mapOf(CYLConstants.CYLTabBarItemTitle to "Never", CYLConstants.CYLTabBarItemImage to "system:star", CYLConstants.CYLTabBarItemPageIdentifier to "never"))), finish)
         },
-        EdgeCase("B28", "Animation keys, options and speed") { finish ->
-            fromFile("animation.json", text("""{"CYLTabBarControllerTabBarItemAnimationSpeed": "fast", "CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home", "CYLTabBarRiveURL": "https://example.com/icons.riv", "CYLTabBarAnimationOptions": {"artboard": "HOME", "input": "active", "duration": 2, "bad": [1, 2]}}, {"CYLTabBarItemTitle": "Me", "CYLTabBarItemImage": "system:person", "CYLTabBarItemIdentifier": "me", "CYLTabBarAnimationFilePath": "no_such_animation.pag", "CYLTabBarAnimationOptions": "not a dictionary", "CYLTabBarLottieLoopsWhenUnselected": "maybe"}]}"""), finish)
-        },
+        fileCase("B28", "Animation keys, options and speed", "animation.json", """{"CYLTabBarControllerTabBarItemAnimationSpeed": "fast", "CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home", "CYLTabBarRiveURL": "https://example.com/icons.riv", "CYLTabBarAnimationOptions": {"artboard": "HOME", "input": "active", "duration": 2, "bad": [1, 2]}}, {"CYLTabBarItemTitle": "Me", "CYLTabBarItemImage": "system:person", "CYLTabBarItemIdentifier": "me", "CYLTabBarAnimationFilePath": "no_such_animation.pag", "CYLTabBarAnimationOptions": "not a dictionary", "CYLTabBarLottieLoopsWhenUnselected": "maybe"}]}"""),
         EdgeCase("B30", "GIF keys and a file that is not a GIF") { finish ->
             val fake = File(requireContext().cacheDir, "not_a_gif.gif").apply { writeText("this is not a GIF") }
             fromFile("gif.json", text("""{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home", "CYLTabBarGIFFilePath": "${fake.absolutePath}"}, {"CYLTabBarItemTitle": "Me", "CYLTabBarItemImage": "system:person", "CYLTabBarItemIdentifier": "me", "CYLTabBarGIFURL": "https://example.com/tab_me.gif", "CYLTabBarGIFSize": "{30, 30}"}]}"""), finish)
         },
-        EdgeCase("B13", "Invalid URLs and Lottie files") { finish ->
-            fromFile("urls.json", text("""{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemImageURL": "javascript:alert(1)", "CYLTabBarLottieURL": "ftp://example.com/a.json", "CYLTabBarLottieFilePath": "/no/such/animation.json", "CYLTabBarLottieDarkURL": "no_such_animation.json"}]}"""), finish)
-        },
-        EdgeCase("B12", "Duplicate identifiers") { finish ->
-            fromFile("ids.json", text("""{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "A", "CYLTabBarItemIdentifier": "tab"}, {"CYLTabBarItemTitle": "B", "CYLTabBarItemIdentifier": "tab"}, {"CYLTabBarItemTitle": "C", "CYLTabBarItemIdentifier": "tab"}]}"""), finish)
-        },
-        EdgeCase("B11", "Misspelled keys") { finish ->
-            fromFile("typos.json", text("""{"CYLTabBarControllerContxt": "typo", "CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitel": "Typo", "CYLTabBarItemTitle": "Home", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemImage": "system:house"}]}"""), finish)
-        },
-        EdgeCase("B19", "Invalid colors and fonts") { finish ->
-            fromFile("colors.json", text("""{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemTitleColor": "not a color", "CYLTabBarItemIconColor": "#12345", "CYLTabBarItemSelectedTitleColor": "#FF3B30", "CYLTabBarItemBackgroundColor": 123, "CYLTabBarItemTitleFont": 0, "CYLTabBarItemSelectedTitleFont": "NoSuchFont:12", "CYLTabBarItemAccessibilityLabel": [1, 2]}, {"CYLTabBarItemTitle": "Me", "CYLTabBarItemIdentifier": "me", "CYLTabBarItemImage": "system:person", "CYLTabBarItemTitleFont": "bold:12", "CYLTabBarItemSelectedIconColor": "#34C759"}]}"""), finish)
-        },
-        EdgeCase("B21", "Empty strings") { finish ->
-            fromFile("empty_strings.json", text("""{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarLottieURL": "", "CYLTabBarLottieFilePath": "", "CYLTabBarItemImageURL": "", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemPageIdentifier": "", "CYLTabBarItemTitleColor": "", "CYLTabBarItemTitleFont": ""}, {"CYLTabBarItemTitle": "Me", "CYLTabBarItemImage": "system:", "CYLTabBarItemIdentifier": "me", "CYLTabBarItemPlatforms": ""}]}"""), finish)
-        },
+        fileCase("B13", "Invalid URLs and Lottie files", "urls.json", """{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemImageURL": "javascript:alert(1)", "CYLTabBarLottieURL": "ftp://example.com/a.json", "CYLTabBarLottieFilePath": "/no/such/animation.json", "CYLTabBarLottieDarkURL": "no_such_animation.json"}]}"""),
+        fileCase("B12", "Duplicate identifiers", "ids.json", """{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "A", "CYLTabBarItemIdentifier": "tab"}, {"CYLTabBarItemTitle": "B", "CYLTabBarItemIdentifier": "tab"}, {"CYLTabBarItemTitle": "C", "CYLTabBarItemIdentifier": "tab"}]}"""),
+        fileCase("B11", "Misspelled keys", "typos.json", """{"CYLTabBarControllerContxt": "typo", "CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitel": "Typo", "CYLTabBarItemTitle": "Home", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemImage": "system:house"}]}"""),
+        fileCase("B19", "Invalid colors and fonts", "colors.json", """{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemTitleColor": "not a color", "CYLTabBarItemIconColor": "#12345", "CYLTabBarItemSelectedTitleColor": "#FF3B30", "CYLTabBarItemBackgroundColor": 123, "CYLTabBarItemTitleFont": 0, "CYLTabBarItemSelectedTitleFont": "NoSuchFont:12", "CYLTabBarItemAccessibilityLabel": [1, 2]}, {"CYLTabBarItemTitle": "Me", "CYLTabBarItemIdentifier": "me", "CYLTabBarItemImage": "system:person", "CYLTabBarItemTitleFont": "bold:12", "CYLTabBarItemSelectedIconColor": "#34C759"}]}"""),
+        fileCase("B21", "Empty strings", "empty_strings.json", """{"CYLTabBarControllerTabBarItemsAttributes": [{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarLottieURL": "", "CYLTabBarLottieFilePath": "", "CYLTabBarItemImageURL": "", "CYLTabBarItemIdentifier": "home", "CYLTabBarItemPageIdentifier": "", "CYLTabBarItemTitleColor": "", "CYLTabBarItemTitleFont": ""}, {"CYLTabBarItemTitle": "Me", "CYLTabBarItemImage": "system:", "CYLTabBarItemIdentifier": "me", "CYLTabBarItemPlatforms": ""}]}"""),
         EdgeCase("A12", "Truncated protobuf") { finish -> fromFile("truncated.binpb", byteArrayOf(0x0A, 0x40, 0x0A, 0x04, 'H'.code.toByte(), 'o'.code.toByte(), 'm'.code.toByte(), 'e'.code.toByte()), finish) },
         EdgeCase("A12", "Corrupted binary plist") { finish ->
             // [EN] "bplist00", a one-entry dictionary, and an offset table that points past the end. [CN] "bplist00"、一个条目的字典，以及越界的偏移表。
@@ -224,9 +196,7 @@ object DemoConfiguration {
                 ByteArray(6) + byteArrayOf(0x01, 0x01) + ByteArray(7) + byteArrayOf(0x04) + ByteArray(7) + ByteArray(1) + ByteArray(7) + byteArrayOf(0x11)
             fromFile("corrupted.plist", data, finish)
         },
-        EdgeCase("A14", "XML external entity") { finish ->
-            fromFile("xxe.xml", text("<?xml version=\"1.0\"?>\n<!DOCTYPE r [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>\n<r><CYLTabBarControllerContext>&xxe;</CYLTabBarControllerContext><CYLTabBarControllerTabBarItemsAttributes><item CYLTabBarItemTitle=\"Home\" CYLTabBarItemIdentifier=\"home\" CYLTabBarItemImage=\"system:house\"/></CYLTabBarControllerTabBarItemsAttributes></r>"), finish)
-        },
+        fileCase("A14", "XML external entity", "xxe.xml", "<?xml version=\"1.0\"?>\n<!DOCTYPE r [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>\n<r><CYLTabBarControllerContext>&xxe;</CYLTabBarControllerContext><CYLTabBarControllerTabBarItemsAttributes><item CYLTabBarItemTitle=\"Home\" CYLTabBarItemIdentifier=\"home\" CYLTabBarItemImage=\"system:house\"/></CYLTabBarControllerTabBarItemsAttributes></r>"),
         EdgeCase("A2", "Missing file") { finish ->
             try { finish(CYLTabBarController.tabBarControllerWithConfigurationFile(requireActivity(), "no_such_configuration.yaml"), null) } catch (error: Exception) { finish(null, error) }
         },

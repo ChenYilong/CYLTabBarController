@@ -10,7 +10,7 @@
 #import "CYLLocalization.h"
 #import <objc/runtime.h>
 
-NSString *const CYLSampleConfigurationURLString = @"https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations/cyl_tabbar_configuration.yaml";
+NSString *const CYLSampleConfigurationURLString = @"https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/Example-Shared/Configurations/cyl_tabbar_configuration.yaml";
 
 static NSString *const CYLConfigurationDemoCellIdentifier = @"CYLConfigurationDemoCell";
 
@@ -97,10 +97,36 @@ static void CYLRegisterConfigurationDemoPages(void) {
     });
 }
 
+/*!
+ * [EN] Stands in for a download: copies the bundled samples into Caches/CYLConfigurationDemo with the names of
+ *      docs/Resource-Routes.md (tabbar@1.0.json, tabbar@2.0.json, tabbar-dark@1.0.json, tabbar-dark@2.0.yaml) and the
+ *      string tables in Localization/.
+ * [CN] 代替下载：把内置示例复制到 Caches/CYLConfigurationDemo，文件名遵循 docs/Resource-Routes.md（tabbar@1.0.json、tabbar@2.0.json、
+ *      tabbar-dark@1.0.json、tabbar-dark@2.0.yaml），字符串表放在 Localization/ 中。
+ */
+static void CYLCopySamplesIntoSandbox(NSString *samples) {
+    NSFileManager *manager = NSFileManager.defaultManager;
+    NSString *folder = [CYLResourceRoute pathForRoute:@"sandbox:Caches/CYLConfigurationDemo" baseDirectory:nil];
+    [manager removeItemAtPath:folder error:NULL];
+    [manager createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:NULL];
+    NSDictionary<NSString *, NSString *> *copies = @{
+        @"tabbar@1.0.json" : @"cyl_tabbar_configuration.json",
+        @"tabbar@2.0.json" : @"cyl_tabbar_configuration.json",
+        @"tabbar-dark@1.0.json" : @"cyl_tabbar_configuration.json",
+        @"tabbar-dark@2.0.yaml" : @"cyl_tabbar_configuration.yaml",
+    };
+    [copies enumerateKeysAndObjectsUsingBlock:^(NSString *name, NSString *source, BOOL *stop) {
+        [manager copyItemAtPath:[samples stringByAppendingPathComponent:source] toPath:[folder stringByAppendingPathComponent:name] error:NULL];
+    }];
+    [manager copyItemAtPath:[samples stringByAppendingPathComponent:@"Localization"] toPath:[folder stringByAppendingPathComponent:@"Localization"] error:NULL];
+}
+
 @implementation UIViewController (CYLConfigurationDemo)
 
 + (NSArray<NSString *> *)cyl_sampleConfigurationFilePaths {
-    NSString *directory = [CYLResourceBundle().resourcePath stringByAppendingPathComponent:@"Configurations"];
+    // [EN] The samples belong to the app (Example-Shared/Configurations, bundled as "Configurations"), not to the library.
+    // [CN] 示例文件属于 App（Example-Shared/Configurations，以 "Configurations" 文件夹打包），不属于本库。
+    NSString *directory = [CYLResourceRoute pathForRoute:@"bundle:Configurations" baseDirectory:nil];
     NSArray<NSString *> *names = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:NULL]
                                   sortedArrayUsingSelector:@selector(compare:)];
     NSMutableArray<NSString *> *paths = [NSMutableArray array];
@@ -144,6 +170,38 @@ static void CYLRegisterConfigurationDemoPages(void) {
             NSDictionary *configuration = [CYLTabBarController configurationWithContentsOfFile:path error:NULL];
             [weakSelf cyl_presentConfigurationDemoTabBarController:tabBarController
                                                             source:path.lastPathComponent
+                                                        sourceText:CYLConfigurationSourceText(path, configuration)
+                                                             error:error];
+        }]];
+    }
+    // [EN] A resource route instead of a path (docs/Resource-Routes.md): the folder, then the file by name, theme, version, format.
+    // [CN] 用资源路由代替路径（docs/Resource-Routes.md）：先找目录，再按名称、主题、版本、格式选出文件。
+    NSString *route = @"bundle:Configurations?name=cyl_tabbar_configuration";
+    NSString *routedPath = [CYLResourceRoute pathForRoute:route baseDirectory:nil];
+    if (routedPath) {
+        [sheet addAction:[UIAlertAction actionWithTitle:route style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            NSError *error = nil;
+            CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfigurationRoute:route error:&error];
+            NSDictionary *configuration = [CYLTabBarController configurationWithRoute:route error:NULL];
+            [weakSelf cyl_presentConfigurationDemoTabBarController:tabBarController
+                                                            source:[NSString stringWithFormat:@"%@\n→ %@", route, routedPath.lastPathComponent]
+                                                        sourceText:CYLConfigurationSourceText(routedPath, configuration)
+                                                             error:error];
+        }]];
+    }
+    // [EN] Resources downloaded into the sandbox: the samples are copied into Caches as a download would save them (several
+    //      versions and themes, and the string tables next to them), then the route picks one file.
+    // [CN] 下载到沙盒的资源：把示例文件按下载后的方式复制到 Caches（多个版本与主题，字符串表放在旁边），再由路由选出一个文件。
+    NSString *sandboxRoute = @"sandbox:Caches/CYLConfigurationDemo?name=tabbar&theme=dark";
+    if (routedPath) {
+        [sheet addAction:[UIAlertAction actionWithTitle:sandboxRoute style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            CYLCopySamplesIntoSandbox(routedPath.stringByDeletingLastPathComponent);
+            NSError *error = nil;
+            CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfigurationRoute:sandboxRoute error:&error];
+            NSString *path = [CYLResourceRoute pathForRoute:sandboxRoute baseDirectory:nil];
+            NSDictionary *configuration = path ? [CYLTabBarController configurationWithContentsOfFile:path error:NULL] : nil;
+            [weakSelf cyl_presentConfigurationDemoTabBarController:tabBarController
+                                                            source:[NSString stringWithFormat:@"%@\n→ %@", sandboxRoute, path.lastPathComponent ?: @"-"]
                                                         sourceText:CYLConfigurationSourceText(path, configuration)
                                                              error:error];
         }]];

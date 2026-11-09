@@ -193,6 +193,20 @@ Whenever you work on a project that runs in Xcode (a demo, an example, any app w
 
 The root `Podfile` is the reference: it already has the top lines and the hook.
 
+4. **No copied sources.** SonarCloud counts every copied file as duplicated code. Before copying a file from another
+   demo, reference it instead:
+   - The HealthyHome demos (`Example-SwiftUI`, `Example-Swift-Carthage`, `Example-PAG`, `Example-Swift-SwiftManager`)
+     compile the sources of `Example-Swift-03/HealthyHome` (file references with `sourceTree = SOURCE_ROOT` and a
+     `../Example-Swift-03/HealthyHome/…` path). A demo-specific difference goes into that file behind a Swift compile
+     condition set only in that demo's app target (`SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) …"`):
+     `CYL_DEMO_PAG`, `CYL_DEMO_SWIFTUI`, `CYL_DEMO_FLATDESIGN_DELEGATE` (the FlatDesign delegate of Carthage and PAG).
+   - Sources shared by unrelated demos go into `Example-Shared/` (e.g. `CYLPlusButtonSubclass+Layout.swift`, used by
+     Example-Swift and Example-Swift-02; each keeps its own `plusButton()`). React Native examples reference
+     `example/ios/…` (e.g. `SceneDelegate.swift`).
+   - The sample configuration files are in `Example-Shared/Configurations/`, bundled as a folder reference.
+   - Test helpers shared by several test files go into one file (Android: `CYLTestSupport.kt`; scripts:
+     `scripts/configuration-tests/confined_paths.py`).
+
 ## Git and pull requests
 
 - **Before every Commitizen-style (`git cz`) commit**, run this first in the repository root, so the vault's auto sync does not commit or push in the middle of it:

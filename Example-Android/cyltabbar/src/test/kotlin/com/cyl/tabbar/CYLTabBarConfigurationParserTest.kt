@@ -20,7 +20,7 @@ import org.junit.Test
 class CYLTabBarConfigurationParserTest {
 
     private val root: File = generateSequence(File(".").absoluteFile) { it.parentFile }.first { File(it, "CYLTabBarController.podspec").exists() }
-    private val samples = File(root, "CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations")
+    private val samples = File(root, "Example-Shared/Configurations")
 
     private fun parse(file: File, sniff: Boolean): Map<String, Any?> =
         if (sniff) CYLTabBarConfigurationParser.dictionaryWithData(file.readBytes(), CYLTabBarConfigurationFormat.Unknown)
@@ -81,12 +81,20 @@ class CYLTabBarConfigurationParserTest {
     fun everySampleGivesTheTabsOfTheJSONSample() {
         val expected = itemsWithoutFirstTitle(parse(File(samples, "cyl_tabbar_configuration.json"), false))
         assertNotNull(expected)
-        val files = samples.listFiles().orEmpty().filter { !it.name.endsWith(".proto") && !it.name.startsWith(".") }.sortedBy { it.name }
+        // [EN] Files only: not the Localization folder of string tables. [CN] 只取文件，不包括存放字符串表的 Localization 文件夹。
+        val files = samples.listFiles().orEmpty().filter { it.isFile && !it.name.endsWith(".proto") && !it.name.startsWith(".") }.sortedBy { it.name }
         assertEquals("the 17 samples", 17, files.size)
         val failures = ArrayList<String>()
         for (file in files) for (sniff in listOf(false, true)) {
             val (parsed, error) = attempt(file, sniff)
             if (itemsWithoutFirstTitle(parsed) != expected) failures += "${file.name} (${if (sniff) "content" else "extension"}): ${error?.message ?: "different dictionary"}"
+            // [EN] Every text format names its string tables (binary Protobuf has no field for them).
+            // [CN] 每种文本格式都写明字符串表（二进制 Protobuf 没有对应字段）。
+            val localization = parsed?.get(CYLConstants.CYLTabBarControllerLocalization) as? Map<*, *>
+            if (file.extension != "binpb" && (localization?.get(CYLConstants.CYLTabBarLocalizationTableName) != "ConfigurationDemo" ||
+                    localization[CYLConstants.CYLTabBarLocalizationPath] != "Localization")) {
+                failures += "${file.name} (${if (sniff) "content" else "extension"}): CYLTabBarControllerLocalization is $localization"
+            }
         }
         assertTrue(failures.joinToString("\n"), failures.isEmpty())
     }
@@ -143,7 +151,7 @@ class CYLTabBarConfigurationParserTest {
 
     @Test
     fun everyExportedExampleConfigurationReadsTheSameInEveryFormat() {
-        val folders = root.listFiles().orEmpty().filter { it.name.startsWith("Example") }.map { File(it, "Configurations") }.filter { it.isDirectory }
+        val folders = root.listFiles().orEmpty().filter { it.name.startsWith("Example") && it.name != "Example-Shared" }.map { File(it, "Configurations") }.filter { it.isDirectory }
         assertTrue("exported configurations", folders.isNotEmpty())
         val failures = ArrayList<String>()
         val checks = folders.sumOf { compareExports(it, failures) }

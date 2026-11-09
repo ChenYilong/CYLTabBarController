@@ -32,20 +32,6 @@ class CYLTabBarControllerTest {
 
     class Page : Fragment()
 
-    private fun attributes(vararg titles: String) = titles.map { mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemIdentifier to it.lowercase()) }
-
-    private fun <T> withActivity(block: (FragmentActivity) -> T): T {
-        // [EN] Robolectric.buildActivity needs no manifest entry (ActivityScenario does). [CN] Robolectric.buildActivity 不需要在清单中声明。
-        val controller = Robolectric.buildActivity(FragmentActivity::class.java).setup()
-        try {
-            return block(controller.get())
-        } finally {
-            controller.pause().stop().destroy()
-        }
-    }
-
-    private fun idle() = shadowOf(Looper.getMainLooper()).idle()
-
     @Test
     fun selectsPagesAndAsksTheDelegate() = withActivity { activity ->
         val pages = listOf(Page(), Page(), Page())

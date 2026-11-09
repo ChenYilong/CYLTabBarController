@@ -16,19 +16,7 @@ import re
 import sys
 import tempfile
 
-# [EN] The repository and the temporary folder. [CN] 仓库与临时目录。
-ALLOWED_ROOTS = (os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), tempfile.gettempdir())
-
-
-def confined_path(path, roots):
-    """[EN] The real path of `path` when it lies inside one of `roots`, else exit: no path traversal from arguments.
-    [CN] `path` 位于 `roots` 之一内时返回其真实路径，否则退出：防止通过参数进行路径穿越。"""
-    real = os.path.realpath(path)
-    for root in roots:
-        root = os.path.realpath(root)
-        if real == root or real.startswith(root + os.sep):
-            return real
-    sys.exit('%s: outside %s' % (path, ' / '.join(roots)))
+from confined_paths import ALLOWED_ROOTS, confined_path  # [EN] shared path checks [CN] 共用的路径检查
 
 
 C_ARRAYS = {'pair', 'argv', 'cases', 'bytes', 'trailer'}

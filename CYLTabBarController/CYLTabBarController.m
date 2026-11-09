@@ -109,6 +109,7 @@ NSString *const CYLTabBarControllerThemeIdentifier = @"CYLTabBarControllerThemeI
 NSString *const CYLTabBarControllerDarkThemeIdentifier = @"CYLTabBarControllerDarkThemeIdentifier";
 NSString *const CYLTabBarControllerThemeManagerName = @"CYLTabBarControllerThemeManagerName";
 NSString *const CYLTabBarControllerLocalization = @"CYLTabBarControllerLocalization";
+NSString *const CYLTabBarControllerConfigurationRoute = @"CYLTabBarControllerConfigurationRoute";
 NSString *const CYLTabBarLocalizationTableName = @"CYLTabBarLocalizationTableName";
 NSString *const CYLTabBarLocalizationPath = @"CYLTabBarLocalizationPath";
 NSString *const CYLTabBarLocalizationBundleName = @"CYLTabBarLocalizationBundleName";

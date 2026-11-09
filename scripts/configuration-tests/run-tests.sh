@@ -15,7 +15,7 @@ set -eu
 HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$HERE/../.." && pwd)
 SOURCES="$ROOT/CYLTabBarController"
-SAMPLES="$SOURCES/Resources/CYLTabBarController.bundle/Configurations"
+SAMPLES="$ROOT/Example-Shared/Configurations"
 WORK=$(mktemp -d "${TMPDIR:-/tmp}/cyl-configuration-tests.XXXXXX")
 trap 'rm -rf "$WORK"' EXIT
 

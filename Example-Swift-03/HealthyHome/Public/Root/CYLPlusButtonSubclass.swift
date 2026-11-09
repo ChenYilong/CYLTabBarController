@@ -6,6 +6,9 @@
 //  Copyright © 2020 apple. All rights reserved.
 //
 
+#if CYL_DEMO_SWIFTUI
+import SwiftUI
+#endif
 import UIKit
 
 class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
@@ -54,17 +57,31 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
     }
 
     static func plusChildViewController() -> UIViewController {
+        #if CYL_DEMO_SWIFTUI
+        // [EN] SwiftUI demo: the plus button's page is a SwiftUI view in a UIHostingController.
+        // [CN] SwiftUI 演示：PlusButton 对应的页面是放在 UIHostingController 中的 SwiftUI 视图。
+        let publish = UIHostingController(rootView: PublishView())
+        publish.title = CYLLocalizedString("发布")
+        return RootNavigationController(rootViewController: publish)
+        #else
         let wisdom = WisdomVC()
         //        wisdom.title = "菜单"
         let nav = RootNavigationController(rootViewController: wisdom)
         return nav
+        #endif
     }
     
+    // [CN] Example-PAG（`CYL_DEMO_PAG`）不实现 `alignsTitleWithTabBarItemTitles`：其按钮只有背景图片，标题画在图上，保持在图片中心
+    //      （见 docs/PlusButton-Background-Image-Liquid-Glass.md）。
+    // [EN] Example-PAG (`CYL_DEMO_PAG`) has no `alignsTitleWithTabBarItemTitles`: its button has a background image only, with
+    //      its title drawn on it, so the title stays in the middle of the picture (see docs/PlusButton-Background-Image-Liquid-Glass.md).
+    #if !CYL_DEMO_PAG
     /// MARK: 插入位置
     // The plus button's title stays on the same center line as the tab item titles, in every tab bar style.
     static func alignsTitleWithTabBarItemTitles() -> Bool {
         return true
     }
+    #endif
 
     static func indexOfPlusButtonInTabBar() -> UInt {
         return 2

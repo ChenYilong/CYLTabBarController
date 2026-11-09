@@ -621,7 +621,8 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
               CYLTabBarControllerThemeManagerName, CYLTabBarControllerPlusButton, CYLTabBarControllerPlusButtonAction,
               CYLTabBarControllerUserInterfaceStyle, CYLTabBarControllerTabButtonTapAnimation, CYLTabBarControllerSwipeToSwitchTab,
               CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning,
-              CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers, CYLTabBarControllerLocalization ];
+              CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers, CYLTabBarControllerLocalization,
+              CYLTabBarControllerConfigurationRoute ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -1537,60 +1538,6 @@ static NSArray<NSString *> *CYLLocalizedConfigurationKeys(void) {
 }
 
 /*!
- * [EN] A folder in the app's sandbox, for tables downloaded at run time: "sandbox:Documents/…" (Android: `filesDir`),
- *      "sandbox:Caches/…" (Android: `cacheDir`), "sandbox:tmp/…", or "sandbox:<path>" below the app's home folder.
- * [CN] App 沙盒中的目录，用于运行时下载的字符串表："sandbox:Documents/…"（Android：`filesDir`）、"sandbox:Caches/…"（Android：`cacheDir`）、
- *      "sandbox:tmp/…"，或 "sandbox:<路径>"（App 主目录之下）。
- */
-static NSString *CYLLocalizationSandboxPath(NSString *rest) {
-    while ([rest hasPrefix:@"/"]) {
-        rest = [rest substringFromIndex:1];
-    }
-    NSArray<NSString *> *parts = [rest componentsSeparatedByString:@"/"];
-    NSString *first = parts.firstObject ?: @"";
-    NSString *remainder = parts.count > 1 ? [[parts subarrayWithRange:NSMakeRange(1, parts.count - 1)] componentsJoinedByString:@"/"] : @"";
-    NSString *root = nil;
-    if ([first isEqualToString:@"Documents"]) {
-        root = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
-    } else if ([first isEqualToString:@"Caches"]) {
-        root = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
-    } else if ([first isEqualToString:@"tmp"]) {
-        root = NSTemporaryDirectory();
-    }
-    return root ? [root stringByAppendingPathComponent:remainder] : [NSHomeDirectory() stringByAppendingPathComponent:rest];
-}
-
-/*!
- * [EN] The location routes of `CYLTabBarLocalizationPath` (docs/Configuration-Localization.md), checked in this order:
- *      "bundle:<path>" in the app's resources, "sandbox:<Documents|Caches|tmp>/<path>" in the app's sandbox, "file:" URL,
- *      "/…" absolute, "~/…" the app's home folder, anything else relative to `baseDirectory` (the configuration file's
- *      folder, else the app's resources).
- * [CN] `CYLTabBarLocalizationPath` 的位置路由（docs/Configuration-Localization.md），按以下顺序判断："bundle:<路径>" App 资源，
- *      "sandbox:<Documents|Caches|tmp>/<路径>" App 沙盒，"file:" URL，"/…" 绝对路径，"~/…" App 主目录，其余相对于 `baseDirectory`
- *      （配置文件所在目录，否则为 App 资源目录）。
- */
-static NSString *CYLLocalizationResolvedPath(NSString *path, NSString *baseDirectory) {
-    if ([path hasPrefix:@"bundle:"]) {
-        NSString *rest = [path substringFromIndex:@"bundle:".length];
-        while ([rest hasPrefix:@"/"]) {
-            rest = [rest substringFromIndex:1];
-        }
-        return [NSBundle.mainBundle.resourcePath ?: @"" stringByAppendingPathComponent:rest];
-    }
-    if ([path hasPrefix:@"file:"]) {
-        return [NSURL URLWithString:path].path ?: path;
-    }
-    if ([path hasPrefix:@"sandbox:"]) {
-        return CYLLocalizationSandboxPath([path substringFromIndex:@"sandbox:".length]);
-    }
-    path = [path stringByExpandingTildeInPath];
-    if (path.isAbsolutePath) {
-        return path;
-    }
-    return [baseDirectory stringByAppendingPathComponent:path];
-}
-
-/*!
  * [EN] The folder of the `.lproj` folders, and the table name, for a `CYLTabBarControllerLocalization` value; nil when it is
  *      off or invalid.
  * [CN] 根据 `CYLTabBarControllerLocalization` 的值得到 `.lproj` 文件夹所在目录与表名；关闭或无效时为 nil。
@@ -1623,7 +1570,8 @@ static NSString *_Nullable CYLLocalizationDirectory(id value, NSString *_Nullabl
     }
     NSString *path = CYLStringValue(info[CYLTabBarLocalizationPath]);
     if (path.length > 0) {
-        return CYLLocalizationResolvedPath(path, fileDirectory ?: resources);
+        // [EN] A location route (CYLResourceRoute, docs/Resource-Routes.md). [CN] 位置路由（CYLResourceRoute，docs/Resource-Routes.md）。
+        return [CYLResourceRoute pathForRoute:path baseDirectory:fileDirectory ?: resources];
     }
     NSString *bundleName = CYLStringValue(info[CYLTabBarLocalizationBundleName]);
     if (bundleName.length > 0 && ![bundleName isEqualToString:@"main"]) {
@@ -1721,6 +1669,27 @@ static void CYLApplyConfigurationLocalization(NSMutableDictionary<NSString *, id
     [configuration setDictionary:localized];
 }
 
+/*!
+ * [EN] `CYLTabBarControllerConfigurationRoute`: the routed file's keys, then this configuration's other keys over them.
+ * [CN] `CYLTabBarControllerConfigurationRoute`：先取路由指向文件中的键，再用本配置中的其他键覆盖。
+ */
+static void CYLApplyConfigurationRoute(NSMutableDictionary<NSString *, id> *configuration) {
+    id route = configuration[CYLTabBarControllerConfigurationRoute];
+    if (!route) {
+        return;
+    }
+    [configuration removeObjectForKey:CYLTabBarControllerConfigurationRoute];
+    NSError *error = nil;
+    NSDictionary<NSString *, id> *file = [route isKindOfClass:[NSString class]] ? [CYLTabBarController configurationWithRoute:route error:&error] : nil;
+    if (!file) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerConfigurationRoute, route);
+        return;
+    }
+    NSMutableDictionary<NSString *, id> *merged = [file mutableCopy];
+    [merged addEntriesFromDictionary:configuration];
+    [configuration setDictionary:merged];
+}
+
 + (NSDictionary<NSString *, id> *)cyl_normalizedConfiguration:(NSDictionary<NSString *, id> *)configuration {
     if (![configuration isKindOfClass:[NSDictionary class]]) {
         // E.g. an untyped JSON result that is a list (B18). 例如类型不明、实际为数组的 JSON 结果（B18）。
@@ -1733,7 +1702,9 @@ static void CYLApplyConfigurationLocalization(NSMutableDictionary<NSString *, id
             [normalized removeObjectForKey:key];
         }
     }
-    // [EN] Localized texts first, so every later step sees the translated values. [CN] 先本地化文本，后续步骤看到的都是翻译后的值。
+    // [EN] The routed file first, then its localized texts, so every later step sees the translated values.
+    // [CN] 先读取路由指向的文件，再本地化文本，后续步骤看到的都是翻译后的值。
+    CYLApplyConfigurationRoute(normalized);
     CYLApplyConfigurationLocalization(normalized);
     if (normalized[CYLTabBarControllerViewControllers]) {
         normalized[CYLTabBarControllerViewControllers] = CYLValidViewControllers(normalized[CYLTabBarControllerViewControllers]);
@@ -1966,6 +1937,34 @@ static void CYLApplyConfigurationLocalization(NSMutableDictionary<NSString *, id
 
 + (instancetype)tabBarControllerWithConfigurationFile:(NSString *)filePath error:(NSError **)error {
     return [[self alloc] initWithConfigurationFile:filePath error:error];
+}
+
+/// [EN] The path of a route, or nil and a file-not-found error. [CN] 路由对应的路径；没有时返回 nil 并设置“文件不存在”错误。
++ (nullable NSString *)cyl_pathOfConfigurationRoute:(NSString *)route error:(NSError **)error {
+    NSString *path = [route isKindOfClass:[NSString class]] ? [CYLResourceRoute pathForRoute:route baseDirectory:nil] : nil;
+    if (path.length == 0 || ![NSFileManager.defaultManager fileExistsAtPath:path]) {
+        if (error) {
+            NSString *description = [NSString stringWithFormat:@"No configuration file matches the route \"%@\".", [route isKindOfClass:[NSString class]] ? route : @""];
+            *error = [NSError errorWithDomain:CYLTabBarConfigurationErrorDomain code:CYLTabBarConfigurationErrorFileNotFound
+                                     userInfo:@{ NSLocalizedDescriptionKey : description }];
+        }
+        return nil;
+    }
+    return path;
+}
+
++ (NSDictionary<NSString *, id> *)configurationWithRoute:(NSString *)route error:(NSError **)error {
+    NSString *path = [self cyl_pathOfConfigurationRoute:route error:error];
+    return path ? [self configurationWithContentsOfFile:path error:error] : nil;
+}
+
+- (instancetype)initWithConfigurationRoute:(NSString *)route error:(NSError **)error {
+    NSString *path = [[self class] cyl_pathOfConfigurationRoute:route error:error];
+    return path ? [self initWithConfigurationFile:path error:error] : nil;
+}
+
++ (instancetype)tabBarControllerWithConfigurationRoute:(NSString *)route error:(NSError **)error {
+    return [[self alloc] initWithConfigurationRoute:route error:error];
 }
 
 - (void)cyl_applyConfigurationThemes:(NSDictionary<NSString *, id> *)normalizedConfiguration {

@@ -58,7 +58,7 @@ cd Example-Swift && pod install && open *.xcworkspace
 | Lottie | [Example](../Example)（Objective-C，根目录的 `CYLTabBarController.xcodeproj`） | `CYLFlatDesignTabBar`（含 Lottie 4.x / includes Lottie 4.x） | [Example/MainTabBarController.m](../Example/MainTabBarController.m) |
 | Lottie 4.x | [Example-Swift](../Example-Swift) | `LottieSwift` | [Example-Swift/MainTabBarController.swift](../Example-Swift/MainTabBarController.swift) |
 | Lottie 2.5 | [Example-Swift-02](../Example-Swift-02) | `Lottie` | [MainRootNavigationViewController.swift](../Example-Swift-02/CYLTabBarController-Swift/Classes/Main/MainRootNavigationViewController.swift) |
-| PAG | [Example-PAG](../Example-PAG) | `PAG` | [TabBarCommon.swift](../Example-PAG/HealthyHome/Tool/TabBarCommon.swift) |
+| PAG | [Example-PAG](../Example-PAG) | `PAG` | [TabBarCommon.swift](../Example-Swift-03/HealthyHome/Tool/TabBarCommon.swift) (`#if CYL_DEMO_PAG`) |
 | Rive（UIKit） | [Example-Rive](../Example-Rive) | `Rive` | [TabItems.swift](../Example-SwiftUI-Rive/AnimatedApp/Navigation/TabItems.swift) |
 | Rive（SwiftUI） | [Example-SwiftUI-Rive](../Example-SwiftUI-Rive) | `Rive` | 同上 / The same file |
 | GIF | [Example-GIF](../Example-GIF) | `GIF` | [AppDelegate.swift](../Example-GIF/GIFApp/Classes/Other/AppDelegate.swift) |
@@ -117,7 +117,7 @@ pod 'CYLTabBarController/PAG'
 ```
 
 ```swift
-// Swift — Example-PAG/HealthyHome/Tool/TabBarCommon.swift
+// Swift — Example-Swift-03/HealthyHome/Tool/TabBarCommon.swift (#if CYL_DEMO_PAG, compiled by Example-PAG)
 // Each file is found in the main bundle; "" leaves a tab with its images. 文件在 main bundle 中查找；"" 表示该 Tab 保持图片。
 let animationFiles = ["tab_home.pag", "tab_health.pag", "tab_moments.pag", "tab_me.pag"]
 let attributes = zip(tabBarItemsAttributes, animationFiles).map { attributes, fileName in

@@ -11,6 +11,8 @@
 // [CN] 与此类绑定的文档：
 //   - CYLUtils helpers: responding outside the superview, a tap animation, and image loading / CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/CYLUtils-Helpers.md
+//   - Resource routes / 资源路由
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Resource-Routes.md
 // docs-binding:end
 
 /*!
@@ -22,6 +24,7 @@
 #import <UIKit/UIKit.h>
 #import "CYLUtilsMacros.h"
 #import "CYLLocalizedString.h"
+#import "CYLResourceRoute.h"
 #import "NSObject+CYLUtils.h"
 #import "UIView+CYLUtils.h"
 #import "UIViewController+CYLUtils.h"

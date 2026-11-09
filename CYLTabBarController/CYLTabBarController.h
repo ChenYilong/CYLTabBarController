@@ -622,6 +622,17 @@ FOUNDATION_EXTERN NSString *const CYLTabBarControllerThemeManagerName;
  *      没有译文的键保持原样，与 `NSLocalizedString` 相同。Android 读取同样的文件，一份配置及其字符串表适用于所有平台。
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerLocalization;
+/*!
+ * [EN] Configuration key: a resource route (`CYLResourceRoute`, docs/Resource-Routes.md) to a configuration file, built
+ *      into the app or in its sandbox, e.g. "bundle:Configurations?name=tabbar" or "sandbox:Caches/tabbar?name=tabbar&theme=dark".
+ *      The file's keys are read first, then the other keys of this configuration win over them, so code (or React Native
+ *      and Flutter, which send a dictionary) can change a few values of a file. A route that matches no file is logged and
+ *      ignored. Android reads the same key.
+ * [CN] 配置键：指向配置文件的资源路由（`CYLResourceRoute`，docs/Resource-Routes.md），文件可以内置在 App 中或位于沙盒，例如
+ *      "bundle:Configurations?name=tabbar" 或 "sandbox:Caches/tabbar?name=tabbar&theme=dark"。先读取文件中的键，再由本配置中的其他键
+ *      覆盖，因此代码（以及发送字典的 React Native 与 Flutter）可以修改文件中的少数值。没有匹配文件的路由会打印日志并被忽略。Android 读取同一个键。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerConfigurationRoute;
 /// [EN] The strings table, without ".strings" (default "Localizable"). [CN] 字符串表名，不含 ".strings"（默认 "Localizable"）。
 FOUNDATION_EXTERN NSString *const CYLTabBarLocalizationTableName;
 /*!
@@ -2617,6 +2628,25 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
 
 /// [EN] Convenience constructor for `-initWithConfigurationFile:error:`. [CN] `-initWithConfigurationFile:error:` 的便利构造方法。
 + (nullable instancetype)tabBarControllerWithConfigurationFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
+
+/*!
+ * [EN] Reads the configuration file a resource route points to (`CYLResourceRoute`, docs/Resource-Routes.md): built into
+ *      the app or in its sandbox, and with a query, the one file that matches a name, theme, version and format, e.g.
+ *      @"bundle:Configurations?name=tabbar" or @"sandbox:Caches/tabbar?name=tabbar&theme=dark&version=2.1&format=json".
+ *      A route without a prefix is relative to the app's resources. Returns nil and
+ *      `CYLTabBarConfigurationErrorFileNotFound` when the route matches no file.
+ * [CN] 读取资源路由（`CYLResourceRoute`，docs/Resource-Routes.md）指向的配置文件：App 内置或位于沙盒中；带查询参数时，选出与名称、主题、
+ *      版本、格式匹配的唯一文件，例如 @"bundle:Configurations?name=tabbar" 或
+ *      @"sandbox:Caches/tabbar?name=tabbar&theme=dark&version=2.1&format=json"。没有前缀的路由相对于 App 资源。路由没有匹配的文件时
+ *      返回 nil 与 `CYLTabBarConfigurationErrorFileNotFound`。
+ */
++ (nullable NSDictionary<NSString *, id> *)configurationWithRoute:(NSString *)route error:(NSError *_Nullable *_Nullable)error;
+
+/// [EN] `-initWithConfigurationFile:error:` with a resource route (see `+configurationWithRoute:error:`). [CN] 使用资源路由的 `-initWithConfigurationFile:error:`（见 `+configurationWithRoute:error:`）。
+- (nullable instancetype)initWithConfigurationRoute:(NSString *)route error:(NSError *_Nullable *_Nullable)error;
+
+/// [EN] Convenience constructor for `-initWithConfigurationRoute:error:`. [CN] `-initWithConfigurationRoute:error:` 的便利构造方法。
++ (nullable instancetype)tabBarControllerWithConfigurationRoute:(NSString *)route error:(NSError *_Nullable *_Nullable)error;
 
 /*!
  * [EN] Downloads a configuration (http, https, or a file URL) and parses it; `completion` runs on the main queue. The

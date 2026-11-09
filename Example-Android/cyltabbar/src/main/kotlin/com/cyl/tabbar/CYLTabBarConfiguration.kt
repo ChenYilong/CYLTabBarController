@@ -77,8 +77,41 @@ object CYLTabBarConfiguration {
         val configuration = parse(data, CYLTabBarConfigurationParser.formatForPathExtension(path.substringAfterLast('/').substringAfterLast('.', "")))
         if (CYLConstants.CYLTabBarControllerLocalization !in configuration) return configuration
         // [EN] A relative `CYLTabBarLocalizationPath` is resolved against this file (or asset). [CN] 相对的 `CYLTabBarLocalizationPath` 相对于本文件（或 asset）。
-        val source = if (file.isFile) (file.absoluteFile.parent ?: "") else "asset:" + path.substringBeforeLast('/', "")
+        val source = if (file.isFile) (file.absoluteFile.parent ?: "") else CYLResourceRoute.ASSET_PREFIX + path.substringBeforeLast('/', "")
         return configuration + (CYLTabBarConfigurationLocalization.FILE_DIRECTORY_KEY to source)
+    }
+
+    /**
+     * [EN] `+configurationWithRoute:error:`: the configuration file a resource route points to (`CYLResourceRoute`,
+     *      docs/Resource-Routes.md), e.g. "bundle:Configurations?name=tabbar" or
+     *      "sandbox:Caches/tabbar?name=tabbar&theme=dark&version=2.1&format=json"; `FileNotFound` when it matches no file.
+     * [CN] 读取资源路由（`CYLResourceRoute`，docs/Resource-Routes.md）指向的配置文件，例如 "bundle:Configurations?name=tabbar" 或
+     *      "sandbox:Caches/tabbar?name=tabbar&theme=dark&version=2.1&format=json"；没有匹配的文件时抛出 `FileNotFound`。
+     */
+    @JvmStatic
+    @Throws(CYLConfigurationException::class)
+    fun configurationWithRoute(context: Context, route: String): Map<String, Any?> {
+        val path = CYLResourceRoute.pathForRoute(context, route)?.takeIf { it.isNotEmpty() }
+            ?: throw CYLConfigurationException(CYLTabBarConfigurationError.FileNotFound, "No configuration file matches the route \"$route\".")
+        return configurationWithContentsOfFile(context, path)
+    }
+
+    /**
+     * [EN] `CYLTabBarControllerConfigurationRoute`: the routed file's keys, then the other keys of `configuration` over them;
+     *      a route that matches no file is logged and ignored, as on iOS.
+     * [CN] `CYLTabBarControllerConfigurationRoute`：先取路由指向文件中的键，再用 `configuration` 中的其他键覆盖；没有匹配文件的路由会打印日志
+     *      并被忽略，与 iOS 相同。
+     */
+    @JvmStatic
+    fun withRoutedFile(context: Context, configuration: Map<String, Any?>): Map<String, Any?> {
+        val route = configuration[CYLConstants.CYLTabBarControllerConfigurationRoute] ?: return configuration
+        val rest = configuration - CYLConstants.CYLTabBarControllerConfigurationRoute
+        val file = (route as? String)?.let { runCatching { configurationWithRoute(context, it) }.getOrNull() }
+        if (file == null) {
+            android.util.Log.w("CYLTabBarController", "configuration: invalid ${CYLConstants.CYLTabBarControllerConfigurationRoute}: $route")
+            return rest
+        }
+        return file + rest
     }
 
     /** [EN] Reads at most 5 MB (API 23: no `readNBytes`). [CN] 最多读取 5 MB（API 23 没有 `readNBytes`）。 */

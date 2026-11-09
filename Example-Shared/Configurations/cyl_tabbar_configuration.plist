@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CYLTabBarControllerContext</key>
+	<string>CYLConfigurationDemo</string>
+	<key>CYLTabBarControllerDarkThemeIdentifier</key>
+	<string>dark</string>
+	<key>CYLTabBarControllerImageInsets</key>
+	<string>{0, 0, 0, 0}</string>
+	<key>CYLTabBarControllerLocalization</key>
+	<dict>
+		<key>CYLTabBarLocalizationPath</key>
+		<string>Localization</string>
+		<key>CYLTabBarLocalizationTableName</key>
+		<string>ConfigurationDemo</string>
+	</dict>
+	<key>CYLTabBarControllerStyleType</key>
+	<string>default</string>
+	<key>CYLTabBarControllerTabBarItemsAttributes</key>
+	<array>
+		<dict>
+			<key>CYLTabBarItemIdentifier</key>
+			<string>home</string>
+			<key>CYLTabBarItemImage</key>
+			<string>system:house</string>
+			<key>CYLTabBarItemSelectedImage</key>
+			<string>system:house.fill</string>
+			<key>CYLTabBarItemTitle</key>
+			<string>Plist</string>
+		</dict>
+		<dict>
+			<key>CYLTabBarItemIdentifier</key>
+			<string>message</string>
+			<key>CYLTabBarItemImage</key>
+			<string>system:message</string>
+			<key>CYLTabBarItemPlatforms</key>
+			<string>ios,android</string>
+			<key>CYLTabBarItemSelectedImage</key>
+			<string>system:message.fill</string>
+			<key>CYLTabBarItemTitle</key>
+			<string>Message</string>
+		</dict>
+		<dict>
+			<key>CYLTabBarItemIdentifier</key>
+			<string>discover</string>
+			<key>CYLTabBarItemImage</key>
+			<string>system:safari</string>
+			<key>CYLTabBarItemImageInsets</key>
+			<string>{1, 0, -1, 0}</string>
+			<key>CYLTabBarItemPageIdentifier</key>
+			<string>web</string>
+			<key>CYLTabBarItemPageParameters</key>
+			<dict>
+				<key>url</key>
+				<string>https://github.com/ChenYilong/CYLTabBarController</string>
+			</dict>
+			<key>CYLTabBarItemSelectedImage</key>
+			<string>system:safari.fill</string>
+			<key>CYLTabBarItemTitle</key>
+			<string>Discover</string>
+		</dict>
+		<dict>
+			<key>CYLTabBarItemIdentifier</key>
+			<string>me</string>
+			<key>CYLTabBarItemImage</key>
+			<string>system:person</string>
+			<key>CYLTabBarItemMinimumAppVersion</key>
+			<string>1.0.0</string>
+			<key>CYLTabBarItemSelectedImage</key>
+			<string>system:person.fill</string>
+			<key>CYLTabBarItemTitle</key>
+			<string>Me</string>
+			<key>CYLTabBarItemTitlePositionAdjustment</key>
+			<string>{0, -1}</string>
+		</dict>
+	</array>
+	<key>CYLTabBarControllerThemeIdentifier</key>
+	<string>light</string>
+	<key>CYLTabBarControllerThemeManagerName</key>
+	<string>CYLConfigurationDemo</string>
+	<key>CYLTabBarControllerThemes</key>
+	<dict>
+		<key>dark</key>
+		<dict>
+			<key>CYLTabBarBackgroundColor</key>
+			<string>#1C1C1E</string>
+			<key>CYLTabBarItemSelectedIconColor</key>
+			<string>#0A84FF</string>
+			<key>CYLTabBarItemSelectedTitleColor</key>
+			<string>#0A84FF</string>
+		</dict>
+		<key>light</key>
+		<dict>
+			<key>CYLTabBarItemSelectedIconColor</key>
+			<string>#007AFF</string>
+			<key>CYLTabBarItemSelectedTitleColor</key>
+			<string>#007AFF</string>
+		</dict>
+	</dict>
+	<key>CYLTabBarControllerTitlePositionAdjustment</key>
+	<string>{0, -2}</string>
+</dict>
+</plist>

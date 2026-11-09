@@ -28,15 +28,6 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34])
 class CYLTabBarHostViewTest {
 
-    private fun <T> withActivity(block: (FragmentActivity) -> T): T {
-        val controller = Robolectric.buildActivity(FragmentActivity::class.java).setup()
-        try {
-            return block(controller.get())
-        } finally {
-            controller.pause().stop().destroy()
-        }
-    }
-
     private fun image(activity: FragmentActivity) = BitmapDrawable(activity.resources, Bitmap.createBitmap(24, 24, Bitmap.Config.ARGB_8888))
 
     /** [EN] A host view laid out at the bottom of the activity. [CN] 布局在 Activity 底部的宿主视图。 */

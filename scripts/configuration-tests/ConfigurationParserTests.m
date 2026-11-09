@@ -124,6 +124,31 @@ static NSArray *CYLFiles(NSString *folder) {
 
 /// [EN] 1. Every sample file gives the dictionary of the JSON sample (the first tab's title is the format's name).
 /// [CN] 1. 每个示例文件都得到与 JSON 示例相同的字典（第一个 Tab 的标题为格式名称）。
+/// [EN] The skins of a configuration as identifier -> values, from either form. [CN] 把配置中的皮肤统一为 标识 -> 值，两种写法均可。
+static NSDictionary *CYLThemesByIdentifier(id configuration) {
+    id themes = [configuration objectForKey:@"CYLTabBarControllerThemes"];
+    if ([themes isKindOfClass:[NSDictionary class]]) {
+        return themes;
+    }
+    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    NSUInteger i;
+    for (i = 0; [themes isKindOfClass:[NSArray class]] && i < [themes count]; i++) {
+        NSMutableDictionary *theme = [[themes objectAtIndex:i] mutableCopy];
+        NSString *identifier = [theme objectForKey:@"CYLTabBarThemeIdentifier"];
+        if (identifier) {
+            [theme removeObjectForKey:@"CYLTabBarThemeIdentifier"];
+            // [EN] Protobuf: the values are in the map CYLTabBarThemeValues. [CN] Protobuf：值位于 map 字段 CYLTabBarThemeValues 中。
+            id values = [theme objectForKey:@"CYLTabBarThemeValues"];
+            if ([values isKindOfClass:[NSDictionary class]]) {
+                [theme removeObjectForKey:@"CYLTabBarThemeValues"];
+                [theme addEntriesFromDictionary:values];
+            }
+            [result setObject:theme forKey:identifier];
+        }
+    }
+    return result;
+}
+
 static void CYLTestSamples(NSString *folder) {
     printf("Samples (%s)\n", [folder UTF8String]);
     NSDictionary *json = CYLParse([folder stringByAppendingPathComponent:@"cyl_tabbar_configuration.json"], NO, NULL);
@@ -131,7 +156,7 @@ static void CYLTestSamples(NSString *folder) {
     NSUInteger i;
     for (i = 0; i < [files count]; i++) {
         NSString *file = [files objectAtIndex:i];
-        if ([file hasSuffix:@".proto"] || [file hasPrefix:@"."]) {
+        if ([file hasSuffix:@".proto"] || [file hasPrefix:@"."] || file.pathExtension.length == 0) { // [EN] not the Localization folder [CN] 跳过 Localization 文件夹
             continue;
         }
         int sniff;
@@ -152,6 +177,24 @@ static void CYLTestSamples(NSString *folder) {
             CYLChecks++;
             if (!parsedItems || ![parsedItems isEqual:expectedItems]) {
                 CYLFail([NSString stringWithFormat:@"%@ (%@): %@", file, sniff ? @"content" : @"extension", [error localizedDescription] ?: @"different dictionary"]);
+            }
+            // [EN] Every format carries the same two skins (a list of skins with CYLTabBarThemeIdentifier, or a dictionary).
+            // [CN] 每种格式都带有同样的两套皮肤（带 CYLTabBarThemeIdentifier 的皮肤数组，或字典）。
+            CYLChecks++;
+            if (![CYLThemesByIdentifier(parsed) isEqual:CYLThemesByIdentifier(expected)]
+                || ![[parsed objectForKey:@"CYLTabBarControllerDarkThemeIdentifier"] isEqual:@"dark"]) {
+                CYLFail([NSString stringWithFormat:@"%@ (%@): skins are %@", file, sniff ? @"content" : @"extension", [parsed objectForKey:@"CYLTabBarControllerThemes"]]);
+            }
+            // [EN] Every text format names its string tables (binary Protobuf has no field for them).
+            // [CN] 每种文本格式都写明字符串表（二进制 Protobuf 没有对应字段）。
+            if (![file hasSuffix:@".binpb"]) {
+                NSDictionary *localization = [parsed objectForKey:@"CYLTabBarControllerLocalization"];
+                CYLChecks++;
+                if (![localization isKindOfClass:[NSDictionary class]]
+                    || ![[localization objectForKey:@"CYLTabBarLocalizationTableName"] isEqual:@"ConfigurationDemo"]
+                    || ![[localization objectForKey:@"CYLTabBarLocalizationPath"] isEqual:@"Localization"]) {
+                    CYLFail([NSString stringWithFormat:@"%@ (%@): CYLTabBarControllerLocalization is %@", file, sniff ? @"content" : @"extension", localization]);
+                }
             }
         }
     }

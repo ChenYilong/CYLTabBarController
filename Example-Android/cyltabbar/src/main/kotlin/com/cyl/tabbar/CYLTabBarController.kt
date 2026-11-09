@@ -393,8 +393,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     private fun initWithConfiguration(configuration: Map<String, Any?>) {
         val appVersion = try { activity.packageManager.getPackageInfo(activity.packageName, 0).versionName } catch (error: Exception) { null }
         val darkMode = (activity.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        // [EN] Localized texts first, as on iOS (CYLTabBarControllerLocalization). [CN] 与 iOS 一样先本地化文本。
-        val localized = CYLTabBarConfigurationLocalization.localize(activity, configuration)
+        // [EN] The routed file, then localized texts first, as on iOS. [CN] 与 iOS 一样，先读取路由指向的文件，再本地化文本。
+        val localized = CYLTabBarConfigurationLocalization.localize(activity, CYLTabBarConfiguration.withRoutedFile(activity, configuration))
         val normalized = CYLTabBarConfiguration.cyl_normalizedConfiguration(localized, "android", appVersion, darkMode)
         @Suppress("UNCHECKED_CAST")
         var items = (normalized[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] as? List<Map<String, Any?>>) ?: emptyList()
@@ -1533,6 +1533,17 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         fun tabBarControllerWithConfigurationFile(activity: FragmentActivity, path: String): CYLTabBarController {
             val controller = CYLTabBarController(activity, configurationWithContentsOfFile(activity, path))
             if (controller.viewControllers.isEmpty()) throw CYLTabBarConfiguration.CYLConfigurationException(CYLTabBarConfiguration.CYLTabBarConfigurationError.NoPages, "no tab of $path found its page")
+            return controller
+        }
+
+        /** [EN] `+configurationWithRoute:error:` / `+tabBarControllerWithConfigurationRoute:error:` (docs/Resource-Routes.md). [CN] 从资源路由创建。 */
+        @JvmStatic @Throws(CYLTabBarConfiguration.CYLConfigurationException::class)
+        fun configurationWithRoute(context: Context, route: String) = CYLTabBarConfiguration.configurationWithRoute(context, route)
+
+        @JvmStatic @Throws(CYLTabBarConfiguration.CYLConfigurationException::class)
+        fun tabBarControllerWithConfigurationRoute(activity: FragmentActivity, route: String): CYLTabBarController {
+            val controller = CYLTabBarController(activity, configurationWithRoute(activity, route))
+            if (controller.viewControllers.isEmpty()) throw CYLTabBarConfiguration.CYLConfigurationException(CYLTabBarConfiguration.CYLTabBarConfigurationError.NoPages, "no tab of $route found its page")
             return controller
         }
 

@@ -190,6 +190,7 @@ class CYLTabBar extends StatefulWidget {
     this.swipeToSwitchTab,
     this.animationSpeed,
     this.plusButton,
+    this.configurationRoute,
     this.configuration = const {},
     this.selectedIndex,
     this.badgeValues = const [],
@@ -294,8 +295,14 @@ class CYLTabBar extends StatefulWidget {
   /// keeps the configuration's.
   final Offset? titlePositionAdjustment;
 
+  /// A resource route to a configuration file built into the app or in its sandbox (docs/Resource-Routes.md), e.g.
+  /// `bundle:Configurations?name=tabbar` or `sandbox:Caches/tabbar?name=tabbar&theme=dark`. The file is read first; the
+  /// other parameters and [configuration] win over its keys.
+  final String? configurationRoute;
+
   /// The configuration sent to the native library.
   Map<String, Object?> buildConfiguration() => {
+        if (configurationRoute != null) 'CYLTabBarControllerConfigurationRoute': configurationRoute,
         if (styleType != null) 'CYLTabBarControllerStyleType': styleType,
         if (userInterfaceStyle != null) 'CYLTabBarControllerUserInterfaceStyle': userInterfaceStyle,
         if (tapAnimation != null) 'CYLTabBarControllerTabButtonTapAnimation': tapAnimation,

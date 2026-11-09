@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F618DA17597B437580976BF5 /* Configurations in Resources */ = {isa = PBXBuildFile; fileRef = A1839EF9BFD2474F9B1A186E /* Configurations */; };
 		0A226B506615FEAF53B63F15 /* Pods_GIFApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9539E3C35FC9862B9097017 /* Pods_GIFApp.framework */; };
 		3B8A0B44005BA319F2BA6056 /* tab_star.gif in Resources */ = {isa = PBXBuildFile; fileRef = D29B96195DFAC3AA0ECC45FD /* tab_star.gif */; };
 		3C25258E344C2986B798F917 /* tab_rocket.gif in Resources */ = {isa = PBXBuildFile; fileRef = 765B3B6B67AACD02647430B5 /* tab_rocket.gif */; };
@@ -32,6 +33,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A1839EF9BFD2474F9B1A186E /* Configurations */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Configurations; path = "../Example-Shared/Configurations"; sourceTree = SOURCE_ROOT; };
 		10B2B41390DA6BE0F43BB0E1 /* CYLSettingsDemoTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLSettingsDemoTableViewController.swift; path = "../Example-Shared/CYLSettingsDemoTableViewController.swift"; sourceTree = "<group>"; };
 		863ECC7ADA9F01AD11686382 /* CYLDemoTabBarStyle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLDemoTabBarStyle.swift; path = "../Example-Shared/CYLDemoTabBarStyle.swift"; sourceTree = "<group>"; };
 		2CDA77BCC28E878CAB5EFD15 /* Pods-GIFApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GIFApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-GIFApp/Pods-GIFApp.release.xcconfig"; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 		922DCED41FF63399005C89BE = {
 			isa = PBXGroup;
 			children = (
+				A1839EF9BFD2474F9B1A186E /* Configurations */,
 				D6B9DA7EE87C4B448F2A9C22 /* CYLPlusButtonBadgeDemo.swift */,
 				DD4620CD423ACC34E7994417 /* LottieResources */,
 				922DCEDF1FF63399005C89BE /* GIFApp */,
@@ -279,6 +282,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F618DA17597B437580976BF5 /* Configurations in Resources */,
 				922DCEEB1FF63399005C89BE /* LaunchScreen.storyboard in Resources */,
 				922DCEE81FF63399005C89BE /* Assets.xcassets in Resources */,
 				92DD37E220A5740500754AC8 /* NextHomeViewController.xib in Resources */,

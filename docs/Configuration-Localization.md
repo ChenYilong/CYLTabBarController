@@ -83,6 +83,7 @@
 
 | 中文 | English |
 |:---|:---|
+| 这些规则由 `CYLResourceRoute`（CYLUtils）实现，配置文件本身也可以用路由读取，并按名称、主题、版本与格式选择，见[资源路由](Resource-Routes.md)。 | These rules are implemented by `CYLResourceRoute` (CYLUtils); configuration files can be read with a route too, picked by name, theme, version and format, see [Resource routes](Resource-Routes.md). |
 | `CYLTabBarLocalizationPath` 的值按下表的顺序匹配（左侧为匹配规则的正则表达式），由前缀判断从 App 内置资源、沙盒还是本地路径读取。iOS 与 Android 使用相同的规则，同一份配置在两个平台上找到对应的位置。 | The value of `CYLTabBarLocalizationPath` is matched against the table below in order (the left column is the matching rule as a regular expression); its prefix says whether the tables come from the app's built-in resources, the sandbox or a local path. iOS and Android use the same rules, so one configuration finds the matching place on both. |
 
 | 规则 / Rule | 示例 / Example | 中文 | English |

@@ -23,6 +23,7 @@
 		9AF5961421C8E7B100C6AF2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AF5960821C8E7B100C6AF2B /* Assets.xcassets */; };
 		9AF5961621C8E7B100C6AF2B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AF5960B21C8E7B100C6AF2B /* LaunchScreen.storyboard */; };
 		BB208C52C920405FAAD3EA6A /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDCED1DA23994595818FD2A6 /* CYLPlusButtonBadgeDemo.swift */; };
+		204C38646E0F44C896CD214F /* CYLPlusButtonSubclass+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB35D245850242059F64FAE8 /* CYLPlusButtonSubclass+Layout.swift */; };
 		C0196AB673A3C11A8689ED66 /* Pods_CYLTabBarController_Swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DEC604443F0BED5845C1590 /* Pods_CYLTabBarController_Swift.framework */; };
 		C1A5CE0E2E000000000000B1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E000000000000B2 /* SceneDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -50,6 +51,7 @@
 		C1A5CE0E2E000000000000B2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		C7C15F27AFB129417A291CF9 /* Pods-CYLTabBarController-Swift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTabBarController-Swift.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift.debug.xcconfig"; sourceTree = "<group>"; };
 		DDCED1DA23994595818FD2A6 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
+		EB35D245850242059F64FAE8 /* CYLPlusButtonSubclass+Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "CYLPlusButtonSubclass+Layout.swift"; path = "../Example-Shared/CYLPlusButtonSubclass+Layout.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				DDCED1DA23994595818FD2A6 /* CYLPlusButtonBadgeDemo.swift */,
+				EB35D245850242059F64FAE8 /* CYLPlusButtonSubclass+Layout.swift */,
 				290BE55989ECAEC679C254A1 /* LottieResources */,
 				9AF595DF21C8E63C00C6AF2B /* AppDelegate.swift */,
 				C1A5CE0E2E000000000000B2 /* SceneDelegate.swift */,
@@ -365,6 +368,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB208C52C920405FAAD3EA6A /* CYLPlusButtonBadgeDemo.swift in Sources */,
+				204C38646E0F44C896CD214F /* CYLPlusButtonSubclass+Layout.swift in Sources */,
 				9AF5961021C8E7B100C6AF2B /* HomeViewController.swift in Sources */,
 				9AF595E221C8E63C00C6AF2B /* AppDelegate.swift in Sources */,
 				C1A5CE0E2E000000000000B1 /* SceneDelegate.swift in Sources */,

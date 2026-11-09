@@ -145,6 +145,9 @@ public final class CYLConstants {
     // [EN] Localized texts of a configuration (see CYLTabBarConfigurationLocalization, docs/Configuration-File.md).
     // [CN] 配置中的本地化文本（见 CYLTabBarConfigurationLocalization、docs/Configuration-File.md）。
     public static final String CYLTabBarControllerLocalization = "CYLTabBarControllerLocalization";
+    // [EN] A resource route to a configuration file (CYLResourceRoute, docs/Resource-Routes.md); the other keys win over the file's.
+    // [CN] 指向配置文件的资源路由（CYLResourceRoute，docs/Resource-Routes.md）；其他键覆盖文件中的键。
+    public static final String CYLTabBarControllerConfigurationRoute = "CYLTabBarControllerConfigurationRoute";
     public static final String CYLTabBarLocalizationTableName = "CYLTabBarLocalizationTableName";
     public static final String CYLTabBarLocalizationPath = "CYLTabBarLocalizationPath";
     public static final String CYLTabBarLocalizationBundleName = "CYLTabBarLocalizationBundleName";
