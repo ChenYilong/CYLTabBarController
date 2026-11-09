@@ -190,6 +190,8 @@ docs/
     ├── plusbutton-badge-after-3-taps.png
     ├── plusbutton-badge-before.png
     ├── plusbutton-image-loaded-later.png
+    ├── plusbutton-lottie-423-me.png
+    ├── plusbutton-lottie-423-messages.png
     ├── plusbutton-overlap-classic.png
     ├── plusbutton-overlap-flat.png
     ├── plusbutton-overlap-lg.png
