@@ -186,11 +186,17 @@ cache.downloadTimeout = 15;
 |:---|:---|
 | 页面的 `title` 会同时设置 Tab 与导航栏，而原地修改的 Tab 标题（本页的 API、皮肤、配置文件）不会传到导航栏。在创建 Tab 时让页面跟随 Tab 标题即可，不需要在 `-viewDidLoad` 中再设置标题：本库在 Tab 设置时与之后每次修改时设置 `navigationItem.title`，并发送 `CYLTabBarItemTitleDidChangeNotification`（object 为页面，`userInfo[CYLTabBarItemTitle]` 为新标题）。`CYL_TAB_BAR_ITEM_TITLE(page)` 随时读取当前的 Tab 标题（显示选中标题时返回普通标题）。 | A page's `title` sets both its tab and its navigation bar, and a tab title changed in place (this page's API, skins, configuration files) never reached the navigation bar. Make the page follow its tab title where the tabs are created; there is no need to set a title in `-viewDidLoad`: the library sets `navigationItem.title` when the tab is set up and on every later change, and posts `CYLTabBarItemTitleDidChangeNotification` (the object is the page, `userInfo[CYLTabBarItemTitle]` the new title). `CYL_TAB_BAR_ITEM_TITLE(page)` reads the current tab title at any time (the normal title while a selected title shows). |
 
+| PlusButton 的页面（PlusButton 子控制器）同样可以跟随：它的「Tab 标题」即 PlusButton 的标题。`-updatePlusButtonWithAttributes:`（以及换肤）修改标题时，本库设置该页面的导航栏标题，并发送同样的通知（object 为该页面，userInfo 另有 `CYLPlusButtonKey`；PlusButton 没有页面时 object 为 PlusButton）。ObjC 示例在 `+plusChildViewController` 中设置跟随，不再写死「PlusChildViewController」。 | The plus button's page (the plus child view controller) can follow too: its "tab title" is the plus button's title. When `-updatePlusButtonWithAttributes:` (or a skin) changes it, the library sets that page's navigation bar title and posts the same notifications (the object is the page, userInfo adds `CYLPlusButtonKey`; without a page the object is the plus button). The ObjC example makes it follow in `+plusChildViewController` instead of a fixed "PlusChildViewController". |
+| 2026-11-09 在 iOS 26.1 模拟器（液态玻璃）上验证：启动后 PlusButton 页面的导航栏显示「Post」（PlusButton 的标题，以前为「PlusChildViewController」）。原地修改标题由单元测试 `testPlusButtonTitleUpdatesItsPageNavigationTitle` 覆盖，本次未在模拟器上点击验证（模拟器自动化在示例列表中不稳定）。 | Verified on 2026-11-09 on an iOS 26.1 simulator (Liquid Glass): at launch the plus button's page reads "Post" (the plus button's title; it was "PlusChildViewController"). The in-place title change is covered by the unit test `testPlusButtonTitleUpdatesItsPageNavigationTitle`; it was not tapped through on the simulator this time (the simulator automation was unreliable in the example's list). |
+| ![PlusButton 页面的导航栏标题](assets/update-tab-plus-page-navigation-title.png) | ![The plus button page's navigation bar title](assets/update-tab-plus-page-navigation-title.png) |
+
 ```objc
 // Where the tabs are created (the ObjC example: MainTabBarController.m). 创建 Tab 的位置（ObjC 示例：MainTabBarController.m）。
 for (UIViewController *viewController in viewControllers) {
     CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(viewController.cyl_getViewControllerInsteadOfNavigationController);
 }
+// The plus button's page (the ObjC example: CYLPlusButtonSubclass.m, +plusChildViewController). PlusButton 的页面。
+CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(plusChildViewController);
 // Later, anywhere: 之后任意位置：
 NSString *title = CYL_TAB_BAR_ITEM_TITLE(self);
 ```

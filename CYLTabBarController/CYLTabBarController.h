@@ -2794,6 +2794,14 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidChangeNotification;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerKey;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemViewControllerKey;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemKey;
+/*!
+ * [EN] userInfo key when the plus button changed (`-updatePlusButtonWithAttributes:`, skins): the plus button. The same three
+ *      notifications are posted; their object is the plus button's page (the plus child view controller), or the plus button
+ *      when it has no page. Its page follows the new title like any tab (`CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM`).
+ * [CN] PlusButton 变化时（`-updatePlusButtonWithAttributes:`、换肤）的 userInfo key：PlusButton。发送同样的三个通知；object 为 PlusButton 的
+ *      页面（PlusButton 子控制器），没有页面时为 PlusButton。其页面与其他 Tab 一样跟随新标题（`CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM`）。
+ */
+FOUNDATION_EXTERN NSString *const CYLPlusButtonKey;
 
 /*!
  * [EN] Posted when a tab's title or selected title changes in place (`-updateTabBarItemsWithAttributes:`,
@@ -2877,7 +2885,7 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifiersKey;
  */
 @interface UIViewController (CYLTabBarItemTitle)
 
-/// [EN] The current title of the tab this page is in (its normal title, also while a selected title shows), nil outside a tab. [CN] 本页面所在 Tab 的当前标题（普通标题，显示选中标题时也是），不在 Tab 中时为 nil。
+/// [EN] The current title of the tab this page is in (its normal title, also while a selected title shows; the plus button's title for its page), nil outside a tab. [CN] 本页面所在 Tab 的当前标题（普通标题，显示选中标题时也是），不在 Tab 中时为 nil。
 @property (nonatomic, copy, readonly, nullable) NSString *cyl_tabBarItemTitle;
 
 /// [EN] YES: `navigationItem.title` is the tab's title, now and after every change. Default NO. [CN] YES：`navigationItem.title` 为 Tab 的标题，立即生效并在之后每次变化时更新。默认 NO。

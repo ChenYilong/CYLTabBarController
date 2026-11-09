@@ -275,7 +275,8 @@ docs/
     ├── update-tab-navigation-title-changed.png
     ├── update-tab-navigation-title-restored.png
     ├── update-tab-navigation-title-skin.png
-    └── update-tab-network-icons-plus-button.png
+    ├── update-tab-network-icons-plus-button.png
+    └── update-tab-plus-page-navigation-title.png
 ```
 
 <!-- navigation:end -->

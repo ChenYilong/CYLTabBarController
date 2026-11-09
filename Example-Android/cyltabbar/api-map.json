@@ -2298,6 +2298,10 @@
   "status": "planned",
   "note": "tab change notifications: Android listeners planned"
  },
+ "CYLPlusButtonKey": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
  "CYLTabBarItemOldTitleKey": {
   "status": "planned",
   "note": "tab change notifications: Android listeners planned"

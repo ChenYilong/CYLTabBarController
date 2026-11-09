@@ -417,7 +417,9 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 + (UIViewController *)plusChildViewController {
     UIViewController *plusChildViewController = [[UIViewController alloc] init];
 //    plusChildViewController.view.backgroundColor = [UIColor redColor];
-    plusChildViewController.navigationItem.title = CYLLocalizedString(@"PlusChildViewController");
+    // [EN] The navigation bar title is the plus button's title, also after it changes (a skin, `-updatePlusButtonWithAttributes:`).
+    // [CN] 导航栏标题即 PlusButton 的标题，标题变化后（换肤、`-updatePlusButtonWithAttributes:`）也会同步。
+    CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(plusChildViewController);
     UIViewController *plusChildNavigationController = [[UINavigationController alloc]
                                                    initWithRootViewController:plusChildViewController];
     // [EN] The library's localization (AGENTS.md): NSLocalizedString read the app's own table, which has no translation, so

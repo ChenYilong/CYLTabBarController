@@ -173,6 +173,43 @@
     XCTAssertEqual(iconNotes.firstObject.userInfo[CYLTabBarItemChangedAttributesKey][CYLTabBarItemImage], image);
 }
 
+/// [EN] The plus button's page follows the plus button's title: `-updatePlusButtonWithAttributes:` sets its navigation bar
+///      title and posts the title notification with the page as object and `CYLPlusButtonKey`.
+/// [CN] PlusButton 的页面跟随 PlusButton 的标题：`-updatePlusButtonWithAttributes:` 设置其导航栏标题，并发送以页面为 object、带有
+///      `CYLPlusButtonKey` 的标题通知。
+- (void)testPlusButtonTitleUpdatesItsPageNavigationTitle {
+    NSString *context = [NSUUID UUID].UUIDString;
+    UIViewController *plusPage = [[UIViewController alloc] init];
+    CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(plusPage);
+    UINavigationController *plusNavigation = [[UINavigationController alloc] initWithRootViewController:plusPage];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : context,
+        CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a" },
+                                                      @{ CYLTabBarItemTitle : @"B", CYLTabBarItemIdentifier : @"b" } ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [pageIdentifier isEqualToString:@"post"] ? plusNavigation : [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"],
+                                           CYLTabBarItemPageIdentifier : @"post" },
+    }];
+    [tabBarController loadViewIfNeeded];
+    XCTAssertTrue([tabBarController.viewControllers containsObject:plusNavigation]);
+    XCTAssertEqualObjects(plusPage.navigationItem.title, @"Post", @"the plus button's title when its tab is set up");
+    XCTAssertEqualObjects(CYL_TAB_BAR_ITEM_TITLE(plusPage), @"Post");
+    __block NSNotification *titleNote = nil;
+    id observer = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemTitleDidChangeNotification object:plusPage queue:nil usingBlock:^(NSNotification *note) {
+        titleNote = note;
+    }];
+    XCTAssertTrue([tabBarController updatePlusButtonWithAttributes:@{ CYLTabBarItemTitle : @"★ Post" }]);
+    [[NSNotificationCenter defaultCenter] removeObserver:observer];
+    XCTAssertEqualObjects(plusPage.navigationItem.title, @"★ Post", @"follows the plus button's new title");
+    XCTAssertEqualObjects(CYL_TAB_BAR_ITEM_TITLE(plusPage), @"★ Post");
+    XCTAssertEqualObjects(titleNote.userInfo[CYLTabBarItemTitle], @"★ Post");
+    XCTAssertEqualObjects(titleNote.userInfo[CYLTabBarItemOldTitleKey], @"Post");
+    XCTAssertNotNil(titleNote.userInfo[CYLPlusButtonKey]);
+    XCTAssertEqual(titleNote.userInfo[CYLTabBarItemViewControllerKey], plusNavigation);
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{
