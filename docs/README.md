@@ -278,6 +278,7 @@ docs/
 │   ├── update-tab-navigation-title-restored.png
 │   ├── update-tab-navigation-title-skin.png
 │   ├── update-tab-network-icons-plus-button.png
+│   ├── update-tab-plus-page-navigation-title-changed.png
 │   └── update-tab-plus-page-navigation-title.png
 ├── commit-readiness-2026-11-09.md
 └── instructions.md

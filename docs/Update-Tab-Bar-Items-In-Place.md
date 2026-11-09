@@ -40,6 +40,7 @@
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
 | [角标](#角标--badges) | [Badges](#角标--badges) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
+| [TODO](#todo) | [TODO](#todo) |
 
 <!-- navigation:end -->
 
@@ -187,8 +188,9 @@ cache.downloadTimeout = 15;
 | 页面的 `title` 会同时设置 Tab 与导航栏，而原地修改的 Tab 标题（本页的 API、皮肤、配置文件）不会传到导航栏。在创建 Tab 时让页面跟随 Tab 标题即可，不需要在 `-viewDidLoad` 中再设置标题：本库在 Tab 设置时与之后每次修改时设置 `navigationItem.title`，并发送 `CYLTabBarItemTitleDidChangeNotification`（object 为页面，`userInfo[CYLTabBarItemTitle]` 为新标题）。`CYL_TAB_BAR_ITEM_TITLE(page)` 随时读取当前的 Tab 标题（显示选中标题时返回普通标题）。 | A page's `title` sets both its tab and its navigation bar, and a tab title changed in place (this page's API, skins, configuration files) never reached the navigation bar. Make the page follow its tab title where the tabs are created; there is no need to set a title in `-viewDidLoad`: the library sets `navigationItem.title` when the tab is set up and on every later change, and posts `CYLTabBarItemTitleDidChangeNotification` (the object is the page, `userInfo[CYLTabBarItemTitle]` the new title). `CYL_TAB_BAR_ITEM_TITLE(page)` reads the current tab title at any time (the normal title while a selected title shows). |
 
 | PlusButton 的页面（PlusButton 子控制器）同样可以跟随：它的「Tab 标题」即 PlusButton 的标题。`-updatePlusButtonWithAttributes:`（以及换肤）修改标题时，本库设置该页面的导航栏标题，并发送同样的通知（object 为该页面，userInfo 另有 `CYLPlusButtonKey`；PlusButton 没有页面时 object 为 PlusButton）。ObjC 示例在 `+plusChildViewController` 中设置跟随，不再写死「PlusChildViewController」。 | The plus button's page (the plus child view controller) can follow too: its "tab title" is the plus button's title. When `-updatePlusButtonWithAttributes:` (or a skin) changes it, the library sets that page's navigation bar title and posts the same notifications (the object is the page, userInfo adds `CYLPlusButtonKey`; without a page the object is the plus button). The ObjC example makes it follow in `+plusChildViewController` instead of a fixed "PlusChildViewController". |
-| 2026-11-09 在 iOS 26.1 模拟器（液态玻璃）上验证：启动后 PlusButton 页面的导航栏显示「Post」（PlusButton 的标题，以前为「PlusChildViewController」）。原地修改标题由单元测试 `testPlusButtonTitleUpdatesItsPageNavigationTitle` 覆盖，本次未在模拟器上点击验证（模拟器自动化在示例列表中不稳定）。 | Verified on 2026-11-09 on an iOS 26.1 simulator (Liquid Glass): at launch the plus button's page reads "Post" (the plus button's title; it was "PlusChildViewController"). The in-place title change is covered by the unit test `testPlusButtonTitleUpdatesItsPageNavigationTitle`; it was not tapped through on the simulator this time (the simulator automation was unreliable in the example's list). |
+| 2026-11-09 在 iOS 26.1 模拟器（液态玻璃）上验证：启动后 PlusButton 页面的导航栏显示「Post」（PlusButton 的标题，以前为「PlusChildViewController」）。在首页点「批量更换标题」后，PlusButton 显示「★ Post」，打开其页面后导航栏也显示「★ Post」（第二张截图）。单元测试：`testPlusButtonTitleUpdatesItsPageNavigationTitle`。 | Verified on 2026-11-09 on an iOS 26.1 simulator (Liquid Glass): at launch the plus button's page reads "Post" (the plus button's title; it was "PlusChildViewController"). After "Change all titles" on the Home tab, the plus button reads "★ Post", and its page's navigation bar reads "★ Post" too (second screenshot). Unit test: `testPlusButtonTitleUpdatesItsPageNavigationTitle`. |
 | ![PlusButton 页面的导航栏标题](assets/update-tab-plus-page-navigation-title.png) | ![The plus button page's navigation bar title](assets/update-tab-plus-page-navigation-title.png) |
+| ![批量更换标题后 PlusButton 页面的导航栏标题](assets/update-tab-plus-page-navigation-title-changed.png) | ![The plus button page's navigation bar title after "Change all titles"](assets/update-tab-plus-page-navigation-title-changed.png) |
 
 ```objc
 // Where the tabs are created (the ObjC example: MainTabBarController.m). 创建 Tab 的位置（ObjC 示例：MainTabBarController.m）。
@@ -286,3 +288,12 @@ NSString *title = CYL_TAB_BAR_ITEM_TITLE(self);
 | 本库不依赖任何图片库；需要 WebP、渐进式加载等时，请用 `-setTabBarItemIconViewProvider:atIndex:` 返回 SDWebImage 或 Kingfisher 加载的视图。 | The library depends on no image library; for WebP, progressive loading and the like, return a view loaded by SDWebImage or Kingfisher from `-setTabBarItemIconViewProvider:atIndex:`. |
 | 替换页面会重新设置 TabBar：直接添加到 Tab 按钮上的视图（如封面、角标）需要在新按钮创建后重新添加，例如在 `-performWhenTabBarItemsReady:` 中。 | Replacing a page sets the tab bar up again: views added to the tab buttons yourself (covers, badges) must be added again to the new buttons, e.g. in `-performWhenTabBarItemsReady:`. |
 | 本次在 iOS 26.5 模拟器上验证了液态玻璃与扁平样式；经典样式（iOS 25 及更早）未在本次重新运行。 | Verified this time on the iOS 26.5 simulator with Liquid Glass and FlatDesign; the classic style (iOS 25 and earlier) was not run again this time. |
+
+## TODO
+
+| 中文 | English |
+|:---|:---|
+| 状态（2026-11-09）：iOS 上的标题、导航栏标题跟随与通知已完成，并经单元测试与 iOS 26.1 模拟器验证（含 PlusButton 页面）。 | Status (2026-11-09): titles, following navigation titles and notifications are done on iOS, verified by unit tests and on the iOS 26.1 simulator (the plus button's page included). |
+| 已知缺陷：原地更换标题后，液态玻璃下 Tab 按钮的辅助功能标签仍为旧标题（`axe describe-ui` 读到「Post」「Nearby」，屏幕上为「★ Post」「★ Nearby」），VoiceOver 读出旧标题。PlusButton 本身的标签已更新。完成标准：更换与恢复后 `describe-ui` 读到新标题，并补一个单元测试。 | Known defect: after an in-place title change on Liquid Glass, the tab buttons' accessibility labels keep the old titles (`axe describe-ui` reads "Post" and "Nearby" while the screen shows "★ Post" and "★ Nearby"), so VoiceOver reads the old titles. The plus button's own label is updated. Done when `describe-ui` reads the new titles after changing and restoring, with a unit test. |
+| 已知缺陷：批量更换标题后，「附近」角标中的「8」字体变小。 | Known defect: after "Change all titles", the "8" in the Nearby badge is drawn in a smaller font. |
+| 待做：Android 尚未提供导航栏标题跟随与 Tab 变化通知（`api-map.json` 中标为 planned）。完成标准：Android 实现相同的事件与参数，并在模拟器上验证。 | To do: Android has no following navigation titles or tab change notifications yet (marked planned in `api-map.json`). Done when Android offers the same events and parameters, verified on an emulator. |
